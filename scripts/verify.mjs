@@ -87,5 +87,20 @@ const patchRel = pack?.dsh?.bundle?.patch
 if (typeof patchRel !== 'string' || !existsSync(join(root, 'packages/company-pack', patchRel))) fail('pack-bundle', 'dsh.bundle.patch 缺失或未指向真实文件')
 else ok('pack-bundle')
 
+// ── 7. preset 行引用的插件必须在 pack dependencies 里 ──────────────────────
+// DSH 的 verify-cordis-config 同构门禁（AGENTS.md：cordis.yml 的裸插件必须出现在
+// 其解析清单的 dependencies）。漏了 → profile 安装后行解析不到 → preset 标记 broken，
+// UI 里给不出可用角色（R1 实证：persona / skill-filesystem 缺依赖）。
+const packDeps = new Set(Object.keys(pack?.dependencies ?? {}))
+const rowPlugins = new Set()
+for (const role of roles) {
+  const text = readFileSync(join(root, 'packages/company-pack/presets', role, 'agent.cordis.yml'), 'utf8')
+  for (const m of text.matchAll(/name:\s*'(@deepseek-ai\/[^']+)'/g)) {
+    rowPlugins.add(m[1])
+    if (!packDeps.has(m[1])) fail('preset-dep', `${role} 的行引用 ${m[1]}，但不在 pack dependencies（安装后解析不到 → preset broken）`)
+  }
+}
+ok(`preset-row-deps ×${rowPlugins.size}`)
+
 console.log(failures.length === 0 ? '\nverify: ALL PASS' : `\nverify: ${failures.length} FAILURE(S)`)
 process.exit(failures.length === 0 ? 0 : 1)

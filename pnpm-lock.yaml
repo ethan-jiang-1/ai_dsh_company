@@ -24,6 +24,12 @@ importers:
       '@deepseek-ai/dsh-experimental-tool-agent-team':
         specifier: workspace:*
         version: link:vendor/dsh/packages/experimental/tool-agent-team
+      '@deepseek-ai/dsh-persona':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/preset/persona
+      '@deepseek-ai/dsh-skill-filesystem':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/skill/skill-filesystem
       '@deepseek-ai/dsh-tool-present':
         specifier: workspace:*
         version: link:vendor/dsh/packages/fs/tool-present
@@ -60,9 +66,15 @@ importers:
       '@deepseek-ai/dsh-experimental-tool-agent-team':
         specifier: 0.1.5-rc.2
         version: link:../../vendor/dsh/packages/experimental/tool-agent-team
+      '@deepseek-ai/dsh-persona':
+        specifier: 0.1.5-rc.2
+        version: link:../../vendor/dsh/packages/preset/persona
       '@deepseek-ai/dsh-session-persistence-jsonl':
         specifier: 0.1.5-rc.2
         version: link:../../vendor/dsh/packages/session/session-persistence-jsonl
+      '@deepseek-ai/dsh-skill-filesystem':
+        specifier: 0.1.5-rc.2
+        version: link:../../vendor/dsh/packages/skill/skill-filesystem
       '@deepseek-ai/dsh-tool-fs':
         specifier: 0.1.5-rc.2
         version: link:../../vendor/dsh/packages/fs/tool-fs

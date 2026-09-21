@@ -1,11 +1,13 @@
 {
   "name": "dsh-company-pack",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "type": "module",
   "description": "Virtual company multi-role plugin pack: 4 role presets (CEO / VP-Eng / VP-Sales / COO) + host bundle rows. Design docs: docs/00-index.md",
   "dependencies": {
     "@deepseek-ai/dsh-agent-presets": "0.1.5-rc.2",
+    "@deepseek-ai/dsh-persona": "0.1.5-rc.2",
+    "@deepseek-ai/dsh-skill-filesystem": "0.1.5-rc.2",
     "@deepseek-ai/dsh-session-persistence-jsonl": "0.1.5-rc.2",
     "@deepseek-ai/dsh-tool-fs": "0.1.5-rc.2",
     "@deepseek-ai/dsh-tool-fs-search": "0.1.5-rc.2",

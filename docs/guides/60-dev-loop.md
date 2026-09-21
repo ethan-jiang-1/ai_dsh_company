@@ -191,5 +191,11 @@ pnpm dsh web -- --port 3081 --no-open                                      # 308
   `devDependencies`（`workspace:*`）——源码 CLI 下 TS 导入走 tsconfig paths 进 src，但插件清单的
   `require.resolve` 走 **Node 原生解析**，root 无链接就报
   `REQUEST_EXTENSION: DeepSeek request extension preparation failed`。
+- **preset 行的插件必须在 pack dependencies 里**（R1 实证，`pnpm verify` 已加门禁）：
+  preset 的 `agent.cordis.yml` 里 `name:` 写的裸插件（如 `@deepseek-ai/dsh-persona`、
+  `dsh-skill-filesystem`）会**按安装域解析**——不在 pack dependencies（profile 安装）或根
+  devDeps workspace 链接（源码域）里，行就解析不到 → **preset 被标记 broken → UI 给不出可用角色**
+  （扫描得到、名字也对，就是不能用；`discoverPresets` 的 `broken` 字段是唯一线索）。
+  对应 DSH 的 `verify-cordis-config` 门禁；我们同构到 `scripts/verify.mjs` 检查 7。
 - **patchReload**：headless 用途的自定义 profile 必须 `"startup"`（见 §2 第 3.5 层）；web 形态
   才用 `"live"`。
