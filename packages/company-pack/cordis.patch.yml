@@ -6,13 +6,18 @@
 #   会 not found 警告丢弃——那种场景用 dev/company.overlay.yml 的 insert 补。
 # 依赖纪律：runtime deps 精确钉 0.1.5-rc.2（= vendor 钉住 tag；R5 转 peer + compatibility 矩阵）。
 
-# ── preset roster（替换 web-app 的出厂行；roots 自定位到本包安装目录的 presets/）──
+# ── preset roster（替换 web-app 的出厂行；roots 自定位）──
+# ⚠ baseUrl 语义（R1 实证，app-boot/src/index.ts:799）：`ctx.baseUrl` = **profile 目录**
+#   （cordis.yml 所在处的 file URL），不是本包安装目录。所以路径必须写成 profile 相对的
+#   `node_modules/dsh-company-pack/presets/`；写成 `presets/` 会指向 <profile>/presets/
+#   ——不存在 → scanRoot 遇 ENOENT **静默返回空** → UI 里看不到任何公司角色。
+#   UI 按 trust 分组：本行 trust: system → 四个角色出现在 **Built-in** 组（不是 Custom）。
 - id: agent-presets
   name: '@deepseek-ai/dsh-agent-presets'
   config:
     default: ceo
     roots:
-      - path: !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('presets/', baseUrl))"
+      - path: !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/', baseUrl))"
         trust: system
 
 - insert:

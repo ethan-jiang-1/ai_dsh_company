@@ -50,4 +50,16 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       expect(patch).toMatch(new RegExp(`^\\s+- id: ${row}$`, 'm'))
     }
   })
+
+  it('roots 是 profile 相对路径（baseUrl = profile 目录，写成 presets/ 会静默扫空）', () => {
+    const patch = readFileSync(join(PACK, 'cordis.patch.yml'), 'utf8')
+    const match = /path:\s*!!js\s*"([^"]+)"/.exec(patch)
+    expect(match, 'roots path 应为 !!js 表达式').not.toBeNull()
+    const expr = (match as RegExpExecArray)[1] as string
+    const fakeProfile = 'file:///tmp/dsh-profile-fixture/'
+    const resolved = new Function('baseUrl', `return ${expr}`)(fakeProfile) as string
+    // 2026-09-22 实证：写成 `presets/` → <profile>/presets/（不存在）→ scanRoot 静默返回空 → UI 无角色
+    expect(resolved).toBe(fileURLToPath(new URL('node_modules/dsh-company-pack/presets/', fakeProfile)))
+    expect(resolved).toContain('node_modules/dsh-company-pack/presets')
+  })
 })

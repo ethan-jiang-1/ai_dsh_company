@@ -192,6 +192,12 @@ pnpm dsh web -- --port 3081 --no-open                                      # 308
   `devDependencies`（`workspace:*`）——源码 CLI 下 TS 导入走 tsconfig paths 进 src，但插件清单的
   `require.resolve` 走 **Node 原生解析**，root 无链接就报
   `REQUEST_EXTENSION: DeepSeek request extension preparation failed`。
+- **`!!js` 里的 `baseUrl` = profile 目录，不是你的包目录**（R1 实证，`app-boot/src/index.ts:799`
+  设 `ctx.baseUrl = pathToFileURL(dirname(configPath)) + '/'`）。所以 bundle 里给 agent-presets 的
+  roots 必须写 profile 相对路径（`node_modules/<你的包>/presets/`）；写成 `presets/` 会指向
+  `<profile>/presets/`——不存在 → `scanRoot` 遇 ENOENT **静默返回空** → UI 里一个角色都不出现
+  （无报错、无警告，最难查的一类）。另：**preset 在 UI 按 trust 分组**——`system` → **Built-in**、
+  `user` → **Custom**（`AgentPresetSection.tsx`）。
 - **preset 行的插件必须在 pack dependencies 里**（R1 实证，`pnpm verify` 已加门禁）：
   preset 的 `agent.cordis.yml` 里 `name:` 写的裸插件（如 `@deepseek-ai/dsh-persona`、
   `dsh-skill-filesystem`）会**按安装域解析**——不在 pack dependencies（profile 安装）或根
