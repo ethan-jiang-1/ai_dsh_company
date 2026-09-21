@@ -42,6 +42,15 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
+  it('四个角色显示名共用公司前缀（D14 系列命名，R2 补角色时不许忘）', () => {
+    const names = ['ceo', 'vp-eng', 'vp-sales', 'coo'].map(role => {
+      const match = /^name:\s*(.+)$/m.exec(readFileSync(join(PRESETS_DIR, role, 'preset.yml'), 'utf8'))
+      expect(match, `${role} preset.yml 缺 name`).not.toBeNull()
+      return (match as RegExpExecArray)[1]!.trim()
+    })
+    expect(names.every(name => name.startsWith('wochen ')), `显示名未共用 wochen 前缀：${names.join(' / ')}`).toBe(true)
+  })
+
   it('bundle 行：agent-presets 用替换语义（覆盖 web-app 出厂行），其余新增走 insert', () => {
     const patch = readFileSync(join(PACK, 'cordis.patch.yml'), 'utf8')
     expect(patch).toMatch(/^- id: agent-presets$/m)

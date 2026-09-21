@@ -61,6 +61,7 @@ implemented → archived）。
 | D11 | **迭代单位 = 垂直轮**：R1 最薄全路径（CEO+VP-Eng 两人公司）→ 逐轮加宽；交付按完整垂直切片、验证按最窄证据、打磨蛇形折回；现成团队 UI R1 作观察窗、R2 进验收，自定义皮肤 R5；每轮换全新对话上下文（交接靠 roadmap 两清单） | notes/implemented/2026-09-21-vertical-rounds.md；FAQ 13 dev-loop 第 4/6 阶段 |
 | D12 | **patch 语义定案**（R1 实证）：`- id:` 只替换已有行（not found 即丢弃并警告）；**新增行必须 `- insert:` 子列表**；因此 host 行随 pack 的 bundle 走，且 `agent-presets` 行用**替换**语法覆盖 web-app 的出厂行（default: standard → ceo + 自定位 roots）；纯 headless 组合（无此行）用 `dev/company.overlay.yml` 的 insert 补 | notes/implemented/2026-09-22-r1-*.md；vendor shipped dsh-headless/dsh-web-app 的 cordis.patch.yml |
 | D13 | **开发纪律全程沿用 DSH**（整套继承 + 按本 repo 规模裁剪，**不发明本地流程**）；纪律权威在 vendor 树（`AGENTS.md`/`docs/AGENTS.md`/`docs/testing.md`/`.agents/notes/`），本 repo 只做落点映射 | AGENTS.md §纪律（权威对照表）；用户指令 |
+| D14 | **公司名 = wochen；角色显示名系列化** `<公司名> <角色>`（`wochen CEO` 等）；**preset id 保持 kebab 不变**（`ceo`/`vp-eng`/`vp-sales`/`coo`——id 受 `PRESET_ID=/^[a-z0-9][a-z0-9-]*$/` 限制，不能带下划线/大写）；角色层级不动（CEO 是个体、VP 是职能，见 40 §0.1） | notes/implemented/2026-09-22-wochen-naming.md；40 §1 |
 
 ### 待定（阻塞项标 ⛔）
 

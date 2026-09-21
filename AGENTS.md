@@ -1,7 +1,8 @@
 # AGENTS.md — 本仓库的入口链
 
-虚拟公司多角色 DSH 插件：一个包（`packages/company-pack`）提供四个角色 preset
-（CEO / VP-Eng / VP-Sales / COO）+ host profile 源；协作用 DSH 现成通道（Agent Teams 主通道）。
+虚拟公司（**wochen**）多角色 DSH 插件：一个包（`packages/company-pack`）提供四个角色 preset
+（显示名 `wochen CEO` / `wochen VP-Eng` / `wochen VP-Sales` / `wochen COO`）+ host profile 源；
+协作用 DSH 现成通道（Agent Teams 主通道）。
 
 ## 布局
 
