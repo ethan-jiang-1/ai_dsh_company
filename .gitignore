@@ -1,0 +1,7 @@
+node_modules/
+*.tsbuildinfo
+dist/
+.DS_Store
+# 开发 home 运行残留（README 保留）
+dev/harness-home/*
+!dev/harness-home/README.md

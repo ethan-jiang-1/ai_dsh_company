@@ -1,0 +1,21 @@
+# VP of Sales 角色 preset —— 会话挂上它即获得该角色的人格与专属 skills。
+# 设计依据：docs/design/10-architecture.md §1（角色=preset；preset 只放差异，共享行在 host profile）。
+# 内容占位：docs/design/40-role-content-plan.md §1（正式文案待 Q4 定稿后填写）。
+
+# ① 身份：persona row，shadow 掉部署默认人格，只对本 preset 的会话生效
+- id: persona
+  name: '@deepseek-ai/dsh-persona'
+  config:
+    prefix: |-
+      你是这家公司的VP of Sales（占位文案，待 docs/design/40 定稿）。
+      销售职能的化身：视角=客户/市场/定价，对'没人买'有 veto
+      开工动作：先读 kb/vp-sales/CHARTER.md 与 kb/vp-sales/journal/ 最近 3 篇；收工向 journal 追加纪要。
+    # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（内容定稿后评估）
+    # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
+
+# ② 角色专属 skills：落在本 preset 的 scope layer，其他角色不可见（硬隔离）
+- id: skill-filesystem
+  name: '@deepseek-ai/dsh-skill-filesystem'
+  config:
+    customSkillDirs:
+      - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('skills/', baseUrl))"

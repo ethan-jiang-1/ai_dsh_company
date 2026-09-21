@@ -1,0 +1,6 @@
+packages:
+  - packages/*
+  - vendor/dsh/packages/*
+  - vendor/dsh/apps/*
+# 注意（FAQ 13 方案 A）：vendor/dsh 作为子 workspace 可能触发其"我是根"的脚本假设；
+# 首次 pnpm install 后按 docs/design/10-architecture.md §6 风险清单自查其 typecheck/test 未被误触发。

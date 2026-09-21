@@ -1,0 +1,10 @@
+{
+  "name": "dsh-company-pack",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Virtual company multi-role plugin pack: 4 role presets (CEO / VP-Eng / VP-Sales / COO) + host profile source. Design docs: docs/00-index.md",
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" }
+  }
+}

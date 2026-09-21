@@ -1,0 +1,9 @@
+{
+  "name": "ai-dsh-company",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dsh": "node --import tsx/esm vendor/dsh/apps/cli/src/bin.ts",
+    "verify": "node scripts/verify.mjs"
+  }
+}
