@@ -8,3 +8,5 @@
 | 2026-09-21 | 双 DSH 立为一等事实：vendor 基线 / 日用全局安装 / 外部研究树三实体表进 AGENTS.md，env.sh 裸 dsh 环境级拦截，guides/60 §6 扩双 DSH | implemented → [implemented/2026-09-21-dual-dsh-entities.md](./implemented/2026-09-21-dual-dsh-entities.md) |
 | 2026-09-21 | roadmap 重切垂直轮（D11）+ UI 归轮 + 轮次交接清单（新会话开工/轮次收尾）：R1 两人公司最薄全路径，团队 UI R1 观察窗 R2 验收，皮肤 R5；Q4 降为最小动议 | implemented → [implemented/2026-09-21-vertical-rounds.md](./implemented/2026-09-21-vertical-rounds.md) |
 | 2026-09-22 | R0 立环验收：workspace 形状/版本对齐/pnpm 入口/tsconfig 门面/局部 host 面/原生 flock 零特权编译/roots 实测回填/profile.md 诞生——`pnpm dsh --profile headless` 真会话跑通 | implemented → [implemented/2026-09-22-r0-loop-acceptance.md](./implemented/2026-09-22-r0-loop-acceptance.md) |
+| 2026-09-22 | R1 两人公司：CEO/VP-Eng 正式 persona+skills+KB，company profile 部署+team web bundle 观察窗，入戏探针（M1），跑动议「知识库自建技术评估」出第一份 deliverable | in progress |
+| 2026-09-22 | R1 中途文档同步（fresh-agent 审计）+ 纪律强调：AGENTS.md 纪律段改"全程沿用 DSH 纪律"并建权威对照表（D13），修 README/AGENTS/pack README/design10 §6/00-index/guides60 的陈旧叙述 | implemented → [implemented/2026-09-22-r1-docs-sync.md](./implemented/2026-09-22-r1-docs-sync.md) |

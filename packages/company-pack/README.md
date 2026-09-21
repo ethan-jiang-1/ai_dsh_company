@@ -4,7 +4,7 @@
 
 | 面 | 内容 | 轮次 |
 |---|---|---|
-| 配置面（现在） | `presets/<role>/`（persona + skills，硬隔离）+ `profiles/company.cordis.yml`（host 共享行源）+ `cordis.patch.yml`（空 bundle） | R0–R2 |
+| 配置面（现在） | `presets/<role>/`（persona + skills，硬隔离）+ `cordis.patch.yml`（bundle 行：`agent-presets` 替换 web-app 出厂行、`tool-present`/团队两行 insert）+ `package.json` 的 runtime deps（8 个，精确钉 `0.1.5-rc.2`） | R0–R2 |
 | host 代码面 | `src/`（M2 委托 provider、org 工具——有了再建，见 docs/design/20 §3 / 10 §2.1） | R3+ |
 | client 面 | `src/client/` + `dsh.client` 字段 + tsdown 构建（Company 驾驶舱，docs/30 §2） | R5 |
 

@@ -1,0 +1,17 @@
+# company 组合 overlay（实验/动议用）：挂在 shipped headless 上加公司行。
+# 全源码域解析（workspace 协议），无 profile 安装混线。
+# 语法：新增行用 insert；替换行用 - id:（教义见 guides/60 §2 第 1 层）。
+- insert:
+    - id: agent-presets
+      name: '@deepseek-ai/dsh-agent-presets'
+      config:
+        default: ceo
+        roots:
+          - path: /Users/bowhead/ai_dsh_company/packages/company-pack/presets
+            trust: system
+    - id: tool-present
+      name: '@deepseek-ai/dsh-tool-present'
+    - id: agent-team
+      name: '@deepseek-ai/dsh-experimental-agent-team'
+    - id: tool-agent-team
+      name: '@deepseek-ai/dsh-experimental-tool-agent-team'

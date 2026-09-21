@@ -1,5 +1,26 @@
-# company-pack 的 bundle 层：dsh plugin add 时并入的默认插件行。
-# 阶段 0 为空列表——pack 的价值先在 presets/ 与 profiles/，host 共享行走 profile 部署。
-# 已知风险（记录在 notes/implemented/2026-09-21-repo-scaffolding.md）：空列表若被 Loader
-# 拒绝，阶段 5 release-smoke 时把 profiles/company.cordis.yml 的共享行折叠进来。
-[]
+# company-pack 的 bundle 层：plugin add 时并入的默认行（host 共享面；角色差异在 presets/）。
+# 语法教义（R1 实证，源自 shipped dsh-headless 的 cordis.patch.yml）：
+#   `- id: X` 只能替换 base/bundle 已有行；**新增行必须 `- insert:` 子列表**。
+#   ⚠ agent-presets 用替换语法：web-app bundle 已 insert 此行（default: standard），
+#   我们的替换行把 config 换成自己的 roots + default: ceo；在无此行的组合（纯 headless）
+#   会 not found 警告丢弃——那种场景用 dev/company.overlay.yml 的 insert 补。
+# 依赖纪律：runtime deps 精确钉 0.1.5-rc.2（= vendor 钉住 tag；R5 转 peer + compatibility 矩阵）。
+
+# ── preset roster（替换 web-app 的出厂行；roots 自定位到本包安装目录的 presets/）──
+- id: agent-presets
+  name: '@deepseek-ai/dsh-agent-presets'
+  config:
+    default: ceo
+    roots:
+      - path: !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('presets/', baseUrl))"
+        trust: system
+
+- insert:
+    # ── 交付物声明工具（base 无此行）──
+    - id: tool-present
+      name: '@deepseek-ai/dsh-tool-present'
+    # ── 团队协作（主通道 M4/D4；直插行——未装官方 bundle，无续驶控制冲突，10 §3 冲突注①）──
+    - id: agent-team
+      name: '@deepseek-ai/dsh-experimental-agent-team'
+    - id: tool-agent-team
+      name: '@deepseek-ai/dsh-experimental-tool-agent-team'

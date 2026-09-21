@@ -7,13 +7,13 @@
 
 ```
 CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 门禁校验）
-packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、profiles/、cordis.patch.yml、src/（R3+ 才有代码）
+packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml（bundle 行：roster 替换+团队/present 新增）、src/（R3+ 才有代码）
 company-workspace/      运行时"公司共享盘"（会话 cwd）：kb/<role>/（CHARTER+journal）、templates/、deliverables/
 vendor/dsh/             DSH 源码 submodule（钉 tag，见下）
 docs/                   文档层：00-index（地图+决策台账+外部材料登记）→ design/ plans/ guides/ + 顶层合同
 notes/                  决策记录：intents.md → proposed/ → implemented/
 scripts/                verify.mjs（结构门禁）……
-dev/harness-home/       开发 DSH_HOME（gitignore 运行残留）
+dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）
 snapshots/              最小 replay 证据（R5 起，JSONL diff 起步）
 ```
 
@@ -26,7 +26,9 @@ git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 corepack enable pnpm                   # 一次性：pnpm 走 Node 自带 corepack（读 packageManager 钉 11.7.0）
 pnpm install                           # workspace 解析（vendor/dsh 全树）；引导全配方见 guides/60 §7
 source dev/env.sh                      # 双 home 兜底：DSH_HOME=<repo>/dev/harness-home，别碰日用 ~/.dsh；并把裸 dsh（日用全局安装）拦截
+                                       # ⚠ 每个新 shell/后台 job 必须先 source 本文件——DSH_HOME 不继承，漏了会静默写日用 home（guides/60 §6.5）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（R0 已验收）
+pnpm dsh web -- --port 3081 --no-open  # web 观察窗（需 client 面+前端构建，guides/60 §7）；3080 是本 GUI 占用
 pnpm verify                            # 结构门禁（UTF-8/链接/preset 结构/symlink/vendor pin/pack 形状）
 node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile → dsh plugin add → 冒烟
 ```
@@ -58,17 +60,27 @@ node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile
   `_faq_on_digested/13_expert-plugin-repo-organization/`（本 repo 形态的依据 FAQ）。
   引用时注明是外部研究材料；逐份落点登记见 `docs/00-index.md` §外部研究材料登记。
 
-## 纪律（沿用 DSH 开发习惯）
+## 纪律（**全程沿用 DSH 的研发纪律**，不发明本地流程）
 
-- **docs/ = 当前合同**（只写 now，按性质分层不按时间）；**notes/ = 决策**（非平凡变更必须带
-  Note：决定 / 输掉的方案 / 需要验证什么；proposed 与实现在同一 diff 改写为 implemented）。
-- **窄证据切片**：核对现场 → 窄 diff → 原子修改 → 跑最小证据（`pnpm verify` 起步）→ 沉淀 →
-  只报告实际跑过的检查。
-- **真实安装形状**：源码直跑之外，交付前 `npm pack` → 干净 profile → `dsh plugin add` 冒烟
-  （源码测试会掩盖依赖声明错误）。
-- **升级环**：`vendor/dsh` 换 tag → 记 SHA 簿记 → typecheck → compatibility 矩阵加列 → 重装冒烟。
-- 开发环的完整操作手册（调试阶梯 / 插拔速查 / 设计四问 / 发布纪律时点 / 双 home）：
-  `docs/guides/60-dev-loop.md`；demo 现场运维 runbook：`docs/guides/50-budget-and-ops.md`。
+本 repo 的开发过程不是"借鉴"DSH，而是**整套继承**：凡 DSH 有明文纪律的，一律照做，只按本
+repo 规模裁剪（例如 CI 穷举暂由本地门禁代行）。**纪律的权威在 vendor 树，不在本 repo 的转述**：
+
+| DSH 纪律 | 权威（vendor 树） | 本 repo 落点 |
+|---|---|---|
+| docs = 当前合同（一处事实一个家，只写 now） | `docs/AGENTS.md` | `docs/` 按性质分层（D10）+ `pnpm verify` 链接门禁 |
+| 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么） | `.agents/notes/README.md` | `notes/intents.md → implemented/` |
+| 窄证据切片；本地窄、CI 穷举；只报告实际跑过的检查 | `AGENTS.md` Run relevant checks | guides/60 §1 六步闭环 + `pnpm verify` |
+| 测试分层（unit/coverage/e2e/expected/**snapshot 无 key 重放**）；测试描述行为 | `docs/testing.md` | `snapshots/`（R5 正式化；R1 会话日志即首份资产） |
+| 真实入口路径（发布产物 `lib/` 跑）+ 真实安装形状 | `docs/testing.md` Test the real entry path | R5 `release-smoke`（`npm pack`→干净 profile→`plugin add`） |
+| 源码面/产物面不混（paths 指 src） | `AGENTS.md` Conventions | 根 `tsconfig.json` extends vendor base |
+| vendor 钉版本 + manifest/SHA + 同步程序 | `vendor/README.md` | AGENTS.md vendor 簿记 + `scripts/sync-dsh.mjs`（R5） |
+| 日志税：model-visible ⟺ logged | `AGENTS.md` Conventions | guides/60 §3 设计四问② |
+| 机械门禁（结尾换行、链接、结构） | `AGENTS.md` Conventions + `scripts/run-gates.ts` | `scripts/verify.mjs` |
+
+- 具体操作手册：`docs/guides/60-dev-loop.md`（六步闭环 / 调试阶梯 / 插拔速查 / 设计四问 /
+  发布纪律时点 / 双 home）。demo 现场运维 runbook：`docs/guides/50-budget-and-ops.md`。
+- **不发明**：不新增 spec 流程（OpenSpec 留触发条件，guides/60 §5）、不自造调度器/记忆/门禁——
+  优先用 DSH 现成载体（D13）。
 
 ## vendor 簿记
 
@@ -80,7 +92,9 @@ node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile
 
 ## 当前状态
 
-**R0（立环）✅ 完成（2026-09-22）**：`pnpm dsh --profile headless` 从 vendor 源码跑通真实 API
-会话；环境引导配方沉淀于 guides/60 §7。当前轮 **R1 两人公司——▶ 可开工**（Q4 已定：
-「给我们公司要不要自建知识库写一页技术评估」）；迭代按垂直轮（D11）见
-`docs/plans/roadmap.md`。
+**R0（立环）✅ 完成（2026-09-22）**；**R1 两人公司 🔄 进行中**：内容面（CEO/VP-Eng 正式
+persona + 各 1 skill + KB 章程 + review-note 模板）与部署面（pack 装进 company/web profile、
+组合核验 155 行）已完成；待办：入戏探针（M1）、跑动议「给我们公司要不要自建知识库写一页
+技术评估」出第一份 deliverable、R1 收尾（demo.md 雏形/presets.md/Note）。
+观察窗：`pnpm dsh web -- --port 3081 --no-open`（3080 是本 GUI 占用）。迭代按垂直轮（D11）
+见 `docs/plans/roadmap.md`。

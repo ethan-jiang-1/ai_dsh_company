@@ -49,7 +49,7 @@ implemented → archived）。
 | # | 决定 | 依据/出处 |
 |---|---|---|
 | D1 | **自写包 = 1 个**（company-pack）；行多包少，角色是 preset 目录不是包 | 10 §2；FAQ 13 决策 2 |
-| D2 | 角色 = agent preset（persona row + 自有 skills/ + 角色工具行），共享行放 host/profile 层、preset 只放差异 | 10 §1/§6；cordis preset 两平面教义 |
+| D2 | 角色 = agent preset（persona row + 自有 skills/ + 角色工具行），共享行**随 pack 的 bundle 层**、preset 只放差异（R1 实证细化：profile 层 patch 只能替换不能新增，见 D12） | 10 §1/§6；cordis preset 两平面教义 |
 | D3 | repo 形态 = FAQ 13 方案 A：独立 repo + `vendor/dsh` pinned submodule + 双 home | 10 §6；FAQ 13 |
 | D4 | **demo 主通道 = Agent Teams（M4/通道 B）**；"事件从 CEO 进出"由 Lead-only 权威模型内建 | 10 §2.2 + plans/roadmap；用户 demo 需求 |
 | D5 | 第 0 天零自定义 JS：纯配置 pack + 现成 team profile bundle 即可跑通 demo v0（注：R3 加 continuable 委托前，把 team 两包改为直插我们 profile 的行——bundle 会 disable 全局续驶控制，见 10 §3 通道 A 冲突注） | 10 §2.1/§3；30 §1 |
@@ -59,6 +59,8 @@ implemented → archived）。
 | D9 | 上游缺口（常驻对话+独立组合）若成刚需→走 FAQ 13 方案 B 提 seam（`ChildComposition` 加 preset 字段），不 vendor patch | 20 §4.1 |
 | D10 | **docs/ 按性质分层（导航/设计/计划/指南/合同），不按时间分层**；初始意图归 `notes/intents.md`（否决"初始化/"目录方案） | notes/implemented/2026-09-21-docs-layering.md |
 | D11 | **迭代单位 = 垂直轮**：R1 最薄全路径（CEO+VP-Eng 两人公司）→ 逐轮加宽；交付按完整垂直切片、验证按最窄证据、打磨蛇形折回；现成团队 UI R1 作观察窗、R2 进验收，自定义皮肤 R5；每轮换全新对话上下文（交接靠 roadmap 两清单） | notes/implemented/2026-09-21-vertical-rounds.md；FAQ 13 dev-loop 第 4/6 阶段 |
+| D12 | **patch 语义定案**（R1 实证）：`- id:` 只替换已有行（not found 即丢弃并警告）；**新增行必须 `- insert:` 子列表**；因此 host 行随 pack 的 bundle 走，且 `agent-presets` 行用**替换**语法覆盖 web-app 的出厂行（default: standard → ceo + 自定位 roots）；纯 headless 组合（无此行）用 `dev/company.overlay.yml` 的 insert 补 | notes/implemented/2026-09-22-r1-*.md；vendor shipped dsh-headless/dsh-web-app 的 cordis.patch.yml |
+| D13 | **开发纪律全程沿用 DSH**（整套继承 + 按本 repo 规模裁剪，**不发明本地流程**）；纪律权威在 vendor 树（`AGENTS.md`/`docs/AGENTS.md`/`docs/testing.md`/`.agents/notes/`），本 repo 只做落点映射 | AGENTS.md §纪律（权威对照表）；用户指令 |
 
 ### 待定（阻塞项标 ⛔）
 

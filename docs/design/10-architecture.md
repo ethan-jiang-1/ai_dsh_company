@@ -246,16 +246,14 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
 ai_dsh_company/
 ├── AGENTS.md                     # 入口链：怎么跑、DSH 源在 vendor/dsh、探索路由、DSH_HOME 兜底
 ├── CLAUDE.md -> AGENTS.md
-├── pnpm-workspace.yaml           # packages/* + vendor/dsh/packages/*
+├── pnpm-workspace.yaml           # packages/* + vendor/dsh 全树（packages/*/* + apps/* + vendor/* + native/system*）
 ├── package.json                  # private root；dsh script 指向 vendor/dsh 的 CLI 入口；
-│                                 #   @deepseek-ai/cordis 作 peerDependency
+│                                 #   devDeps 含四个 insert 行的 workspace:* 链接（require.resolve 解析需要，R1 实证）
+├── tsconfig.json                 # 源码面门面：extends vendor base（paths → vendor src）
 ├── packages/
 │   └── company-pack/             # 唯一发布载体（自包含），第 0 天就这一个包
-│       ├── package.json          # dsh.bundle.patch + dsh.compatibility 矩阵
-│       ├── cordis.patch.yml      # bundle 默认行（可先薄后厚）
-│       ├── profiles/
-│       │   └── company.cordis.yml  # host 层：共享工具行 + team 两包 + persistence
-│       │                          #   + dsh-agent-presets 的 roots 指向本 pack 的 presets/
+│       ├── package.json          # dsh.bundle.patch + runtime deps（精确钉 0.1.5-rc.2）
+│       ├── cordis.patch.yml      # bundle 行（host 共享面）：agent-presets 替换 + 团队/present insert
 │       ├── presets/
 │       │   ├── ceo/              # agent.cordis.yml（persona + delegation 工具行 + team 使用策略）
 │       │   │   ├── preset.yml    # 显示名/描述（picker 里看到的"CEO"）
@@ -269,7 +267,10 @@ ai_dsh_company/
 │   ├── templates/                #   文档模板（PRD/周报/评审……）
 │   └── deliverables/             #   产出物落这里，用 present 标记
 ├── vendor/dsh/                   # git submodule 钉 release tag（agent 探索 DSH 源码的红利）
-├── dev/harness-home/             # 开发 DSH_HOME（双 home 隔离；export DSH_HOME 兜底进脚本）
+├── dev/
+│   ├── env.sh                    # 双 home 兜底（DSH_HOME）+ 裸 dsh 拦截
+│   ├── company.overlay.yml       # headless + --patch 实验/动议用的 insert overlay（无 web-app 行的组合）
+│   └── harness-home/             # 开发 DSH_HOME（双 home 隔离；gitignore 运行残留）
 ├── scripts/
 │   ├── verify.mjs                # 结构/链接/自包含门禁
 │   ├── release-smoke.mjs         # npm pack → 干净 profile → dsh plugin add → 冒烟会话
@@ -281,20 +282,25 @@ ai_dsh_company/
 
 要点：
 
-1. **共享行放 host/profile 层，preset 只放差异**。preset 层没有 patch 继承（"standard plus one
+1. **共享行随 pack 的 bundle 层，preset 只放差异**（R1 实证修正：原设计写"放 profile 层"，
+   实测 **profile 层 patch 只能替换已有行、不能新增**）。preset 层没有 patch 继承（"standard plus one
    change"不可表达，shipped `cordis`/`ptc` 都是整份复制再改）；4 个角色 preset 若各自复制全部
-   共享行，维护成本翻四倍。把 fs/bash/检索/team 行放 `profiles/company.cordis.yml`，
-   角色 preset 薄到 persona + skills + 角色特有工具。代价是 preset 不再"拷走即用"——我们是
-   自部署产品，这个代价可控，且换来 DRY。
-2. **presets 进 roster 的落法**（FAQ 13 已核实）：pack 里的 `presets/` 不会自动进 roster，
-   `dsh-agent-presets` 只扫 shipped 根 / 配置 `roots` / 用户根 `<dshHome>/.agent-presets`。
-   走 `roots`（带 `trust`——preset 是受信配置）；**这行 patch 放 profile 层**（patch 对一行是
-   整行替换，在 pack 自己的 patch 里动 `dsh-agent-presets` 得连 base 配置一起重述，更稳的是
-   profile 层）。
+   共享行，维护成本翻四倍。把 fs/检索/team/present 行放进 pack 的 `cordis.patch.yml`
+   （新增用 `- insert:`），角色 preset 薄到 persona + skills + 角色特有工具。代价是 preset
+   不再"拷走即用"——我们是自部署产品，这个代价可控，且换来 DRY。
+2. **presets 进 roster 的落法**（FAQ 13 已核实 + R1 实证）：pack 里的 `presets/` 不会自动进
+   roster，`dsh-agent-presets` 只扫 shipped 根 / 配置 `roots` / 用户根。roots 行写在 pack 的
+   bundle 里，且**用替换语法覆盖 web-app 的出厂 `agent-presets` 行**（default: standard → ceo）；
+   roots 路径用 `!!js` + `baseUrl` **自定位**到本包安装目录的 `presets/`，任何安装位置都对。
+   纯 headless 组合没有这行，用 `dev/company.overlay.yml` 的 insert 补。
 3. **experimental team 两包是 host 行**（服务注册 + per-member scoped 工具安装），加
-   `dsh-session-persistence-jsonl` 才激活；放进 `profiles/company.cordis.yml`。
+   `dsh-session-persistence-jsonl` 才激活；以 `- insert:` 行随 bundle 走（R1 起直插，
+   不装官方 bundle，故无续驶控制冲突）。
 4. **双 home**：日用 `~/.dsh` 不动，开发 `DSH_HOME=<repo>/dev/harness-home`，环境脚本兜底
    （coding agent 不会自己想起这个区别）。
+5. **已知开放点（R1 实测）**：company profile（base + 本 pack，**无 web-app**）里 agent-presets
+   行在源码 CLI 下挂起（进程不退、无输出；同一行在 web profile 组合里正常）。观察窗改用
+   web profile 绕开；根因未定，记在 R1 Note 的"未验证"。
 
 ---
 

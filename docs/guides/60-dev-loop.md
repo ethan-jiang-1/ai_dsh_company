@@ -55,11 +55,16 @@ proposed Note 在同一 diff 改写为 implemented，不留到交付后。
 
 | 层 | 手段 | 核对什么 |
 |---|---|---|
-| 1 组合层 | `pnpm dsh --profile <p> --dump-config` | 打印最终组合树，确认"我以为挂上的行"真的在、config 是我以为的；层级顺序 bundle → profile patch → home patch → `--patch` overlay（`vendor/dsh/apps/cli/src/dump-config.ts`） |
+| 1 组合层 | `pnpm dsh --profile <p> --dump-config` | 打印最终组合树，确认"我以为挂上的行"真的在、config 是我以为的；层级顺序 bundle → profile patch → home patch → `--patch` overlay（`vendor/dsh/apps/cli/src/dump-config.ts`）。⚠ patch 语法：`- id:` 只替换已有行，**新增行必须 `- insert:`**（教义源自 shipped dsh-headless 的 cordis.patch.yml；R1 实证） |
 | 2 装载层 | preset 装不上时看 roster 报错 | roster **连原因一起列出**（fail-loud），报错即诊断，不静默跳过 |
 | 3 生效层 | 改 patch 行后要不要重启 | 自定义 profile 的 user patch 层**热重载**（长驻面默认开）；headless/sdk 一次性成型，调试它们要重启（`vendor/dsh/packages/boot/app-boot/src/profile.ts`） |
-| 4 会话层 | 读会话 JSONL，不猜 | model-visible ⟺ logged：上下文组装问题从日志（`$DSH_HOME` 下 sessions）重建；读不全 = 欠了 §3 第②问的债 |
+| 3.5 **退出层（R1 实证）** | **症状"任务似已跑完但进程不退 + stdout 零输出"→ 先查 `patchReload`** | **自定义 profile（非 shipped 名字）默认 `'live'`**（源码注释："Custom profiles retain the historical live patch-file behavior"）——live watcher 常驻，一次性 headless 任务跑完进程也不退、stdout 不 flush。修法：profile 的 package.json 改 `"patchReload": "startup"`。shipped 名字（headless/web/sdk…）走模板不受此扰。第一分叉点永远是 **shipped 名字 vs 自定义名字** |
+| 4 会话层 | 读会话 JSONL，不猜 | model-visible ⟺ logged：上下文组装问题从日志（`$DSH_HOME` 下 sessions）重建；读不全 = 欠了 §3 第②问的债。⚠ bash 沙箱对会话文件有**间歇视图抖动**（列出得、打开不得），且 headless 会话收尾会删目录——分析要趁进程活着时做（R1 实证） |
 | 5 回归层 | snapshot 重放（R5 起） | `snapshots/`；回答"行为为什么变了"的最快路径 |
+
+诊断方法论补一条（R1 血泪）：**栈采样先于二分**——`sample <pid> 3` 看主线程，kevent 空转 =
+"等一个不会来的事件"（watcher/未 resolve 的 Promise），CPU 满载 = 死循环；这比砍配置二分快得多
+（R1 三刀二分全白切，问题在 profile 形态默认值而非内容）。
 
 一次性实验不落盘：`pnpm dsh --profile <p> --patch ./dev/try-x.patch.yml`——`--patch` 是
 "profile 层之后再叠一层"的可重复旗标（`vendor/dsh/apps/cli/src/args.ts`），风险半径一次
@@ -82,8 +87,12 @@ proposed Note 在同一 diff 改写为 implemented，不留到交付后。
 |---|---|---|
 | workspace 直跑 | `source dev/env.sh && pnpm dsh --profile headless "…"` | 日常开发，改配置即刻生效 |
 | patch overlay | `pnpm dsh --profile <p> --patch ./dev/try-x.patch.yml` | 一次性实验某插件行，不落盘 |
+| **公司 overlay（headless 动议）** | `pnpm dsh --profile headless --patch ./dev/company.overlay.yml "…"` | 无 web-app 行的组合里补公司行（insert 语法）；R1 用它验过全组合 |
 | profile 内持久 | `pnpm dsh plugin --profile <p> add file:./packages/company-pack` | 验证真实安装形状（`plugin` 子命令把参数转发给 profile 目录里的 pnpm；R5 门禁化） |
 | 正式分发 | `pnpm dsh plugin --profile <p> add <npm-name>` | 用户视角；CI 测兼容矩阵 |
+
+⚠ overlay 语法（R1 实证）：`- id:` **只替换已有行**（not found 会警告丢弃）；**新增行必须
+`- insert:` 子列表**（教义源自 shipped dsh-headless/dsh-web-app 的 cordis.patch.yml）。
 
 拔法（从轻到重）：会话不挂 preset → patch 行 `disabled: true`（行还在，Loader 每次 mount
 求值）→ 卸载（registrations are effects，无残留）。异常时先 `--dump-config` 对照实际组合
@@ -120,6 +129,15 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibil
    不是保证。验证一律 `pnpm dsh`；`env.sh` 已把裸 `dsh` 设为拦截提醒（bypass：`command dsh`）。
    注意 `DSH_HOME` 只护数据层：source 过 env.sh 后裸 `dsh` 也落在 dev home，但跑的
    仍是全局代码。
+5. **新 shell 陷阱（R1 实证）**：后台 job / 新开终端 = 全新环境，`DSH_HOME` **不继承**——
+   任何 `pnpm dsh` / `node bin.ts` 调用前必须先 `source dev/env.sh`，否则**静默**落日用
+   home `~/.dsh`（写 profile、装包都进日用数据）。实证：R1 部署时一次 `plugin add` 在
+   未 source 的 shell 里试图 `mkdir ~/.dsh/profiles/company`，被沙箱 EPERM 拦下（日用
+   home 未被污染）——沙箱是最后防线，不是第一防线；第一防线永远是 source env.sh。
+6. **端口与实例隔离（部署事实）**：headless 形态（探针/动议）**无端口**——单次任务
+   进程，stdout 出结果，日志落 `$DSH_HOME/sessions/`。web 形态（观察窗）起**本地**
+   HTTP 端口（值见启动横幅）；因 `DSH_HOME` 指 dev home，它与日用 DSH 的 web 实例
+   （若同时开）是两个完全独立进程：profile、会话、凭据、端口互不可见。
 
 ## 7. 环境引导（clean checkout → 可跑通；R0 实证配方，2026-09-22）
 
@@ -138,6 +156,12 @@ node ./node_modules/typescript/bin/tsc -b \
 (cd vendor/dsh && ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE host)
 # 原生插件（flock，会话持久化刚需；macOS 用 CommandLineTools 的 cc）：
 (cd vendor/dsh/native/system && ../../node_modules/.bin/tsx scripts/build.ts)
+# web 观察窗（可选；三件事缺一不可）：
+node ./node_modules/typescript/bin/tsc -b vendor/dsh/tsconfig.client.json   # client 面（测试面报错可忽略）
+(cd vendor/dsh && ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE client)
+pnpm --filter @deepseek-ai/dsh-web-frontend run build                       # 前端 dist
+source dev/env.sh && pnpm dsh plugin --profile web add file:./packages/company-pack   # 首次会拦 koffi，见下
+pnpm dsh web -- --port 3081 --no-open                                      # 3080 是本 GUI 占用
 ```
 
 实证过的坑与解法（细节见 notes/implemented/2026-09-22-r0-loop-acceptance.md）：
@@ -153,3 +177,19 @@ node ./node_modules/typescript/bin/tsc -b \
 - **根 devDeps**（tsx/tsdown/typescript/@types/node/@types/js-yaml/lightningcss/vitest）
   版本逐字镜像 vendor 根声明；vendor 换 tag 时随升级环 diff 对齐。
 - **凭据**：`cp ~/.dsh/.credentials.yaml dev/harness-home/ && chmod 600`（gitignored）。
+- **web 观察窗三件事**（R1 实证）：① client bundles（`tsdown --env.DSH_BUILD_FACE client`）——
+  缺了报 `client bundles not found; run pnpm run build before launch`；② 前端 dist
+  （`pnpm --filter @deepseek-ai/dsh-web-frontend run build`）——缺了首页 404 空页；
+  ③ pack 装进 **web profile**（`plugin add file:./packages/company-pack`，首次被 koffi 构建审批
+  拦住 → profile 的 `pnpm-workspace.yaml` 改 `koffi: true` 再装；pnpm 成功后 CLI 才写
+  `dsh.profile.bundles`，中途失败要手动补）。观察窗默认端口 3080，**与本 GUI 冲突**，用
+  `-- --port 3081`。preset roster 出现在 UI 的 CUSTOM 区（四个角色）。
+- **bundle 叠加的重复行 id**（R1 实证）：web-app 已 insert `agent-presets`，pack 再 insert 同 id
+  → `duplicate loader entry id` 硬拒。修法：对已存在的行用**替换**语法（`- id:`），只有真正
+  新增的行才 insert。
+- **根 devDeps 的 workspace 链接**（R1 实证）：insert 的四个行其包名必须同时是根
+  `devDependencies`（`workspace:*`）——源码 CLI 下 TS 导入走 tsconfig paths 进 src，但插件清单的
+  `require.resolve` 走 **Node 原生解析**，root 无链接就报
+  `REQUEST_EXTENSION: DeepSeek request extension preparation failed`。
+- **patchReload**：headless 用途的自定义 profile 必须 `"startup"`（见 §2 第 3.5 层）；web 形态
+  才用 `"live"`。
