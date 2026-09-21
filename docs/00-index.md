@@ -30,6 +30,7 @@ implemented → archived）。
 | [design/40-role-content-plan.md](./design/40-role-content-plan.md) | 设计 | 四个角色的内容设计：persona 要素、skills 清单、KB/模板骨架、入戏探针（文案待 Q4） |
 | [plans/roadmap.md](./plans/roadmap.md) | 计划 | 阶段表：0 立环 → 1 角色+内容 → 2 团队 demo → 3 汇报线 → 4 成品 → 5 UI+门禁 |
 | [guides/50-budget-and-ops.md](./guides/50-budget-and-ops.md) | 指南 | 限流旋钮总表、成本结构、demo 运维 runbook（症状→动作）、回放复盘 |
+| [guides/60-dev-loop.md](./guides/60-dev-loop.md) | 指南 | 开发环操作手册：六步闭环、调试阶梯、设计四问、插拔速查、升级环与发布时点、双 home/双 DSH |
 
 ### 合同出生地图（顶层，实现到哪生到哪——不预建空文件）
 
@@ -74,18 +75,37 @@ implemented → archived）。
 | 机制面（组合/隔离/协作/UI 扩展点） | ✅ 充分，全部钉到源码 | design/10、20、30 |
 | 内容面（persona/skills/KB/模板实际内容） | ⚠️ 骨架已立，文案待填（Q4） | design/40 |
 | 运营面（预算限流/runbook/回放） | ✅ 骨架+数值 | guides/50 |
-| 流程面（notes/ 纪律、门禁脚本） | ✅ 方案已定，目录已落地 | 10 §6 + notes/ + scripts/verify.mjs |
+| 流程面（notes/ 纪律、门禁脚本） | ✅ 方案已定，操作手册已沉淀 | 10 §6 + notes/ + scripts/verify.mjs + guides/60 |
 
-## 术语映射（本项目用法 ↔ DSH 官方）
+## 外部研究材料登记（repo 外，只读引用）
 
-| 本项目 | DSH 官方 |
-|---|---|
-| 角色（CEO/VP…） | agent preset（`presets/<id>/agent.cordis.yml` + persona + skills） |
-| 组织/公司 | 一个 host profile + preset roster（`dsh-agent-presets` roots） |
-| worker（角色底下干活的一次性代理） | one-shot subagent（`dsh-tool-subagent`，spawn provider） |
-| 派活/汇报线 | 命名委托工具（通道 A / M2） |
-| 会议/任务板/邮箱 | Agent Teams（`ctx.agentTeams`，experimental） |
-| 通道 A/B/C/D（机制） | 命名委托 / Agent Teams / dsh-sdk 子进程 / workflow 脚本（10 §3） |
-| M1–M4（用法/编排） | 人中继 / 隔离委托 / SDK 编排器 / 团队（20 §3；与通道映射表在 10 §3 篇首） |
-| 驾驶舱 | Company 右栏页签（`sidebarRightTabs` + Remote 读模型，30 §2） |
-| 交付物 | `present` 工具的 explicit deliveries（30 §1） |
+本 repo 的形态与机制结论大量借鉴两处 repo 外材料（均在 `/Users/bowhead/deepseek-harness/`
+工作树内、已被该 repo 的 git 跟踪；不在本 repo 版本控制范围，引用时注明是外部研究材料）。
+该研究树 HEAD 在钉住 tag 之后 149 个提交（本地 FAQ/docs 工作，`dsh-v0.1.5-rc.2-149-gc4442c6928`），
+`_digested` 的审计基线仍为 rc.2——引外部笔记时以基线对齐，不追研究树新提交。
+**思想吸收进本 repo 文档后，日常不再依赖原文**；下表是"哪个想法落在了哪儿"的地图：
+
+| 材料 | 内容 | 吸收落点 |
+|---|---|---|
+| `_faq_on_digested/13_expert-plugin-repo-organization/answer.md` | 五决策框架（入口形态/包粒度/DSH 源码位置/UI 层/spec 流程） | D1–D3、D6；design/10 §0–§2、§9 |
+| `…/option-a-standalone-with-pinned-dsh.md` | **本 repo 形态依据（Option A）**：目录树、装法、取舍、升级阶梯 | design/10 §6（目录树）、§8–§9；AGENTS.md 布局/簿记 |
+| `…/dev-loop.md` | 开发过程生命周期（六步闭环/调试阶梯/设计四问/插拔速查） | guides/60（全文吸收）；AGENTS.md 纪律 |
+| `…/dual-home-isolation.md` | 双 home 机制、崩溃半径、迁移方向 | dev/env.sh；guides/60 §6 |
+| `…/research.md` | 第三方生态证据（peers/兼容矩阵/自包含/真实安装形状） | guides/60 §5 发布纪律时点；design/10 §8 |
+| `_digested/`（源码消化笔记） | DSH 源码机制笔记（= vendor 钉住 tag `dsh-v0.1.5-rc.2` 的审计基线） | design/10–40 的机制核对引文；**权威仍在 `vendor/dsh/` 本体** |
+
+## 术语映射（本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达）
+
+新会话查 DSH 机制先查这张表：概念 → 官方载体 → 源码路径一步到位（路径均核实存在于钉住 tag）。
+
+| 本项目 | DSH 官方 | vendor/dsh 落点（读源码从这进） |
+|---|---|---|
+| 角色（CEO/VP…） | agent preset（`presets/<id>/agent.cordis.yml` + persona + skills） | `packages/preset/agent-presets`（范本 `presets/cordis/`）+ `packages/preset/persona` |
+| 组织/公司 | 一个 host profile + preset roster（`dsh-agent-presets` roots） | `packages/preset/agent-presets/src/index.ts`（roots 推导）+ `docs/architecture.md`（组合链） |
+| worker（角色底下干活的一次性代理） | one-shot subagent（`dsh-tool-subagent`，spawn provider） | `packages/subagent/tool-subagent/README.md` |
+| 派活/汇报线 | 命名委托工具（通道 A / M2） | 同上（per-instance persona 教义在其 README） |
+| 会议/任务板/邮箱 | Agent Teams（`ctx.agentTeams`，experimental） | `packages/experimental/agent-team` + `packages/experimental/tool-agent-team` + `docs/subsystems/agent-team.md` |
+| 通道 A/B/C/D（机制） | 命名委托 / Agent Teams / dsh-sdk 子进程 / workflow 脚本（10 §3） | [10-architecture.md](./design/10-architecture.md) §3 篇首映射表（各通道包清单） |
+| M1–M4（用法/编排） | 人中继 / 隔离委托 / SDK 编排器 / 团队（20 §3） | [20-roles-isolation.md](./design/20-roles-isolation.md) §3 选型速查 |
+| 驾驶舱 | Company 右栏页签（`sidebarRightTabs` + Remote 读模型，30 §2） | `packages/client/ui-sidebar-documentpreview`（右栏 tab 范本）+ `docs/subsystems/slots.md` + `docs/subsystems/sidebar-right.md` |
+| 交付物 | `present` 工具的 explicit deliveries（30 §1） | `packages/client/ui-deliverables` |

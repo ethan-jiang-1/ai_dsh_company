@@ -6,13 +6,15 @@
 ## 布局
 
 ```
+CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 门禁校验）
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、profiles/、cordis.patch.yml、src/（阶段3+才有代码）
 company-workspace/      运行时"公司共享盘"（会话 cwd）：kb/<role>/（CHARTER+journal）、templates/、deliverables/
 vendor/dsh/             DSH 源码 submodule（钉 tag，见下）
-docs/                   文档层：00-index（地图+决策台账）→ design/ plans/ guides/ + 顶层合同
+docs/                   文档层：00-index（地图+决策台账+外部材料登记）→ design/ plans/ guides/ + 顶层合同
 notes/                  决策记录：intents.md → proposed/ → implemented/
 scripts/                verify.mjs（结构门禁）……
 dev/harness-home/       开发 DSH_HOME（gitignore 运行残留）
+snapshots/              最小 replay 证据（阶段 5 起，JSONL diff 起步）
 ```
 
 设计全貌与决策台账：`docs/00-index.md`（先读它，再按需进 design/10-40）。
@@ -22,19 +24,38 @@ dev/harness-home/       开发 DSH_HOME（gitignore 运行残留）
 ```sh
 git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 pnpm install                           # workspace 解析（含 vendor/dsh；装完按 10 §6 自查子 workspace 风险）
-source dev/env.sh                      # 双 home 兜底：DSH_HOME=<repo>/dev/harness-home，别碰日用 ~/.dsh
+source dev/env.sh                      # 双 home 兜底：DSH_HOME=<repo>/dev/harness-home，别碰日用 ~/.dsh；并把裸 dsh（日用全局安装）拦截
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（验证立环）
-pnpm verify                            # 结构门禁（UTF-8/链接/preset 结构/symlink/vendor pin）
+pnpm verify                            # 结构门禁（UTF-8/链接/preset 结构/symlink/vendor pin/pack 形状）
 node scripts/release-smoke.mjs         # （阶段 5 建）npm pack → 干净 profile → dsh plugin add → 冒烟
 ```
 
+## 密钥
+
+`pnpm dsh` 是真实 API 会话，需要 `DEEPSEEK_API_KEY`。凭据按 home 隔离：在开发 home
+（`dev/harness-home/.credentials.yaml`）配一次即可（见 guides/60 §6）；永不提交密钥。
+
 ## DSH 源码在哪、怎么读
 
-- 本仓库内：`vendor/dsh/`。探索路由：`vendor/dsh/docs/architecture.md` →
-  `docs/capability-seams.md` → 具体 package README。机制结论的权威在这棵树。
+三个 DSH 实体，角色不同，**别混**：
+
+| 实体 | 位置 | 角色 |
+|---|---|---|
+| ① 开发基线（唯一权威） | `vendor/dsh/`（钉 tag，见下簿记） | 机制核对与验证会话都用它：一律 `pnpm dsh` |
+| ② 日用全局安装 | npm 全局（`which dsh`；跑日常会话与改本 repo 的 coding 会话的就是它） | 与本 repo 开发无关；版本随全局升级漂移（当前恰同为 0.1.5-rc.2，**巧合不是保证**），其行为不作机制依据 |
+| ③ 外部研究树 | `/Users/bowhead/deepseek-harness/`（`_digested`/FAQ 宿主） | 只读参考，登记见 `docs/00-index.md` §外部研究材料登记 |
+
+裸 `dsh` 已被 `dev/env.sh` 拦截提醒（`DSH_HOME` 只护数据层，护不住代码版本层；确要日用：
+`command dsh` 或另开终端）。
+
+- 探索路由（对 ①）：`vendor/dsh/docs/architecture.md` → `docs/capability-seams.md` →
+  具体 package README。机制结论的权威在 ① 这棵树。
+- 本项目概念 → DSH 载体 → vendor 源码路径的直达表：`docs/00-index.md` §术语映射。
+- DSH 全局不变量（fail-loud、model-visible ⟺ logged、registrations are effects、
+  plugins not loop changes）：`vendor/dsh/AGENTS.md` 的 Conventions 节。
 - repo 外只读参考：`/Users/bowhead/deepseek-harness/_digested/`（源码消化笔记）与
   `_faq_on_digested/13_expert-plugin-repo-organization/`（本 repo 形态的依据 FAQ）。
-  引用时注明是外部研究材料。
+  引用时注明是外部研究材料；逐份落点登记见 `docs/00-index.md` §外部研究材料登记。
 
 ## 纪律（沿用 DSH 开发习惯）
 
@@ -45,6 +66,8 @@ node scripts/release-smoke.mjs         # （阶段 5 建）npm pack → 干净 p
 - **真实安装形状**：源码直跑之外，交付前 `npm pack` → 干净 profile → `dsh plugin add` 冒烟
   （源码测试会掩盖依赖声明错误）。
 - **升级环**：`vendor/dsh` 换 tag → 记 SHA 簿记 → typecheck → compatibility 矩阵加列 → 重装冒烟。
+- 开发环的完整操作手册（调试阶梯 / 插拔速查 / 设计四问 / 发布纪律时点 / 双 home）：
+  `docs/guides/60-dev-loop.md`；demo 现场运维 runbook：`docs/guides/50-budget-and-ops.md`。
 
 ## vendor 簿记
 
