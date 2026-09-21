@@ -81,5 +81,6 @@ node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile
 ## 当前状态
 
 **R0（立环）✅ 完成（2026-09-22）**：`pnpm dsh --profile headless` 从 vendor 源码跑通真实 API
-会话；环境引导配方沉淀于 guides/60 §7。当前轮 **R1 两人公司——⛔ Q4**（最小动议主题，一句话
-任务即可），见 `docs/00-index.md` 台账；迭代按垂直轮（D11）见 `docs/plans/roadmap.md`。
+会话；环境引导配方沉淀于 guides/60 §7。当前轮 **R1 两人公司——▶ 可开工**（Q4 已定：
+「给我们公司要不要自建知识库写一页技术评估」）；迭代按垂直轮（D11）见
+`docs/plans/roadmap.md`。

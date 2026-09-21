@@ -9,7 +9,7 @@
 | 轮 | 状态 | 做什么（垂直：动议从 CEO 进、交付从 CEO 出） | 轮内最窄验证 | 验收（外部可观察） | 合同/内容随之出生 |
 |---|---|---|---|---|---|
 | R0 立环 | ✅ 完成 | 环境：submodule 钉 tag + workspace + AGENTS.md + 双 home | `pnpm verify` 结构门禁 | `pnpm dsh --profile headless "hi"` 从源码跑通；typecheck 解析到 DSH src | `profile.md` 骨架 |
-| R1 两人公司 | ⛔ Q4 | CEO + VP-Eng（骨架 persona + 各 1 个核心 skill）；装 team web bundle 作**观察窗**（零自定义 UI）；一条最小动议（Q4）：收动议 → spawn teammate → 派一任务 → VP 出稿 → CEO 收口 `present` | 两角色入戏探针先在**独立会话**过（M1 式）再进 team | 一场完整会话日志 + `deliverables/` 第一份交付物（UI 可见是红利不是门槛） | CEO/VP-Eng 的 40 号文案；`demo.md` 雏形 |
+| R1 两人公司 | ▶ 可开工（Q4 已定） | CEO + VP-Eng（骨架 persona + 各 1 个核心 skill）；装 team web bundle 作**观察窗**（零自定义 UI）；一条最小动议（Q4 已定：「给我们公司要不要自建知识库写一页技术评估」）：收动议 → spawn teammate → 派一任务 → VP 出稿 → CEO 收口 `present` | 两角色入戏探针先在**独立会话**过（M1 式）再进 team | 一场完整会话日志 + `deliverables/` 第一份交付物（UI 可见是红利不是门槛） | CEO/VP-Eng 的 40 号文案；`demo.md` 雏形 |
 | R2 四人全员 | — | +VP-Sales +COO（文案+skills）；任务板 DAG 分派；VP 间至少一次互审（mailbox 跨层级）；fork teammate 下发会议上下文 | 新增两角色独立会话探针；task CAS 拒绝过期修订 | [30-ui-demo](../design/30-ui-demo.md) §3 分镜 v0 **全程 UI 可见**；消息不丢不重 | `presets.md`（四角色语义合同）；40 号补全 |
 | R3 汇报线 | — | **team 两包从 bundle 改直插行**（10 §3 冲突注，仍零 JS）；CEO 加 `vp_eng`/`vp_sales` 命名委托工具（continuable + persona），团队之外的快捷派活 | 委托 child 与 team 成员并存不互破（shadow 语义） | 委派出稿 → 全局 send_message 追加意见 → child 修订；日志可回放 | `delegation.md` |
 | R4 成品流程 | — | templates + deliverables 流程全量接入 | 模板即流程：写作类工作流第一版 = 模板 + skill 指引 | 端到端写作流水线：brief → 分头出稿 → 互审 → 合稿落 `deliverables/` | `demo.md` 定稿 |
