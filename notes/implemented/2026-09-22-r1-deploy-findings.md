@@ -46,3 +46,20 @@
 - **web profile 的 `file:` 副本刷新**：pack 内容变更后 pnpm 缓存命中不刷新（R1 手工 `cp` 同步过
   一次）；正式机制（bump 版本重装）留 R5 release-smoke 验证。
 - **入戏探针（M1）与动议本身尚未跑**：R1 验收还差这两步（见 roadmap R1 行）。
+- **勘误（同日追加）**：上文"headless 全组合 overlay → exit 0 且模型回复"只证明**组合装载成功**
+  （无重复 id、依赖可解析），**不证明 persona 挂载**——R1 实测 headless 会话里角色永远不生效：
+  **preset 挂载只在 Web 面**（只有 web-app 组合 `session-controller`，其 `composeAgent` 负责
+  "未指定 preset 时挂 default"；headless/sdk/acp 一次性驱动经 core agent registry 绕过它）。
+  推论：入戏探针与 demo 动议必须走 Web UI；自动化验证属 R5 web 快照 lane。详见 design/10 §6
+  要点 6 与 guides/60 §2 第 3.6 层。
+
+## 回归测试资产（同日追加，回应"测试在哪"）
+
+- **`pnpm test`（keyless，vitest）**：`tests/presets.spec.ts` 四条——① roster 扫出四角色且零
+  broken；② preset 行插件都在 pack dependencies（DSH `verify-cordis-config` 同构）；③ R1 两角色
+  内容非占位且 skill frontmatter 与目录名一致；④ bundle 行语法（agent-presets 替换 + 三条 insert）。
+- **guard 验证（DSH 纪律"引入回归、看它变红、再还原"）**：临时删掉 pack 的 `dsh-persona` 依赖
+  → 测试 ② 变红（1 failed）→ 还原后 4 passed。**诚实记录**：测试 ① 在源码域**抓不到**这个 bug
+  （根 workspace 链接掩盖），只有 ② 能抓——所以两者分工必须都在。
+- **删掉的错误资产**：曾写 `tests/persona.e2e.ts`（headless + overlay 断言会话日志含 persona）——
+  该路径永远失败（headless 不挂 preset），属"测错面"的误导性测试，已删除，不留假绿。

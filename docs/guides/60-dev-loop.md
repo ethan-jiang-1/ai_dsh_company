@@ -40,8 +40,8 @@ AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ plans/
    卡"是。
 3. **原子修改 owner 面**：每个事实一个 owner——改 preset 行不动 host 行语义，改 pack 不动
    vendor（`vendor/dsh/` 只读，簿记见 AGENTS.md）。
-4. **跑最小证据**：起步 `pnpm verify`；有行为测试后只跑"会为这次回归而失败"的那个 +
-   typecheck，不默认全量。
+4. **跑最小证据**：起步 `pnpm verify` + `pnpm test`（keyless 回归）；有行为测试后只跑"会为这次
+   回归而失败"的那个 + typecheck，不默认全量。
 5. **沉淀**：门禁守住的事实进 docs/（只写 now），选择进 Note。
 6. **只报告实际跑过的检查**：没跑的不算数。
 
@@ -59,6 +59,7 @@ proposed Note 在同一 diff 改写为 implemented，不留到交付后。
 | 2 装载层 | preset 装不上时看 roster 报错 | roster **连原因一起列出**（fail-loud），报错即诊断，不静默跳过 |
 | 3 生效层 | 改 patch 行后要不要重启 | 自定义 profile 的 user patch 层**热重载**（长驻面默认开）；headless/sdk 一次性成型，调试它们要重启（`vendor/dsh/packages/boot/app-boot/src/profile.ts`） |
 | 3.5 **退出层（R1 实证）** | **症状"任务似已跑完但进程不退 + stdout 零输出"→ 先查 `patchReload`** | **自定义 profile（非 shipped 名字）默认 `'live'`**（源码注释："Custom profiles retain the historical live patch-file behavior"）——live watcher 常驻，一次性 headless 任务跑完进程也不退、stdout 不 flush。修法：profile 的 package.json 改 `"patchReload": "startup"`。shipped 名字（headless/web/sdk…）走模板不受此扰。第一分叉点永远是 **shipped 名字 vs 自定义名字** |
+| 3.6 **表面层（R1 实证）** | **症状"角色没入戏 / persona 不生效"→ 先问跑在哪个面** | **preset 只在 Web 面挂载**：只有 `web-app` 组合 `session-controller`（其 `composeAgent` 负责"未指定 preset 时挂 default"），headless / sdk / acp 的一次性驱动直接经 core agent registry 建 agent、**绕过 preset**。所以在 headless 里验角色内容永远失败，换 Web 会话（选 preset）验证 |
 | 4 会话层 | 读会话 JSONL，不猜 | model-visible ⟺ logged：上下文组装问题从日志（`$DSH_HOME` 下 sessions）重建；读不全 = 欠了 §3 第②问的债。⚠ bash 沙箱对会话文件有**间歇视图抖动**（列出得、打开不得），且 headless 会话收尾会删目录——分析要趁进程活着时做（R1 实证） |
 | 5 回归层 | snapshot 重放（R5 起） | `snapshots/`；回答"行为为什么变了"的最快路径 |
 

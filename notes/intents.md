@@ -10,3 +10,4 @@
 | 2026-09-22 | R0 立环验收：workspace 形状/版本对齐/pnpm 入口/tsconfig 门面/局部 host 面/原生 flock 零特权编译/roots 实测回填/profile.md 诞生——`pnpm dsh --profile headless` 真会话跑通 | implemented → [implemented/2026-09-22-r0-loop-acceptance.md](./implemented/2026-09-22-r0-loop-acceptance.md) |
 | 2026-09-22 | R1 两人公司：CEO/VP-Eng 正式 persona+skills+KB，company profile 部署+team web bundle 观察窗，入戏探针（M1），跑动议「知识库自建技术评估」出第一份 deliverable | in progress |
 | 2026-09-22 | R1 中途文档同步（fresh-agent 审计）+ 纪律强调：AGENTS.md 纪律段改"全程沿用 DSH 纪律"并建权威对照表（D13），修 README/AGENTS/pack README/design10 §6/00-index/guides60 的陈旧叙述 | implemented → [implemented/2026-09-22-r1-docs-sync.md](./implemented/2026-09-22-r1-docs-sync.md) |
+| 2026-09-22 | 回归测试资产（R1）：`pnpm test` keyless vitest 四条（roster 零 broken / 行依赖 / 内容定稿 / bundle 语法）+ guard 反证（删依赖看变红）；发现 **preset 只在 Web 面挂载**（headless/sdk/acp 绕过），删掉测错面的 headless e2e | implemented → [implemented/2026-09-22-r1-deploy-findings.md](./implemented/2026-09-22-r1-deploy-findings.md) |

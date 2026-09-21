@@ -301,6 +301,12 @@ ai_dsh_company/
 5. **已知开放点（R1 实测）**：company profile（base + 本 pack，**无 web-app**）里 agent-presets
    行在源码 CLI 下挂起（进程不退、无输出；同一行在 web profile 组合里正常）。观察窗改用
    web profile 绕开；根因未定，记在 R1 Note 的"未验证"。
+6. **preset 挂载只在 Web 面**（R1 实测，机制级）：只有 `web-app` bundle 组合 `session-controller`
+   （headless / sdk / acp 都是 0），而 `composeAgent`（"session 未指定 preset 时挂 default"）
+   住在 session-controller 里。**headless 一次性驱动直接经 core agent registry 建 agent，绕过
+   preset 组合**——所以 headless 会话永远是部署默认人格（headless bundle 自己那行
+   `personaPrefix: "You are a coding agent…"`），角色内容（persona / 专属 skills）**只能在 Web
+   会话里生效**。推论：入戏探针与 demo 动议必须走 Web UI；自动化验证属 R5 的 web 快照 lane。
 
 ---
 

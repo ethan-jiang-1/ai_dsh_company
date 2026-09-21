@@ -29,7 +29,8 @@ source dev/env.sh                      # 双 home 兜底：DSH_HOME=<repo>/dev/h
                                        # ⚠ 每个新 shell/后台 job 必须先 source 本文件——DSH_HOME 不继承，漏了会静默写日用 home（guides/60 §6.5）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（R0 已验收）
 pnpm dsh web -- --port 3081 --no-open  # web 观察窗（需 client 面+前端构建，guides/60 §7）；3080 是本 GUI 占用
-pnpm verify                            # 结构门禁（UTF-8/链接/preset 结构/symlink/vendor pin/pack 形状）
+pnpm verify                            # 结构门禁（UTF-8/链接/preset 结构/symlink/vendor pin/pack 形状/preset 行依赖）
+pnpm test                              # keyless 回归（vitest：roster 零 broken、行依赖、内容定稿、bundle 语法）
 node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile → dsh plugin add → 冒烟
 ```
 
