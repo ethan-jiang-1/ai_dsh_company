@@ -1,0 +1,13 @@
+{
+  // 源码面解析的门面：extends DSH 的 base（paths 相对声明文件解析，即 vendor/dsh/ 下），
+  // 让 tsx/tsc 把 @deepseek-ai/* 的 workspace 导入解析到 vendor 的 src/ 而非构建产物 lib/。
+  // 没有这份文件 → pnpm dsh 报 ERR_MODULE_NOT_FOUND .../lib/index.js（2026-09-21 实证）。
+  // 本 repo 自有 TS 代码（R3+ 起）也以此解析到 DSH 源码。
+  "extends": "./vendor/dsh/tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false,
+    "noEmit": true
+  },
+  "files": []
+}

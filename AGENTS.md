@@ -23,9 +23,10 @@ snapshots/              最小 replay 证据（R5 起，JSONL diff 起步）
 
 ```sh
 git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
-pnpm install                           # workspace 解析（含 vendor/dsh；装完按 10 §6 自查子 workspace 风险）
+corepack enable pnpm                   # 一次性：pnpm 走 Node 自带 corepack（读 packageManager 钉 11.7.0）
+pnpm install                           # workspace 解析（vendor/dsh 全树）；引导全配方见 guides/60 §7
 source dev/env.sh                      # 双 home 兜底：DSH_HOME=<repo>/dev/harness-home，别碰日用 ~/.dsh；并把裸 dsh（日用全局安装）拦截
-pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（验证立环）
+pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（R0 已验收）
 pnpm verify                            # 结构门禁（UTF-8/链接/preset 结构/symlink/vendor pin/pack 形状）
 node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile → dsh plugin add → 冒烟
 ```
@@ -79,6 +80,6 @@ node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile
 
 ## 当前状态
 
-R0（立环）进行中。迭代按**垂直轮**（决策 D11）见 `docs/plans/roadmap.md`——每轮换全新
-对话上下文，交接靠其"轮次交接"两清单（新会话开工动作 / 轮次收尾清单）。开工阻塞项：
-Q4（R1 最小动议主题，一句话任务即可），见 `docs/00-index.md` 台账。
+**R0（立环）✅ 完成（2026-09-22）**：`pnpm dsh --profile headless` 从 vendor 源码跑通真实 API
+会话；环境引导配方沉淀于 guides/60 §7。当前轮 **R1 两人公司——⛔ Q4**（最小动议主题，一句话
+任务即可），见 `docs/00-index.md` 台账；迭代按垂直轮（D11）见 `docs/plans/roadmap.md`。

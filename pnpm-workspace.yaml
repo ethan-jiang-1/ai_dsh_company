@@ -1,6 +1,44 @@
 packages:
   - packages/*
-  - vendor/dsh/packages/*
+  # DSH 的包在 packages/<group>/<pkg> 两层深（vendor 自己的 workspace 也是 */* 写法）；
+  # 只写一层 → "No matching version found for @deepseek-ai/dsh-acp@*"（2026-09-21 实证）。
+  - vendor/dsh/packages/*/*
   - vendor/dsh/apps/*
-# 注意（FAQ 13 方案 A）：vendor/dsh 作为子 workspace 可能触发其"我是根"的脚本假设；
-# 首次 pnpm install 后按 docs/design/10-architecture.md §6 风险清单自查其 typecheck/test 未被误触发。
+  # vendored cordis 全家（cordis/cosmokit/schemastery/loader/...）：DSH 依赖它们为
+  # workspace 包（其 vendor/* glob 的镜像），缺了 → apps/cli 报 cordis PKG_NOT_FOUND。
+  - vendor/dsh/vendor/*
+  # node-addon-system 源树（webworker-runtime 依赖 @deepseek-ai/node-addon-system，
+  # 缺了 → PKG_NOT_FOUND，2026-09-21 实证）。benchmarks/website/python 暂无需求，不加。
+  - vendor/dsh/native/system
+  - vendor/dsh/native/system/packages/*
+
+# ↓ 组合/构建策略镜像 vendor/dsh/pnpm-workspace.yaml（路径改指 vendor 内）；
+#   vendor 换 tag 时随升级环（guides/60 §5）同步 diff 这一段。
+linkWorkspacePackages: true
+
+overrides:
+  '@deepseek-ai/cosmokit': 'link:vendor/dsh/vendor/cosmokit'
+  '@deepseek-ai/schemastery': 'link:vendor/dsh/vendor/schemastery'
+
+peerDependencyRules:
+  allowedVersions:
+    typescript: '>=5 <7'
+
+# pnpm 10+ strictDepBuilds：未列名的带构建脚本依赖会被硬拒——镜像 vendor 清单
+# （其中 file: 条目在本 repo 不命中任何包，无害保留）。
+allowBuilds:
+  esbuild: true
+  lefthook: true
+  node-pty: true
+  '@google/genai': false
+  protobufjs: false
+  node-addon-require-builtin: false
+  koffi: true
+  '@deepseek-ai/dsh-subprocess-local@file:packages/subprocess/subprocess-local': true
+  electron-winstaller: false
+  msgpackr-extract: false
+
+patchedDependencies:
+  # 只镜像闭包内实际命中的补丁；@yao-pkg/pkg（vendor 打单文件 exe 用）不在本 repo
+  # 闭包，声明了会被 ERR_PNPM_UNUSED_PATCH 硬拒（2026-09-21 实证）。
+  node-pty@1.2.0-beta.15: vendor/dsh/patches/node-pty@1.2.0-beta.15.patch

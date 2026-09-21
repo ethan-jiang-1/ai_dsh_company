@@ -31,12 +31,12 @@ implemented → archived）。
 | [plans/roadmap.md](./plans/roadmap.md) | 计划 | 垂直轮（D11）：R0 立环 → R1 两人公司 → R2 四人全员 → R3 汇报线 → R4 成品流程 → R5 皮肤+门禁；轮次交接两清单 |
 | [guides/50-budget-and-ops.md](./guides/50-budget-and-ops.md) | 指南 | 限流旋钮总表、成本结构、demo 运维 runbook（症状→动作）、回放复盘 |
 | [guides/60-dev-loop.md](./guides/60-dev-loop.md) | 指南 | 开发环操作手册：六步闭环、调试阶梯、设计四问、插拔速查、升级环与发布时点、双 home/双 DSH |
+| [profile.md](./profile.md) | 合同 | host 组合现在时：部署形状（源码直跑/持久安装实测）、行清单语义、开放点 |
 
 ### 合同出生地图（顶层，实现到哪生到哪——不预建空文件）
 
 | 将出生的合同 | 诞生轮次 | 内容来源 |
 |---|---|---|
-| `profile.md` | R0 收尾 | host 行清单的"现在时"+ presets roots 的真实部署路径（消除 design/10 §6 的 TODO） |
 | `presets.md` | R1 起（CEO+VP-Eng），R2 长全 | 四角色 preset 的语义合同（persona 定稿、skills 清单、验证方式）——40 号骨架升格 |
 | `demo.md` | R1 雏形 → R4 定稿 | demo 操作合同：剧本、分镜、观测点（30 §3 分镜落地后的现在时） |
 | `delegation.md` | R3 | 命名委托工具的语义（工具行、persona 文案、续驶路径） |

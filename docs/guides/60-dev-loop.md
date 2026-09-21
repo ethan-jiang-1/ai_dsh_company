@@ -120,3 +120,36 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibil
    不是保证。验证一律 `pnpm dsh`；`env.sh` 已把裸 `dsh` 设为拦截提醒（bypass：`command dsh`）。
    注意 `DSH_HOME` 只护数据层：source 过 env.sh 后裸 `dsh` 也落在 dev home，但跑的
    仍是全局代码。
+
+## 7. 环境引导（clean checkout → 可跑通；R0 实证配方，2026-09-22）
+
+```sh
+git submodule update --init             # vendor/dsh 钉 tag
+corepack enable pnpm                    # 一次性：pnpm 读根 packageManager（钉 11.7.0）
+pnpm install                            # 全 workspace（vendor/dsh 全树含 vendored cordis 与 native/system）
+# host 面构建（typert 类型图产物，源码直跑需要；tsc 局部 + tsdown host 面）：
+node ./node_modules/typescript/bin/tsc -b \
+  vendor/dsh/packages/typert/generator \
+  vendor/dsh/packages/llm/llm \
+  vendor/dsh/packages/interaction/commands \
+  vendor/dsh/packages/feedback/command-feedback \
+  vendor/dsh/packages/goal/goal \
+  vendor/dsh/packages/subagent/subagent
+(cd vendor/dsh && ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE host)
+# 原生插件（flock，会话持久化刚需；macOS 用 CommandLineTools 的 cc）：
+(cd vendor/dsh/native/system && ../../node_modules/.bin/tsx scripts/build.ts)
+```
+
+实证过的坑与解法（细节见 notes/implemented/2026-09-22-r0-loop-acceptance.md）：
+
+- **pnpm 入口**：`/usr/local` 老 corepack shim 执行新 pnpm 会 VM 崩
+  （ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING）——`corepack enable pnpm` 换 nvm 自带
+  corepack 的 shim；根 `packageManager: pnpm@11.7.0` 与 vendor 逐字一致。
+- **编译器**：macOS 走 CommandLineTools（本机 xcode-select 已切换）。无垫片直连 CLT cc
+  报 `errno.h not found` 时，`export SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk`
+  兜底；不需要完整 Xcode。
+- **workspace 形状**：glob 必须 `packages/*/*` 两层 + `vendor/*`（vendored cordis 全家）+
+  `native/system*`（node-addon-system）；见 pnpm-workspace.yaml 注释。
+- **根 devDeps**（tsx/tsdown/typescript/@types/node/@types/js-yaml/lightningcss/vitest）
+  版本逐字镜像 vendor 根声明；vendor 换 tag 时随升级环 diff 对齐。
+- **凭据**：`cp ~/.dsh/.credentials.yaml dev/harness-home/ && chmod 600`（gitignored）。

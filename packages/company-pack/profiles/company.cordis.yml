@@ -1,17 +1,18 @@
 # company profile 的 host 组合（部署源文件）。
-# 部署路径（阶段 0 手动；阶段 5 进 release-smoke）：
-#   1) dsh plugin --profile company add file:./packages/company-pack
+# 部署路径（R0 已实测，合同见 docs/profile.md）：
+#   1) pnpm dsh plugin --profile company add file:./packages/company-pack
+#      → pack 落 <DSH_HOME>/profiles/company/node_modules/dsh-company-pack/（probe 探针实测模式）
 #   2) 本文件内容并入 $DSH_HOME/profiles/company/cordis.yml（或经 patch 层覆盖）
 # 设计依据：docs/design/10-architecture.md §6（共享行在 host、preset 只放差异、roots 落 profile 层）。
-# 阶段 2 起团队两行先装官方 bundle（见 docs/design/30-ui-demo §1）；阶段 3 按 10 §3 冲突注改直插。
+# R2 起团队两行先装官方 bundle（见 docs/design/30-ui-demo §1）；R3 按 10 §3 冲突注改直插。
 
-# ── preset roster（TODO 阶段0收尾：file: 安装一次，确认 presets/ 的真实安装路径后替换）──
+# ── preset roster（roots 为 plugin add 实测路径；换 profile 名部署时同步替换）──
 - id: agent-presets
   name: '@deepseek-ai/dsh-agent-presets'
   config:
     default: ceo
     roots:
-      - path: ~/CHANGE-ME-pack-presets-path   # 占位：pack 安装目录下 presets/（trust: system）
+      - path: /Users/bowhead/ai_dsh_company/dev/harness-home/profiles/company/node_modules/dsh-company-pack/presets
         trust: system
 
 # ── 持久化（team 激活前提）──
@@ -27,9 +28,9 @@
   name: '@deepseek-ai/dsh-tool-skill'
 - id: tool-present
   name: '@deepseek-ai/dsh-tool-present'
-# TODO 阶段1按需增补：tool-bash / tool-web / tool-todo / compaction 行
+# TODO R1 按需增补：tool-bash / tool-web / tool-todo / compaction 行
 
-# ── 阶段 3：团队协作改直插行时取消注释（与官方 bundle 二选一，见 10 §3 冲突注）──
+# ── R3：团队协作改直插行时取消注释（与官方 bundle 二选一，见 10 §3 冲突注）──
 # - id: agent-team
 #   name: '@deepseek-ai/dsh-experimental-agent-team'
 # - id: tool-agent-team
