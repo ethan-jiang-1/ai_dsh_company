@@ -17,6 +17,18 @@
 | 6 调整 | 证据驱动打磨，不重设计 | 回到阶段 1 但意图更窄；vendor 换 tag 走 §5 |
 | 7 收尾 | 只报告实际跑过的检查 | §4 + `pnpm verify` |
 
+## 0.5 新会话开工动作（轮次交接的读侧）
+
+每轮换**全新对话上下文**执行（决策 D11）——干净的轮次上下文，不跨轮携带。新会话固定开场：
+
+```text
+AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ plans/roadmap.md 找当前轮
+→ 有 ⛔ 先解阻塞 → Plan Mode 出 decision-complete 计划 → notes/intents.md 登记 → 开工
+```
+
+人只需要说"继续下一轮"。判断"环境/上轮就绪了什么"只读当前轮 Note 的"实际跑过的验证 +
+环境状态"，不信记忆、不信聊天记录。收尾侧清单见 roadmap"轮次交接"节。
+
 ## 1. 落地：六步闭环
 
 ```text
@@ -47,13 +59,13 @@ proposed Note 在同一 diff 改写为 implemented，不留到交付后。
 | 2 装载层 | preset 装不上时看 roster 报错 | roster **连原因一起列出**（fail-loud），报错即诊断，不静默跳过 |
 | 3 生效层 | 改 patch 行后要不要重启 | 自定义 profile 的 user patch 层**热重载**（长驻面默认开）；headless/sdk 一次性成型，调试它们要重启（`vendor/dsh/packages/boot/app-boot/src/profile.ts`） |
 | 4 会话层 | 读会话 JSONL，不猜 | model-visible ⟺ logged：上下文组装问题从日志（`$DSH_HOME` 下 sessions）重建；读不全 = 欠了 §3 第②问的债 |
-| 5 回归层 | snapshot 重放（阶段 5 起） | `snapshots/`；回答"行为为什么变了"的最快路径 |
+| 5 回归层 | snapshot 重放（R5 起） | `snapshots/`；回答"行为为什么变了"的最快路径 |
 
 一次性实验不落盘：`pnpm dsh --profile <p> --patch ./dev/try-x.patch.yml`——`--patch` 是
 "profile 层之后再叠一层"的可重复旗标（`vendor/dsh/apps/cli/src/args.ts`），风险半径一次
 进程，连 dev home 都不落。
 
-## 3. 设计四问（阶段 3+ 写第一行 JS 前必答）
+## 3. 设计四问（R3+ 写第一行 JS 前必答）
 
 | 问 | 判据 | 本 repo 落点 |
 |---|---|---|
@@ -70,7 +82,7 @@ proposed Note 在同一 diff 改写为 implemented，不留到交付后。
 |---|---|---|
 | workspace 直跑 | `source dev/env.sh && pnpm dsh --profile headless "…"` | 日常开发，改配置即刻生效 |
 | patch overlay | `pnpm dsh --profile <p> --patch ./dev/try-x.patch.yml` | 一次性实验某插件行，不落盘 |
-| profile 内持久 | `pnpm dsh plugin --profile <p> add file:./packages/company-pack` | 验证真实安装形状（`plugin` 子命令把参数转发给 profile 目录里的 pnpm；阶段 5 门禁化） |
+| profile 内持久 | `pnpm dsh plugin --profile <p> add file:./packages/company-pack` | 验证真实安装形状（`plugin` 子命令把参数转发给 profile 目录里的 pnpm；R5 门禁化） |
 | 正式分发 | `pnpm dsh plugin --profile <p> add <npm-name>` | 用户视角；CI 测兼容矩阵 |
 
 拔法（从轻到重）：会话不挂 preset → patch 行 `disabled: true`（行还在，Loader 每次 mount
@@ -79,7 +91,7 @@ proposed Note 在同一 diff 改写为 implemented，不留到交付后。
 
 ## 5. 升级环与发布纪律时点
 
-升级环（AGENTS.md 纪律的展开；做成一个脚本 `scripts/sync-dsh.mjs`，阶段 5 建）：
+升级环（AGENTS.md 纪律的展开；做成一个脚本 `scripts/sync-dsh.mjs`，R5 建）：
 
 ```text
 vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibility 矩阵加列 → 真实安装冒烟
@@ -89,9 +101,9 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibil
 
 | 时点 | 必须补上 | 依据 |
 |---|---|---|
-| 现在（零 JS，阶段 0–2） | 无——pack 无代码，不存在依赖声明错误面 | [10-architecture.md](../design/10-architecture.md) §2.1 |
-| 阶段 3+（pack 有 `src/`） | `@deepseek-ai/cordis` + 用到的 `@deepseek-ai/dsh-*` 作 **peerDependencies**；拒绝精确钉死（pre-stable API，钉死 = 每次上游同步逼发版） | FAQ 13 research.md 生态失败样本 |
-| 阶段 5（发布） | `dsh.compatibility` 矩阵；`npm pack` → 干净 profile → `dsh plugin add` 冒烟 | [roadmap.md](../plans/roadmap.md) 阶段 5 |
+| 现在（零 JS，R0–R2） | 无——pack 无代码，不存在依赖声明错误面 | [10-architecture.md](../design/10-architecture.md) §2.1 |
+| R3+（pack 有 `src/`） | `@deepseek-ai/cordis` + 用到的 `@deepseek-ai/dsh-*` 作 **peerDependencies**；拒绝精确钉死（pre-stable API，钉死 = 每次上游同步逼发版） | FAQ 13 research.md 生态失败样本 |
+| R5（发布） | `dsh.compatibility` 矩阵；`npm pack` → 干净 profile → `dsh plugin add` 冒烟 | [roadmap.md](../plans/roadmap.md) R5 |
 | OpenSpec 引入 | 触发条件：**第二贡献者进场**或**向 DSH 上游提 seam**（配合 D9 走方案 B）；此前 notes/ 纪律够用 | FAQ 13 answer.md 决策 5 |
 
 ## 6. 双 home 与双 DSH 操作细节

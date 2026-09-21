@@ -159,7 +159,7 @@ CEO preset 里给每个直接汇报对象配一个 `dsh-tool-subagent` 实例（
 - **与 team bundle 的组合冲突（核实过 patch 源）**：`agent-team-profile` 会 disable 全局
   `tool-subagent-control`（send_message/interrupt_agent/list_agents）并把 `tool-subagent`
   压成 one-shot，而团队的九个工具**只覆盖 team 成员**——若装着 bundle 再加 continuable
-  命名委托行，这些 child 将无法被续驶。两条解法：① 阶段 3 起不用 bundle，把
+  命名委托行，这些 child 将无法被续驶。两条解法：① R3 起不用 bundle，把
   `agent-team` + `tool-agent-team` 两行直接写进我们自己的 `profiles/company.cordis.yml`
   （仍是零 JS；团队工具对成员自动 shadow 全局同名工具，全局控制保留给非 team 的
   continuable child——shadow 语义见 `tool-agent-team/README.md`："shadow those globals

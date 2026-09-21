@@ -24,7 +24,7 @@
 ## 1. 第 0 层 · 现成的可视面（零自定义代码）
 
 装 `agent-team-profile`（Host 侧，**先装**）+ `@deepseek-ai/dsh-experimental-agent-team-web-profile`
-（Web 侧，后装）后，Web GUI 免费获得（阶段 3 起按 10 §3 冲突注改直插行，UI 不受影响）：
+（Web 侧，后装）后，Web GUI 免费获得（R3 起按 10 §3 冲突注改直插行，UI 不受影响）：
 
 | 可视面 | 机制（已核实） |
 |---|---|
@@ -112,13 +112,13 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
   `sync-dsh.mjs` 升级环 + compatibility 矩阵，UI 层的断点（槽位名/Remote 方法名）升级时
   一并过 typecheck。
 
-## 5. 分阶段
+## 5. 分层归轮
 
-| 阶段 | 做什么 | 验收 |
+| 层 | 做什么 | 验收 |
 |---|---|---|
-| v0（＝roadmap 阶段 2） | 装 team 两个 profile bundle；跑通 §3 分镜 | 一场完整 demo 全程在 UI 里可见，零自定义 UI 代码 |
-| v1（＝roadmap 阶段 5 前半） | pack 长出 client 面：Company 右栏页签（Remote 读模型 + 组织图/动态流） | 驾驶舱一屏流动；HMR 热更跑通 |
-| v2（＝roadmap 阶段 5 后半） | `tool.call.toolview` 委派工具卡 + header 动作 | 对话流里的公司语义皮；`npm pack` → 干净 profile → 真实安装冒烟 |
+| v0（＝R1 观察窗起，R2 进验收） | 装 team 两个 profile bundle；跑通 §3 分镜 | 一场完整 demo 全程在 UI 里可见，零自定义 UI 代码 |
+| v1（＝R5 前半） | pack 长出 client 面：Company 右栏页签（Remote 读模型 + 组织图/动态流） | 驾驶舱一屏流动；HMR 热更跑通 |
+| v2（＝R5 后半） | `tool.call.toolview` 委派工具卡 + header 动作 | 对话流里的公司语义皮；`npm pack` → 干净 profile → 真实安装冒烟 |
 
 v1 是 pack 里第一段 client 代码（React + slots），与"自定义 host 工具/provider"同包
 不同目录（`src/client/` vs `src/`）——包数仍然是 **1**。

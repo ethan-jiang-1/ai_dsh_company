@@ -4,4 +4,4 @@
 （研发/销售/COO）各自是独立 preset，事件从 CEO 进出，中间用 Agent Teams 协作。
 
 - 入口：[AGENTS.md](./AGENTS.md)（coding agent）· [docs/00-index.md](./docs/00-index.md)（设计地图+决策台账）
-- 阶段：见 [docs/plans/roadmap.md](./docs/plans/roadmap.md)（当前阶段 0 立环）
+- 轮次：见 [docs/plans/roadmap.md](./docs/plans/roadmap.md)（垂直轮迭代 D11；当前 R0 立环）

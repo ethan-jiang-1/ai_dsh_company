@@ -7,14 +7,14 @@
 
 ```
 CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 门禁校验）
-packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、profiles/、cordis.patch.yml、src/（阶段3+才有代码）
+packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、profiles/、cordis.patch.yml、src/（R3+ 才有代码）
 company-workspace/      运行时"公司共享盘"（会话 cwd）：kb/<role>/（CHARTER+journal）、templates/、deliverables/
 vendor/dsh/             DSH 源码 submodule（钉 tag，见下）
 docs/                   文档层：00-index（地图+决策台账+外部材料登记）→ design/ plans/ guides/ + 顶层合同
 notes/                  决策记录：intents.md → proposed/ → implemented/
 scripts/                verify.mjs（结构门禁）……
 dev/harness-home/       开发 DSH_HOME（gitignore 运行残留）
-snapshots/              最小 replay 证据（阶段 5 起，JSONL diff 起步）
+snapshots/              最小 replay 证据（R5 起，JSONL diff 起步）
 ```
 
 设计全貌与决策台账：`docs/00-index.md`（先读它，再按需进 design/10-40）。
@@ -27,7 +27,7 @@ pnpm install                           # workspace 解析（含 vendor/dsh；装
 source dev/env.sh                      # 双 home 兜底：DSH_HOME=<repo>/dev/harness-home，别碰日用 ~/.dsh；并把裸 dsh（日用全局安装）拦截
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（验证立环）
 pnpm verify                            # 结构门禁（UTF-8/链接/preset 结构/symlink/vendor pin/pack 形状）
-node scripts/release-smoke.mjs         # （阶段 5 建）npm pack → 干净 profile → dsh plugin add → 冒烟
+node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile → dsh plugin add → 冒烟
 ```
 
 ## 密钥
@@ -79,5 +79,6 @@ node scripts/release-smoke.mjs         # （阶段 5 建）npm pack → 干净 p
 
 ## 当前状态
 
-阶段 0（立环）进行中，阶段表见 `docs/plans/roadmap.md`；开工阻塞项：Q4（第一场 demo 动议主题），
-见 `docs/00-index.md` 台账。
+R0（立环）进行中。迭代按**垂直轮**（决策 D11）见 `docs/plans/roadmap.md`——每轮换全新
+对话上下文，交接靠其"轮次交接"两清单（新会话开工动作 / 轮次收尾清单）。开工阻塞项：
+Q4（R1 最小动议主题，一句话任务即可），见 `docs/00-index.md` 台账。
