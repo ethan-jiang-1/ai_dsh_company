@@ -282,12 +282,14 @@ ai_dsh_company/
 
 要点：
 
-1. **共享行随 pack 的 bundle 层，preset 只放差异**（R1 实证修正：原设计写"放 profile 层"，
-   实测 **profile 层 patch 只能替换已有行、不能新增**）。preset 层没有 patch 继承（"standard plus one
-   change"不可表达，shipped `cordis`/`ptc` 都是整份复制再改）；4 个角色 preset 若各自复制全部
-   共享行，维护成本翻四倍。把 fs/检索/team/present 行放进 pack 的 `cordis.patch.yml`
-   （新增用 `- insert:`），角色 preset 薄到 persona + skills + 角色特有工具。代价是 preset
-   不再"拷走即用"——我们是自部署产品，这个代价可控，且换来 DRY。
+1. **工具面归 preset 自己声明（自包含）；profile/bundle 行只管全局服务与默认行**（R1 二次实证：
+   原设计"共享行放 host/profile 层、preset 只放差异"**对工具面不成立**——R1 首跑 CEO 会话只拿到
+   bundle 加的 10 个工具（团队 9 + present），没有 fs/skill，于是读不了 CHARTER、加载不了 skill、
+   **写不出交付物**）。shipped `standard` 同样是自包含：255 行里自己声明
+   tool-bash/tool-fs/tool-fs-search/tool-skill/goal/planning/compaction/delegation/…。
+   故每个角色 preset 声明自己那套工具行（复制式演化——DSH 无 patch 继承）；pack 的
+   `cordis.patch.yml` 只负责**全局行**（agent-presets roster、团队两行、present）。
+   代价：4 个角色各持一份工具行清单（R2 补另两个时照抄）；换来按角色的最小权限工具面。
 2. **presets 进 roster 的落法**（FAQ 13 已核实 + R1 实证）：pack 里的 `presets/` 不会自动进
    roster，`dsh-agent-presets` 只扫 shipped 根 / 配置 `roots` / 用户根。roots 行写在 pack 的
    bundle 里，且**用替换语法覆盖 web-app 的出厂 `agent-presets` 行**（default: standard → ceo）；

@@ -30,9 +30,27 @@ importers:
       '@deepseek-ai/dsh-skill-filesystem':
         specifier: workspace:*
         version: link:vendor/dsh/packages/skill/skill-filesystem
+      '@deepseek-ai/dsh-tool-ask-user':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/interaction/tool-ask-user
+      '@deepseek-ai/dsh-tool-fs':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/fs/tool-fs
+      '@deepseek-ai/dsh-tool-fs-search':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/fs/tool-fs-search
       '@deepseek-ai/dsh-tool-present':
         specifier: workspace:*
         version: link:vendor/dsh/packages/fs/tool-present
+      '@deepseek-ai/dsh-tool-skill':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/skill/tool-skill
+      '@deepseek-ai/dsh-tool-subagent':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/subagent/tool-subagent
+      '@deepseek-ai/dsh-tool-todo':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/todo/tool-todo
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -78,6 +96,9 @@ importers:
       '@deepseek-ai/dsh-skill-filesystem':
         specifier: 0.1.5-rc.2
         version: link:../../vendor/dsh/packages/skill/skill-filesystem
+      '@deepseek-ai/dsh-tool-ask-user':
+        specifier: 0.1.5-rc.2
+        version: link:../../vendor/dsh/packages/interaction/tool-ask-user
       '@deepseek-ai/dsh-tool-fs':
         specifier: 0.1.5-rc.2
         version: link:../../vendor/dsh/packages/fs/tool-fs
@@ -90,6 +111,12 @@ importers:
       '@deepseek-ai/dsh-tool-skill':
         specifier: 0.1.5-rc.2
         version: link:../../vendor/dsh/packages/skill/tool-skill
+      '@deepseek-ai/dsh-tool-subagent':
+        specifier: 0.1.5-rc.2
+        version: link:../../vendor/dsh/packages/subagent/tool-subagent
+      '@deepseek-ai/dsh-tool-todo':
+        specifier: 0.1.5-rc.2
+        version: link:../../vendor/dsh/packages/todo/tool-todo
 
   vendor/dsh/apps/cli:
     dependencies:

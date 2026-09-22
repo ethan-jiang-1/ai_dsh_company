@@ -37,6 +37,17 @@ UI 按 trust 分组，故四张卡出现在 **Built-in** 组（`AgentPresetSecti
   历史评审三问）+ `journal/`。
 - **验证**：Web 会话选 `vp-eng` → 身份探针 + 产出探针（半页 PRD 出评审意见，不得越权替销售/运营下结论）。
 
+## 工具面（preset 自包含声明，R1 实证）
+
+| 角色 | 工具行 | 说明 |
+|---|---|---|
+| CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` + `delegation` 组（`tool-subagent` spawn） | 读 KB、写交付物、加载 skill、澄清提问、声明交付；`delegation` 是为 teammate 共享 Lead 组合而带（VP 生 worker 用） |
+| VP-Eng | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-present` + `delegation` 组 | 同上，无 `tool-ask-user`（VP 不直接问用户） |
+| 全局（pack bundle） | `agent-presets` roster 替换 + `tool-present` / `agent-team` / `tool-agent-team` insert | 只放全局行；**工具面不靠它**（见 [10 §6](./design/10-architecture.md) 要点 1） |
+
+⚠ **preset 是自包含组合**：DSH 无 patch 继承，工具行必须写在 preset 里——R1 首跑就是漏了这一步，
+CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）。`pnpm test` 已加门禁检查。
+
 ## 验证方式（分层）
 
 | 层 | 手段 | 现状 |

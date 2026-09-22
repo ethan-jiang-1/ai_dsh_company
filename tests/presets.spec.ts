@@ -42,6 +42,18 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
+  it('R1 定稿的角色必须声明基础工具行（preset 自包含；R1 首跑：无工具行 → 读不了文件、写不出交付物）', () => {
+    const required = ['tool-fs', 'tool-fs-search', 'tool-skill', 'tool-todo', 'tool-present']
+    for (const role of ['ceo', 'vp-eng']) {
+      const composition = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
+      const declared = new Set([...composition.matchAll(/^- id:\s*([a-z0-9-]+)$/gm)].map(m => m[1] as string))
+      const missing = required.filter(row => !declared.has(row))
+      expect(missing, `${role} 缺工具行：${missing.join(', ')}（preset 是自包含组合，DSH 无 patch 继承）`).toEqual([])
+      expect(composition, `${role} 必须挂 skill-filesystem`).toMatch(/^- id: skill-filesystem$/m)
+      expect(composition, `${role} 必须挂 persona`).toMatch(/^- id: persona$/m)
+    }
+  })
+
   it('四个角色显示名共用公司前缀（D14 系列命名，R2 补角色时不许忘）', () => {
     const names = ['ceo', 'vp-eng', 'vp-sales', 'coo'].map(role => {
       const match = /^name:\s*(.+)$/m.exec(readFileSync(join(PRESETS_DIR, role, 'preset.yml'), 'utf8'))
