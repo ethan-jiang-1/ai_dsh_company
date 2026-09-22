@@ -46,7 +46,8 @@ AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ plans/
 6. **只报告实际跑过的检查**：没跑的不算数。
 7. **完成定义 = 该面最小"真检查"通过，且发现权在你（代理）一侧**（D15，社区与宿主复盘一致结论）：
    配置/preset 类改动 → `node scripts/preset-smoke.mjs`（**真挂载**；dump/扫描不算证据）；客户端类
-   改动 → 查 boot 清单依赖闭环；**在让用户看 UI 之前，先用机器验证过**。把"你看一眼"当验收手段
+   改动 → 查 boot 清单依赖闭环；`agent-instructions` 注入类改动 → `node scripts/handbook-smoke.mjs`
+   （断言指令基线 = `company-workspace/AGENTS.md`，未混入开发仓库那份）；**在让用户看 UI 之前，先用机器验证过**。把"你看一眼"当验收手段
    正是宿主 [post-mortem 0003](../../vendor/dsh/docs/postmortem/0003-web-agent-gui-feedback-loop.md)
    记的失败模式（delegated acceptance to the user）。本仓两次事故的复盘见
    [`notes/postmortem/`](../../notes/postmortem/README.md)。
@@ -180,6 +181,8 @@ node ./node_modules/typescript/bin/tsc -p packages/company-pack/tsconfig.json
 #   （tsdown 原地写 lib/** 时不用——inode 不变；但 **presets/*.yml 这类源文件用编辑工具改会换 inode**，
 #    且安装副本实测是真拷贝（link count 1），不重装则改动不可见——2026-09-22 实证）。
 node scripts/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）
+node scripts/handbook-smoke.mjs        # agent-instructions 注入完成定义：指令基线 = 公司手册（默认只跑 ceo 一次小调用）
+node scripts/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
 ```
 
 实证过的坑与解法（细节见 notes/implemented/2026-09-22-r0-loop-acceptance.md）：
@@ -293,6 +296,31 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - **完成信号用持久事件**（`turn/end`），不要用状态位（`session/list.running` 是"会话有活着的 agent"，
   idle 也为 true，会让等待永不满足）。
 - **慢是常态**：内容档超时 ≥5min；快档 90s 足够；失败重试一次（换新会话）。
+
+### 9.1 测试分层与预算（R3 立，回答"回归不能跑这么慢"）
+
+**教训（R3）**：把"真浏览器 + 真模型 + 真 UI"的委派卡 e2e 当回归门禁——240s 都没等到
+（CEO persona 的开工仪式先烧 5–6 步模型往返），而且**依赖模型配合**：模型不调那个工具就永远绿不了。
+**这是层次放错，不是脚本写得不好。**
+
+**分层（按"要不要模型"切，不按"重不重要"切）**：
+
+| 层 | 时间 | 跑什么 | 何时跑 |
+|---|---|---|---|
+| 结构 keyless | ~1s | `pnpm verify` | 每次改动 |
+| **单元/组件 keyless** | ~1s | `pnpm test`——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要 jsdom/浏览器） | 每次改动 |
+| 装配 keyless | ~10s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） | 客户端改动 |
+| 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） | 轮末 / **升 pin 时** |
+| 认证档（真模型） | 分钟级 | `preset-smoke` / `probe-smoke` / `handbook-smoke` | **每轮一次**，产出归档；不进回归 |
+
+**三条硬规矩**：
+
+1. **真模型 / 真浏览器不进迭代环**：迭代环只跑 `verify` + `test`（秒级）；分钟级一律"轮末一次"。
+2. **能做成纯函数就做成纯函数**：UI 组件把"展示事实"抽成纯函数（范本 `delegationCardModel`），
+   keyless 单测直接断言它——组件层就永远不需要模型与浏览器。
+3. **认证档要能"重放"而不是"重跑"**：真模型跑一次 → 会话日志归档 → 后续用归档做回放断言
+   （R5 replay harness）。**重跑只在升 pin 或行为确实要改时做**；R3 的委派卡端到端（模型→工具→卡片）
+   就留给 R5 的 replay harness（试过的慢 e2e 已否决，原因见 delegation.md §6）。
 
 ## 10. 自动化只许是轻任务（硬上限，不许无限跑）
 

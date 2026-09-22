@@ -10,10 +10,13 @@ const PRESETS_DIR = join(PACK, 'presets')
 // 与源码 CLI 同域的解析锚点：apps/cli 向上走到仓库根 node_modules（workspace 链接）。
 const HARNESS_BASE = pathToFileURL(join(ROOT, 'vendor/dsh/apps/cli/')).href
 
-/** 一个 preset 目录里声明的行插件名（`name: '@deepseek-ai/...'`）。 */
+/** 一个 preset 目录里声明的行插件名（`name: '@deepseek-ai/...'`），按包名归一（去 subpath）。 */
 function rowPlugins(role: string): string[] {
   const text = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
-  return [...text.matchAll(/name:\s*'(@deepseek-ai\/[^']+)'/g)].map(m => m[1] as string)
+  // 行名可带 subpath（`@scope/pkg/sub`，如 tool-subagent-control/list-agents）；
+  // dependencies 里登记的是包名，所以按 `@scope/name` 归一后再比对（R3 实证）。
+  return [...text.matchAll(/name:\s*'(@deepseek-ai\/[^']+)'/g)]
+    .map(m => /^(@[^/]+\/[^/]+)/.exec(m[1] as string)?.[1] ?? (m[1] as string))
 }
 
 describe('company roster（R1 回归：preset 必须可挂载）', () => {
@@ -99,6 +102,28 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     // 2026-09-22 实证：写成 `presets/` → <profile>/presets/（不存在）→ scanRoot 静默返回空 → UI 无角色
     expect(resolved).toBe(fileURLToPath(new URL('node_modules/dsh-company-pack/presets/', fakeProfile)))
     expect(resolved).toContain('node_modules/dsh-company-pack/presets')
+  })
+
+  it('CEO 汇报线（R3）：命名委托工具是 one-shot 前台；续驶控制行不得回填（team shadow 实证）', () => {
+    const ceo = readFileSync(join(PRESETS_DIR, 'ceo', 'agent.cordis.yml'), 'utf8')
+    // 每个直接汇报对象一个 distinct toolName（per-instance persona 教义）。
+    for (const tool of ['vp_eng', 'vp_sales']) {
+      const match = new RegExp(`toolName: ${tool}([\\s\\S]*?)(?=\\n\\s*- id: |$)`).exec(ceo)
+      expect(match, `CEO 缺命名委托工具 ${tool}`).not.toBeNull()
+      const block = (match as RegExpExecArray)[1] as string
+      // R3 实证：CEO 会话从第一帧起就是 team-scoped，团队版 send_message/list_agents/
+      // interrupt_agent 按成员**名字**寻址 ⇒ subagent child 无法被续驶。所以命名委托必须是
+      // one-shot 前台（拿结果），不能是 continuable（会生出管不了的孤儿 child）。
+      expect(block, `${tool} 必须 one-shot（continuable 的续驶在 CEO 会话里不可用）`).toContain('backgroundMode: one-shot')
+      expect(block, `${tool} 必须关掉 run_in_background（没有 job_output 工具可收后台 one-shot）`).toContain('enableRunInBackground: false')
+      expect(block, `${tool} 缺 per-instance persona`).toContain('persona: |-')
+      expect(block, `${tool} 缺 maxDepth（禁止 VP→VP 平级派活）`).toContain('maxDepth: 1')
+    }
+    // 反向守卫：这两个控制行在 CEO 会话里会被团队版 shadow（是死行），别再"修"回来。
+    expect(ceo, 'tool-subagent-control 在 CEO 会话被 team shadow，是死行（见 docs/delegation.md）')
+      .not.toMatch(/^\s*- id: tool-subagent-control$/m)
+    expect(ceo, 'list-agents 同理是死行')
+      .not.toMatch(/^\s*- id: tool-subagent-list-agents$/m)
   })
 
   it('公司手册（模型可见）覆盖五角色职责边界、路由与升级规则——不随内容改动悄悄失效', () => {

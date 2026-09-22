@@ -14,10 +14,9 @@
 //       chromium（缺 playwright 期望的版本时自动回退缓存里最新一份）。
 // 用法：source dev/env.sh && node scripts/client-load-smoke.mjs [--port 3092]
 import { spawn } from 'node:child_process'
-import { existsSync, readdirSync } from 'node:fs'
-import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
+import { launchChromium, loadChromium } from './lib/playwright.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const arg = (name, fallback) => {
@@ -35,56 +34,6 @@ if (home === undefined || home === '') {
 }
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
-
-/** 递归找 chromium 可执行文件（headless shell / macOS app bundle / chrome）。 */
-function findExecutable(dir) {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const path = join(dir, entry.name)
-    if (entry.isDirectory()) {
-      const hit = findExecutable(path)
-      if (hit !== undefined) return hit
-    } else if (entry.name === 'chrome-headless-shell' || entry.name === 'Chromium' || entry.name === 'chrome') {
-      return path
-    }
-  }
-  return undefined
-}
-
-/** 定位 playwright：根 node_modules → .pnpm store（vendor 全树安装后存在）。 */
-async function loadChromium() {
-  const candidates = [join(ROOT, 'node_modules/playwright/index.mjs')]
-  const pnpmDir = join(ROOT, 'node_modules/.pnpm')
-  if (existsSync(pnpmDir)) {
-    for (const name of readdirSync(pnpmDir).sort().reverse()) {
-      if (name.startsWith('playwright@')) candidates.push(join(pnpmDir, name, 'node_modules/playwright/index.mjs'))
-    }
-  }
-  for (const candidate of candidates) {
-    if (!existsSync(candidate)) continue
-    const mod = await import(pathToFileURL(candidate).href)
-    if (mod.chromium !== undefined) return mod.chromium
-  }
-  throw new Error('client-load-smoke: 找不到 playwright（先 `pnpm install`，guides/60 §7）')
-}
-
-/** 启动 chromium：默认解析失败（缓存里没有期望版本）时，回退缓存里最新一份可执行文件。 */
-async function launch(chromiumApi) {
-  try {
-    return await chromiumApi.launch()
-  } catch (error) {
-    if (!String(error).includes("Executable doesn't exist")) throw error
-    const cache = process.env.PLAYWRIGHT_BROWSERS_PATH ?? join(homedir(), 'Library/Caches/ms-playwright')
-    if (!existsSync(cache)) throw error
-    const roots = readdirSync(cache)
-      .filter(name => name.startsWith('chromium_headless_shell-') || name.startsWith('chromium-'))
-      .sort().reverse()
-    for (const root of roots) {
-      const executable = findExecutable(join(cache, root))
-      if (executable !== undefined) return await chromiumApi.launch({ executablePath: executable })
-    }
-    throw error
-  }
-}
 
 /** boot web profile，等到启动横幅打印带 token 的 URL（与 preset-smoke 同一入口）。 */
 async function boot() {
@@ -108,12 +57,12 @@ async function boot() {
   return { child, ...(await banner) }
 }
 
-const chromiumApi = await loadChromium()
+const chromiumApi = await loadChromium(ROOT)
 const { child, port, token } = await boot()
 let failures = 0
 const fail = (label, detail) => { failures++; console.log(`  FAIL ${label}: ${detail}`) }
 try {
-  const browser = await launch(chromiumApi)
+  const browser = await launchChromium(chromiumApi)
   try {
     const page = await browser.newPage()
     const loaderErrors = []

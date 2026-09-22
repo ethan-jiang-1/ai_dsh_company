@@ -109,8 +109,13 @@ const rowPlugins = new Set()
 for (const role of roles) {
   const text = readFileSync(join(root, 'packages/company-pack/presets', role, 'agent.cordis.yml'), 'utf8')
   for (const m of text.matchAll(/name:\s*'(@deepseek-ai\/[^']+)'/g)) {
-    rowPlugins.add(m[1])
-    if (!packDeps.has(m[1])) fail('preset-dep', `${role} 的行引用 ${m[1]}，但不在 pack dependencies（安装后解析不到 → preset broken）`)
+    // 行名可带 subpath（如 `@deepseek-ai/dsh-tool-subagent-control/list-agents`，shipped
+    // standard preset 就这么写）；依赖存在性按**包名** `@scope/name` 归一（R3 实证：
+    // 不归一 → 把合法的 subpath 行误判成缺依赖）。
+    const spec = m[1]
+    const pkg = /^(@[^/]+\/[^/]+)/.exec(spec)?.[1] ?? spec
+    rowPlugins.add(spec)
+    if (!packDeps.has(pkg)) fail('preset-dep', `${role} 的行引用 ${spec}，但 pack dependencies 里没有 ${pkg}（安装后解析不到 → preset broken）`)
   }
 }
 ok(`preset-row-deps ×${rowPlugins.size}`)

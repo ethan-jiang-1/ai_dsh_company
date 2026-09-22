@@ -159,11 +159,15 @@ CEO preset 里给每个直接汇报对象配一个 `dsh-tool-subagent` 实例（
 - **与 team bundle 的组合冲突（核实过 patch 源）**：`agent-team-profile` 会 disable 全局
   `tool-subagent-control`（send_message/interrupt_agent/list_agents）并把 `tool-subagent`
   压成 one-shot，而团队的九个工具**只覆盖 team 成员**——若装着 bundle 再加 continuable
-  命名委托行，这些 child 将无法被续驶。两条解法：① R3 起不用 bundle，把
-  `agent-team` + `tool-agent-team` 两行直接写进我们自己的 `profiles/company.cordis.yml`
-  （仍是零 JS；团队工具对成员自动 shadow 全局同名工具，全局控制保留给非 team 的
-  continuable child——shadow 语义见 `tool-agent-team/README.md`："shadow those globals
-  for team members only"）；② 保持 bundle，把命名委托行也设为 one-shot（放弃续驶）。
+  命名委托行，这些 child 将无法被续驶。两条解法：① **已定（R1 起就是这么做的）**：不装官方
+  bundle，把 `agent-team` + `tool-agent-team` 两行直接 insert 进本包 `cordis.patch.yml`
+  （仍是零 JS；R3 的"改直插行"因此已完成，只剩验证）；② 保持 bundle，把命名委托行也设为
+  one-shot（放弃续驶）。
+  ⚠ **R3 待验证点（别当成已成立的事实）**：团队工具是 **scoped 注册**，"shadow those globals
+  **for team members only**"——而 **Lead（CEO）自己也是 team member**。所以"CEO 会话里
+  spawn 过 teammate 之后，还能不能用 `send_message`/`list_agents` 驱动命名委托生出来的
+  非 team continuable child"是未验证假设，由 R3 的 `delegation-smoke` 真跑判定；结论写进
+  `delegation.md`（见 roadmap R3 行的"并存不互破"验收）。
 
 ### 通道 B · Agent Teams（experimental，最贴近"公司开会"）
 

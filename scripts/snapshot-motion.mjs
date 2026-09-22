@@ -20,6 +20,10 @@ const SESSION = arg('session')
 const OUT = resolve(ROOT, arg('out', 'snapshots/r2-motion'))
 const MOTION = arg('motion', '（未注明）')
 const CWD_REL = arg('cwd', 'company-workspace')
+// 场景名（R3 起可配）：探针类场景不是"动议"，别让 snapshot.yml 顶着 r2 的名字。
+const SCENARIO = arg('scenario', 'r2-five-role-motion')
+// 探针场景不改工作区：跳过 workspace.expected 拷贝（否则会把 R2 的交付物原样抄进来，噪声）。
+const NO_WORKSPACE = process.argv.includes('--no-workspace')
 if (SESSION === undefined) {
   console.error('snapshot-motion: 需要 --session <session-id>')
   process.exit(2)
@@ -75,18 +79,22 @@ for (const child of children) writeFileSync(join(OUT, 'sessions', `${child.name}
 
 // 工作区期望态：交付物 + 各角色 journal（对照基线；record/refresh 不重写业务文件）。
 const expected = join(OUT, 'workspace.expected')
-rmSync(expected, { recursive: true, force: true })
-mkdirSync(join(expected, 'kb'), { recursive: true })
-cpSync(join(cwd, 'deliverables'), join(expected, 'deliverables'), { recursive: true })
-for (const role of readdirSync(join(cwd, 'kb'))) {
-  const journal = join(cwd, 'kb', role, 'journal')
-  if (existsSync(journal)) cpSync(journal, join(expected, 'kb', role, 'journal'), { recursive: true })
+if (NO_WORKSPACE) {
+  rmSync(expected, { recursive: true, force: true })
+} else {
+  rmSync(expected, { recursive: true, force: true })
+  mkdirSync(join(expected, 'kb'), { recursive: true })
+  cpSync(join(cwd, 'deliverables'), join(expected, 'deliverables'), { recursive: true })
+  for (const role of readdirSync(join(cwd, 'kb'))) {
+    const journal = join(cwd, 'kb', role, 'journal')
+    if (existsSync(journal)) cpSync(journal, join(expected, 'kb', role, 'journal'), { recursive: true })
+  }
 }
 
 const lines = (text) => text.split('\n').filter(line => line !== '').length
-writeFileSync(join(OUT, 'snapshot.yml'), `# 动议回归资产：录制会话（Lead + children）+ 工作区期望态（独立 oracle）。
+writeFileSync(join(OUT, 'snapshot.yml'), `# 回归资产：录制会话（Lead + children）+ 工作区期望态（独立 oracle）。
 # 形状同 R1（snapshots/r1-motion/）；replay harness 归 R5，当前用途是基线对照。
-scenario: r2-five-role-motion
+scenario: ${SCENARIO}
 recordedAt: ${new Date().toISOString().slice(0, 10)}
 profile: web
 agentPreset: ${lead.agentPreset ?? 'ceo'}
@@ -96,7 +104,7 @@ session:
   lead: sessions/lead.jsonl        # ${String(lines(leadJsonl))} 行
   children: sessions/              # ${String(children.length)} 个：${children.map(c => `${c.name}`).join(' / ') || '（无）'}
 workspace:
-  expected: workspace.expected/    # deliverables/ + kb/<role>/journal/
+  expected: ${NO_WORKSPACE ? '（本场景不改工作区，未录）' : 'workspace.expected/    # deliverables/ + kb/<role>/journal/'}
 `)
 console.log(`snapshot-motion: ${OUT}`)
 console.log(`  lead ${String(lines(leadJsonl))} 行；children ${String(children.length)} 个（${children.map(c => c.name).join(', ') || '无'}）`)

@@ -28,10 +28,11 @@ implemented → archived）。
 | [design/20-roles-isolation.md](./design/20-roles-isolation.md) | 设计 | 每角色独立六面的机制安排；composition 继承分水岭与 `mount()` 裂缝；M1–M4 编排选型；两个结构性缺口 |
 | [design/30-ui-demo.md](./design/30-ui-demo.md) | 设计 | Web UI 演示层：现成团队 UI（零代码）、公司皮肤（slots/Remote）、demo 分镜 |
 | [design/40-role-content-plan.md](./design/40-role-content-plan.md) | 设计 | 四个角色的内容设计：persona 要素、skills 清单、KB/模板骨架、入戏探针（文案待 Q4） |
-| [plans/roadmap.md](./plans/roadmap.md) | 计划 | 垂直轮（D11）：R0 立环 → R1 两人公司 → R2 四人全员 → R3 汇报线 → R4 成品流程 → R5 皮肤+门禁；轮次交接两清单 |
+| [plans/roadmap.md](./plans/roadmap.md) | 计划 | 垂直轮（D11）：R0 立环 → R1 两人公司 → R2 五角色全员 → R3 汇报线 → R4 成品流程 → R5 皮肤+门禁 → R6 分身成长（待命）；轮次交接两清单 |
 | [guides/50-budget-and-ops.md](./guides/50-budget-and-ops.md) | 指南 | 限流旋钮总表、成本结构、demo 运维 runbook（症状→动作）、回放复盘 |
 | [guides/60-dev-loop.md](./guides/60-dev-loop.md) | 指南 | 开发环操作手册：六步闭环、调试阶梯、设计四问、插拔速查、升级环与发布时点、双 home/双 DSH |
 | [profile.md](./profile.md) | 合同 | host 组合现在时：部署形状（源码直跑/持久安装实测）、行清单语义、开放点 |
+| [delegation.md](./delegation.md) | 合同 | 汇报线现在时（R3 出生）：命名委托工具（one-shot 前台）与 team 的分工、team shadow 边界与证据、委派工具卡、分层验证 |
 | [presets.md](./presets.md) | 合同 | 角色 preset 语义（R2：五角色定稿——CEO / VP-Eng / VP-Sales / COO / CFO）；名册运行时实测；验证分层 |
 | [demo.md](./demo.md) | 合同 | demo 操作合同（R2 五角色版 + 场景 B 三角色应急协作；R4 定稿）：动议、前置、分镜与观测点、验收判据、已知边界 |
 
@@ -47,8 +48,9 @@ implemented → archived）。
 
 | 将出生的合同 | 诞生轮次 | 内容来源 |
 |---|---|---|
-| `delegation.md` | R3 | 命名委托工具的语义（工具行、persona 文案、续驶路径） |
 | `release.md` | R5 | 发布形状：peers、compatibility 矩阵、真实安装冒烟程序 |
+
+（`delegation.md` 已于 R3 出生，见上表。）
 
 ## 决策台账
 
@@ -73,12 +75,13 @@ implemented → archived）。
 | D15 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**。迭代是常态，但必须由**代理能自己跑的检查**闭合：真入口路径 > dump/扫描；"伺服了"≠"能加载"；让用户看 UI 之前必须先机器验证过。**同时否决**：为这类失败引入 spec 流程（无第一方证据，且本类失败不在其射程）、把指令文件写更长（advisory，非确定性） | notes/research/2026-09-22-agent-workflow-community-practice.md（17 个一手来源）；notes/postmortem/0001-0002；vendor `docs/testing.md` + `docs/postmortem/0003`；落点：guides/60 §1/§2/§7、AGENTS.md 纪律表、roadmap 收尾清单第 6 条 |
 | D16 | **Q2 定案（2026-09-22）**：角色模型路由 = R2 全员同模型（默认路由，不写 `agentOptions`）。理由：当前瓶颈是内容质量与协作可见性，成本无差异化证据；需要差异路由时 R3 在委托工具 `agentOptions` 层做，不动 persona | tests/presets.spec.ts；presets.md |
 | D17 | **Q3 定案（2026-09-22）**：公司事实（CHARTER / journal / 客户 / 预算基准）全部留 workspace 活数据（D7 三载体）；随 pack 发布的只有方法论 skills 与结构模板——pack 不含公司事实，换公司复用 = 只换 workspace | presets.md；company-workspace/kb/ |
+| D18 | **R3 汇报线定案（2026-09-22）**：CEO 的命名委托工具 `vp_eng` / `vp_sales` = **one-shot 前台**（`backgroundMode: one-shot` + `enableRunInBackground: false` + `maxDepth: 1` + per-instance persona）。**continuable 在本组合里不可用**：CEO 会话从**第一帧**起 team-scoped，团队版 `send_message` / `list_agents` / `interrupt_agent` 按成员**名字**寻址，而 subagent child 不在名册上 ⇒ 续驶/中断/列举全不可达。因此：续驶与连续对话归 **team（M4）**；"child 拿到角色完整 skills/工具面"归 **M2（未做）**；CEO preset **不放**全局控制行（在 CEO 会话是死行，有反向守卫）；并行快捷派活要等上游 seam，**本仓不自建**（D13） | [delegation.md](./delegation.md)；`scripts/delegation-smoke.mjs`（边界守卫）；`snapshots/r2-motion/sessions/lead.jsonl` 第一帧 |
 
 ### 待定（阻塞项标 ⛔）
 
 | # | 问题 | 影响面 | 何时必须定 |
 |---|---|---|---|
-| Q1 | M2 的 one-shot 形状是否满足"跟 VP 的连续对话"需求？若否→推 D9 上游 seam 或上 M3 | R3 之后的增强路线 | R3 轮内（命名委托实现后） |
+| Q1 ✅ | ~~M2 的 one-shot 形状是否满足"跟 VP 的连续对话"需求？~~ **已定（R3）**：需求由 **team 的持久成员**满足（邮箱 Steer / idle 开轮 / inactive 冷恢复）；通道 A 在本组合里**只能是 one-shot**，它的价值是"单职能快捷出稿"而非连续对话。M2 自定义 provider 只在需要**组合隔离**时才有价值 | R3 之后的增强路线 | 已定（R3 轮内，见 D18 + delegation.md） |
 | Q2 ✅ | 角色是否需要不同模型路由？影响 preset 行与委托工具 `agentOptions` | 内容设计、成本 | R1 前（定 persona 时一起定） |
 | Q3 ✅ | 公司手册哪些随 pack 发布、哪些留 workspace 活数据？ | KB 骨架 | R1–R2 中 |
 | Q4 ✅ | ~~R1 的最小动议主题~~ **已定（2026-09-22）：「给我们公司要不要自建知识库写一页技术评估」** | R1 探针任务与预算 | 已定；整场 demo 剧本 R2 前再议 |

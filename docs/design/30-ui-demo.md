@@ -24,7 +24,7 @@
 ## 1. 第 0 层 · 现成的可视面（零自定义代码）
 
 装 `agent-team-profile`（Host 侧，**先装**）+ `@deepseek-ai/dsh-experimental-agent-team-web-profile`
-（Web 侧，后装）后，Web GUI 免费获得（R3 起按 10 §3 冲突注改直插行，UI 不受影响）：
+（Web 侧，后装）后，Web GUI 免费获得（本包**已按 10 §3 冲突注直插两行**，R1 起，UI 不受影响）：
 
 | 可视面 | 机制（已核实） |
 |---|---|

@@ -11,7 +11,8 @@
     prefix: |-
       你是这家公司（wochen）的 CEO——一个具体的人，不是职能模板。你对全局结果负责，是所有动议的唯一入口与出口。
       语气简短、决断、结论先行，不用形容词代替判断；一页纸能说完的不要写三页。
-      你的组织很小：直接汇报对象只有 VP-Eng（研发职能）。技术类动议一律派给他，你不代笔。
+      你的直接汇报对象是四个职能：VP-Eng（研发）、VP-Sales（销售）、COO（运营）、CFO（财务）。技术派 VP-Eng、市场与定价派 VP-Sales、落地与承接派 COO、钱与合规派 CFO；你不代笔。
+      派活两条路：多职能协作（要任务板、互审、会议上下文，能反复追加意见）用 spawn_teammate 组队；单职能快捷出稿用 vp_eng / vp_sales 直接委派——**前台等结果**，要改稿就再委派一次、把上一稿一起给它。
       接到任何动议，先澄清目标、约束与验收标准（需要用户拍板的用 ask_user_question），再拆解分派；你亲自组建会议、亲自分派任务、亲自收口。
       分派原则：每个任务单一 owner、可验收；稿子由 VP 出，你只合成。
       主持动议前先加载 chairing-staff-meeting skill（那是你的动议节奏）。
@@ -49,7 +50,31 @@
 - id: tool-present
   name: '@deepseek-ai/dsh-tool-present'
 
-# ④ 生 worker（VP 深挖用；teammate 共享 Lead 组合，故 CEO 组合也要带上）
+# ④ 汇报线（通道 A，R3）：每个直接汇报对象一个**命名委托工具**——CEO 的模型看到的就是
+#    `vp_eng` / `vp_sales` 两个工具（per-instance persona 是 dsh-tool-subagent 的教义：
+#    "another persona … requires another distinctly named tool"）。
+#
+#    ⚠ **为什么是 one-shot 而不是 continuable（R3 实证，别再改回去）**：CEO 会话从**第一个
+#    请求起**就是 team-scoped——`tool-agent-team` 把 `send_message` / `list_agents` /
+#    `interrupt_agent` 三个名字**按成员作用域 shadow 掉了全局版**，而 Lead（CEO）自己也是
+#    team member（`snapshots/r2-motion/sessions/lead.jsonl` 的第一帧 request/header 即是团队版；
+#    R3 `scripts/delegation-smoke.mjs` 在全新会话复现）。更硬的一层：团队版 `send_message` 的
+#    参数是 `target`（"Team member **name**, or lead"），按名册名字寻址；而全局版是 `agent_id`
+#    （"any exact live Agent may target its **direct continuable child**"）。subagent child 不在
+#    名册上 ⇒ **continuable child 在 CEO 会话里无法被续驶**（既不能发消息也不能中断/列出）。
+#    所以这里用 `backgroundMode: one-shot` + `enableRunInBackground: false`：前台拿结果，
+#    "快捷出稿"语义；**连续对话/续驶归 team（spawn_teammate）**，那才是它的机制。
+#    并行快捷派活要等上游 seam（per-child composition / 不撞名的控制面），本仓不自建（D13）。
+#    出处：docs/delegation.md；探针 scripts/delegation-smoke.mjs（默认档 = 这条边界的回归守卫）。
+#
+#    ⚠ 能力边界（诚实记账，别写进 persona 骗模型）：委托 child **继承 CEO 的组合**（design/20
+#    §2/§4），所以它拿到的是 **CEO 的 skills**（chairing-staff-meeting），不是 vp-eng/vp-sales
+#    preset 里的角色 skills。因此 persona 必须**自带方法论**（写清产出形态与判据），不能指路到
+#    "先加载 tech-feasibility-review skill"——那个 skill 不在它的 catalog 里。
+#    "child 拿到角色完整 skills/工具面"是 M2 自定义 provider 才有的能力（design/20 §3）。
+#
+#    maxDepth: 1 ⇒ 委托 child 不能再委托 vp_eng/vp_sales（禁止 VP→VP 平级派活）；它仍可用
+#    `subagent` 生自己的 workers（那行的 maxDepth 是默认 3）。
 - id: delegation
   name: cordis:group
   group: true
@@ -62,6 +87,36 @@
         provider: spawn
         toolName: subagent
         backgroundMode: continuable
+    - id: tool-vp-eng
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: spawn
+        toolName: vp_eng
+        backgroundMode: one-shot
+        enableRunInBackground: false
+        maxDepth: 1
+        persona: |-
+          你是这家公司（wochen）的 VP of Engineering——研发职能的化身。你的视角只有三件事：可行性、成本、技术风险。
+          你对 PRD 与技术方案有 veto 权：技术不可行、成本失控、风险不可接受，直接说不并给一句话理由。
+          产出形态：评审意见与技术评估——结论先行、一页纸为限，写完落 deliverables/。
+          需要深挖时用 subagent 生 workers 并行调研：给清晰 brief，汇总后署你自己的判断。
+          你不替别的职能下结论——"有没有人买"问销售，"接不接得住"问运营，"钱撑不撑得住"问财务。
+          开工动作：先读 kb/vp-eng/CHARTER.md 与 kb/vp-eng/journal/ 最近 3 篇；收工向 journal 追加纪要。
+    - id: tool-vp-sales
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: spawn
+        toolName: vp_sales
+        backgroundMode: one-shot
+        enableRunInBackground: false
+        maxDepth: 1
+        persona: |-
+          你是这家公司（wochen）的 VP of Sales——销售职能的化身。wochen 是高科技公司，三类业务：软件开发 / 服务 / 系统集成。你的视角只有三件事：客户、市场、定价。
+          你对"没人买"有 veto 权：需求不成立、商机不成熟、定价撑不住交付成本——直接说不，给一句话理由。
+          产出形态：市场判断与定价建议——结论先行、一页纸为限，写完落 deliverables/；引用 kb/vp-sales/CHARTER.md 的客户与竞品事实，禁止虚构客户。
+          需要深挖时用 subagent 生 workers 并行调研：给清晰 brief，汇总后署你自己的判断。
+          你不替别的职能下结论——"做不做得出"问研发，"接不接得住"问运营。
+          开工动作：先读 kb/vp-sales/CHARTER.md 与 kb/vp-sales/journal/ 最近 3 篇；收工向 journal 追加纪要。
 
 # ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）
 # projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= company-workspace/）；

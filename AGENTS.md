@@ -35,6 +35,8 @@ pnpm test                              # keyless 回归（vitest：roster 零 br
 node scripts/preset-smoke.mjs          # 上线前门禁：boot 真 web，逐个 preset 建会话（唯一能抓"preset 挂载失败"的检查；需 DSH_HOME + 已装 pack）
 node scripts/client-load-smoke.mjs     # client 面完成定义：headless 浏览器加载真页面，断言零插件挂载失败 + 品牌槽在场（需 DSH_HOME；postmortem 0003）
 node scripts/probe-smoke.mjs           # 角色连通冒烟（默认快速档 ~6s）：真 web + 真 preset + 一句 ping，断言"挂载/轮次跑完/模型回话/人格进 prompt"；`--full` 才跑 15 个内容探针（慢，5–10min，按需）
+node scripts/handbook-smoke.mjs        # agent-instructions 注入完成定义：断言会话的指令基线 = company-workspace/AGENTS.md（且未混入开发仓库 AGENTS.md）；默认只跑 ceo 一次小调用
+node scripts/delegation-smoke.mjs      # 汇报线边界守卫（R3，1 条 prompt）：vp_eng/vp_sales 在模型可见目录 + 三个控制名仍是**团队版**（shadow 边界变了就红）；`--delegate` 多 1 条 prompt 真委派一次，断言**前台拿到稿子**
 node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile → dsh plugin add → 冒烟
 ```
 
@@ -126,17 +128,25 @@ pin + manifest/SHA 纪律）。
 
 ## 当前状态
 
-**R0（立环）✅ / R1 两人公司 ✅ 完成（2026-09-22）**：CEO + VP-Eng 正式内容就位，pack 装进
-web profile；**首条动议跑通**（CEO 澄清 → 任务板 → `spawn_teammate(vp-eng)` → VP 出稿 →
-CEO 合稿 `present`），`company-workspace/deliverables/` 两份交付物 + 两个 journal；
-首份回归资产 `snapshots/r1-motion/`。当前轮 **R3 汇报线——▶ 开工中（2026-09-22）**（R2 五人全员已闭环：机制真跑 + 收口 present + 归档；仅"两空间镜头 UI 观演"留待下次开窗）。下一步切片见 `docs/plans/roadmap.md` R3 行（命名委托工具 + team 两包直插行 + 委派工具卡薄片）。迭代按垂直轮（D11）见 `docs/plans/roadmap.md`。
-**R2 切片顺序（步步为营，UI 反馈优先）**：① 任务板活面板 ✅（打开期间每 5s 自动刷新；client-load-smoke 全绿）→
-② 两空间分镜彩排（现两角色即可走，收 UI 反馈后把分镜 v0 烤进 `demo.md`）→
-③ +VP-Sales/COO/CFO 正式文案与 skills ✅（pnpm test / verify / preset-smoke 五角色全绿；连通冒烟 `scripts/probe-smoke.mjs` 5/5 **6 秒**（默认快速档：挂载/轮次/回话/人格进 prompt），`--full` 内容档曾 14/15；CFO 增设 + 编制 50 人细到岗位 = `kb/org.md` 唯一事实家 + 每角色 1 号工作流，见 `notes/implemented/2026-09-22-r2-roles-alive.md`）→
-④ 五人动议全流程 ✅（真跑 + 受限收口：4 teammate + 7 任务含 3 条 `blocked_by` 依赖 + 互审回路 + 消息 queued/delivered 25/25 不丢不重 + 7 份交付物 + **CEO 合稿 `present`**（收口指令工具调用 ≤6、墙钟 ≤4 分钟，实际 60 秒内完成）；归档 `snapshots/r2-motion/`＝lead 486 行 + 4 child 会话；**两空间镜头的 UI 观演留待下次开窗，不阻塞 R3**；见 `notes/implemented/2026-09-22-r2-motion-run.md`）→
-⑤ 轮次收尾清单（roadmap 六条）。
-**皮肤第一笔已落**：pack 长出 client 面（`src/client/`：侧栏品牌槽 + **会话头部任务板**）+ `DSH_CLIENT_TITLE`
-构建期品牌——见 `notes/implemented/2026-09-22-client-face-brand.md`。
-观察窗：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。
-**自动化纪律（R2 立，两条都在 `docs/guides/60-dev-loop.md`）**：§9 门禁分层（连通档默认 ≈6s / 内容档 `--full` 按需）；
-§10 **自动化只许是轻任务**——开跑前定墙钟与调用上限、必须可中断、不无人值守跑多智能体、产出证据后只做收口。
+**R0 立环 ✅ / R1 两人公司 ✅ / R2 五角色全员 ✅ / R3 汇报线 ✅ 完成（2026-09-22）。
+当前轮 R4 成品流程——▶ 下一轮**（见 `docs/plans/roadmap.md`；迭代按垂直轮 D11，每轮换全新对话上下文）。
+
+**R3 交付（外部可观察）**：CEO 汇报线两条路——多职能协作走 `spawn_teammate`（team，主通道），
+单职能快捷出稿走**命名委托工具** `vp_eng` / `vp_sales`（**one-shot 前台** + per-instance persona +
+`maxDepth: 1`）；**委派工具卡**（`tool.call.toolview`）在对话流渲染"委派 · VP-Eng｜brief｜稿子"。
+语义合同 `docs/delegation.md`（D18）；收尾记录 `notes/implemented/2026-09-22-r3-reporting-line.md`。
+
+**R3 推翻的原设计（本轮最重要的产出）**：原计划命名委托用 `continuable` + `send_message` 追加意见
+——**实证否掉**：CEO 会话从**第一帧**起 team-scoped，`send_message`/`list_agents`/`interrupt_agent`
+三个名字被团队版 shadow，而团队版按**成员名字**寻址，subagent child 不在名册上。⇒ 续驶/连续对话
+归 team；`continuable` 在 CEO 会话里只会生出管不了的 child。证据三层（归档 / 工具 schema / 服务实现）
+见 `delegation.md` §2 与 `snapshots/r3-delegation/`。
+
+**门禁分层（R3 立，用户当轮反馈"回归不能跑这么慢"）**：见 `docs/guides/60-dev-loop.md` §9.1——
+**真模型/真浏览器不进迭代环**。迭代环 = `pnpm verify` + `pnpm test`（**19 条 2.1s**，含委派卡
+keyless 行为层）；认证档（`preset-smoke` / `probe-smoke` / `handbook-smoke` / `delegation-smoke`）
+**每轮一次**，产出归档；端到端真 UI 留 R5 replay harness。**R2 旧纪律**：§9 门禁分层、§10 自动化只许是轻任务。
+
+**观察窗**：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。
+**皮肤已落**：pack 的 client 面 = 侧栏品牌槽 + 会话头部任务板（活面板）+ 委派工具卡。
+**R4 起点**：`docs/plans/roadmap.md` R4 行 + `notes/proposed/2026-09-22-workspace-hygiene.md`（交付物三态 / 练习场隔离）。

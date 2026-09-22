@@ -94,7 +94,7 @@ UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSecti
 
 | 角色 | 工具行 | 说明 |
 |---|---|---|
-| CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` + `delegation` 组（`tool-subagent` spawn） | 读 KB、写交付物、加载 skill、澄清提问、声明交付；`delegation` 是为 teammate 共享 Lead 组合而带（VP 生 worker 用） |
+| CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` + `delegation` 组（`tool-subagent` spawn + **`vp_eng` / `vp_sales` 命名委托**） | 读 KB、写交付物、加载 skill、澄清提问、声明交付；**汇报线两条路**（R3）：命名委托 = one-shot 前台快捷出稿，协作走 team；语义见 [delegation.md](./delegation.md) |
 | VP-Eng / VP-Sales / COO / CFO | 同 VP-Eng（R2 起） | 无 `tool-ask-user`（VP 不直接问用户）；`delegation` 供深挖调研 / 盘点 / 测算 |
 | 全局（pack bundle） | `agent-presets` roster 替换 + `tool-present` / `agent-team` / `tool-agent-team` insert | 只放全局行；**工具面不靠它**（见 [10 §6](./design/10-architecture.md) 要点 1） |
 
