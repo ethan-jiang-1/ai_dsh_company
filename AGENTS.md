@@ -152,3 +152,6 @@ pin + manifest/SHA 纪律）。
 **观察窗**：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。
 **皮肤已落**：pack 的 client 面 = 侧栏品牌槽 + 会话头部任务板（活面板）+ 委派工具卡。
 **R4 起点**：`docs/plans/roadmap.md` R4 行 + `notes/proposed/2026-09-22-workspace-hygiene.md`（交付物三态 / 练习场隔离）。
+**R3 留下的两笔（别丢）**：① **委派卡端到端真 UI** → **R5** 的无 key replay harness（roadmap R5 行已点名；
+试过的慢 e2e 已否决，理由见 `delegation.md` §6）；② **`subagent` 行的 continuable footgun**
+（VP 根会话无控制行 ⇒ 那些 child 管不了）→ R4 轮间待办（roadmap「轮间待办 R3 → R4」+ `delegation.md` §4.4）。

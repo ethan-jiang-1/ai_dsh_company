@@ -13,7 +13,7 @@
 | R2 全员（五角色） | ✅ 完成（机制+门禁；UI 观演待下次开窗） | +VP-Sales +COO +CFO（文案+skills）；任务板 DAG 分派；VP 间至少一次互审（mailbox 跨层级）；fork teammate 下发会议上下文；pack 头部任务板升级为**活面板**（打开期间自动刷新，成员状态/任务修订双侧实时） | 新增两角色独立会话探针；task CAS 拒绝过期修订 | [30-ui-demo](../design/30-ui-demo.md) §3 分镜 v0 按「两空间镜头」走：**不讲解也能看懂谁在哪个空间、活怎么交接**；消息不丢不重 | `presets.md`（五角色语义合同）；40 号补全 |
 | R3 汇报线 | ✅ 完成（2026-09-22） | **team 两包直插行**（R1 起就已直插，本轮只做"并存不互破"的验证）；CEO 加 `vp_eng`/`vp_sales` 命名委托工具（**one-shot 前台** + per-instance persona + `maxDepth: 1`——原计划的 continuable 被 team shadow 实证否掉，见 D18）；**委派工具卡**（`tool.call.toolview` 薄片，自 R5 v2 提前——机制与它的脸同轮交付） | shadow 边界真跑取证：CEO 会话的控制名归团队版、按成员**名字**寻址（`scripts/delegation-smoke.mjs`；`--delegate` 真委派一次断言前台拿到稿子） | 委派出稿（前台拿结果）→ 再委派一次带上一稿改稿；委派卡由 **keyless 行为层**守（`tests/delegation-card.spec.ts`）+ 真页面挂载冒烟；**端到端真 UI 留给 R5 replay**；边界有回归守卫 | `delegation.md`（D18）；`notes/implemented/2026-09-22-r3-reporting-line.md` |
 | R4 成品流程 | ▶ 下一轮 | templates + deliverables 流程全量接入；**共享盘卫生**（[proposed/workspace-hygiene](../../notes/proposed/2026-09-22-workspace-hygiene.md)）：交付物三态（成品 `deliverables/<slug>/final.md` 必须来自一次 `present`、过程稿进 `drafts/`、排练产物不进 deliverables）、练习场 ≠ 运行场（排练换 workspace 目录） | 模板即流程：写作类工作流第一版 = 模板 + skill 指引；keyless 交付物检查脚本 | 端到端写作流水线：brief → 分头出稿 → 互审 → 合稿落 `deliverables/`；**每份 `final.md` 可回溯到 `deliverables/presented` 事件**（oracle = `snapshots/r1-motion/session.jsonl`，加一份无 `present` 的文件即变红） | `demo.md` 定稿 |
-| R5 皮肤 + 门禁 | — | [30-ui-demo](../design/30-ui-demo.md) §5 v1 驾驶舱页签（含**协作动态流**：pack 自建 Remote 折叠 session 事件；**组织在场板**（[proposed/org-presence-board](../../notes/proposed/2026-09-22-org-presence-board.md)）：每个分身一行 = preset 显示名 + `TeamMemberView.status` + 当前 `TeamTaskView.subject`，数据源 `agent-preset/selected` + `ctx.sessionQuery`，均已在 bundle 行内；v2 委派工具卡已提前至 R3）；verify / release-smoke / sync-dsh 脚本 | 发布纪律时点表（[guides/60](../guides/60-dev-loop.md) §5）逐项补；在场板读模型 keyless 单测 | 驾驶舱页签跑通（含在场板：分身接活 5s 内转 `running`）；`npm pack` → 干净 profile → `dsh plugin add` → 冒烟通过 | `release.md` |
+| R5 皮肤 + 门禁 | — | [30-ui-demo](../design/30-ui-demo.md) §5 v1 驾驶舱页签（含**协作动态流**：pack 自建 Remote 折叠 session 事件；**组织在场板**（[proposed/org-presence-board](../../notes/proposed/2026-09-22-org-presence-board.md)）：每个分身一行 = preset 显示名 + `TeamMemberView.status` + 当前 `TeamTaskView.subject`，数据源 `agent-preset/selected` + `ctx.sessionQuery`，均已在 bundle 行内；v2 委派工具卡已提前至 R3）；**无 key replay harness**（录制会话 → 重放断言；**含 R3 留下的委派卡端到端**：真 UI 对话流里 `[data-tool="vp_eng"]` 渲染——R3 试过的慢 e2e 已否决，理由见 [delegation.md](../delegation.md) §6）；verify / release-smoke / sync-dsh 脚本 | 发布纪律时点表（[guides/60](../guides/60-dev-loop.md) §5）逐项补；在场板读模型 keyless 单测 | 驾驶舱页签跑通（含在场板：分身接活 5s 内转 `running`）；**委派卡端到端在 replay 里无 key 断言通过**；`npm pack` → 干净 profile → `dsh plugin add` → 冒烟通过 | `release.md` |
 | R6 分身成长 | ⛔ 待命（阻塞：轮间待办两条 + U1 实证） | **培养回路**：改 `presets/<role>/` 即培养动作，生效边界 = 新会话，验收 = 三道门禁 + 该角色入戏探针；**学习载体**：journal 唯一，人审提升进 skills（照 DSH `human-review-skill-maintenance` 取舍），**否决分身运行时自改 skill**；**不做自主节律**（提 upstream seam，不自建调度器）（[proposed/twin-cultivation-and-self-learning](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md)） | U1 实证：skills 热改是否下一轮生效（vendor 内部两条陈述冲突）；隔离反证（`.dsh/skills/` 探针不盖角色 skill） | 一次完整回路：动议结束 → journal 有教训 → 人提升进 pack skill → 三道门禁 + 探针全绿，且旧会话不受影响 | 培养/学习合同（名字待定） |
 
 主通道不变（D4）：demo 主循环走团队（M4/通道 B）；通道 A 命名委托 R3 加入；M2（自定义
@@ -26,6 +26,14 @@ UI 侧：v0（现成团队 UI）＝ R1 观察窗起、R2 进验收；委派工�
 ② 补 `agent-instructions` 接线（D7 的"公司手册 → project root"载体目前是空的，先跑 U4 实证再定）。
 两条都不改变今天的可见行为，出处见
 [proposed/2026-09-22-twin-cultivation-and-self-learning.md](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md)。
+（这两条 R2 后已做：`includeDefaultRoots: false` 见
+[implemented/2026-09-22-skill-root-isolation.md](../../notes/implemented/2026-09-22-skill-root-isolation.md)；
+`agent-instructions` 接线见 `notes/implemented/2026-09-22-r2-roles-alive.md` + `scripts/handbook-smoke.mjs`。）
+
+轮间待办（R3 → R4）：**一条**——CEO preset 的 `subagent` 行仍是 `continuable`，而 VP 根会话没有
+控制行 ⇒ 那些 child 同样管不了（与 R3 否掉 continuable 命名委托是同一个 footgun）。统一处理
+（改 one-shot，或给非 team 会话补控制行），**前提是不动 teammate 的 worker 行为**。出处
+[delegation.md](../../docs/delegation.md) §4.4 + [R3 Note](../../notes/implemented/2026-09-22-r3-reporting-line.md)「未做 / 移出本轮」。
 
 ## 轮次交接（每轮全新对话上下文，靠这两份清单不吃上下文）
 
