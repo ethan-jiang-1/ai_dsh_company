@@ -81,6 +81,9 @@ importers:
 
   packages/company-pack:
     dependencies:
+      '@deepseek-ai/dsh-agent-instructions':
+        specifier: 0.1.5-rc.2
+        version: link:../../vendor/dsh/packages/context/agent-instructions
       '@deepseek-ai/dsh-agent-presets':
         specifier: 0.1.5-rc.2
         version: link:../../vendor/dsh/packages/preset/agent-presets
