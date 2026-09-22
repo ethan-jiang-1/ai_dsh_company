@@ -32,7 +32,7 @@
 | [research/agent-workflow-community-practice](../../notes/research/2026-09-22-agent-workflow-community-practice.md) | — | **CLOSED** | 全部建议已落地：D15 + 三篇复盘 + `scripts/verify.mjs` §8 client 两半门禁 |
 | `notes/postmortem/0001–0003` | — | **CLOSED** | 护栏已进 `scripts/`（`preset-smoke` / `client-load-smoke`）；0002 根因已在文内更正 |
 | `notes/implemented/` ×18 | — | **归档候选（低优先，不急）** | 本仓无 `notes/archived/` 层；`verify` 不查 notes 链接，搬家成本低但收益也低 |
-| `notes/intents.md` | — | **台账缺口** | 台账停在 R3：`scenario-b` 归档与"三条现场教训"没有行（见 §6） |
+| `notes/intents.md` | — | **✅ 已闭合（2026-09-22）** | `scenario-b` + "三条现场教训"的行已补（§7.1）；R4 / D19 拆轮 / ①按问题组队 / ②练习场各行也已登记 |
 
 一句话版：**R5b 的皮肤面就绪度没问题，卡的是 R5a 的 replay harness 形状（§2.3）；
 R6 的"培养/学习"已经就绪、只是它墙上写的阻塞项过期了（§5）；该进 suspended 的是
@@ -169,9 +169,9 @@ roadmap 原来的 R5 一行装着：驾驶舱 v1（含协作动态流）+ 组织
 
 ## 7. 台账卫生（小修，谁做都行）
 
-1. **`notes/intents.md`**：R5 拆轮 + 搁置池已于 2026-09-22 登记（D19）。**仍缺**：`scenario-b`
-   归档（commit `0a8a287`）与"三条现场教训"（commit `45d034d`）没有行——补一行
-   "R2 场景 B 归档 + 现场教训"，保持"一次决策一行"。
+1. **`notes/intents.md`**：R5 拆轮 + 搁置池已于 2026-09-22 登记（D19）。~~仍缺：`scenario-b`
+   归档（commit `0a8a287`）与"三条现场教训"（commit `45d034d`）没有行~~
+   **已补（2026-09-22，backfill 一行指向两个 commit 与落盘文件）**，保持"一次决策一行"。
 2. ~~roadmap R6 行/维护规则的阻塞项按 §5 改写。~~ **已改（2026-09-22）。**
 3. **`packages/company-pack/package.json`**：`description` 四角色过期（已五角色）；
    peers/compat 欠账见 §2.2 + §9 P4。**未改**（R5a 一起做，避免现在动 manifest 触发重装）。
@@ -259,5 +259,5 @@ roadmap 原来的 R5 一行装着：驾驶舱 v1（含协作动态流）+ 组织
 
 ### P5 · 台账缺口（小修）
 
-- 补 `scenario-b` + "三条现场教训"的 `notes/intents.md` 行（见 §7.1）。
+- ~~补 `scenario-b` + "三条现场教训"的 `notes/intents.md` 行（见 §7.1）。~~ **已补（2026-09-22）。**
 - `notes/implemented/` 归档层**本轮不做**（见 §7.4）。
