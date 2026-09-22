@@ -176,8 +176,9 @@ pnpm dsh web -- --port 3081 --no-open                                      # 308
 # pack 自己的 client 面（改了 src/client/** 才需要；产物进 lib/）：
 node ./node_modules/typescript/bin/tsc -p packages/company-pack/tsconfig.json
 (cd packages/company-pack && ../../node_modules/.bin/tsdown)
-# ⚠ 新增文件（lib/**）后要重装进 profile 才会被伺服：`plugin --profile web remove` + `add`
-#   （内容更新不用：tsdown 原地写，file: 依赖是硬链，inode 不变——2026-09-22 实证）。
+# ⚠ pack 内容改动后要重装进 profile 才会被伺服：`plugin --profile web remove` + `add`
+#   （tsdown 原地写 lib/** 时不用——inode 不变；但 **presets/*.yml 这类源文件用编辑工具改会换 inode**，
+#    且安装副本实测是真拷贝（link count 1），不重装则改动不可见——2026-09-22 实证）。
 node scripts/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）
 ```
 

@@ -22,6 +22,9 @@
 - id: skill-filesystem
   name: '@deepseek-ai/dsh-skill-filesystem'
   config:
+    # 硬隔离：只认本 preset 的 skills/，不并入项目根（rank 100/200）与用户级（400/500）技能集。
+    # 否则角色会话会看见 ~/.agents/skills 一类的用户技能，且项目根同名 skill 会盖掉角色 skill。
+    includeDefaultRoots: false
     customSkillDirs:
       - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('skills/', baseUrl))"
 

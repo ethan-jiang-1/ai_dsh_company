@@ -11,7 +11,7 @@
 //       client 面与前端 dist 已构建（guides/60 §7）。
 // 用法：source dev/env.sh && node scripts/preset-smoke.mjs [--port 3099] [--profile web]
 import { spawn } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -26,6 +26,12 @@ const CWD = resolve(arg('cwd', join(ROOT, 'company-workspace')))
 const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
 const OUR_PACKAGE = 'dsh-company-pack'
 const BOOT_TIMEOUT_MS = 120_000
+
+/** 该角色目录里实际存在的 skill（preset 约定：目录名 = skill 名）。 */
+const roleSkills = (role) => readdirSync(join(ROOT, 'packages/company-pack/presets', role, 'skills'), { withFileTypes: true })
+  .filter(entry => entry.isDirectory())
+  .map(entry => entry.name)
+  .sort()
 
 const home = process.env.DSH_HOME
 if (home === undefined || home === '') {
@@ -144,14 +150,36 @@ try {
   }
 
   // ② 真入口：逐个 preset 建会话——**这一步才会触发行 config 校验**
+  const sessionIds = new Map()
   for (const role of ROLES) {
     await check(`session/create 挂上 ${role}`, async () => {
       const created = await rpc(base, cookie, 'session/create', { request: { cwd: CWD, agentPreset: role } })
       if (created?.agentPreset !== role) throw new Error(`返回的 preset 不是 ${role}：${JSON.stringify(created)}`)
+      const id = created?.id ?? created?.sessionId
+      if (typeof id !== 'string') throw new Error(`session/create 没返回会话 id：${JSON.stringify(created).slice(0, 200)}`)
+      sessionIds.set(role, id)
     })
   }
 
-  // ③ 浏览器模块闭包（lint 级）：每个 client 模块 `dsh.client.inject` 里的包名，应当是
+  // ③ 角色 skills 硬隔离（真入口断言）：`skills/list` 是 session 寻址的冷读 Remote，
+  //    按会话的 preset scope 解析注册表。断言"恰好等于该角色目录里的 skill"——
+  //    `includeDefaultRoots` 默认 true 时，角色会话会额外看见项目根/用户级技能集
+  //    （`~/.agents/skills` 等），本条即抓这个泄漏。
+  for (const role of ROLES) {
+    await check(`${role} 只看见自己的 skills`, async () => {
+      const sessionId = sessionIds.get(role)
+      if (sessionId === undefined) throw new Error('没有会话 id（上一步未通过）')
+      const value = await rpc(base, cookie, 'skills/list', { request: { sessionId } })
+      const actual = (value.skills ?? []).map(skill => skill.name).sort()
+      const expected = roleSkills(role)
+      const extra = actual.filter(name => !expected.includes(name))
+      const missing = expected.filter(name => !actual.includes(name))
+      if (extra.length > 0) throw new Error(`看见了非本角色的 skill：${extra.join(', ')}`)
+      if (missing.length > 0) throw new Error(`本角色 skill 缺席：${missing.join(', ')}`)
+    })
+  }
+
+  // ④ 浏览器模块闭包（lint 级）：每个 client 模块 `dsh.client.inject` 里的包名，应当是
   //    动态行（entries[].id）或 shell baseline 之一。⚠ inject 是 **informational only**
   //    （vendor packages/client/AGENTS.md）：不排序、不 gate 加载——这里抓的是"引用了
   //    不存在的包名"这类配置笔误，**不是可加载性判据**。client 入口真正的挂载失败
