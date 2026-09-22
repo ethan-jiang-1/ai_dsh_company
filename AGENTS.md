@@ -129,29 +129,41 @@ pin + manifest/SHA 纪律）。
 
 ## 当前状态
 
-**R0 立环 ✅ / R1 两人公司 ✅ / R2 五角色全员 ✅ / R3 汇报线 ✅ 完成（2026-09-22）。
-当前轮 R4 成品流程——▶ 下一轮**（见 `docs/plans/roadmap.md`；迭代按垂直轮 D11，每轮换全新对话上下文）。
+**R0 立环 ✅ / R1 两人公司 ✅ / R2 五角色全员 ✅ / R3 汇报线 ✅ / R4 成品流程 ✅ 完成（2026-09-22）。
+当前轮 R5 皮肤 + 门禁——▶ 下一轮**（见 `docs/plans/roadmap.md`；迭代按垂直轮 D11，每轮换全新对话上下文）。
 
-**R3 交付（外部可观察）**：CEO 汇报线两条路——多职能协作走 `spawn_teammate`（team，主通道），
-单职能快捷出稿走**命名委托工具** `vp_eng` / `vp_sales`（**one-shot 前台** + per-instance persona +
-`maxDepth: 1`）；**委派工具卡**（`tool.call.toolview`）在对话流渲染"委派 · VP-Eng｜brief｜稿子"。
-语义合同 `docs/delegation.md`（D18）；收尾记录 `notes/implemented/2026-09-22-r3-reporting-line.md`。
+**R4 交付（外部可观察）**：交付物三态有**机器判据**——`scripts/lib/deliverables.mjs`（纯逻辑）+
+`scripts/deliverables-check.mjs`（运行场入口，解多帧 zstd）。规则：成品 `deliverables/<slug>/final.md`
+必须回溯到一次 **Lead（CEO）会话**的 `present`；过程稿 `deliverables/<slug>/drafts/<角色>.md`；
+排练/探针产物不进 `deliverables/`。合同家 = `company-workspace/AGENTS.md`「交付物三态」（随每个成员
+会话首帧注入 ⇒ 模型可见）。运行场已是三态形状（**6 成品 / 12 过程稿 / 0 违规**）；模板即流程
+（`prd.md`/`weekly-report.md` 补齐、18 处产出路径改到 `drafts/`）；R3 留的 `subagent` footgun 关掉。
+收尾记录 `notes/implemented/2026-09-22-r4-workshop-flow.md`；端到端归档 `snapshots/r4-motion/`。
 
-**R3 推翻的原设计（本轮最重要的产出）**：原计划命名委托用 `continuable` + `send_message` 追加意见
-——**实证否掉**：CEO 会话从**第一帧**起 team-scoped，`send_message`/`list_agents`/`interrupt_agent`
-三个名字被团队版 shadow，而团队版按**成员名字**寻址，subagent child 不在名册上。⇒ 续驶/连续对话
-归 team；`continuable` 在 CEO 会话里只会生出管不了的 child。证据三层（归档 / 工具 schema / 服务实现）
-见 `delegation.md` §2 与 `snapshots/r3-delegation/`。
+**R4 判据的三个设计决定（别随手改）**：① **成品归 Lead**（`agentPreset=ceo` 且 `delegationDepth=0`）
+——依据是公司手册的承诺权，且实测 R2 里 CFO 也 `present` 过 3 次，不限归属则过程稿与定稿平级；
+② **按交付物身份（`slug` + 角色）比对，不按字面路径**——那是给三态迁移留的桥，否则迁移一次就把历史
+证据全判成 dangling（假阳性）；③ **反向检查只追 Lead 声明**，非 Lead 的成品声明只在它**此刻真躺在
+盘上**时判越权（历史行为不追着报，否则一次越权永久污染此后每轮审计）。
 
-**门禁分层（R3 立，用户当轮反馈"回归不能跑这么慢"）**：见 `docs/guides/60-dev-loop.md` §9.1——
-**真模型/真浏览器不进迭代环**，且**有机械门禁**（`tests/layering.spec.ts`：回归层出现子进程/浏览器/
-网络/密钥即红，已反证）。迭代环 = `pnpm verify` + `pnpm test`（**22 条 ≈2s**，含委派卡 keyless 行为层
-+ 分层守卫）；认证档（`preset-smoke` / `probe-smoke` / `handbook-smoke` / `delegation-smoke`）
-**每轮一次**，产出归档；端到端真 UI 留 R5 replay harness。**R2 旧纪律**：§9 门禁分层、§10 自动化只许是轻任务。
+**R4 关掉的 footgun 与残留**：四个职能 preset 补 `tool-subagent-control` + `.../list-agents`（上游
+成对形状）——vendor 实证：`tool-agent-team` 的 maybeInstall 只在 `tryMembership != undefined`
+（团队成员）时装团队版控制名，而职能**根**会话不是成员 ⇒ 不补就是"既没团队版也没全局版"，continuable
+child 失联。CEO preset 保持不放（team-scoped，死行，有反向守卫）。**残留**：teammate 共享 CEO preset，
+那里的 `subagent` 仍与 team shadow 相冲 —— 留 R5 与升 pin 一起处理（`docs/delegation.md` §4.4）。
 
-**观察窗**：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。
+**门禁分层（R3 立）**：见 `docs/guides/60-dev-loop.md` §9.1——**真模型/真浏览器不进迭代环**，且
+**有机械门禁**（`tests/layering.spec.ts`：回归层出现子进程/浏览器/网络/密钥即红，已反证）。迭代环 =
+`pnpm verify` + `pnpm test`（**38 条 ≈0.2s**）；认证档（`preset-smoke` / `delegation-smoke` /
+`handbook-smoke` / `probe-smoke`）**每轮一次**，产出归档；端到端真 UI 留 R5 replay harness。
+**R2 旧纪律**：§9 门禁分层、§10 自动化只许是轻任务。
+
+**观察窗**：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。⚠ **改 pack 的
+`presets/**` 后必须重装进 profile**（`plugin --profile web remove` + `add`）——profile 里的 pack 是
+**真拷贝**；新增的行插件还要进 pack `dependencies` 与 lockfile（R4 为此踩过一次）。
 **皮肤已落**：pack 的 client 面 = 侧栏品牌槽 + 会话头部任务板（活面板）+ 委派工具卡。
-**R4 起点**：`docs/plans/roadmap.md` R4 行 + `notes/proposed/2026-09-22-workspace-hygiene.md`（交付物三态 / 练习场隔离）。
-**R3 留下的两笔（别丢）**：① **委派卡端到端真 UI** → **R5** 的无 key replay harness（roadmap R5 行已点名；
-试过的慢 e2e 已否决，理由见 `delegation.md` §6）；② **`subagent` 行的 continuable footgun**
-（VP 根会话无控制行 ⇒ 那些 child 管不了）→ R4 轮间待办（roadmap「轮间待办 R3 → R4」+ `delegation.md` §4.4）。
+**R5 起点**：`docs/plans/roadmap.md` R5 行 + `notes/proposed/2026-09-22-org-presence-board.md`
+（组织在场板）+ 无 key replay harness（**含 R3 留下的委派卡端到端**）。
+**R4 留下的一笔（别丢）**：**journal 回溯压缩决定不做**——规则已立在公司手册「轮末收敛」（已闭轮的
+journal 压成 CHARTER 一条附录，只由人做），但 R1/R2 的 38 篇角色记忆**保留不压**（理由见 R4 Note：
+提案这条无证据、结构异质、且它是 D8 唯一的跨会话记忆、R6 培养回路正建立其上）。

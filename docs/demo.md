@@ -1,7 +1,8 @@
-# demo · 动议操作合同（R2 五角色版）
+# demo · 动议操作合同（R4 定稿）
 
-> 顶层合同：demo 的剧本、分镜与观测点。R1 雏形（两人公司单动议）已并入本篇；本版按
-> [design/30-ui-demo.md](./design/30-ui-demo.md) §3 分镜 v0 重排为**两空间镜头**；R4 定稿。
+> 顶层合同：demo 的剧本、分镜与观测点。R1 雏形（两人公司单动议）已并入本篇；R2 按
+> [design/30-ui-demo.md](./design/30-ui-demo.md) §3 分镜 v0 重排为**两空间镜头**并加场景 B；
+> **R4 定稿**：补场景 C（写作流水线）+ 交付物三态的落盘形状与**机器验收**（`deliverables/<slug>/`）。
 
 ## 动议（R2）
 
@@ -17,6 +18,8 @@
 3. 浏览器打开该 URL（**必须带 token**：直接开端口会卡鉴权）。会话列表按【工作目录】过滤——先选到 `company-workspace`，否则看不到本场会话。
 4. 新建会话：preset 选 **wochen CEO**（`ceo` 是 profile 默认）；工作目录 `company-workspace`
 5. 进“另一位成员的空间”：**teammate 的会话不在顶层列表**——在会话头部点 **Team 名册**，点成员名打开其会话（`sessions.openSubagent`，子会话）。显式入口是 R5 皮肤第一项。
+6. 收场验收：`node scripts/deliverables-check.mjs`（交付物三态；审归档快照要配 `--only <slug>`，
+   因为快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只有本轮日志）
 
 ## 分镜 v0（两空间镜头：谁在哪个空间、活怎么交接）
 
@@ -42,6 +45,15 @@
 - 任务板出现过 **DAG 依赖**与 **≥1 次跨 VP 互审**（消息 + 回执 + 修订号变化）
 - 归档为 `snapshots/r2-motion/`（沿用 R1 形状：会话 JSONL + workspace 期望态）
 
+**R4 加判据（交付物三态，整场通用，机器判）**：
+
+- 收场跑 `node scripts/deliverables-check.mjs` 必须 **0 违规**——即 `deliverables/` 下每个
+  `<slug>/final.md` 都能回溯到**一次 CEO 的 `present`**；`drafts/` 里的稿子不算成品；
+  `kb/**` 不在判据射程内。判据语义与三个设计决定见 `notes/implemented/2026-09-22-r4-workshop-flow.md`。
+- 审**归档快照**要加 `--only <slug>`：快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只装
+  本轮日志，不给作用域会把历史成品误报成"无 Lead 背书"（那是输入不成对，不是违规）。
+- 一条反证基线：往 `deliverables/<slug>/` 塞一份没被 `present` 过的 `final.md`，该检查必须变红。
+
 ## 已知边界
 
 - 动议必须在 **Web 面**跑（preset 只在 Web 面挂载，[10 §6](./design/10-architecture.md) 要点 6）。
@@ -49,6 +61,9 @@
   硬隔离在独立 preset 会话里成立（[design/20](./design/20-roles-isolation.md) §4 分水岭）。
   要让团队内成员拿到完整 preset 面，走 R3 命名委托或上游 seam（D9）。
 - 五人同时在线时模型调用量上升；预算口径见 `kb/org.md`（AI 试点每案 $200/月硬顶）。
+- **交付物三态是硬约定，不是习惯**：`company-workspace/AGENTS.md` 的「交付物三态」一节随每个成员
+  会话首帧注入，`node scripts/deliverables-check.mjs` 机器核对。写错位置（比如职能自己写 `final.md`、
+  或把排练产物平铺在 `deliverables/` 根下）会被判据报出来。
 
 ## 场景 B · 三角色应急协作（CEO / COO / VP-Eng）——专看"活怎么交接"
 
@@ -68,3 +83,27 @@ COO 手上并行池已 7 个项目（上限 8）。CEO 要在这三者之间拍�
 
 **预算（轻任务纪律）**：3 个角色、每人 1 轮出稿、工具调用 ≤10/人、总墙钟 ≤6 分钟；
 不许 spawn 额外 worker、不许新调研（只引用 KB 现行事实）。
+
+## 场景 C · 写作流水线（R4 定稿的那一条）——专看“成品从哪来”
+
+**故事**：给现有 9 家客户一份能直接对外发的《客户支持 SLA 承诺页》（响应/恢复时限分级 + 违约补偿口径）。
+
+**口径（CEO 收动议时定，不新增澄清）**：slug = `support-sla-page`；不新增编制；对外承诺必须落在
+COO 承接能力内；毛利不得低于 CFO 底线。
+
+| # | 空间 | 镜头 | 观测点（外部可验证） |
+|---|---|---|---|
+| 1 | CEO | 收动议，定 slug 与三条约束 | CEO 会话里出现 slug 与约束；**没有**反问用户 |
+| 2 | CEO | 建任务板（含 owner / blocked_by）+ `spawn_teammate(vp-sales)` + `spawn_teammate(coo)`，slug 与口径一起下发 | 名册 3 行；侧栏多出两个会话 |
+| 3 | **切 VP-Sales** | 出市场与定价口径稿 | 落在 `deliverables/support-sla-page/drafts/vp-sales.md`——**不是 `final.md`** |
+| 4 | **切 COO** | 出承接与成本稿 | 落在 `deliverables/support-sla-page/drafts/coo.md` |
+| 5 | 跨空间互审 | COO 质疑 VP-Sales 的时限承诺 | `deliverables/support-sla-page/drafts/review-coo.md`；两个会话都有消息与回执 |
+| 6 | 回 CEO | 合稿 → `final.md` → `present` | 交付卡片出现；`final.md` 有“保留分歧”节，不抹平 |
+| 7 | 收尾 | 三个 journal 各一篇 | `kb/{ceo,coo,vp-sales}/journal/support-sla-page.md` |
+
+**实测基线**：`snapshots/r4-motion/`（lead 234 行 + vp-sales + coo + 期望态）。这一场真跑 **150 秒**
+（预算 6 分钟）。**值得指出的一处**：互审稿路径 `drafts/review-coo.md` 是**模型自己**按三态约定放的
+（prompt 只给了另两份）——三态合同随公司手册注入首帧，所以它会生效，不靠人盯。
+
+**三态口诀（三场通用）**：四个职能**一律写 `drafts/`**；`final.md` 与 `present` 只归 CEO；
+排练/探针产物不进 `deliverables/`（进 `snapshots/<轮次>-*/` 或删）。
