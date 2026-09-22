@@ -2,6 +2,8 @@ node_modules/
 *.tsbuildinfo
 dist/
 .DS_Store
+# 自写包的构建产物（源码面/产物面不混，同 DSH 的 lib/ 约定；构建见 guides/60 §7）
+packages/company-pack/lib/
 # pnpm 运行残留（store 落仓库内：沙箱拒默认位置时的回退；调试日志）
 .pnpm-store/
 .pnpm-debug.log
