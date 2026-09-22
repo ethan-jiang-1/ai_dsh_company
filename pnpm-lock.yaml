@@ -129,6 +129,9 @@ importers:
       '@deepseek-ai/dsh-tool-subagent':
         specifier: 0.1.5-rc.2
         version: link:../../vendor/dsh/packages/subagent/tool-subagent
+      '@deepseek-ai/dsh-tool-subagent-control':
+        specifier: 0.1.5-rc.2
+        version: link:../../vendor/dsh/packages/subagent/tool-subagent-control
       '@deepseek-ai/dsh-tool-todo':
         specifier: 0.1.5-rc.2
         version: link:../../vendor/dsh/packages/todo/tool-todo
