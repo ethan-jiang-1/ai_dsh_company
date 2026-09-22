@@ -29,3 +29,7 @@
       name: '@deepseek-ai/dsh-experimental-agent-team'
     - id: tool-agent-team
       name: '@deepseek-ai/dsh-experimental-tool-agent-team'
+    # ── 团队 Web 可视面（官方 web-profile 的同一条 insert）：Team 按钮 / 名册 /
+    #    实时任务板 / 点进 VP 会话 / 交付物卡片——观察与调试任务起止的最简途径（R1 补）──
+    - id: ui-agent-team
+      name: '@deepseek-ai/dsh-experimental-client-ui-agent-team'

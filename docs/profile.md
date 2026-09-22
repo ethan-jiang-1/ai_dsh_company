@@ -18,9 +18,9 @@
    （教义源自 shipped dsh-headless 的 cordis.patch.yml）。
 2. **strictDepBuilds**：profile 首次安装会拦 `koffi` 构建脚本——CLI 已在 profile 的
    `pnpm-workspace.yaml` 预置占位（`koffi: set this to true or false`），改成 `koffi: true` 后重装。
-3. **file: 依赖刷新**：pack 内容变更后 pnpm 缓存命中不刷新目录副本——开发期直接同步
-   `cp packages/company-pack/cordis.patch.yml <profile>/node_modules/dsh-company-pack/`，
-   或 bump pack 版本重装；正式形状 R5 release-smoke 验证。
+3. **`file:` 副本是硬链接**（R1 更正）：profile 里的 pack 文件与源文件**同 inode**——改**已有文件**
+   自动同步（不必 `cp`）；只有**新增文件**（新 preset/skill 目录）与**依赖变化**才需要
+   `plugin add`（必要时先 `remove` 强制重解析；bump 版本也会触发）。正式形状 R5 release-smoke 验证。
 4. **patchReload 必须 `'startup'`**（R1 实证）：自定义 profile 默认 `'live'`（热重载 watcher
    常驻）——headless 动议会跑完但进程永不退、stdout 不 flush。company profile 的
    package.json 已改 `"patchReload": "startup"`；将来 web 观察窗 profile 才用 live。

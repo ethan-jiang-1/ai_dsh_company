@@ -15,7 +15,7 @@ docs/                   文档层：00-index（地图+决策台账+外部材料�
 notes/                  决策记录：intents.md → proposed/ → implemented/
 scripts/                verify.mjs（结构门禁）……
 dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）
-snapshots/              最小 replay 证据（R5 起，JSONL diff 起步）
+snapshots/              回归资产：r1-motion（录制会话 + workspace.expected 独立 oracle）；replay harness R5
 ```
 
 设计全貌与决策台账：`docs/00-index.md`（先读它，再按需进 design/10-40）。
@@ -31,7 +31,8 @@ source dev/env.sh                      # 双 home 兜底：DSH_HOME=<repo>/dev/h
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（R0 已验收）
 pnpm dsh web -- --port 3081 --no-open  # web 观察窗（需 client 面+前端构建，guides/60 §7）；3080 是本 GUI 占用
 pnpm verify                            # 结构门禁（UTF-8/链接/preset 结构/symlink/vendor pin/pack 形状/preset 行依赖）
-pnpm test                              # keyless 回归（vitest：roster 零 broken、行依赖、内容定稿、bundle 语法）
+pnpm test                              # keyless 回归（vitest：roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义、必填 config）
+node scripts/preset-smoke.mjs          # 上线前门禁：boot 真 web，逐个 preset 建会话（唯一能抓"preset 挂载失败"的检查；需 DSH_HOME + 已装 pack）
 node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile → dsh plugin add → 冒烟
 ```
 
@@ -94,9 +95,9 @@ repo 规模裁剪（例如 CI 穷举暂由本地门禁代行）。**纪律的权
 
 ## 当前状态
 
-**R0（立环）✅ 完成（2026-09-22）**；**R1 两人公司 🔄 进行中**：内容面（CEO/VP-Eng 正式
-persona + 各 1 skill + KB 章程 + review-note 模板）与部署面（pack 装进 company/web profile、
-组合核验 155 行）已完成；待办：入戏探针（M1）、跑动议「给我们公司要不要自建知识库写一页
-技术评估」出第一份 deliverable、R1 收尾（demo.md 雏形/presets.md/Note）。
-观察窗：`pnpm dsh web -- --port 3081 --no-open`（3080 是本 GUI 占用）。迭代按垂直轮（D11）
-见 `docs/plans/roadmap.md`。
+**R0（立环）✅ / R1 两人公司 ✅ 完成（2026-09-22）**：CEO + VP-Eng 正式内容就位，pack 装进
+web profile；**首条动议跑通**（CEO 澄清 → 任务板 → `spawn_teammate(vp-eng)` → VP 出稿 →
+CEO 合稿 `present`），`company-workspace/deliverables/` 两份交付物 + 两个 journal；
+首份回归资产 `snapshots/r1-motion/`。当前轮 **R2 四人全员——▶ 可开工**（补 VP-Sales/COO 内容、
+分镜 v0 全程 UI 可见）。迭代按垂直轮（D11）见 `docs/plans/roadmap.md`。
+观察窗：`pnpm dsh web -- --port 3083 --no-open`（3080 是本 GUI 占用）。

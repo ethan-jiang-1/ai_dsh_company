@@ -208,6 +208,14 @@ pnpm dsh web -- --port 3081 --no-open                                      # 308
   对应 DSH 的 `verify-cordis-config` 门禁；我们同构到 `scripts/verify.mjs` 检查 7。
 - **patchReload**：headless 用途的自定义 profile 必须 `"startup"`（见 §2 第 3.5 层）；web 形态
   才用 `"live"`。
+- **上线前必跑 preset 冒烟**（R1 起，两道防线）：
+  1. **防线一（快，`pnpm test`）**：已知必填 config 字段必须随工具行给出（如
+     `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`）。
+  2. **防线二（真，`node scripts/preset-smoke.mjs`）**：boot 真 web profile → `agentPresets/list`
+     断言四角色零 broken → **逐个 `session/create` 真挂一次**。
+  **只有防线二能抓"preset 挂载失败"**：行 config 校验发生在挂载时，roster 扫描与 `--dump-config`
+  都看不到，UI 还会吞掉错误（症状就是"新建会话点了没反应"）。已反证：去掉一个必填 config 即变红
+  （精确指向 preset 与缺失字段），恢复后 ALL PASS。
 
 ## 8. 驱动 Web 面会话（RPC；R1 实证）
 

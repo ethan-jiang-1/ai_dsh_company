@@ -54,6 +54,23 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
+  it('带必填 config 的工具行必须给出配置（R1 实证：抄行名不抄 config → preset 挂载失败、UI 静默）', () => {
+    // 防线一：快、进 pnpm test。字段名来自 shipped standard preset（其 Config schema 无默认值）。
+    const requiredConfig: Record<string, string[]> = {
+      'tool-fs-search': ['sampleOverCapGlobResults'],
+      'tool-todo': ['allowParallelInProgress'],
+    }
+    for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo']) {
+      const text = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
+      for (const [row, fields] of Object.entries(requiredConfig)) {
+        if (!new RegExp(`^- id: ${row}$`, 'm').test(text)) continue
+        for (const field of fields) {
+          expect(text, `${role} 的 ${row} 缺必填 ${field}（preset 会挂载失败）`).toContain(field)
+        }
+      }
+    }
+  })
+
   it('四个角色显示名共用公司前缀（D14 系列命名，R2 补角色时不许忘）', () => {
     const names = ['ceo', 'vp-eng', 'vp-sales', 'coo'].map(role => {
       const match = /^name:\s*(.+)$/m.exec(readFileSync(join(PRESETS_DIR, role, 'preset.yml'), 'utf8'))

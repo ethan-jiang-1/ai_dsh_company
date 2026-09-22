@@ -52,7 +52,8 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 
 | 层 | 手段 | 现状 |
 |---|---|---|
-| keyless | `pnpm test`（roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义） | ✅ 6 条 |
+| keyless | `pnpm test`（roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义、必填 config） | ✅ 8 条 |
 | 运行时 roster | web 观察窗 `agentPresets/list` RPC | ✅ 实测 8 条零 broken |
-| 会话级（persona 生效、skills 隔离） | Web 会话手动探针（**headless 不挂 preset**，见 [10 §6](./design/10-architecture.md) 要点 6） | R1 跑动议时一并做 |
-| 回归资产 | 动议会话日志归档 `snapshots/` | R1 收尾 |
+| **挂载（上线前门禁）** | `node scripts/preset-smoke.mjs`：boot 真 web，逐个 preset `session/create` | ✅ ALL PASS（反证过：去掉必填 config 即红） |
+| 会话级（persona 生效、协作） | Web 会话跑真动议（**headless 不挂 preset**，见 [10 §6](./design/10-architecture.md) 要点 6） | ✅ R1 动议跑通（CEO→VP-Eng→交付物→journal） |
+| 回归资产 | 动议会话 + 期望工作区归档 | ✅ [`snapshots/r1-motion/`](../snapshots/r1-motion/snapshot.yml)（replay harness R5） |
