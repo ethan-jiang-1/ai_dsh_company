@@ -316,11 +316,17 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 **三条硬规矩**：
 
 1. **真模型 / 真浏览器不进迭代环**：迭代环只跑 `verify` + `test`（秒级）；分钟级一律"轮末一次"。
+   **这条有机械门禁**：`tests/layering.spec.ts` 扫 `tests/**`，出现 `node:child_process` / playwright /
+   `fetch(` / 密钥即红（已反证：塞一行 `import { spawn } from 'node:child_process'` 立刻变红）。
+   想测真入口 → 写 `scripts/*-smoke.mjs`，别塞进 `tests/`。
 2. **能做成纯函数就做成纯函数**：UI 组件把"展示事实"抽成纯函数（范本 `delegationCardModel`），
    keyless 单测直接断言它——组件层就永远不需要模型与浏览器。
 3. **认证档要能"重放"而不是"重跑"**：真模型跑一次 → 会话日志归档 → 后续用归档做回放断言
    （R5 replay harness）。**重跑只在升 pin 或行为确实要改时做**；R3 的委派卡端到端（模型→工具→卡片）
    就留给 R5 的 replay harness（试过的慢 e2e 已否决，原因见 delegation.md §6）。
+
+**回归层预算**：`pnpm test` 墙钟 **< 5s**（当前 22 条 ≈2s）。超了先怀疑"有人把模型/浏览器塞进来了"，
+拆层而不是加超时。
 
 ## 10. 自动化只许是轻任务（硬上限，不许无限跑）
 

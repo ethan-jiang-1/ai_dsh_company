@@ -79,6 +79,7 @@ repo 规模裁剪（例如 CI 穷举暂由本地门禁代行）。**纪律的权
 | 窄证据切片；本地窄、CI 穷举；只报告实际跑过的检查 | `AGENTS.md` Run relevant checks | guides/60 §1 六步闭环 + `pnpm verify` |
 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**（迭代是常态，但必须由代理能自己跑的检查闭合） | `docs/testing.md` Test the real entry path / Verify the world, not the self-report；`docs/postmortem/0003`（"delegated acceptance to the user"） | guides/60 §1 第⑥步 + §7 两道防线；`preset-smoke.mjs` 是 preset/config 类改动的完成定义 |
 | 测试分层（unit/coverage/e2e/expected/**snapshot 无 key 重放**）；测试描述行为 | `docs/testing.md` | `snapshots/`（R5 正式化；R1 会话日志即首份资产） |
+| **测试分层与预算：真模型 / 真浏览器不进回归**（回归层 = 秒级、无 key、无浏览器；真入口一律进认证档 `scripts/*-smoke.mjs`，每轮一次） | `docs/testing.md` 测试分层 | guides/60 §9.1 + **机械门禁 `tests/layering.spec.ts`**（回归层出现子进程/浏览器/网络/密钥即红；已反证） |
 | 真实入口路径（发布产物 `lib/` 跑）+ 真实安装形状 | `docs/testing.md` Test the real entry path | R5 `release-smoke`（`npm pack`→干净 profile→`plugin add`） |
 | 源码面/产物面不混（paths 指 src） | `AGENTS.md` Conventions | 根 `tsconfig.json` extends vendor base |
 | vendor 钉版本 + manifest/SHA + 同步程序 | `vendor/README.md` | AGENTS.md vendor 簿记 + `scripts/sync-dsh.mjs`（R5） |
@@ -143,8 +144,9 @@ pin + manifest/SHA 纪律）。
 见 `delegation.md` §2 与 `snapshots/r3-delegation/`。
 
 **门禁分层（R3 立，用户当轮反馈"回归不能跑这么慢"）**：见 `docs/guides/60-dev-loop.md` §9.1——
-**真模型/真浏览器不进迭代环**。迭代环 = `pnpm verify` + `pnpm test`（**19 条 2.1s**，含委派卡
-keyless 行为层）；认证档（`preset-smoke` / `probe-smoke` / `handbook-smoke` / `delegation-smoke`）
+**真模型/真浏览器不进迭代环**，且**有机械门禁**（`tests/layering.spec.ts`：回归层出现子进程/浏览器/
+网络/密钥即红，已反证）。迭代环 = `pnpm verify` + `pnpm test`（**22 条 ≈2s**，含委派卡 keyless 行为层
++ 分层守卫）；认证档（`preset-smoke` / `probe-smoke` / `handbook-smoke` / `delegation-smoke`）
 **每轮一次**，产出归档；端到端真 UI 留 R5 replay harness。**R2 旧纪律**：§9 门禁分层、§10 自动化只许是轻任务。
 
 **观察窗**：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。

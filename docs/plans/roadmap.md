@@ -44,10 +44,15 @@ AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ 本表
 4. `notes/implemented/` 记本轮 Note——"实际跑过的验证 + 环境状态"必写（下轮会话判断
    "哪些已就绪"只读这里，不信记忆不信聊天记录）；
 5. `notes/intents.md` 对应行改 implemented；
-6. **上线前门禁全绿**：`pnpm verify` + `pnpm test` + **`node scripts/preset-smoke.mjs`**
-   （最后一条是唯一能抓"preset 挂载失败"的检查——行 config 校验发生在挂载时，roster/dump 都看不到，
-   UI 还会吞错误；R1 血泪教训，见 guides/60 §7 两道防线）；**内容改动**另跑
-   `node scripts/probe-smoke.mjs`（会话级：真 web + 真 preset + 真模型，五角色三探针按 KB 事实断言；R2 建）。
+6. **上线前门禁全绿**，按两层跑（guides/60 §9.1 的分层纪律）：
+   - **迭代环（秒级，每次都跑）**：`pnpm verify` + `pnpm test`（后者有机械门禁
+     `tests/layering.spec.ts`：回归层出现模型/浏览器/子进程/网络即红）；
+   - **认证档（分钟级，每轮一次）**：`node scripts/preset-smoke.mjs`（**唯一能抓"preset 挂载失败"**
+     的检查——行 config 校验发生在挂载时，roster/dump 都看不到，UI 还会吞错误；R1 血泪教训，
+     见 guides/60 §7 两道防线）+ `client-load-smoke`（客户端改动）+ **内容改动**另跑
+     `node scripts/probe-smoke.mjs`（会话级：真 web + 真 preset + 真模型；R2 建）与
+     `handbook-smoke` / `delegation-smoke`（各自面）。
+   **认证档一律不进 `pnpm test`**（R3 立的规矩，别再混回去）。
 
 ## 维护规则
 
