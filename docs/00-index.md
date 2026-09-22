@@ -40,7 +40,7 @@ implemented → archived）。
 | 位置 | 回答什么 |
 |---|---|
 | `notes/intents.md` → `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含**实际跑过的验证 + 环境状态**） |
-| [notes/postmortem/](../notes/postmortem/README.md) | **事故复盘**：为什么流程放过了它 + 加了什么护栏（0001 preset 挂载失败、0002 client 插件不在模块表） |
+| [notes/postmortem/](../notes/postmortem/README.md) | **事故复盘**：为什么流程放过了它 + 加了什么护栏（0001 preset 挂载失败、0002 团队 UI 不可见·根因误诊已更正、0003 重复挂载 remote 砖全 UI） |
 | [notes/research/2026-09-22-agent-workflow-community-practice.md](../notes/research/2026-09-22-agent-workflow-community-practice.md) | 外部研究：代理工作流的社区/厂商一手证据（结论已吸纳为 D15，否决项也记在里面） |
 
 ### 合同出生地图（顶层，实现到哪生到哪——不预建空文件）

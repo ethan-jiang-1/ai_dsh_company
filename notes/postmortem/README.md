@@ -18,8 +18,9 @@ Timeline 必须给**证据坐标**（会话 id、事件序列、RPC 报错原文
 | # | 标题 | 一句话 |
 |---|---|---|
 | [0001](0001-preset-required-config-mount-failure.md) | preset 挂载失败：工具行缺必填 config | 扫描/roster/dump 全绿，因为没人**挂载**过；用户在 UI 里发现 |
-| [0002](0002-client-plugin-module-table-gap.md) | client 插件挂到虚空：浏览器模块表没枚举它 | host 侧正常、模块也在伺服，但依赖不在模块表 → 静默不挂载 |
+| [0002](0002-client-plugin-module-table-gap.md) | client 插件挂到虚空：团队 UI 不可见 | host 侧正常、模块也在伺服；当时的根因（"模块表没枚举依赖"）**后被证伪**（见文内更正节），R1 症状的真实原因未确立 |
+| [0003](0003-duplicate-remote-mount.md) | 一个 remote 两个挂载者：重复 `$mount` 砖全 UI | 0002 的误诊催生自挂 workaround → `already mounted` → 整个 Web UI 砖在 BootPage 错误屏；浏览器检查缺位，用户发现 |
 
-两篇的共同缺陷（也是本目录存在的原因）：**最后一次检查由人在浏览器里做**。对应的纪律与门禁见
+三篇的共同缺陷（也是本目录存在的原因）：**最后一次检查由人在浏览器里做**。对应的纪律与门禁见
 `AGENTS.md` 纪律表与 `docs/guides/60-dev-loop.md` §2；外部证据见
 [`notes/research/2026-09-22-agent-workflow-community-practice.md`](../research/2026-09-22-agent-workflow-community-practice.md)。
