@@ -12,8 +12,8 @@ packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）�
 company-workspace/      运行时"公司共享盘"（会话 cwd）：kb/<role>/（CHARTER+journal）、templates/、deliverables/
 vendor/dsh/             DSH 源码 submodule（钉 tag，见下）
 docs/                   文档层：00-index（地图+决策台账+外部材料登记）→ design/ plans/ guides/ + 顶层合同
-notes/                  决策记录：intents.md → proposed/ → implemented/
-scripts/                verify.mjs（结构门禁）……
+notes/                  决策记录：intents.md → proposed/ → implemented/；事故复盘 postmortem/；外部研究 research/
+scripts/                verify.mjs（结构门禁）、preset-smoke.mjs（真入口冒烟）……
 dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）
 snapshots/              回归资产：r1-motion（录制会话 + workspace.expected 独立 oracle）；replay harness R5
 ```
@@ -73,6 +73,7 @@ repo 规模裁剪（例如 CI 穷举暂由本地门禁代行）。**纪律的权
 | docs = 当前合同（一处事实一个家，只写 now） | `docs/AGENTS.md` | `docs/` 按性质分层（D10）+ `pnpm verify` 链接门禁 |
 | 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么） | `.agents/notes/README.md` | `notes/intents.md → implemented/` |
 | 窄证据切片；本地窄、CI 穷举；只报告实际跑过的检查 | `AGENTS.md` Run relevant checks | guides/60 §1 六步闭环 + `pnpm verify` |
+| **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**（迭代是常态，但必须由代理能自己跑的检查闭合） | `docs/testing.md` Test the real entry path / Verify the world, not the self-report；`docs/postmortem/0003`（"delegated acceptance to the user"） | guides/60 §1 第⑥步 + §7 两道防线；`preset-smoke.mjs` 是 preset/config 类改动的完成定义 |
 | 测试分层（unit/coverage/e2e/expected/**snapshot 无 key 重放**）；测试描述行为 | `docs/testing.md` | `snapshots/`（R5 正式化；R1 会话日志即首份资产） |
 | 真实入口路径（发布产物 `lib/` 跑）+ 真实安装形状 | `docs/testing.md` Test the real entry path | R5 `release-smoke`（`npm pack`→干净 profile→`plugin add`） |
 | 源码面/产物面不混（paths 指 src） | `AGENTS.md` Conventions | 根 `tsconfig.json` extends vendor base |
@@ -83,7 +84,11 @@ repo 规模裁剪（例如 CI 穷举暂由本地门禁代行）。**纪律的权
 - 具体操作手册：`docs/guides/60-dev-loop.md`（六步闭环 / 调试阶梯 / 插拔速查 / 设计四问 /
   发布纪律时点 / 双 home）。demo 现场运维 runbook：`docs/guides/50-budget-and-ops.md`。
 - **不发明**：不新增 spec 流程（OpenSpec 留触发条件，guides/60 §5）、不自造调度器/记忆/门禁——
-  优先用 DSH 现成载体（D13）。
+  优先用 DSH 现成载体（D13）。**否决理由（有证据）**：规格驱动工具（Spec Kit / Kiro / OpenSpec）
+  优化的是"别做错东西"，而本仓两次事故是"东西做对了但装不上"（schema 校验、模块解析）——
+  规格不校验 config schema、也不进浏览器模块表，且无第一方返工量化证据；把指令文件写更长同样是
+  最弱杠杆（Anthropic 明说这类指令是 advisory，hooks 才是确定性的；GitHub 2500 仓分析结论是
+  好文件靠迭代长出来）。见 notes/research/2026-09-22-agent-workflow-community-practice.md。
 
 ## vendor 簿记
 

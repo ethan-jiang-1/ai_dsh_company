@@ -35,6 +35,14 @@ implemented → archived）。
 | [presets.md](./presets.md) | 合同 | 角色 preset 语义（R1：CEO+VP-Eng 定稿，VP-Sales/COO 占位待 R2）；名册运行时实测；验证分层 |
 | [demo.md](./demo.md) | 合同 | demo 操作合同（R1 雏形，R4 定稿）：动议、前置、分镜与观测点、验收判据、已知边界 |
 
+### notes/（决策与教训，不进 docs）
+
+| 位置 | 回答什么 |
+|---|---|
+| `notes/intents.md` → `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含**实际跑过的验证 + 环境状态**） |
+| [notes/postmortem/](../notes/postmortem/README.md) | **事故复盘**：为什么流程放过了它 + 加了什么护栏（0001 preset 挂载失败、0002 client 插件不在模块表） |
+| [notes/research/2026-09-22-agent-workflow-community-practice.md](../notes/research/2026-09-22-agent-workflow-community-practice.md) | 外部研究：代理工作流的社区/厂商一手证据（结论已吸纳为 D15，否决项也记在里面） |
+
 ### 合同出生地图（顶层，实现到哪生到哪——不预建空文件）
 
 | 将出生的合同 | 诞生轮次 | 内容来源 |
@@ -62,6 +70,7 @@ implemented → archived）。
 | D12 | **patch 语义定案**（R1 实证）：`- id:` 只替换已有行（not found 即丢弃并警告）；**新增行必须 `- insert:` 子列表**；因此 host 行随 pack 的 bundle 走，且 `agent-presets` 行用**替换**语法覆盖 web-app 的出厂行（default: standard → ceo + 自定位 roots）；纯 headless 组合（无此行）用 `dev/company.overlay.yml` 的 insert 补 | notes/implemented/2026-09-22-r1-*.md；vendor shipped dsh-headless/dsh-web-app 的 cordis.patch.yml |
 | D13 | **开发纪律全程沿用 DSH**（整套继承 + 按本 repo 规模裁剪，**不发明本地流程**）；纪律权威在 vendor 树（`AGENTS.md`/`docs/AGENTS.md`/`docs/testing.md`/`.agents/notes/`），本 repo 只做落点映射 | AGENTS.md §纪律（权威对照表）；用户指令 |
 | D14 | **公司名 = wochen；角色显示名系列化** `<公司名> <角色>`（`wochen CEO` 等）；**preset id 保持 kebab 不变**（`ceo`/`vp-eng`/`vp-sales`/`coo`——id 受 `PRESET_ID=/^[a-z0-9][a-z0-9-]*$/` 限制，不能带下划线/大写）；角色层级不动（CEO 是个体、VP 是职能，见 40 §0.1） | notes/implemented/2026-09-22-wochen-naming.md；40 §1 |
+| D15 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**。迭代是常态，但必须由**代理能自己跑的检查**闭合：真入口路径 > dump/扫描；"伺服了"≠"能加载"；让用户看 UI 之前必须先机器验证过。**同时否决**：为这类失败引入 spec 流程（无第一方证据，且本类失败不在其射程）、把指令文件写更长（advisory，非确定性） | notes/research/2026-09-22-agent-workflow-community-practice.md（17 个一手来源）；notes/postmortem/0001-0002；vendor `docs/testing.md` + `docs/postmortem/0003`；落点：guides/60 §1/§2/§7、AGENTS.md 纪律表、roadmap 收尾清单第 6 条 |
 
 ### 待定（阻塞项标 ⛔）
 

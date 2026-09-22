@@ -44,6 +44,12 @@ AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ plans/
    回归而失败"的那个 + typecheck，不默认全量。
 5. **沉淀**：门禁守住的事实进 docs/（只写 now），选择进 Note。
 6. **只报告实际跑过的检查**：没跑的不算数。
+7. **完成定义 = 该面最小"真检查"通过，且发现权在你（代理）一侧**（D15，社区与宿主复盘一致结论）：
+   配置/preset 类改动 → `node scripts/preset-smoke.mjs`（**真挂载**；dump/扫描不算证据）；客户端类
+   改动 → 查 boot 清单依赖闭环；**在让用户看 UI 之前，先用机器验证过**。把"你看一眼"当验收手段
+   正是宿主 [post-mortem 0003](../../vendor/dsh/docs/postmortem/0003-web-agent-gui-feedback-loop.md)
+   记的失败模式（delegated acceptance to the user）。本仓两次事故的复盘见
+   [`notes/postmortem/`](../../notes/postmortem/README.md)。
 
 交付形状：一次交付 = **完整垂直切片**——配置/代码 + 验证 + docs + Note 在同一 diff；
 proposed Note 在同一 diff 改写为 implemented，不留到交付后。
