@@ -28,7 +28,8 @@ implemented → archived）。
 | [design/20-roles-isolation.md](./design/20-roles-isolation.md) | 设计 | 每角色独立六面的机制安排；composition 继承分水岭与 `mount()` 裂缝；M1–M4 编排选型；两个结构性缺口 |
 | [design/30-ui-demo.md](./design/30-ui-demo.md) | 设计 | Web UI 演示层：现成团队 UI（零代码）、公司皮肤（slots/Remote）、demo 分镜 |
 | [design/40-role-content-plan.md](./design/40-role-content-plan.md) | 设计 | 四个角色的内容设计：persona 要素、skills 清单、KB/模板骨架、入戏探针（文案待 Q4） |
-| [plans/roadmap.md](./plans/roadmap.md) | 计划 | 垂直轮（D11）：R0 立环 → R1 两人公司 → R2 五角色全员 → R3 汇报线 → R4 成品流程 → R5 皮肤+门禁 → R6 分身成长（待命）；轮次交接两清单 |
+| [plans/roadmap.md](./plans/roadmap.md) | 计划 | 垂直轮（D11）：R0 立环 → R1 两人公司 → R2 五角色全员 → R3 汇报线 → R4 成品流程 → R5a 门禁与发布 → R5b 驾驶舱 → R6 分身成长（待命）；轮次交接两清单 + **搁置池** |
+| [plans/r5-plus-readiness.md](./plans/r5-plus-readiness.md) | 计划 | R5+ 就绪度梳理（2026-09-22 一次性快照）：notes/ 逐项分级（可排期 / 待决策 / 待研究 / 搁置 / 已闭合）+ R5 容量风险 + 台账缺口 |
 | [guides/50-budget-and-ops.md](./guides/50-budget-and-ops.md) | 指南 | 限流旋钮总表、成本结构、demo 运维 runbook（症状→动作）、回放复盘 |
 | [guides/60-dev-loop.md](./guides/60-dev-loop.md) | 指南 | 开发环操作手册：六步闭环、调试阶梯、设计四问、插拔速查、升级环与发布时点、双 home/双 DSH |
 | [profile.md](./profile.md) | 合同 | host 组合现在时：部署形状（源码直跑/持久安装实测）、行清单语义、开放点 |
@@ -76,6 +77,7 @@ implemented → archived）。
 | D16 | **Q2 定案（2026-09-22）**：角色模型路由 = R2 全员同模型（默认路由，不写 `agentOptions`）。理由：当前瓶颈是内容质量与协作可见性，成本无差异化证据；需要差异路由时 R3 在委托工具 `agentOptions` 层做，不动 persona | tests/presets.spec.ts；presets.md |
 | D17 | **Q3 定案（2026-09-22）**：公司事实（CHARTER / journal / 客户 / 预算基准）全部留 workspace 活数据（D7 三载体）；随 pack 发布的只有方法论 skills 与结构模板——pack 不含公司事实，换公司复用 = 只换 workspace | presets.md；company-workspace/kb/ |
 | D18 | **R3 汇报线定案（2026-09-22）**：CEO 的命名委托工具 `vp_eng` / `vp_sales` = **one-shot 前台**（`backgroundMode: one-shot` + `enableRunInBackground: false` + `maxDepth: 1` + per-instance persona）。**continuable 在本组合里不可用**：CEO 会话从**第一帧**起 team-scoped，团队版 `send_message` / `list_agents` / `interrupt_agent` 按成员**名字**寻址，而 subagent child 不在名册上 ⇒ 续驶/中断/列举全不可达。因此：续驶与连续对话归 **team（M4）**；"child 拿到角色完整 skills/工具面"归 **M2（未做）**；CEO preset **不放**全局控制行（在 CEO 会话是死行，有反向守卫）；并行快捷派活要等上游 seam，**本仓不自建**（D13） | [delegation.md](./delegation.md)；`scripts/delegation-smoke.mjs`（边界守卫）；`snapshots/r2-motion/sessions/lead.jsonl` 第一帧 |
+| D19 | **R5 拆轮 + 搁置池（2026-09-22）**：① **R5 → R5a 门禁与发布 / R5b 驾驶舱**——同轮塞 4–5 个面时，最不确定的 replay harness 会卡住皮肤交付（D11：一轮一份可观察的外部行为）；② **进搁置池须满足"缺上游 seam"或"缺明确需求"**，被否决的方案不进池（归 D 号/复盘/`rejected`），复活条件写进池内每行；首批四条 = 自主节律 / 并行快捷派活 / M2 / 界面外推送；③ R6 的"两条接线 + U1"阻塞经核实**已清**，只余一次活体探针（轮间待办 R5a → R6） | [plans/r5-plus-readiness.md](./plans/r5-plus-readiness.md)；[plans/roadmap.md](./plans/roadmap.md) §搁置池 |
 
 ### 待定（阻塞项标 ⛔）
 

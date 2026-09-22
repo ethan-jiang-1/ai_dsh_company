@@ -1,7 +1,12 @@
 # 2026-09-22 · 分身培养与自我学习（写权、载体与自主节律的边界）
 
 状态：proposed（2026-09-22）
-进轮：R6 分身成长（2026-09-22 起，⛔ 待命——阻塞项见 [roadmap](../../docs/plans/roadmap.md) 轮间待办）
+进轮：R6 分身成长（2026-09-22 起）
+梳理（2026-09-22）：原有两条"前置修复"阻塞**已落地**——见下 §三 与
+[../implemented/2026-09-22-skill-root-isolation.md](../implemented/2026-09-22-skill-root-isolation.md)；
+U1 已在源码层回答、U2/U3 作废，见
+[../research/2026-09-22-digital-twin-cultivation-and-self-learning.md](../research/2026-09-22-digital-twin-cultivation-and-self-learning.md)
+§5。逐项就绪度判定见 [../../docs/plans/r5-plus-readiness.md](../../docs/plans/r5-plus-readiness.md)。
 
 ## 背景
 
@@ -47,7 +52,7 @@
 
   ⇒ 现在"自己长出的 skill"等于"改全公司的 skill"；没有授权模型之前不做。
 
-### 三、前置修复两条（做完才谈得上上面两条）
+### 三、前置修复两条（做完才谈得上上面两条）——**两条均已落地（2026-09-22）**
 
 1. **隔离角色 skills**：五个 preset 的 `skill-filesystem` 都保留 `includeDefaultRoots` 默认
    true（已核实：行里只写了 `customSkillDirs`），共享根与角色私有目录同 layer。显式关掉它或
@@ -56,7 +61,7 @@
    preset 各自补回，公司五个 preset 都没补 ⇒ 角色会话不加载 `<projectRoot>/AGENTS.md` 链
    （研究笔记标为**推断**，先跑 U4 实证）。补一行，或证明不需要并记录原因。
 
-### 四、自主节律：不做，只记缺口
+### 四、自主节律：不做，只记缺口（**已进 roadmap 搁置池**，复活条件 = 上游接缝）
 
 "分身自己定期复盘"需要"外部触发 → 自动续跑"的接缝，DSH 现在没有。按 D9 的先例：**提 seam，
 不 vendor patch**。本提案不承诺任何自建调度器。
@@ -82,8 +87,11 @@
 
 ## 风险与未决
 
-- **U1–U8 均未跑**（研究笔记逐条给了最小实证步骤）。其中 **U1（skills 热改是否下一轮生效）**
-  在 vendor 内部有两条互相冲突的陈述，直接决定"学习"能否比"新会话"更实时。
+- **U1–U8 的现状（2026-09-22 梳理后）**：**U1 已在源码层回答**（skill 条目改动下一轮生效，
+  见研究笔记 §5）；**U2/U3 作废**（隔离后共享 skill 根不再进入角色技能面）；
+  U4 已闭合（`agent-instructions` 接线 + `handbook-smoke`）；U5 仍是【推断】但风险低；
+  U6/U7 只服务于已搁置的"自主节律"，保留 U7 当上游 seam 证据、不跑。
+  逐条最小实证步骤仍在研究笔记 §3，但只需跑 §3.1 的活体探针。
 - **沙箱对 pack 目录的拒绝（U5）**依赖"会话 cwd = `company-workspace/`"这一本仓设定。
 - **是否新开一轮**：培养/学习是新能力，R5 是皮肤 + 门禁收尾轮，塞不进。建议新开一轮（R6）；
   轮序调整按 roadmap 维护规则改表 + notes 记一行原因。

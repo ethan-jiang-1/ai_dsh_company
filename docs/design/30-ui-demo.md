@@ -117,8 +117,8 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 | 层 | 做什么 | 验收 |
 |---|---|---|
 | v0（＝R1 观察窗起，R2 进验收） | 装 team 两个 profile bundle；跑通 §3 分镜 | 一场完整 demo 全程在 UI 里可见，零自定义 UI 代码 |
-| v1（＝R5 前半） | pack 长出 client 面：Company 右栏页签（Remote 读模型 + 组织图/动态流） | 驾驶舱一屏流动；HMR 热更跑通 |
-| v2（＝R5 后半） | `tool.call.toolview` 委派工具卡 + header 动作 | 对话流里的公司语义皮；`npm pack` → 干净 profile → 真实安装冒烟 |
+| v1（＝**R5b 驾驶舱**） | pack 长出 client 面：Company 右栏页签（Remote 读模型 + 组织图/动态流 + 组织在场板） | 驾驶舱一屏流动；不靠讲解能进某位成员的空间；HMR 热更跑通 |
+| v2（委派卡**已提前至 R3** 交付；`npm pack` 真实安装冒烟归 **R5a**） | `tool.call.toolview` 委派工具卡 + header 动作 | 对话流里的公司语义皮；`npm pack` → 干净 profile → 真实安装冒烟 |
 
 v1 是 pack 里第一段 client 代码（React + slots），与"自定义 host 工具/provider"同包
 不同目录（`src/client/` vs `src/`）——包数仍然是 **1**。

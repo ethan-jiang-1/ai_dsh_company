@@ -6,6 +6,10 @@
 范围：只回答"机制上由什么承载、边界在哪"，不写愿望、不写产品设想。
 约定：每条结论标 **【读到的】**（有源码/文档出处）或 **【推断】**（由已读事实推出，无明文）。行号为该 SHA 下的精确行号，路径相对仓库根。
 
+> ⚠ **后续修订（2026-09-22，晚于本笔记）**：§C 的两条前置修复**已落地**、U1 **已在源码层回答**、
+> §D 的"自学习可写落点"结论**被隔离改动推翻**、U2/U3 **作废**。读 §C / §D / §3 前先读
+> 文末 [§5 后续修订](#5-后续修订2026-09-22本笔记之后)。
+
 ## 1. 一句话结论
 
 **【读到的】** DSH 里**没有**记忆子系统：`docs/subsystems/` 的 40+ 个页面里没有 memory 一页，`packages/` 下没有 memory 包，唯一面向用户的 "memory" 面是三方 MCP 记忆服务器的互操作示例（默认关闭）。
@@ -315,3 +319,29 @@ webhook 会话的 `create_goal` 会被 `requireDirectHuman` 拒——这是**【
 - 凡标 **【推断】** 的条目（尤其 C 的 agent-instructions 缺失、D/E 的沙箱拒绝、F 的 webhook→goal 断点）都需第 3 节的实证步骤确认后才可当结论引用。
 - vendor 树为 pre-stable；规则可能随 pin 漂移，升级 pin 时本笔记需重新核对。
 - 子代理产出的两份源码报告（skill-filesystem/写策略、goal/schedule/workflow/subagent 自主性）中的关键行号已由本笔记作者抽查复核；未复核的少数条目已在正文中标注为推断。
+
+---
+
+## 5. 后续修订（2026-09-22，本笔记之后）
+
+> 本节晚于正文。正文是当日的机制快照，**以下四条改写了它的结论**——读 §C / §D / §3 前先读这里。
+
+1. **§C 的两条"前置修复"都已落地**（[../implemented/2026-09-22-skill-root-isolation.md](../implemented/2026-09-22-skill-root-isolation.md)
+   与 [implemented/2026-09-22-r2-roles-alive.md](../implemented/2026-09-22-r2-roles-alive.md)）：
+   五个 preset 都加了 `includeDefaultRoots: false`；五个 preset 都补回了 `agent-instructions` 行，
+   且 `scripts/handbook-smoke.mjs` 已把"会话指令基线 = `company-workspace/AGENTS.md`"做成
+   真入口断言。⇒ §C 结尾"给全公司立一条规矩目前没有可用的自动载体"与 **U4 作废**。
+2. **U1 已在源码层回答**（同篇末节）：skill 条目的增删改名**下一轮**就刷新（首方 `write`/`edit`
+   直接失效 provider），不必等新会话。§3 记的"两条 vendor 陈述冲突"由此收敛；仍缺一次活体探针
+   （最小步骤见 [../../docs/plans/r5-plus-readiness.md](../../docs/plans/r5-plus-readiness.md) §3.1）。
+3. **§D 的"唯一可写落点"结论被隔离改动推翻**：`includeDefaultRoots: false` 之后，角色 provider
+   只扫自己的 `customSkillDirs`，`<projectRoot>/.dsh/skills`（rank 100）**不再进入角色的技能面**
+   ⇒ 往那里写 skill 对任何公司角色都不可见。正文 D 的"自我学习落在 skills 上机制上可行，
+   但落点很别扭"应改读为**不可行**——这同时让提案里"否决分身运行时自改 skill"从取舍变成机制事实。
+4. **U2 / U3 作废，U5–U7 降级**：U3 的 rank-100 覆盖前提是"共享根与角色目录同 layer"，
+   隔离后不再成立；U2 的探针会写全公司共享目录，随隔离失去意义——**两条都不要再跑**。
+   U4 已闭合；U5 仍只是【推断】但风险低；U6/U7 只服务于已搁置的"自主节律"
+   （见 r5-plus-readiness §4），**保留 U7 作上游 seam 的证据引用，不跑**。
+
+**净结论**：本笔记的机制面（A/B/E/F/G）**仍然有效**；失效面只集中在 §C 的两条前置、
+§D 的自学习落点、以及 §3 的 U1–U4。R6 的"培养/学习"因此不再缺前置。

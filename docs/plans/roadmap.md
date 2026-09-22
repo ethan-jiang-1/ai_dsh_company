@@ -3,7 +3,7 @@
 > 性质：**计划层**——被实现逐轮吞掉（验收进 docs/ 合同、决策进 notes/、过期即修订）。
 > 2026-09-21 重切（D11）：原"先全角色（阶段 1）后团队（阶段 2）"的横切否决，改垂直轮——
 > 交付按完整垂直切片、验证按最窄证据、打磨蛇形折回；原 M1 独立会话验证不丢，降为轮内
-> 最窄验证。UI 归轮：现成团队 UI 在 R1 作观察窗、R2 进验收；自定义皮肤 R5（30 §5）。
+> 最窄验证。UI 归轮：现成团队 UI 在 R1 作观察窗、R2 进验收；自定义皮肤 R5b（30 §5）。
 > **每轮换全新对话上下文执行**——交接不吃上下文，靠文末两份清单。
 
 | 轮 | 状态 | 做什么（垂直：动议从 CEO 进、交付从 CEO 出） | 轮内最窄验证 | 验收（外部可观察） | 合同/内容随之出生 |
@@ -13,12 +13,14 @@
 | R2 全员（五角色） | ✅ 完成（机制+门禁；UI 观演待下次开窗） | +VP-Sales +COO +CFO（文案+skills）；任务板 DAG 分派；VP 间至少一次互审（mailbox 跨层级）；fork teammate 下发会议上下文；pack 头部任务板升级为**活面板**（打开期间自动刷新，成员状态/任务修订双侧实时） | 新增两角色独立会话探针；task CAS 拒绝过期修订 | [30-ui-demo](../design/30-ui-demo.md) §3 分镜 v0 按「两空间镜头」走：**不讲解也能看懂谁在哪个空间、活怎么交接**；消息不丢不重 | `presets.md`（五角色语义合同）；40 号补全 |
 | R3 汇报线 | ✅ 完成（2026-09-22） | **team 两包直插行**（R1 起就已直插，本轮只做"并存不互破"的验证）；CEO 加 `vp_eng`/`vp_sales` 命名委托工具（**one-shot 前台** + per-instance persona + `maxDepth: 1`——原计划的 continuable 被 team shadow 实证否掉，见 D18）；**委派工具卡**（`tool.call.toolview` 薄片，自 R5 v2 提前——机制与它的脸同轮交付） | shadow 边界真跑取证：CEO 会话的控制名归团队版、按成员**名字**寻址（`scripts/delegation-smoke.mjs`；`--delegate` 真委派一次断言前台拿到稿子） | 委派出稿（前台拿结果）→ 再委派一次带上一稿改稿；委派卡由 **keyless 行为层**守（`tests/delegation-card.spec.ts`）+ 真页面挂载冒烟；**端到端真 UI 留给 R5 replay**；边界有回归守卫 | `delegation.md`（D18）；`notes/implemented/2026-09-22-r3-reporting-line.md` |
 | R4 成品流程 | ▶ 下一轮 | templates + deliverables 流程全量接入；**共享盘卫生**（[proposed/workspace-hygiene](../../notes/proposed/2026-09-22-workspace-hygiene.md)）：交付物三态（成品 `deliverables/<slug>/final.md` 必须来自一次 `present`、过程稿进 `drafts/`、排练产物不进 deliverables）、练习场 ≠ 运行场（排练换 workspace 目录） | 模板即流程：写作类工作流第一版 = 模板 + skill 指引；keyless 交付物检查脚本 | 端到端写作流水线：brief → 分头出稿 → 互审 → 合稿落 `deliverables/`；**每份 `final.md` 可回溯到 `deliverables/presented` 事件**（oracle = `snapshots/r1-motion/session.jsonl`，加一份无 `present` 的文件即变红） | `demo.md` 定稿 |
-| R5 皮肤 + 门禁 | — | [30-ui-demo](../design/30-ui-demo.md) §5 v1 驾驶舱页签（含**协作动态流**：pack 自建 Remote 折叠 session 事件；**组织在场板**（[proposed/org-presence-board](../../notes/proposed/2026-09-22-org-presence-board.md)）：每个分身一行 = preset 显示名 + `TeamMemberView.status` + 当前 `TeamTaskView.subject`，数据源 `agent-preset/selected` + `ctx.sessionQuery`，均已在 bundle 行内；v2 委派工具卡已提前至 R3）；**无 key replay harness**（录制会话 → 重放断言；**含 R3 留下的委派卡端到端**：真 UI 对话流里 `[data-tool="vp_eng"]` 渲染——R3 试过的慢 e2e 已否决，理由见 [delegation.md](../delegation.md) §6）；verify / release-smoke / sync-dsh 脚本 | 发布纪律时点表（[guides/60](../guides/60-dev-loop.md) §5）逐项补；在场板读模型 keyless 单测 | 驾驶舱页签跑通（含在场板：分身接活 5s 内转 `running`）；**委派卡端到端在 replay 里无 key 断言通过**；`npm pack` → 干净 profile → `dsh plugin add` → 冒烟通过 | `release.md` |
-| R6 分身成长 | ⛔ 待命（阻塞：轮间待办两条 + U1 实证） | **培养回路**：改 `presets/<role>/` 即培养动作，生效边界 = 新会话，验收 = 三道门禁 + 该角色入戏探针；**学习载体**：journal 唯一，人审提升进 skills（照 DSH `human-review-skill-maintenance` 取舍），**否决分身运行时自改 skill**；**不做自主节律**（提 upstream seam，不自建调度器）（[proposed/twin-cultivation-and-self-learning](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md)） | U1 实证：skills 热改是否下一轮生效（vendor 内部两条陈述冲突）；隔离反证（`.dsh/skills/` 探针不盖角色 skill） | 一次完整回路：动议结束 → journal 有教训 → 人提升进 pack skill → 三道门禁 + 探针全绿，且旧会话不受影响 | 培养/学习合同（名字待定） |
+| R5a 门禁与发布 | — | **无 key replay harness**（录制会话 → 重放断言；**含 R3 留下的委派卡端到端**：真 UI 对话流里卡片节点渲染——判据口径已按 accessibility tree 修正，见 [r5-plus-readiness](./r5-plus-readiness.md) §9 P1.3；R3 试过的慢 e2e 已否决，理由见 [delegation.md](../delegation.md) §6）；`release-smoke`（`npm pack` → 干净 profile → `dsh plugin add` → 冒烟）与 `sync-dsh`（升 pin 程序）；**发布欠账**：`peerDependencies` + `dsh.compatibility` 矩阵（guides/60 §5 写的是"R3+"，已欠） | **先窄研究再落**：一条最小场景把 `snapshots/r3-delegation/sessions/lead.jsonl` 归一化到能重放（形状、可导入的一方库与最小实验见 [r5-plus-readiness](./r5-plus-readiness.md) §2.3/§9）；发布产物在干净 profile 里装得上 | **委派卡端到端在 replay 里无 key 断言通过**；`npm pack` → 干净 profile → `dsh plugin add` → 冒烟通过 | `release.md` |
+| R5b 驾驶舱 | — | [30-ui-demo](../design/30-ui-demo.md) §5 v1 驾驶舱页签（pack 自建 Remote 读模型 + **协作动态流** + **组织在场板**（[proposed/org-presence-board](../../notes/proposed/2026-09-22-org-presence-board.md)）：每个分身一行 = preset 显示名 + `TeamMemberView.status` + 当前 `TeamTaskView.subject`，数据源 `agent-preset/selected` + `ctx.sessionQuery`，均已在 bundle 行内）；**成员空间入口**（场景 B 反馈：teammate 会话不作为顶层会话出现——侧栏分组 / 头部动作 / 名册行可点，三选一再写进验收）；v2 委派工具卡已于 R3 交付 | 在场板读模型 keyless 单测（含缺失/未知状态不崩）；`client-load-smoke` 扩展为断言槽在场 + 零插件挂载失败 | 驾驶舱一屏流动（含在场板：分身接活 5s 内转 `running`）；**不靠讲解能点进某位成员的空间** | 无（[30 §5](../design/30-ui-demo.md) 随轮更新） |
+| R6 分身成长 | ⏸ 待命（**前置已清**：接线两条已落地、U1 已答；剩一次活体探针） | **培养回路**：改 `presets/<role>/` 即培养动作，生效边界 = 新会话，验收 = 三道门禁 + 该角色入戏探针；**学习载体**：journal 唯一，人审提升进 skills（照 DSH `human-review-skill-maintenance` 取舍），**否决分身运行时自改 skill**（隔离后已是机制事实）；**不做自主节律**（提 upstream seam，不自建调度器）（[proposed/twin-cultivation-and-self-learning](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md)） | U1 活体探针（skills 热改下一轮生效——源码层已答，只剩实证钉死）；培养回归：改一次角色 skill → 三道门禁 + 该角色探针全绿、**旧会话不受影响** | 一次完整回路：动议结束 → journal 有教训 → 人提升进 pack skill → 三道门禁 + 探针全绿，且旧会话不受影响 | 培养/学习合同（名字待定） |
 
 主通道不变（D4）：demo 主循环走团队（M4/通道 B）；通道 A 命名委托 R3 加入；M2（自定义
-provider）可选增强（触发条件见 [20-roles-isolation.md](../design/20-roles-isolation.md) §3）。
-UI 侧：v0（现成团队 UI）＝ R1 观察窗起、R2 进验收；委派工具卡（v2 薄片）提前至 R3，驾驶舱 v1 ＝ R5（[30-ui-demo.md](../design/30-ui-demo.md) §5）；组织在场板是 R5 驾驶舱的一个切片。
+provider）可选增强（触发条件见 [20-roles-isolation.md](../design/20-roles-isolation.md) §3）
+——**现进搁置池，见下**。
+UI 侧：v0（现成团队 UI）＝ R1 观察窗起、R2 进验收；委派工具卡（v2 薄片）提前至 R3，驾驶舱 v1 ＝ R5b（[30-ui-demo.md](../design/30-ui-demo.md) §5）；组织在场板是 R5b 的一个切片。
 
 轮间待办（不占轮，R2 收尾后立刻做）：**接线修复两条**——① 五个 preset 显式关
 `includeDefaultRoots`，把角色私有 skills 与共享 skill 根隔离（今天仓库内无 `.dsh/`，陷阱是潜伏的：
@@ -34,6 +36,23 @@ UI 侧：v0（现成团队 UI）＝ R1 观察窗起、R2 进验收；委派工�
 控制行 ⇒ 那些 child 同样管不了（与 R3 否掉 continuable 命名委托是同一个 footgun）。统一处理
 （改 one-shot，或给非 team 会话补控制行），**前提是不动 teammate 的 worker 行为**。出处
 [delegation.md](../../docs/delegation.md) §4.4 + [R3 Note](../../notes/implemented/2026-09-22-r3-reporting-line.md)「未做 / 移出本轮」。
+
+轮间待办（R5a → R6）：**一条**——**U1 活体探针**：改一次某角色 `SKILL.md` 正文 → **同一会话**
+下一轮再 `skill({ name })` 看正文是否变。源码层已答"下一轮生效"（[skill-root-isolation](../../notes/implemented/2026-09-22-skill-root-isolation.md) 末节），
+此探针只为把 vendor 内部两条陈述的冲突钉死；要一次真会话 ⇒ **认证档，不进回归**。最小步骤见
+[r5-plus-readiness](./r5-plus-readiness.md) §9 P3 与研究笔记 §5。
+
+## 搁置池（suspended：不占轮、不研究、留复活条件）
+
+> 判据：**只有"缺上游 seam"或"缺明确需求"才进这里**；被否决的方案不进（那归 D 号 / 复盘 / `rejected`）。
+> 升 pin（`sync-dsh`）时顺手回看一遍。条目一旦复活，按其性质回本表或写新提案。
+
+| 项 | 出处 | 搁置理由（已核实） | 复活条件 |
+|---|---|---|---|
+| **自主节律**（分身定期复盘） | [proposed/twin-cultivation](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md) §四 | 机制不闭合：`goal` 需人类授权且 session-start 一律 disarm；`schedule` 只在 live 会话投递且默认没装；webhook 起的会话进不了 goal 循环；全树无 cron | 上游补"外部触发 ↔ 会话内自主续跑"的 seam——**提 seam，不自建调度器**（D9/D13） |
+| **并行快捷派活**（同时开几个 VP） | [delegation.md](../delegation.md) §4.4 | 本组合无干净解法：缺 per-child composition 与不撞名的控制面 | 上游 seam |
+| **M2 自定义 provider** | [00-index](../00-index.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"的需求已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
+| **界面外推送 / 收件箱** | [proposed/org-presence-board](../../notes/proposed/2026-09-22-org-presence-board.md) §背景 | egress 只有 `sessionTelemetry`（OTel）与 hooks，webhook 是 ingress；收件人是谁、粒度多细属部署选择 | 明确的物理人通知需求 + 选定部署面 |
 
 ## 轮次交接（每轮全新对话上下文，靠这两份清单不吃上下文）
 
@@ -73,3 +92,10 @@ AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ 本表
   [implemented/2026-09-22-r3-reporting-line.md](../../notes/implemented/2026-09-22-r3-reporting-line.md)。
 - 2026-09-22：三篇提案进轮（④ 共享盘卫生 → R4、① 组织在场板 → R5、②③ 分身成长 → 新增 R6 待命），
   R6 的阻塞项是轮间待办两条接线修复 + U1 实证；原因与验收判据见各自提案（`notes/proposed/`）。
+- 2026-09-22（R4 轮内做的 R5+ 就绪度梳理）：**R6 的阻塞项已清、文字已过期**——两条接线修复 R2 后即已落地
+  （`includeDefaultRoots: false` + `agent-instructions` 行），U1 已在源码层回答（skill 条目改动
+  下一轮生效），U2/U3 随隔离作废。据此本轮同时做了三件事：① **R5 拆成 R5a（门禁与发布）/
+  R5b（驾驶舱）**——原来 4–5 个面塞一轮，最不确定的 replay harness 会卡住皮肤；② 新增
+  **搁置池**（自主节律 / 并行快捷派活 / M2 / 界面外推送，四条都是"缺 upstream seam 或明确需求"）；
+  ③ 轮间待办加 U1 活体探针（R5a → R6）。判据、证据与打磨细节见
+  [plans/r5-plus-readiness.md](./r5-plus-readiness.md)；台账 D19。
