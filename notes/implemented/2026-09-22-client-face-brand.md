@@ -71,3 +71,23 @@ bundle 含"任务板"文案（8 处）与 `agentTeams`（57 处）；`verify`/`t
 
 **未验证**：面板的**视觉**需人工确认（我验证的是"模块能挂上 + 数据接口可用"这两层）。
 **已知取舍**：client bundle 约 197KB（内联了 zod）；官方 Team UI 仍不可用（上游缺口，未改 vendor）。
+
+## 追加：门禁上线即抓到**系统性**上游缺口
+
+把"客户端模块依赖闭环"加进 `preset-smoke` 后，第一次运行就报出**三个 shipped 模块**缺同一依赖：
+
+```
+WARN 非本包模块缺依赖（上游缺口）：
+  @deepseek-ai/dsh-client-ui-subagent          → @deepseek-ai/dsh-client-ui-primitives
+  @deepseek-ai/dsh-client-ui-jobs              → @deepseek-ai/dsh-client-ui-primitives
+  @deepseek-ai/dsh-experimental-client-ui-agent-team → @deepseek-ai/dsh-client-ui-primitives
+```
+
+规则核实（`packages/client/modules/src/index.ts`）：模块表**只枚举声明了 `dsh.client` 且
+`platform: 'web'` 的包**；`ui-primitives` 是纯组件库、没有该字段 → 永远不在表里 → 任何把它写进
+`dsh.client.inject` 的插件都**注定静默挂不上**。这是上游不一致（要么别列，要么该库应声明
+`dsh.client`），未改 vendor。
+
+**结论**：本构建形态下 subagent 面板 / jobs 面板 / 官方团队面板都不可用；本 pack 的任务板是
+自实现（不依赖该库），**不受影响**。门禁把这层变成 WARN（本包缺失才是 FAIL）——既守住自己，
+又不为上游缺口常年红着。

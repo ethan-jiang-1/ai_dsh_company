@@ -23,6 +23,7 @@ const PORT = Number(arg('port', '3099'))
 const PROFILE = arg('profile', 'web')
 const CWD = resolve(arg('cwd', join(ROOT, 'company-workspace')))
 const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo']
+const OUR_PACKAGE = 'dsh-company-pack'
 const BOOT_TIMEOUT_MS = 120_000
 
 const home = process.env.DSH_HOME
@@ -80,6 +81,37 @@ async function authenticate(port, token) {
   return cookies.map(c => c.split(';')[0]).join('; ')
 }
 
+/**
+ * 解析页面里的 `window.__DSH_BOOT__` 启动清单。
+ * @returns 模块总数，以及"inject 依赖不在清单里"的 `模块 → 依赖` 清单。
+ */
+async function moduleClosure(base, cookie) {
+  const html = await (await fetch(`${base}/`, { headers: { cookie } })).text()
+  const marker = html.indexOf('__DSH_BOOT__')
+  if (marker === -1) throw new Error('页面里找不到 __DSH_BOOT__（前端未构建？）')
+  const start = html.indexOf('{', marker)
+  let depth = 0
+  let end = -1
+  for (let index = start; index < html.length; index++) {
+    const char = html[index]
+    if (char === '{') depth++
+    else if (char === '}') {
+      depth--
+      if (depth === 0) { end = index + 1; break }
+    }
+  }
+  const boot = JSON.parse(html.slice(start, end))
+  const entries = boot.entries ?? []
+  const ids = new Set(entries.map(entry => entry.id))
+  const missing = []
+  for (const entry of entries) {
+    for (const dep of entry.inject ?? []) {
+      if (!ids.has(dep)) missing.push(`${entry.id} → ${dep}`)
+    }
+  }
+  return { count: entries.length, missing }
+}
+
 const failures = []
 const check = (label, fn) => fn().then(
   () => console.log(`  PASS ${label}`),
@@ -109,6 +141,19 @@ try {
       const created = await rpc(base, cookie, 'session/create', { request: { cwd: CWD, agentPreset: role } })
       if (created?.agentPreset !== role) throw new Error(`返回的 preset 不是 ${role}：${JSON.stringify(created)}`)
     })
+  }
+
+  // ③ 浏览器模块依赖闭环：启动清单里每个 client 模块的 inject 依赖必须都在清单内。
+  //    缺一个 → 该模块**静默挂不上**（无报错、UI 里什么都没有）。R1 实证：官方团队 UI 就因此
+  //    永远挂不上（依赖一个不在模块表的组件库）。本包自己的模块缺失 = FAIL；他人模块缺失 = WARN。
+  const closure = await moduleClosure(base, cookie)
+  const ours = closure.missing.filter(item => item.startsWith(OUR_PACKAGE))
+  const foreign = closure.missing.filter(item => !item.startsWith(OUR_PACKAGE))
+  await check(`client 模块依赖闭环（${String(closure.count)} 个模块，本包缺失 ${String(ours.length)}）`, async () => {
+    if (ours.length > 0) throw new Error(`本包模块缺依赖：${ours.join(', ')}`)
+  })
+  if (foreign.length > 0) {
+    console.log(`  WARN 非本包模块缺依赖（上游缺口，解释"UI 里没有"）：${foreign.join(', ')}`)
   }
 } finally {
   child.kill('SIGTERM')
