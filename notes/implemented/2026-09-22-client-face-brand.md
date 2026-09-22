@@ -91,3 +91,24 @@ WARN 非本包模块缺依赖（上游缺口）：
 **结论**：本构建形态下 subagent 面板 / jobs 面板 / 官方团队面板都不可用；本 pack 的任务板是
 自实现（不依赖该库），**不受影响**。门禁把这层变成 WARN（本包缺失才是 FAIL）——既守住自己，
 又不为上游缺口常年红着。
+
+## 追加更正（同日晚些）：上节根因是误诊，重复挂载砖了全 UI（postmortem 0003）
+
+上面两个"追加"的机制结论（inject 引用不在 entries 里的包 → 模块静默挂不上）**已被证伪**：
+
+- `dsh.client.inject` 是 **informational only**（vendor `packages/client/AGENTS.md`）：不排序、
+  不 gate 加载——差集非空证明不了"挂不上"；
+- `ui-primitives` 是 shell 预置 **baseline**（`platform.ts` 的 `PLATFORM_MODULES`），对每个
+  动态 bundle 隐式可用，本来就**不该**出现在 entries 里（subagent/jobs/官方团队面板引用它是
+  正常的，三个"上游缺口"WARN 全是假警报）；
+- 实证（headless Chromium）：官方 `client-ui-agent-team` 正常加载、挂 remote、渲染面板
+  （Agent Team 按钮 → Members / Shared tasks，task-1 活数据可读）。
+
+**后果**：本包既然自挂同一份 remote，官方先挂、本包后到 → `client api: agentTeams/createTask
+is already mounted` → client 入口失败**不静默**——整个 Web UI 砖在 BootPage 错误屏
+（"HARNESS / Failed to load plugins"），品牌槽与任务板也一并丢失（apply 在注册槽之前就抛了）。
+
+**修正**：client 入口删掉 `$mount` 与运行时 import（官方行挂，本包板经 `remote.agentTeams`
+服务读；fiber 等待，官方缺席时安静 PENDING）；tsdown 的 `noExternal` 同步删除，client bundle
+197KB → 8.9KB。preset-smoke 闭包世界补上 baseline。R1"官方 Team UI 挂不上"的真实原因
+**至今未确立**（postmortem 0002 的更正节）；复发时用 `scripts/client-load-smoke.mjs` 重诊。

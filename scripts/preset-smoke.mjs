@@ -11,6 +11,7 @@
 //       client 面与前端 dist 已构建（guides/60 §7）。
 // 用法：source dev/env.sh && node scripts/preset-smoke.mjs [--port 3099] [--profile web]
 import { spawn } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -83,7 +84,7 @@ async function authenticate(port, token) {
 
 /**
  * 解析页面里的 `window.__DSH_BOOT__` 启动清单。
- * @returns 模块总数，以及"inject 依赖不在清单里"的 `模块 → 依赖` 清单。
+ * @returns 模块总数，以及"inject 依赖既非动态行、也非 shell baseline"的 `模块 → 依赖` 清单。
  */
 async function moduleClosure(base, cookie) {
   const html = await (await fetch(`${base}/`, { headers: { cookie } })).text()
@@ -103,10 +104,17 @@ async function moduleClosure(base, cookie) {
   const boot = JSON.parse(html.slice(start, end))
   const entries = boot.entries ?? []
   const ids = new Set(entries.map(entry => entry.id))
+  // shell 预置 baseline（vendor `packages/client/web/src/platform.ts` 的 PLATFORM_MODULES）：
+  // react / cordis / store / ui-slots / ui-primitives / ui-dockkit 等。它们不在 entries 里、
+  // 也**不应该**在（baseline 对每个动态 bundle 隐式可用）。闭包世界 = 动态行 ∪ baseline。
+  const platform = readFileSync(
+    join(ROOT, 'vendor/dsh/packages/client/web/src/platform.ts'), 'utf8')
+  const platformBlock = /export const PLATFORM_MODULES = \[([^\]]*)\]/s.exec(platform)?.[1] ?? ''
+  const baseline = new Set([...platformBlock.matchAll(/'([^']+)'/g)].map(m => m[1]))
   const missing = []
   for (const entry of entries) {
     for (const dep of entry.inject ?? []) {
-      if (!ids.has(dep)) missing.push(`${entry.id} → ${dep}`)
+      if (!ids.has(dep) && !baseline.has(dep)) missing.push(`${entry.id} → ${dep}`)
     }
   }
   return { count: entries.length, missing }
@@ -143,17 +151,21 @@ try {
     })
   }
 
-  // ③ 浏览器模块依赖闭环：启动清单里每个 client 模块的 inject 依赖必须都在清单内。
-  //    缺一个 → 该模块**静默挂不上**（无报错、UI 里什么都没有）。R1 实证：官方团队 UI 就因此
-  //    永远挂不上（依赖一个不在模块表的组件库）。本包自己的模块缺失 = FAIL；他人模块缺失 = WARN。
+  // ③ 浏览器模块闭包（lint 级）：每个 client 模块 `dsh.client.inject` 里的包名，应当是
+  //    动态行（entries[].id）或 shell baseline 之一。⚠ inject 是 **informational only**
+  //    （vendor packages/client/AGENTS.md）：不排序、不 gate 加载——这里抓的是"引用了
+  //    不存在的包名"这类配置笔误，**不是可加载性判据**。client 入口真正的挂载失败
+  //    **不静默**：BootPage 错误屏 + console `failed to apply loader entry`，由
+  //    `scripts/client-load-smoke.mjs` 抓。R1 的"官方 Team UI 挂不上"是误诊
+  //    （postmortem 0003）。本包模块缺失 = FAIL；他人模块缺失 = WARN。
   const closure = await moduleClosure(base, cookie)
   const ours = closure.missing.filter(item => item.startsWith(OUR_PACKAGE))
   const foreign = closure.missing.filter(item => !item.startsWith(OUR_PACKAGE))
-  await check(`client 模块依赖闭环（${String(closure.count)} 个模块，本包缺失 ${String(ours.length)}）`, async () => {
-    if (ours.length > 0) throw new Error(`本包模块缺依赖：${ours.join(', ')}`)
+  await check(`client 模块闭包 lint（${String(closure.count)} 个模块，本包缺失 ${String(ours.length)}）`, async () => {
+    if (ours.length > 0) throw new Error(`本包模块引用未知包名：${ours.join(', ')}`)
   })
   if (foreign.length > 0) {
-    console.log(`  WARN 非本包模块缺依赖（上游缺口，解释"UI 里没有"）：${foreign.join(', ')}`)
+    console.log(`  WARN 非本包模块 inject 引用未知包名（上游配置可疑）：${foreign.join(', ')}`)
   }
 } finally {
   child.kill('SIGTERM')

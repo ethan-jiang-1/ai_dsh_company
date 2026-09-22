@@ -108,3 +108,26 @@ exist".
   [`notes/research/2026-09-22-agent-workflow-community-practice.md`](../research/2026-09-22-agent-workflow-community-practice.md)
   and the host's own
   [post-mortem 0003](../../vendor/dsh/docs/postmortem/0003-web-agent-gui-feedback-loop.md).
+
+## Correction (2026-09-22, later the same day): the root-cause theory was wrong
+
+The loadability theory above is disproven; [0003](0003-duplicate-remote-mount.md) records the incident
+that resulted from acting on it.
+
+- `dsh.client.inject` is **informational only** (vendor `packages/client/AGENTS.md`): it neither
+  sequences activation nor gates loading, so an inject entry absent from `entries[].id` proves
+  nothing about loadability. Diffing those sets (the diagnostic this report canonized, later taught
+  as guide §3.9) answers a different question.
+- `@deepseek-ai/dsh-client-ui-primitives` is a shell-seeded **baseline module**
+  (`packages/client/web/src/platform.ts`, `PLATFORM_MODULES`), implicitly available to every dynamic
+  bundle; listing it in `inject` is normal, and the three "affected shipped modules" all load.
+- Empirically (headless Chromium, this tree): the shipped team module loads, mounts the generated
+  Team remote, and renders a working panel (Agent Team button → Members / Shared tasks, live data).
+
+What remains true from this report: the R1 symptom (no team entry point visible) was real, and its
+actual cause was **never established** — the module-table explanation was a misdiagnosis reached
+without browser evidence. If the symptom recurs, re-diagnose with `scripts/client-load-smoke.mjs`.
+The "failed silently" framing also missed the loud failure mode this class actually has: a client
+entry whose `apply` throws bricks the whole UI on the BootPage failure screen, with a banner and a
+console error. The closure guard kept its lint value (catching unknown package names) with the world
+widened to dynamic rows ∪ baseline.

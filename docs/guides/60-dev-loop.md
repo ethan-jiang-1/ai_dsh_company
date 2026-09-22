@@ -68,7 +68,7 @@ proposed Note 在同一 diff 改写为 implemented，不留到交付后。
 | 3.6 **表面层（R1 实证）** | **症状"角色没入戏 / persona 不生效"→ 先问跑在哪个面** | **preset 只在 Web 面挂载**：只有 `web-app` 组合 `session-controller`（其 `composeAgent` 负责"未指定 preset 时挂 default"），headless / sdk / acp 的一次性驱动直接经 core agent registry 建 agent、**绕过 preset**。所以在 headless 里验角色内容永远失败，换 Web 会话（选 preset）验证 |
 | 3.7 **工具面层（R1 实证）** | **症状"角色会话只能协调、不能读写文件 / 加载 skill / 写交付物"→ 查 preset 是否声明了工具行** | preset composition 是**自包含**的：工具行不随 profile/bundle 继承（shipped `standard` 自己声明全部工具行）。查证手段：**会话日志 `request/header.tools`** 列出的工具名（`--dump-config` 看不出来——它只打印 profile 树）。⚠ 会话日志是**多 frame zstd**：Node `zstdDecompressSync` 只解第一 frame（读到 200 字节就停），用 `zstd -d -c`（homebrew）读全量 |
 | 3.8 **Web RPC 层（R1 实证）** | **UI 静默失败（"新建会话没反应"）→ 直接打 `session/create` RPC 拿真实错误** | UI 不显示 preset mount 失败；RPC 会返回 `agent-preset/invalid` + 具体行与缺失字段（R1 实证：工具行缺必填 config，如 `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`——**抄 shipped preset 的行要连 config 一起抄**）。驱动方法见 §8 |
-| 3.9 **客户端模块层（R1 实证）** | **症状"插件行为在 host 侧正常、UI 里却什么都没有（按钮/面板不出现）"→ 查浏览器模块表的依赖闭环** | Web 的每个 client 模块在启动清单里带 `inject` 依赖；**依赖里有一个不在清单 `entries[].id` 里，该模块就静默挂不上**（无报错）。查法：从页面 HTML 解析 `window.__DSH_BOOT__`，比对 `entries[].inject` 与 `entries[].id` 的差集。R1 实证：官方 `client-ui-agent-team` 依赖 `@deepseek-ai/dsh-client-ui-primitives`（纯组件库，无 `dsh.client` → 不在模块表）→ 官方 Team UI 永远挂不上；解法是**自己实现等价的 client 面**（本 pack 的任务板）并把依赖限制在模块表内。⚠ 反过来的坑：`dsh.client.inject` 里列了不存在于模块表的包，等于自断加载 |
+| 3.9 **客户端模块层（R1 误诊 → R2 更正，postmortem 0003）** | **症状"整窗只剩 HARNESS / Failed to load plugins 错误屏"→ 某个 client 入口 apply 抛错，砖的是全 app** | ① client 入口失败**不静默**：BootPage 错误屏 + 浏览器 console 有 `failed to apply loader entry <id> (<name>)`；先跑 `node scripts/client-load-smoke.mjs`（headless 浏览器断言零挂载失败 + 品牌在场）。② `dsh.client.inject` 是 **informational only**（vendor `packages/client/AGENTS.md`）：不排序、不 gate 加载——"inject 引用了不在 entries 里的包" ≠ 挂不上；shell baseline（`platform.ts` 的 `PLATFORM_MODULES`：react/cordis/store/ui-slots/ui-primitives/ui-dockkit）隐式回答这些名字（R1 曾据此误诊"官方 Team UI 挂不上"，实为可用）。③ 真正"挂不上但没报错"的形态是 fiber **PENDING**（声明的服务无人提供，无超时，贡献安静不出现）。④ 复用别人已挂的贡献（如官方 Team remote）：走服务 inject 等它，**别重复 `$mount`**——同一描述符挂两次 = `already mounted` = 全 UI 砖（2026-09-22 实证） |
 | 4 会话层 | 读会话 JSONL，不猜 | model-visible ⟺ logged：上下文组装问题从日志（`$DSH_HOME` 下 sessions）重建；读不全 = 欠了 §3 第②问的债。⚠ bash 沙箱对会话文件有**间歇视图抖动**（列出得、打开不得），且 headless 会话收尾会删目录——分析要趁进程活着时做（R1 实证） |
 | 5 回归层 | snapshot 重放（R5 起） | `snapshots/`；回答"行为为什么变了"的最快路径 |
 
@@ -176,7 +176,9 @@ pnpm dsh web -- --port 3081 --no-open                                      # 308
 # pack 自己的 client 面（改了 src/client/** 才需要；产物进 lib/）：
 node ./node_modules/typescript/bin/tsc -p packages/company-pack/tsconfig.json
 (cd packages/company-pack && ../../node_modules/.bin/tsdown)
-# ⚠ 新增文件（lib/**）后要重装进 profile 才会被伺服：`plugin --profile web remove` + `add`。
+# ⚠ 新增文件（lib/**）后要重装进 profile 才会被伺服：`plugin --profile web remove` + `add`
+#   （内容更新不用：tsdown 原地写，file: 依赖是硬链，inode 不变——2026-09-22 实证）。
+node scripts/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）
 ```
 
 实证过的坑与解法（细节见 notes/implemented/2026-09-22-r0-loop-acceptance.md）：
