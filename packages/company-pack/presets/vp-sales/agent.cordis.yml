@@ -52,6 +52,17 @@
   isolate:
     workflowEngine: true
   config:
+    # 续驶控制面：**与 tool-subagent(continuable) 成对声明**（上游 standard / ptc / cordis
+    # 三个 preset 都这么写）。为什么本仓职能 preset 必须补这两行：`tool-agent-team` 的
+    # maybeInstall 只在 ctx.agentTeams.tryMembership(agent) !== undefined（= 团队成员）时把
+    # **团队版**控制名装进来；职能**根会话不是团队成员**，所以这里若不声明全局版，会话里就
+    # 既没有团队版也没有全局版 ⇒ continuable child 生出来就失联（R3 → R4 轮间待办）。
+    # CEO preset 反过来**不能**放：CEO 从第一帧起就是 team-scoped（Lead 自己也是成员），
+    # 这两行在那里会被团队版 shadow 成死行（见 docs/delegation.md §2）。
+    - id: tool-subagent-control
+      name: '@deepseek-ai/dsh-tool-subagent-control'
+    - id: tool-subagent-list-agents
+      name: '@deepseek-ai/dsh-tool-subagent-control/list-agents'
     - id: tool-subagent
       name: '@deepseek-ai/dsh-tool-subagent'
       config:

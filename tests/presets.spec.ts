@@ -126,6 +126,33 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       .not.toMatch(/^\s*- id: tool-subagent-list-agents$/m)
   })
 
+  it('续驶控制面与 subagent 成对（R4 关闭 footgun）：职能 preset 必须有，CEO preset 必须没有', () => {
+    // 机制（vendor 实证）：`tool-agent-team` 的 maybeInstall 只在
+    // `ctx.agentTeams.tryMembership(agent) !== undefined`（= 团队成员）时才装**团队版**控制名
+    // （vendor/dsh/packages/experimental/tool-agent-team/src/index.ts:397-402）。
+    //   - 职能**根**会话不是团队成员 ⇒ 团队版不会装；若 preset 自己也不声明全局版，会话里就
+    //     既没有团队版也没有全局版 ⇒ `subagent`(continuable) 生出来的 child 失联
+    //     （既发不了消息、也中断不了、也列不出来）——这正是 R3→R4 的轮间待办。
+    //   - 上游 standard / ptc / cordis 三个 preset 都是**成对**声明这两行 + tool-subagent。
+    //   - CEO preset 反过来不能有：CEO 从第一帧起就是 team-scoped（Lead 自己是成员），
+    //     这两行在那里被团队版 shadow 成死行（R3 实证，见 docs/delegation.md §2）。
+    const controlRows = ['tool-subagent-control', 'tool-subagent-list-agents']
+    for (const role of ['vp-eng', 'vp-sales', 'coo', 'cfo']) {
+      const text = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
+      for (const row of controlRows) {
+        expect(text, `${role} 缺 ${row}：它的根会话不是团队成员，团队版控制名不会装，continuable child 会失联`)
+          .toMatch(new RegExp(`^\\s*- id: ${row}$`, 'm'))
+      }
+      expect(text, `${role} 的 subagent 是 continuable，却没有控制面——要么补控制行，要么改 one-shot`)
+        .toContain('backgroundMode: continuable')
+    }
+    const ceo = readFileSync(join(PRESETS_DIR, 'ceo', 'agent.cordis.yml'), 'utf8')
+    for (const row of controlRows) {
+      expect(ceo, `CEO 会话里 ${row} 被团队版 shadow，是死行（别修回来）`)
+        .not.toMatch(new RegExp(`^\\s*- id: ${row}$`, 'm'))
+    }
+  })
+
   it('公司手册（模型可见）覆盖五角色职责边界、路由与升级规则——不随内容改动悄悄失效', () => {
     const handbook = readFileSync(join(ROOT, 'company-workspace/AGENTS.md'), 'utf8')
     for (const role of ['CEO', 'CFO', 'VP-Sales', 'VP-Eng', 'COO']) {
