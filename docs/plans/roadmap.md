@@ -35,7 +35,10 @@ AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ 本表
 3. 验收中已成事实的部分迁入对应合同（00-index 合同出生地图）；
 4. `notes/implemented/` 记本轮 Note——"实际跑过的验证 + 环境状态"必写（下轮会话判断
    "哪些已就绪"只读这里，不信记忆不信聊天记录）；
-5. `notes/intents.md` 对应行改 implemented。
+5. `notes/intents.md` 对应行改 implemented；
+6. **上线前门禁全绿**：`pnpm verify` + `pnpm test` + **`node scripts/preset-smoke.mjs`**
+   （最后一条是唯一能抓"preset 挂载失败"的检查——行 config 校验发生在挂载时，roster/dump 都看不到，
+   UI 还会吞错误；R1 血泪教训，见 guides/60 §7 两道防线）。
 
 ## 维护规则
 
