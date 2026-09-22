@@ -32,13 +32,13 @@ implemented → archived）。
 | [guides/50-budget-and-ops.md](./guides/50-budget-and-ops.md) | 指南 | 限流旋钮总表、成本结构、demo 运维 runbook（症状→动作）、回放复盘 |
 | [guides/60-dev-loop.md](./guides/60-dev-loop.md) | 指南 | 开发环操作手册：六步闭环、调试阶梯、设计四问、插拔速查、升级环与发布时点、双 home/双 DSH |
 | [profile.md](./profile.md) | 合同 | host 组合现在时：部署形状（源码直跑/持久安装实测）、行清单语义、开放点 |
+| [presets.md](./presets.md) | 合同 | 角色 preset 语义（R1：CEO+VP-Eng 定稿，VP-Sales/COO 占位待 R2）；名册运行时实测；验证分层 |
+| [demo.md](./demo.md) | 合同 | demo 操作合同（R1 雏形，R4 定稿）：动议、前置、分镜与观测点、验收判据、已知边界 |
 
 ### 合同出生地图（顶层，实现到哪生到哪——不预建空文件）
 
 | 将出生的合同 | 诞生轮次 | 内容来源 |
 |---|---|---|
-| `presets.md` | R1 起（CEO+VP-Eng），R2 长全 | 四角色 preset 的语义合同（persona 定稿、skills 清单、验证方式）——40 号骨架升格 |
-| `demo.md` | R1 雏形 → R4 定稿 | demo 操作合同：剧本、分镜、观测点（30 §3 分镜落地后的现在时） |
 | `delegation.md` | R3 | 命名委托工具的语义（工具行、persona 文案、续驶路径） |
 | `release.md` | R5 | 发布形状：peers、compatibility 矩阵、真实安装冒烟程序 |
 
