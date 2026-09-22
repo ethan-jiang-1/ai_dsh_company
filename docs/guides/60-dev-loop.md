@@ -61,6 +61,7 @@ proposed Note 在同一 diff 改写为 implemented，不留到交付后。
 | 3.5 **退出层（R1 实证）** | **症状"任务似已跑完但进程不退 + stdout 零输出"→ 先查 `patchReload`** | **自定义 profile（非 shipped 名字）默认 `'live'`**（源码注释："Custom profiles retain the historical live patch-file behavior"）——live watcher 常驻，一次性 headless 任务跑完进程也不退、stdout 不 flush。修法：profile 的 package.json 改 `"patchReload": "startup"`。shipped 名字（headless/web/sdk…）走模板不受此扰。第一分叉点永远是 **shipped 名字 vs 自定义名字** |
 | 3.6 **表面层（R1 实证）** | **症状"角色没入戏 / persona 不生效"→ 先问跑在哪个面** | **preset 只在 Web 面挂载**：只有 `web-app` 组合 `session-controller`（其 `composeAgent` 负责"未指定 preset 时挂 default"），headless / sdk / acp 的一次性驱动直接经 core agent registry 建 agent、**绕过 preset**。所以在 headless 里验角色内容永远失败，换 Web 会话（选 preset）验证 |
 | 3.7 **工具面层（R1 实证）** | **症状"角色会话只能协调、不能读写文件 / 加载 skill / 写交付物"→ 查 preset 是否声明了工具行** | preset composition 是**自包含**的：工具行不随 profile/bundle 继承（shipped `standard` 自己声明全部工具行）。查证手段：**会话日志 `request/header.tools`** 列出的工具名（`--dump-config` 看不出来——它只打印 profile 树）。⚠ 会话日志是**多 frame zstd**：Node `zstdDecompressSync` 只解第一 frame（读到 200 字节就停），用 `zstd -d -c`（homebrew）读全量 |
+| 3.8 **Web RPC 层（R1 实证）** | **UI 静默失败（"新建会话没反应"）→ 直接打 `session/create` RPC 拿真实错误** | UI 不显示 preset mount 失败；RPC 会返回 `agent-preset/invalid` + 具体行与缺失字段（R1 实证：工具行缺必填 config，如 `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`——**抄 shipped preset 的行要连 config 一起抄**）。驱动方法见 §8 |
 | 4 会话层 | 读会话 JSONL，不猜 | model-visible ⟺ logged：上下文组装问题从日志（`$DSH_HOME` 下 sessions）重建；读不全 = 欠了 §3 第②问的债。⚠ bash 沙箱对会话文件有**间歇视图抖动**（列出得、打开不得），且 headless 会话收尾会删目录——分析要趁进程活着时做（R1 实证） |
 | 5 回归层 | snapshot 重放（R5 起） | `snapshots/`；回答"行为为什么变了"的最快路径 |
 
@@ -207,3 +208,37 @@ pnpm dsh web -- --port 3081 --no-open                                      # 308
   对应 DSH 的 `verify-cordis-config` 门禁；我们同构到 `scripts/verify.mjs` 检查 7。
 - **patchReload**：headless 用途的自定义 profile 必须 `"startup"`（见 §2 第 3.5 层）；web 形态
   才用 `"live"`。
+
+## 8. 驱动 Web 面会话（RPC；R1 实证）
+
+preset 只在 Web 面挂载（§2 第 3.6 层），所以**验证角色行为必须驱动 Web 面**。Web 面有 HTTP RPC，
+可以脚本化建会话、发 prompt、列会话：
+
+```sh
+# ① token → cookie（cookie 按 origin 隔离：换端口/换实例都要重新换一次）
+curl -sL -c /tmp/ck.txt -o /dev/null "http://127.0.0.1:3081/?token=<TOKEN>"
+
+# ② 建会话（带 agentPreset 即挂角色 preset）
+curl -s -X POST "http://127.0.0.1:3081/api/session/create" \
+  -H 'Content-Type: application/json' -b /tmp/ck.txt \
+  -d '{"type":"client-request","rpcId":"c1","method":"session/create",
+       "payload":{"args":{"request":{"cwd":"<绝对 cwd>","agentPreset":"ceo"}}}}'
+
+# ③ 发动议
+curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
+  -H 'Content-Type: application/json' -b /tmp/ck.txt \
+  -d '{"type":"client-request","rpcId":"p1","method":"session/prompt",
+       "payload":{"args":{"request":{"requestId":"r-1","sessionId":"<sid>","mode":"queue",
+                                    "content":[{"type":"text","text":"<动议>"}]}}}}'
+```
+
+规则（都是实证踩出来的）：
+
+- **endpoint = `<namespace>/<method>`**（斜杠，不是点；见 gateway `claimsEndpoint` 的两段校验）。
+  namespace 来自服务键：`session-controller` → `session`，`agent-presets` → `agentPresets`。
+- **信封固定** `{"type":"client-request","rpcId":…,"method":…,"payload":{"args":{…}}}`。
+- **`args` 是位置参数的具名对象**，名字取自源码参数名：`create(request)` → `args.request`；
+  `list(_request, signal)` → **`args._request`**（占位参数的下划线也要照写）。
+- 常用：`session/create`、`session/prompt`、`session/list`、`agentPresets/list`。
+- **`ask_user_question` 的回答不走 RPC**（走 wire）——脚本化跑到提问就会停下等真人；此时去 UI 里答。
+- 这条通道也是 R5「web 快照 lane」的雏形。

@@ -33,10 +33,14 @@
   name: '@deepseek-ai/dsh-tool-fs'
 - id: tool-fs-search
   name: '@deepseek-ai/dsh-tool-fs-search'
+  config:
+    sampleOverCapGlobResults: false
 - id: tool-skill
   name: '@deepseek-ai/dsh-tool-skill'
 - id: tool-todo
   name: '@deepseek-ai/dsh-tool-todo'
+  config:
+    allowParallelInProgress: true
 - id: tool-ask-user
   name: '@deepseek-ai/dsh-tool-ask-user'
 - id: tool-present
