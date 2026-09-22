@@ -273,6 +273,11 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - **`ask_user_question` 的回答不走 RPC**（走 wire）——脚本化跑到提问就会停下等真人；此时去 UI 里答。
 - 这条通道也是 R5「web 快照 lane」的雏形。
 
+
+- **读会话日志**用 `scripts/lib/session-log.mjs`（page 与事件解析的共用实现）。两个坑：`session/page`
+  的 `throughSeq` 必须是**有效 seq**（`-1` 实测返回 0 条；当前游标可从越界报错 `… is past cursor N` 取），
+  完成信号取**持久事件 `turn/end`**（`session/list.running` 是“会话有活着的 agent”，idle 也为 true；用它等会假超时）。
+
 ## 9. 门禁分层：连通档（默认，秒级）vs 内容档（按需，分钟级）
 
 **教训（R2，2026-09-22）**：会话级门禁最初写成"五角色 × 三探针按 KB 事实断言内容"——串行跑

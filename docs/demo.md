@@ -14,8 +14,9 @@
 
 1. `source dev/env.sh`（双 home；**新 shell 必须**）
 2. `pnpm dsh web -- --port 3086 --no-open`（3080 被 GUI 占用；启动横幅打印带 token 的 URL）
-3. 浏览器打开该 URL；侧栏可见 CEO 会话，点开 VP 会话即"进另一个空间"
+3. 浏览器打开该 URL（**必须带 token**：直接开端口会卡鉴权）。会话列表按【工作目录】过滤——先选到 `company-workspace`，否则看不到本场会话。
 4. 新建会话：preset 选 **wochen CEO**（`ceo` 是 profile 默认）；工作目录 `company-workspace`
+5. 进“另一位成员的空间”：**teammate 的会话不在顶层列表**——在会话头部点 **Team 名册**，点成员名打开其会话（`sessions.openSubagent`，子会话）。显式入口是 R5 皮肤第一项。
 
 ## 分镜 v0（两空间镜头：谁在哪个空间、活怎么交接）
 
