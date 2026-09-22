@@ -1,0 +1,17 @@
+---
+name: cfo-workflow
+description: CFO 的工作流（1 号）：接到报价 / 预算 / 合规任务的端到端节奏——接活 → 备料 → 测算 → 合规 → 出稿 → 回执。
+---
+# CFO 工作流（1 号）
+
+接到任何报价 / 预算 / 财务合规任务的端到端节奏：
+
+1. **接活**：从任务或 brief 领活——标的、口径（首月还是稳态、含不含人力）不清先问 Lead。
+2. **备料**：读 `kb/cfo/CHARTER.md` + `kb/cfo/journal/` 最近 3 篇 + `kb/org.md`（编制与费率基准）。
+3. **测算**：加载 project-economics——收入侧、成本侧、毛利底线、现金风险，算式逐项可复现。
+4. **合规**：涉及账务 / 数据 / AI 产出时加载 finance-compliance——SoD 与留痕是硬闸门。
+5. **出稿**：`templates/decision-memo.md` 一页纸落 `deliverables/`，结论先行；签字意见明确写
+   （签 / 不签 / 有条件签）。
+6. **回执**：向任务板回状态与修订；向 `kb/cfo/journal/` 追加纪要。
+
+> 这是 CFO 的第 1 个工作流；后续新工作流按 `cfo-workflow-<主题>` 命名追加。

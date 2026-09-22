@@ -32,7 +32,7 @@ implemented → archived）。
 | [guides/50-budget-and-ops.md](./guides/50-budget-and-ops.md) | 指南 | 限流旋钮总表、成本结构、demo 运维 runbook（症状→动作）、回放复盘 |
 | [guides/60-dev-loop.md](./guides/60-dev-loop.md) | 指南 | 开发环操作手册：六步闭环、调试阶梯、设计四问、插拔速查、升级环与发布时点、双 home/双 DSH |
 | [profile.md](./profile.md) | 合同 | host 组合现在时：部署形状（源码直跑/持久安装实测）、行清单语义、开放点 |
-| [presets.md](./presets.md) | 合同 | 角色 preset 语义（R1：CEO+VP-Eng 定稿，VP-Sales/COO 占位待 R2）；名册运行时实测；验证分层 |
+| [presets.md](./presets.md) | 合同 | 角色 preset 语义（R2：五角色定稿——CEO / VP-Eng / VP-Sales / COO / CFO）；名册运行时实测；验证分层 |
 | [demo.md](./demo.md) | 合同 | demo 操作合同（R1 雏形，R4 定稿）：动议、前置、分镜与观测点、验收判据、已知边界 |
 
 ### notes/（决策与教训，不进 docs）
@@ -71,14 +71,16 @@ implemented → archived）。
 | D13 | **开发纪律全程沿用 DSH**（整套继承 + 按本 repo 规模裁剪，**不发明本地流程**）；纪律权威在 vendor 树（`AGENTS.md`/`docs/AGENTS.md`/`docs/testing.md`/`.agents/notes/`），本 repo 只做落点映射 | AGENTS.md §纪律（权威对照表）；用户指令 |
 | D14 | **公司名 = wochen；角色显示名系列化** `<公司名> <角色>`（`wochen CEO` 等）；**preset id 保持 kebab 不变**（`ceo`/`vp-eng`/`vp-sales`/`coo`——id 受 `PRESET_ID=/^[a-z0-9][a-z0-9-]*$/` 限制，不能带下划线/大写）；角色层级不动（CEO 是个体、VP 是职能，见 40 §0.1） | notes/implemented/2026-09-22-wochen-naming.md；40 §1 |
 | D15 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**。迭代是常态，但必须由**代理能自己跑的检查**闭合：真入口路径 > dump/扫描；"伺服了"≠"能加载"；让用户看 UI 之前必须先机器验证过。**同时否决**：为这类失败引入 spec 流程（无第一方证据，且本类失败不在其射程）、把指令文件写更长（advisory，非确定性） | notes/research/2026-09-22-agent-workflow-community-practice.md（17 个一手来源）；notes/postmortem/0001-0002；vendor `docs/testing.md` + `docs/postmortem/0003`；落点：guides/60 §1/§2/§7、AGENTS.md 纪律表、roadmap 收尾清单第 6 条 |
+| D16 | **Q2 定案（2026-09-22）**：角色模型路由 = R2 全员同模型（默认路由，不写 `agentOptions`）。理由：当前瓶颈是内容质量与协作可见性，成本无差异化证据；需要差异路由时 R3 在委托工具 `agentOptions` 层做，不动 persona | tests/presets.spec.ts；presets.md |
+| D17 | **Q3 定案（2026-09-22）**：公司事实（CHARTER / journal / 客户 / 预算基准）全部留 workspace 活数据（D7 三载体）；随 pack 发布的只有方法论 skills 与结构模板——pack 不含公司事实，换公司复用 = 只换 workspace | presets.md；company-workspace/kb/ |
 
 ### 待定（阻塞项标 ⛔）
 
 | # | 问题 | 影响面 | 何时必须定 |
 |---|---|---|---|
 | Q1 | M2 的 one-shot 形状是否满足"跟 VP 的连续对话"需求？若否→推 D9 上游 seam 或上 M3 | R3 之后的增强路线 | R2 跑完 demo 后 |
-| Q2 | 角色是否需要不同模型路由？影响 preset 行与委托工具 `agentOptions` | 内容设计、成本 | R1 前（定 persona 时一起定） |
-| Q3 | 公司手册哪些随 pack 发布、哪些留 workspace 活数据？ | KB 骨架 | R1–R2 中 |
+| Q2 ✅ | 角色是否需要不同模型路由？影响 preset 行与委托工具 `agentOptions` | 内容设计、成本 | R1 前（定 persona 时一起定） |
+| Q3 ✅ | 公司手册哪些随 pack 发布、哪些留 workspace 活数据？ | KB 骨架 | R1–R2 中 |
 | Q4 ✅ | ~~R1 的最小动议主题~~ **已定（2026-09-22）：「给我们公司要不要自建知识库写一页技术评估」** | R1 探针任务与预算 | 已定；整场 demo 剧本 R2 前再议 |
 
 ## 覆盖状态（2026-09-21 审计 + 重构）

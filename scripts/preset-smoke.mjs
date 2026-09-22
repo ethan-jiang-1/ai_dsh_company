@@ -23,7 +23,7 @@ const arg = (name, fallback) => {
 const PORT = Number(arg('port', '3099'))
 const PROFILE = arg('profile', 'web')
 const CWD = resolve(arg('cwd', join(ROOT, 'company-workspace')))
-const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo']
+const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
 const OUR_PACKAGE = 'dsh-company-pack'
 const BOOT_TIMEOUT_MS = 120_000
 

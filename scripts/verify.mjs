@@ -44,8 +44,8 @@ for (const p of linkHolders) {
 }
 ok(`md-links ×${linkCount}`)
 
-// ── 3. preset 结构：4 角色 × (composition + metadata + ≥1 skill) ───────────
-const roles = ['ceo', 'vp-eng', 'vp-sales', 'coo']
+// ── 3. preset 结构：5 角色 × (composition + metadata + ≥1 skill) ───────────
+const roles = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
 for (const role of roles) {
   const dir = join(root, 'packages/company-pack/presets', role)
   for (const f of ['agent.cordis.yml', 'preset.yml']) {

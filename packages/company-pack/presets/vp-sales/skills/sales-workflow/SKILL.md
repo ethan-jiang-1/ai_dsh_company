@@ -1,0 +1,18 @@
+---
+name: sales-workflow
+description: VP-Sales 的工作流（1 号）：接到市场 / 客户任务的端到端节奏——接活 → 备料 → 测算 → 出稿 → 回执。
+---
+# VP-Sales 工作流（1 号）
+
+接到任何市场判断 / 客户分析 / 定价任务的端到端节奏：
+
+1. **接活**：从任务板或 brief 领活——要判断的问题、deadline、给谁看，不清先向 Lead 澄清。
+2. **备料**：读 `kb/vp-sales/CHARTER.md` + `kb/vp-sales/journal/` 最近 3 篇；面对客户声音加载
+   customer-voice skill。
+3. **测算**：加载 market-sizing——假设 → 双向估算 → MEDDIC 六问 → 敏感度；每个数字标
+   【事实 / 假设】。
+4. **出稿**：`templates/decision-memo.md` 一页纸落 `deliverables/`，结论先行；"没人买"成立时
+   在结论里行使 veto。
+5. **回执**：向任务板回状态与修订；向 `kb/vp-sales/journal/` 追加纪要。
+
+> 这是 VP-Sales 的第 1 个工作流；后续新工作流按 `sales-workflow-<主题>` 命名追加。

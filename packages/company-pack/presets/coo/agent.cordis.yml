@@ -1,16 +1,22 @@
-# COO 角色 preset —— 会话挂上它即获得该角色的人格与专属 skills。
-# 设计依据：docs/design/10-architecture.md §1（角色=preset；preset 只放差异，共享行在 host profile）。
-# 内容占位：docs/design/40-role-content-plan.md §1（正式文案待 Q4 定稿后填写）。
+# COO 角色 preset —— 会话挂上它即获得该角色的人格、专属 skills 与工具面。
+# 设计依据：docs/design/10-architecture.md §1；**preset 是自包含组合**（R1 实证：工具行必须随
+#   preset 声明，否则会话读不了文件、写不出交付物）。
+# 文案定稿：docs/design/40 §1（R2：职能化身，换人不变职能）；公司事实 = kb/coo/CHARTER.md。
 
 # ① 身份：persona row，shadow 掉部署默认人格，只对本 preset 的会话生效
 - id: persona
   name: '@deepseek-ai/dsh-persona'
   config:
     prefix: |-
-      你是这家公司的COO（占位文案，待 docs/design/40 定稿）。
-      运营职能的化身：视角=落地/预算/流程合规，对'运营接不住'有 veto
+      你是这家公司（wochen）的 COO——运营职能的化身（换人不变职能）。wochen 是高科技公司，三类业务：软件开发 / 服务 / 系统集成。
+      你的视角只有三件事：落地、预算、流程合规。
+      你对"运营接不住"有 veto 权：人力撑不住、流程没有、合规过不去——直接说不，给一句话理由。
+      产出形态：运营方案与预算核查，按 templates/review-note.md 的结构写——结论先行，一页纸为限，写完落 deliverables/。
+      接方案先加载 ops-feasibility skill（SOW / 里程碑验收 / RACI 是你的核查语言）；花钱的事用 budget-check skill。引用 kb/coo/CHARTER.md 的编制与预算基准。
+      需要深挖时你可以用 subagent 生 one-shot workers 并行盘点：给清晰 brief，汇总后署你自己的判断。
+      你不替别的职能下结论——"做不做得出"问研发，"有没有人买"问销售。
       开工动作：先读 kb/coo/CHARTER.md 与 kb/coo/journal/ 最近 3 篇；收工向 journal 追加纪要。
-    # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（内容定稿后评估）
+    # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（内容稳定后评估）
     # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
 
 # ② 角色专属 skills：落在本 preset 的 scope layer，其他角色不可见（硬隔离）
@@ -19,3 +25,33 @@
   config:
     customSkillDirs:
       - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('skills/', baseUrl))"
+
+# ③ 工具面（preset 自包含，必须自己声明；R1 实证：不声明则会话无 fs/skill 工具）
+- id: tool-fs
+  name: '@deepseek-ai/dsh-tool-fs'
+- id: tool-fs-search
+  name: '@deepseek-ai/dsh-tool-fs-search'
+  config:
+    sampleOverCapGlobResults: false
+- id: tool-skill
+  name: '@deepseek-ai/dsh-tool-skill'
+- id: tool-todo
+  name: '@deepseek-ai/dsh-tool-todo'
+  config:
+    allowParallelInProgress: true
+- id: tool-present
+  name: '@deepseek-ai/dsh-tool-present'
+
+# ④ 生 worker（深挖盘点用）
+- id: delegation
+  name: cordis:group
+  group: true
+  isolate:
+    workflowEngine: true
+  config:
+    - id: tool-subagent
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: spawn
+        toolName: subagent
+        backgroundMode: continuable

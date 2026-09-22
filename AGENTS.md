@@ -1,7 +1,7 @@
 # AGENTS.md — 本仓库的入口链
 
-虚拟公司（**wochen**）多角色 DSH 插件：一个包（`packages/company-pack`）提供四个角色 preset
-（显示名 `wochen CEO` / `wochen VP-Eng` / `wochen VP-Sales` / `wochen COO`）+ host profile 源；
+虚拟公司（**wochen**）多角色 DSH 插件：一个包（`packages/company-pack`）提供五个角色 preset
+（显示名 `wochen CEO` / `wochen VP-Eng` / `wochen VP-Sales` / `wochen COO` / `wochen CFO`）+ host profile 源；
 协作用 DSH 现成通道（Agent Teams 主通道）。
 
 ## 布局
@@ -128,12 +128,12 @@ pin + manifest/SHA 纪律）。
 **R0（立环）✅ / R1 两人公司 ✅ 完成（2026-09-22）**：CEO + VP-Eng 正式内容就位，pack 装进
 web profile；**首条动议跑通**（CEO 澄清 → 任务板 → `spawn_teammate(vp-eng)` → VP 出稿 →
 CEO 合稿 `present`），`company-workspace/deliverables/` 两份交付物 + 两个 journal；
-首份回归资产 `snapshots/r1-motion/`。当前轮 **R2 四人全员——▶ 开工中（2026-09-22）**（补 VP-Sales/COO 内容、
+首份回归资产 `snapshots/r1-motion/`。当前轮 **R2 全员（五角色）——▶ 开工中（2026-09-22）**（补 VP-Sales/COO 内容、
 分镜 v0 两空间镜头 + 任务板活面板；UI 薄片重排见 `notes/implemented/2026-09-22-r2-ui-slice-replan.md`）。迭代按垂直轮（D11）见 `docs/plans/roadmap.md`。
 **R2 切片顺序（步步为营，UI 反馈优先）**：① 任务板活面板 ✅（打开期间每 5s 自动刷新；client-load-smoke 全绿）→
 ② 两空间分镜彩排（现两角色即可走，收 UI 反馈后把分镜 v0 烤进 `demo.md`）→
-③ +VP-Sales/COO 正式文案与 skills（含独立会话探针，顺手定 Q2/Q3）→
-④ 四人动议全流程（DAG 分派、VP 互审、fork 会议上下文）+ `snapshots/r2-motion/` →
+③ +VP-Sales/COO/CFO 正式文案与 skills ✅（pnpm test / verify / preset-smoke 五角色全绿；探针待用户在观察窗逐角色跑；CFO 增设 + 编制 50 人细到岗位 = `kb/org.md` 唯一事实家 + 每角色 1 号工作流，见 `notes/implemented/2026-09-22-r2-roles-alive.md`）→
+④ 五人动议全流程（CEO + 四 VP：DAG 分派、VP 互审、fork 会议上下文）+ `snapshots/r2-motion/` →
 ⑤ 轮次收尾清单（roadmap 六条）。
 **皮肤第一笔已落**：pack 长出 client 面（`src/client/`：侧栏品牌槽 + **会话头部任务板**）+ `DSH_CLIENT_TITLE`
 构建期品牌——见 `notes/implemented/2026-09-22-client-face-brand.md`。

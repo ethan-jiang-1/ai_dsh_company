@@ -19,19 +19,19 @@ function rowPlugins(role: string): string[] {
 describe('company roster（R1 回归：preset 必须可挂载）', () => {
   it('四个角色全部被扫到，且零 broken（行插件可解析）', async () => {
     const found = await discoverPresets([{ path: PRESETS_DIR, trust: 'system' }], HARNESS_BASE)
-    expect(found.map(p => p.id).sort()).toEqual(['ceo', 'coo', 'vp-eng', 'vp-sales'])
+    expect(found.map(p => p.id).sort()).toEqual(['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales'])
     // 2026-09-22 实证的失败形态：扫描得到、名字对，但行插件缺依赖 → broken → UI 给不出角色
     expect(found.filter(p => p.broken !== undefined).map(p => `${p.id}: ${String(p.broken)}`)).toEqual([])
   })
 
   it('preset 行引用的插件都在 pack dependencies 里（DSH verify-cordis-config 同构）', () => {
     const deps = new Set(Object.keys(JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')).dependencies ?? {}))
-    const missing = [...new Set(['ceo', 'vp-eng', 'vp-sales', 'coo'].flatMap(rowPlugins))].filter(name => !deps.has(name))
+    const missing = [...new Set(['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'].flatMap(rowPlugins))].filter(name => !deps.has(name))
     expect(missing).toEqual([])
   })
 
-  it('R1 定稿的两个角色：persona 非占位，skill 目录名与 frontmatter 一致', () => {
-    for (const role of ['ceo', 'vp-eng']) {
+  it('四角色文案定稿（R1 两角色守卫扩展），skill 目录名与 frontmatter 一致', () => {
+    for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']) {
       expect(readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8'), `${role} persona 仍是占位`).not.toContain('占位')
       expect(readFileSync(join(PRESETS_DIR, role, 'preset.yml'), 'utf8'), `${role} preset.yml 仍是占位`).not.toContain('占位')
       const skills = readdirSync(join(PRESETS_DIR, role, 'skills'), { withFileTypes: true }).filter(e => e.isDirectory())
@@ -42,9 +42,9 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
-  it('R1 定稿的角色必须声明基础工具行（preset 自包含；R1 首跑：无工具行 → 读不了文件、写不出交付物）', () => {
+  it('四角色必须声明基础工具行（preset 自包含；R1 首跑：无工具行 → 读不了文件、写不出交付物）', () => {
     const required = ['tool-fs', 'tool-fs-search', 'tool-skill', 'tool-todo', 'tool-present']
-    for (const role of ['ceo', 'vp-eng']) {
+    for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']) {
       const composition = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
       const declared = new Set([...composition.matchAll(/^- id:\s*([a-z0-9-]+)$/gm)].map(m => m[1] as string))
       const missing = required.filter(row => !declared.has(row))
@@ -60,7 +60,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       'tool-fs-search': ['sampleOverCapGlobResults'],
       'tool-todo': ['allowParallelInProgress'],
     }
-    for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo']) {
+    for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']) {
       const text = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
       for (const [row, fields] of Object.entries(requiredConfig)) {
         if (!new RegExp(`^- id: ${row}$`, 'm').test(text)) continue
@@ -72,7 +72,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   })
 
   it('四个角色显示名共用公司前缀（D14 系列命名，R2 补角色时不许忘）', () => {
-    const names = ['ceo', 'vp-eng', 'vp-sales', 'coo'].map(role => {
+    const names = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'].map(role => {
       const match = /^name:\s*(.+)$/m.exec(readFileSync(join(PRESETS_DIR, role, 'preset.yml'), 'utf8'))
       expect(match, `${role} preset.yml 缺 name`).not.toBeNull()
       return (match as RegExpExecArray)[1]!.trim()
