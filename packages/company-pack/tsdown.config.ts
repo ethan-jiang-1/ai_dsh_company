@@ -35,12 +35,10 @@ export default defineConfig([
     entry: { client: 'lib/types/client/index.js' },
     format: 'cjs',
     platform: 'browser',
-    // 只外置"浏览器模块表能回答"的：react 运行时与 DSH 的 client/api 模块。
-    // 其余（含 `@deepseek-ai/dsh-experimental-agent-team/remote` 描述符与 zod）必须内联——
-    // 它们不是模块表条目，留成 require 会在浏览器里抛错（tsdown 默认会把 package.json 的
-    // dependencies 当 external，所以要显式 noExternal 把描述符拉回来）。
+    // 只外置"浏览器模块表能回答"的：react 运行时与 DSH 的 client/api 模块（baseline +
+    // 动态行）。其余（如 zod）必须内联——留成 require 会在浏览器里抛错（tsdown 默认会把
+    // package.json 的 dependencies 当 external，所以要显式拉回来）。
     external: ['react', 'react/jsx-runtime', /^@deepseek-ai\/dsh-client-/, /^@deepseek-ai\/dsh-api-/],
-    noExternal: [/@deepseek-ai\/dsh-experimental-agent-team\/remote/],
     outputOptions: {
       entryFileNames: 'client.js',
       banner: `window.__ModuleLoader__.load({ id: ${JSON.stringify(PACKAGE_ID)}, factory: (require) => {`,

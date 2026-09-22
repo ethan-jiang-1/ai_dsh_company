@@ -10,7 +10,7 @@
 CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 门禁校验）
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml（bundle 行）、src/client/（client 面：品牌皮肤）、src/（host 代码 R3+）
 company-workspace/      运行时"公司共享盘"（会话 cwd）：kb/<role>/（CHARTER+journal）、templates/、deliverables/
-vendor/dsh/             DSH 源码 submodule（钉 tag，见下）
+vendor/dsh/             DSH 源码 submodule（钉 SHA，**只读铁律**：见 §vendor 铁律，`pnpm verify` 强制）
 docs/                   文档层：00-index（地图+决策台账+外部材料登记）→ design/ plans/ guides/ + 顶层合同
 notes/                  决策记录：intents.md → proposed/ → implemented/；事故复盘 postmortem/；外部研究 research/
 scripts/                verify.mjs（结构门禁）、preset-smoke.mjs（真入口冒烟）……
@@ -30,7 +30,7 @@ source dev/env.sh                      # 双 home 兜底：DSH_HOME=<repo>/dev/h
                                        # ⚠ 每个新 shell/后台 job 必须先 source 本文件——DSH_HOME 不继承，漏了会静默写日用 home（guides/60 §6.5）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（R0 已验收）
 pnpm dsh web -- --port 3081 --no-open  # web 观察窗（需 client 面+前端构建，guides/60 §7）；3080 是本 GUI 占用
-pnpm verify                            # 结构门禁（UTF-8/链接/preset 结构/symlink/vendor pin/pack 形状/preset 行依赖）
+pnpm verify                            # 结构门禁（UTF-8/链接/preset 结构/symlink/**vendor 铁律：SHA+零改动**/pack 形状/行依赖/client 两半）
 pnpm test                              # keyless 回归（vitest：roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义、必填 config）
 node scripts/preset-smoke.mjs          # 上线前门禁：boot 真 web，逐个 preset 建会话（唯一能抓"preset 挂载失败"的检查；需 DSH_HOME + 已装 pack）
 node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile → dsh plugin add → 冒烟
@@ -47,7 +47,7 @@ node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile
 
 | 实体 | 位置 | 角色 |
 |---|---|---|
-| ① 开发基线（唯一权威） | `vendor/dsh/`（钉 tag，见下簿记） | 机制核对与验证会话都用它：一律 `pnpm dsh` |
+| ① 开发基线（唯一权威） | `vendor/dsh/`（钉 SHA，**只读铁律**见 §vendor 铁律） | 机制核对与验证会话都用它：一律 `pnpm dsh` |
 | ② 日用全局安装 | npm 全局（`which dsh`；跑日常会话与改本 repo 的 coding 会话的就是它） | 与本 repo 开发无关；版本随全局升级漂移（当前恰同为 0.1.5-rc.2，**巧合不是保证**），其行为不作机制依据 |
 | ③ 外部研究树 | `/Users/bowhead/deepseek-harness/`（`_digested`/FAQ 宿主） | 只读参考，登记见 `docs/00-index.md` §外部研究材料登记 |
 
@@ -80,6 +80,30 @@ repo 规模裁剪（例如 CI 穷举暂由本地门禁代行）。**纪律的权
 | vendor 钉版本 + manifest/SHA + 同步程序 | `vendor/README.md` | AGENTS.md vendor 簿记 + `scripts/sync-dsh.mjs`（R5） |
 | 日志税：model-visible ⟺ logged | `AGENTS.md` Conventions | guides/60 §3 设计四问② |
 | 机械门禁（结尾换行、链接、结构） | `AGENTS.md` Conventions + `scripts/run-gates.ts` | `scripts/verify.mjs` |
+
+### vendor 铁律（本仓最高优先级，机械门禁在 `pnpm verify`）
+
+**`vendor/` 下受版本控制的内容（当前只有 `vendor/dsh/`），一个字节都不许改。** 这不是建议，是门禁：`pnpm verify` 检查
+submodule HEAD == 簿记 SHA（`vendor-pin`）且工作树零改动（`vendor-clean`，`git status --porcelain`
+必须为空）。两条都做过反证（改一个 tracked 文件即 FAIL，报 `M README.md`）。
+
+**允许面**（只有这两类，别的都算违反）：
+
+1. **只读**：探索源码、`extends` 它的 tsconfig、import 它的包、跑它的构建脚本。
+2. **在 vendor 内产生被它自己 `.gitignore` 覆盖的构建产物**（`lib/`、`apps/web/dist/`、
+   `node_modules/`）——"从源码跑"要求构建，构建必须在树内；这些产物不出现在 `git status` 里，
+   所以不违反 `vendor-clean`。⚠ **禁止 `git clean -x`**（会删掉运行所需的产物）。
+
+**需要改 vendor 的行为时，三条正路（都不碰 vendor）**：
+
+| 想要 | 正路 |
+|---|---|
+| 组合/配置层面的差异 | 本 pack 的 bundle `cordis.patch.yml`（`- id:` 替换 / `- insert:` 新增）或 profile patch |
+| 需要上游修的行为 | 改 **DSH upstream** → 升 pin（`scripts/sync-dsh.mjs`，R5）；期间在本仓记入 `notes/` |
+| 上游功能在本形态下不可用 | **在本 pack 自己实现等价面**（先例：官方团队 UI 挂不上 → 自建任务板） |
+
+**为什么用 SHA 而不是 tag**：tag 可被移动/别名，SHA 才是钉住的合同（`vendor/README.md` 的
+pin + manifest/SHA 纪律）。
 
 - 具体操作手册：`docs/guides/60-dev-loop.md`（六步闭环 / 调试阶梯 / 插拔速查 / 设计四问 /
   发布纪律时点 / 双 home）。demo 现场运维 runbook：`docs/guides/50-budget-and-ops.md`。
