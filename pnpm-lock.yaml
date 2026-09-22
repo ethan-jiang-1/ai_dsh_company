@@ -123,6 +123,22 @@ importers:
       '@deepseek-ai/dsh-tool-todo':
         specifier: 0.1.5-rc.2
         version: link:../../vendor/dsh/packages/todo/tool-todo
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:*
+        version: link:../../vendor/dsh/vendor/cordis
+      '@deepseek-ai/dsh-client-ui-renderer':
+        specifier: workspace:*
+        version: link:../../vendor/dsh/packages/client/ui-renderer
+      '@deepseek-ai/dsh-client-ui-sidebar':
+        specifier: workspace:*
+        version: link:../../vendor/dsh/packages/client/ui-sidebar
+      '@types/react':
+        specifier: ~18.3.1
+        version: 18.3.31
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
 
   vendor/dsh/apps/cli:
     dependencies:

@@ -37,6 +37,8 @@ preset roster 的 `roots` 已改**自定位**（`!!js` + `baseUrl` 解析到本�
 | `tool-fs` / `tool-fs-search` / `tool-skill` | 共享工具面（base 已有） | ✅ |
 | `tool-present`（insert） | 交付物声明（deliverables 卡片） | ✅ dump 实测在列 |
 | `agent-team` + `tool-agent-team`（insert） | 团队协作主通道（M4/D4；直插行，无续驶冲突，10 §3 冲突注①） | ✅ dump 实测在列 |
+| `ui-agent-team`（insert） | 团队 Web 可视面：Team 按钮 / 名册 / 实时任务板 / 点进 VP 会话 | ✅ 前端加载列表含其 client 模块 |
+| `company-client`（insert，`name: dsh-company-pack`） | 本包 client 面：浏览器半注册 `sidebar.brand.name`（品牌皮肤） | ✅ 前端加载列表含 `dsh-company-pack/client.js` |
 
 R1 起按需增补 tool-bash / tool-web / tool-todo / compaction 行（[40 号](./design/40-role-content-plan.md)）。
 

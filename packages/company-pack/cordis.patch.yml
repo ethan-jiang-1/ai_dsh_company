@@ -33,3 +33,7 @@
     #    实时任务板 / 点进 VP 会话 / 交付物卡片——观察与调试任务起止的最简途径（R1 补）──
     - id: ui-agent-team
       name: '@deepseek-ai/dsh-experimental-client-ui-agent-team'
+    # ── 本包自己的 client 面（皮肤第一笔）：host 半是空壳，浏览器半注册
+    #    `sidebar.brand.name` 槽（侧栏品牌名）。行的 name 就是本包名。──
+    - id: company-client
+      name: 'dsh-company-pack'

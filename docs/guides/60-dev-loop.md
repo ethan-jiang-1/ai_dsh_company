@@ -165,6 +165,11 @@ node ./node_modules/typescript/bin/tsc -b vendor/dsh/tsconfig.client.json   # cl
 DSH_CLIENT_TITLE="DSH Wochen Team" pnpm --filter @deepseek-ai/dsh-web-frontend run build   # 前端 dist
 source dev/env.sh && pnpm dsh plugin --profile web add file:./packages/company-pack   # 首次会拦 koffi，见下
 pnpm dsh web -- --port 3081 --no-open                                      # 3080 是本 GUI 占用
+
+# pack 自己的 client 面（改了 src/client/** 才需要；产物进 lib/）：
+node ./node_modules/typescript/bin/tsc -p packages/company-pack/tsconfig.json
+(cd packages/company-pack && ../../node_modules/.bin/tsdown)
+# ⚠ 新增文件（lib/**）后要重装进 profile 才会被伺服：`plugin --profile web remove` + `add`。
 ```
 
 实证过的坑与解法（细节见 notes/implemented/2026-09-22-r0-loop-acceptance.md）：

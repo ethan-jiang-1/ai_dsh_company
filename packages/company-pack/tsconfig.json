@@ -1,0 +1,13 @@
+{
+  "extends": "../../vendor/dsh/tsconfig.base.client.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false,
+    "rootDir": "src",
+    "outDir": "lib/types",
+    // 清掉 vendor base 的 paths（它把 vendor 的 src 拉进本程序，会带出 vendored
+    // 包的内部类型错误）；改用 node_modules 里已构建的 lib/types 声明。
+    "paths": {}
+  },
+  "include": ["src"]
+}
