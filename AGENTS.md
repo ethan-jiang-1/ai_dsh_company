@@ -129,12 +129,11 @@ pin + manifest/SHA 纪律）。
 **R0（立环）✅ / R1 两人公司 ✅ 完成（2026-09-22）**：CEO + VP-Eng 正式内容就位，pack 装进
 web profile；**首条动议跑通**（CEO 澄清 → 任务板 → `spawn_teammate(vp-eng)` → VP 出稿 →
 CEO 合稿 `present`），`company-workspace/deliverables/` 两份交付物 + 两个 journal；
-首份回归资产 `snapshots/r1-motion/`。当前轮 **R2 全员（五角色）——▶ 开工中（2026-09-22）**（补 VP-Sales/COO 内容、
-分镜 v0 两空间镜头 + 任务板活面板；UI 薄片重排见 `notes/implemented/2026-09-22-r2-ui-slice-replan.md`）。迭代按垂直轮（D11）见 `docs/plans/roadmap.md`。
+首份回归资产 `snapshots/r1-motion/`。当前轮 **R3 汇报线——▶ 开工中（2026-09-22）**（R2 五人全员已闭环：机制真跑 + 收口 present + 归档；仅"两空间镜头 UI 观演"留待下次开窗）。下一步切片见 `docs/plans/roadmap.md` R3 行（命名委托工具 + team 两包直插行 + 委派工具卡薄片）。迭代按垂直轮（D11）见 `docs/plans/roadmap.md`。
 **R2 切片顺序（步步为营，UI 反馈优先）**：① 任务板活面板 ✅（打开期间每 5s 自动刷新；client-load-smoke 全绿）→
 ② 两空间分镜彩排（现两角色即可走，收 UI 反馈后把分镜 v0 烤进 `demo.md`）→
 ③ +VP-Sales/COO/CFO 正式文案与 skills ✅（pnpm test / verify / preset-smoke 五角色全绿；连通冒烟 `scripts/probe-smoke.mjs` 5/5 **6 秒**（默认快速档：挂载/轮次/回话/人格进 prompt），`--full` 内容档曾 14/15；CFO 增设 + 编制 50 人细到岗位 = `kb/org.md` 唯一事实家 + 每角色 1 号工作流，见 `notes/implemented/2026-09-22-r2-roles-alive.md`）→
-④ 五人动议全流程 ⚠ **部分验收**（真跑一场并归档：4 teammate + 7 任务含 3 条 `blocked_by` 依赖 + 互审任务与"评审→改稿→回执"回路 + 消息 queued/delivered 25/25 不丢不重 + 7 份交付物 → `snapshots/r2-motion/`；**CEO 合稿 `present` 未走到**——按"轻任务"纪律中止无限长跑，UI 观演亦未进行；见 `notes/implemented/2026-09-22-r2-motion-run.md`）→
+④ 五人动议全流程 ✅（真跑 + 受限收口：4 teammate + 7 任务含 3 条 `blocked_by` 依赖 + 互审回路 + 消息 queued/delivered 25/25 不丢不重 + 7 份交付物 + **CEO 合稿 `present`**（收口指令工具调用 ≤6、墙钟 ≤4 分钟，实际 60 秒内完成）；归档 `snapshots/r2-motion/`＝lead 486 行 + 4 child 会话；**两空间镜头的 UI 观演留待下次开窗，不阻塞 R3**；见 `notes/implemented/2026-09-22-r2-motion-run.md`）→
 ⑤ 轮次收尾清单（roadmap 六条）。
 **皮肤第一笔已落**：pack 长出 client 面（`src/client/`：侧栏品牌槽 + **会话头部任务板**）+ `DSH_CLIENT_TITLE`
 构建期品牌——见 `notes/implemented/2026-09-22-client-face-brand.md`。
