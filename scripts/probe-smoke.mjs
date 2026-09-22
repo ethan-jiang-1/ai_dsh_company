@@ -16,6 +16,7 @@
 import { spawn } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ensureRehearsalWorkspace, REHEARSAL_REL } from './lib/rehearsal.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const arg = (name, fallback) => {
@@ -23,7 +24,10 @@ const arg = (name, fallback) => {
   return i === -1 ? fallback : process.argv[i + 1]
 }
 const PORT = Number(arg('port', '3097'))
-const CWD = resolve(arg('cwd', join(ROOT, 'company-workspace')))
+// 练习场 ≠ 运行场（轮间待办②）：默认 cwd 在排练场，排练/探针产物不再积进真盘；
+// `--cwd` 可显式覆盖（确需指回真盘时）。
+const CWD = resolve(arg('cwd', join(ROOT, REHEARSAL_REL)))
+if (!process.argv.includes('--cwd')) ensureRehearsalWorkspace(ROOT)
 const BOOT_TIMEOUT_MS = 120_000
 const PROBE_TIMEOUT_MS = Number(arg('timeout', '90000'))
 const CONCURRENCY = Number(arg('concurrency', '5'))

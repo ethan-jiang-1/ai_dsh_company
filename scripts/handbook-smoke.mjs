@@ -14,6 +14,7 @@ import { spawn } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { collectText, readRecords } from './lib/session-log.mjs'
+import { ensureRehearsalWorkspace, REHEARSAL_REL } from './lib/rehearsal.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const arg = (name, fallback) => {
@@ -22,7 +23,11 @@ const arg = (name, fallback) => {
 }
 const PORT = Number(arg('port', '3096'))
 const ROLES = arg('roles', 'ceo').split(',').map(role => role.trim()).filter(role => role !== '')
-const CWD = resolve(arg('cwd', join(ROOT, 'company-workspace')))
+// 练习场 ≠ 运行场（轮间待办②）：默认 cwd 在排练场，排练/探针产物不再积进真盘；
+// `--cwd` 可显式覆盖。排练场的 AGENTS.md 是指向真盘手册的符号链接 ⇒ 注入基线仍是手册，
+// projectRootMarkers: [] ⇒ 指令链只认 cwd，不会向上混入开发仓库 AGENTS.md——断言语义不变。
+const CWD = resolve(arg('cwd', join(ROOT, REHEARSAL_REL)))
+if (!process.argv.includes('--cwd')) ensureRehearsalWorkspace(ROOT)
 const BOOT_TIMEOUT_MS = 120_000
 const BASELINE_TIMEOUT_MS = 120_000
 

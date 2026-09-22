@@ -26,6 +26,7 @@ import { spawn } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { collectText, readRecords } from './lib/session-log.mjs'
+import { ensureRehearsalWorkspace, REHEARSAL_REL } from './lib/rehearsal.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const arg = (name, fallback) => {
@@ -36,7 +37,10 @@ const PORT = Number(arg('port', '3098'))
 const WALL_MS = Number(arg('wall', '180')) * 1000
 // `--delegate`：多花 1 条 prompt 真委派一次，断言**前台拿到稿子**（R3 验收里「委派出稿」的真检查）。
 const DELEGATE = process.argv.includes('--delegate')
-const CWD = resolve(arg('cwd', join(ROOT, 'company-workspace')))
+// 练习场 ≠ 运行场（轮间待办②）：默认 cwd 在排练场，排练/探针产物不再积进真盘；
+// `--cwd` 可显式覆盖（确需指回真盘时）。
+const CWD = resolve(arg('cwd', join(ROOT, REHEARSAL_REL)))
+if (!process.argv.includes('--cwd')) ensureRehearsalWorkspace(ROOT)
 const BOOT_TIMEOUT_MS = 120_000
 
 const home = process.env.DSH_HOME

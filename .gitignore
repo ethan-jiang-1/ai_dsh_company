@@ -10,3 +10,5 @@ packages/company-pack/lib/
 # 开发 home 运行残留（README 保留）
 dev/harness-home/*
 !dev/harness-home/README.md
+# 排练场（轮间待办②「练习场 ≠ 运行场」）：排练/探针会话的 cwd；产物不进 git，也不进真盘
+dev/rehearsal-workspace/

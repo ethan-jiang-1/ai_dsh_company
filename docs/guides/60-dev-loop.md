@@ -154,6 +154,15 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibil
    进程，stdout 出结果，日志落 `$DSH_HOME/sessions/`。web 形态（观察窗）起**本地**
    HTTP 端口（值见启动横幅）；因 `DSH_HOME` 指 dev home，它与日用 DSH 的 web 实例
    （若同时开）是两个完全独立进程：profile、会话、凭据、端口互不可见。
+7. **排练场 ≠ 运行场（轮间待办②，2026-09-22 落地）**：排练/探针会话的默认 cwd 是
+   `dev/rehearsal-workspace/`（`node scripts/rehearsal-init.mjs` 幂等成型；四个 smoke 脚本
+   `preset/probe/handbook/delegation` 已默认指这里并会自建，`--cwd` 可显式覆盖）。
+   **真盘 `company-workspace/` 只收真实动议的产物**——排练产物不受三态判据约束
+   （`drafts/` 本就不需要 `present`），跑在真盘会安静积污（R4 W2 删过 15 份）。
+   验收判据 = 新默认跑一次探针后 `git status --porcelain company-workspace/` 为空。
+   排练场里手册是指向真盘的**符号链接**（注入基线不变），CHARTER/org/templates 每次刷新，
+   **journal 不镜像**（排练记忆不混真记忆）。`snapshot-motion` / `deliverables-check`
+   默认仍指真盘——归档与审计本来就属于运行场。
 
 ## 7. 环境引导（clean checkout → 可跑通；R0 实证配方，2026-09-22）
 
