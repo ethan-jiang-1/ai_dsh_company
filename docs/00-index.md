@@ -35,7 +35,7 @@ implemented → archived）。
 | [profile.md](./profile.md) | 合同 | host 组合现在时：部署形状（源码直跑/持久安装实测）、行清单语义、开放点 |
 | [delegation.md](./delegation.md) | 合同 | 汇报线现在时（R3 出生）：命名委托工具（one-shot 前台）与 team 的分工、team shadow 边界与证据、委派工具卡、分层验证 |
 | [presets.md](./presets.md) | 合同 | 角色 preset 语义（R2：五角色定稿——CEO / VP-Eng / VP-Sales / COO / CFO）；名册运行时实测；验证分层 |
-| [demo.md](./demo.md) | 合同 | demo 操作合同（R2 五角色版 + 场景 B 三角色应急协作；R4 定稿）：动议、前置、分镜与观测点、验收判据、已知边界 |
+| [demo.md](./demo.md) | 合同 | demo 操作合同（**R4 定稿**：R2 五角色 + 场景 B 三角色应急 + **场景 C 写作流水线**）：动议、前置、分镜与观测点、验收判据（含**交付物三态**的机器判据）、已知边界 |
 
 ### notes/（决策与教训，不进 docs）
 
@@ -78,6 +78,7 @@ implemented → archived）。
 | D17 | **Q3 定案（2026-09-22）**：公司事实（CHARTER / journal / 客户 / 预算基准）全部留 workspace 活数据（D7 三载体）；随 pack 发布的只有方法论 skills 与结构模板——pack 不含公司事实，换公司复用 = 只换 workspace | presets.md；company-workspace/kb/ |
 | D18 | **R3 汇报线定案（2026-09-22）**：CEO 的命名委托工具 `vp_eng` / `vp_sales` = **one-shot 前台**（`backgroundMode: one-shot` + `enableRunInBackground: false` + `maxDepth: 1` + per-instance persona）。**continuable 在本组合里不可用**：CEO 会话从**第一帧**起 team-scoped，团队版 `send_message` / `list_agents` / `interrupt_agent` 按成员**名字**寻址，而 subagent child 不在名册上 ⇒ 续驶/中断/列举全不可达。因此：续驶与连续对话归 **team（M4）**；"child 拿到角色完整 skills/工具面"归 **M2（未做）**；CEO preset **不放**全局控制行（在 CEO 会话是死行，有反向守卫）；并行快捷派活要等上游 seam，**本仓不自建**（D13） | [delegation.md](./delegation.md)；`scripts/delegation-smoke.mjs`（边界守卫）；`snapshots/r2-motion/sessions/lead.jsonl` 第一帧 |
 | D19 | **R5 拆轮 + 搁置池（2026-09-22）**：① **R5 → R5a 门禁与发布 / R5b 驾驶舱**——同轮塞 4–5 个面时，最不确定的 replay harness 会卡住皮肤交付（D11：一轮一份可观察的外部行为）；② **进搁置池须满足"缺上游 seam"或"缺明确需求"**，被否决的方案不进池（归 D 号/复盘/`rejected`），复活条件写进池内每行；首批四条 = 自主节律 / 并行快捷派活 / M2 / 界面外推送；③ R6 的"两条接线 + U1"阻塞经核实**已清**，只余一次活体探针（轮间待办 R5a → R6） | [plans/r5-plus-readiness.md](./plans/r5-plus-readiness.md)；[plans/roadmap.md](./plans/roadmap.md) §搁置池 |
+| D20 | **交付物三态判据（R4，2026-09-22）**：① **成品 = Lead 会话的 `present`**（`agentPreset=ceo` 且 `delegationDepth=0`）——依据是公司手册的承诺权，且实测 R2 里 CFO 也 `present` 过 3 次，不限归属则过程稿与定稿平级、仍答不上"哪些是成品"；② **按交付物身份（`slug` + 角色）比对，不按字面路径**——给三态迁移留桥，否则迁移一次就把历史证据全判成 dangling（假阳性，不是违规）；③ **反向检查只追 Lead 声明**，非 Lead 的成品声明只在它**此刻真躺在盘上**时判越权（历史行为不追着报，否则一次越权永久污染此后每轮审计）。实现 `scripts/lib/deliverables.mjs` + 入口 `scripts/deliverables-check.mjs`（**审归档快照须配 `--only <slug>`**，因快照是整盘 workspace + 本轮日志）；合同家 = `company-workspace/AGENTS.md`「交付物三态」 | [implemented/2026-09-22-r4-workshop-flow.md](../notes/implemented/2026-09-22-r4-workshop-flow.md) |
 
 ### 待定（阻塞项标 ⛔）
 
