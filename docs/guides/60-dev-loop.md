@@ -161,8 +161,8 @@ node ./node_modules/typescript/bin/tsc -b \
 (cd vendor/dsh/native/system && ../../node_modules/.bin/tsx scripts/build.ts)
 # web 观察窗（可选；三件事缺一不可）：
 node ./node_modules/typescript/bin/tsc -b vendor/dsh/tsconfig.client.json   # client 面（测试面报错可忽略）
-(cd vendor/dsh && ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE client)
-pnpm --filter @deepseek-ai/dsh-web-frontend run build                       # 前端 dist
+(cd vendor/dsh && DSH_CLIENT_TITLE="DSH Wochen Team" ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE client)
+DSH_CLIENT_TITLE="DSH Wochen Team" pnpm --filter @deepseek-ai/dsh-web-frontend run build   # 前端 dist
 source dev/env.sh && pnpm dsh plugin --profile web add file:./packages/company-pack   # 首次会拦 koffi，见下
 pnpm dsh web -- --port 3081 --no-open                                      # 3080 是本 GUI 占用
 ```
@@ -208,6 +208,10 @@ pnpm dsh web -- --port 3081 --no-open                                      # 308
   对应 DSH 的 `verify-cordis-config` 门禁；我们同构到 `scripts/verify.mjs` 检查 7。
 - **patchReload**：headless 用途的自定义 profile 必须 `"startup"`（见 §2 第 3.5 层）；web 形态
   才用 `"live"`。
+- **品牌（皮肤第一笔，零代码）**：`DSH_CLIENT_TITLE` 是构建期环境变量，同时决定**浏览器标签页标题**
+  （`apps/web/vite.config.ts`）与**应用内主标题**（`ui-layout/src/client/AppFrame.tsx:192`）——所以
+  **上面两条构建命令都要带它**（web dist 与 client 面各注入一次）。侧栏品牌名是插槽
+  `sidebar.brand.name`（官方品牌包占着），改它需要 pack 自己的 client 面（R5 皮肤 v1）。
 - **上线前必跑 preset 冒烟**（R1 起，两道防线）：
   1. **防线一（快，`pnpm test`）**：已知必填 config 字段必须随工具行给出（如
      `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`）。
