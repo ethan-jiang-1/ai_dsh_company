@@ -23,6 +23,7 @@
     "cordis.patch.yml"
   ],
   "dependencies": {
+    "@deepseek-ai/dsh-agent-instructions": "0.1.5-rc.2",
     "@deepseek-ai/dsh-agent-presets": "0.1.5-rc.2",
     "@deepseek-ai/dsh-persona": "0.1.5-rc.2",
     "@deepseek-ai/dsh-skill-filesystem": "0.1.5-rc.2",
@@ -40,6 +41,7 @@
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "workspace:*",
+    "@deepseek-ai/dsh-agent-instructions": "workspace:*",
     "@deepseek-ai/dsh-api-remotes": "workspace:*",
     "@deepseek-ai/dsh-api-session-controller": "workspace:*",
     "@deepseek-ai/dsh-client-ui-conversation": "workspace:*",

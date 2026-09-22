@@ -57,3 +57,12 @@
         provider: spawn
         toolName: subagent
         backgroundMode: continuable
+
+# ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）
+# projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= company-workspace/）；
+#   否则会认到开发仓库根，把**本仓的开发 AGENTS.md**（vendor 铁律等）灌进角色会话。
+- id: agent-instructions
+  name: '@deepseek-ai/dsh-agent-instructions'
+  config:
+    maxBytes: 16384
+    projectRootMarkers: []
