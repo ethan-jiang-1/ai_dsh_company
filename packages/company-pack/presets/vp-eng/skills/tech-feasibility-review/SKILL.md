@@ -14,7 +14,7 @@ description: 技术评估方法论：选项枚举（自建/现成/混合）→ �
    - 风险：最可能翻车的一件事 + 兜底手段。
 3. **结论**：先行。三选一 + 一句话理由；若建议"不做"，直接行使 veto 并说明。
 4. **格式与交付**：按 `templates/review-note.md` 结构写，结论先行，一页纸为限；
-   交付到 `deliverables/`。
+   交付到 `deliverables/<slug>/drafts/vp-eng.md`。
 
 红线：只谈技术与成本；"有没有人买"归销售、"接不接得住"归运营，不代答。
 需要事实支撑时优先读自己的 KB（`kb/vp-eng/`），不够再派 one-shot worker 调研。

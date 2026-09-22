@@ -11,7 +11,7 @@ description: VP-Sales 的工作流（1 号）：接到市场 / 客户任务的�
    customer-voice skill。
 3. **测算**：加载 market-sizing——假设 → 双向估算 → MEDDIC 六问 → 敏感度；每个数字标
    【事实 / 假设】。
-4. **出稿**：`templates/decision-memo.md` 一页纸落 `deliverables/`，结论先行；"没人买"成立时
+4. **出稿**：`templates/decision-memo.md` 一页纸落 `deliverables/<slug>/drafts/vp-sales.md`，结论先行；"没人买"成立时
    在结论里行使 veto。
 5. **回执**：向任务板回状态与修订；向 `kb/vp-sales/journal/` 追加纪要。
 

@@ -17,7 +17,7 @@ description: CEO 的动议节奏（R2 五角色版）：澄清→DAG 拆解分�
    与人力；CFO 审毛利与合规闸门）。评审意图用 `send_message` 发给对方（跨职能沟通走邮箱，
    消息与回执都在各自会话日志里），owner 按意见修订并在任务板回执。
 5. **收口**：亲自读稿、亲自合成。保留各职能的结论与保留意见，**不抹平分歧**；要改让 owner 改。
-   定稿写入 `deliverables/`，用 `present` 声明交付。
+   定稿写入 `deliverables/<slug>/final.md`，用 `present` 声明交付。
 6. **记账**：向 `kb/ceo/journal/` 追加当日纪要（动议 / 决定 / 分歧 / 遗留）。
 
 新成员入会：用 `fork` teammate 下发会议上下文（已澄清的口径 + 已有任务），别让它从零追问。

@@ -14,7 +14,7 @@ description: 市场与商机估算方法论：假设→双向估算→MEDDIC 资
 3. **单单资格过 MEDDIC 六问**：Metrics（客户要改善的指标）、Economic buyer（谁签字）、Decision criteria（验收标准）、Decision process（采购流程）、Identify pain（痛点）、Champion（我方内线）。六问答不上来 = 商机不成熟，不进 pipeline，更不许写进估算的分子。
 4. **敏感度**：挑最不确定的两个假设各 ±50%，结论翻掉就明说"估算不可用"。
 5. **结论先行**：投 / 不投 / 有条件投 + 一句话理由；"没人买"成立时直接行使 veto。
-6. **格式与交付**：按 `templates/decision-memo.md` 结构，一页纸为限，交付到 `deliverables/`。
+6. **格式与交付**：按 `templates/decision-memo.md` 结构，一页纸为限，交付到 `deliverables/<slug>/drafts/vp-sales.md`。
 
 红线：只谈市场与定价；"做不做得出"归研发、"接不接得住"归运营，不代答。
 每个数字标【事实】（出处 = 自己 KB）或【假设】（待验证）；禁止无标注数字。

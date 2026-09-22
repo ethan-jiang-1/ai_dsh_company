@@ -131,11 +131,42 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     for (const role of ['CEO', 'CFO', 'VP-Sales', 'VP-Eng', 'COO']) {
       expect(handbook, `手册缺 ${role} 的职责边界`).toContain(role)
     }
-    for (const section of ['职责边界', '这事问谁', '冲突与升级', '承诺权']) {
+    for (const section of ['职责边界', '这事问谁', '冲突与升级', '承诺权', '交付物三态']) {
       expect(handbook, `手册缺「${section}」节`).toContain(section)
     }
     // 路由必须回答高频冲突：数字口径（毛利/成本）与排期/交付日期该找谁
     expect(handbook).toMatch(/毛利/)
     expect(handbook).toMatch(/交付日期|排期/)
+  })
+
+  it('交付物三态（R4）：手册写清成品归 CEO、职能写 drafts；模板不再是占位', () => {
+    const handbook = readFileSync(join(ROOT, 'company-workspace/AGENTS.md'), 'utf8')
+    // 三态的字面形状必须与判据实现一致（scripts/lib/deliverables.mjs 的 FINAL_BASENAME / DRAFTS_DIRNAME）
+    expect(handbook, '三态必须点明成品路径').toContain('deliverables/<slug>/final.md')
+    expect(handbook, '三态必须点明过程稿路径').toContain('deliverables/<slug>/drafts/<角色>.md')
+    expect(handbook, '必须写明成品只归 CEO').toMatch(/只有 CEO/)
+    // 判据必须可被模型自行跑（发现权在代理一侧，D15）
+    expect(handbook, '三态要指向机器判据入口').toContain('scripts/deliverables-check.mjs')
+
+    for (const template of ['prd.md', 'weekly-report.md', 'review-note.md', 'decision-memo.md', 'ops-review-note.md']) {
+      const body = readFileSync(join(ROOT, 'company-workspace/templates', template), 'utf8')
+      expect(body, `${template} 仍是占位（模板即流程：写作类工作流的第一版就是它）`).not.toContain('占位')
+      expect(body.length, `${template} 太短，像没写完`).toBeGreaterThan(300)
+    }
+  })
+
+  it('职能 preset 一律指向 drafts/，不许自己写 final.md（成品是对外承诺，归 CEO）', () => {
+    for (const role of ['vp-eng', 'vp-sales', 'coo', 'cfo']) {
+      const dir = join(PRESETS_DIR, role)
+      const files = [join(dir, 'agent.cordis.yml')]
+      for (const skill of readdirSync(join(dir, 'skills'), { withFileTypes: true })) {
+        if (skill.isDirectory()) files.push(join(dir, 'skills', skill.name, 'SKILL.md'))
+      }
+      for (const file of files) {
+        const text = readFileSync(file, 'utf8')
+        expect(text, `${file} 引用了 deliverables/ 直落（应写 <slug>/drafts/<角色>.md）`).not.toMatch(/deliverables\/`?(?![<])/)
+        expect(text, `${file} 让职能写 final.md（越权）`).not.toContain('/final.md')
+      }
+    }
   })
 })
