@@ -156,11 +156,14 @@ export function parseSessionLog(text) {
 
 /**
  * 审计一个工作区的交付物三态。
- * @param input - `{ workspaceFiles, sessions, legacyFlat?, leadPreset? }`
+ * @param input - `{ workspaceFiles, sessions, legacyFlat?, leadPreset?, onlySlug? }`
  *   - `workspaceFiles`：工作区相对路径清单（调用方列目录得到，本模块不碰文件系统）；
  *   - `sessions`：`parseSessionLog` 的产物数组；
  *   - `legacyFlat`：把平铺旧形状也算合法（只给已归档快照用）；
- *   - `leadPreset`：入口角色 preset id，默认 `ceo`。
+ *   - `leadPreset`：入口角色 preset id，默认 `ceo`；
+ *   - `onlySlug`：只审这一个交付物。**审归档快照时必须给**——快照的 `workspace.expected/`
+ *     是整盘拷贝，而 `sessions/` 只装本轮的日志；不给作用域就会把历史成品误报成
+ *     "无 Lead 背书"（那是输入不成对，不是违规）。
  * @returns `{ finals, drafts, violations }`——`finals`/`drafts` 是形状分类结果，
  *   `violations` 每条 `{ code, path, detail }`。
  */
@@ -168,8 +171,10 @@ export function auditDeliverables(input) {
   const { workspaceFiles, sessions } = input
   const legacyFlat = input.legacyFlat === true
   const leadPreset = input.leadPreset ?? 'ceo'
+  const scope = input.onlySlug === undefined ? undefined : `deliverables/${String(input.onlySlug)}/`
+  const inScope = path => scope === undefined || path.startsWith(scope)
 
-  const onDisk = new Set(workspaceFiles.map(normalizeRel))
+  const onDisk = new Set(workspaceFiles.map(normalizeRel).filter(inScope))
   const onDiskIds = new Set()
   const finals = []
   const drafts = []
@@ -199,6 +204,7 @@ export function auditDeliverables(input) {
     const lead = isLeadSession(session, leadPreset)
     for (const { path } of session.presented) {
       if (!path.startsWith('deliverables/')) continue // kb/** 等不在判据射程内
+      if (!inScope(path)) continue
       const id = deliverableId(path)
       if (id === undefined) continue
       if (id.kind === 'final') {

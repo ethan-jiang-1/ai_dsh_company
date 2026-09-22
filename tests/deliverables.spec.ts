@@ -203,6 +203,21 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
     expect(auditDeliverables({ workspaceFiles: [], sessions: [teammate] }).violations).toEqual([])
   })
 
+  it('onlySlug 作用域：审归档快照必需——快照是整盘 workspace + 本轮日志，不给作用域会误报历史成品', () => {
+    const result = auditDeliverables({
+      workspaceFiles: [
+        'deliverables/this-round/final.md',
+        'deliverables/old-round/final.md',
+      ],
+      sessions: [
+        { id: 's1', agentPreset: 'ceo', delegationDepth: 0, presented: [{ path: 'deliverables/this-round/final.md' }] },
+      ],
+      onlySlug: 'this-round',
+    })
+    expect(result.finals.map(f => f.path)).toEqual(['deliverables/this-round/final.md'])
+    expect(result.violations).toEqual([])
+  })
+
   it('迁移桥：历史声明按身份生效——旧路径 present 过的成品，搬到新形状后依然算被声明', () => {
     // 这正是 W2 三态迁移的形状：`X.md` → `X/final.md`、`X-<role>.md` → `X/drafts/<role>.md`
     const workspaceFiles = [

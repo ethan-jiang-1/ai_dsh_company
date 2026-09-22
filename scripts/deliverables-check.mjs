@@ -11,6 +11,12 @@
 //   source dev/env.sh && node scripts/deliverables-check.mjs
 //   node scripts/deliverables-check.mjs --workspace snapshots/r1-motion/workspace.expected \
 //        --sessions snapshots/r1-motion --legacy-flat      # 审已归档快照（平铺旧形状）
+//   node scripts/deliverables-check.mjs --workspace snapshots/r4-motion/workspace.expected \
+//        --sessions snapshots/r4-motion --only support-sla-page   # 审快照里本轮那一件
+//
+// ⚠ 审归档快照必须配 `--only <slug>`：快照的 `workspace.expected/` 是**整盘拷贝**，而
+//   `sessions/` 只装本轮日志——不给作用域会把历史成品误报成"无 Lead 背书"（输入不成对）。
+//   整盘审计请跑运行场（默认档：真日志全在 $DSH_HOME）。
 //
 // 退出码：0 = 零违规；1 = 有违规（打印每条 code + path）。
 import { execFileSync } from 'node:child_process'
@@ -25,6 +31,8 @@ const arg = (name, fallback) => {
   return i === -1 ? fallback : process.argv[i + 1]
 }
 const LEGACY_FLAT = process.argv.includes('--legacy-flat')
+/** 只审一个交付物（审归档快照必给，见文件头）。 */
+const ONLY_SLUG = arg('only')
 
 const workspaceRel = arg('workspace', 'company-workspace')
 const workspace = resolve(ROOT, workspaceRel)
@@ -105,10 +113,11 @@ const result = auditDeliverables({
   workspaceFiles: listFiles(workspace),
   sessions,
   legacyFlat: LEGACY_FLAT,
+  ...(ONLY_SLUG === undefined ? {} : { onlySlug: ONLY_SLUG }),
 })
 
 const leadSessions = sessions.filter(s => s.delegationDepth === 0 && s.agentPreset === 'ceo').length
-console.log(`deliverables-check: ${workspaceRel}${LEGACY_FLAT ? '（平铺旧形状口径）' : ''}`)
+console.log(`deliverables-check: ${workspaceRel}${LEGACY_FLAT ? '（平铺旧形状口径）' : ''}${ONLY_SLUG === undefined ? '' : `（只审 ${ONLY_SLUG}）`}`)
 console.log(`  会话日志 ${sessions.length} 份（其中 Lead ${leadSessions} 份）`)
 console.log(`  成品 ${result.finals.length} 份：${result.finals.map(f => f.path).join(' / ') || '（无）'}`)
 console.log(`  过程稿 ${result.drafts.length} 份`)
