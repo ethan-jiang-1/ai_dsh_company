@@ -68,6 +68,62 @@ R4 动议（写《客户支持 SLA 承诺页》，slug `support-sla-page`）里�
 - 踩坑记录：**块注释里写 glob 路径**（`snapshots/` 加通配再加斜杠）会因 `*` 紧跟 `/` 提前闭合
   注释，报错位置离真因很远（已写进 `scripts/lib/deliverables.mjs` 模块头）。
 
+## 自验（5 步，从快到慢——照着跑就能看到 R4 是否满足）
+
+**第 0 步 · 先 source**（漏了会被脚本拒绝：在本仓的 coding 会话里 `DSH_HOME` 是**有值**的，
+值是日用 home `~/.dsh`，所以"未设就报错"那道防线不触发——这是 R4 加守卫的原因）
+
+```sh
+cd <repo> && source dev/env.sh
+```
+
+**第 1 步 · 判据在运行场（秒级，无 key）**
+
+```sh
+node scripts/deliverables-check.mjs
+```
+
+期望：`成品 6 份 / 过程稿 12 份 / 违规 0 条 —— ALL PASS`。这一条直接回答 R4 的核心问题——
+"哪些是成品"不再靠命名约定，而是每份 `final.md` 都能回溯到一次 CEO 的 `present`。
+
+**第 2 步 · 验收判据点名的 oracle（R1 归档，验收判据 2 的原话）**
+
+```sh
+node scripts/deliverables-check.mjs \
+  --workspace snapshots/r1-motion/workspace.expected --sessions snapshots/r1-motion --legacy-flat
+```
+
+期望：`成品 1 份：deliverables/kb-rag-assessment.md / 违规 0 条`。
+
+**第 3 步 · 反证：判据真会红（这是"检查真的在检查"的证据）**
+
+```sh
+mkdir -p company-workspace/deliverables/rogue-demo
+echo '# 我自己说我是成品' > company-workspace/deliverables/rogue-demo/final.md
+node scripts/deliverables-check.mjs     # 退出码 1，点名 final-not-presented …/rogue-demo/final.md
+rm -rf company-workspace/deliverables/rogue-demo
+```
+
+**第 4 步 · 回归层守卫（秒级）**
+
+```sh
+pnpm test    # 38 条；其中 tests/deliverables.spec.ts 13 条守判据本身（含两份反证）
+```
+
+**第 5 步 · 自己跑一场看真的（真模型，分钟级）**
+
+按 `docs/demo.md` 场景 C 起观察窗（`pnpm dsh web -- --port 3086 --no-open`；**3080 是 GUI，别动**），
+选 `wochen CEO`，跑那条写作动议，收场再跑第 1 步。期望 `deliverables/<slug>/` 出
+`final.md` + `drafts/*.md`，判据 0 违规。
+
+**四条容易踩的**：
+1. 忘 `source dev/env.sh` → 脚本**拒绝执行**（不是静默跑错 home）；
+2. `--workspace` 要给**含 `deliverables/` 的工作区根**，不是 `deliverables/` 本身（给错也拒绝执行）；
+3. 审**归档快照**必须配 `--only <slug>`（快照是整盘 workspace + 本轮日志，不给作用域会把历史成品
+   误报成"无背书"——输入不成对，不是违规）；
+4. 改了 `packages/company-pack/presets/**` 后**必须重装进 profile**（profile 里是真拷贝），
+   否则观察窗里还是旧行为。
+
 ## 未做 / 移出本轮
 
 - **W3 journal 回溯压缩**：**规则已立**（`company-workspace/AGENTS.md`「轮末收敛」——已闭轮的

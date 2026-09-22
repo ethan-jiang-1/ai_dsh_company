@@ -21,6 +21,7 @@
 // 退出码：0 = 零违规；1 = 有违规（打印每条 code + path）。
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { auditDeliverables, parseSessionLog } from './lib/deliverables.mjs'
@@ -75,6 +76,15 @@ function sessionLogs() {
     console.error('deliverables-check: 需要 DSH_HOME（先 source dev/env.sh），或用 --sessions 指定明文日志目录')
     process.exit(2)
   }
+  // ⚠ fail-loud：`DSH_HOME` 指向**日用 home** 时必须拒绝。实测（R4）：在 DSH 的 coding 会话里
+  // `DSH_HOME` 是**有值的**（环境里带着 `~/.dsh`），所以"不设就报错"这道防线**挡不住**——漏 source
+  // 时脚本会安静地去审日用 home 的会话库（guides/60 §6.5 警告的那件事）。审的是哪份日志属于
+  // 判据的前提，猜错了整份结论都是假的，所以这里直接停。
+  const dailyHome = join(homedir(), '.dsh')
+  if (resolve(home) === resolve(dailyHome)) {
+    console.error(`deliverables-check: DSH_HOME 指向日用 home（${dailyHome}）——拒绝执行。\n  先 \`source dev/env.sh\`（把 DSH_HOME 切到 dev/harness-home），或用 --sessions 指定明文日志目录。`)
+    process.exit(2)
+  }
   const sessionRoot = join(home, 'sessions', `-${workspace.replaceAll('/', '-')}--`)
   if (!existsSync(sessionRoot)) {
     console.error(`deliverables-check: 该工作区还没有会话目录：${sessionRoot}`)
@@ -109,8 +119,17 @@ if (source.files.length > 0) {
   }
 }
 
+const workspaceFiles = listFiles(workspace)
+// ⚠ fail-loud：工作区里一份 `deliverables/` 下的文件都找不到 ⇒ 几乎肯定是 `--workspace` 指错了
+// 层级（实测（R4）：指到 `company-workspace/deliverables` 本身时，相对路径全部丢掉 `deliverables/`
+// 前缀，判据会把**所有** Lead 声明报成 dangling —— 结论全假但不报错）。
+if (!workspaceFiles.some(file => file.startsWith('deliverables/'))) {
+  console.error(`deliverables-check: ${workspaceRel} 下找不到任何 deliverables/ 文件。\n  --workspace 要给**含 deliverables/ 的工作区根**（如 company-workspace），不是 deliverables/ 本身。`)
+  process.exit(2)
+}
+
 const result = auditDeliverables({
-  workspaceFiles: listFiles(workspace),
+  workspaceFiles,
   sessions,
   legacyFlat: LEGACY_FLAT,
   ...(ONLY_SLUG === undefined ? {} : { onlySlug: ONLY_SLUG }),

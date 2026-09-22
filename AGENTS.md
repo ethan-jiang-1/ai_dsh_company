@@ -27,7 +27,10 @@ git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 corepack enable pnpm                   # 一次性：pnpm 走 Node 自带 corepack（读 packageManager 钉 11.7.0）
 pnpm install                           # workspace 解析（vendor/dsh 全树）；引导全配方见 guides/60 §7
 source dev/env.sh                      # 双 home 兜底：DSH_HOME=<repo>/dev/harness-home，别碰日用 ~/.dsh；并把裸 dsh（日用全局安装）拦截
-                                       # ⚠ 每个新 shell/后台 job 必须先 source 本文件——DSH_HOME 不继承，漏了会静默写日用 home（guides/60 §6.5）
+                                       # ⚠ 每个新 shell/后台 job 必须先 source 本文件。**别信"不继承"**（R4 更正）：
+                                       #   在 DSH 的 coding 会话里跑 bash 时 DSH_HOME 是**继承且带值**的，值 = 日用
+                                       #   home `~/.dsh` ⇒ 漏 source 不会报错，会安静地拿日用 home 当输入/输出
+                                       #   （guides/60 §6.5）。判据类脚本自己拒绝日用 home。
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（R0 已验收）
 pnpm dsh web -- --port 3081 --no-open  # web 观察窗（需 client 面+前端构建，guides/60 §7）；3080 是本 GUI 占用
 pnpm verify                            # 结构门禁（UTF-8/链接/preset 结构/symlink/**vendor 铁律：SHA+零改动**/pack 形状/行依赖/client 两半）

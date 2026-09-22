@@ -140,11 +140,16 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibil
    不是保证。验证一律 `pnpm dsh`；`env.sh` 已把裸 `dsh` 设为拦截提醒（bypass：`command dsh`）。
    注意 `DSH_HOME` 只护数据层：source 过 env.sh 后裸 `dsh` 也落在 dev home，但跑的
    仍是全局代码。
-5. **新 shell 陷阱（R1 实证）**：后台 job / 新开终端 = 全新环境，`DSH_HOME` **不继承**——
-   任何 `pnpm dsh` / `node bin.ts` 调用前必须先 `source dev/env.sh`，否则**静默**落日用
-   home `~/.dsh`（写 profile、装包都进日用数据）。实证：R1 部署时一次 `plugin add` 在
-   未 source 的 shell 里试图 `mkdir ~/.dsh/profiles/company`，被沙箱 EPERM 拦下（日用
-   home 未被污染）——沙箱是最后防线，不是第一防线；第一防线永远是 source env.sh。
+5. **新 shell 陷阱（R1 实证 + R4 更正）**：任何 `pnpm dsh` / `node bin.ts` 调用前必须先
+   `source dev/env.sh`，否则**静默**落日用 home `~/.dsh`（写 profile、装包都进日用数据）。
+   实证：R1 部署时一次 `plugin add` 在未 source 的 shell 里试图 `mkdir ~/.dsh/profiles/company`，
+   被沙箱 EPERM 拦下（日用 home 未被污染）——沙箱是最后防线，不是第一防线。
+   ⚠ **R4 更正一处过期表述**：这里原先写"`DSH_HOME` **不继承**"。那只在**普通终端**成立。
+   在 **DSH 的 coding 会话里跑 bash** 时，`DSH_HOME` 是**继承且带值的**，值就是日用 home
+   `~/.dsh`（实测：不 source 直接 `echo $DSH_HOME` → `/Users/bowhead/.dsh`）。后果比"没设"更坏：
+   脚本里"未设则报错"的那道防线**根本不触发**，会安静地拿日用 home 的会话库当输入。
+   所以：**判据/审计类脚本要自己拒绝日用 home**（`scripts/deliverables-check.mjs` 已有这道守卫），
+   别的 `scripts/*-smoke.mjs` 还是只靠"未设则报错"，同属这一类风险。
 6. **端口与实例隔离（部署事实）**：headless 形态（探针/动议）**无端口**——单次任务
    进程，stdout 出结果，日志落 `$DSH_HOME/sessions/`。web 形态（观察窗）起**本地**
    HTTP 端口（值见启动横幅）；因 `DSH_HOME` 指 dev home，它与日用 DSH 的 web 实例
