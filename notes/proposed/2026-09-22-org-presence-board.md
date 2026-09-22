@@ -1,7 +1,11 @@
 # 2026-09-22 · 组织在场板（物理人看得见谁在忙、忙什么）
 
 状态：proposed（2026-09-22）
-进轮：R5 皮肤 + 门禁（驾驶舱切片，2026-09-22 起，见 [roadmap](../../docs/plans/roadmap.md)）
+进轮：**R5b 驾驶舱**（2026-09-22 起，见 [roadmap](../../docs/plans/roadmap.md)）
+梳理（2026-09-22 晚）：R5 已按 D19 拆成 **R5a 门禁与发布 / R5b 驾驶舱**，本提案属 **R5b**
+（正文旧 `R5` 已全部改指 R5b）。**开工前必须先钉四个决定**——已升为
+[00-index 待定 Q5–Q8](../../docs/00-index.md)，判据 = 四条都变成本文的**现在时陈述**才算
+decision-complete（内容与选项见 [r5-plus-readiness](../../docs/plans/r5-plus-readiness.md) §9 P2）。
 
 ## 背景
 
@@ -20,7 +24,7 @@
 
 ## 提案
 
-1. **落点**：R5 驾驶舱（[30 §5](../../docs/design/30-ui-demo.md)）增加"组织在场板"切片，与既定的
+1. **落点**：R5b 驾驶舱（[30 §5](../../docs/design/30-ui-demo.md)）增加"组织在场板"切片，与既定的
    "协作动态流"共用同一个 pack 自建 Remote，不新增机制。
 2. **三列数据的来源**（全部是现成机制，已核实）：
    - 身份映射：`agent-preset/selected` 是 known session event
@@ -47,7 +51,7 @@
 
 - `session/event` 是公开 scoped 服务事件：
   `'session/event'(this: Scoped<Session>, session: Session, event: SessionEvent)`
-  ——`vendor/dsh/packages/core/session/src/index.ts:72`。R5 协作动态流的数据路径同此。
+  ——`vendor/dsh/packages/core/session/src/index.ts:72`。R5b 协作动态流的数据路径同此。
 - `ctx.sessionQuery` 是 host 侧读面，`live` 字段即"当前存在于 `ctx.sessions`"。
 - workspace 归属按 `SessionHeader.cwd`（`vendor/dsh/docs/subsystems/workspace.md`）。
 - 第一方 client 面已有 `ui-session` / `ui-sidebar` / `ui-jobs` / `ui-goal` / `ui-agent-preset`
@@ -67,7 +71,7 @@
 
 ## 验收判据
 
-R5 切片完成时，以下都必须是**代理能自己跑**的检查（D15）：
+R5b 切片完成时，以下都必须是**代理能自己跑**的检查（D15）：
 
 1. host 侧 keyless 单测：给定 roster + 会话事件流，在场板读模型输出"四个分身 ×
    (显示名, status, 当前任务 subject)"，缺失/未知状态不崩（进 `pnpm test` 家族）。
@@ -90,5 +94,5 @@ R5 切片完成时，以下都必须是**代理能自己跑**的检查（D15）�
 
 用户按"侧栏切到 VP-Eng 空间"找不到入口——**teammate 会话不作为顶层会话出现**，官方入口在
 会话头部的 Team 名册（`sessions.openSubagent`）。反馈原话："这在哪我没看到界面上有吗"。
-⇒ R5 皮肤必须补一个**显式的"进入某位成员的空间"入口**（名册行可点 / 头部动作 / 侧栏分组），
+⇒ R5b 皮肤必须补一个**显式的"进入某位成员的空间"入口**（名册行可点 / 头部动作 / 侧栏分组），
 否则"谁在哪个空间"只能靠讲解——这正是 R2 验收判据要消灭的东西。

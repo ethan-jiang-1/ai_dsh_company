@@ -150,11 +150,15 @@ for (const entry of ownPackages) {
 }
 ok(`client-halves ×${clientHalves.length}`)
 
-// ── 9. 提案必须在 roadmap 里被引用（防遗忘）─────────────────────────────────
-// 起因（R4 收尾后实测）：`notes/proposed/` 里一条提案被写进某轮的"做什么"列，整轮跑完却从没实现
-// ——直到有人**想起来问**"proposed 里的东西都安排了吗"才被发现。文档纪律（一处事实一个家）管不住
-// 这种"登记了但没人做"，所以把它变成门禁：**提案文件必须在 roadmap 出现**。注意本门禁只保证
-// "被引用"，不保证"会实现"——真正被逐条核对的是 roadmap 的**验收列**（见该表维护规则里的教训）。
+// ── 9. 提案纪律：roadmap 必须把 notes/proposed/ 消化掉 ─────────────────────
+// 起因（R4 收尾后实测，用户要求"roadmap 一定要消化掉 notes/proposed 里的东西"）：`notes/proposed/`
+// 里一条提案被写进某轮的"做什么"列，整轮跑完却从没实现——直到有人**想起来问**才发现。文档纪律
+// （一处事实一个家）管不住"登记了但没人做"，所以变成两条门禁：
+//   ① **每个提案都必须在 roadmap 出现**（有归宿：某轮 / 轮间待办 / 搁置池）；
+//   ② **已消化的不许赖在 proposed/**——一旦某提案的条目全都有归宿（交付 / 排期 / 明确不做），
+//      它的 状态 行会带终态字（已消化 / 已交付 / 部分交付），那它就该**毕业**到 notes/implemented/
+//      （毕业 ≠ 全部实现，而是"每一条都有归宿"，如 `workspace-hygiene` 有一条转轮间待办）。
+// ⚠ 门禁只保证"被引用 + 该毕业的毕业"，不保证"会实现"——真正被逐条核对的是 roadmap 的**验收列**。
 const proposedDir = join(root, 'notes/proposed')
 const roadmapText = readFileSync(join(root, 'docs/plans/roadmap.md'), 'utf8')
 const proposals = existsSync(proposedDir) ? readdirSync(proposedDir).filter(n => n.endsWith('.md')) : []
@@ -162,6 +166,16 @@ const unscheduled = proposals.filter(name => !roadmapText.includes(name))
 unscheduled.length === 0
   ? ok(`proposal-scheduled ×${proposals.length}`)
   : fail('proposal-scheduled', `这些提案没在 plans/roadmap.md 里出现（挂进去才有人做）：${unscheduled.join(', ')}`)
+
+/** 终态字：提案的状态行里出现这些，说明它已经被消化，该毕业了。 */
+const DIGESTED_MARKERS = ['已消化', '已交付', '部分交付']
+const notGraduated = proposals.filter(name => {
+  const statusLine = readFileSync(join(proposedDir, name), 'utf8').split('\n').find(line => line.startsWith('状态：')) ?? ''
+  return DIGESTED_MARKERS.some(marker => statusLine.includes(marker))
+})
+notGraduated.length === 0
+  ? ok('proposal-graduated (proposed/ 里只剩未落地的)')
+  : fail('proposal-graduated', `这些提案已消化却仍在 notes/proposed/（搬到 notes/implemented/ 并写明条目去向）：${notGraduated.join(', ')}`)
 
 console.log(failures.length === 0 ? '\nverify: ALL PASS' : `\nverify: ${failures.length} FAILURE(S)`)
 process.exit(failures.length === 0 ? 0 : 1)

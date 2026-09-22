@@ -15,7 +15,7 @@ docs/                   文档层：00-index（地图+决策台账+外部材料�
 notes/                  决策记录：intents.md → proposed/ → implemented/；事故复盘 postmortem/；外部研究 research/
 scripts/                verify.mjs（结构门禁）、preset-smoke.mjs（真入口冒烟）……
 dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）
-snapshots/              回归资产：r1-motion（录制会话 + workspace.expected 独立 oracle）；replay harness R5
+snapshots/              回归资产：r1/r2/r3/r4-motion + scenario-b（录制会话 + workspace.expected 独立 oracle）；replay harness R5a
 ```
 
 设计全貌与决策台账：`docs/00-index.md`（先读它，再按需进 design/10-40）。
@@ -40,7 +40,9 @@ node scripts/client-load-smoke.mjs     # client 面完成定义：headless 浏�
 node scripts/probe-smoke.mjs           # 角色连通冒烟（默认快速档 ~6s）：真 web + 真 preset + 一句 ping，断言"挂载/轮次跑完/模型回话/人格进 prompt"；`--full` 才跑 15 个内容探针（慢，5–10min，按需）
 node scripts/handbook-smoke.mjs        # agent-instructions 注入完成定义：断言会话的指令基线 = company-workspace/AGENTS.md（且未混入开发仓库 AGENTS.md）；默认只跑 ceo 一次小调用
 node scripts/delegation-smoke.mjs      # 汇报线边界守卫（R3，1 条 prompt）：vp_eng/vp_sales 在模型可见目录 + 三个控制名仍是**团队版**（shadow 边界变了就红）；`--delegate` 多 1 条 prompt 真委派一次，断言**前台拿到稿子**
-node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile → dsh plugin add → 冒烟
+node scripts/deliverables-check.mjs    # 交付物三态（R4）：成品必须回溯到一次 CEO 的 `present`；审归档快照配 --only <slug>；缺 DSH_HOME 或指到日用 home 时拒绝执行
+node scripts/snapshot-motion.mjs       # 动议归档：会话日志（Lead + children）+ workspace.expected 录进 snapshots/（每轮收尾用）
+node scripts/release-smoke.mjs         # （R5a 建）npm pack → 干净 profile → dsh plugin add → 冒烟
 ```
 
 ## 密钥
@@ -81,11 +83,11 @@ repo 规模裁剪（例如 CI 穷举暂由本地门禁代行）。**纪律的权
 | 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么） | `.agents/notes/README.md` | `notes/intents.md → implemented/` |
 | 窄证据切片；本地窄、CI 穷举；只报告实际跑过的检查 | `AGENTS.md` Run relevant checks | guides/60 §1 六步闭环 + `pnpm verify` |
 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**（迭代是常态，但必须由代理能自己跑的检查闭合） | `docs/testing.md` Test the real entry path / Verify the world, not the self-report；`docs/postmortem/0003`（"delegated acceptance to the user"） | guides/60 §1 第⑥步 + §7 两道防线；`preset-smoke.mjs` 是 preset/config 类改动的完成定义 |
-| 测试分层（unit/coverage/e2e/expected/**snapshot 无 key 重放**）；测试描述行为 | `docs/testing.md` | `snapshots/`（R5 正式化；R1 会话日志即首份资产） |
+| 测试分层（unit/coverage/e2e/expected/**snapshot 无 key 重放**）；测试描述行为 | `docs/testing.md` | `snapshots/`（R5a 正式化；R1 会话日志即首份资产） |
 | **测试分层与预算：真模型 / 真浏览器不进回归**（回归层 = 秒级、无 key、无浏览器；真入口一律进认证档 `scripts/*-smoke.mjs`，每轮一次） | `docs/testing.md` 测试分层 | guides/60 §9.1 + **机械门禁 `tests/layering.spec.ts`**（回归层出现子进程/浏览器/网络/密钥即红；已反证） |
-| 真实入口路径（发布产物 `lib/` 跑）+ 真实安装形状 | `docs/testing.md` Test the real entry path | R5 `release-smoke`（`npm pack`→干净 profile→`plugin add`） |
+| 真实入口路径（发布产物 `lib/` 跑）+ 真实安装形状 | `docs/testing.md` Test the real entry path | R5a `release-smoke`（`npm pack`→干净 profile→`plugin add`） |
 | 源码面/产物面不混（paths 指 src） | `AGENTS.md` Conventions | 根 `tsconfig.json` extends vendor base |
-| vendor 钉版本 + manifest/SHA + 同步程序 | `vendor/README.md` | AGENTS.md vendor 簿记 + `scripts/sync-dsh.mjs`（R5） |
+| vendor 钉版本 + manifest/SHA + 同步程序 | `vendor/README.md` | AGENTS.md vendor 簿记 + `scripts/sync-dsh.mjs`（R5a） |
 | 日志税：model-visible ⟺ logged | `AGENTS.md` Conventions | guides/60 §3 设计四问② |
 | 机械门禁（结尾换行、链接、结构） | `AGENTS.md` Conventions + `scripts/run-gates.ts` | `scripts/verify.mjs` |
 
@@ -107,7 +109,7 @@ submodule HEAD == 簿记 SHA（`vendor-pin`）且工作树零改动（`vendor-cl
 | 想要 | 正路 |
 |---|---|
 | 组合/配置层面的差异 | 本 pack 的 bundle `cordis.patch.yml`（`- id:` 替换 / `- insert:` 新增）或 profile patch |
-| 需要上游修的行为 | 改 **DSH upstream** → 升 pin（`scripts/sync-dsh.mjs`，R5）；期间在本仓记入 `notes/` |
+| 需要上游修的行为 | 改 **DSH upstream** → 升 pin（`scripts/sync-dsh.mjs`，R5a）；期间在本仓记入 `notes/` |
 | 上游功能在本形态下不可用 | **先证伪"不可用"再自建**：R1 曾误诊"官方团队 UI 挂不上"→ 自建任务板 + 重复挂 remote → 全 UI 砖（postmortem 0003；实为可用，`dsh.client.inject` 是 informational only）。确属不可用才在本 pack 自己实现等价面 |
 
 **为什么用 SHA 而不是 tag**：tag 可被移动/别名，SHA 才是钉住的合同（`vendor/README.md` 的
@@ -133,7 +135,12 @@ pin + manifest/SHA 纪律）。
 ## 当前状态
 
 **R0 立环 ✅ / R1 两人公司 ✅ / R2 五角色全员 ✅ / R3 汇报线 ✅ / R4 成品流程 ✅ 完成（2026-09-22）。
-当前轮 R5 皮肤 + 门禁——▶ 下一轮**（见 `docs/plans/roadmap.md`；迭代按垂直轮 D11，每轮换全新对话上下文）。
+当前轮 **R5a 门禁与发布 —— ▶ 下一轮**（R5b 驾驶舱排其后，R6 前置全清；见 `docs/plans/roadmap.md`；
+迭代按垂直轮 D11，每轮换全新对话上下文）。
+
+**先做两件轮间待办（不占轮，见 roadmap「轮间待办 R4 → R5a」）**：① **按问题组队**——补 CEO 的团队
+成型 skill（现在**没人指定名单时默认 4/4 全员**；兼作 R6 的 U1 活体探针）② **练习场 ≠ 运行场**——
+排练/探针换独立 workspace（R4 收尾核对提案时发现这条漏了，且判据抓不到排练写进 `drafts/` 的产物）。
 
 **R4 交付（外部可观察）**：交付物三态有**机器判据**——`scripts/lib/deliverables.mjs`（纯逻辑）+
 `scripts/deliverables-check.mjs`（运行场入口，解多帧 zstd）。规则：成品 `deliverables/<slug>/final.md`
@@ -153,20 +160,23 @@ pin + manifest/SHA 纪律）。
 成对形状）——vendor 实证：`tool-agent-team` 的 maybeInstall 只在 `tryMembership != undefined`
 （团队成员）时装团队版控制名，而职能**根**会话不是成员 ⇒ 不补就是"既没团队版也没全局版"，continuable
 child 失联。CEO preset 保持不放（team-scoped，死行，有反向守卫）。**残留**：teammate 共享 CEO preset，
-那里的 `subagent` 仍与 team shadow 相冲 —— 留 R5 与升 pin 一起处理（`docs/delegation.md` §4.4）。
+那里的 `subagent` 仍与 team shadow 相冲 —— 留 R5a 与升 pin 一起处理（`docs/delegation.md` §4.4）。
 
 **门禁分层（R3 立）**：见 `docs/guides/60-dev-loop.md` §9.1——**真模型/真浏览器不进迭代环**，且
 **有机械门禁**（`tests/layering.spec.ts`：回归层出现子进程/浏览器/网络/密钥即红，已反证）。迭代环 =
 `pnpm verify` + `pnpm test`（**38 条 ≈0.2s**）；认证档（`preset-smoke` / `delegation-smoke` /
-`handbook-smoke` / `probe-smoke`）**每轮一次**，产出归档；端到端真 UI 留 R5 replay harness。
+`handbook-smoke` / `probe-smoke`）**每轮一次**，产出归档；端到端真 UI 留 R5a replay harness。
 **R2 旧纪律**：§9 门禁分层、§10 自动化只许是轻任务。
 
 **观察窗**：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。⚠ **改 pack 的
 `presets/**` 后必须重装进 profile**（`plugin --profile web remove` + `add`）——profile 里的 pack 是
 **真拷贝**；新增的行插件还要进 pack `dependencies` 与 lockfile（R4 为此踩过一次）。
 **皮肤已落**：pack 的 client 面 = 侧栏品牌槽 + 会话头部任务板（活面板）+ 委派工具卡。
-**R5 起点**：`docs/plans/roadmap.md` R5 行 + `notes/proposed/2026-09-22-org-presence-board.md`
-（组织在场板）+ 无 key replay harness（**含 R3 留下的委派卡端到端**）。
+**R5a 起点**：`docs/plans/roadmap.md` R5a 行（无 key replay harness + `release-smoke` + `sync-dsh` +
+发布欠账）+ `plans/r5-plus-readiness.md` §9 P1（**先窄研究再落**）。
+**R5b 起点**：同表 R5b 行 + `notes/proposed/2026-09-22-org-presence-board.md`（组织在场板）——
+⚠ **开工前先钉 `docs/00-index.md` 待定 Q5–Q8**（在场板主键 / 冷启动补历史 / `status` 文案 /
+成员空间入口；判据 = 四条都变成提案里的现在时陈述，才进 Plan Mode）。
 **R4 留下的一笔（别丢）**：**journal 回溯压缩决定不做**——规则已立在公司手册「轮末收敛」（已闭轮的
 journal 压成 CHARTER 一条附录，只由人做），但 R1/R2 的 38 篇角色记忆**保留不压**（理由见 R4 Note：
 提案这条无证据、结构异质、且它是 D8 唯一的跨会话记忆、R6 培养回路正建立其上）。

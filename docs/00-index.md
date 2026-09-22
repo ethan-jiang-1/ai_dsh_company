@@ -41,7 +41,7 @@ implemented → archived）。
 
 | 位置 | 回答什么 |
 |---|---|
-| `notes/intents.md` → `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含**实际跑过的验证 + 环境状态**） |
+| `notes/intents.md` → `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含**实际跑过的验证 + 环境状态**）。**提案纪律**：`proposed/` 不是停车场——进它就必须在 [plans/roadmap.md](./plans/roadmap.md) 有归宿；条目全有归宿后**毕业**到 `implemented/`（毕业 ≠ 全部实现，而是"每一条都有归宿"）。两条机械门禁 `proposal-scheduled` / `proposal-graduated` |
 | [notes/postmortem/](../notes/postmortem/README.md) | **事故复盘**：为什么流程放过了它 + 加了什么护栏（0001 preset 挂载失败、0002 团队 UI 不可见·根因误诊已更正、0003 重复挂载 remote 砖全 UI） |
 | [notes/research/2026-09-22-agent-workflow-community-practice.md](../notes/research/2026-09-22-agent-workflow-community-practice.md) | 外部研究：代理工作流的社区/厂商一手证据（结论已吸纳为 D15，否决项也记在里面） |
 
@@ -49,7 +49,9 @@ implemented → archived）。
 
 | 将出生的合同 | 诞生轮次 | 内容来源 |
 |---|---|---|
-| `release.md` | R5 | 发布形状：peers、compatibility 矩阵、真实安装冒烟程序 |
+| `release.md` | **R5a** | 发布形状：peers、compatibility 矩阵、真实安装冒烟程序（欠账清单见 [plans/r5-plus-readiness.md](./plans/r5-plus-readiness.md) §9 P4） |
+| *（不单独出生合同）* | R5b 驾驶舱 | UI 面随轮更新 [design/30-ui-demo.md](./design/30-ui-demo.md) §5 |
+| 培养/学习合同（**名字待定**） | R6 | 培养回路与学习载体的现在时语义；入口条件见 [plans/roadmap.md](./plans/roadmap.md) R6 行 |
 
 （`delegation.md` 已于 R3 出生，见上表。）
 
@@ -88,6 +90,17 @@ implemented → archived）。
 | Q2 ✅ | 角色是否需要不同模型路由？影响 preset 行与委托工具 `agentOptions` | 内容设计、成本 | R1 前（定 persona 时一起定） |
 | Q3 ✅ | 公司手册哪些随 pack 发布、哪些留 workspace 活数据？ | KB 骨架 | R1–R2 中 |
 | Q4 ✅ | ~~R1 的最小动议主题~~ **已定（2026-09-22）：「给我们公司要不要自建知识库写一页技术评估」** | R1 探针任务与预算 | 已定；整场 demo 剧本 R2 前再议 |
+
+R5b 开工前必须先钉的四条（内容与选项见 [plans/r5-plus-readiness.md](./plans/r5-plus-readiness.md) §9 P2；
+判据 = 四条都变成 [proposed/org-presence-board](../notes/proposed/2026-09-22-org-presence-board.md) 里的
+**现在时陈述**，才开始 Plan Mode）：
+
+| # | 问题 | 影响面 | 何时必须定 |
+|---|---|---|---|
+| Q5 ⛔ | **在场板主键**：会话 × preset（不漏 CEO 直起的 subagent）还是 team roster（状态更准）？——**它也顺带决定 CEO 要不要单开一行「公司级」视图**（原提案 §风险与未决 里那条未决落在这里） | 在场板读模型与它的验收 | **R5b 开工前** |
+| Q6 ⛔ | **冷启动补历史**：只吃 `session/event`（进程活着才有）还是事件 + `sessionQuery` 合并？ | 刷新后面板会不会空 | R5b 开工前 |
+| Q7 | **`status` 文案**：直显 `running` / `idle`，还是加"团队内"限定语？ | UI 文案与验收行 | R5b 开工前 |
+| Q8 ⛔ | **成员空间入口**：侧栏分组 / 头部动作 / 名册行可点——取决于 `sessions.openSubagent` 对**非 team child** 是否可达 | 场景 B 那个"进不去成员空间" | R5b 开工前 |
 
 ## 覆盖状态（2026-09-21 审计 + 重构）
 

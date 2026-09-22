@@ -25,7 +25,7 @@
 
 | notes/ 条目 | 目标轮 | 判定 | 关键理由 / 待办 |
 |---|---|---|---|
-| [proposed/workspace-hygiene](../../notes/proposed/2026-09-22-workspace-hygiene.md) | R4 | **在跑（不归本文件）** | R4 代理已落 `scripts/lib/deliverables.mjs`（交付物三态纯逻辑）+ `tests/deliverables.spec.ts`（keyless 断言，套件 31 passed） |
+| [implemented/workspace-hygiene](../../notes/implemented/2026-09-22-workspace-hygiene.md) | R4 | **✅ 已消化（不归本文件）** | R4 交付 `scripts/lib/deliverables.mjs` + `deliverables-check.mjs` + `tests/deliverables.spec.ts`（13 条）；1 条（练习场 ≠ 运行场）转轮间待办、1 条按决定不做——逐条去向见该文件的「条目去向」表 |
 | [proposed/org-presence-board](../../notes/proposed/2026-09-22-org-presence-board.md) | R5b | **READY-DECISIONS** | 四个数据源全部 vendor 核实；三个 join 语义未钉 + 一个新增 UI 入口（见 §2.1） |
 | [proposed/twin-cultivation-and-self-learning](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md) | R6 | **READY（培养/学习）＋ SUSPENDED（自主节律）** | 两条前置修复已落地、U1 已答；**阻塞项文字已过期**（见 §5） |
 | [research/digital-twin-cultivation-and-self-learning](../../notes/research/2026-09-22-digital-twin-cultivation-and-self-learning.md) | R6 依据 | **RESEARCH（部分已作废）** | §C 前置已做、§D 结论被隔离改动推翻、U2/U3 作废（该笔记已加修订节） |
