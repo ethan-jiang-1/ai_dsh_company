@@ -134,8 +134,10 @@ CEO 合稿 `present`），`company-workspace/deliverables/` 两份交付物 + �
 **R2 切片顺序（步步为营，UI 反馈优先）**：① 任务板活面板 ✅（打开期间每 5s 自动刷新；client-load-smoke 全绿）→
 ② 两空间分镜彩排（现两角色即可走，收 UI 反馈后把分镜 v0 烤进 `demo.md`）→
 ③ +VP-Sales/COO/CFO 正式文案与 skills ✅（pnpm test / verify / preset-smoke 五角色全绿；连通冒烟 `scripts/probe-smoke.mjs` 5/5 **6 秒**（默认快速档：挂载/轮次/回话/人格进 prompt），`--full` 内容档曾 14/15；CFO 增设 + 编制 50 人细到岗位 = `kb/org.md` 唯一事实家 + 每角色 1 号工作流，见 `notes/implemented/2026-09-22-r2-roles-alive.md`）→
-④ 五人动议全流程（CEO + 四 VP：DAG 分派、VP 互审、fork 会议上下文）+ `snapshots/r2-motion/` →
+④ 五人动议全流程 ⚠ **部分验收**（真跑一场并归档：4 teammate + 7 任务含 3 条 `blocked_by` 依赖 + 互审任务与"评审→改稿→回执"回路 + 消息 queued/delivered 25/25 不丢不重 + 7 份交付物 → `snapshots/r2-motion/`；**CEO 合稿 `present` 未走到**——按"轻任务"纪律中止无限长跑，UI 观演亦未进行；见 `notes/implemented/2026-09-22-r2-motion-run.md`）→
 ⑤ 轮次收尾清单（roadmap 六条）。
 **皮肤第一笔已落**：pack 长出 client 面（`src/client/`：侧栏品牌槽 + **会话头部任务板**）+ `DSH_CLIENT_TITLE`
 构建期品牌——见 `notes/implemented/2026-09-22-client-face-brand.md`。
 观察窗：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。
+**自动化纪律（R2 立，两条都在 `docs/guides/60-dev-loop.md`）**：§9 门禁分层（连通档默认 ≈6s / 内容档 `--full` 按需）；
+§10 **自动化只许是轻任务**——开跑前定墙钟与调用上限、必须可中断、不无人值守跑多智能体、产出证据后只做收口。
