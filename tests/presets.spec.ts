@@ -100,4 +100,17 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(resolved).toBe(fileURLToPath(new URL('node_modules/dsh-company-pack/presets/', fakeProfile)))
     expect(resolved).toContain('node_modules/dsh-company-pack/presets')
   })
+
+  it('公司手册（模型可见）覆盖五角色职责边界、路由与升级规则——不随内容改动悄悄失效', () => {
+    const handbook = readFileSync(join(ROOT, 'company-workspace/AGENTS.md'), 'utf8')
+    for (const role of ['CEO', 'CFO', 'VP-Sales', 'VP-Eng', 'COO']) {
+      expect(handbook, `手册缺 ${role} 的职责边界`).toContain(role)
+    }
+    for (const section of ['职责边界', '这事问谁', '冲突与升级', '承诺权']) {
+      expect(handbook, `手册缺「${section}」节`).toContain(section)
+    }
+    // 路由必须回答高频冲突：数字口径（毛利/成本）与排期/交付日期该找谁
+    expect(handbook).toMatch(/毛利/)
+    expect(handbook).toMatch(/交付日期|排期/)
+  })
 })
