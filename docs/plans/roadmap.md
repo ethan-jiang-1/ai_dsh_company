@@ -46,7 +46,8 @@ AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ 本表
 5. `notes/intents.md` 对应行改 implemented；
 6. **上线前门禁全绿**：`pnpm verify` + `pnpm test` + **`node scripts/preset-smoke.mjs`**
    （最后一条是唯一能抓"preset 挂载失败"的检查——行 config 校验发生在挂载时，roster/dump 都看不到，
-   UI 还会吞错误；R1 血泪教训，见 guides/60 §7 两道防线）。
+   UI 还会吞错误；R1 血泪教训，见 guides/60 §7 两道防线）；**内容改动**另跑
+   `node scripts/probe-smoke.mjs`（会话级：真 web + 真 preset + 真模型，五角色三探针按 KB 事实断言；R2 建）。
 
 ## 维护规则
 

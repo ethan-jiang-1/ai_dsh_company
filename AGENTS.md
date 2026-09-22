@@ -34,6 +34,7 @@ pnpm verify                            # 结构门禁（UTF-8/链接/preset 结�
 pnpm test                              # keyless 回归（vitest：roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义、必填 config）
 node scripts/preset-smoke.mjs          # 上线前门禁：boot 真 web，逐个 preset 建会话（唯一能抓"preset 挂载失败"的检查；需 DSH_HOME + 已装 pack）
 node scripts/client-load-smoke.mjs     # client 面完成定义：headless 浏览器加载真页面，断言零插件挂载失败 + 品牌槽在场（需 DSH_HOME；postmortem 0003）
+node scripts/probe-smoke.mjs           # 角色连通冒烟（默认快速档 ~6s）：真 web + 真 preset + 一句 ping，断言"挂载/轮次跑完/模型回话/人格进 prompt"；`--full` 才跑 15 个内容探针（慢，5–10min，按需）
 node scripts/release-smoke.mjs         # （R5 建）npm pack → 干净 profile → dsh plugin add → 冒烟
 ```
 
@@ -132,7 +133,7 @@ CEO 合稿 `present`），`company-workspace/deliverables/` 两份交付物 + �
 分镜 v0 两空间镜头 + 任务板活面板；UI 薄片重排见 `notes/implemented/2026-09-22-r2-ui-slice-replan.md`）。迭代按垂直轮（D11）见 `docs/plans/roadmap.md`。
 **R2 切片顺序（步步为营，UI 反馈优先）**：① 任务板活面板 ✅（打开期间每 5s 自动刷新；client-load-smoke 全绿）→
 ② 两空间分镜彩排（现两角色即可走，收 UI 反馈后把分镜 v0 烤进 `demo.md`）→
-③ +VP-Sales/COO/CFO 正式文案与 skills ✅（pnpm test / verify / preset-smoke 五角色全绿；探针待用户在观察窗逐角色跑；CFO 增设 + 编制 50 人细到岗位 = `kb/org.md` 唯一事实家 + 每角色 1 号工作流，见 `notes/implemented/2026-09-22-r2-roles-alive.md`）→
+③ +VP-Sales/COO/CFO 正式文案与 skills ✅（pnpm test / verify / preset-smoke 五角色全绿；连通冒烟 `scripts/probe-smoke.mjs` 5/5 **6 秒**（默认快速档：挂载/轮次/回话/人格进 prompt），`--full` 内容档曾 14/15；CFO 增设 + 编制 50 人细到岗位 = `kb/org.md` 唯一事实家 + 每角色 1 号工作流，见 `notes/implemented/2026-09-22-r2-roles-alive.md`）→
 ④ 五人动议全流程（CEO + 四 VP：DAG 分派、VP 互审、fork 会议上下文）+ `snapshots/r2-motion/` →
 ⑤ 轮次收尾清单（roadmap 六条）。
 **皮肤第一笔已落**：pack 长出 client 面（`src/client/`：侧栏品牌槽 + **会话头部任务板**）+ `DSH_CLIENT_TITLE`

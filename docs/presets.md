@@ -101,5 +101,5 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 | keyless | `pnpm test`（roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义、必填 config） | ✅ 五角色覆盖 |
 | 运行时 roster | web 观察窗 `agentPresets/list` RPC | ✅ 实测 10 条零 broken |
 | **挂载（上线前门禁）** | `node scripts/preset-smoke.mjs`：boot 真 web，逐个 preset `session/create` | ✅ 五角色 ALL PASS（反证过：去掉必填 config 即红） |
-| 会话级（persona 生效、协作） | Web 会话跑真动议（**headless 不挂 preset**，见 [10 §6](./design/10-architecture.md) 要点 6） | ✅ R1 动议跑通；⏳ R2 探针（vp-sales/coo/cfo 三探针）与多人动议待跑 |
+| 会话级（persona 生效、连通） | `node scripts/probe-smoke.mjs`（默认快速档 ~6s：真会话发一句 ping，断言挂载/轮次/回话/**人格进 prompt**）；`--full` = 五角色三探针内容断言（慢，按需） | ✅ R2 建：快速档 5/5 PASS；内容档曾 14/15（KB 事实与 veto 语义均命中） |
 | 回归资产 | 动议会话 + 期望工作区归档 | ✅ [`snapshots/r1-motion/`](../snapshots/r1-motion/snapshot.yml)（R2 补 `r2-motion/`；replay harness R5） |
