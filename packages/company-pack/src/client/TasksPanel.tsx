@@ -1,5 +1,5 @@
 /** 会话头部动作：本会话所属团队的任务板（只读；纯 DOM，不依赖 ui-primitives）。 */
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TeamView } from '@deepseek-ai/dsh-experimental-agent-team/client'
 import type { RemoteResult } from '@deepseek-ai/dsh-api-remotes/client'
@@ -29,8 +29,16 @@ export function TasksAction({ sessionId, load }: TasksActionProps) {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const refresh = async (): Promise<void> => {
-    setLoading(true)
+  const busyRef = useRef(false)
+
+  /**
+   * 拉一次权威状态。silent = 后台轮询：不闪「刷新中…」，且与前一次未返回的拉取互斥。
+   * @param silent - 是否为后台静默刷新。
+   */
+  const refresh = async (silent = false): Promise<void> => {
+    if (busyRef.current) return
+    busyRef.current = true
+    if (!silent) setLoading(true)
     setError(null)
     try {
       const result = await load(sessionId)
@@ -39,9 +47,18 @@ export function TasksAction({ sessionId, load }: TasksActionProps) {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause))
     } finally {
-      setLoading(false)
+      busyRef.current = false
+      if (!silent) setLoading(false)
     }
   }
+
+  /** 活面板：打开期间每 5 秒拉一次权威状态，成员状态与任务修订双侧实时。 */
+  useEffect(() => {
+    if (!open) return
+    void refresh(true)
+    const timer = setInterval(() => { void refresh(true) }, 5000)
+    return () => { clearInterval(timer) }
+  }, [open])
 
   const live = view?.tasks.filter(task => task.status !== 'completed' && task.status !== 'deleted') ?? []
 
@@ -51,11 +68,7 @@ export function TasksAction({ sessionId, load }: TasksActionProps) {
         type="button"
         aria-expanded={open}
         title="团队任务板"
-        onClick={() => {
-          const next = !open
-          setOpen(next)
-          if (next) void refresh()
-        }}
+        onClick={() => { setOpen(!open) }}
       >
         🗂 任务板{live.length === 0 ? '' : ` (${String(live.length)})`}
       </button>
@@ -84,6 +97,7 @@ export function TasksAction({ sessionId, load }: TasksActionProps) {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
             <strong>团队任务板</strong>
+            <span style={{ opacity: 0.6, fontSize: '0.75rem' }}>每 5 秒自动刷新</span>
             <span style={{ flex: 1 }} />
             <button type="button" onClick={() => { void refresh() }} disabled={loading}>
               {loading ? '刷新中…' : '刷新'}
