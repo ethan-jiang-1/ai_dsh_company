@@ -150,5 +150,18 @@ for (const entry of ownPackages) {
 }
 ok(`client-halves ×${clientHalves.length}`)
 
+// ── 9. 提案必须在 roadmap 里被引用（防遗忘）─────────────────────────────────
+// 起因（R4 收尾后实测）：`notes/proposed/` 里一条提案被写进某轮的"做什么"列，整轮跑完却从没实现
+// ——直到有人**想起来问**"proposed 里的东西都安排了吗"才被发现。文档纪律（一处事实一个家）管不住
+// 这种"登记了但没人做"，所以把它变成门禁：**提案文件必须在 roadmap 出现**。注意本门禁只保证
+// "被引用"，不保证"会实现"——真正被逐条核对的是 roadmap 的**验收列**（见该表维护规则里的教训）。
+const proposedDir = join(root, 'notes/proposed')
+const roadmapText = readFileSync(join(root, 'docs/plans/roadmap.md'), 'utf8')
+const proposals = existsSync(proposedDir) ? readdirSync(proposedDir).filter(n => n.endsWith('.md')) : []
+const unscheduled = proposals.filter(name => !roadmapText.includes(name))
+unscheduled.length === 0
+  ? ok(`proposal-scheduled ×${proposals.length}`)
+  : fail('proposal-scheduled', `这些提案没在 plans/roadmap.md 里出现（挂进去才有人做）：${unscheduled.join(', ')}`)
+
 console.log(failures.length === 0 ? '\nverify: ALL PASS' : `\nverify: ${failures.length} FAILURE(S)`)
 process.exit(failures.length === 0 ? 0 : 1)
