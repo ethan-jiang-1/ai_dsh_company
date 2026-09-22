@@ -44,3 +44,30 @@
 - pack 的 client 面目前只有品牌一处；R5 的 Company 驾驶舱页签（`sidebar.right.pane.tab`）与
   委派工具卡（`tool.call.toolview`）复用同一套基础设施。
 - `files` 字段已含 `lib/**`，但 npm 发布形状（`npm pack` → 干净 profile）仍归 R5 release-smoke。
+
+## 追加：自带任务板（官方 Team UI 在本构建形态下挂不上）
+
+**症状**：host 侧一切正常（RPC `agentTeams/view` 返回成员与任务），但 UI 里没有任何团队入口。
+
+**根因（客户端模块表的依赖闭环）**：官方 `@deepseek-ai/dsh-experimental-client-ui-agent-team` 的
+`dsh.client.inject` 含 **`@deepseek-ai/dsh-client-ui-primitives`**——那是纯组件库，**没有 `dsh.client`
+字段、不在浏览器模块表里**。启动清单里该依赖缺失 → 模块静默挂不上 → 它的 `remote.agentTeams`
+也无人注册 → 团队 UI 整体不存在。查法：从页面 HTML 解析 `window.__DSH_BOOT__`，比对
+`entries[].inject` 与 `entries[].id` 的差集（官方模块缺失依赖正是 `ui-primitives`）。
+
+**解法**：本 pack 的 client 面**自己实现只读任务板**，并自己挂同一份生成描述符：
+- `src/client/TasksPanel.tsx`：会话头部动作（`conversation.session.header.actions`，id `company-tasks`，
+  order 21），点开显示成员状态 + 共享任务（id@revision / 主题 / 状态 / owner / 依赖），带刷新。
+  纯 DOM + 内联样式，**不依赖 `ui-primitives`**。
+- `src/client/index.ts`：`await ctx.remote.$mount(agentTeamsRemote)` 后注册品牌槽与任务板；
+  子代理会话经 `sessions.binding(...).subagent.address.parentSessionId` 归到 Lead。
+- `dsh.client.inject` 只列**模块表里确实存在**的包（api-remotes / api-session-controller /
+  ui-conversation / ui-renderer / ui-sidebar）。
+- tsdown：`noExternal` 强制内联 `@deepseek-ai/dsh-experimental-agent-team/remote`（tsdown 默认把
+  package.json 的 dependencies 当 external，描述符留成 require 会在浏览器抛错）。
+
+**验证（实际跑过）**：boot 清单里我们的条目 `inject` 与 `entries[].id` **差集为空**；服务的合并
+bundle 含"任务板"文案（8 处）与 `agentTeams`（57 处）；`verify`/`test`/`preset-smoke` 全绿。
+
+**未验证**：面板的**视觉**需人工确认（我验证的是"模块能挂上 + 数据接口可用"这两层）。
+**已知取舍**：client bundle 约 197KB（内联了 zod）；官方 Team UI 仍不可用（上游缺口，未改 vendor）。
