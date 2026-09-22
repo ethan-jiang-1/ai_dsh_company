@@ -10,14 +10,14 @@
 |---|---|---|---|---|---|
 | R0 立环 | ✅ 完成 | 环境：submodule 钉 tag + workspace + AGENTS.md + 双 home | `pnpm verify` 结构门禁 | `pnpm dsh --profile headless "hi"` 从源码跑通；typecheck 解析到 DSH src | `profile.md` 骨架 |
 | R1 两人公司 | ✅ 完成 | CEO + VP-Eng（骨架 persona + 各 1 个核心 skill）；pack 装进 web profile 作**观察窗**（零自定义 UI）；一条最小动议（Q4 已定：「给我们公司要不要自建知识库写一页技术评估」）：收动议 → spawn teammate → 派一任务 → VP 出稿 → CEO 收口 `present` | 两角色入戏探针：**Web 会话**分别选 CEO / VP-Eng preset（⚠ headless 不挂 preset，见 [10 §6](../design/10-architecture.md) 要点 6） | **Web 会话**里一场完整动议的会话日志 + `deliverables/` 第一份交付物（UI 是唯一载体，不是红利） | CEO/VP-Eng 的 40 号文案；`demo.md` 雏形 |
-| R2 四人全员 | ▶ 可开工 | +VP-Sales +COO（文案+skills）；任务板 DAG 分派；VP 间至少一次互审（mailbox 跨层级）；fork teammate 下发会议上下文 | 新增两角色独立会话探针；task CAS 拒绝过期修订 | [30-ui-demo](../design/30-ui-demo.md) §3 分镜 v0 **全程 UI 可见**；消息不丢不重 | `presets.md`（四角色语义合同）；40 号补全 |
-| R3 汇报线 | — | **team 两包从 bundle 改直插行**（10 §3 冲突注，仍零 JS）；CEO 加 `vp_eng`/`vp_sales` 命名委托工具（continuable + persona），团队之外的快捷派活 | 委托 child 与 team 成员并存不互破（shadow 语义） | 委派出稿 → 全局 send_message 追加意见 → child 修订；日志可回放 | `delegation.md` |
+| R2 四人全员 | ▶ 可开工 | +VP-Sales +COO（文案+skills）；任务板 DAG 分派；VP 间至少一次互审（mailbox 跨层级）；fork teammate 下发会议上下文；pack 头部任务板升级为**活面板**（打开期间自动刷新，成员状态/任务修订双侧实时） | 新增两角色独立会话探针；task CAS 拒绝过期修订 | [30-ui-demo](../design/30-ui-demo.md) §3 分镜 v0 按「两空间镜头」走：**不讲解也能看懂谁在哪个空间、活怎么交接**；消息不丢不重 | `presets.md`（四角色语义合同）；40 号补全 |
+| R3 汇报线 | — | **team 两包从 bundle 改直插行**（10 §3 冲突注，仍零 JS）；CEO 加 `vp_eng`/`vp_sales` 命名委托工具（continuable + persona），团队之外的快捷派活；**委派工具卡**（`tool.call.toolview` 薄片，自 R5 v2 提前——机制与它的脸同轮交付） | 委托 child 与 team 成员并存不互破（shadow 语义） | 委派出稿 → 全局 send_message 追加意见 → child 修订；工具卡在对话流渲染；日志可回放 | `delegation.md` |
 | R4 成品流程 | — | templates + deliverables 流程全量接入 | 模板即流程：写作类工作流第一版 = 模板 + skill 指引 | 端到端写作流水线：brief → 分头出稿 → 互审 → 合稿落 `deliverables/` | `demo.md` 定稿 |
-| R5 皮肤 + 门禁 | — | [30-ui-demo](../design/30-ui-demo.md) §5 v1 驾驶舱页签 / v2 委派工具卡；verify / release-smoke / sync-dsh 脚本 | 发布纪律时点表（[guides/60](../guides/60-dev-loop.md) §5）逐项补 | 驾驶舱页签跑通；`npm pack` → 干净 profile → `dsh plugin add` → 冒烟通过 | `release.md` |
+| R5 皮肤 + 门禁 | — | [30-ui-demo](../design/30-ui-demo.md) §5 v1 驾驶舱页签（含**协作动态流**：pack 自建 Remote 折叠 session 事件；v2 委派工具卡已提前至 R3）；verify / release-smoke / sync-dsh 脚本 | 发布纪律时点表（[guides/60](../guides/60-dev-loop.md) §5）逐项补 | 驾驶舱页签跑通；`npm pack` → 干净 profile → `dsh plugin add` → 冒烟通过 | `release.md` |
 
 主通道不变（D4）：demo 主循环走团队（M4/通道 B）；通道 A 命名委托 R3 加入；M2（自定义
 provider）可选增强（触发条件见 [20-roles-isolation.md](../design/20-roles-isolation.md) §3）。
-UI 侧：v0（现成团队 UI）＝ R1 观察窗起、R2 进验收；v1/v2 ＝ R5（[30-ui-demo.md](../design/30-ui-demo.md) §5）。
+UI 侧：v0（现成团队 UI）＝ R1 观察窗起、R2 进验收；委派工具卡（v2 薄片）提前至 R3，驾驶舱 v1 ＝ R5（[30-ui-demo.md](../design/30-ui-demo.md) §5）。
 
 ## 轮次交接（每轮全新对话上下文，靠这两份清单不吃上下文）
 

@@ -129,7 +129,7 @@ pin + manifest/SHA 纪律）。
 web profile；**首条动议跑通**（CEO 澄清 → 任务板 → `spawn_teammate(vp-eng)` → VP 出稿 →
 CEO 合稿 `present`），`company-workspace/deliverables/` 两份交付物 + 两个 journal；
 首份回归资产 `snapshots/r1-motion/`。当前轮 **R2 四人全员——▶ 可开工**（补 VP-Sales/COO 内容、
-分镜 v0 全程 UI 可见）。迭代按垂直轮（D11）见 `docs/plans/roadmap.md`。
+分镜 v0 两空间镜头 + 任务板活面板；UI 薄片重排见 `notes/implemented/2026-09-22-r2-ui-slice-replan.md`）。迭代按垂直轮（D11）见 `docs/plans/roadmap.md`。
 **皮肤第一笔已落**：pack 长出 client 面（`src/client/`：侧栏品牌槽 + **会话头部任务板**）+ `DSH_CLIENT_TITLE`
 构建期品牌——见 `notes/implemented/2026-09-22-client-face-brand.md`。
 观察窗：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。
