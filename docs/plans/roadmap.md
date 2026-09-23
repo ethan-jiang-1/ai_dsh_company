@@ -14,7 +14,15 @@
   不做自主节律（提 upstream seam，不自建调度器）。出处 =
   [twin-cultivation-and-self-learning](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md)（已毕业）。
   验收 = 一次完整回路：动议结束 → journal 有教训 → 人提升进 pack skill → 三道门禁 + 探针全绿，且旧会话不受影响。
+- ⏸ **UX 打磨**（feature 型；R5b 收尾预期）：用户验收口径「DEMO 水平是够了」——驾驶舱/在场板
+  的交互打磨、demo 分镜的观感细化；范围待该条目 Plan Mode 时定（产出 = 收尾 Note 的验收节）。
 - ⏸ **整治转待办**（R6 销账落入；低优先）：
+  - 下次「磨」的输入 = R6 Note「审计覆盖缺口」清单（presets.md 三方比对 / research 即时性 /
+    0001、0003 深读 / guides/50 旋钮复校 / journal 行号全量 / snapshots 差异——清单住收尾 Note，不复制）。
+  - 编号方案（N1）：design/guides 目录编号与顶层合同双体系二选一（命名合同遗留，R6 Note 登记）。
+  - **升 pin**（触发型：上游出新 tag 时跑 `scripts/sync-dsh.mjs --pin`，合同 docs/release.md）——
+    含 teammate footgun 残留处理（delegation.md §4.4）与搁置池顺手回看。
+
   - notes/implemented 归档层评估（原 r5-plus §7.4 迁入）：候选 = repo-scaffolding / docs-layering / dev-loop-guide / wochen-naming / r0-loop-acceptance / r1-docs-sync；仍带活判据的六篇（r3-reporting-line、skill-root-isolation、client-remote-single-mount、r2-roles-alive、r2-motion-run、r1-deploy-findings）不要动。
   - COO 产出模板指认改齐（W3）：pack persona + 三 skill 从 `review-note.md` 改 `ops-review-note.md`（CHARTER 勘误已裁定）；改齐后 CHARTER 勘误行可移除。
   - invest-mobile-complement 两篇 journal 补记或登记豁免（W8）：手册「收工留痕」vs 实盘缺 vp-eng/vp-sales 纪要。
