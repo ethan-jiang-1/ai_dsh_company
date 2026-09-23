@@ -76,8 +76,7 @@ subagent child 不在名册上 ⇒ **continuable child 在 CEO 会话里既发�
 3. **并行快捷派活**（同时开几个 VP 不等结果）在本组合里没有干净解法：continuable 管不了、
    one-shot 前台串行。要它得等上游 seam（per-child composition / 不撞名的控制面），
    **本仓不自建**（D13）。
-4. **同一 footgun 还在别处**：CEO preset 的 `subagent` 行仍是 `continuable`，而 VP 根会话没有控制行
-   ⇒ 那些 child 同样管不了。留待下轮统一，**不在 R3 顺手改**（会动到 teammate 的 worker 行为）。
+4. **控制面现状**：四个职能 preset 已补 `tool-subagent-control` + `.../list-agents`（R4；上游成对形状——vendor 的 maybeInstall 只对 team 成员装团队版控制名，职能根会话不是成员）；CEO preset 不放全局控制行（team-scoped 死行，有反向守卫）。**残留**：teammate 共享 CEO preset，其 `subagent` 与 team shadow 相冲——随升 pin 处理（`scripts/sync-dsh.mjs --pin`）。
 
 ## 5. UI：委派工具卡
 
@@ -101,10 +100,10 @@ subagent child 不在名册上 ⇒ **continuable child 在 CEO 会话里既发�
 | 真页面挂载 | `node scripts/client-load-smoke.mjs`：真浏览器加载真页面，零 loader 错误 + 品牌在场 | client 入口 apply 抛错（slot 名写错会在这里炸，postmortem 0003） | 客户端改动 |
 | 机制 / 边界 | `node scripts/delegation-smoke.mjs`（1 条 prompt ≈30s）：`vp_eng`/`vp_sales` 在模型可见目录 + 三个控制名仍是团队版；`--delegate` 多 1 条 prompt **真委派一次**，断言前台拿到 child 正文（不是 `started subagent`） | shadow 边界变了就红（提示重评 one-shot 决定）；委派出稿的**前台语义** | 轮末 / **升 pin 时** |
 | 挂载（上线前门禁） | `node scripts/preset-smoke.mjs` | 行 config 校验（preset 挂载失败，postmortem 0001） | 轮末 |
-| 端到端（**未做，留给 R5**） | 模型真调 `vp_eng` → 真 UI 对话流里的委派卡 | "模型→工具→卡片"全链路 | R5 replay harness |
+| 端到端（**已交付，R5a**） | 模型真调 `vp_eng` → 真 UI 对话流里的委派卡 | "模型→工具→卡片"全链路 | `replay-smoke --ui`（无 key 重放 + ariaSnapshot 金样） |
 
-**为什么端到端留给 R5（R3 试过并否决，别重走）**：先做的是"真浏览器 + 真 composer 驱动模型"
+**为什么端到端走重放而非每轮真跑（R3 试过并否决）：**先做的是"真浏览器 + 真 composer 驱动模型"
 的 e2e，240s 都等不到卡片——CEO persona 的开工仪式先烧 5–6 步模型往返，且**依赖模型配合**
 （模型不调那个工具就永远绿不了）；改成"RPC 造证据 + 真浏览器只做渲染断言"后，又卡在侧栏
 **会话列表成员/排序**（RPC 建的会话不在侧栏可见行里，属无关的 UI 细节）。结论：这条链的正确
-形态是 **R5 的 replay harness**（录制会话 → 无 key 重放），不是每轮真跑。
+形态是 replay harness（录制会话 → 无 key 重放；R5a 已交付），不是每轮真跑。

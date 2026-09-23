@@ -8,7 +8,7 @@
 3. **preset id 不变**（`ceo`/`vp-eng`/`vp-sales`/`coo`，kebab）：id 受
    `PRESET_ID = /^[a-z0-9][a-z0-9-]*$/`（`preset.ts:18`）限制，**下划线与大写都不合法**——
    所以 `wochen_CEO` 只能是显示名，不能是 id。
-4. **角色层级不动**：CEO 是个体、VP 是职能（[40 §0.1](../docs/design/40-role-content-plan.md)），
+4. **角色层级不动**：CEO 是个体、VP 是职能（[40 §0.1](../../docs/design/40-role-content-plan.md)），
    本次只加系列前缀，不改 persona 框架。
 
 ## 输掉的方案

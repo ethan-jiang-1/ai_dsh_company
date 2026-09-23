@@ -142,73 +142,8 @@ repo 内为自由区；工具状态（缓存/store/配置）一律**先重定向
 
 ## 当前状态
 
-**R0 立环 ✅ / R1 两人公司 ✅ / R2 五角色全员 ✅ / R3 汇报线 ✅ / R4 成品流程 ✅ / R5a 门禁与发布 ✅（2026-09-23）/ R5b 驾驶舱 ✅（2026-09-23）。
-下一轮 **R6 内容诊治 ▶**（再后 R7 分身成长；见 `docs/plans/roadmap.md`；
-迭代按垂直轮 D11，每轮换全新对话上下文）。
+当前条目 **R6 内容诊治 🔄**（2026-09-23 开工；章程与增补 = `docs/plans/roadmap.md` R6 行 + 维护规则 D21/D23；诊断件 `docs/plans/content-corruption-audit.md` + `process-deviation-audit.md`，销账后删除）。
 
-**R5b 交付（外部可观察）**：① **驾驶舱页签**——Company 右栏页签：组织在场板（lead + 分身行 =
-显示名 /「团队内」中文状态 / 当前任务 subject）+ 差分动态流；数据 = `remote.agentTeams.view(lead)`
-拉式（挂载即拉 + 5s 轮询），纯读模型 `packages/company-pack/src/lib/presence.ts`（14 条 keyless
-单测）；**行可点进成员空间**（照官方 `openTeammate` 模式）。Q5–Q8 开工前钉死（**D22**；定案与
-证据 = 提案 §四个定案：主键 team roster——"会话×preset"被录制证伪 / 冷启动拉式 RPC / 中文映射 +
-团队限定 / 入口 = 行可点）。② **r2-motion replay 场景**（五会话形状 + `replayJudges: presence`
-判据档）默认档绿 + `--ui` 驾驶舱端到端绿（无 key 33s：页签 / 5 行 / 列头 / 点行切会话）；
-replay-smoke 泛化多 child。③ 认证档全绿：client-load / preset-smoke / r3 --ui 回归 11 PASS；
-判据 3 真模型时间线（排练场 2 分身：22s running → 28s 任务 subject → 217s completed）。
-收尾记录 `notes/implemented/2026-09-23-r5b-cockpit.md`。
-
-**R5a 交付（外部可观察）**：① **无 key replay harness**——`scripts/replay-smoke.mjs`（P1.1 窄研究
-→ P1.2 落地 → P1.3 委派卡端到端）：默认档 = 会话日志归一化零 diff + sidecar×4（system-prompt /
-tool-schemas expected）零 diff；`--ui` 档 = 真浏览器加载真页面（连接工作区 → 搜索开会话 → 展开轮次组）
-→ centerCol ariaSnapshot 金样（`snapshots/r3-delegation/replay/ui.expected.md`）+ 委派卡可访问名断言；
-**红证** = 摘场景组合 `company-client` 行三连红。② **发布欠账闭账**——pack manifest 改
-**peerDependencies**（17 个，不钉死）+ `dsh.compatibility.dshReleases` 矩阵 + description 五角色；
-`pnpm verify` 新门禁 `pack-compat`（升 pin 忘加矩阵列即红，已反证）+ preset-row-deps 改读 deps ∪ peers。
-③ **`release-smoke`**（构建 → npm pack → 干净 profile → `plugin add` → boot 冒烟，真实安装形状）
-与 **`sync-dsh`**（检查模式 + `--pin` 升级环）出生；合同 = `docs/release.md`。
-收尾记录 `notes/implemented/2026-09-23-r5a-gates-and-release.md`。
-
-**轮间待办①② 已落地 ✅（2026-09-22，见 `notes/implemented/2026-09-22-team-assembly-and-rehearsal-split.md`）**：
-① 按问题组队——CEO 新 skill `assembling-the-team`，双向对照两场全过（两职能不超编 / 四职能不漏人），
-兼作 U1 活体探针（结论：skill 改动**只有新会话生效**）⇒ **R7「分身成长」前置全清**；② 练习场 ≠ 运行场——
-排练/探针默认 cwd 已换 `dev/rehearsal-workspace/`（真盘零新增验收过两道）。
-
-**R4 交付（外部可观察）**：交付物三态有**机器判据**——`scripts/lib/deliverables.mjs`（纯逻辑）+
-`scripts/deliverables-check.mjs`（运行场入口，解多帧 zstd）。规则：成品 `deliverables/<slug>/final.md`
-必须回溯到一次 **Lead（CEO）会话**的 `present`；过程稿 `deliverables/<slug>/drafts/<角色>.md`；
-排练/探针产物不进 `deliverables/`。合同家 = `company-workspace/AGENTS.md`「交付物三态」（随每个成员
-会话首帧注入 ⇒ 模型可见）。运行场已是三态形状（**6 成品 / 12 过程稿 / 0 违规**）；模板即流程
-（`prd.md`/`weekly-report.md` 补齐、18 处产出路径改到 `drafts/`）；R3 留的 `subagent` footgun 关掉。
-收尾记录 `notes/implemented/2026-09-22-r4-workshop-flow.md`；端到端归档 `snapshots/r4-motion/`。
-
-**R4 判据的三个设计决定（别随手改）**：① **成品归 Lead**（`agentPreset=ceo` 且 `delegationDepth=0`）
-——依据是公司手册的承诺权，且实测 R2 里 CFO 也 `present` 过 3 次，不限归属则过程稿与定稿平级；
-② **按交付物身份（`slug` + 角色）比对，不按字面路径**——那是给三态迁移留的桥，否则迁移一次就把历史
-证据全判成 dangling（假阳性）；③ **反向检查只追 Lead 声明**，非 Lead 的成品声明只在它**此刻真躺在
-盘上**时判越权（历史行为不追着报，否则一次越权永久污染此后每轮审计）。
-
-**R4 关掉的 footgun 与残留**：四个职能 preset 补 `tool-subagent-control` + `.../list-agents`（上游
-成对形状）——vendor 实证：`tool-agent-team` 的 maybeInstall 只在 `tryMembership != undefined`
-（团队成员）时装团队版控制名，而职能**根**会话不是成员 ⇒ 不补就是"既没团队版也没全局版"，continuable
-child 失联。CEO preset 保持不放（team-scoped，死行，有反向守卫）。**残留**：teammate 共享 CEO preset，
-那里的 `subagent` 仍与 team shadow 相冲 —— 与升 pin 一起处理（`scripts/sync-dsh.mjs --pin`；
-`docs/delegation.md` §4 第 4 条）。
-
-**门禁分层（R3 立，R5a 扩）**：见 `docs/guides/60-dev-loop.md` §9.1——**真模型/真浏览器不进迭代环**，且
-**有机械门禁**（`tests/layering.spec.ts`：回归层出现子进程/浏览器/网络/密钥即红，且 replay lane
-不得被 import/编进任何 vitest 配置——R5a 双红证）。迭代环 = `pnpm verify` + `pnpm test`
-（**53 条 ≈0.3s**）；认证档（`preset-smoke` / `client-load-smoke` / `delegation-smoke` /
-`handbook-smoke` / `probe-smoke` / `presence-e2e-smoke` / `replay-smoke [--ui]` / `release-smoke`）**每轮一次**，按改动面选跑；
-端到端真 UI = `replay-smoke --ui`（R5a 起就绪）。
-
-**观察窗**：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。**dev profile 的 pack 是
-`link:` 符号链接**（2026-09-22 起，`node_modules/dsh-company-pack` → 仓库源码）：改 `presets/**` /
-persona / skills **即刻生效，无需重装**（新会话生效边界见 U1 探针结论）；只有改 pack 依赖或 bundle
-行才需要重装。profile 的 `.npmrc` 已把 store/cache 钉在 repo 内（`~/Library` 不再被碰）。
-**真实安装形状的验证 = `release-smoke`（R5a 起，合同 `docs/release.md`）**。新增的行插件要进
-pack 依赖声明（R5a 起 = peerDependencies）与 lockfile（R4 为此踩过一次）。
-**皮肤已落**：pack 的 client 面 = 侧栏品牌槽 + 会话头部任务板（活面板）+ 委派工具卡 + Company
-驾驶舱页签（右栏：组织在场板行可点 + 差分动态流，R5b）。
-**R4 留下的一笔（别丢）**：**journal 回溯压缩决定不做**——规则已立在公司手册「轮末收敛」（已闭轮的
-journal 压成 CHARTER 一条附录，只由人做），但 R1/R2 的 38 篇角色记忆**保留不压**（理由见 R4 Note：
-提案这条无证据、结构异质、且它是 D8 唯一的跨会话记忆、R7 培养回路正建立其上）。
+- 已闭轮的交付、判据与设计决定：唯一事实家 = `docs/00-index.md` 台账（D 号）+ `notes/implemented/` 收尾 Note——本节不复述。
+- 门禁分层（迭代环秒级 / 认证档每轮一次按面选跑）：权威家 = `docs/guides/60-dev-loop.md` §9.1。
+- 环境要点（观察窗 / `link:` 安装 / 双 home / 排练场）：guides/60 §6–§7；真实安装形状 = `release-smoke`（合同 `docs/release.md`）。

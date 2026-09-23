@@ -124,8 +124,18 @@ company-workspace+notes 11、命名横切 2。
 
 ## 覆盖缺口（销账时顺带或明确不做）
 
-- release.md 版本号未对 package.json 核；presets.md↔CHARTER↔persona 三方逐字比对；research/ 三篇正文即时性；postmortem 0001/0003 深读；guides/50 旋钮默认值对 vendor 复校；journal 行号引用未全量；snapshots 与 live 盘差异未逐项。
+- ~~release.md 版本号未对 package.json 核~~（已核：0.2.0 = 0.2.0 ✓，无发现）；presets.md↔CHARTER↔persona 三方逐字比对；research/ 三篇正文即时性；postmortem 0001/0003 深读；guides/50 旋钮默认值对 vendor 复校；journal 行号引用未全量；snapshots 与 live 盘差异未逐项。
 
 ## 销账记录（P2 填）
 
-（修掉 ✅ / 转待办 → 队列行 / 明确不做 → 理由）
+**执行分批（预排，批准后按序）**：
+批次① docs 删并 ✅（2026-09-23）：D1–D4（r5-plus 删除 + §7.4 迁队列 + 四处入链修复）、A1–A5（当前状态 214→149 行）、B1–B4（roadmap 202→157 行 + 队列引导节出生）；verify ALL PASS。
+批次② 导航与指南 ✅：C1–C3 + release.md 补行 + C4 映射注删除（00-index 148→131 行）；E1–E5（guides/60）；F1–F3（guides/50）。顺手加修：N2 覆盖状态节去日期 + "方案已定"改"已沉淀"。
+批次③ 设计与合同 ✅：G1/H1/I1/I2（10/30/40）+ J1/J2/K1/K2/L1/M1/M2（profile/delegation/presets/demo）；顺手加修 profile:35 "四角色"→"五角色"（G1 同类）。
+批次④ workspace 与 notes ✅：W1/W2/W6/W7 修（org.md 指针 / COO CHARTER 流程载体 / 两条断链补跳 / intents 补 3 行 backfill）；W3/W8/W9/W11 + §7.4 转待办落 roadmap §队列。
+剩余：N1 → P4 合同（编号方案）；P4 项（A7 纪律表替换 + G2 节奏语 + B4 收尾程序迁家）随转型落盘。
+批次① docs 删并——r5-plus §7.4 转待办 + 整文件删除 + 修入链（D1–D4）；AGENTS.md 当前状态压缩（A1–A5，P4 纪律表另批）；roadmap 三段历史折叠（B1–B4）。
+批次② 导航与指南——00-index（C1–C3 + release.md 补行）；guides/60（E1–E5）；guides/50（F1–F3）。
+批次③ 设计与合同——design 10/30/40（G1/H1/I1/I2）；profile/delegation/presets/demo（J1–M2）。
+批次④ workspace 与 notes——W1/W2/W6/W7 修；W3/W8/W9/W11 转待办落队列；N1 进 P4 合同。
+每批收尾跑 `pnpm verify`；批间不动代码面。

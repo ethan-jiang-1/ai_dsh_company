@@ -12,7 +12,7 @@
 
 你的方向合理，但有一个关键的概念纠偏：**"角色"的 DSH 原生载体是 agent preset（组合文件），不是插件（代码包）**。
 正确形状：Option A 独立 repo + **一个 company pack**，pack 里 host/profile 层放共享行，
-`presets/ceo|vp-eng|vp-sales|coo/` 每角色一个薄 preset（persona + 角色 skills + 角色工具行）；
+`presets/ceo|vp-eng|vp-sales|coo|cfo/` 每角色一个薄 preset（persona + 角色 skills + 角色工具行；五角色 R2 定稿）；
 协作用 DSH 已有的通道（delegation / Agent Teams / workflow），不自造调度器。
 "每角色完全隔离的 skills 面"和"角色间深度协作"在 DSH 里是一对真实的张力（见 §4 分水岭），
 要按场景分层选通道，不能指望一个机制同时给到极致。
@@ -264,7 +264,8 @@ ai_dsh_company/
 │       │   │   └── skills/       # CEO 专属 skills（战略、会议主持、任务拆解……）
 │       │   ├── vp-eng/           # 同构：persona + skills/（研发管线、技术评审……）
 │       │   ├── vp-sales/
-│       │   └── coo/
+│       │   ├── coo/
+│       │   └── cfo/
 │       └── src/                  # 自定义工具/服务（org_chart、公司检索……有了再建）
 ├── company-workspace/            # 运行时"公司共享盘"：会话的 cwd（gitignore 运行残留）
 │   ├── kb/                       #   活 KB（handbook、各角色 wiki……）

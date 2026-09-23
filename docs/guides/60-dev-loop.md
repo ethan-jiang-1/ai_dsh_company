@@ -43,8 +43,7 @@ AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ plans/
 4. **跑最小证据**：起步 `pnpm verify` + `pnpm test`（keyless 回归）；有行为测试后只跑"会为这次
    回归而失败"的那个 + typecheck，不默认全量。
 5. **沉淀**：门禁守住的事实进 docs/（只写 now），选择进 Note。
-6. **只报告实际跑过的检查**：没跑的不算数。
-7. **完成定义 = 该面最小"真检查"通过，且发现权在你（代理）一侧**（D15，社区与宿主复盘一致结论）：
+6. **只报告实际跑过的检查；完成定义 = 该面最小"真检查"通过、发现权在代理一侧**（D15）：没跑的不算数。
    配置/preset 类改动 → `node scripts/preset-smoke.mjs`（**真挂载**；dump/扫描不算证据）；客户端类
    改动 → 查 boot 清单依赖闭环；`agent-instructions` 注入类改动 → `node scripts/handbook-smoke.mjs`
    （断言指令基线 = `company-workspace/AGENTS.md`，未混入开发仓库那份）；**在让用户看 UI 之前，先用机器验证过**。把"你看一眼"当验收手段
@@ -71,7 +70,7 @@ proposed Note 在同一 diff 改写为 implemented，不留到交付后。
 | 3.8 **Web RPC 层（R1 实证）** | **UI 静默失败（"新建会话没反应"）→ 直接打 `session/create` RPC 拿真实错误** | UI 不显示 preset mount 失败；RPC 会返回 `agent-preset/invalid` + 具体行与缺失字段（R1 实证：工具行缺必填 config，如 `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`——**抄 shipped preset 的行要连 config 一起抄**）。驱动方法见 §8 |
 | 3.9 **客户端模块层（R1 误诊 → R2 更正，postmortem 0003）** | **症状"整窗只剩 HARNESS / Failed to load plugins 错误屏"→ 某个 client 入口 apply 抛错，砖的是全 app** | ① client 入口失败**不静默**：BootPage 错误屏 + 浏览器 console 有 `failed to apply loader entry <id> (<name>)`；先跑 `node scripts/client-load-smoke.mjs`（headless 浏览器断言零挂载失败 + 品牌在场）。② `dsh.client.inject` 是 **informational only**（vendor `packages/client/AGENTS.md`）：不排序、不 gate 加载——"inject 引用了不在 entries 里的包" ≠ 挂不上；shell baseline（`platform.ts` 的 `PLATFORM_MODULES`：react/cordis/store/ui-slots/ui-primitives/ui-dockkit）隐式回答这些名字（R1 曾据此误诊"官方 Team UI 挂不上"，实为可用）。③ 真正"挂不上但没报错"的形态是 fiber **PENDING**（声明的服务无人提供，无超时，贡献安静不出现）。④ 复用别人已挂的贡献（如官方 Team remote）：走服务 inject 等它，**别重复 `$mount`**——同一描述符挂两次 = `already mounted` = 全 UI 砖（2026-09-22 实证） |
 | 4 会话层 | 读会话 JSONL，不猜 | model-visible ⟺ logged：上下文组装问题从日志（`$DSH_HOME` 下 sessions）重建；读不全 = 欠了 §3 第②问的债。⚠ bash 沙箱对会话文件有**间歇视图抖动**（列出得、打开不得），且 headless 会话收尾会删目录——分析要趁进程活着时做（R1 实证） |
-| 5 回归层 | snapshot 重放（R5 起） | `snapshots/`；回答"行为为什么变了"的最快路径 |
+| 5 回归层 | snapshot 重放（R5a 起） | `snapshots/`；回答"行为为什么变了"的最快路径 |
 
 诊断方法论补一条（R1 血泪）：**栈采样先于二分**——`sample <pid> 3` 看主线程，kevent 空转 =
 "等一个不会来的事件"（watcher/未 resolve 的 Promise），CPU 满载 = 死循环；这比砍配置二分快得多
@@ -125,7 +124,7 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibil
 |---|---|---|
 | ~~现在（零 JS，R0–R2）~~ | 无——pack 无代码，不存在依赖声明错误面 | [10-architecture.md](../design/10-architecture.md) §2.1 |
 | R3+（pack 有 `src/`）✅ R5a 已补 | `@deepseek-ai/cordis` + 用到的 `@deepseek-ai/dsh-*` 作 **peerDependencies**；拒绝精确钉死（pre-stable API，钉死 = 每次上游同步逼发版） | FAQ 13 research.md 生态失败样本 |
-| R5（发布）✅ R5a 已补 | `dsh.compatibility` 矩阵；`npm pack` → 干净 profile → `dsh plugin add` 冒烟（`release-smoke`） | [roadmap.md](../plans/roadmap.md) R5；合同 = [release.md](../release.md) |
+| R5a（发布）✅ 已补 | `dsh.compatibility` 矩阵；`npm pack` → 干净 profile → `dsh plugin add` 冒烟（`release-smoke`） | [roadmap.md](../plans/roadmap.md) R5a 行；合同 = [release.md](../release.md) |
 | OpenSpec 引入 | 触发条件：**第二贡献者进场**或**向 DSH 上游提 seam**（配合 D9 走方案 B）；此前 notes/ 纪律够用 | FAQ 13 answer.md 决策 5 |
 
 ## 6. 双 home 与双 DSH 操作细节
@@ -224,7 +223,7 @@ node scripts/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团
   内容改动即刻生效；profile `.npmrc` 把 store/cache 钉在 repo 内，`~/Library` 不被碰。
   历史：file: 拷贝时代首次装会拦 koffi 构建审批 → profile 的 `pnpm-workspace.yaml` 改
   `koffi: true` 再装；link: 下 profile 不再装 koffi，koffi 由源码域解析）。观察窗默认端口 3080，**与本 GUI 冲突**，用
-  `-- --port 3081`。preset roster 出现在 UI 的 CUSTOM 区（四个角色）。
+  `-- --port 3081`。preset roster 出现在 UI 的 Built-in 组（五角色；trust 分组见上文 R1 坑注）。
 - **bundle 叠加的重复行 id**（R1 实证）：web-app 已 insert `agent-presets`，pack 再 insert 同 id
   → `duplicate loader entry id` 硬拒。修法：对已存在的行用**替换**语法（`- id:`），只有真正
   新增的行才 insert。
@@ -291,7 +290,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
   `list(_request, signal)` → **`args._request`**（占位参数的下划线也要照写）。
 - 常用：`session/create`、`session/prompt`、`session/list`、`agentPresets/list`。
 - **`ask_user_question` 的回答不走 RPC**（走 wire）——脚本化跑到提问就会停下等真人；此时去 UI 里答。
-- 这条通道也是 R5「web 快照 lane」的雏形。
+- 这条通道也是 R5a「web 快照 lane」的雏形。
 
 
 - **读会话日志**用 `scripts/lib/session-log.mjs`（page 与事件解析的共用实现）。两个坑：`session/page`
@@ -338,7 +337,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） | 轮末 / **升 pin 时** |
 | **重放 lane（第三档，无 key）** | ~11s | `replay-smoke`（默认：会话日志 + sidecar 零 diff）；`--ui`（+真浏览器委派卡端到端）——**要起进程与浏览器但不花模型钱**，故只由 `scripts/replay-smoke.mjs` 驱动、不进 `pnpm test`（机械门禁见下） | replay/组合/委派卡改动 / 轮末 |
 | 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→boot 冒烟；合同 [release.md](../release.md)） | pack 依赖/发布面改动 / 轮末 |
-| 认证档（真模型） | 分钟级 | `preset-smoke` / `probe-smoke` / `handbook-smoke` | **每轮一次**，产出归档；不进回归 |
+| 认证档（真模型） | 分钟级 | `preset-smoke` / `probe-smoke` / `handbook-smoke` / `presence-e2e-smoke` | **每轮一次**，产出归档；不进回归 |
 
 **三条硬规矩**：
 
@@ -351,10 +350,10 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 2. **能做成纯函数就做成纯函数**：UI 组件把"展示事实"抽成纯函数（范本 `delegationCardModel`），
    keyless 单测直接断言它——组件层就永远不需要模型与浏览器。
 3. **认证档要能"重放"而不是"重跑"**：真模型跑一次 → 会话日志归档 → 后续用归档做回放断言
-   （R5 replay harness）。**重跑只在升 pin 或行为确实要改时做**；R3 的委派卡端到端（模型→工具→卡片）
-   就留给 R5 的 replay harness（试过的慢 e2e 已否决，原因见 delegation.md §6）。
+   （R5a replay harness）。**重跑只在升 pin 或行为确实要改时做**；R3 的委派卡端到端（模型→工具→卡片）
+   就留给 R5a 的 replay harness（试过的慢 e2e 已否决，原因见 delegation.md §6）。
 
-**回归层预算**：`pnpm test` 墙钟 **< 5s**（当前 22 条 ≈2s）。超了先怀疑"有人把模型/浏览器塞进来了"，
+**回归层预算**：`pnpm test` 墙钟 **< 5s**（秒级；实测量见最近收尾 Note）。超了先怀疑"有人把模型/浏览器塞进来了"，
 拆层而不是加超时。
 
 ## 10. 自动化只许是轻任务（硬上限，不许无限跑）

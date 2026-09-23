@@ -49,7 +49,7 @@ shipped 槽位树里我们值得占的位置：
 
 | 槽位 | 我们放什么 | demo 价值 |
 |---|---|---|
-| `sidebar.right.pane.tab` / `ctx.sidebarRightTabs.register` | **Company 页签**：组织架构图（CEO→四 VP→workers）+ 协作动态流（谁给谁发了什么消息、任务状态迁移）+ 交付物画廊 | 一屏看全局，这是 demo 的"驾驶舱" |
+| `sidebar.right.pane.tab` / `ctx.sidebarRightTabs.register` | **Company 页签**：组织在场板（lead + 分身行，行可点进成员空间）+ 协作动态流（成员/任务差分；**消息级聚合在搁置池**，见 roadmap §搁置池） | 一屏看全局，这是 demo 的"驾驶舱"（v1 已交付，D22） |
 | `tool.call.toolview`（keyed，按工具名） | **委派工具卡**：`vp_eng(...)` 调用渲染成"给 VP-Eng 的 brief 卡"（任务进、结果出、状态流转）；team 工具同法 | 让"派活/交稿"在对话流里有公司语义的皮 |
 | `conversation.session.header.actions` | Company 动作入口（打开驾驶舱、展开当前任务的 lineage） | 快捷入口 |
 | `conversation.session.header.lineage` | （可选）会话头显示组织汇报线 | 视觉强化"这是 VP-Eng 的会话" |
@@ -94,7 +94,7 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
    给 VP-Sales 发消息对齐；VP-Sales 会话里看它回消息。
 5. 回 CEO 会话：`wait_agent` 等各方完成、读板收口、合稿。
 6. `present` → 交付卡片出现，点击右栏预览成品文档。
-7. （v1 皮肤上线后）右栏 Company 页签全程开着：组织图 + 消息流 + 任务迁移一屏流动。
+7. 右栏 Company 页签全程开着：在场板 + 差分动态流一屏流动（v1 已交付，R5b；消息级聚合在搁置池）。
 
 ## 4. 开发环与坑
 

@@ -20,7 +20,7 @@
    `pnpm-workspace.yaml` 预置占位（`koffi: set this to true or false`），改成 `koffi: true` 后重装。
 3. **`file:` 副本是硬链接**（R1 更正）：profile 里的 pack 文件与源文件**同 inode**——改**已有文件**
    自动同步（不必 `cp`）；只有**新增文件**（新 preset/skill 目录）与**依赖变化**才需要
-   `plugin add`（必要时先 `remove` 强制重解析；bump 版本也会触发）。正式形状 R5 release-smoke 验证。
+   `plugin add`（必要时先 `remove` 强制重解析；bump 版本也会触发）。正式形状 `release-smoke` 验证（合同 = [release.md](./release.md)）。
 4. **patchReload 必须 `'startup'`**（R1 实证）：自定义 profile 默认 `'live'`（热重载 watcher
    常驻）——headless 动议会跑完但进程永不退、stdout 不 flush。company profile 的
    package.json 已改 `"patchReload": "startup"`；将来 web 观察窗 profile 才用 live。
@@ -32,15 +32,14 @@ preset roster 的 `roots` 已改**自定位**（`!!js` + `baseUrl` 解析到本�
 
 | 行 | 语义 | 状态 |
 |---|---|---|
-| `agent-presets`（insert；roots 自定位 + default: ceo） | preset roster；四角色 presets 随包安装 | ✅ dump 实测在列 |
+| `agent-presets`（insert；roots 自定位 + default: ceo） | preset roster；五角色 presets 随包安装 | ✅ dump 实测在列 |
 | `session-persistence-jsonl` | 会话持久化；team 激活前提 | ✅（base 已有，bundle 确认语义） |
-| `tool-fs` / `tool-fs-search` / `tool-skill` | 共享工具面（base 已有） | ✅ |
 | `tool-present`（insert） | 交付物声明（deliverables 卡片） | ✅ dump 实测在列 |
 | `agent-team` + `tool-agent-team`（insert） | 团队协作主通道（M4/D4；直插行，无续驶冲突，10 §3 冲突注①） | ✅ dump 实测在列 |
 | `ui-agent-team`（insert） | 团队 Web 可视面：Team 按钮 / 名册 / 实时任务板 / 点进 VP 会话 | ✅ 前端加载列表含其 client 模块 |
 | `company-client`（insert，`name: dsh-company-pack`） | 本包 client 面：浏览器半注册 `sidebar.brand.name`（品牌皮肤） | ✅ 前端加载列表含 `dsh-company-pack/client.js` |
 
-R1 起按需增补 tool-bash / tool-web / tool-todo / compaction 行（[40 号](./design/40-role-content-plan.md)）。
+工具行走 preset 的自包含组合，不随 host bundle 增补（R1 实证，机制见 [10 §6 要点 1](./design/10-architecture.md)）。
 
 ## 已知开放点
 

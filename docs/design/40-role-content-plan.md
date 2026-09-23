@@ -2,7 +2,7 @@
 
 > 机制已定（[10](./10-architecture.md) / [20](./20-roles-isolation.md)）；本篇是**内容面**：
 > 五个角色到底"是谁、知道什么、会什么、产出什么"。demo 成败在这里，不在机制。
-> 状态：骨架——每节给了结构与要求，文案随垂直轮填写（R1 只写 CEO+VP-Eng，R2 补全另两位已定稿（落点 = [../presets.md](../presets.md) 合同与各 preset 文件））；填写时连同 Q2（模型路由）一起定。
+> 状态：已定稿——五角色内容随 R2 全员落地（现时语义 = [../presets.md](../presets.md) 合同与各 preset 文件；模型路由 = 全员同模型，D16）。
 
 ## 0. 设计原则
 
@@ -60,8 +60,7 @@
 
 ### 共享层（全员）
 
-- 全局 skill：`company-handbook`（公司使命/术语/决策礼仪——放 project `.dsh/skills` 或
-  `<dshHome>/skills`，见 Q3 待定边界）。
+- 全局指令：公司手册经 `agent-instructions` 行注入（基线 = `company-workspace/AGENTS.md`，D17；守卫 = `scripts/handbook-smoke.mjs`）。
 - `templates/`（workspace）：`prd.md`、`review-note.md`、`decision-memo.md`、`weekly-report.md`。
 
 ## 2. skills / KB 的落点（对照 10 §5 三载体）
@@ -74,7 +73,7 @@
 | 事实/客户/历史 | `company-workspace/kb/<role>/` | 活数据，fs 工具读取 |
 | journal（角色记忆） | `company-workspace/kb/<role>/journal/YYYY-MM-DD.md` | D8：文件即记忆 |
 
-## 3. 入戏探针（轮内最窄验证的剧本：R1 验 CEO/VP-Eng，R2 验新增两角色）
+## 3. 入戏探针（R1 验 CEO/VP-Eng；R2 新增 vp-sales / coo / cfo 三角色）
 
 每个角色独立会话（M1 模式）跑三个探针，全部通过才算"内容合格"：
 
@@ -86,10 +85,6 @@
 反例记录：探针失败的修法通常是 persona 太虚（改 persona）或 KB 没接上（改 skill 指引），
 不要先怀疑机制。
 
-## 4. 与待定问题的接口
+## 4. 已闭合接口
 
-- Q2（模型路由）：若 CEO 与 VP 分模型，写在各 preset 的委托工具/会话创建 `agentOptions`，
-  persona 文案不受影响（`{{model}}` 插值会自动跟随）。
-- Q3（KB 边界）：本篇 §1 各角色 KB 条目里，标注"随 pack 发布"还是"活数据"的初判，
-  定稿后把"随 pack 发布"部分移进 preset 目录。
-- Q4（demo 动议主题）：探针的 mini 任务应从第一场 demo 的动议里抽——先定 Q4 再填 §3。
+- Q2 → D16（全员同模型默认路由）；Q3 → D17（公司事实留 workspace 活数据，pack 只发方法论 skills 与结构模板）；Q4 → 已定 2026-09-22（动议见 [../demo.md](../demo.md)）。

@@ -1,6 +1,6 @@
 # 50 · 预算限流与 demo 运维
 
-> 四个角色 + 各自 workers 的组织会烧 token、会出状况。本篇收拢**限流旋钮**与
+> 五个角色 + 各自 workers 的组织会烧 token、会出状况。本篇收拢**限流旋钮**与
 > **demo 运维 runbook**（症状→动作），并给回放复盘的路径。数值默认值均核实自
 > DSH 工作树（`packages/experimental/agent-team/src/index.ts`、
 > `packages/subagent/tool-subagent/README.md`、`packages/workflow/workflow-worker-thread/src/runtime.ts`）。
@@ -9,12 +9,12 @@
 
 | 旋钮 | 默认 | 在哪调 | 对本项目的意义 |
 |---|---|---|---|
-| team `maxMembers` | 8 | host 行 config（startup 校验 fail-loud） | CEO+3 VP=4，留 4 个余量；扩编制才调 |
+| team `maxMembers` | 8 | host 行 config（startup 校验 fail-loud） | CEO+4 职能=5，留 3 个余量；扩编制才调 |
 | team `maxTasks` / `maxPendingMessagesPerMember` / `maxMessageBytes` | 256 / 64 / 64KiB | 同上 | 默认够一场 demo；消息超 64KiB 会拒（长稿走文件+消息里给路径） |
 | workflow `maxTotalAgents` | per-run 上限（tool/consumer 可压低） | `dsh-tool-workflow` 行 / 调用参数 | CEO 写循环脚本时的 runaway 保险；冲刺前显式设小 |
 | workflow 并发槽 | engine 配置（`acquireSlot`） | workflow-worker-thread 行 | 限制同时跑的 agent() 数 |
 | subagent `maxDepth` | 3 | `dsh-tool-subagent` 行 | 组织深度：CEO(0)→VP(1)→worker(2)→grand-worker(3)——默认够 4 层，别乱调大 |
-| `maxTokens`（每次请求输出上限） | adapter/route 默认 | 会话创建 `agentOptions` / 委托工具行 | Q2 定模型路由时一起定；防单角色长篇失控 |
+| `maxTokens`（每次请求输出上限） | adapter/route 默认 | 会话创建 `agentOptions` / 委托工具行 | 防单角色长篇失控（路由 = 全员同模型默认，D16） |
 | compaction 阈值 | preset 行配置 | 各角色 preset 的 compaction 行 | VP 长会话靠压缩保上下文；按角色差异化 |
 
 ## 2. 成本结构（每场 demo 的 token 面）
@@ -24,7 +24,8 @@
 - **脉冲成本**：workers（one-shot，随生随灭）、workflow 冲刺（脚本内 agent() 并发）。
 - **省钱杠杆**：① `fork` teammate 下发会议上下文，比"CEO 逐个转述 brief"省重复输入；
   ② 稳定事实放 KB 文件按需读，不进 persona（40 §0.2）；③ 长稿交割走 workspace 文件 +
-  消息里给路径（避开 64KiB 邮箱上限同时也省 token）；④ demo 彩排用 Q2 定的低成本路由。
+  消息里给路径（避开 64KiB 邮箱上限同时也省 token）；④ 需要压彩排成本时，在彩排动议的委托工具
+  `agentOptions` 上临时收紧（正式场不动——D16 默认全员同模型）。
 
 ## 3. demo 运维 runbook（症状 → 动作）
 
@@ -52,9 +53,7 @@
 - 升级纪律（experimental 漂移、`sync-dsh.mjs` 升级环、兼容矩阵）见 [10](../design/10-architecture.md) §8，
   不在此重复。
 
-## 5. 开工前检查单（Q4 定稿后执行）
+## 5. 开工前检查单
 
-- [ ] Q4 demo 动议主题定稿 → 40 §3 探针任务从中抽取
-- [ ] Q2 模型路由定稿 → 本篇 §1 的 `maxTokens`/路由行随之落
 - [ ] §1 旋钮按 demo 规模过一遍（默认值即可跑通，冲刺类动议显式压 workflow 总量）
 - [ ] §3 runbook 通读一遍（现场出状况时按表行动，不临场发明）

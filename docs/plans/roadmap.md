@@ -18,57 +18,15 @@
 | R6 内容诊治 | 🔄 进行中（2026-09-23 开工；插入原因与章程见维护规则，范围增补见 D23） | **内容诊治**（不交付新功能；两条线，同一目标 = **让今后的开发更舒适**）。**线 A · 内容腐化诊治**，五面：① **docs/ 全层**（计划层躺已 ✅ 的历史段、已闭合待定 Q 挂着、过期指代、r5-plus §5 型语义漂移）；② **AGENTS.md 入口链**（「当前状态」沉积五轮收尾快照、与 roadmap 轮间待办整段双写——违反「一处事实一个家，只写 now」）；③ **company-workspace**（公司手册 + kb 审计；**R4「journal 不压」决定默认不重开**，重开须带新证据提案）；④ **notes/ 指针核对**（状态行 / 归属 / 引用可达；**历史记录不重写**）；⑤ **docs/ 命名体系**（时间编码命名 → 主题命名，`r5-plus-readiness` 首案；命名规则进文档卫生合同）。**线 B · 流程对齐审计**：本仓是 DSH 研发纪律（D13）的**头一次实际使用**——对照**从 vendor 逐源枚举的全量纪律清单**逐条核对已闭轮实践（AGENTS.md 纪律表是记忆版，审计后替换；研究基线 = [research/2026-09-23-dsh-inround-task-surface](../../notes/research/2026-09-23-dsh-inround-task-surface.md) §二–§四）（届时 R0–R5b；**权威在 vendor 树**，不认本仓转述），抓两类偏差：没严格遵循的、把「灵活性」理解错的（哪些是允许的规模裁剪、哪些是违规偏离——弹性边界写清）；修正 = 改实践 / 改落点映射。新增两支：**过程可见性**（plan mode 呈批 + 实施期 todo_write——机制在场零纪律，落点候选 guides/60 §1 / AGENTS.md 纪律表）与**迭代模型**（垂直轮 vs DSH 连续流；D23 已定向 R6 后转 feature 流，审计定弹性边界与转型细节）。**审计先行**：先落两份清单——「腐化点清单」（线 A，逐文件逐类）与「流程偏离清单」（线 B，逐条纪律），诊断件本身是产物，细化琢磨都在清单上；量若超一轮按 D11 拆轮（R5→R5a/b 先例）。**定位 = 首次全量 + 把「磨」制度化，不承诺一次扫净**（卫生要磨几轮：本轮建防回堆机制，此后按机制磨）。**转型落盘（D23）**：R6 = 最后一个轮号——收尾交付 DSH 对齐 feature 流：plans 层队列化（条目按主题命名、**完成即离队**不标 ✅）、guides/60 改条目级开发环（含实施期 todo_write 纪律）、AGENTS.md 同步；R7「分身成长」转队列首条（范围与前置不变）；此后**默认严格 DSH 套路，偏离须登记 D 号 + 约束证据** | 两份清单先行落盘（先诊断后动手）；防回堆机械门禁**有反证**（故意造一处腐化 → `pnpm verify` 红、还原即绿）；入口链探针进**认证档**（真模型不进回归，guides/60 §9.1） | **入口链探针**：全新上下文 Agent 只读 AGENTS.md → 00-index → 本表，答 N 个「现在」问题（当前轮 / 下一步 / 某事实的家在哪等，题单轮内定）**零过期、零自相矛盾**，归档进 snapshots；**两份清单逐条销账**（修掉 / 转待办 / 明确不做，各有归宿）；**防回堆门禁进 pnpm verify** 且带反证记录（含 plans 层禁 ✅ 残留档）；**转型合同出生**（队列形态 + 条目生命周期 + todo 纪律落点 + 偏离登记制度） | 文档卫生合同（名字与落点轮内定：guides/60 / 00-index / 顶层新合同）；线 B 弹性边界结论落 AGENTS.md 纪律表 / guides；若收尾清单因此增「卫生项」则改本表收尾清单；流程合同（feature 流现在时，含防再犯五件套） |
 | R7 分身成长 | ⏸ 待命（**前置全清**：接线两条已落地、U1 探针并入轮间待办 ①；**排在 R6 内容诊治之后**；2026-09-23 前为 R6） | **培养回路**：改 `presets/<role>/` 即培养动作，生效边界 = 新会话，验收 = 三道门禁 + 该角色入戏探针；**学习载体**：journal 唯一，人审提升进 skills（照 DSH `human-review-skill-maintenance` 取舍），**否决分身运行时自改 skill**（隔离后已是机制事实）；**不做自主节律**（提 upstream seam，不自建调度器）（[proposed/twin-cultivation-and-self-learning](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md)） | U1 活体探针（✅ 已随轮间待办①完成：结论 = 三档之②「只有新会话变」，见 research/digital-twin §5.5）；培养回归：改一次角色 skill → 三道门禁 + 该角色探针全绿、**旧会话不受影响** | 一次完整回路：动议结束 → journal 有教训 → 人提升进 pack skill → 三道门禁 + 探针全绿，且旧会话不受影响 | 培养/学习合同（名字待定） |
 
-主通道不变（D4）：demo 主循环走团队（M4/通道 B）；通道 A 命名委托 R3 加入；M2（自定义
-provider）可选增强（触发条件见 [20-roles-isolation.md](../design/20-roles-isolation.md) §3）
-——**现进搁置池，见下**。
-UI 侧：v0（现成团队 UI）＝ R1 观察窗起、R2 进验收；委派工具卡（v2 薄片）提前至 R3，驾驶舱 v1 ＝ R5b（[30-ui-demo.md](../design/30-ui-demo.md) §5）；组织在场板是 R5b 的一个切片。
+## 队列（D23 条目制过渡形态；结构随 R6 收尾定稿）
 
-轮间待办（不占轮，R2 收尾后立刻做）：**接线修复两条**——① 五个 preset 显式关
-`includeDefaultRoots`，把角色私有 skills 与共享 skill 根隔离（今天仓库内无 `.dsh/`，陷阱是潜伏的：
-一旦有人往 `<repo>/.dsh/skills/` 放同名 skill，会以 rank 100 盖掉角色 skill 并对全公司生效）；
-② 补 `agent-instructions` 接线（D7 的"公司手册 → project root"载体目前是空的，先跑 U4 实证再定）。
-两条都不改变今天的可见行为，出处见
-[proposed/2026-09-22-twin-cultivation-and-self-learning.md](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md)。
-（这两条 R2 后已做：`includeDefaultRoots: false` 见
-[implemented/2026-09-22-skill-root-isolation.md](../../notes/implemented/2026-09-22-skill-root-isolation.md)；
-`agent-instructions` 接线见 `notes/implemented/2026-09-22-r2-roles-alive.md` + `scripts/handbook-smoke.mjs`。）
-
-轮间待办（R3 → R4）：**一条**——CEO preset 的 `subagent` 行仍是 `continuable`，而 VP 根会话没有
-控制行 ⇒ 那些 child 同样管不了（与 R3 否掉 continuable 命名委托是同一个 footgun）。统一处理
-（改 one-shot，或给非 team 会话补控制行），**前提是不动 teammate 的 worker 行为**。出处
-[delegation.md](../../docs/delegation.md) §4.4 + [R3 Note](../../notes/implemented/2026-09-22-r3-reporting-line.md)「未做 / 移出本轮」。
-
-轮间待办（R4 → R5a）：**两条，均已落地 ✅（2026-09-22，见
-[implemented/2026-09-22-team-assembly-and-rehearsal-split.md](../../notes/implemented/2026-09-22-team-assembly-and-rehearsal-split.md)）**。
-① **按问题组队（CEO 的团队成型方法）✅**——双向对照两场全过（两职能不超编 / 四职能不漏人），
-兼作的 U1 活体探针已完成（三档之②"只有新会话变"）⇒ **R7「分身成长」前置全清**；提案已毕业。
-原提案：[dynamic-team-assembly](../../notes/implemented/2026-09-22-dynamic-team-assembly.md)。
-用户观察经查证属实：
-CEO 只有 1 个 skill（`design/40` §1 计划 3 个），而现有那个从"DAG 拆解分派"开始 ⇒ **默认已经
-决定要开会**；实测四场动议的名单来源——R2 / 场景 B / R4 场景 C 全是**人在指定**（场景 C 的 prompt
-里直接写着"只要这两位"），而 `invest-mobile-complement` 那场**没人指定时是 4/4 全员**。
-⇒ "团队随问题成形"这个默认要修。交付 = 新 skill `assembling-the-team` + persona 加挂钩
-（**排在 `chairing-staff-meeting` 之前**）+ 把职能归属从旧 skill **搬走**（不并存）；验收 =
-**双向行为对照**（两职能动议不许超编、四职能动议不许漏人）+ 产物过三态判据 0 违规。
-**它同时就是下一条 U1 活体探针的实操**（改 `SKILL.md` → 新会话是否生效），做完 R7 的前置即全清。
-出处 [dynamic-team-assembly](../../notes/implemented/2026-09-22-dynamic-team-assembly.md)（已毕业）。
-
-> **U1 探针的最小步骤**（原「轮间待办 R5a → R6」，已并入本条 ①，不再另占一次动作）：改一次某角色
-> `SKILL.md` 正文 → 新会话再 `skill({ name })` 看正文是否变。源码层已答"下一轮生效"
-> （[skill-root-isolation](../../notes/implemented/2026-09-22-skill-root-isolation.md) 末节），此探针只为把 vendor
-> 内部两条陈述的冲突钉死；要一次真会话 ⇒ **认证档，不进回归**。步骤见
-> [r5-plus-readiness](./r5-plus-readiness.md) §9 P3 与研究笔记 §5。
-
-② **练习场 ≠ 运行场 ✅ 已落地（2026-09-22，同上 Note）**——排练/探针默认 workspace 已换
-`dev/rehearsal-workspace/`（四 smoke 脚本翻转 + rehearsal-init）；验收过两道：probe 后真盘零新增、
-两场带 spawn 的真动议跑完真盘仍零新增。原缺口记录：
-[implemented/workspace-hygiene](../../notes/implemented/2026-09-22-workspace-hygiene.md)
-第 3 条）——R4 的"做什么"列了它，**但没实现**（R4 收尾核对提案条目时发现：全仓 scripts / tests /
-packages / dev / 手册 / 指南**零痕迹**）。失败模式仍在，而且是判据**抓不到**的那一类：排练跑在真盘
-时，过程稿不受约束（`drafts/` 本就不需要 `present`），产物会安静地积在 `company-workspace/` 里
-——R4 W2 删掉的那 15 份污染文件正是探针跑在真盘的产物。交付 = 排练/探针的默认 workspace 换到独立
-目录（workspace 归属按 `SessionHeader.cwd`，机制天然支持）+ 写进 guides/60 与公司手册；
-**验收 = 用新默认跑一次探针后，真盘的 `deliverables/` 与 `kb/**` 零新增**（不是靠人记得不写）。
+- **分身成长**（原 R7 条目，⏸ 队列首条——范围与前置不变，全文见轮次表 R7 行与 D21/D23）。
+- **整治转待办**（R6 销账落入；低优先）：
+  - notes/implemented 归档层评估（原 r5-plus §7.4 迁入）：候选 = repo-scaffolding / docs-layering / dev-loop-guide / wochen-naming / r0-loop-acceptance / r1-docs-sync；仍带活判据的六篇（r3-reporting-line、skill-root-isolation、client-remote-single-mount、r2-roles-alive、r2-motion-run、r1-deploy-findings）不要动。
+  - COO 产出模板指认改齐（W3）：pack persona + 三 skill 从 `review-note.md` 改 `ops-review-note.md`（CHARTER 勘误已裁定）；改齐后 CHARTER 勘误行可移除。
+  - invest-mobile-complement 两篇 journal 补记或登记豁免（W8）：手册「收工留痕」vs 实盘缺 vp-eng/vp-sales 纪要。
+  - 互审稿命名钉一个系列（W9）：建议 `{role}-review`（与 reconcile-package 首例一致）；存量不动。
+  - 五份 CHARTER「收工动作」三态措辞对齐（W11）：交付物写 `<slug>/drafts/<角色>.md`。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
@@ -162,7 +120,7 @@ AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ 本表
   `⏸ 待命（排在 R5a 之后）`、R6 标 `⏸ 待命（前置全清；排在 R5b 之后）`（原先一个 `—` 一个 ⏸，
   读不出先后）；② 原「轮间待办（R5a → R6）」的 U1 探针**已并入 R4 → R5a ①**，撤掉那节重复块
   （同一件事不占两处，最小步骤改作 ① 下的引用块）；③ **R5b 开工前必须钉的四条决策升为
-  `docs/00-index.md` 待定 Q5–Q8**——原先只藏在 [r5-plus-readiness](./r5-plus-readiness.md) §9 P2，
+  `docs/00-index.md` 待定 Q5–Q8**——原先只藏在 r5-plus-readiness §9 P2（文件已删，R6 D1），
   而新会话开工动作读的是「00-index 台账 + 待定 Q」，藏着的决策等于没有；④ `00-index` 的**合同出生
   地图**改 R5 → **R5a**，并补 R5b（不单独出生合同）与 R6（培养/学习合同，名字待定）；⑤ `AGENTS.md`
   命令表补上 R4 新增的两个脚本（`deliverables-check` / `snapshot-motion`），并把散落的 `R5` 旧指代
@@ -199,4 +157,4 @@ AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ 本表
   R5b（驾驶舱）**——原来 4–5 个面塞一轮，最不确定的 replay harness 会卡住皮肤；② 新增
   **搁置池**（自主节律 / 并行快捷派活 / M2 / 界面外推送，四条都是"缺 upstream seam 或明确需求"）；
   ③ 轮间待办加 U1 活体探针（R5a → R6）。判据、证据与打磨细节见
-  [plans/r5-plus-readiness.md](./r5-plus-readiness.md)；台账 D19。
+  台账 D19。（原依据 r5-plus-readiness.md 已删——R6 D1）

@@ -17,7 +17,7 @@
 2. `pnpm dsh web -- --port 3086 --no-open`（3080 被 GUI 占用；启动横幅打印带 token 的 URL）
 3. 浏览器打开该 URL（**必须带 token**：直接开端口会卡鉴权）。会话列表按【工作目录】过滤——先选到 `company-workspace`，否则看不到本场会话。
 4. 新建会话：preset 选 **wochen CEO**（`ceo` 是 profile 默认）；工作目录 `company-workspace`
-5. 进“另一位成员的空间”：**teammate 的会话不在顶层列表**——在会话头部点 **Team 名册**，点成员名打开其会话（`sessions.openSubagent`，子会话）。显式入口是 R5 皮肤第一项。
+5. 进“另一位成员的空间”：**teammate 的会话不在顶层列表**——在会话头部点 **Team 名册**，点成员名打开其会话（`sessions.openSubagent`，子会话）。显式入口 = 驾驶舱在场板**行可点**（R5b 已交付，D22④）。
 6. 收场验收：`node scripts/deliverables-check.mjs`（交付物三态；审归档快照要配 `--only <slug>`，
    因为快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只有本轮日志）
 
@@ -36,7 +36,7 @@
 | 9 | 收尾 | 记账 | `kb/<role>/journal/` 各追加一篇 |
 
 **镜头纪律**：每一步先指"这是谁的空间"（会话头部/侧栏），再指"活怎么交接"（任务板 owner/依赖、
-消息记录）。跨空间的消息聚合视图在 R5 驾驶舱（30 §2），v0 靠各空间自己的对话流 + 任务板。
+消息记录）。跨空间动态：驾驶舱 v1 动态流 = 成员/任务差分（消息级聚合在搁置池，见 roadmap）；另可走各空间对话流 + 任务板。
 
 ## 验收判据（R2）
 
