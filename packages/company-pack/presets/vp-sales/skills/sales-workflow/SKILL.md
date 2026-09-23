@@ -13,6 +13,8 @@ description: VP-Sales 的工作流（1 号）：接到市场 / 客户任务的�
    【事实 / 假设】。
 4. **出稿**：`templates/decision-memo.md` 一页纸落 `deliverables/<slug>/drafts/vp-sales.md`，结论先行；"没人买"成立时
    在结论里行使 veto。
-5. **回执**：向任务板回状态与修订；向 `kb/vp-sales/journal/` 追加纪要。
+5. **回执**：向任务板回状态与修订；向 `kb/vp-sales/journal/` 追加纪要。评审他人稿时
+   **提问只到标注性质为止**（出处、性质、可执行性），不要求对方改数字；对方按我的意见
+   改了判据，对应保留当轮撤回。
 
 > 这是 VP-Sales 的第 1 个工作流；后续新工作流按 `sales-workflow-<主题>` 命名追加。

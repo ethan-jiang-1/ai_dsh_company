@@ -185,6 +185,12 @@
   均参与该动议（`drafts/` 有各自权威稿）但未留 journal——违反手册「收工留痕」。处置 = **补记**
   （优于豁免：drafts 是各自会话真实产出，据此回填不属编造）；两篇补记纪要鲜明标记【补记 2026-09-24】
   + 指认权威稿 + 细节以稿为准。
+- 2026-09-24（**培养轮 2（当夜）**）：候选余量 D/E/F 提升（D/F→CFO `project-economics`、
+  E→VP-Sales `sales-workflow`；证据 = `ent-agent-platform` journal；执行依据 = 用户"其他的你来
+  定夺"委托 + 睡前长程授权，可单 commit revert）；候选 C 仍留今后培养轮（跨角色载体 = 真分叉，
+  提案要点进晨报）。验证 = verify + test + preset-smoke + `probe --full` **15/15 全部命中**（含
+  §9 单题重试；该认证档同时覆盖 W3 的 COO 挂载）。收尾 Note =
+  [implemented/2026-09-24-cultivation-round-2.md](./notes/implemented/2026-09-24-cultivation-round-2.md)。
 - 2026-09-24（**entry-probe 判据时间不变化**〔整治转待办销账〕）：两案选**时间不变问法**（另一案
   "收尾程序加刷新步"否决——多一个会忘的人工程序，且同病同根「时变状态进时不变载体」）。Q1 判据
   弃锚条目名改断言路由 + 记录家（ROADMAP §队列 + 收尾 Note/台账/git）；Q2 改问「完成即离队」语义
