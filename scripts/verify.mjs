@@ -199,7 +199,10 @@ ok(`client-halves ×${clientHalves.length}`)
 // ⚠ 门禁只保证"被引用 + 该毕业的毕业"，不保证"会实现"——真正被逐条核对的是 roadmap 的**验收列**。
 const proposedDir = join(root, 'notes/proposed')
 const roadmapText = readFileSync(join(root, 'docs/plans/roadmap.md'), 'utf8')
-const proposals = existsSync(proposedDir) ? readdirSync(proposedDir).filter(n => n.endsWith('.md')) : []
+// README.md 是文件夹说明书（curated entry point，非提案）——DSH 同款：notes 层的 README 不在提案命名空间
+const proposals = existsSync(proposedDir)
+  ? readdirSync(proposedDir).filter(n => n.endsWith('.md') && n !== 'README.md')
+  : []
 const unscheduled = proposals.filter(name => !roadmapText.includes(name))
 unscheduled.length === 0
   ? ok(`proposal-scheduled ×${proposals.length}`)
