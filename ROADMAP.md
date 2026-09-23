@@ -20,7 +20,6 @@
     含 teammate footgun 残留处理（delegation.md §4.4）与搁置池顺手回看。
 
   - notes/implemented 归档层评估（原 r5-plus §7.4 迁入）：候选 = repo-scaffolding / docs-layering / dev-loop-guide / wochen-naming / r0-loop-acceptance / r1-docs-sync；仍带活判据的六篇（r3-reporting-line、skill-root-isolation、client-remote-single-mount、r2-roles-alive、r2-motion-run、r1-deploy-findings）不要动。
-  - invest-mobile-complement 两篇 journal 补记或登记豁免（W8）：手册「收工留痕」vs 实盘缺 vp-eng/vp-sales 纪要。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
@@ -182,6 +181,10 @@
   手册经符号链接同生效于排练场——根治排练产物撞 `md-newline`）；排练场参考镜像已刷新
   （rehearsal-init）。验证：verify 16 项 + test 91/91 + preset-smoke 真挂载 ALL PASS
   （COO preset 面改动的入戏认证归当夜培养轮 2 认证档一并跑——见后续行）。
+- 2026-09-24（**W8 销账：invest-mobile-complement 两篇 journal 补记**）：实盘核实 vp-eng / vp-sales
+  均参与该动议（`drafts/` 有各自权威稿）但未留 journal——违反手册「收工留痕」。处置 = **补记**
+  （优于豁免：drafts 是各自会话真实产出，据此回填不属编造）；两篇补记纪要鲜明标记【补记 2026-09-24】
+  + 指认权威稿 + 细节以稿为准。
 - 2026-09-24（**entry-probe 判据时间不变化**〔整治转待办销账〕）：两案选**时间不变问法**（另一案
   "收尾程序加刷新步"否决——多一个会忘的人工程序，且同病同根「时变状态进时不变载体」）。Q1 判据
   弃锚条目名改断言路由 + 记录家（ROADMAP §队列 + 收尾 Note/台账/git）；Q2 改问「完成即离队」语义
