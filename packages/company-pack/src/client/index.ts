@@ -16,6 +16,7 @@ import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
 import { installStyles } from './styles.ts'
 import { TasksAction } from './TasksPanel.tsx'
+import { TEAM_TOOL_KEYS, TeamToolCard } from './TeamToolCard.tsx'
 
 /** Required services: the slot registry plus the remote namespace we read. */
 export const inject = ['slots', 'remote', 'sessions']
@@ -47,15 +48,18 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // 本包 client 面的样式表：挂载时一次性注入（S0 决定 = 注入式，不走 CSS Modules；见 styles.ts 头注）。
   installStyles()
 
-  // 委派工具卡（R3）：把 CEO 的命名委托工具渲染成"给 VP 的 brief 卡"。
+  // 委派工具卡（R3）+ 团队工具卡（S2）：把 CEO 的命名委托与团队动作渲染成公司语义的卡。
   // keyed slot 的 key 域是**开放**的（槽合同原话："a typo simply never renders"），
-  // 所以 key 必须与 preset 里的 toolName 逐字一致——拼错不报错、只是永远不渲染。
+  // 所以 key 必须与 preset 里的 toolName / 官方工具名逐字一致——拼错不报错、只是永远不渲染。
   ctx.inject(['slots'], (scoped) => {
     // 回调必须**返回**注册效果（`SlotInjectionEffect` = 一个 disposer 或 disposer 的可迭代），
     // 所以这里 map 出 disposer 数组，而不是 for 循环里 register 完返回 void（tsc 会红）。
-    scoped.slots.inject('tool.call.toolview', () =>
-      DELEGATION_TOOL_KEYS.map(key =>
-        scoped.slots.register({ name: 'tool.call.toolview', key }, DelegationCard)))
+    scoped.slots.inject('tool.call.toolview', () => [
+      ...DELEGATION_TOOL_KEYS.map(key =>
+        scoped.slots.register({ name: 'tool.call.toolview', key }, DelegationCard)),
+      ...TEAM_TOOL_KEYS.map(key =>
+        scoped.slots.register({ name: 'tool.call.toolview', key }, TeamToolCard)),
+    ])
   })
 
   ctx.inject(['sessions', 'remote.agentTeams', 'slots'], (scoped) => {

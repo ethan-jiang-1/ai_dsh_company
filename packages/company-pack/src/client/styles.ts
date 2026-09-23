@@ -43,6 +43,10 @@ const CSS = `
   min-height: 0;
   overflow: hidden;
   color: var(--dsw-alias-label-primary);
+  /* 落在会话内容列内（Chat 同款几何）。铺满整列会压到内容列两侧的 .widthHandle 抓取条——
+     实测（2026-09-23）：左拖柄占 455→495，正好盖住第四个页签，真实用户点不动。 */
+  width: min(100%, var(--dsh-chat-content-width, 100%));
+  margin: 0 auto;
 }
 .wk-view-tabs {
   display: flex;
@@ -132,6 +136,99 @@ const CSS = `
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
+
+/* ── S2 皮肤：旧组件（委派卡 / 任务板弹窗 / 驾驶舱行）令牌化 ── */
+
+/* 委派工具卡：左边色带表状态（绿=已交稿 / 红=失败 / 黄=中止 / 中性=进行中） */
+.wk-delegation {
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-left: 3px solid var(--dsw-alias-border-l3);
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin: 4px 0;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.wk-delegation[data-state='ok'] { border-left-color: var(--dsw-alias-state-success-primary); }
+.wk-delegation[data-state='error'] { border-left-color: var(--dsw-alias-state-error-primary); }
+.wk-delegation[data-state='stopped'] { border-left-color: var(--dsw-alias-state-warn-primary); }
+.wk-delegation-head { display: flex; align-items: baseline; gap: 8px; }
+.wk-delegation-head[role='button'] { cursor: pointer; }
+.wk-delegation-role { font-weight: 600; }
+.wk-delegation-state { color: var(--dsw-alias-label-tertiary); font-size: 12px; }
+.wk-delegation-title { font-weight: 500; margin-top: 4px; }
+.wk-delegation-pre {
+  white-space: pre-wrap;
+  margin: 4px 0 0;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+}
+.wk-delegation-result {
+  white-space: pre-wrap;
+  margin: 2px 0 0;
+  max-height: 18rem;
+  overflow: auto;
+  font-size: 12px;
+}
+.wk-delegation-actions { margin-top: 6px; }
+
+/* 头部动作的浮层（任务板） */
+.wk-popover {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  z-index: 110;
+  min-width: 34rem;
+  max-width: 46rem;
+  max-height: 24rem;
+  overflow: auto;
+  padding: 10px 12px;
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 12px;
+  background: var(--dsw-specific-menu);
+  box-shadow: var(--dsw-elevation-prominent);
+  color: var(--dsw-alias-label-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+}
+.wk-popover-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.wk-popover-head strong { font-weight: 600; }
+.wk-table { border-collapse: collapse; width: 100%; }
+.wk-table th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--dsw-alias-label-tertiary);
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+.wk-table td { padding: 2px 6px; vertical-align: top; }
+/* 任务正文列：给足宽度再换行——原实现 26rem 弹窗把长标题挤成竖排 */
+.wk-table td[data-col='subject'] { min-width: 16rem; white-space: normal; word-break: break-word; }
+.wk-table td[data-col='id'], .wk-table td[data-col='status'],
+.wk-table td[data-col='owner'], .wk-table td[data-col='blocked'] { white-space: nowrap; }
+.wk-cell-id { color: var(--dsw-alias-label-tertiary); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+/* 右栏驾驶舱（Company 页签）：在场板 + 动态流 */
+.wk-pane { padding: 8px 12px; font-size: 13px; line-height: 1.5; text-align: left; color: var(--dsw-alias-label-primary); }
+.wk-pane-head { display: flex; align-items: baseline; gap: 8px; }
+.wk-list { display: grid; gap: 4px; }
+.wk-row-head { color: var(--dsw-alias-label-tertiary); font-size: 12px; border-bottom: 0; }
+.wk-row-status { flex: 0 0 auto; }
+.wk-row-button {
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+.wk-row-button:hover { background: var(--dsw-alias-interactive-bg-hover); }
+.wk-activity-block { border-top: 1px solid var(--dsw-alias-border-l1); margin-top: 8px; padding-top: 6px; }
 
 @media (prefers-reduced-motion: reduce) {
   /* 动效层（S3）的过渡/动画在此统一关闭——先立规矩，S3 加 keyframes 时自动被覆盖 */

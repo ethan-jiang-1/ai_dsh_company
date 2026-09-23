@@ -1,5 +1,12 @@
-/** Company 驾驶舱页签（R5b）：组织在场板（行可点进成员空间）+ 协作动态流。纯 DOM，不依赖 ui-primitives。 */
+/**
+ * Company 驾驶舱页签（R5b；S2 令牌化）：组织在场板（行可点进成员空间）+ 协作动态流。
+ *
+ * S2：内联硬编码色与文字星号换成 `--dsw-*` 令牌 + 官方 `StateDot`/`Tag`；列头「团队内状态」
+ * 不再被固定 flex 宽挤成两行。**结构与文案保持不变**——replay 金样断言依赖
+ * `list[name=组织在场板]` / `listitem` / 文本「团队内状态」。
+ */
 import { useEffect, useRef, useState } from 'react'
+import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TeamView } from '@deepseek-ai/dsh-experimental-agent-team/client'
 import type { RemoteResult } from '@deepseek-ai/dsh-api-remotes/client'
@@ -26,6 +33,25 @@ const MAX_ACTIVITY = 50
 
 /** 轮询间隔：与 R2 任务板同节奏（5s）。验收「接活 5s 内转执行中」与它对齐。 */
 const POLL_MS = 5_000
+
+/** 成员状态 → StateDot 语义。 */
+function memberDot(status: PresenceRow['status']): 'done' | 'ongoing' | 'warning' | 'error' | 'idle' {
+  switch (status) {
+    case 'running': return 'ongoing'
+    case 'provisioning': return 'warning'
+    case 'failed': return 'error'
+    case 'idle': return 'done'
+    default: return 'idle'
+  }
+}
+
+/** 成员状态 → Tag 色调。 */
+function memberTone(status: PresenceRow['status']): 'info' | 'danger' | 'warning' | 'outline' {
+  if (status === 'running') return 'info'
+  if (status === 'failed') return 'danger'
+  if (status === 'provisioning') return 'warning'
+  return 'outline'
+}
 
 /**
  * 驾驶舱主体：在场板（lead + 分身，行 = 显示名 / 团队内状态 / 当前任务）+ 动态流。
@@ -73,60 +99,58 @@ export function CompanyPane({ sessionId, load, openMember }: CompanyPaneProps) {
   }, [sessionId])
 
   return (
-    <div style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem', lineHeight: 1.5, textAlign: 'left' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+    <div className="wk-pane">
+      <div className="wk-pane-head">
         <strong>组织在场板</strong>
-        <span style={{ opacity: 0.6, fontSize: '0.75rem' }}>每 5 秒自动刷新</span>
+        <span className="wk-meta">每 5 秒自动刷新</span>
       </div>
-      {error !== null && <div style={{ color: '#e5534b' }}>{error}</div>}
+      {error !== null && <div className="wk-error">{error}</div>}
       {rows === null
-        ? error === null && <div style={{ opacity: 0.75 }}>读取团队状态…</div>
+        ? error === null && <div className="wk-meta">读取团队状态…</div>
         : rows.length === 0
-          ? <div style={{ opacity: 0.75 }}>当前没有团队动议</div>
+          ? <div className="wk-meta">当前没有团队动议</div>
           : (
             <>
-              <div style={{ display: 'flex', gap: '0.4rem', opacity: 0.7, fontSize: '0.75rem', margin: '0.3rem 0 0.15rem' }}>
-                <span style={{ flex: '0 0 9.5rem' }}>成员</span>
-                <span style={{ flex: '0 0 3.5rem' }}>团队内状态</span>
-                <span>当前任务</span>
+              <div className="wk-row wk-row-head" aria-hidden="true">
+                <span className="wk-row-name">成员</span>
+                <span className="wk-row-status">团队内状态</span>
+                <span className="wk-row-task">当前任务</span>
               </div>
-              <div role="list" aria-label="组织在场板" style={{ display: 'grid', gap: '0.25rem' }}>
+              <div role="list" aria-label="组织在场板" className="wk-list">
                 {rows.map(row => (
                   <button
                     key={row.id}
                     type="button"
                     role="listitem"
-                    style={{
-                      display: 'flex', gap: '0.4rem', textAlign: 'left', padding: '0.25rem 0.4rem',
-                      border: '1px solid rgba(128,128,128,0.35)', borderRadius: '0.35rem', cursor: 'pointer',
-                    }}
+                    className="wk-row wk-row-button"
                     aria-label={`${row.displayName}，${row.statusLabel}，${row.currentTask === null ? '无进行中任务' : `任务：${row.currentTask}`}`}
                     title={row.role === 'lead' ? '进入 CEO（Lead）空间' : '进入该成员的空间'}
                     onClick={() => { void openMember(sessionId, { id: row.id, role: row.role }) }}
                   >
-                    <span style={{ flex: '0 0 9.5rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span className="wk-row-name">
+                      <StateDot state={memberDot(row.status)} />
                       {row.role === 'lead' ? '★ ' : ''}{row.displayName}
                     </span>
-                    <span style={{ flex: '0 0 3.5rem' }}>{row.statusLabel}</span>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span className="wk-row-status"><Tag tone={memberTone(row.status)}>{row.statusLabel}</Tag></span>
+                    <span className="wk-row-task" title={row.currentTask ?? ''}>
                       {row.currentTask ?? '—'}
                     </span>
                   </button>
                 ))}
               </div>
-              <div style={{ opacity: 0.6, fontSize: '0.75rem', margin: '0.25rem 0 0.5rem' }}>
+              <div className="wk-meta" style={{ margin: '0.25rem 0 0.5rem' }}>
                 状态 = 该分身在本场团队动议中的忙闲
               </div>
             </>
           )}
-      <div style={{ borderTop: '1px solid rgba(128,128,128,0.3)', marginTop: '0.35rem', paddingTop: '0.35rem' }}>
+      <div className="wk-activity-block">
         <strong>协作动态</strong>
         {activity.length === 0
-          ? <div style={{ opacity: 0.75 }}>暂无动态（打开期间的变化会出现在这里）</div>
+          ? <div className="wk-meta">暂无动态（打开期间的变化会出现在这里）</div>
           : (
-            <ul style={{ margin: '0.25rem 0 0', paddingLeft: '1.1rem' }}>
+            <ul className="wk-activity">
               {activity.map((entry, index) => (
-                <li key={`${entry.time}-${index}`} style={{ margin: '0.1rem 0' }}>{entry.text}</li>
+                <li key={`${String(entry.time)}-${String(index)}`}>{entry.text}</li>
               ))}
             </ul>
           )}

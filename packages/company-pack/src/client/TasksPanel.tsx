@@ -1,5 +1,6 @@
-/** 会话头部动作：本会话所属团队的任务板（只读；纯 DOM，不依赖 ui-primitives）。 */
+/** 会话头部动作：本会话所属团队的任务板（只读；S2 令牌化 + 官方 Button/图标）。 */
 import { useEffect, useRef, useState } from 'react'
+import { Button, IconChecklistOutline14 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TeamView } from '@deepseek-ai/dsh-experimental-agent-team/client'
 import type { RemoteResult } from '@deepseek-ai/dsh-api-remotes/client'
@@ -20,6 +21,8 @@ const STATUS_LABEL: Record<string, string> = {
 
 /**
  * 渲染"任务板"按钮与面板：成员状态 + 共享任务（含 owner/依赖/修订号）。
+ * S2：emoji → 官方图标；原生 `<button>` → `Button`；颜色走 `--dsw-*` 令牌；
+ * 弹窗加宽到 34rem 并给任务正文列最小宽度（原 26rem 会把长标题挤成竖排）。
  * @param props - 槽运行时 props 与本插件注入的加载器。
  * @returns 头部按钮，点开为面板。
  */
@@ -64,75 +67,56 @@ export function TasksAction({ sessionId, load }: TasksActionProps) {
 
   return (
     <span style={{ position: 'relative', display: 'inline-flex' }}>
-      <button
-        type="button"
-        aria-expanded={open}
+      <Button
+        size="sm"
+        variant="ghost"
         title="团队任务板"
+        aria-expanded={open}
+        icon={<IconChecklistOutline14 />}
         onClick={() => { setOpen(!open) }}
       >
-        🗂 任务板{live.length === 0 ? '' : ` (${String(live.length)})`}
-      </button>
+        任务板{live.length === 0 ? '' : ` (${String(live.length)})`}
+      </Button>
       {open && (
-        <div
-          role="dialog"
-          aria-label="团队任务板"
-          style={{
-            position: 'absolute',
-            top: '100%',
-            right: 0,
-            zIndex: 30,
-            minWidth: '26rem',
-            maxWidth: '38rem',
-            maxHeight: '24rem',
-            overflow: 'auto',
-            padding: '0.6rem 0.75rem',
-            border: '1px solid rgba(128,128,128,0.4)',
-            borderRadius: '0.5rem',
-            background: 'Canvas',
-            color: 'CanvasText',
-            fontSize: '0.85rem',
-            lineHeight: 1.5,
-            textAlign: 'left',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+        <div className="wk-popover" role="dialog" aria-label="团队任务板">
+          <div className="wk-popover-head">
             <strong>团队任务板</strong>
-            <span style={{ opacity: 0.6, fontSize: '0.75rem' }}>每 5 秒自动刷新</span>
+            <span className="wk-meta">每 5 秒自动刷新</span>
             <span style={{ flex: 1 }} />
-            <button type="button" onClick={() => { void refresh() }} disabled={loading}>
+            <Button size="sm" variant="outline" onClick={() => { void refresh() }} disabled={loading}>
               {loading ? '刷新中…' : '刷新'}
-            </button>
-            <button type="button" onClick={() => { setOpen(false) }}>关闭</button>
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => { setOpen(false) }}>关闭</Button>
           </div>
-          {error !== null && <div style={{ color: '#e5534b' }}>{error}</div>}
+          {error !== null && <div className="wk-error">{error}</div>}
           {view !== null && (
             <>
-              <div style={{ opacity: 0.75, marginBottom: '0.3rem' }}>
+              <div className="wk-meta" style={{ marginBottom: '0.3rem' }}>
                 成员：{view.members.map(member => `${member.name}(${member.status})`).join('、') || '（无）'}
               </div>
               {view.tasks.length === 0
-                ? <div style={{ opacity: 0.75 }}>还没有共享任务</div>
+                ? <div className="wk-meta">还没有共享任务</div>
                 : (
-                    <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                    <table className="wk-table">
                       <thead>
-                        <tr style={{ opacity: 0.7 }}>
-                          <th style={{ textAlign: 'left', padding: '0.15rem 0.3rem' }}>id</th>
-                          <th style={{ textAlign: 'left', padding: '0.15rem 0.3rem' }}>任务</th>
-                          <th style={{ textAlign: 'left', padding: '0.15rem 0.3rem' }}>状态</th>
-                          <th style={{ textAlign: 'left', padding: '0.15rem 0.3rem' }}>owner</th>
-                          <th style={{ textAlign: 'left', padding: '0.15rem 0.3rem' }}>依赖</th>
+                        <tr>
+                          <th>id</th>
+                          <th>任务</th>
+                          <th>状态</th>
+                          <th>owner</th>
+                          <th>依赖</th>
                         </tr>
                       </thead>
                       <tbody>
                         {view.tasks.map(task => (
-                          <tr key={task.id} style={{ verticalAlign: 'top' }}>
-                            <td style={{ padding: '0.15rem 0.3rem', whiteSpace: 'nowrap' }}>{task.id}@{task.revision}</td>
-                            <td style={{ padding: '0.15rem 0.3rem' }}>{task.subject}</td>
-                            <td style={{ padding: '0.15rem 0.3rem', whiteSpace: 'nowrap' }}>
+                          <tr key={task.id}>
+                            <td data-col="id"><span className="wk-cell-id">{task.id}@{task.revision}</span></td>
+                            <td data-col="subject">{task.subject}</td>
+                            <td data-col="status">
                               {STATUS_LABEL[task.status] ?? task.status}{task.ready ? '' : '（阻塞）'}
                             </td>
-                            <td style={{ padding: '0.15rem 0.3rem', whiteSpace: 'nowrap' }}>{task.ownerName ?? '未分配'}</td>
-                            <td style={{ padding: '0.15rem 0.3rem', whiteSpace: 'nowrap' }}>{task.blockedBy.join(',') || '—'}</td>
+                            <td data-col="owner">{task.ownerName ?? '未分配'}</td>
+                            <td data-col="blocked">{task.blockedBy.join(',') || '—'}</td>
                           </tr>
                         ))}
                       </tbody>

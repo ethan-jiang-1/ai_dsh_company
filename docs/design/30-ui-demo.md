@@ -56,8 +56,11 @@ shipped 槽位树里我们值得占的位置：
 
 两个关键工程事实：
 
-- **extension 带（band）天然高于 builtin**：右栏 tab 注册的 `priority: 'extension'`
-  是最高带——第三方类型的声明 outrank 一切 shipped viewer，不需要 hack。
+- **右栏 tab 类型的 band 天然高于 builtin**：`ctx.sidebarRightTabs.register` 的
+  `priority: 'extension'`（`extension(3) > builtin(2) > fallback(1)`）是最高带——第三方类型
+  outrank 一切 shipped viewer，不需要 hack。⚠ 这**不是 slot 概念**（2026-09-23 订正）：slot 侧
+  只有 `priority`，**升序小者渲染**，同 cell 同 priority 二次注册抛错；别把两者混为一谈
+  （依据 = `ui-sidebar-right/src/client/tab-registry.ts:48-58` + `ui-slots/src/index.ts:526-527,834-837`）。
 - **数据面走 Remote API，不走文件**：官方团队 UI 的 `mount.ts` 就是范本——
   `ctx.remote.$mount(contribution)` 挂载生成的 Remote stub，组件里
   `await ctx.remote.agentTeams.view(leadSessionId)` 拉权威状态。我们的 host 插件同样可以
