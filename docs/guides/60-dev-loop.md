@@ -368,3 +368,27 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
   绝不放进无人值守的自动流程。
 - **收口优先**：任务已产出关键证据（文件/事件/日志）后，剩余步骤要么用"只做收口"的受限指令
   （明确禁新调研、给工具调用上限），要么人工接手——不要为了"跑完整"再放开跑。
+
+## 11. 工具态与越界写入（2026-09-23 立）
+
+**教训（R4→R5a 轮间，2026-09-22）**：断网弄坏 dev profile 后，离线恢复需要写 pnpm 的 registry
+元数据缓存——它默认在 `~/Library/Caches/pnpm`（workspace 之外）。为了它走了"从 store 合成元数据"
+的弯路，还产生了一串越界写入授权。
+
+**原则（三条）**：
+
+1. **repo 内 = 自由区**：仓库及其 gitignored 运行态区（`dev/harness-home/`、`.pnpm-store/`、
+   `dev/rehearsal-workspace/`、`dev/harness-home/cache/`）内的读写不需要任何授权。
+2. **越界需求优先用"重定向"消灭，而不是申请**：凡工具要把状态写到 HOME（缓存 / store / 配置），
+   **先配置重定向进仓库 gitignored 区，再首次使用**。已有落点：
+   - DSH 数据层：`DSH_HOME=dev/harness-home`（env.sh，双 home）
+   - pnpm store：仓库根 `.pnpm-store/`；dev profile 的 `.npmrc` 把 `store-dir` / `cache-dir` 钉在 repo 内
+   - dev profile 的 pack：`link:` 符号链接（内容改动即刻生效，重装仅在改依赖/bundle 行）
+   - 排练/探针 cwd：`dev/rehearsal-workspace/`
+   **新工具进工具链时，重定向配置必须在首次使用前完成**——这是引导配方（§7）的一部分。
+3. **确需越界（重定向覆盖不了的场景）**：先问人，一次说清"写哪个路径、为什么没有替代"；
+   沙箱是最后防线（§6 第 5 条），不拿它当默认方案。
+
+**反例存档**：`~/Library/Caches/pnpm` 合成元数据事故（2026-09-22，见
+[implemented/2026-09-22-team-assembly-and-rehearsal-split.md](../../notes/implemented/2026-09-22-team-assembly-and-rehearsal-split.md)
+环境状态节；清理按 etag `synthetic-from-store` 标记识别）。

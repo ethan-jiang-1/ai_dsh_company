@@ -116,6 +116,10 @@ submodule HEAD == 簿记 SHA（`vendor-pin`）且工作树零改动（`vendor-cl
 **为什么用 SHA 而不是 tag**：tag 可被移动/别名，SHA 才是钉住的合同（`vendor/README.md` 的
 pin + manifest/SHA 纪律）。
 
+**本仓原生纪律（与 guides/60 §9/§10 同级）**：§11 **工具态与越界写入**（2026-09-23 立）——
+repo 内为自由区；工具状态（缓存/store/配置）一律**先重定向进仓库 gitignored 区再首次使用**
+（落点清单：双 home、`.pnpm-store`、profile `.npmrc`、排练场）；确需越界先问人，一次说清路径与理由。
+
 - 具体操作手册：`docs/guides/60-dev-loop.md`（六步闭环 / 调试阶梯 / 插拔速查 / 设计四问 /
   发布纪律时点 / 双 home）。demo 现场运维 runbook：`docs/guides/50-budget-and-ops.md`。
 - **不发明**：不新增 spec 流程（OpenSpec 留触发条件，guides/60 §5）、不自造调度器/记忆/门禁——
