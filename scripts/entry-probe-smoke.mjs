@@ -17,7 +17,7 @@
 // 驱动形状与 probe-smoke 同构（boot → cookie → session/create → prompt → 等 turn/end → 读日志）；
 // 探针 cwd = 排练场（练习场 ≠ 运行场）。
 import { spawn } from 'node:child_process'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ensureRehearsalWorkspace, REHEARSAL_REL } from './lib/rehearsal.mjs'
@@ -33,11 +33,15 @@ const BOOT_TIMEOUT_MS = 120_000
 const TURN_TIMEOUT_MS = Number(arg('timeout', '240000'))
 
 // ── 题单（8 问三分类：状态过期 / 事实家漂移 / 自相矛盾；期望要点 = 机器可核 token） ──
+// 判据纪律（2026-09-24 修，整治转待办「Q1/Q2 锚定」销账）：**只断言路由与形状，不锚定当期值**——
+// 时变事实（队列头条目名、下一项、pin 的 tag 值）由 Agent 现读入口链作答、归档供人核；
+// token 层锚定当期值 = 把时变状态写进时不变判据（R6 Note §十一：Q1 曾锚 /分身成长/、
+// Q2 曾锚 /UX 打磨/、Q4 曾锚 tag 字面——条目离队或升 pin 即必红）。
 const QUESTIONS = [
-  { id: 'Q1-队列头', ask: '接下来开工的头条条目是什么？你从哪个文件的哪一节读到的？（只许引用入口链内的文件）', expect: [/分身成长/, /ROADMAP|队列/] },
-  { id: 'Q2-下一项', ask: '排在队列头条目之后的下一项是什么？', expect: [/UX 打磨|打磨/] },
+  { id: 'Q1-队列头', ask: '接下来开工的头条条目是什么？你从哪个文件的哪一节读到的？条目完成后它的记录住到哪里？（只许引用入口链内的文件）', expect: [/ROADMAP|队列/, /收尾 Note|implemented|台账|git/] },
+  { id: 'Q2-完成即离队', ask: '队列条目的「完成即离队」是什么意思？在队列文件里还找得到已完成条目的段落吗？', expect: [/离队|删/, /收尾 Note|implemented|台账|git/] },
   { id: 'Q3-三态规则家', ask: '「交付物三态」（成品/过程稿/排练产物）的规则写在哪个文件？', expect: [/company-workspace\/AGENTS\.md|公司手册/] },
-  { id: 'Q4-vendor', ask: 'vendor/dsh 钉在哪个 tag？对它的铁律是什么？', expect: [/dsh-v0\.1\.5-rc\.2|0\.1\.5/, /只读|一个字节|零改动/] },
+  { id: 'Q4-vendor', ask: 'vendor/dsh 钉在哪个 tag？对它的铁律是什么？', expect: [/dsh-v\d+\.\d+/, /只读|一个字节|零改动/] },
   { id: 'Q5-preset完成定义', ask: '改了 preset 的 agent.cordis.yml 之后，完成定义是跑哪个脚本？为什么 --dump-config 不算证据？', expect: [/preset-smoke/, /挂载|看不到|行校验发生在挂载时/] },
   { id: 'Q6-流程形态', ask: '本项目接下来的开发流程形态是什么？依据哪个决策（D 号）？', expect: [/feature|条目|队列/, /D23/] },
   { id: 'Q7-认证档边界', ask: '认证档与回归档的边界在哪份文档定义？真模型测试进不进 pnpm test？', expect: [/60-dev-loop|9\.1/, /不进|不进回归|layering/] },
@@ -195,13 +199,16 @@ try {
   await sleep(300)
 }
 
-// ── 归档（语义级抽查的家） ──
-const DATE = new Date().toISOString().slice(0, 10)
+// ── 归档（语义级抽查的家；同日重跑不覆盖既有归档——R6 Note §十一抓到的第二个坑） ──
+const stamp = new Date().toISOString()
+const DATE = stamp.slice(0, 10)
 const OUT_DIR = join(ROOT, 'snapshots/entry-probe', DATE)
 mkdirSync(OUT_DIR, { recursive: true })
-writeFileSync(join(OUT_DIR, 'answer.md'),
-  `# 入口链探针归档 · ${DATE}\n\n> 全新上下文（standard preset，排练场 cwd）只读 AGENTS.md → 00-index → roadmap，答 8 问。\n> 判据：零过期、零自相矛盾（token 层 ${String(passCount)}/${String(QUESTIONS.length)} PASS）。\n\n## 原始回答\n\n${reply}\n`)
-console.log(`归档 → ${OUT_DIR}/answer.md`)
+let OUT_FILE = join(OUT_DIR, 'answer.md')
+if (existsSync(OUT_FILE)) OUT_FILE = join(OUT_DIR, `answer-${stamp.slice(11, 19).replaceAll(':', '')}.md`)
+writeFileSync(OUT_FILE,
+  `# 入口链探针归档 · ${DATE} ${stamp.slice(11, 19)}\n\n> 全新上下文（standard preset，排练场 cwd）只读 AGENTS.md → 00-index → roadmap，答 8 问。\n> 判据：零过期、零自相矛盾（token 层 ${String(passCount)}/${String(QUESTIONS.length)} PASS）。\n\n## 原始回答\n\n${reply}\n`)
+console.log(`归档 → ${OUT_FILE}`)
 
 const total = QUESTIONS.length
 console.log(failures.length === 0

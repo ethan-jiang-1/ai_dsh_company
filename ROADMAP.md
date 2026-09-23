@@ -16,8 +16,6 @@
   - 下次「磨」的输入 = R6 Note「审计覆盖缺口」清单（presets.md 三方比对 / research 即时性 /
     0001、0003 深读 / guides/50 旋钮复校 / journal 行号全量 / snapshots 差异——清单住收尾 Note，不复制）。
   - 编号方案（N1）：design/guides 目录编号与顶层合同双体系二选一（命名合同遗留，R6 Note 登记）。
-  - entry-probe Q1/Q2 token 期望锚定 R6 期条目名（条目推移即过期；同日重跑会覆盖既有归档）：改时间
-    不变问法，或收尾程序加"期望随队列刷新"一步（发现与证据 = notes/implemented/2026-09-23-dsh-inround-task-surface.md §十一）。
   - **升 pin**（触发型：上游出新 tag 时跑 `scripts/sync-dsh.mjs --pin`，合同 docs/release.md）——
     含 teammate footgun 残留处理（delegation.md §4.4）与搁置池顺手回看。
 
@@ -184,3 +182,9 @@
   手册经符号链接同生效于排练场——根治排练产物撞 `md-newline`）；排练场参考镜像已刷新
   （rehearsal-init）。验证：verify 16 项 + test 91/91 + preset-smoke 真挂载 ALL PASS
   （COO preset 面改动的入戏认证归当夜培养轮 2 认证档一并跑——见后续行）。
+- 2026-09-24（**entry-probe 判据时间不变化**〔整治转待办销账〕）：两案选**时间不变问法**（另一案
+  "收尾程序加刷新步"否决——多一个会忘的人工程序，且同病同根「时变状态进时不变载体」）。Q1 判据
+  弃锚条目名改断言路由 + 记录家（ROADMAP §队列 + 收尾 Note/台账/git）；Q2 改问「完成即离队」语义
+  （原"下一项"锚 /UX 打磨/ 早已过期）；Q4 tag 判据改形状 `/dsh-v\d+\.\d+/`（升 pin 不烂）；归档
+  同日重跑不再覆盖（时间戳后缀）。keyless 验证：node --check + 形状判据命中当前与假想未来 tag +
+  期望 token 在入口链可读；真跑归当夜收尾认证档。
