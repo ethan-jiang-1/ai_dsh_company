@@ -48,7 +48,8 @@ RFC：[2026-09-22-twin-cultivation-and-self-learning.md](./2026-09-22-twin-culti
 - 边界探针两会话留 dev home 排练场目录（证据源）；`ent-agent-platform` 的 journal/deliverables 仍在
   排练场（教训源，教训候选 C/D/E/F 的证据也在那里）。
 - dev `web` profile = `link:` 安装（改 preset 无需重装）；`company` profile = `file:`（本轮未用）。
-- **未 push**（历史积压 113+；push 走 `ssh.github.com:443`，由人推）。
+- **已 push**（2026-09-24 当夜 443 通道成功，`06e7634..2f0f316`——历史积压 113+ 一并推净；
+  push 命令见 AGENTS.md 命令表）。
 
 ## ⑤ 条目去向（RFC 表之外的增量；全文见 RFC 末节）
 
