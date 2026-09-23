@@ -238,7 +238,12 @@ roadmap 原来的 R5 一行装着：驾驶舱 v1（含协作动态流）+ 组织
 - **判据**：四条都变成提案里的现在时陈述，且"风险与未决"里对应条目删掉；
   然后按 roadmap §新会话开工动作 进 Plan Mode。
 
-### P3 · 轮间待办：U1 活体探针（R5a → R6）
+### P3 · 轮间待办：U1 活体探针（R5a → R6）✅ 已完成（2026-09-22，随轮间待办①）
+
+> 结论 = 三档之②**"只有新会话变"**（同会话下一轮 `skill()` 仍旧文、新会话见新文）；
+> 落档：[research/digital-twin §5.5](../../notes/research/2026-09-22-digital-twin-cultivation-and-self-learning.md)
+> （同时纠正了 §5.2 的源码层判断）与
+> [implemented/2026-09-22-team-assembly-and-rehearsal-split.md](../../notes/implemented/2026-09-22-team-assembly-and-rehearsal-split.md)。
 
 1. `source dev/env.sh`；`pnpm dsh web -- --port 3086 --no-open`。
 2. ceo preset 建会话 A，让它 `skill({ name: 'chairing-staff-meeting' })`，记下正文首行。

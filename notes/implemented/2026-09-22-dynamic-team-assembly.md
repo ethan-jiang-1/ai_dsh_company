@@ -1,7 +1,9 @@
 # 2026-09-22 · 按问题组队（CEO 的团队成型方法）
 
-状态：proposed（2026-09-22）
-归属：**轮间待办**（R4 收尾后立刻做，不占轮）；同时是 R6「分身成长」机制的**第一次实操**
+状态：**已消化（2026-09-22）**——双向行为对照两场全过（两职能不超编 / 四职能不漏人），
+本文件从 `notes/proposed/` **毕业**到 `notes/implemented/`。实现与实测见
+[implemented/2026-09-22-team-assembly-and-rehearsal-split.md](./2026-09-22-team-assembly-and-rehearsal-split.md)。
+归属：轮间待办①（R4 收尾后做，不占轮）；兼作 R6「分身成长」的 U1 活体探针实操（**R6 前置全清**）
 
 ## 背景（用户原话）
 
@@ -77,3 +79,17 @@ prompt 里写着“用 `spawn_teammate` 拉起 vp-sales 与 coo 两位（**只�
 - **它顺带解掉 R6 的阻塞项**：R6「分身成长」的验收是“改 `presets/<role>/` → 三道门禁 + 该角色探针
   全绿、旧会话不受影响”，阻塞项是“只差一次活体探针（改一次 `SKILL.md`，看新会话是否生效）”。
   本项**就是**那次实操 ⇒ 做完在 roadmap 里把 R6 的阻塞项划掉。
+
+## 条目去向（2026-09-22 毕业时补）
+
+| # | 条目 | 去向 | 证据 |
+|---|---|---|---|
+| 1 | 新 skill `assembling-the-team`（五步） | ✅ 已交付 | `presets/ceo/skills/assembling-the-team/SKILL.md`；重装后 preset-smoke 挂载 PASS |
+| 2 | persona 挂钩（排在 chairing 之前） | ✅ 已交付 | `presets/ceo/agent.cordis.yml`（含收紧句“名单里没有的职能一个都不叫”） |
+| 3 | 职能归属从旧 skill 搬走（不并存） | ✅ 已交付 | `chairing-staff-meeting` 步骤 2 改指 assembling-the-team；标题/描述去“R2 五角色版” |
+| 4 | 验收 1 不许超编 | ✅ PASS | 第一场：无名单动议只拉 vp-eng + coo |
+| 5 | 验收 2 不许漏人 | ✅ PASS | 第二场：四职能全到 |
+| 6 | 验收 3 不叫谁有理由 | ✅ PASS | “动议没问，所以没叫这两个职能，不为稳妥陪跑”写入 CEO 正文 |
+| 7 | 验收 4 三态判据 0 违规 | ✅ PASS | 排练场 2 成品 / 11 过程稿 / 0 违规 |
+| 8 | 风险条“不达标退路机械化判据” | 未触发 | 措辞迭代一次后行为即达标（implemented Note“判据外的实证收获”） |
+| 9 | 顺带：U1 活体探针（R6 前置） | ✅ 完成 | 三档之②“只有新会话变”，research/digital-twin §5.5 |

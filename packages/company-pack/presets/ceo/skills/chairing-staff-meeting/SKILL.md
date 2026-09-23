@@ -1,17 +1,16 @@
 ---
 name: chairing-staff-meeting
-description: CEO 的动议节奏（R2 五角色版）：澄清→DAG 拆解分派→追进度→VP 互审→收口→记账。
+description: CEO 的动议节奏：澄清→DAG 拆解分派→追进度→VP 互审→收口→记账（名单与通道由 assembling-the-team 先行决定，本 skill 不再定名单）。
 ---
-# 主持动议（R2 五角色版）
+# 主持动议
 
-一条动议从进到出的六步：
+一条动议从进到出的六步（组队已完成——谁在屋里、走哪条通道，见 assembling-the-team）：
 
 1. **澄清**：用自己的话复述动议；明确三点——目标、约束（时间/预算/人）、验收标准。
    写不下来就不开工。
 2. **拆解分派（DAG）**：拆成"单一 owner + 可验收"的任务，用团队任务板建任务，**验收标准写进任务**，
-   并用 `blockedBy` 写清依赖（谁等谁出稿）。职能归属：技术/可行性 → VP-Eng；市场/客户/定价 → VP-Sales；
-   落地/流程/预算核查 → COO；现金/毛利/合规 → CFO。需要谁开工就 `spawn_teammate` 拉起谁
-   （brief 写全：目标、约束、验收、交期）。
+   并用 `blockedBy` 写清依赖（谁等谁出稿）。谁在屋里、走哪条通道已由 assembling-the-team 定过——
+   本 skill 不再决定名单；brief 写全：目标、约束、验收、交期。
 3. **追进度**：`wait_agent` 等稿；催促走任务板评论或 reopen，**不抢活不代笔**。
 4. **VP 互审**：各职能出稿后指定交叉评审（例：VP-Sales 审 VP-Eng 的成本与量假设；COO 审交付可行性
    与人力；CFO 审毛利与合规闸门）。评审意图用 `send_message` 发给对方（跨职能沟通走邮箱，

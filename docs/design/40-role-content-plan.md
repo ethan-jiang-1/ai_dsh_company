@@ -24,6 +24,10 @@
 - **skills（初版 3 个）**：`chairing-staff-meeting`（会议节奏：brief→并行→互审→收口）、
   `task-decomposition`（拆任务到"单一 owner + 可验收"粒度，配 blockedBy 建议）、
   `synthesizing-deliverables`（合稿规则：保留各职能的结论与分歧点，不抹平）。
+- **skills（2026-09-22 增补，轮间待办①按问题组队落地）**：`assembling-the-team`
+  （组队五步：要不要叫人 / 叫谁 / 不叫谁 / 哪条通道 / 定 slug），**排在 chairing 之前**，
+  职能归属从 chairing 步骤 2 搬进它（不并存）；`task-decomposition` / `synthesizing-deliverables`
+  未建——其职责实际由 chairing 步骤 2 / 5 承担。
 - **KB**：`kb/ceo/`（决策原则、对外文风样例）；journal 由本人追加。
 
 ### VP of Engineering（职能：研发）

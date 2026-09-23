@@ -139,9 +139,11 @@ pin + manifest/SHA 纪律）。
 当前轮 **R5a 门禁与发布 —— ▶ 下一轮**（R5b 驾驶舱排其后，R6 前置全清；见 `docs/plans/roadmap.md`；
 迭代按垂直轮 D11，每轮换全新对话上下文）。
 
-**先做两件轮间待办（不占轮，见 roadmap「轮间待办 R4 → R5a」）**：① **按问题组队**——补 CEO 的团队
-成型 skill（现在**没人指定名单时默认 4/4 全员**；兼作 R6 的 U1 活体探针）② **练习场 ≠ 运行场**——
-排练/探针换独立 workspace（R4 收尾核对提案时发现这条漏了，且判据抓不到排练写进 `drafts/` 的产物）。
+**轮间待办①② 已落地 ✅（2026-09-22，见 `notes/implemented/2026-09-22-team-assembly-and-rehearsal-split.md`）**：
+① 按问题组队——CEO 新 skill `assembling-the-team`，双向对照两场全过（两职能不超编 / 四职能不漏人），
+兼作 U1 活体探针（结论：skill 改动**只有新会话生效**）⇒ **R6 前置全清**；② 练习场 ≠ 运行场——
+排练/探针默认 cwd 已换 `dev/rehearsal-workspace/`（真盘零新增验收过两道）。
+**下一轮 = R5a 门禁与发布**：起点 `docs/plans/roadmap.md` R5a 行 + `plans/r5-plus-readiness.md` §9 P1（先窄研究再落）。
 
 **R4 交付（外部可观察）**：交付物三态有**机器判据**——`scripts/lib/deliverables.mjs`（纯逻辑）+
 `scripts/deliverables-check.mjs`（运行场入口，解多帧 zstd）。规则：成品 `deliverables/<slug>/final.md`

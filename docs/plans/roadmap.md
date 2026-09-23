@@ -37,7 +37,12 @@ UI 侧：v0（现成团队 UI）＝ R1 观察窗起、R2 进验收；委派工�
 （改 one-shot，或给非 team 会话补控制行），**前提是不动 teammate 的 worker 行为**。出处
 [delegation.md](../../docs/delegation.md) §4.4 + [R3 Note](../../notes/implemented/2026-09-22-r3-reporting-line.md)「未做 / 移出本轮」。
 
-轮间待办（R4 → R5a）：**两条**。① **按问题组队（CEO 的团队成型方法）**。用户观察经查证属实：
+轮间待办（R4 → R5a）：**两条，均已落地 ✅（2026-09-22，见
+[implemented/2026-09-22-team-assembly-and-rehearsal-split.md](../../notes/implemented/2026-09-22-team-assembly-and-rehearsal-split.md)）**。
+① **按问题组队（CEO 的团队成型方法）✅**——双向对照两场全过（两职能不超编 / 四职能不漏人），
+兼作的 U1 活体探针已完成（三档之②"只有新会话变"）⇒ **R6 前置全清**；提案已毕业。
+原提案：[dynamic-team-assembly](../../notes/implemented/2026-09-22-dynamic-team-assembly.md)。
+用户观察经查证属实：
 CEO 只有 1 个 skill（`design/40` §1 计划 3 个），而现有那个从"DAG 拆解分派"开始 ⇒ **默认已经
 决定要开会**；实测四场动议的名单来源——R2 / 场景 B / R4 场景 C 全是**人在指定**（场景 C 的 prompt
 里直接写着"只要这两位"），而 `invest-mobile-complement` 那场**没人指定时是 4/4 全员**。
@@ -45,7 +50,7 @@ CEO 只有 1 个 skill（`design/40` §1 计划 3 个），而现有那个从"DA
 （**排在 `chairing-staff-meeting` 之前**）+ 把职能归属从旧 skill **搬走**（不并存）；验收 =
 **双向行为对照**（两职能动议不许超编、四职能动议不许漏人）+ 产物过三态判据 0 违规。
 **它同时就是下一条 U1 活体探针的实操**（改 `SKILL.md` → 新会话是否生效），做完 R6 的前置即全清。
-出处 [proposed/dynamic-team-assembly](../../notes/proposed/2026-09-22-dynamic-team-assembly.md)。
+出处 [dynamic-team-assembly](../../notes/implemented/2026-09-22-dynamic-team-assembly.md)（已毕业）。
 
 > **U1 探针的最小步骤**（原「轮间待办 R5a → R6」，已并入本条 ①，不再另占一次动作）：改一次某角色
 > `SKILL.md` 正文 → 新会话再 `skill({ name })` 看正文是否变。源码层已答"下一轮生效"
@@ -53,7 +58,10 @@ CEO 只有 1 个 skill（`design/40` §1 计划 3 个），而现有那个从"DA
 > 内部两条陈述的冲突钉死；要一次真会话 ⇒ **认证档，不进回归**。步骤见
 > [r5-plus-readiness](./r5-plus-readiness.md) §9 P3 与研究笔记 §5。
 
-② **练习场 ≠ 运行场**（[implemented/workspace-hygiene](../../notes/implemented/2026-09-22-workspace-hygiene.md)
+② **练习场 ≠ 运行场 ✅ 已落地（2026-09-22，同上 Note）**——排练/探针默认 workspace 已换
+`dev/rehearsal-workspace/`（四 smoke 脚本翻转 + rehearsal-init）；验收过两道：probe 后真盘零新增、
+两场带 spawn 的真动议跑完真盘仍零新增。原缺口记录：
+[implemented/workspace-hygiene](../../notes/implemented/2026-09-22-workspace-hygiene.md)
 第 3 条）——R4 的"做什么"列了它，**但没实现**（R4 收尾核对提案条目时发现：全仓 scripts / tests /
 packages / dev / 手册 / 指南**零痕迹**）。失败模式仍在，而且是判据**抓不到**的那一类：排练跑在真盘
 时，过程稿不受约束（`drafts/` 本就不需要 `present`），产物会安静地积在 `company-workspace/` 里
