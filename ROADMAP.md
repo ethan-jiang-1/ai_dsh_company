@@ -22,13 +22,7 @@
     含 teammate footgun 残留处理（delegation.md §4.4）与搁置池顺手回看。
 
   - notes/implemented 归档层评估（原 r5-plus §7.4 迁入）：候选 = repo-scaffolding / docs-layering / dev-loop-guide / wochen-naming / r0-loop-acceptance / r1-docs-sync；仍带活判据的六篇（r3-reporting-line、skill-root-isolation、client-remote-single-mount、r2-roles-alive、r2-motion-run、r1-deploy-findings）不要动。
-  - COO 产出模板指认改齐（W3）：pack persona + 三 skill 从 `review-note.md` 改 `ops-review-note.md`（CHARTER 勘误已裁定）；改齐后 CHARTER 勘误行可移除。
   - invest-mobile-complement 两篇 journal 补记或登记豁免（W8）：手册「收工留痕」vs 实盘缺 vp-eng/vp-sales 纪要。
-  - 互审稿命名钉一个系列（W9）：建议 `{role}-review`（与 reconcile-package 首例一致）；存量不动。
-  - 五份 CHARTER「收工动作」三态措辞对齐（W11）：交付物写 `<slug>/drafts/<角色>.md`。
-  - **公司手册加一行「文件以单个换行结尾」**（触发过两次：R5b 的 vp-eng journal、本次用户试用后 CEO 的
-    `ent-agent-platform.md`——排练场产物会进 `pnpm verify` 的 md 扫描面，**排练场不是门禁豁免区**）；
-    根治 = 手册约定，而不是每次手修。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
@@ -183,3 +177,10 @@
   RFC 与 digital-twin 研究笔记双双毕业（**`notes/research/` 清空**——规则不变：活研究进、落地即出）；
   教训候选 C/D/E/F 留今后培养轮（清单住 RFC 条目去向表）。**完成即离队**：队列剩整治转待办
   （当夜按用户长程授权消化中——逐项进展见后续维护规则行与晨报）。
+- 2026-09-24（**整治转待办四项销账**〔当夜长程执行第一批〕）：**W3** COO 模板指认改齐
+  （pack persona + 三 skill → `ops-review-note.md`，CHARTER 勘误行随移；commit `0df46b6`）；
+  **W11** 四份职能 CHARTER 收工动作对齐三态路径 + CEO 份对齐 final（`d012d10`）；
+  **W9** 互审稿命名钉 `{role}-review` + **W10** 手册加「文件以单个换行结尾」（`95280df`，
+  手册经符号链接同生效于排练场——根治排练产物撞 `md-newline`）；排练场参考镜像已刷新
+  （rehearsal-init）。验证：verify 16 项 + test 91/91 + preset-smoke 真挂载 ALL PASS
+  （COO preset 面改动的入戏认证归当夜培养轮 2 认证档一并跑——见后续行）。
