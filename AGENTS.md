@@ -198,7 +198,7 @@ child 失联。CEO preset 保持不放（team-scoped，死行，有反向守卫�
 **有机械门禁**（`tests/layering.spec.ts`：回归层出现子进程/浏览器/网络/密钥即红，且 replay lane
 不得被 import/编进任何 vitest 配置——R5a 双红证）。迭代环 = `pnpm verify` + `pnpm test`
 （**53 条 ≈0.3s**）；认证档（`preset-smoke` / `client-load-smoke` / `delegation-smoke` /
-`handbook-smoke` / `probe-smoke` / `replay-smoke [--ui]` / `release-smoke`）**每轮一次**，按改动面选跑；
+`handbook-smoke` / `probe-smoke` / `presence-e2e-smoke` / `replay-smoke [--ui]` / `release-smoke`）**每轮一次**，按改动面选跑；
 端到端真 UI = `replay-smoke --ui`（R5a 起就绪）。
 
 **观察窗**：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。**dev profile 的 pack 是
