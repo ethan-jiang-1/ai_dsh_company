@@ -127,8 +127,10 @@ R5b 切片完成时，以下都必须是**代理能自己跑**的检查（D15）
 2. `node scripts/client-load-smoke.mjs`：真页面加载后**零插件挂载失败**（驾驶舱的新注册
    走同一条健康路径，注册抛错会被它抓）；**页签在场 + 行可点**的真页断言由
    `replay-smoke --ui --scenario r2-motion` 承担（真会话真数据，验收 5 同流程）。
-3. 端到端（真会话，四角色）：任一分身接活后 5s 内状态列转「执行中」且任务 subject 出现；
-   任务完成转「完成」。
+3. 端到端（真模型，排练场微动议 2 分身——窄证据：四角色走同一条 roster/状态/任务机制路径，
+   全量验证归 demo 分镜）：任一分身接活后状态列转「执行中」，其 in_progress 任务 subject
+   随后出现（窗口断言 ≤15s；R5b 实测 claim 晚于 spawn 约 6s = UI 5s 轮询下一拍，非同帧）；
+   任务完成转「完成」。复跑入口 = `node scripts/presence-e2e-smoke.mjs`（认证档，真模型）。
 4. 回放：`snapshots/r2-motion/` 的录制喂给读模型产出**非空**在场板（4 分身行 + lead 行 +
    7 任务；无 key）。r2 是 lead + 4 child 的**五会话形状**，按 `snapshots/<scenario>/replay/`
    约定建新场景（组合 patch + `DSH_SNAPSHOT_CHILD_FILES` 多 child 映射 + snapshot.yml），

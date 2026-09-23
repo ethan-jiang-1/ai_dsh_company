@@ -40,6 +40,7 @@ node scripts/client-load-smoke.mjs     # client 面完成定义：headless 浏�
 node scripts/probe-smoke.mjs           # 角色连通冒烟（默认快速档 ~6s）：真 web + 真 preset + 一句 ping，断言"挂载/轮次跑完/模型回话/人格进 prompt"；`--full` 才跑 15 个内容探针（慢，5–10min，按需）
 node scripts/handbook-smoke.mjs        # agent-instructions 注入完成定义：断言会话的指令基线 = company-workspace/AGENTS.md（且未混入开发仓库 AGENTS.md）；默认只跑 ceo 一次小调用
 node scripts/delegation-smoke.mjs      # 汇报线边界守卫（R3，1 条 prompt）：vp_eng/vp_sales 在模型可见目录 + 三个控制名仍是**团队版**（shadow 边界变了就红）；`--delegate` 多 1 条 prompt 真委派一次，断言**前台拿到稿子**
+node scripts/presence-e2e-smoke.mjs    # 在场板状态链端到端（R5b，真模型 ~$1）：排练场 2 分身微动议，轮询 agentTeams.view 断言「接活转执行中 → 任务 subject → completed」；改轮询/状态文案/在场板数据链时选跑
 node scripts/deliverables-check.mjs    # 交付物三态（R4）：成品必须回溯到一次 CEO 的 `present`；审归档快照配 --only <slug>；缺 DSH_HOME 或指到日用 home 时拒绝执行
 node scripts/snapshot-motion.mjs       # 动议归档：会话日志（Lead + children）+ workspace.expected 录进 snapshots/（每轮收尾用）
 node scripts/rehearsal-init.mjs        # 排练场成型（轮间待办②练习场≠运行场）：smoke 脚本默认 cwd 已指 dev/rehearsal-workspace（自建；--cwd 可覆盖），真盘只收真实动议产物
