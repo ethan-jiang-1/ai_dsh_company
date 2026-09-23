@@ -16,7 +16,7 @@ describe('formatTokens', () => {
 describe('budgetSummary', () => {
   it('合计四路令牌并给出占比（占比和为 1）', () => {
     const summary = budgetSummary(
-      { uncachedInput: 1_000, cacheRead: 2_000, cacheWrite: 0, output: 1_000 },
+      { uncachedInputTokens: 1_000, cacheReadTokens: 2_000, cacheWriteTokens: 0, outputTokens: 1_000 },
       { turns: 3, steps: 9, llmMs: 8_000, toolMs: 2_000 },
     )
     expect(summary.totalTokens).toBe(4_000)
@@ -39,7 +39,7 @@ describe('budgetSummary', () => {
   })
 
   it('总令牌为 0 时占比全 0（不产生 NaN）', () => {
-    const summary = budgetSummary({ output: 0 }, { llmMs: 0, toolMs: 0 })
+    const summary = budgetSummary({ outputTokens: 0 }, { llmMs: 0, toolMs: 0 })
     expect(summary.rows.every(row => row.share === 0)).toBe(true)
     expect(summary.toolShare).toBeNull()
   })

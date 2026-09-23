@@ -11,6 +11,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import { WocheBrandName } from './Brand.tsx'
 import { CompanyPane, type MemberTarget } from './CompanyPane.tsx'
+import { createCompanyView } from './CompanyView.tsx'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
 import { installStyles } from './styles.ts'
@@ -21,6 +22,9 @@ export const inject = ['slots', 'remote', 'sessions']
 
 /** 本包驾驶舱 tab 的身份：tab 类型 id = keyed 槽 `sidebar.right.pane.tab` 的 key。 */
 const COMPANY_TAB_ID = 'dsh-company-pack/cockpit'
+
+/** 公司整页视图的 cell id（`conversation.view` list 槽的 id；与官方 chat / trajectory 并列）。 */
+const COMPANY_VIEW_ID = 'dsh-company-pack/company'
 
 /**
  * 本包 client 面登记四处：委派工具卡（R3）、部署品牌、会话头部任务板、Company 驾驶舱页签（R5b）。
@@ -116,5 +120,26 @@ export async function apply(ctx: ClientContext): Promise<void> {
           openMember,
         }),
       }, CompanyPane))
+  })
+
+  // 公司整页视图（条目 ① S1）：`conversation.view` 的第三个页签（Chat / Trajectory / 公司）。
+  // 该槽**没有 inject 面**（catalog registerOptions 只有 id/order/label）且 team 投影是 host-only
+  // ⇒ 数据面用注册处闭包注入（见 CompanyView 头注）；跨插件值导入仍被禁。
+  ctx.inject(['sessions', 'remote.agentTeams', 'slots'], (scoped) => {
+    const sessions = scoped.sessions
+    /** 子代理会话归到它的 Lead：团队状态挂在 Lead 上。 */
+    const leadOf = (sessionId: SessionId): SessionId => {
+      const address = sessions.binding(sessionId)?.session.getSnapshot().subagent?.address
+      return address?.parentSessionId ?? sessionId
+    }
+    const CompanyView = createCompanyView({
+      load: (sessionId: SessionId) => scoped.remote.agentTeams.view(leadOf(sessionId)),
+    })
+    scoped.slots.inject('conversation.view', () => scoped.slots.register({
+      name: 'conversation.view',
+      id: COMPANY_VIEW_ID,
+      order: 20,
+      label: () => '公司',
+    }, CompanyView))
   })
 }

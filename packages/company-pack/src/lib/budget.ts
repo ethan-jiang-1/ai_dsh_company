@@ -8,12 +8,12 @@
  * 纯格式化函数，keyless 单测直接断言（数据来自 `useProjection('tokenUsage'|'sessionStats')`）。
  */
 
-/** `tokenUsage` 投影的读取子集（`vendor/dsh/packages/llm/token-meter/src/projection.ts:71`）。 */
+/** `tokenUsage` 投影的读取子集（`vendor/dsh/packages/llm/token-meter/src/usage-projection.ts:14-19,45-50`）。 */
 export interface TokenUsageLike {
-  readonly uncachedInput?: number | undefined
-  readonly output?: number | undefined
-  readonly cacheRead?: number | undefined
-  readonly cacheWrite?: number | undefined
+  readonly uncachedInputTokens?: number | undefined
+  readonly outputTokens?: number | undefined
+  readonly cacheReadTokens?: number | undefined
+  readonly cacheWriteTokens?: number | undefined
 }
 
 /** `sessionStats` 投影的读取子集（`vendor/dsh/packages/session/session-stats/src/projection.ts:199-208`）。 */
@@ -63,10 +63,10 @@ function trim(value: number): string {
  */
 export function budgetSummary(usage: TokenUsageLike | undefined, stats: SessionStatsLike | undefined): BudgetSummary {
   const rows: UsageRow[] = [
-    { label: '未缓存输入', tokens: usage?.uncachedInput ?? 0, share: 0 },
-    { label: '缓存读', tokens: usage?.cacheRead ?? 0, share: 0 },
-    { label: '缓存写', tokens: usage?.cacheWrite ?? 0, share: 0 },
-    { label: '输出', tokens: usage?.output ?? 0, share: 0 },
+    { label: '未缓存输入', tokens: usage?.uncachedInputTokens ?? 0, share: 0 },
+    { label: '缓存读', tokens: usage?.cacheReadTokens ?? 0, share: 0 },
+    { label: '缓存写', tokens: usage?.cacheWriteTokens ?? 0, share: 0 },
+    { label: '输出', tokens: usage?.outputTokens ?? 0, share: 0 },
   ]
   const totalTokens = rows.reduce((sum, row) => sum + row.tokens, 0)
   const llmMs = stats?.llmMs ?? 0
