@@ -112,7 +112,8 @@ proposed Note 在同一 diff 改写为 implemented，不留到交付后。
 
 ## 5. 升级环与发布纪律时点
 
-升级环（AGENTS.md 纪律的展开；做成一个脚本 `scripts/sync-dsh.mjs`，R5 建）：
+升级环（AGENTS.md 纪律的展开；执行器 `scripts/sync-dsh.mjs`，R5a 建——默认检查簿记一致，
+`--pin <tag>` 走完整程序）：
 
 ```text
 vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibility 矩阵加列 → 真实安装冒烟
@@ -122,9 +123,9 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibil
 
 | 时点 | 必须补上 | 依据 |
 |---|---|---|
-| 现在（零 JS，R0–R2） | 无——pack 无代码，不存在依赖声明错误面 | [10-architecture.md](../design/10-architecture.md) §2.1 |
-| R3+（pack 有 `src/`） | `@deepseek-ai/cordis` + 用到的 `@deepseek-ai/dsh-*` 作 **peerDependencies**；拒绝精确钉死（pre-stable API，钉死 = 每次上游同步逼发版） | FAQ 13 research.md 生态失败样本 |
-| R5（发布） | `dsh.compatibility` 矩阵；`npm pack` → 干净 profile → `dsh plugin add` 冒烟 | [roadmap.md](../plans/roadmap.md) R5 |
+| ~~现在（零 JS，R0–R2）~~ | 无——pack 无代码，不存在依赖声明错误面 | [10-architecture.md](../design/10-architecture.md) §2.1 |
+| R3+（pack 有 `src/`）✅ R5a 已补 | `@deepseek-ai/cordis` + 用到的 `@deepseek-ai/dsh-*` 作 **peerDependencies**；拒绝精确钉死（pre-stable API，钉死 = 每次上游同步逼发版） | FAQ 13 research.md 生态失败样本 |
+| R5（发布）✅ R5a 已补 | `dsh.compatibility` 矩阵；`npm pack` → 干净 profile → `dsh plugin add` 冒烟（`release-smoke`） | [roadmap.md](../plans/roadmap.md) R5；合同 = [release.md](../release.md) |
 | OpenSpec 引入 | 触发条件：**第二贡献者进场**或**向 DSH 上游提 seam**（配合 D9 走方案 B）；此前 notes/ 纪律够用 | FAQ 13 answer.md 决策 5 |
 
 ## 6. 双 home 与双 DSH 操作细节

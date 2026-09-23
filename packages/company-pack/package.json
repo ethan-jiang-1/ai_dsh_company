@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Virtual company multi-role plugin pack: 4 role presets (CEO / VP-Eng / VP-Sales / COO) + host bundle rows + deployment brand skin. Design docs: docs/00-index.md",
+  "description": "Virtual company multi-role plugin pack: 5 role presets (CEO / VP-Eng / VP-Sales / COO / CFO) + host bundle rows + deployment brand skin. Design docs: docs/00-index.md",
   "main": "lib/index.js",
   "exports": {
     ".": {
@@ -14,7 +14,6 @@
       "types": "./lib/types/client/index.d.ts",
       "default": "./lib/client.js"
     },
-    "./src/*": "./src/*",
     "./package.json": "./package.json"
   },
   "files": [
@@ -22,23 +21,24 @@
     "presets/**",
     "cordis.patch.yml"
   ],
-  "dependencies": {
-    "@deepseek-ai/dsh-agent-instructions": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-agent-presets": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-persona": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-skill-filesystem": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-session-persistence-jsonl": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-tool-fs": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-tool-fs-search": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-tool-skill": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-tool-todo": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-tool-ask-user": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-tool-subagent": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-tool-present": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-experimental-agent-team": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-experimental-tool-agent-team": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-experimental-client-ui-agent-team": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-tool-subagent-control": "0.1.5-rc.2"
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@deepseek-ai/dsh-agent-instructions": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-agent-presets": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-persona": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-skill-filesystem": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-session-persistence-jsonl": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-tool-fs": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-tool-fs-search": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-tool-skill": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-tool-todo": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-tool-ask-user": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-tool-subagent": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-tool-present": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-experimental-agent-team": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-experimental-tool-agent-team": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-experimental-client-ui-agent-team": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-tool-subagent-control": "^0.1.5-rc.2"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "workspace:*",
@@ -58,6 +58,11 @@
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "compatibility": {
+      "dshReleases": [
+        "dsh-v0.1.5-rc.2"
+      ]
     },
     "client": {
       "inject": [

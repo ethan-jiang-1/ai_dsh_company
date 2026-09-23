@@ -66,6 +66,9 @@ importers:
       '@types/node':
         specifier: ^22.20.0
         version: 22.20.4
+      dsh-company-pack:
+        specifier: workspace:*
+        version: link:packages/company-pack
       lightningcss:
         specifier: ^1.32.0
         version: 1.33.0
@@ -93,58 +96,55 @@ importers:
 
   packages/company-pack:
     dependencies:
-      '@deepseek-ai/dsh-agent-instructions':
-        specifier: 0.1.5-rc.2
-        version: link:../../vendor/dsh/packages/context/agent-instructions
       '@deepseek-ai/dsh-agent-presets':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/preset/agent-presets
-      '@deepseek-ai/dsh-experimental-agent-team':
-        specifier: 0.1.5-rc.2
-        version: link:../../vendor/dsh/packages/experimental/agent-team
       '@deepseek-ai/dsh-experimental-client-ui-agent-team':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/experimental/client-ui-agent-team
       '@deepseek-ai/dsh-experimental-tool-agent-team':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/experimental/tool-agent-team
       '@deepseek-ai/dsh-persona':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/preset/persona
       '@deepseek-ai/dsh-session-persistence-jsonl':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/session/session-persistence-jsonl
       '@deepseek-ai/dsh-skill-filesystem':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/skill/skill-filesystem
       '@deepseek-ai/dsh-tool-ask-user':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/interaction/tool-ask-user
       '@deepseek-ai/dsh-tool-fs':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/fs/tool-fs
       '@deepseek-ai/dsh-tool-fs-search':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/fs/tool-fs-search
       '@deepseek-ai/dsh-tool-present':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/fs/tool-present
       '@deepseek-ai/dsh-tool-skill':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/skill/tool-skill
       '@deepseek-ai/dsh-tool-subagent':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/subagent/tool-subagent
       '@deepseek-ai/dsh-tool-subagent-control':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/subagent/tool-subagent-control
       '@deepseek-ai/dsh-tool-todo':
-        specifier: 0.1.5-rc.2
+        specifier: ^0.1.5-rc.2
         version: link:../../vendor/dsh/packages/todo/tool-todo
     devDependencies:
       '@deepseek-ai/cordis':
         specifier: workspace:*
         version: link:../../vendor/dsh/vendor/cordis
+      '@deepseek-ai/dsh-agent-instructions':
+        specifier: workspace:*
+        version: link:../../vendor/dsh/packages/context/agent-instructions
       '@deepseek-ai/dsh-api-remotes':
         specifier: workspace:*
         version: link:../../vendor/dsh/packages/api/remotes
@@ -166,6 +166,9 @@ importers:
       '@deepseek-ai/dsh-client-ui-tool':
         specifier: workspace:*
         version: link:../../vendor/dsh/packages/client/ui-tool
+      '@deepseek-ai/dsh-experimental-agent-team':
+        specifier: workspace:*
+        version: link:../../vendor/dsh/packages/experimental/agent-team
       '@deepseek-ai/dsh-session':
         specifier: workspace:*
         version: link:../../vendor/dsh/packages/core/session

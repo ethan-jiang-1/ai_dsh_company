@@ -94,17 +94,27 @@ else {
   } catch { fail('vendor-pin', 'vendor/dsh 未初始化（git submodule update --init）') }
 }
 
-// ── 6. pack 形状：dsh.bundle.patch 指向的文件存在 ───────────────────────────
+// ── 6. pack 形状：dsh.bundle.patch 指向的文件存在 + 兼容矩阵覆盖钉住的 tag ──────
 const pack = JSON.parse(readFileSync(join(root, 'packages/company-pack/package.json'), 'utf8'))
 const patchRel = pack?.dsh?.bundle?.patch
 if (typeof patchRel !== 'string' || !existsSync(join(root, 'packages/company-pack', patchRel))) fail('pack-bundle', 'dsh.bundle.patch 缺失或未指向真实文件')
 else ok('pack-bundle')
+// 兼容矩阵（R5a 发布欠账，guides/60 §5）：`dsh.compatibility.dshReleases` 必须包含当前
+// 钉住的 vendor tag——升 pin 不加矩阵列 = 没验证过就装作验证过。升 pin 走
+// scripts/sync-dsh.mjs（它会同步加列），这条门禁保证忘加就红。
+const compatReleases = pack?.dsh?.compatibility?.dshReleases
+if (!Array.isArray(compatReleases) || !compatReleases.includes(expectedTag)) {
+  fail('pack-compat', `dsh.compatibility.dshReleases 必须包含当前钉住的 ${expectedTag}（升 pin 走 scripts/sync-dsh.mjs 并同步加列）`)
+} else ok(`pack-compat (${expectedTag} ×${String(compatReleases.length)})`)
 
-// ── 7. preset 行引用的插件必须在 pack dependencies 里 ──────────────────────
+// ── 7. preset 行引用的插件必须在 pack 依赖声明里（R5a 起：dependencies ∪ peerDependencies）──
 // DSH 的 verify-cordis-config 同构门禁（AGENTS.md：cordis.yml 的裸插件必须出现在
 // 其解析清单的 dependencies）。漏了 → profile 安装后行解析不到 → preset 标记 broken，
 // UI 里给不出可用角色（R1 实证：persona / skill-filesystem 缺依赖）。
-const packDeps = new Set(Object.keys(pack?.dependencies ?? {}))
+// R5a 起 runtime 依赖声明从 dependencies 精确钉改 peerDependencies（guides/60 §5：
+// pre-stable API 拒绝钉死；profile 模板自带 autoInstallPeers: false，行解析走安装锚
+// 兜底）——本门禁按包名归一，两种声明都算"在列"。
+const packDeps = new Set([...Object.keys(pack?.dependencies ?? {}), ...Object.keys(pack?.peerDependencies ?? {})])
 const rowPlugins = new Set()
 for (const role of roles) {
   const text = readFileSync(join(root, 'packages/company-pack/presets', role, 'agent.cordis.yml'), 'utf8')
@@ -115,7 +125,7 @@ for (const role of roles) {
     const spec = m[1]
     const pkg = /^(@[^/]+\/[^/]+)/.exec(spec)?.[1] ?? spec
     rowPlugins.add(spec)
-    if (!packDeps.has(pkg)) fail('preset-dep', `${role} 的行引用 ${spec}，但 pack dependencies 里没有 ${pkg}（安装后解析不到 → preset broken）`)
+    if (!packDeps.has(pkg)) fail('preset-dep', `${role} 的行引用 ${spec}，但 pack 依赖声明（dependencies ∪ peerDependencies）里没有 ${pkg}（安装后解析不到 → preset broken）`)
   }
 }
 ok(`preset-row-deps ×${rowPlugins.size}`)

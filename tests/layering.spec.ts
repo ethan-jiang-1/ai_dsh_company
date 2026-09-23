@@ -60,6 +60,32 @@ describe('测试分层纪律（guides/60 §9.1：真模型/真浏览器不进回
     expect(config, '认证档脚本（scripts/）不得进 vitest include').not.toMatch(/include:.*scripts\//)
   })
 
+  it('replay lane 是第三档：只由 scripts/replay-smoke.mjs 驱动，不进 pnpm test', () => {
+    // ① 回归层不得 import scripts/ 下的**驱动脚本**——上面的 FORBIDDEN 只扫 spec 自己的
+    //    文本，import 进来会把 spawn/fetch/浏览器整条带进回归层（文本扫描看不见传递引入）。
+    //    `scripts/lib/`（纯逻辑库）除外：deliverables.mjs 这类无副作用模块本来就是 keyless
+    //    单测的对象（R4 设计），禁它会误伤。
+    const importers: string[] = []
+    for (const file of specFiles(TESTS)) {
+      if (file.endsWith(SELF)) continue
+      const text = readFileSync(file, 'utf8')
+      if (/(?:from|import)\s*\(?['"][^'"]*scripts\/(?!lib\/)/.test(text)) importers.push(relative(ROOT, file))
+    }
+    expect(importers, '驱动脚本（*-smoke / replay-smoke）不得被 tests/ import（scripts/lib/ 纯逻辑库除外）').toEqual([])
+
+    // ② 任何 vitest 配置都不得把 scripts/ 编进测试发现——将来加第二个 config（replay lane）也算。
+    const configFiles = readdirSync(ROOT).filter(name => /^vitest.*\.config\./.test(name))
+    expect(configFiles.length, '主 vitest.config.ts 应在场').toBeGreaterThan(0)
+    for (const name of configFiles) {
+      const text = readFileSync(join(ROOT, name), 'utf8')
+      expect(text, `${name} 不得引用 scripts/（replay lane 起进程+浏览器，属认证档）`).not.toContain('scripts/')
+    }
+
+    // ③ 纪律有家：replay-smoke 自己的头注声明分层（guides/60 §9.1）。
+    const replay = readFileSync(join(ROOT, 'scripts/replay-smoke.mjs'), 'utf8')
+    expect(replay, 'replay-smoke 头注必须声明"不进 pnpm test"').toContain('不进 pnpm test')
+  })
+
   it('分层预算写在 guides/60 §9.1（纪律有家，不靠记忆）', () => {
     const guide = readFileSync(join(ROOT, 'docs/guides/60-dev-loop.md'), 'utf8')
     expect(guide, 'guides/60 缺 §9.1 测试分层').toContain('9.1 测试分层与预算')

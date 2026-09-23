@@ -4,7 +4,8 @@
 #   ⚠ agent-presets 用替换语法：web-app bundle 已 insert 此行（default: standard），
 #   我们的替换行把 config 换成自己的 roots + default: ceo；在无此行的组合（纯 headless）
 #   会 not found 警告丢弃——那种场景用 dev/company.overlay.yml 的 insert 补。
-# 依赖纪律：runtime deps 精确钉 0.1.5-rc.2（= vendor 钉住 tag；R5 转 peer + compatibility 矩阵）。
+# 依赖纪律（R5a 起）：runtime 依赖声明为 peerDependencies（不精确钉死；pre-stable API），
+# 兼容矩阵在 package.json 的 dsh.compatibility.dshReleases —— 合同见 docs/release.md。
 
 # ── preset roster（替换 web-app 的出厂行；roots 自定位）──
 # ⚠ baseUrl 语义（R1 实证，app-boot/src/index.ts:799）：`ctx.baseUrl` = **profile 目录**

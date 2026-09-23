@@ -49,12 +49,12 @@ implemented → archived）。
 
 | 将出生的合同 | 诞生轮次 | 内容来源 |
 |---|---|---|
-| `release.md` | **R5a** | 发布形状：peers、compatibility 矩阵、真实安装冒烟程序（欠账清单见 [plans/r5-plus-readiness.md](./plans/r5-plus-readiness.md) §9 P4） |
 | *（不单独出生合同）* | R5b 驾驶舱 | UI 面随轮更新 [design/30-ui-demo.md](./design/30-ui-demo.md) §5 |
 | 文档卫生合同（**名字待定**） | **R6** | 内容诊治轮出生：入口链与内容层卫生的现在时规则（线 B 流程对齐的弹性边界结论落 AGENTS.md 纪律表 / guides，是否单独立合同轮内定）；入口条件见 [plans/roadmap.md](./plans/roadmap.md) R6 行 |
 | 培养/学习合同（**名字待定**） | R7 | 培养回路与学习载体的现在时语义；入口条件见 [plans/roadmap.md](./plans/roadmap.md) R7 行（2026-09-23 前为 R6） |
 
-（`delegation.md` 已于 R3 出生，见上表。）
+（`delegation.md` 已于 R3 出生、[release.md](./release.md) 已于 R5a 出生——发布形状：
+peers / 兼容矩阵 / 真实安装冒烟 / 升 pin 程序，见上表历史行。）
 
 ## 决策台账
 

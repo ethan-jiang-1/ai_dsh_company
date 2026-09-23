@@ -44,7 +44,8 @@ R1 起按需增补 tool-bash / tool-web / tool-todo / compaction 行（[40 号](
 
 ## 已知开放点
 
-- pack 的 runtime deps 精确钉 `0.1.5-rc.2`（8 个，npm 实测同版可用）；R5 转 peerDependencies
-  + compatibility 矩阵（guides/60 §5 时点表）。
+- ~~pack 的 runtime deps 精确钉 `0.1.5-rc.2`~~ **已闭（R5a）**：改 peerDependencies +
+  compatibility 矩阵，合同与程序见 [release.md](./release.md)（`release-smoke` /
+  `sync-dsh`）。
 - `plugin add` 的行注册顺序：pnpm 成功后 CLI 才写 bundles 列表——若中途失败，手动补
   `dsh.profile.bundles`（R1 实证一次）。

@@ -43,8 +43,9 @@ node scripts/delegation-smoke.mjs      # 汇报线边界守卫（R3，1 条 prom
 node scripts/deliverables-check.mjs    # 交付物三态（R4）：成品必须回溯到一次 CEO 的 `present`；审归档快照配 --only <slug>；缺 DSH_HOME 或指到日用 home 时拒绝执行
 node scripts/snapshot-motion.mjs       # 动议归档：会话日志（Lead + children）+ workspace.expected 录进 snapshots/（每轮收尾用）
 node scripts/rehearsal-init.mjs        # 排练场成型（轮间待办②练习场≠运行场）：smoke 脚本默认 cwd 已指 dev/rehearsal-workspace（自建；--cwd 可覆盖），真盘只收真实动议产物
-node scripts/replay-smoke.mjs          # 无 key 会话重放（R5a P1.2）：--record 场景组合下重录（认证档）→ 默认重放 + 归一化比对（第三档，不进 pnpm test；机制见 notes/research/2026-09-23-replay-harness-feasibility.md）
-node scripts/release-smoke.mjs         # （R5a 建）npm pack → 干净 profile → dsh plugin add → 冒烟
+node scripts/replay-smoke.mjs          # 无 key 会话重放（R5a P1.2/P1.3）：--record 场景组合下重录（认证档）→ 默认重放 + 归一化比对 + sidecar 比对；--ui 加真浏览器委派卡端到端（ariaSnapshot 金样，P1.3；第三档，不进 pnpm test；机制见 notes/research/2026-09-23-replay-harness-feasibility.md）
+node scripts/release-smoke.mjs         # 发布冒烟（R5a P4）：构建 → npm pack → 干净 profile → plugin add → boot 冒烟（真实安装形状，dev profile 的 link: 不算数；合同 = docs/release.md）
+node scripts/sync-dsh.mjs              # 升 pin 程序（R5a P4）：默认检查四处簿记一致；--pin <tag> 走完整升级环（guides/60 §5 + docs/release.md）
 ```
 
 ## 密钥
@@ -140,15 +141,30 @@ repo 内为自由区；工具状态（缓存/store/配置）一律**先重定向
 
 ## 当前状态
 
-**R0 立环 ✅ / R1 两人公司 ✅ / R2 五角色全员 ✅ / R3 汇报线 ✅ / R4 成品流程 ✅ 完成（2026-09-22）。
-当前轮 **R5a 门禁与发布 —— ▶ 下一轮**（R5b 驾驶舱排其后，再后 R6 内容诊治（2026-09-23 插入）→ R7 分身成长（原 R6 改号，前置全清）；见 `docs/plans/roadmap.md`；
+**R0 立环 ✅ / R1 两人公司 ✅ / R2 五角色全员 ✅ / R3 汇报线 ✅ / R4 成品流程 ✅ / R5a 门禁与发布 ✅（2026-09-23）。
+下一轮 **R5b 驾驶舱 ▶**（再后 R6 内容诊治 → R7 分身成长；见 `docs/plans/roadmap.md`；
 迭代按垂直轮 D11，每轮换全新对话上下文）。
+
+**R5a 交付（外部可观察）**：① **无 key replay harness**——`scripts/replay-smoke.mjs`（P1.1 窄研究
+→ P1.2 落地 → P1.3 委派卡端到端）：默认档 = 会话日志归一化零 diff + sidecar×4（system-prompt /
+tool-schemas expected）零 diff；`--ui` 档 = 真浏览器加载真页面（连接工作区 → 搜索开会话 → 展开轮次组）
+→ centerCol ariaSnapshot 金样（`snapshots/r3-delegation/replay/ui.expected.md`）+ 委派卡可访问名断言；
+**红证** = 摘场景组合 `company-client` 行三连红。② **发布欠账闭账**——pack manifest 改
+**peerDependencies**（17 个，不钉死）+ `dsh.compatibility.dshReleases` 矩阵 + description 五角色；
+`pnpm verify` 新门禁 `pack-compat`（升 pin 忘加矩阵列即红，已反证）+ preset-row-deps 改读 deps ∪ peers。
+③ **`release-smoke`**（构建 → npm pack → 干净 profile → `plugin add` → boot 冒烟，真实安装形状）
+与 **`sync-dsh`**（检查模式 + `--pin` 升级环）出生；合同 = `docs/release.md`。
+收尾记录 `notes/implemented/2026-09-23-r5a-gates-and-release.md`。
 
 **轮间待办①② 已落地 ✅（2026-09-22，见 `notes/implemented/2026-09-22-team-assembly-and-rehearsal-split.md`）**：
 ① 按问题组队——CEO 新 skill `assembling-the-team`，双向对照两场全过（两职能不超编 / 四职能不漏人），
 兼作 U1 活体探针（结论：skill 改动**只有新会话生效**）⇒ **R7「分身成长」前置全清**；② 练习场 ≠ 运行场——
 排练/探针默认 cwd 已换 `dev/rehearsal-workspace/`（真盘零新增验收过两道）。
-**下一轮 = R5a 门禁与发布**：起点 `docs/plans/roadmap.md` R5a 行 + `plans/r5-plus-readiness.md` §9 P1（先窄研究再落）。
+
+**R5b 起点**：`docs/plans/roadmap.md` R5b 行 + `notes/proposed/2026-09-22-org-presence-board.md`（组织在场板）——
+⚠ **开工前先钉 `docs/00-index.md` 待定 Q5–Q8**（在场板主键 / 冷启动补历史 / `status` 文案 /
+成员空间入口；判据 = 四条都变成提案里的现在时陈述，才进 Plan Mode）；回放断言可直接用
+`replay-smoke --scenario` 喂 `snapshots/r2-motion/` 的录制（harness 已就绪）。
 
 **R4 交付（外部可观察）**：交付物三态有**机器判据**——`scripts/lib/deliverables.mjs`（纯逻辑）+
 `scripts/deliverables-check.mjs`（运行场入口，解多帧 zstd）。规则：成品 `deliverables/<slug>/final.md`
@@ -168,26 +184,23 @@ repo 内为自由区；工具状态（缓存/store/配置）一律**先重定向
 成对形状）——vendor 实证：`tool-agent-team` 的 maybeInstall 只在 `tryMembership != undefined`
 （团队成员）时装团队版控制名，而职能**根**会话不是成员 ⇒ 不补就是"既没团队版也没全局版"，continuable
 child 失联。CEO preset 保持不放（team-scoped，死行，有反向守卫）。**残留**：teammate 共享 CEO preset，
-那里的 `subagent` 仍与 team shadow 相冲 —— 留 R5a 与升 pin 一起处理（`docs/delegation.md` §4.4）。
+那里的 `subagent` 仍与 team shadow 相冲 —— 与升 pin 一起处理（`scripts/sync-dsh.mjs --pin`；
+`docs/delegation.md` §4.4）。
 
-**门禁分层（R3 立）**：见 `docs/guides/60-dev-loop.md` §9.1——**真模型/真浏览器不进迭代环**，且
-**有机械门禁**（`tests/layering.spec.ts`：回归层出现子进程/浏览器/网络/密钥即红，已反证）。迭代环 =
-`pnpm verify` + `pnpm test`（**38 条 ≈0.2s**）；认证档（`preset-smoke` / `delegation-smoke` /
-`handbook-smoke` / `probe-smoke`）**每轮一次**，产出归档；端到端真 UI 留 R5a replay harness。
-**R2 旧纪律**：§9 门禁分层、§10 自动化只许是轻任务。
+**门禁分层（R3 立，R5a 扩）**：见 `docs/guides/60-dev-loop.md` §9.1——**真模型/真浏览器不进迭代环**，且
+**有机械门禁**（`tests/layering.spec.ts`：回归层出现子进程/浏览器/网络/密钥即红，且 replay lane
+不得被 import/编进任何 vitest 配置——R5a 双红证）。迭代环 = `pnpm verify` + `pnpm test`
+（**39 条 ≈0.2s**）；认证档（`preset-smoke` / `client-load-smoke` / `delegation-smoke` /
+`handbook-smoke` / `probe-smoke` / `replay-smoke [--ui]` / `release-smoke`）**每轮一次**，按改动面选跑；
+端到端真 UI = `replay-smoke --ui`（R5a 起就绪）。
 
 **观察窗**：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。**dev profile 的 pack 是
 `link:` 符号链接**（2026-09-22 起，`node_modules/dsh-company-pack` → 仓库源码）：改 `presets/**` /
 persona / skills **即刻生效，无需重装**（新会话生效边界见 U1 探针结论）；只有改 pack 依赖或 bundle
-行才需要重装。profile 的 `.npmrc` 已把 store/cache 钉在 repo 内（`~/Library` 不再被碰）。**真实安装
-形状的验证归 R5a `release-smoke`**（干净 profile + file:/registry 安装）。新增的行插件仍要进 pack
-`dependencies` 与 lockfile（R4 为此踩过一次）。
+行才需要重装。profile 的 `.npmrc` 已把 store/cache 钉在 repo 内（`~/Library` 不再被碰）。
+**真实安装形状的验证 = `release-smoke`（R5a 起，合同 `docs/release.md`）**。新增的行插件要进
+pack 依赖声明（R5a 起 = peerDependencies）与 lockfile（R4 为此踩过一次）。
 **皮肤已落**：pack 的 client 面 = 侧栏品牌槽 + 会话头部任务板（活面板）+ 委派工具卡。
-**R5a 起点**：`docs/plans/roadmap.md` R5a 行（无 key replay harness + `release-smoke` + `sync-dsh` +
-发布欠账）+ `plans/r5-plus-readiness.md` §9 P1（**先窄研究再落**）。
-**R5b 起点**：同表 R5b 行 + `notes/proposed/2026-09-22-org-presence-board.md`（组织在场板）——
-⚠ **开工前先钉 `docs/00-index.md` 待定 Q5–Q8**（在场板主键 / 冷启动补历史 / `status` 文案 /
-成员空间入口；判据 = 四条都变成提案里的现在时陈述，才进 Plan Mode）。
 **R4 留下的一笔（别丢）**：**journal 回溯压缩决定不做**——规则已立在公司手册「轮末收敛」（已闭轮的
 journal 压成 CHARTER 一条附录，只由人做），但 R1/R2 的 38 篇角色记忆**保留不压**（理由见 R4 Note：
 提案这条无证据、结构异质、且它是 D8 唯一的跨会话记忆、R7 培养回路正建立其上）。

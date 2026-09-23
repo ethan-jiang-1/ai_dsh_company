@@ -93,3 +93,49 @@ cd vendor/dsh && ./node_modules/.bin/vitest run --config vitest.snapshot.config.
 §6 遗留三条的实测答案（P1.2 落地时全部钉死）：profile 选 **web + patch** ✓（ceo preset +
 team + 委派全部挂上，最小 patch 即可）；pnpm run 陷阱按建议绕开（直接 node 驱动）；team
 shadow 的工具目录经 `{{tools}}` 归一吸收、无假阳性（禁 `vp_eng` 的红测试证明敏感度真实存在）。
+
+## 8. P1.3 落地实证（2026-09-23 深夜，web lane + sidecar + 委派卡端到端）
+
+`node scripts/replay-smoke.mjs --ui` 双判据通过：**绿** = 无 key 12s 全绿（会话零 diff +
+4 份 sidecar 零 diff + 委派卡 ×1 + ui 金样零 diff）；**红** = 摘场景组合的 `company-client`
+行 → 三连红（卡基数 0 / aria 无节点 / 金样 diff 点名缺 `🗂 任务板`）→ 还原复绿。
+P1.1–P1.3 没覆盖到、落地中钉死的机制：
+
+1. **裸包名行要求根 node_modules 能解析**：`dsh-company-pack` 写进场景组合后报
+   `Cannot find package … imported from <临时cwd>/.dsh/profiles/web/`——
+   `materializeProfilePatch` 的 `linkProfilePackage`（launcher.ts:386-406）从 **patch 文件
+   位置**解析裸包名，解析不到就**静默跳过**（"may instead belong to the dsh installation"），
+   而行装载器从 profile 目录向上找 `profiles/node_modules`（heal 兜底链接）。解法 = 根
+   `package.json` devDependencies 加 `dsh-company-pack: workspace:*`（P1.2 给
+   dsh-llm-replay/dsh-session-snapshot 补链接的同款修法，同款坑）。
+2. **sidecar 的归一化语境是"全 run 的 session ids"，不是单条日志**：lead 的 system prompt
+   嵌 `Team id is session-<自身id>`、child 的嵌 lead 的 id——ctx 只带自己的 header id 时
+   两条 sidecar 每次运行必漂移。vendor 对位是 `normalizedSystemPrompts(log, ctx)` +
+   场景自有替换（scaffold.ts:1069-1072）：`webUrl → {{webUrl}}`（web 起在 OS 随机端口，
+   "…Web GUI at http://127.0.0.1:<port>" 随之漂移）；录制侧从文本**句子锚定**自提取
+   （避免误伤公司手册里的正当端口引用），重放侧传本次 boot 的 base。
+3. **fresh home 首访必弹 "Internal Testing Notice" 模态框**，挡住整页指针事件——守卫必须
+   **等它出现**再关（goto 返回时它往往还没挂载完，条件检查会扑空，实证一次）；另加兜底：
+   还剩可见模态框就点名失败。
+4. **目录选择器必须钉 browse 对**：web-app 出厂行 `directory-picker-auto` 在有显示环境的
+   macOS 选 **native**（OS 原生选择器）——headless 浏览器里永远打不开（症状：textbox 点
+   了没反应，无 dialog 无 menu）。bundle 注释原话："pin the interaction = 直接组这对行"
+   （`dsh-host-directory-picker-browse` + `dsh-client-ui-directory-picker-browse`，两侧组合
+   同构地禁 auto + insert 对）。零会话事件，重放零 diff 不受影响。
+5. **`[data-tool="vp_eng"]` 不能当委派卡在场判据**：**通用工具行也渲染同款属性**
+   （vendor present.e2e 的 `[data-tool="present"]` 就是通用行）——红证时 locator 版误绿、
+   可访问名版正确红。基数断言一律走可访问名（`getByRole('button', { name: /^委派 VP-Eng（研发）/ })`），
+   data-tool 只作诊断输出。这正是 readiness P1.3 "断言口径必须落在可访问名/文本"的实证注脚。
+6. **工具卡默认折叠在 "N tool call" 轮次组里**，不展开不进 aria 树（aria 树不含
+   display:none 的内容）——捕获前 `expandTurnProcesses`（vendor support.ts:41 同款）。
+
+红证的口径说明：readiness 原文是"摘 `cordis.patch.yml` 里的 toolview 注册"，但该注册实际
+住在本包 client 入口（`src/client/index.ts` 的 `slots.inject('tool.call.toolview', …)`，
+编译进 `lib/client.js`）；场景组合的 `company-client` 行是让这个注册进浏览器的唯一通道，
+摘行 = 摘注册的装载，可观察效果等价且不动产物文件。
+
+与原计划的差异：金样捕获区域用 `centerCol`（vendor present.e2e 同款），断言双轨 = 可访问名
+（aria 树口径）+ aria 金样全文比对；`data-tool` locator 降级为诊断。浏览器管线
+（normalizeAria / captureStableAria / expandTurnProcesses / 连工作区 / 搜索开会话）为
+vendor scaffold/support 的逐行转写（scaffold 顶部 `import { expect } from 'vitest'`，
+纯 Node 驱动 import 不了——P1.2 Note 的预判成立）。

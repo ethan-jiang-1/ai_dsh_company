@@ -58,15 +58,12 @@ R7（原 R6）的"培养/学习"已经就绪、只是它墙上写的阻塞项过
    官方入口在会话头部的 Team 名册（`sessions.openSubagent`）。要选一个槽
    （侧栏分组 / 头部动作 / 名册行可点）并写进 R5b 验收——这是"谁在哪个空间"能否不靠讲解的判据。
 
-### 2.2 R5a 的两个"门禁/发布"脚本 —— READY（机械）
+### 2.2 R5a 的两个"门禁/发布"脚本 —— ✅ READY → **已交付（R5a，2026-09-23）**
 
-- `release-smoke`：`npm pack` → 干净 profile → `dsh plugin add` → 冒烟，形状已写在
-  [guides/60](../guides/60-dev-loop.md) §5 与 [profile.md](../profile.md)。
-- `sync-dsh`：换 tag → 记 SHA 簿记 → typecheck → compatibility 矩阵加列 → 真实安装冒烟（同上）。
-- **欠账一条（R5a 必须补）**：guides/60 §5 规定"R3+（pack 有 `src/`）用到的 `dsh-*` 作
-  **peerDependencies**、拒绝精确钉死"，而 `packages/company-pack/package.json` 现在仍是
-  `dependencies` 精确钉 `0.1.5-rc.2`，且没有 `dsh.compatibility`。R5a 发布前必须一起改。
-  顺带：该 manifest 的 `description` 还写着"4 role presets"，R2 起已是五角色。
+> 两个脚本均已落地并绿：`release-smoke`（构建 → npm pack → 干净 profile → plugin add →
+> boot 冒烟，全绿；开发中三次真实红 = 敏感度实证）与 `sync-dsh`（默认检查四处簿记一致 +
+> `--pin` 完整程序）。peers/矩阵欠账同步闭账（manifest 已改 peers + `dsh.compatibility`，
+> `pnpm verify` 新增 `pack-compat` 门禁）。合同 = [release.md](../release.md)。
 
 ### 2.3 无 key replay harness —— **RESEARCH（R5a 唯一真正的未知）**
 
@@ -173,8 +170,8 @@ roadmap 原来的 R5 一行装着：驾驶舱 v1（含协作动态流）+ 组织
    归档（commit `0a8a287`）与"三条现场教训"（commit `45d034d`）没有行~~
    **已补（2026-09-22，backfill 一行指向两个 commit 与落盘文件）**，保持"一次决策一行"。
 2. ~~roadmap R6 行/维护规则的阻塞项按 §5 改写。~~ **已改（2026-09-22）。**
-3. **`packages/company-pack/package.json`**：`description` 四角色过期（已五角色）；
-   peers/compat 欠账见 §2.2 + §9 P4。**未改**（R5a 一起做，避免现在动 manifest 触发重装）。
+3. ~~**`packages/company-pack/package.json`**：`description` 四角色过期（已五角色）；
+   peers/compat 欠账见 §2.2 + §9 P4。~~ **已闭（R5a，2026-09-23，见 §9 P4）。**
 4. **`notes/implemented/` 无归档层**：低优先。真要收，候选是 `repo-scaffolding`、
    `docs-layering`、`dev-loop-guide`、`wochen-naming`、`r0-loop-acceptance`、`r1-docs-sync`；
    仍带活判据的（`r3-reporting-line`、`skill-root-isolation`、`client-remote-single-mount`、
@@ -222,22 +219,25 @@ roadmap 原来的 R5 一行装着：驾驶舱 v1（含协作动态流）+ 组织
   重放**必须红**且报错点名 `vp_eng`；还原即绿。
 - 产出物：`snapshots/r3-delegation/` 的归一化副本（原始录制保留）+ `scripts/replay-smoke.mjs` + 研究笔记。
 
-**P1.3 委派卡端到端（web lane + `ui.expected.md`）**
-- ⚠ **判据口径必须改**：roadmap 原本写 `[data-tool="vp_eng"]`，那是 **DOM 属性**；而 `ui.expected.md`
-  是 **accessibility tree**（只有 role / name / text，没有 `data-*`）。断言要落在**可访问名/文本**上。
-  卡片可见文本是"委派 · VP-Eng"（`DelegationCard.tsx` 渲染 `委派` + VP 显示名），但卡片**只有
-  `expandable` 时**才有 `role="button"`，否则是普通 div。
-- **做法**：先录一次，看它在树里长什么样，再决定断言 `button "委派 …"` 还是 `text: 委派 · VP-Eng`；
-  若两者都不稳，就给卡片补显式 `aria-label`（那是**产品改动**，按改动走门禁 + 更新 keyless 组件层）。
-- **判据（绿）**：真 UI 重放里出现该卡片节点；**（红）**：把 `cordis.patch.yml` 里 `tool.call.toolview`
-  注册摘掉 → 红。
-- 产出物：一个 web 场景的 `ui.expected.md` + 重放脚本里的一条断言 + roadmap R5a 验收行改成新口径。
+**P1.3 委派卡端到端（web lane + `ui.expected.md`）✅ 已完成（2026-09-23）**
 
-**P1.4 归轮与分层守卫（防它偷偷变慢）**
-- replay lane 是**第三档**：无 key，但要起进程（web lane 还要起浏览器）⇒ 只由
-  `scripts/replay-smoke.mjs` 驱动，**不得进 `pnpm test`**。
-- **判据**：扩 `tests/layering.spec.ts`——断言 `package.json` 的 `test` 仍是纯 `vitest run`、
-  `vitest.config.ts` 的 include 只认 `tests/**`，且第二个 config（replay）**不被主 config include**。
+> `replay-smoke --ui` 双判据闭环：绿 = 无 key 12s 全绿（卡 ×1 可访问名断言 + centerCol aria
+> 金样零 diff + 4 份 sidecar 零 diff）；红 = 摘场景组合 `company-client` 行 → 三连红（卡基数 0 /
+> aria 无节点 / 金样 diff）→ 还原复绿。落地钉死的六个机制（裸包名解析 / 全 run session-ids ctx /
+> Internal Testing Notice / browse 对钉定 / data-tool 通用行陷阱 / 轮次组展开）见
+> [research 笔记 §8](../../notes/research/2026-09-23-replay-harness-feasibility.md)。
+> 判据口径实证注脚：`[data-tool]` locator **通用工具行也渲染**（红证时误绿），基数断言一律走
+> 可访问名；红证用摘 `company-client` 行（= 注册的装载通道，效果等价于摘 toolview 注册）。
+- ⚠ ~~判据口径必须改~~（已按可访问名落地）：断言落在可访问名/文本——aria 树里没有 `data-*`。
+- ~~判据（绿/红）~~ 已双证；产出物 = `snapshots/r3-delegation/replay/ui.expected.md` +
+  sidecar ×4 + 脚本断言 + roadmap R5a 验收行（口径已在表内）。
+
+**P1.4 归轮与分层守卫（防它偷偷变慢）✅ 已完成（2026-09-23）**
+
+> `tests/layering.spec.ts` 已扩（39 条之一）：① tests/ 不得 import scripts/ 驱动脚本
+> （`scripts/lib/` 纯逻辑库除外——deliverables.mjs 是 keyless 单测对象）；② 任何
+> vitest 配置不得引用 scripts/；③ replay-smoke 头注必须声明"不进 pnpm test"。红证双过
+> （违规 spec + 第二个 config 各红一次），全量 `pnpm test` 39/39 绿。
 
 ### P2 · R5b：开工前必须钉的四个决定（钉完提案才算 decision-complete）
 
@@ -266,14 +266,14 @@ roadmap 原来的 R5 一行装着：驾驶舱 v1（含协作动态流）+ 组织
   都不变（要重启）。**哪一档都要记进研究笔记 §5**——它决定 R7"学习回路"能不能当场生效。
 - **判据**：结果落进研究笔记 §5 的追问（R7 收尾引用）；探针文件改回原样。
 
-### P4 · R5a：发布欠账（机械，别忘）
+### P4 · R5a：发布欠账（机械，别忘）✅ 已完成（2026-09-23）
 
-- `packages/company-pack/package.json`：把用到的 `@deepseek-ai/dsh-*` 与 `@deepseek-ai/cordis`
-  从 `dependencies` 精确钉死改为 **`peerDependencies`**，并按 guides/60 §5 加 `dsh.compatibility`
-  矩阵；顺手改 `description`（"4 role presets" → 五角色）。
-- **判据**：`release-smoke` 在**干净 profile** 里 `dsh plugin add` 装上并冒烟通过；
-  `pnpm verify` 的 `preset-row-deps` 仍绿（它按包名归一，peer 也要在列）。
-- 产出物：`release.md` 出生（发布形状、peers、兼容矩阵、真实安装冒烟程序）。
+> 全部闭账：manifest 已改 **peerDependencies**（17 个：cordis `^4.0.2` + dsh-* `^0.1.5-rc.2`，
+> dependencies 清空）+ `dsh.compatibility.dshReleases` 矩阵 + description 五角色；
+> `pnpm verify` 的 preset-row-deps 改读 deps ∪ peers（仍绿 ×12）且新增 `pack-compat` 门禁
+> （钉住 tag ∉ 矩阵即红，已反证）；`release-smoke.mjs` 干净 profile 全绿（真实安装形状，
+> 安装副本 peers/矩阵/presets/lib 全数断言）；`sync-dsh.mjs` 出生（检查模式绿 + 脏树拒绝
+> 实证）；`release.md` 出生。合同与程序 = [release.md](../release.md)。
 
 ### P5 · 台账缺口（小修）
 

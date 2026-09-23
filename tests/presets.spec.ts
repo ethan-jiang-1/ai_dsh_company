@@ -27,8 +27,11 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(found.filter(p => p.broken !== undefined).map(p => `${p.id}: ${String(p.broken)}`)).toEqual([])
   })
 
-  it('preset 行引用的插件都在 pack dependencies 里（DSH verify-cordis-config 同构）', () => {
-    const deps = new Set(Object.keys(JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')).dependencies ?? {}))
+  it('preset 行引用的插件都在 pack 依赖声明里（DSH verify-cordis-config 同构；R5a 起 deps ∪ peers）', () => {
+    const manifest = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')) as { dependencies?: Record<string, string>, peerDependencies?: Record<string, string> }
+    // R5a 起 runtime 依赖 = peerDependencies（docs/release.md：不精确钉死）；本断言按包名归一，
+    // 两种声明都算"在列"——与 scripts/verify.mjs §7 的门禁同口径。
+    const deps = new Set([...Object.keys(manifest.dependencies ?? {}), ...Object.keys(manifest.peerDependencies ?? {})])
     const missing = [...new Set(['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'].flatMap(rowPlugins))].filter(name => !deps.has(name))
     expect(missing).toEqual([])
   })
