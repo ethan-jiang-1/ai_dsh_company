@@ -66,8 +66,30 @@ cd vendor/dsh && ./node_modules/.bin/vitest run --config vitest.snapshot.config.
 3. 入口 `scripts/replay-smoke.mjs`：spawn `vendor/dsh/apps/cli/src/bin.ts` + patch 链 + `DSH_SNAPSHOT_*` env，比对归一化产物（**不进 `pnpm test`**，第三档——readiness P1.4 已有分层守卫计划）。
 4. 判据（绿/红）：零 diff 通过 + 无 key；临时删 `presets/ceo/agent.cordis.yml` 的 `vp_eng` 行 → 重放红且点名 `vp_eng`（readiness P1.2 原文）。
 
-## 6. 遗留与风险（P1.2 开工先答）
+## 7. P1.2 落地实证（2026-09-23 晚，随落地补记）
 
-- **profile 选择**：r3-delegation 是 **web 会话**（preset 只在 web-app 组合挂载，guides/60 §2 第 3.6 层）。两条路：(a) `profile: web` + 我们的 patch（web lane 形状，要构建 client bundles——R0 引导已建）；(b) `profile: headless` + patch insert `session-controller`/web-app 行（组合可行性未证）。**倾向 (a)**：与录制时形状一致，且 P1.3 的 UI 断言本来就要 web lane。P1.2 第一件事就是拿最小 patch 验证 (a) 挂上 ceo preset + team。
-- pnpm run 包装器的 deps-status 陷阱同样适用于我们未来的 `replay-smoke`（若用 pnpm script 包装）——直接调 vitest/node 二进制。
-- r3 fixture 的 `request/header` 里 team 版控制名与 `{{tools}}` sidecar 的关系：team shadow 的工具目录会整体进 tool-schemas sidecar，比对按 class 归口——P1.2 实测确认无假阳性。
+`scripts/replay-smoke.mjs --record / （默认）replay` 已落地并双判据通过（r3-delegation：
+**无 key 零 diff 11s**；禁 `vp_eng` 行 → 红，报 `Error: unknown tool "vp_eng"`；还原复绿）。
+落地中钉死的三个机制（P1.1 没覆盖到的）：
+
+1. **title-llm 是脚本条目黑洞**：web 组合默认启用 `session-title-llm`，其 LLM 调用打 llm-replay
+   适配器但**不进 deriveReplayScript**（只收 assistant 流）⇒ 每次标题生成吃掉一个脚本条目、
+   供条整体错位。解法 = **录/放组合同构地禁用 title-llm**（两侧都走截断回退，事件形态一致）。
+   vendor 的 headless 场景天然无此问题（其 fixture 无 title-llm-request 事件）。
+2. **重试抖动不可复现**：默认 retry policy `jitterRatio: 0.1` 让 `llm/retry` 的 `delayMs` 每次
+   不同（499.6 vs 531.0ms 实测）。解法 = 两侧组合声明同一 `retryPolicy: {backoff: {jitterRatio: 0}}`
+   （vendor 的 retry 场景 `empty-response-retry-current` 即用确定性 policy `[1,1,0]` + `recording: authored`）。
+3. **llm-replay 的模型能力声明重建 request header**：录制侧真 provider 的适配器会补
+   `maxTokens/reasoningEffort/adapterDefaults`，重放侧必须在 `ReplayModelConfig` 声明
+   `defaultMaxTokens` / `reasoningEfforts` / `defaultReasoningEffort` / `contextWindow` /
+   `systemPromptUpdate`，`request/header` 与 `request/context` 才逐字段一致（接口注释原话：
+   "so replay reconstructs the request header a live catalog produced"）。
+
+另两个实操细节：**录制必须在场景组合下跑**（`--record` 用 `cordis.yml`，与
+`cordis.snapshot.yml` 仅差 LLM 行——从 delegation-smoke 采收的捷径会因组合漂移 diff）；
+根 `devDependencies` 需链接 `dsh-llm-replay`/`dsh-session-snapshot`（R1 同款解析问题，
+本例报 `cannot resolve active package`）。
+
+§6 遗留三条的实测答案（P1.2 落地时全部钉死）：profile 选 **web + patch** ✓（ceo preset +
+team + 委派全部挂上，最小 patch 即可）；pnpm run 陷阱按建议绕开（直接 node 驱动）；team
+shadow 的工具目录经 `{{tools}}` 归一吸收、无假阳性（禁 `vp_eng` 的红测试证明敏感度真实存在）。

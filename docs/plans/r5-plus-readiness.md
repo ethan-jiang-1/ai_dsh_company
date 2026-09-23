@@ -205,7 +205,15 @@ roadmap 原来的 R5 一行装着：驾驶舱 v1（含协作动态流）+ 组织
   ② 最小归一化字段集；③ web lane 的 `ui.expected.md` 由谁采集（浏览器怎么起、断言怎么落）。
 - **判据**：研究笔记里给出"一条最小场景的可执行命令"，且该命令**今天就跑得动**（哪怕先是一个空场景）。
 
-**P1.2 落一条最小场景（复用 `snapshots/r3-delegation/`）**
+**P1.2 落一条最小场景（复用 `snapshots/r3-delegation/`）✅ 已完成（2026-09-23）**
+
+> `scripts/replay-smoke.mjs --record / replay` 双判据通过：绿 = 无 key 归一化零 diff（11s，
+> lead+child 两会话）；红 = 禁 `vp_eng` 行 → `Error: unknown tool "vp_eng"`；还原复绿。
+> 落地钉死的三个机制（title-llm 条目黑洞 / 重试抖动 / llm-replay 能力声明）见
+> [research 笔记 §7](../../notes/research/2026-09-23-replay-harness-feasibility.md)。
+> 与原计划的差异：fixture 落在 `snapshots/r3-delegation/replay/`（raw + 归一化 + 组合 patch
+> 三层，R3 历史归档不动）；sidecar（system-prompt/tool-schemas expected）**未做**——归
+> P1.3 web lane 升级时补（suite.ts 有 vitest 依赖，纯 Node 驱动暂不可 import）。
 - 把已归档的 `snapshots/r3-delegation/sessions/lead.jsonl` 归一化成重放输入（`session.jsonl` +
   vendor 字段的 `snapshot.yml` + 逐 header class 的 sidecar），加 `scripts/replay-smoke.mjs` 作运行场入口
   （spawn `pnpm dsh`，**不进 `pnpm test`**）。

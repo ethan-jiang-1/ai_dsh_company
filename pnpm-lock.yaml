@@ -27,9 +27,15 @@ importers:
       '@deepseek-ai/dsh-experimental-tool-agent-team':
         specifier: workspace:*
         version: link:vendor/dsh/packages/experimental/tool-agent-team
+      '@deepseek-ai/dsh-llm-replay':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/test-support/llm-replay
       '@deepseek-ai/dsh-persona':
         specifier: workspace:*
         version: link:vendor/dsh/packages/preset/persona
+      '@deepseek-ai/dsh-session-snapshot':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/test-support/session-snapshot
       '@deepseek-ai/dsh-skill-filesystem':
         specifier: workspace:*
         version: link:vendor/dsh/packages/skill/skill-filesystem
@@ -84,12 +90,6 @@ importers:
       vitest:
         specifier: ^4.1.8
         version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.20.4)(happy-dom@20.14.5)(vite@6.4.3(@types/node@22.20.4)(jiti@2.7.0)(lightningcss@1.33.0)(tsx@4.23.15)(yaml@2.9.1))
-
-  dev/harness-home/tmp/redirect-test:
-    dependencies:
-      open:
-        specifier: 11.0.4
-        version: 11.0.4
 
   packages/company-pack:
     dependencies:

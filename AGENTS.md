@@ -43,6 +43,7 @@ node scripts/delegation-smoke.mjs      # 汇报线边界守卫（R3，1 条 prom
 node scripts/deliverables-check.mjs    # 交付物三态（R4）：成品必须回溯到一次 CEO 的 `present`；审归档快照配 --only <slug>；缺 DSH_HOME 或指到日用 home 时拒绝执行
 node scripts/snapshot-motion.mjs       # 动议归档：会话日志（Lead + children）+ workspace.expected 录进 snapshots/（每轮收尾用）
 node scripts/rehearsal-init.mjs        # 排练场成型（轮间待办②练习场≠运行场）：smoke 脚本默认 cwd 已指 dev/rehearsal-workspace（自建；--cwd 可覆盖），真盘只收真实动议产物
+node scripts/replay-smoke.mjs          # 无 key 会话重放（R5a P1.2）：--record 场景组合下重录（认证档）→ 默认重放 + 归一化比对（第三档，不进 pnpm test；机制见 notes/research/2026-09-23-replay-harness-feasibility.md）
 node scripts/release-smoke.mjs         # （R5a 建）npm pack → 干净 profile → dsh plugin add → 冒烟
 ```
 
