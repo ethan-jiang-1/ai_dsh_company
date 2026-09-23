@@ -336,6 +336,8 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 | **单元/组件 keyless** | ~1s | `pnpm test`——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要 jsdom/浏览器） | 每次改动 |
 | 装配 keyless | ~10s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） | 客户端改动 |
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） | 轮末 / **升 pin 时** |
+| **重放 lane（第三档，无 key）** | ~11s | `replay-smoke`（默认：会话日志 + sidecar 零 diff）；`--ui`（+真浏览器委派卡端到端）——**要起进程与浏览器但不花模型钱**，故只由 `scripts/replay-smoke.mjs` 驱动、不进 `pnpm test`（机械门禁见下） | replay/组合/委派卡改动 / 轮末 |
+| 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→boot 冒烟；合同 [release.md](../release.md)） | pack 依赖/发布面改动 / 轮末 |
 | 认证档（真模型） | 分钟级 | `preset-smoke` / `probe-smoke` / `handbook-smoke` | **每轮一次**，产出归档；不进回归 |
 
 **三条硬规矩**：
@@ -343,7 +345,9 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 1. **真模型 / 真浏览器不进迭代环**：迭代环只跑 `verify` + `test`（秒级）；分钟级一律"轮末一次"。
    **这条有机械门禁**：`tests/layering.spec.ts` 扫 `tests/**`，出现 `node:child_process` / playwright /
    `fetch(` / 密钥即红（已反证：塞一行 `import { spawn } from 'node:child_process'` 立刻变红）。
-   想测真入口 → 写 `scripts/*-smoke.mjs`，别塞进 `tests/`。
+   想测真入口 → 写 `scripts/*-smoke.mjs`，别塞进 `tests/`。**R5a 起另禁两条**（均双红证）：tests/
+   不得 import `scripts/` 下的驱动脚本（`scripts/lib/` 纯逻辑库除外）；任何 vitest 配置不得把
+   `scripts/` 编进测试发现——重放 lane 是第三档，只由 `scripts/replay-smoke.mjs` 驱动。
 2. **能做成纯函数就做成纯函数**：UI 组件把"展示事实"抽成纯函数（范本 `delegationCardModel`），
    keyless 单测直接断言它——组件层就永远不需要模型与浏览器。
 3. **认证档要能"重放"而不是"重跑"**：真模型跑一次 → 会话日志归档 → 后续用归档做回放断言

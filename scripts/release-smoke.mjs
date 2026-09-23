@@ -69,7 +69,6 @@ mkdirSync(packTmp, { recursive: true })
 const packEnv = { ...process.env, npm_config_cache: join(ROOT, 'dev/harness-home/tmp/npm-cache') }
 const tarball = join(packTmp, run('npm', ['pack', '--pack-destination', packTmp], { cwd: PACK_DIR, env: packEnv }).trim().split('\n').filter(Boolean).at(-1))
 if (!existsSync(tarball)) { console.error(`release-smoke: npm pack 没产出 tarball（${tarball}）`); process.exit(1) }
-const packManifest = JSON.parse(readFileSync(join(PACK_DIR, 'package.json'), 'utf8'))
 console.log(`  tarball：${tarball.split('/').pop()}（${String(Math.round(Number(run('ls', ['-l', tarball]).split(/\s+/)[4] ?? 0) / 1024))} KB）`)
 
 // ── ③ 干净 profile 预置（先删后建；initProfile 对已存在文件零改动 ⇒ 预置即生效）──

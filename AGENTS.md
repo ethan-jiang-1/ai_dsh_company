@@ -185,7 +185,7 @@ tool-schemas expected）零 diff；`--ui` 档 = 真浏览器加载真页面（�
 （团队成员）时装团队版控制名，而职能**根**会话不是成员 ⇒ 不补就是"既没团队版也没全局版"，continuable
 child 失联。CEO preset 保持不放（team-scoped，死行，有反向守卫）。**残留**：teammate 共享 CEO preset，
 那里的 `subagent` 仍与 team shadow 相冲 —— 与升 pin 一起处理（`scripts/sync-dsh.mjs --pin`；
-`docs/delegation.md` §4.4）。
+`docs/delegation.md` §4 第 4 条）。
 
 **门禁分层（R3 立，R5a 扩）**：见 `docs/guides/60-dev-loop.md` §9.1——**真模型/真浏览器不进迭代环**，且
 **有机械门禁**（`tests/layering.spec.ts`：回归层出现子进程/浏览器/网络/密钥即红，且 replay lane
