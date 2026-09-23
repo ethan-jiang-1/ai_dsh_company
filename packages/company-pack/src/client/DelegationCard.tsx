@@ -106,12 +106,12 @@ export function DelegationCard({ toolName, block, inspect }: ToolCallViewProps) 
   return (
     <div className="wk-delegation" data-tool={toolName} data-state={state}>
       {header}
-      <div style={{ marginTop: '0.2rem' }}>
+      <div className="wk-mt-xs">
         {brief.title !== '' ? <div className="wk-delegation-title">{brief.title}</div> : null}
         {open ? <pre className="wk-delegation-pre">{brief.prompt}</pre> : null}
       </div>
       {open && output !== null ? (
-        <div style={{ marginTop: '0.4rem' }}>
+        <div className="wk-mt-sm">
           <div className="wk-delegation-state">VP 交回的稿子</div>
           <pre className="wk-delegation-result" data-role="delegation-result">{output}</pre>
         </div>

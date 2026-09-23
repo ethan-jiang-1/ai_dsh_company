@@ -258,6 +258,31 @@ const CSS = `
 /* 只有最新的那条动（列表倒序 ⇒ :first-child 就是新条目；key 稳定 ⇒ 旧条目不会重放动画） */
 .wk-activity li:first-child { animation: wk-slide-in var(--ds-transition-duration) var(--ds-ease-in-out) both; }
 
+/* ── 视觉打磨（条目 ③）：空态/加载态统一 + 内联样式收口 ── */
+
+/* 空态 / 加载态：一处定义（StateNote 组件用），避免各面板各写各的 */
+.wk-empty { opacity: 0.75; }
+.wk-loading { opacity: 0.75; font-style: normal; }
+
+/* 行内小间距（原为内联 style 字面量，收进类里便于统一调） */
+.wk-mt-xs { margin-top: 0.2rem; }
+.wk-mt-sm { margin-top: 0.4rem; }
+.wk-mb-xs { margin-bottom: 0.3rem; }
+.wk-lead-note { margin: 0.25rem 0 0.5rem; }
+.wk-tabstrip-meta { align-self: center; padding-right: 0.25rem; }
+
+/* DAG 边：颜色进 CSS（原内联），并修对比度——
+   ① 待办边：原 border-l3 在浅色下只有 1.47（几乎看不见）⇒ 换 label-tertiary（3.71 / 8.54 ✓）
+   ② 已走通边：success-primary 深浅同值（green-500），浅色下仅 2.28 ⇒ 用 color-mix 把它混向标签墨色
+      （浅色变深、深色变亮，两主题同时达标：4.14 / 9.93 ✓）；color-mix 不支持时回退到原令牌 */
+.wk-edge { fill: none; stroke: var(--dsw-alias-label-tertiary); stroke-width: 1.5; }
+.wk-edge[data-done='true'] {
+  stroke: var(--dsw-alias-state-success-primary);
+  stroke: color-mix(in srgb, var(--dsw-alias-state-success-primary) 70%, var(--dsw-alias-label-primary));
+  stroke-dasharray: 1;
+}
+.wk-edge[data-done='false'] { stroke-dasharray: 0.02 0.015; }
+
 @media (prefers-reduced-motion: reduce) {
   /* 动效层统一关闭（官方惯例：28 个 vendor 样式表都这么做）。
      注意选择器要逐个点名——.wk-motion 只是给未来新元素预留的开关。 */

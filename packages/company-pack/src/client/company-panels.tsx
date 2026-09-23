@@ -39,6 +39,20 @@ function memberDot(status: PresenceRow['status']): 'done' | 'ongoing' | 'warning
 }
 
 /**
+ * 空态 / 加载态的统一呈现（条目「视觉打磨」③）：**一处定义**，四个面板与页签体共用，
+ * 避免"（空）""还没有…""当前没有…"各写各的。
+ * @param props.text - 文案（句末统一带句号；加载态用省略号）。
+ * @param props.kind - `empty`（默认）或 `loading`。
+ * @returns 提示行。
+ */
+export function StateNote({ text, kind = 'empty' }: { readonly text: string; readonly kind?: 'empty' | 'loading' }) {
+  return <div className={kind === 'loading' ? 'wk-meta wk-loading' : 'wk-meta wk-empty'}>{text}</div>
+}
+
+/** 统一的加载态文案（读权威团队态期间）。 */
+export const LOADING_NOTE = '读取团队状态…'
+
+/**
  * 看板：三列（待办 / 进行中 / 完成），卡上带 owner、依赖徽章与就绪状态。
  * @param props.columns - 读模型折好的列。
  * @returns 看板。
@@ -53,7 +67,7 @@ export function BoardPanel({ columns }: { readonly columns: readonly BoardColumn
             <span className="wk-column-count">{column.cards.length}</span>
           </div>
           {column.cards.length === 0
-            ? <div className="wk-meta">（空）</div>
+            ? <StateNote text="这一列暂时是空的。" />
             : column.cards.map(card => (
               <article className="wk-card" key={card.id}>
                 <div className="wk-card-subject">{card.subject}</div>
@@ -80,7 +94,7 @@ export function BoardPanel({ columns }: { readonly columns: readonly BoardColumn
  * @returns SVG（空图给空态文案）。
  */
 export function DagPanel({ layout }: { readonly layout: DagLayout }) {
-  if (layout.nodes.length === 0) return <div className="wk-meta">这场动议还没有任务依赖图。</div>
+  if (layout.nodes.length === 0) return <StateNote text="这场动议还没有任务依赖图。" />
   return (
     <svg
       width={layout.width}
@@ -95,12 +109,9 @@ export function DagPanel({ layout }: { readonly layout: DagLayout }) {
           className="wk-edge"
           data-done={edge.done}
           d={edge.path}
-          /* pathLength=1：把 dash 单位归一化 ⇒ dashoffset 1→0 的"画线"与真实长度无关 */
+          /* pathLength=1：把 dash 单位归一化 ⇒ dashoffset 1→0 的"画线"与真实长度无关。
+             颜色/线宽/dash 全在 CSS（.wk-edge[data-done]）——含浅色对比度修正。 */
           pathLength={1}
-          fill="none"
-          stroke={edge.done ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-border-l3)'}
-          strokeWidth={1.5}
-          strokeDasharray={edge.done ? 1 : '0.02 0.015'}
         />
       ))}
       {layout.nodes.map(node => (
@@ -137,12 +148,13 @@ export function PresencePanel({ rows, activity }: {
   return (
     <div>
       {rows.length === 0
-        ? <div className="wk-meta">当前没有团队动议。</div>
+        ? <StateNote text="当前没有团队动议。" />
         : rows.map(row => (
           <div className="wk-row" key={row.id}>
             <span className="wk-row-name">
               <StateDot state={memberDot(row.status)} />
-              {row.role === 'lead' ? '★ ' : ''}{row.displayName}
+              {row.displayName}
+              {row.role === 'lead' ? <Tag tone="neutral">Lead</Tag> : null}
             </span>
             <Tag tone={row.status === 'failed' ? 'danger' : row.status === 'running' ? 'info' : 'outline'}>
               {row.statusLabel}
@@ -152,7 +164,7 @@ export function PresencePanel({ rows, activity }: {
         ))}
       <div className="wk-section-title">协作动态</div>
       {activity.length === 0
-        ? <div className="wk-meta">暂无动态（打开期间的变化会出现在这里）。</div>
+        ? <StateNote text="暂无动态（打开期间的变化会出现在这里）。" />
         : (
           <ul className="wk-activity">
             {activity.map(entry => (
@@ -234,7 +246,7 @@ export function BudgetPanel({ summary }: { readonly summary: BudgetSummary }) {
           </div>
         </div>
       ))}
-      <div className="wk-meta">只显示令牌（wire 上没有金额字段，不编单价）。</div>
+      <StateNote text="只显示令牌（wire 上没有金额字段，不编单价）。" />
     </div>
   )
 }

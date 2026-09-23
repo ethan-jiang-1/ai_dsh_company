@@ -145,7 +145,7 @@ export function TeamToolCard({ toolName, block, inspect }: ToolCallViewProps) {
         ? <div className="wk-delegation-title">{detail}</div>
         : null}
       {open && output !== null ? (
-        <div style={{ marginTop: '0.4rem' }}>
+        <div className="wk-mt-sm">
           <div className="wk-delegation-state">结果</div>
           <pre className="wk-delegation-result" data-role="team-tool-result">{output}</pre>
         </div>

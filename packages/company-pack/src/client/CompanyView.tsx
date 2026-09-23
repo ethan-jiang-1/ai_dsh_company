@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
-import { BoardPanel, BudgetPanel, DagPanel, PresencePanel } from './company-panels.tsx'
+import { BoardPanel, BudgetPanel, DagPanel, LOADING_NOTE, PresencePanel, StateNote } from './company-panels.tsx'
 import { useCompanyData, type CompanyDataInjected } from './use-company-data.ts'
 
 /** 本视图的 props（标准 session kit + owner props）。 */
@@ -57,7 +57,7 @@ export function createCompanyView(injected: CompanyViewInjected) {
             </button>
           ))}
           <span style={{ flex: 1 }} />
-          <span className="wk-meta" style={{ alignSelf: 'center', paddingRight: '0.25rem' }}>每 5 秒刷新</span>
+          <span className="wk-meta wk-tabstrip-meta">每 5 秒刷新</span>
           <Button
             size="sm"
             variant="ghost"
@@ -69,7 +69,7 @@ export function createCompanyView(injected: CompanyViewInjected) {
         </div>
         <div className="wk-view-body">
           {data.error !== null && <div className="wk-error">{data.error}</div>}
-          {data.team === null && data.error === null && <div className="wk-meta">读取团队状态…</div>}
+          {data.team === null && data.error === null && <StateNote kind="loading" text={LOADING_NOTE} />}
           {data.team !== null && panel === 'board' && <BoardPanel columns={data.columns} />}
           {data.team !== null && panel === 'dag' && <DagPanel layout={data.dag} />}
           {data.team !== null && panel === 'presence' && (

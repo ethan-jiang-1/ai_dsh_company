@@ -10,6 +10,7 @@ import type { RemoteResult } from '@deepseek-ai/dsh-api-remotes/client'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type { TeamViewLike } from '../lib/presence.ts'
+import { LOADING_NOTE, StateNote } from './company-panels.tsx'
 
 const STATUS_LABEL: Record<string, string> = {
   pending: '待办',
@@ -25,14 +26,14 @@ const STATUS_LABEL: Record<string, string> = {
  * @returns 表格。
  */
 export function TasksTableView({ view }: { readonly view: TeamViewLike | null }) {
-  if (view === null) return <div className="wk-meta">读取团队状态…</div>
+  if (view === null) return <StateNote kind="loading" text={LOADING_NOTE} />
   return (
     <>
-      <div className="wk-meta" style={{ marginBottom: '0.3rem' }}>
+      <div className="wk-meta wk-mb-xs">
         成员：{view.members.map(member => `${member.name}(${member.status})`).join('、') || '（无）'}
       </div>
       {view.tasks.length === 0
-        ? <div className="wk-meta">还没有共享任务</div>
+        ? <StateNote text="还没有共享任务。" />
         : (
             <table className="wk-table">
               <thead>

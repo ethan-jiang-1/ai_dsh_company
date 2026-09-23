@@ -15,7 +15,7 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { PresenceRow } from '../lib/presence.ts'
-import { BoardPanel, BudgetPanel, DagPanel } from './company-panels.tsx'
+import { BoardPanel, BudgetPanel, DagPanel, StateNote } from './company-panels.tsx'
 import { TasksTableView } from './TasksPanel.tsx'
 import { useCompanyData, type CompanyDataInjected } from './use-company-data.ts'
 
@@ -128,7 +128,7 @@ export function PresenceTab(props: PresenceTabProps) {
       {data.error !== null && <div className="wk-error">{data.error}</div>}
       {data.streamError !== null && <div className="wk-error">动态流不可用：{data.streamError}</div>}
       {data.rows.length === 0
-        ? <div className="wk-meta">当前没有团队动议。</div>
+        ? <StateNote text="当前没有团队动议。" />
         : (
           <>
             <div className="wk-row wk-row-head" aria-hidden="true">
@@ -149,20 +149,21 @@ export function PresenceTab(props: PresenceTabProps) {
                 >
                   <span className="wk-row-name">
                     <StateDot state={memberDot(row.status)} />
-                    {row.role === 'lead' ? '★ ' : ''}{row.displayName}
+                    {row.displayName}
+                    {row.role === 'lead' ? <Tag tone="neutral">Lead</Tag> : null}
                   </span>
                   <span className="wk-row-status"><Tag tone={memberTone(row.status)}>{row.statusLabel}</Tag></span>
                   <span className="wk-row-task" title={row.currentTask ?? ''}>{row.currentTask ?? '—'}</span>
                 </button>
               ))}
             </div>
-            <div className="wk-meta" style={{ margin: '0.25rem 0 0.5rem' }}>状态 = 该分身在本场团队动议中的忙闲</div>
+            <div className="wk-meta wk-lead-note">状态 = 该分身在本场团队动议中的忙闲</div>
           </>
         )}
       <div className="wk-activity-block">
         <strong>协作动态</strong>
         {data.activity.length === 0
-          ? <div className="wk-meta">暂无动态（打开期间的变化会出现在这里）</div>
+          ? <StateNote text="暂无动态（打开期间的变化会出现在这里）。" />
           : (
             <ul className="wk-activity">
               {data.activity.map(entry => (
