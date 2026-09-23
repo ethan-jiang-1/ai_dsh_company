@@ -40,11 +40,18 @@
 
 ## ④ 环境状态（下条会话判断"哪些已就绪"只读这里）
 
-- 观察窗（重放，无 key）在 **3081**；条目 ① 收尾时重起过一个（token 随 boot 变化）——
-  **本轮未重起**（bundle 已重建但窗口是旧会话进程），下条会话要用就重起（`node /tmp/ux-serve.mjs`）。
-- 一次性脚本在 `/tmp`：`ux-company.mjs`（含 S2/S3/S4 验收探针）、`ux-serve.mjs`、`ux-empty.mjs`、`ux-shots.mjs`。
-- 截图证据：`dev/harness-home/ux-shots/`（gitignored，含 08-sidebar-guide / 09-sidebar-board /
-  10-float-panel / 11-after-dock / tasks-tab-opened / view-float）。
+- 观察窗（重放，无 key）：**给人现场试用时的三个坑**（2026-09-23 实测，都已踩过）：
+  1. **`mkdtemp` 必须取 realpath**：macOS 的 `/var/folders/…` 是 `/private/var/folders/…` 的符号链接，
+     而界面目录选择器返回 `/private/…`、客户端把它规范化 ⇒ 用 `/var/…` 建会话会让它们落进**另一个
+     工作区分组**（侧栏永远看不到）。`/tmp/ux-serve.mjs` 已修（`realpathSync(mkdtempSync(...))`）。
+  2. **侧栏会话列表与 `session/list` 不同源**：RPC 返回全部 6 条（含「动议（R2 正式场）」），
+     但界面侧栏只列客户端自己创建的会话 ⇒ **重放会话要用侧栏放大镜（Search sessions）搜索进入**。
+  3. **工作区路径要手粘**：对话框默认是目录浏览器，**必须先点 `Edit path`** 才出现粘贴框（已写进
+     `docs/demo.md` 前置第 3 条）。
+- 当前窗口：**3083**（`OBSERVE_PORT=3083 node /tmp/ux-serve.mjs`），工作区 `/private/var/folders/…/dsh-observe-r2-motion-ZCkbT1`。
+- 一次性脚本在 `/tmp`：`ux-company.mjs`（S2/S3/S4 验收探针）、`ux-serve.mjs`（常驻观察窗）、
+  `ux-path.mjs` / `ux-priv.mjs` / `ux-where.mjs` / `ux-reload.mjs`（用户路径与界面结构探针）。
+- 截图证据：`dev/harness-home/ux-shots/`（gitignored）。
 - **未 push**（push 走 `ssh.github.com:443`，由人推）。
 
 ## ⑤ 条目去向与打磨点销账
