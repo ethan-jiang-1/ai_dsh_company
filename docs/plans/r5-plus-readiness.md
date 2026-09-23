@@ -192,7 +192,12 @@ roadmap 原来的 R5 一行装着：驾驶舱 v1（含协作动态流）+ 组织
 
 ### P1 · R5a：无 key replay harness（唯一需要先研究的）
 
-**P1.1 窄研究（约半天，不写实现）**
+**P1.1 窄研究（约半天，不写实现）✅ 已完成（2026-09-23）**
+
+> 三问全答 + 判据命令实测跑通（`agent-instructions` 场景 1.8s 无 key 重放通过）。结论、
+> 机制出处（钉到 vendor 文件）与 P1.2 落地路径见
+> [research/2026-09-23-replay-harness-feasibility](../../notes/research/2026-09-23-replay-harness-feasibility.md)；
+> 遗留一条：r3 场景的 profile 选择（web + patch 优先，P1.2 第一件事验证）。
 - 读：`vendor/dsh/snapshots/AGENTS.md`、`vendor/dsh/vitest.snapshot.config.ts`、
   `vendor/dsh/snapshots/session/headless.snapshot.ts`、`vendor/dsh/snapshots/web/present/`（web lane 样例）、
   `vendor/dsh/packages/test-support/session-snapshot/src/{harness,manifest,launcher,normalize}.ts`。
