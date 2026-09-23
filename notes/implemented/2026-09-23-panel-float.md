@@ -1,7 +1,7 @@
 # 面板窗口化（可移动 · 可缩放 · 最小尺寸约束）
 
-状态：proposed（2026-09-23 登记入队；出处 = 用户反馈：任务板弹窗与官方 Agent Team 弹窗互盖、且都不能移动）
-类型：feature（队列序 2；小切片，可独立验收）
+状态：已消化（2026-09-23 交付并收尾；收尾 Note = [2026-09-23-panel-tabs.md](./2026-09-23-panel-tabs.md)）
+类型：feature（原队列序 1——条目 ① 收尾后递补；完成即离队）
 研究依据：[research/2026-09-23-visual-expression-for-demo.md](../research/2026-09-23-visual-expression-for-demo.md) §1.4
 
 ## 问题

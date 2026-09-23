@@ -17,7 +17,7 @@
 2. `pnpm dsh web -- --port 3086 --no-open`（3080 被 GUI 占用；启动横幅打印带 token 的 URL）
 3. 浏览器打开该 URL（**必须带 token**：直接开端口会卡鉴权）。会话列表按【工作目录】过滤——先选到 `company-workspace`，否则看不到本场会话。
 4. 新建会话：preset 选 **wochen CEO**（`ceo` 是 profile 默认）；工作目录 `company-workspace`
-5. 进“另一位成员的空间”：**teammate 的会话不在顶层列表**——在会话头部点 **Team 名册**，点成员名打开其会话（`sessions.openSubagent`，子会话）。显式入口 = 驾驶舱在场板**行可点**（R5b 已交付，D22④）。
+5. 进“另一位成员的空间”：**teammate 的会话不在顶层列表**——在会话头部点 **Team 名册**，点成员名打开其会话（`sessions.openSubagent`，子会话）。显式入口 = 右栏「在场」页签的在场板**行可点**（条目 ② 起为平台页签，可拖出成浮窗并看）。
 6. 收场验收：`node scripts/deliverables-check.mjs`（交付物三态；审归档快照要配 `--only <slug>`，
    因为快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只有本轮日志）
 
@@ -26,7 +26,7 @@
 | # | 空间 | 镜头内容 | 观测点（外部可验证，不讲解也能看懂） |
 |---|---|---|---|
 | 1 | CEO | 收到动议，先澄清目标/约束/验收 | CEO 复述动议并列出三点，不直接开写 |
-| 2 | CEO | DAG 拆解：建任务 + `blockedBy` 依赖 + 指定 owner | 任务板（🗂 头部按钮）出现多行任务：owner 分别是 VP-Sales/VP-Eng/COO/CFO，依赖列非空 |
+| 2 | CEO | DAG 拆解：建任务 + `blockedBy` 依赖 + 指定 owner | 头部「任务板」按钮（开右栏页签）或「公司」视图·看板出现多行任务：owner 分别是 VP-Sales/VP-Eng/COO/CFO，依赖徽章非空 |
 | 3 | CEO | `spawn_teammate` 拉起四个职能 | 名册出现 CEO + 四行成员，状态 running/idle 实时变化；任务板成员栏同步 |
 | 4 | **切到 VP-Eng 会话** | 它读自己的 KB、消化 brief、出稿 | 会话里能看到读 `kb/vp-eng/CHARTER.md` 的工具调用；产出写入 `deliverables/` |
 | 5 | **切到 VP-Sales 会话** | 市场与定价判断（MEDDIC 六问 / 双向估算） | 引用 `kb/vp-sales/` 客户事实；数字带【事实/假设】标注 |
@@ -36,7 +36,8 @@
 | 9 | 收尾 | 记账 | `kb/<role>/journal/` 各追加一篇 |
 
 **镜头纪律**：每一步先指"这是谁的空间"（会话头部/侧栏），再指"活怎么交接"（任务板 owner/依赖、
-消息记录）。跨空间动态：驾驶舱 v1 动态流 = 成员/任务差分（消息级聚合在搁置池，见 roadmap）；另可走各空间对话流 + 任务板。
+消息记录）。跨空间动态：「在场」页签的动态流 = `session/follow` 流式（打开即见全程；消息级聚合在
+搁置池，见 roadmap）；另可走「公司」视图四面板 + 各空间对话流。
 
 ## 验收判据（R2）
 
