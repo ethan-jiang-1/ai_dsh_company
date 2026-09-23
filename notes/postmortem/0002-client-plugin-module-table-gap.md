@@ -105,7 +105,7 @@ exist".
   instead of assuming coverage.
 - The recurring defect across 0001 and 0002 is not missing knowledge: it is that the *last* check
   was performed by the human, in a browser. See
-  [`notes/research/2026-09-22-agent-workflow-community-practice.md`](../research/2026-09-22-agent-workflow-community-practice.md)
+  [`notes/implemented/2026-09-22-agent-workflow-community-practice.md`](../implemented/2026-09-22-agent-workflow-community-practice.md)
   and the host's own
   [post-mortem 0003](../../vendor/dsh/docs/postmortem/0003-web-agent-gui-feedback-loop.md).
 

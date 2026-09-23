@@ -1,5 +1,8 @@
 # 2026-09-23 · R5a P1.1 窄研究：无 key replay harness 机制三问（已答，含跑通证据）
 
+状态：**已落地（研究）** → R5a replay harness 已交付（`scripts/replay-smoke.mjs` 无 key 重放 + `--ui` 档）。
+2026-09-23 自 `notes/research/` 毕业。
+
 > 性质：R5a 门禁与发布的先行研究（roadmap R5a 行"先窄研究再落"；readiness §9 P1.1）。
 > 判据：给出"一条最小场景的可执行命令，今天就跑得动"——**已达成，见 §4**。
 > 机制出处全部钉到 vendor 树（钉住 tag dsh-v0.1.5-rc.2）的具体文件。

@@ -100,7 +100,7 @@ mount.
   mount-time validation.
 - **Dump is not mount.** Configuration output proves intent, never effect.
 - **The discovery权 must be the agent's.** The research note
-  [`notes/research/2026-09-22-agent-workflow-community-practice.md`](../research/2026-09-22-agent-workflow-community-practice.md)
+  [`notes/implemented/2026-09-22-agent-workflow-community-practice.md`](../implemented/2026-09-22-agent-workflow-community-practice.md)
   reaches the same conclusion from vendor guidance: iteration is normal, but it must be closed by a
   check the agent runs, never by the human noticing in the browser. The host tree's own
   [post-mortem 0003](../../vendor/dsh/docs/postmortem/0003-web-agent-gui-feedback-loop.md) records

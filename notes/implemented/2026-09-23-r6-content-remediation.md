@@ -7,7 +7,7 @@
 ## Motivation
 
 五轮堆叠后内容腐化有实证（D21 四证据），且流程对齐审计（D23 前置研究 =
-[research/2026-09-23-dsh-inround-task-surface.md](../research/2026-09-23-dsh-inround-task-surface.md)）
+[implemented/2026-09-23-dsh-inround-task-surface.md](../implemented/2026-09-23-dsh-inround-task-surface.md)）
 证实本仓对 D13"整套继承"实为**部分继承**——轮号制、roadmap 历史沉积、todo/plan 反馈面零使用、
 纪律表凭记忆写，均为走样。目标 = **让今后的开发更舒适**（信噪比持续提高）。
 

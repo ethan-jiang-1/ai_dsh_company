@@ -23,4 +23,4 @@ Timeline 必须给**证据坐标**（会话 id、事件序列、RPC 报错原文
 
 三篇的共同缺陷（也是本目录存在的原因）：**最后一次检查由人在浏览器里做**。对应的纪律与门禁见
 `AGENTS.md` 纪律表与 `docs/guides/60-dev-loop.md` §2；外部证据见
-[`notes/research/2026-09-22-agent-workflow-community-practice.md`](../research/2026-09-22-agent-workflow-community-practice.md)。
+[`notes/implemented/2026-09-22-agent-workflow-community-practice.md`](../implemented/2026-09-22-agent-workflow-community-practice.md)。

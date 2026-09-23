@@ -71,7 +71,7 @@ prompt 里写着“用 `spawn_teammate` 拉起 vp-sales 与 coo 两位（**只�
 ## 风险与未决
 
 - **persona / skill 是 advisory，不是确定性**（见
-  [research/2026-09-22-agent-workflow-community-practice](../research/2026-09-22-agent-workflow-community-practice.md)
+  [implemented/2026-09-22-agent-workflow-community-practice](../implemented/2026-09-22-agent-workflow-community-practice.md)
   与 D15）：所以验收落在“叫了几个”的行为上，不落在“文件写得好不好”。若两场对照仍不达标，退路是
   把判据机械化（从会话日志读 `team/member` 事件数做 keyless 断言）——**但那要等行为先稳定**，
   别本末倒置。

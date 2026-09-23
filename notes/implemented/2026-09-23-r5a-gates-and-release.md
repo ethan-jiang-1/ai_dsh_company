@@ -63,4 +63,4 @@
 | teammate 共享 CEO preset，其 `subagent` 行与 team shadow 相冲 | 与升 pin 一起处理（`sync-dsh --pin`；`docs/delegation.md` §4.4）——本轮无新 tag 可升，不占轮次 |
 | `sync-dsh --pin` 全程序未真跑（无新 tag） | 首次真实升 pin 时执行；预检守卫（脏树拒绝）已实证 |
 | R5b 的回放断言（r2-motion 录制喂在场板读模型） | R5b 轮内做，喂法 = `replay-smoke --scenario`（harness 已就绪） |
-| research 笔记 §8 记录的 P1.3 六机制 | [research/2026-09-23-replay-harness-feasibility.md](../research/2026-09-23-replay-harness-feasibility.md) §8 |
+| research 笔记 §8 记录的 P1.3 六机制 | [implemented/2026-09-23-replay-harness-feasibility.md](../implemented/2026-09-23-replay-harness-feasibility.md) §8 |

@@ -22,7 +22,7 @@ snapshots/              回归资产：r1/r2/r3/r4-motion + scenario-b（录制�
 设计全貌与决策台账：`docs/00-index.md`（先读它，再按需进 design/10-40）。接下来开发什么 =
 `ROADMAP.md` §队列（▶ 即当前条目；开工 / 收尾程序 = `docs/guides/60-dev-loop.md` §0.5/§12）。
 **条目状态不镜像进本文件**（root AGENTS.md 只收常设指令——vendor tier 表 "Status rots"；依据 =
-[research §十一](notes/research/2026-09-23-dsh-inround-task-surface.md)）。
+[research §十一](notes/implemented/2026-09-23-dsh-inround-task-surface.md)）。
 
 ## 命令表
 
@@ -101,7 +101,7 @@ repo 内为自由区；工具状态（缓存/store/配置）一律**先重定向
   发布纪律时点 / 双 home）。demo 现场运维 runbook：`docs/guides/50-budget-and-ops.md`。
 - **不发明**：不新增 spec 流程（OpenSpec 留触发条件，guides/60 §5）、不自造调度器/记忆/门禁——
   优先用 DSH 现成载体（D13）。否决依据（规格工具 vs 本仓两次事故的对照）：
-  [research/2026-09-22-agent-workflow-community-practice](notes/research/2026-09-22-agent-workflow-community-practice.md)。
+  [implemented/2026-09-22-agent-workflow-community-practice](notes/implemented/2026-09-22-agent-workflow-community-practice.md)。
 
 ## vendor 簿记
 

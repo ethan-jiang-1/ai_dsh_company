@@ -12,20 +12,28 @@
 
 ## 队列
 
-- ▶ **分身成长**（队列首条；原 R7 条目，范围与前置不变）：培养回路 = 改 `presets/<role>/` 即培养动作，
-  生效边界 = 新会话，验收 = 三道门禁 + 该角色入戏探针；学习载体 = journal 唯一、人审提升进 skills
-  （照 DSH `human-review-skill-maintenance` 取舍）；**否决分身运行时自改 skill**（隔离后已是机制事实）；
+- ▶ **demo 可视表达**（feature；队列首条）——把机制"演"出来：`conversation.view` 整页公司视图
+  （任务 DAG / 组织在场 / 协作动态 / 预算与交付）+ 皮肤改用官方设计系统（ui-primitives 令牌与图标）
+  + 团队工具卡 + 动效层；动态流由 5s 差分改 `session/follow` 流式。RFC =
+  [2026-09-23-demo-visual-expression](./notes/proposed/2026-09-23-demo-visual-expression.md)；研究 =
+  [research/2026-09-23-visual-expression-for-demo](./notes/research/2026-09-23-visual-expression-for-demo.md)。
+  验收 = 一场 demo 走查**零"需要讲解"瞬间**（吸收原「UX 打磨」）+ 机器轴（client-load 零挂载失败 /
+  replay --ui 金样 / 读模型 keyless 单测）+ 内联硬编码色与 emoji 清零。
+- ⏸ **面板窗口化**（feature；序 2，小切片）——任务板/驾驶舱可拖动、可缩放、最小尺寸 220×140 钳制，
+  与官方 Agent Team 弹窗不再互锁死；平台原生（`ctx.sidebarRight.float/dock` + ui-dockkit），不自造窗口管理。
+  RFC = [2026-09-23-panel-float](./notes/proposed/2026-09-23-panel-float.md)；验收 = 可拖可缩可置顶可收回 + client-load 绿。
+- ⏸ **分身成长**（feature；序 3，原队列首条后移——用户 2026-09-23 定「可视表达优先」）：培养回路 = 改
+  `presets/<role>/` 即培养动作，生效边界 = 新会话，验收 = 三道门禁 + 该角色入戏探针；学习载体 = journal 唯一、
+  人审提升进 skills（照 DSH `human-review-skill-maintenance` 取舍）；**否决分身运行时自改 skill**（隔离后已是机制事实）；
   不做自主节律（提 upstream seam，不自建调度器）。出处 =
   [twin-cultivation-and-self-learning](./notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md)。
   验收 = 一次完整回路：动议结束 → journal 有教训 → 人提升进 pack skill → 三道门禁 + 探针全绿，且旧会话不受影响。
-- ⏸ **UX 打磨**（feature 型）——RFC：[2026-09-23-ux-polish](./notes/proposed/2026-09-23-ux-polish.md)；
-  出自 R5b 收尾预期（用户口径「DEMO 水平是够了」），验收 = 一场完整 demo 走查零卡点。
 - ⏸ **整治转待办**（R6 销账落入；低优先）：
   - 下次「磨」的输入 = R6 Note「审计覆盖缺口」清单（presets.md 三方比对 / research 即时性 /
     0001、0003 深读 / guides/50 旋钮复校 / journal 行号全量 / snapshots 差异——清单住收尾 Note，不复制）。
   - 编号方案（N1）：design/guides 目录编号与顶层合同双体系二选一（命名合同遗留，R6 Note 登记）。
   - entry-probe Q1/Q2 token 期望锚定 R6 期条目名（条目推移即过期；同日重跑会覆盖既有归档）：改时间
-    不变问法，或收尾程序加"期望随队列刷新"一步（发现与证据 = notes/research/2026-09-23-dsh-inround-task-surface.md §十一）。
+    不变问法，或收尾程序加"期望随队列刷新"一步（发现与证据 = notes/implemented/2026-09-23-dsh-inround-task-surface.md §十一）。
   - **升 pin**（触发型：上游出新 tag 时跑 `scripts/sync-dsh.mjs --pin`，合同 docs/release.md）——
     含 teammate footgun 残留处理（delegation.md §4.4）与搁置池顺手回看。
 
@@ -64,7 +72,7 @@
   证实本仓对 D13「整套继承」实为**部分继承**——轮号制与 roadmap 历史沉积是本仓发明（D11 引据
   系把 FAQ dev-loop 的单变更生命周期拉伸成项目级轮次）、轮内 todo/plan 反馈面从未启用
   （机制在场、零纪律；依据与对照表 =
-  [research/2026-09-23-dsh-inround-task-surface](./notes/research/2026-09-23-dsh-inround-task-surface.md)）。
+  [implemented/2026-09-23-dsh-inround-task-surface](./notes/implemented/2026-09-23-dsh-inround-task-surface.md)）。
   决定：① **R6 按原章程执行**（审计先行不动），收尾**新增转型落盘**（见 R6 行）；② R6 后
   **默认严格 DSH 套路**，偏离必须登记 D 号并附约束证据（如本地单人仓无 GitHub 协作面），
   不再默认「按规模裁剪」；③ **防再犯五件套**：全量纪律清单（从 vendor 逐源枚举，替换记忆版
@@ -147,3 +155,15 @@
   **搁置池**（自主节律 / 并行快捷派活 / M2 / 界面外推送，四条都是"缺 upstream seam 或明确需求"）；
   ③ 轮间待办加 U1 活体探针（R5a → R6）。判据、证据与打磨细节见
   台账 D19。（原依据 r5-plus-readiness.md 已删——R6 D1）
+- 2026-09-23（**可视表达优先 · 队列次序调整**，用户决定）：用户判断现 UI「看着还是比较粗糙」、要
+  「不讲解也能看懂」并要视觉表达力与动效 ⇒ 队列序改为 **① demo 可视表达 ② 面板窗口化 ③ 分身成长
+  （原首条后移）④ 整治转待办**；**原「UX 打磨」被 ① 吸收并毕业**（`notes/implemented/2026-09-23-ux-polish.md`
+  含逐条去向）。同日两条新 feature 的 RFC 落 `notes/proposed/`（demo-visual-expression / panel-float），
+  依据 = 研究笔记 `notes/research/2026-09-23-visual-expression-for-demo.md`（三线调研：平台能力 / 生态与官方口径 /
+  设计参照与库选型）。**依赖选型门槛（用户令）**：新引入的插件/依赖必须成熟 + 高采用 + 可审计，
+  否则自建；第三方 DSH 看板插件因采用度与"git 安装会在沙箱外执行 prepare"风险被否决（借设计不装）。
+- 2026-09-23（**research 层生命周期立规**，用户决定）：`notes/research/` 只放**活研究**（在飞 / 供未开工条目 /
+  明确"今后才做才有意义"而留着的题）；**结论落地即毕业**到 `notes/implemented/`（与提案同一终态层），
+  状态行写「已落地（研究）→ 落点」。判据 = **还有没有未完成的条目/决策在等它**。首批执行：3 篇已落地研究迁走
+  （agent-workflow-community-practice / dsh-inround-task-surface / replay-harness-feasibility，引用同步改路径）；
+  留 2 篇活研究（digital-twin-cultivation 供序 3 条目、visual-expression 供序 1/2 条目）。规则家 = guides/60 §12。
