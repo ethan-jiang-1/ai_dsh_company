@@ -3,6 +3,10 @@
 > 性质：**计划层，只写"接下来"**——纯队列 + 搁置池 + 维护规则；**完成即离队**（不标 ✅，记录活在
 > 收尾 Note + 台账 D 号 + git）。条目生命周期与收尾程序 = `docs/guides/60-dev-loop.md` §0 / §12。
 > 每条目换全新对话上下文（偏离注册表已登记：交接靠入口链，不靠本文件携带）。
+> **队列 = 有序索引，不是全文**：feature 条目必须配 `notes/proposed/` 的独立 RFC
+> （问题/方案/输掉的方案/验收全文住 RFC；proposal-scheduled 门禁强制索引在场）；
+> 队列行 ≤3 行（主题名 / 状态 / 链接 / 验收指针）。卫生小修与触发型条目可不设 RFC，
+> 细节在条目开工的 Plan Mode 时写。
 > 历史轮次 R0–R5b 的全文已随 R6 转型离队（细节：00-index 台账 D 号 + notes/implemented 各收尾
 > Note + git 历史；轮号映射见维护规则 D21/D23）。
 
@@ -14,8 +18,8 @@
   不做自主节律（提 upstream seam，不自建调度器）。出处 =
   [twin-cultivation-and-self-learning](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md)（已毕业）。
   验收 = 一次完整回路：动议结束 → journal 有教训 → 人提升进 pack skill → 三道门禁 + 探针全绿，且旧会话不受影响。
-- ⏸ **UX 打磨**（feature 型；R5b 收尾预期）：用户验收口径「DEMO 水平是够了」——驾驶舱/在场板
-  的交互打磨、demo 分镜的观感细化；范围待该条目 Plan Mode 时定（产出 = 收尾 Note 的验收节）。
+- ⏸ **UX 打磨**（feature 型）——RFC：[2026-09-23-ux-polish](../../notes/proposed/2026-09-23-ux-polish.md)；
+  出自 R5b 收尾预期（用户口径「DEMO 水平是够了」），验收 = 一场完整 demo 走查零卡点。
 - ⏸ **整治转待办**（R6 销账落入；低优先）：
   - 下次「磨」的输入 = R6 Note「审计覆盖缺口」清单（presets.md 三方比对 / research 即时性 /
     0001、0003 深读 / guides/50 旋钮复校 / journal 行号全量 / snapshots 差异——清单住收尾 Note，不复制）。
