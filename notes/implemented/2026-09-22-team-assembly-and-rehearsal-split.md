@@ -49,7 +49,11 @@ persona 加「名单里没有的职能一个都不叫」），重装后复跑即
 
 ## 环境状态（下轮判断"什么已就绪"只读这里）
 
-- `DSH_HOME=dev/harness-home`；pack 已重装进 web profile（含新 skill）。
+- `DSH_HOME=dev/harness-home`；pack 已装进 web profile（含新 skill）。**当日稍后：dev profile 改为
+  `link:` 符号链接安装**——`node_modules/dsh-company-pack` → 仓库源码，内容改动即刻生效（新会话
+  生效边界 = U1 探针结论）；重装仅在改依赖/bundle 行时；profile `.npmrc` 把 store/cache 钉在 repo 内
+  （`~/Library` 不再被碰）；真实安装形状归 R5a release-smoke。实证：profile `node_modules` 只剩
+  一个符号链接也全绿（preset-smoke 5/5——dsh-* 行全部从源码域解析，79 包拷贝安装是冗余的）。
 - 排练场 `dev/rehearsal-workspace/`（gitignored）已有两场动议的真实产物。
 - ⚠ **事故记录（网络断连把 profile 弄成半损坏）**：`remove` 成功后 `add` 赶上网络断、进程被杀，
   锁文件被重写成"无 pack"、`node_modules/@deepseek-ai` 被清空。恢复配方 = 网络恢复后

@@ -171,9 +171,12 @@ child 失联。CEO preset 保持不放（team-scoped，死行，有反向守卫�
 `handbook-smoke` / `probe-smoke`）**每轮一次**，产出归档；端到端真 UI 留 R5a replay harness。
 **R2 旧纪律**：§9 门禁分层、§10 自动化只许是轻任务。
 
-**观察窗**：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。⚠ **改 pack 的
-`presets/**` 后必须重装进 profile**（`plugin --profile web remove` + `add`）——profile 里的 pack 是
-**真拷贝**；新增的行插件还要进 pack `dependencies` 与 lockfile（R4 为此踩过一次）。
+**观察窗**：`pnpm dsh web -- --port 3086 --no-open`（3080 是本 GUI 占用）。**dev profile 的 pack 是
+`link:` 符号链接**（2026-09-22 起，`node_modules/dsh-company-pack` → 仓库源码）：改 `presets/**` /
+persona / skills **即刻生效，无需重装**（新会话生效边界见 U1 探针结论）；只有改 pack 依赖或 bundle
+行才需要重装。profile 的 `.npmrc` 已把 store/cache 钉在 repo 内（`~/Library` 不再被碰）。**真实安装
+形状的验证归 R5a `release-smoke`**（干净 profile + file:/registry 安装）。新增的行插件仍要进 pack
+`dependencies` 与 lockfile（R4 为此踩过一次）。
 **皮肤已落**：pack 的 client 面 = 侧栏品牌槽 + 会话头部任务板（活面板）+ 委派工具卡。
 **R5a 起点**：`docs/plans/roadmap.md` R5a 行（无 key replay harness + `release-smoke` + `sync-dsh` +
 发布欠账）+ `plans/r5-plus-readiness.md` §9 P1（**先窄研究再落**）。

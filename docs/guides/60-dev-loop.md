@@ -99,7 +99,8 @@ proposed Note 在同一 diff 改写为 implemented，不留到交付后。
 | workspace 直跑 | `source dev/env.sh && pnpm dsh --profile headless "…"` | 日常开发，改配置即刻生效 |
 | patch overlay | `pnpm dsh --profile <p> --patch ./dev/try-x.patch.yml` | 一次性实验某插件行，不落盘 |
 | **公司 overlay（headless 动议）** | `pnpm dsh --profile headless --patch ./dev/company.overlay.yml "…"` | 无 web-app 行的组合里补公司行（insert 语法）；R1 用它验过全组合 |
-| profile 内持久 | `pnpm dsh plugin --profile <p> add file:./packages/company-pack` | 验证真实安装形状（`plugin` 子命令把参数转发给 profile 目录里的 pnpm；R5 门禁化） |
+| profile 内持久（dev = link:） | `pnpm dsh plugin --profile <p> add link:./packages/company-pack` | **日常开发**：符号链接指仓库源码，内容改动即刻生效；store/cache 由 profile `.npmrc` 钉在 repo 内 |
+| profile 内持久（真实形状） | `pnpm dsh plugin --profile <p> add file:./packages/company-pack` | 仅验证真实安装形状——归 R5a release-smoke（干净 profile；`plugin` 子命令把参数转发给 profile 目录里的 pnpm） |
 | 正式分发 | `pnpm dsh plugin --profile <p> add <npm-name>` | 用户视角；CI 测兼容矩阵 |
 
 ⚠ overlay 语法（R1 实证）：`- id:` **只替换已有行**（not found 会警告丢弃）；**新增行必须
@@ -185,15 +186,18 @@ node ./node_modules/typescript/bin/tsc -b \
 node ./node_modules/typescript/bin/tsc -b vendor/dsh/tsconfig.client.json   # client 面（测试面报错可忽略）
 (cd vendor/dsh && DSH_CLIENT_TITLE="DSH Wochen Team" ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE client)
 DSH_CLIENT_TITLE="DSH Wochen Team" pnpm --filter @deepseek-ai/dsh-web-frontend run build   # 前端 dist
-source dev/env.sh && pnpm dsh plugin --profile web add file:./packages/company-pack   # 首次会拦 koffi，见下
+source dev/env.sh && pnpm dsh plugin --profile web add link:./packages/company-pack          # dev 用 link:（内容改动即刻生效）；真实形状归 release-smoke
 pnpm dsh web -- --port 3081 --no-open                                      # 3080 是本 GUI 占用
 
 # pack 自己的 client 面（改了 src/client/** 才需要；产物进 lib/）：
 node ./node_modules/typescript/bin/tsc -p packages/company-pack/tsconfig.json
 (cd packages/company-pack && ../../node_modules/.bin/tsdown)
-# ⚠ pack 内容改动后要重装进 profile 才会被伺服：`plugin --profile web remove` + `add`
-#   （tsdown 原地写 lib/** 时不用——inode 不变；但 **presets/*.yml 这类源文件用编辑工具改会换 inode**，
-#    且安装副本实测是真拷贝（link count 1），不重装则改动不可见——2026-09-22 实证）。
+# ⚠ 重装纪律（2026-09-22 更新）：dev profile 的 pack 已改 **`link:` 符号链接**——改 presets/**
+#   persona / skills 即刻生效，**无需重装**；只有改 pack 依赖或 bundle 行才需要
+#   `plugin --profile web remove` + `add`。profile 的 `.npmrc` 把 store/cache 钉在 repo 内
+#   （`~/Library` 不被碰）。**真实安装形状的验证归 R5a release-smoke**（干净 profile + file:/registry）。
+#   历史：file: 拷贝时代，presets/*.yml 用编辑工具改会换 inode、安装副本是真拷贝（link count 1），
+#   不重装则改动不可见——该坑随 link: 消失。
 node scripts/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）
 node scripts/handbook-smoke.mjs        # agent-instructions 注入完成定义：指令基线 = 公司手册（默认只跑 ceo 一次小调用）
 node scripts/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
@@ -215,9 +219,10 @@ node scripts/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团
 - **web 观察窗三件事**（R1 实证）：① client bundles（`tsdown --env.DSH_BUILD_FACE client`）——
   缺了报 `client bundles not found; run pnpm run build before launch`；② 前端 dist
   （`pnpm --filter @deepseek-ai/dsh-web-frontend run build`）——缺了首页 404 空页；
-  ③ pack 装进 **web profile**（`plugin add file:./packages/company-pack`，首次被 koffi 构建审批
-  拦住 → profile 的 `pnpm-workspace.yaml` 改 `koffi: true` 再装；pnpm 成功后 CLI 才写
-  `dsh.profile.bundles`，中途失败要手动补）。观察窗默认端口 3080，**与本 GUI 冲突**，用
+  ③ pack 装进 **web profile**（`plugin add link:./packages/company-pack`，dev 用符号链接——
+  内容改动即刻生效；profile `.npmrc` 把 store/cache 钉在 repo 内，`~/Library` 不被碰。
+  历史：file: 拷贝时代首次装会拦 koffi 构建审批 → profile 的 `pnpm-workspace.yaml` 改
+  `koffi: true` 再装；link: 下 profile 不再装 koffi，koffi 由源码域解析）。观察窗默认端口 3080，**与本 GUI 冲突**，用
   `-- --port 3081`。preset roster 出现在 UI 的 CUSTOM 区（四个角色）。
 - **bundle 叠加的重复行 id**（R1 实证）：web-app 已 insert `agent-presets`，pack 再 insert 同 id
   → `duplicate loader entry id` 硬拒。修法：对已存在的行用**替换**语法（`- id:`），只有真正
