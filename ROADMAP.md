@@ -12,11 +12,7 @@
 
 ## 队列
 
-- ▶ **视觉打磨**（feature；队列首条——② 收尾后递补）——用户 2026-09-23 走查后登记（原话「视觉上，
-  我们回头再打磨」）：公司视图 / 公司页签 / 任务板 / 委派卡的视觉细修（间距、层级、图标、空态、
-  深浅色一致性、窄栏下五页签 chips 的观感）；细节在开工 Plan Mode 写（打磨型条目可不设 RFC）。
-  出处 = [implemented/2026-09-23-company-view](./notes/implemented/2026-09-23-company-view.md) ⑤。
-- ⏸ **分身成长**（feature；序 2，原队列首条后移——用户 2026-09-23 定「可视表达优先」）：培养回路 = 改
+- ▶ **分身成长**（feature；队列首条——视觉打磨收尾后递补，原队列首条归位）：培养回路 = 改
   `presets/<role>/` 即培养动作，生效边界 = 新会话，验收 = 三道门禁 + 该角色入戏探针；学习载体 = journal 唯一、
   人审提升进 skills（照 DSH `human-review-skill-maintenance` 取舍）；**否决分身运行时自改 skill**（隔离后已是机制事实）；
   不做自主节律（提 upstream seam，不自建调度器）。出处 =
@@ -36,6 +32,9 @@
   - invest-mobile-complement 两篇 journal 补记或登记豁免（W8）：手册「收工留痕」vs 实盘缺 vp-eng/vp-sales 纪要。
   - 互审稿命名钉一个系列（W9）：建议 `{role}-review`（与 reconcile-package 首例一致）；存量不动。
   - 五份 CHARTER「收工动作」三态措辞对齐（W11）：交付物写 `<slug>/drafts/<角色>.md`。
+  - **公司手册加一行「文件以单个换行结尾」**（触发过两次：R5b 的 vp-eng journal、本次用户试用后 CEO 的
+    `ent-agent-platform.md`——排练场产物会进 `pnpm verify` 的 md 扫描面，**排练场不是门禁豁免区**）；
+    根治 = 手册约定，而不是每次手修。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
@@ -175,3 +174,9 @@
   `notes/implemented/2026-09-23-panel-tabs.md`，RFC 毕业到 `notes/implemented/2026-09-23-panel-float.md`。
   命名表随迁（design/30 §5：右栏 = 公司页签 ×5；改名映射追加 驾驶舱→在场）。实施期发现（已留痕）：
   `openTab` 落位对 `active()` 有延迟 ⇒ 推迟 + 重试 + kind 守卫；停靠 pane 上限 2 / 布局仅内存 = 平台事实。
+- 2026-09-23（**条目「视觉打磨」收尾**）：★ 退役（→ 官方 `Tag`「Lead」）/ 内联样式收口（含 DAG 边样式进 CSS）/
+  空态统一（`StateNote` 一处定义）/ **DAG 边对比度修正**（待办边 1.47→3.71、已走通边 2.28→4.14，用
+  `color-mix(成功绿 70%, 标签墨色)` 做主题自适应、零字面色）。深色与窄窗**机器核对**全绿（读不了截图 ⇒
+  全用 computed style 判据：主题翻转 + 对比度 + 无溢出）。**完成即离队**：收尾 Note =
+  `notes/implemented/2026-09-23-visual-polish.md`。队列首条归位 = **分身成长**（原队列首条，两轮 UI 条目后回归）。
+  新增整治待办：公司手册加「文件以单个换行结尾」（排练场产物两次撞 `md-newline`，根治在手册）。
