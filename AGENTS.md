@@ -129,11 +129,8 @@ repo 内为自由区；工具状态（缓存/store/配置）一律**先重定向
 - 具体操作手册：`docs/guides/60-dev-loop.md`（六步闭环 / 调试阶梯 / 插拔速查 / 设计四问 /
   发布纪律时点 / 双 home）。demo 现场运维 runbook：`docs/guides/50-budget-and-ops.md`。
 - **不发明**：不新增 spec 流程（OpenSpec 留触发条件，guides/60 §5）、不自造调度器/记忆/门禁——
-  优先用 DSH 现成载体（D13）。**否决理由（有证据）**：规格驱动工具（Spec Kit / Kiro / OpenSpec）
-  优化的是"别做错东西"，而本仓两次事故是"东西做对了但装不上"（schema 校验、模块解析）——
-  规格不校验 config schema、也不进浏览器模块表，且无第一方返工量化证据；把指令文件写更长同样是
-  最弱杠杆（Anthropic 明说这类指令是 advisory，hooks 才是确定性的；GitHub 2500 仓分析结论是
-  好文件靠迭代长出来）。见 notes/research/2026-09-22-agent-workflow-community-practice.md。
+  优先用 DSH 现成载体（D13）。否决依据（规格工具 vs 本仓两次事故的对照）：
+  [research/2026-09-22-agent-workflow-community-practice](notes/research/2026-09-22-agent-workflow-community-practice.md)。
 
 ## vendor 簿记
 
