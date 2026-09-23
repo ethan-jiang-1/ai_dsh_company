@@ -1,18 +1,17 @@
 # 2026-09-22 · 分身培养与自我学习（写权、载体与自主节律的边界）
 
-状态：proposed（2026-09-22）
-进轮：R7 分身成长（2026-09-22 起；原排 R6，2026-09-23 让位「内容诊治」轮而改号——见 roadmap 维护规则同日条）
+状态：已消化（2026-09-24 交付并收尾；收尾 Note = [2026-09-24-twin-cultivation.md](./2026-09-24-twin-cultivation.md)）
+进轮：原 R6 → 改号 R7（2026-09-23，D21）→ D23 后为队列条目「分身成长」（2026-09-24 交付；完成即离队）
+研究依据：[implemented/2026-09-22-digital-twin-cultivation-and-self-learning.md](./2026-09-22-digital-twin-cultivation-and-self-learning.md)（**§6 = 交付期修订**：skill 正文生效边界 = 同会话下一轮，"只有新会话变"作废）
 梳理（2026-09-22）：原有两条"前置修复"阻塞**已落地**——见下 §三 与
-[../implemented/2026-09-22-skill-root-isolation.md](../implemented/2026-09-22-skill-root-isolation.md)；
-U1 已在源码层回答、U2/U3 作废，见
-[../research/2026-09-22-digital-twin-cultivation-and-self-learning.md](../research/2026-09-22-digital-twin-cultivation-and-self-learning.md)
-§5。逐项就绪度判定见 r5-plus-readiness（原审计文件，已于 R6 删除——git 留史）。
+[2026-09-22-skill-root-isolation.md](./2026-09-22-skill-root-isolation.md)；
+U1 已在源码层回答、U2/U3 作废（见研究笔记 §5，后经 §6 再修正）。逐项就绪度判定见 r5-plus-readiness（原审计文件，已于 R6 删除——git 留史）。
 
 ## 背景
 
 数字分身要被不同的人专业培养，也要能在干活中学到东西。DSH 没有为这两件事提供专门机制，只有
 "文件 + 权限"。机制底已研究清楚
-（[../research/2026-09-22-digital-twin-cultivation-and-self-learning.md](../research/2026-09-22-digital-twin-cultivation-and-self-learning.md)），
+（[2026-09-22-digital-twin-cultivation-and-self-learning.md](./2026-09-22-digital-twin-cultivation-and-self-learning.md)），
 本提案把结论变成可执行的边界。
 
 三条已钉死的事实：
@@ -99,3 +98,17 @@ U1 已在源码层回答、U2/U3 作废，见
   ——也就是说 R7 不再等任何前置。
 - **U2/U3 的探针会写全公司共享的 `.dsh/skills/`**，跑完必须清理，否则静默盖掉角色 skill
   （U2/U3 既已作废，本条保留为历史风险记录）。
+
+## 条目去向（2026-09-24 消化时逐条销账）
+
+| 条目 | 归宿 |
+|---|---|
+| §一 培养 = 改 pack + 人审验收 | ✅ 2026-09-24 走通：A/B/G 三条教训提升进 `presets/ceo/skills/chairing-staff-meeting/`，四道检查全绿；合同 = [presets.md §培养回路与学习载体](../../docs/presets.md)（D25） |
+| §二 学习 = journal 唯一 + 人审提升 | ✅ 同轮走通：教训源 = 用户 9-23 真动议 `ent-agent-platform` 五份 journal（复用，零新模型成本）；人审采纳 A/B（用户批）+ G（授权代理裁定） |
+| §三 前置修复两条 | 已于 R2 落地（[2026-09-22-skill-root-isolation.md](./2026-09-22-skill-root-isolation.md) + `handbook-smoke` 常设门禁） |
+| §四 自主节律：不做、只记缺口 | 搁置池（缺上游 seam；复活条件已写，见 [ROADMAP.md](../../ROADMAP.md) §搁置池） |
+| 验收 1 隔离反证 | 已闭（R2：isolation Note；`preset-smoke` ③ 常设断言） |
+| 验收 2 手册接线 | 已闭（R2：五 preset `agent-instructions` 行 + `handbook-smoke`） |
+| 验收 3 培养回归 + 旧会话不受影响 | ✅ 全绿 + **边界按面修正**：skill 正文 = 同会话下一轮（活体实证，研究笔记 §6）；persona / 组合文件 = 新会话（vendor stamp 机制）。"旧会话不受影响"的准确表述 = 按面（合同表） |
+| 验收 4 学习回路 + 人审留痕 | ✅ 收尾 Note + 本表即留痕 |
+| 教训候选余量（本轮未提升） | C 引用两分法（出处核不到 ⇒ 标未核实）/ D 不替别人填数 / E 提问只到标注性质 / F 门槛算式自查 → **留今后培养轮**；C 需先定跨角色载体（公司手册 vs 各角色 skills）。证据 = 排练场 `kb/{vp-sales,cfo,coo}/journal/ent-agent-platform*.md`（gitignored；关键引文见收尾 Note ②） |

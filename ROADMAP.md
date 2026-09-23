@@ -12,12 +12,6 @@
 
 ## 队列
 
-- ▶ **分身成长**（feature；队列首条——视觉打磨收尾后递补，原队列首条归位）：培养回路 = 改
-  `presets/<role>/` 即培养动作，生效边界 = 新会话，验收 = 三道门禁 + 该角色入戏探针；学习载体 = journal 唯一、
-  人审提升进 skills（照 DSH `human-review-skill-maintenance` 取舍）；**否决分身运行时自改 skill**（隔离后已是机制事实）；
-  不做自主节律（提 upstream seam，不自建调度器）。出处 =
-  [twin-cultivation-and-self-learning](./notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md)。
-  验收 = 一次完整回路：动议结束 → journal 有教训 → 人提升进 pack skill → 三道门禁 + 探针全绿，且旧会话不受影响。
 - ⏸ **整治转待办**（R6 销账落入；低优先）：
   - 下次「磨」的输入 = R6 Note「审计覆盖缺口」清单（presets.md 三方比对 / research 即时性 /
     0001、0003 深读 / guides/50 旋钮复校 / journal 行号全量 / snapshots 差异——清单住收尾 Note，不复制）。
@@ -43,7 +37,7 @@
 
 | 项 | 出处 | 搁置理由（已核实） | 复活条件 |
 |---|---|---|---|
-| **自主节律**（分身定期复盘） | [proposed/twin-cultivation](./notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md) §四 | 机制不闭合：`goal` 需人类授权且 session-start 一律 disarm；`schedule` 只在 live 会话投递且默认没装；webhook 起的会话进不了 goal 循环；全树无 cron | 上游补"外部触发 ↔ 会话内自主续跑"的 seam——**提 seam，不自建调度器**（D9/D13） |
+| **自主节律**（分身定期复盘） | [implemented/twin-cultivation](./notes/implemented/2026-09-22-twin-cultivation-and-self-learning.md) §四 | 机制不闭合：`goal` 需人类授权且 session-start 一律 disarm；`schedule` 只在 live 会话投递且默认没装；webhook 起的会话进不了 goal 循环；全树无 cron | 上游补"外部触发 ↔ 会话内自主续跑"的 seam——**提 seam，不自建调度器**（D9/D13） |
 | **并行快捷派活**（同时开几个 VP） | [delegation.md](./docs/delegation.md) §4.4 | 本组合无干净解法：缺 per-child composition 与不撞名的控制面 | 上游 seam |
 | **M2 自定义 provider** | [00-index](./docs/00-index.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"的需求已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
 | **界面外推送 / 收件箱** | [org-presence-board（已毕业）](./notes/implemented/2026-09-22-org-presence-board.md) §背景 | egress 只有 `sessionTelemetry`（OTel）与 hooks，webhook 是 ingress；收件人是谁、粒度多细属部署选择 | 明确的物理人通知需求 + 选定部署面 |
@@ -180,3 +174,12 @@
   全用 computed style 判据：主题翻转 + 对比度 + 无溢出）。**完成即离队**：收尾 Note =
   `notes/implemented/2026-09-23-visual-polish.md`。队列首条归位 = **分身成长**（原队列首条，两轮 UI 条目后回归）。
   新增整治待办：公司手册加「文件以单个换行结尾」（排练场产物两次撞 `md-newline`，根治在手册）。
+- 2026-09-24（**条目「分身成长」收尾**）：培养 + 学习一次完整回路走通（教训源 = 用户 9-23 真动议
+  `ent-agent-platform` 五份 journal，复用零新成本；人审 A/B〔用户批〕+ G〔授权代理裁定〕→
+  `presets/ceo/skills/chairing-staff-meeting/` +4 行，四道检查全绿）。**生效边界按面钉死并修正 U1**
+  （persona / 组合文件 = 新会话；**skill 正文 = 同会话下一轮**——活体探针量日志工具结果，证伪
+  2026-09-22"只有新会话变"，与 vendor"每次 get() 读盘"一致）；合同落
+  [presets.md §培养回路与学习载体](./docs/presets.md)（落现有家零新增；出生地图解决，台账 D25）；
+  RFC 与 digital-twin 研究笔记双双毕业（**`notes/research/` 清空**——规则不变：活研究进、落地即出）；
+  教训候选 C/D/E/F 留今后培养轮（清单住 RFC 条目去向表）。**完成即离队**：队列剩整治转待办
+  （当夜按用户长程授权消化中——逐项进展见后续维护规则行与晨报）。

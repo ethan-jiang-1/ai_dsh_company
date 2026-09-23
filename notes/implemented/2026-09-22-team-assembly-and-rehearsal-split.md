@@ -24,7 +24,8 @@
    - `docs/design/40` §1 CEO skills 清单补行。
 3. **U1 活体探针（顺路完成，R6 前置全清）**：结论 = 三档之②**只有新会话变**
    （profile 真拷贝插标记 → 同会话下一轮仍旧文、新会话见新文；探针自改自还原）。
-   详见 [research/digital-twin §5.5](../research/2026-09-22-digital-twin-cultivation-and-self-learning.md)。
+   详见 [research/digital-twin §5.5](../implemented/2026-09-22-digital-twin-cultivation-and-self-learning.md)
+   （该结论后被 2026-09-24 修订二 §6 修正：skill 正文 = 同会话下一轮）。
 
 ## 实际跑过的验证
 

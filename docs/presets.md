@@ -110,3 +110,30 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 | **挂载（上线前门禁）** | `node scripts/preset-smoke.mjs`：boot 真 web，逐个 preset `session/create` | ✅ 五角色 ALL PASS（反证过：去掉必填 config 即红） |
 | 会话级（persona 生效、连通） | `node scripts/probe-smoke.mjs`（默认快速档 ~6s：真会话发一句 ping，断言挂载/轮次/回话/**人格进 prompt**）；`--full` = 五角色三探针内容断言（慢，按需） | ✅ R2 建：快速档 5/5 PASS；内容档曾 14/15（KB 事实与 veto 语义均命中） |
 | 回归资产 | 动议会话 + 期望工作区归档 | ✅ `snapshots/`（r1–r4 motion + scenario-b + r3 replay 场景；replay harness R5a） |
+
+## 培养回路与学习载体（分身成长条目出生，2026-09-24）
+
+**培养动作 = 改 `packages/company-pack/presets/<role>/`**：人格 = `agent.cordis.yml` 的 persona row，
+能力 = `skills/*/SKILL.md`。培养权就是 repo 写权限——DSH 没有原生"培养授权"动作，这是权限事实。
+dev `web` profile 用 `link:` 符号链接装 pack（[guides/60 §7](./guides/60-dev-loop.md)）——改仓库
+preset 即对 profile 可见、无需重装；真实安装形状（`file:`）归 release-smoke。
+
+**生效边界按面**（D25；依据 = vendor 源码 + [2026-09-24 活体探针](../notes/implemented/2026-09-24-twin-cultivation.md)）：
+
+| 改动面 | 生效时点 | 依据 |
+|---|---|---|
+| persona / 组合文件（工具行、skill 根） | **新会话**（运行中的会话保持自己的 generation） | vendor `agent-presets` README stamp 机制（活体未跑） |
+| skill 正文（`SKILL.md` body） | **同会话下一轮**（`get()` 每次读盘） | 活体实证（日志工具结果层）+ vendor 源码一致；**修正** 2026-09-22 U1"只有新会话变"（U1 量的是模型转述） |
+| skill 条目（增删改名） | 下一轮（pre-step digest 重算 → 替换目录注入） | vendor 源码层（[研究笔记 §5.2/§6](../notes/implemented/2026-09-22-digital-twin-cultivation-and-self-learning.md)） |
+
+**培养验收（把"培养"从感觉变成检查）**：改任何 preset 内容后，`pnpm test` + `pnpm verify` +
+`node scripts/preset-smoke.mjs`（真挂载）+ `node scripts/probe-smoke.mjs --full`（入戏探针）全绿，
+才算培养成功（首例 = 2026-09-24，CEO `chairing-staff-meeting` +4 行）。
+
+**学习载体 = workspace journal 唯一**（D8：`kb/<role>/journal/`，经工具调用进日志）。
+提升回路 = **人读 journal → 提炼 → 写进 pack skills**：只采纳有证据的教训、不自动提升、
+单人维护者的 bus factor 写进风险（照 DSH `human-review-skill-maintenance` 提案取舍）；
+提升文本只写方法论、不含公司事实与出处（D17——出处留收尾 Note，pack 换公司可复用）。
+**分身运行时自改 skill 已否决且为机制事实**（角色 skill 根隔离后，分身可写的共享根不进任何
+角色的技能面 + 角色私有目录被沙箱拒 + preset 子树 loader `write()` 是 no-op）；
+**自主节律**缺上游 seam，住 [ROADMAP.md](../ROADMAP.md) §搁置池。
