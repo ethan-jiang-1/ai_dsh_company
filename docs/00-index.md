@@ -28,7 +28,7 @@ implemented → archived）。
 | [design/20-roles-isolation.md](./design/20-roles-isolation.md) | 设计 | 每角色独立六面的机制安排；composition 继承分水岭与 `mount()` 裂缝；M1–M4 编排选型；两个结构性缺口 |
 | [design/30-ui-demo.md](./design/30-ui-demo.md) | 设计 | Web UI 演示层：现成团队 UI（零代码）、公司皮肤（slots/Remote）、demo 分镜 |
 | [design/40-role-content-plan.md](./design/40-role-content-plan.md) | 设计 | 四个角色的内容设计：persona 要素、skills 清单、KB/模板骨架、入戏探针（文案待 Q4） |
-| [plans/roadmap.md](./plans/roadmap.md) | 计划 | 垂直轮（D11）：R0 立环 → R1 两人公司 → R2 五角色全员 → R3 汇报线 → R4 成品流程 → R5a 门禁与发布 → R5b 驾驶舱 → R6 分身成长（待命）；轮次交接两清单 + **搁置池** |
+| [plans/roadmap.md](./plans/roadmap.md) | 计划 | 垂直轮（D11）：R0 立环 → R1 两人公司 → R2 五角色全员 → R3 汇报线 → R4 成品流程 → R5a 门禁与发布 → R5b 驾驶舱 → R6 内容诊治 → R7 分身成长（待命）；轮次交接两清单 + **搁置池** |
 | [plans/r5-plus-readiness.md](./plans/r5-plus-readiness.md) | 计划 | R5+ 就绪度梳理（2026-09-22 一次性快照）：notes/ 逐项分级（可排期 / 待决策 / 待研究 / 搁置 / 已闭合）+ R5 容量风险 + 台账缺口 |
 | [guides/50-budget-and-ops.md](./guides/50-budget-and-ops.md) | 指南 | 限流旋钮总表、成本结构、demo 运维 runbook（症状→动作）、回放复盘 |
 | [guides/60-dev-loop.md](./guides/60-dev-loop.md) | 指南 | 开发环操作手册：六步闭环、调试阶梯、设计四问、插拔速查、升级环与发布时点、双 home/双 DSH |
@@ -51,7 +51,8 @@ implemented → archived）。
 |---|---|---|
 | `release.md` | **R5a** | 发布形状：peers、compatibility 矩阵、真实安装冒烟程序（欠账清单见 [plans/r5-plus-readiness.md](./plans/r5-plus-readiness.md) §9 P4） |
 | *（不单独出生合同）* | R5b 驾驶舱 | UI 面随轮更新 [design/30-ui-demo.md](./design/30-ui-demo.md) §5 |
-| 培养/学习合同（**名字待定**） | R6 | 培养回路与学习载体的现在时语义；入口条件见 [plans/roadmap.md](./plans/roadmap.md) R6 行 |
+| 文档卫生合同（**名字待定**） | **R6** | 内容诊治轮出生：入口链与内容层卫生的现在时规则（线 B 流程对齐的弹性边界结论落 AGENTS.md 纪律表 / guides，是否单独立合同轮内定）；入口条件见 [plans/roadmap.md](./plans/roadmap.md) R6 行 |
+| 培养/学习合同（**名字待定**） | R7 | 培养回路与学习载体的现在时语义；入口条件见 [plans/roadmap.md](./plans/roadmap.md) R7 行（2026-09-23 前为 R6） |
 
 （`delegation.md` 已于 R3 出生，见上表。）
 
@@ -81,6 +82,7 @@ implemented → archived）。
 | D18 | **R3 汇报线定案（2026-09-22）**：CEO 的命名委托工具 `vp_eng` / `vp_sales` = **one-shot 前台**（`backgroundMode: one-shot` + `enableRunInBackground: false` + `maxDepth: 1` + per-instance persona）。**continuable 在本组合里不可用**：CEO 会话从**第一帧**起 team-scoped，团队版 `send_message` / `list_agents` / `interrupt_agent` 按成员**名字**寻址，而 subagent child 不在名册上 ⇒ 续驶/中断/列举全不可达。因此：续驶与连续对话归 **team（M4）**；"child 拿到角色完整 skills/工具面"归 **M2（未做）**；CEO preset **不放**全局控制行（在 CEO 会话是死行，有反向守卫）；并行快捷派活要等上游 seam，**本仓不自建**（D13） | [delegation.md](./delegation.md)；`scripts/delegation-smoke.mjs`（边界守卫）；`snapshots/r2-motion/sessions/lead.jsonl` 第一帧 |
 | D19 | **R5 拆轮 + 搁置池（2026-09-22）**：① **R5 → R5a 门禁与发布 / R5b 驾驶舱**——同轮塞 4–5 个面时，最不确定的 replay harness 会卡住皮肤交付（D11：一轮一份可观察的外部行为）；② **进搁置池须满足"缺上游 seam"或"缺明确需求"**，被否决的方案不进池（归 D 号/复盘/`rejected`），复活条件写进池内每行；首批四条 = 自主节律 / 并行快捷派活 / M2 / 界面外推送；③ R6 的"两条接线 + U1"阻塞经核实**已清**，只余一次活体探针（轮间待办 R5a → R6） | [plans/r5-plus-readiness.md](./plans/r5-plus-readiness.md)；[plans/roadmap.md](./plans/roadmap.md) §搁置池 |
 | D20 | **交付物三态判据（R4，2026-09-22）**：① **成品 = Lead 会话的 `present`**（`agentPreset=ceo` 且 `delegationDepth=0`）——依据是公司手册的承诺权，且实测 R2 里 CFO 也 `present` 过 3 次，不限归属则过程稿与定稿平级、仍答不上"哪些是成品"；② **按交付物身份（`slug` + 角色）比对，不按字面路径**——给三态迁移留桥，否则迁移一次就把历史证据全判成 dangling（假阳性，不是违规）；③ **反向检查只追 Lead 声明**，非 Lead 的成品声明只在它**此刻真躺在盘上**时判越权（历史行为不追着报，否则一次越权永久污染此后每轮审计）。实现 `scripts/lib/deliverables.mjs` + 入口 `scripts/deliverables-check.mjs`（**审归档快照须配 `--only <slug>`**，因快照是整盘 workspace + 本轮日志）；合同家 = `company-workspace/AGENTS.md`「交付物三态」 | [implemented/2026-09-22-r4-workshop-flow.md](../notes/implemented/2026-09-22-r4-workshop-flow.md) |
+| D21 | **R6 内容诊治插轮 + 分身成长改号 R7（2026-09-23，用户决定）**：五轮堆叠后内容腐化已有实证（「当前状态」沉积收尾快照并与 roadmap 双写、已闭合的待定 Q1 仍挂 00-index、roadmap 计划层躺已 ✅ 的历史段、原 R6 行「U1 只剩实证钉死」文字过期）⇒ 插**纯整治轮**（不交付新功能），两条线：**线 A 内容腐化诊治**（docs/ 全层 / AGENTS.md 入口链 / company-workspace（手册+kb；R4「journal 不压」默认不重开）/ notes/ 指针核对，历史不重写）；**线 B 流程对齐审计**（本仓是 DSH 研发纪律的头一次实际使用——对照 AGENTS.md 纪律表逐条核对已闭轮实践（届时 R0–R5b），权威在 vendor 树；抓「没严格遵循」与「灵活性理解错」两类偏差，弹性边界写清，目标 = 让今后开发更舒适）；验收 = **入口链探针**（全新上下文只读入口链答「现在」问题）+ **防回堆机械门禁**进 pnpm verify（带反证）+ **两份清单逐条销账**；定位 = **首次全量 + 制度化「磨」、不承诺一次扫净**（用户原话：「打扫卫生要磨几次才可能磨好」）；审计先行，量超一轮按 D11 拆轮。原 R6「分身成长」整体后移为 R7，范围与前置不变；旧行保留旧轮号（历史不改写，映射以本条为准） | [plans/roadmap.md](./plans/roadmap.md) R6/R7 行 + 维护规则 2026-09-23 条 |
 
 ### 待定（阻塞项标 ⛔）
 

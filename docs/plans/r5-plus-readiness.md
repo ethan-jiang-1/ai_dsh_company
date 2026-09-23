@@ -27,15 +27,15 @@
 |---|---|---|---|
 | [implemented/workspace-hygiene](../../notes/implemented/2026-09-22-workspace-hygiene.md) | R4 | **✅ 已消化（不归本文件）** | R4 交付 `scripts/lib/deliverables.mjs` + `deliverables-check.mjs` + `tests/deliverables.spec.ts`（13 条）；1 条（练习场 ≠ 运行场）转轮间待办、1 条按决定不做——逐条去向见该文件的「条目去向」表 |
 | [proposed/org-presence-board](../../notes/proposed/2026-09-22-org-presence-board.md) | R5b | **READY-DECISIONS** | 四个数据源全部 vendor 核实；三个 join 语义未钉 + 一个新增 UI 入口（见 §2.1） |
-| [proposed/twin-cultivation-and-self-learning](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md) | R6 | **READY（培养/学习）＋ SUSPENDED（自主节律）** | 两条前置修复已落地、U1 已答；**阻塞项文字已过期**（见 §5） |
-| [research/digital-twin-cultivation-and-self-learning](../../notes/research/2026-09-22-digital-twin-cultivation-and-self-learning.md) | R6 依据 | **RESEARCH（部分已作废）** | §C 前置已做、§D 结论被隔离改动推翻、U2/U3 作废（该笔记已加修订节） |
+| [proposed/twin-cultivation-and-self-learning](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md) | R7 | **READY（培养/学习）＋ SUSPENDED（自主节律）** | 两条前置修复已落地、U1 已答；**阻塞项文字已过期**（见 §5） |
+| [research/digital-twin-cultivation-and-self-learning](../../notes/research/2026-09-22-digital-twin-cultivation-and-self-learning.md) | R7 依据（原 R6） | **RESEARCH（部分已作废）** | §C 前置已做、§D 结论被隔离改动推翻、U2/U3 作废（该笔记已加修订节） |
 | [research/agent-workflow-community-practice](../../notes/research/2026-09-22-agent-workflow-community-practice.md) | — | **CLOSED** | 全部建议已落地：D15 + 三篇复盘 + `scripts/verify.mjs` §8 client 两半门禁 |
 | `notes/postmortem/0001–0003` | — | **CLOSED** | 护栏已进 `scripts/`（`preset-smoke` / `client-load-smoke`）；0002 根因已在文内更正 |
 | `notes/implemented/` ×18 | — | **归档候选（低优先，不急）** | 本仓无 `notes/archived/` 层；`verify` 不查 notes 链接，搬家成本低但收益也低 |
 | `notes/intents.md` | — | **✅ 已闭合（2026-09-22）** | `scenario-b` + "三条现场教训"的行已补（§7.1）；R4 / D19 拆轮 / ①按问题组队 / ②练习场各行也已登记 |
 
 一句话版：**R5b 的皮肤面就绪度没问题，卡的是 R5a 的 replay harness 形状（§2.3）；
-R6 的"培养/学习"已经就绪、只是它墙上写的阻塞项过期了（§5）；该进 suspended 的是
+R7（原 R6）的"培养/学习"已经就绪、只是它墙上写的阻塞项过期了（§5）；该进 suspended 的是
 "自主节律 / 并行快捷派活 / M2 / 界面外推送"四条等上游 seam 或明确需求的（§4、roadmap 搁置池）。**
 
 ## 2. 可进 R5+ 的项
@@ -108,10 +108,10 @@ R6 的"培养/学习"已经就绪、只是它墙上写的阻塞项过期了（§
 
 1. **U1 的活体探针**（便宜，半小时）：改一次某角色 `SKILL.md` 正文 → 同一会话下一轮再
    `skill({name})` 看正文是否变。源码层已答（见 §5），但"两条 vendor 陈述冲突"这件事值得
-   一次实证钉死；这是 R6"学习回路"的生效边界。
+   一次实证钉死；这是 R7"学习回路"的生效边界。
 2. **成员空间入口的槽位**（小）：确认 `sessions.openSubagent` 对**非 team 的 subagent child**
    （R3 命名委托、CEO 直起的 subagent）是否同样可达；不可达就要在 UI 里显式标"非团队成员"。
-3. **U5**（沙箱拒 pack 目录）仍只是【推断】：结论不变、风险低，只在 R6 真要谈"自学习写权"
+3. **U5**（沙箱拒 pack 目录）仍只是【推断】：结论不变、风险低，只在 R7 真要谈"自学习写权"
    时再跑。
 4. **U6/U7**（goal/schedule 不可用；webhook→goal 断点）：**只服务于自主节律**。既然自主节律
    已搁置（§4），这两条**不跑**，只保留 U7 当"上游 seam"的证据引用即可。
@@ -129,7 +129,7 @@ R6 的"培养/学习"已经就绪、只是它墙上写的阻塞项过期了（§
 
 ## 5. 已闭合 / 已过期（状态该改，别再当阻塞）
 
-**R6 的墙上文字过期了。** roadmap R6 行与维护规则都写"阻塞：轮间待办两条接线修复 + U1 实证"，
+**R7（原 R6）的墙上文字过期了。** roadmap 该行与维护规则都写"阻塞：轮间待办两条接线修复 + U1 实证"，
 但：
 
 - **两条接线修复已落地**：五个 preset 都是 `includeDefaultRoots: false`
@@ -137,7 +137,7 @@ R6 的"培养/学习"已经就绪、只是它墙上写的阻塞项过期了（§
   `agent-instructions` 行；`handbook-smoke` 已把"指令基线 = `company-workspace/AGENTS.md`"
   做成真入口断言。出处：[implemented/skill-root-isolation](../../notes/implemented/2026-09-22-skill-root-isolation.md)。
 - **U1 已在源码层回答**（同一篇，末节）：skill 条目的增删改名**下一轮**就刷新（`write`/`edit`
-  直接失效 provider），不必等新会话。⇒ R6"学习回路"的生效边界不必再靠"新会话"假设；
+  直接失效 provider），不必等新会话。⇒ R7"学习回路"的生效边界不必再靠"新会话"假设；
   只差 §3.1 的活体探针把两条 vendor 陈述的冲突钉死。
 
 **也随之作废的两条研究结论**（该笔记已加修订节）：
@@ -165,7 +165,7 @@ roadmap 原来的 R5 一行装着：驾驶舱 v1（含协作动态流）+ 组织
 
 依据：D11"交付按完整垂直切片"；R3 已经证明一轮塞多面时，验收口径会被当轮实证改写两次
 （[implemented/r3-reporting-line](../../notes/implemented/2026-09-22-r3-reporting-line.md)）。
-**顺序上 R5a 先做**：它不依赖皮肤，且 replay 是 R5b 与 R6 都要用的旁证载体。
+**顺序上 R5a 先做**：它不依赖皮肤，且 replay 是 R5b 与 R7 都要用的旁证载体。
 
 ## 7. 台账卫生（小修，谁做都行）
 
@@ -243,7 +243,7 @@ roadmap 原来的 R5 一行装着：驾驶舱 v1（含协作动态流）+ 组织
 - **判据**：四条都变成提案里的现在时陈述，且"风险与未决"里对应条目删掉；
   然后按 roadmap §新会话开工动作 进 Plan Mode。
 
-### P3 · 轮间待办：U1 活体探针（R5a → R6）✅ 已完成（2026-09-22，随轮间待办①）
+### P3 · 轮间待办：U1 活体探针（R5a → R6，今 R7）✅ 已完成（2026-09-22，随轮间待办①）
 
 > 结论 = 三档之②**"只有新会话变"**（同会话下一轮 `skill()` 仍旧文、新会话见新文）；
 > 落档：[research/digital-twin §5.5](../../notes/research/2026-09-22-digital-twin-cultivation-and-self-learning.md)
@@ -255,8 +255,8 @@ roadmap 原来的 R5 一行装着：驾驶舱 v1（含协作动态流）+ 组织
 3. 直接改 `packages/company-pack/presets/ceo/skills/chairing-staff-meeting/SKILL.md` 正文一行。
 4. **同一会话**下一轮再 `skill(...)` → 变了吗？再新建会话 B → 变了吗？
 - 三档结论：同会话即变（源码层说法成立）/ 只有新会话变（`agent-presets` README 说法成立）/
-  都不变（要重启）。**哪一档都要记进研究笔记 §5**——它决定 R6"学习回路"能不能当场生效。
-- **判据**：结果落进研究笔记 §5 的追问（R6 收尾引用）；探针文件改回原样。
+  都不变（要重启）。**哪一档都要记进研究笔记 §5**——它决定 R7"学习回路"能不能当场生效。
+- **判据**：结果落进研究笔记 §5 的追问（R7 收尾引用）；探针文件改回原样。
 
 ### P4 · R5a：发布欠账（机械，别忘）
 
