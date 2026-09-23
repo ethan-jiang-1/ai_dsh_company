@@ -15,9 +15,13 @@
 - ⏸ **整治转待办**（R6 销账落入；低优先）：
   - 下次「磨」的输入 = R6 Note「审计覆盖缺口」清单（presets.md 三方比对 / research 即时性 /
     0001、0003 深读 / guides/50 旋钮复校 / journal 行号全量 / snapshots 差异——清单住收尾 Note，不复制）。
-  - 编号方案（N1）：design/guides 目录编号与顶层合同双体系二选一（命名合同遗留，R6 Note 登记）。
+  - 编号方案（N1）：design/guides 目录编号与顶层合同双体系二选一——**提案已出**（2026-09-24 当夜，
+    [proposed/n1-docs-naming](./notes/proposed/2026-09-24-n1-docs-naming.md)：推荐 A 全去编号、
+    vendor 同构；执行 = 一次机械 commit + 两道链接门禁红→绿），**人裁后执行**。
   - **升 pin**（触发型：上游出新 tag 时跑 `scripts/sync-dsh.mjs --pin`，合同 docs/release.md）——
-    含 teammate footgun 残留处理（delegation.md §4.4）与搁置池顺手回看。
+    **触发已满足（2026-09-24 web 核实）**：当前钉 rc.2（9-10）已落后 5 tag，最新 = `dsh-v0.1.7-rc.1`
+    （9-23）、同系列补丁 `dsh-v0.1.5-rc.3`（9-22）；**白天跑**（vendor 基线全换 + 流程合同对 vendor
+    重校 + teammate footgun 残留处理（delegation.md §4.4）+ 搁置池顺手回看——不当夜自动执行）。
 
   - notes/implemented 归档层评估（原 r5-plus §7.4 迁入）：候选 = repo-scaffolding / docs-layering / dev-loop-guide / wochen-naming / r0-loop-acceptance / r1-docs-sync；仍带活判据的六篇（r3-reporting-line、skill-root-isolation、client-remote-single-mount、r2-roles-alive、r2-motion-run、r1-deploy-findings）不要动。
 
