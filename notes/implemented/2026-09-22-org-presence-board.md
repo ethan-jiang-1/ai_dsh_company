@@ -6,7 +6,7 @@ R5b 交付，见 [implemented/2026-09-23-r5b-cockpit.md](./2026-09-23-r5b-cockpi
 进轮：**R5b 驾驶舱**（2026-09-22 起，见 [roadmap](../../docs/plans/roadmap.md)）
 梳理（2026-09-22 晚）：R5 已按 D19 拆成 **R5a 门禁与发布 / R5b 驾驶舱**，本提案属 **R5b**
 （正文旧 `R5` 已全部改指 R5b）。原"开工前必须先钉四个决定"（[00-index 待定
-Q5–Q8](../../docs/00-index.md)，内容与选项见 [r5-plus-readiness](../../docs/plans/r5-plus-readiness.md)
+Q5–Q8](../../docs/00-index.md)，内容与选项见 r5-plus-readiness（原审计文件，已于 R6 删除——处置见 docs/plans/content-corruption-audit.md D1）
 §9 P2）**已完成（2026-09-23）**：四条都已是下文 §四个定案 的现在时陈述，"风险与未决"对应
 条目已删——提案 decision-complete，可进 Plan Mode。
 

@@ -44,6 +44,34 @@ for (const p of linkHolders) {
 }
 ok(`md-links ×${linkCount}`)
 
+// ── 2b. notes/ 树链接核验（W6 移交：notes/ 曾是 md-links 盲区，两条断链存活数月才被发现） ──
+// 与 2 同一规则（相对链接必须可解析），只是覆盖面扩到 notes/ 全树。
+let notesLinkCount = 0
+for (const p of mdFiles.filter(p2 => p2.startsWith(join(root, 'notes')))) {
+  const text = readFileSync(p, 'utf8')
+  for (const m of text.matchAll(/\]\((\.{1,2}\/[^)#\s]+)\)/g)) {
+    notesLinkCount++
+    const target = resolve(dirname(p), m[1])
+    if (!existsSync(target)) fail('notes-link', `${p} → ${m[1]}`)
+  }
+}
+ok(`notes-links ×${notesLinkCount}`)
+
+// ── 2c. 词数预算（缩编自 vendor `verify-doc-budgets`；防入口链继续膨胀——R6 D23/清单 B #52） ──
+// 上限 = 当前值 + 余量；超限先搬（内容挪到该去的家）再压，确需空间才在 Note 里说明后升上限。
+const DOC_BUDGETS = [
+  ['AGENTS.md', 165],            // 2026-09-23 整治后 149 行（此前沉积 214）
+  ['docs/00-index.md', 145],     // 整治后 131
+  ['docs/guides/60-dev-loop.md', 440], // 整治后 ~397
+]
+for (const [rel, cap] of DOC_BUDGETS) {
+  const lines = readFileSync(join(root, rel), 'utf8').split('\n').length - 1
+  lines <= cap
+    ? ok(`doc-budget ${rel} (${lines}/${cap})`)
+    : fail('doc-budget', `${rel} ${lines} 行超上限 ${cap}（先搬内容到该去的家，再压；不直接加行）`)
+}
+
+
 // ── 3. preset 结构：5 角色 × (composition + metadata + ≥1 skill) ───────────
 const roles = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
 for (const role of roles) {

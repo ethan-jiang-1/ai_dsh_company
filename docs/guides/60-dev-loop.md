@@ -5,29 +5,31 @@
 > [00-index.md](../00-index.md) §外部研究材料登记）；机制结论以 `vendor/dsh/` 工作树为权威，
 > 本篇引用的旗标与行为均已在钉住 tag（dsh-v0.1.5-rc.2）核对。
 
-## 0. 全周期速览
+## 0. 全周期速览（条目生命周期——D23 转型后本仓的开发单位 = 队列条目）
 
 | 阶段 | 做什么 | 本 repo 载体 |
 |---|---|---|
+| 0 取条目 | 全新会话读入口链，从**队列**取头条目 | `docs/plans/roadmap.md` §队列（§0.5） |
 | 1 意图 | 一行动机 + 一行**外部可观察行为** | `notes/intents.md` 登记行 |
 | 2 决策 | 摆方案、选定、**给输掉的方案留尸体** | `notes/proposed/<date>-<slug>.md` 三段式 |
-| 3 设计 | decision-complete 的实施计划，人批准后才动手 | Plan Mode + §3 设计四问（有代码起） |
-| 4 落地 | 窄证据切片闭环 | §1 六步；交付 = 完整垂直切片 |
+| 3 设计 | decision-complete 的实施计划，人批准后才动手 | Plan Mode 呈批（**反馈门①**：批 / 打回带反馈）+ §3 设计四问 |
+| 4 落地 | 窄证据切片闭环；**实施期维护 todo_write 清单**（开工前列全、完成即勾、人 steer 即重排——**反馈门②**） | §1 六步 + 宿主 TodoPanel |
 | 5 调试 | 逐层排除，不跳层 | §2 调试阶梯 |
 | 6 调整 | 证据驱动打磨，不重设计 | 回到阶段 1 但意图更窄；vendor 换 tag 走 §5 |
-| 7 收尾 | 只报告实际跑过的检查 | §4 + `pnpm verify` |
+| 7 收尾 | 只报告实际跑过的检查；docs 只写 now；**完成即离队**（队列里删行，记录活在 Note + git） | §12 + Note 模板 + `pnpm verify` |
 
-## 0.5 新会话开工动作（轮次交接的读侧）
+## 0.5 新会话开工动作（条目交接的读侧）
 
-每轮换**全新对话上下文**执行（决策 D11）——干净的轮次上下文，不跨轮携带。新会话固定开场：
+每条目换**全新对话上下文**执行（约束登记见流程合同：不跨条目携带上下文）。新会话固定开场：
 
 ```text
-AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ plans/roadmap.md 找当前轮
-→ 有 ⛔ 先解阻塞 → Plan Mode 出 decision-complete 计划 → notes/intents.md 登记 → 开工
+AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ plans/roadmap.md §队列取头条目
+→ 有 ⛔ 先解阻塞 → Plan Mode 出 decision-complete 计划（呈人批）→ notes/intents.md 登记
+→ todo_write 列全任务 → 开工
 ```
 
-人只需要说"继续下一轮"。判断"环境/上轮就绪了什么"只读当前轮 Note 的"实际跑过的验证 +
-环境状态"，不信记忆、不信聊天记录。收尾侧清单见 roadmap"轮次交接"节。
+人只需要说"继续下一条"。判断"环境/上轮就绪了什么"只读最近收尾 Note 的"实际跑过的验证 +
+环境状态"，不信记忆、不信聊天记录。收尾侧程序 = 本篇 §12（条目收尾）。
 
 ## 1. 落地：六步闭环
 
@@ -36,8 +38,9 @@ AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ plans/
 ```
 
 1. **核对现场**：不信任记忆，先读当前的代码/文档/日志——权威只在外部可验证状态里。
-2. **判定窄 diff**：动手前说清这次动哪几个文件；"改一下 UI"不是窄 diff，"给 X 工具加一张
-   卡"是。
+2. **判定窄 diff + 列全任务**：动手前说清这次动哪几个文件；"改一下 UI"不是窄 diff，"给 X 工具加一张
+   卡"是。判定后**立即 `todo_write` 列全任务清单**（开工前列全、完成即勾、人 steer 后重排）——
+   这是实施期的进度面（宿主 TodoPanel 实时可见），也是纪律自带的部分（工具描述已喂给模型）。
 3. **原子修改 owner 面**：每个事实一个 owner——改 preset 行不动 host 行语义，改 pack 不动
    vendor（`vendor/dsh/` 只读，簿记见 AGENTS.md）。
 4. **跑最小证据**：起步 `pnpm verify` + `pnpm test`（keyless 回归）；有行为测试后只跑"会为这次
@@ -396,3 +399,37 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 **反例存档**：`~/Library/Caches/pnpm` 合成元数据事故（2026-09-22，见
 [implemented/2026-09-22-team-assembly-and-rehearsal-split.md](../../notes/implemented/2026-09-22-team-assembly-and-rehearsal-split.md)
 环境状态节；清理按 etag `synthetic-from-store` 标记识别）。
+
+## 12. 条目收尾（程序之家，自 roadmap"轮次交接"迁入——D23/V5）+ 流程合同
+
+**收尾在同 diff 内完成，缺一即未收尾**：
+
+1. docs 只写 now：本条目已成的事实迁进对应合同（00-index 合同出生地图 / 顶层合同）——随代码同 diff；
+2. `notes/implemented/` 记收尾 Note（模板见下）——下条会话判断"哪些已就绪"只读它；
+3. `notes/intents.md` 对应行改 implemented；
+4. 门禁全绿两层：`pnpm verify` + `pnpm test`（迭代环，每次）+ 认证档按改动面选跑（§9.1；
+   真模型不进回归——`tests/layering.spec.ts` 机械守卫）；**commit 前迭代环必跑**；
+5. **完成即离队**：队列里删掉该条目行（记录活在 Note + git；队列只写"接下来"）；
+6. roadmap 维护规则记一行（结构/范围变更时）。
+
+**收尾 Note 模板**（裁剪自 DSH PR 模板三段，登记的偏离等价物）：头 = 日期 + 条目名 + 状态行；
+节 = ① Motivation（动机与外部可观察行为一行）② 交付（变更要点，含对 wire/config/API 的影响）
+③ **实际跑过的验证**（每条检查一行：命令 + 结果；只列实跑的）④ **环境状态**（凭据/端口/进程/
+一次性文件——下条会话判断"哪些已就绪"只读这里）⑤ 条目去向表（若源自提案）。
+
+**流程合同（现在时；偏离必须登记，默认严格 DSH 套路）**：
+
+- **条目生命周期**：见 §0 表；反馈双门 = Plan Mode 呈批（①）+ todo_write 实时面（②）。
+- **偏离注册表**（每条 = 约束证据，镜像 DSH "require evidence for public choices"）：
+  无 GitHub 协作面 → 队列 + 同 diff 收尾替代 issue/PR 流；无 CI → 本地门禁代行（coverage 不设）；
+  中文单语；fresh context 每条目 → 集中台账（intents/00-index——**反向适配 DSH"禁集中索引"**，
+  约束 = 换条目换上下文需要非活树载体）+ 入口链交接；无归档层（规模，评估条目在队列）；
+  中文硬换行（vendor 要求一物理行一段，本仓不迁）；快照时点 = 条目收尾归档（same-PR 等价物）。
+- **防再犯五件套**：① 全量纪律清单（vendor 逐源枚举，本表从 R6 枚举提炼；升 pin 时重校）；
+  ② 本偏离注册表；③ 机械门禁（verify：notes-links / doc-budget / layering / vendor 铁律…）；
+  ④ 入口链探针（`scripts/entry-probe-smoke.mjs`，认证档，8 问归档 snapshots）；⑤ sync-dsh 升 pin
+  时流程合同对 vendor 重校。
+- **硬规矩**（自轮制平移）：竖切（一条目一可观察行为）/ 最窄验证 / 自动化轻任务（§10 三上限）/
+  完成定义 = 该面最小真检查（D15）。
+- **方向铁律**：打扫 = **净减少 + 信噪比提高**——每次整治收尾回答"文件数与总行数少了多少"；
+  处置优先序 = 删 > 并 > 修 > 记。

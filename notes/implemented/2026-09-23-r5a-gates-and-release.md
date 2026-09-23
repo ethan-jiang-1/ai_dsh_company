@@ -2,7 +2,7 @@
 
 > 轮次：[roadmap](../../docs/plans/roadmap.md) R5a（后半，接 P1.1/P1.2 —— commit `133b82d`/`bcda032`）。
 > 意图登记：[intents.md](../intents.md) 2026-09-23「R5a 续作」行。
-> 权威判据：[r5-plus-readiness](../../docs/plans/r5-plus-readiness.md) §9 P1.3 / P1.4 / P4（已逐条销账）。
+> 权威判据：r5-plus-readiness §9 P1.3 / P1.4 / P4（已逐条销账；该文件已于 R6 删除，git 留史）。
 
 ## 交付了什么（外部可观察）
 

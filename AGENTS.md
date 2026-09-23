@@ -34,7 +34,7 @@ source dev/env.sh                      # 双 home 兜底：DSH_HOME=<repo>/dev/h
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（R0 已验收）
 pnpm dsh web -- --port 3081 --no-open  # web 观察窗（需 client 面+前端构建，guides/60 §7）；3080 是本 GUI 占用
 pnpm verify                            # 结构门禁（UTF-8/链接/preset 结构/symlink/**vendor 铁律：SHA+零改动**/pack 形状/行依赖/client 两半）
-pnpm test                              # keyless 回归（vitest：roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义、必填 config）
+pnpm test                              # keyless 回归（vitest，53 条 ≈0.3s；覆盖面见 tests/ 目录——描述不在此枚举，防数字漂移）
 node scripts/preset-smoke.mjs          # 上线前门禁：boot 真 web，逐个 preset 建会话（唯一能抓"preset 挂载失败"的检查；需 DSH_HOME + 已装 pack）
 node scripts/client-load-smoke.mjs     # client 面完成定义：headless 浏览器加载真页面，断言零插件挂载失败 + 品牌槽在场（需 DSH_HOME；postmortem 0003）
 node scripts/probe-smoke.mjs           # 角色连通冒烟（默认快速档 ~6s）：真 web + 真 preset + 一句 ping，断言"挂载/轮次跑完/模型回话/人格进 prompt"；`--full` 才跑 15 个内容探针（慢，5–10min，按需）
@@ -76,24 +76,27 @@ node scripts/sync-dsh.mjs              # 升 pin 程序（R5a P4）：默认检�
   `_faq_on_digested/13_expert-plugin-repo-organization/`（本 repo 形态的依据 FAQ）。
   引用时注明是外部研究材料；逐份落点登记见 `docs/00-index.md` §外部研究材料登记。
 
-## 纪律（**全程沿用 DSH 的研发纪律**，不发明本地流程）
+## 纪律（沿 DSH 研发纪律；**默认严格照做，偏离必须登记**）
 
-本 repo 的开发过程不是"借鉴"DSH，而是**整套继承**：凡 DSH 有明文纪律的，一律照做，只按本
-repo 规模裁剪（例如 CI 穷举暂由本地门禁代行）。**纪律的权威在 vendor 树，不在本 repo 的转述**：
+纪律的权威在 vendor 树（钉住的 tag），本表是**落点地图**不是转述来源；逐源枚举的全量清单
+（R6 线 B 产出，98 行提炼）与偏离注册表住 `docs/guides/60-dev-loop.md` §12（流程合同）。
+**偏离规则：任何偏离 DSH 明文纪律的做法 = 一个 D 号 + 约束证据**（如"本地单人仓无 GitHub
+协作面"）；"按规模裁剪"不是缺省自由。
 
 | DSH 纪律 | 权威（vendor 树） | 本 repo 落点 |
 |---|---|---|
-| docs = 当前合同（一处事实一个家，只写 now） | `docs/AGENTS.md` | `docs/` 按性质分层（D10）+ `pnpm verify` 链接门禁 |
-| 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么） | `.agents/notes/README.md` | `notes/intents.md → implemented/` |
-| 窄证据切片；本地窄、CI 穷举；只报告实际跑过的检查 | `AGENTS.md` Run relevant checks | guides/60 §1 六步闭环 + `pnpm verify` |
-| **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**（迭代是常态，但必须由代理能自己跑的检查闭合） | `docs/testing.md` Test the real entry path / Verify the world, not the self-report；`docs/postmortem/0003`（"delegated acceptance to the user"） | guides/60 §1 第⑥步 + §7 两道防线；`preset-smoke.mjs` 是 preset/config 类改动的完成定义 |
-| 测试分层（unit/coverage/e2e/expected/**snapshot 无 key 重放**）；测试描述行为 | `docs/testing.md` | `snapshots/`（R5a 正式化；R1 会话日志即首份资产） |
-| **测试分层与预算：真模型 / 真浏览器不进回归**（回归层 = 秒级、无 key、无浏览器；真入口一律进认证档 `scripts/*-smoke.mjs`，每轮一次） | `docs/testing.md` 测试分层 | guides/60 §9.1 + **机械门禁 `tests/layering.spec.ts`**（回归层出现子进程/浏览器/网络/密钥即红；已反证） |
-| 真实入口路径（发布产物 `lib/` 跑）+ 真实安装形状 | `docs/testing.md` Test the real entry path | R5a `release-smoke`（`npm pack`→干净 profile→`plugin add`） |
+| **过程反馈面：plan mode 呈批（计划归 exit_plan_mode）+ 实施期 todo_write（开工列全、完成即勾、steer 即重排）** | `packages/plan` + `packages/todo`（工具描述自带使用纪律） | guides/60 §0 条目生命周期（反馈双门）+ 宿主 TodoPanel |
+| docs = 当前合同（一处事实一个家，**只写 now**；词数预算 + slop 猎杀） | `docs/AGENTS.md` | `docs/` 按性质分层（D10）+ verify 链接/预算门禁；计划层**纯队列、完成即离队**（D23） |
+| 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么） | `.agents/notes/README.md` | `notes/intents.md → implemented/`；收尾 Note 模板 = guides/60 §12 |
+| 窄证据切片；只报告实际跑过的检查；push/commit 前跑迭代环 | `AGENTS.md` Run relevant checks | guides/60 §1 六步闭环 + §12 收尾 |
+| **完成定义 = 该面最小"真检查"通过；发现权在代理一侧** | `docs/testing.md`；`docs/postmortem/0003` | guides/60 §1 第⑥步 + §7 两道防线；preset 类改动完成定义 = `preset-smoke.mjs`（真挂载） |
+| 测试分层：真模型 / 真浏览器不进回归；行为变更同 diff 更新录制快照 | `docs/testing.md` | guides/60 §9.1 + 机械门禁 `tests/layering.spec.ts`（已反证）+ 认证档按面选跑 |
+| 真实入口路径（发布产物 `lib/` 跑）+ 真实安装形状 | `docs/testing.md` | `release-smoke`（`npm pack`→干净 profile→`plugin add`），合同 `docs/release.md` |
 | 源码面/产物面不混（paths 指 src） | `AGENTS.md` Conventions | 根 `tsconfig.json` extends vendor base |
-| vendor 钉版本 + manifest/SHA + 同步程序 | `vendor/README.md` | AGENTS.md vendor 簿记 + `scripts/sync-dsh.mjs`（R5a） |
+| vendor 钉版本 + manifest/SHA + 同步程序；**升 pin 时流程合同对 vendor 重校** | `vendor/README.md` | AGENTS.md vendor 簿记 + `scripts/sync-dsh.mjs` |
 | 日志税：model-visible ⟺ logged | `AGENTS.md` Conventions | guides/60 §3 设计四问② |
-| 机械门禁（结尾换行、链接、结构） | `AGENTS.md` Conventions + `scripts/run-gates.ts` | `scripts/verify.mjs` |
+| 机械可查的不变量进执行门禁 + **每个新门禁带反证**（红→还原→绿） | `AGENTS.md` Conventions | `scripts/verify.mjs`（md-newline / 链接含 notes/ 树 / preset 结构 / vendor 铁律 / pack 形状 / pack-compat / client 两半 / proposal 两则 / **doc-budget**） |
+| **卫生铁律：打扫 = 净减少 + 信噪比提高；处置序 = 删 > 并 > 修 > 记** | （本仓原生，D23） | guides/60 §12 流程合同（方向铁律条） |
 
 ### vendor 铁律（本仓最高优先级，机械门禁在 `pnpm verify`）
 
@@ -142,8 +145,8 @@ repo 内为自由区；工具状态（缓存/store/配置）一律**先重定向
 
 ## 当前状态
 
-当前条目 **R6 内容诊治 🔄**（2026-09-23 开工；章程与增补 = `docs/plans/roadmap.md` R6 行 + 维护规则 D21/D23；诊断件 `docs/plans/content-corruption-audit.md` + `process-deviation-audit.md`，销账后删除）。
+上一条目 **内容诊治**（2026-09-23 收尾，R6 = 本仓最后轮号；收尾 Note = `notes/implemented/2026-09-23-r6-content-remediation.md`，净减少结算在其中）。当前队列头条目 = **分身成长**（roadmap §队列）。
 
 - 已闭轮的交付、判据与设计决定：唯一事实家 = `docs/00-index.md` 台账（D 号）+ `notes/implemented/` 收尾 Note——本节不复述。
-- 门禁分层（迭代环秒级 / 认证档每轮一次按面选跑）：权威家 = `docs/guides/60-dev-loop.md` §9.1。
-- 环境要点（观察窗 / `link:` 安装 / 双 home / 排练场）：guides/60 §6–§7；真实安装形状 = `release-smoke`（合同 `docs/release.md`）。
+- 门禁分层（迭代环秒级 / 认证档每条目按面选跑）：权威家 = `docs/guides/60-dev-loop.md` §9.1。
+- 环境要点（观察窗 / `link:` 安装 / 双 home / 排练场）：guides/60 §6–§7；真实安装形状 = `release-smoke`（合同 `docs/release.md`）；**push 走 `ssh.github.com:443`**（22 被拦，见 R6 Note 环境状态）。

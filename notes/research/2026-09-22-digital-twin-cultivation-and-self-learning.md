@@ -333,7 +333,7 @@ webhook 会话的 `create_goal` 会被 `requireDirectHuman` 拒——这是**【
    真入口断言。⇒ §C 结尾"给全公司立一条规矩目前没有可用的自动载体"与 **U4 作废**。
 2. **U1 已在源码层回答**（同篇末节）：skill 条目的增删改名**下一轮**就刷新（首方 `write`/`edit`
    直接失效 provider），不必等新会话。§3 记的"两条 vendor 陈述冲突"由此收敛；仍缺一次活体探针
-   （最小步骤见 [../../docs/plans/r5-plus-readiness.md](../../docs/plans/r5-plus-readiness.md) §3.1）。
+   （最小步骤见 r5-plus-readiness §3.1——文件已删，git 留史）。
 3. **§D 的"唯一可写落点"结论被隔离改动推翻**：`includeDefaultRoots: false` 之后，角色 provider
    只扫自己的 `customSkillDirs`，`<projectRoot>/.dsh/skills`（rank 100）**不再进入角色的技能面**
    ⇒ 往那里写 skill 对任何公司角色都不可见。正文 D 的"自我学习落在 skills 上机制上可行，

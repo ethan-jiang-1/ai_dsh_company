@@ -6,7 +6,7 @@
 [../implemented/2026-09-22-skill-root-isolation.md](../implemented/2026-09-22-skill-root-isolation.md)；
 U1 已在源码层回答、U2/U3 作废，见
 [../research/2026-09-22-digital-twin-cultivation-and-self-learning.md](../research/2026-09-22-digital-twin-cultivation-and-self-learning.md)
-§5。逐项就绪度判定见 [../../docs/plans/r5-plus-readiness.md](../../docs/plans/r5-plus-readiness.md)。
+§5。逐项就绪度判定见 r5-plus-readiness（原审计文件，已于 R6 删除——git 留史）。
 
 ## 背景
 
