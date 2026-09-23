@@ -12,9 +12,10 @@
 
 ## 队列
 
-- ⏸ **整治转待办**（R6 销账落入；低优先）：
-  - 下次「磨」的输入 = R6 Note「审计覆盖缺口」清单（presets.md 三方比对 / research 即时性 /
-    0001、0003 深读 / guides/50 旋钮复校 / journal 行号全量 / snapshots 差异——清单住收尾 Note，不复制）。
+- ⏸ **整治转待办**（R6 销账落入；低优先；当夜 2026-09-24 已消化大半——见维护规则同日各行）：
+  - 「磨」剩余输入（当夜已跑 6 项中的 5 项 + 1 项出真修复，见维护规则 2026-09-24「磨审计」行）：
+    **snapshots 与 live 盘差异逐项语义目录**（机械层已过：`deliverables-check` ALL PASS + r3 重放
+    随手册重录；剩余 = 逐快照语义 diff 的编目）。
   - 编号方案（N1）：design/guides 目录编号与顶层合同双体系二选一——**提案已出**（2026-09-24 当夜，
     [proposed/n1-docs-naming](./notes/proposed/2026-09-24-n1-docs-naming.md)：推荐 A 全去编号、
     vendor 同构；执行 = 一次机械 commit + 两道链接门禁红→绿），**人裁后执行**。
@@ -22,8 +23,8 @@
     **触发已满足（2026-09-24 web 核实）**：当前钉 rc.2（9-10）已落后 5 tag，最新 = `dsh-v0.1.7-rc.1`
     （9-23）、同系列补丁 `dsh-v0.1.5-rc.3`（9-22）；**白天跑**（vendor 基线全换 + 流程合同对 vendor
     重校 + teammate footgun 残留处理（delegation.md §4.4）+ 搁置池顺手回看——不当夜自动执行）。
-
-  - notes/implemented 归档层评估（原 r5-plus §7.4 迁入）：候选 = repo-scaffolding / docs-layering / dev-loop-guide / wochen-naming / r0-loop-acceptance / r1-docs-sync；仍带活判据的六篇（r3-reporting-line、skill-root-isolation、client-remote-single-mount、r2-roles-alive、r2-motion-run、r1-deploy-findings）不要动。
+  - 教训候选 C（引用两分法）的载体裁决：公司手册（全会话注入）vs 各角色 skills（按需加载）——
+    培养轮 2 留给人工的分叉（提案要点见 2026-09-24 晨报）。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
@@ -195,6 +196,18 @@
   提案要点进晨报）。验证 = verify + test + preset-smoke + `probe --full` **15/15 全部命中**（含
   §9 单题重试；该认证档同时覆盖 W3 的 COO 挂载）。收尾 Note =
   [implemented/2026-09-24-cultivation-round-2.md](./notes/implemented/2026-09-24-cultivation-round-2.md)。
+- 2026-09-24（**磨审计（当夜，R6 缺口清单 6 项）**）：① journal 行号引用全量核——121 处提取比对，
+  118 精确命中；2 处**先前已存在**的过期（coo journal `:8`"维护合同不在池内"现行无此行、vp-sales
+  journal 引 coo `:14` 载体清单实为 `:13`）+ 3 处当晚预期错位（勘误历史记述）——全在冻结 journal 层，
+  不改写、仅登记；② presets↔CHARTER↔persona 三方比对——**PASS**（W3 后指针零残留、数字不进 pack
+  〔D17〕、veto 语义由当夜探针活证）；③ 0001/0003 深读——守卫全在岗，修 1 处过期指针（0001 行动项 3：
+  plans/roadmap.md → guides/60 §12）；④ guides/50 旋钮对 vendor 复校——**PASS 零漂移**
+  （8/256/64/64KiB/maxDepth 3 全对钉住 tag）；⑤ research 即时性——3/3 已毕业且修正随行
+  （digital-twin §6 当夜补）；⑥ snapshots 差异机械层——`deliverables-check` ALL PASS（0 违规）+
+  **replay-smoke 抓到真漂移**（手册 W9/W10 进注入消息 ⇒ r3 录制过期）→ 按 §9.1 重录 + harness 修
+  防再犯（commit `bc297b6`）；语义逐项目录留待办。**归档层评估（同夜）**：结论 = 暂不归档——
+  r0-loop-acceptance 被 guides/60 §7 引为实操出处（**活判据，待办原前提有误记正**）；其余五篇可归档
+  但净文件数不减、33 篇信噪比尚可，等规模翻倍或合并整治轮再兑现。
 - 2026-09-24（**entry-probe 判据时间不变化**〔整治转待办销账〕）：两案选**时间不变问法**（另一案
   "收尾程序加刷新步"否决——多一个会忘的人工程序，且同病同根「时变状态进时不变载体」）。Q1 判据
   弃锚条目名改断言路由 + 记录家（ROADMAP §队列 + 收尾 Note/台账/git）；Q2 改问「完成即离队」语义
