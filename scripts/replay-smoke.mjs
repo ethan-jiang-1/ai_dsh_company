@@ -323,6 +323,12 @@ if (RECORD) {
     }
     mkdirSync(join(replayDir, 'raw'), { recursive: true })
     // child 按 header createdAt 排序（llm-replay 绑定序；与 childRaws()/fixture 序号一致）。
+    // ⚠ 先清掉旧 raw child（任意命名）再写新集：childRaws() 枚举 raw/ 全部非 lead 的 .jsonl，
+    //   残留旧 child 会让 fixture 期望数与实写数错位（2026-09-24 重录实测：旧 vp-eng-child.jsonl
+    //   与新 child-1.jsonl 并存 ⇒ replay 报"缺 session.2"）。
+    for (const stale of readdirSync(join(replayDir, 'raw')).filter(n => n !== 'lead.jsonl' && n.endsWith('.jsonl'))) {
+      rmSync(join(replayDir, 'raw', stale), { force: true })
+    }
     const ordered = [parsed[0], ...parsed.slice(1).sort((a, b) => Number(a.header.createdAt ?? 0) - Number(b.header.createdAt ?? 0))]
     const raws = ordered.map(p => p.text)
     writeFileSync(rawLead, raws[0], 'utf8')
