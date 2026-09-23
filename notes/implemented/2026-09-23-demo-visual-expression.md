@@ -2,7 +2,7 @@
 
 状态：已消化（2026-09-23 交付并收尾；收尾 Note = [2026-09-23-company-view.md](./2026-09-23-company-view.md)）
 类型：feature（原队列序 1；完成即离队）
-研究依据：[research/2026-09-23-visual-expression-for-demo.md](../research/2026-09-23-visual-expression-for-demo.md)
+研究依据：[implemented/2026-09-23-visual-expression-for-demo.md](./2026-09-23-visual-expression-for-demo.md)
 
 ## 打磨点销账（收尾时补，用户 2026-09-23 走查后）
 

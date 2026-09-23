@@ -1,6 +1,9 @@
 # 2026-09-23 · demo 可视表达研究（机制怎么"演"出来）
 
-状态：研究结论（供「demo 可视表达」条目开工用）
+状态：**已落地（研究）** → 结论落点 = 公司视图 / 公司页签 / 视觉打磨三篇收尾 Note
+（[2026-09-23-company-view](./2026-09-23-company-view.md) / [2026-09-23-panel-tabs](./2026-09-23-panel-tabs.md) /
+[2026-09-23-visual-polish](./2026-09-23-visual-polish.md)）+ [design/30-ui-demo.md](../../docs/design/30-ui-demo.md)
+（座位/令牌/命名）+ ROADMAP「依赖选型门槛」行（第三方看板否决证据 = 本笔记 §4）。2026-09-24 自 `notes/research/` 毕业。
 方法：三条后台调研线并行（平台能力 / 生态与官方口径 / 设计参照与库选型）+ 一条采用度线（进行中）。
 标注：**【一手】** = vendor 源码、官方文档或 npm registry 直接核实；**【本地研究】** = 外部研究树
 （`/Users/bowhead/deepseek-harness/`）的二次研究，非官方口径；**【推断】** / **【未发现】** 照字面。

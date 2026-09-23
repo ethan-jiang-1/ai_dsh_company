@@ -2,7 +2,7 @@
 
 状态：✅ 已交付并收尾（队列条目「demo 可视表达」完成即离队）
 条目 RFC：[implemented/2026-09-23-demo-visual-expression.md](./2026-09-23-demo-visual-expression.md)（已毕业，状态「已消化」）
-研究依据：[research/2026-09-23-visual-expression-for-demo.md](../research/2026-09-23-visual-expression-for-demo.md)
+研究依据：[implemented/2026-09-23-visual-expression-for-demo.md](./2026-09-23-visual-expression-for-demo.md)
 
 ## ① Motivation（外部可观察行为）
 

@@ -152,7 +152,7 @@
   「不讲解也能看懂」并要视觉表达力与动效 ⇒ 队列序改为 **① demo 可视表达 ② 面板窗口化 ③ 分身成长
   （原首条后移）④ 整治转待办**；**原「UX 打磨」被 ① 吸收并毕业**（`notes/implemented/2026-09-23-ux-polish.md`
   含逐条去向）。同日两条新 feature 的 RFC 落 `notes/proposed/`（demo-visual-expression / panel-float），
-  依据 = 研究笔记 `notes/research/2026-09-23-visual-expression-for-demo.md`（三线调研：平台能力 / 生态与官方口径 /
+  依据 = 研究笔记 `notes/implemented/2026-09-23-visual-expression-for-demo.md`（三线调研：平台能力 / 生态与官方口径 /
   设计参照与库选型）。**依赖选型门槛（用户令）**：新引入的插件/依赖必须成熟 + 高采用 + 可审计，
   否则自建；第三方 DSH 看板插件因采用度与"git 安装会在沙箱外执行 prepare"风险被否决（借设计不装）。
 - 2026-09-23（**research 层生命周期立规**，用户决定）：`notes/research/` 只放**活研究**（在飞 / 供未开工条目 /

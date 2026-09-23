@@ -2,7 +2,7 @@
 
 状态：已消化（2026-09-23 交付并收尾；收尾 Note = [2026-09-23-panel-tabs.md](./2026-09-23-panel-tabs.md)）
 类型：feature（原队列序 1——条目 ① 收尾后递补；完成即离队）
-研究依据：[research/2026-09-23-visual-expression-for-demo.md](../research/2026-09-23-visual-expression-for-demo.md) §1.4
+研究依据：[implemented/2026-09-23-visual-expression-for-demo.md](./2026-09-23-visual-expression-for-demo.md) §1.4
 
 ## 问题
 
