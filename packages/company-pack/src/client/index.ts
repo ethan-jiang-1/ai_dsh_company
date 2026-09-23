@@ -13,6 +13,7 @@ import { WocheBrandName } from './Brand.tsx'
 import { CompanyPane, type MemberTarget } from './CompanyPane.tsx'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
+import { installStyles } from './styles.ts'
 import { TasksAction } from './TasksPanel.tsx'
 
 /** Required services: the slot registry plus the remote namespace we read. */
@@ -39,6 +40,9 @@ const COMPANY_TAB_ID = 'dsh-company-pack/cockpit'
  * @param ctx - Client root context.
  */
 export async function apply(ctx: ClientContext): Promise<void> {
+  // 本包 client 面的样式表：挂载时一次性注入（S0 决定 = 注入式，不走 CSS Modules；见 styles.ts 头注）。
+  installStyles()
+
   // 委派工具卡（R3）：把 CEO 的命名委托工具渲染成"给 VP 的 brief 卡"。
   // keyed slot 的 key 域是**开放**的（槽合同原话："a typo simply never renders"），
   // 所以 key 必须与 preset 里的 toolName 逐字一致——拼错不报错、只是永远不渲染。

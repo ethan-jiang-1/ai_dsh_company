@@ -1,0 +1,160 @@
+/**
+ * 任务 DAG 布局（条目 ① S1）：纯函数分层 + 定坐标；视图只负责画 SVG。
+ *
+ * 零依赖（研究 §3「最小可行组合」）：节点数在我们的规模（一次动议 ≤20）下，最长路径分层
+ * 只需几十行，不需要 dagre/elkjs；布局库留到图确实变大时再按采用度门槛引。
+ * 分层语义 = **关键路径**：`level(n) = max(level(blocker) + 1)`，根任务在第 0 层——
+ * 一列看下去就是"最长的依赖链有多长"，同级任务可并行。
+ */
+import { dependencyEdges, type TaskRow } from './board.ts'
+
+/** 一个节点（含算好的视口坐标；渲染层不自己算布局）。 */
+export interface DagNode {
+  readonly id: string
+  readonly subject: string
+  readonly status: TaskRow['status']
+  readonly ready: boolean
+  readonly ownerLabel: string | null
+  /** 层级（0 = 无依赖的根）。 */
+  readonly level: number
+  /** 同级内序号（0 起，= 输入序）。 */
+  readonly order: number
+  readonly x: number
+  readonly y: number
+  readonly width: number
+  readonly height: number
+}
+
+/** 一条依赖边（blocker → blocked）。 */
+export interface DagEdge {
+  readonly from: string
+  readonly to: string
+  /** SVG `path` 的 `d`：blocker 底边中点 → blocked 顶边中点（三次贝塞尔）。 */
+  readonly path: string
+  /** blocker 已完成 ⇒ 这条依赖"已走通"（渲染成实线/高亮）。 */
+  readonly done: boolean
+}
+
+export interface DagLayout {
+  readonly nodes: readonly DagNode[]
+  readonly edges: readonly DagEdge[]
+  readonly width: number
+  readonly height: number
+}
+
+export interface DagOptions {
+  readonly nodeWidth?: number
+  readonly nodeHeight?: number
+  readonly hGap?: number
+  readonly vGap?: number
+  readonly padding?: number
+}
+
+const DEFAULTS = { nodeWidth: 168, nodeHeight: 44, hGap: 28, vGap: 56, padding: 12 } as const
+
+/**
+ * 分层：`level(n) = max(level(blocker) + 1)`，根 = 0。
+ * 缺失的 blocker 忽略；**成环不挂**——层级钳在 `节点数 - 1`（任何 DAG 的层级上界），
+ * 松弛迭代上限 = 节点数，所以环内节点会停在有限层、画布尺寸也有界。
+ * @param tasks - 任务行。
+ * @returns 任务 id → 层级。
+ */
+export function dagLevels(tasks: readonly TaskRow[]): Map<string, number> {
+  const byId = new Map(tasks.map(task => [task.id, task]))
+  const levels = new Map<string, number>(tasks.map(task => [task.id, 0]))
+  const ceiling = Math.max(0, tasks.length - 1)
+  for (let round = 0; round < tasks.length; round++) {
+    let changed = false
+    for (const task of tasks) {
+      const own = levels.get(task.id) ?? 0
+      for (const blocker of task.blockedBy) {
+        if (!byId.has(blocker)) continue
+        const candidate = Math.min((levels.get(blocker) ?? 0) + 1, ceiling)
+        if (candidate > own) {
+          levels.set(task.id, candidate)
+          changed = true
+        }
+      }
+    }
+    if (!changed) break
+  }
+  return levels
+}
+
+/** 坐标取一位小数（快照/金样友好：浮点尾巴不制造假 diff）。 */
+function round(value: number): number {
+  return Math.round(value * 10) / 10
+}
+
+/**
+ * 分层 + 同级居中 + 定坐标 → 可直接画的布局（含边路径与画布尺寸）。
+ * @param tasks - 任务行（顺序 = 同级内的显示序）。
+ * @param options - 尺寸/间距覆盖（默认值见 `DEFAULTS`）。
+ * @returns 布局。
+ */
+export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): DagLayout {
+  const nodeWidth = options.nodeWidth ?? DEFAULTS.nodeWidth
+  const nodeHeight = options.nodeHeight ?? DEFAULTS.nodeHeight
+  const hGap = options.hGap ?? DEFAULTS.hGap
+  const vGap = options.vGap ?? DEFAULTS.vGap
+  const padding = options.padding ?? DEFAULTS.padding
+
+  const levels = dagLevels(tasks)
+  const byLevel = new Map<number, TaskRow[]>()
+  for (const task of tasks) {
+    const level = levels.get(task.id) ?? 0
+    const bucket = byLevel.get(level)
+    if (bucket === undefined) byLevel.set(level, [task])
+    else bucket.push(task)
+  }
+
+  const levelKeys = [...byLevel.keys()].sort((a, b) => a - b)
+  const maxLevel = levelKeys.length === 0 ? 0 : levelKeys[levelKeys.length - 1]!
+  const widest = Math.max(1, ...[...byLevel.values()].map(bucket => bucket.length))
+  const width = padding * 2 + widest * nodeWidth + (widest - 1) * hGap
+  const height = padding * 2 + (maxLevel + 1) * nodeHeight + maxLevel * vGap
+
+  const nodes: DagNode[] = []
+  for (const level of levelKeys) {
+    const bucket = byLevel.get(level) ?? []
+    const rowWidth = bucket.length * nodeWidth + Math.max(0, bucket.length - 1) * hGap
+    const startX = padding + (width - padding * 2 - rowWidth) / 2
+    bucket.forEach((task, order) => {
+      nodes.push({
+        id: task.id,
+        subject: task.subject,
+        status: task.status,
+        ready: task.ready,
+        ownerLabel: task.ownerName,
+        level,
+        order,
+        x: round(startX + order * (nodeWidth + hGap)),
+        y: round(padding + level * (nodeHeight + vGap)),
+        width: nodeWidth,
+        height: nodeHeight,
+      })
+    })
+  }
+
+  const positionById = new Map(nodes.map(node => [node.id, node]))
+  const statusById = new Map(tasks.map(task => [task.id, task.status]))
+  const edges: DagEdge[] = []
+  for (const edge of dependencyEdges(tasks)) {
+    const from = positionById.get(edge.from)
+    const to = positionById.get(edge.to)
+    if (from === undefined || to === undefined) continue
+    const x1 = from.x + from.width / 2
+    const y1 = from.y + from.height
+    const x2 = to.x + to.width / 2
+    const y2 = to.y
+    const mid = (y1 + y2) / 2
+    edges.push({
+      from: edge.from,
+      to: edge.to,
+      path: `M ${String(round(x1))} ${String(round(y1))} C ${String(round(x1))} ${String(round(mid))}, ${String(round(x2))} ${String(round(mid))}, ${String(round(x2))} ${String(round(y2))}`,
+      done: statusById.get(edge.from) === 'completed',
+    })
+  }
+
+  return { nodes, edges, width: round(width), height: round(height) }
+}

@@ -91,6 +91,10 @@ export interface TeamViewLike {
     subject: string
     status: string
     ownerName?: string
+    /** 以下四项供看板 / DAG 读模型用（`TeamTaskView` 有，事件路径的 `TeamTaskSnapshot` 无 `ready`）。 */
+    revision?: number
+    blockedBy?: readonly string[]
+    ready?: boolean
   }[]
 }
 
