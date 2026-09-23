@@ -49,6 +49,21 @@
 - 令牌：复用 `--ds-ease-in-out` / `--ds-transition-duration[-fast|-slow]`；不够时用 `ctx.theme.overrideTokens`
   自加（source 作用域，官方一等公民路径）。**必须 `prefers-reduced-motion` 回退**（官方惯例，28 个文件已这么做）。
 
+### 实施期发现的缺陷（真页面实测；**登记在此，不只在 commit 里**）
+
+条目实施中由**真页面**（重放 + playwright + 截图）发现的行为缺陷，一律登记回本 RFC——发现权在代理一侧，
+但**发现要留痕**（只写在 commit message 或待办里 = 无归属；规则见 guides/60 §12）：
+
+1. **`remote.session` 命名空间未 inject** ⇒ `session/follow` 直接不可用，而当时的 `catch` 静默吞错
+   （违反 fail-loud）。修：补 `remote.session`；流错误改为**显式落面板**。（切片 1 收尾）
+2. **follow 快照只带最新一页** ⇒ 成员 provisioning 事件在页外，动态里的**目标** id 解析不出名字
+   （显示裸 uuid；发送方有 `senderName` 兜底，所以只有目标中招）。修：用轮询的权威名册建 id→名表
+   （`memberNames`）补上；+2 条回归测试。（切片 1 收尾）
+3. **公司视图铺满整列压住页签**（实测几何）：视图 1390px、会话内容列仅 ~912px，内容列两侧的
+   `.widthHandle` 抓取条（左柄 455→495）正好盖住第四个页签 ⇒ **真实用户点不动**。
+   修：视图宽度约束到 `--dsh-chat-content-width` 并居中；实测四页签命中恢复正常。（切片 2）
+4. `docs/design/30-ui-demo.md:57` 的 band 表述订正（见「风险与未决」）。（切片 2）
+
 ### 构建前置（不先做会"样式写了没生效"假绿）
 
 - 本包 client 半 tsdown 配置是手抄契约（只有 banner/footer/externals），**未接 CSS Modules 流水线** ⇒
