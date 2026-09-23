@@ -5,4 +5,4 @@ CEO 与三位 VP（研发/销售/COO）各自是独立 preset，事件从 CEO �
 
 - 入口：[AGENTS.md](./AGENTS.md)（coding agent）· [docs/00-index.md](./docs/00-index.md)（设计地图+决策台账）
 - 纪律：**全程沿用 DSH 的研发纪律**（权威对照表见 [AGENTS.md](./AGENTS.md) §纪律；操作手册 [guides/60](./docs/guides/60-dev-loop.md)）
-- 轮次：见 [docs/plans/roadmap.md](./docs/plans/roadmap.md)（垂直轮迭代 D11；当前 R1 两人公司，进行中）
+- 队列：见 [ROADMAP.md](./ROADMAP.md) §队列（条目制 D23/D24，完成即离队——当前状态以队列为准，此处不镜像）

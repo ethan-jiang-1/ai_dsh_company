@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 入口链探针（R6 P3，认证档）：全新上下文 Agent **只读入口链**（AGENTS.md → docs/00-index.md →
-// docs/plans/ 队列），回答 8 个"现在"问题。判据 = **零过期、零自相矛盾**（roadmap R6 验收行）。
+// ROADMAP.md §队列），回答 8 个"现在"问题。判据 = **零过期、零自相矛盾**（roadmap R6 验收行）。
 //
 // 断言两层：① token 级（每题期望要点，脚本 regex 断言——见 QUESTIONS）；② 语义级归档给
 // 人抽查（答案 + 引用原文一并落 snapshots/entry-probe/<date>/）。答案随文档演进，**不建金样、
@@ -34,18 +34,18 @@ const TURN_TIMEOUT_MS = Number(arg('timeout', '240000'))
 
 // ── 题单（8 问三分类：状态过期 / 事实家漂移 / 自相矛盾；期望要点 = 机器可核 token） ──
 const QUESTIONS = [
-  { id: 'Q1-当前条目', ask: '当前进行中的工作是什么？你从哪个文件的哪一节读到的？（只许引用入口链内的文件）', expect: [/R6|内容诊治/, /roadmap/] },
-  { id: 'Q2-下一项', ask: '排在它之后的下一项工作是什么？', expect: [/分身成长/] },
+  { id: 'Q1-队列头', ask: '接下来开工的头条条目是什么？你从哪个文件的哪一节读到的？（只许引用入口链内的文件）', expect: [/分身成长/, /ROADMAP|队列/] },
+  { id: 'Q2-下一项', ask: '排在队列头条目之后的下一项是什么？', expect: [/UX 打磨|打磨/] },
   { id: 'Q3-三态规则家', ask: '「交付物三态」（成品/过程稿/排练产物）的规则写在哪个文件？', expect: [/company-workspace\/AGENTS\.md|公司手册/] },
   { id: 'Q4-vendor', ask: 'vendor/dsh 钉在哪个 tag？对它的铁律是什么？', expect: [/dsh-v0\.1\.5-rc\.2|0\.1\.5/, /只读|一个字节|零改动/] },
   { id: 'Q5-preset完成定义', ask: '改了 preset 的 agent.cordis.yml 之后，完成定义是跑哪个脚本？为什么 --dump-config 不算证据？', expect: [/preset-smoke/, /挂载|看不到|行校验发生在挂载时/] },
   { id: 'Q6-流程形态', ask: '本项目接下来的开发流程形态是什么？依据哪个决策（D 号）？', expect: [/feature|条目|队列/, /D23/] },
   { id: 'Q7-认证档边界', ask: '认证档与回归档的边界在哪份文档定义？真模型测试进不进 pnpm test？', expect: [/60-dev-loop|9\.1/, /不进|不进回归|layering/] },
-  { id: 'Q8-矛盾裁决', ask: '如果 docs/plans 里某文件的陈述与 notes/implemented 的收尾记录矛盾，以哪边为准？为什么？', expect: [/台账|收尾|implemented|D 号/, /now|过期|计划层|权威/] },
+  { id: 'Q8-矛盾裁决', ask: '如果根部队列文件 ROADMAP.md 的陈述与 notes/implemented 的收尾记录矛盾，以哪边为准？为什么？', expect: [/台账|收尾|implemented|D 号/, /now|过期|队列|权威/] },
 ]
 const PROMPT = [
   '你是本仓库的fresh审读代理。规则：',
-  '1. 只许读三个入口文件：AGENTS.md、docs/00-index.md、docs/plans/roadmap.md（含它们链接到的 docs/ 内文件；',
+  '1. 只许读三个入口文件：AGENTS.md、docs/00-index.md、ROADMAP.md（含它们链接到的 docs/ 内文件；',
   '   **不许读 notes/**、不许读代码、不许联网）。',
   '2. 依次回答下面 8 个问题，每题给出：答案 + 你依据的文件与节名。',
   '3. 答不了的题直说"入口链答不了"，不许编。',

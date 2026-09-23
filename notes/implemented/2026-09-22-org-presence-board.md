@@ -2,8 +2,8 @@
 
 状态：**已消化（2026-09-23，R5b 收尾毕业——条目全有归宿**：在场板 / 差分动态流 / 行可点入口 =
 R5b 交付，见 [implemented/2026-09-23-r5b-cockpit.md](./2026-09-23-r5b-cockpit.md)；消息级动态流 =
-进 [roadmap 搁置池](../../docs/plans/roadmap.md)（stub codegen 归 vendor 管线）；界面外推送 = 搁置池**）**
-进轮：**R5b 驾驶舱**（2026-09-22 起，见 [roadmap](../../docs/plans/roadmap.md)）
+进 [roadmap 搁置池](../../ROADMAP.md)（stub codegen 归 vendor 管线）；界面外推送 = 搁置池**）**
+进轮：**R5b 驾驶舱**（2026-09-22 起，见 [roadmap](../../ROADMAP.md)）
 梳理（2026-09-22 晚）：R5 已按 D19 拆成 **R5a 门禁与发布 / R5b 驾驶舱**，本提案属 **R5b**
 （正文旧 `R5` 已全部改指 R5b）。原"开工前必须先钉四个决定"（[00-index 待定
 Q5–Q8](../../docs/00-index.md)，内容与选项见 r5-plus-readiness（原审计文件，已于 R6 删除——处置见 docs/plans/content-corruption-audit.md D1）
@@ -23,7 +23,7 @@ Q5–Q8](../../docs/00-index.md)，内容与选项见 r5-plus-readiness（原审
 - **界面内（本提案承诺）**：驾驶舱里的组织在场板——每个分身一行，显示 preset 显示名、忙闲、
   当前任务。
 - **界面外（本提案明确不做，留未决）**：分身主动推送给物理人的通知渠道。
-  （2026-09-22：已进 [roadmap 搁置池](../../docs/plans/roadmap.md)，复活条件 = 明确的物理人通知需求 + 选定部署面。）
+  （2026-09-22：已进 [roadmap 搁置池](../../ROADMAP.md)，复活条件 = 明确的物理人通知需求 + 选定部署面。）
 
 ## 提案
 

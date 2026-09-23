@@ -1,6 +1,6 @@
 # release · 发布形状的现在时（company-pack）
 
-> 顶层合同：pack 的依赖姿态、兼容矩阵、真实安装冒烟程序、升 pin 程序。
+> 顶层合同：vendor 政策、pack 的依赖姿态、兼容矩阵、真实安装冒烟程序、升 pin 程序。
 > 依据：guides/60 §5（发布纪律时点表）+ FAQ 13（外部研究：dsh-market / dsh-im 生态姿态）。
 > 执行器：`scripts/release-smoke.mjs`（发布冒烟）与 `scripts/sync-dsh.mjs`（升 pin）。
 
@@ -31,6 +31,30 @@
 - 机械门禁：`pnpm verify` 的 `pack-compat`——当前钉住 tag 不在矩阵里就红
   （升 pin 忘加列 = 没验证过就装作验证过）。`sync-dsh` 检查模式同时核对四处簿记一致
   （submodule HEAD / verify.mjs 常量 / AGENTS.md 簿记行 / 矩阵）。
+
+## vendor 政策（钉住的上游；AGENTS.md 只留铁律与指针）
+
+- **只读铁律**：`vendor/` 下受版本控制的内容一个字节都不许改——`pnpm verify` 双门禁强制
+  （vendor-pin：submodule HEAD == 簿记 SHA；vendor-clean：`git status --porcelain` 必须为空），
+  均带反证（改一个 tracked 文件即 FAIL，报 `M README.md`）。
+- **允许面**（只有这两类，别的都算违反）：
+
+  1. **只读**：探索源码、`extends` 它的 tsconfig、import 它的包、跑它的构建脚本。
+  2. **树内构建产物**：vendor 自己 `.gitignore` 覆盖的产物（`lib/`、`apps/web/dist/`、
+     `node_modules/`）——"从源码跑"要求构建，构建必须在树内；产物不出现在 `git status`，
+     不违反 vendor-clean。⚠ **禁止 `git clean -x`**（会删掉运行所需的产物）。
+
+- **想改 vendor 的行为，三条正路（都不碰 vendor）**：
+
+| 想要 | 正路 |
+|---|---|
+| 组合/配置层面的差异 | 本 pack 的 bundle `cordis.patch.yml`（`- id:` 替换 / `- insert:` 新增）或 profile patch |
+| 需要上游修的行为 | 改 **DSH upstream** → 升 pin（`scripts/sync-dsh.mjs`，见下节）；期间在本仓记入 `notes/` |
+| 上游功能在本形态下不可用 | **先证伪"不可用"再自建**：R1 曾误诊"官方团队 UI 挂不上"→ 自建任务板 + 重复挂 remote → 全 UI 砖（postmortem 0003；实为可用，`dsh.client.inject` 是 informational only）。确属不可用才在本 pack 自己实现等价面 |
+
+- **为什么用 SHA 而不用 tag**：tag 可被移动/别名，SHA 才是钉住的合同。
+- **submodule 首次克隆技巧**：本地路径 + `-c protocol.file.allow=always`（单命令放行，未改全局
+  配置）；`.gitmodules` 的 URL 已指上游，别改回去。
 
 ## 发布冒烟（`node scripts/release-smoke.mjs`，认证档）
 

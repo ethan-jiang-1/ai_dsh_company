@@ -1,6 +1,6 @@
 # 队列 · 开发流（条目制，D23）
 
-> 性质：**计划层，只写"接下来"**——纯队列 + 搁置池 + 维护规则；**完成即离队**（不标 ✅，记录活在
+> 性质：**根部队列文件（D24），只写"接下来"**——纯队列 + 搁置池 + 维护规则；**完成即离队**（不标 ✅，记录活在
 > 收尾 Note + 台账 D 号 + git）。条目生命周期与收尾程序 = `docs/guides/60-dev-loop.md` §0 / §12。
 > 每条目换全新对话上下文（偏离注册表已登记：交接靠入口链，不靠本文件携带）。
 > **队列 = 有序索引，不是全文**：feature 条目必须配 `notes/proposed/` 的独立 RFC
@@ -16,14 +16,16 @@
   生效边界 = 新会话，验收 = 三道门禁 + 该角色入戏探针；学习载体 = journal 唯一、人审提升进 skills
   （照 DSH `human-review-skill-maintenance` 取舍）；**否决分身运行时自改 skill**（隔离后已是机制事实）；
   不做自主节律（提 upstream seam，不自建调度器）。出处 =
-  [twin-cultivation-and-self-learning](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md)（已毕业）。
+  [twin-cultivation-and-self-learning](./notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md)。
   验收 = 一次完整回路：动议结束 → journal 有教训 → 人提升进 pack skill → 三道门禁 + 探针全绿，且旧会话不受影响。
-- ⏸ **UX 打磨**（feature 型）——RFC：[2026-09-23-ux-polish](../../notes/proposed/2026-09-23-ux-polish.md)；
+- ⏸ **UX 打磨**（feature 型）——RFC：[2026-09-23-ux-polish](./notes/proposed/2026-09-23-ux-polish.md)；
   出自 R5b 收尾预期（用户口径「DEMO 水平是够了」），验收 = 一场完整 demo 走查零卡点。
 - ⏸ **整治转待办**（R6 销账落入；低优先）：
   - 下次「磨」的输入 = R6 Note「审计覆盖缺口」清单（presets.md 三方比对 / research 即时性 /
     0001、0003 深读 / guides/50 旋钮复校 / journal 行号全量 / snapshots 差异——清单住收尾 Note，不复制）。
   - 编号方案（N1）：design/guides 目录编号与顶层合同双体系二选一（命名合同遗留，R6 Note 登记）。
+  - entry-probe Q1/Q2 token 期望锚定 R6 期条目名（条目推移即过期；同日重跑会覆盖既有归档）：改时间
+    不变问法，或收尾程序加"期望随队列刷新"一步（发现与证据 = notes/research/2026-09-23-dsh-inround-task-surface.md §十一）。
   - **升 pin**（触发型：上游出新 tag 时跑 `scripts/sync-dsh.mjs --pin`，合同 docs/release.md）——
     含 teammate footgun 残留处理（delegation.md §4.4）与搁置池顺手回看。
 
@@ -40,15 +42,15 @@
 
 | 项 | 出处 | 搁置理由（已核实） | 复活条件 |
 |---|---|---|---|
-| **自主节律**（分身定期复盘） | [proposed/twin-cultivation](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md) §四 | 机制不闭合：`goal` 需人类授权且 session-start 一律 disarm；`schedule` 只在 live 会话投递且默认没装；webhook 起的会话进不了 goal 循环；全树无 cron | 上游补"外部触发 ↔ 会话内自主续跑"的 seam——**提 seam，不自建调度器**（D9/D13） |
-| **并行快捷派活**（同时开几个 VP） | [delegation.md](../delegation.md) §4.4 | 本组合无干净解法：缺 per-child composition 与不撞名的控制面 | 上游 seam |
-| **M2 自定义 provider** | [00-index](../00-index.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"的需求已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
-| **界面外推送 / 收件箱** | [org-presence-board（已毕业）](../../notes/implemented/2026-09-22-org-presence-board.md) §背景 | egress 只有 `sessionTelemetry`（OTel）与 hooks，webhook 是 ingress；收件人是谁、粒度多细属部署选择 | 明确的物理人通知需求 + 选定部署面 |
-| **消息级协作动态流**（在场板 v1 的动态流只含成员/任务迁移差分） | R5b 机制核实（[implemented/2026-09-23-r5b-cockpit](../../notes/implemented/2026-09-23-r5b-cockpit.md)） | 消息内容要 host 侧折 lead 会话 team 事件（`sessionProjections.stateOf(…, 'agentTeam')` 通道已核实存在）→ 自建 Typert Remote——但其**客户端 stub 由 vendor codegen 管线生成**，本 pack 无接线；自建 codegen 不值一轮 | 上游提供 pack 侧 remote stub 生成，或公开 host-only 投影的客户端读 RPC |
+| **自主节律**（分身定期复盘） | [proposed/twin-cultivation](./notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md) §四 | 机制不闭合：`goal` 需人类授权且 session-start 一律 disarm；`schedule` 只在 live 会话投递且默认没装；webhook 起的会话进不了 goal 循环；全树无 cron | 上游补"外部触发 ↔ 会话内自主续跑"的 seam——**提 seam，不自建调度器**（D9/D13） |
+| **并行快捷派活**（同时开几个 VP） | [delegation.md](./docs/delegation.md) §4.4 | 本组合无干净解法：缺 per-child composition 与不撞名的控制面 | 上游 seam |
+| **M2 自定义 provider** | [00-index](./docs/00-index.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"的需求已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
+| **界面外推送 / 收件箱** | [org-presence-board（已毕业）](./notes/implemented/2026-09-22-org-presence-board.md) §背景 | egress 只有 `sessionTelemetry`（OTel）与 hooks，webhook 是 ingress；收件人是谁、粒度多细属部署选择 | 明确的物理人通知需求 + 选定部署面 |
+| **消息级协作动态流**（在场板 v1 的动态流只含成员/任务迁移差分） | R5b 机制核实（[implemented/2026-09-23-r5b-cockpit](./notes/implemented/2026-09-23-r5b-cockpit.md)） | 消息内容要 host 侧折 lead 会话 team 事件（`sessionProjections.stateOf(…, 'agentTeam')` 通道已核实存在）→ 自建 Typert Remote——但其**客户端 stub 由 vendor codegen 管线生成**，本 pack 无接线；自建 codegen 不值一轮 | 上游提供 pack 侧 remote stub 生成，或公开 host-only 投影的客户端读 RPC |
 
 ## 轮次与条目交接
 
-开工动作 = [guides/60 §0.5](../guides/60-dev-loop.md)；收尾程序 = [guides/60 §12](../guides/60-dev-loop.md)（含收尾 Note 模板）。
+开工动作 = [guides/60 §0.5](./docs/guides/60-dev-loop.md)；收尾程序 = [guides/60 §12](./docs/guides/60-dev-loop.md)（含收尾 Note 模板）。
 
 ## 维护规则
 
@@ -62,7 +64,7 @@
   证实本仓对 D13「整套继承」实为**部分继承**——轮号制与 roadmap 历史沉积是本仓发明（D11 引据
   系把 FAQ dev-loop 的单变更生命周期拉伸成项目级轮次）、轮内 todo/plan 反馈面从未启用
   （机制在场、零纪律；依据与对照表 =
-  [research/2026-09-23-dsh-inround-task-surface](../../notes/research/2026-09-23-dsh-inround-task-surface.md)）。
+  [research/2026-09-23-dsh-inround-task-surface](./notes/research/2026-09-23-dsh-inround-task-surface.md)）。
   决定：① **R6 按原章程执行**（审计先行不动），收尾**新增转型落盘**（见 R6 行）；② R6 后
   **默认严格 DSH 套路**，偏离必须登记 D 号并附约束证据（如本地单人仓无 GitHub 协作面），
   不再默认「按规模裁剪」；③ **防再犯五件套**：全量纪律清单（从 vendor 逐源枚举，替换记忆版
@@ -117,14 +119,14 @@
   被"team shadow + 按成员名字寻址"三层证据否掉，改 one-shot 前台（D18）。同时立了
   **测试分层纪律**（guides/60 §9.1：真模型/真浏览器不进回归）——起因是用户当轮指出
   "这种测试如果是 regression 的话跑得这样慢完全受不了"。详见
-  [implemented/2026-09-22-r3-reporting-line.md](../../notes/implemented/2026-09-22-r3-reporting-line.md)。
+  [implemented/2026-09-22-r3-reporting-line.md](./notes/implemented/2026-09-22-r3-reporting-line.md)。
 - 2026-09-22：三篇提案进轮（④ 共享盘卫生 → R4、① 组织在场板 → R5、②③ 分身成长 → 新增 R6 待命），
   R6 的阻塞项是轮间待办两条接线修复 + U1 实证；原因与验收判据见各自提案（`notes/proposed/`）。
 - 2026-09-22：**R4 收尾**——R4 ✅、R5a 标 ▶ 下一轮。R4 的验收口径落地为**机器判据**：成品
   `deliverables/<slug>/final.md` 必须回溯到一次 **Lead（CEO）会话**的 `present`，判据同时守
   过程稿与"非 Lead 越权定稿"（`scripts/lib/deliverables.mjs` + `scripts/deliverables-check.mjs`
   + `tests/deliverables.spec.ts`，含反证）。三处判据设计决定与"成品归 Lead"的依据见
-  [implemented/2026-09-22-r4-workshop-flow.md](../../notes/implemented/2026-09-22-r4-workshop-flow.md)；
+  [implemented/2026-09-22-r4-workshop-flow.md](./notes/implemented/2026-09-22-r4-workshop-flow.md)；
   台账 D20。同轮：R3 留的 `subagent` continuable footgun 关掉（四职能 preset 补控制面，teammate
   侧残留留 R5a）；**journal 回溯压缩决定不做**（规则已立，理由见该 Note）。
 - 2026-09-22（**R4 收尾后按用户要求逐条核对 `notes/proposed/` 的条目归属**）：4 个提案文件在本表都有

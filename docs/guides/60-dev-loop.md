@@ -9,7 +9,7 @@
 
 | 阶段 | 做什么 | 本 repo 载体 |
 |---|---|---|
-| 0 取条目 | 全新会话读入口链，从**队列**取头条目 | `docs/plans/roadmap.md` §队列（§0.5） |
+| 0 取条目 | 全新会话读入口链，从**队列**取头条目 | `ROADMAP.md` §队列（§0.5） |
 | 1 意图 | 一行动机 + 一行**外部可观察行为** | `notes/intents.md` 登记行 |
 | 2 决策 | 摆方案、选定、**给输掉的方案留尸体** | `notes/proposed/<date>-<slug>.md` 三段式 |
 | 3 设计 | decision-complete 的实施计划，人批准后才动手 | Plan Mode 呈批（**反馈门①**：批 / 打回带反馈）+ §3 设计四问 |
@@ -23,7 +23,7 @@
 每条目换**全新对话上下文**执行（约束登记见流程合同：不跨条目携带上下文）。新会话固定开场：
 
 ```text
-AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ plans/roadmap.md §队列取头条目
+AGENTS.md（自动加载）→ docs/00-index.md（台账 + 待定 Q）→ ROADMAP.md §队列取头条目
 → 有 ⛔ 先解阻塞 → Plan Mode 出 decision-complete 计划（呈人批）→ notes/intents.md 登记
 → todo_write 列全任务 → 开工
 ```
@@ -127,7 +127,7 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibil
 |---|---|---|
 | ~~现在（零 JS，R0–R2）~~ | 无——pack 无代码，不存在依赖声明错误面 | [10-architecture.md](../design/10-architecture.md) §2.1 |
 | R3+（pack 有 `src/`）✅ R5a 已补 | `@deepseek-ai/cordis` + 用到的 `@deepseek-ai/dsh-*` 作 **peerDependencies**；拒绝精确钉死（pre-stable API，钉死 = 每次上游同步逼发版） | FAQ 13 research.md 生态失败样本 |
-| R5a（发布）✅ 已补 | `dsh.compatibility` 矩阵；`npm pack` → 干净 profile → `dsh plugin add` 冒烟（`release-smoke`） | [roadmap.md](../plans/roadmap.md) R5a 行；合同 = [release.md](../release.md) |
+| R5a（发布）✅ 已补 | `dsh.compatibility` 矩阵；`npm pack` → 干净 profile → `dsh plugin add` 冒烟（`release-smoke`） | [ROADMAP.md](../../ROADMAP.md) R5a 行；合同 = [release.md](../release.md) |
 | OpenSpec 引入 | 触发条件：**第二贡献者进场**或**向 DSH 上游提 seam**（配合 D9 走方案 B）；此前 notes/ 纪律够用 | FAQ 13 answer.md 决策 5 |
 
 ## 6. 双 home 与双 DSH 操作细节

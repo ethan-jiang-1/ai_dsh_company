@@ -31,9 +31,9 @@ for (const p of mdFiles) {
 }
 ok(`md-utf8/newline ×${mdFiles.length}`)
 
-// ── 2. 相对链接可解析（docs/ + AGENTS.md + pack 文档） ─────────────────────
+// ── 2. 相对链接可解析（docs/ + 根部 AGENTS.md/ROADMAP.md + pack 文档） ─────────────
 let linkCount = 0
-const linkHolders = [...mdFiles.filter(p => p.startsWith(join(root, 'docs')) || p === join(root, 'AGENTS.md') || p.includes('company-pack'))]
+const linkHolders = [...mdFiles.filter(p => p.startsWith(join(root, 'docs')) || p === join(root, 'AGENTS.md') || p === join(root, 'ROADMAP.md') || p.includes('company-pack'))]
 for (const p of linkHolders) {
   const text = readFileSync(p, 'utf8')
   for (const m of text.matchAll(/\]\((\.{1,2}\/[^)#\s]+)\)/g)) {
@@ -60,7 +60,7 @@ ok(`notes-links ×${notesLinkCount}`)
 // ── 2c. 词数预算（缩编自 vendor `verify-doc-budgets`；防入口链继续膨胀——R6 D23/清单 B #52） ──
 // 上限 = 当前值 + 余量；超限先搬（内容挪到该去的家）再压，确需空间才在 Note 里说明后升上限。
 const DOC_BUDGETS = [
-  ['AGENTS.md', 165],            // 2026-09-23 整治后 149 行（此前沉积 214）
+  ['AGENTS.md', 115],            // 2026-09-23 二次收口（渐进披露）后 107 行；指针化内容住 release.md/00-index/guides/60
   ['docs/00-index.md', 145],     // 整治后 131
   ['docs/guides/60-dev-loop.md', 440], // 整治后 ~397
 ]
@@ -198,7 +198,7 @@ ok(`client-halves ×${clientHalves.length}`)
 //      （毕业 ≠ 全部实现，而是"每一条都有归宿"，如 `workspace-hygiene` 有一条转轮间待办）。
 // ⚠ 门禁只保证"被引用 + 该毕业的毕业"，不保证"会实现"——真正被逐条核对的是 roadmap 的**验收列**。
 const proposedDir = join(root, 'notes/proposed')
-const roadmapText = readFileSync(join(root, 'docs/plans/roadmap.md'), 'utf8')
+const roadmapText = readFileSync(join(root, 'ROADMAP.md'), 'utf8')
 // README.md 是文件夹说明书（curated entry point，非提案）——DSH 同款：notes 层的 README 不在提案命名空间
 const proposals = existsSync(proposedDir)
   ? readdirSync(proposedDir).filter(n => n.endsWith('.md') && n !== 'README.md')
@@ -206,7 +206,7 @@ const proposals = existsSync(proposedDir)
 const unscheduled = proposals.filter(name => !roadmapText.includes(name))
 unscheduled.length === 0
   ? ok(`proposal-scheduled ×${proposals.length}`)
-  : fail('proposal-scheduled', `这些提案没在 plans/roadmap.md 里出现（挂进去才有人做）：${unscheduled.join(', ')}`)
+  : fail('proposal-scheduled', `这些提案没在 ROADMAP.md 里出现（挂进去才有人做）：${unscheduled.join(', ')}`)
 
 /** 终态字：提案的状态行里出现这些，说明它已经被消化，该毕业了。 */
 const DIGESTED_MARKERS = ['已消化', '已交付', '部分交付']

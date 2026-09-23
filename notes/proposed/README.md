@@ -3,7 +3,7 @@
 > 一文件一条目：问题 / 方案 / **输掉的方案留尸** / 验收。文件名 = `YYYY-MM-DD-<主题>.md`
 > （日期 = 登记时点，时间层约定）。
 >
-> **排序与状态不在这里**：唯一事实家 = [roadmap §队列](../../docs/plans/roadmap.md)（有序索引）。
+> **排序与状态不在这里**：唯一事实家 = [ROADMAP.md §队列](../../ROADMAP.md)（有序索引）。
 > 机械门禁：`proposal-scheduled`（每个 RFC 必须在队列有索引行）/ `proposal-graduated`
 > （该毕业的不许赖在 proposed/）。发现方式 = 浏览本文件夹 + 文件名（DSH 纪律：
 > "the lifecycle/class filesystem tree is the inventory"；不建集中索引——共享文件必漂移，

@@ -164,7 +164,7 @@ packages/company-pack/
 └── profiles/company.cordis.yml  # host 行 + agent-presets roots；M4 再加 team 两包
 ```
 
-实施顺序（对齐决策 D4/D11 与 [../plans/roadmap.md](../plans/roadmap.md) 垂直轮表）：
+实施顺序（对齐决策 D4/D11 与 [../ROADMAP.md](../../ROADMAP.md)——当时为垂直轮表，现为队列）：
 M1（R1/R2 轮内最窄验证：角色独立会话入戏探针）→ **M4（R1 起 demo 主循环）** → 通道 A
 命名委托工具（R3，零代码汇报线）→ M2（可选增强，触发条件见 §3 选型速查）；M3 仅当
 "连续谈判"被证明刚需时再上。
