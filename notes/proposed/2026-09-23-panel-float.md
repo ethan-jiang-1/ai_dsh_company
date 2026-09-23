@@ -15,11 +15,28 @@
 
 ## 提案
 
+### 首要设计决定（2026-09-23 用户现场提问带出）
+
+用户看观察窗时问：「看板 / 依赖图 / 在场 / 用量」**这叫什么东西**——答案是：**平台里没有名分**，
+它们是条目 ① 里我在 `CompanyView.tsx` 自造的一排 `<button role="tab">` + `useState` 条件渲染
+（组件内部开关：不可注册、不可寻址、**不可移动**）。按 D13「优先用现成载体、不自造」，这本该先问。
+两条路：
+
+- **(a) 把四个面板各提升为平台级右栏页签类型**（`ctx.sidebarRightTabs.register` + keyed 槽
+  `sidebar.right.pane.tab`）⇒ 每个都能 `ctx.sidebarRight.float(tabId)` 拖成浮窗，也能被 split。
+  **倾向此路**：正是用户要的"可移动"，且不再自造子页签。
+- (b) 保留整页公司视图，视图内嵌 dockkit surface 做分栏/浮出——能力更全，但要在我们的组件里
+  自建 dockkit surface 接线（风险与工作量都高，且 dockkit 自述 internal engine）。
+
+本条开工时先钉这个决定，再谈浮窗细节。
+
+### 浮窗本体
+
 - **用平台原生浮窗，不自造窗口管理**（D13）：`ctx.sidebarRight.float(tabId, rect?)` 把已停靠页签拽出成浮动面板，
   `dock(paneId)` 收回（服务面公开 10 个操作之一，`ui-sidebar-right/src/client/service.ts:195,200`）。
 - 手势与约束由 `ui-dockkit` 提供：header grip 拖动移动、右下角缩放、**`FLOAT_MIN_SIZE = 220×140` 钳制**、
   点击置顶、默认浮出 `380×300`（研究 §1.4 已逐行核实）。
-- 落点：Company 驾驶舱页签（`sidebar.right.pane.tab`）+ 任务板。任务板从 anchored 弹窗改为
+- 落点：公司驾驶舱页签（`sidebar.right.pane.tab`）+ 任务板。任务板从 anchored 弹窗改为
   「右栏页签 + 浮出按钮」，或直接浮出。
 - **死局解除**：官方弹窗仍不可移动（vendor 只读），但我们的面板可拖开、可置顶、可缩放到合适尺寸。
 

@@ -120,8 +120,19 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 | 层 | 做什么 | 验收 |
 |---|---|---|
 | v0（＝R1 观察窗起，R2 进验收） | 装 team 两个 profile bundle；跑通 §3 分镜 | 一场完整 demo 全程在 UI 里可见，零自定义 UI 代码 |
-| v1（＝**R5b 驾驶舱**，✅ 2026-09-23 交付） | Company 右栏页签（`ctx.sidebarRightTabs` page 型 + keyed 槽体）：在场板（lead + 分身行，**行可点进成员空间**）+ 差分动态流；数据 = `remote.agentTeams.view(lead)` 拉式（挂载即拉 + 5s 轮询），纯读模型 `src/lib/presence.ts`（rows / activity / 事件折算三入口）。成员身份 = team roster（Q5）；消息级动态流留升级路径（host 投影通道已核实，客户端 stub codegen 归 vendor 管线） | 页签/行/列头/点行切会话由 `replay-smoke --ui --scenario r2-motion` 无 key 端到端断言；读模型 14 条 keyless 单测在 `pnpm test` |
+| v1（＝**R5b 公司驾驶舱**，✅ 2026-09-23 交付） | 右栏页签（`ctx.sidebarRightTabs` page 型 + keyed 槽体）：在场板（lead + 分身行，**行可点进成员空间**）+ 差分动态流；数据 = `remote.agentTeams.view(lead)` 拉式（挂载即拉 + 5s 轮询），纯读模型 `src/lib/presence.ts`（rows / activity / 事件折算三入口）。成员身份 = team roster（Q5）；消息级动态流留升级路径（host 投影通道已核实，客户端 stub codegen 归 vendor 管线） | 页签/行/列头/点行切会话由 `replay-smoke --ui --scenario r2-motion` 无 key 端到端断言；读模型 14 条 keyless 单测在 `pnpm test` |
 | v2（委派卡**已提前至 R3** 交付；`npm pack` 真实安装冒烟归 **R5a**） | `tool.call.toolview` 委派工具卡 + header 动作 | 对话流里的公司语义皮；`npm pack` → 干净 profile → 真实安装冒烟 |
+| v3（＝**公司视图**，✅ 2026-09-23 交付，条目 ① demo 可视表达） | `conversation.view` 的第三个整页页签（id `dsh-company-pack/company`，标签「公司」）：四个面板 **看板 / 依赖图 / 在场 / 用量**；数据 = `agentTeams.view`（拉式 5s）+ `session/follow`（流式动态）+ `useProjection('tokenUsage'/'sessionStats')`（令牌用量）；皮肤 = `ui-primitives` + `--dsw-*` 令牌（零字面色），动效 = 零依赖纯 CSS + `prefers-reduced-motion` 回退 | 读模型 keyless 单测（board/dag/budget/presence）+ `client-load-smoke` + `replay-smoke --ui`（r3 委派卡金样 / r2 驾驶舱端到端）+ 真页面截图走查（零「需要讲解」） |
+
+### 命名（2026-09-23 定；判据 = **一致 + 今后能对上**）
+
+| 层 | 正式名 | UI 标签 | 代码实体 | 平台载体 |
+|---|---|---|---|---|
+| 整页视图 | **公司视图** | 「公司」 | `CompanyView.tsx` / id `dsh-company-pack/company` | `conversation.view` 条目（官方术语 target View） |
+| 右栏页签 | **公司驾驶舱** | 「公司驾驶舱」 | `CompanyPane.tsx` / key `dsh-company-pack/cockpit` | `sidebar.right.pane.tab` + `ctx.sidebarRightTabs` |
+| 视图内四面板 | **看板 / 依赖图 / 在场 / 用量** | 同名 | `BoardPanel` / `DagPanel` / `PresencePanel` / `BudgetPanel` | **无平台名分**（组件内部子页签；是否提升为平台页签 = 队列「面板窗口化」的首要设计决定） |
+
+**改名映射**（历史层不改写，能对上即可）：旧「Company 驾驶舱」= 今 **公司驾驶舱**。
 
 v1 是 pack 里第一段 client 代码（React + slots），与"自定义 host 工具/provider"同包
 不同目录（`src/client/` vs `src/`）——包数仍然是 **1**。

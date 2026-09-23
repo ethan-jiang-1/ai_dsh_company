@@ -1,4 +1,4 @@
-/** 浏览器半：部署品牌（侧栏）+ 团队任务板（会话头部）+ Company 驾驶舱页签（右栏，R5b）。 */
+/** 浏览器半：部署品牌（侧栏）+ 团队任务板（会话头部）+ 公司驾驶舱页签（右栏，R5b）。 */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
@@ -28,7 +28,7 @@ const COMPANY_TAB_ID = 'dsh-company-pack/cockpit'
 const COMPANY_VIEW_ID = 'dsh-company-pack/company'
 
 /**
- * 本包 client 面登记四处：委派工具卡（R3）、部署品牌、会话头部任务板、Company 驾驶舱页签（R5b）。
+ * 本包 client 面登记四处：委派工具卡（R3）、部署品牌、会话头部任务板、公司驾驶舱页签（R5b）。
  *
  * 谁挂 remote：官方 `client-ui-agent-team` 行（本包 cordis.patch.yml 插入的 `ui-agent-team`）
  * 自己 `$mount` 生成的 Team Remote——本入口**不再重复挂**。同一描述符挂第二次会在 client
@@ -83,7 +83,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
       }, TasksAction))
   })
 
-  // Company 驾驶舱页签（R5b）：右栏 page 型 tab（无地址，按 kind 打开；guide 页给入口胶囊）。
+  // 公司驾驶舱页签（R5b）：右栏 page 型 tab（无地址，按 kind 打开；guide 页给入口胶囊）。
   // 数据面与任务板同一拉式通道（D-b）；行可点进成员空间（D-d，照官方 openTeammate 模式）。
   ctx.inject(['sessions', 'remote.agentTeams', 'slots', 'sidebarRightTabs'], (scoped) => {
     const sessions = scoped.sessions
@@ -107,10 +107,10 @@ export async function apply(ctx: ClientContext): Promise<void> {
       id: COMPANY_TAB_ID,
       kind: 'company',
       priority: 'extension',
-      title: () => 'Company 驾驶舱',
+      title: () => '公司驾驶舱',
       guide: [{
         order: 50,
-        title: () => 'Company 驾驶舱',
+        title: () => '公司驾驶舱',
         description: () => '组织在场板：谁在忙、忙什么；点行进成员空间',
       }],
     }), 'company-pack: cockpit tab type')

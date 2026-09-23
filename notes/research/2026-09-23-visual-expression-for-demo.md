@@ -38,7 +38,7 @@
 | `tool.call.toolview` | keyed/session | 工具卡（我们已用 `vp_eng`/`vp_sales`） | 17 个 key |
 | `conversation.chat.node` | keyed/session | 新节点类型 | 18 个 key |
 | `conversation.chat.turnTail` | chain/session | 轮末汇总条 | `ui-deliverables` |
-| `sidebar.right.pane.tab` | keyed/session | 右栏页签体（Company 驾驶舱） | text-preview / files / guide |
+| `sidebar.right.pane.tab` | keyed/session | 右栏页签体（公司驾驶舱） | text-preview / files / guide |
 | `conversation.session.header.actions` | list/session | 头部动作（任务板按钮） | agent-preset / jobs / schedule / agent-team |
 | `conversation.input.dock` / `composer.dock` | list/session | 输入区上下仪表 | queue/todo/goal / StatsPills |
 | ★ `sidebar.right.tab.menu.item`、★ `conversation.input.left/right`、★ `sidebar.right.tab.guide` | 各种 | 次级 | 无 |

@@ -550,14 +550,14 @@ async function runUiFlow(page, { url, workspace }) {
  * R5b 驾驶舱端到端（r2-motion 场景）：右栏打开 → guide 胶囊进 Company 页签 →
  * 在场板 5 行（D-a：lead + 4 分身；D-c：团队内状态列头）→ 点 VP-Eng 行 →
  * 断言当前会话切进该成员的空间（D-d；行可点 = 提案验收 5）。
- * 锚点（en 页面 + 本包中文文案）：'Open right sidebar' / 'Company 驾驶舱' /
+ * 锚点（en 页面 + 本包中文文案）：'Open right sidebar' / '公司驾驶舱' /
  * list '组织在场板' / text '团队内状态' / 行 aria-label 'wochen <角色>，…' /
  * 成员会话标记 = lineage tree 'Subagent sessions' 或 read-only composer。
  */
 async function runCockpitFlow(page) {
   const expand = page.getByRole('button', { name: 'Open right sidebar' })
   if (await expand.count() > 0) await expand.click()
-  const capsule = page.getByRole('button', { name: /Company 驾驶舱/ }).first()
+  const capsule = page.getByRole('button', { name: /公司驾驶舱/ }).first()
   await capsule.waitFor({ state: 'visible', timeout: 15_000 })
   await capsule.click()
   const board = page.getByRole('list', { name: '组织在场板' })

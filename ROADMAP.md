@@ -12,16 +12,15 @@
 
 ## 队列
 
-- ▶ **demo 可视表达**（feature；队列首条）——把机制"演"出来：`conversation.view` 整页公司视图
-  （任务 DAG / 组织在场 / 协作动态 / 预算与交付）+ 皮肤改用官方设计系统（ui-primitives 令牌与图标）
-  + 团队工具卡 + 动效层；动态流由 5s 差分改 `session/follow` 流式。RFC =
-  [2026-09-23-demo-visual-expression](./notes/proposed/2026-09-23-demo-visual-expression.md)；研究 =
-  [research/2026-09-23-visual-expression-for-demo](./notes/research/2026-09-23-visual-expression-for-demo.md)。
-  验收 = 一场 demo 走查**零"需要讲解"瞬间**（吸收原「UX 打磨」）+ 机器轴（client-load 零挂载失败 /
-  replay --ui 金样 / 读模型 keyless 单测）+ 内联硬编码色与 emoji 清零。
-- ⏸ **面板窗口化**（feature；序 2，小切片）——任务板/驾驶舱可拖动、可缩放、最小尺寸 220×140 钳制，
-  与官方 Agent Team 弹窗不再互锁死；平台原生（`ctx.sidebarRight.float/dock` + ui-dockkit），不自造窗口管理。
-  RFC = [2026-09-23-panel-float](./notes/proposed/2026-09-23-panel-float.md)；验收 = 可拖可缩可置顶可收回 + client-load 绿。
+- ▶ **面板窗口化**（feature；队列首条——原序 2，① 收尾后递补）——任务板 / 驾驶舱 / 公司视图四面板
+  可拖动、可缩放、最小尺寸 220×140 钳制，与官方 Agent Team 弹窗不再互锁死；平台原生
+  （`ctx.sidebarRight.float/dock` + ui-dockkit），不自造窗口管理。**首要设计决定 = 四个面板是否从
+  「组件内部子页签」提升为平台页签类型**（提升后才能被 `float()` 浮出；用户 2026-09-23 现场问「这叫
+  什么东西」带出）。RFC = [2026-09-23-panel-float](./notes/proposed/2026-09-23-panel-float.md)；
+  验收 = 可拖可缩可置顶可收回 + client-load 绿。
+- ⏸ **视觉打磨**（feature；序 2）——用户 2026-09-23 走查后登记（原话「视觉上，我们回头再打磨」）：
+  公司视图 / 驾驶舱 / 任务板 / 委派卡的视觉细修（间距、层级、图标、空态、深浅色一致性）；细节在开工
+  Plan Mode 写（打磨型条目可不设 RFC）。出处 = [implemented/2026-09-23-company-view](./notes/implemented/2026-09-23-company-view.md) ⑤。
 - ⏸ **分身成长**（feature；序 3，原队列首条后移——用户 2026-09-23 定「可视表达优先」）：培养回路 = 改
   `presets/<role>/` 即培养动作，生效边界 = 新会话，验收 = 三道门禁 + 该角色入戏探针；学习载体 = journal 唯一、
   人审提升进 skills（照 DSH `human-review-skill-maintenance` 取舍）；**否决分身运行时自改 skill**（隔离后已是机制事实）；
@@ -167,3 +166,10 @@
   状态行写「已落地（研究）→ 落点」。判据 = **还有没有未完成的条目/决策在等它**。首批执行：3 篇已落地研究迁走
   （agent-workflow-community-practice / dsh-inround-task-surface / replay-harness-feasibility，引用同步改路径）；
   留 2 篇活研究（digital-twin-cultivation 供序 3 条目、visual-expression 供序 1/2 条目）。规则家 = guides/60 §12。
+- 2026-09-23（**条目 ①「demo 可视表达」收尾**）：公司视图 v1 交付（S0 地基 / S1 四面板 + `session/follow`
+  流式动态 / S2 皮肤令牌化 + 团队工具卡 / S3 零依赖动效）；用户验收**通过**（原话「不错，这个超出了我的
+  预期，尤其是结构上」）。**完成即离队**：队列删行，收尾 Note = `notes/implemented/2026-09-23-company-view.md`，
+  RFC 毕业到 `notes/implemented/2026-09-23-demo-visual-expression.md`（状态「已消化」）。打磨点去向：
+  视觉细修 → 新条目 **视觉打磨**；面板可移动 → 递补为队列首条的 **面板窗口化**（其首要决定 = 四面板是否
+  提升为平台页签）；**命名在本条目内解决**（design/30 §5 命名表：公司视图 / 公司驾驶舱 / 四面板）。
+  同轮立规：**实施期发现要留痕**（真页面发现的行为缺陷登记回条目 RFC，不许只活在 commit 里）。
