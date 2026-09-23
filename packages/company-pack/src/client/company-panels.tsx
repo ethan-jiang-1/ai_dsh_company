@@ -4,6 +4,7 @@
  * 视觉纪律：颜色一律 `--dsw-*` 令牌；状态用官方 `StateDot`/`Tag`（platform module，零体积）；
  * DAG 是自绘 SVG（平台无 mermaid / 图表渲染器，研究 §1.5）。
  */
+import { useEffect, useRef, useState } from 'react'
 import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { BoardColumn, TaskRow } from '../lib/board.ts'
 import { UNASSIGNED_LABEL } from '../lib/board.ts'
@@ -91,15 +92,19 @@ export function DagPanel({ layout }: { readonly layout: DagLayout }) {
       {layout.edges.map(edge => (
         <path
           key={`${edge.from}->${edge.to}`}
+          className="wk-edge"
+          data-done={edge.done}
           d={edge.path}
+          /* pathLength=1：把 dash 单位归一化 ⇒ dashoffset 1→0 的"画线"与真实长度无关 */
+          pathLength={1}
           fill="none"
           stroke={edge.done ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-border-l3)'}
           strokeWidth={1.5}
-          strokeDasharray={edge.done ? undefined : '4 3'}
+          strokeDasharray={edge.done ? 1 : '0.02 0.015'}
         />
       ))}
       {layout.nodes.map(node => (
-        <g key={node.id} transform={`translate(${String(node.x)} ${String(node.y)})`}>
+        <g key={node.id} className="wk-node" transform={`translate(${String(node.x)} ${String(node.y)})`}>
           <rect
             width={node.width}
             height={node.height}
@@ -150,11 +155,58 @@ export function PresencePanel({ rows, activity }: {
         ? <div className="wk-meta">暂无动态（打开期间的变化会出现在这里）。</div>
         : (
           <ul className="wk-activity">
-            {activity.map((entry, index) => <li key={`${String(entry.time)}-${String(index)}`}>{entry.text}</li>)}
+            {activity.map(entry => (
+              /* key 用内容而非下标：列表倒序重建时下标会整体位移，用下标会让**旧条目重放动画** */
+              <li key={`${String(entry.time)}-${entry.kind}-${entry.text}`}>{entry.text}</li>
+            ))}
           </ul>
         )}
     </div>
   )
+}
+
+/** 数字滚动时长（ms）。 */
+const COUNT_UP_MS = 320
+
+/**
+ * 令牌总数滚动到目标值（rAF 插值）。
+ * **尊重 `prefers-reduced-motion`**：命中时直接落终值，不做插值（官方惯例）。
+ * @param target - 目标值。
+ * @returns 当前显示值。
+ */
+function useCountUp(target: number): number {
+  const [value, setValue] = useState(target)
+  const fromRef = useRef(target)
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      setValue(target)
+      return
+    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setValue(target)
+      fromRef.current = target
+      return
+    }
+    const from = fromRef.current
+    if (from === target) {
+      setValue(target)
+      return
+    }
+    let frame = 0
+    const started = performance.now()
+    const tick = (now: number): void => {
+      const progress = Math.min(1, (now - started) / COUNT_UP_MS)
+      setValue(Math.round(from + (target - from) * progress))
+      if (progress < 1) frame = requestAnimationFrame(tick)
+      else fromRef.current = target
+    }
+    frame = requestAnimationFrame(tick)
+    return () => {
+      cancelAnimationFrame(frame)
+      fromRef.current = target
+    }
+  }, [target])
+  return value
 }
 
 /**
@@ -163,9 +215,10 @@ export function PresencePanel({ rows, activity }: {
  * @returns 用量面板。
  */
 export function BudgetPanel({ summary }: { readonly summary: BudgetSummary }) {
+  const total = useCountUp(summary.totalTokens)
   return (
     <div>
-      <div className="wk-usage-total">{formatTokens(summary.totalTokens)} <span className="wk-meta">tokens</span></div>
+      <div className="wk-usage-total">{formatTokens(total)} <span className="wk-meta">tokens</span></div>
       <div className="wk-meta">
         轮次 {summary.turns ?? '—'} · 步数 {summary.steps ?? '—'}
         {summary.toolShare === null ? '' : ` · 工具耗时占比 ${String(Math.round(summary.toolShare * 100))}%`}

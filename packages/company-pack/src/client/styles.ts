@@ -230,9 +230,42 @@ const CSS = `
 .wk-row-button:hover { background: var(--dsw-alias-interactive-bg-hover); }
 .wk-activity-block { border-top: 1px solid var(--dsw-alias-border-l1); margin-top: 8px; padding-top: 6px; }
 
+/* ── S3 动效层（零依赖：纯 CSS keyframes；令牌复用 --ds-*，reduced-motion 在末尾统一关） ── */
+
+/* DAG 边：done = 画出来（pathLength=1 归一化，所以 dashoffset 1→0 与真实长度无关）；
+   未就绪 = 虚线流动（提示"还在等"） */
+@keyframes wk-edge-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes wk-edge-flow {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -0.05; }
+}
+/* 节点入场 */
+@keyframes wk-node-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* 动态流新条目从左侧滑入 */
+@keyframes wk-slide-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.wk-edge { animation: wk-edge-draw var(--ds-transition-duration-slow) var(--ds-ease-in-out) both; }
+.wk-edge[data-done='false'] { animation: wk-edge-flow 1.2s linear infinite; }
+.wk-node { animation: wk-node-in var(--ds-transition-duration) var(--ds-ease-in-out) both; }
+/* 只有最新的那条动（列表倒序 ⇒ :first-child 就是新条目；key 稳定 ⇒ 旧条目不会重放动画） */
+.wk-activity li:first-child { animation: wk-slide-in var(--ds-transition-duration) var(--ds-ease-in-out) both; }
+
 @media (prefers-reduced-motion: reduce) {
-  /* 动效层（S3）的过渡/动画在此统一关闭——先立规矩，S3 加 keyframes 时自动被覆盖 */
-  .wk-motion {
+  /* 动效层统一关闭（官方惯例：28 个 vendor 样式表都这么做）。
+     注意选择器要逐个点名——.wk-motion 只是给未来新元素预留的开关。 */
+  .wk-motion,
+  .wk-edge,
+  .wk-edge[data-done='false'],
+  .wk-node,
+  .wk-activity li:first-child {
     transition: none !important;
     animation: none !important;
   }
