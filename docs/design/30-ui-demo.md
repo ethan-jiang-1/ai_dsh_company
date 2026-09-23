@@ -117,7 +117,7 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 | 层 | 做什么 | 验收 |
 |---|---|---|
 | v0（＝R1 观察窗起，R2 进验收） | 装 team 两个 profile bundle；跑通 §3 分镜 | 一场完整 demo 全程在 UI 里可见，零自定义 UI 代码 |
-| v1（＝**R5b 驾驶舱**） | pack 长出 client 面：Company 右栏页签（Remote 读模型 + 组织图/动态流 + 组织在场板） | 驾驶舱一屏流动；不靠讲解能进某位成员的空间；HMR 热更跑通 |
+| v1（＝**R5b 驾驶舱**，✅ 2026-09-23 交付） | Company 右栏页签（`ctx.sidebarRightTabs` page 型 + keyed 槽体）：在场板（lead + 分身行，**行可点进成员空间**）+ 差分动态流；数据 = `remote.agentTeams.view(lead)` 拉式（挂载即拉 + 5s 轮询），纯读模型 `src/lib/presence.ts`（rows / activity / 事件折算三入口）。成员身份 = team roster（Q5）；消息级动态流留升级路径（host 投影通道已核实，客户端 stub codegen 归 vendor 管线） | 页签/行/列头/点行切会话由 `replay-smoke --ui --scenario r2-motion` 无 key 端到端断言；读模型 14 条 keyless 单测在 `pnpm test` |
 | v2（委派卡**已提前至 R3** 交付；`npm pack` 真实安装冒烟归 **R5a**） | `tool.call.toolview` 委派工具卡 + header 动作 | 对话流里的公司语义皮；`npm pack` → 干净 profile → 真实安装冒烟 |
 
 v1 是 pack 里第一段 client 代码（React + slots），与"自定义 host 工具/provider"同包

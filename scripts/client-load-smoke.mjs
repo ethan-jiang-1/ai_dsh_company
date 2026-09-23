@@ -8,6 +8,9 @@
 // 断言三件事：① 无 "Failed to load plugins" banner；② console 无 `failed to apply loader
 // entry`；③ 品牌槽在场（`DSH_CLIENT_TITLE`，guides/60 §7 的构建期品牌 = 本仓固定值）——
 // 它证明 app 渲染完成且本包 client 入口成功 apply。
+// R5b 起：驾驶舱页签（sidebarRightTabs 注册 + keyed 槽体）走同一条 apply 路径，注册抛错
+// 会被 ①② 抓到；**页签在场 + 行可点**的功能断言在 `replay-smoke --ui --scenario r2-motion`
+// （真会话真数据，见 org-presence-board 提案验收 2/5 的分工注）。
 //
 // 前置：与 preset-smoke 相同（DSH_HOME + 已装 pack + 前端与 client 面已构建）；另需
 //       playwright（vendor 全树 `pnpm install` 后在 .pnpm store，本脚本自动定位）与一份

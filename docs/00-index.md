@@ -83,6 +83,7 @@ peers / 兼容矩阵 / 真实安装冒烟 / 升 pin 程序，见上表历史行�
 | D19 | **R5 拆轮 + 搁置池（2026-09-22）**：① **R5 → R5a 门禁与发布 / R5b 驾驶舱**——同轮塞 4–5 个面时，最不确定的 replay harness 会卡住皮肤交付（D11：一轮一份可观察的外部行为）；② **进搁置池须满足"缺上游 seam"或"缺明确需求"**，被否决的方案不进池（归 D 号/复盘/`rejected`），复活条件写进池内每行；首批四条 = 自主节律 / 并行快捷派活 / M2 / 界面外推送；③ R6 的"两条接线 + U1"阻塞经核实**已清**，只余一次活体探针（轮间待办 R5a → R6） | [plans/r5-plus-readiness.md](./plans/r5-plus-readiness.md)；[plans/roadmap.md](./plans/roadmap.md) §搁置池 |
 | D20 | **交付物三态判据（R4，2026-09-22）**：① **成品 = Lead 会话的 `present`**（`agentPreset=ceo` 且 `delegationDepth=0`）——依据是公司手册的承诺权，且实测 R2 里 CFO 也 `present` 过 3 次，不限归属则过程稿与定稿平级、仍答不上"哪些是成品"；② **按交付物身份（`slug` + 角色）比对，不按字面路径**——给三态迁移留桥，否则迁移一次就把历史证据全判成 dangling（假阳性，不是违规）；③ **反向检查只追 Lead 声明**，非 Lead 的成品声明只在它**此刻真躺在盘上**时判越权（历史行为不追着报，否则一次越权永久污染此后每轮审计）。实现 `scripts/lib/deliverables.mjs` + 入口 `scripts/deliverables-check.mjs`（**审归档快照须配 `--only <slug>`**，因快照是整盘 workspace + 本轮日志）；合同家 = `company-workspace/AGENTS.md`「交付物三态」 | [implemented/2026-09-22-r4-workshop-flow.md](../notes/implemented/2026-09-22-r4-workshop-flow.md) |
 | D21 | **R6 内容诊治插轮 + 分身成长改号 R7（2026-09-23，用户决定）**：五轮堆叠后内容腐化已有实证（「当前状态」沉积收尾快照并与 roadmap 双写、已闭合的待定 Q1 仍挂 00-index、roadmap 计划层躺已 ✅ 的历史段、原 R6 行「U1 只剩实证钉死」文字过期）⇒ 插**纯整治轮**（不交付新功能），两条线：**线 A 内容腐化诊治**（docs/ 全层 / AGENTS.md 入口链 / company-workspace（手册+kb；R4「journal 不压」默认不重开）/ notes/ 指针核对，历史不重写）；**线 B 流程对齐审计**（本仓是 DSH 研发纪律的头一次实际使用——对照 AGENTS.md 纪律表逐条核对已闭轮实践（届时 R0–R5b），权威在 vendor 树；抓「没严格遵循」与「灵活性理解错」两类偏差，弹性边界写清，目标 = 让今后开发更舒适）；验收 = **入口链探针**（全新上下文只读入口链答「现在」问题）+ **防回堆机械门禁**进 pnpm verify（带反证）+ **两份清单逐条销账**；定位 = **首次全量 + 制度化「磨」、不承诺一次扫净**（用户原话：「打扫卫生要磨几次才可能磨好」）；审计先行，量超一轮按 D11 拆轮。原 R6「分身成长」整体后移为 R7，范围与前置不变；旧行保留旧轮号（历史不改写，映射以本条为准） | [plans/roadmap.md](./plans/roadmap.md) R6/R7 行 + 维护规则 2026-09-23 条 |
+| D22 | **R5b 驾驶舱定案（2026-09-23，Q5–Q8）**：① **在场板主键 = team roster**——"会话 × preset"被 r2/r3 两份录制**证伪**（child 的 `agentPreset` 恒为发起者 `ceo`、`agent-preset/selected` 事件合计 0 条，四个分身不可辨）；lead 行即 CEO（`roster.list()` 恒置顶 `role:'lead'`），不另开"公司级"视图；不在 team 里的会话不进场板（可见性归 lineage/侧栏）。② **冷启动 = 拉式 RPC `remote.agentTeams.view(lead)`**——挂载即拉 + 5s 轮询，不订阅 `session/event`、不需要 `sessionQuery`（原两路合并的问题设定整个消解）；durable team 态由 lead 日志事件重建，live 缺席 → `inactive` 非行消失。③ **status 文案 = 中文映射 + 团队限定**（执行中/待命/未上线/启动中/故障）。④ **成员空间入口 = 在场板行可点**（照官方 `openTeammate`；`openSubagent` 寻址按父会话 catalog，one-shot/continuable 都在，对非 team child 亦可达）。同轮：r2-motion replay 场景出生 + replay-smoke 泛化多 child + **presence 判据档**（历史录制全量零 diff 必然红——内容演进 ≠ 重放缺陷；member/task 集合等价 + 在场板同形替代）；消息级动态流进搁置池（stub codegen 归 vendor 管线，host 投影通道已核实）。定案与证据全文 = [implemented/org-presence-board §四个定案](../notes/implemented/2026-09-22-org-presence-board.md)；收尾 = [implemented/2026-09-23-r5b-cockpit](../notes/implemented/2026-09-23-r5b-cockpit.md) | [implemented/2026-09-23-r5b-cockpit.md](../notes/implemented/2026-09-23-r5b-cockpit.md)；[roadmap](./plans/roadmap.md) R5b 行 |
 
 ### 待定（阻塞项标 ⛔）
 
@@ -93,16 +94,16 @@ peers / 兼容矩阵 / 真实安装冒烟 / 升 pin 程序，见上表历史行�
 | Q3 ✅ | 公司手册哪些随 pack 发布、哪些留 workspace 活数据？ | KB 骨架 | R1–R2 中 |
 | Q4 ✅ | ~~R1 的最小动议主题~~ **已定（2026-09-22）：「给我们公司要不要自建知识库写一页技术评估」** | R1 探针任务与预算 | 已定；整场 demo 剧本 R2 前再议 |
 
-R5b 开工前必须先钉的四条（内容与选项见 [plans/r5-plus-readiness.md](./plans/r5-plus-readiness.md) §9 P2；
-判据 = 四条都变成 [proposed/org-presence-board](../notes/proposed/2026-09-22-org-presence-board.md) 里的
-**现在时陈述**，才开始 Plan Mode）：
+R5b 开工前四条（**2026-09-23 已全部钉死**；定案与证据 =
+[proposed/org-presence-board](../notes/implemented/2026-09-22-org-presence-board.md) §四个定案——
+判据已达成：四条均为提案里的现在时陈述、"风险与未决"对应条目已删，**可进 Plan Mode**）：
 
 | # | 问题 | 影响面 | 何时必须定 |
 |---|---|---|---|
-| Q5 ⛔ | **在场板主键**：会话 × preset（不漏 CEO 直起的 subagent）还是 team roster（状态更准）？——**它也顺带决定 CEO 要不要单开一行「公司级」视图**（原提案 §风险与未决 里那条未决落在这里） | 在场板读模型与它的验收 | **R5b 开工前** |
-| Q6 ⛔ | **冷启动补历史**：只吃 `session/event`（进程活着才有）还是事件 + `sessionQuery` 合并？ | 刷新后面板会不会空 | R5b 开工前 |
-| Q7 | **`status` 文案**：直显 `running` / `idle`，还是加"团队内"限定语？ | UI 文案与验收行 | R5b 开工前 |
-| Q8 ⛔ | **成员空间入口**：侧栏分组 / 头部动作 / 名册行可点——取决于 `sessions.openSubagent` 对**非 team child** 是否可达 | 场景 B 那个"进不去成员空间" | R5b 开工前 |
+| Q5 ✅ | ~~**在场板主键**：会话 × preset 还是 team roster？~~ **已定（2026-09-23）：team roster**——r2/r3 两份录制实证"会话 × preset"下 child 的 `agentPreset` 恒为 `ceo` 且 `agent-preset/selected` 事件 0 条（身份源证伪）；lead 行即 CEO（`roster.list()` 恒置顶 `role:'lead'`），不另开"公司级"视图 | 在场板读模型与它的验收 | 已定（R5b 开工前，见提案 §四个定案 D-a） |
+| Q6 ✅ | ~~**冷启动补历史**：只吃 `session/event` 还是事件 + `sessionQuery` 合并？~~ **已定（2026-09-23）：拉式 RPC `remote.agentTeams.view(lead)`**——挂载/打开即拉 + 轮询（与 R2 任务板同构），不订阅 `session/event`、不需要 `sessionQuery`；durable `team/*` 事件重建，刷新后非空（纯事件折算实证） | 刷新后面板会不会空 | 已定（R5b 开工前，见提案 §四个定案 D-b） |
+| Q7 ✅ | ~~**`status` 文案**：直显还是加限定？~~ **已定（2026-09-23）：中文映射 + 团队限定**——列头「团队内状态」，running→执行中 / idle→待命 / inactive→未上线 / provisioning→启动中 / failed→故障 | UI 文案与验收行 | 已定（R5b 开工前，见提案 §四个定案 D-c） |
+| Q8 ✅ | ~~**成员空间入口**：侧栏分组 / 头部动作 / 名册行可点？~~ **已定（2026-09-23）：在场板行可点**——照官方 `openTeammate` 模式（`refreshSubagents(lead)` + `openSubagent`）；寻址按父会话 subagent catalog（one-shot/continuable 都在），对非 team child 亦可达 | 场景 B 那个"进不去成员空间" | 已定（R5b 开工前，见提案 §四个定案 D-d） |
 
 ## 覆盖状态（2026-09-21 审计 + 重构）
 

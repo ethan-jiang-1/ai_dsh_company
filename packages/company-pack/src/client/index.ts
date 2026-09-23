@@ -1,13 +1,16 @@
-/** 浏览器半：部署品牌（侧栏）+ 团队任务板（会话头部）。 */
+/** 浏览器半：部署品牌（侧栏）+ 团队任务板（会话头部）+ Company 驾驶舱页签（右栏，R5b）。 */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
 import type {} from '@deepseek-ai/dsh-experimental-agent-team/remote'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-api-session-controller/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
+import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import { WocheBrandName } from './Brand.tsx'
+import { CompanyPane, type MemberTarget } from './CompanyPane.tsx'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
 import { TasksAction } from './TasksPanel.tsx'
@@ -15,8 +18,11 @@ import { TasksAction } from './TasksPanel.tsx'
 /** Required services: the slot registry plus the remote namespace we read. */
 export const inject = ['slots', 'remote', 'sessions']
 
+/** 本包驾驶舱 tab 的身份：tab 类型 id = keyed 槽 `sidebar.right.pane.tab` 的 key。 */
+const COMPANY_TAB_ID = 'dsh-company-pack/cockpit'
+
 /**
- * 本包 client 面登记三处：委派工具卡（R3）、部署品牌、会话头部任务板。
+ * 本包 client 面登记四处：委派工具卡（R3）、部署品牌、会话头部任务板、Company 驾驶舱页签（R5b）。
  *
  * 谁挂 remote：官方 `client-ui-agent-team` 行（本包 cordis.patch.yml 插入的 `ui-agent-team`）
  * 自己 `$mount` 生成的 Team Remote——本入口**不再重复挂**。同一描述符挂第二次会在 client
@@ -28,6 +34,8 @@ export const inject = ['slots', 'remote', 'sessions']
  * 官方缺席时本贡献保持 PENDING（板不出现），不会崩。
  * **委派工具卡只依赖 `slots`**（它渲染的是 call/result 切片，不读团队状态），所以单独 inject——
  * 别让它被 team remote 的缺席拖住。
+ * **驾驶舱页签（R5b）**另需 `sidebarRightTabs` 服务（`ui-sidebar-right` 的 tab 注册面）；
+ * 行数据与任务板同走 `remote.agentTeams.view` 拉式通道（Q5–Q8 定案 D-b）。
  * @param ctx - Client root context.
  */
 export async function apply(ctx: ClientContext): Promise<void> {
@@ -61,5 +69,48 @@ export async function apply(ctx: ClientContext): Promise<void> {
           load: (sessionId: SessionId) => scoped.remote.agentTeams.view(leadSessionId(sessionId)),
         }),
       }, TasksAction))
+  })
+
+  // Company 驾驶舱页签（R5b）：右栏 page 型 tab（无地址，按 kind 打开；guide 页给入口胶囊）。
+  // 数据面与任务板同一拉式通道（D-b）；行可点进成员空间（D-d，照官方 openTeammate 模式）。
+  ctx.inject(['sessions', 'remote.agentTeams', 'slots', 'sidebarRightTabs'], (scoped) => {
+    const sessions = scoped.sessions
+    const leadSessionId = (sessionId: SessionId): SessionId => {
+      const address = sessions.binding(sessionId)?.session.getSnapshot().subagent?.address
+      return address?.parentSessionId ?? sessionId
+    }
+    /** D-d 成员空间入口：teammate = catalog 寻址（对非 team child 亦可达）；lead = 顶层 open。 */
+    const openMember = async (sessionId: SessionId, member: MemberTarget): Promise<void> => {
+      const lead = leadSessionId(sessionId)
+      if (member.role === 'lead') {
+        sessions.open(lead)
+        return
+      }
+      await sessions.refreshSubagents(lead)
+      if (sessions.list.getSnapshot().current !== sessionId) return
+      sessions.openSubagent({ parentSessionId: lead, childSessionId: member.id as SessionId, mode: 'continuable' })
+    }
+
+    scoped.effect(() => scoped.sidebarRightTabs.register({
+      id: COMPANY_TAB_ID,
+      kind: 'company',
+      priority: 'extension',
+      title: () => 'Company 驾驶舱',
+      guide: [{
+        order: 50,
+        title: () => 'Company 驾驶舱',
+        description: () => '组织在场板：谁在忙、忙什么；点行进成员空间',
+      }],
+    }), 'company-pack: cockpit tab type')
+
+    scoped.slots.inject('sidebar.right.pane.tab', () =>
+      scoped.slots.register({
+        name: 'sidebar.right.pane.tab',
+        key: COMPANY_TAB_ID,
+        inject: () => ({
+          load: (sessionId: SessionId) => scoped.remote.agentTeams.view(leadSessionId(sessionId)),
+          openMember,
+        }),
+      }, CompanyPane))
   })
 }

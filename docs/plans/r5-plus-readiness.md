@@ -26,7 +26,7 @@
 | notes/ 条目 | 目标轮 | 判定 | 关键理由 / 待办 |
 |---|---|---|---|
 | [implemented/workspace-hygiene](../../notes/implemented/2026-09-22-workspace-hygiene.md) | R4 | **✅ 已消化（不归本文件）** | R4 交付 `scripts/lib/deliverables.mjs` + `deliverables-check.mjs` + `tests/deliverables.spec.ts`（13 条）；1 条（练习场 ≠ 运行场）转轮间待办、1 条按决定不做——逐条去向见该文件的「条目去向」表 |
-| [proposed/org-presence-board](../../notes/proposed/2026-09-22-org-presence-board.md) | R5b | **READY-DECISIONS** | 四个数据源全部 vendor 核实；三个 join 语义未钉 + 一个新增 UI 入口（见 §2.1） |
+| [org-presence-board（已毕业）](../../notes/implemented/2026-09-22-org-presence-board.md) | R5b | **READY-DECISIONS** | 四个数据源全部 vendor 核实；三个 join 语义未钉 + 一个新增 UI 入口（见 §2.1） |
 | [proposed/twin-cultivation-and-self-learning](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md) | R7 | **READY（培养/学习）＋ SUSPENDED（自主节律）** | 两条前置修复已落地、U1 已答；**阻塞项文字已过期**（见 §5） |
 | [research/digital-twin-cultivation-and-self-learning](../../notes/research/2026-09-22-digital-twin-cultivation-and-self-learning.md) | R7 依据（原 R6） | **RESEARCH（部分已作废）** | §C 前置已做、§D 结论被隔离改动推翻、U2/U3 作废（该笔记已加修订节） |
 | [research/agent-workflow-community-practice](../../notes/research/2026-09-22-agent-workflow-community-practice.md) | — | **CLOSED** | 全部建议已落地：D15 + 三篇复盘 + `scripts/verify.mjs` §8 client 两半门禁 |
@@ -122,7 +122,7 @@ R7（原 R6）的"培养/学习"已经就绪、只是它墙上写的阻塞项过
 | **自主节律**（分身定期复盘） | [proposed/twin §四](../../notes/proposed/2026-09-22-twin-cultivation-and-self-learning.md) | 机制不闭合：`goal` 需人类授权且 session-start 一律 disarm；`schedule` 只在会话 live 时投递且默认没装；webhook 起的会话进不了 goal 循环；全树无 cron | 上游补"外部触发 ↔ 会话内自主续跑"的 seam（提 seam，不自建） |
 | **并行快捷派活**（同时开几个 VP） | [delegation.md](../delegation.md) §4.4；R3 Note | 本组合无干净解法（per-child composition / 不撞名的控制面缺失） | 上游 seam；本仓不自建（D13） |
 | **M2 自定义 provider** | 台账 Q1（已闭合） | 只在需要**组合隔离**时才有价值；需求已由 team 持久成员满足 | 出现"必须隔离组合"的具体需求 |
-| **界面外推送 / 收件箱** | [proposed/org-presence-board](../../notes/proposed/2026-09-22-org-presence-board.md) §背景 | egress 只有 session-telemetry 与 hooks；收件人是谁、粒度多细属部署选择，不是本仓能定的 | 出现明确的物理人通知需求 + 选定部署面 |
+| **界面外推送 / 收件箱** | [org-presence-board（已毕业）](../../notes/implemented/2026-09-22-org-presence-board.md) §背景 | egress 只有 session-telemetry 与 hooks；收件人是谁、粒度多细属部署选择，不是本仓能定的 | 出现明确的物理人通知需求 + 选定部署面 |
 
 ## 5. 已闭合 / 已过期（状态该改，别再当阻塞）
 
