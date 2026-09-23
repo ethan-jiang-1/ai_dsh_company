@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import {
   PRESET_DISPLAY_NAMES,
   diffActivity,
+  memberNames,
   presenceFromEvents,
   rowsFromTeamView,
   statusLabelFor,
@@ -225,5 +226,32 @@ describe('显示名映射与 preset.yml 同源（防漂移）', () => {
       expect(match, `${id} preset.yml 缺 name`).not.toBeNull()
       expect(match![1]!.trim(), `${id} 的显示名与 PRESET_DISPLAY_NAMES 漂移`).toBe(expected)
     }
+  })
+})
+
+/**
+ * live 流（`session/follow`）的名册补充表：快照只带最新一页，成员 provisioning 事件可能在页外，
+ * 动态里的**目标** id 就解析不出名字（发送方有 `senderName` 兜底，所以只有目标会裸 id）。
+ * 这是 2026-09-23 真页面截图抓到的缺陷的回归测试。
+ */
+describe('presenceFromEvents · nameById 名册补充表', () => {
+  it('名册外的目标 id：无补充表时裸 id，有补充表时显示成员名', () => {
+    const events = [messageEvent('session-sender', 'vp-eng', 'session-target', '对齐一下', 5)]
+    expect(presenceFromEvents(events).activity[0]?.text).toContain('session-target')
+    const names = new Map([['session-target', 'coo']])
+    expect(presenceFromEvents(events, names).activity[0]?.text).toContain('wochen COO')
+  })
+
+  it('memberNames 从 TeamView 建 id → 成员名表', () => {
+    const view: TeamViewLike = {
+      members: [
+        { id: 's-lead', name: 'lead', role: 'lead', status: 'running' },
+        { id: 's-eng', name: 'vp-eng', role: 'teammate', status: 'idle' },
+      ],
+      tasks: [],
+    }
+    const names = memberNames(view)
+    expect(names.get('s-eng')).toBe('vp-eng')
+    expect(names.get('s-lead')).toBe('lead')
   })
 })

@@ -125,7 +125,8 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // 公司整页视图（条目 ① S1）：`conversation.view` 的第三个页签（Chat / Trajectory / 公司）。
   // 该槽**没有 inject 面**（catalog registerOptions 只有 id/order/label）且 team 投影是 host-only
   // ⇒ 数据面用注册处闭包注入（见 CompanyView 头注）；跨插件值导入仍被禁。
-  ctx.inject(['sessions', 'remote.agentTeams', 'slots'], (scoped) => {
+  // ⚠ remote 按命名空间 inject：`remote.agentTeams`（拉团队态）+ `remote.session`（follow 流）。
+  ctx.inject(['sessions', 'remote.agentTeams', 'remote.session', 'slots'], (scoped) => {
     const sessions = scoped.sessions
     /** 子代理会话归到它的 Lead：团队状态挂在 Lead 上。 */
     const leadOf = (sessionId: SessionId): SessionId => {
@@ -134,6 +135,18 @@ export async function apply(ctx: ClientContext): Promise<void> {
     }
     const CompanyView = createCompanyView({
       load: (sessionId: SessionId) => scoped.remote.agentTeams.view(leadOf(sessionId)),
+      // 协作动态的流式源（S1 收尾）：`session/follow` 是 WebSocket 流，快照给历史、其后给实时。
+      // 只取团队事件（wire 形状 → 领域形状的最小投影）；assistant-stream 帧与视图无关，丢弃。
+      follow: async function* (sessionId: SessionId, signal: AbortSignal) {
+        const address = { kind: 'session' as const, sessionId: leadOf(sessionId) }
+        for await (const frame of scoped.remote.session.follow({ address }, signal)) {
+          if (frame.type === 'snapshot') {
+            yield { kind: 'history' as const, events: frame.records.map(record => record.event) }
+          } else if (frame.type === 'event') {
+            yield { kind: 'event' as const, event: frame.event }
+          }
+        }
+      },
     })
     scoped.slots.inject('conversation.view', () => scoped.slots.register({
       name: 'conversation.view',

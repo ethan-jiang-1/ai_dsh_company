@@ -239,17 +239,25 @@ export function diffActivity(prev: TeamViewLike | undefined, next: TeamViewLike,
 /**
  * 回放 / 离线路径：折 lead 会话日志的 `team/*` 事件 → 完整板（验收判据 4 的读模型）。
  * 纯事件（无进程、无 sessionQuery）下成员显示「未上线」而不是行消失（D-b：durable 态重建）。
+ * @param events - 团队事件（时间序）。
+ * @param nameById - 可选的 id → 成员名补充表（**live 流必需**：`session/follow` 的快照只带
+ *   最新一页，成员 provisioning 事件可能在页外，目标 id 会解析不出名字——用 `agentTeams.view`
+ *   的权威名册补上）。
+ * @returns 板（teamId / 行 / 动态）。
  */
-export function presenceFromEvents(events: readonly TeamEventLike[]): PresenceBoardModel {
+export function presenceFromEvents(
+  events: readonly TeamEventLike[],
+  nameById?: ReadonlyMap<string, string>,
+): PresenceBoardModel {
   const members = new Map<string, { name: string; phase: string; error?: string | undefined }>()
   const tasks = new Map<string, { subject: string; status: string; ownerId?: string | undefined }>()
   const activity: ActivityEntry[] = []
   let teamId: string | null = null
 
-  /** 会话 id → 显示名（成员按名册，lead/teamId → CEO；未知 id 原样）。 */
+  /** 会话 id → 显示名（成员按名册，lead/teamId → CEO；名册外的 id 查 `nameById` 补充表，再不行原样）。 */
   const displayOf = (id: string, fallbackName?: string): string => {
     if (teamId !== null && id === teamId) return PRESET_DISPLAY_NAMES.ceo
-    const name = members.get(id)?.name ?? fallbackName ?? id
+    const name = members.get(id)?.name ?? fallbackName ?? nameById?.get(id) ?? id
     return displayNameFor(name, 'teammate')
   }
 
@@ -332,4 +340,35 @@ export function presenceFromEvents(events: readonly TeamEventLike[]): PresenceBo
   }
 
   return { teamId, rows, activity }
+}
+
+/**
+ * 折一串团队事件 → 动态流（**零重复**：就是 `presenceFromEvents` 的动态切片）。
+ * 公司视图的 live 路径把快照历史 + 逐条实时事件攒进同一个数组后调用它——
+ * 事件量在我们的规模（一场动议几百条）下重算成本可忽略，换来"只有一套折算语义"。
+ * @param events - 团队事件（按时间序）。
+ * @param nameById - 可选的 id → 成员名补充表（live 流用权威名册补快照页外的成员）。
+ * @returns 动态（时间序）。
+ */
+export function activityFromEvents(
+  events: readonly TeamEventLike[],
+  nameById?: ReadonlyMap<string, string>,
+): readonly ActivityEntry[] {
+  return presenceFromEvents(events, nameById).activity
+}
+
+/** 公司视图消费的团队事件流帧：快照（历史）/ 单条（实时）。 */
+export type TeamStreamFrame =
+  | { readonly kind: 'history'; readonly events: readonly TeamEventLike[] }
+  | { readonly kind: 'event'; readonly event: TeamEventLike }
+
+/**
+ * 权威名册 → id → 成员名表（喂 `presenceFromEvents` 的 `nameById`）。
+ * 用途：`session/follow` 的快照只带最新一页，成员 provisioning 事件可能在页外，
+ * 动态里的目标 id 会解析不出名字——用 `agentTeams.view` 的名册补上。
+ * @param view - 官方 `TeamView` 的读取子集。
+ * @returns id → 成员名。
+ */
+export function memberNames(view: TeamViewLike): ReadonlyMap<string, string> {
+  return new Map(view.members.map(member => [member.id, member.name]))
 }
