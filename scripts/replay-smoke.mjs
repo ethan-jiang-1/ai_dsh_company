@@ -547,24 +547,24 @@ async function runUiFlow(page, { url, workspace }) {
 }
 
 /**
- * R5b 驾驶舱端到端（r2-motion 场景）：右栏打开 → guide 胶囊进 Company 页签 →
- * 在场板 5 行（D-a：lead + 4 分身；D-c：团队内状态列头）→ 点 VP-Eng 行 →
- * 断言当前会话切进该成员的空间（D-d；行可点 = 提案验收 5）。
- * 锚点（en 页面 + 本包中文文案）：'Open right sidebar' / '公司驾驶舱' /
+ * 在场页签端到端（r2-motion 场景；原 R5b 驾驶舱，条目 ② 起升级为平台页签「在场」）：
+ * 右栏打开 → guide 胶囊进「在场」页签 → 在场板 5 行（D-a：lead + 4 分身；D-c：团队内状态列头）
+ * → 点 VP-Eng 行 → 断言当前会话切进该成员的空间（D-d；行可点 = 提案验收 5）。
+ * 锚点（en 页面 + 本包中文文案）：'Open right sidebar' / guide '在场' /
  * list '组织在场板' / text '团队内状态' / 行 aria-label 'wochen <角色>，…' /
  * 成员会话标记 = lineage tree 'Subagent sessions' 或 read-only composer。
  */
 async function runCockpitFlow(page) {
   const expand = page.getByRole('button', { name: 'Open right sidebar' })
   if (await expand.count() > 0) await expand.click()
-  const capsule = page.getByRole('button', { name: /公司驾驶舱/ }).first()
+  const capsule = page.getByRole('button', { name: /^在场/ }).first()
   await capsule.waitFor({ state: 'visible', timeout: 15_000 })
   await capsule.click()
   const board = page.getByRole('list', { name: '组织在场板' })
   await board.waitFor({ state: 'visible', timeout: 15_000 })
   const rows = board.getByRole('listitem')
   const rowCount = await rows.count()
-  check('驾驶舱页签打开且在场板渲染（页签在场，提案验收 2 的真页形态）', rowCount === 5, `${String(rowCount)} 行`)
+  check('「在场」页签打开且在场板渲染（平台页签形态，提案验收 2）', rowCount === 5, `${String(rowCount)} 行`)
   for (const role of ['wochen CEO', 'wochen VP-Sales', 'wochen VP-Eng', 'wochen COO', 'wochen CFO']) {
     const hit = await rows.filter({ has: page.getByText(role, { exact: false }) }).count()
     check(`在场板行：${role}`, hit === 1, `${String(hit)} 行命中`)

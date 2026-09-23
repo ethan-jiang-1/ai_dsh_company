@@ -1,150 +1,45 @@
 /**
  * 公司整页视图（条目 ① S1，`conversation.view` id `company`）：把机制"演"出来。
  *
- * 四个面板（看板 / 依赖图 / 在场 / 用量）共用一份 team 快照；数据面三条：
- * - **team 状态**：`remote.agentTeams.view(lead)` 拉式轮询（5s，与既有任务板同节奏）。
- *   为什么走**注册处闭包**而不是槽的 `inject` 面：`conversation.view` 的槽声明没有 inject
- *   （catalog registerOptions 只有 id/order/label），而 team 投影是 **host-only**
- *   （`SessionProjectionStateMap`，无 `wire`）⇒ 客户端读不到。闭包是本插件内对 cordis
- *   服务的合法消费；跨插件值导入仍被禁（`packages/client/AGENTS.md`）。
- * - **协作动态**：`remote.session.follow`（WebSocket 流）——快照给历史、其后给实时；
- *   同一条流同时解决"打开即见全程"（不再是「暂无动态」）与实时性。
- * - **用量**：标准 props 的 `useProjection('tokenUsage'|'sessionStats')`（客户端可见投影）。
+ * 数据面自条目 ② S1a 起抽到 `useCompanyData`（公司视图与五个平台页签体共用同一实现）；
+ * 本文件只剩"页内子页签 + 四个面板"的展示编排。
  */
-import { useEffect, useMemo, useRef, useState } from 'react'
-import type { SessionId } from '@deepseek-ai/dsh-session/types'
-import type { TeamView } from '@deepseek-ai/dsh-experimental-agent-team/client'
-import type { RemoteResult } from '@deepseek-ai/dsh-api-remotes/client'
+import { useState } from 'react'
+import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
-import type {} from '@deepseek-ai/dsh-session-stats/client'
-import type {} from '@deepseek-ai/dsh-token-meter/client'
-import { boardColumns, tasksFromTeamView } from '../lib/board.ts'
-import { budgetSummary } from '../lib/budget.ts'
-import { layoutDag } from '../lib/dag.ts'
-import {
-  activityFromEvents,
-  memberNames,
-  rowsFromTeamView,
-  type ActivityEntry,
-  type TeamEventLike,
-  type TeamStreamFrame,
-  type TeamViewLike,
-} from '../lib/presence.ts'
 import { BoardPanel, BudgetPanel, DagPanel, PresencePanel } from './company-panels.tsx'
+import { useCompanyData, type CompanyDataInjected } from './use-company-data.ts'
 
 /** 本视图的 props（标准 session kit + owner props）。 */
 export type CompanyViewProps = PropsRuntime<'conversation.view'>
 
-/** 注册处闭包注入的数据面。 */
-export interface CompanyViewInjected {
-  /** 权威团队态（拉式，喂看板 / 依赖图 / 在场）。 */
-  readonly load: (sessionId: SessionId) => Promise<RemoteResult<TeamView>>
-  /** 团队事件流（`session/follow`）：快照给历史、其后给实时（喂协作动态）。 */
-  readonly follow: (sessionId: SessionId, signal: AbortSignal) => AsyncIterable<TeamStreamFrame>
+/** 注册处闭包注入的数据面 + 浮出入口（条目 ② S4）。 */
+export interface CompanyViewInjected extends CompanyDataInjected {
+  /** 打开 `kind` 对应的平台页签并拽出成浮窗（注册处经 `openTab` + `active()` + `float` 实现）。 */
+  readonly floatPanel: (kind: string) => void
 }
-
-/** 轮询间隔（与既有任务板/驾驶舱同节奏）。 */
-const POLL_MS = 5_000
-
-/** 动态流保留条数上限。 */
-const MAX_ACTIVITY = 50
 
 type PanelKey = 'board' | 'dag' | 'presence' | 'budget'
 
-const PANELS: readonly { readonly key: PanelKey; readonly label: string }[] = [
-  { key: 'board', label: '看板' },
-  { key: 'dag', label: '依赖图' },
-  { key: 'presence', label: '在场' },
-  { key: 'budget', label: '用量' },
+const PANELS: readonly { readonly key: PanelKey; readonly label: string; readonly kind: string }[] = [
+  { key: 'board', label: '看板', kind: 'company-board' },
+  { key: 'dag', label: '依赖图', kind: 'company-dag' },
+  { key: 'presence', label: '在场', kind: 'company-presence' },
+  { key: 'budget', label: '用量', kind: 'company-budget' },
 ]
 
 /**
- * 造公司视图组件（闭包捕获数据面）。
- * @param injected - team 视图拉取（注册处已绑好 lead 会话寻址）。
+ * 造公司视图组件（闭包捕获数据面 + 浮出入口）。
+ * @param injected - team 视图拉取 + 事件流 + 浮出（注册处已绑好 lead 会话寻址）。
  * @returns 可注册到 `conversation.view` 的组件。
  */
 export function createCompanyView(injected: CompanyViewInjected) {
   return function CompanyView(props: CompanyViewProps) {
     const { sessionId, useProjection } = props
-    const [team, setTeam] = useState<TeamViewLike | null>(null)
-    const [activity, setActivity] = useState<readonly ActivityEntry[]>([])
-    const [error, setError] = useState<string | null>(null)
-    const [streamError, setStreamError] = useState<string | null>(null)
     const [panel, setPanel] = useState<PanelKey>('board')
-
-    const busyRef = useRef(false)
-    const eventsRef = useRef<readonly TeamEventLike[]>([])
-    const namesRef = useRef<ReadonlyMap<string, string>>(new Map())
-
-    /** 重算动态（事件或名册任一变化都重算：名册迟到时把裸会话 id 换成成员名）。 */
-    const refreshActivity = (): void => {
-      setActivity(activityFromEvents(eventsRef.current, namesRef.current).slice(-MAX_ACTIVITY).reverse())
-    }
-
-    useEffect(() => {
-      let cancelled = false
-      /** 拉一次权威团队态（喂看板 / 依赖图 / 在场；动态另走事件流）。 */
-      const refresh = async (): Promise<void> => {
-        if (busyRef.current) return
-        busyRef.current = true
-        try {
-          const result = await injected.load(sessionId)
-          if (cancelled) return
-          if (result.ok) {
-            namesRef.current = memberNames(result.value)
-            setTeam(result.value)
-            setError(null)
-            refreshActivity()
-          } else {
-            setError(result.error.message)
-          }
-        } catch (cause) {
-          if (!cancelled) setError(cause instanceof Error ? cause.message : String(cause))
-        } finally {
-          busyRef.current = false
-        }
-      }
-      void refresh()
-      const timer = setInterval(() => { void refresh() }, POLL_MS)
-      return () => {
-        cancelled = true
-        clearInterval(timer)
-      }
-    }, [sessionId])
-
-    // 协作动态：`session/follow` 流（快照给历史 ⇒ 打开即见全程，不再是「暂无动态」；其后逐条实时）。
-    // 流断了不致命（任务板/在场仍由 5s 轮询维持），但**不静默**：错误显式落在面板上（fail-loud）。
-    useEffect(() => {
-      const controller = new AbortController()
-      eventsRef.current = []
-      setActivity([])
-      setStreamError(null)
-      void (async () => {
-        try {
-          for await (const frame of injected.follow(sessionId, controller.signal)) {
-            if (controller.signal.aborted) return
-            eventsRef.current = frame.kind === 'history'
-              ? frame.events
-              : [...eventsRef.current, frame.event]
-            refreshActivity()
-          }
-        } catch (cause) {
-          if (!controller.signal.aborted) {
-            setStreamError(cause instanceof Error ? cause.message : String(cause))
-          }
-        }
-      })()
-      return () => { controller.abort() }
-    }, [sessionId])
-
-    const tasks = useMemo(() => (team === null ? [] : tasksFromTeamView(team)), [team])
-    const columns = useMemo(() => boardColumns(tasks), [tasks])
-    const dag = useMemo(() => layoutDag(tasks), [tasks])
-    const rows = useMemo(() => (team === null ? [] : rowsFromTeamView(team)), [team])
-    const usage = useProjection('tokenUsage')
-    const stats = useProjection('sessionStats')
-    const summary = useMemo(() => budgetSummary(usage, stats), [usage, stats])
+    const data = useCompanyData(injected, sessionId, useProjection, { stream: true })
+    const current = PANELS.find(entry => entry.key === panel)
 
     return (
       <div className="wk-view">
@@ -163,19 +58,27 @@ export function createCompanyView(injected: CompanyViewInjected) {
           ))}
           <span style={{ flex: 1 }} />
           <span className="wk-meta" style={{ alignSelf: 'center', paddingRight: '0.25rem' }}>每 5 秒刷新</span>
+          <Button
+            size="sm"
+            variant="ghost"
+            title={`把「${current?.label ?? ''}」拖出成浮窗（可移动 / 可缩放）`}
+            onClick={() => { if (current !== undefined) injected.floatPanel(current.kind) }}
+          >
+            浮出
+          </Button>
         </div>
         <div className="wk-view-body">
-          {error !== null && <div className="wk-error">{error}</div>}
-          {team === null && error === null && <div className="wk-meta">读取团队状态…</div>}
-          {team !== null && panel === 'board' && <BoardPanel columns={columns} />}
-          {team !== null && panel === 'dag' && <DagPanel layout={dag} />}
-          {team !== null && panel === 'presence' && (
+          {data.error !== null && <div className="wk-error">{data.error}</div>}
+          {data.team === null && data.error === null && <div className="wk-meta">读取团队状态…</div>}
+          {data.team !== null && panel === 'board' && <BoardPanel columns={data.columns} />}
+          {data.team !== null && panel === 'dag' && <DagPanel layout={data.dag} />}
+          {data.team !== null && panel === 'presence' && (
             <>
-              {streamError !== null && <div className="wk-error">动态流不可用：{streamError}</div>}
-              <PresencePanel rows={rows} activity={activity} />
+              {data.streamError !== null && <div className="wk-error">动态流不可用：{data.streamError}</div>}
+              <PresencePanel rows={data.rows} activity={data.activity} />
             </>
           )}
-          {panel === 'budget' && <BudgetPanel summary={summary} />}
+          {panel === 'budget' && <BudgetPanel summary={data.summary} />}
         </div>
       </div>
     )
