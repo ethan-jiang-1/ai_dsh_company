@@ -10,11 +10,9 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **驾驶舱① ·「需要你」注意力中心**（主线头号：跨会话聚合四类等人状态——待答问询 / 待批审批 / 完成
-  通知 / 升级待处理，一键跳会话；聚合面 = workspace 全部会话）：
-  [proposed/cockpit-human-loop](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片一（含问询甲）。
 - **驾驶舱② · 审批闸门**（已裁：闸 org.md 现行双签线——毛利 <30%/折扣 <9折 ⇒ CFO 触线请求审批；
-  `ctx.approval` + signoff 工具行，应答路径实施首步核实）：
+  `ctx.approval` + signoff 工具行，应答路径实施首步核实；**e2e 验收含面板 DOM 断言**——补切片一
+  登记的最后一跳缺口）：
   同 [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片二。
 - **驾驶舱③ · 问询路径·乙**（已裁：独立 VP 会话加 `tool-ask-user` + 手册两模式；动议内中继显性化已
   并入①；teammate 无 preset 面，不碰承诺权）：
@@ -245,3 +243,10 @@
   （prompt 未教转义内嵌双引号 ⇒ 非法 JSON；13:44 旧 run 已 0/8 但结果没被记录——门禁"立了没真跑"的
   教训）② 探针修后 8/8 且抓到真缺陷：「四角色」残影两处已改。收尾 =
   [implemented/n1-docs-naming](./notes/implemented/2026-09-24-n1-docs-naming.md)；RFC 毕业即改写。
+- 2026-09-25（**凌晨 · 驾驶舱①「需要你」注意力中心销账〔goal 第二条〕**）：`src/lib/attention.ts` +
+  `attention-registry` + `AttentionTab`（页签 `company-attention`，五页签之首）。**实施期机制升级**
+  （留痕）：问询/审批改走 `ctx.remote.$on` 远端事件观察者（vendor `ui-approval`/`ui-user-questions`
+  同款 waterfall，只登记不拦截）——比原计划的折会话日志更实时、跨会话、零流成本；完成/升级仍走
+  follow 流折算。验收：keyless 9/9（全套 166/166）+ client-load 真页面零挂载 + 真模型证据（CEO 挂起
+  `ask_user_question`：tool/call 无 result、turn 保持打开——agent 真停等人，排练场跑）。**登记缺口**：
+  面板 DOM 最后一跳归切片二 e2e；「不讲解也能看懂」走查留用户。RFC §切片一标注实施实况。

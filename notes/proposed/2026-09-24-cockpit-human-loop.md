@@ -29,7 +29,7 @@
 out-of-turn approval workflow is deferred"——审批闸门第一版设计在**轮内语义**（agent 提案时请求、人当场
 批）；跨轮审批是上游 deferred 项，不自行发明。
 
-## 切片一 ·「需要你」注意力中心（四切片的公共显示面）
+## 切片一 ·「需要你」注意力中心（四切片的公共显示面）【已实施 2026-09-25 凌晨】
 
 - **干什么**：驾驶舱新增聚合面，跨会话收集四类"等人"状态：**待答问询**（ask-user 挂起）、**待批审批**
   （`approval/asked` 未决）、**完成通知**（`present` / 动议收口 / journal 收尾）、**升级待处理**
@@ -37,12 +37,17 @@ out-of-turn approval workflow is deferred"——审批闸门第一版设计在**
   （成员空间入口已有）。
 - **聚合范围（自裁）**：公司 workspace **全部会话**，不限于 team roster——独立 VP 会话在内（切片三乙
   的问询就出现在那里）；sessions store 已在 client 注入面。
-- **数据**：`remote.session.follow` 事件流 + 会话日志事件推导；companyDash 自有 remote 加读面（$mount
-  机制升级后仍在，装配面细节升 pin 时再核）。
-- **实施第一步**：窄核实事件形状（snapshots 找真实调用实例；无则先录一条带 ask-user 的探针会话再动
-  UI——D15 发现权在代理）。
-- **验收**：keyless 读模型单测（事件 → 注意力条目的纯函数）+ client-load 零挂载失败 + 真会话一条挂起
-  问询出现在面板（presence-e2e 式认证档）+「不讲解也能看懂」走查。
+- **实施实况（比原计划更好的机制，实施期发现留痕）**：问询/审批不走"折会话日志"，改走 **`ctx.remote.$on`
+  远端事件观察者**（`user-questions/request` / `approval/request` waterfall——vendor `ui-approval` /
+  `ui-user-questions` 同款载体；只登记、永远 `next()` 委托，真应答仍归官方 UI）——跨会话、实时、
+  自带会话归属（`scopeOf(this)`），零流订阅成本。完成/升级仍走 follow 流折算（present 调用 +
+  【待澄清】消息）。交付物：`src/lib/attention.ts`（读模型）+ `attention-registry.ts` + `AttentionTab`
+  （页签 `company-attention`，排在五页签之首）。
+- **验收实况**：keyless 单测 9/9（`tests/attention.spec.ts`，全套 166/166）+ client-load 真页面零挂载
+  失败 + **真模型证据**（CEO 会话挂起 `ask_user_question`：tool/call 无 result、turn 保持打开 =
+  agent 真停在等人；排练场跑、payload 与面板 `what` 字段同形）。**已登记缺口**：面板 DOM 最后一跳
+  （远端事件 → 面板行）未上浏览器断言——归切片二的 e2e 一并覆盖（该 e2e 本就需要审批出现在面板）；
+  「不讲解也能看懂」走查留用户（发现问题的出口 = 视觉打磨二期条目）。
 
 ## 切片二 · 审批闸门（公司签字线变机制停点）
 
