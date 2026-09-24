@@ -27,7 +27,7 @@
 | [design/30-ui-demo.md](./design/30-ui-demo.md) | 设计 | Web UI 演示层：现成团队 UI（零代码）、公司皮肤（slots/Remote）、demo 分镜 |
 | [design/40-role-content-plan.md](./design/40-role-content-plan.md) | 设计 | 角色内容设计（五角色 R2 定稿，现时语义见 [presets.md](./presets.md)）：persona 要素、skills 清单、KB/模板骨架、入戏探针 |
 | [guides/50-budget-and-ops.md](./guides/50-budget-and-ops.md) | 指南 | 限流旋钮总表、成本结构、demo 运维 runbook（症状→动作）、回放复盘 |
-| [guides/60-dev-loop.md](./guides/60-dev-loop.md) | 指南 | 开发环操作手册：六步闭环、调试阶梯、设计四问、插拔速查、升级环与发布时点、双 home/双 DSH |
+| [guides/60-dev-loop.md](./guides/60-dev-loop.md) | 指南 | 开发操作手册：任务入口与授权（§0.5）、实施和证据交接（§1）；其余按改动面查调试、发布、双 home 等章节 |
 | [profile.md](./profile.md) | 合同 | host 组合现在时：部署形状（源码直跑/持久安装实测）、行清单语义、开放点 |
 | [delegation.md](./delegation.md) | 合同 | 汇报线现在时（R3 出生）：命名委托工具（one-shot 前台）与 team 的分工、team shadow 边界与证据、委派工具卡、分层验证 |
 | [presets.md](./presets.md) | 合同 | 角色 preset 语义（R2：五角色定稿——CEO / VP-Eng / VP-Sales / COO / CFO）；名册运行时实测；验证分层 |
@@ -46,7 +46,7 @@
 
 | 主题 | 当前事实家 |
 |---|---|
-| 文档卫生与开发流程 | 本文件的文档组织原则 + [开发环 §12](./guides/60-dev-loop.md) |
+| 文档卫生与开发流程 | 本文件的文档组织原则 + [开发环 §0.5/§1/§12](./guides/60-dev-loop.md) |
 | 培养/学习回路 | [presets.md](./presets.md) 的培养回路与学习载体（D25） |
 
 `delegation.md` 与 `release.md` 见上方地图；当前没有待另建的合同。
@@ -55,7 +55,7 @@
 
 ### 决策记录（先辨当前适用范围）
 
-D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历史；D10 的 plans 层已由 D24 退役；D11 的轮次制已由 D23 替代；D19 的拆轮与 D21 的插轮是历史，搁置条件仍适用。D13/D23 的原意保留，当前执行步骤与本仓适配见 [开发环 §0/§12](./guides/60-dev-loop.md)。其余决定按所属合同与当前实现核对，冲突时查相关 Note，不按文件新旧机械裁决。
+D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历史；D10 的 plans 层已由 D24 退役；D11 的完整切片与窄验证仍可参考，轮次流程由 D23/D24 队列流程替代。队列条目默认新对话上下文接手是 D23 本仓适配。D19 的拆轮安排是历史，搁置池准入条件见 ROADMAP；D21 记录历史轮次安排。D13 的默认适配自由经 D23 收紧：遵循钉住的 DSH 纪律，本地差异按 D 号说明约束与证据。任务操作规则见[开发环 §0.5/§1/§12](./guides/60-dev-loop.md)。其他决定按对应 owner 与当前实现核对；冲突时查关联 Note 和窄证据。
 
 | # | 决定 | 依据/出处 |
 |---|---|---|
@@ -71,32 +71,35 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | D10 | **docs/ 按性质分层（导航/设计/计划/指南/合同），不按时间分层**；初始意图归 `notes/intents.md`（否决"初始化/"目录方案） | notes/implemented/2026-09-21-docs-layering.md |
 | D11 | **迭代单位 = 垂直轮**：R1 最薄全路径（CEO+VP-Eng 两人公司）→ 逐轮加宽；交付按完整垂直切片、验证按最窄证据、打磨蛇形折回；现成团队 UI R1 作观察窗、R2 进验收，自定义皮肤 R5；每轮换全新对话上下文（交接靠 roadmap 两清单） | notes/implemented/2026-09-21-vertical-rounds.md；FAQ 13 dev-loop 第 4/6 阶段 |
 | D12 | **patch 语义定案**（R1 实证）：`- id:` 只替换已有行（not found 即丢弃并警告）；**新增行必须 `- insert:` 子列表**；因此 host 行随 pack 的 bundle 走，且 `agent-presets` 行用**替换**语法覆盖 web-app 的出厂行（default: standard → ceo + 自定位 roots）；纯 headless 组合（无此行）用 `dev/company.overlay.yml` 的 insert 补 | notes/implemented/2026-09-22-r1-*.md；vendor shipped dsh-headless/dsh-web-app 的 cordis.patch.yml |
-| D13 | **开发纪律全程沿用 DSH**（整套继承 + 按本 repo 规模裁剪，**不发明本地流程**）；纪律权威在 vendor 树（`AGENTS.md`/`docs/AGENTS.md`/`docs/testing.md`/`.agents/notes/`），本 repo 只做落点映射 | AGENTS.md §纪律（权威对照表）；用户指令 |
+| D13 | **历史宣言：开发纪律沿用 DSH**（当时写作“整套继承 + 按规模裁剪、不发明本地流程”）。该默认适配自由已由 D23 限定：默认遵循钉住的 vendor 纪律，偏离须登记 D 号与约束证据；当前 owner 见 AGENTS.md §纪律及开发环 §12 | [D23 转型 Note](../notes/implemented/2026-09-23-dsh-inround-task-surface.md)；用户决定 |
 | D14 | **公司名 = wochen；角色显示名系列化** `<公司名> <角色>`（`wochen CEO` 等）；**preset id 保持 kebab 不变**（`ceo`/`vp-eng`/`vp-sales`/`coo`——id 受 `PRESET_ID=/^[a-z0-9][a-z0-9-]*$/` 限制，不能带下划线/大写）；角色层级不动（CEO 是个体、VP 是职能，见 40 §0.1） | notes/implemented/2026-09-22-wochen-naming.md；40 §1 |
-| D15 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**。迭代是常态，但必须由**代理能自己跑的检查**闭合：真入口路径 > dump/扫描；"伺服了"≠"能加载"；让用户看 UI 之前必须先机器验证过。**同时否决**：为这类失败引入 spec 流程（无第一方证据，且本类失败不在其射程）、把指令文件写更长（advisory，非确定性） | notes/implemented/2026-09-22-agent-workflow-community-practice.md（17 个一手来源）；notes/postmortem/0001-0002；vendor `docs/testing.md` + `docs/postmortem/0003`；落点：guides/60 §1/§2/§7、AGENTS.md 纪律表、roadmap 收尾清单第 6 条 |
+| D15 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**。迭代是常态，但必须由**代理能自己跑的检查**闭合：真入口路径 > dump/扫描；"伺服了"≠"能加载"；让用户看 UI 之前必须先机器验证过。**同时否决**：为这类失败引入 spec 流程（无第一方证据，且本类失败不在其射程）、把指令文件写更长（advisory，非确定性） | notes/implemented/2026-09-22-agent-workflow-community-practice.md（17 个一手来源）；notes/postmortem/0001-0002；vendor `docs/testing.md` + `docs/postmortem/0003`；落点：guides/60 §1/§2/§7、AGENTS.md 纪律表 |
 | D16 | **Q2 定案（2026-09-22）**：角色模型路由 = R2 全员同模型（默认路由，不写 `agentOptions`）。理由：当前瓶颈是内容质量与协作可见性，成本无差异化证据；需要差异路由时 R3 在委托工具 `agentOptions` 层做，不动 persona | tests/presets.spec.ts；presets.md |
 | D17 | **Q3 定案（2026-09-22）**：公司事实（CHARTER / journal / 客户 / 预算基准）全部留 workspace 活数据（D7 三载体）；随 pack 发布的只有方法论 skills 与结构模板——pack 不含公司事实，换公司复用 = 只换 workspace | presets.md；company-workspace/kb/ |
 | D18 | **R3 汇报线定案（2026-09-22）**：CEO 的命名委托工具 `vp_eng` / `vp_sales` = **one-shot 前台**（`backgroundMode: one-shot` + `enableRunInBackground: false` + `maxDepth: 1` + per-instance persona）。**continuable 在本组合里不可用**：CEO 会话从**第一帧**起 team-scoped，团队版 `send_message` / `list_agents` / `interrupt_agent` 按成员**名字**寻址，而 subagent child 不在名册上 ⇒ 续驶/中断/列举全不可达。因此：续驶与连续对话归 **team（M4）**；"child 拿到角色完整 skills/工具面"归 **M2（未做）**；CEO preset **不放**全局控制行（在 CEO 会话是死行，有反向守卫）；并行快捷派活要等上游 seam，**本仓不自建**（D13） | [delegation.md](./delegation.md)；`scripts/delegation-smoke.mjs`（边界守卫）；`snapshots/r2-motion/sessions/lead.jsonl` 第一帧 |
 | D19 | **R5 拆轮 + 搁置池（2026-09-22）**：① **R5 → R5a 门禁与发布 / R5b 驾驶舱**——同轮塞 4–5 个面时，最不确定的 replay harness 会卡住皮肤交付（D11：一轮一份可观察的外部行为）；② **进搁置池须满足"缺上游 seam"或"缺明确需求"**，被否决的方案不进池（归 D 号/复盘/`rejected`），复活条件写进池内每行；首批四条 = 自主节律 / 并行快捷派活 / M2 / 界面外推送；③ R6 的"两条接线 + U1"阻塞经核实**已清**，只余一次活体探针（轮间待办 R5a → R6） | [ROADMAP.md](../ROADMAP.md) §搁置池（原 r5-plus-readiness.md 已于 R6 删除，处置见腐化点清单 D1） |
 | D20 | **交付物三态判据（R4，2026-09-22）**：① **成品 = Lead 会话的 `present`**（`agentPreset=ceo` 且 `delegationDepth=0`）——依据是公司手册的承诺权，且实测 R2 里 CFO 也 `present` 过 3 次，不限归属则过程稿与定稿平级、仍答不上"哪些是成品"；② **按交付物身份（`slug` + 角色）比对，不按字面路径**——给三态迁移留桥，否则迁移一次就把历史证据全判成 dangling（假阳性，不是违规）；③ **反向检查只追 Lead 声明**，非 Lead 的成品声明只在它**此刻真躺在盘上**时判越权（历史行为不追着报，否则一次越权永久污染此后每轮审计）。实现 `scripts/lib/deliverables.mjs` + 入口 `scripts/deliverables-check.mjs`（**审归档快照须配 `--only <slug>`**，因快照是整盘 workspace + 本轮日志）；合同家 = `company-workspace/AGENTS.md`「交付物三态」 | [implemented/2026-09-22-r4-workshop-flow.md](../notes/implemented/2026-09-22-r4-workshop-flow.md) |
-| D21 | **R6 内容诊治插轮 + 分身成长改号 R7（2026-09-23，用户决定）**：五轮堆叠后内容腐化已有实证（「当前状态」沉积收尾快照并与 roadmap 双写、已闭合的待定 Q1 仍挂 00-index、roadmap 计划层躺已 ✅ 的历史段、原 R6 行「U1 只剩实证钉死」文字过期）⇒ 插**纯整治轮**（不交付新功能），两条线：**线 A 内容腐化诊治**（docs/ 全层 / AGENTS.md 入口链 / company-workspace（手册+kb；R4「journal 不压」默认不重开）/ notes/ 指针核对，历史不重写）；**线 B 流程对齐审计**（本仓是 DSH 研发纪律的头一次实际使用——对照 AGENTS.md 纪律表逐条核对已闭轮实践（届时 R0–R5b），权威在 vendor 树；抓「没严格遵循」与「灵活性理解错」两类偏差，弹性边界写清，目标 = 让今后开发更舒适）；验收 = **入口链探针**（全新上下文只读入口链答「现在」问题）+ **防回堆机械门禁**进 pnpm verify（带反证）+ **两份清单逐条销账**；定位 = **首次全量 + 制度化「磨」、不承诺一次扫净**（用户原话：「打扫卫生要磨几次才可能磨好」）；审计先行，量超一轮按 D11 拆轮。原 R6「分身成长」整体后移为 R7，范围与前置不变；旧行保留旧轮号（历史不改写，映射以本条为准） | [ROADMAP.md](../ROADMAP.md) R6/R7 行 + 维护规则 2026-09-23 条 |
+| D21 | **历史轮次调整（2026-09-23，用户决定）**：R6 用于内容诊治，分身成长改号 R7；轮次制随后由 D23/D24 退役。原范围、审计证据与映射只在各自收尾 Note 保留，不把已退役的轮次搬入当前任务队列 | [implemented/2026-09-23-r6-content-remediation.md](../notes/implemented/2026-09-23-r6-content-remediation.md)；[D23 转型 Note](../notes/implemented/2026-09-23-dsh-inround-task-surface.md) |
 | D22 | **R5b 驾驶舱定案（2026-09-23，Q5–Q8）**：① **在场板主键 = team roster**——"会话 × preset"被 r2/r3 两份录制**证伪**（child 的 `agentPreset` 恒为发起者 `ceo`、`agent-preset/selected` 事件合计 0 条，四个分身不可辨）；lead 行即 CEO（`roster.list()` 恒置顶 `role:'lead'`），不另开"公司级"视图；不在 team 里的会话不进场板（可见性归 lineage/侧栏）。② **冷启动 = 拉式 RPC `remote.agentTeams.view(lead)`**——挂载即拉 + 5s 轮询，不订阅 `session/event`、不需要 `sessionQuery`（原两路合并的问题设定整个消解）；durable team 态由 lead 日志事件重建，live 缺席 → `inactive` 非行消失。③ **status 文案 = 中文映射 + 团队限定**（执行中/待命/未上线/启动中/故障）。④ **成员空间入口 = 在场板行可点**（照官方 `openTeammate`；`openSubagent` 寻址按父会话 catalog，one-shot/continuable 都在，对非 team child 亦可达）。同轮：r2-motion replay 场景出生 + replay-smoke 泛化多 child + **presence 判据档**（历史录制全量零 diff 必然红——内容演进 ≠ 重放缺陷；member/task 集合等价 + 在场板同形替代）；消息级动态流进搁置池（stub codegen 归 vendor 管线，host 投影通道已核实）。定案与证据全文 = [implemented/org-presence-board §四个定案](../notes/implemented/2026-09-22-org-presence-board.md)；收尾 = [implemented/2026-09-23-r5b-cockpit](../notes/implemented/2026-09-23-r5b-cockpit.md) | [implemented/2026-09-23-r5b-cockpit.md](../notes/implemented/2026-09-23-r5b-cockpit.md)；[ROADMAP.md](../ROADMAP.md) R5b 行 |
-| D23 | **R6 后严格 DSH 研发流（2026-09-23，用户决定；R6 = 最后轮号）**：研究发现本仓对 D13「整套继承」实为**部分继承**——轮号制与 roadmap 历史沉积系本仓发明（D11 引据是把 FAQ dev-loop 单变更生命周期拉伸成项目级轮次）、轮内 todo/plan 反馈面从未启用（机制在场零纪律；病根 = 继承从记忆声称从未枚举 + 适配不声明 + 无复查环）。决定：R6 按原章程执行（审计先行），收尾**新增转型落盘**——plans 层队列化（条目按主题命名、**完成即离队**）、guides/60 条目级开发环（含实施期 todo_write 纪律）、AGENTS.md 同步；R7「分身成长」转队列首条，范围与前置不变；此后**默认严格 DSH 套路，偏离须登记 D 号附约束证据**。防再犯五件套 = 全量纪律清单（vendor 逐源枚举，替换记忆版纪律表）+ 偏离登记 + 机械门禁（带反证，含 plans 层禁 ✅ 残留）+ 入口链探针（认证档）+ 升 pin 时流程合同对 vendor 重校。 | [implemented/2026-09-23-dsh-inround-task-surface.md](../notes/implemented/2026-09-23-dsh-inround-task-surface.md)（可迁移文档：形态 / 对照 / 病根 / 转型 / 五件套 / 迁移清单）；[ROADMAP.md](../ROADMAP.md) R6 行 + 维护规则 2026-09-23 条 |
-| D24 | **队列迁根部 `ROADMAP.md`，plans 层退役（2026-09-23，用户决定）**：docs/ 收敛纯静态合同（只写 now）——队列是每条目必改的调度状态、以**完成即离队**（遗忘）为目标，住 docs/ 与层纪律冲突（「时变状态进时不变载体」三连之三，research §十一）。候选裁决：**notes/ 否决**——决策记录层是累积层（intents 行只翻不删、implemented 归档即冻结），剔除态状态机入累积层 = 换器官重犯；DSH 映射亦指外（RFC ↔ `notes/proposed/` 已镜像；队列 ↔ Issues = 项目级操作面，不在 notes）。**定根部**：AGENTS.md（常设指令）+ ROADMAP.md（当前指令）= 驾驶舱对偶，入口链一跳直达；搁置池随迁；维护规则 ~90 行历史仍在文件内（迁 notes/ = 已登记独立小条目）。活引用改路径（历史层只修链接不改语义——notes-links 门禁要求）；探针题面随改（Q1/Q2 顺势改队列语义，结构修复仍留整治转待办） | [research §十二](../notes/implemented/2026-09-23-dsh-inround-task-surface.md) |
+| D23 | **开发流改为条目制（2026-09-23）**：轮次流程退役；队列条目默认新上下文接手（本仓适配）。当前授权、Plan Mode 与反馈面规则唯一见[开发环 §0.5/§1](./guides/60-dev-loop.md)。 | [转型与依据](../notes/implemented/2026-09-23-dsh-inround-task-surface.md) |
+| D24 | **队列 owner = 根部 `ROADMAP.md`（2026-09-23）**：`plans/` 退役；AGENTS.md 存常设路由，ROADMAP 只调度活动/暂停项，完成即离队，决定与证据留 Note。当前规则见 ROADMAP 文件头。 | [转型依据](../notes/implemented/2026-09-23-dsh-inround-task-surface.md) |
 | D25 | **培养/学习回路定案（2026-09-24，分身成长条目）**：培养 = 改 `presets/<role>/`（persona row + skills），培养权 = repo 写权限（无原生授权动作）；**生效边界按面**——persona / 组合文件 = 新会话（vendor stamp 机制），**skill 正文 = 同会话下一轮**（活体实证**修正 U1 旧结论**"只有新会话变"：U1 量模型转述、本轮量日志工具结果，与 vendor"每次 get() 读盘"一致；证据 = 收尾 Note ③）；培养验收 = `verify` + `test` + `preset-smoke` + `probe --full` 四绿。学习 = journal 唯一载体（D8）+ **人审提升**（照 DSH `human-review-skill-maintenance`：只采纳有证据的、不自动提升、单人 bus factor 在案；提升文本只写方法论，D17）；否决分身自改 skill（隔离后为机制事实）；自主节律住搁置池 | [implemented/2026-09-24-twin-cultivation.md](../notes/implemented/2026-09-24-twin-cultivation.md)；[implemented/2026-09-22-digital-twin §6](../notes/implemented/2026-09-22-digital-twin-cultivation-and-self-learning.md) |
+| D26 | **文档卫生按指导价值取舍（2026-09-24）**：移除“每次净减文件/行数”和固定删并修记顺序；优先处理重复/失效指令与活指针，保留仍指导未来决策的理由、反例和重启条件；文件/行数仅观察，不是完成门槛 | 本轮 [基石整治 Note](../notes/implemented/2026-09-24-foundation-remediation.md) §决定；用户确认 2026-09-24 |
 
-### 待定（阻塞项标 ⛔）
+### 待定与活动提案
 
-Q1–Q8 已全部闭合（Q1→D18、Q2→D16、Q3→D17、Q4 已定 2026-09-22、Q5–Q8→D22）。当前无待定项。
+旧问题 Q1–Q8 均已闭合（Q1→D18、Q2→D16、Q3→D17、Q4 于 2026-09-22 定案、Q5–Q8→D22）。这只结算该组问题；当前待人裁或待触发的项目见 [ROADMAP.md](../ROADMAP.md) §队列与 §搁置池（如 N1 命名提案、引用载体候选、上游新 tag）。
 
-## 覆盖状态
+## 文档路由
 
-| 面 | 覆盖 | 文档 |
-|---|---|---|
-| 机制面（组合/隔离/协作/UI 扩展点） | ✅ 充分，全部钉到源码 | design/10、20、30 |
-| 内容面（persona/skills/KB/模板实际内容） | ✅ 五角色定稿（R2；含 CFO、50 人编制、职责边界与路由） | design/40 + presets.md + kb/org.md + company-workspace/AGENTS.md |
-| 运营面（预算限流/runbook/回放） | ✅ 骨架+数值 | guides/50 |
-| 流程面（notes/ 纪律、门禁脚本） | ✅ 已沉淀（verify 门禁 + guides/60 操作手册） | 10 §6 + notes/ + scripts/verify.mjs + guides/60 |
+本表说明主题事实的 owner，不代表该面在当前提交经过完整覆盖或认证；验证状态与缺口见各合同及相关 Note。
+
+| 面 | 事实家 / 导航 |
+|---|---|
+| 机制（组合/隔离/协作/UI 扩展点） | design/10、20、30；源码与运行结论按对应合同核对 |
+| 内容（persona/skills/KB/模板） | design/40 + presets.md + `company-workspace/kb/` + `company-workspace/AGENTS.md` |
+| 运营（预算限流/runbook/回放） | guides/50 |
+| 流程（Notes、门禁及开发环） | guides/60 + `notes/` + `scripts/verify.mjs` |
 
 ## 外部研究材料登记（repo 外，只读引用）
 

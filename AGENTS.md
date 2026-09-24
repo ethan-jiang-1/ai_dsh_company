@@ -16,18 +16,14 @@ docs/                   当前合同与导航：00-index（地图+台账）→ d
 notes/                  **开发记忆与证据链**：intents.md → proposed/ → implemented/；rejected/ 保留防复犯理由；postmortem/ 记事故；research/ 记仍在用的外部研究
 scripts/                verify.mjs（结构门禁）、preset-smoke.mjs（真入口冒烟）……
 dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）
-snapshots/              回归资产：r1/r2/r3/r4-motion + scenario-b（录制会话 + workspace.expected 独立 oracle）；replay harness R5a
+snapshots/              回归资产：历史录制、workspace.actual 副本与部分场景独立编写的 workspace.expected；以各 snapshot.yml / Note 为准
 ```
 
-设计全貌与决策台账：`docs/00-index.md`（先读它，再按需进 design/10-40）。接下来开发什么 =
-`ROADMAP.md` §队列（▶ 即当前条目；开工 / 收尾程序 = `docs/guides/60-dev-loop.md` §0.5/§12）。
+设计全貌与当前决策：`docs/00-index.md`（按主题进入对应 owner）。任务入口与执行规则唯一见 `docs/guides/60-dev-loop.md` §0.5/§1；只有用户要求“继续下一条”时才从 `ROADMAP.md` §队列取任务。
 **条目状态不镜像进本文件**（root AGENTS.md 只收常设指令——vendor tier 表 "Status rots"；依据 =
 [research §十一](notes/implemented/2026-09-23-dsh-inround-task-surface.md)）。
 
-**`notes/` 是 DSH 开发流程的核心数据，不是可有可无的历史附件。** 开工先按条目/机制检索相关 Note，读决定、输掉的方案、约束与验证证据，再改代码；无需通读全树。
-非平凡变更同 diff 写/更新 Note，提案落地后改写为 `implemented/`；仅代码或聊天里的结论不算交接。
-`implemented/` 仍是活跃决策记忆：路径/名称/默认值随实现更新，决策逆转另写 Note 并互链；明确归档才冻结，不作当前权威。
-生命周期、读取触发与维护细则见 [开发环 §12](docs/guides/60-dev-loop.md)；原生定义见 [DSH Agent Notes](vendor/dsh/.agents/notes/README.md)。
+**`notes/` 是 DSH 开发流程的核心数据。** 开工按主题检索相关 Note，读取仍适用的决定、约束和验证证据；非平凡变更同 diff 更新对应 Note，提案落地后归入 `implemented/`。`implemented/` 是活跃决策记忆：实现事实变化时同步更新；决定逆转另写 Note 并互链，明确归档后才冻结。细则见[开发环 §12](docs/guides/60-dev-loop.md)；DSH 原生定义见 [Agent Notes](vendor/dsh/.agents/notes/README.md)。
 
 ## 命令表
 
@@ -62,7 +58,7 @@ presence-e2e（在场板链，真模型 ~$1）/ deliverables-check（三态审�
 | 实体 | 位置 | 角色 |
 |---|---|---|
 | ① 开发基线（**唯一权威**） | `vendor/dsh/`（钉 SHA，只读铁律见下节） | 机制核对与验证会话一律用它：`pnpm dsh` |
-| ② 日用全局安装 | npm 全局（`which dsh`；跑日常会话的就是它） | 与本 repo 开发无关；版本随全局漂移（当前恰同为 0.1.5-rc.2，巧合不是保证），行为不作机制依据 |
+| ② 日用全局安装 | npm 全局（`which dsh`；跑日常会话的就是它） | 与本 repo 开发无关；版本可能随全局安装漂移，不作本仓机制依据 |
 | ③ 外部研究树 | `/Users/bowhead/deepseek-harness/`（`_digested`/FAQ 宿主） | 只读参考，登记见 `docs/00-index.md` §外部研究材料登记 |
 
 裸 `dsh` 已被 `dev/env.sh` 拦截（DSH_HOME 只护数据层护不住代码层；确要日用：`command dsh`）。
@@ -71,17 +67,14 @@ changes）= `vendor/dsh/AGENTS.md` Conventions 节；探索路由与概念→源
 
 ## 纪律（沿 DSH 研发纪律；**默认严格照做，偏离必须登记**）
 
-纪律的权威在 vendor 树（钉住的 tag），本表是**落点地图**不是转述来源；逐源枚举的全量清单
-（R6 线 B 产出，98 行提炼）与偏离注册表住 `docs/guides/60-dev-loop.md` §12（流程合同）。
-**偏离规则：任何偏离 DSH 明文纪律的做法 = 一个 D 号 + 约束证据**（如"本地单人仓无 GitHub
-协作面"）；"按规模裁剪"不是缺省自由。
+纪律以钉住的 `vendor/dsh/` 为准；本表是仓内落点索引，不替代原文。当前任务分支与执行规则见 [开发环 §0.5/§1/§12](docs/guides/60-dev-loop.md)。本仓特有适配按 D 号记录约束与证据。
 
 | DSH 纪律 | 权威（vendor 树） | 本 repo 落点 |
 |---|---|---|
-| **过程反馈面：plan mode 呈批（计划归 exit_plan_mode）+ 实施期 todo_write（开工列全、完成即勾、steer 即重排）** | `packages/plan` + `packages/todo`（工具描述自带使用纪律） | guides/60 §0 条目生命周期（反馈双门）+ 宿主 TodoPanel |
-| docs = 当前合同（一处事实一个家，**只写 now**；词数预算 + slop 猎杀） | `docs/AGENTS.md` | `docs/` 按性质分层（D10）+ verify 链接/预算门禁；队列**纯化、完成即离队**（D23；D24 迁根部 `ROADMAP.md`） |
+| 任务反馈面 | `packages/todo` / `packages/plan`（按各自条件使用） | 适用规则唯一见 guides/60 §0.5/§1 |
+| docs = 当前合同（一处事实一个家，**只写 now**） | `docs/AGENTS.md` | `docs/` 按性质分层（D10）；本仓物理行预算与队列规则见 verify / guides/60 §12 |
 | 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么） | `.agents/notes/README.md` | `notes/intents.md → implemented/`；收尾 Note 模板 = guides/60 §12 |
-| 窄证据切片；只报告实际跑过的检查；push/commit 前跑迭代环 | `AGENTS.md` Run relevant checks | guides/60 §1 六步闭环 + §12 收尾 |
+| 按变更选择相关检查；只报告实际跑过的检查 | `AGENTS.md` Run relevant checks | 本地流程见 guides/60 §1/§9.1/§12 |
 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧** | `docs/testing.md`；`docs/postmortem/0003` | guides/60 §1 第⑥步 + §7 两道防线；preset 类改动完成定义 = `preset-smoke.mjs`（真挂载） |
 | 测试分层：真模型 / 真浏览器不进回归；行为变更同 diff 更新录制快照 | `docs/testing.md` | guides/60 §9.1 + 机械门禁 `tests/layering.spec.ts`（已反证）+ 认证档按面选跑 |
 | 真实入口路径（发布产物 `lib/` 跑）+ 真实安装形状 | `docs/testing.md` | `release-smoke`（`npm pack`→干净 profile→`plugin add`），合同 `docs/release.md` |
@@ -89,9 +82,9 @@ changes）= `vendor/dsh/AGENTS.md` Conventions 节；探索路由与概念→源
 | vendor 钉版本 + manifest/SHA + 同步程序；**升 pin 时流程合同对 vendor 重校** | `vendor/README.md` | AGENTS.md vendor 簿记 + `scripts/sync-dsh.mjs` |
 | 日志税：model-visible ⟺ logged | `AGENTS.md` Conventions | guides/60 §3 设计四问② |
 | 机械可查的不变量进执行门禁 + **每个新门禁带反证**（红→还原→绿） | `AGENTS.md` Conventions | `scripts/verify.mjs`（md-newline / 链接含 notes/ 树 / preset 结构 / vendor 铁律 / pack 形状 / pack-compat / client 两半 / proposal 两则 / **doc-budget**） |
-| **卫生铁律：打扫 = 净减少 + 信噪比提高；处置序 = 删 > 并 > 修 > 记** | （本仓原生，D23） | guides/60 §12 流程合同（方向铁律条） |
+| **文档卫生（本仓政策，D26）**：删重复/失效指令、并重复事实家、修活指针；保留仍指导决策的取舍与反例。行数只作观察，不作为删改目标 | [D26](docs/00-index.md)；适配理由见本轮 Note | guides/60 §12 |
 
-### vendor 铁律（本仓最高优先级，机械门禁在 `pnpm verify`）
+### vendor 铁律（本仓强制边界；受更高层指令与工具权限约束，机械门禁在 `pnpm verify`）
 
 **`vendor/` 下受版本控制的内容一个字节都不许改**（submodule HEAD == 簿记 SHA + 工作树零改动，
 `pnpm verify` 双门禁强制，均带反证）。允许面一句话：vendor 自己 `.gitignore` 覆盖的树内构建产物
@@ -102,8 +95,7 @@ changes）= `vendor/dsh/AGENTS.md` Conventions 节；探索路由与概念→源
 repo 内为自由区；工具状态（缓存/store/配置）一律**先重定向进仓库 gitignored 区再首次使用**
 （落点清单：双 home、`.pnpm-store`、profile `.npmrc`、排练场）；确需越界先问人，一次说清路径与理由。
 
-- 具体操作手册：`docs/guides/60-dev-loop.md`（六步闭环 / 调试阶梯 / 插拔速查 / 设计四问 /
-  发布纪律时点 / 双 home）。demo 现场运维 runbook：`docs/guides/50-budget-and-ops.md`。
+- 开工与执行唯一流程：`docs/guides/60-dev-loop.md` §0.5/§1；其他操作按需查同文后续章节。demo 现场运维 runbook：`docs/guides/50-budget-and-ops.md`。
 - **不发明**：不新增 spec 流程（OpenSpec 留触发条件，guides/60 §5）、不自造调度器/记忆/门禁——
   优先用 DSH 现成载体（D13）。否决依据（规格工具 vs 本仓两次事故的对照）：
   [implemented/2026-09-22-agent-workflow-community-practice](notes/implemented/2026-09-22-agent-workflow-community-practice.md)。

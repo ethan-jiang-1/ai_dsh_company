@@ -5,56 +5,40 @@
 > [00-index.md](../00-index.md) §外部研究材料登记）；机制结论以 `vendor/dsh/` 工作树为权威，
 > 本篇引用的旗标与行为均已在钉住 tag（dsh-v0.1.5-rc.2）核对。
 
-## 0. 全周期速览（条目生命周期——D23 转型后本仓的开发单位 = 队列条目）
+## 0. 开发环导航
 
-| 阶段 | 做什么 | 本 repo 载体 |
-|---|---|---|
-| 0 取任务 | 用户明确任务优先；“继续下一条”才从活动队列取；恢复任务先核对 Note 与现场 | `ROADMAP.md` §队列 + 相关 Note（§0.5） |
-| 1 意图 | 一行动机 + 一行**外部可观察行为** | `notes/intents.md` 登记行 |
-| 2 决策 | 摆方案、选定、**给输掉的方案留尸体** | `notes/proposed/<date>-<slug>.md` 三段式 |
-| 3 设计 | 有关键分叉或范围变化先呈计划；已有明确授权按 §0.5 执行，不反复求批 | Plan Mode 时用 exit_plan_mode 呈批；§3 设计四问 |
-| 4 落地 | 窄证据切片闭环；**实施期维护 todo_write 清单**（开工前列全、完成即勾、人 steer 即重排——**反馈门②**） | §1 六步 + 宿主 TodoPanel |
-| 5 调试 | 逐层排除，不跳层 | §2 调试阶梯 |
-| 6 调整 | 证据驱动打磨，不重设计 | 回到阶段 1 但意图更窄；vendor 换 tag 走 §5 |
-| 7 收尾 | 只报告实际跑过的检查；docs 只写 now；**完成即离队**（队列里删行，记录活在 Note + git） | §12 + Note 模板 + `pnpm verify` |
+| 需要做什么 | 唯一详细位置 |
+|---|---|
+| 选择任务、判断授权与 Plan Mode | §0.5 |
+| 实施、验证、交接 | §1；验证触发条件见 §9.1 |
+| 排查运行问题 | §2 |
+| 更新 Notes 与收尾队列项 | §12 |
 
-## 0.5 新会话开工动作（条目交接的读侧）
+## 0.5 任务入口与交接
 
-条目以可由新上下文接手为准（本仓交接约束，不是 DSH 强制每项重开会话）。按任务分支开场：
+**本仓交接（D23）**：队列条目默认由新对话上下文接手，这是本仓适配。按入口分支行动：
 
-```text
-AGENTS.md → docs/00-index.md（当前合同与 D 号适用范围）
-→ 明确任务：按用户范围；“继续下一条”：只取 ROADMAP 活动项，只有 ⏸ 就停下说明待决；恢复：先读原任务 Note
-→ 按主题读相关 Notes 的决定/失败方案/约束/验证，再查受影响实现与当前工作树
-→ 明确目标、非目标、验收及阻塞 → 已授权且无关键分叉才实施；需选择/扩大范围时先呈计划
-→ 非平凡变更登记意图和 Note，多步工作维护 todo；按 §1 小步实施
-```
+1. **明确任务**：按用户目标与授权进入对应 owner，不从队列另取任务。
+2. **继续下一条**：此时才读 `ROADMAP.md` 活动队列；若仅有 ⏸，报告阻塞、触发条件与复活方后停止。
+3. **恢复未完成项**：读原任务 Note，核对相关合同、未提交 diff 与必要现场，从已证实缺口继续。
 
-在 Plan Mode 中用 exit_plan_mode 呈批后再实施；不在该模式不硬调该工具。指定的纯机械小修不为仪式另建 RFC；需求/取舍/跨面变化先有 Note。恢复时不重复已证实的步骤，也不将旧绿灯当现场；运行条件变动才补相应检查。收尾 = §12。
+三种分支都只读相关 Notes（包括 implemented / rejected 中仍有效的决定与约束），不扫全树。行动前确认结果、owner、范围和验收；用户指令定义目标和授权，合同定义预期，Note 解释取舍，实现与日志证明实际。发生冲突时查关联决定并做区分“实现缺陷/事实过期”的窄检查；关键需求或授权仍不明确时先问人。扩大范围或遇到未授权的关键选择，先确认。
 
-## 1. 落地：六步闭环
+**Plan Mode（D23 本仓政策）**：ROADMAP feature 条目默认先进入 Plan Mode 并用 `exit_plan_mode` 呈批，获批后按批准范围实施；用户已明确批准具体计划时不重复求批。明确授权的机械单步修正可直接做。需 Plan Mode 时用 `/plan` 进入；仅在模式中调用 `exit_plan_mode`。
 
-```text
-核对现场 → 判定窄 diff → 原子修改 owner 面 → 跑最小证据 → 沉淀 gate/Note → 只报告实际跑过的检查
-```
+## 1. 执行链：从授权到有证据交接
 
-1. **核对现场**：不信任记忆，先读当前的代码/文档/日志——权威只在外部可验证状态里。
-2. **判定窄 diff + 列任务**：动手前明确目标、受影响 owner 与验收；多步实施用 `todo_write` 列清单，完成即勾、人 steer 后重排。
-   简单单步可不建 todo；todo 是进度面，不能代替 Note 的决定与验证记录；不改与任务无关的内容。
-3. **原子修改 owner 面**：每个事实一个 owner——改 preset 行不动 host 行语义，改 pack 不动
-   vendor（`vendor/dsh/` 只读，簿记见 AGENTS.md）。
-4. **跑最小证据**：文档/结构跑 `pnpm verify`；逻辑先跑会捕获该回归的相关测试，TS 改动跑所属 typecheck；按 §9.1 补真实入口。跨面整治可跑本仓完整 keyless 回归，不因提交或推送机械重跑已通过且输入未变的检查。
-5. **沉淀**：门禁守住的事实进 docs/（只写 now），选择进 Note。
-6. **只报告实际跑过的检查；完成定义 = 该面最小"真检查"通过、发现权在代理一侧**（D15）：没跑的不算数。
-   配置/preset 类改动 → `node scripts/preset-smoke.mjs`（**真挂载**；dump/扫描不算证据）；客户端类
-   改动 → 查 boot 清单依赖闭环；`agent-instructions` 注入类改动 → `node scripts/handbook-smoke.mjs`
-   （断言指令基线 = `company-workspace/AGENTS.md`，未混入开发仓库那份）；**在让用户看 UI 之前，先用机器验证过**。把"你看一眼"当验收手段
-   正是宿主 [post-mortem 0003](../../vendor/dsh/docs/postmortem/0003-web-agent-gui-feedback-loop.md)
-   记的失败模式（delegated acceptance to the user）。本仓两次事故的复盘见
-   [`notes/postmortem/`](../../notes/postmortem/README.md)。
+§0.5 负责选任务、授权和解决事实冲突；这里从目标、owner 与验收明确后开始：
 
-交付形状：一次交付 = **完整垂直切片**——配置/代码 + 验证 + docs + Note 在同一 diff；
-proposed Note 在同一 diff 改写为 implemented，不留到交付后。
+1. **定切片**：点明本次改动、非目标与验收。多步任务用 `todo_write` 跟踪并随用户反馈调整；机械单步可省。
+2. **最窄实施**：只改拥有该事实的合同/实现，不顺手扩范围。`vendor/dsh/` 只读（见根 `AGENTS.md`）。
+3. **选证据**：运行能因本次回归失败的最窄检查，再按受影响面补真实入口；触发条件见 §9.1。静态结构检查不证明运行行为。
+4. **同步事实**：docs 只写当前合同；仅在出现新决定、约束或关键验证时新增/更新 Note。既有事实变化时更新其 owner，不复制全文到多处。
+5. **交接**：逐项报告已完成、未验证、未完成及其证据/下一步。ROADMAP 条目只有完成验收后才离队；只报告实际执行过的命令。
+
+完成定义是该面的最小真实检查通过（D15）；未跑的关键验收明确标缺口。按改动面选择检查与入口验证，细则唯一见 §9.1；结构检查不能替代运行验收。
+
+**交付记录**：feature 或非平凡变更同 diff 更新实现、当前合同、必要验证与 Note；机械单步只改事实 owner 并运行相关检查，不新建意图或 RFC。
 
 ## 2. 调试阶梯（组合层 → 会话层，不跳层）
 
@@ -152,7 +136,7 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibil
    `~/.dsh`（实测：不 source 直接 `echo $DSH_HOME` → `/Users/bowhead/.dsh`）。后果比"没设"更坏：
    脚本里"未设则报错"的那道防线**根本不触发**，会安静地拿日用 home 的会话库当输入。
    所以：**判据/审计类脚本要自己拒绝日用 home**。`preset/probe/handbook/delegation/client-load/presence-e2e` 六个 smoke 共用 `scripts/lib/runtime-home.mjs`，在启动前拒绝日用目录、重叠路径及其符号链接；
-   `deliverables-check` / `release-smoke` 原有守卫保留；`entry-probe` / `snapshot-motion` 尚未统一，不可推断全脚本已隔离。
+   `deliverables-check` / `release-smoke`、`entry-probe` / `snapshot-motion` 均在运行前调用 `requireDevHome`，拒绝缺失或与日用 home 重叠的路径；`sync-dsh --pin` 也要求隔离 home。守卫不涵盖未接入该 helper 的任意脚本，也不防守检查后的并发符号链接替换。
 6. **端口与实例隔离（部署事实）**：headless 形态（探针/动议）**无端口**——单次任务
    进程，stdout 出结果，日志落 `$DSH_HOME/sessions/`。web 形态（观察窗）起**本地**
    HTTP 端口（值见启动横幅）；因 `DSH_HOME` 指 dev home，它与日用 DSH 的 web 实例
@@ -333,20 +317,18 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 
 | 层 | 时间 | 跑什么 | 何时跑 |
 |---|---|---|---|
-| 结构 keyless | ~1s | `pnpm verify` | 每次改动 |
-| **单元/组件 keyless** | ~1s | `pnpm test`——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要 jsdom/浏览器） | 每次改动 |
-| 装配 keyless | ~10s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） | 客户端改动 |
-| 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） | 轮末 / **升 pin 时** |
-| **重放 lane（第三档，无 key）** | ~11s | `replay-smoke`（默认：会话日志 + sidecar 零 diff）；`--ui`（+真浏览器委派卡端到端）——**要起进程与浏览器但不花模型钱**，故只由 `scripts/replay-smoke.mjs` 驱动、不进 `pnpm test`（机械门禁见下） | replay/组合/委派卡改动 / 轮末 |
-| 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→boot 冒烟；合同 [release.md](../release.md)） | pack 依赖/发布面改动 / 轮末 |
-| 认证档（真模型） | 分钟级 | `preset-smoke` / `probe-smoke` / `handbook-smoke` / `presence-e2e-smoke` | **每轮一次**，产出归档；不进回归 |
+| 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接与物理行预算门禁） | 文档、链接、结构或流程合同改动 |
+| **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器） | 行为代码改变时选会因回归失败的最窄测试；跨面变更再扩大 |
+| 装配 keyless | ~10s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） | 客户端装配/入口改变，且接受条件涉及挂载 |
+| 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） | 委托边界改变或该验收明确要求；升 pin 时按发布合同复核 |
+| **重放 lane（第三档，无 key）** | ~11s | `replay-smoke`（会话日志 + sidecar；已声明 workspace oracle 的场景另比完整工作区）；`--ui`（+真浏览器端到端）——要起进程/浏览器，不进 `pnpm test` | 录制行为、组合、委派 UI 或 workspace replay 改动 |
+| 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../release.md)） | pack 依赖、安装形状、built 启动器改动；或其属于关键验收时 |
+| 认证档（真模型） | 分钟级 | 按面选择 `preset-smoke` / `probe-smoke` / `handbook-smoke` / `presence-e2e-smoke` | 改动影响相应真模型行为或验收要求认证时；不因“轮末/每轮”机械重跑 |
 
 **三条硬规矩**：
 
-1. **真模型 / 真浏览器不进迭代环**：迭代环只跑 `verify` + `test`（秒级）；分钟级一律"轮末一次"。
-   **这条有机械门禁**：`tests/layering.spec.ts` 扫 `tests/**`，出现 `node:child_process` / playwright /
-   `fetch(` / 密钥即红（已反证：塞一行 `import { spawn } from 'node:child_process'` 立刻变红）。
-   想测真入口 → 写 `scripts/*-smoke.mjs`，别塞进 `tests/`。**R5a 起另禁两条**（均双红证）：tests/
+1. **真模型 / 真浏览器不进迭代环的秒级回归档**：keyless 单测与结构检查保持快速；认证档仅在受影响面或验收要求时运行，不按“轮末/每轮”机械触发。需要真入口 → 写 `scripts/*-smoke.mjs`，别塞进 `tests/`。**这条有机械门禁**：`tests/layering.spec.ts` 扫 `tests/**`，出现 `node:child_process` / playwright /
+   `fetch(` / 密钥即红（已反证：塞一行 `import { spawn } from 'node:child_process'` 立刻变红）。**R5a 起另禁两条**（均双红证）：tests/
    不得 import `scripts/` 下的驱动脚本（`scripts/lib/` 纯逻辑库除外）；任何 vitest 配置不得把
    `scripts/` 编进测试发现——重放 lane 是第三档，只由 `scripts/replay-smoke.mjs` 驱动。
 2. **能做成纯函数就做成纯函数**：UI 组件把"展示事实"抽成纯函数（范本 `delegationCardModel`），
@@ -399,38 +381,19 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 [implemented/2026-09-22-team-assembly-and-rehearsal-split.md](../../notes/implemented/2026-09-22-team-assembly-and-rehearsal-split.md)
 环境状态节；清理按 etag `synthetic-from-store` 标记识别）。
 
-## 12. 条目收尾（程序之家，自 roadmap"轮次交接"迁入——D23/V5）+ 流程合同
+## 12. 记录与收尾
 
-**收尾在同 diff 内完成，缺一即未收尾**：
+按变更规模留下最少充分记录：
 
-1. docs 只写 now：本条目已成的事实迁进对应合同（00-index 合同出生地图 / 顶层合同）——随代码同 diff；
-2. `notes/implemented/` 记收尾 Note（模板见下）——下条会话判断"哪些已就绪"的证据入口；
-3. `notes/intents.md` 对应行改 implemented；
-4. 按 §1/§9.1 完成与改动匹配的验证，逐条记录命令、结果与覆盖；未跑的关键验收明确为缺口，不用扫描替代真入口、不用关键词替代语义审阅；通过且输入未变的检查不为 commit 重跑；
-5. **完成即离队**：队列里删掉该条目行（记录活在 Note + git；队列只写"接下来"）；
-6. 范围/顺序调整写回相关 Note；ROADMAP 只更新队列指针，不往历史维护段继续堆收尾记录。
+- 机械单步修正：更新事实 owner，跑相关检查；不新建 intent、RFC 或收尾 Note。
+- 非平凡决定/feature：相关 `notes/intents.md` 与 RFC/Note 随同变更更新；记录实际决定、关键取舍、跑过的验证与未完成项。
+- 完成 ROADMAP 条目：验收通过后删除队列行、更新状态指针；未完成项保留在队列并写清阻塞与下一步。不要把完成标记或过期环境状态堆回活动队列。
+- Note 只记录对后续决策、实施或复验仍有用的信息；实现事实变化时更新对应 `implemented/` Note，决定逆转另写并互链。过期或重复且不再指导行动的内容删除；保留有效约束、否决理由和可复用验证证据。
+- 交接说明范围、改动 owner、实际跑过的检查及结果、未验证/未完成项与下一步。仅记录会影响恢复的环境线索。
 
-**收尾 Note 模板**（沿用现有结构，补足 DSH Note 的决策信息）：头 = 日期 + 条目名 + 状态行；
-节 = ① Motivation（动机与外部可观察行为）② 交付（实际决定、输掉的方案、后果与约束，含 wire/config/API 影响）
-③ **实际跑过的验证**（命令 + 结果 + 范围；未跑项明确标出）④ **环境状态**（凭据/端口/进程/
-一次性文件——下条会话核对现场的线索，不代表永久就绪）⑤ 条目去向表（若源自提案）。
+**流程规则**：
 
-**流程合同（现在时；偏离必须登记，默认严格 DSH 套路）**：
-
-- **条目生命周期**：见 §0/§0.5；Plan Mode 的审阅与多步 todo 是反馈面，不是所有编辑的仪式前置。明确任务授权不因队列顺序失效；关键分叉仍须问人。
-- **偏离注册表**（每条 = 约束证据，镜像 DSH "require evidence for public choices"）：
-  无 GitHub 协作面 → 队列 + 同 diff 收尾替代 issue/PR 流；无 CI → 本地门禁代行（coverage 不设）；
-  中文单语；可由 fresh context 接手 → 既有 intents/00-index 导航（本仓保留的适配，DSH 以活树检索为主），
-  导航不代替相关 Note 与现场；无归档层（当前规模保留，不以目录少而跳过维护）；
-  中文硬换行（vendor 要求一物理行一段，本仓不迁）；快照时点 = 条目收尾归档（same-PR 等价物）。
-- **防再犯五件套**：① 全量纪律清单（vendor 逐源枚举，本表从 R6 枚举提炼；升 pin 时重校）；
-  ② 本偏离注册表；③ 机械门禁（verify：notes-links / doc-budget / layering / vendor 铁律…）；
-  ④ 入口探针（8 问 + coding 基线 + 引文核对；机器通过不等于语义通过）；⑤ 升 pin 提交流程复核证据，sync-dsh 只校验该证据字段与 SHA 绑定，不代替人/agent 逐条复核（见 release.md）。
-- **硬规矩**（自轮制平移）：竖切（一条目一可观察行为）/ 最窄验证 / 自动化轻任务（§10 三上限）/
-  完成定义 = 该面最小真检查（D15）。
-- **notes 层生命周期**：`proposed/` 落地后改写为实际决定并毕业 `implemented/`；`research/` 只留活研究，采纳后毕业并指向落点。开工按主题检索相关 Note；新 Note 先查替代关系，部分替代保留有效理由，否决理由仍有防复犯价值就保留。
-  **implemented 是活跃决策记忆，不是冻结历史**：路径/名称/默认值随实现更新，决定逆转新写 Note 并互链；明确归档才冻结且不作当前权威（[原生规则](../../vendor/dsh/.agents/notes/implemented/AGENTS.md)）。不以年龄或行数清除决策证据。
-- **实施期发现要留痕**：真页面 / 真模型发现的行为缺陷**登记回该条目的 RFC**（切片内或新增切片），
-  不许只活在 commit message 或待办清单里——否则"这个条目到底做了什么"就答不上来（无归属）。
-- **方向铁律**：打扫 = **净减少 + 信噪比提高**——每次整治收尾回答"文件数与总行数少了多少"；
-  处置优先序 = 删 > 并 > 修 > 记。
+- 任务入口、授权与 Plan Mode 适用条件唯一见 §0.5；多步任务的 todo 规则见 §1。
+- 默认遵循钉住的 DSH 纪律；vendor 原文是权威，本仓适配按 D 号记录约束与证据。根 `AGENTS.md` 只提供纪律落点索引，不是逐源清单。升 pin 时按 [release.md](../release.md) 重校流程合同。
+- 按改动面选择验证（§9.1）；结构门禁不替代运行验收。入口探针机器通过不等于语义审阅通过。
+- 文档卫生按指导价值：移除失效/重复指令与无行动价值的历史噪声；保留仍指导当前决策、解释约束或支持复验的证据。不以净减行数为目标（D26）。
