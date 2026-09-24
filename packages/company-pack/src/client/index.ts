@@ -17,6 +17,7 @@ import { createAttentionRegistry } from './attention-registry.ts'
 import { createCompanyView } from './CompanyView.tsx'
 import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from './company-tabs.tsx'
 import { CultivationTab } from './CultivationTab.tsx'
+import { LedgerTab } from './LedgerTab.tsx'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
 import { installStyles } from './styles.ts'
@@ -200,6 +201,8 @@ export async function apply(ctx: ClientContext): Promise<void> {
       '共享任务表：状态 / owner / 依赖 / 修订号', 55)
     registerType('dsh-company-pack/cultivation', 'company-cultivation', '培养',
       '养 Agent：journal 待审收件箱 + 提升流程', 56)
+    registerType('dsh-company-pack/ledger', 'company-ledger', '台账',
+      '动议台账：公司累计干了什么（日期/类型/参与/成品/结论）', 57)
 
     // 培养面板的文件读取闭包（驾驶舱④）：经会话身份读当前工作区；失败降级 null（面板如实显示）。
     const listJournal = async (sessionId: SessionId, role: string, signal: AbortSignal): Promise<readonly string[] | null> => {
@@ -214,6 +217,13 @@ export async function apply(ctx: ClientContext): Promise<void> {
     const readHead = async (sessionId: SessionId, path: string, signal: AbortSignal): Promise<string | null> => {
       try {
         const result = await scoped.remote.workspaceFiles.read(leadOf(sessionId), path, { limit: 240 }, signal)
+        if (!result.ok) return null
+        return result.value.text
+      } catch { return null }
+    }
+    const readLedger = async (sessionId: SessionId, signal: AbortSignal): Promise<string | null> => {
+      try {
+        const result = await scoped.remote.workspaceFiles.read(leadOf(sessionId), 'kb/motion-ledger.md', { limit: 240 }, signal)
         if (!result.ok) return null
         return result.value.text
       } catch { return null }
@@ -249,6 +259,9 @@ export async function apply(ctx: ClientContext): Promise<void> {
       scoped.slots.register(
         { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/cultivation', inject: () => ({ floatTab, listJournal, readHead }) },
         CultivationTab),
+      scoped.slots.register(
+        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/ledger', inject: () => ({ floatTab, readLedger }) },
+        LedgerTab),
     ])
   })
 

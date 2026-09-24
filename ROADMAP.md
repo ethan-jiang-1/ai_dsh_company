@@ -10,9 +10,6 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **呈现与叙事 · 经营仪表 + Demo 场景 D**（支柱 2 交错位，主轴 = 自用+演示并重；素材取自前两条目；
-  视觉打磨二期走查触发）：
-  [proposed/presentation-narrative](./notes/proposed/2026-09-24-presentation-narrative.md)。
 - ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；机械层已过——`deliverables-check` ALL PASS +
   r3 重录随手册完成；可后台派活不占轮）。
 - ⏸ **升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.1（触发型搁置，2026-09-24 晚用户改向后离队）**：材料全备于
@@ -269,3 +266,10 @@
   验收 = 两场 deliverables-check 0 违规 + demo.md 场景 D/E 分镜 + 当轮收敛（培养面板归 0）+ 快照归档。
   通道 D 记「可选未取」。观察项三条进磨清单（journal 缺口二犯 / 文件名自记日期漂移 / 换行不合规）。
   RFC 毕业即改写 → [implemented/new-motion-types](./notes/implemented/2026-09-24-new-motion-types.md)。
+- 2026-09-25（**凌晨 · 呈现与叙事销账〔goal 第八条，队列清空〕**）：切片一经营仪表——台账事实家
+  `kb/motion-ledger.md`（10 场动议，维护挂进当轮收敛）+ `LedgerTab` 页签（keyless 4/4 fixture 即生产
+  文件 + 真数据走查 10/10 PASS）；切片二叙事（demo 场景 D/E 分镜 + 快照）已随新动议条目交付，replay
+  场景化登记为触发型缺口；切片三视觉打磨二期触发型注册。**实施教训**：workspaceFiles.read 的 limit
+  是行数且有 maxLines 上限。RFC 毕业即改写 →
+  [implemented/presentation-narrative](./notes/implemented/2026-09-24-presentation-narrative.md)。
+  **至此 goal 队列八条目全部完成**（N1 → 驾驶舱①②③④ → 记忆收敛+培养3 → 新动议×2 → 呈现叙事）。
