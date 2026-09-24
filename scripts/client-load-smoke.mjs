@@ -18,6 +18,7 @@
 // 用法：source dev/env.sh && node scripts/client-load-smoke.mjs [--port 3092]
 import { spawn } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
+import { requireDevHome } from './lib/runtime-home.mjs'
 import { fileURLToPath } from 'node:url'
 import { launchChromium, loadChromium } from './lib/playwright.mjs'
 
@@ -30,9 +31,11 @@ const PORT = Number(arg('port', '3092'))
 const BRAND = 'DSH Wochen Team'
 const BOOT_TIMEOUT_MS = 120_000
 
-const home = process.env.DSH_HOME
-if (home === undefined || home === '') {
-  console.error('client-load-smoke: 需要 DSH_HOME（先 `source dev/env.sh`；双 home 纪律：别碰日用 ~/.dsh）')
+let home
+try {
+  home = requireDevHome('client-load-smoke')
+} catch (error) {
+  console.error(error.message)
   process.exit(2)
 }
 

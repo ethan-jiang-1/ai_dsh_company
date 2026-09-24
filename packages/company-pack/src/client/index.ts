@@ -43,8 +43,8 @@ const COMPANY_VIEW_ID = 'dsh-company-pack/company'
  * @param ctx - Client root context.
  */
 export async function apply(ctx: ClientContext): Promise<void> {
-  // 本包 client 面的样式表：挂载时一次性注入（S0 决定 = 注入式，不走 CSS Modules；见 styles.ts 头注）。
-  installStyles()
+  // CSS 与 fiber 同寿命；重新挂载读取新样式，卸载仅清理本次节点。
+  ctx.effect(installStyles)
 
   // 委派工具卡（R3）+ 团队工具卡（S2）：把 CEO 的命名委托与团队动作渲染成公司语义的卡。
   // keyed slot 的 key 域是**开放**的（槽合同原话："a typo simply never renders"），

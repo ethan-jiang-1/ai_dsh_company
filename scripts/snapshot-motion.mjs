@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 动议归档：把一场动议的会话日志（Lead + 其 teammate/child 会话）与工作区期望态录进 snapshots/。
+// 动议归档：会话日志 + workspace.actual 实测态；独立 oracle 仅从显式输入导入且永不覆盖。
 //
 // 形状沿用 R1（`snapshots/r1-motion/`）与 vendor `snapshots/AGENTS.md`：一场景一目录 + snapshot.yml；
 // replay harness 归 R5，当前用途是**基线对照**（行为变了就 diff 本目录）。
@@ -7,10 +7,14 @@
 // 用法：source dev/env.sh && node scripts/snapshot-motion.mjs \
 //         --session session-<lead-id> --out snapshots/r2-motion --motion "动议原文" [--cwd company-workspace]
 import { execFileSync } from 'node:child_process'
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { requireDevHome } from './lib/runtime-home.mjs'
+import { captureWorkspace } from './lib/workspace-oracle.mjs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+const { dump } = createRequire(new URL('../vendor/dsh/package.json', import.meta.url))('js-yaml')
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -22,17 +26,16 @@ const MOTION = arg('motion', '（未注明）')
 const CWD_REL = arg('cwd', 'company-workspace')
 // 场景名（R3 起可配）：探针类场景不是"动议"，别让 snapshot.yml 顶着 r2 的名字。
 const SCENARIO = arg('scenario', 'r2-five-role-motion')
-// 探针场景不改工作区：跳过 workspace.expected 拷贝（否则会把 R2 的交付物原样抄进来，噪声）。
+// --workspace-expected / --workspace-before 指向独立编写的完整树；不接受 live cwd 或符号链接。
+const EXPECTED_SOURCE = arg('workspace-expected')
+const BEFORE_SOURCE = arg('workspace-before')
+// 探针只跳过工作区采集，保留已有 oracle。
 const NO_WORKSPACE = process.argv.includes('--no-workspace')
 if (SESSION === undefined) {
   console.error('snapshot-motion: 需要 --session <session-id>')
   process.exit(2)
 }
-const home = process.env.DSH_HOME
-if (home === undefined || home === '') {
-  console.error('snapshot-motion: 需要 DSH_HOME（先 source dev/env.sh）')
-  process.exit(2)
-}
+const home = requireDevHome('snapshot-motion')
 
 const cwd = resolve(ROOT, CWD_REL)
 const slug = `-${cwd.replaceAll('/', '-')}--`
@@ -72,39 +75,27 @@ for (const [id, name] of members) {
   try { children.push({ id, name, jsonl: readSession(id) }) } catch { /* 未落盘：跳过 */ }
 }
 
+const workspace = captureWorkspace({
+  cwd, out: OUT, noWorkspace: NO_WORKSPACE,
+  expectedSource: EXPECTED_SOURCE === undefined ? undefined : resolve(ROOT, EXPECTED_SOURCE),
+  beforeSource: BEFORE_SOURCE === undefined ? undefined : resolve(ROOT, BEFORE_SOURCE),
+})
+
 rmSync(join(OUT, 'sessions'), { recursive: true, force: true })
 mkdirSync(join(OUT, 'sessions'), { recursive: true })
 writeFileSync(join(OUT, 'sessions', 'lead.jsonl'), leadJsonl)
 for (const child of children) writeFileSync(join(OUT, 'sessions', `${child.name}-${child.id}.jsonl`), child.jsonl)
 
-// 工作区期望态：交付物 + 各角色 journal（对照基线；record/refresh 不重写业务文件）。
-const expected = join(OUT, 'workspace.expected')
-if (NO_WORKSPACE) {
-  rmSync(expected, { recursive: true, force: true })
-} else {
-  rmSync(expected, { recursive: true, force: true })
-  mkdirSync(join(expected, 'kb'), { recursive: true })
-  cpSync(join(cwd, 'deliverables'), join(expected, 'deliverables'), { recursive: true })
-  for (const role of readdirSync(join(cwd, 'kb'))) {
-    const journal = join(cwd, 'kb', role, 'journal')
-    if (existsSync(journal)) cpSync(journal, join(expected, 'kb', role, 'journal'), { recursive: true })
-  }
-}
-
 const lines = (text) => text.split('\n').filter(line => line !== '').length
-writeFileSync(join(OUT, 'snapshot.yml'), `# 回归资产：录制会话（Lead + children）+ 工作区期望态（独立 oracle）。
-# 形状同 R1（snapshots/r1-motion/）；replay harness 归 R5，当前用途是基线对照。
-scenario: ${SCENARIO}
-recordedAt: ${new Date().toISOString().slice(0, 10)}
-profile: web
-agentPreset: ${lead.agentPreset ?? 'ceo'}
-cwd: ${CWD_REL}
-motion: ${MOTION}
-session:
-  lead: sessions/lead.jsonl        # ${String(lines(leadJsonl))} 行
-  children: sessions/              # ${String(children.length)} 个：${children.map(c => `${c.name}`).join(' / ') || '（无）'}
-workspace:
-  expected: ${NO_WORKSPACE ? '（本场景不改工作区，未录）' : 'workspace.expected/    # deliverables/ + kb/<role>/journal/'}
-`)
+writeFileSync(join(OUT, 'snapshot.yml'), dump({
+  scenario: SCENARIO,
+  recordedAt: new Date().toISOString().slice(0, 10),
+  profile: 'web',
+  agentPreset: lead.agentPreset ?? 'ceo',
+  cwd: CWD_REL,
+  motion: MOTION,
+  session: { lead: 'sessions/lead.jsonl', children: 'sessions/' },
+  workspace,
+}))
 console.log(`snapshot-motion: ${OUT}`)
 console.log(`  lead ${String(lines(leadJsonl))} 行；children ${String(children.length)} 个（${children.map(c => c.name).join(', ') || '无'}）`)

@@ -2,6 +2,7 @@
 
 | 日期 | 意图（动机 + 外部可观察行为） | 状态 |
 |---|---|---|
+| 2026-09-24 | 基础环境第一小步：保留原结构，强调 Notes 开工输入与决策证据；修正当前章程工具路径，并使六个 smoke 对日用 home 立即拒绝；更大流程调整暂不执行 | implemented → [implemented/2026-09-24-foundation-first-step.md](./implemented/2026-09-24-foundation-first-step.md) |
 | 2026-09-21 | 阶段 0 立环：repo 骨架可承载 docs 全部设计决定——`pnpm verify` 全绿、submodule 钉 tag、四 preset 结构就位 | implemented → [implemented/2026-09-21-repo-scaffolding.md](./implemented/2026-09-21-repo-scaffolding.md) |
 | 2026-09-21 | docs/ 分层重组：按性质（导航/设计/计划/指南/合同）不按时间；"初始意图"归 notes | implemented → [implemented/2026-09-21-docs-layering.md](./implemented/2026-09-21-docs-layering.md) |
 | 2026-09-21 | 开发环沉淀 + agent 直达：guides/60、00-index 外部材料登记与术语映射加 vendor 落点列、AGENTS.md 小修（含密钥节与探索路由补强）；FAQ 原文登记不复制 | implemented → [implemented/2026-09-21-dev-loop-guide.md](./implemented/2026-09-21-dev-loop-guide.md) |

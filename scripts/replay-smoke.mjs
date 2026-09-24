@@ -3,6 +3,7 @@
 //   --prepare     原始录制（replay/raw/，lead.jsonl + 任意名 child）→ 归一化 fixture
 //                 （session.v3.jsonl + session.<k>.v3.jsonl，child 按 header createdAt 排序）
 //                 + sidecar（system-prompt.expected.md / tool-schemas.expected.json；child 带 .k. 后缀）
+//   --refresh     headless authored 场景无 key 刷新会话/sidecar，完整 workspace oracle 必须先通过且永不重写。
 //   --record      场景组合（replay/cordis.yml，真模型认证档）下重录 → replay/raw/ → 顺带 prepare
 //   --ui          默认重放的全部检查 + 委派卡端到端（P1.3，r3-delegation 场景）：playwright
 //                 加载真页面 → 连接工作区 → 搜索打开 lead 会话 → 展开轮次组 → ariaSnapshot
@@ -31,6 +32,8 @@ import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, 
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { tmpdir } from 'node:os'
+import { createRequire } from 'node:module'
+import { compareWorkspace, seedWorkspace, workspaceOracle } from './lib/workspace-oracle.mjs'
 import {
   normalizeSessionLog,
   normalizeSessionSnapshots,
@@ -42,6 +45,7 @@ import { materializeProfilePatch } from '../vendor/dsh/packages/test-support/ses
 import { prepareSessionSnapshotFixtureForComparison } from '../vendor/dsh/packages/test-support/llm-replay/lib/index.js'
 import { launchChromium, loadChromium } from './lib/playwright.mjs'
 
+const { load } = createRequire(new URL('../vendor/dsh/package.json', import.meta.url))('js-yaml')
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -54,9 +58,16 @@ const RECORD = process.argv.includes('--record')
 const UI = process.argv.includes('--ui')
 const REFRESH_UI = process.argv.includes('--refresh-ui')
 const KEEP = process.argv.includes('--keep')
+const REFRESH = process.argv.includes('--refresh')
 const scenarioDir = join(ROOT, 'snapshots', SCENARIO)
 const replayDir = join(scenarioDir, 'replay')
 const rawLead = join(replayDir, 'raw', 'lead.jsonl')
+const metadata = load(readFileSync(join(scenarioDir, 'snapshot.yml'), 'utf8'))
+const oracle = workspaceOracle(scenarioDir, metadata)
+const HEADLESS = metadata.profile === 'headless'
+if (HEADLESS && (RECORD || UI || REFRESH_UI)) throw new Error('Headless workspace fixture supports keyless replay, --prepare, and --refresh only')
+if (HEADLESS && !oracle) throw new Error('Headless workspace replay requires workspace.final with before/expected trees')
+if (REFRESH && (!HEADLESS || RECORD || PREPARE)) throw new Error('--refresh supports only keyless headless replay')
 
 /**
  * 场景的 child 会话清单：`replay/raw/` 下除 lead 外的录制，按 header `createdAt` 排序
@@ -193,17 +204,53 @@ if (PREPARE) {
   process.exit(0)
 }
 
+// The headless lane uses the shipped CLI and keeps runtime files outside the complete workspace tree.
+async function driveHeadless({ patchSource, env, tasks }) {
+  if (tasks.length !== 1) throw new Error('Headless workspace replay requires one recorded user task')
+  const runParent = join(ROOT, 'dev/harness-home/replay-runs')
+  mkdirSync(runParent, { recursive: true })
+  const runRoot = mkdtempSync(join(runParent, `${SCENARIO}-`))
+  const workspace = join(runRoot, 'workspace')
+  try {
+    seedWorkspace(oracle.before, workspace)
+    const patch = materializeProfilePatch(patchSource, runRoot, runRoot, 0)
+    const replayEnv = { ...process.env, ...env, DSH_HOME: join(runRoot, '.dsh'), DSH_AGENTS_HOME: join(runRoot, '.agents'), DSH_PERMISSION_MODE: 'workspace-write' }
+    for (const key of Object.keys(replayEnv)) if (/KEY|SECRET|TOKEN|PASSWORD/i.test(key)) delete replayEnv[key]
+    const result = spawnSync(process.execPath, [join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js'), '--profile', 'headless', '--patch', patch, tasks[0]], {
+      cwd: workspace, env: replayEnv, encoding: 'utf8', timeout: WALL_MS, killSignal: 'SIGKILL', maxBuffer: 16 * 1024 * 1024,
+    })
+    if (result.error || result.status !== 0) throw new Error(`headless replay failed (${result.status}): ${result.error?.message ?? ''}\n${result.stderr}\n${result.stdout}`)
+    const logs = []
+    const walk = dir => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const path = join(dir, entry.name)
+        if (entry.isDirectory()) walk(path)
+        else if (/^session\.v\d+\.jsonl$/.test(entry.name)) logs.push(readFileSync(path, 'utf8'))
+      }
+    }
+    walk(join(runRoot, '.dsh/sessions'))
+    return { workspace, runRoot, parsed: logs.map(text => ({ text, header: headerOf(text) })), baseUrl: '' }
+  } catch (error) {
+    if (KEEP) console.log(`  （--keep：现场保留 ${runRoot}）`)
+    else rmSync(runRoot, { recursive: true, force: true })
+    throw error
+  }
+}
+
 // ── boot + 驱动 + 收割持久化会话（record 与 replay 共用）──
 async function driveScenario({ patchSource, env, tasks }) {
-  const workspace = mkdtempSync(join(tmpdir(), `dsh-replay-${SCENARIO}-`))
-  mkdirSync(join(workspace, '.dsh'), { recursive: true })
-  mkdirSync(join(workspace, '.agents'), { recursive: true })
-  cpSync(join(ROOT, 'company-workspace/AGENTS.md'), join(workspace, 'AGENTS.md')) // 公司手册 = 注入基线
-  const patchRoot = join(workspace, '.snapshot-patches')
+  if (HEADLESS) return driveHeadless({ patchSource, env, tasks })
+  const runRoot = mkdtempSync(join(tmpdir(), `dsh-replay-${SCENARIO}-`))
+  const workspace = oracle ? join(runRoot, 'workspace') : runRoot
+  mkdirSync(join(runRoot, '.dsh'), { recursive: true })
+  mkdirSync(join(runRoot, '.agents'), { recursive: true })
+  if (oracle) seedWorkspace(oracle.before, workspace)
+  else cpSync(join(ROOT, 'company-workspace/AGENTS.md'), join(workspace, 'AGENTS.md'))
+  const patchRoot = join(runRoot, '.snapshot-patches')
   mkdirSync(patchRoot, { recursive: true })
-  const patch = materializeProfilePatch(patchSource, workspace, patchRoot, 0)
+  const patch = materializeProfilePatch(patchSource, runRoot, patchRoot, 0)
   if (env.credentials) {
-    copyFileSync(env.credentials, join(workspace, '.dsh', '.credentials.yaml'))
+    copyFileSync(env.credentials, join(runRoot, '.dsh', '.credentials.yaml'))
     delete env.credentials
   }
   const child = spawn(process.execPath,
@@ -212,8 +259,8 @@ async function driveScenario({ patchSource, env, tasks }) {
       cwd: ROOT,
       env: {
         ...process.env,
-        DSH_HOME: join(workspace, '.dsh'),
-        DSH_AGENTS_HOME: join(workspace, '.agents'),
+        DSH_HOME: join(runRoot, '.dsh'),
+        DSH_AGENTS_HOME: join(runRoot, '.agents'),
         ...env,
         NODE_OPTIONS: [process.env.NODE_OPTIONS, '--disable-warning=ExperimentalWarning'].filter(Boolean).join(' '),
       },
@@ -275,7 +322,7 @@ async function driveScenario({ patchSource, env, tasks }) {
     }
     await sleep(2000)
     // 收割持久化会话
-    const sessionRoot = join(workspace, '.dsh', 'sessions')
+    const sessionRoot = join(runRoot, '.dsh', 'sessions')
     const files = []
     const walk = (dir) => {
       for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -294,7 +341,7 @@ async function driveScenario({ patchSource, env, tasks }) {
       // （r2 实证：4 child 的归一化比对全对不上行）。
       .sort((a, b) => ((a.header.parentSession ? 1 : 0) - (b.header.parentSession ? 1 : 0))
         || Number(a.header.createdAt ?? 0) - Number(b.header.createdAt ?? 0))
-    return { workspace, child, parsed, sessionId, url, baseUrl: base }
+    return { workspace, runRoot, child, parsed, sessionId, url, baseUrl: base }
   } catch (error) {
     child.kill('SIGTERM')
     throw error
@@ -310,7 +357,7 @@ if (RECORD) {
   const credentials = join(ROOT, 'dev/harness-home/.credentials.yaml')
   if (!existsSync(credentials)) { console.error('replay-smoke --record: 需要 dev home 凭据（真模型认证档）'); process.exit(2) }
   console.log(`--record：场景组合下重录（任务来源 ${basename(taskSource)}，真模型，${String(tasks.length)} 段）`)
-  const { workspace, child, parsed } = await driveScenario({
+  const { workspace, runRoot, child, parsed } = await driveScenario({
     patchSource: join(replayDir, 'cordis.yml'),
     env: { credentials },
     tasks,
@@ -343,7 +390,7 @@ if (RECORD) {
     writeSidecars(raws)
     console.log(`--record：录制 + fixture + sidecar 完成（1 lead + ${String(raws.length - 1)} child；lead ${String(records(raws[0]).length)} 行）`)
   } finally {
-    if (!KEEP) rmSync(workspace, { recursive: true, force: true })
+    if (!KEEP) rmSync(runRoot, { recursive: true, force: true })
   }
   process.exit(0)
 }
@@ -357,9 +404,11 @@ if (RECORD) {
  *              persona/手册/R3 委托工具已演进，重放忠实用当前组合 ⇒ 逐字节零 diff 必然红
  *              （那三类 diff 恰好是重放灵敏度的证据，不是缺陷）。组合漂移检测归 full 档场景。
  */
-const snapshotMeta = readFileSync(join(scenarioDir, 'snapshot.yml'), 'utf8')
-const JUDGES = /^replayJudges:\s*presence\s*$/m.test(snapshotMeta) ? 'presence' : 'full'
+const JUDGES = metadata.replayJudges === 'presence' ? 'presence' : 'full'
 console.log(`  判据档位 = ${JUDGES}（${SCENARIO}）`)
+const workspaceScope = oracle ? '完整 workspace 文件树（before → expected）' : '仅会话/读模型；workspace 未认证'
+console.log(`  范围 = ${workspaceScope}`)
+if (!oracle) console.log('  SKIP workspace：未声明 workspace.final: true + before/expected；历史 expected 归档不构成重放成功证据')
 const childFixtures = childRaws().map((_, index) => childFixture(index + 1))
 for (const p of [fixLead, ...childFixtures, join(replayDir, 'cordis.snapshot.yml')]) {
   if (!existsSync(p)) { console.error(`replay-smoke: 缺 ${p}（先 --record 或 --prepare）`); process.exit(2) }
@@ -600,12 +649,13 @@ async function runCockpitFlow(page) {
 }
 
 let workspace
+let runRoot
 let parsed = []
 let webChild
 let replayUrl = ''
 let replayBase = ''
 try {
-  ;({ workspace, parsed, child: webChild, url: replayUrl, baseUrl: replayBase } = await driveScenario({
+  ;({ workspace, runRoot, parsed, child: webChild, url: replayUrl, baseUrl: replayBase } = await driveScenario({
     patchSource: join(replayDir, 'cordis.snapshot.yml'),
     env: {
       DSH_SNAPSHOT: 'replay',
@@ -617,8 +667,21 @@ try {
     },
     tasks,
   }))
+  if (oracle) {
+    const differences = compareWorkspace(oracle.expected, workspace)
+    check('完整 workspace 文件树零 diff（missing/extra/content）', differences.length === 0, differences.join('; '))
+  }
   const expectedSessions = 1 + childFixtures.length
   check(`持久化会话数 = ${String(expectedSessions)}（lead + ${String(childFixtures.length)} child）`, parsed.length === expectedSessions, `实际 ${String(parsed.length)}${parsed.length !== expectedSessions ? `：${parsed.map(p => p.header.id).join(', ')}` : ''}`)
+  if (REFRESH) {
+    if (failures.length > 0) throw new Error('Refusing refresh after workspace/session failure')
+    const raws = parsed.map(p => p.text)
+    writeFileSync(rawLead, raws[0], 'utf8')
+    fixtures[0] = normalizeFixtures(raws)[0]
+    writeFileSync(fixLead, fixtures[0], 'utf8')
+    writeSidecars(raws)
+    console.log('  --refresh：keyless session + sidecars refreshed; independent workspace oracle untouched')
+  }
   if (parsed.length !== expectedSessions) {
     for (const p of parsed) {
       const counts = {}
@@ -746,10 +809,10 @@ try {
   webChild?.kill('SIGTERM')
   await sleep(300)
   if (KEEP) console.log(`  （--keep：现场保留 ${workspace ?? '(未建立)'}）`)
-  else if (workspace) rmSync(workspace, { recursive: true, force: true })
+  else if (runRoot) rmSync(runRoot, { recursive: true, force: true })
 }
 
 console.log(failures.length === 0
-  ? `\nreplay-smoke: ALL PASS（${SCENARIO} 无 key 重放${UI ? ` + ${SCENARIO === 'r2-motion' ? '驾驶舱' : '委派卡'}端到端` : ''}，${JUDGES === 'presence' ? 'member/task 集合等价 + 在场板同形' : '归一化零 diff'}，${String(Math.round((Date.now() - startedAt) / 1000))}s）`
+  ? `\nreplay-smoke: ALL PASS（${SCENARIO} 无 key 重放${UI ? ` + ${SCENARIO === 'r2-motion' ? '驾驶舱' : '委派卡'}端到端` : ''}，${JUDGES === 'presence' ? 'member/task 集合等价 + 在场板同形' : '归一化零 diff'}，${workspaceScope}，${String(Math.round((Date.now() - startedAt) / 1000))}s）`
   : `\nreplay-smoke: ${String(failures.length)} FAILURE(S)\n  ${failures.join('\n  ')}`)
 process.exit(failures.length === 0 ? 0 : 1)

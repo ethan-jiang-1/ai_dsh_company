@@ -15,6 +15,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { collectText, readRecords } from './lib/session-log.mjs'
 import { ensureRehearsalWorkspace, REHEARSAL_REL } from './lib/rehearsal.mjs'
+import { requireDevHome } from './lib/runtime-home.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const arg = (name, fallback) => {
@@ -27,7 +28,6 @@ const ROLES = arg('roles', 'ceo').split(',').map(role => role.trim()).filter(rol
 // `--cwd` 可显式覆盖。排练场的 AGENTS.md 是指向真盘手册的符号链接 ⇒ 注入基线仍是手册，
 // projectRootMarkers: [] ⇒ 指令链只认 cwd，不会向上混入开发仓库 AGENTS.md——断言语义不变。
 const CWD = resolve(arg('cwd', join(ROOT, REHEARSAL_REL)))
-if (!process.argv.includes('--cwd')) ensureRehearsalWorkspace(ROOT)
 const BOOT_TIMEOUT_MS = 120_000
 const BASELINE_TIMEOUT_MS = 120_000
 
@@ -36,11 +36,14 @@ const HANDBOOK_MARKERS = ['公司手册', '事实的家', '唯一事实家']
 /** 只可能来自**本仓开发用** AGENTS.md 的字符串——出现即说明 projectRoot 认到了仓库根。 */
 const DEV_REPO_MARKERS = ['vendor 铁律', 'pnpm verify', '双 home']
 
-const home = process.env.DSH_HOME
-if (home === undefined || home === '') {
-  console.error('handbook-smoke: 需要 DSH_HOME（先 `source dev/env.sh`；双 home 纪律：别碰日用 ~/.dsh）')
+let home
+try {
+  home = requireDevHome('handbook-smoke')
+} catch (error) {
+  console.error(error.message)
   process.exit(2)
 }
+if (!process.argv.includes('--cwd')) ensureRehearsalWorkspace(ROOT)
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 let rpcId = 0

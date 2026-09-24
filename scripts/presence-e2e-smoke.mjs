@@ -14,6 +14,7 @@
 // 用法：source dev/env.sh && node scripts/presence-e2e-smoke.mjs [--wall 600]
 import { spawn } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
+import { requireDevHome } from './lib/runtime-home.mjs'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -26,9 +27,11 @@ const POLL_MS = 2_000
 const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
 const BOOT_TIMEOUT_MS = 120_000
 
-const home = process.env.DSH_HOME
-if (home === undefined || home === '') {
-  console.error('presence-e2e-smoke: 需要 DSH_HOME（先 `source dev/env.sh`；双 home 纪律：别碰日用 ~/.dsh）')
+let home
+try {
+  home = requireDevHome('presence-e2e-smoke')
+} catch (error) {
+  console.error(error.message)
   process.exit(2)
 }
 

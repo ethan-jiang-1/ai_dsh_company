@@ -5,6 +5,7 @@ import { readFileSync, existsSync, lstatSync, readdirSync, readlinkSync } from '
 import { execFileSync } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { validateMarkdownLinks } from './lib/markdown-links.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const failures = []
@@ -31,40 +32,23 @@ for (const p of mdFiles) {
 }
 ok(`md-utf8/newline ×${mdFiles.length}`)
 
-// ── 2. 相对链接可解析（docs/ + 根部 AGENTS.md/ROADMAP.md + pack 文档） ─────────────
-let linkCount = 0
-const linkHolders = [...mdFiles.filter(p => p.startsWith(join(root, 'docs')) || p === join(root, 'AGENTS.md') || p === join(root, 'ROADMAP.md') || p.includes('company-pack'))]
-for (const p of linkHolders) {
-  const text = readFileSync(p, 'utf8')
-  for (const m of text.matchAll(/\]\((\.{1,2}\/[^)#\s]+)\)/g)) {
-    linkCount++
-    const target = resolve(dirname(p), m[1])
-    if (!existsSync(target)) fail('link', `${p} → ${m[1]}`)
-  }
+// ── 2. 当前源文档的 Markdown 引用：文件 + 标题锚点 + reference definitions ──────
+// 磁盘发现含未跟踪的新 Note；根部/docs/notes/pack + 公司手册/章程/org/templates。
+// 生成物、vendor 源、dev/snapshots、journal/deliverables、明确归档不作出链检查源。
+const links = validateMarkdownLinks(root)
+for (const v of links.violations) {
+  fail(v.file.startsWith('notes/') ? 'notes-link' : 'link', `${v.file}:${v.line} → ${v.url} (${v.reason})`)
 }
-ok(`md-links ×${linkCount}`)
+if (links.violations.length === 0) ok(`md-links (含 notes) ×${links.linkCount} / ${links.files.length} files`)
 
-// ── 2b. notes/ 树链接核验（W6 移交：notes/ 曾是 md-links 盲区，两条断链存活数月才被发现） ──
-// 与 2 同一规则（相对链接必须可解析），只是覆盖面扩到 notes/ 全树。
-let notesLinkCount = 0
-for (const p of mdFiles.filter(p2 => p2.startsWith(join(root, 'notes')))) {
-  const text = readFileSync(p, 'utf8')
-  for (const m of text.matchAll(/\]\((\.{1,2}\/[^)#\s]+)\)/g)) {
-    notesLinkCount++
-    const target = resolve(dirname(p), m[1])
-    if (!existsSync(target)) fail('notes-link', `${p} → ${m[1]}`)
-  }
-}
-ok(`notes-links ×${notesLinkCount}`)
-
-// ── 2c. 词数预算（缩编自 vendor `verify-doc-budgets`；防入口链继续膨胀——R6 D23/清单 B #52） ──
+// ── 2c. 行数预算（缩编自 vendor `verify-doc-budgets`；防入口链继续膨胀——R6 D23/清单 B #52） ──
 // 上限 = 当前值 + 余量；超限先搬（内容挪到该去的家）再压，确需空间才在 Note 里说明后升上限。
-const DOC_BUDGETS = [
+const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 115],            // 2026-09-23 二次收口（渐进披露）后 107 行；指针化内容住 release.md/00-index/guides/60
   ['docs/00-index.md', 145],     // 整治后 131
   ['docs/guides/60-dev-loop.md', 440], // 整治后 ~397
 ]
-for (const [rel, cap] of DOC_BUDGETS) {
+for (const [rel, cap] of DOC_LINE_BUDGETS) {
   const lines = readFileSync(join(root, rel), 'utf8').split('\n').length - 1
   lines <= cap
     ? ok(`doc-budget ${rel} (${lines}/${cap})`)

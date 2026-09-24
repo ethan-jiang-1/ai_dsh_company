@@ -1,0 +1,14 @@
+# Read-only coding-repository probe; never inherit the company-role preset.
+- id: sandbox-policy
+  config:
+    mode: read-only
+- id: approval
+  config:
+    policy: never
+- id: permission
+  config:
+    defaultPreset: entry-probe
+    presets:
+      entry-probe:
+        sandbox: read-only
+        approval: never

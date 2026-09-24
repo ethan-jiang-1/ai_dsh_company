@@ -1,5 +1,5 @@
 /**
- * 本包 client 面的样式表：挂载时一次性注入 `<style>`（幂等）。
+ * 本包 client 面的样式表：每次挂载注入自有 `<style>`，随 fiber dispose 移除。
  *
  * 为什么不是 CSS Modules（条目 ① S0 决定，2026-09-23）：本包 client 半的 tsdown 配置是手抄的
  * 关键产物契约（banner/footer/externals），**没有** vendor 那套 lightningcss 的 `x.module.css`
@@ -10,9 +10,6 @@
  * 动效复用 `--ds-ease-in-out` / `--ds-transition-duration[-fast|-slow]`，并给
  * `prefers-reduced-motion: reduce` 回退（官方惯例，vendor 内 28 个样式表已这么做）。
  */
-
-/** 注入点 id：同 id 只插一次（幂等；重复 apply 不会重复插）。 */
-const STYLE_ID = 'dsh-company-pack/client-styles'
 
 /** 本包 client 面的样式：S1 视图类名、S2 皮肤类名、S3 动效 keyframes 都加在这里。 */
 const CSS = `
@@ -298,14 +295,14 @@ const CSS = `
 `
 
 /**
- * 注入本包样式表（幂等；非浏览器环境静默跳过）。
- * @returns 无。
+ * 注入本次挂载拥有的样式表；非浏览器环境返回空清理函数。
+ * @returns 只移除本次注入节点的 disposer，交由 ctx.effect 管理。
  */
-export function installStyles(): void {
-  if (typeof document === 'undefined') return
-  if (document.getElementById(STYLE_ID) !== null) return
+export function installStyles(): () => void {
+  if (typeof document === 'undefined') return () => {}
   const style = document.createElement('style')
-  style.id = STYLE_ID
+  style.dataset.companyPack = 'styles'
   style.textContent = CSS
   document.head.append(style)
+  return () => style.remove()
 }

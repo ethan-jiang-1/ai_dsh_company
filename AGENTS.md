@@ -12,8 +12,8 @@ ROADMAP.md              根部队列（接下来 + 搁置池；▶ = 当前条�
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml（bundle 行）、src/client/（client 面：品牌皮肤）、src/（host 代码 R3+）
 company-workspace/      运行时"公司共享盘"（会话 cwd）：kb/<role>/（CHARTER+journal）、templates/、deliverables/
 vendor/dsh/             DSH 源码 submodule（钉 SHA，**只读铁律**：见 §vendor 铁律，`pnpm verify` 强制）
-docs/                   文档层：00-index（地图+决策台账+外部材料登记）→ design/ guides/ + 顶层合同
-notes/                  决策记录：intents.md → proposed/ → implemented/；事故复盘 postmortem/；外部研究 research/
+docs/                   当前合同与导航：00-index（地图+台账）→ design/ guides/ + 顶层合同
+notes/                  **开发记忆与证据链**：intents.md → proposed/ → implemented/；rejected/ 保留防复犯理由；postmortem/ 记事故；research/ 记仍在用的外部研究
 scripts/                verify.mjs（结构门禁）、preset-smoke.mjs（真入口冒烟）……
 dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）
 snapshots/              回归资产：r1/r2/r3/r4-motion + scenario-b（录制会话 + workspace.expected 独立 oracle）；replay harness R5a
@@ -24,6 +24,11 @@ snapshots/              回归资产：r1/r2/r3/r4-motion + scenario-b（录制�
 **条目状态不镜像进本文件**（root AGENTS.md 只收常设指令——vendor tier 表 "Status rots"；依据 =
 [research §十一](notes/implemented/2026-09-23-dsh-inround-task-surface.md)）。
 
+**`notes/` 是 DSH 开发流程的核心数据，不是可有可无的历史附件。** 开工先按条目/机制检索相关 Note，读决定、输掉的方案、约束与验证证据，再改代码；无需通读全树。
+非平凡变更同 diff 写/更新 Note，提案落地后改写为 `implemented/`；仅代码或聊天里的结论不算交接。
+`implemented/` 仍是活跃决策记忆：路径/名称/默认值随实现更新，决策逆转另写 Note 并互链；明确归档才冻结，不作当前权威。
+生命周期、读取触发与维护细则见 [开发环 §12](docs/guides/60-dev-loop.md)；原生定义见 [DSH Agent Notes](vendor/dsh/.agents/notes/README.md)。
+
 ## 命令表
 
 ```sh
@@ -33,7 +38,7 @@ pnpm install                           # workspace 解析；引导全配方（�
 source dev/env.sh                      # 双 home 兜底 + 裸 dsh 拦截（DSH_HOME=dev/harness-home）。⚠ coding 会话里
                                        #   DSH_HOME 继承且带日用值，漏 source 不报错、安静用错 home（guides/60 §6.5）
 pnpm verify                            # 结构门禁（UTF-8/链接/doc-budget/symlink/**vendor 铁律**/preset 结构/行依赖/client 两半/proposal 两则）
-pnpm test                              # keyless 回归（vitest，53 条 ≈0.3s；真模型/浏览器不进回归，tests/layering.spec.ts 守卫）
+pnpm test                              # keyless 回归（vitest；数量与耗时以实跑为准；真模型/浏览器不进回归，tests/layering.spec.ts 守卫）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）
 node scripts/preset-smoke.mjs          # preset 改动的完成定义：boot 真 web 逐角色建会话——挂载失败只有这里
                                        #   抓得到（dump/roster 看不见；需 DSH_HOME + 已装 pack）

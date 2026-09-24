@@ -21,7 +21,7 @@
 // 退出码：0 = 零违规；1 = 有违规（打印每条 code + path）。
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
-import { homedir } from 'node:os'
+import { requireDevHome } from './lib/runtime-home.mjs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { auditDeliverables, parseSessionLog } from './lib/deliverables.mjs'
@@ -71,18 +71,9 @@ function sessionLogs() {
     return { dirs: [dir], files: found }
   }
 
-  const home = process.env.DSH_HOME
-  if (home === undefined || home === '') {
-    console.error('deliverables-check: 需要 DSH_HOME（先 source dev/env.sh），或用 --sessions 指定明文日志目录')
-    process.exit(2)
-  }
-  // ⚠ fail-loud：`DSH_HOME` 指向**日用 home** 时必须拒绝。实测（R4）：在 DSH 的 coding 会话里
-  // `DSH_HOME` 是**有值的**（环境里带着 `~/.dsh`），所以"不设就报错"这道防线**挡不住**——漏 source
-  // 时脚本会安静地去审日用 home 的会话库（guides/60 §6.5 警告的那件事）。审的是哪份日志属于
-  // 判据的前提，猜错了整份结论都是假的，所以这里直接停。
-  const dailyHome = join(homedir(), '.dsh')
-  if (resolve(home) === resolve(dailyHome)) {
-    console.error(`deliverables-check: DSH_HOME 指向日用 home（${dailyHome}）——拒绝执行。\n  先 \`source dev/env.sh\`（把 DSH_HOME 切到 dev/harness-home），或用 --sessions 指定明文日志目录。`)
+  let home
+  try { home = requireDevHome('deliverables-check') } catch (error) {
+    console.error(`${error.message}；或用 --sessions 指定明文归档日志目录`)
     process.exit(2)
   }
   const sessionRoot = join(home, 'sessions', `-${workspace.replaceAll('/', '-')}--`)

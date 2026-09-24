@@ -27,6 +27,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { collectText, readRecords } from './lib/session-log.mjs'
 import { ensureRehearsalWorkspace, REHEARSAL_REL } from './lib/rehearsal.mjs'
+import { requireDevHome } from './lib/runtime-home.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const arg = (name, fallback) => {
@@ -40,14 +41,16 @@ const DELEGATE = process.argv.includes('--delegate')
 // 练习场 ≠ 运行场（轮间待办②）：默认 cwd 在排练场，排练/探针产物不再积进真盘；
 // `--cwd` 可显式覆盖（确需指回真盘时）。
 const CWD = resolve(arg('cwd', join(ROOT, REHEARSAL_REL)))
-if (!process.argv.includes('--cwd')) ensureRehearsalWorkspace(ROOT)
 const BOOT_TIMEOUT_MS = 120_000
 
-const home = process.env.DSH_HOME
-if (home === undefined || home === '') {
-  console.error('delegation-smoke: 需要 DSH_HOME（先 `source dev/env.sh`；双 home 纪律：别碰日用 ~/.dsh）')
+let home
+try {
+  home = requireDevHome('delegation-smoke')
+} catch (error) {
+  console.error(error.message)
   process.exit(2)
 }
+if (!process.argv.includes('--cwd')) ensureRehearsalWorkspace(ROOT)
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 let rpcId = 0
