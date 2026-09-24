@@ -7,11 +7,11 @@ import { describe, expect, it } from 'vitest'
  * 测试分层纪律的**机械门禁**（guides/60 §9.1，R3 立）。
  *
  * 起因（用户当轮反馈）："这种测试如果是 regression 的话，跑得这样慢是完全受不了的。"
- * 结论：按"要不要模型"分层——回归层（`pnpm test`）必须**秒级、无 key、无浏览器**；
- * 真模型/真浏览器一律进认证档（`scripts/*-smoke.mjs`），每轮跑一次。
+ * 结论：`pnpm test` 是秒级 keyless 单元/纯逻辑层；需要子进程的 CLI 集成检查放独立 smoke，
+ * 真模型/真浏览器才进认证档，均按改动面与验收要求运行。
  *
- * 散文会被忘掉，所以这里把它变成断言：**回归层里出现子进程 / playwright / fetch / 密钥，
- * 直接红。** 想测真入口 → 写认证档脚本，别塞进 tests/。
+ * 散文会被忘掉，所以这里把它变成断言：**Vitest spec 里出现子进程 / playwright / fetch / 密钥，
+ * 直接红。** 有副作用的 CLI 或真实入口检查 → 写 `scripts/*-smoke.mjs`，别塞进 tests/。
  */
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))

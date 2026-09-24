@@ -1,6 +1,5 @@
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { spawnSync } from 'node:child_process'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { captureWorkspace, compareWorkspace, seedWorkspace, workspaceOracle } from '../scripts/lib/workspace-oracle.mjs'
 
@@ -22,26 +21,6 @@ const tree = (name: string, text = 'unchanged\n') => {
 }
 
 describe('independent capture oracle', () => {
-  it('the snapshot CLI captures actual and preserves expected across no-workspace reruns', () => {
-    const cwd = tree('live', 'live')
-    const out = join(root, 'scenario')
-    tree('scenario/workspace.expected', 'independent')
-    const home = join(root, 'home')
-    const sessionDir = join(home, 'sessions', `-${cwd.replaceAll('/', '-')}--`, 'session-fixture')
-    mkdirSync(sessionDir, { recursive: true })
-    const compressed = spawnSync('zstd', ['-q', '-c'], { input: '{"type":"session","version":3,"agentPreset":"ceo"}\n' })
-    expect(compressed.status).toBe(0)
-    writeFileSync(join(sessionDir, 'session.v3.jsonl.zstd'), compressed.stdout)
-    const run = (extra: string[] = []) => spawnSync(process.execPath, [join(import.meta.dirname, '../scripts/snapshot-motion.mjs'), '--session', 'session-fixture', '--cwd', cwd, '--out', out, ...extra], { env: { ...process.env, DSH_HOME: home }, encoding: 'utf8' })
-    const captured = run()
-    expect(captured.status, captured.stderr).toBe(0)
-    expect(readFileSync(join(out, 'workspace.actual/nested/file.txt'), 'utf8')).toBe('live')
-    expect(readFileSync(join(out, 'snapshot.yml'), 'utf8')).toContain('final: false')
-    const skipped = run(['--no-workspace'])
-    expect(skipped.status, skipped.stderr).toBe(0)
-    expect(readFileSync(join(out, 'workspace.expected/nested/file.txt'), 'utf8')).toBe('independent')
-  })
-
   it('captures the complete live tree to actual while preserving legacy expected bytes', () => {
     const cwd = tree('live', 'live\n')
     const out = join(root, 'scenario')

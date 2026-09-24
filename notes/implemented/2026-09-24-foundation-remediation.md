@@ -1,6 +1,6 @@
 # 基石整治：Agent 入口链与执行链
 
-状态：implemented（完成基础入口链与执行链 Markdown 收敛；代码、测试与应用层未纳入）
+状态：implemented（完成入口/执行 Markdown 收敛，并修正 keyless 测试分层）
 
 ## 目标与范围
 
@@ -9,7 +9,7 @@
 - **入口 owner**：根 `AGENTS.md` 负责路由；`docs/00-index.md` 负责导航与决定适用范围；用户要求继续队列时，`ROADMAP.md` 是活动/暂停项的唯一调度家；相关 Note 与合同按任务主题读取。
 - **执行 owner**：`docs/guides/60-dev-loop.md` §0.5 定义任务分支与授权，§1 定义实施/验证/交接，§12 定义记录与收尾。
 - **当前授权规则**：feature 队列条目默认先 Plan Mode 呈批，获批后按范围实施；用户已批准具体计划时不重复求批；明确授权的机械单步可直接做。多步任务用 `todo_write`，简单单步可省。此为本仓适配；DSH 机制依据仍以钉住的 vendor 为准。
-- **范围外**：本轮不处理公司角色手册、上层应用/业务文档、代码、脚本、测试或 vendor。工作树中已有的相关改动保持原状，不据此 Note 接受、撤销或扩展。
+- **范围外**：不处理公司角色手册、业务内容、生产行为变更、真模型/浏览器认证或 vendor；本轮仅为保持 Vitest keyless 而把 CLI 集成检查移到独立 smoke。
 
 ## 验收
 
@@ -38,13 +38,14 @@
 - 执行规则集中在开发环 §0.5/§1/§12；Plan Mode feature 默认明确标为本仓政策，并区分获批计划和授权机械单步。
 - `git diff --check`：通过。
 - `pnpm verify`：通过（指南措辞同步后复跑）；含 Markdown 编码/换行、链接、文档预算与结构门禁。
-- `pnpm test`：曾实跑 158 项，156 通过、2 失败。一个是指南措辞断言与旧文案不符，文档已同步修正但未重跑；另一个是 `workspace-oracle.spec.ts` 的 CLI 子进程场景触发 `layering.spec.ts` 分层守卫，留待代码/测试工作授权后处理。
+- `pnpm test`：17 个 spec 文件、157 项全部通过。修正旧指南短语断言；CLI 子进程场景移出 Vitest，改由 `scripts/snapshot-motion-smoke.mjs` 覆盖，纯逻辑用例留在 `workspace-oracle.spec.ts`。
+- `pnpm exec vitest run tests/layering.spec.ts tests/workspace-oracle.spec.ts`：14 项通过；`node scripts/snapshot-motion-smoke.mjs`：通过。未运行真模型/浏览器认证。
 - `vendor/dsh` 保持 SHA `fb2c4b9e698e30edb738bca4cf0618587db7d203` 且工作树干净。
 
 ## 范围外
 
-公司角色/业务文档、代码、脚本、测试、vendor 与全仓应用历史均未纳入；工作树中已有的相关更改保持原状。
+公司角色/业务文档、生产行为、真模型/浏览器认证、vendor 与全仓应用历史未纳入；仅改测试分层和 snapshot-motion CLI smoke，以维持 Vitest keyless 约定。
 
 ## 交接边界
 
-本 Note 只结算基础 Markdown 流程，不认证工作树中未审查的代码、脚本、测试、运行环境或应用内容。`FOUNDATION-REMEDIATION.md` 是未跟踪的交接材料，按用户要求保持不提交；它不取代上述当前 owner。
+本 Note 记录基础流程 Markdown 与 keyless 测试分层收尾，不认证真模型/浏览器行为。
