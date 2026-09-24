@@ -2,6 +2,7 @@
 
 | 日期 | 意图（动机 + 外部可观察行为） | 状态 |
 |---|---|---|
+| 2026-09-25 | **驾驶舱② · 审批闸门（goal 第三条）**：org.md 双签线变机制停点——`request_signoff` 工具（`ctx.approval` 管线）+ CFO skill 触线触发；验收 = keyless 5/5 + 培养四门禁（probe 15/15）+ 总验收 e2e **7/7 全回路**（触线→asked→注意力面板 DOM→人批 allowed-once→同轮收口，`scripts/attention-e2e-smoke.mjs`）；实施期发现 = COO 失控编排（persona 纪律线修复）+ pack 双编译面拆分 + §7 构建配方更新 | implemented（RFC §切片二实施实况 + ROADMAP 维护记录 2026-09-25 凌晨行；commits `6a68f7d`+） |
 | 2026-09-25 | **驾驶舱① ·「需要你」注意力中心（goal 第二条）**：跨会话聚合四类等人状态（待答问询/待批审批/完成通知/升级待处理）+ 一键跳会话；实施期机制升级 = 问询/审批走 `ctx.remote.$on` 远端事件观察者（官方 waterfall 同款、只登记不拦截）；验收 = keyless 9/9 + client-load 零挂载 + 真模型挂起证据（tool/call 无 result、turn 保持打开）；面板 DOM 最后一跳归切片二 e2e | implemented（RFC §切片一实施实况 + ROADMAP 维护记录 2026-09-25 凌晨行；commit `97084f0`） |
 | 2026-09-24 | **N1 执行 · docs 全去编号（人裁方案 A，goal 第一条）**：7 文件改名 + 全仓 85 文件引用两遍改净 + 标题去前缀；顺手修 entry-probe 既有缺陷（prompt 未教转义内嵌双引号 ⇒ 非法 JSON，两轮 0/8 病根；13:44 旧 run 已失败但结果未被记录）并清掉探针报出的「四角色」残影两处；verify / test 157 / entry-probe（修后 8/8）全绿 | implemented → [implemented/2026-09-24-n1-docs-naming.md](./implemented/2026-09-24-n1-docs-naming.md) |
 | 2026-09-24 | **Note 生命周期吸纳（DSH sdlc-reference，用户令"点选吸纳、不推翻现有"）**：六条细则落 guides/dev-loop §12——状态行惯例 / 备选必载 / 毕业即改写 / 新增触发取代检查 / rejected 去留判据 / implemented 只跟事实；显式不吸纳四项（class 子目录 / archived 冻结树 / 去中心化 INDEX / 严格格式门禁）理由在案 | implemented → [implemented/2026-09-24-notes-lifecycle-absorption.md](./implemented/2026-09-24-notes-lifecycle-absorption.md) |

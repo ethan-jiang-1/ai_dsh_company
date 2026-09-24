@@ -331,7 +331,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 | **重放 lane（第三档，无 key）** | ~11s | `replay-smoke`（会话日志 + sidecar；已声明 workspace oracle 的场景另比完整工作区）；`--ui`（+真浏览器端到端）——要起进程/浏览器，不进 `pnpm test` | 录制行为、组合、委派 UI 或 workspace replay 改动 |
 | CLI 集成（keyless，需子进程） | 秒级 | `node scripts/snapshot-motion-smoke.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） | snapshot-motion CLI 或 workspace capture 接线改动 |
 | 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../release.md)） | pack 依赖、安装形状、built 启动器改动；或其属于关键验收时 |
-| 认证档（真模型） | 分钟级 | 按面选择 `preset-smoke` / `probe-smoke` / `handbook-smoke` / `presence-e2e-smoke` | 改动影响相应真模型行为或验收要求认证时；不因“轮末/每轮”机械重跑 |
+| 认证档（真模型） | 分钟级 | 按面选择 `preset-smoke` / `probe-smoke` / `handbook-smoke` / `presence-e2e-smoke` / `attention-e2e-smoke`（人机三节点全回路） | 改动影响相应真模型行为或验收要求认证时；不因“轮末/每轮”机械重跑 |
 
 **三条硬规矩**：
 

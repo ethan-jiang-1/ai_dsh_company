@@ -10,10 +10,6 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **驾驶舱② · 审批闸门**（已裁：闸 org.md 现行双签线——毛利 <30%/折扣 <9折 ⇒ CFO 触线请求审批；
-  `ctx.approval` + signoff 工具行，应答路径实施首步核实；**e2e 验收含面板 DOM 断言**——补切片一
-  登记的最后一跳缺口）：
-  同 [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片二。
 - **驾驶舱③ · 问询路径·乙**（已裁：独立 VP 会话加 `tool-ask-user` + 手册两模式；动议内中继显性化已
   并入①；teammate 无 preset 面，不碰承诺权）：
   同 [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片三。
@@ -250,3 +246,10 @@
   follow 流折算。验收：keyless 9/9（全套 166/166）+ client-load 真页面零挂载 + 真模型证据（CEO 挂起
   `ask_user_question`：tool/call 无 result、turn 保持打开——agent 真停等人，排练场跑）。**登记缺口**：
   面板 DOM 最后一跳归切片二 e2e；「不讲解也能看懂」走查留用户。RFC §切片一标注实施实况。
+- 2026-09-25（**凌晨 · 驾驶舱②审批闸门销账〔goal 第三条〕**）：`request_signoff` 工具（`ctx.approval`
+  管线，挂既有 `company-client` bundle 行；应答 = 官方 ui-approval 面板，无需自建 answerer）+ CFO
+  `project-economics` 触线触发 + keyless 5/5 + 培养四门禁（probe --full **15/15**）+ **总验收 e2e 7/7
+  全回路**（`scripts/attention-e2e-smoke.mjs` 固化为认证档：触线→审批→注意力面板 DOM〔切片一缺口
+  闭合〕→人批 allowed-once→同轮收口；截图归 snapshots/attention-e2e/）。**实施期两发现**：① COO 失控
+  编排（事实题办成团队动议，27 步单轮）→ persona「事实直答」纪律线修复；② pack 双编译面拆分
+  （host/client 类型增强冲突）+ §7 构建配方更新（`tsc -b`；不重建 lib = 代码改动永不生效的教训）。

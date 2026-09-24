@@ -42,7 +42,8 @@ node scripts/preset-smoke.mjs          # preset 改动的完成定义：boot 真
 
 其余门禁/冒烟脚本（`node scripts/<名>.mjs`；分层与何时跑 = guides/dev-loop §9.1，发布/升 pin = [release.md](docs/release.md)）：
 client-load（客户端装配，keyless）/ probe（连通档默认 ~6s）/ handbook（手册注入）/ delegation（汇报线边界）/
-presence-e2e（在场板链，真模型 ~$1）/ deliverables-check（三态审计，缺 DSH_HOME 自拒）/ snapshot-motion
+presence-e2e（在场板链，真模型 ~$1）/ attention-e2e（人机三节点全回路：触线→审批→面板→人批→继续，真模型+真浏览器 ~$1–2）/
+deliverables-check（三态审计，缺 DSH_HOME 自拒）/ snapshot-motion
 （动议归档，条目收尾）/ snapshot-motion-smoke（keyless CLI 集成检查）/ replay（无 key 重放）/ rehearsal-init（排练场）。web 观察窗 =
 `pnpm dsh web -- --port 3081 --no-open`（3080 是本 GUI 占用；构建三件事见 guides/dev-loop §7）。
 

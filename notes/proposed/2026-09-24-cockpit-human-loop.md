@@ -49,7 +49,7 @@ out-of-turn approval workflow is deferred"——审批闸门第一版设计在**
   （远端事件 → 面板行）未上浏览器断言——归切片二的 e2e 一并覆盖（该 e2e 本就需要审批出现在面板）；
   「不讲解也能看懂」走查留用户（发现问题的出口 = 视觉打磨二期条目）。
 
-## 切片二 · 审批闸门（公司签字线变机制停点）
+## 切片二 · 审批闸门（公司签字线变机制停点）【已实施 2026-09-25 凌晨】
 
 - **干什么**：`kb/org.md` 签字线接上 `ctx.approval`——需要签字的动作由 agent 主动请求审批；注意力中心
   显示待批项；人批完 agent 同轮继续。
@@ -57,15 +57,19 @@ out-of-turn approval workflow is deferred"——审批闸门第一版设计在**
   测算触线时、给出结论前请求审批。理由：规则是**现行的**（非发明）、多数真动议自然触发、CFO skill
   已算出这两个数、全链路（agent 请求 → 人批 → 同轮继续）可走通。落选：present 前闸（present 本就
   CEO 亲手做、人又是动议发起者——语义弱且每场多一道）；新增固定支出（触发面窄，要专门造动议才看得见）。
-- **机制形状**：pack 提供轻量 signoff 工具行（host 侧 consumer，内部 `ctx.approval.request()`）；
-  应答路径二选一、**实施第一步核实**——(a) web 出厂组合若已带人答 answerer（权限提示面）则直接用；
-  (b) 无则 pack 组合**公司 answerer**（路由表：签字线 → 收件人，v1 全路由唯一操作者，驾驶舱应答）。
-  工具行挂载面（bundle 全局 vs preset 行）同一步核实——teammate 必须看得见它（分镜 4 实证 teammate
-  有 fs 工具 ⇒ bundle 面可达 teammate 的假设待验证）。
-- **角色侧配套**：CFO `project-economics` 加触发词（"触双签线时先请求审批再落结论"）——内容改动走
-  培养验收四门禁。
-- **验收**：一场真动议中出现 `approval/asked`→`decided` 事件对（会话日志证据）+ 注意力中心显示 + 人批
-  后 agent 继续 + keyless 单测（签字线 → 审批请求映射的纯函数）。
+- **实施实况**：工具 = `request_signoff`（`src/index.ts` host 半注册；`src/lib/signoff.ts` 纯函数映射），
+  挂载面 = **既有 `company-client` bundle 行**（无需新行——r2-motion 实证 teammate 可见全局工具行）；
+  **应答路径 (a) 成立**——web bundle 自带官方 `ui-approval` 人答面板（`Allow once`/`Reject`），不需要
+  自建公司 answerer；事件对 `approval/asked`+`decided` 进会话日志；**迟连浏览器也能收到挂起审批**。
+- **验收实况**：keyless 单测 5/5（`tests/signoff.spec.ts`，全套 168）+ 培养四门禁全绿（verify / test /
+  preset-smoke / **probe --full 15/15**）+ **总验收 e2e 7/7 全回路**（`scripts/attention-e2e-smoke.mjs`，
+  真模型 + 真浏览器：触线 → asked → 注意力面板 DOM 显示〔切片一缺口闭合〕→ 人点 Allow once →
+  decided(allowed-once) → 同轮收口；截图 = `snapshots/attention-e2e/2026-09-25/`）。
+- **实施期两笔大发现（留痕）**：① **COO 失控编排**——知识探针三连超时，日志实证 COO 把事实题办成
+  整场团队动议（spawn×3 + 27 步单轮），修法 = COO persona 加「事实直答」纪律线（培养事件，探针修后
+  15/15）；② **pack 双编译面拆分**——host 代码把核心包 Context 类型增强拉进单程序会遮掉 client 面
+  sessions 类型，按 vendor 形态拆 tsconfig.host/client + solution root；连带 §7 构建配方更新与
+  「preset 内容即时生效 ≠ 代码面即时生效（不重建 lib = 改动永远不生效）」的实证教训。
 
 ## 切片三 · 问询路径（自裁：甲乙都做，作用域天然不重叠）
 
