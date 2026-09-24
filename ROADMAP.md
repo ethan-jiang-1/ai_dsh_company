@@ -10,9 +10,6 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **记忆收敛 + 培养轮 3**（经营深度第一步，人裁维持、顺位随驾驶舱线后移；46 篇 journal 首次全量收敛；
-  教训候选 C 载体分叉提请人裁；ent-agent-platform 排练场记忆定归宿）：
-  [proposed/memory-convergence-and-cultivation-r3](./notes/proposed/2026-09-24-memory-convergence-and-cultivation-r3.md)。
 - **新动议类型 ×2 · 季度经营会 + 事件复盘**（weekly-report 模板首次运转；通道 D 可选试炼；每场独立
   真跑 + 收口；兼任驾驶舱三节点的真实验证场）：
   [proposed/new-motion-types](./notes/proposed/2026-09-24-new-motion-types.md)。
@@ -262,3 +259,10 @@
   implemented**（[cockpit-human-loop](./notes/implemented/2026-09-24-cockpit-human-loop.md)）——
   人机三节点（通知 / 问询 / 审批）+ 人养 Agent 全部机制化。走查留痕：新建空会话不进侧栏树；工作区
   切换 = 树上组节点展开 + 既有公司动议会话作上下文。
+- 2026-09-25（**凌晨 · 记忆收敛+培养轮 3 销账〔goal 第六条〕**）：手册「轮末收敛」**首次执行**——
+  46 篇 journal 压进五 CHARTER「历史纪要」（同题复核系列合并成条、全文 100% 归档
+  memory-convergence-2026-09-25，git 记为干净 rename）；journal 清空 ⇒ 培养面板真实待审归 0；
+  **候选 C 引用两分法提升进手册「路由规矩」**（载体自裁：跨角色一行；证据随归档固化）；ent-agent-platform
+  归宿 = 教训提尽 + 六篇按角色前缀固化归档。验证 = verify / test 174 / deliverables-check 0 违规 /
+  handbook-smoke。执行留痕：历史纪要维护者亲自提取；起草子代理 30 分钟无产出中断弃用（教训）；
+  章程路径门禁拦下注记行反引号 journal/（改「」修复）。RFC 毕业即改写。

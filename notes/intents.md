@@ -2,6 +2,7 @@
 
 | 日期 | 意图（动机 + 外部可观察行为） | 状态 |
 |---|---|---|
+| 2026-09-25 | **记忆收敛 + 培养轮 3（goal 第六条）**：手册「轮末收敛」首次执行——46 篇 journal 全文归档（memory-convergence 快照，git 干净 rename）+ 五 CHARTER 落「历史纪要」（同题系列合并、结论宁保守勿演绎）+ journal 清空；候选 C 引用两分法提升进手册路由规矩（载体自裁跨角色一行）；验证 = verify / test 174 / deliverables-check 0 违规 / handbook-smoke | implemented → [implemented/2026-09-24-memory-convergence-and-cultivation-r3.md](./implemented/2026-09-24-memory-convergence-and-cultivation-r3.md)（含实施实况 + 执行方式留痕） |
 | 2026-09-25 | **驾驶舱④ · 培养面板 + 人机协作线毕业（goal 第五条）**：`remote.workspaceFiles` 数据面 + CultivationTab（journal 待审收件箱 +「怎么养」指引）；验收 = keyless 5/5（全套 173）+ client-load + 真数据走查 PASS（46 篇真 journal 如实进面板）；四切片全交付 ⇒ cockpit RFC 毕业到 implemented | implemented → [implemented/2026-09-24-cockpit-human-loop.md](./implemented/2026-09-24-cockpit-human-loop.md)（整线收尾 Note：四切片实况 + 验证资产 + 登记缺口） |
 | 2026-09-25 | **驾驶舱③ · 问询路径·乙（goal 第四条）**：四 VP preset 加 `tool-ask-user` + 手册「问人两条路」两模式（动议内升级 CEO / 独立会话直问）；机制修正 = teammate 面本就带 ask-user（r2-motion 实证），汇报线是内容层约束；验收 = 培养四门禁全绿（probe 15/15）+ 真模型证据（独立 VP-Eng 直问挂起） | implemented（RFC §切片三实施实况 + ROADMAP 维护记录 2026-09-25 凌晨行） |
 | 2026-09-25 | **驾驶舱② · 审批闸门（goal 第三条）**：org.md 双签线变机制停点——`request_signoff` 工具（`ctx.approval` 管线）+ CFO skill 触线触发；验收 = keyless 5/5 + 培养四门禁（probe 15/15）+ 总验收 e2e **7/7 全回路**（触线→asked→注意力面板 DOM→人批 allowed-once→同轮收口，`scripts/attention-e2e-smoke.mjs`）；实施期发现 = COO 失控编排（persona 纪律线修复）+ pack 双编译面拆分 + §7 构建配方更新 | implemented（RFC §切片二实施实况 + ROADMAP 维护记录 2026-09-25 凌晨行；commits `6a68f7d`+） |
