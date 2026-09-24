@@ -117,6 +117,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | `…/dual-home-isolation.md` | 双 home 机制、崩溃半径、迁移方向 | dev/env.sh；guides/60 §6 |
 | `…/research.md` | 第三方生态证据（peers/兼容矩阵/自包含/真实安装形状） | guides/60 §5 发布纪律时点；design/10 §8 |
 | `_digested/`（源码消化笔记） | DSH 源码机制笔记（= vendor 钉住 tag `dsh-v0.1.5-rc.2` 的审计基线） | design/10–40 的机制核对引文；**权威仍在 `vendor/dsh/` 本体** |
+| `_agent_ready_development/sdlc-reference/01-agent-note-lifecycle.md` | DSH Agent Note 生命周期（状态/路径/格式/取代/归档；基于上游 0.1.7-rc.1 树） | guides/60 §12 Note 生命周期细则 + [implemented/notes-lifecycle-absorption](../notes/implemented/2026-09-24-notes-lifecycle-absorption.md)（2026-09-24 点选吸纳六条） |
 
 ## 术语映射（本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达）
 

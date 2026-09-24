@@ -395,6 +395,21 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - Note 只记录对后续决策、实施或复验仍有用的信息；实现事实变化时更新对应 `implemented/` Note，决定逆转另写并互链。过期或重复且不再指导行动的内容删除；保留有效约束、否决理由和可复用验证证据。
 - 交接说明范围、改动 owner、实际跑过的检查及结果、未验证/未完成项与下一步。仅记录会影响恢复的环境线索。
 
+**Note 生命周期细则（2026-09-24 吸纳自 DSH Agent Note lifecycle，点选不推翻；取舍全录 =
+[notes/implemented/2026-09-24-notes-lifecycle-absorption.md](../../notes/implemented/2026-09-24-notes-lifecycle-absorption.md)）**：
+
+- **状态行**：`proposed/` / `implemented/` / `rejected/` 新写或再编辑的 Note 首部有「状态：」行，开头
+  即生命周期去向（proposed / implemented / 已消化…）；存量不回扫（`postmortem/`、`research/` 另有自身约定）。
+- **备选必载**：proposed RFC 记「输掉的方案」；决定类 Note 保留"它击败了什么"——没记录击败对象的决定
+  会重新引发争论（备选只记录、不编造）。
+- **毕业 = 正文改写**：`proposed → implemented` 不只挪文件——提案改写成现在时的已交付事实，删迁移计划
+  与未来时态，仍有维护价值的验收/风险写进「后果 / 验证」。
+- **新增 Note 触发取代检查**：落盘前搜同决定、同机制的既有 owner——完整取代：吸收独有理由后旧 Note
+  同 diff 删除；部分取代：双方保留互链并更新仍有效的事实。
+- **rejected 的去留**：只在仍能阻止一个可信错误时保留；防复犯价值消失即整篇删除。
+- **implemented 只跟事实**：随实现更新的只有路径、名称、结构等事实；决定被推翻时另写新 Note 互链，
+  不把旧文改写成相反。
+
 **流程规则**：
 
 - 任务入口、授权与 Plan Mode 适用条件唯一见 §0.5；多步任务的 todo 规则见 §1。

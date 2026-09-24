@@ -207,3 +207,9 @@
   N1 升队列首条、升 pin 转基座轮条目、教训候选 C 并入记忆收敛条目、snapshots 语义目录留 ⏸；
   四份新 RFC 落 proposed/。同日早些时候：基石整治收尾提交并推送（`da4405c`）；push 走显式 URL
   不更新 origin/master 引用（曾显 ahead-131、实为 5，push 后 fetch 即正——运维注意）。
+- 2026-09-24（**晚 · Note 生命周期吸纳**）：按用户令"点选吸纳、不推翻现有"，从外部参考
+  `01-agent-note-lifecycle`（DSH sdlc-reference）吸纳六条进 guides/60 §12（状态行惯例 / 备选必载 /
+  毕业即改写 / 新增触发取代检查 / rejected 去留 / implemented 只跟事实）；四项显式不吸纳（class
+  子目录 / archived 冻结树 / 去中心化 INDEX / 严格格式门禁）理由与取舍 =
+  [implemented/notes-lifecycle-absorption](./notes/implemented/2026-09-24-notes-lifecycle-absorption.md)；
+  材料登记进 00-index 外部研究表。
