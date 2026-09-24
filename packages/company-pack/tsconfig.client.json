@@ -1,0 +1,12 @@
+// Client 编译面：只编 src/client/** + src/lib/**（共享读模型）。
+// 与 host 面分叶的原因见 tsconfig.host.json 头注（Context 类型增强冲突，2026-09-25 实证）。
+{
+  "extends": "../../vendor/dsh/tsconfig.base.client.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types",
+    "tsBuildInfoFile": "lib/tsconfig.client.tsbuildinfo",
+    "paths": {}
+  },
+  "include": ["src/client", "src/lib"]
+}

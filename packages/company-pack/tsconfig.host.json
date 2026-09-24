@@ -1,0 +1,17 @@
+// Host 编译面（驾驶舱②起本包有了真正的 host 代码）：只编 src/index.ts + src/lib/**（共享读模型）。
+// ⚠ 必须与 client 面分开：host 面的依赖（dsh-tools / dsh-user-approval）会把核心包的
+// Context 类型增强（sessions: SessionStore）拉进程序，遮掉 client 面的 sessions 服务类型——
+// 单程序两者不可兼得（2026-09-25 实证），故按 vendor「双编译面」形态拆叶
+// （vendor packages/AGENTS.md 命名规则；范本 = experimental/inspector）。
+{
+  "extends": "../../vendor/dsh/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types",
+    "tsBuildInfoFile": "lib/tsconfig.host.tsbuildinfo",
+    // 清掉 vendor base 的 paths（它把 vendor 的 src 拉进本程序，会带出 vendored
+    // 包的内部类型错误）；改用 node_modules 里已构建的 lib/types 声明。
+    "paths": {}
+  },
+  "include": ["src/index.ts", "src/lib"]
+}

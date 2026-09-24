@@ -178,9 +178,13 @@ DSH_CLIENT_TITLE="DSH Wochen Team" pnpm --filter @deepseek-ai/dsh-web-frontend r
 source dev/env.sh && pnpm dsh plugin --profile web add link:./packages/company-pack          # dev 用 link:（内容改动即刻生效）；真实形状归 release-smoke
 pnpm dsh web -- --port 3081 --no-open                                      # 3080 是本 GUI 占用
 
-# pack 自己的 client 面（改了 src/client/** 才需要；产物进 lib/）：
-node ./node_modules/typescript/bin/tsc -p packages/company-pack/tsconfig.json
+# pack 代码面构建（改 src/** 任一面都需要——host〔src/index.ts+lib〕与 client〔src/client〕双编译面，
+# 2026-09-25 起 solution root；⚠ 旧命令 `tsc -p tsconfig.json` 在 solution root 上静默不构建，即此坑的由来）：
+node ./node_modules/typescript/bin/tsc -b packages/company-pack
 (cd packages/company-pack && ../../node_modules/.bin/tsdown)
+# ⚠ preset 内容与代码面不同步：link: 安装下改 presets/**（persona/skills）**即刻生效无需重建**，
+#   但 host/client 代码（src/**）走 lib/ 构建产物——**不重建 = 改动永远不生效**（2026-09-25 实证：
+#   verify 的 client-halves 门禁只查形状不构建，preset-smoke/client-load 全绿也可能验的是旧包）。
 # ⚠ 重装纪律（2026-09-22 更新）：dev profile 的 pack 已改 **`link:` 符号链接**——改 presets/**
 #   persona / skills 即刻生效，**无需重装**；只有改 pack 依赖或 bundle 行才需要
 #   `plugin --profile web remove` + `add`。profile 的 `.npmrc` 把 store/cache 钉在 repo 内

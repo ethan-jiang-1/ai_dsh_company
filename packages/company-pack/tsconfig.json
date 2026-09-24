@@ -1,13 +1,10 @@
+// Solution root：只引用两面（host + client），自身不编文件。
+// 构建 = `tsc -b packages/company-pack`（两叶都出 lib/types/**，共享 src/lib 双面编译、
+// 产物一致——vendor experimental/inspector 同形）。此后 host / client 任一面改动都要重建。
 {
-  "extends": "../../vendor/dsh/tsconfig.base.client.json",
-  "compilerOptions": {
-    "composite": false,
-    "incremental": false,
-    "rootDir": "src",
-    "outDir": "lib/types",
-    // 清掉 vendor base 的 paths（它把 vendor 的 src 拉进本程序，会带出 vendored
-    // 包的内部类型错误）；改用 node_modules 里已构建的 lib/types 声明。
-    "paths": {}
-  },
-  "include": ["src"]
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.host.json" },
+    { "path": "./tsconfig.client.json" }
+  ]
 }
