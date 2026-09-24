@@ -1,0 +1,100 @@
+/**
+ * 培养面板读模型（驾驶舱④切片四）：把各角色 journal 目录的清单与文件首段折成「待审收件箱」行。
+ *
+ * 数据面 = `remote.workspaceFiles`（list + read，浏览器经会话身份读自己工作区）——纯函数只消费
+ * 调用方喂进来的清单与文本。**待审语义**：journal/ 里的条目即待审素材——手册「轮末收敛」规则
+ *（人审后压进 CHARTER「历史纪要」、journal 只留当前轮）成立后天然准确；收敛未做时面板如实显示
+ * 全部存量（46 篇 = 46 篇待审，不撒谎）。keyless 单测 = `tests/cultivation.spec.ts`。
+ */
+
+/** 五角色（与 preset roster 一致）。 */
+export const CULTIVATION_ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'] as const
+
+/** 角色显示名（与在场板同口径）。 */
+const ROLE_LABELS: Readonly<Record<(typeof CULTIVATION_ROLES)[number], string>> = {
+  ceo: 'CEO',
+  'vp-eng': 'VP-Eng',
+  'vp-sales': 'VP-Sales',
+  coo: 'COO',
+  cfo: 'CFO',
+}
+
+/** 一条 journal 待审条目。 */
+export interface JournalEntry {
+  readonly role: string
+  /** 文件名（相对 journal/ 目录）。 */
+  readonly name: string
+  /** 一句话标题（文件首个标题或首行）。 */
+  readonly title: string
+}
+
+/** 面板一行：一个角色的待审收件箱。 */
+export interface CultivationRow {
+  readonly role: string
+  readonly label: string
+  /** 待审条目总数。 */
+  readonly count: number
+  /** 预览条目（文件名倒序前 3 条；排序依据见 {@link inboxRows} 注）。 */
+  readonly entries: readonly JournalEntry[]
+}
+
+/** 预览条数上限。 */
+export const PREVIEW_LIMIT = 3
+
+/** 标题截断上限。 */
+const TITLE_CLIP = 60
+
+/**
+ * 从 journal 文本提取一句话标题：优先首个 `#`/`##` 标题行，退回首段首个非空行；截断到
+ * {@link TITLE_CLIP} 字。空文本给「（空）」。
+ */
+export function journalTitle(text: string): string {
+  const lines = text.split('\n')
+  for (const line of lines) {
+    const heading = /^#{1,3}\s+(.+)$/.exec(line.trim())
+    if (heading !== null) {
+      const title = heading[1]!.trim()
+      if (title !== '') return clip(title)
+    }
+  }
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (trimmed !== '') return clip(trimmed)
+  }
+  return '（空）'
+}
+
+function clip(text: string): string {
+  return text.length <= TITLE_CLIP ? text : `${text.slice(0, TITLE_CLIP)}…`
+}
+
+/**
+ * 折面板行。
+ * @param listings - 每角色的 journal 文件名清单（只喂 `.md` 文件，目录由调用方过滤）。
+ * @param firstText - 已读取文件的首段文本（未读的条目标题降级为文件名）。
+ * @returns 每角色一行；清单缺角色给 0 条（面板如实显示"无待审"）。
+ *
+ * 排序注：listing 无 mtime，按**文件名倒序**近似"最新在前"——历史 journal 命名不定长，此排序
+ * 在「记忆收敛」条目把命名钉成日期前缀后即精确（衔接留痕，见 RFC §切片四）。
+ */
+export function inboxRows(
+  listings: Readonly<Record<string, readonly string[]>>,
+  firstText: Readonly<Record<string, string>>,
+): readonly CultivationRow[] {
+  return CULTIVATION_ROLES.map(role => {
+    const names = [...(listings[role] ?? [])].sort().reverse()
+    const entries = names.slice(0, PREVIEW_LIMIT).map(name => ({
+      role,
+      name,
+      title: firstText[`${role}/${name}`] !== undefined
+        ? journalTitle(firstText[`${role}/${name}`]!)
+        : name.replace(/\.md$/, ''),
+    }))
+    return {
+      role,
+      label: ROLE_LABELS[role] ?? role,
+      count: names.length,
+      entries,
+    }
+  })
+}

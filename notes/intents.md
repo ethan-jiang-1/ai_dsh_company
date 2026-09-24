@@ -2,6 +2,7 @@
 
 | 日期 | 意图（动机 + 外部可观察行为） | 状态 |
 |---|---|---|
+| 2026-09-25 | **驾驶舱④ · 培养面板 + 人机协作线毕业（goal 第五条）**：`remote.workspaceFiles` 数据面 + CultivationTab（journal 待审收件箱 +「怎么养」指引）；验收 = keyless 5/5（全套 173）+ client-load + 真数据走查 PASS（46 篇真 journal 如实进面板）；四切片全交付 ⇒ cockpit RFC 毕业到 implemented | implemented → [implemented/2026-09-24-cockpit-human-loop.md](./implemented/2026-09-24-cockpit-human-loop.md)（整线收尾 Note：四切片实况 + 验证资产 + 登记缺口） |
 | 2026-09-25 | **驾驶舱③ · 问询路径·乙（goal 第四条）**：四 VP preset 加 `tool-ask-user` + 手册「问人两条路」两模式（动议内升级 CEO / 独立会话直问）；机制修正 = teammate 面本就带 ask-user（r2-motion 实证），汇报线是内容层约束；验收 = 培养四门禁全绿（probe 15/15）+ 真模型证据（独立 VP-Eng 直问挂起） | implemented（RFC §切片三实施实况 + ROADMAP 维护记录 2026-09-25 凌晨行） |
 | 2026-09-25 | **驾驶舱② · 审批闸门（goal 第三条）**：org.md 双签线变机制停点——`request_signoff` 工具（`ctx.approval` 管线）+ CFO skill 触线触发；验收 = keyless 5/5 + 培养四门禁（probe 15/15）+ 总验收 e2e **7/7 全回路**（触线→asked→注意力面板 DOM→人批 allowed-once→同轮收口，`scripts/attention-e2e-smoke.mjs`）；实施期发现 = COO 失控编排（persona 纪律线修复）+ pack 双编译面拆分 + §7 构建配方更新 | implemented（RFC §切片二实施实况 + ROADMAP 维护记录 2026-09-25 凌晨行；commits `6a68f7d`+） |
 | 2026-09-25 | **驾驶舱① ·「需要你」注意力中心（goal 第二条）**：跨会话聚合四类等人状态（待答问询/待批审批/完成通知/升级待处理）+ 一键跳会话；实施期机制升级 = 问询/审批走 `ctx.remote.$on` 远端事件观察者（官方 waterfall 同款、只登记不拦截）；验收 = keyless 9/9 + client-load 零挂载 + 真模型挂起证据（tool/call 无 result、turn 保持打开）；面板 DOM 最后一跳归切片二 e2e | implemented（RFC §切片一实施实况 + ROADMAP 维护记录 2026-09-25 凌晨行；commit `97084f0`） |

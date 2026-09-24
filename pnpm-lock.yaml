@@ -151,6 +151,9 @@ importers:
       '@deepseek-ai/dsh-api-session-controller':
         specifier: workspace:*
         version: link:../../vendor/dsh/packages/api/session-controller
+      '@deepseek-ai/dsh-api-workspace-files':
+        specifier: workspace:*
+        version: link:../../vendor/dsh/packages/api/workspace-files
       '@deepseek-ai/dsh-client-ui-conversation':
         specifier: workspace:*
         version: link:../../vendor/dsh/packages/client/ui-conversation

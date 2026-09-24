@@ -1,6 +1,8 @@
 # 2026-09-24 · 驾驶舱·人机协作线：注意力中心 + 审批闸门 + 问询路径 + 培养面板
 
-状态：proposed（2026-09-24 晚主线改向后落盘；三个设计分叉**已自裁**〔依据用户指示：设计分叉默认自裁、仅真卡住才问人；各节含理由与落选方案〕；执行待"继续下一条"触发）
+状态：implemented（**四切片全交付 2026-09-25 凌晨**，goal 长程执行——各节「已实施」含实况与验证；
+三个设计分叉自裁记录见各节；验证资产 = `tests/attention|signoff|cultivation.spec.ts`（全套 173）+
+`scripts/attention-e2e-smoke.mjs`（认证档 7/7）+ 截图 `snapshots/attention-e2e/2026-09-25/`）
 
 ## 问题
 
@@ -89,13 +91,23 @@ out-of-turn approval workflow is deferred"——审批闸门第一版设计在**
 - **落选**：动议内也直问（毁单一对外口径，且 teammate 机制上无从挂）；只做甲（独立会话里 VP 反而
   不许问人，与体验矛盾）。
 
-## 切片四 · 培养面板（养 Agent 成为一等体验）
+## 切片四 · 培养面板（养 Agent 成为一等体验）【已实施 2026-09-25 凌晨】
 
-- **干什么**：驾驶舱加"培养"面——每角色：自上次人审以来的**新 journal 教训**（待审收件箱）、最近提升
-  的 skill、探针状态（上次 `probe --full` 结果）。让人审提升从后台任务变成驾驶舱日常动作。
-- **衔接**：已排队的「记忆收敛 + 培养轮 3」是其素材地基（收敛后 journal 只留当前轮，面板读"当前轮
-  未审条目"——收敛未做前面板先以 baseline 标记运行，不阻塞）。
-- **验收**：keyless 读模型（journal 差分 → 待审清单纯函数）+ client-load + 真 journal 数据渲染走查。
+- **干什么**：驾驶舱加"培养"面——每角色 journal 待审收件箱（"怎么养"三步指引随附），让人审提升从
+  后台任务变成驾驶舱日常动作。
+- **实施实况**：数据面 = `remote.workspaceFiles`（list + read 经会话身份读 `kb/<role>/journal/`），
+  交付 = `src/lib/cultivation.ts`（读模型）+ `CultivationTab`（页签 `company-cultivation`）；
+  **待审语义** = journal/ 存量即待审（收敛未做就如实全显——46 篇 = 46 篇，不撒谎）。**验收实况**：
+  keyless 5/5（全套 173）+ client-load 真页面零挂载 + **真数据走查 PASS**（真公司工作区会话上下文，
+  46 篇 journal 如实进面板：CEO 8 / VP-Eng 9 / VP-Sales 9 / COO 12 / CFO 8；截图
+  `snapshots/attention-e2e/2026-09-25/cultivation-panel.png`）。
+- **登记缺口（v1 不做，有数据面依据）**：「最近提升 skill」与「探针状态」住仓库侧（presets/ +
+  scripts/ 产物），浏览器数据面够不到——等 host 读面或收敛条目的标记约定再补。排序按文件名倒序
+  （listing 无 mtime）——「记忆收敛」把 journal 命名钉成日期前缀后即精确。
+- **走查实证留痕**：新建空会话不进侧栏树（搜索对空会话索引不稳）；工作区切换走树上组节点展开 +
+  既有公司动议会话作上下文（invest-mobile-complement 的会话，真会话真盘）。
+- **衔接**：「记忆收敛 + 培养轮 3」（队列下一条）落地后，journal 只留当前轮——面板即"当前轮未审"
+  的精确收件箱。
 
 ## 收件人模型（自裁）
 

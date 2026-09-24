@@ -6,6 +6,7 @@ import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
 import type {} from '@deepseek-ai/dsh-experimental-agent-team/remote'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-api-session-controller/client'
+import type {} from '@deepseek-ai/dsh-api-workspace-files/remote'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
@@ -15,6 +16,7 @@ import { AttentionTab } from './AttentionTab.tsx'
 import { createAttentionRegistry } from './attention-registry.ts'
 import { createCompanyView } from './CompanyView.tsx'
 import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from './company-tabs.tsx'
+import { CultivationTab } from './CultivationTab.tsx'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
 import { installStyles } from './styles.ts'
@@ -127,8 +129,9 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // 只有平台级 tab 才能被 `ctx.sidebarRight.float(tabId)` 拖出成浮窗（可移动/可缩放/最小 220×140/
   // 点击置顶），也才能被 split 并看（A1 决定）。原「公司驾驶舱」页签（R5b）与新的「在场」重复，
   // 按"一处事实一个家"合并：驾驶舱内容升级为「在场」页签（行可点 + 流式动态），旧 tab 退役。
-  // ⚠ remote 按命名空间 inject：`remote.agentTeams`（拉团队态）+ `remote.session`（follow 流）。
-  ctx.inject(['sessions', 'remote.agentTeams', 'remote.session', 'slots', 'sidebarRight', 'sidebarRightTabs'], (scoped) => {
+  // ⚠ remote 按命名空间 inject：`remote.agentTeams`（拉团队态）+ `remote.session`（follow 流）
+  //    + `remote.workspaceFiles`（培养面板读 kb/<role>/journal/）。
+  ctx.inject(['sessions', 'remote.agentTeams', 'remote.session', 'remote.workspaceFiles', 'slots', 'sidebarRight', 'sidebarRightTabs'], (scoped) => {
     const sessions = scoped.sessions
     /** 子代理会话归到它的 Lead：团队状态挂在 Lead 上。 */
     const leadOf = (sessionId: SessionId): SessionId => {
@@ -195,6 +198,26 @@ export async function apply(ctx: ClientContext): Promise<void> {
       '令牌用量与占比（只做令牌，不做美元）', 54)
     registerType('dsh-company-pack/tasks', 'company-tasks', '任务板',
       '共享任务表：状态 / owner / 依赖 / 修订号', 55)
+    registerType('dsh-company-pack/cultivation', 'company-cultivation', '培养',
+      '养 Agent：journal 待审收件箱 + 提升流程', 56)
+
+    // 培养面板的文件读取闭包（驾驶舱④）：经会话身份读当前工作区；失败降级 null（面板如实显示）。
+    const listJournal = async (sessionId: SessionId, role: string, signal: AbortSignal): Promise<readonly string[] | null> => {
+      try {
+        const result = await scoped.remote.workspaceFiles.list(leadOf(sessionId), `kb/${role}/journal`, signal)
+        if (!result.ok) return null
+        return result.value.entries
+          .filter(entry => entry.type === 'file' && entry.name.endsWith('.md'))
+          .map(entry => entry.name)
+      } catch { return null }
+    }
+    const readHead = async (sessionId: SessionId, path: string, signal: AbortSignal): Promise<string | null> => {
+      try {
+        const result = await scoped.remote.workspaceFiles.read(leadOf(sessionId), path, { limit: 240 }, signal)
+        if (!result.ok) return null
+        return result.value.text
+      } catch { return null }
+    }
 
     // keyed 槽体：与上面的类型共享同一 id；回调返回 disposer 数组（同工具卡那段写法）。
     // 「需要你」的注入面另有挂起项快照（apply 登记处）与 sessions.open 跳转。
@@ -223,6 +246,9 @@ export async function apply(ctx: ClientContext): Promise<void> {
       scoped.slots.register(
         { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/tasks', inject: () => ({ load, follow, floatTab }) },
         TasksTab),
+      scoped.slots.register(
+        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/cultivation', inject: () => ({ floatTab, listJournal, readHead }) },
+        CultivationTab),
     ])
   })
 

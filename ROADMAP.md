@@ -10,8 +10,6 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **驾驶舱④ · 培养面板**（每角色待审 journal 收件箱 + 最近提升 skill + 探针状态；素材衔接记忆收敛）：
-  同 [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片四。
 - **记忆收敛 + 培养轮 3**（经营深度第一步，人裁维持、顺位随驾驶舱线后移；46 篇 journal 首次全量收敛；
   教训候选 C 载体分叉提请人裁；ent-agent-platform 排练场记忆定归宿）：
   [proposed/memory-convergence-and-cultivation-r3](./notes/proposed/2026-09-24-memory-convergence-and-cultivation-r3.md)。
@@ -221,7 +219,7 @@
   请求轮内有效，跨轮审批上游 deferred）/ 通知可从会话事件推导（r2-motion 五份日志均含相关事件字样，
   精确形状切片一实证）——**驾驶舱线不需要升 pin**。
 - 2026-09-24（**晚 · 驾驶舱线 RFC 落盘**）：
-  [proposed/cockpit-human-loop](./notes/proposed/2026-09-24-cockpit-human-loop.md) 四切片进队列
+  [proposed/cockpit-human-loop](./notes/implemented/2026-09-24-cockpit-human-loop.md) 四切片进队列
   （①注意力中心 / ②审批闸门 / ③问询路径 / ④培养面板），三个待裁点写进 RFC（审批闸哪个动作 /
   问询路径甲乙 / 收件人模型）；既有条目顺位后移（记忆收敛+培养3、新动议 ×2 兼任驾驶舱验证场、
   呈现叙事殿后）。落盘后停笔待用户 review。
@@ -230,7 +228,7 @@
   RFC）；②问询路径甲乙都做且作用域不重叠（甲 = 动议内升级中继，并入注意力中心第四类条目；乙 = 独立
   VP 会话加 ask-user——teammate 本无 preset 工具面，故不碰动议内承诺权）；③收件人模型 v1 单操作者 +
   owner 字段 + answerer 路由表形状。取舍全文 =
-  [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) 各节。执行转入长程 goal（用户令）。
+  [RFC](./notes/implemented/2026-09-24-cockpit-human-loop.md) 各节。执行转入长程 goal（用户令）。
 - 2026-09-24（**晚 · N1 执行销账〔goal 第一条〕**）：方案 A 落地——7 文件改名 + 85 文件引用两遍改净 +
   标题去前缀；verify（md-links ×321）/ test 157 项全绿。**两笔顺手账**：① entry-probe 既有缺陷修复
   （prompt 未教转义内嵌双引号 ⇒ 非法 JSON；13:44 旧 run 已 0/8 但结果没被记录——门禁"立了没真跑"的
@@ -256,3 +254,11 @@
   （probe --full 15/15，ceo#1 一次并发抖动重试过）+ 真模型证据（独立 VP-Eng 直问挂起、turn 保持
   打开）。承诺权与单一对外口径不动（R3/D18 维持）。观察项：探针默认 90s 超时偏紧（coo#2 / ceo#1
   两例并发抖动）。
+- 2026-09-25（**凌晨 · 驾驶舱④培养面板销账 + 人机协作线毕业〔goal 第五条，驾驶舱线收官〕**）：
+  `remote.workspaceFiles`（list/read）数据面 + `src/lib/cultivation.ts` + `CultivationTab`（页签
+  `company-cultivation`）——每角色 journal 待审收件箱 +「怎么养」三步指引；v1 登记缺口 = 最近提升
+  skill / 探针状态（仓库侧数据，浏览器面够不到）。验收 = keyless 5/5（全套 173）+ client-load +
+  **真数据走查 PASS**（46 篇真 journal 如实进面板，截图归档）。**四切片全交付 ⇒ RFC 毕业到
+  implemented**（[cockpit-human-loop](./notes/implemented/2026-09-24-cockpit-human-loop.md)）——
+  人机三节点（通知 / 问询 / 审批）+ 人养 Agent 全部机制化。走查留痕：新建空会话不进侧栏树；工作区
+  切换 = 树上组节点展开 + 既有公司动议会话作上下文。
