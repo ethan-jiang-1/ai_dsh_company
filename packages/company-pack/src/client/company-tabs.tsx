@@ -34,15 +34,24 @@ export type PresenceTabProps = CompanyTabProps & {
 }
 
 /**
+ * 页签体共用外框需要的最小 props（`useTabInfo` + 浮出操作）——「需要你」页签（AttentionTab）
+ * 复用同一外框，故收窄成独立接口导出（结构上 CompanyTabProps 天然满足）。
+ */
+export interface PanelFrameProps {
+  readonly useTabInfo: CompanyTabProps['useTabInfo']
+  readonly floatTab: (tabId: TabId) => void
+}
+
+/**
  * 页签体共用外框：标题 + 刷新说明 + **「浮出」** + 内容。
  *
  * 「浮出」走平台服务 `float(tabId)`（tabId 由 `useTabInfo()` 给）——浮窗的移动（grip）、缩放
  * （`data-dockkit-float-resize`，最小 220×140 钳制）、置顶、**收回（浮窗自带的 dock 按钮）**
  * 全部是平台能力，我们不自造窗口管理（D13）。
  */
-function PanelFrame({ title, tabProps, children }: {
+export function PanelFrame({ title, tabProps, children }: {
   readonly title: string
-  readonly tabProps: CompanyTabProps
+  readonly tabProps: PanelFrameProps
   readonly children: ReactNode
 }) {
   const info = tabProps.useTabInfo()

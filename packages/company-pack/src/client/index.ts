@@ -11,6 +11,8 @@ import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import { WocheBrandName } from './Brand.tsx'
+import { AttentionTab } from './AttentionTab.tsx'
+import { createAttentionRegistry } from './attention-registry.ts'
 import { createCompanyView } from './CompanyView.tsx'
 import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from './company-tabs.tsx'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
@@ -45,6 +47,44 @@ const COMPANY_VIEW_ID = 'dsh-company-pack/company'
 export async function apply(ctx: ClientContext): Promise<void> {
   // CSS 与 fiber 同寿命；重新挂载读取新样式，卸载仅清理本次节点。
   ctx.effect(installStyles)
+
+  // 驾驶舱①·「需要你」：挂起项登记处（apply 闭包内创建——client 纪律禁模块级单例）。
+  // 观察者写入 / 页签读取共享同一实例。
+  const attention = createAttentionRegistry()
+
+  // 驾驶舱①·远端事件观察者（跨会话、实时）：user-questions/request（待答问询）与
+  // approval/request（待批审批；切片二落地前不会触发，管线先行）。⚠ 只登记、**永远委托**
+  // （next()）——本监听者是观察者不是应答者，真应答走官方 ui-user-questions / ui-approval
+  // 的 waterfall；this = 事件归属 owner ctx，scopeOf → 发起会话（同款 ui-approval 手法）。
+  ctx.inject(['sessions', 'remote'], (scoped) => {
+    scoped.remote.$on('user-questions/request', function (request, next) {
+      const sessionId = scoped.sessions.scopeOf(this)
+      if (sessionId === undefined) return next()
+      const first = request.questions[0]
+      const done = attention.begin({
+        kind: 'question',
+        sessionId,
+        what: typeof first?.question === 'string' && first.question.trim() !== ''
+          ? first.question.trim()
+          : '（问询内容缺失）',
+        since: Date.now(),
+      })
+      return (async () => { try { return await next() } finally { done() } })()
+    })
+    scoped.remote.$on('approval/request', function (request, next) {
+      const sessionId = scoped.sessions.scopeOf(this)
+      if (sessionId === undefined) return next()
+      const done = attention.begin({
+        kind: 'approval',
+        sessionId,
+        what: typeof request.reason === 'string' && request.reason.trim() !== ''
+          ? `${request.toolName}：${request.reason.trim()}`
+          : request.toolName,
+        since: Date.now(),
+      })
+      return (async () => { try { return await next() } finally { done() } })()
+    })
+  })
 
   // 委派工具卡（R3）+ 团队工具卡（S2）：把 CEO 的命名委托与团队动作渲染成公司语义的卡。
   // keyed slot 的 key 域是**开放**的（槽合同原话："a typo simply never renders"），
@@ -143,6 +183,8 @@ export async function apply(ctx: ClientContext): Promise<void> {
       }), `company-pack: ${kind} tab type`)
     }
 
+    registerType('dsh-company-pack/attention', 'company-attention', '需要你',
+      '注意力中心：谁在等你（问询/审批/升级）+ 刚完成', 50)
     registerType('dsh-company-pack/board', 'company-board', '看板',
       '任务看板：活到哪一步（owner / 依赖 / 修订号）', 51)
     registerType('dsh-company-pack/dag', 'company-dag', '依赖图',
@@ -155,7 +197,17 @@ export async function apply(ctx: ClientContext): Promise<void> {
       '共享任务表：状态 / owner / 依赖 / 修订号', 55)
 
     // keyed 槽体：与上面的类型共享同一 id；回调返回 disposer 数组（同工具卡那段写法）。
+    // 「需要你」的注入面另有挂起项快照（apply 登记处）与 sessions.open 跳转。
     scoped.slots.inject('sidebar.right.pane.tab', () => [
+      scoped.slots.register(
+        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/attention', inject: () => ({
+          follow,
+          floatTab,
+          getPending: () => attention.list(),
+          openSession: (sessionId: SessionId) => { scoped.sessions.open(sessionId) },
+          leadOf,
+        }) },
+        AttentionTab),
       scoped.slots.register(
         { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/board', inject: () => ({ load, follow, floatTab }) },
         BoardTab),
