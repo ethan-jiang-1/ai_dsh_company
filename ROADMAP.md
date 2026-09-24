@@ -10,9 +10,6 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **新动议类型 ×2 · 季度经营会 + 事件复盘**（weekly-report 模板首次运转；通道 D 可选试炼；每场独立
-  真跑 + 收口；兼任驾驶舱三节点的真实验证场）：
-  [proposed/new-motion-types](./notes/proposed/2026-09-24-new-motion-types.md)。
 - **呈现与叙事 · 经营仪表 + Demo 场景 D**（支柱 2 交错位，主轴 = 自用+演示并重；素材取自前两条目；
   视觉打磨二期走查触发）：
   [proposed/presentation-narrative](./notes/proposed/2026-09-24-presentation-narrative.md)。
@@ -266,3 +263,9 @@
   归宿 = 教训提尽 + 六篇按角色前缀固化归档。验证 = verify / test 174 / deliverables-check 0 违规 /
   handbook-smoke。执行留痕：历史纪要维护者亲自提取；起草子代理 30 分钟无产出中断弃用（教训）；
   章程路径门禁拦下注记行反引号 journal/（改「」修复）。RFC 毕业即改写。
+- 2026-09-25（**凌晨 · 新动议 ×2 销账〔goal 第七条，两场真跑〕**）：**季度经营会** 241s（CFO/COO 主角
+  零 VP；Q3 总判「判不了」+ Q4 三条补件 + 新口径出台；**收敛后首场 = 历史纪要回环闭合**）；
+  **事件复盘** 100s（场景 B 续集；**Q3 新口径首次实战 = 跨动议组织记忆生效**；根因区分已证实/待验证）。
+  验收 = 两场 deliverables-check 0 违规 + demo.md 场景 D/E 分镜 + 当轮收敛（培养面板归 0）+ 快照归档。
+  通道 D 记「可选未取」。观察项三条进磨清单（journal 缺口二犯 / 文件名自记日期漂移 / 换行不合规）。
+  RFC 毕业即改写 → [implemented/new-motion-types](./notes/implemented/2026-09-24-new-motion-types.md)。
