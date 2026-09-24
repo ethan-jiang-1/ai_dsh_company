@@ -10,22 +10,32 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **N1 执行 · 方案 A 全去编号**（2026-09-24 晚人裁 A；机械 commit，先于基座轮——避免新 RFC 引用旧路径双改）：
+- **N1 执行 · 方案 A 全去编号**（2026-09-24 晚人裁 A；机械 commit，排首位——避免后续 RFC 引用旧路径双改）：
   [proposed/n1-docs-naming](./notes/proposed/2026-09-24-n1-docs-naming.md) §方案 A + §验收。
-- **基座轮 · 升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.1 + 能力收割审计**（人裁：增量报告确认风险后执行；
-  前置 = 报告落 `notes/research/`；兼做搁置池五条复活复查）：
-  [proposed/pin-upgrade-and-harvest](./notes/proposed/2026-09-24-pin-upgrade-and-harvest.md)。
-- **记忆收敛 + 培养轮 3**（支柱 1「经营深度」第一步，主线人裁；46 篇 journal 首次全量收敛；
+- **驾驶舱① ·「需要你」注意力中心**（主线头号：跨会话聚合三类等人状态——待答问询 / 待批审批 / 完成
+  通知，一键跳会话）：
+  [proposed/cockpit-human-loop](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片一。
+- **驾驶舱② · 审批闸门**（org.md 签字线接 `ctx.approval` + pack 组合公司 answerer；**闸哪个动作待裁**）：
+  同 [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片二。
+- **驾驶舱③ · 问询路径**（VP 问人**分叉待裁**：动议内走汇报线中继显性化〔推荐先行〕/ 独立会话直接问人）：
+  同 [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片三。
+- **驾驶舱④ · 培养面板**（每角色待审 journal 收件箱 + 最近提升 skill + 探针状态；素材衔接记忆收敛）：
+  同 [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片四。
+- **记忆收敛 + 培养轮 3**（经营深度第一步，人裁维持、顺位随驾驶舱线后移；46 篇 journal 首次全量收敛；
   教训候选 C 载体分叉提请人裁；ent-agent-platform 排练场记忆定归宿）：
   [proposed/memory-convergence-and-cultivation-r3](./notes/proposed/2026-09-24-memory-convergence-and-cultivation-r3.md)。
-- **新动议类型 ×2 · 季度经营会 + 事件复盘**（支柱 1 主体；weekly-report 模板首次运转；通道 D 可选试炼；
-  每场独立真跑 + 收口）：
+- **新动议类型 ×2 · 季度经营会 + 事件复盘**（weekly-report 模板首次运转；通道 D 可选试炼；每场独立
+  真跑 + 收口；兼任驾驶舱三节点的真实验证场）：
   [proposed/new-motion-types](./notes/proposed/2026-09-24-new-motion-types.md)。
 - **呈现与叙事 · 经营仪表 + Demo 场景 D**（支柱 2 交错位，主轴 = 自用+演示并重；素材取自前两条目；
   视觉打磨二期走查触发）：
   [proposed/presentation-narrative](./notes/proposed/2026-09-24-presentation-narrative.md)。
 - ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；机械层已过——`deliverables-check` ALL PASS +
   r3 重录随手册完成；可后台派活不占轮）。
+- ⏸ **升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.1（触发型搁置，2026-09-24 晚用户改向后离队）**：材料全备于
+  研究层——[增量报告](./notes/research/2026-09-24-dsh-upstream-delta.md)（2211 commit 盘点 + 搁置池五问
+  判定 + 15 收割项 + 风险清单）+ [迁移方案](./notes/research/2026-09-24-pin-upgrade-and-harvest.md)
+  （preset 声明迁移 + client 数据层重写 + V4 单向门）；复活条件 = 某条目需要新基座或用户重新拍板。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
@@ -213,3 +223,14 @@
   子目录 / archived 冻结树 / 去中心化 INDEX / 严格格式门禁）理由与取舍 =
   [implemented/notes-lifecycle-absorption](./notes/implemented/2026-09-24-notes-lifecycle-absorption.md)；
   材料登记进 00-index 外部研究表。
+- 2026-09-24（**晚 · 主线改向：驾驶舱·人机协作优先**）：用户裁定当前重点 = 驾驶舱体验（人的操作台）+
+  人养 Agent + agent 协作之外的三个停点（通知人 / 问人 / 等人批）；升 pin **不是重点**——RFC 经用户
+  手动移入研究层、队列降触发型 ⏸（材料全备）。机制面核实（rc.2）：三节点均有载体——`tool-ask-user`
+  问询 / `user-approval`（`ctx.approval` + answerer waterfall，**pack 可组合 answerer 路由"这单谁批"**；
+  请求轮内有效，跨轮审批上游 deferred）/ 通知可从会话事件推导（r2-motion 五份日志均含相关事件字样，
+  精确形状切片一实证）——**驾驶舱线不需要升 pin**。
+- 2026-09-24（**晚 · 驾驶舱线 RFC 落盘**）：
+  [proposed/cockpit-human-loop](./notes/proposed/2026-09-24-cockpit-human-loop.md) 四切片进队列
+  （①注意力中心 / ②审批闸门 / ③问询路径 / ④培养面板），三个待裁点写进 RFC（审批闸哪个动作 /
+  问询路径甲乙 / 收件人模型）；既有条目顺位后移（记忆收敛+培养3、新动议 ×2 兼任驾驶舱验证场、
+  呈现叙事殿后）。落盘后停笔待用户 review。

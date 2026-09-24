@@ -47,5 +47,5 @@ rejected/ postmortem/ research/）本就是 DSH 机制的裁剪版——需要�
 
 外部参考基于 0.1.7-rc.1 树，其引言提及上游 0008 复盘把 Note 创建标准收窄为「持久决定理由」并
 显式豁免机械/局部编辑——我们钉的 rc.2 README 已含同向豁免句（"Only a purely mechanical or
-local edit… is exempt"）；两树差异在基座轮 vendor 原文重校时对照（
-[pin-upgrade-and-harvest §方案 3](../proposed/2026-09-24-pin-upgrade-and-harvest.md)）。
+local edit… is exempt"）；两树差异在升 pin 复活执行时对照（
+[pin-upgrade-and-harvest §方案 3](../research/2026-09-24-pin-upgrade-and-harvest.md)，方案已随主线改向搁置进研究层）。
