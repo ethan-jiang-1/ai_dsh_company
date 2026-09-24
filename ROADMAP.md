@@ -12,12 +12,14 @@
 
 - **N1 执行 · 方案 A 全去编号**（2026-09-24 晚人裁 A；机械 commit，排首位——避免后续 RFC 引用旧路径双改）：
   [proposed/n1-docs-naming](./notes/proposed/2026-09-24-n1-docs-naming.md) §方案 A + §验收。
-- **驾驶舱① ·「需要你」注意力中心**（主线头号：跨会话聚合三类等人状态——待答问询 / 待批审批 / 完成
-  通知，一键跳会话）：
-  [proposed/cockpit-human-loop](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片一。
-- **驾驶舱② · 审批闸门**（org.md 签字线接 `ctx.approval` + pack 组合公司 answerer；**闸哪个动作待裁**）：
+- **驾驶舱① ·「需要你」注意力中心**（主线头号：跨会话聚合四类等人状态——待答问询 / 待批审批 / 完成
+  通知 / 升级待处理，一键跳会话；聚合面 = workspace 全部会话）：
+  [proposed/cockpit-human-loop](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片一（含问询甲）。
+- **驾驶舱② · 审批闸门**（已裁：闸 org.md 现行双签线——毛利 <30%/折扣 <9折 ⇒ CFO 触线请求审批；
+  `ctx.approval` + signoff 工具行，应答路径实施首步核实）：
   同 [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片二。
-- **驾驶舱③ · 问询路径**（VP 问人**分叉待裁**：动议内走汇报线中继显性化〔推荐先行〕/ 独立会话直接问人）：
+- **驾驶舱③ · 问询路径·乙**（已裁：独立 VP 会话加 `tool-ask-user` + 手册两模式；动议内中继显性化已
+  并入①；teammate 无 preset 面，不碰承诺权）：
   同 [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片三。
 - **驾驶舱④ · 培养面板**（每角色待审 journal 收件箱 + 最近提升 skill + 探针状态；素材衔接记忆收敛）：
   同 [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片四。
@@ -234,3 +236,9 @@
   （①注意力中心 / ②审批闸门 / ③问询路径 / ④培养面板），三个待裁点写进 RFC（审批闸哪个动作 /
   问询路径甲乙 / 收件人模型）；既有条目顺位后移（记忆收敛+培养3、新动议 ×2 兼任驾驶舱验证场、
   呈现叙事殿后）。落盘后停笔待用户 review。
+- 2026-09-24（**晚 · 驾驶舱线三分叉自裁**）：用户指示"设计分叉默认自裁、仅真卡住才问人"——①审批闸
+  org.md 现行双签线（毛利 <30%/折扣 <9折 ⇒ CFO 触线请求；present 前闸与新增固定支出落选，理由在
+  RFC）；②问询路径甲乙都做且作用域不重叠（甲 = 动议内升级中继，并入注意力中心第四类条目；乙 = 独立
+  VP 会话加 ask-user——teammate 本无 preset 工具面，故不碰动议内承诺权）；③收件人模型 v1 单操作者 +
+  owner 字段 + answerer 路由表形状。取舍全文 =
+  [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) 各节。执行转入长程 goal（用户令）。
