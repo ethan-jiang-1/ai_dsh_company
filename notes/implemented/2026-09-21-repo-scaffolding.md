@@ -22,5 +22,5 @@
 
 ## 未验证 / 已知风险
 
-- `pnpm install` 未跑（含 vendor/dsh 子 workspace，按 docs/design/10 §6 风险清单自查后再定）
+- `pnpm install` 未跑（含 vendor/dsh 子 workspace，按 docs/design/architecture §6 风险清单自查后再定）
 - 空列表 patch 的 Loader 接受性；presets roots 真实安装路径

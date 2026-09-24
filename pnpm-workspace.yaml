@@ -13,7 +13,7 @@ packages:
   - vendor/dsh/native/system/packages/*
 
 # ↓ 组合/构建策略镜像 vendor/dsh/pnpm-workspace.yaml（路径改指 vendor 内）；
-#   vendor 换 tag 时随升级环（guides/60 §5）同步 diff 这一段。
+#   vendor 换 tag 时随升级环（guides/dev-loop §5）同步 diff 这一段。
 linkWorkspacePackages: true
 
 overrides:

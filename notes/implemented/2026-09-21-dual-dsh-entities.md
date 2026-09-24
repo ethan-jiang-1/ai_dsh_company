@@ -11,7 +11,7 @@
    `command dsh`）。理由：`DSH_HOME` 只护数据层护不住代码层——source 过 env.sh 后
    裸 `dsh` 也落在 dev home，但跑的仍是全局代码，版本漂移后验证会静默失真。
    沿用双 home 教义"靠环境兜底不靠提醒"。
-3. guides/60 §6 扩为"双 home 与双 DSH"（补第 4 条：代码层规则）；00-index 地图行同步、
+3. guides/dev-loop §6 扩为"双 home 与双 DSH"（补第 4 条：代码层规则）；index 地图行同步、
    外部材料登记表补研究树 HEAD 事实（rc.2 后 149 提交，`_digested` 审计基线仍 rc.2，
    引外部笔记以基线对齐）。
 

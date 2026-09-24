@@ -1,6 +1,6 @@
 # 研究 · DSH 研发流程基线与本仓适配
 
-状态：**已落地（研究）**。D23 定开发流适配，D24 定队列 owner；当前操作规则见 `docs/guides/60-dev-loop.md`。2026-09-23 自 `notes/research/` 毕业。
+状态：**已落地（研究）**。D23 定开发流适配，D24 定队列 owner；当前操作规则见 `docs/guides/dev-loop.md`。2026-09-23 自 `notes/research/` 毕业。
 
 > **性质与用途**：一份"论文"式研究记录——记录我们如何发现"以为在 follow DSH 研发流程、
 > 实际部分走样"，DSH 的真实形态是什么（全部一手引证），以及纠正与防再犯的机制设计。
@@ -12,7 +12,7 @@
 > **方法**：vendor 树一手材料优先（包 README → 子系统文档 → 生成目录 → Agent Note →
 > bundle 指引 → 根/子树 AGENTS.md → `.github/` 模板与配置 → postmortem），辅以一个子代理
 > 全仓普查（产物 `dev/research-dsh-workflow-survey.md`，普查底稿随库存档）与外部研究树 FAQ
-> （00-index 已登记）。普查引文进本文前经本轮会话逐条亲验。
+> （index 已登记）。普查引文进本文前经本轮会话逐条亲验。
 > **证据分级**：**affordance**（机制在场）/ **documented**（DSH 文档规定这么用）/
 > **observed**（DSH 自家实践留痕）。三级强度不同，随条标注；仅 affordance+documented 而
 > 无 observed 的腿在 §九声明。
@@ -30,7 +30,7 @@ keyless 回归档相对）；**「轮」** = 本仓曾经的迭代单位（R0–
 
 ## 〇、摘要
 
-DSH 的研发流程 = **连续的 issue→PR 流 + 文档只写当前状态**；plan mode 与 `todo_write` 是可用反馈面，按其各自条件使用；会话日志承载过程，repo 内 Notes 记录决策。DSH 不使用项目级 roadmap / plan 文件。本仓曾将单变更流程扩为轮次制，并在 D23/D24 转为队列条目、将队列迁至根 `ROADMAP.md`。**本仓适配**：feature 队列条目默认先经 Plan Mode 呈批；多步任务用 todo；具体分支以[开发环 §0.5/§1](../../docs/guides/60-dev-loop.md) 为准。纪律来源、适配理由和当时审计证据见本 Note 后续章节；这些历史记录不是当前操作指令。
+DSH 的研发流程 = **连续的 issue→PR 流 + 文档只写当前状态**；plan mode 与 `todo_write` 是可用反馈面，按其各自条件使用；会话日志承载过程，repo 内 Notes 记录决策。DSH 不使用项目级 roadmap / plan 文件。本仓曾将单变更流程扩为轮次制，并在 D23/D24 转为队列条目、将队列迁至根 `ROADMAP.md`。**本仓适配**：feature 队列条目默认先经 Plan Mode 呈批；多步任务用 todo；具体分支以[开发环 §0.5/§1](../../docs/guides/dev-loop.md) 为准。纪律来源、适配理由和当时审计证据见本 Note 后续章节；这些历史记录不是当前操作指令。
 
 ## 一、DSH 的轮内反馈面：Plan Mode 与 todo_write
 
@@ -165,14 +165,14 @@ now，任务态在 Issues（队列视角，关闭即出文档），历史在 git
 
 ## 五、决定（D23）与转型设计
 
-**决定（D23，2026-09-23）**：轮次流程退役，改按主题队列；默认遵循钉住的 DSH 纪律，本地适配按 D 号记录约束与证据。Feature 队列条目默认 Plan Mode 呈批是本仓适配；获批后按范围实施，明确授权的机械单步可直接做。当前规则唯一见[开发环 §0.5](../../docs/guides/60-dev-loop.md)。
+**决定（D23，2026-09-23）**：轮次流程退役，改按主题队列；默认遵循钉住的 DSH 纪律，本地适配按 D 号记录约束与证据。Feature 队列条目默认 Plan Mode 呈批是本仓适配；获批后按范围实施，明确授权的机械单步可直接做。当前规则唯一见[开发环 §0.5](../../docs/guides/dev-loop.md)。
 
 **转型后的形态**（DSH-aligned，按本仓约束缩编）：
 
 | 维度 | 轮次制（历史） | D23 决定（D24 后续定队列 owner） |
 |---|---|---|
 | 队列 | roadmap 按轮号排期 | 按主题调度；队列后来由 D24 迁至根 `ROADMAP.md` |
-| 生命周期 | 轮首计划、实施、轮末清单收尾 | feature 队列项默认 Plan Mode 呈批；多步实施使用 todo；当前条件与授权边界见[开发环 §0.5/§1/§12](../../docs/guides/60-dev-loop.md) |
+| 生命周期 | 轮首计划、实施、轮末清单收尾 | feature 队列项默认 Plan Mode 呈批；多步实施使用 todo；当前条件与授权边界见[开发环 §0.5/§1/§12](../../docs/guides/dev-loop.md) |
 | 完成项 | 留在表内标完成 | 验收后离队；决定与证据留 Note |
 | 条目类型 | 一切塞进轮次 | 区分 feature、卫生小修与研究，按适用流程处理 |
 | 交接 | 轮次交接清单 | 入口链与相关 Note 支持新上下文接手 |
@@ -180,7 +180,7 @@ now，任务态在 Issues（队列视角，关闭即出文档），历史在 git
 
 ## 六、适配 DSH 纪律的原则
 
-D23 的研究得到几条可复用原则：以钉住的 vendor 为机制权威；记录本地适配的约束与证据；机械可验证的不变量配反例进入门禁；语义一致性依靠阅读与审查；vendor 升 pin 时重校本地流程。当前仓内落点见根 `AGENTS.md` 与[开发环 §12](../../docs/guides/60-dev-loop.md)。这些原则不意味着 DSH 要求所有 feature 任务都先 Plan Mode；该默认是本仓适配。
+D23 的研究得到几条可复用原则：以钉住的 vendor 为机制权威；记录本地适配的约束与证据；机械可验证的不变量配反例进入门禁；语义一致性依靠阅读与审查；vendor 升 pin 时重校本地流程。当前仓内落点见根 `AGENTS.md` 与[开发环 §12](../../docs/guides/dev-loop.md)。这些原则不意味着 DSH 要求所有 feature 任务都先 Plan Mode；该默认是本仓适配。
 
 ## 七、给采纳 DSH 纪律的项目
 

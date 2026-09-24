@@ -132,7 +132,7 @@ pnpm test    # 38 条；其中 tests/deliverables.spec.ts 13 条守判据本身�
   ② 实测结构异质（164 个 `## 动议` 节，只有 22/38 有 `## 结论`），机械压缩必然编造摘要，手工压
   1845 行换回的只是目录整洁；③ 它是 D8 唯一的跨会话角色记忆，R6「分身成长」回路正建立其上。
   **2026-09-22 用户拍板：就停在这——规则已立、不回溯压缩**（R1/R2 的记忆完整保留；增长从此有界）。
-- **W7 轮次收尾的文档同步**：`docs/plans/roadmap.md`、`docs/00-index.md`、`notes/intents.md` 三处
+- **W7 轮次收尾的文档同步**：`docs/plans/roadmap.md`、`docs/index.md`、`notes/intents.md` 三处
   正被**另一个并行会话**修改（R5 拆轮 + 搁置池，D19），故暂停以免互踩。
   **2026-09-22 用户定次序：等并行会话提交后，R4 收尾一次做完**（含 roadmap 状态列、`AGENTS.md`
   当前状态、`demo.md` 定稿、`intents.md` 的 R4 行改 implemented）。

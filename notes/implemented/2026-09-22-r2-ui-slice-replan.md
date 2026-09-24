@@ -25,7 +25,7 @@ CEO 一个独立空间、VP 一个独立空间、两个空间相互沟通，且*
   `TeamView = { members, tasks }`——**没有消息/邮箱读模型**。「谁→谁」消息流需要自建
   Remote 读模型，那是 R5 驾驶舱的既定机制，不是薄片。R2 里消息的跨空间可见由两处现有面
   承担：各会话对话流里 `send_message`/`spawn_teammate`/`team_task_*` 工具调用实时展开
-  （[30 §1](../../docs/design/30-ui-demo.md)）+ 任务板活面板。
+  （[ui-demo §1](../../docs/design/ui-demo.md)）+ 任务板活面板。
 - **驾驶舱整个提前到 R2**：R2 的瓶颈是内容（两角色文案/KB/skills）；驾驶舱要画的数据
   （四角色组织图、跨 VP 消息聚合）需要四角色先存在；发布门禁不滑档。
 

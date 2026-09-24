@@ -6,7 +6,7 @@ export const ENTRY_QUESTIONS = [
   { id: 'Q4', ask: 'vendor/dsh 当前钉住哪个 tag？受控源码如何处理？', expect: [/dsh-v\d+\.\d+/, /只读|零改动|不改/] },
   { id: 'Q5', ask: '改 preset 组合后用哪个脚本验真入口？为什么 dump-config 不够？', expect: [/preset-smoke/, /挂载|行校验/] },
   { id: 'Q6', ask: '开发单位与当前队列在哪？哪些决定记录说明它？', expect: [/条目|队列/, /D23|D24|Note/] },
-  { id: 'Q7', ask: '回归与认证档在哪定义？真模型是否进 pnpm test？', expect: [/60-dev-loop|9\.1/, /不进|不含|排除/] },
+  { id: 'Q7', ask: '回归与认证档在哪定义？真模型是否进 pnpm test？', expect: [/dev-loop|9\.1/, /不进|不含|排除/] },
   { id: 'Q8', ask: 'notes 在开工、实现、收尾各起什么作用？若 Note 与当前实现冲突如何核对？', expect: [/检索|读取|读/, /决定|取舍|方案/, /验证|证据/, /核对|源码|实现/] },
 ]
 

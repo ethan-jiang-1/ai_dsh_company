@@ -25,7 +25,7 @@
 //   不了；格式（{initial, changes} + <!-- system/message change N --> 分隔）照抄其源码。
 // 浏览器面为什么复刻而不 import：vendor apps/web/tests/scaffold.ts 同样 import vitest；
 //   normalizeAria / captureStableAria / expandTurnProcesses 逐行转写（出处注在函数头）。
-// 分层（guides/60 §9.1 + readiness P1.4）：第三档（无 key、但要起进程与浏览器），不进 pnpm test。
+// 分层（guides/dev-loop §9.1 + readiness P1.4）：第三档（无 key、但要起进程与浏览器），不进 pnpm test。
 // 预算（§10）：墙钟 ≤ --wall。
 import { spawn, spawnSync } from 'node:child_process'
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'

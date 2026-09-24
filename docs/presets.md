@@ -1,7 +1,7 @@
 # presets · 角色 preset 的语义合同（R2：五角色定稿）
 
 > 顶层合同：五个角色 preset 的"现在时"语义（persona 定稿、skills 清单、验证方式）。
-> 内容来源 [design/40-role-content-plan.md](./design/40-role-content-plan.md)；命名约定见台账 D14
+> 内容来源 [design/role-content-plan.md](./design/role-content-plan.md)；命名约定见台账 D14
 > （显示名 `wochen <角色>`，preset id 保持 kebab）。R1 定稿 CEO / VP-Eng；R2 定稿 VP-Sales / COO，
 > 并增设 CFO（用户 2026-09-22 定案：50 人高科技公司，软件开发 / 服务 / 系统集成）。
 > **编制唯一事实家 = `company-workspace/kb/org.md`**（细到岗位）；各角色 CHARTER 只留本条线事实
@@ -96,7 +96,7 @@ UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSecti
 |---|---|---|
 | CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` + `delegation` 组（`tool-subagent` spawn + **`vp_eng` / `vp_sales` 命名委托**） | 读 KB、写交付物、加载 skill、澄清提问、声明交付；**汇报线两条路**（R3）：命名委托 = one-shot 前台快捷出稿，协作走 team；语义见 [delegation.md](./delegation.md) |
 | VP-Eng / VP-Sales / COO / CFO | 同 VP-Eng（R2 起） | 无 `tool-ask-user`（VP 不直接问用户）；`delegation` 供深挖调研 / 盘点 / 测算 |
-| 全局（pack bundle） | `agent-presets` roster 替换 + `tool-present` / `agent-team` / `tool-agent-team` insert | 只放全局行；**工具面不靠它**（见 [10 §6](./design/10-architecture.md) 要点 1） |
+| 全局（pack bundle） | `agent-presets` roster 替换 + `tool-present` / `agent-team` / `tool-agent-team` insert | 只放全局行；**工具面不靠它**（见 [architecture §6](./design/architecture.md) 要点 1） |
 
 ⚠ **preset 是自包含组合**：DSH 无 patch 继承，工具行必须写在 preset 里——R1 首跑就是漏了这一步，
 CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）。`pnpm test` 已加门禁检查（R2 起覆盖五角色）。
@@ -115,7 +115,7 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 
 **培养动作 = 改 `packages/company-pack/presets/<role>/`**：人格 = `agent.cordis.yml` 的 persona row，
 能力 = `skills/*/SKILL.md`。培养权就是 repo 写权限——DSH 没有原生"培养授权"动作，这是权限事实。
-dev `web` profile 用 `link:` 符号链接装 pack（[guides/60 §7](./guides/60-dev-loop.md)）——改仓库
+dev `web` profile 用 `link:` 符号链接装 pack（[guides/dev-loop §7](./guides/dev-loop.md)）——改仓库
 preset 即对 profile 可见、无需重装；真实安装形状（`file:`）归 release-smoke。
 
 **生效边界按面**（D25；依据 = vendor 源码 + [2026-09-24 活体探针](../notes/implemented/2026-09-24-twin-cultivation.md)）：

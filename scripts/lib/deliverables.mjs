@@ -21,7 +21,7 @@
 //
 // 本模块**不做 I/O**：调用方把"工作区文件清单"与"会话日志文本"喂进来。于是同一份逻辑
 // 既能在回归层（`tests/`，秒级、无 key）被直接断言，也能被运行场脚本（`scripts/`，可起进程）
-// 复用——分层纪律见 `docs/guides/60-dev-loop.md` §9.1。
+// 复用——分层纪律见 `docs/guides/dev-loop.md` §9.1。
 
 /** 公司五个角色 id，与 `packages/company-pack/presets/` 一致。 */
 export const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']

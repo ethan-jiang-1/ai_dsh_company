@@ -8,7 +8,7 @@
 // 所以唯一能上线前抓住它的手段是：走真入口路径（web RPC session/create）挂一次。
 //
 // 前置：DSH_HOME 指向已装本 pack 的 profile（`source dev/env.sh` 后用 dev home），
-//       client 面与前端 dist 已构建（guides/60 §7）。
+//       client 面与前端 dist 已构建（guides/dev-loop §7）。
 // 用法：source dev/env.sh && node scripts/preset-smoke.mjs [--port 3099] [--profile web]
 import { spawn } from 'node:child_process'
 import { readFileSync, readdirSync } from 'node:fs'
@@ -144,7 +144,7 @@ try {
   const base = `http://127.0.0.1:${String(port)}`
   const cookie = await authenticate(port, token)
 
-  // ① roster：四个角色都在且零 broken（扫不到就不必谈挂载）
+  // ① roster：五个角色都在且零 broken（扫不到就不必谈挂载）
   //    `agentPresets/list` 无参数 → args 就是空对象；`session/create(request)` → args 是 { request }
   const roster = await rpc(base, cookie, 'agentPresets/list', {})
   const presets = roster.presets ?? []

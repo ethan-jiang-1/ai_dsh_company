@@ -67,7 +67,7 @@ out-of-turn approval workflow is deferred"——审批闸门第一版设计在**
 现状：CEO 有 ask-user；VP 无（"VP 不直接问用户"，问题升级回 CEO——R3 汇报线定案，动议语境）。
 
 - **甲 · 动议内 = 升级中继显性化（并入切片一）**：VP teammate 本就**没有 preset 工具面**
-  （[design/20 分水岭](../../docs/design/20-roles-isolation.md)），只能走 send_message 升级 CEO——
+  （[design/roles-isolation 分水岭](../../docs/design/roles-isolation.md)），只能走 send_message 升级 CEO——
   注意力中心把升级链显示为第四类条目（"待转述 / 待处理"）；VP skill 加升级约定（消息带【待澄清】
   前缀）供确定性识别。纯显示层 + 内容约定，承诺权不动。
 - **乙 · 独立 VP 会话 = 直接问人（独立小步）**：VP preset 工具行加 `tool-ask-user` + 手册区分两种

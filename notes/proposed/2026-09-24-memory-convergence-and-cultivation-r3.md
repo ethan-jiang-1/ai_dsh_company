@@ -30,7 +30,7 @@
 
 ## 非目标
 
-不投机补建 design/40 的 4 个未建 skill（CEO 拆任务/合稿、VP-Eng 研发排期/worker 编排）——等真
+不投机补建 design/role-content-plan 的 4 个未建 skill（CEO 拆任务/合稿、VP-Eng 研发排期/worker 编排）——等真
 动议暴露需求再按培养回路建；不新开动议（归下一条目）；不动 UI 与 vendor。
 
 ## 验收

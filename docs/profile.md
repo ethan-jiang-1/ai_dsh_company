@@ -2,7 +2,7 @@
 
 > 顶层合同：部署形状与 host 行清单语义。行清单源文件（bundle 层）：
 > [packages/company-pack/cordis.patch.yml](../packages/company-pack/cordis.patch.yml)；
-> 设计依据 [design/10-architecture.md](./design/10-architecture.md) §6（共享行在 host、preset 只放差异）。
+> 设计依据 [design/architecture.md](./design/architecture.md) §6（共享行在 host、preset 只放差异）。
 
 ## 部署形状（R1 实测）
 
@@ -35,11 +35,11 @@ preset roster 的 `roots` 已改**自定位**（`!!js` + `baseUrl` 解析到本�
 | `agent-presets`（insert；roots 自定位 + default: ceo） | preset roster；五角色 presets 随包安装 | ✅ dump 实测在列 |
 | `session-persistence-jsonl` | 会话持久化；team 激活前提 | ✅（base 已有，bundle 确认语义） |
 | `tool-present`（insert） | 交付物声明（deliverables 卡片） | ✅ dump 实测在列 |
-| `agent-team` + `tool-agent-team`（insert） | 团队协作主通道（M4/D4；直插行，无续驶冲突，10 §3 冲突注①） | ✅ dump 实测在列 |
+| `agent-team` + `tool-agent-team`（insert） | 团队协作主通道（M4/D4；直插行，无续驶冲突，architecture §3 冲突注①） | ✅ dump 实测在列 |
 | `ui-agent-team`（insert） | 团队 Web 可视面：Team 按钮 / 名册 / 实时任务板 / 点进 VP 会话 | ✅ 前端加载列表含其 client 模块 |
 | `company-client`（insert，`name: dsh-company-pack`） | 本包 client 面：浏览器半注册 `sidebar.brand.name`（品牌皮肤） | ✅ 前端加载列表含 `dsh-company-pack/client.js` |
 
-工具行走 preset 的自包含组合，不随 host bundle 增补（R1 实证，机制见 [10 §6 要点 1](./design/10-architecture.md)）。
+工具行走 preset 的自包含组合，不随 host bundle 增补（R1 实证，机制见 [architecture §6 要点 1](./design/architecture.md)）。
 
 ## 已知开放点
 

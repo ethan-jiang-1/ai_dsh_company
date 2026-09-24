@@ -16,7 +16,7 @@
 4. **`scripts/client-load-smoke.mjs` 上线**（本事故的完成定义）：headless Chromium 加载真 web
    页面，断言零 plugin-load 失败（BootPage banner / console `failed to apply loader entry`）
    且品牌槽在场。修前 RED、修后 GREEN（同一条命令，本次实证）。
-5. **假事实清理**（docs = 当前合同）：guide 60 §3.9 重写为真实机制；postmortem 0002 追加
+5. **假事实清理**（docs = 当前合同）：guide dev-loop §3.9 重写为真实机制；postmortem 0002 追加
    更正节；client-face note 追加更正；preset-smoke 闭包世界补 shell baseline（三个
    "上游缺口" WARN 均为 baseline 假警报）；AGENTS.md 铁律表"先证伪不可用再自建"。
 

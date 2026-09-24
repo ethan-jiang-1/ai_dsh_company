@@ -1,6 +1,6 @@
 # 每个角色完全独立 · 深挖篇（context / tools / knowledge / workflow 的机制级安排）
 
-> 承接 [10-architecture.md](./10-architecture.md)。那一篇回答"repo 怎么摆"；
+> 承接 [architecture.md](./architecture.md)。那一篇回答"repo 怎么摆"；
 > 这一篇回答你这次的问题：**长期做 Agent 的人最在乎的"每个 Agent 上下文完整独立"，
 > 在 DSH 里到底怎么安排最合理**。全部结论在 DSH 工作树源码逐条核实（关键处标了文件）。
 
@@ -152,7 +152,7 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
    skill 指引"开工先读自己的 journal"。这反而贴合公司隐喻：离职换人（换 preset/换模型），
    公司资产（KB/journal/deliverables）留在盘上。
 
-## 5. 落到本 repo 的增量（对 [10-architecture.md](./10-architecture.md) §6 目录树的补丁）
+## 5. 落到本 repo 的增量（对 [architecture.md](./architecture.md) §6 目录树的补丁）
 
 ```text
 packages/company-pack/

@@ -1,6 +1,6 @@
-# 10 · 架构：repo 形态、组合层设计与插件计数
+# 架构：repo 形态、组合层设计与插件计数
 
-> 总入口与决策台账：[00-index.md](../00-index.md)。
+> 总入口与决策台账：[index.md](../index.md)。
 > 依据：FAQ 13（`_faq_on_digested/13_expert-plugin-repo-organization`）+ DSH 源码工作树逐条核实
 > （`packages/preset/*`、`packages/subagent/*`、`packages/experimental/agent-team/*`、`packages/workflow/*`、
 > `docs/subsystems/{agent-team,subagent,skills,workflow,spill}.md`）。
@@ -96,10 +96,10 @@ host 层共享行 + N 个角色 preset + 共享 KB + 模板。插件包（代码
 | 层 | 内容 | 自写 JS |
 |---|---|---|
 | ① 纯配置层（第 0 天） | `presets/<role>/`（agent.cordis.yml + persona 行 + skills/ 目录）、共享 KB、`cordis.patch.yml`、`profiles/company.cordis.yml` | **0 行** |
-| ② 第一段真代码（按需） | M2 委托 provider（给委托 child 挂角色 preset，见 [20-roles-isolation.md](./20-roles-isolation.md) §2/§3，百行级）；自定义工具行（org_chart、公司检索） | 同一 pack 内新增行 |
+| ② 第一段真代码（按需） | M2 委托 provider（给委托 child 挂角色 preset，见 [roles-isolation.md](./roles-isolation.md) §2/§3，百行级）；自定义工具行（org_chart、公司检索） | 同一 pack 内新增行 |
 | ③ 拆第二/三个包 | 触发条件（FAQ 13 决策 2 纪律）：某块代码独立演化 / 出现第二个消费方 / 独立发版需求；长出一窝专家才升方案 D | — |
 
-### 2.2 编排主通道（已核定，见 00-index 决策台账 D4）
+### 2.2 编排主通道（已核定，见 index 决策台账 D4）
 
 demo 形态"事件从 CEO 进、从 CEO 出"首选 **Agent Teams（M4）**——只有 Lead 能创建/interrupt
 teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱、teammates 保留 one-shot
@@ -127,7 +127,7 @@ teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱�
 
 ## 3. 协作通道盘点：DSH 已经给了四条，选着用
 
-> 术语约定：本节按**机制**分四条通道（A–D）；[20-roles-isolation.md](./20-roles-isolation.md) §3
+> 术语约定：本节按**机制**分四条通道（A–D）；[roles-isolation.md](./roles-isolation.md) §3
 > 按**用法**分四种编排（M1–M4）。映射：M1 人中继＝多会话直用机制；M2 隔离委托＝通道 A 的
 > 自定义 provider 强化版；M3 SDK 编排＝通道 C；M4 团队＝通道 B。通道 D（workflow）是任意
 > 编排里 CEO 手里的"流水线"工具，不单独构成编排。

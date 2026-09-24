@@ -49,4 +49,4 @@ DSH 的 notes 是按生命周期和决策类别组织的活动记忆：它保存
 3. 实现与验证：实现路径、名称、默认值变化同步更新 implemented Note；按受影响面选一个最小、会对回归失败的检查，并在 Note 中只写实际运行的命令和结果。[implemented 维护](../../vendor/dsh/.agents/notes/implemented/AGENTS.md) · [相关证据选择](../../vendor/dsh/.agents/skills/dsh-pre-push-checks/SKILL.md#select-relevant-evidence)
 4. 维护与归档：新 Note 写入时做一次同机制的 supersession 检索；只有 implemented 且未来指导价值低时才按完整 triplet 归档并封存，不以数量目标批量删除。[notes 子树规则](../../vendor/dsh/.agents/notes/AGENTS.md) · [supersession 与归档](../../vendor/dsh/.agents/skills/dsh-archive-agent-notes/SKILL.md#check-supersession-when-adding-a-note)
 
-研究结论的边界：以上描述的是钉住 commit 的 DSH 机制。`notes/` 的具体目录映射、每次本地命令和额外卫生方向由本仓自己的 `AGENTS.md`、`docs/guides/60-dev-loop.md` 与 `scripts/verify.mjs` 另行规定；它们不能被反向表述成 vendor 原生规则。
+研究结论的边界：以上描述的是钉住 commit 的 DSH 机制。`notes/` 的具体目录映射、每次本地命令和额外卫生方向由本仓自己的 `AGENTS.md`、`docs/guides/dev-loop.md` 与 `scripts/verify.mjs` 另行规定；它们不能被反向表述成 vendor 原生规则。

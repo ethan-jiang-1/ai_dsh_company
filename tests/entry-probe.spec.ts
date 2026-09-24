@@ -11,7 +11,7 @@ function good() {
     'dsh-v0.1.5-rc.2 只读',
     'preset-smoke 验证挂载',
     '条目队列 D23',
-    '60-dev-loop 真模型不进回归',
+    'dev-loop 真模型不进回归',
     '开工检索决定和取舍，核对实现，留下验证证据',
   ]
   return { answers: ENTRY_QUESTIONS.map((q: { id: string }, i: number) => ({ id: q.id, status: 'answered', answer: texts[i], evidence: [evidence] })), conflicts: [] as string[] }

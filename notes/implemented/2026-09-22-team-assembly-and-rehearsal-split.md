@@ -13,7 +13,7 @@
    - `preset/probe/handbook/delegation` 四个 smoke 脚本默认 cwd 翻转到排练场（`--cwd` 可覆盖，
      启动时自建）；`snapshot-motion` / `deliverables-check` 默认不动——归档与审计属于运行场。
    - 机制依据：workspace 归属按 `SessionHeader.cwd`（vendor workspace.md），零新功能。
-   - 文档：guides/60 §6.7、公司手册「工作纪律」一行、根 AGENTS.md 命令表、.gitignore。
+   - 文档：guides/dev-loop §6.7、公司手册「工作纪律」一行、根 AGENTS.md 命令表、.gitignore。
 2. **①按问题组队**：
    - 新 skill `presets/ceo/skills/assembling-the-team/SKILL.md`（五步：要不要叫人 / 要谁 /
      不叫谁也写下 / 走哪条通道 / 定 slug）。
@@ -21,7 +21,7 @@
      不 spawn 任何 teammate。名单里没有的职能一个都不叫——超编与漏编都是你的失败」，
      排在 `chairing-staff-meeting` 之前。
    - 旧 skill 去重：步骤 2 的职能归属**搬进新 skill 不并存**；front-matter 与标题去掉「R2 五角色版」。
-   - `docs/design/40` §1 CEO skills 清单补行。
+   - `docs/design/role-content-plan` §1 CEO skills 清单补行。
 3. **U1 活体探针（顺路完成，R6 前置全清）**：结论 = 三档之②**只有新会话变**
    （profile 真拷贝插标记 → 同会话下一轮仍旧文、新会话见新文；探针自改自还原）。
    详见 [research/digital-twin §5.5](../implemented/2026-09-22-digital-twin-cultivation-and-self-learning.md)
@@ -70,4 +70,4 @@ persona 加「名单里没有的职能一个都不叫」），重装后复跑即
 - R5a 全部内容（replay harness / release-smoke / sync-dsh / peers 欠账）——下一轮，起点
   readiness §9 P1（先窄研究再落）。
 - CEO 计划中的另两个 skill（`task-decomposition` / `synthesizing-deliverables`）仍未建，
-  其职责实际由 chairing 步骤 2/5 承担（design/40 §1 已注明）。
+  其职责实际由 chairing 步骤 2/5 承担（design/role-content-plan §1 已注明）。

@@ -1,7 +1,7 @@
 # CFO 角色 preset —— 会话挂上它即获得该角色的人格、专属 skills 与工具面。
-# 设计依据：docs/design/10-architecture.md §1；**preset 是自包含组合**（R1 实证：工具行必须随
+# 设计依据：docs/design/architecture.md §1；**preset 是自包含组合**（R1 实证：工具行必须随
 #   preset 声明，否则会话读不了文件、写不出交付物）。
-# 文案定稿：docs/design/40 §1（R2 增设：职能化身，换人不变职能）；公司事实 = kb/cfo/CHARTER.md + kb/org.md。
+# 文案定稿：docs/design/role-content-plan §1（R2 增设：职能化身，换人不变职能）；公司事实 = kb/cfo/CHARTER.md + kb/org.md。
 
 # ① 身份：persona row，shadow 掉部署默认人格，只对本 preset 的会话生效
 - id: persona

@@ -14,7 +14,7 @@
 | **P4 发布欠账闭账** | pack manifest：`dependencies` 精确钉 → **`peerDependencies`**（17 个：cordis `^4.0.2` + dsh-* `^0.1.5-rc.2`）+ `dsh.compatibility.dshReleases` 矩阵 + description 五角色 + 摘掉指向 tarball 外的 `./src/*` 出口 |
 | **P4 新门禁** | `pnpm verify` 的 `pack-compat`（钉住 tag ∉ 矩阵即红）+ `preset-row-deps` 改读 deps ∪ peers（verify.mjs §7 与 tests/presets.spec.ts 两处同口径） |
 | **P4 脚本** | `scripts/release-smoke.mjs`（构建 → npm pack → 干净 profile → plugin add → boot 冒烟）+ `scripts/sync-dsh.mjs`（检查模式 + `--pin` 升级环） |
-| **合同** | [docs/release.md](../../docs/release.md) 出生（依赖姿态 / 矩阵语义 / 冒烟程序 / 升 pin 程序），00-index 出生地图已记 |
+| **合同** | [docs/release.md](../../docs/release.md) 出生（依赖姿态 / 矩阵语义 / 冒烟程序 / 升 pin 程序），index 出生地图已记 |
 
 ## 实际跑过的验证（判据全记录）
 

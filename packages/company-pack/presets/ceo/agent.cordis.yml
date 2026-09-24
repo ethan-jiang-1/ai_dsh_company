@@ -1,8 +1,8 @@
 # CEO 角色 preset —— 会话挂上它即获得该角色的人格、专属 skills 与工具面。
-# 设计依据：docs/design/10-architecture.md §1；**R1 实证修正**：preset 是自包含组合
+# 设计依据：docs/design/architecture.md §1；**R1 实证修正**：preset 是自包含组合
 #   （DSH 无 patch 继承，shipped standard 自己声明全部工具行）——**工具行必须随 preset 声明**，
 #   否则会话只拿到全局 bundle 的少数行（R1 首跑：CEO 只有 10 个团队工具，读不了文件、写不出交付物）。
-# 文案定稿：docs/design/40 §1（R1：CEO 个体，非职能模板）。
+# 文案定稿：docs/design/role-content-plan §1（R1：CEO 个体，非职能模板）。
 
 # ① 身份：persona row，shadow 掉部署默认人格，只对本 preset 的会话生效
 - id: persona
@@ -68,11 +68,11 @@
 #    并行快捷派活要等上游 seam（per-child composition / 不撞名的控制面），本仓不自建（D13）。
 #    出处：docs/delegation.md；探针 scripts/delegation-smoke.mjs（默认档 = 这条边界的回归守卫）。
 #
-#    ⚠ 能力边界（诚实记账，别写进 persona 骗模型）：委托 child **继承 CEO 的组合**（design/20
+#    ⚠ 能力边界（诚实记账，别写进 persona 骗模型）：委托 child **继承 CEO 的组合**（design/roles-isolation
 #    §2/§4），所以它拿到的是 **CEO 的 skills**（chairing-staff-meeting），不是 vp-eng/vp-sales
 #    preset 里的角色 skills。因此 persona 必须**自带方法论**（写清产出形态与判据），不能指路到
 #    "先加载 tech-feasibility-review skill"——那个 skill 不在它的 catalog 里。
-#    "child 拿到角色完整 skills/工具面"是 M2 自定义 provider 才有的能力（design/20 §3）。
+#    "child 拿到角色完整 skills/工具面"是 M2 自定义 provider 才有的能力（design/roles-isolation §3）。
 #
 #    maxDepth: 1 ⇒ 委托 child 不能再委托 vp_eng/vp_sales（禁止 VP→VP 平级派活）；它仍可用
 #    `subagent` 生自己的 workers（那行的 maxDepth 是默认 3）。

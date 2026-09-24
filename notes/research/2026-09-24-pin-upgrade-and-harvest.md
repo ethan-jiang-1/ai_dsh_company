@@ -12,7 +12,7 @@
 
 1. `node scripts/sync-dsh.mjs --pin dsh-v0.1.7-rc.1`：vendor 换 tag + AGENTS.md 簿记 + 兼容矩阵加列。
 2. 按 [release.md](../../docs/release.md) 升 pin 程序全跑：typecheck / release-smoke / replay-smoke
-   （快照漂移按 [guides/60 §9.1](../../docs/guides/60-dev-loop.md) 判据档处置）/
+   （快照漂移按 [guides/dev-loop §9.1](../../docs/guides/dev-loop.md) 判据档处置）/
    delegation-smoke（[delegation.md](../../docs/delegation.md) §4.4 边界复核）。
 3. 流程合同对 vendor 重校：AGENTS.md 纪律表所引 vendor 原文（Conventions / testing.md /
    `.agents/notes/README.md` 等）是否有变——外部参考显示 rc.2 之后上游有 0008 复盘（Note 创建标准

@@ -61,6 +61,6 @@
 
 - 机器级一次性动作已做：corepack pnpm shim 启用；xcode-select 已切 CommandLineTools。
 - 仓库级：pnpm-lock.yaml 已提交；vendor 内部构建产物（lib/、system.node）存在且被
-  submodule 自身 gitignore 覆盖；引导全配方在 guides/60 §7。
+  submodule 自身 gitignore 覆盖；引导全配方在 guides/dev-loop §7。
 - 未验证：空列表 `cordis.patch.yml` 的 Loader 接受性（probe 已装未起会话，R1 首次
   company profile 会话时验证）；`tsc -b` 全量 host 面（有意不做，见决定 5）。

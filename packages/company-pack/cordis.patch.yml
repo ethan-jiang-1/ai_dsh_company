@@ -25,7 +25,7 @@
     # ── 交付物声明工具（base 无此行）──
     - id: tool-present
       name: '@deepseek-ai/dsh-tool-present'
-    # ── 团队协作（主通道 M4/D4；直插行——未装官方 bundle，无续驶控制冲突，10 §3 冲突注①）──
+    # ── 团队协作（主通道 M4/D4；直插行——未装官方 bundle，无续驶控制冲突，architecture §3 冲突注①）──
     - id: agent-team
       name: '@deepseek-ai/dsh-experimental-agent-team'
     - id: tool-agent-team

@@ -15,7 +15,7 @@ import {
 
 /**
  * 只测纯函数（毫秒级）。真浏览器 / 真模型的端到端（槽在场、5s 转「执行中」、行点击进成员
- * 空间）是认证档：`client-load-smoke` / `replay-smoke [--ui]` / 排练场小动议（guides/60 §9.1）。
+ * 空间）是认证档：`client-load-smoke` / `replay-smoke [--ui]` / 排练场小动议（guides/dev-loop §9.1）。
  */
 
 const LEAD = 'session-lead-0001'

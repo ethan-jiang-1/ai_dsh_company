@@ -93,7 +93,7 @@ exist".
   Proven red by removing the pack's `./client` export.
 - The pack's client face is built so its dependency list contains only ids that exist in the module
   table, and `tsdown` force-inlines the Team remote descriptor that is not a table entry.
-- `docs/guides/60-dev-loop.md` §2 layer 3.9 — "host healthy, UI empty" is diagnosed by diffing the
+- `docs/guides/dev-loop.md` §2 layer 3.9 — "host healthy, UI empty" is diagnosed by diffing the
   boot manifest's `inject` lists against its `id` set.
 
 ## Lessons

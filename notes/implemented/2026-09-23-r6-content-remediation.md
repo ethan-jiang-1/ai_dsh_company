@@ -18,23 +18,23 @@
    / 随文件归档 4 / 不动+理由 3**。全文见 git（本提交链；文件已按"诊断件销账后删除"删除）。
 2. **销账（净减少结算见下）**：r5-plus-readiness 删除（活残余 §7.4 迁队列）；AGENTS.md 当前状态
    214→152 行（五轮沉积 → 八行指针）；roadmap 202→134 行（轮次表退役 → 纯队列、完成即离队）；
-   00-index Q1–Q8 压缩 + release.md 补登 + 出生地图清✅行；guides/60 与 50 过期陈述全修（计数
-   去 R2 时代值、四人残影 → 五角色、R5 → R5a ×7、合同层"未做"改已交付）；design/10·30·40 对齐
+   index Q1–Q8 压缩 + release.md 补登 + 出生地图清✅行；guides/dev-loop 与 50 过期陈述全修（计数
+   去 R2 时代值、四人残影 → 五角色、R5 → R5a ×7、合同层"未做"改已交付）；design/architecture·30·40 对齐
    五角色与搁置池；profile 行清单对齐 bundle 实物；delegation/demo/presets 现在时化；
    org.md/COO CHARTER 指针与流程载体修正；notes 两条断链 + intents 补 3 行 backfill。
 3. **防回堆门禁 ×2 进 `scripts/verify.mjs`（均带反证）**：`notes-links`（md 链接核验扩到 notes/
-   全树——上线当天抓出 4 条存量断链，全修复）；`doc-budget`（AGENTS.md 165 / 00-index 145 /
-   guides/60 440 行上限；红证 = 造 21 行垃圾即红）。plans 层禁 ✅ 残留档随队列化由结构自然承担
+   全树——上线当天抓出 4 条存量断链，全修复）；`doc-budget`（AGENTS.md 165 / index 145 /
+   guides/dev-loop 440 行上限；红证 = 造 21 行垃圾即红）。plans 层禁 ✅ 残留档随队列化由结构自然承担
    （纯队列里没有历史行可腐化），未设独立门禁。
 4. **入口链探针**（`scripts/entry-probe-smoke.mjs`，认证档）：全新上下文只读入口链答 8 个"现在"
    问题，token 断言 8/8 + 归档 `snapshots/entry-probe/2026-09-23/answer.md`。反证实测：植入过期
    后探针 Agent **主动显式报告矛盾**（"AGENTS.md 写 R5b 与 roadmap R6 相矛盾——入口链里的过期
    状态"），还原复绿 8/8——矛盾检测属语义层（归档可查），token 层不红为设计内边界。
-5. **转型落盘（D23）**：plans 层队列化（本文件同 diff）；guides/60 §0/§0.5 条目生命周期 +
+5. **转型落盘（D23）**：plans 层队列化（本文件同 diff）；guides/dev-loop §0/§0.5 条目生命周期 +
    §1 实施期 todo_write 纪律 + **§12 条目收尾（收尾程序自 roadmap 迁家）+ 流程合同**
    （偏离注册表 7 条 + 防再犯五件套 + 卫生铁律"删>并>修>记"）；AGENTS.md 纪律表替换
    （记忆版 → 枚举提炼版，新增过程反馈面/预算/slop/偏离登记/升 pin 重校/卫生铁律各行）；
-   两合同**落现有家出生，零新增文件**（文档卫生 → 00-index；流程 → guides/60 §12）。
+   两合同**落现有家出生，零新增文件**（文档卫生 → index；流程 → guides/dev-loop §12）。
 6. **R6 = 最后轮号**：此后队列条目按主题命名，完成后从队列删除。
 
 ## 净减少结算（方向铁律的度量）
@@ -45,12 +45,12 @@
 | docs/ 总行数 | 2267 | ~1940 | **≈ −327** |
 | AGENTS.md | 214 行 | 152 | **−62**（沉积 → 指针；纪律表替换净 +3） |
 | docs/plans/roadmap.md | 192 | 134 | **−58**（纯队列形态） |
-| guides/60 | 399 | 435 | +36（条目环 + 收尾程序迁家 + 流程合同——signal 增项） |
-| 00-index | 148 | 131 | −17（Q1–Q8 压一行 + 出生地图清✅） |
+| guides/dev-loop | 399 | 435 | +36（条目环 + 收尾程序迁家 + 流程合同——signal 增项） |
+| index | 148 | 131 | −17（Q1–Q8 压一行 + 出生地图清✅） |
 
 ## 实际跑过的验证
 
-- `pnpm verify`：每个批次收尾各跑一次，全绿；两新门禁红证（人造断链红 ×1；00-index 造 21 行
+- `pnpm verify`：每个批次收尾各跑一次，全绿；两新门禁红证（人造断链红 ×1；index 造 21 行
   → doc-budget 红）→ 还原复绿；绿证常态化通过。
 - `pnpm test`：53 条全绿（本轮未动代码面，仅末次复核）。
 - `node scripts/entry-probe-smoke.mjs`：**8/8 PASS**（真模型；standard preset + 排练场 cwd）+
@@ -71,8 +71,8 @@
   措辞（W11）、编号方案（N1，随卫生合同）。
 - **审计覆盖缺口**（本轮未扫的角落，留给下次"磨"；来源 = 诊断件销账前的覆盖缺口节，git 留史）：
   presets.md ↔ CHARTER ↔ persona 三方逐字比对；notes/research 三篇正文即时性（是否存在被推翻
-  未标注段）；postmortem 0001/0003 深读；guides/50 其余旋钮默认值对 vendor 复校；journal 行号
+  未标注段）；postmortem 0001/0003 深读；guides/budget-and-ops 其余旋钮默认值对 vendor 复校；journal 行号
   引用全量核；snapshots 与 live 盘差异逐项。
 - **登记的噪声残留**（判断：暂留，非本轮处置）：roadmap 维护规则 ~90 行带日期历史住计划层
-  （D21"历史不重写"先例；若要迁 notes/ 是一次独立小条目）；guides/60 §2/§7 的 R1 时代坑注
+  （D21"历史不重写"先例；若要迁 notes/ 是一次独立小条目）；guides/dev-loop §2/§7 的 R1 时代坑注
   （判断：**非噪声**——它们是"环境查不到、只有踩过才知道"的 trap 文档，正是指南层的本职）。

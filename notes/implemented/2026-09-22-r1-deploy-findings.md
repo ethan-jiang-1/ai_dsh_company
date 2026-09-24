@@ -11,7 +11,7 @@
    `session-persistence-jsonl`、`tool-fs`/`tool-fs-search`/`tool-skill`/`tool-present`、
    `experimental-agent-team`、`experimental-tool-agent-team`。R5 转 peer + compatibility 矩阵。
 3. **团队两行从 R1 起直插**（不装官方 `agent-team-profile` bundle）：保持零 JS、避免 bundle 的
-   全局续驶控制 disable（10 §3 冲突注①）；R3 的"从 bundle 改直插"因此提前完成。
+   全局续驶控制 disable（architecture §3 冲突注①）；R3 的"从 bundle 改直插"因此提前完成。
 4. **观察窗用 web profile**（`dsh web -- --port 3081`）：pack 装进 **web profile**（bundle 行生效），
    preset roster 在 UI 的 CUSTOM 区出现四角色；3080 与本 GUI 冲突，固定用 3081。
 5. **根 devDependencies 加四个 insert 行的 `workspace:*` 链接**：源码 CLI 下 TS 导入走
@@ -22,8 +22,8 @@
 
 - **company profile 跑观察窗**：`--profile company`（base + pack，无 web-app）里 agent-presets
   行在源码 CLI 下**挂起**（进程不退、无输出；同一行在 web profile 里正常）。根因未定 → 改用
-  web profile 绕开，开放点记 design/10 §6 要点 5 与下方"未验证"。
-- **官方 team bundle + 我们 pack 并存**：会 disable 全局续驶控制（10 §3 冲突注），且 R1 用不到
+  web profile 绕开，开放点记 design/architecture §6 要点 5 与下方"未验证"。
+- **官方 team bundle + 我们 pack 并存**：会 disable 全局续驶控制（architecture §3 冲突注），且 R1 用不到
   官方 bundle 的默认行 → 直插行。
 - **`--patch` overlay 加 agent-presets 行（headless 形态）**：headless 组合无此行，insert 能加；
   但 web 组合已有此行，再 insert 即 `duplicate loader entry id` → 定案为"pack 用替换、overlay 用
@@ -50,8 +50,8 @@
   （无重复 id、依赖可解析），**不证明 persona 挂载**——R1 实测 headless 会话里角色永远不生效：
   **preset 挂载只在 Web 面**（只有 web-app 组合 `session-controller`，其 `composeAgent` 负责
   "未指定 preset 时挂 default"；headless/sdk/acp 一次性驱动经 core agent registry 绕过它）。
-  推论：入戏探针与 demo 动议必须走 Web UI；自动化验证属 R5 web 快照 lane。详见 design/10 §6
-  要点 6 与 guides/60 §2 第 3.6 层。
+  推论：入戏探针与 demo 动议必须走 Web UI；自动化验证属 R5 web 快照 lane。详见 design/architecture §6
+  要点 6 与 guides/dev-loop §2 第 3.6 层。
 
 ## 回归测试资产（同日追加，回应"测试在哪"）
 

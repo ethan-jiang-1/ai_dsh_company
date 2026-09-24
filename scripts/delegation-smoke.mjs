@@ -19,7 +19,7 @@
 //   - vp_eng / vp_sales / subagent / spawn_teammate 必须在模型可见目录里（挂载没坏）
 //   - 三个控制名必须仍是**团队版**（若变回全局版 ⇒ 续驶可能重新可用 ⇒ 重评 one-shot 决定）
 //
-// 预算（guides/60 §10）：墙钟 ≤ `--wall`（默认 180s）；模型 prompt **1 条**；可中断（Ctrl-C）。
+// 预算（guides/dev-loop §10）：墙钟 ≤ `--wall`（默认 180s）；模型 prompt **1 条**；可中断（Ctrl-C）。
 // 前置：DSH_HOME + 已装 pack + 模型凭据。
 // 用法：source dev/env.sh && node scripts/delegation-smoke.mjs [--port 3098] [--wall 180]
 import { spawn } from 'node:child_process'
@@ -98,7 +98,7 @@ async function authenticate(port, token) {
   return cookies.map(c => c.split(';')[0]).join('; ')
 }
 
-/** 发一条 prompt 并等**新的** `turn/end`（完成信号用持久事件，不用状态位——guides/60 §9）。
+/** 发一条 prompt 并等**新的** `turn/end`（完成信号用持久事件，不用状态位——guides/dev-loop §9）。
  *  ⚠ 必须比较 turn/end 的**数量**：只看"有没有"会在第二次调用时立刻被上一次的 turn/end 满足
  *  （R3 实测：--delegate 档因此报了"CEO 没调用 vp_eng"的假阴性）。 */
 async function askOnce(page, address, base, cookie, text) {

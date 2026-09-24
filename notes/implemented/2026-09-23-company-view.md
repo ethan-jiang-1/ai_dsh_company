@@ -18,7 +18,7 @@
   状态 → `StateDot`·`Tag`）；**团队工具卡**（`spawn_teammate`·`send_message`·`team_task_*` 等在
   对话流里渲染成公司语义卡）；修任务板弹窗窄列竖排与驾驶舱列头折行。
 - **动效层**：零依赖纯 CSS（边画线 / 节点入场 / 动态滑入 / 令牌滚动）+ `prefers-reduced-motion` 回退。
-- **命名**（`docs/design/30-ui-demo.md` §5 命名表）：公司视图 / 公司驾驶舱（旧「Company 驾驶舱」改名）/
+- **命名**（`docs/design/ui-demo.md` §5 命名表）：公司视图 / 公司驾驶舱（旧「Company 驾驶舱」改名）/
   四面板（看板·依赖图·在场·用量）。
 - **wire / config / API 影响：零**——只动 client 面（`packages/company-pack/src/client/**` 与 `src/lib/*`）；
   新增两个 **type-only** devDeps（`dsh-session-stats` / `dsh-token-meter`）；不动 preset、不动会话日志、
@@ -58,5 +58,5 @@
 | 原「UX 打磨」提案 | 已被本条目吸收并毕业（[implemented/2026-09-23-ux-polish.md](./2026-09-23-ux-polish.md)） |
 | **视觉细修**（用户：「视觉上，我们回头再打磨」） | → 队列新条目 **⏸ 视觉打磨** |
 | 面板可移动 / 可缩放（依赖图、在场不能移动） | → 队列 **⏸ 面板窗口化**（首要决定 = 四面板是否提升为平台页签） |
-| 命名统一 | **本条目内解决**（design/30 §5 命名表） |
+| 命名统一 | **本条目内解决**（design/ui-demo §5 命名表） |
 | 平台行为：空白会话不渲染视图页签条 | 记录在案（非缺陷，不改） |

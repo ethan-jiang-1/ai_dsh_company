@@ -1,17 +1,15 @@
 # 队列 · 开发流（条目制，D23）
 
 > 性质：**当前任务队列（D24）**。用户说“继续下一条”时查 §队列；只从当前条目/搁置项取任务，不从历史段推断。
-> **完成即离队**：验收通过后删除队列行，交付证据留 Note。任务入口、授权、实施和收尾唯一流程见 `docs/guides/60-dev-loop.md` §0.5/§1/§12。
+> **完成即离队**：验收通过后删除队列行，交付证据留 Note。任务入口、授权、实施和收尾唯一流程见 `docs/guides/dev-loop.md` §0.5/§1/§12。
 > 队列条目默认由新对话上下文接手（D23 本仓适配）；用户明确任务优先于队列顺序。
-> **队列 = 有序索引，不是全文**：feature 条目配 `notes/proposed/` RFC；问题、取舍与验收留在 RFC。队列行 ≤3 行（主题 / 状态 / 链接 / 验收指针）。Plan Mode 条件唯一见[开发环 §0.5](./docs/guides/60-dev-loop.md)。卫生小修与触发型条目可不设 RFC。
-> 历史决定按 `docs/00-index.md` 台账与对应 Note 查阅；本文件历史段不提供当前任务。
+> **队列 = 有序索引，不是全文**：feature 条目配 `notes/proposed/` RFC；问题、取舍与验收留在 RFC。队列行 ≤3 行（主题 / 状态 / 链接 / 验收指针）。Plan Mode 条件唯一见[开发环 §0.5](./docs/guides/dev-loop.md)。卫生小修与触发型条目可不设 RFC。
+> 历史决定按 `docs/index.md` 台账与对应 Note 查阅；本文件历史段不提供当前任务。
 
 ## 队列
 
 ▶ 表示明确在办；⏸ 不自动开工。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **N1 执行 · 方案 A 全去编号**（2026-09-24 晚人裁 A；机械 commit，排首位——避免后续 RFC 引用旧路径双改）：
-  [proposed/n1-docs-naming](./notes/proposed/2026-09-24-n1-docs-naming.md) §方案 A + §验收。
 - **驾驶舱① ·「需要你」注意力中心**（主线头号：跨会话聚合四类等人状态——待答问询 / 待批审批 / 完成
   通知 / 升级待处理，一键跳会话；聚合面 = workspace 全部会话）：
   [proposed/cockpit-human-loop](./notes/proposed/2026-09-24-cockpit-human-loop.md) §切片一（含问询甲）。
@@ -48,13 +46,13 @@
 |---|---|---|---|
 | **自主节律**（分身定期复盘） | [implemented/twin-cultivation](./notes/implemented/2026-09-22-twin-cultivation-and-self-learning.md) §四 | 机制不闭合：`goal` 需人类授权且 session-start 一律 disarm；`schedule` 只在 live 会话投递且默认没装；webhook 起的会话进不了 goal 循环；全树无 cron | 上游补"外部触发 ↔ 会话内自主续跑"的 seam——**提 seam，不自建调度器**（D9/D13） |
 | **并行快捷派活**（同时开几个 VP） | [delegation.md](./docs/delegation.md) §4.4 | 本组合无干净解法：缺 per-child composition 与不撞名的控制面 | 上游 seam |
-| **M2 自定义 provider** | [00-index](./docs/00-index.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"的需求已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
+| **M2 自定义 provider** | [index](./docs/index.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"的需求已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
 | **界面外推送 / 收件箱** | [org-presence-board（已毕业）](./notes/implemented/2026-09-22-org-presence-board.md) §背景 | egress 只有 `sessionTelemetry`（OTel）与 hooks，webhook 是 ingress；收件人是谁、粒度多细属部署选择 | 明确的物理人通知需求 + 选定部署面 |
 | **消息级协作动态流**（在场板 v1 的动态流只含成员/任务迁移差分） | R5b 机制核实（[implemented/2026-09-23-r5b-cockpit](./notes/implemented/2026-09-23-r5b-cockpit.md)） | 消息内容要 host 侧折 lead 会话 team 事件（`sessionProjections.stateOf(…, 'agentTeam')` 通道已核实存在）→ 自建 Typert Remote——但其**客户端 stub 由 vendor codegen 管线生成**，本 pack 无接线；自建 codegen 不值一轮 | 上游提供 pack 侧 remote stub 生成，或公开 host-only 投影的客户端读 RPC |
 
 ## 维护规则
 
-- 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/60 §0.5/§1/§12](./docs/guides/60-dev-loop.md)。
+- 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
 
@@ -71,7 +69,7 @@
   提案毕业（条目全有归宿：消息级动态流进搁置池）。台账 D22。
 - 2026-09-23（**R6 内容诊治插轮，原 R6「分身成长」改号 R7**，用户决定）：动因 = 五轮堆叠后内容腐化
   已有实证——① AGENTS.md「当前状态」沉积五轮收尾快照并与本表轮间待办整段双写（违反 D10
-  「一处事实一个家，只写 now」）；② 00-index 已闭合的待定 Q1 仍挂着；③ 本表计划层躺三段已 ✅ 的
+  「一处事实一个家，只写 now」）；② index 已闭合的待定 Q1 仍挂着；③ 本表计划层躺三段已 ✅ 的
   轮间待办历史；④ 原 R6 行「U1 只剩实证钉死」文字过期（探针已完成）——语义过期会复发
   （r5-plus §5 修过一次）。决定：插**纯整治轮 R6「内容诊治」**（不交付新功能），两条线：**线 A · 内容腐化诊治**（四面 =
   docs/ 全层 / AGENTS.md 入口链 / company-workspace（手册 + kb；R4「journal 不压」默认不重开，
@@ -99,15 +97,15 @@
   `⏸ 待命（排在 R5a 之后）`、R6 标 `⏸ 待命（前置全清；排在 R5b 之后）`（原先一个 `—` 一个 ⏸，
   读不出先后）；② 原「轮间待办（R5a → R6）」的 U1 探针**已并入 R4 → R5a ①**，撤掉那节重复块
   （同一件事不占两处，最小步骤改作 ① 下的引用块）；③ **R5b 开工前必须钉的四条决策升为
-  `docs/00-index.md` 待定 Q5–Q8**——原先只藏在 r5-plus-readiness §9 P2（文件已删，R6 D1），
-  而新会话开工动作读的是「00-index 台账 + 待定 Q」，藏着的决策等于没有；④ `00-index` 的**合同出生
+  `docs/index.md` 待定 Q5–Q8**——原先只藏在 r5-plus-readiness §9 P2（文件已删，R6 D1），
+  而新会话开工动作读的是「index 台账 + 待定 Q」，藏着的决策等于没有；④ `index` 的**合同出生
   地图**改 R5 → **R5a**，并补 R5b（不单独出生合同）与 R6（培养/学习合同，名字待定）；⑤ `AGENTS.md`
   命令表补上 R4 新增的两个脚本（`deliverables-check` / `snapshot-motion`），并把散落的 `R5` 旧指代
   统一到 `R5a`。
 - 2026-09-22：**R3 收尾**——R3 ✅、R4 标 ▶ 下一轮。R3 的验收口径在本轮被实证改写两次：
   ① "team 两包改直插行"其实 R1 起就已直插（本轮只做验证）；② 原计划的 `continuable` 命名委托
   被"team shadow + 按成员名字寻址"三层证据否掉，改 one-shot 前台（D18）。同时立了
-  **测试分层纪律**（guides/60 §9.1：真模型/真浏览器不进回归）——起因是用户当轮指出
+  **测试分层纪律**（guides/dev-loop §9.1：真模型/真浏览器不进回归）——起因是用户当轮指出
   "这种测试如果是 regression 的话跑得这样慢完全受不了"。详见
   [implemented/2026-09-22-r3-reporting-line.md](./notes/implemented/2026-09-22-r3-reporting-line.md)。
 - 2026-09-22：三篇提案进轮（④ 共享盘卫生 → R4、① 组织在场板 → R5、②③ 分身成长 → 新增 R6 待命），
@@ -148,20 +146,20 @@
   明确"今后才做才有意义"而留着的题）；**结论落地即毕业**到 `notes/implemented/`（与提案同一终态层），
   状态行写「已落地（研究）→ 落点」。判据 = **还有没有未完成的条目/决策在等它**。首批执行：3 篇已落地研究迁走
   （agent-workflow-community-practice / dsh-inround-task-surface / replay-harness-feasibility，引用同步改路径）；
-  留 2 篇活研究（digital-twin-cultivation 供序 3 条目、visual-expression 供序 1/2 条目）。规则家 = guides/60 §12。
+  留 2 篇活研究（digital-twin-cultivation 供序 3 条目、visual-expression 供序 1/2 条目）。规则家 = guides/dev-loop §12。
 - 2026-09-23（**条目 ①「demo 可视表达」收尾**）：公司视图 v1 交付（S0 地基 / S1 四面板 + `session/follow`
   流式动态 / S2 皮肤令牌化 + 团队工具卡 / S3 零依赖动效）；用户验收**通过**（原话「不错，这个超出了我的
   预期，尤其是结构上」）。**完成即离队**：队列删行，收尾 Note = `notes/implemented/2026-09-23-company-view.md`，
   RFC 毕业到 `notes/implemented/2026-09-23-demo-visual-expression.md`（状态「已消化」）。打磨点去向：
   视觉细修 → 新条目 **视觉打磨**；面板可移动 → 递补为队列首条的 **面板窗口化**（其首要决定 = 四面板是否
-  提升为平台页签）；**命名在本条目内解决**（design/30 §5 命名表：公司视图 / 公司驾驶舱 / 四面板）。
+  提升为平台页签）；**命名在本条目内解决**（design/ui-demo §5 命名表：公司视图 / 公司驾驶舱 / 四面板）。
   同轮立规：**实施期发现要留痕**（真页面发现的行为缺陷登记回条目 RFC，不许只活在 commit 里）。
 - 2026-09-23（**条目 ②「面板窗口化」收尾**）：公司页签 v4 交付（A1：看板/依赖图/在场/用量/任务板五个
   平台页签 + 页签头「浮出」+ 公司视图一键浮出 + 任务板按钮改 launcher ⇒ anchored 弹窗退役，原始投诉
   从根上消灭）；**驾驶舱并入「在场」**（`CompanyPane.tsx` 删除，行可点 + 流式动态保留）。真页面机器判据
   全绿（浮窗 grip/resize/dock 三件套 + dock 收回 + anchored 不在场）。**完成即离队**：收尾 Note =
   `notes/implemented/2026-09-23-panel-tabs.md`，RFC 毕业到 `notes/implemented/2026-09-23-panel-float.md`。
-  命名表随迁（design/30 §5：右栏 = 公司页签 ×5；改名映射追加 驾驶舱→在场）。实施期发现（已留痕）：
+  命名表随迁（design/ui-demo §5：右栏 = 公司页签 ×5；改名映射追加 驾驶舱→在场）。实施期发现（已留痕）：
   `openTab` 落位对 `active()` 有延迟 ⇒ 推迟 + 重试 + kind 守卫；停靠 pane 上限 2 / 布局仅内存 = 平台事实。
 - 2026-09-23（**条目「视觉打磨」收尾**）：★ 退役（→ 官方 `Tag`「Lead」）/ 内联样式收口（含 DAG 边样式进 CSS）/
   空态统一（`StateNote` 一处定义）/ **DAG 边对比度修正**（待办边 1.47→3.71、已走通边 2.28→4.14，用
@@ -200,12 +198,12 @@
   journal 引 coo `:14` 载体清单实为 `:13`）+ 3 处当晚预期错位（勘误历史记述）——全在冻结 journal 层，
   不改写、仅登记；② presets↔CHARTER↔persona 三方比对——**PASS**（W3 后指针零残留、数字不进 pack
   〔D17〕、veto 语义由当夜探针活证）；③ 0001/0003 深读——守卫全在岗，修 1 处过期指针（0001 行动项 3：
-  plans/roadmap.md → guides/60 §12）；④ guides/50 旋钮对 vendor 复校——**PASS 零漂移**
+  plans/roadmap.md → guides/dev-loop §12）；④ guides/budget-and-ops 旋钮对 vendor 复校——**PASS 零漂移**
   （8/256/64/64KiB/maxDepth 3 全对钉住 tag）；⑤ research 即时性——3/3 已毕业且修正随行
   （digital-twin §6 当夜补）；⑥ snapshots 差异机械层——`deliverables-check` ALL PASS（0 违规）+
   **replay-smoke 抓到真漂移**（手册 W9/W10 进注入消息 ⇒ r3 录制过期）→ 按 §9.1 重录 + harness 修
   防再犯（commit `bc297b6`）；语义逐项目录留待办。**归档层评估（同夜）**：结论 = 暂不归档——
-  r0-loop-acceptance 被 guides/60 §7 引为实操出处（**活判据，待办原前提有误记正**）；其余五篇可归档
+  r0-loop-acceptance 被 guides/dev-loop §7 引为实操出处（**活判据，待办原前提有误记正**）；其余五篇可归档
   但净文件数不减、33 篇信噪比尚可，等规模翻倍或合并整治轮再兑现。
 - 2026-09-24（**entry-probe 判据时间不变化**〔整治转待办销账〕）：两案选**时间不变问法**（另一案
   "收尾程序加刷新步"否决——多一个会忘的人工程序，且同病同根「时变状态进时不变载体」）。Q1 判据
@@ -215,16 +213,16 @@
   期望 token 在入口链可读；真跑归当夜收尾认证档。
 - 2026-09-24（**晚 · 统筹计划落盘 + 队列重排**）：用户四项裁决——主轴 = 自用+演示并重 / 升 pin
   dsh-v0.1.7-rc.1（增量报告确认后执行）/ N1 方案 A / 主线 = 支柱 1 经营深度；工作方式确认（计划先
-  显性化 `notes/proposed/` 再按"继续下一条"逐条执行，已落 guides/60 §0.5）。整治转待办块解散：
+  显性化 `notes/proposed/` 再按"继续下一条"逐条执行，已落 guides/dev-loop §0.5）。整治转待办块解散：
   N1 升队列首条、升 pin 转基座轮条目、教训候选 C 并入记忆收敛条目、snapshots 语义目录留 ⏸；
   四份新 RFC 落 proposed/。同日早些时候：基石整治收尾提交并推送（`da4405c`）；push 走显式 URL
   不更新 origin/master 引用（曾显 ahead-131、实为 5，push 后 fetch 即正——运维注意）。
 - 2026-09-24（**晚 · Note 生命周期吸纳**）：按用户令"点选吸纳、不推翻现有"，从外部参考
-  `01-agent-note-lifecycle`（DSH sdlc-reference）吸纳六条进 guides/60 §12（状态行惯例 / 备选必载 /
+  `01-agent-note-lifecycle`（DSH sdlc-reference）吸纳六条进 guides/dev-loop §12（状态行惯例 / 备选必载 /
   毕业即改写 / 新增触发取代检查 / rejected 去留 / implemented 只跟事实）；四项显式不吸纳（class
   子目录 / archived 冻结树 / 去中心化 INDEX / 严格格式门禁）理由与取舍 =
   [implemented/notes-lifecycle-absorption](./notes/implemented/2026-09-24-notes-lifecycle-absorption.md)；
-  材料登记进 00-index 外部研究表。
+  材料登记进 index 外部研究表。
 - 2026-09-24（**晚 · 主线改向：驾驶舱·人机协作优先**）：用户裁定当前重点 = 驾驶舱体验（人的操作台）+
   人养 Agent + agent 协作之外的三个停点（通知人 / 问人 / 等人批）；升 pin **不是重点**——RFC 经用户
   手动移入研究层、队列降触发型 ⏸（材料全备）。机制面核实（rc.2）：三节点均有载体——`tool-ask-user`
@@ -242,3 +240,8 @@
   VP 会话加 ask-user——teammate 本无 preset 工具面，故不碰动议内承诺权）；③收件人模型 v1 单操作者 +
   owner 字段 + answerer 路由表形状。取舍全文 =
   [RFC](./notes/proposed/2026-09-24-cockpit-human-loop.md) 各节。执行转入长程 goal（用户令）。
+- 2026-09-24（**晚 · N1 执行销账〔goal 第一条〕**）：方案 A 落地——7 文件改名 + 85 文件引用两遍改净 +
+  标题去前缀；verify（md-links ×321）/ test 157 项全绿。**两笔顺手账**：① entry-probe 既有缺陷修复
+  （prompt 未教转义内嵌双引号 ⇒ 非法 JSON；13:44 旧 run 已 0/8 但结果没被记录——门禁"立了没真跑"的
+  教训）② 探针修后 8/8 且抓到真缺陷：「四角色」残影两处已改。收尾 =
+  [implemented/n1-docs-naming](./notes/implemented/2026-09-24-n1-docs-naming.md)；RFC 毕业即改写。

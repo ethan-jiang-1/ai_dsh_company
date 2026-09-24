@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 结构门禁：UTF-8 / 文档链接 / preset 结构 / symlink / vendor pin / pack 形状。
-// 纪律：只报告实际跑过的检查（docs/design/10-architecture.md §6）。阶段 5 前不测行为，只测结构。
+// 纪律：只报告实际跑过的检查（docs/design/architecture.md §6）。阶段 5 前不测行为，只测结构。
 import { readFileSync, existsSync, lstatSync, readdirSync, readlinkSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
@@ -44,9 +44,9 @@ if (links.violations.length === 0) ok(`md-links (含 notes) ×${links.linkCount}
 // ── 2c. 行数预算（缩编自 vendor `verify-doc-budgets`；防入口链继续膨胀——R6 D23/清单 B #52） ──
 // 上限 = 当前值 + 余量；超限先搬（内容挪到该去的家）再压，确需空间才在 Note 里说明后升上限。
 const DOC_LINE_BUDGETS = [
-  ['AGENTS.md', 115],            // 2026-09-23 二次收口（渐进披露）后 107 行；指针化内容住 release.md/00-index/guides/60
-  ['docs/00-index.md', 145],     // 整治后 131
-  ['docs/guides/60-dev-loop.md', 440], // 整治后 ~397
+  ['AGENTS.md', 115],            // 2026-09-23 二次收口（渐进披露）后 107 行；指针化内容住 release.md/index/guides/dev-loop
+  ['docs/index.md', 145],     // 整治后 131
+  ['docs/guides/dev-loop.md', 440], // 整治后 ~397
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
   const lines = readFileSync(join(root, rel), 'utf8').split('\n').length - 1
@@ -111,7 +111,7 @@ const pack = JSON.parse(readFileSync(join(root, 'packages/company-pack/package.j
 const patchRel = pack?.dsh?.bundle?.patch
 if (typeof patchRel !== 'string' || !existsSync(join(root, 'packages/company-pack', patchRel))) fail('pack-bundle', 'dsh.bundle.patch 缺失或未指向真实文件')
 else ok('pack-bundle')
-// 兼容矩阵（R5a 发布欠账，guides/60 §5）：`dsh.compatibility.dshReleases` 必须包含当前
+// 兼容矩阵（R5a 发布欠账，guides/dev-loop §5）：`dsh.compatibility.dshReleases` 必须包含当前
 // 钉住的 vendor tag——升 pin 不加矩阵列 = 没验证过就装作验证过。升 pin 走
 // scripts/sync-dsh.mjs（它会同步加列），这条门禁保证忘加就红。
 const compatReleases = pack?.dsh?.compatibility?.dshReleases
@@ -123,7 +123,7 @@ if (!Array.isArray(compatReleases) || !compatReleases.includes(expectedTag)) {
 // DSH 的 verify-cordis-config 同构门禁（AGENTS.md：cordis.yml 的裸插件必须出现在
 // 其解析清单的 dependencies）。漏了 → profile 安装后行解析不到 → preset 标记 broken，
 // UI 里给不出可用角色（R1 实证：persona / skill-filesystem 缺依赖）。
-// R5a 起 runtime 依赖声明从 dependencies 精确钉改 peerDependencies（guides/60 §5：
+// R5a 起 runtime 依赖声明从 dependencies 精确钉改 peerDependencies（guides/dev-loop §5：
 // pre-stable API 拒绝钉死；profile 模板自带 autoInstallPeers: false，行解析走安装锚
 // 兜底）——本门禁按包名归一，两种声明都算"在列"。
 const packDeps = new Set([...Object.keys(pack?.dependencies ?? {}), ...Object.keys(pack?.peerDependencies ?? {})])
@@ -163,11 +163,11 @@ for (const entry of ownPackages) {
   if (!declaresClient) continue
   clientHalves.push(manifest.name)
   // 产物面：只在构建过（lib/ 存在）时检查——lib/ 是 gitignore 的产物，未构建时由
-  // preset-smoke 的"真 profile + 浏览器模块表"断言兜底（guides/60 §7）。
+  // preset-smoke 的"真 profile + 浏览器模块表"断言兜底（guides/dev-loop §7）。
   const clientRel = manifest.exports['./client']
   const clientPath = typeof clientRel === 'string' ? clientRel : clientRel?.default
   if (existsSync(join(dir, 'lib')) && typeof clientPath === 'string' && !existsSync(join(dir, clientPath))) {
-    fail('client-half', `${manifest.name} 的 "./client" 指向 ${clientPath}，但产物不存在（重新构建？guides/60 §7）`)
+    fail('client-half', `${manifest.name} 的 "./client" 指向 ${clientPath}，但产物不存在（重新构建？guides/dev-loop §7）`)
   }
 }
 ok(`client-halves ×${clientHalves.length}`)

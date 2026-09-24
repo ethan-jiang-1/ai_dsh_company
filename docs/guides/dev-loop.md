@@ -1,8 +1,8 @@
-# 60 · 开发环：一个变更从意图到调整的操作手册
+# 开发环：一个变更从意图到调整的操作手册
 
 > 性质：指南层——"怎么操作"的展开与查表处；纪律压缩版在根 AGENTS.md。
 > 来源：FAQ 13 `dev-loop.md` + `dual-home-isolation.md`（repo 外研究材料，落点登记见
-> [00-index.md](../00-index.md) §外部研究材料登记）；机制结论以 `vendor/dsh/` 工作树为权威，
+> [index.md](../index.md) §外部研究材料登记）；机制结论以 `vendor/dsh/` 工作树为权威，
 > 本篇引用的旗标与行为均已在钉住 tag（dsh-v0.1.5-rc.2）核对。
 
 ## 0. 开发环导航
@@ -46,7 +46,7 @@
 ## 2. 调试阶梯（组合层 → 会话层，不跳层）
 
 行为不符预期时按序排查。demo **现场**的症状→动作表另见
-[50-budget-and-ops.md](./50-budget-and-ops.md) §3；本阶梯用于开发插件本身时的排查。
+[budget-and-ops.md](./budget-and-ops.md) §3；本阶梯用于开发插件本身时的排查。
 
 | 层 | 手段 | 核对什么 |
 |---|---|---|
@@ -74,8 +74,8 @@
 | 问 | 判据 | 本 repo 落点 |
 |---|---|---|
 | ① 占哪个 ctx 键 / 发哪些事件 | 每个新能力一个自己的键，`inject` 声明依赖，不劫持别人的 | company-pack `src/` 的设计节 |
-| ② 模型会看见什么新状态 | **日志税**：每个新的模型可见输入配 `SessionEventMap` 成员（并定 `ignorable`），否则 JSONL 回放不出来 | [10-architecture.md](../design/10-architecture.md) §8 已预警；漏了在第 5 阶段以"日志读不全"还债 |
-| ③ UI 走哪层 | presenter 纯函数 → `tool.call.toolview` 槽 → `dsh.client.inject`，不一步到顶 | [30-ui-demo.md](../design/30-ui-demo.md) 分层（D6） |
+| ② 模型会看见什么新状态 | **日志税**：每个新的模型可见输入配 `SessionEventMap` 成员（并定 `ignorable`），否则 JSONL 回放不出来 | [architecture.md](../design/architecture.md) §8 已预警；漏了在第 5 阶段以"日志读不全"还债 |
+| ③ UI 走哪层 | presenter 纯函数 → `tool.call.toolview` 槽 → `dsh.client.inject`，不一步到顶 | [ui-demo.md](../design/ui-demo.md) 分层（D6） |
 | ④ 证据是什么 | "会为这次回归而失败"的那个测试，现在就点名 | 该变更的 Note"需验证什么" |
 
 ## 4. 插拔速查
@@ -111,7 +111,7 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibil
 
 | 时点 | 必须补上 | 依据 |
 |---|---|---|
-| ~~现在（零 JS，R0–R2）~~ | 无——pack 无代码，不存在依赖声明错误面 | [10-architecture.md](../design/10-architecture.md) §2.1 |
+| ~~现在（零 JS，R0–R2）~~ | 无——pack 无代码，不存在依赖声明错误面 | [architecture.md](../design/architecture.md) §2.1 |
 | R3+（pack 有 `src/`）✅ R5a 已补 | `@deepseek-ai/cordis` + 用到的 `@deepseek-ai/dsh-*` 作 **peerDependencies**；拒绝精确钉死（pre-stable API，钉死 = 每次上游同步逼发版） | FAQ 13 research.md 生态失败样本 |
 | R5a（发布）✅ 已补 | `dsh.compatibility` 矩阵；`npm pack` → 干净 profile → `dsh plugin add` 冒烟（`release-smoke`） | [ROADMAP.md](../../ROADMAP.md) R5a 行；合同 = [release.md](../release.md) |
 | OpenSpec 引入 | 触发条件：**第二贡献者进场**或**向 DSH 上游提 seam**（配合 D9 走方案 B）；此前 notes/ 纪律够用 | FAQ 13 answer.md 决策 5 |
@@ -242,7 +242,7 @@ node scripts/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团
   1. **防线一（快，`pnpm test`）**：已知必填 config 字段必须随工具行给出（如
      `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`）。
   2. **防线二（真，`node scripts/preset-smoke.mjs`）**：boot 真 web profile → `agentPresets/list`
-     断言四角色零 broken → **逐个 `session/create` 真挂一次**。
+     断言五角色零 broken → **逐个 `session/create` 真挂一次**。
   **只有防线二能抓"preset 挂载失败"**：行 config 校验发生在挂载时，roster 扫描与 `--dump-config`
   都看不到，UI 还会吞掉错误（症状就是"新建会话点了没反应"）。已反证：去掉一个必填 config 即变红
   （精确指向 preset 与缺失字段），恢复后 ALL PASS。

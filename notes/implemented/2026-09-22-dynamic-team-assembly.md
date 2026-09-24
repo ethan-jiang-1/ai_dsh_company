@@ -16,7 +16,7 @@ prompt 里写着“用 `spawn_teammate` 拉起 vp-sales 与 coo 两位（**只�
 
 ## 依据（实际查过）
 
-- **CEO 只有 1 个 skill**，而 [design/40](../../docs/design/40-role-content-plan.md) §1 原计划 3 个：
+- **CEO 只有 1 个 skill**，而 [design/role-content-plan](../../docs/design/role-content-plan.md) §1 原计划 3 个：
   `chairing-staff-meeting` / `task-decomposition` / `synthesizing-deliverables`。后两个从没做。
 - 现有那个 skill 的步骤是：澄清 → **拆解分派（DAG）** → 追进度 → VP 互审 → 收口 → 记账。它
   **从“DAG 拆解分派”开始，默认已经决定要开会了**；标题还叫“（R2 五角色版）”。中间那句“需要谁
@@ -26,7 +26,7 @@ prompt 里写着“用 `spawn_teammate` 拉起 vp-sales 与 coo 两位（**只�
   CEO persona 的两条路规则。⇒ 新 skill **必须把这块责任搬过去，不能并存**，否则 CEO 会拿到两条
   互相覆盖的指示。
 - 成本是真的：每个 teammate = 真模型调用；`kb/org.md` 有 AI 试点每案 $200/月硬顶，
-  [guides/60](../../docs/guides/60-dev-loop.md) §10 立了“自动化只许轻任务”。让 CFO 陪跑一个与钱
+  [guides/dev-loop](../../docs/guides/dev-loop.md) §10 立了“自动化只许轻任务”。让 CFO 陪跑一个与钱
   无关的动议，是要付钱的。
 
 ## 提案
@@ -61,7 +61,7 @@ prompt 里写着“用 `spawn_teammate` 拉起 vp-sales 与 coo 两位（**只�
 ## 输掉的方案（为什么不做成别的东西）
 
 - **不做“总控调度器”**：那要自建机制（D13 禁止）。DSH 现成载体就是 skill（按需加载的方法）+
-  persona（身份与开工动作）；模板即流程（design/40 §0.4）的同一个思路。
+  persona（身份与开工动作）；模板即流程（design/role-content-plan §0.4）的同一个思路。
 - **不塞 R5**：R5a 是门禁与发布、R5b 是驾驶舱，都不属于任何一半；且 **D19 刚为"同轮塞太多面"
   把 R5 拆开**，往收尾中的 R4 或已拆的 R5 里塞新能力是同一种错。
 - **不叫 R4.5**：数字该跟着主题走（D10 同理）——R4 的线是成品流程，这件事是 CEO 内容面；且它

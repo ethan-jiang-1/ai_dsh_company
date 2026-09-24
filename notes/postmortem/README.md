@@ -26,5 +26,5 @@ Timeline 必须给**证据坐标**（会话 id、事件序列、RPC 报错原文
 - [0004-entry-execution-remediation-handoff.md](0004-entry-execution-remediation-handoff.md)：入口/执行链 Markdown 收敛范围、验证记录与当前 owner 指针。按用户要求置于本目录并沿用编号命名；不计入上方事故复盘编号表。
 
 三篇的共同缺陷（也是本目录存在的原因）：**最后一次检查由人在浏览器里做**。对应的纪律与门禁见
-`AGENTS.md` 纪律表与 `docs/guides/60-dev-loop.md` §2；外部证据见
+`AGENTS.md` 纪律表与 `docs/guides/dev-loop.md` §2；外部证据见
 [`notes/implemented/2026-09-22-agent-workflow-community-practice.md`](../implemented/2026-09-22-agent-workflow-community-practice.md)。

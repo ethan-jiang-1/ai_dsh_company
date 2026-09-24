@@ -2,9 +2,9 @@
 
 ## 决定
 
-docs/ 组织为五层：导航（00-index）/ 设计（design/，为什么）/ 计划（plans/，接下来）/
+docs/ 组织为五层：导航（index）/ 设计（design/，为什么）/ 计划（plans/，接下来）/
 指南（guides/，怎么操作）/ 合同（顶层按主题，现在是什么——随阶段诞生，不预建空文件）。
-10 §7 阶段表迁出为 plans/roadmap.md。
+architecture §7 阶段表迁出为 plans/roadmap.md。
 
 ## 输掉的方案
 

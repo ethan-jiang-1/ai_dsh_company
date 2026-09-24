@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 /**
- * 测试分层纪律的**机械门禁**（guides/60 §9.1，R3 立）。
+ * 测试分层纪律的**机械门禁**（guides/dev-loop §9.1，R3 立）。
  *
  * 起因（用户当轮反馈）："这种测试如果是 regression 的话，跑得这样慢是完全受不了的。"
  * 结论：`pnpm test` 是秒级 keyless 单元/纯逻辑层；需要子进程的 CLI 集成检查放独立 smoke，
@@ -39,7 +39,7 @@ function specFiles(dir: string): string[] {
   return found
 }
 
-describe('测试分层纪律（guides/60 §9.1：真模型/真浏览器不进回归）', () => {
+describe('测试分层纪律（guides/dev-loop §9.1：真模型/真浏览器不进回归）', () => {
   it('回归层不许出现子进程 / 浏览器 / 网络 / 密钥', () => {
     const offenders: string[] = []
     for (const file of specFiles(TESTS)) {
@@ -81,14 +81,14 @@ describe('测试分层纪律（guides/60 §9.1：真模型/真浏览器不进回
       expect(text, `${name} 不得引用 scripts/（replay lane 起进程+浏览器，属认证档）`).not.toContain('scripts/')
     }
 
-    // ③ 纪律有家：replay-smoke 自己的头注声明分层（guides/60 §9.1）。
+    // ③ 纪律有家：replay-smoke 自己的头注声明分层（guides/dev-loop §9.1）。
     const replay = readFileSync(join(ROOT, 'scripts/replay-smoke.mjs'), 'utf8')
     expect(replay, 'replay-smoke 头注必须声明"不进 pnpm test"').toContain('不进 pnpm test')
   })
 
-  it('分层预算写在 guides/60 §9.1（纪律有家，不靠记忆）', () => {
-    const guide = readFileSync(join(ROOT, 'docs/guides/60-dev-loop.md'), 'utf8')
-    expect(guide, 'guides/60 缺 §9.1 测试分层').toContain('9.1 测试分层与预算')
+  it('分层预算写在 guides/dev-loop §9.1（纪律有家，不靠记忆）', () => {
+    const guide = readFileSync(join(ROOT, 'docs/guides/dev-loop.md'), 'utf8')
+    expect(guide, 'guides/dev-loop 缺 §9.1 测试分层').toContain('9.1 测试分层与预算')
     expect(guide, '§9.1 必须写明"真模型 / 真浏览器不进迭代环"').toContain('真模型 / 真浏览器不进迭代环')
   })
 })

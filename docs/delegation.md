@@ -1,8 +1,8 @@
 # delegation · 汇报线合同（R3：两条路与它们的机制边界）
 
 > 顶层合同：CEO 的"派活"现在时语义——哪条路走什么、边界在哪、被什么检查守住。
-> 机制依据 [design/10-architecture.md](./design/10-architecture.md) §3（通道 A/B）与
-> [design/20-roles-isolation.md](./design/20-roles-isolation.md) §2–§3；R3 的实证记录在
+> 机制依据 [design/architecture.md](./design/architecture.md) §3（通道 A/B）与
+> [design/roles-isolation.md](./design/roles-isolation.md) §2–§3；R3 的实证记录在
 > `notes/implemented/2026-09-22-r3-*.md`。台账 Q1 由本篇闭合。
 
 ## 0. 一句话
@@ -71,7 +71,7 @@ subagent child 不在名册上 ⇒ **continuable child 在 CEO 会话里既发�
    （写清产出形态与判据），不能指路到 `tech-feasibility-review` 这类角色 skill——那不在它的
    catalog 里。
 2. **要"child 拿到角色完整 skills/工具面"** ⇒ 那是 M2（自定义 provider 在 child 创建窗口 mount
-   角色 preset，[design/20](./design/20-roles-isolation.md) §3），本仓未做。触发条件 = 出现
+   角色 preset，[design/roles-isolation](./design/roles-isolation.md) §3），本仓未做。触发条件 = 出现
    "必须隔离组合"的委派。
 3. **并行快捷派活**（同时开几个 VP 不等结果）在本组合里没有干净解法：continuable 管不了、
    one-shot 前台串行。要它得等上游 seam（per-child composition / 不撞名的控制面），
@@ -90,7 +90,7 @@ subagent child 不在名册上 ⇒ **continuable child 在 CEO 会话里既发�
 
 ## 6. 验证（分层，只报告实际跑过的）
 
-**分层原则（R3 立，guides/60 §9.1）**：按"要不要模型"切，不按"重不重要"切。真模型/真浏览器
+**分层原则（R3 立，guides/dev-loop §9.1）**：按"要不要模型"切，不按"重不重要"切。真模型/真浏览器
 **不进回归**——它们分钟级且依赖模型配合；回归只跑秒级的 keyless 层。
 
 | 层 | 手段 | 守什么 | 何时跑 |

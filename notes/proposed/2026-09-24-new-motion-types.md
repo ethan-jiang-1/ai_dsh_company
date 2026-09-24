@@ -13,7 +13,7 @@
 1. **季度经营会**（复盘 + 下季优先级）：CFO/COO 主导（区别于现有 CEO 主导形态）；weekly-report
    模板首次运转（各条线先出素材）；产出 = 季度经营报告（三态照旧：各线 `drafts/` + CEO `final.md`
    + `present`）。可选机制试炼：CEO 用通道 D（workflow 脚本）批量收集各条线素材——通道 D 在
-   公司组合未接线（preset 工具行无 workflow 行），本场景天然；受 [guides/60 §10](../../docs/guides/60-dev-loop.md)
+   公司组合未接线（preset 工具行无 workflow 行），本场景天然；受 [guides/dev-loop §10](../../docs/guides/dev-loop.md)
    轻任务纪律约束（预算先行、可中断、人工在场）。
 2. **事件复盘**（场景 B 续集）：跨角色应急（时间压力下的决定）+ 事后复盘产出；复用场景 B 形态
    （3 角色、轻预算）；产出 = 事件复盘报告（进 deliverables 三态）。
@@ -38,5 +38,5 @@
 
 ## 风险
 
-真模型成本与时间（五角色满编一场的预算口径见 `kb/org.md` 与 guides/50）；对策：季度会按场景 B
+真模型成本与时间（五角色满编一场的预算口径见 `kb/org.md` 与 guides/budget-and-ops）；对策：季度会按场景 B
 的轻预算档先试（参与的条线按议题定，不强求全员）。

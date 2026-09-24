@@ -1,7 +1,7 @@
 # 代理驱动仓库的「改完 → 人肉跑 → 集成/配置翻车 → 再修」回路：一手资料研究
 
 状态：**已落地（研究）** → 结论 = D15（完成定义与发现权在代理一侧；否决 spec 流程与"加长指令文件"），
-落在 `docs/guides/60-dev-loop.md` §1/§2/§7 + `AGENTS.md` 纪律表 + postmortem 0001/0002。
+落在 `docs/guides/dev-loop.md` §1/§2/§7 + `AGENTS.md` 纪律表 + postmortem 0001/0002。
 2026-09-23 自 `notes/research/` 毕业（research 层只放活研究）。
 
 日期：2026-09-22

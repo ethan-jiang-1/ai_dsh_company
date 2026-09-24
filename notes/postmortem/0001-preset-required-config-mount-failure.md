@@ -90,9 +90,9 @@ mount.
 - `scripts/verify.mjs` check 8 — rows with known schema-required fields must carry them (fast, runs
   in `pnpm test`'s neighbourhood).
 - 收尾清单第 6 条（时为 `docs/plans/roadmap.md`，D24 后随收尾程序住
-  [guides/60 §12](../../docs/guides/60-dev-loop.md)）— every round ends with `verify` + `test` +
+  [guides/dev-loop §12](../../docs/guides/dev-loop.md)）— every round ends with `verify` + `test` +
   `preset-smoke`.
-- `docs/guides/60-dev-loop.md` §2 layer 3.8 and §7 — silent UI failures are diagnosed by calling the
+- `docs/guides/dev-loop.md` §2 layer 3.8 and §7 — silent UI failures are diagnosed by calling the
   gateway RPC, and the two pre-flight defences are documented.
 
 ## Lessons

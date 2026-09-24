@@ -29,12 +29,13 @@ if (!Number.isInteger(PORT) || PORT < 0 || PORT > 65535 || !Number.isFinite(TURN
 // Overriding cwd can silently change the injected instruction chain. Keep this probe repo-specific.
 if (process.argv.includes('--cwd')) { console.error('entry-probe: cwd 固定为开发仓库根，不接受 --cwd'); process.exit(2) }
 const PROMPT = [
-  '你是本仓库的只读审读代理。先读 AGENTS.md、docs/00-index.md、ROADMAP.md；',
+  '你是本仓库的只读审读代理。先读 AGENTS.md、docs/index.md、ROADMAP.md；',
   '再按入口指针读取相关 docs/ 和 notes/（无需通读全树）。不要联网、执行命令、修改文件或启动子代理。',
   '这是审读任务，不执行队列，不进入实施；来源矛盾或答不了时明确列出，不编造。',
   '最后只输出一个 JSON 对象，不要输出前后说明，结构如下：',
   '{"answers":[{"id":"Q1","status":"answered","answer":"本题答案","evidence":[{"path":"ROADMAP.md","quote":"该文件中逐字原文，至少8字符"}]}],"conflicts":[]}',
   'answers 必须每题恰好一项；status 可为 answered/unresolved；conflicts 列出发现的来源冲突。',
+  'quote 与 answer 里如需包含英文双引号，必须用 \\\" 转义或改写为「」，保证整体是合法 JSON；宁可另选一段不含双引号的原文。',
   '每题给出其自己的答案和证据，不以其他题的内容替代。以下八题：',
   ...ENTRY_QUESTIONS.map(q => `${q.id}: ${q.ask}`),
 ].join('\n')
@@ -51,7 +52,7 @@ function readSource(path) {
   sourceHashes.set(path, createHash('sha256').update(text).digest('hex'))
   return text
 }
-for (const path of ['AGENTS.md', 'docs/00-index.md', 'ROADMAP.md']) readSource(path)
+for (const path of ['AGENTS.md', 'docs/index.md', 'ROADMAP.md']) readSource(path)
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 let rpcId = 0

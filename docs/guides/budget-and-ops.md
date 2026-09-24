@@ -1,4 +1,4 @@
-# 50 · 预算限流与 demo 运维
+# 预算限流与 demo 运维
 
 > 五个角色 + 各自 workers 的组织会烧 token、会出状况。本篇收拢**限流旋钮**与
 > **demo 运维 runbook**（症状→动作），并给回放复盘的路径。数值默认值均核实自
@@ -20,10 +20,10 @@
 ## 2. 成本结构（每场 demo 的 token 面）
 
 - **常驻成本**：CEO 会话（全程）+ 4 个 VP 会话（spawn 后 resident）——每个会话独立计费、
-  独立 KV cache（persona prefix 稳定对 cache 友好，20 §1）。
+  独立 KV cache（persona prefix 稳定对 cache 友好，roles-isolation §1）。
 - **脉冲成本**：workers（one-shot，随生随灭）、workflow 冲刺（脚本内 agent() 并发）。
 - **省钱杠杆**：① `fork` teammate 下发会议上下文，比"CEO 逐个转述 brief"省重复输入；
-  ② 稳定事实放 KB 文件按需读，不进 persona（40 §0.2）；③ 长稿交割走 workspace 文件 +
+  ② 稳定事实放 KB 文件按需读，不进 persona（role-content-plan §0.2）；③ 长稿交割走 workspace 文件 +
   消息里给路径（避开 64KiB 邮箱上限同时也省 token）；④ 需要压彩排成本时，在彩排动议的委托工具
   `agentOptions` 上临时收紧（正式场不动——D16 默认全员同模型）。
 
@@ -39,7 +39,7 @@
 | 消息"发了没反应" | 发送结果是 `queued`（已持久化，**不得重发**）还是 `accepted` | `queued`＝对方 inactive，冷恢复时必达；等或用 `wait_agent`；别重发造成重复 |
 | 任务板编辑被拒 | `TEAM_TASK_STALE_REVISION`（CAS） | 重新 `team_task_get` 拿最新修订再改——两个人同时改一任务是设计内冲突 |
 | teammate 建不出来 | roster/名册报错连原因列出（fail-loud） | 按报错修 preset 行/名字（名字永久占用不复用，`provisioning` 失败也占名）；超编检查 `maxMembers` |
-| VP 会话被 compaction 洗糊涂 | 长会话压缩后丢细节 | 指引它重读自己 journal/CHARTER（40 §0.3 的开工动作就是为此） |
+| VP 会话被 compaction 洗糊涂 | 长会话压缩后丢细节 | 指引它重读自己 journal/CHARTER（role-content-plan §0.3 的开工动作就是为此） |
 | Web 第 4 个窗口卡死 | FAQ 12：rev 轮换+陈旧缓存（动态模块 404） | 按 FAQ 12 runbook：重打补丁→重启→验证；demo 前升过 vendor 必走一遍 |
 | 演示中途要撤回某 VP 的话 | — | Lead `interrupt_agent` + 任务板 reopen；会话日志不可改，复盘时用回放解释 |
 | demo 崩了要重来 | 所有团队状态在 Lead session log（durable） | 重开进程冷恢复：teammates inactive 冷恢复收 queued 消息；或从 JSONL 回放叙事 |
@@ -50,7 +50,7 @@
   整场（`docs/subsystems/agent-team.md` §Replay）。复盘 = 读日志，不靠记忆。
 - 每场 demo 收尾动作：CEO `present` 交付物；人（你）把"值得留的教训"追加进对应角色
   journal——这是组织学习闭环的 v0。
-- 升级纪律（experimental 漂移、`sync-dsh.mjs` 升级环、兼容矩阵）见 [10](../design/10-architecture.md) §8，
+- 升级纪律（experimental 漂移、`sync-dsh.mjs` 升级环、兼容矩阵）见 [10](../design/architecture.md) §8，
   不在此重复。
 
 ## 5. 开工前检查单

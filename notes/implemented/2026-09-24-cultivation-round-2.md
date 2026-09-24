@@ -32,7 +32,7 @@
 |---|---|
 | `pnpm verify` / `pnpm test` | ALL PASS（16 项）/ 91/91 |
 | `node scripts/preset-smoke.mjs` | ALL PASS（5 preset 真挂载 + 隔离 ×5 + client 闭包）——本档同时覆盖 **W3**（COO 指认改齐）后的挂载 |
-| `node scripts/probe-smoke.mjs --full`（认证档；覆盖 W3 + 本轮 CFO / VP-Sales 改动） | **15/15 全部命中**：批跑 14/15 + 失败题按 guides/60 §9 单题重试通过（coo#2 批跑 90s 超时 → 单跑 3653 字符命中 /8/ + /CEO/；cfo#3 前一场批跑超时、本场批内通过 1005 字符——**超时在轮换 = 并发慢轮次抖动，非内容回归**，CEO/CFO/VP-Sales 三角色探针均批内全过 = 培养后入戏不受损） |
+| `node scripts/probe-smoke.mjs --full`（认证档；覆盖 W3 + 本轮 CFO / VP-Sales 改动） | **15/15 全部命中**：批跑 14/15 + 失败题按 guides/dev-loop §9 单题重试通过（coo#2 批跑 90s 超时 → 单跑 3653 字符命中 /8/ + /CEO/；cfo#3 前一场批跑超时、本场批内通过 1005 字符——**超时在轮换 = 并发慢轮次抖动，非内容回归**，CEO/CFO/VP-Sales 三角色探针均批内全过 = 培养后入戏不受损） |
 
 ## ④ 环境状态
 

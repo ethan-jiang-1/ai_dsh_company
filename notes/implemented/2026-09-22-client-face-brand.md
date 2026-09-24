@@ -2,7 +2,7 @@
 
 ## 决定
 
-1. **company-pack 现在有 client 面**（design/30 §0 的形态落地）：`package.json` 加
+1. **company-pack 现在有 client 面**（design/ui-demo §0 的形态落地）：`package.json` 加
    `exports["./client"]` + `dsh.client`（`platform: web`，inject renderer/sidebar），
    `src/index.ts` 是空 host 半（`apply(){}`），`src/client/index.tsx` 注册侧栏槽
    **`sidebar.brand.name`** 渲染 `DSH Wochen Team`。
@@ -18,7 +18,7 @@
 5. **tsconfig 清 `paths`**：继承 vendor client base 会带上 `paths`（把 vendor `src` 拉进本程序，
    触发 vendored 包内部类型错误）；清空后改用 node_modules 里已构建的 `lib/types` 声明。
 6. **标题品牌化（零代码）**：`DSH_CLIENT_TITLE` 是构建期变量，同时决定标签页标题与 AppFrame
-   主标题——**web dist 与 client 面两条构建命令都要带**（guides/60 §7）。
+   主标题——**web dist 与 client 面两条构建命令都要带**（guides/dev-loop §7）。
 
 ## 输掉的方案
 

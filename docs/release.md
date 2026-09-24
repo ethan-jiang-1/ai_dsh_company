@@ -1,7 +1,7 @@
 # release · 发布形状的现在时（company-pack）
 
 > 顶层合同：vendor 政策、pack 的依赖姿态、兼容矩阵、真实安装冒烟程序、升 pin 程序。
-> 依据：guides/60 §5（发布纪律时点表）+ FAQ 13（外部研究：dsh-market / dsh-im 生态姿态）。
+> 依据：guides/dev-loop §5（发布纪律时点表）+ FAQ 13（外部研究：dsh-market / dsh-im 生态姿态）。
 > 执行器：`scripts/release-smoke.mjs`（发布冒烟）与 `scripts/sync-dsh.mjs`（升 pin）。
 
 ## 依赖姿态（R5a 起的现在时）
@@ -61,7 +61,7 @@
 程序（脚本按序执行，任一步失败即红）：
 
 0. **前置**：`source dev/env.sh`；共用 `requireDevHome` 拒绝日用 home 及其祖先/后代/符号链接别名。读取 vendor CLI `package.json` 的 `bin.dsh`（当前 `apps/cli/lib/bin.js`），检查它和 web dist 在场；缺失即失败，不回退源码。
-1. **构建 company-pack**：`tsc -p packages/company-pack` + tsdown。本脚本不重建 vendor；已有 vendor 产物可运行不等于来自当前 SHA 的新鲜构建。配方归 [开发环](./guides/60-dev-loop.md) §7。
+1. **构建 company-pack**：`tsc -p packages/company-pack` + tsdown。本脚本不重建 vendor；已有 vendor 产物可运行不等于来自当前 SHA 的新鲜构建。配方归 [开发环](./guides/dev-loop.md) §7。
 2. **`npm pack`**：tarball 落 `dev/harness-home/tmp/release-pack/`（npm cache 重定向进
    repo gitignored 区——纪律 §11）。
 3. **干净 profile**：dev harness home 下 `release-check`，**先删后建**；预置
@@ -91,4 +91,4 @@
   （npm publish）等出现第二个消费者/部署需求时再定，当前 release-smoke 验证的是
   `file:` tarball 安装形状）。
 - 发布前必跑：`pnpm verify` + `pnpm test`（迭代环）+ `release-smoke`（认证档）；
-  preset/内容改动另跑 `preset-smoke`（guides/60 §9.1 分层）。
+  preset/内容改动另跑 `preset-smoke`（guides/dev-loop §9.1 分层）。

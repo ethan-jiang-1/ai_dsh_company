@@ -1,6 +1,6 @@
 # Note 生命周期吸纳：DSH Agent Note lifecycle 六条细则（点选，不推翻）
 
-状态：implemented（2026-09-24 晚；细则 owner = guides/60 §12「Note 生命周期细则」）
+状态：implemented（2026-09-24 晚；细则 owner = guides/dev-loop §12「Note 生命周期细则」）
 
 ## 问题
 
@@ -9,7 +9,7 @@ dsh-v0.1.7-rc.1 树整理的 DSH Agent Note 生命周期）系统摆出一套成
 进来，点选吸纳，不推翻现有」。本仓 notes/ 体系（intents 台账 → proposed/ → implemented/ +
 rejected/ postmortem/ research/）本就是 DSH 机制的裁剪版——需要逐点判断哪些补进来、哪些显式不要。
 
-## 吸纳的六条（落 guides/60 §12）
+## 吸纳的六条（落 guides/dev-loop §12）
 
 | 细则 | 吸自 | 对本仓的价值 |
 |---|---|---|
@@ -25,7 +25,7 @@ rejected/ postmortem/ research/）本就是 DSH 机制的裁剪版——需要�
 - **class 子目录体系**（feature/bug-fix/simplification/architecture/process/testing）：重构 42 篇
   implemented + 全仓链接属推翻级；规模翻倍或合并整治轮时与归档评估同窗再议。
 - **archived/ 冻结树 + seal manifest**：2026-09-24 磨审计已评估「暂不归档」（r0-loop-acceptance
-  仍被 guides/60 §7 引为活判据），不重开。
+  仍被 guides/dev-loop §7 引为活判据），不重开。
 - **去中心化 INDEX**（no-index rationale）：DSH 前提是"目录树即清单、按 class 浏览"；本仓开工方式是
   "按主题检索 intents 台账 + 队列指针"（D24）——intents.md 是入口不是冗余，保留；防漂移靠门禁 + D26。
 - **严格状态值域 + 位置互证门禁**（verify-agent-note-format 同款）：现状 23/42 无状态行、值形自由
@@ -34,12 +34,12 @@ rejected/ postmortem/ research/）本就是 DSH 机制的裁剪版——需要�
 
 ## 取代检查（按新细则执行的首例）
 
-搜同决定 owner：D26（文档卫生）、2026-09-23 research 层生命周期立规、guides/60 §12 既有规则——
+搜同决定 owner：D26（文档卫生）、2026-09-23 research 层生命周期立规、guides/dev-loop §12 既有规则——
 本 Note 是**细化不是取代**（部分重叠、互不吸收），互链保留。
 
 ## 验证
 
-`pnpm verify` 全绿（md-links 含新增链接；doc-budget guides/60 403→418、00-index 137→138）。
+`pnpm verify` 全绿（md-links 含新增链接；doc-budget guides/dev-loop 403→418、index 137→138）。
 本 Note 本身即「决定随变更交付、直接进 implemented/ 不必经 proposed/」的首次示范（用户令 = 决定
 已做出；vendor README "a decision already made starts in implemented/" 同构）。
 

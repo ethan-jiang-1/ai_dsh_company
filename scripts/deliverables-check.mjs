@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 交付物三态判据的**运行场入口**（R4「成品流程」轮）。
 //
-// 与 `tests/deliverables.spec.ts` 的分工（guides/60 §9.1 分层纪律）：
+// 与 `tests/deliverables.spec.ts` 的分工（guides/dev-loop §9.1 分层纪律）：
 //   - 回归层（vitest）守判据本身，只读**明文**归档日志，秒级、无 key；
 //   - 本脚本跑**运行场**——`company-workspace/` + `$DSH_HOME/sessions/`，那里的日志是
 //     多帧 zstd（Node 内置 zstd 只解首帧，实测 329KB 只吐出 1 行），所以这里起 `zstd` 解帧。

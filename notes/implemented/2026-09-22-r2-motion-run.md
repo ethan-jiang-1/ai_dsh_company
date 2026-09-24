@@ -15,7 +15,7 @@ session `session-37cc53ac-4a71-45bb-886d-8ee71e46ae0a`，跑在 web 观察窗（
 | 跨职能互审 | 互审任务被 claim → 出评审件 → `send_message` 发修订指令 → owner 改稿 + 任务板回执（消息流里能看到"修订指令 · 互审意见已到齐，请改稿 + 回执"） |
 | 消息投递 | `team/message/queued` 25 / `team/message/delivered` 25（**不丢不重**：队列与投递计数一致） |
 | 交付物 | `deliverables/reconcile-package*.md` 共 7 份（VP-Sales/VP-Eng/CFO/COO 稿 + 两份互审件 + 合稿） |
-| M4 共享组合的实证 | teammate 会话 header `agentPreset: "ceo"`、`parentSessionId: null`、`delegationDepth: 1`——团队内成员共享 Lead 组合（design/20 §4 缺口的现场证据） |
+| M4 共享组合的实证 | teammate 会话 header `agentPreset: "ceo"`、`parentSessionId: null`、`delegationDepth: 1`——团队内成员共享 Lead 组合（design/roles-isolation §4 缺口的现场证据） |
 
 归档：`snapshots/r2-motion/`（lead 451 行 + 4 个 child 会话 + `workspace.expected/`），
 由新脚本 `scripts/snapshot-motion.mjs` 从 `$DSH_HOME/sessions/` 生成。
@@ -29,7 +29,7 @@ session `session-37cc53ac-4a71-45bb-886d-8ee71e46ae0a`，跑在 web 观察窗（
   所以"全程 UI 可见 / 两空间镜头"的验收仍未由人观察过。
 - 因此 R2 的 ④ **不是全部验收通过**，是"机制已被真跑证实 + 归档就位 + 收口镜未走"。
 
-## 随之立的两条纪律（guides/60）
+## 随之立的两条纪律（guides/dev-loop）
 
 - **§9 门禁分层**：连通档（默认，≈6s）vs 内容档（`--full`，按需）。
 - **§10 自动化只许是轻任务**：开跑前定三个上限（墙钟 / 轮次或工具调用 / 输出量），

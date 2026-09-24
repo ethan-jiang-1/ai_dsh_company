@@ -2,7 +2,7 @@
 
 状态：**已落地（研究）** → 结论落点 = 公司视图 / 公司页签 / 视觉打磨三篇收尾 Note
 （[2026-09-23-company-view](./2026-09-23-company-view.md) / [2026-09-23-panel-tabs](./2026-09-23-panel-tabs.md) /
-[2026-09-23-visual-polish](./2026-09-23-visual-polish.md)）+ [design/30-ui-demo.md](../../docs/design/30-ui-demo.md)
+[2026-09-23-visual-polish](./2026-09-23-visual-polish.md)）+ [design/ui-demo.md](../../docs/design/ui-demo.md)
 （座位/令牌/命名）+ ROADMAP「依赖选型门槛」行（第三方看板否决证据 = 本笔记 §4）。2026-09-24 自 `notes/research/` 毕业。
 方法：三条后台调研线并行（平台能力 / 生态与官方口径 / 设计参照与库选型）+ 一条采用度线（进行中）。
 标注：**【一手】** = vendor 源码、官方文档或 npm registry 直接核实；**【本地研究】** = 外部研究树
@@ -29,7 +29,7 @@
   按 `order`；`keyed` 必填 `key`；`priority` **升序小者渲染**，同 cell 同 priority 二次注册抛错
   （`packages/client/ui-slots/src/index.ts:526-527,834-837`）。
 - **「band」不是 slot 概念**：`extension(3) > builtin(2) > fallback(1)` 只存在于右栏 tab 类型注册
-  （`ui-sidebar-right/src/client/tab-registry.ts:48-58`）。⚠ 本仓 `docs/design/30-ui-demo.md:57` 把它写成
+  （`ui-sidebar-right/src/client/tab-registry.ts:48-58`）。⚠ 本仓 `docs/design/ui-demo.md:57` 把它写成
   slot 优先级，**属表述不精确**，随本条目修正。
 - 对可视化有用的座位（★ = 当前空位）：
 

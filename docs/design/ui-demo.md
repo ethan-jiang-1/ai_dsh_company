@@ -1,7 +1,7 @@
 # UI 演示层 · 怎么在 Web 上示范组织的协调工作
 
-> 承接 [10-architecture.md](./10-architecture.md) 与
-> [20-roles-isolation.md](./20-roles-isolation.md)；总入口 [00-index.md](../00-index.md)。
+> 承接 [architecture.md](./architecture.md) 与
+> [roles-isolation.md](./roles-isolation.md)；总入口 [index.md](../index.md)。
 > 本篇回答：demo 要"看见他们协调"，DSH Web UI 给到哪一层、我们自己要写哪一层。
 > 依据：`docs/subsystems/{client-modules,slots,sidebar-right,web-client}.md`、
 > `packages/experimental/client-ui-agent-team/`（官方范本，逐行读过）、
@@ -24,7 +24,7 @@
 ## 1. 第 0 层 · 现成的可视面（零自定义代码）
 
 装 `agent-team-profile`（Host 侧，**先装**）+ `@deepseek-ai/dsh-experimental-agent-team-web-profile`
-（Web 侧，后装）后，Web GUI 免费获得（本包**已按 10 §3 冲突注直插两行**，R1 起，UI 不受影响）：
+（Web 侧，后装）后，Web GUI 免费获得（本包**已按 architecture §3 冲突注直插两行**，R1 起，UI 不受影响）：
 
 | 可视面 | 机制（已核实） |
 |---|---|

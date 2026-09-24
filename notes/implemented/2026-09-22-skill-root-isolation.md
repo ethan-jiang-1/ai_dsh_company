@@ -22,7 +22,7 @@ preset 文件里那句注释"角色专属 skills……其他角色不可见（**
    这是真入口路径检查（真 web profile + 真 `session/create` + 真读模型），不是配置形状检查。
 3. **重装纪律修正**：pack 装进 profile 的是**真拷贝**（inode 不同、link count 1），改
    `presets/*.yml` 后必须 `plugin --profile web remove` + `add` 才被伺服；
-   guides/60 §7 原先只写"新增 `lib/**` 才要重装"（那条针对 tsdown 原地写），已补正。
+   guides/dev-loop §7 原先只写"新增 `lib/**` 才要重装"（那条针对 tsdown 原地写），已补正。
 
 ## 输掉的方案
 

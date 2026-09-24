@@ -41,7 +41,7 @@ export async function loadChromium(root) {
     const mod = await import(pathToFileURL(candidate).href)
     if (mod.chromium !== undefined) return mod.chromium
   }
-  throw new Error('找不到 playwright（先 `pnpm install`，guides/60 §7）')
+  throw new Error('找不到 playwright（先 `pnpm install`，guides/dev-loop §7）')
 }
 
 /** 启动 chromium：默认解析失败（缓存里没有期望版本）时，回退缓存里最新一份可执行文件。 */

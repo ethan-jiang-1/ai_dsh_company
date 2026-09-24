@@ -37,7 +37,7 @@ RFC：[2026-09-22-twin-cultivation-and-self-learning.md](./2026-09-22-twin-culti
 | `pnpm verify` / `pnpm test` | ALL PASS（16 项门禁）/ **91/91** |
 | `node scripts/preset-smoke.mjs` | ALL PASS（5 preset 真挂载 + 隔离断言 ×5 + client 闭包 lint） |
 | 边界活体探针（`/tmp/cultivation-boundary.mjs`，一次性；3 次模型调用，墙钟 ~2.5 min） | 4 断言 3 绿 + **1 修正性发现**：旧会话第 2 轮也见新文（非探针故障——工具调用名已从会话日志核实为 `skill`；会话 `session-7d09615f…`〔A，两轮〕/ `session-e46fc82d…`〔B〕，dev home 排练场目录，未清理） |
-| `node scripts/probe-smoke.mjs --full`（入戏探针，认证档一次） | **15/15 PASS**（coo#2 知识首轮 90s 超时，按 guides/60 §9「失败重试一次换新会话」通过；**CEO 三探针全过 = 培养后入戏不受损**） |
+| `node scripts/probe-smoke.mjs --full`（入戏探针，认证档一次） | **15/15 PASS**（coo#2 知识首轮 90s 超时，按 guides/dev-loop §9「失败重试一次换新会话」通过；**CEO 三探针全过 = 培养后入戏不受损**） |
 | coo#2 单题重试（`/tmp/probe-coo2-retry.mjs`，1 次调用） | PASS（回复 3207 字符，/8/ + /CEO/ 命中） |
 
 ## ④ 环境状态（下条会话判断"哪些已就绪"只读这里）

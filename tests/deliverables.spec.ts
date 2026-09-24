@@ -19,7 +19,7 @@ import {
  * `deliverables/presented` 事件——"哪些是成品"不再靠 `-vp-eng` 这类命名约定。
  * 判据的合同家 = `company-workspace/AGENTS.md`；动机 = `notes/proposed/2026-09-22-workspace-hygiene.md`。
  *
- * 分层（guides/60 §9.1）：本层 keyless、秒级、不碰模型与浏览器——只读**明文**归档日志。
+ * 分层（guides/dev-loop §9.1）：本层 keyless、秒级、不碰模型与浏览器——只读**明文**归档日志。
  * 运行场那份（读 `$DSH_HOME` 的多帧 zstd 日志）是认证档，归 `scripts/deliverables-check.mjs`。
  */
 

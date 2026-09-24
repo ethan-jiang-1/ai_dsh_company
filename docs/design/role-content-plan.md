@@ -1,6 +1,6 @@
-# 40 · 角色内容设计（persona / skills / KB / 模板）
+# 角色内容设计（persona / skills / KB / 模板）
 
-> 机制已定（[10](./10-architecture.md) / [20](./20-roles-isolation.md)）；本篇是**内容面**：
+> 机制已定（[10](./architecture.md) / [20](./roles-isolation.md)）；本篇是**内容面**：
 > 五个角色到底"是谁、知道什么、会什么、产出什么"。demo 成败在这里，不在机制。
 > 状态：已定稿——五角色内容随 R2 全员落地（现时语义 = [../presets.md](../presets.md) 合同与各 preset 文件；模型路由 = 全员同模型，D16）。
 
@@ -63,7 +63,7 @@
 - 全局指令：公司手册经 `agent-instructions` 行注入（基线 = `company-workspace/AGENTS.md`，D17；守卫 = `scripts/handbook-smoke.mjs`）。
 - `templates/`（workspace）：`prd.md`、`review-note.md`、`decision-memo.md`、`weekly-report.md`。
 
-## 2. skills / KB 的落点（对照 10 §5 三载体）
+## 2. skills / KB 的落点（对照 architecture §5 三载体）
 
 | 内容 | 落点 | 说明 |
 |---|---|---|
