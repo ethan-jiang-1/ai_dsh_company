@@ -71,18 +71,21 @@ out-of-turn approval workflow is deferred"——审批闸门第一版设计在**
   sessions 类型，按 vendor 形态拆 tsconfig.host/client + solution root；连带 §7 构建配方更新与
   「preset 内容即时生效 ≠ 代码面即时生效（不重建 lib = 改动永远不生效）」的实证教训。
 
-## 切片三 · 问询路径（自裁：甲乙都做，作用域天然不重叠）
+## 切片三 · 问询路径（自裁：甲乙都做，作用域天然不重叠）【乙已实施 2026-09-25 凌晨；甲随切片一】
 
 现状：CEO 有 ask-user；VP 无（"VP 不直接问用户"，问题升级回 CEO——R3 汇报线定案，动议语境）。
+**实施期机制修正（r2-motion 实证）**：teammate 的团队工具面本就带 `ask_user_question`——汇报线一直是
+内容层约束（persona/手册），不是机制约束；乙因此更安全（动议内 teammate 根本不挂 preset 工具面）。
 
 - **甲 · 动议内 = 升级中继显性化（并入切片一）**：VP teammate 本就**没有 preset 工具面**
   （[design/roles-isolation 分水岭](../../docs/design/roles-isolation.md)），只能走 send_message 升级 CEO——
   注意力中心把升级链显示为第四类条目（"待转述 / 待处理"）；VP skill 加升级约定（消息带【待澄清】
   前缀）供确定性识别。纯显示层 + 内容约定，承诺权不动。
-- **乙 · 独立 VP 会话 = 直接问人（独立小步）**：VP preset 工具行加 `tool-ask-user` + 手册区分两种
-  模式（"动议内升级走 CEO；独立会话可直接问人"）。依据：独立会话本就是"和你的职能 agent 直接对话"
-  形态（'每人养自己的 agent'的主场）；且 teammate 不挂 preset 工具面 ⇒ 乙**不会**影响动议内承诺权
-  （R3/D18 不动）。preset 改动走培养验收四门禁。
+- **乙 · 独立 VP 会话 = 直接问人（已实施）**：四个 VP preset 工具行加 `tool-ask-user`（2026-09-25）+
+  手册「问人两条路」两模式注记（动议内升级 CEO 带【待澄清】前缀；独立会话直问）。验收 = 培养四门禁
+  全绿（verify / test 168 / preset-smoke / probe --full 15/15〔ceo#1 一次并发抖动，重试过——探针
+  90s 默认超时偏紧的观察项登记〕）+ **真模型证据**：独立 VP-Eng 会话 `ask_user_question` 挂起无
+  result、turn 保持打开（直问成立）。承诺权与单一对外口径不动（R3/D18 维持）。
 - **落选**：动议内也直问（毁单一对外口径，且 teammate 机制上无从挂）；只做甲（独立会话里 VP 反而
   不许问人，与体验矛盾）。
 

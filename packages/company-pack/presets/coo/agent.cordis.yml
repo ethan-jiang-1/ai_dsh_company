@@ -43,6 +43,9 @@
   name: '@deepseek-ai/dsh-tool-todo'
   config:
     allowParallelInProgress: true
+# 问询（驾驶舱③乙）：独立会话可直接问人；动议内仍升级 CEO（见公司手册「问人两条路」）。
+- id: tool-ask-user
+  name: '@deepseek-ai/dsh-tool-ask-user'
 - id: tool-present
   name: '@deepseek-ai/dsh-tool-present'
 
