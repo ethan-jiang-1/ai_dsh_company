@@ -10,6 +10,18 @@
 //
 // `page(request)` 由调用方注入（各脚本的 RPC 封套不同，本模块不认识它们的 base/cookie）。
 
+/** 从一条消息的 content blocks 提取正文，不遍历事件里的重复 stream 投影。 */
+function collectMessageText(message) {
+  return Array.isArray(message?.content)
+    ? message.content.filter(block => block?.type === 'text' && typeof block.text === 'string').map(block => block.text)
+    : []
+}
+
+/** Read one assistant event through its assembled-message projection, not its duplicated stream. */
+export function assistantMessageText(event) {
+  return collectMessageText(event?.data?.message).join('\n')
+}
+
 /** 从事件 data 里深提取全部 text 片段（`{ type: 'text', text }` 递归收集）。 */
 export function collectText(value, out = []) {
   if (Array.isArray(value)) {

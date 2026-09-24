@@ -9,7 +9,7 @@ import { createHash } from 'node:crypto'
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { requireDevHome } from './lib/runtime-home.mjs'
-import { collectText, readRecords } from './lib/session-log.mjs'
+import { assistantMessageText, collectText, readRecords } from './lib/session-log.mjs'
 import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from './lib/entry-probe.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -122,7 +122,7 @@ try {
     if (baseline) assertCodingBaseline(baseline)
     if (events.some(e => e.type === 'turn/end')) {
       assertCodingBaseline(baseline)
-      const replies = events.filter(e => e.type === 'assistant/message').map(e => collectText(e.data).join('\n')).filter(Boolean)
+      const replies = events.filter(e => e.type === 'assistant/message').map(assistantMessageText).filter(Boolean)
       reply = replies.at(-1) ?? ''
       result = evaluateEntryProbe(reply, readSource)
       break

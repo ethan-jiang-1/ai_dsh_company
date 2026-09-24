@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { assistantMessageText, collectText } from '../scripts/lib/session-log.mjs'
 import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from '../scripts/lib/entry-probe.mjs'
 
 const evidence = { path: 'ROADMAP.md', quote: '逐字可核的证据原文至少八字符' }
@@ -20,6 +21,21 @@ const readSource = (path: string) => {
   return evidence.quote
 }
 const evaluate = (value: unknown) => evaluateEntryProbe(JSON.stringify(value), readSource)
+
+describe('会话回答只取组装消息，不重复遍历 stream', () => {
+  it('从 assistant/message 的公开 message content 读取一次文本', () => {
+    const text = '{"answers":[],"conflicts":[]}'
+    const event = {
+      message: { content: [{ type: 'text', text }] },
+      stream: [
+        { type: 'text-chunks', texts: [text] },
+        { type: 'chunk', chunk: { type: 'block-end', block: { type: 'text', text } } },
+      ],
+    }
+    expect(assistantMessageText({ data: event })).toBe(text)
+    expect(collectText(event).join('\n')).toBe([text, text].join('\n'))
+  })
+})
 
 describe('入口探针不使用全文兜底', () => {
   it('逐题回答与原文均匹配时通过机器层', () => {

@@ -178,6 +178,8 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     // 判据必须可被模型自行跑（发现权在代理一侧，D15）
     expect(handbook, '三态要指向机器判据入口').toContain('scripts/deliverables-check.mjs')
 
+    const presetGuide = readFileSync(join(ROOT, 'docs/presets.md'), 'utf8')
+    expect(presetGuide, 'COO 运营核查必须路由到 COO 专用模板').toContain('产出=运营方案 + 预算核查（`templates/ops-review-note.md`）')
     for (const template of ['prd.md', 'weekly-report.md', 'review-note.md', 'decision-memo.md', 'ops-review-note.md']) {
       const body = readFileSync(join(ROOT, 'company-workspace/templates', template), 'utf8')
       expect(body, `${template} 仍是占位（模板即流程：写作类工作流的第一版就是它）`).not.toContain('占位')

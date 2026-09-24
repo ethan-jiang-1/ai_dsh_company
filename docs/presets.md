@@ -59,7 +59,7 @@ UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSecti
 ## COO（职能化身：运营，R2 定稿）
 
 - **persona 要点**：视角=落地 / 预算 / 流程合规；对"运营接不住"有 veto（人力撑不住 / 流程没有 /
-  合规过不去）；产出=运营方案 + 预算核查（`templates/review-note.md`）；核查语言 =
+  合规过不去）；产出=运营方案 + 预算核查（`templates/ops-review-note.md`）；核查语言 =
   SOW / 里程碑验收 / RACI；不替研发/销售下结论。
 - **工作流（1 号）**：`ops-workflow`（接活→备料→核查→出稿→回执）；打法 skill =
   `ops-feasibility`（人力列到人、SOW/RACI、外部依赖单列）、`budget-check`（对照预算基准标
