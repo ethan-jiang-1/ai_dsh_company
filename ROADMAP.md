@@ -10,19 +10,22 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- ⏸ **整治转待办**（R6 销账落入；低优先；当夜 2026-09-24 已消化大半）：
-  - 「磨」剩余输入：
-    **snapshots 与 live 盘差异逐项语义目录**（机械层已过：`deliverables-check` ALL PASS + r3 重放
-    随手册重录；剩余 = 逐快照语义 diff 的编目）。
-  - 编号方案（N1）：design/guides 目录编号与顶层合同双体系二选一——**提案已出**（2026-09-24 当夜，
-    [proposed/n1-docs-naming](./notes/proposed/2026-09-24-n1-docs-naming.md)：推荐 A 全去编号、
-    vendor 同构；执行 = 一次机械 commit + 两道链接门禁红→绿），**人裁后执行**。
-  - **升 pin**（触发型：上游出新 tag 时跑 `scripts/sync-dsh.mjs --pin`，合同 docs/release.md）——
-    目标 tag 与升级授权在执行前重新核实，不以历史检索结果代表“最新”。本轮基石整治不升级 pin。
-    前置：干净工作树、目标版本明确、流程复核证据、构建与兼容验证（[发布合同](./docs/release.md)）；
-    同时复看 delegation.md §4.4 与搁置池，不能由脚本完成就推断语义复核已完成。
-  - 教训候选 C（引用两分法）的载体裁决：公司手册（全会话注入）vs 各角色 skills（按需加载）——
-    培养轮 2 留给人工的分叉（提案要点见 2026-09-24 晨报）。
+- **N1 执行 · 方案 A 全去编号**（2026-09-24 晚人裁 A；机械 commit，先于基座轮——避免新 RFC 引用旧路径双改）：
+  [proposed/n1-docs-naming](./notes/proposed/2026-09-24-n1-docs-naming.md) §方案 A + §验收。
+- **基座轮 · 升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.1 + 能力收割审计**（人裁：增量报告确认风险后执行；
+  前置 = 报告落 `notes/research/`；兼做搁置池五条复活复查）：
+  [proposed/pin-upgrade-and-harvest](./notes/proposed/2026-09-24-pin-upgrade-and-harvest.md)。
+- **记忆收敛 + 培养轮 3**（支柱 1「经营深度」第一步，主线人裁；46 篇 journal 首次全量收敛；
+  教训候选 C 载体分叉提请人裁；ent-agent-platform 排练场记忆定归宿）：
+  [proposed/memory-convergence-and-cultivation-r3](./notes/proposed/2026-09-24-memory-convergence-and-cultivation-r3.md)。
+- **新动议类型 ×2 · 季度经营会 + 事件复盘**（支柱 1 主体；weekly-report 模板首次运转；通道 D 可选试炼；
+  每场独立真跑 + 收口）：
+  [proposed/new-motion-types](./notes/proposed/2026-09-24-new-motion-types.md)。
+- **呈现与叙事 · 经营仪表 + Demo 场景 D**（支柱 2 交错位，主轴 = 自用+演示并重；素材取自前两条目；
+  视觉打磨二期走查触发）：
+  [proposed/presentation-narrative](./notes/proposed/2026-09-24-presentation-narrative.md)。
+- ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；机械层已过——`deliverables-check` ALL PASS +
+  r3 重录随手册完成；可后台派活不占轮）。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
@@ -198,3 +201,9 @@
   （原"下一项"锚 /UX 打磨/ 早已过期）；Q4 tag 判据改形状 `/dsh-v\d+\.\d+/`（升 pin 不烂）；归档
   同日重跑不再覆盖（时间戳后缀）。keyless 验证：node --check + 形状判据命中当前与假想未来 tag +
   期望 token 在入口链可读；真跑归当夜收尾认证档。
+- 2026-09-24（**晚 · 统筹计划落盘 + 队列重排**）：用户四项裁决——主轴 = 自用+演示并重 / 升 pin
+  dsh-v0.1.7-rc.1（增量报告确认后执行）/ N1 方案 A / 主线 = 支柱 1 经营深度；工作方式确认（计划先
+  显性化 `notes/proposed/` 再按"继续下一条"逐条执行，已落 guides/60 §0.5）。整治转待办块解散：
+  N1 升队列首条、升 pin 转基座轮条目、教训候选 C 并入记忆收敛条目、snapshots 语义目录留 ⏸；
+  四份新 RFC 落 proposed/。同日早些时候：基石整治收尾提交并推送（`da4405c`）；push 走显式 URL
+  不更新 origin/master 引用（曾显 ahead-131、实为 5，push 后 fetch 即正——运维注意）。
