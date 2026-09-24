@@ -21,6 +21,10 @@ Timeline 必须给**证据坐标**（会话 id、事件序列、RPC 报错原文
 | [0002](0002-client-plugin-module-table-gap.md) | client 插件挂到虚空：团队 UI 不可见 | host 侧正常、模块也在伺服；当时的根因（"模块表没枚举依赖"）**后被证伪**（见文内更正节），R1 症状的真实原因未确立 |
 | [0003](0003-duplicate-remote-mount.md) | 一个 remote 两个挂载者：重复 `$mount` 砖全 UI | 0002 的误诊催生自挂 workaround → `already mounted` → 整个 Web UI 砖在 BootPage 错误屏；浏览器检查缺位，用户发现 |
 
+## 相关交接（非事故复盘）
+
+- [0004-entry-execution-remediation-handoff.md](0004-entry-execution-remediation-handoff.md)：入口/执行链 Markdown 收敛范围、验证记录与当前 owner 指针。按用户要求置于本目录并沿用编号命名；不计入上方事故复盘编号表。
+
 三篇的共同缺陷（也是本目录存在的原因）：**最后一次检查由人在浏览器里做**。对应的纪律与门禁见
 `AGENTS.md` 纪律表与 `docs/guides/60-dev-loop.md` §2；外部证据见
 [`notes/implemented/2026-09-22-agent-workflow-community-practice.md`](../implemented/2026-09-22-agent-workflow-community-practice.md)。

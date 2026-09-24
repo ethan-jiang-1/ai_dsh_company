@@ -2,6 +2,7 @@
 
 | 日期 | 意图（动机 + 外部可观察行为） | 状态 |
 |---|---|---|
+| 2026-09-24 | **基石整治：Agent 入口链与执行链**：入口/执行 Markdown 收敛——根 AGENTS.md 只做入口路由、00-index 精简 D23/D24 适用说明、ROADMAP 文件头只述队列职责、开发环 §0.5/§1/§12 收敛为唯一执行规则（其他文件短路由不复制正文）；另修正 keyless 测试分层（CLI 子进程场景移出 Vitest → `scripts/snapshot-motion-smoke.mjs`，纯逻辑留 `workspace-oracle.spec.ts`）；验收 = 入口链人工复核三分支 + `git diff --check` + verify + test 17 文件 157 项全绿（commit `8cfb019`/`fb23bfa`/`75d7352`/`5e6cd27`） | implemented → [implemented/2026-09-24-foundation-remediation.md](./implemented/2026-09-24-foundation-remediation.md)；交接与验证边界 = [postmortem/0004](./postmortem/0004-entry-execution-remediation-handoff.md)（交接材料，非事故复盘） |
 | 2026-09-24 | 基础环境第一小步：保留原结构，强调 Notes 开工输入与决策证据；修正当前章程工具路径，并使六个 smoke 对日用 home 立即拒绝；更大流程调整暂不执行 | implemented → [implemented/2026-09-24-foundation-first-step.md](./implemented/2026-09-24-foundation-first-step.md) |
 | 2026-09-21 | 阶段 0 立环：repo 骨架可承载 docs 全部设计决定——`pnpm verify` 全绿、submodule 钉 tag、四 preset 结构就位 | implemented → [implemented/2026-09-21-repo-scaffolding.md](./implemented/2026-09-21-repo-scaffolding.md) |
 | 2026-09-21 | docs/ 分层重组：按性质（导航/设计/计划/指南/合同）不按时间；"初始意图"归 notes | implemented → [implemented/2026-09-21-docs-layering.md](./implemented/2026-09-21-docs-layering.md) |
