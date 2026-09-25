@@ -13,13 +13,10 @@
 - **① 打扫卫生 · 记事面治腐化 + 收尾清扫**（harness-alignment 台账 §五已向本条登记 4 项输入：rejected/ 缺席、trim-cot-leakage 判定问、外链钉版评估、升 pin 旧机制引用扫描）：RFC =
   [proposed/notebook-hygiene](./notes/proposed/2026-09-25-notebook-hygiene.md)——六处无家/腐化立家修指针 + **收尾清扫**
   （中立体独立会话；条目收尾后扫；输入 = diff + Note + 队列行；腐化清单统一进本条处置）。
-- **② 打扫卫生 · 长程自主执行的目标形态**（依赖 ①：打磨型输入源 = ①立的磨清单）：RFC =
-  [proposed/longrun-goal-shape](./notes/proposed/2026-09-25-longrun-goal-shape.md)——goal objective 写预算 + 输入源 +
-  三类停止条件（交付型 / 打磨型两形态）；落点 = dev-loop §0.5 一小段。
-- **③ 加新东西 · 人机合一（先 UX 研究，再内容层）**（换基座已完成）：RFC =
+- **② 加新东西 · 人机合一（先 UX 研究，再内容层）**（换基座已完成）：RFC =
   [proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md)——**定性 = UX 问题**（人何时、以何形态被
   拉进来；用户自陈无好思路）⇒ 阶段 0 先 research 出候选模式与判据（`notes/research/`）→ A1 `kb/owners.md` + A2 手册三档/缺口回流/不在场分档。
-- **④ 加新东西 · 人机合一机制层**：RFC 同 ③ 的 B1–B4——收件人路由（answerer 多收件人先核实）/
+- **③ 加新东西 · 人机合一机制层**：RFC 同 ② 的 B1–B4——收件人路由（answerer 多收件人先核实）/
   补料 · 建议 · 规矩回流三类载体 / 不在场机制化 / 证据回看。
 
 ## 磨清单（低优先磨活；不占轮、可后台派活；触发即升队）
@@ -56,6 +53,12 @@
 - 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
+
+- 2026-09-25（**长程 goal 形态交付**）：dev-loop §0.5 增「长程 goal 的目标写法」段——交付型（队列有界）/
+  打磨型（预算 + 输入源〔§磨清单〕+ 枯竭即收口）两形态 + 三类停止条件 + 节奏；两形态均有实例（当前四项
+  总 goal = 交付型；磨清单 = 打磨型输入源）。收尾 Note = [implemented/longrun-goal-shape](./notes/implemented/2026-09-25-longrun-goal-shape.md)。
+  次序说明：本条先于 ①（记事面）毕业——其唯一依赖（磨清单立家）已随 ① 主体落地，① 的收尾清扫清单
+  处置仍在途（中立体子代理），不阻塞本条。
 
 - 2026-09-25（**打造自己的 harness · 语料对照交付**）：以《Agent-ready Development》（钉 rc.1，56 文件）为镜
   全量对照——台账 27 篇零待定（9 已对齐 / 3 采纳切片 / 3+2 不适用+触发），印证"本仓已接近语料形态、大头是
