@@ -10,27 +10,23 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **① 换基座 · 升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2**（用户 2026-09-25 定为最优先：只有换到新基座才知道
-  对已写代码/内容的影响面；先修对原有，再加新东西）：RFC =
-  [proposed/pin-upgrade-0.1.7-rc.2](./notes/proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md)——阶段 0 靶校正（上游已发 rc.2
-  = `477b4f42`；先定取源）→ 阶段 1 **换基座后先跑现有门禁、产《实测影响面清单》**，再按七步适配（peerDependencies /
-  preset 声明迁移 / client 数据层 / 快照回归 / 发布链）；15 条收割项不捆绑。
-- **② 打造自己的 harness · 以《Agent-ready Development》为镜**（依赖 ①：先换基座修对原有，再谈理念对齐；
-  用户 2026-09-25 定档在升级之后、打扫卫生之前）：RFC =
-  [proposed/harness-alignment](./notes/proposed/2026-09-25-harness-alignment.md)——对照外部语料（56 文件，钉 DSH `rc.1`）
-  逐篇产**采纳／不采纳判定台账**（读→判→改三阶段），落地入口归属 / 反馈六层 / 参与阶梯 / 插件作者入口 /
-  边界与成本五片；运行时可检查性与升 pin 收割项合并处理。
-- **③ 打扫卫生 · 记事面治腐化**（依赖 ①；② 可能修正其范围）：RFC =
-  [proposed/notebook-hygiene](./notes/proposed/2026-09-25-notebook-hygiene.md)——「磨清单」立家（三条观察项）/
-  触发型两条入内 / intents 指针 / `rejected` 合同裁断 / index 研究树登记；验收 = verify ALL PASS + 无悬空引用与死链。
-- **④ 打扫卫生 · 长程自主执行的目标形态**（依赖 ③：打磨型的输入源 = ③立的磨清单）：RFC =
+- **① 换基座 · 升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2**（用户 2026-09-25 定为最优先：先换基座才知道影响面）：
+  RFC = [proposed/pin-upgrade-0.1.7-rc.2](./notes/proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md)——阶段 0 靶校正（上游已发
+  rc.2 = `477b4f42`；先定取源）→ 阶段 1 先跑现有门禁产《实测影响面清单》再七步适配；15 条收割项不捆绑。
+- **② 打造自己的 harness · 以《Agent-ready Development》为镜**（依赖 ①；用户定档在打扫卫生之前）：RFC =
+  [proposed/harness-alignment](./notes/proposed/2026-09-25-harness-alignment.md)——27 篇**全读、分层用力**（9+6 逐条判 /
+  其余抓新形状）→ 采纳·不采纳判定台账 → 小步落地；红线（目录归属 / 门禁语义 / preset·client 数据层）先报人。
+- **③ 打扫卫生 · 记事面治腐化 + 收尾清扫**（依赖 ①；② 可能修正其范围）：RFC =
+  [proposed/notebook-hygiene](./notes/proposed/2026-09-25-notebook-hygiene.md)——六处无家/腐化立家修指针 + **收尾清扫**
+  （中立体独立会话；条目收尾后扫；输入 = diff + Note + 队列行；腐化清单统一进本条处置）。
+- **④ 打扫卫生 · 长程自主执行的目标形态**（依赖 ③：打磨型输入源 = ③立的磨清单）：RFC =
   [proposed/longrun-goal-shape](./notes/proposed/2026-09-25-longrun-goal-shape.md)——goal objective 写预算 + 输入源 +
   三类停止条件（交付型 / 打磨型两形态）；落点 = dev-loop §0.5 一小段。
 - **⑤ 加新东西 · 人机合一内容层**（前置 ① 已完成；不动机制与 client）：RFC =
   [proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md) A1–A2——`kb/owners.md`
   （角色 ↔ 物理人 + 授权面）/ 手册落三档审批 · 规则缺口回流 · 不在场分档 + **退化形状**。
-- **⑥ 加新东西 · 人机合一机制层**（依赖 ①：升 pin 重写 preset 声明与 client 数据层，先做要迁两次）：RFC 同 ⑤ 的
-  B1–B4——收件人路由（answerer 多收件人先核实）/ 补料 · 建议 · 规矩回流三类载体 / 不在场机制化 / 证据回看。
+- **⑥ 加新东西 · 人机合一机制层**（依赖 ①）：RFC 同 ⑤ 的 B1–B4——收件人路由（answerer 多收件人先核实）/
+  补料 · 建议 · 规矩回流三类载体 / 不在场机制化 / 证据回看。
 - ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；③ 之后按其判据搬进 §磨清单）：机械层已过——
   `deliverables-check` ALL PASS + r3 重录随手册完成；可后台派活不占轮。
 
