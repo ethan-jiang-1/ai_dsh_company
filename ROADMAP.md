@@ -22,9 +22,9 @@
 - **④ 打扫卫生 · 长程自主执行的目标形态**（依赖 ③：打磨型输入源 = ③立的磨清单）：RFC =
   [proposed/longrun-goal-shape](./notes/proposed/2026-09-25-longrun-goal-shape.md)——goal objective 写预算 + 输入源 +
   三类停止条件（交付型 / 打磨型两形态）；落点 = dev-loop §0.5 一小段。
-- **⑤ 加新东西 · 人机合一内容层**（前置 ① 已完成；不动机制与 client）：RFC =
-  [proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md) A1–A2——`kb/owners.md`
-  （角色 ↔ 物理人 + 授权面）/ 手册落三档审批 · 规则缺口回流 · 不在场分档 + **退化形状**。
+- **⑤ 加新东西 · 人机合一（先 UX 研究，再内容层）**（前置 ① 已完成）：RFC =
+  [proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md)——**定性 = UX 问题**（人何时、以何形态被
+  拉进来；用户自陈无好思路）⇒ 阶段 0 先 research 出候选模式与判据（`notes/research/`）→ A1 `kb/owners.md` + A2 手册三档/缺口回流/不在场分档。
 - **⑥ 加新东西 · 人机合一机制层**（依赖 ①）：RFC 同 ⑤ 的 B1–B4——收件人路由（answerer 多收件人先核实）/
   补料 · 建议 · 规矩回流三类载体 / 不在场机制化 / 证据回看。
 - ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；③ 之后按其判据搬进 §磨清单）：机械层已过——
