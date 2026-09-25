@@ -10,8 +10,22 @@
 
 ## 〇、研究输入（两路在途，回来后摘录要点）
 
-- **vendor 机制盘点**（一手）：answerer 路由面（多收件人？按会话/角色指定？）、approval 策略面、
-  通知面（信箱背压？）、中断/继续语义、记录面、附件→共享盘直路。〔待填〕
+- **vendor 机制盘点**（一手，中立体子代理核，文件:行在案）：
+  1. **answerer 路由** = Agent 作用域 waterfall，**无收件人字段**（无 recipients/role/session 指定）；
+    无超时无默认答案；无人应答 → `NO_PROVIDER` 错误回传（fail-loud 非降级）；子代理禁问（DELEGATED_CALLER
+    须在最终结果报告未决问题）。
+  2. **approval** = 策略仅 `ask|never` 两档，**无"哪些操作要批"的中央清单**（各 asker 自调）；轮内有效
+    （turn-enclosed，无 open turn 即 throw）、一次性 grant、fail-closed；面板字段 = reason/toolName/callId。
+  3. **通知面**：**跨会话"谁在等人"聚合面在 vendor 不存在**（remotes 只中继给本会话连接）；team 信箱有
+    背压（`maxPendingMessagesPerMember` + 持久 journal + 崩溃重投）⇒ 跨会话注意力中心必须自建（与本仓现状一致）。
+  4. **继续语义**：审批/问答 resolve 在**同一 open turn 同一步**（turn-enclosed 即为此设计）；取消 =
+    `cancel({kind:'user'}, {keepInbox:true})`，steering 消息 park 进 inbox 下轮再投。
+  5. **记录面**：审批有结构化成对审计（`approval/asked`+`decided`）；**user-question 无专用事件**——人的
+    答案藏在 tool result JSON 里；team 消息进 Lead journal。
+  6. **附件直路** = **部分成立**：composer 上传 → `DSH_HOME/attachments/v1` 只读副本 → 模型收到 handle
+    文本（指引其用文件工具读 + **拷进可写位置再改**）；"上传即入共享盘"不存在。
+  **总判**：多收件人路由**不成立**（B1 按预案退化：owner 字段如实 + 单人路由 + 记证伪）；附件直路
+  **部分成立**（B2 补料可走此路：人上传 → agent 读只读副本 → 拷入共享盘，需明写规矩）。
 - **外部实践**（候选来源）：mixed-initiative（Horvitz 期望效用打断）、人审工作流（PR review /
   Temporal Signal / Slack 交互审批）、AI 产品 permission 形态（Copilot / Claude Code / Cursor）、
   on-call 注意力路由（分级/digest/SLA 升级）。〔待填〕
