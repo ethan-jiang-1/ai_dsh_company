@@ -120,12 +120,12 @@
      修法：四处夹具的 `llm-deepseek` 行按 rc.2 名字逐字对齐（`-api-key`）+ 补禁用 `llm-deepseek-account`；
      随后重录（lead 39 行 + 1 child）⇒ `replay-smoke` **ALL PASS**（两会话归一化零 diff + 四份 sidecar 零 diff）。
      `--scenario r2-motion`（presence 档）**ALL PASS**（在场板 5 行同形）。
-  6. **`--ui` 浏览器档剩一层**：rc.2 把搜索框占位符由 `Search sessions...` 改为 `Search session names`
-     （aria 未变），已按新占位符更新定位器；之后卡在 `[data-turn-process]` 按钮 **disabled 且计数全 0**
-     （`data-turn-process-messages="0" subagents="0" tool-calls="0"`）⇒ 打不开轮次过程 ⇒ 委派卡断言走不到。
-     待查：rc.2 的 turn-process 计数来自哪个投影、重放会话为何投影为空（V4 事件口径？）。
-- **真模型探针**（本轮实测）：`probe-smoke --full` 三跑 = 12/15、14/15（180s 超时）、13/15（串行 180s），
-  **每次失败的项都不同**且日志无网络/限流线索 ⇒ 判定为提供方延迟抖动，非基座回归；仍留观察项（"探针超时偏紧"已有前例）。
-  `handbook-smoke` ALL PASS；`deliverables-check` ALL PASS（9 成品 / 23 过程稿 / 0 违规）。
-- vendor 自建的嵌套不兼容需要一条长期解（D27）：或让 vendor 独立 install/build（改本仓 workspace 镜像策略），或给 `sync-dsh` 加"独立 staging 树构建"步骤。
-- 15 条收割项（阶段 2）未开始。
+  6. **`--ui` 浏览器档剩一层（已排除两处、定位到第三处）**：
+     - ① 搜索框占位符 rc.2 改名（`Search sessions...` → `Search session names`；aria 未变）⇒ 定位器已更新；
+     - ② `expandTurnProcesses` 原先点**所有** `[data-turn-process]`；rc.2 里**没有过程的轮次**其 toggle 带
+       `disabled`（点不动、30s 超时）⇒ 已改为只点 enabled 的并给读模型时间；
+     - ③ 仍红：`[data-tool="vp_eng"]` 卡**在 DOM 里但 hidden**（`data-state="ok"`），因为承载它的轮次过程组
+       在 rc.2 里 `data-turn-process-messages="0" / tool-calls="0"` ⇒ 组不展开。计数来自客户端 store
+       `turnProcesses`（`ui-chat/contract/store.ts`，由会话快照折出，**不是 host 投影**）⇒ 说明浏览器侧拿到的
+       replay 会话快照里该轮过程为空。会话日志本身内容完整（3×`assistant/message` + 1×`tool/call`，归一化零 diff）。
+       **待查**：replay 会话的客户端快照为何丢过程节点（V4 事件口径 / 快照折节点的时间点 / 需要 --refresh-ui 重录金样）。

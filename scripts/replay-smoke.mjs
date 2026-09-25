@@ -493,9 +493,13 @@ async function captureStableAria(page, selector, workspaceCwd) {
 async function expandTurnProcesses(page) {
   const controls = page.locator('[data-turn-process]')
   await controls.first().waitFor({ state: 'visible', timeout: 10_000 })
-  const count = await controls.count()
+  // rc.2：过程计数来自会话读模型——**没有过程的轮次**其 toggle 带 `disabled`（点不动）。
+  // 只点启用的；并给读模型一点时间把有过程的轮次变 enabled（重放会话首帧可能还没折完）。
+  const enabled = page.locator('[data-turn-process]:not([disabled])')
+  await enabled.first().waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {})
+  const count = await enabled.count()
   for (let index = 0; index < count; index++) {
-    const control = controls.nth(index)
+    const control = enabled.nth(index)
     if (await control.getAttribute('aria-expanded') !== 'true') await control.click()
   }
 }
