@@ -110,7 +110,8 @@ try {
   // 打开 CFO 会话（搜索 + 点击）
   const searchButton = page.getByRole('button', { name: 'Search sessions' })
   if (await searchButton.getAttribute('aria-expanded') !== 'true') await searchButton.click()
-  const search = page.getByPlaceholder('Search sessions', { exact: false })
+  // rc.2：搜索框占位符由 'Search sessions...' 改为 'Search session names'（aria 未变）。
+  const search = page.getByPlaceholder('Search session names')
   await search.fill(TITLE)
   const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: TITLE })
   await result.first().waitFor({ timeout: 15_000 })

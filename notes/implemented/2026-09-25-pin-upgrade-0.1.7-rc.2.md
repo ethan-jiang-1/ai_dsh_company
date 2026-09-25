@@ -133,3 +133,11 @@
      （委派卡渲染 ×1 + aria 树含委派卡 + 金样零 diff）；`r2-motion` 与 `r3-delegation` 的无 key 重放均 **ALL PASS**。
      附带教训：**一个回调里返回 disposer 数组**的 keyed 注册写法在 rc.2 下不生效（改为官方同形的"一键一 inject"）——
      这处虽不是本次卡的根因，但已按 rc.2 形状改正。
+
+**补充实测（同轮稍后）**：
+- `attention-e2e-smoke` **ALL PASS（7/7）**：触线 → 审批 → 注意力面板 DOM → 人点 Allow once → agent 同轮收口
+  全回路在 rc.2 上通（唯一的适配是同一处搜索占位符改名）。
+- `presence-e2e-smoke` **仍红**：它轮询的 RPC `agentTeams/view` 在 0.1.7 **已移除**（返回 `not found`）⇒
+  三条状态链断言全挂。rc.2 的对应读法已核实：**`SessionControlController.control` 流**（`session-controller/src/control.ts`）
+  给出一个 `baseline` 帧 + 随后逐条 `{ type: 'projection', sessionId, key, value, seq }` 帧，
+  团队态 = Lead 会话的 `agentTeam` 投影值。**待做** = 把该脚本从"轮询已移除的 RPC"改成"消费 control 流的投影帧"。
