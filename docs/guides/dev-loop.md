@@ -42,6 +42,7 @@
 5. **交接**：逐项报告已完成、未验证、未完成及其证据/下一步。ROADMAP 条目只有完成验收后才离队；只报告实际执行过的命令。
 
 完成定义是该面的最小真实检查通过（D15）；未跑的关键验收明确标缺口。按改动面选择检查与入口验证，细则唯一见 §9.1；结构检查不能替代运行验收。
+**证据不许假绿**：命令链一律 `set -o pipefail` + `&&`——`pnpm verify | tail` 的退出码是 `tail` 的，不带 pipefail 必假绿。
 
 **交付记录**：feature 或非平凡变更同 diff 更新实现、当前合同、必要验证与 Note；机械单步只改事实 owner 并运行相关检查，不新建意图或 RFC。
 
@@ -192,6 +193,7 @@ pnpm dsh web -- --port 3081 --no-open                                      # 308
 # 2026-09-25 起 solution root；⚠ 旧命令 `tsc -p tsconfig.json` 在 solution root 上静默不构建，即此坑的由来）：
 node ./node_modules/typescript/bin/tsc -b packages/company-pack
 (cd packages/company-pack && ../../node_modules/.bin/tsdown)
+# ③ client 面生效第三跳 = **用户浏览器刷新**（无 HMR：模块表 rev 会变，不刷新看的是旧 bundle）
 # ⚠ preset 内容与代码面不同步：link: 安装下改 presets/**（persona/skills）**即刻生效无需重建**，
 #   但 host/client 代码（src/**）走 lib/ 构建产物——**不重建 = 改动永远不生效**（2026-09-25 实证：
 #   verify 的 client-halves 门禁只查形状不构建，preset-smoke/client-load 全绿也可能验的是旧包）。
@@ -268,17 +270,18 @@ preset 只在 Web 面挂载（§2 第 3.6 层），所以**验证角色行为必
 
 ```sh
 # ① token → cookie（cookie 按 origin 隔离：换端口/换实例都要重新换一次）
-curl -sL -c /tmp/ck.txt -o /dev/null "http://127.0.0.1:3081/?token=<TOKEN>"
+#    从响应头抓 set-cookie 显式带上——`curl -c jar` 抓不稳，别用（脚本同法 = [harvest-probe.mjs](../../scripts/harvest-probe.mjs) 的 getSetCookie）
+COOKIE=$(curl -s -D - -o /dev/null "http://127.0.0.1:3081/?token=<TOKEN>" | grep -i '^set-cookie:' | head -1 | cut -d' ' -f2 | cut -d';' -f1)
 
 # ② 建会话（带 agentPreset 即挂角色 preset）
 curl -s -X POST "http://127.0.0.1:3081/api/session/create" \
-  -H 'Content-Type: application/json' -b /tmp/ck.txt \
+  -H 'Content-Type: application/json' -H "Cookie: $COOKIE" \
   -d '{"type":"client-request","rpcId":"c1","method":"session/create",
        "payload":{"args":{"request":{"cwd":"<绝对 cwd>","agentPreset":"ceo"}}}}'
 
 # ③ 发动议
 curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
-  -H 'Content-Type: application/json' -b /tmp/ck.txt \
+  -H 'Content-Type: application/json' -H "Cookie: $COOKIE" \
   -d '{"type":"client-request","rpcId":"p1","method":"session/prompt",
        "payload":{"args":{"request":{"requestId":"r-1","sessionId":"<sid>","mode":"queue",
                                     "content":[{"type":"text","text":"<动议>"}]}}}}'
