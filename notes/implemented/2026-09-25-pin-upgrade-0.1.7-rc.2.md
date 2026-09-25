@@ -150,3 +150,11 @@ rc.2 迁移路径（无 key 探针实证）：`agentTeams/view` RPC 已移除 �
 首处命中的不是注释而是**真正的 RPC 调用**（头部注释写的是 `agentTeams.view` 带点号）⇒ 端点名被改成整句中文
 ⇒ 连续四轮 404 "not found"，且表象（"endpoint 404"）与真因（"字符串替换改坏调用点"）相距甚远。
 复盘：对"改文案"类替换也要 assert 命中处上下文；排查时先 `grep` 实际调用点再谈机制。
+
+**① 收官证据（2026-09-25 晚，HEAD=d7bb267 全量复跑）**：
+`verify` ALL PASS ／ `test` 178/178 ／ `preset-smoke` ALL PASS（5 挂载 + 技能隔离 + 闭包 lint）／
+`client-load` ALL PASS（品牌槽 + 零 loader 错误）／ `release-smoke` ALL PASS ／ `deliverables-check` ALL PASS ／
+`handbook-smoke` ALL PASS ／ `snapshot-motion-smoke` PASS ／ `replay` r3 全量零 diff + r2 presence **ALL PASS** ／
+`replay --ui` 委派卡端到端 + 金样零 diff **ALL PASS** ／ `attention-e2e` 7/7 **ALL PASS** ／
+`presence-e2e` 状态链 **ALL PASS** ／ `probe --full` **15/15 ALL PASS**（前三跑失败项各不相同 ⇒ 确证提供方抖动）。
+**换基座（队列 ①）就此交付**。余项均属后续队列：15 收割项（阶段 2，RFC 明示不捆绑）、D27 嵌套工作区 vendor 自建的长期解。
