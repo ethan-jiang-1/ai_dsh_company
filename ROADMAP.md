@@ -10,6 +10,15 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
+## 队列
+
+- **① 收割轮 · rc.2 能力收割**：RFC = [proposed/harvest-round](./notes/proposed/2026-09-25-harvest-round.md)——
+  delta §④ 十五项逐条判定（已收/收/不收，零待定）→ 选收切片落地（preset 加 tool-cordis 行 / workspace-changes·
+  office 预览实测 / manifest 品牌化·容量参数·`--dump-config-schema` 登记）→ 不收项进搁置池带触发。
+- **② 打磨轮 · 磨清单清账 + 打磨型 goal 首实践**：RFC = [proposed/polish-round](./notes/proposed/2026-09-25-polish-round.md)——
+  四项逐项小修（journal 缺席 skill 强化 / journal 文件名日期口径 / q3 换行 / snapshots 语义目录）+
+  dogfood 打磨型 goal 形态并回访写法。
+
 ## 磨清单（低优先磨活；不占轮、可后台派活；触发即升队）
 
 > 家规（notebook-hygiene 立，2026-09-25）：观察项与低优先磨活住这里，各带「谁来磨／何时磨」；
@@ -46,6 +55,10 @@
 - 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
+
+- 2026-09-25（**队列重启：收割轮 + 打磨轮入队**；用户规矩 = 先显性化进 notes/proposed/ 再推进）：
+  收割轮 = 升 pin 挂账的 15 能力项逐条判定（预判：2 已收 / 6 收〔多为验证+登记，大件出厂自带〕/
+  7 不收）；打磨轮 = 磨清单四项清账 + 打磨型 goal 形态首实践。两份 RFC 已落 proposed/。
 
 - 2026-09-25（**人机合一机制层交付 ⇒ 四项总 goal 全部完成，队列清空**）：B1 路由形状层（vendor 证伪 ⇒
   退化 + 多 owner fixture 单测）；B2 human-loop-e2e 认证档 **12/12 ALL PASS**（补料/建议/规矩缺口→问人→
