@@ -8,22 +8,24 @@
 
 ## 队列
 
-▶ 表示明确在办；⏸ 不自动开工。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
+▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；机械层已过——`deliverables-check` ALL PASS +
-  r3 重录随手册完成；可后台派活不占轮）。
-- **记事面治腐化**（发散线索立家 + 指针修复，2026-09-25 盘点产出入队）：RFC =
+- **① 记事面治腐化**（无依赖；先做——它给后续条目立家）：RFC =
   [proposed/notebook-hygiene](./notes/proposed/2026-09-25-notebook-hygiene.md)——「磨清单」立家（三条观察项）/
-  触发型两条补索引 / intents 指针 / `rejected` 合同裁断 / index 研究树登记；验收 = verify ALL PASS + 无悬空引用与死链。
-- **人机合一**（物理人 ↔ 分身：配对 / 四类接口 / 不在场策略，2026-09-25 用户口述需求登记）：RFC =
-  [proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md)——人侧建模与收件人路由 /
-  要资料·要建议·规矩缺口三类接口补齐 / 审批分层三档 / 人不在时的阻塞与非阻塞分档；建在已毕业人机协作线之上。
-- **长程自主执行的目标形态**（交付型 vs 打磨型，2026-09-25 盘点产出入队）：RFC =
-  [proposed/longrun-goal-shape](./notes/proposed/2026-09-25-longrun-goal-shape.md)——goal objective 写预算与输入源
-  而非固定条目清单；落点 = dev-loop §0.5 一小段；验收 = 下次长程执行按预算式 objective 起 goal 并到点自评收口。
-- ⏸ **升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2（触发型搁置；2026-09-25 靶校正：上游已发 rc.2 = `477b4f42`）**：
-  RFC = [proposed/pin-upgrade-0.1.7-rc.2](./notes/proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md)（阶段 0 靶校正 +
-  七步程序，不捆绑 15 收割项）；材料 = [增量报告](./notes/research/2026-09-24-dsh-upstream-delta.md) + [迁移方案](./notes/research/2026-09-24-pin-upgrade-and-harvest.md)；复活条件 = 某条目需要新基座或用户重新拍板。
+  触发型两条入内 / intents 指针 / `rejected` 合同裁断 / index 研究树登记；验收 = verify ALL PASS + 无悬空引用与死链。
+- **② 长程自主执行的目标形态**（依赖 ①：打磨型的输入源 = ①立的磨清单）：RFC =
+  [proposed/longrun-goal-shape](./notes/proposed/2026-09-25-longrun-goal-shape.md)——goal objective 写预算 + 输入源 +
+  三类停止条件（交付型 / 打磨型两形态）；落点 = dev-loop §0.5 一小段。
+- **③ 人机合一 · 内容层**（无基座依赖；不动机制与 client）：RFC =
+  [proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md) A1–A2——`kb/owners.md`
+  （角色 ↔ 物理人 + 授权面）/ 手册落三档审批 · 规则缺口回流 · 不在场分档 + **退化形状**；机制层见 ⑤。
+- **④ 升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2**（2026-09-25 用户确认必做；⑤ 的前置）：RFC =
+  [proposed/pin-upgrade-0.1.7-rc.2](./notes/proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md)——阶段 0 靶校正（上游已发
+  rc.2 = `477b4f42`）→ 七步程序（preset 声明迁移 / client 数据层重写 / V4 单向门），不捆绑 15 收割项。
+- **⑤ 人机合一 · 机制层**（依赖 ④：升 pin 重写 preset 声明与 client 数据层，先做要迁两次）：RFC 同 ③ 的
+  B1–B4——收件人路由（answerer 多收件人先核实）/ 补料 · 建议 · 规矩回流三类载体 / 不在场机制化 / 证据回看。
+- ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；① 之后按其判据搬进 §磨清单）：机械层已过——
+  `deliverables-check` ALL PASS + r3 重录随手册完成；可后台派活不占轮。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
