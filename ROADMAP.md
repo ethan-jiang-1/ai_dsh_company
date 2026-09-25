@@ -10,7 +10,10 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-（当前空——无在办条目。下一批由用户点名或 §磨清单升格；历史轮次见文末维护记录。）
+- **① journal 日期机制**：RFC = [proposed/journal-date-mechanism](./notes/proposed/2026-09-26-journal-date-mechanism.md)——
+  机制核实：角色**没有任何取真日期的通道**（无 shell/无时钟工具/runtime context 不含日期），且现口径
+  "读最新一篇取次日"**本身就是漂移算法** ⇒ 三案（C 文案止损 / A pack 侧 runtime context 注入〔原生 seam，
+  host 面先报人〕/ B 提上游）。验收 = 下一场动议日期与会话日志一致 + 台账两行修正。**待用户批准才执行**。
 
 ## 磨清单（低优先磨活；不占轮、可后台派活；触发即升队）
 
@@ -22,7 +25,8 @@
   **证据 +1（2026-09-26）**：CEO journal 日期链式漂移 09-29→09-30 复利（真日期 09-26；COO/VP-Eng
   已把漂移值当基准"锚"，复利进台账）——见 [implemented/ux-experiment-round](./notes/implemented/2026-09-25-ux-experiment-round.md)
   §三档分拣。谁来磨 = 机制面轮；磨法候选 = CEO skill 定稿盘点加"成员 journal 在场盘点"＋
-  deliverables-check 式 journal 审计（注意排练/真盘边界）；何时磨 = **本次会话内落 `proposed/` 提案**。
+  deliverables-check 式 journal 审计（注意排练/真盘边界）；何时磨 = **已落
+  [proposed/journal-date-mechanism](./notes/proposed/2026-09-26-journal-date-mechanism.md)（2026-09-26），待批准**。
 - **问询批量打包 + 串行追问致烦**：场一 4 问同屏、第二轮追问同一批内容 ⇒ 人原话「哎哟，别烦我了，
   你随便找人吧」（日志 `session-306dafdf` seq 97/98/103/104）。谁来磨 = **待人裁**（改规矩 = 立法）；
   磨法候选 = 手册「人机接口」节 + 问询相关 skill 加问询节流纪律（一次一件／非阻塞不与阻塞同屏／
