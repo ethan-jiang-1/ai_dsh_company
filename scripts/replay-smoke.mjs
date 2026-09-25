@@ -65,6 +65,10 @@ const rawLead = join(replayDir, 'raw', 'lead.jsonl')
 const metadata = load(readFileSync(join(scenarioDir, 'snapshot.yml'), 'utf8'))
 const oracle = workspaceOracle(scenarioDir, metadata)
 const HEADLESS = metadata.profile === 'headless'
+// rc.2：五个角色预设行住在 pack 的 `presets/<role>/agent.cordis.yml`（各自是 patch 文件）；
+// `--patch` 可重复 ⇒ 组合夹具只声明 registry，预设行由这里追加（单一事实 = pack 的文件）。
+const PRESET_PATCHES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
+  .flatMap(role => ['--patch', join(ROOT, 'packages/company-pack/presets', role, 'agent.cordis.yml')])
 if (HEADLESS && (RECORD || UI || REFRESH_UI)) throw new Error('Headless workspace fixture supports keyless replay, --prepare, and --refresh only')
 if (HEADLESS && !oracle) throw new Error('Headless workspace replay requires workspace.final with before/expected trees')
 if (REFRESH && (!HEADLESS || RECORD || PREPARE)) throw new Error('--refresh supports only keyless headless replay')
@@ -216,7 +220,7 @@ async function driveHeadless({ patchSource, env, tasks }) {
     const patch = materializeProfilePatch(patchSource, runRoot, runRoot, 0)
     const replayEnv = { ...process.env, ...env, DSH_HOME: join(runRoot, '.dsh'), DSH_AGENTS_HOME: join(runRoot, '.agents'), DSH_PERMISSION_MODE: 'workspace-write' }
     for (const key of Object.keys(replayEnv)) if (/KEY|SECRET|TOKEN|PASSWORD/i.test(key)) delete replayEnv[key]
-    const result = spawnSync(process.execPath, [join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js'), '--profile', 'headless', '--patch', patch, tasks[0]], {
+    const result = spawnSync(process.execPath, [join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js'), '--profile', 'headless', '--patch', patch, ...PRESET_PATCHES, tasks[0]], {
       cwd: workspace, env: replayEnv, encoding: 'utf8', timeout: WALL_MS, killSignal: 'SIGKILL', maxBuffer: 16 * 1024 * 1024,
     })
     if (result.error || result.status !== 0) throw new Error(`headless replay failed (${result.status}): ${result.error?.message ?? ''}\n${result.stderr}\n${result.stdout}`)
@@ -258,7 +262,7 @@ async function driveScenario({ patchSource, env, tasks }) {
     delete env.credentials
   }
   const child = spawn(process.execPath,
-    ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--patch', patch, '--', '--port', '0', '--no-open'],
+    ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--patch', patch, ...PRESET_PATCHES, '--', '--port', '0', '--no-open'],
     {
       cwd: ROOT,
       env: {
