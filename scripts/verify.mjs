@@ -55,6 +55,36 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
     : fail('doc-budget', `${rel} ${lines} 行超上限 ${cap}（先搬内容到该去的家，再压；不直接加行）`)
 }
 
+// ── 2d. 裸路径门禁（notebook-hygiene §机械防线，2026-09-25）──────────────────
+// 为什么：活指针腐化有复发史（AGENTS 写 `notes/rejected/` 而目录不存在；升 pin 后三处旧机制引用漂移）。
+// md-links 门禁只管 Markdown 链接，管不到反引号里的裸路径。范围只收导航/合同五文件。
+// 白名单两类：gitignored 运行态目录（存在与否不代表指针腐化）与 vendor 相对写法（在 vendor 树内存在）。
+const NAV_FILES = ['AGENTS.md', 'README.md', 'ROADMAP.md', 'docs/index.md', 'docs/guides/dev-loop.md']
+const TOP_DIRS = ['notes/', 'docs/', 'scripts/', 'packages/', 'snapshots/', 'dev/', 'tests/', 'company-workspace/', 'vendor/']
+const RUNTIME_PREFIXES = ['dev/harness-home', 'dev/rehearsal-workspace', '.pnpm-store']   // gitignored 运行态
+// 双树查：本仓根 **或** vendor/dsh 命中即过（AGENTS 纪律表的"权威（vendor 树）"列合法使用 vendor 相对写法）。
+// 白名单 = 历史性退役路径的叙述性提及（自带"现迁至…"说明的历史段）。
+const RETIRED_PATHS = new Set(['docs/plans/roadmap.md'])
+let barePathCount = 0
+let barePathBad = false
+for (const rel of NAV_FILES) {
+  const lines = readFileSync(join(root, rel), 'utf8').split('\n')
+  lines.forEach((line, i) => {
+    for (const m of line.matchAll(/`([^`\n]+)`/g)) {
+      const raw = m[1].replace(/^\.\//, '').replace(/\/+$/, '')
+      if (!TOP_DIRS.some(d => `${raw}/`.startsWith(d))) continue
+      if (/[*<>…]/.test(raw) || raw.includes(' ')) continue            // 通配/占位/省略/命令行不是路径
+      if (RUNTIME_PREFIXES.some(p => raw.startsWith(p))) continue
+      barePathCount++
+      if (!existsSync(join(root, raw)) && !existsSync(join(root, 'vendor/dsh', raw)) && !RETIRED_PATHS.has(raw)) {
+        barePathBad = true
+        fail('bare-path', `${rel}:${i + 1} → \`${raw}\` 不存在（双树均无——活指针腐化：改指针到现行家）`)
+      }
+    }
+  })
+}
+if (!barePathBad) ok(`bare-path ×${barePathCount}（导航文件反引号裸路径存在性）`)
+
 
 // ── 3. preset 结构：5 角色 × (声明文件 + ≥1 skill) ─────────────────────────
 // 0.1.7 起显示名/描述/order 内联进 `agent.cordis.yml` 的 `dsh-agent-preset` 行（原 preset.yml 并入），

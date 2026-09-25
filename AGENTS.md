@@ -13,7 +13,7 @@ packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）�
 company-workspace/      运行时"公司共享盘"（会话 cwd）：kb/<role>/（CHARTER+journal）、templates/、deliverables/
 vendor/dsh/             DSH 源码 submodule（钉 SHA，**只读铁律**：见 §vendor 铁律，`pnpm verify` 强制）
 docs/                   当前合同与导航：index（地图+台账）→ design/ guides/ + 顶层合同
-notes/                  **开发记忆与证据链**：intents.md → proposed/ → implemented/；rejected/ 保留防复犯理由；postmortem/ 记事故；research/ 记仍在用的外部研究
+notes/                  **开发记忆与证据链**：intents.md → proposed/ → implemented/；否决理由随 owner Note 的「输掉的方案」节保留（不设 rejected/ 目录——2026-09-25 裁断，负知识已有家、开目录造空壳）；postmortem/ 记事故；research/ 记仍在用的外部研究
 scripts/                verify.mjs（结构门禁）、preset-smoke.mjs（真入口冒烟）……
 dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）
 snapshots/              回归资产：历史录制、workspace.actual 副本与部分场景独立编写的 workspace.expected；以各 snapshot.yml / Note 为准
@@ -76,7 +76,7 @@ changes）= `vendor/dsh/AGENTS.md` Conventions 节；探索路由与概念→源
 | docs = 当前合同（一处事实一个家，**只写 now**） | `docs/AGENTS.md` | `docs/` 按性质分层（D10）；本仓物理行预算与队列规则见 verify / guides/dev-loop §12 |
 | 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么） | `.agents/notes/README.md` | `notes/intents.md → implemented/`；收尾 Note 模板 = guides/dev-loop §12 |
 | 按变更选择相关检查；只报告实际跑过的检查 | `AGENTS.md` Run relevant checks | 本地流程见 guides/dev-loop §1/§9.1/§12 |
-| **完成定义 = 该面最小"真检查"通过；发现权在代理一侧** | `docs/testing.md`；`docs/postmortem/0003` | guides/dev-loop §1 第⑥步 + §7 两道防线；preset 类改动完成定义 = `preset-smoke.mjs`（真挂载） |
+| **完成定义 = 该面最小"真检查"通过；发现权在代理一侧** | `docs/testing.md`；`docs/postmortem/0003-web-agent-gui-feedback-loop.md` | guides/dev-loop §1 第⑥步 + §7 两道防线；preset 类改动完成定义 = `preset-smoke.mjs`（真挂载） |
 | 测试分层：真模型 / 真浏览器不进回归；行为变更同 diff 更新录制快照 | `docs/testing.md` | guides/dev-loop §9.1 + 机械门禁 `tests/layering.spec.ts`（已反证）+ 认证档按面选跑 |
 | 真实入口路径（发布产物 `lib/` 跑）+ 真实安装形状 | `docs/testing.md` | `release-smoke`（`npm pack`→干净 profile→`plugin add`），合同 `docs/release.md` |
 | 源码面/产物面不混（paths 指 src） | `AGENTS.md` Conventions | 根 `tsconfig.json` extends vendor base |

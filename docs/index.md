@@ -73,7 +73,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | D12 | **patch 语义定案**（R1 实证）：`- id:` 只替换已有行（not found 即丢弃并警告）；**新增行必须 `- insert:` 子列表**；因此 host 行随 pack 的 bundle 走，且 `agent-presets` 行用**替换**语法覆盖 web-app 的出厂行（default: standard → ceo + 自定位 roots）；纯 headless 组合（无此行）用 `dev/company.overlay.yml` 的 insert 补 | notes/implemented/2026-09-22-r1-*.md；vendor shipped dsh-headless/dsh-web-app 的 cordis.patch.yml |
 | D13 | **历史宣言：开发纪律沿用 DSH**（当时写作“整套继承 + 按规模裁剪、不发明本地流程”）。该默认适配自由已由 D23 限定：默认遵循钉住的 vendor 纪律，偏离须登记 D 号与约束证据；当前 owner 见 AGENTS.md §纪律及开发环 §12 | [D23 转型 Note](../notes/implemented/2026-09-23-dsh-inround-task-surface.md)；用户决定 |
 | D14 | **公司名 = wochen；角色显示名系列化** `<公司名> <角色>`（`wochen CEO` 等）；**preset id 保持 kebab 不变**（`ceo`/`vp-eng`/`vp-sales`/`coo`——id 受 `PRESET_ID=/^[a-z0-9][a-z0-9-]*$/` 限制，不能带下划线/大写）；角色层级不动（CEO 是个体、VP 是职能，见 role-content-plan §0.1） | notes/implemented/2026-09-22-wochen-naming.md；role-content-plan §1 |
-| D15 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**。迭代是常态，但必须由**代理能自己跑的检查**闭合：真入口路径 > dump/扫描；"伺服了"≠"能加载"；让用户看 UI 之前必须先机器验证过。**同时否决**：为这类失败引入 spec 流程（无第一方证据，且本类失败不在其射程）、把指令文件写更长（advisory，非确定性） | notes/implemented/2026-09-22-agent-workflow-community-practice.md（17 个一手来源）；notes/postmortem/0001-0002；vendor `docs/testing.md` + `docs/postmortem/0003`；落点：guides/dev-loop §1/§2/§7、AGENTS.md 纪律表 |
+| D15 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**。迭代是常态，但必须由**代理能自己跑的检查**闭合：真入口路径 > dump/扫描；"伺服了"≠"能加载"；让用户看 UI 之前必须先机器验证过。**同时否决**：为这类失败引入 spec 流程（无第一方证据，且本类失败不在其射程）、把指令文件写更长（advisory，非确定性） | notes/implemented/2026-09-22-agent-workflow-community-practice.md（17 个一手来源）；notes/postmortem/0001-0002；vendor `docs/testing.md` + `docs/postmortem/0003-web-agent-gui-feedback-loop.md`；落点：guides/dev-loop §1/§2/§7、AGENTS.md 纪律表 |
 | D16 | **Q2 定案（2026-09-22）**：角色模型路由 = R2 全员同模型（默认路由，不写 `agentOptions`）。理由：当前瓶颈是内容质量与协作可见性，成本无差异化证据；需要差异路由时 R3 在委托工具 `agentOptions` 层做，不动 persona | tests/presets.spec.ts；presets.md |
 | D17 | **Q3 定案（2026-09-22）**：公司事实（CHARTER / journal / 客户 / 预算基准）全部留 workspace 活数据（D7 三载体）；随 pack 发布的只有方法论 skills 与结构模板——pack 不含公司事实，换公司复用 = 只换 workspace | presets.md；company-workspace/kb/ |
 | D18 | **R3 汇报线定案（2026-09-22）**：CEO 的命名委托工具 `vp_eng` / `vp_sales` = **one-shot 前台**（`backgroundMode: one-shot` + `enableRunInBackground: false` + `maxDepth: 1` + per-instance persona）。**continuable 在本组合里不可用**：CEO 会话从**第一帧**起 team-scoped，团队版 `send_message` / `list_agents` / `interrupt_agent` 按成员**名字**寻址，而 subagent child 不在名册上 ⇒ 续驶/中断/列举全不可达。因此：续驶与连续对话归 **team（M4）**；"child 拿到角色完整 skills/工具面"归 **M2（未做）**；CEO preset **不放**全局控制行（在 CEO 会话是死行，有反向守卫）；并行快捷派活要等上游 seam，**本仓不自建**（D13） | [delegation.md](./delegation.md)；`scripts/delegation-smoke.mjs`（边界守卫）；`snapshots/r2-motion/sessions/lead.jsonl` 第一帧 |
@@ -107,7 +107,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 工作树内、已被该 repo 的 git 跟踪；不在本 repo 版本控制范围，引用时注明是外部研究材料）：
 `_faq_on_digested/`、`_digested/`、`_agent_ready_development/`（后者 = Agent-ready Development 语料，
 第三视角"Development Harness"专题；已逐篇对照完毕——判定台账见下表该行）。
-该研究树 HEAD 在钉住 tag 之后 149 个提交（本地 FAQ/docs 工作，`dsh-v0.1.5-rc.2-149-gc4442c6928`），
+该研究树 HEAD 在钉住 tag 之后 199 个提交（本地 FAQ/docs 工作，`dsh-v0.1.7-rc.1-199-g5c3af9b21b`，2026-09-25 复核），
 `_digested` 的审计基线仍为 rc.2——引外部笔记时以基线对齐，不追研究树新提交。
 **思想吸收进本 repo 文档后，日常不再依赖原文**；下表是"哪个想法落在了哪儿"的地图：
 
@@ -130,8 +130,8 @@ package README——机制结论的权威在 vendor 树。
 
 | 本项目 | DSH 官方 | vendor/dsh 落点（读源码从这进） |
 |---|---|---|
-| 角色（CEO/VP…） | agent preset（`presets/<id>/agent.cordis.yml` + persona + skills） | `packages/preset/agent-presets`（范本 `presets/cordis/`）+ `packages/preset/persona` |
-| 组织/公司 | 一个 host profile + preset roster（`dsh-agent-presets` roots） | `packages/preset/agent-presets/src/index.ts`（roots 推导）+ `docs/architecture.md`（组合链） |
+| 角色（CEO/VP…） | agent preset（`presets/<id>/agent.cordis.yml` + persona + skills） | `packages/preset/agent-preset`（每预设一行声明，rc.2 形）+ `packages/preset/persona`；出厂范本 = `packages/bundle/web-app/presets/` |
+| 组织/公司 | 一个 host profile + preset roster（rc.2：`agent-preset-registry` 装配，roots 目录扫描已废） | `packages/preset/agent-preset-registry`（default 装配）+ `docs/architecture.md`（组合链）；升 pin迁移实证 = [pin-upgrade](../notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md) |
 | worker（角色底下干活的一次性代理） | one-shot subagent（`dsh-tool-subagent`，spawn provider） | `packages/subagent/tool-subagent/README.md` |
 | 派活/汇报线 | 命名委托工具（通道 A / M2） | 同上（per-instance persona 教义在其 README） |
 | 会议/任务板/邮箱 | Agent Teams（`ctx.agentTeams`，experimental） | `packages/experimental/agent-team` + `packages/experimental/tool-agent-team` + `docs/subsystems/agent-team.md` |
