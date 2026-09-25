@@ -28,7 +28,7 @@
 // 分层（guides/dev-loop §9.1 + readiness P1.4）：第三档（无 key、但要起进程与浏览器），不进 pnpm test。
 // 预算（§10）：墙钟 ≤ --wall。
 import { spawn, spawnSync } from 'node:child_process'
-import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { tmpdir } from 'node:os'
@@ -256,6 +256,16 @@ async function driveScenario({ patchSource, env, tasks }) {
   // —— profile = 接收测试包链接的 profile 目录（本 lane 用临时 home 的 web profile）。
   const profileDir = join(runRoot, '.dsh', 'profiles', 'web')
   mkdirSync(profileDir, { recursive: true })
+  // rc.2：client 模块表（`window.__DSH_BOOT__` 的 dsh.client 行）按 **profile 的 node_modules** 解析
+  // 每个 browser 模块 ⇒ 裸 `--patch` lane（无 profile 安装）下本包的 client 半解析不到，
+  // 于是品牌槽与委派卡一起缺席。这里给临时 profile 补最小安装形状：node_modules 符号链接 + bundles 声明。
+  mkdirSync(join(profileDir, 'node_modules'), { recursive: true })
+  symlinkSync(join(ROOT, 'packages', 'company-pack'), join(profileDir, 'node_modules', 'dsh-company-pack'), 'dir')
+  writeFileSync(join(profileDir, 'package.json'), `${JSON.stringify({
+    name: 'dsh-replay-profile',
+    private: true,
+    dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', 'dsh-company-pack'] } },
+  }, null, 2)}\n`, 'utf8')
   const patch = materializeProfilePatch(patchSource, runRoot, profileDir, patchRoot, 0)
   if (env.credentials) {
     copyFileSync(env.credentials, join(runRoot, '.dsh', '.credentials.yaml'))
@@ -501,6 +511,14 @@ async function expandTurnProcesses(page) {
   for (let index = 0; index < count; index++) {
     const control = enabled.nth(index)
     if (await control.getAttribute('aria-expanded') !== 'true') await control.click()
+  }
+  // rc.2 新增一层：工具调用收进**步骤过程分组**（文案 `message.stepProcess.done.tools` = "Called tools"，
+  // 旧 pin 无此层）——委派卡就在这个折叠组里，必须再点开它，否则卡在 DOM 里但 hidden。
+  const calledTools = page.getByRole('button', { name: 'Called tools', exact: true })
+  const groups = await calledTools.count()
+  for (let index = 0; index < groups; index++) {
+    const group = calledTools.nth(index)
+    if (await group.getAttribute('aria-expanded') !== 'true') await group.click()
   }
 }
 

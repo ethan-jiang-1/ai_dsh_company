@@ -93,14 +93,16 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // keyed slot 的 key 域是**开放**的（槽合同原话："a typo simply never renders"），
   // 所以 key 必须与 preset 里的 toolName / 官方工具名逐字一致——拼错不报错、只是永远不渲染。
   ctx.inject(['slots'], (scoped) => {
-    // 回调必须**返回**注册效果（`SlotInjectionEffect` = 一个 disposer 或 disposer 的可迭代），
-    // 所以这里 map 出 disposer 数组，而不是 for 循环里 register 完返回 void（tsc 会红）。
-    scoped.slots.inject('tool.call.toolview', () => [
-      ...DELEGATION_TOOL_KEYS.map(key =>
-        scoped.slots.register({ name: 'tool.call.toolview', key }, DelegationCard)),
-      ...TEAM_TOOL_KEYS.map(key =>
-        scoped.slots.register({ name: 'tool.call.toolview', key }, TeamToolCard)),
-    ])
+    // rc.2 起**一键一 inject**（官方内置 toolview 全是这个形状：`readToolview`/`presentRow`…）。
+    // 旧写法（一个 inject 回调里返回 disposer 数组）在 rc.2 下不再生效 ⇒ 委派卡/团队卡退化成通用行。
+    for (const key of DELEGATION_TOOL_KEYS) {
+      scoped.slots.inject('tool.call.toolview', () =>
+        scoped.slots.register({ name: 'tool.call.toolview', key }, DelegationCard))
+    }
+    for (const key of TEAM_TOOL_KEYS) {
+      scoped.slots.inject('tool.call.toolview', () =>
+        scoped.slots.register({ name: 'tool.call.toolview', key }, TeamToolCard))
+    }
   })
 
   ctx.inject(['sessions', 'sidebarRight', 'slots'], (scoped) => {

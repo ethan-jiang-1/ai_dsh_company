@@ -120,12 +120,16 @@
      修法：四处夹具的 `llm-deepseek` 行按 rc.2 名字逐字对齐（`-api-key`）+ 补禁用 `llm-deepseek-account`；
      随后重录（lead 39 行 + 1 child）⇒ `replay-smoke` **ALL PASS**（两会话归一化零 diff + 四份 sidecar 零 diff）。
      `--scenario r2-motion`（presence 档）**ALL PASS**（在场板 5 行同形）。
-  6. **`--ui` 浏览器档剩一层（已排除两处、定位到第三处）**：
-     - ① 搜索框占位符 rc.2 改名（`Search sessions...` → `Search session names`；aria 未变）⇒ 定位器已更新；
-     - ② `expandTurnProcesses` 原先点**所有** `[data-turn-process]`；rc.2 里**没有过程的轮次**其 toggle 带
-       `disabled`（点不动、30s 超时）⇒ 已改为只点 enabled 的并给读模型时间；
-     - ③ 仍红：`[data-tool="vp_eng"]` 卡**在 DOM 里但 hidden**（`data-state="ok"`），因为承载它的轮次过程组
-       在 rc.2 里 `data-turn-process-messages="0" / tool-calls="0"` ⇒ 组不展开。计数来自客户端 store
-       `turnProcesses`（`ui-chat/contract/store.ts`，由会话快照折出，**不是 host 投影**）⇒ 说明浏览器侧拿到的
-       replay 会话快照里该轮过程为空。会话日志本身内容完整（3×`assistant/message` + 1×`tool/call`，归一化零 diff）。
-       **待查**：replay 会话的客户端快照为何丢过程节点（V4 事件口径 / 快照折节点的时间点 / 需要 --refresh-ui 重录金样）。
+  6. **`--ui` 浏览器档已全绿（三层根因逐层剥开）**：
+     - ① 搜索框占位符 rc.2 改名（`Search sessions...` → `Search session names`；aria 未变）⇒ 定位器更新；
+     - ② `expandTurnProcesses` 只点 enabled 的 `[data-turn-process]`（rc.2 里无过程的轮次 toggle 带 `disabled`），
+       并**补点 rc.2 新增的步骤过程分组**（`message.stepProcess.done.tools` = "Called tools"，旧 pin 无此层）——
+       委派卡就在这个折叠组里；
+     - ③ **真根因**：rc.2 的 client 模块表（`window.__DSH_BOOT__` 的 `dsh.client` 行）**按 profile 的 node_modules 解析**，
+       而本条 lane 是裸 `--patch` + 临时 home（没有 profile 安装）⇒ 本包 client 半解析不到，
+       品牌槽与委派卡一起缺席（截图实证：侧栏显示官方 "DSH Local Build" 而非 "DSH Wochen Team"）。
+       修法 = 给临时 profile 补**最小安装形状**（`node_modules/dsh-company-pack` 符号链接 + `dsh.profile.bundles` 声明）。
+     之后按规矩重录（lead 36 行）+ `--refresh-ui` 刷金样 ⇒ `replay-smoke --ui` **ALL PASS**
+     （委派卡渲染 ×1 + aria 树含委派卡 + 金样零 diff）；`r2-motion` 与 `r3-delegation` 的无 key 重放均 **ALL PASS**。
+     附带教训：**一个回调里返回 disposer 数组**的 keyed 注册写法在 rc.2 下不生效（改为官方同形的"一键一 inject"）——
+     这处虽不是本次卡的根因，但已按 rc.2 形状改正。
