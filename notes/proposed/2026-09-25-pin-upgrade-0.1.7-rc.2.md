@@ -13,14 +13,17 @@
 - 既有材料 [upstream-delta](../research/2026-09-24-dsh-upstream-delta.md) +
   [pin-upgrade-and-harvest](../research/2026-09-24-pin-upgrade-and-harvest.md) 以 **rc.1** 收口，
   [ROADMAP.md](../../ROADMAP.md) 的 ⏸ 行也写 rc.1 ⇒ **靶落后一个 tag**。
-- 研究树本地尚无 rc.2 对象（其 tag 只到 rc.1）⇒ `rc.1 → rc.2` 增量未核实。从 GitHub API 读到的
-  release commit 形状是**纯版本号 bump**（317 增 / 317 删，全部落在各 `package.json` 的 `version` 字段），
-  待阶段 0 用本地证据确认。
+- 研究树本地尚无 rc.2 对象（其 tag 只到 rc.1）。**2026-09-25 阶段 0 已实测核实**：`rc.1 → rc.2` =
+  **346 commit / 3429 文件 / +136,313 −24,518**，且落在本仓依赖的面上（`user-questions` 含 timed waits and
+  late replies、`approval` 说明本地化与 auto-review、`preset` 19、`schedule` 20 含禁用 shipped schedule、
+  `projection`、`workspace-files` 链接解析）——**不是纯发布 bump**。GitHub API 早先显示的 317/317 只是那一个
+  merge commit 自身的版本号改动，不代表区间。明细见 [upstream-delta §⑦](../research/2026-09-24-dsh-upstream-delta.md)。
 
 ## 方案
 
-1. **阶段 0 · 靶校正（小）**：研究树只读 `fetch upstream` 取 rc.2 对象，核 `rc.1 → rc.2` 增量（预期 = 发布
-   工程 commit）；把 ROADMAP ⏸ 行与两份研究材料的靶改成 rc.2，并写明"材料仍适用"或"需补哪些点"。
+1. **阶段 0 · 靶校正【已取证，待收口】**：rc.2 已抓进 `vendor/dsh`（**https 官方 GitHub，7.7s；不动 origin、
+   不动 vendor HEAD**；ssh:443 在本机 VPN 后不通）。`rc.1 → rc.2` 增量已核实并写进增量报告 §⑦；两份研究材料的
+   靶已改 rc.2，ROADMAP 已按 rc.2 立项。**取源结论 = https**；submodule 的 origin 仍指本机研究树（未改）。
 2. **阶段 1 · 影响面实测 + 升级七步**：**先换基座、构建、跑现有门禁**（`verify` / `test` / `preset-smoke` /
    `client-load` / `probe` / `release-smoke`）产**《实测影响面清单》**——逐条记：哪道门禁、红还是绿、归属
    原因（peer 名 / preset 声明形状 / 投影 API / 快照格式 / 构建配方）、适配动作。然后再照增量报告 §⑥ 逐项
@@ -45,7 +48,9 @@
 
 ## 验收
 
-- 阶段 0：研究材料与 ROADMAP 的靶一致为 rc.2；`rc.1 → rc.2` 增量有本地证据（含"是否纯发布"的结论）。
+- 阶段 0：研究材料与 ROADMAP 的靶一致为 rc.2；`rc.1 → rc.2` 增量有本地证据——**已达成：结论 = 非纯发布，
+  346 commit / 3429 文件，落在 user-questions·approval·preset·schedule·projection·workspace-files 六面
+  （增量报告 §⑦）**。
 - 阶段 1：**先产出《实测影响面清单》**（跑过哪些门禁、各自红／绿、红条的归属原因与适配动作、未覆盖的面），
   再逐项消红；`pnpm verify` 的 `vendor-pin` + `vendor-clean` 在 rc.2 上重校通过；`preset-smoke` 五角色真挂载；
   client-load + presence-e2e + 快照档绿；`release-smoke` 穿新兼容门禁；[AGENTS.md](../../AGENTS.md) 的
@@ -56,6 +61,8 @@
 
 - 已列于增量报告 §⑤：peer 破面、preset 声明迁移工程量、V4 单向门；另有"`baseUrl` 解析环境"与
   "web-app 启动面兼容性"两项**需实测**。
+- **阶段 0 推翻了"纯发布 bump"的预期**（rc.1→rc.2 = 346 commit，见 §⑦）⇒ 阶段 1 的《实测影响面清单》
+  必须按这份增量逐面核对，不能只看 peer 破面那一项。
 - 升级期间日用全局安装与本仓基线会分叉：按 [dev-loop §6](../../docs/guides/dev-loop.md) 的双 home 纪律跑，
   防"安静用错 home"。
 - 取新 tag 的路径有一处现实坑：`vendor/dsh` 的 origin 指向本机研究树 `/Users/bowhead/deepseek-harness`，

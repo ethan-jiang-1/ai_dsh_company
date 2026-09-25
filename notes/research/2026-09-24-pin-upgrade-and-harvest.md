@@ -1,16 +1,16 @@
-# 2026-09-24 · 基座轮：升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.1 + 能力收割审计
+# 2026-09-24 · 基座轮：升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2 + 能力收割审计
 
-状态：搁置（2026-09-24 晚用户改向：驾驶舱·人机协作优先，升 pin 挪出主线——文件经用户手动移入研究层；复活条件 = 需要新基座的条目出现或用户重新拍板；增量证据 = 同目录 dsh-upstream-delta）
+状态：**进行中（2026-09-25 用户定为队列 ①，先换基座再打扫卫生）**；原为搁置（2026-09-24 晚用户改向：驾驶舱·人机协作优先，升 pin 挪出主线——文件经用户手动移入研究层；复活条件 = 需要新基座的条目出现或用户重新拍板；增量证据 = 同目录 dsh-upstream-delta）
 
 ## 问题
 
-上游已出 6 个新 tag（rc.3 → 0.1.7-rc.1，远端已核实），升 pin 触发条件早已满足（触发型登记），
+上游已出 7 个新 tag（rc.3 → 0.1.7-rc.2，远端已核实；2026-09-25 靶校正：rc.2 在 rc.1 之上还有 346 commit，见增量报告 §⑦），升 pin 触发条件早已满足（触发型登记），
 基座债持续累积；且搁置池至少 3 条（自主节律 / 并行快捷派活 / 消息级动态流）的复活条件就是
-"上游 seam"——升级即复查窗口。用户 2026-09-24 晚裁决：**增量报告确认风险后升 dsh-v0.1.7-rc.1**。
+"上游 seam"——升级即复查窗口。用户 2026-09-24 晚裁决：**增量报告确认风险后升 dsh-v0.1.7-rc.2**（2026-09-25 用户定为队列 ①，靶从 rc.1 校正到 rc.2）。
 
 ## 方案
 
-1. `node scripts/sync-dsh.mjs --pin dsh-v0.1.7-rc.1`：vendor 换 tag + AGENTS.md 簿记 + 兼容矩阵加列。
+1. `node scripts/sync-dsh.mjs --pin dsh-v0.1.7-rc.2 --process-review <证据 JSON>`：vendor 换 tag + AGENTS.md 簿记 + 兼容矩阵加列。
 2. 按 [release.md](../../docs/release.md) 升 pin 程序全跑：typecheck / release-smoke / replay-smoke
    （快照漂移按 [guides/dev-loop §9.1](../../docs/guides/dev-loop.md) 判据档处置）/
    delegation-smoke（[delegation.md](../../docs/delegation.md) §4.4 边界复核）。

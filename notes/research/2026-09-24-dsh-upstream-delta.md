@@ -249,10 +249,10 @@ client remote 移除；③ preset roots 目录扫描废除；④ session V4（�
 
 ## ⑥ 建议
 
-**pin 目标：`dsh-v0.1.7-rc.1`（46a7f68）**。理由：六个 tag 全量含入（rc.3 已并入）；0.1.6 两段是
-中间态（preset 机制未定型、无 V4、无兼容门禁），单独钉无意义；rc.1 是该系列唯一带完整门禁与打磨的
-收口点，且机制重写（preset/V4/投影）正是本仓搁置项的复活载体。代价：接受 ⑤-4 的 preset 声明迁移
-工程量与 ⑤-6 的单向 V4 门。
+**pin 目标：`dsh-v0.1.7-rc.2`（477b4f42；2026-09-25 靶校正，原为 rc.1）**。理由：七个 tag 全量含入
+（rc.3 已并入）；0.1.6 两段是中间态（preset 机制未定型、无 V4、无兼容门禁），单独钉无意义；rc.2 在
+rc.1 之上还有 346 commit（见 ⑦，非纯发布 bump），且机制重写（preset/V4/投影）正是本仓搁置项的复活
+载体。代价：接受 ⑤-4 的 preset 声明迁移工程量与 ⑤-6 的单向 V4 门，外加 ⑦ 的新增量面。
 
 **升级程序七步（按序）**：① sync-dsh 既定流程（submodule 前移 + 簿记 + 兼容矩阵加列 + verify 双门禁
 重校）；② peerDependencies 重写（`dsh-agent-presets` → `dsh-agent-preset` + `dsh-agent-preset-registry`，
@@ -261,6 +261,22 @@ client remote 移除；③ preset roots 目录扫描废除；④ session V4（�
 client-load + presence-e2e + snapshot 回归）；⑤ 快照回归策略（V3 照跑 + 布局差异预期 + 新录 V4 +
 单向门写进 Note）；⑥ 发布链全量（release-smoke 穿新门禁、deliverables-check、delegation-smoke）；
 ⑦ 时机与拆分：升级本身单独立项（③+④ 两天级工程）；收割项在升级后独立进 ROADMAP，不捆绑。
+
+## ⑦ rc.1 → rc.2 增量（2026-09-25 本地核实；靶校正）
+
+阶段 0 靶校正时把 rc.2 抓进 `vendor/dsh`（https，7.7s；**不动 origin、不动 vendor HEAD**）后实测：
+
+- **不是"纯发布 bump"**：`rc.1..rc.2` = **346 commit**（含 merge）/ 3429 文件 / +136,313 −24,518。
+  GitHub API 上那个 merge commit 自身的 317/317（全是 `package.json` 的 `version`）只代表**它这一步**，
+  不代表区间——先前"rc.2 只是发布工程"的印象据此纠正。
+- 落在本仓依赖面上的改动（按提交主题筛）：`user-questions` 5（含
+  `feat(user-questions): support timed waits and late replies`——**人机合一"人不在 / 迟到回复"的现成机制**）、
+  `approval` 5（说明本地化、auto-review 否认后转问人）、`preset` 19（含 legacy preset 的 Schedule 工具
+  期望修正）、`schedule` 20（含 `feat(web): disable shipped schedule and time context plugins`——与搁置池
+  「自主节律」相关）、`projection` 5（live projection 失败归类、动态工具更新投影）、`workspace-files`
+  （目录链接按解析目标列举——影响走 `workspaceFiles` 的台账 / 培养面板）。
+- 结论：**升级幅面比原判大**，但方向对我们有利（三条恰好喂队列 ⑤ / 搁置池 / 升 pin 后的 client 重写）。
+  影响面仍以换基座后跑现有门禁的《实测影响面清单》为准（RFC 阶段 1）。
 
 ## 局限声明
 
