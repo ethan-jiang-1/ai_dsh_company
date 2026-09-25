@@ -23,4 +23,18 @@ describe('client 面（R3：委派工具卡）', () => {
     // 委派卡只依赖 slots，不该被 team remote 的缺席拖住（与品牌/任务板分开 inject）。
     expect(index, "委派卡应单独 ctx.inject(['slots'], …)").toMatch(/ctx\.inject\(\['slots'\]/)
   })
+
+  it('tool.call.toolview 注册必须带 priority -1（同键同优先级 = 注册 throw）', () => {
+    // rc.2 的 vendor details-toolview 也在 spawn_teammate / send_message / list_agents / team_task_* 上
+    // 注册（priority 0）；keyed 槽"同键同优先级"直接 throw（vendor ui-slots：lowest renders）。
+    // ⚠ 这条**只能靠源码钉**：2026-09-26 实测把 priority 去掉后 `client-load-smoke` 仍全绿
+    //   （冲突要等该 key 的一次工具调用渲染才炸）⇒ 加载档不是这个虫类的防线。
+    const index = readFileSync(join(PACK, 'src/client/index.ts'), 'utf8')
+    const calls = [...index.matchAll(/slots\.register\(\{([^}]*)\}/g)].map(match => match[1]!)
+    const toolviews = calls.filter(call => call.includes("'tool.call.toolview'"))
+    expect(toolviews.length, 'tool.call.toolview 注册数变了，复核本断言').toBe(2)
+    for (const call of toolviews) {
+      expect(call, '缺 priority（或非负）= 与 vendor details-toolview 同键同优先级 ⇒ 注册 throw').toMatch(/priority:\s*-\d/)
+    }
+  })
 })

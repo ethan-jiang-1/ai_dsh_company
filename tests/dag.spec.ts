@@ -68,6 +68,30 @@ describe('layoutDag', () => {
     expect(layout.nodes).toHaveLength(1)
   })
 
+  it('waitingOn：悬空 blocker 按未完成计（与 board.ts 同口径，不静默放行）', () => {
+    expect(layoutDag([task('a', ['ghost'])]).nodes[0]?.waitingOn).toBe(1)
+    expect(layoutDag([task('a', ['b']), task('b', [], 'completed')]).nodes.find(n => n.id === 'a')?.waitingOn).toBe(0)
+    expect(layoutDag([task('a', ['b']), task('b')]).nodes.find(n => n.id === 'a')?.waitingOn).toBe(1)
+  })
+
+  it('同级按 blocker 重心排序（输入序只做平局兜底）', () => {
+    // b、c 同在第 1 层；b 的前置是第 0 层最右的 y，c 的前置是最左的 x ⇒ 期望 c 在 b 左边。
+    const tasks = [task('x'), task('y'), task('b', ['y']), task('c', ['x'])]
+    const layout = layoutDag(tasks)
+    const cx = layout.nodes.find(n => n.id === 'c')!.x
+    const bx = layout.nodes.find(n => n.id === 'b')!.x
+    expect(cx).toBeLessThan(bx)
+    // 只把**同一层内的输入序**倒过来（第 0 层不动）：重心排序应当压过输入序，落位不变。
+    const swapped = layoutDag([task('x'), task('y'), task('c', ['x']), task('b', ['y'])])
+    expect(swapped.nodes.find(n => n.id === 'c')!.x).toBe(cx)
+    expect(swapped.nodes.find(n => n.id === 'b')!.x).toBe(bx)
+  })
+
+  it('同级无前置信息时退回输入序（平局兜底）', () => {
+    const layout = layoutDag([task('p'), task('q')])
+    expect(layout.nodes.map(n => n.id)).toEqual(['p', 'q'])
+  })
+
   it('同级节点水平铺开且不重叠', () => {
     const layout = layoutDag([task('a'), task('b'), task('c')])
     const [a, b, c] = layout.nodes

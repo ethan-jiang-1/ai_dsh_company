@@ -27,6 +27,18 @@ function taskTone(status: TaskRow['status']): 'success' | 'info' | 'outline' {
   return 'outline'
 }
 
+/**
+ * DAG 节点的状态徽章（文案 + 类名一处定义）。
+ * 优先级：还在等前置 > 已完成 > 进行中 > 可开工——**进行中不得被读成"可开工"**（文案会误导调度）。
+ * 悬空 blocker 已由 `layoutDag` 的 `waitingOn` 计入（与 `board.ts` 同口径）。
+ */
+function NodeBadge({ node }: { readonly node: DagLayout['nodes'][number] }) {
+  if (node.waitingOn > 0) return <span className="wk-dag-wait">{`等 ${String(node.waitingOn)} 项`}</span>
+  if (node.status === 'completed') return <span className="wk-dag-done">已完成</span>
+  if (node.status === 'in_progress') return <span className="wk-dag-ready">进行中</span>
+  return <span className="wk-dag-ready">可开工</span>
+}
+
 /** 成员状态 → StateDot 语义（团队内忙闲，D-c 文案在 `presence.ts`）。 */
 function memberDot(status: PresenceRow['status']): 'done' | 'ongoing' | 'warning' | 'error' | 'idle' {
   switch (status) {
@@ -104,9 +116,14 @@ export function DagPanel({ layout }: { readonly layout: DagLayout }) {
       aria-label="任务依赖图"
     >
       <defs>
-        {/* 箭头随边走色（context-stroke）——完成边高亮色、等待边灰。 */}
-        <marker id="wk-arrow" viewBox="0 0 8 8" refX={7} refY={4} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
-          <path d="M 0 0 L 8 4 L 0 8 z" fill="context-stroke" />
+        {/* 箭头 = **双 marker 显式上色**（CSS 里 .wk-arrow-tip-*）。不用 SVG2 `context-stroke`：
+            Chrome 124+/Firefox 支持，Safari 无信号——不支持时 marker 会 fallback 成黑，
+            深色主题下箭头直接看不见。 */}
+        <marker id="wk-arrow-wait" viewBox="0 0 8 8" refX={7} refY={4} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
+          <path className="wk-arrow-tip-wait" d="M 0 0 L 8 4 L 0 8 z" />
+        </marker>
+        <marker id="wk-arrow-done" viewBox="0 0 8 8" refX={7} refY={4} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
+          <path className="wk-arrow-tip-done" d="M 0 0 L 8 4 L 0 8 z" />
         </marker>
       </defs>
       {layout.edges.map(edge => (
@@ -115,7 +132,7 @@ export function DagPanel({ layout }: { readonly layout: DagLayout }) {
           className="wk-edge"
           data-done={edge.done}
           d={edge.path}
-          markerEnd="url(#wk-arrow)"
+          markerEnd={`url(#wk-arrow-${edge.done ? 'done' : 'wait'})`}
           /* pathLength=1：把 dash 单位归一化 ⇒ dashoffset 1→0 的"画线"与真实长度无关。
              颜色/线宽/dash 全在 CSS（.wk-edge[data-done]）——含浅色对比度修正。 */
           pathLength={1}
@@ -126,7 +143,7 @@ export function DagPanel({ layout }: { readonly layout: DagLayout }) {
         // 内层 wk-node 只管**入场动画**——动画关键帧里的 CSS transform 会覆盖 SVG transform
         // 属性，合在一层 = 动画结束态 translateY(0) 把定位吃掉 ⇒ 所有节点堆到 (0,0) 叠成一摞。
         <g key={node.id} transform={`translate(${String(node.x)} ${String(node.y)})`}>
-          <g className="wk-node" data-status={node.status} data-ready={node.ready}>
+          <g className="wk-node" data-status={node.status}>
             <rect
               className="wk-dag-card"
               width={node.width}
@@ -143,11 +160,7 @@ export function DagPanel({ layout }: { readonly layout: DagLayout }) {
                 </div>
                 <div className="wk-dag-meta">
                   {node.ownerLabel !== null && <span className="wk-dag-owner">{node.ownerLabel}</span>}
-                  {node.waitingOn > 0
-                    ? <span className="wk-dag-wait">等 {String(node.waitingOn)} 项</span>
-                    : node.status === 'completed'
-                      ? <span className="wk-dag-done">已完成</span>
-                      : <span className="wk-dag-ready">可开工</span>}
+                  <NodeBadge node={node} />
                 </div>
               </div>
             </foreignObject>

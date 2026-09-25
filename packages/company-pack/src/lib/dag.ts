@@ -13,13 +13,12 @@ export interface DagNode {
   readonly id: string
   readonly subject: string
   readonly status: TaskRow['status']
-  readonly ready: boolean
   readonly ownerLabel: string | null
   /** 层级（0 = 无依赖的根）。 */
   readonly level: number
-  /** 还没走完的前置数（0 = 依赖已就绪；徽章用）。 */
+  /** 还没走完的前置数（0 = 依赖已就绪；徽章用）。**悬空 blocker 按未完成计**（与 `board.ts` 同口径）。 */
   readonly waitingOn: number
-  /** 同级内序号（0 起，= 输入序）。 */
+  /** 同级内序号（0 起）：**blocker 重心排序**后的位置；输入序只做平局兜底。 */
   readonly order: number
   readonly x: number
   readonly y: number
@@ -90,7 +89,7 @@ function round(value: number): number {
 
 /**
  * 分层 + 同级居中 + 定坐标 → 可直接画的布局（含边路径与画布尺寸）。
- * @param tasks - 任务行（顺序 = 同级内的显示序）。
+ * @param tasks - 任务行（同级内按 blocker 重心重排；输入序仅作平局兜底）。
  * @param options - 尺寸/间距覆盖（默认值见 `DEFAULTS`）。
  * @returns 布局。
  */
@@ -102,7 +101,6 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
   const padding = options.padding ?? DEFAULTS.padding
 
   const levels = dagLevels(tasks)
-  const byId = new Map(tasks.map(task => [task.id, task]))
   const statusOf = new Map(tasks.map(task => [task.id, task.status]))
   const byLevel = new Map<number, TaskRow[]>()
   for (const task of tasks) {
@@ -145,15 +143,13 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
     const rowWidth = bucket.length * nodeWidth + Math.max(0, bucket.length - 1) * hGap
     const startX = padding + (width - padding * 2 - rowWidth) / 2
     bucket.forEach((task, order) => {
-      const liveBlockers = task.blockedBy.filter(id => byId.has(id))
       nodes.push({
         id: task.id,
         subject: task.subject,
         status: task.status,
-        ready: task.ready,
         ownerLabel: task.ownerName,
         level,
-        waitingOn: liveBlockers.filter(id => (statusOf.get(id) ?? 'pending') !== 'completed').length,
+        waitingOn: task.blockedBy.filter(id => (statusOf.get(id) ?? 'pending') !== 'completed').length,
         order,
         x: round(startX + order * (nodeWidth + hGap)),
         y: round(padding + level * (nodeHeight + vGap)),
@@ -164,7 +160,6 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
   }
 
   const positionById = new Map(nodes.map(node => [node.id, node]))
-  const statusById = new Map(tasks.map(task => [task.id, task.status]))
   const edges: DagEdge[] = []
   for (const edge of dependencyEdges(tasks)) {
     const from = positionById.get(edge.from)
@@ -179,7 +174,7 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
       from: edge.from,
       to: edge.to,
       path: `M ${String(round(x1))} ${String(round(y1))} C ${String(round(x1))} ${String(round(mid))}, ${String(round(x2))} ${String(round(mid))}, ${String(round(x2))} ${String(round(y2))}`,
-      done: statusById.get(edge.from) === 'completed',
+      done: statusOf.get(edge.from) === 'completed',
     })
   }
 

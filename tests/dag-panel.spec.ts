@@ -12,8 +12,8 @@ import { DagPanel } from '../packages/company-pack/src/client/company-panels.tsx
 import { layoutDag } from '../packages/company-pack/src/lib/dag.ts'
 import type { TaskRow } from '../packages/company-pack/src/lib/board.ts'
 
-const task = (id: string, blockedBy: readonly string[] = []): TaskRow =>
-  ({ id, subject: `任务 ${id}`, status: 'pending', blockedBy, ownerName: 'vp-eng', ready: blockedBy.length === 0, revision: 1 })
+const task = (id: string, blockedBy: readonly string[] = [], status: TaskRow['status'] = 'pending'): TaskRow =>
+  ({ id, subject: `任务 ${id}`, status, blockedBy, ownerName: 'vp-eng', ready: blockedBy.length === 0, revision: 1 })
 
 describe('DagPanel 渲染结构（定位/动画分层）', () => {
   const tasks = [task('a'), task('b'), task('c', ['a']), task('d', ['b'])]
@@ -39,5 +39,42 @@ describe('DagPanel 渲染结构（定位/动画分层）', () => {
   it('边带箭头 marker', () => {
     expect(html).toContain('marker-end')
     expect(html).toContain('wk-arrow')
+  })
+})
+
+describe('DagPanel 状态徽章与箭头（2026-09-26 code-review 补的钉子）', () => {
+  it('四态文案各自在场：可开工 / 进行中 / 已完成 / 等 N 项', () => {
+    const layout = layoutDag([
+      task('a'),
+      task('b', [], 'in_progress'),
+      task('c', [], 'completed'),
+      task('d', ['a']),
+    ])
+    const html = renderToString(createElement(DagPanel, { layout }))
+    expect(html).toContain('可开工')
+    expect(html).toContain('进行中')
+    expect(html).toContain('已完成')
+    expect(html).toContain('等 1 项')
+  })
+
+  it('进行中不得被读成可开工：两态各自只出一种文案', () => {
+    const inProgress = renderToString(createElement(DagPanel, { layout: layoutDag([task('a', [], 'in_progress')]) }))
+    expect(inProgress).toContain('进行中')
+    expect(inProgress).not.toContain('可开工')
+    const pending = renderToString(createElement(DagPanel, { layout: layoutDag([task('a')]) }))
+    expect(pending).toContain('可开工')
+    expect(pending).not.toContain('进行中')
+  })
+
+  it('箭头 = 双 marker 显式上色（不依赖 SVG2 context-stroke）', () => {
+    const layout = layoutDag([task('a', [], 'completed'), task('b', ['a']), task('c', ['b'])])
+    const html = renderToString(createElement(DagPanel, { layout }))
+    expect(html).toContain('id="wk-arrow-wait"')
+    expect(html).toContain('id="wk-arrow-done"')
+    expect(html).toContain('wk-arrow-tip-wait')
+    expect(html).toContain('wk-arrow-tip-done')
+    expect(html, 'context-stroke 在 Safari 无信号，不支持时箭头会变黑').not.toContain('context-stroke')
+    expect(html).toContain('url(#wk-arrow-done)')
+    expect(html).toContain('url(#wk-arrow-wait)')
   })
 })

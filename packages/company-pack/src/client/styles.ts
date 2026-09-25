@@ -132,15 +132,17 @@ const CSS = `
   background: var(--dsw-alias-bg-layer-2); border-radius: 4px; padding: 1px 5px;
   max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.wk-dag-wait { font-size: 10px; color: var(--dsw-alias-state-warning-primary, #b8860b); }
+.wk-dag-wait { font-size: 10px; color: var(--dsw-alias-state-warn-primary); }
 .wk-dag-ready { font-size: 10px; color: var(--dsw-alias-state-success-primary); }
 .wk-dag-done { font-size: 10px; color: var(--dsw-alias-label-secondary); }
-/* 状态化：进行中 = 主色描边；完成 = 整卡降透明度（依赖图一眼看出"卡在哪一拨"）。 */
+/* 状态化：进行中 = 主色描边；完成 = 整卡降透明度（依赖图一眼看出"卡在哪一拨"）。
+   ⚠ 降透明度**不能写在 .wk-node 自己身上**：它带入场动画（animation: wk-node-in … both，
+   关键帧动 opacity 0→1），而 CSS 级联里 **animation 声明高于普通作者声明** ⇒ 动画结束态的
+   opacity:1 会把这里的 0.55 吃掉（与 2026-09-25 transform 覆盖定位同类的坑，已实测两次）。
+   故一律落在**不被动画的子元素**上。 */
 .wk-node[data-status='in_progress'] .wk-dag-card { stroke: var(--dsw-alias-state-business-primary); stroke-width: 1.5; }
-.wk-node[data-status='completed'] { opacity: 0.55; }
-/* 边：完成 = 高亮实线；等待 = 灰虚线（流动动画保留）。 */
-.wk-edge { stroke: var(--dsw-alias-border-l3); fill: none; stroke-width: 1.5; }
-.wk-edge[data-done='true'] { stroke: var(--dsw-alias-state-success-primary); }
+.wk-node[data-status='completed'] .wk-dag-card,
+.wk-node[data-status='completed'] .wk-dag-node { opacity: 0.55; }
 .wk-dag-node-title {
   font-size: 11px;
   line-height: 1.3;
@@ -296,6 +298,13 @@ const CSS = `
   stroke-dasharray: 1;
 }
 .wk-edge[data-done='false'] { stroke-dasharray: 0.02 0.015; }
+/* 箭头尖：**双 marker 显式上色**（不用 SVG2 context-stroke——Chrome 124+ / Firefox 支持，
+   Safari 无信号；不支持时 marker 会 fallback 成黑，深色主题下箭头直接消失）。 */
+.wk-arrow-tip-wait { fill: var(--dsw-alias-label-tertiary); }
+.wk-arrow-tip-done {
+  fill: var(--dsw-alias-state-success-primary);
+  fill: color-mix(in srgb, var(--dsw-alias-state-success-primary) 70%, var(--dsw-alias-label-primary));
+}
 
 @media (prefers-reduced-motion: reduce) {
   /* 动效层统一关闭（官方惯例：28 个 vendor 样式表都这么做）。
