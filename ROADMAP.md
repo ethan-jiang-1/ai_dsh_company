@@ -10,10 +10,7 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **① 加新东西 · 人机合一（先 UX 研究，再内容层）**（换基座已完成）：RFC =
-  [proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md)——**定性 = UX 问题**（人何时、以何形态被
-  拉进来；用户自陈无好思路）⇒ 阶段 0 先 research 出候选模式与判据（`notes/research/`）→ A1 `kb/owners.md` + A2 手册三档/缺口回流/不在场分档。
-- **② 加新东西 · 人机合一机制层**：RFC 同 ① 的 B1–B4——收件人路由（answerer 多收件人先核实）/
+- **① 加新东西 · 人机合一机制层**：RFC 同（内容层已交付的）[proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md) 的 B1–B4——收件人路由（answerer 多收件人先核实）/
   补料 · 建议 · 规矩回流三类载体 / 不在场机制化 / 证据回看。
 
 ## 磨清单（低优先磨活；不占轮、可后台派活；触发即升队）
@@ -50,6 +47,12 @@
 - 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
+
+- 2026-09-25（**人机合一 · 阶段 0 + 内容层交付**）：阶段 0 = [research/human-agent-ux-patterns](./notes/research/2026-09-25-human-agent-ux-patterns.md)
+  （六问 × 12 外部模式 × vendor 六面全数判定；核心洞察 = "批准即立法"——递进是批准历史变规矩、不是自动放权）；
+  A1 = [kb/owners.md](./company-workspace/kb/owners.md) 人侧事实家；A2 = 公司手册「人机接口」节（审批三档/规矩缺口
+  回流/不在场分档/退化形状）。退化形状真证据：审批 = attention-e2e 7/7（现行）；补料 = 动议读共享盘既有证据；
+  问询→答复完整链由机制层 B2/B3 验收时补专跑（记入 intents）。手册面检查 = handbook-smoke ALL PASS。
 
 - 2026-09-25（**打扫卫生·记事面交付**）：六点全落地（磨清单立家/⏸ 两行/intents 三修/rejected 裁断不设
   目录/index 研究树行/**bare-path 门禁**带红绿反证并顺手抓出 3 处真腐化）；移交 4 项全处置；
