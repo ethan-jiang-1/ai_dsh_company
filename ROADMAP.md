@@ -21,18 +21,32 @@
   拉进来；用户自陈无好思路）⇒ 阶段 0 先 research 出候选模式与判据（`notes/research/`）→ A1 `kb/owners.md` + A2 手册三档/缺口回流/不在场分档。
 - **④ 加新东西 · 人机合一机制层**：RFC 同 ③ 的 B1–B4——收件人路由（answerer 多收件人先核实）/
   补料 · 建议 · 规矩回流三类载体 / 不在场机制化 / 证据回看。
-- ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；① 之后按其判据搬进 §磨清单）：机械层已过——
-  `deliverables-check` ALL PASS + r3 重录随手册完成；可后台派活不占轮。
+
+## 磨清单（低优先磨活；不占轮、可后台派活；触发即升队）
+
+> 家规（notebook-hygiene 立，2026-09-25）：观察项与低优先磨活住这里，各带「谁来磨／何时磨」；
+> 从队列可见一跳到达。队列走空且用户点名时才升格为队列条目。
+
+- **事件复盘场成员 journal 缺席**（VP-Eng/COO 未留 journal，W8 同款第二次）：谁来磨 = 内容面轮
+  （persona/skill 强化「收尾写 journal」）；何时磨 = 下次事件复盘场前后。
+- **CEO journal 文件名自记日期漂移**：谁来磨 = 内容面轮（skill 写清文件名日期口径）；何时磨 = 下次
+  CEO journal 写作时顺带核。
+- **q3 场 `final.md` 换行不合规**：谁来磨 = 任意接触该交付物的人；何时磨 = 下次 deliverables-check
+  红时即修（机械可见）。
+- **snapshots 与 live 盘差异逐项语义目录**（自 ⏸ 搁置池迁入）：机械层已过（`deliverables-check`
+  ALL PASS + r3 重录随手册完成）；何时磨 = 需要动 snapshots 语义时先补目录再动手。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
-> 判据：**只有"缺上游 seam"或"缺明确需求"才进这里**；被否决的方案不进（那归 D 号 / 复盘 / `rejected`）。
+> 判据：**只有"缺上游 seam"或"缺明确需求"才进这里**；被否决的方案不进（那归 D 号 / 复盘 / 各 Note 的「输掉的方案」节）。
 > 升 pin（`sync-dsh`）时顺手回看一遍。条目一旦复活，按其性质回本表或写新提案。
 
 | 项 | 出处 | 搁置理由（已核实） | 复活条件 |
 |---|---|---|---|
 | **自主节律**（分身定期复盘） | [implemented/twin-cultivation](./notes/implemented/2026-09-22-twin-cultivation-and-self-learning.md) §四 | 机制不闭合：`goal` 需人类授权且 session-start 一律 disarm；`schedule` 只在 live 会话投递且默认没装；webhook 起的会话进不了 goal 循环；全树无 cron | 上游补"外部触发 ↔ 会话内自主续跑"的 seam——**提 seam，不自建调度器**（D9/D13） |
 | **并行快捷派活**（同时开几个 VP） | [delegation.md](./docs/delegation.md) §4.4 | 本组合无干净解法：缺 per-child composition 与不撞名的控制面 | 上游 seam |
+| **Demo 场景 D：可重放叙事场景** | [implemented/presentation-narrative](./notes/implemented/2026-09-24-presentation-narrative.md) §切片二 | 需求未出现：无放映场合；素材（新动议类型场景）已备 | demo／放映需求出现 |
+| **视觉打磨二期** | 同上 §切片三 | 走查触发型——未发现新问题不开（登记处即触发条件） | 用户走查驾驶舱页签发现新问题 |
 | **M2 自定义 provider** | [index](./docs/index.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"的需求已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
 | **界面外推送 / 收件箱** | [org-presence-board（已毕业）](./notes/implemented/2026-09-22-org-presence-board.md) §背景 | egress 只有 `sessionTelemetry`（OTel）与 hooks，webhook 是 ingress；收件人是谁、粒度多细属部署选择 | 明确的物理人通知需求 + 选定部署面 |
 | **消息级协作动态流**（在场板 v1 的动态流只含成员/任务迁移差分） | R5b 机制核实（[implemented/2026-09-23-r5b-cockpit](./notes/implemented/2026-09-23-r5b-cockpit.md)） | 消息内容要 host 侧折 lead 会话 team 事件（`sessionProjections.stateOf(…, 'agentTeam')` 通道已核实存在）→ 自建 Typert Remote——但其**客户端 stub 由 vendor codegen 管线生成**，本 pack 无接线；自建 codegen 不值一轮 | 上游提供 pack 侧 remote stub 生成，或公开 host-only 投影的客户端读 RPC |
