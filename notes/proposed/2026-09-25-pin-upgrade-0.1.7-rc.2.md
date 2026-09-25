@@ -21,13 +21,15 @@
 
 1. **阶段 0 · 靶校正（小）**：研究树只读 `fetch upstream` 取 rc.2 对象，核 `rc.1 → rc.2` 增量（预期 = 发布
    工程 commit）；把 ROADMAP ⏸ 行与两份研究材料的靶改成 rc.2，并写明"材料仍适用"或"需补哪些点"。
-2. **阶段 1 · 升级七步**（照增量报告 §⑥，不另发明）：① `sync-dsh`（submodule 前移 + 簿记 + 兼容矩阵加列 +
-   verify 双门禁重校）；② peerDependencies 重写（`dsh-agent-presets` 在 0.1.7 不存在，拆为
-   `dsh-agent-preset` + `dsh-agent-preset-registry`；range 按新 release 对齐——材料给的是 `^0.1.7-rc.1`，
-   钉 rc.2 时以兼容门禁实测定）；③ preset 声明迁移（工程量主体；完成定义 = `preset-smoke` 真挂载）；
-   ④ client 数据层重写（`remote.agentTeams` → 投影；完成定义 = client-load + presence-e2e + 快照回归）；
-   ⑤ 快照回归策略（V3 照跑 + 新录 V4 + 单向门写进 Note）；⑥ 发布链全量（`release-smoke` 穿新 peer 兼容
-   门禁 + `deliverables-check` + `delegation-smoke`）；⑦ 拆分 = 升级单独立项，15 条收割项升级后独立进队列。
+2. **阶段 1 · 影响面实测 + 升级七步**：**先换基座、构建、跑现有门禁**（`verify` / `test` / `preset-smoke` /
+   `client-load` / `probe` / `release-smoke`）产**《实测影响面清单》**——逐条记：哪道门禁、红还是绿、归属
+   原因（peer 名 / preset 声明形状 / 投影 API / 快照格式 / 构建配方）、适配动作。然后再照增量报告 §⑥ 逐项
+   适配，不另发明：① `sync-dsh`（submodule 前移 + 簿记 + 兼容矩阵加列 + verify 双门禁重校）；② peerDependencies
+   重写（`dsh-agent-presets` 在 0.1.7 不存在，拆为 `dsh-agent-preset` + `dsh-agent-preset-registry`；range 按新
+   release 对齐——材料给的是 `^0.1.7-rc.1`，钉 rc.2 时以兼容门禁实测定）；③ preset 声明迁移（工程量主体；
+   完成定义 = `preset-smoke` 真挂载）；④ client 数据层重写（`remote.agentTeams` → 投影；完成定义 = client-load +
+   presence-e2e + 快照回归）；⑤ 快照回归策略（V3 照跑 + 新录 V4 + 单向门写进 Note）；⑥ 发布链全量（`release-smoke`
+   穿新 peer 兼容门禁 + `deliverables-check` + `delegation-smoke`）；⑦ 拆分 = 升级单独立项，15 条收割项升级后独立进队列。
 3. **阶段 2 · 收割项登记**（升级后）：从增量报告 §④ 的 15 条里逐条判"对本 pack 的用途 + 建议立项与否"，
    各给归宿（ROADMAP / 搁置池）。其中与**自治 seam** 相关的（job 完成唤醒 idle owner、workflow、
    `schedule` 现状）顺手核对，作为搁置池「自主节律」的复活判据输入——只登记证据，不因它改升级范围。
@@ -44,7 +46,8 @@
 ## 验收
 
 - 阶段 0：研究材料与 ROADMAP 的靶一致为 rc.2；`rc.1 → rc.2` 增量有本地证据（含"是否纯发布"的结论）。
-- 阶段 1：`pnpm verify` 的 `vendor-pin` + `vendor-clean` 在 rc.2 上重校通过；`preset-smoke` 五角色真挂载；
+- 阶段 1：**先产出《实测影响面清单》**（跑过哪些门禁、各自红／绿、红条的归属原因与适配动作、未覆盖的面），
+  再逐项消红；`pnpm verify` 的 `vendor-pin` + `vendor-clean` 在 rc.2 上重校通过；`preset-smoke` 五角色真挂载；
   client-load + presence-e2e + 快照档绿；`release-smoke` 穿新兼容门禁；[AGENTS.md](../../AGENTS.md) 的
   vendor 簿记与兼容矩阵同步。
 - 阶段 2：15 条收割项各有"立项／不立项 + 理由"与归宿。

@@ -10,19 +10,21 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **① 记事面治腐化**（无依赖；先做——它给后续条目立家）：RFC =
+- **① 换基座 · 升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2**（用户 2026-09-25 定为最优先：只有换到新基座才知道
+  对已写代码/内容的影响面；先修对原有，再加新东西）：RFC =
+  [proposed/pin-upgrade-0.1.7-rc.2](./notes/proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md)——阶段 0 靶校正（上游已发 rc.2
+  = `477b4f42`；先定取源）→ 阶段 1 **换基座后先跑现有门禁、产《实测影响面清单》**，再按七步适配（peerDependencies /
+  preset 声明迁移 / client 数据层 / 快照回归 / 发布链）；15 条收割项不捆绑。
+- **② 打扫卫生 · 记事面治腐化**（依赖 ①：在适配后的状态上打扫，避免二次返工）：RFC =
   [proposed/notebook-hygiene](./notes/proposed/2026-09-25-notebook-hygiene.md)——「磨清单」立家（三条观察项）/
   触发型两条入内 / intents 指针 / `rejected` 合同裁断 / index 研究树登记；验收 = verify ALL PASS + 无悬空引用与死链。
-- **② 长程自主执行的目标形态**（依赖 ①：打磨型的输入源 = ①立的磨清单）：RFC =
+- **③ 打扫卫生 · 长程自主执行的目标形态**（依赖 ②：打磨型的输入源 = ②立的磨清单）：RFC =
   [proposed/longrun-goal-shape](./notes/proposed/2026-09-25-longrun-goal-shape.md)——goal objective 写预算 + 输入源 +
   三类停止条件（交付型 / 打磨型两形态）；落点 = dev-loop §0.5 一小段。
-- **③ 人机合一 · 内容层**（无基座依赖；不动机制与 client）：RFC =
+- **④ 加新东西 · 人机合一内容层**（前置 ① 已完成；不动机制与 client）：RFC =
   [proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md) A1–A2——`kb/owners.md`
-  （角色 ↔ 物理人 + 授权面）/ 手册落三档审批 · 规则缺口回流 · 不在场分档 + **退化形状**；机制层见 ⑤。
-- **④ 升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2**（2026-09-25 用户确认必做；⑤ 的前置）：RFC =
-  [proposed/pin-upgrade-0.1.7-rc.2](./notes/proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md)——阶段 0 靶校正（上游已发
-  rc.2 = `477b4f42`）→ 七步程序（preset 声明迁移 / client 数据层重写 / V4 单向门），不捆绑 15 收割项。
-- **⑤ 人机合一 · 机制层**（依赖 ④：升 pin 重写 preset 声明与 client 数据层，先做要迁两次）：RFC 同 ③ 的
+  （角色 ↔ 物理人 + 授权面）/ 手册落三档审批 · 规则缺口回流 · 不在场分档 + **退化形状**。
+- **⑤ 加新东西 · 人机合一机制层**（依赖 ①：升 pin 重写 preset 声明与 client 数据层，先做要迁两次）：RFC 同 ④ 的
   B1–B4——收件人路由（answerer 多收件人先核实）/ 补料 · 建议 · 规矩回流三类载体 / 不在场机制化 / 证据回看。
 - ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；① 之后按其判据搬进 §磨清单）：机械层已过——
   `deliverables-check` ALL PASS + r3 重录随手册完成；可后台派活不占轮。
