@@ -95,13 +95,16 @@ export async function apply(ctx: ClientContext): Promise<void> {
   ctx.inject(['slots'], (scoped) => {
     // rc.2 起**一键一 inject**（官方内置 toolview 全是这个形状：`readToolview`/`presentRow`…）。
     // 旧写法（一个 inject 回调里返回 disposer 数组）在 rc.2 下不再生效 ⇒ 委派卡/团队卡退化成通用行。
+    // priority -1：keyed 槽 lowest renders——rc.2 的 vendor details-toolview 也在 spawn_teammate/
+    // send_message/list_agents 等键上注册（priority 0），同键同优先级会 throw；我们 richer 的卡
+    // 必须压过通用明细行 ⇒ 显式 -1（2026-09-25 UX 实验现场抓到，dag-probe 控制台红证）。
     for (const key of DELEGATION_TOOL_KEYS) {
       scoped.slots.inject('tool.call.toolview', () =>
-        scoped.slots.register({ name: 'tool.call.toolview', key }, DelegationCard))
+        scoped.slots.register({ name: 'tool.call.toolview', key, priority: -1 }, DelegationCard))
     }
     for (const key of TEAM_TOOL_KEYS) {
       scoped.slots.inject('tool.call.toolview', () =>
-        scoped.slots.register({ name: 'tool.call.toolview', key }, TeamToolCard))
+        scoped.slots.register({ name: 'tool.call.toolview', key, priority: -1 }, TeamToolCard))
     }
   })
 
