@@ -56,13 +56,13 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
 }
 
 
-// ── 3. preset 结构：5 角色 × (composition + metadata + ≥1 skill) ───────────
+// ── 3. preset 结构：5 角色 × (声明文件 + ≥1 skill) ─────────────────────────
+// 0.1.7 起显示名/描述/order 内联进 `agent.cordis.yml` 的 `dsh-agent-preset` 行（原 preset.yml 并入），
+// 故这里只要求声明文件；挂载验证归 preset-smoke（真 web 逐角色建会话）。
 const roles = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
 for (const role of roles) {
   const dir = join(root, 'packages/company-pack/presets', role)
-  for (const f of ['agent.cordis.yml', 'preset.yml']) {
-    if (!existsSync(join(dir, f))) fail('preset-file', `${role}/${f} 缺失`)
-  }
+  if (!existsSync(join(dir, 'agent.cordis.yml'))) fail('preset-file', `${role}/agent.cordis.yml 缺失`)
   const skillsDir = join(dir, 'skills')
   const skills = existsSync(skillsDir) ? readdirSync(skillsDir, { withFileTypes: true }).filter(e => e.isDirectory()) : []
   if (skills.length === 0) { fail('preset-skill', `${role} 无 skills/<name>/SKILL.md`); continue }
@@ -87,8 +87,8 @@ try {
 // 构建产物**（lib/、dist/、node_modules/——"从源码跑"要求构建，构建必须在树内）。
 // 任何 tracked 文件的改动、或未被 gitignore 的新文件，都判 FAIL。
 // 为什么用 SHA 而不是 tag：tag 可被移动/别名，SHA 才是钉住的合同。
-const expectedTag = 'dsh-v0.1.5-rc.2'
-const expectedSha = 'fb2c4b9e698e30edb738bca4cf0618587db7d203'
+const expectedTag = 'dsh-v0.1.7-rc.2'
+const expectedSha = '477b4f420553e8a52c2fbccc464d7561b239c443'
 const vendorDir = join(root, 'vendor/dsh')
 const gm = readFileSync(join(root, '.gitmodules'), 'utf8')
 if (!gm.includes('vendor/dsh') || !gm.includes('deepseek-ai/deepseek-harness')) fail('gitmodules', 'URL/路径不符')
@@ -108,9 +108,12 @@ else {
 
 // ── 6. pack 形状：dsh.bundle.patch 指向的文件存在 + 兼容矩阵覆盖钉住的 tag ──────
 const pack = JSON.parse(readFileSync(join(root, 'packages/company-pack/package.json'), 'utf8'))
+// 0.1.7 起 `dsh.bundle.patch` 可以是字符串或**数组**（registry + 每预设一个 patch 文件）。
 const patchRel = pack?.dsh?.bundle?.patch
-if (typeof patchRel !== 'string' || !existsSync(join(root, 'packages/company-pack', patchRel))) fail('pack-bundle', 'dsh.bundle.patch 缺失或未指向真实文件')
-else ok('pack-bundle')
+const patchRels = typeof patchRel === 'string' ? [patchRel] : Array.isArray(patchRel) ? patchRel : []
+const badPatch = patchRels.filter(rel => typeof rel !== 'string' || !existsSync(join(root, 'packages/company-pack', rel)))
+if (patchRels.length === 0 || badPatch.length > 0) fail('pack-bundle', `dsh.bundle.patch 缺失、为空或未指向真实文件：${JSON.stringify(badPatch)}`)
+else ok(`pack-bundle ×${patchRels.length}`)
 // 兼容矩阵（R5a 发布欠账，guides/dev-loop §5）：`dsh.compatibility.dshReleases` 必须包含当前
 // 钉住的 vendor tag——升 pin 不加矩阵列 = 没验证过就装作验证过。升 pin 走
 // scripts/sync-dsh.mjs（它会同步加列），这条门禁保证忘加就红。

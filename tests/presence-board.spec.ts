@@ -129,12 +129,13 @@ describe('presenceFromEvents（回放 / 离线路径，验收判据 4：非空�
   })
 })
 
-describe('rowsFromTeamView（live 路径：remote.agentTeams.view 的快照 → 行）', () => {
+describe('rowsFromTeamView（live 路径：Lead 的 agentTeam 投影 → 行）', () => {
+  // 0.1.7 起成员只有持久生命周期 `phase`（provisioning/active/failed）；live 忙闲不在投影里。
   const view = {
     members: [
-      { id: LEAD, name: 'lead', role: 'lead', status: 'running', diagnostics: [] },
-      { id: VP_ENG, name: 'vp-eng', role: 'teammate', status: 'running', diagnostics: [] },
-      { id: COO, name: 'coo', role: 'teammate', status: 'idle', diagnostics: [] },
+      { id: LEAD, name: 'lead', role: 'lead', phase: 'active' },
+      { id: VP_ENG, name: 'vp-eng', role: 'teammate', phase: 'active' },
+      { id: COO, name: 'coo', role: 'teammate', phase: 'provisioning' },
     ],
     tasks: [
       { id: 'task-2', revision: 2, subject: 'VP-Eng：技术可行性结论', status: 'in_progress', blockedBy: [], ownerName: 'vp-eng', ready: true, writeScopeWarnings: [] },
@@ -142,14 +143,14 @@ describe('rowsFromTeamView（live 路径：remote.agentTeams.view 的快照 → 
     ],
   }
 
-  it('lead 行显示 CEO 显示名；状态文案按 D-c 中文映射', () => {
+  it('lead 行显示 CEO 显示名；phase 按 D-c 中文映射（active → 待命）', () => {
     const rows = rowsFromTeamView(view)
     expect(rows).toHaveLength(3)
-    expect(rows[0]).toMatchObject({ displayName: 'wochen CEO', statusLabel: '执行中', currentTask: null })
+    expect(rows[0]).toMatchObject({ displayName: 'wochen CEO', statusLabel: '待命', currentTask: null })
     const eng = rows.find(row => row.name === 'vp-eng')
-    expect(eng).toMatchObject({ displayName: 'wochen VP-Eng', statusLabel: '执行中' })
+    expect(eng).toMatchObject({ displayName: 'wochen VP-Eng', statusLabel: '待命' })
     expect(eng!.currentTask).toBe('VP-Eng：技术可行性结论')
-    expect(rows.find(row => row.name === 'coo')).toMatchObject({ statusLabel: '待命', currentTask: null })
+    expect(rows.find(row => row.name === 'coo')).toMatchObject({ statusLabel: '启动中', currentTask: null })
   })
 
   it('按 ownerName 关联当前任务（TeamTaskView 无 ownerId，只有 ownerName）', () => {
@@ -161,12 +162,12 @@ describe('rowsFromTeamView（live 路径：remote.agentTeams.view 的快照 → 
 describe('缺失 / 未知不崩（验收判据 1 的后半句）', () => {
   it('未知 status 值 → 「未知」，不抛', () => {
     expect(statusLabelFor('warping')).toBe('未知')
-    const rows = rowsFromTeamView({ members: [{ id: 'x', name: 'coo', role: 'teammate', status: 'warping', diagnostics: [] }], tasks: [] })
+    const rows = rowsFromTeamView({ members: [{ id: 'x', name: 'coo', role: 'teammate', phase: 'warping' }], tasks: [] })
     expect(rows[0]).toMatchObject({ status: 'unknown', statusLabel: '未知' })
   })
 
   it('未命中 preset 名册的成员名原样显示（任意组队名不崩）', () => {
-    const rows = rowsFromTeamView({ members: [{ id: 'x', name: 'contractor-a', role: 'teammate', status: 'idle', diagnostics: [] }], tasks: [] })
+    const rows = rowsFromTeamView({ members: [{ id: 'x', name: 'contractor-a', role: 'teammate', phase: 'active' }], tasks: [] })
     expect(rows[0]!.displayName).toBe('contractor-a')
   })
 
@@ -186,19 +187,21 @@ describe('缺失 / 未知不崩（验收判据 1 的后半句）', () => {
 })
 
 describe('diffActivity（live 动态流 = 快照差分）', () => {
-  const member = (id: string, name: string, role: 'lead' | 'teammate', status: string) => ({ id, name, role, status })
+  // 0.1.7：成员只有持久生命周期 phase（live 忙闲来自 Session 状态，不在这条读模型里）。
+  const member = (id: string, name: string, role: 'lead' | 'teammate', phase: string) => ({ id, name, role, phase })
   const task = (id: string, subject: string, status: string, ownerName?: string) =>
     ({ id, subject, status, ...(ownerName === undefined ? {} : { ownerName }) })
 
   it('首次同步不产动态（板即状态）', () => {
-    expect(diffActivity(undefined, { members: [member('l', 'lead', 'lead', 'running')], tasks: [] }, 1)).toEqual([])
+    expect(diffActivity(undefined, { members: [member('l', 'lead', 'lead', 'active')], tasks: [] }, 1)).toEqual([])
   })
 
-  it('成员出现 → 上线；状态迁移 → 转执行中 / 转待命 / 故障', () => {
-    const t0 = { members: [member('s1', 'vp-eng', 'teammate', 'idle')], tasks: [] }
-    const t1 = { members: [member('s1', 'vp-eng', 'teammate', 'running'), member('s2', 'coo', 'teammate', 'idle')], tasks: [] }
+  it('成员出现 → 上线；phase 迁移 → 转启动中 / 转待命 / 故障', () => {
+    // 0.1.7：差分按持久生命周期 phase（active → 「待命」；live 忙闲不在投影里）。
+    const t0 = { members: [member('s1', 'vp-eng', 'teammate', 'active')], tasks: [] }
+    const t1 = { members: [member('s1', 'vp-eng', 'teammate', 'provisioning'), member('s2', 'coo', 'teammate', 'active')], tasks: [] }
     const texts = diffActivity(t0, t1, 5).map(entry => entry.text)
-    expect(texts).toContain('wochen VP-Eng 转执行中')
+    expect(texts).toContain('wochen VP-Eng 转启动中')
     expect(texts).toContain('wochen COO 上线')
     const t2 = { members: [member('s1', 'vp-eng', 'teammate', 'failed')], tasks: [] }
     expect(diffActivity(t1, t2, 9).map(entry => entry.text)).toEqual(['wochen VP-Eng 故障'])
@@ -217,13 +220,14 @@ describe('diffActivity（live 动态流 = 快照差分）', () => {
   })
 })
 
-describe('显示名映射与 preset.yml 同源（防漂移）', () => {
-  it('PRESET_DISPLAY_NAMES 与 presets/*/preset.yml 的 name 逐字一致', () => {
+describe('显示名映射与 preset 声明同源（防漂移）', () => {
+  it('PRESET_DISPLAY_NAMES 与 presets/*/agent.cordis.yml 行内 config.name 逐字一致', () => {
     const packRoot = join(import.meta.dirname, '..', 'packages', 'company-pack')
     for (const [id, expected] of Object.entries(PRESET_DISPLAY_NAMES)) {
-      const text = readFileSync(join(packRoot, 'presets', id, 'preset.yml'), 'utf8')
-      const match = /^name:\s*(.+)$/m.exec(text)
-      expect(match, `${id} preset.yml 缺 name`).not.toBeNull()
+      // 0.1.7 起显示名内联进预设声明行（原 preset.yml 已并入）：config.name 缩进 8 空格。
+      const text = readFileSync(join(packRoot, 'presets', id, 'agent.cordis.yml'), 'utf8')
+      const match = /^ {8}name:\s*(.+)$/m.exec(text)
+      expect(match, `${id} 预设行缺 config.name`).not.toBeNull()
       expect(match![1]!.trim(), `${id} 的显示名与 PRESET_DISPLAY_NAMES 漂移`).toBe(expected)
     }
   })
@@ -242,11 +246,11 @@ describe('presenceFromEvents · nameById 名册补充表', () => {
     expect(presenceFromEvents(events, names).activity[0]?.text).toContain('wochen COO')
   })
 
-  it('memberNames 从 TeamView 建 id → 成员名表', () => {
+  it('memberNames 从 agentTeam 投影建 id → 成员名表', () => {
     const view: TeamViewLike = {
       members: [
-        { id: 's-lead', name: 'lead', role: 'lead', status: 'running' },
-        { id: 's-eng', name: 'vp-eng', role: 'teammate', status: 'idle' },
+        { id: 's-lead', name: 'lead', role: 'lead', phase: 'active' },
+        { id: 's-eng', name: 'vp-eng', role: 'teammate', phase: 'active' },
       ],
       tasks: [],
     }

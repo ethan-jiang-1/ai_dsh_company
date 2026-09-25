@@ -7,19 +7,15 @@
 # 依赖纪律（R5a 起）：runtime 依赖声明为 peerDependencies（不精确钉死；pre-stable API），
 # 兼容矩阵在 package.json 的 dsh.compatibility.dshReleases —— 合同见 docs/release.md。
 
-# ── preset roster（替换 web-app 的出厂行；roots 自定位）──
-# ⚠ baseUrl 语义（R1 实证，app-boot/src/index.ts:799）：`ctx.baseUrl` = **profile 目录**
-#   （cordis.yml 所在处的 file URL），不是本包安装目录。所以路径必须写成 profile 相对的
-#   `node_modules/dsh-company-pack/presets/`；写成 `presets/` 会指向 <profile>/presets/
-#   ——不存在 → scanRoot 遇 ENOENT **静默返回空** → UI 里看不到任何公司角色。
-#   UI 按 trust 分组：本行 trust: system → 四个角色出现在 **Built-in** 组（不是 Custom）。
-- id: agent-presets
-  name: '@deepseek-ai/dsh-agent-presets'
+# ── preset roster（替换 web-app 出厂行：default 改 ceo）──
+# 0.1.7 起预设声明模型变了：registry 一行（本处，按 id 替换 web-app 的 insert）+ **每个预设一行**
+#   `@deepseek-ai/dsh-agent-preset`（预设的子插件行内联进 `config.plugins`）。五行分别住
+#   `presets/<role>/agent.cordis.yml`，经 package.json 的 `dsh.bundle.patch` **数组**并入。
+#   （旧模型 = `@deepseek-ai/dsh-agent-presets` 一行 + roots 目录扫描，该包在 0.1.7 已拆。）
+- id: agent-preset-registry
+  name: '@deepseek-ai/dsh-agent-preset-registry'
   config:
     default: ceo
-    roots:
-      - path: !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/', baseUrl))"
-        trust: system
 
 - insert:
     # ── 交付物声明工具（base 无此行）──

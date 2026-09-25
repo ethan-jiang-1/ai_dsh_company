@@ -15,6 +15,21 @@ export const STATUS_LABEL: Record<PresenceStatus, string> = {
   unknown: '未知',
 }
 
+/**
+ * 0.1.7 投影的成员生命周期 → 本读模型的状态（未知值落 `unknown`，不抛）。
+ * `active` 落 `idle`（待命）：投影不表达 live turn 活动，别把它读成"正在工作"。
+ * @param phase - `TeamMemberPhase`（或任意字符串）。
+ * @returns 本仓的在场状态。
+ */
+export function presenceStatusFromPhase(phase: string): PresenceStatus {
+  switch (phase) {
+    case 'provisioning': return 'provisioning'
+    case 'active': return 'idle'
+    case 'failed': return 'failed'
+    default: return 'unknown'
+  }
+}
+
 /** 状态 → 文案（未知值不抛）。 */
 export function statusLabelFor(status: string): string {
   return STATUS_LABEL[status as PresenceStatus] ?? STATUS_LABEL.unknown
@@ -78,13 +93,21 @@ export interface PresenceBoardModel {
 
 // ---- wire 事实的宽松结构类型（只声明读到的字段；多出的字段忽略，少掉的按缺省处理） ----
 
-/** `remote.agentTeams.view` 返回的 `TeamView` 子集（client live 路径的输入）。 */
+/**
+ * `agentTeam` 投影（0.1.7 起 client live 路径的输入；旧 `remote.agentTeams.view` 的 `TeamView` 已移除）的子集。
+ *
+ * ⚠ **成员项换了语义**：0.1.7 的 `TeamMemberProjection` 只带**持久生命周期** `phase`
+ * （`provisioning` / `active` / `failed`），**不再带团队内忙闲**——官方消费方把"此刻在不在跑"
+ * 从 Session 状态座位（`useSessionStatus`）另行叠。本读模型按最小改判处理：`phase` → 中文状态，
+ * `active` 落「待命」（live turn 活动的叠加留作后续条目，见 teammember-live-activity）。
+ */
 export interface TeamViewLike {
   readonly members: readonly {
     id: string
     name: string
     role: 'lead' | 'teammate'
-    status: string
+    /** 持久生命周期（`TeamMemberPhase`），非 live 忙闲。 */
+    phase: string
   }[]
   readonly tasks: readonly {
     id: string
@@ -178,11 +201,8 @@ export function rowsFromTeamView(view: TeamViewLike): PresenceRow[] {
     name: member.name,
     displayName: displayNameFor(member.name, member.role),
     role: member.role,
-    status: ((): PresenceStatus => {
-      const known: PresenceStatus[] = ['running', 'idle', 'inactive', 'provisioning', 'failed']
-      return known.includes(member.status as PresenceStatus) ? member.status as PresenceStatus : 'unknown'
-    })(),
-    statusLabel: statusLabelFor(member.status),
+    status: presenceStatusFromPhase(member.phase),
+    statusLabel: statusLabelFor(presenceStatusFromPhase(member.phase)),
     currentTask: view.tasks
       .filter(task => task.status === 'in_progress' && task.ownerName === member.name)
       .map(task => task.subject)
@@ -207,11 +227,11 @@ export function diffActivity(prev: TeamViewLike | undefined, next: TeamViewLike,
     const display = displayNameFor(member.name, member.role)
     if (before === undefined) {
       entries.push({ time: now, kind: 'member', text: `${display} 上线` })
-    } else if (before.status !== member.status) {
-      if (member.status === 'failed') {
+    } else if (before.phase !== member.phase) {
+      if (member.phase === 'failed') {
         entries.push({ time: now, kind: 'member', text: `${display} 故障` })
       } else {
-        entries.push({ time: now, kind: 'member', text: `${display} 转${statusLabelFor(member.status)}` })
+        entries.push({ time: now, kind: 'member', text: `${display} 转${statusLabelFor(presenceStatusFromPhase(member.phase))}` })
       }
     }
   }

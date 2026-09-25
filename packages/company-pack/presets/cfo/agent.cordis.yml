@@ -4,80 +4,89 @@
 # 文案定稿：docs/design/role-content-plan §1（R2 增设：职能化身，换人不变职能）；公司事实 = kb/cfo/CHARTER.md + kb/org.md。
 
 # ① 身份：persona row，shadow 掉部署默认人格，只对本 preset 的会话生效
-- id: persona
-  name: '@deepseek-ai/dsh-persona'
-  config:
-    prefix: |-
-      你是这家公司（wochen）的 CFO——财务职能的化身（换人不变职能）。wochen 是高科技公司，三类业务：软件开发 / 服务 / 系统集成；全员 50 人（编制唯一事实家 = kb/org.md）。
-      你的视角只有三件事：现金、成本、合规。
-      你对资金与账务红线有 veto 权：现金流撑不住、毛利低于底线、账务或税务不合规——直接说不，给一句话理由。
-      产出形态：项目经济性测算与财务合规意见，按 templates/decision-memo.md 的结构写——结论先行，一页纸为限，写完落 deliverables/<slug>/drafts/cfo.md。
-      任何报价与预算先加载 project-economics skill（毛利底线是你的签字线）；涉及账务与数据合规用 finance-compliance skill（SoD 与留痕是硬闸门）。你自己的端到端节奏见 cfo-workflow skill。引用 kb/cfo/CHARTER.md 的财务事实。
-      需要深挖时你可以用 subagent 生 one-shot workers 并行测算：给清晰 brief，汇总后署你自己的判断。
-      你不替别的职能下结论——"接不接得住"问运营，"有没有人买"问销售。
-      开工动作：先读 kb/cfo/CHARTER.md 与 kb/cfo/journal/ 最近 3 篇；收工向 journal 追加纪要。
-    # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（内容稳定后评估）
-    # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
-
-# ② 角色专属 skills：落在本 preset 的 scope layer，其他角色不可见（硬隔离）
-- id: skill-filesystem
-  name: '@deepseek-ai/dsh-skill-filesystem'
-  config:
-    # 硬隔离：只认本 preset 的 skills/，不并入项目根（rank 100/200）与用户级（400/500）技能集。
-    # 否则角色会话会看见 ~/.agents/skills 一类的用户技能，且项目根同名 skill 会盖掉角色 skill。
-    includeDefaultRoots: false
-    customSkillDirs:
-      - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('skills/', baseUrl))"
-
-# ③ 工具面（preset 自包含，必须自己声明；R1 实证：不声明则会话无 fs/skill 工具）
-- id: tool-fs
-  name: '@deepseek-ai/dsh-tool-fs'
-- id: tool-fs-search
-  name: '@deepseek-ai/dsh-tool-fs-search'
-  config:
-    sampleOverCapGlobResults: false
-- id: tool-skill
-  name: '@deepseek-ai/dsh-tool-skill'
-- id: tool-todo
-  name: '@deepseek-ai/dsh-tool-todo'
-  config:
-    allowParallelInProgress: true
-# 问询（驾驶舱③乙）：独立会话可直接问人；动议内仍升级 CEO（见公司手册「问人两条路」）。
-- id: tool-ask-user
-  name: '@deepseek-ai/dsh-tool-ask-user'
-- id: tool-present
-  name: '@deepseek-ai/dsh-tool-present'
-
-# ④ 生 worker（深挖测算用）
-- id: delegation
-  name: cordis:group
-  group: true
-  isolate:
-    workflowEngine: true
-  config:
-    # 续驶控制面：**与 tool-subagent(continuable) 成对声明**（上游 standard / ptc / cordis
-    # 三个 preset 都这么写）。为什么本仓职能 preset 必须补这两行：`tool-agent-team` 的
-    # maybeInstall 只在 ctx.agentTeams.tryMembership(agent) !== undefined（= 团队成员）时把
-    # **团队版**控制名装进来；职能**根会话不是团队成员**，所以这里若不声明全局版，会话里就
-    # 既没有团队版也没有全局版 ⇒ continuable child 生出来就失联（R3 → R4 轮间待办）。
-    # CEO preset 反过来**不能**放：CEO 从第一帧起就是 team-scoped（Lead 自己也是成员），
-    # 这两行在那里会被团队版 shadow 成死行（见 docs/delegation.md §2）。
-    - id: tool-subagent-control
-      name: '@deepseek-ai/dsh-tool-subagent-control'
-    - id: tool-subagent-list-agents
-      name: '@deepseek-ai/dsh-tool-subagent-control/list-agents'
-    - id: tool-subagent
-      name: '@deepseek-ai/dsh-tool-subagent'
+- insert:
+    - id: preset-cfo
+      name: '@deepseek-ai/dsh-agent-preset'
       config:
-        provider: spawn
-        toolName: subagent
-        backgroundMode: continuable
+        id: cfo
+        name: wochen CFO
+        description: '财务职能的化身——视角：现金/成本/合规；对资金与账务红线有 veto；产出项目经济性测算与财务合规意见'
+        order: 5
+        plugins:
+          - id: persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: |-
+                你是这家公司（wochen）的 CFO——财务职能的化身（换人不变职能）。wochen 是高科技公司，三类业务：软件开发 / 服务 / 系统集成；全员 50 人（编制唯一事实家 = kb/org.md）。
+                你的视角只有三件事：现金、成本、合规。
+                你对资金与账务红线有 veto 权：现金流撑不住、毛利低于底线、账务或税务不合规——直接说不，给一句话理由。
+                产出形态：项目经济性测算与财务合规意见，按 templates/decision-memo.md 的结构写——结论先行，一页纸为限，写完落 deliverables/<slug>/drafts/cfo.md。
+                任何报价与预算先加载 project-economics skill（毛利底线是你的签字线）；涉及账务与数据合规用 finance-compliance skill（SoD 与留痕是硬闸门）。你自己的端到端节奏见 cfo-workflow skill。引用 kb/cfo/CHARTER.md 的财务事实。
+                需要深挖时你可以用 subagent 生 one-shot workers 并行测算：给清晰 brief，汇总后署你自己的判断。
+                你不替别的职能下结论——"接不接得住"问运营，"有没有人买"问销售。
+                开工动作：先读 kb/cfo/CHARTER.md 与 kb/cfo/journal/ 最近 3 篇；收工向 journal 追加纪要。
+              # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（内容稳定后评估）
+              # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
 
-# ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）
-# projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= company-workspace/）；
-#   否则会认到开发仓库根，把**本仓的开发 AGENTS.md**（vendor 铁律等）灌进角色会话。
-- id: agent-instructions
-  name: '@deepseek-ai/dsh-agent-instructions'
-  config:
-    maxBytes: 16384
-    projectRootMarkers: []
+          # ② 角色专属 skills：落在本 preset 的 scope layer，其他角色不可见（硬隔离）
+          - id: skill-filesystem
+            name: '@deepseek-ai/dsh-skill-filesystem'
+            config:
+              # 硬隔离：只认本 preset 的 skills/，不并入项目根（rank 100/200）与用户级（400/500）技能集。
+              # 否则角色会话会看见 ~/.agents/skills 一类的用户技能，且项目根同名 skill 会盖掉角色 skill。
+              includeDefaultRoots: false
+              customSkillDirs:
+                - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/cfo/skills/', baseUrl))"
+
+          # ③ 工具面（preset 自包含，必须自己声明；R1 实证：不声明则会话无 fs/skill 工具）
+          - id: tool-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+          - id: tool-fs-search
+            name: '@deepseek-ai/dsh-tool-fs-search'
+            config:
+              sampleOverCapGlobResults: false
+          - id: tool-skill
+            name: '@deepseek-ai/dsh-tool-skill'
+          - id: tool-todo
+            name: '@deepseek-ai/dsh-tool-todo'
+            config:
+              allowParallelInProgress: true
+          # 问询（驾驶舱③乙）：独立会话可直接问人；动议内仍升级 CEO（见公司手册「问人两条路」）。
+          - id: tool-ask-user
+            name: '@deepseek-ai/dsh-tool-ask-user'
+          - id: tool-present
+            name: '@deepseek-ai/dsh-tool-present'
+
+          # ④ 生 worker（深挖测算用）
+          - id: delegation
+            name: cordis:group
+            group: true
+            isolate:
+              workflowEngine: true
+            config:
+              # 续驶控制面：**与 tool-subagent(continuable) 成对声明**（上游 standard / ptc / cordis
+              # 三个 preset 都这么写）。为什么本仓职能 preset 必须补这两行：`tool-agent-team` 的
+              # maybeInstall 只在 ctx.agentTeams.tryMembership(agent) !== undefined（= 团队成员）时把
+              # **团队版**控制名装进来；职能**根会话不是团队成员**，所以这里若不声明全局版，会话里就
+              # 既没有团队版也没有全局版 ⇒ continuable child 生出来就失联（R3 → R4 轮间待办）。
+              # CEO preset 反过来**不能**放：CEO 从第一帧起就是 team-scoped（Lead 自己也是成员），
+              # 这两行在那里会被团队版 shadow 成死行（见 docs/delegation.md §2）。
+              - id: tool-subagent-control
+                name: '@deepseek-ai/dsh-tool-subagent-control'
+              - id: tool-subagent-list-agents
+                name: '@deepseek-ai/dsh-tool-subagent-control/list-agents'
+              - id: tool-subagent
+                name: '@deepseek-ai/dsh-tool-subagent'
+                config:
+                  provider: spawn
+                  toolName: subagent
+                  backgroundMode: continuable
+
+          # ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）
+          # projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= company-workspace/）；
+          #   否则会认到开发仓库根，把**本仓的开发 AGENTS.md**（vendor 铁律等）灌进角色会话。
+          - id: agent-instructions
+            name: '@deepseek-ai/dsh-agent-instructions'
+            config:
+              maxBytes: 16384
+              projectRootMarkers: []

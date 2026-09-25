@@ -36,9 +36,9 @@ const PANELS: readonly { readonly key: PanelKey; readonly label: string; readonl
  */
 export function createCompanyView(injected: CompanyViewInjected) {
   return function CompanyView(props: CompanyViewProps) {
-    const { sessionId, useProjection } = props
+    const { sessionId, useProjection, useSessions } = props
     const [panel, setPanel] = useState<PanelKey>('board')
-    const data = useCompanyData(injected, sessionId, useProjection, { stream: true })
+    const data = useCompanyData(injected, sessionId, useProjection, useSessions, { stream: true })
     const current = PANELS.find(entry => entry.key === panel)
 
     return (

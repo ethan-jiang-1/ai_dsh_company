@@ -2,14 +2,11 @@
  * 会话头部动作：任务板的**入口按钮**（条目 ② S3：点开 = 打开右栏平台页签，anchored 弹窗退役）
  * + 任务板表格视图（页签体共用）。
  */
-import { useEffect, useRef, useState } from 'react'
-import { Button, IconChecklistOutline14 } from '@deepseek-ai/dsh-client-ui-primitives'
+import { Button, IconChecklistOutlineMedium } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
-import type { TeamView } from '@deepseek-ai/dsh-experimental-agent-team/client'
-import type { RemoteResult } from '@deepseek-ai/dsh-api-remotes/client'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
-import type { TeamViewLike } from '../lib/presence.ts'
+import { presenceStatusFromPhase, statusLabelFor, type TeamViewLike } from '../lib/presence.ts'
 import { LOADING_NOTE, StateNote } from './company-panels.tsx'
 
 const STATUS_LABEL: Record<string, string> = {
@@ -30,7 +27,7 @@ export function TasksTableView({ view }: { readonly view: TeamViewLike | null })
   return (
     <>
       <div className="wk-meta wk-mb-xs">
-        成员：{view.members.map(member => `${member.name}(${member.status})`).join('、') || '（无）'}
+        成员：{view.members.map(member => `${member.name}(${statusLabelFor(presenceStatusFromPhase(member.phase))})`).join('、') || '（无）'}
       </div>
       {view.tasks.length === 0
         ? <StateNote text="还没有共享任务。" />
@@ -64,12 +61,12 @@ export function TasksTableView({ view }: { readonly view: TeamViewLike | null })
   )
 }
 
-/** 组件 props：槽的运行时 props + 注入面（计数拉取 + 打开平台页签）。 */
+/** 组件 props：槽的运行时 props + 注入面（Lead 寻址 + 打开平台页签）。 */
 export type TasksActionProps =
   PropsRuntime<'conversation.session.header.actions'>
   & {
-    /** 拉团队态（只用于按钮上的活动任务计数）。 */
-    readonly load: (sessionId: SessionId) => Promise<RemoteResult<TeamView>>
+    /** 团队态挂在 Lead 上：把任意会话归到它的 Lead（0.1.7 起纯函数，无 team RPC）。 */
+    readonly leadOf: (sessionId: SessionId) => SessionId
     /** 打开右栏「任务板」平台页签（`ctx.sidebarRight.openTab('company-tasks')`）。 */
     readonly openTasks: () => void
   }
@@ -81,41 +78,19 @@ export type TasksActionProps =
  * @param props - 槽运行时 props 与注入面。
  * @returns 头部按钮（带活动任务计数）。
  */
-export function TasksAction({ sessionId, load, openTasks }: TasksActionProps) {
-  const [live, setLive] = useState(0)
-  const busyRef = useRef(false)
-
-  /** 每 5 秒拉一次计数（失败不致命：按钮仍可打开页签）。 */
-  useEffect(() => {
-    let cancelled = false
-    const refresh = async (): Promise<void> => {
-      if (busyRef.current) return
-      busyRef.current = true
-      try {
-        const result = await load(sessionId)
-        if (!cancelled && result.ok) {
-          setLive(result.value.tasks.filter(task => task.status !== 'completed' && task.status !== 'deleted').length)
-        }
-      } catch {
-        /* 计数拉取失败：静默（页签体自己会 fail-loud 报错） */
-      } finally {
-        busyRef.current = false
-      }
-    }
-    void refresh()
-    const timer = setInterval(() => { void refresh() }, 5000)
-    return () => {
-      cancelled = true
-      clearInterval(timer)
-    }
-  }, [sessionId])
+export function TasksAction({ sessionId, leadOf, openTasks, useSessions }: TasksActionProps) {
+  // 活动任务计数：直接读 Lead 的 `agentTeam` 投影（Host 投影帧保持最新，无需轮询）。
+  const team = useSessions((state) => state.projectionsBySession[leadOf(sessionId)]?.values.agentTeam)
+  const live = team === undefined
+    ? 0
+    : team.tasks.filter(task => task.status !== 'completed' && task.status !== 'deleted').length
 
   return (
     <Button
       size="sm"
       variant="ghost"
       title="团队任务板（右栏页签，可拖出成浮窗）"
-      icon={<IconChecklistOutline14 />}
+      icon={<IconChecklistOutlineMedium />}
       onClick={openTasks}
     >
       任务板{live === 0 ? '' : ` (${String(live)})`}

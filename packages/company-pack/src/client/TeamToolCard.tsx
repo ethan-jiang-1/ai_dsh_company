@@ -58,7 +58,9 @@ export interface TeamCardModel {
  */
 export function teamCardModel(toolName: string, block: ToolCallViewProps['block']): TeamCardModel {
   const settled = 'kind' in block
-  const argsRaw = (settled ? block.call?.argsRaw : block.argsRaw) ?? ''
+  // rc.2：`PreparingToolCall`（参数未到）没有 `argsRaw`，只有 `StartedToolCall` 有 ⇒ 收窄后读；未到按空串。
+  const source = settled ? block.call : block
+  const argsRaw = (source !== undefined && source !== null && 'argsRaw' in source ? source.argsRaw : undefined) ?? ''
   const args = parseArgsObject(argsRaw)
   const name = textOf(args, 'name')
   const target = textOf(args, 'target')

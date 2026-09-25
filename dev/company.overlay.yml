@@ -2,13 +2,12 @@
 # 全源码域解析（workspace 协议），无 profile 安装混线。
 # 语法：新增行用 insert；替换行用 - id:（教义见 guides/dev-loop §2 第 1 层）。
 - insert:
-    - id: agent-presets
-      name: '@deepseek-ai/dsh-agent-presets'
+    # 0.1.7 预设模型：registry（default）+ 每预设一行；本 overlay 只补 registry，
+    # 五个预设行由 pack 的 bundle patch 数组并入（见 packages/company-pack/package.json）。
+    - id: agent-preset-registry
+      name: '@deepseek-ai/dsh-agent-preset-registry'
       config:
         default: ceo
-        roots:
-          - path: /Users/bowhead/ai_dsh_company/packages/company-pack/presets
-            trust: system
     - id: tool-present
       name: '@deepseek-ai/dsh-tool-present'
     - id: agent-team

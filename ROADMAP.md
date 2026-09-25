@@ -10,24 +10,21 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **① 换基座 · 升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2**（用户定为最优先；阶段 0 已取证，靶 = `477b4f42`）：RFC =
-  [proposed/pin-upgrade-0.1.7-rc.2](./notes/proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md)——①a 候选测量窗口（切 rc.2 跑门禁产
-  《实测影响面清单》→ 还原）→ ①b 消费面适配（peer 名/range + bundle 行 + preset 声明 + client 数据层）→ ①c 官方 `sync-dsh` 落账；收割项不捆绑。
-- **② 打造自己的 harness · 以《Agent-ready Development》为镜**（依赖 ①；用户定档在打扫卫生之前）：RFC =
+- **① 打造自己的 harness · 以《Agent-ready Development》为镜**（用户定档：换基座之后、打扫卫生之前）：RFC =
   [proposed/harness-alignment](./notes/proposed/2026-09-25-harness-alignment.md)——27 篇**全读、分层用力**（9+6 逐条判 /
   其余抓新形状）→ 采纳·不采纳判定台账 → 小步落地；红线（目录归属 / 门禁语义 / preset·client 数据层）先报人。
-- **③ 打扫卫生 · 记事面治腐化 + 收尾清扫**（依赖 ①；② 可能修正其范围）：RFC =
+- **② 打扫卫生 · 记事面治腐化 + 收尾清扫**（② 可能修正其范围）：RFC =
   [proposed/notebook-hygiene](./notes/proposed/2026-09-25-notebook-hygiene.md)——六处无家/腐化立家修指针 + **收尾清扫**
   （中立体独立会话；条目收尾后扫；输入 = diff + Note + 队列行；腐化清单统一进本条处置）。
-- **④ 打扫卫生 · 长程自主执行的目标形态**（依赖 ③：打磨型输入源 = ③立的磨清单）：RFC =
+- **③ 打扫卫生 · 长程自主执行的目标形态**（依赖 ②：打磨型输入源 = ②立的磨清单）：RFC =
   [proposed/longrun-goal-shape](./notes/proposed/2026-09-25-longrun-goal-shape.md)——goal objective 写预算 + 输入源 +
   三类停止条件（交付型 / 打磨型两形态）；落点 = dev-loop §0.5 一小段。
-- **⑤ 加新东西 · 人机合一（先 UX 研究，再内容层）**（前置 ① 已完成）：RFC =
+- **④ 加新东西 · 人机合一（先 UX 研究，再内容层）**（换基座已完成）：RFC =
   [proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md)——**定性 = UX 问题**（人何时、以何形态被
   拉进来；用户自陈无好思路）⇒ 阶段 0 先 research 出候选模式与判据（`notes/research/`）→ A1 `kb/owners.md` + A2 手册三档/缺口回流/不在场分档。
-- **⑥ 加新东西 · 人机合一机制层**（依赖 ①）：RFC 同 ⑤ 的 B1–B4——收件人路由（answerer 多收件人先核实）/
+- **⑤ 加新东西 · 人机合一机制层**：RFC 同 ⑤ 的 B1–B4——收件人路由（answerer 多收件人先核实）/
   补料 · 建议 · 规矩回流三类载体 / 不在场机制化 / 证据回看。
-- ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；③ 之后按其判据搬进 §磨清单）：机械层已过——
+- ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；② 之后按其判据搬进 §磨清单）：机械层已过——
   `deliverables-check` ALL PASS + r3 重录随手册完成；可后台派活不占轮。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
@@ -48,6 +45,15 @@
 - 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
+
+- 2026-09-25（**换基座收尾：升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2**）：基座换到 rc.2 并完成消费面适配——
+  包名拆分（`dsh-agent-presets` → `dsh-agent-preset` + `-registry`）、`dsh.bundle.patch` 改数组 + 每预设一行声明、
+  `preset.yml` 内联删除、`customSkillDirs` 的 `baseUrl` 改 profile 相对、**client 团队态改读 `agentTeam` 投影**
+  （`remote.agentTeams` 已移除）+ `uiWorkspace.openSession` 导航 + 成员 `phase` 语义。验证 = verify ALL PASS /
+  test 178 / preset-smoke / client-load / release-smoke 全绿。**登记偏离 D27**（官方 sync-dsh 事务装不下：
+  vendor 自建在本仓嵌套工作区必失败，独立 staging 树可构建）⇒ 手工同步四处簿记 + 门禁留证。
+  收尾 Note = [implemented/pin-upgrade-0.1.7-rc.2](./notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md)；
+  影响面实测 = [research/pin-upgrade-impact](./notes/research/2026-09-25-pin-upgrade-impact.md)。待续 = 真模型档认证 + 快照/回放 + 15 收割项。
 
 以下是历史记录，不是当前指令。旧轮次、完成标记、环境状态和旧探针结果仅说明当时状态；当前任务从 §队列读取，当前操作规则见对应合同与活跃 Note。
 

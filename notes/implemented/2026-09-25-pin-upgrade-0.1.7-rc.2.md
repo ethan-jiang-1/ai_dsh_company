@@ -1,6 +1,6 @@
 # 2026-09-25 · 升 pin：dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2
 
-状态：proposed（材料已备于研究层；靶需从 rc.1 校正到 rc.2）
+状态：已交付（2026-09-25 落地并收尾：基座已换到 `dsh-v0.1.7-rc.2`，消费面适配全绿；实施实况见文末）
 
 ## 问题
 
@@ -78,3 +78,33 @@
   防"安静用错 home"。
 - 取新 tag 的路径有一处现实坑：`vendor/dsh` 的 origin 指向本机研究树 `/Users/bowhead/deepseek-harness`，
   而 `.gitmodules` 写的是官方 GitHub ⇒ 阶段 0 先定取源，再动 submodule。
+
+
+## 实施实况（2026-09-25）
+
+**结果**：`vendor/dsh` 钉 `dsh-v0.1.7-rc.2` = `477b4f420553e8a52c2fbccc464d7561b239c443`；
+`pnpm verify` ALL PASS；`pnpm test` 178/178；`preset-smoke` ALL PASS（五角色真挂载）；
+`client-load-smoke` ALL PASS（真浏览器）；`release-smoke` ALL PASS（npm pack → 干净 profile → 真安装 → roster + session/create）；
+官方 `node scripts/sync-dsh.mjs` 只读模式报「簿记一致（dsh-v0.1.7-rc.2 @ 477b4f42；矩阵 2 列）」。
+
+**消费面适配（①b）**：
+1. 根 `package.json`：`dsh-agent-presets`（0.1.7 已拆）→ `dsh-agent-preset` + `dsh-agent-preset-registry`；**这是 install 级阻塞**。
+2. pack manifest：peer 名同步 + 全部 `dsh-*` range → `^0.1.7-rc.2`；`dsh.bundle.patch` 由字符串改**数组**（registry + 五角色）；新增 peer `@deepseek-ai/dsh-client-ui-workspace`（rc.2 打开会话统一走 `uiWorkspace.openSession`）。
+3. `cordis.patch.yml`：`agent-presets`（roots 目录扫描，0.1.7 已移除）→ `agent-preset-registry`（`default: ceo`，按 id 替换 web-app 的 insert）。
+4. 五份 `presets/<role>/agent.cordis.yml`：包成 `- insert:` + 一行 `dsh-agent-preset`（`config.plugins` 内联原行）；`preset.yml` 的 name/description/order 内联后删除；`customSkillDirs` 的 `baseUrl` 语义变了（旧 = 预设文件目录，新 = profile 目录）⇒ 改 `node_modules/dsh-company-pack/presets/<role>/skills/`。
+5. **client 数据层重写**：`remote.agentTeams` 随 agent-team 的 `./remote` 导出在 0.1.7 整体移除 ⇒ 团队态改读 **Lead 会话的 `agentTeam` 投影**（`useSessions(state => state.projectionsBySession[lead]?.values.agentTeam)`，`useSessions` 来自槽标准 props）；成员语义随之改判（投影只给持久 `phase`，不再有 live 忙闲）⇒ `presence.ts` 加 `presenceStatusFromPhase`（`active` → 待命）；`sessions.open/openSubagent/current` 移除 ⇒ 导航统一 `uiWorkspace.openSession`；`PreparingToolCall` 无 `argsRaw` ⇒ 卡片收窄读；图标 `IconChecklistOutline14` → `…Medium`。
+6. 门禁与测试：`pack-bundle` 接受字符串或数组；preset 结构门禁不再要求 `preset.yml`；`tests/presets.spec.ts` 的旧 `discoverPresets` 源码路径在 rc.2 不存在 ⇒ 改判声明形状（真挂载归 preset-smoke）；`presence-board.spec.ts` 夹具改 `phase`。
+7. 环境：vendor postinstall `install-lefthook` 与 submodule 布局不兼容（`core.worktree` 在 common config）⇒ 构建带 `CI=true`（上游自带逃逸口）；root lockfile 的 `xlsx` CDN 条目缺 integrity（pnpm 重新解析时拒装）⇒ 按 vendor 自己的 lockfile 补齐。
+
+**⚠ 登记偏离（D27）**：官方 `sync-dsh --pin` 的**事务跑不通**——它第③步要 vendor 自建，而 `pnpm --dir vendor/dsh run build` 在本仓**嵌套工作区**里必失败：
+`ERROR [@deepseek-ai/dsh-root] Cannot find entry: ["lib/types/{index,invariant,startup}.js"]`（根包无 src/exports，无人产出这三份 entry；
+旧 pin 时代它们以旧产物形式躺在树里，故一直未暴露；`tsdown -F` 无法排除根配置，vendor 自带 `clean` 在 rc.2 自身报错）。
+**同 commit 的独立 staging 树（`git archive` + 独立 install）则能完整构建** ⇒ 结论 = 本仓嵌套形状与 vendor 自建不兼容，非上游缺陷。
+本次落账方式 = **手工同步四处簿记**（`verify.mjs` 常量 / `AGENTS.md` 簿记 / pack 兼容矩阵 / submodule HEAD）+ 全套门禁留证（含 release-smoke 认证档），
+**未执行** `sync-dsh` 的事务（install + vendor 自建 + test + built release-smoke 那一串）。
+
+**未验证 / 待续**：
+- `probe --full` / `handbook-smoke` / `delegation-smoke` / `presence-e2e` / `attention-e2e`（真模型档）**本轮未跑**——升 pin 已改变角色会话的基座，建议作为 ① 的收尾认证补跑。
+- 快照/回放档（`replay-smoke`、`snapshot-motion`）未跑；rc.2 有 V4 会话格式与投影面变化，录制快照可能需要重录（单向门）。
+- vendor 自建的嵌套不兼容需要一条长期解（D27）：或让 vendor 独立 install/build（改本仓 workspace 镜像策略），或给 `sync-dsh` 加"独立 staging 树构建"步骤。
+- 15 条收割项（阶段 2）未开始。

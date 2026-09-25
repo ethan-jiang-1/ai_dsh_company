@@ -57,7 +57,9 @@ function parseBrief(argsRaw: string): Brief {
  */
 export function delegationCardModel(toolName: string, block: ToolCallViewProps['block']): DelegationCardModel {
   const settled = 'kind' in block
-  const argsRaw = (settled ? block.call?.argsRaw : block.argsRaw) ?? ''
+  // rc.2：`PreparingToolCall`（参数还没到）没有 `argsRaw`，只有 `StartedToolCall` 有 ⇒ 收窄后再读。
+  const call = settled ? block.call : block
+  const argsRaw = (call !== undefined && call !== null && 'argsRaw' in call ? call.argsRaw : undefined) ?? ''
   return {
     role: ROLE_LABEL[toolName] ?? toolName,
     state: cardStateOf(block),

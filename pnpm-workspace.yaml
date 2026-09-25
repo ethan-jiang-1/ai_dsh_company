@@ -42,3 +42,11 @@ patchedDependencies:
   # 只镜像闭包内实际命中的补丁；@yao-pkg/pkg（vendor 打单文件 exe 用）不在本 repo
   # 闭包，声明了会被 ERR_PNPM_UNUSED_PATCH 硬拒（2026-09-21 实证）。
   node-pty@1.2.0-beta.15: vendor/dsh/patches/node-pty@1.2.0-beta.15.patch
+
+minimumReleaseAgeExclude:
+  - '@deepseek-ai/libreoffice-kit-darwin-arm64@0.1.1'
+  - '@deepseek-ai/libreoffice-kit-darwin-x64@0.1.1'
+  - '@deepseek-ai/libreoffice-kit-wasm@0.1.1'
+  - '@deepseek-ai/libreoffice-kit-win32-arm64@0.1.1'
+  - '@deepseek-ai/libreoffice-kit-win32-x64@0.1.1'
+  - '@deepseek-ai/libreoffice-kit@0.1.1'

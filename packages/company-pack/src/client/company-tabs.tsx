@@ -100,7 +100,7 @@ function memberTone(status: PresenceRow['status']): 'info' | 'danger' | 'warning
  * @returns 看板。
  */
 export function BoardTab(props: CompanyTabProps) {
-  const data = useCompanyData(props, props.sessionId, props.useProjection)
+  const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
   return (
     <PanelFrame title="看板" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
@@ -115,7 +115,7 @@ export function BoardTab(props: CompanyTabProps) {
  * @returns 依赖图。
  */
 export function DagTab(props: CompanyTabProps) {
-  const data = useCompanyData(props, props.sessionId, props.useProjection)
+  const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
   return (
     <PanelFrame title="依赖图" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
@@ -131,7 +131,7 @@ export function DagTab(props: CompanyTabProps) {
  */
 export function PresenceTab(props: PresenceTabProps) {
   const { openMember, ...dataFace } = props
-  const data = useCompanyData(dataFace, props.sessionId, props.useProjection, { stream: true })
+  const data = useCompanyData(dataFace, props.sessionId, props.useProjection, props.useSessions, { stream: true })
   return (
     <PanelFrame title="在场" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
@@ -191,7 +191,7 @@ export function PresenceTab(props: PresenceTabProps) {
  * @returns 用量面板。
  */
 export function BudgetTab(props: CompanyTabProps) {
-  const data = useCompanyData(props, props.sessionId, props.useProjection)
+  const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
   return (
     <PanelFrame title="用量" tabProps={props}>
       <BudgetPanel summary={data.summary} />
@@ -205,7 +205,7 @@ export function BudgetTab(props: CompanyTabProps) {
  * @returns 任务板表格。
  */
 export function TasksTab(props: CompanyTabProps) {
-  const data = useCompanyData(props, props.sessionId, props.useProjection)
+  const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
   return (
     <PanelFrame title="任务板" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}

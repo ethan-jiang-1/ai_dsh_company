@@ -103,4 +103,4 @@ repo 内为自由区；工具状态（缓存/store/配置）一律**先重定向
 
 ## vendor 簿记
 
-- upstream：`https://github.com/deepseek-ai/deepseek-harness.git`；当前钉住：tag `dsh-v0.1.5-rc.2` = `fb2c4b9e698e30edb738bca4cf0618587db7d203`（= `_digested` 审计基线，机制文档的核对基线与其一致）。
+- upstream：`https://github.com/deepseek-ai/deepseek-harness.git`；当前钉住：tag `dsh-v0.1.7-rc.2` = `477b4f420553e8a52c2fbccc464d7561b239c443`（= `_digested` 审计基线，机制文档的核对基线与其一致）。
