@@ -1,0 +1,59 @@
+# 2026-09-25 · 升 pin：dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2
+
+状态：proposed（材料已备于研究层；靶需从 rc.1 校正到 rc.2）
+
+## 问题
+
+本仓钉住 `vendor/dsh` = `dsh-v0.1.5-rc.2`（`fb2c4b9e698e30edb738bca4cf0618587db7d203`，submodule 干净、
+`pnpm verify` 的 `vendor-pin` + `vendor-clean` 双门禁在案）。2026-09-25 只读核对：上游已发到
+**`dsh-v0.1.7-rc.2`（`477b4f420553e8a52c2fbccc464d7561b239c443`，2026-09-24 21:39）**。
+
+- 钉住版与 0.1.7 系列之间共 **7 个 tag**（rc.3 / 0.1.6-alpha.1–2 / 0.1.7-alpha.1–2 / 0.1.7-rc.1 / 0.1.7-rc.2）；
+  `pin → rc.1` = 3304 commit（其中 **2211 non-merge**，与增量报告口径一致）。
+- 既有材料 [upstream-delta](../research/2026-09-24-dsh-upstream-delta.md) +
+  [pin-upgrade-and-harvest](../research/2026-09-24-pin-upgrade-and-harvest.md) 以 **rc.1** 收口，
+  [ROADMAP.md](../../ROADMAP.md) 的 ⏸ 行也写 rc.1 ⇒ **靶落后一个 tag**。
+- 研究树本地尚无 rc.2 对象（其 tag 只到 rc.1）⇒ `rc.1 → rc.2` 增量未核实。从 GitHub API 读到的
+  release commit 形状是**纯版本号 bump**（317 增 / 317 删，全部落在各 `package.json` 的 `version` 字段），
+  待阶段 0 用本地证据确认。
+
+## 方案
+
+1. **阶段 0 · 靶校正（小）**：研究树只读 `fetch upstream` 取 rc.2 对象，核 `rc.1 → rc.2` 增量（预期 = 发布
+   工程 commit）；把 ROADMAP ⏸ 行与两份研究材料的靶改成 rc.2，并写明"材料仍适用"或"需补哪些点"。
+2. **阶段 1 · 升级七步**（照增量报告 §⑥，不另发明）：① `sync-dsh`（submodule 前移 + 簿记 + 兼容矩阵加列 +
+   verify 双门禁重校）；② peerDependencies 重写（`dsh-agent-presets` 在 0.1.7 不存在，拆为
+   `dsh-agent-preset` + `dsh-agent-preset-registry`；range 按新 release 对齐——材料给的是 `^0.1.7-rc.1`，
+   钉 rc.2 时以兼容门禁实测定）；③ preset 声明迁移（工程量主体；完成定义 = `preset-smoke` 真挂载）；
+   ④ client 数据层重写（`remote.agentTeams` → 投影；完成定义 = client-load + presence-e2e + 快照回归）；
+   ⑤ 快照回归策略（V3 照跑 + 新录 V4 + 单向门写进 Note）；⑥ 发布链全量（`release-smoke` 穿新 peer 兼容
+   门禁 + `deliverables-check` + `delegation-smoke`）；⑦ 拆分 = 升级单独立项，15 条收割项升级后独立进队列。
+3. **阶段 2 · 收割项登记**（升级后）：从增量报告 §④ 的 15 条里逐条判"对本 pack 的用途 + 建议立项与否"，
+   各给归宿（ROADMAP / 搁置池）。其中与**自治 seam** 相关的（job 完成唤醒 idle owner、workflow、
+   `schedule` 现状）顺手核对，作为搁置池「自主节律」的复活判据输入——只登记证据，不因它改升级范围。
+
+## 输掉的方案
+
+- **停在 rc.1**：rc.2 紧随其后（仅发布工程 commit），单独钉 rc.1 一落地即落后；输给"钉最新 rc"。
+- **钉研究树 HEAD 而非 tag**：vendor 铁律与 [release.md](../../docs/release.md) 要求钉 SHA/tag 并走发布门禁，
+  HEAD 未过门禁；输给"钉 tag"。
+- **把 15 条收割项塞进升级条目**：增量报告 §⑥⑦ 明说"不捆绑"（两天级工程会被拖成不可验收的大条目）；
+  输给"升级单独立项、收割项后置"。
+- **为"跑满 8 小时"自建调度循环**：搁置池已判缺上游 seam，且 D9/D13 禁自建调度器；输给"提 seam"。
+
+## 验收
+
+- 阶段 0：研究材料与 ROADMAP 的靶一致为 rc.2；`rc.1 → rc.2` 增量有本地证据（含"是否纯发布"的结论）。
+- 阶段 1：`pnpm verify` 的 `vendor-pin` + `vendor-clean` 在 rc.2 上重校通过；`preset-smoke` 五角色真挂载；
+  client-load + presence-e2e + 快照档绿；`release-smoke` 穿新兼容门禁；[AGENTS.md](../../AGENTS.md) 的
+  vendor 簿记与兼容矩阵同步。
+- 阶段 2：15 条收割项各有"立项／不立项 + 理由"与归宿。
+
+## 风险
+
+- 已列于增量报告 §⑤：peer 破面、preset 声明迁移工程量、V4 单向门；另有"`baseUrl` 解析环境"与
+  "web-app 启动面兼容性"两项**需实测**。
+- 升级期间日用全局安装与本仓基线会分叉：按 [dev-loop §6](../../docs/guides/dev-loop.md) 的双 home 纪律跑，
+  防"安静用错 home"。
+- 取新 tag 的路径有一处现实坑：`vendor/dsh` 的 origin 指向本机研究树 `/Users/bowhead/deepseek-harness`，
+  而 `.gitmodules` 写的是官方 GitHub ⇒ 阶段 0 先定取源，再动 submodule。

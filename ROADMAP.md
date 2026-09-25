@@ -12,10 +12,15 @@
 
 - ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；机械层已过——`deliverables-check` ALL PASS +
   r3 重录随手册完成；可后台派活不占轮）。
-- ⏸ **升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.1（触发型搁置，2026-09-24 晚用户改向后离队）**：材料全备于
-  研究层——[增量报告](./notes/research/2026-09-24-dsh-upstream-delta.md)（2211 commit 盘点 + 搁置池五问
-  判定 + 15 收割项 + 风险清单）+ [迁移方案](./notes/research/2026-09-24-pin-upgrade-and-harvest.md)
-  （preset 声明迁移 + client 数据层重写 + V4 单向门）；复活条件 = 某条目需要新基座或用户重新拍板。
+- **记事面治腐化**（发散线索立家 + 指针修复，2026-09-25 盘点产出入队）：RFC =
+  [proposed/notebook-hygiene](./notes/proposed/2026-09-25-notebook-hygiene.md)——「磨清单」立家（三条观察项）/
+  触发型两条补索引 / intents 指针 / `rejected` 合同裁断 / index 研究树登记；验收 = verify ALL PASS + 无悬空引用与死链。
+- **长程自主执行的目标形态**（交付型 vs 打磨型，2026-09-25 盘点产出入队）：RFC =
+  [proposed/longrun-goal-shape](./notes/proposed/2026-09-25-longrun-goal-shape.md)——goal objective 写预算与输入源
+  而非固定条目清单；落点 = dev-loop §0.5 一小段；验收 = 下次长程执行按预算式 objective 起 goal 并到点自评收口。
+- ⏸ **升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2（触发型搁置；2026-09-25 靶校正：上游已发 rc.2 = `477b4f42`）**：
+  RFC = [proposed/pin-upgrade-0.1.7-rc.2](./notes/proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md)（阶段 0 靶校正 +
+  七步程序，不捆绑 15 收割项）；材料 = [增量报告](./notes/research/2026-09-24-dsh-upstream-delta.md) + [迁移方案](./notes/research/2026-09-24-pin-upgrade-and-harvest.md)；复活条件 = 某条目需要新基座或用户重新拍板。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
