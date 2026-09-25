@@ -1,6 +1,6 @@
 # 2026-09-25 · Harness 对照：以《Agent-ready Development》为镜，把本仓 harness 打造好
 
-状态：proposed（2026-09-25 用户定档：排在**升 pin 之后、打扫卫生之前**）
+状态：已交付（2026-09-25 三阶段完成：台账 → 三切片 → 归位；实施实况见文末）
 
 ## 问题
 
@@ -76,7 +76,7 @@ DSH 之上的插件。coding agent 同时阅读插件仓库与 DSH 仓库，两�
 **用途**：给自己开发本项目用优先；数字分身是否共用这套，留待用户后续判断。
 
 **本条目不含收尾清扫**：清扫由**独立的清扫会话**做（中立体，打造的人不扫、扫的人不打造），
-处置入口见 [notebook-hygiene](./2026-09-25-notebook-hygiene.md) 的「收尾清扫」节。
+处置入口见 [notebook-hygiene](../proposed/2026-09-25-notebook-hygiene.md) 的「收尾清扫」节。
 
 ## 与其它条目的关系
 
@@ -122,3 +122,24 @@ DSH 之上的插件。coding agent 同时阅读插件仓库与 DSH 仓库，两�
 - **边做边扫会互相污染**：打造者顺手打扫会把自己的盲区一起固化；对策 = 清扫中立体、收尾才扫（见队列 ③）。
 - **范围膨胀**：本条容易变成"什么都想改"；对策 = 每片独立验收、独立 commit，单片超一轮按 D11 拆。
 - **与升 pin 的收割项重叠**：运行时查询类（06）会想两头都做；已明确归本条阶段 2，避免重复立项。
+
+
+## 实施实况（2026-09-25 交付）
+
+**阶段 1**：对照台账 = [research/harness-alignment-ledger](../research/2026-09-25-harness-alignment-ledger.md)
+——27 篇 + 2 特殊文件全覆盖、判定二分零待定（15 篇逐条判：9 已对齐 / 3 采纳切片 / 3 不适用+触发条件；
+快读 12 文件 5 个真新形状：3 并进切片、2 不适用/已覆盖）。主会话亲读 15 篇逐条判语料 + 四路阅读代理交叉核对。
+
+**阶段 2**（三切片独立 commit）：
+- 切片 C `ed633d0`：根 README 安装节 + pack README 随 rc.2 改判（bundle 行模型 / 21 peers）+ R5 待办改写
+  为已落地 + ui-demo 旧 `cordis_inspect` 引用修正；
+- 切片 B `8a90332`：dev-loop §12 判据三句（Note 豁免判据 / 反证操作口径 / 非表演式反驳）；
+- 切片 A `15ea897`：architecture §10 改动归属表（改什么→面→验收）+ dev-loop §9.1 证明边界段。
+
+**阶段 3**：index 外部材料登记指向台账（**不照搬清单 owner = 台账 §四.4**，index 只放指针——one-home）；
+无新机械门禁被采纳（钉版外链 / 孤儿资产 / 目录 README 均判不适用或登记 ②）⇒ verify 反证项空集。
+全程 verify ALL PASS / test 178/178。
+
+**移交**（台账 §五）：`rejected/` 缺席 + trim-cot-leakage 判定问 + 外链钉版评估 + 升 pin 旧机制引用扫描
+→ 队列「打扫卫生·记事面」；inspect 双工具 + `--dump-config-schema` → 升 pin 收割轮；
+registry 三态 + 改内容必 bump → 真实发布时；CI/PR 面/skills 家/change-scope → 第二贡献者进场时。

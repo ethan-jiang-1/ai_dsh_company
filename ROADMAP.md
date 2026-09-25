@@ -10,21 +10,18 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **① 打造自己的 harness · 以《Agent-ready Development》为镜**（用户定档：换基座之后、打扫卫生之前）：RFC =
-  [proposed/harness-alignment](./notes/proposed/2026-09-25-harness-alignment.md)——27 篇**全读、分层用力**（9+6 逐条判 /
-  其余抓新形状）→ 采纳·不采纳判定台账 → 小步落地；红线（目录归属 / 门禁语义 / preset·client 数据层）先报人。
-- **② 打扫卫生 · 记事面治腐化 + 收尾清扫**（② 可能修正其范围）：RFC =
+- **① 打扫卫生 · 记事面治腐化 + 收尾清扫**（harness-alignment 台账 §五已向本条登记 4 项输入：rejected/ 缺席、trim-cot-leakage 判定问、外链钉版评估、升 pin 旧机制引用扫描）：RFC =
   [proposed/notebook-hygiene](./notes/proposed/2026-09-25-notebook-hygiene.md)——六处无家/腐化立家修指针 + **收尾清扫**
   （中立体独立会话；条目收尾后扫；输入 = diff + Note + 队列行；腐化清单统一进本条处置）。
-- **③ 打扫卫生 · 长程自主执行的目标形态**（依赖 ②：打磨型输入源 = ②立的磨清单）：RFC =
+- **② 打扫卫生 · 长程自主执行的目标形态**（依赖 ①：打磨型输入源 = ①立的磨清单）：RFC =
   [proposed/longrun-goal-shape](./notes/proposed/2026-09-25-longrun-goal-shape.md)——goal objective 写预算 + 输入源 +
   三类停止条件（交付型 / 打磨型两形态）；落点 = dev-loop §0.5 一小段。
-- **④ 加新东西 · 人机合一（先 UX 研究，再内容层）**（换基座已完成）：RFC =
+- **③ 加新东西 · 人机合一（先 UX 研究，再内容层）**（换基座已完成）：RFC =
   [proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md)——**定性 = UX 问题**（人何时、以何形态被
   拉进来；用户自陈无好思路）⇒ 阶段 0 先 research 出候选模式与判据（`notes/research/`）→ A1 `kb/owners.md` + A2 手册三档/缺口回流/不在场分档。
-- **⑤ 加新东西 · 人机合一机制层**：RFC 同 ⑤ 的 B1–B4——收件人路由（answerer 多收件人先核实）/
+- **④ 加新东西 · 人机合一机制层**：RFC 同 ③ 的 B1–B4——收件人路由（answerer 多收件人先核实）/
   补料 · 建议 · 规矩回流三类载体 / 不在场机制化 / 证据回看。
-- ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；② 之后按其判据搬进 §磨清单）：机械层已过——
+- ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；① 之后按其判据搬进 §磨清单）：机械层已过——
   `deliverables-check` ALL PASS + r3 重录随手册完成；可后台派活不占轮。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
@@ -45,6 +42,12 @@
 - 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
+
+- 2026-09-25（**打造自己的 harness · 语料对照交付**）：以《Agent-ready Development》（钉 rc.1，56 文件）为镜
+  全量对照——台账 27 篇零待定（9 已对齐 / 3 采纳切片 / 3+2 不适用+触发），印证"本仓已接近语料形态、大头是
+  确认+显性化"的预判。三切片：README 安装节+三处跨 rc 过时指针（`ed633d0`）、dev-loop 判据三句（`8a90332`）、
+  architecture §10 改动归属表 + §9.1 证明边界（`15ea897`）。不照搬清单 owner = 台账 §四.4（index 放指针）。
+  无新门禁采纳（候选均判不适用/登记 ①）。收尾 Note = [implemented/harness-alignment](./notes/implemented/2026-09-25-harness-alignment.md)。
 
 - 2026-09-25（**换基座收尾：升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2**）：基座换到 rc.2 并完成消费面适配——
   包名拆分（`dsh-agent-presets` → `dsh-agent-preset` + `-registry`）、`dsh.bundle.patch` 改数组 + 每预设一行声明、

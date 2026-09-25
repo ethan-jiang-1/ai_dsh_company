@@ -1,12 +1,12 @@
 # 2026-09-25 · Harness 对照台账：以《Agent-ready Development》为镜
 
-状态：阶段 1 完成（27 篇正文全量读 + 2 个特殊文件过完；主会话亲读 15 篇逐条判语料，
-四路阅读代理交叉核对；判定二分、无「待定」）。
+状态：已交付（阶段 1 台账 + 阶段 2 三切片落地：C `ed633d0` 入口指针 / B `8a90332` 判据三句 / A `15ea897` 归属表+证明边界；
+主会话亲读 15 篇逐条判 + 四路阅读代理交叉核对；判定二分、无「待定」；不照搬清单 owner = 本文 §四.4）
 
 > 语料：`/Users/bowhead/deepseek-harness/_agent_ready_development/`，钉 DSH commit `46a7f68b` =
 > tag `dsh-v0.1.7-rc.1`（**比本仓 pin `rc.2` 差一个 tag**——只吸收理念层结论；机制细节一律回
 > `vendor/dsh/` 复核；跨 rc 机制差异已实证两处，见 §五）。owner RFC =
-> [proposed/harness-alignment](../proposed/2026-09-25-harness-alignment.md)。
+> [proposed/harness-alignment](../implemented/2026-09-25-harness-alignment.md)。
 > 判定三值：**采纳切片** / **已对齐** / **本仓不适用**（触发型不适用项一律带复活条件）。
 
 ## 总判（一句话）
