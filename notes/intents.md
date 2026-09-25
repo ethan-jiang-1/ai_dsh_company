@@ -2,6 +2,7 @@
 
 | 日期 | 意图（动机 + 外部可观察行为） | 状态 |
 |---|---|---|
+| 2026-09-25 | **人机合一（用户口述需求登记，入队）**：Agent↔Agent 已通，缺"物理人 ↔ 分身"层——现状只有审批闸门（`request_signoff`，fail-closed + 日志）与问人两条路，收件人 = v1 单操作者，`kb/org.md` 是 50 人数字编制、人侧未建模；缺口 = 要资料/要建议/规矩不知道三类接口无载体 + 审批未分层 + 人不在时的分档规则缺；方案 = 四切片（人侧建模与路由 / 四类接口补齐含规则缺口回流 / 不在场策略 / 证据回看），建在已毕业驾驶舱人机协作线之上 | proposed → [proposed/2026-09-25-human-agent-integration.md](./proposed/2026-09-25-human-agent-integration.md) |
 | 2026-09-25 | **记事面治腐化（盘点产出，入队）**：六处线索无家或指针已腐——「磨清单」不存在（三条观察项只活在 Note 正文）／两条触发型注册无索引行／intents 驾驶舱①②③三行指向已毕业 RFC／两条 implemented Note 从 intents 不可达／`notes/rejected/` 合同与事实不符／index 研究树登记过期；方案 = 逐项立家 + 二选一裁断（含可选 verify 裸路径门禁，带反证） | proposed → [proposed/2026-09-25-notebook-hygiene.md](./proposed/2026-09-25-notebook-hygiene.md) |
 | 2026-09-25 | **升 pin 靶校正 + 升级程序（盘点产出，挂 ⏸）**：vendor/dsh 钉 `dsh-v0.1.5-rc.2`（`fb2c4b9e`），上游已发 `dsh-v0.1.7-rc.2`（`477b4f42`，2026-09-24 21:39，release commit 形状为纯版本 bump）；既有材料靶为 rc.1 ⇒ 阶段 0 靶校正 + 阶段 1 七步升级（preset 声明迁移／client 数据层重写／V4 单向门，不捆绑 15 收割项）+ 阶段 2 收割项独立立项 | proposed → [proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md](./proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md)（并挂 ROADMAP ⏸ 行） |
 | 2026-09-25 | **长程自主执行的目标形态（盘点产出，入队）**：8 小时期望 → 实际 2h50 自行收口，根因 = goal objective 写成固定 8 条队列（队列有界）而非预算有界；方案 = 交付型／打磨型两形态显式区分，objective 写预算 + 输入源 + 三类停止条件，落 dev-loop §0.5 一小段 | proposed → [proposed/2026-09-25-longrun-goal-shape.md](./proposed/2026-09-25-longrun-goal-shape.md) |

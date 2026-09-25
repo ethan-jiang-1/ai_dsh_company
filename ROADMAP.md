@@ -15,6 +15,9 @@
 - **记事面治腐化**（发散线索立家 + 指针修复，2026-09-25 盘点产出入队）：RFC =
   [proposed/notebook-hygiene](./notes/proposed/2026-09-25-notebook-hygiene.md)——「磨清单」立家（三条观察项）/
   触发型两条补索引 / intents 指针 / `rejected` 合同裁断 / index 研究树登记；验收 = verify ALL PASS + 无悬空引用与死链。
+- **人机合一**（物理人 ↔ 分身：配对 / 四类接口 / 不在场策略，2026-09-25 用户口述需求登记）：RFC =
+  [proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md)——人侧建模与收件人路由 /
+  要资料·要建议·规矩缺口三类接口补齐 / 审批分层三档 / 人不在时的阻塞与非阻塞分档；建在已毕业人机协作线之上。
 - **长程自主执行的目标形态**（交付型 vs 打磨型，2026-09-25 盘点产出入队）：RFC =
   [proposed/longrun-goal-shape](./notes/proposed/2026-09-25-longrun-goal-shape.md)——goal objective 写预算与输入源
   而非固定条目清单；落点 = dev-loop §0.5 一小段；验收 = 下次长程执行按预算式 objective 起 goal 并到点自评收口。
