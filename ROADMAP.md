@@ -10,7 +10,14 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-（当前空——无在办条目。下一批由用户点名或 §磨清单升格；历史轮次见文末维护记录。）
+- **① A 案 · 长链动议（依赖图中途形态 + 多模态验收）**：RFC = [proposed/long-chain-motion-dag-midflight](./notes/proposed/2026-09-26-long-chain-motion-dag-midflight.md)——
+  刻意串深链（9 波、逐波放行）制造"中途"窗口；人在第 3/5/7 波截图，**图像多模态逐张判 6 条**
+  （无堆叠 / 边两态可辨 / 箭头随色 / 完成态降透明 / 进行中描边 / 卡点可见）；顺带验问询节流与日期口径。
+  **需用户在场 + $3–6**；执行待批准。
+- **② journal 缺席机制（磨清单在册项）**：RFC = [proposed/journal-presence-mechanism](./notes/proposed/2026-09-26-journal-presence-mechanism.md)——
+  文案已证无效（8→8 红证）⇒ 候选 = A 仓库侧 `journal-audit` 审计（deliverables-check 家族，事后检测）
+  + B CEO 定稿盘点加"成员 journal 在场盘点"（**换执行者**）；C 运行时拦截核过 vendor 无 seam ⇒ 提上游。
+  验收 = 审计脚本反证 + 下一场动议 journal 在场率。执行待批准。
 
 ## 磨清单（低优先磨活；不占轮、可后台派活；触发即升队）
 
@@ -20,7 +27,7 @@
 
 - **journal 缺席 = 文案不够，需机制**：skill 硬闸门语气实测未管住（draft 正常产出但 journal 步照跳）。
   谁来磨 = 机制面轮；磨法候选 = CEO skill 定稿盘点加"成员 journal 在场盘点"＋ deliverables-check 式
-  journal 审计（注意排练/真盘边界）；何时磨 = 下次内容面/机制面轮顺带，或用户点名。
+  journal 审计（注意排练/真盘边界）；何时磨 = **已落 [proposed/journal-presence-mechanism](./notes/proposed/2026-09-26-journal-presence-mechanism.md)（队列 ②），待批准**。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
@@ -51,6 +58,19 @@
 
 ## 历史维护记录（非当前指令）
 
+- 2026-09-26（**自主窗口：code-review 两轴 findings 全处置 + 新规矩行为面验证 + 两个提案入队**）：
+  ① 三笔 client 改动跑 Standards+Spec 两轴审查 ⇒ **7 条真缺陷全修**（令牌错名 `state-warning-primary`、
+  死重复 `.wk-edge`、**动画 opacity 吃掉完成态降透明**〔与堆叠虫同类〕、`in_progress` 被读成「可开工」、
+  悬空 blocker 口径不符、箭头 `context-stroke` 在 Safari 无信号 ⇒ 改双 marker、JSDoc/测试标题过期）
+  + **3 道新防线**（`tests/client-css.spec.ts` 令牌存在性 & 动画元素纯度、toolview priority 源码钉、
+  DAG 徽章/重心/悬空覆盖），均带红绿反证；**反证中证明 `client-load-smoke` 抓不到 toolview 冲突**（在案）。
+  ② 落 4 条只在会话里活着的操作知识（pipefail 假绿 / client 生效第三跳 / cookie 显式带〔实跑验证〕/ token 生灭）。
+  ③ **日期口径行为面 PASS**（真模型排练档探针：文件名与首行都是占位 `日期待核`、未问人）→ 落成可复跑
+  认证档 `scripts/date-rule-probe.mjs`。④ 中立体收尾清扫 9 条 findings 全处置（活指针 2 / 文档卫生 5 /
+  repository-vantage 3），含**规则正文三处双写收敛为手册一处**。⑤ 两个提案入队（队列 ①②）。
+  commits = `c49442e` / `cd64e86` + 本条；验证 = verify ALL PASS / test 202 / preset-smoke / handbook-smoke /
+  client-load-smoke 全绿。
+
 - 2026-09-26（**journal 日期机制 + 问询节流交付 ⇒ 队列清空**）：用户**只批 C 文案止损**——手册立
   「日期口径」（角色无取真日期通道 ⇒ 禁推算／禁"取次日"／禁猜；取不到用 `日期待核` 占位）+ CEO skill
   记账步同步 + 台账两行按会话日志修正。**漂移实为三代链**：09-28→09-29→09-30，三场真日期
@@ -64,7 +84,7 @@
 - 2026-09-26（**UX 实验轮交付 ⇒ 队列清空**）：两场真盘动议（续约评估 / 营收盘子）四类拉人点全命中，
   人侧 6 条回应全部日志可回溯（含真人 Reject 一次、稳 15% 档位一次）；两只真虫修复（DAG 堆叠 `3288709`
   / toolview 槽位 `fc9eb85`）+ 新防线 `tests/dag-panel.spec.ts`；三档分拣完成，**新发现两条**：
-  追问疲劳（待人裁，入磨清单）、journal 日期链式漂移坐实（转机制面提案）。**日志复核修正原笔记两处误记**
+  追问疲劳（当时待人裁；**后已交付**，见上一行）、journal 日期链式漂移坐实（**后已交付**，同上）。**日志复核修正原笔记两处误记**
   （"人裁 ≤$200" 实为 CFO 建议 CEO 拍；场二无双签交互）。收尾 Note =
   [implemented/ux-experiment-round](./notes/implemented/2026-09-25-ux-experiment-round.md)；
   体感笔记按 research 层生命周期结论并入后删除（末次 blob `310227d`）。

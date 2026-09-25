@@ -36,7 +36,7 @@ A（pack 侧 runtime context 注入）/ B（上游 seam）**未批**，留案见
 
 ## 采用方案：C 文案止损
 
-三处落点（一处事实一个家）：
+三处落点（**手册持规则正文**；另两处只持各自的动作与列口径）：
 
 1. **公司手册「日期口径」**（`company-workspace/AGENTS.md` §协作规矩）：全角色规则——没有取真日期
    的通道 ⇒ 不许推算 / 不许"取次日" / 不许凭记忆猜；取不到真日期时文件名与正文首行一律用占位
@@ -63,9 +63,15 @@ A（pack 侧 runtime context 注入）/ B（上游 seam）**未批**，留案见
 - **代价**：日期暂时缺失（占位），由人 / 轮末收敛回填；**收益**：禁止写具体数字 ⇒ 漂移不再复利。
 - 已执行：`handbook-smoke` ALL PASS（手册注入）；`preset-smoke` ALL PASS（5 preset 全部可挂载）；
   `pnpm verify` ALL PASS；`pnpm test` 190/190。
-- **未验证（待人 / 下次动议）**：下一场真动议的 journal 与台账应写「日期待核」占位或真日期、
-  不得出现推算值；复核方法 = 与 `dev/harness-home/sessions/.../session.v4.jsonl.zstd` 的
-  `session.createdAt` 比对。
+- **行为面（窄口径）已验证（2026-09-26 排练档单步探针，真模型；可复跑 = `scripts/date-rule-probe.mjs`）**：起一个 ceo 会话（cwd = 排练场）只让它执行
+  skill 第 6 步记账 ⇒ 产物 = `dev/rehearsal-workspace/kb/ceo/journal/日期待核-date-rule-probe.md`
+  （**文件名与首行都是占位 `日期待核`，无任何推算日期**），正文自陈"无取真日期通道；不推算、不取次日、
+  不凭记忆猜，真日期由轮末收敛或人回填"，并主动声明"不写既有基准日期（那正是本规则要禁的）"；
+  且**没有**为日期去问人（无 `ask_user_question`）。**边界**：这是单步探针（只跑记账步），不等于整场动议；
+  排练档产物不进真盘（`dev/rehearsal-workspace/` 已 gitignore）。
+- **仍未验证**：真动议整场（多角色、多轮）下的日期口径与台账行写法；待人/下次动议复核
+  （方法 = 读会话库 `$DSH_HOME/sessions/` 里该会话的 `session.createdAt`，与会话 id 一并记；
+  **会话库是运行时残留、不入 git**，故复核证据以会话 id 为准）。
 
 ## 实施实况（2026-09-26）
 

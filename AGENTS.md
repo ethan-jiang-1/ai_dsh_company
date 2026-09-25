@@ -45,7 +45,8 @@ client-load（客户端装配，keyless）/ probe（连通档默认 ~6s）/ hand
 presence-e2e（在场板链，真模型 ~$1）/ attention-e2e（人机三节点全回路：触线→审批→面板→人批→继续，真模型+真浏览器 ~$1–2）/
 human-loop-e2e（人机接口三载体：补料落盘被读到／建议非阻塞落稿／规矩缺口→问人→裁决→回流 journal，真模型+真浏览器 ~$1–2）/
 deliverables-check（三态审计，缺 DSH_HOME 自拒）/ snapshot-motion
-（动议归档，条目收尾）/ snapshot-motion-smoke（keyless CLI 集成检查）/ replay（无 key 重放）/ rehearsal-init（排练场）。web 观察窗 =
+（动议归档，条目收尾）/ snapshot-motion-smoke（keyless CLI 集成检查）/ replay（无 key 重放）/ rehearsal-init（排练场）/
+date-rule（日期口径**行为面**认证档：真模型 ≈$0.05、排练场；文案层规矩的唯一行为防线）。web 观察窗 =
 `pnpm dsh web -- --port 3081 --no-open`（3080 是本 GUI 占用；构建三件事见 guides/dev-loop §7）。
 
 **push 走 `ssh.github.com:443`**（22 端口被拦；环境状态见最近收尾 Note 的环境状态节）。

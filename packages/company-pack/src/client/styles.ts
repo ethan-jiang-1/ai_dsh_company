@@ -301,6 +301,7 @@ const CSS = `
 /* 箭头尖：**双 marker 显式上色**（不用 SVG2 context-stroke——Chrome 124+ / Firefox 支持，
    Safari 无信号；不支持时 marker 会 fallback 成黑，深色主题下箭头直接消失）。 */
 .wk-arrow-tip-wait { fill: var(--dsw-alias-label-tertiary); }
+/* 第二行 fill 是 color-mix 的渐进增强：不支持时回退到上一行令牌（同 .wk-edge[data-done] 的写法）。 */
 .wk-arrow-tip-done {
   fill: var(--dsw-alias-state-success-primary);
   fill: color-mix(in srgb, var(--dsw-alias-state-success-primary) 70%, var(--dsw-alias-label-primary));
