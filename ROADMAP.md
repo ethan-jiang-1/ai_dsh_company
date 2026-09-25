@@ -15,18 +15,23 @@
   [proposed/pin-upgrade-0.1.7-rc.2](./notes/proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md)——阶段 0 靶校正（上游已发 rc.2
   = `477b4f42`；先定取源）→ 阶段 1 **换基座后先跑现有门禁、产《实测影响面清单》**，再按七步适配（peerDependencies /
   preset 声明迁移 / client 数据层 / 快照回归 / 发布链）；15 条收割项不捆绑。
-- **② 打扫卫生 · 记事面治腐化**（依赖 ①：在适配后的状态上打扫，避免二次返工）：RFC =
+- **② 打造自己的 harness · 以《Agent-ready Development》为镜**（依赖 ①：先换基座修对原有，再谈理念对齐；
+  用户 2026-09-25 定档在升级之后、打扫卫生之前）：RFC =
+  [proposed/harness-alignment](./notes/proposed/2026-09-25-harness-alignment.md)——对照外部语料（56 文件，钉 DSH `rc.1`）
+  逐篇产**采纳／不采纳判定台账**（读→判→改三阶段），落地入口归属 / 反馈六层 / 参与阶梯 / 插件作者入口 /
+  边界与成本五片；运行时可检查性与升 pin 收割项合并处理。
+- **③ 打扫卫生 · 记事面治腐化**（依赖 ①；② 可能修正其范围）：RFC =
   [proposed/notebook-hygiene](./notes/proposed/2026-09-25-notebook-hygiene.md)——「磨清单」立家（三条观察项）/
   触发型两条入内 / intents 指针 / `rejected` 合同裁断 / index 研究树登记；验收 = verify ALL PASS + 无悬空引用与死链。
-- **③ 打扫卫生 · 长程自主执行的目标形态**（依赖 ②：打磨型的输入源 = ②立的磨清单）：RFC =
+- **④ 打扫卫生 · 长程自主执行的目标形态**（依赖 ③：打磨型的输入源 = ③立的磨清单）：RFC =
   [proposed/longrun-goal-shape](./notes/proposed/2026-09-25-longrun-goal-shape.md)——goal objective 写预算 + 输入源 +
   三类停止条件（交付型 / 打磨型两形态）；落点 = dev-loop §0.5 一小段。
-- **④ 加新东西 · 人机合一内容层**（前置 ① 已完成；不动机制与 client）：RFC =
+- **⑤ 加新东西 · 人机合一内容层**（前置 ① 已完成；不动机制与 client）：RFC =
   [proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md) A1–A2——`kb/owners.md`
   （角色 ↔ 物理人 + 授权面）/ 手册落三档审批 · 规则缺口回流 · 不在场分档 + **退化形状**。
-- **⑤ 加新东西 · 人机合一机制层**（依赖 ①：升 pin 重写 preset 声明与 client 数据层，先做要迁两次）：RFC 同 ④ 的
+- **⑥ 加新东西 · 人机合一机制层**（依赖 ①：升 pin 重写 preset 声明与 client 数据层，先做要迁两次）：RFC 同 ⑤ 的
   B1–B4——收件人路由（answerer 多收件人先核实）/ 补料 · 建议 · 规矩回流三类载体 / 不在场机制化 / 证据回看。
-- ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；① 之后按其判据搬进 §磨清单）：机械层已过——
+- ⏸ **snapshots 与 live 盘差异逐项语义目录**（低优先磨活；③ 之后按其判据搬进 §磨清单）：机械层已过——
   `deliverables-check` ALL PASS + r3 重录随手册完成；可后台派活不占轮。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
