@@ -12,10 +12,7 @@
 
 ## 队列
 
-- **① 收割轮 · rc.2 能力收割**：RFC = [proposed/harvest-round](./notes/proposed/2026-09-25-harvest-round.md)——
-  delta §④ 十五项逐条判定（已收/收/不收，零待定）→ 选收切片落地（preset 加 tool-cordis 行 / workspace-changes·
-  office 预览实测 / manifest 品牌化·容量参数·`--dump-config-schema` 登记）→ 不收项进搁置池带触发。
-- **② 打磨轮 · 磨清单清账 + 打磨型 goal 首实践**：RFC = [proposed/polish-round](./notes/proposed/2026-09-25-polish-round.md)——
+- **① 打磨轮 · 磨清单清账 + 打磨型 goal 首实践**：RFC = [proposed/polish-round](./notes/proposed/2026-09-25-polish-round.md)——
   四项逐项小修（journal 缺席 skill 强化 / journal 文件名日期口径 / q3 换行 / snapshots 语义目录）+
   dogfood 打磨型 goal 形态并回访写法。
 
@@ -46,6 +43,12 @@
 | **视觉打磨二期** | 同上 §切片三 | 走查触发型——未发现新问题不开（登记处即触发条件） | 用户走查驾驶舱页签发现新问题 |
 | **注意力中心「带假设走的」条目类别**（人机合一 B3） | [implemented/human-agent-integration](./notes/implemented/2026-09-25-human-agent-integration.md) B3 | 证伪：假设只写稿件未决项，无机器事件可折；造事件 = 发明假设工具（D13 边缘） | 多物理人进场，或假设事件源（上游 seam/假设工具）出现 |
 | **注意力面板/台账「决策来源显示」**（人机合一 B4） | 同上 B4 | client 红线（用户 2026-09-25 裁决退化）；审批成对审计 + journal 留痕已覆盖回看 | 用户点名做 client 增强 |
+| RemoteStream 双工流（client→host 流内推 item） | [harvest-ledger #2](./notes/research/2026-09-25-harvest-ledger.md) | 无交互式面板需求 | 交互式面板（插话/追加油）立项 |
+| subagent 上限 Web 设置页 | 同上 #6 | 改 patch 一行即可调，无频调需求 | 多动议并行频撞上限 |
+| job-controller + terminal-controller | 同上 #7 | demo 运维线 | demo 需求出现 |
+| remote-mock 测试支撑 | 同上 #12 | 现有 keyless 链够用 | client 测试需要 mock remote |
+| 新工具族（ssh/browser-use/voice/PTC/auto-review/skill-office） | 同上 #14 | demo 储备不预挂（D13） | demo 卖点需求逐项点名 |
+| OTLP 产品遥测 | 同上 #15 | 默认不挂载 | 运营侧使用数据需求 |
 | **M2 自定义 provider** | [index](./docs/index.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"的需求已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
 | **界面外推送 / 收件箱** | [org-presence-board（已毕业）](./notes/implemented/2026-09-22-org-presence-board.md) §背景 | egress 只有 `sessionTelemetry`（OTel）与 hooks，webhook 是 ingress；收件人是谁、粒度多细属部署选择 | 明确的物理人通知需求 + 选定部署面 |
 | **消息级协作动态流**（在场板 v1 的动态流只含成员/任务迁移差分） | R5b 机制核实（[implemented/2026-09-23-r5b-cockpit](./notes/implemented/2026-09-23-r5b-cockpit.md)） | 消息内容要 host 侧折 lead 会话 team 事件（`sessionProjections.stateOf(…, 'agentTeam')` 通道已核实存在）→ 自建 Typert Remote——但其**客户端 stub 由 vendor codegen 管线生成**，本 pack 无接线；自建 codegen 不值一轮 | 上游提供 pack 侧 remote stub 生成，或公开 host-only 投影的客户端读 RPC |
@@ -55,6 +58,12 @@
 - 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
+
+- 2026-09-25（**收割轮交付**）：delta §④ 十五项判完（已收 2／收 5／不收 8 含 2 条描述失准修正）——
+  inspect 双工具进五角色 preset（preset-smoke ALL PASS）、office 预览与 workspace-changes 实测确凿
+  （六轮探针 + 「变更捕获需 git 仓」实测知识）、容量参数/schema 工具登记、六项不收进搁置池带触发。
+  台账 = [research/harvest-ledger](./notes/research/2026-09-25-harvest-ledger.md)；收尾 Note =
+  [implemented/harvest-round](./notes/implemented/2026-09-25-harvest-round.md)。
 
 - 2026-09-25（**队列重启：收割轮 + 打磨轮入队**；用户规矩 = 先显性化进 notes/proposed/ 再推进）：
   收割轮 = 升 pin 挂账的 15 能力项逐条判定（预判：2 已收 / 6 收〔多为验证+登记，大件出厂自带〕/
@@ -100,7 +109,7 @@
   test 178 / preset-smoke / client-load / release-smoke 全绿。**登记偏离 D27**（官方 sync-dsh 事务装不下：
   vendor 自建在本仓嵌套工作区必失败，独立 staging 树可构建）⇒ 手工同步四处簿记 + 门禁留证。
   收尾 Note = [implemented/pin-upgrade-0.1.7-rc.2](./notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md)；
-  影响面实测 = [research/pin-upgrade-impact](./notes/research/2026-09-25-pin-upgrade-impact.md)。待续 = 真模型档认证 + 快照/回放 + 15 收割项。
+  影响面实测已并入 [收尾 Note](./notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md) 实况节（研究稿按 research 层生命周期毕业删除）。待续 = 真模型档认证 + 快照/回放 + 15 收割项。
 
 以下是历史记录，不是当前指令。旧轮次、完成标记、环境状态和旧探针结果仅说明当时状态；当前任务从 §队列读取，当前操作规则见对应合同与活跃 Note。
 

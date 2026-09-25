@@ -27,7 +27,7 @@
 2. **阶段 1 · 三步走（2026-09-25 阶段 0 实证后改序：官方脚本的事务模型装不下消费面改动）**
    - **①a 候选测量窗口**（登记偏离，短窗口、不留 commit）：把 submodule HEAD 切到 `dsh-v0.1.7-rc.2`
      （tag checkout，vendor tracked 零改动）→ `pnpm install` + host 面构建 → 跑现有门禁
-     （`verify` / `test` / `preset-smoke` / `client-load` / `probe`）→ 产**[《实测影响面清单》](../research/2026-09-25-pin-upgrade-impact.md)**
+     （`verify` / `test` / `preset-smoke` / `client-load` / `probe`）→ 产《实测影响面清单》（事实已并入本文「实施实况」；研究稿 2026-09-25 毕业删除，全文见 git `6f57fe5`）
      （哪道门禁、红/绿、归属原因、适配动作）→ **还原 HEAD**。窗口期内 `vendor-pin` 门禁红属已知。
    - **①b 消费面适配**（在旧 pin 上落地并 commit）：peerDependencies 重写（`dsh-agent-presets` 在 0.1.7
      不存在 ⇒ `dsh-agent-preset` + `dsh-agent-preset-registry`；range 对齐新 release）+ **bundle 补丁行**
@@ -62,7 +62,7 @@
 - 阶段 0：研究材料与 ROADMAP 的靶一致为 rc.2；`rc.1 → rc.2` 增量有本地证据——**已达成：结论 = 非纯发布，
   346 commit / 3429 文件，落在 user-questions·approval·preset·schedule·projection·workspace-files 六面
   （增量报告 §⑦）**。
-- 阶段 1：**先产出[《实测影响面清单》](../research/2026-09-25-pin-upgrade-impact.md)**（跑过哪些门禁、各自红／绿、红条的归属原因与适配动作、未覆盖的面），
+- 阶段 1：**先产出《实测影响面清单》**（跑过哪些门禁、各自红／绿、红条的归属原因与适配动作、未覆盖的面——事实已并入本文「实施实况」；研究稿 2026-09-25 毕业删除，全文见 git `6f57fe5`），
   再逐项消红；`pnpm verify` 的 `vendor-pin` + `vendor-clean` 在 rc.2 上重校通过；`preset-smoke` 五角色真挂载；
   client-load + presence-e2e + 快照档绿；`release-smoke` 穿新兼容门禁；[AGENTS.md](../../AGENTS.md) 的
   vendor 簿记与兼容矩阵同步。

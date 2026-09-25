@@ -46,7 +46,7 @@ if (links.violations.length === 0) ok(`md-links (含 notes) ×${links.linkCount}
 const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 115],            // 2026-09-23 二次收口（渐进披露）后 107 行；指针化内容住 release.md/index/guides/dev-loop
   ['docs/index.md', 145],     // 整治后 131
-  ['docs/guides/dev-loop.md', 440], // 整治后 ~397
+  ['docs/guides/dev-loop.md', 448], // 2026-09-25 收割轮升至 448：+§2 进程内查询档（inspect/schema 工具）等三处小登记（依据 = harvest-ledger #5/#13），说明在 verify 提升处与台账
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
   const lines = readFileSync(join(root, rel), 'utf8').split('\n').length - 1

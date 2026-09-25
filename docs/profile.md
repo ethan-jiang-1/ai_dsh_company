@@ -48,3 +48,8 @@ preset roster 的 `roots` 已改**自定位**（`!!js` + `baseUrl` 解析到本�
   `sync-dsh`）。
 - `plugin add` 的行注册顺序：pnpm 成功后 CLI 才写 bundles 列表——若中途失败，手动补
   `dsh.profile.bundles`（R1 实证一次）。
+
+**Team 容量与信箱背压（rc.2 可调参数，收割 #11）**：编制上限（`maxMembers`，默认 8）与信箱背压
+（`maxPendingMessagesPerMember` / `maxMessageBytes`）在组合层调——行清单与默认值见
+`vendor/dsh/packages/experimental/agent-team/src/mailbox.ts` 与 `agent-team-profile`；调参 = bundle 行
+config，不动 preset。

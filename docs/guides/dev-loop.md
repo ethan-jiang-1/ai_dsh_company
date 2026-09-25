@@ -71,6 +71,10 @@
 "profile 层之后再叠一层"的可重复旗标（`vendor/dsh/apps/cli/src/args.ts`），风险半径一次
 进程，连 dev home 都不落。
 
+
+**进程内查询（rc.2 收割）**：角色会话里 `cordis_inspect_list` 发现 Inspect Provider 与方法、
+`cordis_inspect_query` 按 schema 精查挂载与 Config（preset 已挂 `tool-cordis` 行）；组合层另有
+`dsh --dump-config-schema` 自描述配置 schema——三者回答"这台进程现在真跑着什么"（对照 §5 升 pin 扫描）。
 ## 3. 设计四问（R3+ 写第一行 JS 前必答）
 
 | 问 | 判据 | 本 repo 落点 |
@@ -416,18 +420,18 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 **Note 生命周期细则（2026-09-24 吸纳自 DSH Agent Note lifecycle，点选不推翻；取舍全录 =
 [notes/implemented/2026-09-24-notes-lifecycle-absorption.md](../../notes/implemented/2026-09-24-notes-lifecycle-absorption.md)）**：
 
-- **状态行**：`proposed/` / `implemented/` 新写或再编辑的 Note 首部有「状态：」行，开头
-  即生命周期去向（proposed / implemented / 已消化…）；存量不回扫（`postmortem/`、`research/` 另有自身约定）。
-- **备选必载**：proposed RFC 记「输掉的方案」；决定类 Note 保留"它击败了什么"——没记录击败对象的决定
-  会重新引发争论（备选只记录、不编造）。
+- **状态行**：`proposed/` / `implemented/` 新写或再编辑的 Note 首部有「状态：」行，开头即生命周期去向（proposed / implemented / 已消化…）；存量不回扫（`postmortem/` 另有约定；research 层见下条）。
+- **备选必载**：proposed RFC 记「输掉的方案」；决定类 Note 保留"它击败了什么"——没记录击败对象的决定会重新引发争论（备选只记录、不编造）。
 - **毕业 = 正文改写**：`proposed → implemented` 不只挪文件——提案改写成现在时的已交付事实，删迁移计划
   与未来时态，仍有维护价值的验收/风险写进「后果 / 验证」。
-- **新增 Note 触发取代检查**：落盘前搜同决定、同机制的既有 owner——完整取代：吸收独有理由后旧 Note
-  同 diff 删除；部分取代：双方保留互链并更新仍有效的事实。
+- **新增 Note 触发取代检查**：落盘前搜同决定、同机制的既有 owner——完整取代：吸收独有理由后旧 Note 同 diff 删除；部分取代：双方保留互链并更新仍有效的事实。
 - **否决理由的去留**：随 owner Note 的「输掉的方案」节，不单开 rejected 目录（2026-09-25 裁断
   见 notebook-hygiene；原 rejected Note 形态取消）；只在仍能阻止一个可信错误时保留，防复犯价值消失即删。
 - **implemented 只跟事实**：随实现更新的只有路径、名称、结构等事实；决定被推翻时另写新 Note 互链，
   不把旧文改写成相反。
+- **research 层只放活研究（2026-09-25 立，裁决与首轮清扫 = [implemented/research-notes-lifecycle](../../notes/implemented/2026-09-25-research-notes-lifecycle.md)）**：
+  首部状态行写清「喂给谁 + 毕业动作」；消费方毕业时同 diff 三选一——仍在用 → 留下改状态行；已消化 → 结论
+  并入 owner Note 后删文件（全文归 git，收尾 Note 记末次 SHA）；放弃 → 否决理由随「输掉的方案」节。不开 archived/（沿 rejected/ 裁断）。
 
 **流程规则**：
 

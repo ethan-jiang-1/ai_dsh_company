@@ -1,8 +1,11 @@
 # 2026-09-25 · 人机合一 · 阶段 0：人机交互模式候选集（UX 判据）
 
-状态：阶段 0 完成（vendor 盘点 + 外部实践两路研究已回，候选集合成完毕；外部检索一手为主，Horvitz 两篇 PDF 未逐字核——如实标注）
+状态：活参考——喂给谁 = [docs/index §外部研究材料登记](../../docs/index.md)（UX 来源引用全集的家）+ 未来 UX 轮
+（搁置池「视觉打磨二期」复活时查候选判定）；消费方人机合一全链已毕业（阶段 0 → A1/A2 → B1–B4），
+消费记录 = [implemented/human-agent-integration](../implemented/2026-09-25-human-agent-integration.md)。
+外部检索一手为主，Horvitz 两篇 PDF 未逐字核——如实标注。毕业动作 = UX 判定不再被引用且无待复活条目时按三选一处置。
 
-> owner RFC = [proposed/human-agent-integration](../implemented/2026-09-25-human-agent-integration.md)「定性：这是 UX 问题」节。
+> owner RFC = [implemented/human-agent-integration](../implemented/2026-09-25-human-agent-integration.md)「定性：这是 UX 问题」节。
 > 形状约束（判"成不成立"的底）：审批**轮内有效 + fail-closed**（`ctx.approval` 管线）；无界面外推送 seam
 > （搁置池「界面外推送」判定）；v1 **单操作者**坐在驾驶舱前（未来多物理人、各有各的班）；一切以**会话为中心**。
 > 已有地基（不算缺口）：审批闸门 `request_signoff`（attention-e2e 7/7 全回路实证）、问询两条路

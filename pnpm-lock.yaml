@@ -126,6 +126,9 @@ importers:
       '@deepseek-ai/dsh-tool-ask-user':
         specifier: ^0.1.7-rc.2
         version: link:../../vendor/dsh/packages/interaction/tool-ask-user
+      '@deepseek-ai/dsh-tool-cordis':
+        specifier: ^0.1.7-rc.2
+        version: link:../../vendor/dsh/packages/extensions/tool-cordis
       '@deepseek-ai/dsh-tool-fs':
         specifier: ^0.1.7-rc.2
         version: link:../../vendor/dsh/packages/fs/tool-fs

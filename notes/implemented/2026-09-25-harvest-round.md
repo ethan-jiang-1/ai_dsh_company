@@ -1,6 +1,6 @@
 # 2026-09-25 · 收割轮：rc.2 能力收割（delta §④ 十五项逐条判定 + 选收落地）
 
-状态：proposed（2026-09-25 入队；用户规矩 = 盘算显性化后推进）
+状态：已交付（2026-09-25：台账 15/15 零待定 + 切片全落 + 六轮探针实测；实况见文末）
 
 ## 问题
 
@@ -57,3 +57,25 @@
 - delta §④ 的个别描述可能与 rc.2 实际不符（#3 已见嫌疑）——判定时以 vendor 现状为准，台账记修正；
 - "实测"项都是真模型/真浏览器分钟级（合计 ≈ $1–2）；preset 加行属正常内容工作（非红线——同 驾驶舱③ 加
   ask-user 行先例），但若发现要动声明**模型**则停下报人。
+
+
+## 实施实况（2026-09-25 交付）
+
+**台账** = [research/harvest-ledger](../research/2026-09-25-harvest-ledger.md)：15/15 零待定——
+已收 2（#1 投影随升 pin／#10 基座默认）· 收 5（#5 #8 #9 #11 #13）· 不收 8（含 **delta 描述失准修正 ×2**：
+#3 presetId 是内部 API 非消费面、#4 plugin-manager 无 title/icon/tags 字段）。
+
+**切片落地**：
+- 切片一：五角色 preset 加 `tool-cordis` 裸行（出厂 cordis preset 同款）+ peer
+  `@deepseek-ai/dsh-tool-cordis ^0.1.7-rc.2`（preset-dep 门禁当场红证 → 补声明 → 绿）；
+  **preset-smoke ALL PASS**；dev-loop §2 调试阶梯补「进程内查询」档（inspect 双工具 +
+  `--dump-config-schema`，#5 #13）。
+- 切片二：`scripts/harvest-probe.mjs` 六轮真模型探针（≈$3）——**#9 预览确凿**（CSV+PDF 侧栏预览双开，
+  入口 = present 行「在侧边栏打开」）；**#8 host 侧确凿**（`workspace/changes` 事件落日志）+
+  实测知识：**变更捕获需 git 仓**（无仓只抓 file-tool 编辑、bash 写入不可见——真公司盘在本仓内天然有 git ✓）；
+  审阅卡 headless 定位未遂（vendor e2e 走自有 data-* 钩子），观察窗人工终验一步即收。手册登记两行。
+- 切片三：profile.md 登记 Team 容量/信箱背压调参处（#11）。
+
+**不收 8 项**：2 项描述失准修正记台账；6 项进搁置池（各带复活条件）。
+**验证**：verify ALL PASS（dev-loop 预算 440→448，依据与说明在 verify 注释 + 台账）/ test 186 /
+preset-smoke ALL PASS。

@@ -48,6 +48,8 @@
               sampleOverCapGlobResults: false
           - id: tool-skill
             name: '@deepseek-ai/dsh-tool-skill'
+          - id: tool-cordis
+            name: '@deepseek-ai/dsh-tool-cordis'
           - id: tool-todo
             name: '@deepseek-ai/dsh-tool-todo'
             config:
