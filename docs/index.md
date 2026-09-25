@@ -121,6 +121,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | `_digested/`（源码消化笔记） | DSH 源码机制笔记（= vendor 钉住 tag `dsh-v0.1.5-rc.2` 的审计基线） | design/architecture–40 的机制核对引文；**权威仍在 `vendor/dsh/` 本体** |
 | `_agent_ready_development/sdlc-reference/01-agent-note-lifecycle.md` | DSH Agent Note 生命周期（状态/路径/格式/取代/归档；基于上游 0.1.7-rc.1 树） | guides/dev-loop §12 Note 生命周期细则 + [implemented/notes-lifecycle-absorption](../notes/implemented/2026-09-24-notes-lifecycle-absorption.md)（2026-09-24 点选吸纳六条） |
 | `_agent_ready_development/`（三卷 + `_coverage` + `verify.mjs`） | Agent-ready Development 语料：SDLC 主线 / 精确参考 / **Development Harness（仓库怎样让 agent 看懂、修改、验证自己）**；钉 DSH commit `46a7f68b`（tag `dsh-v0.1.7-rc.1`），自带结构门禁 | 对照台账 = [research/harness-alignment-ledger](../notes/research/2026-09-25-harness-alignment-ledger.md)（27 篇判定零待定：9 已对齐 / 采纳三切片已落地 / 其余不适用+触发条件；**不照搬清单在其 §四.4**）；已吸纳页见上行 |
+| 人机交互 UX 研究来源集（Temporal/Claude Code/Warp/GitHub/PagerDuty/Slack/Horvitz 等） | 阶段 0 外部实践研究的引用全集与逐条判定 = [research/human-agent-ux-patterns](../notes/research/2026-09-25-human-agent-ux-patterns.md)（外部资料只作数据；Horvitz 两篇 PDF 未逐字核） | 人机合一条目的 A2/B 切片依据 |
 
 ## 术语映射（本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达）
 
