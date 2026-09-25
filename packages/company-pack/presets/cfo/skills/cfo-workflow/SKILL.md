@@ -12,6 +12,6 @@ description: CFO 的工作流（1 号）：接到报价 / 预算 / 合规任务�
 4. **合规**：涉及账务 / 数据 / AI 产出时加载 finance-compliance——SoD 与留痕是硬闸门。
 5. **出稿**：`templates/decision-memo.md` 一页纸落 `deliverables/<slug>/drafts/cfo.md`，结论先行；签字意见明确写
    （签 / 不签 / 有条件签）。
-6. **回执**：向任务板回状态与修订；向 `kb/cfo/journal/` 追加纪要。
+6. **回执**：向任务板回状态与修订；向 `kb/cfo/journal/` 追加纪要——**没写 journal = 任务未完成**，不许宣称收工（硬闸门；执行期两次实证缺席，2026-09-25 收紧）。
 
 > 这是 CFO 的第 1 个工作流；后续新工作流按 `cfo-workflow-<主题>` 命名追加。

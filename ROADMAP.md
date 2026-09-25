@@ -12,23 +12,14 @@
 
 ## 队列
 
-- **① 打磨轮 · 磨清单清账 + 打磨型 goal 首实践**：RFC = [proposed/polish-round](./notes/proposed/2026-09-25-polish-round.md)——
-  四项逐项小修（journal 缺席 skill 强化 / journal 文件名日期口径 / q3 换行 / snapshots 语义目录）+
-  dogfood 打磨型 goal 形态并回访写法。
-
 ## 磨清单（低优先磨活；不占轮、可后台派活；触发即升队）
 
 > 家规（notebook-hygiene 立，2026-09-25）：观察项与低优先磨活住这里，各带「谁来磨／何时磨」；
 > 从队列可见一跳到达。队列走空且用户点名时才升格为队列条目。
-
-- **事件复盘场成员 journal 缺席**（VP-Eng/COO 未留 journal，W8 同款第二次）：谁来磨 = 内容面轮
-  （persona/skill 强化「收尾写 journal」）；何时磨 = 下次事件复盘场前后。
-- **CEO journal 文件名自记日期漂移**：谁来磨 = 内容面轮（skill 写清文件名日期口径）；何时磨 = 下次
-  CEO journal 写作时顺带核。
-- **q3 场 `final.md` 换行不合规**：谁来磨 = 任意接触该交付物的人；何时磨 = 下次 deliverables-check
-  红时即修（机械可见）。
-- **snapshots 与 live 盘差异逐项语义目录**（自 ⏸ 搁置池迁入）：机械层已过（`deliverables-check`
-  ALL PASS + r3 重录随手册完成）；何时磨 = 需要动 snapshots 语义时先补目录再动手。
+> 新观察项按家规入此。当前 1 项（2026-09-25 打磨轮实测新增）：
+- **journal 缺席 = 文案不够，需机制**：skill 硬闸门语气实测未管住（draft 正常产出但 journal 步照跳）。
+  谁来磨 = 机制面轮；磨法候选 = CEO skill 定稿盘点加"成员 journal 在场盘点"＋ deliverables-check 式
+  journal 审计（注意排练/真盘边界）；何时磨 = 下次内容面/机制面轮顺带，或用户点名。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
@@ -58,6 +49,12 @@
 - 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
+
+- 2026-09-25（**打磨轮交付 ⇒ 队列再度清空**）：四项清账（journal 硬闸门×5 skill＋CEO 日期口径＋q3 复核
+  已合规＋snapshots 语义节）；**行为红证如实记**——skill 文案管不住 journal 缺席（draft 正常但 journal 照跳），
+  按预案记「需机制」并重挂磨清单（候选 = CEO 盘点步 + journal 审计）；preset-smoke ALL PASS。
+  打磨型形态 dogfood 结论：输入源自繁殖 ⇒ 「枯竭」按"本轮不再新增磨项"算。收尾 Note =
+  [implemented/polish-round](./notes/implemented/2026-09-25-polish-round.md)。
 
 - 2026-09-25（**收割轮交付**）：delta §④ 十五项判完（已收 2／收 5／不收 8 含 2 条描述失准修正）——
   inspect 双工具进五角色 preset（preset-smoke ALL PASS）、office 预览与 workspace-changes 实测确凿
