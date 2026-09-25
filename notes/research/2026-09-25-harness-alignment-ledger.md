@@ -6,7 +6,7 @@
 > 语料：`/Users/bowhead/deepseek-harness/_agent_ready_development/`，钉 DSH commit `46a7f68b` =
 > tag `dsh-v0.1.7-rc.1`（**比本仓 pin `rc.2` 差一个 tag**——只吸收理念层结论；机制细节一律回
 > `vendor/dsh/` 复核；跨 rc 机制差异已实证两处，见 §五）。owner RFC =
-> [proposed/harness-alignment](../implemented/2026-09-25-harness-alignment.md)。
+> [implemented/harness-alignment](../implemented/2026-09-25-harness-alignment.md)。
 > 判定三值：**采纳切片** / **已对齐** / **本仓不适用**（触发型不适用项一律带复活条件）。
 
 ## 总判（一句话）
@@ -30,9 +30,9 @@
 - 本仓现状：D10 一处事实一个家（AGENTS 纪律表 + index 台账）；当前事实/决策理由分离（docs 只写 now，
   理由归 notes）；负知识 = 各 Note「输掉的方案」节 + postmortem/；lifecycle 六细则 = dev-loop §12
   （2026-09-24 点选吸纳自 sdlc-reference/01，含四项显式不吸纳）。
-- 差距：① `notes/rejected/` 在 AGENTS.md 写着但目录不存在——**已登记腐化**（intents.md 打扫卫生行），
-  归队列 ② 处置，本条不顺手改；② 生成目录（module-graph 等）——单 pack 仓无此规模，手工表+verify 门禁足够。
-- **判定：已对齐**（rejected/ 缺席登记 ②）。生成目录 = **本仓不适用**（规模差一个量级；语料自己也把它
+- 差距：① `notes/rejected/` 在 AGENTS.md 写着但目录不存在——**已随「打扫卫生·记事面」处置**
+  （2026-09-25 裁断：不设目录，负知识随「输掉的方案」节）；② 生成目录（module-graph 等）——单 pack 仓无此规模，手工表+verify 门禁足够。
+- **判定：已对齐**（rejected/ 缺席已处置）。生成目录 = **本仓不适用**（规模差一个量级；语料自己也把它
   定位为大规模仓库的 index 手段）。被否：建 rejected/ 目录树——负知识已有家（输掉的方案节），开目录
   反而造空壳（02 篇原话："只在仍能阻止一个合理错误时保留"）。
 
@@ -114,8 +114,8 @@
 
 **ref-05 prose-doc-standards**：one-home=D10；只写 now；doc-budget/链接门禁对应语料预算/配对；
 双语/文档站/生成 catalog = 不适用（单语、无站）。**判定：大体已对齐**；一个采纳小件：
-`dsh-trim-cot-leakage` 判定问（"只拿 HEAD 的读者能否核验每个 claim"）→ **挂队列 ② 收尾清扫输入**
-（登记 §五，不新开条目）。被否：在本仓建 doc-sync 命令——文档量一个 verify 管得过来。
+`dsh-trim-cot-leakage` 判定问（"只拿 HEAD 的读者能否核验每个 claim"）→ **挂「打扫卫生·记事面」收尾清扫输入**
+（已随该条进清扫契约，不新开条目）。被否：在本仓建 doc-sync 命令——文档量一个 verify 管得过来。
 
 **ref-06 review-and-human-role**：三层分工本地版 = §9.1 + D15 + "入口探针机器通过不等于语义审阅通过"
 （dev-loop 已有同构句）；运行时人审 = request_signoff/attention-e2e。缺一条 agent 行为纪律：
@@ -157,7 +157,7 @@
 - **语料根 verify.mjs**：对照后我们缺三个门禁形状——a) 目录 README 必备 = **不适用**（目录少，AGENTS §布局
   是一张表）；b) 孤儿资产 = **不适用**（本仓无图，snapshots 资产均有 snapshot.yml 引用；真出现资产再立）；
   c) 外链钉版 = **已对齐（习惯层）**：research notes 引 GitHub 一律钉 commit（delta note 实证）；机械化为
-  门禁的收益低于成本，**登记给 ② 打扫卫生**（链接腐化是其辖区）连带处置。d) 禁引隔离词表 = 不适用
+  门禁的收益低于成本，**登记给「打扫卫生·记事面」**（链接腐化是其辖区；已裁定：不机械化，习惯层已钉版）连带处置。d) 禁引隔离词表 = 不适用
   （本仓反向：显式登记引用 _digested）；SVG 门禁 = 不适用（无图）。
 - **_coverage/**（语料自我维护）：**本仓不适用（形态已覆盖）**——对应物 = vendor 簿记（钉定基线+升 pin 重校
   总则）+ D 号台账 + intents 历轮记录；"上游路径→受影响文档"的逐路径触发表由**每次升 pin 产一篇 delta/impact
@@ -183,8 +183,8 @@
 
 ## 五、登记给其它条目 / 前瞻
 
-- → 队列 ②（notebook-hygiene）：`notes/rejected/` 合同与事实不符（已登记）；**新增**：trim-cot-leakage
-  判定问补进其收尾清扫输入；外链钉版机械化评估（低优先）。
+- → 「打扫卫生·记事面」（notebook-hygiene，**已交付**）：rejected/ 已裁断（不设目录）；trim-cot-leakage
+  判定问已进清扫契约；外链钉版已裁定（不机械化，习惯层钉版）；升 pin 旧机制引用扫描已落 dev-loop §5。
 - → 收割轮（升 pin 待续项）：inspect 双工具落地时调试阶梯补"进程内查询"档；`--dump-config-schema` 登记。
 - → 前瞻（触发型）：真实 npm 发布时 registry 三态 + 改内容必 bump；CI/PR 面出现时 change-scope/skills 家/
   hooks 复活评估；TODO 三档语义（开始用 TODO 标记时先定义）。

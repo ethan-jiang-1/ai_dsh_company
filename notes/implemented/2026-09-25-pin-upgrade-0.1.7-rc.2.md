@@ -27,7 +27,7 @@
 2. **阶段 1 · 三步走（2026-09-25 阶段 0 实证后改序：官方脚本的事务模型装不下消费面改动）**
    - **①a 候选测量窗口**（登记偏离，短窗口、不留 commit）：把 submodule HEAD 切到 `dsh-v0.1.7-rc.2`
      （tag checkout，vendor tracked 零改动）→ `pnpm install` + host 面构建 → 跑现有门禁
-     （`verify` / `test` / `preset-smoke` / `client-load` / `probe`）→ 产**《实测影响面清单》**
+     （`verify` / `test` / `preset-smoke` / `client-load` / `probe`）→ 产**[《实测影响面清单》](../research/2026-09-25-pin-upgrade-impact.md)**
      （哪道门禁、红/绿、归属原因、适配动作）→ **还原 HEAD**。窗口期内 `vendor-pin` 门禁红属已知。
    - **①b 消费面适配**（在旧 pin 上落地并 commit）：peerDependencies 重写（`dsh-agent-presets` 在 0.1.7
      不存在 ⇒ `dsh-agent-preset` + `dsh-agent-preset-registry`；range 对齐新 release）+ **bundle 补丁行**
@@ -62,7 +62,7 @@
 - 阶段 0：研究材料与 ROADMAP 的靶一致为 rc.2；`rc.1 → rc.2` 增量有本地证据——**已达成：结论 = 非纯发布，
   346 commit / 3429 文件，落在 user-questions·approval·preset·schedule·projection·workspace-files 六面
   （增量报告 §⑦）**。
-- 阶段 1：**先产出《实测影响面清单》**（跑过哪些门禁、各自红／绿、红条的归属原因与适配动作、未覆盖的面），
+- 阶段 1：**先产出[《实测影响面清单》](../research/2026-09-25-pin-upgrade-impact.md)**（跑过哪些门禁、各自红／绿、红条的归属原因与适配动作、未覆盖的面），
   再逐项消红；`pnpm verify` 的 `vendor-pin` + `vendor-clean` 在 rc.2 上重校通过；`preset-smoke` 五角色真挂载；
   client-load + presence-e2e + 快照档绿；`release-smoke` 穿新兼容门禁；[AGENTS.md](../../AGENTS.md) 的
   vendor 簿记与兼容矩阵同步。
@@ -138,7 +138,7 @@
 - `attention-e2e-smoke` **ALL PASS（7/7）**：触线 → 审批 → 注意力面板 DOM → 人点 Allow once → agent 同轮收口
   全回路在 rc.2 上通（唯一的适配是同一处搜索占位符改名）。
 - `presence-e2e-smoke` **仍红**：它轮询的 RPC `agentTeams/view` 在 0.1.7 **已移除**（返回 `not found`）⇒
-  三条状态链断言全挂。rc.2 的对应读法已核实：**`SessionControlController.control` 流**（`session-controller/src/control.ts`）
+  三条状态链断言全挂。rc.2 的对应读法已核实：**`SessionControlController.control` 流**（`packages/api/session-controller/src/control.ts`）
   给出一个 `baseline` 帧 + 随后逐条 `{ type: 'projection', sessionId, key, value, seq }` 帧，
   团队态 = Lead 会话的 `agentTeam` 投影值。**待做** = 把该脚本从"轮询已移除的 RPC"改成"消费 control 流的投影帧"。
 
@@ -154,7 +154,7 @@ rc.2 迁移路径（无 key 探针实证）：`agentTeams/view` RPC 已移除 �
 **① 收官证据（2026-09-25 晚，HEAD=d7bb267 全量复跑）**：
 `verify` ALL PASS ／ `test` 178/178 ／ `preset-smoke` ALL PASS（5 挂载 + 技能隔离 + 闭包 lint）／
 `client-load` ALL PASS（品牌槽 + 零 loader 错误）／ `release-smoke` ALL PASS ／ `deliverables-check` ALL PASS ／
-`handbook-smoke` ALL PASS ／ `snapshot-motion-smoke` PASS ／ `replay` r3 全量零 diff + r2 presence **ALL PASS** ／
-`replay --ui` 委派卡端到端 + 金样零 diff **ALL PASS** ／ `attention-e2e` 7/7 **ALL PASS** ／
+`handbook-smoke` ALL PASS ／ `snapshot-motion-smoke` PASS ／ `replay-smoke` r3 全量零 diff + r2 presence **ALL PASS** ／
+`replay-smoke --ui` 委派卡端到端 + 金样零 diff **ALL PASS** ／ `attention-e2e` 7/7 **ALL PASS** ／
 `presence-e2e` 状态链 **ALL PASS** ／ `probe --full` **15/15 ALL PASS**（前三跑失败项各不相同 ⇒ 确证提供方抖动）。
 **换基座（队列 ①）就此交付**。余项均属后续队列：15 收割项（阶段 2，RFC 明示不捆绑）、D27 嵌套工作区 vendor 自建的长期解。
