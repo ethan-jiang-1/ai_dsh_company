@@ -569,7 +569,9 @@ async function runUiFlow(page, { url, workspace }) {
     const searchText = SCENARIO === 'r2-motion' ? '动议（R2 正式场）' : '只回复两个字'
     const searchButton = page.getByRole('button', { name: 'Search sessions' })
     if (await searchButton.getAttribute('aria-expanded') !== 'true') await searchButton.click()
-    const search = page.getByPlaceholder('Search sessions', { exact: false })
+    // rc.2：`search.placeholder` 文案由 'Search sessions...' 改为 'Search session names'
+    // （aria 标签 `search.sessions.aria` 未变，仍是 'Search sessions'）——按新占位符定位。
+    const search = page.getByPlaceholder('Search session names')
     await search.fill(searchText)
     const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: searchText })
     await result.first().waitFor({ timeout: 15_000 })

@@ -113,10 +113,17 @@
      追加 `packages/company-pack/presets/<role>/agent.cordis.yml`（rc.2 的 `--patch` 是可重复收集器）。
   4. `r3-delegation` 已在 rc.2 **重录**（`--record`：1 lead + 1 child、lead 35 行）⇒
      `sidecar system-prompt/tool-schemas 零 diff` 由红转绿（说明录制与当前基座的提示/工具表对齐）。
-  5. **剩余卡点**：无 key 重放时 `llm-replay` 没接住第一请求，落到真路由 ⇒ `MISSING_CREDENTIAL`
-     ⇒ 重放会话只到 turn 1 就结束（实际 1 个会话，缺 child），归一化 diff 红。
-     **待查**：rc.2 的 llm-replay 匹配口径（请求头/录制格式 V4 与 `.v3.jsonl` 命名约定）、或重放组合里
-     providers 段是否需要随 rc.2 的 request/header 形状补齐。
+  5. **无 key 重放已全绿**（根因与修法）：rc.2 的补丁**替换行校验 name** ——
+     夹具里 `- id: llm-deepseek` 仍写旧包名（`@deepseek-ai/dsh-llm-deepseek`，rc.2 该行已换 `-api-key` 变体）
+     会**整行被跳过**（组合转储可见 `patch: name mismatch … skipping`），而 rc.2 又多了一行
+     `llm-deepseek-account` —— 两处叠加 ⇒ 真 LLM 路由仍注册 ⇒ 重放落真路由报 `MISSING_CREDENTIAL`。
+     修法：四处夹具的 `llm-deepseek` 行按 rc.2 名字逐字对齐（`-api-key`）+ 补禁用 `llm-deepseek-account`；
+     随后重录（lead 39 行 + 1 child）⇒ `replay-smoke` **ALL PASS**（两会话归一化零 diff + 四份 sidecar 零 diff）。
+     `--scenario r2-motion`（presence 档）**ALL PASS**（在场板 5 行同形）。
+  6. **`--ui` 浏览器档剩一层**：rc.2 把搜索框占位符由 `Search sessions...` 改为 `Search session names`
+     （aria 未变），已按新占位符更新定位器；之后卡在 `[data-turn-process]` 按钮 **disabled 且计数全 0**
+     （`data-turn-process-messages="0" subagents="0" tool-calls="0"`）⇒ 打不开轮次过程 ⇒ 委派卡断言走不到。
+     待查：rc.2 的 turn-process 计数来自哪个投影、重放会话为何投影为空（V4 事件口径？）。
 - **真模型探针**（本轮实测）：`probe-smoke --full` 三跑 = 12/15、14/15（180s 超时）、13/15（串行 180s），
   **每次失败的项都不同**且日志无网络/限流线索 ⇒ 判定为提供方延迟抖动，非基座回归；仍留观察项（"探针超时偏紧"已有前例）。
   `handbook-smoke` ALL PASS；`deliverables-check` ALL PASS（9 成品 / 23 过程稿 / 0 违规）。
