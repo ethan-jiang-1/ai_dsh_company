@@ -10,27 +10,17 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **① journal 日期机制**：RFC = [proposed/journal-date-mechanism](./notes/proposed/2026-09-26-journal-date-mechanism.md)——
-  机制核实：角色**没有任何取真日期的通道**（无 shell/无时钟工具/runtime context 不含日期），且现口径
-  "读最新一篇取次日"**本身就是漂移算法** ⇒ 三案（C 文案止损 / A pack 侧 runtime context 注入〔原生 seam，
-  host 面先报人〕/ B 提上游）。验收 = 下一场动议日期与会话日志一致 + 台账两行修正。**待用户批准才执行**。
+（当前空——无在办条目。下一批由用户点名或 §磨清单升格；历史轮次见文末维护记录。）
 
 ## 磨清单（低优先磨活；不占轮、可后台派活；触发即升队）
 
 > 家规（notebook-hygiene 立，2026-09-25）：观察项与低优先磨活住这里，各带「谁来磨／何时磨」；
 > 从队列可见一跳到达。队列走空且用户点名时才升格为队列条目。
-> 新观察项按家规入此。当前 2 项（2026-09-26 UX 实验轮实测新增 1 项）：
+> 新观察项按家规入此。当前 1 项：
 
 - **journal 缺席 = 文案不够，需机制**：skill 硬闸门语气实测未管住（draft 正常产出但 journal 步照跳）。
-  **证据 +1（2026-09-26）**：CEO journal 日期链式漂移 09-29→09-30 复利（真日期 09-26；COO/VP-Eng
-  已把漂移值当基准"锚"，复利进台账）——见 [implemented/ux-experiment-round](./notes/implemented/2026-09-25-ux-experiment-round.md)
-  §三档分拣。谁来磨 = 机制面轮；磨法候选 = CEO skill 定稿盘点加"成员 journal 在场盘点"＋
-  deliverables-check 式 journal 审计（注意排练/真盘边界）；何时磨 = **已落
-  [proposed/journal-date-mechanism](./notes/proposed/2026-09-26-journal-date-mechanism.md)（2026-09-26），待批准**。
-- **问询批量打包 + 串行追问致烦**：场一 4 问同屏、第二轮追问同一批内容 ⇒ 人原话「哎哟，别烦我了，
-  你随便找人吧」（日志 `session-306dafdf` seq 97/98/103/104）。谁来磨 = **待人裁**（改规矩 = 立法）；
-  磨法候选 = 手册「人机接口」节 + 问询相关 skill 加问询节流纪律（一次一件／非阻塞不与阻塞同屏／
-  同一批内容不串行追问，缺料就按缺料出稿），或机制面新提案；何时磨 = 用户点名。
+  谁来磨 = 机制面轮；磨法候选 = CEO skill 定稿盘点加"成员 journal 在场盘点"＋ deliverables-check 式
+  journal 审计（注意排练/真盘边界）；何时磨 = 下次内容面/机制面轮顺带，或用户点名。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
@@ -60,6 +50,16 @@
 - 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
+
+- 2026-09-26（**journal 日期机制 + 问询节流交付 ⇒ 队列清空**）：用户**只批 C 文案止损**——手册立
+  「日期口径」（角色无取真日期通道 ⇒ 禁推算／禁"取次日"／禁猜；取不到用 `日期待核` 占位）+ CEO skill
+  记账步同步 + 台账两行按会话日志修正。**漂移实为三代链**：09-28→09-29→09-30，三场真日期
+  09-25/09-26/09-26（源头 = emergency-x 的 journal 文件名）；A（pack 侧 runtime context 注入）/
+  B（上游 seam）**未批留案**。同次批准**问询节流**规矩（同源发现：人原话「哎哟，别烦我了」）⇒
+  手册「人机接口」加三原则。收尾 Notes =
+  [implemented/journal-date-mechanism](./notes/implemented/2026-09-26-journal-date-mechanism.md) +
+  [implemented/inquiry-throttle](./notes/implemented/2026-09-26-inquiry-throttle.md)；
+  验证 = handbook-smoke / preset-smoke ALL PASS + verify + test 190/190。
 
 - 2026-09-26（**UX 实验轮交付 ⇒ 队列清空**）：两场真盘动议（续约评估 / 营收盘子）四类拉人点全命中，
   人侧 6 条回应全部日志可回溯（含真人 Reject 一次、稳 15% 档位一次）；两只真虫修复（DAG 堆叠 `3288709`
