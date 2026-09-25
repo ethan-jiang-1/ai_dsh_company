@@ -141,3 +141,12 @@
   三条状态链断言全挂。rc.2 的对应读法已核实：**`SessionControlController.control` 流**（`session-controller/src/control.ts`）
   给出一个 `baseline` 帧 + 随后逐条 `{ type: 'projection', sessionId, key, value, seq }` 帧，
   团队态 = Lead 会话的 `agentTeam` 投影值。**待做** = 把该脚本从"轮询已移除的 RPC"改成"消费 control 流的投影帧"。
+
+**presence-e2e 收口（同日）**：**ALL PASS**（41s；vp-eng/vp-sales 接活 phase=active → task pending → in_progress@vp-eng → completed 全链）。
+rc.2 迁移路径（无 key 探针实证）：`agentTeams/view` RPC 已移除 ⇒ 改读 **`session/projections`**
+（`{ request: { sessionId } }`——参数按 manifest 包在 `request` 里，与 `session/create` 同形；
+返回 `{ asOfSeq, values }`，团队态 = `values.agentTeam`，成员只给持久 `phase`）。
+**事故教训（自伤，值得记）**：迁移补丁里一步"改文案"的 `replace('agentTeams/view', …, count=1)`
+首处命中的不是注释而是**真正的 RPC 调用**（头部注释写的是 `agentTeams.view` 带点号）⇒ 端点名被改成整句中文
+⇒ 连续四轮 404 "not found"，且表象（"endpoint 404"）与真因（"字符串替换改坏调用点"）相距甚远。
+复盘：对"改文案"类替换也要 assert 命中处上下文；排查时先 `grep` 实际调用点再谈机制。

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // 判据 3 复跑入口（R5b，[implemented/org-presence-board 验收 3]）——在场板状态链的**真模型**
-// 端到端：排练场跑一场 2 分身微动议，轮询 `agentTeams.view` 断言状态链
+// 端到端：排练场跑一场 2 分身微动议，轮询 `session/projections` 的 `agentTeam` 投影断言状态链
+//（0.1.7 起 `agentTeams/view` RPC 已移除；投影只给持久 `phase`，live 忙闲另在会话状态座位上）
 //   分身接活 → status 转「执行中」→ 其 in_progress 任务 subject 出现 → 任务转「完成」。
 //
 // 为什么存在：replay 里成员由脚本瞬时驱动，「接活转 running」的动态面只有真模型能跑
@@ -74,6 +75,16 @@ try {
     return body.result.value
   }
 
+  /**
+   * 读 Lead 会话的 `agentTeam` 投影（0.1.7 起 `agentTeams/view` RPC 已移除）。
+   * @returns 投影值（members/tasks），会话尚不存在时给空壳。
+   */
+  const teamView = async () => {
+    // 参数按 manifest 包在 `request` 里（与 session/create、session/prompt 同形）。
+    const value = await rpc('session/projections', { request: { sessionId: lead } })
+    return value?.values?.agentTeam ?? { members: [], tasks: [] }
+  }
+
   const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'ceo' } })
   const lead = created.sessionId
   console.log(`lead session: ${lead}`)
@@ -89,7 +100,7 @@ try {
   await rpc('session/prompt', {
     request: { requestId: `pe2e-${Date.now()}`, sessionId: lead, mode: 'queue', content: [{ type: 'text', text: prompt }], clientTimeZone: 'Asia/Shanghai' },
   })
-  console.log('prompt sent; polling agentTeams/view …')
+  console.log('prompt sent; polling session/projections（rc.2：`agentTeams/view` 已移除，团队态改读 Lead 会话的 `agentTeam` 投影） …')
 
   // 状态链断言（R5b 实证时序：running 先于 claim —— spawn 后 running 出现，claim 晚一拍，
   // 上一轮脚本的同帧断言是错的；本版断言 = running 出现后 **15s 窗口内** subject 出现）。
@@ -103,20 +114,21 @@ try {
     const elapsed = Math.round((Date.now() - startedAt) / 1000)
     let view
     try {
-      view = await rpc('agentTeams/view', { agentId: lead })
+      view = await teamView()
       viewErr = null
     } catch (error) {
-      if (viewErr === null) console.log(`  view 尚不可用：${String(error.message).slice(0, 90)}`)
+      if (viewErr?.message !== error.message) console.log(`  view 尚不可用：${String(error.message).slice(0, 90)}`)
       viewErr = error
       continue
     }
-    const members = (view.members ?? []).map(m => `${m.name}:${m.status}`)
+    // 0.1.7 投影只给持久生命周期 `phase`（provisioning|active|failed）；live 忙闲在会话状态座位上。
+    const members = (view.members ?? []).map(m => `${m.name}:${m.phase}`)
     const tasks = (view.tasks ?? []).map(t => `${t.id}:${t.status}${t.ownerName !== undefined ? `@${t.ownerName}` : ''}`)
     console.log(`  ${String(elapsed)}s members=[${members.join(',')}] tasks=[${tasks.join(',')}]`)
 
-    const running = (view.members ?? []).find(m => m.status === 'running' && m.role === 'teammate')
-    if (running !== undefined && sawRunning === null) {
-      sawRunning = running.name
+    const active = (view.members ?? []).find(m => m.phase === 'active' && m.role === 'teammate')
+    if (active !== undefined && sawRunning === null) {
+      sawRunning = active.name
       runningAt = Date.now()
     }
     if (sawRunning !== null && sawSubject === null) {
@@ -129,14 +141,14 @@ try {
     // running 出现 15s 内 subject 必须出现（窗口断言），出现后即可停。
     if (sawSubject !== null) break
   }
-  check('分身接活转「执行中」（running）', sawRunning !== null, sawRunning ?? '未观察到')
+  check('分身接活（投影 phase=active）', sawRunning !== null, sawRunning ?? '未观察到')
   const subjectLagS = sawRunning === null ? -1 : Math.round((Date.now() - runningAt) / 1000)
-  check('running 后 15s 内 in_progress 任务 subject 出现', sawSubject !== null, sawSubject !== null ? `lag=${String(subjectLagS)}s；${sawSubject}` : '窗口内未见')
-  // completed 需要动议推进——running/subject 出现后继续等到出现或墙钟。
+  check('接活后 15s 内 in_progress 任务 subject 出现', sawSubject !== null, sawSubject !== null ? `lag=${String(subjectLagS)}s；${sawSubject}` : '窗口内未见')
+  // completed 需要动议推进——接活/subject 出现后继续等到出现或墙钟。
   while (!sawCompleted && Date.now() - startedAt < WALL_MS) {
     await sleep(POLL_MS)
     try {
-      const view = await rpc('agentTeams/view', { agentId: lead })
+      const view = await teamView()
       sawCompleted = (view.tasks ?? []).some(t => t.status === 'completed')
     } catch { /* ignore */ }
   }
