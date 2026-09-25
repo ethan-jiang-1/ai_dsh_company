@@ -108,7 +108,9 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
   web profile 上，别碰日用 home。
 - **FAQ 12 的坑要背**：dsh web 多开窗口第 4 个卡住 = rev 轮换 + 陈旧缓存 index（动态模块
   404）。demo 前升级过 vendor/dsh 的话，按 FAQ 12 的 runbook 重打补丁/重启/验证。
-- **槽位探索工具**：运行中的动态包可用 `cordis_inspect what:"client"` 查询活槽位树；
+- **槽位探索工具**：运行中的组合用 `cordis_inspect_list` 发现 Inspect Provider 与方法、
+  `cordis_inspect_query` 按 provider schema 精确查询活槽位树（0.1.7 起仅此两个只读工具；
+  旧单工具形 `cordis_inspect what:"…"` 已随 rc.2 退役）；
   源码侧 `pnpm run gen-client-catalog` 生成全量槽位合同（cardinality/scope/occupants）。
   写 UI 前先对目录，别凭记忆猜槽位名。
 - **锁版本**：experimental 团队包（含它的 UI）无稳定性承诺——vendor 钉 tag +
