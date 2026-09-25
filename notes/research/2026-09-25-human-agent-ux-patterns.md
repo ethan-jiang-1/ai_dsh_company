@@ -2,7 +2,7 @@
 
 状态：阶段 0 完成（vendor 盘点 + 外部实践两路研究已回，候选集合成完毕；外部检索一手为主，Horvitz 两篇 PDF 未逐字核——如实标注）
 
-> owner RFC = [proposed/human-agent-integration](../proposed/2026-09-25-human-agent-integration.md)「定性：这是 UX 问题」节。
+> owner RFC = [proposed/human-agent-integration](../implemented/2026-09-25-human-agent-integration.md)「定性：这是 UX 问题」节。
 > 形状约束（判"成不成立"的底）：审批**轮内有效 + fail-closed**（`ctx.approval` 管线）；无界面外推送 seam
 > （搁置池「界面外推送」判定）；v1 **单操作者**坐在驾驶舱前（未来多物理人、各有各的班）；一切以**会话为中心**。
 > 已有地基（不算缺口）：审批闸门 `request_signoff`（attention-e2e 7/7 全回路实证）、问询两条路

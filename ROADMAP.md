@@ -10,9 +10,6 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **① 加新东西 · 人机合一机制层**：RFC 同（内容层已交付的）[proposed/human-agent-integration](./notes/proposed/2026-09-25-human-agent-integration.md) 的 B1–B4——收件人路由（answerer 多收件人先核实）/
-  补料 · 建议 · 规矩回流三类载体 / 不在场机制化 / 证据回看。
-
 ## 磨清单（低优先磨活；不占轮、可后台派活；触发即升队）
 
 > 家规（notebook-hygiene 立，2026-09-25）：观察项与低优先磨活住这里，各带「谁来磨／何时磨」；
@@ -38,6 +35,8 @@
 | **并行快捷派活**（同时开几个 VP） | [delegation.md](./docs/delegation.md) §4.4 | 本组合无干净解法：缺 per-child composition 与不撞名的控制面 | 上游 seam |
 | **Demo 场景 D：可重放叙事场景** | [implemented/presentation-narrative](./notes/implemented/2026-09-24-presentation-narrative.md) §切片二 | 需求未出现：无放映场合；素材（新动议类型场景）已备 | demo／放映需求出现 |
 | **视觉打磨二期** | 同上 §切片三 | 走查触发型——未发现新问题不开（登记处即触发条件） | 用户走查驾驶舱页签发现新问题 |
+| **注意力中心「带假设走的」条目类别**（人机合一 B3） | [implemented/human-agent-integration](./notes/implemented/2026-09-25-human-agent-integration.md) B3 | 证伪：假设只写稿件未决项，无机器事件可折；造事件 = 发明假设工具（D13 边缘） | 多物理人进场，或假设事件源（上游 seam/假设工具）出现 |
+| **注意力面板/台账「决策来源显示」**（人机合一 B4） | 同上 B4 | client 红线（用户 2026-09-25 裁决退化）；审批成对审计 + journal 留痕已覆盖回看 | 用户点名做 client 增强 |
 | **M2 自定义 provider** | [index](./docs/index.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"的需求已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
 | **界面外推送 / 收件箱** | [org-presence-board（已毕业）](./notes/implemented/2026-09-22-org-presence-board.md) §背景 | egress 只有 `sessionTelemetry`（OTel）与 hooks，webhook 是 ingress；收件人是谁、粒度多细属部署选择 | 明确的物理人通知需求 + 选定部署面 |
 | **消息级协作动态流**（在场板 v1 的动态流只含成员/任务迁移差分） | R5b 机制核实（[implemented/2026-09-23-r5b-cockpit](./notes/implemented/2026-09-23-r5b-cockpit.md)） | 消息内容要 host 侧折 lead 会话 team 事件（`sessionProjections.stateOf(…, 'agentTeam')` 通道已核实存在）→ 自建 Typert Remote——但其**客户端 stub 由 vendor codegen 管线生成**，本 pack 无接线；自建 codegen 不值一轮 | 上游提供 pack 侧 remote stub 生成，或公开 host-only 投影的客户端读 RPC |
@@ -47,6 +46,14 @@
 - 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
+
+- 2026-09-25（**人机合一机制层交付 ⇒ 四项总 goal 全部完成，队列清空**）：B1 路由形状层（vendor 证伪 ⇒
+  退化 + 多 owner fixture 单测）；B2 human-loop-e2e 认证档 **12/12 ALL PASS**（补料/建议/规矩缺口→问人→
+  裁决→回流 journal 三链真证据）；B3/B4 按用户裁决 **退化收口**——证伪（缺事件源）与 client 增强进
+  搁置池（复活条件在列）。人机合一 RFC 全链毕业（阶段 0 → A1/A2 → B1–B4）。收尾 Note =
+  [implemented/human-agent-integration](./notes/implemented/2026-09-25-human-agent-integration.md)。
+  本轮四项总账：记事面治腐化（六点+门禁+清扫首跑）/ 长程 goal 形态 / 人机合一阶段0+内容层 / 机制层——
+  全部按各自 RFC 验收离队。
 
 - 2026-09-25（**人机合一 · 阶段 0 + 内容层交付**）：阶段 0 = [research/human-agent-ux-patterns](./notes/research/2026-09-25-human-agent-ux-patterns.md)
   （六问 × 12 外部模式 × vendor 六面全数判定；核心洞察 = "批准即立法"——递进是批准历史变规矩、不是自动放权）；

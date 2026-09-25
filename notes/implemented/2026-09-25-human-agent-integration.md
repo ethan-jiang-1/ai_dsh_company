@@ -1,6 +1,6 @@
 # 2026-09-25 · 人机合一：物理人 ↔ 分身（配对、四类接口、不在场策略）
 
-状态：proposed（内容层 A 已落地：阶段 0 候选集 + A1 owners.md + A2 手册四类接口规矩，证据 = intents 行与 [ux-patterns](../research/2026-09-25-human-agent-ux-patterns.md)；机制层 B1–B4 仍由本 RFC 拥有，由队列「人机合一机制层」接续——升 pin 前置已完成）
+状态：已交付（全链：阶段 0 研究 → A1/A2 内容层 → B1/B2 机制层 → B3/B4 按用户 2026-09-25 裁决**退化收口**；实况见文末）
 
 ## 问题
 
@@ -168,3 +168,34 @@ A1（人侧建模）是组织事实、不依赖 UX 结论，可与阶段 0 **并
   检查"（dev-loop §12），并在轮末收敛时并入 CHARTER 历史纪要。
 - **与人不在场现实的关系**：本 RFC 只定"带假设继续"的纪律，不解决"没人时怎么自动续跑"——那仍受上游
   seam 限制（见 [longrun-goal-shape](../implemented/2026-09-25-longrun-goal-shape.md) 与搁置池「自主节律」）。
+
+
+## 实施实况（2026-09-25 全链交付）
+
+**阶段 0**：[research/human-agent-ux-patterns](../research/2026-09-25-human-agent-ux-patterns.md)——六问 ×
+12 外部模式 × vendor 六面全判定（验收五项全过）；核心洞察 = **「批准即立法」**（现成世界无"随时间自动
+放权"，递进 = 批准历史沉淀为规矩后同类停止询问）。
+
+**内容层 A**：A1 = `company-workspace/kb/owners.md`（角色↔物理人 + 授权面四类，v1 单操作者）；
+A2 = 公司手册「人机接口」节（审批三档 / 规矩缺口三步回流 / 不在场分档 / 退化形状）——
+handbook-smoke ALL PASS。
+
+**机制层 B**：
+- **B1 收件人路由（退化，证伪在案）**：vendor 核实 ask/approval 均单 agent 作用域 waterfall、无
+  recipients 字段 ⇒ 平台层分发不成立；落 `src/lib/routing.ts` 纯形状层（消费 owners 表；roleOfWho +
+  routeByRole；查不到 = undefined fail-loud）+ 多 owner fixture 单测（两个角色分别路由到不同 owner，
+  B1 验收主断言；test 186 全绿）。真模型证据沿用 attention-e2e 7/7。
+- **B2 三类接口真证据**：`scripts/human-loop-e2e-smoke.mjs` 认证档 **12/12 ALL PASS**——补料（人写文件→
+  agent 读到并用）/ 建议（两轮零闸门、草稿照常、定稿消化建议）/ 规矩缺口（agent 问人→浏览器问询卡→
+  人点选项→回流 journal 日期+缺口+裁决+回落点→收口）。实证：相③ 需硬性步骤指令（模型方差红证在案）。
+- **B3 不在场机制化（退化收口，用户 2026-09-25 裁决 A）**：阻塞型挂起已由注意力中心如实显示
+  （四类条目 + attention-e2e 7/7）；**「带假设走的」条目类别证伪**——假设只写进稿件未决项（手册规矩，
+  B2 相② 已证可行），**无可折成面板条目的机器事件**；要造事件 = 给 pack 发明假设工具（D13 边缘）
+  ⇒ 进搁置池，复活条件 = 多物理人进场或假设事件源（上游 seam / 假设工具需求）出现。
+- **B4 证据回看（退化收口，同裁决）**：审批成对审计 + replay 可回放 ✓（既有）；问询记录在
+  tool/call + result（vendor 形状，答案可回看但欠结构化——vendor 限制记录在案）；「真人拍的板」的
+  journal 留痕由手册规矩 + B2 相③ 真证据覆盖 ⇒ **client 面板「决策来源显示」进搁置池**，复活条件 =
+  用户点名做 client 增强。
+
+**验证总账**：verify ALL PASS / test 186/186 / handbook-smoke / attention-e2e 7/7 /
+human-loop-e2e 12/12；外部来源已登记 index §外部研究材料登记。
