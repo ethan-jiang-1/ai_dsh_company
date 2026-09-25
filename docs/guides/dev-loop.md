@@ -333,6 +333,12 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 | 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../release.md)） | pack 依赖、安装形状、built 启动器改动；或其属于关键验收时 |
 | 认证档（真模型） | 分钟级 | 按面选择 `preset-smoke` / `probe-smoke` / `handbook-smoke` / `presence-e2e-smoke` / `attention-e2e-smoke`（人机三节点全回路） | 改动影响相应真模型行为或验收要求认证时；不因“轮末/每轮”机械重跑 |
 
+**证明边界（每层只证明自己能观察的性质）**：verify 证结构不证行为；keyless 单测证模块正例与错误，
+不证装配与真入口；client-load 证挂载零失败不证内容；delegation/replay 证可见边界与组合复现，不证设计
+取舍；release-smoke 证安装形状不证语义；认证档证真行为不证跨面正确。换档先问"这一层能证明我关心的
+性质吗"，不为安心堆档（对照《Agent-ready Development》05 六层反馈；判定见
+[harness-alignment 台账](../../notes/research/2026-09-25-harness-alignment-ledger.md) §B）。
+
 **三条硬规矩**：
 
 1. **真模型 / 真浏览器不进迭代环的秒级回归档**：keyless 单测与结构检查保持快速；认证档仅在受影响面或验收要求时运行，不按“轮末/每轮”机械触发。需要真入口 → 写 `scripts/*-smoke.mjs`，别塞进 `tests/`。**这条有机械门禁**：`tests/layering.spec.ts` 扫 `tests/**`，出现 `node:child_process` / playwright /

@@ -343,3 +343,24 @@ ai_dsh_company/
   `packages/<one-expert>/`，加 registry + templates。
 - 要给 DSH 上游提 seam（比如 per-teammate composition）→ 方案 B 通道进 DSH repo 做，本 repo
   只留消费者。
+
+## 10. 改动归属表：改什么 → 去哪个面 → 该面验收
+
+> 对照《Agent-ready Development》repo-harness/04 的 "Where new behavior goes"（判定与理由 =
+> [harness-alignment 台账](../../notes/research/2026-09-25-harness-alignment-ledger.md) §C）：
+> fresh agent 不该拼三处文档才答出"这个改动放哪、什么算完成"。
+
+| 改什么 | 首选落点 | 该面最小验收 |
+|---|---|---|
+| 角色 persona / skills / KB 事实 | `presets/<role>/`（preset 只放差异，共享行走 host 层） | `preset-smoke`（真挂载）+ 内容档 probe |
+| 组合行（registry / 预设 / 工具行） | `cordis.patch.yml` + `dsh.bundle.patch` 数组 | `pnpm verify`（preset 结构 / 行依赖）+ `preset-smoke` |
+| host 行为（审批线 / org 工具） | `packages/company-pack/src/` | `pnpm test` + 边界改动加 `delegation-smoke` |
+| client 面（品牌 / 委派卡 / 在场板） | `src/client/`（两半编译，见 dev-loop §7） | `tsc -b` + `client-load-smoke`；行为变更用 replay `--ui` |
+| 会话回放资产 | `snapshots/<场景>/`（世代不删；行为变更随 diff 重录） | `replay-smoke` |
+| 文档 / 合同 / 流程 | 对应 owner（docs/ 或 notes/，路由见 [index](../index.md)） | `pnpm verify`（链接 / 预算 / 结构） |
+| vendor 行为 | **不改**——三条正路：bundle patch / 提上游升 pin / 先证伪再自建（AGENTS §vendor 铁律） | `pnpm verify`（vendor-pin/clean）+ 升 pin 走 release.md |
+| 依赖 / 安装形状 | pack manifest + peers（版本谱系唯一见 AGENTS §vendor 簿记） | `release-smoke` |
+
+落点全在既有面上（不新增目录）。升级条件（何时拆包 / 何时上 registry）见 §9。keyless 测试集中
+在根 `tests/`（每 spec 对应一面）是**有意选择**：单包阶段集中放置比散进包内更可检（分层门禁与
+layering 守卫都按根布局写）。
