@@ -7,7 +7,7 @@
 ROADMAP §磨清单（notebook-hygiene 立）现有 4 项低优先磨活无主：三条执行期观察项
 （事件复盘场成员 journal 缺席〔W8 同款第二次〕/ CEO journal 文件名自记日期漂移 / q3 场 `final.md`
 换行不合规）+ snapshots 与 live 盘差异逐项语义目录。它们是"发现的真问题"，正是
-[longrun-goal-shape](./2026-09-25-longrun-goal-shape.md) 定义的**打磨型输入源**——放着不清，
+[longrun-goal-shape](../implemented/2026-09-25-longrun-goal-shape.md) 定义的**打磨型输入源**——放着不清，
 下次复盘还会撞同样的坑。
 
 ## 方案
