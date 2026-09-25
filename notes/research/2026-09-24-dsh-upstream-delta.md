@@ -1,7 +1,7 @@
 # 2026-09-24 · DSH 上游增量盘点：rc.2 → 0.1.7-rc.1（基座轮前置研究）
 
 状态：仍在用——升 pin 已毕业（[implemented/pin-upgrade-0.1.7-rc.2](../implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md)，
-方案与取舍在那查）；本稿活价值 = §④ 15 条收割项（[收割轮 RFC](../proposed/2026-09-25-harvest-round.md) 的判定输入）
+方案与取舍在那查）；本稿活价值 = §④ 15 条收割项（[收割轮 RFC](../implemented/2026-09-25-harvest-round.md) 的判定输入）
 + §⑤⑥⑦ 风险/增量明细，另被 [harness-alignment-ledger](./2026-09-25-harness-alignment-ledger.md) 交叉引用（收割项⑤⑬）。
 毕业动作 = 收割轮收口后，结论落该轮收尾 Note / harvest-ledger，本稿删除（全文归 git）。
 

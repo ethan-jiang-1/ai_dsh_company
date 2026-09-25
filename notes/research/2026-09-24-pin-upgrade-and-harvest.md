@@ -2,7 +2,7 @@
 
 状态：半消化——升级方案半已被收尾 Note 取代（[implemented/pin-upgrade-0.1.7-rc.2](../implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md)：
 三步走方案 + 输掉的方案俱在那查）；剩余活价值 = 收割审计部分（15 条收割项立项判据 + 自治 seam 复活判据核对输入，
-喂 [收割轮 RFC](../proposed/2026-09-25-harvest-round.md)）。毕业动作 = 收割轮收口后删除（全文归 git）。
+喂 [收割轮 RFC](../implemented/2026-09-25-harvest-round.md)）。毕业动作 = 收割轮收口后删除（全文归 git）。
 
 ## 问题
 

@@ -34,7 +34,7 @@ owner Note「输掉的方案」节，正文删。
 | 2026-09-25-pin-upgrade-impact | 已消化：A–D 四组事实（install 阻塞、D27 硬阻塞、CI=true 逃逸口、vendor clean 报错）全部已在 [pin-upgrade 收尾 Note](./2026-09-25-pin-upgrade-0.1.7-rc.2.md)「实施实况」节 | **删**；末次 SHA `6f57fe5`；引用改写 ×4（收尾 Note 两处 / intents / ROADMAP 历史段） |
 | 2026-09-25-harness-alignment-ledger | 仍在用：dev-loop §9.1 / index / architecture / README 四处活引用，不照搬清单 owner = 其 §四.4 | 留；状态行「已交付」→「活参考」 |
 | 2026-09-25-human-agent-ux-patterns | 消化完但有后续读者（UX 候选判定唯一家；搁置池「视觉打磨二期」待复活）——**用户裁定留** | 留；转活参考；顺手修 label rot（链接文字仍写 proposed/ 而目标已毕业） |
-| 2026-09-24-dsh-upstream-delta | 仍在用：§④ 15 收割项 = [收割轮 RFC](../proposed/2026-09-25-harvest-round.md) 判定输入；ledger 交叉引用其收割项⑤⑬ | 留；状态行改指收割轮 + 毕业动作 |
+| 2026-09-24-dsh-upstream-delta | 仍在用：§④ 15 收割项 = [收割轮 RFC](../implemented/2026-09-25-harvest-round.md) 判定输入；ledger 交叉引用其收割项⑤⑬ | 留；状态行改指收割轮 + 毕业动作 |
 | 2026-09-24-pin-upgrade-and-harvest | 半消化：升级方案半已被收尾 Note 取代；收割审计半喂收割轮 | 留；状态行写明「半消化」+ 剩余活价值 + 毕业动作 |
 
 ## 输掉的方案
