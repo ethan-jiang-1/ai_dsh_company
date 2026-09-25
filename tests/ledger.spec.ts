@@ -12,15 +12,20 @@ import { join } from 'node:path'
 const REAL_LEDGER = readFileSync(join('company-workspace/kb/motion-ledger.md'), 'utf8')
 
 describe('parseMotionLedger', () => {
-  it('真台账：10 场动议全部解析，字段逐列正确', () => {
+  it('真台账：11 场动议全部解析，字段逐列正确（第 11 场 = UX 实验续约评估，2026-09-25）', () => {
     const rows = parseMotionLedger(REAL_LEDGER)
-    expect(rows).toHaveLength(10)
+    expect(rows).toHaveLength(11)
     expect(rows[0]).toMatchObject({ slug: 'agentic-coworker', date: '2026-09-22', kind: '评估', final: '✅' })
     const q3 = rows.find(row => row.slug === 'q3-business-review')
     expect(q3).toMatchObject({ wallClock: '241s', roles: 'CEO+CFO+COO' })
     expect(q3!.summary).toContain('判不了')
     const untimed = rows.find(row => row.slug === 'integration-50w-signoff')
     expect(untimed).toMatchObject({ final: '—', wallClock: '—' })
+    // UX 实验场（renewal-x-2026）：双签被拒（fail-closed 实证）+ 缺口裁定进结论。
+    const renewal = rows.find(row => row.slug === 'renewal-x-2026')
+    expect(renewal).toBeDefined()
+    expect(renewal!.summary).toContain('不签 8.2 折')
+    expect(renewal!.summary).toContain('≤$200')
   })
 
   it('表头不符返回空（台账被改坏 → 面板空态而非渲染错行）', () => {
@@ -43,11 +48,11 @@ describe('parseMotionLedger', () => {
 })
 
 describe('ledgerStats', () => {
-  it('真台账统计：10 场 / 9 成品 / 7 未记（墙钟未记含「—」）', () => {
+  it('真台账统计：11 场 / 10 成品 / 8 未记（含 UX 实验场；墙钟未记含「—」）', () => {
     const rows = parseMotionLedger(REAL_LEDGER)
     const stats = ledgerStats(rows)
-    expect(stats.total).toBe(10)
-    expect(stats.finals).toBe(9)
-    expect(stats.untimed).toBe(7)
+    expect(stats.total).toBe(11)
+    expect(stats.finals).toBe(10)
+    expect(stats.untimed).toBe(8)
   })
 })

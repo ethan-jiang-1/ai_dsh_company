@@ -103,30 +103,54 @@ export function DagPanel({ layout }: { readonly layout: DagLayout }) {
       role="img"
       aria-label="任务依赖图"
     >
+      <defs>
+        {/* 箭头随边走色（context-stroke）——完成边高亮色、等待边灰。 */}
+        <marker id="wk-arrow" viewBox="0 0 8 8" refX={7} refY={4} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
+          <path d="M 0 0 L 8 4 L 0 8 z" fill="context-stroke" />
+        </marker>
+      </defs>
       {layout.edges.map(edge => (
         <path
           key={`${edge.from}->${edge.to}`}
           className="wk-edge"
           data-done={edge.done}
           d={edge.path}
+          markerEnd="url(#wk-arrow)"
           /* pathLength=1：把 dash 单位归一化 ⇒ dashoffset 1→0 的"画线"与真实长度无关。
              颜色/线宽/dash 全在 CSS（.wk-edge[data-done]）——含浅色对比度修正。 */
           pathLength={1}
         />
       ))}
       {layout.nodes.map(node => (
-        <g key={node.id} className="wk-node" transform={`translate(${String(node.x)} ${String(node.y)})`}>
+        <g
+          key={node.id}
+          className="wk-node"
+          data-status={node.status}
+          data-ready={node.ready}
+          transform={`translate(${String(node.x)} ${String(node.y)})`}
+        >
           <rect
+            className="wk-dag-card"
             width={node.width}
             height={node.height}
             rx={8}
             fill="var(--dsw-alias-bg-layer-1)"
             stroke="var(--dsw-alias-border-l2)"
           />
-          <foreignObject x={8} y={7} width={node.width - 16} height={node.height - 14}>
+          <foreignObject x={9} y={7} width={node.width - 18} height={node.height - 12}>
             <div className="wk-dag-node" {...{ xmlns: 'http://www.w3.org/1999/xhtml' }}>
-              <StateDot state={taskDot(node.status)} size={8} />
-              <span className="wk-dag-node-title" title={`${node.id}：${node.subject}`}>{node.subject}</span>
+              <div className="wk-dag-node-head">
+                <StateDot state={taskDot(node.status)} size={8} />
+                <span className="wk-dag-node-title" title={`${node.id}：${node.subject}`}>{node.subject}</span>
+              </div>
+              <div className="wk-dag-meta">
+                {node.ownerLabel !== null && <span className="wk-dag-owner">{node.ownerLabel}</span>}
+                {node.waitingOn > 0
+                  ? <span className="wk-dag-wait">等 {String(node.waitingOn)} 项</span>
+                  : node.status === 'completed'
+                    ? <span className="wk-dag-done">已完成</span>
+                    : <span className="wk-dag-ready">可开工</span>}
+              </div>
             </div>
           </foreignObject>
         </g>

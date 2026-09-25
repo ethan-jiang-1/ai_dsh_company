@@ -123,7 +123,24 @@ const CSS = `
 .wk-bar-fill { height: 100%; background: var(--dsw-alias-state-business-primary); }
 
 /* DAG */
-.wk-dag-node { display: flex; align-items: flex-start; gap: 5px; }
+/* 依赖图节点卡：标题行 + 元信息行（owner 徽章 / 等待·就绪状态）。 */
+.wk-dag-node { display: flex; flex-direction: column; gap: 3px; }
+.wk-dag-node-head { display: flex; align-items: flex-start; gap: 5px; }
+.wk-dag-meta { display: flex; align-items: center; gap: 6px; padding-left: 13px; }
+.wk-dag-owner {
+  font-size: 10px; line-height: 1.2; color: var(--dsw-alias-label-secondary);
+  background: var(--dsw-alias-bg-layer-2); border-radius: 4px; padding: 1px 5px;
+  max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.wk-dag-wait { font-size: 10px; color: var(--dsw-alias-state-warning-primary, #b8860b); }
+.wk-dag-ready { font-size: 10px; color: var(--dsw-alias-state-success-primary); }
+.wk-dag-done { font-size: 10px; color: var(--dsw-alias-label-secondary); }
+/* 状态化：进行中 = 主色描边；完成 = 整卡降透明度（依赖图一眼看出"卡在哪一拨"）。 */
+.wk-node[data-status='in_progress'] .wk-dag-card { stroke: var(--dsw-alias-state-business-primary); stroke-width: 1.5; }
+.wk-node[data-status='completed'] { opacity: 0.55; }
+/* 边：完成 = 高亮实线；等待 = 灰虚线（流动动画保留）。 */
+.wk-edge { stroke: var(--dsw-alias-border-l3); fill: none; stroke-width: 1.5; }
+.wk-edge[data-done='true'] { stroke: var(--dsw-alias-state-success-primary); }
 .wk-dag-node-title {
   font-size: 11px;
   line-height: 1.3;

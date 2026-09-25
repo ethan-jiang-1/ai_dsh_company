@@ -17,6 +17,8 @@ export interface DagNode {
   readonly ownerLabel: string | null
   /** 层级（0 = 无依赖的根）。 */
   readonly level: number
+  /** 还没走完的前置数（0 = 依赖已就绪；徽章用）。 */
+  readonly waitingOn: number
   /** 同级内序号（0 起，= 输入序）。 */
   readonly order: number
   readonly x: number
@@ -50,7 +52,7 @@ export interface DagOptions {
   readonly padding?: number
 }
 
-const DEFAULTS = { nodeWidth: 168, nodeHeight: 44, hGap: 28, vGap: 56, padding: 12 } as const
+const DEFAULTS = { nodeWidth: 176, nodeHeight: 54, hGap: 32, vGap: 60, padding: 16 } as const
 
 /**
  * 分层：`level(n) = max(level(blocker) + 1)`，根 = 0。
@@ -100,12 +102,35 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
   const padding = options.padding ?? DEFAULTS.padding
 
   const levels = dagLevels(tasks)
+  const byId = new Map(tasks.map(task => [task.id, task]))
+  const statusOf = new Map(tasks.map(task => [task.id, task.status]))
   const byLevel = new Map<number, TaskRow[]>()
   for (const task of tasks) {
     const level = levels.get(task.id) ?? 0
     const bucket = byLevel.get(level)
     if (bucket === undefined) byLevel.set(level, [task])
     else bucket.push(task)
+  }
+  // 同级排序 = **blocker 重心**（barycenter）：每层按"它的前置们在上一层里的平均位置"排序，
+  // 输入序只做平局兜底——一条链上的节点会尽量排在彼此正下方，边交叉显著减少（≤20 节点规模够用）。
+  const orderByLevel = new Map<number, Map<string, number>>()
+  const sortedByLevel = new Map<number, TaskRow[]>()
+  for (const level of [...byLevel.keys()].sort((a, b) => a - b)) {
+    const bucket = [...(byLevel.get(level) ?? [])]
+    if (orderByLevel.size > 0 && level > 0) {
+      const prevOrder = orderByLevel.get(level - 1) ?? new Map<string, number>()
+      bucket.sort((a, b) => {
+        const bary = (task: TaskRow): number => {
+          const positions = task.blockedBy.map(id => prevOrder.get(id)).filter((v): v is number => v !== undefined)
+          return positions.length === 0 ? Number.MAX_SAFE_INTEGER : positions.reduce((sum, v) => sum + v, 0) / positions.length
+        }
+        return bary(a) - bary(b)
+      })
+    }
+    const order = new Map<string, number>()
+    bucket.forEach((task, index) => order.set(task.id, index))
+    orderByLevel.set(level, order)
+    sortedByLevel.set(level, bucket)
   }
 
   const levelKeys = [...byLevel.keys()].sort((a, b) => a - b)
@@ -116,10 +141,11 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
 
   const nodes: DagNode[] = []
   for (const level of levelKeys) {
-    const bucket = byLevel.get(level) ?? []
+    const bucket = sortedByLevel.get(level) ?? []
     const rowWidth = bucket.length * nodeWidth + Math.max(0, bucket.length - 1) * hGap
     const startX = padding + (width - padding * 2 - rowWidth) / 2
     bucket.forEach((task, order) => {
+      const liveBlockers = task.blockedBy.filter(id => byId.has(id))
       nodes.push({
         id: task.id,
         subject: task.subject,
@@ -127,6 +153,7 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
         ready: task.ready,
         ownerLabel: task.ownerName,
         level,
+        waitingOn: liveBlockers.filter(id => (statusOf.get(id) ?? 'pending') !== 'completed').length,
         order,
         x: round(startX + order * (nodeWidth + hGap)),
         y: round(padding + level * (nodeHeight + vGap)),
