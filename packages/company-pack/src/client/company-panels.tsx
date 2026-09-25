@@ -122,37 +122,36 @@ export function DagPanel({ layout }: { readonly layout: DagLayout }) {
         />
       ))}
       {layout.nodes.map(node => (
-        <g
-          key={node.id}
-          className="wk-node"
-          data-status={node.status}
-          data-ready={node.ready}
-          transform={`translate(${String(node.x)} ${String(node.y)})`}
-        >
-          <rect
-            className="wk-dag-card"
-            width={node.width}
-            height={node.height}
-            rx={8}
-            fill="var(--dsw-alias-bg-layer-1)"
-            stroke="var(--dsw-alias-border-l2)"
-          />
-          <foreignObject x={9} y={7} width={node.width - 18} height={node.height - 12}>
-            <div className="wk-dag-node" {...{ xmlns: 'http://www.w3.org/1999/xhtml' }}>
-              <div className="wk-dag-node-head">
-                <StateDot state={taskDot(node.status)} size={8} />
-                <span className="wk-dag-node-title" title={`${node.id}：${node.subject}`}>{node.subject}</span>
+        // 两层 g 分家（2026-09-25 实验现场红证）：外层只管**定位**（transform 属性）；
+        // 内层 wk-node 只管**入场动画**——动画关键帧里的 CSS transform 会覆盖 SVG transform
+        // 属性，合在一层 = 动画结束态 translateY(0) 把定位吃掉 ⇒ 所有节点堆到 (0,0) 叠成一摞。
+        <g key={node.id} transform={`translate(${String(node.x)} ${String(node.y)})`}>
+          <g className="wk-node" data-status={node.status} data-ready={node.ready}>
+            <rect
+              className="wk-dag-card"
+              width={node.width}
+              height={node.height}
+              rx={8}
+              fill="var(--dsw-alias-bg-layer-1)"
+              stroke="var(--dsw-alias-border-l2)"
+            />
+            <foreignObject x={9} y={7} width={node.width - 18} height={node.height - 12}>
+              <div className="wk-dag-node" {...{ xmlns: 'http://www.w3.org/1999/xhtml' }}>
+                <div className="wk-dag-node-head">
+                  <StateDot state={taskDot(node.status)} size={8} />
+                  <span className="wk-dag-node-title" title={`${node.id}：${node.subject}`}>{node.subject}</span>
+                </div>
+                <div className="wk-dag-meta">
+                  {node.ownerLabel !== null && <span className="wk-dag-owner">{node.ownerLabel}</span>}
+                  {node.waitingOn > 0
+                    ? <span className="wk-dag-wait">等 {String(node.waitingOn)} 项</span>
+                    : node.status === 'completed'
+                      ? <span className="wk-dag-done">已完成</span>
+                      : <span className="wk-dag-ready">可开工</span>}
+                </div>
               </div>
-              <div className="wk-dag-meta">
-                {node.ownerLabel !== null && <span className="wk-dag-owner">{node.ownerLabel}</span>}
-                {node.waitingOn > 0
-                  ? <span className="wk-dag-wait">等 {String(node.waitingOn)} 项</span>
-                  : node.status === 'completed'
-                    ? <span className="wk-dag-done">已完成</span>
-                    : <span className="wk-dag-ready">可开工</span>}
-              </div>
-            </div>
-          </foreignObject>
+            </foreignObject>
+          </g>
         </g>
       ))}
     </svg>

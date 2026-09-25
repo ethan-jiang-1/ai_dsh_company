@@ -14,7 +14,7 @@ const REAL_LEDGER = readFileSync(join('company-workspace/kb/motion-ledger.md'), 
 describe('parseMotionLedger', () => {
   it('真台账：11 场动议全部解析，字段逐列正确（第 11 场 = UX 实验续约评估，2026-09-25）', () => {
     const rows = parseMotionLedger(REAL_LEDGER)
-    expect(rows).toHaveLength(11)
+    expect(rows).toHaveLength(12)
     expect(rows[0]).toMatchObject({ slug: 'agentic-coworker', date: '2026-09-22', kind: '评估', final: '✅' })
     const q3 = rows.find(row => row.slug === 'q3-business-review')
     expect(q3).toMatchObject({ wallClock: '241s', roles: 'CEO+CFO+COO' })
@@ -48,11 +48,11 @@ describe('parseMotionLedger', () => {
 })
 
 describe('ledgerStats', () => {
-  it('真台账统计：11 场 / 10 成品 / 8 未记（含 UX 实验场；墙钟未记含「—」）', () => {
+  it('真台账统计：12 场 / 11 成品 / 9 未记（含两场 UX 实验场）', () => {
     const rows = parseMotionLedger(REAL_LEDGER)
     const stats = ledgerStats(rows)
-    expect(stats.total).toBe(11)
-    expect(stats.finals).toBe(10)
-    expect(stats.untimed).toBe(8)
+    expect(stats.total).toBe(12)
+    expect(stats.finals).toBe(11)
+    expect(stats.untimed).toBe(9)
   })
 })
