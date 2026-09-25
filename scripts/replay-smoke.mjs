@@ -248,7 +248,11 @@ async function driveScenario({ patchSource, env, tasks }) {
   else cpSync(join(ROOT, 'company-workspace/AGENTS.md'), join(workspace, 'AGENTS.md'))
   const patchRoot = join(runRoot, '.snapshot-patches')
   mkdirSync(patchRoot, { recursive: true })
-  const patch = materializeProfilePatch(patchSource, runRoot, patchRoot, 0)
+  // rc.2：启动器签名多了 profile 参数（`materializeProfilePatch(source, cwd, profile, targetDir, index)`）
+  // —— profile = 接收测试包链接的 profile 目录（本 lane 用临时 home 的 web profile）。
+  const profileDir = join(runRoot, '.dsh', 'profiles', 'web')
+  mkdirSync(profileDir, { recursive: true })
+  const patch = materializeProfilePatch(patchSource, runRoot, profileDir, patchRoot, 0)
   if (env.credentials) {
     copyFileSync(env.credentials, join(runRoot, '.dsh', '.credentials.yaml'))
     delete env.credentials

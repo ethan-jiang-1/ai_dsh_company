@@ -105,6 +105,16 @@
 
 **未验证 / 待续**：
 - `probe --full` / `handbook-smoke` / `delegation-smoke` / `presence-e2e` / `attention-e2e`（真模型档）**本轮未跑**——升 pin 已改变角色会话的基座，建议作为 ① 的收尾认证补跑。
-- 快照/回放档（`replay-smoke`、`snapshot-motion`）未跑；rc.2 有 V4 会话格式与投影面变化，录制快照可能需要重录（单向门）。
+- **快照/回放档**（本轮实测）：`snapshot-motion-smoke` **PASS**；`replay-smoke` 走通一半——
+  ① 启动器签名变了（rc.2 `materializeProfilePatch(source, cwd, profile, targetDir, index)` 多一个 `profile` 参数），
+  已按新签名修正（传临时 home 的 web profile 目录）；② 之后卡在**夹具仍按旧预设模型声明**
+  （`snapshots/{r2-motion,r3-delegation}/replay/cordis*.yml` 里的 `@deepseek-ai/dsh-agent-presets` + roots 扫描，
+  该包在 0.1.7 已拆）⇒ `session/create: Unknown agent preset: ceo`。
+  **待决**：夹具改为 rc.2 声明模型（五行 `dsh-agent-preset` 会把 500+ 行预设内容复制两份，违"一处事实一个家"），
+  或让 replay lane 改为**把 pack 装进临时 profile**（与 preset-smoke/release-smoke 同路，夹具只留 registry 行）。
+  倾向后者；本条为 ① 收尾剩余项。
+- **真模型探针**（本轮实测）：`probe-smoke --full` 三跑 = 12/15、14/15（180s 超时）、13/15（串行 180s），
+  **每次失败的项都不同**且日志无网络/限流线索 ⇒ 判定为提供方延迟抖动，非基座回归；仍留观察项（"探针超时偏紧"已有前例）。
+  `handbook-smoke` ALL PASS；`deliverables-check` ALL PASS（9 成品 / 23 过程稿 / 0 违规）。
 - vendor 自建的嵌套不兼容需要一条长期解（D27）：或让 vendor 独立 install/build（改本仓 workspace 镜像策略），或给 `sync-dsh` 加"独立 staging 树构建"步骤。
 - 15 条收割项（阶段 2）未开始。
