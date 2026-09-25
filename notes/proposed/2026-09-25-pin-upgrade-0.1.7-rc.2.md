@@ -24,21 +24,32 @@
 1. **阶段 0 · 靶校正【已取证，待收口】**：rc.2 已抓进 `vendor/dsh`（**https 官方 GitHub，7.7s；不动 origin、
    不动 vendor HEAD**；ssh:443 在本机 VPN 后不通）。`rc.1 → rc.2` 增量已核实并写进增量报告 §⑦；两份研究材料的
    靶已改 rc.2，ROADMAP 已按 rc.2 立项。**取源结论 = https**；submodule 的 origin 仍指本机研究树（未改）。
-2. **阶段 1 · 影响面实测 + 升级七步**：**先换基座、构建、跑现有门禁**（`verify` / `test` / `preset-smoke` /
-   `client-load` / `probe` / `release-smoke`）产**《实测影响面清单》**——逐条记：哪道门禁、红还是绿、归属
-   原因（peer 名 / preset 声明形状 / 投影 API / 快照格式 / 构建配方）、适配动作。然后再照增量报告 §⑥ 逐项
-   适配，不另发明：① `sync-dsh`（submodule 前移 + 簿记 + 兼容矩阵加列 + verify 双门禁重校）；② peerDependencies
-   重写（`dsh-agent-presets` 在 0.1.7 不存在，拆为 `dsh-agent-preset` + `dsh-agent-preset-registry`；range 按新
-   release 对齐——材料给的是 `^0.1.7-rc.1`，钉 rc.2 时以兼容门禁实测定）；③ preset 声明迁移（工程量主体；
-   完成定义 = `preset-smoke` 真挂载）；④ client 数据层重写（`remote.agentTeams` → 投影；完成定义 = client-load +
-   presence-e2e + 快照回归）；⑤ 快照回归策略（V3 照跑 + 新录 V4 + 单向门写进 Note）；⑥ 发布链全量（`release-smoke`
-   穿新 peer 兼容门禁 + `deliverables-check` + `delegation-smoke`）；⑦ 拆分 = 升级单独立项，15 条收割项升级后独立进队列。
+2. **阶段 1 · 三步走（2026-09-25 阶段 0 实证后改序：官方脚本的事务模型装不下消费面改动）**
+   - **①a 候选测量窗口**（登记偏离，短窗口、不留 commit）：把 submodule HEAD 切到 `dsh-v0.1.7-rc.2`
+     （tag checkout，vendor tracked 零改动）→ `pnpm install` + host 面构建 → 跑现有门禁
+     （`verify` / `test` / `preset-smoke` / `client-load` / `probe`）→ 产**《实测影响面清单》**
+     （哪道门禁、红/绿、归属原因、适配动作）→ **还原 HEAD**。窗口期内 `vendor-pin` 门禁红属已知。
+   - **①b 消费面适配**（在旧 pin 上落地并 commit）：peerDependencies 重写（`dsh-agent-presets` 在 0.1.7
+     不存在 ⇒ `dsh-agent-preset` + `dsh-agent-preset-registry`；range 对齐新 release）+ **bundle 补丁行**
+     （[cordis.patch.yml](../../packages/company-pack/cordis.patch.yml) 引用的旧包名）+ preset 声明迁移
+     （完成定义 = `preset-smoke` 真挂载）+ client 数据层重写（`remote.agentTeams` → 投影；
+     完成定义 = client-load + presence-e2e + 快照回归）。静态门禁可过（`pack-compat` 只查"矩阵含当前 tag"，
+     不查 peer range）；**代价 = 这一两个 commit 处于"声明已朝 rc.2、基座仍旧 pin"的短暂不一致**（可回滚）。
+   - **①c 官方落账**：`node scripts/sync-dsh.mjs --pin dsh-v0.1.7-rc.2 --process-review <证据 JSON>`
+     ——事务式：verify → fetch tag → 暂存新簿记/矩阵 → checkout 候选 → install → vendor 自建 → test +
+     built `release-smoke` → 全过才写簿记/矩阵 → 再 verify。失败自动回滚；迭代到全绿。
+   - 细项照增量报告 §⑥：⑤ 快照回归策略（V3 照跑 + 新录 V4 + 单向门写进 Note）；⑥ 发布链全量
+     （`release-smoke` 穿新 peer 兼容门禁 + `deliverables-check` + `delegation-smoke`）；⑦ 15 条收割项升级后独立进队列。
 3. **阶段 2 · 收割项登记**（升级后）：从增量报告 §④ 的 15 条里逐条判"对本 pack 的用途 + 建议立项与否"，
    各给归宿（ROADMAP / 搁置池）。其中与**自治 seam** 相关的（job 完成唤醒 idle owner、workflow、
    `schedule` 现状）顺手核对，作为搁置池「自主节律」的复活判据输入——只登记证据，不因它改升级范围。
 
 ## 输掉的方案
 
+- **先 `sync-dsh` 再改 peerDependencies（原计划 ①→②）**：阶段 0 实证证伪——脚本要求"干净树 + 起手
+  `verify` 绿 + 全程消费面不变"，而本包的 bundle 补丁引用 `@deepseek-ai/dsh-agent-presets`，该包在 rc.2
+  **不存在**（拆为 `dsh-agent-preset` + `dsh-agent-preset-registry`）⇒ release-smoke 在候选上必挂，脚本
+  无法承载消费面改动；输给"先测量、再适配、后官方落账"（①a→①b→①c）。
 - **停在 rc.1**：rc.2 紧随其后（仅发布工程 commit），单独钉 rc.1 一落地即落后；输给"钉最新 rc"。
 - **钉研究树 HEAD 而非 tag**：vendor 铁律与 [release.md](../../docs/release.md) 要求钉 SHA/tag 并走发布门禁，
   HEAD 未过门禁；输给"钉 tag"。

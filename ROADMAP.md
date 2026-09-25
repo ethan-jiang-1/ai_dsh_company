@@ -10,9 +10,9 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **① 换基座 · 升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2**（用户 2026-09-25 定为最优先：先换基座才知道影响面）：
-  RFC = [proposed/pin-upgrade-0.1.7-rc.2](./notes/proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md)——阶段 0 靶校正（上游已发
-  rc.2 = `477b4f42`；先定取源）→ 阶段 1 先跑现有门禁产《实测影响面清单》再七步适配；15 条收割项不捆绑。
+- **① 换基座 · 升 pin dsh-v0.1.5-rc.2 → dsh-v0.1.7-rc.2**（用户定为最优先；阶段 0 已取证，靶 = `477b4f42`）：RFC =
+  [proposed/pin-upgrade-0.1.7-rc.2](./notes/proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md)——①a 候选测量窗口（切 rc.2 跑门禁产
+  《实测影响面清单》→ 还原）→ ①b 消费面适配（peer 名/range + bundle 行 + preset 声明 + client 数据层）→ ①c 官方 `sync-dsh` 落账；收割项不捆绑。
 - **② 打造自己的 harness · 以《Agent-ready Development》为镜**（依赖 ①；用户定档在打扫卫生之前）：RFC =
   [proposed/harness-alignment](./notes/proposed/2026-09-25-harness-alignment.md)——27 篇**全读、分层用力**（9+6 逐条判 /
   其余抓新形状）→ 采纳·不采纳判定台账 → 小步落地；红线（目录归属 / 门禁语义 / preset·client 数据层）先报人。
