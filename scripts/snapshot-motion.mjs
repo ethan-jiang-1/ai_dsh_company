@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // 动议归档：会话日志 + workspace.actual 实测态；独立 oracle 仅从显式输入导入且永不覆盖。
+// 何时跑：一场动议收尾、要把它的会话与工作区落成回归资产时（**条目收尾动作之一**；不是门禁、不是探针）
 //
 // 形状沿用 R1（`snapshots/r1-motion/`）与 vendor `snapshots/AGENTS.md`：一场景一目录 + snapshot.yml；
 // replay harness 已交付（scripts/replay-smoke.mjs）；本目录用途 = **基线对照**（行为变了就 diff）。

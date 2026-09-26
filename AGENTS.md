@@ -36,8 +36,7 @@ source dev/env.sh                      # 双 home 兜底 + 裸 dsh 拦截（DSH_
 pnpm verify                            # 结构门禁（清单唯一源 = scripts/verify.mjs；跑一次看 PASS 行即得全表，本行不复述）
 pnpm test                              # keyless 回归（vitest；数量与耗时以实跑为准；真模型/浏览器不进回归，tests/layering.spec.ts 守卫）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）
-node scripts/preset-smoke.mjs          # preset 改动的完成定义：boot 真 web 逐角色建会话——挂载失败只有这里
-                                       #   抓得到（dump/roster 看不见；需 DSH_HOME + 已装 pack）
+node scripts/preset-smoke.mjs          # preset 改动的**完成定义**（触发条件与成本见该脚本头注；挂载失败只有它抓得到）
 ```
 
 其余门禁/冒烟脚本见 `scripts/`：**每个门禁/探针脚本（`*-{smoke,probe,audit,check}.mjs`）头注写明「何时跑」与成本**（`script-triggers` 门禁强制自述，
@@ -82,7 +81,7 @@ changes）= `vendor/dsh/AGENTS.md` Conventions 节；探索路由与概念→源
 | 源码面/产物面不混（paths 指 src） | `AGENTS.md` Conventions | 根 `tsconfig.json` extends vendor base |
 | vendor 钉版本 + manifest/SHA + 同步程序；**升 pin 时流程合同对 vendor 重校** | `vendor/README.md` | AGENTS.md vendor 簿记 + `scripts/sync-dsh.mjs` |
 | 日志税：model-visible ⟺ logged | `AGENTS.md` Conventions | guides/dev-loop §3 设计四问② |
-| 机械可查的不变量进执行门禁 + **每个新门禁带反证**（红→还原→绿） | `AGENTS.md` Conventions | `scripts/verify.mjs`（**清单唯一源**：md-utf8/newline、md-links 含 notes/ 树、doc-budget、**bare-path**、preset 结构、claude-symlink、vendor-pin/clean、pack-bundle、pack-compat、preset-row-deps、client-halves、proposal-scheduled/graduated） |
+| 机械可查的不变量进执行门禁 + **每个新门禁带反证**（红→还原→绿） | `AGENTS.md` Conventions | `scripts/verify.mjs`（**清单唯一源 = 那个文件自己**——跑一次看 PASS 行即得全表；**本表不复述门禁名**，复述必漂） |
 | **文档卫生（本仓政策，D26）**：删重复/失效指令、并重复事实家、修活指针；保留仍指导决策的取舍与反例。行数只作观察，不作为删改目标 | [D26](docs/index.md)；适配理由见本轮 Note | guides/dev-loop §12 |
 
 ### vendor 铁律（本仓强制边界；受更高层指令与工具权限约束，机械门禁在 `pnpm verify`）

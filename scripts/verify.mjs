@@ -87,7 +87,10 @@ const NOW_FILES = (() => {
   // ⚠ 边界与 `markdown-links.mjs` 一致：**排除 `deliverables/` 与 `journal/`**——那是公司
   // *产出物与记忆*（正文里出现 `packages/company-pack/...` 之类是业务叙述，不是仓库指针），
   // 拿仓库指针判据去扫它们必出假阳性（实测扩面第一跑即误报一份 final.md）。
+  // `tests/**` 也纳入 pin-currency 的扫描面（2026-09-26 补）：夹具里的 pin 字面量同样会漂，
+  // 实测全仓 tests/ 只有一处且等于当前 pin ⇒ 纳入零成本。
   return out.concat(
+    walkMd(join(root, 'tests')),
     walkMd(join(root, 'docs')),
     walkMd(join(root, 'notes')).filter(p => p.split('/').length === 2),
     walkMd(join(root, 'company-workspace')).filter(p => !/^company-workspace\/(deliverables|kb\/[^/]+\/journal)\//.test(p)),

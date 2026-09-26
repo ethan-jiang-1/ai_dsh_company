@@ -330,16 +330,16 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 ——**别把逐个脚本的触发条件抄回本表**（2026-09-26 实测本表曾漏 6 个已存在脚本，而 AGENTS.md 又把
 "何时跑"指回本表，成环）：
 
-| 层 | 时间 | 跑什么 | 何时跑 |
-|---|---|---|---|
-| 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接与物理行预算门禁） | 文档、链接、结构或流程合同改动 |
-| **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器） | 行为代码改变时选会因回归失败的最窄测试；跨面变更再扩大 |
-| 装配 keyless | ~10s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） | 客户端装配/入口改变，且接受条件涉及挂载 |
-| 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） | 委托边界改变或该验收明确要求；升 pin 时按发布合同复核 |
-| **重放 lane（第三档，无 key）** | ~11s | `replay-smoke`（会话日志 + sidecar；已声明 workspace oracle 的场景另比完整工作区）；`--ui`（+真浏览器端到端）——要起进程/浏览器，不进 `pnpm test` | 录制行为、组合、委派 UI 或 workspace replay 改动 |
-| CLI 集成（keyless，需子进程） | 秒级 | `node scripts/snapshot-motion-smoke.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） | snapshot-motion CLI 或 workspace capture 接线改动 |
-| 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../release.md)） | pack 依赖、安装形状、built 启动器改动；或其属于关键验收时 |
-| 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件见其头注「何时跑」**；`script-triggers` 门禁强制） | 改动影响相应真模型行为或验收要求认证时；不因“轮末/每轮”机械重跑 |
+| 层 | 时间 | 跑什么（代表脚本；**它自己的触发条件在头注**） |
+|---|---|---|
+| 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接、物理行预算、裸路径与 pin 一致性门禁） |
+| **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器） |
+| 装配 keyless | ~10s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） |
+| 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
+| **重放 lane（第三档，无 key）** | ~11s | `replay-smoke`（会话日志 + sidecar；已声明 workspace oracle 的场景另比完整工作区）；`--ui`（+真浏览器端到端）——要起进程/浏览器，不进 `pnpm test` |
+| CLI 集成（keyless，需子进程） | 秒级 | `node scripts/snapshot-motion-smoke.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） |
+| 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../release.md)） |
+| 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件与成本见其头注「何时跑」**；`script-triggers` 门禁强制） |
 
 **证明边界（每层只证明自己能观察的性质）**：verify 证结构不证行为；keyless 单测证模块正例与错误，
 不证装配与真入口；client-load 证挂载零失败不证内容；delegation/replay 证可见边界与组合复现，不证设计
