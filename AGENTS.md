@@ -10,7 +10,7 @@
 CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 门禁校验）
 ROADMAP.md              根部队列（接下来 + 搁置池；▶ = 当前条目；完成即离队——D24 自 docs/plans 迁入）
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml（bundle 行）、src/client/（client 面：品牌皮肤）、src/（host 代码 R3+）
-company-workspace/      运行时"公司共享盘"（会话 cwd）：kb/<role>/（CHARTER+journal）、templates/、deliverables/
+company-workspace/      运行时"公司共享盘"（会话 cwd）：**AGENTS.md（公司手册，随成员会话注入）**、kb/<role>/（CHARTER+journal）、templates/、deliverables/
 vendor/dsh/             DSH 源码 submodule（钉 SHA，**只读铁律**：见 §vendor 铁律，`pnpm verify` 强制）
 docs/                   当前合同与导航：index（地图+台账）→ design/ guides/ + 顶层合同
 notes/                  **开发记忆与证据链**：intents.md → proposed/ → implemented/；否决理由随 owner Note 的「输掉的方案」节保留（不设 rejected/ 目录——2026-09-25 裁断，负知识已有家、开目录造空壳）；postmortem/ 记事故；research/ 记仍在用的外部研究
@@ -32,7 +32,7 @@ git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 corepack enable pnpm                   # 一次性：pnpm 走 corepack（packageManager 钉 11.7.0）
 pnpm install                           # workspace 解析；引导全配方（含 vendor 构建）见 guides/dev-loop §7
 source dev/env.sh                      # 双 home 兜底 + 裸 dsh 拦截（DSH_HOME=dev/harness-home）。⚠ coding 会话里
-                                       #   DSH_HOME 继承且带日用值，漏 source 不报错、安静用错 home（guides/dev-loop §6.5）
+                                       #   DSH_HOME 继承且带日用值，漏 source 不报错、安静用错 home（guides/dev-loop §6 第 5 条）
 pnpm verify                            # 结构门禁（清单唯一源 = scripts/verify.mjs；跑一次看 PASS 行即得全表，本行不复述）
 pnpm test                              # keyless 回归（vitest；数量与耗时以实跑为准；真模型/浏览器不进回归，tests/layering.spec.ts 守卫）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）
@@ -45,7 +45,7 @@ node scripts/preset-smoke.mjs          # preset 改动的完成定义：boot 真
 发布/升 pin = [release.md](docs/release.md)。web 观察窗 = `pnpm dsh web -- --port 3081 --no-open`
 （3080 是本 GUI 占用；构建三件事见 guides/dev-loop §7）。
 
-**push 走 `ssh.github.com:443`**（22 端口被拦；环境状态见最近收尾 Note 的环境状态节）。
+**push 走 `ssh.github.com:443`**（22 端口被拦；`origin` 已指向该 URL，`git push` / `git fetch` 直接用即可）。
 
 ## 密钥
 
@@ -71,10 +71,10 @@ changes）= `vendor/dsh/AGENTS.md` Conventions 节；探索路由与概念→源
 | DSH 纪律 | 权威（vendor 树） | 本 repo 落点 |
 |---|---|---|
 | 任务反馈面 | `packages/todo` / `packages/plan`（按各自条件使用） | 适用规则唯一见 guides/dev-loop §0.5/§1 |
-| docs = 当前合同（一处事实一个家，**只写 now**） | `docs/AGENTS.md` | `docs/` 按性质分层（D10）；本仓物理行预算与队列规则见 verify / guides/dev-loop §12 |
-| 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么） | `.agents/notes/README.md` | `notes/intents.md → implemented/`；收尾 Note 模板 = guides/dev-loop §12 |
+| docs = 当前合同（一处事实一个家，**只写 now**） | `docs/AGENTS.md` | `docs/` 按性质分层（D10）；物理行预算 = `scripts/verify.mjs` 的 `DOC_LINE_BUDGETS`；队列规则 = `ROADMAP.md` §维护规则 |
+| 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么） | `.agents/notes/README.md` | `notes/intents.md → implemented/`；收尾 Note 要写什么 = guides/dev-loop §12「记录与收尾」；范式照 [journal-presence-mechanism](notes/implemented/2026-09-26-journal-presence-mechanism.md) |
 | 按变更选择相关检查；只报告实际跑过的检查 | `AGENTS.md` Run relevant checks | 本地流程见 guides/dev-loop §1/§9.1/§12 |
-| **完成定义 = 该面最小"真检查"通过；发现权在代理一侧** | `docs/testing.md`；`docs/postmortem/0003-web-agent-gui-feedback-loop.md` | guides/dev-loop §1 第⑥步 + §7 两道防线；preset 类改动完成定义 = `preset-smoke.mjs`（真挂载） |
+| **完成定义 = 该面最小"真检查"通过；发现权在代理一侧** | `docs/testing.md`；`docs/postmortem/0003-web-agent-gui-feedback-loop.md` | guides/dev-loop §1「完成定义」段 + §7 两道防线；preset 类改动完成定义 = `preset-smoke.mjs`（真挂载） |
 | 测试分层：真模型 / 真浏览器不进回归；行为变更同 diff 更新录制快照 | `docs/testing.md` | guides/dev-loop §9.1 + 机械门禁 `tests/layering.spec.ts`（已反证）+ 认证档按面选跑 |
 | 真实入口路径（发布产物 `lib/` 跑）+ 真实安装形状 | `docs/testing.md` | `release-smoke`（`npm pack`→干净 profile→`plugin add`），合同 `docs/release.md` |
 | 源码面/产物面不混（paths 指 src） | `AGENTS.md` Conventions | 根 `tsconfig.json` extends vendor base |
