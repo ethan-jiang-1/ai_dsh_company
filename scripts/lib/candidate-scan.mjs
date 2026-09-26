@@ -89,3 +89,129 @@ export function scanR3(briefText, draftFiles, motionHasFinal) {
   }
   return { candidates, blocked, closed: false }
 }
+
+// ═══════════════ 金标准标注（实验 B 打分腿；纯逻辑，IO 在 scripts/candidate-scan-eval.mjs）═══════════════
+
+/** 标注状态枚举（格式约定唯一见标注文件头部；改枚举要同步改约定）。 */
+export const GOLD_STATUSES = ['待办', '阻塞', '待核实', '取消', '已出稿', '完成', '关闭']
+/** 真候选 / 待核实 = 该显示（显示类别不同但都算"surfaced"）。 */
+const goldPending = (s) => s === '待办' || s === '待核实'
+
+/** 解析标注文件全文 → 行数组。格式约定唯一见标注文件头部（`；` 分隔条目；条目 = 角色·T号·状态·一句话）。 */
+export function parseLabelsText(text) {
+  const rows = []
+  let section = null
+  for (const line of text.split('\n')) {
+    if (line.startsWith('## 合成语料')) { section = 'synthetic'; continue }
+    if (line.startsWith('## 真盘动议')) { section = 'real'; continue }
+    if (line.startsWith('## ') || line.startsWith('# ')) { section = null; continue }
+    if (!section || !line.trim().startsWith('|') || /\|-{2,}/.test(line)) continue
+    const cells = line.split('|').slice(1, -1).map(c => c.trim())
+    if (cells.length < 4 || !cells[0] || cells[0] === 'case' || cells[0] === 'slug') continue
+    const tasks = []
+    // 分隔符 = `；`，但描述文字里也可能出现 `；` ⇒ 碎片不以下一条的「角色·」开头时并回上一条
+    const ENTRY_HEAD = /^(vp-eng|vp-sales|coo|cfo|ceo|——)·/
+    const fragments = []
+    for (const raw of cells[1].split('；')) {
+      if (raw === '' || raw === '无') continue
+      if (fragments.length > 0 && !ENTRY_HEAD.test(raw)) fragments[fragments.length - 1] += `；${raw}`
+      else fragments.push(raw)
+    }
+    for (const entry of fragments) {
+      const f = entry.split('·')
+      if (f.length < 3) throw new Error(`标注条目缺字段：「${entry}」（${cells[0]}）`)
+      const [role, task, status] = [f[0], f[1], f[2]]
+      if (!GOLD_STATUSES.includes(status)) throw new Error(`状态非法：「${status}」（${cells[0]}：${entry}）`)
+      tasks.push({ role, task, status })
+    }
+    const approvalMatch = /审批×(\d+)/.exec(cells[3])
+    rows.push({
+      id: cells[0], kind: section, tasks,
+      closed: tasks.some(t => t.status === '关闭'),
+      approvals: approvalMatch ? Number(approvalMatch[1]) : 0,
+      remind: cells[2], zeroNote: cells[3],
+    })
+  }
+  return rows
+}
+
+/**
+ * 三规则 vs 金标准打分（纯逻辑）。判据 = 评审 §五 B：召回/精确/错误"已完成"/错误"需立即处理"
+ * + 零容忍计数（审批漏报 / 取消误报与静默漏显示 / 阻塞漏显示 / 已关闭动议仍报）。
+ * @param rows parseLabelsText 的输出
+ * @param scans Map<id, {r1, r2, r3, drafts}>——同 id 的三规则实跑结果与稿清单（IO 由调用方做）
+ * @returns {M, zeroTol, details}——M 按 R1（角色级）/R2/R3（任务级）累加
+ */
+export function scoreLabels(rows, scans) {
+  const M = { R1: freshMetric(), R2: freshMetric(), R3: freshMetric() }
+  function freshMetric() {
+    return { tp: 0, reported: 0, falseImmediate: 0, blockedAsCandidate: 0, staleAsCandidate: 0, miss: 0, missWithDraft: 0 }
+  }
+  const zeroTol = { approvalMiss: 0, cancelReported: 0, cancelSilent: 0, blockedMiss: 0, closedButReported: 0 }
+  const details = []
+
+  for (const row of rows) {
+    const scan = scans.get(row.id)
+    if (scan === undefined) throw new Error(`标注行没有对应的扫描结果：${row.id}`)
+    const { r1, r2, r3, drafts } = scan
+
+    const goldTasks = new Map(row.tasks.filter(t => t.status !== '关闭').map(t => [t.task, t]))
+    const goldPendingRoles = new Set(row.tasks.filter(t => goldPending(t.status) && t.role !== '——').map(t => t.role))
+    const goldBlockedRoles = new Set(row.tasks.filter(t => t.status === '阻塞' && t.role !== '——').map(t => t.role))
+    const roleHasDraft = (r) => drafts.some(f => f.replace(/\.md$/, '').replace(/-review$/, '') === r)
+
+    // R1：角色级
+    for (const c of r1) {
+      M.R1.reported++
+      if (goldPendingRoles.has(c.role)) M.R1.tp++
+      else if (goldBlockedRoles.has(c.role)) M.R1.blockedAsCandidate++
+      else { M.R1.falseImmediate++; if (row.closed) zeroTol.closedButReported++ }
+    }
+    for (const role of goldPendingRoles) {
+      if (!r1.some(c => c.role === role)) {
+        M.R1.miss++
+        if (roleHasDraft(role)) M.R1.missWithDraft++
+      }
+    }
+
+    // R2 / R3：任务级
+    for (const rule of ['R2', 'R3']) {
+      const reports = rule === 'R2' ? r2 : r3.candidates
+      for (const t of reports) {
+        M[rule].reported++
+        const gold = goldTasks.get(t.task)
+        if (gold !== undefined && goldPending(gold.status)) {
+          M[rule].tp++
+          // 显示类别错误：待核实（稿与状态行矛盾）被当**候选**报出 ⇒ 人会去"立即处理"一件没核实的事
+          if (gold.status === '待核实') M[rule].staleAsCandidate++
+        }
+        else if (gold !== undefined && gold.status === '阻塞') M[rule].blockedAsCandidate++
+        else if (gold !== undefined && gold.status === '取消') { M[rule].falseImmediate++; zeroTol.cancelReported++ }
+        else { M[rule].falseImmediate++; if (row.closed) zeroTol.closedButReported++ }
+      }
+      for (const [id, gold] of goldTasks) {
+        if (!goldPending(gold.status)) continue
+        if (!reports.some(t => t.task === id)) {
+          M[rule].miss++
+          if (gold.role !== '——' && roleHasDraft(gold.role)) M[rule].missWithDraft++
+        }
+      }
+    }
+
+    // 取消：静默漏显示（规则无"取消"通道 ⇒ 已取消事项在人视角不可见——评审零容忍口径）
+    zeroTol.cancelSilent += row.tasks.filter(t => t.status === '取消').length
+
+    // R3 专属：blocked 清单 vs 金标准阻塞项（阻塞该显示为"依赖未齐"；两处都不在 = 漏显示）
+    for (const gold of row.tasks.filter(t => t.status === '阻塞' && t.task !== '——')) {
+      const inBlocked = r3.blocked.some(b => b.task === gold.task)
+      const inCand = r3.candidates.some(c => c.task === gold.task)
+      if (!inBlocked && !inCand) zeroTol.blockedMiss++
+    }
+
+    // 审批：三条规则结构性看不见 ⇒ 全部计漏报（零容忍）
+    zeroTol.approvalMiss += row.approvals
+
+    details.push({ id: row.id, r1, r2, r3, gold: row.tasks, approvals: row.approvals })
+  }
+  return { M, zeroTol, details }
+}
