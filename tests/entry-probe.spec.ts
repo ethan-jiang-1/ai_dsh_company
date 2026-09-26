@@ -105,6 +105,22 @@ describe('入口探针不使用全文兜底', () => {
     expect(result.failures[0]).toContain('可重跑')
   })
 
+  // 2026-09-26 两次实测（Q4/Q5）：源文件**折行**处有换行、引用自然没有那个空格（中文无词边界）；
+  // 源文件在**下一行注释**里、引用会丢掉 `// ` 前缀。两类都是排版，不是幻觉。
+  it('归一化覆盖折行与注释前缀（中文无词边界）', () => {
+    const src = '（submodule HEAD == 簿记 SHA + 工作树零改动，\n`pnpm verify` 双门禁强制，均带反证）'
+    const reader = (path: string) => (path === 'AGENTS.md' ? src : evidence.quote)
+    const a = good()
+    a.answers[0].evidence = [{ path: 'AGENTS.md', quote: '（submodule HEAD == 簿记 SHA + 工作树零改动，pnpm verify 双门禁强制，均带反证）' }]
+    expect(evaluateEntryProbe(JSON.stringify(a), reader).failures).toEqual([])
+
+    const src2 = '// `--dump-config` 只打印 profile 树，\n// 两者都看不到 config 校验；'
+    const reader2 = (path: string) => (path === 'AGENTS.md' ? src2 : evidence.quote)
+    const b = good()
+    b.answers[0].evidence = [{ path: 'AGENTS.md', quote: '`--dump-config` 只打印 profile 树，两者都看不到 config 校验；' }]
+    expect(evaluateEntryProbe(JSON.stringify(b), reader2).failures).toEqual([])
+  })
+
   it('引用比对忽略排版空白，但文字仍须真实存在', () => {
     // 忠实复刻 Q5 现场：源文件用空格对齐，模型引用时把它规范化了。
     const aligned = 'node scripts/preset-smoke.mjs          # preset 改动的完成定义'
