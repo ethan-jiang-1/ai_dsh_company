@@ -179,6 +179,26 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 **人之间的交接**（机制上没有通道，这是流程级）：说一句话——"CEO 派了 `<slug>`，你看一下" /
 "我写完了"。协议五步见 [multi-human.md](./multi-human.md) §3。
 
+**可直接粘贴的开场白**（把 `<slug>` 换成当场用的，如 `frame-z-2026`；先确认 `deliverables/` 没有同名）：
+
+```
+【门甲 · CEO】这场是多人模式。动议：客户 Z 要一份 8.8 折的三年框架协议，今天要结论。
+请立项并写任务书到 deliverables/<slug>/drafts/ceo.md，分派 CFO 出经济性、COO 出承接；
+不要 spawn 成员代劳。写完任务书就停，等人回话。
+
+【门乙 · CFO】读 deliverables/<slug>/drafts/ceo.md（CEO 给你的任务书），
+按它出你的稿 deliverables/<slug>/drafts/cfo.md，并按手册「收工留痕」写你的 journal。
+按规矩处理签字线。
+
+【门丙 · COO】读 deliverables/<slug>/drafts/ceo.md，出 deliverables/<slug>/drafts/coo.md + 写你的 journal。
+
+【门甲 · CEO（收口）】CFO 与 COO 的稿已就位，读 deliverables/<slug>/drafts/ 下的稿，
+合稿 deliverables/<slug>/final.md 并 present。
+```
+
+⚠ **别在门乙/门丙那边说"你以 CEO 的身份…"**——每扇门只用**它自己角色**的权限；越权的话，
+`owners.md` 的授权面就成了摆设（demo 的卖点正是"谁签得动"按人分）。
+
 **实测基线**：**两扇门排练已 PASS**（2026-09-26，排练场：ceo 门落任务书 → cfo 门读它、出稿、写 journal
 且日期用占位）；真盘那一场待跑（跑完把会话归档到 `snapshots/` 并回填本节）。
 **预算**：3 人、每人单轮出稿、工具 ≤10/人、总墙钟 ≤10 分钟；不新增调研。
