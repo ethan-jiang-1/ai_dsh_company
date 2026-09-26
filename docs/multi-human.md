@@ -3,7 +3,7 @@
 > 顶层合同：**多个物理人**在同一家公司共享盘上协作的**形态、开门配方、边界与迁移清单**。
 > 人侧归属与授权面的事实家 = [`company-workspace/kb/owners.md`](../company-workspace/kb/owners.md)；
 > 成员侧的协作规矩 = [`company-workspace/AGENTS.md`](../company-workspace/AGENTS.md)。
-> 来源与取舍（含输掉的方案）= [proposed/multi-human-role-routing](../notes/proposed/2026-09-26-multi-human-role-routing.md)。
+> 来源与取舍（含输掉的方案）= [proposed/multi-human-role-routing](../notes/implemented/2026-09-26-multi-human-role-routing.md)。
 > **不许复杂化**（用户定的）：不搞 client/server、不搞账号体系、**不在 DSH 里造"人"这一层**。
 
 ## 0. 先读这条：机制边界（决定一切怎么摆）
@@ -36,7 +36,7 @@
 实测依据：`scripts/budget-signoff-probe.mjs` 的正例——CFO 根会话确实会发 `request_signoff`。
 
 （手册「问人两条路」与「审批三档」目前只写了成员那一侧，**缺这条区分**——已登记待补，
-见 [RFC](../notes/proposed/2026-09-26-multi-human-role-routing.md) 进度表 f 行。）
+见 [RFC](../notes/implemented/2026-09-26-multi-human-role-routing.md) 进度表 f 行。）
 
 ## 1. 形态（已定，可逆）
 

@@ -10,9 +10,6 @@
 
 **三种状态**：**▶ = 当前在办**（同一时刻只应有一个）；**⏸ = 阻塞中**（等人裁决或等外部触发——轮到也不开工，按 dev-loop §0.5 报告阻塞、触发条件与复活方）；**无标记 = 已批准待办**（**范围**已在 RFC 里获批；轮到它时**是否还需 Plan Mode 呈批按 dev-loop §0.5 判**——用户已明确批准具体计划时不重复求批，否则默认先呈批。本节只管**次序**，不管授权）。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有 ⏸，逐项报告其阻塞/触发条件及谁或什么能复活，不从历史条目推断任务。
 
-▶ **① 多人协作：同一个工作目录，各自开自己的门**（用户 2026-09-26 批"开工"）：RFC = [proposed/multi-human-role-routing](./notes/proposed/2026-09-26-multi-human-role-routing.md) §采用方案。
-  形态**已在 RFC 自裁**（每角色一个浏览器 profile，可逆）；本条目交付 = 多门配方 + owners.md 多物理人 + 迁移清单合同 + 一场真动议验收（后者需人到场点）。
-
 
 ## 磨清单（低优先磨活；不占轮、可后台派活）
 
@@ -100,7 +97,7 @@
 | OTLP 产品遥测 | 同上 #15 | 默认不挂载 | 运营侧使用数据需求 |
 | **M2 自定义 provider** | [index](./docs/index.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"的需求已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
 | **界面外推送 / 收件箱** | [org-presence-board（已毕业）](./notes/implemented/2026-09-22-org-presence-board.md) §背景 | egress 只有 `sessionTelemetry`（OTel）与 hooks（命令型、拦截式），webhook 是 ingress；**2026-09-26 需求已出现**（真动议的问询卡只在"当时连着的人"那里出现，人离台即丢）——但**用户裁定 demo 阶段不做**：约定 = "人在台面前"成立即可，不上通知/收件箱（避免 demo 期复杂度）。**核过两件事**：① 钉住的 DSH 核心**没有 mobile**（`apps/` 只有 cli/desktop/desktop-host/web，docs/website 零 "mobile"、无 PWA manifest）；② 但**生态有现成做法**——[web-push 通知（tasks/approvals/questions）](https://github.com/blauerberg/dsh-web-push-notification)、[手机寻呼机 + 通知栏直接审批](https://github.com/wg5759/dsh-pager)、[移动端 Web shell 插件](https://github.com/jasondu/dsh-ui-mobile)、[dispatch 锁屏审批](https://github.com/alextangson/dsh-dispatch)。MVP 时按依赖门槛（成熟/采用/可审计）评估，**demo 期借设计不装**（同 2026-09-23 看板插件的裁决） | 到 MVP 阶段，或明确要求"人不在台面前也要收到"时 |
-| **委派会话的人机审批路由** | [proposed/multi-human-role-routing](./notes/proposed/2026-09-26-multi-human-role-routing.md) §机制结论（2026-09-26 实测） | 机制边界：子会话 `approval/policy` 硬编码 `never`（`child-agent.ts:254`）⇒ **分身发起的签字审批自动被拒、到不了人**；人机审批实际是 Lead 专属。双签线因此只能落到 CEO 一扇门 | 上游任一 seam：① 委派会话的 `approvalPolicy` 可配置；② 审批按授权面路由（而非按发起 agent） |
+| **委派会话的人机审批路由** | [implemented/multi-human-role-routing](./notes/implemented/2026-09-26-multi-human-role-routing.md) §机制结论（2026-09-26 实测） | 机制边界：子会话 `approval/policy` 硬编码 `never`（`child-agent.ts:254`）⇒ **分身发起的签字审批自动被拒、到不了人**；人机审批实际是 Lead 专属。双签线因此只能落到 CEO 一扇门 | 上游任一 seam：① 委派会话的 `approvalPolicy` 可配置；② 审批按授权面路由（而非按发起 agent） |
 | **消息级协作动态流**（在场板 v1 的动态流只含成员/任务迁移差分） | R5b 机制核实（[implemented/2026-09-23-r5b-cockpit](./notes/implemented/2026-09-23-r5b-cockpit.md)） | 消息内容要 host 侧折 lead 会话 team 事件（`sessionProjections.stateOf(…, 'agentTeam')` 通道已核实存在）→ 自建 Typert Remote——但其**客户端 stub 由 vendor codegen 管线生成**，本 pack 无接线；自建 codegen 不值一轮 | 上游提供 pack 侧 remote stub 生成，或公开 host-only 投影的客户端读 RPC |
 
 ## 维护规则
