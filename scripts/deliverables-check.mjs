@@ -127,11 +127,37 @@ const result = auditDeliverables({
   ...(ONLY_SLUG === undefined ? {} : { onlySlug: ONLY_SLUG }),
 })
 
+// 观察项②（本脚本侧，不进纯逻辑库）：盘上每个 slug 都该在动议台账里有行。
+// 为什么（2026-09-26 实测）：sea-entry-2026 与 renewal-y-2026 的产物进了真盘、也 present 过，
+// 却**没有台账行**——台账是"经营历史唯一事实家"，缺行 = 历史有洞。
+// 只警告不判红：动议跑完到轮末收敛之间，台账行本来就还没写（收敛时才补）。
+const ledgerPath = join(workspace, 'kb/motion-ledger.md')
+const ledgerSlugs = new Set()
+if (existsSync(ledgerPath)) {
+  for (const line of readFileSync(ledgerPath, 'utf8').split('\n')) {
+    const cell = /^\|\s*([a-z0-9][a-z0-9-]*)\s*\|/.exec(line)?.[1]
+    if (cell !== undefined && cell !== 'slug') ledgerSlugs.add(cell)
+  }
+}
+const onDiskSlugs = [...new Set([...result.finals, ...result.drafts].map(row => row.slug))].sort()
+const unledgered = onDiskSlugs.filter(slug => !ledgerSlugs.has(slug))
+const warnings = [...result.warnings]
+if (existsSync(ledgerPath) && unledgered.length > 0) {
+  warnings.push({
+    code: 'slug-unledgered',
+    detail: `盘上有目录但 \`kb/motion-ledger.md\` 没有行的 slug：${unledgered.join(', ')}——台账是经营历史的唯一事实家；轮末收敛时补行（跑完未收敛期间出现属正常）`,
+  })
+}
+
 const leadSessions = sessions.filter(s => s.delegationDepth === 0 && s.agentPreset === 'ceo').length
 console.log(`deliverables-check: ${workspaceRel}${LEGACY_FLAT ? '（平铺旧形状口径）' : ''}${ONLY_SLUG === undefined ? '' : `（只审 ${ONLY_SLUG}）`}`)
 console.log(`  会话日志 ${sessions.length} 份（其中 Lead ${leadSessions} 份）`)
 console.log(`  成品 ${result.finals.length} 份：${result.finals.map(f => f.path).join(' / ') || '（无）'}`)
 console.log(`  过程稿 ${result.drafts.length} 份`)
+if (warnings.length > 0) {
+  console.log(`  观察项 ${warnings.length} 条（不判违规，但每次都提醒）：`)
+  for (const w of warnings) console.log(`    ${w.code} | ${w.detail}`)
+}
 if (result.violations.length === 0) {
   console.log('  违规 0 条 —— ALL PASS')
   process.exit(0)

@@ -33,6 +33,18 @@ export const DRAFTS_DIRNAME = 'drafts'
 /** 平铺旧形状里表达"这份就是定稿"的后缀（R2 用过 `reconcile-package-final.md`）。 */
 const LEGACY_FINAL_SUFFIX = '-final'
 
+/**
+ * **观察项**（不是违规，不影响退出码）：值得每次提醒、但不该判红的信号。
+ * 为什么要有这一档（2026-09-26）：slug 撞车在本仓**已经发生过**（renewal-y-2026 两场动议共用），
+ * 判红会让门禁永久带伤；但它的真实代价（产物互相覆盖、判据看不出）值得每次都摆到人眼前。
+ */
+export const WARNING = {
+  /** 同一 slug 的成品被**多个 Lead 会话**声明过 ⇒ 产物互相覆盖。 */
+  SLUG_COLLISION: 'slug-collision',
+  /** 盘上有 `deliverables/<slug>/` 但动议台账没有该行（跑完到轮末收敛之间的正常态，也含真漏登）。 */
+  SLUG_UNLEDGERED: 'slug-unledgered',
+}
+
 /** 判据违规代码（测试与脚本都按这些码断言，别用自由文本）。 */
 export const VIOLATION = {
   /** 盘上有成品，但没有任何 Lead 会话的 `present` 提及它。 */
@@ -194,6 +206,8 @@ export function auditDeliverables(input) {
   // 会永久污染此后每一轮审计）。
   const leadFinalIds = new Set()
   const leadDraftIds = new Set()
+  /** slug → 声明过它成品的 Lead 会话 id 集合（撞车检测用）。 */
+  const leadFinalSessions = new Map()
   const onDiskFinalIds = new Set()
   for (const file of onDisk) {
     const id = deliverableId(file)
@@ -208,8 +222,12 @@ export function auditDeliverables(input) {
       const id = deliverableId(path)
       if (id === undefined) continue
       if (id.kind === 'final') {
-        if (lead) leadFinalIds.add(idKey(id))
-        else if (onDiskFinalIds.has(idKey(id))) nonLeadFinalIds.add(idKey(id))
+        if (lead) {
+          leadFinalIds.add(idKey(id))
+          const who = leadFinalSessions.get(id.slug) ?? new Set()
+          who.add(session.id ?? '(会话无 id)')
+          leadFinalSessions.set(id.slug, who)
+        } else if (onDiskFinalIds.has(idKey(id))) nonLeadFinalIds.add(idKey(id))
       } else if (lead) {
         leadDraftIds.add(idKey(id))
       }
@@ -266,5 +284,16 @@ export function auditDeliverables(input) {
     })
   }
 
-  return { finals, drafts, violations }
+  // 观察项（不判违规）：同一 slug 的成品被多个 Lead 会话声明过 ⇒ 产物互相覆盖。
+  const warnings = []
+  for (const [slug, who] of leadFinalSessions) {
+    if (who.size > 1) {
+      warnings.push({
+        code: WARNING.SLUG_COLLISION,
+        slug,
+        detail: `slug \`${slug}\` 的成品被 ${who.size} 个不同的 Lead 会话声明过（产物会互相覆盖，而三态判据看不出撞车）——开新动议前先看 deliverables/ 有没有同名`,
+      })
+    }
+  }
+  return { finals, drafts, violations, warnings }
 }

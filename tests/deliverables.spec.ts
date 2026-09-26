@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { afterAll, describe, expect, it } from 'vitest'
 import {
   VIOLATION,
+  WARNING,
   auditDeliverables,
   classifyDeliverable,
   deliverableId,
@@ -126,6 +127,19 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
       sessions: [],
     })
     expect(result.violations.map(v => v.code)).toContain(VIOLATION.UNSHAPED_FILE)
+  })
+
+  // 2026-09-26 立（观察项档）：slug 撞车在本仓已真实发生（renewal-y-2026 两场动议共用 ⇒ 产物
+  // 互相覆盖，而三态判据看不出）。判红会让门禁永久带伤，故只警告；但必须每次都提醒。
+  it('观察项：同一 slug 的成品被多个 Lead 会话声明过 ⇒ 警告（不判违规）', () => {
+    const workspaceFiles = ['deliverables/pilot/final.md']
+    const lead = id => ({ id, agentPreset: 'ceo', delegationDepth: 0, presented: [{ path: 'deliverables/pilot/final.md' }] })
+    const one = auditDeliverables({ workspaceFiles, sessions: [lead('s1')] })
+    expect(one.warnings).toEqual([])                                  // 单来源：不报
+    const two = auditDeliverables({ workspaceFiles, sessions: [lead('s1'), lead('s2')] })
+    expect(two.warnings.map(w => w.code)).toEqual([WARNING.SLUG_COLLISION])
+    expect(two.warnings[0].slug).toBe('pilot')
+    expect(two.violations).toEqual([])                                // 警告**不**影响违规面
   })
 
   it('承诺权：非 Lead 会话 present 成品路径即越权（新形状下才判，legacy 是假阳性）', () => {
