@@ -51,8 +51,12 @@ this.ctx.waterfall(scopeTarget(req.agent, req.agent), 'approval/request', req,
 
 - **发卡时没客户端连着 ⇒ 瀑布立即落到 `unavailable`（fail-closed）**，`approval/asked` +
   `approval/decided {outcome:'unavailable'}` 照样成对落账——**不等待后来连接的客户端**；
-- 页面开着但**中途刷新/关闭** ⇒ client `pending.delegate()` ⇒ 瀑布走空 ⇒ 同样 `unavailable`
-  （这就是"刷新即丢"的精确机制）；
+- ~~页面开着但**中途刷新/关闭** ⇒ 同样 `unavailable`~~ **❌ 此推断被实测证伪（2026-09-26 暂停后复跑前）**：
+  用户关掉浏览器后，两张卡**没有**失败关闭，而是**无限挂起**（asked 1 / decided 0，轮次阻塞 20+ 分钟）。
+  `unavailable` 兜底只在**派发时就没有接听者**的情形成立；**已派发出去的请求，客户端断开不会让它落账**。
+  **干净解锁的正路 = `session/cancel`**（实测：两会话各落 `approval/decided {outcome:'cancelled'}`、
+  轮次正常收尾）——这也是一条要写进 runbook 的运维动作；
+- **正确结论**：卡的两种死法——派发时没人（`unavailable`，秒失败）/ 派发后没人答（**挂死**，需 cancel）。；
 - 接听者**按会话作用域**（`scopeTarget(req.agent, req.agent)`）⇒ **只开 CEO 标签时，
   CFO 的卡会立刻 `unavailable`**——两扇门必须**同时**开着才能各接各的卡。
 
@@ -92,8 +96,8 @@ this.ctx.waterfall(scopeTarget(req.agent, req.agent), 'approval/request', req,
 - **浏览器标签页标题**：跟着会话标题走（改名后标签也会带【角色】）——待用户侧栏确认。
 
 **暂停时的状态**（都可安全恢复）：
-- 两张卡仍挂起（asked ✓ / decided 0）——用户关掉标签 ⇒ 卡**干净失败关闭**（`unavailable`，
-  源码已核实），实验数据不丢；回头我在**新一轮**重新发卡即可；
+- 两张卡曾无限挂起（用户关页**没有**触发失败关闭——实测证伪了"关页⇒unavailable"的推断），
+  已用 `session/cancel` 干净解锁（各落 `cancelled`）；复跑时在新一轮重新发卡；
 - 段一产物全部已提交；段三脚本就绪。goal 已按用户要求暂停。
 
 ## 段二（两卡，等点）
