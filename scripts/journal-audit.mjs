@@ -161,12 +161,33 @@ function presence(workspace, role, motion) {
   return windowHit === null ? { level: 'missing', hit: null } : { level: 'suspect', hit: windowHit }
 }
 
+/**
+ * 格式检查（2026-09-26 加）：本轮真动议实测 **2/6 篇 journal 没以单个换行结尾**（手册明令的格式规则，
+ * md-newline 门禁事后才抓得到）⇒ 并进审计，让"格式不合规"和"缺席"一样当场可见。
+ */
+function formatViolations(workspace, motion) {
+  const bad = []
+  for (const role of ROLES) {
+    const dir = join(workspace, 'kb', role, 'journal')
+    if (!existsSync(dir)) continue
+    for (const name of readdirSync(dir)) {
+      const path = join(dir, name)
+      if (!statSync(path).isFile()) continue
+      if (motion.slug !== undefined && !name.includes(motion.slug)) continue
+      const body = readFileSync(path, 'utf8')
+      if (!body.endsWith('\n') || body.endsWith('\n\n')) bad.push(`${role}/${name}`)
+    }
+  }
+  return bad
+}
+
 const entries = candidates()
 console.log(`journal-audit: 扫 ${String(entries.length)} 个真盘会话（DSH_HOME=${HOME}）`)
 let violations = 0
 let suspect = 0
 let audited = 0
 let historical = 0
+let formatCount = 0
 for (const entry of entries) {
   const motion = motionOf(entry)
   if (motion.owners.length === 0) continue
@@ -177,14 +198,17 @@ for (const entry of entries) {
   const soft = rows.filter(row => row.level === 'suspect')
   violations += bad.length
   suspect += soft.length
-  const mark = bad.length > 0 ? '❌' : soft.length > 0 ? '⚠' : '✅'
+  const format = formatViolations(entry.workspace, motion)
+  formatCount += format.length
+  const mark = bad.length > 0 || format.length > 0 ? '❌' : soft.length > 0 ? '⚠' : '✅'
   const shortId = entry.sessionId.replace(/^session-/, '').slice(0, 8)
   console.log(`${mark} ${motion.slug ?? '(无 slug)'} @ ${new Date(entry.createdAt).toISOString().slice(0, 16)} 会话 ${shortId}`)
   const label = row => row.level === 'confirmed' ? '确认'
     : row.level === 'archived' ? `在场(已归档 ${String(row.hit)})`
       : row.level === 'suspect' ? `存疑(${String(row.hit)})` : '**缺席**'
   console.log(`   ${rows.map(row => `${row.role}:${label(row)}`).join('  ')}`)
+  if (format.length > 0) console.log(`   ⚠ 格式不合规（结尾换行）：${format.join('、')}`)
 }
-console.log(`\njournal-audit: 审计 ${String(audited)} 场（规则生效后）/ 缺席 ${String(violations)} 条 / 存疑 ${String(suspect)} 条 / 历史场次 ${String(historical)} 场（不计判）`)
-console.log(violations === 0 ? 'ALL PASS（无缺席）' : 'FAIL（有缺席：收工留痕未落实）')
-process.exit(violations === 0 ? 0 : 1)
+console.log(`\njournal-audit: 审计 ${String(audited)} 场（规则生效后）/ 缺席 ${String(violations)} 条 / 格式不合规 ${String(formatCount)} 条 / 存疑 ${String(suspect)} 条 / 历史场次 ${String(historical)} 场（不计判）`)
+console.log(violations === 0 && formatCount === 0 ? 'ALL PASS（无缺席、格式合规）' : 'FAIL（有缺席或格式不合规：收工留痕未落实）')
+process.exit(violations === 0 && formatCount === 0 ? 0 : 1)

@@ -10,10 +10,7 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **① A 案 · 长链动议（只剩深链可读性 + 体感）**：RFC = [proposed/long-chain-motion-dag-midflight](./notes/proposed/2026-09-26-long-chain-motion-dag-midflight.md)——
-  **①–⑤ 判据已由夹具视觉档答完**（`scripts/dag-visual-probe.mjs`：机器 12/12 + 图像目视通过，成本 ≈$0）；
-  真动议只剩两件只有它能答的：**⑥ 深链"一眼看出卡在哪"的可读性** + **真人坐驾驶舱的体感**。
-  ⇒ 降级为"**等用户愿意在场时再跑**"，可缩到 5–6 波（成本减半）。可逆条件见 RFC「调整」节。
+（当前空——无在办条目。下一批由用户点名或 §磨清单升格；历史轮次见文末维护记录。）
 
 
 ## 磨清单（低优先磨活；不占轮、可后台派活；触发即升队）
@@ -50,6 +47,13 @@
 - 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
+
+- 2026-09-26（**A 案交付 ⇒ 队列清空（含 proposed/）**）：两段式——夹具档答 ①–⑤（零成本，见
+  `dag-visual`）+ 真动议答 ⑥（`scripts/dag-midflight-probe.mjs`，无人值守 ≈$2：6 波深链 9 分钟跑完、
+  0 次问人/审批、present 1 次、deliverables-check 0 违规）。中途图三态同屏、卡点一眼可见；
+  **顺带在真动议上验证两条新规矩**（日期口径 6/6 用占位零编造；收工留痕 5/5 + 审计判 ✅）。
+  留一条方法论教训：**小图里 CEO/CFO 一字之差会读错 ⇒ 图像判据必须配文本 dump**（采集器已加）。
+  收尾 Note = [implemented/long-chain-motion-dag-midflight](./notes/implemented/2026-09-26-long-chain-motion-dag-midflight.md)。
 
 - 2026-09-26（**research 层第二轮清扫 + 搁置池分拣**）：按生命周期规则补执行**逾期毕业**——`dsh-upstream-delta`
   与 `pin-upgrade-and-harvest` 删除（生命周期 Note 第 59 行早已裁明"收割轮收口时毕业删除"，收割轮早收了；
@@ -160,7 +164,7 @@
   test 178 / preset-smoke / client-load / release-smoke 全绿。**登记偏离 D27**（官方 sync-dsh 事务装不下：
   vendor 自建在本仓嵌套工作区必失败，独立 staging 树可构建）⇒ 手工同步四处簿记 + 门禁留证。
   收尾 Note = [implemented/pin-upgrade-0.1.7-rc.2](./notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md)；
-  影响面实测已并入 [收尾 Note](./notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md) 实况节（研究稿按 research 层生命周期毕业删除）。待续 = 真模型档认证 + 快照/回放 + 15 收割项。
+  影响面实测已并入 [收尾 Note](./notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md) 实况节（研究稿按 research 层生命周期毕业删除）。待续 = 真模型档认证 + 快照/回放 + 15 收割项——**三项后均已交付**（认证档见 AGENTS 命令表 / replay 已立 / 收割轮已收口），此行仅存史。
 
 以下是历史记录，不是当前指令。旧轮次、完成标记、环境状态和旧探针结果仅说明当时状态；当前任务从 §队列读取，当前操作规则见对应合同与活跃 Note。
 

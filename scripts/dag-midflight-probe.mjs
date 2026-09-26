@@ -20,6 +20,8 @@ mkdirSync(SHOTS, { recursive: true })
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 const args = process.argv.slice(2)
 const WAVES = Number(args[args.indexOf('--waves') + 1] ?? '6')
+// `--session <id>` = **只截既有会话**（不发动议）：动议跑完后补收官图，或复看某场的历史形态。
+const EXISTING = args.indexOf('--session') === -1 ? undefined : args[args.indexOf('--session') + 1]
 
 let home
 try {
@@ -80,16 +82,35 @@ const rpc = async (endpoint, args_) => {
   return body.result.value
 }
 
-const TITLE = `DAG 中途形态 · 长链动议 ${String(Date.now() % 100000)}`
-const created = await rpc('session/create', { request: { cwd: WORKSPACE, agentPreset: 'ceo' } })
-const sessionId = created.sessionId
-try { await rpc('session/rename', { request: { sessionId, title: TITLE } }) } catch { /* 标题仅用于浏览器定位 */ }
-console.log(`session: ${sessionId}｜title: ${TITLE}`)
-await rpc('session/prompt', { request: {
-  requestId: `dm-${String(Date.now())}`, sessionId, mode: 'queue',
-  content: [{ type: 'text', text: MOTION }],
-  clientTimeZone: 'Asia/Shanghai',
-} })
+let sessionId = EXISTING
+let TITLE
+if (sessionId === undefined) {
+  TITLE = `DAG 中途形态 · 长链动议 ${String(Date.now() % 100000)}`
+  const created = await rpc('session/create', { request: { cwd: WORKSPACE, agentPreset: 'ceo' } })
+  sessionId = created.sessionId
+  try { await rpc('session/rename', { request: { sessionId, title: TITLE } }) } catch { /* 标题仅用于浏览器定位 */ }
+  console.log(`session: ${sessionId}｜title: ${TITLE}`)
+  await rpc('session/prompt', { request: {
+    requestId: `dm-${String(Date.now())}`, sessionId, mode: 'queue',
+    content: [{ type: 'text', text: MOTION }],
+    clientTimeZone: 'Asia/Shanghai',
+  } })
+} else {
+  // 标题从**会话日志**读（`session/list` 的 args 形状随版本变；日志是权威且免 RPC）。
+  const { execFileSync, execSync } = await import('node:child_process')
+  const { readdirSync, existsSync } = await import('node:fs')
+  TITLE = sessionId
+  const bucket = join(home, 'sessions')
+  for (const dir of existsSync(bucket) ? readdirSync(bucket) : []) {
+    const file = join(bucket, dir, sessionId, 'session.v4.jsonl.zstd')
+    if (!existsSync(file)) continue
+    const text = execFileSync('zstd', ['-d', '-c', file], { maxBuffer: 256 * 1024 * 1024 }).toString('utf8')
+    const line = text.split('\n').find(entry => entry.includes('"session/title"'))
+    if (line !== undefined) TITLE = JSON.parse(line).data?.title ?? TITLE
+    break
+  }
+  console.log(`session: ${sessionId}（既有）｜title: ${TITLE}`)
+}
 
 // ── 浏览器：打开该会话 + 依赖图页签（截图用；保持常开）──
 const { loadChromium, launchChromium } = await import('./lib/playwright.mjs')
@@ -113,18 +134,36 @@ await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15
 console.log('会话已在浏览器打开')
 
 const openDag = async () => {
+  const dagImage = page.getByRole('img', { name: '任务依赖图' })
+  if (await dagImage.count() > 0 && await dagImage.first().isVisible()) return // 已经开着
+  // 右栏可能是关着的、也可能切到了别的页签：先确保右栏展开，再点「依赖图」胶囊。
   const expand = page.getByRole('button', { name: 'Open right sidebar' })
   if (await expand.count() > 0) await expand.first().click().catch(() => {})
-  const capsule = page.getByRole('button', { name: /^依赖图/ }).first()
-  await capsule.waitFor({ state: 'visible', timeout: 20_000 })
-  await capsule.click()
-  await page.getByRole('img', { name: '任务依赖图' }).waitFor({ state: 'visible', timeout: 20_000 })
+  const capsule = page.getByRole('button', { name: /依赖图/ }).first()
+  try {
+    await capsule.waitFor({ state: 'visible', timeout: 10_000 })
+    await capsule.click()
+  } catch {
+    // 兜底：按可见文字找（胶囊被折叠/改名时仍能点到）
+    const byText = page.getByText('依赖图', { exact: false }).first()
+    await byText.waitFor({ state: 'visible', timeout: 10_000 })
+    await byText.click()
+  }
+  await dagImage.first().waitFor({ state: 'visible', timeout: 20_000 })
 }
 
 const shoot = async name => {
   await openDag()
+  // 顺带 dump 节点文本（小图里 CEO/CFO 这种一字之差靠肉眼不可靠——文本才作数）
+  const labels = await page.evaluate(() => [...document.querySelectorAll('.wk-node')].map(node => ({
+    owner: node.querySelector('.wk-dag-owner')?.textContent ?? null,
+    state: node.querySelector('.wk-dag-meta span:last-child')?.textContent ?? null,
+    title: node.querySelector('.wk-dag-node-title')?.textContent ?? null,
+  })))
+  writeFileSync(join(SHOTS, `${name}-nodes.json`), JSON.stringify(labels, null, 2), 'utf8')
+  console.log(`  节点文本: ${labels.map(item => `${String(item.title).slice(0, 3)}/${String(item.owner)}/${String(item.state)}`).join('  ')}`)
   await page.waitForTimeout(700) // 入场动画落定（抢读会拍到 opacity 0 的半成品）
-  await page.getByRole('img', { name: '任务依赖图' }).screenshot({ path: join(SHOTS, `${name}.png`) })
+  await page.getByRole('img', { name: '任务依赖图' }).first().screenshot({ path: join(SHOTS, `${name}.png`) })
   await page.screenshot({ path: join(SHOTS, `${name}-full.png`) })
   console.log(`  出图 snapshots/dag-midflight/${name}.png（+ 全页）`)
 }
@@ -139,6 +178,14 @@ const completedOf = async () => {
     if (task?.status === 'completed' && typeof task.id === 'string') done.add(task.id)
   }
   return { done: done.size, turnEnded: events.some(event => event?.type === 'turn/end') }
+}
+
+if (EXISTING !== undefined) {
+  await shoot('final')
+  console.log('\ndag-midflight-probe: 既有会话截图完成')
+  try { child.kill('SIGTERM') } catch { /* 已退出 */ }
+  await browser.close()
+  process.exit(0)
 }
 
 // ── 中途检查点：完成数跨过 3 / 5 时各截一张（+ 收口后一张）──
