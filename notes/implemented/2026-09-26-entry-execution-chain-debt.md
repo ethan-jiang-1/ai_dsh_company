@@ -103,7 +103,7 @@ vendor）与**执行链**（取任务 → 判授权 → 实施 → 选验证 →
 | | 条目 | 关键动作 | 验收 |
 |---|---|---|---|
 | ① | 门禁真相与探针补齐 | B1 `tsc -b` 三处同步；B6 verify 清单单一源；三道门禁扩面（裸路径扩到 docs/notes/README、**pin 版本一致性**、状态行跨行盲区）；S5 entry-probe 扩到执行链 + 首跑基线 | 新门禁**红→还原→绿**反证；基线分在案 |
-| ② | 执行链收敛 | B8/B9/B10 ROADMAP 处置 + 活条目加 ▶；B7 §9.1 补行（先腾预算）；R7 的 AGENTS 五个断指针 + R5 命令表改真实文件名 + 公司手册入布局；**收尾动作 owner 补齐**（B11 D27／S2 intents 压缩规则／push 命令落点／认证档清单单一源） | entry-probe 复跑；§0.5 三分支人工复核 |
+| ② | 执行链收敛 | B8/B9/B10 ROADMAP 处置 + 活条目加 ▶；B7 dev-loop §9.1 补行（先腾预算）；R7 的 AGENTS 五个断指针 + R5 命令表改真实文件名 + 公司手册入布局；**收尾动作 owner 补齐**（B11 D27／S2 intents 压缩规则／push 命令落点／认证档清单单一源） | entry-probe 复跑；dev-loop §0.5 三分支人工复核 |
 | ③ | 腐化清扫 | R1→R7 七批，每批一个 commit | 每批可独立 revert；死指针 0 |
 | ④ | 共享盘归档（非删除） | 补台账两行（`renewal-y-2026` / `sea-entry-2026`，注明探针来源）；为 4 场 09-26 动议建快照（`workspace.actual` + `snapshot.yml`，`renewal-y-2026` README 记"两场撞 slug + 探针来源"）；执行 09-26 **轮末收敛**（23 篇 journal → CHARTER 历史纪要 → `journal/` 清空留 `.gitkeep`）；29 份非点名 drafts 随轮归档；落身份规则 9 条 + 修 B12；补两道门禁（**探针禁写真盘**、**slug 撞车检测**） | `deliverables-check` **实跑仍 0 违规**；`company-workspace/` 108 → 约 56；13 份 `final.md` 一份不动；新门禁红绿反证 |
 | ⑤ | 最终收敛验收 | 地图最终形态（AGENTS/index/dev-loop 只写 now）；entry-probe **全绿 + `conflicts` 空**；收尾 Note + 中立体清扫 | 全绿 + 清扫 findings 零悬空 |
@@ -122,7 +122,7 @@ vendor）与**执行链**（取任务 → 判授权 → 实施 → 选验证 →
   不建生成索引）和本仓 `proposed/README` 的既有裁断冲突；改用 `docs/index.md` 的**人工主题路由**
   补跳板（少量、可控、不会漂）。
 - **把 entry-probe 加进 `pnpm verify`**：否决——它是真模型认证档（分钟级、要 key），进 verify 会
-  破坏秒级 keyless 结构门禁的分层纪律（§9.1 硬规矩 1）；改为立"何时跑"的触发规则。
+  破坏秒级 keyless 结构门禁的分层纪律（dev-loop §9.1 硬规矩 1）；改为立"何时跑"的触发规则。
 - **逐条改腐化而不建门禁**：否决——腐化有复发史（bare-path 门禁的立项理由就是同一类），
   机械可查的不变量必须进门禁并带反证。
 
