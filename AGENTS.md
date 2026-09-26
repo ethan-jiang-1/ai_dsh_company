@@ -41,7 +41,7 @@ node scripts/preset-smoke.mjs          # preset 改动的完成定义：boot 真
 ```
 
 其余门禁/冒烟脚本见 `scripts/`：**每个脚本头注写明「何时跑」与成本**（`script-triggers` 门禁强制自述，
-清单唯一源 = `scripts/`——本文件与 dev-loop 都不复述逐个脚本，复述必漂）。分层原则 = guides/dev-loop §9.1；
+清单唯一源 = `scripts/`——**逐个脚本的触发条件与成本别抄回本文件**，复述必漂）。分层原则 = guides/dev-loop §9.1；
 发布/升 pin = [release.md](docs/release.md)。web 观察窗 = `pnpm dsh web -- --port 3081 --no-open`
 （3080 是本 GUI 占用；构建三件事见 guides/dev-loop §7）。
 
@@ -66,7 +66,9 @@ changes）= `vendor/dsh/AGENTS.md` Conventions 节；探索路由与概念→源
 
 ## 纪律（沿 DSH 研发纪律；**默认严格照做，偏离必须登记**）
 
-纪律以钉住的 `vendor/dsh/` 为准；本表是仓内落点索引，不替代原文。当前任务分支与执行规则见 [开发环 §0.5/§1/§12](docs/guides/dev-loop.md)。本仓特有适配按 D 号记录约束与证据。
+纪律以钉住的 `vendor/dsh/` 为准；本表是仓内落点索引，不替代原文。**「权威（vendor 树）」列的路径
+是 vendor 树内相对路径**（如 `docs/testing.md` = `vendor/dsh/docs/testing.md`；本仓 `docs/` 下没有该文件
+——2026-09-26 实测 fresh agent 会按本仓相对路径解析而落空）。当前任务分支与执行规则见 [开发环 §0.5/§1/§12](docs/guides/dev-loop.md)。本仓特有适配按 D 号记录约束与证据。
 
 | DSH 纪律 | 权威（vendor 树） | 本 repo 落点 |
 |---|---|---|

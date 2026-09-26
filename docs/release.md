@@ -26,7 +26,7 @@
 ## 兼容矩阵（`dsh.compatibility.dshReleases`）
 
 ```json
-"dsh": { "compatibility": { "dshReleases": ["dsh-v0.1.5-rc.2", "dsh-v<当前钉住>"] } }
+"dsh": { "compatibility": { "dshReleases": ["<历史 tag>", "<当前钉住 tag>"] } }
 ```
 **形状 = 数组，含历史版本 + 当前钉住的那一个**（`verify.mjs` 的 `pack-compat` 门禁强制矩阵含当前
 tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具体值）。

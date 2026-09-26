@@ -36,19 +36,30 @@ const PROMPT = [
   '最后只输出一个 JSON 对象，不要输出前后说明，结构如下：',
   '{"answers":[{"id":"Q1","status":"answered","answer":"本题答案","evidence":[{"path":"ROADMAP.md","quote":"该文件中逐字原文，至少8字符"}]}],"conflicts":[]}',
   'answers 必须每题恰好一项；status 可为 answered/unresolved；conflicts 列出发现的来源冲突。',
-  'quote 与 answer 里**一律不要出现 ASCII 双引号**——需要引用时用「」书名号代替；也不要把两者混写成 「"""…"""」（2026-09-26 实证：一处未转义的 " 会让整份 JSON 不可解析、12 题全判 0）。',
+  'JSON 语法：quote 与 answer 里如出现 ASCII 双引号必须写成 \\" 转义（或改写成「」——比对时引号字形与空白、markdown 标记都会被归一化，不影响判分）；务必保证整份输出是合法 JSON（2026-09-26 实证：一处未转义的 " 会让整份不可解析、12 题全判 0）。',
   `每题给出其自己的答案和证据，不以其他题的内容替代。以下 ${ENTRY_QUESTIONS.length} 题：`,
   ...ENTRY_QUESTIONS.map(q => `${q.id}: ${q.ask}`),
 ].join('\n')
 const sourceHashes = new Map()
-// 允许面（2026-09-26 扩）：根入口 + docs/ + notes/ + **公司手册**。
+// 允许面（2026-09-26 两次扩）：根入口 + docs/ + notes/ + **公司手册** + **scripts/ + tests/**。
 // 为什么加 `company-workspace/AGENTS.md`：Q3 问"交付物三态的事实家在哪个文件"，正确答案就是它
 // （D20 点名的合同家、随每个成员会话首帧注入）。旧允许面读不到它 ⇒ **正确答案反而被判"来源不可读"**，
 // 而只有引 `docs/index.md` 的代理句才能过——那是在奖励绕路、惩罚直答。首跑实测踩到（基线 8/12 的 Q3）。
+// 为什么加 `scripts/` 与 `tests/`：③ 把"何时跑"的家搬进了**脚本自己的头注**，于是"该跑哪个脚本"这类
+// 问题的最权威证据就是脚本本身；旧允许面只收 .md ⇒ 引脚本一律"来源不可读"（实测 Q4/Q5/Q7/Q10 同挂）。
+// **允许面必须跟着事实的家走。**
+// 写成一张模式表（而不是一串 || 条件）：后缀约束与路径约束同处一处，避免"后缀检查排在允许面前面"
+// 这类顺序 bug（实测踩过一次：`!path.endsWith('.md')` 把 .mjs 全挡在门外）。
+const ALLOWED_SOURCE = [
+  /^AGENTS\.md$/, /^ROADMAP\.md$/, /^company-workspace\/AGENTS\.md$/,
+  /^(docs|notes)\/[\w./-]+\.md$/, /^snapshots\/README\.md$/,
+  /^scripts\/[\w./-]+\.(mjs|ts)$/,
+  /^tests\/[\w.-]+\.ts$/,
+]
 function readSource(path) {
-  if (isAbsolute(path) || path.includes('\\') || path.split('/').includes('..') || !path.endsWith('.md') ||
-      !(['AGENTS.md', 'ROADMAP.md', 'company-workspace/AGENTS.md'].includes(path) || /^(docs|notes)\//.test(path))) {
-    throw new Error('只允许根入口、docs/、notes/、公司手册的仓库相对 Markdown 路径')
+  if (isAbsolute(path) || path.includes('\\') || path.split('/').includes('..') ||
+      !ALLOWED_SOURCE.some(pattern => pattern.test(path))) {
+    throw new Error('只允许根入口 / docs/ / notes/ / 公司手册（.md），以及 scripts/**（.mjs|.ts）、tests/**（.ts）的仓库相对路径')
   }
   const physical = realpathSync(join(ROOT, path))
   const rel = relative(ROOT, physical)

@@ -107,6 +107,24 @@ describe('入口探针不使用全文兜底', () => {
     expect(failures.join()).toContain('原文不匹配')
     expect(failures.join()).toContain('引的是')   // 报错要带上引了什么，便于一眼改
   })
+  // 2026-09-26 立：三类**渲染层**差异不得算幻觉（都在同一轮里真实误杀过正确答案）。
+  it('归一化只抹渲染层差异：换行/反引号/引号字形', () => {
+    const src = '**只有防线二能抓"preset 挂载失败"**：行 config 校验发生在挂载时'
+    const reader = (path: string) => (path === 'AGENTS.md' ? src : evidence.quote)
+    const cases = [
+      '**只有防线二能抓「preset 挂载失败」**：行 config 校验发生在挂载时',  // 引号字形（提示词逼出来的）
+      '只有防线二能抓"preset 挂载失败"：行 config 校验发生在挂载时',        // 去掉强调标记
+      '只有防线二能抓"preset\n挂载失败"：行 config 校验发生在挂载时',       // 跨行取句
+    ]
+    for (const quote of cases) {
+      const value = good()
+      value.answers[0].evidence = [{ path: 'AGENTS.md', quote }]
+      expect(evaluateEntryProbe(JSON.stringify(value), reader).failures, quote).toEqual([])
+    }
+    const wrong = good()
+    wrong.answers[0].evidence = [{ path: 'AGENTS.md', quote: '这段文字真的不在源文件里出现过' }]
+    expect(evaluateEntryProbe(JSON.stringify(wrong), reader).failures.join()).toContain('原文不匹配')
+  })
 })
 
 describe('coding 指令与公司运行指令分开', () => {

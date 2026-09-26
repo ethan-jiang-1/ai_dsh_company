@@ -8,7 +8,7 @@
 |---|---|---|---|
 | ② 门禁真相与探针补齐 | ✅ 完成 | `1dc024d` `7e33d8f` | B1 假绿修复（三态反证）；B6 门禁清单单一源；裸路径门禁扩面 5→22 文件（203 条零假阳性，抓到 3 条真腐化）；新门禁 `pin-bookkeeping` + `pin-currency`；状态行门禁修跨行盲区；entry-probe 8→12 问 + **修尺子自身三处缺陷**；基线 = **12/12 + 3 条未消矛盾**（独立复现 B3/B12/R5） |
 | ③ 执行链收敛 | ✅ 完成 | `107f2ce` `0b97cde` `e8df28a` | B7 改"触发条件的家 = 脚本头注" + `script-triggers` 门禁（18 脚本；不往顶到上限的 dev-loop 塞行）；B8 ROADMAP **429→73 行**（历史段删除，blob `d159b0228e2b` 留证，3 处入站引用标注）；B9 状态三态语义；B10 搁置项不是任务源；R4 计数常量/升队条件/场景 D 撞名；B3 `rejected/` 残影（执行链第一跳）；B11 D27 入台账 + intents 行预算 + push 落点；R7 五个断指针；R11 公司手册入布局 |
-| ④ 腐化清扫 | ⏳ 待办 | | R1–R7 七批 |
+| ④ 腐化清扫 | ✅ 完成 | `78308c1` `88df276` `01b3ba5` | R1 版本常量改指针（release/architecture/pack README）；R2 机制三代（**profile.md 最重**：把已退役 `company` profile 当现行形状、`file:` 那条写反——实测 inode 不同/link count 1 = 真拷贝；architecture 的 roots 模型、roles-isolation 的四角色+已消失包名、ui-demo 的 `remote.agentTeams`/`dist/client.js`、pack JSDoc 四处、cordis 头注自相矛盾）；R3 死指针 5 条（含两条**门禁盲区**里的：dev README 与 .gitignore，非 .md/被排除树）；R4 僵尸待办 7 处（R3 待验证点、随升 pin、轮末、归 R5、R4 定稿、驾驶舱旧名、role-content-plan skills 清单）；R5 枚举双写 3 处（改成自查命令与指针）；R6 矛盾对（tests 标题四角色）；R7 其余 5 处；noise 5 处（src/README 重写、architecture §7 stub 保号改写、死测试数、升 pin 证据落点、ROADMAP≡dev-loop 重复规则） |
 | ⑤ 共享盘归档 | ⏳ 待办 | | 补台账两行 + 4 场快照 + 轮末收敛 + 身份规则 + 两道防复发门禁 |
 | ⑥ 最终收敛验收 | ⏳ 待办 | | 地图终态 + entry-probe 复跑（目标：全绿且 `conflicts` 空）+ 收尾 Note + 中立体清扫 |
 
