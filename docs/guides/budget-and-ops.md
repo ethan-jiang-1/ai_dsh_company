@@ -36,7 +36,7 @@
 | `pnpm dsh web` 报 `EADDRINUSE 3086` | 已经有一个观察窗在跑 | 先 `lsof -nP -iTCP:3086 -sTCP:LISTEN` 复用旧窗（token 在它自己的启动横幅里）；**3080 是本 GUI，永不动** |
 | 重启后/换端口后调 API 报鉴权失败 | 启动 token **随进程生灭**（重启即换），cookie 名**每次启动随机** | 从**新进程**的启动横幅重取 `/?token=`；cookie 从响应头**显式带**（`curl -D -` 抓 set-cookie；**别用 `-c jar`**，脚本同法见 [harvest-probe.mjs](../../scripts/harvest-probe.mjs) 的 `getSetCookie()`） |
 | 失控的团队跑怎么停 | Lead 的 `session/cancel` 有效；teammate 由 subagent 路由托管 | teammate 会报 `agent-busy` / `not found (not attached)`——只能等其本轮结束或停进程（2026-09-22 实测）；**日志已落盘**，停完照常归档 |
-| 找不到某位 VP 的空间 | teammate 会话是**子会话**，不在顶层列表 | 会话头部 **Team 名册** → 点成员名打开；R5b 已交付**驾驶舱页签**（在场板行可点，见 notes/implemented/2026-09-22-org-presence-board.md） |
+| 找不到某位 VP 的空间 | teammate 会话是**子会话**，不在顶层列表 | 会话头部 **Team 名册** → 点成员名打开；已交付的**「在场」页签**（在场板行可点；旧名「驾驶舱页签」已并入「在场」，见 notes/implemented/2026-09-22-org-presence-board.md） |
 | VP 一直 running 不出活 | `list_agents` 看状态 | Lead 调 `interrupt_agent`（只断当前轮，任务归属与邮箱保留），改派或重试 |
 | 消息"发了没反应" | 发送结果是 `queued`（已持久化，**不得重发**）还是 `accepted` | `queued`＝对方 inactive，冷恢复时必达；等或用 `wait_agent`；别重发造成重复 |
 | 任务板编辑被拒 | `TEAM_TASK_STALE_REVISION`（CAS） | 重新 `team_task_get` 拿最新修订再改——两个人同时改一任务是设计内冲突 |

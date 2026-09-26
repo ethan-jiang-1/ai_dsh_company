@@ -165,11 +165,11 @@ CEO preset 里给每个直接汇报对象配一个 `dsh-tool-subagent` 实例（
   bundle，把 `agent-team` + `tool-agent-team` 两行直接 insert 进本包 `cordis.patch.yml`
   （仍是零 JS；R3 的"改直插行"因此已完成，只剩验证）；② 保持 bundle，把命名委托行也设为
   one-shot（放弃续驶）。
-  ⚠ **R3 待验证点（别当成已成立的事实）**：团队工具是 **scoped 注册**，"shadow those globals
-  **for team members only**"——而 **Lead（CEO）自己也是 team member**。所以"CEO 会话里
-  spawn 过 teammate 之后，还能不能用 `send_message`/`list_agents` 驱动命名委托生出来的
-  非 team continuable child"是未验证假设，由 R3 的 `delegation-smoke` 真跑判定；结论写进
-  `delegation.md`（见 roadmap R3 行的"并存不互破"验收）。
+  ✅ **R3 的待验证点已判定（2026-09-22，别再当开放问题读）**：当时问的是"CEO 会话 spawn 过
+  teammate 之后，还能不能用团队版 `send_message`/`list_agents` 驱动命名委托生出来的非 team
+  child"。**结论 = 不能**——child 不在名册上，续驶/中断/列举全不可达，故命名委托定为
+  **one-shot 前台**（D18）。结论与证据在 [delegation.md §2](../delegation.md)（"为什么不是
+  continuable——别改回去"），回归守卫 = `scripts/delegation-smoke.mjs`。
 
 ### 通道 B · Agent Teams（experimental，最贴近"公司开会"）
 

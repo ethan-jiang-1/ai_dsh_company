@@ -34,34 +34,35 @@
 
 - **persona 要素**：视角=可行性/成本/技术风险；对 PRD 有技术 veto；产出=评审意见+研发计划；
   需要 deep-dive 时生 workers（one-shot subagent）并行调研。
-- **skills**：`tech-feasibility-review`、`engineering-plan`（排期/依赖/风险表）、
-  `spawning-research-workers`（怎么写 worker brief、怎么汇总 worker 结果）。
+- **skills**（盘上现状）：`eng-workflow`（1 号端到端工作流）、`tech-feasibility-review`。
+  （旧文列的 `engineering-plan` / `spawning-research-workers` **从未落地**——2026-09-26 按盘核对更正；
+  需要时按 `<role>-workflow-<主题>` 追加。）
 - **KB**：`kb/vp-eng/`（技术栈事实、历史评审标准）。
 
 ### VP of Sales（职能：销售/市场）
 
 - **persona 要素**：视角=客户/市场/定价；对"没人买"有 veto；产出=市场判断+定价建议。
-- **skills**：`market-sizing`（假设→估算→敏感度）、`customer-voice`（从 KB 客户访谈提炼）。
+- **skills**（盘上现状）：`sales-workflow`（1 号端到端工作流）、`market-sizing`（假设→估算→敏感度）、`customer-voice`（从 KB 客户访谈提炼）。
 - **KB**：`kb/vp-sales/`（客户画像、竞品事实）。
 
 ### COO（职能：运营）
 
 - **persona 要素**：视角=落地/预算/流程合规；对"运营接不住"有 veto；产出=运营方案+预算核查。
-- **skills**：`ops-feasibility`（人力/流程/时程核查）、`budget-check`。
+- **skills**（盘上现状）：`ops-workflow`（1 号端到端工作流）、`ops-feasibility`（人力/流程/时程核查）、`budget-check`。
 - **KB**：`kb/coo/`（流程手册、预算基准）。
 
 ### CFO（职能：财务，R2 增设）
 
 - **persona 要素**：视角=现金/成本/合规；对"现金流撑不住 / 毛利低于底线 / 账务不合规"有 veto；
   产出=项目经济性测算 + 财务合规意见（SoD 与留痕是硬闸门）。
-- **skills**：`project-economics`（毛利底线 30% 签字线、人·周分摊、里程碑收款曲线）、
-  `finance-compliance`（SoD、留痕字段、四流一致、AI 产出不得入账）。
+- **skills**（盘上现状）：`cfo-workflow`（1 号端到端工作流）、`project-economics`（毛利底线 30%
+  签字线、人·周分摊、里程碑收款曲线）、`finance-compliance`（SoD、留痕字段、四流一致、AI 产出不得入账）。
 - **KB**：`kb/cfo/`（财务条线事实、SoD 纪律、双签线、现金流原则）。
 
 ### 共享层（全员）
 
 - 全局指令：公司手册经 `agent-instructions` 行注入（基线 = `company-workspace/AGENTS.md`，D17；守卫 = `scripts/handbook-smoke.mjs`）。
-- `templates/`（workspace）：`prd.md`、`review-note.md`、`decision-memo.md`、`weekly-report.md`。
+- `templates/`（workspace）：`prd.md`、`review-note.md`、`decision-memo.md`、`weekly-report.md`、`ops-review-note.md`（COO 专用运营核查）。
 
 ## 2. skills / KB 的落点（对照 architecture §5 三载体）
 
@@ -71,7 +72,7 @@
 | 角色方法 skills | `presets/<role>/skills/<name>/SKILL.md` | per-preset layer，硬隔离（别的角色看不见） |
 | 公司手册（稳定部分） | 全局 skills root | 全员可见 |
 | 事实/客户/历史 | `company-workspace/kb/<role>/` | 活数据，fs 工具读取 |
-| journal（角色记忆） | `company-workspace/kb/<role>/journal/YYYY-MM-DD.md` | D8：文件即记忆 |
+| journal（角色记忆） | `company-workspace/kb/<role>/journal/<日期>-<slug>.md`（取不到真日期用 `日期待核-<slug>.md`，见公司手册「日期口径」） | D8：文件即记忆 |
 
 ## 3. 入戏探针（R1 验 CEO/VP-Eng；R2 新增 vp-sales / coo / cfo 三角色）
 

@@ -2,7 +2,7 @@
 // 动议归档：会话日志 + workspace.actual 实测态；独立 oracle 仅从显式输入导入且永不覆盖。
 //
 // 形状沿用 R1（`snapshots/r1-motion/`）与 vendor `snapshots/AGENTS.md`：一场景一目录 + snapshot.yml；
-// replay harness 归 R5，当前用途是**基线对照**（行为变了就 diff 本目录）。
+// replay harness 已交付（scripts/replay-smoke.mjs）；本目录用途 = **基线对照**（行为变了就 diff）。
 //
 // 用法：source dev/env.sh && node scripts/snapshot-motion.mjs \
 //         --session session-<lead-id> --out snapshots/r2-motion --motion "动议原文" [--cwd company-workspace]

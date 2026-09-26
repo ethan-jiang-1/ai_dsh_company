@@ -349,7 +349,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 
 **三条硬规矩**：
 
-1. **真模型 / 真浏览器不进迭代环的秒级回归档**：keyless 单测与结构检查保持快速；认证档仅在受影响面或验收要求时运行，不按“轮末/每轮”机械触发。需要真入口 → 写 `scripts/*-smoke.mjs`，别塞进 `tests/`。**这条有机械门禁**：`tests/layering.spec.ts` 扫 `tests/**`，出现 `node:child_process` / playwright /
+1. **真模型 / 真浏览器不进迭代环的秒级回归档**：keyless 单测与结构检查保持快速；认证档仅在受影响面或验收要求时运行，不按“轮末/每轮”机械触发。需要真入口 → 写 `scripts/*-smoke.mjs`，别塞进 `tests/`。**这条有机械门禁**：`tests/layering.spec.ts` 扫 `tests/**`，出现 `node:child_process` / `spawn(` / playwright /
    `fetch(` / 密钥即红（已反证：塞一行 `import { spawn } from 'node:child_process'` 立刻变红）。**R5a 起另禁两条**（均双红证）：tests/
    不得 import `scripts/` 下的驱动脚本（`scripts/lib/` 纯逻辑库除外）；任何 vitest 配置不得把
    `scripts/` 编进测试发现——重放 lane 是第三档，只由 `scripts/replay-smoke.mjs` 驱动。

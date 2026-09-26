@@ -40,7 +40,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(missing).toEqual([])
   })
 
-  it('四角色文案定稿（R1 两角色守卫扩展），skill 目录名与 frontmatter 一致', () => {
+  it('五角色文案定稿（R1 两角色守卫扩展），skill 目录名与 frontmatter 一致', () => {
     for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']) {
       const decl = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
       expect(decl, `${role} persona 仍是占位`).not.toContain('占位')
@@ -53,7 +53,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
-  it('四角色必须声明基础工具行（preset 自包含；R1 首跑：无工具行 → 读不了文件、写不出交付物）', () => {
+  it('五角色必须声明基础工具行（preset 自包含；R1 首跑：无工具行 → 读不了文件、写不出交付物）', () => {
     const required = ['tool-fs', 'tool-fs-search', 'tool-skill', 'tool-todo', 'tool-present']
     for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']) {
       const composition = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
@@ -82,7 +82,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
-  it('四个角色显示名共用公司前缀（D14 系列命名，R2 补角色时不许忘）', () => {
+  it('五角色显示名共用公司前缀（D14 系列命名，R2 补角色时不许忘）', () => {
     const names = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'].map(role => {
       const match = /^ {8}name:\s*(.+)$/m.exec(readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8'))
       expect(match, `${role} 行内 config.name 缺失`).not.toBeNull()

@@ -11,7 +11,7 @@ const { fromMarkdown } = await import(pathToFileURL(vendorRequire.resolve('mdast
 const { gfmFromMarkdown } = await import(pathToFileURL(vendorRequire.resolve('mdast-util-gfm')).href)
 const { gfm } = await import(pathToFileURL(vendorRequire.resolve('micromark-extension-gfm')).href)
 
-// These are not source corpora. Active implemented/rejected/postmortem Notes ARE sources.
+// These are not source corpora. Active implemented/postmortem Notes ARE sources (no rejected/ dir).
 const EXCLUDED = new Set(['node_modules', 'vendor', 'lib', 'dist', 'build', 'generated', 'dev',
   'snapshots', 'journal', 'deliverables', 'archived', 'archive', 'historical'])
 
