@@ -83,6 +83,7 @@
 
 | 项 | 出处 | 搁置理由（已核实） | 复活条件 |
 |---|---|---|---|
+| **角色身份的 UX（投影 + 侧栏徽标 + 窗口标题 + 角色色）** | [proposed/role-identity-ux](./notes/proposed/2026-09-26-role-identity-ux.md) | 研究与设计已完成（三条正路全部源码核实：agentPreset 投影 / sidebar.session.row.leading 行装饰位 / 本包 client 面），**等用户点头开工**——用户已定方向"选长远正确的做法"，但要求"好好研究完别急" ⇒ 本稿先交 | 用户说"做"→ 按 A（host 投影）→ B（侧栏徽标）→ C（窗口标题+色条）三段落地，每段真浏览器验收 |
 | **多人协作的门边界与对齐**（L1 门 / L2 对齐 / L3 并发） | [proposed/multi-human-ux](./notes/proposed/2026-09-26-multi-human-ux.md) | **等实验证据**：评审 §六 决策顺序的 1/3/4/5 已执行（撤回 L1-C / 明确人工交接 / L3 改版本纪律 / 上游 seam 单独记录）；可自主的实验腿已跑完（B 仪器自检 + C 署名腿，见提案「实验进展」表）；**剩下的三腿全要人**：B 金标准标注（模板 20 行）、A/D 各约 3 人 × 20 分钟（手册已备）、C 签署腿（要一场触 9 折线的报价动议） | 三腿实验跑完 → 按 [评审 §五 判据](./notes/research/2026-09-26-multi-human-ux-review.md) 出"要不要结构化派活字段 / 上游 seam"的结论；或用户点名先做哪一腿 |
 | **自主节律**（分身定期复盘） | [implemented/twin-cultivation](./notes/implemented/2026-09-22-twin-cultivation-and-self-learning.md) §四 | 机制不闭合：`goal` 需人类授权且 session-start 一律 disarm；`schedule` 只在 live 会话投递且默认没装；webhook 起的会话进不了 goal 循环；全树无 cron | 上游补"外部触发 ↔ 会话内自主续跑"的 seam——**提 seam，不自建调度器**（D9/D13） |
 | **并行快捷派活**（同时开几个 VP） | [delegation.md](./docs/delegation.md) §4.4 | 本组合无干净解法：缺 per-child composition 与不撞名的控制面 | 上游 seam |
