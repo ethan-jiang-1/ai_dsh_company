@@ -44,11 +44,19 @@
   | `replay/raw/*.jsonl`（改名） | 6.4M | `replay-smoke` 的**直接输入**（`:65,:83`） | **实测 5/5 哈希与 `sessions/` 全同 ⇒ 逐字节改名副本**，可从 `sessions/` 再生 ⇒ **最干净的 6.4M** |
   | `replay/session*.v3.jsonl` | 6.2M | `--prepare` 产出的**归一化 fixture**（重放真正读它） | **不能动**（功能性） |
 
-  **结论（给下一次动手的人）**：① `r2-motion/replay/raw/` 是唯一**零风险**的一刀（纯改名副本，且
-  有再生路径）；② `sessions/` 与 `raw/` 是同一份数据的两种命名，留哪个取决于"要原始名还是要
-  replay 直接可跑"——**留 `raw/` + 把原始名信息记进 `snapshot.yml`** 是更省的一侧（但要先跑一遍
-  `replay-smoke` 证明不依赖 `sessions/`）；③ `r3-delegation` 的 `raw/` 与它的 `sessions/` **哈希零交集**
-  （是另一次录制），**别按 r2 的经验顺手删**——每个场景要各自比对。
+  **结论（2026-09-26 修订——原判被反证证伪）**：
+  - ❌ ~~`r2-motion/replay/raw/` 是零风险的一刀~~ **错了**。实测：删掉后跑完成定义
+    `node scripts/replay-smoke.mjs --scenario r2-motion` ⇒ **3 处红**（`持久化会话数 = 1（lead + 0 child）`、
+    member/task 集合等价、在场板同形）；还原后复跑 ⇒ ALL PASS。**根因**：`childRaws()`
+    （`replay-smoke.mjs:83`，读 `replay/raw/`）**在重放路径里也用于发现子会话**，不是只服务 `--prepare`。
+    ⇒ **`raw/` 是功能性资产，不是冗余副本**；「内容逐字节相同」**不等于**「可删」——同一份内容的两种
+    命名，各自被不同代码路径**按名读取**。负知识写在 `snapshots/r2-motion/README.md`。
+  - 仍然成立的两条：① 体积账没变（34 MB / 547 文件 / 占全仓 67%；`r2-motion` 20 MB = 59%），
+    大头在**会话日志与归一化 fixture**，那是功能性的、动不了；② `r3-delegation` 的 `raw/` 与它的
+    `sessions/` **哈希零交集**（另一次录制）⇒ 任何瘦身必须**逐场景实测**，不能类推。
+  - **下一步该往哪找**（若真要瘦身）：不在"重复副本"，而在**会话日志本身**（`r2-motion` 6.4M 原始 +
+    6.2M 归一化）——例如**归一化 fixture 是否能只留 `session*.v3.jsonl` 而把 `sessions/` 换成
+    指针**（但 `deliverables-check --sessions` 读 `sessions/`，要先查消费面）。**动手前先列消费面。**
 
 - ~~**B12 的行为面**~~ **已磨（2026-09-26，触发条件 = 动真盘行为规矩时）**：认证档 = `scripts/budget-signoff-probe.mjs`
   （真模型 ≈$0.1–0.2、排练场、可复跑）。**一正一负双向判据**（只测负例会假绿——模型可能压根不会用那个工具）：
