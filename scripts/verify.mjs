@@ -92,9 +92,24 @@ const NOW_FILES = (() => {
   return out.concat(
     walkMd(join(root, 'tests')),
     walkMd(join(root, 'docs')),
-    walkMd(join(root, 'notes')).filter(p => p.split('/').length === 2),
+    // `notes/**` 分**两档**（2026-09-26 补盲区 + 分档）：
+    // · **硬档**（`proposed/` `research/`）= **活文档**——fresh agent 会照着它去干活，死指针代价高；
+    // · **观察档**（`implemented/` `postmortem/`）= **记录当时事实**的档案——里面引的路径**当时是对的**
+    //   （实测 36/39 条是 vendor 上游改过名）。**改它就是篡改记录** ⇒ 每次提醒、不判红。
+    // 此前只扫 `notes/` 直接子文件（`p.split('/').length === 2`）⇒ `proposed/` 与 `implemented/` 全在面外。
+    walkMd(join(root, 'notes/proposed')),
+    walkMd(join(root, 'notes/research')),
     walkMd(join(root, 'company-workspace')).filter(p => !/^company-workspace\/(deliverables|kb\/[^/]+\/journal)\//.test(p)),
   )
+})()
+/** 观察档：`notes/implemented|postmortem/**` —— 记录**当时**事实的档案，死指针只提醒不判红。 */
+const WARN_FILES = (() => {
+  const walkMd = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+    const path = join(dir, entry.name)
+    if (entry.isDirectory()) return ['node_modules', '.git', 'lib'].includes(entry.name) ? [] : walkMd(path)
+    return entry.name.endsWith('.md') ? [path.slice(root.length + 1)] : []
+  })
+  return [...walkMd(join(root, 'notes/implemented')), ...walkMd(join(root, 'notes/postmortem'))]
 })()
 const TOP_DIRS = ['notes/', 'docs/', 'scripts/', 'packages/', 'snapshots/', 'dev/', 'tests/', 'company-workspace/', 'vendor/']
 const RUNTIME_PREFIXES = ['dev/harness-home', 'dev/rehearsal-workspace', '.pnpm-store']   // gitignored 运行态
@@ -103,24 +118,39 @@ const RUNTIME_PREFIXES = ['dev/harness-home', 'dev/rehearsal-workspace', '.pnpm-
 const RETIRED_PATHS = new Set(['docs/plans/roadmap.md'])
 let barePathCount = 0
 let barePathBad = false
-for (const rel of NOW_FILES) {
-  const lines = readFileSync(join(root, rel), 'utf8').split('\n')
-  lines.forEach((line, i) => {
-    for (const m of line.matchAll(/`([^`\n]+)`/g)) {
-      let raw = m[1].replace(/^\.\//, '').replace(/\/+$/, '')
-      if (!TOP_DIRS.some(d => `${raw}/`.startsWith(d))) continue
-      if (/[*<>…{}]/.test(raw) || raw.includes(' ')) continue          // 通配/占位/花括号展开/命令行不是路径
-      raw = raw.replace(/:\d+(?:-\d+)?$/, '')                          // 引文行号不是路径的一部分
-      if (RUNTIME_PREFIXES.some(p => raw.startsWith(p))) continue
-      barePathCount++
-      if (!existsSync(join(root, raw)) && !existsSync(join(root, 'vendor/dsh', raw)) && !RETIRED_PATHS.has(raw)) {
-        barePathBad = true
-        fail('bare-path', `${rel}:${i + 1} → \`${raw}\` 不存在（双树均无——活指针腐化：改指针到现行家）`)
+const barePathWarn = []
+/** 扫一批文件的反引号裸路径；hit 回调决定"判红"还是"记观察"。 */
+const scanBarePaths = (files, hit) => {
+  for (const rel of files) {
+    const lines = readFileSync(join(root, rel), 'utf8').split('\n')
+    lines.forEach((line, i) => {
+      for (const m of line.matchAll(/`([^`\n]+)`/g)) {
+        let raw = m[1].replace(/^\.\//, '').replace(/\/+$/, '')
+        if (!TOP_DIRS.some(d => `${raw}/`.startsWith(d))) continue
+        if (/[*<>…{}]/.test(raw) || raw.includes(' ')) continue          // 通配/占位/花括号展开/命令行不是路径
+        raw = raw.replace(/:\d+(?:-\d+)?$/, '')                          // 引文行号不是路径的一部分
+        if (RUNTIME_PREFIXES.some(p => raw.startsWith(p))) continue
+        barePathCount++
+        if (!existsSync(join(root, raw)) && !existsSync(join(root, 'vendor/dsh', raw)) && !RETIRED_PATHS.has(raw)) {
+          hit(`${rel}:${i + 1}`, raw)
+        }
       }
-    }
-  })
+    })
+  }
 }
-if (!barePathBad) ok(`bare-path ×${barePathCount}（${NOW_FILES.length} 文件反引号裸路径存在性）`)
+scanBarePaths(NOW_FILES, (where, raw) => {
+  barePathBad = true
+  fail('bare-path', `${where} → \`${raw}\` 不存在（双树均无——活指针腐化：改指针到现行家）`)
+})
+scanBarePaths(WARN_FILES, (where, raw) => { barePathWarn.push(`${where} → \`${raw}\``) })
+if (!barePathBad) {
+  ok(`bare-path ×${barePathCount}（${NOW_FILES.length} 文件反引号裸路径存在性；另观察档 ${WARN_FILES.length} 文件）`)
+  if (barePathWarn.length > 0) {
+    console.log(`  观察项 ${barePathWarn.length} 条（观察档 = \`notes/implemented|postmortem/**\`：`
+      + '记录**当时**事实的档案，里面引的路径当时是对的——**改它就是篡改记录**，故只提醒不判红）：')
+    for (const w of barePathWarn) console.log(`    ${w}`)
+  }
+}
 
 // ── 2e. pin 版本一致性门禁（2026-09-26 立，技术债清扫 B2/B3/B4 类）───────────────
 // 为什么：升 pin 的消费面只改了一半——代码改对了，叙述机制的老文档留在上一代（dev-loop 头部

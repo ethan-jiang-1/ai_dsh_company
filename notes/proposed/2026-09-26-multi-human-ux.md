@@ -48,18 +48,30 @@ dev/homes/bob/company-workspace   -> ../../company-workspace
 `endsWith('company-workspace')` 过滤照样认 ✓。
 
 - ✓ 一个服务、消息通、门天然隔离、**零 client 改动**
-- ✗ **`deliverables-check.mjs:80` 会漏**：它按 `resolve` 后的路径算 bucket 名
+- ✗ **`scripts/deliverables-check.mjs:80` 会漏**：它按 `resolve` 后的路径算 bucket 名
   （`-${workspace.replaceAll('/','-')}--`），而会话实际落在 symlink 名的 bucket 里
   ⇒ 乙的门里那次 `present` 它看不见 ⇒ 假红 `final-not-presented`。**要改扫描面**（按后缀扫多个 bucket）。
 - ⚠ 未实测：symlink cwd 下**写入是否被沙箱放行**（预期放行：相对路径解析后落在 symlink 前缀内）。
 
-**A/B/C 对照**：
+### D · **命名约定代偿**（零结构，不隔离只帮找）
+每扇门把会话标题写成 `<角色> · <slug>`，侧栏可搜/可辨。
+- ✓ 零结构、零改动、今天就能用
+- ✗ **不解决"看得到别人的门"**（只是让它不那么刺眼）；靠人自觉命名
 
-| | 门的隔离 | 消息通道 | 新结构 | 门禁改动 | 与真实多人同形 |
-|---|---|---|---|---|---|
-| A | ✗ | ✓ | 无 | 无 | ✗ |
-| B | ✓ | ✗ | 多 home | 要（扫多 home） | ✓✓ |
-| C | ✓ | ✓ | symlink 目录 | 要（扫多 bucket） | 半（一个服务） |
+### E · **client 侧"我的门"过滤/收藏**（**红线，只留案**）
+在驾驶舱里按角色 pin/过滤会话列表。
+- ✓ 这才是真正好用的 UX
+- ✗ **要动 client 数据层**（用户 2026-09-25 已裁 demo 期不做）⇒ **本轮不做，只登记**
+
+**方案对照（含成本）**：
+
+| | 门的隔离 | 消息通道 | 新结构 | 门禁改动 | 与真实多人同形 | 今天能做？ |
+|---|---|---|---|---|---|---|
+| A | ✗ | ✓ | 无 | 无 | ✗ | ✓ |
+| B | ✓ | ✗ | 多 home | 要（扫多 home） | ✓✓ | ✓ |
+| C | ✓ | ✓ | symlink 目录 | 要（扫多 bucket） | 半（一个服务） | ✓（已实测分组） |
+| D | ✗（只帮找） | ✓ | 无 | 无 | ✗ | ✓ |
+| E | ✓ | ✓ | client 改动 | — | ✗ | **✗ 红线** |
 
 ## L2 · 对齐：正解是**扫盘推待办**，不是找通道
 
@@ -75,8 +87,15 @@ dev/homes/bob/company-workspace   -> ../../company-workspace
 - 依据全在盘上：任务书（谁派活、点了谁）+ 目录内容（谁出了稿）⇒ **可推、可复核、无新事实家**
 - 这也顺带解决了"自己新建会话对不上话"：**不用对上**——门自己会去找话题。
 
-**可选增强（要动 client 数据层 = 红线，只留案）**：驾驶舱加一个"动议"页签，按 slug 聚合各角色稿的
-状态（谁出了、谁没出、谁缺席）。**那才是真正的 UX**；在它到位之前，靠上面那条扫盘纪律代偿。
+**其他方案（列出以证空间完整）**：
+- **F · 显式派活单**：CEO 写 `deliverables/<slug>/ASSIGN.md`（谁 / 做什么 / 状态）。
+  ✗ 比"扫盘推"多一个**新文件类型**（`drafts/<角色>.md` 已是既有形状，任务书用它就够）——
+  多一个事实家就多一处会漂。**除非**评审认为"任务书兼派活单"在语义上太挤。
+- **G · 靠 CEO 的动议会话 spawn 成员，人的门只读**：✗ 机制上成员**拉不到人**（①-b 实测）⇒
+  人就成了旁观者，"各自开门"失去意义。
+- **H · 上游 seam：按角色路由通知**（搁置池）：✓ 才是真解；✗ 需上游能力，**不自建**。
+- **I · 驾驶舱"动议"页签**（按 slug 聚合各角色稿状态）：✓ **那才是真正的 UX**；
+  ✗ 要动 client 数据层 = **红线，只留案**。
 
 ## L3 · 并发：**用产物形状把锁需求消掉**，而不是去实现锁
 
@@ -94,6 +113,13 @@ dev/homes/bob/company-workspace   -> ../../company-workspace
 而那可以退化成"看文件 mtime/内容"（够用），**不必造锁**。
 - 兜底仍在：**写前读**（手册纪律）+ 事后门禁（三态判据抓"成品没有 present 背书"）
 - ⚠ 唯一真风险：**同一个人开两扇门写同一个文件**（自己撞自己）——低危，靠"一门一角色"的纪律挡
+
+**其他方案（列出以证空间完整）**：
+- **J · append-only 活动流**（谁在写什么，如 `kb/<slug>/ACTIVITY.md`）：✓ 有可见性；
+  ✗ 造新事实家 + 需要"什么时候写"的纪律，**收益不抵成本**（可见性看 mtime/内容已够）。
+- **K · 文件级租约**（`.lock` sidecar）：✗ 造锁机制 = 发明（D13），且锁要解决的问题已被形状消掉。
+- **L · 用 git 当并发层**（各人 commit/push，冲突显式化）：✓ 这才是多写者的"真答案"；
+  ✗ demo 期给每个物理人加 git 仪式太重；**迁到真实多人时可作可选层**（合同 §5 迁移清单可挂）。
 
 ## 推荐（待用户裁）
 
@@ -120,8 +146,70 @@ dev/homes/bob/company-workspace   -> ../../company-workspace
 
 ## 依据
 
-- 机制：①-b 探针（`scripts/member-inquiry-probe.mjs`）+ `user-questions/src/index.ts:101-106` +
-  `child-agent.ts:254`；本提案的 symlink 分组实测 = 会话 bucket 名
+- 机制：①-b 探针（`scripts/member-inquiry-probe.mjs`）+ `vendor/dsh/packages/interaction/user-questions/src/index.ts:101-106` +
+  `vendor/dsh/packages/subagent/subagent/src/child-agent.ts:254`；本提案的 symlink 分组实测 = 会话 bucket 名
   `--Users-...-dev-homes-bob-company-workspace--`（按字面路径）。
 - 合同：[docs/multi-human.md](../../docs/multi-human.md)（§0 机制边界 / §2 开门 runbook / §3 交接协议）。
 - 真盘实测那场：slug `sea-reconcile-2026`（見 §问题 的 preset 默认坑）。
+
+## 可核清单（**每条结论都能被独立核实**——评审请优先打这里）
+
+| # | 结论 | 怎么自己核 |
+|---|---|---|
+| 1 | **被委派的成员（含 team teammate）拉不到人**：问询在服务层被拒 | 跑 `source dev/env.sh && node scripts/member-inquiry-probe.mjs`（真模型 ≈$0.1，排练场）；源码 `vendor/dsh/packages/interaction/user-questions/src/index.ts:101-106`（抛 `DELEGATED_CALLER`） |
+| 2 | 审批对成员**硬编码** `never` | `vendor/dsh/packages/subagent/subagent/src/child-agent.ts:254` |
+| 3 | 判"是不是 root"的字段是 `parent`（**运行时归属**） | `vendor/dsh/packages/core/agent/src/index.ts:66`（注释原文 "Live parent Agent for runtime ownership; **omit for a root Agent**"）+ `:596` `roots()` 实现（`filter(entry => entry.owner === undefined)`） |
+| 4 | team teammate 是 `parent: root` 建的 ⇒ **也不是 root** | `vendor/dsh/packages/experimental/agent-team/src/roster.ts:288`（`request: { prompt, parent: root }`） |
+| 5 | **侧栏按 `cwd` 字面分组**（symlink 能隔离） | 建 `dev/homes/bob/company-workspace -> 真盘`，用该路径 `session/create`，看 `$DSH_HOME/sessions/` 新 bucket 名 = `--Users-…-dev-homes-bob-company-workspace--`（**未被解析成真盘**） |
+| 6 | `deliverables-check` 按 **resolve 后**的路径算 bucket ⇒ symlink 门会漏 | `scripts/deliverables-check.mjs:80`（`-${workspace.replaceAll('/','-')}--`，`workspace` 来自 `resolve`） |
+| 7 | `journal-audit` 认 `endsWith('company-workspace')` ⇒ symlink 门照样认 | `scripts/journal-audit.mjs:78` |
+| 8 | 卡按**"发起它的那个 agent 的会话"**作用域 | RFC §机制核实（两门实测 A=true / B=false）；落点 `docs/multi-human.md` §0 |
+| 9 | **新建会话 preset 默认 = `ceo`**（第二扇门极易开错） | `docs/demo.md` §前置 第 4 步；真盘实证：会话 `0e7ead3b`（preset `ceo`）写了 `kb/cfo/journal/…` |
+| 10 | **`journal-audit` 查在场、不查署名** | 同上：CFO 的 journal 由 ceo 会话写，审计仍判 ✅ |
+
+**仓库自带的探索路径**（评审不必从零摸）：
+- 入口链：`AGENTS.md` → `docs/index.md`（地图 + **§术语映射**：概念→源码直达表）→
+  `docs/guides/dev-loop.md` §0.5/§1（任务入口与执行规则）；
+- **vendor 只读铁律**：`vendor/dsh/` 是钉住 SHA 的 submodule（`dsh-v0.1.7-rc.2` =
+  `477b4f420553e8a52c2fbccc464d7561b239c443`），**一个字节都不许改**（`pnpm verify` 双门禁强制）；
+  上面所有以 vendor 树开头的行号都指它；
+- 跑起来：`source dev/env.sh`（双 home 兜底）→ `pnpm verify`（结构门禁，秒级）→ `pnpm test`
+  （keyless 回归，210 项）；真模型档按 §9.1 分层按面选跑；
+- **起一个真会话看机制**：`CI=true pnpm dsh web -- --port 0 --no-open`（端口是环境状态；启动横幅
+  打印带 token 的 URL）；RPC 形态见任意 `scripts/*-probe.mjs`（`session/create` → `session/prompt`
+  → `session/page` 读事件）；
+- 本仓特有的两条：**「一处事实一个家」**（D10，别把同一事实写两处）与 **「完成定义 = 该面最小真检查
+  通过」**——所以本提案里凡有断言，都尽量给"一条能跑的命令"或"一行能读的源码"。
+
+## 我不知道的（**请评审优先攻这里**）
+
+1. **L2 的最大弱点**：任务书 `drafts/ceo.md` 里"点了谁"是**自然语言**（例："分派 CFO 出经济性、
+   COO 出承接"），**不是结构化字段** ⇒ "扫盘推待办"要读自然语言，**可能漏、可能误**。
+   缓解候选：约定任务书里有一行固定形状（如 `派活：CFO / COO`）——但那等于给任务书加字段。
+   **这是我方案里最脆的一环，请重点打。**
+2. **symlink cwd 下写入是否被沙箱放行**——未实测（预期放行：相对路径解析后落在 symlink 前缀内）。
+3. **侧栏分组的确切实现**——我是从会话 bucket 名**反推**的，**没读 client 侧渲染逻辑**。
+   若 client 实际按 realpath 分组，则方案 C 失效。
+4. **方案 B 下 Agent Teams 消息是否真的跨 home 不通**——未实测，是从"会话库/凭据按 home 隔离"推断的。
+5. **多人同时写同一文件的实际后果**——未实测；当前靠"一文件一写者"的形状规避，没验证过违反时的行为。
+6. **"刷新即丢"对 L2 的影响**：卡是实时事件、刷新不重建（已知边界）⇒ 若 L2 也依赖实时事件就会失效；
+   我的设计**刻意只用盘上状态**（不依赖事件），但没实测"人离台再回来"的完整体验。
+
+## 什么会推翻我（先说清判据，免得争论无锚）
+
+| 若观察到 | 则 |
+|---|---|
+| client 实际按 **realpath** 分组会话 | **L1-C 失效**（symlink 隔离不成立），退回 B 或 D |
+| Agent Teams 消息**能**跨 `$DSH_HOME` | **B 的主要缺点消失**，B 优于 C（更贴真实多人形态） |
+| "扫盘推待办"的漏/误率高到不可用 | **L2 改用显式派活单**（方案 F），接受多一个文件类型 |
+| 真出现**两个物理人写同一文件** | **L3 的"形状消掉锁"不成立** ⇒ 上 git 当并发层（方案 L） |
+| 上游补了"按角色路由"的 seam | **L2/L3 大部分可退役**——通知能到各自的门，"扫盘推"降为兜底 |
+
+## 我建议的评审问题（给评审者）
+
+1. **L1**：除了 A–E，还有别的形态吗？"每人一个 symlink 门"这种**借平台分组语义**的做法，
+   有没有你见过的更干净的等价物？
+2. **L2**：**"对齐"这件事，在"没有通知通道"的前提下，除了"状态可推"，还有第三种范式吗？**
+   （这是我认为最值得被挑战的一条）
+3. **L3**：我主张"用产物形状消掉锁需求"。**这个主张在什么条件下会崩？**
+4. 整体：**这三层拆得对吗？** 有没有被我漏掉的第四层（比如"话题的生命周期/归档"）？
