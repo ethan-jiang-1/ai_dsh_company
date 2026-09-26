@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterAll, afterEach, describe, expect, it, vi } from 'vitest'
@@ -69,6 +69,33 @@ describe('当前角色章程的工具路径以会话 cwd 为基准', () => {
       : `\`deliverables/<slug>/drafts/${role}.md\``)
     for (const match of text.matchAll(/`((?:templates|kb)\/[^`<>]+)`/g)) {
       expect(existsSync(join(workspace, match[1])), `${role}: ${match[1]}`).toBe(true)
+    }
+  })
+})
+
+describe('排练场镜像：kb 根三件事实家必须在场', () => {
+  // 2026-09-26 立（磨清单第 4 项，触发条件 = 动排练场时）：镜像此前只拷 org.md + CHARTER +
+  // templates ⇒ 排练场里的角色**看不到 owners.md（授权面）与 motion-ledger.md（经营台账）**，
+  // 排练动议要按 owners 路由或要看台账就缺料。这条守"kb 根三件一件都不能少"。
+  // 纯夹具（不碰真仓、不写 dev/rehearsal-workspace）：造一个最小 repo 根，只看镜像面。
+  it('ensureRehearsalWorkspace 镜像 kb/{org,owners,motion-ledger}.md', async () => {
+    const { ensureRehearsalWorkspace } = await import('../scripts/lib/rehearsal.mjs')
+    const repo = mkdtempSync(join(tmpdir(), 'company-rehearsal-mirror-'))
+    try {
+      mkdirSync(join(repo, 'company-workspace/kb/ceo'), { recursive: true })
+      writeFileSync(join(repo, 'company-workspace/AGENTS.md'), '# 手册\n')
+      for (const name of ['org.md', 'owners.md', 'motion-ledger.md']) {
+        writeFileSync(join(repo, 'company-workspace/kb', name), `# ${name}\n`)
+      }
+      writeFileSync(join(repo, 'company-workspace/kb/ceo/CHARTER.md'), '# ceo\n')
+      const rehearsal = ensureRehearsalWorkspace(repo)
+      for (const name of ['org.md', 'owners.md', 'motion-ledger.md']) {
+        expect(existsSync(join(rehearsal, 'kb', name)), `缺 ${name}`).toBe(true)
+      }
+      expect(existsSync(join(rehearsal, 'kb/ceo/CHARTER.md'))).toBe(true)
+      expect(existsSync(join(rehearsal, 'kb/ceo/journal'))).toBe(true)
+    } finally {
+      rmSync(repo, { recursive: true, force: true })
     }
   })
 })

@@ -7,7 +7,9 @@
 // 会话 cwd 换到独立目录即完成隔离，不需要新功能。
 //
 // 镜像语义（ensure 幂等，可反复跑）：
-//   - 参考输入每次都刷新：kb/<role>/CHARTER.md、kb/org.md、templates/
+//   - 参考输入每次都刷新：kb/<role>/CHARTER.md、kb/org.md、**kb/owners.md**、
+//     **kb/motion-ledger.md**、templates/（后两件 2026-09-26 补：排练场里的角色此前**看不到
+//     授权面与经营台账**——排练动议若要按 owners.md 路由、或要看台账，就会缺料）
 //   - 排练产物永不触碰：kb/<role>/journal/（**不镜像**真实 journal——排练记忆不混真记忆）、
 //     deliverables/、排练会话写出的任何文件
 //   - AGENTS.md 是指向真盘手册的**符号链接**（相对目标）：手册即注入基线，单一事实家不搬家；
@@ -30,7 +32,10 @@ export function ensureRehearsalWorkspace(repoRoot) {
   mkdirSync(join(rehearsal, 'deliverables'), { recursive: true })
   mkdirSync(join(rehearsal, 'kb'), { recursive: true })
   const realKb = join(real, 'kb')
-  if (existsSync(join(realKb, 'org.md'))) cpSync(join(realKb, 'org.md'), join(rehearsal, 'kb', 'org.md'))
+  // kb 根的**事实家三件**：编制 / 人侧授权面 / 经营台账。少镜像一件，排练场里就有一处事实缺料。
+  for (const name of ['org.md', 'owners.md', 'motion-ledger.md']) {
+    if (existsSync(join(realKb, name))) cpSync(join(realKb, name), join(rehearsal, 'kb', name))
+  }
   for (const entry of readdirSync(realKb, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue
     mkdirSync(join(rehearsal, 'kb', entry.name, 'journal'), { recursive: true })

@@ -44,7 +44,9 @@
   一场跑完），归档按"整目录 + README 说明"处理。逐份 drafts 归属哪一场**未核实**；谁来磨 = 维护者；
   何时磨 = 若将来要拿它当判据档，先分清再引。
 
-- **`kb/owners.md` 与 `kb/motion-ledger.md` 未进排练场镜像**（2026-09-26 新观察）：`rehearsal.mjs`
+- ~~**`kb/owners.md` 与 `kb/motion-ledger.md` 未进排练场镜像**~~ **已磨（2026-09-26，触发条件 = 动排练场时）**：
+  `rehearsal.mjs` 现镜像 **kb 根三件事实家**（org / owners / motion-ledger），并补了**回归**
+  （纯夹具 + 红→还原→绿反证）。原观察：`rehearsal.mjs`
   只镜像 `org.md` / CHARTER / `templates/` ⇒ 排练场里的角色**看不到授权面与经营台账**。疑似缺口
   （排练动议若要按 owners.md 路由就会缺料）。谁来磨 = 维护者；磨法候选 = 把这两件加进镜像清单；
   何时磨 = 下次动排练场时。
