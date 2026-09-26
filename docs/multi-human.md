@@ -136,7 +136,7 @@ CEO 门落任务书 `drafts/ceo.md` → CFO 门读它、出 `drafts/cfo.md`、�
 | 1 | `company-workspace/` 整盘——`kb/`（CHARTER + journal + **owners.md** + org.md + motion-ledger.md）、`deliverables/`、`templates/`、`AGENTS.md`（公司手册） | 这是**真正的共享层**；协作全落在它上面 |
 | 2 | `packages/company-pack/`（角色 persona/skills + bundle 行 + client 面） | 角色与规矩的来源 |
 | 3 | `docs/` + `notes/`（当前合同与开发记忆） | 迁过去的人要能读懂"规矩从哪来" |
-| 4 | 环境：DSH 本体（**同一 pin**）+ 各自的 `$DSH_HOME` | home **每台机器自己的**（会话库/凭据是本地的，不共享） |
+| 4 | 环境：DSH 本体（**同一 pin**）+ 各自的 `$DSH_HOME` | home **每台机器自己的**（会话库/凭据是本地的，不共享）。**多 home 三个已核事实（实验 D 配置 B 活体，2026-09-26）**：① 每家要**各自装 pack**（新 home 只有 factory preset，公司角色建不了门）；② 同一共享盘在两家**各落一个日志 bucket** ⇒ 审计（`deliverables-check` / `journal-audit` 按 `$DSH_HOME` 扫）**每家跑一遍**，只跑一家会漏另一家的会话；③ Agent Teams 消息跨 home 无寻址路径（进程内能力 + 双服务互不可见）——跨家协作只剩共享盘 |
 
 **不能搬的**：`$DSH_HOME/sessions/`（会话日志是**运行时残留**、含机器专属路径）。
 要留证据就按会话 id 归档到 `snapshots/`，别搬会话库。
