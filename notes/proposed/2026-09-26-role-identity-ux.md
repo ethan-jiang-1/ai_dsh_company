@@ -73,13 +73,18 @@
   **靠"值形状不符"抓出来**（列表返回的是上游的纯字符串形状）⇒ 撤销。研究阶段的漏项 =
   只查了 `api/session-controller` 的投影表声明，没查 `agent-preset-registry` 自己的声明文件；
   **验收驱动救了一次**。⇒ B/C 段直接读上游投影，不再写任何 host 代码。
-- **B · 侧栏徽标（client）**：挂 `sidebar.session.row.leading`，读该行投影 → 色点 + 缩写。
-  **验收**：真浏览器——侧栏每行行首可辨角色；非公司会话无痕迹。
-- **C · 窗口标题 + 工作台徽标/色条（client）**：活动会话投影 → `document.title` +
-  `data-wk-role` + CSS。
-  **验收**：两个窗口并排（CEO/CFO），标题与色条一眼可辨；切换会话时同步变化。
+- **B · 侧栏徽标（client）= ✅ 已交付并验收（`ee7b8b5`）**：挂 `sidebar.session.row.leading`
+  （root 域只给 sessionId ⇒ 数据经注册 inject 面注入 `sessions.list` 快照 +
+  `useSyncExternalStore`——subscribe 用 useMemo 绑一次，getServerSnapshot 补齐否则静态渲染抛错）。
+  **验收（2026-09-26 真浏览器自主验收 ALL PASS）**：徽标 5 个（cfo×2 / ceo×3）行首在场、缩写全对
+  （CEO/CFO/…）；非公司会话零痕迹（单测覆盖）；**未连工作区也渲染**（Ungrouped 组直接出）。
+- **C · 窗口标题 + 整窗色条（client）= ✅ 已交付并验收**：根级 effect 无条件接管
+  `document.title = 【角色】会话标题` + `:root[data-wk-role]` + 3px 顶部色条。
+  **验收**：初始 `【CEO】company-workspace` → 点开 CFO 行即变 `【CFO】你好`、
+  `data-wk-role=cfo`、顶条 3px——**与 vendor DocumentTitle 并存无闪烁**（开放问题 3 定案）。
 
-**顺序**：A ✅（零代码）→ **B（下一步）** → C；每段一个 commit + 真浏览器验收。
+**顺序与状态**：A ✅（零代码）→ B ✅ → C ✅（验收 `ee7b8b5` + 一次性自主验收脚本——真浏览器
+连 UI 断言，未入库；单测 6 项在 `tests/role-badge.spec.ts`）→ ③ 收尾（提案本节 + 开门配方）。
 
 ## 六、明确不做
 
@@ -88,11 +93,15 @@
 
 ## 七、开放问题（如实列出，验收时定案）
 
-1. **用户没看到标签变化的两个假设**：面板抑制（`activePanelId !== null`）或客户端会话仓库的
-   title 未实时跟随 `session/rename`——需一次真浏览器观察定案（C 段验收顺带做）。
-2. **五个角色是否都有合适的 `--dsw-*` 令牌**——不够则提上游新令牌，不写死颜色。
-3. **vendor `DocumentTitle` 与我们的 title 效果并存**——我们后挂即覆盖；倾向**直接覆盖**
-   （行为可预期），但需在 C 段实测确认无闪烁。
+1. ~~用户没看到标签变化的两假设~~ **已定案（2026-09-26 自主验收）**：根因 = vendor 的
+   DocumentTitle 受 `activePanelId === null` 门控 + 构建期静态产品名；**我们的 C 段无条件接管后
+   真浏览器实测标题随会话切换即时更新**（【CEO】company-workspace → 【CFO】你好）——不再依赖
+   vendor 的条件，两假设无需进一步区分。
+2. **分类色板：平台没有**（盘点 design-platform.css 182 令牌：只有语义状态色 error/success/
+   warn/business——给角色用会误导）。**当前决定**：所有角色共用品牌色、区分靠文字缩写（已验收可用）；
+   **要每角色一色 ⇒ 上游提"分类色板"令牌**（本包不写字面色——styling 纪律）。留给用户点名时再提。
+3. ~~并存优先级~~ **已定案**：直接接管（后注册者的订阅后触发 ⇒ 稳定胜出），真浏览器实测
+   标题稳定无闪烁。
 
 ## 八、依据（全部源码，可自行核对）
 
