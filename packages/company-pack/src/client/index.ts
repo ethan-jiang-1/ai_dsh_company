@@ -21,6 +21,7 @@ import { LedgerTab } from './LedgerTab.tsx'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
 import { installStyles } from './styles.ts'
+import { ROLE_SHORT, RoleBadge, readPresetOf, sessionTitleOf } from './RoleBadge.tsx'
 import { TasksAction } from './TasksPanel.tsx'
 import { TEAM_TOOL_KEYS, TeamToolCard } from './TeamToolCard.tsx'
 
@@ -50,6 +51,32 @@ const COMPANY_VIEW_ID = 'dsh-company-pack/company'
 export async function apply(ctx: ClientContext): Promise<void> {
   // CSS 与 fiber 同寿命；重新挂载读取新样式，卸载仅清理本次节点。
   ctx.effect(installStyles)
+
+  // 角色身份 UX · C 段：窗口标题带角色 + 整窗角色色条（2026-09-26 立，提案 §五 C）。
+  // vendor 的 DocumentTitle 只在 activePanelId===null 时显示会话标题（用户真实用法下不可靠，
+  // 实测"压根儿找不到变化"）⇒ 本效果无条件接管标题：始终「【角色】会话标题」；
+  // 并把当前角色写到 :root[data-wk-role] 供 CSS 顶部色条使用。
+  // 数据 = 上游 agentPreset 投影（A 段已验）+ 会话列表标题；订阅快照，无轮询。
+  ctx.inject(['sessions'], (scoped) => {
+    scoped.effect(() => {
+      const list = scoped.sessions.list
+      const update = (): void => {
+        const state = list.getSnapshot()
+        const current = Object.values(state.byId).find(s => (s.retainedBy.mainView ?? 0) > 0)
+        const preset = current === undefined ? null : readPresetOf(list, current.id)
+        const short = preset === null ? undefined : ROLE_SHORT[preset]
+        const rawTitle = current === undefined ? undefined : sessionTitleOf(current)
+        if (rawTitle !== undefined && rawTitle !== '') {
+          document.title = short === undefined ? rawTitle : `【${short}】${rawTitle}`
+        }
+        const root = document.documentElement
+        if (short === undefined) delete root.dataset.wkRole
+        else root.dataset.wkRole = preset ?? ''
+      }
+      update()
+      return list.subscribe(update)
+    })
+  })
 
   // 驾驶舱①·「需要你」：挂起项登记处（apply 闭包内创建——client 纪律禁模块级单例）。
   // 观察者写入 / 页签读取共享同一实例。
@@ -111,6 +138,18 @@ export async function apply(ctx: ClientContext): Promise<void> {
   ctx.inject(['sessions', 'sidebarRight', 'slots'], (scoped) => {
     scoped.slots.inject('sidebar.brand.name', () =>
       scoped.slots.register({ name: 'sidebar.brand.name' }, WocheBrandName))
+
+    // 角色身份 UX · B 段：侧栏会话行首的角色徽标（官方 ambient 行装饰位，仅 idle 行渲染）。
+    // root 作用域只给 sessionId（槽合同原话"nothing else"）⇒ 数据经 inject 面注入
+    // 会话列表快照；徽标内部用 useSyncExternalStore 订阅上游 agentPreset 投影。
+    // 无角色/未知 preset 优雅降级为不渲染（RoleBadge 返回 null）。
+    scoped.slots.inject('sidebar.session.row.leading', () =>
+      scoped.slots.register({
+        name: 'sidebar.session.row.leading',
+        id: 'company-role-badge',
+        order: 0,
+        inject: () => ({ roleSource: sessions.list }),
+      }, RoleBadge))
 
     const sessions = scoped.sessions
     /** 子代理会话归到它的 Lead：团队状态挂在 Lead 上。 */

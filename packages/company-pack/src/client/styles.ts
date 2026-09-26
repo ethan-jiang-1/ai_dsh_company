@@ -19,6 +19,38 @@ const CSS = `
   --wk-row-gap: 0.35rem;
 }
 
+/* 侧栏会话行首的角色徽标（角色身份 UX · B 段）：
+   品牌色小徽标 + 角色缩写——每个会话行一眼可辨"这扇门是谁"。
+   颜色一律平台令牌（品牌底 + 反色字）；每角色不同色需上游补分类色板
+   （提案开放问题 2），feature 包不写字面色。 */
+.wk-role-badge {
+  flex: none;
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  padding: 0.22rem 0.32rem;
+  border-radius: var(--dsw-radius-xs);
+  background: var(--dsw-alias-brand-primary);
+  color: var(--dsw-alias-label-primary-inverted);
+  user-select: none;
+}
+
+/* 整窗角色色条（角色身份 UX · C 段）：当前会话有角色时，窗口最顶出现一条品牌色细带
+   ——并排多窗时"哪扇是公司门"一眼可辨（角色区分靠窗口标题的【角色】前缀；
+   每角色不同色需上游分类色板，见提案开放问题 2）。 */
+:root[data-wk-role] body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 2147483647;
+  background: var(--dsw-alias-brand-primary);
+  pointer-events: none;
+}
+
 /* 仅供屏幕阅读器的文本（列头/状态的可访问名） */
 .wk-visually-hidden {
   position: absolute;
