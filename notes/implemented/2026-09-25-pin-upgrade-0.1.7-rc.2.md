@@ -10,14 +10,13 @@
 
 - 钉住版与 0.1.7 系列之间共 **7 个 tag**（rc.3 / 0.1.6-alpha.1–2 / 0.1.7-alpha.1–2 / 0.1.7-rc.1 / 0.1.7-rc.2）；
   `pin → rc.1` = 3304 commit（其中 **2211 non-merge**，与增量报告口径一致）。
-- 既有材料 [upstream-delta](../research/2026-09-24-dsh-upstream-delta.md) +
-  [pin-upgrade-and-harvest](../research/2026-09-24-pin-upgrade-and-harvest.md) 以 **rc.1** 收口，
+- 既有材料（上游增量报告 + 基座轮研究稿；**两稿已按 research 层规则毕业删除**，全文归 git）以 **rc.1** 收口，
   [ROADMAP.md](../../ROADMAP.md) 的 ⏸ 行也写 rc.1 ⇒ **靶落后一个 tag**。
 - 研究树本地尚无 rc.2 对象（其 tag 只到 rc.1）。**2026-09-25 阶段 0 已实测核实**：`rc.1 → rc.2` =
   **346 commit / 3429 文件 / +136,313 −24,518**，且落在本仓依赖的面上（`user-questions` 含 timed waits and
   late replies、`approval` 说明本地化与 auto-review、`preset` 19、`schedule` 20 含禁用 shipped schedule、
   `projection`、`workspace-files` 链接解析）——**不是纯发布 bump**。GitHub API 早先显示的 317/317 只是那一个
-  merge commit 自身的版本号改动，不代表区间。明细见 [upstream-delta §⑦](../research/2026-09-24-dsh-upstream-delta.md)。
+  merge commit 自身的版本号改动，不代表区间。明细见上游增量报告 §⑦（该稿已毕业删除）。
 
 ## 方案
 

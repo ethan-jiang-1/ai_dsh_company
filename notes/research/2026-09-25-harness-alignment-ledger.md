@@ -1,9 +1,9 @@
 # 2026-09-25 · Harness 对照台账：以《Agent-ready Development》为镜
 
-状态：活参考——喂给谁 = [dev-loop §9.1](../../docs/guides/dev-loop.md) 判据三句、[docs/index](../../docs/index.md) 与
+状态：**活参考（消费者 = dev-loop §9.1 判据三句 / docs/index / architecture / README 四处活引用）**——喂给谁 = [dev-loop §9.1](../../docs/guides/dev-loop.md) 判据三句、[docs/index](../../docs/index.md) 与
 [architecture](../../docs/design/architecture.md) 的对照登记、[company-pack README](../../packages/company-pack/README.md)；
 不照搬清单 owner = 本文 §四.4；阶段任务已交付（阶段 1 台账 + 三切片 C `ed633d0` / B `8a90332` / A `15ea897` 落地；
-主会话亲读 15 篇逐条判 + 四路阅读代理交叉核对；判定二分、无「待定」）。毕业动作 = 引用面各自消失时按三选一处置。
+主会话亲读 15 篇逐条判 + 四路阅读代理交叉核对；判定二分、无「待定」）。**毕业动作**：四处引用面各自消失时按三选一处置（预期为"仍在用"长期保留——它是那四处的**唯一出处**，不是待办）。
 
 > 语料：`/Users/bowhead/deepseek-harness/_agent_ready_development/`，钉 DSH commit `46a7f68b` =
 > tag `dsh-v0.1.7-rc.1`（**比本仓 pin `rc.2` 差一个 tag**——只吸收理念层结论；机制细节一律回
@@ -91,7 +91,7 @@
 **repo-harness/06-runtime-inspection**（三查询面：配置树/静态注册/进程内）
 - 本仓现状：查询一已成合同工具（dev-loop §2 组合层；其盲区"config 校验看不见"已实证成反例）；
   查询三（`cordis_inspect_list/query`）= **升 pin 收割项已登记**
-  （[dsh-upstream-delta](./2026-09-24-dsh-upstream-delta.md) 收割项⑤⑬）；跨 rc 陈旧指针一处：ui-demo.md:111 引用 rc.2 已退役的旧单工具形
+  （上游增量报告收割项⑤⑬；该稿已随收割轮收口毕业删除）；跨 rc 陈旧指针一处：ui-demo.md:111 引用 rc.2 已退役的旧单工具形
   `cordis_inspect what:"client"`。
 - **判定：采纳切片（绑收割轮：双工具落地时调试阶梯补"进程内查询"一档 + 修 ui-demo 旧引用 + 登记
   `--dump-config-schema`；修旧引用并入切片 C 立即做）**。生成 catalog/freshness = **本仓不适用**

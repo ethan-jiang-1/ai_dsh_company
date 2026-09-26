@@ -62,6 +62,8 @@ UX 实验轮的三笔 client 改动（`3bb26cd` 依赖图三刀 / `3288709` 堆�
   静默失效从此有门禁（此前**全部门禁盲区**）。
 - 验证：`pnpm test` **202/202**（新增 12 项）/ `pnpm verify` ALL PASS / `client-load-smoke` ALL PASS
   （真浏览器）/ client+host 两面重建。
-- **未验证**：真页面上"完成态确实变暗、箭头确实随色"的**视觉确认**归 A 案（长链动议中途截图 +
-  多模态读图，见 [proposed/long-chain-motion-dag-midflight](../proposed/2026-09-26-long-chain-motion-dag-midflight.md)）。
+- **未验证**：真页面上"完成态确实变暗、箭头确实随色"的**视觉确认**——已由 `scripts/dag-visual-probe.mjs`
+  夹具档答（机器 12/12 + 图像目视通过，2026-09-26）；深链可读性归 A 案真动议。
+- **副作用（有意）**：本轮 findings 就是搁置池「视觉打磨二期」的触发条件本身 ⇒ **该项已关闭**
+  （ROADMAP §搁置池 15 → 14 项），剩余主观观感并入 A 案一并看。
 - commit：`cd64e86`。

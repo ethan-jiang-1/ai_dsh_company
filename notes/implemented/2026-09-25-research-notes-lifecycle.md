@@ -56,6 +56,11 @@ owner Note「输掉的方案」节，正文删。
 ## 条目去向
 
 - 规则 owner = [开发环 §12](../../docs/guides/dev-loop.md)（本 Note 为裁决记录与首轮台账）。
+- **第二轮清扫（2026-09-26）**：上一条的处置**已执行**——`dsh-upstream-delta` 与 `pin-upgrade-and-harvest`
+  毕业删除（6 处入站链接改文字引用）；`harvest-ledger` 留（唯一消费者 = 搁置池六项出处）；
+  `harness-alignment-ledger` 留（四处活引用）；`human-agent-ux-patterns` 留（用户裁定）。
+  五篇 → 三篇，**留下的每篇状态行写明唯一消费者 + 毕业触发**（不再有"模糊挂着"的条目）。
+
 - 收割轮收口时按各稿新状态行处置：upstream-delta 与 pin-upgrade-and-harvest 毕业删除（结论落收割轮收尾
   Note / harvest-ledger）；收割轮产出的 harvest-ledger 按同规则进 research/。
 - 无队列条目变更（记事面卫生线，随本 Note 交付）。

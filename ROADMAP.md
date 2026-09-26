@@ -33,7 +33,6 @@
 | **自主节律**（分身定期复盘） | [implemented/twin-cultivation](./notes/implemented/2026-09-22-twin-cultivation-and-self-learning.md) §四 | 机制不闭合：`goal` 需人类授权且 session-start 一律 disarm；`schedule` 只在 live 会话投递且默认没装；webhook 起的会话进不了 goal 循环；全树无 cron | 上游补"外部触发 ↔ 会话内自主续跑"的 seam——**提 seam，不自建调度器**（D9/D13） |
 | **并行快捷派活**（同时开几个 VP） | [delegation.md](./docs/delegation.md) §4.4 | 本组合无干净解法：缺 per-child composition 与不撞名的控制面 | 上游 seam |
 | **Demo 场景 D：可重放叙事场景** | [implemented/presentation-narrative](./notes/implemented/2026-09-24-presentation-narrative.md) §切片二 | 需求未出现：无放映场合；素材（新动议类型场景）已备 | demo／放映需求出现 |
-| **视觉打磨二期** | 同上 §切片三 | 走查触发型——未发现新问题不开（登记处即触发条件） | 用户走查驾驶舱页签发现新问题 |
 | **注意力中心「带假设走的」条目类别**（人机合一 B3） | [implemented/human-agent-integration](./notes/implemented/2026-09-25-human-agent-integration.md) B3 | 证伪：假设只写稿件未决项，无机器事件可折；造事件 = 发明假设工具（D13 边缘） | 多物理人进场，或假设事件源（上游 seam/假设工具）出现 |
 | **注意力面板/台账「决策来源显示」**（人机合一 B4） | 同上 B4 | client 红线（用户 2026-09-25 裁决退化）；审批成对审计 + journal 留痕已覆盖回看 | 用户点名做 client 增强 |
 | RemoteStream 双工流（client→host 流内推 item） | [harvest-ledger #2](./notes/research/2026-09-25-harvest-ledger.md) | 无交互式面板需求 | 交互式面板（插话/追加油）立项 |
@@ -51,6 +50,14 @@
 - 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
+
+- 2026-09-26（**research 层第二轮清扫 + 搁置池分拣**）：按生命周期规则补执行**逾期毕业**——`dsh-upstream-delta`
+  与 `pin-upgrade-and-harvest` 删除（生命周期 Note 第 59 行早已裁明"收割轮收口时毕业删除"，收割轮早收了；
+  结论在 harvest-round Note / harvest-ledger），6 处入站链接同步改成文字引用；research/ 5 篇 → **3 篇**，
+  留下的每篇状态行都写明**唯一消费者 + 什么条件下毕业**（harvest-ledger = 搁置池六项出处；
+  harness-alignment-ledger = 四处活引用；ux-patterns = 用户裁定留，已点明待其复核）。
+  搁置池 **15 → 14 项**：关闭「视觉打磨二期」——触发条件已由 code-review 实际触发（7 条真视觉缺陷，
+  已修 + 落视觉夹具档兜底），剩余主观观感并入 A 案真动议一并看，不再单列。
 
 - 2026-09-26（**journal 缺席机制交付（用户批 A+B）⇒ 磨清单清空**）：A = `scripts/journal-audit.mjs`
   （维护者按需跑、不进 verify）——三级置信度（确认／在场(已归档)／缺席），标定中修掉四处真缺陷
