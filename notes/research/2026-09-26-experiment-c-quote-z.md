@@ -60,6 +60,14 @@ this.ctx.waterfall(scopeTarget(req.agent, req.agent), 'approval/request', req,
 若发卡时人不在，结果不是"卡挂着等"而是**立即失败关闭**（这本身是"界面外推送/收件箱"搁置项的根因，
 也是实验 D 要观察的边界之一）。
 
+### 三扇门在侧栏里的标题（2026-09-26 从 session/title 事件核出，点卡时按标题认门）
+
+| 门 | preset | 侧栏标题 |
+|---|---|---|
+| **CFO 门（点卡 A）** | cfo | **CFO 8.8折毛利测算稿** |
+| **CEO 门（点卡 B）** | ceo | **写折扣报价任务书** |
+| （COO 门，本场无需开） | coo | 承接三年框架与排期出稿 |
+
 ## 段二（两卡，等点）
 
 - CFO 门（`2beb83d0`）自己发起 `request_signoff`（8.8 折 < 9 折，理由写明对应 **cfo v2**）→ 卡只落 CFO 门；
