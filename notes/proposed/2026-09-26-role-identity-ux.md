@@ -63,17 +63,23 @@
 
 ## 五、实现蓝图（三段，每段独立可验收）
 
-- **A · 数据面（host，~30 行）**：声明合并 `agentPreset` 键（State/Map 两表）+ 注册
-  definition（`init(header)` 取 `header.agentPreset`；`apply` 恒等；`wire.view` 直通；
-  `stateVersion: 1`）。
-  **验收**：RPC `session/list` 实测——每行 `projections.values.agentPreset` 在场（含冷会话）。
+- **A · 数据面 = ✅ 零代码（2026-09-26 实测改判）**：**上游已自带同键同义投影**——
+  `vendor/dsh/packages/preset/agent-preset-registry/src/session.ts:33-42`
+  （*"Current Session preset, initialized from its header and advanced by selection events"*，
+  `string | null`，且**跟随 `agent-preset/selected` 切换**——比我原设计的"创建时角色永不变"更对）。
+  **复验（撤掉我方代码、纯上游构建）**：7/7 关键会话在 `session/list` 里带正确 `agentPreset`
+  （含一例中途切过 preset 的会话显示切换后的值）；首轮全量 14/14。
+  **过程教训（如实记录）**：我先按本蓝图写了一份重复实现（`{preset: string}` 形状），验收时
+  **靠"值形状不符"抓出来**（列表返回的是上游的纯字符串形状）⇒ 撤销。研究阶段的漏项 =
+  只查了 `api/session-controller` 的投影表声明，没查 `agent-preset-registry` 自己的声明文件；
+  **验收驱动救了一次**。⇒ B/C 段直接读上游投影，不再写任何 host 代码。
 - **B · 侧栏徽标（client）**：挂 `sidebar.session.row.leading`，读该行投影 → 色点 + 缩写。
   **验收**：真浏览器——侧栏每行行首可辨角色；非公司会话无痕迹。
 - **C · 窗口标题 + 工作台徽标/色条（client）**：活动会话投影 → `document.title` +
   `data-wk-role` + CSS。
   **验收**：两个窗口并排（CEO/CFO），标题与色条一眼可辨；切换会话时同步变化。
 
-**顺序**：A → B → C（A 是 B/C 的数据前提；每段一个 commit + 真浏览器验收）。
+**顺序**：A ✅（零代码）→ **B（下一步）** → C；每段一个 commit + 真浏览器验收。
 
 ## 六、明确不做
 
