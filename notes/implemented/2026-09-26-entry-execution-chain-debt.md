@@ -1,6 +1,6 @@
 # 2026-09-26 · 技术债清扫：两条链收敛 + 共享盘归档
 
-状态：proposed（用户已批，长程 goal 执行中；逐条进度见下表——**状态行不写终态字**，否则 `proposal-graduated` 会要求毕业，而本 RFC 还有条目未收）
+状态：implemented（2026-09-26 用户批准并交付；②–⑥ 全部落地，逐条见 §交付实况。**本 Note 是活跃决策记忆**：门禁与脚本实现事实变化时同步更新）
 
 ## 进度（逐条销账；每条一 commit + push）
 
@@ -9,8 +9,8 @@
 | ② 门禁真相与探针补齐 | ✅ 完成 | `1dc024d` `7e33d8f` | B1 假绿修复（三态反证）；B6 门禁清单单一源；裸路径门禁扩面 5→22 文件（203 条零假阳性，抓到 3 条真腐化）；新门禁 `pin-bookkeeping` + `pin-currency`；状态行门禁修跨行盲区；entry-probe 8→12 问 + **修尺子自身三处缺陷**；基线 = **12/12 + 3 条未消矛盾**（独立复现 B3/B12/R5） |
 | ③ 执行链收敛 | ✅ 完成 | `107f2ce` `0b97cde` `e8df28a` | B7 改"触发条件的家 = 脚本头注" + `script-triggers` 门禁（18 脚本；不往顶到上限的 dev-loop 塞行）；B8 ROADMAP **429→73 行**（历史段删除，blob `d159b0228e2b` 留证，3 处入站引用标注）；B9 状态三态语义；B10 搁置项不是任务源；R4 计数常量/升队条件/场景 D 撞名；B3 `rejected/` 残影（执行链第一跳）；B11 D27 入台账 + intents 行预算 + push 落点；R7 五个断指针；R11 公司手册入布局 |
 | ④ 腐化清扫 | ✅ 完成 | `78308c1` `88df276` `01b3ba5` | R1 版本常量改指针（release/architecture/pack README）；R2 机制三代（**profile.md 最重**：把已退役 `company` profile 当现行形状、`file:` 那条写反——实测 inode 不同/link count 1 = 真拷贝；architecture 的 roots 模型、roles-isolation 的四角色+已消失包名、ui-demo 的 `remote.agentTeams`/`dist/client.js`、pack JSDoc 四处、cordis 头注自相矛盾）；R3 死指针 5 条（含两条**门禁盲区**里的：dev README 与 .gitignore，非 .md/被排除树）；R4 僵尸待办 7 处（R3 待验证点、随升 pin、轮末、归 R5、R4 定稿、驾驶舱旧名、role-content-plan skills 清单）；R5 枚举双写 3 处（改成自查命令与指针）；R6 矛盾对（tests 标题四角色）；R7 其余 5 处；noise 5 处（src/README 重写、architecture §7 stub 保号改写、死测试数、升 pin 证据落点、ROADMAP≡dev-loop 重复规则） |
-| ⑤ 共享盘归档 | ⏳ 待办 | | 补台账两行 + 4 场快照 + 轮末收敛 + 身份规则 + 两道防复发门禁 |
-| ⑥ 最终收敛验收 | ⏳ 待办 | | 地图终态 + entry-probe 复跑（目标：全绿且 `conflicts` 空）+ 收尾 Note + 中立体清扫 |
+| ⑤ 共享盘归档 | ✅ 完成 | `c318f29` | 台账补两行 + 09-26 轮末收敛（23 篇 journal → 五份 CHARTER 历史纪要）+ 新快照 `memory-convergence-2026-09-26`（64 文件）+ 29 份已归档过程稿移出 live + 身份规则按受众拆（成员侧只加 slug 唯一性 / 维护者侧进 snapshots README）+ 两道观察项（`slug-collision` / `slug-unledgered`，均带回归）。`company-workspace/` 108 → **56**；deliverables-check 实跑 0 违规；journal-audit 4 场全判「在场(已归档)」 |
+| ⑥ 最终收敛验收 | ✅ 完成 | `2d0fe36` | **entry-probe 12/12 MACHINE CHECKS PASS 且 `conflicts` 空**（EXIT=0）；探针四轮共抓出 6 条真矛盾（其中 2 条是我自己的漂移：完成即离队漏执行、标记语义越权）与 5 处尺子自身缺陷，全部处置 |
 
 ## 问题
 
@@ -95,7 +95,7 @@ vendor）与**执行链**（取任务 → 判授权 → 实施 → 选验证 →
 | S4 | **文档预算余量 ≈ 0**（dev-loop 447/448、index 142/145、AGENTS 108/115）⇒ "补全唯一规则家"与行预算冲突 | 次序上**先删后加** |
 | S5 | `entry-probe`（现成 fresh-agent 尺子，8 问）**2026-09-24 后停跑**，只覆盖探查链，无触发规则，不在命令表 | 扩到执行链 + 首跑基线 + 立触发规则 |
 
-## 方案：5 个条目
+## 交付实况（5 个条目）
 
 次序理由：先修**尺子**（①）→ 再修**取任务/选验证**主链（②）→ 再扫叙述层腐化（③）→ 再动共享盘
 （④，规则要先立）→ **最后才写地图**（⑤，地图必须描述最终状态）。**先删后加**是硬约束（S4）。
@@ -126,18 +126,30 @@ vendor）与**执行链**（取任务 → 判授权 → 实施 → 选验证 →
 - **逐条改腐化而不建门禁**：否决——腐化有复发史（bare-path 门禁的立项理由就是同一类），
   机械可查的不变量必须进门禁并带反证。
 
-## 验收（整条）
+## 后果 / 验证（实跑，2026-09-26）
 
-1. `pnpm verify` / `pnpm test` 全绿；新增门禁均带**红→还原→绿**反证。
-2. `deliverables-check` **实跑** 0 违规；`company-workspace/` 只留长期资产与成品。
-3. `entry-probe`（扩到执行链后）全绿且 `conflicts` 为空。
-4. findings 台账**逐条**有处置（修 / 留案并给理由 / 转磨清单），零悬空。
-5. 中立体收尾清扫（独立子代理）findings 全处置。
+| 验收项 | 实况 |
+|---|---|
+| `pnpm verify` / `pnpm test` | ALL PASS / 25 文件 **207 项**全绿（起点 203） |
+| 新增门禁均带红→还原→绿反证 | 6 道：`bare-path` 扩面、`pin-bookkeeping`、`pin-currency`、`script-triggers`、`proposal-graduated` 跨行修复、`slug-collision`（观察项，带回归） |
+| `deliverables-check` 实跑 | **0 违规 ALL PASS**（13 成品 / 过程稿 52 → 23）；观察项 2 条（`renewal-y-2026` 与 `agent-workflow` 的 slug 复用，后者是本次新发现） |
+| `journal-audit` 实跑 | 4 场 09-26 动议全判「在场(已归档)」；仍报 4 条缺席**非本轮引入**，已在快照 README 登记 |
+| `entry-probe`（8→12 问，扩到执行链） | **12/12 且 conflicts 空**。四轮基线：0/12（尺子坏）→ 8/12 → 10/12 → 12/12 |
+| findings 台账逐条销账 | 13 blocker 全处置（B13 按「改正 Note」分支）；45 rot / 10 noise / 5 结构性全处置或显式留案 |
+| 行预算 | AGENTS 108→**104**/115；dev-loop 451→**444**/448（先搬后加，净腾出余量）；index 142→**143**/145 |
+| 文件规模 | `ROADMAP.md` **429 → 73 行**；`company-workspace/` **108 → 56 文件** |
 
-## 风险与未知
+## 仍然开着的（交回队列/磨清单，不假装已闭）
 
-- B13 的定案取决于重采是否可行（`dag-midflight-probe.mjs --session` 支持复看既有会话）；
-  若 `ca50e97f` 的日志已不可读，则退化为"改正 Note + 快照 README 记明来源"。
-- `renewal-y-2026` 目录内**两场动议的产物混装**，逐文件归属未核实 ⇒ 归档按"整目录 + README 说明"。
-- 快照层（S3）体积与重复未审计，瘦身需另立条目并单独取证（回归资产，动它风险高）。
-- `deliverables/` 可能被仓库外部按路径引用（`docs/demo.md:21` 教用户粘贴绝对路径）⇒ 不动成品。
+- **B12 的行为面**：手册 $500 档位已按事实家对齐（文本层），但**没有行为面认证档**验证公司角色
+  真的不再为 $500 发起 `request_signoff`（真模型档，按需）。
+- **`snapshots/` 层的重复与体积**（33 MB / 同批交付物 3–5 份）**未审计**——另立条目。
+- **探针的语义层**：12/12 是**机器判据**通过，`semantic review pending`——机器过不等于语义审阅过
+  （dev-loop §12 已写明这条边界）。
+
+## 风险与未知（交付后仍成立的部分）
+
+- `renewal-y-2026` 目录内两场动议的产物**逐文件归属未核实**（归档按"整目录 + README 说明"处理）。
+- `snapshots/` 体积与重复未审计（见上节）。
+- 探针的 `conflicts` 是**强信号但非全覆盖**：它只报模型读到的矛盾，读不到的不会报。
+- 快照层审计需配 `--only <slug>`（整盘拷贝 + 单轮日志的输入不成对），已在脚本文件头与快照 README 写明。
