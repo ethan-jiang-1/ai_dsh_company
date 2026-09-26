@@ -3,7 +3,8 @@
 > 性质：指南层——"怎么操作"的展开与查表处；纪律压缩版在根 AGENTS.md。
 > 来源：FAQ 13 `dev-loop.md` + `dual-home-isolation.md`（repo 外研究材料，落点登记见
 > [index.md](../index.md) §外部研究材料登记）；机制结论以 `vendor/dsh/` 工作树为权威，
-> 本篇引用的旗标与行为均已在钉住 tag（dsh-v0.1.5-rc.2）核对。
+> 本篇引用的旗标与行为均已在**钉住的 vendor 基线**上核对——基线版本与 SHA 的唯一事实家 = 根
+> `AGENTS.md` §vendor 簿记（升 pin 时的重校记录 = [pin-upgrade Note](../../notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md)）。
 
 ## 0. 开发环导航
 
@@ -137,8 +138,8 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibil
    一次 `DEEPSEEK_API_KEY`（或接受真实 API 测试 self-skip）。
 3. **迁移方向**：成品先在 dev home 验过；迁日用 `~/.dsh` 是"装正式包"，不是拷目录。
 4. **双 DSH（代码层）**：`pnpm dsh` 走 `vendor/dsh` 源码（钉住 tag）；PATH 里的裸 `dsh`
-   是日用全局安装，版本随全局升级漂移——当前三处 DSH 恰好同版（0.1.5-rc.2），是巧合
-   不是保证。验证一律 `pnpm dsh`；`env.sh` 已把裸 `dsh` 设为拦截提醒（bypass：`command dsh`）。
+   是日用全局安装，版本随全局升级漂移——**三处同版是巧合不是保证**（别在此处写死版本号；
+   基线版本唯一见 `AGENTS.md` §vendor 簿记）。验证一律 `pnpm dsh`；`env.sh` 已把裸 `dsh` 设为拦截提醒（bypass：`command dsh`）。
    注意 `DSH_HOME` 只护数据层：source 过 env.sh 后裸 `dsh` 也落在 dev home，但跑的
    仍是全局代码。
 5. **新 shell 陷阱（R1 实证 + R4 更正）**：任何 `pnpm dsh` / `node bin.ts` 调用前必须先

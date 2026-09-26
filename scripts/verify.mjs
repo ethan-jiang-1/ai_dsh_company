@@ -1,5 +1,8 @@
 #!/usr/bin/env node
-// 结构门禁：UTF-8 / 文档链接 / preset 结构 / symlink / vendor pin / pack 形状。
+// 结构门禁（**清单唯一源 = 本文件**；AGENTS.md 与 dev-loop 只留指针，不复述清单——复述必漂）。
+// 当前 12 类 / 16 项：md-utf8+md-newline、md-links（含 notes/ 树）、doc-budget、bare-path、
+// preset 结构、claude-symlink、vendor-pin+vendor-clean、pack-bundle、pack-compat、
+// preset-row-deps、client-halves、proposal-scheduled+graduated。跑一次看 PASS 行即得全表。
 // 纪律：只报告实际跑过的检查（docs/design/architecture.md §6）。阶段 5 前不测行为，只测结构。
 import { readFileSync, existsSync, lstatSync, readdirSync, readlinkSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
@@ -11,6 +14,12 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const failures = []
 const ok = (name) => console.log(`  PASS ${name}`)
 const fail = (name, detail) => { failures.push(`${name}: ${detail}`); console.log(`  FAIL ${name}: ${detail}`) }
+
+// ── 0. 钉住基线（**唯一事实家**：vendor-pin 与 pin-* 两道门禁都用它）─────────────
+// 为什么用 SHA 而不是 tag：tag 可被移动/别名，SHA 才是钉住的合同。
+// ⚠ 升 pin 时改这里 + AGENTS.md §vendor 簿记 + package.json 兼容矩阵（pack-compat 会拦）。
+const expectedTag = 'dsh-v0.1.7-rc.2'
+const expectedSha = '477b4f420553e8a52c2fbccc464d7561b239c443'
 
 // ── 1. Markdown：严格 UTF-8 + 单个结尾换行 ──────────────────────────────────
 const mdFiles = []
@@ -42,10 +51,12 @@ for (const v of links.violations) {
 if (links.violations.length === 0) ok(`md-links (含 notes) ×${links.linkCount} / ${links.files.length} files`)
 
 // ── 2c. 行数预算（缩编自 vendor `verify-doc-budgets`；防入口链继续膨胀——R6 D23/清单 B #52） ──
-// 上限 = 当前值 + 余量；超限先搬（内容挪到该去的家）再压，确需空间才在 Note 里说明后升上限。
+// 上限 = 立项时值 + 余量；超限先搬（内容挪到该去的家）再压，确需空间才在 Note 里说明后升上限。
+// ⚠ 注释里**不要复述当前行数**——那是易腐常量，实测值由每次跑出的 PASS 行给出（2026-09-26 修：
+//   原注释写"后 107 行"/"整治后 131"，实为 108 / 142，属"枚举型事实写两处"那一类腐化）。
 const DOC_LINE_BUDGETS = [
-  ['AGENTS.md', 115],            // 2026-09-23 二次收口（渐进披露）后 107 行；指针化内容住 release.md/index/guides/dev-loop
-  ['docs/index.md', 145],     // 整治后 131
+  ['AGENTS.md', 115],            // 2026-09-23 二次收口（渐进披露）；指针化内容住 release.md / index / guides/dev-loop
+  ['docs/index.md', 145],        // 2026-09-24 基石整治后定
   ['docs/guides/dev-loop.md', 448], // 2026-09-25 收割轮升至 448：+§2 进程内查询档（inspect/schema 工具）等三处小登记（依据 = harvest-ledger #5/#13），说明在 verify 提升处与台账
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
@@ -55,11 +66,24 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
     : fail('doc-budget', `${rel} ${lines} 行超上限 ${cap}（先搬内容到该去的家，再压；不直接加行）`)
 }
 
-// ── 2d. 裸路径门禁（notebook-hygiene §机械防线，2026-09-25）──────────────────
-// 为什么：活指针腐化有复发史（AGENTS 写 `notes/rejected/` 而目录不存在；升 pin 后三处旧机制引用漂移）。
-// md-links 门禁只管 Markdown 链接，管不到反引号里的裸路径。范围只收导航/合同五文件。
-// 白名单两类：gitignored 运行态目录（存在与否不代表指针腐化）与 vendor 相对写法（在 vendor 树内存在）。
-const NAV_FILES = ['AGENTS.md', 'README.md', 'ROADMAP.md', 'docs/index.md', 'docs/guides/dev-loop.md']
+// ── 2d. 裸路径门禁（notebook-hygiene §机械防线，2026-09-25；2026-09-26 扩面）─────────
+// 为什么：活指针腐化有复发史（AGENTS 写 `notes/rejected/` 而目录不存在；升 pin 后旧机制引用漂移）。
+// md-links 门禁只管 Markdown 链接，管不到反引号里的裸路径。
+// **2026-09-26 扩面**（技术债清扫 B 组）：原范围只有导航五文件，而腐化实际长在 docs/design、
+// docs/guides、notes/*.md、各 README 里（architecture 引了两条 0.1.7 拆包后已成空壳的 vendor 路径，
+// budget-and-ops 引的 workflow-worker-thread 同样成空壳）——门禁边界与叙述边界不重合 = 盲区。
+// 同时收窄匹配器，避免扩面后自带假阳性：跳过 `{a,b}` 花括号展开，剥掉 `path:12-34` 的引文行号后缀。
+const NOW_FILES = (() => {
+  const out = ['AGENTS.md', 'README.md', 'ROADMAP.md', 'notes/intents.md', 'company-workspace/AGENTS.md',
+    'snapshots/README.md', 'dev/harness-home/README.md', 'packages/company-pack/README.md',
+    'packages/company-pack/src/README.md'].filter(f => existsSync(join(root, f)))
+  const walkMd = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+    const path = join(dir, entry.name)
+    if (entry.isDirectory()) return ['node_modules', '.git', 'lib'].includes(entry.name) ? [] : walkMd(path)
+    return entry.name.endsWith('.md') ? [path.slice(root.length + 1)] : []
+  })
+  return out.concat(walkMd(join(root, 'docs')), walkMd(join(root, 'notes')).filter(p => p.split('/').length === 2))
+})()
 const TOP_DIRS = ['notes/', 'docs/', 'scripts/', 'packages/', 'snapshots/', 'dev/', 'tests/', 'company-workspace/', 'vendor/']
 const RUNTIME_PREFIXES = ['dev/harness-home', 'dev/rehearsal-workspace', '.pnpm-store']   // gitignored 运行态
 // 双树查：本仓根 **或** vendor/dsh 命中即过（AGENTS 纪律表的"权威（vendor 树）"列合法使用 vendor 相对写法）。
@@ -67,13 +91,14 @@ const RUNTIME_PREFIXES = ['dev/harness-home', 'dev/rehearsal-workspace', '.pnpm-
 const RETIRED_PATHS = new Set(['docs/plans/roadmap.md'])
 let barePathCount = 0
 let barePathBad = false
-for (const rel of NAV_FILES) {
+for (const rel of NOW_FILES) {
   const lines = readFileSync(join(root, rel), 'utf8').split('\n')
   lines.forEach((line, i) => {
     for (const m of line.matchAll(/`([^`\n]+)`/g)) {
-      const raw = m[1].replace(/^\.\//, '').replace(/\/+$/, '')
+      let raw = m[1].replace(/^\.\//, '').replace(/\/+$/, '')
       if (!TOP_DIRS.some(d => `${raw}/`.startsWith(d))) continue
-      if (/[*<>…]/.test(raw) || raw.includes(' ')) continue            // 通配/占位/省略/命令行不是路径
+      if (/[*<>…{}]/.test(raw) || raw.includes(' ')) continue          // 通配/占位/花括号展开/命令行不是路径
+      raw = raw.replace(/:\d+(?:-\d+)?$/, '')                          // 引文行号不是路径的一部分
       if (RUNTIME_PREFIXES.some(p => raw.startsWith(p))) continue
       barePathCount++
       if (!existsSync(join(root, raw)) && !existsSync(join(root, 'vendor/dsh', raw)) && !RETIRED_PATHS.has(raw)) {
@@ -83,7 +108,49 @@ for (const rel of NAV_FILES) {
     }
   })
 }
-if (!barePathBad) ok(`bare-path ×${barePathCount}（导航文件反引号裸路径存在性）`)
+if (!barePathBad) ok(`bare-path ×${barePathCount}（${NOW_FILES.length} 文件反引号裸路径存在性）`)
+
+// ── 2e. pin 版本一致性门禁（2026-09-26 立，技术债清扫 B2/B3/B4 类）───────────────
+// 为什么：升 pin 的消费面只改了一半——代码改对了，叙述机制的老文档留在上一代（dev-loop 头部
+// 自称"已在 0.1.5-rc.2 核对"、index 的 `_digested` 行写 0.1.5-rc.2、release.md 的依赖与矩阵示例）。
+// 这类"易腐常量多拷贝、无机械单一源"没有守卫，只能靠人交叉核对。
+// 规则：**唯一事实家 = 本文件的 expectedTag/expectedSha**（vendor-pin 门禁已用它核对 submodule HEAD）。
+//   ① AGENTS.md §vendor 簿记必须逐字声明该 tag 与 SHA（簿记是给 agent 读的那一份，不能漂）；
+//   ② 现在时文件里出现的 `dsh-v<x.y.z>` 字面量必须等于 expectedTag，除非该行自带历史/外部标记。
+// 收窄理由（避免假阳性）：只认 `dsh-v` 前缀形式——裸 `x.y.z-rc.n` 在本仓多为历史叙述或外部语料；
+//   外研树 `_agent_ready_development` 钉的是另一个 tag，登记在 EXTERNAL_PINS（同 RETIRED_PATHS 的显式豁免体例）。
+// 结构性排除（不是内容白名单，而是尊重文件自述的性质）：
+//   · `notes/intents.md` = 时序意图日志，逐行记"当时"——天生历史，不参与现在时扫描；
+//   · `ROADMAP.md` §历史维护记录 以下 = 文件头自己声明"非当前指令"，同样不参与。
+const EXTERNAL_PINS = new Set(['dsh-v0.1.7-rc.1'])   // 外部研究树语料的 pin，不是本仓 pin
+const PIN_HISTORY_MARKERS = /历史|旧|曾|原|当时|已退役|矩阵|compat|legacy/i
+const PIN_SKIP_FILES = new Set(['notes/intents.md'])
+const pinScanLines = (rel, text) => {
+  const lines = text.split('\n')
+  if (rel !== 'ROADMAP.md') return lines
+  const cut = lines.findIndex(line => line.startsWith('## 历史维护记录'))
+  return cut === -1 ? lines : lines.slice(0, cut)
+}
+const agentsText = readFileSync(join(root, 'AGENTS.md'), 'utf8')
+const bookkeepingOk = agentsText.includes(`tag \`${expectedTag}\``) && agentsText.includes(`= \`${expectedSha}\``)
+bookkeepingOk
+  ? ok(`pin-bookkeeping (AGENTS.md §vendor 簿记 = ${expectedTag} @ ${expectedSha.slice(0, 8)})`)
+  : fail('pin-bookkeeping', `AGENTS.md §vendor 簿记没有逐字声明 tag \`${expectedTag}\` / SHA \`${expectedSha}\`（簿记是唯一人读事实家）`)
+let pinCount = 0
+let pinBad = false
+for (const rel of NOW_FILES) {
+  if (PIN_SKIP_FILES.has(rel)) continue
+  pinScanLines(rel, readFileSync(join(root, rel), 'utf8')).forEach((line, i) => {
+    for (const m of line.matchAll(/dsh-v\d+\.\d+\.\d+(?:-rc\.\d+)?/g)) {
+      if (m[0] === expectedTag || EXTERNAL_PINS.has(m[0])) continue
+      if (PIN_HISTORY_MARKERS.test(line)) continue
+      pinBad = true
+      fail('pin-currency', `${rel}:${i + 1} → \`${m[0]}\` ≠ 当前钉住 ${expectedTag}（现在时文件里的过期 pin：改指针到 AGENTS.md 簿记，或标历史）`)
+    }
+    pinCount += [...line.matchAll(/dsh-v\d+\.\d+\.\d+(?:-rc\.\d+)?/g)].length
+  })
+}
+if (!pinBad) ok(`pin-currency ×${pinCount}（现在时文件的 dsh-v 字面量 = ${expectedTag}；intents 日志与 ROADMAP 历史段按性质排除）`)
 
 
 // ── 3. preset 结构：5 角色 × (声明文件 + ≥1 skill) ─────────────────────────
@@ -117,8 +184,7 @@ try {
 // 构建产物**（lib/、dist/、node_modules/——"从源码跑"要求构建，构建必须在树内）。
 // 任何 tracked 文件的改动、或未被 gitignore 的新文件，都判 FAIL。
 // 为什么用 SHA 而不是 tag：tag 可被移动/别名，SHA 才是钉住的合同。
-const expectedTag = 'dsh-v0.1.7-rc.2'
-const expectedSha = '477b4f420553e8a52c2fbccc464d7561b239c443'
+// （expectedTag / expectedSha 的唯一事实家 = 本文件 §0；此处不再重复声明。）
 const vendorDir = join(root, 'vendor/dsh')
 const gm = readFileSync(join(root, '.gitmodules'), 'utf8')
 if (!gm.includes('vendor/dsh') || !gm.includes('deepseek-ai/deepseek-harness')) fail('gitmodules', 'URL/路径不符')

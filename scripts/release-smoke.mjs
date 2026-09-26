@@ -57,7 +57,16 @@ try {
   profileDir = join(home, 'profiles', PROFILE)
 
   console.log('① 构建 company-pack 发布面（tsc + tsdown）')
-  await run(process.execPath, ['./node_modules/typescript/bin/tsc', '-p', 'packages/company-pack/tsconfig.json'])
+  // 为什么必须 clean + `-b`（2026-09-26 实证，反证在案）：
+  // `tsc -p packages/company-pack/tsconfig.json` 在 **solution root** 上是**静默 no-op**——
+  // 该 tsconfig 是 `files: []` + 两条 references，非 build 模式不展开 references ⇒ 零输入；
+  // 而 TS 的 TS18002（"没有输入文件"）报错条件要求 references 为空，非空即**抑制报错** ⇒ 退出 0、零 emit。
+  // 两条分支实测：① 干净态 ⇒ lib/ 根本没被创建、tsdown 的 entry（lib/types/index.js）无来源；
+  // ② 陈旧态 ⇒ 上一次 `tsc -b` 的产物原样留着被 tsdown 打包 ⇒ **发布冒烟验的是旧包（假绿）**。
+  // 所以这里既改 `-b`（真构建），又先删 lib/（杜绝陈旧产物——release 面要的是"来自当前源码的新鲜构建"，
+  // 同文件对 vendor 的既有警告是同一个道理）。
+  rmSync(join(PACK_DIR, 'lib'), { recursive: true, force: true })
+  await run(process.execPath, ['./node_modules/typescript/bin/tsc', '-b', 'packages/company-pack'])
   const tsdownRun = join(dirname(createRequire(join(ROOT, 'package.json')).resolve('tsdown/package.json')), 'dist/run.mjs')
   await run(process.execPath, [tsdownRun], { cwd: PACK_DIR })
 

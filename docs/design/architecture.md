@@ -34,9 +34,11 @@
 `packages/preset/README.md`（"a session composed from a preset runs that preset's tools, prompt
 sections, and skills while every other session keeps its own"）。
 
-### 1.2 一个角色 preset 里有什么（shipped `cordis` preset 就是范本）
+### 1.2 一个角色 preset 里有什么（shipped 出厂范本 + 声明教义）
 
-`packages/preset/agent-presets/presets/cordis/agent.cordis.yml` 展示了完整配方：
+出厂范本 = `packages/bundle/web-app/presets/standard.patch.yml`（0.1.7 起**每预设一行
+`- insert:` 声明**，`name: '@deepseek-ai/dsh-agent-preset'`）；声明语义原文 =
+`packages/preset/agent-preset/README.md`。下面是完整配方：
 
 ```yaml
 # ① 身份：persona row，shadow 掉部署默认人格，只对这个 preset 的会话生效
@@ -205,8 +207,10 @@ children 仍 join 父 composition；脚本是一次 run，不是常驻组织。
 
 ## 4. 分水岭约束：composition 继承（设计前必须想清楚的一条）
 
-`packages/preset/agent-presets/README.md` 原文：**"A child agent (subagent) joins its parent's
-composition, so it sees the same tools and prompt sections as the agent that spawned it."**
+现行教义（`packages/subagent/subagent/src/child-agent.ts:24-28`，**旧版 README 原句已随 0.1.7 拆包消失**）：
+**child "inherits its parent's composition opportunistically (the documented `ctx.get` pattern),
+never as a hard dep"**——即继承是**机会性**的（拿到就用、拿不到不报错），不是硬依赖；
+包级索引另见 `packages/subagent/subagent/README.md`（"Child composition, delegated policy, depth helpers"）。
 
 也就是说，在通道 A/B/D 里：
 

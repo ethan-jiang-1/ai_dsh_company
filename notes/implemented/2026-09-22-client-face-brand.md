@@ -6,8 +6,11 @@
    `exports["./client"]` + `dsh.client`（`platform: web`，inject renderer/sidebar），
    `src/index.ts` 是空 host 半（`apply(){}`），`src/client/index.tsx` 注册侧栏槽
    **`sidebar.brand.name`** 渲染 `DSH Wochen Team`。
-2. **构建**：`tsc -p packages/company-pack/tsconfig.json`（产出 `lib/types/**`，含 client 半）→
+2. **构建**：`tsc -b packages/company-pack`（产出 `lib/types/**`，含 client 半）→
    `cd packages/company-pack && tsdown`（产出 `lib/index.js` + `lib/client.js`）。
+   （原文写的是 `tsc -p packages/company-pack/tsconfig.json`——当时 tsconfig 还不是 solution root，
+   那条命令有效；2026-09-25 起它是 solution root，`-p` 变成**静默 no-op**，故此处随实现更正。
+   反证与影响面见 [技术债清扫 RFC](../proposed/2026-09-26-entry-execution-chain-debt.md) B1。）
 3. **bundle 行**：insert `company-client`（`name: dsh-company-pack`）——本包自己的 host 半挂上，
    浏览器半由 `dsh.client` 被发现并伺服。
 4. **不用 vendor 的 `clientBundle` 助手**：它按 `packages/*/*/package.json` 找包（vendor monorepo

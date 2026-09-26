@@ -6,7 +6,8 @@
 //   - `fixedExtension: false` → 在 `type: module` 包里也产出 lib/index.js / lib/client.js；
 //   - client 半必须包 `window.__ModuleLoader__.load({id, factory})` 外壳（否则浏览器加载不了）；
 //   - 外置规则：`react/jsx-runtime` 与共享 client 包留作 require（模块表回答），其余内联。
-// 前置：先 `tsc -p tsconfig.json` 产出 lib/types/**（含 lib/types/client/index.js）。
+// 前置：先 `tsc -b packages/company-pack` 产出 lib/types/**（含 lib/types/client/index.js）。
+// ⚠ 别用 `tsc -p tsconfig.json`：solution root 上它是**静默 no-op**（见 tsconfig.json 注释）。
 import { defineConfig } from 'tsdown'
 
 const shared = {

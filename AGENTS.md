@@ -33,7 +33,7 @@ corepack enable pnpm                   # 一次性：pnpm 走 corepack（package
 pnpm install                           # workspace 解析；引导全配方（含 vendor 构建）见 guides/dev-loop §7
 source dev/env.sh                      # 双 home 兜底 + 裸 dsh 拦截（DSH_HOME=dev/harness-home）。⚠ coding 会话里
                                        #   DSH_HOME 继承且带日用值，漏 source 不报错、安静用错 home（guides/dev-loop §6.5）
-pnpm verify                            # 结构门禁（UTF-8/链接/doc-budget/symlink/**vendor 铁律**/preset 结构/行依赖/client 两半/proposal 两则）
+pnpm verify                            # 结构门禁（清单唯一源 = scripts/verify.mjs；跑一次看 PASS 行即得全表，本行不复述）
 pnpm test                              # keyless 回归（vitest；数量与耗时以实跑为准；真模型/浏览器不进回归，tests/layering.spec.ts 守卫）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）
 node scripts/preset-smoke.mjs          # preset 改动的完成定义：boot 真 web 逐角色建会话——挂载失败只有这里
@@ -84,7 +84,7 @@ changes）= `vendor/dsh/AGENTS.md` Conventions 节；探索路由与概念→源
 | 源码面/产物面不混（paths 指 src） | `AGENTS.md` Conventions | 根 `tsconfig.json` extends vendor base |
 | vendor 钉版本 + manifest/SHA + 同步程序；**升 pin 时流程合同对 vendor 重校** | `vendor/README.md` | AGENTS.md vendor 簿记 + `scripts/sync-dsh.mjs` |
 | 日志税：model-visible ⟺ logged | `AGENTS.md` Conventions | guides/dev-loop §3 设计四问② |
-| 机械可查的不变量进执行门禁 + **每个新门禁带反证**（红→还原→绿） | `AGENTS.md` Conventions | `scripts/verify.mjs`（md-newline / 链接含 notes/ 树 / preset 结构 / vendor 铁律 / pack 形状 / pack-compat / client 两半 / proposal 两则 / **doc-budget**） |
+| 机械可查的不变量进执行门禁 + **每个新门禁带反证**（红→还原→绿） | `AGENTS.md` Conventions | `scripts/verify.mjs`（**清单唯一源**：md-utf8/newline、md-links 含 notes/ 树、doc-budget、**bare-path**、preset 结构、claude-symlink、vendor-pin/clean、pack-bundle、pack-compat、preset-row-deps、client-halves、proposal-scheduled/graduated） |
 | **文档卫生（本仓政策，D26）**：删重复/失效指令、并重复事实家、修活指针；保留仍指导决策的取舍与反例。行数只作观察，不作为删改目标 | [D26](docs/index.md)；适配理由见本轮 Note | guides/dev-loop §12 |
 
 ### vendor 铁律（本仓强制边界；受更高层指令与工具权限约束，机械门禁在 `pnpm verify`）

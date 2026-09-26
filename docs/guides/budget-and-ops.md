@@ -3,7 +3,8 @@
 > 五个角色 + 各自 workers 的组织会烧 token、会出状况。本篇收拢**限流旋钮**与
 > **demo 运维 runbook**（症状→动作），并给回放复盘的路径。数值默认值均核实自
 > DSH 工作树（`packages/experimental/agent-team/src/index.ts`、
-> `packages/subagent/tool-subagent/README.md`、`packages/workflow/workflow-worker-thread/src/runtime.ts`）。
+> `packages/subagent/tool-subagent/README.md`、`packages/workflow/workflow-ptc/src/runtime.ts`
+> ——末条原指 `workflow-worker-thread/src/runtime.ts`，该目录在 0.1.7 已成空壳，现行家在 `workflow-ptc`）。
 
 ## 1. 限流旋钮总表
 
