@@ -93,22 +93,28 @@ describe('打分（scoreLabels）：指标与零容忍计数', () => {
     expect(M.R1.missWithDraft).toBe(1)
   })
 
-  it('R2/R3：待核实被报成候选 ⇒ staleAsCandidate；取消被报 ⇒ cancelReported；阻塞两处都无 ⇒ blockedMiss', () => {
+  it('R2/R3：待核实被报成候选 ⇒ staleAsCandidate；取消被报 ⇒ cancelReported；阻塞漏显示逐规则记账', () => {
     const rows = [{ id: 'x', kind: 'synthetic', closed: false, approvals: 1, remind: '', zeroNote: '审批×1',
       tasks: [
         { role: 'vp-sales', task: 'T1', status: '待核实' },
         { role: 'vp-eng', task: 'T2', status: '取消' },
         { role: 'coo', task: 'T3', status: '阻塞' },
       ] }]
-    const scans = new Map([['x', { r1: [], r2: R2([['T1', 'vp-sales'], ['T2', 'vp-eng']]), r3: R3([['T1', 'vp-sales']], []), drafts: [] }]])
+    // R1 报了 vp-sales（待核实角色的 TP）但没报 coo ⇒ R1 阻塞漏显示 +1；
+    // R2 报 T1（待核实当候选）+ T2（取消被报）但没报 T3 ⇒ R2 阻塞漏显示 +1；
+    // R3 把 T1 报成候选、T2 未报（状态行=取消）、T3 两处都无 ⇒ R3 阻塞漏显示 +1
+    const scans = new Map([['x', { r1: R1(['vp-sales']), r2: R2([['T1', 'vp-sales'], ['T2', 'vp-eng']]), r3: R3([['T1', 'vp-sales']], []), drafts: [] }]])
     const { M, zeroTol } = scoreLabels(rows, scans)
     expect(M.R2.reported).toBe(2)
     expect(M.R2.staleAsCandidate).toBe(1)     // T1 待核实当候选
     expect(M.R2.falseImmediate).toBe(1)       // T2 取消被报
     expect(zeroTol.cancelReported).toBe(1)
     expect(zeroTol.cancelSilent).toBe(1)      // 取消项在人视角不可见（规则无取消通道）
-    expect(zeroTol.blockedMiss).toBe(1)       // T3 阻塞：候选与依赖未齐两处都无
     expect(zeroTol.approvalMiss).toBe(1)      // 审批结构性看不见
+    // 阻塞漏显示：三条规则各记各的账
+    expect(zeroTol.blockedMissR1).toBe(1)     // coo 角色不在 R1 候选里
+    expect(zeroTol.blockedMissR2).toBe(1)     // T3 不在 R2 报告里
+    expect(zeroTol.blockedMissR3).toBe(1)     // T3 候选与依赖未齐两处都无
     // R3 把 T1 报成候选（同样待核实当候选）；T2 未报（状态行=取消 ⇒ 不在待办清单）
     expect(M.R3.staleAsCandidate).toBe(1)
     expect(M.R3.falseImmediate).toBe(0)

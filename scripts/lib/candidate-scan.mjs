@@ -147,7 +147,7 @@ export function scoreLabels(rows, scans) {
   function freshMetric() {
     return { tp: 0, reported: 0, falseImmediate: 0, blockedAsCandidate: 0, staleAsCandidate: 0, miss: 0, missWithDraft: 0 }
   }
-  const zeroTol = { approvalMiss: 0, cancelReported: 0, cancelSilent: 0, blockedMiss: 0, closedButReported: 0 }
+  const zeroTol = { approvalMiss: 0, cancelReported: 0, cancelSilent: 0, blockedMissR1: 0, blockedMissR2: 0, blockedMissR3: 0, closedButReported: 0 }
   const details = []
 
   for (const row of rows) {
@@ -198,14 +198,17 @@ export function scoreLabels(rows, scans) {
       }
     }
 
-    // 取消：静默漏显示（规则无"取消"通道 ⇒ 已取消事项在人视角不可见——评审零容忍口径）
+    // 取消：静默漏显示（规则无"取消"通道 ⇒ 已取消事项在人视角不可见——评审零容忍口径，按全局计）
     zeroTol.cancelSilent += row.tasks.filter(t => t.status === '取消').length
 
-    // R3 专属：blocked 清单 vs 金标准阻塞项（阻塞该显示为"依赖未齐"；两处都不在 = 漏显示）
-    for (const gold of row.tasks.filter(t => t.status === '阻塞' && t.task !== '——')) {
-      const inBlocked = r3.blocked.some(b => b.task === gold.task)
-      const inCand = r3.candidates.some(c => c.task === gold.task)
-      if (!inBlocked && !inCand) zeroTol.blockedMiss++
+    // 阻塞漏显示：**逐规则记账**（盲审 2026-09-26：此前只查 R3 ⇒ R1/R2 的结构性盲区只有碰巧才被计）
+    // - R1 角色级：该角色的阻塞活一整条不可见（角色不在候选里）
+    // - R2 任务级：报"状态=待办"的派活行（阻塞若报出 = blockedAsCandidate，可见只是类别错）；无行 ⇒ 不可见
+    // - R3 任务级：候选与"依赖未齐"两处都无 ⇒ 不可见（原逻辑）
+    for (const gold of row.tasks.filter(t => t.status === '阻塞')) {
+      if (gold.role !== '——' && !r1.some(c => c.role === gold.role)) zeroTol.blockedMissR1++
+      if (gold.task !== '——' && !r2.some(c => c.task === gold.task)) zeroTol.blockedMissR2++
+      if (gold.task !== '——' && !r3.blocked.some(b => b.task === gold.task) && !r3.candidates.some(c => c.task === gold.task)) zeroTol.blockedMissR3++
     }
 
     // 审批：三条规则结构性看不见 ⇒ 全部计漏报（零容忍）

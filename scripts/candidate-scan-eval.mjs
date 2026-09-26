@@ -142,18 +142,20 @@ function labelsMode(path) {
   }
 
   console.log(`\n—— 分规则指标（按机器草标；金标准确认后数字才作数）——`)
+  console.log(`  ⚠ 口径：R1 是**角色级**（一次命中覆盖该角色全部待办），与 R2/R3 的任务级召回**不可直接比**；R1 的 TP 里含巧合命中（无稿≠有活，机制上纯属碰巧——case 13 的 coo）`)
   for (const rule of ['R1', 'R2', 'R3']) {
     const m = M[rule]
     const recall = m.tp + m.miss > 0 ? (m.tp / (m.tp + m.miss) * 100).toFixed(0) : '—'
     const precision = m.reported > 0 ? (m.tp / m.reported * 100).toFixed(0) : '—'
     console.log(`  ${rule}: 报 ${String(m.reported)}（对 ${String(m.tp)}／阻塞当候选 ${String(m.blockedAsCandidate)}／待核实当候选 ${String(m.staleAsCandidate)}／错误需立即处理 ${String(m.falseImmediate)}）｜漏 ${String(m.miss)}（其中错误已完成 ${String(m.missWithDraft)}）｜召回 ${recall}%｜精确 ${precision}%`)
   }
+  console.log(`  · 对账口径（评审 §五 B 四指标）：「错误需立即处理」合计 = 错误需立即处理+阻塞当候选+待核实当候选 ⇒ R2 ${String(M.R2.falseImmediate + M.R2.blockedAsCandidate + M.R2.staleAsCandidate)}、R3 ${String(M.R3.falseImmediate + M.R3.blockedAsCandidate + M.R3.staleAsCandidate)}；严格精确（待核实不当 TP）⇒ R2 ${M.R2.reported > 0 ? ((M.R2.tp - M.R2.staleAsCandidate) / M.R2.reported * 100).toFixed(0) : '—'}%、R3 ${M.R3.reported > 0 ? ((M.R3.tp - M.R3.staleAsCandidate) / M.R3.reported * 100).toFixed(0) : '—'}%`)
   console.log(`\n—— 零容忍（评审 §五 B：审批/取消/阻塞漏报零容忍）——`)
-  console.log(`  审批漏报：${String(zeroTol.approvalMiss)}（规则结构性看不见，须显式输入源）`)
-  console.log(`  取消误报为候选：${String(zeroTol.cancelReported)}；取消静默漏显示：${String(zeroTol.cancelSilent)}（规则无取消通道）`)
-  console.log(`  阻塞项漏显示（候选与依赖未齐两处都无）：${String(zeroTol.blockedMiss)}`)
+  console.log(`  审批漏报：${String(zeroTol.approvalMiss)}（规则结构性看不见，须显式输入源——按全局计）`)
+  console.log(`  取消误报为候选：${String(zeroTol.cancelReported)}；取消静默漏显示：${String(zeroTol.cancelSilent)}（规则无取消通道——按全局计）`)
+  console.log(`  阻塞漏显示（逐规则记账）：R1 ${String(zeroTol.blockedMissR1)}（角色级）/ R2 ${String(zeroTol.blockedMissR2)} / R3 ${String(zeroTol.blockedMissR3)}`)
   console.log(`  已关闭动议仍报候选/角色：${String(zeroTol.closedButReported)}`)
-  const violations = zeroTol.approvalMiss + zeroTol.cancelReported + zeroTol.cancelSilent + zeroTol.blockedMiss + zeroTol.closedButReported
+  const violations = zeroTol.approvalMiss + zeroTol.cancelReported + zeroTol.cancelSilent + zeroTol.blockedMissR1 + zeroTol.blockedMissR2 + zeroTol.blockedMissR3 + zeroTol.closedButReported
   console.log(`\n  零容忍违规合计 ${String(violations)} ⇒ 未达门槛：扫描结果只能显示「待核候选」，不进个人待办、不自动通知（维持现状）`)
   return 0
 }
