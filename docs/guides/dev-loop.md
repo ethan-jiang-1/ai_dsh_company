@@ -229,7 +229,7 @@ node scripts/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团
   内容改动即刻生效；profile `.npmrc` 把 store/cache 钉在 repo 内，`~/Library` 不被碰。
   历史：file: 拷贝时代首次装会拦 koffi 构建审批 → profile 的 `pnpm-workspace.yaml` 改
   `koffi: true` 再装；link: 下 profile 不再装 koffi，koffi 由源码域解析）。观察窗默认端口 3080，**与本 GUI 冲突**，用
-  `-- --port 3081`。preset roster 出现在 UI 的 Built-in 组（五角色；trust 分组见上文 R1 坑注）。
+  `-- --port 3081`（示例端口；被占就换）。preset roster 出现在 UI 的 Built-in 组（五角色；trust 分组见上文 R1 坑注）。
 - **bundle 叠加的重复行 id**（R1 实证）：web-app 已 insert `agent-presets`，pack 再 insert 同 id
   → `duplicate loader entry id` 硬拒。修法：对已存在的行用**替换**语法（`- id:`），只有真正
   新增的行才 insert。

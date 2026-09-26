@@ -92,7 +92,7 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 
 ## 3. 演示分镜（一场 demo 怎么走）
 
-1. 开 `pnpm dsh web -- --port 3081 --no-open`（web profile），侧栏开 CEO 会话（ceo preset）。
+1. 开 `pnpm dsh web -- --port 3081 --no-open`（web profile；**端口是环境状态**，被占就换——见 dev-loop §7），侧栏开 CEO 会话（ceo preset）。
 2. 输入一个公司级动议（"评估把 X 产品线扩展到欧洲"）。
 3. 观众看到 CEO：拆解（todo/plan）→ `spawn_teammate` 建出三位 VP（名册出现四行）→
    任务板落任务（blockedBy 依赖可视化）→ 给各 VP 发初始 brief。
