@@ -23,7 +23,8 @@ research 层只有半句括号「另有自身约定」，从未落地。后果�
 新消费方；已消化 → 结论并入 owner Note 后删文件，收尾 Note 记末次 commit SHA（一跳可达全文）；放弃 → 否决理由随
 owner Note「输掉的方案」节，正文删。
 
-与仓里既有实践一致（ROADMAP 历史段「活研究进、落地即出」；2026-09-23 前后四篇研究稿照此毕业）——本次只是
+与仓里既有实践一致（ROADMAP 历史段「活研究进、落地即出」——**该段已于 2026-09-26 删除**，
+全文在 git `git show d159b0228e2b`；2026-09-23 前后四篇研究稿照此毕业）——本次只是
 把约定写下来、补上状态行与 SHA 保险。
 
 ## 首轮清扫台账（六篇逐一）
@@ -31,7 +32,7 @@ owner Note「输掉的方案」节，正文删。
 | 篇 | 判定 | 处置 |
 |---|---|---|
 | 2026-09-24-dsh-development-memory | 已消化：Notes 原则部分采纳进 [foundation-first-step](./2026-09-24-foundation-first-step.md)；生命周期适配由 [notes-lifecycle-absorption](./2026-09-24-notes-lifecycle-absorption.md) + §12 收口；基线为旧 pin，vendor 引用已过期 | **删**；末次 SHA `335901e`；引用改写 = foundation-first-step §Consequences |
-| 2026-09-25-pin-upgrade-impact | 已消化：A–D 四组事实（install 阻塞、D27 硬阻塞、CI=true 逃逸口、vendor clean 报错）全部已在 [pin-upgrade 收尾 Note](./2026-09-25-pin-upgrade-0.1.7-rc.2.md)「实施实况」节 | **删**；末次 SHA `6f57fe5`；引用改写 ×4（收尾 Note 两处 / intents / ROADMAP 历史段） |
+| 2026-09-25-pin-upgrade-impact | 已消化：A–D 四组事实（install 阻塞、D27 硬阻塞、CI=true 逃逸口、vendor clean 报错）全部已在 [pin-upgrade 收尾 Note](./2026-09-25-pin-upgrade-0.1.7-rc.2.md)「实施实况」节 | **删**；末次 SHA `6f57fe5`；引用改写 ×4（收尾 Note 两处 / intents / ROADMAP 历史段——该段 2026-09-26 已删，见 `d159b0228e2b`） |
 | 2026-09-25-harness-alignment-ledger | 仍在用：dev-loop §9.1 / index / architecture / README 四处活引用，不照搬清单 owner = 其 §四.4 | 留；状态行「已交付」→「活参考」 |
 | 2026-09-25-human-agent-ux-patterns | 消化完但有后续读者（UX 候选判定唯一家；搁置池「视觉打磨二期」待复活）——**用户裁定留** | 留；转活参考；顺手修 label rot（链接文字仍写 proposed/ 而目标已毕业） |
 | 2026-09-24-dsh-upstream-delta | 仍在用：§④ 15 收割项 = [收割轮 RFC](../implemented/2026-09-25-harvest-round.md) 判定输入；ledger 交叉引用其收割项⑤⑬ | 留；状态行改指收割轮 + 毕业动作 |

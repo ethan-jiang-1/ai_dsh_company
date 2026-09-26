@@ -29,6 +29,7 @@
 - 根 `AGENTS.md` 收敛为入口与 owner 指针；不在根重复开发步骤。
 - `docs/index.md` 精简 D23/D24 的当前适用说明，并将开发环列为执行规则 owner。
 - `ROADMAP.md` 文件头只说明队列职责，并把 Plan Mode 细则指向开发环；历史段不作为当前入口。
+  （2026-09-26 更新：该历史段已整体删除，见 [技术债清扫 RFC](../proposed/2026-09-26-entry-execution-chain-debt.md) B8/S1；本句留作当时的决定记录。）
 - `docs/guides/dev-loop.md` 已收敛 §0/§0.5/§1/§12：入口分支、Plan Mode 适用条件、实施节奏与交接规则各有明确位置。
 - D23 转型 Note 的当前形态表改为指向现行流程，避免把旧队列形状当作现在规则。
 
