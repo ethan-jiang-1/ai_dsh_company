@@ -188,13 +188,19 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 
 【门乙 · CFO】读 deliverables/<slug>/drafts/ceo.md（CEO 给你的任务书），
 按它出你的稿 deliverables/<slug>/drafts/cfo.md，并按手册「收工留痕」写你的 journal。
-按规矩处理签字线。
+⚠ 你是 **CFO 的根会话**（不是被委派的成员）⇒ 撞签字线时**由你自己发起 `request_signoff`**
+（卡会落到你这扇门）；不要"升级给 CEO"——那是被委派成员的走法。
 
 【门丙 · COO】读 deliverables/<slug>/drafts/ceo.md，出 deliverables/<slug>/drafts/coo.md + 写你的 journal。
 
 【门甲 · CEO（收口）】CFO 与 COO 的稿已就位，读 deliverables/<slug>/drafts/ 下的稿，
 合稿 deliverables/<slug>/final.md 并 present。
 ```
+
+⚠ **"根会话 vs 被委派成员"是这一步的分水岭**：被委派的成员发审批**必被自动拒**
+（`child-agent.ts:254` 硬编码 `never`），所以手册那条"成员触线一律升级 CEO"对它们成立；
+而**每扇门都是根会话**（它自己就是那个角色的 owner）⇒ **该由它自己发起**，卡才会落到它门上。
+（实测：`scripts/budget-signoff-probe.mjs` 正例——CFO 根会话确实会发 `request_signoff`。）
 
 ⚠ **别在门乙/门丙那边说"你以 CEO 的身份…"**——每扇门只用**它自己角色**的权限；越权的话，
 `owners.md` 的授权面就成了摆设（demo 的卖点正是"谁签得动"按人分）。
