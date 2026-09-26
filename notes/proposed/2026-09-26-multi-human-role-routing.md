@@ -36,6 +36,31 @@ CFO 那个物理人签）。现实里至少 3 个物理人 ⇒ 3 个浏览器/3 
    真实环境里每人本地跑自己的 DSH、指向**同一个共享目录**（NFS / Syncthing / git 任选）即可——
    **没有 server 依赖、没有账号要搬**。迁移清单随本条目交付。
 
+## 迁移清单（搬共享目录到真实多人环境要带什么）
+
+**要搬的**（全是文件，无进程/账号状态）：
+1. `company-workspace/` 整盘——`kb/`（CHARTER + journal + **owners.md** + org.md + motion-ledger.md）、
+   `deliverables/`、`templates/`、`AGENTS.md`（公司手册）；
+2. 插件与 preset：`packages/company-pack/`（角色 persona/skills + bundle 行 + client 皮肤）；
+3. `docs/` + `notes/`（开发记忆与合同——迁过去的人要能读懂规矩从哪来）；
+4. 环境：DSH 本体（同一 pin）+ 各自的 `$DSH_HOME`（**每台机器自己的**，不共享——会话库/凭据是本地的）。
+
+**不能搬的**：`$DSH_HOME/sessions/`（会话日志是**运行时残留**，含机器专属路径；要留证据就按会话 id 归档到
+`snapshots/`，别搬会话库）。
+
+**协作前提（多人在同一盘上必须先约定）**：
+1. **slug 唯一性**——见下方"实测撞车"：共享盘上 slug 就是交付物的键，两场动议撞 slug = 产物互相覆盖，
+   而现有门禁**看不出来**。约定：开动议前先看 `deliverables/` 有没有同名 slug；重跑要么换 slug，要么先归档旧产物。
+2. **写入边界**：各自只写 `drafts/<角色>.md` + 自己的 `kb/<角色>/journal/`；`final.md` 只有 CEO 写
+   （机器门禁盯三态，但**盯不住"谁写的"**——靠手册纪律 + 互审）。
+3. **同盘并发**：多人同时写同一文件没有锁（DSH 无多写者协调）⇒ 约定"一个文件同一时刻一个写者"，
+   交接靠"我写完了"的消息（Agent Teams 邮箱）+ 文件本身。
+
+**实测撞车（2026-09-26，本仓真事）**：两场动议（一场中途卡死、一场正常跑）都用了 slug `renewal-y-2026`，
+于是 `deliverables/renewal-y-2026/` 里两场的 drafts/final 混在一起，`deliverables-check` 仍报
+**ALL PASS 0 违规**（它只追溯"每个 final 有没有一次 present 背书"，不区分是不是同一场动议的）。
+⇒ 门禁缺口已记入 §磨清单候选；多人协作时这是**必须靠约定挡住**的第一号风险。
+
 ## 边界（诚实说清，不假装是安全隔离）
 
 - "谁该签"是**政策级**约束（写在 owners.md + 手册里，人和 agent 都照它走），**不是安全级**：

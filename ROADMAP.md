@@ -21,8 +21,13 @@
 
 > 家规（notebook-hygiene 立，2026-09-25）：观察项与低优先磨活住这里，各带「谁来磨／何时磨」；
 > 从队列可见一跳到达。队列走空且用户点名时才升格为队列条目。
-> 新观察项按家规入此。**当前空**（原「journal 缺席 = 文案不够需机制」已交付：
+> 新观察项按家规入此。**当前 1 项**（原「journal 缺席 = 文案不够需机制」已交付：
 > [implemented/journal-presence-mechanism](./notes/implemented/2026-09-26-journal-presence-mechanism.md)）。
+
+- **同 slug 撞车无门禁**（2026-09-26 实测）：两场动议共用 slug `renewal-y-2026` ⇒ 产物在共享盘上互相覆盖，
+  而 `deliverables-check` 仍报 0 违规（只追溯 present 背书，不区分哪场动议）。谁来磨 = 机制面轮；
+  磨法候选 = 让 `deliverables-check` 按"slug 的产物是否来自同一场 Lead 会话"报警（多来源 ⇒ 红或标存疑）；
+  何时磨 = 下次门禁轮顺带，或多人协作条目开工时（它是那条的**第一号风险**）。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
