@@ -8,7 +8,7 @@
 | # | 条目 | 状态 | 实况 |
 |---|---|---|---|
 | a | 解阻与落盘 | ✅ | 队列行的"待你裁"是**假阻塞**：形态早已在 §形态 自裁（每角色一个浏览器 profile，可逆），队列行没跟上 |
-| b | 待实测：**分身自发问询**的门路由 | ⏳ | RFC §机制结论 只验了顶层会话发起的情形 |
+| b | 待实测：**分身自发问询**的门路由 | ✅ | 答"**被拒**"（静态三跳 + 活体一次）；探针 = `scripts/member-inquiry-probe.mjs`（可复跑）。**结论重塑了 demo 形态**，见 §机制结论 |
 | c | `owners.md` 从 v1 单操作者 → 多物理人 | ⏳ | "谁签得动"的事实家；多人协作的前提 |
 | d | 多门配方落成 runbook | ⏳ | 现在只有"每人一个浏览器 profile"一句 |
 | e | 迁移清单落成合同 | ⏳ | RFC §迁移清单 是草稿 |
@@ -86,8 +86,47 @@ CFO 那个物理人签）。现实里至少 3 个物理人 ⇒ 3 个浏览器/3 
 
 | 线 | 谁能发起 | 落到哪扇门 | 多人下成立吗 |
 |---|---|---|---|
-| **问询**（要资料/建议/规矩缺口） | 任何会话（成员亦有 `tool-ask-user`） | **发起者那扇门**（原生作用域） | ✓ 成立（**待实测**：分身发起时是否同样按它的会话路由） |
+| **问询**（要资料/建议/规矩缺口） | **根会话**（顶层）；**被委派的成员一律被拒**（见下） | **发起者那扇门**（原生作用域） | ✗ **对被委派成员不成立**（2026-09-26 静态核实**更正**了本节原先写的"✓ 成立"） |
 | **审批**（签字线） | **只有顶层（Lead）会话**——分身一律 `never` | **Lead 那扇门** | ✗ **不成立**：CFO/COO 的门收不到审批 |
+
+**两堵墙，一处结论（2026-09-26 vendor 只读核实）**：问询与审批对**被委派的成员**都是关闭的，
+只是墙在不同层：
+
+- **问询**：`packages/interaction/user-questions/src/index.ts:101-106` —— 服务层显式守卫，
+  成员调用抛 `DELEGATED_CALLER`：*"human interaction is unavailable while the calling agent is owned
+  by another live agent; include the unresolved question or decision in the child agent's final result"*。
+  即：**成员手里有 `tool-ask-user` 这把工具，但服务层不接**（"有工具" ≠ "能用"）。
+- **审批**：`packages/subagent/subagent/src/child-agent.ts:254` —— 子会话 `approvalPolicy` 硬编码 `'never'`。
+
+⇒ 手册里那条「**成员不直接问用户，一律升级 CEO**」**不是礼貌，是机制强制的**：成员要么把未决问题
+写进自己的结果，要么走 `send_message` 升级。**这条从"纪律"升级为"机制事实"**。
+
+✅ **已实测（①-b，2026-09-26）**：**team teammate 同样被拒**。探针 `scripts/member-inquiry-probe.mjs`
+让 CEO `spawn_teammate` 起一个 VP-Eng、只让它调 `ask_user_question`，拿到的**逐字**是：
+
+```
+Error: human interaction is unavailable while the calling agent is owned by another live agent;
+include the unresolved question or decision in the child agent's final result
+```
+
+⇒ `roots()` 的边界判定成立：`spawn_teammate` 内部走 `subagents.startContinuable({ parent: root })`
+（`agent-team/src/roster.ts:288`），而 `parent` = **运行时归属**（`core/agent/src/index.ts:66`）⇒ teammate
+有 owner ⇒ **不是 root** ⇒ 被 `user-questions` 拒。**静态三跳推断 + 活体一次观察，两路同结论。**
+
+### ★★ 这条结论重塑了多人 demo 的形态（必须写清楚，别让 demo 讲错）
+
+**一场由 CEO 主持的动议里，所有拉人（问询 + 审批）都只能落到 CEO 那扇门**——成员（无论是 one-shot
+委派还是 team teammate）**一律拉不到人**。所以：
+
+| 想展示的事 | 成不成立 | 怎么展示 |
+|---|---|---|
+| "卡落到该落的那扇门" | ✗ **动议内不成立** | 动议内只有 CEO 的门会弹卡 |
+| 各人在**自己的根会话**里干活、通过**共享盘**交接 | ✓ 成立 | 每人的门 = 自己角色的**根会话**（他本人就是那个会话的 owner） |
+| 某人在**自己的根会话**里触线（如 CFO 独立会话撞上签字线） | ✓ 成立 | 那张卡落到**他自己的门**——这才是"谁该批的事弹到谁的门"的**唯一成立形态** |
+
+⇒ **多人的价值在"盘上的分工"，不在"卡的分发"**。demo 要展示"CFO 的门弹 CFO 的卡"，就得让 CFO 的人
+**在自己的根会话里**触线，而不是指望 CEO 动议里的 CFO 成员。**（这也解释了为什么手册那条"成员触线
+一律升级 CEO"是机制强制的。）**
 
 ⇒ **对"CEO 的人不会去签 CFO 的事"的诚实回答**：机制上**现在做不到**——一场由 CEO 主持的动议里，
 **所有签字审批都只能落到 CEO 那扇门**；CFO 的人要签只能靠**流程**（CEO 的人转达 / 线下确认）。
