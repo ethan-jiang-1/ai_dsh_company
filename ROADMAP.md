@@ -10,11 +10,26 @@
 
 ▶ 表示明确在办；⏸ 不自动开工。**列表顺序 = 默认执行次序**，次序只在本列表定义（不另立计划/顺序文件——fresh Agent 从这里取次序：dev-loop §0.5 分支②）。用户指定任务优先于队列顺序；若只有暂停项，逐项报告其阻塞/触发条件及谁或什么能复活（例如等人裁决或等上游新 tag），不从历史条目推断任务。
 
-- **① 多人协作：同一个工作目录，各自开自己的门**：RFC = [proposed/multi-human-role-routing](./notes/proposed/2026-09-26-multi-human-role-routing.md)——
+⏸ **① 多人协作：同一个工作目录，各自开自己的门**：RFC = [proposed/multi-human-role-routing](./notes/proposed/2026-09-26-multi-human-role-routing.md)——
   机制核实两行：**DSH 单操作者设计**（无账号；路由键 = agent，不是"人"）⇒ **不在 DSH 里造"人"这一层**。
-  方案三件全现成：协作 = 文件约定（journal/drafts/final/owners.md）；本地模拟 = 每角色一扇门
-  （浏览器 profile）；迁移 = 搬共享目录（无 server 依赖）。**待你裁一个 UX 点**：一人扮多角色用哪种形态。
-  执行待批准。
+  方案三件全现成：协作 = 文件约定；本地模拟 = 每角色一扇门（浏览器 profile）；迁移 = 搬共享目录。
+  **待你裁一个 UX 点**（一人扮多角色用哪种形态）；**等裁决才开工**，不占队列次序。
+
+▶ **② 门禁真相与探针补齐**（技术债清扫第 1 条——先修尺子）：RFC = [proposed/entry-execution-chain-debt](./notes/proposed/2026-09-26-entry-execution-chain-debt.md) §方案①。
+  修 B1 假绿（solution root 上 `tsc -p` 静默编 0 文件）+ B6 门禁清单单一源 + 三道门禁扩面（裸路径/pin 常量/状态行盲区）+ entry-probe 扩到执行链。
+  验收 = 每道新门禁**红→还原→绿**反证；entry-probe 基线分在案。
+
+**③ 执行链收敛**：RFC 同文 §方案②。ROADMAP 历史段处置 + 状态标记 + §9.1 补 6 行 + AGENTS 五个断指针 + 收尾动作 owner 补齐（D27／intents 压缩规则／push 落点）。
+  验收 = entry-probe 复跑 + §0.5 三分支人工复核。
+
+**④ 腐化清扫（升 pin 的消费面）**：RFC 同文 §方案③、R1–R7。七批各一 commit：版本常量 → 机制三代 → 僵尸待办 → 死指针 → 矛盾对 → 枚举清单单一源 → 噪音。
+  验收 = 每批可独立 revert；死指针 0。
+
+**⑤ 共享盘归档（非删除）**：RFC 同文 §方案④。补台账两行 + 4 场 09-26 动议建快照 + 09-26 轮末收敛（23 篇 journal → CHARTER 历史纪要）+ 身份规则 9 条 + 两道防复发门禁。
+  验收 = `deliverables-check` 实跑仍 0 违规；`company-workspace/` 108 → 约 56；13 份 `final.md` 一份不动。
+
+**⑥ 最终收敛验收**：RFC 同文 §方案⑤。地图最终形态 + entry-probe 全绿且 `conflicts` 空 + 收尾 Note + 中立体清扫。
+  验收 = 全绿 + 清扫 findings 零悬空。
 
 
 ## 磨清单（低优先磨活；不占轮、可后台派活；触发即升队）
