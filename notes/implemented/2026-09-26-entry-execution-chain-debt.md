@@ -131,7 +131,7 @@ vendor）与**执行链**（取任务 → 判授权 → 实施 → 选验证 →
 | 验收项 | 实况 |
 |---|---|
 | `pnpm verify` / `pnpm test` | ALL PASS / 25 文件 **207 项**全绿（起点 203） |
-| 新增门禁均带红→还原→绿反证 | 6 道：`bare-path` 扩面、`pin-bookkeeping`、`pin-currency`、`script-triggers`、`proposal-graduated` 跨行修复、`slug-collision`（观察项，带回归） |
+| 门禁面变化（逐项，均带红→还原→绿反证） | `verify.mjs` **+3 道**（`pin-bookkeeping` / `pin-currency` / `script-triggers`，16 → 19 项）；**扩面 1**（`bare-path` 5 → 22 文件，203 条零假阳性）；**修盲区 1**（`proposal-graduated` 只读首物理行 ⇒ 跨行状态可逃逸）；**修假绿 1**（`release-smoke` 在 solution root 上用 `tsc -p` 静默编 0 文件）；`deliverables-check` **+2 观察项**（`slug-collision` / `slug-unledgered`，观察项不判红 + 带回归） |
 | `deliverables-check` 实跑 | **0 违规 ALL PASS**（13 成品 / 过程稿 52 → 23）；观察项 2 条（`renewal-y-2026` 与 `agent-workflow` 的 slug 复用，后者是本次新发现） |
 | `journal-audit` 实跑 | 4 场 09-26 动议全判「在场(已归档)」；仍报 4 条缺席**非本轮引入**，已在快照 README 登记 |
 | `entry-probe`（8→12 问，扩到执行链） | **12/12 且 conflicts 空**。四轮基线：0/12（尺子坏）→ 8/12 → 10/12 → 12/12 |
