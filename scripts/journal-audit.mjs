@@ -91,14 +91,28 @@ function motionOf(entry) {
   // owner 是**成员 id**（不是角色名）：靠 team/member 事件建映射；Lead 自己的 id = 会话 id ⇒ ceo。
   // （实测：task 对象只有 ownerId，没有 ownerName——首版按 ownerName 读，全场漏光。）
   const roleOf = new Map()
+  // 多人形态（2026-09-26 补，修一处**假绿**）：`owners` 只从 `team/task` 事件推 ⇒ 多人模式下
+  // CEO **不 spawn 成员**、没有任务板事件 ⇒ owners 为空 ⇒ 整场被下面的 `owners.length === 0`
+  // **静默跳过**，审计照样 ALL PASS。补一条：**根会话自己就是参与角色**——但只算**真正提到该 slug**
+  // 的那些（否则任何根会话都会把它的角色算进来，凭空误报缺席）。
+  let selfRole
+  let isRootSession = false
+  const mySlugs = new Set()
   for (const line of read(entry.file).split('\n')) {
     if (line === '') continue
     let record
     try { record = JSON.parse(line) } catch { continue }
     if (typeof record.time === 'number') last = Math.max(last, record.time)
+    // 首行是 `type: session` 的 header，带 agentPreset / delegationDepth（实测两代日志都有）。
+    if (record.type === 'session') {
+      isRootSession = record.delegationDepth === 0
+      const preset = String(record.agentPreset ?? '')
+      if (ROLES.includes(preset)) selfRole = preset
+    }
     const text = JSON.stringify(record.data ?? {})
     for (const match of text.matchAll(/slug[=＝:\s\\"'`]{1,8}([a-z0-9][a-z0-9-]{2,40})/g)) {
       slugs.set(match[1], (slugs.get(match[1]) ?? 0) + 1)
+      mySlugs.add(match[1])
     }
     // ⚠ 事件形状：任务嵌在 data.task 里（不是 data 顶层）——首版按顶层读，全漏。
     if (record.type === 'team/member') {
@@ -114,6 +128,7 @@ function motionOf(entry) {
     }
   }
   const slug = [...slugs.entries()].sort((a, b) => b[1] - a[1])[0]?.[0]
+  if (isRootSession && selfRole !== undefined && slug !== undefined && mySlugs.has(slug)) owners.add(selfRole)
   return { owners: [...owners], slug, from: entry.createdAt - 60 * 60 * 1000, to: last + 2 * 60 * 60 * 1000 }
 }
 /**
