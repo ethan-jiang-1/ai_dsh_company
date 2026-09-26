@@ -40,6 +40,26 @@ verify ALL PASS。
    只能从这里（自由文本）核，`approval/asked`/`decided` 事件本身**没有结构化的版本字段**
    （段三跑完后在判据表里坐实这条）。
 
+## ★ 段二的硬前提（源码级核实，2026-09-26）
+
+`vendor/dsh/packages/interaction/user-approval/src/index.ts` 的 `decide()`：
+
+```
+this.ctx.waterfall(scopeTarget(req.agent, req.agent), 'approval/request', req,
+  () => Promise.resolve<ApprovalOutcome>('unavailable'))   // 没接听者 = 立刻兜底失败
+```
+
+- **发卡时没客户端连着 ⇒ 瀑布立即落到 `unavailable`（fail-closed）**，`approval/asked` +
+  `approval/decided {outcome:'unavailable'}` 照样成对落账——**不等待后来连接的客户端**；
+- 页面开着但**中途刷新/关闭** ⇒ client `pending.delegate()` ⇒ 瀑布走空 ⇒ 同样 `unavailable`
+  （这就是"刷新即丢"的精确机制）；
+- 接听者**按会话作用域**（`scopeTarget(req.agent, req.agent)`）⇒ **只开 CEO 标签时，
+  CFO 的卡会立刻 `unavailable`**——两扇门必须**同时**开着才能各接各的卡。
+
+⇒ **实验流程的硬约束**：先开两个标签（CFO 会话 + CEO 会话）→ 再发卡 → 人在页面开着的状态下点。
+若发卡时人不在，结果不是"卡挂着等"而是**立即失败关闭**（这本身是"界面外推送/收件箱"搁置项的根因，
+也是实验 D 要观察的边界之一）。
+
 ## 段二（两卡，等点）
 
 - CFO 门（`2beb83d0`）自己发起 `request_signoff`（8.8 折 < 9 折，理由写明对应 **cfo v2**）→ 卡只落 CFO 门；
