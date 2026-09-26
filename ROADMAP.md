@@ -86,6 +86,7 @@
 
 | 项 | 出处 | 搁置理由（已核实） | 复活条件 |
 |---|---|---|---|
+| **多人协作的门边界与对齐**（L1 门 / L2 对齐 / L3 并发） | [proposed/multi-human-ux](./notes/proposed/2026-09-26-multi-human-ux.md) | **缺明确需求**：三层都已有可行解，但 L1 要在「symlink 门（要扩门禁扫描面）」与「每人一个 DSH_HOME（消息跨 home 不通）」之间**由用户裁**；L2（扫盘推待办）零成本但需点头才动 | 用户裁 L1 选哪条 + 是否做 L2；L3 结论（不造锁）可随时并入合同 |
 | **自主节律**（分身定期复盘） | [implemented/twin-cultivation](./notes/implemented/2026-09-22-twin-cultivation-and-self-learning.md) §四 | 机制不闭合：`goal` 需人类授权且 session-start 一律 disarm；`schedule` 只在 live 会话投递且默认没装；webhook 起的会话进不了 goal 循环；全树无 cron | 上游补"外部触发 ↔ 会话内自主续跑"的 seam——**提 seam，不自建调度器**（D9/D13） |
 | **并行快捷派活**（同时开几个 VP） | [delegation.md](./docs/delegation.md) §4.4 | 本组合无干净解法：缺 per-child composition 与不撞名的控制面 | 上游 seam |
 | **可重放叙事场景**（原拟名「场景 D」，与 [demo.md](./docs/demo.md) 现行场景 D=季度经营会撞名 ⇒ 2026-09-26 改名） | [implemented/presentation-narrative](./notes/implemented/2026-09-24-presentation-narrative.md) §切片二 | 需求未出现：无放映场合；素材（新动议类型场景）已备 | demo／放映需求出现 |
