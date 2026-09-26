@@ -82,7 +82,17 @@ const NOW_FILES = (() => {
     if (entry.isDirectory()) return ['node_modules', '.git', 'lib'].includes(entry.name) ? [] : walkMd(path)
     return entry.name.endsWith('.md') ? [path.slice(root.length + 1)] : []
   })
-  return out.concat(walkMd(join(root, 'docs')), walkMd(join(root, 'notes')).filter(p => p.split('/').length === 2))
+  // `company-workspace/**` 也纳入（2026-09-26 补盲区）：它是**随每个成员会话注入**的事实面，
+  // 里面的活指针腐化代价更高；而此前它不在扫描面内——实测本仓刚在那里留下一处死指针
+  // （台账指向不存在的快照 README），三条门禁全都没抓到。
+  // ⚠ 边界与 `markdown-links.mjs` 一致：**排除 `deliverables/` 与 `journal/`**——那是公司
+  // *产出物与记忆*（正文里出现 `packages/company-pack/...` 之类是业务叙述，不是仓库指针），
+  // 拿仓库指针判据去扫它们必出假阳性（实测扩面第一跑即误报一份 final.md）。
+  return out.concat(
+    walkMd(join(root, 'docs')),
+    walkMd(join(root, 'notes')).filter(p => p.split('/').length === 2),
+    walkMd(join(root, 'company-workspace')).filter(p => !/^company-workspace\/(deliverables|kb\/[^/]+\/journal)\//.test(p)),
+  )
 })()
 const TOP_DIRS = ['notes/', 'docs/', 'scripts/', 'packages/', 'snapshots/', 'dev/', 'tests/', 'company-workspace/', 'vendor/']
 const RUNTIME_PREFIXES = ['dev/harness-home', 'dev/rehearsal-workspace', '.pnpm-store']   // gitignored 运行态
