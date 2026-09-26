@@ -24,6 +24,11 @@
   永久带伤）＋ 回归；实测抓出 2 例（`renewal-y-2026`、**`agent-workflow`**）。手册同时立了
   「slug 唯一性」规矩（CEO 派活前先看同名）。
 
+- **`owners.md` 与 `routing.ts` 的重复事实家**（2026-09-26 新观察）：`company-workspace/kb/owners.md`
+  是"谁签得动"的事实家，而 `packages/company-pack/src/lib/routing.ts` 里有一份**硬编码的表副本**
+  （`OWNERS_TABLE`，当前无生产消费者、只有测试用）——两边必须手工保持一致，多物理人进场后已出现过
+  一次不一致风险。谁来磨 = 维护者；磨法候选 = 让 client 数据面读 `kb/owners.md`（**红线：要动 client
+  数据层**，未批）；何时磨 = 用户点名，或注意力面板真要用这份路由时。
 - **`snapshots/` 层瘦身审计**（2026-09-26 新观察）：快照占全仓 **60% 追踪文件 / 33 MB**，同一批
   交付物在 3–5 个快照里重复（`emergency-x-incident-review/workspace.actual` 与 live 的 9 个老 slug
   逐字节相同、`q3-business-review` 是它的真子集）。**这是本仓体积的真大头**。谁来磨 = 维护者；

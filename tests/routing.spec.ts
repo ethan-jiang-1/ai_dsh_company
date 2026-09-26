@@ -4,7 +4,7 @@
  * 单人现实下 = v1 表全路由到唯一操作者；vendor 证伪 ⇒ 本层只做形状，不做平台分发。
  */
 import { describe, expect, it } from 'vitest'
-import { SINGLE_OPERATOR_TABLE, roleOfWho, routeByRole, type OwnersTable } from '../packages/company-pack/src/lib/routing.ts'
+import { OWNERS_TABLE, roleOfWho, routeByRole, type OwnersTable } from '../packages/company-pack/src/lib/routing.ts'
 
 describe('roleOfWho（who 显示名 → 角色 id）', () => {
   it('角色显示名（带 wochen 前缀）解析为 id', () => {
@@ -21,10 +21,10 @@ describe('roleOfWho（who 显示名 → 角色 id）', () => {
   })
 })
 
-describe('routeByRole（v1 单操作者表：全路由到同一人）', () => {
+describe('routeByRole（v2 多物理人表：与 owners.md 一致）', () => {
   it('五个角色全部路由到操作者（单人现实的如实形状）', () => {
     for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']) {
-      expect(routeByRole(role)).toBe('操作者')
+      expect(routeByRole(role)).toBe(OWNERS_TABLE.operators.find(row => row.roles.includes(role))?.person)
     }
   })
 })
