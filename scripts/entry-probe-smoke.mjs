@@ -35,15 +35,19 @@ const PROMPT = [
   '最后只输出一个 JSON 对象，不要输出前后说明，结构如下：',
   '{"answers":[{"id":"Q1","status":"answered","answer":"本题答案","evidence":[{"path":"ROADMAP.md","quote":"该文件中逐字原文，至少8字符"}]}],"conflicts":[]}',
   'answers 必须每题恰好一项；status 可为 answered/unresolved；conflicts 列出发现的来源冲突。',
-  'quote 与 answer 里如需包含英文双引号，必须用 \\\" 转义或改写为「」，保证整体是合法 JSON；宁可另选一段不含双引号的原文。',
-  '每题给出其自己的答案和证据，不以其他题的内容替代。以下八题：',
+  'quote 与 answer 里**一律不要出现 ASCII 双引号**——需要引用时用「」书名号代替；也不要把两者混写成 「"""…"""」（2026-09-26 实证：一处未转义的 " 会让整份 JSON 不可解析、12 题全判 0）。',
+  `每题给出其自己的答案和证据，不以其他题的内容替代。以下 ${ENTRY_QUESTIONS.length} 题：`,
   ...ENTRY_QUESTIONS.map(q => `${q.id}: ${q.ask}`),
 ].join('\n')
 const sourceHashes = new Map()
+// 允许面（2026-09-26 扩）：根入口 + docs/ + notes/ + **公司手册**。
+// 为什么加 `company-workspace/AGENTS.md`：Q3 问"交付物三态的事实家在哪个文件"，正确答案就是它
+// （D20 点名的合同家、随每个成员会话首帧注入）。旧允许面读不到它 ⇒ **正确答案反而被判"来源不可读"**，
+// 而只有引 `docs/index.md` 的代理句才能过——那是在奖励绕路、惩罚直答。首跑实测踩到（基线 8/12 的 Q3）。
 function readSource(path) {
   if (isAbsolute(path) || path.includes('\\') || path.split('/').includes('..') || !path.endsWith('.md') ||
-      !(['AGENTS.md', 'ROADMAP.md'].includes(path) || /^(docs|notes)\//.test(path))) {
-    throw new Error('只允许根入口、docs/、notes/ 的仓库相对 Markdown 路径')
+      !(['AGENTS.md', 'ROADMAP.md', 'company-workspace/AGENTS.md'].includes(path) || /^(docs|notes)\//.test(path))) {
+    throw new Error('只允许根入口、docs/、notes/、公司手册的仓库相对 Markdown 路径')
   }
   const physical = realpathSync(join(ROOT, path))
   const rel = relative(ROOT, physical)

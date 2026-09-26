@@ -293,10 +293,22 @@ unscheduled.length === 0
 
 /** 终态字：提案的状态行里出现这些，说明它已经被消化，该毕业了。 */
 const DIGESTED_MARKERS = ['已消化', '已交付', '部分交付']
-const notGraduated = proposals.filter(name => {
-  const statusLine = readFileSync(join(proposedDir, name), 'utf8').split('\n').find(line => line.startsWith('状态：')) ?? ''
-  return DIGESTED_MARKERS.some(marker => statusLine.includes(marker))
-})
+/**
+ * 取提案的「状态：」**逻辑行**——含其后的缩进续行（到空行为止）。
+ * 为什么不能只读第一个物理行（2026-09-26 修盲区）：状态行常写成两行（首行给去向、续行给
+ * "执行待批准"之类的补充），只读首行时，把「已消化」落在续行就能**逃过毕业门禁**。
+ * 现行 RFC 的 `状态：` 就是跨两行写的——这不是假想风险。
+ */
+const statusBlockOf = (text) => {
+  const lines = text.split('\n')
+  const start = lines.findIndex(line => line.startsWith('状态：'))
+  if (start === -1) return ''
+  const block = [lines[start]]
+  for (let i = start + 1; i < lines.length && lines[i].trim() !== ''; i++) block.push(lines[i])
+  return block.join('\n')
+}
+const notGraduated = proposals.filter(name =>
+  DIGESTED_MARKERS.some(marker => statusBlockOf(readFileSync(join(proposedDir, name), 'utf8')).includes(marker)))
 notGraduated.length === 0
   ? ok('proposal-graduated (proposed/ 里只剩未落地的)')
   : fail('proposal-graduated', `这些提案已消化却仍在 notes/proposed/（搬到 notes/implemented/ 并写明条目去向）：${notGraduated.join(', ')}`)

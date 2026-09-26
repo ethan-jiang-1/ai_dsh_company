@@ -3,18 +3,24 @@ import { assistantMessageText, collectText } from '../scripts/lib/session-log.mj
 import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from '../scripts/lib/entry-probe.mjs'
 
 const evidence = { path: 'ROADMAP.md', quote: '逐字可核的证据原文至少八字符' }
+// 按**题号**取答案（不是按位置）——加题时不会静默错位；数量断言一律用 ENTRY_QUESTIONS.length
+// 推导，别写死（写死就是"枚举型事实写两处"，2026-09-26 从 8 扩到 12 时正是这里要改）。
+const ANSWERS: Record<string, string> = {
+  Q1: 'ROADMAP 队列无活动项；implemented Note 留记录',
+  Q2: '完成即离队，历史移入 Note',
+  Q3: 'company-workspace/AGENTS.md 公司手册',
+  Q4: 'dsh-v0.1.7-rc.2 只读',
+  Q5: 'preset-smoke 验证挂载',
+  Q6: '条目队列 D23',
+  Q7: 'dev-loop 真模型不进回归',
+  Q8: '开工检索决定和取舍，核对实现，留下验证证据',
+  Q9: 'Plan Mode 呈批；已批准或机械单步可直接做',
+  Q10: 'dag-visual 视觉夹具；human-loop-e2e 人机回路；date-rule 日期口径',
+  Q11: 'intents 登记 + implemented Note + ROADMAP 队列离队',
+  Q12: '交付型与打磨型；停止 = 预算耗尽 / 输入源枯竭 / 真卡住',
+}
 function good() {
-  const texts = [
-    'ROADMAP 队列无活动项；implemented Note 留记录',
-    '完成即离队，历史移入 Note',
-    'company-workspace/AGENTS.md 公司手册',
-    'dsh-v0.1.5-rc.2 只读',
-    'preset-smoke 验证挂载',
-    '条目队列 D23',
-    'dev-loop 真模型不进回归',
-    '开工检索决定和取舍，核对实现，留下验证证据',
-  ]
-  return { answers: ENTRY_QUESTIONS.map((q: { id: string }, i: number) => ({ id: q.id, status: 'answered', answer: texts[i], evidence: [evidence] })), conflicts: [] as string[] }
+  return { answers: ENTRY_QUESTIONS.map((q: { id: string }) => ({ id: q.id, status: 'answered', answer: ANSWERS[q.id], evidence: [evidence] })), conflicts: [] as string[] }
 }
 const readSource = (path: string) => {
   if (path !== evidence.path) throw new Error('unknown source')
@@ -39,7 +45,7 @@ describe('会话回答只取组装消息，不重复遍历 stream', () => {
 
 describe('入口探针不使用全文兜底', () => {
   it('逐题回答与原文均匹配时通过机器层', () => {
-    expect(evaluate(good())).toEqual({ passed: 8, failures: [] })
+    expect(evaluate(good())).toEqual({ passed: ENTRY_QUESTIONS.length, failures: [] })
   })
   it('支持一个完整 JSON code fence', () => {
     expect(evaluateEntryProbe(`\`\`\`json\n${JSON.stringify(good())}\n\`\`\``, readSource).failures).toEqual([])
@@ -55,7 +61,7 @@ describe('入口探针不使用全文兜底', () => {
     const value = good()
     value.answers[1].id = 'Q1'
     expect(evaluate(value).failures).toContain('Q1: 缺题或重复')
-    value.answers[1].id = 'Q9'
+    value.answers[1].id = 'Q99'
     expect(evaluate(value).failures).toContain('Q2: 缺题或重复')
     expect(evaluateEntryProbe('ROADMAP implemented D23 只读 8/8 PASS', readSource).passed).toBe(0)
   })
@@ -70,10 +76,36 @@ describe('入口探针不使用全文兜底', () => {
   it('证据中的关键词不能代替本题答案', () => {
     const value = good()
     value.answers[0].answer = '不知道'
-    expect(evaluate(value).passed).toBe(7)
+    expect(evaluate(value).passed).toBe(ENTRY_QUESTIONS.length - 1)
   })
   it.each([null, {}, { answers: [] }, { answers: {}, conflicts: [] }])('缺明确结构即失败：%j', value => {
     expect(evaluate(value).failures.length).toBeGreaterThan(0)
+  })
+  // 2026-09-26 立：首跑实证——模型 12 题全答对、还报了 6 条真矛盾，只因正文写了一处
+  // `「"""历史维护记录"""」`（未转义的 ASCII 双引号）就整份判 0，而旧报错只有一句
+  // "必须是完整 JSON"，定位靠手工二分。全有或全无是**有意的**（不做全文兜底），
+  // 但失败必须指得出位置。
+  it('JSON 语法错误要报位置与附近片段（fail-loud 诊断）', () => {
+    const broken = '{"answers":[{"id":"Q1","status":"answered","answer":"他说"""行"""","evidence":[]}],"conflicts":[]}'
+    const result = evaluateEntryProbe(broken, readSource)
+    expect(result.passed).toBe(0)
+    expect(result.failures[0]).toContain('position')
+    expect(result.failures[0]).toContain('出错处附近')
+  })
+  // 2026-09-26 立（基线 8/12 的 Q5）：命令表用空格对齐，模型把 `mjs          #` 引成 `mjs #`
+  // 是自然的规范化，不是幻觉 ⇒ 比对前归一化空白。防幻觉性质不变（文字仍须真在文件里）。
+  it('引用比对忽略排版空白，但文字仍须真实存在', () => {
+    // 忠实复刻 Q5 现场：源文件用空格对齐，模型引用时把它规范化了。
+    const aligned = 'node scripts/preset-smoke.mjs          # preset 改动的完成定义'
+    const reader = (path: string) => (path === 'AGENTS.md' ? aligned : evidence.quote)
+    const spaced = good()
+    spaced.answers[4].evidence = [{ path: 'AGENTS.md', quote: 'node scripts/preset-smoke.mjs # preset 改动的完成定义' }]
+    expect(evaluateEntryProbe(JSON.stringify(spaced), reader).failures).toEqual([])
+    const wrong = good()
+    wrong.answers[4].evidence = [{ path: 'AGENTS.md', quote: '这段原文其实并不存在于任何文件里' }]
+    const failures = evaluateEntryProbe(JSON.stringify(wrong), reader).failures
+    expect(failures.join()).toContain('原文不匹配')
+    expect(failures.join()).toContain('引的是')   // 报错要带上引了什么，便于一眼改
   })
 })
 
