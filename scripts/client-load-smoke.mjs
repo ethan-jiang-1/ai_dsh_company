@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // client-load 冒烟（client 面完成定义）：headless 浏览器加载真 web 页面，断言零插件挂载失败。
+// 何时跑：客户端装配/入口改变、且接受条件涉及挂载时（真页面零挂载失败，keyless ~10s）
 //
 // 为什么必须有它（postmortem 0003）：preset-smoke 只打 RPC 面（roster / session/create），
 // **client 入口的 apply 抛错**（如重复 `$mount`）只有浏览器能抓——这类失败不静默，会把整个

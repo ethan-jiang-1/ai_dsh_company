@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // preset 冒烟（上线前门禁）：boot 真 web profile，逐个 preset 建一次会话，断言挂载成功。
+// 何时跑：**preset 改动的完成定义**：改 presets/**（persona/skills）或组合行后必跑
 //
 // 为什么必须有它（R1 实证）：preset 的失败发生在"**会话创建时挂载**"——Loader 用每行的 config
 // 校验插件 schema，任一必填字段缺失就让整个 preset 挂载失败（agent-preset/invalid）。

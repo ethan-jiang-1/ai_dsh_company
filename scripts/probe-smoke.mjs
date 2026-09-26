@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // 角色连通冒烟（会话级"它通就行"）：boot 真 web → 真挂 preset → 真发一句话 → 断言四件事。
+// 何时跑：角色内容/persona/KB 改动后；连通档默认 ~6s，内容档（--full）按需 5–10min
 //
 // 默认（快速档，约 15–40 秒）：每角色只问一句"在岗吗"，断言
 //   ① session/create 成功（preset 行 config 全过 = 挂载没炸）
@@ -13,6 +14,17 @@
 //
 // 前置：DSH_HOME + 已装 pack + 模型凭据（真模型；ping 档 = 5 次极短调用）。
 // 用法：source dev/env.sh && node scripts/probe-smoke.mjs [--port 3097] [--concurrency 5] [--full] [--timeout 90000]
+//
+// 分层门禁的**设计要点（可迁移到别的面）**——2026-09-26 从 dev-loop §9 搬来这里（一处事实一个家：
+// 这些是"本脚本为什么这么写"的说明，紧挨范例实现；dev-loop §9 只留指针）：
+//   · **"通"不需要考内容**：挂载 + 轮次跑完 + 回话 + 人格进 prompt 已覆盖全部已知失败类
+//     （postmortem 0001 preset 挂载失败 / 0003 client 砖死的那一类）。
+//   · **能从权威日志读的事实，不要从模型答案推断**：人格是否进 prompt 看 `system/message`，
+//     这是 keyless 硬证据；模型答案只用来判"有没有回话"。
+//   · **问句要短**：一句 3 秒能答完的 ping 就够；"不要调用工具"能砍掉多步往返（读文件会把一轮拖到几分钟）。
+//   · **完成信号用持久事件**（`turn/end`），不要用状态位（`session/list.running` 是"会话有活着的 agent"，
+//     idle 也为 true，会让等待永不满足）。
+//   · **慢是常态**：内容档超时 ≥5min；快档 90s 足够；失败重试一次（换新会话）。
 import { spawn } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // Coding entry probe: explicit standard preset + repo cwd + logged coding baseline.
+// 何时跑：入口链/执行链文档（AGENTS.md / docs/index.md / dev-loop / ROADMAP）改动后；真模型认证档
 // Machine checks validate per-question routing/evidence, not semantic correctness.
 // No keyless regression claim: true-model certification, 不进 pnpm test.
 // Usage: source dev/env.sh && node scripts/entry-probe-smoke.mjs [--port 0] [--timeout 240000]

@@ -317,16 +317,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 | **连通档（默认）** | 每角色一句 ping（"只回复两个字：在岗，不要调用工具"），断言四件事：① `session/create` 成功（preset 行 config 全过）② 日志出现新 `turn/end` ③ assistant 正文非空 ④ **人格进 prompt**（`system/message` 含角色标记） | 5 角色并发 **≈6s** |
 | 内容档（`--full`） | 身份 / 知识 / 产出三探针，按 KB 事实与 veto 语义断言 | 5–10min，按需 |
 
-**要点（可迁移到别的面）**：
-
-- **"通"不需要考内容**：挂载 + 轮次跑完 + 回话 + 人格进 prompt 已覆盖全部已知失败类
-  （postmortem 0001 preset 挂载失败 / 0003 client 砖死的那一类）。
-- **能从权威日志读的事实，不要从模型答案推断**：人格是否进 prompt 看 `system/message`，
-  这是 keyless 硬证据；模型答案只用来判"有没有回话"。
-- **问句要短**：一句 3 秒能答完的 ping 就够；"不要调用工具"能砍掉多步往返（读文件会把一轮拖到几分钟）。
-- **完成信号用持久事件**（`turn/end`），不要用状态位（`session/list.running` 是"会话有活着的 agent"，
-  idle 也为 true，会让等待永不满足）。
-- **慢是常态**：内容档超时 ≥5min；快档 90s 足够；失败重试一次（换新会话）。
+**要点（可迁移到别的面）**：五条设计要点（"通"不考内容／从权威日志读事实／问句要短／完成信号用持久事件／慢是常态）写在范例脚本头注 = [`scripts/probe-smoke.mjs`](../../scripts/probe-smoke.mjs)（2026-09-26 从本节搬出，一处事实一个家）。
 
 ### 9.1 测试分层与预算（R3 立，回答"回归不能跑这么慢"）
 
@@ -334,7 +325,10 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 （CEO persona 的开工仪式先烧 5–6 步模型往返），而且**依赖模型配合**：模型不调那个工具就永远绿不了。
 **这是层次放错，不是脚本写得不好。**
 
-**分层（按"要不要模型"切，不按"重不重要"切）**：
+**分层（按"要不要模型"切，不按"重不重要"切）**；**每个脚本的触发条件与成本写在它自己的头注**
+（`// 何时跑：…`，清单唯一源 = `scripts/`，门禁 `script-triggers` 强制自述）——本表只给分层原则，
+**不复述逐个脚本**（复述必漂：2026-09-26 实测本表漏了 6 个已存在脚本，而 AGENTS.md 又把"何时跑"
+指回本表，成环）：
 
 | 层 | 时间 | 跑什么 | 何时跑 |
 |---|---|---|---|
@@ -345,7 +339,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 | **重放 lane（第三档，无 key）** | ~11s | `replay-smoke`（会话日志 + sidecar；已声明 workspace oracle 的场景另比完整工作区）；`--ui`（+真浏览器端到端）——要起进程/浏览器，不进 `pnpm test` | 录制行为、组合、委派 UI 或 workspace replay 改动 |
 | CLI 集成（keyless，需子进程） | 秒级 | `node scripts/snapshot-motion-smoke.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） | snapshot-motion CLI 或 workspace capture 接线改动 |
 | 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../release.md)） | pack 依赖、安装形状、built 启动器改动；或其属于关键验收时 |
-| 认证档（真模型） | 分钟级 | 按面选择 `preset-smoke` / `probe-smoke` / `handbook-smoke` / `presence-e2e-smoke` / `attention-e2e-smoke`（人机三节点全回路） | 改动影响相应真模型行为或验收要求认证时；不因“轮末/每轮”机械重跑 |
+| 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件见其头注「何时跑」**；`script-triggers` 门禁强制） | 改动影响相应真模型行为或验收要求认证时；不因“轮末/每轮”机械重跑 |
 
 **证明边界（每层只证明自己能观察的性质）**：verify 证结构不证行为；keyless 单测证模块正例与错误，
 不证装配与真入口；client-load 证挂载零失败不证内容；delegation/replay 证可见边界与组合复现，不证设计

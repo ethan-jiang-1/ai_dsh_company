@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // 驾驶舱①② 认证档 e2e（2026-09-25 立法）：人机三节点全回路——
+// 何时跑：人机三节点全回路（触线→审批→面板→人批→继续）改动时；真模型+真浏览器，~$1–2
 // 真模型 CFO 触双签线 → request_signoff → approval/asked → 浏览器：注意力面板显示待批项
 // + 官方审批面板（ui-approval）→ 点 Allow once → approval/decided(allowed-once) → 同轮收口。
 //

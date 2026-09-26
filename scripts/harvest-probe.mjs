@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // 收割轮实测探针（一次性，2026-09-25）：验证出厂自带的两个人机面在我们的 profile 下真实可用——
+// 何时跑：上游收割轮（升 pin 后对齐新能力）时；真模型 ≈$3，一次性探针
 //   ① workspace-changes：turn 级文件变更审阅卡（ui-deliverables 的 changes-review 右栏页签）；
 //   ② office 预览：CSV / PDF 文档预览（ui-sidebar-documentpreview）。
 // 性质 = 收割台账（harvest-ledger）#8/#9 的证据采集：宽容式断言（找得到就 PASS、找不到如实记

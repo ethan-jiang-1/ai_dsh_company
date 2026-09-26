@@ -152,6 +152,20 @@ for (const rel of NOW_FILES) {
 }
 if (!pinBad) ok(`pin-currency ×${pinCount}（现在时文件的 dsh-v 字面量 = ${expectedTag}；intents 日志与 ROADMAP 历史段按性质排除）`)
 
+// ── 2f. 脚本触发条件门禁（2026-09-26 立，技术债 B7/R5 类）───────────────────────
+// 为什么：dev-loop §9.1 被 AGENTS.md 指定为"何时跑"的唯一家，却漏了 6 个已存在脚本，而 AGENTS.md
+// 又把它指回 §9.1——成环，fresh agent 查"dag-visual 什么时候跑"两处都查不到。
+// 根因是"枚举型事实写在文档里、实现那处更新了"（本仓六份清单同一种病）。
+// 解法：**触发条件的家 = 脚本自己**（一处事实一个家，紧挨实现、改脚本时必然看见）；
+// 文档只留分层原则与指针；本门禁强制自述存在。
+const TRIGGER_FILES = readdirSync(join(root, 'scripts'))
+  .filter(n => /-(smoke|probe|audit|check)\.mjs$/.test(n)).sort()
+const missingTrigger = TRIGGER_FILES.filter(n =>
+  !readFileSync(join(root, 'scripts', n), 'utf8').split('\n').slice(0, 8).some(line => line.startsWith('// 何时跑：')))
+missingTrigger.length === 0
+  ? ok(`script-triggers ×${TRIGGER_FILES.length}（每个门禁/探针脚本头注自述「何时跑」）`)
+  : fail('script-triggers', `这些脚本头注缺「// 何时跑：」（触发条件的家 = 脚本自己，别写回文档）：${missingTrigger.join(', ')}`)
+
 
 // ── 3. preset 结构：5 角色 × (声明文件 + ≥1 skill) ─────────────────────────
 // 0.1.7 起显示名/描述/order 内联进 `agent.cordis.yml` 的 `dsh-agent-preset` 行（原 preset.yml 并入），

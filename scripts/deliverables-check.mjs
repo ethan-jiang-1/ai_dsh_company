@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // 交付物三态判据的**运行场入口**（R4「成品流程」轮）。
+// 何时跑：交付物三态判据或 company-workspace/deliverables 改动后；维护者按需跑（缺 DSH_HOME 自拒），不进 verify
 //
 // 与 `tests/deliverables.spec.ts` 的分工（guides/dev-loop §9.1 分层纪律）：
 //   - 回归层（vitest）守判据本身，只读**明文**归档日志，秒级、无 key；
