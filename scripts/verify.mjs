@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 // 结构门禁（**清单唯一源 = 本文件**；AGENTS.md 与 dev-loop 只留指针，不复述清单——复述必漂）。
-// 当前 12 类 / 16 项：md-utf8+md-newline、md-links（含 notes/ 树）、doc-budget、bare-path、
-// preset 结构、claude-symlink、vendor-pin+vendor-clean、pack-bundle、pack-compat、
-// preset-row-deps、client-halves、proposal-scheduled+graduated。跑一次看 PASS 行即得全表。
+// **本行不写类数与项数**：那是易腐常量，实测写"12 类 / 16 项"后加了 3 道门禁就立刻失真
+// （D28：枚举型事实的家 = 实现自己）。要全表就跑一次看 PASS 行。
 // 纪律：只报告实际跑过的检查（docs/design/architecture.md §6）。阶段 5 前不测行为，只测结构。
 import { readFileSync, existsSync, lstatSync, readdirSync, readlinkSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'

@@ -25,7 +25,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { requireDevHome } from './lib/runtime-home.mjs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { auditDeliverables, parseSessionLog } from './lib/deliverables.mjs'
+import { WARNING, auditDeliverables, parseSessionLog } from './lib/deliverables.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const arg = (name, fallback) => {
@@ -144,7 +144,7 @@ const unledgered = onDiskSlugs.filter(slug => !ledgerSlugs.has(slug))
 const warnings = [...result.warnings]
 if (existsSync(ledgerPath) && unledgered.length > 0) {
   warnings.push({
-    code: 'slug-unledgered',
+    code: WARNING.SLUG_UNLEDGERED,
     detail: `盘上有目录但 \`kb/motion-ledger.md\` 没有行的 slug：${unledgered.join(', ')}——台账是经营历史的唯一事实家；轮末收敛时补行（跑完未收敛期间出现属正常）`,
   })
 }

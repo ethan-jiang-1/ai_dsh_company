@@ -6,7 +6,7 @@
 
 | 条目 | 状态 | commits | 实况 |
 |---|---|---|---|
-| ② 门禁真相与探针补齐 | ✅ 完成 | `1dc024d` `7e33d8f` | B1 假绿修复（三态反证）；B6 门禁清单单一源；裸路径门禁扩面 5→22 文件（203 条零假阳性，抓到 3 条真腐化）；新门禁 `pin-bookkeeping` + `pin-currency`；状态行门禁修跨行盲区；entry-probe 8→12 问 + **修尺子自身三处缺陷**；基线 = **12/12 + 3 条未消矛盾**（独立复现 B3/B12/R5） |
+| ② 门禁真相与探针补齐 | ✅ 完成 | `1dc024d` `7e33d8f` | B1 假绿修复（三态反证）；B6 门禁清单单一源；裸路径门禁扩面 5→**36 文件**（217 条零假阳性；② 时到 22 文件、⑥ 自查又补 `company-workspace/**` 盲区，见下条）；新门禁 `pin-bookkeeping` + `pin-currency`；状态行门禁修跨行盲区；entry-probe 8→12 问 + **修尺子自身三处缺陷**；基线 = **12/12 + 3 条未消矛盾**（独立复现 B3/B12/R5） |
 | ③ 执行链收敛 | ✅ 完成 | `107f2ce` `0b97cde` `e8df28a` | B7 改"触发条件的家 = 脚本头注" + `script-triggers` 门禁（18 脚本；不往顶到上限的 dev-loop 塞行）；B8 ROADMAP **429→73 行**（历史段删除，blob `d159b0228e2b` 留证，3 处入站引用标注）；B9 状态三态语义；B10 搁置项不是任务源；R4 计数常量/升队条件/场景 D 撞名；B3 `rejected/` 残影（执行链第一跳）；B11 D27 入台账 + intents 行预算 + push 落点；R7 五个断指针；R11 公司手册入布局 |
 | ④ 腐化清扫 | ✅ 完成 | `78308c1` `88df276` `01b3ba5` | R1 版本常量改指针（release/architecture/pack README）；R2 机制三代（**profile.md 最重**：把已退役 `company` profile 当现行形状、`file:` 那条写反——实测 inode 不同/link count 1 = 真拷贝；architecture 的 roots 模型、roles-isolation 的四角色+已消失包名、ui-demo 的 `remote.agentTeams`/`dist/client.js`、pack JSDoc 四处、cordis 头注自相矛盾）；R3 死指针 5 条（含两条**门禁盲区**里的：dev README 与 .gitignore，非 .md/被排除树）；R4 僵尸待办 7 处（R3 待验证点、随升 pin、轮末、归 R5、R4 定稿、驾驶舱旧名、role-content-plan skills 清单）；R5 枚举双写 3 处（改成自查命令与指针）；R6 矛盾对（tests 标题四角色）；R7 其余 5 处；noise 5 处（src/README 重写、architecture §7 stub 保号改写、死测试数、升 pin 证据落点、ROADMAP≡dev-loop 重复规则） |
 | ⑤ 共享盘归档 | ✅ 完成 | `c318f29` | 台账补两行 + 09-26 轮末收敛（23 篇 journal → 五份 CHARTER 历史纪要）+ 新快照 `memory-convergence-2026-09-26`（64 文件）+ 29 份已归档过程稿移出 live + 身份规则按受众拆（成员侧只加 slug 唯一性 / 维护者侧进 snapshots README）+ 两道观察项（`slug-collision` / `slug-unledgered`，均带回归）。`company-workspace/` 108 → **56**；deliverables-check 实跑 0 违规；journal-audit 4 场全判「在场(已归档)」 |
@@ -131,7 +131,7 @@ vendor）与**执行链**（取任务 → 判授权 → 实施 → 选验证 →
 | 验收项 | 实况 |
 |---|---|
 | `pnpm verify` / `pnpm test` | ALL PASS / 25 文件 **207 项**全绿（起点 203） |
-| 门禁面变化（逐项，均带红→还原→绿反证） | `verify.mjs` **+3 道**（`pin-bookkeeping` / `pin-currency` / `script-triggers`，16 → 19 项）；**扩面 1**（`bare-path` 5 → 22 文件，203 条零假阳性）；**修盲区 1**（`proposal-graduated` 只读首物理行 ⇒ 跨行状态可逃逸）；**修假绿 1**（`release-smoke` 在 solution root 上用 `tsc -p` 静默编 0 文件）；`deliverables-check` **+2 观察项**（`slug-collision` / `slug-unledgered`，观察项不判红 + 带回归） |
+| 门禁面变化（逐项，均带红→还原→绿反证） | `verify.mjs` **+3 道**（`pin-bookkeeping` / `pin-currency` / `script-triggers`，16 → 19 项）；**扩面 2 次**（`bare-path` 5 → 22 → **36 文件**、217 条零假阳性：第二次是 ⑥ 自查发现 `company-workspace/kb/` 不在扫描面内、而那里刚被我留了一处死指针）；**修盲区 1**（`proposal-graduated` 只读首物理行 ⇒ 跨行状态可逃逸）；**修假绿 1**（`release-smoke` 在 solution root 上用 `tsc -p` 静默编 0 文件）；`deliverables-check` **+2 观察项**（`slug-collision` 在纯逻辑库、**带回归**；`slug-unledgered` 在运行场入口、靠实跑核，不判红） |
 | `deliverables-check` 实跑 | **0 违规 ALL PASS**（13 成品 / 过程稿 52 → 23）；观察项 2 条（`renewal-y-2026` 与 `agent-workflow` 的 slug 复用，后者是本次新发现） |
 | `journal-audit` 实跑 | 4 场 09-26 动议全判「在场(已归档)」；仍报 4 条缺席**非本轮引入**，已在快照 README 登记 |
 | `entry-probe`（8→12 问，扩到执行链） | **12/12 且 conflicts 空**。四轮基线：0/12（尺子坏）→ 8/12 → 10/12 → 12/12 |

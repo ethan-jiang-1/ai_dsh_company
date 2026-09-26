@@ -40,7 +40,7 @@ node scripts/preset-smoke.mjs          # preset 改动的完成定义：boot 真
                                        #   抓得到（dump/roster 看不见；需 DSH_HOME + 已装 pack）
 ```
 
-其余门禁/冒烟脚本见 `scripts/`：**每个脚本头注写明「何时跑」与成本**（`script-triggers` 门禁强制自述，
+其余门禁/冒烟脚本见 `scripts/`：**每个门禁/探针脚本（`*-{smoke,probe,audit,check}.mjs`）头注写明「何时跑」与成本**（`script-triggers` 门禁强制自述，
 清单唯一源 = `scripts/`——**逐个脚本的触发条件与成本别抄回本文件**，复述必漂）。分层原则 = guides/dev-loop §9.1；
 发布/升 pin = [release.md](docs/release.md)。web 观察窗 = `pnpm dsh web -- --port 3081 --no-open`
 （3080 是本 GUI 占用；构建三件事见 guides/dev-loop §7）。
