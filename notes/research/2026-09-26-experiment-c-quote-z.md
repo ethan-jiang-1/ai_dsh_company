@@ -30,6 +30,16 @@ verify ALL PASS。
 - **这正是评审指认的第三种漂的真语料实证**，也是"要不要结构化派活字段"的正面证据——
   但注意：结构化字段本身也会漂（状态行不更新），**要么回写要么双源核对**。
 
+## 仪器化过程中的两个机制事实（2026-09-26 干跑发现）
+
+1. **`session/page` 事件流不带 header，也没有任何事件携带 agentPreset**
+   （`permission/preset` 是文件沙箱策略，不是角色 preset）⇒ **任何想从事件流判"哪个角色发起"的审计
+   都必须去读日志文件第一行的 header**（journal-audit 同款做法）。段三抽取器已按此修正并干跑通过
+   （CFO 门 preset=cfo depth=0 / CEO 门 preset=ceo depth=0）。
+2. `request_signoff` 的**调用参数**（summary/payload）在 `tool/call` 事件里——**审批对应哪一版稿**
+   只能从这里（自由文本）核，`approval/asked`/`decided` 事件本身**没有结构化的版本字段**
+   （段三跑完后在判据表里坐实这条）。
+
 ## 段二（两卡，等点）
 
 - CFO 门（`2beb83d0`）自己发起 `request_signoff`（8.8 折 < 9 折，理由写明对应 **cfo v2**）→ 卡只落 CFO 门；
