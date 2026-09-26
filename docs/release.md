@@ -83,6 +83,7 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 
 默认只读核对四处簿记，不做流程语义审计。升级使用 `source dev/env.sh && node scripts/sync-dsh.mjs --pin <tag> --process-review <repo-relative.json>`；证据文件先经人审提交，两个工作树须干净。
 
+**证据文件命名与落点**（2026-09-26 补，此前只有格式要求没有家）：`notes/<YYYY-MM-DD>-pin-review-<目标 tag>.json`（顶层 `notes/`，与 `intents.md` 同级——它是流程物证不是 Note）。
 人审证据 JSON 必含 `fromSha`、`toSha`（完整 SHA）、`reviewedBy`、`reviewedAt`（YYYY-MM-DD）、`processContractReview`（核对 vendor 纪律与本地流程合同的结论，可引用既有 Note）。脚本核对文件受版本控制、字段非空及 SHA 对应；**这是人审声明，不是自动语义审计，也不认证签名者身份**。
 
 程序：验证旧簿记及 `verify` → fetch tag 并核对证据 SHA → 在内存暂存新簿记/矩阵 → checkout 候选 → `pnpm install` → vendor 自有 `pnpm run build` → `test` + built `release-smoke` → 验证通过才写簿记/矩阵 → 再 `verify`。候选冒烟时矩阵仍为旧值，安装检查只确认其在场；成功后矩阵才增加实测 tag。安装限 180 秒、vendor build 与 release-smoke 各 600 秒，其余命令 120 秒；子进程组等待退出。

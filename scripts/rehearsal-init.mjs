@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 排练场成型（轮间待办②「练习场 ≠ 运行场」）：dev/rehearsal-workspace/ 幂等成型。
 //
-// 四个 smoke 脚本（preset / probe / handbook / delegation）的默认 cwd 已经指到这里，
+// 排练/探针脚本的默认 cwd 已经指到这里（清单唯一源 = 各脚本头注「何时跑」与 lib/rehearsal.mjs），
 // 且启动时会自建（ensureRehearsalWorkspace）；本命令用于手动初始化/刷新参考镜像。
 //
 // 镜像什么、不动什么（详见 scripts/lib/rehearsal.mjs 头注）：

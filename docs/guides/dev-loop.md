@@ -150,14 +150,14 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibil
    在 **DSH 的 coding 会话里跑 bash** 时，`DSH_HOME` 是**继承且带值的**，值就是日用 home
    `~/.dsh`（实测：不 source 直接 `echo $DSH_HOME` → `/Users/bowhead/.dsh`）。后果比"没设"更坏：
    脚本里"未设则报错"的那道防线**根本不触发**，会安静地拿日用 home 的会话库当输入。
-   所以：**判据/审计类脚本要自己拒绝日用 home**。`preset/probe/handbook/delegation/client-load/presence-e2e` 六个 smoke 共用 `scripts/lib/runtime-home.mjs`，在启动前拒绝日用目录、重叠路径及其符号链接；
+   所以：**判据/审计类脚本要自己拒绝日用 home**。**判据/审计类脚本一律接入 `scripts/lib/runtime-home.mjs`**（在启动前拒绝日用目录、重叠路径及其符号链接；清单唯一源 = 各脚本自己的 import，`grep -l runtime-home scripts/*.mjs` 即得——**别在文档里列名单**，2026-09-26 实测旧名单只列了 6 个而实际已有 17 个）；
    `deliverables-check` / `release-smoke`、`entry-probe` / `snapshot-motion` 均在运行前调用 `requireDevHome`，拒绝缺失或与日用 home 重叠的路径；`sync-dsh --pin` 也要求隔离 home。守卫不涵盖未接入该 helper 的任意脚本，也不防守检查后的并发符号链接替换。
 6. **端口与实例隔离（部署事实）**：headless 形态（探针/动议）**无端口**——单次任务
    进程，stdout 出结果，日志落 `$DSH_HOME/sessions/`。web 形态（观察窗）起**本地**
    HTTP 端口（值见启动横幅）；因 `DSH_HOME` 指 dev home，它与日用 DSH 的 web 实例
    （若同时开）是两个完全独立进程：profile、会话、凭据、端口互不可见。
 7. **排练场 ≠ 运行场（轮间待办②，2026-09-22 落地）**：排练/探针会话的默认 cwd 是
-   `dev/rehearsal-workspace/`（`node scripts/rehearsal-init.mjs` 幂等成型；四个 smoke 脚本
+   `dev/rehearsal-workspace/`（`node scripts/rehearsal-init.mjs` 幂等成型；排练/探针脚本（清单见各脚本头注「何时跑」）
    `preset/probe/handbook/delegation` 已默认指这里并会自建，`--cwd` 可显式覆盖）。
    **真盘 `company-workspace/` 只收真实动议的产物**——排练产物不受三态判据约束
    （`drafts/` 本就不需要 `present`），跑在真盘会安静积污（R4 W2 删过 15 份）。
