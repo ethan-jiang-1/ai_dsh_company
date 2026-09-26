@@ -16,7 +16,7 @@
  * 优雅降级：无投影值 / 空 / 未知 preset（非公司盘）⇒ **不渲染任何角色痕迹**。
  * 颜色纪律：只用平台令牌（品牌底 + 反色字）；每角色不同色需上游分类色板（提案开放问题 2）。
  */
-import { useMemo, useSyncExternalStore } from 'react'
+import { useCallback, useMemo, useSyncExternalStore } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 
 /**
@@ -82,10 +82,10 @@ export function sessionTitleOf(session: unknown): string | undefined {
 export function RoleBadge({ sessionId, roleSource }: RoleBadgeProps) {
   // subscribe 必须跨渲染稳定（每次 bind 会生成新引用 ⇒ 每渲染重订阅）。
   const subscribe = useMemo(() => roleSource.subscribe.bind(roleSource), [roleSource])
-  const preset = useSyncExternalStore(
-    subscribe,
-    () => readPresetOf(roleSource, sessionId),
-  )
+  // getServerSnapshot 同 getSnapshot：本组件只跑在浏览器（SPA 无 SSR），传它只为
+  // useSyncExternalStore 的完整性（缺了在静态渲染/测试里直接抛错）。
+  const getPreset = useCallback(() => readPresetOf(roleSource, sessionId), [roleSource, sessionId])
+  const preset = useSyncExternalStore(subscribe, getPreset, getPreset)
   const short = preset === null ? undefined : ROLE_SHORT[preset]
   if (short === undefined) return null
   return <span className="wk-role-badge" data-wk-role={preset}>{short}</span>
