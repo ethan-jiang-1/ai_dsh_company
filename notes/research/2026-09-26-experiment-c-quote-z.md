@@ -68,6 +68,34 @@ this.ctx.waterfall(scopeTarget(req.agent, req.agent), 'approval/request', req,
 | **CEO 门（点卡 B）** | ceo | **写折扣报价任务书** |
 | （COO 门，本场无需开） | coo | 承接三年框架与排期出稿 |
 
+## ★ 用户暂停（2026-09-26）+ 实验 D 的第一条**活体数据**
+
+用户开好两扇门后反馈：**"看窗口名字都不知道哪一个是哪一个……晕头转向"**，要求暂停。
+这正是评审 §五 D（门的心智模型）预测的混淆——**被真实用户当场撞上**，比任何模拟实验都硬。
+
+**即修（Level 0，零代码）**：vendor 本来就有 `session/rename` RPC
+（`packages/api/session-controller/src/index.ts:402` `@Remote('rename')`，
+参数 `{sessionId, title}`；侧栏渲染的就是它，`tree.ts:294 sessionTitle`）⇒
+直接把三个门改名带角色前缀：
+
+| 门 | 新标题（侧栏现在就显示这个） |
+|---|---|
+| CEO `88582ba0` | **【CEO】折扣报价动议 · quote-z-2026** |
+| CFO `2beb83d0` | **【CFO】8.8折毛利测算 · quote-z-2026** |
+| COO `44710d4e` | **【COO】三年框架承接 · quote-z-2026** |
+
+**角色可见性的三层答案**（回应"能不能把角色名放上去"）：
+- **L0（已做，零代码）**：开门时顺手 `session/rename` 加角色前缀——立即可用，应写进 runbook 与开门配方；
+- **L1（本仓 pack 的 client 面，不动 vendor）**：company-pack 的 `src/client/`（品牌皮肤面）加
+  "当前会话角色"徽标/头部标识——需要 spike client 插件 API（`ctx.sidebarRightTabs` 一类）；
+- **L2（上游）**：会话原生带角色身份并在 UI 各处显示——提 seam，不自建。
+- **浏览器标签页标题**：跟着会话标题走（改名后标签也会带【角色】）——待用户侧栏确认。
+
+**暂停时的状态**（都可安全恢复）：
+- 两张卡仍挂起（asked ✓ / decided 0）——用户关掉标签 ⇒ 卡**干净失败关闭**（`unavailable`，
+  源码已核实），实验数据不丢；回头我在**新一轮**重新发卡即可；
+- 段一产物全部已提交；段三脚本就绪。goal 已按用户要求暂停。
+
 ## 段二（两卡，等点）
 
 - CFO 门（`2beb83d0`）自己发起 `request_signoff`（8.8 折 < 9 折，理由写明对应 **cfo v2**）→ 卡只落 CFO 门；
