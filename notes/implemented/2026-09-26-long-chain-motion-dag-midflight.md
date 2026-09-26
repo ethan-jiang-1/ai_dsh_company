@@ -93,6 +93,14 @@
 
 ## 实施实况（2026-09-26 交付）
 
+> ⚠ **更正（2026-09-26，技术债清扫 B13）**：本节声称的图与节点 dump **不是** `ca50e97f` 那场的产物。
+> `snapshots/dag-midflight/run.json` 记的 sessionId = `session-41515cf5`（标题「动议观察 · 23684」，
+> waves 5 / completed 4 = **中途卡死的那场**），两份 `-nodes.json` 的 7 个节点标题也**全是「续约 Y」**
+> （`renewal-y-2026`），dev home 里**没有第二套图**。⇒ 归档证据来自**卡死的观察场**，不是本 Note 所述的
+> 真动议。**结论（中途形态可读、卡点一眼可见）不受影响**——那是夹具档 + 真动议两次运行共同支撑的；
+> 但「归档图 = 真动议图」这句是错的，已在此改正。要真动议的图：`node scripts/dag-midflight-probe.mjs
+> --session ca50e97f` 重采（或直接复看既有会话）。
+
 **真动议**：会话 `ca50e97f`（真盘，slug `sea-entry-2026`）——6 波深链（T1 市场调研 → T2 客户画像 →
 T3 合规门槛 → T4 交付承接 → T5 成本基准 → T6 CEO 合稿），4 名成员 + CEO，11:19→11:28（≈9 分钟），
 6/6 任务完成，`present` 1 次。**无人值守安全按设计生效**：`ask_user_question` 0 次、`request_signoff` 0 次
