@@ -14,20 +14,14 @@
   刻意串深链（9 波、逐波放行）制造"中途"窗口；人在第 3/5/7 波截图，**图像多模态逐张判 6 条**
   （无堆叠 / 边两态可辨 / 箭头随色 / 完成态降透明 / 进行中描边 / 卡点可见）；顺带验问询节流与日期口径。
   **需用户在场 + $3–6**；执行待批准。
-- **② journal 缺席机制（磨清单在册项）**：RFC = [proposed/journal-presence-mechanism](./notes/proposed/2026-09-26-journal-presence-mechanism.md)——
-  文案已证无效（8→8 红证）⇒ 候选 = A 仓库侧 `journal-audit` 审计（deliverables-check 家族，事后检测）
-  + B CEO 定稿盘点加"成员 journal 在场盘点"（**换执行者**）；C 运行时拦截核过 vendor 无 seam ⇒ 提上游。
-  验收 = 审计脚本反证 + 下一场动议 journal 在场率。执行待批准。
+
 
 ## 磨清单（低优先磨活；不占轮、可后台派活；触发即升队）
 
 > 家规（notebook-hygiene 立，2026-09-25）：观察项与低优先磨活住这里，各带「谁来磨／何时磨」；
 > 从队列可见一跳到达。队列走空且用户点名时才升格为队列条目。
-> 新观察项按家规入此。当前 1 项：
-
-- **journal 缺席 = 文案不够，需机制**：skill 硬闸门语气实测未管住（draft 正常产出但 journal 步照跳）。
-  谁来磨 = 机制面轮；磨法候选 = CEO skill 定稿盘点加"成员 journal 在场盘点"＋ deliverables-check 式
-  journal 审计（注意排练/真盘边界）；何时磨 = **已落 [proposed/journal-presence-mechanism](./notes/proposed/2026-09-26-journal-presence-mechanism.md)（队列 ②），待批准**。
+> 新观察项按家规入此。**当前空**（原「journal 缺席 = 文案不够需机制」已交付：
+> [implemented/journal-presence-mechanism](./notes/implemented/2026-09-26-journal-presence-mechanism.md)）。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 
@@ -57,6 +51,16 @@
 - 顺序、范围或阻塞变化：改 §队列并更新相关 Note；验收完成即删除队列项。当前任务与交接规则唯一见 [guides/dev-loop §0.5/§1/§12](./docs/guides/dev-loop.md)。
 
 ## 历史维护记录（非当前指令）
+
+- 2026-09-26（**journal 缺席机制交付（用户批 A+B）⇒ 磨清单清空**）：A = `scripts/journal-audit.mjs`
+  （维护者按需跑、不进 verify）——三级置信度（确认／在场(已归档)／缺席），标定中修掉四处真缺陷
+  （只认 v4 日志 / `data.task` 嵌套 / owner 是成员 id / 正文命中不限时间导致跨场误判）+ 规则生效日
+  cutoff + 归档区查询；**反证** = 挪走 `kb/cfo/journal/` ⇒ cfo 翻缺席、还原 ⇒ 回确认；
+  **与独立记录吻合**（emergency-x 的 coo 缺席 = 该角色 CHARTER 记的 W8 同款缺口）。
+  B = CEO skill 收口步加"定稿前另盘点 journal 在场，缺席当场退回补写"（**换执行者**）；
+  `preset-smoke` ALL PASS + **行为面探针 PASS**（造"一角色有 journal、另一无"的收口场景，CEO 逐角色点名）。
+  C（运行时拦截）核过 vendor 无 seam ⇒ 留案提上游。收尾 Note =
+  [implemented/journal-presence-mechanism](./notes/implemented/2026-09-26-journal-presence-mechanism.md)。
 
 - 2026-09-26（**自主窗口：code-review 两轴 findings 全处置 + 新规矩行为面验证 + 两个提案入队**）：
   ① 三笔 client 改动跑 Standards+Spec 两轴审查 ⇒ **7 条真缺陷全修**（令牌错名 `state-warning-primary`、
