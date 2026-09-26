@@ -57,7 +57,14 @@ export function evaluateEntryProbe(reply, readSource) {
     const at = /position (\d+)/.exec(error.message)?.[1]
     const idx = at === undefined ? -1 : Number(at)
     const near = idx < 0 ? '' : `；出错处附近：…${body.slice(Math.max(0, idx - 60), idx + 60)}…`
-    return { passed: 0, failures: [`回答必须是完整 JSON；不使用全文兜底或跨题匹配（${error.message}${near}）`] }
+    // 分类（2026-09-26 实证）：**"JSON 主体完整、后面多了内容"** 绝大多数是**模型输出格式抖动**
+    // （实测泄漏过工具调用标记 `</｜｜DSML｜｜ …>`）——题答对了，是格式问题。**判 0 仍是对的**
+    // （判据不做全文兜底是有意的），但报错必须让人一眼分清"仓库答错"与"可重跑"。
+    const trailing = /non-whitespace character after JSON/.test(error.message)
+    const hint = trailing
+      ? '——**JSON 主体已完整、后面多了内容**：多为模型输出格式问题（工具调用标记/多余说明），**可重跑一次**；不是仓库问题'
+      : ''
+    return { passed: 0, failures: [`回答必须是完整 JSON；不使用全文兜底或跨题匹配（${error.message}${near}${hint}）`] }
   }
   if (!value || typeof value !== 'object' || !Array.isArray(value.answers) || !Array.isArray(value.conflicts)) {
     return { passed: 0, failures: ['缺 answers/conflicts 数组'] }

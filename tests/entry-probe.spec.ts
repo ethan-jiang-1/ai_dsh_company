@@ -94,6 +94,17 @@ describe('入口探针不使用全文兜底', () => {
   })
   // 2026-09-26 立（基线 8/12 的 Q5）：命令表用空格对齐，模型把 `mjs          #` 引成 `mjs #`
   // 是自然的规范化，不是幻觉 ⇒ 比对前归一化空白。防幻觉性质不变（文字仍须真在文件里）。
+  // 2026-09-26 实证：模型把 12 题全答对、JSON 主体完整，却在结尾泄漏了一段工具调用标记
+  // （`</｜｜DSML｜｜ parameter>`）⇒ 判 0/12。**判 0 是对的**（判据不做全文兜底），
+  // 但报错必须点明"可重跑、不是仓库问题"。
+  it('JSON 后多出内容：判失败但报错要标明可重跑（模型格式抖动）', () => {
+    const ok = JSON.stringify(good())
+    const result = evaluateEntryProbe(`${ok}\n</｜｜DSML｜｜ parameter></｜｜DSML｜｜ invoke>`, readSource)
+    expect(result.passed).toBe(0)
+    expect(result.failures[0]).toContain('JSON 主体已完整')
+    expect(result.failures[0]).toContain('可重跑')
+  })
+
   it('引用比对忽略排版空白，但文字仍须真实存在', () => {
     // 忠实复刻 Q5 现场：源文件用空格对齐，模型引用时把它规范化了。
     const aligned = 'node scripts/preset-smoke.mjs          # preset 改动的完成定义'
