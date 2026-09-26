@@ -8,7 +8,7 @@
 // 需要裁决的一律写「未决项」fail-closed。
 // 用法：source dev/env.sh && node scripts/dag-midflight-probe.mjs [--waves 6]
 import { spawn } from 'node:child_process'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { readRecords } from './lib/session-log.mjs'
@@ -22,6 +22,9 @@ const args = process.argv.slice(2)
 const WAVES = Number(args[args.indexOf('--waves') + 1] ?? '6')
 // `--session <id>` = **只截既有会话**（不发动议）：动议跑完后补收官图，或复看某场的历史形态。
 const EXISTING = args.indexOf('--session') === -1 ? undefined : args[args.indexOf('--session') + 1]
+// `--prompt-file <path>` = 用外部动议文本（默认是本档内置的"长链动议"）。动议设计随用途变，
+// 采集/截图逻辑不变 ⇒ 同一档既能采"深链可读性"，也能采"会拉人进来的动议"。
+const PROMPT_FILE = args.indexOf('--prompt-file') === -1 ? undefined : args[args.indexOf('--prompt-file') + 1]
 
 let home
 try {
@@ -85,14 +88,15 @@ const rpc = async (endpoint, args_) => {
 let sessionId = EXISTING
 let TITLE
 if (sessionId === undefined) {
-  TITLE = `DAG 中途形态 · 长链动议 ${String(Date.now() % 100000)}`
+  TITLE = `动议观察 · ${String(Date.now() % 100000)}`
   const created = await rpc('session/create', { request: { cwd: WORKSPACE, agentPreset: 'ceo' } })
   sessionId = created.sessionId
   try { await rpc('session/rename', { request: { sessionId, title: TITLE } }) } catch { /* 标题仅用于浏览器定位 */ }
   console.log(`session: ${sessionId}｜title: ${TITLE}`)
+  const text = PROMPT_FILE === undefined ? MOTION : readFileSync(PROMPT_FILE, 'utf8')
   await rpc('session/prompt', { request: {
     requestId: `dm-${String(Date.now())}`, sessionId, mode: 'queue',
-    content: [{ type: 'text', text: MOTION }],
+    content: [{ type: 'text', text }],
     clientTimeZone: 'Asia/Shanghai',
   } })
 } else {
