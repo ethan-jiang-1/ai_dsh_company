@@ -261,7 +261,7 @@ export function diffActivity(prev: TeamViewLike | undefined, next: TeamViewLike,
  * 纯事件（无进程、无 sessionQuery）下成员显示「未上线」而不是行消失（D-b：durable 态重建）。
  * @param events - 团队事件（时间序）。
  * @param nameById - 可选的 id → 成员名补充表（**live 流必需**：`session/follow` 的快照只带
- *   最新一页，成员 provisioning 事件可能在页外，目标 id 会解析不出名字——用 `agentTeams.view`
+ *   最新一页，成员 provisioning 事件可能在页外，目标 id 会解析不出名字——用 `agentTeam` 投影
  *   的权威名册补上）。
  * @returns 板（teamId / 行 / 动态）。
  */
@@ -385,7 +385,7 @@ export type TeamStreamFrame =
 /**
  * 权威名册 → id → 成员名表（喂 `presenceFromEvents` 的 `nameById`）。
  * 用途：`session/follow` 的快照只带最新一页，成员 provisioning 事件可能在页外，
- * 动态里的目标 id 会解析不出名字——用 `agentTeams.view` 的名册补上。
+ * 动态里的目标 id 会解析不出名字——用 `agentTeam` 投影的名册补上。
  * @param view - 官方 `TeamView` 的读取子集。
  * @returns id → 成员名。
  */

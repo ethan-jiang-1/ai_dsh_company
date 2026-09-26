@@ -27,7 +27,7 @@
 |---|---|---|---|
 | 代码包（plugin package） | npm 包，导出 Cordis 插件 | 有没有**新代码**（自定义工具/服务/流） | 只在角色需要专属工具时才出现 |
 | bundle（`dsh.bundle.patch`） | pack 的 `cordis.patch.yml` | 装进来时默认加哪些**行** | company pack 的 host 层共享行 |
-| profile / patch | `$DSH_HOME/profiles/<p>` | 部署级组合选择 | `company` profile：共享行 + team 行 + preset roots |
+| profile / patch | `$DSH_HOME/profiles/<p>` | 部署级组合选择 | 开发用 `web` profile（共享行 + team 行 + registry 行）；`company` profile 已退役 |
 | **agent preset** | 一个目录一个 `agent.cordis.yml` | **一个会话**挂什么（工具/prompt sections/skills/persona） | **每个角色一个 preset** |
 
 依据：`docs/architecture.md` 的组合链（package → bundle → profile/patch → app 启动 Loader）；
@@ -72,8 +72,8 @@ sections, and skills while every other session keeps its own"）。
   "a plugin mounted by an agent preset's standing composition lands in that preset's layer"，
   读时合并 scope 链、最近层同名直接赢。→ CEO preset 挂 CEO skills 目录，VP preset 挂 VP
   skills 目录，**互不可见**，这正是"每个角色有自己的 skill、单独隔离"的官方载体。
-- **preset 目录可以带资产**：shipped preset 目录 = `agent.cordis.yml + preset.yml（显示名/描述）+
-  skills/`；authoring 是 copy-only（拷整个目录进 `<dshHome>/.agent-presets`）。
+- **preset 目录可以带资产**：0.1.7 起的 shipped preset 目录 = `agent.cordis.yml`（**显示名/描述已内联**
+  进 `dsh-agent-preset` 行；旧的独立 `preset.yml` 随升 pin 删除）+ `skills/`。
 
 ### 1.3 所以"组织插件 + N 个角色插件"应该倒过来
 
@@ -97,7 +97,7 @@ host 层共享行 + N 个角色 preset + 共享 KB + 模板。插件包（代码
 
 | 层 | 内容 | 自写 JS |
 |---|---|---|
-| ① 纯配置层（第 0 天） | `presets/<role>/`（agent.cordis.yml + persona 行 + skills/ 目录）、共享 KB、`cordis.patch.yml`、`profiles/company.cordis.yml` | **0 行** |
+| ① 纯配置层（第 0 天） | `presets/<role>/`（agent.cordis.yml + persona 行 + skills/ 目录）、共享 KB、`cordis.patch.yml` | **0 行** |
 | ② 第一段真代码（按需） | M2 委托 provider（给委托 child 挂角色 preset，见 [roles-isolation.md](./roles-isolation.md) §2/§3，百行级）；自定义工具行（org_chart、公司检索） | 同一 pack 内新增行 |
 | ③ 拆第二/三个包 | 触发条件（FAQ 13 决策 2 纪律）：某块代码独立演化 / 出现第二个消费方 / 独立发版需求；长出一窝专家才升方案 D | — |
 
@@ -112,8 +112,8 @@ teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱�
 ### 2.3 装但不写的行（cordis.patch.yml / profile 的行清单，全是现成包）
 
 ```yaml
-# host 层（profiles/company.cordis.yml）
-- @deepseek-ai/dsh-agent-presets          # roster；roots 指向本 pack 的 presets/
+# bundle 层（pack 的 cordis.patch.yml；profile 只选 bundle）
+- @deepseek-ai/dsh-agent-preset-registry  # roster（替换出厂行，default: ceo）；五角色各一行声明另住 presets/<role>/agent.cordis.yml
 - @deepseek-ai/dsh-session-persistence-jsonl  # team 激活前提
 - @deepseek-ai/dsh-experimental-agent-team       # M4 域服务（或直接装 agent-team-profile）
 - @deepseek-ai/dsh-experimental-tool-agent-team  # M4 九个工具
@@ -260,11 +260,10 @@ ai_dsh_company/
 ├── tsconfig.json                 # 源码面门面：extends vendor base（paths → vendor src）
 ├── packages/
 │   └── company-pack/             # 唯一发布载体（自包含），第 0 天就这一个包
-│       ├── package.json          # dsh.bundle.patch + runtime deps（精确钉 0.1.5-rc.2）
-│       ├── cordis.patch.yml      # bundle 行（host 共享面）：agent-presets 替换 + 团队/present insert
+│       ├── package.json          # dsh.bundle.patch + runtime 依赖（peerDependencies，不钉死版本）
+│       ├── cordis.patch.yml      # bundle 行（host 共享面）：agent-preset-registry 替换 + 团队/present insert
 │       ├── presets/
 │       │   ├── ceo/              # agent.cordis.yml（persona + delegation 工具行 + team 使用策略）
-│       │   │   ├── preset.yml    # 显示名/描述（picker 里看到的"CEO"）
 │       │   │   └── skills/       # CEO 专属 skills（战略、会议主持、任务拆解……）
 │       │   ├── vp-eng/           # 同构：persona + skills/（研发管线、技术评审……）
 │       │   ├── vp-sales/
@@ -297,21 +296,23 @@ ai_dsh_company/
    **写不出交付物**）。shipped `standard` 同样是自包含：255 行里自己声明
    tool-bash/tool-fs/tool-fs-search/tool-skill/goal/planning/compaction/delegation/…。
    故每个角色 preset 声明自己那套工具行（复制式演化——DSH 无 patch 继承）；pack 的
-   `cordis.patch.yml` 只负责**全局行**（agent-presets roster、团队两行、present）。
-   代价：4 个角色各持一份工具行清单（R2 补另两个时照抄）；换来按角色的最小权限工具面。
-2. **presets 进 roster 的落法**（FAQ 13 已核实 + R1 实证）：pack 里的 `presets/` 不会自动进
-   roster，`dsh-agent-presets` 只扫 shipped 根 / 配置 `roots` / 用户根。roots 行写在 pack 的
-   bundle 里，且**用替换语法覆盖 web-app 的出厂 `agent-presets` 行**（default: standard → ceo）；
-   roots 路径用 `!!js` + `baseUrl` **自定位**到本包安装目录的 `presets/`，任何安装位置都对。
-   纯 headless 组合没有这行，用 `dev/company.overlay.yml` 的 insert 补。
+   `cordis.patch.yml` 只负责**全局行**（registry roster、团队两行、present）。
+   代价：五个角色各持一份工具行清单（复制式演化）；换来按角色的最小权限工具面。
+2. **presets 进 roster 的落法**（0.1.7 模型）：registry **一行**（`agent-preset-registry`，用替换
+   语法覆盖 web-app 的出厂 insert 行，`default: standard → ceo`）+ **每个预设一行**
+   `@deepseek-ai/dsh-agent-preset`（住 `presets/<role>/agent.cordis.yml`，经 `dsh.bundle.patch`
+   **数组**并入）。（旧模型 = `dsh-agent-presets` 一行 + `roots` 目录扫描 + `!!js`/`baseUrl` 自定位；
+   0.1.7 已把该包拆成 `agent-preset` + `agent-preset-registry`，**roots 机制已废**。）
+   纯 headless 组合没有 registry 行，用 `dev/company.overlay.yml` 的 insert 补。
 3. **experimental team 两包是 host 行**（服务注册 + per-member scoped 工具安装），加
    `dsh-session-persistence-jsonl` 才激活；以 `- insert:` 行随 bundle 走（R1 起直插，
    不装官方 bundle，故无续驶控制冲突）。
 4. **双 home**：日用 `~/.dsh` 不动，开发 `DSH_HOME=<repo>/dev/harness-home`，环境脚本兜底
    （coding agent 不会自己想起这个区别）。
-5. **已知开放点（R1 实测）**：company profile（base + 本 pack，**无 web-app**）里 agent-presets
-   行在源码 CLI 下挂起（进程不退、无输出；同一行在 web profile 组合里正常）。观察窗改用
-   web profile 绕开；根因未定，记在 R1 Note 的"未验证"。
+5. **~~已知开放点（R1 实测）~~ 已随升 pin 失效**：原文记"company profile（无 web-app）里
+   agent-presets 行在源码 CLI 下挂起"——那是 0.1.5 模型 + 已退役 company profile 的组合，
+   0.1.7 换 registry 模型后该行已不存在。观察窗现行做法 = web profile（见 [profile.md](../profile.md)）；
+   原始观察留档在 R1 Note，本条不再作为开放点。
 6. **preset 挂载只在 Web 面**（R1 实测，机制级）：只有 `web-app` bundle 组合 `session-controller`
    （headless / sdk / acp 都是 0），而 `composeAgent`（"session 未指定 preset 时挂 default"）
    住在 session-controller 里。**headless 一次性驱动直接经 core agent registry 建 agent，绕过

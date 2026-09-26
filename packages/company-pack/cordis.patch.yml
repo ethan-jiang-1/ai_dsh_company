@@ -1,9 +1,9 @@
 # company-pack 的 bundle 层：plugin add 时并入的默认行（host 共享面；角色差异在 presets/）。
 # 语法教义（R1 实证，源自 shipped dsh-headless 的 cordis.patch.yml）：
 #   `- id: X` 只能替换 base/bundle 已有行；**新增行必须 `- insert:` 子列表**。
-#   ⚠ agent-presets 用替换语法：web-app bundle 已 insert 此行（default: standard），
-#   我们的替换行把 config 换成自己的 roots + default: ceo；在无此行的组合（纯 headless）
-#   会 not found 警告丢弃——那种场景用 dev/company.overlay.yml 的 insert 补。
+#   ⚠ roster 行用**替换**语法：web-app bundle 已 insert `agent-preset-registry`（default: standard），
+#   我们的替换行把 default 改成 ceo；在无此行的组合（纯 headless）会 not found 警告丢弃
+#   ——那种场景用 dev/company.overlay.yml 的 insert 补。
 # 依赖纪律（R5a 起）：runtime 依赖声明为 peerDependencies（不精确钉死；pre-stable API），
 # 兼容矩阵在 package.json 的 dsh.compatibility.dshReleases —— 合同见 docs/release.md。
 

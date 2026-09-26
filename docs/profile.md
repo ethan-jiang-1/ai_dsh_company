@@ -9,8 +9,9 @@
 | 形状 | 命令 | 状态 |
 |---|---|---|
 | 源码直跑 | `source dev/env.sh && pnpm dsh --profile headless "…"` | ✅ R0 已验收 |
-| company profile 持久部署 | `pnpm dsh plugin --profile company add file:./packages/company-pack` | ✅ R1 已部署实测（`dev/harness-home/profiles/company/`，bundles = [dsh-base, dsh-company-pack]） |
-| 组合验证 | `pnpm dsh --profile company --dump-config` | ✅ 88 行，四新行在列 |
+| **开发 web 观察窗**（现行） | `pnpm dsh web -- --port 3081 --no-open` → 用 `dev/harness-home/profiles/web`，pack 走 **`link:`**（改 presets/** 即刻生效，无需重装） | ✅ 现行 |
+| 组合验证 | `pnpm dsh --profile web --dump-config` | ✅ 通过（**行数与行名以当次 dump 为准，别在此写死**——2026-09-26 实测本行曾写"88 行，四新行"，而清单早已是 6 行） |
+| ~~company profile 持久部署~~ | ~~`plugin --profile company add file:./packages/company-pack`~~ | ⚠ **已退役**：该 profile 是 R1 的残留（`file:` 装法 + web-app 钉在 `0.1.5-rc.2`，差两代），现行开发用上面的 web profile；真实安装形状的验收归 `release-smoke`（合同 = [release.md](./release.md)） |
 
 部署的四个实证细节（坑与解法）：
 
@@ -18,21 +19,23 @@
    （教义源自 shipped dsh-headless 的 cordis.patch.yml）。
 2. **strictDepBuilds**：profile 首次安装会拦 `koffi` 构建脚本——CLI 已在 profile 的
    `pnpm-workspace.yaml` 预置占位（`koffi: set this to true or false`），改成 `koffi: true` 后重装。
-3. **`file:` 副本是硬链接**（R1 更正）：profile 里的 pack 文件与源文件**同 inode**——改**已有文件**
-   自动同步（不必 `cp`）；只有**新增文件**（新 preset/skill 目录）与**依赖变化**才需要
-   `plugin add`（必要时先 `remove` 强制重解析；bump 版本也会触发）。正式形状 `release-smoke` 验证（合同 = [release.md](./release.md)）。
+3. **安装形状按装法定**（2026-09-26 实测更正）：**`file:` = 真拷贝**（安装副本与源文件 **inode 不同、
+   link count 1**——旧文写的"硬链接/同 inode"是错的，实测反证）；**`link:` = 符号链接**，改 presets/**
+   persona/skills **即刻生效、无需重装**。现行 dev profile 用 `link:`；只有改 pack 依赖或 bundle 行才需要
+   `plugin --profile web remove` + `add`（纪律见 [开发环 §7](./guides/dev-loop.md)）。正式形状由 `release-smoke` 验证。
 4. **patchReload 必须 `'startup'`**（R1 实证）：自定义 profile 默认 `'live'`（热重载 watcher
    常驻）——headless 动议会跑完但进程永不退、stdout 不 flush。company profile 的
    package.json 已改 `"patchReload": "startup"`；将来 web 观察窗 profile 才用 live。
 
-preset roster 的 `roots` 已改**自定位**（`!!js` + `baseUrl` 解析到本包安装目录的
-`presets/`），任何安装位置都对，不再依赖绝对路径。
+preset roster 走 **`agent-preset-registry` 一行 + 每预设一行声明**（0.1.7 起的模型；旧模型的
+`roots` 目录扫描已废，见 [cordis.patch.yml](../packages/company-pack/cordis.patch.yml) 头注与
+[index §术语映射](./index.md)）。
 
 ## host 行清单（现在时，bundle 承载）
 
 | 行 | 语义 | 状态 |
 |---|---|---|
-| `agent-presets`（insert；roots 自定位 + default: ceo） | preset roster；五角色 presets 随包安装 | ✅ dump 实测在列 |
+| `agent-preset-registry`（**替换**出厂行；default: ceo） | preset roster；五角色各一行 `agent-preset` 声明（`presets/<role>/agent.cordis.yml`）经 `dsh.bundle.patch` 数组并入 | ✅ dump 实测在列 |
 | `session-persistence-jsonl` | 会话持久化；team 激活前提 | ✅（base 已有，bundle 确认语义） |
 | `tool-present`（insert） | 交付物声明（deliverables 卡片） | ✅ dump 实测在列 |
 | `agent-team` + `tool-agent-team`（insert） | 团队协作主通道（M4/D4；直插行，无续驶冲突，architecture §3 冲突注①） | ✅ dump 实测在列 |

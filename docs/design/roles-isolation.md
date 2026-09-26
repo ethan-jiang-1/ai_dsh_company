@@ -60,8 +60,8 @@ async composeAgent(presetId) {
 上下文面：每会话独立 log（model-visible ⟺ logged，可完整回放）、compaction 是 preset 内的
 realm 行（角色可各自选压缩策略）、token 计量按 session 键控。
 
-**所以：CEO / VP-Eng / VP-Sales / COO 各开一个根会话、各挂各的 preset，你要的五个独立面
-一次全拿到，零自定义代码。** 缺的只是它们之间的对话通道——这就到了分水岭。
+**所以：五个角色（CEO / VP-Eng / VP-Sales / COO / CFO）各开一个根会话、各挂各的 preset，
+你要的五个独立面一次全拿到，零自定义代码。** 缺的只是它们之间的对话通道——这就到了分水岭。
 
 ## 2. 分水岭的精确表述（这次挖到了底）
 
@@ -122,8 +122,11 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
 
 内建最像"公司"的协作面：持久邮箱（任意成员↔任意成员，Steer 投递、不丢不重、崩溃恢复）、
 共享任务板（CAS 修订 + `blockedBy` DAG + `writeScopes` 告警）、`fork` teammate 下发会议上下文。
-现成 profile bundle：`dsh plugin add @deepseek-ai/dsh-experimental-agent-team-profile`（host 侧）
-+ `agent-team-web-profile`（Web UI 的名册/任务板/teammate 导航）。
+现成包（0.1.7 现状）：host 侧 = `@deepseek-ai/dsh-experimental-agent-team` +
+`@deepseek-ai/dsh-experimental-tool-agent-team`；Web UI 侧 = `@deepseek-ai/dsh-experimental-client-ui-agent-team`
+（名册/任务板/teammate 导航）。**本仓不装官方 profile bundle，改为在 pack 的 `cordis.patch.yml` 里直插这些行**
+（R1 起，避免 bundle 关掉全局续驶控制——见 [architecture §3 冲突注](./architecture.md)）。
+（旧文引的 `dsh-experimental-agent-team-profile` / `agent-team-web-profile` 两包在 0.1.7 已不存在。）
 
 - 代价（§2）：teammates **共享 Lead 的组合**——独立降级为"独立会话上下文 + per-child 无、
   靠 name/description + `team:policy` + KB 目录约定"。工具/skills 面是 CEO preset 的。
@@ -161,7 +164,7 @@ packages/company-pack/
 │   ├── delegation/            # 新增：M2 的 one-shot providers（每角色一个，
 │   │                          #   start() 里 mount 该角色 preset）
 │   └── tools/                 # 可选：org_chart 等公司级工具
-└── profiles/company.cordis.yml  # host 行 + agent-presets roots；M4 再加 team 两包
+└── cordis.patch.yml           # bundle 行（host 共享面）：registry 替换 + 团队两行 + present + client
 ```
 
 实施顺序（对齐决策 D4/D11 与 [../ROADMAP.md](../../ROADMAP.md)——当时为垂直轮表，现为队列）：

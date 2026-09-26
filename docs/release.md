@@ -7,7 +7,9 @@
 ## 依赖姿态（R5a 起的现在时）
 
 - **runtime 依赖 = `peerDependencies`，拒绝精确钉死**（`dependencies` 面已清空）：
-  `@deepseek-ai/cordis ^4.x` + 组合行用到的全部 `@deepseek-ai/dsh-* ^0.1.5-rc.2`。
+  `@deepseek-ai/cordis ^4.x` + 组合行用到的全部 `@deepseek-ai/dsh-*`（**版本以
+  `packages/company-pack/package.json` 为准，此处不复述**——复述必漂，2026-09-26 实测本行曾停在
+  上一代 pin 而 manifest 已升）。
   理由：DSH API 仍 pre-stable，精确钉 = 每次上游同步逼发版（FAQ 13 生态失败样本）；
   dsh-market 姿态。
 - **为什么 peers 装不进 profile 也无碍**：profile 模板自带 `autoInstallPeers: false` +
@@ -24,8 +26,10 @@
 ## 兼容矩阵（`dsh.compatibility.dshReleases`）
 
 ```json
-"dsh": { "compatibility": { "dshReleases": ["dsh-v0.1.5-rc.2"] } }
+"dsh": { "compatibility": { "dshReleases": ["dsh-v0.1.5-rc.2", "dsh-v<当前钉住>"] } }
 ```
+**形状 = 数组，含历史版本 + 当前钉住的那一个**（`verify.mjs` 的 `pack-compat` 门禁强制矩阵含当前
+tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具体值）。
 
 - 语义：**每个列名都是真实验证过的 vendor pin tag**（升 pin 走 sync-dsh，冒烟过了才加列）。
 - 机械门禁：`pnpm verify` 的 `pack-compat`——当前钉住 tag 不在矩阵里就红

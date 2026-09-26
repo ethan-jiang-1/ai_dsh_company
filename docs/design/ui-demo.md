@@ -23,15 +23,17 @@
 
 ## 1. 第 0 层 · 现成的可视面（零自定义代码）
 
-装 `agent-team-profile`（Host 侧，**先装**）+ `@deepseek-ai/dsh-experimental-agent-team-web-profile`
-（Web 侧，后装）后，Web GUI 免费获得（本包**已按 architecture §3 冲突注直插两行**，R1 起，UI 不受影响）：
+装 `@deepseek-ai/dsh-experimental-agent-team` + `@deepseek-ai/dsh-experimental-tool-agent-team`（Host 侧）
++ `@deepseek-ai/dsh-experimental-client-ui-agent-team`（Web 侧）后，Web GUI 免费获得（本包**已按
+architecture §3 冲突注直插这些行**，R1 起，UI 不受影响；旧文的 `agent-team-profile` /
+`agent-team-web-profile` 两包在 0.1.7 已不存在）：
 
 | 可视面 | 机制（已核实） |
 |---|---|
 | **Team 动作入口** | 会话头部的 Team 按钮（注册进 `conversation.session.header.actions` 槽，order 20） |
 | **名册（roster）** | Lead + 每个 teammate 的角色名与实时状态（running/idle/inactive/provisioning/failed） |
-| **共享任务板** | 浏览器经生成的 Remote stub `ctx.remote.agentTeams.view/createTask/updateTask` 直读直改权威状态——任务 DAG、owner、修订号都是活的 |
-| **点开 VP 的会话** | `sessions.openSubagent({parentSessionId, childSessionId, mode: 'continuable'})`——每个 teammate 是一个完整会话，可导航进去**看它自己的对话过程**（它怎么干活、怎么生 worker、怎么收发消息） |
+| **共享任务板** | 浏览器读**会话投影**（0.1.7：`agentTeam` 投影，见 `src/client/use-company-data.ts`）——任务 DAG、owner、修订号都是活的。⚠ 旧文写的 `ctx.remote.agentTeams.view/createTask/updateTask` 是 0.1.5 的 RPC，**0.1.7 已整体移除** |
+| **点开 VP 的会话** | `uiWorkspace.openSession`（0.1.7 统一入口；旧的 `sessions.openSubagent/open/current` 已移除）——每个 teammate 是一个完整会话，可导航进去**看它自己的对话过程** |
 | 多会话并览 | 侧栏会话列表：CEO 会话 + 各 VP 会话同屏开多个 |
 | 委派过程流式可见 | `spawn_teammate` / `send_message` / `team_task_*` / `subagent` 工具调用都在对话流里实时展开 |
 | **交付物卡片** | `present` 工具：CEO 收口时声明的 deliverables 在轮末渲染成卡片网格，点击在右栏预览文件（`ui-deliverables` 的 explicit deliveries） |
@@ -62,17 +64,18 @@ shipped 槽位树里我们值得占的位置：
   只有 `priority`，**升序小者渲染**，同 cell 同 priority 二次注册抛错；别把两者混为一谈
   （依据 = `ui-sidebar-right/src/client/tab-registry.ts:48-58` + `ui-slots/src/index.ts:526-527,834-837`）。
 - **数据面走 Remote API，不走文件**：官方团队 UI 的 `mount.ts` 就是范本——
-  `ctx.remote.$mount(contribution)` 挂载生成的 Remote stub，组件里
-  `await ctx.remote.agentTeams.view(leadSessionId)` 拉权威状态。我们的 host 插件同样可以
-  用 `@Remote('companyDash')` 暴露自己的读模型（比如把团队事件折叠成"协作动态流"），
+  `ctx.remote.$mount(contribution)` 挂载生成的 Remote stub，组件里经它拉权威状态。我们的 host 插件
+  同样可以用 `@Remote(...)` 暴露自己的读模型（范本 = 本包的 `companyDash`，见 `src/client/use-company-data.ts`），
   浏览器端零轮询逻辑、纯声明式拉取。UI 域之间只传 JSON + 回调（slots 纪律）。
+  ⚠ **团队态在 0.1.7 不再走 RPC**：`remote.agentTeams` 随 agent-team 的 `./remote` 导出整体移除，
+  改读 Lead 会话的 `agentTeam` **投影**（`session/projections`）。
 
 client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两个先例）：
 
 ```jsonc
 {
   "dsh": {
-    "bundle": { "patch": "./cordis.patch.yml" },
+    "bundle": { "patch": ["./cordis.patch.yml", "./presets/ceo/agent.cordis.yml", "…（五角色各一）"] },
     "client": {
       "platform": "web",
       "inject": [                       // 依赖边：这些包的工厂先到，我们的行再物化
@@ -89,7 +92,7 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 
 ## 3. 演示分镜（一场 demo 怎么走）
 
-1. 开 `dsh web`（company profile），侧栏开 CEO 会话（ceo preset）。
+1. 开 `pnpm dsh web -- --port 3081 --no-open`（web profile），侧栏开 CEO 会话（ceo preset）。
 2. 输入一个公司级动议（"评估把 X 产品线扩展到欧洲"）。
 3. 观众看到 CEO：拆解（todo/plan）→ `spawn_teammate` 建出三位 VP（名册出现四行）→
    任务板落任务（blockedBy 依赖可视化）→ 给各 VP 发初始 brief。
@@ -101,7 +104,7 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 
 ## 4. 开发环与坑
 
-- **client 构建链**：tsdown（或 esbuild）把 `src/client/` 打成 `dist/client.js`，
+- **client 构建链**：tsdown 把 `src/client/` 打成 **`lib/client.js`**（不是 `dist/`），
   `exports["./client"]` 指向它。dev 时 `dsh-client-hmr` stat-poll bundle → SSE 推送，
   改了重建即可热更，不用重启（机制见 `docs/subsystems/client-modules.md` §The service）。
 - **双 home 纪律不变**：Web 开发也跑在 `DSH_HOME=<repo>/dev/harness-home` 的
@@ -122,9 +125,9 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 | 层 | 做什么 | 验收 |
 |---|---|---|
 | v0（＝R1 观察窗起，R2 进验收） | 装 team 两个 profile bundle；跑通 §3 分镜 | 一场完整 demo 全程在 UI 里可见，零自定义 UI 代码 |
-| v1（＝**R5b 公司驾驶舱**，✅ 2026-09-23 交付） | 右栏页签（`ctx.sidebarRightTabs` page 型 + keyed 槽体）：在场板（lead + 分身行，**行可点进成员空间**）+ 差分动态流；数据 = `remote.agentTeams.view(lead)` 拉式（挂载即拉 + 5s 轮询），纯读模型 `src/lib/presence.ts`（rows / activity / 事件折算三入口）。成员身份 = team roster（Q5）；消息级动态流留升级路径（host 投影通道已核实，客户端 stub codegen 归 vendor 管线） | 页签/行/列头/点行切会话由 `replay-smoke --ui --scenario r2-motion` 无 key 端到端断言；读模型 14 条 keyless 单测在 `pnpm test` |
+| v1（＝**R5b 公司驾驶舱**，✅ 2026-09-23 交付） | 右栏页签（`ctx.sidebarRightTabs` page 型 + keyed 槽体）：在场板（lead + 分身行，**行可点进成员空间**）+ 差分动态流；数据 = ~~`remote.agentTeams.view(lead)` 拉式~~ **0.1.7 起改读 `agentTeam` 投影**（`src/client/use-company-data.ts`；挂载即拉 + 5s 轮询），纯读模型 `src/lib/presence.ts`（rows / activity / 事件折算三入口）。成员身份 = team roster（Q5）；消息级动态流留升级路径（host 投影通道已核实，客户端 stub codegen 归 vendor 管线） | 页签/行/列头/点行切会话由 `replay-smoke --ui --scenario r2-motion` 无 key 端到端断言；读模型 14 条 keyless 单测在 `pnpm test` |
 | v2（委派卡**已提前至 R3** 交付；`npm pack` 真实安装冒烟归 **R5a**） | `tool.call.toolview` 委派工具卡 + header 动作 | 对话流里的公司语义皮；`npm pack` → 干净 profile → 真实安装冒烟 |
-| v3（＝**公司视图**，✅ 2026-09-23 交付，条目 ① demo 可视表达） | `conversation.view` 的第三个整页页签（id `dsh-company-pack/company`，标签「公司」）：四个面板 **看板 / 依赖图 / 在场 / 用量**；数据 = `agentTeams.view`（拉式 5s）+ `session/follow`（流式动态）+ `useProjection('tokenUsage'/'sessionStats')`（令牌用量）；皮肤 = `ui-primitives` + `--dsw-*` 令牌（零字面色），动效 = 零依赖纯 CSS + `prefers-reduced-motion` 回退 | 读模型 keyless 单测（board/dag/budget/presence）+ `client-load-smoke` + `replay-smoke --ui`（r3 委派卡金样 / r2 驾驶舱端到端）+ 真页面截图走查（零「需要讲解」） |
+| v3（＝**公司视图**，✅ 2026-09-23 交付，条目 ① demo 可视表达） | `conversation.view` 的第三个整页页签（id `dsh-company-pack/company`，标签「公司」）：四个面板 **看板 / 依赖图 / 在场 / 用量**；数据 = `agentTeam` 投影（0.1.7 起；旧 `agentTeams.view` 已移除）+ `session/follow`（流式动态）+ `useProjection('tokenUsage'/'sessionStats')`（令牌用量）；皮肤 = `ui-primitives` + `--dsw-*` 令牌（零字面色），动效 = 零依赖纯 CSS + `prefers-reduced-motion` 回退 | 读模型 keyless 单测（board/dag/budget/presence）+ `client-load-smoke` + `replay-smoke --ui`（r3 委派卡金样 / r2 驾驶舱端到端）+ 真页面截图走查（零「需要讲解」） |
 | v4（＝**公司页签**，✅ 2026-09-23 交付，条目 ② 面板窗口化） | 五个**平台页签**：看板 / 依赖图 / 在场 / 用量 / 任务板（`ctx.sidebarRightTabs` + keyed 槽 `sidebar.right.pane.tab`，id `dsh-company-pack/<name>`）。页签头「浮出」= `float(tabId)`；移动/缩放/置顶/收回全平台原生（`data-dockkit-float-grip/-resize/-dock`）。头部任务板按钮改 launcher（`openTab`）。数据面 = `use-company-data.ts` 共享 hook。**原驾驶舱页签并入「在场」**（行可点 + 流式动态） | 真页面机器判据（浮窗三件套在场 + dock 收回 + anchored 弹窗不在场）+ `replay-smoke --ui` r2（在场端到端锚点更新）+ r3 金样零 diff + client-load + 91/91 |
 
 ### 命名（2026-09-23 定；判据 = **一致 + 今后能对上**）

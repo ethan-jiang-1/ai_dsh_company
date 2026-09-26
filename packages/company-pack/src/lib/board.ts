@@ -2,7 +2,7 @@
  * 任务看板读模型（条目 ① S1）：列 = `status`，卡 = owner / 依赖 / 就绪 / 修订号。
  *
  * 纯函数、无 React、无 cordis——keyless 单测直接断言（同 `presence.ts` 的分工）。
- * 数据源 = 官方 Agent Teams 任务板（`agentTeams.view`）；**不自建任务存储**（D13）。
+ * 数据源 = 官方 Agent Teams 任务板（0.1.7 起 = Lead 会话的 `agentTeam` **投影**；旧 `agentTeams.view` RPC 已移除）；**不自建任务存储**（D13）。
  * 看板答"活到哪一步"；依赖结构（谁卡着谁）由 `dag.ts` 答——分列会丢链，故两者并存（研究 §4）。
  */
 import { displayNameFor, type TeamViewLike } from './presence.ts'
@@ -76,7 +76,7 @@ export function readyOf(blockedBy: readonly string[], statusById: ReadonlyMap<st
 }
 
 /**
- * live 路径：`agentTeams.view` → 归一化任务行（过滤 `deleted`）。
+ * live 路径：`agentTeam` 投影 → 归一化任务行（过滤 `deleted`）。
  * `ready` 优先取官方 view 的值；缺失时按 `blockedBy` 现算（同一语义）。
  * @param view - 官方 `TeamView` 的读取子集。
  * @returns 任务行（顺序 = wire 顺序）。
