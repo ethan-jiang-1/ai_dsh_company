@@ -94,6 +94,9 @@ changes）= `vendor/dsh/AGENTS.md` Conventions 节；探索路由与概念→源
 **本仓原生纪律（与 guides/dev-loop §9/§10 同级）**：§11 **工具态与越界写入**（2026-09-23 立）——
 repo 内为自由区；工具状态（缓存/store/配置）一律**先重定向进仓库 gitignored 区再首次使用**
 （落点清单：双 home、`.pnpm-store`、profile `.npmrc`、排练场）；确需越界先问人，一次说清路径与理由。
+§13 **人侧反馈协议 = 实例先行**（2026-09-26 立，D29）：拉人前自检三问（机器判完 / 只剩人的判断 /
+实例+落点备好），人侧请求唯一合法形状 = 跑起来的实例 + 单页走查单 + 一次一件事；默认自主推进到收口点
+才一次性拉人体验——规则唯一见 [dev-loop §13](docs/guides/dev-loop.md)。
 
 - 开工与执行唯一流程：`docs/guides/dev-loop.md` §0.5/§1；其他操作按需查同文后续章节。demo 现场运维 runbook：`docs/guides/budget-and-ops.md`。
 - **不发明**：不新增 spec 流程（OpenSpec 留触发条件，guides/dev-loop §5）、不自造调度器/记忆/门禁——

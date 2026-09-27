@@ -55,8 +55,8 @@ if (links.violations.length === 0) ok(`md-links (含 notes) ×${links.linkCount}
 //   原注释写"后 107 行"/"整治后 131"，实为 108 / 142，属"枚举型事实写两处"那一类腐化）。
 const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 115],            // 2026-09-23 二次收口（渐进披露）；指针化内容住 release.md / index / guides/dev-loop
-  ['docs/index.md', 145],        // 2026-09-24 基石整治后定
-  ['docs/guides/dev-loop.md', 448], // 2026-09-25 收割轮升至 448：+§2 进程内查询档（inspect/schema 工具）等三处小登记（依据 = harvest-ledger #5/#13），说明在 verify 提升处与台账
+  ['docs/index.md', 147],        // 2026-09-24 基石整治后定 145；2026-09-26 升至 147：+D29 人侧反馈协议行（用户令，规则正文住 dev-loop §13）
+  ['docs/guides/dev-loop.md', 466], // 2026-09-25 收割轮升至 448：+§2 进程内查询档（inspect/schema 工具）等三处小登记（依据 = harvest-ledger #5/#13），说明在 verify 提升处与台账；2026-09-26 升至 466：+§13 人侧反馈协议（实例先行，D29 用户令）
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
   const lines = readFileSync(join(root, rel), 'utf8').split('\n').length - 1
