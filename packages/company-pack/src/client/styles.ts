@@ -395,6 +395,24 @@ const CSS = `
 .wk-guide-entry-label {
   font-weight: 500;
 }
+
+/* ── 浮窗身份识别（用户走查 2026-09-27：浮窗背景全一样，认不出哪个是哪个）─────────────
+   ① 面板顶 3px tone 色条（wk-pane-strip；background 吃 currentColor = tone 类的色）——
+      对齐 RoleBadge「整窗角色色条」的既有语言，dock 态也带（split 并看时同样受用）。
+   ② 浮窗头标题 tinted 色丸（CSS 上下文选择器只命中浮窗头，侧栏 chip 不受影响）——
+      浮窗标题栏永远可见，是最强的一眼识别信号。 */
+.wk-pane-strip {
+  height: 3px;
+  flex: none;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.85;
+}
+[data-dockkit-float-title] .wk-tab-title {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  padding: 0.12rem 0.55rem;
+  border-radius: 999px;
+}
 `
 
 /**

@@ -30,6 +30,7 @@ import type { CompanyDataInjected } from './use-company-data.ts'
 export interface AttentionTabInjected {
   readonly follow: CompanyDataInjected['follow']
   readonly floatTab: (tabId: TabId) => void
+  readonly unfloatTab: (paneId: string) => void
   /** apply 世界登记处的快照读（远端事件观察者写入）。 */
   readonly getPending: () => readonly LivePending[]
   /** 一键跳会话（`sessions.open`）。 */
@@ -110,7 +111,7 @@ export function AttentionTab(props: AttentionTabProps) {
   }
 
   return (
-    <PanelFrame title="待办" tabProps={props satisfies PanelFrameProps}>
+    <PanelFrame title="待办" tone="attention" tabProps={props satisfies PanelFrameProps}>
       {streamError !== null && <div className="wk-error">动态流不可用：{streamError}</div>}
       <div className="wk-activity-block">
         <strong>等你处理</strong>

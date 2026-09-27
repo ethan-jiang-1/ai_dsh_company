@@ -17,6 +17,7 @@ import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 /** 页签体注入面：文件读取闭包（绑定 `remote.workspaceFiles`）+ 浮出。 */
 export interface CultivationTabInjected {
   readonly floatTab: (tabId: TabId) => void
+  readonly unfloatTab: (paneId: string) => void
   /** 列某角色 journal 目录的 .md 文件名；不可达（目录缺）给 null。 */
   readonly listJournal: (sessionId: SessionId, role: string, signal: AbortSignal) => Promise<readonly string[] | null>
   /** 读工作区文本文件的首窗口；失败给 null（标题降级为文件名）。 */
@@ -69,7 +70,7 @@ export function CultivationTab(props: CultivationTabProps) {
   const total = rows === null ? 0 : rows.reduce((sum, row) => sum + row.count, 0)
 
   return (
-    <PanelFrame title="培养" tabProps={props satisfies PanelFrameProps}>
+    <PanelFrame tone="growth" title="培养" tabProps={props satisfies PanelFrameProps}>
       {error !== null && <div className="wk-error">{error}</div>}
       <div className="wk-meta">各角色的 journal = 待审素材（人审后按「轮末收敛」压进 CHARTER 历史纪要）。</div>
       {rows === null

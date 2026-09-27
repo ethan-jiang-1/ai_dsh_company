@@ -53,6 +53,16 @@
   一行讲清这个页签是什么 + 关键操作；**有意偏离**：点击开页签**不用** vendor 的 `replaceTab: true`——guide 保留，
   可从 Start 连续开多个页签（vendor 原版点一下顶掉 guide，连续开要反复加回）。② 页签 chip 与浮窗头补**原生
   `title` 属性**悬浮提示（title 槽组件自有面，零 vendor 依赖）。
+- **浮窗状态感知按钮 + 身份识别（2026-09-27，用户走查第三轮反馈）**：
+  ① **浮出/收回**：dock 态显示「浮出」（`float(tabId)`）；浮出态换「收回」——调 `ctx.sidebarRight.dock(paneId)`
+  （公开面 ISidebarRight 的 dock；⚠ service 内部另有 unfloat 同义名，注入面只见 dock）。浮出态感知 =
+  PanelFrame 每次渲染查 DOM 祖先 `[data-dockkit-float]`（属性值 = paneId；`useTabInfo()` 的 layout 是
+  observable，浮出/收回必触发重渲染，检查自然新鲜）。② **浮窗身份**（用户痛点：浮窗背景全一样认不出）：
+  面板顶 3px **tone 色条**（`wk-pane-strip`，`background: currentColor` 吃 tone 类——对齐 RoleBadge「整窗
+  角色色条」的既有语言，dock 态也带）+ 浮窗头标题 **tinted 色丸**（CSS 上下文选择器
+  `[data-dockkit-float-title] .wk-tab-title`，`color-mix` 14% 透明底——只命中浮窗头，侧栏 chip 不受影响；
+  浮窗标题栏永远可见 = 最强一眼识别信号）。vendor 浮窗边框/底色属 dockkit chrome 不可动（那要 seam），
+  我们的两个杠杆（头部内容 + 面板体）都用上了。
 - **验收（2026-09-27 实跑）**：① `tsc -b packages/company-pack` 零错 + tsdown client 面构建；
   ② `client-load-smoke` ALL PASS（真浏览器零挂载失败）；③ playwright 实证：8 页签 chip 全开
   （DOM 断言 icon ×8 在场）、**计算样式断言色值逐对等于令牌解析值**（#f59e0b≡rgb(245,158,11) 等

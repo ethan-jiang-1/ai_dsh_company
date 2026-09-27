@@ -9,6 +9,7 @@
  * 动态流由 5s 差分改成 `session/follow` 流式（打开即见全程）。
  */
 import type { ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { Button, StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
@@ -21,8 +22,10 @@ import { useCompanyData, type CompanyDataInjected } from './use-company-data.ts'
 
 /** 页签体注入面：数据面 + 平台浮出操作。 */
 export interface CompanyTabInjected extends CompanyDataInjected {
-  /** `ctx.sidebarRight.float`：把本页签拽出成浮窗（可移动/缩放/置顶；收回由浮窗自带的 dock 按钮负责）。 */
+  /** `ctx.sidebarRight.float`：把本页签拽出成浮窗（可移动/缩放/置顶）。 */
   readonly floatTab: (tabId: TabId) => void
+  /** `ctx.sidebarRight.unfloat`：把浮窗收回右栏（用户走查 2026-09-27：浮出态里「浮出」按钮无意义，换「收回」）。 */
+  readonly unfloatTab: (paneId: string) => void
 }
 
 /** 页签体 props：槽标准 props（含 `sessionId` / `useProjection` / `useTabInfo`）+ 注入面。 */
@@ -34,41 +37,66 @@ export type PresenceTabProps = CompanyTabProps & {
 }
 
 /**
- * 页签体共用外框需要的最小 props（`useTabInfo` + 浮出操作）——「待办」页签（AttentionTab）
+ * 页签体共用外框需要的最小 props（`useTabInfo` + 浮出/收回操作）——「待办」页签（AttentionTab）
  * 复用同一外框，故收窄成独立接口导出（结构上 CompanyTabProps 天然满足）。
  */
 export interface PanelFrameProps {
   readonly useTabInfo: CompanyTabProps['useTabInfo']
   readonly floatTab: (tabId: TabId) => void
+  readonly unfloatTab: (paneId: string) => void
 }
 
 /**
- * 页签体共用外框：标题 + 刷新说明 + **「浮出」** + 内容。
+ * 页签体共用外框：tone 色条 + 标题 + 刷新说明 + **「浮出 / 收回」（状态感知）** + 内容。
  *
- * 「浮出」走平台服务 `float(tabId)`（tabId 由 `useTabInfo()` 给）——浮窗的移动（grip）、缩放
- * （`data-dockkit-float-resize`，最小 220×140 钳制）、置顶、**收回（浮窗自带的 dock 按钮）**
- * 全部是平台能力，我们不自造窗口管理（D13）。
+ * - 色条（用户走查 2026-09-27：浮窗背景全一样认不出哪个是哪个）：面板顶 3px tone 色
+ *   （`background: currentColor` 吃 tone 类；浮窗头标题另有 tinted 色丸，见 styles.ts）。
+ * - 浮出/收回：dock 态显示「浮出」（`float(tabId)`）；浮出态显示「收回」（`unfloat(paneId)`）。
+ *   浮出态感知 = 每次渲染查 DOM 祖先 `[data-dockkit-float]`（其属性值 = paneId）——
+ *   `useTabInfo()` 的 layout 是 observable，浮出/收回都会触发本组件重渲染，检查自然保持新鲜。
+ *   浮窗的移动（grip）、缩放、置顶仍是平台能力，我们不自造窗口管理（D13）。
  */
-export function PanelFrame({ title, tabProps, children }: {
+export function PanelFrame({ title, tone, tabProps, children }: {
   readonly title: string
+  readonly tone: string
   readonly tabProps: PanelFrameProps
   readonly children: ReactNode
 }) {
   const info = tabProps.useTabInfo()
+  const rootRef = useRef<HTMLDivElement | null>(null)
+  const [floatPaneId, setFloatPaneId] = useState<string | null>(null)
+  useLayoutEffect(() => {
+    const paneId = rootRef.current?.closest('[data-dockkit-float]')?.getAttribute('data-dockkit-float') ?? null
+    setFloatPaneId(previous => previous === paneId ? previous : paneId)
+  })
   return (
-    <div className="wk-pane">
+    <div className="wk-pane" ref={rootRef}>
+      <div className={`wk-pane-strip wk-tone-${tone}`} aria-hidden="true" />
       <div className="wk-pane-head">
         <strong>{title}</strong>
         <span className="wk-meta">每 5 秒自动刷新</span>
         <span style={{ flex: 1 }} />
-        <Button
-          size="sm"
-          variant="ghost"
-          title="把这个面板拽出成浮窗（可移动 / 可缩放）"
-          onClick={() => { tabProps.floatTab(info.tab.id) }}
-        >
-          浮出
-        </Button>
+        {floatPaneId === null
+          ? (
+            <Button
+              size="sm"
+              variant="ghost"
+              title="把这个面板拽出成浮窗（可移动 / 可缩放）"
+              onClick={() => { tabProps.floatTab(info.tab.id) }}
+            >
+              浮出
+            </Button>
+          )
+          : (
+            <Button
+              size="sm"
+              variant="ghost"
+              title="收回右栏（浮窗回到侧栏页签）"
+              onClick={() => { tabProps.unfloatTab(floatPaneId) }}
+            >
+              收回
+            </Button>
+          )}
       </div>
       {children}
     </div>
@@ -102,7 +130,7 @@ function memberTone(status: PresenceRow['status']): 'info' | 'danger' | 'warning
 export function BoardTab(props: CompanyTabProps) {
   const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
   return (
-    <PanelFrame title="看板" tabProps={props}>
+    <PanelFrame title="看板" tone="overview" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
       <BoardPanel columns={data.columns} />
     </PanelFrame>
@@ -117,7 +145,7 @@ export function BoardTab(props: CompanyTabProps) {
 export function DagTab(props: CompanyTabProps) {
   const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
   return (
-    <PanelFrame title="依赖图" tabProps={props}>
+    <PanelFrame title="依赖图" tone="structure" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
       <DagPanel layout={data.dag} />
     </PanelFrame>
@@ -133,7 +161,7 @@ export function PresenceTab(props: PresenceTabProps) {
   const { openMember, ...dataFace } = props
   const data = useCompanyData(dataFace, props.sessionId, props.useProjection, props.useSessions, { stream: true })
   return (
-    <PanelFrame title="在场" tabProps={props}>
+    <PanelFrame title="在场" tone="people" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
       {data.streamError !== null && <div className="wk-error">动态流不可用：{data.streamError}</div>}
       {data.rows.length === 0
@@ -193,7 +221,7 @@ export function PresenceTab(props: PresenceTabProps) {
 export function BudgetTab(props: CompanyTabProps) {
   const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
   return (
-    <PanelFrame title="用量" tabProps={props}>
+    <PanelFrame title="用量" tone="burn" tabProps={props}>
       <BudgetPanel summary={data.summary} />
     </PanelFrame>
   )
@@ -207,7 +235,7 @@ export function BudgetTab(props: CompanyTabProps) {
 export function TasksTab(props: CompanyTabProps) {
   const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
   return (
-    <PanelFrame title="任务板" tabProps={props}>
+    <PanelFrame title="任务板" tone="work" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
       <TasksTableView view={data.team} />
     </PanelFrame>

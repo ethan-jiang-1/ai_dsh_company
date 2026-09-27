@@ -1,7 +1,7 @@
 /** 浏览器半：部署品牌（侧栏）+ 团队任务板（会话头部）+ 公司驾驶舱页签（右栏，R5b）。 */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type { ReactNode } from 'react'
-import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
+import type { PaneId, TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
@@ -194,6 +194,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
     }
     /** 平台浮出（S2）：把页签拽出成浮窗；收回由浮窗自带的 dock 按钮负责（平台能力，不自造）。 */
     const floatTab = (tabId: TabId): void => { scoped.sidebarRight.float(tabId) }
+    const unfloatTab = (paneId: string): void => { scoped.sidebarRight.dock(paneId as PaneId) }
     // 协作动态的流式源：`session/follow` 是 WebSocket 流，快照给历史、其后给实时；
     // 只取团队事件（wire 形状 → 领域形状的最小投影），assistant-stream 帧与视图无关。
     const follow = async function* (sessionId: SessionId, signal: AbortSignal) {
@@ -293,31 +294,32 @@ export async function apply(ctx: ClientContext): Promise<void> {
         { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/attention', inject: () => ({
           follow,
           floatTab,
+          unfloatTab,
           getPending: () => attention.list(),
           openSession: (sessionId: SessionId) => { scoped.uiWorkspace.openSession(sessionId) },
           leadOf,
         }) },
         AttentionTab),
       scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/board', inject: () => ({ leadOf, follow, floatTab }) },
+        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/board', inject: () => ({ leadOf, follow, floatTab, unfloatTab }) },
         BoardTab),
       scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/dag', inject: () => ({ leadOf, follow, floatTab }) },
+        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/dag', inject: () => ({ leadOf, follow, floatTab, unfloatTab }) },
         DagTab),
       scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/presence', inject: () => ({ leadOf, follow, openMember, floatTab }) },
+        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/presence', inject: () => ({ leadOf, follow, openMember, floatTab, unfloatTab }) },
         PresenceTab),
       scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/budget', inject: () => ({ leadOf, follow, floatTab }) },
+        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/budget', inject: () => ({ leadOf, follow, floatTab, unfloatTab }) },
         BudgetTab),
       scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/tasks', inject: () => ({ leadOf, follow, floatTab }) },
+        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/tasks', inject: () => ({ leadOf, follow, floatTab, unfloatTab }) },
         TasksTab),
       scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/cultivation', inject: () => ({ floatTab, listJournal, readHead }) },
+        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/cultivation', inject: () => ({ floatTab, unfloatTab, listJournal, readHead }) },
         CultivationTab),
       scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/ledger', inject: () => ({ floatTab, readLedger }) },
+        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/ledger', inject: () => ({ floatTab, unfloatTab, readLedger }) },
         LedgerTab),
     ])
 

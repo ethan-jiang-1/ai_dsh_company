@@ -15,6 +15,7 @@ import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 /** 页签体注入面：台账文件读取闭包 + 浮出。 */
 export interface LedgerTabInjected {
   readonly floatTab: (tabId: TabId) => void
+  readonly unfloatTab: (paneId: string) => void
   /** 读 `kb/motion-ledger.md` 全文；不可达给 null（面板显示读取失败，不静默）。 */
   readonly readLedger: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>
 }
@@ -54,7 +55,7 @@ export function LedgerTab(props: LedgerTabProps) {
   const stats = rows === null ? null : ledgerStats(rows)
 
   return (
-    <PanelFrame title="台账" tabProps={props satisfies PanelFrameProps}>
+    <PanelFrame tone="archive" title="台账" tabProps={props satisfies PanelFrameProps}>
       {error !== null && <div className="wk-error">{error}</div>}
       {stats !== null && (
         <div className="wk-meta" aria-label="台账统计">
