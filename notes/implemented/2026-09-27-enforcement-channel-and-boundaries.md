@@ -10,9 +10,10 @@ ROADMAP 磨清单两条对应行已磨即离队。）
    接线 = `dev/env.sh` 幂等设 `core.hooksPath`（本地 git config 不随 clone 走，靠「一切会话先 source」的
    环境兜底习惯接线——与双 home 同款哲学：靠环境不靠提醒）；bypass = `git push --no-verify`（用后须在
    收尾 Note 说明原因）。
-2. **最小 CI**（`.github/workflows/verify.yml`）：干净环境跑 verify（checkout + submodule recursive + node 22；
-   零 npm 依赖——verify 与其 lib 仅用 node 标准库，本地实测无 install 即可跑）。防「本地环境差异」与
-   「--no-verify 绕过」两层（DSH：hook 管「忘了跑」，CI owns exhaustive）。
+2. **最小 CI**（`.github/workflows/verify.yml`）：干净环境跑 verify（checkout + submodule recursive +
+   corepack + `pnpm install --frozen-lockfile` + node 22）。防「本地环境差异」与「--no-verify 绕过」两层
+   （DSH：hook 管「忘了跑」，CI owns exhaustive）。⚠ verify **不是零依赖**：`markdown-links.mjs` 复用
+   vendor 声明的 mdast 解析器（三级基址解析：vendor 根包 → ui-primitives 成员——见下「CI 首跑」条）。
 3. **反证账（19 类门禁全量现场负例）**：逐类引入对应回归 → 看对应 FAIL tag 红 → 还原；19/19 全绿
    （含 gitmodules / vendor-pin / vendor-clean 这类「碰 vendor 才能证」的：submodule HEAD 临时移 HEAD~1
    再回钉、tracked 文件加一字节再 checkout——负例控制是验证门禁会拦，终态根树+vendor 树双零改动）。
@@ -41,8 +42,17 @@ ROADMAP 磨清单两条对应行已磨即离队。）
   网络层（挂于 ssh.github.com:443 间歇故障——网络问题非 hook 问题，两态对比恰为 hook 生效证据）。
 - `pnpm test` 238/238（1.15s）；`node scripts/preset-smoke.mjs` ALL PASS（5 preset 真挂载 + 各角色只见
   自己的 skills + client 闭包 66 模块无缺失）。
-- CI YAML 解析 OK（js-yaml）；**未验证项 = CI Actions 首跑**（网络故障推不上去；网络恢复后首跑看结果，
-  若红按报错修——这是如实标注的缺口，不是绿灯崇拜）。
+- CI Actions 首跑：**红 → 真因修复 → 绿**（三跑闭环，2026-09-27）：
+  ① 首跑（run 36336141531）红 = 我写 workflow 时断言「verify 零依赖」错了——`markdown-links.mjs`
+  经 `vendor/dsh/package.json` 解析 mdast 三件套，裸 checkout 无 store 即 MODULE_NOT_FOUND；
+  ② 二跑（run 36336516428，补标准引导 install）仍红 = 根因更深一层：根 workspace 刻意**不含
+  vendor/dsh 根包**（pnpm-workspace.yaml 只挂其子包），根 install 永远不链 vendor 根包的 devDeps
+  ——本地能跑是因 vendor 另有自带 install（`vendor/dsh/node_modules/.pnpm`，1389 包）；
+  ③ 终修 = 解析器两级基址（vendor 根包 → `ui-primitives` 子包：声明**同一组**依赖、版本区间与
+  vendor 根 pin 逐字一致，root store 单一版本 2.0.3/3.1.0/3.0.0 两边相同）——CI 只跑根 install 靠
+  基址②解析；三跑（run 36336928987）**绿，57s**。两次红都是真问题真修；link 门禁负例随 lib 改动
+  复验（红→还原→绿）。**教训**：给门禁写「零依赖」这类断言前，grep import 要看全文件（漏了
+  createRequire 三行）；「本地能跑」≠「最小环境能跑」。
 
 ## 预算与登记
 
