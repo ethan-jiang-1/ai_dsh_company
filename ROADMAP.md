@@ -47,6 +47,8 @@
 | OTLP 产品遥测 | 同上 #15 | 默认不挂载 | 运营侧使用数据需求 |
 | **M2 自定义 provider** | [index](./docs/index.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
 | **界面外推送 / 收件箱** | [org-presence-board（已毕业）](./notes/implemented/2026-09-22-org-presence-board.md) §背景 | 需求已出现（实时卡人离台即丢）但**用户裁定 demo 期不做**——"人在台面前"成立即可；生态有现成做法（[web-push](https://github.com/blauerberg/dsh-web-push-notification) / [pager](https://github.com/wg5759/dsh-pager) / [ui-mobile](https://github.com/jasondu/dsh-ui-mobile) / [dispatch](https://github.com/alextangson/dsh-dispatch)），借设计不装 | 到 MVP 阶段按依赖门槛评估，或明确要求"人不在台面前也要收到" |
+| **多人门的折中视图**（L1-E 激活：默认只见自己的门 + 一键切全局；实验 D 用户裁决「A、B 都不对，要折中」） | [multi-human-ux 毕业稿 §结论](./notes/implemented/2026-09-26-multi-human-ux.md) | **client 红线未解除**（demo 期不做 client 增强，2026-09-25 裁）；实验 D 两配置均已由用户本人否决（A 红线触发 / B 隔离过度） | 用户点名开工 client 增强时（届时先过 client 红线裁决） |
+| **会话库共享文件系统后端**（S3 类；用户部署路径裁决：先本地调通，将来迁共享 FS，"只要是一个共享文件系统就行"） | [multi-human-ux 毕业稿 §结论](./notes/implemented/2026-09-26-multi-human-ux.md)（配置 B 人判腿 2026-09-26） | MVP 未到；DSH 会话库后端属上游能力（`dshHomePath`），本仓不自建（D13） | MVP 多人部署阶段；届时向上游提 seam 或评估部署架构 |
 | **委派会话的人机审批路由** | [implemented/multi-human-role-routing](./notes/implemented/2026-09-26-multi-human-role-routing.md) §机制结论 | 子会话 `approval/policy` 硬编码 `never` ⇒ 分身发起的签字审批自动被拒、到不了人；人机审批实际是 Lead 专属 | 上游任一 seam：① 委派会话 `approvalPolicy` 可配置；② 审批按授权面路由 |
 | **消息级协作动态流** | [implemented/r5b-cockpit](./notes/implemented/2026-09-23-r5b-cockpit.md) | host 侧 team 事件通道已核实，但客户端 stub 由 vendor codegen 生成、本 pack 无接线；自建 codegen 不值一轮 | 上游提供 pack 侧 stub 生成，或公开 host-only 投影读 RPC |
 

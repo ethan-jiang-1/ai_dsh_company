@@ -6,11 +6,11 @@
 > 无人引用的死稿直接删（git 即归档）。规则正文 = [dev-loop §12](../../docs/guides/dev-loop.md)；
 > 机械门禁 = `verify` 的 `research-liveness`（每个未完结研究必须自带户口：喂给谁 + 毕业动作）。
 
-## 当前未完结（1）
+## 当前未完结（0）
 
 | 文件 | 待什么 | 喂给谁 | 毕业动作 |
 |---|---|---|---|
-| [experiment-ad-handbook](./2026-09-26-experiment-ad-handbook.md) | **配置 B 人判腿待跑**（真评估"每人一个 home"形态时） | [multi-human-ux 毕业稿](../implemented/2026-09-26-multi-human-ux.md) | 配置 B 跑完（或明确放弃）→ 迁 archived/，结果并入毕业稿 |
+（空——A/D 两配置人判腿均已作答，handbook 已迁 archived/）
 
 ## 已完结（在 [notes/archived/](../archived/)，8 份）
 
