@@ -1,0 +1,5 @@
+# archived（完结的研究）
+
+> 本目录放**研究已落地/完结**的稿件——从 `notes/research/` 迁入（迁入规则 = dev-loop §12 / D30）。
+> 它们仍被活文件引用（搁置池出处、判据来源、证据家），可读可引，但**不在工作集**；
+> 索引与未完结研究 = [research/README.md](../research/README.md)。

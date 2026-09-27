@@ -1,6 +1,7 @@
 # 实验手册 · A（冷启动可发现性）与 D（门的心智模型）
 
-状态：**配置 A 人判腿已跑完**（2026-09-26，用户本人；结果与硬结论 = [实验记录 §六](./2026-09-26-experiment-b-labels-and-d-mechanical.md)——红线触发、方向感勉强能；走查执行改用"代理截图圈注"形状，比本手册文字版更符合 D29）。配置 B 人判腿**待跑**（留待真评估 B 形态时）。判据唯一来源 = [评审 §五](./2026-09-26-multi-human-ux-review.md)。
+状态：**配置 A 人判腿已跑完**（2026-09-26，用户本人；结果与硬结论 = [实验记录 §六](../archived/2026-09-26-experiment-b-labels-and-d-mechanical.md)——红线触发、方向感勉强能；走查执行改用"代理截图圈注"形状，比本手册文字版更符合 D29）。配置 B 人判腿**待跑**（留待真评估 B 形态时）。喂给谁 = [multi-human-ux 毕业稿](../implemented/2026-09-26-multi-human-ux.md) 与未来配置 B 评估；毕业动作 = 配置 B
+人判腿跑完（或明确放弃）后按三选一处置。判据唯一来源 = [评审 §五](../archived/2026-09-26-multi-human-ux-review.md)。
 配套：B/C 腿全收口（见 [multi-human-ux 毕业稿](../implemented/2026-09-26-multi-human-ux.md)）。
 
 ## 共同准备（约 15 分钟）
@@ -56,6 +57,6 @@
 
 ## 结果去向（已部分兑现）
 
-配置 A 的结果已落 [实验记录 §六](./2026-09-26-experiment-b-labels-and-d-mechanical.md)（用户本人 2026-09-26 作答，
+配置 A 的结果已落 [实验记录 §六](../archived/2026-09-26-experiment-b-labels-and-d-mechanical.md)（用户本人 2026-09-26 作答，
 走查形状 = 代理截图圈注 + 一张卡）；结论已并入 [multi-human-ux 毕业稿 §结论](../implemented/2026-09-26-multi-human-ux.md)。
 配置 B 的记录表留待真要评估 B 形态时使用。

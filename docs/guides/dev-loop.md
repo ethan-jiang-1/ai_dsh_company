@@ -345,7 +345,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 不证装配与真入口；client-load 证挂载零失败不证内容；delegation/replay 证可见边界与组合复现，不证设计
 取舍；release-smoke 证安装形状不证语义；认证档证真行为不证跨面正确。换档先问"这一层能证明我关心的
 性质吗"，不为安心堆档（对照《Agent-ready Development》05 六层反馈；判定见
-[harness-alignment 台账](../../notes/research/2026-09-25-harness-alignment-ledger.md) §B）。
+[harness-alignment 台账](../../notes/archived/2026-09-25-harness-alignment-ledger.md) §B）。
 
 **三条硬规矩**：
 
@@ -427,9 +427,9 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
   见 notebook-hygiene；原 rejected Note 形态取消）；只在仍能阻止一个可信错误时保留，防复犯价值消失即删。
 - **implemented 只跟事实**：随实现更新的只有路径、名称、结构等事实；决定被推翻时另写新 Note 互链，
   不把旧文改写成相反。
-- **research 层只放活研究（2026-09-25 立，裁决与首轮清扫 = [implemented/research-notes-lifecycle](../../notes/implemented/2026-09-25-research-notes-lifecycle.md)）**：
-  首部状态行写清「喂给谁 + 毕业动作」；消费方毕业时同 diff 三选一——仍在用 → 留下改状态行；已消化 → 结论
-  并入 owner Note 后删文件（全文归 git，收尾 Note 记末次 SHA）；放弃 → 否决理由随「输掉的方案」节。不开 archived/（沿 rejected/ 裁断）。
+- **research 层 = 未完结研究（2026-09-26 用户令修订 09-25 旧形状；原裁决 = [implemented/research-notes-lifecycle](../../notes/implemented/2026-09-25-research-notes-lifecycle.md)）**：目录语义 = TODO——只放有待跑实验 / 待答问题 / 待落地调研的稿件，首部状态行写清「喂给谁 + 毕业动作」；
+  **研究落地即离场**：完结迁 `notes/archived/`（仍被引用的证据台账，可读可引但不在工作集）、过时/被推翻迁 `notes/rejected/`（负知识防复犯）——修订 09-25「不开 archived/rejected」裁断（实操反馈：隐形状态行无法一眼分辨死活，可见分类桶更有效）；无人引用的死稿直接删（git 即归档）；
+  机械门禁 = `verify` 的 `research-liveness`（未完结研究必须自带户口）；索引 = research/README.md。
 
 **流程规则**：
 

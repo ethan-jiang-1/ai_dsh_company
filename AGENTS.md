@@ -13,7 +13,7 @@ packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）�
 company-workspace/      运行时"公司共享盘"（会话 cwd）：**AGENTS.md（公司手册，随成员会话注入）**、kb/<role>/（CHARTER+journal）、templates/、deliverables/
 vendor/dsh/             DSH 源码 submodule（钉 SHA，**只读铁律**：见 §vendor 铁律，`pnpm verify` 强制）
 docs/                   当前合同与导航：index（地图+台账）→ design/ guides/ + 顶层合同
-notes/                  **开发记忆与证据链**：intents.md → proposed/ → implemented/；否决理由随 owner Note 的「输掉的方案」节保留（不设 rejected/ 目录——2026-09-25 裁断，负知识已有家、开目录造空壳）；postmortem/ 记事故；research/ 记仍在用的外部研究
+notes/                  **开发记忆与证据链**：intents.md → proposed/ → implemented/；research/ 只放未完结研究（完结迁 archived/、过时迁 rejected/——2026-09-26 修订）；postmortem/ 记事故
 scripts/                verify.mjs（结构门禁）、preset-smoke.mjs（真入口冒烟）……
 dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）
 snapshots/              回归资产：历史录制、workspace.actual 副本与部分场景独立编写的 workspace.expected；以各 snapshot.yml / Note 为准

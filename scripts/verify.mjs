@@ -55,7 +55,7 @@ if (links.violations.length === 0) ok(`md-links (含 notes) ×${links.linkCount}
 //   原注释写"后 107 行"/"整治后 131"，实为 108 / 142，属"枚举型事实写两处"那一类腐化）。
 const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 115],            // 2026-09-23 二次收口（渐进披露）；指针化内容住 release.md / index / guides/dev-loop
-  ['docs/index.md', 147],        // 2026-09-24 基石整治后定 145；2026-09-26 升至 147：+D29 人侧反馈协议行（用户令，规则正文住 dev-loop §13）
+  ['docs/index.md', 149],        // 2026-09-24 基石整治后定 145；2026-09-26 升至 147：+D29 行；再升至 149：+D30 research 三态行 + notes/archived/rejected 索引行（用户令）
   ['docs/guides/dev-loop.md', 466], // 2026-09-25 收割轮升至 448：+§2 进程内查询档（inspect/schema 工具）等三处小登记（依据 = harvest-ledger #5/#13），说明在 verify 提升处与台账；2026-09-26 升至 466：+§13 人侧反馈协议（实例先行，D29 用户令）
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
@@ -368,6 +368,22 @@ const notGraduated = proposals.filter(name =>
 notGraduated.length === 0
   ? ok('proposal-graduated (proposed/ 里只剩未落地的)')
   : fail('proposal-graduated', `这些提案已消化却仍在 notes/proposed/（搬到 notes/implemented/ 并写明条目去向）：${notGraduated.join(', ')}`)
+
+// ── research 层活状态行门禁（2026-09-26，用户指认「research 挂一堆东西」的防复发）─────────
+// 规则（D30）：research/ = 未完结研究（TODO 语义，dev-loop §12）；完结迁 notes/archived/、过时迁 notes/rejected/。
+// 每份未完结文件必须自带户口：前 10 行有「状态：」行，且前 12 行内写明「喂给谁」或「毕业动作」。
+// 索引 README.md（curated entry point）豁免。
+const researchDir = join(root, 'notes/research')
+const researchFiles = existsSync(researchDir)
+  ? readdirSync(researchDir).filter(n => n.endsWith('.md') && n !== 'README.md')
+  : []
+const noLiveness = researchFiles.filter(name => {
+  const head = readFileSync(join(researchDir, name), 'utf8').split('\n').slice(0, 12).join('\n')
+  return !(head.includes('状态：') && (head.includes('喂给谁') || head.includes('毕业动作')))
+})
+noLiveness.length === 0
+  ? ok(`research-liveness ×${researchFiles.length}（每份活研究自带喂给谁/毕业动作户口）`)
+  : fail('research-liveness', `这些研究稿缺活状态行（喂给谁/毕业动作）——死研究按 dev-loop §12 三选一处置，别挂着：${noLiveness.join(', ')}`)
 
 console.log(failures.length === 0 ? '\nverify: ALL PASS' : `\nverify: ${failures.length} FAILURE(S)`)
 process.exit(failures.length === 0 ? 0 : 1)

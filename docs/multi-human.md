@@ -106,7 +106,7 @@ CEO 门落任务书 `drafts/ceo.md` → CFO 门读它、出 `drafts/cfo.md`、�
 2. **写入边界**——各自只写 `drafts/<角色>.md` + 自己的 `kb/<角色>/journal/`；`final.md` 只有 CEO 写。
    三态判据盯着"成品有没有 present 背书"，但**盯不住"是谁写的"** ⇒ 靠手册纪律 + 互审。
 3. **同盘并发**——**"一个文件同一时刻一个写者"是本仓的流程政策，不是文件系统的保证**。
-   机制实况（2026-09-26 复核，证据 = `notes/research/2026-09-26-multi-human-ux-evidence.md`）：
+   机制实况（2026-09-26 复核，证据 = `notes/archived/2026-09-26-multi-human-ux-evidence.md`）：
    - **有**：`fs-local` 的**实例内** per-target 排队锁 + 版本守卫（读过再写时版本变了报 `FS_STALE_VERSION`，
      "一胜一 stale"有官方测试）；
    - **没有**：**跨进程 / 跨 `$DSH_HOME` / 外部编辑器**的共享租约；**无版本期望的写仍是无条件原子覆盖**；

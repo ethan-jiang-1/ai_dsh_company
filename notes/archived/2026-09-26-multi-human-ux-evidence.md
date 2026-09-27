@@ -1,5 +1,9 @@
 # 2026-09-26 · 多人 UX 提案的一手机制证据
 
+状态：**活证据**。喂给谁 = [评审稿](./2026-09-26-multi-human-ux-review.md)（其修正的一手出处）
++ [multi-human-ux 毕业稿](../implemented/2026-09-26-multi-human-ux.md) 可核清单；毕业动作 = 升 pin 引证重校后
+（或毕业稿可核清单改写时）按三选一处置——关键 file:line 已在毕业稿 §依据，删除前核对无独有引证。
+
 核查对象：[提案](../implemented/2026-09-26-multi-human-ux.md)、[当前合同](../../docs/multi-human.md)、[既有记录](../implemented/2026-09-26-multi-human-role-routing.md)。依据为钉住的 `vendor/dsh` 源码、官方 docs 和官方测试。**本轮只做静态核查，没有启动多 home、浏览器或 symlink cwd 探针。**“已证实”指可由所引源码直接支持，“推断”指机制给出强依据但缺本场运行验证。
 
 ## 会话分组与 symlink

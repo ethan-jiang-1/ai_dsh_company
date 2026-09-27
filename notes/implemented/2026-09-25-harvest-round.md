@@ -34,7 +34,7 @@
 ## 方案
 
 1. **判定台账**（阶段 1）：15 条逐条判（已收 / 收 / 不收 + 理由 + 证据），落
-   `notes/research/2026-09-25-harvest-ledger.md`——同 harness-alignment 台账形态，零"待定"。
+   `notes/archived/2026-09-25-harvest-ledger.md`——同 harness-alignment 台账形态，零"待定"。
 2. **选收落地**（阶段 2，每片独立验收 + commit）：
    - 切片一：preset 加 `tool-cordis` 行（五角色）+ preset-smoke + 调试阶梯补档；
    - 切片二：workspace-changes / office 预览实测（排练场起会话各验一次，截图/日志留证）+ 手册登记；
@@ -61,7 +61,7 @@
 
 ## 实施实况（2026-09-25 交付）
 
-**台账** = [research/harvest-ledger](../research/2026-09-25-harvest-ledger.md)：15/15 零待定——
+**台账** = [research/harvest-ledger](../archived/2026-09-25-harvest-ledger.md)：15/15 零待定——
 已收 2（#1 投影随升 pin／#10 基座默认）· 收 5（#5 #8 #9 #11 #13）· 不收 8（含 **delta 描述失准修正 ×2**：
 #3 presetId 是内部 API 非消费面、#4 plugin-manager 无 title/icon/tags 字段）。
 

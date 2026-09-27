@@ -13,4 +13,4 @@
 `npm pack` → 干净 profile → `dsh plugin add` 真实安装冒烟 =
 release-smoke ALL PASS（[docs/release.md](../../docs/release.md)）。pack 保持 `private: true`——
 真实 npm 发布等第二个消费者出现再定（registry 三态等前瞻 =
-[harness-alignment 台账](../../notes/research/2026-09-25-harness-alignment-ledger.md) §五）。
+[harness-alignment 台账](../../notes/archived/2026-09-25-harness-alignment-ledger.md) §五）。

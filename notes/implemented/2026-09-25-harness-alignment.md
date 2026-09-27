@@ -126,7 +126,7 @@ DSH 之上的插件。coding agent 同时阅读插件仓库与 DSH 仓库，两�
 
 ## 实施实况（2026-09-25 交付）
 
-**阶段 1**：对照台账 = [research/harness-alignment-ledger](../research/2026-09-25-harness-alignment-ledger.md)
+**阶段 1**：对照台账 = [research/harness-alignment-ledger](../archived/2026-09-25-harness-alignment-ledger.md)
 ——27 篇 + 2 特殊文件全覆盖、判定二分零待定（15 篇逐条判：9 已对齐 / 3 采纳切片 / 3 不适用+触发条件；
 快读 12 文件 5 个真新形状：3 并进切片、2 不适用/已覆盖）。主会话亲读 15 篇逐条判语料 + 四路阅读代理交叉核对。
 
