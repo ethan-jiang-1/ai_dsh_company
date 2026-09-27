@@ -1,6 +1,6 @@
 # 2026-09-26 · 多人协作 UX 提案评审与实验建议
 
-状态：**研究结论**。本稿评审 [多人 UX 提案](../proposed/2026-09-26-multi-human-ux.md)，不直接批准其中任何实现方案。DSH 一手机制证据见 [多人 UX 一手机制证据](./2026-09-26-multi-human-ux-evidence.md)；当前多人合同见 [docs/multi-human.md](../../docs/multi-human.md)。
+状态：**研究结论**。本稿评审 [多人 UX 提案](../implemented/2026-09-26-multi-human-ux.md)，不直接批准其中任何实现方案。DSH 一手机制证据见 [多人 UX 一手机制证据](./2026-09-26-multi-human-ux-evidence.md)；当前多人合同见 [docs/multi-human.md](../../docs/multi-human.md)。
 
 ## 一、结论先行
 

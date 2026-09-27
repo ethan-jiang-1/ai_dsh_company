@@ -16,7 +16,7 @@
 
 **合同与手册**：[docs/multi-human.md](../../docs/multi-human.md)（现在时：机制边界 / 形态 / runbook /
 **§3 交接协议** / 协作前提 / 迁移清单 / 边界）；公司手册立「**多人模式**」（开场由人声明即启用）。
-**接续提案**（门的边界与对齐，L1/L2/L3 分层）= [proposed/multi-human-ux](../proposed/2026-09-26-multi-human-ux.md)。
+**接续提案**（门的边界与对齐，L1/L2/L3 分层）= [proposed/multi-human-ux](../implemented/2026-09-26-multi-human-ux.md)。
 
 ## 后果与验证（2026-09-26）
 
@@ -39,7 +39,7 @@
 - **两扇门排练先行验证**：ceo + cfo 两个根会话走通 §3（含 `日期待核` 占位规矩），再上真盘。
 
 **仍然开着的**（都已在别处有归宿，此处只留指针）：
-- **门的边界与话题对齐**（用户 2026-09-26 的 UX 反馈）= [proposed/multi-human-ux](../proposed/2026-09-26-multi-human-ux.md)，
+- **门的边界与话题对齐**（用户 2026-09-26 的 UX 反馈）= [proposed/multi-human-ux](../implemented/2026-09-26-multi-human-ux.md)，
   已进 `ROADMAP.md` §搁置池（等用户裁 L1）。
 - **上游 seam**（审批/问询按角色路由到别的会话）= §机制结论末 + §搁置池；**不自建**。
 - **`owners.md` 与 `routing.ts` 的重复事实家** = `ROADMAP.md` §磨清单。
