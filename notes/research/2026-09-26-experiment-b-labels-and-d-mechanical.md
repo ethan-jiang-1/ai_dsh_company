@@ -3,13 +3,13 @@
 状态：**研究结论（机器自跑腿）**。喂给谁 = [multi-human-ux 提案](../proposed/2026-09-26-multi-human-ux.md)
 §实验进展表（B 的"待人标"行、A/D 的准备）；毕业动作 = 三腿结论出齐后并入 owner Note。
 判据唯一来源 = [评审 §五](./2026-09-26-multi-human-ux-review.md)。**本稿数字全部是条件值**——
-金标准是机器初标（`labels-draft-machine.md`），人复核确认前不作为真实精确率/召回率。
+金标准 = `labels.md`（机器初标 → 独立盲审 → **用户 2026-09-26 按 5 组复核转正，无修改**）。
 
 ## 一、实验 B：金标准草标 + 打分腿（条件值）
 
 **仪器链**（本轮补齐）：`scripts/lib/candidate-scan.mjs`（三规则 + `parseLabelsText` + `scoreLabels`
 纯逻辑）→ `scripts/candidate-scan-eval.mjs --labels <标注文件>`（IO 壳）→
-`snapshots/candidate-scan-corpus/labels-draft-machine.md`（机器初标，**待人复核**）。
+`snapshots/candidate-scan-corpus/labels.md`（已转正，见本稿 §三）。
 解析与计分配 `tests/candidate-scan-labels.spec.ts`（9 项）。语料补三个 case：11-conditional（条件句）、
 12-approval-pending（审批待决——零容忍类首个 case）、13-advise-only（只提意见不写稿）。
 
@@ -37,7 +37,7 @@
   「要不要结构化派活字段」的正面证据，但也看到**结构化字段自己会漂**（状态行不回写 ⇒ R3 把已完成的依赖判成未齐 / quote-z 关闭后状态行全过期）。
   ⇒ 与真语料 #2（quote-z 段一）同结论：**要么回写要么双源核对**。
 
-**待人复核的就是一件事**：`labels-draft-machine.md` 的 15 行「真实任务清单」——独立盲审意见见本稿 §三。
+**人复核已完成（2026-09-26）**：用户按 5 组逐组确认、无修改 ⇒ 数字不再是条件值；独立盲审意见见本稿 §三。
 
 ## 二、实验 D 机械面：配置 B（每人一个 home）四观察（活体，双服务实测）
 
