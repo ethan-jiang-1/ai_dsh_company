@@ -39,16 +39,27 @@
 
 ## 交付实况
 
-- **文件**：`packages/company-pack/src/client/tab-icons.tsx`（8 glyph + 8 标题组件 + 8 guide icon 组件，新增）；
-  `index.ts`（+8 条 `sidebar.right.pane.tab.title` keyed 槽登记；`registerType` 扩 icon 参 → guide 条目
-  同一 glyph 同一 tone——**guide 页是独立渲染路径**（`SidebarRightGuideEntry.icon`，不填画出厂立方体占位），
-  用户走查抓到这一缺口后补）；`styles.ts`（+`wk-tab-title` 布局 + 8 个 tone 类，全部 `var(--dsw-static-*)`，零字面色）。
+- **文件**：`packages/company-pack/src/client/tab-icons.tsx`（8 glyph + 8 标题组件 + 8 guide icon + **8 guide 条目胶囊**，新增）；
+  `index.ts`（+8 条 `sidebar.right.pane.tab.title` keyed 槽登记；+8 条 `sidebar.right.tab.guide.entry` keyed 槽登记
+  （接管 Start 页胶囊）；`registerType` 扩 icon 参 → guide 条目同一 glyph 同一 tone——**guide 页是独立渲染路径**
+  （`SidebarRightGuideEntry.icon`，不填画出厂立方体占位），用户走查抓到这一缺口后补）；
+  `styles.ts`（+`wk-tab-title` 布局 + 8 个 tone 类 + `wk-guide-entry` 胶囊样式，全部 `var(--dsw-*)`，零字面色）。
+- **更名记录（2026-09-27，用户语感裁定）**：「需要你」→ **「待办」**（原名是 *Needs You* 直译腔；「待办」与
+  「任务板」天然成对——待办=人的事、任务板=分身的事）。全链路改名：client 5 文件 + 公司手册宪章节 +
+  dev-loop 引用 + 测试注释；历史 Note / intents 行保原名为当时事实，出处注记保留在 tab-icons 注释与手册标题。
+- **tooltip 交付（2026-09-27，用户令）**：① Start（guide）页 8 条目走 keyed 槽
+  `sidebar.right.tab.guide.entry` **接管胶囊**——根因：vendor guide 只在条目 ≤4 时显示描述
+  （`MAX_DESCRIBED_ENTRIES=4`），我们 8 条全被折叠成纯标题；接管后每颗胶囊挂 vendor `Tooltip`（ui-primitives），
+  一行讲清这个页签是什么 + 关键操作；**有意偏离**：点击开页签**不用** vendor 的 `replaceTab: true`——guide 保留，
+  可从 Start 连续开多个页签（vendor 原版点一下顶掉 guide，连续开要反复加回）。② 页签 chip 与浮窗头补**原生
+  `title` 属性**悬浮提示（title 槽组件自有面，零 vendor 依赖）。
 - **验收（2026-09-27 实跑）**：① `tsc -b packages/company-pack` 零错 + tsdown client 面构建；
   ② `client-load-smoke` ALL PASS（真浏览器零挂载失败）；③ playwright 实证：8 页签 chip 全开
   （DOM 断言 icon ×8 在场）、**计算样式断言色值逐对等于令牌解析值**（#f59e0b≡rgb(245,158,11) 等
   8 对 + 浮窗头 1 对，hex↔rgb 离线精确比对全等），浮窗头（`data-dockkit-float-title`）icon 在场
-  且色值正确；**guide 页（右栏 Start）8 条目同批断言 8/8 OK**（用户走查反馈后补测）；截图 =
-  /tmp/wk-strip.png、/tmp/wk-float-title.png、/tmp/wk-float-window.png、/tmp/wk-full.png、/tmp/wk-guide.png
+  且色值正确；**guide 页 8 条目同批断言 8/8 OK**；**tooltip 实证**：hover「待办」胶囊 → 提示文本可见、
+  点击「在场」→ 页签开（guide 保留）、chip 原生 title 属性在场；截图 = /tmp/wk-strip.png、/tmp/wk-float-title.png、
+  /tmp/wk-float-window.png、/tmp/wk-full.png、/tmp/wk-guide.png、/tmp/wk-tooltip.png
   （一次性运行态证据，不进版本库）；④ verify ALL PASS + test 全绿。
 - **踩坑记录**（未来复用）：① guide（Start）页签是右栏空态——开第一个真页签即被替换，
   多开用页签条的 `[data-dockkit-add-tab]`（+按钮）逐个唤出 guide 再点条目；② playwright 断言令牌值

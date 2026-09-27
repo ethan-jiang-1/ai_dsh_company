@@ -1,5 +1,5 @@
 /**
- * 「需要你」页签体（驾驶舱①切片一）：跨会话注意力聚合面板。
+ * 「待办」页签体（驾驶舱①切片一）：跨会话注意力聚合面板。
  *
  * - 上段**等你处理**：问询 / 审批挂起项（apply 世界的远端事件观察者登记，本地 2s 轮询快照）
  *   + 升级待处理（follow 流的【待澄清】消息，切片三甲）；每条带「去处理」跳会话按钮。
@@ -56,7 +56,7 @@ const itemKey = (item: AttentionItem): string =>
   `${item.time}-${item.kind}-${item.jumpTo}-${item.what}`
 
 /**
- * 「需要你」页签体。
+ * 「待办」页签体。
  * @param props - 槽 props + 注入面。
  * @returns 注意力面板。
  */
@@ -110,14 +110,14 @@ export function AttentionTab(props: AttentionTabProps) {
   }
 
   return (
-    <PanelFrame title="需要你" tabProps={props satisfies PanelFrameProps}>
+    <PanelFrame title="待办" tabProps={props satisfies PanelFrameProps}>
       {streamError !== null && <div className="wk-error">动态流不可用：{streamError}</div>}
       <div className="wk-activity-block">
         <strong>等你处理</strong>
         {waiting.length === 0
           ? <div className="wk-meta">没有等你的事——各角色都在正常推进。</div>
           : (
-            <ul className="wk-activity" aria-label="需要你处理的事">
+            <ul className="wk-activity" aria-label="待办事项">
               {waiting.map(item => (
                 <li key={itemKey(item)}>
                   <Tag tone={attentionTone(item.kind)}>{attentionLabel(item.kind)}</Tag>

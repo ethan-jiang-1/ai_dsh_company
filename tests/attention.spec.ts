@@ -1,4 +1,4 @@
-/** 「需要你」注意力读模型（驾驶舱①切片一的 keyless 完成定义）。 */
+/** 「待办」注意力读模型（原「需要你」；keyless 完成定义）。 */
 import { describe, expect, it } from 'vitest'
 import {
   ESCALATION_MARK,

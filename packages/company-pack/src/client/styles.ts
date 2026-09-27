@@ -364,7 +364,7 @@ const CSS = `
 .wk-tab-title svg {
   flex: none;
 }
-.wk-tone-attention { color: var(--dsw-static-amber-500); }    /* 需要你：注意·要人 */
+.wk-tone-attention { color: var(--dsw-static-amber-500); }    /* 待办：注意·要人 */
 .wk-tone-burn      { color: var(--dsw-static-amber-400); }    /* 用量：注意·消耗 */
 .wk-tone-overview  { color: var(--dsw-static-blue-600); }     /* 看板：执行·总览 */
 .wk-tone-work      { color: var(--dsw-static-blue-500); }     /* 任务板：执行·工作台 */
@@ -372,6 +372,29 @@ const CSS = `
 .wk-tone-archive   { color: var(--dsw-static-deepseek-400); } /* 台账：机制·账 */
 .wk-tone-people    { color: var(--dsw-static-green-500); }    /* 在场：人·在线 */
 .wk-tone-growth    { color: var(--dsw-static-green-400); }    /* 培养：人·成长 */
+
+/* guide 条目胶囊（Start 页；接管自 vendor EntryBox——槽 sidebar.right.tab.guide.entry）：
+   视觉对齐出厂胶囊（圆角、hover 底色全令牌），外加 Tooltip（组件层）与原生 title（chip 侧）。 */
+.wk-guide-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: none;
+  border-radius: var(--dsw-radius-xs);
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.wk-guide-entry:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+.wk-guide-entry-label {
+  font-weight: 500;
+}
 `
 
 /**

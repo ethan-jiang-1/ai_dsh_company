@@ -34,7 +34,7 @@ export type PresenceTabProps = CompanyTabProps & {
 }
 
 /**
- * 页签体共用外框需要的最小 props（`useTabInfo` + 浮出操作）——「需要你」页签（AttentionTab）
+ * 页签体共用外框需要的最小 props（`useTabInfo` + 浮出操作）——「待办」页签（AttentionTab）
  * 复用同一外框，故收窄成独立接口导出（结构上 CompanyTabProps 天然满足）。
  */
 export interface PanelFrameProps {

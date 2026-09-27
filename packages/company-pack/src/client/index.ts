@@ -24,6 +24,8 @@ import {
   DagTabTitle, LedgerTabTitle, PresenceTabTitle, TasksTabTitle,
   AttentionGuideIcon, BoardGuideIcon, BudgetGuideIcon, CultivationGuideIcon,
   DagGuideIcon, LedgerGuideIcon, PresenceGuideIcon, TasksGuideIcon,
+  AttentionGuideEntry, BoardGuideEntry, BudgetGuideEntry, CultivationGuideEntry,
+  DagGuideEntry, LedgerGuideEntry, PresenceGuideEntry, TasksGuideEntry,
 } from './tab-icons.tsx'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
@@ -85,7 +87,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
     })
   })
 
-  // 驾驶舱①·「需要你」：挂起项登记处（apply 闭包内创建——client 纪律禁模块级单例）。
+  // 驾驶舱①·「待办」：挂起项登记处（apply 闭包内创建——client 纪律禁模块级单例）。
   // 观察者写入 / 页签读取共享同一实例。
   const attention = createAttentionRegistry()
 
@@ -243,8 +245,8 @@ export async function apply(ctx: ClientContext): Promise<void> {
       }), `company-pack: ${kind} tab type`)
     }
 
-    registerType('dsh-company-pack/attention', 'company-attention', '需要你',
-      '注意力中心：谁在等你（问询/审批/升级）+ 刚完成', 50, AttentionGuideIcon)
+    registerType('dsh-company-pack/attention', 'company-attention', '待办',
+      '人的待办收件箱：待批审批 / 待答问询 / 升级 + 完成通知', 50, AttentionGuideIcon)
     registerType('dsh-company-pack/board', 'company-board', '看板',
       '任务看板：活到哪一步（owner / 依赖 / 修订号）', 51, BoardGuideIcon)
     registerType('dsh-company-pack/dag', 'company-dag', '依赖图',
@@ -286,7 +288,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
     }
 
     // keyed 槽体：与上面的类型共享同一 id；回调返回 disposer 数组（同工具卡那段写法）。
-    // 「需要你」的注入面另有挂起项快照（apply 登记处）与 sessions.open 跳转。
+    // 「待办」的注入面另有挂起项快照（apply 登记处）与 sessions.open 跳转。
     scoped.slots.inject('sidebar.right.pane.tab', () => [      scoped.slots.register(
         { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/attention', inject: () => ({
           follow,
@@ -347,6 +349,36 @@ export async function apply(ctx: ClientContext): Promise<void> {
       scoped.slots.register(
         { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/ledger' },
         LedgerTabTitle),
+    ])
+
+    // guide 条目槽（Start 页胶囊接管；用户令 2026-09-27：挂 hover tooltip）：vendor guide
+    // 只在条目 ≤4 时显示描述（MAX_DESCRIBED_ENTRIES=4），我们 8 条全被折叠成纯标题 ⇒
+    // 走 keyed 槽 sidebar.right.tab.guide.entry 接管胶囊（vendor Tooltip + 点击 openTab）。
+    scoped.slots.inject('sidebar.right.tab.guide.entry', () => [
+      scoped.slots.register(
+        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/attention', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
+        AttentionGuideEntry),
+      scoped.slots.register(
+        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/board', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
+        BoardGuideEntry),
+      scoped.slots.register(
+        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/dag', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
+        DagGuideEntry),
+      scoped.slots.register(
+        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/presence', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
+        PresenceGuideEntry),
+      scoped.slots.register(
+        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/budget', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
+        BudgetGuideEntry),
+      scoped.slots.register(
+        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/tasks', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
+        TasksGuideEntry),
+      scoped.slots.register(
+        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/cultivation', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
+        CultivationGuideEntry),
+      scoped.slots.register(
+        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/ledger', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
+        LedgerGuideEntry),
     ])
   })
 
