@@ -65,7 +65,7 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 程序（脚本按序执行，任一步失败即红）：
 
 0. **前置**：`source dev/env.sh`；共用 `requireDevHome` 拒绝日用 home 及其祖先/后代/符号链接别名。读取 vendor CLI `package.json` 的 `bin.dsh`（当前 `apps/cli/lib/bin.js`），检查它和 web dist 在场；缺失即失败，不回退源码。
-1. **构建 company-pack**：先删 `lib/` 再 `tsc -b packages/company-pack` + tsdown。**别用 `tsc -p`**——本包 tsconfig 是 solution root（`files: []` + references），`-p` 非 build 模式不展开 references ⇒ 零输入、静默退出 0、零 emit；陈旧态下 tsdown 会拿上一次的产物打包 ⇒ 冒烟验旧包（假绿）。本脚本不重建 vendor；已有 vendor 产物可运行不等于来自当前 SHA 的新鲜构建。配方归 [开发环](./guides/dev-loop.md) §7。
+1. **构建 company-pack**：先删 `lib/` 再 `tsc -b packages/company-pack` + tsdown。**别用 `tsc -p`**——本包 tsconfig 是 solution root（`files: []` + references），`-p` 非 build 模式不展开 references ⇒ 零输入、静默退出 0、零 emit；陈旧态下 tsdown 会拿上一次的产物打包 ⇒ 冒烟验旧包（假绿）。本脚本不重建 vendor；已有 vendor 产物可运行不等于来自当前 SHA 的新鲜构建。配方归 [guides/bootstrap](./guides/bootstrap.md)。
 2. **`npm pack`**：tarball 落 `dev/harness-home/tmp/release-pack/`（npm cache 重定向进
    repo gitignored 区——纪律 §11）。
 3. **干净 profile**：dev harness home 下 `release-check`，**先删后建**；预置

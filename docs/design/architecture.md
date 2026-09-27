@@ -361,7 +361,7 @@ ai_dsh_company/
 | 角色 persona / skills / KB 事实 | `presets/<role>/`（preset 只放差异，共享行走 host 层） | `preset-smoke`（真挂载）+ 内容档 probe |
 | 组合行（registry / 预设 / 工具行） | `cordis.patch.yml` + `dsh.bundle.patch` 数组 | `pnpm verify`（preset 结构 / 行依赖）+ `preset-smoke` |
 | host 行为（审批线 / org 工具） | `packages/company-pack/src/` | `pnpm test` + 边界改动加 `delegation-smoke` |
-| client 面（品牌 / 委派卡 / 在场板） | `src/client/`（两半编译，见 dev-loop §7） | `tsc -b` + `client-load-smoke`；行为变更用 replay `--ui` |
+| client 面（品牌 / 委派卡 / 在场板） | `src/client/`（两半编译，见 guides/bootstrap） | `tsc -b` + `client-load-smoke`；行为变更用 replay `--ui` |
 | 会话回放资产 | `snapshots/<场景>/`（世代不删；行为变更随 diff 重录） | `replay-smoke` |
 | 文档 / 合同 / 流程 | 对应 owner（docs/ 或 notes/，路由见 [index](../index.md)） | `pnpm verify`（链接 / 预算 / 结构） |
 | vendor 行为 | **不改**——三条正路：bundle patch / 提上游升 pin / 先证伪再自建（AGENTS §vendor 铁律） | `pnpm verify`（vendor-pin/clean）+ 升 pin 走 release.md |

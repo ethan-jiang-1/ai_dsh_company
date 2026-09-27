@@ -7,7 +7,7 @@
 // Web UI 砖在 BootPage 错误屏。本检查对该事故类修前 RED、修后 GREEN 均已实证（0003）。
 //
 // 断言三件事：① 无 "Failed to load plugins" banner；② console 无 `failed to apply loader
-// entry`；③ 品牌槽在场（`DSH_CLIENT_TITLE`，guides/dev-loop §7 的构建期品牌 = 本仓固定值）——
+// entry`；③ 品牌槽在场（`DSH_CLIENT_TITLE`，guides/bootstrap 的构建期品牌 = 本仓固定值）——
 // 它证明 app 渲染完成且本包 client 入口成功 apply。
 // R5b 起：驾驶舱页签（sidebarRightTabs 注册 + keyed 槽体）走同一条 apply 路径，注册抛错
 // 会被 ①② 抓到；**页签在场 + 行可点**的功能断言在 `replay-smoke --ui --scenario r2-motion`

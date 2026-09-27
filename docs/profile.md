@@ -22,7 +22,7 @@
 3. **安装形状按装法定**（2026-09-26 实测更正）：**`file:` = 真拷贝**（安装副本与源文件 **inode 不同、
    link count 1**——旧文写的"硬链接/同 inode"是错的，实测反证）；**`link:` = 符号链接**，改 presets/**
    persona/skills **即刻生效、无需重装**。现行 dev profile 用 `link:`；只有改 pack 依赖或 bundle 行才需要
-   `plugin --profile web remove` + `add`（纪律见 [开发环 §7](./guides/dev-loop.md)）。正式形状由 `release-smoke` 验证。
+   `plugin --profile web remove` + `add`（纪律见 [guides/bootstrap](./guides/bootstrap.md)）。正式形状由 `release-smoke` 验证。
 4. **patchReload 必须 `'startup'`**（R1 实证）：自定义 profile 默认 `'live'`（热重载 watcher
    常驻）——headless 动议会跑完但进程永不退、stdout 不 flush。company profile 的
    package.json 已改 `"patchReload": "startup"`；将来 web 观察窗 profile 才用 live。

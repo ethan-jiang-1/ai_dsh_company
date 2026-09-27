@@ -15,7 +15,7 @@
 ## 前置（本机）
 
 1. `source dev/env.sh`（双 home；**新 shell 必须**）
-2. `pnpm dsh web -- --port 3086 --no-open`（**示例端口——端口是环境状态，被占就换或 `--port 0`**，见 dev-loop §7；启动横幅打印带 token 的 URL）
+2. `pnpm dsh web -- --port 3086 --no-open`（**示例端口——端口是环境状态，被占就换或 `--port 0`**，见 guides/bootstrap；启动横幅打印带 token 的 URL）
 3. 浏览器打开该 URL（**必须带 token**：直接开端口会卡鉴权）。**先连工作区**——会话列表按【工作目录】
    过滤，不连就看不到本场会话。两条入口：空态页点主区的 **Choose workspace**；已有工作区时走侧栏
    `Workspaces` 旁的 **Add workspace** 图标。对话框里**必须先点 `Edit path`** 才会出现路径输入框 →

@@ -115,7 +115,7 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 
 **培养动作 = 改 `packages/company-pack/presets/<role>/`**：人格 = `agent.cordis.yml` 的 persona row，
 能力 = `skills/*/SKILL.md`。培养权就是 repo 写权限——DSH 没有原生"培养授权"动作，这是权限事实。
-dev `web` profile 用 `link:` 符号链接装 pack（[guides/dev-loop §7](./guides/dev-loop.md)）——改仓库
+dev `web` profile 用 `link:` 符号链接装 pack（[guides/bootstrap](./guides/bootstrap.md)）——改仓库
 preset 即对 profile 可见、无需重装；真实安装形状（`file:`）归 release-smoke。
 
 **生效边界按面**（D25；依据 = vendor 源码 + [2026-09-24 活体探针](../notes/implemented/2026-09-24-twin-cultivation.md)）：

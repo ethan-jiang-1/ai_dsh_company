@@ -54,12 +54,14 @@ if (links.violations.length === 0) ok(`md-links (含 notes) ×${links.linkCount}
 // ── 2c. 行数预算（缩编自 vendor `verify-doc-budgets`；防入口链继续膨胀——R6 D23/清单 B #52） ──
 // 负例留证 2026-09-27：AGENTS.md 临时超上限 → doc-budget 红。
 // 上限 = 立项时值 + 余量；超限先搬（内容挪到该去的家）再压，确需空间才在 Note 里说明后升上限。
+// **2026-09-27 起采 DSH 棘轮语义（FAQ 07 入口链）**：瘦身轮后上限随内容下调（≥5% 头寸）、只降不升；
+// 上调须在 Note 里论证（三文件曾同时顶格 = 常驻层饱和信号，处置 = 瘦身不是提额）。
 // ⚠ 注释里**不要复述当前行数**——那是易腐常量，实测值由每次跑出的 PASS 行给出（2026-09-26 修：
 //   原注释写"后 107 行"/"整治后 131"，实为 108 / 142，属"枚举型事实写两处"那一类腐化）。
 const DOC_LINE_BUDGETS = [
-  ['AGENTS.md', 115],            // 2026-09-23 二次收口（渐进披露）；指针化内容住 release.md / index / guides/dev-loop
-  ['docs/index.md', 149],        // 2026-09-24 基石整治后定 145；2026-09-26 升至 147：+D29 行；再升至 149：+D30 research 三态行 + notes/archived/rejected 索引行（用户令）
-  ['docs/guides/dev-loop.md', 467], // 2026-09-25 收割轮升至 448：+§2 进程内查询档（inspect/schema 工具）等三处小登记（依据 = harvest-ledger #5/#13），说明在 verify 提升处与台账；2026-09-26 升至 466：+§13 人侧反馈协议（实例先行，D29 用户令）；2026-09-27 升至 467：+§2 inspect≠授权边界一句（FAQ 07 四边界核对，审计 = notes/archived/2026-09-27-harness-gap-audit-faq07.md）
+  ['AGENTS.md', 105],            // 2026-09-23 二次收口（渐进披露）；2026-09-27 瘦身轮：密钥/三实体/原生纪律/不发明段压缩（当时 108→100），棘轮 115→105
+  ['docs/index.md', 146],        // 2026-09-26 升至 149（D29/D30 行）；2026-09-27 瘦身轮：合同落点段删并、D19+D21 / D23+D24 并行、肥行压一行指针（当时 149→139），棘轮 149→146
+  ['docs/guides/dev-loop.md', 395], // 2026-09-26/27 升至 467（§13、inspect 句）后同日瘦身轮：§7 整段迁 guides/bootstrap.md、§7 留指针防断链（当时 467→376），棘轮 467→395
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
   const lines = readFileSync(join(root, rel), 'utf8').split('\n').length - 1
@@ -330,11 +332,11 @@ for (const entry of ownPackages) {
   if (!declaresClient) continue
   clientHalves.push(manifest.name)
   // 产物面：只在构建过（lib/ 存在）时检查——lib/ 是 gitignore 的产物，未构建时由
-  // preset-smoke 的"真 profile + 浏览器模块表"断言兜底（guides/dev-loop §7）。
+  // preset-smoke 的"真 profile + 浏览器模块表"断言兜底（guides/bootstrap）。
   const clientRel = manifest.exports['./client']
   const clientPath = typeof clientRel === 'string' ? clientRel : clientRel?.default
   if (existsSync(join(dir, 'lib')) && typeof clientPath === 'string' && !existsSync(join(dir, clientPath))) {
-    fail('client-half', `${manifest.name} 的 "./client" 指向 ${clientPath}，但产物不存在（重新构建？guides/dev-loop §7）`)
+    fail('client-half', `${manifest.name} 的 "./client" 指向 ${clientPath}，但产物不存在（重新构建？guides/bootstrap）`)
   }
 }
 ok(`client-halves ×${clientHalves.length}`)

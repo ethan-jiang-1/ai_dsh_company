@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 认证档（不进 pnpm test）：company-pack 构建 → npm pack → 干净 profile 真安装 → built CLI boot/RPC。
 // 何时跑：pack 依赖、安装形状、built 启动器改动时；或它属于关键验收时（无 key，分钟级）
-// vendor 产物是前置条件，不由此脚本重建；存在/运行通过不代表新鲜。构建配方见 guides/dev-loop §7。
+// vendor 产物是前置条件，不由此脚本重建；存在/运行通过不代表新鲜。构建配方见 guides/bootstrap。
 // 用法：source dev/env.sh && node scripts/release-smoke.mjs [--keep]
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
@@ -40,7 +40,7 @@ try {
   if (isAbsolute(rel) || rel.startsWith('..')) throw new Error('vendor CLI bin.dsh 越出 CLI 目录')
   for (const artifact of [cli, join(ROOT, 'vendor/dsh/apps/web/dist/index.html')]) {
     if (!existsSync(artifact) || !statSync(artifact).isFile()) {
-      throw new Error(`缺少 built artifact：${artifact}；按 docs/guides/dev-loop.md §7 构建；不会回退 tsx/src`)
+      throw new Error(`缺少 built artifact：${artifact}；按 docs/guides/bootstrap.md 构建；不会回退 tsx/src`)
     }
   }
   console.log(`built CLI：${cli}（plain Node；vendor 产物新鲜度未证明，本脚本只重建 company-pack）`)

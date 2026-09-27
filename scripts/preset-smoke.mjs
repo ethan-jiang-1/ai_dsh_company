@@ -9,7 +9,7 @@
 // 所以唯一能上线前抓住它的手段是：走真入口路径（web RPC session/create）挂一次。
 //
 // 前置：DSH_HOME 指向已装本 pack 的 profile（`source dev/env.sh` 后用 dev home），
-//       client 面与前端 dist 已构建（guides/dev-loop §7）。
+//       client 面与前端 dist 已构建（guides/bootstrap）。
 // 用法：source dev/env.sh && node scripts/preset-smoke.mjs [--port 3099] [--profile web]
 import { spawn } from 'node:child_process'
 import { readFileSync, readdirSync } from 'node:fs'

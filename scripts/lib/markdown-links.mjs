@@ -19,7 +19,7 @@ const resolveParser = (id) => {
   for (const base of parserBases) {
     try { return createRequire(base).resolve(id) } catch { /* 换下一基址 */ }
   }
-  throw new Error(`${id} 在 vendor 根包与 ui-primitives 成员处都解析不到（引导 = dev-loop §7 的 install）`)
+  throw new Error(`${id} 在 vendor 根包与 ui-primitives 成员处都解析不到（引导 = guides/bootstrap 的 install）`)
 }
 const { fromMarkdown } = await import(pathToFileURL(resolveParser('mdast-util-from-markdown')).href)
 const { gfmFromMarkdown } = await import(pathToFileURL(resolveParser('mdast-util-gfm')).href)

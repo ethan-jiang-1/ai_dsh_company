@@ -30,9 +30,8 @@ snapshots/              回归资产：历史录制、workspace.actual 副本与
 ```sh
 git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 corepack enable pnpm                   # 一次性：pnpm 走 corepack（packageManager 钉 11.7.0）
-pnpm install                           # workspace 解析；引导全配方（含 vendor 构建）见 guides/dev-loop §7
-source dev/env.sh                      # 双 home 兜底 + 裸 dsh 拦截（DSH_HOME=dev/harness-home）。⚠ coding 会话里
-                                       #   DSH_HOME 继承且带日用值，漏 source 不报错、安静用错 home（guides/dev-loop §6 第 5 条）
+pnpm install                           # workspace 解析；引导全配方（含 vendor 构建）见 guides/bootstrap
+source dev/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 门禁接线（⚠ coding 会话里 DSH_HOME 继承带日用值——guides/dev-loop §6 第 5 条）
 pnpm verify                            # 结构门禁（清单唯一源 = scripts/verify.mjs；跑一次看 PASS 行即得全表，本行不复述；push 侧 pre-push hook 强制）
 pnpm test                              # keyless 回归（vitest；数量与耗时以实跑为准；真模型/浏览器不进回归，tests/layering.spec.ts 守卫）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）
@@ -42,14 +41,13 @@ node scripts/preset-smoke.mjs          # preset 改动的**完成定义**（触�
 其余门禁/冒烟脚本见 `scripts/`：**每个门禁/探针脚本（`*-{smoke,probe,audit,check}.mjs`）头注写明「何时跑」与成本**（`script-triggers` 门禁强制自述，
 清单唯一源 = `scripts/`——**逐个脚本的触发条件与成本别抄回本文件**，复述必漂）。分层原则 = guides/dev-loop §9.1；
 发布/升 pin = [release.md](docs/release.md)。web 观察窗 = `pnpm dsh web -- --port 3081 --no-open`（**端口是环境状态不是仓库事实**——被占就换，
-或 `--port 0` 让系统分配、从启动横幅读端口与 token；构建三件事见 guides/dev-loop §7）。
+或 `--port 0` 让系统分配、从启动横幅读端口与 token；构建三件事见 guides/bootstrap）。
 
 **push 走 `ssh.github.com:443`**（22 端口被拦；`origin` 已指向该 URL，`git push` / `git fetch` 直接用即可）。
 
 ## 密钥
 
-`pnpm dsh` 与真模型冒烟需要 `DEEPSEEK_API_KEY`。凭据按 home 隔离：开发 home
-（`dev/harness-home/.credentials.yaml`）配一次即可（guides/dev-loop §6）；永不提交密钥。
+`pnpm dsh` 与真模型冒烟需 `DEEPSEEK_API_KEY`；凭据按 home 隔离（开发 home `dev/harness-home/.credentials.yaml` 配一次，guides/dev-loop §6）；永不提交密钥。
 
 ## DSH 源码：三个实体，别混
 
@@ -60,8 +58,7 @@ node scripts/preset-smoke.mjs          # preset 改动的**完成定义**（触�
 | ③ 外部研究树 | `/Users/bowhead/deepseek-harness/`（`_digested`/FAQ 宿主） | 只读参考，登记见 `docs/index.md` §外部研究材料登记 |
 
 裸 `dsh` 已被 `dev/env.sh` 拦截（DSH_HOME 只护数据层护不住代码层；确要日用：`command dsh`）。
-DSH 全局不变量（fail-loud / model-visible ⟺ logged / registrations are effects / plugins not loop
-changes）= `vendor/dsh/AGENTS.md` Conventions 节；探索路由与概念→源码直达表 = `docs/index.md` §术语映射。
+DSH 全局不变量（fail-loud / model-visible ⟺ logged / registrations are effects）= `vendor/dsh/AGENTS.md` Conventions 节；概念→源码直达表 = `docs/index.md` §术语映射。
 
 ## 纪律（沿 DSH 研发纪律；**默认严格照做，偏离必须登记**）
 
@@ -75,7 +72,7 @@ changes）= `vendor/dsh/AGENTS.md` Conventions 节；探索路由与概念→源
 | docs = 当前合同（一处事实一个家，**只写 now**） | `docs/AGENTS.md` | `docs/` 按性质分层（D10）；物理行预算 = `scripts/verify.mjs` 的 `DOC_LINE_BUDGETS`；队列规则 = `ROADMAP.md` §维护规则 |
 | 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么） | `.agents/notes/README.md` | `notes/intents.md → implemented/`；收尾 Note 要写什么 = guides/dev-loop §12「记录与收尾」；范式照 [journal-presence-mechanism](notes/implemented/2026-09-26-journal-presence-mechanism.md) |
 | 按变更选择相关检查；只报告实际跑过的检查 | `AGENTS.md` Run relevant checks | 本地流程见 guides/dev-loop §1/§9.1/§12 |
-| **完成定义 = 该面最小"真检查"通过；发现权在代理一侧** | `docs/testing.md`；`docs/postmortem/0003-web-agent-gui-feedback-loop.md` | guides/dev-loop §1「完成定义」段 + §7 两道防线；preset 类改动完成定义 = `preset-smoke.mjs`（真挂载） |
+| **完成定义 = 该面最小"真检查"通过；发现权在代理一侧** | `docs/testing.md`；`docs/postmortem/0003-web-agent-gui-feedback-loop.md` | guides/dev-loop §1「完成定义」段 + bootstrap 两道防线；preset 类改动完成定义 = `preset-smoke.mjs`（真挂载） |
 | 测试分层：真模型 / 真浏览器不进回归；行为变更同 diff 更新录制快照 | `docs/testing.md` | guides/dev-loop §9.1 + 机械门禁 `tests/layering.spec.ts`（已反证）+ 认证档按面选跑 |
 | 真实入口路径（发布产物 `lib/` 跑）+ 真实安装形状 | `docs/testing.md` | `release-smoke`（`npm pack`→干净 profile→`plugin add`），合同 `docs/release.md` |
 | 源码面/产物面不混（paths 指 src） | `AGENTS.md` Conventions | 根 `tsconfig.json` extends vendor base |
@@ -91,17 +88,12 @@ changes）= `vendor/dsh/AGENTS.md` Conventions 节；探索路由与概念→源
 不算改（⚠ 禁 `git clean -x`）；想改 vendor 行为的三条正路（bundle patch / 提上游升 pin / 先证伪
 "不可用"再自建）、SHA-not-tag 理由与克隆技巧 = [release.md §vendor 政策](docs/release.md)。
 
-**本仓原生纪律（与 guides/dev-loop §9/§10 同级）**：§11 **工具态与越界写入**（2026-09-23 立）——
-repo 内为自由区；工具状态（缓存/store/配置）一律**先重定向进仓库 gitignored 区再首次使用**
-（落点清单：双 home、`.pnpm-store`、profile `.npmrc`、排练场）；确需越界先问人，一次说清路径与理由。
-§13 **自主优先协议**（2026-09-26 立，D29）：尽量遵循 DSH 研发流程；自主解决问题——动手发明前先探索、
-借鉴**成熟 DSH 插件**（下载量/影响力门槛）思想；REVIEW 分级——能自主审的自主审，阶段收口才人审，
-人审形状 = 跑起来的实例 + 单页走查单 + 一次一件事——规则唯一见 [dev-loop §13](docs/guides/dev-loop.md)。
+**本仓原生纪律**：§11 **工具态与越界写入**——repo 内自由区；工具状态先重定向进仓库 gitignored 区再首次用
+（落点：双 home、`.pnpm-store`、profile `.npmrc`、排练场），确需越界先问人、一次说清路径与理由；§13
+**自主优先协议**（D29）——先探索后发明、借鉴成熟插件、REVIEW 分级、人审四件套——规则唯一见 [dev-loop §11/§13](docs/guides/dev-loop.md)。
 
 - 开工与执行唯一流程：`docs/guides/dev-loop.md` §0.5/§1；其他操作按需查同文后续章节。demo 现场运维 runbook：`docs/guides/budget-and-ops.md`。
-- **不发明**：不新增 spec 流程（OpenSpec 留触发条件，guides/dev-loop §5）、不自造调度器/记忆/门禁——
-  优先用 DSH 现成载体（D13）。否决依据（规格工具 vs 本仓两次事故的对照）：
-  [implemented/2026-09-22-agent-workflow-community-practice](notes/implemented/2026-09-22-agent-workflow-community-practice.md)。
+- **不发明**：不新增 spec 流程（OpenSpec 留触发条件，guides/dev-loop §5）、不自造调度器/记忆/门禁——优先用 DSH 现成载体（D13）；否决依据 = [community-practice](notes/implemented/2026-09-22-agent-workflow-community-practice.md)。
 
 ## vendor 簿记
 
