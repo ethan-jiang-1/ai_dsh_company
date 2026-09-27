@@ -28,6 +28,12 @@
   数据层**，未批）；何时磨 = 用户点名，或注意力面板真要用这份路由时。
 - **`snapshots/` 层瘦身审计**（2026-09-26 新观察；**审计已出，见下**）：谁来磨 = 维护者；
   何时磨 = 用户点名或下次做 demo 资产清理时。**动它风险高**（回归资产），先审计再动手。
+  **消费面盘点（2026-09-26 夜，证伪瘦身方案）**：`r2-motion/sessions/` 有三个功能消费面——
+  `replay-smoke`（replay+ui 双 lane 按名读取）、`deliverables-check --sessions`、
+  `tests/deliverables.spec.ts:170`（vitest **直读** `sessions/lead.jsonl`）⇒
+  原拟"sessions/ 换指针"**不可行**（打断 vitest 与审计两个真消费面）；
+  「内容逐字节相同 ≠ 可删」第二次实证（第一次 = raw/ 反证，见 `snapshots/r2-motion/README.md`）。
+  瘦身挂起，直到真实存储压力出现且愿以录制保真度换空间。
 
   **审计结果（2026-09-26，只读测量）**：`snapshots/` = **34 MB / 547 追踪文件**（占全仓 818 文件的
   **67%**）。体积集中在一个目录：**`r2-motion/` 20 MB = 快照总量的 59%**；其余大头依次
