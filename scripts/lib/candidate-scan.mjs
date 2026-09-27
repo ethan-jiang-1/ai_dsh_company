@@ -60,13 +60,20 @@ export function scanR1(briefText, draftFiles) {
     .map(role => ({ rule: 'R1', role, why: `任务书点名 ${role}，drafts/ 无其稿`, needsVerify: true }))
 }
 
+/** 角色 → 盘上是否已有其稿（<角色>.md 或 <角色>-review.md）——双源核对用。 */
+export function roleHasDraft(role, draftFiles) {
+  return draftFiles.some(f => f.replace(/\.md$/, '').replace(/-review$/, '') === role)
+}
+
 /**
  * R2 · 结构化派活行：按机器可读的派活行报"状态=待办"的任务（不看动议整体状态）。
+ * 双源核对（2026-09-26 采纳结论的一部分）：状态行"待办"但该角色稿已在盘上 ⇒ 标 `stale: true`
+ * （显示为「待核实」——稿与状态行矛盾，谁漂了待查，不直接当候选催人）。
  */
-export function scanR2(briefText) {
+export function scanR2(briefText, draftFiles = []) {
   return parseAssignments(briefText)
     .filter(t => t.status === '待办')
-    .map(t => ({ rule: 'R2', role: t.role, task: t.id, title: t.title, deps: t.deps, why: `派活行状态=待办`, needsVerify: true }))
+    .map(t => ({ rule: 'R2', role: t.role, task: t.id, title: t.title, deps: t.deps, why: `派活行状态=待办`, needsVerify: true, stale: roleHasDraft(t.role, draftFiles) }))
 }
 
 /**
@@ -84,7 +91,7 @@ export function scanR3(briefText, draftFiles, motionHasFinal) {
   for (const t of tasks) {
     if (t.status !== '待办') continue
     const missing = t.deps.filter(d => !done.has(d))
-    if (missing.length === 0) candidates.push({ rule: 'R3', role: t.role, task: t.id, title: t.title, why: '状态=待办且依赖已齐', needsVerify: true })
+    if (missing.length === 0) candidates.push({ rule: 'R3', role: t.role, task: t.id, title: t.title, why: '状态=待办且依赖已齐', needsVerify: true, stale: roleHasDraft(t.role, draftFiles) })
     else blocked.push({ rule: 'R3', role: t.role, task: t.id, title: t.title, missingDeps: missing, why: `依赖未齐：${missing.join(',')}`, needsVerify: true })
   }
   return { candidates, blocked, closed: false }

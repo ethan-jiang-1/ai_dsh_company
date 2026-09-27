@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseLabelsText, scoreLabels } from '../scripts/lib/candidate-scan.mjs'
+import { parseLabelsText, scoreLabels, scanR2, scanR3, roleHasDraft } from '../scripts/lib/candidate-scan.mjs'
 
 // 实验B打分腿的纯逻辑（判据单一来源 = scripts/lib/candidate-scan.mjs；格式约定见标注文件头部）。
 // IO（读标注文件/语料/deliverables）在 scripts/candidate-scan-eval.mjs——tests/ 不碰驱动脚本的文件面。
@@ -123,5 +123,20 @@ describe('打分（scoreLabels）：指标与零容忍计数', () => {
   it('标注行没有对应扫描结果 ⇒ fail-loud', () => {
     const rows = [{ id: 'ghost', kind: 'synthetic', closed: false, approvals: 0, remind: '', zeroNote: '', tasks: [] }]
     expect(() => scoreLabels(rows, new Map())).toThrow(/ghost/)
+  })
+})
+
+describe('双源核对（2026-09-26 采纳结论的一部分）', () => {
+  const BRIEF = '派活｜T1｜vp-sales｜市场门｜依赖：无｜状态：待办\n'
+  it('状态行待办 + 稿不在盘 ⇒ stale=false（正常候选）', () => {
+    expect(scanR2(BRIEF, [])[0].stale).toBe(false)
+    expect(scanR3(BRIEF, [], false).candidates[0].stale).toBe(false)
+  })
+  it('状态行待办 + 稿已在盘 ⇒ stale=true（待核实，不是干净候选）——R2/R3 同标', () => {
+    expect(scanR2(BRIEF, ['vp-sales.md'])[0].stale).toBe(true)
+    expect(scanR3(BRIEF, ['vp-sales.md'], false).candidates[0].stale).toBe(true)
+  })
+  it('互审稿（<角色>-review.md）也算该角色有稿', () => {
+    expect(roleHasDraft('cfo', ['cfo-review.md'])).toBe(true)
   })
 })

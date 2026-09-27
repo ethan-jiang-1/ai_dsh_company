@@ -56,7 +56,7 @@ function selfCheck() {
     const { drafts, hasFinal, expect } = parseCase(readFileSync(join(dir, 'case.yml'), 'utf8'))
 
     const r1 = scanR1(brief, drafts)
-    const r2 = scanR2(brief)
+    const r2 = scanR2(brief, drafts)
     const r3 = scanR3(brief, drafts, hasFinal)
     summary.R1 += r1.length
     summary.R2 += r2.length
@@ -130,7 +130,7 @@ function labelsMode(path) {
   const scans = new Map()
   for (const row of rows) {
     const { brief, drafts, hasFinal } = scanInputOf(row)
-    scans.set(row.id, { r1: scanR1(brief, drafts), r2: scanR2(brief), r3: scanR3(brief, drafts, hasFinal), drafts })
+    scans.set(row.id, { r1: scanR1(brief, drafts), r2: scanR2(brief, drafts), r3: scanR3(brief, drafts, hasFinal), drafts })
   }
   const { M, zeroTol, details } = scoreLabels(rows, scans)
 
@@ -138,7 +138,7 @@ function labelsMode(path) {
   for (const d of details) {
     console.log(`· ${d.id}`)
     console.log(`    金标准: ${d.gold.map(t => `${t.role === '——' ? '〔整场〕' : t.role}·${t.task}·${t.status}`).join('；') || '（无任务）'}${d.approvals > 0 ? `；审批×${String(d.approvals)}` : ''}`)
-    console.log(`    R1=[${d.r1.map(c => c.role).join(',') || '—'}] R2=[${d.r2.map(c => `${c.task}(${c.role})`).join(',') || '—'}] R3候选=[${d.r3.candidates.map(c => `${c.task}(${c.role})`).join(',') || '—'}]${d.r3.closed ? '（判已关闭）' : d.r3.blocked.length > 0 ? `（blocked=${d.r3.blocked.map(b => b.task).join(',')})` : ''}`)
+    console.log(`    R1=[${d.r1.map(c => c.role).join(',') || '—'}] R2=[${d.r2.map(c => `${c.task}${c.stale ? '*' : ''}(${c.role})`).join(',') || '—'}] R3候选=[${d.r3.candidates.map(c => `${c.task}${c.stale ? '*' : ''}(${c.role})`).join(',') || '—'}]${d.r3.closed ? '（判已关闭）' : d.r3.blocked.length > 0 ? `（blocked=${d.r3.blocked.map(b => b.task).join(',')})` : ''}`)
   }
 
   console.log(`\n—— 分规则指标（按机器草标；金标准确认后数字才作数）——`)
