@@ -98,7 +98,7 @@ export function PanelFrame({ title, tone, tabProps, children }: {
             </Button>
           )}
       </div>
-      {children}
+      <div className="wk-pane-body">{children}</div>
     </div>
   )
 }

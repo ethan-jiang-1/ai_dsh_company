@@ -261,6 +261,9 @@ const CSS = `
 
 /* 右栏驾驶舱（Company 页签）：在场板 + 动态流 */
 .wk-pane { padding: 8px 12px; font-size: 13px; line-height: 1.5; text-align: left; color: var(--dsw-alias-label-primary); }
+/* 内容区横向滚动（UX 走查 2026-09-28）：窄浮窗（最小 220px 钳制）下任务板表格横向溢出、
+   overflow:visible 会把内容裁到够不着——滚动而不是裁切。 */
+.wk-pane-body { overflow-x: auto; }
 .wk-pane-head { display: flex; align-items: baseline; gap: 8px; }
 .wk-list { display: grid; gap: 4px; }
 .wk-row-head { color: var(--dsw-alias-label-tertiary); font-size: 12px; border-bottom: 0; }

@@ -5,10 +5,12 @@
  * 本文件只剩"页内子页签 + 四个面板"的展示编排。
  */
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { BoardPanel, BudgetPanel, DagPanel, LOADING_NOTE, PresencePanel, StateNote } from './company-panels.tsx'
+import { DagGlyph, GaugeGlyph, GridGlyph, PeopleGlyph } from './tab-icons.tsx'
 import { useCompanyData, type CompanyDataInjected } from './use-company-data.ts'
 
 /** 本视图的 props（标准 session kit + owner props）。 */
@@ -22,11 +24,11 @@ export interface CompanyViewInjected extends CompanyDataInjected {
 
 type PanelKey = 'board' | 'dag' | 'presence' | 'budget'
 
-const PANELS: readonly { readonly key: PanelKey; readonly label: string; readonly kind: string }[] = [
-  { key: 'board', label: '看板', kind: 'company-board' },
-  { key: 'dag', label: '依赖图', kind: 'company-dag' },
-  { key: 'presence', label: '在场', kind: 'company-presence' },
-  { key: 'budget', label: '用量', kind: 'company-budget' },
+const PANELS: readonly { readonly key: PanelKey; readonly label: string; readonly kind: string; readonly tone: string; readonly Glyph: (props: { readonly size?: number | undefined; readonly className?: string | undefined }) => ReactNode }[] = [
+  { key: 'board', label: '看板', kind: 'company-board', tone: 'overview', Glyph: GridGlyph },
+  { key: 'dag', label: '依赖图', kind: 'company-dag', tone: 'structure', Glyph: DagGlyph },
+  { key: 'presence', label: '在场', kind: 'company-presence', tone: 'people', Glyph: PeopleGlyph },
+  { key: 'budget', label: '用量', kind: 'company-budget', tone: 'burn', Glyph: GaugeGlyph },
 ]
 
 /**
@@ -53,6 +55,9 @@ export function createCompanyView(injected: CompanyViewInjected) {
               aria-selected={panel === entry.key}
               onClick={() => { setPanel(entry.key) }}
             >
+              <span className={`wk-tab-title wk-tone-${entry.tone}`}>
+                <entry.Glyph size={13} />
+              </span>
               {entry.label}
             </button>
           ))}
@@ -64,7 +69,7 @@ export function createCompanyView(injected: CompanyViewInjected) {
             title={`把「${current?.label ?? ''}」拖出成浮窗（可移动 / 可缩放）`}
             onClick={() => { if (current !== undefined) injected.floatPanel(current.kind) }}
           >
-            浮出
+            浮出{current?.label ?? ''}
           </Button>
         </div>
         <div className="wk-view-body">
