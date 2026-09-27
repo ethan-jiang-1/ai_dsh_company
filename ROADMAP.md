@@ -52,6 +52,7 @@
 | **多人门的折中视图**（L1-E 激活：默认只见自己的门 + 一键切全局；实验 D 用户裁决「A、B 都不对，要折中」） | [multi-human-ux 毕业稿 §结论](./notes/implemented/2026-09-26-multi-human-ux.md) | **client 红线未解除**（demo 期不做 client 增强，2026-09-25 裁）；实验 D 两配置均已由用户本人否决（A 红线触发 / B 隔离过度） | 用户点名开工 client 增强时（届时先过 client 红线裁决） |
 | **会话库共享文件系统后端**（S3 类；用户部署路径裁决：先本地调通，将来迁共享 FS，"只要是一个共享文件系统就行"） | [multi-human-ux 毕业稿 §结论](./notes/implemented/2026-09-26-multi-human-ux.md)（配置 B 人判腿 2026-09-26） | MVP 未到；DSH 会话库后端属上游能力（`dshHomePath`），本仓不自建（D13） | MVP 多人部署阶段；届时向上游提 seam 或评估部署架构 |
 | **委派会话的人机审批路由** | [implemented/multi-human-role-routing](./notes/implemented/2026-09-26-multi-human-role-routing.md) §机制结论 | 子会话 `approval/policy` 硬编码 `never` ⇒ 分身发起的签字审批自动被拒、到不了人；人机审批实际是 Lead 专属 | 上游任一 seam：① 委派会话 `approvalPolicy` 可配置；② 审批按授权面路由 |
+| **浮窗 raise 不置顶（vendor rc.2 缺陷）** | [ux-sweep round1 §补修](./notes/implemented/2026-09-28-ux-sweep-round1.md) | 格子化浮窗路径缺 per-pane z-index（全部 cell 同层，叠放=DOM 序恒定）；本仓已用 CSS 垫片修复（:has 锚定 active cell 抬层） | 上游修 rc.2 该路径时撤垫片；或用户决定向上游提 seam |
 | **消息级协作动态流** | [implemented/r5b-cockpit](./notes/implemented/2026-09-23-r5b-cockpit.md) | host 侧 team 事件通道已核实，但客户端 stub 由 vendor codegen 生成、本 pack 无接线；自建 codegen 不值一轮 | 上游提供 pack 侧 stub 生成，或公开 host-only 投影读 RPC |
 
 ## 维护规则

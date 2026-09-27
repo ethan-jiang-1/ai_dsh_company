@@ -2,6 +2,7 @@
 
 | 日期 | 意图与交付（动机 + 外部可观察行为；交付行含交付清单与验证证据摘要） | 状态 |
 |---|---|
+| 2026-09-28 | **浮窗 Z 序修复（已交付，用户报：点后面的浮窗不置顶）**：根因 = vendor rc.2 格子化浮窗路径所有 cell 共用 z-60（叠放=DOM 序恒定，raise 只翻 active 不重排层）；修 = CSS 垫片（:has 锚定，激活 cell 62/未激活 61，零 vendor 改动）；验证 = playwright 双浮窗 elementFromPoint 顶层翻转 + 来回切换；vendor 缺口登记搁置池 | 已交付 → [ux-sweep round1 §走查后补修](./implemented/2026-09-28-ux-sweep-round1.md) |
 | 2026-09-28 | **UX 走查第一轮（已交付，ongoing goal）**：playwright 全程模拟用户（会话流/公司视图/8 页签面板逐个快照/双浮窗/窄浮窗溢出/console 全收集）→ 三件小修：公司视图子页签补 icon×4+tone、PanelFrame 内容区横向滚动（380px 浮窗表格实测被裁→可滚 296px）、「浮出」按钮动态对象名（浮出看板…消同名歧义）；不修清单五项带理由落 Note | 已交付 → [implemented/2026-09-28-ux-sweep-round1.md](./implemented/2026-09-28-ux-sweep-round1.md) |
 | 2026-09-27 | **公司页签 icon × 语义色向（已交付，用户点名即做）**：8 页签独特 SVG glyph + 四色向体系（琥珀注意/蓝执行/紫机制/绿人心，--dsw-static 令牌族主/次两档），经 keyed 槽 sidebar.right.pane.tab.title **一处注册两处生效**（页签条 chip + 浮窗头，零 vendor 改动）；RFC 先落 proposed 显性化（用户令）后同日毕业；验收 = tsc/tsdown + client-load-smoke + playwright 计算样式断言 9 对色值逐对等于令牌 + 截图；两个排练场测试会话已清 | 已交付 → [implemented/2026-09-27-ux-tab-icons.md](./implemented/2026-09-27-ux-tab-icons.md) |
 | 2026-09-27 | **常驻层瘦身 + 预算棘轮（已交付，用户批）**：dev-loop §7 整段迁 guides/bootstrap.md（467→376，17 处引用同步零断链）；index 台账并行压指针（149→139）；AGENTS 修剪（108→100）；预算棘轮下调只降不升（105/146/395，≥5% 头寸）；顺带清两个「你好」空会话（CEO/CFO 开门测试遗留，已备份）。doc-budget 负例复验 + verify/test 全绿 | 已交付 → [implemented/2026-09-27-standing-layer-slim.md](./implemented/2026-09-27-standing-layer-slim.md) |

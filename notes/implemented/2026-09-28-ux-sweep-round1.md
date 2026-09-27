@@ -23,6 +23,18 @@ playwright 模拟真实用户全流程（每阶段独立容错）：进入 → �
    侧栏面板的「浮出」同名并排（走查脚本 strict violation 即真人也会歧义的证据）；tooltip 本就带对象名，
    现在按钮文本也带。侧栏面板的按钮保持通用「浮出」（语境在面板头内）。
 
+## 走查后补修（用户报：点后面的浮窗不置顶）
+
+- **浮窗 Z 序修复**（styles.ts，零 vendor 改动的 CSS 垫片）：根因 = vendor rc.2 格子化浮窗路径
+  （`data-dockkit-host:"float"` cell）所有浮窗 cell 共用 `z-index: var(--dsh-dockkit-float-layer, 60)`——
+  **同一值**，相互叠放靠 DOM 顺序（按 tab id 排序、恒定）；raise 只翻 `data-dockkit-float-active`
+  不重排绘制层 ⇒ 点亮了还压在底下（elementFromPoint 实证复现）。bundle 里另一套 FloatLayer
+  （带 per-pane zIndex）存在但未在用。修法：`div:has(> section[data-dockkit-float(-active)])` 把
+  激活浮窗 cell 抬 62、未激活 61（高于基座 60，不碰 vendor 变量约定；特异性 (0,1,2) 盖过
+  .floatingCell (0,1,0) 与加载顺序无关）。验证 = playwright 双浮窗重叠，点露出的边条 →
+  elementFromPoint 顶层翻转，来回切换正常（cellZ 62/61 交替实证）。**vendor 缺口已登记搁置池**
+  （上游条件成立时提 seam：格子化路径补 per-pane z-index）。
+
 ## 有意不修（带理由）
 
 | 发现 | 不修理由 |

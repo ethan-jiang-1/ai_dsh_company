@@ -421,6 +421,16 @@ const CSS = `
   padding: 0.12rem 0.55rem;
   border-radius: 999px;
 }
+
+/* ── 浮窗 Z 序修复（用户报 2026-09-28：点后面的浮窗不置顶）────────────────────
+   根因（vendor rc.2 格子化浮窗路径）：浮窗 cell 统一 z-index 60（--dsh-dockkit-float-layer），
+   相互叠放 = DOM 顺序（按 tab id 排序、恒定）；raise 只翻 data-dockkit-float-active，
+   不重排绘制层 ⇒ 点亮了还压在底下。修法（我们面，零 vendor 改动）：
+   激活浮窗的 cell 抬到 62、未激活浮窗 61（均高于基座 60，不碰 vendor 对外变量约定）。
+   cell 是 css-module 类不可依赖 ⇒ :has(>) 从子节点 [data-dockkit-float] 锚定；
+   div:has(> section[...]) 的特异性 (0,1,2) 盖过 .floatingCell (0,1,0)，与加载顺序无关。 */
+div:has(> section[data-dockkit-float]) { z-index: calc(var(--dsh-dockkit-float-layer, 60) + 1); }
+div:has(> section[data-dockkit-float-active]) { z-index: calc(var(--dsh-dockkit-float-layer, 60) + 2); }
 `
 
 /**
