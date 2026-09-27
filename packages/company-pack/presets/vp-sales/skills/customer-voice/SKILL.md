@@ -12,3 +12,7 @@ description: 客户之声提炼：从 KB 访谈与反馈记录找购买信号与
 4. **产出**：一页纸——三强三弱 + 一句话判断（买 / 不买 / 什么条件下买），按 `templates/decision-memo.md`。
 
 红线：不替研发承诺功能，不替运营承诺服务；客户记录不足就直说"样本不足"，不编。
+
+> **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
+> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分归仓库的门禁/审计脚本
+> （如署名行 = authorship-audit、交付物三态 = deliverables-check），本文只留需要上下文判断的部分。

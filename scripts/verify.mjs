@@ -21,6 +21,7 @@ const expectedTag = 'dsh-v0.1.7-rc.2'
 const expectedSha = '477b4f420553e8a52c2fbccc464d7561b239c443'
 
 // ── 1. Markdown：严格 UTF-8 + 单个结尾换行 ──────────────────────────────────
+// 负例留证 2026-09-27：临时 md 无尾换行 → md-newline 红（还原后绿）。
 const mdFiles = []
 const walk = (dir) => {
   for (const e of readdirSync(dir, { withFileTypes: true })) {
@@ -41,6 +42,7 @@ for (const p of mdFiles) {
 ok(`md-utf8/newline ×${mdFiles.length}`)
 
 // ── 2. 当前源文档的 Markdown 引用：文件 + 标题锚点 + reference definitions ──────
+// 负例留证 2026-09-27：公司手册追加死链 → link 红。
 // 磁盘发现含未跟踪的新 Note；根部/docs/notes/pack + 公司手册/章程/org/templates。
 // 生成物、vendor 源、dev/snapshots、journal/deliverables、明确归档不作出链检查源。
 const links = validateMarkdownLinks(root)
@@ -50,13 +52,14 @@ for (const v of links.violations) {
 if (links.violations.length === 0) ok(`md-links (含 notes) ×${links.linkCount} / ${links.files.length} files`)
 
 // ── 2c. 行数预算（缩编自 vendor `verify-doc-budgets`；防入口链继续膨胀——R6 D23/清单 B #52） ──
+// 负例留证 2026-09-27：AGENTS.md 临时超上限 → doc-budget 红。
 // 上限 = 立项时值 + 余量；超限先搬（内容挪到该去的家）再压，确需空间才在 Note 里说明后升上限。
 // ⚠ 注释里**不要复述当前行数**——那是易腐常量，实测值由每次跑出的 PASS 行给出（2026-09-26 修：
 //   原注释写"后 107 行"/"整治后 131"，实为 108 / 142，属"枚举型事实写两处"那一类腐化）。
 const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 115],            // 2026-09-23 二次收口（渐进披露）；指针化内容住 release.md / index / guides/dev-loop
   ['docs/index.md', 149],        // 2026-09-24 基石整治后定 145；2026-09-26 升至 147：+D29 行；再升至 149：+D30 research 三态行 + notes/archived/rejected 索引行（用户令）
-  ['docs/guides/dev-loop.md', 466], // 2026-09-25 收割轮升至 448：+§2 进程内查询档（inspect/schema 工具）等三处小登记（依据 = harvest-ledger #5/#13），说明在 verify 提升处与台账；2026-09-26 升至 466：+§13 人侧反馈协议（实例先行，D29 用户令）
+  ['docs/guides/dev-loop.md', 467], // 2026-09-25 收割轮升至 448：+§2 进程内查询档（inspect/schema 工具）等三处小登记（依据 = harvest-ledger #5/#13），说明在 verify 提升处与台账；2026-09-26 升至 466：+§13 人侧反馈协议（实例先行，D29 用户令）；2026-09-27 升至 467：+§2 inspect≠授权边界一句（FAQ 07 四边界核对，审计 = notes/archived/2026-09-27-harness-gap-audit-faq07.md）
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
   const lines = readFileSync(join(root, rel), 'utf8').split('\n').length - 1
@@ -66,6 +69,7 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
 }
 
 // ── 2d. 裸路径门禁（notebook-hygiene §机械防线，2026-09-25；2026-09-26 扩面）─────────
+// 负例留证 2026-09-27：公司手册反引号死路径 → bare-path 红（⚠ 负例要真破坏子串——includes 是子串匹配）。
 // 为什么：活指针腐化有复发史（AGENTS 写 `notes/rejected/` 而目录不存在；升 pin 后旧机制引用漂移）。
 // md-links 门禁只管 Markdown 链接，管不到反引号里的裸路径。
 // **2026-09-26 扩面**（技术债清扫 B 组）：原范围只有导航五文件，而腐化实际长在 docs/design、
@@ -153,6 +157,7 @@ if (!barePathBad) {
 }
 
 // ── 2e. pin 版本一致性门禁（2026-09-26 立，技术债清扫 B2/B3/B4 类）───────────────
+// 负例留证 2026-09-27：簿记 SHA 漂一字 → pin-bookkeeping 红；README 现在时行过期 pin 字面量 → pin-currency 红。
 // 为什么：升 pin 的消费面只改了一半——代码改对了，叙述机制的老文档留在上一代（dev-loop 头部
 // 自称"已在 0.1.5-rc.2 核对"、index 的 `_digested` 行写 0.1.5-rc.2、release.md 的依赖与矩阵示例）。
 // 这类"易腐常量多拷贝、无机械单一源"没有守卫，只能靠人交叉核对。
@@ -194,7 +199,8 @@ for (const rel of NOW_FILES) {
 }
 if (!pinBad) ok(`pin-currency ×${pinCount}（现在时文件的 dsh-v 字面量 = ${expectedTag}；intents 日志与 ROADMAP 历史段按性质排除）`)
 
-// ── 2f. 脚本触发条件门禁（2026-09-26 立，技术债 B7/R5 类）───────────────────────
+// ── 2f. 脚本触发条件门禁（2026-09-26 立，技术债 B7/R5 类）───────────────
+// 负例留证 2026-09-27：探针头注「何时跑」改形 → script-triggers 红。────────
 // 为什么：dev-loop §9.1 被 AGENTS.md 指定为"何时跑"的唯一家，却漏了 6 个已存在脚本，而 AGENTS.md
 // 又把它指回 §9.1——成环，fresh agent 查"dag-visual 什么时候跑"两处都查不到。
 // 根因是"枚举型事实写在文档里、实现那处更新了"（本仓六份清单同一种病）。
@@ -210,6 +216,7 @@ missingTrigger.length === 0
 
 
 // ── 3. preset 结构：5 角色 × (声明文件 + ≥1 skill) ─────────────────────────
+// 负例留证 2026-09-27：移走一个 SKILL.md → skill-file 红。
 // 0.1.7 起显示名/描述/order 内联进 `agent.cordis.yml` 的 `dsh-agent-preset` 行（原 preset.yml 并入），
 // 故这里只要求声明文件；挂载验证归 preset-smoke（真 web 逐角色建会话）。
 const roles = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
@@ -229,6 +236,7 @@ for (const role of roles) {
 ok(`presets ×${roles.length}`)
 
 // ── 4. CLAUDE.md symlink → AGENTS.md ────────────────────────────────────────
+// 负例留证 2026-09-27：CLAUDE.md 换成普通文件 → claude-symlink 红。
 const claude = join(root, 'CLAUDE.md')
 try {
   if (!lstatSync(claude).isSymbolicLink() || readlinkSync(claude) !== 'AGENTS.md') fail('claude-symlink', 'CLAUDE.md 应为指向 AGENTS.md 的 symlink')
@@ -236,6 +244,7 @@ try {
 } catch { fail('claude-symlink', 'CLAUDE.md 不存在') }
 
 // ── 5. vendor/dsh：submodule 钉在簿记 SHA，且工作树**一个字节都不许改**（铁律）──────
+// 负例留证 2026-09-27：submodule HEAD 移到 HEAD~1 → vendor-pin 红；vendor 内 tracked 文件加一字节 → vendor-clean 红；.gitmodules URL 破坏 → gitmodules 红。
 // 铁律的允许面（见 AGENTS.md §vendor 铁律）：**只读** + 在 vendor 内产生 **gitignore 覆盖的
 // 构建产物**（lib/、dist/、node_modules/——"从源码跑"要求构建，构建必须在树内）。
 // 任何 tracked 文件的改动、或未被 gitignore 的新文件，都判 FAIL。
@@ -259,6 +268,7 @@ else {
 }
 
 // ── 6. pack 形状：dsh.bundle.patch 指向的文件存在 + 兼容矩阵覆盖钉住的 tag ──────
+// 负例留证 2026-09-27：patch 指向不存在文件 → pack-bundle 红；矩阵滤掉当前 tag → pack-compat 红。
 const pack = JSON.parse(readFileSync(join(root, 'packages/company-pack/package.json'), 'utf8'))
 // 0.1.7 起 `dsh.bundle.patch` 可以是字符串或**数组**（registry + 每预设一个 patch 文件）。
 const patchRel = pack?.dsh?.bundle?.patch
@@ -275,6 +285,7 @@ if (!Array.isArray(compatReleases) || !compatReleases.includes(expectedTag)) {
 } else ok(`pack-compat (${expectedTag} ×${String(compatReleases.length)})`)
 
 // ── 7. preset 行引用的插件必须在 pack 依赖声明里（R5a 起：dependencies ∪ peerDependencies）──
+// 负例留证 2026-09-27：行引用未声明依赖的插件 → preset-dep 红。
 // DSH 的 verify-cordis-config 同构门禁（AGENTS.md：cordis.yml 的裸插件必须出现在
 // 其解析清单的 dependencies）。漏了 → profile 安装后行解析不到 → preset 标记 broken，
 // UI 里给不出可用角色（R1 实证：persona / skill-filesystem 缺依赖）。
@@ -298,6 +309,7 @@ for (const role of roles) {
 ok(`preset-row-deps ×${rowPlugins.size}`)
 
 // ── 8. client 两半声明一致（DSH verify-cordis-config 的 validateClientHalvesDeclared 同构）──
+// 负例留证 2026-09-27：删 dsh.client 声明（导出仍在）→ client-half 红。
 // 规则：导出 "./client" ⟺ 声明 dsh.client。不一致时该包"组合得上、激活得了、什么都不贡献"，
 // 且**任何地方都不报错**。⚠ 宿主那条门禁只扫 `packages/client/*/package.json`，**覆盖不到本仓
 // 的 client 面**（R1 实证：这条缺口让一个 client 插件静默挂不上，UI 里什么都没有）。
@@ -328,6 +340,7 @@ for (const entry of ownPackages) {
 ok(`client-halves ×${clientHalves.length}`)
 
 // ── 9. 提案纪律：roadmap 必须把 notes/proposed/ 消化掉 ─────────────────────
+// 负例留证 2026-09-27：无归宿提案 → proposal-scheduled 红；「已交付」状态滞留 proposed → proposal-graduated 红。
 // 起因（R4 收尾后实测，用户要求"roadmap 一定要消化掉 notes/proposed 里的东西"）：`notes/proposed/`
 // 里一条提案被写进某轮的"做什么"列，整轮跑完却从没实现——直到有人**想起来问**才发现。文档纪律
 // （一处事实一个家）管不住"登记了但没人做"，所以变成两条门禁：
@@ -370,6 +383,7 @@ notGraduated.length === 0
   : fail('proposal-graduated', `这些提案已消化却仍在 notes/proposed/（搬到 notes/implemented/ 并写明条目去向）：${notGraduated.join(', ')}`)
 
 // ── research 层活状态行门禁（2026-09-26，用户指认「research 挂一堆东西」的防复发）─────────
+// 负例留证 2026-09-27：无户口活研究稿 → research-liveness 红。
 // 规则（D30）：research/ = 未完结研究（TODO 语义，dev-loop §12）；完结迁 notes/archived/、过时迁 notes/rejected/。
 // 每份未完结文件必须自带户口：前 10 行有「状态：」行，且前 12 行内写明「喂给谁」或「毕业动作」。
 // 索引 README.md（curated entry point）豁免。

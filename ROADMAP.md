@@ -24,15 +24,6 @@
 - **dev home 的探针会话残留**（gitignored 运行态）：驾驶舱会话库留着多场证据会话与已退役的
   `company` profile。都是证据，留着无妨；谁来磨 = 维护者；何时磨 = 需要腾空间或做干净 demo 时
   （清法 = UI 里删会话 + 删 profile 目录）。
-- **反馈 enforcement 通道（git pre-push hook + 可选最小 CI）**：全部门禁目前靠「记得跑」——无
-  pre-push hook、无 CI 穷举档。依据 = FAQ 07 立场 2（agents follow enforced gates far more
-  reliably than prose；对照审计 = [archived/harness-gap-audit-faq07](./notes/archived/2026-09-27-harness-gap-audit-faq07.md)
-  §反馈维）。谁来磨 = 维护者；何时磨 = 用户点名，或下轮打磨轮；磨法 = pre-push 接 `pnpm verify`
-  （秒级全门禁），负例控制 = 装好后故意改坏一个链接推一次看红；CI 为可选第二档（verify + test）。
-- **收尾级补强：skill 边界三件套 + inspect≠授权边界一句 + 门禁反证账盘点**：10 个 SKILL.md 补
-  「guidance 不是 checklist / 命中先读全文 / 可机械部分指向门禁」；dev-loop §2 补一句 inspect
-  不是授权边界；对照 `scripts/verify.mjs` 盘点哪些门禁缺留证反例并补做（口径 = 只回滚实现保留测试）。
-  谁来磨 = 维护者；何时磨 = 用户点名（skill 改动完成定义 = preset-smoke）。
 
 ## 搁置池（suspended：不占轮、不研究、留复活条件）
 

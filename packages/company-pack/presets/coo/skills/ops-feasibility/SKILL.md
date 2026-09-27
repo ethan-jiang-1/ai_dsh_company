@@ -14,3 +14,7 @@ description: 运营可行性核查：人力/流程/时程三条逐项过——�
 
 红线：只谈落地与合规；技术可行性归研发、市场需求归销售，不代答。
 需要更多事实支撑时优先读自己的 KB（`kb/coo/`），不够再派 one-shot worker 盘点。
+
+> **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
+> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分归仓库的门禁/审计脚本
+> （如署名行 = authorship-audit、交付物三态 = deliverables-check），本文只留需要上下文判断的部分。

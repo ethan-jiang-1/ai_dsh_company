@@ -1,0 +1,9 @@
+#!/bin/sh
+# pre-push：push 前跑全量结构门禁（enforcement 通道，2026-09-27 立；接线 = dev/env.sh 幂等设 core.hooksPath）。
+# 为什么：DSH 立场——"Agents follow enforced gates far more reliably than prose conventions"。
+#        verify 秒级（实测 ~2s），全量进 hook 不越「hook 只装便宜高置信缺陷」的预算（DSH lefthook 同款边界）。
+# 负例留证（2026-09-27）：AGENTS.md 临时加死链 → push 被 verify 拦下（未触网络层）；还原 → 放行到网络层。
+# bypass：git push --no-verify（紧急逃生门；用了要在收尾 Note 说明原因）。
+[ -t 0 ] || cat >/dev/null   # 消费 stdin 的 ref 清单（git push 管道喂入；手动直跑时不阻塞）
+cd "$(git rev-parse --show-toplevel)" || exit 1
+exec node scripts/verify.mjs

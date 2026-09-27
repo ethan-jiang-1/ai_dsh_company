@@ -15,3 +15,7 @@ description: 财务合规核查：SoD（出纳不做账、出稿与审核两人�
 6. **格式与交付**：按 `templates/decision-memo.md` 结构，一页纸为限，交付到 `deliverables/<slug>/drafts/cfo.md`。
 
 红线：只谈财务与合规；技术可行性归研发、落地安排归运营，不代答。
+
+> **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
+> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分归仓库的门禁/审计脚本
+> （如署名行 = authorship-audit、交付物三态 = deliverables-check），本文只留需要上下文判断的部分。

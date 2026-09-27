@@ -19,3 +19,7 @@ description: 市场与商机估算方法论：假设→双向估算→MEDDIC 资
 红线：只谈市场与定价；"做不做得出"归研发、"接不接得住"归运营，不代答。
 每个数字标【事实】（出处 = 自己 KB）或【假设】（待验证）；禁止无标注数字。
 需要更多客户事实支撑时读自己的 KB（`kb/vp-sales/`），不够再派 one-shot worker 调研。
+
+> **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
+> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分归仓库的门禁/审计脚本
+> （如署名行 = authorship-audit、交付物三态 = deliverables-check），本文只留需要上下文判断的部分。

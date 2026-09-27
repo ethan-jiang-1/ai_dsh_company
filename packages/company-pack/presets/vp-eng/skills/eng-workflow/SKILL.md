@@ -14,3 +14,7 @@ description: VP-Eng 的工作流（1 号）：接到评审 / 技术任务的端�
 5. **回执**：向任务板回状态与修订；向 `kb/vp-eng/journal/` 追加纪要——**没写 journal = 任务未完成**，不许宣称收工（硬闸门；执行期两次实证缺席，2026-09-25 收紧）。
 
 > 这是 VP-Eng 的第 1 个工作流；后续新工作流按 `eng-workflow-<主题>` 命名追加。
+
+> **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
+> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分归仓库的门禁/审计脚本
+> （如署名行 = authorship-audit、交付物三态 = deliverables-check），本文只留需要上下文判断的部分。

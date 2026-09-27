@@ -33,7 +33,7 @@ corepack enable pnpm                   # 一次性：pnpm 走 corepack（package
 pnpm install                           # workspace 解析；引导全配方（含 vendor 构建）见 guides/dev-loop §7
 source dev/env.sh                      # 双 home 兜底 + 裸 dsh 拦截（DSH_HOME=dev/harness-home）。⚠ coding 会话里
                                        #   DSH_HOME 继承且带日用值，漏 source 不报错、安静用错 home（guides/dev-loop §6 第 5 条）
-pnpm verify                            # 结构门禁（清单唯一源 = scripts/verify.mjs；跑一次看 PASS 行即得全表，本行不复述）
+pnpm verify                            # 结构门禁（清单唯一源 = scripts/verify.mjs；跑一次看 PASS 行即得全表，本行不复述；push 侧 pre-push hook 强制）
 pnpm test                              # keyless 回归（vitest；数量与耗时以实跑为准；真模型/浏览器不进回归，tests/layering.spec.ts 守卫）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）
 node scripts/preset-smoke.mjs          # preset 改动的**完成定义**（触发条件与成本见该脚本头注；挂载失败只有它抓得到）

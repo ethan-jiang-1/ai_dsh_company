@@ -77,6 +77,7 @@
 **进程内查询（rc.2 收割）**：角色会话里 `cordis_inspect_list` 发现 Inspect Provider 与方法、
 `cordis_inspect_query` 按 schema 精查挂载与 Config（preset 已挂 `tool-cordis` 行）；组合层另有
 `dsh --dump-config-schema` 自描述配置 schema——三者回答"这台进程现在真跑着什么"（对照 §5 升 pin 扫描）。
+⚠ inspect 是**可见性工具，不是授权边界**（vm 只防意外全局污染，不替代 sandbox/approval）——「查得到」不等于「被授权」（FAQ 07 四边界；2026-09-27 补）。
 ## 3. 设计四问（R3+ 写第一行 JS 前必答）
 
 | 问 | 判据 | 本 repo 落点 |
@@ -441,7 +442,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - 条目收尾后可派**中立体清扫**（独立子代理；输入 = diff + 收尾 Note + ROADMAP 行；固定清单格式与首跑样例见 [implemented/notebook-hygiene](../../notes/implemented/2026-09-25-notebook-hygiene.md) 实况）——扫与修分家。
 - 文档卫生按指导价值：移除失效/重复指令与无行动价值的历史噪声；保留仍指导当前决策、解释约束或支持复验的证据。不以净减行数为目标（D26）。
 - **`notes/intents.md` 的行 = 一行指针**（日期 + 一句话 + 状态 + 链接），**详情归对应 Note**——在行里复述 Note 内容是造重复事实家（2026-09-26 实测：5 天 585B → 40.5KB、≈600B/行，且与 Note 双写）。历史行只留指针，不回填细节。
-- **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链一律 `set -o pipefail` + `&&`（不带 pipefail 的 `cmd | tail` 退出码是 `tail` 的 = 假绿）。
+- **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链一律 `set -o pipefail` + `&&`（不带 pipefail 的 `cmd | tail` 退出码是 `tail` 的 = 假绿）。push 由 **pre-push hook 强制跑全量 `pnpm verify`**（2026-09-27 立，enforcement 通道；接线 = `source dev/env.sh` 幂等设 `core.hooksPath`；bypass = `--no-verify`，用后须在收尾 Note 说明原因）。
 
 ## 13. 自主优先协议（2026-09-26 立，用户令；D29）
 

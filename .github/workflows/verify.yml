@@ -1,0 +1,20 @@
+# CI 穷举档（enforcement 通道第二档，2026-09-27 立）：干净环境跑全量结构门禁。
+# 为什么：pre-push hook 防「忘了跑」，CI 防「本地环境差异」与「--no-verify 绕过」（DSH：CI owns exhaustive）。
+# 只跑 verify（零 npm 依赖、秒级——scripts/verify.mjs 与其 lib 仅用 node 标准库）；test lane 需要
+# 全量构建链（dev-loop §7），触发条件成立再后加（第二贡献者进场 / 忘跑成为实际频率）。
+# ⚠ 首跑验证待网络恢复推送后在 Actions 看（写就时 ssh.github.com:443 间歇故障，本地无法预演）。
+name: verify
+on:
+  push:
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/verify.mjs
