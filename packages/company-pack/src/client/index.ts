@@ -1,5 +1,6 @@
 /** 浏览器半：部署品牌（侧栏）+ 团队任务板（会话头部）+ 公司驾驶舱页签（右栏，R5b）。 */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
+import type { ReactNode } from 'react'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
@@ -21,6 +22,8 @@ import { LedgerTab } from './LedgerTab.tsx'
 import {
   AttentionTabTitle, BoardTabTitle, BudgetTabTitle, CultivationTabTitle,
   DagTabTitle, LedgerTabTitle, PresenceTabTitle, TasksTabTitle,
+  AttentionGuideIcon, BoardGuideIcon, BudgetGuideIcon, CultivationGuideIcon,
+  DagGuideIcon, LedgerGuideIcon, PresenceGuideIcon, TasksGuideIcon,
 } from './tab-icons.tsx'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
@@ -224,33 +227,38 @@ export async function apply(ctx: ClientContext): Promise<void> {
      * @param title - 页签与 guide 的标题。
      * @param description - guide 描述。
      * @param order - guide 排序。
+     * @param icon - guide 条目 icon（右栏 Start 页那排胶囊；不填则出厂立方体占位——
+     *   RFC icon × 语义色向：与页签 chip / 浮窗头同一 glyph 同一 tone）。
      */
-    const registerType = (id: string, kind: string, title: string, description: string, order: number): void => {
+    const registerType = (
+      id: string, kind: string, title: string, description: string, order: number,
+      icon: (props: { readonly size?: number | undefined; readonly className?: string | undefined }) => ReactNode,
+    ): void => {
       scoped.effect(() => scoped.sidebarRightTabs.register({
         id,
         kind,
         priority: 'extension',
         title: () => title,
-        guide: [{ id, order, title: () => title, description: () => description }],
+        guide: [{ id, order, title: () => title, description: () => description, icon }],
       }), `company-pack: ${kind} tab type`)
     }
 
     registerType('dsh-company-pack/attention', 'company-attention', '需要你',
-      '注意力中心：谁在等你（问询/审批/升级）+ 刚完成', 50)
+      '注意力中心：谁在等你（问询/审批/升级）+ 刚完成', 50, AttentionGuideIcon)
     registerType('dsh-company-pack/board', 'company-board', '看板',
-      '任务看板：活到哪一步（owner / 依赖 / 修订号）', 51)
+      '任务看板：活到哪一步（owner / 依赖 / 修订号）', 51, BoardGuideIcon)
     registerType('dsh-company-pack/dag', 'company-dag', '依赖图',
-      '任务依赖图：谁依赖谁、关键路径', 52)
+      '任务依赖图：谁依赖谁、关键路径', 52, DagGuideIcon)
     registerType('dsh-company-pack/presence', 'company-presence', '在场',
-      '组织在场板：谁在忙、忙什么；点行进成员空间', 53)
+      '组织在场板：谁在忙、忙什么；点行进成员空间', 53, PresenceGuideIcon)
     registerType('dsh-company-pack/budget', 'company-budget', '用量',
-      '令牌用量与占比（只做令牌，不做美元）', 54)
+      '令牌用量与占比（只做令牌，不做美元）', 54, BudgetGuideIcon)
     registerType('dsh-company-pack/tasks', 'company-tasks', '任务板',
-      '共享任务表：状态 / owner / 依赖 / 修订号', 55)
+      '共享任务表：状态 / owner / 依赖 / 修订号', 55, TasksGuideIcon)
     registerType('dsh-company-pack/cultivation', 'company-cultivation', '培养',
-      '养 Agent：journal 待审收件箱 + 提升流程', 56)
+      '养 Agent：journal 待审收件箱 + 提升流程', 56, CultivationGuideIcon)
     registerType('dsh-company-pack/ledger', 'company-ledger', '台账',
-      '动议台账：公司累计干了什么（日期/类型/参与/成品/结论）', 57)
+      '动议台账：公司累计干了什么（日期/类型/参与/成品/结论）', 57, LedgerGuideIcon)
 
     // 培养面板的文件读取闭包（驾驶舱④）：经会话身份读当前工作区；失败降级 null（面板如实显示）。
     const listJournal = async (sessionId: SessionId, role: string, signal: AbortSignal): Promise<readonly string[] | null> => {

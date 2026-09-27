@@ -39,14 +39,16 @@
 
 ## 交付实况
 
-- **文件**：`packages/company-pack/src/client/tab-icons.tsx`（8 glyph + 8 标题组件，新增）；
-  `index.ts`（+8 条 `sidebar.right.pane.tab.title` keyed 槽登记，与 pane.tab 登记同块）；
-  `styles.ts`（+`wk-tab-title` 布局 + 8 个 tone 类，全部 `var(--dsw-static-*)`，零字面色）。
+- **文件**：`packages/company-pack/src/client/tab-icons.tsx`（8 glyph + 8 标题组件 + 8 guide icon 组件，新增）；
+  `index.ts`（+8 条 `sidebar.right.pane.tab.title` keyed 槽登记；`registerType` 扩 icon 参 → guide 条目
+  同一 glyph 同一 tone——**guide 页是独立渲染路径**（`SidebarRightGuideEntry.icon`，不填画出厂立方体占位），
+  用户走查抓到这一缺口后补）；`styles.ts`（+`wk-tab-title` 布局 + 8 个 tone 类，全部 `var(--dsw-static-*)`，零字面色）。
 - **验收（2026-09-27 实跑）**：① `tsc -b packages/company-pack` 零错 + tsdown client 面构建；
   ② `client-load-smoke` ALL PASS（真浏览器零挂载失败）；③ playwright 实证：8 页签 chip 全开
   （DOM 断言 icon ×8 在场）、**计算样式断言色值逐对等于令牌解析值**（#f59e0b≡rgb(245,158,11) 等
   8 对 + 浮窗头 1 对，hex↔rgb 离线精确比对全等），浮窗头（`data-dockkit-float-title`）icon 在场
-  且色值正确；截图 = /tmp/wk-strip.png、/tmp/wk-float-title.png、/tmp/wk-float-window.png、/tmp/wk-full.png
+  且色值正确；**guide 页（右栏 Start）8 条目同批断言 8/8 OK**（用户走查反馈后补测）；截图 =
+  /tmp/wk-strip.png、/tmp/wk-float-title.png、/tmp/wk-float-window.png、/tmp/wk-full.png、/tmp/wk-guide.png
   （一次性运行态证据，不进版本库）；④ verify ALL PASS + test 全绿。
 - **踩坑记录**（未来复用）：① guide（Start）页签是右栏空态——开第一个真页签即被替换，
   多开用页签条的 `[data-dockkit-add-tab]`（+按钮）逐个唤出 guide 再点条目；② playwright 断言令牌值

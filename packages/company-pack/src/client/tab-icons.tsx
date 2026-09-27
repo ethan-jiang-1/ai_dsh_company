@@ -174,3 +174,34 @@ export function PresenceTabTitle(): ReactNode {
 export function CultivationTabTitle(): ReactNode {
   return <TabTitle tone="growth" glyph={SproutGlyph} label="培养" />
 }
+
+/* guide 页条目 icon（右栏 Start 页那排胶囊；GuideBody 以 <Icon size={22|26}> 调用，
+   不填 icon 它画出厂立方体占位）。包 tone span = 与页签 chip / 浮窗头同一 icon 同一色。 */
+
+/** guide 条目 icon 骨架：tone 色包装 + glyph，透传 size/className（IconProps 形状）。 */
+function guideIcon(tone: string, GlyphComponent: (props: GlyphProps) => ReactNode): (props: GlyphProps) => ReactNode {
+  return function GuideIcon({ size = 22, className }: GlyphProps): ReactNode {
+    return (
+      <span className={`wk-tab-title wk-tone-${tone}${className === undefined ? '' : ` ${className}`}`}>
+        <GlyphComponent size={size} />
+      </span>
+    )
+  }
+}
+
+/** 「需要你」guide icon（琥珀）。 */
+export const AttentionGuideIcon = guideIcon('attention', BellGlyph)
+/** 「看板」guide icon（蓝）。 */
+export const BoardGuideIcon = guideIcon('overview', GridGlyph)
+/** 「依赖图」guide icon（紫）。 */
+export const DagGuideIcon = guideIcon('structure', DagGlyph)
+/** 「在场」guide icon（绿）。 */
+export const PresenceGuideIcon = guideIcon('people', PeopleGlyph)
+/** 「用量」guide icon（琥珀次档）。 */
+export const BudgetGuideIcon = guideIcon('burn', GaugeGlyph)
+/** 「任务板」guide icon（蓝次档）。 */
+export const TasksGuideIcon = guideIcon('work', KanbanGlyph)
+/** 「培养」guide icon（绿次档）。 */
+export const CultivationGuideIcon = guideIcon('growth', SproutGlyph)
+/** 「台账」guide icon（紫次档）。 */
+export const LedgerGuideIcon = guideIcon('archive', LedgerGlyph)
