@@ -63,6 +63,13 @@
   `[data-dockkit-float-title] .wk-tab-title`，`color-mix` 14% 透明底——只命中浮窗头，侧栏 chip 不受影响；
   浮窗标题栏永远可见 = 最强一眼识别信号）。vendor 浮窗边框/底色属 dockkit chrome 不可动（那要 seam），
   我们的两个杠杆（头部内容 + 面板体）都用上了。
+- **配色微调（2026-09-27，用户走查：四蓝一片分不清）**：蓝系 4→3 且拉开明度——任务板 blue-500→**blue-800
+  藏青**、依赖图 deepseek-500→**deepseek-400 淡紫蓝**、台账 deepseek-400→**amber-600 赭色**（移出蓝系，账本
+  皮革色）；看板 blue-600 正蓝锚点不动。口诀更新：**琥珀喊你和记账（三档橙），三蓝干活分深浅（正蓝/淡紫/藏青），
+  绿色是人**。tone 类名不动只换令牌值 ⇒ chip/浮窗头色丸/面板色条/guide 全自动跟随。验证 = playwright 亮暗
+  双主题各 8/8 色值逐对等于令牌。**踩坑留档（构建管线）**：tsdown 入口是 `lib/types/**`（tsc 产物）——
+  改 src 后只跑 tsdown = 打包旧产物（本页一度验出旧色）；`rm -rf lib` 后只跑 tsdown 直接红（入口没了）。
+  正解 = §7 两步连跑；警告已补 bootstrap.md。
 - **验收（2026-09-27 实跑）**：① `tsc -b packages/company-pack` 零错 + tsdown client 面构建；
   ② `client-load-smoke` ALL PASS（真浏览器零挂载失败）；③ playwright 实证：8 页签 chip 全开
   （DOM 断言 icon ×8 在场）、**计算样式断言色值逐对等于令牌解析值**（#f59e0b≡rgb(245,158,11) 等

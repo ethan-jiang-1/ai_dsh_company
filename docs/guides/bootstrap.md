@@ -31,6 +31,7 @@ pnpm dsh web -- --port 3081 --no-open                                      # 端
 # 2026-09-25 起 solution root；⚠ 旧命令 `tsc -p tsconfig.json` 在 solution root 上静默不构建，即此坑的由来）：
 node ./node_modules/typescript/bin/tsc -b packages/company-pack
 (cd packages/company-pack && ../../node_modules/.bin/tsdown)
+# ⚠ 两步必须连跑：tsdown 的入口是 lib/types/**（tsc 的产物）——改 src 后只跑 tsdown = 打包上一次的旧产物（2026-09-27 实测：改 styles.ts 只跑 tsdown，页面仍旧色）；也别删 lib/ 再只跑 tsdown（入口没了直接红）
 # ③ client 面生效第三跳 = **用户浏览器刷新**（无 HMR：模块表 rev 会变，不刷新看的是旧 bundle）
 # ⚠ preset 内容与代码面不同步：link: 安装下改 presets/**（persona/skills）**即刻生效无需重建**，
 #   但 host/client 代码（src/**）走 lib/ 构建产物——**不重建 = 改动永远不生效**（2026-09-25 实证：

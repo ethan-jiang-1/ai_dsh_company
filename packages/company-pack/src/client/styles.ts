@@ -364,14 +364,19 @@ const CSS = `
 .wk-tab-title svg {
   flex: none;
 }
-.wk-tone-attention { color: var(--dsw-static-amber-500); }    /* 待办：注意·要人 */
-.wk-tone-burn      { color: var(--dsw-static-amber-400); }    /* 用量：注意·消耗 */
-.wk-tone-overview  { color: var(--dsw-static-blue-600); }     /* 看板：执行·总览 */
-.wk-tone-work      { color: var(--dsw-static-blue-500); }     /* 任务板：执行·工作台 */
-.wk-tone-structure { color: var(--dsw-static-deepseek-500); } /* 依赖图：机制·结构 */
-.wk-tone-archive   { color: var(--dsw-static-deepseek-400); } /* 台账：机制·账 */
+.wk-tone-attention { color: var(--dsw-static-amber-500); }    /* 待办：注意·要人（橙·中） */
+.wk-tone-burn      { color: var(--dsw-static-amber-400); }    /* 用量：注意·消耗（橙·亮） */
+.wk-tone-overview  { color: var(--dsw-static-blue-600); }     /* 看板：执行·总览（正蓝锚点） */
+.wk-tone-work      { color: var(--dsw-static-blue-800); }     /* 任务板：执行·工作台（藏青——与看板深浅分明） */
+.wk-tone-structure { color: var(--dsw-static-deepseek-400); } /* 依赖图：机制·结构（淡紫蓝——与正蓝拉开明度） */
+.wk-tone-archive   { color: var(--dsw-static-amber-600); }    /* 台账：账（赭色——移出蓝系，账本皮革色） */
 .wk-tone-people    { color: var(--dsw-static-green-500); }    /* 在场：人·在线 */
 .wk-tone-growth    { color: var(--dsw-static-green-400); }    /* 培养：人·成长 */
+
+/* 2026-09-27 配色微调（用户走查：四蓝一片分不清）：蓝系 4→3 且拉开明度
+   （正 blue-600 / 淡紫 deepseek-400 / 藏青 blue-800），台账移出蓝系换 amber-600。
+   口诀更新：琥珀喊你和记账（三档橙），三蓝干活分深浅，绿色是人。
+   ⚠ 深底注意：blue-800 rgb(30,64,175) 饱和蓝暗底可见；deepseek-800 以下禁用（暗底隐身）。 */
 
 /* guide 条目胶囊（Start 页；接管自 vendor EntryBox——槽 sidebar.right.tab.guide.entry）：
    视觉对齐出厂胶囊（圆角、hover 底色全令牌），外加 Tooltip（组件层）与原生 title（chip 侧）。 */
