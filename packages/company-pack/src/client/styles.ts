@@ -351,6 +351,27 @@ const CSS = `
     animation: none !important;
   }
 }
+
+/* ── 公司页签标题（icon × 语义色向，RFC 2026-09-27；tab-icons.tsx 消费）─────────
+   色 = 方向（琥珀注意 / 蓝执行 / 紫机制 / 绿人心），icon = 面板身份；族内主/次两档。
+   颜色一律平台**静态色相族**令牌——跨浅/深主题稳定的识别色；alias 墨色层在暗色下
+   退化为墨/白，不能当识别色（RFC §色令牌）。只给 icon 上色，文字保持默认前景。 */
+.wk-tab-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.wk-tab-title svg {
+  flex: none;
+}
+.wk-tone-attention { color: var(--dsw-static-amber-500); }    /* 需要你：注意·要人 */
+.wk-tone-burn      { color: var(--dsw-static-amber-400); }    /* 用量：注意·消耗 */
+.wk-tone-overview  { color: var(--dsw-static-blue-600); }     /* 看板：执行·总览 */
+.wk-tone-work      { color: var(--dsw-static-blue-500); }     /* 任务板：执行·工作台 */
+.wk-tone-structure { color: var(--dsw-static-deepseek-500); } /* 依赖图：机制·结构 */
+.wk-tone-archive   { color: var(--dsw-static-deepseek-400); } /* 台账：机制·账 */
+.wk-tone-people    { color: var(--dsw-static-green-500); }    /* 在场：人·在线 */
+.wk-tone-growth    { color: var(--dsw-static-green-400); }    /* 培养：人·成长 */
 `
 
 /**

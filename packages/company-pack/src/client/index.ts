@@ -18,6 +18,10 @@ import { createCompanyView } from './CompanyView.tsx'
 import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from './company-tabs.tsx'
 import { CultivationTab } from './CultivationTab.tsx'
 import { LedgerTab } from './LedgerTab.tsx'
+import {
+  AttentionTabTitle, BoardTabTitle, BudgetTabTitle, CultivationTabTitle,
+  DagTabTitle, LedgerTabTitle, PresenceTabTitle, TasksTabTitle,
+} from './tab-icons.tsx'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
 import { installStyles } from './styles.ts'
@@ -275,8 +279,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
 
     // keyed 槽体：与上面的类型共享同一 id；回调返回 disposer 数组（同工具卡那段写法）。
     // 「需要你」的注入面另有挂起项快照（apply 登记处）与 sessions.open 跳转。
-    scoped.slots.inject('sidebar.right.pane.tab', () => [
-      scoped.slots.register(
+    scoped.slots.inject('sidebar.right.pane.tab', () => [      scoped.slots.register(
         { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/attention', inject: () => ({
           follow,
           floatTab,
@@ -306,6 +309,36 @@ export async function apply(ctx: ClientContext): Promise<void> {
       scoped.slots.register(
         { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/ledger', inject: () => ({ floatTab, readLedger }) },
         LedgerTab),
+    ])
+
+    // 页签标题槽（RFC 2026-09-27 icon × 语义色向）：keyed 槽 sidebar.right.pane.tab.title
+    // （vendor 契约注册可选、fallback 纯文本）——**一处注册两处生效**：页签条 chip 与
+    // 浮窗头（FloatHeader 同一 renderer）都走这里。组件 = tab-icons.tsx 的 icon+文字。
+    scoped.slots.inject('sidebar.right.pane.tab.title', () => [
+      scoped.slots.register(
+        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/attention' },
+        AttentionTabTitle),
+      scoped.slots.register(
+        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/board' },
+        BoardTabTitle),
+      scoped.slots.register(
+        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/dag' },
+        DagTabTitle),
+      scoped.slots.register(
+        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/presence' },
+        PresenceTabTitle),
+      scoped.slots.register(
+        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/budget' },
+        BudgetTabTitle),
+      scoped.slots.register(
+        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/tasks' },
+        TasksTabTitle),
+      scoped.slots.register(
+        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/cultivation' },
+        CultivationTabTitle),
+      scoped.slots.register(
+        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/ledger' },
+        LedgerTabTitle),
     ])
   })
 
