@@ -4,12 +4,26 @@ import { dirname, extname, join, relative, resolve } from 'node:path'
 import { createRequire } from 'node:module'
 import { pathToFileURL } from 'node:url'
 
-// Reuse the pinned vendor gate's declared parser dependencies. Requires the normal
-// initialized/installed vendor workspace; no transitive-store guessing or vendor writes.
-const vendorRequire = createRequire(new URL('../../vendor/dsh/package.json', import.meta.url))
-const { fromMarkdown } = await import(pathToFileURL(vendorRequire.resolve('mdast-util-from-markdown')).href)
-const { gfmFromMarkdown } = await import(pathToFileURL(vendorRequire.resolve('mdast-util-gfm')).href)
-const { gfm } = await import(pathToFileURL(vendorRequire.resolve('micromark-extension-gfm')).href)
+// Reuse the pinned vendor gate's declared parser dependencies. Requires an installed
+// workspace; no transitive-store guessing or vendor writes.
+// 解析基址两级（2026-09-27 CI 首跑红后立）：① vendor/dsh 根包——本地完整引导（vendor 自带
+// install 的 store）时的形状；② vendor 子包 ui-primitives——它声明**同一组**解析器（版本区间
+// 与 vendor 根 pin 逐字一致，root store 单一版本 2.0.3/3.1.0/3.0.0 两边相同），根 workspace
+// install 即覆盖（根 workspace 刻意不含 vendor/dsh 根包，只挂其子包——见 pnpm-workspace.yaml）。
+// CI 只跑根 install（.github/workflows/verify.yml）靠 ② 解析。
+const parserBases = [
+  new URL('../../vendor/dsh/package.json', import.meta.url),
+  new URL('../../vendor/dsh/packages/client/ui-primitives/package.json', import.meta.url),
+]
+const resolveParser = (id) => {
+  for (const base of parserBases) {
+    try { return createRequire(base).resolve(id) } catch { /* 换下一基址 */ }
+  }
+  throw new Error(`${id} 在 vendor 根包与 ui-primitives 成员处都解析不到（引导 = dev-loop §7 的 install）`)
+}
+const { fromMarkdown } = await import(pathToFileURL(resolveParser('mdast-util-from-markdown')).href)
+const { gfmFromMarkdown } = await import(pathToFileURL(resolveParser('mdast-util-gfm')).href)
+const { gfm } = await import(pathToFileURL(resolveParser('micromark-extension-gfm')).href)
 
 // These are not source corpora. Active implemented/postmortem Notes ARE sources (no rejected/ dir).
 const EXCLUDED = new Set(['node_modules', 'vendor', 'lib', 'dist', 'build', 'generated', 'dev',
