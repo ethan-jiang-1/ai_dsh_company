@@ -30,7 +30,7 @@ export interface DagNode {
 export interface DagEdge {
   readonly from: string
   readonly to: string
-  /** SVG `path` 的 `d`：blocker 底边中点 → blocked 顶边中点（三次贝塞尔）。 */
+  /** SVG `path` 的 `d`：V-H-V 正交走线——blocker 底边锚点 → 垂直下探 → 水平车道 → 垂直入 blocked 顶边锚点。 */
   readonly path: string
   /** blocker 已完成 ⇒ 这条依赖"已走通"（渲染成实线/高亮）。 */
   readonly done: boolean
@@ -159,12 +159,15 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
     })
   }
 
-  // ── 边路径 + 车道分离（2026-09-28 RFC：同带重合消除）──
-  // 交叉是行布局下限（barycenter 已最优、排序无解），但多条边共用同一条走廊会让交叉段
-  // **重合**——收官全绿时中段读作一团乱麻。车道 = 同一带（from 层→to 层）内的边按
-  // （源 x、目标 x）排序各占一条 y 通道（(i+1)/(n+1) 等分带高），控制点从共用的 mid 改为
-  // 各自 lane ⇒ 中段水平段互斥、交叉从「叠着过」变「错层跨越」。单边带 lane = 中点，
-  // 渲染与旧版逐像素相同（向后兼容）；跨多层的边自成一组，仍走中点。
+  // ── 边路径：车道分离 + 正交走线（V-H-V）──
+  // 两层动机（2026-09-28 试用反馈两轮）：
+  // ① 车道分离：交叉是行布局下限（barycenter 已最优、排序无解），但共用走廊的**重合段**
+  //    不是必然——同带（from 层→to 层）的边按（源 x、目标 x）排序各占一条 y 通道
+  //    （(i+1)/(n+1) 等分带高），水平轨互斥、交叉从「叠着过」变「垂直跨越」。
+  // ② 正交走线：弧线在 ~730px 小窗里以多个高度扫过整条带 + X 交叉，读作一团面条；
+  //    V-H-V 直角走线（垂直下探—水平轨—垂直入靶）是电路图形态，交叉点垂直清晰。
+  // 多入/多出节点的锚点按 (k+1)/(n+1) 散开在顶/底边（末段垂直线不共线）；
+  // 单入单出保持中心锚点（渲染向后兼容）。跨多层的边自成一组、仍走带中点。
   const positionById = new Map(nodes.map(node => [node.id, node]))
   const positioned: { from: DagNode; to: DagNode }[] = []
   for (const edge of dependencyEdges(tasks)) {
@@ -189,16 +192,32 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
       laneY.set(edge, y1 + (y2 - y1) * ((index + 1) / (bucket.length + 1)))
     })
   }
+  const exitX = new Map<{ from: DagNode; to: DagNode }, number>()
+  const entryX = new Map<{ from: DagNode; to: DagNode }, number>()
+  const outEdges = new Map<DagNode, { from: DagNode; to: DagNode }[]>()
+  const inEdges = new Map<DagNode, { from: DagNode; to: DagNode }[]>()
+  for (const edge of positioned) {
+    outEdges.set(edge.from, [...(outEdges.get(edge.from) ?? []), edge])
+    inEdges.set(edge.to, [...(inEdges.get(edge.to) ?? []), edge])
+  }
+  for (const [source, list] of outEdges) {
+    list.sort((a, b) => a.to.x - b.to.x)
+    list.forEach((edge, index) => exitX.set(edge, source.x + source.width * ((index + 1) / (list.length + 1))))
+  }
+  for (const [target, list] of inEdges) {
+    list.sort((a, b) => a.from.x - b.from.x)
+    list.forEach((edge, index) => entryX.set(edge, target.x + target.width * ((index + 1) / (list.length + 1))))
+  }
   const edges: DagEdge[] = positioned.map(edge => {
-    const x1 = round(edge.from.x + edge.from.width / 2)
     const y1 = round(edge.from.y + edge.from.height)
-    const x2 = round(edge.to.x + edge.to.width / 2)
     const y2 = round(edge.to.y)
     const lane = round(laneY.get(edge) ?? (y1 + y2) / 2)
+    const x1 = round(exitX.get(edge) ?? edge.from.x + edge.from.width / 2)
+    const x2 = round(entryX.get(edge) ?? edge.to.x + edge.to.width / 2)
     return {
       from: edge.from.id,
       to: edge.to.id,
-      path: `M ${String(x1)} ${String(y1)} C ${String(x1)} ${String(lane)}, ${String(x2)} ${String(lane)}, ${String(x2)} ${String(y2)}`,
+      path: `M ${String(x1)} ${String(y1)} L ${String(x1)} ${String(lane)} L ${String(x2)} ${String(lane)} L ${String(x2)} ${String(y2)}`,
       done: statusOf.get(edge.from.id) === 'completed',
     }
   })

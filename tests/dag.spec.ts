@@ -108,12 +108,12 @@ describe('layoutDag', () => {
   })
 })
 
-describe('layoutDag 边线车道分离（2026-09-28 RFC：同带重合消除）', () => {
-  /** 解析 path `M x1 y1 C cx1 cy1, cx2 cy2, x2 y2` 的关键字段。 */
-  const parse = (path: string): { y1: number; cy1: number; y2: number } => {
-    const match = /^M ([\d.]+) ([\d.]+) C ([\d.]+) ([\d.]+), ([\d.]+) ([\d.]+), ([\d.]+) ([\d.]+)$/.exec(path)
+describe('layoutDag 边线车道分离 + 正交路由（2026-09-28 RFC：同带重合消除；同日追加直角走线）', () => {
+  /** 解析 path `M x1 y1 L x1 lane L x2 lane L x2 y2`（V-H-V 正交走线）的关键字段。 */
+  const parse = (path: string): { x1: number; y1: number; lane: number; x2: number; y2: number } => {
+    const match = /^M ([\d.-]+) ([\d.-]+) L ([\d.-]+) ([\d.-]+) L ([\d.-]+) ([\d.-]+) L ([\d.-]+) ([\d.-]+)$/.exec(path)
     if (match === null) throw new Error(`path 形状意外：${path}`)
-    return { y1: Number(match[2]), cy1: Number(match[4]), y2: Number(match[8]) }
+    return { x1: Number(match[1]), y1: Number(match[2]), lane: Number(match[4]), x2: Number(match[5]), y2: Number(match[8]) }
   }
   /** 现场形状（2026-09-28 试用反馈那场）：4 根 → 3 子，带 0→1 里 5 条边。 */
   const tangled = () => [
@@ -125,9 +125,9 @@ describe('layoutDag 边线车道分离（2026-09-28 RFC：同带重合消除）'
     const layout = layoutDag(tangled())
     const byBand = new Map<string, number[]>()
     for (const edge of layout.edges) {
-      const { y1, y2, cy1 } = parse(edge.path)
+      const { y1, y2, lane } = parse(edge.path)
       const key = `${String(y1)}→${String(y2)}`
-      byBand.set(key, [...(byBand.get(key) ?? []), cy1])
+      byBand.set(key, [...(byBand.get(key) ?? []), lane])
     }
     const multi = [...byBand.entries()].filter(([, lanes]) => lanes.length >= 2)
     expect(multi.length).toBeGreaterThan(0) // 夹具确实造出了同带多边，否则断言空转
@@ -136,13 +136,39 @@ describe('layoutDag 边线车道分离（2026-09-28 RFC：同带重合消除）'
     }
   })
 
-  it('车道都在带内（y1 < cy < y2）；单边带 lane = 中点（渲染向后兼容）', () => {
+  it('车道都在带内（y1 < lane < y2）；单边带 lane = 中点（渲染向后兼容）', () => {
     for (const edge of layoutDag(tangled()).edges) {
-      const { y1, cy1, y2 } = parse(edge.path)
-      expect(cy1).toBeGreaterThan(y1)
-      expect(cy1).toBeLessThan(y2)
+      const { y1, lane, y2 } = parse(edge.path)
+      expect(lane).toBeGreaterThan(y1)
+      expect(lane).toBeLessThan(y2)
     }
     const chain = parse(layoutDag([task('a'), task('b', ['a'])]).edges[0]!.path)
-    expect(chain.cy1).toBeCloseTo((chain.y1 + chain.y2) / 2, 5)
+    expect(chain.lane).toBeCloseTo((chain.y1 + chain.y2) / 2, 5)
+  })
+
+  it('正交走线是纯 V-H-V（垂直下探—水平轨—垂直入靶，三段各自对齐）', () => {
+    for (const edge of layoutDag(tangled()).edges) {
+      const m = /^M ([\d.-]+) ([\d.-]+) L ([\d.-]+) ([\d.-]+) L ([\d.-]+) ([\d.-]+) L ([\d.-]+) ([\d.-]+)$/.exec(edge.path)
+      expect(m, edge.path).not.toBeNull()
+      expect(Number(m![3])).toBe(Number(m![1])) // 第一段垂直：x 不变
+      expect(Number(m![6])).toBe(Number(m![4])) // 水平轨两端同一 lane
+      expect(Number(m![7])).toBe(Number(m![5])) // 第三段垂直：x 不变
+      expect(Number(m![8])).toBe(parse(edge.path).y2)
+    }
+  })
+
+  it('同靶多入边锚点散开（末段垂直线不共线）；单入单出保持中心锚点', () => {
+    const layout = layoutDag(tangled())
+    const byTarget = new Map<string, number[]>()
+    for (const edge of layout.edges) {
+      const target = edge.to
+      byTarget.set(target, [...(byTarget.get(target) ?? []), parse(edge.path).x2])
+    }
+    for (const [target, xs] of byTarget) {
+      if (xs.length >= 2) expect(new Set(xs).size, `${target} 的入边锚点共线：${xs.join('、')}`).toBe(xs.length)
+    }
+    const chain = parse(layoutDag([task('a'), task('b', ['a'])]).edges[0]!.path)
+    const nodeA = layoutDag([task('a'), task('b', ['a'])]).nodes.find(n => n.id === 'a')!
+    expect(chain.x1).toBeCloseTo(nodeA.x + nodeA.width / 2, 1) // 单出边仍从底边中心出
   })
 })
