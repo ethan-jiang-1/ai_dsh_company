@@ -32,8 +32,10 @@
 
 - 本地：`pnpm verify` ALL PASS + `pnpm test` 230/230（提交前实跑）。
 - CI 首跑（36373885805）：verify ✓（53s 内过）→ test ✗（红在 cosmokit 包入口解析，日志已取）。
-- CI 撤 test 步后的提交：**回填于此**（预期绿）。
+- CI 撤 test 步后（run 36374458046）：**绿 ✓ verify 51s**——红→绿两跑闭环完成。
 - hook 负例：失败 spec → exit 1；还原 → exit 0（上节）。
+- 环境状态：runner 报 checkout/setup-node v4 的 Node 20 deprecation 警告（GitHub 强制跑 Node 24，
+  非阻断）——升 @v5 留作顺手小修，不值单独一轮。
 
 ## 登记
 
