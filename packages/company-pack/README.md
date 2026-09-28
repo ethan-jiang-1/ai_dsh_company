@@ -18,6 +18,6 @@ release-smoke ALL PASS（[docs/release.md](../../docs/release.md)）。pack 保�
 ## 已知限制（随行为变更同 diff 更新；2026-09-28 立，借 FAQ 04 package README tier）
 
 - 机制与出厂行替换只对钉版 `dsh-v0.1.7-rc.2` 验证过；升 pin 后过 `pack-compat` + release-smoke 再声明兼容（本仓嵌套工作区 vendor 自建偏离 = D27）。
-- 委派子会话的签字审批到不了人（子会话审批面宿主侧受限）——人机审批实际是 Lead 专属（上游 seam 候选，见 ROADMAP §搁置池）。
+- 委派子会话的签字审批到不了人（子会话审批面宿主侧受限）——人机审批实际是 Lead 专属（上游 seam 候选，见 `_backlog/suspended.md`）。
 - 浮窗 raise 置顶依赖 CSS 垫片（vendor rc.2 缺陷；上游修复后撤垫片）。
 - 成员会话常驻注入基线 ≈ 手册 16.4KB + CHARTER 5–9KB + persona prefix：宿主注入预算（maxBytes）需 ≥ 该链，dsh 默认 65,536B 够用，改小会**静默裁文件**。

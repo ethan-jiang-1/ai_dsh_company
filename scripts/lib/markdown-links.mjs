@@ -47,7 +47,7 @@ export function sourceMarkdownFiles(root) {
     }
   }
   walk(root, false)
-  for (const dir of ['docs', 'notes', 'packages/company-pack', 'company-workspace/templates']) walk(join(root, dir))
+  for (const dir of ['docs', 'notes', '_backlog', 'packages/company-pack', 'company-workspace/templates']) walk(join(root, dir))
   for (const file of ['company-workspace/AGENTS.md', 'company-workspace/kb/org.md']) {
     if (existsSync(join(root, file))) add(join(root, file))
   }

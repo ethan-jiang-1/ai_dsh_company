@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Coding entry probe: explicit standard preset + repo cwd + logged coding baseline.
-// 何时跑：入口链/执行链文档（AGENTS.md / docs/index.md / dev-loop / ROADMAP）改动后；真模型认证档
+// 何时跑：入口链/执行链文档（AGENTS.md / docs/index.md / dev-loop / _backlog）改动后；真模型认证档
 // Machine checks validate per-question routing/evidence, not semantic correctness.
 // No keyless regression claim: true-model certification, 不进 pnpm test.
 // Usage: source dev/env.sh && node scripts/entry-probe-smoke.mjs [--port 0] [--timeout 240000]
@@ -30,11 +30,11 @@ if (!Number.isInteger(PORT) || PORT < 0 || PORT > 65535 || !Number.isFinite(TURN
 // Overriding cwd can silently change the injected instruction chain. Keep this probe repo-specific.
 if (process.argv.includes('--cwd')) { console.error('entry-probe: cwd 固定为开发仓库根，不接受 --cwd'); process.exit(2) }
 const PROMPT = [
-  '你是本仓库的只读审读代理。先读 AGENTS.md、docs/index.md、ROADMAP.md；',
-  '再按入口指针读取相关 docs/ 和 notes/（无需通读全树）。不要联网、执行命令、修改文件或启动子代理。',
-  '这是审读任务，不执行队列，不进入实施；来源矛盾或答不了时明确列出，不编造。',
+  '你是本仓库的只读审读代理。先读 AGENTS.md、docs/index.md、docs/guides/dev-loop.md；',
+  '再按入口指针读取相关 docs/、notes/ 与 _backlog/（无需通读全树）。不要联网、执行命令、修改文件或启动子代理。',
+  '这是审读任务，不执行任务，不进入实施；来源矛盾或答不了时明确列出，不编造。',
   '最后只输出一个 JSON 对象，不要输出前后说明，结构如下：',
-  '{"answers":[{"id":"Q1","status":"answered","answer":"本题答案","evidence":[{"path":"ROADMAP.md","quote":"该文件中逐字原文，至少8字符"}]}],"conflicts":[]}',
+  '{"answers":[{"id":"Q1","status":"answered","answer":"本题答案","evidence":[{"path":"AGENTS.md","quote":"该文件中逐字原文，至少8字符"}]}],"conflicts":[]}',
   'answers 必须每题恰好一项；status 可为 answered/unresolved；conflicts 列出发现的来源冲突。',
   'JSON 语法：quote 与 answer 里如出现 ASCII 双引号必须写成 \\" 转义（或改写成「」——比对时引号字形与空白、markdown 标记都会被归一化，不影响判分）；务必保证整份输出是合法 JSON（2026-09-26 实证：一处未转义的 " 会让整份不可解析、12 题全判 0）。',
   `每题给出其自己的答案和证据，不以其他题的内容替代。以下 ${ENTRY_QUESTIONS.length} 题：`,
@@ -51,7 +51,7 @@ const sourceHashes = new Map()
 // 写成一张模式表（而不是一串 || 条件）：后缀约束与路径约束同处一处，避免"后缀检查排在允许面前面"
 // 这类顺序 bug（实测踩过一次：`!path.endsWith('.md')` 把 .mjs 全挡在门外）。
 const ALLOWED_SOURCE = [
-  /^AGENTS\.md$/, /^ROADMAP\.md$/, /^company-workspace\/AGENTS\.md$/,
+  /^AGENTS\.md$/, /^company-workspace\/AGENTS\.md$/, /^_backlog\/[\w./-]+\.md$/,
   /^(docs|notes)\/[\w./-]+\.md$/, /^snapshots\/README\.md$/,
   /^scripts\/[\w./-]+\.(mjs|ts)$/,
   /^tests\/[\w.-]+\.ts$/,
@@ -59,7 +59,7 @@ const ALLOWED_SOURCE = [
 function readSource(path) {
   if (isAbsolute(path) || path.includes('\\') || path.split('/').includes('..') ||
       !ALLOWED_SOURCE.some(pattern => pattern.test(path))) {
-    throw new Error('只允许根入口 / docs/ / notes/ / 公司手册（.md），以及 scripts/**（.mjs|.ts）、tests/**（.ts）的仓库相对路径')
+    throw new Error('只允许根入口 / docs/ / notes/ / _backlog/ / 公司手册（.md），以及 scripts/**（.mjs|.ts）、tests/**（.ts）的仓库相对路径')
   }
   const physical = realpathSync(join(ROOT, path))
   const rel = relative(ROOT, physical)
@@ -68,7 +68,7 @@ function readSource(path) {
   sourceHashes.set(path, createHash('sha256').update(text).digest('hex'))
   return text
 }
-for (const path of ['AGENTS.md', 'docs/index.md', 'ROADMAP.md']) readSource(path)
+for (const path of ['AGENTS.md', 'docs/index.md', 'docs/guides/dev-loop.md']) readSource(path)
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 let rpcId = 0

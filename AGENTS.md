@@ -8,19 +8,18 @@
 
 ```
 CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 门禁校验）
-ROADMAP.md              根部队列（接下来 + 搁置池；▶ = 当前条目；完成即离队——D24 自 docs/plans 迁入）
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml（bundle 行）、src/client/（client 面：品牌皮肤）、src/（host 代码 R3+）
 company-workspace/      运行时"公司共享盘"（会话 cwd）：**AGENTS.md（公司手册，随成员会话注入）**、kb/<role>/（CHARTER+journal）、templates/、deliverables/
 vendor/dsh/             DSH 源码 submodule（钉 SHA，**只读铁律**：见 §vendor 铁律，`pnpm verify` 强制）
 docs/                   当前合同与导航：index（地图+台账）→ design/ guides/ + 顶层合同
 notes/                  **开发记忆与证据链**：intents.md → proposed/ → implemented/；archived/（完结研究）/ rejected/（负知识）；postmortem/ 记事故
-_backlog/               推敲空间（正式加工前）：plans/ 推敲卡、bugs/ 缺陷卡、_done/ 归档——**不是任务队列**；毕业四门见其 README（D31）
+_backlog/               推敲与搁置层（D31/D32）：plans/ 推敲卡、bugs/ 缺陷卡、suspended.md 搁置池、polish.md 磨清单、_done/ 归档；规矩 = 其 README
 scripts/                verify.mjs（结构门禁）、preset-smoke.mjs（真入口冒烟）……
 dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）
 snapshots/              回归资产：历史录制、workspace.actual 副本与部分场景独立编写的 workspace.expected；以各 snapshot.yml / Note 为准
 ```
 
-设计全貌与当前决策：`docs/index.md`（按主题进入对应 owner）。任务入口与执行规则唯一见 `docs/guides/dev-loop.md` §0.5/§1；只有用户要求“继续下一条”时才从 `ROADMAP.md` §队列取任务。
+设计全貌与当前决策：`docs/index.md`（按主题进入对应 owner）。任务入口与执行规则唯一见 `docs/guides/dev-loop.md` §0.5/§1；任务源 = 已批 RFC 与 `_backlog/polish.md`（D32——无中心队列文件，推敲卡不是任务）。
 **条目状态不镜像进本文件**（root AGENTS.md 只收常设指令——vendor tier 表 "Status rots"；依据 =
 [research §十一](notes/implemented/2026-09-23-dsh-inround-task-surface.md)）。
 
@@ -70,7 +69,7 @@ DSH 全局不变量（fail-loud / model-visible ⟺ logged / registrations are e
 | DSH 纪律 | 权威（vendor 树） | 本 repo 落点 |
 |---|---|---|
 | 任务反馈面 | `packages/todo` / `packages/plan`（按各自条件使用） | 适用规则唯一见 guides/dev-loop §0.5/§1 |
-| docs = 当前合同（一处事实一个家，**只写 now**） | `docs/AGENTS.md` | `docs/` 按性质分层（D10）；物理行预算 = `scripts/verify.mjs` 的 `DOC_LINE_BUDGETS`；队列规则 = `ROADMAP.md` §维护规则 |
+| docs = 当前合同（一处事实一个家，**只写 now**） | `docs/AGENTS.md` | `docs/` 按性质分层（D10）；物理行预算 = `scripts/verify.mjs` 的 `DOC_LINE_BUDGETS`；队列层已退役（D32），_backlog 规矩 = 其 README |
 | 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么） | `.agents/notes/README.md` | `notes/intents.md → implemented/`；收尾 Note 要写什么 = guides/dev-loop §12「记录与收尾」；范式照 [journal-presence-mechanism](notes/implemented/2026-09-26-journal-presence-mechanism.md) |
 | 按变更选择相关检查；只报告实际跑过的检查 | `AGENTS.md` Run relevant checks | 本地流程见 guides/dev-loop §1/§9.1/§12 |
 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧** | `docs/testing.md`；`docs/postmortem/0003-web-agent-gui-feedback-loop.md` | guides/dev-loop §1「完成定义」段 + bootstrap 两道防线；preset 类改动完成定义 = `preset-smoke.mjs`（真挂载） |

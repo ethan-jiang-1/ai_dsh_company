@@ -205,7 +205,7 @@ D23 的研究得到几条可复用原则：以钉住的 vendor 为机制权威�
 
 ## 十、落地证据
 
-D23 转型的历史范围与验证记录见[R6 收尾 Note](./2026-09-23-r6-content-remediation.md)。D24 的队列位置裁决及当前路由见本节 §十二与[根队列](../../ROADMAP.md)。当前规则以 `AGENTS.md`、开发环和 `ROADMAP.md` 为准。
+D23 转型的历史范围与验证记录见[R6 收尾 Note](./2026-09-23-r6-content-remediation.md)。D24 的队列位置裁决及当前路由见本节 §十二与[根队列](2026-09-28-roadmap-retirement.md)。当前规则以 `AGENTS.md`、开发环和 `ROADMAP.md` 为准。
 
 ## 十一、入口文档的状态边界
 

@@ -1,15 +1,15 @@
 /** Stable routing questions; current values must come from repository evidence. */
 export const ENTRY_QUESTIONS = [
-  { id: 'Q1', ask: '当前可开工的队列项是什么？若只有暂停项或没有活动项，明确说明。完成记录住哪里？', expect: [/ROADMAP|队列/, /Note|implemented|台账/] },
-  { id: 'Q2', ask: '完成即离队是什么意思？当前队列与历史记录如何区分？', expect: [/离队|移除|删/, /Note|implemented|历史/] },
+  { id: 'Q1', ask: '现在可开工的任务从哪里取（已批 RFC？磨活？）？没有时怎么办？完成记录住哪里？', expect: [/RFC|磨活|polish|用户指令/, /Note|implemented|台账/] },
+  { id: 'Q2', ask: '完成即离场是什么意思？当前任务源与历史记录如何区分？', expect: [/离场|离队|移除|删/, /Note|implemented|历史/] },
   { id: 'Q3', ask: '交付物三态规则的事实家在哪个文件？', expect: [/company-workspace\/AGENTS\.md|公司手册/] },
   { id: 'Q4', ask: 'vendor/dsh 当前钉住哪个 tag？受控源码如何处理？', expect: [/dsh-v\d+\.\d+/, /只读|零改动|不改/] },
   { id: 'Q5', ask: '改 preset 组合后用哪个脚本验真入口？为什么 dump-config 不够？', expect: [/preset-smoke/, /挂载|行校验/] },
-  { id: 'Q6', ask: '开发单位与当前队列在哪？哪些决定记录说明它？', expect: [/条目|队列/, /D23|D24|Note/] },
+  { id: 'Q6', ask: '任务源与「未成熟思考不算任务」的规矩在哪定义？哪些决定记录说明它？', expect: [/RFC|磨活|_backlog|推敲/, /D23|D24|D31|D32|Note/] },
   { id: 'Q7', ask: '回归与认证档在哪定义？真模型是否进 pnpm test？', expect: [/dev-loop|9\.1/, /不进|不含|排除/] },
   { id: 'Q8', ask: 'notes 在开工、实现、收尾各起什么作用？若 Note 与当前实现冲突如何核对？', expect: [/检索|读取|读/, /决定|取舍|方案/, /验证|证据/, /核对|源码|实现/] },
   // ── 执行链四跳（2026-09-26 扩面：原 8 问只覆盖探查链，收尾动作与授权条件无人认证）──
-  { id: 'Q9', ask: '队列里的 feature 条目开工前要不要先呈批？什么情况下可以直接做、不必求批？', expect: [/Plan Mode|呈批|exit_plan_mode/, /机械单步|已批准|明确批准/] },
+  { id: 'Q9', ask: 'feature 类任务开工前要不要先呈批？什么情况下可以直接做、不必求批？', expect: [/Plan Mode|呈批|exit_plan_mode/, /机械单步|已批准|明确批准/] },
   // 措辞要点（2026-09-26 修）：不能说"人机接口全回路"——AGENTS.md 里 attention-e2e 自称
   // "人机三节点全回路"，答它完全合理（首跑实测即如此，属题目歧义而非模型错）。用该脚本自己的
   // 区分词"三载体"提问，答案才唯一。
@@ -17,7 +17,7 @@ export const ENTRY_QUESTIONS = [
   // "客户端装配/入口改变"，把它读成答案完全合理（实测第二轮即如此）。用该脚本自己的区分特征
   // （"只能看、不能 keyless 断言的视觉"）提问，答案才唯一。
   { id: 'Q10', ask: '依赖图/面板里那些**只能看、不能 keyless 断言**的视觉事实、人机接口三载体（补料落盘／建议非阻塞落稿／规矩缺口回流 journal）、日期口径行为面，各该跑哪个脚本？', expect: [/dag-visual/, /human-loop-e2e/, /date-rule/] },
-  { id: 'Q11', ask: '一个非平凡变更收尾时，除了改实现，还要动哪些文件或登记处？', expect: [/intents/, /Note|implemented/, /ROADMAP|队列/] },
+  { id: 'Q11', ask: '一个非平凡变更收尾时，除了改实现，还要动哪些文件或登记处？', expect: [/intents/, /Note|implemented/] },
   { id: 'Q12', ask: '长程自主执行的 goal 有哪两种写法？停止条件有哪几类？', expect: [/交付型/, /打磨型/, /预算|枯竭|卡住/] },
 ]
 

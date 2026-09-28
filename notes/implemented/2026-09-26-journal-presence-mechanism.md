@@ -78,6 +78,6 @@
 
 ## 依据
 
-- 磨清单项与红证：[ROADMAP §磨清单](../../ROADMAP.md)；打磨轮收尾 =
+- 磨清单项与红证：[ROADMAP §磨清单](../../_backlog/polish.md)；打磨轮收尾 =
   [polish-round](./2026-09-25-polish-round.md) §实施实况。
 - 同族审计脚本形态：[deliverables-check.mjs](../../scripts/deliverables-check.mjs)。

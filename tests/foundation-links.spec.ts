@@ -25,10 +25,10 @@ const check = (source: string) => {
 // Fixtures have no Git index: newly authored Notes must not depend on git add.
 describe('bounded source discovery', () => {
   it('checks all root Markdown, active Notes, pack source and current company documents', () => {
-    const sources = ['README.md', 'README.zh.md', 'AGENTS.md', 'ROADMAP.md',
+    const sources = ['README.md', 'README.zh.md', 'AGENTS.md',
       'docs/guides/new.md', 'notes/intents.md', 'notes/proposed/new.md',
       'notes/implemented/new.md', 'notes/rejected/new.md', 'notes/postmortem/new.md',
-      'notes/research/untracked/new.md', 'packages/company-pack/README.md',
+      '_backlog/new.md', '_backlog/plans/new.md', 'packages/company-pack/README.md',
       'packages/company-pack/src/README.md', 'packages/company-pack/presets/ceo/skills/new/SKILL.md',
       'company-workspace/AGENTS.md', 'company-workspace/kb/org.md',
       'company-workspace/kb/new-role/CHARTER.md', 'company-workspace/templates/nested/new.md']

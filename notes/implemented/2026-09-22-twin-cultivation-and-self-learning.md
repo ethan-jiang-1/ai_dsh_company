@@ -106,7 +106,7 @@ U1 已在源码层回答、U2/U3 作废（见研究笔记 §5，后经 §6 再�
 | §一 培养 = 改 pack + 人审验收 | ✅ 2026-09-24 走通：A/B/G 三条教训提升进 `presets/ceo/skills/chairing-staff-meeting/`，四道检查全绿；合同 = [presets.md §培养回路与学习载体](../../docs/presets.md)（D25） |
 | §二 学习 = journal 唯一 + 人审提升 | ✅ 同轮走通：教训源 = 用户 9-23 真动议 `ent-agent-platform` 五份 journal（复用，零新模型成本）；人审采纳 A/B（用户批）+ G（授权代理裁定） |
 | §三 前置修复两条 | 已于 R2 落地（[2026-09-22-skill-root-isolation.md](./2026-09-22-skill-root-isolation.md) + `handbook-smoke` 常设门禁） |
-| §四 自主节律：不做、只记缺口 | 搁置池（缺上游 seam；复活条件已写，见 [ROADMAP.md](../../ROADMAP.md) §搁置池） |
+| §四 自主节律：不做、只记缺口 | 搁置池（缺上游 seam；复活条件已写，见 [ROADMAP.md](../../_backlog/suspended.md) §搁置池） |
 | 验收 1 隔离反证 | 已闭（R2：isolation Note；`preset-smoke` ③ 常设断言） |
 | 验收 2 手册接线 | 已闭（R2：五 preset `agent-instructions` 行 + `handbook-smoke`） |
 | 验收 3 培养回归 + 旧会话不受影响 | ✅ 全绿 + **边界按面修正**：skill 正文 = 同会话下一轮（活体实证，研究笔记 §6）；persona / 组合文件 = 新会话（vendor stamp 机制）。"旧会话不受影响"的准确表述 = 按面（合同表） |

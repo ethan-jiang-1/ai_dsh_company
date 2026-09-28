@@ -5,7 +5,7 @@
 ## 问题
 
 2026-09-25 凌晨长程执行收尾后盘点：若干线索**没有索引家**或**指针已腐**。按本仓入口契约
-（[ROADMAP.md](../../ROADMAP.md) 文件头「队列 = 有序索引」+ [dev-loop §0.5](../../docs/guides/dev-loop.md)
+（[ROADMAP.md](2026-09-28-roadmap-retirement.md) 文件头「队列 = 有序索引」+ [dev-loop §0.5](../../docs/guides/dev-loop.md)
 「继续下一条」分支），下次开工只读 §队列 ⇒ 这些线索会被漏掉。
 
 实证六点：

@@ -3,7 +3,7 @@
 状态：implemented（2026-09-26 三段全交付并真浏览器验收：A = 上游自带 `agentPreset` 投影〔零代码，
 撤码复验 7/7〕、B = 侧栏角色徽标 `ee7b8b5`、C = 窗口标题【角色】+ `:root[data-wk-role]` + 3px 顶条；
 keyless 单测 6 项 + 真浏览器自主验收 ALL PASS）。残余项「每角色一色」= 上游分类色板 seam，
-住 [ROADMAP §搁置池](../../ROADMAP.md)。用户定方向的原话（"UX 一旦糟糕，再漂亮的主意和技术
+住 [ROADMAP §搁置池](../../_backlog/suspended.md)。用户定方向的原话（"UX 一旦糟糕，再漂亮的主意和技术
 都没用"）即本稿取舍依据。
 
 ## 一、用户痛点（原话）

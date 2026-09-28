@@ -170,17 +170,11 @@ if (!barePathBad) {
 // 收窄理由（避免假阳性）：只认 `dsh-v` 前缀形式——裸 `x.y.z-rc.n` 在本仓多为历史叙述或外部语料；
 //   外研树 `_agent_ready_development` 钉的是另一个 tag，登记在 EXTERNAL_PINS（同 RETIRED_PATHS 的显式豁免体例）。
 // 结构性排除（不是内容白名单，而是尊重文件自述的性质）：
-//   · `notes/intents.md` = 时序意图日志，逐行记"当时"——天生历史，不参与现在时扫描；
-//   · `ROADMAP.md` §历史维护记录 以下 = 文件头自己声明"非当前指令"，同样不参与。
+//   · `notes/intents.md` = 时序意图日志，逐行记"当时"——天生历史，不参与现在时扫描。
+//     （原 `ROADMAP.md` §历史维护记录 特例随 D32 队列层退役一并移除——文件已删。）
 const EXTERNAL_PINS = new Set(['dsh-v0.1.7-rc.1'])   // 外部研究树语料的 pin，不是本仓 pin
 const PIN_HISTORY_MARKERS = /历史|旧|曾|原|当时|已退役|矩阵|compat|legacy/i
 const PIN_SKIP_FILES = new Set(['notes/intents.md'])
-const pinScanLines = (rel, text) => {
-  const lines = text.split('\n')
-  if (rel !== 'ROADMAP.md') return lines
-  const cut = lines.findIndex(line => line.startsWith('## 历史维护记录'))
-  return cut === -1 ? lines : lines.slice(0, cut)
-}
 const agentsText = readFileSync(join(root, 'AGENTS.md'), 'utf8')
 const bookkeepingOk = agentsText.includes(`tag \`${expectedTag}\``) && agentsText.includes(`= \`${expectedSha}\``)
 bookkeepingOk
@@ -190,7 +184,7 @@ let pinCount = 0
 let pinBad = false
 for (const rel of NOW_FILES) {
   if (PIN_SKIP_FILES.has(rel)) continue
-  pinScanLines(rel, readFileSync(join(root, rel), 'utf8')).forEach((line, i) => {
+  readFileSync(join(root, rel), 'utf8').split('\n').forEach((line, i) => {
     for (const m of line.matchAll(/dsh-v\d+\.\d+\.\d+(?:-rc\.\d+)?/g)) {
       if (m[0] === expectedTag || EXTERNAL_PINS.has(m[0])) continue
       if (PIN_HISTORY_MARKERS.test(line)) continue
@@ -200,7 +194,7 @@ for (const rel of NOW_FILES) {
     pinCount += [...line.matchAll(/dsh-v\d+\.\d+\.\d+(?:-rc\.\d+)?/g)].length
   })
 }
-if (!pinBad) ok(`pin-currency ×${pinCount}（现在时文件的 dsh-v 字面量 = ${expectedTag}；intents 日志与 ROADMAP 历史段按性质排除）`)
+if (!pinBad) ok(`pin-currency ×${pinCount}（现在时文件的 dsh-v 字面量 = ${expectedTag}；intents 日志按性质排除）`)
 
 // ── 2f. 脚本触发条件门禁（2026-09-26 立，技术债 B7/R5 类）───────────────
 // 负例留证 2026-09-27：探针头注「何时跑」改形 → script-triggers 红。────────
@@ -342,26 +336,26 @@ for (const entry of ownPackages) {
 }
 ok(`client-halves ×${clientHalves.length}`)
 
-// ── 9. 提案纪律：roadmap 必须把 notes/proposed/ 消化掉 ─────────────────────
+// ── 9. 提案纪律：notes/proposed/ 只收已批 RFC，且该毕业的必须毕业 ─────────────
 // 负例留证 2026-09-27：无归宿提案 → proposal-scheduled 红；「已交付」状态滞留 proposed → proposal-graduated 红。
-// 起因（R4 收尾后实测，用户要求"roadmap 一定要消化掉 notes/proposed 里的东西"）：`notes/proposed/`
-// 里一条提案被写进某轮的"做什么"列，整轮跑完却从没实现——直到有人**想起来问**才发现。文档纪律
-// （一处事实一个家）管不住"登记了但没人做"，所以变成两条门禁：
-//   ① **每个提案都必须在 roadmap 出现**（有归宿：某轮 / 轮间待办 / 搁置池）；
-//   ② **已消化的不许赖在 proposed/**——一旦某提案的条目全都有归宿（交付 / 排期 / 明确不做），
-//      它的 状态 行会带终态字（已消化 / 已交付 / 部分交付），那它就该**毕业**到 notes/implemented/
-//      （毕业 ≠ 全部实现，而是"每一条都有归宿"，如 `workspace-hygiene` 有一条转轮间待办）。
-// ⚠ 门禁只保证"被引用 + 该毕业的毕业"，不保证"会实现"——真正被逐条核对的是 roadmap 的**验收列**。
+// 2026-09-28 D32 重构（队列层退役）：原判据「提案必须在 ROADMAP 出现」的防病机理 = 防"登记了但没人做"。
+// 队列没了，病根不变 ⇒ 判据换成等价物：**每份 RFC 状态行必须带「批准」标记**（用户令 / Plan Mode 通过 +
+// 日期）——没批准的思考属于 _backlog/plans/ 推敲卡，不配住 proposed/；
+//   ① proposal-scheduled：状态行（逻辑行，含缩进续行）带「批准」；
+//   ② proposal-graduated（不变）：已消化的不许赖在 proposed/——毕业 ≠ 全部实现，而是"每一条都有归宿"。
+// ⚠ 门禁只保证"被批准 + 该毕业的毕业"，不保证"会实现"——实施由用户指令逐条进入。
 const proposedDir = join(root, 'notes/proposed')
-const roadmapText = readFileSync(join(root, 'ROADMAP.md'), 'utf8')
 // README.md 是文件夹说明书（curated entry point，非提案）——DSH 同款：notes 层的 README 不在提案命名空间
 const proposals = existsSync(proposedDir)
   ? readdirSync(proposedDir).filter(n => n.endsWith('.md') && n !== 'README.md')
   : []
-const unscheduled = proposals.filter(name => !roadmapText.includes(name))
-unscheduled.length === 0
+const unapproved = proposals.filter(name => {
+  const head = readFileSync(join(proposedDir, name), 'utf8').split('\n').slice(0, 12).join('\n')
+  return !(head.includes('批准：') || head.includes('批准:'))
+})
+unapproved.length === 0
   ? ok(`proposal-scheduled ×${proposals.length}`)
-  : fail('proposal-scheduled', `这些提案没在 ROADMAP.md 里出现（挂进去才有人做）：${unscheduled.join(', ')}`)
+  : fail('proposal-scheduled', `这些 RFC 状态行缺「批准：」标记（未批准的思考住 _backlog/plans/ 推敲卡，别滞留 proposed/）：${unapproved.join(', ')}`)
 
 /** 终态字：提案的状态行里出现这些，说明它已经被消化，该毕业了。 */
 const DIGESTED_MARKERS = ['已消化', '已交付', '部分交付']

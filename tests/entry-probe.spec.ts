@@ -2,21 +2,22 @@ import { describe, expect, it } from 'vitest'
 import { assistantMessageText, collectText } from '../scripts/lib/session-log.mjs'
 import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from '../scripts/lib/entry-probe.mjs'
 
-const evidence = { path: 'ROADMAP.md', quote: '逐字可核的证据原文至少八字符' }
+// 通配证据路径：单测桩对它返回 quote 自身（自洽），与下方真夹具（AGENTS.md）不撞车
+const evidence = { path: 'docs/index.md', quote: '逐字可核的证据原文至少八字符' }
 // 按**题号**取答案（不是按位置）——加题时不会静默错位；数量断言一律用 ENTRY_QUESTIONS.length
 // 推导，别写死（写死就是"枚举型事实写两处"，2026-09-26 从 8 扩到 12 时正是这里要改）。
 const ANSWERS: Record<string, string> = {
-  Q1: 'ROADMAP 队列无活动项；implemented Note 留记录',
-  Q2: '完成即离队，历史移入 Note',
+  Q1: '任务源 = 已批 RFC 与磨活；implemented Note 留记录',
+  Q2: '完成即离场，历史移入 Note',
   Q3: 'company-workspace/AGENTS.md 公司手册',
   Q4: 'dsh-v0.1.7-rc.2 只读',
   Q5: 'preset-smoke 验证挂载',
-  Q6: '条目队列 D23',
+  Q6: '任务源与推敲卡规矩 D31 D32',
   Q7: 'dev-loop 真模型不进回归',
   Q8: '开工检索决定和取舍，核对实现，留下验证证据',
   Q9: 'Plan Mode 呈批；已批准或机械单步可直接做',
   Q10: 'dag-visual 视觉夹具；human-loop-e2e 人机回路；date-rule 日期口径',
-  Q11: 'intents 登记 + implemented Note + ROADMAP 队列离队',
+  Q11: 'intents 登记 + implemented Note 收尾',
   Q12: '交付型与打磨型；停止 = 预算耗尽 / 输入源枯竭 / 真卡住',
 }
 function good() {
@@ -63,7 +64,7 @@ describe('入口探针不使用全文兜底', () => {
     expect(evaluate(value).failures).toContain('Q1: 缺题或重复')
     value.answers[1].id = 'Q99'
     expect(evaluate(value).failures).toContain('Q2: 缺题或重复')
-    expect(evaluateEntryProbe('ROADMAP implemented D23 只读 8/8 PASS', readSource).passed).toBe(0)
+    expect(evaluateEntryProbe('队列 implemented D23 只读 8/8 PASS', readSource).passed).toBe(0)
   })
   it('无答案、有冲突或证据伪造都会失败', () => {
     const value = good()
