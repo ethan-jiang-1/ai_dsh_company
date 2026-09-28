@@ -136,4 +136,4 @@ preset 即对 profile 可见、无需重装；真实安装形状（`file:`）归
 提升文本只写方法论、不含公司事实与出处（D17——出处留收尾 Note，pack 换公司可复用）。
 **分身运行时自改 skill 已否决且为机制事实**（角色 skill 根隔离后，分身可写的共享根不进任何
 角色的技能面 + 角色私有目录被沙箱拒 + preset 子树 loader `write()` 是 no-op）；
-**自主节律**缺上游 seam，住 [_backlog/suspended.md](../_backlog/suspended.md)。
+**自主节律**缺上游 seam，住 [_backlog/_done/_misc/suspended.md](../_backlog/_done/_misc/suspended.md)（2026-09-28 整池退役迁入）。

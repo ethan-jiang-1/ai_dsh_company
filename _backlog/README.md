@@ -9,9 +9,9 @@
 
 ## `_` 前缀语义（借 deerflow；`_` 只表示「不在活跃队列」，不表示禁读）
 
-- **归档件**（会关闭；fresh agent 默认忽略，点名才读）：`_done/`。
-- **活跃推敲卡**住无前缀目录（`plans/`、`bugs/`）；**已裁决的搁置/磨活** = 本目录两张表
-  （`suspended.md` / `polish.md`）。
+- **归档件**（会关闭；fresh agent 默认忽略，点名才读）：`_done/`（含已毕业推敲卡、已修复缺陷卡，
+  以及 2026-09-28 整池退役的搁置池 `_done/_misc/suspended.md` 与磨清单 `_done/_misc/polish.md`）。
+- **活跃推敲卡**住无前缀目录（`plans/`、`bugs/`）。
 
 ## 目录
 
@@ -20,9 +20,8 @@ _backlog/
 ├── README.md            # 本文件（规矩手册）
 ├── plans/               # 推敲卡：设计 / 分析 / 调研（含原 notes/research 的未完结调研，D31）
 ├── bugs/                # 缺陷卡：已发现、不当场修的缺陷（当场修掉的不建档）
-├── suspended.md         # 搁置池（已裁决"不做/不现在"，复活条件必填；D32 自 ROADMAP 迁入）
-├── polish.md            # 磨清单（低优先磨活，谁来磨/何时磨；D32 自 ROADMAP 迁入）
-└── _done/               # 归档（位置即状态）：_closed_plans/ + _fixed_bugs/
+└── _done/               # 归档（位置即状态）：_closed_plans/ + _fixed_bugs/ + _misc/
+                          #（_misc/ = 2026-09-28 用户裁决整池退役的搁置池与磨清单；复活/触发条件仍在表内，点名才读）
 ```
 
 ## 推敲卡（plans/）的生命周期：毕业四门
@@ -32,8 +31,8 @@ _backlog/
 
 | 判断 | 出路 | 卡的去向 |
 |---|---|---|
-| 该做（现在/近期） | RFC 落 [notes/proposed/](../notes/proposed/)，状态行记「批准：」（门禁查）；实施由用户逐条点名。小修可不设 RFC → 进 [polish.md](polish.md) | 关闭迁 `_done/_closed_plans/`，状态行记去向指针 |
-| 该做但不现在（待触发） | [suspended.md](suspended.md) 行（满足其准入判据，复活条件必填） | 同上 |
+| 该做（现在/近期） | RFC 落 [notes/proposed/](../notes/proposed/)，状态行记「批准：」（门禁查）；实施由用户逐条点名。小修可不设 RFC，由用户点名直接做 | 关闭迁 `_done/_closed_plans/`，状态行记去向指针 |
+| 该做但不现在（待触发） | 状态行写「待触发 + 复活条件」（搁置池已退役，2026-09-28——旧表归档在 `_done/_misc/suspended.md`，点名才读） | 同上 |
 | 不做（证伪/否决） | 结论并入 owner Note「输掉的方案」，防复犯价值高的迁 [notes/rejected/](../notes/rejected/) | 同上 |
 | 不用单独记（消化） | 结论已并入某 Note/合同 | 同上，状态行记消化落点 |
 
@@ -63,14 +62,14 @@ _backlog/
 - **读**：① 立新卡前先检索（防重复推敲，同 Note 生命周期「新增触发取代检查」精神）；
   ② 用户点名继续推敲某卡；③ 打磨型 goal（dev-loop §0.5）可把「把一张卡成熟到毕业判断」当输入源
   （产出 = 呈批，不是开工）。
-- fresh agent 的任务源 = 已批 RFC + [polish.md](polish.md)（dev-loop §0.5 分支②）：**推敲卡不是任务**。
+- fresh agent 的任务源 = 已批 RFC + 用户点名（dev-loop §0.5；磨清单已退役，2026-09-28）：**推敲卡不是任务**。
 
 ## 明确不借（负知识：重新提出前先读理由）
 
 | 不借项 | 理由 |
 |---|---|
 | `todos/` 桶 | 任务源 = 已批 RFC + 用户指令（D32 后亦然）；todo 桶仍是第二任务家，另立必漂 |
-| `_suspended_*` 桶 | 悬挂事实家 = 本目录 `suspended.md` 表（准入判据 + 复活条件齐全）；另立 = 第二个搁置池 |
+| `_suspended_*` 桶 | 悬挂事实家 = 归档表 `_done/_misc/suspended.md`（准入判据 + 复活条件齐全，2026-09-28 起点名才读）；另立 = 第二个搁置池 |
 | `_reference/` 桶 | [notes/archived/](../notes/archived/) + docs/index.md §外部研究材料登记已覆盖留存参考语义 |
 | 复盘卡 | [notes/postmortem/](../notes/postmortem/) 已有（事故复盘 ≠ 设计推敲，别混） |
 | 队列/排序文件回巢（含在 _backlog 里立 queue 文件） | D32 用户裁决拆掉的就是它；次序回到用户手上——重新立 = 推翻 D32，须新 D 号带证据 |

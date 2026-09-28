@@ -8,12 +8,15 @@
 
 - [_closed_plans/](_closed_plans/README.md) — 已毕业推敲卡（文件名带立卡日期 `YYMMDD-slug`，按日期流/slug 查）
 - [_fixed_bugs/](_fixed_bugs/README.md) — 已修复缺陷卡（**Next BUG ID 权威源**）
+- [_misc/](_misc/) — 整池退役的搁置池 [suspended.md](_misc/suspended.md) 与磨清单 [polish.md](_misc/polish.md)（2026-09-28 用户裁决；复活/触发条件仍在表内，点名才读）
 
 ## 已毕业推敲卡
 
 | 卡 | 毕业门 | 去向 | 日期 |
 |---|---|---|---|
-| （空） | | | |
+| [260928-sidebar-split-budget.md](_closed_plans/260928-sidebar-split-budget.md) | 不做（维持 2 停靠 + N 浮出现状，不推 upstream） | 关闭迁本目录 `_closed_plans/` | 2026-09-28 |
+| [suspended.md](_misc/suspended.md) | 整池退役（用户裁决；复活条件仍在表内，点名才读） | `git mv` 迁 `_misc/` | 2026-09-28 |
+| [polish.md](_misc/polish.md) | 整池退役（用户裁决；余项触发条件仍在表内，点名才读） | `git mv` 迁 `_misc/` | 2026-09-28 |
 
 ## 已修复缺陷卡
 

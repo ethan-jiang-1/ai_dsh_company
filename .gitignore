@@ -12,3 +12,5 @@ dev/harness-home/*
 !dev/harness-home/README.md
 # 排练场（轮间待办②「练习场 ≠ 运行场」）：排练/探针会话的 cwd；产物不进 git，也不进真盘
 dev/rehearsal-workspace/
+# 浏览器探针的工具态（§11：工具态先落 gitignored 区）：playwright 浏览器下载 ~300M，绝不入库
+dev/pw-browsers/
