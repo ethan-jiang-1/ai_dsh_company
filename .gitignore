@@ -14,3 +14,7 @@ dev/harness-home/*
 dev/rehearsal-workspace/
 # 浏览器探针的工具态（§11：工具态先落 gitignored 区）：playwright 浏览器下载 ~300M，绝不入库
 dev/pw-browsers/
+# 手动分发导出（精神借 ai_dsh_architect）：_dist/ 是导出目的地不是源——tgz 忽略，
+# 手册是唯一 tracked 例外（版本由 verify 的 dist-manual 门禁对 pack package.json 核对）
+_dist/*
+!_dist/安装手册.md

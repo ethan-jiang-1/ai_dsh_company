@@ -211,6 +211,24 @@ missingTrigger.length === 0
   ? ok(`script-triggers ×${TRIGGER_FILES.length}（每个门禁/探针脚本头注自述「何时跑」）`)
   : fail('script-triggers', `这些脚本头注缺「// 何时跑：」（触发条件的家 = 脚本自己，别写回文档）：${missingTrigger.join(', ')}`)
 
+// ── 2g. 手动分发手册版本门禁（2026-09-28 立，精神借 ai_dsh_architect 的 tracked manual）────
+// 负例留证 2026-09-28：手改手册表头版本 → dist-manual 红，跑 export-dist 还原 → 绿。
+// 为什么：_dist/安装手册.md 是 tracked 生成物（tgz 之外的唯一 tracked 例外），表头版本若与
+// pack package.json 漂移 = 手册教人装的版本不是仓库当前版本；升版本忘重导 = 谎报。
+// 解法：版本 bump 必须同 diff 重跑 `node scripts/export-dist.mjs`（手册由脚本生成、永不手改）。
+{
+  const packVersion = JSON.parse(readFileSync(join(root, 'packages/company-pack/package.json'), 'utf8')).version
+  const manualPath = join(root, '_dist', '安装手册.md')
+  if (!existsSync(manualPath)) {
+    fail('dist-manual', '_dist/安装手册.md 缺失——跑 `node scripts/export-dist.mjs` 生成（tracked 生成物，随版本变更同 diff 重导）')
+  } else {
+    const manual = readFileSync(manualPath, 'utf8')
+    const header = manual.split('| 版本 |')[1]?.split('|')[0]?.trim()
+    header === packVersion
+      ? ok(`dist-manual（安装手册表头版本 = pack package.json ${packVersion}）`)
+      : fail('dist-manual', `安装手册表头版本（${header ?? '解析不到'}）≠ pack package.json（${packVersion}）——重跑 \`node scripts/export-dist.mjs\` 再提交，别手改手册`)
+  }
+}
 
 // ── 3. preset 结构：5 角色 × (声明文件 + ≥1 skill) ─────────────────────────
 // 负例留证 2026-09-27：移走一个 SKILL.md → skill-file 红。

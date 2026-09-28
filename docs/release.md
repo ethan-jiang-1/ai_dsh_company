@@ -97,3 +97,18 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
   `file:` tarball 安装形状）。
 - 发布前必跑：`pnpm verify` + `pnpm test`（迭代环）+ `release-smoke`（认证档）；
   preset/内容改动另跑 `preset-smoke`（guides/dev-loop §9.1 分层）。
+
+## 手动分发（`node scripts/export-dist.mjs`，无 key、秒级；2026-09-28 立，精神借 ai_dsh_architect）
+
+一条命令产出仓库外可装的两件套到 `_dist/`：`dsh-company-pack-<version>.tgz` + 生成式《安装手册》。
+三条规矩：
+
+- **`_dist/` 是导出目的地不是源**：tgz 全 gitignore；《安装手册》是唯一 tracked 例外——
+  由脚本生成（版本/日期/条目数注入），**永不手改**；verify 的 `dist-manual` 门禁核对手册表头
+  版本 == pack package.json（升版本忘重导即红；反证 2026-09-28 红→绿）。版本 bump 必须同 diff 重跑导出。
+- **打包步 = release-smoke 同一条 `npm pack`**（npm cache 钉 scratch，§11）；导出后对产物本体
+  再断言一次发布边界（cordis.patch.yml / lib 双半 / presets 在场，无 `package/` 外文件）。
+- **导出 ≠ 发布**：不 bump 版本、不跑认证档、不进 registry——按工作树现状打包；真实发布动作
+  仍按上文「版本纪律」（第二个消费者出现再定）。
+
+交付对象拿到的安装/验证/卸载步骤都在手册里（镜像 release-smoke 验证过的路径），本节不复述。
