@@ -8,7 +8,7 @@
 import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { DagPanel, fitScale } from '../packages/company-pack/src/client/company-panels.tsx'
+import { DagPanel, fitScale, wrapTitle } from '../packages/company-pack/src/client/company-panels.tsx'
 import { PanelFrame } from '../packages/company-pack/src/client/company-tabs.tsx'
 import { layoutDag } from '../packages/company-pack/src/lib/dag.ts'
 import type { TaskRow } from '../packages/company-pack/src/lib/board.ts'
@@ -26,9 +26,9 @@ describe('DagPanel 渲染结构（定位/动画分层）', () => {
     expect(html).toContain('wk-dag-owner')
   })
 
-  it('定位层数 = 节点数：外层 g 带 translate 且不带 wk-node', () => {
+  it('定位层数：外层 g 带 translate 且不带 wk-node（每节点 3 处 translate：定位 + 内容 + meta）', () => {
     const positioned = (html.match(/transform="translate\(/g) ?? []).length
-    expect(positioned).toBe(4)
+    expect(positioned).toBe(4 * 3)
     // 事故形态回归钉：wk-node 与 transform 出现在同一个 g 上 = 动画会吃定位。
     expect(html).not.toMatch(/class="wk-node"[^>]*transform=|transform="[^"]*"[^>]*class="wk-node"/)
   })
@@ -78,6 +78,20 @@ describe('DagPanel 画布自适应栏宽（2026-09-28 两轮试用反馈：右�
     }))
     expect(html).toContain('重画') // action 槽进页签头（与「浮出」同簇）
     expect(html).toContain('每 5 秒自动刷新') // 既有头元素不受影响
+  })
+
+  it('节点内容禁用 foreignObject（「文字堆左上角」整类问题的根因，2026-09-28 移除防回潮）', () => {
+    const html = renderToString(createElement(DagPanel, { layout: layoutDag([task('a'), task('b', ['a'])]) }))
+    expect(html).not.toContain('foreignObject')
+    expect(html).toContain('wk-dag-node-title') // 文字仍由依赖图标题元素承载（现在是 SVG text）
+  })
+
+  it('wrapTitle：短标题单行、长标题两行带省略号、单字超宽不死循环', () => {
+    expect(wrapTitle('短标题', 145)).toEqual(['短标题', null])
+    const [line1, line2] = wrapTitle('T7 CFO 互审 VP-Sales 稿（报价区间 ↔ 毛利底线与签字线）', 145)
+    expect(line2).not.toBeNull() // 长标题折两行
+    expect(line1!.length + line2!.length).toBeLessThan(40) // 且有截断
+    expect(wrapTitle('长', 1)[0]).toBe('长') // 单字超宽不死循环
   })
 })
 

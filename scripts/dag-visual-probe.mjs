@@ -116,7 +116,7 @@ const readStyles = () => page.evaluate(() => {
     等待箭头: style('.wk-arrow-tip-wait', 'fill'),
     已通箭头: style('.wk-arrow-tip-done', 'fill'),
     动画名: style('.wk-node', 'animationName'),
-    徽章: [...document.querySelectorAll('#dag-fixture .wk-dag-meta span:last-child')].map(el => el.textContent),
+    徽章: [...document.querySelectorAll('#dag-fixture .wk-dag-meta .wk-dag-status')].map(el => el.textContent),
   }
 })
 

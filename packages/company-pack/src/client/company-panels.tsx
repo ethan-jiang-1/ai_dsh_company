@@ -13,13 +13,6 @@ import { formatTokens } from '../lib/budget.ts'
 import type { DagLayout } from '../lib/dag.ts'
 import type { ActivityEntry, PresenceRow } from '../lib/presence.ts'
 
-/** 任务状态 → StateDot 语义。 */
-function taskDot(status: TaskRow['status']): 'done' | 'ongoing' | 'idle' {
-  if (status === 'completed') return 'done'
-  if (status === 'in_progress') return 'ongoing'
-  return 'idle'
-}
-
 /** 任务状态 → Tag 色调。 */
 function taskTone(status: TaskRow['status']): 'success' | 'info' | 'outline' {
   if (status === 'completed') return 'success'
@@ -27,16 +20,52 @@ function taskTone(status: TaskRow['status']): 'success' | 'info' | 'outline' {
   return 'outline'
 }
 
-/**
- * DAG 节点的状态徽章（文案 + 类名一处定义）。
- * 优先级：还在等前置 > 已完成 > 进行中 > 可开工——**进行中不得被读成"可开工"**（文案会误导调度）。
- * 悬空 blocker 已由 `layoutDag` 的 `waitingOn` 计入（与 `board.ts` 同口径）。
- */
-function NodeBadge({ node }: { readonly node: DagLayout['nodes'][number] }) {
-  if (node.waitingOn > 0) return <span className="wk-dag-wait">{`等 ${String(node.waitingOn)} 项`}</span>
-  if (node.status === 'completed') return <span className="wk-dag-done">已完成</span>
-  if (node.status === 'in_progress') return <span className="wk-dag-ready">进行中</span>
-  return <span className="wk-dag-ready">可开工</span>
+/** SVG 文本宽度估算：CJK 记 1em、其余记 0.55em（卡内手动排版用，不引测量 API）。 */
+function textWidth(text: string, fontSize: number): number {
+  let width = 0
+  for (const ch of text) width += fontSize * (/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch) ? 1 : 0.55)
+  return width
+}
+
+/** 按宽度截断（超宽尾部加省略号；单字超宽也保证推进，不死循环）。 */
+function truncateToWidth(text: string, maxWidth: number, fontSize: number): string {
+  let width = 0
+  for (let index = 0; index < text.length; index++) {
+    width += textWidth(text[index]!, fontSize)
+    if (width > maxWidth) return text.slice(0, Math.max(1, index)) + '…'
+  }
+  return text
+}
+
+/** 标题折行成 ≤2 行（第二行超宽尾加省略号）——SVG text 不自动换行，手动排。 */
+export function wrapTitle(subject: string, maxWidth: number, fontSize = 11): readonly [string, string | null] {
+  const chars = [...subject]
+  let first = ''
+  let index = 0
+  while (index < chars.length && textWidth(first + chars[index]!, fontSize) <= maxWidth) {
+    first += chars[index]!
+    index++
+  }
+  if (index >= chars.length) return [first, null]
+  if (first === '') {
+    first = chars[index]!
+    index++
+  }
+  const ellipsisWidth = textWidth('…', fontSize)
+  let second = ''
+  while (index < chars.length && textWidth(second + chars[index]!, fontSize) <= maxWidth - ellipsisWidth) {
+    second += chars[index]!
+    index++
+  }
+  return [first, second + (index < chars.length ? '…' : '')]
+}
+
+/** 节点状态徽章的数据面（文案 + class；class 决定 SVG text 的 fill）。 */
+function statusBadge(node: DagLayout['nodes'][number]): { text: string; className: string } {
+  if (node.waitingOn > 0) return { text: `等 ${String(node.waitingOn)} 项`, className: 'wk-dag-wait' }
+  if (node.status === 'completed') return { text: '已完成', className: 'wk-dag-done' }
+  if (node.status === 'in_progress') return { text: '进行中', className: 'wk-dag-ready' }
+  return { text: '可开工', className: 'wk-dag-ready' }
 }
 
 /** 成员状态 → StateDot 语义（团队内忙闲，D-c 文案在 `presence.ts`）。 */
@@ -174,35 +203,48 @@ export function DagPanel({ layout }: { readonly layout: DagLayout }) {
           pathLength={1}
         />
       ))}
-      {layout.nodes.map(node => (
+      {layout.nodes.map(node => {
         // 两层 g 分家（2026-09-25 实验现场红证）：外层只管**定位**（transform 属性）；
         // 内层 wk-node 只管**入场动画**——动画关键帧里的 CSS transform 会覆盖 SVG transform
         // 属性，合在一层 = 动画结束态 translateY(0) 把定位吃掉 ⇒ 所有节点堆到 (0,0) 叠成一摞。
-        <g key={node.id} transform={`translate(${String(node.x)} ${String(node.y)})`}>
-          <g className="wk-node" data-status={node.status}>
-            <rect
-              className="wk-dag-card"
-              width={node.width}
-              height={node.height}
-              rx={8}
-              fill="var(--dsw-alias-bg-layer-1)"
-              stroke="var(--dsw-alias-border-l2)"
-            />
-            <foreignObject x={9} y={7} width={node.width - 18} height={node.height - 12}>
-              <div className="wk-dag-node" {...{ xmlns: 'http://www.w3.org/1999/xhtml' }}>
-                <div className="wk-dag-node-head">
-                  <StateDot state={taskDot(node.status)} size={8} />
-                  <span className="wk-dag-node-title" title={`${node.id}：${node.subject}`}>{node.subject}</span>
-                </div>
-                <div className="wk-dag-meta">
-                  {node.ownerLabel !== null && <span className="wk-dag-owner">{node.ownerLabel}</span>}
-                  <NodeBadge node={node} />
-                </div>
-              </div>
-            </foreignObject>
+        // 内容 = **纯 SVG 元素**（2026-09-28 第三轮试用反馈定稿）：foreignObject 里的 HTML 在
+        // Safari/WebKit 下不跟缩放/易错位（「文字堆左上角」事故根因），文字改 <text> 手动
+        // 排版（wrapTitle 截两行）、状态点改 <circle>，与卡片/连线同一条坐标管线，任何浏览器
+        // 都不可能错位。
+        const [titleLine1, titleLine2] = wrapTitle(node.subject, node.width - 18 - 13)
+        const badge = statusBadge(node)
+        const owner = node.ownerLabel === null ? null : truncateToWidth(node.ownerLabel, 90, 10)
+        const ownerWidth = owner === null ? 0 : Math.round(textWidth(owner, 10) + 10)
+        return (
+          <g key={node.id} transform={`translate(${String(node.x)} ${String(node.y)})`}>
+            <g className="wk-node" data-status={node.status}>
+              <rect
+                className="wk-dag-card"
+                width={node.width}
+                height={node.height}
+                rx={8}
+                fill="var(--dsw-alias-bg-layer-1)"
+                stroke="var(--dsw-alias-border-l2)"
+              />
+              <g className="wk-dag-node" transform={`translate(9 7)`}>
+                <title>{`${node.id}：${node.subject}`}</title>
+                <circle className="wk-dag-dot" data-status={node.status} cx={4} cy={9} r={4} />
+                <text className="wk-dag-node-title" x={13} y={16}>{titleLine1}</text>
+                {titleLine2 !== null && <text className="wk-dag-node-title" x={13} y={29}>{titleLine2}</text>}
+                <g className="wk-dag-meta" transform={`translate(13 0)`}>
+                  {owner !== null && (
+                    <>
+                      <rect className="wk-dag-owner-pill" x={0} y={36} width={ownerWidth} height={12} rx={4} />
+                      <text className="wk-dag-owner" x={5} y={45.5}>{owner}</text>
+                    </>
+                  )}
+                  <text className={`wk-dag-status ${badge.className}`} x={owner === null ? 0 : ownerWidth + 6} y={45.5}>{badge.text}</text>
+                </g>
+              </g>
+            </g>
           </g>
-        </g>
-      ))}
+        )
+      })}
         </svg>
       </div>
     </div>

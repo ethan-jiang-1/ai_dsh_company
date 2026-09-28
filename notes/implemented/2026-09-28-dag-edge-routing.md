@@ -1,4 +1,4 @@
-# DAG 边线车道分离——拿走「中段打结」的重合感（已交付）
+# 依赖图渲染质量三轮定稿——车道分离、跨层边边缘通道、foreignObject 移除（已交付）
 
 状态：已交付（2026-09-28 实施同日全验收链通过。源卡
 [_backlog/_done/_closed_plans/260928-dag-edge-routing.md](../../_backlog/_done/_closed_plans/260928-dag-edge-routing.md)）
@@ -71,6 +71,20 @@
 keyless 248/248（新增 fitScale 四态 + 不穿卡 + 边缘通道断言）；夹具档 13 判据 ALL PASS
 （截图选择器随 wrapper 结构修正）；真板面（8 节点 13 边）DOM 断言：文字全在卡内、
 scale(0.879) 生效、13 边全圆弧、4 条跨层边走边缘。
+
+## 追加切片 3（同日第四轮用户反馈：「node 的内容总画到左上边不合理的位置」）
+
+前三轮的「文字堆左上角」在 Chromium、WebKit（playwright 2358，浮出/拖小/收回四态）里都无法
+复现——文字全在卡内。不再赌浏览器版本与缩放机制，**拔掉病根**：节点内容从 foreignObject
+（SVG 里嵌 HTML）整类移除，改**纯 SVG 元素**——状态点 `<circle>`、标题 `<text>` 两行手动
+折行截断（`wrapTitle`/`truncateToWidth`/`textWidth` 纯函数，CJK 1em/ASCII 0.55em 估宽）、
+owner 徽章 `<rect>+<text>`。文字与卡片/连线走同一条坐标管线，任何浏览器的缩放/变换行为
+差异都不可能再造成错位。涉 transforms 的旧样式（flex/line-clamp/ellipsis）随 HTML 一起退役，
+改 fill 令牌；动画纯度钉（transform/opacity 不上 .wk-node）不变。
+
+验收追加：keyless 251/251（新增「禁 foreignObject 回潮」总闸 + wrapTitle 三态 + 定位层数
+改 3 层计数）；夹具档 13 判据 ALL PASS；真板面双引擎 DOM 断言——WebKit 与 Chromium 均
+8 节点文字全在卡内、scale(0.879) 生效、13 边全圆弧。
 
 ## 已知边界
 

@@ -160,18 +160,17 @@ const CSS = `
    ⚠ 不用 CSS 宽度缩放（max-width:100%）：Safari/WebKit 里 foreignObject 内的 HTML 不跟
    SVG 的 CSS 宽度缩放走——卡片和线缩了、节点文字留在原位堆向左上角（用户实测事故）。 */
 .wk-dag-svg { display: block; }
-/* 依赖图节点卡：标题行 + 元信息行（owner 徽章 / 等待·就绪状态）。 */
-.wk-dag-node { display: flex; flex-direction: column; gap: 3px; }
-.wk-dag-node-head { display: flex; align-items: flex-start; gap: 5px; }
-.wk-dag-meta { display: flex; align-items: center; gap: 6px; padding-left: 13px; }
-.wk-dag-owner {
-  font-size: 10px; line-height: 1.2; color: var(--dsw-alias-label-secondary);
-  background: var(--dsw-alias-bg-layer-2); border-radius: 4px; padding: 1px 5px;
-  max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.wk-dag-wait { font-size: 10px; color: var(--dsw-alias-state-warn-primary); }
-.wk-dag-ready { font-size: 10px; color: var(--dsw-alias-state-success-primary); }
-.wk-dag-done { font-size: 10px; color: var(--dsw-alias-label-secondary); }
+/* 依赖图节点卡：纯 SVG 内容（2026-09-28 第三轮定稿，foreignObject 已移除——
+   Safari/WebKit 下 HTML 不跟 SVG 缩放、文字堆左上角）。文字 fill 走令牌。 */
+.wk-dag-node-title { font-size: 11px; fill: var(--dsw-alias-label-primary); }
+.wk-dag-owner-pill { fill: var(--dsw-alias-bg-layer-2); }
+.wk-dag-owner { font-size: 10px; fill: var(--dsw-alias-label-secondary); }
+.wk-dag-dot[data-status='completed'] { fill: var(--dsw-alias-state-success-primary); }
+.wk-dag-dot[data-status='in_progress'] { fill: var(--dsw-alias-state-business-primary); }
+.wk-dag-dot[data-status='pending'] { fill: var(--dsw-alias-state-idle-primary); }
+.wk-dag-wait { font-size: 10px; fill: var(--dsw-alias-state-warn-primary); }
+.wk-dag-ready { font-size: 10px; fill: var(--dsw-alias-state-success-primary); }
+.wk-dag-done { font-size: 10px; fill: var(--dsw-alias-label-secondary); }
 /* 状态化：进行中 = 主色描边；完成 = 整卡降透明度（依赖图一眼看出"卡在哪一拨"）。
    ⚠ 降透明度**不能写在 .wk-node 自己身上**：它带入场动画（animation: wk-node-in … both，
    关键帧动 opacity 0→1），而 CSS 级联里 **animation 声明高于普通作者声明** ⇒ 动画结束态的
@@ -180,15 +179,6 @@ const CSS = `
 .wk-node[data-status='in_progress'] .wk-dag-card { stroke: var(--dsw-alias-state-business-primary); stroke-width: 1.5; }
 .wk-node[data-status='completed'] .wk-dag-card,
 .wk-node[data-status='completed'] .wk-dag-node { opacity: 0.55; }
-.wk-dag-node-title {
-  font-size: 11px;
-  line-height: 1.3;
-  color: var(--dsw-alias-label-primary);
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
 
 /* ── S2 皮肤：旧组件（委派卡 / 任务板弹窗 / 驾驶舱行）令牌化 ── */
 
