@@ -1,6 +1,6 @@
 # 推敲：依赖图边线路由（中段打结的视觉缓解）
 
-> 状态：已毕业（2026-09-28，用户批准转入 RFC）｜去向 = [notes/proposed/2026-09-28-dag-edge-routing.md](../../../notes/proposed/2026-09-28-dag-edge-routing.md)｜原毕业门判断 = 待触发——用户作为次序权威直接点名「都要修改掉」，方案走车道分离（纯布局函数）
+> 状态：已毕业（2026-09-28，用户批准转入 RFC）｜去向 = [notes/implemented/2026-09-28-dag-edge-routing.md](../../../notes/implemented/2026-09-28-dag-edge-routing.md)｜原毕业门判断 = 待触发——用户作为次序权威直接点名「都要修改掉」，方案走车道分离（纯布局函数）
 
 ## 背景 / 触发
 

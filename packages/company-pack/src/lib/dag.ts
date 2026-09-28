@@ -159,24 +159,49 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
     })
   }
 
+  // ── 边路径 + 车道分离（2026-09-28 RFC：同带重合消除）──
+  // 交叉是行布局下限（barycenter 已最优、排序无解），但多条边共用同一条走廊会让交叉段
+  // **重合**——收官全绿时中段读作一团乱麻。车道 = 同一带（from 层→to 层）内的边按
+  // （源 x、目标 x）排序各占一条 y 通道（(i+1)/(n+1) 等分带高），控制点从共用的 mid 改为
+  // 各自 lane ⇒ 中段水平段互斥、交叉从「叠着过」变「错层跨越」。单边带 lane = 中点，
+  // 渲染与旧版逐像素相同（向后兼容）；跨多层的边自成一组，仍走中点。
   const positionById = new Map(nodes.map(node => [node.id, node]))
-  const edges: DagEdge[] = []
+  const positioned: { from: DagNode; to: DagNode }[] = []
   for (const edge of dependencyEdges(tasks)) {
     const from = positionById.get(edge.from)
     const to = positionById.get(edge.to)
     if (from === undefined || to === undefined) continue
-    const x1 = from.x + from.width / 2
-    const y1 = from.y + from.height
-    const x2 = to.x + to.width / 2
-    const y2 = to.y
-    const mid = (y1 + y2) / 2
-    edges.push({
-      from: edge.from,
-      to: edge.to,
-      path: `M ${String(round(x1))} ${String(round(y1))} C ${String(round(x1))} ${String(round(mid))}, ${String(round(x2))} ${String(round(mid))}, ${String(round(x2))} ${String(round(y2))}`,
-      done: statusOf.get(edge.from) === 'completed',
+    positioned.push({ from, to })
+  }
+  const bands = new Map<string, { from: DagNode; to: DagNode }[]>()
+  for (const edge of positioned) {
+    const key = `${String(edge.from.level)}→${String(edge.to.level)}`
+    const bucket = bands.get(key)
+    if (bucket === undefined) bands.set(key, [edge])
+    else bucket.push(edge)
+  }
+  const laneY = new Map<{ from: DagNode; to: DagNode }, number>()
+  for (const bucket of bands.values()) {
+    bucket.sort((a, b) => (a.from.x - b.from.x) || (a.to.x - b.to.x))
+    bucket.forEach((edge, index) => {
+      const y1 = edge.from.y + edge.from.height
+      const y2 = edge.to.y
+      laneY.set(edge, y1 + (y2 - y1) * ((index + 1) / (bucket.length + 1)))
     })
   }
+  const edges: DagEdge[] = positioned.map(edge => {
+    const x1 = round(edge.from.x + edge.from.width / 2)
+    const y1 = round(edge.from.y + edge.from.height)
+    const x2 = round(edge.to.x + edge.to.width / 2)
+    const y2 = round(edge.to.y)
+    const lane = round(laneY.get(edge) ?? (y1 + y2) / 2)
+    return {
+      from: edge.from.id,
+      to: edge.to.id,
+      path: `M ${String(x1)} ${String(y1)} C ${String(x1)} ${String(lane)}, ${String(x2)} ${String(lane)}, ${String(x2)} ${String(y2)}`,
+      done: statusOf.get(edge.from.id) === 'completed',
+    }
+  })
 
   return { nodes, edges, width: round(width), height: round(height) }
 }

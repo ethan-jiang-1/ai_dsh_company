@@ -107,3 +107,42 @@ describe('layoutDag', () => {
     expect(layout.height).toBeGreaterThan(0)
   })
 })
+
+describe('layoutDag 边线车道分离（2026-09-28 RFC：同带重合消除）', () => {
+  /** 解析 path `M x1 y1 C cx1 cy1, cx2 cy2, x2 y2` 的关键字段。 */
+  const parse = (path: string): { y1: number; cy1: number; y2: number } => {
+    const match = /^M ([\d.]+) ([\d.]+) C ([\d.]+) ([\d.]+), ([\d.]+) ([\d.]+), ([\d.]+) ([\d.]+)$/.exec(path)
+    if (match === null) throw new Error(`path 形状意外：${path}`)
+    return { y1: Number(match[2]), cy1: Number(match[4]), y2: Number(match[8]) }
+  }
+  /** 现场形状（2026-09-28 试用反馈那场）：4 根 → 3 子，带 0→1 里 5 条边。 */
+  const tangled = () => [
+    task('t1'), task('t2'), task('t3'), task('t4'),
+    task('t5', ['t4']), task('t6', ['t2', 't3']), task('t7', ['t1', 't4']),
+  ]
+
+  it('同层间带的边中段车道互斥（交叉允许、重合不允许）', () => {
+    const layout = layoutDag(tangled())
+    const byBand = new Map<string, number[]>()
+    for (const edge of layout.edges) {
+      const { y1, y2, cy1 } = parse(edge.path)
+      const key = `${String(y1)}→${String(y2)}`
+      byBand.set(key, [...(byBand.get(key) ?? []), cy1])
+    }
+    const multi = [...byBand.entries()].filter(([, lanes]) => lanes.length >= 2)
+    expect(multi.length).toBeGreaterThan(0) // 夹具确实造出了同带多边，否则断言空转
+    for (const [band, lanes] of multi) {
+      expect(new Set(lanes).size, `带 ${band} 车道：${lanes.join('、')}`).toBe(lanes.length)
+    }
+  })
+
+  it('车道都在带内（y1 < cy < y2）；单边带 lane = 中点（渲染向后兼容）', () => {
+    for (const edge of layoutDag(tangled()).edges) {
+      const { y1, cy1, y2 } = parse(edge.path)
+      expect(cy1).toBeGreaterThan(y1)
+      expect(cy1).toBeLessThan(y2)
+    }
+    const chain = parse(layoutDag([task('a'), task('b', ['a'])]).edges[0]!.path)
+    expect(chain.cy1).toBeCloseTo((chain.y1 + chain.y2) / 2, 5)
+  })
+})
