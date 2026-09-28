@@ -1,36 +1,42 @@
-# 2026-09-28 · CI 加 test lane + 样板化（ci.yml）
+# 2026-09-28 · CI 样板化：verify-only CI + test 进 pre-push hook（首跑红定界）
 
-状态：implemented（2026-09-28。起因 = 用户点名「还是需要一个简单负担不重的 CI，github 需要的那种」
-——既定触发条件（第二贡献者/忘跑成常态）未到，**用户指令即新触发**，不包装成判据产物；
-有此前见 = [enforcement 通道](./2026-09-27-enforcement-channel-and-boundaries.md) 的 verify-only 道。
+状态：implemented（2026-09-28。起因 = 用户点名「还是需要一个简单负担不重的 CI，github 需要的那种」。
+本轮含一次**红灯对照抓到自己错判**的完整闭环，如实入档。）
 
 ## 交付
 
-1. **workflow `verify` → `ci`**（`git mv`，无 required check 引用故改名零成本；检查名从此为
-   `ci / verify-and-test`）。单 job 顺序两步：`verify` → `pnpm test`——不并行，省一份重复 install。
-2. **test lane 进 CI**：核查依据 = vitest 走 tsconfig paths 指 vendor **src**（纪律本就不走 lib），
-   230 测试的 import 面无一指向构建产物（vendor src + 本仓 TS/TSX + react 等 npm 依赖）——
-   Note 里旧断言「需 §7 全量构建链」被证伪。唯一实证风险 = 根 install 不覆盖 vendor 根包传递依赖
-   （昨天 CI 二跑同款坑的变体）：红则补最小依赖，修不动则带证回退本步。
-3. **concurrency** 同 ref 取消旧跑（「每条一 commit + push」节奏下防排队）；**timeout-minutes: 15**
-   帽住网络类坑。真模型/浏览器/preset-smoke/replay 不进 CI（分层纪律 + 需 dev home）。
-4. **README badge** 一行（ci.yml 徽章）——「GitHub 需要的那种」的可见性面。
+1. **workflow `verify` → `ci`**（`git mv`，无 required check 引用故改名零成本；检查名 = `ci / verify`）。
+   单 job：干净环境全量结构门禁；**concurrency 同 ref 取消旧跑**（「每条一 commit + push」节奏防排队）；
+   **timeout-minutes: 15** 帽住网络类坑。README 加 badge 一枚。
+2. **test lane 进 CI 的尝试被首跑红否决**（run 36373885805，红在 test 步）：根因 = vendor **内部**的
+   `@deepseek-ai/*` 解析走包入口（`vendor/dsh/vendor/cordis/src/events.ts` → cosmokit → 未构建 lib）。
+   本仓 tsconfig 是 `files: []` 门面——paths 只服务本仓文件，vendor 内部文件走 node 解析；本地能过
+   纯粹因为 dev 树已构建 lib。**「import 面无构建产物」的核查漏了 vendor 内部这一层**——DSH 自己的
+   `"test"` 脚本 = `build:native-system && vitest run`，即 DSH 本尊也是先构建再测。
+3. **test 的 enforcement 挪进 pre-push hook**（本仓 dev 树按 bootstrap 必然已构建，test 1.3s 便宜
+   高置信——正中「hook 只装便宜高置信缺陷」口径）：hook 现跑 `verify` + `pnpm test`，行为测试从此
+   推不上未过关的 origin。CI 保持 verify-only（其定位 = 干净环境差异 + --no-verify 绕过的穷举档）。
+4. **负例留证**：临时失败 spec → hook exit **1**（pnpm test 红）→ 删除 → exit **0**；CI 红腿 =
+   test 步 exit 1（日志在案），撤步后 CI 应回绿。
 
 ## 输掉的方案
 
-- **分支保护 / required checks**：会把「直接 push master 的条目制」逼成 PR 流；hook（忘跑）+
-  CI（环境差异/绕过）的 DSH 分工已覆盖真实风险。第二贡献者进场再议。
-- **并行双 job**：install 重复付一遍（~40s），顺序总时长反而短。
-- **矩阵 / cron / coverage gate**：单 OS 单 node 是本仓现实；无长驻分支 cron 即空转；coverage 不借
-  （判定稿在案）。
+- **vitest 配 src 别名修 vendor 内部解析**：失败 spec 全是 client 链，牵涉 ~20 个 `@deepseek-ai/*`
+  包 + 各自传递依赖——别名映射是维护无底洞，且与 vendor 自己的包入口语义对着干。不借。
+- **CI 里跑 vendor 全量构建再 test**：DSH 同款（build && vitest）但 `pnpm --dir vendor/dsh run build`
+  在本仓嵌套工作区必失败（D27 在案）；等于把升 pin 的坑再挖一遍，负担远超「样板 CI」定位。
+- **CI 只跑「不碰 vendor 链」的 22/27 个 spec**：排除清单随 spec 增长必腐，覆盖静默缩水——发明脆弱机制。
+- **分支保护 / required checks / 矩阵 / cron / coverage**：同前论，不做。
 
 ## 验证（实际跑过的）
 
 - 本地：`pnpm verify` ALL PASS + `pnpm test` 230/230（提交前实跑）。
-- CI 首跑（ci.yml 首次 push）：**结果回填于此**（预期红点 = 传递依赖缺；打法 = 三跑闭环先例）。
+- CI 首跑（36373885805）：verify ✓（53s 内过）→ test ✗（红在 cosmokit 包入口解析，日志已取）。
+- CI 撤 test 步后的提交：**回填于此**（预期绿）。
+- hook 负例：失败 spec → exit 1；还原 → exit 0（上节）。
 
 ## 登记
 
-- intents.md 同批一行指针；[enforcement Note](./2026-09-27-enforcement-channel-and-boundaries.md)
-  「输掉的方案」中 test lane 延后行补反转指针。
-- 后续若有第二个消费者/贡献者：required checks + 分支保护重新评估（触发条件在案）。
+- intents.md 同批修正 CI 行；[enforcement Note](./2026-09-27-enforcement-channel-and-boundaries.md)
+  的 test lane 指针改为终态（进 hook 非 CI）；dev-loop §12 push 落点 bullet 补 hook 跑 verify+test。
+- test 回 CI 的触发条件：上游提供免构建 test 路径，或第二贡献者进场值得付构建链成本。
