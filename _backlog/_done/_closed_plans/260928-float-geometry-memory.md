@@ -1,6 +1,6 @@
 # 推敲：浮窗几何记忆（浮出位置/大小下次还原 + 视口不足时的摆位）
 
-> 状态：推敲中｜毕业门判断 = 待定（先答「vendor dock intents 能否从 pack 侧带 rect 驱动」再定方案）｜下一步 = 读 `ui-dockkit` intents/engine 形状核实 B 案前置；用户再被默认位烦到或 demo 需要稳定布局时升优先级
+> 状态：已毕业（2026-09-28，用户批准转入 RFC）｜去向 = [notes/proposed/2026-09-28-float-geometry-memory.md](../../../notes/proposed/2026-09-28-float-geometry-memory.md)｜原毕业门判断 = 待定——**B 案前置已核实：平台 `float(tabId, rect?)` 本就带可选 rect（service.ts:227/648），pack 侧零 vendor 改动可行**
 
 ## 背景 / 触发
 

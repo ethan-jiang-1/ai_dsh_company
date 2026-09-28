@@ -9,8 +9,7 @@
 
 | 卡 | 一句话 | 毕业门判断 |
 |---|---|---|
-| [260928-float-geometry-memory.md](260928-float-geometry-memory.md) | 浮窗位置/大小下次还原 + 视口不足摆位；难处在与 vendor 引擎状态同步，不在几何 | 待定（先核 vendor intents 可否外部驱动） |
-| [260928-dag-edge-routing.md](260928-dag-edge-routing.md) | 依赖图边线打结的路由级缓解；形状固有非 bug | 待触发（≥2 次「因交叉误读」反馈） |
+| （空——首卡立时建行） | | |
 
 ## 卡片模板
 
