@@ -48,19 +48,22 @@ export interface PanelFrameProps {
 }
 
 /**
- * 页签体共用外框：tone 色条 + 标题 + 刷新说明 + **「浮出 / 收回」（状态感知）** + 内容。
+ * 页签体共用外框：tone 色条 + 标题 + 刷新说明 + **页签自备动作（可选）** + 「浮出 / 收回」（状态感知）+ 内容。
  *
  * - 色条（用户走查 2026-09-27：浮窗背景全一样认不出哪个是哪个）：面板顶 3px tone 色
  *   （`background: currentColor` 吃 tone 类；浮窗头标题另有 tinted 色丸，见 styles.ts）。
+ * - 页签自备动作（2026-09-28，用户令）：`action` 槽渲染在页签头右侧（与「浮出」同簇）——
+ *   面板私有的小操作（如依赖图的「重画」）不为此另开机制。
  * - 浮出/收回：dock 态显示「浮出」（`float(tabId)`）；浮出态显示「收回」（`unfloat(paneId)`）。
  *   浮出态感知 = 每次渲染查 DOM 祖先 `[data-dockkit-float]`（其属性值 = paneId）——
  *   `useTabInfo()` 的 layout 是 observable，浮出/收回都会触发本组件重渲染，检查自然保持新鲜。
  *   浮窗的移动（grip）、缩放、置顶仍是平台能力，我们不自造窗口管理（D13）。
  */
-export function PanelFrame({ title, tone, tabProps, children }: {
+export function PanelFrame({ title, tone, tabProps, action, children }: {
   readonly title: string
   readonly tone: string
   readonly tabProps: PanelFrameProps
+  readonly action?: ReactNode
   readonly children: ReactNode
 }) {
   const info = tabProps.useTabInfo()
@@ -98,6 +101,7 @@ export function PanelFrame({ title, tone, tabProps, children }: {
         <strong>{title}</strong>
         <span className="wk-meta">每 5 秒自动刷新</span>
         <span style={{ flex: 1 }} />
+        {action}
         {floatPaneId === null
           ? (
             <Button
@@ -165,15 +169,32 @@ export function BoardTab(props: CompanyTabProps) {
 
 /**
  * 依赖图页签体。
+ * 「重画」（2026-09-28 用户令）：偶发渲染抽风时手动强制重画——`key` 递增 ⇒ DagPanel 整组件
+ * 重挂载（重测容器宽、重放布局与入场动画）；平时不需要（5 秒自动刷新只换数据不重挂载）。
  * @param props - 槽 props + 注入数据面。
  * @returns 依赖图。
  */
 export function DagTab(props: CompanyTabProps) {
   const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
+  const [redrawKey, setRedrawKey] = useState(0)
   return (
-    <PanelFrame title="依赖图" tone="structure" tabProps={props}>
+    <PanelFrame
+      title="依赖图"
+      tone="structure"
+      tabProps={props}
+      action={(
+        <Button
+          size="sm"
+          variant="ghost"
+          title="强制重画一次（重测栏宽、重放布局与动画）——偶发渲染不对时用"
+          onClick={() => { setRedrawKey(previous => previous + 1) }}
+        >
+          重画
+        </Button>
+      )}
+    >
       {data.error !== null && <div className="wk-error">{data.error}</div>}
-      <DagPanel layout={data.dag} />
+      <DagPanel key={redrawKey} layout={data.dag} />
     </PanelFrame>
   )
 }

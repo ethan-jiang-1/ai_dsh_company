@@ -9,6 +9,7 @@ import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { DagPanel, fitScale } from '../packages/company-pack/src/client/company-panels.tsx'
+import { PanelFrame } from '../packages/company-pack/src/client/company-tabs.tsx'
 import { layoutDag } from '../packages/company-pack/src/lib/dag.ts'
 import type { TaskRow } from '../packages/company-pack/src/lib/board.ts'
 
@@ -61,6 +62,22 @@ describe('DagPanel 画布自适应栏宽（2026-09-28 两轮试用反馈：右�
     expect(html).toMatch(/transform:scale\(/) // 绘制级缩放（SSR 首帧 scale=1，测得后再缩）
     expect(html).not.toMatch(/max-width/) // CSS 宽度缩放已被 Safari 事故证伪
     expect(html).not.toMatch(/min-width/) // 旧下限机制由 fitScale 接管
+  })
+
+  it('PanelFrame 的 action 槽渲染页签自备动作（依赖图「重画」的机制面，2026-09-28 用户令）', () => {
+    const html = renderToString(createElement(PanelFrame, {
+      title: '依赖图',
+      tone: 'structure',
+      tabProps: {
+        useTabInfo: (() => ({ tab: { id: 'stub-tab' } })) as never,
+        floatTab: () => {},
+        unfloatTab: () => {},
+      },
+      action: createElement('button', { type: 'button' }, '重画'),
+      children: null,
+    }))
+    expect(html).toContain('重画') // action 槽进页签头（与「浮出」同簇）
+    expect(html).toContain('每 5 秒自动刷新') // 既有头元素不受影响
   })
 })
 
