@@ -1,16 +1,23 @@
-# CI 穷举档（enforcement 通道第二档，2026-09-27 立）：干净环境跑全量结构门禁。
+# CI 穷举档（enforcement 通道第二档，2026-09-27 立；2026-09-28 加 test lane）：干净环境跑结构门禁 + keyless 行为测试。
 # 为什么：pre-push hook 防「忘了跑」，CI 防「本地环境差异」与「--no-verify 绕过」（DSH：CI owns exhaustive）。
+# lanes：① verify = 全量结构门禁；② test = vitest keyless（tsconfig paths 指 vendor src，无需构建链——
+#   import 面核查 2026-09-28：无一指向 lib/dist；唯一实证风险 = 根 install 不覆盖 vendor 根包的传递依赖，
+#   红了补最小依赖或带证回退，打法同 2026-09-27 三跑闭环）。真模型/浏览器/preset-smoke/replay 不进 CI
+#   （分层纪律 + 需 dev home），留本地按触发条件跑。
 # ⚠ verify 不是零依赖：scripts/lib/markdown-links.mjs 复用 vendor 工作区的解析器依赖
 # （mdast-util-from-markdown 等，经 vendor/dsh/package.json 解析——首跑失败的根因即此），
 # 所以走标准引导（dev-loop §7 第 3 步）：corepack + pnpm install --frozen-lockfile。
-# test lane 同理需要全量构建链，触发条件成立再后加（第二贡献者进场 / 忘跑成为实际频率）。
-name: verify
+name: ci
 on:
   push:
   pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  verify:
+  verify-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,3 +29,4 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: node scripts/verify.mjs
+      - run: pnpm test

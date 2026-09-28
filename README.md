@@ -1,5 +1,7 @@
 # ai_dsh_company
 
+[![ci](https://github.com/ethan-jiang-1/ai_dsh_company/actions/workflows/ci.yml/badge.svg)](https://github.com/ethan-jiang-1/ai_dsh_company/actions/workflows/ci.yml)
+
 虚拟公司多角色 DSH 插件项目：一个 pack（`packages/company-pack`）扮演一家公司——**wochen**，
 CEO、VP-Eng、VP-Sales、COO、CFO 各自是独立 preset，事件从 CEO 进出，中间用 Agent Teams 协作。
 
