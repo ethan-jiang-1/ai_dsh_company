@@ -155,6 +155,12 @@ const CSS = `
 .wk-bar-fill { height: 100%; background: var(--dsw-alias-state-business-primary); }
 
 /* DAG */
+/* 画布自适应栏宽（2026-09-28 试用反馈：右缘裁切）：布局按内容算宽（4 根任务 = 832px），
+   右栏常只有 ~731px 且 overflow-x:auto 的滚动条无常驻 ⇒ 最右节点被拦腰切掉还看不出右边有货。
+   max-width:100% = 等比缩到栏宽（viewBox 保形 + height:auto 锁比例）；缩放下限不写死在这里——
+   是组件内联的 min-width（0.75 × 布局宽，随图变，company-panels.tsx）：低于它再缩字就不可读，
+   宁可横向滚动。 */
+.wk-dag-svg { display: block; max-width: 100%; height: auto; }
 /* 依赖图节点卡：标题行 + 元信息行（owner 徽章 / 等待·就绪状态）。 */
 .wk-dag-node { display: flex; flex-direction: column; gap: 3px; }
 .wk-dag-node-head { display: flex; align-items: flex-start; gap: 5px; }

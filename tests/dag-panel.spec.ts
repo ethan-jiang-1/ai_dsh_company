@@ -42,6 +42,28 @@ describe('DagPanel 渲染结构（定位/动画分层）', () => {
   })
 })
 
+describe('DagPanel 画布自适应栏宽（2026-09-28 试用反馈：右缘裁切）', () => {
+  /* 事故形态：布局按内容算宽（4 根 = 832px），右栏常只有 ~731px，SVG 定宽 ⇒ 最右节点被
+     拦腰切掉（overflow-x:auto 无常驻滚动条，看不出右边还有）。钉两件事：svg 带自适应类；
+     min-width 下限 = 0.75 × 布局宽（再缩字不可读，回退横向滚动）。 */
+  it('svg 带 wk-dag-svg 类与 min-width 下限（0.75 × 布局宽）', () => {
+    const html = renderToString(createElement(DagPanel, {
+      layout: layoutDag([task('a'), task('b'), task('c'), task('d')]),
+    })) // 4 根并行一层 = 832px（现场 731px 栏里会裁切的形状）
+    expect(html).toContain('wk-dag-svg')
+    expect(html).toMatch(/min-width:\s*624px/)
+  })
+
+  it('下限随布局宽走：宽图下限更高（1040px 布局 → 780px），窄图不拉伸', () => {
+    const wide = renderToString(createElement(DagPanel, {
+      layout: layoutDag([task('a'), task('b'), task('c'), task('d'), task('e')]),
+    }))
+    expect(wide).toMatch(/min-width:\s*780px/)
+    const narrow = renderToString(createElement(DagPanel, { layout: layoutDag([task('a')]) }))
+    expect(narrow).toMatch(/min-width:\s*156px/)
+  })
+})
+
 describe('DagPanel 状态徽章与箭头（2026-09-26 code-review 补的钉子）', () => {
   it('四态文案各自在场：可开工 / 进行中 / 已完成 / 等 N 项', () => {
     const layout = layoutDag([

@@ -100,8 +100,14 @@ export function BoardPanel({ columns }: { readonly columns: readonly BoardColumn
   )
 }
 
+/** 画布缩放下限（占布局宽的比例）：再缩 11px 标题就不到 8px，宁可回退横向滚动。 */
+const DAG_MIN_SCALE = 0.75
+
 /**
  * 依赖图：自绘 SVG（节点左侧状态点 + 依赖连线；blocker 已完成 = 实线）。
+ * 画布自适应栏宽：`max-width: 100%`（CSS）等比缩到栏宽；`minWidth`（内联，随布局宽走）
+ * 是缩放下限——低于它不再缩，改由容器横向滚动（2026-09-28 试用反馈：定宽 832px 的图
+ * 在 ~731px 栏里把最右节点拦腰切掉，且滚动条无常驻、看不出右边还有）。
  * @param props.layout - `layoutDag` 算好的节点/边与画布尺寸。
  * @returns SVG（空图给空态文案）。
  */
@@ -109,9 +115,11 @@ export function DagPanel({ layout }: { readonly layout: DagLayout }) {
   if (layout.nodes.length === 0) return <StateNote text="这场动议还没有任务依赖图。" />
   return (
     <svg
+      className="wk-dag-svg"
       width={layout.width}
       height={layout.height}
       viewBox={`0 0 ${String(layout.width)} ${String(layout.height)}`}
+      style={{ minWidth: Math.round(layout.width * DAG_MIN_SCALE) }}
       role="img"
       aria-label="任务依赖图"
     >
