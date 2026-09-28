@@ -103,8 +103,8 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 工作树内、已被该 repo 的 git 跟踪；不在本 repo 版本控制范围，引用时注明是外部研究材料）：
 `_faq_on_digested/`、`_digested/`、`_agent_ready_development/`（后者 = Agent-ready Development 语料，
 第三视角"Development Harness"专题；已逐篇对照完毕——判定台账见下表该行）。
-该研究树 HEAD 在钉住 tag 之后 199 个提交（本地 FAQ/docs 工作，`dsh-v0.1.7-rc.1-199-g5c3af9b21b`，2026-09-25 复核），
-`_digested` 的审计基线仍为 rc.2——引外部笔记时以基线对齐，不追研究树新提交。
+该研究树 HEAD 持续演进（本地 FAQ/docs 工作）；引用以各材料注册行核对的版本为准，`_digested` 审计基线
+仍为 rc.2——引外部笔记时以基线对齐，不追研究树新提交（钉基线复核 2026-09-28：被引用文件自注册起零变化）。
 **思想吸收进本 repo 文档后，日常不再依赖原文**；下表是"哪个想法落在了哪儿"的地图：
 
 | 材料 | 内容 | 吸收落点 |
@@ -118,7 +118,8 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | `_agent_ready_development/sdlc-reference/01-agent-note-lifecycle.md` | DSH Agent Note 生命周期（状态/路径/格式/取代/归档；基于上游 0.1.7-rc.1 树） | guides/dev-loop §12 Note 生命周期细则 + [implemented/notes-lifecycle-absorption](../notes/implemented/2026-09-24-notes-lifecycle-absorption.md)（2026-09-24 点选吸纳六条） |
 | `_agent_ready_development/`（三卷 + `_coverage` + `verify.mjs`） | Agent-ready Development 语料：SDLC 主线 / 精确参考 / **Development Harness（仓库怎样让 agent 看懂、修改、验证自己）**；钉 DSH commit `46a7f68b`（tag `dsh-v0.1.7-rc.1`），自带结构门禁 | 对照台账 = [research/harness-alignment-ledger](../notes/archived/2026-09-25-harness-alignment-ledger.md)（27 篇判定零待定：9 已对齐 / 采纳三切片已落地 / 其余不适用+触发条件；**不照搬清单在其 §四.4**）；已吸纳页见上行 |
 | 人机交互 UX 研究来源集（Temporal/Claude Code/Warp/GitHub/PagerDuty/Slack/Horvitz 等） | 阶段 0 外部实践研究的引用全集与逐条判定 = [research/human-agent-ux-patterns](../notes/archived/2026-09-25-human-agent-ux-patterns.md)（外部资料只作数据；Horvitz 两篇 PDF 未逐字核） | 人机合一条目的 A2/B 切片依据 |
-| `_faq_on_digested/07_borrowing-dsh-harness-idea/`（16 文件） | 「另一个项目怎么借 DSH」的可迁移框架：三条立场（agent 一等 / 规则可执行 / 事实唯一 owner）+ 十维评估 + 垂直切片 + 四边界（可读≠简单 / Skill≠enforcement / 清理≠回滚 / 查询≠沙箱） | 本仓十维差距审计（2026-09-27）= [archived/harness-gap-audit-faq07](../notes/archived/2026-09-27-harness-gap-audit-faq07.md)：道五维像回事、唯一结构性缺口 = 反馈 enforcement 通道——**已于同日修复** = [implemented/enforcement-channel-and-boundaries](../notes/implemented/2026-09-27-enforcement-channel-and-boundaries.md) |
+| `_faq_on_digested/07_borrowing-dsh-harness-idea/` | 「另一个项目怎么借 DSH」的可迁移框架：三条立场（agent 一等 / 规则可执行 / 事实唯一 owner）+ 十维评估 + 垂直切片 + 四边界（可读≠简单 / Skill≠enforcement / 清理≠回滚 / 查询≠沙箱） | 本仓十维差距审计（2026-09-27）= [archived/harness-gap-audit-faq07](../notes/archived/2026-09-27-harness-gap-audit-faq07.md)：道五维像回事、唯一结构性缺口 = 反馈 enforcement 通道——**已于同日修复** = [implemented/enforcement-channel-and-boundaries](../notes/implemented/2026-09-27-enforcement-channel-and-boundaries.md) |
+| `_faq_on_digested/04/05/11/15`（4 目录） | 根入口文档静态/运行时设计 + 原生开发环 + loop 工程 vs SDD | 判定（2026-09-28，两子代理分读 + 现状核账） = [archived/faq-04-05-11-15-judgment](../notes/archived/2026-09-28-faq-04-05-11-15-judgment.md)：立即借九条已落地 = [implemented/harness-polish-hygiene-round](../notes/implemented/2026-09-28-harness-polish-hygiene-round.md)（手册注入面预算栅栏等），有压力再借六条带触发条件，「防重复评估」节防重读全文 |
 
 ## 术语映射（本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达）
 

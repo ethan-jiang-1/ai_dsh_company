@@ -10,6 +10,8 @@
    VP 的 persona 写"一个职能的化身"（该职能的视角、关切、 veto 点）——换人不变职能。
 2. **persona 管"是谁"，skills 管"怎么做"，KB 管"知道什么"**：不要把操作细节堆进 persona
    prefix（它每个请求都计 token）；可复用方法进 skills（按需加载），事实与历史进 KB 文件。
+   skill frontmatter 的 `description` 是**常驻注入面**（catalog 只注入 name+description）——
+   每条必含一句"何时用"触发时机（2026-09-28 借 FAQ 05）。
 3. **开工动作标准化**：每个角色 persona 末尾固定一段——"开工先读 `kb/<role>/CHARTER.md`
    与最近 3 篇 `kb/<role>/journal/`，收工追加 journal"。这是 D8 决策（无 memory seam）的落点。
 4. **模板即流程**：写作类工作流的第一版就是"模板 + skill 指引"，不写代码。

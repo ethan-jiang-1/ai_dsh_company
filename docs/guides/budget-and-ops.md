@@ -32,6 +32,7 @@
 
 | 症状 | 判断 | 动作 |
 |---|---|---|
+| 改了手册/CHARTER，进行中的成员会话「看不到」 | 指令注入是**触达驱动**（无 watcher）：外部编辑只在下次成功 read/write/edit 或 resume 对齐时可见（2026-09-28 借 FAQ 05） | 让该成员**碰一次工作区文件**（任意 read/edit）或重开会话；不是挂载坏了 |
 | 浏览器里找不到某场会话 | 会话列表按**工作目录**过滤，且必须用带 token 的 URL | 先选/加 `company-workspace`；直接开端口会卡鉴权（启动横幅里的 `/?token=` 一定要带上） |
 | `pnpm dsh web` 报 `EADDRINUSE 3086` | 已经有一个观察窗在跑 | 先 `lsof -nP -iTCP:3086 -sTCP:LISTEN` 复用旧窗（token 在它自己的启动横幅里）；**3080 是本 GUI，永不动** |
 | 重启后/换端口后调 API 报鉴权失败 | 启动 token **随进程生灭**（重启即换），cookie 名**每次启动随机** | 从**新进程**的启动横幅重取 `/?token=`；cookie 从响应头**显式带**（`curl -D -` 抓 set-cookie；**别用 `-c jar`**，脚本同法见 [harvest-probe.mjs](../../scripts/harvest-probe.mjs) 的 `getSetCookie()`） |
