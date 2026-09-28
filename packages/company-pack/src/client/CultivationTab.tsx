@@ -13,10 +13,11 @@ import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import { CULTIVATION_ROLES, inboxRows, type CultivationRow } from '../lib/cultivation.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
+import type { FloatRectLike } from './float-geometry.ts'
 
 /** 页签体注入面：文件读取闭包（绑定 `remote.workspaceFiles`）+ 浮出。 */
 export interface CultivationTabInjected {
-  readonly floatTab: (tabId: TabId) => void
+  readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
   readonly unfloatTab: (paneId: string) => void
   /** 列某角色 journal 目录的 .md 文件名；不可达（目录缺）给 null。 */
   readonly listJournal: (sessionId: SessionId, role: string, signal: AbortSignal) => Promise<readonly string[] | null>

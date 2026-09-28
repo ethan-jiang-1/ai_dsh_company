@@ -24,12 +24,13 @@ import {
   type LivePending,
 } from '../lib/attention.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
+import type { FloatRectLike } from './float-geometry.ts'
 import type { CompanyDataInjected } from './use-company-data.ts'
 
 /** 页签体注入面：follow 流 + 浮出 + 挂起项快照 + 会话跳转 + lead 归并。 */
 export interface AttentionTabInjected {
   readonly follow: CompanyDataInjected['follow']
-  readonly floatTab: (tabId: TabId) => void
+  readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
   readonly unfloatTab: (paneId: string) => void
   /** apply 世界登记处的快照读（远端事件观察者写入）。 */
   readonly getPending: () => readonly LivePending[]

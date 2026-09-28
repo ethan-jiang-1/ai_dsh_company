@@ -12,6 +12,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
+import type { FloatRectLike } from './float-geometry.ts'
 import { WocheBrandName } from './Brand.tsx'
 import { AttentionTab } from './AttentionTab.tsx'
 import { createAttentionRegistry } from './attention-registry.ts'
@@ -192,8 +193,8 @@ export async function apply(ctx: ClientContext): Promise<void> {
       const address = sessions.subagentAddress(sessionId)
       return address?.parentSessionId ?? sessionId
     }
-    /** 平台浮出（S2）：把页签拽出成浮窗；收回由浮窗自带的 dock 按钮负责（平台能力，不自造）。 */
-    const floatTab = (tabId: TabId): void => { scoped.sidebarRight.float(tabId) }
+    /** 平台浮出（S2）：把页签拽出成浮窗；rect = 记忆摆位（浮窗几何记忆 RFC，缺省 = 平台级联位）；收回由浮窗自带的 dock 按钮负责（平台能力，不自造）。 */
+    const floatTab = (tabId: TabId, rect?: FloatRectLike): void => { scoped.sidebarRight.float(tabId, rect) }
     const unfloatTab = (paneId: string): void => { scoped.sidebarRight.dock(paneId as PaneId) }
     // 协作动态的流式源：`session/follow` 是 WebSocket 流，快照给历史、其后给实时；
     // 只取团队事件（wire 形状 → 领域形状的最小投影），assistant-stream 帧与视图无关。

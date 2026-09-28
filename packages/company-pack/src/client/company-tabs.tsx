@@ -9,21 +9,22 @@
  * 动态流由 5s 差分改成 `session/follow` 流式（打开即见全程）。
  */
 import type { ReactNode } from 'react'
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Button, StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { PresenceRow } from '../lib/presence.ts'
+import { clampRect, loadFloatRect, saveFloatRect, type FloatRectLike } from './float-geometry.ts'
 import { BoardPanel, BudgetPanel, DagPanel, StateNote } from './company-panels.tsx'
 import { TasksTableView } from './TasksPanel.tsx'
 import { useCompanyData, type CompanyDataInjected } from './use-company-data.ts'
 
 /** 页签体注入面：数据面 + 平台浮出操作。 */
 export interface CompanyTabInjected extends CompanyDataInjected {
-  /** `ctx.sidebarRight.float`：把本页签拽出成浮窗（可移动/缩放/置顶）。 */
-  readonly floatTab: (tabId: TabId) => void
+  /** `ctx.sidebarRight.float`：把本页签拽出成浮窗（可移动/缩放/置顶）；rect = 记忆摆位（浮窗几何记忆 RFC）。 */
+  readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
   /** `ctx.sidebarRight.unfloat`：把浮窗收回右栏（用户走查 2026-09-27：浮出态里「浮出」按钮无意义，换「收回」）。 */
   readonly unfloatTab: (paneId: string) => void
 }
@@ -42,7 +43,7 @@ export type PresenceTabProps = CompanyTabProps & {
  */
 export interface PanelFrameProps {
   readonly useTabInfo: CompanyTabProps['useTabInfo']
-  readonly floatTab: (tabId: TabId) => void
+  readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
   readonly unfloatTab: (paneId: string) => void
 }
 
@@ -69,6 +70,27 @@ export function PanelFrame({ title, tone, tabProps, children }: {
     const paneId = rootRef.current?.closest('[data-dockkit-float]')?.getAttribute('data-dockkit-float') ?? null
     setFloatPaneId(previous => previous === paneId ? previous : paneId)
   })
+  /** 采集当前浮窗矩形并按稳定身份存档（浮窗几何记忆 RFC；浮出态外调用 = no-op）。
+   *  key 用 `contentId`（= keyed 槽 key，如 `dsh-company-pack/dag`——`openContent` 的去重身份，
+   *  页签关掉重开不变）而不是运行时 `tab.id`（`tab3` 这类生成 id，重开会换 ⇒ 存档孤儿化）。 */
+  const captureFloatRect = (): void => {
+    const pane = rootRef.current?.closest('[data-dockkit-float]') ?? null
+    if (pane === null) return
+    const rect = pane.getBoundingClientRect()
+    if (rect.width === 0 && rect.height === 0) return // 未挂载/不可见：不采
+    const tabKey = info.tab.contentId !== '' ? info.tab.contentId : info.tab.id
+    saveFloatRect(window.localStorage, tabKey, { x: rect.x, y: rect.y, width: rect.width, height: rect.height })
+  }
+  // 浮出期间监听手势结束（拖拽/缩放都以 pointerup 落定）：每次落定即采一次；浮出瞬间先采一次
+  // （默认位也进记忆 ⇒ 没拖过就收回、下次浮出仍在同一默认位）。收回时 pointerup 先于 click，
+  // 最后一拖已入库；onClick 里再补采一次兜底（防无拖拽直接收回丢初始位）。
+  useEffect(() => {
+    if (floatPaneId === null) return
+    captureFloatRect()
+    document.addEventListener('pointerup', captureFloatRect)
+    return () => { document.removeEventListener('pointerup', captureFloatRect) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- info.tab.id 在页签生命周期内不变
+  }, [floatPaneId])
   return (
     <div className="wk-pane" ref={rootRef}>
       <div className={`wk-pane-strip wk-tone-${tone}`} aria-hidden="true" />
@@ -81,8 +103,12 @@ export function PanelFrame({ title, tone, tabProps, children }: {
             <Button
               size="sm"
               variant="ghost"
-              title="把这个面板拽出成浮窗（可移动 / 可缩放）"
-              onClick={() => { tabProps.floatTab(info.tab.id) }}
+              title="把这个面板拽出成浮窗（可移动 / 可缩放；下次浮出回到上次位置）"
+              onClick={() => {
+                const tabKey = info.tab.contentId !== '' ? info.tab.contentId : info.tab.id
+                const saved = loadFloatRect(window.localStorage, tabKey)
+                tabProps.floatTab(info.tab.id, saved === null ? undefined : clampRect(saved, window.innerWidth, window.innerHeight))
+              }}
             >
               浮出
             </Button>
@@ -92,7 +118,7 @@ export function PanelFrame({ title, tone, tabProps, children }: {
               size="sm"
               variant="ghost"
               title="收回右栏（浮窗回到侧栏页签）"
-              onClick={() => { tabProps.unfloatTab(floatPaneId) }}
+              onClick={() => { captureFloatRect(); tabProps.unfloatTab(floatPaneId) }}
             >
               收回
             </Button>

@@ -11,10 +11,11 @@ import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import { ledgerStats, parseMotionLedger, type MotionRow } from '../lib/ledger.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
+import type { FloatRectLike } from './float-geometry.ts'
 
 /** 页签体注入面：台账文件读取闭包 + 浮出。 */
 export interface LedgerTabInjected {
-  readonly floatTab: (tabId: TabId) => void
+  readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
   readonly unfloatTab: (paneId: string) => void
   /** 读 `kb/motion-ledger.md` 全文；不可达给 null（面板显示读取失败，不静默）。 */
   readonly readLedger: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>
