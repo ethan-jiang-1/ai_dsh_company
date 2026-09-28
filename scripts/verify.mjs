@@ -100,12 +100,12 @@ const NOW_FILES = (() => {
     walkMd(join(root, 'tests')),
     walkMd(join(root, 'docs')),
     // `notes/**` 分**两档**（2026-09-26 补盲区 + 分档）：
-    // · **硬档**（`proposed/` `research/`）= **活文档**——fresh agent 会照着它去干活，死指针代价高；
+    // · **硬档**（`proposed/` + `_backlog/` 推敲卡）= **活文档**——fresh agent 会照着它去干活，死指针代价高；
     // · **观察档**（`implemented/` `postmortem/`）= **记录当时事实**的档案——里面引的路径**当时是对的**
     //   （实测 36/39 条是 vendor 上游改过名）。**改它就是篡改记录** ⇒ 每次提醒、不判红。
     // 此前只扫 `notes/` 直接子文件（`p.split('/').length === 2`）⇒ `proposed/` 与 `implemented/` 全在面外。
     walkMd(join(root, 'notes/proposed')),
-    walkMd(join(root, 'notes/research')),
+    walkMd(join(root, '_backlog')),
     walkMd(join(root, 'company-workspace')).filter(p => !/^company-workspace\/(deliverables|kb\/[^/]+\/journal)\//.test(p)),
   )
 })()
@@ -385,22 +385,23 @@ notGraduated.length === 0
   ? ok('proposal-graduated (proposed/ 里只剩未落地的)')
   : fail('proposal-graduated', `这些提案已消化却仍在 notes/proposed/（搬到 notes/implemented/ 并写明条目去向）：${notGraduated.join(', ')}`)
 
-// ── research 层活状态行门禁（2026-09-26，用户指认「research 挂一堆东西」的防复发）─────────
-// 负例留证 2026-09-27：无户口活研究稿 → research-liveness 红。
-// 规则（D30）：research/ = 未完结研究（TODO 语义，dev-loop §12）；完结迁 notes/archived/、过时迁 notes/rejected/。
-// 每份未完结文件必须自带户口：前 10 行有「状态：」行，且前 12 行内写明「喂给谁」或「毕业动作」。
-// 索引 README.md（curated entry point）豁免。
-const researchDir = join(root, 'notes/research')
-const researchFiles = existsSync(researchDir)
-  ? readdirSync(researchDir).filter(n => n.endsWith('.md') && n !== 'README.md')
+// ── 推敲卡活状态行门禁（原 research-liveness，2026-09-28 D31 随 notes/research 并入 _backlog/plans 改造）──
+// 复发依据不变：D30 起因 = 用户指认「research 挂一堆东西」（未完结思考稿缺户口、挂着不动）。
+// 负例留证 2026-09-27（research 稿）／2026-09-28（plans 卡复测）：无户口卡 → plans-liveness 红，还原 → 绿。
+// 规则（D31）：_backlog/plans/ = 推敲卡（设计/分析/调研），毕业四门见 _backlog/README.md；
+// 每张活跃卡前 12 行必须有「状态：」行且写明「毕业」门判断（推敲中含下一步，已毕业含去向）。
+// 索引 README.md 豁免。
+const plansDir = join(root, '_backlog/plans')
+const plansFiles = existsSync(plansDir)
+  ? readdirSync(plansDir).filter(n => n.endsWith('.md') && n !== 'README.md')
   : []
-const noLiveness = researchFiles.filter(name => {
-  const head = readFileSync(join(researchDir, name), 'utf8').split('\n').slice(0, 12).join('\n')
-  return !(head.includes('状态：') && (head.includes('喂给谁') || head.includes('毕业动作')))
+const noLiveness = plansFiles.filter(name => {
+  const head = readFileSync(join(plansDir, name), 'utf8').split('\n').slice(0, 12).join('\n')
+  return !(head.includes('状态：') && head.includes('毕业'))
 })
 noLiveness.length === 0
-  ? ok(`research-liveness ×${researchFiles.length}（每份活研究自带喂给谁/毕业动作户口）`)
-  : fail('research-liveness', `这些研究稿缺活状态行（喂给谁/毕业动作）——死研究按 dev-loop §12 三选一处置，别挂着：${noLiveness.join(', ')}`)
+  ? ok(`plans-liveness ×${plansFiles.length}（每张推敲卡自带毕业门判断户口）`)
+  : fail('plans-liveness', `这些推敲卡缺活状态行（状态：+ 毕业门判断）——按 _backlog/README.md 毕业四门处置，别挂着：${noLiveness.join(', ')}`)
 
 console.log(failures.length === 0 ? '\nverify: ALL PASS' : `\nverify: ${failures.length} FAILURE(S)`)
 process.exit(failures.length === 0 ? 0 : 1)

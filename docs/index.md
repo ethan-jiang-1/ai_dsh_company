@@ -40,8 +40,8 @@
 
 | 位置 | 回答什么 |
 |---|---|
-| `notes/intents.md` → `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含**实际跑过的验证 + 环境状态**）。**提案纪律**：`proposed/` 不是停车场——进它就必须在 [ROADMAP.md](../ROADMAP.md) 有归宿；条目全有归宿后**毕业**到 `implemented/`（毕业 ≠ 全部实现，而是"每一条都有归宿"）。两条机械门禁 `proposal-scheduled` / `proposal-graduated`。**research 层三态（D30）**：`research/` 只放未完结研究（TODO 性质，自带喂给谁/毕业动作为户口）；完结迁 `archived/`、过时迁 `rejected/`；索引 = research/README.md |
-| [notes/archived/](../notes/archived/) · [notes/rejected/](../notes/rejected/) | **研究层离场两桶（D30）**：archived = 完结且仍被引用的研究（实验记录/评审/调研/台账，可读可引但不在工作集）；rejected = 过时/被推翻的研究（负知识防复犯）。都从 research/ 落地后迁入，不设回收站语义（git 即归档） |
+| `notes/intents.md` → `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含**实际跑过的验证 + 环境状态**）。**提案纪律**：`proposed/` 不是停车场——进它就必须在 [ROADMAP.md](../ROADMAP.md) 有归宿；条目全有归宿后**毕业**到 `implemented/`（毕业 ≠ 全部实现，而是"每一条都有归宿"）。两条机械门禁 `proposal-scheduled` / `proposal-graduated`。**未成熟思考的上游 = `_backlog/plans/` 推敲卡（D31）**：毕业四门见 `_backlog/README.md` |
+| [notes/archived/](../notes/archived/) · [notes/rejected/](../notes/rejected/) | **研究层离场两桶（D30，出口随 D31 保留）**：archived = 完结且仍被引用的研究（实验记录/评审/调研/台账，可读可引但不在工作集）；rejected = 过时/被推翻的研究（负知识防复犯）。不设回收站语义（git 即归档） |
 | [notes/postmortem/](../notes/postmortem/README.md) | **事故复盘**：为什么流程放过了它 + 加了什么护栏（0001 preset 挂载失败、0002 团队 UI 不可见·根因误诊已更正、0003 重复挂载 remote 砖全 UI） |
 | [notes/implemented/2026-09-22-agent-workflow-community-practice.md](../notes/implemented/2026-09-22-agent-workflow-community-practice.md) | 外部研究：代理工作流的社区/厂商一手证据（结论已吸纳为 D15，否决项也记在里面） |
 
@@ -80,7 +80,8 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | D27 | **升 pin 程序偏离官方事务（2026-09-25，登记偏离）**：官方 `sync-dsh --pin` 第③步要求 vendor 自建，而 `pnpm --dir vendor/dsh run build` 在本仓**嵌套工作区**里必失败（独立 staging 树可构建）⇒ 本仓改为**手工簿记 + 门禁留证**（`vendor-pin`/`vendor-clean`/`pack-compat` 三道）。长期解（嵌套工作区里跑 vendor 自建）未做 | [implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md](../notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md) §登记偏离 |
 | D28 | **枚举型事实的家 = 实现自己**（2026-09-26）：脚本触发条件、门禁清单、pin 版本这类枚举在文档里复述必漂（实测六份清单同一种病）；家 = 脚本头注「何时跑」/ `verify.mjs` 的 expectedTag 与 `DOC_LINE_BUDGETS`，文档只留分层原则 + 指针，门禁强制 | [entry-execution-chain-debt](../notes/implemented/2026-09-26-entry-execution-chain-debt.md) |
 | D29 | **自主优先协议**（2026-09-26，用户令，同日两轮细化）：① 尽量遵循 DSH 研发流程（D13/D23）；② 自主解决问题——动手发明前先探索、借鉴**成熟 DSH 插件**（下载量 / 影响力门槛）的既有思想，探索产物按 research 层生命周期落盘；③ REVIEW 分级——能自主审的自主审（独立盲审 / 中立体清扫 / code-review），阶段收口、不得不人审时才人审，人审形状 = 跑起来的实例 + 单页走查单 + 一次一件事 + 收尾留动作（「你去体验一下」类无落点请求 = 违规） | [guides/dev-loop §13](./guides/dev-loop.md)；AGENTS §本仓原生纪律 |
-| D30 | **research 层三态模型**（2026-09-26，用户令，修订 09-25「不开 archived/rejected」裁断）：`research/` 只放未完结研究（TODO 语义，每份自带喂给谁/毕业动作为户口）；研究落地即离场——完结迁 `notes/archived/`、过时/被推翻迁 `notes/rejected/`；无人引用的死稿删除（git 即归档）。起因 = 用户指认「research 挂一堆东西」+「完结的不该在 TODO 里」 | [guides/dev-loop §12](./guides/dev-loop.md)；索引 = notes/research/README.md |
+| D30 | **research 层三态模型**（2026-09-26，用户令，修订 09-25「不开 archived/rejected」裁断）：`research/` 只放未完结研究（TODO 语义，每份自带喂给谁/毕业动作为户口）；研究落地即离场——完结迁 `notes/archived/`、过时/被推翻迁 `notes/rejected/`；无人引用的死稿删除（git 即归档）。起因 = 用户指认「research 挂一堆东西」+「完结的不该在 TODO 里」。**D31 修订**：research 目录退役并入 `_backlog/plans/`，三态出口保留 | [guides/dev-loop §12](./guides/dev-loop.md)；**D31 修订后索引随目录退役**（git 留史） |
+| D31 | **推敲空间 `_backlog/` + research 并入**（2026-09-28，用户令）：借外部仓 ai_deerflow_deep_research_v2 的 `_backlog` 三件——plans 推敲卡 / bugs 缺陷卡 / _done（位置即状态），补上「该不该做 / 何时 / 次序 / 是否放弃」四问成熟前的家；红线 = **只承载判断材料，不承载次序与授权**（D23 plans 层教训）；research 目录退役并入 plans（调研卡 = 卡性质，D30 三态出口保留）；门禁 research-liveness → plans-liveness | [_backlog/README.md](../_backlog/README.md)；[implemented/2026-09-28-backlog-deliberation-space](../notes/implemented/2026-09-28-backlog-deliberation-space.md) |
 
 ### 待定与活动提案
 
@@ -102,7 +103,8 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 本 repo 的形态与机制结论大量借鉴三处 repo 外材料（均在 `/Users/bowhead/deepseek-harness/`
 工作树内、已被该 repo 的 git 跟踪；不在本 repo 版本控制范围，引用时注明是外部研究材料）：
 `_faq_on_digested/`、`_digested/`、`_agent_ready_development/`（后者 = Agent-ready Development 语料，
-第三视角"Development Harness"专题；已逐篇对照完毕——判定台账见下表该行）。
+第三视角"Development Harness"专题；已逐篇对照完毕——判定台账见下表该行）；
+另有第四处**独立外部仓** = `/Users/bowhead/ai_deerflow_deep_research_v2`（`_backlog` 借鉴源，见下表与 D31）。
 该研究树 HEAD 持续演进（本地 FAQ/docs 工作）；引用以各材料注册行核对的版本为准，`_digested` 审计基线
 仍为 rc.2——引外部笔记时以基线对齐，不追研究树新提交（钉基线复核 2026-09-28：被引用文件自注册起零变化）。
 **思想吸收进本 repo 文档后，日常不再依赖原文**；下表是"哪个想法落在了哪儿"的地图：
@@ -119,6 +121,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | `_agent_ready_development/`（三卷 + `_coverage` + `verify.mjs`） | Agent-ready Development 语料：SDLC 主线 / 精确参考 / **Development Harness（仓库怎样让 agent 看懂、修改、验证自己）**；钉 DSH commit `46a7f68b`（tag `dsh-v0.1.7-rc.1`），自带结构门禁 | 对照台账 = [research/harness-alignment-ledger](../notes/archived/2026-09-25-harness-alignment-ledger.md)（27 篇判定零待定：9 已对齐 / 采纳三切片已落地 / 其余不适用+触发条件；**不照搬清单在其 §四.4**）；已吸纳页见上行 |
 | 人机交互 UX 研究来源集（Temporal/Claude Code/Warp/GitHub/PagerDuty/Slack/Horvitz 等） | 阶段 0 外部实践研究的引用全集与逐条判定 = [research/human-agent-ux-patterns](../notes/archived/2026-09-25-human-agent-ux-patterns.md)（外部资料只作数据；Horvitz 两篇 PDF 未逐字核） | 人机合一条目的 A2/B 切片依据 |
 | `_faq_on_digested/07_borrowing-dsh-harness-idea/` | 「另一个项目怎么借 DSH」的可迁移框架：三条立场（agent 一等 / 规则可执行 / 事实唯一 owner）+ 十维评估 + 垂直切片 + 四边界（可读≠简单 / Skill≠enforcement / 清理≠回滚 / 查询≠沙箱） | 本仓十维差距审计（2026-09-27）= [archived/harness-gap-audit-faq07](../notes/archived/2026-09-27-harness-gap-audit-faq07.md)：道五维像回事、唯一结构性缺口 = 反馈 enforcement 通道——**已于同日修复** = [implemented/enforcement-channel-and-boundaries](../notes/implemented/2026-09-27-enforcement-channel-and-boundaries.md) |
+| `/Users/bowhead/ai_deerflow_deep_research_v2/_backlog`（独立外部仓，同机工作树） | 另一个 harness 仓的待办/推敲层规矩：plans（推敲卡）/ bugs（缺陷卡）/ `_done`（位置即状态）/ `_` 前缀语义 / 搬迁铁律（git mv、文件名不变、内容不重写、编号权威住归档侧）+ 它自己那份「借 DSH」总账（借精神不抄形式的方法论样本） | `_backlog/` 全套 + 毕业四门（D31）；判定、取舍与不借清单 = [implemented/2026-09-28-backlog-deliberation-space](../notes/implemented/2026-09-28-backlog-deliberation-space.md) |
 | `_faq_on_digested/04/05/11/15`（4 目录） | 根入口文档静态/运行时设计 + 原生开发环 + loop 工程 vs SDD | 判定（2026-09-28，两子代理分读 + 现状核账） = [archived/faq-04-05-11-15-judgment](../notes/archived/2026-09-28-faq-04-05-11-15-judgment.md)：立即借九条已落地 = [implemented/harness-polish-hygiene-round](../notes/implemented/2026-09-28-harness-polish-hygiene-round.md)（手册注入面预算栅栏等），有压力再借六条带触发条件，「防重复评估」节防重读全文 |
 
 ## 术语映射（本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达）

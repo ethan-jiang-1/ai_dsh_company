@@ -2,6 +2,8 @@
 
 > ⚠ **2026-09-26 修订**：本稿立的「不开 archived/rejected」裁断已被用户令推翻——research/ 收紧为
 > 只放未完结研究，完结迁 `notes/archived/`、过时迁 `notes/rejected/`（现行规则唯一见 dev-loop §12 / D30）。
+> ⚠ **2026-09-28 再修订（D31）**：research 目录退役并入 `_backlog/plans/` 推敲卡（三态出口保留），
+> 现行规则唯一见 `_backlog/README.md` 与 dev-loop §12。
 > 本稿保留作历史与首轮清扫记录。
 
 状态：已交付（规则 = 开发环 §12「research 层只放活研究」；首轮六篇清扫完成：2 删 / 2 转活参考 / 2 喂收割轮改状态行）。

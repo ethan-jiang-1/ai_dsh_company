@@ -3,6 +3,9 @@
 > 一文件一条目：问题 / 方案 / **输掉的方案留尸** / 验收。文件名 = `YYYY-MM-DD-<主题>.md`
 > （日期 = 登记时点，时间层约定）。
 >
+> **没成熟到能写齐三件的思考不进这里**——那是 [`_backlog/plans/`](../../_backlog/plans/README.md)
+> 推敲卡的事（D31）：卡可以只有问题没有方案，RFC 必须有问题/方案/验收。
+>
 > **排序与状态不在这里**：唯一事实家 = [ROADMAP.md §队列](../../ROADMAP.md)（有序索引）。
 > 机械门禁：`proposal-scheduled`（每个 RFC 必须在队列有索引行）/ `proposal-graduated`
 > （该毕业的不许赖在 proposed/）。发现方式 = 浏览本文件夹 + 文件名（DSH 纪律：

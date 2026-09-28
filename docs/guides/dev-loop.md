@@ -27,10 +27,12 @@
 
 **计划先落盘再执行（用户 2026-09-24 确认的工作方式）**：统筹讨论产出多条目计划时，先把结论显性化为
 `notes/proposed/` RFC 与 `ROADMAP.md` 队列，再按"继续下一条"的节奏逐条实施；不以对话内共识代替落盘。
+未成熟到能定范围与验收的思考，先落 `_backlog/plans/` 推敲卡（毕业四门见其 README），成熟后才显性化
+为 RFC+队列——半成品不进 proposed/（归宿门禁会拦）、更不进队列。
 
 **Plan Mode（D23 本仓政策）**：ROADMAP feature 条目默认先进入 Plan Mode 并用 `exit_plan_mode` 呈批，获批后按批准范围实施；用户已明确批准具体计划时不重复求批。明确授权的机械单步修正可直接做。需 Plan Mode 时用 `/plan` 进入；仅在模式中调用 `exit_plan_mode`。
 
-**长程 goal 的目标写法（两形态 + 三类停止条件，2026-09-25 立）**：**交付型** = 「按 ROADMAP §队列逐条执行」（有界 = 队列空即收口）；**打磨型** = 预算（时间／轮次）+ 输入源（ROADMAP §磨清单 + 执行期审计发现）+ 枯竭即收口。停止条件三类写进 objective：预算耗尽 → 自评收口；队列／输入源空 → 收口并报告；真卡住（机制证伪／验收无法变绿／需人裁决）→ 停并报阻塞与证据，不硬闯。节奏 = 每条一个 commit + push，每完成一条简报。objective 引用条目/授权原文（不自拟、不扩围）——扩围即回授权，不改写 objective 了事（2026-09-28 借 FAQ 15：机制存在 ≠ 被使用）。
+**长程 goal 的目标写法（两形态 + 三类停止条件，2026-09-25 立）**：**交付型** = 「按 ROADMAP §队列逐条执行」（有界 = 队列空即收口）；**打磨型** = 预算（时间／轮次）+ 输入源（ROADMAP §磨清单 + 执行期审计发现 + `_backlog/plans/` 未决卡——推敲型：产出 = 毕业判断呈批，不是开工）+ 枯竭即收口。停止条件三类写进 objective：预算耗尽 → 自评收口；队列／输入源空 → 收口并报告；真卡住（机制证伪／验收无法变绿／需人裁决）→ 停并报阻塞与证据，不硬闯。节奏 = 每条一个 commit + push，每完成一条简报。objective 引用条目/授权原文（不自拟、不扩围）——扩围即回授权，不改写 objective 了事（2026-09-28 借 FAQ 15：机制存在 ≠ 被使用）。
 
 ## 1. 执行链：从授权到有证据交接
 
@@ -343,9 +345,9 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
   见 notebook-hygiene；原 rejected Note 形态取消）；只在仍能阻止一个可信错误时保留，防复犯价值消失即删。
 - **implemented 只跟事实**：随实现更新的只有路径、名称、结构等事实；决定被推翻时另写新 Note 互链，
   不把旧文改写成相反。
-- **research 层 = 未完结研究（2026-09-26 用户令修订 09-25 旧形状；原裁决 = [implemented/research-notes-lifecycle](../../notes/implemented/2026-09-25-research-notes-lifecycle.md)）**：目录语义 = TODO——只放有待跑实验 / 待答问题 / 待落地调研的稿件，首部状态行写清「喂给谁 + 毕业动作」；
-  **研究落地即离场**：完结迁 `notes/archived/`（仍被引用的证据台账，可读可引但不在工作集）、过时/被推翻迁 `notes/rejected/`（负知识防复犯）——修订 09-25「不开 archived/rejected」裁断（实操反馈：隐形状态行无法一眼分辨死活，可见分类桶更有效）；无人引用的死稿直接删（git 即归档）；
-  机械门禁 = `verify` 的 `research-liveness`（未完结研究必须自带户口）；索引 = research/README.md。
+- **未完结思考的家 = `_backlog/plans/` 推敲卡（D31 修订 D30；research 目录退役，起因链 = [implemented/research-notes-lifecycle](../../notes/implemented/2026-09-25-research-notes-lifecycle.md)）**：调研/设计推敲未到裁决时以卡的形式住 `_backlog/`，状态行自带毕业门判断（机械门禁 `plans-liveness`，原 research-liveness 改造）；
+  **三态出口保留 D30 精神**：完结迁 `_backlog/_done/_closed_plans/`（可读可引）或并入 owner Note、过时/被推翻迁 `notes/rejected/`（负知识防复犯）、无人引用的死稿直接删（git 即归档）；
+  规矩手册 = `_backlog/README.md`（毕业四门、与队列/proposed 的边界、明确不借表）；`notes/archived/` 仍为既有证据台账的家（存量不动）。
 
 **流程规则**：
 
