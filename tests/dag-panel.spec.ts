@@ -8,7 +8,7 @@
 import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { DagPanel } from '../packages/company-pack/src/client/company-panels.tsx'
+import { DagPanel, fitScale } from '../packages/company-pack/src/client/company-panels.tsx'
 import { layoutDag } from '../packages/company-pack/src/lib/dag.ts'
 import type { TaskRow } from '../packages/company-pack/src/lib/board.ts'
 
@@ -42,25 +42,25 @@ describe('DagPanel 渲染结构（定位/动画分层）', () => {
   })
 })
 
-describe('DagPanel 画布自适应栏宽（2026-09-28 试用反馈：右缘裁切）', () => {
-  /* 事故形态：布局按内容算宽（4 根 = 832px），右栏常只有 ~731px，SVG 定宽 ⇒ 最右节点被
-     拦腰切掉（overflow-x:auto 无常驻滚动条，看不出右边还有）。钉两件事：svg 带自适应类；
-     min-width 下限 = 0.75 × 布局宽（再缩字不可读，回退横向滚动）。 */
-  it('svg 带 wk-dag-svg 类与 min-width 下限（0.75 × 布局宽）', () => {
+describe('DagPanel 画布自适应栏宽（2026-09-28 两轮试用反馈：右缘裁切 + Safari 文字堆角）', () => {
+  /* 第一轮：定宽 832px 的图在 ~731px 栏里右缘拦腰裁切 ⇒ 要缩放。
+     第二轮：CSS 宽度缩放（max-width:100%）在 Safari 里 foreignObject 的 HTML 不跟缩——
+     卡和线缩了、文字堆向左上角 ⇒ 改 **transform: scale()**（绘制级，整面一起缩）。 */
+  it('fitScale：fit 容器宽优先、0.75 下限、宽容器不放大', () => {
+    expect(fitScale(731, 832)).toBeCloseTo(731 / 832, 5) // 现场：832px 图在 731px 栏 → 0.879
+    expect(fitScale(500, 832)).toBe(0.75) // 触底：再小字不可读，回退横向滚动
+    expect(fitScale(2000, 832)).toBe(1) // 容器更宽也不放大（只缩不放）
+    expect(fitScale(0, 832)).toBe(1) // 未测得容器宽（SSR/首帧）：不缩放
+  })
+
+  it('svg 用 transform 缩放（Safari 安全）且带量宽 wrapper；不用 CSS 宽度缩放', () => {
     const html = renderToString(createElement(DagPanel, {
       layout: layoutDag([task('a'), task('b'), task('c'), task('d')]),
     })) // 4 根并行一层 = 832px（现场 731px 栏里会裁切的形状）
-    expect(html).toContain('wk-dag-svg')
-    expect(html).toMatch(/min-width:\s*624px/)
-  })
-
-  it('下限随布局宽走：宽图下限更高（1040px 布局 → 780px），窄图不拉伸', () => {
-    const wide = renderToString(createElement(DagPanel, {
-      layout: layoutDag([task('a'), task('b'), task('c'), task('d'), task('e')]),
-    }))
-    expect(wide).toMatch(/min-width:\s*780px/)
-    const narrow = renderToString(createElement(DagPanel, { layout: layoutDag([task('a')]) }))
-    expect(narrow).toMatch(/min-width:\s*156px/)
+    expect(html).toContain('wk-dag-fit') // 外层量容器宽的 wrapper（ResizeObserver 挂点）
+    expect(html).toMatch(/transform:scale\(/) // 绘制级缩放（SSR 首帧 scale=1，测得后再缩）
+    expect(html).not.toMatch(/max-width/) // CSS 宽度缩放已被 Safari 事故证伪
+    expect(html).not.toMatch(/min-width/) // 旧下限机制由 fitScale 接管
   })
 })
 

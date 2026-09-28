@@ -104,25 +104,53 @@ export function BoardPanel({ columns }: { readonly columns: readonly BoardColumn
 const DAG_MIN_SCALE = 0.75
 
 /**
+ * 画布缩放系数：fit 容器宽优先，0.75 下限（再缩 11px 标题就 <8px，回退横向滚动）。
+ * 纯函数（keyless 可测）；graphWidth 非正时给 1（不缩放，防除零）。
+ */
+export function fitScale(availableWidth: number, graphWidth: number): number {
+  if (!(graphWidth > 0) || !(availableWidth > 0)) return 1
+  return Math.max(DAG_MIN_SCALE, Math.min(1, availableWidth / graphWidth))
+}
+
+/**
  * 依赖图：自绘 SVG（节点左侧状态点 + 依赖连线；blocker 已完成 = 实线）。
- * 画布自适应栏宽：`max-width: 100%`（CSS）等比缩到栏宽；`minWidth`（内联，随布局宽走）
- * 是缩放下限——低于它不再缩，改由容器横向滚动（2026-09-28 试用反馈：定宽 832px 的图
- * 在 ~731px 栏里把最右节点拦腰切掉，且滚动条无常驻、看不出右边还有）。
+ * 画布自适应栏宽（2026-09-28 两轮试用反馈定稿）：
+ * - **transform: scale() 缩放**（非 CSS 宽度缩放）：Safari/WebKit 里 foreignObject 内的
+ *   HTML **不跟 SVG 的 CSS 宽度缩放走**——纯 SVG 元素（卡、线）缩了，节点文字留在原位
+ *   堆向左上角（用户实测）；transform 是绘制级缩放，整面（含 foreignObject）一起缩。
+ * - 缩放系数 = `fitScale(容器宽, 布局宽)`，ResizeObserver 跟随容器；触底 0.75 后内盒比
+ *   容器宽 ⇒ 由 `.wk-pane-body` 横向滚动接管。SSR/首帧 scale=1（测量后再缩）。
  * @param props.layout - `layoutDag` 算好的节点/边与画布尺寸。
  * @returns SVG（空图给空态文案）。
  */
 export function DagPanel({ layout }: { readonly layout: DagLayout }) {
+  const fitRef = useRef<HTMLDivElement | null>(null)
+  const [availableWidth, setAvailableWidth] = useState(0)
+  useEffect(() => {
+    const element = fitRef.current
+    if (element === null) return
+    const measure = (): void => {
+      setAvailableWidth(previous => element.clientWidth === previous ? previous : element.clientWidth)
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(element)
+    return () => { observer.disconnect() }
+  }, [])
   if (layout.nodes.length === 0) return <StateNote text="这场动议还没有任务依赖图。" />
+  const scale = availableWidth === 0 ? 1 : fitScale(availableWidth, layout.width)
   return (
-    <svg
-      className="wk-dag-svg"
-      width={layout.width}
-      height={layout.height}
-      viewBox={`0 0 ${String(layout.width)} ${String(layout.height)}`}
-      style={{ minWidth: Math.round(layout.width * DAG_MIN_SCALE) }}
-      role="img"
-      aria-label="任务依赖图"
-    >
+    <div className="wk-dag-fit" ref={fitRef}>
+      <div style={{ width: `${String(Math.round(layout.width * scale))}px`, height: `${String(Math.round(layout.height * scale))}px` }}>
+        <svg
+          className="wk-dag-svg"
+          width={layout.width}
+          height={layout.height}
+          viewBox={`0 0 ${String(layout.width)} ${String(layout.height)}`}
+          style={{ transform: `scale(${String(scale)})`, transformOrigin: 'top left' }}
+          role="img"
+          aria-label="任务依赖图"
+        >
       <defs>
         {/* 箭头 = **双 marker 显式上色**（CSS 里 .wk-arrow-tip-*）。不用 SVG2 `context-stroke`：
             Chrome 124+/Firefox 支持，Safari 无信号——不支持时 marker 会 fallback 成黑，
@@ -175,7 +203,9 @@ export function DagPanel({ layout }: { readonly layout: DagLayout }) {
           </g>
         </g>
       ))}
-    </svg>
+        </svg>
+      </div>
+    </div>
   )
 }
 

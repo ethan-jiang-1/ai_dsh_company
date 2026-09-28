@@ -30,7 +30,7 @@ export interface DagNode {
 export interface DagEdge {
   readonly from: string
   readonly to: string
-  /** SVG `path` 的 `d`：V-H-V 正交走线——blocker 底边锚点 → 垂直下探 → 水平车道 → 垂直入 blocked 顶边锚点。 */
+  /** SVG `path` 的 `d`：贝塞尔圆弧——blocker 底边锚点 → 带中车道 → blocked 顶边锚点（锚点散开、车道互斥）。 */
   readonly path: string
   /** blocker 已完成 ⇒ 这条依赖"已走通"（渲染成实线/高亮）。 */
   readonly done: boolean
@@ -159,15 +159,21 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
     })
   }
 
-  // ── 边路径：车道分离 + 正交走线（V-H-V）──
-  // 两层动机（2026-09-28 试用反馈两轮）：
-  // ① 车道分离：交叉是行布局下限（barycenter 已最优、排序无解），但共用走廊的**重合段**
-  //    不是必然——同带（from 层→to 层）的边按（源 x、目标 x）排序各占一条 y 通道
-  //    （(i+1)/(n+1) 等分带高），水平轨互斥、交叉从「叠着过」变「垂直跨越」。
-  // ② 正交走线：弧线在 ~730px 小窗里以多个高度扫过整条带 + X 交叉，读作一团面条；
-  //    V-H-V 直角走线（垂直下探—水平轨—垂直入靶）是电路图形态，交叉点垂直清晰。
-  // 多入/多出节点的锚点按 (k+1)/(n+1) 散开在顶/底边（末段垂直线不共线）；
-  // 单入单出保持中心锚点（渲染向后兼容）。跨多层的边自成一组、仍走带中点。
+  // ── 边路径：圆弧 + 车道分离（车道收带中部）──
+  // 三轮试用反馈定稿（2026-09-28）：
+  // ① 同带多边共用一条走廊的重合段要消——车道互斥（同带边按〔源 x、目标 x〕排序各占一条）。
+  // ② 风格 = **圆弧**（贝塞尔；直角走线被用户否决——"肯定是圆弧风格"）。
+  // ③ 车道只铺在**带中部 [25%, 75%]**：车道铺满整条带时，长轨贴着节点行飞（离行仅 ~10px），
+  //    会被读作"线从隔壁节点出来"（几何实证：T1→T7 轨在 T2 卡正下方 10px 且与 T2 出线相交成
+  //    十字接头）——收中后曲线离两侧行 ≥ 带高 1/4，只在走廊中央流动。
+  // 多入/多出节点锚点按 (k+1)/(n+1) 散开在顶/底边（曲线落点不挤一点）；单入单出保持中心
+  // 锚点（渲染向后兼容）。
+  // **跨多层边**（to.level > from.level+1，如 T8 合稿直接吃第 0 行的根前置）：任何穿过
+  // 中间行的走法都会切卡（T8 场实测：T1..T4→T8 中段横穿 T5/T6/T7 卡身 = "线穿节点"）——
+  // 改走**画布两侧边缘通道**（padding 16px 里）：带内转到边缘 → 沿边缘竖直下 → 目标上方
+  // 带内转入；同侧多条时边缘 x 分车道。跨层边因此不与带内车道竞争。
+  const LANE_LO = 0.25
+  const LANE_HI = 0.75
   const positionById = new Map(nodes.map(node => [node.id, node]))
   const positioned: { from: DagNode; to: DagNode }[] = []
   for (const edge of dependencyEdges(tasks)) {
@@ -178,6 +184,7 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
   }
   const bands = new Map<string, { from: DagNode; to: DagNode }[]>()
   for (const edge of positioned) {
+    if (edge.to.level > edge.from.level + 1) continue // 跨层边走边缘通道，不进带车道
     const key = `${String(edge.from.level)}→${String(edge.to.level)}`
     const bucket = bands.get(key)
     if (bucket === undefined) bands.set(key, [edge])
@@ -189,7 +196,8 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
     bucket.forEach((edge, index) => {
       const y1 = edge.from.y + edge.from.height
       const y2 = edge.to.y
-      laneY.set(edge, y1 + (y2 - y1) * ((index + 1) / (bucket.length + 1)))
+      const fraction = LANE_LO + (LANE_HI - LANE_LO) * ((index + 1) / (bucket.length + 1))
+      laneY.set(edge, y1 + (y2 - y1) * fraction)
     })
   }
   const exitX = new Map<{ from: DagNode; to: DagNode }, number>()
@@ -208,16 +216,43 @@ export function layoutDag(tasks: readonly TaskRow[], options: DagOptions = {}): 
     list.sort((a, b) => a.from.x - b.from.x)
     list.forEach((edge, index) => entryX.set(edge, target.x + target.width * ((index + 1) / (list.length + 1))))
   }
+  // 边缘通道车道：跨层边按（源中点 vs 目标中点）选侧；同侧按 y 排序分 x 车道（padding 16 内）。
+  const marginX = new Map<{ from: DagNode; to: DagNode }, number>()
+  for (const side of ['left', 'right'] as const) {
+    const list = positioned
+      .filter(edge => edge.to.level > edge.from.level + 1)
+      .filter(edge => (side === 'left'
+        ? edge.from.x + edge.from.width / 2 <= edge.to.x + edge.to.width / 2
+        : edge.from.x + edge.from.width / 2 > edge.to.x + edge.to.width / 2))
+      .sort((a, b) => (a.from.y - b.from.y) || (a.to.y - b.to.y))
+    list.forEach((edge, index) => {
+      const offset = 3 + 10 * ((index + 1) / (list.length + 1))
+      marginX.set(edge, side === 'left' ? offset : width - offset)
+    })
+  }
   const edges: DagEdge[] = positioned.map(edge => {
     const y1 = round(edge.from.y + edge.from.height)
     const y2 = round(edge.to.y)
-    const lane = round(laneY.get(edge) ?? (y1 + y2) / 2)
     const x1 = round(exitX.get(edge) ?? edge.from.x + edge.from.width / 2)
     const x2 = round(entryX.get(edge) ?? edge.to.x + edge.to.width / 2)
+    const margin = marginX.get(edge)
+    if (margin !== undefined) {
+      // 带内转到边缘（第一段 y 不超过源下方第一条带的中点 ⇒ 不进中间行）→ 沿边缘下 → 转入。
+      const a = round(y1 + vGap / 2)
+      const b = round(y2 - vGap / 2)
+      const m = round((b + y2) / 2)
+      return {
+        from: edge.from.id,
+        to: edge.to.id,
+        path: `M ${String(x1)} ${String(y1)} C ${String(x1)} ${String(a)}, ${String(margin)} ${String(a)}, ${String(margin)} ${String(a)} L ${String(margin)} ${String(b)} C ${String(margin)} ${String(m)}, ${String(x2)} ${String(m)}, ${String(x2)} ${String(y2)}`,
+        done: statusOf.get(edge.from.id) === 'completed',
+      }
+    }
+    const lane = round(laneY.get(edge) ?? (y1 + y2) / 2)
     return {
       from: edge.from.id,
       to: edge.to.id,
-      path: `M ${String(x1)} ${String(y1)} L ${String(x1)} ${String(lane)} L ${String(x2)} ${String(lane)} L ${String(x2)} ${String(y2)}`,
+      path: `M ${String(x1)} ${String(y1)} C ${String(x1)} ${String(lane)}, ${String(x2)} ${String(lane)}, ${String(x2)} ${String(y2)}`,
       done: statusOf.get(edge.from.id) === 'completed',
     }
   })

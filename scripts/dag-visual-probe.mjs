@@ -121,7 +121,9 @@ const readStyles = () => page.evaluate(() => {
 })
 
 const shoot = async name => {
-  await page.locator('#dag-fixture > svg').screenshot({ path: join(SHOTS, `${name}.png`) })
+  // svg 自适应缩放（2026-09-28）后 DagPanel 根是量宽 wrapper（div>div>svg）；按 aria-label
+  // 定位——容器里 StateDot 的 spinner 也是小 svg，不能裸用标签选择器。
+  await page.locator('#dag-fixture svg[aria-label="任务依赖图"]').screenshot({ path: join(SHOTS, `${name}.png`) })
   console.log(`  出图 snapshots/dag-visual/${name}.png`)
 }
 
