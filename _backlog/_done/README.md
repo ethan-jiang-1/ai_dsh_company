@@ -6,7 +6,7 @@
 
 ## 目录
 
-- [_closed_plans/](_closed_plans/README.md) — 已毕业推敲卡（无编号，按 slug 查）
+- [_closed_plans/](_closed_plans/README.md) — 已毕业推敲卡（文件名带立卡日期 `YYMMDD-slug`，按日期流/slug 查）
 - [_fixed_bugs/](_fixed_bugs/README.md) — 已修复缺陷卡（**Next BUG ID 权威源**）
 
 ## 已毕业推敲卡

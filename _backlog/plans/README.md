@@ -1,8 +1,9 @@
 # plans/ · 活跃推敲卡
 
-> 一文件一张卡（kebab-case slug 即标识，无编号、无次序）。毕业（批准 / 搁置 / 否决 / 消化）时
-> `git mv` 到 [`../_done/_closed_plans/`](../_done/_closed_plans/)，文件名不变、内容不重写，
-> 状态行补去向指针。规矩手册 = [`../README.md`](../README.md)。
+> 一文件一张卡。**文件名 = `YYMMDD-<slug>.md`（日期 = 立卡日；无编号、无次序——时间轴就在文件名上，
+> 归档后按日期流一眼看清先后）**。slug = kebab-case 主题词。毕业（批准 / 搁置 / 否决 / 消化）时
+> `git mv` 到 [`../_done/_closed_plans/`](../_done/_closed_plans/)，**文件名不变**（日期流随卡走）、
+> 内容不重写，状态行补去向指针。规矩手册 = [`../README.md`](../README.md)。
 
 ## 活跃列表
 
@@ -11,6 +12,8 @@
 | （空——首卡立时建行） | | |
 
 ## 卡片模板
+
+文件名 = `YYMMDD-<slug>.md`（例：2026-09-28 立的卡 = `260928-<slug>.md`）：
 
 ```markdown
 # 推敲：<标题>
