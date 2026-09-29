@@ -16,7 +16,7 @@
 // 前置：与 preset-smoke 相同（DSH_HOME + 已装 pack + 前端与 client 面已构建）；另需
 //       playwright（vendor 全树 `pnpm install` 后在 .pnpm store，本脚本自动定位）与一份
 //       chromium（缺 playwright 期望的版本时自动回退缓存里最新一份）。
-// 用法：source dev/env.sh && node scripts/client-load-smoke.mjs [--port 3092]
+// 用法：source dev/env.sh && node scripts/client-load-smoke.mjs [--port 0]
 import { spawn } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { requireDevHome } from './lib/runtime-home.mjs'
@@ -28,7 +28,7 @@ const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
   return i === -1 ? fallback : process.argv[i + 1]
 }
-const PORT = Number(arg('port', '3092'))
+const PORT = Number(arg('port', '0'))
 const BRAND = 'DSH Wochen Team'
 const BOOT_TIMEOUT_MS = 120_000
 

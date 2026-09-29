@@ -25,7 +25,7 @@ node ./node_modules/typescript/bin/tsc -b vendor/dsh/tsconfig.client.json   # cl
 (cd vendor/dsh && DSH_CLIENT_TITLE="DSH Wochen Team" ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE client)
 DSH_CLIENT_TITLE="DSH Wochen Team" pnpm --filter @deepseek-ai/dsh-web-frontend run build   # 前端 dist
 source dev/env.sh && pnpm dsh plugin --profile web add link:./packages/company-pack          # dev 用 link:（内容改动即刻生效）；真实形状归 release-smoke
-pnpm dsh web -- --port 3081 --no-open                                      # 端口是环境状态：被占就换，或 --port 0（从横幅读端口/token）
+pnpm dsh web -- --port 0 --no-open                                         # 端口是环境状态：系统分配，从横幅读端口/token
 
 # pack 代码面构建（改 src/** 任一面都需要——host〔src/index.ts+lib〕与 client〔src/client〕双编译面，
 # 2026-09-25 起 solution root；⚠ 旧命令 `tsc -p tsconfig.json` 在 solution root 上静默不构建，即此坑的由来）：
@@ -67,7 +67,7 @@ node scripts/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团
   内容改动即刻生效；profile `.npmrc` 把 store/cache 钉在 repo 内，`~/Library` 不被碰。
   历史：file: 拷贝时代首次装会拦 koffi 构建审批 → profile 的 `pnpm-workspace.yaml` 改
   `koffi: true` 再装；link: 下 profile 不再装 koffi，koffi 由源码域解析）。观察窗默认端口 3080，**与本 GUI 冲突**，用
-  `-- --port 3081`（示例端口；被占就换）。preset roster 出现在 UI 的 Built-in 组（五角色；trust 分组见上文 R1 坑注）。
+  `-- --port 0`（端口是环境状态，系统分配后从启动横幅读）。preset roster 出现在 UI 的 Built-in 组（五角色；trust 分组见上文 R1 坑注）。
 - **bundle 叠加的重复行 id**（R1 实证）：web-app 已 insert `agent-presets`，pack 再 insert 同 id
   → `duplicate loader entry id` 硬拒。修法：对已存在的行用**替换**语法（`- id:`），只有真正
   新增的行才 insert。

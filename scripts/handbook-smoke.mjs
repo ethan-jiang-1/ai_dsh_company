@@ -10,7 +10,7 @@
 // 证明不了注入内容；本脚本是这条线的完成定义。
 //
 // 前置：DSH_HOME + 已装 pack + 模型凭据（每个角色 1 次小调用）。
-// 用法：source dev/env.sh && node scripts/handbook-smoke.mjs [--roles ceo,vp-eng] [--port 3096]
+// 用法：source dev/env.sh && node scripts/handbook-smoke.mjs [--roles ceo,vp-eng] [--port 0]
 import { spawn } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -23,7 +23,7 @@ const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
   return i === -1 ? fallback : process.argv[i + 1]
 }
-const PORT = Number(arg('port', '3096'))
+const PORT = Number(arg('port', '0'))
 const ROLES = arg('roles', 'ceo').split(',').map(role => role.trim()).filter(role => role !== '')
 // 练习场 ≠ 运行场（轮间待办②）：默认 cwd 在排练场，排练/探针产物不再积进真盘；
 // `--cwd` 可显式覆盖。排练场的 AGENTS.md 是指向真盘手册的符号链接 ⇒ 注入基线仍是手册，

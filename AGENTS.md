@@ -40,8 +40,9 @@ node scripts/preset-smoke.mjs          # preset 改动的**完成定义**（触�
 
 其余门禁/冒烟脚本见 `scripts/`：**每个门禁/探针脚本（`*-{smoke,probe,audit,check}.mjs`）头注写明「何时跑」与成本**（`script-triggers` 门禁强制自述，
 清单唯一源 = `scripts/`——**逐个脚本的触发条件与成本别抄回本文件**，复述必漂）。分层原则 = guides/dev-loop §9.1；
-发布/升 pin = [release.md](docs/release.md)。web 观察窗 = `pnpm dsh web -- --port 3081 --no-open`（**端口是环境状态不是仓库事实**——被占就换，
-或 `--port 0` 让系统分配、从启动横幅读端口与 token；构建三件事见 guides/bootstrap）。
+发布/升 pin = [release.md](docs/release.md)。web 观察窗的起法与开门步骤（连工作区 / token / 选 preset）唯一见 [demo.md §前置](docs/demo.md)：
+**先 `source dev/env.sh`**——未 source 时 `DSH_HOME` 是日用 `~/.dsh`，那里**另有同名 `web` profile**（起得来、不报错、五角色一个不出现）；
+端口是环境状态不是仓库事实（`--port 0` 或挑空闲端口，token URL 从启动横幅读），构建三件事见 guides/bootstrap。
 
 **push 走 `ssh.github.com:443`**（22 端口被拦；`origin` 已指向该 URL，`git push` / `git fetch` 直接用即可）。
 

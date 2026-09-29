@@ -14,8 +14,12 @@
 
 ## 前置（本机）
 
-1. `source dev/env.sh`（双 home；**新 shell 必须**）
-2. `pnpm dsh web -- --port 3086 --no-open`（**示例端口——端口是环境状态，被占就换或 `--port 0`**，见 guides/bootstrap；启动横幅打印带 token 的 URL）
+1. `source dev/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒，自检代替警告）**：
+   `pnpm dsh --profile web --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 就说明你起的是日用 `~/.dsh`
+   ——那里**也有个同名 `web` profile**（装的是日用插件集、没有公司五角色），或 pack 没装。不 source 的失败是**静默**的：
+   起得来、不报错、五角色一个不出现。**计数 ≥1 同时证明「不必再 `plugin add`」**（dev web profile 已 `link:` 装好）。
+2. `pnpm dsh web -- --port 0 --no-open`（**端口是环境状态不是仓库事实**：`--port 0` 交系统分配，端口与 token 从启动横幅读；
+   要固定端口就先 `lsof -nP -iTCP:<port> -sTCP:LISTEN` 确认空闲——固定端口的回报是浏览器 origin 不变，工作区连接与面板布局能留下）
 3. 浏览器打开该 URL（**必须带 token**：直接开端口会卡鉴权）。**先连工作区**——会话列表按【工作目录】
    过滤，不连就看不到本场会话。两条入口：空态页点主区的 **Choose workspace**；已有工作区时走侧栏
    `Workspaces` 旁的 **Add workspace** 图标。对话框里**必须先点 `Edit path`** 才会出现路径输入框 →

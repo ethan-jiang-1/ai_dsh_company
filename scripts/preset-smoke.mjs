@@ -10,7 +10,7 @@
 //
 // 前置：DSH_HOME 指向已装本 pack 的 profile（`source dev/env.sh` 后用 dev home），
 //       client 面与前端 dist 已构建（guides/bootstrap）。
-// 用法：source dev/env.sh && node scripts/preset-smoke.mjs [--port 3099] [--profile web]
+// 用法：source dev/env.sh && node scripts/preset-smoke.mjs [--port 0] [--profile web]
 import { spawn } from 'node:child_process'
 import { readFileSync, readdirSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
@@ -23,7 +23,7 @@ const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
   return i === -1 ? fallback : process.argv[i + 1]
 }
-const PORT = Number(arg('port', '3099'))
+const PORT = Number(arg('port', '0'))
 const PROFILE = arg('profile', 'web')
 // 练习场 ≠ 运行场（轮间待办②）：默认 cwd 在排练场，排练/探针产物不再积进真盘；
 // `--cwd` 可显式覆盖（确需指回真盘时）。

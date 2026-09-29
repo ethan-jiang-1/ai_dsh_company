@@ -22,7 +22,7 @@
 //
 // 预算（guides/dev-loop §10）：墙钟 ≤ `--wall`（默认 180s）；模型 prompt **1 条**；可中断（Ctrl-C）。
 // 前置：DSH_HOME + 已装 pack + 模型凭据。
-// 用法：source dev/env.sh && node scripts/delegation-smoke.mjs [--port 3098] [--wall 180]
+// 用法：source dev/env.sh && node scripts/delegation-smoke.mjs [--port 0] [--wall 180]
 import { spawn } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -35,7 +35,7 @@ const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
   return i === -1 ? fallback : process.argv[i + 1]
 }
-const PORT = Number(arg('port', '3098'))
+const PORT = Number(arg('port', '0'))
 const WALL_MS = Number(arg('wall', '180')) * 1000
 // `--delegate`：多花 1 条 prompt 真委派一次，断言**前台拿到稿子**（R3 验收里「委派出稿」的真检查）。
 const DELEGATE = process.argv.includes('--delegate')
