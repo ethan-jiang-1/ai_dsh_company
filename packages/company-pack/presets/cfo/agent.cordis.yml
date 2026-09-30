@@ -58,6 +58,14 @@
             name: '@deepseek-ai/dsh-tool-ask-user'
           - id: tool-present
             name: '@deepseek-ai/dsh-tool-present'
+          # 上网（web_search + web_fetch）：web-app bundle 把 host 上的 `tool-web` 行 `disabled: true` 了，
+          #   改为**按 agent preset 组合**（vendor base 注释原文）⇒ 不在 preset 里声明就没有联网能力。
+          #   后端住 base 且未被 disable；搜索复用 DEEPSEEK_API_KEY，抓取为匿名（仅公开 HTTP(S)）。
+          - id: tool-web
+            name: '@deepseek-ai/dsh-tool-web'
+            config:
+              fetch: true
+              searchTimeoutMs: 60000
 
           # ④ 生 worker（深挖测算用）
           - id: delegation

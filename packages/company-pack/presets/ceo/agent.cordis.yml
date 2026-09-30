@@ -61,6 +61,15 @@
             name: '@deepseek-ai/dsh-tool-ask-user'
           - id: tool-present
             name: '@deepseek-ai/dsh-tool-present'
+          # 上网（web_search + web_fetch）：web-app bundle 把 host 上的 `tool-web` 行 `disabled: true` 了，
+          #   改为**按 agent preset 组合**（vendor base 注释原文）⇒ 不在 preset 里声明，角色连同它 spawn 的
+          #   child 都没有联网能力。后端住 base 且未被 disable；搜索复用 DEEPSEEK_API_KEY（无独立 key），
+          #   抓取为匿名（仅公开 HTTP(S)）。搜索 = 一次完整模型回合，故 60s。
+          - id: tool-web
+            name: '@deepseek-ai/dsh-tool-web'
+            config:
+              fetch: true
+              searchTimeoutMs: 60000
 
           # ④ 汇报线（通道 A，R3）：每个直接汇报对象一个**命名委托工具**——CEO 的模型看到的就是
           #    `vp_eng` / `vp_sales` 两个工具（per-instance persona 是 dsh-tool-subagent 的教义：

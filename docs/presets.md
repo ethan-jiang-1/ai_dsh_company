@@ -94,12 +94,18 @@ UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSecti
 
 | 角色 | 工具行 | 说明 |
 |---|---|---|
-| CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` + `delegation` 组（`tool-subagent` spawn + **`vp_eng` / `vp_sales` 命名委托**） | 读 KB、写交付物、加载 skill、澄清提问、声明交付；**汇报线两条路**（R3）：命名委托 = one-shot 前台快捷出稿，协作走 team；语义见 [delegation.md](./delegation.md) |
-| VP-Eng / VP-Sales / COO / CFO | 同 VP-Eng（R2 起）+ **`tool-ask-user`（2026-09-25 驾驶舱③乙）** | 独立会话可直接问人；动议内仍升级 CEO——手册「问人两条路」两模式约束（承诺权与单一对外口径不动，R3/D18 维持）；`delegation` 供深挖调研 / 盘点 / 测算 |
+| CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` / **`tool-web`** + `delegation` 组（`tool-subagent` spawn + **`vp_eng` / `vp_sales` 命名委托**） | 读 KB、写交付物、加载 skill、澄清提问、声明交付、**上网（搜/取）**；**汇报线两条路**（R3）：命名委托 = one-shot 前台快捷出稿，协作走 team；语义见 [delegation.md](./delegation.md) |
+| VP-Eng / VP-Sales / COO / CFO | 同 VP-Eng（R2 起）+ **`tool-ask-user`（2026-09-25 驾驶舱③乙）** + **`tool-web`（2026-09-29）** | 独立会话可直接问人；动议内仍升级 CEO——手册「问人两条路」两模式约束（承诺权与单一对外口径不动，R3/D18 维持）；`delegation` 供深挖调研 / 盘点 / 测算；VPS 引客户事实时可用 web 核价/竞品 |
 | 全局（pack bundle） | `agent-presets` roster 替换 + `tool-present` / `agent-team` / `tool-agent-team` insert | 只放全局行；**工具面不靠它**（见 [architecture §6](./design/architecture.md) 要点 1） |
 
 ⚠ **preset 是自包含组合**：DSH 无 patch 继承，工具行必须写在 preset 里——R1 首跑就是漏了这一步，
 CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）。`pnpm test` 已加门禁检查（R2 起覆盖五角色）。
+
+⚠ **联网（`tool-web`）天生不继承，必须逐 preset 声明**（2026-09-29 补）：`web-app` bundle 把 host 上的
+`tool-web` 行 `disabled: true`，**改为按 agent preset 组合**（vendor base 注释原文）——所以漏写这一行时
+角色**静默无联网**（不报错，只是目录里少两个工具）。**子会话不用另配**：`subagent` 与 team teammate
+走 `composeFrom` **继承 Lead 的组合**（[roles-isolation §2/§4](./design/roles-isolation.md)；本组 delegation 行无 `toolFilter`，故不裁剪）——
+实测 Lead 27 工具含 `web_search`/`web_fetch`，摘掉该行即回 25 且两个工具消失，委派子会话（depth=1）同含。
 
 ## 验证方式（分层）
 
@@ -122,7 +128,7 @@ preset 即对 profile 可见、无需重装；真实安装形状（`file:`）归
 
 | 改动面 | 生效时点 | 依据 |
 |---|---|---|
-| persona / 组合文件（工具行、skill 根） | **新会话**（运行中的会话保持自己的 generation） | vendor `agent-presets` README stamp 机制（活体未跑） |
+| persona / 组合文件（工具行、skill 根） | **新会话**（运行中的会话保持自己的 generation）；⚠ **新增依赖模块 / 新行解析时还须重启观察窗**——2026-09-29 实测：旧进程上新开会话仍是 25 工具（无 `web_search`），重启后 27 工具含之（该轮两个变量同时变，故取稳妥口径） | vendor `agent-presets` README stamp 机制；**活体已跑**（2026-09-29 联网整治，见 [role-web-access](../notes/implemented/2026-09-29-role-web-access.md)） |
 | skill 正文（`SKILL.md` body） | **同会话下一轮**（`get()` 每次读盘） | 活体实证（日志工具结果层）+ vendor 源码一致；**修正** 2026-09-22 U1"只有新会话变"（U1 量的是模型转述） |
 | skill 条目（增删改名） | 下一轮（pre-step digest 重算 → 替换目录注入） | vendor 源码层（[研究笔记 §5.2/§6](../notes/implemented/2026-09-22-digital-twin-cultivation-and-self-learning.md)） |
 

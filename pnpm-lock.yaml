@@ -63,6 +63,9 @@ importers:
       '@deepseek-ai/dsh-tool-todo':
         specifier: workspace:*
         version: link:vendor/dsh/packages/todo/tool-todo
+      '@deepseek-ai/dsh-tool-web':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/web/tool-web
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -123,6 +126,9 @@ importers:
       '@deepseek-ai/dsh-skill-filesystem':
         specifier: ^0.1.7-rc.2
         version: link:../../vendor/dsh/packages/skill/skill-filesystem
+      '@deepseek-ai/dsh-time-context':
+        specifier: ^0.1.7-rc.2
+        version: link:../../vendor/dsh/packages/context/time-context
       '@deepseek-ai/dsh-tool-ask-user':
         specifier: ^0.1.7-rc.2
         version: link:../../vendor/dsh/packages/interaction/tool-ask-user
@@ -150,6 +156,9 @@ importers:
       '@deepseek-ai/dsh-tool-todo':
         specifier: ^0.1.7-rc.2
         version: link:../../vendor/dsh/packages/todo/tool-todo
+      '@deepseek-ai/dsh-tool-web':
+        specifier: ^0.1.7-rc.2
+        version: link:../../vendor/dsh/packages/web/tool-web
     devDependencies:
       '@deepseek-ai/cordis':
         specifier: workspace:*

@@ -14,3 +14,9 @@
       name: '@deepseek-ai/dsh-experimental-agent-team'
     - id: tool-agent-team
       name: '@deepseek-ai/dsh-experimental-tool-agent-team'
+    # 日期通道（推敲卡 260929-date-channel-mechanism D2'）：headless 组合无 web-app 的
+    # time-context 行，此处 insert 补（pack 的替换行只在 web-app 组合里找得到 id）。
+    - id: time-context
+      name: '@deepseek-ai/dsh-time-context'
+      config:
+        timeZone: Asia/Shanghai
