@@ -17,22 +17,20 @@
   config:
     default: ceo
 
-# ── 日期通道（推敲卡 _backlog/plans/260929-date-channel-mechanism.md D2'）：启用出厂 time-context ──
-# web-app bundle 出厂挂了这行但 disabled: true（vendor/dsh/packages/bundle/web-app/cordis.patch.yml）。
-# ⚠ 替换语义实测（2026-09-29 探针红证）：patch 换行只替换 **config 整块**；行级键（disabled）
-#   是**按键覆盖**——不写就沿用 web-app 的 disabled: true（首跑 config 换上了、插件仍关着）。
-#   ⇒ 必须**显式写 disabled: false** 才真正启用。
-# 效果：角色会话历史收到 durable 的当前时间注入（user-role 消息——model-visible ⟺ logged 不变量
-# 不破；默认 10 分钟一条，请求带浏览器时区优先、缺省回落 Asia/Shanghai）。
-# 「日期口径」"没有时钟通道"的前提自此失效——规则正文随机制同 diff 改（公司手册「日期口径」节）。
-# 纯 headless 组合无此行 ⇒ dev/company.overlay.yml 的 insert 补（双轨，同 agent-preset-registry）。
-- id: time-context
-  name: '@deepseek-ai/dsh-time-context'
-  disabled: false
-  config:
-    timeZone: Asia/Shanghai
-
 - insert:
+    # ── 日期通道（推敲卡 _backlog/plans/260929-date-channel-mechanism.md D2'）──
+    # 0.1.7 时代这是对 web-app 出厂行的**替换**（出厂挂了但 disabled: true，须显式 disabled: false
+    #   才真正启用——2026-09-29 探针红证）。0.2.0 起出厂行整体迁入可选 schedule-bundle
+    #   （upstream commit 64a361ee44）⇒ 替换行落空，改为 **insert**（全新行，默认 enabled）。
+    # 效果：角色会话历史收到 durable 的当前时间注入（user-role 消息——model-visible ⟺ logged 不变量
+    #   不破；默认 10 分钟一条，请求带浏览器时区优先、缺省回落 Asia/Shanghai）。
+    # 「日期口径」"没有时钟通道"的前提自此失效——规则正文已随升 pin 同 diff 改（公司手册「日期口径」节）。
+    # 双轨收敛：headless overlay 的补偿 insert 已随本次升 pin 移除（升 pin Note）。
+    - id: time-context
+      name: '@deepseek-ai/dsh-time-context'
+      disabled: false
+      config:
+        timeZone: Asia/Shanghai
     # ── 交付物声明工具（base 无此行）──
     - id: tool-present
       name: '@deepseek-ai/dsh-tool-present'

@@ -17,8 +17,8 @@ const fail = (name, detail) => { failures.push(`${name}: ${detail}`); console.lo
 // ── 0. 钉住基线（**唯一事实家**：vendor-pin 与 pin-* 两道门禁都用它）─────────────
 // 为什么用 SHA 而不是 tag：tag 可被移动/别名，SHA 才是钉住的合同。
 // ⚠ 升 pin 时改这里 + AGENTS.md §vendor 簿记 + package.json 兼容矩阵（pack-compat 会拦）。
-const expectedTag = 'dsh-v0.1.7-rc.2'
-const expectedSha = '477b4f420553e8a52c2fbccc464d7561b239c443'
+const expectedTag = 'dsh-v0.2.0-rc.2'
+const expectedSha = '639ed015397290b3745d163aafe02ffee4aa3f84'
 
 // ── 1. Markdown：严格 UTF-8 + 单个结尾换行 ──────────────────────────────────
 // 负例留证 2026-09-27：临时 md 无尾换行 → md-newline 红（还原后绿）。

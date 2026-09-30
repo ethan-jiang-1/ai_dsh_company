@@ -100,6 +100,17 @@ try {
   browser = await launchChromium(chromium)
   const page = await browser.newPage()
   await page.goto(`${base}/?token=${banner.token}`)
+  // 首启通告模态（遮罩会拦截后续 click）：0.1.7 = Internal Testing Notice；0.2.0 增 Preview
+  // Notice（vendor ui-settings-models welcomeTitle，按钮同为 Continue）——都要等出现再关
+  // （goto 返回时常未挂载完，条件检查会扑空；replay-smoke --ui 同款处理）。
+  for (const name of ['Internal Testing Notice', 'Preview Notice']) {
+    const notice = page.getByRole('dialog', { name })
+    await notice.waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {})
+    if (await notice.isVisible().catch(() => false)) {
+      await notice.getByRole('button', { name: 'Continue' }).click()
+      await notice.waitFor({ state: 'detached', timeout: 10_000 })
+    }
+  }
   await page.locator('[data-composer-input][contenteditable="true"]').waitFor({ timeout: 20_000 })
   const welcome = page.locator('[class*="onboardingOverlay"]')
   if (await welcome.count() > 0 && await welcome.isVisible()) {
@@ -120,13 +131,17 @@ try {
   await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
   console.log('session opened')
 
-  // 注意力面板（批准之前！）：右栏 →「需要你」→ 断言待批条目在场
+  // 注意力面板（批准之前！）：右栏 →「待办」页签 → 断言待批条目在场。
+  // 定位器随仓内演进修（2026-09-27 页签「需要你」→「待办」；面板 v2 = 等你处理/刚完成两段，
+  // 列表 aria-label 待办事项；旧脚本找的「需要你处理的事」列表已不存在——重命名轮欠下的脚本债）。
   const expand = page.getByRole('button', { name: 'Open right sidebar' })
   if (await expand.count() > 0) await expand.first().click()
-  const capsule = page.getByRole('button', { name: /^需要你/ }).first()
-  await capsule.waitFor({ state: 'visible', timeout: 15_000 })
-  await capsule.click()
-  const attentionList = page.getByRole('list', { name: '需要你处理的事' })
+  // 2026-09-30 实测（0.2.0）：待办入口是右栏 guide **按钮**（dockkit tabs 只有 Start，
+  // 诊断转储留证）；0.1.7 的「需要你」胶囊同为按钮形。点击后注意力列表才挂载。
+  const todoTab = page.getByRole('button', { name: /^待办/ }).first()
+  await todoTab.waitFor({ state: 'visible', timeout: 15_000 })
+  await todoTab.click()
+  const attentionList = page.getByRole('list', { name: '待办事项' })
   await attentionList.waitFor({ state: 'visible', timeout: 20_000 })
   const attentionText = String(await attentionList.textContent())
   check('注意力面板显示待批审批（驾驶舱① DOM 缺口闭合）', attentionText.includes('待批审批'), attentionText.slice(0, 90))

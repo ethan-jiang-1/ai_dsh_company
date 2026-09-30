@@ -104,11 +104,22 @@ const headerOf = (text) => records(text)[0] ?? {}
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 
 /** vendor writeSessionFixtures 生产线的裁剪版（stabilize 需先代 fixture，首录无先代跳过；redact 收数组）。 */
+// 场景自有替换（webUrl 同款先例）：日期通道（0.2.0 升 pin 起随 pack bundle insert 启用）把
+// **当前时间**作为 durable user/message 注入会话——时间戳是墙钟，录制与重放必然不同（这正是
+// 机制在工作的证据）。归一化两件：采样时刻（ISO 带时区）→ <time-context-sample>；相对时长
+// （"Elapsed since …" 后面的值随节奏漂）→ <time-context-elapsed>。录制侧与重放侧同管道对称生效。
+const TIME_CONTEXT_SAMPLE = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?[+-]\d{2}:\d{2}\[[^\]"]*\]/g
+const TIME_CONTEXT_ELAPSED = /(Elapsed since the preceding model-visible message: )[^"\\\n]*/g
+const normalizeTimeContext = (text) => text
+  .replace(TIME_CONTEXT_SAMPLE, '<time-context-sample>')
+  .replace(TIME_CONTEXT_ELAPSED, '$1<time-context-elapsed>')
+
 function normalizeFixtures(raws) {
   const scrubbed = raws
     .map(raw => tokenizeSessionFixtureCwd(raw))
     .map(stable => prepareSessionSnapshotFixtureForComparison(stable))
     .map(prepared => scrubSessionSnapshot(prepared))
+    .map(text => normalizeTimeContext(text))
   return redactSessionSnapshotIds(scrubbed)
 }
 
@@ -561,6 +572,14 @@ async function runUiFlow(page, { url, workspace }) {
       await notice.getByRole('button', { name: 'Continue' }).click()
       await notice.waitFor({ state: 'detached', timeout: 10_000 })
     }
+    // 0.2.0 新增首启通告：Preview Notice（vendor ui-settings-models locales welcomeTitle，
+    // 按钮同为 Continue；welcome-notice.client.spec 同款）——fresh home 首访必弹，同款等出现再关。
+    const preview = page.getByRole('dialog', { name: 'Preview Notice' })
+    await preview.waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {})
+    if (await preview.isVisible()) {
+      await preview.getByRole('button', { name: 'Continue' }).click()
+      await preview.waitFor({ state: 'detached', timeout: 10_000 })
+    }
     // 兜底：还有别的可见模态框就点名失败——别让它静默拦截后续 click 查半天才懂
     const otherDialogs = page.getByRole('dialog')
     if (await otherDialogs.count() > 0) {
@@ -724,11 +743,12 @@ try {
     console.log('  （会话数不足，仍对比已有会话以定位差异行）')
   }
   // 归一化比对（vendor 对位：两侧各自 ctx；{{cwd}}/{{system}}/{{tools}} + id redaction 吸收波动）
+  // 重放侧先过场景自有 time-context 归一化（fixture 落盘时已同管道归一化，两侧对称）。
   const ctxOf = (items) => ({
     sessionIds: items.map(i => String(i.header.id)).filter(id => id !== ''),
     cwd: typeof items[0]?.header.cwd === 'string' ? items[0].header.cwd : '',
   })
-  const actualN = normalizeSessionSnapshots(parsed.map(p => p.text), ctxOf(parsed))
+  const actualN = normalizeSessionSnapshots(parsed.map(p => normalizeTimeContext(p.text)), ctxOf(parsed))
   const expectedN = normalizeSessionSnapshots(fixtures, ctxOf(fixtures.map(t => ({ header: headerOf(t) }))))
   let diffLine = ''
   let sessionDiffs = 0

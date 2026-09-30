@@ -7,7 +7,7 @@
 用户试用反馈（2026-09-28，浮窗几何记忆同轮）：看到「two panel is the limit」，问能否更多——
 最多需要 4 个面板。
 
-## 已知（2026-09-28 vendor 源码核实，钉版 dsh-v0.1.7-rc.2）
+## 已知（2026-09-28 vendor 源码核实，当时钉版 dsh-v0.1.7-rc.2）
 
 - **引擎容量本来就是 4**：`ui-dockkit/engine/constraints.ts:10`
   `MAX_DOCK_PANES = 4`（注释："V1 caps the docked grid at four panes; **floating panes do
