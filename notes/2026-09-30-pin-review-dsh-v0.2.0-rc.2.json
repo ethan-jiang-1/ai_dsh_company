@@ -1,0 +1,9 @@
+{
+  "from": "dsh-v0.1.7-rc.2",
+  "to": "dsh-v0.2.0-rc.2",
+  "fromSha": "477b4f420553e8a52c2fbccc464d7561b239c443",
+  "toSha": "639ed015397290b3745d163aafe02ffee4aa3f84",
+  "reviewedBy": "bowhead",
+  "reviewedAt": "2026-09-30",
+  "processContractReview": "vendor 纪律核对：本仓 vendor 铁律 = vendor 树零改动 + SHA-not-tag，升 pin 走 docs/release.md 升 pin 程序。本次取证操作只把候选 tag 的对象抓进 vendor/dsh 的 git 缓存（fetch 官方 origin），未改 submodule origin、未移动 vendor HEAD、tracked 内容零改动；测量窗口对 vendor 只做 tag checkout（tracked 零改动，窗口结束已还原 477b4f42 并复核）。本地流程合同核对：官方 `sync-dsh --pin` 事务在本仓装不下——D27 在案（vendor 自建在嵌套工作区必失败），本轮已在 candidate 上实测复核：独立 staging 树与嵌套树同报 `[@deepseek-ai/dsh-root] Cannot find entry: [\"lib/types/{index,invariant,startup}.js\"]`（/tmp/pinwin/19-*.log 与 /tmp/pinwin/08-*.log；0.1.7 时代根 entry 由树内旧产物掩盖，产物消失后 face 构建同样撞上，见 /tmp/pinwin/04-*.log）⇒ 沿 0.1.7 先例走「测量窗口实测 → 全绿后手工写四处簿记 + lockfile + submodule 指针」路径，等价于官方事务的 validate→verify 顺序（簿记在门禁全绿前不落盘）。增量证据：477b4f42..639ed015 = 448 commit，非纯发布 bump；消费面 delta 报告 = notes/research/2026-09-30-dsh-upstream-delta-0.2.0.md（结论：纯适配、无 install 级阻塞、24 peer 包全在；唯一硬破面 = cordis.patch.yml 的 time-context 替换行随 web-app 出厂行迁移而落空，commit 64a361ee44）。人审范围：本文件由 bowhead 于 2026-09-30 过目确认（含 D27 路径选择与增量摘要）。声明边界：这是人审声明，不是自动脚本的语义审计，也不认证签名者身份。"
+}
