@@ -642,10 +642,12 @@ async function runUiFlow(page, { url, workspace }) {
     const cardCount = await cardButton.count()
     check('委派卡渲染 ×1（可访问名 "委派 VP-Eng（研发）…"）', cardCount === 1, `${String(cardCount)} 张（DOM 里 vp_eng 行 ${String(await genericRow.count())} 处，含通用行）`)
     // 金样：centerCol（会话中列，vendor present.e2e 同款区域）；展开轮次组后捕获。
-    // 场景自有归一化：用量按钮的数字随工具面大小漂（批1→批3 三刷金样的教训）——掩码成占位，
+    // 场景自有归一化：①用量按钮数字随工具面大小漂（批1→批3 三刷金样的教训）；②Think 按钮
+    // 文本 = 模型 reasoning 摘要，每次重录必然变（批4→批5 两连红实证）——均掩码成占位，
     // 写金样与比对同管道（webUrl 替换同款先例）；按钮在场性仍被金样断言。
     const aria = (await captureStableAria(page, '[class*="centerCol"]', workspace))
       .replace(/Usage [\d.]+[KM]? tok/g, 'Usage {{tokens}} tok')
+      .replace(/- button "Think (?:[^"\\]|\\.)*"/g, '- button "Think {{reasoning}}"')
     check('委派卡节点在 aria 树（可访问名 "委派 VP-Eng（研发）…"）', aria.includes('委派 VP-Eng（研发）'))
     if (REFRESH_UI) {
       writeFileSync(goldenUi, `${aria}\n`, 'utf8')

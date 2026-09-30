@@ -53,6 +53,22 @@
             name: '@deepseek-ai/dsh-command-goal'
           - id: tool-goal
             name: '@deepseek-ai/dsh-tool-goal'
+          # ── 0.2.0 harvest 批5a：计划模式（推敲位）——会话切进 plan 模式后生效。
+          #    section 为**公司化改写**（vendor 原文是编码代理口味：repository / another engineer）。
+          - id: planning
+            name: cordis:group
+            group: true
+            isolate:
+              planMode: true
+            config:
+              - id: plan-mode
+                name: '@deepseek-ai/dsh-plan-mode'
+                config:
+                  section: |
+                    你处于计划模式（推敲位）。在 exit_plan_mode 成功或用户切换会话模式之前保持计划模式。用户的祈使语气意味着「计划这件事」，不是「执行它」。
+                    先探索后落笔：读 kb/（CHARTER、相关 journal）与 deliverables/<slug>/drafts/ 下的既有稿件，用 session_search 查历史会话，把结论的依据找齐。本模式内不写任何交付物（drafts/、final.md、journal 均不动）。
+                    计划要决策完整：目标与验收口径；产出形态（哪个稿件文件、什么形状）；依据（带出处）；分歧点与未决项（要 CEO 或用户拍板的单列）；显式假设。一页为限。
+                    就绪后调用 exit_plan_mode 提交完整计划（# 标题开头的 markdown，且是该回复唯一的收尾工具调用）。被驳回就把反馈折进来再提一次。
           # 历史压缩组：角色会话动辄读大 KB/journal，长动议没有压缩迟早爆上下文；
           # compaction-basic 按 Config 阈值自动压，/compact 是人命令，pruner 裁大工具结果。
           - id: compaction

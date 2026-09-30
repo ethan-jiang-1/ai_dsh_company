@@ -21,6 +21,9 @@ importers:
       '@deepseek-ai/dsh-agent-preset-registry':
         specifier: workspace:*
         version: link:vendor/dsh/packages/preset/agent-preset-registry
+      '@deepseek-ai/dsh-browser-use':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/browser-use/browser-use
       '@deepseek-ai/dsh-command-compact':
         specifier: workspace:*
         version: link:vendor/dsh/packages/compaction/command-compact
@@ -36,6 +39,9 @@ importers:
       '@deepseek-ai/dsh-experimental-agent-team':
         specifier: workspace:*
         version: link:vendor/dsh/packages/experimental/agent-team
+      '@deepseek-ai/dsh-experimental-browser-use-playwright-mcp':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/experimental/browser-use-playwright-mcp
       '@deepseek-ai/dsh-experimental-client-ui-agent-team':
         specifier: workspace:*
         version: link:vendor/dsh/packages/experimental/client-ui-agent-team
@@ -48,6 +54,9 @@ importers:
       '@deepseek-ai/dsh-persona':
         specifier: workspace:*
         version: link:vendor/dsh/packages/preset/persona
+      '@deepseek-ai/dsh-plan-mode':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/plan/plan-mode
       '@deepseek-ai/dsh-session-query-sqlite':
         specifier: workspace:*
         version: link:vendor/dsh/packages/session-query/session-query-sqlite
@@ -138,6 +147,9 @@ importers:
       '@deepseek-ai/dsh-agent-preset-registry':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/preset/agent-preset-registry
+      '@deepseek-ai/dsh-browser-use':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/browser-use/browser-use
       '@deepseek-ai/dsh-client-ui-workspace':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/client/ui-workspace
@@ -153,6 +165,9 @@ importers:
       '@deepseek-ai/dsh-compaction-tool-result-pruner':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/compaction/compaction-tool-result-pruner
+      '@deepseek-ai/dsh-experimental-browser-use-playwright-mcp':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/experimental/browser-use-playwright-mcp
       '@deepseek-ai/dsh-experimental-client-ui-agent-team':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/experimental/client-ui-agent-team
@@ -162,6 +177,9 @@ importers:
       '@deepseek-ai/dsh-persona':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/preset/persona
+      '@deepseek-ai/dsh-plan-mode':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/plan/plan-mode
       '@deepseek-ai/dsh-session-persistence-jsonl':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/session/session-persistence-jsonl
