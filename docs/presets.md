@@ -96,6 +96,7 @@ UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSecti
 |---|---|---|
 | CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` / **`tool-web`** + `delegation` 组（`tool-subagent` spawn + **`vp_eng` / `vp_sales` 命名委托**） | 读 KB、写交付物、加载 skill、澄清提问、声明交付、**上网（搜/取）**；**汇报线两条路**（R3）：命名委托 = one-shot 前台快捷出稿，协作走 team；语义见 [delegation.md](./delegation.md) |
 | VP-Eng / VP-Sales / COO / CFO | 同 VP-Eng（R2 起）+ **`tool-ask-user`（2026-09-25 驾驶舱③乙）** + **`tool-web`（2026-09-29）** | 独立会话可直接问人；动议内仍升级 CEO——手册「问人两条路」两模式约束（承诺权与单一对外口径不动，R3/D18 维持）；`delegation` 供深挖调研 / 盘点 / 测算；VPS 引客户事实时可用 web 核价/竞品 |
+| 全体（0.2.0 harvest 批1，2026-09-30） | **`tool-jobs`**（后台任务）/ **`tool-goal` + `/goal`**（跨轮目标）/ **`compaction` 组**（compaction-basic + `/compact` + tool-result-pruner：长会话历史压缩）/ delegation 组内 **`subagent_fork`**（可续跑自身分叉） | 行形状逐字照抄 `vendor/dsh/packages/bundle/web-app/presets/standard.patch.yml`（0.1.7→0.2.0 间 standard 长出的面，本仓 preset 原为 0.1.7 形状）；fork 的编排位 = [delegation.md](./delegation.md) §4.4 |
 | 全局（pack bundle） | `agent-presets` roster 替换 + `tool-present` / `agent-team` / `tool-agent-team` insert | 只放全局行；**工具面不靠它**（见 [architecture §6](./design/architecture.md) 要点 1） |
 
 ⚠ **preset 是自包含组合**：DSH 无 patch 继承，工具行必须写在 preset 里——R1 首跑就是漏了这一步，

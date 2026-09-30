@@ -73,9 +73,11 @@ subagent child 不在名册上 ⇒ **continuable child 在 CEO 会话里既发�
 2. **要"child 拿到角色完整 skills/工具面"** ⇒ 那是 M2（自定义 provider 在 child 创建窗口 mount
    角色 preset，[design/roles-isolation](./design/roles-isolation.md) §3），本仓未做。触发条件 = 出现
    "必须隔离组合"的委派。
-3. **并行快捷派活**（同时开几个 VP 不等结果）在本组合里没有干净解法：continuable 管不了、
-   one-shot 前台串行。要它得等上游 seam（per-child composition / 不撞名的控制面），
-   **本仓不自建**（D13）。
+3. **并行快捷派活**（同时开几个 VP 不等结果）：~~没有干净解法，等上游 seam~~ **seam 已随
+   0.2.0 harvest 到位**（2026-09-30 批1/批4）：`subagent_fork`（可续跑的自身分叉，批1 已逐
+   preset 声明）与 `tool-workflow`（JS 编排 fan-out 子代理，批4 接入 CEO）。命名委托
+   （`vp_eng`/`vp_sales` one-shot 前台）仍是**单职能快捷出稿**的主路；fork/workflow 补的是
+   并行与编排位。
 4. **控制面现状**：四个职能 preset 已补 `tool-subagent-control` + `.../list-agents`（R4；上游成对形状——vendor 的 maybeInstall 只对 team 成员装团队版控制名，职能根会话不是成员）；CEO preset 不放全局控制行（team-scoped 死行，有反向守卫）。~~**残留**：teammate 共享 CEO preset，其 `subagent` 与 team shadow 相冲——随升 pin 处理。~~ **已随 2026-09-25 升 pin 处置**（团队态改读 `agentTeam` 投影；`sync-dsh` 已跑）——本条不再是待办，留作当时的判断记录。
 
 ## 5. UI：委派工具卡

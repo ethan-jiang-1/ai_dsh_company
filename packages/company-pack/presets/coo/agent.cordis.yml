@@ -46,6 +46,34 @@
             name: '@deepseek-ai/dsh-tool-fs-search'
             config:
               sampleOverCapGlobResults: false
+          # ── 0.2.0 harvest 批1（standard 追平，2026-09-30）：上游 standard preset 工具面在
+          #    0.1.7→0.2.0 间长出一批，本仓 preset 是 0.1.7 形状的自包含声明，逐行补齐（行形状照抄
+          #    vendor/dsh/packages/bundle/web-app/presets/standard.patch.yml）──
+          - id: tool-jobs
+            name: '@deepseek-ai/dsh-tool-jobs'
+          - id: command-goal
+            name: '@deepseek-ai/dsh-command-goal'
+          - id: tool-goal
+            name: '@deepseek-ai/dsh-tool-goal'
+          # 历史压缩组：角色会话动辄读大 KB/journal，长动议没有压缩迟早爆上下文；
+          # compaction-basic 按 Config 阈值自动压，/compact 是人命令，pruner 裁大工具结果。
+          - id: compaction
+            name: cordis:group
+            group: true
+            isolate:
+              compaction: true
+              toolResultPruner: true
+            config:
+              - id: compaction-basic
+                name: '@deepseek-ai/dsh-compaction-basic'
+              - id: command-compact
+                name: '@deepseek-ai/dsh-command-compact'
+              - id: tool-result-pruner
+                name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+                config:
+                  thresholdChars: 8192
+                  headChars: 4096
+                  tailChars: 1024
           - id: tool-skill
             name: '@deepseek-ai/dsh-tool-skill'
           - id: tool-cordis
@@ -91,6 +119,14 @@
                 config:
                   provider: spawn
                   toolName: subagent
+                  backgroundMode: continuable
+              # 0.2.0 harvest 批1：subagent_fork 可续跑的自身分叉（行形状照抄 standard）——
+              # 并行快捷派活的上游 seam 到位（搁置池复活判据之一）；编排面（workflow）批4 再接。
+              - id: tool-subagent-fork
+                name: '@deepseek-ai/dsh-tool-subagent'
+                config:
+                  provider: fork
+                  toolName: subagent_fork
                   backgroundMode: continuable
 
           # ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）

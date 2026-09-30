@@ -21,6 +21,18 @@ importers:
       '@deepseek-ai/dsh-agent-preset-registry':
         specifier: workspace:*
         version: link:vendor/dsh/packages/preset/agent-preset-registry
+      '@deepseek-ai/dsh-command-compact':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/compaction/command-compact
+      '@deepseek-ai/dsh-command-goal':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/goal/command-goal
+      '@deepseek-ai/dsh-compaction-basic':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/compaction/compaction-basic
+      '@deepseek-ai/dsh-compaction-tool-result-pruner':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/compaction/compaction-tool-result-pruner
       '@deepseek-ai/dsh-experimental-agent-team':
         specifier: workspace:*
         version: link:vendor/dsh/packages/experimental/agent-team
@@ -51,6 +63,12 @@ importers:
       '@deepseek-ai/dsh-tool-fs-search':
         specifier: workspace:*
         version: link:vendor/dsh/packages/fs/tool-fs-search
+      '@deepseek-ai/dsh-tool-goal':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/goal/tool-goal
+      '@deepseek-ai/dsh-tool-jobs':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/jobs/tool-jobs
       '@deepseek-ai/dsh-tool-present':
         specifier: workspace:*
         version: link:vendor/dsh/packages/deliverables/tool-present
@@ -111,6 +129,18 @@ importers:
       '@deepseek-ai/dsh-client-ui-workspace':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/client/ui-workspace
+      '@deepseek-ai/dsh-command-compact':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/compaction/command-compact
+      '@deepseek-ai/dsh-command-goal':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/goal/command-goal
+      '@deepseek-ai/dsh-compaction-basic':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/compaction/compaction-basic
+      '@deepseek-ai/dsh-compaction-tool-result-pruner':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/compaction/compaction-tool-result-pruner
       '@deepseek-ai/dsh-experimental-client-ui-agent-team':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/experimental/client-ui-agent-team
@@ -141,6 +171,12 @@ importers:
       '@deepseek-ai/dsh-tool-fs-search':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/fs/tool-fs-search
+      '@deepseek-ai/dsh-tool-goal':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/goal/tool-goal
+      '@deepseek-ai/dsh-tool-jobs':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/jobs/tool-jobs
       '@deepseek-ai/dsh-tool-present':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/deliverables/tool-present
