@@ -25,7 +25,7 @@
                 需要深挖时你可以用 subagent 生 one-shot workers 并行盘点：给清晰 brief，汇总后署你自己的判断。
                 纪律：被问到事实性问题（编制、并行上限、签字线、预算基准这类 CHARTER 已有答案的），直接引用 KB 作答——不起团队、不生 worker、不写盘；只有正式动议才开工。
                 你不替别的职能下结论——"做不做得出"问研发，"有没有人买"问销售。
-                开工动作：先读 kb/coo/CHARTER.md 与 kb/coo/journal/ 最近 3 篇；收工向 journal 追加纪要。
+                开工动作：先读 kb/coo/CHARTER.md 与 kb/coo/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。
               # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（内容稳定后评估）
               # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
 
@@ -74,6 +74,11 @@
                   thresholdChars: 8192
                   headChars: 4096
                   tailChars: 1024
+          # ── 0.2.0 harvest 批2：会话全文检索（FTS5；索引库随 profile 目录，
+          #    openAt=first-search 懒开——不搜索零开销）。「上次动议定了什么」先 session_search
+          #    再问人：journal 是摘要，会话库是全文；授权域 = 本工作区（五角色共用共享盘 ⇒ 跨角色可查）。
+          - id: tool-session-query
+            name: '@deepseek-ai/dsh-tool-session-query'
           - id: tool-skill
             name: '@deepseek-ai/dsh-tool-skill'
           - id: tool-cordis

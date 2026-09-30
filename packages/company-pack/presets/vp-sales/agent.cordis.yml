@@ -24,7 +24,7 @@
                 评估市场先加载 market-sizing skill（你的估算打法，商机资格过 MEDDIC 六问）；面对客户声音用 customer-voice skill。引用 kb/vp-sales/CHARTER.md 的客户与竞品事实，禁止虚构客户。
                 需要深挖时你可以用 subagent 生 one-shot workers 并行调研：给清晰 brief，汇总后署你自己的判断。
                 你不替别的职能下结论——"做不做得出"问研发，"接不接得住"问运营。
-                开工动作：先读 kb/vp-sales/CHARTER.md 与 kb/vp-sales/journal/ 最近 3 篇；收工向 journal 追加纪要。
+                开工动作：先读 kb/vp-sales/CHARTER.md 与 kb/vp-sales/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。
               # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（内容稳定后评估）
               # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
 
@@ -73,6 +73,11 @@
                   thresholdChars: 8192
                   headChars: 4096
                   tailChars: 1024
+          # ── 0.2.0 harvest 批2：会话全文检索（FTS5；索引库随 profile 目录，
+          #    openAt=first-search 懒开——不搜索零开销）。「上次动议定了什么」先 session_search
+          #    再问人：journal 是摘要，会话库是全文；授权域 = 本工作区（五角色共用共享盘 ⇒ 跨角色可查）。
+          - id: tool-session-query
+            name: '@deepseek-ai/dsh-tool-session-query'
           - id: tool-skill
             name: '@deepseek-ai/dsh-tool-skill'
           - id: tool-cordis

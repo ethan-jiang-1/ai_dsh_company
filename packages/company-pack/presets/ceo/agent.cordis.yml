@@ -28,7 +28,7 @@
                 主持动议前再加载 chairing-staff-meeting skill（那是你的动议节奏；名单与通道已由组队步骤定过）。
                 收口原则：保留各职能的结论与分歧点，不抹平；定稿写入 deliverables/<slug>/final.md 并用 present 声明；<slug> 由你在分派时给定，全员共用。
                 veto：只有你可以说"这家公司不做了"。
-                开工动作：先读 kb/ceo/CHARTER.md 与 kb/ceo/journal/ 最近 3 篇；收工向 journal 追加纪要。
+                开工动作：先读 kb/ceo/CHARTER.md 与 kb/ceo/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。
               # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（R2 内容稳定后评估）
               # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
 
@@ -77,6 +77,11 @@
                   thresholdChars: 8192
                   headChars: 4096
                   tailChars: 1024
+          # ── 0.2.0 harvest 批2：会话全文检索（FTS5；索引库随 profile 目录，
+          #    openAt=first-search 懒开——不搜索零开销）。「上次动议定了什么」先 session_search
+          #    再问人：journal 是摘要，会话库是全文；授权域 = 本工作区（五角色共用共享盘 ⇒ 跨角色可查）。
+          - id: tool-session-query
+            name: '@deepseek-ai/dsh-tool-session-query'
           - id: tool-skill
             name: '@deepseek-ai/dsh-tool-skill'
           - id: tool-cordis

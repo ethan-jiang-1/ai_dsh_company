@@ -48,6 +48,9 @@ importers:
       '@deepseek-ai/dsh-persona':
         specifier: workspace:*
         version: link:vendor/dsh/packages/preset/persona
+      '@deepseek-ai/dsh-session-query-sqlite':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/session-query/session-query-sqlite
       '@deepseek-ai/dsh-session-snapshot':
         specifier: workspace:*
         version: link:vendor/dsh/packages/test-support/session-snapshot
@@ -72,6 +75,9 @@ importers:
       '@deepseek-ai/dsh-tool-present':
         specifier: workspace:*
         version: link:vendor/dsh/packages/deliverables/tool-present
+      '@deepseek-ai/dsh-tool-session-query':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/session-query/tool-session-query
       '@deepseek-ai/dsh-tool-skill':
         specifier: workspace:*
         version: link:vendor/dsh/packages/skill/tool-skill
@@ -153,6 +159,9 @@ importers:
       '@deepseek-ai/dsh-session-persistence-jsonl':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/session/session-persistence-jsonl
+      '@deepseek-ai/dsh-session-query-sqlite':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/session-query/session-query-sqlite
       '@deepseek-ai/dsh-skill-filesystem':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/skill/skill-filesystem
@@ -180,6 +189,9 @@ importers:
       '@deepseek-ai/dsh-tool-present':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/deliverables/tool-present
+      '@deepseek-ai/dsh-tool-session-query':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/session-query/tool-session-query
       '@deepseek-ai/dsh-tool-skill':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/skill/tool-skill

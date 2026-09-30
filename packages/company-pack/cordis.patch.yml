@@ -17,6 +17,15 @@
   config:
     default: ceo
 
+# ── 会话全文检索（0.2.0 harvest 批2）：base 出厂挂着 seam 但 openAt: never + :memory:
+#   （派生索引重启即丢）。替换行翻开懒开 + durable 路径（锚 profile 目录，baseUrl = profile dir，
+#   customSkillDirs 同款 !!js 先例）；索引库独立于会话库（上游教义：别指 session-persistence db）。
+- id: session-query-sqlite
+  name: '@deepseek-ai/dsh-session-query-sqlite'
+  config:
+    path: !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('session-search.db', baseUrl))"
+    openAt: first-search
+
 - insert:
     # ── 日期通道（推敲卡 _backlog/plans/260929-date-channel-mechanism.md D2'）──
     # 0.1.7 时代这是对 web-app 出厂行的**替换**（出厂挂了但 disabled: true，须显式 disabled: false
