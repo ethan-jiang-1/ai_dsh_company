@@ -70,10 +70,16 @@
 
 - **`_digested` 审计基线未随升**：外部研究树的机制文档核对基线仍停 0.1.7（AGENTS.md 簿记行已加
   历史注记标记）。下次动机制文档时先对 0.2.0 源码复核——升 pin 重校纪律照旧。
-- **`probe --full` 未收口**：三轮 8→12→1 pass，失败全为"等待回复超时 90000ms"、无报错、失败项轮转，
-  且**同刻单调用**（handbook-smoke）通过 ⇒ 提供方并发限流形态（当晚真模型调用量大）。**复跑判据**：
-  低峰期 `node scripts/probe-smoke.mjs --full` 全绿后在本 Note 登记补跑结果；若低峰仍系统性红，
-  才升级为 0.2.0 适配问题排查（首查点 = 时间注入是否改变 probe 会话的 prompt 节奏）。
+- **`probe --full` 未收口（已定性，非 0.2.0 适配问题）**：四轮 8→12→1→1→4 pass，失败全为
+  "等待回复超时"。**帧级证据纠正了"并发限流"的初判**（初判写进事务 commit message，勿引用）：
+  失败会话的 v4 日志（`session.v4.jsonl.zstd`，0.2.0 新格式+zstd——顺带记：找日志别再 grep
+  `*.jsonl`）显示模型在**正常工作**（6 次工具调用、2 条 assistant 消息），卡在 step 3 的 LLM 调用
+  **悬挂 ~2 分钟后报 `TRANSPORT` 失败**，vendor 重试梯（`[normal,5,…,500,10000,…]`，maxRetries 5）
+  接管续跑——重试机制工作正常，但 probe 等待窗吃不住"单次悬挂数分钟"的传输抖动；probe 每轮因
+  persona 的「开工先读 KB」纪律要打 3+ 次 LLM 调用，暴露面远大于单调用（handbook 单调用同刻通过
+  的原因）。**复跑判据不变**：低峰期 `--full` 全绿后在本 Note 登记补跑结果；若低峰仍见 TRANSPORT
+  悬挂，属提供方容量问题（挂账观察，不属本仓修复面）。可选缓解 = probe 头注的 timeout 默认值上调
+  （90s 对"慢轮次 150s+"本就压线），留待下次动 probe 时顺手。
 - **BUG-001（手册超字节顶，16384）仍在**：0.2.0 的 agent-instructions 把截断**横幅显性化**
   （"Workspace instruction budget 16384 bytes: truncated from 16757 to 15991 bytes"——r3 重录
   fixture 可见）。本轮日期口径节改写净减约 260 字节（缓解未治愈）；修复归 BUG-001 卡自身的流程，
