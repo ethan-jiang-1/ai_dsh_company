@@ -27,17 +27,16 @@
     openAt: first-search
 
 - insert:
-    # ── 日期通道（推敲卡 _backlog/plans/260929-date-channel-mechanism.md D2'）──
-    # 0.1.7 时代这是对 web-app 出厂行的**替换**（出厂挂了但 disabled: true，须显式 disabled: false
-    #   才真正启用——2026-09-29 探针红证）。0.2.0 起出厂行整体迁入可选 schedule-bundle
-    #   （upstream commit 64a361ee44）⇒ 替换行落空，改为 **insert**（全新行，默认 enabled）。
-    # 效果：角色会话历史收到 durable 的当前时间注入（user-role 消息——model-visible ⟺ logged 不变量
-    #   不破；默认 10 分钟一条，请求带浏览器时区优先、缺省回落 Asia/Shanghai）。
-    # 「日期口径」"没有时钟通道"的前提自此失效——规则正文已随升 pin 同 diff 改（公司手册「日期口径」节）。
-    # 双轨收敛：headless overlay 的补偿 insert 已随本次升 pin 移除（升 pin Note）。
+    # ── 日期通道 + 自主节律（0.2.0 harvest 批3）：行归 schedule-bundle 所有 ──
+    # pack 的 dependencies 声明 '@deepseek-ai/dsh-experimental-schedule-bundle'——plugin add 时
+    # plugin-manager 的 reconcile 把声明了 dsh.bundle 的新增依赖**自动启用为 profile layer**
+    # （operations.ts reconcile；npm 有 0.2.0-rc.2），带来 time-context / schedule / ui-schedule
+    # 三行（schedule = 宿主级 cron 定时 + 到点恢复冷会话投递——搁置池「自主节律」的复活 seam；
+    # ui-schedule = 任务页 UI）。本包不再 insert 这些行（两份事实 + 与手动开关撞重复 id 硬拒）。
+    # 这里只留**替换行钉 config**：timeZone 回落不依赖 Node 进程时区（显式 Asia/Shanghai；
+    # 浏览器时区存在时仍优先——vendor 教义）。行不存在的组合（无 bundle 层）该行 not-found 丢弃。
     - id: time-context
       name: '@deepseek-ai/dsh-time-context'
-      disabled: false
       config:
         timeZone: Asia/Shanghai
     # ── 交付物声明工具（base 无此行）──

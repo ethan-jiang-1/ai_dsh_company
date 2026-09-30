@@ -59,6 +59,9 @@ try {
     missing.length ? `missing: ${missing.join(', ')}` : `${entries.length} entries, presets ×${presetFiles}${outside.length ? `, outside package/: ${outside.join(', ')}` : ''}`)
 
   // 3. 手册——脚本生成，版本/日期/条目数注入；步骤镜像 release-smoke 验证过的安装路径
+   // 验证基线单一源 = verify.mjs 的 expectedTag（写死版本号必漂——本行曾停在 0.1.7-rc.2）。
+   const verifyText = readFileSync(join(repoRoot, 'scripts', 'verify.mjs'), 'utf8')
+   const expectedTag = /const expectedTag = '([^']+)'/.exec(verifyText)?.[1] ?? '(未知 pin)'
   const date = new Date().toISOString().slice(0, 10)
   const manual = `# dsh-company-pack 手动安装手册
 
@@ -67,7 +70,7 @@ try {
 | 版本 | ${version} |
 | 安装包 | \`${tarballName}\`（与本手册同目录） |
 | 打包日期 | ${date} |
-| 验证基线 | DSH \`dsh-v0.1.7-rc.2\`（Node ≥ 22.19） |
+| 验证基线 | DSH \`${expectedTag}\`（Node ≥ 22.19） |
 
 这个安装包是自包含的：bundle 补丁（cordis.patch.yml）、五个角色 preset（presets/）、浏览器端
 （lib/）、README，共 ${entries.length} 个条目——不需要 npm registry，不需要克隆仓库，拿到这一个文件就能装。
@@ -79,6 +82,13 @@ try {
 
 \`\`\`sh
 dsh plugin --profile web add /path/to/${tarballName}
+dsh plugin --profile web add @deepseek-ai/dsh-experimental-schedule-bundle
+\`\`\`
+
+第二行装**节律 bundle**（日期通道 time-context + 定时提醒 schedule + 任务页 ui-schedule——
+行归它所有，装完自动启用）。不开它角色会话就没有日期注入与定时能力（公司手册「日期口径」
+按 fail-closed 口径执行）；之后想关，网页插件页一键开关即可。
+\`\`\`sh
 \`\`\`
 
 想先隔离试用、不动日常环境？换一个名字，多一步一次性初始化：

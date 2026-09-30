@@ -36,10 +36,13 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack
 # ⚠ preset 内容与代码面不同步：link: 安装下改 presets/**（persona/skills）**即刻生效无需重建**，
 #   但 host/client 代码（src/**）走 lib/ 构建产物——**不重建 = 改动永远不生效**（2026-09-25 实证：
 #   verify 的 client-halves 门禁只查形状不构建，preset-smoke/client-load 全绿也可能验的是旧包）。
-# ⚠ 重装纪律（2026-09-22 更新）：dev profile 的 pack 已改 **`link:` 符号链接**——改 presets/**
-#   persona / skills 即刻生效，**无需重装**；只有改 pack 依赖或 bundle 行才需要
+# ⚠ 重装纪律（2026-09-22 更新；2026-09-30 补节律 bundle）：dev profile 的 pack 已改 **`link:` 符号链接**
+#   ——改 presets/** persona / skills 即刻生效，**无需重装**；只有改 pack 依赖或 bundle 行才需要
 #   `plugin --profile web remove` + `add`。profile 的 `.npmrc` 把 store/cache 钉在 repo 内
 #   （`~/Library` 不被碰）。**真实安装形状的验证归 R5a release-smoke**（干净 profile + file:/registry）。
+#   **节律 bundle（harvest 批3）在 dev web profile 的 bundles 列表手动启用**（profile package.json 是
+#   dev 工件）：link: 形态不落 pack 传递依赖，OPTIONAL_BUNDLE 从安装闭包解析、无需安装——启用 =
+#   bundles 数组加 `@deepseek-ai/dsh-experimental-schedule-bundle`（时间通道/schedule/ui-schedule 三行归它）。
 #   历史：file: 拷贝时代，presets/*.yml 用编辑工具改会换 inode、安装副本是真拷贝（link count 1），
 #   不重装则改动不可见——该坑随 link: 消失。
 node scripts/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）

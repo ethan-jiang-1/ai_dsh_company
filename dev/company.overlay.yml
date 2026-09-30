@@ -14,5 +14,5 @@
       name: '@deepseek-ai/dsh-experimental-agent-team'
     - id: tool-agent-team
       name: '@deepseek-ai/dsh-experimental-tool-agent-team'
-    # 日期通道：pack 的 bundle patch 行自 0.2.0 升 pin 起**自带 insert**（升 pin Note），
-    # 本 overlay 不再补偿 insert——两处都插会撞重复行 id 硬拒。
+    # 日期通道：行归 schedule-bundle 所有（0.2.0 harvest 批3 起 pack 以 dependencies 声明、
+    # plugin add 自动启用；本 overlay 不插——两处都插会撞重复行 id 硬拒）。

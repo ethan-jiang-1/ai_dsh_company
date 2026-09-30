@@ -273,10 +273,15 @@ async function driveScenario({ patchSource, env, tasks }) {
   // 于是品牌槽与委派卡一起缺席。这里给临时 profile 补最小安装形状：node_modules 符号链接 + bundles 声明。
   mkdirSync(join(profileDir, 'node_modules'), { recursive: true })
   symlinkSync(join(ROOT, 'packages', 'company-pack'), join(profileDir, 'node_modules', 'dsh-company-pack'), 'dir')
+  // 批3（harvest）：pack 的 dependencies 声明 schedule-bundle，真实安装由 reconcile 自动启用为
+  // profile layer；临时 profile 镜像该形状——bundle 进 node_modules（vendor 工作区包自带依赖闭包）
+  // + bundles 列表。缺它则 time-context/schedule/ui-schedule 三行全体缺席（pack 侧只剩 config 钉行）。
+  mkdirSync(join(profileDir, 'node_modules', '@deepseek-ai'), { recursive: true })
+  symlinkSync(join(ROOT, 'vendor', 'dsh', 'packages', 'experimental', 'schedule-bundle'), join(profileDir, 'node_modules', '@deepseek-ai', 'dsh-experimental-schedule-bundle'), 'dir')
   writeFileSync(join(profileDir, 'package.json'), `${JSON.stringify({
     name: 'dsh-replay-profile',
     private: true,
-    dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', 'dsh-company-pack'] } },
+    dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', '@deepseek-ai/dsh-experimental-schedule-bundle', 'dsh-company-pack'] } },
   }, null, 2)}\n`, 'utf8')
   const patch = materializeProfilePatch(patchSource, runRoot, profileDir, patchRoot, 0)
   if (env.credentials) {
@@ -636,8 +641,11 @@ async function runUiFlow(page, { url, workspace }) {
     const cardButton = page.getByRole('button', { name: /^委派 VP-Eng（研发）/ })
     const cardCount = await cardButton.count()
     check('委派卡渲染 ×1（可访问名 "委派 VP-Eng（研发）…"）', cardCount === 1, `${String(cardCount)} 张（DOM 里 vp_eng 行 ${String(await genericRow.count())} 处，含通用行）`)
-    // 金样：centerCol（会话中列，vendor present.e2e 同款区域）；展开轮次组后捕获
-    const aria = await captureStableAria(page, '[class*="centerCol"]', workspace)
+    // 金样：centerCol（会话中列，vendor present.e2e 同款区域）；展开轮次组后捕获。
+    // 场景自有归一化：用量按钮的数字随工具面大小漂（批1→批3 三刷金样的教训）——掩码成占位，
+    // 写金样与比对同管道（webUrl 替换同款先例）；按钮在场性仍被金样断言。
+    const aria = (await captureStableAria(page, '[class*="centerCol"]', workspace))
+      .replace(/Usage [\d.]+[KM]? tok/g, 'Usage {{tokens}} tok')
     check('委派卡节点在 aria 树（可访问名 "委派 VP-Eng（研发）…"）', aria.includes('委派 VP-Eng（研发）'))
     if (REFRESH_UI) {
       writeFileSync(goldenUi, `${aria}\n`, 'utf8')
