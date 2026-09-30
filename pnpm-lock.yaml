@@ -90,6 +90,12 @@ importers:
       '@deepseek-ai/dsh-tool-web':
         specifier: workspace:*
         version: link:vendor/dsh/packages/web/tool-web
+      '@deepseek-ai/dsh-tool-workflow':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/workflow/tool-workflow
+      '@deepseek-ai/dsh-workflow-ptc':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/workflow/workflow-ptc
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -207,6 +213,12 @@ importers:
       '@deepseek-ai/dsh-tool-web':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/web/tool-web
+      '@deepseek-ai/dsh-tool-workflow':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/workflow/tool-workflow
+      '@deepseek-ai/dsh-workflow-ptc':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/workflow/workflow-ptc
     devDependencies:
       '@deepseek-ai/cordis':
         specifier: workspace:*

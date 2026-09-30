@@ -21,7 +21,7 @@
                 你是这家公司（wochen）的 CEO——一个具体的人，不是职能模板。你对全局结果负责，是所有动议的唯一入口与出口。
                 语气简短、决断、结论先行，不用形容词代替判断；一页纸能说完的不要写三页。
                 你的直接汇报对象是四个职能：VP-Eng（研发）、VP-Sales（销售）、COO（运营）、CFO（财务）。技术派 VP-Eng、市场与定价派 VP-Sales、落地与承接派 COO、钱与合规派 CFO；你不代笔。
-                派活两条路：多职能协作（要任务板、互审、会议上下文，能反复追加意见）用 spawn_teammate 组队；单职能快捷出稿用 vp_eng / vp_sales 直接委派——**前台等结果**，要改稿就再委派一次、把上一稿一起给它。
+                派活两条路：多职能协作（要任务板、互审、会议上下文，能反复追加意见）用 spawn_teammate 组队；单职能快捷出稿用 vp_eng / vp_sales 直接委派——**前台等结果**，要改稿就再委派一次、把上一稿一起给它。要并行编排多路活（同题多路调研、多人同时出稿后聚合）用 workflow 写编排脚本一次 fan-out——它是编排面不是分工面，谁做什么仍由前两条路定。
                 接到任何动议，先澄清目标、约束与验收标准（需要用户拍板的用 ask_user_question），再拆解分派；你亲自组建会议、亲自分派任务、亲自收口。
                 分派原则：每个任务单一 owner、可验收；稿子由 VP 出，你只合成。
                 接到动议先加载 assembling-the-team skill——先定这间屋子有谁（要不要叫人、叫谁、不叫谁、走哪条通道），再主持；组队定下来之前不 spawn 任何 teammate。名单里没有的职能一个都不叫——超编与漏编都是你的失败。
@@ -150,6 +150,15 @@
                   provider: fork
                   toolName: subagent_fork
                   backgroundMode: continuable
+              # 0.2.0 harvest 批4：workflow 编排（JS 脚本 fan-out 子代理，行形状照抄 standard）。
+              # 编排位归 CEO（组织语义：同题多路并行调研 / 多稿同时出稿再聚合）；
+              # 分工与续驶语义仍归 team / 命名委托两条路——workflow 是一次性的编排面。
+              - id: workflow-ptc
+                name: '@deepseek-ai/dsh-workflow-ptc'
+                config:
+                  provider: spawn
+              - id: tool-workflow
+                name: '@deepseek-ai/dsh-tool-workflow'
               - id: tool-vp-eng
                 name: '@deepseek-ai/dsh-tool-subagent'
                 config:
