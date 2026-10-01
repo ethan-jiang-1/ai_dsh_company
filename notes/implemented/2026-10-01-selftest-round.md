@@ -73,6 +73,23 @@ prompt 加引文纪律（优先整行照抄）。**残余**：转抄噪声不可
 **登记不动**：首启双模态（vendor 面）；公司共享盘里 09-25/26 时代的 `日期待核-*` journal
 （培养面板待审的历史数据——轮末收敛归人，机制不代办）。
 
+## UX 打磨实验 · 第二日追加（lab4–6：真实数据面 + composer 交互）
+
+用户追加指令「可能还有潜在 bug，借助新工具把 UX 搞对」。换打法专挑**有真实数据的面**：
+
+- **老会话兼容（最可能藏雷的面，实测干净）**：0.1.7 时代真会话（11 turns / 154 steps / 4.8M tok，
+  9/29 录得）经 v4 格式迁移在 0.2.0 渲染器完整打开——正文、final.md 引用、Usage/turns 元信息
+  全部正常，`[object Object]`/`NaN`/`isError` 零坏痕，console 零 error。**经由搜索链路打开**
+  （会话列表行没有原生可点击祖先——div onClick，`el.click()` 打不通；搜索树条目点击是通路）。
+- **composer 交互**：`/` 命令面板在新会话含全部收割命令（goal/compact/export/permission/model/
+  plan——批1 的 /goal + /compact 人工可见 ✓）；`@` 引用弹层 ✓（kb/deliverables 文件清单）。
+- **浮窗跨刷新持久** ✓（float 元素 ×6 刷新前后不变——float-geometry-memory 特性健在）。
+- **用量面板真数据 sanity** ✓（今晚大量调用后无 NaN/undefined）。
+- **问询超时自清实证**：挂 40 分钟的验证问询自行收口、待办卡消散（0.1.7 timed-waits fail-safe
+  在真会话生效）。
+- 走查方法教训追加：会话标题匹配要大小写敏感核对（「Token工厂」≠「token 工厂」）；会话列表行
+  无原生点击祖先时改走搜索链路；UI 状态（页签/浮窗/滚动）不跨页面加载持久，实验要先建状态。
+
 ## 待续
 
 - `probe --full` 低峰补跑（升 pin + 收割两轮工具面变化的合并收口；判据在升 pin Note）。
