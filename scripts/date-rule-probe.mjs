@@ -12,7 +12,7 @@
 // 用法：source dev/env.sh && node scripts/date-rule-probe.mjs
 // 退出码：0 = PASS；1 = FAIL（红证，按「文案不够需机制」处置）；2 = 环境/启动失败。
 import { spawn } from 'node:child_process'
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync, unlinkSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { readRecords } from './lib/session-log.mjs'
@@ -93,6 +93,12 @@ const created_files = readdirSync(CEO_JOURNAL)
 for (const name of created_files) {
   console.log(`  产物 ${name} :: ${readFileSync(join(CEO_JOURNAL, name), 'utf8').split('\n').slice(0, 3).join(' | ')}`)
 }
+// 自清理（2026-10-01 UX 打磨轮）：探针 journal 是断言目标不是记忆——留在排练场会持续
+// 污染培养面板的待审清单（实测 18 份堆积）。判定与日志完成后删除本run产物。
+for (const name of created_files) {
+  try { unlinkSync(join(CEO_JOURNAL, name)) } catch (error) { console.log(`  清理失败 ${name}: ${error.message}`) }
+}
+console.log('  探针产物已自清理（排练场 journal 不留残留）')
 const placeholder = created_files.some(name => name.includes('日期待核'))
 const today = new Date().toLocaleDateString('sv-SE')  // 本机时区 YYYY-MM-DD（注入 = 宿主时钟，应一致）
 const datedToday = created_files.some(name => name.startsWith(today))
