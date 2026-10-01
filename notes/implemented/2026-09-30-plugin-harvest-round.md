@@ -56,7 +56,7 @@
 
 ## 风险 / 待续
 
-- **chromium-1243 安装进行中**（`@playwright/mcp` 0.0.80 → playwright-core 1.63.0-alpha 要 1243，缓存只有 1228；安装目标 = 本机 ms-playwright 共享缓存，需沙箱升级审批）。装完复跑 browser 真入口行为验证（本次导航已实证工具链通、模型诚实回退 web_fetch 答题）并在本 Note 登记。**部署前置**：浏览器能力需 `playwright install chromium`（写进手册的候选，待复跑绿后补）。
+- **browser-use 行为验证收口（机制链通、沙箱写是上游 seam 缺口）**：chromium-1243 已装（`@playwright/mcp` 0.0.80 → playwright-core 1.63.0-alpha 要 1243，缓存原只有 1228；装机走沙箱升级审批）。真入口两轮实证：工具链全通（seam + provider + `mcp__playwright-mcp__browser_navigate` 调用落日志、模型行为诚实——导航失败时拒绝用 web_fetch 冒充、按规程用 ask_user_question 问人）。**阻塞点 = 角色会话产品沙箱拒写 playwright 缓存目录**（`EPERM mkdir ~/Library/Caches/ms-playwright/...` ×2：预建子目录后 mkdir 过了、缓存内写仍拒 ⇒ 是整树拒绝不是缺目录；sandbox-local 无路径白名单 Config 面）。正路 = **提上游 seam**（三选一：provider 给 workspace 内缓存目录的 Config 面 / sandbox × browser-use 联动白名单 / 验证 attach 模式——用户自带登录态浏览器本就是更对的产品形状）。**部署现状**：chromium 已装，但沙箱解锁前 browser 工具在角色会话内会挂载、调用会失败、模型会诚实回退（web_fetch 不受影响）。
 - **probe --full**：升 pin 轮的未收口项（提供方 TRANSPORT 悬挂，判据在[升 pin Note](./2026-09-30-pin-upgrade-0.2.0-rc.2.md) §风险）叠加本轮五批工具面变化——低峰一次全绿即双收口。
 - 搁置池登记：**自主节律已复活**（批3 机制 + 用户总指令为任务源）；「并行快捷派活」 seam 已到位（批1 fork + 批4 workflow），内容层用法（persona 深调）留后续轮。
-- office-to-pdf 的上游 seam 提案候选（二进制落盘通道）。
+- 上游 seam 提案候选 ×2：office-to-pdf 二进制落盘通道；browser-use × sandbox 可写目录面（本条证据最全：两轮 EPERM 实测 + 沙箱 Config 面核查）。
