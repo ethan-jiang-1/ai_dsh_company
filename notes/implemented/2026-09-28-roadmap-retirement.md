@@ -18,7 +18,7 @@
 |---|---|---|
 | §队列（次序唯一家、▶ 在办、已批待办） | **用户逐条点名** + RFC 状态行「批准：」 | 无中心排序文件；在办 = 会话 goal/用户指令；「继续下一条」分支改读任务源（dev-loop §0.5 分支②） |
 | RFC 的"归宿"（proposal-scheduled 防停车场） | RFC 自身状态行的「批准：」标记 | 门禁改查标记（未批准的思考属 `_backlog/plans/` 推敲卡，不配进 proposed/）；proposal-graduated 不变 |
-| §搁置池（20 行，准入判据+复活条件） | `_backlog/suspended.md` | 整表迁入，行内容原样，只修链接前缀；升 pin 时回看规则照旧 |
+| §搁置池（20 行，准入判据+复活条件） | `_backlog/suspended.md`（**后迁 `_backlog/_done/_misc/suspended.md`**——2026-09-28 整池退役，intents D32 行声明初迁落点作废） | 整表迁入，行内容原样，只修链接前缀；升 pin 时回看规则照旧 |
 | §磨清单（2 项，谁来磨/何时磨） | `_backlog/polish.md` | 整表迁入；"升队条件② 队列走空且用户点名"改"② 用户点名"（队列条件失效） |
 | 完成即离队 | 完成即离场 | `_backlog` 表行/卡 git mv 或删行，证据留 Note（dev-loop §12 同步） |
 

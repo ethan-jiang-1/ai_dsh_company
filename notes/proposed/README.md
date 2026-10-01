@@ -9,7 +9,7 @@
 > **批准与状态都在 RFC 自己的状态行**（「批准：」标记 = 机械门禁 `proposal-scheduled` 查；
 > 未批准的思考住 [`_backlog/plans/`](../../_backlog/plans/README.md) 推敲卡）。实施次序 = 用户逐条给
 > （D32，无中心排序文件）。
-> 机械门禁：`proposal-scheduled`（每个 RFC 必须在队列有索引行）/ `proposal-graduated`
+> 机械门禁：`proposal-scheduled`（每个 RFC 状态行带「批准：」标记——D32 起查标记不查队列，反证已证）/ `proposal-graduated`
 > （该毕业的不许赖在 proposed/）。发现方式 = 浏览本文件夹 + 文件名（DSH 纪律：
 > "the lifecycle/class filesystem tree is the inventory"；不建集中索引——共享文件必漂移，
 > rationale 见 vendor 的 `packages/` 侧说明（原文引的 `implemented/process/…-remove-generated-agent-note-index.md` 在钉住 tag 里**已不存在**，2026-09-26 核实；结论不受影响：不建集中索引）。

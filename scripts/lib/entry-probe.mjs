@@ -34,7 +34,7 @@ export const ENTRY_QUESTIONS = [
 const squash = (text) => text
   // ① 注释前缀（源文件是代码：`//` / `*` / `/*` 是排版，不是原文语义）——实测模型引用脚本头注时
   //    自然跨行取句，会把下一行的 `// ` 前缀一并丢掉。
-  .split('\n').map(line => line.replace(/^\s*(?:\/\/+|\*+\/?|\/\*+)\s?/, '')).join('\n')
+  .split('\n').map(line => line.replace(/^\s*(?:\/\/+|\*+\/?|\/\*+|>+)\s?/, '')).join('\n')
   // ② **所有空白**（不是"折叠成单空格"）：中文没有词边界，折行/对齐/缩进都不该算差异。
   //    实测两次误杀都出在这里——源文件折行处有个换行，模型引的时候自然没有那个空格。
   .replace(/\s+/g, '')
@@ -91,7 +91,10 @@ export function evaluateEntryProbe(reply, readSource) {
         errors.push('来源需 path 和至少 8 字符的原文'); continue
       }
       try {
-        if (!squash(readSource(evidence.path)).includes(squash(evidence.quote))) {
+        // 模型常把长行用 … 截断（多轮实测：错位题目轮换、分数恒 10/12）——首尾 … 剥掉后
+        // 仍要求逐字包含（截断引文的前/后缀同样是原文在场证据；中间挖空不算）。
+        const quoted = squash(evidence.quote).replace(/^…+/, '').replace(/…+$/, '')
+        if (quoted.length < 8 || !squash(readSource(evidence.path)).includes(quoted)) {
           errors.push(`原文不匹配：${evidence.path}（引的是：${squash(evidence.quote).slice(0, 60)}…）`)
         }
       } catch (error) { errors.push(`来源不可读：${evidence.path} (${error.message})`) }

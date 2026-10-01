@@ -10,7 +10,7 @@
 | 卡 | 一句话 | 毕业门判断 |
 |---|---|---|
 | [260929-deliverables-lifecycle-metadata](./260929-deliverables-lifecycle-metadata.md) | deliverables 的日期/元数据/生命周期——**2026-09-30 三路盲审修正**：D20 桥对改名不成立（slug 归一化前置）、C1 倾向弱化（引用图+判据根部两笔新账）、词表重构 | 五决策点待人拍：命名（A1/A2/A3）/ 事实家范围 / 词表（先跑 20 话题试归类）/ 归档家 / 迁移时机 |
-| [260929-date-channel-mechanism](./260929-date-channel-mechanism.md) | 日期从哪来：启用出厂 time-context——探针判据①②绿；**半实施三方错位（机制/手册/skill）升格最高优先** | 用户二选一收口：批 RFC 补完改文面（四件+组合探针）或回滚 patch——半态不过周末 |
+| [260929-date-channel-mechanism](./260929-date-channel-mechanism.md) | 日期从哪来：出厂 time-context 已启用（探针判据翻新复跑绿）——**半实施三方错位已收口**（手册/skill/probe 三处文面 2026-09-30 改完） | 剩：机制启用的 RFC 追认（待用户） |
 | [260929-collab-mechanism-evidence](./260929-collab-mechanism-evidence.md) | 调研卡：Q0 vendor 盘点（含五件套归宿）/ Q1 外部生态 / E2 跨进程实测（守卫不闭合）/ E3 日志导出闭环 **全已答** | 余 E1/Q2，跑完即毕业消化 |
 | [260929-writing-collab-locks-redis](./260929-writing-collab-locks-redis.md) | 写作协作锁与感知——盲审后 R0 瘦身为四条可验收项（原 R0-5 = 现 R0 第 4 条：先实测出厂 changed-files 卡）、R1 拆两段（atomic-write 仅单机+脚本侧） | 待 E1/Q2 + 用户点头；Redis 留带触发条件的实验位 |
 

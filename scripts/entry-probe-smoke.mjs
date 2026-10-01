@@ -37,6 +37,7 @@ const PROMPT = [
   '{"answers":[{"id":"Q1","status":"answered","answer":"本题答案","evidence":[{"path":"AGENTS.md","quote":"该文件中逐字原文，至少8字符"}]}],"conflicts":[]}',
   'answers 必须每题恰好一项；status 可为 answered/unresolved；conflicts 列出发现的来源冲突。',
   'JSON 语法：quote 与 answer 里如出现 ASCII 双引号必须写成 \\" 转义（或改写成「」——比对时引号字形与空白、markdown 标记都会被归一化，不影响判分）；务必保证整份输出是合法 JSON（2026-09-26 实证：一处未转义的 " 会让整份不可解析、12 题全判 0）。',
+  '引文纪律：quote 优先**整行照抄**；行太长宁可选更短的一整句，也不要用 … 截断长行（首尾 … 会被剥掉后按前缀核对，中间挖空必判不匹配——多轮实证的失分主因）。',
   `每题给出其自己的答案和证据，不以其他题的内容替代。以下 ${ENTRY_QUESTIONS.length} 题：`,
   ...ENTRY_QUESTIONS.map(q => `${q.id}: ${q.ask}`),
 ].join('\n')

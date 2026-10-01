@@ -82,11 +82,11 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | D29 | **自主优先协议**（2026-09-26，用户令，同日两轮细化）：① 尽量遵循 DSH 研发流程（D13/D23）；② 自主解决问题——动手发明前先探索、借鉴**成熟 DSH 插件**（下载量 / 影响力门槛）的既有思想，探索产物按 research 层生命周期落盘；③ REVIEW 分级——能自主审的自主审（独立盲审 / 中立体清扫 / code-review），阶段收口、不得不人审时才人审，人审形状 = 跑起来的实例 + 单页走查单 + 一次一件事 + 收尾留动作（「你去体验一下」类无落点请求 = 违规） | [guides/dev-loop §13](./guides/dev-loop.md)；AGENTS §本仓原生纪律 |
 | D30 | **research 层三态模型**（2026-09-26，用户令，修订 09-25「不开 archived/rejected」裁断）：`research/` 只放未完结研究（TODO 语义，每份自带喂给谁/毕业动作为户口）；研究落地即离场——完结迁 `notes/archived/`、过时/被推翻迁 `notes/rejected/`；无人引用的死稿删除（git 即归档）。起因 = 用户指认「research 挂一堆东西」+「完结的不该在 TODO 里」。**D31 修订**：research 目录退役并入 `_backlog/plans/`，三态出口保留 | [guides/dev-loop §12](./guides/dev-loop.md)；**D31 修订后索引随目录退役**（git 留史） |
 | D31 | **推敲空间 `_backlog/` + research 并入**（2026-09-28，用户令）：借外部仓 ai_deerflow_deep_research_v2 的 `_backlog` 三件——plans 推敲卡 / bugs 缺陷卡 / _done（位置即状态），补上「该不该做 / 何时 / 次序 / 是否放弃」四问成熟前的家；红线 = **只承载判断材料，不承载次序与授权**（D23 plans 层教训）；research 目录退役并入 plans（调研卡 = 卡性质，D30 三态出口保留）；门禁 research-liveness → plans-liveness | [_backlog/README.md](../_backlog/README.md)；[implemented/2026-09-28-backlog-deliberation-space](../notes/implemented/2026-09-28-backlog-deliberation-space.md) |
-| D32 | **队列层退役（2026-09-28，用户令「ROADMAP 痕迹彻底清理」）**：ROADMAP.md 删除（末次全文 commit `5018118`）；职能去向 = 实施次序→用户逐条给、在办→会话 goal/用户指令、已批→RFC 状态行「批准：」标记（proposal-scheduled 改查它，反证已证）、搁置池→`_backlog/suspended.md`、磨清单→`_backlog/_done/_misc/polish.md`（两张表 2026-09-28 整池退役迁入）；毕业四门、入口链（dev-loop §0.5 分支②、entry-probe Q1/Q2/Q6/Q9/Q11）、md-links 扫描面同步重接；历史层（intents/snapshots/旧 Note）按"当时事实"保留 | [implemented/2026-09-28-roadmap-retirement](../notes/implemented/2026-09-28-roadmap-retirement.md)（含**保留 ROADMAP 的反方论据全文**——用户裁决前的 dissent 留档） |
+| D32 | **队列层退役（2026-09-28，用户令「ROADMAP 痕迹彻底清理」）**：ROADMAP.md 删除（末次全文 commit `5018118`）；职能去向 = 实施次序→用户逐条给、在办→会话 goal/用户指令、已批→RFC 状态行「批准：」标记（proposal-scheduled 改查它，反证已证）、搁置池/磨清单→`_backlog/_done/_misc/`（同日二次归档；初迁 `_backlog/suspended.md` 已由 intents D32 行声明作废）；毕业四门、入口链（dev-loop §0.5 分支②、entry-probe Q1/Q2/Q6/Q9/Q11）、md-links 扫描面同步重接；历史层（intents/snapshots/旧 Note）按"当时事实"保留 | [implemented/2026-09-28-roadmap-retirement](../notes/implemented/2026-09-28-roadmap-retirement.md)（含**保留 ROADMAP 的反方论据全文**——用户裁决前的 dissent 留档） |
 
 ### 待定与活动提案
 
-旧问题 Q1–Q8 均已闭合（Q1→D18、Q2→D16、Q3→D17、Q4 于 2026-09-22 定案、Q5–Q8→D22）。这只结算该组问题；当前任务源 = [notes/proposed/](../notes/proposed/README.md) 已批 RFC 与 [_backlog/_done/_misc/polish.md](../_backlog/_done/_misc/polish.md)（磨活），待触发的搁置项见 [_backlog/_done/_misc/suspended.md](../_backlog/_done/_misc/suspended.md)（均已整池退役，点名才读；条目名不在此复述——复述会过期，2026-09-24 探针实证）。
+旧问题 Q1–Q8 均已闭合（Q1→D18、Q2→D16、Q3→D17、Q4 于 2026-09-22 定案、Q5–Q8→D22）。这只结算该组问题；当前任务源 = [notes/proposed/](../notes/proposed/README.md) 已批 RFC 与用户点名（D32，无中心队列；磨活走 [_backlog/plans/](../_backlog/plans/README.md) 推敲卡）；磨清单/搁置池已整池退役归 [_backlog/_done/_misc/](../_backlog/_done/_misc/)，点名才读（条目名不在此复述——复述会过期，2026-09-24 探针实证）。
 
 ## 文档路由
 
@@ -117,7 +117,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | `…/dev-loop.md` | 开发过程生命周期（六步闭环/调试阶梯/设计四问/插拔速查） | guides/dev-loop（全文吸收）；AGENTS.md 纪律 |
 | `…/dual-home-isolation.md` | 双 home 机制、崩溃半径、迁移方向 | dev/env.sh；guides/dev-loop §6 |
 | `…/research.md` | 第三方生态证据（peers/兼容矩阵/自包含/真实安装形状） | guides/dev-loop §5 发布纪律时点；design/architecture §8 |
-| `_digested/`（源码消化笔记） | DSH 源码机制笔记（= vendor 钉住 tag 的审计基线，版本唯一见 `AGENTS.md` §vendor 簿记） | design/ 各篇（architecture / roles-isolation / ui-demo）的机制核对引文；**权威仍在 `vendor/dsh/` 本体** |
+| `_digested/`（源码消化笔记） | DSH 源码机制笔记（审计基线，版本唯一见 `AGENTS.md` §vendor 簿记——**基线可能落后当前钉住一代**，升 pin 未重审时以簿记注记为准） | design/ 各篇（architecture / roles-isolation / ui-demo）的机制核对引文；**权威仍在 `vendor/dsh/` 本体** |
 | `_agent_ready_development/sdlc-reference/01-agent-note-lifecycle.md` | DSH Agent Note 生命周期（状态/路径/格式/取代/归档；基于上游 0.1.7-rc.1 树） | guides/dev-loop §12 Note 生命周期细则 + [implemented/notes-lifecycle-absorption](../notes/implemented/2026-09-24-notes-lifecycle-absorption.md)（2026-09-24 点选吸纳六条） |
 | `_agent_ready_development/`（三卷 + `_coverage` + `verify.mjs`） | Agent-ready Development 语料：SDLC 主线 / 精确参考 / **Development Harness（仓库怎样让 agent 看懂、修改、验证自己）**；钉 DSH commit `46a7f68b`（tag `dsh-v0.1.7-rc.1`），自带结构门禁 | 对照台账 = [research/harness-alignment-ledger](../notes/archived/2026-09-25-harness-alignment-ledger.md)（27 篇判定零待定：9 已对齐 / 采纳三切片已落地 / 其余不适用+触发条件；**不照搬清单在其 §四.4**）；已吸纳页见上行 |
 | 人机交互 UX 研究来源集（Temporal/Claude Code/Warp/GitHub/PagerDuty/Slack/Horvitz 等） | 阶段 0 外部实践研究的引用全集与逐条判定 = [research/human-agent-ux-patterns](../notes/archived/2026-09-25-human-agent-ux-patterns.md)（外部资料只作数据；Horvitz 两篇 PDF 未逐字核） | 人机合一条目的 A2/B 切片依据 |
