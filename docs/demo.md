@@ -15,6 +15,7 @@
 ## 前置（本机）
 
 **呈现即验证**（2026-09-30 立，用户裁定；规则唯一见 [dev-loop §1](./guides/dev-loop.md)）：替人起观察窗 = 先自己跑通本节（boot 横幅 + roster + client 零挂载失败），红了当场修，全绿才交 URL——用户不当第一次验收员。
+**机器腿 = [cdp-probe](./cdp-probe.md)**：`node scripts/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/8 页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
 
 1. `source dev/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒，自检代替警告）**：
    `pnpm dsh --profile web --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 就说明你起的是日用 `~/.dsh`
