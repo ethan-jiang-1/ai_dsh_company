@@ -101,13 +101,22 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
 // 71 行 / 最长 1932。两种数都被引用过（Note 一度写"71 行超 500 字节"）——本门禁比较的是 `.length`，
 // 故权威数 = 32 行 / 最长 1169，报错文案与 Note 均按码元表述。
 // 例外：授权链线索（用户点名/裁定原话）是 intents 独有价值，允许保留在"一句话"内。
+// **行数上限（第二刀，2026-10-02 用户拍板"窗口+归档"）**：单文件随轮次无限增长（11 天 96 行 ⇒
+// 一年 250–350 行，常驻被 grep 的活表 90% 命中来自已死历史）。活表 ≤60 行（棘轮只降不升），出窗行
+// git mv 进 notes/archived/intents-<YYYY-MM>.md（按月冻结、grep 面不丢、git blob 是底裤）；
+// 负例 = 本刀出生现场（96 行当场红，归档后转绿）。
 {
   const cap = 500
-  const fat = readFileSync(join(root, 'notes/intents.md'), 'utf8').split('\n')
-    .filter(line => line.startsWith('| 2026-') && line.length > cap)
-  fat.length === 0
-    ? ok(`intents-row-budget（表行均 ≤ ${cap} 码元）`)
-    : fail('intents-row-budget', `intents.md 有 ${String(fat.length)} 行超 ${cap} 码元（最长 ${String(Math.max(...fat.map(l => l.length)))}）——压回一行指针，详情归 Note，活状态归 _backlog/proposed`)
+  const rowCap = 60
+  const rows = readFileSync(join(root, 'notes/intents.md'), 'utf8').split('\n')
+    .filter(line => line.startsWith('| 2026-'))
+  const fat = rows.filter(line => line.length > cap)
+  const problems = []
+  if (fat.length > 0) problems.push(`intents.md 有 ${String(fat.length)} 行超 ${cap} 码元（最长 ${String(Math.max(...fat.map(l => l.length)))}）——压回一行指针，详情归 Note，活状态归 _backlog/proposed`)
+  if (rows.length > rowCap) problems.push(`活表 ${String(rows.length)} 行超上限 ${String(rowCap)}——出窗行 git mv 进 notes/archived/intents-<YYYY-MM>.md（活表只留最近授权链）`)
+  problems.length === 0
+    ? ok(`intents-row-budget（表行均 ≤ ${cap} 码元 × ${String(rows.length)}/${String(rowCap)} 行）`)
+    : fail('intents-row-budget', problems.join('；'))
 }
 
 // ── 2d. 裸路径门禁（notebook-hygiene §机械防线，2026-09-25；2026-09-26 扩面）─────────
