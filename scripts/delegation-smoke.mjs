@@ -19,6 +19,10 @@
 // 本脚本的判据（边界变了就红，提示重新评估设计）：
 //   - vp_eng / vp_sales / subagent / spawn_teammate 必须在模型可见目录里（挂载没坏）
 //   - 三个控制名必须仍是**团队版**（若变回全局版 ⇒ 续驶可能重新可用 ⇒ 重评 one-shot 决定）
+//   -（--delegate 档）child 目录里的 Team 工具**在场**（上游已登记限制：one-shot child 在拿到
+//     subagent descriptor 前被 Team 安装误当 Lead，看得见、调不通——vendor tool-agent-team README
+//     "Known Limitations · One-shot child tool visibility"，时序修正 deferred；2026-10-02 消化对账轮
+//     钉住）。若消失 ⇒ 上游修了安装时序 ⇒ 重评 docs/delegation.md §4 记账
 //
 // 预算（guides/dev-loop §10）：墙钟 ≤ `--wall`（默认 180s）；模型 prompt **1 条**；可中断（Ctrl-C）。
 // 前置：DSH_HOME + 已装 pack + 模型凭据。
@@ -201,6 +205,46 @@ try {
         problems.push('vp_eng 返回了 "started subagent"——它是 continuable 而不是 one-shot 前台（配置被改回去了？）')
       } else if (result.trim() === '' || result === '(无结果)') {
         problems.push('vp_eng 没有返回正文（前台 one-shot 应该直接拿到 child 的稿子）')
+      }
+    }
+
+    // ── [3] child 面守卫（2026-10-02 立，消化对账轮；同日真跑实证）──
+    // 上游已登记限制：one-shot child 在拿到 subagent descriptor 前被 Team 安装误当 Lead ⇒
+    // 目录里看得到 Team 工具、调用在身份确认后被拒（vendor tool-agent-team README
+    // "Known Limitations · One-shot child tool visibility"）。实证（2026-10-02 真跑）：child 目录
+    // 41 工具含全部六个 Team 工具，且 child 会话头 agentPreset=ceo（组合继承的同一证据）。
+    // child 定位 = CEO 日志的 subagent/catalog（parent-owned direct-child 目录，data.childId 裸 UUID
+    // + data.mode；subagent/start 的 data.id 作兜底、mode 记 unknown）；读 child 日志用 subagent
+    // 地址（session/page 拒绝裸 child id："subagent Sessions require their durable parent address"）。
+    // 读 child 日志不加 prompt 预算。
+    const childEntries = after.flatMap(r => {
+      const e = r.event
+      if (e?.type === 'subagent/catalog' && typeof e.data?.childId === 'string') {
+        return [[e.data.childId, e.data.mode ?? 'unknown']]
+      }
+      if (e?.type === 'subagent/start' && typeof e.data?.id === 'string') {
+        return [[e.data.id, 'unknown']]
+      }
+      return []
+    })
+    const children = [...new Map(childEntries).entries()]
+    if (children.length === 0 && run !== undefined) {
+      problems.push('CEO 日志里没有 subagent/catalog / subagent/start（child 会话定位不到——事件形状又变了？child 面守卫失效）')
+    }
+    for (const [childId, mode] of children) {
+      const childRecords = await readRecords(page, {
+        kind: 'subagent', parentSessionId: address.sessionId, childSessionId: childId, mode,
+      })
+      const childHeader = childRecords.filter(r => r.event?.type === 'request/header').map(r => r.event.data.header).at(-1)
+      if (childHeader === undefined) {
+        problems.push(`child ${childId.slice(0, 8)} 的会话日志读不到 request/header——child 面守卫失效`)
+        continue
+      }
+      const childNames = childHeader.tools?.map(t => t.name) ?? []
+      const teamTools = childNames.filter(n => /^(spawn_teammate|team_task_|wait_agent)/.test(n))
+      console.log(`[3] child ${childId.slice(0, 8)} 目录（${String(childNames.length)} 个工具）：Team 工具${teamTools.length > 0 ? `在场：${teamTools.join(', ')}` : '不在场'}`)
+      if (teamTools.length === 0) {
+        problems.push(`child ${childId.slice(0, 8)} 目录里没有 Team 工具——上游修了 one-shot child 的安装时序（README Known Limitations），重评 docs/delegation.md §4 的记账`)
       }
     }
   }

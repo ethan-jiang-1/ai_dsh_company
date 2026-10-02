@@ -70,6 +70,11 @@ subagent child 不在名册上 ⇒ **continuable child 在 CEO 会话里既发�
    **不是** vp-eng / vp-sales preset 的角色 skills。所以 per-instance persona 必须**自带方法论**
    （写清产出形态与判据），不能指路到 `tech-feasibility-review` 这类角色 skill——那不在它的
    catalog 里。
+   同一继承的另一面（2026-10-02 钉住）：one-shot child 的目录里**看得到 Team 工具**——上游已登记
+   限制，安装时序把 child 误当 Lead，调用在身份确认后被拒（vendor tool-agent-team README
+   "Known Limitations · One-shot child tool visibility"，时序修正 deferred）。per-instance persona
+   应写明「别调 `spawn_teammate` / `team_task_*` / `wait_agent`——你调不通」；
+   `delegation-smoke --delegate` 的 [3] 守卫把这条边界钉进回归。
 2. **要"child 拿到角色完整 skills/工具面"** ⇒ 那是 M2（自定义 provider 在 child 创建窗口 mount
    角色 preset，[design/roles-isolation](./design/roles-isolation.md) §3），本仓未做。触发条件 = 出现
    "必须隔离组合"的委派。
@@ -100,7 +105,7 @@ subagent child 不在名册上 ⇒ **continuable child 在 CEO 会话里既发�
 | keyless 行为 | `pnpm test` → `tests/delegation-card.spec.ts`：纯函数视图模型（running/ok/error/stopped、brief 解析、截断 JSON 回退、未知工具名回退）+ `react-dom/server` 静态渲染 | 卡片**渲染语义**（不需要 DOM、不需要模型，毫秒级） | 每次改动 |
 | keyless 装配 | `pnpm test` → `tests/client-face.spec.ts`：卡片 key ↔ preset `toolName` **逐字一致** + 注册走共享常量 + 单独 `inject(['slots'])` | keyed slot 的**静默失效**（key 拼错 = 永不渲染） | 每次改动 |
 | 真页面挂载 | `node scripts/client-load-smoke.mjs`：真浏览器加载真页面，零 loader 错误 + 品牌在场 | client 入口 apply 抛错（slot 名写错会在这里炸，postmortem 0003） | 客户端改动 |
-| 机制 / 边界 | `node scripts/delegation-smoke.mjs`（1 条 prompt ≈30s）：`vp_eng`/`vp_sales` 在模型可见目录 + 三个控制名仍是团队版；`--delegate` 多 1 条 prompt **真委派一次**，断言前台拿到 child 正文（不是 `started subagent`） | shadow 边界变了就红（提示重评 one-shot 决定）；委派出稿的**前台语义** | 该边界改动后 / **升 pin 时** |
+| 机制 / 边界 | `node scripts/delegation-smoke.mjs`（1 条 prompt ≈30s）：`vp_eng`/`vp_sales` 在模型可见目录 + 三个控制名仍是团队版；`--delegate` 多 1 条 prompt **真委派一次**，断言前台拿到 child 正文（不是 `started subagent`）+ **[3] child 面守卫**（2026-10-02 立）：读 child 会话日志的 request/header，断言 Team 工具仍在场（README 已登记的目录暴露限制；纯日志读取不加 prompt） | shadow 边界变了就红（提示重评 one-shot 决定）；委派出稿的**前台语义**；child 目录暴露边界（上游修时序 ⇒ 重评 §4 记账） | 该边界改动后 / **升 pin 时** |
 | 挂载（上线前门禁） | `node scripts/preset-smoke.mjs` | 行 config 校验（preset 挂载失败，postmortem 0001） | preset 组合或内容改动后 |
 | 端到端（**已交付，R5a**） | 模型真调 `vp_eng` → 真 UI 对话流里的委派卡 | "模型→工具→卡片"全链路 | `replay-smoke --ui`（无 key 重放 + ariaSnapshot 金样） |
 

@@ -98,4 +98,4 @@ DSH 全局不变量（fail-loud / model-visible ⟺ logged / registrations are e
 
 ## vendor 簿记
 
-- upstream：`https://github.com/deepseek-ai/deepseek-harness.git`；当前钉住：tag `dsh-v0.2.0-rc.2` = `639ed015397290b3745d163aafe02ffee4aa3f84`（历史基线注记：`_digested` 审计基线仍停在上一代 pin `dsh-v0.1.7-rc.2` = `477b4f42`，未随本次重审；机制文档核对基线的差异见升 pin Note）。
+- upstream：`https://github.com/deepseek-ai/deepseek-harness.git`；当前钉住：tag `dsh-v0.2.0-rc.2` = `639ed015397290b3745d163aafe02ffee4aa3f84`（`_digested` 审计基线自其 0009 轮起同 pin，2026-10-02 核对其 00-index 声明；此前"落后一代"的注记见升 pin Note）。

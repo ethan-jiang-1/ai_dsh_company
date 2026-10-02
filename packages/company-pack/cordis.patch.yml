@@ -28,11 +28,12 @@
 
 - insert:
     # ── 日期通道 + 自主节律（0.2.0 harvest 批3）：行归 schedule-bundle 所有 ──
-    # pack 的 dependencies 声明 '@deepseek-ai/dsh-experimental-schedule-bundle'——plugin add 时
-    # plugin-manager 的 reconcile 把声明了 dsh.bundle 的新增依赖**自动启用为 profile layer**
-    # （operations.ts reconcile；npm 有 0.2.0-rc.2），带来 time-context / schedule / ui-schedule
-    # 三行（schedule = 宿主级 cron 定时 + 到点恢复冷会话投递——搁置池「自主节律」的复活 seam；
-    # ui-schedule = 任务页 UI）。本包不再 insert 这些行（两份事实 + 与手动开关撞重复 id 硬拒）。
+    # schedule-bundle 是 **profile 级手动安装**（`dsh plugin --profile <name> add
+    # @deepseek-ai/dsh-experimental-schedule-bundle` / Web 插件页开关），带来 time-context /
+    # schedule / ui-schedule 三行（schedule = 宿主级 cron 定时 + 到点恢复冷会话投递——搁置池
+    # 「自主节律」的复活 seam；ui-schedule = 任务页 UI）。本包**不 insert、不依赖**它：
+    # 「pack dependencies ⇒ reconcile 自动启用」实测证伪（reconcile 只认直接安装的 bundle 包，
+    # harvest Note §输掉的方案）；自己 insert 三行则与手动开关撞重复 id 硬拒。
     # 这里只留**替换行钉 config**：timeZone 回落不依赖 Node 进程时区（显式 Asia/Shanghai；
     # 浏览器时区存在时仍优先——vendor 教义）。行不存在的组合（无 bundle 层）该行 not-found 丢弃。
     - id: time-context
@@ -43,10 +44,23 @@
     - id: tool-present
       name: '@deepseek-ai/dsh-tool-present'
     # ── 团队协作（主通道 M4/D4；直插行——未装官方 bundle，无续驶控制冲突，architecture §3 冲突注①）──
+    #    config 钉值镜像官方 agent-team-profile patch（vendor packages/experimental/agent-team-profile/
+    #    cordis.patch.yml）：官方把 maxMembers 钉回 8（代码默认 16）。钉住 = ① 与官方组合对齐；
+    #    ② 上游改默认值不再静默漂进本仓（2026-10-02 立显式决定——此前裸 insert 无意识吃代码默认）。
+    #    maxMembers 8 顺带是编制守卫：kb/org.md 超编的 spawn 会在服务层被拦。
     - id: agent-team
       name: '@deepseek-ai/dsh-experimental-agent-team'
+      config:
+        maxMembers: 8
+        maxTasks: 256
+        maxPendingMessagesPerMember: 64
+        maxMessageBytes: 65536
+        disposalTimeoutMs: 5000
     - id: tool-agent-team
       name: '@deepseek-ai/dsh-experimental-tool-agent-team'
+      config:
+        freshProvider: spawn
+        forkProvider: fork
     # ── 团队 Web 可视面（官方 web-profile 的同一条 insert）：Team 按钮 / 名册 /
     #    实时任务板 / 点进 VP 会话 / 交付物卡片——观察与调试任务起止的最简途径（R1 补）──
     - id: ui-agent-team

@@ -158,6 +158,7 @@
                 config:
                   provider: spawn
                   toolName: subagent
+                  modelSelectionSettings: true
                   backgroundMode: continuable
               # 0.2.0 harvest 批1：subagent_fork 可续跑的自身分叉（行形状照抄 standard）——
               # 并行快捷派活的上游 seam 到位（搁置池复活判据之一）；编排面（workflow）批4 再接。
@@ -174,5 +175,5 @@
           - id: agent-instructions
             name: '@deepseek-ai/dsh-agent-instructions'
             config:
-              maxBytes: 16384
+              maxBytes: 32768  # 字节栅栏：verify handbook-budget 核对手册+1024B ≤ 此值（静默截断负例 = 2026-10-02 消化对账轮）
               projectRootMarkers: []

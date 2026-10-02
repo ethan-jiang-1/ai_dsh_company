@@ -86,6 +86,15 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 **证据文件命名与落点**（2026-09-26 补，此前只有格式要求没有家）：`notes/<YYYY-MM-DD>-pin-review-<目标 tag>.json`（顶层 `notes/`，与 `intents.md` 同级——它是流程物证不是 Note）。
 人审证据 JSON 必含 `fromSha`、`toSha`（完整 SHA）、`reviewedBy`、`reviewedAt`（YYYY-MM-DD）、`processContractReview`（核对 vendor 纪律与本地流程合同的结论，可引用既有 Note）。脚本核对文件受版本控制、字段非空及 SHA 对应；**这是人审声明，不是自动语义审计，也不认证签名者身份**。
 
+升 pin 的人审（`processContractReview` 结论里）必须额外覆盖两项（2026-10-02 立，消化对账轮）：
+
+1. **experimental 行重校**：本 pack 直插的 experimental 行（agent-team 族等）逐字段对照 vendor 同 tag
+   的官方 optional bundle patch（如 `packages/experimental/agent-team-profile/cordis.patch.yml`）——差异须是
+   有意识的偏离并写明理由（反例：裸 insert 曾无意识吃 `maxMembers` 代码默认 16，而官方组合钉 8）。
+2. **货架过账**：对照外部研究树当轮 `_digested/plugin-inventory`（基线对齐新 pin；不对齐时按其
+   `_change_log/` 判定影响面），新增/退役能力按判收四档（追平 standard / 未挂载现货 / 评估 / 刻意排除）
+   记入收割台账 Note——先查货架再动手是 FAQ 17 四步流程，升 pin 是它的固定触发点。
+
 程序：验证旧簿记及 `verify` → fetch tag 并核对证据 SHA → 在内存暂存新簿记/矩阵 → checkout 候选 → `pnpm install` → vendor 自有 `pnpm run build` → `test` + built `release-smoke` → 验证通过才写簿记/矩阵 → 再 `verify`。候选冒烟时矩阵仍为旧值，安装检查只确认其在场；成功后矩阵才增加实测 tag。安装限 180 秒、vendor build 与 release-smoke 各 600 秒，其余命令 120 秒；子进程组等待退出。
 
 捕获到失败或 TERM/INT 时，恢复原 vendor HEAD、AGENTS/verify/pack manifest 和安装修改的 lockfile；不使用 reset/clean，不覆盖检测到的并发修改（报出需人工恢复的路径）。锁文件以安装结束时读到的版本为受控版本；运行期间不应并行编辑或安装。`node_modules`、缓存及 ignored 构建产物不回滚，失败后须按原 pin 重装/重建；强杀/断电无自动恢复保证。checkout 已发布 tag 不修改 vendor tracked 内容。

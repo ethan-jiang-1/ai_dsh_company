@@ -22,6 +22,6 @@
 
 | Bug | 标题 | 修复 commit | 日期 |
 |---|---|---|---|
-| （空） | | | |
+| [BUG-001-manual-truncation.md](_fixed_bugs/BUG-001-manual-truncation.md) | 公司手册超出 agent-instructions maxBytes——尾部在所有角色会话被截断（maxBytes 16384→32768 + verify `handbook-budget` 门禁；红→还原→绿） | 未单独 commit（随 2026-10-02 消化对账轮工作树） | 2026-10-02 |
 
-**Next BUG ID: BUG-001**（新号 = 已分配最大号 + 1，活跃 ∪ 归档一起算）
+**Next BUG ID: BUG-002**（新号 = 已分配最大号 + 1，活跃 ∪ 归档一起算）
