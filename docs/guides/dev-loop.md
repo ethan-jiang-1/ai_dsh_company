@@ -360,7 +360,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - 收到人审/用户反馈：成立就修复并补证据；不成立用技术事实反驳，**不作表演式同意**。
 - 条目收尾后可派**中立体清扫**（独立子代理；输入 = diff + 收尾 Note + 关联 `_backlog` 行/卡；固定清单格式与首跑样例见 [implemented/notebook-hygiene](../../notes/implemented/2026-09-25-notebook-hygiene.md) 实况）——扫与修分家。
 - 文档卫生按指导价值：移除失效/重复指令与无行动价值的历史噪声；保留仍指导当前决策、解释约束或支持复验的证据。不以净减行数为目标（D26）。
-- **`notes/intents.md` 的行 = 一行指针**（日期 + 一句话 + 状态 + 链接），**详情归对应 Note**——在行里复述 Note 内容是造重复事实家（2026-09-26 实测：5 天 585B → 40.5KB、≈600B/行，且与 Note 双写）。历史行只留指针，不回填细节。
+- **`notes/intents.md` 的行 = 一行指针**（日期 + 一句话 + 状态 + 链接），**详情归对应 Note**——在行里复述 Note 内容是造重复事实家（2026-09-26 实测：5 天 585B → 40.5KB、≈600B/行，且与 Note 双写）。历史行只留指针，不回填细节；活状态（待续/剩账）住 `_backlog/plans/` 或 `notes/proposed/`。机械面 = verify `intents-row-budget`（表行 ≤500 码元；2026-10-02 立带负例——负例即 32 个胖行的出生现场）。
 - **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链一律 `set -o pipefail` + `&&`（不带 pipefail 的 `cmd | tail` 退出码是 `tail` 的 = 假绿）。push 由 **pre-push hook 强制跑全量 `pnpm verify` + `pnpm test`**（verify 2026-09-27 立；test 09-28 加，不进 CI 的定界见 [ci-test-lane Note](../../notes/implemented/2026-09-28-ci-test-lane.md)；接线 = `source dev/env.sh` 幂等设 `core.hooksPath`；bypass = `--no-verify`，用后须在收尾 Note 说明原因）。
 - **复盘一问：本轮有没有 agent 遵守的"未成文规则"**（从代码模式推断出的伪规则，跨会话会扩散）？三选一收口：升格 verify 门禁 / 写进 owner Note / 显式作废——规则不留空气（2026-09-28 借 FAQ 11）。
 

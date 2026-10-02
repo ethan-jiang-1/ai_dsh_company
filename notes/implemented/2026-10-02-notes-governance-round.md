@@ -1,0 +1,47 @@
+# 2026-10-02 · notes 治理微整轮：intents 瘦身 + research 残骸 + pin-review JSON 落点
+
+状态：implemented（用户三连问驱动：「intents.md 意义大吗？是不是噪声源」「notes/research/ 还有什么意义」「pin-review JSON 留在 notes/ 根对不对」，方案 A 用户拍板）
+
+## 三个问题、三个答案
+
+1. **intents.md**：与 `_backlog` 不是替代关系（backlog = 未成熟判断的家；intents = 交付时序 + 授权链），
+   但噪声判断成立——病根与直觉相反：早期行（09-21~24）是最守规矩的瘦指针，**09-28 后的大轮次胖行复发**
+   （实测 66.8KB / 95 个数据行，**按码元 32 行超 500**（最长 1169），**按字节 71 行超 500**（最长 1932）；
+   门禁比的是码元，故权威数 = 32/1169），违反 09-26 已立的「一行指针」合同；且行内
+   「待续/剩账」= 活状态镜像（D32 已否决的模式），行内复述会独立腐烂（实例：09-30 行的「_digested 基线
+   未随升」在簿记修复后成为过期状态躺在表里）。
+2. **notes/research/**：D31（09-28）已退役（未完结思考的家 = `_backlog/plans/` 推敲卡），10-01 自测轮
+   搬走最后一个漏网文件后只剩**空目录残骸**（git 零文件）——本轮 `rmdir` 清除，无历史损失。
+3. **pin-review JSON**：不是放错而是合同自相矛盾——release.md 09-26 补的落点行写「顶层 notes/」，但自家
+   先例（0.1.7 孤儿 JSON）早迁 archived/、同轮 delta 报告也住 archived/，且顶层随 pin 无限堆积。本轮
+   `git mv` 0.2.0 JSON → `notes/archived/`（三件证据同家），release.md 落点行改写并记录迁移理由，
+   intents 行与升 pin Note 两处引用同步。
+
+## 交付（方案 A）
+
+- **intents.md 手术**：95 个数据行全部压回一行指针（日期+一句话+状态+链接），授权链线索（用户点名/裁定原话）
+  保留在「一句话」内——这是 intents 独有、Note 与 git log 替代不了的价值；66.8KB → 28.4KB。
+  顺手修两处旧伤：技术债清扫行补上缺失的 Note 链接；多人协作行的 `proposed/` 链接实际指向 implemented/（改为直链）。
+- **verify 新门禁 `intents-row-budget`**（表行 ≤500 码元；⚠ **码元 ≠ 字节**——中文行字节 ≈ 1.6× 码元，
+  同一行按字节数会得出另一套数）：负例 = 出生现场——首跑红在 **32 个胖行**（按码元，最长 1169；
+  同批按字节数是 71 行 / 最长 1932——两个数都被引用过，此处以**码元**为准，因门禁比较的就是 `.length`）
+  ，手术当日转绿（术后最长 381 码元 / 569 字节，全行过关）。
+- **活状态搬家**：收割轮/升 pin 轮的「待续」两笔（chromium 装好后 browser 行为复跑、probe --full 低峰
+  收口）→ [残检收口卡](../../_backlog/plans/261002-deferred-verifications.md)（触发条件型等待卡，细节
+  留在各自 Note）；date-channel 机制启用 RFC 追认本就有家（该推敲卡状态行），intents 行改为指过去。
+- intents.md 表头补「一行指针」合同声明（含门禁名），防合同只在 dev-loop §12 里被忘掉。
+
+## 输掉的方案
+
+- **B 窗口化**（只留近两周、其余 archived 快照）：输——丢全历史授权链的 grep 面，且引入"窗口滚动"这
+  个新状态维护义务，比行预算门禁更重。
+- **C 整文件退役**（时序靠 implemented/ 文件名 + git log）：输——丢「哪天、谁点名、要的什么」这条
+  线；Note 里有授权记录但不成一条时间线，回溯成本高。
+- **intents.md 进 DOC_LINE_BUDGETS 行数预算**：输——行数不是病根（99 行不多），**行宽**才是；行预算
+  门禁直击病根。
+
+## 验证（实际跑过）
+
+`intents-row-budget` 首跑 RED（32 行超限，最长 1178——负例即出生现场）→ 手术 → GREEN；
+verify 其余全项 PASS（md-links / bare-path / doc-budget / plans-liveness ×6 含新卡）；
+`pnpm test` 251 passed（回归无涉，intents 不进测试面）。

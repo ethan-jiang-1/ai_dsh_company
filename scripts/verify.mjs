@@ -91,6 +91,25 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
     : fail('handbook-budget', `手册 ${handbookBytes}B + ${margin}B > maxBytes ${maxBytes}——agent-instructions 正在静默截断手册尾部（升 preset maxBytes 或先瘦身手册）`)
 }
 
+// ── 2c-ter. intents 行预算（2026-10-02 立，治理轮）───────────────────────────────
+// 为什么：dev-loop §12 早已立「intents.md 行 = 一行指针（日期+一句话+状态+链接），复述 Note = 重复
+// 事实家」——09-26 立规时实测 5 天 585B→40.5KB；此后每个大轮次都复发胖行（2026-10-02 实测 66.8KB、
+// 95 个数据行，行内复述的验证清单/commit 链会独立腐烂——如 09-30 行的"_digested 基线
+// 未随升"在簿记修复后成为过期状态）。
+// 负例 = 本门禁出生现场（首跑红在 32 个胖行上，手术当日转绿）。
+// ⚠ 单位 = **UTF-16 码元**（`.length`），不是字节：中文行字节 ≈ 1.6× 码元，同一批行按字节数是
+// 71 行 / 最长 1932。两种数都被引用过（Note 一度写"71 行超 500 字节"）——本门禁比较的是 `.length`，
+// 故权威数 = 32 行 / 最长 1169，报错文案与 Note 均按码元表述。
+// 例外：授权链线索（用户点名/裁定原话）是 intents 独有价值，允许保留在"一句话"内。
+{
+  const cap = 500
+  const fat = readFileSync(join(root, 'notes/intents.md'), 'utf8').split('\n')
+    .filter(line => line.startsWith('| 2026-') && line.length > cap)
+  fat.length === 0
+    ? ok(`intents-row-budget（表行均 ≤ ${cap} 码元）`)
+    : fail('intents-row-budget', `intents.md 有 ${String(fat.length)} 行超 ${cap} 码元（最长 ${String(Math.max(...fat.map(l => l.length)))}）——压回一行指针，详情归 Note，活状态归 _backlog/proposed`)
+}
+
 // ── 2d. 裸路径门禁（notebook-hygiene §机械防线，2026-09-25；2026-09-26 扩面）─────────
 // 负例留证 2026-09-27：公司手册反引号死路径 → bare-path 红（⚠ 负例要真破坏子串——includes 是子串匹配）。
 // 为什么：活指针腐化有复发史（AGENTS 写 `notes/rejected/` 而目录不存在；升 pin 后旧机制引用漂移）。

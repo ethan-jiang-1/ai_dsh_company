@@ -57,7 +57,7 @@
 
 ## 验收
 
-- delta 报告 + 人审证据 JSON（`notes/2026-09-30-pin-review-dsh-v0.2.0-rc.2.json`，bowhead/2026-09-30）先于簿记提交。
+- delta 报告 + 人审证据 JSON（`notes/archived/2026-09-30-pin-review-dsh-v0.2.0-rc.2.json`，bowhead/2026-09-30；2026-10-02 自 notes/ 根迁入与 0.1.7 先例同家）先于簿记提交。
 - `pnpm verify` ALL PASS（含 `pin-bookkeeping` / `pin-currency` / `pack-compat` 矩阵 3 列）；
   `sync-dsh` 只读模式报「簿记一致（dsh-v0.2.0-rc.2 @ 639ed015；矩阵 3 列）」。
 - 全套门禁实测（详见「实施实况 §验证矩阵」）：verify / test 251 / preset-smoke（五角色真挂载）/

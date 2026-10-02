@@ -83,7 +83,7 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 
 默认只读核对四处簿记，不做流程语义审计。升级使用 `source dev/env.sh && node scripts/sync-dsh.mjs --pin <tag> --process-review <repo-relative.json>`；证据文件先经人审提交，两个工作树须干净。
 
-**证据文件命名与落点**（2026-09-26 补，此前只有格式要求没有家）：`notes/<YYYY-MM-DD>-pin-review-<目标 tag>.json`（顶层 `notes/`，与 `intents.md` 同级——它是流程物证不是 Note）。
+**证据文件命名与落点**（2026-09-26 补；**2026-10-02 迁 archived/**——原"顶层 notes/"与自家先例打架：0.1.7 的孤儿 JSON 早已迁 archived/，且同轮 delta 报告也住 archived/，顶层还会随 pin 无限堆积）：`notes/archived/<YYYY-MM-DD>-pin-review-<目标 tag>.json`（完结流程物证的家，与 delta 报告同住；`--process-review` 传该 repo 相对路径即可——sync-dsh 只要求 git 已跟踪、不限于子目录）。
 人审证据 JSON 必含 `fromSha`、`toSha`（完整 SHA）、`reviewedBy`、`reviewedAt`（YYYY-MM-DD）、`processContractReview`（核对 vendor 纪律与本地流程合同的结论，可引用既有 Note）。脚本核对文件受版本控制、字段非空及 SHA 对应；**这是人审声明，不是自动语义审计，也不认证签名者身份**。
 
 升 pin 的人审（`processContractReview` 结论里）必须额外覆盖两项（2026-10-02 立，消化对账轮）：
