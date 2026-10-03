@@ -96,8 +96,10 @@ CI=true pnpm dsh web -- --port 0 --no-open         # 端口是环境状态；见
 
 **已排练验证（2026-09-26）**：两个根会话（ceo + cfo，cwd = 排练场）跑了一遍上述协议——
 CEO 门落任务书 `drafts/ceo.md` → CFO 门读它、出 `drafts/cfo.md`、写自己的 journal（文件名用
-`日期待核-<slug>.md` 占位，日期口径也守住了）⇒ **PASS**。⇒ 协议**可跑通**；
-剩下的是把它搬到**真盘**上跑一场真动议（本条目 ①-f，需人到场点）。
+`日期待核-<slug>.md` 占位，日期口径也守住了）⇒ **PASS**。
+**真盘首跑已完成（2026-10-04，firstdeal-v-2026）**：三扇门全链（CEO 派活不 spawn → CFO/COO 各自
+根会话出稿 → CFO 半边 `request_signoff` 卡落 CFO 门、人经浏览器应答 allowed-once → CEO 半边卡落
+CEO 门、人应答 → final + present）。判据与证据 = [E2E Note](../notes/implemented/2026-10-04-e2e-multihuman-firstdeal.md)。
 
 ## 4. 协作前提（多人在同一盘上必须先约定）
 
@@ -171,3 +173,7 @@ CEO 门落任务书 `drafts/ceo.md` → CFO 门读它、出 `drafts/cfo.md`、�
 
 一场**真动议**：至少两个角色各自在**自己的门**里干活，稿件/纪要/合稿沿文件约定交接成功
 （`deliverables-check` 0 违规 + journal 各自在场）；迁移清单随本合同交付；`pnpm verify` / `pnpm test` 保持绿。
+**已完成（2026-10-04）**：firstdeal-v-2026 三扇门真盘动议——双签两半各落各门均人应答、
+根会话归属 ✓×3（cfo/coo/ceo 各自会话写各自稿）、0 spawn、check 违规 0、journal 三在场。
+证据 = [E2E Note](../notes/implemented/2026-10-04-e2e-multihuman-firstdeal.md)；快照 =
+`snapshots/memory-convergence-2026-10-04-3/`。
