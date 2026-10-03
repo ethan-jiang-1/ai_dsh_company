@@ -1,6 +1,6 @@
 # 推敲（调研）：协作机制证据底座——原生栈实测 E1/E2/E3 + 生态与先例扫描 Q1/Q2/Q3
 
-> 状态：推敲中（调研卡——产出是证据不是方案）｜毕业门判断 = Q0/Q1/E2/E3 已答（2026-09-29/30：vendor 盘点 + 外部生态 + 跨进程实测 + 日志导出闭环，结论已喂消费卡）；余 **E1（真模型单步）/ Q2（源码定案）** 待跑、Q3 条件触发｜下一步 = 用户点名跑 E1/Q2（分钟级），跑完本卡即可毕业迁 _done
+> 状态：推敲中（调研卡——产出是证据不是方案）｜毕业门判断 = Q0/Q1/E2/E3 已答（2026-09-29/30：vendor 盘点 + 外部生态 + 跨进程实测 + 日志导出闭环，结论已喂消费卡）；余 **E1（真模型单步）/ Q2（源码定案）** 待跑、Q3 条件触发｜⚠ 地基对账（2026-10-03）：升 pin 0.2.0-rc.2 已于 09-30 落地（下文 Q0「升 pin 不急」按当时事实保留、已被超越）；收割轮已消费本卡登记区三件（schedule/workflow/goal，见归宿节）；E1/Q2 跑时一律以现行钉树为准，E2 已由 10-01 自测轮在新 pin 复跑通过｜下一步 = 用户点名跑 E1/Q2（分钟级），跑完本卡即可毕业迁 _done
 
 ## 背景 / 触发
 
@@ -18,7 +18,8 @@
 ## 已知与未决
 
 **已核实、不再研究的**（都有出处，直接引用即可）：fs-observation-policy 的组合层插行
-（[base bundle](../../vendor/dsh/packages/bundle/base/cordis.patch.yml) 第 277 行，无人禁用）；fs-local
+（[base bundle](../../vendor/dsh/packages/bundle/base/cordis.patch.yml) 第 278–279 行，无人禁用；
+0.1.7 时代引 277 行，0.2.0-rc.2 实测已移至 278–279）；fs-local
 实例内锁 + `FS_STALE_VERSION` 官方测试；Agent Teams 任务板 CAS / 邮箱 / `wait_agent` 语义
 （[vendor Note](../../vendor/dsh/.agents/notes/implemented/feature/2026-08-05-agent-teams.md)）；跨 home 无
 Team 寻址、多机只剩共享盘（[multi-human.md](../../docs/multi-human.md) §5）。
@@ -31,7 +32,7 @@ Team 寻址、多机只剩共享盘（[multi-human.md](../../docs/multi-human.md
 |---|---|---|---|
 | **Q0 ✅已答** | DSH 自家插件体系的协作能力盘点（用户 2026-09-29 点名"查查 DSH 插件体系里有没有可借鉴的多角色协作"） | vendor 钉树通读 + 上游 GitHub ls-remote/浅 fetch，零模型，已跑 | 见下节「Q0 结论」——**头号发现 = time-context**（改写日期卡） |
 | **Q1 ✅已答** | 成熟 DSH 插件生态扫描（D29 口径）：有没有现成的协作锁/事件流/存在感插件 | 子代理 npm registry + GitHub API 实测（2026-09-29/30），已跑 | 见下节「Q1 结论」——**锁真空、无 Redis 型插件、team-rooms 幼苗** |
-| **E1** | 角色会话 fs 守卫实测：① 不读直接覆写既有文件；② 读→外部改→写；③ 两会话并发 create 同一新文件 | `date-rule-probe` 同款单步真模型探针，排练场（`dev/rehearsal-workspace/`），分钟级/分币级 | ①被拒（要求先读）②`FS_STALE_VERSION` ③一胜一拒。**任一红 ⇒ Redis 卡的 R0 地基重估** |
+| **E1** | 角色会话 fs 守卫实测：① 不读直接覆写既有文件；② 读→外部改→写；③ 两会话并发 create 同一新文件 | `date-rule-probe` 同款单步真模型探针，排练场（`dev/rehearsal-workspace/`），分钟级/分币级；**跑时以 0.2.0-rc.2 树为准** | ①被拒（要求先读）②`FS_STALE_VERSION` ③一胜一拒。**任一红 ⇒ Redis 卡的 R0 地基重估** |
 | **E2 ✅已答** | 双进程同盘覆写实测：两个进程各自挂真 fs-local（vendor 构建产物），对同一目标写 | 零模型，`scripts/cross-process-fs-probe.mjs`，秒级，已跑 | 见下节「E2 结论」——**跨进程连守卫都不闭合（20/20 互踩）** |
 | **E3 ✅已答** | 会话日志导出/聚合可行性：zstd 多帧 → 明文 `.jsonl` 目录，让 `deliverables-check --sessions` 的快照审计路径真能落地 | 零模型，`scripts/session-log-export.mjs`，已跑 | 见下节「E3 结论」——**工具落地 + 09-26 快照 4 场 0 违规，缺口闭合** |
 | **Q2** | `wait_agent` 跨根会话可用性（CEO 门等 CFO 门） | 机制推断即可：不同根会话 = 不同 Team ⇒ 查 vendor 源码定案，不必跑 | 预期不可用 ⇒ **模型间跨根感知 = 无主留白**（面板只解决**人的**感知——Redis 卡 P4 留白声明），不是"归面板"；编号更正：该议题现 = Redis 卡 R0 第 4 条 |
@@ -53,14 +54,20 @@ Team 寻址、多机只剩共享盘（[multi-human.md](../../docs/multi-human.md
   本仓 pin 字面量唯一事实家 = AGENTS.md §vendor 簿记，此处不写带前缀全名）；
   协作机制无大件，唯一相关 = `user-questions` 支持 timed waits + late replies（对"卡刷新即丢"利好）。
   我们 pin 的 0.1.7-rc.2 仍是 0.1.x 线最新 ⇒ **为协作目的升 pin 不急**；0.2.0 正式后按 release.md 程序重校。
+  （**2026-10-03 附注：本段已被超越**——09-30 用户点名升 0.2.0-rc.2，动机是 0.2.0 能力面而非协作
+  （[升 pin Note](../../notes/implemented/2026-09-30-pin-upgrade-0.2.0-rc.2.md)）；本段按当时事实保留，
+  `user-questions` timed waits 利好已随新基线在场。）
 - **"现成未用件"归宿（盲审 B12：无归宿=毕业即埋，逐件定案如下；复活任一件须重读本节）**：
-  - `schedule`：**登记待触发**——多人模式出现"催稿/定时查收"真实需求时启用（出厂 disabled，
-    pack patch 一行可启）；
-  - `session-reference`：**登记待触发**——跨角色交接出现"引用他会话上下文"真实需求时评估；
-  - `goal`：**登记待触发**——培养回路出现跨 restart 长目标时评估；
-  - `workflow` + `ralph`：**登记为场景 C 类一次性写作流水线的候选通道**（D4 团队主通道不变，
-    两者互补；触发 = 一次多角色并行起草+互审的真实动议需要结构化 fan-out）；
+  - `schedule`：~~登记待触发~~ **已收（09-30 收割轮批3）**——schedule-bundle 落地（cron/定频 + 到点投递
+    回原会话 + **宿主恢复冷会话**；行归 bundle 所有，pack 只留替换行钉 timeZone）；旧搁置池「自主节律」
+    复活条件实证闭合（[harvest Note](../../notes/implemented/2026-09-30-plugin-harvest-round.md) 批3）；
+  - `session-reference`：**登记待触发**（仍未收）——跨角色交接出现"引用他会话上下文"真实需求时评估；
+  - `goal`：~~登记待触发~~ **已收（批1）**——tool-goal + `/goal` 落地（动议跨轮推进 create/get/update）；
+  - `workflow` + `ralph`：~~登记为场景 C 类候选通道~~ **workflow 已收（批4，仅 CEO 编排位——persona
+    派活两条路→三条路，"编排面不是分工面"）**；`tool-ralph` 用户裁定**登记不动**（出厂关，激进循环）；
   - `tool-subagent-control`：**不用**——被 team 版按名 shadow（R3 实证），登记仅为防重复探索。
+  - （登记区外同族事实：批1 `tool-subagent-fork` 落地——旧搁置池「并行快捷派活」的 seam 到位，
+    delegation.md §4.4 已改判；本卡不持有该判断，仅记指向防重复探索。）
 
 ### E2 结论（2026-09-30，`scripts/cross-process-fs-probe.mjs`；真 fs-local 服务 × 2 进程，零模型）
 

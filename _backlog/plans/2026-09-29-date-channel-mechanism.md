@@ -22,6 +22,15 @@ README 自述 "gives the model a clock"）——随 web-app bundle 挂载但 **`
 `schedule` 同样 disabled），本仓 pack 未启用 ⇒ 角色会话至今无时钟。
 **留案 A（自建注入）被这个出厂件超越：不用自建，换行启用即可。**
 
+   **⚠ 载体已变（2026-10-03 地基对账）**：上引 web-app `disabled: true` 是 **0.1.7 时代的发现形状**；
+   升 pin 0.2.0-rc.2 后 vendor web-app/base 均**不再有独立 time-context 行**——现行载体 =
+   **schedule-bundle**（自带 time-context / schedule / ui-schedule 三行，**profile 级手动安装**：
+   release-smoke 预置 bundles 断言、dev web profile 手动加行见 bootstrap.md），pack 只留**替换行钉
+   `timeZone: Asia/Shanghai`**（[pack cordis.patch.yml:39-42](../../packages/company-pack/cordis.patch.yml)；
+   bundle 不在场的组合该行 not-found 丢弃）。机制结论不变（durable user-role 注入），出处换家 =
+   收割轮批3（[harvest Note](../../notes/implemented/2026-09-30-plugin-harvest-round.md)）。
+   **RFC 追认时机制形状须按现行载体写**，不是 0.1.7 的 web-app 替换行。
+
 其形状（[README](../../vendor/dsh/packages/context/time-context/README.md) 核实）恰好比留案 A 想做的更好：
 
 - 注入物 = **durable user-role 消息**（当前时间 ISO+时区、浏览器时区政策、elapsed），进**会话历史** ⇒
@@ -43,7 +52,8 @@ README 自述 "gives the model a clock"）——随 web-app bundle 挂载但 **`
 
 1. 公司手册「日期口径」：从"没有通道 ⇒ 一律占位"改成"**读 time-context 注入的时间写真日期；
    注入缺失时占位**"（禁推算/禁取次日的核心条款不变）——⚠ 改文受**双预算约束**：行数棘轮
-   （`DOC_LINE_BUDGETS` 余 9 行）+ **字节顶已解（2026-10-02）**：BUG-001 修复后 maxBytes 升 32768
+   （`DOC_LINE_BUDGETS` 195 顶；2026-10-03 实测 192/195 **余 3 行**——较 09-30 的余 9 行更紧）
+   + **字节顶已解（2026-10-02）**：BUG-001 修复后 maxBytes 升 32768
    （现手册 17417B，余量 ~15KB，`handbook-budget` 门禁盯守）——改文现在**只受行数棘轮约束**；
    仍需同批处理的是**行数腾位**（原 BUG-001 双约束中的字节侧已除）。
 2. **CEO skill 记账步**（`chairing-staff-meeting/SKILL.md:30`，盲审补——原稿漏了这处，而它恰是
