@@ -464,23 +464,49 @@ notGraduated.length === 0
   ? ok('proposal-graduated (proposed/ 里只剩未落地的)')
   : fail('proposal-graduated', `这些提案已消化却仍在 notes/proposed/（搬到 notes/implemented/ 并写明条目去向）：${notGraduated.join(', ')}`)
 
-// ── 推敲卡活状态行门禁（原 research-liveness，2026-09-28 D31 随 notes/research 并入 _backlog/plans 改造）──
-// 复发依据不变：D30 起因 = 用户指认「research 挂一堆东西」（未完结思考稿缺户口、挂着不动）。
-// 负例留证 2026-09-27（research 稿）／2026-09-28（plans 卡复测）：无户口卡 → plans-liveness 红，还原 → 绿。
-// 规则（D31）：_backlog/plans/ = 推敲卡（设计/分析/调研），毕业四门见 _backlog/README.md；
-// 每张活跃卡前 12 行必须有「状态：」行且写明「毕业」门判断（推敲中含下一步，已毕业含去向）。
-// 索引 README.md 豁免。
-const plansDir = join(root, '_backlog/plans')
-const plansFiles = existsSync(plansDir)
-  ? readdirSync(plansDir).filter(n => n.endsWith('.md') && n !== 'README.md')
-  : []
-const noLiveness = plansFiles.filter(name => {
-  const head = readFileSync(join(plansDir, name), 'utf8').split('\n').slice(0, 12).join('\n')
-  return !(head.includes('状态：') && head.includes('毕业'))
-})
-noLiveness.length === 0
-  ? ok(`plans-liveness ×${plansFiles.length}（每张推敲卡自带毕业门判断户口）`)
-  : fail('plans-liveness', `这些推敲卡缺活状态行（状态：+ 毕业门判断）——按 _backlog/README.md 毕业四门处置，别挂着：${noLiveness.join(', ')}`)
+// ── _backlog 活状态 + 索引交叉核对门禁（backlog-liveness；原 plans-liveness，2026-10-03 D33 章制回借升格）──
+// 复发依据：① 状态行侧 = D30 起因（未完结思考稿缺户口挂着不动；负例留证 2026-09-27 research 稿 /
+//   2026-09-28 plans 卡复测）；② 索引侧 = D33 轮实测活违规两处——两张已毕业卡不在 _done/README
+//   索引、两张活跃卡不在 plans/README 活跃列表：「位置即状态」只护文件搬迁没护索引同步，
+//   FAQ 15 升格判据成立（负例 = 本轮红→还原→绿，见 D33 Note）。
+// 规则（D33 章程 _backlog/README.md）：① 制度目录在场；② 活跃卡状态行——plans 卡前 12 行含
+//   「状态：」且含「毕业」，bugs 卡含「状态：」；③ 索引交叉核对——每张卡/材料文件必须被
+//   plans|bugs|reference|_done 四份 README 之一点名（反向——索引行指向不存在的文件——由
+//   md-links 硬档扫描覆盖，此处不重复）。
+{
+  const bl = '_backlog'
+  const dirs = [`${bl}/plans`, `${bl}/bugs`, `${bl}/reference`,
+    `${bl}/_done/_closed_plans`, `${bl}/_done/_suspended_plans`, `${bl}/_done/_fixed_bugs`,
+    `${bl}/_done/_suspended_bugs`, `${bl}/_done/_reference`, `${bl}/_done/_misc`]
+  const listMd = d => existsSync(join(root, d))
+    ? readdirSync(join(root, d)).filter(n => n.endsWith('.md') && n !== 'README.md')
+    : []
+  const missingDirs = dirs.filter(d => !existsSync(join(root, d)))
+  missingDirs.length === 0
+    ? ok(`backlog-liveness 制度目录 ×${dirs.length}`)
+    : fail('backlog-liveness', `制度目录缺失（章程的目录形状，别删）：${missingDirs.join(', ')}`)
+
+  const badPlans = listMd(`${bl}/plans`).filter(name => {
+    const head = readFileSync(join(root, `${bl}/plans`, name), 'utf8').split('\n').slice(0, 12).join('\n')
+    return !(head.includes('状态：') && head.includes('毕业'))
+  })
+  const badBugs = listMd(`${bl}/bugs`).filter(name =>
+    !readFileSync(join(root, `${bl}/bugs`, name), 'utf8').split('\n').slice(0, 12).join('\n').includes('状态：'))
+  const livenessBad = [...badPlans.map(n => `${bl}/plans/${n}（缺状态行/毕业门判断）`),
+    ...badBugs.map(n => `${bl}/bugs/${n}（缺状态行）`)]
+  livenessBad.length === 0
+    ? ok(`backlog-liveness 状态行 ×${listMd(`${bl}/plans`).length + listMd(`${bl}/bugs`).length}（每张活跃卡自带户口）`)
+    : fail('backlog-liveness', `这些活跃卡缺活状态行——按 _backlog/README.md 毕业四门处置，别挂着：${livenessBad.join(', ')}`)
+
+  const indexHaystack = [`${bl}/plans/README.md`, `${bl}/bugs/README.md`,
+    `${bl}/reference/README.md`, `${bl}/_done/README.md`]
+    .map(p => readFileSync(join(root, p), 'utf8')).join('\n')
+  const unindexed = dirs.flatMap(d => listMd(d).map(name => `${d}/${name}`))
+    .filter(rel => !indexHaystack.includes(rel.split('/').pop()))
+  unindexed.length === 0
+    ? ok('backlog-liveness 索引交叉核对（每张卡/材料件都被索引点名）')
+    : fail('backlog-liveness', `这些卡/材料件没被任何索引点名（位置即状态必须连索引同步）：${unindexed.join(', ')}`)
+}
 
 console.log(failures.length === 0 ? '\nverify: ALL PASS' : `\nverify: ${failures.length} FAILURE(S)`)
 process.exit(failures.length === 0 ? 0 : 1)

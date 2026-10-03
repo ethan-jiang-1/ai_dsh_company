@@ -1,22 +1,26 @@
 # plans/ · 活跃推敲卡
 
-> 一文件一张卡。**文件名 = `YYMMDD-<slug>.md`（日期 = 立卡日；无编号、无次序——时间轴就在文件名上，
-> 归档后按日期流一眼看清先后）**。slug = kebab-case 主题词。毕业（批准 / 搁置 / 否决 / 消化）时
-> `git mv` 到 [`../_done/_closed_plans/`](../_done/_closed_plans/)，**文件名不变**（日期流随卡走）、
-> 内容不重写，状态行补去向指针。规矩手册 = [`../README.md`](../README.md)。
+> 一文件一张卡。**文件名 = `YYYY-MM-DD-<slug>.md`（日期 = 立卡日；无编号、无次序——时间轴就在文件名上，
+> 归档后按日期流一眼看清先后；2026-10-03 D33 由 YYMMDD 改全日期，与 notes 树统一）**。slug = kebab-case
+> 主题词。毕业（该做 / 待触发兑现 / 否决 / 消化）时 `git mv` 到
+> [`../_done/_closed_plans/`](../_done/_closed_plans/)，**文件名不变**（日期流随卡走）、内容不重写，
+> 状态行补去向指针；**无判断被用户暂停**的卡迁 [`../_done/_suspended_plans/`](../_done/_suspended_plans/)。
+> 本文件是账本（行随卡走），章程 = [`../README.md`](../README.md)。
 
 ## 活跃列表
 
 | 卡 | 一句话 | 毕业门判断 |
 |---|---|---|
-| [260929-deliverables-lifecycle-metadata](./260929-deliverables-lifecycle-metadata.md) | deliverables 的日期/元数据/生命周期——**2026-09-30 三路盲审修正**：D20 桥对改名不成立（slug 归一化前置）、C1 倾向弱化（引用图+判据根部两笔新账）、词表重构 | 五决策点待人拍：命名（A1/A2/A3）/ 事实家范围 / 词表（先跑 20 话题试归类）/ 归档家 / 迁移时机 |
-| [260929-date-channel-mechanism](./260929-date-channel-mechanism.md) | 日期从哪来：出厂 time-context 已启用（探针判据翻新复跑绿）——**半实施三方错位已收口**（手册/skill/probe 三处文面 2026-09-30 改完） | 剩：机制启用的 RFC 追认（待用户） |
-| [260929-collab-mechanism-evidence](./260929-collab-mechanism-evidence.md) | 调研卡：Q0 vendor 盘点（含五件套归宿）/ Q1 外部生态 / E2 跨进程实测（守卫不闭合）/ E3 日志导出闭环 **全已答** | 余 E1/Q2，跑完即毕业消化 |
-| [260929-writing-collab-locks-redis](./260929-writing-collab-locks-redis.md) | 写作协作锁与感知——盲审后 R0 瘦身为四条可验收项（原 R0-5 = 现 R0 第 4 条：先实测出厂 changed-files 卡）、R1 拆两段（atomic-write 仅单机+脚本侧） | 待 E1/Q2 + 用户点头；Redis 留带触发条件的实验位 |
+| [2026-09-29-deliverables-lifecycle-metadata](./2026-09-29-deliverables-lifecycle-metadata.md) | deliverables 的日期/元数据/生命周期——**2026-09-30 三路盲审修正**：D20 桥对改名不成立（slug 归一化前置）、C1 倾向弱化（引用图+判据根部两笔新账）、词表重构 | 五决策点待人拍：命名（A1/A2/A3）/ 事实家范围 / 词表（先跑 20 话题试归类）/ 归档家 / 迁移时机 |
+| [2026-09-29-date-channel-mechanism](./2026-09-29-date-channel-mechanism.md) | 日期从哪来：出厂 time-context 已启用（探针判据翻新复跑绿）——**半实施三方错位已收口**（手册/skill/probe 三处文面 2026-09-30 改完） | 剩：机制启用的 RFC 追认（待用户） |
+| [2026-09-29-collab-mechanism-evidence](./2026-09-29-collab-mechanism-evidence.md) | 调研卡：Q0 vendor 盘点（含五件套归宿）/ Q1 外部生态 / E2 跨进程实测（守卫不闭合）/ E3 日志导出闭环 **全已答** | 余 E1/Q2，跑完即毕业消化 |
+| [2026-09-29-writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md) | 写作协作锁与感知——盲审后 R0 瘦身为四条可验收项（原 R0-5 = 现 R0 第 4 条：先实测出厂 changed-files 卡）、R1 拆两段（atomic-write 仅单机+脚本侧） | 待 E1/Q2 + 用户点头；Redis 留带触发条件的实验位 |
+| [2026-10-02-deferred-verifications](./2026-10-02-deferred-verifications.md) | 触发条件型等待卡：两笔验证债（browser 行为复跑、`probe --full` 低峰双收口）2026-10-02 自 intents 迁来立卡 | 两笔触发条件成立、跑完判收即整卡毕业迁档 |
+| [2026-10-02-feedback-channel-cultivation](./2026-10-02-feedback-channel-cultivation.md) | 货架残余**消费**候选——feedback 家族（出厂已挂、全库零消费）+ contextPressure / modelSelection 两条投影（零成本数据源） | D1 消费面选型（叙事决定）答完即毕业 |
 
 ## 卡片模板
 
-文件名 = `YYMMDD-<slug>.md`（例：2026-09-28 立的卡 = `260928-<slug>.md`）：
+文件名 = `YYYY-MM-DD-<slug>.md`（例：2026-09-28 立的卡 = `2026-09-28-<slug>.md`）：
 
 ```markdown
 # 推敲：<标题>
@@ -39,7 +43,7 @@
 **调研类卡**（原 research 层功能，D31 并入）在「已知与未决」里补两字段：
 **待答问题 / 待跑实验**清单 + **喂给谁**（结论将喂给哪张卡或哪个决定）。
 
-## 状态行规则（机械门禁 `plans-liveness`）
+## 状态行规则（机械门禁 `backlog-liveness` 的 plans 侧）
 
 首部 12 行内必须有 `状态：` 行且写明毕业门判断——**每张卡自带户口**，防挂死稿
 （原 research-liveness 同款精神：D30 起因 = 死研究稿挂着一动不动）。

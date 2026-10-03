@@ -13,13 +13,13 @@ company-workspace/      运行时"公司共享盘"（会话 cwd）：**AGENTS.md
 vendor/dsh/             DSH 源码 submodule（钉 SHA，**只读铁律**：见 §vendor 铁律，`pnpm verify` 强制）
 docs/                   当前合同与导航：index（地图+台账）→ design/ guides/ + 顶层合同
 notes/                  **开发记忆与证据链**：intents.md → proposed/ → implemented/；archived/（完结研究）/ rejected/（负知识）；postmortem/ 记事故
-_backlog/               推敲层（D31）：plans/ 推敲卡、bugs/ 缺陷卡、_done/ 归档（含 2026-09-28 退役的搁置池/磨清单，_done/_misc/）；规矩 = 其 README
+_backlog/               推敲层（D31 立层；D33 章制回借）：plans/ 推敲卡（含待触发等待卡）、bugs/ 缺陷卡、reference/ 研究材料、_done/ 归档（_closed/_suspended/_fixed/_reference + _misc/ 退役池）；章程/账本二分，规矩 = 其 README
 scripts/                verify.mjs（结构门禁）、preset-smoke.mjs（真入口冒烟）……
 dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）
 snapshots/              回归资产：历史录制、workspace.actual 副本与部分场景独立编写的 workspace.expected；以各 snapshot.yml / Note 为准
 ```
 
-设计全貌与当前决策：`docs/index.md`（按主题进入对应 owner）。任务入口与执行规则唯一见 `docs/guides/dev-loop.md` §0.5/§1；任务源 = 已批 RFC 与用户点名（D32——无中心队列文件，推敲卡不是任务；磨清单/搁置池 2026-09-28 整池退役）。
+设计全貌与当前决策：`docs/index.md`（按主题进入对应 owner）。任务入口与执行规则唯一见 `docs/guides/dev-loop.md` §0.5/§1；任务源 = 已批 RFC 与用户点名（D32——无中心队列文件，推敲卡不是任务；磨清单/搁置池 2026-09-28 整池退役，D33 复立的搁置卡桶只收用户明令暂停的无判断卡、非队列）。
 **条目状态不镜像进本文件**（root AGENTS.md 只收常设指令——vendor tier 表 "Status rots"；依据 =
 [research §十一](notes/implemented/2026-09-23-dsh-inround-task-surface.md)）。
 

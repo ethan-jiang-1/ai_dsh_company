@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 跨进程文件并发探针（研究卡 E2，2026-09-30 立）：真 fs-local 服务、零模型、秒级。
-// 何时跑：讨论"多进程/多 home 同盘写作并发"时取证（研究卡 _backlog/plans/260929-collab-mechanism-evidence.md E2）；
+// 何时跑：讨论"多进程/多 home 同盘写作并发"时取证（研究卡 _backlog/plans/2026-09-29-collab-mechanism-evidence.md E2）；
 //   vendor 升 pin 后复跑一次（fs 语义变了要知道）。成本：零模型（不起会话），纯进程编排，秒级。
 //
 // 三段判据：

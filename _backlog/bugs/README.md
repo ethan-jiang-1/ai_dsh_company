@@ -1,9 +1,12 @@
 # bugs/ · 活跃缺陷卡
 
 > 一文件一张卡：`BUG-<NNN>-<slug>.md`。修完 `git mv` 到
-> [`../_done/_fixed_bugs/`](../_done/_fixed_bugs/)，文件名不变、内容不重写。
-> **编号权威在归档侧**：新号 = [../_done/README.md](../_done/README.md) 的 Next BUG ID
-> （已分配最大号 + 1，活跃 ∪ 归档一起算）。规矩手册 = [`../README.md`](../README.md)。
+> [`../_done/_fixed_bugs/`](../_done/_fixed_bugs/)，文件名不变、内容不重写；查实但修复未确认的
+> 迁 [`../_done/_suspended_bugs/`](../_done/_suspended_bugs/)（id 保留）。**编号权威在归档侧**：
+> 新号 = [`../_done/_fixed_bugs/README.md`](../_done/_fixed_bugs/README.md) 的 Next BUG ID
+> （已分配最大号 + 1，活跃 ∪ 归档一起算）。**状态行追加律**：修完只在状态行**追加**判定
+> （`状态：活跃 — 已修复 YYYY-MM-DD：<判定，Note 指针>`），不重写原行；搁置不追加（无判断落地）。
+> 本文件是账本，章程 = [`../README.md`](../README.md)。
 
 ## 活跃列表
 
@@ -23,6 +26,9 @@
 
 ## 根因（假设）
 机制层原因——越到契约/结构层越好，避免只描述表象；未定位就写假设与验证途径。
+
+## 暴露的失败类
+这个 bug 是哪一类失败的探针；横切排查是否值得做、排查面是什么（契约探针纪律）。
 
 ## 复现
 最小复现步骤 / 命令 / 输入。

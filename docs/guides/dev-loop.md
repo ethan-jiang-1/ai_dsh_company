@@ -347,7 +347,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - **否决理由的去留**：随 owner Note 的「输掉的方案」节；**防复犯价值高的**另迁 [`notes/rejected/`](../../notes/rejected/README.md)（D30 修订设立，取代 2026-09-25 的「不单开」裁断）；只在仍能阻止一个可信错误时保留，防复犯价值消失即删。
 - **implemented 只跟事实**：随实现更新的只有路径、名称、结构等事实；决定被推翻时另写新 Note 互链，
   不把旧文改写成相反。
-- **未完结思考的家 = `_backlog/plans/` 推敲卡（D31 修订 D30；research 目录退役，起因链 = [implemented/research-notes-lifecycle](../../notes/implemented/2026-09-25-research-notes-lifecycle.md)）**：调研/设计推敲未到裁决时以卡的形式住 `_backlog/`，状态行自带毕业门判断（机械门禁 `plans-liveness`，原 research-liveness 改造）；
+- **未完结思考的家 = `_backlog/plans/` 推敲卡（D31 修订 D30；research 目录退役，起因链 = [implemented/research-notes-lifecycle](../../notes/implemented/2026-09-25-research-notes-lifecycle.md)）**：调研/设计推敲未到裁决时以卡的形式住 `_backlog/`，状态行自带毕业门判断（机械门禁 `backlog-liveness`，原 plans-liveness 于 D33 升格：+制度目录在场 +索引交叉核对）；
   **三态出口保留 D30 精神**：完结迁 `_backlog/_done/_closed_plans/`（可读可引）或并入 owner Note、过时/被推翻迁 `notes/rejected/`（负知识防复犯）、无人引用的死稿直接删（git 即归档）；
   规矩手册 = `_backlog/README.md`（毕业四门、与队列/proposed 的边界、明确不借表）；`notes/archived/` 仍为既有证据台账的家（存量不动）。
 

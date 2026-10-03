@@ -81,8 +81,9 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | D28 | **枚举型事实的家 = 实现自己**（2026-09-26）：脚本触发条件、门禁清单、pin 版本这类枚举在文档里复述必漂（实测六份清单同一种病）；家 = 脚本头注「何时跑」/ `verify.mjs` 的 expectedTag 与 `DOC_LINE_BUDGETS`，文档只留分层原则 + 指针，门禁强制 | [entry-execution-chain-debt](../notes/implemented/2026-09-26-entry-execution-chain-debt.md) |
 | D29 | **自主优先协议**（2026-09-26，用户令，同日两轮细化）：① 尽量遵循 DSH 研发流程（D13/D23）；② 自主解决问题——动手发明前先探索、借鉴**成熟 DSH 插件**（下载量 / 影响力门槛）的既有思想，探索产物按 research 层生命周期落盘；③ REVIEW 分级——能自主审的自主审（独立盲审 / 中立体清扫 / code-review），阶段收口、不得不人审时才人审，人审形状 = 跑起来的实例 + 单页走查单 + 一次一件事 + 收尾留动作（「你去体验一下」类无落点请求 = 违规） | [guides/dev-loop §13](./guides/dev-loop.md)；AGENTS §本仓原生纪律 |
 | D30 | **research 层三态模型**（2026-09-26，用户令，修订 09-25「不开 archived/rejected」裁断）：`research/` 只放未完结研究（TODO 语义，每份自带喂给谁/毕业动作为户口）；研究落地即离场——完结迁 `notes/archived/`、过时/被推翻迁 `notes/rejected/`；无人引用的死稿删除（git 即归档）。起因 = 用户指认「research 挂一堆东西」+「完结的不该在 TODO 里」。**D31 修订**：research 目录退役并入 `_backlog/plans/`，三态出口保留 | [guides/dev-loop §12](./guides/dev-loop.md)；**D31 修订后索引随目录退役**（git 留史） |
-| D31 | **推敲空间 `_backlog/` + research 并入**（2026-09-28，用户令）：借外部仓 ai_deerflow_deep_research_v2 的 `_backlog` 三件——plans 推敲卡 / bugs 缺陷卡 / _done（位置即状态），补上「该不该做 / 何时 / 次序 / 是否放弃」四问成熟前的家；红线 = **只承载判断材料，不承载次序与授权**（D23 plans 层教训）；research 目录退役并入 plans（调研卡 = 卡性质，D30 三态出口保留）；门禁 research-liveness → plans-liveness | [_backlog/README.md](../_backlog/README.md)；[implemented/2026-09-28-backlog-deliberation-space](../notes/implemented/2026-09-28-backlog-deliberation-space.md) |
+| D31 | **推敲空间 `_backlog/` + research 并入**（2026-09-28，用户令）：借外部仓 ai_deerflow_deep_research_v2 的 `_backlog` 三件——plans 推敲卡 / bugs 缺陷卡 / _done（位置即状态），补上「该不该做 / 何时 / 次序 / 是否放弃」四问成熟前的家；红线 = **只承载判断材料，不承载次序与授权**（D23 plans 层教训）；research 目录退役并入 plans（调研卡 = 卡性质，D30 三态出口保留）；门禁 research-liveness → plans-liveness。**D33 回借**：章制 2026-10-03 自 ai_dsh_loop_advisor 升级（主干框架/章程账本二分/索引交叉核对门禁/两桶解禁/全日期卡名） | [_backlog/README.md](../_backlog/README.md)；[implemented/2026-09-28-backlog-deliberation-space](../notes/implemented/2026-09-28-backlog-deliberation-space.md) |
 | D32 | **队列层退役（2026-09-28，用户令「ROADMAP 痕迹彻底清理」）**：ROADMAP.md 删除（末次全文 commit `5018118`）；职能去向 = 实施次序→用户逐条给、在办→会话 goal/用户指令、已批→RFC 状态行「批准：」标记（proposal-scheduled 改查它，反证已证）、搁置池/磨清单→`_backlog/_done/_misc/`（同日二次归档；初迁 `_backlog/suspended.md` 已由 intents D32 行声明作废）；毕业四门、入口链（dev-loop §0.5 分支②、entry-probe Q1/Q2/Q6/Q9/Q11）、md-links 扫描面同步重接；历史层（intents/snapshots/旧 Note）按"当时事实"保留 | [implemented/2026-09-28-roadmap-retirement](../notes/implemented/2026-09-28-roadmap-retirement.md)（含**保留 ROADMAP 的反方论据全文**——用户裁决前的 dissent 留档） |
+| D33 | **`_backlog` 章制回借（2026-10-03，用户令「从 ai_dsh_loop_advisor/_backlog 学习整理」）**：本仓送出去的制度在外面进化一代后借回——主干框架（缓冲→加工→回流）+ 三硬规则 + 反双记账合成规则 + 章程/账本二分入章程；门禁 plans-liveness → **backlog-liveness**（+制度目录在场 + 索引交叉核对；升格依据 = 本轮实测活违规两处）；`_suspended_*`/`reference/` 两桶解禁再借（用户拍板②；`_misc/` 定性历史池）；卡名 YYMMDD → `YYYY-MM-DD`（用户拍板①，全仓一种日期格式，9 卡 git mv + 活指针修复）；毕业门第二行理顺为等待卡口径（确认 2026-10-02 治理轮决定，不逆转） | [_backlog/README.md](../_backlog/README.md)；[implemented/2026-10-03-backlog-charter-refit](../notes/implemented/2026-10-03-backlog-charter-refit.md) |
 
 ### 待定与活动提案
 
@@ -105,7 +106,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 工作树内、已被该 repo 的 git 跟踪；不在本 repo 版本控制范围，引用时注明是外部研究材料）：
 `_faq_on_digested/`、`_digested/`、`_agent_ready_development/`（后者 = Agent-ready Development 语料，
 第三视角"Development Harness"专题；已逐篇对照完毕——判定台账见下表该行）；
-另有第四处**独立外部仓** = `/Users/bowhead/ai_deerflow_deep_research_v2`（`_backlog` 借鉴源，见下表与 D31）。
+另有第四处**独立外部仓** = `/Users/bowhead/ai_deerflow_deep_research_v2`（`_backlog` 借鉴源，见下表与 D31）；第五处 = `/Users/bowhead/ai_dsh_loop_advisor/_backlog`（D31 制度的演进宿主，D33 回借源，见下表）。
 该研究树 HEAD 持续演进（本地 FAQ/docs 工作）；引用以各材料注册行核对的版本为准，`_digested` 审计基线
 已同 pin（2026-10-02 核对其 00-index：`dsh-v0.2.0-rc.2`，0009 轮随升）——引外部笔记时以基线对齐，不追研究树新提交。
 **思想吸收进本 repo 文档后，日常不再依赖原文**；下表是"哪个想法落在了哪儿"的地图：
@@ -124,6 +125,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | `_faq_on_digested/07_borrowing-dsh-harness-idea/` | 「另一个项目怎么借 DSH」的可迁移框架：三条立场（agent 一等 / 规则可执行 / 事实唯一 owner）+ 十维评估 + 垂直切片 + 四边界（可读≠简单 / Skill≠enforcement / 清理≠回滚 / 查询≠沙箱） | 本仓十维差距审计（2026-09-27）= [archived/harness-gap-audit-faq07](../notes/archived/2026-09-27-harness-gap-audit-faq07.md)：道五维像回事、唯一结构性缺口 = 反馈 enforcement 通道——**已于同日修复** = [implemented/enforcement-channel-and-boundaries](../notes/implemented/2026-09-27-enforcement-channel-and-boundaries.md) |
 | `/Users/bowhead/ai_deerflow_deep_research_v2/_backlog`（独立外部仓，同机工作树） | 另一个 harness 仓的待办/推敲层规矩：plans（推敲卡）/ bugs（缺陷卡）/ `_done`（位置即状态）/ `_` 前缀语义 / 搬迁铁律（git mv、文件名不变、内容不重写、编号权威住归档侧）+ 它自己那份「借 DSH」总账（借精神不抄形式的方法论样本） | `_backlog/` 全套 + 毕业四门（D31）；判定、取舍与不借清单 = [implemented/2026-09-28-backlog-deliberation-space](../notes/implemented/2026-09-28-backlog-deliberation-space.md) |
 | `_faq_on_digested/04/05/11/15`（4 目录） | 根入口文档静态/运行时设计 + 原生开发环 + loop 工程 vs SDD | 判定（2026-09-28，两子代理分读 + 现状核账） = [archived/faq-04-05-11-15-judgment](../notes/archived/2026-09-28-faq-04-05-11-15-judgment.md)：立即借九条已落地 = [implemented/harness-polish-hygiene-round](../notes/implemented/2026-09-28-harness-polish-hygiene-round.md)（手册注入面预算栅栏等），有压力再借六条带触发条件，「防重复评估」节防重读全文 |
+| `/Users/bowhead/ai_dsh_loop_advisor/_backlog`（独立外部仓，同机工作树；2026-10-03 当日态） | D31 制度的直系后代（本仓 → ai_dsh_architect → advisor，其间又借 ai_deerflow_dr_v3 主干框架）：四门/主干框架/三条硬规则/章程账本二分/搁置池新纪律（搁置 = 队列决定，agent 不得自行判搁置）/索引交叉核对门禁/随卡归档的 reference/ | 章制回借（D33）：主干框架与硬规则、章程账本二分、backlog-liveness 升格、两桶解禁、全日期卡名；判定与不借边界 = [implemented/2026-10-03-backlog-charter-refit](../notes/implemented/2026-10-03-backlog-charter-refit.md) |
 
 ## 术语映射（本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达）
 

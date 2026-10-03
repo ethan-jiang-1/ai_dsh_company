@@ -3,7 +3,7 @@
 // 何时跑：time-context 组合行（pack patch / overlay）或 time-context 配置改动时——
 //   preset-smoke 只证明"行不炸"，本探针证明"注入真的到了模型眼前、模型真的读得到"（D15：真检查）。
 //
-// 判据（推敲卡 _backlog/plans/260929-date-channel-mechanism.md 毕业门）：
+// 判据（推敲卡 _backlog/plans/2026-09-29-date-channel-mechanism.md 毕业门）：
 //   ① 机制：会话事件里出现 time-context 注入原文（"Time sampled while preparing turn…"）；
 //   ② 读回：模型把注入原文转写进纪要文件正文（证明模型可见、不是只进日志）；
 //   ③ 观察（不计红绿）：纪要文件名是否用注入日期开头——若模型仍写「日期待核」，

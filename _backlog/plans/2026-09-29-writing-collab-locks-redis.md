@@ -9,7 +9,7 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
 
 即两问：① 多角色（多人模式下 = 多个根会话）在同一共享盘上写稿，要不要引入 Redis 获得真正的锁；
 ② Redis 还有哪些机制（除锁之外）对"写作协作"有用。本卡把两问放到一张卡里答，因为答案共享同一份
-机制事实盘点。姊妹卡：[deliverables-lifecycle-metadata](./260929-deliverables-lifecycle-metadata.md)
+机制事实盘点。姊妹卡：[deliverables-lifecycle-metadata](./2026-09-29-deliverables-lifecycle-metadata.md)
 （静态布局：日期/metadata/状态归宿）——**接缝**：那张卡的 meta/台账聚合问题与本卡的"审计与事件流"
 是同一块地（谁记录谁做了什么），两张卡不要各自发明一套。
 
@@ -184,7 +184,7 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
 
 本卡原带的实验/扫描清单（E1 角色会话 fs 守卫实测、E2 双进程同盘覆写实测、Q1 成熟插件生态扫描、
 Q2 `wait_agent` 跨根会话可用性、Q3 框架先例深扫）已整体迁至研究卡
-[collab-mechanism-evidence](./260929-collab-mechanism-evidence.md)。拆卡理由：用户要按"先研究什么"
+[collab-mechanism-evidence](./2026-09-29-collab-mechanism-evidence.md)。拆卡理由：用户要按"先研究什么"
 排产，研究项集中在一张卡才看得见、排得动；本卡只持有**判断**（阶梯 + 反方清单），不持有实验。
 喂给关系：E1/E2 定 R0 地基与跨进程差价、Q1 定"借还是自建"、Q2 定跨根感知归面板还是等机制。
 

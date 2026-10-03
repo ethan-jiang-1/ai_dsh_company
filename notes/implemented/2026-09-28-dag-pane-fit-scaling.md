@@ -10,7 +10,7 @@
 1. **右缘裁切（真 bug，主犯）**：布局按内容算宽（4 根任务 = 832px），右栏实宽 ~731px；SVG 定宽 +
    `.wk-pane-body { overflow-x: auto }` 滚动条无常驻 ⇒ 最右节点（T4）被拦腰切断且无提示，观感即「画错了」。
 2. **中段边线打结（次要，形状固有）**：该动议 T7 的前置分居两端（T1 最左 / T4 最右），行布局下限 =
-   2 对交叉，barycenter 单遍已到下限——**排序无解，非 bug**；处置 = 挂 plans 卡（`260928-dag-edge-routing`）。
+   2 对交叉，barycenter 单遍已到下限——**排序无解，非 bug**；处置 = 挂 plans 卡（`2026-09-28-dag-edge-routing`）。
 
 「刷新」非问题：页签头自带「每 5 秒自动刷新」，用户看到的就是当前形态。
 
@@ -36,6 +36,6 @@
 
 ## 残留
 
-- 边线打结的路由级改进 → `_backlog/plans/260928-dag-edge-routing.md`
+- 边线打结的路由级改进 → `_backlog/plans/2026-09-28-dag-edge-routing.md`
 - 浮窗几何记忆（用户同轮提的新需求：浮出位置/大小还原 + 视口不足摆位）→
-  `_backlog/plans/260928-float-geometry-memory.md`
+  `_backlog/plans/2026-09-28-float-geometry-memory.md`

@@ -6,10 +6,10 @@
 
 两张判断卡压在同一批"机制事实"上，其中几条**是推断不是实测**：
 
-- [writing-collab-locks-redis](./260929-writing-collab-locks-redis.md)（Redis/锁判断）的整个 R0 地基
+- [writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md)（Redis/锁判断）的整个 R0 地基
   = "`fs-observation-policy` 已激活且行为如文档所述"——组合层事实核实了（base bundle 插行、无人禁用），
   但**角色会话里的实际行为没实测过**；
-- [deliverables-lifecycle-metadata](./260929-deliverables-lifecycle-metadata.md)（deliverables 布局）的
+- [deliverables-lifecycle-metadata](./2026-09-29-deliverables-lifecycle-metadata.md)（deliverables 布局）的
   收敛回填依赖会话日志，而快照侧的日志导出缺口是[已登记的坑](../../snapshots/README.md)。
 
 用户 2026-09-29 要求按"先研究什么、后研究什么"排产 ⇒ 把全部研究项**收进一张卡**（D31：调研 = 卡性质），
@@ -101,7 +101,7 @@ Team 寻址、多机只剩共享盘（[multi-human.md](../../docs/multi-human.md
   但 README 明言跨进程不协调）。完整候选表与检索面链接 = 子代理报告原文（外部数据，快照值，不复述进本卡正文）。
 
 **喂给谁**：Q0/Q1/E2/E3 **已喂**（日期卡重写+探针绿 + Redis 卡补事实 6–8 与实测差价 + snapshots 规矩回流）；
-E1/Q2 → [writing-collab-locks-redis](./260929-writing-collab-locks-redis.md)
+E1/Q2 → [writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md)
 （R0 地基的最后一角：角色会话里 observation-policy 实际行为 + wait_agent 跨根定案）；Q3 →（条件）Redis 实验新卡。
 
 ## 候选与取舍

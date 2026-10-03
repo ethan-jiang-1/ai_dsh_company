@@ -1,22 +1,33 @@
 # _done/ · 归档（位置即状态；fresh agent 默认忽略，点名才读）
 
-> 已毕业的推敲卡与已修复的缺陷卡住这里。`git mv` 迁入、文件名不变、内容不重写——
-> 迁移时只在卡的状态行补去向指针。编号权威与两条索引都在本文件。
-> 规矩手册 = [`../README.md`](../README.md)。
+> 两种诚实的离场卡住这里——**做完的**（已毕业推敲卡、已修复缺陷卡）与**暂停的**（搁置卡：
+> 非-done 也非-删）——外加随卡归档的研究材料与 2026-09-28 整池退役的历史池。`git mv` 迁入、
+> 文件名不变、内容不重写：毕业只在卡的状态行补去向指针，搁置什么都不加。**本文件是归档索引**
+> （各子目录 README 持契约不持清单）；**Next BUG ID 权威 = [_fixed_bugs/README.md](_fixed_bugs/README.md)**。
+> 章程 = [`../README.md`](../README.md)。
 
 ## 目录
 
-- [_closed_plans/](_closed_plans/README.md) — 已毕业推敲卡（文件名带立卡日期 `YYMMDD-slug`，按日期流/slug 查）
+- [_closed_plans/](_closed_plans/README.md) — 已毕业推敲卡（文件名带立卡日期 `YYYY-MM-DD-slug`，按日期流/slug 查）
+- [_suspended_plans/](_suspended_plans/README.md) — 搁置推敲卡（无判断、用户暂停；重启条件随卡）
 - [_fixed_bugs/](_fixed_bugs/README.md) — 已修复缺陷卡（**Next BUG ID 权威源**）
-- [_misc/](_misc/) — 整池退役的搁置池 [suspended.md](_misc/suspended.md) 与磨清单 [polish.md](_misc/polish.md)（2026-09-28 用户裁决；复活/触发条件仍在表内，点名才读）
+- [_suspended_bugs/](_suspended_bugs/README.md) — 查实但修复未确认的缺陷卡（id 保留）
+- [_reference/](_reference/README.md) — 随毕业卡归档的研究材料（slug 查）
+- [_misc/](_misc/README.md) — 2026-09-28 整池退役的搁置池 [suspended.md](_misc/suspended.md) 与磨清单 [polish.md](_misc/polish.md)（用户裁决；复活/触发条件仍在表内，点名才读，不再收新件）
 
 ## 已毕业推敲卡
 
 | 卡 | 毕业门 | 去向 | 日期 |
 |---|---|---|---|
-| [260928-sidebar-split-budget.md](_closed_plans/260928-sidebar-split-budget.md) | 不做（维持 2 停靠 + N 浮出现状，不推 upstream） | 关闭迁本目录 `_closed_plans/` | 2026-09-28 |
-| [suspended.md](_misc/suspended.md) | 整池退役（用户裁决；复活条件仍在表内，点名才读） | `git mv` 迁 `_misc/` | 2026-09-28 |
-| [polish.md](_misc/polish.md) | 整池退役（用户裁决；余项触发条件仍在表内，点名才读） | `git mv` 迁 `_misc/` | 2026-09-28 |
+| [2026-09-28-dag-edge-routing.md](_closed_plans/2026-09-28-dag-edge-routing.md) | 该做（用户点名「都要修改掉」，车道分离） | [implemented/2026-09-28-dag-edge-routing](../../notes/implemented/2026-09-28-dag-edge-routing.md) | 2026-09-28 |
+| [2026-09-28-float-geometry-memory.md](_closed_plans/2026-09-28-float-geometry-memory.md) | 该做（B 案前置已核实，用户批准转 RFC） | [implemented/2026-09-28-float-geometry-memory](../../notes/implemented/2026-09-28-float-geometry-memory.md) | 2026-09-28 |
+| [2026-09-28-sidebar-split-budget.md](_closed_plans/2026-09-28-sidebar-split-budget.md) | 不做（维持 2 停靠 + N 浮出现状，不推 upstream） | 关闭迁本目录 `_closed_plans/` | 2026-09-28 |
+
+## 搁置推敲卡（暂停——不是做完）
+
+| 卡 | 搁置原因 | 重启条件 |
+|---|---|---|
+| （空——首张搁置卡落地时建行） | | |
 
 ## 已修复缺陷卡
 
@@ -24,4 +35,21 @@
 |---|---|---|---|
 | [BUG-001-manual-truncation.md](_fixed_bugs/BUG-001-manual-truncation.md) | 公司手册超出 agent-instructions maxBytes——尾部在所有角色会话被截断（maxBytes 16384→32768 + verify `handbook-budget` 门禁；红→还原→绿） | 未单独 commit（随 2026-10-02 消化对账轮工作树） | 2026-10-02 |
 
-**Next BUG ID: BUG-002**（新号 = 已分配最大号 + 1，活跃 ∪ 归档一起算）
+## 搁置缺陷卡（查实——修复未确认）
+
+| ID | 标题 | 搁置原因 |
+|---|---|---|
+| （空——首张搁置卡落地时建行） | | |
+
+## 随卡归档的研究材料
+
+| 文件 | 喂过哪张卡 | 日期 |
+|---|---|---|
+| （空——随首张毕业卡迁入时建行） | | |
+
+## 退役历史池（2026-09-28 整池退役，点名才读）
+
+| 件 | 处置 | 日期 |
+|---|---|---|
+| [suspended.md](_misc/suspended.md) | 整池退役（用户裁决；复活条件仍在表内，点名才读） | 2026-09-28 |
+| [polish.md](_misc/polish.md) | 整池退役（用户裁决；余项触发条件仍在表内，点名才读） | 2026-09-28 |
