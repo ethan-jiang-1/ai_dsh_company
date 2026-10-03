@@ -101,17 +101,20 @@ if (EXECUTE) {
     else { renameOrFallback(join(ROOT, src), join(ROOT, dst)); fsMoved += 1 }
   }
   console.log(`迁移完成：git mv ${String(gitMoved)} / fs mv ${String(fsMoved)}`)
-  // ③ 真盘门禁验收
+  // ③ 真盘门禁验收（退出码传递：子门禁失败 ⇒ 本脚本退 1——「证据不许假绿」，红证 2026-10-04：
+  //   剥 PATH 里的 zstd 令 deliverables-check 退 2，旧版无条件 exit(0) 假绿，修后退 1）
+  let gateFailures = 0
   for (const cmd of [['scripts/deliverables-check.mjs'], ['scripts/authorship-audit.mjs']]) {
     try {
       const out = execFileSync(process.execPath, cmd, { cwd: ROOT, encoding: 'utf8', timeout: 300_000,
         env: { ...process.env, DSH_HOME: join(ROOT, 'dev/harness-home') } })
       console.log(`[${cmd[0]}]\n` + out.split('\n').filter(l => /ALL PASS|违规|观察项 \d|一致 \d|版本引用/.test(l)).slice(0, 4).join('\n'))
     } catch (error) {
+      gateFailures += 1
       console.log(`[${cmd[0]}] exit ${String(error.status)}\n` + String(error.stdout ?? '').split('\n').slice(-6).join('\n'))
     }
   }
-  process.exit(0)
+  process.exit(gateFailures === 0 ? 0 : 1)
 }
 function renameOrFallback(from, to) {
   try { execFileSync('git', ['mv', from, to], { cwd: ROOT }) } catch { rmSync(to, { recursive: true, force: true }); cpSync(from, to, { recursive: true }); rmSync(from, { recursive: true, force: true }) }

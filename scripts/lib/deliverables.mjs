@@ -80,6 +80,30 @@ export function isPlaceholderClaim(body) {
 export const META_TYPES = ['决策', '生产', '诊断', '口径问答']
 /** 决议结果枚举（跨型共用；单值装不下的历史由「落地事件」多行字段承载）。 */
 export const META_RESULTS = ['进行中', '已采纳', '已否决', '已搁置', '已废弃', '判不了', '已完成']
+/**
+ * 终态词表（反向门禁用，布局卡评审修正 6）：present 是收口动作 ⇒ 收口后「结果」必须是终态词。
+ * 「进行中」合法但非终态——present 在而结果=进行中 = P6 病（收口了还挂着进行中）⇒ 红。
+ */
+export const META_FINAL_RESULTS = META_RESULTS.filter(word => word !== '进行中')
+
+/**
+ * 反向门禁（布局卡评审修正 6：present 在而结果≠终态 → 红；2026-10-04 code-review 补落）。
+ * 射程：**Lead present 过的成品** × 其 meta 的「结果」字段——留空或「进行中」判红
+ * （收口动作已发生，状态必须落终态）；无 meta 的成品不在射程（final-without-meta 观察项
+ * T-9 盯守，避免同一条双报）。纯逻辑，IO 接线在 deliverables-check。
+ * @param leadFinalSlugs - Lead present 过的成品 slug（`auditDeliverables().leadFinalSlugs`）。
+ * @param metaResultBySlug - slug → meta「结果」字段值（缺行按留空）。
+ * @returns 违规行数组：`{ slug, result }`。
+ */
+export function presentResultRows(leadFinalSlugs, metaResultBySlug) {
+  const rows = []
+  for (const slug of leadFinalSlugs) {
+    const result = metaResultBySlug.get(slug)
+    if (result === undefined) continue
+    if (!META_FINAL_RESULTS.includes(result)) rows.push({ slug, result })
+  }
+  return rows
+}
 
 /**
  * 解析 meta.md 全文：`字段: 值` 行进 fields（取首现），`落地事件:` 行逐条进 events（多值）。
@@ -136,6 +160,8 @@ export const VIOLATION = {
   META_SHAPE_BAD: 'meta-shape-bad',
   /** `present` 提及的过程稿在盘上找不到（反向检查）。 */
   DANGLING_PRESENT: 'dangling-present',
+  /** 反向门禁：Lead present 过的成品，meta「结果」仍非终态（留空/进行中——布局卡评审修正 6）。 */
+  PRESENT_RESULT_NOT_FINAL: 'present-result-not-final',
 }
 
 /** 把路径归一成工作区相对的正斜杠形式，便于两侧比较。 */
@@ -381,5 +407,5 @@ export function auditDeliverables(input) {
       })
     }
   }
-  return { finals, drafts, metas, violations, warnings }
+  return { finals, drafts, metas, violations, warnings, leadFinalSlugs: [...leadFinalSessions.keys()] }
 }

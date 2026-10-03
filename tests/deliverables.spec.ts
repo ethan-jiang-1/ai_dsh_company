@@ -13,6 +13,7 @@ import {
   isPlaceholderClaim,
   parseMeta,
   parseSessionLog,
+  presentResultRows,
   slugFromDirName,
   validateMeta,
 } from '../scripts/lib/deliverables.mjs'
@@ -382,5 +383,29 @@ describe('meta.md 形状校验（validateMeta / parseMeta）', () => {
     const { ok, problems } = parseAndValidate('slug: 2026-09-22-foo\nkickoff: 2026-09-22\n类型: 决策\n结果: 已采纳')
     expect(ok).toBe(false)
     expect(problems[0]).toContain('剥前缀')
+  })
+})
+
+describe('反向门禁（布局卡评审修正 6：present 在而结果≠终态 → 红；2026-10-04 code-review 补落）', () => {
+  const leadOf = (slug: string) => ({
+    id: 's1', agentPreset: 'ceo', delegationDepth: 0,
+    presented: [{ path: `deliverables/${slug}/final.md` }],
+  })
+
+  it('auditDeliverables 交回 leadFinalSlugs（Lead present 过的成品 slug 面）', () => {
+    const result = auditDeliverables({
+      workspaceFiles: ['deliverables/pilot/final.md', 'deliverables/pilot/meta.md'],
+      sessions: [leadOf('pilot')],
+    })
+    expect(result.leadFinalSlugs).toEqual(['pilot'])
+  })
+
+  it('present ∧ 结果留空 / 进行中 ⇒ 红；终态词 ⇒ 过；无 meta ⇒ 不在射程（T-9 观察项管）', () => {
+    const rows = presentResultRows(['pilot', 'ghost-done', 'no-meta'], new Map<string, string>([
+      ['pilot', ''],
+      ['ghost-done', '进行中'],
+      ['term', '已否决'],
+    ]))
+    expect(rows).toEqual([{ slug: 'pilot', result: '' }, { slug: 'ghost-done', result: '进行中' }])
   })
 })

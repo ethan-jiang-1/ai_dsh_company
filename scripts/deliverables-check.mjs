@@ -25,7 +25,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { requireDevHome } from './lib/runtime-home.mjs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { VIOLATION, WARNING, auditDeliverables, isPlaceholderClaim, parseSessionLog, validateMeta } from './lib/deliverables.mjs'
+import { VIOLATION, WARNING, auditDeliverables, isPlaceholderClaim, parseSessionLog, presentResultRows, validateMeta } from './lib/deliverables.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const arg = (name, fallback) => {
@@ -201,6 +201,18 @@ for (const [slug, meta] of metaBySlug) {
   if (ledgerDate !== undefined && ledgerDate !== '日期待核' && meta.fields.get('kickoff') !== ledgerDate) {
     warnings.push({ code: WARNING.META_LEDGER_MISMATCH, detail: `\`${slug}/meta.md\` kickoff = ${meta.fields.get('kickoff')} ≠ 台账日期列 ${ledgerDate}——两笔账对不上，以会话日志 createdAt 复核后对齐一处` })
   }
+}
+
+// 反向门禁（布局卡评审修正 6，2026-10-04 补落）：present 在而结果≠终态 → 红——
+// present 是收口动作，收了口状态必须落终态词（留空/进行中 = P6 病复发：结果靠自觉回写没人盯）。
+// 判据纯逻辑 = lib presentResultRows（keyless spec 在 tests/deliverables.spec.ts）；无 meta 不在射程（T-9 观察项管）。
+const metaResultBySlug = new Map([...metaBySlug].map(([slug, meta]) => [slug, meta.fields.get('结果') ?? '']))
+for (const row of presentResultRows(result.leadFinalSlugs, metaResultBySlug)) {
+  violations.push({
+    code: VIOLATION.PRESENT_RESULT_NOT_FINAL,
+    path: `deliverables/${row.slug}/final.md`,
+    detail: `Lead present 过 \`${row.slug}\` 的成品，但 meta「结果」=「${row.result === '' ? '（留空）' : row.result}」非终态（词表 = lib META_FINAL_RESULTS）——收口动作已发生，状态必须落终态`,
+  })
 }
 
 console.log(`deliverables-check: ${workspaceRel}${LEGACY_FLAT ? '（平铺旧形状口径）' : ''}${ONLY_SLUG === undefined ? '' : `（只审 ${ONLY_SLUG}）`}`)

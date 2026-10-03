@@ -147,17 +147,17 @@ for (const root of ['deliverables', 'deliverables-archive']) {
   const rootDir = join(WS, root)
   if (!existsSync(rootDir)) continue
   for (const slug of readdirSync(rootDir)) {
-  const slugDir = join(rootDir, slug)
-  const finalPath = join(slugDir, 'final.md')
-  if (!existsSync(finalPath)) continue
-  const currentByDraft = new Map()
-  const draftsDir = join(slugDir, 'drafts')
-  if (existsSync(draftsDir)) {
-    for (const name of readdirSync(draftsDir)) {
-      if (name.endsWith('.md')) currentByDraft.set(`drafts/${name}`, currentVersionOf(readFileSync(join(draftsDir, name), 'utf8')))
+    const slugDir = join(rootDir, slug)
+    const finalPath = join(slugDir, 'final.md')
+    if (!existsSync(finalPath)) continue
+    const currentByDraft = new Map()
+    const draftsDir = join(slugDir, 'drafts')
+    if (existsSync(draftsDir)) {
+      for (const name of readdirSync(draftsDir)) {
+        if (name.endsWith('.md')) currentByDraft.set(`drafts/${name}`, currentVersionOf(readFileSync(join(draftsDir, name), 'utf8')))
+      }
     }
-  }
-  for (const r of crossCheckVersions(readFileSync(finalPath, 'utf8'), currentByDraft)) versionRows.push({ slug, ...r })
+    for (const r of crossCheckVersions(readFileSync(finalPath, 'utf8'), currentByDraft)) versionRows.push({ slug, ...r })
   }
 }
 const staleRefs = versionRows.filter(r => r.stale)
