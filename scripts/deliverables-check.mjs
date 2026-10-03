@@ -101,7 +101,8 @@ function readSessionText(file) {
 const sessions = []
 if (source.files.length > 0) {
   for (const file of source.files) sessions.push(parseSessionLog(readSessionText(file)))
-} else {
+} else if (source.sessionRoot !== undefined) {
+  // --sessions 明文目录里一个 .jsonl 都没有 = 零会话（合法态，不是错误）——空目录不落这条路径。
   for (const sessionDir of readdirSync(source.sessionRoot, { withFileTypes: true })) {
     if (!sessionDir.isDirectory()) continue
     const dir = join(source.sessionRoot, sessionDir.name)
