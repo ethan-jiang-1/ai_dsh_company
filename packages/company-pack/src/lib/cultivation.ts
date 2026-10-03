@@ -117,7 +117,13 @@ export type FeedbackEventLike =
   | { readonly type: 'feedback/message-put'; readonly data: { readonly item?: unknown } }
   | { readonly type: 'feedback/message-delete'; readonly data: { readonly messageId?: unknown } }
 
-const isItem = (value: unknown): value is FeedbackItem => {
+/**
+ * wire 载荷的已验形状（isItemShape 收窄后的视图）：note 保持 unknown——消费侧再单独窄化
+ * （typeof === 'string'），不把「校验过三字段」偷换 成「note 也验过」。
+ */
+type ItemShape = { readonly messageId: string, readonly rating: 'positive' | 'negative', readonly updatedAt: number, readonly note?: unknown }
+
+const isItemShape = (value: unknown): value is ItemShape => {
   if (value === null || typeof value !== 'object') return false
   const item = value as Record<string, unknown>
   return typeof item.messageId === 'string' && item.messageId !== ''
@@ -136,11 +142,11 @@ export function feedbackItems(events: readonly unknown[]): readonly FeedbackItem
     if (event === null || typeof event !== 'object') continue
     const e = event as FeedbackEventLike
     if (e.type === 'feedback/message-put') {
-      const item = e.data?.item
-      if (isItem(item)) {
+      const raw = e.data?.item
+      if (isItemShape(raw)) {
         // wire → 领域形状的最小投影：只留消费面四字段（version/createdAt 等不透传）。
-        const note = typeof (item as Record<string, unknown>).note === 'string' ? (item as Record<string, unknown>).note : undefined
-        byId.set(item.messageId, { messageId: item.messageId, rating: item.rating, ...(note !== undefined ? { note } : {}), updatedAt: item.updatedAt })
+        const note = typeof raw.note === 'string' ? raw.note : undefined
+        byId.set(raw.messageId, { messageId: raw.messageId, rating: raw.rating, ...(note !== undefined ? { note } : {}), updatedAt: raw.updatedAt })
       }
     } else if (e.type === 'feedback/message-delete') {
       if (typeof e.data?.messageId === 'string') byId.delete(e.data.messageId)
