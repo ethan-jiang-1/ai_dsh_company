@@ -156,8 +156,9 @@
   **日期从哪来**（机制层）已拆出独立卡 [date-channel-mechanism](./2026-09-29-date-channel-mechanism.md)：
   留案的 pack 侧注入方案触发条件大概率已 fired（用户点名要日期）。本卡只管"日期进了树怎么摆"——
   机制卡毕业与否都不阻塞这里（A2 收敛补日期在无机制下依然成立；机制复活则回填量大减）。
-- **仓库自己的命名先例**：`notes/implemented/` = `YYYY-MM-DD-<slug>.md`；`_backlog` 卡 = `YYMMDD-<slug>.md`
-  （日期 = 立卡日，时间轴就在文件名上）。deliverables 是**全仓唯一没有日期前缀的档案层**。
+- **仓库自己的命名先例**：`notes/implemented/` = `YYYY-MM-DD-<slug>.md`；`_backlog` 卡 = `YYYY-MM-DD-<slug>.md`
+  （日期 = 立卡日，时间轴就在文件名上；2026-10-03 D33 起与 notes 树统一为全日期，原 YYMMDD 形状退役）。
+  deliverables 是**全仓唯一没有日期前缀的档案层**。
 - **三态合同只管文件类别，不管话题生命周期**：成品 final / 过程稿 drafts / 排练产物不进盘
   （公司手册「交付物三态」）。话题本身**没有任何状态**——"这场动议否决了/落地了/归档了"无处可查，
   只能读 final 正文的一句话结论自己判断。

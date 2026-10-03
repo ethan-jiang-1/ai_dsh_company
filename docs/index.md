@@ -87,7 +87,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 
 ### 待定与活动提案
 
-旧问题 Q1–Q8 均已闭合（Q1→D18、Q2→D16、Q3→D17、Q4 于 2026-09-22 定案、Q5–Q8→D22）。这只结算该组问题；当前任务源 = [notes/proposed/](../notes/proposed/README.md) 已批 RFC 与用户点名（D32，无中心队列；磨活走 [_backlog/plans/](../_backlog/plans/README.md) 推敲卡）；磨清单/搁置池已整池退役归 [_backlog/_done/_misc/](../_backlog/_done/_misc/)，点名才读（条目名不在此复述——复述会过期，2026-09-24 探针实证）。
+旧问题 Q1–Q8 均已闭合（Q1→D18、Q2→D16、Q3→D17、Q4 于 2026-09-22 定案、Q5–Q8→D22）。这只结算该组问题；当前任务源 = [notes/proposed/](../notes/proposed/README.md) 已批 RFC 与用户点名（D32，无中心队列；磨活走 [_backlog/plans/](../_backlog/plans/README.md) 推敲卡）；旧磨清单/搁置池整池退役归 [_backlog/_done/_misc/](../_backlog/_done/_misc/)，点名才读（条目名不在此复述——复述会过期，2026-09-24 探针实证）；D33 复立的 `_done/_suspended_*` 搁置卡桶同非任务源（重启须用户明确决定）。
 
 ## 文档路由
 
