@@ -1,6 +1,6 @@
 # 推敲：写作协作的锁与感知——文件系统现状盘点、Redis 评估与原生替代阶梯
 
-> 状态：推敲中（2026-09-30 盲审修正后）｜毕业门判断 = 倾向**"先满载原生 + 门禁补强，Redis 不进默认形态、只留带触发条件的实验位"**——E1/Q2 已答并写回（2026-10-03：E1 三判据全绿 + Q2 跨根不可用定案，**R0 地基闭合**；收据 = [研究卡 E1/Q2 结论](../_done/_closed_plans/2026-09-29-collab-mechanism-evidence.md)）｜下一步 = **用户点头 R0 四条清单**（唯一剩账），点头即落 RFC
+> 状态：已毕业（2026-10-03，R0 四条落地）｜批准：用户 2026-10-03 点头 R0 四条清单（对话在案）｜去向 = [notes/implemented/2026-10-03-redis-r0-native-collab.md](../../../notes/implemented/2026-10-03-redis-r0-native-collab.md)（四条落地证据 + R1/R2/R3 触发条件的归属家）｜原毕业门判断 = 先满载原生 + 门禁补强，Redis 不进默认形态、只留带触发条件的实验位——R0 已落地，R2 待触发随 Note
 
 ## 背景 / 触发
 
@@ -9,7 +9,7 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
 
 即两问：① 多角色（多人模式下 = 多个根会话）在同一共享盘上写稿，要不要引入 Redis 获得真正的锁；
 ② Redis 还有哪些机制（除锁之外）对"写作协作"有用。本卡把两问放到一张卡里答，因为答案共享同一份
-机制事实盘点。姊妹卡：[deliverables-lifecycle-metadata](./2026-09-29-deliverables-lifecycle-metadata.md)
+机制事实盘点。姊妹卡：[deliverables-lifecycle-metadata](../../plans/2026-09-29-deliverables-lifecycle-metadata.md)
 （静态布局：日期/metadata/状态归宿）——**接缝**：那张卡的 meta/台账聚合问题与本卡的"审计与事件流"
 是同一块地（谁记录谁做了什么），两张卡不要各自发明一套。
 
@@ -19,11 +19,11 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
 
 | # | 痛点 | 证据 |
 |---|---|---|
-| P1 | **同文件并发写**：跨进程/跨 home/外部编辑器没有共享租约——"一个文件同一时刻一个写者"只是流程政策，不是机制保证 | [multi-human.md §4](../../docs/multi-human.md)；机制核实 = [multi-human-ux-evidence](../../notes/archived/2026-09-26-multi-human-ux-evidence.md)「文件并发语义」节 |
-| P2 | **撞 slug / 撞稿**：两场动议共用 `renewal-y-2026`，产物互相覆盖、两场混装，三态判据看不出 | [memory-convergence-2026-09-26 §边界 1](../../snapshots/memory-convergence-2026-09-26/README.md)；已有观察项 `slug-collision`（纯逻辑，带回归） |
+| P1 | **同文件并发写**：跨进程/跨 home/外部编辑器没有共享租约——"一个文件同一时刻一个写者"只是流程政策，不是机制保证 | [multi-human.md §4](../../../docs/multi-human.md)；机制核实 = [multi-human-ux-evidence](../../../notes/archived/2026-09-26-multi-human-ux-evidence.md)「文件并发语义」节 |
+| P2 | **撞 slug / 撞稿**：两场动议共用 `renewal-y-2026`，产物互相覆盖、两场混装，三态判据看不出 | [memory-convergence-2026-09-26 §边界 1](../../../snapshots/memory-convergence-2026-09-26/README.md)；已有观察项 `slug-collision`（纯逻辑，带回归） |
 | P3 | **版本一致性**：quote-z-2026 双签 allowed-once 但**只对 cfo v2 生效**，盘面已 v3，final 只能记"版号待对齐"；署名行版号是手写的 | 台账 `quote-z-2026` 行结论；`scripts/authorship-audit.mjs` 头注 |
-| P4 | **感知/通知**：根会话之间**没有消息通道**（Agent Teams 按队伍作用域，不同根会话是不同队）；"我写完了"靠人开口说；实时卡刷新即丢 | [multi-human.md §0+§3](../../docs/multi-human.md)（§0 证卡按会话作用域，§3 证非团队会话互不通信）；手册「待办」节"刷新即丢" |
-| P5 | **审计与日期**：谁在何时写了什么，唯一权威 = `$DSH_HOME` 会话日志（zstd 多帧），**按 home 分桶**（跨 home 审计要每家跑一遍）、~~快照里没有日志（导出缺口）~~ **导出缺口已闭合（2026-09-30 E3：`session-log-export.mjs` + 09-26 快照 4 场审计 0 违规）**，日期要靠它回填 | [journal-date-mechanism](../../notes/implemented/2026-09-26-journal-date-mechanism.md)；memory-convergence README"登记一条缺口"；**E3 收据 = 研究卡 E3 结论** |
+| P4 | **感知/通知**：根会话之间**没有消息通道**（Agent Teams 按队伍作用域，不同根会话是不同队）；"我写完了"靠人开口说；实时卡刷新即丢 | [multi-human.md §0+§3](../../../docs/multi-human.md)（§0 证卡按会话作用域，§3 证非团队会话互不通信）；手册「待办」节"刷新即丢" |
+| P5 | **审计与日期**：谁在何时写了什么，唯一权威 = `$DSH_HOME` 会话日志（zstd 多帧），**按 home 分桶**（跨 home 审计要每家跑一遍）、~~快照里没有日志（导出缺口）~~ **导出缺口已闭合（2026-09-30 E3：`session-log-export.mjs` + 09-26 快照 4 场审计 0 违规）**，日期要靠它回填 | [journal-date-mechanism](../../../notes/implemented/2026-09-26-journal-date-mechanism.md)；memory-convergence README"登记一条缺口"；**E3 收据 = 研究卡 E3 结论** |
 | P6 | **派活状态回写滞后**：任务书状态行不回写，扫盘把过期待办报成活 | 公司手册「机器可读派活行」节（实验实证） |
 
 ### 关键机制事实（vendor 只读核实 + 本仓实证，2026-09-29 复核）
@@ -32,17 +32,17 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
 
 1. **`fs-observation-policy` 大概率已激活**（base bundle 第 278–279 行 insert 该插件——0.1.7 时代引
    277 行，0.2.0-rc.2 实测 278–279，
-   web-app 与本仓 pack 均未禁用——[vendor/dsh/packages/bundle/base/cordis.patch.yml](../../vendor/dsh/packages/bundle/base/cordis.patch.yml)）。
+   web-app 与本仓 pack 均未禁用——[vendor/dsh/packages/bundle/base/cordis.patch.yml](../../../vendor/dsh/packages/bundle/base/cordis.patch.yml)）。
    它给每个会话的 fs 工具装上：**读后才能覆写**（没读过就 write/edit 会被拒，fail-loud 带指引）、
    **读过之后文件变了再写 = `FS_STALE_VERSION` 拒绝**（"一胜一 stale"有官方测试）、
    **写不存在的路径 = 带守卫的创建**（并发创建只有第一个成功）——最后这条就是**原生的
-   "先到先得抢注"原语**（README = [vendor/dsh/packages/fs/fs-observation-policy/README.md](../../vendor/dsh/packages/fs/fs-observation-policy/README.md)）。
+   "先到先得抢注"原语**（README = [vendor/dsh/packages/fs/fs-observation-policy/README.md](../../../vendor/dsh/packages/fs/fs-observation-policy/README.md)）。
    ⚠ 注意它**按会话**观察且不跨进程持久（resume 后要重读）——**E1 已实测（2026-10-03，全绿）**：守卫在
    角色会话真实生效（盲写被机械拒、stale 拒 4/4）；**新机制事实：守卫管新鲜度不管独占**——并发同文件
    败者天然先读后合法重写 = 后写者静默胜出，机械拒只在败者恰好盲写时出现（收据 = 研究卡 E1 结论）
    ⇒ R0-2 的「占位=认领」主张语义是必需品。
 2. **fs 后端实例内 per-target 排队锁**：同一 DSH 进程内所有会话共享（`fs-local` 的 `withLock`）。
-   **而现行多人 runbook = 一个 `dsh web` 服务进程 + 三扇浏览器门**（[multi-human.md §2](../../docs/multi-human.md)）
+   **而现行多人 runbook = 一个 `dsh web` 服务进程 + 三扇浏览器门**（[multi-human.md §2](../../../docs/multi-human.md)）
    ⇒ **今天的三门并发全在这一个进程里，锁和版本守卫都罩得住**。真正的裸区是：两个服务进程共用一张盘
    （双 home 开发态、未来的多机形态）和外部编辑器。
    **E2 实测（2026-09-30，真 fs-local × 2 进程）**：裸区比想象的更秃——跨进程**同版本守卫写**
@@ -52,33 +52,33 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
    **措辞精度（盲审 C5）**：20/20 是"GO 屏障同步双发 + 同版本"的**强制紧循环**——实测命题是
    "同时持同版本同时放行必互踩"，**不是**"真实写节奏必然互踩"（秒级读写间隔的命中率未测）；
    设计结论不受影响：守卫不能当跨进程互斥**依赖**。更硬的直引补上（盲审 A12）：
-   [fs-local README](../../vendor/dsh/packages/fs/fs-local/README.md) 原文
+   [fs-local README](../../../vendor/dsh/packages/fs/fs-local/README.md) 原文
    "The per-target mutation lock is in-process only … never serialized"——机制直证，先于编排取证。
 3. **Agent Teams 是现成的协调面**（本仓 pack 直插）：任务板带 `expectedRevision` CAS（过时修订被拒）、
    `ownerId`、`writeScopes`（**advisory**——重叠只告警不阻断）；邮箱持久投递（带署名、去重、离线补投）；
    `wait_agent` 能**阻塞等边**（名册/邮箱/任务/存活变化），替代轮询。
-4. **vendor 对"把 X 当锁"已有裁决**（[agent-teams Note · Alternatives](../../vendor/dsh/.agents/notes/implemented/feature/2026-08-05-agent-teams.md)）：
+4. **vendor 对"把 X 当锁"已有裁决**（[agent-teams Note · Alternatives](../../../vendor/dsh/.agents/notes/implemented/feature/2026-08-05-agent-teams.md)）：
    "Treat task ownership or write scopes as locks. Rejected because **external writers bypass them**,
    crashed owners remain durable, and path-prefix overlap cannot prove semantic independence.
    **False mutual exclusion is more dangerous than an explicit warning.**"
    ——这条论证对 Redis 锁**同样成立**（外部写者照样绕过；崩溃 owner 要 TTL，TTL 到期写一半要 fencing token）。
    我们引 Redis 进来并不会让这条消失，只是把"绕过面"从 DSH 会话换成"没装 Redis 客户端的写者"。
 5. **跨机形态的事实**：Agent Teams 消息跨 home 无寻址路径，多机协作**只剩共享盘**
-   （[multi-human.md §5](../../docs/multi-human.md)）⇒ 即使多机，协调面也只有文件 + git——
+   （[multi-human.md §5](../../../docs/multi-human.md)）⇒ 即使多机，协调面也只有文件 + git——
    除非再引网络服务（用户已裁决"不搞 client/server"，multi-human.md 篇首）。
-6. **官方已有跨进程文件写锁件（2026-09-29 新核实）**：[`dsh-atomic-write`](../../vendor/dsh/packages/util/atomic-write/README.md)
+6. **官方已有跨进程文件写锁件（2026-09-29 新核实）**：[`dsh-atomic-write`](../../../vendor/dsh/packages/util/atomic-write/README.md)
    （util 库，零依赖、非插件）——`wx` 创建 `<file>.lock` 兄弟文件**串行化跨进程读-改-写循环**；
    持有者进程不存在即接管（**liveness 接管，非 TTL 续租**——无续租流量、不依赖时钟）；
    rename 原子提交、读者无锁。边界：无 fsync（不承诺崩溃持久性）、只收字符串。
    ⇒ E2 那个"跨进程互踩"缺口，**官方在库层面已给答案**（R1 据此改写，见下）。
-7. **官方共享状态/变更事件 seam（2026-09-29 新核实；盲审 A4 补边界）**：[`dsh-storage-domain`](../../vendor/dsh/packages/storage/storage-domain/README.md)
+7. **官方共享状态/变更事件 seam（2026-09-29 新核实；盲审 A4 补边界）**：[`dsh-storage-domain`](../../../vendor/dsh/packages/storage/storage-domain/README.md)
    ——schema 校验 KV 域（**SQLite/JSON** 后端），同步读 + **持久有序写** + `domain/changed` 事件，
    host 侧对模型不可见。⇒ 若 pack 侧将来要"动议事件域"（谁在何时做了什么的结构化记录），
    **原生载体就在这**，不引 daemon。⚠ 边界（README Known Limitations）：`domain/changed` 是**进程内**
    事件——第二进程/重连的 GUI 观察不到变更（跨进程 revision 模式上游未落地），且对模型与客户端
    零暴露 ⇒ "喂驾驶舱"须自建 client 渲染面；本卡自己认定的多机形态下这条 seam 罩不住。
 8. **上游对"跨进程互斥"的两次裁决（TTL 家族两连否）**：
-   [SessionWriteLease Note](../../vendor/dsh/.agents/notes/implemented/feature/2026-08-31-cross-process-session-write-lease.md)
+   [SessionWriteLease Note](../../../vendor/dsh/.agents/notes/implemented/feature/2026-08-31-cross-process-session-write-lease.md)
    ——会话日志的跨进程写锁**先实现了 TTL 记录式（owner token + 过期 + 续租 + rename 接管），评审中推翻**，
    原话："a distributed algorithm in miniature: renewal timers, loss detection, takeover claiming …
    its residual multi-actor races still allowed bounded dual-writer overlap"，换成了**内核 flock**
@@ -135,7 +135,7 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
      + `handbook-budget` 门禁）——与布局卡修正 7 共享同一预算池；**字节侧约束已除，仅余行数棘轮（且更紧）**，
      两条 RFC 的改文须排收敛顺序，RFC 带腾位/扩额计划）；
   2. 抢注语义显式化——**拆两段**（盲审：原稿隐含反向依赖姊妹卡 meta 未拍板；且与
-     [multi-human.md §4](../../docs/multi-human.md) "文件存在≠收到/认领/授权/完成"既有合同打架，
+     [multi-human.md §4](../../../docs/multi-human.md) "文件存在≠收到/认领/授权/完成"既有合同打架，
      给"存在"第二语义须同 diff 改合同）：(a) **不依赖 meta 的版本** = 开场建 `drafts/<角色>.md` 占位、
      **首行写明"占位=认领，非出稿"**、门禁认占位形状；(b) **meta 建档抢注**（前置 = 布局卡 B1 毕业），
      两卡接缝合并。原稿"createIfAbsent 天然幂等"措辞撤回——它是一次性抢注，重写被拒，这正是本义；
@@ -151,7 +151,7 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
      再立项；架构模式借 activity 观察面：只读、不偷模型数据、只在有人看时流动）。
   代价：仓内开发，无守护进程、无新工具面给角色。
 - **R1 跨进程串行化（盲审后拆两段——原稿"包一层"对角色是幻觉）**：
-  (a) **维护者/外部脚本侧**：用 [`dsh-atomic-write`](../../vendor/dsh/packages/util/atomic-write/README.md)
+  (a) **维护者/外部脚本侧**：用 [`dsh-atomic-write`](../../../vendor/dsh/packages/util/atomic-write/README.md)
   （wx 锁 + liveness 接管）——**边界补记**：README 明写 **one host, one PID namespace**，跨机共享盘上
   liveness 探活会误判接管、双写照样发生（与事实 8 的 NFSv3 flock 注记同族）；
   (b) **角色侧**：**现状无解，如实登记**——角色写入走进程内 fs 工具面（无 shell），pack 没有执行位
@@ -191,7 +191,7 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
 
 本卡原带的实验/扫描清单（E1 角色会话 fs 守卫实测、E2 双进程同盘覆写实测、Q1 成熟插件生态扫描、
 Q2 `wait_agent` 跨根会话可用性、Q3 框架先例深扫）已整体迁至研究卡
-[collab-mechanism-evidence](../_done/_closed_plans/2026-09-29-collab-mechanism-evidence.md)
+[collab-mechanism-evidence](./2026-09-29-collab-mechanism-evidence.md)
 （2026-10-03 该卡毕业迁档：E1/Q2 已答并写回本卡）。拆卡理由：用户要按"先研究什么"
 排产，研究项集中在一张卡才看得见、排得动；本卡只持有**判断**（阶梯 + 反方清单），不持有实验。
 喂给关系与结果：E1/E2 定 R0 地基与跨进程差价（**均已实测钉死**）、Q1 定"借还是自建"（已定：不引）、
@@ -203,5 +203,5 @@ Q2 定跨根感知归面板还是等机制（已定案：跨根不可用 = 无�
   ——剩 **用户点头 R0 四条清单** 这一道。E2/Q1 已答并写回本卡（差价已钉死，不再是待办）。
 - **R2 的待触发门**：触发条件两条齐 + 用户批；只做实验不进产品形态。
 - **放弃门**：E1 全绿 + N 场真多人动议（N 用户定）无触发证据 ⇒ Redis 线关门，结论并进
-  [multi-human.md](../../docs/multi-human.md) §4 的机制事实栏（"锁已由 X 提供"），本卡迁 `_done`。
+  [multi-human.md](../../../docs/multi-human.md) §4 的机制事实栏（"锁已由 X 提供"），本卡迁 `_done`。
 - 卡本身不阻塞姊妹卡：deliverables 迁移（那张）先行不依赖本卡结论。

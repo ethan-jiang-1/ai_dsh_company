@@ -18,6 +18,44 @@ export function nominalRoleOf(fileName) {
     : undefined
 }
 
+/** 稿首署名行里的当前版号（`版本 v<N>`）；无版号行 = undefined。 */
+export const DRAFT_VERSION = /版本\s*v(\d+)/
+
+export function currentVersionOf(body) {
+  const m = DRAFT_VERSION.exec(body)
+  return m === null ? undefined : Number(m[1])
+}
+
+/**
+ * final 对稿版号的引用抽取（R0-3 版本一致交叉核对的引用半边）。
+ * 认 quote-z-2026 盘上的两种真实形状（粗体/括号噪声容忍，同一行 60 字符内配对）：
+ *   ① 引用行：`drafts/cfo.md`（T1，**本定稿以 v2 为准**）
+ *   ② 审批记录表：**`deliverables/<slug>/drafts/cfo.md` v2**
+ * 同一稿被引多次（含不同版号）逐条保留——冲突引用本身就是要暴露的事实。
+ * @returns {{draft: string, cited: number}[]} draft = `drafts/<name>.md`（相对该 slug 目录）。
+ */
+export function citedVersionsOf(finalBody) {
+  const CITE = /`((?:deliverables\/[\w.-]+\/)?drafts\/[\w.-]+\.md)`[^`\n]{0,60}?v(\d+)/g
+  const out = []
+  for (const m of finalBody.matchAll(CITE)) {
+    const tail = m[1].match(/drafts\/[^/]+$/)[0]
+    out.push({ draft: tail, cited: Number(m[2]) })
+  }
+  return out
+}
+
+/**
+ * 版本一致交叉核对（R0-3；quote-z-2026 失败模式的仪器化：双签锚 v2、盘面已 v3）。
+ * 危险方向双向判红：引用版号 ≠ 稿面当前版号 ⇒ final 的依据无法按所引版号在盘上复核。
+ * 稿面无版号行（历史稿）⇒ 观察不判红（同署名档的「证据不可考不判红」精神）。
+ */
+export function crossCheckVersions(finalBody, currentByDraft) {
+  return citedVersionsOf(finalBody).map(({ draft, cited }) => {
+    const current = currentByDraft.get(draft)
+    return { draft, cited, current, stale: current !== undefined && current !== cited }
+  })
+}
+
 /**
  * 判档：一份稿的署名情况 vs 实际写入者。
  * @param body  稿全文（抽署名/更正行用）。

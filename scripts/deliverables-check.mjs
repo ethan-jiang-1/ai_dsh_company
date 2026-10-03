@@ -25,7 +25,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { requireDevHome } from './lib/runtime-home.mjs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { WARNING, auditDeliverables, parseSessionLog } from './lib/deliverables.mjs'
+import { WARNING, auditDeliverables, isPlaceholderClaim, parseSessionLog } from './lib/deliverables.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const arg = (name, fallback) => {
@@ -150,6 +150,23 @@ if (existsSync(ledgerPath) && unledgered.length > 0) {
 }
 
 const leadSessions = sessions.filter(s => s.delegationDepth === 0 && s.agentPreset === 'ceo').length
+
+// 观察项③（R0-2 占位=认领，2026-10-03）：开场抢注登记面——谁占了这个 slug 的哪个坑。
+// 判据 = lib 的 isPlaceholderClaim（首行一字不差「占位=认领，非出稿」）；只登记不判红：
+// 占位稿是过程稿的合法形状，它取代的是"文件存在 ≠ 认领"下无从查起的口头抢注。
+const claims = []
+for (const row of result.drafts) {
+  const bodyPath = join(workspace, row.path)
+  if (!existsSync(bodyPath)) continue
+  if (isPlaceholderClaim(readFileSync(bodyPath, 'utf8'))) claims.push(`${row.slug}/${row.path.split('/').pop()}`)
+}
+if (claims.length > 0) {
+  warnings.push({
+    code: WARNING.PLACEHOLDER_CLAIMS,
+    detail: `占位=认领的抢注登记：${claims.join('；')}——占坑 = 开场先落 \`drafts/<角色>.md\` 首行「占位=认领，非出稿」；真正出稿时换掉占位首行`,
+  })
+}
+
 console.log(`deliverables-check: ${workspaceRel}${LEGACY_FLAT ? '（平铺旧形状口径）' : ''}${ONLY_SLUG === undefined ? '' : `（只审 ${ONLY_SLUG}）`}`)
 console.log(`  会话日志 ${sessions.length} 份（其中 Lead ${leadSessions} 份）`)
 console.log(`  成品 ${result.finals.length} 份：${result.finals.map(f => f.path).join(' / ') || '（无）'}`)

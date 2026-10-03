@@ -131,7 +131,7 @@
 2. 任何一个 kick-off 之后的议题**最好有 metadata**——今后打整（清理/迁移/审计）才方便；
 3. 历史的东西肯定还有 **archived / rejected / implemented** 的事——所以"这底下的目录结构要思考思考如何调整"。
 
-同轮姊妹卡：[writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md)（写作协作的锁与感知，
+同轮姊妹卡：[writing-collab-locks-redis](../_done/_closed_plans/2026-09-29-writing-collab-locks-redis.md)（写作协作的锁与感知，
 含 Redis 评估）。拆两张卡的理由：本卡是**静态布局/契约重构**（不动机制，改目录、字段与门禁，可独立毕业）；
 那张是**运行时协调机制**（要不要新基建，要实验证据）。两张卡的接缝 = "元数据/事件流是谁的事实家"
 （本卡 §元数据载体的 B4 方案 vs 那张卡的审计聚合问题），互指不互吞。

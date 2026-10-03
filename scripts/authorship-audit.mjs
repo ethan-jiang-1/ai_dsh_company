@@ -15,13 +15,15 @@
 //   早期单操作者动议里 CEO 会话起草、成员审改是正常运作，拿文件名判红 = 误报（首跑曾报 12 条假 FAIL）。
 //   ⚠ **写入路径归一**：同一份日志里绝对/相对路径并存，**相对路径必须按该会话自己的 cwd 补全**
 //   （首版按脚本进程 cwd 归一 ⇒ 全部稿误判"写入者未知"）。
+//   ✓ **版本一致**（R0-3，2026-10-03 加）—— final 依据所引稿版号 == 稿面署名行当前版号；
+//   ✗ **版本过期** —— 引用 vN ≠ 稿面当前 vM（quote-z-2026 失败模式仪器化：双签锚 v2、盘面已 v3）。
 // 用法：source dev/env.sh && node scripts/authorship-audit.mjs [--workspace <dir>]
 // 退出码：0 = 无"署名不实"；1 = 有；2 = 环境（缺 DSH_HOME）。
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { join, resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { classifyAuthorship } from './lib/authorship.mjs'
+import { classifyAuthorship, crossCheckVersions, currentVersionOf } from './lib/authorship.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const WS_FLAG = process.argv.indexOf('--workspace')
@@ -106,9 +108,32 @@ for (const slug of readdirSync(join(WS, 'deliverables'))) {
   }
 }
 
+// 版本一致交叉核对（R0-3，2026-10-03；quote-z-2026 失败模式仪器化——final 依据所引版号 ≠ 稿面当前版号）：
+//   ✓ 引用版号 == 当前版号；✗ 不等（依据无法按所引版号在盘上复核）；？稿面无版号行（历史稿，观察）。
+const versionRows = []
+for (const slug of readdirSync(join(WS, 'deliverables'))) {
+  const slugDir = join(WS, 'deliverables', slug)
+  const finalPath = join(slugDir, 'final.md')
+  if (!existsSync(finalPath)) continue
+  const currentByDraft = new Map()
+  const draftsDir = join(slugDir, 'drafts')
+  if (existsSync(draftsDir)) {
+    for (const name of readdirSync(draftsDir)) {
+      if (name.endsWith('.md')) currentByDraft.set(`drafts/${name}`, currentVersionOf(readFileSync(join(draftsDir, name), 'utf8')))
+    }
+  }
+  for (const r of crossCheckVersions(readFileSync(finalPath, 'utf8'), currentByDraft)) versionRows.push({ slug, ...r })
+}
+const staleRefs = versionRows.filter(r => r.stale)
+const unversionedRefs = versionRows.filter(r => !r.stale && r.current === undefined)
+
 const COUNT = { match: 0, reclaimed: 0, fail: 0, unsigned: 0, 'unsigned-mismatch': 0, unknown: 0 }
 const MARK = { match: '✓', reclaimed: '◐', fail: '✗', 'unsigned-mismatch': '？', unsigned: '？', unknown: '？' }
-console.log(`authorship-audit: 扫 ${String(scanned)} 个会话 / ${String(rows.length)} 份稿（workspace=${WS}）`)
+console.log(`authorship-audit: 扫 ${String(scanned)} 个会话 / ${String(rows.length)} 份稿 / ${String(versionRows.length)} 处 final 版本引用（workspace=${WS}）`)
+for (const r of versionRows) {
+  if (r.current === undefined) console.log(`  ？ ${r.slug}/final.md 引用 ${r.draft} v${String(r.cited)}｜稿面无版号行（观察）`)
+  else if (r.stale) console.log(`  ✗ ${r.slug}/final.md 引用 ${r.draft} v${String(r.cited)} ≠ 稿面当前 v${String(r.current)}（依据无法按所引版号复核——quote-z 失败模式）`)
+}
 for (const r of rows) {
   COUNT[r.level] += 1
   const desc = r.level === 'match' ? `署名=${r.claimed}｜写入=${r.writer}`
@@ -120,6 +145,8 @@ for (const r of rows) {
       : `无署名行｜实际写入=${r.writer ?? '?'}`
   console.log(`  ${MARK[r.level]} ${r.slug}/${r.file}｜${desc}`)
 }
-console.log(`\nauthorship-audit: 一致 ${String(COUNT.match)}｜已收回 ${String(COUNT.reclaimed)}｜无署名(观察) ${String(COUNT.unsigned + COUNT['unsigned-mismatch'])}｜写入者不可考(观察) ${String(COUNT.unknown)}｜**署名不实 ${String(COUNT.fail)}**`)
-console.log(COUNT.fail === 0 ? 'ALL PASS（无「声明了作者却对不上且无更正行」的稿）' : `FAIL（${String(COUNT.fail)} 份稿署名不实）`)
-process.exit(COUNT.fail === 0 ? 0 : 1)
+console.log(`\nauthorship-audit: 一致 ${String(COUNT.match)}｜已收回 ${String(COUNT.reclaimed)}｜无署名(观察) ${String(COUNT.unsigned + COUNT['unsigned-mismatch'])}｜写入者不可考(观察) ${String(COUNT.unknown)}｜**署名不实 ${String(COUNT.fail)}**｜版本引用 ${String(versionRows.length)}（✗过期 ${String(staleRefs.length)}｜？无版号 ${String(unversionedRefs.length)}）`)
+const ok = COUNT.fail === 0 && staleRefs.length === 0
+console.log(ok ? 'ALL PASS（无「声明了作者却对不上且无更正行」的稿；final 版本引用全部对得上盘面）'
+  : `FAIL（署名不实 ${String(COUNT.fail)}｜版本引用过期 ${String(staleRefs.length)}）`)
+process.exit(ok ? 0 : 1)

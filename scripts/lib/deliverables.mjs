@@ -43,6 +43,17 @@ export const WARNING = {
   SLUG_COLLISION: 'slug-collision',
   /** 盘上有 `deliverables/<slug>/` 但动议台账没有该行（跑完到轮末收敛之间的正常态，也含真漏登）。 */
   SLUG_UNLEDGERED: 'slug-unledgered',
+  /** 开场占位抢注登记（R0-2）：`drafts/<role>.md` 首行「占位=认领，非出稿」= 机器可查的认领面。 */
+  PLACEHOLDER_CLAIMS: 'placeholder-claims',
+}
+
+/** 占位抢注的首行形状（R0-2，2026-10-03；「一字不差」是机器可查的前提，合同家 = multi-human.md §3 纪律 5）。 */
+export const PLACEHOLDER_CLAIM_LINE = '占位=认领，非出稿'
+
+/** 判一份稿是不是占位抢注稿：首个非空行（去首尾空白）恰好是占位首行。 */
+export function isPlaceholderClaim(body) {
+  const first = body.split('\n').find(line => line.trim() !== '')
+  return first !== undefined && first.trim() === PLACEHOLDER_CLAIM_LINE
 }
 
 /** 判据违规代码（测试与脚本都按这些码断言，别用自由文本）。 */

@@ -10,6 +10,7 @@ import {
   classifyDeliverable,
   deliverableId,
   isLeadSession,
+  isPlaceholderClaim,
   parseSessionLog,
 } from '../scripts/lib/deliverables.mjs'
 
@@ -259,5 +260,24 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
       'deliverables/reconcile-package/final.md',
     ])
     expect(result.violations).toEqual([])
+  })
+})
+
+// 占位=认领（R0-2，2026-10-03）：开场抢注的机器可查形状——首行一字不差。
+describe('占位抢注判定（isPlaceholderClaim）', () => {
+  it('首行恰好是占位首行 ⇒ true', () => {
+    expect(isPlaceholderClaim('占位=认领，非出稿\n\n正文随后换掉首行')).toBe(true)
+  })
+
+  it('首行前有空行也算（首个非空行判定）', () => {
+    expect(isPlaceholderClaim('\n占位=认领，非出稿\n')).toBe(true)
+  })
+
+  it('占位行不在首位 / 措辞走样 / 有标题在前 ⇒ false（一字不差是机器可查的前提）', () => {
+    expect(isPlaceholderClaim('# CFO 稿\n占位=认领，非出稿')).toBe(false)
+    expect(isPlaceholderClaim('占位=认领（非出稿）')).toBe(false)
+    expect(isPlaceholderClaim('占位 = 认领，非出稿')).toBe(false)
+    expect(isPlaceholderClaim('正文')).toBe(false)
+    expect(isPlaceholderClaim('')).toBe(false)
   })
 })
