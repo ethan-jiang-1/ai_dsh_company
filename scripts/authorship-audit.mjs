@@ -15,6 +15,10 @@
 //   早期单操作者动议里 CEO 会话起草、成员审改是正常运作，拿文件名判红 = 误报（首跑曾报 12 条假 FAIL）。
 //   ⚠ **写入路径归一**：同一份日志里绝对/相对路径并存，**相对路径必须按该会话自己的 cwd 补全**
 //   （首版按脚本进程 cwd 归一 ⇒ 全部稿误判"写入者未知"）。
+//   ✓ **写入者归属 = 团队成员名优先、preset 兜底**（2026-10-04 q4 动议实测修）：被 spawn 的队友会话
+//     **继承 Lead 组合 ⇒ agentPreset=ceo**（组合继承，手册机制事实）——按 preset 归属会把真队友写的
+//     成员稿误判「署名不实」。修法 = 从各会话日志的 `team/member` 事件建 sessionId→成员名映射，
+//     队友写入按成员名归属；depth=0 的根会话（人开第二扇门 preset 没改的真代笔）不受影响。
 //   ✓ **版本一致**（R0-3，2026-10-03 加）—— final 依据所引稿版号 == 稿面署名行当前版号；
 //   ✗ **版本过期** —— 引用 vN ≠ 稿面当前 vM（quote-z-2026 失败模式仪器化：双签锚 v2、盘面已 v3）。
 // 用法：source dev/env.sh && node scripts/authorship-audit.mjs [--workspace <dir>]
@@ -73,6 +77,7 @@ function writesOf(logText) {
 // 键 = **交付物身份**（deliverableId，C1 跟随扩根）：迁移改名后（deliverables/ → 归档日期前缀），
 // 日志里的老路径与盘上的新路径解析到同一身份，写入者匹配不断链；判据射程外的路径退回裸路径键。
 const writers = new Map()
+const memberBySession = new Map()
 const cutoff = Date.now() - 90 * 24 * 3600 * 1000   // 覆盖全部历史动议（09-21 起）
 let scanned = 0
 for (const bucket of readdirSync(SESSIONS)) {
@@ -89,12 +94,25 @@ for (const bucket of readdirSync(SESSIONS)) {
     const file = join(sdir, newest)
     if (statSync(file).mtimeMs < cutoff) continue
     scanned += 1
-    const { preset, files } = writesOf(readLog(file))
+    const logText = readLog(file)
+    // team/member 事件：sessionId → 成员名（写入者归属的优先键；只有 Lead 会话日志携带，扫到就收）
+    for (const line of logText.split('\n')) {
+      if (!line.includes('"team/member"')) continue
+      try {
+        const rec = JSON.parse(line)
+        const member = rec?.data?.member
+        if (typeof member?.id === 'string' && typeof member?.name === 'string') {
+          memberBySession.set(member.id, member.name)
+        }
+      } catch { /* 坏行跳过——判据只认结构化事件 */ }
+    }
+    const { preset, files } = writesOf(logText)
     for (const [abs, seq] of files) {
       const absResolved = resolve(abs)
       const rel = relative(WS, absResolved)
-      const id = rel.startsWith('deliverables') ? deliverableId(normalizeRel(rel)) : undefined
-      const key = id !== undefined ? `id:${JSON.stringify([id.slug, id.kind, id.role ?? ''])}` : absResolved
+      // 内层变量名 = did：不遮蔽外层循环的 `id`（会话目录名——成员归属的键；首版遮蔽 bug = 成员名永远查不到）
+      const did = rel.startsWith('deliverables') ? deliverableId(normalizeRel(rel)) : undefined
+      const key = did !== undefined ? `id:${JSON.stringify([did.slug, did.kind, did.role ?? ''])}` : absResolved
       const prev = writers.get(key)
       if (prev === undefined || seq > prev.seq) writers.set(key, { preset, seq, session: id })
     }
@@ -115,8 +133,9 @@ for (const root of ['deliverables', 'deliverables-archive']) {
       const rel = normalizeRel(relative(WS, path))
       const writerId = deliverableId(rel)
       const key = writerId !== undefined ? `id:${JSON.stringify([writerId.slug, writerId.kind, writerId.role ?? ''])}` : resolve(path)
-      const writer = writers.get(key) ?? null
-      rows.push({ slug, file: name, ...classifyAuthorship(readFileSync(path, 'utf8'), name, writer?.preset ?? null) })
+      const writerEntry = writers.get(key) ?? null
+      const writer = writerEntry === null ? null : (memberBySession.get(writerEntry.session) ?? writerEntry.preset)
+      rows.push({ slug, file: name, ...classifyAuthorship(readFileSync(path, 'utf8'), name, writer) })
     }
   }
 }
