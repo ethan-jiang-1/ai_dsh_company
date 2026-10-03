@@ -8,6 +8,7 @@
 
 | 日期 | 意图与交付 | 状态 |
 |---|---|---|
+| 2026-10-04 | **推进轮：meta 模板 + 多人模式三扇门真盘首跑**（用户令「继续往前推进」）：templates/meta.md + CEO skill 引用（E2E 缺口修复，preset-smoke 绿）；E2E firstdeal-v-2026——多人模式完成定义（multi-human §7/场景 F）闭环：双签两半各落各门均人应答 allowed-once、根会话归属 ✓×3、0 spawn、meta 模板首跑即合规；过程抓 2 真教训（waitTurnEnd seq 锚、操作者错话污染）+ journal-audit slug 盲区登记 | 已交付 → [E2E Note](./implemented/2026-10-04-e2e-multihuman-firstdeal.md) |
 | 2026-10-04 | **交接轮：清账 + 双轴 review + 自主 E2E**（用户选三件 + 令「会话残留能清就清」+ 令「E2E 静默自主、自拟题、多角色、证据考核」）：版本过期引用 ✗5→0；12 提交双轴复查（1 假绿面 + 1 缺失门禁已修，2 项待人拍）；会话库 1221→125；E2E 动议 realtime-recon-2026（13 判据预注册、👍 点击呈现 7/7、3 真缺陷修 2）| 已交付 → [code-review](./implemented/2026-10-04-code-review-12commits.md) + [E2E](./implemented/2026-10-04-e2e-realtime-recon.md)；待拍两笔见 code-review Note「登记不修」 |
 | 2026-10-03 | **`_backlog` 章制回借**（用户令「从 ai_dsh_loop_advisor/_backlog 学习整理」+ 两拍板：全日期卡名、两桶解禁）：主干框架/三硬规则/章程账本二分/索引交叉核对入章程，9 卡 git mv + 账本组重写，门禁 plans-liveness → backlog-liveness | 已交付 → [implemented/2026-10-03-backlog-charter-refit.md](./implemented/2026-10-03-backlog-charter-refit.md)；规矩 = [_backlog/README.md](../_backlog/README.md) |
 | 2026-10-02 | **notes 治理微整轮**（用户三连问：intents 意义 / research 残留 / pin-review JSON 落点）：intents 胖行手术回一行指针 + `intents-row-budget` 门禁（负例 = 出生现场 32 行红）；research/ 空残骸删；pin-review JSON 迁 archived/ 与先例同家 | 已交付 → [implemented/2026-10-02-notes-governance-round.md](./implemented/2026-10-02-notes-governance-round.md) |
