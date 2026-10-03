@@ -153,7 +153,7 @@
   机制核实见 [journal-date-mechanism](../../notes/implemented/2026-09-26-journal-date-mechanism.md)）⇒
   现行口径 = 文件名与首行用占位 `日期待核`，真日期由**轮末收敛或人**从会话日志（`session.createdAt`）
   回填。日期曾链式漂移复利三代（09-25 动议被记 09-28 → 次日 09-29 → 09-30），红证在案。
-  **日期从哪来**（机制层）已拆出独立卡 [date-channel-mechanism](./2026-09-29-date-channel-mechanism.md)：
+  **日期从哪来**（机制层）已拆出独立卡 [date-channel-mechanism](../_done/_closed_plans/2026-09-29-date-channel-mechanism.md)：
   留案的 pack 侧注入方案触发条件大概率已 fired（用户点名要日期）。本卡只管"日期进了树怎么摆"——
   机制卡毕业与否都不阻塞这里（A2 收敛补日期在无机制下依然成立；机制复活则回填量大减）。
 - **仓库自己的命名先例**：`notes/implemented/` = `YYYY-MM-DD-<slug>.md`；`_backlog` 卡 = `YYYY-MM-DD-<slug>.md`
@@ -263,6 +263,6 @@ CEO skill `chairing-staff-meeting` 的派活步文案。**先在 `dev/rehearsal-
   4. **归档家**（仅 C1 下有效）：(a) 共享盘内 vs (b) snapshots（完整代价见第二轮补充节）+ 死指针处置三选一 + 归档索引机制；
   5. **迁移时机**：并步（最硬论据 = 单独跑永远追尾巴）or 单独跑；**拍板前先跑零模型排练**把工时变实测（无台账 5 场未收敛是活例，其中 token-cn-idc / token-works 两场**未 git add**——git 日期通道对它们不存在）。
   **RFC 必答清单（不另设决策点）**：meta 写者矩阵（T-10：全字段单写者 = CEO、收敛字段 = 维护者，进 §4.2；veto 转录授权待裁）；T-2 meta 形状白名单；T-3 渲染验收（生成 ≡ 现台账）+ 列集变更同 diff 改 client；T-7 onlySlug 归一化同源；T-9 final-without-meta 观察项；T-11 涟漪逐条处置；T-12 文件头常量；手册改文腾位计划（行数棘轮为主约束**且更紧**——2026-10-03 实测 192/195 余 3 行；字节侧 BUG-001 已于 2026-10-02 修复，maxBytes 32768 余量 ~15KB，与日期卡共享预算池）。
-  日期机制（D2' 启用出厂 time-context）已拆到 [date-channel-mechanism](./2026-09-29-date-channel-mechanism.md)，**A2/A3 与它无依赖，仅 A1 评估依赖其落地**。
+  日期机制（D2' 启用出厂 time-context）已拆到 [date-channel-mechanism](../_done/_closed_plans/2026-09-29-date-channel-mechanism.md)，**A2/A3 与它无依赖，仅 A1 评估依赖其落地**。
 - **待触发/放弃门**：若用户裁决 A3+C2（零搬迁），则本卡降级为"加 meta + 词表"小改，R3 级，可不设 RFC。
 - **证据缺口**：原则性缺口已由两轮评审清空；零模型迁移排练跑一次即把迁移成本从估计变实测（⑤ 的拍板前置）。
