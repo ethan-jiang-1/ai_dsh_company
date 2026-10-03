@@ -317,7 +317,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
         { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/tasks', inject: () => ({ leadOf, follow, floatTab, unfloatTab }) },
         TasksTab),
       scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/cultivation', inject: () => ({ floatTab, unfloatTab, listJournal, readHead }) },
+        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/cultivation', inject: () => ({ floatTab, unfloatTab, listJournal, readHead, followEvents: follow }) },
         CultivationTab),
       scoped.slots.register(
         { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/ledger', inject: () => ({ floatTab, unfloatTab, readLedger }) },

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   CULTIVATION_ROLES,
   PREVIEW_LIMIT,
+  feedbackItems,
   inboxRows,
   journalTitle,
 } from '../packages/company-pack/src/lib/cultivation.ts'
@@ -57,5 +58,37 @@ describe('inboxRows', () => {
     const [ceo] = inboxRows({ ceo: names }, {})
     expect(ceo.entries).toHaveLength(PREVIEW_LIMIT)
     expect(ceo.count).toBe(10)
+  })
+})
+
+// feedback 读模型半边（D1「两者都要」的读模型侧，2026-10-03）：事件流 → 赞/踩当前态。
+// wire 形状 = vendor message-feedback 的会话事件（put 载荷 { item }、delete 载荷 { messageId }）。
+describe('feedbackItems', () => {
+  const put = (messageId: string, rating: 'positive' | 'negative', updatedAt: number, note?: string) =>
+    ({ type: 'feedback/message-put', data: { sessionId: 's1', item: { messageId, rating, note, version: 'v', createdAt: updatedAt - 1, updatedAt } } })
+
+  it('put → 当前态一条；note 与 rating 原样带出', () => {
+    const rows = feedbackItems([put('m1', 'positive', 100, '好判断')])
+    expect(rows).toEqual([{ messageId: 'm1', rating: 'positive', note: '好判断', updatedAt: 100 }])
+  })
+
+  it('同一 messageId 二次 put = upsert（最新覆盖）；delete = 移除', () => {
+    expect(feedbackItems([put('m1', 'positive', 100), put('m1', 'negative', 200)])).toEqual([{ messageId: 'm1', rating: 'negative', updatedAt: 200 }])
+    expect(feedbackItems([put('m1', 'positive', 100), { type: 'feedback/message-delete', data: { sessionId: 's1', messageId: 'm1' } }])).toEqual([])
+  })
+
+  it('多条按 updatedAt 倒序（最新在前）', () => {
+    const rows = feedbackItems([put('a', 'positive', 10), put('b', 'negative', 30), put('c', 'positive', 20)])
+    expect(rows.map(r => r.messageId)).toEqual(['b', 'c', 'a'])
+  })
+
+  it('非 feedback 事件与坏形状一律跳过（wire 边界不信任）', () => {
+    expect(feedbackItems([
+      { type: 'turn/start', data: {} },
+      { type: 'feedback/message-put', data: { item: { messageId: '', rating: 'positive', updatedAt: 1 } } },
+      { type: 'feedback/message-put', data: { item: { messageId: 'x', rating: 'weird', updatedAt: 1 } } },
+      { type: 'feedback/message-put', data: {} },
+      null,
+    ])).toEqual([])
   })
 })
