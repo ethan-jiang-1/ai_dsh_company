@@ -1,6 +1,6 @@
 # 2026-09-30 · 升 pin：dsh-v0.1.7-rc.2 → dsh-v0.2.0-rc.2
 
-状态：已交付（基座钉 `dsh-v0.2.0-rc.2` = `639ed015397290b3745d163aafe02ffee4aa3f84`，事务 commit `78fb7de`；官方 `sync-dsh` 只读核对「簿记一致（矩阵 3 列）」；`probe --full` 真模型档未收口，见 §未验证）
+状态：已交付（基座钉 `dsh-v0.2.0-rc.2` = `639ed015397290b3745d163aafe02ffee4aa3f84`，事务 commit `78fb7de`；官方 `sync-dsh` 只读核对「簿记一致（矩阵 3 列）」；~~`probe --full` 真模型档未收口~~ **已收口（2026-10-03 补跑 14/15、TRANSPORT 零复发，见 §风险 补跑登记）**）
 
 ## 问题
 
@@ -80,6 +80,12 @@
   的原因）。**复跑判据不变**：低峰期 `--full` 全绿后在本 Note 登记补跑结果；若低峰仍见 TRANSPORT
   悬挂，属提供方容量问题（挂账观察，不属本仓修复面）。可选缓解 = probe 头注的 timeout 默认值上调
   （90s 对"慢轮次 150s+"本就压线），留待下次动 probe 时顺手。
+  **✅ 补跑登记（2026-10-03，验证债卡第 2 笔判收）**：低峰补跑 `--full --timeout 240000` =
+  **14/15 PASS，TRANSPORT 零复发**——升 pin 轮的四轮传输悬挂全部未再出现，"提供方容量抖动"
+  的帧级定性就此关闭。唯一失败 = **ceo#3 产出断言 `/证据|验证|验收/` 词面未命中**：回复实质
+  正确（"砍掉 + 销售拿出具名客户付费信号（预算/意向书）再重开" = 证据语义的当轮措辞）——
+  内容断言的词面敏感是已知形态（模型措辞逐轮变化），非传输/适配缺陷；判据微调（可选：断言词
+  补「信号|依据」）留待下次动 probe 时顺手，不单独开题。
 - **BUG-001（手册超字节顶，16384）仍在**：0.2.0 的 agent-instructions 把截断**横幅显性化**
   （"Workspace instruction budget 16384 bytes: truncated from 16757 to 15991 bytes"——r3 重录
   fixture 可见）。本轮日期口径节改写净减约 260 字节（缓解未治愈）；修复归 BUG-001 卡自身的流程，
@@ -132,7 +138,7 @@ vendor 根新增 schedule-bundle 依赖被吸收）、staging 产物拷回（~23
 ALL PASS ／ `snapshot-motion` PASS ／ `presence-e2e` 状态链 ALL PASS（真模型）／
 `attention-e2e` 7/7 ALL PASS（触线→审批→面板→人批→同轮收口，真模型）／ `handbook-smoke` ALL PASS ／
 `delegation-smoke` ALL PASS（控制名归团队版边界）／ `export-dist` ALL PASS ／
-`probe --full` **1/15 未收口**（形态与判据见 §风险）。
+`probe --full` **14/15 已收口**（2026-10-03 补跑，TRANSPORT 零复发；唯一 miss = 内容断言词面，见 §风险）。
 
 **收割项候选（0.2.0 可见新面，未判收——升级纪律不捆绑，逐条判收归后续队列）**：
 schedule-bundle（可选 bundle：schedule/ui-schedule 出厂行）· tool-workflow / workflow-ptc / tool-ralph ·

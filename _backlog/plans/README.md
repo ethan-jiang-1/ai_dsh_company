@@ -11,7 +11,7 @@
 
 | 卡 | 一句话 | 毕业门判断 |
 |---|---|---|
-| [2026-10-02-deferred-verifications](./2026-10-02-deferred-verifications.md) | 触发条件型等待卡：两笔验证债（browser 行为复跑、`probe --full` 低峰双收口）2026-10-02 自 intents 迁来立卡 | 第 1 笔触发已成立但新阻塞（沙箱拒写 playwright 缓存树）；**seam 三选一已拍（2026-10-03）：暂缓登记**，等真实演示需求触发选型；第 2 笔等低峰窗口；各自判收即毕业 |
+| [2026-10-02-deferred-verifications](./2026-10-02-deferred-verifications.md) | 触发条件型等待卡：两笔验证债（browser 行为复跑、`probe --full` 低峰双收口）2026-10-02 自 intents 迁来立卡 | 第 1 笔触发已成立但新阻塞（沙箱拒写 playwright 缓存树）；**seam 三选一已拍（2026-10-03）：暂缓登记**，等真实演示需求触发选型；**第 2 笔已判收（2026-10-03 补跑 14/15、TRANSPORT 零复发——帧级定性归档进升 pin Note）**；剩第 1 笔，判收即毕业 |
 
 ## 卡片模板
 
