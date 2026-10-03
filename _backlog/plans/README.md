@@ -13,8 +13,7 @@
 |---|---|---|
 | [2026-09-29-deliverables-lifecycle-metadata](./2026-09-29-deliverables-lifecycle-metadata.md) | deliverables 的日期/元数据/生命周期——**2026-09-30 三路盲审修正**：D20 桥对改名不成立（slug 归一化前置）、C1 倾向弱化（引用图+判据根部两笔新账）、词表重构 | 五决策点待人拍，**前置 = 第 0 决策点 C1 搬迁 vs C2 不搬迁**（拍 C2 则④⑤失效）：命名（A1 复活待 D2' 追认 / A2 / A3）/ 事实家范围 / 词表分型（20 话题试归类已跑：覆盖率 19%）/ 归档家 / 迁移时机（拍板前先跑零模型排练） |
 | [2026-09-29-date-channel-mechanism](./2026-09-29-date-channel-mechanism.md) | 日期从哪来：出厂 time-context 已启用（探针判据翻新复跑绿）——**半实施三方错位已收口**（手册/skill/probe 三处文面 2026-09-30 改完） | 剩：机制启用的 RFC 追认（待用户） |
-| [2026-09-29-collab-mechanism-evidence](./2026-09-29-collab-mechanism-evidence.md) | 调研卡：Q0 vendor 盘点（含五件套归宿）/ Q1 外部生态 / E2 跨进程实测（守卫不闭合）/ E3 日志导出闭环 **全已答** | 余 E1/Q2，跑完即毕业消化 |
-| [2026-09-29-writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md) | 写作协作锁与感知——盲审后 R0 瘦身为四条可验收项（原 R0-5 = 现 R0 第 4 条：先实测出厂 changed-files 卡）、R1 拆两段（atomic-write 仅单机+脚本侧） | 待 E1/Q2 + 用户点头；Redis 留带触发条件的实验位 |
+| [2026-09-29-writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md) | 写作协作锁与感知——盲审后 R0 瘦身为四条可验收项（原 R0-5 = 现 R0 第 4 条：先实测出厂 changed-files 卡）、R1 拆两段（atomic-write 仅单机+脚本侧）；**E1/Q2 已答并写回（2026-10-03）：R0 地基闭合** | 待用户点头 R0 四条清单；Redis 留带触发条件的实验位 |
 | [2026-10-02-deferred-verifications](./2026-10-02-deferred-verifications.md) | 触发条件型等待卡：两笔验证债（browser 行为复跑、`probe --full` 低峰双收口）2026-10-02 自 intents 迁来立卡 | 第 1 笔触发已成立但出新阻塞（角色沙箱拒写 playwright 缓存树——上游 seam 三选一待决）；第 2 笔等低峰窗口；各自判收即整卡毕业迁档 |
 | [2026-10-02-feedback-channel-cultivation](./2026-10-02-feedback-channel-cultivation.md) | 货架残余**消费**候选——feedback 家族（出厂已挂、全库零消费）+ contextPressure / modelSelection 两条投影（零成本数据源） | D1 消费面选型（叙事决定）答完即毕业 |
 

@@ -247,7 +247,7 @@ A2 的一个真实代价要点名：**改名发生在收敛时**，意味着"进
 `$DSH_HOME` 会话日志补）+ 更新 `deliverables.mjs`/tests/snapshots 形状说明/公司手册「交付物三态」节 +
 CEO skill `chairing-staff-meeting` 的派活步文案。**先在 `dev/rehearsal-workspace/` 排练一遍**（零模型成本，
 纯脚本 + 门禁红绿），这是本卡的待跑实验；无台账行的 5 场要从会话日志补日期 ⇒ 研究卡
-[collab-mechanism-evidence](./2026-09-29-collab-mechanism-evidence.md) 的 E3（日志导出工具）是它的加速器
+[collab-mechanism-evidence](../_done/_closed_plans/2026-09-29-collab-mechanism-evidence.md) 的 E3（日志导出工具）是它的加速器
 （E3 **已落地**：2026-09-30 `scripts/session-log-export.mjs` 实测 349 份导出 + 09-26 快照 4 场审计 0 违规，
 收据 = 研究卡 E3 结论；人肉回填只剩兜底价值）。
 

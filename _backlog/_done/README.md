@@ -22,6 +22,7 @@
 | [2026-09-28-dag-edge-routing.md](_closed_plans/2026-09-28-dag-edge-routing.md) | 该做（用户点名「都要修改掉」，车道分离） | [implemented/2026-09-28-dag-edge-routing](../../notes/implemented/2026-09-28-dag-edge-routing.md) | 2026-09-28 |
 | [2026-09-28-float-geometry-memory.md](_closed_plans/2026-09-28-float-geometry-memory.md) | 该做（B 案前置已核实，用户批准转 RFC） | [implemented/2026-09-28-float-geometry-memory](../../notes/implemented/2026-09-28-float-geometry-memory.md) | 2026-09-28 |
 | [2026-09-28-sidebar-split-budget.md](_closed_plans/2026-09-28-sidebar-split-budget.md) | 不做（维持 2 停靠 + N 浮出现状，不推 upstream） | 关闭迁本目录 `_closed_plans/` | 2026-09-28 |
+| [2026-09-29-collab-mechanism-evidence.md](_closed_plans/2026-09-29-collab-mechanism-evidence.md) | 消化（六项全答：Q0/Q1/E2/E3 早已答；E1 三判据全绿 + Q2 跨根不可用定案） | 消费卡 [writing-collab-locks-redis](../plans/2026-09-29-writing-collab-locks-redis.md) 已知节 + 认证档 [fs-guard-probe.mjs](../../scripts/fs-guard-probe.mjs) | 2026-10-03 |
 
 ## 搁置推敲卡（暂停——不是做完）
 
