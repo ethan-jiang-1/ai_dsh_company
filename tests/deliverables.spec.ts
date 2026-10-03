@@ -11,7 +11,10 @@ import {
   deliverableId,
   isLeadSession,
   isPlaceholderClaim,
+  parseMeta,
   parseSessionLog,
+  slugFromDirName,
+  validateMeta,
 } from '../scripts/lib/deliverables.mjs'
 
 /**
@@ -279,5 +282,105 @@ describe('占位抢注判定（isPlaceholderClaim）', () => {
     expect(isPlaceholderClaim('占位 = 认领，非出稿')).toBe(false)
     expect(isPlaceholderClaim('正文')).toBe(false)
     expect(isPlaceholderClaim('')).toBe(false)
+  })
+})
+
+// ── C1 布局（2026-10-03 拍板）：日期前缀 + 归档根 + meta 户口 ──
+// 评审修正 1 的 slug 归一化前置 + T-11 跟随扩根 + T-2/T-7/T-9 的机器面；判据单一来源 = lib。
+describe('C1 布局：日期前缀、归档根、meta 形状', () => {
+  const lead = { id: 's1', agentPreset: 'ceo', delegationDepth: 0, presented: [{ path: 'deliverables/foo/final.md' }] }
+
+  it('slugFromDirName：剥 A1 日期前缀', () => {
+    expect(slugFromDirName('2026-09-22-agentic-coworker')).toBe('agentic-coworker')
+    expect(slugFromDirName('agentic-coworker')).toBe('agentic-coworker')
+  })
+
+  it('A1 日期前缀目录的身份 = 剥前缀 slug（deliverableId）', () => {
+    expect(deliverableId('deliverables/2026-09-22-foo/final.md')).toEqual({ slug: 'foo', kind: 'final' })
+    expect(deliverableId('deliverables/2026-09-22-foo/drafts/cfo.md')).toEqual({ slug: 'foo', kind: 'draft', role: 'cfo' })
+  })
+
+  it('归档根交付物与活跃根同构（跟随扩根）', () => {
+    expect(deliverableId('deliverables-archive/2026-09-22-foo/final.md')).toEqual({ slug: 'foo', kind: 'final' })
+    expect(classifyDeliverable('deliverables-archive/2026-09-22-foo/final.md')).toEqual({ state: 'final', slug: 'foo' })
+    expect(classifyDeliverable('deliverables-archive/2026-09-22-foo/drafts/cfo.md')).toEqual({ state: 'draft', slug: 'foo', role: 'cfo' })
+    expect(classifyDeliverable('deliverables-archive/foo-final.md')).toEqual({ state: 'other' }) // 归档根不认平铺
+  })
+
+  it('meta.md 是白名单形状（T-2），且不进 finals/drafts', () => {
+    expect(deliverableId('deliverables/foo/meta.md')).toEqual({ slug: 'foo', kind: 'meta' })
+    const result = auditDeliverables({
+      workspaceFiles: ['deliverables/2026-09-22-foo/final.md', 'deliverables/2026-09-22-foo/meta.md'],
+      sessions: [lead],
+    })
+    expect(result.metas.map(m => m.slug)).toEqual(['foo'])
+    expect(result.violations).toEqual([])
+  })
+
+  it('改名存活性（D20 桥延伸到改名）：present 记的是老形状路径、盘上已是归档日期前缀路径 ⇒ 身份对上，不判红', () => {
+    const result = auditDeliverables({
+      workspaceFiles: ['deliverables-archive/2026-09-22-foo/final.md', 'deliverables-archive/2026-09-22-foo/drafts/ceo.md'],
+      sessions: [lead],
+    })
+    expect(result.finals.map(f => f.slug)).toEqual(['foo'])
+    expect(result.violations).toEqual([])
+  })
+
+  it('onlySlug 按归一 slug 匹配（T-7：字面前缀匹配在日期前缀下会静默零匹配）', () => {
+    const files = ['deliverables-archive/2026-09-22-foo/final.md', 'deliverables-archive/2026-09-22-bar/final.md']
+    expect(auditDeliverables({ workspaceFiles: files, sessions: [lead], onlySlug: 'foo' }).finals.length).toBe(1)
+    expect(auditDeliverables({ workspaceFiles: files, sessions: [lead], onlySlug: '2026-09-22-foo' }).finals.length).toBe(0)
+  })
+
+  it('同 slug 双根并存 ⇒ slug-collision 照报（查重扫双根）', () => {
+    const duplicate = { id: 's2', agentPreset: 'ceo', delegationDepth: 0, presented: [{ path: 'deliverables/foo/final.md' }] }
+    const result = auditDeliverables({
+      workspaceFiles: ['deliverables/foo/final.md', 'deliverables-archive/2026-09-22-foo/final.md'],
+      sessions: [lead, duplicate],
+    })
+    expect(result.warnings.some(w => w.code === WARNING.SLUG_COLLISION)).toBe(true)
+  })
+})
+
+describe('meta.md 形状校验（validateMeta / parseMeta）', () => {
+  const parseAndValidate = body => ({ ...validateMeta(body), events: parseMeta(body).events })
+  const GOOD = [
+    'slug: agentic-coworker',
+    'kickoff: 2026-09-22',
+    '类型: 决策',
+    '参与: CEO+VP-Eng',
+    '结果: 已采纳',
+    'closed: 2026-09-22',
+    '墙钟: 未记',
+    '一句话结论: 方向批做、只批只读窄口径',
+    '落地事件: vp-eng 2026-09-25 认领 T1（出处 = journal）',
+    '落地事件: 维护者 2026-09-26 收敛归档',
+  ].join('\n')
+
+  it('合法 meta ⇒ ok，落地事件多条进 events', () => {
+    const { ok, fields, events } = parseAndValidate(GOOD)
+    expect(ok).toBe(true)
+    expect(fields.get('结果')).toBe('已采纳')
+    expect(events.length).toBe(2)
+  })
+
+  it('缺必填行 / 类型枚举外 / 结果枚举外 / kickoff 日期格式 ⇒ problems（红）', () => {
+    const missing = parseAndValidate('slug: foo\n结果: 已采纳')
+    expect(missing.ok).toBe(false)
+    expect(missing.problems.length).toBeGreaterThanOrEqual(2) // 缺 kickoff、缺类型
+    expect(parseAndValidate(GOOD.replace('类型: 决策', '类型: 战略')).ok).toBe(false)
+    expect(parseAndValidate(GOOD.replace('结果: 已采纳', '结果: 大胜')).ok).toBe(false)
+    expect(parseAndValidate(GOOD.replace('kickoff: 2026-09-22', 'kickoff: 09-22')).ok).toBe(false)
+  })
+
+  it('结果留空 = 合法回填态（观察归脚本侧，不判红）', () => {
+    const { ok } = parseAndValidate('slug: foo\nkickoff: 2026-09-22\n类型: 决策\n结果:')
+    expect(ok).toBe(true)
+  })
+
+  it('slug 字段带日期前缀 ⇒ 拒（日期住 kickoff 字段，不重复住 slug）', () => {
+    const { ok, problems } = parseAndValidate('slug: 2026-09-22-foo\nkickoff: 2026-09-22\n类型: 决策\n结果: 已采纳')
+    expect(ok).toBe(false)
+    expect(problems[0]).toContain('剥前缀')
   })
 })

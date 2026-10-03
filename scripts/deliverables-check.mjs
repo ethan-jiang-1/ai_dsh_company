@@ -25,7 +25,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { requireDevHome } from './lib/runtime-home.mjs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { WARNING, auditDeliverables, isPlaceholderClaim, parseSessionLog } from './lib/deliverables.mjs'
+import { VIOLATION, WARNING, auditDeliverables, isPlaceholderClaim, parseSessionLog, validateMeta } from './lib/deliverables.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const arg = (name, fallback) => {
@@ -116,8 +116,8 @@ const workspaceFiles = listFiles(workspace)
 // ⚠ fail-loud：工作区里一份 `deliverables/` 下的文件都找不到 ⇒ 几乎肯定是 `--workspace` 指错了
 // 层级（实测（R4）：指到 `company-workspace/deliverables` 本身时，相对路径全部丢掉 `deliverables/`
 // 前缀，判据会把**所有** Lead 声明报成 dangling —— 结论全假但不报错）。
-if (!workspaceFiles.some(file => file.startsWith('deliverables/'))) {
-  console.error(`deliverables-check: ${workspaceRel} 下找不到任何 deliverables/ 文件。\n  --workspace 要给**含 deliverables/ 的工作区根**（如 company-workspace），不是 deliverables/ 本身。`)
+if (!workspaceFiles.some(file => file.startsWith('deliverables/') || file.startsWith('deliverables-archive/'))) {
+  console.error(`deliverables-check: ${workspaceRel} 下找不到任何 deliverables(-archive)/ 文件。\n  --workspace 要给**含 deliverables/ 的工作区根**（如 company-workspace），不是 deliverables/ 本身。`)
   process.exit(2)
 }
 
@@ -134,10 +134,13 @@ const result = auditDeliverables({
 // 只警告不判红：动议跑完到轮末收敛之间，台账行本来就还没写（收敛时才补）。
 const ledgerPath = join(workspace, 'kb/motion-ledger.md')
 const ledgerSlugs = new Set()
+const ledgerDateBySlug = new Map()
 if (existsSync(ledgerPath)) {
   for (const line of readFileSync(ledgerPath, 'utf8').split('\n')) {
-    const cell = /^\|\s*([a-z0-9][a-z0-9-]*)\s*\|/.exec(line)?.[1]
-    if (cell !== undefined && cell !== 'slug') ledgerSlugs.add(cell)
+    const m = /^\|\s*([a-z0-9][a-z0-9-]*)\s*\|\s*(\d{4}-\d{2}-\d{2}|日期待核)/.exec(line)
+    if (m === null || m[1] === 'slug') continue
+    ledgerSlugs.add(m[1])
+    ledgerDateBySlug.set(m[1], m[2])
   }
 }
 const onDiskSlugs = [...new Set([...result.finals, ...result.drafts].map(row => row.slug))].sort()
@@ -168,6 +171,38 @@ if (claims.length > 0) {
   })
 }
 
+const violations = [...result.violations]
+// ── meta.md 户口面（布局卡 B1，2026-10-03 拍板：meta 是家、台账过渡期人工 + 一致性观察）──
+// 形状红：parse/validate 判据在 lib（validateMeta）；观察三项：final-without-meta（T-9）、
+// 结果留空（存量回填态）、kickoff 与台账日期不一致（两笔账对不上）。
+const finalSlugs = [...new Set(result.finals.map(f => f.slug))]
+const metaBySlug = new Map()
+for (const row of result.metas) {
+  const bodyPath = join(workspace, row.path)
+  if (!existsSync(bodyPath)) continue
+  const body = readFileSync(bodyPath, 'utf8')
+  const verdict = validateMeta(body)
+  if (!verdict.ok) {
+    violations.push({ code: VIOLATION.META_SHAPE_BAD, path: row.path, detail: `meta.md 形状不合法：${verdict.problems.join('；')}` })
+    continue
+  }
+  metaBySlug.set(row.slug, { path: row.path, fields: verdict.fields })
+}
+for (const slug of finalSlugs) {
+  if (!metaBySlug.has(slug)) {
+    warnings.push({ code: WARNING.FINAL_WITHOUT_META, detail: `成品 \`${slug}/final.md\` 在盘上但没有 meta.md（T-9：没有户口的成品绕过一切新检查）——补 \`meta.md\`（形状 = lib validateMeta）` })
+  }
+}
+for (const [slug, meta] of metaBySlug) {
+  if (meta.fields.get('结果') === '') {
+    warnings.push({ code: WARNING.META_RESULT_PENDING, detail: `\`${slug}/meta.md\` 的「结果」留空（存量迁移回填态）——收敛时维护者回填（词表 = lib META_RESULTS）` })
+  }
+  const ledgerDate = ledgerDateBySlug.get(slug)
+  if (ledgerDate !== undefined && ledgerDate !== '日期待核' && meta.fields.get('kickoff') !== ledgerDate) {
+    warnings.push({ code: WARNING.META_LEDGER_MISMATCH, detail: `\`${slug}/meta.md\` kickoff = ${meta.fields.get('kickoff')} ≠ 台账日期列 ${ledgerDate}——两笔账对不上，以会话日志 createdAt 复核后对齐一处` })
+  }
+}
+
 console.log(`deliverables-check: ${workspaceRel}${LEGACY_FLAT ? '（平铺旧形状口径）' : ''}${ONLY_SLUG === undefined ? '' : `（只审 ${ONLY_SLUG}）`}`)
 console.log(`  会话日志 ${sessions.length} 份（其中 Lead ${leadSessions} 份）`)
 console.log(`  成品 ${result.finals.length} 份：${result.finals.map(f => f.path).join(' / ') || '（无）'}`)
@@ -176,12 +211,12 @@ if (warnings.length > 0) {
   console.log(`  观察项 ${warnings.length} 条（不判违规，但每次都提醒）：`)
   for (const w of warnings) console.log(`    ${w.code} | ${w.detail}`)
 }
-if (result.violations.length === 0) {
+if (violations.length === 0) {
   console.log('  违规 0 条 —— ALL PASS')
   process.exit(0)
 }
-console.log(`  违规 ${result.violations.length} 条：`)
-for (const violation of result.violations) {
+console.log(`  违规 ${violations.length} 条：`)
+for (const violation of violations) {
   console.log(`    ${violation.code} | ${violation.path}\n      ${violation.detail}`)
 }
 process.exit(1)

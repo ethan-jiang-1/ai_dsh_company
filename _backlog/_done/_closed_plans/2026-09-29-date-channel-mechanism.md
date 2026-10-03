@@ -9,7 +9,7 @@
   C 文案止损，留案了 A（pack 侧自建 `systemPrompt.context` 注入）与 B（上游 seam）两个未批方案，
   触发条件 = "日期缺失再次造成问题，或用户点名"——**已 fired**（用户点名）。
 - 拆卡理由不变：本卡是机制问题（company-pack 组合面），与姊妹卡
-  [deliverables-lifecycle-metadata](../../plans/2026-09-29-deliverables-lifecycle-metadata.md)（纯目录/契约）正交；
+  [deliverables-lifecycle-metadata](./2026-09-29-deliverables-lifecycle-metadata.md)（纯目录/契约）正交；
   作用面不止 deliverables（journal 文件名、台账行、一切要日期的产物）。
 
 ## 已知与未决

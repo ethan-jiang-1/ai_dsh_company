@@ -26,6 +26,7 @@
 | [2026-09-29-date-channel-mechanism.md](_closed_plans/2026-09-29-date-channel-mechanism.md) | 该做（D2' 已兑现并获用户追认——「未批先行」消除） | [implemented/2026-10-03-d2-time-context-ratification](../../notes/implemented/2026-10-03-d2-time-context-ratification.md)（实现事实家 = 升 pin Note + 收割轮批3） | 2026-10-03 |
 | [2026-10-02-feedback-channel-cultivation.md](_closed_plans/2026-10-02-feedback-channel-cultivation.md) | 该做（D1 选型拍定：两者都要——读模型 + 手册引导） | 实施随培养回路下一轮立项，届时新 RFC 引本卡 | 2026-10-03 |
 | [2026-09-29-writing-collab-locks-redis.md](_closed_plans/2026-09-29-writing-collab-locks-redis.md) | 该做（R0 四条已落地；R2 留带触发条件的实验位随 Note） | [implemented/2026-10-03-redis-r0-native-collab](../../notes/implemented/2026-10-03-redis-r0-native-collab.md) | 2026-10-03 |
+| [2026-09-29-deliverables-lifecycle-metadata.md](_closed_plans/2026-09-29-deliverables-lifecycle-metadata.md) | 该做（五决策点拍定并同 diff 落地：C1/A1/B1/分型/归档家/并步） | [implemented/2026-10-03-deliverables-lifecycle-landing](../../notes/implemented/2026-10-03-deliverables-lifecycle-landing.md) | 2026-10-03 |
 
 ## 搁置推敲卡（暂停——不是做完）
 

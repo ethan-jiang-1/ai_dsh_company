@@ -1,6 +1,6 @@
 # 推敲：deliverables 的日期、元数据与生命周期归宿（archived / rejected / implemented 怎么落进目录）
 
-> 状态：推敲中（2026-09-30 三路盲审后修正）｜毕业门判断 = 方向该做不变，但 **C1 倾向弱化（slug 归一化 + 引用图两笔新账）、C2 权重上升**；决策点扩为五个｜下一步 = 用户拍五决策点（命名 / 事实家范围 / 词表重构 / 归档家 / 迁移时机）
+> 状态：已毕业（2026-10-03，五决策点拍定并同 diff 落地）｜批准：用户 2026-10-03 拍 C1 搬迁 + A1/B1/分型/归档家/并步（对话在案）｜去向 = [notes/implemented/2026-10-03-deliverables-lifecycle-landing.md](../../../notes/implemented/2026-10-03-deliverables-lifecycle-landing.md)（存量 22 话题已迁入 deliverables-archive/，check 违规 0）｜原毕业门判断 = 方向该做（五点拍定即落地）
 
 ## 评审修正（2026-09-30，三路盲审合并；原文保留于下文各节，本节为准）
 
@@ -131,7 +131,7 @@
 2. 任何一个 kick-off 之后的议题**最好有 metadata**——今后打整（清理/迁移/审计）才方便；
 3. 历史的东西肯定还有 **archived / rejected / implemented** 的事——所以"这底下的目录结构要思考思考如何调整"。
 
-同轮姊妹卡：[writing-collab-locks-redis](../_done/_closed_plans/2026-09-29-writing-collab-locks-redis.md)（写作协作的锁与感知，
+同轮姊妹卡：[writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md)（写作协作的锁与感知，
 含 Redis 评估）。拆两张卡的理由：本卡是**静态布局/契约重构**（不动机制，改目录、字段与门禁，可独立毕业）；
 那张是**运行时协调机制**（要不要新基建，要实验证据）。两张卡的接缝 = "元数据/事件流是谁的事实家"
 （本卡 §元数据载体的 B4 方案 vs 那张卡的审计聚合问题），互指不互吞。
@@ -142,18 +142,18 @@
 
 - `deliverables/` 下 **20 个话题目录**，命名全部 = 裸 `<slug>`（无日期）；**全部有 `final.md`**；过程稿有无
   取决于轮末收敛（09-26 轮的 4 场 drafts 已随轮归档进
-  [memory-convergence-2026-09-26](../../snapshots/memory-convergence-2026-09-26/README.md)，live 只剩 final）。
+  [memory-convergence-2026-09-26](../../../snapshots/memory-convergence-2026-09-26/README.md)，live 只剩 final）。
 - **日期的唯一事实家 = `kb/motion-ledger.md`**（slug｜日期｜类型｜参与｜墙钟｜成品｜一句话结论），由维护者
-  在**轮末收敛**时手工追加（[snapshots/README.md §归档动作](../../snapshots/README.md) 第 4 步）。
+  在**轮末收敛**时手工追加（[snapshots/README.md §归档动作](../../../snapshots/README.md) 第 4 步）。
   **中心表已经在漏**：盘上 20 个目录，台账只有 16 行——09-28/29 新增的 5 场
   （token-×3、cd/sh-mz-agent-2026）**全部无行**（`deliverables-check` 的观察项 `slug-unledgered`
-  每次提醒，见 [entry-execution-chain-debt](../../notes/implemented/2026-09-26-entry-execution-chain-debt.md)）。
+  每次提醒，见 [entry-execution-chain-debt](../../../notes/implemented/2026-09-26-entry-execution-chain-debt.md)）。
   这正是"中心表手工同步"模式的固有漂移，不是执行疏忽。
 - **公司角色没有任何取真日期的通道**（无 shell、无时钟工具、runtime context 无日期、fs 模型面无 mtime——
-  机制核实见 [journal-date-mechanism](../../notes/implemented/2026-09-26-journal-date-mechanism.md)）⇒
+  机制核实见 [journal-date-mechanism](../../../notes/implemented/2026-09-26-journal-date-mechanism.md)）⇒
   现行口径 = 文件名与首行用占位 `日期待核`，真日期由**轮末收敛或人**从会话日志（`session.createdAt`）
   回填。日期曾链式漂移复利三代（09-25 动议被记 09-28 → 次日 09-29 → 09-30），红证在案。
-  **日期从哪来**（机制层）已拆出独立卡 [date-channel-mechanism](../_done/_closed_plans/2026-09-29-date-channel-mechanism.md)：
+  **日期从哪来**（机制层）已拆出独立卡 [date-channel-mechanism](./2026-09-29-date-channel-mechanism.md)：
   留案的 pack 侧注入方案触发条件大概率已 fired（用户点名要日期）。本卡只管"日期进了树怎么摆"——
   机制卡毕业与否都不阻塞这里（A2 收敛补日期在无机制下依然成立；机制复活则回填量大减）。
 - **仓库自己的命名先例**：`notes/implemented/` = `YYYY-MM-DD-<slug>.md`；`_backlog` 卡 = `YYYY-MM-DD-<slug>.md`
@@ -170,7 +170,7 @@
 - **反向锁**：被 `present` 过的 final **永不删**（`deliverables-check` 反查）⇒ 任何"归档 = 移走"的方案
   必须让脚本认识新家，否则反向锁失效。
 - **rejected 的现状是最疼的**：09-26 有一场动议中途卡死、另一场重跑共用 `renewal-y-2026`，
-  产物**两场混装**而三态判据看不出（[memory-convergence-2026-09-26 README §边界 1](../../snapshots/memory-convergence-2026-09-26/README.md)）。
+  产物**两场混装**而三态判据看不出（[memory-convergence-2026-09-26 README §边界 1](../../../snapshots/memory-convergence-2026-09-26/README.md)）。
   若当时话题带状态（第一场标"已废弃"），撞车在盘面上一眼可辨。⇒ 状态不是锦上添花，是防混装的护栏。
 
 ### 一个需要先想清楚的概念拆解：用户说的三个词其实跨了两个轴
@@ -247,7 +247,7 @@ A2 的一个真实代价要点名：**改名发生在收敛时**，意味着"进
 `$DSH_HOME` 会话日志补）+ 更新 `deliverables.mjs`/tests/snapshots 形状说明/公司手册「交付物三态」节 +
 CEO skill `chairing-staff-meeting` 的派活步文案。**先在 `dev/rehearsal-workspace/` 排练一遍**（零模型成本，
 纯脚本 + 门禁红绿），这是本卡的待跑实验；无台账行的 5 场要从会话日志补日期 ⇒ 研究卡
-[collab-mechanism-evidence](../_done/_closed_plans/2026-09-29-collab-mechanism-evidence.md) 的 E3（日志导出工具）是它的加速器
+[collab-mechanism-evidence](./2026-09-29-collab-mechanism-evidence.md) 的 E3（日志导出工具）是它的加速器
 （E3 **已落地**：2026-09-30 `scripts/session-log-export.mjs` 实测 349 份导出 + 09-26 快照 4 场审计 0 违规，
 收据 = 研究卡 E3 结论；人肉回填只剩兜底价值）。
 
@@ -263,6 +263,6 @@ CEO skill `chairing-staff-meeting` 的派活步文案。**先在 `dev/rehearsal-
   4. **归档家**（仅 C1 下有效）：(a) 共享盘内 vs (b) snapshots（完整代价见第二轮补充节）+ 死指针处置三选一 + 归档索引机制；
   5. **迁移时机**：并步（最硬论据 = 单独跑永远追尾巴）or 单独跑；**拍板前先跑零模型排练**把工时变实测（无台账 5 场未收敛是活例，其中 token-cn-idc / token-works 两场**未 git add**——git 日期通道对它们不存在）。
   **RFC 必答清单（不另设决策点）**：meta 写者矩阵（T-10：全字段单写者 = CEO、收敛字段 = 维护者，进 §4.2；veto 转录授权待裁）；T-2 meta 形状白名单；T-3 渲染验收（生成 ≡ 现台账）+ 列集变更同 diff 改 client；T-7 onlySlug 归一化同源；T-9 final-without-meta 观察项；T-11 涟漪逐条处置；T-12 文件头常量；手册改文腾位计划（行数棘轮为主约束**且更紧**——2026-10-03 实测 192/195 余 3 行；字节侧 BUG-001 已于 2026-10-02 修复，maxBytes 32768 余量 ~15KB，与日期卡共享预算池）。
-  日期机制（D2' 启用出厂 time-context）已拆到 [date-channel-mechanism](../_done/_closed_plans/2026-09-29-date-channel-mechanism.md)，**A2/A3 与它无依赖，仅 A1 评估依赖其落地**。
+  日期机制（D2' 启用出厂 time-context）已拆到 [date-channel-mechanism](./2026-09-29-date-channel-mechanism.md)，**A2/A3 与它无依赖，仅 A1 评估依赖其落地**。
 - **待触发/放弃门**：若用户裁决 A3+C2（零搬迁），则本卡降级为"加 meta + 词表"小改，R3 级，可不设 RFC。
 - **证据缺口**：原则性缺口已由两轮评审清空；零模型迁移排练跑一次即把迁移成本从估计变实测（⑤ 的拍板前置）。

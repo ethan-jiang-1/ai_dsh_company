@@ -9,7 +9,7 @@
 - [writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md)（Redis/锁判断）的整个 R0 地基
   = "`fs-observation-policy` 已激活且行为如文档所述"——组合层事实核实了（base bundle 插行、无人禁用），
   但**角色会话里的实际行为没实测过**；
-- [deliverables-lifecycle-metadata](../../plans/2026-09-29-deliverables-lifecycle-metadata.md)（deliverables 布局）的
+- [deliverables-lifecycle-metadata](./2026-09-29-deliverables-lifecycle-metadata.md)（deliverables 布局）的
   收敛回填依赖会话日志，而快照侧的日志导出缺口是[已登记的坑](../../../snapshots/README.md)。
 
 用户 2026-09-29 要求按"先研究什么、后研究什么"排产 ⇒ 把全部研究项**收进一张卡**（D31：调研 = 卡性质），

@@ -30,6 +30,18 @@ export const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
 export const FINAL_BASENAME = 'final.md'
 export const DRAFTS_DIRNAME = 'drafts'
 
+/** 活跃根与归档根（C1，2026-10-03 拍板：收敛件整目录 git mv 进归档家，判据跟随扩根——T-11 处置 = 跟随扩根）。 */
+export const ACTIVE_ROOT = 'deliverables/'
+export const ARCHIVE_ROOT = 'deliverables-archive/'
+
+/** 话题目录名的日期前缀（A1 命名：`<kickoff 日期>-<slug>`）；slug = 剥前缀。 */
+const DATE_PREFIX = /^\d{4}-\d{2}-\d{2}-/
+
+/** 话题目录名 → slug（剥日期前缀；无前缀原样返回）。 */
+export function slugFromDirName(dirName) {
+  return dirName.replace(DATE_PREFIX, '')
+}
+
 /** 平铺旧形状里表达"这份就是定稿"的后缀（R2 用过 `reconcile-package-final.md`）。 */
 const LEGACY_FINAL_SUFFIX = '-final'
 
@@ -45,6 +57,12 @@ export const WARNING = {
   SLUG_UNLEDGERED: 'slug-unledgered',
   /** 开场占位抢注登记（R0-2）：`drafts/<role>.md` 首行「占位=认领，非出稿」= 机器可查的认领面。 */
   PLACEHOLDER_CLAIMS: 'placeholder-claims',
+  /** 成品在盘上但同 slug 没有 meta.md（T-9：绕过一切新检查、从生成台账消失的入口）。 */
+  FINAL_WITHOUT_META: 'final-without-meta',
+  /** meta 的「结果」留空（存量迁移回填态；收敛时维护者回填）。 */
+  META_RESULT_PENDING: 'meta-result-pending',
+  /** meta.kickoff 与台账日期列不一致（两笔账对不上——B4 一致性门禁的观察半边）。 */
+  META_LEDGER_MISMATCH: 'meta-ledger-mismatch',
 }
 
 /** 占位抢注的首行形状（R0-2，2026-10-03；「一字不差」是机器可查的前提，合同家 = multi-human.md §3 纪律 5）。 */
@@ -54,6 +72,54 @@ export const PLACEHOLDER_CLAIM_LINE = '占位=认领，非出稿'
 export function isPlaceholderClaim(body) {
   const first = body.split('\n').find(line => line.trim() !== '')
   return first !== undefined && first.trim() === PLACEHOLDER_CLAIM_LINE
+}
+
+// ── meta.md（B1 事实家，2026-10-03 拍板；机器可读行风格照「派活行」先例）──
+
+/** 动议分型（决策点③：先分型再定词——试金 22 话题全覆盖的四型）。 */
+export const META_TYPES = ['决策', '生产', '诊断', '口径问答']
+/** 决议结果枚举（跨型共用；单值装不下的历史由「落地事件」多行字段承载）。 */
+export const META_RESULTS = ['进行中', '已采纳', '已否决', '已搁置', '已废弃', '判不了', '已完成']
+
+/**
+ * 解析 meta.md 全文：`字段: 值` 行进 fields（取首现），`落地事件:` 行逐条进 events（多值）。
+ * 不认形状的行忽略——校验交给 {@link validateMeta}，解析不抛。
+ */
+export function parseMeta(body) {
+  const fields = new Map()
+  const events = []
+  for (const line of body.split('\n')) {
+    const m = /^([\w一-鿿]+)\s*[:：]\s*(.*)$/.exec(line.trim())
+    if (m === null) continue
+    if (m[1] === '落地事件') { if (m[2].trim() !== '') events.push(m[2].trim()); continue }
+    if (!fields.has(m[1])) fields.set(m[1], m[2].trim())
+  }
+  return { fields, events }
+}
+
+/**
+ * 校验 meta.md 形状（机器可查的字段面；缺行/枚举外/日期格式不对 = 红，走 `META_SHAPE_BAD`）。
+ * 「结果」行允许**留空**（存量迁移的回填态）——留空归观察（`META_RESULT_PENDING`），不判红。
+ */
+export function validateMeta(body) {
+  const { fields } = parseMeta(body)
+  const problems = []
+  for (const key of ['slug', 'kickoff', '类型', '结果']) {
+    if (!fields.has(key)) problems.push(`缺行「${key}:」`)
+  }
+  if (fields.has('kickoff') && !/^\d{4}-\d{2}-\d{2}$/.test(fields.get('kickoff'))) {
+    problems.push(`kickoff 不是 YYYY-MM-DD：「${fields.get('kickoff')}」`)
+  }
+  if (fields.has('类型') && fields.get('类型') !== '' && !META_TYPES.includes(fields.get('类型'))) {
+    problems.push(`类型不在词表 ${JSON.stringify(META_TYPES)}：「${fields.get('类型')}」`)
+  }
+  if (fields.has('结果') && fields.get('结果') !== '' && !META_RESULTS.includes(fields.get('结果'))) {
+    problems.push(`结果不在词表 ${JSON.stringify(META_RESULTS)}：「${fields.get('结果')}」`)
+  }
+  if (fields.has('slug') && /\d{4}-\d{2}-\d{2}-/.test(fields.get('slug'))) {
+    problems.push('slug 字段写剥前缀形式（不带日期前缀——日期住 kickoff 字段）')
+  }
+  return { ok: problems.length === 0, problems, fields }
 }
 
 /** 判据违规代码（测试与脚本都按这些码断言，别用自由文本）。 */
@@ -66,6 +132,8 @@ export const VIOLATION = {
   FINAL_PRESENTED_BY_NON_LEAD: 'final-presented-by-non-lead',
   /** `deliverables/` 下的 `.md` 既不是成品也不是过程稿形状。 */
   UNSHAPED_FILE: 'unshaped-file',
+  /** meta.md 形状不合法（缺必填行 / 枚举外取值 / 日期格式不对——validateMeta 的判红面）。 */
+  META_SHAPE_BAD: 'meta-shape-bad',
   /** `present` 提及的过程稿在盘上找不到（反向检查）。 */
   DANGLING_PRESENT: 'dangling-present',
 }
@@ -94,15 +162,17 @@ function idKey(id) {
  */
 export function deliverableId(relPath) {
   const path = normalizeRel(relPath)
-  if (!path.startsWith('deliverables/') || !path.endsWith('.md')) return undefined
-  const parts = path.slice('deliverables/'.length).split('/')
+  const root = path.startsWith(ACTIVE_ROOT) ? ACTIVE_ROOT : path.startsWith(ARCHIVE_ROOT) ? ARCHIVE_ROOT : undefined
+  if (root === undefined || !path.endsWith('.md')) return undefined
+  const parts = path.slice(root.length).split('/')
 
-  // 新形状（三态的字面形状）
-  if (parts.length === 2 && parts[1] === FINAL_BASENAME) return { slug: parts[0], kind: 'final' }
+  // 新形状（三态的字面形状 + meta 户口；目录名可带 A1 日期前缀，slug 按剥前缀归一）
+  if (parts.length === 2 && parts[1] === FINAL_BASENAME) return { slug: slugFromDirName(parts[0]), kind: 'final' }
+  if (parts.length === 2 && parts[1] === 'meta.md') return { slug: slugFromDirName(parts[0]), kind: 'meta' }
   if (parts.length === 3 && parts[1] === DRAFTS_DIRNAME) {
-    return { slug: parts[0], kind: 'draft', role: parts[2].replace(/\.md$/, '') }
+    return { slug: slugFromDirName(parts[0]), kind: 'draft', role: parts[2].replace(/\.md$/, '') }
   }
-  if (parts.length !== 1) return undefined
+  if (parts.length !== 1 || root === ARCHIVE_ROOT) return undefined
 
   // 平铺旧形状
   let base = parts[0].replace(/\.md$/, '')
@@ -129,11 +199,13 @@ export function deliverableId(relPath) {
  */
 export function classifyDeliverable(relPath, options = {}) {
   const path = normalizeRel(relPath)
-  if (!path.startsWith('deliverables/') || !path.endsWith('.md')) return { state: 'other' }
-  const flat = !path.slice('deliverables/'.length).includes('/')
-  if (flat && options.legacyFlat !== true) return { state: 'other' }
+  const root = path.startsWith(ACTIVE_ROOT) ? ACTIVE_ROOT : path.startsWith(ARCHIVE_ROOT) ? ARCHIVE_ROOT : undefined
+  if (root === undefined || !path.endsWith('.md')) return { state: 'other' }
+  const flat = !path.slice(root.length).includes('/')
+  if (flat && (root === ARCHIVE_ROOT || options.legacyFlat !== true)) return { state: 'other' }
   const id = deliverableId(path)
   if (id === undefined) return { state: 'other' }
+  if (id.kind === 'meta') return { state: 'meta', slug: id.slug }
   return id.kind === 'final'
     ? { state: 'final', slug: id.slug }
     : { state: 'draft', slug: id.slug, role: id.role }
@@ -194,13 +266,15 @@ export function auditDeliverables(input) {
   const { workspaceFiles, sessions } = input
   const legacyFlat = input.legacyFlat === true
   const leadPreset = input.leadPreset ?? 'ceo'
-  const scope = input.onlySlug === undefined ? undefined : `deliverables/${String(input.onlySlug)}/`
-  const inScope = path => scope === undefined || path.startsWith(scope)
+  // 只审一个 slug：按**归一后的 slug** 匹配（T-7——A1 日期前缀目录名 ≠ slug，字面前缀匹配会静默零匹配）。
+  const onlySlug = input.onlySlug === undefined ? undefined : String(input.onlySlug)
+  const inScope = path => onlySlug === undefined || deliverableId(path)?.slug === onlySlug
 
   const onDisk = new Set(workspaceFiles.map(normalizeRel).filter(inScope))
   const onDiskIds = new Set()
   const finals = []
   const drafts = []
+  const metas = []
   const unshaped = []
   for (const file of onDisk) {
     const id = deliverableId(file)
@@ -208,7 +282,8 @@ export function auditDeliverables(input) {
     const verdict = classifyDeliverable(file, { legacyFlat })
     if (verdict.state === 'final') finals.push({ path: file, slug: verdict.slug })
     else if (verdict.state === 'draft') drafts.push({ path: file, slug: verdict.slug, role: verdict.role })
-    else if (file.startsWith('deliverables/') && file.endsWith('.md')) unshaped.push(file)
+    else if (verdict.state === 'meta') metas.push({ path: file, slug: verdict.slug })
+    else if ((file.startsWith(ACTIVE_ROOT) || file.startsWith(ARCHIVE_ROOT)) && file.endsWith('.md')) unshaped.push(file)
   }
 
   // 声明面：判据只追 **Lead 声明**——`company-workspace/AGENTS.md` 的承诺权写明只有 CEO 的
@@ -281,7 +356,7 @@ export function auditDeliverables(input) {
     violations.push({
       code: VIOLATION.UNSHAPED_FILE,
       path,
-      detail: `deliverables/ 下的 .md 必须是 <slug>/${FINAL_BASENAME} 或 <slug>/${DRAFTS_DIRNAME}/<role>.md`,
+      detail: `deliverables(-archive)/ 下的 .md 必须是 <slug>/${FINAL_BASENAME}、<slug>/meta.md 或 <slug>/${DRAFTS_DIRNAME}/<role>.md`,
     })
   }
   // 反向检查：Lead 声明过的过程稿必须还在盘上（过程稿是 CEO 引用的证据，丢了要报）。
@@ -306,5 +381,5 @@ export function auditDeliverables(input) {
       })
     }
   }
-  return { finals, drafts, violations, warnings }
+  return { finals, drafts, metas, violations, warnings }
 }

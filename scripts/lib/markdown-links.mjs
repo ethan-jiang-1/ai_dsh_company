@@ -27,7 +27,7 @@ const { gfm } = await import(pathToFileURL(resolveParser('micromark-extension-gf
 
 // These are not source corpora. Active implemented/postmortem Notes ARE sources (no rejected/ dir).
 const EXCLUDED = new Set(['node_modules', 'vendor', 'lib', 'dist', 'build', 'generated', 'dev',
-  'snapshots', 'journal', 'deliverables', 'archived', 'archive', 'historical'])
+  'snapshots', 'journal', 'deliverables', 'deliverables-archive', 'archived', 'archive', 'historical'])
 
 /** Discover current Markdown from disk, including untracked/new Notes; never follow directory symlinks. */
 export function sourceMarkdownFiles(root) {

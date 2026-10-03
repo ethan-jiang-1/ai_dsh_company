@@ -21,8 +21,9 @@
 // 退出码：0 = 无"署名不实"；1 = 有；2 = 环境（缺 DSH_HOME）。
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
-import { join, resolve, dirname } from 'node:path'
+import { join, relative, resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { deliverableId, normalizeRel } from './lib/deliverables.mjs'
 import { classifyAuthorship, crossCheckVersions, currentVersionOf } from './lib/authorship.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -68,7 +69,9 @@ function writesOf(logText) {
   return { preset, files }
 }
 
-// 索引：归一后的文件路径 → 写入它的会话（取该文件上写入序最大的那个）
+// 索引：写入目标 → 写它的会话（取该目标上写入序最大的那个）。
+// 键 = **交付物身份**（deliverableId，C1 跟随扩根）：迁移改名后（deliverables/ → 归档日期前缀），
+// 日志里的老路径与盘上的新路径解析到同一身份，写入者匹配不断链；判据射程外的路径退回裸路径键。
 const writers = new Map()
 const cutoff = Date.now() - 90 * 24 * 3600 * 1000   // 覆盖全部历史动议（09-21 起）
 let scanned = 0
@@ -88,31 +91,44 @@ for (const bucket of readdirSync(SESSIONS)) {
     scanned += 1
     const { preset, files } = writesOf(readLog(file))
     for (const [abs, seq] of files) {
-      const key = resolve(abs)
+      const absResolved = resolve(abs)
+      const rel = relative(WS, absResolved)
+      const id = rel.startsWith('deliverables') ? deliverableId(normalizeRel(rel)) : undefined
+      const key = id !== undefined ? `id:${JSON.stringify([id.slug, id.kind, id.role ?? ''])}` : absResolved
       const prev = writers.get(key)
       if (prev === undefined || seq > prev.seq) writers.set(key, { preset, seq, session: id })
     }
   }
 }
 
-// 共享盘：每份稿 判档（判据 = lib/authorship.mjs）
+// 共享盘（活跃根 + 归档根，C1 跟随扩根）：每份稿 判档（判据 = lib/authorship.mjs）
 const rows = []
-for (const slug of readdirSync(join(WS, 'deliverables'))) {
-  const drafts = join(WS, 'deliverables', slug, 'drafts')
-  if (!existsSync(drafts)) continue
-  for (const name of readdirSync(drafts)) {
-    if (!name.endsWith('.md')) continue
-    const path = join(drafts, name)
-    const writer = writers.get(resolve(path)) ?? null
-    rows.push({ slug, file: name, ...classifyAuthorship(readFileSync(path, 'utf8'), name, writer?.preset ?? null) })
+for (const root of ['deliverables', 'deliverables-archive']) {
+  const rootDir = join(WS, root)
+  if (!existsSync(rootDir)) continue
+  for (const slug of readdirSync(rootDir)) {
+    const drafts = join(rootDir, slug, 'drafts')
+    if (!existsSync(drafts)) continue
+    for (const name of readdirSync(drafts)) {
+      if (!name.endsWith('.md')) continue
+      const path = join(drafts, name)
+      const rel = normalizeRel(relative(WS, path))
+      const writerId = deliverableId(rel)
+      const key = writerId !== undefined ? `id:${JSON.stringify([writerId.slug, writerId.kind, writerId.role ?? ''])}` : resolve(path)
+      const writer = writers.get(key) ?? null
+      rows.push({ slug, file: name, ...classifyAuthorship(readFileSync(path, 'utf8'), name, writer?.preset ?? null) })
+    }
   }
 }
 
 // 版本一致交叉核对（R0-3，2026-10-03；quote-z-2026 失败模式仪器化——final 依据所引版号 ≠ 稿面当前版号）：
 //   ✓ 引用版号 == 当前版号；✗ 不等（依据无法按所引版号在盘上复核）；？稿面无版号行（历史稿，观察）。
 const versionRows = []
-for (const slug of readdirSync(join(WS, 'deliverables'))) {
-  const slugDir = join(WS, 'deliverables', slug)
+for (const root of ['deliverables', 'deliverables-archive']) {
+  const rootDir = join(WS, root)
+  if (!existsSync(rootDir)) continue
+  for (const slug of readdirSync(rootDir)) {
+  const slugDir = join(rootDir, slug)
   const finalPath = join(slugDir, 'final.md')
   if (!existsSync(finalPath)) continue
   const currentByDraft = new Map()
@@ -123,6 +139,7 @@ for (const slug of readdirSync(join(WS, 'deliverables'))) {
     }
   }
   for (const r of crossCheckVersions(readFileSync(finalPath, 'utf8'), currentByDraft)) versionRows.push({ slug, ...r })
+  }
 }
 const staleRefs = versionRows.filter(r => r.stale)
 const unversionedRefs = versionRows.filter(r => !r.stale && r.current === undefined)

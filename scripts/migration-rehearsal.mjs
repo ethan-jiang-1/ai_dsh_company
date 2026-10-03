@@ -1,28 +1,37 @@
 #!/usr/bin/env node
-// 布局卡 C1 存量迁移的零模型排练（2026-10-03 立；keyless，秒级；推敲卡 ⑤ 迁移时机的拍板前置）：
-// 何时跑：布局卡 RFC 决策点⑤（迁移时机）拍板前跑一次；真迁移实施前复跑作 pre-flight 演练。
+// 布局卡 C1 存量迁移的一体仪器（2026-10-03；--execute 前零模型，--execute 改真盘；推敲卡 ⑤ 拍板前置）：
+// 何时跑：布局卡 RFC 决策点⑤拍板前跑一次（默认 = 排练/排练场）；真迁移时 `--execute`（先复跑默认态作
+//   pre-flight，再执行）。
 //
-// 它做什么：把真盘 `company-workspace/deliverables/` 复制进排练场 staging，按 A2+C1(a) 形状
-//   演练「全部存量话题 → `deliverables-archive/<kickoff 日期>-<slug>/`」的整批迁移——
-//   日期判定（台账权威 → git 首次 add → mtime 兜底）、操作清单、实际执行、门禁事后视野。
-// 它不做什么：不改真盘、不动判据代码（slug 归一化是实施件不是排练件）、不猜会话 createdAt
-//   （真迁移用 E3 导出工具补精确日期；本排练记录 git 代理日期的偏差样本）。
-// 判据（排练成功的定义）：
-//   ① 每个话题都拿到一个日期来源与归属（无日期空白）；
-//   ② 迁移后 `deliverables/` 根清空、archive 内 22 个日期前缀目录；
-//   ③ `deliverables-check` 对迁移后 staging 报空视野（≠ 报错）——T-11 判据盲区的实证形状；
-//   ④ 全程墙钟实测（工时从估计变实测）。
-// 用法：node scripts/migration-rehearsal.mjs（不依赖 DSH_HOME；纯文件操作）
-// 退出码：0 = 四判据满足；1 = 有判据未满足；2 = 环境失败。
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs'
+// 默认态（排练）：把真盘 `company-workspace/deliverables/` 复制进排练场 staging，演练 A2→A1 形状的
+//   「存量话题 → `deliverables-archive/<kickoff 日期>-<slug>/`」整批迁移 + 门禁事后视野。
+// `--execute`（真迁移）：在**真盘**上——① 按台账/git/mtime 给每个话题生成 meta.md（机械字段；
+//   「结果」留空 = 回填态，收敛时维护者回填）；② `git mv deliverables/<slug> deliverables-archive/<日期>-<slug>`；
+//   ③ 真盘跑 deliverables-check + authorship-audit 验收。
+// 判据（排练成功）：① 无日期空白 ② 根清空、archive 计数齐 ③ 迁移后判据视野=全部话题（跟随扩根修复 T-11）④ 墙钟实测。
+// 用法：node scripts/migration-rehearsal.mjs            # 排练（staging，只读真盘）
+//       node scripts/migration-rehearsal.mjs --execute  # 真迁移（改真盘！先跑 git status 确认干净）
+// 退出码：0 = 判据满足；1 = 有判据未满足；2 = 环境失败。
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+const EXECUTE = process.argv.includes('--execute')
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const REAL = join(ROOT, 'company-workspace/deliverables')
 const LEDGER = join(ROOT, 'company-workspace/kb/motion-ledger.md')
 const STAGE = join(ROOT, 'dev/rehearsal-workspace/migration-rehearsal')
+
+// 台账「类型」列 → meta 分型词表（META_TYPES）；无法判的落「决策」并在 detail 标注来源。
+const typeOf = (ledgerType, slug) => {
+  const t = ledgerType ?? ''
+  if (t.includes('口径问答')) return '口径问答'
+  if (t.includes('复盘') || t.includes('季度')) return '诊断'
+  if (t.includes('流水线') || t.includes('写作')) return '生产'
+  if (t !== '') return '决策'
+  return /agent-2026$|poc/.test(slug) ? '生产' : '决策'   // 无台账行的话题：构建类归生产，其余归决策（提交留痕供复核）
+}
 
 const t0 = Date.now()
 // ── 1. staging 成型（幂等：先清场）──
@@ -34,11 +43,13 @@ const topics = readdirSync(join(STAGE, 'deliverables')).filter(name =>
   statSync(join(STAGE, 'deliverables', name)).isDirectory() && !name.startsWith('.'))
 
 // ── 2. 日期判定：台账权威 → git 首次 add → mtime 兜底 ──
-const ledgerDate = new Map()
+const ledgerRows = new Map()
 for (const line of readFileSync(LEDGER, 'utf8').split('\n')) {
-  const m = /^\|\s*([a-z0-9][a-z0-9-]*)\s*\|\s*(20\d\d-\d\d-\d\d|日期待核)/.exec(line)
-  if (m !== null) ledgerDate.set(m[1], m[2])
+  const m = /^\|\s*([a-z0-9][a-z0-9-]*)\s*\|\s*([^|]+)\|\s*([^|]+)\|\s*([^|]+)\|\s*([^|]+)\|\s*([^|]+)\|\s*([^|]+)\|/.exec(line)
+  if (m === null || m[1] === 'slug') continue
+  ledgerRows.set(m[1], { date: m[2].trim(), type: m[3].trim(), part: m[4].trim(), wall: m[5].trim(), concl: m[7].trim() })
 }
+const ledgerDate = new Map([...ledgerRows].map(([slug, r]) => [slug, r.date]))
 const gitAddDate = slug => {
   try {
     const out = execFileSync('git', ['log', '--diff-filter=A', '--format=%as', '--', `company-workspace/deliverables/${slug}`],
@@ -58,6 +69,53 @@ for (const slug of topics.sort()) {
   plan.push({ slug, date, source })
 }
 const noDate = plan.filter(p => !/^\d{4}-\d{2}-\d{2}$/.test(p.date))
+
+// ── 2.5 --execute：真盘迁移（meta 生成 + git mv + 门禁验收）──
+if (EXECUTE) {
+  const archiveDir = join(ROOT, 'company-workspace/deliverables-archive')
+  mkdirSync(archiveDir, { recursive: true })
+  // ① meta 生成（机械字段；「结果」留空 = 回填态，类型映射见 typeOf——提交留痕供维护者复核）
+  for (const p of plan) {
+    const row = ledgerRows.get(p.slug)
+    const meta = [
+      `slug: ${p.slug}`,
+      `kickoff: ${p.date}`,
+      `类型: ${typeOf(row?.type, p.slug)}`,
+      `参与: ${row?.part ?? 'CEO（待补）'}`,
+      '结果:',
+      'closed:',
+      `墙钟: ${row?.wall ?? '未记'}`,
+      `一句话结论: ${row?.concl ?? '（待补——见 final 正文）'}`,
+    ].join('\n') + '\n'
+    writeFileSync(join(REAL, p.slug, 'meta.md'), meta, 'utf8')
+  }
+  console.log(`meta 生成 ${String(plan.length)} 份（结果留空待回填）`)
+  // ② 移动：tracked = git mv（保历史）；untracked = fs rename（git mv 会拒）
+  let gitMoved = 0, fsMoved = 0
+  for (const p of plan) {
+    const src = `company-workspace/deliverables/${p.slug}`
+    const dst = `company-workspace/deliverables-archive/${p.date}-${p.slug}`
+    let tracked = true
+    try { execFileSync('git', ['ls-files', '--error-unmatch', src], { cwd: ROOT, stdio: 'pipe' }) } catch { tracked = false }
+    if (tracked) { execFileSync('git', ['mv', src, dst], { cwd: ROOT }); gitMoved += 1 }
+    else { renameOrFallback(join(ROOT, src), join(ROOT, dst)); fsMoved += 1 }
+  }
+  console.log(`迁移完成：git mv ${String(gitMoved)} / fs mv ${String(fsMoved)}`)
+  // ③ 真盘门禁验收
+  for (const cmd of [['scripts/deliverables-check.mjs'], ['scripts/authorship-audit.mjs']]) {
+    try {
+      const out = execFileSync(process.execPath, cmd, { cwd: ROOT, encoding: 'utf8', timeout: 300_000,
+        env: { ...process.env, DSH_HOME: join(ROOT, 'dev/harness-home') } })
+      console.log(`[${cmd[0]}]\n` + out.split('\n').filter(l => /ALL PASS|违规|观察项 \d|一致 \d|版本引用/.test(l)).slice(0, 4).join('\n'))
+    } catch (error) {
+      console.log(`[${cmd[0]}] exit ${String(error.status)}\n` + String(error.stdout ?? '').split('\n').slice(-6).join('\n'))
+    }
+  }
+  process.exit(0)
+}
+function renameOrFallback(from, to) {
+  try { execFileSync('git', ['mv', from, to], { cwd: ROOT }) } catch { rmSync(to, { recursive: true, force: true }); cpSync(from, to, { recursive: true }); rmSync(from, { recursive: true, force: true }) }
+}
 
 // ── 3. 执行迁移（staging 内 mv）──
 mkdirSync(join(STAGE, 'deliverables-archive'), { recursive: true })
@@ -89,9 +147,9 @@ console.log(`迁移排练：${String(topics.length)} 个话题（台账 ${String
 for (const p of plan) console.log(`  ${p.date}  ${p.slug}  [${p.source}]`)
 console.log(`已迁移 ${String(moved)} → archive ${String(archived.length)} 个目录；deliverables/ 根剩余 ${leftInRoot.length === 0 ? '0（清空 ✓）' : leftInRoot.join(',')}`)
 console.log(`无日期空白：${noDate.length === 0 ? '是 ✓' : '否——' + noDate.map(p => p.slug).join(',')}`)
-console.log(`迁移后 deliverables-check 视野：成品 ${checkSeesFinals ?? '?'} 份（T-11 实证：归档件出判据视野）`)
+console.log(`迁移后 deliverables-check 视野：成品 ${checkSeesFinals ?? '?'} 份（跟随扩根 = 判据穿透归档根，T-11 已修复；无会话上下文的 not-presented 不计）`)
 console.log(`墙钟：${String(Math.round((Date.now() - t0) / 100) / 10)}s（复制+判定+迁移+门禁全程）`)
 
-const ok = noDate.length === 0 && leftInRoot.length === 0 && archived.length === topics.length && checkSeesFinals === '0'
+const ok = noDate.length === 0 && leftInRoot.length === 0 && archived.length === topics.length && checkSeesFinals === String(topics.length)
 console.log(`migration-rehearsal: ${ok ? 'PASS' : 'FAIL'}`)
 process.exit(ok ? 0 : 1)

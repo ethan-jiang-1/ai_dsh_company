@@ -139,7 +139,7 @@ const NOW_FILES = (() => {
   // `company-workspace/**` 也纳入（2026-09-26 补盲区）：它是**随每个成员会话注入**的事实面，
   // 里面的活指针腐化代价更高；而此前它不在扫描面内——实测本仓刚在那里留下一处死指针
   // （台账指向不存在的快照 README），三条门禁全都没抓到。
-  // ⚠ 边界与 `markdown-links.mjs` 一致：**排除 `deliverables/` 与 `journal/`**——那是公司
+  // ⚠ 边界与 `markdown-links.mjs` 一致：**排除 `deliverables(-archive)/` 与 `journal/`**——那是公司
   // *产出物与记忆*（正文里出现 `packages/company-pack/...` 之类是业务叙述，不是仓库指针），
   // 拿仓库指针判据去扫它们必出假阳性（实测扩面第一跑即误报一份 final.md）。
   // `tests/**` 也纳入 pin-currency 的扫描面（2026-09-26 补）：夹具里的 pin 字面量同样会漂，
@@ -154,7 +154,7 @@ const NOW_FILES = (() => {
     // 此前只扫 `notes/` 直接子文件（`p.split('/').length === 2`）⇒ `proposed/` 与 `implemented/` 全在面外。
     walkMd(join(root, 'notes/proposed')),
     walkMd(join(root, '_backlog')),
-    walkMd(join(root, 'company-workspace')).filter(p => !/^company-workspace\/(deliverables|kb\/[^/]+\/journal)\//.test(p)),
+    walkMd(join(root, 'company-workspace')).filter(p => !/^company-workspace\/(deliverables|deliverables-archive|kb\/[^/]+\/journal)\//.test(p)),
   )
 })()
 /** 观察档：`notes/implemented|postmortem/**` —— 记录**当时**事实的档案，死指针只提醒不判红。 */

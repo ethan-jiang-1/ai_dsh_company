@@ -9,7 +9,7 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
 
 即两问：① 多角色（多人模式下 = 多个根会话）在同一共享盘上写稿，要不要引入 Redis 获得真正的锁；
 ② Redis 还有哪些机制（除锁之外）对"写作协作"有用。本卡把两问放到一张卡里答，因为答案共享同一份
-机制事实盘点。姊妹卡：[deliverables-lifecycle-metadata](../../plans/2026-09-29-deliverables-lifecycle-metadata.md)
+机制事实盘点。姊妹卡：[deliverables-lifecycle-metadata](./2026-09-29-deliverables-lifecycle-metadata.md)
 （静态布局：日期/metadata/状态归宿）——**接缝**：那张卡的 meta/台账聚合问题与本卡的"审计与事件流"
 是同一块地（谁记录谁做了什么），两张卡不要各自发明一套。
 
