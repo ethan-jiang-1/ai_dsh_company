@@ -12,7 +12,6 @@
 | 卡 | 一句话 | 毕业门判断 |
 |---|---|---|
 | [2026-10-04-work-status-visibility](./2026-10-04-work-status-visibility.md) | H6 裁决落地：成员工作状态全员可见（状态即可、ETA 显式不做）；剩 = 走查在场板两态可读 + 落地形状三选一 | 接近毕业——选 (a) 现状钉死随手毕业；选 (b) 态势条则 RFC |
-| [2026-10-04-cross-process-shared-disk](./2026-10-04-cross-process-shared-disk.md) | 跨进程共享盘写完整性（多真人各开实例，E2 互踩）：候选五路（规矩强化/dsh-atomic-write/R1 互斥/R2 redis/上游 seam），dsh-atomic-write 形状未复核 | 该做（用户令）——首项复核零成本随时做；选型等触发条件（多真人常态化/首例丢失更新） |
 | [2026-10-02-deferred-verifications](./2026-10-02-deferred-verifications.md) | 触发条件型等待卡：两笔验证债（browser 行为复跑、`probe --full` 低峰双收口）2026-10-02 自 intents 迁来立卡 | 第 1 笔触发已成立但新阻塞（沙箱拒写 playwright 缓存树）；**seam 三选一已拍（2026-10-03）：暂缓登记**，等真实演示需求触发选型；**第 2 笔已判收（2026-10-03 补跑 14/15、TRANSPORT 零复发——帧级定性归档进升 pin Note）**；剩第 1 笔，判收即毕业 |
 
 ## 卡片模板

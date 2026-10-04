@@ -15,7 +15,7 @@
 3. **第三批**：C6（interrupt 竞态）/C7（cold-resume 邮箱恢复）——prompt 最难驱动，可能需要更
    确定的驱动器。
 4. **挂起**：C8（跨进程——等产品决策 `dsh-atomic-write`；**推敲卡已立** =
-   [_backlog/plans/2026-10-04-cross-process-shared-disk](../../_backlog/plans/2026-10-04-cross-process-shared-disk.md)）、
+   [_backlog/_done/_closed_plans/2026-10-04-cross-process-shared-disk](../../_backlog/_done/_closed_plans/2026-10-04-cross-process-shared-disk.md)）、
    H6（注意力中心是否报成员动态——**已裁决进卡** = [_backlog/plans/2026-10-04-work-status-visibility](../../_backlog/plans/2026-10-04-work-status-visibility.md)）、H8（多人开门常态化触发）。
 
 ## 交付

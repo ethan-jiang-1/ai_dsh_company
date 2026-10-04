@@ -30,6 +30,7 @@
 | [2026-10-04-multi-user-concurrency-bdd.md](_closed_plans/2026-10-04-multi-user-concurrency-bdd.md) | 该做（用户令「评估之后开始加工」；C1 走查观察已在手） | [implemented/2026-10-04-multi-user-bdd-batch1](../../notes/implemented/2026-10-04-multi-user-bdd-batch1.md)（C1/C2 固化 = team-concurrency-probe 4/4） | 2026-10-04 |
 | [2026-10-04-human-agent-unity-ux-bdd.md](_closed_plans/2026-10-04-human-agent-unity-ux-bdd.md) | 该做（同上；H3 主回路零资产） | [implemented/2026-10-04-multi-user-bdd-batch1](../../notes/implemented/2026-10-04-multi-user-bdd-batch1.md)（H3 固化 = member-rescue-probe 6/6） | 2026-10-04 |
 | [2026-10-04-doc-snr-cleanup-audit.md](_closed_plans/2026-10-04-doc-snr-cleanup-audit.md) | 该做（同日：四线审计 17 项发现 → 批次①机械修复 ×12 + 批次②三裁断（用户拍板：轻瘦身 / 并表 testing.md / 头注状态字段）全落地） | [implemented/2026-10-04-doc-snr-cleanup-round](../../notes/implemented/2026-10-04-doc-snr-cleanup-round.md)（残余观察项见其「未做」节） | 2026-10-04 |
+| [2026-10-04-cross-process-shared-disk.md](_closed_plans/2026-10-04-cross-process-shared-disk.md) | 该做（轻）——用户拍板 Agent Teams 协调面 + 单写进程部署约定，零新代码；小修不设 RFC（章程明文） | [implemented/2026-10-04-shared-disk-taskboard-coordination](../../notes/implemented/2026-10-04-shared-disk-taskboard-coordination.md)（手册「动议任务板」行 + 输掉的方案留尸 + 待验证项） | 2026-10-04 |
 
 ## 搁置推敲卡（暂停——不是做完）
 
