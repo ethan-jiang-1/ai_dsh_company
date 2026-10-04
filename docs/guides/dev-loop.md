@@ -121,7 +121,8 @@
 `--pin <tag>` 走完整程序）：
 
 ```text
-vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → compatibility 矩阵加列 → 真实安装冒烟
+vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回放全绿（升 pin 回归网第一道，
+  政策家 = docs/testing.md §4）→ compatibility 矩阵加列 → 真实安装冒烟
 ```
 
 升 pin 重校含**旧机制引用扫描**：`grep` 仓内文档对已退役／改名机制（旧工具名、旧包名、旧行形态）的
@@ -261,9 +262,9 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 | 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../release.md)） |
 | 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件与成本见其头注「何时跑」**；`script-triggers` 门禁强制） |
 
-**证明边界（每层只证明自己能观察的性质）**：verify 证结构不证行为；keyless 单测证模块正例与错误，
-不证装配与真入口；client-load 证挂载零失败不证内容；delegation/replay 证可见边界与组合复现，不证设计
-取舍；release-smoke 证安装形状不证语义；认证档证真行为不证跨面正确。换档先问"这一层能证明我关心的
+**证明边界（每层只证明自己能观察的性质）的唯一家 = [docs/testing.md](../../docs/testing.md) §1**
+（2026-10-04 立测试宪法时自本节迁入——宪法还拥有：改动面→最小证据映射、证据纪律七条、资产
+三分法、自测轮授权、已知未覆盖面、升级地图；本节只留命令与预算）。换档先问"这一层能证明我关心的
 性质吗"，不为安心堆档（对照《Agent-ready Development》05 六层反馈；判定见
 [harness-alignment 台账](../../notes/archived/2026-09-25-harness-alignment-ledger.md) §B）。
 

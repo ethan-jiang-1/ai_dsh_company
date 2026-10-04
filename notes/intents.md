@@ -63,3 +63,4 @@
 | 2026-09-25 | **驾驶舱③ · 问询路径·乙**（goal 第四条）：四 VP 加 tool-ask-user + 手册「问人两条路」两模式 | implemented（[cockpit-human-loop §切片三](./implemented/2026-09-24-cockpit-human-loop.md)） |
 | 2026-09-25 | **驾驶舱② · 审批闸门**（goal 第三条）：request_signoff 机制停点（ctx.approval 管线）+ e2e 7/7 全回路 | implemented（[cockpit-human-loop §切片二](./implemented/2026-09-24-cockpit-human-loop.md)） |
 | 2026-09-25 | **驾驶舱① ·「需要你」注意力中心**（goal 第二条）：跨会话聚合四类等人状态 + remote.$on 观察者 | implemented（[cockpit-human-loop §切片一](./implemented/2026-09-24-cockpit-human-loop.md)） |
+| 2026-10-04 | **测试宪法落地**（_digested/test-strategy 消化采纳）：docs/testing.md（证据政策唯一家）+ pack 导出形态守卫 + 升 pin 语料回放步 | implemented（[testing-constitution](./implemented/2026-10-04-testing-constitution.md)） |

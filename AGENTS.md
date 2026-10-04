@@ -64,8 +64,8 @@ DSH 全局不变量（fail-loud / model-visible ⟺ logged / registrations are e
 ## 纪律（沿 DSH 研发纪律；**默认严格照做，偏离必须登记**）
 
 纪律以钉住的 `vendor/dsh/` 为准；本表是仓内落点索引，不替代原文。**「权威（vendor 树）」列的路径
-是 vendor 树内相对路径**（如 `docs/testing.md` = `vendor/dsh/docs/testing.md`；本仓 `docs/` 下没有该文件
-——2026-09-26 实测 fresh agent 会按本仓相对路径解析而落空）。当前任务分支与执行规则见 [开发环 §0.5/§1/§12](docs/guides/dev-loop.md)。本仓特有适配按 D 号记录约束与证据。
+是 vendor 树内相对路径**（如 `docs/testing.md` = `vendor/dsh/docs/testing.md`；本仓 `docs/testing.md`
+是**本仓测试宪法**（2026-10-04 立）——两者同名不同物，权威列永远指 vendor 树内那份）。当前任务分支与执行规则见 [开发环 §0.5/§1/§12](docs/guides/dev-loop.md)。本仓特有适配按 D 号记录约束与证据。
 
 | DSH 纪律 | 权威（vendor 树） | 本 repo 落点 |
 |---|---|---|
@@ -74,7 +74,7 @@ DSH 全局不变量（fail-loud / model-visible ⟺ logged / registrations are e
 | 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么） | `.agents/notes/README.md` | `notes/intents.md → implemented/`；收尾 Note 要写什么 = guides/dev-loop §12「记录与收尾」；范式照 [journal-presence-mechanism](notes/implemented/2026-09-26-journal-presence-mechanism.md) |
 | 按变更选择相关检查；只报告实际跑过的检查 | `AGENTS.md` Run relevant checks | 本地流程见 guides/dev-loop §1/§9.1/§12 |
 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧** | `docs/testing.md`；`docs/postmortem/0003-web-agent-gui-feedback-loop.md` | guides/dev-loop §1「完成定义」段 + bootstrap 两道防线；preset 类改动完成定义 = `preset-smoke.mjs`（真挂载） |
-| 测试分层：真模型 / 真浏览器不进回归；行为变更同 diff 更新录制快照 | `docs/testing.md` | guides/dev-loop §9.1 + 机械门禁 `tests/layering.spec.ts`（已反证）+ 认证档按面选跑 |
+| 测试分层：真模型 / 真浏览器不进回归；行为变更同 diff 更新录制快照 | `docs/testing.md` | **测试宪法 `docs/testing.md`**（证据政策唯一家）+ dev-loop §9.1（命令/预算）+ 机械门禁 `tests/layering.spec.ts`（已反证）+ 认证档按面选跑 |
 | 真实入口路径（发布产物 `lib/` 跑）+ 真实安装形状 | `docs/testing.md` | `release-smoke`（`npm pack`→干净 profile→`plugin add`），合同 `docs/release.md` |
 | 源码面/产物面不混（paths 指 src） | `AGENTS.md` Conventions | 根 `tsconfig.json` extends vendor base |
 | vendor 钉版本 + manifest/SHA + 同步程序；**升 pin 时流程合同对 vendor 重校** | `vendor/README.md` | AGENTS.md vendor 簿记 + `scripts/sync-dsh.mjs` |

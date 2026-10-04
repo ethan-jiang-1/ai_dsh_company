@@ -86,7 +86,7 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 **证据文件命名与落点**（2026-09-26 补；**2026-10-02 迁 archived/**——原"顶层 notes/"与自家先例打架：0.1.7 的孤儿 JSON 早已迁 archived/，且同轮 delta 报告也住 archived/，顶层还会随 pin 无限堆积）：`notes/archived/<YYYY-MM-DD>-pin-review-<目标 tag>.json`（完结流程物证的家，与 delta 报告同住；`--process-review` 传该 repo 相对路径即可——sync-dsh 只要求 git 已跟踪、不限于子目录）。
 人审证据 JSON 必含 `fromSha`、`toSha`（完整 SHA）、`reviewedBy`、`reviewedAt`（YYYY-MM-DD）、`processContractReview`（核对 vendor 纪律与本地流程合同的结论，可引用既有 Note）。脚本核对文件受版本控制、字段非空及 SHA 对应；**这是人审声明，不是自动语义审计，也不认证签名者身份**。
 
-升 pin 的人审（`processContractReview` 结论里）必须额外覆盖两项（2026-10-02 立，消化对账轮）：
+升 pin 的人审（`processContractReview` 结论里）必须额外覆盖三项（2026-10-02 立前两项，消化对账轮；2026-10-04 增第三项）：
 
 1. **experimental 行重校**：本 pack 直插的 experimental 行（agent-team 族等）逐字段对照 vendor 同 tag
    的官方 optional bundle patch（如 `packages/experimental/agent-team-profile/cordis.patch.yml`）——差异须是
@@ -94,6 +94,8 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 2. **货架过账**：对照外部研究树当轮 `_digested/plugin-inventory`（基线对齐新 pin；不对齐时按其
    `_change_log/` 判定影响面），新增/退役能力按判收四档（追平 standard / 未挂载现货 / 评估 / 刻意排除）
    记入收割台账 Note——先查货架再动手是 FAQ 17 四步流程，升 pin 是它的固定触发点。
+3. **语料回放全绿**：vendor 换 tag 后先跑 `scripts/replay-smoke.mjs`（r2/r3/r4 判据档 + workspace
+   oracle）再谈语义结论——replay 语料 = 升 pin 回归网第一道（政策家 = [testing.md](./testing.md) §4）。
 
 程序：验证旧簿记及 `verify` → fetch tag 并核对证据 SHA → 在内存暂存新簿记/矩阵 → checkout 候选 → `pnpm install` → vendor 自有 `pnpm run build` → `test` + built `release-smoke` → 验证通过才写簿记/矩阵 → 再 `verify`。候选冒烟时矩阵仍为旧值，安装检查只确认其在场；成功后矩阵才增加实测 tag。安装限 180 秒、vendor build 与 release-smoke 各 600 秒，其余命令 120 秒；子进程组等待退出。
 

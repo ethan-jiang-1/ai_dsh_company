@@ -34,6 +34,7 @@
 | [presets.md](./presets.md) | 合同 | 角色 preset 语义（R2：五角色定稿——CEO / VP-Eng / VP-Sales / COO / CFO）；名册运行时实测；验证分层；培养回路与学习载体（D25） |
 | [demo.md](./demo.md) | 合同 | demo 操作合同（R4 立场景 C，2026-09-25 补场景 D 季度经营会 / E 事件复盘）：动议、前置、分镜与观测点、验收判据（含**交付物三态**的机器判据）、已知边界 |
 | [release.md](./release.md) | 合同 | 发布形状现在时（R5a 出生）：peers / 兼容矩阵 / 真实安装冒烟（release-smoke）/ 升 pin 程序（sync-dsh） |
+| [testing.md](./testing.md) | 合同 | **测试宪法**（2026-10-04 立）：什么算证据——分层与证明边界、改动面→最小证据、证据纪律、资产三分法、自测轮授权、已知未覆盖面与升级地图 |
 | [multi-human.md](./multi-human.md) | 合同 | **多人协作现在时**（2026-09-26 出生）：机制边界（卡按会话作用域、成员拉不到人）/ 形态 / 开门 runbook / 协作前提三条 / 迁移清单 / 边界 |
 
 ### notes/（决策与教训，不进 docs）
