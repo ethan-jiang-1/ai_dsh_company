@@ -8,6 +8,7 @@
 
 | 日期 | 意图与交付 | 状态 |
 |---|---|---|
+| 2026-10-04 | **推进轮三：双 home 并发演练**（用户令「再跑一轮」）：dev/harness-home-b 新 bootstrap（凭据+link 装 pack 两步零坑）+ 首场跨 home 动议 renewal-w-2026（home-A CEO 门 ⇄ home-B CFO 门，交接全走共享盘）；§5 论断首验——审计镜像归属图（每家只见自己的半张，完整图须两家各跑再拼）、bucket 隔离（同名各存）、journal 覆盖洞；9 判据全绿；home-b 留作常设双 home 回归资产 | 已交付 → [E2E Note](./implemented/2026-10-04-e2e-dualhome.md) |
 | 2026-10-04 | **推进轮二：跨门互审→返工→拒签 fail-closed**（用户令「如法炮制，挑没把握的方向」）：renewal-u-2026 三门拒签场——占位=认领全环首次真盘实证（命中→清零）、互审 cfo-review R1–R6、跨门返工 v1→v2、人拒绝签核 ⇒ CFO fail-closed 改写（renewal-x 先例引用正确）、final 保留分歧结案；新发现孤儿 web 握会话写句柄机制（驱动脚本须 finally 杀 web）；12 判据全绿 | 已交付 → [E2E Note](./implemented/2026-10-04-e2e-review-rework-reject.md) |
 | 2026-10-04 | **推进轮：meta 模板 + 多人模式三扇门真盘首跑**（用户令「继续往前推进」）：templates/meta.md + CEO skill 引用（E2E 缺口修复，preset-smoke 绿）；E2E firstdeal-v-2026——多人模式完成定义（multi-human §7/场景 F）闭环：双签两半各落各门均人应答 allowed-once、根会话归属 ✓×3、0 spawn、meta 模板首跑即合规；过程抓 2 真教训（waitTurnEnd seq 锚、操作者错话污染）+ journal-audit slug 盲区登记 | 已交付 → [E2E Note](./implemented/2026-10-04-e2e-multihuman-firstdeal.md) |
 | 2026-10-04 | **交接轮：清账 + 双轴 review + 自主 E2E**（用户选三件 + 令「会话残留能清就清」+ 令「E2E 静默自主、自拟题、多角色、证据考核」）：版本过期引用 ✗5→0；12 提交双轴复查（1 假绿面 + 1 缺失门禁已修，2 项待人拍）；会话库 1221→125；E2E 动议 realtime-recon-2026（13 判据预注册、👍 点击呈现 7/7、3 真缺陷修 2）| 已交付 → [code-review](./implemented/2026-10-04-code-review-12commits.md) + [E2E](./implemented/2026-10-04-e2e-realtime-recon.md)；待拍两笔见 code-review Note「登记不修」 |

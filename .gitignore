@@ -18,3 +18,4 @@ dev/pw-browsers/
 # 手册是唯一 tracked 例外（版本由 verify 的 dist-manual 门禁对 pack package.json 核对）
 _dist/*
 !_dist/安装手册.md
+dev/harness-home-b/
