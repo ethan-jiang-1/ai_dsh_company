@@ -38,7 +38,7 @@ pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需
 node scripts/preset-smoke.mjs          # preset 改动的**完成定义**（触发条件与成本见该脚本头注；挂载失败只有它抓得到）
 ```
 
-其余门禁/冒烟脚本见 `scripts/`：**每个门禁/探针脚本（`*-{smoke,probe,audit,check}.mjs`）头注写明「何时跑」与成本**（`script-triggers` 门禁强制自述，
+其余门禁/冒烟脚本见 `scripts/`：**每个门禁/探针脚本（`*-{smoke,probe,audit,check,eval}.mjs`）头注写明「何时跑」与成本**（`script-triggers` 门禁强制自述，
 清单唯一源 = `scripts/`——**逐个脚本的触发条件与成本别抄回本文件**，复述必漂）。分层原则 = guides/dev-loop §9.1；
 发布/升 pin = [release.md](docs/release.md)。web 观察窗的起法与开门步骤（连工作区 / token / 选 preset）唯一见 [demo.md §前置](docs/demo.md)：
 **先 `source dev/env.sh`**——未 source 时 `DSH_HOME` 是日用 `~/.dsh`，那里**另有同名 `web` profile**（起得来、不报错、五角色一个不出现）；

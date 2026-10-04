@@ -1,6 +1,6 @@
 # 2026-10-04 · 多用户并发交互 UX 立项：场景规格 + 分期判据（lane Note）
 
-状态：implemented（Phase 1 交付，2026-10-04 同日）。批准 = 用户 2026-10-04「觉得需要立项」
+状态：implemented（Phase 1+2 交付，2026-10-04 同日）。批准 = 用户 2026-10-04「觉得需要立项」
 （承接同日对话：用户指认「多用户并发交互 UX 零测试资产」+ 诊断「口头担忧多次提起、最后都没啥
 东西——所以必须搞 TDD/BDD 一样的东西」）。
 
@@ -17,7 +17,7 @@
 |---|---|---|---|
 | S1 同 slug 撞车 | 共享盘已有 <slug> 产物；另一场动议同 slug present ⇒ `slug-collision` 观察项命中 | `deliverables.spec:336`（keyless 已钉）+ `deliverables-check` 真跑（09-30 renewal-y 实证） | ✅ 闭合 |
 | S3 占位抢注 | 空 draft 双写者同时占位 ⇒ 进程内恰一胜一拒（fs-local FIFO 锁，vendor 自有 test 承担）；盘上语义 = 首行一字不差「占位=认领，非出稿」⇒ 观察项 `placeholder-claims` 只登记不判红 | `deliverables.spec:271`（含一字不差反例）+ 真盘实证（renewal-u：命中→替换→清零） | ✅ 闭合 |
-| S4 双门同时等人 | CEO 门与 CFO 门各挂一张 `request_signoff` 卡；两个浏览器各答各的 ⇒ 互不串线：allowed-once 各自一次性、注意力两行共存销一留一、两会话各自收口 | read-model 半 = `mergeAttention` 两源共存（attention.spec 已有）；**e2e 半 = attention-e2e 扩双门腿（Phase 2）** | Phase 2 |
+| S4 双门同时等人 | CEO 门与 CFO 门各挂一张 `request_signoff` 卡；两个浏览器各答各的 ⇒ 互不串线：allowed-once 各自一次性、注意力两行共存销一留一、两会话各自收口 | **`attention-e2e-smoke --dual-gate`（2026-10-04 交付，首跑 10/10 全绿）**；read-model 半 = `mergeAttention` 两源共存（attention.spec） | ✅ 闭合 |
 | S2 跨进程同文件写 | 两进程各持同版本同时写 ⇒ 期望 = 后者被拒或原子接管；**现状 = 20/20 互踩（E2）** | 演示资产在（`cross-process-fs-probe`）；目标行为判据 ⏸ 等产品决策（`dsh-atomic-write` 采纳与否） | ⏸ 等决策 |
 | S5 双 home 审计拼图 | 双 home 动议收口 ⇒ 两家各跑 check/audit，并集 = 完整归属图（单一 home 不存在完整归属图——972b2d4 实证） | runbook 面（budget-and-ops 症状表；首次双 home 真场时实跑一行） | Phase 3 |
 | S6 双客户端观察一致 | 两个浏览器会话同开在场板/看板 ⇒ 渲染一致、无跨会话状态泄漏 | cdp-probe 双客户端腿（重） | Phase 3（多人开门常态化触发） |
@@ -25,8 +25,14 @@
 ## 分期
 
 - **Phase 1（本轮交付）**：本 Note（场景规格）+ 纪律升格（宪法 §3.8、dev-loop 四问④）。
-- **Phase 2（已批待跑；预算帽 ≤$6 / ≤3 跑 / ≤15min）**：`attention-e2e-smoke` 扩 `--dual-gate`
-  ——两会话双卡并行、双浏览器应答、独立性断言；跑过才算资产交付（完成定义 = D15）。
+- **Phase 2（2026-10-04 交付）**：`attention-e2e-smoke --dual-gate`——两会话（cfo + coo，触发文本
+  用 budget-signoff-probe 已验证的报价线 prompt）各挂一张卡 ⇒ 注意力中心**跨会话聚合两行** →
+  应答 A（allowed-once + 同轮收口）→ **独立性断言：B 日志无 decided、注意力销一留一仍挂 B** →
+  切 B 应答独立收口。**首跑 10/10 全绿**（一次过；预算帽 $6 实际 ≈$2；三张证据截图 =
+  `snapshots/attention-e2e/2026-10-04-dual/`）。诚实边界：双门用的是 cfo+coo 两个 preset（机制
+  等价于 CEO门/CFO门——判据是「两会话各自独立」，角色只是叙事面）；单门路径经同构重构未复跑
+  （共享 helper 全部被双门腿实跑覆盖，下次按面触发自然复验）。同 diff 附带：`script-triggers`
+  门禁扩 `-eval`（宪法 §1.1 词表核查发现的逃逸；反证红→还原→绿 ×26）。
 - **Phase 3（触发制）**：S5 runbook 行（首次双 home 真场）、S6 双客户端腿（多人开门常态化）。
 - **等待**：S2 目标行为判据（产品决策）。
 
@@ -43,4 +49,5 @@
 - S1/S3 keyless 判据已在网：`pnpm test` 30 文件 283 用例全绿（本 Note 无新代码——keyless 层
   经对账确认已满覆盖，见同日 testing-constitution Note 盘点轮）。
 - `pnpm verify` ALL PASS（宪法 60→61 行：新增 §3.8，预算同 diff 升格）。
-- Phase 2 跑后回填双门判据结果。
+- **Phase 2 实跑**：`--dual-gate` 首跑 exit 0，10/10 全绿（聚合两行 / 两摘要可区分 / A 收口 /
+  B 无 decided / 销一留一 / B 收口）；证据截图 ×3 入 `snapshots/attention-e2e/2026-10-04-dual/`。

@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 // 驾驶舱①② 认证档 e2e（2026-09-25 立法）：人机三节点全回路——
-// 何时跑：人机三节点全回路（触线→审批→面板→人批→继续）改动时；真模型+真浏览器，~$1–2
-// 真模型 CFO 触双签线 → request_signoff → approval/asked → 浏览器：注意力面板显示待批项
-// + 官方审批面板（ui-approval）→ 点 Allow once → approval/decided(allowed-once) → 同轮收口。
+// 何时跑：人机三节点全回路（触线→审批→面板→人批→继续）改动时，或多用户并发 lane Phase 2
+//         （`--dual-gate`，S4 双门判据）；真模型+真浏览器，单门 ≈$1–2 / 3–5min，双门 ≈$2–4 / 5–8min
+// 单门（默认）：真模型 CFO 触双签线 → request_signoff → approval/asked → 浏览器：注意力面板显示
+//   待批项 + 官方审批面板（ui-approval）→ 点 Allow once → approval/decided(allowed-once) → 同轮收口。
+// 双门（--dual-gate，多用户并发 lane S4，2026-10-04 立项）：**两会话各挂一张签核卡** →
+//   ① 注意力中心（跨会话聚合）显示两行待批；② 应答 A ⇒ A 收口而 **B 不受扰**（日志无 decided、
+//   注意力仍挂 B 一行）；③ 切到 B 应答 ⇒ B 独立收口。判据 = 独立性，不是双倍单门。
 //
 // 为什么存在：注意力中心（驾驶舱①）与审批闸门（②）的关键链路只有真模型 + 真浏览器能验——
-// 远端事件观察者、面板 DOM、应答 waterfall、轮内继续，四环缺一不可。改动 signoff 工具 /
-// attention 读模型 / 观察者接线 / CFO project-economics 时按面选跑。
+// 远端事件观察者、面板 DOM、应答 waterfall、轮内继续，四环缺一不可；双门腿另验「跨会话聚合 +
+// 会话作用域应答」这一多用户核心语义（keyless 层只能钉 read-model，见 attention.spec）。
 //
 // 实证教训（2026-09-25 首跑，脚本内已内化）：
 //   - 本组合下 app 自动连上 rehearsal 工作区——无需 EmptyHero 连接流程；composer 就绪即已连。
@@ -15,8 +19,8 @@
 //   - 注意力断言必须在**批准之前**（批准后条目即销账）；迟连的浏览器也能收到挂起审批。
 //
 // 分层（guides/dev-loop §9.1）：认证档——真模型 + 真浏览器 + 起进程，不进 `pnpm test`。
-// 预算：单 CFO 单轮 + 一次审批 ≈ $1–2 / 3–5 分钟。排练场 cwd，真盘零接触。
-// 用法：source dev/env.sh && node scripts/attention-e2e-smoke.mjs
+// 排练场 cwd，真盘零接触。
+// 用法：source dev/env.sh && node scripts/attention-e2e-smoke.mjs [--dual-gate]
 import { spawn } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
@@ -26,8 +30,8 @@ import { launchChromium, loadChromium } from './lib/playwright.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
-const DSH_HOME = join(ROOT, 'dev/harness-home')
-const SHOTS = join(ROOT, 'snapshots/attention-e2e', new Date().toISOString().slice(0, 10))
+const DUAL = process.argv.includes('--dual-gate')
+const SHOTS = join(ROOT, 'snapshots/attention-e2e', new Date().toISOString().slice(0, 10) + (DUAL ? '-dual' : ''))
 mkdirSync(SHOTS, { recursive: true })
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 const results = []
@@ -59,7 +63,7 @@ const banner = await new Promise((res, rej) => {
   setTimeout(() => rej(new Error('boot 超时')), 120_000)
 })
 const base = `http://127.0.0.1:${banner.port}`
-console.log(`web up: ${base}`)
+console.log(`web up: ${base}${DUAL ? '（--dual-gate 双门）' : ''}`)
 let browser
 try {
   const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
@@ -74,26 +78,63 @@ try {
     if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? 'unknown'}`)
     return body.result.value
   }
-  const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'cfo' } })
-  const sessionId = created.sessionId
-  const TITLE = `审批闸门 e2e ${String(Date.now() % 100000)}`
-  console.log(`session: ${sessionId}（cfo / rehearsal，"${TITLE}"）`)
-  try { await rpc('session/rename', { request: { sessionId, title: TITLE } }) } catch { /* 无 title 搜索兜底 */ }
-  await rpc('session/prompt', { request: {
-    requestId: `e2e-${Date.now()}`, sessionId, mode: 'queue',
-    content: [{ type: 'text', text: '排练指令（触线测试）：客户 X 要求以 8.2 折（低于 9 折下限）签 support-sla 维护合同，年费 $18,000，毛利约 26%。按 project-economics 给结论——触双签线必须先调 request_signoff 请求审批，等人的决定再收口。' }],
-    clientTimeZone: 'Asia/Shanghai',
-  } })
-  console.log('prompt sent; polling approval/asked …')
-  const deadline = Date.now() + 300_000
-  let asked = null
-  while (Date.now() < deadline) {
-    const records = await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })
-    asked = records.map(r => r.event).find(e => e?.type === 'approval/asked' && e.data?.toolName === 'request_signoff')
-    if (asked) break
-    await sleep(4_000)
+
+  /** 建一个会话并发触线 prompt（preset 角色 + prompt 由调用方给——触发文本是已验证资产）。 */
+  const createSignoffSession = async (preset, title, text) => {
+    const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: preset } })
+    const sessionId = created.sessionId
+    try { await rpc('session/rename', { request: { sessionId, title } }) } catch { /* 无 title 搜索兜底 */ }
+    await rpc('session/prompt', { request: {
+      requestId: `e2e-${Date.now()}-${preset}`, sessionId, mode: 'queue',
+      content: [{ type: 'text', text }], clientTimeZone: 'Asia/Shanghai',
+    } })
+    console.log(`session: ${sessionId}（${preset}，"${title}"）`)
+    return sessionId
   }
-  check('approval/asked 落日志（request_signoff）', asked !== null, asked ? String(asked.data.reason).slice(0, 60) : '300s 未等到')
+
+  /** 轮询会话日志直到出现 request_signoff 的 approval/asked。 */
+  const waitForAsked = async sessionId => {
+    const deadline = Date.now() + 300_000
+    while (Date.now() < deadline) {
+      const records = await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })
+      const asked = records.map(r => r.event).find(e => e?.type === 'approval/asked' && e?.data?.toolName === 'request_signoff')
+      if (asked) return asked
+      await sleep(4_000)
+    }
+    return null
+  }
+
+  /** 轮询会话日志直到 approval/decided + turn/end。 */
+  const waitForDecided = async sessionId => {
+    const deadline = Date.now() + 240_000
+    while (Date.now() < deadline) {
+      const records = await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })
+      const events = records.map(r => r.event).filter(Boolean)
+      const decided = events.find(e => e?.type === 'approval/decided')
+      const turnEnded = events.some(e => e?.type === 'turn/end')
+      if (decided && turnEnded) return { decided, turnEnded }
+      await sleep(4_000)
+    }
+    return { decided: null, turnEnded: false }
+  }
+
+  // ── 触线：单门 = CFO 一张卡；双门 = CFO + COO 两张卡（触发文本都是已验证资产）──
+  const HEAD = '排练指令（触线测试，只做这一件事，做完即收口；不要 spawn 成员、不要写文件、不要 present）：\n'
+  const PROMPT_CFO = HEAD + '客户 X 要求以 8.2 折（低于 9 折下限）签 support-sla 维护合同，年费 $18,000，毛利约 26%。按 project-economics 给结论——触双签线必须先调 request_signoff 请求审批，等人的决定再收口。'
+  const PROMPT_B = HEAD + '客户报价：**8.5 折**（折扣线 < 9 折）。请按规矩处理这条报价的签字线，把该走的闸门走完，然后给出你的结论。'
+  const gates = DUAL
+    ? [{ id: 'A', preset: 'cfo', prompt: PROMPT_CFO }, { id: 'B', preset: 'coo', prompt: PROMPT_B }]
+    : [{ id: 'A', preset: 'cfo', prompt: PROMPT_CFO }]
+  for (const gate of gates) {
+    gate.title = `审批闸门 e2e ${gate.id} ${String(Date.now() % 100000)}`
+    gate.sessionId = await createSignoffSession(gate.preset, gate.title, gate.prompt)
+  }
+  console.log('prompt sent; polling approval/asked …')
+  for (const gate of gates) {
+    gate.asked = await waitForAsked(gate.sessionId)
+    check(`门${gate.id}（${gate.preset}）approval/asked 落日志（request_signoff）`, gate.asked !== null,
+      gate.asked ? String(gate.asked.data.reason).slice(0, 60) : '300s 未等到')
+  }
 
   // ── 浏览器侧（实证：app 自动连上 rehearsal 工作区；右栏为会话作用域）──
   const chromium = await loadChromium(ROOT)
@@ -119,64 +160,104 @@ try {
   }
   console.log('workspace connected（自动）')
 
-  // 打开 CFO 会话（搜索 + 点击）
-  const searchButton = page.getByRole('button', { name: 'Search sessions' })
-  if (await searchButton.getAttribute('aria-expanded') !== 'true') await searchButton.click()
-  // rc.2：搜索框占位符由 'Search sessions...' 改为 'Search session names'（aria 未变）。
-  const search = page.getByPlaceholder('Search session names')
-  await search.fill(TITLE)
-  const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: TITLE })
-  await result.first().waitFor({ timeout: 15_000 })
-  await result.first().click()
-  await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
-  console.log('session opened')
-
-  // 注意力面板（批准之前！）：右栏 →「待办」页签 → 断言待批条目在场。
-  // 定位器随仓内演进修（2026-09-27 页签「需要你」→「待办」；面板 v2 = 等你处理/刚完成两段，
-  // 列表 aria-label 待办事项；旧脚本找的「需要你处理的事」列表已不存在——重命名轮欠下的脚本债）。
-  const expand = page.getByRole('button', { name: 'Open right sidebar' })
-  if (await expand.count() > 0) await expand.first().click()
-  // 2026-09-30 实测（0.2.0）：待办入口是右栏 guide **按钮**（dockkit tabs 只有 Start，
-  // 诊断转储留证）；0.1.7 的「需要你」胶囊同为按钮形。点击后注意力列表才挂载。
-  const todoTab = page.getByRole('button', { name: /^待办/ }).first()
-  await todoTab.waitFor({ state: 'visible', timeout: 15_000 })
-  await todoTab.click()
-  const attentionList = page.getByRole('list', { name: '待办事项' })
-  await attentionList.waitFor({ state: 'visible', timeout: 20_000 })
-  const attentionText = String(await attentionList.textContent())
-  check('注意力面板显示待批审批（驾驶舱① DOM 缺口闭合）', attentionText.includes('待批审批'), attentionText.slice(0, 90))
-  check('注意力面板显示双签线摘要', attentionText.includes('双签') || attentionText.includes('8.2'), '')
-  await page.screenshot({ path: join(SHOTS, 'attention-panel.png'), fullPage: false })
-
-  // 官方审批面板（会话 composer 区）→ Allow once（headless 默认英文 locale）
-  const allowButton = page.getByRole('button', { name: 'Allow once' })
-  await allowButton.waitFor({ state: 'visible', timeout: 30_000 })
-  await page.screenshot({ path: join(SHOTS, 'approval-panel.png'), fullPage: false })
-  check('官方审批面板在场（Allow once / Reject）', true)
-  await allowButton.click()
-  console.log('clicked Allow once; polling approval/decided …')
-
-  // 决定 + 收口
-  const deadline2 = Date.now() + 240_000
-  let decided = null
-  let turnEnded = false
-  while (Date.now() < deadline2) {
-    const records = await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })
-    const events = records.map(r => r.event).filter(Boolean)
-    decided = events.find(e => e?.type === 'approval/decided')
-    turnEnded = events.some(e => e?.type === 'turn/end')
-    if (decided && turnEnded) break
-    await sleep(4_000)
+  // 按标题搜会话并打开（搜索树条目点击 = 实证通路；会话列表行 div onClick 打不通）。
+  const openSessionBySearch = async title => {
+    const searchButton = page.getByRole('button', { name: 'Search sessions' })
+    if (await searchButton.getAttribute('aria-expanded') !== 'true') await searchButton.click()
+    const search = page.getByPlaceholder('Search session names')
+    await search.fill(title)
+    const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: title })
+    await result.first().waitFor({ timeout: 15_000 })
+    await result.first().click()
+    await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
   }
-  check('approval/decided 落日志', decided !== null, decided ? JSON.stringify(decided.data).slice(0, 80) : '未等到')
-  check('决定 = allowed-once', decided?.data?.outcome === 'allowed-once', JSON.stringify(decided?.data).slice(0, 80))
-  check('agent 同轮收口（turn/end）', turnEnded)
-  await page.screenshot({ path: join(SHOTS, 'after-approve.png'), fullPage: false })
+
+  // 打开右栏注意力面板（「待办」按钮；0.2.0 形态——面板 v2 等你处理/刚完成两段）。
+  const openAttentionPanel = async () => {
+    const expand = page.getByRole('button', { name: 'Open right sidebar' })
+    if (await expand.count() > 0) await expand.first().click()
+    const todoTab = page.getByRole('button', { name: /^待办/ }).first()
+    await todoTab.waitFor({ state: 'visible', timeout: 15_000 })
+    await todoTab.click()
+    const list = page.getByRole('list', { name: '待办事项' })
+    await list.waitFor({ state: 'visible', timeout: 20_000 })
+    return list
+  }
+
+  if (!DUAL) {
+    // ── 单门（历史形态，判据与 2026-09-25 首跑对齐）──
+    const gate = gates[0]
+    await openSessionBySearch(gate.title)
+    console.log('session opened')
+    const attentionList = await openAttentionPanel()
+    const attentionText = String(await attentionList.textContent())
+    check('注意力面板显示待批审批（驾驶舱① DOM 缺口闭合）', attentionText.includes('待批审批'), attentionText.slice(0, 90))
+    check('注意力面板显示双签线摘要', attentionText.includes('双签') || attentionText.includes('8.2'), '')
+    await page.screenshot({ path: join(SHOTS, 'attention-panel.png'), fullPage: false })
+    const allowButton = page.getByRole('button', { name: 'Allow once' })
+    await allowButton.waitFor({ state: 'visible', timeout: 30_000 })
+    await page.screenshot({ path: join(SHOTS, 'approval-panel.png'), fullPage: false })
+    check('官方审批面板在场（Allow once / Reject）', true)
+    await allowButton.click()
+    console.log('clicked Allow once; polling approval/decided …')
+    const { decided, turnEnded } = await waitForDecided(gate.sessionId)
+    check('approval/decided 落日志', decided !== null, decided ? JSON.stringify(decided.data).slice(0, 80) : '未等到')
+    check('决定 = allowed-once', decided?.data?.outcome === 'allowed-once', JSON.stringify(decided?.data).slice(0, 80))
+    check('agent 同轮收口（turn/end）', turnEnded)
+    await page.screenshot({ path: join(SHOTS, 'after-approve.png'), fullPage: false })
+  } else {
+    // ── 双门（多用户并发 lane S4）：聚合 → 独立应答 A → B 不受扰 → 独立应答 B ──
+    const [gateA, gateB] = gates
+    await openSessionBySearch(gateA.title)
+    console.log('gate A session opened')
+    const attentionList = await openAttentionPanel()
+    const attentionText = String(await attentionList.textContent())
+    const pendingCount = attentionText.split('待批审批').length - 1
+    check('注意力中心跨会话聚合：两行待批共存', pendingCount >= 2, `待批条目=${String(pendingCount)}；${attentionText.slice(0, 90)}`)
+    check('两门摘要在场且可区分（A=8.2 / B=8.5）', attentionText.includes('8.2') && attentionText.includes('8.5'), '')
+    await page.screenshot({ path: join(SHOTS, 'dual-attention.png'), fullPage: false })
+
+    // 应答 A（当前已开 A 的会话，官方审批面板即 A 的卡）
+    const allowA = page.getByRole('button', { name: 'Allow once' })
+    await allowA.waitFor({ state: 'visible', timeout: 30_000 })
+    await allowA.click()
+    console.log('clicked Allow once (gate A); polling approval/decided …')
+    const { decided, turnEnded } = await waitForDecided(gateA.sessionId)
+    check('门A approval/decided 落日志且 = allowed-once', decided?.data?.outcome === 'allowed-once',
+      decided ? JSON.stringify(decided.data).slice(0, 80) : '未等到')
+    check('门A 同轮收口（turn/end）', turnEnded)
+
+    // 独立性：应答 A 后，B 日志只有 asked 没有 decided，注意力只剩 B 一行
+    const recordsB = await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId: gateB.sessionId })
+    const eventsB = recordsB.map(r => r.event).filter(Boolean)
+    check('独立性：应答 A 不波及 B（B 无 decided）',
+      eventsB.some(e => e?.type === 'approval/asked') && !eventsB.some(e => e?.type === 'approval/decided'),
+      `B 事件=${eventsB.filter(e => e?.type.startsWith('approval')).length}`)
+    const listAfterA = await openAttentionPanel().catch(() => null) ?? attentionList
+    const afterAText = String(await listAfterA.textContent())
+    const afterACount = afterAText.split('待批审批').length - 1
+    check('注意力销一留一：A 销账后仍挂 B', afterACount >= 1 && !afterAText.includes('8.2') && afterAText.includes('8.5'),
+      `待批条目=${String(afterACount)}`)
+    await page.screenshot({ path: join(SHOTS, 'dual-independence.png'), fullPage: false })
+
+    // 切到 B 应答
+    await openSessionBySearch(gateB.title)
+    console.log('gate B session opened')
+    const allowB = page.getByRole('button', { name: 'Allow once' })
+    await allowB.waitFor({ state: 'visible', timeout: 30_000 })
+    await allowB.click()
+    console.log('clicked Allow once (gate B); polling approval/decided …')
+    const { decided: decidedB, turnEnded: turnEndedB } = await waitForDecided(gateB.sessionId)
+    check('门B approval/decided 落日志且 = allowed-once', decidedB?.data?.outcome === 'allowed-once',
+      decidedB ? JSON.stringify(decidedB.data).slice(0, 80) : '未等到')
+    check('门B 同轮收口（turn/end）', turnEndedB)
+    await page.screenshot({ path: join(SHOTS, 'dual-after-b.png'), fullPage: false })
+  }
 
   const failed = results.filter(r => !r.ok)
   console.log(failed.length === 0
-    ? `\nattention-e2e: ALL PASS（${results.length}/${results.length}）——触线→审批→面板→人批→继续 全回路`
-    : `\nattention-e2e: ${failed.length} FAILURE(S)`)
+    ? `\nattention-e2e${DUAL ? ' --dual-gate' : ''}: ALL PASS（${results.length}/${results.length}）${DUAL ? '——双门聚合/独立应答/各自收口' : '——触线→审批→面板→人批→继续 全回路'}`
+    : `\nattention-e2e${DUAL ? ' --dual-gate' : ''}: ${failed.length} FAILURE(S)`)
   process.exitCode = failed.length === 0 ? 0 : 1
 } finally {
   if (browser) await browser.close().catch(() => {})

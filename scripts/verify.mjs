@@ -253,7 +253,9 @@ if (!pinBad) ok(`pin-currency ×${pinCount}（现在时文件的 dsh-v 字面量
 // 解法：**触发条件的家 = 脚本自己**（一处事实一个家，紧挨实现、改脚本时必然看见）；
 // 文档只留分层原则与指针；本门禁强制自述存在。
 const TRIGGER_FILES = readdirSync(join(root, 'scripts'))
-  .filter(n => /-(smoke|probe|audit|check)\.mjs$/.test(n)).sort()
+  // 2026-10-04 加 eval：宪法 §1.1 词表成文核查发现 -eval 逃逸本门禁（candidate-scan-eval 实际
+  // 有头注，但不变量没罩住它——新增门禁类后缀时这里同步扩）。
+  .filter(n => /-(smoke|probe|audit|check|eval)\.mjs$/.test(n)).sort()
 const missingTrigger = TRIGGER_FILES.filter(n =>
   !readFileSync(join(root, 'scripts', n), 'utf8').split('\n').slice(0, 8).some(line => line.startsWith('// 何时跑：')))
 missingTrigger.length === 0
