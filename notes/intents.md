@@ -67,3 +67,4 @@
 | 2026-10-04 | **多用户并发交互 UX 立项**（用户令）：场景规格 S1-S6 + 分期判据（Phase 1=规格与纪律升格已交付；Phase 2=双门 e2e 首跑 10/10 已交付） | implemented（[multi-user-concurrency-lane](./implemented/2026-10-04-multi-user-concurrency-lane.md)） |
 | 2026-10-04 | **多用户 BDD 加工·第一批**（用户令评估+加工）：H3 求救回路 probe 6/6 + C1/C2 并发固化 probe 4/4 首跑全绿；两卡毕业 _done；次序四批在 Note | implemented（[multi-user-bdd-batch1](./implemented/2026-10-04-multi-user-bdd-batch1.md)） |
 | 2026-10-04 | **多用户 BDD 加工·第二批**（用户令继续）：H7 分歧保留 probe 4/4（CFO 独立评估+lead 并排保留分歧+吸收进决定）+ C4 原子发布读侧/C5 scope 警告 probe 3/3（真交错 6 行无撕行+警告原文在场） | implemented（[multi-user-bdd-batch2](./implemented/2026-10-04-multi-user-bdd-batch2.md)） |
+| 2026-10-04 | **多用户 BDD 加工·第三批（终批）**（ongoing goal）：C6 打断恢复 probe 4/4（打断命中活轮+inbox 保留+新指示续行）+ C7 崩溃恢复 probe 4/4（SIGKILL 后名册/邮箱回放恢复+投递回执 durable 零丢失）；仪器史诚实入档（C6 两判据 bug、C7 八跑六驱动器 bug） | implemented（[multi-user-bdd-batch3](./implemented/2026-10-04-multi-user-bdd-batch3.md)） |
