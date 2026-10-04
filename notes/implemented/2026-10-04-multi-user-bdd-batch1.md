@@ -16,7 +16,7 @@
    确定的驱动器。
 4. **挂起**：C8（跨进程——等产品决策 `dsh-atomic-write`；**推敲卡已立** =
    [_backlog/_done/_closed_plans/2026-10-04-cross-process-shared-disk](../../_backlog/_done/_closed_plans/2026-10-04-cross-process-shared-disk.md)）、
-   H6（注意力中心是否报成员动态——**已裁决进卡** = [_backlog/plans/2026-10-04-work-status-visibility](../../_backlog/plans/2026-10-04-work-status-visibility.md)）、H8（多人开门常态化触发）。
+   H6（注意力中心是否报成员动态——**已裁决进卡** = [_backlog/_done/_closed_plans/2026-10-04-work-status-visibility](../../_backlog/_done/_closed_plans/2026-10-04-work-status-visibility.md)）、H8（多人开门常态化触发）。
 
 ## 交付
 
