@@ -50,8 +50,9 @@ D15/门禁注释，新会话沿纪律表落点进 vendor 语境错配的 testing
 
 ## 验证（实际跑过的）
 
-- `pnpm test`：**29 文件 279 用例全绿，1.86s**（新守卫 2 用例在内；预算 <5s 达标）。
+- `pnpm test`：**29 文件 279 用例全绿，1.86s**（新守卫 2 用例在内；预算 <5s 达标）。同日追加第二批资产后 = **30 文件 283 用例 1.59s**。
 - `pnpm verify`：**ALL PASS**（doc-budget 两处调整生效：index 146→147、testing.md 注册 60）。
 - **守卫反证三步**：host 入口临时加 `export default apply` → 新守卫 host 用例红（client 半不受影响，符合预期）→ 还原 → 绿。
 - **首跑修正（实证留档）**：`@deepseek-ai/cordis-plugin-loader` 包名在本仓 vitest **不解析**（Cannot find package——本仓 vitest 的 paths 没接住 vendor base 的 extends 链映射），守卫改走既有先例 = 相对路径直引 vendor loader src（`tests/style-lifecycle.spec.ts` 引 cordis src 同法）。头注已记此坑。
+- **第二批资产（同日盘点轮，用户问「需不需要补充测试资产」触发）**：全仓模块 × 测试导入机械对账后，唯一真缺口 = host 半 `request_signoff` 的行为路径（插件证据阶梯台阶二：纯函数有 signoff.spec、真挂载有 preset-smoke、人回路有录制，唯 execute 分支零 keyless 资产）⇒ 补 `tests/signoff-tool.spec.ts` 4 用例（真 defineTool 包装 + 只 stand-in ctx.approval：schema 拒缺参 / 无 agent fail-closed 不触审批 / reason-decision-note 透传线 / callId 缺省不带键）；**反证三步** = 破坏 fail-closed 分支 → 精确红在目标用例 → 还原 → 绿。对账结论登记：纯函数层已满覆盖（diffActivity/memberNames/activityFromEvents 经 presence-board.spec）；零引用模块逐一判定——`tool-card.ts` 经两张卡片 spec 传递覆盖、`use-company-data` 为 React 接线（纯函数全部已测）、`release-process.mjs` 纯编排（release-smoke 本身是它的测试）、`cdp-driver.mjs` 浏览器驱动（keyless 层禁入，layering 门禁）——均不补。
 - pre-push hook：push 时自动跑 verify + test（本 Note 同 diff 提交）。
