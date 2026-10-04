@@ -1,10 +1,8 @@
 # 测试宪法：什么算证据
 
 > 性质：合同层——本仓测试政策的**唯一家**。规则的目标不是让测试变多，是**让绿有意义**。
-> 命令与预算档 = [guides/dev-loop §9.1](./guides/dev-loop.md)；每个门禁/脚本的触发条件与成本 =
-> 各自头注（`script-triggers` 门禁强制自述）；快照树的规则 = [snapshots/README.md](../snapshots/README.md)；
-> 理由与教训 = `notes/`。思想源头 = DSH `docs/testing.md`（55 行宪法）经外部研究材料
-> `_digested/test-strategy` 消化后的本仓投影（登记见 [index.md](./index.md) §外部研究材料登记）。
+> 命令与预算档 = [guides/dev-loop §9.1](./guides/dev-loop.md)；每个脚本头注自述「何时跑/成本/状态」（门禁强制）；
+> 快照树规则 = [snapshots/README.md](../snapshots/README.md)；理由与教训 = `notes/`。思想源头 = DSH `docs/testing.md`（55 行宪法）经 `_digested/test-strategy` 消化的本仓投影（登记见 [index.md](./index.md) §外部研究材料登记）。
 
 ## 1. 分层与证明边界（每层只证明自己能观察的性质）
 
@@ -13,7 +11,9 @@
 | 结构门禁 `verify` | 结构、一致性、簿记 | 运行行为 |
 | keyless 单测 `test` | 模块正例与错误路径、纯函数视图模型、静态渲染 | 装配、真入口、真渲染交互 |
 | 装配冒烟（`preset-smoke` / `client-load-smoke`） | 真挂载、零失败 | 内容语义 |
-| 机制冒烟（`delegation-smoke` / `replay-smoke`） | 模型可见边界、组合复现 | 设计取舍、跨面正确 |
+| 机制冒烟（`delegation-smoke`） | 模型可见边界 | 设计取舍、跨面正确 |
+| 重放 lane（`replay-smoke`；会话日志 + sidecar 回放，无 key；`--ui` 另加真浏览器端到端） | 会话级行为复现与回归锚 | 录制之外的行为、设计取舍 |
+| CLI 集成（`snapshot-motion-smoke`；真实 CLI + 临时 fixture，不进 `pnpm test`） | 真实 CLI 进程路径 | 语义 |
 | 发布形状（`release-smoke`） | 安装形状、built 入口可达 | 语义 |
 | 认证档（真模型） | 真行为 | 跨面正确 |
 | 行为质量档（`probe --full` + candidate-scan 语料） | 角色内容质量 | 机制回归 |
@@ -47,7 +47,7 @@
 
 单测、smoke、rationale **不替代组装转录**——会话级行为的固化证据只有回放场景。
 
-## 3. 证据纪律（九条教义的本仓投影）
+## 3. 证据纪律（DSH 教义的本仓投影）
 
 1. **验证世界，不信自报**：断言从会话日志、在盘文件、RPC/外部观察取；agent 自述与模型正文不算证据。
 2. **mock 白名单**：只许替非确定边界（模型/网络/时钟），下游保持真实现；每个替身写明"证明不了什么"。本仓 keyless 层现状零 mock——保持。

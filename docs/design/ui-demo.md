@@ -51,7 +51,7 @@ shipped 槽位树里我们值得占的位置：
 
 | 槽位 | 我们放什么 | demo 价值 |
 |---|---|---|
-| `sidebar.right.pane.tab` / `ctx.sidebarRightTabs.register` | **Company 页签**：组织在场板（lead + 分身行，行可点进成员空间）+ 协作动态流（成员/任务差分；**消息级聚合在搁置池**，见 roadmap §搁置池） | 一屏看全局，这是 demo 的"驾驶舱"（v1 已交付，D22） |
+| `sidebar.right.pane.tab` / `ctx.sidebarRightTabs.register` | **Company 页签**：组织在场板（lead + 分身行，行可点进成员空间）+ 协作动态流（成员/任务差分；**消息级聚合留升级路径**——原「搁置池」项已随 D32 队列层退役归档，见 [index.md](../index.md) D32 行） | 一屏看全局，这是 demo 的"驾驶舱"（v1 已交付，D22） |
 | `tool.call.toolview`（keyed，按工具名） | **委派工具卡**：`vp_eng(...)` 调用渲染成"给 VP-Eng 的 brief 卡"（任务进、结果出、状态流转）；team 工具同法 | 让"派活/交稿"在对话流里有公司语义的皮 |
 | `conversation.session.header.actions` | Company 动作入口（打开驾驶舱、展开当前任务的 lineage） | 快捷入口 |
 | `conversation.session.header.lineage` | （可选）会话头显示组织汇报线 | 视觉强化"这是 VP-Eng 的会话" |

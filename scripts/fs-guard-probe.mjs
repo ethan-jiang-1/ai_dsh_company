@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // fs-observation-policy 角色会话行为面认证档（调研卡 E1，2026-10-03 立；真模型，≈$0.1，排练场）：
 // 何时跑：writing-collab-locks-redis 卡 R0-1（手册机制事实栏）落地前必跑——E1 是该卡 R0 地基的最后一角；
 //   fs-observation-policy / fs-local / fs 工具面改动或升 pin 后复跑（先例：cross-process-fs-probe 升 pin 必复跑）。

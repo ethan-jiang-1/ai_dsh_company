@@ -17,7 +17,7 @@ const ANSWERS: Record<string, string> = {
   Q8: '开工检索决定和取舍，核对实现，留下验证证据',
   Q9: 'Plan Mode 呈批；已批准或机械单步可直接做',
   Q10: 'dag-visual 视觉夹具；human-loop-e2e 人机回路；date-rule 日期口径',
-  Q11: 'intents 登记 + implemented Note 收尾',
+  Q11: 'implemented Note 收尾（授权链线索记在状态行）+ 事实 owner 合同同步',
   Q12: '交付型与打磨型；停止 = 预算耗尽 / 输入源枯竭 / 真卡住',
 }
 function good() {

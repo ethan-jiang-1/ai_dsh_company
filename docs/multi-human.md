@@ -35,8 +35,8 @@
 **不要**"升级给 CEO"（那会把卡送到甲的门上，恰好演示反了）。
 实测依据：`scripts/budget-signoff-probe.mjs` 的正例——CFO 根会话确实会发 `request_signoff`。
 
-（手册「问人两条路」与「审批三档」目前只写了成员那一侧，**缺这条区分**——已登记待补，
-见 [RFC](../notes/implemented/2026-09-26-multi-human-role-routing.md) 进度表 f 行。）
+（手册「问人两条路」与「审批三档」均已含这条根会话 vs 被委派成员的区分——见两节的 ⚠ 段；
+[RFC](../notes/implemented/2026-09-26-multi-human-role-routing.md) 进度表 f 行随之闭合。）
 
 ## 1. 形态（已定，可逆）
 

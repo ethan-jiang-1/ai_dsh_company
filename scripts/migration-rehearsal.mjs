@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// 布局卡 C1 存量迁移的一体仪器（2026-10-03；--execute 前零模型，--execute 改真盘；推敲卡 ⑤ 拍板前置）：
-// 何时跑：布局卡 RFC 决策点⑤拍板前跑一次（默认 = 排练/排练场）；真迁移时 `--execute`（先复跑默认态作
-//   pre-flight，再执行）。
+// 状态：已耗（2026-10-03 C1 迁移已执行完毕；复跑仅限重放排练或经用户点名的再迁移——--execute 改真盘）
+// 布局卡 C1 存量迁移的一体仪器（2026-10-03；--execute 前零模型，--execute 改真盘）：
+// 何时跑：已耗退役——C1 迁移已执行（deliverables-archive/ 22 话题在场）；复跑默认态仅作历史重放，
+//   `--execute` 只在用户点名的再迁移场景（先 git status 确认干净）。
 //
 // 默认态（排练）：把真盘 `company-workspace/deliverables/` 复制进排练场 staging，演练 A2→A1 形状的
 //   「存量话题 → `deliverables-archive/<kickoff 日期>-<slug>/`」整批迁移 + 门禁事后视野。

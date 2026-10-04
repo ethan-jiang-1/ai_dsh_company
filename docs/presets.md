@@ -99,7 +99,7 @@ UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSecti
 | 全体（0.2.0 harvest 批1，2026-09-30） | **`tool-jobs`**（后台任务）/ **`tool-goal` + `/goal`**（跨轮目标）/ **`compaction` 组**（compaction-basic + `/compact` + tool-result-pruner：长会话历史压缩）/ delegation 组内 **`subagent_fork`**（可续跑自身分叉） | 行形状逐字照抄 `vendor/dsh/packages/bundle/web-app/presets/standard.patch.yml`（0.1.7→0.2.0 间 standard 长出的面，本仓 preset 原为 0.1.7 形状）；fork 的编排位 = [delegation.md](./delegation.md) §4.4 |
 | CEO（0.2.0 harvest 批4，2026-09-30） | delegation 组内 **`workflow-ptc` + `tool-workflow`**（`workflow` 工具：JS 编排脚本 fan-out 子代理；行形状照抄 standard） | **编排位归 CEO**（组织语义：同题多路并行调研 / 多稿同时出稿后聚合）；persona 派活从两条路扩为三条——workflow 是**编排面不是分工面**，谁做什么仍由 team / 命名委托定（[delegation.md](./delegation.md) §4.4）。VP/COO/CFO 不给：深挖调研走各自 `subagent`，跨职能编排升级 CEO |
 | 全体（0.2.0 harvest 批2，2026-09-30） | **`tool-session-query`**（session_search 等 ×5：会话全文检索）；host 侧 = bundle 替换行翻开 `session-query-sqlite`（`openAt: first-search` 懒开 + 索引库锚 profile 目录） | 「上次动议定了什么」先查会话全文再问人——journal 是摘要、会话库是全文；授权域 = 本工作区（五角色共用共享盘 ⇒ 跨角色可查，合稿引用校对受益）；persona 开工动作句已同步 |
-| 全体（0.2.0 harvest 批3，2026-09-30） | **schedule 工具 ×4**（schedule_create/list/delete/update，宿主级 cron/定频定时）+ **ui-schedule** 任务页 + **time-context** 日期通道——三行归 `dsh-experimental-schedule-bundle` 所有，部署启用 = bundle 进 profile bundles 列表（真安装 `plugin add` 该包即自动启用；导出手册已写明）；pack 侧只留**替换行钉 `timeZone: Asia/Shanghai`**（回落不依赖进程时区） | 「自主节律」（搁置池复活项）：到点投递回原会话、宿主恢复冷会话——seam 实证（schedule README）；工具按 agent 作用域落位（角色根会话有、瞬态委派 child 无——实测 r3 夹具，正合"立节奏的是角色本体"）；persona 节律句已同步 |
+| 全体（0.2.0 harvest 批3，2026-09-30） | **schedule 工具 ×4**（schedule_create/list/delete/update，宿主级 cron/定频定时）+ **ui-schedule** 任务页 + **time-context** 日期通道——三行归 `dsh-experimental-schedule-bundle` 所有，部署启用 = bundle 进 profile bundles 列表（真安装 `plugin add` 该包即自动启用；导出手册已写明）；pack 侧只留**替换行钉 `timeZone: Asia/Shanghai`**（回落不依赖进程时区） | 「自主节律」（原搁置池复活项，批 3 落地）：到点投递回原会话、宿主恢复冷会话——seam 实证（schedule README）；工具按 agent 作用域落位（角色根会话有、瞬态委派 child 无——实测 r3 夹具，正合"立节奏的是角色本体"）；persona 节律句已同步 |
 | 全局（pack bundle） | `agent-presets` roster 替换 + `tool-present` / `agent-team` / `tool-agent-team` insert | 只放全局行；**工具面不靠它**（见 [architecture §6](./design/architecture.md) 要点 1） |
 
 ⚠ **preset 是自包含组合**：DSH 无 patch 继承，工具行必须写在 preset 里——R1 首跑就是漏了这一步，
@@ -146,4 +146,5 @@ preset 即对 profile 可见、无需重装；真实安装形状（`file:`）归
 提升文本只写方法论、不含公司事实与出处（D17——出处留收尾 Note，pack 换公司可复用）。
 **分身运行时自改 skill 已否决且为机制事实**（角色 skill 根隔离后，分身可写的共享根不进任何
 角色的技能面 + 角色私有目录被沙箱拒 + preset 子树 loader `write()` 是 no-op）；
-**自主节律**缺上游 seam，住 [_backlog/_done/_misc/suspended.md](../_backlog/_done/_misc/suspended.md)（2026-09-28 整池退役迁入）。
+**自主节律**已由 0.2.0 收割批 3 落地（schedule 工具 ×4 + time-context 日期通道，见上文工具面「批 3」行；
+原搁置池复活项随 D32 队列层退役而消化）。

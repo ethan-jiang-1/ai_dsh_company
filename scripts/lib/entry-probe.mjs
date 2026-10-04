@@ -17,7 +17,7 @@ export const ENTRY_QUESTIONS = [
   // "客户端装配/入口改变"，把它读成答案完全合理（实测第二轮即如此）。用该脚本自己的区分特征
   // （"只能看、不能 keyless 断言的视觉"）提问，答案才唯一。
   { id: 'Q10', ask: '依赖图/面板里那些**只能看、不能 keyless 断言**的视觉事实、人机接口三载体（补料落盘／建议非阻塞落稿／规矩缺口回流 journal）、日期口径行为面，各该跑哪个脚本？', expect: [/dag-visual/, /human-loop-e2e/, /date-rule/] },
-  { id: 'Q11', ask: '一个非平凡变更收尾时，除了改实现，还要动哪些文件或登记处？', expect: [/intents/, /Note|implemented/] },
+  { id: 'Q11', ask: '一个非平凡变更收尾时，除了改实现，还要动哪些文件或登记处？', expect: [/Note|implemented/, /docs|合同|owner/] },
   { id: 'Q12', ask: '长程自主执行的 goal 有哪两种写法？停止条件有哪几类？', expect: [/交付型/, /打磨型/, /预算|枯竭|卡住/] },
 ]
 

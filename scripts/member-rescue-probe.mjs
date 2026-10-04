@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 成员求救回路 e2e（H 系 H3，多用户 BDD 第一批，2026-10-04；真模型+真浏览器 ≈$2–4 / 5–10min，排练场）
 // 何时跑：成员→lead→人 的求助回路（成员拉人被拒 ⇒ send_message lead ⇒ lead ask_user_question ⇒
 //         人答 ⇒ 转达 ⇒ 成员续行）改动或 vendor 升 pin 涉及 user-questions/agent-team 时

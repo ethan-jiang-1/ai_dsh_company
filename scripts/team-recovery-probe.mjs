@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 崩溃恢复探针（C 系 C7，多用户 BDD 第三批，2026-10-04；真模型 ≈$2–4 / 5–10min，排练场）
 // 何时跑：agent-team 持久邮箱/恢复语义要复核时；vendor 升 pin 涉及 session 持久化或 agent-team
 //         projection 回放时必复跑

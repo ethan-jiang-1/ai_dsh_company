@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 分歧保留行为面探针（H 系 H7，多用户 BDD 第二批，2026-10-04；真模型 ≈$2–3 / 4–8min，排练场）
 // 何时跑：lead persona「收口不抹平分歧」原则、成员 persona（评估独立性）或 org.md 签字线改动时；
 //         vendor 升 pin 涉及 agent-team 消息投递时顺带复跑

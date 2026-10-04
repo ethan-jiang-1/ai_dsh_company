@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 何时跑：需要交付 tarball 给仓库外的人时（版本号变动后、给无仓库权限者、风险变更前快照）；无 key，秒级。
 // 用法：node scripts/export-dist.mjs
 //

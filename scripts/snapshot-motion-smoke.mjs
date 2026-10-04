@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // Keyless CLI integration check for snapshot-motion. Kept outside vitest because it starts child processes.
 // 何时跑：snapshot-motion CLI 或 workspace capture 接线改动时（keyless CLI 集成，需子进程）
 // Usage: node scripts/snapshot-motion-smoke.mjs

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // Coding entry probe: explicit standard preset + repo cwd + logged coding baseline.
 // 何时跑：入口链/执行链文档（AGENTS.md / docs/index.md / dev-loop / _backlog）改动后；真模型认证档
 // Machine checks validate per-question routing/evidence, not semantic correctness.

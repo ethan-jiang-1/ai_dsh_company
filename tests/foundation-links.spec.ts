@@ -26,7 +26,7 @@ const check = (source: string) => {
 describe('bounded source discovery', () => {
   it('checks all root Markdown, active Notes, pack source and current company documents', () => {
     const sources = ['README.md', 'README.zh.md', 'AGENTS.md',
-      'docs/guides/new.md', 'notes/intents.md', 'notes/proposed/new.md',
+      'docs/guides/new.md', 'notes/proposed/new.md',
       'notes/implemented/new.md', 'notes/rejected/new.md', 'notes/postmortem/new.md',
       '_backlog/new.md', '_backlog/plans/new.md', 'packages/company-pack/README.md',
       'packages/company-pack/src/README.md', 'packages/company-pack/presets/ceo/skills/new/SKILL.md',

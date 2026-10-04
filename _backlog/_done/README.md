@@ -29,6 +29,7 @@
 | [2026-09-29-deliverables-lifecycle-metadata.md](_closed_plans/2026-09-29-deliverables-lifecycle-metadata.md) | 该做（五决策点拍定并同 diff 落地：C1/A1/B1/分型/归档家/并步） | [implemented/2026-10-03-deliverables-lifecycle-landing](../../notes/implemented/2026-10-03-deliverables-lifecycle-landing.md) | 2026-10-03 |
 | [2026-10-04-multi-user-concurrency-bdd.md](_closed_plans/2026-10-04-multi-user-concurrency-bdd.md) | 该做（用户令「评估之后开始加工」；C1 走查观察已在手） | [implemented/2026-10-04-multi-user-bdd-batch1](../../notes/implemented/2026-10-04-multi-user-bdd-batch1.md)（C1/C2 固化 = team-concurrency-probe 4/4） | 2026-10-04 |
 | [2026-10-04-human-agent-unity-ux-bdd.md](_closed_plans/2026-10-04-human-agent-unity-ux-bdd.md) | 该做（同上；H3 主回路零资产） | [implemented/2026-10-04-multi-user-bdd-batch1](../../notes/implemented/2026-10-04-multi-user-bdd-batch1.md)（H3 固化 = member-rescue-probe 6/6） | 2026-10-04 |
+| [2026-10-04-doc-snr-cleanup-audit.md](_closed_plans/2026-10-04-doc-snr-cleanup-audit.md) | 该做（同日：四线审计 17 项发现 → 批次①机械修复 ×12 + 批次②三裁断（用户拍板：轻瘦身 / 并表 testing.md / 头注状态字段）全落地） | [implemented/2026-10-04-doc-snr-cleanup-round](../../notes/implemented/2026-10-04-doc-snr-cleanup-round.md)（残余观察项见其「未做」节） | 2026-10-04 |
 
 ## 搁置推敲卡（暂停——不是做完）
 

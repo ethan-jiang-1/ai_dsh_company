@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 交付物三态判据的**运行场入口**（R4「成品流程」轮）。
 // 何时跑：交付物三态判据或 company-workspace/deliverables 改动后；维护者按需跑（缺 DSH_HOME 自拒），不进 verify
 //

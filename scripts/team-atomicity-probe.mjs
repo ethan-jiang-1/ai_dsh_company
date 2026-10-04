@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 团队写完整性与 scope 警告探针（C 系 C4+C5，多用户 BDD 第二批，2026-10-04；真模型 ≈$2–4 / 5–10min，排练场）
 // 何时跑：fs-local 原子发布/agent-team 任务视图（writeScopeWarnings）语义要复核时；
 //         vendor 升 pin 涉及其上时复跑

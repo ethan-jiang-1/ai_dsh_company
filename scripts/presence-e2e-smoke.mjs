@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 判据 3 复跑入口（R5b，[implemented/org-presence-board 验收 3]）——在场板状态链的**真模型**
 // 何时跑：在场板链改动或验收明确要求时；真模型 ~$1
 // 端到端：排练场跑一场 2 分身微动议，轮询 `session/projections` 的 `agentTeam` 投影断言状态链

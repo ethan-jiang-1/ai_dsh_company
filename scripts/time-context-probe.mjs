@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 日期通道 D2' 探针（2026-09-29 立；真模型，≈$0.05，排练场）：
 // 何时跑：time-context 组合行（pack patch / overlay）或 time-context 配置改动时——
 //   preset-smoke 只证明"行不炸"，本探针证明"注入真的到了模型眼前、模型真的读得到"（D15：真检查）。

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 成员打断恢复探针（C 系 C6，多用户 BDD 第三批，2026-10-04；真模型 ≈$2–3 / 4–8min，排练场）
 // 何时跑：agent-team interrupt 语义要复核时；vendor 升 pin 涉及 agent-team 成员生命周期时复跑
 //

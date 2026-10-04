@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 结构门禁（**清单唯一源 = 本文件**；AGENTS.md 与 dev-loop 只留指针，不复述清单——复述必漂）。
 // **本行不写类数与项数**：那是易腐常量，实测写"12 类 / 16 项"后加了 3 道门禁就立刻失真
 // （D28：枚举型事实的家 = 实现自己）。要全表就跑一次看 PASS 行。
@@ -92,33 +93,11 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
     : fail('handbook-budget', `手册 ${handbookBytes}B + ${margin}B > maxBytes ${maxBytes}——agent-instructions 正在静默截断手册尾部（升 preset maxBytes 或先瘦身手册）`)
 }
 
-// ── 2c-ter. intents 行预算（2026-10-02 立，治理轮）───────────────────────────────
-// 为什么：dev-loop §12 早已立「intents.md 行 = 一行指针（日期+一句话+状态+链接），复述 Note = 重复
-// 事实家」——09-26 立规时实测 5 天 585B→40.5KB；此后每个大轮次都复发胖行（2026-10-02 实测 66.8KB、
-// 95 个数据行，行内复述的验证清单/commit 链会独立腐烂——如 09-30 行的"_digested 基线
-// 未随升"在簿记修复后成为过期状态）。
-// 负例 = 本门禁出生现场（首跑红在 32 个胖行上，手术当日转绿）。
-// ⚠ 单位 = **UTF-16 码元**（`.length`），不是字节：中文行字节 ≈ 1.6× 码元，同一批行按字节数是
-// 71 行 / 最长 1932。两种数都被引用过（Note 一度写"71 行超 500 字节"）——本门禁比较的是 `.length`，
-// 故权威数 = 32 行 / 最长 1169，报错文案与 Note 均按码元表述。
-// 例外：授权链线索（用户点名/裁定原话）是 intents 独有价值，允许保留在"一句话"内。
-// **行数上限（第二刀，2026-10-02 用户拍板"窗口+归档"）**：单文件随轮次无限增长（11 天 96 行 ⇒
-// 一年 250–350 行，常驻被 grep 的活表 90% 命中来自已死历史）。活表 ≤60 行（棘轮只降不升），出窗行
-// git mv 进 notes/archived/intents-<YYYY-MM>.md（按月冻结、grep 面不丢、git blob 是底裤）；
-// 负例 = 本刀出生现场（96 行当场红，归档后转绿）。
-{
-  const cap = 500
-  const rowCap = 60
-  const rows = readFileSync(join(root, 'notes/intents.md'), 'utf8').split('\n')
-    .filter(line => line.startsWith('| 2026-'))
-  const fat = rows.filter(line => line.length > cap)
-  const problems = []
-  if (fat.length > 0) problems.push(`intents.md 有 ${String(fat.length)} 行超 ${cap} 码元（最长 ${String(Math.max(...fat.map(l => l.length)))}）——压回一行指针，详情归 Note，活状态归 _backlog/proposed`)
-  if (rows.length > rowCap) problems.push(`活表 ${String(rows.length)} 行超上限 ${String(rowCap)}——出窗行 git mv 进 notes/archived/intents-<YYYY-MM>.md（活表只留最近授权链）`)
-  problems.length === 0
-    ? ok(`intents-row-budget（表行均 ≤ ${cap} 码元 × ${String(rows.length)}/${String(rowCap)} 行）`)
-    : fail('intents-row-budget', problems.join('；'))
-}
+// ── 2c-ter. intents 行预算门禁——已随 intents.md 退役拆除（2026-10-04，D34，用户令）────
+// 为什么拆：该文件是第三本账（内容 100% 派生自 Note 状态行，_backlog 章程反双记账同款病），
+// 且违反上游 no-index 教义（vendor notes README："Do not add a centralized INDEX.md"）——两道规矩
+// （行预算 + 窗口冻结）都是在给派生索引续命。退役 = 整表冻结进 notes/archived/intents-2026-10.md
+// （终档）后删除文件；授权链线索住 Note 状态行。依据 = cleanup-round Note 决定 ④。
 
 // ── 2d. 裸路径门禁（notebook-hygiene §机械防线，2026-09-25；2026-09-26 扩面）─────────
 // 负例留证 2026-09-27：公司手册反引号死路径 → bare-path 红（⚠ 负例要真破坏子串——includes 是子串匹配）。
@@ -129,7 +108,7 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
 // budget-and-ops 引的 workflow-worker-thread 同样成空壳）——门禁边界与叙述边界不重合 = 盲区。
 // 同时收窄匹配器，避免扩面后自带假阳性：跳过 `{a,b}` 花括号展开，剥掉 `path:12-34` 的引文行号后缀。
 const NOW_FILES = (() => {
-  const out = ['AGENTS.md', 'README.md', 'ROADMAP.md', 'notes/intents.md', 'company-workspace/AGENTS.md',
+  const out = ['AGENTS.md', 'README.md', 'ROADMAP.md', 'company-workspace/AGENTS.md',
     'snapshots/README.md', 'dev/harness-home/README.md', 'packages/company-pack/README.md',
     'packages/company-pack/src/README.md'].filter(f => existsSync(join(root, f)))
   const walkMd = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
@@ -219,11 +198,11 @@ if (!barePathBad) {
 // 收窄理由（避免假阳性）：只认 `dsh-v` 前缀形式——裸 `x.y.z-rc.n` 在本仓多为历史叙述或外部语料；
 //   外研树 `_agent_ready_development` 钉的是另一个 tag，登记在 EXTERNAL_PINS（同 RETIRED_PATHS 的显式豁免体例）。
 // 结构性排除（不是内容白名单，而是尊重文件自述的性质）：
-//   · `notes/intents.md` = 时序意图日志，逐行记"当时"——天生历史，不参与现在时扫描。
-//     （原 `ROADMAP.md` §历史维护记录 特例随 D32 队列层退役一并移除——文件已删。）
+//   · 原 `notes/intents.md`（时序意图日志）与 `ROADMAP.md` §历史维护记录两个特例，均随各自文件
+//     退役移除（D32 / D34）——现在无结构性排除项，集合留空备用。
 const EXTERNAL_PINS = new Set(['dsh-v0.1.7-rc.1'])   // 外部研究树语料的 pin，不是本仓 pin
 const PIN_HISTORY_MARKERS = /历史|旧|曾|原|当时|已退役|矩阵|compat|legacy/i
-const PIN_SKIP_FILES = new Set(['notes/intents.md'])
+const PIN_SKIP_FILES = new Set([])
 const agentsText = readFileSync(join(root, 'AGENTS.md'), 'utf8')
 const bookkeepingOk = agentsText.includes(`tag \`${expectedTag}\``) && agentsText.includes(`= \`${expectedSha}\``)
 bookkeepingOk
@@ -243,7 +222,7 @@ for (const rel of NOW_FILES) {
     pinCount += [...line.matchAll(/dsh-v\d+\.\d+\.\d+(?:-rc\.\d+)?/g)].length
   })
 }
-if (!pinBad) ok(`pin-currency ×${pinCount}（现在时文件的 dsh-v 字面量 = ${expectedTag}；intents 日志按性质排除）`)
+if (!pinBad) ok(`pin-currency ×${pinCount}（现在时文件的 dsh-v 字面量 = ${expectedTag}）`)
 
 // ── 2f. 脚本触发条件门禁（2026-09-26 立，技术债 B7/R5 类）───────────────
 // 负例留证 2026-09-27：探针头注「何时跑」改形 → script-triggers 红。────────
@@ -261,6 +240,24 @@ const missingTrigger = TRIGGER_FILES.filter(n =>
 missingTrigger.length === 0
   ? ok(`script-triggers ×${TRIGGER_FILES.length}（每个门禁/探针脚本头注自述「何时跑」）`)
   : fail('script-triggers', `这些脚本头注缺「// 何时跑：」（触发条件的家 = 脚本自己，别写回文档）：${missingTrigger.join(', ')}`)
+
+// ── 2f-bis. 脚本状态头注门禁（2026-10-04 清扫批，用户裁断③：头注加状态字段）────
+// 负例留证 2026-10-04：剥掉任一脚本「状态」行 → script-status 红，还原即绿。
+// 为什么：scripts/ 混住常驻门禁与已耗一次性仪器，fresh agent 分不清活门禁与用完的探针
+// （实测 migration-rehearsal 迁移已执行后头注仍像活触发器、--execute 改真盘）。解法与 2f 同教义：
+// 家 = 脚本自己——每个脚本头注自述「状态：常驻」或「状态：已耗（YYYY-MM-DD …原因/复跑条件）」。
+const ALL_SCRIPTS = readdirSync(join(root, 'scripts')).filter(n => n.endsWith('.mjs')).sort()
+const statusMissing = []
+const statusBad = []
+for (const n of ALL_SCRIPTS) {
+  const head = readFileSync(join(root, 'scripts', n), 'utf8').split('\n').slice(0, 8)
+  const line = head.find(l => l.startsWith('// 状态：'))
+  if (!line) statusMissing.push(n)
+  else if (!/^\/\/ 状态：(常驻|已耗（\d{4}-\d{2}-\d{2})/.test(line)) statusBad.push(`${n}: ${line.slice(3)}`)
+}
+statusMissing.length === 0 && statusBad.length === 0
+  ? ok(`script-status ×${ALL_SCRIPTS.length}（头注自述「状态：常驻|已耗（日期+原因）」）`)
+  : fail('script-status', `脚本状态头注缺失或形非法：缺 = ${statusMissing.join(', ') || '无'}；非法 = ${statusBad.join('；') || '无'}（格式：「// 状态：常驻」或「// 状态：已耗（YYYY-MM-DD …）」）`)
 
 // ── 2g. 手动分发手册版本门禁（2026-09-28 立，精神借 ai_dsh_architect 的 tracked manual）────
 // 负例留证 2026-09-28：手改手册表头版本 → dist-manual 红，跑 export-dist 还原 → 绿。

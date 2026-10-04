@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// 状态：常驻
+// 何时跑：升 pin 前/后的簿记核对（默认只读检查）；`--pin <tag>` 走完整程序（成本与合同唯一见 docs/release.md）。
 // 认证档（不进 pnpm test）：检查模式只读；--pin 在验证候选后发布簿记/兼容矩阵。
 // 失败恢复受控元数据和原 HEAD，不 reset/clean。依赖和 ignored 构建产物不在回滚范围。
 // 人审证据只作声明校验，不声称脚本能语义审计流程合同。完整合同见 docs/release.md。

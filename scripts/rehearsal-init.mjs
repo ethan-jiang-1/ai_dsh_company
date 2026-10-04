@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 排练场成型（轮间待办②「练习场 ≠ 运行场」）：dev/rehearsal-workspace/ 幂等成型。
 //
 // 排练/探针脚本的默认 cwd 已经指到这里（清单唯一源 = 各脚本头注「何时跑」与 lib/rehearsal.mjs），

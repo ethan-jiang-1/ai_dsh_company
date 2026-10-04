@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：已耗（2026-09-25 收割轮一次性取证；证据已入 harvest-ledger——下次收割另起新探针，不复用）
 // 收割轮实测探针（一次性，2026-09-25）：验证出厂自带的两个人机面在我们的 profile 下真实可用——
 // 何时跑：上游收割轮（升 pin 后对齐新能力）时；真模型 ≈$3，一次性探针
 //   ① workspace-changes：turn 级文件变更审阅卡（ui-deliverables 的 changes-review 右栏页签）；

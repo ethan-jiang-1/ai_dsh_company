@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 实验语料打分器（2026-09-26 立；keyless，秒级）——实验 B 的"仪器自检"腿 + "金标准打分"腿。
 // 何时跑：`scripts/lib/candidate-scan.mjs` 或 `snapshots/candidate-scan-corpus/` 改动时（自检腿）；
 //         金标准标注文件改动时（打分腿）：`node scripts/candidate-scan-eval.mjs --labels <标注文件>`。

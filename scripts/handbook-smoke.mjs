@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 公司手册注入验收（会话级验证）：boot 真 web → 真挂 preset → 真发一个 prompt → 读会话日志里的
 // 何时跑：公司手册（company-workspace/AGENTS.md）改动时；真模型
 // **指令基线**事件（`user/message` + `source.kind === 'agent-instructions'` + `baseline === true`）。

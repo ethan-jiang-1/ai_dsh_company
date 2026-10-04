@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // client-load 冒烟（client 面完成定义）：headless 浏览器加载真 web 页面，断言零插件挂载失败。
 // 何时跑：客户端装配/入口改变、且接受条件涉及挂载时（真页面零挂载失败，keyless ~10s）
 //

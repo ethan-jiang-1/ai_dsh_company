@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // cdp-probe——观察窗的「呈现即验证」机器腿（borrowed from ai_dsh_loop_advisor，驱动层逐字拷贝）。
 // 何时跑：①「启动给我看」类请求的自检（呈现即验证，dev-loop §1 + demo.md §前置的机器实现：
 //   先对已起实例断言真实渲染，全绿才把 URL 交给人）；②插件 client 面改动后；

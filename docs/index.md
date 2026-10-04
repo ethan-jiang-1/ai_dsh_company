@@ -1,7 +1,6 @@
 # 文档地图、组织原则与决策台账
 
-本目录是"虚拟公司多角色插件"项目的文档层。性质：**当前合同 + 设计依据**——实现开始后，
-随代码同 diff 维护"现在为真"的部分；决定、替代方案和验证证据归 `notes/`。`implemented/` 的实现事实仍维护，不是冻结历史；归档是按未来指导价值作出的另一次选择，不是必经下一站。
+本目录是"虚拟公司多角色插件"项目的文档层。性质：**当前合同 + 设计依据**——只写 now、随代码同 diff；决定、替代方案与验证证据归 `notes/`（`implemented/` 实现事实仍维护——归档是按未来指导价值的另一次选择，不是必经下一站）。
 
 ## 文档组织原则（为什么不是"初始化/"）
 
@@ -41,7 +40,7 @@
 
 | 位置 | 回答什么 |
 |---|---|
-| `notes/intents.md` → `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含**实际跑过的验证 + 环境状态**）。**提案纪律**：`proposed/` 不是停车场——进它就必须在状态行带「批准：」标记（`proposal-scheduled` 门禁查；未批准的思考住 `_backlog/plans/` 推敲卡）；条目全有归宿后**毕业**到 `implemented/`（毕业 ≠ 全部实现，而是"每一条都有归宿"）。两条机械门禁 `proposal-scheduled` / `proposal-graduated`。**未成熟思考的上游 = `_backlog/plans/` 推敲卡（D31）**：毕业四门见 `_backlog/README.md` |
+| `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含**实际跑过的验证 + 环境状态**；授权链线索记在 Note 状态行——intents.md 已退役，D34）。**提案纪律**：`proposed/` 不是停车场——进它就必须在状态行带「批准：」标记（`proposal-scheduled` 门禁查；未批准的思考住 `_backlog/plans/` 推敲卡）；条目全有归宿后**毕业**到 `implemented/`（毕业 ≠ 全部实现，而是"每一条都有归宿"）。两条机械门禁 `proposal-scheduled` / `proposal-graduated`。**未成熟思考的上游 = `_backlog/plans/` 推敲卡（D31）**：毕业四门见 `_backlog/README.md` |
 | [notes/archived/](../notes/archived/) · [notes/rejected/](../notes/rejected/) | **研究层离场两桶（D30，出口随 D31 保留）**：archived = 完结且仍被引用的研究（实验记录/评审/调研/台账，可读可引但不在工作集）；rejected = 过时/被推翻的研究（负知识防复犯）。不设回收站语义（git 即归档） |
 | [notes/postmortem/](../notes/postmortem/README.md) | **事故复盘**：为什么流程放过了它 + 加了什么护栏（0001 preset 挂载失败、0002 团队 UI 不可见·根因误诊已更正、0003 重复挂载 remote 砖全 UI） |
 | [notes/implemented/2026-09-22-agent-workflow-community-practice.md](../notes/implemented/2026-09-22-agent-workflow-community-practice.md) | 外部研究：代理工作流的社区/厂商一手证据（结论已吸纳为 D15，否决项也记在里面） |
@@ -50,7 +49,7 @@
 
 ### 决策记录（先辨当前适用范围）
 
-D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历史；D10 的 plans 层已由 D24 退役；D11 的完整切片与窄验证仍可参考，轮次流程由 D23/D24 队列流程替代。队列条目默认新对话上下文接手是 D23 本仓适配。D19 的拆轮安排是历史，搁置池准入条件见 ROADMAP；D21 记录历史轮次安排。D13 的默认适配自由经 D23 收紧：遵循钉住的 DSH 纪律，本地差异按 D 号说明约束与证据。任务操作规则见[开发环 §0.5/§1/§12](./guides/dev-loop.md)。其他决定按对应 owner 与当前实现核对；冲突时查关联 Note 和窄证据。
+D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历史；D10 的 plans 层已由 D24 退役；D11 的完整切片与窄验证仍可参考，轮次流程由 D23/D24 队列流程替代。队列条目默认新对话上下文接手是 D23 本仓适配。D19 的拆轮安排是历史（搁置池已随 D32 整层退役，归档 `_backlog/_done/_misc/`）；D21 记录历史轮次安排。D13 的默认适配自由经 D23 收紧：遵循钉住的 DSH 纪律，本地差异按 D 号说明约束与证据。任务操作规则见[开发环 §0.5/§1](./guides/dev-loop.md)。其他决定按对应 owner 与当前实现核对；冲突时查关联 Note 和窄证据。
 
 | # | 决定 | 依据/出处 |
 |---|---|---|
@@ -63,7 +62,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | D7 | KB 三载体分层：产品化角色知识→preset skills；公司手册→全局/project root；活数据→workspace 文件 | architecture §5 |
 | D8 | 跨会话角色记忆 = workspace journal 文件（`kb/<role>/journal/`） | roles-isolation §4.2 |
 | D9 | 上游缺口（常驻对话+独立组合）若成刚需→走 FAQ 13 方案 B 提 seam（`ChildComposition` 加 preset 字段），不 vendor patch | roles-isolation §4.1 |
-| D10 | **docs/ 按性质分层（导航/设计/计划/指南/合同），不按时间分层**；初始意图归 `notes/intents.md`（否决"初始化/"目录方案） | notes/implemented/2026-09-21-docs-layering.md |
+| D10 | **docs/ 按性质分层（导航/设计/计划/指南/合同），不按时间分层**；初始意图归 intents 登记表（该表已由 D34 退役；否决"初始化/"目录方案） | notes/implemented/2026-09-21-docs-layering.md |
 | D11 | **迭代单位 = 垂直轮**：R1 最薄全路径（CEO+VP-Eng 两人公司）→ 逐轮加宽；交付按完整垂直切片、验证按最窄证据、打磨蛇形折回；现成团队 UI R1 作观察窗、R2 进验收，自定义皮肤 R5；每轮换全新对话上下文（交接靠 roadmap 两清单） | notes/implemented/2026-09-21-vertical-rounds.md；FAQ 13 dev-loop 第 4/6 阶段 |
 | D12 | **patch 语义定案**（R1 实证）：`- id:` 只替换已有行（not found 即丢弃并警告）；**新增行必须 `- insert:` 子列表**；因此 host 行随 pack 的 bundle 走，且 `agent-presets` 行用**替换**语法覆盖 web-app 的出厂行（default: standard → ceo + 自定位 roots）；纯 headless 组合（无此行）用 `dev/company.overlay.yml` 的 insert 补 | notes/implemented/2026-09-22-r1-*.md；vendor shipped dsh-headless/dsh-web-app 的 cordis.patch.yml |
 | D13 | **历史宣言：开发纪律沿用 DSH**（当时写作“整套继承 + 按规模裁剪、不发明本地流程”）。该默认适配自由已由 D23 限定：默认遵循钉住的 vendor 纪律，偏离须登记 D 号与约束证据；当前 owner 见 AGENTS.md §纪律及开发环 §12 | [D23 转型 Note](../notes/implemented/2026-09-23-dsh-inround-task-surface.md)；用户决定 |
@@ -85,6 +84,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | D31 | **推敲空间 `_backlog/` + research 并入**（2026-09-28，用户令）：借外部仓 ai_deerflow_deep_research_v2 的 `_backlog` 三件——plans 推敲卡 / bugs 缺陷卡 / _done（位置即状态），补上「该不该做 / 何时 / 次序 / 是否放弃」四问成熟前的家；红线 = **只承载判断材料，不承载次序与授权**（D23 plans 层教训）；research 目录退役并入 plans（调研卡 = 卡性质，D30 三态出口保留）；门禁 research-liveness → plans-liveness。**D33 回借**：章制 2026-10-03 自 ai_dsh_loop_advisor 升级（主干框架/章程账本二分/索引交叉核对门禁/两桶解禁/全日期卡名） | [_backlog/README.md](../_backlog/README.md)；[implemented/2026-09-28-backlog-deliberation-space](../notes/implemented/2026-09-28-backlog-deliberation-space.md) |
 | D32 | **队列层退役（2026-09-28，用户令「ROADMAP 痕迹彻底清理」）**：ROADMAP.md 删除（末次全文 commit `5018118`）；职能去向 = 实施次序→用户逐条给、在办→会话 goal/用户指令、已批→RFC 状态行「批准：」标记（proposal-scheduled 改查它，反证已证）、搁置池/磨清单→`_backlog/_done/_misc/`（同日二次归档；初迁 `_backlog/suspended.md` 已由 intents D32 行声明作废）；毕业四门、入口链（dev-loop §0.5 分支②、entry-probe Q1/Q2/Q6/Q9/Q11）、md-links 扫描面同步重接；历史层（intents/snapshots/旧 Note）按"当时事实"保留 | [implemented/2026-09-28-roadmap-retirement](../notes/implemented/2026-09-28-roadmap-retirement.md)（含**保留 ROADMAP 的反方论据全文**——用户裁决前的 dissent 留档） |
 | D33 | **`_backlog` 章制回借（2026-10-03，用户令「从 ai_dsh_loop_advisor/_backlog 学习整理」）**：本仓送出去的制度在外面进化一代后借回——主干框架（缓冲→加工→回流）+ 三硬规则 + 反双记账合成规则 + 章程/账本二分入章程；门禁 plans-liveness → **backlog-liveness**（+制度目录在场 + 索引交叉核对；升格依据 = 本轮实测活违规两处）；`_suspended_*`/`reference/` 两桶解禁再借（用户拍板②；`_misc/` 定性历史池）；卡名 YYMMDD → `YYYY-MM-DD`（用户拍板①，全仓一种日期格式，9 卡 git mv + 活指针修复）；毕业门第二行理顺为等待卡口径（确认 2026-10-02 治理轮决定，不逆转） | [_backlog/README.md](../_backlog/README.md)；[implemented/2026-10-03-backlog-charter-refit](../notes/implemented/2026-10-03-backlog-charter-refit.md) |
+| D34 | **intents.md 退役（2026-10-04，用户令「有了 `_backlog` 还放在这儿是噪声」）**：第三本账（内容 100% 派生自 Note 状态行，_backlog 章程反双记账同款病）+ 膨胀病史三次（40.5KB 胖行 / 96 行超窗 / 61 行触限）+ 违反上游 no-index 教义（vendor notes README："Do not add a centralized `INDEX.md`"——活跃树即清单）⇒ 整表冻结进 `notes/archived/intents-2026-10.md`（终档）后删文件；拆 `intents-row-budget` 门禁与窗口规矩；五处指针重接（AGENTS ×2 / dev-loop ×2 / index / verify / entry-probe Q11）。授权链线索住 Note 状态行，时间轴 = notes/ 文件名日期 + git log | [implemented/2026-10-04-doc-snr-cleanup-round](../notes/implemented/2026-10-04-doc-snr-cleanup-round.md) 决定④ |
 
 ### 待定与活动提案
 

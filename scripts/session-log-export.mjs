@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// 状态：常驻
 // 会话日志导出（研究卡 E3，2026-09-30 立）：把 $DSH_HOME 里的 zstd 多帧会话日志导出成
 // **明文平铺 .jsonl 目录**，让 `deliverables-check --sessions` / `authorship-audit` 等明文消费者
 // （含归档快照审计——snapshots/README「登记一条缺口」从此有了工具）吃得上。

@@ -246,9 +246,9 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 （CEO persona 的开工仪式先烧 5–6 步模型往返），而且**依赖模型配合**：模型不调那个工具就永远绿不了。
 **这是层次放错，不是脚本写得不好。**
 
-**分层（按"要不要模型"切，不按"重不重要"切）**：本表给**分层原则 + 各层的代表脚本**；
-**每个脚本自己的触发条件与成本在它头注里**（`// 何时跑：…`，门禁 `script-triggers` 强制自述）
-——**别把逐个脚本的触发条件抄回本表**（2026-09-26 实测本表曾漏 6 个已存在脚本，而 AGENTS.md 又把
+**分层（按"要不要模型"切，不按"重不重要"切）**：**层定义与证明边界唯一见 [testing.md §1](../../docs/testing.md)**；
+本表只给**命令与预算速查**。每个脚本自己的触发条件与成本在它头注里（`// 何时跑：…`，
+门禁 `script-triggers` 强制自述）——**别把逐个脚本的触发条件抄回本表**（2026-09-26 实测本表曾漏 6 个已存在脚本，而 AGENTS.md 又把
 "何时跑"指回本表，成环）：
 
 | 层 | 时间 | 跑什么（代表脚本；**它自己的触发条件在头注**） |
@@ -261,9 +261,11 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 | CLI 集成（keyless，需子进程） | 秒级 | `node scripts/snapshot-motion-smoke.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） |
 | 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../release.md)） |
 | 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件与成本见其头注「何时跑」**；`script-triggers` 门禁强制） |
+| 行为质量档（认证） | 分钟级 | `probe --full`（内容档三探针）+ `candidate-scan-eval`（语料判据家 = testing.md §4） |
 
 **证明边界（每层只证明自己能观察的性质）的唯一家 = [docs/testing.md](../../docs/testing.md) §1**
-（2026-10-04 立测试宪法时自本节迁入——宪法还拥有：改动面→最小证据映射、证据纪律七条、资产
+（2026-10-04 立测试宪法时自本节迁入——宪法还拥有：改动面→最小证据映射、证据纪律（条数以宪法 §3
+实列为准，别在此复述数字）、资产
 三分法、自测轮授权、已知未覆盖面、升级地图；本节只留命令与预算）。换档先问"这一层能证明我关心的
 性质吗"，不为安心堆档（对照《Agent-ready Development》05 六层反馈；判定见
 [harness-alignment 台账](../../notes/archived/2026-09-25-harness-alignment-ledger.md) §B）。
@@ -331,7 +333,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - 机械单步修正：更新事实 owner，跑相关检查；不新建 intent、RFC 或收尾 Note。
 - 记录判据（不是 diff 大小）：需要 Note 的信号 = **存在真实替代方案 + 持久取舍**；豁免的实质 =
   除决定理由无处安放外，其余事实都已有 owner（代码、测试、现有文档能承载的不重复记）。
-- 非平凡决定/feature：相关 `notes/intents.md` 与 RFC/Note 随同变更更新；记录实际决定、关键取舍、跑过的验证与未完成项。pack 行为面变更同 diff 更新 `packages/company-pack/README.md` 的已知限制段（2026-09-28 立）。
+- 非平凡决定/feature：相关 RFC/Note 随同变更更新；记录实际决定、关键取舍、跑过的验证与未完成项。pack 行为面变更同 diff 更新 `packages/company-pack/README.md` 的已知限制段（2026-09-28 立）。
 - **宣布完成前对照条目/授权原文过一遍需求与体验验收**（2026-09-28 借 FAQ 15）——机器绿灯只证机制面，不证"做的是不是这件事"。
 - **被证伪的已落地切片整片 revert**（实现+测试+docs+Note 同退），修正另起新条目；不做半 revert 的外科修补——半退留"文档说 A、代码是 B"漂移态，结构门禁查 HEAD 不查语义一致，抓不住（2026-09-28 借 FAQ 11）。
 - 完成条目：验收通过后其 `_backlog` 表行/卡即离场（`git mv` 或删行，证据留 Note）；未完成项写清阻塞与下一步留在原处。不要把完成标记或过期环境状态堆回任务源。
@@ -362,7 +364,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - 收到人审/用户反馈：成立就修复并补证据；不成立用技术事实反驳，**不作表演式同意**。
 - 条目收尾后可派**中立体清扫**（独立子代理；输入 = diff + 收尾 Note + 关联 `_backlog` 行/卡；固定清单格式与首跑样例见 [implemented/notebook-hygiene](../../notes/implemented/2026-09-25-notebook-hygiene.md) 实况）——扫与修分家。
 - 文档卫生按指导价值：移除失效/重复指令与无行动价值的历史噪声；保留仍指导当前决策、解释约束或支持复验的证据。不以净减行数为目标（D26）。
-- **`notes/intents.md` 的行 = 一行指针**（日期 + 一句话 + 状态 + 链接），**详情归对应 Note**——在行里复述 Note 内容是造重复事实家（2026-09-26 实测：5 天 585B → 40.5KB、≈600B/行，且与 Note 双写）。历史行只留指针，不回填细节；活状态（待续/剩账）住 `_backlog/plans/` 或 `notes/proposed/`。机械面 = verify `intents-row-budget`（表行 ≤500 码元；2026-10-02 立带负例——负例即 32 个胖行的出生现场）+ **窗口规矩**：活表 ≤60 行只留最近授权链，出窗行按月冻结进 `notes/archived/intents-<YYYY-MM>.md`（同日第二刀，用户拍板，负例 = 96 行出生现场；月度文件只追加不改写，git blob 是底裤）。
+- **授权链与时间轴（intents.md 已退役，D34 2026-10-04）**：授权线索（用户点名/裁定原话）记在**对应 Note 的状态行**；时间轴 = `notes/implemented/` 文件名日期 + git log；冻结档案 = `notes/archived/intents-*.md`（2026-10 为终档，只读）。退役理由 = 第三本账与 Note 双写、膨胀病史三次、违反上游 no-index 教义（vendor notes README）。
 - **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链一律 `set -o pipefail` + `&&`（不带 pipefail 的 `cmd | tail` 退出码是 `tail` 的 = 假绿）。push 由 **pre-push hook 强制跑全量 `pnpm verify` + `pnpm test`**（verify 2026-09-27 立；test 09-28 加，不进 CI 的定界见 [ci-test-lane Note](../../notes/implemented/2026-09-28-ci-test-lane.md)；接线 = `source dev/env.sh` 幂等设 `core.hooksPath`；bypass = `--no-verify`，用后须在收尾 Note 说明原因）。
 - **复盘一问：本轮有没有 agent 遵守的"未成文规则"**（从代码模式推断出的伪规则，跨会话会扩散）？三选一收口：升格 verify 门禁 / 写进 owner Note / 显式作废——规则不留空气（2026-09-28 借 FAQ 11）。
 
