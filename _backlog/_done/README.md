@@ -27,6 +27,8 @@
 | [2026-10-02-feedback-channel-cultivation.md](_closed_plans/2026-10-02-feedback-channel-cultivation.md) | 该做（D1 选型拍定：两者都要——读模型 + 手册引导） | 实施随培养回路下一轮立项，届时新 RFC 引本卡 | 2026-10-03 |
 | [2026-09-29-writing-collab-locks-redis.md](_closed_plans/2026-09-29-writing-collab-locks-redis.md) | 该做（R0 四条已落地；R2 留带触发条件的实验位随 Note） | [implemented/2026-10-03-redis-r0-native-collab](../../notes/implemented/2026-10-03-redis-r0-native-collab.md) | 2026-10-03 |
 | [2026-09-29-deliverables-lifecycle-metadata.md](_closed_plans/2026-09-29-deliverables-lifecycle-metadata.md) | 该做（五决策点拍定并同 diff 落地：C1/A1/B1/分型/归档家/并步） | [implemented/2026-10-03-deliverables-lifecycle-landing](../../notes/implemented/2026-10-03-deliverables-lifecycle-landing.md) | 2026-10-03 |
+| [2026-10-04-multi-user-concurrency-bdd.md](_closed_plans/2026-10-04-multi-user-concurrency-bdd.md) | 该做（用户令「评估之后开始加工」；C1 走查观察已在手） | [implemented/2026-10-04-multi-user-bdd-batch1](../../notes/implemented/2026-10-04-multi-user-bdd-batch1.md)（C1/C2 固化 = team-concurrency-probe 4/4） | 2026-10-04 |
+| [2026-10-04-human-agent-unity-ux-bdd.md](_closed_plans/2026-10-04-human-agent-unity-ux-bdd.md) | 该做（同上；H3 主回路零资产） | [implemented/2026-10-04-multi-user-bdd-batch1](../../notes/implemented/2026-10-04-multi-user-bdd-batch1.md)（H3 固化 = member-rescue-probe 6/6） | 2026-10-04 |
 
 ## 搁置推敲卡（暂停——不是做完）
 
@@ -50,7 +52,7 @@
 
 | 文件 | 喂过哪张卡 | 日期 |
 |---|---|---|
-| （空——随首张毕业卡迁入时建行） | | |
+| [2026-10-04-multi-user-ux-walk.md](_reference/2026-10-04-multi-user-ux-walk.md) | 上两张（multi-user BDD C 系 + H 系——两轮走查实录 + Agent Team 能力面清单） | 2026-10-04 |
 
 ## 退役历史池（2026-09-28 整池退役，点名才读）
 

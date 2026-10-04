@@ -1,8 +1,8 @@
 # 推敲：多用户并发数据完整性——BDD 场景组（C 系）
 
-> 状态：推敲中｜毕业门判断 = **该做**（C1 已有走查观察证据；毕业 = 用户圈定场景批次批 RFC → probe 固化判据）｜
+> 状态：已毕业（2026-10-04 第一批加工交付：C1/C2 固化 = scripts/team-concurrency-probe.mjs 首跑 4/4；去向与后续批次 = [batch1 Note](../../notes/implemented/2026-10-04-multi-user-bdd-batch1.md)）｜原判断：该做（C1 已有走查观察证据；毕业 = 用户圈定场景批次批 RFC → probe 固化判据）｜
 > 下一步 = 用户圈定 C1–C7 进第一批；C8 挂产品决策不排期。证据半边 =
-> [reference/2026-10-04-multi-user-ux-walk](../reference/2026-10-04-multi-user-ux-walk.md)。
+> [reference/2026-10-04-multi-user-ux-walk](../_reference/2026-10-04-multi-user-ux-walk.md)。
 
 ## 背景 / 触发
 

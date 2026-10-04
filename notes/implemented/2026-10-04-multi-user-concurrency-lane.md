@@ -13,6 +13,9 @@
 
 ## 场景规格（S1–S6；本表是 lane 的验收规格，逐条兑现时其可执行形态进脚本头注）
 
+> 细粒度 BDD 场景（C 系并发 / H 系人机合一）与其批次跟踪 = [multi-user-bdd-batch1 Note](./2026-10-04-multi-user-bdd-batch1.md)
+> （推敲卡已毕业 `_done`；第一批 H3 + C1/C2 已固化）。
+
 | # | Given / When / Then（判据） | judge 落点 | 状态 |
 |---|---|---|---|
 | S1 同 slug 撞车 | 共享盘已有 <slug> 产物；另一场动议同 slug present ⇒ `slug-collision` 观察项命中 | `deliverables.spec:336`（keyless 已钉）+ `deliverables-check` 真跑（09-30 renewal-y 实证） | ✅ 闭合 |

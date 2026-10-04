@@ -11,8 +11,6 @@
 
 | 卡 | 一句话 | 毕业门判断 |
 |---|---|---|
-| [2026-10-04-multi-user-concurrency-bdd](./2026-10-04-multi-user-concurrency-bdd.md) | 多用户并发数据完整性 BDD 场景组（C1–C8）：C1 同文件双写已有走查观察（一胜一拒零互踩）；含「要不要 redis」判定树 | 该做——用户圈定批次批 RFC → probe 固化；C8 挂 dsh-atomic-write 决策 |
-| [2026-10-04-human-agent-unity-ux-bdd](./2026-10-04-human-agent-unity-ux-bdd.md) | 人机合一 UX BDD 场景组（H 系）：H3 成员求救回路是主回路缺口（零端到端资产）；H1/H2/H4 已闭合 | 该做——H3 建议第一批（≈$2–4）；H6/H7 先设计决策 |
 | [2026-10-02-deferred-verifications](./2026-10-02-deferred-verifications.md) | 触发条件型等待卡：两笔验证债（browser 行为复跑、`probe --full` 低峰双收口）2026-10-02 自 intents 迁来立卡 | 第 1 笔触发已成立但新阻塞（沙箱拒写 playwright 缓存树）；**seam 三选一已拍（2026-10-03）：暂缓登记**，等真实演示需求触发选型；**第 2 笔已判收（2026-10-03 补跑 14/15、TRANSPORT 零复发——帧级定性归档进升 pin Note）**；剩第 1 笔，判收即毕业 |
 
 ## 卡片模板

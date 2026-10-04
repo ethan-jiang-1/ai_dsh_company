@@ -65,3 +65,4 @@
 | 2026-09-25 | **驾驶舱① ·「需要你」注意力中心**（goal 第二条）：跨会话聚合四类等人状态 + remote.$on 观察者 | implemented（[cockpit-human-loop §切片一](./implemented/2026-09-24-cockpit-human-loop.md)） |
 | 2026-10-04 | **测试宪法落地**（_digested/test-strategy 消化采纳）：docs/testing.md（证据政策唯一家）+ pack 导出形态守卫 + 升 pin 语料回放步 | implemented（[testing-constitution](./implemented/2026-10-04-testing-constitution.md)） |
 | 2026-10-04 | **多用户并发交互 UX 立项**（用户令）：场景规格 S1-S6 + 分期判据（Phase 1=规格与纪律升格已交付；Phase 2=双门 e2e 首跑 10/10 已交付） | implemented（[multi-user-concurrency-lane](./implemented/2026-10-04-multi-user-concurrency-lane.md)） |
+| 2026-10-04 | **多用户 BDD 加工·第一批**（用户令评估+加工）：H3 求救回路 probe 6/6 + C1/C2 并发固化 probe 4/4 首跑全绿；两卡毕业 _done；次序四批在 Note | implemented（[multi-user-bdd-batch1](./implemented/2026-10-04-multi-user-bdd-batch1.md)） |
