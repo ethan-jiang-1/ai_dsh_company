@@ -62,7 +62,7 @@ const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 105],            // 2026-09-23 二次收口（渐进披露）；2026-09-27 瘦身轮：密钥/三实体/原生纪律/不发明段压缩（当时 108→100），棘轮 115→105
   ['docs/index.md', 147],        // 2026-09-26 升至 149（D29/D30 行）；2026-09-27 瘦身轮：合同落点段删并、D19+D21 / D23+D24 并行、肥行压一行指针（当时 149→139），棘轮 149→146；2026-10-04 升至 147（文档地图加 testing.md 宪法行，Note 同 diff）
   ['docs/guides/dev-loop.md', 395], // 2026-09-26/27 升至 467（§13、inspect 句）后同日瘦身轮：§7 整段迁 guides/bootstrap.md、§7 留指针防断链（当时 467→376），棘轮 467→395
-  ['docs/testing.md', 60],       // 2026-10-04 立测试宪法（_digested/test-strategy 消化采纳轮；政策唯一家，只写 now——膨胀先迁，不加预算）
+  ['docs/testing.md', 61],       // 2026-10-04 立测试宪法（_digested/test-strategy 消化采纳轮；政策唯一家，只写 now——膨胀先迁，不加预算）；同日 61（§3.8 红/场景先行，多用户 lane 立项轮）
   ['company-workspace/AGENTS.md', 195], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面（186 行 ≈ 16.4KB × 每会话），同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
