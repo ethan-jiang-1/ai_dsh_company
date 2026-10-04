@@ -57,3 +57,17 @@ D15/门禁注释，新会话沿纪律表落点进 vendor 语境错配的 testing
 - **第二批资产（同日盘点轮，用户问「需不需要补充测试资产」触发）**：全仓模块 × 测试导入机械对账后，唯一真缺口 = host 半 `request_signoff` 的行为路径（插件证据阶梯台阶二：纯函数有 signoff.spec、真挂载有 preset-smoke、人回路有录制，唯 execute 分支零 keyless 资产）⇒ 补 `tests/signoff-tool.spec.ts` 4 用例（真 defineTool 包装 + 只 stand-in ctx.approval：schema 拒缺参 / 无 agent fail-closed 不触审批 / reason-decision-note 透传线 / callId 缺省不带键）；**反证三步** = 破坏 fail-closed 分支 → 精确红在目标用例 → 还原 → 绿。对账结论登记：纯函数层已满覆盖（diffActivity/memberNames/activityFromEvents 经 presence-board.spec）；零引用模块逐一判定——`tool-card.ts` 经两张卡片 spec 传递覆盖、`use-company-data` 为 React 接线（纯函数全部已测）、`release-process.mjs` 纯编排（release-smoke 本身是它的测试）、`cdp-driver.mjs` 浏览器驱动（keyless 层禁入，layering 门禁）——均不补。
 - **同日追加三（宪法 §1.1 资产命名语法）**：用户点破 DSH「后缀即层」是好实践（名字即 lane，不打开文件就知道单元/端到端/该进哪个回归）。对账：用例名行为命题文体、fixture 在 include 外、`-e2e-smoke` 标记本仓已合；**缺口 = scripts 后缀词表 de-facto 在用却无政策家 + tests/ 下非 spec 形态 = 静默死资产无政策行** ⇒ 宪法 §1.1 成文（7 行词表 + 用例名文体 + 政策不设新门——未复发守门禁升格判据）；**存量 33 脚本不回改**（改名 = 引用链 churn，D26）；与 DSH 的诚实差异：DSH 后缀经 8 份 vitest 配置机械绑车道，本仓只有 tests/ 半边机械（单一 include）、scripts/ 是约定 + script-triggers 头注门禁。
 - pre-push hook：push 时自动跑 verify + test（本 Note 同 diff 提交）。
+
+## 全天产出地图（收口索引，2026-10-04 深夜补——用户指认"忙了一天但线索散"，本节 = 一页看全）
+
+**① 规矩层**：[docs/testing.md](../../docs/testing.md)（新建，75 行宪法）＋ [tests/pack-exports.spec.ts](../../tests/pack-exports.spec.ts)、
+[tests/signoff-tool.spec.ts](../../tests/signoff-tool.spec.ts)（守卫+行为资产）＋ dev-loop/release/AGENTS/index/verify 接线（§1.1 命名语法、§3.8 红场景先行、script-triggers 扩 eval、行预算 ×2）。
+**② 多用户 BDD 五 Note 六 probe**：[lane 立项+S1-S6 规格](./2026-10-04-multi-user-concurrency-lane.md) →
+[batch1](./2026-10-04-multi-user-bdd-batch1.md)（member-rescue-probe 6/6 + team-concurrency-probe 4/4）→
+[batch2](./2026-10-04-multi-user-bdd-batch2.md)（dissent-preservation-probe 4/4 + team-atomicity-probe 3/3）→
+[batch3](./2026-10-04-multi-user-bdd-batch3.md)（member-interrupt-probe 4/4 + team-recovery-probe 4/4）——
+probe 本体全在 `scripts/`（六个，命名语法 §1.1）。
+**③ 推敲卡生→死**：两卡一材料从 `_backlog/plans|reference/` 毕业迁 `_backlog/_done/`（_closed_plans ×2 + _reference ×1，状态行补去向、索引三处同步）。
+**④ 未动（等用户）**：[_backlog/plans/2026-10-02-deferred-verifications](../../_backlog/plans/2026-10-02-deferred-verifications.md)
+第 1 笔（角色沙箱×playwright 缓存树，seam 三选一暂缓）＋ C8/H6/H8 三决策项（见 lane Note 挂起表）。
+**⑤ 证据快照**：`snapshots/attention-e2e/2026-10-04-dual|rescue/`。intents 四行指针对应。
