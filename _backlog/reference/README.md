@@ -19,4 +19,4 @@
 
 | 文件 | 喂哪张卡 | 一句话 |
 |---|---|---|
-| （空——首件研究材料落地时建行） | | |
+| [2026-10-04-multi-user-ux-walk](./2026-10-04-multi-user-ux-walk.md) | [plans/multi-user-concurrency-bdd](../plans/2026-10-04-multi-user-concurrency-bdd.md) + [plans/human-agent-unity-ux-bdd](../plans/2026-10-04-human-agent-unity-ux-bdd.md) | 两轮走查实录（人机合一 159s 全旅程 + 双成员同文件并发观察）+ Agent Team 能力面清单（内建并发机制与跨进程缺口） |
