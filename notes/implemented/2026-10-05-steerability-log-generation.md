@@ -29,5 +29,5 @@
 
 ## 后果
 
-- [runtime-runbundle RFC](../proposed/2026-10-05-steerability-runtime-runbundle.md) 的「session ids 与日志世代」字段现在有统一语义可引用。
+- [runtime-runbundle RFC](./2026-10-05-steerability-runtime-runbundle.md)（已实施）的「session ids 与日志世代」字段现在有统一语义可引用。
 - journal-audit 的 coo 缺席为数据侧待处置观察（2026-09-24 场次，早于本变更 11 天）——不在本条扩围，留用户裁决。

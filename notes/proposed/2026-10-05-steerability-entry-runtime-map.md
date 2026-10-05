@@ -33,7 +33,7 @@
    workspace、snapshot、replay tmp、browser state 的关系与时序；Web 链全图（问题节所列）；「错误入口」
    提示段（headless 只证明通用 CLI；未 source env.sh 时日用 home 同名 web profile 陷阱引 [docs/demo.md](../../docs/demo.md)）。
    退役 profile 标记行的事实 owner 在
-   [运行态与 run bundle RFC](2026-10-05-steerability-runtime-runbundle.md)，本文件只导航。
+   [运行态与 run bundle RFC](../implemented/2026-10-05-steerability-runtime-runbundle.md)（已实施 = dev/README），本文件只导航。
 5. **交叉链接**：四个入口文件互链各答其一，不重复事实。
 
 ## 输掉的方案（留尸）

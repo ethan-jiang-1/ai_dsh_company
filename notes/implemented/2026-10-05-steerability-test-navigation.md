@@ -8,7 +8,7 @@
 - **[harness/navigation-assets.spec](../../tests/harness/navigation-assets.spec.ts) 立**（7 项 keyless 守卫）：钉导航骨架（四区行 / 映射锚点 / 首跑定位 / 不复述头注 / **tests/README 相对链接可解析**——md-links 门禁不扫 tests/，此缺口由本 spec 补上）+ snapshots oracle 政策在场。
 - **[snapshots/README.md](../../snapshots/README.md) 场景元数据政策行立**：新场景的 snapshot.yml / 场景 README 须声明 `workspace.expected` 来源性质（独立 oracle / 录制整盘副本 / authored 回放）；历史 payload 不改写。
 - **[dev-loop §9.1](../../docs/guides/dev-loop.md) 首跑行**：新 Agent 首跑验收指针，唯一家 = tests/README。
-- focused 反证测试归位确认：日志世代（[log-generation RFC](./2026-10-05-steerability-log-generation.md) 自带 11 例合同 spec）、preset/child（[矩阵 RFC](./2026-10-05-steerability-preset-skill-matrix.md)——已实施，四形态矩阵 + 真日志抽查）、tmp 出口（[运行态 RFC](../proposed/2026-10-05-steerability-runtime-runbundle.md)）——本条只收导航 own 的部分，未越界。
+- focused 反证测试归位确认：日志世代（[log-generation RFC](./2026-10-05-steerability-log-generation.md) 自带 11 例合同 spec）、preset/child（[矩阵 RFC](./2026-10-05-steerability-preset-skill-matrix.md)——已实施，四形态矩阵 + 真日志抽查）、tmp 出口（[运行态 RFC](./2026-10-05-steerability-runtime-runbundle.md)——已实施，dev/README §四逐项登记）——本条只收导航 own 的部分，未越界。
 
 ## 验证记录
 
