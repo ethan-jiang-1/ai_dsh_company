@@ -128,8 +128,10 @@ d) 用 team_task_update 把任务标记 completed，再给 lead 发一句「${na
   check('P3 writeScope 重叠警告原文在场（C5a 同场复核）',
     /write scopes overlap with task-/i.test(flatLead), flatLead.match(/write scopes overlap[^"\\]*/i)?.[0] ?? '未见警告')
 
-  writeFileSync(join(ASSETS, 'probe-stdout.md'),
-    `# taskboard-presence-probe 2026-10-04\n\nsession: ${sessionId}\n\n判据明细：\n${results.map(r => `- ${r.ok ? 'PASS' : 'FAIL'} ${r.label}${r.detail ? `（${r.detail}）` : ''}`).join('\n')}\n`)
+  const report = `# taskboard-presence-probe 2026-10-04\n\nsession: ${sessionId}\n\n判据明细：\n${results.map(r => `- ${r.ok ? 'PASS' : 'FAIL'} ${r.label}${r.detail ? `（${r.detail}）` : ''}`).join('\n')}\n`
+  writeFileSync(join(ASSETS, 'probe-stdout.md'), report)
+  // 复跑不覆盖历史（2026-10-05 复跑轮教训：稳定指针 + 时间戳历史各一份）
+  writeFileSync(join(ASSETS, `probe-stdout-${new Date().toISOString().replace(/[:.]/g, '-')}.md`), report)
   const failed = results.filter(r => !r.ok)
   console.log(failed.length === 0
     ? `\ntaskboard-presence-probe: ALL PASS（${results.length}/${results.length}）——认领两态 + 在场板原料 + scope 警告`

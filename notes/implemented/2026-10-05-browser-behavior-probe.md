@@ -48,6 +48,15 @@ sandbox 联动。**选型维持用户 2026-10-03 拍板的「暂缓登记」，�
 - **沿用批5b 口径在角色会话内复跑**：第二层墙（沙箱内 chromium 崩溃）使该路径今天不可判收；
   用户明示改由维护者侧测试 = 正确的分层（工具链行为层与沙箱部署层分开验证）。
 
+## 复跑登记（2026-10-05，用户令「值得再跑一遍」——多次采样才叫证明）
+
+- **栅栏内 ×2：Target crashed 再现 → 4/4 确定性**（第二层墙非偶发——seam ② 证据升格）；
+- 栅栏外 ×2：5/5 稳定（累计 3/3）；B0 重定向 4/4 稳定（修复非侥幸）；
+- 孤儿 chromium/headless_shell 进程 **0/2**（probe 杀 server 后 ps 复查；ps 在栅栏内被拒、栅栏外查得）——收割干净，本轮新问首次回答；
+- **复跑新抓一题**：probe 资产路径无 run 区分，复跑覆盖首跑 probe-stdout.md → 两 probe
+  （taskboard/browser）改「稳定指针 + 时间戳历史」双写；首跑证据自留痕转录恢复。
+- 矩阵全文 = [rerun-matrix.md](../../snapshots/browser-behavior-probe/2026-10-04/rerun-matrix.md)。
+
 ## 依据
 
 - deferred-verifications 卡（两笔债的出处与判收口径）：[卡](../../_backlog/_done/_closed_plans/2026-10-02-deferred-verifications.md)

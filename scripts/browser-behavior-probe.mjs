@@ -148,8 +148,10 @@ try {
     && type.result?.isError !== true && snap3Text.includes('ECHO:probe-typed'),
     `click.isError=${String(click.result?.isError)} click原文=${resultText(click.result).replace(/\n/g, ' ').slice(0, 220)} | type.isError=${String(type.result?.isError)} type原文=${resultText(type.result).replace(/\n/g, ' ').slice(0, 150)} | snap2含CLICKED=${snap2Text.includes('CLICKED-OK')} snap3含ECHO=${snap3Text.includes('ECHO:probe-typed')}`)
 
-  writeFileSync(join(ASSETS, 'probe-stdout.md'),
-    `# browser-behavior-probe 2026-10-05\n\ncli: ${cli}\nfixture: ${FIXTURE_URL}\nbrowsers root: ${PW_BROWSERS}（重定向进栅栏）\n\n判据明细：\n${results.map(r => `- ${r.ok ? 'PASS' : 'FAIL'} ${r.label}${r.detail ? `（${r.detail}）` : ''}`).join('\n')}\n\n## 最终快照（type 后）\n\n\`\`\`\n${snap3Text.slice(0, 2000)}\n\`\`\`\n`)
+  const report = `# browser-behavior-probe 2026-10-05\n\ncli: ${cli}\nfixture: ${FIXTURE_URL}\nbrowsers root: ${PW_BROWSERS}（重定向进栅栏）\n\n判据明细：\n${results.map(r => `- ${r.ok ? 'PASS' : 'FAIL'} ${r.label}${r.detail ? `（${r.detail}）` : ''}`).join('\n')}\n\n## 最终快照（type 后）\n\n\`\`\`\n${snap3Text.slice(0, 2000)}\n\`\`\`\n`
+  writeFileSync(join(ASSETS, 'probe-stdout.md'), report)
+  // 复跑不覆盖历史（2026-10-05 复跑轮教训：稳定指针 + 时间戳历史各一份）
+  writeFileSync(join(ASSETS, `probe-stdout-${new Date().toISOString().replace(/[:.]/g, '-')}.md`), report)
   const failed = results.filter(r => !r.ok)
   console.log(failed.length === 0
     ? `\nbrowser-behavior-probe: ALL PASS（${results.length}/${results.length}）——缓存重定向进栅栏 + 导航/读内容/点击/输入行为链全通`

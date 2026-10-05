@@ -33,6 +33,15 @@
 - **复用 team-atomicity-probe 扩判据**：一 probe 一关注点（C4/C5 已固化各自可复跑），认领两态/
   在场原料另立新 probe，判据互不牵连。
 
+## 复跑登记（2026-10-05，用户令「值得再跑一遍」——多次采样才叫证明）
+
+- **复跑 5/5 ALL PASS（累计 2/2）**——P3 本轮拿到逐字警告原文 `write scopes overlap with task-2`
+  （与 batch2 C5a 完全一致；首跑为噪声匹配先命中，复跑样本更干净）。
+- **复跑新抓一题**：probe 资产路径无 run 区分，复跑覆盖首跑 probe-stdout.md → probe 改「稳定指针 +
+  时间戳历史」双写（browser-behavior-probe 同款修复）；首跑证据自留痕转录恢复。
+- 资产 = [snapshots/taskboard-presence-probe/2026-10-04/](../../snapshots/taskboard-presence-probe/2026-10-04/probe-stdout.md)
+  （probe-stdout-run1.md / probe-stdout-run2.md / probe-stdout.md 最新）。
+
 ## 依据
 
 - 两张被判收 Note：shared-disk-taskboard-coordination / presence-board-progress-surface
