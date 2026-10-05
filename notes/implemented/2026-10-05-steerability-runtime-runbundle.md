@@ -26,3 +26,4 @@
 - dev/README 对 runtime-map 的前向引用在 entry-runtime-map 落地时转为正式链接。
 - journal-audit coo 缺席（2026-09-24 场次）已处置：journal-audit「已知历史缺口」观察档（2026-10-05 同日，依据与外科红证见 [log-generation](./2026-10-05-steerability-log-generation.md) 后果节）。
 - dev/logs 空置目录已确认无写入者并删除（2026-10-05 卫生轮；dev/README 行同步移除）。
+- 退役 profiles/company 已删除（2026-10-05 裁决轮：零功能消费面终核 + 48M 死重；dev/README 留墓碑行 + runtime-map 条目同步；dev-loop §6 的 `~/.dsh/profiles/company` 提及是日用 home 历史事故记录，与此无关、保留）。

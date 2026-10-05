@@ -20,7 +20,7 @@
 | 件 | 是什么 | 标记 |
 |---|---|---|
 | `harness-home/` | **开发主 DSH_HOME**：`sessions/`（会话日志 = 数据层证据源，世代选择唯一口径 = [session-log-generation](../scripts/lib/session-log-generation.mjs)）、`profiles/`（`headless` / `web` = current）、`storages/`、`cache/`、`oracle-tests/`、`replay-runs/` + `replay-diagnosis/`（replay 现场与失败诊断）、`repository-migration-hashes.json`（迁移校验基线） | runtime·current |
-| `harness-home/profiles/company/` | **退役 profile**（file: 复制形状 + 旧 Web 版本）——**非权威、不可作为当前入口**；处置 = 保留 + 标记（2026-10-05 拍板），删除需消费面清单 + 回滚方案 + 单独决定 | runtime·**retired** |
+| ~~`harness-home/profiles/company/`~~ | **已删除**（2026-10-05 裁决轮：零功能消费面终核 + 48M 死重；理论重建 = git/vendor 历史 + `file:` 安装程序有文档）——若再现同名目录 = 异常，查来历 | deleted·2026-10-05 |
 | `harness-home/b/`、`harness-home-b/` | 第二/嵌套 home——多 home 实验与跨 home 审计视角（authorship 口径：每家导出各审一次再拼结果） | runtime·实验面 |
 | `pw-browsers/` | 浏览器二进制与 profile（`PLAYWRIGHT_BROWSERS_PATH` 重定向落点）；**UI 布局记忆按 origin 隔离**存在浏览器 profile——换端口重启即新 origin、记忆清零 | runtime |
 | `rehearsal-workspace/` | **排练盘**：排练/探针 cwd——**绝不写 live 公司盘**（`company-workspace/`） | runtime·排练 |

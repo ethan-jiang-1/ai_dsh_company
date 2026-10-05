@@ -1,7 +1,7 @@
 # 推敲：多用户并发数据完整性——BDD 场景组（C 系）
 
 > 状态：已毕业（2026-10-04 第一批加工交付：C1/C2 固化 = scripts/team-concurrency-probe.mjs 首跑 4/4；去向与后续批次 = [batch1 Note](../../../notes/implemented/2026-10-04-multi-user-bdd-batch1.md)）｜原判断：该做（C1 已有走查观察证据；毕业 = 用户圈定场景批次批 RFC → probe 固化判据）｜
-> 圈定已兑现（C1–C7 第一批 = batch1 Note）；C8 挂产品决策不排期（仍待产品裁决）。证据半边 =
+> 圈定已兑现（C1–C7 第一批 = batch1 Note）；C8 已裁决关账（2026-10-05 用户拍板：**规矩层即答案**——单写进程部署约定已闭合，残余风险归部署纪律不归产品；复活触发 = 多进程写盘常态化 或 dsh-atomic-write 上游落地，触发兑现按写回规则立新卡引用本卡，不复活）。证据半边 =
 > [reference/2026-10-04-multi-user-ux-walk](../_reference/2026-10-04-multi-user-ux-walk.md)。
 
 ## 背景 / 触发

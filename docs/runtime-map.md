@@ -44,7 +44,7 @@ repo（pnpm dsh；代码唯一权威 = vendor/dsh 钉 SHA 只读）
 - `pnpm dsh --profile headless` 只证明通用 CLI；**公司完整操作走 Web profile**（空间细节 = [项目地图](project-map.md)）。
 - 未 `source dev/env.sh` 时 `DSH_HOME` = 日用 `~/.dsh`——那里**另有同名 `web` profile**（起得来、不报错、
   五角色一个不出现）；开门步骤唯一家 = [demo.md §前置](demo.md)。
-- 退役 `profiles/company`（file: 旧形状）非权威、不可作为当前入口——处置与标记 = [dev/README](../dev/README.md) 运行态表。
+- 已删除的退役 profile：dev home 曾有 `profiles/company`（file: 旧形状）——2026-10-05 裁决删除（零功能消费面终核 + 48M 死重）；**若再现同名目录即为异常**（墓碑记录 = [dev/README](../dev/README.md) 运行态表）。
 - 进程 cwd ≠ 会话 cwd；启动成功 ≠ 五角色已装配（挂载证据 = preset-smoke，[tests/README](../tests/README.md)）。
 
 ## 四、五问直达
