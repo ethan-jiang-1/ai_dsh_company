@@ -17,10 +17,16 @@
 //   B4 后续行为——click 后 snapshot 出现 CLICKED-OK；type 后出现 ECHO:probe-typed（≥2 个 navigate 外真调用）
 //   B5 资产——判据明细 + 交互快照落 snapshots/browser-behavior-probe/2026-10-04/
 //
-// 机制事实（2026-10-05 实测两条，写判据前实证）：
+// 机制事实（2026-10-05 实测四条，写判据前/迭代中实证）：
 //   ① @playwright/mcp initializeServer 写 ~/Library/Caches/ms-playwright/b/browser@* 标记——workspace
 //      沙箱三度 EPERM（角色会话 ×2 + 维护者层 ×1）＝批5b 以来导航未成的根因；
-//   ② 0.0.80 屏蔽 file: 协议 ⇒ fixture 必须走 http（本 probe 自起 127.0.0.1 static server）。
+//   ② 0.0.80 屏蔽 file: 协议 ⇒ fixture 必须走 http（本 probe 自起 127.0.0.1 static server）；
+//   ③ 标记目录由 serverRegistry 的 registryDirectory2() 从 defaultCacheDirectory2() 直连构造，
+//      env 免疫（PLAYWRIGHT_BROWSERS_PATH 管不到）⇒ HOME 重定向兜住（os.homedir() 认 $HOME）；
+//   ④ Target crashed 根因 = MCP 默认启用 chromium 全进程内沙箱（--no-sandbox 旗子语义：
+//      "disable the sandbox for all process types that are normally sandboxed"）在 DSH seatbelt
+//      内嵌套崩溃——裸 playwright-core 默认 chromiumSandbox:false 故 A/B 双过。拉起加
+//      --no-sandbox ⇒ **栅栏内 5/5（零升级）**。
 //
 // seam 选型证据（2026-10-05 源码定位，coreBundle serverRegistry.ts 段）：
 //   ③ 标记写者 = @playwright/mcp 0.0.80 的 serverRegistry——registryDirectory2() =
@@ -83,7 +89,7 @@ const FIXTURE_URL = `http://127.0.0.1:${fixturePort}/fixture.html`
 // env 多带一个 PLAYWRIGHT_BROWSERS_PATH（provider 今日未暴露此面 = seam 缺口本体）
 const requireFromProvider = createRequire(join(ROOT, 'vendor/dsh/packages/experimental/browser-use-playwright-mcp/lib/index.js'))
 const cli = join(dirname(requireFromProvider.resolve('@playwright/mcp/package.json')), 'cli.js')
-const child = spawn(process.execPath, [cli, '--browser', 'chromium', '--isolated', '--headless'],
+const child = spawn(process.execPath, [cli, '--browser', 'chromium', '--isolated', '--headless', '--no-sandbox'],
   { cwd: REHEARSAL, env: { ...process.env, HOME: FAKE_HOME, PLAYWRIGHT_BROWSERS_PATH: PW_BROWSERS }, stdio: ['pipe', 'pipe', 'pipe'] })
 let stderrLog = ''
 child.stderr.on('data', c => { stderrLog += String(c) })

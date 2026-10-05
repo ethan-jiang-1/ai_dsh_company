@@ -57,6 +57,19 @@ sandbox 联动。**选型维持用户 2026-10-03 拍板的「暂缓登记」，�
   （taskboard/browser）改「稳定指针 + 时间戳历史」双写；首跑证据自留痕转录恢复。
 - 矩阵全文 = [rerun-matrix.md](../../snapshots/browser-behavior-probe/2026-10-04/rerun-matrix.md)。
 
+## 第二层墙击穿（2026-10-05 复跑轮同日，用户令「修好这里」）
+
+- **根因修正**：栅栏内 Target crashed ≠「chromium 子进程沙箱内不稳定」——A/B 实证裸 playwright-core
+  在栅栏内**默认内沙箱也导航成功**；不对称点 = **MCP 默认启用 chromium 全进程内沙箱**（`--no-sandbox`
+  旗子语义："disable the sandbox for all process types that are normally sandboxed"）在 DSH seatbelt
+  内嵌套崩溃。修法 = 拉起加 `--no-sandbox` ⇒ **栅栏内 5/5 ALL PASS（零升级）**。
+- seam 影响更新：②「sandbox × browser-use 联动白名单」降级为**不必须**——provider 落地形状收敛为
+  `BrowserMcpConfig` 补两字段：env 透传（HOME / PLAYWRIGHT_BROWSERS_PATH）+ no-sandbox（或 chromium
+  args 面）＝上游小改；安全权衡如实记录：chromium 内沙箱关闭后，浏览器级隔离由外层产品沙箱独任
+  （页内恶意脚本的浏览器级逃逸面变宽——选型时权衡；本地 probe 场景外层栅栏已足）。
+- 资产更新：栅栏内绿跑进 probe-stdout 时间戳历史；in-fence-crash.log 保留为第二层墙的历史证据
+  （附根因修正批注）。
+
 ## 依据
 
 - deferred-verifications 卡（两笔债的出处与判收口径）：[卡](../../_backlog/_done/_closed_plans/2026-10-02-deferred-verifications.md)

@@ -78,7 +78,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | D25 | **培养/学习回路（2026-09-24）**：培养 = 改 `presets/<role>/`（生效边界按面：persona / 组合文件 = 新会话，skill 正文 = 同会话下一轮——活体实证修正 U1 旧结论）；验收四绿（verify/test/preset-smoke/probe --full）。学习 = journal 唯一载体（D8）+ 人审提升；否决分身自改 skill | [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) 全文（含 U1 修正证据）；[digital-twin §6](../notes/implemented/2026-09-22-digital-twin-cultivation-and-self-learning.md) |
 | D26 | **文档卫生按指导价值取舍（2026-09-24）**：移除“每次净减文件/行数”和固定删并修记顺序；优先处理重复/失效指令与活指针，保留仍指导未来决策的理由、反例和重启条件；文件/行数仅观察，不是完成门槛 | 本轮 [基石整治 Note](../notes/implemented/2026-09-24-foundation-remediation.md) §决定；用户确认 2026-09-24 |
 | D27 | **升 pin 程序偏离官方事务（2026-09-25，登记偏离）**：官方 `sync-dsh --pin` 第③步要求 vendor 自建，而 `pnpm --dir vendor/dsh run build` 在本仓**嵌套工作区**里必失败（独立 staging 树可构建）⇒ 本仓改为**手工簿记 + 门禁留证**（`vendor-pin`/`vendor-clean`/`pack-compat` 三道）。长期解（嵌套工作区里跑 vendor 自建）未做 | [implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md](../notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md) §登记偏离 |
-| D28 | **枚举型事实的家 = 实现自己**（2026-09-26）：脚本触发条件、门禁清单、pin 版本这类枚举在文档里复述必漂（实测六份清单同一种病）；家 = 脚本头注「何时跑」/ `gates.mjs` 的 expectedTag 与 `DOC_LINE_BUDGETS`，文档只留分层原则 + 指针，门禁强制 | [entry-execution-chain-debt](../notes/implemented/2026-09-26-entry-execution-chain-debt.md) |
+| D28 | **枚举型事实的家 = 实现自己**（2026-09-26）：脚本触发条件、门禁清单、pin 版本这类枚举在文档里复述必漂（实测六份清单同一种病）；家 = 脚本头注「何时跑」/ `run-gates.mjs` 的 expectedTag 与 `DOC_LINE_BUDGETS`，文档只留分层原则 + 指针，门禁强制 | [entry-execution-chain-debt](../notes/implemented/2026-09-26-entry-execution-chain-debt.md) |
 | D29 | **自主优先协议**（2026-09-26，用户令，同日两轮细化）：① 尽量遵循 DSH 研发流程（D13/D23）；② 自主解决问题——动手发明前先探索、借鉴**成熟 DSH 插件**（下载量 / 影响力门槛）的既有思想，探索产物按 research 层生命周期落盘；③ REVIEW 分级——能自主审的自主审（独立盲审 / 中立体清扫 / code-review），阶段收口、不得不人审时才人审，人审形状 = 跑起来的实例 + 单页走查单 + 一次一件事 + 收尾留动作（「你去体验一下」类无落点请求 = 违规） | [guides/dev-loop §13](./guides/dev-loop.md)；AGENTS §本仓原生纪律 |
 | D30 | **research 层三态模型**（2026-09-26，用户令，修订 09-25「不开 archived/rejected」裁断）：`research/` 只放未完结研究（TODO 语义，每份自带喂给谁/毕业动作为户口）；研究落地即离场——完结迁 `notes/archived/`、过时/被推翻迁 `notes/rejected/`；无人引用的死稿删除（git 即归档）。起因 = 用户指认「research 挂一堆东西」+「完结的不该在 TODO 里」。**D31 修订**：research 目录退役并入 `_backlog/plans/`，三态出口保留 | [guides/dev-loop §12](./guides/dev-loop.md)；**D31 修订后索引随目录退役**（git 留史） |
 | D31 | **推敲空间 `_backlog/` + research 并入**（2026-09-28，用户令）：借外部仓 ai_deerflow_deep_research_v2 的 `_backlog` 三件——plans 推敲卡 / bugs 缺陷卡 / _done（位置即状态），补上「该不该做 / 何时 / 次序 / 是否放弃」四问成熟前的家；红线 = **只承载判断材料，不承载次序与授权**（D23 plans 层教训）；research 目录退役并入 plans（调研卡 = 卡性质，D30 三态出口保留）；门禁 research-liveness → plans-liveness。**D33 回借**：章制 2026-10-03 自 ai_dsh_loop_advisor 升级（主干框架/章程账本二分/索引交叉核对门禁/两桶解禁/全日期卡名） | [_backlog/README.md](../_backlog/README.md)；[implemented/2026-09-28-backlog-deliberation-space](../notes/implemented/2026-09-28-backlog-deliberation-space.md) |
@@ -99,7 +99,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | 机制（组合/隔离/协作/UI 扩展点） | design/architecture + design/roles-isolation + design/ui-demo；源码与运行结论按对应合同核对 |
 | 内容（persona/skills/KB/模板） | design/role-content-plan + presets.md + `company-workspace/kb/` + `company-workspace/AGENTS.md` |
 | 运营（预算限流/runbook/回放） | guides/budget-and-ops |
-| 流程（Notes、门禁及开发环） | guides/dev-loop + `notes/` + `scripts/gates.mjs` |
+| 流程（Notes、门禁及开发环） | guides/dev-loop + `notes/` + `scripts/run-gates.mjs` |
 
 ## 外部研究材料登记（repo 外，只读引用）
 
