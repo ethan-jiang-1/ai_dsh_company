@@ -22,6 +22,22 @@
 实测方式：web 观察窗的 `agentPresets/list` RPC（返回 10 条 = DSH 出厂 5 + 本 pack 5，零 broken）。
 UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSection.tsx`）。
 
+## 四形态矩阵：身份、工具与 skills 从哪来（RFC preset-skill-matrix 2026-10-05 立）
+
+「角色名 = preset = skills = child 身份」是常见误读——四种会话形态来源各不相同，一格一事实：
+
+| 形态 | persona 来源 | 工具 / skills 来源 | cwd 与 CHARTER·KB | 日志 | 问人权限 |
+|---|---|---|---|---|---|
+| 独立角色 preset 根会话（人选 preset 开门） | `presets/<role>/agent.cordis.yml` persona row | **preset 自声明**（自包含、无继承——见下「工具面」） | 人连接的 workspace；手册经 `agent-instructions` 注入、KB = cwd 的 `kb/<role>/` | `$DSH_HOME/sessions/<slug>/<id>/`（世代选择唯一口径 = session-log-generation） | `tool-ask-user` 直问人 |
+| CEO Lead 动议会话 | `presets/ceo/`（同上） | 同上（ceo 自声明，含 delegation 组） | `company-workspace`；spawn 队友 | 同上（Lead 目录） | Lead 直问人；成员升级 CEO |
+| teammate（Agent Teams 成员） | **继承 Lead 组合**（composeFrom ⇒ `agentPreset=ceo`）——身份来自成员名、任务书与手册注入，**不是成员角色的 preset** | 继承 Lead 组合（delegation 行无 `toolFilter` 不裁剪） | 同 Lead 工作区；读自己的 CHARTER | 各自 sessionId 目录（authorship 按 `team/member` 事件建 sessionId→成员名映射） | 动议内升级 CEO（不直问） |
+| 命名 child / one-shot subagent | 继承 Lead（`agentPreset=ceo`）；**名册角色名 ≠ 加载 preset**（反例 = 2026-09-26 sea-reconcile：CFO 稿实为 ceo preset 会话代笔，[authorship-audit](../scripts/audit/authorship-audit.mjs) 头注） | 继承；⚠ 目录看得见 Team 工具但调不通（上游已登记限制，[pack README](../packages/company-pack/README.md) 已知限制节） | 同 Lead | child 自带 sessionId 日志 | 经 Lead |
+
+改哪一列 → 哪个文件：persona/工具/skills → `presets/<role>/`（owner 表 = [pack README](../packages/company-pack/README.md)）；手册/CHARTER/KB → `company-workspace/`；生效时点 = 下文「生效边界按面」表。
+
+- **skill/工具实际生效的证据 = 会话日志**（`request/header.tools` 列实际工具名）——多帧 zstd 用 `zstd -d -c` 读（手段唯一家 = [dev-loop §3.7](./guides/dev-loop.md)，不复述）；`--dump-config` 只证组合层，不证会话实际全貌。
+- **agent loop 是 vendor 运行机制**：本仓负责四个面——preset 声明（`presets/`）、bundle 装配（`cordis.patch.yml`）、host+client 注册（`src/`）、workspace 约束（手册与模板）；**公司手册是给 DSH 会话里的公司角色的，不是 Coding Agent 指令**（两类主体的分界 = 根 [AGENTS.md](../AGENTS.md) 入口）。
+
 ## CEO（个体：动议的唯一入口与出口）
 
 - **persona 要点**：对全局结果负责；语气简短、决断、结论先行；接到动议先澄清目标/约束/验收
