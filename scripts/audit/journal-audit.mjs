@@ -12,6 +12,8 @@
 //     ✅ 确认 = journal 文件名或正文含本场 slug
 //     ⚠ 存疑 = 只按时间窗命中（该目录下有文件落在本场时间窗内）
 //     ❌ 违规 = 两者都没有
+//     🟡 已知历史缺口 = 已被角色 CHARTER / Note 承认、且早于对应纪律强制面落地的历史缺席——
+//       每次照报提醒、**不进退出码**（deliverables-check「观察项」同款档，2026-10-05 立）
 // 输入 = `$DSH_HOME/sessions/` 里的**真盘**会话（排练场默认排除——排练产物本就不写公司盘）。
 // 用法：source dev/env.sh && node scripts/audit/journal-audit.mjs [--cwd <公司盘绝对路径>] [--limit N]
 // 退出码：0 = 无违规；1 = 有违规（红）；2 = 环境问题（缺 DSH_HOME / 无 zstd）。
@@ -49,6 +51,19 @@ const LIMIT = Number(argOf('--limit') ?? '400')
 // 「收工留痕」硬闸门语气 2026-09-25 才进 skill；早于此的场次按**历史**单列（不判违规——
 // 拿今天的规矩去判规则生效前的行为是假阳性，会淹掉真信号）。
 const SINCE = Date.parse(argOf('--since') ?? '2026-09-24T00:00:00Z')
+
+/**
+ * 已知历史缺口名册（2026-10-05 立；观察项档，不进退出码）。入册三条件：①缺席为真且角色侧
+ * 已承认（CHARTER/Note 既成记录）；②场次早于纪律强制面落地（journal 硬闸门语气 2026-09-25
+ * 才进 skill——journal-presence-mechanism Note）；③经标定期判例确认（同 Note：emergency-x 的
+ * coo 缺席与 CHARTER「当轮未留 journal（W8 同款缺口）」一致）。**删本条 = 掩盖已承认的事实**；
+ * 它挡的只是「退出码被永远已知的一条历史缺席占住、新信号被淹」这一种病。
+ */
+const KNOWN_MISSES = [
+  { sessionIdPrefix: '6a0e551f', role: 'coo', reason: 'emergency-x 09-24：硬闸门（09-25 落地）前的场次，CHARTER 已承认（W8 同款缺口）' },
+]
+const isKnownMiss = (entry, role) =>
+  KNOWN_MISSES.some(k => entry.sessionId.startsWith(`session-${k.sessionIdPrefix}`) && k.role === role)
 
 const ROLES = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']
 /** 全量解压（team/task 事件在流中后段，必须读全）。 */
@@ -203,27 +218,31 @@ let suspect = 0
 let audited = 0
 let historical = 0
 let formatCount = 0
+let knownCount = 0
 for (const entry of entries) {
   const motion = motionOf(entry)
   if (motion.owners.length === 0) continue
   if (entry.createdAt < SINCE) { historical += 1; continue }
   audited += 1
-  const rows = motion.owners.map(role => ({ role, ...presence(entry.workspace, role, motion) }))
-  const bad = rows.filter(row => row.level === 'missing')
+  const rows = motion.owners.map(role => ({ role, known: isKnownMiss(entry, role), ...presence(entry.workspace, role, motion) }))
+  const bad = rows.filter(row => row.level === 'missing' && !row.known)
+  const knownMisses = rows.filter(row => row.level === 'missing' && row.known)
   const soft = rows.filter(row => row.level === 'suspect')
   violations += bad.length
+  knownCount += knownMisses.length
   suspect += soft.length
   const format = formatViolations(entry.workspace, motion)
   formatCount += format.length
-  const mark = bad.length > 0 || format.length > 0 ? '❌' : soft.length > 0 ? '⚠' : '✅'
+  const mark = bad.length > 0 || format.length > 0 ? '❌' : knownMisses.length > 0 ? '🟡' : soft.length > 0 ? '⚠' : '✅'
   const shortId = entry.sessionId.replace(/^session-/, '').slice(0, 8)
   console.log(`${mark} ${motion.slug ?? '(无 slug)'} @ ${new Date(entry.createdAt).toISOString().slice(0, 16)} 会话 ${shortId}`)
   const label = row => row.level === 'confirmed' ? '确认'
     : row.level === 'archived' ? `在场(已归档 ${String(row.hit)})`
-      : row.level === 'suspect' ? `存疑(${String(row.hit)})` : '**缺席**'
+      : row.level === 'suspect' ? `存疑(${String(row.hit)})`
+        : row.known ? `缺席(已承认历史缺口：${KNOWN_MISSES.find(k => k.role === row.role)?.reason ?? ''})` : '**缺席**'
   console.log(`   ${rows.map(row => `${row.role}:${label(row)}`).join('  ')}`)
   if (format.length > 0) console.log(`   ⚠ 格式不合规（结尾换行）：${format.join('、')}`)
 }
-console.log(`\njournal-audit: 审计 ${String(audited)} 场（规则生效后）/ 缺席 ${String(violations)} 条 / 格式不合规 ${String(formatCount)} 条 / 存疑 ${String(suspect)} 条 / 历史场次 ${String(historical)} 场（不计判）`)
-console.log(violations === 0 && formatCount === 0 ? 'ALL PASS（无缺席、格式合规）' : 'FAIL（有缺席或格式不合规：收工留痕未落实）')
+console.log(`\njournal-audit: 审计 ${String(audited)} 场（规则生效后）/ 缺席 ${String(violations)} 条 / 格式不合规 ${String(formatCount)} 条 / 存疑 ${String(suspect)} 条 / 已知历史缺口 ${String(knownCount)} 条（每次提醒、不进退出码）/ 历史场次 ${String(historical)} 场（不计判）`)
+console.log(violations === 0 && formatCount === 0 ? 'ALL PASS（无新缺席、格式合规）' : 'FAIL（有缺席或格式不合规：收工留痕未落实）')
 process.exit(violations === 0 && formatCount === 0 ? 0 : 1)

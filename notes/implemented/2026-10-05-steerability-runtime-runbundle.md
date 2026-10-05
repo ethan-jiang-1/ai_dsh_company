@@ -24,4 +24,4 @@
 ## 后果
 
 - dev/README 对 runtime-map 的前向引用在 entry-runtime-map 落地时转为正式链接。
-- journal-audit coo 缺席（2026-09-24 场次）仍为数据侧待处置观察（[log-generation](./2026-10-05-steerability-log-generation.md) 已记）。
+- journal-audit coo 缺席（2026-09-24 场次）已处置：journal-audit「已知历史缺口」观察档（2026-10-05 同日，依据与外科红证见 [log-generation](./2026-10-05-steerability-log-generation.md) 后果节）。

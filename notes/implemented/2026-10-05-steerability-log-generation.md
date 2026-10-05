@@ -30,4 +30,4 @@
 ## 后果
 
 - [runtime-runbundle RFC](./2026-10-05-steerability-runtime-runbundle.md)（已实施）的「session ids 与日志世代」字段现在有统一语义可引用。
-- journal-audit 的 coo 缺席为数据侧待处置观察（2026-09-24 场次，早于本变更 11 天）——不在本条扩围，留用户裁决。
+- journal-audit 的 coo 缺席（2026-09-24 场次，早于本变更 11 天）——不在本条扩围；**同日已处置** = journal-audit 立「已知历史缺口」观察档（缺席照报、每次提醒、不进退出码——deliverables-check 观察项同款；该缺席为标定期判例且与 coo CHARTER「W8 同款缺口」既成记录一致，依据 = journal-presence-mechanism Note；外科红证 = 合成会话两位 owner 照红 exit 1、还原复绿，观察档只吞 6a0e551f+coo 一条）。
