@@ -47,6 +47,7 @@
 |---|---|---|---|
 | [BUG-001-manual-truncation.md](_fixed_bugs/BUG-001-manual-truncation.md) | 公司手册超出 agent-instructions maxBytes——尾部在所有角色会话被截断（maxBytes 16384→32768 + verify `handbook-budget` 门禁；红→还原→绿） | 未单独 commit（随 2026-10-02 消化对账轮工作树） | 2026-10-02 |
 | [BUG-003-present-no-role-gate.md](_fixed_bugs/BUG-003-present-no-role-gate.md) | present 无角色门禁——判据层补 DRAFT_PRESENTED_BY_NON_LEAD 观察档（非 Lead present 过程稿每次提醒、成品侧越权照旧违规；多人形态修正单操作者语境的历史容忍） | 修复轮 commit（spec 3 例红→绿 + live 复验违规 0 保持） | 2026-10-06 |
+| [BUG-004-claim-yield-not-machine-readable.md](_fixed_bugs/BUG-004-claim-yield-not-machine-readable.md) | 占位让位不可机判——手册补让位行格式与重读规矩 + PLACEHOLDER_YIELD_LINE/isPlaceholderYield 机查面 + claim-race 3 轮行为验证（run3 PASS：恰一人持认，标准让位行格式完美） | 修复轮 commit | 2026-10-06 |
 
 ## 搁置缺陷卡（查实——修复未确认）
 

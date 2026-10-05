@@ -448,3 +448,18 @@ describe('非 Lead present 过程稿的观察档（BUG-003，2026-10-06 多人 U
     expect(result.warnings.filter(w => w.code === 'draft-presented-by-non-lead')).toEqual([])
   })
 })
+
+describe('让位行的机器可查面（BUG-004，2026-10-06 修复轮立——持认判定 = 占位 ∧ ¬让位）', () => {
+  it('首行恰好「让位=认领撤销，非出稿」⇒ isPlaceholderYield 为真', async () => {
+    const { isPlaceholderYield, PLACEHOLDER_YIELD_LINE } = await import('../../scripts/lib/deliverables.mjs')
+    expect(PLACEHOLDER_YIELD_LINE).toBe('让位=认领撤销，非出稿')
+    expect(isPlaceholderYield('\n\n让位=认领撤销，非出稿\n\n出稿：cfo｜版本 v2…让位记录')).toBe(true)
+  })
+
+  it('让位行不在首行 / 仍是占位首行 ⇒ 非让位（持认与让位靠首行互斥区分）', async () => {
+    const { isPlaceholderYield, isPlaceholderClaim } = await import('../../scripts/lib/deliverables.mjs')
+    expect(isPlaceholderYield('占位=认领，非出稿\n\n（后文提了让位但首行未改写）')).toBe(false)
+    expect(isPlaceholderClaim('占位=认领，非出稿\n')).toBe(true)
+    expect(isPlaceholderYield('占位=认领，非出稿\n')).toBe(false)
+  })
+})

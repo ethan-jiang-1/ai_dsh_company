@@ -13,7 +13,6 @@
 | Bug | 标题 | 严重级 | 发现 |
 |---|---|---|---|
 | [BUG-002-dual-ceo-silent-supersession.md](BUG-002-dual-ceo-silent-supersession.md) | 多人模式双 CEO 门无检测——已收口 final 被另一门静默改版取代（B 盘面行为规范，缺门级防线） | P1 | 2026-10-06 |
-| [BUG-004-claim-yield-not-machine-readable.md](BUG-004-claim-yield-not-machine-readable.md) | 占位约定可裁但不可机判——让位无标记格式 + 占位后重读对手非强制（run1 行为面成立、靠自觉收场） | P2 | 2026-10-06 |
 | [BUG-005-dual-signoff-single-door-routing.md](BUG-005-dual-signoff-single-door-routing.md) | 双签线多门形态退化为单签——request_signoff 按发起会话路由，CEO 人无批准通道（日志只读可见半旁路，批准通道为零） | P1 | 2026-10-06 |
 
 ## 卡片模板

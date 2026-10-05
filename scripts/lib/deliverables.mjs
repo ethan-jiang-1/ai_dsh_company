@@ -82,6 +82,18 @@ export function isPlaceholderClaim(body) {
   return first !== undefined && first.trim() === PLACEHOLDER_CLAIM_LINE
 }
 
+/**
+ * 让位的首行形状（BUG-004 修复轮，2026-10-06；合同家 = 公司手册「写盘守卫」行——
+ * 占位后重读同组对手文件，让位时把首行改写为本行；持认判定 = 占位 ∧ ¬让位）。
+ */
+export const PLACEHOLDER_YIELD_LINE = '让位=认领撤销，非出稿'
+
+/** 判一份稿是不是让位稿：首个非空行恰好是让位首行（与占位靠首行互斥区分）。 */
+export function isPlaceholderYield(body) {
+  const first = body.split('\n').find(line => line.trim() !== '')
+  return first !== undefined && first.trim() === PLACEHOLDER_YIELD_LINE
+}
+
 // ── meta.md（B1 事实家，2026-10-03 拍板；机器可读行风格照「派活行」先例）──
 
 /** 动议分型（决策点③：先分型再定词——试金 22 话题全覆盖的四型）。 */

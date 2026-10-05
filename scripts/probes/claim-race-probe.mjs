@@ -111,15 +111,22 @@ await Promise.all([awaitTurnEnd(cfoId), awaitTurnEnd(cooId)])
 const readDraft = role => { try { return readFileSync(join(DELIV, 'drafts', `${role}.md`), 'utf8') } catch { return '' } }
 const cfoDraft = readDraft('cfo')
 const cooDraft = readDraft('coo')
+const { PLACEHOLDER_YIELD_LINE } = await import('../lib/deliverables.mjs')
 const CLAIM = /占位=认领|占位＝认领/
-const YIELD = /让位/
-const claimedT1 = text => (CLAIM.test(text) || (text.includes('T1') && /renewal-y 客户背景/.test(text))) && !YIELD.test(text)
+/** 持认 = 占位行在场 ∧ ¬让位（让位可出现在正文叙述里——如让位裁定节的「归对门」结论——
+ *  判定只认**首行标准让位行**：手册明文「让位时把首行改写为让位标记」，改写即撤销持认；
+ *  正文提及让位但首行仍是占位 = 持认者的正常叙述，不是让位。run2 校准）。 */
+const claimedT1 = text => {
+  const first = text.split('\n').find(l => l.trim() !== '')?.trim() ?? ''
+  return first !== PLACEHOLDER_YIELD_LINE && CLAIM.test(text) && !/本门撤销认领/.test(text)
+}
 const cfoClaim = claimedT1(cfoDraft)
 const cooClaim = claimedT1(cooDraft)
 const cfoOwn = /经济性测算/.test(cfoDraft)
 const cooOwn = /交付窗口/.test(cooDraft)
-console.log(`  cfo.md: 占位/认领T1=${String(cfoClaim)} 干了T2=${String(cfoOwn)}（${String(cfoDraft.length)} 字）`)
-console.log(`  coo.md: 占位/认领T1=${String(cooClaim)} 干了T3=${String(cooOwn)}（${String(cooDraft.length)} 字）`)
+const yieldLineExact = text => text.split('\n').find(l => l.trim() !== '')?.trim() === PLACEHOLDER_YIELD_LINE
+console.log(`  cfo.md: 占位/持认T1=${String(cfoClaim)} 干了T2=${String(cfoOwn)} 首行=标准让位行=${String(yieldLineExact(cfoDraft))}（${String(cfoDraft.length)} 字）`)
+console.log(`  coo.md: 占位/持认T1=${String(cooClaim)} 干了T3=${String(cooOwn)} 首行=标准让位行=${String(yieldLineExact(cooDraft))}（${String(cooDraft.length)} 字）`)
 const claims = [cfoClaim, cooClaim].filter(Boolean).length
 console.log(`  判据B1(恰一人认领): ${String(claims === 1)}；判据B2观察(双认领): ${String(claims === 2)}`)
 const pass = claims === 1
