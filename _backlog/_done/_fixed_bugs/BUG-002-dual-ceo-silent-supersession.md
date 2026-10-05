@@ -1,6 +1,6 @@
 # BUG-002：多人模式双 CEO 门无检测——已收口 final 被另一门静默改版取代
 
-> 严重级别：P1（重要——多真人形态下对外成品的决议权静默易主，无任何跨门信号）｜发现：2026-10-06（多人 UX bug 猎捕 S1，用户立项）｜状态：活跃
+> 严重级别：P1（重要——多真人形态下对外成品的决议权静默易主，无任何跨门信号）｜发现：2026-10-06（多人 UX bug 猎捕 S1，用户立项）｜状态：活跃 — 已修复 2026-10-06（两轮修复）：第一轮 commit beee677 声称完成但 diff 仅 2 文件（doors.ts + spec）——host 接线靠后续 git add -A 顺带入库但 lib 未重建、卡未迁移（**假绿**——用户点破后 TDD 驱动补修）；第二轮 = 本次：①force 重建 lib（lib/index.js 含 doorsFromSessions ×3）；②client-load-smoke ALL PASS（真浏览器装配面健康）；③dual-ceo-probe PASS（双 CEO 门全链路：B 会话工具序列含 workspace_doors——CEO 在收口前主动调用检测工具，防线不只注册还被自然使用）；④修法落点如实记录：原卡「client 层 create 警示」→ 实际 = host 事件监听（api-session/added/removed/status）维护 doorFacts + workspace_doors 工具注册 + doorsFromSessions 纯函数投影——create 对话框是 vendor UI 摸不到。收据 = 本修复 commit + client-load-smoke + dual-ceo-probe 双绿。
 
 ## 症状
 

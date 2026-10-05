@@ -46,6 +46,7 @@
 | Bug | 标题 | 修复 commit | 日期 |
 |---|---|---|---|
 | [BUG-001-manual-truncation.md](_fixed_bugs/BUG-001-manual-truncation.md) | 公司手册超出 agent-instructions maxBytes——尾部在所有角色会话被截断（maxBytes 16384→32768 + verify `handbook-budget` 门禁；红→还原→绿） | 未单独 commit（随 2026-10-02 消化对账轮工作树） | 2026-10-02 |
+| [BUG-002-dual-ceo-silent-supersession.md](_fixed_bugs/BUG-002-dual-ceo-silent-supersession.md) | 双 CEO 门无检测——doors 纯函数投影 + host workspace_doors 工具（事件监听 api-session/*）+ CEO 自然使用（dual-ceo-probe PASS：B 主动调用检测工具）；两轮修复（第一轮假绿补修） | 修复 commit（client-load-smoke + dual-ceo-probe 双绿） | 2026-10-06 |
 | [BUG-003-present-no-role-gate.md](_fixed_bugs/BUG-003-present-no-role-gate.md) | present 无角色门禁——判据层补 DRAFT_PRESENTED_BY_NON_LEAD 观察档（非 Lead present 过程稿每次提醒、成品侧越权照旧违规；多人形态修正单操作者语境的历史容忍） | 修复轮 commit（spec 3 例红→绿 + live 复验违规 0 保持） | 2026-10-06 |
 | [BUG-004-claim-yield-not-machine-readable.md](_fixed_bugs/BUG-004-claim-yield-not-machine-readable.md) | 占位让位不可机判——手册补让位行格式与重读规矩 + PLACEHOLDER_YIELD_LINE/isPlaceholderYield 机查面 + claim-race 3 轮行为验证（run3 PASS：恰一人持认，标准让位行格式完美） | 修复轮 commit | 2026-10-06 |
 | [BUG-005-dual-signoff-single-door-routing.md](_fixed_bugs/BUG-005-dual-signoff-single-door-routing.md) | 双签多门退化单签——手册补多人双签补签流程（两签齐才完整）+ multi-human §0 登记日志半旁路 + dual-signoff probe 复验 PASS（CEO 知道流程并能执行） | 修复轮 commit | 2026-10-06 |
