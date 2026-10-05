@@ -36,3 +36,19 @@ export function requireDevHome(name) {
   }
   return target
 }
+
+/**
+ * Orient-facing probe（RFC driver-surface-package 条目 B）：与 requireDevHome 同款的双向
+ * 重叠判定，但**只分类不抛**——观测命令要的是警告与呈现，不是拒绝执行。
+ */
+export function devHomeStatus(home, { dailyHome } = {}) {
+  const daily = physicalPath(resolve(dailyHome ?? join(homedir(), '.dsh')))
+  if (home === undefined || home.trim() === '') {
+    return { kind: 'unset', dailyHome: daily, warning: '⚠ DSH_HOME 未设置——先 source dev/env.sh（否则会话与凭据落日用 home，profile 组合不可预期）' }
+  }
+  const target = physicalPath(resolve(home))
+  if (contains(daily, target) || contains(target, daily)) {
+    return { kind: 'daily', home: target, dailyHome: daily, warning: '⚠ DSH_HOME 与日用 home 重叠——先 source dev/env.sh（双 home 纪律 = guides/dev-loop §6）' }
+  }
+  return { kind: 'ok', home: target, dailyHome: daily }
+}

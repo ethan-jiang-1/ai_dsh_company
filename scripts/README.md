@@ -7,6 +7,7 @@
 | 当前目标 | 入口 |
 |---|---|
 | 检查结构、引用与簿记 | `pnpm verify` → [run-gates](run-gates.mjs) |
+| 看运行态全景 / 场景 run bundle 视图 | `pnpm orient` → [orient](tools/orient.mjs)（keyless 只读；含日用 home 警告） |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；[分层守卫](../tests/harness/layering.spec.ts) |
 | 确认角色真的挂载 | [preset-smoke](smoke/preset-smoke.mjs) |
 | 确认 client 真的装配 | [client-load-smoke](smoke/client-load-smoke.mjs) |
