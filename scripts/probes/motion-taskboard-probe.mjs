@@ -19,7 +19,7 @@ import { existsSync, mkdirSync, readdirSync, readdir, statSync, writeFileSync } 
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const MOTION_DIR = join(REHEARSAL, 'motion-taskboard')
 const DELIVERABLES = join(ROOT, 'company-workspace', 'deliverables')
 const ASSETS = join(ROOT, 'snapshots/probes/motion-taskboard-probe/2026-10-05')

@@ -25,7 +25,8 @@
 |---|---|---|
 | 自写运行包 | [company-pack](../packages/company-pack/) | 五个角色 preset、bundle 行、host 注册与 client 面；发布形状由 [包声明](../packages/company-pack/package.json) 决定 |
 | 真实公司盘 | [company-workspace](../company-workspace/) | 公司角色会话 cwd；手册、公司事实、模板、交付物和 journal；不是开发 docs 的镜像 |
-| 开发环境 | [dev](../dev/)、[env.sh](../dev/env.sh) | 源码验证使用开发 DSH_HOME；排练盘成型见 [rehearsal 实现](../scripts/lib/rehearsal.mjs) |
+| 启动配置 | [dev](../dev/)、[env.sh](../dev/env.sh) | tracked 启动配置；源码验证使用开发 DSH_HOME |
+| 运行残留 | [runtime](../runtime/)、[runtime/README](../runtime/README.md) | 开发 DSH_HOME、第二 home、浏览器工具态与排练盘（全部 gitignored；逐件 owner = runtime/README；排练盘成型见 [rehearsal 实现](../scripts/lib/rehearsal.mjs)） |
 | 上游机制 | [vendor/dsh](../vendor/dsh/) | 钉住的只读 submodule；开发 `pnpm dsh` 的源码基线 |
 | keyless 回归 | [tests](../tests/)、[Vitest 配置](../vitest.config.ts) | 模块逻辑、静态渲染、隔离文件夹具；分层守卫见 [layering.spec.ts](../tests/harness/layering.spec.ts) |
 | 维护工具 | [scripts](../scripts/README.md) | 门禁、真实入口、窄探针、审计、回放与导出；共享实现位于 [scripts/lib](../scripts/lib/) |

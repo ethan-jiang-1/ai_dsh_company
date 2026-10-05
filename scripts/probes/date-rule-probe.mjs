@@ -18,7 +18,7 @@ import { readdirSync, readFileSync, statSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const CEO_JOURNAL = join(REHEARSAL, 'kb/ceo/journal')
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 

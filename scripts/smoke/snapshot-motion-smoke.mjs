@@ -11,7 +11,7 @@ import { dirname, join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
 const { load } = createRequire(join(ROOT, 'vendor/dsh/package.json'))('js-yaml')
-const temp = mkdtempSync(join(ROOT, 'dev/harness-home/snapshot-motion-smoke-'))
+const temp = mkdtempSync(join(ROOT, 'runtime/harness-home/snapshot-motion-smoke-'))
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, { encoding: 'utf8', ...options })

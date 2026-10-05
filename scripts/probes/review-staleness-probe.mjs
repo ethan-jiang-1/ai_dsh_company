@@ -12,7 +12,7 @@
 //     = 理想路径；引用过期版本（盘面 v2 但互审稿写「对 v1 的意见」）= 版本穿透缺口。
 //   B2（观察）：互审稿是否标注「评审对象版本 = v<N>」——手册互审稿命名只有 -review.md 后缀约定，
 //     没有要求标注版本——这是设计缺口还是可接受约定？记录为观察。
-// 用法：DSH_HOME=dev/harness-home node scripts/probes/review-staleness-probe.mjs
+// 用法：DSH_HOME=runtime/harness-home node scripts/probes/review-staleness-probe.mjs
 // 退出码：0 = B1 过（CEO 互审引用了当前版本或显式标注了版本差）；1 = B1 失败（穿透）；2 = 环境。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'
@@ -20,7 +20,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const SLUG = '2026-10-06-review-staleness'
 const DELIV = join(REHEARSAL, 'deliverables', SLUG)
 const sleep = ms => new Promise(r => setTimeout(r, ms))

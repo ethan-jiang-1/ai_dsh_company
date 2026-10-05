@@ -44,7 +44,7 @@ import { existsSync, mkdirSync, readdirSync, symlinkSync, writeFileSync } from '
 import http from 'node:http'
 import { dirname, join, resolve } from 'node:path'
 
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const ASSETS = join(ROOT, 'snapshots/probes/browser-behavior-probe/2026-10-04')
 mkdirSync(join(REHEARSAL, 'browser-probe'), { recursive: true })
 mkdirSync(ASSETS, { recursive: true })

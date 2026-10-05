@@ -6,7 +6,7 @@ import { captureWorkspace, compareWorkspace, seedWorkspace, workspaceOracle } fr
 
 let root: string
 beforeEach(() => {
-  const parent = join(ROOT, 'dev/harness-home/oracle-tests')
+  const parent = join(ROOT, 'runtime/harness-home/oracle-tests')
   mkdirSync(parent, { recursive: true })
   root = mkdtempSync(join(parent, 'case-'))
 })

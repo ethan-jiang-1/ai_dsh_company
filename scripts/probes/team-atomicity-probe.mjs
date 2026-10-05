@@ -22,7 +22,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const TARGET = join(REHEARSAL, 'journal', 'atomicity-probe.md')
 mkdirSync(dirname(TARGET), { recursive: true })
 const sleep = ms => new Promise(r => setTimeout(r, ms))

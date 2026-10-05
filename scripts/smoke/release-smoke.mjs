@@ -136,7 +136,7 @@ try {
     check(`roster 含 ${role}（零 broken）`, row !== undefined && row.broken === undefined,
       row === undefined ? '不在 roster' : (row.broken === undefined ? '' : String(row.broken).slice(0, 120)))
   }
-  const rehearsal = join(ROOT, 'dev/rehearsal-workspace')
+  const rehearsal = join(ROOT, 'runtime/rehearsal-workspace')
   mkdirSync(rehearsal, { recursive: true })
   const created = await rpc('session/create', { request: { cwd: rehearsal, agentPreset: 'ceo' } })
   check('session/create 挂上 ceo', created?.agentPreset === 'ceo' || created?.preset === 'ceo', JSON.stringify(created).slice(0, 120))

@@ -142,9 +142,9 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回�
 
 机制与崩溃半径见 FAQ 13 `dual-home-isolation.md`（外部材料）；本 repo 已落 `dev/env.sh`。操作面四条：
 
-1. **环境兜底优先**：一切会话先 `source dev/env.sh`（`DSH_HOME=<repo>/dev/harness-home`）；
+1. **环境兜底优先**：一切会话先 `source dev/env.sh`（`DSH_HOME=<repo>/runtime/harness-home`）；
    agent 不会自己想起双 home 的区别，靠环境不靠提醒。
-2. **dev home 配一次 key**：凭据按 home 隔离，`dev/harness-home/.credentials.yaml` 自己配
+2. **dev home 配一次 key**：凭据按 home 隔离，`runtime/harness-home/.credentials.yaml` 自己配
    一次 `DEEPSEEK_API_KEY`（或接受真实 API 测试 self-skip）。
 3. **迁移方向**：成品先在 dev home 验过；迁日用 `~/.dsh` 是"装正式包"，不是拷目录。
 4. **双 DSH（代码层）**：`pnpm dsh` 走 `vendor/dsh` 源码（钉住 tag）；PATH 里的裸 `dsh`
@@ -167,7 +167,7 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回�
    HTTP 端口（值见启动横幅）；因 `DSH_HOME` 指 dev home，它与日用 DSH 的 web 实例
    （若同时开）是两个完全独立进程：profile、会话、凭据、端口互不可见。
 7. **排练场 ≠ 运行场（轮间待办②，2026-09-22 落地）**：排练/探针会话的默认 cwd 是
-   `dev/rehearsal-workspace/`（`node scripts/tools/rehearsal-init.mjs` 幂等成型；排练/探针脚本（清单见各脚本头注「何时跑」）
+   `runtime/rehearsal-workspace/`（`node scripts/tools/rehearsal-init.mjs` 幂等成型；排练/探针脚本（清单见各脚本头注「何时跑」）
    `preset/probe/handbook/delegation` 已默认指这里并会自建，`--cwd` 可显式覆盖）。
    **真盘 `company-workspace/` 只收真实动议的产物**——排练产物不受三态判据约束
    （`drafts/` 本就不需要 `present`），跑在真盘会安静积污（R4 W2 删过 15 份）。
@@ -312,14 +312,14 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 
 **原则（三条）**：
 
-1. **repo 内 = 自由区**：仓库及其 gitignored 运行态区（`dev/harness-home/`、`.pnpm-store/`、
-   `dev/rehearsal-workspace/`、`dev/harness-home/cache/`）内的读写不需要任何授权。
+1. **repo 内 = 自由区**：仓库及其 gitignored 运行态区（`runtime/harness-home/`、`.pnpm-store/`、
+   `runtime/rehearsal-workspace/`、`runtime/harness-home/cache/`）内的读写不需要任何授权。
 2. **越界需求优先用"重定向"消灭，而不是申请**：凡工具要把状态写到 HOME（缓存 / store / 配置），
    **先配置重定向进仓库 gitignored 区，再首次使用**。已有落点：
-   - DSH 数据层：`DSH_HOME=dev/harness-home`（env.sh，双 home）
+   - DSH 数据层：`DSH_HOME=runtime/harness-home`（env.sh，双 home）
    - pnpm store：仓库根 `.pnpm-store/`；dev profile 的 `.npmrc` 把 `store-dir` / `cache-dir` 钉在 repo 内
    - dev profile 的 pack：`link:` 符号链接（内容改动即刻生效，重装仅在改依赖/bundle 行）
-   - 排练/探针 cwd：`dev/rehearsal-workspace/`
+   - 排练/探针 cwd：`runtime/rehearsal-workspace/`
    **新工具进工具链时，重定向配置必须在首次使用前完成**——这是引导配方（[bootstrap](./bootstrap.md)）的一部分。
 3. **确需越界（重定向覆盖不了的场景）**：先问人，一次说清"写哪个路径、为什么没有替代"；
    沙箱是最后防线（§6 第 5 条），不拿它当默认方案。

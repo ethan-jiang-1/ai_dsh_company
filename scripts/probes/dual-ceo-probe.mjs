@@ -17,7 +17,7 @@
 //     在场 + 正确返回 = 本卡修复到位；自动警示留 UX 增强。
 //   C（判红绿）：final 文本不得交错损坏（两结论段拼接且无版本链注记 = FAIL；
 //     规范版本链取代 v1→v2 = 记录，不判红）。
-// 用法：DSH_HOME=dev/harness-home node scripts/probes/dual-ceo-probe.mjs
+// 用法：DSH_HOME=runtime/harness-home node scripts/probes/dual-ceo-probe.mjs
 // 退出码：0 = 判据 B/C 成立（防线在——即便来自文案层）；1 = FAIL（缺口确认）；2 = 环境失败。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'
@@ -25,7 +25,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const SLUG = '2026-10-06-dual-ceo-probe'
 const DELIV = join(REHEARSAL, 'deliverables', SLUG)
 const sleep = ms => new Promise(r => setTimeout(r, ms))

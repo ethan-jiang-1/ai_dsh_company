@@ -20,7 +20,7 @@
 //     0 违规 ALL PASS，present 面未触发 BUG-003 观察因为发起者是 CEO）。
 //   E6 事后审计：deliverables-check 0 违规 + journal-audit 0 新缺席 + 非 CEO present = 0。
 //   观察：workspace_doors 工具是否被任何门调用（BUG-002 修复面——检测面可用性）。
-// 用法：DSH_HOME=dev/harness-home node scripts/probes/multi-user-e2e-probe.mjs
+// 用法：DSH_HOME=runtime/harness-home node scripts/probes/multi-user-e2e-probe.mjs
 // 退出码：0 = E1–E6 全过；1 = 任一判据失败；2 = 环境。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'
@@ -28,7 +28,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const SLUG = '2026-10-06-multi-user-e2e'
 const DELIV = join(REHEARSAL, 'deliverables', SLUG)
 const sleep = ms => new Promise(r => setTimeout(r, ms))

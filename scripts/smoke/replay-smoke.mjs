@@ -225,7 +225,7 @@ if (PREPARE) {
 // The headless lane uses the shipped CLI and keeps runtime files outside the complete workspace tree.
 async function driveHeadless({ patchSource, env, tasks }) {
   if (tasks.length !== 1) throw new Error('Headless workspace replay requires one recorded user task')
-  const runParent = join(ROOT, 'dev/harness-home/replay-runs')
+  const runParent = join(ROOT, 'runtime/harness-home/replay-runs')
   mkdirSync(runParent, { recursive: true })
   const runRoot = mkdtempSync(join(runParent, `${SCENARIO}-`))
   const workspace = join(runRoot, 'workspace')
@@ -393,7 +393,7 @@ if (RECORD) {
   // 任务来源：已有 fixture（refresh 语义）→ 原始录制 → R3 历史归档（首录）
   const taskSource = existsSync(fixLead) ? fixLead : (existsSync(rawLead) ? rawLead : archiveLead)
   const tasks = tasksFromSession(readFileSync(taskSource, 'utf8'))
-  const credentials = join(ROOT, 'dev/harness-home/.credentials.yaml')
+  const credentials = join(ROOT, 'runtime/harness-home/.credentials.yaml')
   if (!existsSync(credentials)) { console.error('replay-smoke --record: 需要 dev home 凭据（真模型认证档）'); process.exit(2) }
   console.log(`--record：场景组合下重录（任务来源 ${basename(taskSource)}，真模型，${String(tasks.length)} 段）`)
   const { workspace, runRoot, child, parsed } = await driveScenario({

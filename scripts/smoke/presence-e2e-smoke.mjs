@@ -12,7 +12,7 @@
 //
 // 分层（guides/dev-loop §9.1）：认证档第三档——真模型、起进程，**不进 `pnpm test`**。
 // 预算：2 分身单轮微动议 ≈ $1 / 3–7 分钟（--wall 封顶墙钟）。
-// 前置：DSH_HOME + 模型凭据（dev home）；cwd 写死 `dev/rehearsal-workspace`（练习场 ≠ 运行场，
+// 前置：DSH_HOME + 模型凭据（dev home）；cwd 写死 `runtime/rehearsal-workspace`（练习场 ≠ 运行场，
 //   产物落排练场，真盘零接触）。
 // 用法：source dev/env.sh && node scripts/smoke/presence-e2e-smoke.mjs [--wall 600]
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
@@ -26,7 +26,7 @@ const arg = (name, fallback) => {
 }
 const WALL_MS = Number(arg('wall', '600')) * 1000
 const POLL_MS = 2_000
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const BOOT_TIMEOUT_MS = 120_000
 
 let home
@@ -54,7 +54,7 @@ const banner = await new Promise((res, rej) => {
   setTimeout(() => rej(new Error(`等待启动横幅超时\n${output.slice(-800)}`)), BOOT_TIMEOUT_MS)
 })
 const base = `http://127.0.0.1:${String(banner.port)}`
-console.log(`web up: ${base}（cwd = dev/rehearsal-workspace）`)
+console.log(`web up: ${base}（cwd = runtime/rehearsal-workspace）`)
 
 const startedAt = Date.now()
 let failures = 0

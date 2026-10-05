@@ -1,6 +1,6 @@
 # 开发环境兜底：coding agent 不会自己想起双 home / 双 DSH 的区别（docs/guides/dev-loop.md §6）。
 # 用法：source dev/env.sh
-export DSH_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")/harness-home" && pwd)"
+export DSH_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")/../runtime/harness-home" && pwd)"
 mkdir -p "$DSH_HOME"
 
 # 裸 dsh 拦截（代码层）：PATH 里的 dsh 是日用全局安装，与本 repo 开发基线（vendor/dsh

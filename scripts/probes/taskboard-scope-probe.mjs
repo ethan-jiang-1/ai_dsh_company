@@ -14,14 +14,14 @@
 //     ⇒ 记录为机制事实（multi-human.md §0 登记），不是 bug 卡——这是 DSH 的设计边界而非缺陷，
 //     但跨门协调因此只能靠文件层，值得登记进手册/multi-human.md。
 //   B3：COO 门的 team_task_list 为空（或只有自己的任务）——不能看到 CFO 的（不混板）。
-// 用法：DSH_HOME=dev/harness-home node scripts/probes/taskboard-scope-probe.mjs
+// 用法：DSH_HOME=runtime/harness-home node scripts/probes/taskboard-scope-probe.mjs
 // 退出码：0 = B1+B3 成立（板 per-team = 设计事实，登记为观察）；1 = B1 失败（异常）；2 = 环境。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 let home

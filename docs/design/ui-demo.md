@@ -107,7 +107,7 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 - **client 构建链**：tsdown 把 `src/client/` 打成 **`lib/client.js`**（不是 `dist/`），
   `exports["./client"]` 指向它。dev 时 `dsh-client-hmr` stat-poll bundle → SSE 推送，
   改了重建即可热更，不用重启（机制见 `docs/subsystems/client-modules.md` §The service）。
-- **双 home 纪律不变**：Web 开发也跑在 `DSH_HOME=<repo>/dev/harness-home` 的
+- **双 home 纪律不变**：Web 开发也跑在 `DSH_HOME=<repo>/runtime/harness-home` 的
   web profile 上，别碰日用 home。
 - **FAQ 12 的坑要背**：dsh web 多开窗口第 4 个卡住 = rev 轮换 + 陈旧缓存 index（动态模块
   404）。demo 前升级过 vendor/dsh 的话，按 FAQ 12 的 runbook 重打补丁/重启/验证。

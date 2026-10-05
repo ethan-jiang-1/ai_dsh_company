@@ -62,7 +62,7 @@ node scripts/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名
   `native/system*`（node-addon-system）；见 pnpm-workspace.yaml 注释。
 - **根 devDeps**（tsx/tsdown/typescript/@types/node/@types/js-yaml/lightningcss/vitest）
   版本逐字镜像 vendor 根声明；vendor 换 tag 时随升级环 diff 对齐。
-- **凭据**：`cp ~/.dsh/.credentials.yaml dev/harness-home/ && chmod 600`（gitignored）。
+- **凭据**：`cp ~/.dsh/.credentials.yaml runtime/harness-home/ && chmod 600`（gitignored）。
 - **web 观察窗三件事**（R1 实证）：① client bundles（`tsdown --env.DSH_BUILD_FACE client`）——
   缺了报 `client bundles not found; run pnpm run build before launch`；② 前端 dist
   （`pnpm --filter @deepseek-ai/dsh-web-frontend run build`）——缺了首页 404 空页；

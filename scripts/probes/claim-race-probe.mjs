@@ -14,7 +14,7 @@
 //   B2（发现判据）：双持认领（两会话的文件都无让位标记而都占位/含 T1）= FAIL ⇒ 仲裁缺口。
 //   观察：占位后是否重读对方文件（约定的仲裁途径 = 盘面可见性；run1 双方都走了——但这不是
 //     手册强制的动作，是行为自觉，风险窗口记录进 BUG-004）。
-// 用法：DSH_HOME=dev/harness-home node scripts/probes/claim-race-probe.mjs
+// 用法：DSH_HOME=runtime/harness-home node scripts/probes/claim-race-probe.mjs
 // 退出码：0 = B1 成立（盘面可见性完成仲裁）；1 = B2（双认领缺口确认）；2 = 环境失败。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'
@@ -22,7 +22,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const SLUG = '2026-10-06-claim-race-probe'
 const DELIV = join(REHEARSAL, 'deliverables', SLUG)
 const sleep = ms => new Promise(r => setTimeout(r, ms))

@@ -17,7 +17,8 @@ docs/                   当前合同与导航：index（地图+台账）→ desi
 notes/                  **开发记忆与证据链**：proposed/（RFC）→ implemented/（活跃决策记忆）；archived/（完结研究 + intents 冻结档案）/ rejected/（负知识）；postmortem/ 记事故
 _backlog/               推敲层：plans/ 推敲卡（含待触发等待卡）、bugs/ 缺陷卡、reference/ 研究材料、_done/ 归档（_closed/_suspended/_fixed/_reference + _misc/ 退役池）；章程/账本二分，规矩与制度沿革（D31/D33）= 其 README
 scripts/                run-gates.mjs（稳定门禁）；smoke/ probes/ audit/ tools/ archive/ 按职责；lib/ 隔离逻辑、drivers/ 真实驱动
-dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）；README = 分类 owner
+dev/                    启动配置（tracked）：env.sh（双 home+裸 dsh 拦截）、company.overlay.yml / entry-probe.patch.yml（实验 overlay）；README = owner
+runtime/                运行残留家（gitignored）：harness-home/（开发 DSH_HOME）+ 第二 home、pw-browsers/、rehearsal-workspace/；README = 分类 owner（2026-10-06 条目 A 自 dev/ 拆出）
 snapshots/              回归资产：历史录制、workspace.actual 副本与部分场景独立编写的 workspace.expected；以各 snapshot.yml / Note 为准
 ```
 
@@ -50,7 +51,7 @@ node scripts/smoke/preset-smoke.mjs          # preset 改动的**完成定义**�
 
 ## 密钥
 
-`pnpm dsh` 与真模型冒烟需 `DEEPSEEK_API_KEY`；凭据按 home 隔离（开发 home `dev/harness-home/.credentials.yaml` 配一次，guides/dev-loop §6）；永不提交密钥。
+`pnpm dsh` 与真模型冒烟需 `DEEPSEEK_API_KEY`；凭据按 home 隔离（开发 home `runtime/harness-home/.credentials.yaml` 配一次，guides/dev-loop §6）；永不提交密钥。
 
 ## DSH 源码：三个实体，别混
 

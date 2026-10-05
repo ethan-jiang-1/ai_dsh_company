@@ -14,7 +14,7 @@ import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 import { launchChromium, loadChromium } from '../drivers/playwright.mjs'
 
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const SHOTS = join(ROOT, 'snapshots/probes/harvest-probe', new Date().toISOString().slice(0, 10))
 mkdirSync(SHOTS, { recursive: true })
 const sleep = ms => new Promise(r => setTimeout(r, ms))

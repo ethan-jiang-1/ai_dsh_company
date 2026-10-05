@@ -21,7 +21,7 @@ import { join } from 'node:path'
 const EXECUTE = process.argv.includes('--execute')
 const REAL = join(ROOT, 'company-workspace/deliverables')
 const LEDGER = join(ROOT, 'company-workspace/kb/motion-ledger.md')
-const STAGE = join(ROOT, 'dev/rehearsal-workspace/migration-rehearsal')
+const STAGE = join(ROOT, 'runtime/rehearsal-workspace/migration-rehearsal')
 
 // 台账「类型」列 → meta 分型词表（META_TYPES）；无法判的落「决策」并在 detail 标注来源。
 const typeOf = (ledgerType, slug) => {
@@ -107,7 +107,7 @@ if (EXECUTE) {
   for (const cmd of [['scripts/audit/deliverables-check.mjs'], ['scripts/audit/authorship-audit.mjs']]) {
     try {
       const out = execFileSync(process.execPath, cmd, { cwd: ROOT, encoding: 'utf8', timeout: 300_000,
-        env: { ...process.env, DSH_HOME: join(ROOT, 'dev/harness-home') } })
+        env: { ...process.env, DSH_HOME: join(ROOT, 'runtime/harness-home') } })
       console.log(`[${cmd[0]}]\n` + out.split('\n').filter(l => /ALL PASS|违规|观察项 \d|一致 \d|版本引用/.test(l)).slice(0, 4).join('\n'))
     } catch (error) {
       gateFailures += 1

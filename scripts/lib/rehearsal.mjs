@@ -1,4 +1,4 @@
-// 排练场（dev/rehearsal-workspace/）的成型与守卫 —— 轮间待办②「练习场 ≠ 运行场」。
+// 排练场（runtime/rehearsal-workspace/）的成型与守卫 —— 轮间待办②「练习场 ≠ 运行场」。
 // 出处：notes/implemented/2026-09-22-workspace-hygiene.md 条目去向 #3；roadmap 轮间待办（R4 → R5a）②。
 //
 // 为什么：排练/探针跑在真盘时，过程稿不受三态判据约束（drafts/ 本就不需要 present），
@@ -17,7 +17,7 @@
 import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readlinkSync, rmSync, symlinkSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
-export const REHEARSAL_REL = join('dev', 'rehearsal-workspace')
+export const REHEARSAL_REL = join('runtime', 'rehearsal-workspace')
 
 /** 幂等成型排练场，返回其绝对路径。repoRoot = 仓库根（scripts/ 的上一级）。 */
 export function ensureRehearsalWorkspace(repoRoot) {

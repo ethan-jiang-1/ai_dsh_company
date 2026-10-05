@@ -16,7 +16,7 @@
 //     不得 spawn_teammate（替别人干活的形态）、不发 request_signoff（35% 毛利不触线）；
 //     ⚠ **subagent 允许**（CFO persona 明文「需要深挖时生 one-shot workers」——run1 的独立合规
 //     核查 worker 属合法深挖，v1 判据误校准已纠正）。
-// 用法：DSH_HOME=dev/harness-home node scripts/probes/task-discovery-probe.mjs
+// 用法：DSH_HOME=runtime/harness-home node scripts/probes/task-discovery-probe.mjs
 // 退出码：0 = 三判据全过；1 = FAIL（按判据定性）；2 = 环境失败。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'
@@ -24,7 +24,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const SLUG = '2026-10-06-task-discovery-probe'
 const DELIV = join(REHEARSAL, 'deliverables', SLUG)
 const sleep = ms => new Promise(r => setTimeout(r, ms))

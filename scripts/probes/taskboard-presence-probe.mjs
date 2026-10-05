@@ -24,7 +24,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'dev/rehearsal-workspace')
+const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
 const ASSETS = join(ROOT, 'snapshots/probes/taskboard-presence-probe/2026-10-04')
 mkdirSync(ASSETS, { recursive: true })
 const sleep = ms => new Promise(r => setTimeout(r, ms))

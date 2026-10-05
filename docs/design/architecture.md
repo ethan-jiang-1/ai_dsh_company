@@ -307,7 +307,7 @@ ai_dsh_company/
 3. **experimental team 两包是 host 行**（服务注册 + per-member scoped 工具安装），加
    `dsh-session-persistence-jsonl` 才激活；以 `- insert:` 行随 bundle 走（R1 起直插，
    不装官方 bundle，故无续驶控制冲突）。
-4. **双 home**：日用 `~/.dsh` 不动，开发 `DSH_HOME=<repo>/dev/harness-home`，环境脚本兜底
+4. **双 home**：日用 `~/.dsh` 不动，开发 `DSH_HOME=<repo>/runtime/harness-home`，环境脚本兜底
    （coding agent 不会自己想起这个区别）。
 5. **~~已知开放点（R1 实测）~~ 已随升 pin 失效**：原文记"company profile（无 web-app）里
    agent-presets 行在源码 CLI 下挂起"——那是 0.1.5 模型 + 已退役 company profile 的组合，
