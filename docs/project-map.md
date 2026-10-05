@@ -2,6 +2,8 @@
 
 这份地图供项目驾驭者与维护 Coding Agent 使用。根 [AGENTS.md](../AGENTS.md) 路由开发任务；[公司手册](../company-workspace/AGENTS.md) 是角色会话的运行时输入。先用下表选入口，政策和操作细节由链接目标维护。
 
+**快读（happy path）**：启动公司 → [demo.md §前置](demo.md)；改东西 → 下表按任务进入；验证 → [tests/README](../tests/README.md) 最窄检查表；卡住 → 本页「交互与调试入口」现象表；时序与状态轴 → [运行态地图](runtime-map.md)。
+
 ## 按任务进入
 
 | 当前目的 | 入口 | 读完能做什么 |
@@ -9,10 +11,11 @@
 | 第一次进入或还不能启动 | [引导指南](guides/bootstrap.md) | 安装 workspace、构建 host/client 与 Web 产物 |
 | 开始代码或文档变更 | [开发环](guides/dev-loop.md) §0.5/§1 | 判断任务、范围、授权与完成证据 |
 | 启动并操作公司 | [动议合同](demo.md) §前置 | 打开带 token 的观察窗、连接公司盘、创建 CEO 会话 |
+| 查运行态与时序 | [运行态地图](runtime-map.md) | 分清代码/运行态/会话事实/证据四轴与首跑错误入口 |
 | 查组合和工具装载 | [profile 合同](profile.md)、[开发环](guides/dev-loop.md) §2 | dump 组合、检查名册与实际会话挂载 |
 | 修改角色内容 | [preset 合同](presets.md) | 找到 persona、skill 与 workspace 事实的各自 owner |
 | 修改 host 或 Web | [源码地图](../packages/company-pack/src/README.md) | 找到注册入口、读模型与渲染实现 |
-| 选择验证 | [测试宪法](testing.md)、[脚本索引](../scripts/README.md) | 选择证明当前性质的最窄检查 |
+| 选择验证 | [测试宪法](testing.md)、[tests/README](../tests/README.md)、[脚本索引](../scripts/README.md) | 选择证明当前性质的最窄检查 |
 | 查证据与归档 | [快照规则](../snapshots/README.md) | 区分录制、副本、独立 oracle、视觉夹具和归档 |
 | 查设计理由或旧决定 | [主题导航与决策台账](index.md) | 从主题进入合同和关联 Note |
 
@@ -31,7 +34,7 @@
 | 决策记忆 | [notes](../notes/) | 按主题检索决定、被否决方案与复验依据 |
 | 推敲空间 | [_backlog](../_backlog/README.md) | 未成熟判断材料；任务执行按开发环与用户指令进入 |
 
-三个位置影响运行：**代码来源**决定 DSH 版本，**DSH_HOME**决定 profile 与会话日志，**会话 cwd**决定公司事实和输出。开发环境用 `source dev/env.sh` 与 `pnpm dsh` 配对；裸 `dsh` 是另一份全局安装。[开发环 §6](guides/dev-loop.md) 解释双 home 与双 DSH。
+**四个位置影响运行**：**代码来源**决定 DSH 版本、**DSH_HOME** 决定 profile 与会话日志、**会话 cwd** 决定公司事实和输出、**验证证据**冻结时点事实——四条状态轴的权威位置与「不能从这里推断什么」唯一家 = [运行态地图 §二](runtime-map.md)。开发环境用 `source dev/env.sh` 与 `pnpm dsh` 配对；裸 `dsh` 是另一份全局安装。[开发环 §6](guides/dev-loop.md) 解释双 home 与双 DSH。
 
 ## 真实运行链
 

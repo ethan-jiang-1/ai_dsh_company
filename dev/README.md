@@ -3,7 +3,7 @@
 > 职责由一个具名文件拥有（D35 同款精神）：本文件管 dev/ 树每件东西是什么、权威性与生命周期。
 > 双 home 纪律与机制 = [architecture §6](../docs/design/architecture.md)；进入开发环境 =
 > `source dev/env.sh`（双 home 兜底 + 裸 `dsh` 拦截 + pre-push 接线，幂等）；全链时序运行态地图 =
-> docs/runtime-map.md（RFC entry-runtime-map 落地中立，届时转链）。
+> [docs/runtime-map.md](../docs/runtime-map.md)。
 > ⚠ 本树运行态全部 gitignored——**不是版本控制面、不是证据权威**；`harness-home/` 内部细则见其
 > [README](./harness-home/README.md)。
 

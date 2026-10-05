@@ -1,7 +1,7 @@
 # AGENTS.md — 本仓库的入口链
 
 wochen 虚拟公司 DSH 插件：一个 company pack 提供五个角色 preset 与 host/client 面。
-**初入仓库或查运行链**：读 [项目地图](docs/project-map.md)；**开始变更**：读 [开发环 §0.5/§1](docs/guides/dev-loop.md)；**选验证**：读 [测试宪法](docs/testing.md) 和 [脚本索引](scripts/README.md)。
+**初入仓库**：读 [项目地图](docs/project-map.md)（空间）+ [运行态地图](docs/runtime-map.md)（时序与四状态轴）；**开始变更**：读 [开发环 §0.5/§1](docs/guides/dev-loop.md)；**选验证**：读 [测试宪法](docs/testing.md)、[tests/README](tests/README.md)（改动面→最窄检查表）和 [脚本索引](scripts/README.md)；**新 Agent 首跑验收**（推荐、非强制）= [tests/README](tests/README.md) 首跑节。
 
 **你（读者）= 维护本 repo 的开发 agent**；五个 wochen 角色是你**维护的产物**（它们跑在 DSH 会话里，
 由 `pnpm dsh` / web 观察窗驱动）——别把自己混进公司角色，也别替角色执行公司手册。
