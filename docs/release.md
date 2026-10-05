@@ -96,6 +96,7 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
    记入收割台账 Note——先查货架再动手是 FAQ 17 四步流程，升 pin 是它的固定触发点。
 3. **语料回放全绿**：vendor 换 tag 后先跑 `scripts/smoke/replay-smoke.mjs`（r2/r3 会话判据 + foundation workspace
    oracle；资格与缺口见[快照合同](../snapshots/README.md)）再谈语义结论——replay = 升 pin 回归网第一道（[testing.md](./testing.md) §4）。
+    已知漂移红（r3 ×2 / foundation ×3 = 录制期组合演进，2026-10-05 裁决维持为漂移金丝雀、不弱化断言不重录掩盖）；升 pin 重校时顺带评估是否以新版本场景重录换更宽绿网（新录不覆盖旧锚，payload 冻结不破）。
 
 程序：验证旧簿记及 `verify` → fetch tag 并核对证据 SHA → 在内存暂存新簿记/矩阵 → checkout 候选 → `pnpm install` → vendor 自有 `pnpm run build` → `test` + built `release-smoke` → 验证通过才写簿记/矩阵 → 再 `verify`。候选冒烟时矩阵仍为旧值，安装检查只确认其在场；成功后矩阵才增加实测 tag。安装限 180 秒、vendor build 与 release-smoke 各 600 秒，其余命令 120 秒；子进程组等待退出。
 
