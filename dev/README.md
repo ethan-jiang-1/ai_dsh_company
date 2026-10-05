@@ -24,7 +24,6 @@
 | `harness-home/b/`、`harness-home-b/` | 第二/嵌套 home——多 home 实验与跨 home 审计视角（authorship 口径：每家导出各审一次再拼结果） | runtime·实验面 |
 | `pw-browsers/` | 浏览器二进制与 profile（`PLAYWRIGHT_BROWSERS_PATH` 重定向落点）；**UI 布局记忆按 origin 隔离**存在浏览器 profile——换端口重启即新 origin、记忆清零 | runtime |
 | `rehearsal-workspace/` | **排练盘**：排练/探针 cwd——**绝不写 live 公司盘**（`company-workspace/`） | runtime·排练 |
-| `logs/` | 当前无写入者（空目录，2026-10-05 核）——登记待处置；确认无用即可删 | runtime·空置 |
 
 ## 三、层级事实（四条，钉死）
 

@@ -1,7 +1,7 @@
 # 推敲：人机合一 UX——BDD 场景组（H 系）
 
 > 状态：已毕业（2026-10-04 第一批加工交付：H3 固化 = scripts/member-rescue-probe.mjs 首跑 6/6；去向与后续批次 = [batch1 Note](../../../notes/implemented/2026-10-04-multi-user-bdd-batch1.md)）｜原判断：该做（H1/H2/H4 已闭合；H3 是主回路缺口、H7 是走查发现）｜
-> 下一步 = 用户圈定批次（H3 建议第一批）；证据半边 =
+> 圈定已兑现（H3 入第一批 = batch1 Note）。证据半边 =
 > [reference/2026-10-04-multi-user-ux-walk](../_reference/2026-10-04-multi-user-ux-walk.md)。
 
 ## 背景 / 触发

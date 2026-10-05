@@ -15,9 +15,9 @@ company-workspace/      运行时"公司共享盘"（会话 cwd）：**AGENTS.md
 vendor/dsh/             DSH 源码 submodule（钉 SHA，**只读铁律**：见 §vendor 铁律，`pnpm verify` 强制）
 docs/                   当前合同与导航：index（地图+台账）→ design/ guides/ + 顶层合同
 notes/                  **开发记忆与证据链**：proposed/（RFC）→ implemented/（活跃决策记忆）；archived/（完结研究 + intents 冻结档案）/ rejected/（负知识）；postmortem/ 记事故
-_backlog/               推敲层（D31 立层；D33 章制回借）：plans/ 推敲卡（含待触发等待卡）、bugs/ 缺陷卡、reference/ 研究材料、_done/ 归档（_closed/_suspended/_fixed/_reference + _misc/ 退役池）；章程/账本二分，规矩 = 其 README
+_backlog/               推敲层：plans/ 推敲卡（含待触发等待卡）、bugs/ 缺陷卡、reference/ 研究材料、_done/ 归档（_closed/_suspended/_fixed/_reference + _misc/ 退役池）；章程/账本二分，规矩与制度沿革（D31/D33）= 其 README
 scripts/                run-gates.mjs（稳定门禁）；smoke/ probes/ audit/ tools/ archive/ 按职责；lib/ 隔离逻辑、drivers/ 真实驱动
-dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）
+dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）；README = 分类 owner
 snapshots/              回归资产：历史录制、workspace.actual 副本与部分场景独立编写的 workspace.expected；以各 snapshot.yml / Note 为准
 ```
 
