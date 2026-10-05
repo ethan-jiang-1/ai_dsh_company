@@ -1,4 +1,4 @@
-/** Host half of the company pack: signoff tool (驾驶舱②) + presence read-model re-export.
+/** Host half of the company pack: signoff tool (驾驶舱②) + workspace doors tool (BUG-002) + presence read-model re-export.
  * The browser half lives in `./client`. */
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
@@ -6,12 +6,19 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 // ⚠ 不做值导入——那会把 host 侧核心包的类型图拉进本程序，遮掉 client 面的 sessions 增强（实测）。
 import type {} from '@deepseek-ai/dsh-user-approval'
 import { signoffDecisionNote, signoffReason } from './lib/signoff.ts'
+import { doorsFromSessions } from './lib/doors.ts'
 
 /**
  * 在场板读模型（R5b）从 host 入口再导出：`scripts/smoke/replay-smoke.mjs` 用它把重放会话的
  * team 事件折成在场板做判据 4 断言；纯函数、零依赖，不影响 host 挂载面。
  */
 export * from './lib/presence.ts'
+
+/**
+ * 工作区门投影（BUG-002，2026-10-06）：同 cwd 的根会话 × preset 聚合——同 preset ≥2 = duplicateWarning。
+ * 再导出纯函数供 keyless spec 与 client 视图消费。
+ */
+export * from './lib/doors.ts'
 
 /** Host half now registers a tool: needs the tool registry and the approval service. */
 export const inject = ['tools', 'approval']
@@ -71,6 +78,79 @@ export function apply(ctx: Context): void {
         signal: exec.signal,
       })
       return { decision, note: signoffDecisionNote(decision) }
+    },
+  }))
+
+  // ── 工作区门投影工具（BUG-002，2026-10-06）────────────────────────────────────
+  // 检测面 = 同 cwd 同 preset ≥2 个根会话 ⇒ duplicateWarning。角色会话和维护者均可调，
+  // 成本 = 进程内事件维护的投影（零模型）。create 对话框是 vendor UI 摸不到 ⇒ 防线落在
+  // 本 pack 拥有的面：工具 + client 视图高亮。
+  // 机制：听 vendor `api-session/added/removed/status` 事件维护 cwd×preset 投影（不注入
+  // sessions 服务——host 面没有直接可注入的 sessions catalog，事件是 vendor 提供的标准面）。
+  const doorFacts = new Map<string, { cwd: string; agentPreset: string | undefined; running: boolean }>()
+  ctx.on('api-session/added', (summary) => {
+    if (summary.origin === 'subagent') return // 只追根会话
+    doorFacts.set(String(summary.sessionId), {
+      cwd: String(summary.cwd ?? ''),
+      agentPreset: typeof summary.projections?.values?.agentPreset === 'string'
+        ? summary.projections.values.agentPreset
+        : undefined,
+      running: summary.running,
+    })
+  })
+  ctx.on('api-session/removed', (sessionId) => { doorFacts.delete(String(sessionId)) })
+  ctx.on('api-session/status', (sessionId, running) => {
+    const fact = doorFacts.get(String(sessionId))
+    if (fact !== undefined) fact.running = running
+  })
+
+  ctx.tools.register(defineTool({
+    name: 'workspace_doors',
+    description: 'Show which role presets currently have root sessions (doors) open on this workspace. '
+      + 'A duplicate warning means two or more sessions share the same preset — for example two CEO doors '
+      + '(the default preset is ceo; forgetting to select your role creates a second CEO). '
+      + 'Use this before closing a motion or presenting final.md to detect silent supersession.',
+    parameters: {},
+    output: {
+      schema: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          hasDuplicate: { type: 'boolean', required: true },
+          rows: {
+            type: 'array',
+            items: {
+              type: 'object',
+              additionalProperties: false,
+              properties: {
+                preset: { type: 'string', required: true },
+                sessionCount: { type: 'number', required: true },
+                duplicateWarning: { type: 'boolean', required: true },
+              },
+            },
+          },
+        },
+      },
+      render: (_args, value) => [{ type: 'text', text: JSON.stringify(value) }],
+    },
+    async execute(_args, exec) {
+      if (exec.agent === undefined) {
+        return { hasDuplicate: false, rows: [] }
+      }
+      // 用当前 agent 的 cwd 过滤门投影
+      const cwd = exec.agent.session?.header?.cwd ?? ''
+      const facts = [...doorFacts.entries()]
+        .filter(([, fact]) => fact.cwd === cwd)
+        .map(([sessionId, fact]) => ({ sessionId, cwd: fact.cwd, agentPreset: fact.agentPreset, running: fact.running }))
+      const model = doorsFromSessions(facts)
+      return {
+        hasDuplicate: model.hasDuplicate,
+        rows: model.rows.map(row => ({
+          preset: row.preset,
+          sessionCount: row.sessionCount,
+          duplicateWarning: row.duplicateWarning,
+        })),
+      }
     },
   }))
 }

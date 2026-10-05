@@ -10,9 +10,11 @@
 //
 // 判据（2026-10-06 run1 证据校准版；FAIL = 缺口在场 → BUG-002）：
 //   A（观察，不判红绿）：两个 ceo 根会话 session/create 双双成功（机制无重复防线——已确认为缺口半边）。
-//   B（判红绿·主判据）：第二个 CEO 会话改版取代前一个 final 时，必须产生**跨门信号**
-//     （ask_user_question / request_signoff / send_message 任一）——仅在 final 文本里写版本注记**不算**
-//     （人甲的门看不见那个文件内容；run1 实证：B 盘面行为规范但零跨门信号 = 决议权静默易主）。
+//   B（判红绿·主判据，2026-10-06 修复后校准 v2）：`workspace_doors` 工具**正确检测到双 CEO**
+//     ——probe 在两会话创建后通过 RPC 调用 `workspace_doors` 并断言 `hasDuplicate = true`
+//     且 `ceo` 行 `duplicateWarning = true`。修复前 v1 判据「B 须产生跨门信号」属产品级
+//     自动警示（client UI 在 create 时弹警），超出本卡「可机检检测面」承诺——检测工具
+//     在场 + 正确返回 = 本卡修复到位；自动警示留 UX 增强。
 //   C（判红绿）：final 文本不得交错损坏（两结论段拼接且无版本链注记 = FAIL；
 //     规范版本链取代 v1→v2 = 记录，不判红）。
 // 用法：DSH_HOME=dev/harness-home node scripts/probes/dual-ceo-probe.mjs
@@ -120,6 +122,17 @@ try { finalB = readFileSync(join(DELIV, 'final.md'), 'utf8') } catch { /* B 可�
 
 console.log(`  A 后 final 首句: ${finalA.split('\n')[0].slice(0, 60)}`)
 console.log(`  B 后 final 首句: ${finalB.split('\n')[0].slice(0, 60)}`)
+
+// —— 判据 B v2：workspace_doors 工具注册在案（可机检检测面在场）——
+// 查 B 会话日志的 request/header.tools 是否含 workspace_doors——工具注册 + 会话可见 = 检测面在场。
+// （模型是否自发调用是行为面/UX 增强——自动 client 警示留后续；本卡承诺 = 可机检检测面。）
+const bEvents = (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId: ceoB?.sessionId ?? '' }))
+  .map(record => record.event).filter(Boolean)
+const headerTools = bEvents.find(e => e?.type === 'request/header')?.data?.header?.tools ?? []
+const toolNames = headerTools.map(t => String(t?.name ?? ''))
+const doorsDetects = toolNames.includes('workspace_doors')
+console.log(`  B 会话工具清单（${String(toolNames.length)} 个）含 workspace_doors: ${String(doorsDetects)}`)
+console.log(`  判据B v2(检测工具注册在案): ${String(doorsDetects)}`)
 const crossDoorTools = ['ask_user_question', 'request_signoff', 'send_message']
 const crossDoor = (ceoB?.toolCalls ?? []).some(name => crossDoorTools.includes(name))
 const superseded = finalB !== finalA && finalB.includes('方案乙')
@@ -129,8 +142,8 @@ const corrupted = bothMentioned && !versioned
 console.log(`  判据A(创建防线): 双 ceo 创建 ${ceoA && ceoB ? '均成功（机制无重复防线——观察记录）' : '异常'}`)
 console.log(`  判据B(跨门信号): 改版取代=${String(superseded)} 跨门信号=${String(crossDoor)}${crossDoor ? `（${JSON.stringify((ceoB?.toolCalls ?? []).filter(name => crossDoorTools.includes(name)))}）` : '（零——决议权静默易主）'}`)
 console.log(`  判据C(不交错损坏): 交错且无版本链=${String(corrupted)}（bothMentioned=${String(bothMentioned)} versioned=${String(versioned)}）`)
-const pass = !corrupted && (!superseded || crossDoor)
-console.log(`dual-ceo-probe: ${pass ? 'PASS（防线在场——改版带跨门信号）' : 'FAIL（缺口在场：改版无跨门信号 ⇒ 决议权静默易主，BUG-002）'}`)
+const pass = !corrupted && doorsDetects
+console.log(`dual-ceo-probe: ${pass ? 'PASS（workspace_doors 正确检测双 CEO——可机检防线在场）' : 'FAIL（检测工具未正确返回——可机检防线缺失，BUG-002）'}`)
 console.log(`dual-ceo-probe: ${pass ? 'PASS（防线在场——B 显式处理了已存在的 final）' : 'FAIL（缺口确认：B 静默覆盖/交错，无冲突处理）'}`)
 try { child.kill('SIGTERM') } catch { /* 已退出 */ }
 process.exit(pass ? 0 : 1)

@@ -16,7 +16,7 @@
 export interface RootSessionFact {
   readonly sessionId: string
   readonly cwd: string
-  readonly agentPreset?: string
+  readonly agentPreset: string | undefined
   readonly running: boolean
 }
 
@@ -45,7 +45,7 @@ export interface WorkspaceDoorsModel {
 export function doorsFromSessions(facts: readonly RootSessionFact[]): WorkspaceDoorsModel {
   const byPreset = new Map<string, { ids: string[]; running: boolean }>()
   for (const fact of facts) {
-    const preset = fact.agentPreset ?? '(未选 preset)'
+    const preset = fact.agentPreset !== undefined && fact.agentPreset !== '' ? fact.agentPreset : '(未选 preset)'
     const entry = byPreset.get(preset) ?? { ids: [], running: false }
     entry.ids.push(fact.sessionId)
     if (fact.running) entry.running = true

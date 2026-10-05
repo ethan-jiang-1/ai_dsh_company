@@ -15,26 +15,31 @@ import { signoffDecisionNote, signoffReason } from '../../packages/company-pack/
 
 /** 只实现 apply/execute 用到的两个面；其余 cast 掉——stand-in 的是 ctx 壳，不是被测逻辑。 */
 function harness(approve: 'allowed-once' | 'denied') {
-  let captured: {
+  const registered: Array<{
     name: string
     execute(args: unknown, exec: { agent?: unknown; callId?: string; signal: AbortSignal }): Promise<{
       decision: string
       note: string
     }>
-  } | undefined
+  }> = []
   const requests: Array<Record<string, unknown>> = []
   const ctx = {
-    tools: { register: (def: never) => { captured = def as NonNullable<typeof captured> } },
+    tools: { register: (def: never) => { registered.push(def as never) } },
     approval: {
       request: async (req: Record<string, unknown>) => {
         requests.push(req)
         return approve
       },
     },
+    // BUG-002 修复：apply 里新加了 api-session 事件监听 + workspace_doors 工具注册——
+    // 两个 ctx.tools.register 调用都被上面捕获，但 harness 只测第一个（signoff）。
+    // ctx.on 是 Cordis 标准 API——mock 一个 no-op 让事件监听不炸即可。
+    on: () => () => {},
   }
   apply(ctx as unknown as Parameters<typeof apply>[0])
-  if (captured === undefined) throw new Error('apply 没有注册任何工具')
-  return { captured, requests, signal: new AbortController().signal }
+  const signoff = registered.find(r => r.name === 'request_signoff')
+  if (signoff === undefined) throw new Error('apply 没有注册 request_signoff 工具')
+  return { captured: signoff, requests, signal: new AbortController().signal }
 }
 
 const ARGS = { line: '毛利<30% 双签', summary: '报价低于签字线，需要人工决定。' } as const
