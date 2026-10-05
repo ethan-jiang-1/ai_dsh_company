@@ -63,6 +63,14 @@ export const WARNING = {
   META_RESULT_PENDING: 'meta-result-pending',
   /** meta.kickoff 与台账日期列不一致（两笔账对不上——B4 一致性门禁的观察半边）。 */
   META_LEDGER_MISMATCH: 'meta-ledger-mismatch',
+  /**
+   * 非 Lead 会话 present 了**过程稿**（BUG-003，2026-10-06 多人 UX 猎捕立）。
+   * 观察档（不判违规）：单操作者语境下「非 Lead 的 present = 过程稿可见化」是当时的**有意容忍**
+   * （见 auditDeliverables 声明面注释）；多人形态把容忍作废——每扇门后是**不同的人**，present 的
+   * vendor 语义 = "Declare existing files as final deliverables"，非 Lead 直呈即绕过成品专属性。
+   * 历史行为不追溯红（观察项每次提醒），成品侧越权仍是既有违规（两档并存不互吞）。
+   */
+  DRAFT_PRESENTED_BY_NON_LEAD: 'draft-presented-by-non-lead',
 }
 
 /** 占位抢注的首行形状（R0-2，2026-10-03；「一字不差」是机器可查的前提，合同家 = multi-human.md §3 纪律 5）。 */
@@ -314,6 +322,10 @@ export function auditDeliverables(input) {
 
   // 声明面：判据只追 **Lead 声明**——`company-workspace/AGENTS.md` 的承诺权写明只有 CEO 的
   // `present` 才算交付物声明，其他会话的 `present` 只是过程稿的可见化，不构成交付物。
+  // ⚠ 多人形态修正（BUG-003，2026-10-06）：非 Lead 的 present 在单操作者语境下是「过程稿
+  // 可见化」（当时的有意容忍——每个门后是同一个人）；多人形态下每扇门后是**不同的人** ⇒
+  // 非 Lead 直呈过程稿升为**观察项**（DRAFT_PRESENTED_BY_NON_LEAD，不判违规、每次提醒），
+  // 成品侧越权照旧判违规。
   // 非 Lead 声明的成品只在**它此刻真的躺在盘上**时判越权（历史行为不追着报，否则一次越权
   // 会永久污染此后每一轮审计）。
   const leadFinalIds = new Set()
@@ -326,6 +338,8 @@ export function auditDeliverables(input) {
     if (id?.kind === 'final') onDiskFinalIds.add(idKey(id))
   }
   const nonLeadFinalIds = new Set()
+  /** presenter preset + 过程稿 id → 观察行（去重：同一会话反复 present 同稿只提醒一次）。 */
+  const nonLeadDraftPresents = new Map()
   for (const session of sessions) {
     const lead = isLeadSession(session, leadPreset)
     for (const { path } of session.presented) {
@@ -342,6 +356,10 @@ export function auditDeliverables(input) {
         } else if (onDiskFinalIds.has(idKey(id))) nonLeadFinalIds.add(idKey(id))
       } else if (lead) {
         leadDraftIds.add(idKey(id))
+      } else if (id.kind === 'draft') {
+        nonLeadDraftPresents.set(`${String(session.agentPreset ?? '?')}\u0000${idKey(id)}`, {
+          slug: id.slug, role: id.role, preset: session.agentPreset ?? '?', path,
+        })
       }
     }
   }
@@ -406,6 +424,15 @@ export function auditDeliverables(input) {
         detail: `slug \`${slug}\` 的成品被 ${who.size} 个不同的 Lead 会话声明过（产物会互相覆盖，而三态判据看不出撞车）——开新动议前先看 deliverables/ 有没有同名`,
       })
     }
+  }
+  // 观察项（BUG-003）：非 Lead 会话 present 过程稿——多人形态下直呈其门上的人即绕过成品
+  // 专属性（vendor 工具语义 = final deliverables 声明）；历史容忍不追溯红，每次提醒。
+  for (const entry of nonLeadDraftPresents.values()) {
+    warnings.push({
+      code: WARNING.DRAFT_PRESENTED_BY_NON_LEAD,
+      slug: entry.slug,
+      detail: `非 Lead 会话（${entry.preset}）present 了过程稿 \`${entry.path}\`——多人形态下这会把它当 final deliverable 直呈该门上的人（BUG-003）；present 应留在 CEO 收口步`,
+    })
   }
   return { finals, drafts, metas, violations, warnings, leadFinalSlugs: [...leadFinalSessions.keys()] }
 }

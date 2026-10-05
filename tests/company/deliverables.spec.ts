@@ -408,3 +408,43 @@ describe('反向门禁（布局卡评审修正 6：present 在而结果≠终态
     expect(rows).toEqual([{ slug: 'pilot', result: '' }, { slug: 'ghost-done', result: '进行中' }])
   })
 })
+
+describe('非 Lead present 过程稿的观察档（BUG-003，2026-10-06 多人 UX 猎捕立——观察项不判违规）', () => {
+  const cfoPresentsDraft = {
+    id: 's-cfo', agentPreset: 'cfo', delegationDepth: 0,
+    presented: [{ path: 'deliverables/pilot/drafts/cfo.md' }],
+  }
+  const ceoPresentsDraft = {
+    id: 's-ceo', agentPreset: 'ceo', delegationDepth: 0,
+    presented: [{ path: 'deliverables/pilot/drafts/cfo.md' }],
+  }
+
+  it('cfo present 过程稿 ⇒ 观察项 draft-presented-by-non-lead（历史容忍不追溯红，但每次提醒）', () => {
+    const result = auditDeliverables({
+      workspaceFiles: ['deliverables/pilot/drafts/cfo.md', 'deliverables/pilot/meta.md'],
+      sessions: [cfoPresentsDraft],
+    })
+    expect(result.violations).toEqual([])
+    expect(result.warnings).toEqual([
+      expect.objectContaining({ code: 'draft-presented-by-non-lead', slug: 'pilot' }),
+    ])
+  })
+
+  it('CEO present 过程稿 ⇒ 无此观察项（Lead 引用过程稿是收口正常面）', () => {
+    const result = auditDeliverables({
+      workspaceFiles: ['deliverables/pilot/drafts/cfo.md', 'deliverables/pilot/meta.md'],
+      sessions: [ceoPresentsDraft],
+    })
+    expect(result.warnings.filter(w => w.code === 'draft-presented-by-non-lead')).toEqual([])
+  })
+
+  it('cfo present 成品（在盘）⇒ 仍是既有违规 final-presented-by-non-lead（两档并存不互吞）', () => {
+    const result = auditDeliverables({
+      workspaceFiles: ['deliverables/pilot/final.md', 'deliverables/pilot/meta.md'],
+      sessions: [{ id: 's-cfo', agentPreset: 'cfo', delegationDepth: 0, presented: [{ path: 'deliverables/pilot/final.md' }] }],
+    })
+    expect(result.violations.map(v => v.code)).toContain('final-presented-by-non-lead')
+    expect(result.violations.map(v => v.code)).toContain('final-not-presented')
+    expect(result.warnings.filter(w => w.code === 'draft-presented-by-non-lead')).toEqual([])
+  })
+})

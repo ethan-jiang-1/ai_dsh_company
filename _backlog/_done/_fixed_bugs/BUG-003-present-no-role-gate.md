@@ -1,6 +1,6 @@
 # BUG-003：present 工具无角色门禁——任意角色根会话可 present 过程稿直呈用户，绕过成品专属性
 
-> 严重级别：P1（重要——多人形态下每个门都能把文件直呈其人，公司层「成品声明权归 CEO」只剩文案自觉）｜发现：2026-10-06（多人 UX bug 猎捕 S2，用户立项）｜状态：活跃
+> 严重级别：P1（重要——多人形态下每个门都能把文件直呈其人，公司层「成品声明权归 CEO」只剩文案自觉）｜发现：2026-10-06（多人 UX bug 猎捕 S2，用户立项）｜状态：活跃 — 已修复 2026-10-06：判据层补 DRAFT_PRESENTED_BY_NON_LEAD 观察档（scripts/lib/deliverables.mjs + tests/company/deliverables.spec 3 例红→绿：非 Lead present 过程稿→观察项、Lead present→无、非 Lead present 成品→既有违规不互吞）。**检测缺口精确定位修正**：成品侧越权本有 FINAL_PRESENTED_BY_NON_LEAD 违规检测（卡内「零检测」表述过宽）；过程稿侧系单操作者语境的**有意容忍**（库内设计注释原文），多人形态将其作废。live 复验 = 违规 0 保持 + 历史成员会话 present 浮为观察项（成员继承 ceo 组合 ⇒ agentPreset=ceo、depth≥1 的历史形态实证）；观察项噪声若需压缩再议名册制。收据 = 修复 commit（同 diff 含 spec 与门禁绿）。
 
 ## 症状
 
