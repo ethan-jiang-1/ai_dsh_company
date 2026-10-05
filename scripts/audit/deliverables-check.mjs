@@ -22,6 +22,7 @@
 //
 // 退出码：0 = 零违规；1 = 有违规（打印每条 code + path）。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { pickSessionLog } from '../lib/session-log-generation.mjs'
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { requireDevHome } from '../lib/runtime-home.mjs'
@@ -106,9 +107,9 @@ if (source.files.length > 0) {
   for (const sessionDir of readdirSync(source.sessionRoot, { withFileTypes: true })) {
     if (!sessionDir.isDirectory()) continue
     const dir = join(source.sessionRoot, sessionDir.name)
-    const log = readdirSync(dir).find(name => name.endsWith('.jsonl.zstd') || name.endsWith('.jsonl'))
+    const log = pickSessionLog(dir)
     if (log === undefined) continue
-    sessions.push(parseSessionLog(readSessionText(join(dir, log))))
+    sessions.push(parseSessionLog(readSessionText(join(dir, log.name))))
   }
 }
 

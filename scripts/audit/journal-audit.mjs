@@ -20,6 +20,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { snapshotScenes } from '../lib/repository-layout.mjs'
+import { pickSessionLog } from '../lib/session-log-generation.mjs'
 
 const args = process.argv.slice(2)
 const argOf = name => {
@@ -66,10 +67,8 @@ function candidates() {
       // 会话日志有两代（v3 / v4）——只认 v4 会把 09-25 之前的场次全漏掉（首版就漏了 26/30）。
       const sessionDir = join(dir, id)
       if (!statSync(sessionDir).isDirectory()) continue
-      const name = readdirSync(sessionDir)
-        .filter(entry => /^session\.v\d+\.jsonl\.zstd$/.test(entry))
-        .sort()
-        .at(-1)
+      // 世代选择唯一口径 = session-log-generation（版本化数值取最高——只认单一世代或按字典序都会漏场/读旧世代）。
+      const name = pickSessionLog(sessionDir)?.name
       if (name === undefined) continue
       const file = join(sessionDir, name)
       let header

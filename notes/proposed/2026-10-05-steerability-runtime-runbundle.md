@@ -38,7 +38,7 @@ dev/ 运行态无 owner 文档，多类状态易混（2026-10-05 核验）：
    session log/workspace/snapshot，不复制、不成第二权威；live 权威仍是 DSH session + workspace；
    现有场景表达不了时才在场景层加字段。
 7. **联动**：run bundle 的「session ids 与日志世代」字段依赖
-   [日志世代修复 RFC](2026-10-05-steerability-log-generation.md) 的统一选择语义。
+   [日志世代修复 RFC](../implemented/2026-10-05-steerability-log-generation.md)（已实施——pickSessionLog 统一语义）的选择语义。
 
 ## 输掉的方案（留尸）
 

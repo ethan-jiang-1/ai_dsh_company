@@ -25,6 +25,7 @@
 // 用法：source dev/env.sh && node scripts/audit/authorship-audit.mjs [--workspace <dir>]
 // 退出码：0 = 无"署名不实"；1 = 有；2 = 环境（缺 DSH_HOME）。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { pickSessionLog } from '../lib/session-log-generation.mjs'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { join, relative, resolve } from 'node:path'
@@ -86,11 +87,8 @@ for (const bucket of readdirSync(SESSIONS)) {
   for (const id of readdirSync(bdir)) {
     const sdir = join(bdir, id)
     if (!statSync(sdir).isDirectory()) continue
-    let newest = null
-    for (const name of readdirSync(sdir)) {
-      if (/^session\.v\d+\.jsonl\.zstd$/.test(name)) newest = name
-    }
-    if (newest === null) continue
+    const newest = pickSessionLog(sdir)?.name
+    if (newest === undefined) continue
     const file = join(sdir, newest)
     if (statSync(file).mtimeMs < cutoff) continue
     scanned += 1

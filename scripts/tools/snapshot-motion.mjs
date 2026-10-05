@@ -9,8 +9,9 @@
 // 用法：source dev/env.sh && node scripts/tools/snapshot-motion.mjs \
 //         --session session-<lead-id> --out snapshots/replay/r2-motion --motion "动议原文" [--cwd company-workspace]
 import { repositoryRoot as ROOT, snapshotOutput, snapshotOutputPath } from '../lib/repository-layout.mjs'
+import { pickSessionLog } from '../lib/session-log-generation.mjs'
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { requireDevHome } from '../lib/runtime-home.mjs'
 import { captureWorkspace } from '../lib/workspace-oracle.mjs'
@@ -46,12 +47,13 @@ const slug = `-${cwd.replaceAll('/', '-')}--`
 const sessionsDir = join(home, 'sessions', slug)
 if (!existsSync(sessionsDir)) throw new Error(`会话目录不存在：${sessionsDir}`)
 
-/** 解压一个会话目录的 JSONL（zstd → 明文）。 */
+/** 读一个会话目录的 JSONL（世代选择唯一口径 = scripts/lib/session-log-generation.mjs；zstd → 明文）。 */
 function readSession(sessionId) {
   const dir = join(sessionsDir, sessionId)
-  const zstd = readdirSync(dir).find(name => name.endsWith('.jsonl.zstd'))
-  if (zstd === undefined) throw new Error(`${sessionId} 里没有 .jsonl.zstd`)
-  return execFileSync('zstd', ['-dc', join(dir, zstd)], { maxBuffer: 64 * 1024 * 1024 }).toString('utf8')
+  const log = pickSessionLog(dir)
+  if (log === undefined) throw new Error(`${sessionId} 里没有会话日志（canonical 形状见 session-log-generation.mjs）`)
+  if (!log.zstd) return readFileSync(join(dir, log.name), 'utf8')
+  return execFileSync('zstd', ['-dc', join(dir, log.name)], { maxBuffer: 64 * 1024 * 1024 }).toString('utf8')
 }
 
 /** 会话头（第一行）里的元数据。 */

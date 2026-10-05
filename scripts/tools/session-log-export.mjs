@@ -11,6 +11,7 @@
 //   不给 --workspace = 导出该 home 下全部 bucket（文件名带 bucket 前缀防撞）。
 // 退出码：0 = 导出完成；1 = 无可导日志或全部失败；2 = 参数/环境失败。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { pickSessionLog } from '../lib/session-log-generation.mjs'
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -30,11 +31,8 @@ if (!existsSync(SESSIONS)) { console.error(`session-log-export: 会话根不存�
 const workspaceArg = arg('workspace')
 const wantedBucket = workspaceArg !== undefined ? `-${resolve(workspaceArg).replaceAll('/', '-')}--` : undefined
 
-/** 找一个会话目录里的日志（与 deliverables-check 的活档同口径：优先 .jsonl.zstd，其次 .jsonl）。 */
-function logOf(sessionDir) {
-  const names = readdirSync(sessionDir)
-  return names.find(name => name.endsWith('.jsonl.zstd')) ?? names.find(name => name.endsWith('.jsonl'))
-}
+/** 找一个会话目录里的日志（世代选择唯一口径 = scripts/lib/session-log-generation.mjs：版本化数值取最高、同代 zstd 优先、child 排除）。 */
+const logOf = (sessionDir) => pickSessionLog(sessionDir)?.name
 
 /** 解一份日志：明文直读；zstd 多帧交给 CLI（Node 内置只解首帧）。 */
 function readLogText(file) {
