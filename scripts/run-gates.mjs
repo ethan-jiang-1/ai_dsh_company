@@ -65,7 +65,7 @@ if (links.violations.length === 0) ok(`md-links (含 notes) ×${links.linkCount}
 //   原注释写"后 107 行"/"整治后 131"，实为 108 / 142，属"枚举型事实写两处"那一类腐化）。
 const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 105],            // 2026-09-23 二次收口（渐进披露）；2026-09-27 瘦身轮：密钥/三实体/原生纪律/不发明段压缩（当时 108→100），棘轮 115→105
-  ['docs/index.md', 147],        // 2026-09-26 升至 149（D29/D30 行）；2026-09-27 瘦身轮：合同落点段删并、D19+D21 / D23+D24 并行、肥行压一行指针（当时 149→139），棘轮 149→146；2026-10-04 升至 147（文档地图加 testing.md 宪法行，Note 同 diff）
+  ['docs/index.md', 148],        // 2026-09-26 升至 149（D29/D30 行）；2026-09-27 瘦身轮：合同落点段删并、D19+D21 / D23+D24 并行、肥行压一行指针（当时 149→139），棘轮 149→146；2026-10-04 升至 147（文档地图加 testing.md 宪法行，Note 同 diff）；2026-10-05 升至 148（D35 台账行，Note 同 diff）
   ['docs/guides/dev-loop.md', 395], // 2026-09-26/27 升至 467（§13、inspect 句）后同日瘦身轮：§7 整段迁 guides/bootstrap.md、§7 留指针防断链（当时 467→376），棘轮 467→395
   ['docs/testing.md', 75],       // 2026-10-04 立测试宪法（_digested/test-strategy 消化采纳轮；政策唯一家，只写 now——膨胀先迁，不加预算）；同日 61（§3.8 红/场景先行）；同日 75（§1.1 资产命名语法，用户点破 DSH「后缀即层」实践）
   ['company-workspace/AGENTS.md', 195], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面（186 行 ≈ 16.4KB × 每会话），同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates
@@ -495,6 +495,30 @@ const notGraduated = proposals.filter(name =>
 notGraduated.length === 0
   ? ok('proposal-graduated (proposed/ 里只剩未落地的)')
   : fail('proposal-graduated', `这些提案已消化却仍在 notes/proposed/（搬到 notes/implemented/ 并写明条目去向）：${notGraduated.join(', ')}`)
+
+// ── 9-bis. Note 活状态门禁（notes-liveness，2026-10-05 D35 立；notes/ 分类 owner = notes/README.md）──
+// implemented/ 新写 Note（文件名日期 ≥ 生效日）前 6 行须有「状态：」行且以生命周期词开头
+// （implemented/已交付/已消化——词表唯一家 = notes/README §一）；存量按生效日祖父豁免
+// （存量不回扫 = 状态行规矩的既有口径，2026-09-24）。
+// 负例留证（2026-10-05 实跑，红→还原→绿三步）：fixture A 无状态行 / fixture B 状态词错位
+// （proposed 开头）双红 → 删 fixture 还原 → green；收据 = implemented/2026-10-05-notes-taxonomy-owner.md。
+{
+  const NOTES_EFFECTIVE_DATE = '2026-10-05'
+  const implDir = join(root, 'notes/implemented')
+  const implNotes = existsSync(implDir)
+    ? readdirSync(implDir).filter(n => n.endsWith('.md'))
+    : []
+  const freshNotes = implNotes.filter(n => {
+    const m = /^(\d{4}-\d{2}-\d{2})-/.exec(n)
+    return m !== null && m[1] >= NOTES_EFFECTIVE_DATE
+  })
+  const LIFECYCLE_WORD = /^状态：\s*\**\s*(implemented|已交付|已消化)/m
+  const badNotes = freshNotes.filter(name =>
+    !LIFECYCLE_WORD.test(readFileSync(join(implDir, name), 'utf8').split('\n').slice(0, 6).join('\n')))
+  badNotes.length === 0
+    ? ok(`notes-liveness ×${freshNotes.length}（implemented/ 新写 Note 状态行；生效日前存量豁免）`)
+    : fail('notes-liveness', `这些 implemented/ Note 前 6 行缺合规「状态：」行（须以 implemented/已交付/已消化 开头——词表与规则 = notes/README）：${badNotes.join(', ')}`)
+}
 
 // ── _backlog 活状态 + 索引交叉核对门禁（backlog-liveness；原 plans-liveness，2026-10-03 D33 章制回借升格）──
 // 复发依据：① 状态行侧 = D30 起因（未完结思考稿缺户口挂着不动；负例留证 2026-09-27 research 稿 /

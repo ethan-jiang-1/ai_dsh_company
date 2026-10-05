@@ -16,7 +16,7 @@ RFC 条目的执行序列从「读 RFC → 呈批 → 实施 → 收尾」显式
 
 - 环的**序列合同**唯一家 = [notes/proposed/README.md](../proposed/README.md) 生命周期段（条目开工必读处——这是每个 RFC 实施者必然经过的位置，无需再向 AGENTS/dev-loop 复制指针）。
 - 红/绿**判据**（什么算证据、分层证明边界、prove-it-red、防假绿）已有唯一家 = [docs/testing.md](../../docs/testing.md) §3——未改动、不复述。
-- 执行链通用规则与 Note 收尾内容 = [dev-loop](../../docs/guides/dev-loop.md) §1/§12——未改动。
+- 执行链通用规则 = [dev-loop](../../docs/guides/dev-loop.md) §1（未改动）；Note 分类/生命周期/证据规则 = [notes/README](../README.md)（本 Note 落地同日由 D35 从 dev-loop §12 迁出为分类 owner——见 [notes-taxonomy-owner](./2026-10-05-notes-taxonomy-owner.md)；环的序列合同不受影响）。
 - **机器底线** = `proposal-scheduled` 门禁扩展：RFC 必须带「## 验收」节（「怎么测」的载体；无验收节的 RFC 不能住 proposed/）。
 
 ## 输掉的方案

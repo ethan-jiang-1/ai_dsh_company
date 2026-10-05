@@ -328,32 +328,13 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 
 ## 12. 记录与收尾
 
-按变更规模留下最少充分记录：
-
-- 机械单步修正：更新事实 owner，跑相关检查；不新建 intent、RFC 或收尾 Note。
-- 记录判据（不是 diff 大小）：需要 Note 的信号 = **存在真实替代方案 + 持久取舍**；豁免的实质 =
-  除决定理由无处安放外，其余事实都已有 owner（代码、测试、现有文档能承载的不重复记）。
-- 非平凡决定/feature：相关 RFC/Note 随同变更更新；记录实际决定、关键取舍、跑过的验证与未完成项。pack 行为面变更同 diff 更新 `packages/company-pack/README.md` 的已知限制段（2026-09-28 立）。
+收尾动作清单（**Note 分类、生命周期与证据规则唯一家 = [notes/README.md](../../notes/README.md)**——D35 从本节迁出为分类 owner 文件：义务范围/记录判据/取代检查/备选必载/毕业改写/真证据/内容策展）：
 - **宣布完成前对照条目/授权原文过一遍需求与体验验收**（2026-09-28 借 FAQ 15）——机器绿灯只证机制面，不证"做的是不是这件事"。
 - **被证伪的已落地切片整片 revert**（实现+测试+docs+Note 同退），修正另起新条目；不做半 revert 的外科修补——半退留"文档说 A、代码是 B"漂移态，结构门禁查 HEAD 不查语义一致，抓不住（2026-09-28 借 FAQ 11）。
 - 完成条目：验收通过后其 `_backlog` 表行/卡即离场（`git mv` 或删行，证据留 Note）；未完成项写清阻塞与下一步留在原处。不要把完成标记或过期环境状态堆回任务源。
-- Note 只记录对后续决策、实施或复验仍有用的信息；实现事实变化时更新对应 `implemented/` Note，决定逆转另写并互链。过期或重复且不再指导行动的内容删除；保留有效约束、否决理由和可复用验证证据。
 - 交接说明范围、改动 owner、实际跑过的检查及结果、未验证/未完成项与下一步。仅记录会影响恢复的环境线索。
 
-**Note 生命周期细则（2026-09-24 吸纳自 DSH Agent Note lifecycle，点选不推翻；取舍全录 =
-[notes/implemented/2026-09-24-notes-lifecycle-absorption.md](../../notes/implemented/2026-09-24-notes-lifecycle-absorption.md)）**：
 
-- **状态行**：`proposed/` / `implemented/` 新写或再编辑的 Note 首部有「状态：」行，开头即生命周期去向（proposed / implemented / 已消化…）；存量不回扫（`postmortem/` 另有约定；research 层见下条）。
-- **备选必载**：proposed RFC 记「输掉的方案」；决定类 Note 保留"它击败了什么"——没记录击败对象的决定会重新引发争论（备选只记录、不编造）。
-- **毕业 = 正文改写**：`proposed → implemented` 不只挪文件——提案改写成现在时的已交付事实，删迁移计划
-  与未来时态，仍有维护价值的验收/风险写进「后果 / 验证」。
-- **新增 Note 触发取代检查**：落盘前搜同决定、同机制的既有 owner——完整取代：吸收独有理由后旧 Note 同 diff 删除；部分取代：双方保留互链并更新仍有效的事实。
-- **否决理由的去留**：随 owner Note 的「输掉的方案」节；**防复犯价值高的**另迁 [`notes/rejected/`](../../notes/rejected/README.md)（D30 修订设立，取代 2026-09-25 的「不单开」裁断）；只在仍能阻止一个可信错误时保留，防复犯价值消失即删。
-- **implemented 只跟事实**：随实现更新的只有路径、名称、结构等事实；决定被推翻时另写新 Note 互链，
-  不把旧文改写成相反。
-- **未完结思考的家 = `_backlog/plans/` 推敲卡（D31 修订 D30；research 目录退役，起因链 = [implemented/research-notes-lifecycle](../../notes/implemented/2026-09-25-research-notes-lifecycle.md)）**：调研/设计推敲未到裁决时以卡的形式住 `_backlog/`，状态行自带毕业门判断（机械门禁 `backlog-liveness`，原 plans-liveness 于 D33 升格：+制度目录在场 +索引交叉核对）；
-  **三态出口保留 D30 精神**：完结迁 `_backlog/_done/_closed_plans/`（可读可引）或并入 owner Note、过时/被推翻迁 `notes/rejected/`（负知识防复犯）、无人引用的死稿直接删（git 即归档）；
-  规矩手册 = `_backlog/README.md`（毕业四门、与队列/proposed 的边界、明确不借表）；`notes/archived/` 仍为既有证据台账的家（存量不动）。
 
 **流程规则**：
 
