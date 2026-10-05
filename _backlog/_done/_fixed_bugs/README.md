@@ -6,4 +6,4 @@
 
 ## Next BUG ID
 
-**BUG-004** — 已分配：BUG-001（本目录）、BUG-002/003（活跃，dual-ceo、present-no-role-gate）。
+**BUG-005** — 已分配：BUG-001（本目录）、BUG-002/003/004（活跃，dual-ceo、present-no-role-gate、claim-yield-not-machine-readable）。
