@@ -4,13 +4,16 @@
 // 何时跑：讨论"多进程/多 home 同盘写作并发"时取证（研究卡 _backlog/plans/2026-09-29-collab-mechanism-evidence.md E2）；
 //   vendor 升 pin 后复跑一次（fs 语义变了要知道）。成本：零模型（不起会话），纯进程编排，秒级。
 //
-// 三段判据：
+// 四段判据：
 //   T1 进程内基线（对齐官方测试 filesystem.spec.ts:641-653）：同实例两路并发守卫写 ⇒ 一胜一 FS_STALE_VERSION。
-//       （复现不了 ⇒ 本探针环境有问题，后面两段不作数。）
+//       （复现不了 ⇒ 本探针环境有问题，后面几段不作数。）
 //   T2 跨进程无守卫：两进程各自挂 fs-local，对同一目标 writeText(intent=undefined) ⇒ 双双成功、
 //       终态 = 后写者载荷（静默互踩），且目录里**无锁/租约工件**。
 //   T3 跨进程守卫竞态窗（尽力而为，不计红绿）：两进程同版本 replaceIfVersion 同时放行 ×20 轮 ⇒
 //       出现"双双成功"即实证检测与发布之间存在窗口（源码论断 fs-local/index.ts:214-243 的活体版）。
+//   T4 跨进程占位抢注竞态（尽力而为，不计红绿；2026-10-05 试探轮加）：两进程对同一**新路径**
+//       createIfAbsent 同时放行 ×20 轮 ⇒ 出现"双双创建"即实证创建竞态窗（手册「占位=认领」的机器
+//       可查抢注在跨进程下不闭合——败者占位被静默顶替；E2 只测过覆盖写，创建竞态从未测过）。
 // 用法：node scripts/cross-process-fs-probe.mjs
 // 退出码：0 = T1 过且 T2 实证互踩；1 = 任一判据翻车；2 = 环境失败。
 import { spawn } from 'node:child_process'
@@ -35,6 +38,16 @@ if (mode === 'unguarded') {
   const payload = label + '-payload-' + Date.now();
   const out = await fs.writeText(t, payload, undefined);
   console.log(JSON.stringify({ phase: 'done', ok: true, payload, operation: out.operation }));
+} else if (mode === 'create') {
+  console.log(JSON.stringify({ phase: 'ready' }));
+  await new Promise(r => { const on = d => { if (String(d).includes('GO')) { process.stdin.off('data', on); r() } }; process.stdin.on('data', on) });
+  try {
+    const payload = label + '-create-' + Date.now();
+    const out = await fs.writeText(t, payload, { kind: 'createIfAbsent' });
+    console.log(JSON.stringify({ phase: 'done', ok: true, payload, operation: out.operation }));
+  } catch (error) {
+    console.log(JSON.stringify({ phase: 'done', ok: false, code: error?.code ?? String(error) }));
+  }
 } else {
   const info = await fs.stat(t);
   console.log(JSON.stringify({ phase: 'ready', version: info.version }));
@@ -122,6 +135,22 @@ for (let round = 0; round < 20; round++) {
   else other++
 }
 console.log(`T3 跨进程同版本守卫 ×20: 双双成功(互踩)=${String(bothOk)}｜一胜一 stale=${String(oneStale)}｜其他=${String(other)}${bothOk > 0 ? ' —— 检测与发布之间的窗口被活体命中（守卫跨进程不闭合）' : ' —— 20 轮未命中窗口（窗口存在但时序没排上，源码论断仍立）'}`)
+
+// ── T4 跨进程占位抢注竞态（createIfAbsent ×20，手册「占位=认领」的跨进程根基）──────────────
+let bothCreate = 0; let oneReject = 0; let createOther = 0
+for (let round = 0; round < 20; round++) {
+  const target4 = `placeholder-r${String(round)}.txt`
+  const [ca, cb] = await Promise.all([
+    runWorker(dir, 'claim-A', 'create', target4, { go: true }),
+    runWorker(dir, 'claim-B', 'create', target4, { go: true }),
+  ])
+  const da = ca.find(l => l.phase === 'done')
+  const db = cb.find(l => l.phase === 'done')
+  if (da?.ok === true && db?.ok === true) bothCreate++
+  else if ((da?.ok === true) !== (db?.ok === true)) oneReject++
+  else createOther++
+}
+console.log(`T4 跨进程占位抢注 ×20: 双双创建(双认领)=${String(bothCreate)}｜一胜一拒=${String(oneReject)}｜其他=${String(createOther)}${bothCreate > 0 ? ' —— 创建竞态窗被活体命中（占位=认领跨进程不闭合：败者占位被静默顶替）' : ' —— 20 轮未命中窗口'}`)
 
 await rm(dir, { recursive: true, force: true })
 const verdict = (t1ok.length === 1 && t1stale.length === 1) && t2clobber && artifacts.length === 0
