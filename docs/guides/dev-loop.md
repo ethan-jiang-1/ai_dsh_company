@@ -263,6 +263,8 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 | 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件与成本见其头注「何时跑」**；`script-triggers` 门禁强制） |
 | 行为质量档（认证） | 分钟级 | `probe --full`（内容档三探针）+ `candidate-scan-eval`（语料判据家 = testing.md §4） |
 
+**新 Agent 首跑验收**（推荐、非强制）：有 `DEEPSEEK_API_KEY` = entry-probe-smoke（真模型认证档）；无 key = verify + test + client-load-smoke——路径与定位唯一家 = [tests/README](../../tests/README.md)。
+
 **证明边界（每层只证明自己能观察的性质）的唯一家 = [docs/testing.md](../../docs/testing.md) §1**
 （2026-10-04 立测试宪法时自本节迁入——宪法还拥有：改动面→最小证据映射、证据纪律（条数以宪法 §3
 实列为准，别在此复述数字）、资产
