@@ -12,7 +12,7 @@
 
 | Bug | 标题 | 严重级 | 发现 |
 |---|---|---|---|
-| （空——首卡立时建行） | | | |
+| [BUG-002-dual-ceo-silent-supersession.md](BUG-002-dual-ceo-silent-supersession.md) | 多人模式双 CEO 门无检测——已收口 final 被另一门静默改版取代（B 盘面行为规范，缺门级防线） | P1 | 2026-10-06 |
 
 ## 卡片模板
 
