@@ -4,6 +4,9 @@
 // **本行不写类数与项数**：那是易腐常量，实测写"12 类 / 16 项"后加了 3 道门禁就立刻失真
 // （D28：枚举型事实的家 = 实现自己）。要全表就跑一次看 PASS 行。
 // 纪律：只报告实际跑过的检查（docs/design/architecture.md §6）。阶段 5 前不测行为，只测结构。
+// 切分触发线（2026-10-05 立）：>800 行或 >30 个门禁时，切成 verify/gates/*.mjs + 本文件做薄
+// runner（「跑一次看 PASS 行即得全表」的性质不因切分而变）。在那之前保持单文件——同构
+// 约 20 行/门禁，分区头（── 编号 ──）即目录。
 import { readFileSync, existsSync, lstatSync, readdirSync, readlinkSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
@@ -98,6 +101,36 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
 // 且违反上游 no-index 教义（vendor notes README："Do not add a centralized INDEX.md"）——两道规矩
 // （行预算 + 窗口冻结）都是在给派生索引续命。退役 = 整表冻结进 notes/archived/intents-2026-10.md
 // （终档）后删除文件；授权链线索住 Note 状态行。依据 = cleanup-round Note 决定 ④。
+
+// ── 2c-quater. snapshots 体积预算（2026-10-05 立，复跑轮用户拍板「无法承受没完没了的增长」）──
+// 为什么：memory-convergence-*（轮末收敛整盘拷贝）是**唯一无界增长源**——每轮一份、两周 7 目录，
+// 无预算时增长不可见。回归基线（r1/r2/r4/r5b/scenario-b/foundation）与探针证据按设计常驻本目录，
+// 不设单项预算；总预算 + 收敛子预算让增长每次 verify 都可见。超线处置次序：tar.zst 压缩归档 →
+// 外置冷存（三保：journal-audit 的 workspace.actual/kb 路径契约、CHARTER 历史纪要指针完整性、
+// git remote 备份连续性）。反证 = 预算常量临时调 1 → 本门禁红（2026-10-05 实证）。
+// 噪声剔除先例：r2-motion/replay/raw（6.4M）与 sessions/ 逐字节重复（md5 五对全双），已剔除——
+// 派生/重复形状不入库；恢复路径 = git 历史。
+{
+  const walkBytes = dir => readdirSync(dir, { withFileTypes: true })
+    .reduce((sum, d) => {
+      const p = join(dir, d.name)
+      return sum + (d.isDirectory() ? walkBytes(p) : lstatSync(p).size)
+    }, 0)
+  const SNAPSHOTS_TOTAL_BUDGET_MB = 64
+  const SNAPSHOTS_CONVERGENCE_BUDGET_MB = 16
+  const snapshotsDir = join(root, 'snapshots')
+  const totalBytes = walkBytes(snapshotsDir)
+  const convergenceBytes = readdirSync(snapshotsDir, { withFileTypes: true })
+    .filter(d => d.isDirectory() && d.name.startsWith('memory-convergence-'))
+    .reduce((sum, d) => sum + walkBytes(join(snapshotsDir, d.name)), 0)
+  const mb = b => (b / 1024 / 1024).toFixed(1) + 'M'
+  totalBytes <= SNAPSHOTS_TOTAL_BUDGET_MB * 1024 * 1024
+    ? ok(`snapshots-budget 总量 ${mb(totalBytes)}/${SNAPSHOTS_TOTAL_BUDGET_MB}M`)
+    : fail('snapshots-budget', `snapshots 总量 ${mb(totalBytes)} > ${SNAPSHOTS_TOTAL_BUDGET_MB}M——压缩归档（tar.zst）或外置冷存（保 journal-audit 路径契约 / CHARTER 指针 / 备份连续性）`)
+  convergenceBytes <= SNAPSHOTS_CONVERGENCE_BUDGET_MB * 1024 * 1024
+    ? ok(`snapshots-budget memory-convergence ${mb(convergenceBytes)}/${SNAPSHOTS_CONVERGENCE_BUDGET_MB}M`)
+    : fail('snapshots-budget', `memory-convergence-* 累计 ${mb(convergenceBytes)} > ${SNAPSHOTS_CONVERGENCE_BUDGET_MB}M——收敛切片是唯一无界源（压旧切片或外置）`)
+}
 
 // ── 2d. 裸路径门禁（notebook-hygiene §机械防线，2026-09-25；2026-09-26 扩面）─────────
 // 负例留证 2026-09-27：公司手册反引号死路径 → bare-path 红（⚠ 负例要真破坏子串——includes 是子串匹配）。
