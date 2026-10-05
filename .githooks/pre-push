@@ -11,5 +11,5 @@
 # bypass：git push --no-verify（紧急逃生门；用了要在收尾 Note 说明原因）。
 [ -t 0 ] || cat >/dev/null   # 消费 stdin 的 ref 清单（git push 管道喂入；手动直跑时不阻塞）
 cd "$(git rev-parse --show-toplevel)" || exit 1
-node scripts/verify.mjs || exit 1
+node scripts/gates.mjs || exit 1
 exec pnpm test
