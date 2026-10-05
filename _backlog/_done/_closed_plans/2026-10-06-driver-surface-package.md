@@ -1,13 +1,13 @@
 # 推敲：驾驭者表面包（driver-surface）实施待触发
 
-> 状态：待触发→已毕业（2026-10-06：用户定次序 A→B→C→D→E 并确认以 ongoing goal 推进，开工令兑现）｜毕业门判断 = 已兑现｜去向 = 任务源转回 [RFC driver-surface-package](../../../notes/proposed/2026-10-06-driver-surface-package.md)，实施随 goal 逐条进入
+> 状态：待触发→已毕业（2026-10-06：用户定次序 A→B→C→D→E 并确认以 ongoing goal 推进，开工令兑现；五条目当日全部毕业）｜毕业门判断 = 已兑现｜去向 = [毕业 Note driver-surface-package](../../../notes/implemented/2026-10-06-driver-surface-package.md)（验证记录与输掉的方案在其节内；RFC 原文已随毕业改写为已交付现在时）
 
 ## 背景 / 触发
 
 2026-10-06 驾驭轮：用户（本项目驾驭者）反馈可驾驭性痛点——dev/ 目录混合、运行链不可见、缺白话单页、
 测试资产「一问四家」、loop/run bundle 不显性、AGENTS.md 太密、docs 难读；端到端被当成唯一验证手段。
-已消化为 RFC：[driver-surface-package](../../../notes/proposed/2026-10-06-driver-surface-package.md)
-（批准：2026-10-06 用户令三工作面合并立项 + AGENTS 减密、docs 可读性两补充痛点；`pnpm verify` 全绿）。
+已消化为 RFC：[driver-surface-package](../../../notes/implemented/2026-10-06-driver-surface-package.md)
+（批准：2026-10-06 用户令三工作面合并立项 + AGENTS 减密、docs 可读性两补充痛点；`pnpm verify` 全绿；毕业时改写为已交付现在时）。
 
 ## 已知与未决
 
