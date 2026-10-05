@@ -13,6 +13,7 @@
 | Bug | 标题 | 严重级 | 发现 |
 |---|---|---|---|
 | [BUG-002-dual-ceo-silent-supersession.md](BUG-002-dual-ceo-silent-supersession.md) | 多人模式双 CEO 门无检测——已收口 final 被另一门静默改版取代（B 盘面行为规范，缺门级防线） | P1 | 2026-10-06 |
+| [BUG-003-present-no-role-gate.md](BUG-003-present-no-role-gate.md) | present 工具无角色门禁——CFO 根会话 present 自己的过程稿直呈用户，绕过成品专属性；deliverables-check 对非 CEO present 零检测 | P1 | 2026-10-06 |
 
 ## 卡片模板
 
