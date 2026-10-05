@@ -27,7 +27,7 @@
   同批按字节数是 71 行 / 最长 1932——两个数都被引用过，此处以**码元**为准，因门禁比较的就是 `.length`）
   ，手术当日转绿（术后最长 381 码元 / 569 字节，全行过关）。
 - **活状态搬家**：收割轮/升 pin 轮的「待续」两笔（chromium 装好后 browser 行为复跑、probe --full 低峰
-  收口）→ [残检收口卡](../../_backlog/plans/2026-10-02-deferred-verifications.md)（触发条件型等待卡，细节
+  收口）→ [残检收口卡](../../_backlog/_done/_closed_plans/2026-10-02-deferred-verifications.md)（触发条件型等待卡，细节
   留在各自 Note）；date-channel 机制启用 RFC 追认本就有家（该推敲卡状态行），intents 行改为指过去。
 - intents.md 表头补「一行指针」合同声明（含门禁名），防合同只在 dev-loop §12 里被忘掉。
 

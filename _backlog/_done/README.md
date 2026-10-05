@@ -32,6 +32,7 @@
 | [2026-10-04-doc-snr-cleanup-audit.md](_closed_plans/2026-10-04-doc-snr-cleanup-audit.md) | 该做（同日：四线审计 17 项发现 → 批次①机械修复 ×12 + 批次②三裁断（用户拍板：轻瘦身 / 并表 testing.md / 头注状态字段）全落地） | [implemented/2026-10-04-doc-snr-cleanup-round](../../notes/implemented/2026-10-04-doc-snr-cleanup-round.md)（残余观察项见其「未做」节） | 2026-10-04 |
 | [2026-10-04-cross-process-shared-disk.md](_closed_plans/2026-10-04-cross-process-shared-disk.md) | 该做（轻）——用户拍板 Agent Teams 协调面 + 单写进程部署约定，零新代码；小修不设 RFC（章程明文） | [implemented/2026-10-04-shared-disk-taskboard-coordination](../../notes/implemented/2026-10-04-shared-disk-taskboard-coordination.md)（手册「动议任务板」行 + 输掉的方案留尸 + 待验证项） | 2026-10-04 |
 | [2026-10-04-work-status-visibility.md](_closed_plans/2026-10-04-work-status-visibility.md) | 该做（轻）——形状 (a) 现状钉死（用户令如法炮制；既定「最正确不短视」原则），零新代码；小修不设 RFC | [implemented/2026-10-04-presence-board-progress-surface](../../notes/implemented/2026-10-04-presence-board-progress-surface.md)（multi-human.md §2 合同行 + (b)/(c) 留尸带复活触发 + presence-board.spec 16/16） | 2026-10-04 |
+| [2026-10-02-deferred-verifications.md](_closed_plans/2026-10-02-deferred-verifications.md) | 该做（触发+点名双兑现）——用户令维护者侧系统性复跑浏览器行为链；两笔验证债全判收 | [implemented/2026-10-05-browser-behavior-probe](../../notes/implemented/2026-10-05-browser-behavior-probe.md)（probe 首跑 5/5 + 沙箱两层墙定位 + seam 选型证据） | 2026-10-05 |
 
 ## 搁置推敲卡（暂停——不是做完）
 

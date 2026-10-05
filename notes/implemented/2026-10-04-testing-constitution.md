@@ -68,6 +68,6 @@ D15/门禁注释，新会话沿纪律表落点进 vendor 语境错配的 testing
 [batch3](./2026-10-04-multi-user-bdd-batch3.md)（member-interrupt-probe 4/4 + team-recovery-probe 4/4）——
 probe 本体全在 `scripts/`（六个，命名语法 §1.1）。
 **③ 推敲卡生→死**：两卡一材料从 `_backlog/plans|reference/` 毕业迁 `_backlog/_done/`（_closed_plans ×2 + _reference ×1，状态行补去向、索引三处同步）。
-**④ 未动（等用户）**：[_backlog/plans/2026-10-02-deferred-verifications](../../_backlog/plans/2026-10-02-deferred-verifications.md)
+**④ 未动（等用户）**：[_backlog/_done/_closed_plans/2026-10-02-deferred-verifications](../../_backlog/_done/_closed_plans/2026-10-02-deferred-verifications.md)
 第 1 笔（角色沙箱×playwright 缓存树，seam 三选一暂缓）＋ C8/H6/H8 三决策项（见 lane Note 挂起表）。
 **⑤ 证据快照**：`snapshots/attention-e2e/2026-10-04-dual|rescue/`。intents 四行指针对应。
