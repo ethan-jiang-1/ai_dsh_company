@@ -56,6 +56,9 @@ sandbox 联动。**选型维持用户 2026-10-03 拍板的「暂缓登记」，�
 - **复跑新抓一题**：probe 资产路径无 run 区分，复跑覆盖首跑 probe-stdout.md → 两 probe
   （taskboard/browser）改「稳定指针 + 时间戳历史」双写；首跑证据自留痕转录恢复。
 - 矩阵全文 = [rerun-matrix.md](../../snapshots/browser-behavior-probe/2026-10-04/rerun-matrix.md)。
+- **附加试探（试探轮，栅栏内零升级零模型成本）**：真实网站导航 ✅——`browser_navigate
+  https://example.com` 真回读 `Page Title: Example Domain`（真网络/TLS/渲染；RAW dump 在会话留痕）。
+  教训一笔：快检一次性脚本把本 probe 刚修的 resultText 读法 bug 又复制了一遍——**快检要抄修好的模板**。
 
 ## 第二层墙击穿（2026-10-05 复跑轮同日，用户令「修好这里」）
 
