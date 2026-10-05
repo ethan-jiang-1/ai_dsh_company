@@ -35,6 +35,7 @@ Markdown 链接（md-links 门禁硬查）。**生命周期是移动不是复制
   理由/备选/后果/验证后**同 diff 删除旧的**（历史归 git）；部分取代：双方保留互链并更新仍有效的事实。
   同一决定的事实变化更新原文；决定逆转另写新 Note 互链，不把旧文改写成相反。
 - **备选必载**：决定类 Note 必带「输掉的方案」——没记录击败了什么的决定会重新开讼；备选只记录、不编造。
+- **范式**：收尾 Note 的写法样板 = [journal-presence-mechanism](implemented/2026-09-26-journal-presence-mechanism.md)（决定、输掉的方案、验证三件齐；2026-10-06 条目 D 自 AGENTS 纪律表迁来，指针随家）。
 - **真证据（D35 吸收）**：毕业 Note 必须记录**真跑过的命令与红/绿形态**（含造红的红）；被阻断的检查
   如实写「阻断 + 原因」，不得写成绿；**未验项不得写 implemented**。改动面 → 最小证据选择 =
   [testing.md §2](../docs/testing.md)；实施序列（红绿环）= [proposed/README](proposed/README.md)；
