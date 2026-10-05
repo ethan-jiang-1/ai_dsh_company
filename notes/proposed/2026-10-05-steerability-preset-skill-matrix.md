@@ -27,7 +27,7 @@
    vendor；本仓四个责任面（preset 声明 / bundle 装配 / host+client 注册 / workspace 约束）列举；
    「公司手册 ≠ Coding Agent 指令」一句话 + 指针回根 AGENTS.md 入口路由。
 4. **联动**：矩阵「改哪个文件」列与
-   [pack 边界 RFC](2026-10-05-steerability-pack-boundaries.md) 的 owner 表同事实——改一处两处同步。
+   [pack 边界 RFC](../implemented/2026-10-05-steerability-pack-boundaries.md)（已实施）的 owner 表同事实——改一处两处同步。
 
 ## 输掉的方案（留尸）
 

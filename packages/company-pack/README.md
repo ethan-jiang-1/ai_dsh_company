@@ -1,12 +1,16 @@
 # dsh-company-pack
 
-唯一自写包（决策 D1：一个包；行多包少）。三个面按垂直轮长出：
+唯一自写包（决策 D1：一个包；行多包少）。**owner 表**（每件东西是什么、谁消费——RFC pack-boundaries 2026-10-05 立）：
 
-| 面 | 内容 | 出生 |
-|---|---|---|
-| 配置面（现在） | `presets/<role>/`（persona + skills，硬隔离）+ bundle 行（`cordis.patch.yml`：`agent-preset-registry` 替换出厂行；`dsh.bundle.patch` 为**数组** = registry 1 + 五角色预设行）+ `package.json` 的 peerDependencies（**版本以 `package.json` 为准，此处不复述**——复述必漂） | 轮次 R0–R2（轮次制已退役，见 D23） |
-| host 代码面 | `src/` + `src/lib/`（看板/在场/DAG/台账的读模型与 host 代码） | R3+ |
-| client 面 | `src/client/` + `dsh.client` 字段 + tsdown 构建（公司面板：在场 / 依赖图 / 用量 / 任务板 / 台账） | R5 |
+| 件 | 是什么 | 消费方向 | 出生 |
+|---|---|---|---|
+| `presets/<role>/` | persona + skills **声明**（改它 = 改角色；生效边界见 [docs/presets.md](../../docs/presets.md)） | loader 组合 → 角色会话 | R0–R2 |
+| `src/` | **自写实现**两半：host 半 = `index.ts`（工具注册入口）+ `src/lib/`（共享读模型纯逻辑）；client 半 = `src/client/`（浏览器面）——布局唯一家 = [src/README](./src/README.md) | vendor runtime + `tests/company`（源码直测） | R3+ |
+| `lib/` | **generated 发布产物（read-only）**：`tsc -b packages/company-pack` → tsdown 两面产出；**改 `src/` ≠ 浏览器已重建**——dsh web 常驻面必须重跑构建（事实家 = [bootstrap](../../docs/guides/bootstrap.md)） | `npm pack` → profile 安装（`exports`：`.` → `lib/index.js`、`./client` → `lib/client.js`） | R5 |
+| `cordis.patch.yml` | **bundle 装配行**：`agent-preset-registry` 替换出厂行；`dsh.bundle.patch` 为**数组** = registry 1 + 五角色预设行 | profile 组合层 | R0–R2 |
+| `package.json` | **发布/注入声明**：peerDependencies（**版本以此为准，此处不复述**——复述必漂）、`dsh.compatibility` 矩阵（`pack-compat` 门禁强制含当前 tag）、`files` 白名单、`dsh.client` 字段 | 包管理器 + loader | R0–R2 |
+
+⚠ `lib/` 是生成产物：`git diff` 里它先变 = 你改了构建或忘了它由 `src/` 生成——永远改 `src/`，构建产 `lib/`（物理拆分 host/domain 的重启条件 = [implemented/pack-boundaries](../../notes/implemented/2026-10-05-steerability-pack-boundaries.md) 重启条件节）。
 
 发布前清单已全部落地（2026-09-25 随升 pin ①）：cordis 在 peerDependencies、`dsh.compatibility`
 版本矩阵（历史版本 + 当前钉住，见 `package.json`；`pack-compat` 门禁强制含当前 tag）、

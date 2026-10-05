@@ -21,7 +21,7 @@
 
 - ③ tests/README 改动面表未单列「src/lib 新逻辑」行（需两行拼合）→ **本 diff 已修**（读模型行补「新增模块/影响导出面 → 加 tests/harness（pack-exports 守卫）」）。
 - ① 「怎么启动」完整步骤唯一家在 demo.md §前置（一步链接之遥）→ 归 [entry-runtime-map RFC](../proposed/2026-10-05-steerability-entry-runtime-map.md)（首屏职责）。
-- ② host 工具编码范式无专文档（活范本 = src/index.ts 头注）→ 归 [pack-boundaries RFC](../proposed/2026-10-05-steerability-pack-boundaries.md)（owner 表与消费方向）。
+- ② host 工具编码范式无专文档（活范本 = src/index.ts 头注）→ 归 [pack-boundaries RFC](./2026-10-05-steerability-pack-boundaries.md)（已实施：owner 表 + 依赖图归档）。
 - ⑤ persona 生效时点细节已在 presets.md 生效边界表 → 既有家，导航链路已覆盖。
 - ④ 纯文档走查未实跑命令 → 人类走查（用户收尾）补实跑面。
 
