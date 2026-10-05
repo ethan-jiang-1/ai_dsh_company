@@ -451,6 +451,9 @@ ok(`client-halves ×${clientHalves.length}`)
 // 日期）——没批准的思考属于 _backlog/plans/ 推敲卡，不配住 proposed/；
 //   ① proposal-scheduled：状态行（逻辑行，含缩进续行）带「批准」；
 //   ② proposal-graduated（不变）：已消化的不许赖在 proposed/——毕业 ≠ 全部实现，而是"每一条都有归宿"。
+//   ③ proposal-scheduled 扩展（2026-10-05 TDD 环立，用户令「一定 TDD 手段、全程证据、不随性发挥」）：
+//      RFC 必须带「## 验收」节——「怎么测」先行的载体；红绿环序列合同 = notes/proposed/README 生命周期段。
+//      负例留证：无验收节的 fixture RFC → red → 还原 → green（三步 = implemented/2026-10-05-rfc-tdd-loop.md）。
 // ⚠ 门禁只保证"被批准 + 该毕业的毕业"，不保证"会实现"——实施由用户指令逐条进入。
 const proposedDir = join(root, 'notes/proposed')
 // README.md 是文件夹说明书（curated entry point，非提案）——DSH 同款：notes 层的 README 不在提案命名空间
@@ -461,9 +464,15 @@ const unapproved = proposals.filter(name => {
   const head = readFileSync(join(proposedDir, name), 'utf8').split('\n').slice(0, 12).join('\n')
   return !(head.includes('批准：') || head.includes('批准:'))
 })
-unapproved.length === 0
-  ? ok(`proposal-scheduled ×${proposals.length}`)
-  : fail('proposal-scheduled', `这些 RFC 状态行缺「批准：」标记（未批准的思考住 _backlog/plans/ 推敲卡，别滞留 proposed/）：${unapproved.join(', ')}`)
+const noAcceptance = proposals.filter(name =>
+  !/^##\s*验收/m.test(readFileSync(join(proposedDir, name), 'utf8')))
+const scheduledProblems = [
+  ...unapproved.map(name => `${name} 缺「批准：」标记（未批准的思考住 _backlog/plans/ 推敲卡）`),
+  ...noAcceptance.map(name => `${name} 缺「## 验收」节（验收 = RFC 三件之一，「怎么测」先行的载体——见 notes/proposed/README 生命周期段）`),
+]
+scheduledProblems.length === 0
+  ? ok(`proposal-scheduled ×${proposals.length}（批准标记 + 验收节）`)
+  : fail('proposal-scheduled', `这些 RFC 不合规：${scheduledProblems.join('；')}`)
 
 /** 终态字：提案的状态行里出现这些，说明它已经被消化，该毕业了。 */
 const DIGESTED_MARKERS = ['已消化', '已交付', '部分交付']
