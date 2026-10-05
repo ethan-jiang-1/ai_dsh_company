@@ -1,5 +1,6 @@
 # release · 发布形状的现在时（company-pack）
 
+> 什么时候读：发布、打包、装进真实 profile、升 vendor pin 时。路线 = §vendor 政策 → release-smoke。
 > 顶层合同：vendor 政策、pack 的依赖姿态、兼容矩阵、真实安装冒烟程序、升 pin 程序。
 > 依据：guides/dev-loop §5（发布纪律时点表）+ FAQ 13（外部研究：dsh-market / dsh-im 生态姿态）。
 > 执行器：`scripts/smoke/release-smoke.mjs`（发布冒烟）与 `scripts/tools/sync-dsh.mjs`（升 pin）。

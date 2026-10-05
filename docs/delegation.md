@@ -1,5 +1,6 @@
 # delegation · 汇报线合同（R3：两条路与它们的机制边界）
 
+> 什么时候读：CEO 派活方式要改、或委派行为不符预期时。路线 = 通道表（A/B）→ 边界节。
 > 顶层合同：CEO 的"派活"现在时语义——哪条路走什么、边界在哪、被什么检查守住。
 > 机制依据 [design/architecture.md](./design/architecture.md) §3（通道 A/B）与
 > [design/roles-isolation.md](./design/roles-isolation.md) §2–§3；R3 的实证记录在

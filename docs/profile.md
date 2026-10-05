@@ -1,5 +1,6 @@
 # profile · host 组合的现在时（company）
 
+> 什么时候读：改 host 组合、换部署形状（源码直跑 vs 持久安装）时。路线 = 行清单表 → dump 对照。
 > 顶层合同：部署形状与 host 行清单语义。行清单源文件（bundle 层）：
 > [packages/company-pack/cordis.patch.yml](../packages/company-pack/cordis.patch.yml)；
 > 设计依据 [design/architecture.md](./design/architecture.md) §6（共享行在 host、preset 只放差异）。

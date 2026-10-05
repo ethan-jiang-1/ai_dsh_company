@@ -97,10 +97,10 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 
 | 面 | 事实家 / 导航 |
 |---|---|
-| 机制（组合/隔离/协作/UI 扩展点） | design/architecture + design/roles-isolation + design/ui-demo；源码与运行结论按对应合同核对 |
-| 内容（persona/skills/KB/模板） | design/role-content-plan + presets.md + `company-workspace/kb/` + `company-workspace/AGENTS.md` |
-| 运营（预算限流/runbook/回放） | guides/budget-and-ops |
-| 流程（Notes、门禁及开发环） | guides/dev-loop + `notes/` + `scripts/run-gates.mjs` |
+| 机制——公司怎么组装、角色怎么隔离、UI 往哪挂 | design/architecture + design/roles-isolation + design/ui-demo；源码与运行结论按对应合同核对 |
+| 内容——角色说什么话、带什么技能、KB 放哪 | design/role-content-plan + presets.md + `company-workspace/kb/` + `company-workspace/AGENTS.md` |
+| 运营——token 怎么省、现场出状况怎么办 | guides/budget-and-ops |
+| 流程——任务怎么进、证据怎么交、门禁怎么守 | guides/dev-loop + `notes/` + `scripts/run-gates.mjs` |
 
 ## 外部研究材料登记（repo 外，只读引用）
 

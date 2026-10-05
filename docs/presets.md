@@ -1,5 +1,6 @@
 # presets · 角色 preset 的语义合同（R2：五角色定稿）
 
+> 什么时候读：改 persona、skills 或角色语义时。路线 = 五角色表 → 验证方式节。
 > 顶层合同：五个角色 preset 的"现在时"语义（persona 定稿、skills 清单、验证方式）。
 > 内容来源 [design/role-content-plan.md](./design/role-content-plan.md)；命名约定见台账 D14
 > （显示名 `wochen <角色>`，preset id 保持 kebab）。R1 定稿 CEO / VP-Eng；R2 定稿 VP-Sales / COO，

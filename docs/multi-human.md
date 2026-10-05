@@ -1,5 +1,6 @@
 # 多人协作 · 同一工作目录，各自开自己的门（现在时）
 
+> 什么时候读：多个物理人要进同一家公司盘协作、或协作行为不符预期时。路线 = 形态表 → 开门 runbook。
 > 顶层合同：**多个物理人**在同一家公司共享盘上协作的**形态、开门配方、边界与迁移清单**。
 > 人侧归属与授权面的事实家 = [`company-workspace/kb/owners.md`](../company-workspace/kb/owners.md)；
 > 成员侧的协作规矩 = [`company-workspace/AGENTS.md`](../company-workspace/AGENTS.md)。
