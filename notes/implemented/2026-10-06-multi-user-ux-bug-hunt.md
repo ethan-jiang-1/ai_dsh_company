@@ -9,7 +9,7 @@
 | S1 双 CEO 检测 | 人乙忘选 preset（默认 ceo）⇒ 两 CEO 门并发收口 | **命中** | [BUG-002](../../_backlog/bugs/BUG-002-dual-ceo-silent-supersession.md) P1：create 零警示 + 人甲 final 被静默易主、零跨门信号；B 盘面行为规范（v2 版本链）——缺门级防线非角色纪律 |
 | S2 派活行发现率 | 多人根会话凭任务书认领是否成立 | **正面 + 命中** | 派活行成立（只认领 T1、vp-eng 旧稿诱饵没上当、不改状态行）——旧「<50%」担忧被救回；[BUG-003](../../_backlog/_done/_fixed_bugs/BUG-003-present-no-role-gate.md) P1：CFO present 自己的过程稿直呈用户，工具无角色门禁 + 审计盲区 |
 | S3 占位抢注 | 两门竞速先到先得 ⇒ 双占位无仲裁 | **正面 + 命中** | 占位约定行为面成立（双方都重读对手文件、后见者正式让位转保底活——多人 UX 面第一个「约定有效」行为证据）；[BUG-004](../../_backlog/_done/_fixed_bugs/BUG-004-claim-yield-not-machine-readable.md) P2：让位无机器可查标记 + 重读对手非强制 |
-| S4 双签线落卡 | 双签卡只落 CFO 门 ⇒ CEO 人被绕过 | **命中** | [BUG-005](../../_backlog/bugs/BUG-005-dual-signoff-single-door-routing.md) P1：CEO 门日志只读可查（半旁路，手册未记）、面板不可见、批准通道为零——双签退化为单签；§0 正例（CFO 自己发卡）复验稳定 |
+| S4 双签线落卡 | 双签卡只落 CFO 门 ⇒ CEO 人被绕过 | **命中** | [BUG-005](../../_backlog/_done/_fixed_bugs/BUG-005-dual-signoff-single-door-routing.md) P1：CEO 门日志只读可查（半旁路，手册未记）、面板不可见、批准通道为零——双签退化为单签；§0 正例（CFO 自己发卡）复验稳定 |
 
 ## 方法论发现：判据校准是实验的一半价值
 

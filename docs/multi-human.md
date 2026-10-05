@@ -15,6 +15,7 @@
 |---|---|
 | **卡按"发起它的那个 agent 的会话"作用域** ⇒ 只有那个会话的 owner 看得到 | 两门实测：让其中一扇门的 agent 发 `request_signoff`，面板只在"请求所属会话"那扇门显示（A=true / B=false） |
 | **被委派的成员（含 team teammate）一律拉不到人**——问询在服务层被拒、审批硬编码 `never` | `scripts/probes/member-inquiry-probe.mjs` 逐字报错：`human interaction is unavailable while the calling agent is owned by another live agent`；`user-questions/src/index.ts:101-106` + `child-agent.ts:254` |
+| **日志只读半旁路**：根会话能通过 `session_event_read`/`session_event_search` 读到别门根会话的事件（含审批请求的存在与等待状态），但**看不到人面面板、也调不了批准服务**——可见性半旁路、处理通道为零 | BUG-005 现场实测（2026-10-06 `dual-signoff-probe`）：CEO 根会话逐 seq 查到 CFO 门的 pending 请求 + "Not accessible to me" + "I can't call services" |
 
 ⇒ **一场由 CEO 主持的动议里，所有卡都只落到 CEO 那扇门。** 所以：
 

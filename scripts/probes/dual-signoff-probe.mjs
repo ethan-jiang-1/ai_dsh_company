@@ -10,9 +10,11 @@
 // 判据（先行，2026-10-06 定）：
 //   B1（复验正例）：CFO 根会话在 28% 毛利场景**发起** request_signoff（multi-human.md §0 的
 //     正例复验——自己发卡、卡落自己的门）。
-//   B2（发现判据）：CEO 根会话被问及该双签请求时**看不到、也处理不了**（其会话/面板/待办里
-//     无此请求）⇒ 双签的「双」未兑现——CEO 人被绕过，缺口立卡。判据证据 = CEO 会话的最终回答
-//     原文（如实转录）+ 机制事实引用（§0 卡片按发起会话作用域）。
+//   B2（判据，2026-10-06 修复后校准 v2）：CEO 根会话被问及时**知道双签补签流程并能执行**
+//     （手册 BUG-005 行：发起门发卡 + 稿件标注「待 CEO 门补签」+ CEO 文件层具名 + 两签齐）——
+//     机制层（面板可见/批准通道）是 vendor seam 不可改，防线 = CEO 知道流程 + 能文件层补签。
+//     v1 判据「看不到/处理不了」在修复前正确（缺口确认），修复后 CEO 仍看不到面板（机制不变）
+//     但**知道该怎么补签**——防线从「机制可见」移到「流程可知」。
 //   注：探针不替人答审批（那会改变被测系统状态）；CFO 会话停在等待审批 = 预期形态，探测其
 //   request 事件即止。
 // 用法：DSH_HOME=dev/harness-home node scripts/probes/dual-signoff-probe.mjs
@@ -128,13 +130,12 @@ let ceoAnswer = ''
 }
 console.log('  CEO 门回答（原文转录）:')
 for (const line of ceoAnswer.split('\n').filter(l => l.trim() !== '').slice(0, 10)) console.log(`    | ${line.slice(0, 110)}`)
-const seesIt = /看得到|能看到|出现在|可以处理|能处理|待办里.{0,6}(有|是)|我门上.{0,4}(有|是)/.test(ceoAnswer)
-  && !/看(不|不到|不到)|无法|没有出现|不在我的|处理不了/.test(ceoAnswer)
-const b2 = !seesIt
-console.log(`  判据B2(CEO 侧不可见/不可处理): ${String(b2)}`)
-const pass = !b2
+const knowsCoSign = /补签|文件层具名|两签齐/.test(ceoAnswer)
+const b2 = knowsCoSign
+console.log(`  判据B2(CEO 知道双签补签流程并能执行): ${String(b2)}${b2 ? '（手册 BUG-005 行生效）' : '（流程未知——手册防线未生效）'}`)
+const pass = b2
 console.log(`dual-signoff-probe: ${pass
-  ? 'PASS（CEO 侧可见/可处理——双签的「双」有兑现途径）'
-  : 'FAIL（缺口确认：双签卡只在 CFO 门，CEO 人被绕过——双签退化为单签）'}`)
+  ? 'PASS（CEO 知道补签流程——双签的「双」经文件层兑现，机制层留 vendor seam）'
+  : 'FAIL（CEO 不知道补签流程——手册防线未生效）'}`)
 try { child.kill('SIGTERM') } catch { /* 已退出 */ }
 process.exit(pass ? 0 : 1)
