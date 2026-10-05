@@ -463,3 +463,41 @@ describe('让位行的机器可查面（BUG-004，2026-10-06 修复轮立——�
     expect(isPlaceholderYield('占位=认领，非出稿\n')).toBe(false)
   })
 })
+
+describe('工作区门投影——双 CEO 检测面（BUG-002 修复轮，2026-10-06）', () => {
+  it('两 CEO 根会话同 cwd ⇒ duplicateWarning 行 + hasDuplicate = true', async () => {
+    const { doorsFromSessions } = await import('../../packages/company-pack/src/lib/doors.ts')
+    const model = doorsFromSessions([
+      { sessionId: 'session-a', cwd: '/ws', agentPreset: 'ceo', running: false },
+      { sessionId: 'session-b', cwd: '/ws', agentPreset: 'ceo', running: true },
+    ])
+    expect(model.hasDuplicate).toBe(true)
+    expect(model.rows).toEqual([
+      { preset: 'ceo', sessionCount: 2, sessionIds: ['session-a', 'session-b'], running: true, duplicateWarning: true },
+    ])
+  })
+
+  it('每角色一门 ⇒ 无警告（multi-human 正常态）', async () => {
+    const { doorsFromSessions } = await import('../../packages/company-pack/src/lib/doors.ts')
+    const model = doorsFromSessions([
+      { sessionId: 's1', cwd: '/ws', agentPreset: 'ceo', running: true },
+      { sessionId: 's2', cwd: '/ws', agentPreset: 'cfo', running: false },
+      { sessionId: 's3', cwd: '/ws', agentPreset: 'coo', running: false },
+    ])
+    expect(model.hasDuplicate).toBe(false)
+    expect(model.rows.map(r => `${r.preset}:${r.sessionCount}:${r.duplicateWarning}`)).toEqual([
+      'ceo:1:false', 'cfo:1:false', 'coo:1:false',
+    ])
+  })
+
+  it('未选 preset（undefined）归入「(未选 preset)」行 ⇒ 双未选也是双门警告', async () => {
+    const { doorsFromSessions } = await import('../../packages/company-pack/src/lib/doors.ts')
+    const model = doorsFromSessions([
+      { sessionId: 's1', cwd: '/ws', running: false },
+      { sessionId: 's2', cwd: '/ws', running: false },
+    ])
+    expect(model.rows).toEqual([
+      { preset: '(未选 preset)', sessionCount: 2, sessionIds: ['s1', 's2'], running: false, duplicateWarning: true },
+    ])
+  })
+})
