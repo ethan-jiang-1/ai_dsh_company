@@ -280,7 +280,7 @@ ai_dsh_company/
 │   ├── company.overlay.yml       # headless + --patch 实验/动议用的 insert overlay（无 web-app 行的组合）
 │   └── harness-home/             # 开发 DSH_HOME（双 home 隔离；gitignore 运行残留）
 ├── scripts/
-│   ├── verify.mjs                # 结构/链接/自包含门禁
+│   ├── gates.mjs                # 结构/链接/自包含门禁
 │   ├── release-smoke.mjs         # npm pack → 干净 profile → dsh plugin add → 冒烟会话
 │   └── sync-dsh.mjs              # vendor 换 tag + SHA 簿记 + typecheck + 矩阵加列
 ├── docs/                         # 当前合同（只写 now）：preset 语义、KB 布局、协作通道选择

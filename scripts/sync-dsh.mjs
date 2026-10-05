@@ -30,7 +30,7 @@ try {
   processes = releaseProcesses({ cwd: ROOT, env })
   const run = (cmd, argv, options) => processes.run(cmd, argv, options)
   const gitVendor = async argv => (await run('git', ['-C', VENDOR, ...argv])).trim()
-  const verifyPath = join(ROOT, 'scripts/verify.mjs')
+  const verifyPath = join(ROOT, 'scripts/gates.mjs')
   const agentsPath = join(ROOT, 'AGENTS.md')
   const manifestPath = join(ROOT, 'packages/company-pack/package.json')
   const lockPath = join(ROOT, 'pnpm-lock.yaml')

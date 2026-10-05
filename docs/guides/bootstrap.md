@@ -89,7 +89,7 @@ node scripts/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团
   `dsh-skill-filesystem`）会**按安装域解析**——不在 pack dependencies（profile 安装）或根
   devDeps workspace 链接（源码域）里，行就解析不到 → **preset 被标记 broken → UI 给不出可用角色**
   （扫描得到、名字也对，就是不能用；`discoverPresets` 的 `broken` 字段是唯一线索）。
-  对应 DSH 的 `verify-cordis-config` 门禁；我们同构到 `scripts/verify.mjs` 检查 7。
+  对应 DSH 的 `verify-cordis-config` 门禁；我们同构到 `scripts/gates.mjs` 检查 7。
 - **patchReload**：headless 用途的自定义 profile 必须 `"startup"`（见 [开发环 §2](./dev-loop.md) 第 3.5 层）；web 形态
   才用 `"live"`。
 - **品牌（皮肤第一笔，零代码）**：`DSH_CLIENT_TITLE` 是构建期环境变量，同时决定**浏览器标签页标题**

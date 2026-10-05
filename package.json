@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dsh": "node --import tsx/esm vendor/dsh/apps/cli/src/bin.ts",
-    "verify": "node scripts/verify.mjs",
+    "verify": "node scripts/gates.mjs",
     "test": "vitest run"
   },
   "devDependencies": {
