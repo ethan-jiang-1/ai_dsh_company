@@ -47,7 +47,7 @@ function isPresetRole(name: string): name is PresetRoleId {
 /**
  * D-a：显示名映射。member.name 命中 preset id → 系列化显示名；`role === 'lead'` → CEO
  * （本组织 lead 恒为 CEO）；未命中原样显示（任意组队名不崩）。与各 `presets/<role>/preset.yml`
- * 的 `name` 同源——`tests/presence-board.spec.ts` 有防漂移断言。
+ * 的 `name` 同源——`tests/company/presence-board.spec.ts` 有防漂移断言。
  */
 export const PRESET_DISPLAY_NAMES: Record<PresetRoleId, string> = {
   ceo: 'wochen CEO',

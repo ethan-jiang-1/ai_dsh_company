@@ -31,7 +31,7 @@
 
 ## 证据（全部实跑，2026-09-29）
 
-**① 反证：那一行是唯一变量**（用 [delegation-smoke.mjs](../../scripts/delegation-smoke.mjs)——它会打印
+**① 反证：那一行是唯一变量**（用 [delegation-smoke.mjs](../../scripts/smoke/delegation-smoke.mjs)——它会打印
 CEO 会话的模型可见工具目录，读的是 `request/header`，不是模型自述）：
 
 | 状态 | 目录 | web 工具 |

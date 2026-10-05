@@ -1,4 +1,4 @@
-// 署名核对的纯逻辑（2026-09-26 立；IO 在 scripts/authorship-audit.mjs）。
+// 署名核对的纯逻辑（2026-09-26 立；IO 在 scripts/audit/authorship-audit.mjs）。
 // 为什么抽出来：判据本身值得单测（三档 + 文件名归属不判红），而完整审计要读会话日志（有 DSH_HOME
 // 依赖、秒级），不进 `pnpm test` ⇒ 纯逻辑放这里，keyless 可测。
 

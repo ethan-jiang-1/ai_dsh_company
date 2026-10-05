@@ -2,7 +2,7 @@
 
 状态：已交付（2026-10-04 用户令「去推进…最好是测试驱动…测试完资产到最后汇报」；**判据先行**——
 头注 P1a/P1b/P2a/P2b/P3 写死后真跑；probe =
-[taskboard-presence-probe.mjs](../../scripts/taskboard-presence-probe.mjs)）
+[taskboard-presence-probe.mjs](../../scripts/probes/taskboard-presence-probe.mjs)）
 
 ## 交付
 
@@ -21,7 +21,7 @@
   - P2a 在场板原料（名册 w1/w2；in_progress 快照 subject↔owner 经名册 id→name 映射对上 2/2）；
   - P2b 成员回报链 7 条；
   - P3 `write scopes overlap` 警告在场（C5a 同场复核）。
-- 资产 = [snapshots/taskboard-presence-probe/2026-10-04/](../../snapshots/taskboard-presence-probe/2026-10-04/probe-stdout.md)
+- 资产 = [snapshots/taskboard-presence-probe/2026-10-04/](../../snapshots/probes/taskboard-presence-probe/2026-10-04/probe-stdout.md)
   （probe-stdout.md + probe-run.log 控制台全文）；session = `session-56aa981a`（dev home 排练会话，
   运行残留不迁移）。
 - `pnpm verify` 绿（script-triggers/script-status 门禁含新脚本头注自述）。
@@ -39,7 +39,7 @@
   （与 batch2 C5a 完全一致；首跑为噪声匹配先命中，复跑样本更干净）。
 - **复跑新抓一题**：probe 资产路径无 run 区分，复跑覆盖首跑 probe-stdout.md → probe 改「稳定指针 +
   时间戳历史」双写（browser-behavior-probe 同款修复）；首跑证据自留痕转录恢复。
-- 资产 = [snapshots/taskboard-presence-probe/2026-10-04/](../../snapshots/taskboard-presence-probe/2026-10-04/probe-stdout.md)
+- 资产 = [snapshots/taskboard-presence-probe/2026-10-04/](../../snapshots/probes/taskboard-presence-probe/2026-10-04/probe-stdout.md)
   （probe-stdout-run1.md / probe-stdout-run2.md / probe-stdout.md 最新）。
 
 ## 依据

@@ -1,7 +1,7 @@
 /**
  * 审批闸门纯函数（驾驶舱②切片二）：签字线触线 → 审批请求的映射。
  *
- * 工具面（`src/index.ts` 的 `request_signoff`）消费；keyless 单测 = `tests/signoff.spec.ts`。
+ * 工具面（`src/index.ts` 的 `request_signoff`）消费；keyless 单测 = `tests/company/signoff.spec.ts`。
  * 机制语义（vendor `user-approval`）：一次性审批、轮内有效、无应答者 fail-closed；
  * 事件对 `approval/asked` + `approval/decided` 进会话日志（审计），浏览器侧官方 `ui-approval`
  * 面板应答，注意力中心观察者跨会话显示。

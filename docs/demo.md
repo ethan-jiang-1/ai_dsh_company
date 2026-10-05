@@ -15,7 +15,7 @@
 ## 前置（本机）
 
 **呈现即验证**（2026-09-30 立，用户裁定；规则唯一见 [dev-loop §1](./guides/dev-loop.md)）：替人起观察窗 = 先自己跑通本节（boot 横幅 + roster + client 零挂载失败），红了当场修，全绿才交 URL——用户不当第一次验收员。
-**机器腿 = [cdp-probe](./cdp-probe.md)**：`node scripts/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/8 页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
+**机器腿 = [cdp-probe](./cdp-probe.md)**：`node scripts/probes/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/8 页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
 
 1. `source dev/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒，自检代替警告）**：
    `pnpm dsh --profile web --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 就说明你起的是日用 `~/.dsh`
@@ -31,7 +31,7 @@
    用户与代理都卡过）。平台 UI（vendor 只读）改不了，写进 runbook 代偿。
 4. 新建会话：preset 选 **wochen CEO**（`ceo` 是 profile 默认）；工作目录 `company-workspace`
 5. 进“另一位成员的空间”：**teammate 的会话不在顶层列表**——在会话头部点 **Team 名册**，点成员名打开其会话（`sessions.openSubagent`，子会话）。显式入口 = 右栏「在场」页签的在场板**行可点**（条目 ② 起为平台页签，可拖出成浮窗并看）。
-6. 收场验收：`node scripts/deliverables-check.mjs`（交付物三态；审归档快照要配 `--only <slug>`，
+6. 收场验收：`node scripts/audit/deliverables-check.mjs`（交付物三态；审归档快照要配 `--only <slug>`，
    因为快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只有本轮日志）
 
 ## 分镜 v0（两空间镜头：谁在哪个空间、活怎么交接）
@@ -57,11 +57,11 @@
 - 一场完整会话日志（`$DSH_HOME/sessions/`）——CEO + 四 VP 会话都在
 - `deliverables/` 有本动议的定稿（CEO `present` 声明过）
 - 任务板出现过 **DAG 依赖**与 **≥1 次跨 VP 互审**（消息 + 回执 + 修订号变化）
-- 归档为 `snapshots/r2-motion/`（沿用 R1 形状：会话 JSONL + workspace 期望态）
+- 归档为 `snapshots/replay/r2-motion/`（沿用 R1 形状：会话 JSONL + workspace 期望态）
 
 **R4 加判据（交付物三态，整场通用，机器判）**：
 
-- 收场跑 `node scripts/deliverables-check.mjs` 必须 **0 违规**——即 `deliverables/` 下每个
+- 收场跑 `node scripts/audit/deliverables-check.mjs` 必须 **0 违规**——即 `deliverables/` 下每个
   `<slug>/final.md` 都能回溯到**一次 CEO 的 `present`**；`drafts/` 里的稿子不算成品；
   `kb/**` 不在判据射程内。判据语义与三个设计决定见 `notes/implemented/2026-09-22-r4-workshop-flow.md`。
 - 审**归档快照**要加 `--only <slug>`：快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只装
@@ -76,7 +76,7 @@
   要让团队内成员拿到完整 preset 面，走 R3 命名委托或上游 seam（D9）。
 - 五人同时在线时模型调用量上升；预算口径见 `kb/org.md`（AI 试点每案 $200/月硬顶）。
 - **交付物三态是硬约定，不是习惯**：`company-workspace/AGENTS.md` 的「交付物三态」一节随每个成员
-  会话首帧注入，`node scripts/deliverables-check.mjs` 机器核对。写错位置（比如职能自己写 `final.md`、
+  会话首帧注入，`node scripts/audit/deliverables-check.mjs` 机器核对。写错位置（比如职能自己写 `final.md`、
   或把排练产物平铺在 `deliverables/` 根下）会被判据报出来。
 
 ## 场景 B · 三角色应急协作（CEO / COO / VP-Eng）——专看"活怎么交接"
@@ -115,12 +115,12 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 | 6 | 回 CEO | 合稿 → `final.md` → `present` | 交付卡片出现；`final.md` 有“保留分歧”节，不抹平 |
 | 7 | 收尾 | 三个 journal 各一篇 | `kb/{ceo,coo,vp-sales}/journal/support-sla-page.md` |
 
-**实测基线**：`snapshots/r4-motion/`（lead 234 行 + vp-sales + coo + 期望态）。这一场真跑 **150 秒**
+**实测基线**：`snapshots/replay/r4-motion/`（lead 234 行 + vp-sales + coo + 期望态）。这一场真跑 **150 秒**
 （预算 6 分钟）。**值得指出的一处**：互审稿路径 `drafts/review-coo.md` 是**模型自己**按三态约定放的
 （prompt 只给了另两份）——三态合同随公司手册注入首帧，所以它会生效，不靠人盯。
 
 **三态口诀（三场通用）**：四个职能**一律写 `drafts/`**；`final.md` 与 `present` 只归 CEO；
-排练/探针产物不进 `deliverables/`（进 `snapshots/<轮次>-*/` 或删）。
+排练/探针产物不进 `deliverables/`（进 `snapshots/probes/<场景>/<轮次>/` 或删）。
 
 ## 场景 D · 季度经营会（2026-09-25 新动议类型①）——专看“经营复盘的节奏”
 
@@ -138,7 +138,7 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 | 6 | 回 CEO | 合稿：Q4 优先级三条全补件 + 裁定三条 + 版本冻结 → `present` | final.md 出现「判不了」总判 + P1–P3 |
 | 7 | 收尾 | 三 journal 留痕 → **当轮收敛**（压进 CHARTER 历史纪要、journal 清空） | 驾驶舱④培养面板待审归 0 |
 
-**实测基线**：`snapshots/q3-business-review/`（lead 428 行 + cfo + coo）。真跑 **241 秒**（预算 12 分钟），
+**实测基线**：`snapshots/archive/q3-business-review/`（lead 428 行 + cfo + coo）。真跑 **241 秒**（预算 12 分钟），
 3 人组、工具调用在限。**收敛后首场**：角色开工读的是 CHARTER「历史纪要」（46 篇 journal 已于
 2026-09-25 收敛进归档），季度台账逐案引用的就是它——记忆收敛的回环第一次闭合。CFO 稿里的
 「integration-50w 无 final ⇒ 未核实」正是历史纪要 + 引用两分法（候选 C）联合生效的实证。
@@ -157,7 +157,7 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 | 4 | 回 CEO | 合稿：止血 + 根因（区分已证实/待验证）+ 防再发三条带 owner → `present` | final.md 含时间线/根因/防再发 |
 | 5 | 收尾 | **当轮收敛**（journal → CHARTER 历史纪要即清空） | 培养面板待审归 0 |
 
-**实测基线**：`snapshots/emergency-x-incident-review/`（lead 210 行 + vp-eng + coo）。真跑 **100 秒**
+**实测基线**：`snapshots/archive/emergency-x-incident-review/`（lead 210 行 + vp-eng + coo）。真跑 **100 秒**
 （预算 8 分钟）。**两处值得指出**：① CEO 客户面止血口径直接用的是**上一场季度经营会刚立的新口径**
 （次工作日首响 + 10% 服务信用只抵扣不下现金）——跨动议组织记忆生效实证；② CFO 的 Q3 新口径
 （补偿三口径）在本案客户面被正确引用且未越权（金额与记账口径留 CFO）。**缺口登记**：VP-Eng/COO
@@ -207,7 +207,7 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 ⚠ **"根会话 vs 被委派成员"是这一步的分水岭**：被委派的成员发审批**必被自动拒**
 （`child-agent.ts:254` 硬编码 `never`），所以手册那条"成员触线一律升级 CEO"对它们成立；
 而**每扇门都是根会话**（它自己就是那个角色的 owner）⇒ **该由它自己发起**，卡才会落到它门上。
-（实测：`scripts/budget-signoff-probe.mjs` 正例——CFO 根会话确实会发 `request_signoff`。）
+（实测：`scripts/probes/budget-signoff-probe.mjs` 正例——CFO 根会话确实会发 `request_signoff`。）
 
 ⚠ **别在门乙/门丙那边说"你以 CEO 的身份…"**——每扇门只用**它自己角色**的权限；越权的话，
 `owners.md` 的授权面就成了摆设（demo 的卖点正是"谁签得动"按人分）。
@@ -215,5 +215,5 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 **实测基线**：两扇门排练 PASS（2026-09-26，排练场）；**真盘三扇门已跑**（2026-10-04，
 firstdeal-v-2026：双签两半各落各门均人应答 allowed-once、16 分钟含一次服务中断重试——判据与
 证据 = [E2E Note](../notes/implemented/2026-10-04-e2e-multihuman-firstdeal.md)，快照 =
-`snapshots/memory-convergence-2026-10-04-3/`）。
+`snapshots/archive/memory-convergence-2026-10-04-3/`）。
 **预算**：3 人、每人单轮出稿、工具 ≤10/人、总墙钟 ≤10 分钟；不新增调研。

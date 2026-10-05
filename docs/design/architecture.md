@@ -169,7 +169,7 @@ CEO preset 里给每个直接汇报对象配一个 `dsh-tool-subagent` 实例（
   teammate 之后，还能不能用团队版 `send_message`/`list_agents` 驱动命名委托生出来的非 team
   child"。**结论 = 不能**——child 不在名册上，续驶/中断/列举全不可达，故命名委托定为
   **one-shot 前台**（D18）。结论与证据在 [delegation.md §2](../delegation.md)（"为什么不是
-  continuable——别改回去"），回归守卫 = `scripts/delegation-smoke.mjs`。
+  continuable——别改回去"），回归守卫 = `scripts/smoke/delegation-smoke.mjs`。
 
 ### 通道 B · Agent Teams（experimental，最贴近"公司开会"）
 
@@ -281,8 +281,8 @@ ai_dsh_company/
 │   └── harness-home/             # 开发 DSH_HOME（双 home 隔离；gitignore 运行残留）
 ├── scripts/
 │   ├── run-gates.mjs                # 结构/链接/自包含门禁
-│   ├── release-smoke.mjs         # npm pack → 干净 profile → dsh plugin add → 冒烟会话
-│   └── sync-dsh.mjs              # vendor 换 tag + SHA 簿记 + typecheck + 矩阵加列
+│   ├── smoke/release-smoke.mjs   # npm pack → 干净 profile → dsh plugin add → 冒烟会话
+│   └── tools/sync-dsh.mjs        # vendor 换 tag + SHA 簿记 + typecheck + 矩阵加列
 ├── docs/                         # 当前合同（只写 now）：preset 语义、KB 布局、协作通道选择
 ├── notes/                        # intents.md + proposed/ + implemented/
 └── snapshots/                    # 自建最小 replay（JSONL 日志 diff 起步，够用再升）
@@ -363,11 +363,11 @@ ai_dsh_company/
 | 组合行（registry / 预设 / 工具行） | `cordis.patch.yml` + `dsh.bundle.patch` 数组 | `pnpm verify`（preset 结构 / 行依赖）+ `preset-smoke` |
 | host 行为（审批线 / org 工具） | `packages/company-pack/src/` | `pnpm test` + 边界改动加 `delegation-smoke` |
 | client 面（品牌 / 委派卡 / 在场板） | `src/client/`（两半编译，见 guides/bootstrap） | `tsc -b` + `client-load-smoke`；行为变更用 replay `--ui` |
-| 会话回放资产 | `snapshots/<场景>/`（世代不删；行为变更随 diff 重录） | `replay-smoke` |
+| 会话回放资产 | `snapshots/replay/<场景>/`（世代不删；行为变更随 diff 重录） | `replay-smoke` |
 | 文档 / 合同 / 流程 | 对应 owner（docs/ 或 notes/，路由见 [index](../index.md)） | `pnpm verify`（链接 / 预算 / 结构） |
 | vendor 行为 | **不改**——三条正路：bundle patch / 提上游升 pin / 先证伪再自建（AGENTS §vendor 铁律） | `pnpm verify`（vendor-pin/clean）+ 升 pin 走 release.md |
 | 依赖 / 安装形状 | pack manifest + peers（版本谱系唯一见 AGENTS §vendor 簿记） | `release-smoke` |
 
-落点全在既有面上（不新增目录）。升级条件（何时拆包 / 何时上 registry）见 §9。keyless 测试集中
-在根 `tests/`（每 spec 对应一面）是**有意选择**：单包阶段集中放置比散进包内更可检（分层门禁与
-layering 守卫都按根布局写）。
+业务实现仍在既有包面上；何时拆包或上 registry 见 §9。keyless 测试集中在根 `tests/`，按
+company/client/presets/harness 领域分区（每 spec 对应一面），不散入包内。职责目录降低长期查找成本，
+Vitest 与 layering 守卫递归发现 spec；真实脚本的驱动另住 `scripts/drivers/`，不进入回归。

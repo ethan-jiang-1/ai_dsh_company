@@ -52,8 +52,8 @@ subagent child 不在名册上 ⇒ **continuable child 在 CEO 会话里既发�
   它们是被团队版盖掉的**死行**。`pnpm test` 有**反向守卫**，别"修"回来。
 - 续驶/连续对话归 team（§3）。
 
-证据：`snapshots/r2-motion/sessions/lead.jsonl` 的第一帧 `request/header`（R2 归档即已如此）；
-`scripts/delegation-smoke.mjs` 在全新会话复现并把它变成回归守卫。
+证据：`snapshots/replay/r2-motion/sessions/lead.jsonl` 的第一帧 `request/header`（R2 归档即已如此）；
+`scripts/smoke/delegation-smoke.mjs` 在全新会话复现并把它变成回归守卫。
 
 ## 3. 团队（通道 B，主通道 D4）
 
@@ -102,11 +102,11 @@ subagent child 不在名册上 ⇒ **continuable child 在 CEO 会话里既发�
 
 | 层 | 手段 | 守什么 | 何时跑 |
 |---|---|---|---|
-| keyless 行为 | `pnpm test` → `tests/delegation-card.spec.ts`：纯函数视图模型（running/ok/error/stopped、brief 解析、截断 JSON 回退、未知工具名回退）+ `react-dom/server` 静态渲染 | 卡片**渲染语义**（不需要 DOM、不需要模型，毫秒级） | 每次改动 |
-| keyless 装配 | `pnpm test` → `tests/client-face.spec.ts`：卡片 key ↔ preset `toolName` **逐字一致** + 注册走共享常量 + 单独 `inject(['slots'])` | keyed slot 的**静默失效**（key 拼错 = 永不渲染） | 每次改动 |
-| 真页面挂载 | `node scripts/client-load-smoke.mjs`：真浏览器加载真页面，零 loader 错误 + 品牌在场 | client 入口 apply 抛错（slot 名写错会在这里炸，postmortem 0003） | 客户端改动 |
-| 机制 / 边界 | `node scripts/delegation-smoke.mjs`（1 条 prompt ≈30s）：`vp_eng`/`vp_sales` 在模型可见目录 + 三个控制名仍是团队版；`--delegate` 多 1 条 prompt **真委派一次**，断言前台拿到 child 正文（不是 `started subagent`）+ **[3] child 面守卫**（2026-10-02 立）：读 child 会话日志的 request/header，断言 Team 工具仍在场（README 已登记的目录暴露限制；纯日志读取不加 prompt） | shadow 边界变了就红（提示重评 one-shot 决定）；委派出稿的**前台语义**；child 目录暴露边界（上游修时序 ⇒ 重评 §4 记账） | 该边界改动后 / **升 pin 时** |
-| 挂载（上线前门禁） | `node scripts/preset-smoke.mjs` | 行 config 校验（preset 挂载失败，postmortem 0001） | preset 组合或内容改动后 |
+| keyless 行为 | `pnpm test` → `tests/client/delegation-card.spec.ts`：纯函数视图模型（running/ok/error/stopped、brief 解析、截断 JSON 回退、未知工具名回退）+ `react-dom/server` 静态渲染 | 卡片**渲染语义**（不需要 DOM、不需要模型，毫秒级） | 每次改动 |
+| keyless 装配 | `pnpm test` → `tests/client/client-face.spec.ts`：卡片 key ↔ preset `toolName` **逐字一致** + 注册走共享常量 + 单独 `inject(['slots'])` | keyed slot 的**静默失效**（key 拼错 = 永不渲染） | 每次改动 |
+| 真页面挂载 | `node scripts/smoke/client-load-smoke.mjs`：真浏览器加载真页面，零 loader 错误 + 品牌在场 | client 入口 apply 抛错（slot 名写错会在这里炸，postmortem 0003） | 客户端改动 |
+| 机制 / 边界 | `node scripts/smoke/delegation-smoke.mjs`（1 条 prompt ≈30s）：`vp_eng`/`vp_sales` 在模型可见目录 + 三个控制名仍是团队版；`--delegate` 多 1 条 prompt **真委派一次**，断言前台拿到 child 正文（不是 `started subagent`）+ **[3] child 面守卫**（2026-10-02 立）：读 child 会话日志的 request/header，断言 Team 工具仍在场（README 已登记的目录暴露限制；纯日志读取不加 prompt） | shadow 边界变了就红（提示重评 one-shot 决定）；委派出稿的**前台语义**；child 目录暴露边界（上游修时序 ⇒ 重评 §4 记账） | 该边界改动后 / **升 pin 时** |
+| 挂载（上线前门禁） | `node scripts/smoke/preset-smoke.mjs` | 行 config 校验（preset 挂载失败，postmortem 0001） | preset 组合或内容改动后 |
 | 端到端（**已交付，R5a**） | 模型真调 `vp_eng` → 真 UI 对话流里的委派卡 | "模型→工具→卡片"全链路 | `replay-smoke --ui`（无 key 重放 + ariaSnapshot 金样） |
 
 **为什么端到端走重放而非每轮真跑（R3 试过并否决）：**先做的是"真浏览器 + 真 composer 驱动模型"

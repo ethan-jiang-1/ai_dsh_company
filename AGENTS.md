@@ -1,8 +1,7 @@
 # AGENTS.md — 本仓库的入口链
 
-虚拟公司（**wochen**）多角色 DSH 插件：一个包（`packages/company-pack`）提供五个角色 preset
-（显示名 `wochen CEO` / `wochen VP-Eng` / `wochen VP-Sales` / `wochen COO` / `wochen CFO`）+ host profile 源；
-协作用 DSH 现成通道（Agent Teams 主通道）。
+wochen 虚拟公司 DSH 插件：一个 company pack 提供五个角色 preset 与 host/client 面。
+**初入仓库或查运行链**：读 [项目地图](docs/project-map.md)；**开始变更**：读 [开发环 §0.5/§1](docs/guides/dev-loop.md)；**选验证**：读 [测试宪法](docs/testing.md) 和 [脚本索引](scripts/README.md)。
 
 **你（读者）= 维护本 repo 的开发 agent**；五个 wochen 角色是你**维护的产物**（它们跑在 DSH 会话里，
 由 `pnpm dsh` / web 观察窗驱动）——别把自己混进公司角色，也别替角色执行公司手册。
@@ -17,7 +16,7 @@ vendor/dsh/             DSH 源码 submodule（钉 SHA，**只读铁律**：见 
 docs/                   当前合同与导航：index（地图+台账）→ design/ guides/ + 顶层合同
 notes/                  **开发记忆与证据链**：proposed/（RFC）→ implemented/（活跃决策记忆）；archived/（完结研究 + intents 冻结档案）/ rejected/（负知识）；postmortem/ 记事故
 _backlog/               推敲层（D31 立层；D33 章制回借）：plans/ 推敲卡（含待触发等待卡）、bugs/ 缺陷卡、reference/ 研究材料、_done/ 归档（_closed/_suspended/_fixed/_reference + _misc/ 退役池）；章程/账本二分，规矩 = 其 README
-scripts/                run-gates.mjs（结构门禁）、preset-smoke.mjs（真入口冒烟）……
+scripts/                run-gates.mjs（稳定门禁）；smoke/ probes/ audit/ tools/ archive/ 按职责；lib/ 隔离逻辑、drivers/ 真实驱动
 dev/                    env.sh（双 home+裸 dsh 拦截）、company.overlay.yml（headless 实验 overlay）、harness-home/（开发 DSH_HOME，gitignore 运行残留）
 snapshots/              回归资产：历史录制、workspace.actual 副本与部分场景独立编写的 workspace.expected；以各 snapshot.yml / Note 为准
 ```
@@ -36,9 +35,9 @@ corepack enable pnpm                   # 一次性：pnpm 走 corepack（package
 pnpm install                           # workspace 解析；引导全配方（含 vendor 构建）见 guides/bootstrap
 source dev/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 门禁接线（⚠ coding 会话里 DSH_HOME 继承带日用值——guides/dev-loop §6 第 5 条）
 pnpm verify                            # 结构门禁（清单唯一源 = scripts/run-gates.mjs；跑一次看 PASS 行即得全表，本行不复述；push 侧 pre-push hook 强制）
-pnpm test                              # keyless 回归（vitest；数量与耗时以实跑为准；真模型/浏览器不进回归，tests/layering.spec.ts 守卫）
+pnpm test                              # keyless 回归（vitest；数量与耗时以实跑为准；真模型/浏览器不进回归，tests/harness/layering.spec.ts 守卫）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）
-node scripts/preset-smoke.mjs          # preset 改动的**完成定义**（触发条件与成本见该脚本头注；挂载失败只有它抓得到）
+node scripts/smoke/preset-smoke.mjs          # preset 改动的**完成定义**（触发条件与成本见该脚本头注；挂载失败只有它抓得到）
 ```
 
 其余门禁/冒烟脚本见 `scripts/`：**每个脚本头注写明「何时跑」与成本、并自述「状态：常驻|已耗」**（`script-triggers` / `script-status` 门禁强制自述，
@@ -72,8 +71,8 @@ DSH 全局不变量（fail-loud / model-visible ⟺ logged / registrations are e
 | 任务反馈面；按变更选择相关检查、只报告实际跑过的检查 | `packages/todo` / `packages/plan`（按各自条件使用）；`AGENTS.md` Run relevant checks | 适用规则唯一见 guides/dev-loop §0.5/§1；本地流程 §1/§9.1/§12 |
 | docs = 当前合同（一处事实一个家，**只写 now**）；**文档卫生（D26）**：删重复/失效指令、并重复事实家、修活指针，行数只作观察 | `docs/AGENTS.md` | `docs/` 按性质分层（D10）；物理行预算 = `scripts/run-gates.mjs` 的 `DOC_LINE_BUDGETS`；队列层已退役（D32），_backlog 规矩 = 其 README；卫生细则 = dev-loop §12 |
 | 非平凡变更同 diff 带 Agent Note（决定/输掉的方案/需验证什么；授权链线索记在 Note 状态行——intents.md 已退役 D34）；日志税：model-visible ⟺ logged | `.agents/notes/README.md`；`AGENTS.md` Conventions | `notes/proposed/ RFC → implemented/`；收尾 Note 要写什么 = dev-loop §12（范式照 [journal-presence-mechanism](notes/implemented/2026-09-26-journal-presence-mechanism.md)）；日志税落点 = dev-loop §3② |
-| **完成定义 = 该面最小"真检查"通过，发现权在代理一侧**；测试分层（真模型/真浏览器不进回归；行为变更同 diff 更新录制快照）；真实入口路径（发布产物 `lib/` 跑）与真实安装形状 | `docs/testing.md`；`docs/postmortem/0003-web-agent-gui-feedback-loop.md` | **测试宪法 `docs/testing.md`**（证据政策唯一家）+ dev-loop §1/§9.1 + 机械门禁 `tests/layering.spec.ts`（已反证）+ bootstrap 两道防线；preset 改动完成定义 = `preset-smoke.mjs`（真挂载）；安装形状 = `release-smoke`（合同 [release.md](docs/release.md)） |
-| 源码面/产物面不混（paths 指 src）；vendor 钉版本 + manifest/SHA + 同步程序，**升 pin 时流程合同对 vendor 重校** | `AGENTS.md` Conventions；`vendor/README.md` | 根 `tsconfig.json` extends vendor base；AGENTS §vendor 簿记 + `scripts/sync-dsh.mjs` |
+| **完成定义 = 该面最小"真检查"通过，发现权在代理一侧**；测试分层（真模型/真浏览器不进回归；行为变更同 diff 更新录制快照）；真实入口路径（发布产物 `lib/` 跑）与真实安装形状 | `docs/testing.md`；`docs/postmortem/0003-web-agent-gui-feedback-loop.md` | **测试宪法 `docs/testing.md`**（证据政策唯一家）+ dev-loop §1/§9.1 + 机械门禁 `tests/harness/layering.spec.ts`（已反证）+ bootstrap 两道防线；preset 改动完成定义 = `preset-smoke.mjs`（真挂载）；安装形状 = `release-smoke`（合同 [release.md](docs/release.md)） |
+| 源码面/产物面不混（paths 指 src）；vendor 钉版本 + manifest/SHA + 同步程序，**升 pin 时流程合同对 vendor 重校** | `AGENTS.md` Conventions；`vendor/README.md` | 根 `tsconfig.json` extends vendor base；AGENTS §vendor 簿记 + `scripts/tools/sync-dsh.mjs` |
 | 机械可查的不变量进执行门禁 + **每个新门禁带反证**（红→还原→绿） | `AGENTS.md` Conventions | `scripts/run-gates.mjs`（**清单唯一源 = 那个文件自己**——跑一次看 PASS 行即得全表；**本表不复述门禁名**，复述必漂） |
 
 ### vendor 铁律（本仓强制边界；受更高层指令与工具权限约束，机械门禁在 `pnpm verify`）

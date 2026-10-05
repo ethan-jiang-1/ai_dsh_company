@@ -60,8 +60,8 @@ D15/门禁注释，新会话沿纪律表落点进 vendor 语境错配的 testing
 
 ## 全天产出地图（收口索引，2026-10-04 深夜补——用户指认"忙了一天但线索散"，本节 = 一页看全）
 
-**① 规矩层**：[docs/testing.md](../../docs/testing.md)（新建，75 行宪法）＋ [tests/pack-exports.spec.ts](../../tests/pack-exports.spec.ts)、
-[tests/signoff-tool.spec.ts](../../tests/signoff-tool.spec.ts)（守卫+行为资产）＋ dev-loop/release/AGENTS/index/verify 接线（§1.1 命名语法、§3.8 红场景先行、script-triggers 扩 eval、行预算 ×2）。
+**① 规矩层**：[docs/testing.md](../../docs/testing.md)（新建，75 行宪法）＋ [tests/pack-exports.spec.ts](../../tests/harness/pack-exports.spec.ts)、
+[tests/signoff-tool.spec.ts](../../tests/company/signoff-tool.spec.ts)（守卫+行为资产）＋ dev-loop/release/AGENTS/index/verify 接线（§1.1 命名语法、§3.8 红场景先行、script-triggers 扩 eval、行预算 ×2）。
 **② 多用户 BDD 五 Note 六 probe**：[lane 立项+S1-S6 规格](./2026-10-04-multi-user-concurrency-lane.md) →
 [batch1](./2026-10-04-multi-user-bdd-batch1.md)（member-rescue-probe 6/6 + team-concurrency-probe 4/4）→
 [batch2](./2026-10-04-multi-user-bdd-batch2.md)（dissent-preservation-probe 4/4 + team-atomicity-probe 3/3）→

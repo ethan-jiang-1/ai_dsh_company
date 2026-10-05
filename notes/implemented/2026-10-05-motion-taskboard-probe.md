@@ -1,6 +1,6 @@
 # 2026-10-05 · 真动议首验：手册「动议任务板」行被模型真实执行（motion-taskboard-probe）
 
-状态：已交付（2026-10-05 用户点名「跑 A」；probe = [motion-taskboard-probe.mjs](../../scripts/motion-taskboard-probe.mjs)
+状态：已交付（2026-10-05 用户点名「跑 A」；probe = [motion-taskboard-probe.mjs](../../scripts/probes/motion-taskboard-probe.mjs)
 常驻；两次真动议：第一次被问询纪律正确阻塞——probe 设计缺陷非模型缺陷；第二次零歧义动议全流程走通）
 
 ## 交付
@@ -27,7 +27,7 @@
   声明 + 派活行状态对齐。
 - probe 自身两轮 bug（resultText 读法、epoch ms 当 ISO 解析）均被「断言带原文」当场暴露——
   红绿留痕即修复路径。
-- 资产 = [snapshots/motion-taskboard-probe/2026-10-05/](../../snapshots/motion-taskboard-probe/2026-10-05/timing-analysis.md)
+- 资产 = [snapshots/motion-taskboard-probe/2026-10-05/](../../snapshots/probes/motion-taskboard-probe/2026-10-05/timing-analysis.md)
   （timing-analysis.md 离线判定 + probe-stdout）。
 
 ## 输掉的方案

@@ -1,7 +1,7 @@
 // 「共享盘中的待核工作候选」扫描的纯逻辑（2026-09-26 立；实验 B 的仪器）。
 // 为什么存在：独立评审指出"扫盘推待办"的三种误报（把已关闭动议的历史缺稿报成新待办 /
 // 把已出首稿但仍有依赖的角色报成完成 / 漏掉互审、返工、取消、审批等不产生 drafts/<角色>.md 的任务）。
-// 本模块实现**三条规则**供对照实验，判据与实现在这里单一来源；IO 与打分在 scripts/candidate-scan-eval.mjs。
+// 本模块实现**三条规则**供对照实验，判据与实现在这里单一来源；IO 与打分在 scripts/audit/candidate-scan-eval.mjs。
 //
 // ⚠ 命名纪律（评审 §五 B 的零容忍条款）：未达判据前，输出只能叫「**待核工作候选**」，
 // 不叫"我的待办"，不自动通知。候选项必须带「待核实」标记。
@@ -97,7 +97,7 @@ export function scanR3(briefText, draftFiles, motionHasFinal) {
   return { candidates, blocked, closed: false }
 }
 
-// ═══════════════ 金标准标注（实验 B 打分腿；纯逻辑，IO 在 scripts/candidate-scan-eval.mjs）═══════════════
+// ═══════════════ 金标准标注（实验 B 打分腿；纯逻辑，IO 在 scripts/audit/candidate-scan-eval.mjs）═══════════════
 
 /** 标注状态枚举（格式约定唯一见标注文件头部；改枚举要同步改约定）。 */
 export const GOLD_STATUSES = ['待办', '阻塞', '待核实', '取消', '已出稿', '完成', '关闭']

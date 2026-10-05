@@ -15,7 +15,7 @@
 | 指南 | `guides/` | **怎么操作**：runbook、预算限流 | 活（随操作方式演进） |
 | 合同 | 顶层（按主题） | **是什么**：某子系统现在时语义 | 随代码同 diff，只写 now |
 
-## 文档地图
+项目运行、目录、调试和测试导航见 [project-map.md](./project-map.md)；脚本用途索引见 [scripts/README.md](../scripts/README.md)，触发条件与成本以脚本头注为准。
 
 ### 现有文档
 
@@ -68,9 +68,9 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | D13 | **历史宣言：开发纪律沿用 DSH**（当时写作“整套继承 + 按规模裁剪、不发明本地流程”）。该默认适配自由已由 D23 限定：默认遵循钉住的 vendor 纪律，偏离须登记 D 号与约束证据；当前 owner 见 AGENTS.md §纪律及开发环 §12 | [D23 转型 Note](../notes/implemented/2026-09-23-dsh-inround-task-surface.md)；用户决定 |
 | D14 | **公司名 = wochen；角色显示名系列化** `<公司名> <角色>`（`wochen CEO` 等）；**preset id 保持 kebab 不变**（`ceo`/`vp-eng`/`vp-sales`/`coo`——id 受 `PRESET_ID=/^[a-z0-9][a-z0-9-]*$/` 限制，不能带下划线/大写）；角色层级不动（CEO 是个体、VP 是职能，见 role-content-plan §0.1） | notes/implemented/2026-09-22-wochen-naming.md；role-content-plan §1 |
 | D15 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**：真入口路径 > dump/扫描；"伺服了"≠"能加载"；给人看 UI 前先机器验证。**同时否决**：为此引入 spec 流程、把指令文件写更长 | notes/implemented/2026-09-22-agent-workflow-community-practice.md（17 个一手来源）；vendor `docs/testing.md` + postmortem 0001–0003；落点：guides/dev-loop §1/§2 + guides/bootstrap、AGENTS.md 纪律表 |
-| D16 | **Q2 定案（2026-09-22）**：角色模型路由 = R2 全员同模型（默认路由，不写 `agentOptions`）。理由：当前瓶颈是内容质量与协作可见性，成本无差异化证据；需要差异路由时 R3 在委托工具 `agentOptions` 层做，不动 persona | tests/presets.spec.ts；presets.md |
+| D16 | **Q2 定案（2026-09-22）**：角色模型路由 = R2 全员同模型（默认路由，不写 `agentOptions`）。理由：当前瓶颈是内容质量与协作可见性，成本无差异化证据；需要差异路由时 R3 在委托工具 `agentOptions` 层做，不动 persona | tests/presets/presets.spec.ts；presets.md |
 | D17 | **Q3 定案（2026-09-22）**：公司事实（CHARTER / journal / 客户 / 预算基准）全部留 workspace 活数据（D7 三载体）；随 pack 发布的只有方法论 skills 与结构模板——pack 不含公司事实，换公司复用 = 只换 workspace | presets.md；company-workspace/kb/ |
-| D18 | **R3 汇报线（2026-09-22）**：CEO 命名委托工具 = **one-shot 前台**；continuable 在本组合不可用（child 不在 team 名册，续驶/中断/列举不可达）⇒ 续驶归 team（M4）；CEO preset 不放全局控制行（有反向守卫）；并行派活等上游 seam（不自建，D13） | [delegation.md](./delegation.md) 全文；`scripts/delegation-smoke.mjs`（守卫）；`snapshots/r2-motion/sessions/lead.jsonl` 第一帧 |
+| D18 | **R3 汇报线（2026-09-22）**：CEO 命名委托工具 = **one-shot 前台**；continuable 在本组合不可用（child 不在 team 名册，续驶/中断/列举不可达）⇒ 续驶归 team（M4）；CEO preset 不放全局控制行（有反向守卫）；并行派活等上游 seam（不自建，D13） | [delegation.md](./delegation.md) 全文；`scripts/smoke/delegation-smoke.mjs`（守卫）；`snapshots/replay/r2-motion/sessions/lead.jsonl` 第一帧 |
 | D19+D21 | **R5 拆轮（R5a 门禁/R5b 驾驶舱）+ 搁置池准入（缺上游 seam 或缺明确需求才进池，复活条件写进池内每行；被否决方案不进池）+ 轮次调整**——轮次制均已由 D23/D24 退役，细节只作历史（原 r5-plus-readiness.md 已删，全文在 git `d159b0228e2b`） | 搁置池表现居 [_backlog/_done/_misc/suspended.md](../_backlog/_done/_misc/suspended.md)（D32 迁入，2026-09-28 整池退役）；[r6-content-remediation](../notes/implemented/2026-09-23-r6-content-remediation.md) |
 | D20 | **交付物三态判据（R4）**：成品 = Lead 的 `present`（`agentPreset=ceo` 且 depth=0）；比对按 `slug`+角色身份不按路径（桥 = 身份比对 + slug 剥日期前缀归一，2026-10-03 起覆盖改名与归档根）；反向检查只追 Lead 声明、非 Lead 只查此刻在盘。实现 = `scripts/lib/deliverables.mjs` + `deliverables-check`（审快照配 `--only <slug>`）；合同家 = 公司手册「交付物三态」 | [r4-workshop-flow](../notes/implemented/2026-09-22-r4-workshop-flow.md) 全文 |
 | D22 | **R5b 驾驶舱（2026-09-23，Q5–Q8 四定案）**：在场板主键 = team roster（"会话×preset"被 r2/r3 录制证伪）；冷启动 = 拉式 RPC `remote.agentTeams.view(lead)` + 5s 轮询；status 中文映射；成员入口照官方 openTeammate。同轮 r2-motion replay 场景出生 + presence 判据档 | [org-presence-board §四个定案](../notes/implemented/2026-09-22-org-presence-board.md)；[r5b-cockpit](../notes/implemented/2026-09-23-r5b-cockpit.md) |

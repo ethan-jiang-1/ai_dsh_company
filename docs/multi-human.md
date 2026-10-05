@@ -14,7 +14,7 @@
 | 事实 | 证据 |
 |---|---|
 | **卡按"发起它的那个 agent 的会话"作用域** ⇒ 只有那个会话的 owner 看得到 | 两门实测：让其中一扇门的 agent 发 `request_signoff`，面板只在"请求所属会话"那扇门显示（A=true / B=false） |
-| **被委派的成员（含 team teammate）一律拉不到人**——问询在服务层被拒、审批硬编码 `never` | `scripts/member-inquiry-probe.mjs` 逐字报错：`human interaction is unavailable while the calling agent is owned by another live agent`；`user-questions/src/index.ts:101-106` + `child-agent.ts:254` |
+| **被委派的成员（含 team teammate）一律拉不到人**——问询在服务层被拒、审批硬编码 `never` | `scripts/probes/member-inquiry-probe.mjs` 逐字报错：`human interaction is unavailable while the calling agent is owned by another live agent`；`user-questions/src/index.ts:101-106` + `child-agent.ts:254` |
 
 ⇒ **一场由 CEO 主持的动议里，所有卡都只落到 CEO 那扇门。** 所以：
 
@@ -33,7 +33,7 @@
 
 **所以多人模式下的正确动作是反过来的**：門乙（CFO 的根会话）撞签字线时**由它自己发起**，
 **不要**"升级给 CEO"（那会把卡送到甲的门上，恰好演示反了）。
-实测依据：`scripts/budget-signoff-probe.mjs` 的正例——CFO 根会话确实会发 `request_signoff`。
+实测依据：`scripts/probes/budget-signoff-probe.mjs` 的正例——CFO 根会话确实会发 `request_signoff`。
 
 （手册「问人两条路」与「审批三档」均已含这条根会话 vs 被委派成员的区分——见两节的 ⚠ 段；
 [RFC](../notes/implemented/2026-09-26-multi-human-role-routing.md) 进度表 f 行随之闭合。）
@@ -68,7 +68,7 @@ CI=true pnpm dsh web -- --port 0 --no-open         # 端口是环境状态；见
    （CEO/CFO/COO/VPE/VPS）；当前会话的**浏览器窗口标题**带【角色】前缀、窗口最顶有一条
    细色带——多窗并排也不会认错门。**开每扇门时记得选对 preset**（默认是 `ceo`，已实测踩坑）。
 5. **人该动的时候**：谁的门上出现卡，就由**那个人**答/批。
-6. **看进展 = 右栏「在场」页签（在场板）**：成员行带上线状态 + 当前任务 subject，动态流含任务生命周期——**成员进展的唯一面**。**注意力中心只推「需要你」四类**（问询/审批/升级/完成；问询节流是设计哲学，成员进度不进卡面、不是缺陷）。预期行为判据钉 `tests/presence-board.spec.ts`（D-a/D-b）；**ETA 显式不做**（复活触发 = 真人开始问「还要多久」，届时另立推敲）。
+6. **看进展 = 右栏「在场」页签（在场板）**：成员行带上线状态 + 当前任务 subject，动态流含任务生命周期——**成员进展的唯一面**。**注意力中心只推「需要你」四类**（问询/审批/升级/完成；问询节流是设计哲学，成员进度不进卡面、不是缺陷）。预期行为判据钉 `tests/company/presence-board.spec.ts`（D-a/D-b）；**ETA 显式不做**（复活触发 = 真人开始问「还要多久」，届时另立推敲）。
 
 **端口不是仓库事实**（环境状态，会被别的实例占用——实测 3080/3081/3082 三个都可能是别人的 DSH）：
 被占就换一个空闲端口，或直接 `--port 0`（系统分配，端口与 token 从启动横幅读）。
@@ -114,14 +114,14 @@ CEO 门、人应答 → final + present）。判据与证据 = [E2E Note](../not
    `notes/archived/2026-09-26-multi-human-ux-evidence.md` + 推敲卡 E1/E2 结论
    `_backlog/_done/_closed_plans/2026-09-29-collab-mechanism-evidence.md`）：
    - **有**：`fs-local` 的**实例内** per-target 排队锁 + 版本守卫（读过再写时版本变了报 `FS_STALE_VERSION`，
-     "一胜一 stale"有官方测试）。**E1 实测（真角色会话 ×4 轮全绿，`scripts/fs-guard-probe.mjs`）**：
+     "一胜一 stale"有官方测试）。**E1 实测（真角色会话 ×4 轮全绿，`scripts/probes/fs-guard-probe.mjs`）**：
      守卫在角色会话真实生效——盲写既有文件被拒（`FS_NOT_OBSERVED`，模型被拒后重读重写）、stale 拒 4/4；
      **新机制事实：守卫管新鲜度不管独占**——并发同文件败者天然先读后合法重写 = 后写者静默胜出
      （机械拒只在败者恰好盲写时出现）；
    - **没有**：**跨进程 / 跨 `$DSH_HOME` / 外部编辑器**的共享租约——**E2 实测（真 fs-local × 2 进程）**：
      同版本守卫写 ×20 轮 20/20 双双成功互踩（守卫检查与发布间无跨进程原子性）⇒ 跨进程互斥的正解 =
      `dsh-atomic-write`（维护者/脚本侧）；**无版本期望的写仍是无条件原子覆盖**。
-    - **分野（2026-10-05 T3/T4 实测，probe = `scripts/cross-process-fs-probe.mjs` 新增段）**：覆盖写
+    - **分野（2026-10-05 T3/T4 实测，probe = `scripts/probes/cross-process-fs-probe.mjs` 新增段）**：覆盖写
       （replaceIfVersion）跨进程竞态窗 20/20 命中；**创建（createIfAbsent）= hard-link no-replace
       原子发布、20/20 一胜一拒**（fsio.ts:584 硬链接不可替换发布，内核级原子）⇒ **「占位=认领」的
       机器可查抢注跨进程闭合**——竞态窗只在覆盖写路径（由先读再写 + 单写进程约定覆盖）。
@@ -144,7 +144,7 @@ CEO 门、人应答 → final + present）。判据与证据 = [E2E Note](../not
    若稿经他人代笔后由本人复核收回署名，**必须**加一行
    `本稿由 <角色> 根会话复核并署名（首版系 <谁的会话> 代笔）`——
    真实先例：`deliverables/sea-reconcile-2026/drafts/cfo.md`。
-   **机器核对** = `scripts/authorship-audit.mjs`（比对署名行与实际写入会话的 preset）。
+   **机器核对** = `scripts/audit/authorship-audit.mjs`（比对署名行与实际写入会话的 preset）。
 
 ## 5. 迁移清单（搬共享目录到真实多人环境）
 
@@ -181,4 +181,4 @@ CEO 门、人应答 → final + present）。判据与证据 = [E2E Note](../not
 **已完成（2026-10-04）**：firstdeal-v-2026 三扇门真盘动议——双签两半各落各门均人应答、
 根会话归属 ✓×3（cfo/coo/ceo 各自会话写各自稿）、0 spawn、check 违规 0、journal 三在场。
 证据 = [E2E Note](../notes/implemented/2026-10-04-e2e-multihuman-firstdeal.md)；快照 =
-`snapshots/memory-convergence-2026-10-04-3/`。
+`snapshots/archive/memory-convergence-2026-10-04-3/`。

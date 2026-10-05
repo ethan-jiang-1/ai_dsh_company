@@ -63,7 +63,7 @@
 
 ### 共享层（全员）
 
-- 全局指令：公司手册经 `agent-instructions` 行注入（基线 = `company-workspace/AGENTS.md`，D17；守卫 = `scripts/handbook-smoke.mjs`）。
+- 全局指令：公司手册经 `agent-instructions` 行注入（基线 = `company-workspace/AGENTS.md`，D17；守卫 = `scripts/smoke/handbook-smoke.mjs`）。
 - `templates/`（workspace）：`prd.md`、`review-note.md`、`decision-memo.md`、`weekly-report.md`、`ops-review-note.md`（COO 专用运营核查）。
 
 ## 2. skills / KB 的落点（对照 architecture §5 三载体）

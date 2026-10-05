@@ -10,7 +10,7 @@
  *   前缀的 `team/message/queued`（升级待处理 = 问询切片三甲的中继链显性化）。
  *
  * 纯函数、零依赖；wire 形状 → 领域形状，UI 只消费 {@link AttentionItem}。
- * keyless 单测 = `tests/attention.spec.ts`。
+ * keyless 单测 = `tests/client/attention.spec.ts`。
  */
 
 /** 注意力条目类别。 */

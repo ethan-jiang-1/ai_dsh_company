@@ -10,7 +10,7 @@ import { pathToFileURL } from 'node:url'
 // install 的 store）时的形状；② vendor 子包 ui-primitives——它声明**同一组**解析器（版本区间
 // 与 vendor 根 pin 逐字一致，root store 单一版本 2.0.3/3.1.0/3.0.0 两边相同），根 workspace
 // install 即覆盖（根 workspace 刻意不含 vendor/dsh 根包，只挂其子包——见 pnpm-workspace.yaml）。
-// CI 只跑根 install（.github/workflows/verify.yml）靠 ② 解析。
+// CI 只跑根 install（.github/workflows/ci.yml）靠 ② 解析。
 const parserBases = [
   new URL('../../vendor/dsh/package.json', import.meta.url),
   new URL('../../vendor/dsh/packages/client/ui-primitives/package.json', import.meta.url),
@@ -47,8 +47,9 @@ export function sourceMarkdownFiles(root) {
     }
   }
   walk(root, false)
-  for (const dir of ['docs', 'notes', '_backlog', 'packages/company-pack', 'company-workspace/templates']) walk(join(root, dir))
-  for (const file of ['company-workspace/AGENTS.md', 'company-workspace/kb/org.md']) {
+  for (const dir of ['docs', 'notes', '_backlog', 'scripts', 'packages/company-pack', 'company-workspace/templates']) walk(join(root, dir))
+  // The evidence payload remains frozen; the root contract is current navigation.
+  for (const file of ['snapshots/README.md', 'company-workspace/AGENTS.md', 'company-workspace/kb/org.md']) {
     if (existsSync(join(root, file))) add(join(root, file))
   }
   const kb = join(root, 'company-workspace/kb')

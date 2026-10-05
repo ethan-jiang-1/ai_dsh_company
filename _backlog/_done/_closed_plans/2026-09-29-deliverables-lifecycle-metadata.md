@@ -142,7 +142,7 @@
 
 - `deliverables/` 下 **20 个话题目录**，命名全部 = 裸 `<slug>`（无日期）；**全部有 `final.md`**；过程稿有无
   取决于轮末收敛（09-26 轮的 4 场 drafts 已随轮归档进
-  [memory-convergence-2026-09-26](../../../snapshots/memory-convergence-2026-09-26/README.md)，live 只剩 final）。
+  [memory-convergence-2026-09-26](../../../snapshots/archive/memory-convergence-2026-09-26/README.md)，live 只剩 final）。
 - **日期的唯一事实家 = `kb/motion-ledger.md`**（slug｜日期｜类型｜参与｜墙钟｜成品｜一句话结论），由维护者
   在**轮末收敛**时手工追加（[snapshots/README.md §归档动作](../../../snapshots/README.md) 第 4 步）。
   **中心表已经在漏**：盘上 20 个目录，台账只有 16 行——09-28/29 新增的 5 场
@@ -170,7 +170,7 @@
 - **反向锁**：被 `present` 过的 final **永不删**（`deliverables-check` 反查）⇒ 任何"归档 = 移走"的方案
   必须让脚本认识新家，否则反向锁失效。
 - **rejected 的现状是最疼的**：09-26 有一场动议中途卡死、另一场重跑共用 `renewal-y-2026`，
-  产物**两场混装**而三态判据看不出（[memory-convergence-2026-09-26 README §边界 1](../../../snapshots/memory-convergence-2026-09-26/README.md)）。
+  产物**两场混装**而三态判据看不出（[memory-convergence-2026-09-26 README §边界 1](../../../snapshots/archive/memory-convergence-2026-09-26/README.md)）。
   若当时话题带状态（第一场标"已废弃"），撞车在盘面上一眼可辨。⇒ 状态不是锦上添花，是防混装的护栏。
 
 ### 一个需要先想清楚的概念拆解：用户说的三个词其实跨了两个轴

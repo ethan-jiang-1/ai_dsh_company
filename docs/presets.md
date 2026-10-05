@@ -117,8 +117,8 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 |---|---|---|
 | keyless | `pnpm test`（roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义、必填 config） | ✅ 五角色覆盖 |
 | 运行时 roster | web 观察窗 `agentPresets/list` RPC | ✅ 实测 10 条零 broken |
-| **挂载（上线前门禁）** | `node scripts/preset-smoke.mjs`：boot 真 web，逐个 preset `session/create` | ✅ 五角色 ALL PASS（反证过：去掉必填 config 即红） |
-| 会话级（persona 生效、连通） | `node scripts/probe-smoke.mjs`（默认快速档 ~6s：真会话发一句 ping，断言挂载/轮次/回话/**人格进 prompt**）；`--full` = 五角色三探针内容断言（慢，按需） | ✅ R2 建：快速档 5/5 PASS；内容档曾 14/15（KB 事实与 veto 语义均命中） |
+| **挂载（上线前门禁）** | `node scripts/smoke/preset-smoke.mjs`：boot 真 web，逐个 preset `session/create` | ✅ 五角色 ALL PASS（反证过：去掉必填 config 即红） |
+| 会话级（persona 生效、连通） | `node scripts/smoke/probe-smoke.mjs`（默认快速档 ~6s：真会话发一句 ping，断言挂载/轮次/回话/**人格进 prompt**）；`--full` = 五角色三探针内容断言（慢，按需） | ✅ R2 建：快速档 5/5 PASS；内容档曾 14/15（KB 事实与 veto 语义均命中） |
 | 回归资产 | 动议会话 + 期望工作区归档 | ✅ `snapshots/`（r1–r4 motion + scenario-b + r3 replay 场景；replay harness R5a） |
 
 ## 培养回路与学习载体（分身成长条目出生，2026-09-24）
@@ -137,7 +137,7 @@ preset 即对 profile 可见、无需重装；真实安装形状（`file:`）归
 | skill 条目（增删改名） | 下一轮（pre-step digest 重算 → 替换目录注入） | vendor 源码层（[研究笔记 §5.2/§6](../notes/implemented/2026-09-22-digital-twin-cultivation-and-self-learning.md)） |
 
 **培养验收（把"培养"从感觉变成检查）**：改任何 preset 内容后，`pnpm test` + `pnpm verify` +
-`node scripts/preset-smoke.mjs`（真挂载）+ `node scripts/probe-smoke.mjs --full`（入戏探针）全绿，
+`node scripts/smoke/preset-smoke.mjs`（真挂载）+ `node scripts/smoke/probe-smoke.mjs --full`（入戏探针）全绿，
 才算培养成功（首例 = 2026-09-24，CEO `chairing-staff-meeting` +4 行）。
 
 **学习载体 = workspace journal 唯一**（D8：`kb/<role>/journal/`，经工具调用进日志）。

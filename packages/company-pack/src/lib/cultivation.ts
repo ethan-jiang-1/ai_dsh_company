@@ -4,7 +4,7 @@
  * 数据面 = `remote.workspaceFiles`（list + read，浏览器经会话身份读自己工作区）——纯函数只消费
  * 调用方喂进来的清单与文本。**待审语义**：journal/ 里的条目即待审素材——手册「轮末收敛」规则
  *（人审后压进 CHARTER「历史纪要」、journal 只留当前轮）成立后天然准确；收敛未做时面板如实显示
- * 全部存量（46 篇 = 46 篇待审，不撒谎）。keyless 单测 = `tests/cultivation.spec.ts`。
+ * 全部存量（46 篇 = 46 篇待审，不撒谎）。keyless 单测 = `tests/company/cultivation.spec.ts`。
  */
 
 /** 五角色（与 preset roster 一致）。 */

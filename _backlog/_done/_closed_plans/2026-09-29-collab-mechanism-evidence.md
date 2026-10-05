@@ -1,6 +1,6 @@
 # 推敲（调研）：协作机制证据底座——原生栈实测 E1/E2/E3 + 生态与先例扫描 Q1/Q2/Q3
 
-> 状态：已毕业（2026-10-03，消化——六项全答，Q3 未触发不算欠账）｜去向 = E1/Q2 结论已写回消费卡 [writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md)（R0 地基闭合）；E1 认证档 = [scripts/fs-guard-probe.mjs](../../../scripts/fs-guard-probe.mjs)（真模型 ×4 轮，收据 = 会话日志 841c3f68/14dbbd15/70b8cb04/ed1f4b1a，见下文结论节）｜原毕业门判断 = 跑完 E1/Q2 即毕业消化
+> 状态：已毕业（2026-10-03，消化——六项全答，Q3 未触发不算欠账）｜去向 = E1/Q2 结论已写回消费卡 [writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md)（R0 地基闭合）；E1 认证档 = [scripts/fs-guard-probe.mjs](../../../scripts/probes/fs-guard-probe.mjs)（真模型 ×4 轮，收据 = 会话日志 841c3f68/14dbbd15/70b8cb04/ed1f4b1a，见下文结论节）｜原毕业门判断 = 跑完 E1/Q2 即毕业消化
 
 ## 背景 / 触发
 
@@ -91,7 +91,7 @@ Team 寻址、多机只剩共享盘（[multi-human.md](../../../docs/multi-human
 
 - 工具落地：`$DSH_HOME` 的 zstd 多帧日志 → 明文平铺 `.jsonl`（`--workspace` 过滤单 bucket 或全导）；
   实跑 349 份导出 / 0 失败（company-workspace bucket）。
-- **闭环验证**：[memory-convergence-2026-09-26](../../../snapshots/memory-convergence-2026-09-26/README.md)
+- **闭环验证**：[memory-convergence-2026-09-26](../../../snapshots/archive/memory-convergence-2026-09-26/README.md)
   的 4 场动议快照审计全 **0 违规**——snapshots README 登记过的"快照无可用日志源"缺口**闭合**。
 - **彩蛋**：`renewal-y-2026` 的两场撞车被 `slug-collision` 观察项**当场指认**（"成品被 2 个不同的
   Lead 会话声明过"）——散文记录里的事故第一次变成机器可见证据。

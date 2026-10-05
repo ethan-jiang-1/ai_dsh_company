@@ -3,7 +3,7 @@
  * 渲染成公司语义的卡——"不讲解也能看懂"最便宜的一招（研究 §5 决策速览）。
  *
  * ⚠ keyed slot 的 key 域是开放的：拼错**不报错**，卡只是永远不出现。所以
- * `tests/team-tool-card.spec.ts` 有一条守卫把 `TEAM_TOOL_KEYS` 与 vendor 的工具注册名钉在一起。
+ * `tests/client/team-tool-card.spec.ts` 有一条守卫把 `TEAM_TOOL_KEYS` 与 vendor 的工具注册名钉在一起。
  */
 import { useState, type KeyboardEvent } from 'react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'

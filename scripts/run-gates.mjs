@@ -12,6 +12,7 @@ import { execFileSync } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { validateMarkdownLinks } from './lib/markdown-links.mjs'
+import { inspectScripts, canonicalSnapshotScenes } from './lib/repository-layout.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const failures = []
@@ -47,7 +48,7 @@ ok(`md-utf8/newline ×${mdFiles.length}`)
 
 // ── 2. 当前源文档的 Markdown 引用：文件 + 标题锚点 + reference definitions ──────
 // 负例留证 2026-09-27：公司手册追加死链 → link 红。
-// 磁盘发现含未跟踪的新 Note；根部/docs/notes/pack + 公司手册/章程/org/templates。
+// 磁盘发现含未跟踪的新 Note；根部/docs/notes/scripts/pack + 公司手册/章程/org/templates。
 // 生成物、vendor 源、dev/snapshots、journal/deliverables、明确归档不作出链检查源。
 const links = validateMarkdownLinks(root)
 for (const v of links.violations) {
@@ -120,9 +121,9 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
   const SNAPSHOTS_CONVERGENCE_BUDGET_MB = 16
   const snapshotsDir = join(root, 'snapshots')
   const totalBytes = walkBytes(snapshotsDir)
-  const convergenceBytes = readdirSync(snapshotsDir, { withFileTypes: true })
-    .filter(d => d.isDirectory() && d.name.startsWith('memory-convergence-'))
-    .reduce((sum, d) => sum + walkBytes(join(snapshotsDir, d.name)), 0)
+  const convergenceBytes = canonicalSnapshotScenes(root)
+    .filter(scene => scene.name.startsWith('memory-convergence-'))
+    .reduce((sum, scene) => sum + walkBytes(scene.path), 0)
   const mb = b => (b / 1024 / 1024).toFixed(1) + 'M'
   totalBytes <= SNAPSHOTS_TOTAL_BUDGET_MB * 1024 * 1024
     ? ok(`snapshots-budget 总量 ${mb(totalBytes)}/${SNAPSHOTS_TOTAL_BUDGET_MB}M`)
@@ -161,23 +162,26 @@ const NOW_FILES = (() => {
     walkMd(join(root, 'tests')),
     walkMd(join(root, 'docs')),
     // `notes/**` 分**两档**（2026-09-26 补盲区 + 分档）：
-    // · **硬档**（`proposed/` + `_backlog/` 推敲卡）= **活文档**——fresh agent 会照着它去干活，死指针代价高；
+    // · **硬档**（`proposed/` + `_backlog/` 活跃推敲卡）= **活文档**——fresh agent 会照着它去干活，死指针代价高；
     // · **观察档**（`implemented/` `postmortem/`）= **记录当时事实**的档案——里面引的路径**当时是对的**
     //   （实测 36/39 条是 vendor 上游改过名）。**改它就是篡改记录** ⇒ 每次提醒、不判红。
     // 此前只扫 `notes/` 直接子文件（`p.split('/').length === 2`）⇒ `proposed/` 与 `implemented/` 全在面外。
     walkMd(join(root, 'notes/proposed')),
-    walkMd(join(root, '_backlog')),
+    walkMd(join(root, '_backlog')).filter(p => !p.startsWith('_backlog/_done/')),
     walkMd(join(root, 'company-workspace')).filter(p => !/^company-workspace\/(deliverables|deliverables-archive|kb\/[^/]+\/journal)\//.test(p)),
   )
 })()
-/** 观察档：`notes/implemented|postmortem/**` —— 记录**当时**事实的档案，死指针只提醒不判红。 */
+/** Historical bare receipts are observed; rendered Markdown navigation still uses the hard link gate. */
+// 2026-10-05：_backlog/_done 明确冻结且不是任务源（dev-loop §0.5），其历史裸命令不能按活指针改写。
+// 不豁免活跃 plans/bugs/reference，也不豁免这些历史文件的 Markdown 导航目标。
+/** 观察档：notes implemented/postmortem 与明确冻结的 _backlog/_done；保留当时裸路径并提醒。 */
 const WARN_FILES = (() => {
   const walkMd = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const path = join(dir, entry.name)
     if (entry.isDirectory()) return ['node_modules', '.git', 'lib'].includes(entry.name) ? [] : walkMd(path)
     return entry.name.endsWith('.md') ? [path.slice(root.length + 1)] : []
   })
-  return [...walkMd(join(root, 'notes/implemented')), ...walkMd(join(root, 'notes/postmortem'))]
+  return [...walkMd(join(root, 'notes/implemented')), ...walkMd(join(root, 'notes/postmortem')), ...walkMd(join(root, '_backlog/_done'))]
 })()
 const TOP_DIRS = ['notes/', 'docs/', 'scripts/', 'packages/', 'snapshots/', 'dev/', 'tests/', 'company-workspace/', 'vendor/']
 const RUNTIME_PREFIXES = ['dev/harness-home', 'dev/rehearsal-workspace', '.pnpm-store']   // gitignored 运行态
@@ -214,7 +218,7 @@ scanBarePaths(WARN_FILES, (where, raw) => { barePathWarn.push(`${where} → \`${
 if (!barePathBad) {
   ok(`bare-path ×${barePathCount}（${NOW_FILES.length} 文件反引号裸路径存在性；另观察档 ${WARN_FILES.length} 文件）`)
   if (barePathWarn.length > 0) {
-    console.log(`  观察项 ${barePathWarn.length} 条（观察档 = \`notes/implemented|postmortem/**\`：`
+    console.log(`  观察项 ${barePathWarn.length} 条（观察档 = \`notes/implemented|postmortem/**\` 与 \`_backlog/_done/**\`：`
       + '记录**当时**事实的档案，里面引的路径当时是对的——**改它就是篡改记录**，故只提醒不判红）：')
     for (const w of barePathWarn) console.log(`    ${w}`)
   }
@@ -264,12 +268,9 @@ if (!pinBad) ok(`pin-currency ×${pinCount}（现在时文件的 dsh-v 字面量
 // 根因是"枚举型事实写在文档里、实现那处更新了"（本仓六份清单同一种病）。
 // 解法：**触发条件的家 = 脚本自己**（一处事实一个家，紧挨实现、改脚本时必然看见）；
 // 文档只留分层原则与指针；本门禁强制自述存在。
-const TRIGGER_FILES = readdirSync(join(root, 'scripts'))
-  // 2026-10-04 加 eval：宪法 §1.1 词表成文核查发现 -eval 逃逸本门禁（candidate-scan-eval 实际
-  // 有头注，但不变量没罩住它——新增门禁类后缀时这里同步扩）。
-  .filter(n => /-(smoke|probe|audit|check|eval)\.mjs$/.test(n)).sort()
-const missingTrigger = TRIGGER_FILES.filter(n =>
-  !readFileSync(join(root, 'scripts', n), 'utf8').split('\n').slice(0, 8).some(line => line.startsWith('// 何时跑：')))
+const scriptInspection = inspectScripts(root)
+const TRIGGER_FILES = scriptInspection.triggers
+const missingTrigger = scriptInspection.missingTriggers
 missingTrigger.length === 0
   ? ok(`script-triggers ×${TRIGGER_FILES.length}（每个门禁/探针脚本头注自述「何时跑」）`)
   : fail('script-triggers', `这些脚本头注缺「// 何时跑：」（触发条件的家 = 脚本自己，别写回文档）：${missingTrigger.join(', ')}`)
@@ -279,15 +280,9 @@ missingTrigger.length === 0
 // 为什么：scripts/ 混住常驻门禁与已耗一次性仪器，fresh agent 分不清活门禁与用完的探针
 // （实测 migration-rehearsal 迁移已执行后头注仍像活触发器、--execute 改真盘）。解法与 2f 同教义：
 // 家 = 脚本自己——每个脚本头注自述「状态：常驻」或「状态：已耗（YYYY-MM-DD …原因/复跑条件）」。
-const ALL_SCRIPTS = readdirSync(join(root, 'scripts')).filter(n => n.endsWith('.mjs')).sort()
-const statusMissing = []
-const statusBad = []
-for (const n of ALL_SCRIPTS) {
-  const head = readFileSync(join(root, 'scripts', n), 'utf8').split('\n').slice(0, 8)
-  const line = head.find(l => l.startsWith('// 状态：'))
-  if (!line) statusMissing.push(n)
-  else if (!/^\/\/ 状态：(常驻|已耗（\d{4}-\d{2}-\d{2})/.test(line)) statusBad.push(`${n}: ${line.slice(3)}`)
-}
+const ALL_SCRIPTS = scriptInspection.entries
+const statusMissing = scriptInspection.missingStatus
+const statusBad = scriptInspection.invalidStatus
 statusMissing.length === 0 && statusBad.length === 0
   ? ok(`script-status ×${ALL_SCRIPTS.length}（头注自述「状态：常驻|已耗（日期+原因）」）`)
   : fail('script-status', `脚本状态头注缺失或形非法：缺 = ${statusMissing.join(', ') || '无'}；非法 = ${statusBad.join('；') || '无'}（格式：「// 状态：常驻」或「// 状态：已耗（YYYY-MM-DD …）」）`)
@@ -296,18 +291,18 @@ statusMissing.length === 0 && statusBad.length === 0
 // 负例留证 2026-09-28：手改手册表头版本 → dist-manual 红，跑 export-dist 还原 → 绿。
 // 为什么：_dist/安装手册.md 是 tracked 生成物（tgz 之外的唯一 tracked 例外），表头版本若与
 // pack package.json 漂移 = 手册教人装的版本不是仓库当前版本；升版本忘重导 = 谎报。
-// 解法：版本 bump 必须同 diff 重跑 `node scripts/export-dist.mjs`（手册由脚本生成、永不手改）。
+// 解法：版本 bump 必须同 diff 重跑 `node scripts/tools/export-dist.mjs`（手册由脚本生成、永不手改）。
 {
   const packVersion = JSON.parse(readFileSync(join(root, 'packages/company-pack/package.json'), 'utf8')).version
   const manualPath = join(root, '_dist', '安装手册.md')
   if (!existsSync(manualPath)) {
-    fail('dist-manual', '_dist/安装手册.md 缺失——跑 `node scripts/export-dist.mjs` 生成（tracked 生成物，随版本变更同 diff 重导）')
+    fail('dist-manual', '_dist/安装手册.md 缺失——跑 `node scripts/tools/export-dist.mjs` 生成（tracked 生成物，随版本变更同 diff 重导）')
   } else {
     const manual = readFileSync(manualPath, 'utf8')
     const header = manual.split('| 版本 |')[1]?.split('|')[0]?.trim()
     header === packVersion
       ? ok(`dist-manual（安装手册表头版本 = pack package.json ${packVersion}）`)
-      : fail('dist-manual', `安装手册表头版本（${header ?? '解析不到'}）≠ pack package.json（${packVersion}）——重跑 \`node scripts/export-dist.mjs\` 再提交，别手改手册`)
+      : fail('dist-manual', `安装手册表头版本（${header ?? '解析不到'}）≠ pack package.json（${packVersion}）——重跑 \`node scripts/tools/export-dist.mjs\` 再提交，别手改手册`)
   }
 }
 
@@ -319,12 +314,7 @@ statusMissing.length === 0 && statusBad.length === 0
 // 解法：**自起 web 实例的脚本一律 `--port 0`**（系统分配；真实端口从启动横幅读——这些脚本本就这么取）。
 // 它们 spawn 实例、用完即杀，不需要稳定 origin；给人开的观察窗不受本条约束（稳定 origin 有回报）。
 {
-  const offenders = readdirSync(join(root, 'scripts'))
-    .filter(n => n.endsWith('.mjs'))
-    .flatMap(n => {
-      const matched = /arg\(\s*'port'\s*,\s*'([^']*)'\s*\)/.exec(readFileSync(join(root, 'scripts', n), 'utf8'))
-      return matched !== null && matched[1] !== '0' ? [`${n} → '${matched[1]}'`] : []
-    })
+  const offenders = scriptInspection.fixedPorts
   offenders.length === 0
     ? ok('script-port（脚本默认端口一律 --port 0：端口是环境状态，真实端口从启动横幅读）')
     : fail('script-port', `这些脚本把固定端口当默认（一律改 '0'）：${offenders.join(', ')}`)
@@ -393,10 +383,10 @@ if (patchRels.length === 0 || badPatch.length > 0) fail('pack-bundle', `dsh.bund
 else ok(`pack-bundle ×${patchRels.length}`)
 // 兼容矩阵（R5a 发布欠账，guides/dev-loop §5）：`dsh.compatibility.dshReleases` 必须包含当前
 // 钉住的 vendor tag——升 pin 不加矩阵列 = 没验证过就装作验证过。升 pin 走
-// scripts/sync-dsh.mjs（它会同步加列），这条门禁保证忘加就红。
+// scripts/tools/sync-dsh.mjs（它会同步加列），这条门禁保证忘加就红。
 const compatReleases = pack?.dsh?.compatibility?.dshReleases
 if (!Array.isArray(compatReleases) || !compatReleases.includes(expectedTag)) {
-  fail('pack-compat', `dsh.compatibility.dshReleases 必须包含当前钉住的 ${expectedTag}（升 pin 走 scripts/sync-dsh.mjs 并同步加列）`)
+  fail('pack-compat', `dsh.compatibility.dshReleases 必须包含当前钉住的 ${expectedTag}（升 pin 走 scripts/tools/sync-dsh.mjs 并同步加列）`)
 } else ok(`pack-compat (${expectedTag} ×${String(compatReleases.length)})`)
 
 // ── 7. preset 行引用的插件必须在 pack 依赖声明里（R5a 起：dependencies ∪ peerDependencies）──

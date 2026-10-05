@@ -45,9 +45,9 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack
 #   bundles 数组加 `@deepseek-ai/dsh-experimental-schedule-bundle`（时间通道/schedule/ui-schedule 三行归它）。
 #   历史：file: 拷贝时代，presets/*.yml 用编辑工具改会换 inode、安装副本是真拷贝（link count 1），
 #   不重装则改动不可见——该坑随 link: 消失。
-node scripts/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）
-node scripts/handbook-smoke.mjs        # agent-instructions 注入完成定义：指令基线 = 公司手册（默认只跑 ceo 一次小调用）
-node scripts/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
+node scripts/smoke/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）
+node scripts/smoke/handbook-smoke.mjs        # agent-instructions 注入完成定义：指令基线 = 公司手册（默认只跑 ceo 一次小调用）
+node scripts/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
 ```
 
 实证过的坑与解法（细节见 notes/implemented/2026-09-22-r0-loop-acceptance.md）：
@@ -99,7 +99,7 @@ node scripts/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团
 - **上线前必跑 preset 冒烟**（R1 起，两道防线）：
   1. **防线一（快，`pnpm test`）**：已知必填 config 字段必须随工具行给出（如
      `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`）。
-  2. **防线二（真，`node scripts/preset-smoke.mjs`）**：boot 真 web profile → `agentPresets/list`
+  2. **防线二（真，`node scripts/smoke/preset-smoke.mjs`）**：boot 真 web profile → `agentPresets/list`
      断言五角色零 broken → **逐个 `session/create` 真挂一次**。
   **只有防线二能抓"preset 挂载失败"**：行 config 校验发生在挂载时，roster 扫描与 `--dump-config`
   都看不到，UI 还会吞掉错误（症状就是"新建会话点了没反应"）。已反证：去掉一个必填 config 即变红
