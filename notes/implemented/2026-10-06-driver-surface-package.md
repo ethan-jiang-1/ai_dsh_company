@@ -33,9 +33,13 @@
 - **D**：红 = 棘轮 105→84 后 doc-budget 红（95 行超上限）；绿 = 72/84 + pin-bookkeeping 过 + vitest 338 项；走查 = 原全部入口 ≤2 跳可达（community-practice 经 index 台账 D15 行 2 跳；journal-presence-mechanism 范式经 notes/README §二 2 跳；首跑验收 / §11 / §12 / §13 均 1 跳）。
 - **E**：走查 = 按 index 路由行到达正确 owner 且一句话可懂；md-links 绿；六个预算文件全部不升（AGENTS 72/84、index 148/148、orient 51/80、dev-loop 374/395、testing 75/75、手册 195/195）。
 
-## 边界与未做
+## 边界与未做（2026-10-06 收口轮 review 补登记）
 
 - 真模型面：仅条目 A 的 headless 冒烟过真 API；B/C/D/E 按各自验收节全 keyless（无需真模型）。
+- **orient 会话清单字段 = slug / 时间 / 会话数**——RFC 方案文本里的 preset 字段未实现：preset 藏在多帧 zstd 会话日志内，解码不属 keyless 秒级观测面（session-log lib 无解码器）。要用 preset 口径查会话 = session-log-export 导明文；字段升级待点名。
+- **被改路径的 30 个脚本未逐一实跑**（实跑成本档按各自头注触发）；补偿 = `node --check` + 相对 import 目标存在性全过、rehearsal seam 实跑（rehearsal-init 幂等成型通过：runtime/rehearsal-workspace 参考镜像刷新、产物未动、真盘零写入）、workspace-oracle spec 实际创建 runtime/harness-home/oracle-tests（该路径已被 keyless spec 触达）。
+- **探针脚本 20+ 处仍各自硬编码 runtime/rehearsal-workspace**（本轮仅机械替换）；「发现集中共享模块」的 10-05 教训在 scripts 侧只完成一半——rehearsal seam（lib/rehearsal.mjs REHEARSAL_REL）已存在但未被全部消费。集中化收口待点名另立。
+- **E 范围口径**：白话首屏按「顶层合同」= 合同层八份兑现；design/guides 设计与指南层、project-map/index 导航层未加（project-map 开头已是白话导语）。要不要扩展到 design/guides 层待点名。
 - run bundle 视图 = 有界字段读取（顶层标量 + session/workspace 一层嵌套），非完整 YAML 解析——lib 纯度约束下的取舍；元数据权威仍是 snapshots/README 合同与 snapshot.yml 自身。
 - scripts/ 未再分桶（10-05 职责分区已完成；剩余标签问题由 C 的三标签行收口）。
 - notes/_backlog 制度未动（用户未点名；点名另立 RFC）。

@@ -65,6 +65,11 @@ describe('profiles 与会话清单', () => {
     expect(listProfiles(join(home, 'missing'))).toEqual([])
   })
 
+  it('profiles 过滤 node_modules 等安装产物目录（它们不是 profile）', () => {
+    dir(join(home, 'profiles/node_modules'))
+    expect(listProfiles(home)).toEqual(['headless', 'web'])
+  })
+
   it('会话按 slug 汇总：计数、最新时间、近序排列', () => {
     const sessions = listSessions(home, 5)
     expect(sessions.total).toBe(2)

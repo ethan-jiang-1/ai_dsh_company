@@ -15,12 +15,12 @@ export function homeStatus(env = process.env, { dailyHome } = {}) {
   return devHomeStatus(env.DSH_HOME, { dailyHome })
 }
 
-/** 在场 profiles；home 未初始化/未生效时如实为空。 */
+/** 在场 profiles；home 未初始化/未生效时如实为空。node_modules 是 pnpm 装插件留下的产物目录，不是 profile。 */
 export function listProfiles(home) {
   const dir = join(home, 'profiles')
   if (!existsSync(dir)) return []
   return readdirSync(dir, { withFileTypes: true })
-    .filter(entry => entry.isDirectory() && !entry.name.startsWith('.'))
+    .filter(entry => entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules')
     .map(entry => entry.name).sort()
 }
 
