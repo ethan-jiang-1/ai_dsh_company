@@ -27,9 +27,9 @@
 - 反证两枚：①spec 内翻标（金标准 T1 翻「取消」⇒ zeroTol.cancelReported **按规则双计 = 2**——R2 与 R3 各报一次；本轮自纠：初版断言写 1 是我错，仪器是对的）②活反证 = case.yml 期望临时写错 → 自检腿 exit 1 → 还原 exit 0。
 - verify ALL PASS + vitest **348 项**（+3）+ snapshots-budget 50.9M/64M。
 
-## 边界与未做
+## 边界与未做（2026-10-06 用户复核轮两项已决，随决落地）
 
-- **labels case 14 行待人复核**（用户复核时可裁「待核实 vs 已出稿」口径——08/12 惯例选了待核实，本行沿用； drafts 内容我已核为覆盖任务，漂移源 = CEO 派活行全程未回写）。
-- **标注者 = 收割者本人**（非原初标流程的 fresh agent 独立标注）——流程偏离如实记；复核时按原流程盲审亦可。
-- **打分腿对已归档真盘动议断裂**（预先存在，非本轮引入）：sea-reconcile-2026/quote-z-2026 的 deliverables 已迁 deliverables-archive，scanInputOf 只认 live 路径 ⇒ --labels 全表跑崩。本轮用合成节过滤件拿收据；修复（scanInputOf 归档回退）待点名。
+- ~~labels case 14 行待人复核~~ → **已复核 2026-10-06**：用户裁定**待核实**口径（与 08/12 惯例一致）；labels 状态行与该行零容忍列已转「人已复核」。
+- **标注者 = 收割者本人**（非原初标流程的 fresh agent 独立标注）——流程偏离如实保留；用户直接复核替代了盲审环节。
+- ~~打分腿对已归档真盘动议断裂~~ → **已修 2026-10-06**（用户点名）：scanInputOf 加归档回退（`deliverables-archive/*-<slug>` 尾缀匹配，歧义 fail-loud）；红收据 = 修前全表跑 exit 1（真盘动议无任务书），绿收据 = 修后全表跑 exit 0——**真盘节首份全表打分收据**：R1 召回 29%／精确 44%、R2 召回 75%／精确 75%（含 case 14 待核实当候选 6）、R3 召回 50%／精确 100%；关闭动议 R3 静默正确、R2 在 quote-z 上仍报 3 stale（已关闭动议仍报 =7 计入零容忍）。
 - r6 材料 journal/meta 未入语料（语料收任务书形状；journal 是 journal-audit 的面）。

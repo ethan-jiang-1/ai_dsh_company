@@ -115,9 +115,20 @@ function scanInputOf(row) {
   }
   const dir = join(DELIVERABLES, row.id)
   const briefPath = join(dir, 'drafts/ceo.md')
-  if (!existsSync(briefPath)) throw new Error(`真盘动议无任务书：${briefPath}`)
-  const drafts = readdirSync(join(dir, 'drafts')).filter(f => f !== 'ceo.md')
-  return { brief: readFileSync(briefPath, 'utf8'), drafts, hasFinal: existsSync(join(dir, 'final.md')), label: row.id }
+  let briefDir = dir
+  if (!existsSync(briefPath)) {
+    // 归档回退（2026-10-06 修）：轮末收敛把动议 git mv 进 deliverables-archive/<日期>-<slug>/——
+    // live 路径消失后打分腿即崩（红收据 = 修前全表跑「真盘动议无任务书」exit 1）。
+    // 按尾缀 -<slug> 匹配归档目录；歧义（多日期同名）fail-loud 不猜。
+    const archiveRoot = join(DELIVERABLES, '..', 'deliverables-archive')
+    const hits = existsSync(archiveRoot)
+      ? readdirSync(archiveRoot).filter(name => name.endsWith(`-${row.id}`)) : []
+    if (hits.length === 0) throw new Error(`真盘动议无任务书（live 与归档均无）：${briefPath}`)
+    if (hits.length > 1) throw new Error(`真盘动议归档歧义（${hits.join('、')}）：${row.id}`)
+    briefDir = join(archiveRoot, hits[0])
+  }
+  const drafts = readdirSync(join(briefDir, 'drafts')).filter(f => f !== 'ceo.md')
+  return { brief: readFileSync(join(briefDir, 'drafts/ceo.md'), 'utf8'), drafts, hasFinal: existsSync(join(briefDir, 'final.md')), label: row.id }
 }
 
 function labelsMode(path) {
