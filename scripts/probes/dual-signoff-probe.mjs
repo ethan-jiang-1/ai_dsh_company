@@ -20,11 +20,12 @@
 // 用法：DSH_HOME=runtime/harness-home node scripts/probes/dual-signoff-probe.mjs
 // 退出码：0 = B2 不成立（CEO 侧可见/可处理——防线在场）；1 = B2 成立（缺口确认）；2 = 环境失败。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
+const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 let home

@@ -16,13 +16,14 @@
 // 预算：CEO 三轮 + 一次问询应答 ≈ $1–2 / 3–6 分钟。排练场 cwd，真盘零接触。
 // 用法：source dev/env.sh && node scripts/smoke/human-loop-e2e-smoke.mjs
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 import { launchChromium, loadChromium } from '../drivers/playwright.mjs'
 
-const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
+const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const INPUTS = join(REHEARSAL, 'inputs')
 const JOURNAL_GAP = join(REHEARSAL, 'journal', 'gift-rule-gap.md')
 const SHOTS = join(ROOT, 'snapshots/probes/human-loop-e2e', new Date().toISOString().slice(0, 10))

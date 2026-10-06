@@ -31,3 +31,19 @@ describe('launch config and runtime residue separation (item A)', () => {
     expect(env).not.toContain("'harness-home'")
   })
 })
+
+describe('rehearsal seam adoption (observation-hardening item A)', () => {
+  const consumeScriptLines = (rel: string) =>
+    readdirSync(join(repositoryRoot, rel), { withFileTypes: true })
+      .filter(entry => entry.isFile() && entry.name.endsWith('.mjs'))
+      .flatMap(entry =>
+        readFileSync(join(repositoryRoot, rel, entry.name), 'utf8').split('\n')
+          .map((text, i) => ({ file: `${rel}/${entry.name}`, no: i + 1, text })))
+
+  it('smoke/probes 不硬编码排练盘路径——一律走 lib/rehearsal.mjs 的 REHEARSAL_REL seam', () => {
+    const offenders = [...consumeScriptLines('scripts/smoke'), ...consumeScriptLines('scripts/probes')]
+      .filter(({ text }) => !text.trimStart().startsWith('//') && text.includes('runtime/rehearsal-workspace'))
+      .map(({ file, no }) => `${file}:${no}`)
+    expect(offenders, '排练盘路径集中在 REHEARSAL_REL seam——再搬家时只改一处，不做全量 grep').toEqual([])
+  })
+})

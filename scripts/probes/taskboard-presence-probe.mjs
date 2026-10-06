@@ -19,12 +19,13 @@
 //   P3 writeScope 重叠警告原文在场（C5a 同场复核，任务 writeScopes 故意重叠，零成本）
 // 用法：source dev/env.sh && node scripts/probes/taskboard-presence-probe.mjs
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
+const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const ASSETS = join(ROOT, 'snapshots/probes/taskboard-presence-probe/2026-10-04')
 mkdirSync(ASSETS, { recursive: true })
 const sleep = ms => new Promise(r => setTimeout(r, ms))

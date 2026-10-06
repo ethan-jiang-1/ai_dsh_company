@@ -5,6 +5,7 @@
 // vendor 产物是前置条件，不由此脚本重建；存在/运行通过不代表新鲜。构建配方见 guides/bootstrap。
 // 用法：source dev/env.sh && node scripts/smoke/release-smoke.mjs [--keep]
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
@@ -136,7 +137,7 @@ try {
     check(`roster 含 ${role}（零 broken）`, row !== undefined && row.broken === undefined,
       row === undefined ? '不在 roster' : (row.broken === undefined ? '' : String(row.broken).slice(0, 120)))
   }
-  const rehearsal = join(ROOT, 'runtime/rehearsal-workspace')
+  const rehearsal = join(ROOT, REHEARSAL_REL)
   mkdirSync(rehearsal, { recursive: true })
   const created = await rpc('session/create', { request: { cwd: rehearsal, agentPreset: 'ceo' } })
   check('session/create 挂上 ceo', created?.agentPreset === 'ceo' || created?.preset === 'ceo', JSON.stringify(created).slice(0, 120))

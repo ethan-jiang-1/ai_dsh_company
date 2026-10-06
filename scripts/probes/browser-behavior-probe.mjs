@@ -38,13 +38,14 @@
 //
 // 用法：node scripts/probes/browser-behavior-probe.mjs（栅栏内自证，无需沙箱升级）
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { existsSync, mkdirSync, readdirSync, symlinkSync, writeFileSync } from 'node:fs'
 import http from 'node:http'
 import { dirname, join, resolve } from 'node:path'
 
-const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
+const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const ASSETS = join(ROOT, 'snapshots/probes/browser-behavior-probe/2026-10-04')
 mkdirSync(join(REHEARSAL, 'browser-probe'), { recursive: true })
 mkdirSync(ASSETS, { recursive: true })

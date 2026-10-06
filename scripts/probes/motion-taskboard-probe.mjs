@@ -14,12 +14,13 @@
 //   A4 排练不污染——final.md 落指定排练路径 + 公司共享盘 deliverables/ 零新增
 // 用法：source dev/env.sh && node scripts/probes/motion-taskboard-probe.mjs
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readdir, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
+const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const MOTION_DIR = join(REHEARSAL, 'motion-taskboard')
 const DELIVERABLES = join(ROOT, 'company-workspace', 'deliverables')
 const ASSETS = join(ROOT, 'snapshots/probes/motion-taskboard-probe/2026-10-05')

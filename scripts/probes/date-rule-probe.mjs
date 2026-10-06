@@ -13,12 +13,13 @@
 // 用法：source dev/env.sh && node scripts/probes/date-rule-probe.mjs
 // 退出码：0 = PASS；1 = FAIL（红证，按「文案不够需机制」处置）；2 = 环境/启动失败。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { readdirSync, readFileSync, statSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
+const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const CEO_JOURNAL = join(REHEARSAL, 'kb/ceo/journal')
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 

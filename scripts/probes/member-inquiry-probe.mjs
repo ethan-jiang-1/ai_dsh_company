@@ -19,11 +19,12 @@
 // 用法：source dev/env.sh && node scripts/probes/member-inquiry-probe.mjs
 // 退出码：0 = 判定成功（REFUSED 或 ALLOWED 都算"答了这个问题"）；1 = 无法判定；2 = 环境/启动失败。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
+const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 const REFUSAL = /human interaction is unavailable|DELEGATED_CALLER/
 

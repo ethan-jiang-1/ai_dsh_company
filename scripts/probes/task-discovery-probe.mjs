@@ -19,12 +19,13 @@
 // 用法：DSH_HOME=runtime/harness-home node scripts/probes/task-discovery-probe.mjs
 // 退出码：0 = 三判据全过；1 = FAIL（按判据定性）；2 = 环境失败。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
+const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const SLUG = '2026-10-06-task-discovery-probe'
 const DELIV = join(REHEARSAL, 'deliverables', SLUG)
 const sleep = ms => new Promise(r => setTimeout(r, ms))

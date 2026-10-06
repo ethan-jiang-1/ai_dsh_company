@@ -17,13 +17,14 @@
 //   J6 lead 收口（turn/end）
 // 用法：source dev/env.sh && node scripts/probes/member-rescue-probe.mjs
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 import { launchChromium, loadChromium } from '../drivers/playwright.mjs'
 
-const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
+const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const SHOTS = join(ROOT, 'snapshots/probes/attention-e2e', new Date().toISOString().slice(0, 10) + '-rescue')
 mkdirSync(SHOTS, { recursive: true })
 const sleep = ms => new Promise(r => setTimeout(r, ms))

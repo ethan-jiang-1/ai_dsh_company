@@ -17,11 +17,12 @@
 // 用法：DSH_HOME=runtime/harness-home node scripts/probes/taskboard-scope-probe.mjs
 // 退出码：0 = B1+B3 成立（板 per-team = 设计事实，登记为观察）；1 = B1 失败（异常）；2 = 环境。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
+const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 let home

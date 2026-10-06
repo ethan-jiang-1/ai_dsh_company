@@ -14,12 +14,13 @@
 //   C2b 成员回报里可见 claim 冲突/重试通路（若有冲突）
 // 用法：source dev/env.sh && node scripts/probes/team-concurrency-probe.mjs
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, existsSync, readFileSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
+const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const TARGET = join(REHEARSAL, 'journal', 'team-concurrency-probe.md')
 mkdirSync(dirname(TARGET), { recursive: true })
 const sleep = ms => new Promise(r => setTimeout(r, ms))

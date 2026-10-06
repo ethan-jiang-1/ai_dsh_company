@@ -16,11 +16,12 @@
 //   R4 res 的恢复后回报被 lead 转述（续行通路在崩溃后仍通）
 // 用法：source dev/env.sh && node scripts/probes/team-recovery-probe.mjs
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
 import { readRecords } from '../lib/session-log.mjs'
 
-const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
+const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const MARKER = `R7-恢复标记-${String(Date.now() % 100000)}`
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 const results = []
