@@ -1,5 +1,6 @@
 # 角色内容设计（persona / skills / KB / 模板）
 
+> 什么时候读：设计或重构角色内容（persona、skills、KB 骨架）时；现时语义查 [../presets.md](../presets.md)。
 > 机制已定（[10](./architecture.md) / [20](./roles-isolation.md)）；本篇是**内容面**：
 > 五个角色到底"是谁、知道什么、会什么、产出什么"。demo 成败在这里，不在机制。
 > 状态：已定稿——五角色内容随 R2 全员落地（现时语义 = [../presets.md](../presets.md) 合同与各 preset 文件；模型路由 = 全员同模型，D16）。

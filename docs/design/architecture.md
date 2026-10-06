@@ -1,5 +1,6 @@
 # 架构：repo 形态、组合层设计与插件计数
 
+> 什么时候读：想懂公司怎么组装、组合层怎么分层，或改机制前。这份是设计总纲——repo 怎么摆、插件怎么计数，细节按节进。
 > 总入口与决策台账：[index.md](../index.md)。
 > 依据：FAQ 13（`_faq_on_digested/13_expert-plugin-repo-organization`）+ DSH 源码工作树逐条核实
 > （`packages/preset/*`、`packages/subagent/*`、`packages/experimental/agent-team/*`、`packages/workflow/*`、

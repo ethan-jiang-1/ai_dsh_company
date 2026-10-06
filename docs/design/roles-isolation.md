@@ -1,5 +1,6 @@
 # 每个角色完全独立 · 深挖篇（context / tools / knowledge / workflow 的机制级安排）
 
+> 什么时候读：动角色隔离、上下文/工具/KB 边界，或委派机制前。
 > 承接 [architecture.md](./architecture.md)。那一篇回答"repo 怎么摆"；
 > 这一篇回答你这次的问题：**长期做 Agent 的人最在乎的"每个 Agent 上下文完整独立"，
 > 在 DSH 里到底怎么安排最合理**。全部结论在 DSH 工作树源码逐条核实（关键处标了文件）。

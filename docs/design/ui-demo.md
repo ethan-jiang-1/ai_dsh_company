@@ -1,5 +1,6 @@
 # UI 演示层 · 怎么在 Web 上示范组织的协调工作
 
+> 什么时候读：改 Web 界面、加面板/卡片，或调 demo 视觉前。
 > 承接 [architecture.md](./architecture.md) 与
 > [roles-isolation.md](./roles-isolation.md)；总入口 [index.md](../index.md)。
 > 本篇回答：demo 要"看见他们协调"，DSH Web UI 给到哪一层、我们自己要写哪一层。

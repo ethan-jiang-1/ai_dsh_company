@@ -1,5 +1,6 @@
 # 预算限流与 demo 运维
 
+> 什么时候读：要限流省钱、demo 现场出状况、或回放复盘时。路线 = 旋钮表 → 症状动作表。
 > 五个角色 + 各自 workers 的组织会烧 token、会出状况。本篇收拢**限流旋钮**与
 > **demo 运维 runbook**（症状→动作），并给回放复盘的路径。数值默认值均核实自
 > DSH 工作树（`packages/experimental/agent-team/src/index.ts`、
