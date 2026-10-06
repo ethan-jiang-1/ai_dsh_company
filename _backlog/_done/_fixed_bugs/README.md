@@ -6,4 +6,4 @@
 
 ## Next BUG ID
 
-**BUG-006** — 已分配：BUG-001（本目录）、BUG-002..005（活跃，dual-ceo / present-no-role-gate / claim-yield / dual-signoff）。
+**BUG-007** — 已分配：BUG-001..005（本目录）、BUG-006（活跃，ceo-meta-vocab-drift，2026-10-07 r7 归档审计发现）。

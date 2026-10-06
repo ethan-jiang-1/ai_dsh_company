@@ -1,6 +1,6 @@
 # 2026-10-06 · r7 动议完整终局：r6 同题真模型重跑到 final + 真盘语料收割
 
-状态：proposed（批准：用户 2026-10-06 两项范围裁决——①内容 = r6 同题完整重跑；②通道 = headless + orient 走查。授权链 = 用户「A 后接 B」方向确认；前包 = [orient-scan-view](../implemented/2026-10-06-orient-scan-view.md)——扫描节已入 orient，本包用走查它的实战价值；前包 = [test-asset-harvest](../implemented/2026-10-06-test-asset-harvest.md)——r6-baseline（mid-flight）录制机制与运行态事实的家）
+状态：implemented（已交付 2026-10-07，本文件即毕业 Note——RFC 三件 + 验证记录合一。批准：用户 2026-10-06 两项范围裁决——①内容 = r6 同题完整重跑；②通道 = headless + orient 走查。授权链 = 用户「A 后接 B」方向确认；前包 = [orient-scan-view](2026-10-06-orient-scan-view.md)——扫描节已入 orient，本包用走查它的实战价值；前包 = [test-asset-harvest](2026-10-06-test-asset-harvest.md)——r6-baseline（mid-flight）录制机制与运行态事实的家）
 
 ## 问题
 
@@ -14,6 +14,21 @@
 4. **审计**：`deliverables-check`（交付物三态机器判据：final = Lead present、agentPreset=ceo、depth=0）跑在归档快照上。
 5. **语料收割**：final 场景收真盘 case 16 入 labels.md——**判据先行**（先立标注判据再跑打分腿）；机器标注后**呈批待人复核**（用户裁决口径，镜像 case 14/15 收口）；打分腿 `--labels --variants` 全表重跑（真盘行 2→3）。
 6. **收割三问**（dev-loop §12 首条）按实答，异常→BUG 卡、运行态事实→场景 README/Note。
+
+## 验证记录（全部实跑 2026-10-07）
+
+- **①录制**：`replay-smoke --record --keep --wall 7200` 真模型完成（任务源 session.v3.jsonl = r6 同题，1 段 514s）——**final 在盘**，1 lead（771 行）+ 4 child；`snapshot-motion` 因 `/var` 符号链接拒工（oracle 纪律行为正确）改手工簿记：sessions/（zstd 多帧走 CLI 解，§3.7 教义）+ workspace.expected + snapshot.yml（代码锚 = `68e42ac`）。归档 = `snapshots/replay/r7-motion-final/`（README 记运行态事实）。
+- **②预算**：红 = `snapshots-budget 68.4M > 64M` → 处置 = r6 四个 child fixtures（≈15M，登记债点名物）外置 `runtime/cold-storage/`（runtime/README 登记；仓内 raw.tar.zst 承担恢复与备份连续性；r6 不声明 replay 故无消费面断裂）→ 绿 = `54.5M/64M`。附带红 = r7 journal 两份尾换行（r6 同款教训，gate 红→规范→绿）。
+- **③走查**：切片 `orient --workspace` 单独 commit（`20d32a4`，红绿环+反证收据在彼 commit）；本包对归档快照复跑 = 「已关闭（final 在场，不报）」——**关闭门在完整真终局上的活体验证**；`--scenario replay/r7-motion-final` 视图字段全解析。
+- **④审计**：`deliverables-check --only recon-pack` = 成品 1（final，Lead ceo depth0 present）+ 过程稿 7 + **违规 1 条 `meta-shape-bad`**（真发现 → [BUG-006](../../_backlog/bugs/BUG-006-ceo-meta-vocab-drift.md)：CEO 词表外值，生成侧修，快照不重写）；中途踩 T-7 教义（--only 须给剥日期前缀的归一 slug）。
+- **⑤语料**：case 16 fixture（cases/16-r7-recon-pack，brief = 真模型 CEO 原文）+ labels 真盘行（slug = `recon-pack`）判据先行；自检腿 ALL PASS（16 case，三规则全不报 = 真盘真阴性）；`--labels --variants` 全表 exit 0，聚合指标与收口时数字一致（case 16 无新增 TP/FP）；**机器标注待人复核 = 呈批停止点**。真盘产物归业务历史家 `deliverables-archive/2026-10-07-recon-pack/`（打分腿输入契约）。
+- **⑥收割三问**：①异常 = BUG-006（meta 词表越表）+ T-7/--only 踩坑（既有教义，未新增卡）；②值得钉 = r7 场景本身 + case 16；③运行态事实 = **同题 8.5 分钟到 final vs r6 60 分钟无 final（模型侧方差，wall 兜底纪律保留）**、**CEO 本场回写了状态行（case 14 反形状——两种真盘形状齐了）**、/var 符号链接拒 captureWorkspace。均入场景 README。
+
+## 边界与未做
+
+- case 16 机器标注**待人复核**（本包数字的条件值口径同前；复核呈批随简报呈上）。
+- BUG-006 修复（生成侧 meta 模板钉词表）未做——独立小条目，待点名。
+- r7 未声明可运行 replay（同 r6 先例）；fixtures 消费面 = 审计/对照，非重放。
 
 ## 输掉的方案（备选必载，留尸）
 
