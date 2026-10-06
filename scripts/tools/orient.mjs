@@ -1,46 +1,63 @@
 // 状态：常驻
-// Orient：keyless 只读运行态观测（RFC driver-surface-package 条目 B；preset 字段 =
-// observation-hardening 条目 B）——不开 web 会话就能看到当前 home（含「未 source dev/env.sh
-// = 日用 home」警告）、在场 profiles、最近会话（含 preset）、公司盘概览与便宜检查清单；
-// --scenario <kind>/<场景> 按 snapshots/README「Run bundle 引用合同」计算 run bundle 视图
-// （引用不复制，不落盘 manifest）。何时跑：想看运行态全景 / 排查「现在到底跑在哪个 home」/
-// 回查某场景证据链时；成本：纯 fs 只读 + zstd 解最近会话头部（前 64KB），秒级，无模型无浏览器。
+// Orient：keyless 只读运行态观测（RFC driver-surface-package 条目 B；preset 字段与
+// --session 历史会话口径 = observation-hardening 条目 B / observation-closeout 条目 A）
+// ——不开 web 会话就能看到当前 home（含「未 source dev/env.sh = 日用 home」警告）、在场
+// profiles、最近会话（含 preset）、公司盘概览与便宜检查清单；--session <slug>[/<id前缀>]
+// 列/查某 slug 历史会话的 preset·cwd·createdAt；--scenario <kind>/<场景> 按 snapshots/README
+// 「Run bundle 引用合同」计算 run bundle 视图（引用不复制，不落盘 manifest）。何时跑：想看
+// 运行态全景 / 排查「现在到底跑在哪个 home」/ 查某 slug 历史会话口径 / 回查某场景证据链时；
+// 成本：纯 fs 只读 + zstd 解会话头部（前 64KB），秒级，无模型无浏览器。
 // 纯逻辑核心 = scripts/lib/orient.mjs（keyless 测试面）；git / zstd 等真实进程效果只住本 CLI 侧。
 import { execFileSync } from 'node:child_process'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { repositoryRoot } from '../lib/repository-layout.mjs'
-import { homeStatus, listSessions, orientState, parseSessionPreset, renderOrient, renderRunBundle, runBundleView } from '../lib/orient.mjs'
+import { homeStatus, listSessions, listSlugSessions, orientState, parseSessionHead, renderOrient, renderRunBundle, renderSessionView, runBundleView } from '../lib/orient.mjs'
 
 const ROOT = repositoryRoot
 
-/** 最近会话的 preset：解该 slug 下最新会话日志的头部（zstd 多帧用 CLI 解——Node 内置只解第一帧，
- *  教义 = dev-loop §3.7）；zstd 缺失/解码失败 → undefined（渲染为「不可用」，不伪造）。 */
+/** slug 目录下最新会话日志文件（.jsonl 或 .jsonl.zstd，mtime 近序第一）；无则 null。 */
+function newestLogFile(sessionDir) {
+  const logs = readdirSync(sessionDir)
+    .filter(name => /\.jsonl(\.zstd)?$/.test(name))
+    .map(name => ({ path: join(sessionDir, name), mtime: statSync(join(sessionDir, name)).mtime }))
+    .sort((a, b) => b.mtime - a.mtime)
+  return logs[0]?.path ?? null
+}
+
+/** 解指定会话日志的头部（zstd 多帧用 CLI 解——Node 内置只解第一帧，教义 = dev-loop §3.7）；
+ *  只取前 64KB（type:session 头行总在开头）。zstd 缺失/不可读 → undefined（「不可用」，不伪造）。 */
+function decodeSessionHead(homePath, slug, sessionId) {
+  try {
+    const log = newestLogFile(join(homePath, 'sessions', slug, sessionId))
+    if (!log) return undefined
+    const head = log.endsWith('.zstd')
+      ? execFileSync('zstd', ['-d', '-c', log], { encoding: 'utf8', maxBuffer: 512 * 1024 * 1024 }).slice(0, 65536)
+      : readFileSync(log, 'utf8').slice(0, 65536)
+    return parseSessionHead(head)
+  } catch {
+    return undefined
+  }
+}
+
+/** 最近会话的 preset：解该 slug 下最新会话日志头部。 */
 function sessionPresetFor(homePath, slug) {
   try {
     const slugDir = join(homePath, 'sessions', slug)
     const sessionDirs = readdirSync(slugDir, { withFileTypes: true })
       .filter(entry => entry.isDirectory() && entry.name.startsWith('session-'))
-      .map(entry => ({ path: join(slugDir, entry.name), mtime: statSync(join(slugDir, entry.name)).mtime }))
+      .map(entry => ({ name: entry.name, mtime: statSync(join(slugDir, entry.name)).mtime }))
       .sort((a, b) => b.mtime - a.mtime)
     if (sessionDirs.length === 0) return undefined
-    const logs = readdirSync(sessionDirs[0].path)
-      .filter(name => /\.jsonl(\.zstd)?$/.test(name))
-      .map(name => ({ path: join(sessionDirs[0].path, name), mtime: statSync(join(sessionDirs[0].path, name)).mtime }))
-      .sort((a, b) => b.mtime - a.mtime)
-    if (logs.length === 0) return undefined
-    const log = logs[0].path
-    const head = log.endsWith('.zstd')
-      ? execFileSync('zstd', ['-d', '-c', log], { encoding: 'utf8', maxBuffer: 512 * 1024 * 1024 }).slice(0, 65536)
-      : readFileSync(log, 'utf8').slice(0, 65536)
-    return parseSessionPreset(head)
+    return decodeSessionHead(homePath, slug, sessionDirs[0].name)?.preset
   } catch {
-    return undefined   // zstd 缺失 / 日志不可读 → 「不可用」
+    return undefined
   }
 }
 
 const args = process.argv.slice(2)
 const scenarioIndex = args.indexOf('--scenario')
+const sessionIndex = args.indexOf('--session')
 if (scenarioIndex !== -1) {
   const selection = args[scenarioIndex + 1]
   if (!selection) {
@@ -51,6 +68,37 @@ if (scenarioIndex !== -1) {
     console.log(renderRunBundle(runBundleView(ROOT, selection)))
   } catch (error) {
     // fail-loud：场景缺失/歧义直接报错，不静默降级
+    console.error(String(error.message ?? error))
+    process.exit(1)
+  }
+} else if (sessionIndex !== -1) {
+  const selection = args[sessionIndex + 1]
+  if (!selection) {
+    console.error('用法：pnpm orient --session <slug>[/<id前缀>]（slug 清单 = 主视图会话节）')
+    process.exit(1)
+  }
+  const home = homeStatus(process.env)
+  if (home.kind !== 'ok') {
+    console.error('先 source dev/env.sh（--session 需要生效的开发 home）')
+    process.exit(1)
+  }
+  try {
+    const [slug, idPrefix] = selection.split('/')
+    const all = listSlugSessions(home.home, slug)   // slug 不存在 → fail-loud
+    let rows
+    if (idPrefix) {
+      // 前缀同时兼容全 id（session-…）与 uuid 部分（用户从输出里抄哪段都行）
+      const matched = all.filter(row => row.id.startsWith(idPrefix) || row.id.replace(/^session-/, '').startsWith(idPrefix))
+      if (matched.length === 0) throw new Error(`id 前缀 ${idPrefix} 在 ${slug} 下无命中`)
+      if (matched.length > 1) throw new Error(`id 前缀 ${idPrefix} 命中 ${matched.length} 个（${matched.map(m => m.id).join(', ')}）——加长前缀`)
+      rows = matched
+    } else {
+      rows = all.slice(0, 10)   // 解码成本界：列表视图最多解 10 个头部
+    }
+    const withHead = rows.map(row => ({ ...row, head: decodeSessionHead(home.home, slug, row.id) }))
+    console.log(renderSessionView(slug, withHead, { total: all.length }))
+  } catch (error) {
+    // fail-loud：slug/id 不存在或歧义直接报错，不静默降级
     console.error(String(error.message ?? error))
     process.exit(1)
   }

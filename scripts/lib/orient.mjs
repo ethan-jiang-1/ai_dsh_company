@@ -61,16 +61,36 @@ export const CHECKS = [
   { cmd: 'pnpm orient --scenario <kind>/<场景>', what: 'run bundle 视图（引用合同 = snapshots/README）' },
 ]
 
-/** 从会话日志明文解析 agentPreset：只认 type:session 头行。三态 = string（有 preset）|
- *  null（头行在场但无 preset——裸 CLI 会话）| undefined（头行不在场/解码失败——不可判定，不伪造）。 */
-export function parseSessionPreset(text) {
+/** 列某 slug 下全部会话（id/mtime 近序）；slug 不存在 fail-loud（调用方决定显示条数与解码成本）。 */
+export function listSlugSessions(home, slug) {
+  const slugDir = join(home, 'sessions', slug)
+  if (!existsSync(slugDir)) throw new Error(`session slug 不存在: ${slug}`)
+  return readdirSync(slugDir, { withFileTypes: true })
+    .filter(entry => entry.isDirectory() && entry.name.startsWith('session-'))
+    .map(entry => ({ id: entry.name, mtime: statSync(join(slugDir, entry.name)).mtime.toISOString() }))
+    .sort((a, b) => new Date(b.mtime).getTime() - new Date(a.mtime).getTime())
+}
+
+/** 会话头部三字段（preset 三态 = string|null|undefined；createdAt/cwd = 数值/字符串或 null）。 */
+export function parseSessionHead(text) {
   for (const line of text.split('\n')) {
     if (!line.trim()) continue
     let event
     try { event = JSON.parse(line) } catch { continue }   // 截断的尾部行按非法跳过（头行总在日志开头）
-    if (event?.type === 'session') return typeof event.agentPreset === 'string' ? event.agentPreset : null
+    if (event?.type === 'session') {
+      return {
+        preset: typeof event.agentPreset === 'string' ? event.agentPreset : null,
+        createdAt: typeof event.createdAt === 'number' ? event.createdAt : null,
+        cwd: typeof event.cwd === 'string' ? event.cwd : null,
+      }
+    }
   }
   return undefined
+}
+
+/** 从会话日志明文解析 agentPreset：parseSessionHead 的 preset 投影（三态语义不变）。 */
+export function parseSessionPreset(text) {
+  return parseSessionHead(text)?.preset
 }
 
 /** 组装观测态。gitStatus / sessionPresets 由调用方注入（lib 不起进程）：前者=数字或 null，
@@ -173,6 +193,20 @@ export function runBundleView(root, selection) {
     },
     verification: `node scripts/smoke/replay-smoke.mjs --scenario ${canonical}`,
   }
+}
+
+/** 渲染 --session 视图。rows = [{id, mtime, head}]——head 由 CLI 解码注入（undefined = 解码失败）。 */
+export function renderSessionView(slug, rows, { total } = {}) {
+  const scope = total === undefined ? `显示 ${rows.length}` : `显示 ${rows.length} / 共 ${total}`
+  const lines = [`== 会话明细：${slug}（${scope}）==`]
+  for (const { id, mtime, head } of rows) {
+    const preset = head === undefined ? undefined : head.preset
+    const presetText = preset === undefined ? '（不可用）' : preset === null ? '（无——非 preset 会话）' : preset
+    const created = head?.createdAt ? new Date(head.createdAt).toISOString() : '（不可用）'
+    const cwd = head?.cwd ?? '（不可用）'
+    lines.push(`  ${id} · ${mtime} · preset ${presetText} · cwd ${cwd} · created ${created}`)
+  }
+  return lines.join('\n')
 }
 
 /** 渲染 run bundle 视图（字段缺失/引用断链如实呈现，不伪造）。 */

@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../scripts/lib/repository-layout.mjs'
-import { homeStatus, listProfiles, listSessions, orientState, parseSessionPreset, renderOrient, runBundleView, workspaceOverview } from '../../scripts/lib/orient.mjs'
+import { homeStatus, listProfiles, listSessions, listSlugSessions, orientState, parseSessionHead, parseSessionPreset, renderOrient, renderSessionView, runBundleView, workspaceOverview } from '../../scripts/lib/orient.mjs'
 
 // 条目 B 判据（RFC driver-surface-package）：pnpm orient 的 keyless 只读核心——
 // home 判定（requireDevHome 同款但只警告不抛）/ profiles / 会话清单 / 公司盘概览 /
@@ -43,6 +43,10 @@ beforeEach(() => {
   dir(join(workspace, 'deliverables/old-motion'), '2026-10-04T08:00:00Z')
   dir(join(workspace, 'deliverables/new-motion'), '2026-10-06T09:00:00Z')
 })
+
+/** 会话头行夹具：type:session + 可选 agentPreset（条目 B/A 共用）。 */
+const headerLine = (preset?: string) =>
+  JSON.stringify({ type: 'session', version: 4, id: 's1', cwd: '/x', ...(preset ? { agentPreset: preset } : {}) })
 
 describe('home status（日用 home 判定，只警告不抛）', () => {
   it('未设置 / 正常 / 双向重叠 三态', () => {
@@ -113,8 +117,6 @@ describe('orientState + renderOrient', () => {
 })
 
 describe('session preset（observation-hardening 条目 B）', () => {
-  const headerLine = (preset?: string) =>
-    JSON.stringify({ type: 'session', version: 4, id: 's1', cwd: '/x', ...(preset ? { agentPreset: preset } : {}) })
 
   it('解析 type:session 头行的 agentPreset；无 preset = null、非法/缺席 = undefined（三态不混淆）', () => {
     expect(parseSessionPreset(`${headerLine('ceo')}\n{"type":"permission/preset","data":{"preset":"workspace-write"}}\n{"trunc`)).toBe('ceo')
@@ -132,6 +134,38 @@ describe('session preset（observation-hardening 条目 B）', () => {
     expect(text).toContain('（不可用）')
     const plain = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace }))
     expect(plain).not.toContain('preset')
+  })
+})
+
+describe('session 视图（observation-closeout 条目 A）', () => {
+  it('listSlugSessions 近序列出全部会话；slug 不存在 fail-loud', () => {
+    const rows = listSlugSessions(home, 'slug-company')
+    expect(rows.map(r => r.id)).toEqual(['session-2222', 'session-1111'])
+    expect(rows[0].mtime).toBe('2026-10-06T12:00:00.000Z')
+    expect(() => listSlugSessions(home, 'no-such-slug')).toThrow('session slug 不存在')
+  })
+
+  it('parseSessionHead 抽 preset/createdAt/cwd；parseSessionPreset 三态语义不变', () => {
+    const text = `${JSON.stringify({ type: 'session', id: 's1', cwd: '/repo', createdAt: 1790074328381, agentPreset: 'ceo' })}\n{"type":"permission/preset"}\n{"trunc`
+    expect(parseSessionHead(text)).toEqual({ preset: 'ceo', createdAt: 1790074328381, cwd: '/repo' })
+    expect(parseSessionHead(`${headerLine()}\n`)).toEqual({ preset: null, createdAt: null, cwd: '/x' })
+    expect(parseSessionHead('not json')).toBeUndefined()
+    expect(parseSessionPreset(`${headerLine('ceo')}\n`)).toBe('ceo')
+  })
+
+  it('renderSessionView：preset 三态与 head 缺失（不可用）如实分行呈现', () => {
+    const rows = [
+      { id: 'session-1', mtime: '2026-10-06T10:00:00.000Z', head: { preset: 'ceo', createdAt: 1790074328381, cwd: '/repo' } },
+      { id: 'session-2', mtime: '2026-10-06T09:00:00.000Z', head: { preset: null, createdAt: null, cwd: null } },
+      { id: 'session-3', mtime: '2026-10-06T08:00:00.000Z', head: undefined },
+    ]
+    const text = renderSessionView('slug-company', rows, { total: 3 })
+    expect(text).toContain('共 3')
+    expect(text).toContain('preset ceo')
+    expect(text).toContain('（无——非 preset 会话）')
+    expect(text).toContain('（不可用）')
+    expect(text).toContain('cwd /repo')
+    expect(text).toContain('created 2026-09-22T10:52:08.381Z')   // createdAt 1790074328381 的 ISO
   })
 })
 
