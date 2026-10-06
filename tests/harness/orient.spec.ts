@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../scripts/lib/repository-layout.mjs'
-import { homeStatus, listProfiles, listSessions, orientState, renderOrient, runBundleView, workspaceOverview } from '../../scripts/lib/orient.mjs'
+import { homeStatus, listProfiles, listSessions, orientState, parseSessionPreset, renderOrient, runBundleView, workspaceOverview } from '../../scripts/lib/orient.mjs'
 
 // 条目 B 判据（RFC driver-surface-package）：pnpm orient 的 keyless 只读核心——
 // home 判定（requireDevHome 同款但只警告不抛）/ profiles / 会话清单 / 公司盘概览 /
@@ -109,6 +109,29 @@ describe('orientState + renderOrient', () => {
     expect(text).not.toContain(daily)
     expect(state.home.kind).toBe('unset')
     expect(state.profiles).toEqual([])
+  })
+})
+
+describe('session preset（observation-hardening 条目 B）', () => {
+  const headerLine = (preset?: string) =>
+    JSON.stringify({ type: 'session', version: 4, id: 's1', cwd: '/x', ...(preset ? { agentPreset: preset } : {}) })
+
+  it('解析 type:session 头行的 agentPreset；无 preset = null、非法/缺席 = undefined（三态不混淆）', () => {
+    expect(parseSessionPreset(`${headerLine('ceo')}\n{"type":"permission/preset","data":{"preset":"workspace-write"}}\n{"trunc`)).toBe('ceo')
+    expect(parseSessionPreset(`${headerLine()}\n`)).toBeNull()
+    expect(parseSessionPreset('not json\n{"type":"session","agentPreset":"ceo"}')).toBe('ceo')
+    expect(parseSessionPreset('')).toBeUndefined()
+  })
+
+  it('注入 sessionPresets 后渲染 preset 列；无 preset/不可用/未注入三态如实', () => {
+    dir(join(home, 'sessions/slug-plain/session-4444'))
+    const state = orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace, sessionPresets: { 'slug-company': 'ceo', 'slug-rehearsal': null, 'slug-plain': undefined } })
+    const text = renderOrient(state)
+    expect(text).toContain('preset ceo')
+    expect(text).toContain('（无——非 preset 会话）')
+    expect(text).toContain('（不可用）')
+    const plain = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace }))
+    expect(plain).not.toContain('preset')
   })
 })
 

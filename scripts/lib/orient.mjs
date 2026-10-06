@@ -61,8 +61,21 @@ export const CHECKS = [
   { cmd: 'pnpm orient --scenario <kind>/<场景>', what: 'run bundle 视图（引用合同 = snapshots/README）' },
 ]
 
-/** 组装观测态。gitStatus 由调用方注入（数字或 null=不可用），保持 lib 无进程效果。 */
-export function orientState({ env = process.env, dailyHome, workspaceRoot, gitStatus = null, sessionLimit = 5 } = {}) {
+/** 从会话日志明文解析 agentPreset：只认 type:session 头行。三态 = string（有 preset）|
+ *  null（头行在场但无 preset——裸 CLI 会话）| undefined（头行不在场/解码失败——不可判定，不伪造）。 */
+export function parseSessionPreset(text) {
+  for (const line of text.split('\n')) {
+    if (!line.trim()) continue
+    let event
+    try { event = JSON.parse(line) } catch { continue }   // 截断的尾部行按非法跳过（头行总在日志开头）
+    if (event?.type === 'session') return typeof event.agentPreset === 'string' ? event.agentPreset : null
+  }
+  return undefined
+}
+
+/** 组装观测态。gitStatus / sessionPresets 由调用方注入（lib 不起进程）：前者=数字或 null，
+ *  后者 = slug→preset 映射或 null（null = 不渲染 preset 列；映射内 undefined = 「不可用」）。 */
+export function orientState({ env = process.env, dailyHome, workspaceRoot, gitStatus = null, sessionPresets = null, sessionLimit = 5 } = {}) {
   const home = homeStatus(env, { dailyHome })
   const effective = home.kind === 'ok' ? home.home : null
   return {
@@ -70,6 +83,7 @@ export function orientState({ env = process.env, dailyHome, workspaceRoot, gitSt
     profiles: effective ? listProfiles(effective) : [],
     sessions: effective ? listSessions(effective, sessionLimit) : { total: 0, recent: [] },
     workspace: { root: workspaceRoot, ...workspaceOverview(workspaceRoot), gitStatus },
+    sessionPresets,
     checks: CHECKS,
   }
 }
@@ -87,7 +101,12 @@ export function renderOrient(state) {
   } else {
     lines.push(`共 ${state.sessions.total} 个 slug；最近：`)
     for (const { slug, sessions, latest } of state.sessions.recent) {
-      lines.push(`  ${slug} · ${sessions} 会话 · 最新 ${latest}`)
+      let preset = ''
+      if (state.sessionPresets !== null) {
+        const value = state.sessionPresets[slug]
+        preset = ` · preset ${value === undefined ? '（不可用）' : value === null ? '（无——非 preset 会话）' : value}`
+      }
+      lines.push(`  ${slug} · ${sessions} 会话 · 最新 ${latest}${preset}`)
     }
   }
   lines.push('', '== 公司盘 ==')
