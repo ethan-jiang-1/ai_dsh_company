@@ -140,3 +140,52 @@ describe('双源核对（2026-09-26 采纳结论的一部分）', () => {
     expect(roleHasDraft('cfo', ['cfo-review.md'])).toBe(true)
   })
 })
+
+describe('真实状态漂移形状（case 14 = r6-baseline 录制收割，2026-10-06）', () => {
+  // 真实材料形状：六条结构化派活行全程「待办」未回写，六任务稿（含互审稿）全部落盘，
+  // 动议开着（无 final）。金标准（labels.md case 14 行，待人复核）= 六任务全「待核实」。
+  const BRIEF = [
+    '派活｜T1｜vp-sales｜出定价与买点分层结论｜依赖：无｜状态：待办',
+    '派活｜T2｜vp-eng｜出交付包技术可行性｜依赖：无｜状态：待办',
+    '派活｜T3｜coo｜出产能承接结论｜依赖：T2｜状态：待办',
+    '派活｜T4｜cfo｜出毛利口径与合规闸门结论｜依赖：T1｜状态：待办',
+    '派活｜T5｜cfo｜审定价与毛利并出评审稿｜依赖：T1、T4｜状态：待办',
+    '派活｜T6｜coo｜审交付承接并出评审稿｜依赖：T1、T2、T3｜状态：待办',
+  ].join('\n')
+  const DRAFTS = ['ceo.md', 'cfo-review.md', 'cfo.md', 'coo-review.md', 'coo.md', 'vp-eng.md', 'vp-sales.md']
+  const goldRow = (statuses: string[]) => ({
+    id: 'drift', kind: 'synthetic', closed: false, approvals: 0, remind: '', zeroNote: '',
+    tasks: statuses.map((status, i) => ({ role: ['vp-sales', 'vp-eng', 'coo', 'cfo', 'cfo', 'coo'][i], task: `T${String(i + 1)}`, status })),
+  })
+  const scans = () => {
+    const r2 = scanR2(BRIEF, DRAFTS)
+    const r3 = scanR3(BRIEF, DRAFTS, false)
+    return new Map([['drift', { r1: [], r2, r3, drafts: DRAFTS }]])
+  }
+
+  it('R2 六候选全 stale；R3 两候选 + 四任务沉入 blocked（依赖完成判定被漂移污染）', () => {
+    expect(scanR2(BRIEF, DRAFTS).map(t => [t.task, t.stale])).toEqual([
+      ['T1', true], ['T2', true], ['T3', true], ['T4', true], ['T5', true], ['T6', true],
+    ])
+    const r3 = scanR3(BRIEF, DRAFTS, false)
+    expect(r3.candidates.map(t => t.task)).toEqual(['T1', 'T2'])
+    expect(r3.blocked.map(t => t.task)).toEqual(['T3', 'T4', 'T5', 'T6'])
+  })
+
+  it('金标准=六待核实 ⇒ R2 全 surfaced 但类别错（待核实当候选×6）；R3 漏 4（沉入不可见 blocked）', () => {
+    const { M } = scoreLabels([goldRow(['待核实', '待核实', '待核实', '待核实', '待核实', '待核实'])], scans())
+    expect(M.R2.reported).toBe(6)
+    expect(M.R2.tp).toBe(6)
+    expect(M.R2.staleAsCandidate).toBe(6)
+    expect(M.R2.falseImmediate).toBe(0)
+    expect(M.R3.reported).toBe(2)
+    expect(M.R3.miss).toBe(4)
+    expect(M.R3.missWithDraft).toBe(4)
+  })
+
+  it('反证：同一扫描形状下翻一条金标准为「取消」⇒ zeroTol.cancelReported 见红计数（仪器能分辨对错标注）', () => {
+    const { M, zeroTol } = scoreLabels([goldRow(['取消', '待核实', '待核实', '待核实', '待核实', '待核实'])], scans())
+    expect(zeroTol.cancelReported).toBe(2)      // T1 被 R2 与 R3 各报一次 ⇒ 零容忍按规则双计
+    expect(M.R2.tp).toBe(5)                       // 其余五条不受影响
+  })
+})
