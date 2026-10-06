@@ -269,7 +269,7 @@ export function scoreLabels(rows, scans) {
     // 审批：三条规则结构性看不见 ⇒ 全部计漏报（零容忍）
     zeroTol.approvalMiss += row.approvals
 
-    details.push({ id: row.id, r1, r2, r3, gold: row.tasks, approvals: row.approvals })
+    details.push({ id: row.id, r1, r2, r3, ...(r2c !== undefined ? { r2c } : {}), ...(r3d !== undefined ? { r3d } : {}), gold: row.tasks, approvals: row.approvals })
   }
   return { M, zeroTol, details }
 }

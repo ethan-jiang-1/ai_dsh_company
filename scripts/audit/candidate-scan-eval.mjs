@@ -9,12 +9,13 @@
 // **人复核前给出的是"按此草标"的条件值**）。它能给的证据 = 三规则 vs 标注的
 // 召回/精确/错误已完成/错误需立即处理 + **零容忍违规计数**（审批漏报 / 取消误报 / 阻塞漏显示）。
 //
-// 用法：source dev/env.sh && node scripts/audit/candidate-scan-eval.mjs [--labels <path>]
+// 用法：source dev/env.sh && node scripts/audit/candidate-scan-eval.mjs [--labels <path>] [--variants]
+//   --variants：与 --labels 连用——并排实跑变体 R2′（关闭检查）/ R3′（双源依赖）出 delta（RFC scan-rule-iteration）。
 // 退出码：0 = 全过；1 = 有不符（自检腿 = case 与期望不符；打分腿 = 标注引用了不存在的 case/状态非法）。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { scanR1, scanR2, scanR3, parseLabelsText, scoreLabels } from '../lib/candidate-scan.mjs'
+import { scanR1, scanR2, scanR2Closed, scanR3, scanR3Dual, parseLabelsText, scoreLabels } from '../lib/candidate-scan.mjs'
 
 const CORPUS = join(ROOT, 'snapshots/corpora/candidate-scan-corpus/cases')
 const DELIVERABLES = join(ROOT, 'company-workspace/deliverables')
@@ -138,10 +139,18 @@ function labelsMode(path) {
   console.log(`标注状态：**机器初标（待人复核）** ⇒ 以下数字是"按此草标"的条件值，人改标后须重跑\n`)
 
   // IO + 三规则实跑；解析与打分逻辑在 lib（纯逻辑，配 tests/company/candidate-scan-labels.spec.ts）
+  // --variants（RFC scan-rule-iteration）：并排实跑变体 R2′（关闭检查）/ R3′（双源依赖）——
+  // 基线 R1/R2/R3 永远在场作对照；采不采用由人裁决，本档只呈数据。
+  const variants = process.argv.includes('--variants')
   const scans = new Map()
   for (const row of rows) {
     const { brief, drafts, hasFinal } = scanInputOf(row)
-    scans.set(row.id, { r1: scanR1(brief, drafts), r2: scanR2(brief, drafts), r3: scanR3(brief, drafts, hasFinal), drafts })
+    const entry = { r1: scanR1(brief, drafts), r2: scanR2(brief, drafts), r3: scanR3(brief, drafts, hasFinal), drafts }
+    if (variants) {
+      entry.r2c = scanR2Closed(brief, drafts, hasFinal)
+      entry.r3d = scanR3Dual(brief, drafts, hasFinal)
+    }
+    scans.set(row.id, entry)
   }
   const { M, zeroTol, details } = scoreLabels(rows, scans)
 
@@ -149,26 +158,46 @@ function labelsMode(path) {
   for (const d of details) {
     console.log(`· ${d.id}`)
     console.log(`    金标准: ${d.gold.map(t => `${t.role === '——' ? '〔整场〕' : t.role}·${t.task}·${t.status}`).join('；') || '（无任务）'}${d.approvals > 0 ? `；审批×${String(d.approvals)}` : ''}`)
-    console.log(`    R1=[${d.r1.map(c => c.role).join(',') || '—'}] R2=[${d.r2.map(c => `${c.task}${c.stale ? '*' : ''}(${c.role})`).join(',') || '—'}] R3候选=[${d.r3.candidates.map(c => `${c.task}${c.stale ? '*' : ''}(${c.role})`).join(',') || '—'}]${d.r3.closed ? '（判已关闭）' : d.r3.blocked.length > 0 ? `（blocked=${d.r3.blocked.map(b => b.task).join(',')})` : ''}`)
+    const fmt = list => list.map(c => `${c.task}${c.stale ? '*' : ''}${c.depByDisk ? 'ᵈ' : ''}(${c.role})`).join(',') || '—'
+    const r3dText = d.r3d === undefined ? '' : ` R3′候选=[${fmt(d.r3d.candidates)}]${d.r3d.closed ? '（判已关闭）' : d.r3d.blocked.length > 0 ? `（blocked=${d.r3d.blocked.map(b => b.task).join(',')})` : ''}`
+    const r2cText = d.r2c === undefined ? '' : ` R2′=[${fmt(d.r2c)}]`
+    console.log(`    R1=[${d.r1.map(c => c.role).join(',') || '—'}] R2=[${fmt(d.r2)}]${r2cText} R3候选=[${fmt(d.r3.candidates)}]${d.r3.closed ? '（判已关闭）' : d.r3.blocked.length > 0 ? `（blocked=${d.r3.blocked.map(b => b.task).join(',')})` : ''}${r3dText}`)
   }
 
-  console.log(`\n—— 分规则指标（按机器草标；金标准确认后数字才作数）——`)
-  console.log(`  ⚠ 口径：R1 是**角色级**（一次命中覆盖该角色全部待办），与 R2/R3 的任务级召回**不可直接比**；R1 的 TP 里含巧合命中（无稿≠有活，机制上纯属碰巧——case 13 的 coo）`)
-  for (const rule of ['R1', 'R2', 'R3']) {
+  const ruleLine = (rule) => {
     const m = M[rule]
     const recall = m.tp + m.miss > 0 ? (m.tp / (m.tp + m.miss) * 100).toFixed(0) : '—'
     const precision = m.reported > 0 ? (m.tp / m.reported * 100).toFixed(0) : '—'
-    console.log(`  ${rule}: 报 ${String(m.reported)}（对 ${String(m.tp)}／阻塞当候选 ${String(m.blockedAsCandidate)}／待核实当候选 ${String(m.staleAsCandidate)}／错误需立即处理 ${String(m.falseImmediate)}）｜漏 ${String(m.miss)}（其中错误已完成 ${String(m.missWithDraft)}）｜召回 ${recall}%｜精确 ${precision}%`)
+    return `  ${rule}: 报 ${String(m.reported)}（对 ${String(m.tp)}／阻塞当候选 ${String(m.blockedAsCandidate)}／待核实当候选 ${String(m.staleAsCandidate)}／错误需立即处理 ${String(m.falseImmediate)}）｜漏 ${String(m.miss)}（其中错误已完成 ${String(m.missWithDraft)}）｜召回 ${recall}%｜精确 ${precision}%`
   }
-  console.log(`  · 对账口径（评审 §五 B 四指标）：「错误需立即处理」合计 = 错误需立即处理+阻塞当候选+待核实当候选 ⇒ R2 ${String(M.R2.falseImmediate + M.R2.blockedAsCandidate + M.R2.staleAsCandidate)}、R3 ${String(M.R3.falseImmediate + M.R3.blockedAsCandidate + M.R3.staleAsCandidate)}；严格精确（待核实不当 TP）⇒ R2 ${M.R2.reported > 0 ? ((M.R2.tp - M.R2.staleAsCandidate) / M.R2.reported * 100).toFixed(0) : '—'}%、R3 ${M.R3.reported > 0 ? ((M.R3.tp - M.R3.staleAsCandidate) / M.R3.reported * 100).toFixed(0) : '—'}%`)
+  console.log(`\n—— 分规则指标（按机器草标；金标准确认后数字才作数）${variants ? '；含变体 R2′/R3′ 并排' : ''}——`)
+  console.log(`  ⚠ 口径：R1 是**角色级**（一次命中覆盖该角色全部待办），与 R2/R3 的任务级召回**不可直接比**；R1 的 TP 里含巧合命中（无稿≠有活，机制上纯属碰巧——case 13 的 coo）`)
+  for (const rule of variants ? ['R1', 'R2', 'R2C', 'R3', 'R3D'] : ['R1', 'R2', 'R3']) console.log(ruleLine(rule))
+  if (variants) {
+    const d = (a, b) => `${String(a)}→${String(b)}`
+    console.log(`\n—— 变体 vs 基线 delta（数据呈批，采用与否由人裁决）——`)
+    console.log(`  R2→R2′（关闭检查）：报 ${d(M.R2.reported, M.R2C.reported)}｜错误需立即处理 ${d(M.R2.falseImmediate, M.R2C.falseImmediate)}——关闭门只影响已关闭动议，其余行为与 R2 全同`)
+    console.log(`  R3→R3′（双源依赖）：报 ${d(M.R3.reported, M.R3D.reported)}｜召回 ${d(M.R3.tp + M.R3.miss > 0 ? (M.R3.tp / (M.R3.tp + M.R3.miss) * 100).toFixed(0) + '%' : '—', M.R3D.tp + M.R3D.miss > 0 ? (M.R3D.tp / (M.R3D.tp + M.R3D.miss) * 100).toFixed(0) + '%' : '—')}｜漏 ${d(M.R3.miss, M.R3D.miss)}｜阻塞当候选 ${d(M.R3.blockedAsCandidate, M.R3D.blockedAsCandidate)}——增益=漂移形状浮出（case 14）；代价=返工形状假满足（case 15，depByDisk 候选计阻塞当候选）`)
+  }
+  console.log(`  · 对账口径（评审 §五 B 四指标）：「错误需立即处理」合计 = 错误需立即处理+阻塞当候选+待核实当候选 ⇒ R2 ${String(M.R2.falseImmediate + M.R2.blockedAsCandidate + M.R2.staleAsCandidate)}、R3 ${String(M.R3.falseImmediate + M.R3.blockedAsCandidate + M.R3.staleAsCandidate)}${variants ? `、R2′ ${String(M.R2C.falseImmediate + M.R2C.blockedAsCandidate + M.R2C.staleAsCandidate)}、R3′ ${String(M.R3D.falseImmediate + M.R3D.blockedAsCandidate + M.R3D.staleAsCandidate)}` : ''}；严格精确（待核实不当 TP）⇒ ${['R2', 'R3', ...(variants ? ['R2C', 'R3D'] : [])].map(r => `${r} ${M[r].reported > 0 ? ((M[r].tp - M[r].staleAsCandidate) / M[r].reported * 100).toFixed(0) : '—'}%`).join('、')}`)
   console.log(`\n—— 零容忍（评审 §五 B：审批/取消/阻塞漏报零容忍）——`)
   console.log(`  审批漏报：${String(zeroTol.approvalMiss)}（规则结构性看不见，须显式输入源——按全局计）`)
   console.log(`  取消误报为候选：${String(zeroTol.cancelReported)}；取消静默漏显示：${String(zeroTol.cancelSilent)}（规则无取消通道——按全局计）`)
-  console.log(`  阻塞漏显示（逐规则记账）：R1 ${String(zeroTol.blockedMissR1)}（角色级）/ R2 ${String(zeroTol.blockedMissR2)} / R3 ${String(zeroTol.blockedMissR3)}`)
-  console.log(`  已关闭动议仍报候选/角色：${String(zeroTol.closedButReported)}`)
-  const violations = zeroTol.approvalMiss + zeroTol.cancelReported + zeroTol.cancelSilent + zeroTol.blockedMissR1 + zeroTol.blockedMissR2 + zeroTol.blockedMissR3 + zeroTol.closedButReported
-  console.log(`\n  零容忍违规合计 ${String(violations)} ⇒ 未达门槛：扫描结果只能显示「待核候选」，不进个人待办、不自动通知（维持现状）`)
+  console.log(`  阻塞漏显示（逐规则记账）：R1 ${String(zeroTol.blockedMissR1)}（角色级）/ R2 ${String(zeroTol.blockedMissR2)}${variants ? ` / R2′ ${String(zeroTol.blockedMissR2C)}` : ''} / R3 ${String(zeroTol.blockedMissR3)}${variants ? ` / R3′ ${String(zeroTol.blockedMissR3D)}` : ''}`)
+  console.log(`  已关闭动议仍报候选/角色：基线 ${String(zeroTol.closedButReported - (variants ? countClosedReports(details, 'r2c') + countClosedReports(details, 'r3d') : 0))}${variants ? `｜R2′ ${String(countClosedReports(details, 'r2c'))}｜R3′ ${String(countClosedReports(details, 'r3d'))}` : ''}`)
+  const violations = zeroTol.approvalMiss + zeroTol.cancelReported + zeroTol.cancelSilent + zeroTol.blockedMissR1 + zeroTol.blockedMissR2 + zeroTol.blockedMissR3 + (variants ? zeroTol.blockedMissR2C + zeroTol.blockedMissR3D : 0) + zeroTol.closedButReported
+  console.log(`\n  零容忍违规合计 ${String(violations)}${variants ? '（含变体记账；门槛判定按基线口径另行核）' : ''} ⇒ 未达门槛：扫描结果只能显示「待核候选」，不进个人待办、不自动通知（维持现状）`)
   return 0
+}
+
+/** 变体在已关闭动议上的报数（delta 用；基线 closedButReported 混记全部规则，这里按变体重算）。 */
+function countClosedReports(details, key) {
+  let count = 0
+  for (const d of details) {
+    const reports = key === 'r2c' ? d.r2c : d.r3d?.candidates
+    if (reports !== undefined && d.gold.some(t => t.status === '关闭')) count += reports.length
+  }
+  return count
 }
 
 // ────────────────────────────── 入口 ──────────────────────────────
