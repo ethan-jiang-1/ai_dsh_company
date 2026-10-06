@@ -2,7 +2,8 @@
 // Orient：keyless 只读运行态观测（RFC driver-surface-package 条目 B；preset 字段与
 // --session 历史会话口径 = observation-hardening 条目 B / observation-closeout 条目 A；
 // 「待核工作候选」扫描节 = RFC orient-scan-view——默认全景对 deliverables/ 跑已采用的
-// R3′（scanR3Dual），零容忍未达门槛只显示不进待办，规则语义唯一家 = candidate-scan.mjs）
+// R3′（scanR3Dual），零容忍未达门槛只显示不进待办，规则语义唯一家 = candidate-scan.mjs；
+// --workspace <dir> 把公司盘/扫描指向别的工作区（RFC r7-motion-final 走查切片，缺席 fail-loud））
 // ——不开 web 会话就能看到当前 home（含「未 source dev/env.sh = 日用 home」警告）、在场
 // profiles、最近会话（含 preset）、公司盘概览、待核工作候选与便宜检查清单；--session <slug>[/<id前缀>]
 // 列/查某 slug 历史会话的 preset·cwd·createdAt；--scenario <kind>/<场景> 按 snapshots/README
@@ -11,8 +12,8 @@
 // 成本：纯 fs 只读 + zstd 解会话头部（前 64KB），秒级，无模型无浏览器。
 // 纯逻辑核心 = scripts/lib/orient.mjs（keyless 测试面）；git / zstd 等真实进程效果只住本 CLI 侧。
 import { execFileSync } from 'node:child_process'
-import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
+import { join, resolve } from 'node:path'
 import { repositoryRoot } from '../lib/repository-layout.mjs'
 import { homeStatus, listSessions, listSlugSessions, orientState, parseSessionHead, renderOrient, renderRunBundle, renderSessionView, runBundleView } from '../lib/orient.mjs'
 
@@ -58,6 +59,10 @@ function sessionPresetFor(homePath, slug) {
 }
 
 const args = process.argv.slice(2)
+const argValue = (name) => {
+  const i = args.indexOf(name)
+  return i === -1 ? undefined : args[i + 1]
+}
 const scenarioIndex = args.indexOf('--scenario')
 const sessionIndex = args.indexOf('--session')
 if (scenarioIndex !== -1) {
@@ -118,9 +123,17 @@ if (scenarioIndex !== -1) {
       sessionPresets[slug] = sessionPresetFor(home.home, slug)
     }
   }
+  // --workspace <dir>：把公司盘/待核候选扫描指向别的工作区（如录制快照 workspace.expected）——
+  // RFC r7-motion-final 走查切片。git 改动行仍只算 company-workspace 面（标签如实）。
+  const wsArg = argValue('--workspace')
+  const workspaceRoot = wsArg === undefined ? join(ROOT, 'company-workspace') : resolve(wsArg)
+  if (wsArg !== undefined && !existsSync(workspaceRoot)) {
+    console.error(`--workspace：目录不存在 ${workspaceRoot}`)
+    process.exit(1)
+  }
   console.log(renderOrient(orientState({
     env: process.env,
-    workspaceRoot: join(ROOT, 'company-workspace'),
+    workspaceRoot,
     gitStatus,
     sessionPresets,
   })))
