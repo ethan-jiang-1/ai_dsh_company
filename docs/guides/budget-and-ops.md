@@ -48,6 +48,8 @@
 | 演示中途要撤回某 VP 的话 | — | Lead `interrupt_agent` + 任务板 reopen；会话日志不可改，复盘时用回放解释 |
 | demo 崩了要重来 | 所有团队状态在 Lead session log（durable） | 重开进程冷恢复：teammates inactive 冷恢复收 queued 消息；或从 JSONL 回放叙事 |
 
+每场 demo/排练结束跑一遍**收割三问**（机制家 = [dev-loop §12](./dev-loop.md)）：①抓到异常没 → BUG 卡 + 红绿；②行为值得钉吗（「变了我们要不要知道」）→ `--record` 录 replay 场景或钉判据；③撞到运行态事实没 → 调试阶梯 / 本篇。三问全「无」如实记，不硬凑。
+
 ## 4. 回放与复盘
 
 - **一切皆日志**：roster/task/mailbox 事件 log-only 存 Lead 会话 JSONL；`foldTeam()` 可重放
