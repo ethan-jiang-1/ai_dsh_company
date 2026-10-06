@@ -7,7 +7,7 @@
 | 当前目标 | 入口 |
 |---|---|
 | 检查结构、引用与簿记 | `pnpm verify` → [run-gates](run-gates.mjs) |
-| 看运行态全景 / 场景 run bundle / 会话历史口径 | `pnpm orient`（`--scenario <kind>/<场景>` run bundle；`--session <slug>[/<id前缀>]` 历史会话 preset）→ [orient](tools/orient.mjs)（keyless 只读；含日用 home 警告） |
+| 看运行态全景 / 场景 run bundle / 会话历史口径 | `pnpm orient`（默认全景含「待核工作候选」扫描节，R3′ 口径；`--scenario <kind>/<场景>` run bundle；`--session <slug>[/<id前缀>]` 历史会话 preset）→ [orient](tools/orient.mjs)（keyless 只读；含日用 home 警告） |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；[分层守卫](../tests/harness/layering.spec.ts) |
 | 确认角色真的挂载 | [preset-smoke](smoke/preset-smoke.mjs) |
 | 确认 client 真的装配 | [client-load-smoke](smoke/client-load-smoke.mjs) |

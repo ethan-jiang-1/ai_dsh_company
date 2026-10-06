@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../scripts/lib/repository-layout.mjs'
-import { homeStatus, listProfiles, listSessions, listSlugSessions, orientState, parseSessionHead, parseSessionPreset, renderOrient, renderSessionView, runBundleView, workspaceOverview } from '../../scripts/lib/orient.mjs'
+import { homeStatus, listProfiles, listSessions, listSlugSessions, orientState, parseSessionHead, parseSessionPreset, renderOrient, renderSessionView, runBundleView, scanDeliverables, workspaceOverview } from '../../scripts/lib/orient.mjs'
 
 // 条目 B 判据（RFC driver-surface-package）：pnpm orient 的 keyless 只读核心——
 // home 判定（requireDevHome 同款但只警告不抛）/ profiles / 会话清单 / 公司盘概览 /
@@ -166,6 +166,48 @@ describe('session 视图（observation-closeout 条目 A）', () => {
     expect(text).toContain('（不可用）')
     expect(text).toContain('cwd /repo')
     expect(text).toContain('created 2026-09-22T10:52:08.381Z')   // createdAt 1790074328381 的 ISO
+  })
+})
+
+describe('待核工作候选扫描（RFC orient-scan-view，R3′ 口径）', () => {
+  const brief = (lines: string[]) => `# 任务书\n${lines.join('\n')}\n`
+  const assign = (id: string, role: string, deps: string) => `派活｜${id}｜${role}｜事项 ${id}｜依赖：${deps}｜状态：待办`
+  const motion = (ws: string, slug: string, opts: { final?: boolean; ceo?: string; drafts?: string[] }) => {
+    dir(join(ws, 'deliverables', slug, 'drafts'))
+    if (opts.ceo) put(join(ws, 'deliverables', slug, 'drafts/ceo.md'), opts.ceo)
+    for (const name of opts.drafts ?? []) put(join(ws, 'deliverables', slug, 'drafts', name))
+    if (opts.final) put(join(ws, 'deliverables', slug, 'final.md'))
+  }
+
+  it('三形状：已关闭不报 / 进行中候选+阻塞分列 / 盘上稿降档（depByDisk + stale）', () => {
+    const ws = scratch('ws-scan')
+    motion(ws, 'motion-closed', { final: true, ceo: brief([assign('T1', 'vp-sales', '无')]) })
+    motion(ws, 'motion-open', { ceo: brief([assign('T1', 'vp-sales', '无'), assign('T2', 'cfo', 'T9')]) })
+    motion(ws, 'motion-drift', { ceo: brief([assign('T1', 'vp-eng', '无'), assign('T2', 'coo', 'T1'), assign('T3', 'vp-sales', 'T5')]), drafts: ['vp-eng.md'] })
+    const scan = scanDeliverables(ws)
+    expect(scan['motion-closed']).toEqual({ closed: true, candidates: [], blocked: [] })
+    const open = scan['motion-open']
+    expect(open.closed).toBe(false)
+    expect(open.candidates.map(c => c.task)).toEqual(['T1'])
+    expect(open.blocked.map(b => b.task)).toEqual(['T2'])
+    const drift = scan['motion-drift']
+    expect(drift.candidates.map(c => `${c.task}${c.depByDisk ? 'ᵈ' : ''}`)).toEqual(['T1', 'T2ᵈ'])
+    expect(drift.candidates.find(c => c.task === 'T1')!.stale).toBe(true)
+    expect(drift.blocked.map(b => b.task)).toEqual(['T3'])
+  })
+
+  it('渲染：公司盘后带「待核工作候选」节（R3′ 口径 + 零容忍门槛声明）；空盘如实「无动议在盘」', () => {
+    const ws = scratch('ws-scan-render')
+    motion(ws, 'motion-closed', { final: true, ceo: brief([assign('T1', 'vp-sales', '无')]) })
+    motion(ws, 'motion-open', { ceo: brief([assign('T1', 'vp-sales', '无'), assign('T2', 'cfo', 'T9')]) })
+    const text = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: ws }))
+    expect(text).toContain('待核工作候选')
+    expect(text).toContain('R3′')
+    expect(text).toContain('零容忍')
+    expect(text).toMatch(/motion-closed.*已关闭/s)
+    expect(text).toMatch(/motion-open[\s\S]*候选 1 · 阻塞 1/)
+    const empty = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: scratch('ws-empty') }))
+    expect(empty).toContain('无动议在盘')
   })
 })
 

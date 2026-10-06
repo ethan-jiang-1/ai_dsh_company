@@ -1,8 +1,10 @@
 // 状态：常驻
 // Orient：keyless 只读运行态观测（RFC driver-surface-package 条目 B；preset 字段与
-// --session 历史会话口径 = observation-hardening 条目 B / observation-closeout 条目 A）
+// --session 历史会话口径 = observation-hardening 条目 B / observation-closeout 条目 A；
+// 「待核工作候选」扫描节 = RFC orient-scan-view——默认全景对 deliverables/ 跑已采用的
+// R3′（scanR3Dual），零容忍未达门槛只显示不进待办，规则语义唯一家 = candidate-scan.mjs）
 // ——不开 web 会话就能看到当前 home（含「未 source dev/env.sh = 日用 home」警告）、在场
-// profiles、最近会话（含 preset）、公司盘概览与便宜检查清单；--session <slug>[/<id前缀>]
+// profiles、最近会话（含 preset）、公司盘概览、待核工作候选与便宜检查清单；--session <slug>[/<id前缀>]
 // 列/查某 slug 历史会话的 preset·cwd·createdAt；--scenario <kind>/<场景> 按 snapshots/README
 // 「Run bundle 引用合同」计算 run bundle 视图（引用不复制，不落盘 manifest）。何时跑：想看
 // 运行态全景 / 排查「现在到底跑在哪个 home」/ 查某 slug 历史会话口径 / 回查某场景证据链时；

@@ -8,6 +8,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { devHomeStatus } from './runtime-home.mjs'
+import { scanR3Dual } from './candidate-scan.mjs'
 import { snapshotScenes } from './repository-layout.mjs'
 
 /** 双 home 判定的观测包装：只分类与警告，不拒绝执行。 */
@@ -52,6 +53,28 @@ export function workspaceOverview(workspaceRoot) {
     .map(entry => ({ name: entry.name, mtime: statSync(join(dir, entry.name)).mtime }))
     .sort((a, b) => b.mtime - a.mtime)
   return { deliverables: entries.map(entry => entry.name) }
+}
+
+/**
+ * 待核工作候选扫描（RFC orient-scan-view）：对每个 deliverables/<slug> 跑已采用的 R3′
+ * （scanR3Dual，语义冻结于 candidate-scan.mjs——本函数只做 IO 形状适配：任务书 = drafts/ceo.md、
+ * draftFiles = drafts/ 清单、final.md 在场与否）。规则语义与命名纪律（「待核工作候选」、
+ * needsVerify 恒真、未达零容忍门槛只显示不进待办）唯一家 = candidate-scan.mjs 头注，此处不复述。
+ */
+export function scanDeliverables(workspaceRoot) {
+  const dir = join(workspaceRoot, 'deliverables')
+  if (!existsSync(dir)) return {}
+  const scan = {}
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name.startsWith('.')) continue
+    const slugDir = join(dir, entry.name)
+    const draftsDir = join(slugDir, 'drafts')
+    const draftFiles = existsSync(draftsDir) ? readdirSync(draftsDir) : []
+    const briefFile = join(draftsDir, 'ceo.md')
+    const briefText = existsSync(briefFile) ? readFileSync(briefFile, 'utf8') : ''
+    scan[entry.name] = scanR3Dual(briefText, draftFiles, existsSync(join(slugDir, 'final.md')))
+  }
+  return scan
 }
 
 /** 现在就能跑的便宜检查（静态清单：全部 keyless/秒级；逐脚本触发条件唯一源 = 脚本头注）。 */
@@ -103,6 +126,7 @@ export function orientState({ env = process.env, dailyHome, workspaceRoot, gitSt
     profiles: effective ? listProfiles(effective) : [],
     sessions: effective ? listSessions(effective, sessionLimit) : { total: 0, recent: [] },
     workspace: { root: workspaceRoot, ...workspaceOverview(workspaceRoot), gitStatus },
+    scan: scanDeliverables(workspaceRoot),
     sessionPresets,
     checks: CHECKS,
   }
@@ -134,6 +158,25 @@ export function renderOrient(state) {
     ? `（共 ${state.workspace.deliverables.length}）: ${state.workspace.deliverables.join(', ')}`
     : '（空）'}`)
   lines.push(`git 改动       ${state.workspace.gitStatus === null ? '（不可用——git 未起或不在仓库内）' : `${state.workspace.gitStatus} 处（company-workspace 面）`}`)
+  lines.push('', '== 待核工作候选（R3′ 口径；零容忍未达门槛——只显示，不进个人待办、不自动通知）==')
+  const slugs = Object.entries(state.scan ?? {})
+  if (slugs.length === 0) {
+    lines.push('无动议在盘（deliverables/ 无动议目录）')
+  } else {
+    for (const [slug, result] of slugs) {
+      if (result.closed) {
+        lines.push(`  ${slug} · 已关闭（final 在场，不报）`)
+        continue
+      }
+      const cand = result.candidates.map(c => `${c.task}${c.depByDisk ? 'ᵈ' : ''}${c.stale ? '*' : ''}`)
+      const block = result.blocked.map(b => b.task)
+      const counts = [`候选 ${cand.length}`, `阻塞 ${block.length}`].join(' · ')
+      lines.push(`  ${slug} · ${counts}`)
+      if (cand.length > 0) lines.push(`    候选 ${cand.join(', ')}（${result.candidates.map(c => c.role).join(', ')}）`)
+      if (block.length > 0) lines.push(`    阻塞 ${block.join(', ')}（${result.blocked.map(b => `${b.role}，${b.why}`).join('；')}）`)
+    }
+    lines.push('  （ᵈ = 依赖由盘上稿推断满足，* = 稿与状态行矛盾待核实；全部 needsVerify 恒真——真伪人核）')
+  }
   lines.push('', '== 便宜检查（keyless，现在就能跑）==')
   for (const check of state.checks) lines.push(`  ${check.cmd} — ${check.what}`)
   return lines.join('\n')
