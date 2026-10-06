@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseLabelsText, scoreLabels, scanR2, scanR3, roleHasDraft } from '../../scripts/lib/candidate-scan.mjs'
+import { parseLabelsText, scoreLabels, scanR2, scanR2Closed, scanR3, scanR3Dual, roleHasDraft } from '../../scripts/lib/candidate-scan.mjs'
 
 // 实验B打分腿的纯逻辑（判据单一来源 = scripts/lib/candidate-scan.mjs；格式约定见标注文件头部）。
 // IO（读标注文件/语料/deliverables）在 scripts/audit/candidate-scan-eval.mjs——tests/ 不碰驱动脚本的文件面。
@@ -187,5 +187,61 @@ describe('真实状态漂移形状（case 14 = r6-baseline 录制收割，2026-1
     const { M, zeroTol } = scoreLabels([goldRow(['取消', '待核实', '待核实', '待核实', '待核实', '待核实'])], scans())
     expect(zeroTol.cancelReported).toBe(2)      // T1 被 R2 与 R3 各报一次 ⇒ 零容忍按规则双计
     expect(M.R2.tp).toBe(5)                       // 其余五条不受影响
+  })
+})
+
+describe('规则变体（RFC scan-rule-iteration，2026-10-06：R2′ 关闭检查 + R3′ 双源依赖）', () => {
+  const DRIFT_BRIEF = [
+    '派活｜T1｜vp-sales｜出定价与买点分层结论｜依赖：无｜状态：待办',
+    '派活｜T2｜vp-eng｜出交付包技术可行性｜依赖：无｜状态：待办',
+    '派活｜T3｜coo｜出产能承接结论｜依赖：T2｜状态：待办',
+    '派活｜T4｜cfo｜出毛利口径与合规闸门结论｜依赖：T1｜状态：待办',
+    '派活｜T5｜cfo｜审定价与毛利并出评审稿｜依赖：T1、T4｜状态：待办',
+    '派活｜T6｜coo｜审交付承接并出评审稿｜依赖：T1、T2、T3｜状态：待办',
+  ].join('\n')
+  const DRIFT_DRAFTS = ['ceo.md', 'cfo-review.md', 'cfo.md', 'coo-review.md', 'coo.md', 'vp-eng.md', 'vp-sales.md']
+  const REWORK_BRIEF = [
+    '派活｜T1｜vp-eng｜可行性 v2 返工（v1 有结构性缺口须重写）｜依赖：无｜状态：待办',
+    '派活｜T2｜coo｜出承接排期与人力窗口｜依赖：T1｜状态：待办',
+  ].join('\n')
+
+  it('scanR2Closed：final 在场即静默（quote-z 真盘实证的关闭误报修复）', () => {
+    expect(scanR2Closed('派活｜T1｜cfo｜毛利｜依赖：无｜状态：待办', [], true)).toEqual([])
+    const open = scanR2Closed('派活｜T1｜cfo｜毛利｜依赖：无｜状态：待办', [], false)
+    expect(open).toHaveLength(1)
+    expect(open[0].rule).toBe('R2')
+  })
+
+  it('scanR3Dual（case 14 漂移形状）：四个沉没任务浮出且带 depByDisk 标记', () => {
+    const r = scanR3Dual(DRIFT_BRIEF, DRIFT_DRAFTS, false)
+    expect(r.candidates.map(t => t.task)).toEqual(['T1', 'T2', 'T3', 'T4', 'T5', 'T6'])
+    expect(r.candidates.filter(t => t.depByDisk).map(t => t.task)).toEqual(['T3', 'T4', 'T5', 'T6'])
+    expect(r.candidates.every(t => t.needsVerify)).toBe(true)   // 降档显示：全部仍带待核实标记
+    expect(r.blocked).toEqual([])
+  })
+
+  it('scanR3Dual（case 15 返工形状）：假满足如实发生并带标记——已知局限钉住；基线 R3 同形状正确', () => {
+    const r = scanR3Dual(REWORK_BRIEF, ['vp-eng.md'], false)
+    expect(r.candidates.map(t => t.task)).toEqual(['T1', 'T2'])
+    expect(r.candidates.find(t => t.task === 'T2')?.depByDisk).toBe(true)   // 返工依赖被盘上稿假满足——case 15 钉住的代价
+    expect(scanR3(REWORK_BRIEF, ['vp-eng.md'], false).blocked.map(t => t.task)).toEqual(['T2'])   // 基线在此形状正确
+  })
+
+  it('scoreLabels 扩展键：变体在场计 R2C/R3D；缺省零填充且原指标不变', () => {
+    const row = { id: 'x', kind: 'synthetic', closed: false, approvals: 0, remind: '', zeroNote: '',
+      tasks: [{ role: 'cfo', task: 'T1', status: '待办' }] }
+    const brief = '派活｜T1｜cfo｜毛利｜依赖：无｜状态：待办\n'
+    const r2 = scanR2(brief, [])
+    const r3 = scanR3(brief, [], false)
+    // 变体在场
+    const withVariants = scoreLabels([row], new Map([['x', { r1: [], r2, r3, drafts: [], r2c: scanR2Closed(brief, [], false), r3d: scanR3Dual(brief, [], false) }]]))
+    expect(withVariants.M.R2C.reported).toBe(1)
+    expect(withVariants.M.R3D.reported).toBe(1)
+    expect(withVariants.M.R2.reported).toBe(1)
+    // 变体缺省：键在场为零，R2/R3 不受影响
+    const without = scoreLabels([row], new Map([['x', { r1: [], r2, r3, drafts: [] }]]))
+    expect(without.M.R2C.reported).toBe(0)
+    expect(without.M.R3D.reported).toBe(0)
+    expect(without.M.R2.reported).toBe(1)
   })
 })

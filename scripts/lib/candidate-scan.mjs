@@ -30,7 +30,7 @@ export function parseAssignments(briefText) {
     if (m === null) continue
     out.push({
       id: m[1], role: m[2], title: m[3],
-      deps: m[4] === '无' || m[4] === '' ? [] : m[4].split(',').map(s => s.trim()).filter(Boolean),
+      deps: m[4] === '无' || m[4] === '' ? [] : m[4].split(/[,，、]/).map(s => s.trim()).filter(Boolean),   // 分隔符含中文顿号/全角逗号——r6 真实 CEO 产出用「、」（2026-10-06 case 14 spec 红证）
       status: m[5],
     })
   }
@@ -99,6 +99,48 @@ export function scanR3(briefText, draftFiles, motionHasFinal) {
 
 // ═══════════════ 金标准标注（实验 B 打分腿；纯逻辑，IO 在 scripts/audit/candidate-scan-eval.mjs）═══════════════
 
+/**
+ * R2′ · 关闭检查（RFC scan-rule-iteration 2026-10-06）：final.md 在场即不报——修 R2 在
+ * 已关闭动议上仍报 stale 候选（quote-z 真盘实证：全表零容忍「已关闭动议仍报」=7 的一部分）。
+ * R2 原语义冻结作对照基线，本变体只加关闭门。
+ */
+export function scanR2Closed(briefText, draftFiles, motionHasFinal) {
+  if (motionHasFinal) return []
+  return scanR2(briefText, draftFiles)
+}
+
+/**
+ * R3′ · 双源依赖（RFC scan-rule-iteration 2026-10-06）：依赖完成 = 派活行状态完成 **或**
+ * 依赖任务的角色稿在盘上。修 case 14 真实漂移形状（CEO 不回写状态行 ⇒ R3 把四个待核实任务
+ * 沉入不可见 blocked）；**代价由 case 15 钉住**——返工与漂移文件层面同签名（状态待办+稿在场），
+ * 盘上稿会在返工形状上假满足依赖。经盘上稿推断满足的候选带 `depByDisk: true` 且
+ * `needsVerify` 恒真（降档显示，不升级为干净候选）。
+ */
+export function scanR3Dual(briefText, draftFiles, motionHasFinal) {
+  if (motionHasFinal) return { candidates: [], blocked: [], closed: true }
+  const tasks = parseAssignments(briefText)
+  const doneStatus = new Set(tasks.filter(t => t.status === '已出稿' || t.status === '完成').map(t => t.id))
+  const diskDone = new Set(tasks.filter(t => roleHasDraft(t.role, draftFiles)).map(t => t.id))
+  const candidates = []
+  const blocked = []
+  for (const t of tasks) {
+    if (t.status !== '待办') continue
+    const missing = t.deps.filter(d => !doneStatus.has(d))
+    const byDisk = missing.filter(d => diskDone.has(d))
+    const trulyMissing = missing.filter(d => !diskDone.has(d))
+    if (trulyMissing.length === 0) {
+      candidates.push({
+        rule: 'R3′', role: t.role, task: t.id, title: t.title,
+        why: byDisk.length > 0 ? '状态=待办且依赖由盘上稿推断满足（depByDisk）' : '状态=待办且依赖已齐',
+        needsVerify: true, stale: roleHasDraft(t.role, draftFiles), depByDisk: byDisk.length > 0,
+      })
+    } else {
+      blocked.push({ rule: 'R3′', role: t.role, task: t.id, title: t.title, missingDeps: trulyMissing, why: `依赖未齐：${trulyMissing.join(',')}`, needsVerify: true })
+    }
+  }
+  return { candidates, blocked, closed: false }
+}
+
 /** 标注状态枚举（格式约定唯一见标注文件头部；改枚举要同步改约定）。 */
 export const GOLD_STATUSES = ['待办', '阻塞', '待核实', '取消', '已出稿', '完成', '关闭']
 /** 真候选 / 待核实 = 该显示（显示类别不同但都算"surfaced"）。 */
@@ -146,21 +188,23 @@ export function parseLabelsText(text) {
  * 三规则 vs 金标准打分（纯逻辑）。判据 = 评审 §五 B：召回/精确/错误"已完成"/错误"需立即处理"
  * + 零容忍计数（审批漏报 / 取消误报与静默漏显示 / 阻塞漏显示 / 已关闭动议仍报）。
  * @param rows parseLabelsText 的输出
- * @param scans Map<id, {r1, r2, r3, drafts}>——同 id 的三规则实跑结果与稿清单（IO 由调用方做）
- * @returns {M, zeroTol, details}——M 按 R1（角色级）/R2/R3（任务级）累加
+ * @param scans Map<id, {r1, r2, r3, drafts, r2c?, r3d?}>——同 id 的规则实跑结果与稿清单（IO 由调用方做）。
+ *   r2c / r3d = 变体（scanR2Closed / scanR3Dual，RFC scan-rule-iteration）：**可选**——在场才计
+ *   入 M.R2C / M.R3D 与零容忍 blockedMissR2C/R3D；缺省键零填充，R1/R2/R3 基线指标不受影响。
+ * @returns {M, zeroTol, details}——M 按 R1（角色级）/R2/R3（任务级基线）/R2C/R3D（变体）累加
  */
 export function scoreLabels(rows, scans) {
-  const M = { R1: freshMetric(), R2: freshMetric(), R3: freshMetric() }
   function freshMetric() {
     return { tp: 0, reported: 0, falseImmediate: 0, blockedAsCandidate: 0, staleAsCandidate: 0, miss: 0, missWithDraft: 0 }
   }
-  const zeroTol = { approvalMiss: 0, cancelReported: 0, cancelSilent: 0, blockedMissR1: 0, blockedMissR2: 0, blockedMissR3: 0, closedButReported: 0 }
+  const M = { R1: freshMetric(), R2: freshMetric(), R3: freshMetric(), R2C: freshMetric(), R3D: freshMetric() }
+  const zeroTol = { approvalMiss: 0, cancelReported: 0, cancelSilent: 0, blockedMissR1: 0, blockedMissR2: 0, blockedMissR3: 0, blockedMissR2C: 0, blockedMissR3D: 0, closedButReported: 0 }
   const details = []
 
   for (const row of rows) {
     const scan = scans.get(row.id)
     if (scan === undefined) throw new Error(`标注行没有对应的扫描结果：${row.id}`)
-    const { r1, r2, r3, drafts } = scan
+    const { r1, r2, r3, drafts, r2c, r3d } = scan
 
     const goldTasks = new Map(row.tasks.filter(t => t.status !== '关闭').map(t => [t.task, t]))
     const goldPendingRoles = new Set(row.tasks.filter(t => goldPending(t.status) && t.role !== '——').map(t => t.role))
@@ -181,9 +225,11 @@ export function scoreLabels(rows, scans) {
       }
     }
 
-    // R2 / R3：任务级
-    for (const rule of ['R2', 'R3']) {
-      const reports = rule === 'R2' ? r2 : r3.candidates
+    // R2 / R3（基线）+ 变体（R2′=r2c / R3′=r3d.candidates——在场才计；键缺省零填充）
+    const taskRules = [['R2', r2], ['R3', r3.candidates]]
+    if (r2c !== undefined) taskRules.push(['R2C', r2c])
+    if (r3d !== undefined) taskRules.push(['R3D', r3d.candidates])
+    for (const [rule, reports] of taskRules) {
       for (const t of reports) {
         M[rule].reported++
         const gold = goldTasks.get(t.task)
@@ -216,6 +262,8 @@ export function scoreLabels(rows, scans) {
       if (gold.role !== '——' && !r1.some(c => c.role === gold.role)) zeroTol.blockedMissR1++
       if (gold.task !== '——' && !r2.some(c => c.task === gold.task)) zeroTol.blockedMissR2++
       if (gold.task !== '——' && !r3.blocked.some(b => b.task === gold.task) && !r3.candidates.some(c => c.task === gold.task)) zeroTol.blockedMissR3++
+      if (gold.task !== '——' && r2c !== undefined && !r2c.some(c => c.task === gold.task)) zeroTol.blockedMissR2C++
+      if (gold.task !== '——' && r3d !== undefined && !r3d.blocked.some(b => b.task === gold.task) && !r3d.candidates.some(c => c.task === gold.task)) zeroTol.blockedMissR3D++
     }
 
     // 审批：三条规则结构性看不见 ⇒ 全部计漏报（零容忍）
