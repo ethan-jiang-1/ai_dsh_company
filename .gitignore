@@ -7,7 +7,7 @@ packages/company-pack/lib/
 # pnpm 运行残留（store 落仓库内：沙箱拒默认位置时的回退；调试日志）
 .pnpm-store/
 .pnpm-debug.log
-# 运行残留家（2026-10-06 条目 A：dev/ 拆分——启动配置留 dev/，跑过留下的状态住 runtime/；逐件 owner = runtime/README）
+# 运行残留家（2026-10-06 条目 A 从 dev/ 拆出；2026-10-07 S1 起 tracked 启动配置住 run/；逐件 owner = runtime/README）
 runtime/harness-home/*
 !runtime/harness-home/README.md
 # 排练场（轮间待办②「练习场 ≠ 运行场」）：排练/探针会话的 cwd；产物不进 git，也不进真盘

@@ -65,7 +65,7 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 
 程序（脚本按序执行，任一步失败即红）：
 
-0. **前置**：`source dev/env.sh`；共用 `requireDevHome` 拒绝日用 home 及其祖先/后代/符号链接别名。读取 vendor CLI `package.json` 的 `bin.dsh`（当前 `apps/cli/lib/bin.js`），检查它和 web dist 在场；缺失即失败，不回退源码。
+0. **前置**：`source run/env.sh`；共用 `requireDevHome` 拒绝日用 home 及其祖先/后代/符号链接别名。读取 vendor CLI `package.json` 的 `bin.dsh`（当前 `apps/cli/lib/bin.js`），检查它和 web dist 在场；缺失即失败，不回退源码。
 1. **构建 company-pack**：先删 `lib/` 再 `tsc -b packages/company-pack` + tsdown。**别用 `tsc -p`**——本包 tsconfig 是 solution root（`files: []` + references），`-p` 非 build 模式不展开 references ⇒ 零输入、静默退出 0、零 emit；陈旧态下 tsdown 会拿上一次的产物打包 ⇒ 冒烟验旧包（假绿）。本脚本不重建 vendor；已有 vendor 产物可运行不等于来自当前 SHA 的新鲜构建。配方归 [guides/bootstrap](./guides/bootstrap.md)。
 2. **`npm pack`**：tarball 落 `runtime/harness-home/tmp/release-pack/`（npm cache 重定向进
    repo gitignored 区——纪律 §11）。
@@ -82,7 +82,7 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 
 ## 升 pin 程序（`node scripts/tools/sync-dsh.mjs`，认证档）
 
-默认只读核对四处簿记，不做流程语义审计。升级使用 `source dev/env.sh && node scripts/tools/sync-dsh.mjs --pin <tag> --process-review <repo-relative.json>`；证据文件先经人审提交，两个工作树须干净。
+默认只读核对四处簿记，不做流程语义审计。升级使用 `source run/env.sh && node scripts/tools/sync-dsh.mjs --pin <tag> --process-review <repo-relative.json>`；证据文件先经人审提交，两个工作树须干净。
 
 **证据文件命名与落点**（2026-09-26 补；**2026-10-02 迁 archived/**——原"顶层 notes/"与自家先例打架：0.1.7 的孤儿 JSON 早已迁 archived/，且同轮 delta 报告也住 archived/，顶层还会随 pin 无限堆积）：`notes/archived/<YYYY-MM-DD>-pin-review-<目标 tag>.json`（完结流程物证的家，与 delta 报告同住；`--process-review` 传该 repo 相对路径即可——sync-dsh 只要求 git 已跟踪、不限于子目录）。
 人审证据 JSON 必含 `fromSha`、`toSha`（完整 SHA）、`reviewedBy`、`reviewedAt`（YYYY-MM-DD）、`processContractReview`（核对 vendor 纪律与本地流程合同的结论，可引用既有 Note）。脚本核对文件受版本控制、字段非空及 SHA 对应；**这是人审声明，不是自动语义审计，也不认证签名者身份**。

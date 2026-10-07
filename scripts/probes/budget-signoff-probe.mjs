@@ -13,7 +13,7 @@
 //   · **负例（不该发）**：$800/月 固定支出的会签场景 ⇒ **不得**出现 `request_signoff`；
 //   · **正例（该发）**：8.5 折报价场景（折扣线 < 9 折）⇒ **必须**出现 `request_signoff`。
 //   只测负例会假绿（模型可能压根不会用那个工具）；正例证明"探针看得见审批"。
-// 用法：source dev/env.sh && node scripts/probes/budget-signoff-probe.mjs
+// 用法：source run/env.sh && node scripts/probes/budget-signoff-probe.mjs
 // 退出码：0 = 双向都符合；1 = 不符（红证，按"文案不够需机制"处置）；2 = 环境/启动失败。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../lib/rehearsal.mjs'

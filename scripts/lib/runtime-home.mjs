@@ -27,12 +27,12 @@ function contains(parent, child) {
 export function requireDevHome(name) {
   const home = process.env.DSH_HOME
   if (home === undefined || home.trim() === '') {
-    throw new Error(`${name}: 需要 DSH_HOME（先 source dev/env.sh）`)
+    throw new Error(`${name}: 需要 DSH_HOME（先 source run/env.sh）`)
   }
   const dailyHome = physicalPath(resolve(homedir(), '.dsh'))
   const target = physicalPath(resolve(home))
   if (contains(dailyHome, target) || contains(target, dailyHome)) {
-    throw new Error(`${name}: DSH_HOME 与日用 home（${dailyHome}）重叠——拒绝执行；先 source dev/env.sh`)
+    throw new Error(`${name}: DSH_HOME 与日用 home（${dailyHome}）重叠——拒绝执行；先 source run/env.sh`)
   }
   return target
 }
@@ -44,11 +44,11 @@ export function requireDevHome(name) {
 export function devHomeStatus(home, { dailyHome } = {}) {
   const daily = physicalPath(resolve(dailyHome ?? join(homedir(), '.dsh')))
   if (home === undefined || home.trim() === '') {
-    return { kind: 'unset', dailyHome: daily, warning: '⚠ DSH_HOME 未设置——先 source dev/env.sh（否则会话与凭据落日用 home，profile 组合不可预期）' }
+    return { kind: 'unset', dailyHome: daily, warning: '⚠ DSH_HOME 未设置——先 source run/env.sh（否则会话与凭据落日用 home，profile 组合不可预期）' }
   }
   const target = physicalPath(resolve(home))
   if (contains(daily, target) || contains(target, daily)) {
-    return { kind: 'daily', home: target, dailyHome: daily, warning: '⚠ DSH_HOME 与日用 home 重叠——先 source dev/env.sh（双 home 纪律 = guides/dev-loop §6）' }
+    return { kind: 'daily', home: target, dailyHome: daily, warning: '⚠ DSH_HOME 与日用 home 重叠——先 source run/env.sh（双 home 纪律 = guides/dev-loop §6）' }
   }
   return { kind: 'ok', home: target, dailyHome: daily }
 }

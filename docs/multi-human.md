@@ -50,7 +50,7 @@
 ## 2. 开门配方（runbook）
 
 ```sh
-cd <仓库根> && source dev/env.sh
+cd <仓库根> && source run/env.sh
 CI=true pnpm dsh web -- --port 0 --no-open         # 端口是环境状态；见下方"端口不是仓库事实"
 # 启动横幅里会打印带 token 的 URL：http://127.0.0.1:<port>/?token=<token>
 ```

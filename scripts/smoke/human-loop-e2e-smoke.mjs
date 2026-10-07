@@ -14,7 +14,7 @@
 //
 // 分层（guides/dev-loop §9.1）：认证档——真模型 + 真浏览器 + 起进程，不进 `pnpm test`。
 // 预算：CEO 三轮 + 一次问询应答 ≈ $1–2 / 3–6 分钟。排练场 cwd，真盘零接触。
-// 用法：source dev/env.sh && node scripts/smoke/human-loop-e2e-smoke.mjs
+// 用法：source run/env.sh && node scripts/smoke/human-loop-e2e-smoke.mjs
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'

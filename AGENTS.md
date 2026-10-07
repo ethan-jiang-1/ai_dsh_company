@@ -16,7 +16,7 @@ docs/                   当前合同与导航：index（地图+台账）→ desi
 notes/                  开发记忆：proposed/（RFC）→ implemented/（活跃决策记忆）；分类规则 = notes/README.md
 _backlog/               推敲层：plans/bugs/reference/_done；章程与账本 = 其 README
 scripts/                run-gates.mjs（稳定门禁）；smoke/ probes/ audit/ tools/ archive/ 按职责；lib/ 纯逻辑、drivers/ 真实驱动
-dev/                    启动配置（tracked）：env.sh（双 home+裸 dsh 拦截）+ 实验 overlay
+run/                    运行面（tracked 启动配置）：env.sh（双 home+裸 dsh 拦截）+ 实验 overlay
 runtime/                运行残留家（gitignored）：harness-home（开发 DSH_HOME）、第二 home、pw-browsers、排练盘；owner = runtime/README.md
 snapshots/              回归证据资产；规则与分类 = snapshots/README.md
 ```
@@ -30,7 +30,7 @@ snapshots/              回归证据资产；规则与分类 = snapshots/README.
 ```sh
 git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 corepack enable pnpm && pnpm install   # workspace 解析；全配方（含 vendor 构建）见 guides/bootstrap
-source dev/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 接线（⚠ coding 会话 DSH_HOME 带日用值——dev-loop §6）
+source run/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 接线（⚠ coding 会话 DSH_HOME 带日用值——dev-loop §6）
 pnpm verify                            # 结构门禁（清单唯一源 = scripts/run-gates.mjs）
 pnpm test                              # keyless 回归（真模型/浏览器不进；layering 守卫）
 pnpm orient                            # 运行态全景（keyless 只读；--scenario = run bundle 视图）
@@ -38,7 +38,7 @@ pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需
 node scripts/smoke/preset-smoke.mjs    # preset 改动的完成定义（真挂载）
 ```
 
-逐脚本触发/成本/状态唯一源 = 脚本头注（门禁强制自述）；索引见 [scripts/README](scripts/README.md)——**别抄回本文件，复述必漂**。web 观察窗开门步骤唯一见 [demo.md §前置](docs/demo.md)：**先 `source dev/env.sh`**——日用 `~/.dsh` 另有同名 `web` profile（起得来不报错、五角色不出现）；端口是环境状态，token URL 从启动横幅读；现场运维 = [budget-and-ops](docs/guides/budget-and-ops.md)。**push 走 `ssh.github.com:443`**（origin 已配好）。
+逐脚本触发/成本/状态唯一源 = 脚本头注（门禁强制自述）；索引见 [scripts/README](scripts/README.md)——**别抄回本文件，复述必漂**。web 观察窗开门步骤唯一见 [demo.md §前置](docs/demo.md)：**先 `source run/env.sh`**——日用 `~/.dsh` 另有同名 `web` profile（起得来不报错、五角色不出现）；端口是环境状态，token URL 从启动横幅读；现场运维 = [budget-and-ops](docs/guides/budget-and-ops.md)。**push 走 `ssh.github.com:443`**（origin 已配好）。
 
 ## 密钥
 

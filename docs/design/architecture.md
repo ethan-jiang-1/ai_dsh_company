@@ -276,10 +276,10 @@ ai_dsh_company/
 │   ├── templates/                #   文档模板（PRD/周报/评审……）
 │   └── deliverables/             #   产出物落这里，用 present 标记
 ├── vendor/dsh/                   # git submodule 钉 release tag（agent 探索 DSH 源码的红利）
-├── dev/
+├── run/                          # 运行面（tracked 启动配置；2026-10-07 S1 起，原 dev/）
 │   ├── env.sh                    # 双 home 兜底（DSH_HOME）+ 裸 dsh 拦截
-│   ├── company.overlay.yml       # headless + --patch 实验/动议用的 insert overlay（无 web-app 行的组合）
-│   └── harness-home/             # 开发 DSH_HOME（双 home 隔离；gitignore 运行残留）
+│   └── company.overlay.yml       # headless + --patch 实验/动议用的 insert overlay（无 web-app 行的组合）
+├── runtime/                      # 运行残留家（gitignored）：harness-home（开发 DSH_HOME）、排练盘……
 ├── scripts/
 │   ├── run-gates.mjs                # 结构/链接/自包含门禁
 │   ├── smoke/release-smoke.mjs   # npm pack → 干净 profile → dsh plugin add → 冒烟会话
@@ -304,7 +304,7 @@ ai_dsh_company/
    `@deepseek-ai/dsh-agent-preset`（住 `presets/<role>/agent.cordis.yml`，经 `dsh.bundle.patch`
    **数组**并入）。（旧模型 = `dsh-agent-presets` 一行 + `roots` 目录扫描 + `!!js`/`baseUrl` 自定位；
    0.1.7 已把该包拆成 `agent-preset` + `agent-preset-registry`，**roots 机制已废**。）
-   纯 headless 组合没有 registry 行，用 `dev/company.overlay.yml` 的 insert 补。
+   纯 headless 组合没有 registry 行，用 `run/company.overlay.yml` 的 insert 补。
 3. **experimental team 两包是 host 行**（服务注册 + per-member scoped 工具安装），加
    `dsh-session-persistence-jsonl` 才激活；以 `- insert:` 行随 bundle 走（R1 起直插，
    不装官方 bundle，故无续驶控制冲突）。

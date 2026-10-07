@@ -15,7 +15,7 @@
 //     🟡 已知历史缺口 = 已被角色 CHARTER / Note 承认、且早于对应纪律强制面落地的历史缺席——
 //       每次照报提醒、**不进退出码**（deliverables-check「观察项」同款档，2026-10-05 立）
 // 输入 = `$DSH_HOME/sessions/` 里的**真盘**会话（排练场默认排除——排练产物本就不写公司盘）。
-// 用法：source dev/env.sh && node scripts/audit/journal-audit.mjs [--cwd <公司盘绝对路径>] [--limit N]
+// 用法：source run/env.sh && node scripts/audit/journal-audit.mjs [--cwd <公司盘绝对路径>] [--limit N]
 // 退出码：0 = 无违规；1 = 有违规（红）；2 = 环境问题（缺 DSH_HOME / 无 zstd）。
 import { execFileSync, execSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
@@ -31,7 +31,7 @@ const argOf = name => {
 }
 const HOME = process.env.DSH_HOME ?? ''
 if (HOME === '' || resolve(HOME) === resolve(join(homedir(), '.dsh'))) {
-  console.error('journal-audit: 需要开发 home（先 `source dev/env.sh`）；拒绝在日用 home 上跑')
+  console.error('journal-audit: 需要开发 home（先 `source run/env.sh`）；拒绝在日用 home 上跑')
   process.exit(2)
 }
 try {

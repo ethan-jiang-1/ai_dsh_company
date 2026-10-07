@@ -9,7 +9,7 @@ CEO、VP-Eng、VP-Sales、COO、CFO 各自是独立 preset，事件从 CEO 进�
 
 - **四条状态轴**：代码与构建（vendor 只读、src → lib generated）｜DSH 运行态（runtime/，gitignored）｜
   会话事实（company-workspace/，随会话演进）｜验证证据（snapshots/，冻结）——一轴不推断另一轴。
-- **最小启动**：完整公司面 = Web 观察窗（`source dev/env.sh` → `pnpm dsh web` → token URL 开门，步骤 =
+- **最小启动**：完整公司面 = Web 观察窗（`source run/env.sh` → `pnpm dsh web` → token URL 开门，步骤 =
   [demo.md](./docs/demo.md)）；`pnpm dsh --profile headless` 只证明通用 CLI，**不是**公司运行。
 - **新 Agent 首跑验收**（推荐、非强制）= [tests/README](./tests/README.md) 首跑节（有 key / 无 key 两条路径）；改东西选检查 = 同文件「改动面 → 最窄检查」表。
 

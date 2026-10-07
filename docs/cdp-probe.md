@@ -16,7 +16,7 @@
 ## 本仓用法
 
 ```sh
-source dev/env.sh   # 提供 DSH_PROBE_CHROME 备选；二进制默认复用 loadChromium 解析（ms-playwright 缓存）
+source run/env.sh   # 提供 DSH_PROBE_CHROME 备选；二进制默认复用 loadChromium 解析（ms-playwright 缓存）
 pnpm dsh web -- --port 0 --no-open        # 起观察窗，横幅拿 URL（demo.md §前置）
 node scripts/probes/cdp-probe.mjs 'http://127.0.0.1:<port>/?token=<t>'          # 默认断言面（零模型）
 node scripts/probes/cdp-probe.mjs '<url>' --ask '用一句话自报角色与职责。'      # + 完整产品环（真模型一次调用）

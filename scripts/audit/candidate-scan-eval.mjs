@@ -9,7 +9,7 @@
 // **人复核前给出的是"按此草标"的条件值**）。它能给的证据 = 三规则 vs 标注的
 // 召回/精确/错误已完成/错误需立即处理 + **零容忍违规计数**（审批漏报 / 取消误报 / 阻塞漏显示）。
 //
-// 用法：source dev/env.sh && node scripts/audit/candidate-scan-eval.mjs [--labels <path>] [--variants]
+// 用法：source run/env.sh && node scripts/audit/candidate-scan-eval.mjs [--labels <path>] [--variants]
 //   --variants：与 --labels 连用——并排实跑变体 R2′（关闭检查）/ R3′（双源依赖）出 delta（RFC scan-rule-iteration）。
 // 退出码：0 = 全过；1 = 有不符（自检腿 = case 与期望不符；打分腿 = 标注引用了不存在的 case/状态非法）。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'

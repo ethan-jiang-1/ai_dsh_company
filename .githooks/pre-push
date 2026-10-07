@@ -1,5 +1,5 @@
 #!/bin/sh
-# pre-push：push 前跑全量结构门禁 + keyless 行为测试（enforcement 通道，2026-09-27 立；接线 = dev/env.sh 幂等设 core.hooksPath）。
+# pre-push：push 前跑全量结构门禁 + keyless 行为测试（enforcement 通道，2026-09-27 立；接线 = run/env.sh 幂等设 core.hooksPath）。
 # 为什么：DSH 立场——"Agents follow enforced gates far more reliably than prose conventions"。
 #        verify ~2s + test ~1.3s，合计秒级，不越「hook 只装便宜高置信缺陷」的预算（DSH lefthook 同款边界）。
 #        test 进 hook 而非 CI（2026-09-28 实证定界）：vitest 的 vendor 内部 @deepseek-ai/* 解析依赖

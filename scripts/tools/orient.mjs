@@ -4,7 +4,7 @@
 // 「待核工作候选」扫描节 = RFC orient-scan-view——默认全景对 deliverables/ 跑已采用的
 // R3′（scanR3Dual），零容忍未达门槛只显示不进待办，规则语义唯一家 = candidate-scan.mjs；
 // --workspace <dir> 把公司盘/扫描指向别的工作区（RFC r7-motion-final 走查切片，缺席 fail-loud））
-// ——不开 web 会话就能看到当前 home（含「未 source dev/env.sh = 日用 home」警告）、在场
+// ——不开 web 会话就能看到当前 home（含「未 source run/env.sh = 日用 home」警告）、在场
 // profiles、最近会话（含 preset）、公司盘概览、待核工作候选与便宜检查清单；--session <slug>[/<id前缀>]
 // 列/查某 slug 历史会话的 preset·cwd·createdAt；--scenario <kind>/<场景> 按 snapshots/README
 // 「Run bundle 引用合同」计算 run bundle 视图（引用不复制，不落盘 manifest）。何时跑：想看
@@ -86,7 +86,7 @@ if (scenarioIndex !== -1) {
   }
   const home = homeStatus(process.env)
   if (home.kind !== 'ok') {
-    console.error('先 source dev/env.sh（--session 需要生效的开发 home）')
+    console.error('先 source run/env.sh（--session 需要生效的开发 home）')
     process.exit(1)
   }
   try {

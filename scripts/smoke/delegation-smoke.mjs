@@ -27,7 +27,7 @@
 //
 // 预算（guides/dev-loop §10）：墙钟 ≤ `--wall`（默认 180s）；模型 prompt **1 条**；可中断（Ctrl-C）。
 // 前置：DSH_HOME + 已装 pack + 模型凭据。
-// 用法：source dev/env.sh && node scripts/smoke/delegation-smoke.mjs [--port 0] [--wall 180]
+// 用法：source run/env.sh && node scripts/smoke/delegation-smoke.mjs [--port 0] [--wall 180]
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'
 import { join, resolve } from 'node:path'

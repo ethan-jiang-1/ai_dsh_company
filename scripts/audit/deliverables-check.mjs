@@ -10,7 +10,7 @@
 //   判据逻辑一份，两处复用：`scripts/lib/deliverables.mjs`。
 //
 // 用法：
-//   source dev/env.sh && node scripts/audit/deliverables-check.mjs
+//   source run/env.sh && node scripts/audit/deliverables-check.mjs
 //   node scripts/audit/deliverables-check.mjs --workspace snapshots/replay/r1-motion/workspace.expected \
 //        --sessions snapshots/replay/r1-motion --legacy-flat      # 审已归档快照（平铺旧形状）
 //   node scripts/audit/deliverables-check.mjs --workspace snapshots/replay/r4-motion/workspace.expected \

@@ -7,7 +7,7 @@
 //   ② 跨 home 聚合审计（每家 home 各跑一次本工具再合并目录）；
 //   ③ 要给别的工具喂明文日志时。成本：零模型；秒到分钟级（视日志量，zstd -dc 逐份解）。
 // 用法：
-//   source dev/env.sh && node scripts/tools/session-log-export.mjs --out <dir> [--workspace <绝对路径>] [--home <DSH_HOME>]
+//   source run/env.sh && node scripts/tools/session-log-export.mjs --out <dir> [--workspace <绝对路径>] [--home <DSH_HOME>]
 //   不给 --workspace = 导出该 home 下全部 bucket（文件名带 bucket 前缀防撞）。
 // 退出码：0 = 导出完成；1 = 无可导日志或全部失败；2 = 参数/环境失败。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
@@ -23,7 +23,7 @@ const arg = (name) => {
 const OUT = arg('out')
 if (OUT === undefined) { console.error('session-log-export: 必须给 --out <dir>'); process.exit(2) }
 const HOME = arg('home') ?? process.env.DSH_HOME
-if (HOME === undefined) { console.error('session-log-export: 需要 $DSH_HOME（先 source dev/env.sh）或 --home <path>'); process.exit(2) }
+if (HOME === undefined) { console.error('session-log-export: 需要 $DSH_HOME（先 source run/env.sh）或 --home <path>'); process.exit(2) }
 const SESSIONS = join(HOME, 'sessions')
 if (!existsSync(SESSIONS)) { console.error(`session-log-export: 会话根不存在：${SESSIONS}`); process.exit(2) }
 

@@ -3,14 +3,14 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot } from '../../scripts/lib/repository-layout.mjs'
 
-// 条目 A 布局守卫（RFC driver-surface-package，2026-10-06）：dev/ 只收 tracked 启动配置，
+// 条目 A 布局守卫（RFC driver-surface-package，2026-10-06；2026-10-07 S1 起 run/）：run/ 只收 tracked 启动配置，
 // 运行残留家 = 顶层 runtime/。断言全部落在 tracked 文件上——fresh clone 与开发机同判。
 const LAUNCH_CONFIG = ['README.md', 'company.overlay.yml', 'entry-probe.patch.yml', 'env.sh']
 const RESIDUE_HOMES = ['harness-home', 'harness-home-b', 'pw-browsers', 'rehearsal-workspace']
 
 describe('launch config and runtime residue separation (item A)', () => {
-  it('dev/ holds only tracked launch config — residue reappearing there is a regression', () => {
-    const entries = readdirSync(join(repositoryRoot, 'dev')).sort()
+  it('run/ holds only tracked launch config — residue reappearing there is a regression', () => {
+    const entries = readdirSync(join(repositoryRoot, 'run')).sort()
     expect(entries).toEqual([...LAUNCH_CONFIG].sort())
   })
 
@@ -25,8 +25,8 @@ describe('launch config and runtime residue separation (item A)', () => {
     expect(existsSync(join(repositoryRoot, 'runtime/harness-home/README.md'))).toBe(true)
   })
 
-  it('dev/env.sh pairs with runtime/harness-home — the two homes stay disjoint', () => {
-    const env = readFileSync(join(repositoryRoot, 'dev/env.sh'), 'utf8')
+  it('run/env.sh pairs with runtime/harness-home — the two homes stay disjoint', () => {
+    const env = readFileSync(join(repositoryRoot, 'run/env.sh'), 'utf8')
     expect(env).toContain('../runtime/harness-home')
     expect(env).not.toContain("'harness-home'")
   })

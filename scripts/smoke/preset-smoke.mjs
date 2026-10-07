@@ -9,9 +9,9 @@
 // 两者都看不到 config 校验；**UI 还会把错误吞掉**（"新建会话点了没反应"）。
 // 所以唯一能上线前抓住它的手段是：走真入口路径（web RPC session/create）挂一次。
 //
-// 前置：DSH_HOME 指向已装本 pack 的 profile（`source dev/env.sh` 后用 dev home），
+// 前置：DSH_HOME 指向已装本 pack 的 profile（`source run/env.sh` 后用 dev home），
 //       client 面与前端 dist 已构建（guides/bootstrap）。
-// 用法：source dev/env.sh && node scripts/smoke/preset-smoke.mjs [--port 0] [--profile web]
+// 用法：source run/env.sh && node scripts/smoke/preset-smoke.mjs [--port 0] [--profile web]
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'
 import { readFileSync, readdirSync } from 'node:fs'

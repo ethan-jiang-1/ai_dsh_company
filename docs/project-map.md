@@ -25,7 +25,7 @@
 |---|---|---|
 | 自写运行包 | [company-pack](../packages/company-pack/) | 五个角色 preset、bundle 行、host 注册与 client 面；发布形状由 [包声明](../packages/company-pack/package.json) 决定 |
 | 真实公司盘 | [company-workspace](../company-workspace/) | 公司角色会话 cwd；手册、公司事实、模板、交付物和 journal；不是开发 docs 的镜像 |
-| 启动配置 | [dev](../dev/)、[env.sh](../dev/env.sh) | tracked 启动配置；源码验证使用开发 DSH_HOME |
+| 启动配置 | [run](../run/)、[env.sh](../run/env.sh) | tracked 启动配置；源码验证使用开发 DSH_HOME |
 | 运行残留 | [runtime](../runtime/)、[runtime/README](../runtime/README.md) | 开发 DSH_HOME、第二 home、浏览器工具态与排练盘（全部 gitignored；逐件 owner = runtime/README；排练盘成型见 [rehearsal 实现](../scripts/lib/rehearsal.mjs)） |
 | 上游机制 | [vendor/dsh](../vendor/dsh/) | 钉住的只读 submodule；开发 `pnpm dsh` 的源码基线 |
 | keyless 回归 | [tests](../tests/)、[Vitest 配置](../vitest.config.ts) | 模块逻辑、静态渲染、隔离文件夹具；分层守卫见 [layering.spec.ts](../tests/harness/layering.spec.ts) |
@@ -35,7 +35,7 @@
 | 决策记忆 | [notes](../notes/) | 按主题检索决定、被否决方案与复验依据 |
 | 推敲空间 | [_backlog](../_backlog/README.md) | 未成熟判断材料；任务执行按开发环与用户指令进入 |
 
-**四个位置影响运行**：**代码来源**决定 DSH 版本、**DSH_HOME** 决定 profile 与会话日志、**会话 cwd** 决定公司事实和输出、**验证证据**冻结时点事实——四条状态轴的权威位置与「不能从这里推断什么」唯一家 = [运行态地图 §二](runtime-map.md)。开发环境用 `source dev/env.sh` 与 `pnpm dsh` 配对；裸 `dsh` 是另一份全局安装。[开发环 §6](guides/dev-loop.md) 解释双 home 与双 DSH。
+**四个位置影响运行**：**代码来源**决定 DSH 版本、**DSH_HOME** 决定 profile 与会话日志、**会话 cwd** 决定公司事实和输出、**验证证据**冻结时点事实——四条状态轴的权威位置与「不能从这里推断什么」唯一家 = [运行态地图 §二](runtime-map.md)。开发环境用 `source run/env.sh` 与 `pnpm dsh` 配对；裸 `dsh` 是另一份全局安装。[开发环 §6](guides/dev-loop.md) 解释双 home 与双 DSH。
 
 ## 真实运行链
 
@@ -65,7 +65,7 @@ flowchart TD
 - `company-client` 行接到 [host 入口](../packages/company-pack/src/index.ts)，注册签字工具；[client 入口](../packages/company-pack/src/client/index.ts) 注册品牌、卡片和公司视图，并读取官方会话投影。
 - 公司手册与事实由会话 cwd 进入；[排练实现](../scripts/lib/rehearsal.mjs) 为实验换 cwd、刷新参考输入并保留排练产物。
 
-**公司完整操作走 Web profile。** shipped headless 是通用 CLI 面，单独运行它不会自动得到公司组合。headless 实验需要显式组合；[company overlay](../dev/company.overlay.yml) 只补部分宿主行，实际组合还由调用脚本的 preset patches 决定。不要把“CLI 可启动”当作“五角色公司已装配”。
+**公司完整操作走 Web profile。** shipped headless 是通用 CLI 面，单独运行它不会自动得到公司组合。headless 实验需要显式组合；[company overlay](../run/company.overlay.yml) 只补部分宿主行，实际组合还由调用脚本的 preset patches 决定。不要把“CLI 可启动”当作“五角色公司已装配”。
 
 **团队成员与独立角色 preset 会话有不同隔离语义。** preset 会话挂自己的角色组合；team teammate 的工具、身份与 KB 使用按团队机制走。选择通道时读 [委派合同](delegation.md) 和 [角色隔离设计](design/roles-isolation.md)，不要从角色名字推断它已挂完整 preset。
 

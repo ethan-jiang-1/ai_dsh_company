@@ -6,7 +6,7 @@
 //   ② office 预览：CSV / PDF 文档预览（ui-sidebar-documentpreview）。
 // 性质 = 收割台账（harvest-ledger）#8/#9 的证据采集：宽容式断言（找得到就 PASS、找不到如实记
 // "未定位入口"），截图留证；不是常驻回归 lane。真模型一轮 ≈ $0.5；排练场 cwd。
-// 用法：source dev/env.sh && node scripts/archive/harvest-probe.mjs
+// 用法：source run/env.sh && node scripts/archive/harvest-probe.mjs
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'

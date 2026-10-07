@@ -18,7 +18,7 @@
 **呈现即验证**（2026-09-30 立，用户裁定；规则唯一见 [dev-loop §1](./guides/dev-loop.md)）：替人起观察窗 = 先自己跑通本节（boot 横幅 + roster + client 零挂载失败），红了当场修，全绿才交 URL——用户不当第一次验收员。
 **机器腿 = [cdp-probe](./cdp-probe.md)**：`node scripts/probes/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/8 页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
 
-1. `source dev/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒，自检代替警告）**：
+1. `source run/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒，自检代替警告）**：
    `pnpm dsh --profile web --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 就说明你起的是日用 `~/.dsh`
    ——那里**也有个同名 `web` profile**（装的是日用插件集、没有公司五角色），或 pack 没装。不 source 的失败是**静默**的：
    起得来、不报错、五角色一个不出现。**计数 ≥1 同时证明「不必再 `plugin add`」**（dev web profile 已 `link:` 装好）。

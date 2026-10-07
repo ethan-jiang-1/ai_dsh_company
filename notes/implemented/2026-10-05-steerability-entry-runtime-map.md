@@ -8,7 +8,7 @@
 - **根 [README](../../README.md) 扩为首屏**：四轴一句话版、最小启动两路径（Web = 完整公司面；headless 只证通用 CLI）、首跑验收 + 最窄检查表指针；既有入口 / 安装 / 纪律行保持。
 - **AGENTS 入口路由收紧**（94/105 预算内同位数）：初入 = 项目地图（空间）+ 运行态地图（时序与四轴）；变更 = dev-loop §0.5/§1；验证 = 测试宪法 + tests/README + 脚本索引；首跑验收指针。
 - **[project-map](../../docs/project-map.md) 首屏重排**：快读 happy path 行；按任务进入表 +2 行（查运行态与时序 → runtime-map；选择验证 → tests/README）；「三位置」段升为**四轴引用**（唯一家 = runtime-map §二）。
-- **[dev/README](../../dev/README.md) 对 runtime-map 的前向引用转正链**。
+- **[run/README](../../run/README.md) 对 runtime-map 的前向引用转正链**。
 - 交叉链接：三首屏互链各答其一；四轴表唯一家在 runtime-map，README 只有一句话版。
 
 ## 验证记录（判据先行 = 走查判据）

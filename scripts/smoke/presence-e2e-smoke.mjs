@@ -14,7 +14,7 @@
 // 预算：2 分身单轮微动议 ≈ $1 / 3–7 分钟（--wall 封顶墙钟）。
 // 前置：DSH_HOME + 模型凭据（dev home）；cwd 写死 `runtime/rehearsal-workspace`（练习场 ≠ 运行场，
 //   产物落排练场，真盘零接触）。
-// 用法：source dev/env.sh && node scripts/smoke/presence-e2e-smoke.mjs [--wall 600]
+// 用法：source run/env.sh && node scripts/smoke/presence-e2e-smoke.mjs [--wall 600]
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'

@@ -64,7 +64,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | D9 | 上游缺口（常驻对话+独立组合）若成刚需→走 FAQ 13 方案 B 提 seam（`ChildComposition` 加 preset 字段），不 vendor patch | roles-isolation §4.1 |
 | D10 | **docs/ 按性质分层（导航/设计/计划/指南/合同），不按时间分层**；初始意图归 intents 登记表（该表已由 D34 退役；否决"初始化/"目录方案） | notes/implemented/2026-09-21-docs-layering.md |
 | D11 | **迭代单位 = 垂直轮**：R1 最薄全路径（CEO+VP-Eng 两人公司）→ 逐轮加宽；交付按完整垂直切片、验证按最窄证据、打磨蛇形折回；现成团队 UI R1 作观察窗、R2 进验收，自定义皮肤 R5；每轮换全新对话上下文（交接靠 roadmap 两清单） | notes/implemented/2026-09-21-vertical-rounds.md；FAQ 13 dev-loop 第 4/6 阶段 |
-| D12 | **patch 语义定案**（R1 实证）：`- id:` 只替换已有行（not found 即丢弃并警告）；**新增行必须 `- insert:` 子列表**；因此 host 行随 pack 的 bundle 走，且 `agent-presets` 行用**替换**语法覆盖 web-app 的出厂行（default: standard → ceo + 自定位 roots）；纯 headless 组合（无此行）用 `dev/company.overlay.yml` 的 insert 补 | notes/implemented/2026-09-22-r1-*.md；vendor shipped dsh-headless/dsh-web-app 的 cordis.patch.yml |
+| D12 | **patch 语义定案**（R1 实证）：`- id:` 只替换已有行（not found 即丢弃并警告）；**新增行必须 `- insert:` 子列表**；因此 host 行随 pack 的 bundle 走，且 `agent-presets` 行用**替换**语法覆盖 web-app 的出厂行（default: standard → ceo + 自定位 roots）；纯 headless 组合（无此行）用 `run/company.overlay.yml` 的 insert 补 | notes/implemented/2026-09-22-r1-*.md；vendor shipped dsh-headless/dsh-web-app 的 cordis.patch.yml |
 | D13 | **历史宣言：开发纪律沿用 DSH**（当时写作“整套继承 + 按规模裁剪、不发明本地流程”）。该默认适配自由已由 D23 限定：默认遵循钉住的 vendor 纪律，偏离须登记 D 号与约束证据；当前 owner 见 AGENTS.md §纪律及开发环 §12 | [D23 转型 Note](../notes/implemented/2026-09-23-dsh-inround-task-surface.md)；用户决定 |
 | D14 | **公司名 = wochen；角色显示名系列化** `<公司名> <角色>`（`wochen CEO` 等）；**preset id 保持 kebab 不变**（`ceo`/`vp-eng`/`vp-sales`/`coo`——id 受 `PRESET_ID=/^[a-z0-9][a-z0-9-]*$/` 限制，不能带下划线/大写）；角色层级不动（CEO 是个体、VP 是职能，见 role-content-plan §0.1） | notes/implemented/2026-09-22-wochen-naming.md；role-content-plan §1 |
 | D15 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**：真入口路径 > dump/扫描；"伺服了"≠"能加载"；给人看 UI 前先机器验证。**同时否决**：为此引入 spec 流程、把指令文件写更长 | notes/implemented/2026-09-22-agent-workflow-community-practice.md（17 个一手来源）；vendor `docs/testing.md` + postmortem 0001–0003；落点：guides/dev-loop §1/§2 + guides/bootstrap、AGENTS.md 纪律表 |
@@ -118,7 +118,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | `_faq_on_digested/13_expert-plugin-repo-organization/answer.md` | 五决策框架（入口形态/包粒度/DSH 源码位置/UI 层/spec 流程） | D1–D3、D6；design/architecture §0–§2、§9 |
 | `…/option-a-standalone-with-pinned-dsh.md` | **本 repo 形态依据（Option A）**：目录树、装法、取舍、升级阶梯 | design/architecture §6（目录树）、§8–§9；AGENTS.md 布局/簿记 |
 | `…/dev-loop.md` | 开发过程生命周期（六步闭环/调试阶梯/设计四问/插拔速查） | guides/dev-loop（全文吸收）；AGENTS.md 纪律 |
-| `…/dual-home-isolation.md` | 双 home 机制、崩溃半径、迁移方向 | dev/env.sh；guides/dev-loop §6 |
+| `…/dual-home-isolation.md` | 双 home 机制、崩溃半径、迁移方向 | run/env.sh；guides/dev-loop §6 |
 | `…/research.md` | 第三方生态证据（peers/兼容矩阵/自包含/真实安装形状） | guides/dev-loop §5 发布纪律时点；design/architecture §8 |
 | `_digested/`（源码消化笔记） | DSH 源码机制笔记（审计基线，版本唯一见 `AGENTS.md` §vendor 簿记——**基线可能落后当前钉住一代**，升 pin 未重审时以簿记注记为准） | design/ 各篇（architecture / roles-isolation / ui-demo）的机制核对引文；**权威仍在 `vendor/dsh/` 本体** |
 | `_agent_ready_development/sdlc-reference/01-agent-note-lifecycle.md` | DSH Agent Note 生命周期（状态/路径/格式/取代/归档；基于上游 0.1.7-rc.1 树） | [notes/README.md](../notes/README.md)（D35 迁入）+ [implemented/notes-lifecycle-absorption](../notes/implemented/2026-09-24-notes-lifecycle-absorption.md)（2026-09-24 点选吸纳六条） |

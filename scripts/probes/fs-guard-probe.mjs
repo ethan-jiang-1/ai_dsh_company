@@ -23,7 +23,7 @@
 //   FS_NOT_OBSERVED 的原因文案整体替换成 'file has not been read'（与 fs-local 原因措辞不同形），
 //   码保留在 tool/result 事件的 data.error.code（非 text 块，collectText 够不到）。⇒ 扫描面 =
 //   事件 data 的全量 JSON，锚 = FS_NOT_OBSERVED / FS_STALE_VERSION 两个码。
-// 用法：source dev/env.sh && node scripts/probes/fs-guard-probe.mjs
+// 用法：source run/env.sh && node scripts/probes/fs-guard-probe.mjs
 // 退出码：0 = 三判据全 PASS；1 = 有红或判据空转（不确定态，头注①三态表）；2 = 环境/启动失败。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'

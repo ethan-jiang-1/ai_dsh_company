@@ -39,7 +39,7 @@ describe('bounded source discovery', () => {
   })
 
   it('excludes generated, vendor, runtime, journal, deliverable and explicitly historical sources', () => {
-    const excluded = ['vendor/dsh/README.md', 'dev/README.md', 'snapshots/expected.md',
+    const excluded = ['vendor/dsh/README.md', 'run/README.md', 'snapshots/expected.md',
       'docs/generated/catalog.md', 'notes/archived/old.md', 'notes/archive/old.md',
       'notes/historical/old.md', 'notes/node_modules/README.md', 'notes/.cache/README.md',
       'packages/company-pack/lib/README.md', 'packages/company-pack/dist/README.md',

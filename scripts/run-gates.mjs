@@ -184,7 +184,7 @@ const WARN_FILES = (() => {
   })
   return [...walkMd(join(root, 'notes/implemented')), ...walkMd(join(root, 'notes/postmortem')), ...walkMd(join(root, '_backlog/_done'))]
 })()
-const TOP_DIRS = ['notes/', 'docs/', 'scripts/', 'packages/', 'snapshots/', 'dev/', 'runtime/', 'tests/', 'company-workspace/', 'vendor/']
+const TOP_DIRS = ['notes/', 'docs/', 'scripts/', 'packages/', 'snapshots/', 'run/', 'runtime/', 'tests/', 'company-workspace/', 'vendor/']
 const RUNTIME_PREFIXES = ['runtime/harness-home', 'runtime/harness-home-b', 'runtime/rehearsal-workspace', 'runtime/pw-browsers', '.pnpm-store']   // gitignored 运行态（2026-10-06 条目 A：dev/ 拆分，运行残留随迁顶层 runtime/）
 // 双树查：本仓根 **或** vendor/dsh 命中即过（AGENTS 纪律表的"权威（vendor 树）"列合法使用 vendor 相对写法）。
 // 白名单 = 历史性退役路径的叙述性提及（自带"现迁至…"说明的历史段）。

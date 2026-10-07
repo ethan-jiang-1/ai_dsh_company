@@ -12,7 +12,7 @@ COO、CFO 各自是独立 preset，跑在 DSH 会话里，你通过 web 观察�
 
 ## 二问：怎么跑起来？
 
-白话三步：进开发环境（`source dev/env.sh`）→ 起观察窗（`pnpm dsh web`）→ 浏览器开门
+白话三步：进开发环境（`source run/env.sh`）→ 起观察窗（`pnpm dsh web`）→ 浏览器开门
 （token URL 在启动横幅里读）。**headless 只证明 CLI 能跑，不是公司运行。**
 
 → 唯一步步骤：[demo.md §前置](demo.md)

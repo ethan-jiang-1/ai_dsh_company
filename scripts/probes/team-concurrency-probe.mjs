@@ -12,7 +12,7 @@
 //   C1b 至少一名成员的写入被拒过 **或** 两名都成功但 lead 转述里能看到读写次序（并发观察保真）
 //   C2a 任务认领终态 = 恰一个 owner（或两 claim 一胜一拒被重试消化）
 //   C2b 成员回报里可见 claim 冲突/重试通路（若有冲突）
-// 用法：source dev/env.sh && node scripts/probes/team-concurrency-probe.mjs
+// 用法：source run/env.sh && node scripts/probes/team-concurrency-probe.mjs
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'

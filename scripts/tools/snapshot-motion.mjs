@@ -6,7 +6,7 @@
 // 形状沿用 R1（`snapshots/replay/r1-motion/`）与 vendor `snapshots/AGENTS.md`：一场景一目录 + snapshot.yml；
 // replay harness 已交付（scripts/smoke/replay-smoke.mjs）；本目录用途 = **基线对照**（行为变了就 diff）。
 //
-// 用法：source dev/env.sh && node scripts/tools/snapshot-motion.mjs \
+// 用法：source run/env.sh && node scripts/tools/snapshot-motion.mjs \
 //         --session session-<lead-id> --out snapshots/replay/r2-motion --motion "动议原文" [--cwd company-workspace]
 import { repositoryRoot as ROOT, snapshotOutput, snapshotOutputPath } from '../lib/repository-layout.mjs'
 import { pickSessionLog } from '../lib/session-log-generation.mjs'

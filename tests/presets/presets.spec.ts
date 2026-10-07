@@ -105,7 +105,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       join(PACK, 'cordis.patch.yml'),
       join(PACK, 'package.json'),
       join(ROOT, 'package.json'),
-      join(ROOT, 'dev/company.overlay.yml'),
+      join(ROOT, 'run/company.overlay.yml'),
     ]
     for (const file of files) {
       const text = readFileSync(file, 'utf8')

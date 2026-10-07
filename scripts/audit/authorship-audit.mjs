@@ -22,7 +22,7 @@
 //     队友写入按成员名归属；depth=0 的根会话（人开第二扇门 preset 没改的真代笔）不受影响。
 //   ✓ **版本一致**（R0-3，2026-10-03 加）—— final 依据所引稿版号 == 稿面署名行当前版号；
 //   ✗ **版本过期** —— 引用 vN ≠ 稿面当前 vM（quote-z-2026 失败模式仪器化：双签锚 v2、盘面已 v3）。
-// 用法：source dev/env.sh && node scripts/audit/authorship-audit.mjs [--workspace <dir>]
+// 用法：source run/env.sh && node scripts/audit/authorship-audit.mjs [--workspace <dir>]
 // 退出码：0 = 无"署名不实"；1 = 有；2 = 环境（缺 DSH_HOME）。
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { pickSessionLog } from '../lib/session-log-generation.mjs'
@@ -36,7 +36,7 @@ const WS_FLAG = process.argv.indexOf('--workspace')
 const WS = WS_FLAG === -1 ? join(ROOT, 'company-workspace') : resolve(process.argv[WS_FLAG + 1])
 
 const HOME = process.env.DSH_HOME
-if (HOME === undefined) { console.error('authorship-audit: 先 source dev/env.sh（需要 DSH_HOME）'); process.exit(2) }
+if (HOME === undefined) { console.error('authorship-audit: 先 source run/env.sh（需要 DSH_HOME）'); process.exit(2) }
 const SESSIONS = join(HOME, 'sessions')
 
 /** 读 zstd 会话日志（多帧，用 zstd -dc；读不了就跳过）。 */

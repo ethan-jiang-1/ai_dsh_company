@@ -76,7 +76,7 @@
 "等一个不会来的事件"（watcher/未 resolve 的 Promise），CPU 满载 = 死循环；这比砍配置二分快得多
 （R1 三刀二分全白切，问题在 profile 形态默认值而非内容）。
 
-一次性实验不落盘：`pnpm dsh --profile <p> --patch ./dev/try-x.patch.yml`——`--patch` 是
+一次性实验不落盘：`pnpm dsh --profile <p> --patch ./run/try-x.patch.yml`——`--patch` 是
 "profile 层之后再叠一层"的可重复旗标（`vendor/dsh/apps/cli/src/args.ts`），风险半径一次
 进程，连 dev home 都不落。指令层的同款临时叠加 = `AGENTS.local.md` / `CLAUDE.local.md`
 （vendor `packages/context/agent-instructions` 支持）——不动 git 的本地指令叠加，调试/演示
@@ -102,9 +102,9 @@
 
 | 装法 | 命令 | 用途 |
 |---|---|---|
-| workspace 直跑 | `source dev/env.sh && pnpm dsh --profile headless "…"` | 日常开发，改配置即刻生效 |
-| patch overlay | `pnpm dsh --profile <p> --patch ./dev/try-x.patch.yml` | 一次性实验某插件行，不落盘 |
-| **公司 overlay（headless 动议）** | `pnpm dsh --profile headless --patch ./dev/company.overlay.yml "…"` | 无 web-app 行的组合里补公司行（insert 语法）；R1 用它验过全组合 |
+| workspace 直跑 | `source run/env.sh && pnpm dsh --profile headless "…"` | 日常开发，改配置即刻生效 |
+| patch overlay | `pnpm dsh --profile <p> --patch ./run/try-x.patch.yml` | 一次性实验某插件行，不落盘 |
+| **公司 overlay（headless 动议）** | `pnpm dsh --profile headless --patch ./run/company.overlay.yml "…"` | 无 web-app 行的组合里补公司行（insert 语法）；R1 用它验过全组合 |
 | profile 内持久（dev = link:） | `pnpm dsh plugin --profile <p> add link:./packages/company-pack` | **日常开发**：符号链接指仓库源码，内容改动即刻生效；store/cache 由 profile `.npmrc` 钉在 repo 内 |
 | profile 内持久（真实形状） | `pnpm dsh plugin --profile <p> add file:./packages/company-pack` | 仅验证真实安装形状——归 R5a release-smoke（干净 profile；`plugin` 子命令把参数转发给 profile 目录里的 pnpm） |
 | 正式分发 | `pnpm dsh plugin --profile <p> add <npm-name>` | 用户视角；CI 测兼容矩阵 |
@@ -141,9 +141,9 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回�
 
 ## 6. 双 home 与双 DSH 操作细节
 
-机制与崩溃半径见 FAQ 13 `dual-home-isolation.md`（外部材料）；本 repo 已落 `dev/env.sh`。操作面四条：
+机制与崩溃半径见 FAQ 13 `dual-home-isolation.md`（外部材料）；本 repo 已落 `run/env.sh`。操作面四条：
 
-1. **环境兜底优先**：一切会话先 `source dev/env.sh`（`DSH_HOME=<repo>/runtime/harness-home`）；
+1. **环境兜底优先**：一切会话先 `source run/env.sh`（`DSH_HOME=<repo>/runtime/harness-home`）；
    agent 不会自己想起双 home 的区别，靠环境不靠提醒。
 2. **dev home 配一次 key**：凭据按 home 隔离，`runtime/harness-home/.credentials.yaml` 自己配
    一次 `DEEPSEEK_API_KEY`（或接受真实 API 测试 self-skip）。
@@ -154,7 +154,7 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回�
    注意 `DSH_HOME` 只护数据层：source 过 env.sh 后裸 `dsh` 也落在 dev home，但跑的
    仍是全局代码。
 5. **新 shell 陷阱（R1 实证 + R4 更正）**：任何 `pnpm dsh` / `node bin.ts` 调用前必须先
-   `source dev/env.sh`，否则**静默**落日用 home `~/.dsh`（写 profile、装包都进日用数据）。
+   `source run/env.sh`，否则**静默**落日用 home `~/.dsh`（写 profile、装包都进日用数据）。
    实证：R1 部署时一次 `plugin add` 在未 source 的 shell 里试图 `mkdir ~/.dsh/profiles/company`，
    被沙箱 EPERM 拦下（日用 home 未被污染）——沙箱是最后防线，不是第一防线。
    ⚠ **R4 更正一处过期表述**：这里原先写"`DSH_HOME` **不继承**"。那只在**普通终端**成立。
@@ -350,7 +350,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - 条目收尾后可派**中立体清扫**（独立子代理；输入 = diff + 收尾 Note + 关联 `_backlog` 行/卡；固定清单格式与首跑样例见 [implemented/notebook-hygiene](../../notes/implemented/2026-09-25-notebook-hygiene.md) 实况）——扫与修分家。
 - 文档卫生按指导价值：移除失效/重复指令与无行动价值的历史噪声；保留仍指导当前决策、解释约束或支持复验的证据。不以净减行数为目标（D26）。
 - **授权链与时间轴（intents.md 已退役，D34 2026-10-04）**：授权线索（用户点名/裁定原话）记在**对应 Note 的状态行**；时间轴 = `notes/implemented/` 文件名日期 + git log；冻结档案 = `notes/archived/intents-*.md`（2026-10 为终档，只读）。退役理由 = 第三本账与 Note 双写、膨胀病史三次、违反上游 no-index 教义（vendor notes README）。
-- **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链一律 `set -o pipefail` + `&&`（不带 pipefail 的 `cmd | tail` 退出码是 `tail` 的 = 假绿）。push 由 **pre-push hook 强制跑全量 `pnpm verify` + `pnpm test`**（verify 2026-09-27 立；test 09-28 加，不进 CI 的定界见 [ci-test-lane Note](../../notes/implemented/2026-09-28-ci-test-lane.md)；接线 = `source dev/env.sh` 幂等设 `core.hooksPath`；bypass = `--no-verify`，用后须在收尾 Note 说明原因）。
+- **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链一律 `set -o pipefail` + `&&`（不带 pipefail 的 `cmd | tail` 退出码是 `tail` 的 = 假绿）。push 由 **pre-push hook 强制跑全量 `pnpm verify` + `pnpm test`**（verify 2026-09-27 立；test 09-28 加，不进 CI 的定界见 [ci-test-lane Note](../../notes/implemented/2026-09-28-ci-test-lane.md)；接线 = `source run/env.sh` 幂等设 `core.hooksPath`；bypass = `--no-verify`，用后须在收尾 Note 说明原因）。
 - **复盘一问：本轮有没有 agent 遵守的"未成文规则"**（从代码模式推断出的伪规则，跨会话会扩散）？三选一收口：升格 verify 门禁 / 写进 owner Note / 显式作废——规则不留空气（2026-09-28 借 FAQ 11）。
 
 ## 13. 自主优先协议（2026-09-26 立，用户令；D29）

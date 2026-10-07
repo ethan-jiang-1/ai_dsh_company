@@ -56,9 +56,9 @@ describe('home status（日用 home 判定，只警告不抛）', () => {
     expect(homeStatus({ DSH_HOME: daily }, { dailyHome: join(daily, 'nested') }).kind).toBe('daily')
   })
 
-  it('unset 与 daily 都带 source dev/env.sh 提示，ok 不带', () => {
-    expect(homeStatus({}, { dailyHome: daily }).warning).toContain('source dev/env.sh')
-    expect(homeStatus({ DSH_HOME: join(daily, 'x') }, { dailyHome: daily }).warning).toContain('source dev/env.sh')
+  it('unset 与 daily 都带 source run/env.sh 提示，ok 不带', () => {
+    expect(homeStatus({}, { dailyHome: daily }).warning).toContain('source run/env.sh')
+    expect(homeStatus({ DSH_HOME: join(daily, 'x') }, { dailyHome: daily }).warning).toContain('source run/env.sh')
     expect(homeStatus({ DSH_HOME: home }, { dailyHome: daily }).warning).toBeUndefined()
   })
 })
@@ -103,13 +103,13 @@ describe('orientState + renderOrient', () => {
     expect(text).toContain('3')
     expect(text).toContain('pnpm verify')
     expect(text).toContain('pnpm test')
-    expect(text).not.toContain('source dev/env.sh')
+    expect(text).not.toContain('source run/env.sh')
   })
 
   it('unset 态渲染带警告且不误报 profiles（日用 home 的内容不算）', () => {
     const state = orientState({ env: {}, dailyHome: daily, workspaceRoot: workspace })
     const text = renderOrient(state)
-    expect(text).toContain('source dev/env.sh')
+    expect(text).toContain('source run/env.sh')
     expect(text).not.toContain(daily)
     expect(state.home.kind).toBe('unset')
     expect(state.profiles).toEqual([])

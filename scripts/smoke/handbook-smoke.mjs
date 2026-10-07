@@ -11,7 +11,7 @@
 // 证明不了注入内容；本脚本是这条线的完成定义。
 //
 // 前置：DSH_HOME + 已装 pack + 模型凭据（每个角色 1 次小调用）。
-// 用法：source dev/env.sh && node scripts/smoke/handbook-smoke.mjs [--roles ceo,vp-eng] [--port 0]
+// 用法：source run/env.sh && node scripts/smoke/handbook-smoke.mjs [--roles ceo,vp-eng] [--port 0]
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'
 import { join, resolve } from 'node:path'

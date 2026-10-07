@@ -2,7 +2,7 @@
 
 > 性质：顶层合同——profile / bundle / preset / session / cwd / 日志 / workspace / snapshot 的**时序关系**与
 > **四条状态轴**的唯一家（RFC entry-runtime-map 2026-10-05 立）。什么时候读 = 排查运行链时序、确认某状态在哪条轴、或分不清「现场 vs 证据」时。空间导航 = [项目地图](project-map.md)；
-> runtime/ 运行残留逐件 owner = [runtime/README](../runtime/README.md)、dev/ 启动配置 = [dev/README](../dev/README.md)；证据政策 = [testing.md](testing.md)；
+> runtime/ 运行残留逐件 owner = [runtime/README](../runtime/README.md)、dev/ 启动配置 = [dev/README](../run/README.md)；证据政策 = [testing.md](testing.md)；
 > 四种会话形态 = [presets.md](presets.md) 四形态矩阵。
 
 ## 一、完整 Web 链（时序）
@@ -42,7 +42,7 @@ repo（pnpm dsh；代码唯一权威 = vendor/dsh 钉 SHA 只读）
 ## 三、错误入口（首跑常踩）
 
 - `pnpm dsh --profile headless` 只证明通用 CLI；**公司完整操作走 Web profile**（空间细节 = [项目地图](project-map.md)）。
-- 未 `source dev/env.sh` 时 `DSH_HOME` = 日用 `~/.dsh`——那里**另有同名 `web` profile**（起得来、不报错、
+- 未 `source run/env.sh` 时 `DSH_HOME` = 日用 `~/.dsh`——那里**另有同名 `web` profile**（起得来、不报错、
   五角色一个不出现）；开门步骤唯一家 = [demo.md §前置](demo.md)。
 - 已删除的退役 profile：dev home 曾有 `profiles/company`（file: 旧形状）——2026-10-05 裁决删除（零功能消费面终核 + 48M 死重）；**若再现同名目录即为异常**（墓碑记录 = [runtime/README](../runtime/README.md) 运行态表）。
 - 进程 cwd ≠ 会话 cwd；启动成功 ≠ 五角色已装配（挂载证据 = preset-smoke，[tests/README](../tests/README.md)）。

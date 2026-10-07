@@ -4,8 +4,8 @@
 // 何时跑：①「启动给我看」类请求的自检（呈现即验证，dev-loop §1 + demo.md §前置的机器实现：
 //   先对已起实例断言真实渲染，全绿才把 URL 交给人）；②插件 client 面改动后；
 //   ③升 pin / 收割后 UI 回归。成本：默认档零模型（真实渲染断言面）；`--ask` 加一次真实模型调用。
-// 前置：GUI URL（demo.md §前置：source dev/env.sh → pnpm dsh web -- --port 0 --no-open → 横幅 URL）；
-//   Chrome 二进制：DSH_PROBE_CHROME 环境变量或系统 Chrome（dev/env.sh 已指 Chrome for Testing）。
+// 前置：GUI URL（demo.md §前置：source run/env.sh → pnpm dsh web -- --port 0 --no-open → 横幅 URL）；
+//   Chrome 二进制：DSH_PROBE_CHROME 环境变量或系统 Chrome（run/env.sh 已指 Chrome for Testing）。
 // 用法：node scripts/probes/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser]
 //   默认断言面 = composer + 品牌 + 右栏 8 公司页签逐个开（Start-chip 回切）+ console/异常捕获。
 //   --ask 会真建会话（registry default = ceo）输入问题发送并等待轮次收口——完整产品环，留测试会话。

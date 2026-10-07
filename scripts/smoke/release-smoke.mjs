@@ -3,7 +3,7 @@
 // 认证档（不进 pnpm test）：company-pack 构建 → npm pack → 干净 profile 真安装 → built CLI boot/RPC。
 // 何时跑：pack 依赖、安装形状、built 启动器改动时；或它属于关键验收时（无 key，分钟级）
 // vendor 产物是前置条件，不由此脚本重建；存在/运行通过不代表新鲜。构建配方见 guides/bootstrap。
-// 用法：source dev/env.sh && node scripts/smoke/release-smoke.mjs [--keep]
+// 用法：source run/env.sh && node scripts/smoke/release-smoke.mjs [--keep]
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../lib/rehearsal.mjs'
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'

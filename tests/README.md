@@ -31,7 +31,7 @@
 
 ## 新 Agent 首跑验收（推荐，非强制）
 
-- **有 `DEEPSEEK_API_KEY`**：`source dev/env.sh && node scripts/smoke/entry-probe-smoke.mjs`——真模型认证档，
+- **有 `DEEPSEEK_API_KEY`**：`source run/env.sh && node scripts/smoke/entry-probe-smoke.mjs`——真模型认证档，
   逐题验证入口链路由与证据（机器分 + 来源哈希；成本与触发见头注）；不进 `pnpm test`、**不作门禁**。
 - **无 key**：`pnpm verify` + `pnpm test` + `node scripts/smoke/client-load-smoke.mjs`——结构门禁 + keyless
   回归 + client 真挂载三件套。

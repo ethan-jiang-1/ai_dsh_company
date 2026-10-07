@@ -14,7 +14,7 @@
 // 为什么默认不跑：慢轮次实测 150s+，做门禁太贵；连通性用 ping 就够（2026-09-22 用户裁定）。
 //
 // 前置：DSH_HOME + 已装 pack + 模型凭据（真模型；ping 档 = 5 次极短调用）。
-// 用法：source dev/env.sh && node scripts/smoke/probe-smoke.mjs [--port 0] [--concurrency 5] [--full] [--timeout 90000]
+// 用法：source run/env.sh && node scripts/smoke/probe-smoke.mjs [--port 0] [--concurrency 5] [--full] [--timeout 90000]
 //
 // 分层门禁的**设计要点（可迁移到别的面）**——2026-09-26 从 dev-loop §9 搬来这里（一处事实一个家：
 // 这些是"本脚本为什么这么写"的说明，紧挨范例实现；dev-loop §9 只留指针）：

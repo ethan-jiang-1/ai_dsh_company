@@ -12,7 +12,7 @@
 //      "降透明落在不被动画的子元素上"）、动画确实在跑（animationName=wk-node-in，否则这个坑不成立）、
 //      两态边色不同、两态箭头 fill 不同且非黑（证明双 marker 生效）、徽章四态文案齐；
 //   ② **图像判据**（人/多模态看图）：出 `snapshots/visual/dag-visual/{light,dark}.png`，逐张判"看起来对不对"。
-// 用法：source dev/env.sh && node scripts/probes/dag-visual-probe.mjs
+// 用法：source run/env.sh && node scripts/probes/dag-visual-probe.mjs
 import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
