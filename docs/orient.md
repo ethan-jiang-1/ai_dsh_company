@@ -26,7 +26,7 @@ COO、CFO 各自是独立 preset，跑在 DSH 会话里，你通过 web 观察�
 
 ## 四问：测试资产在哪、怎么选？
 
-三层：**秒级回归**（`pnpm test`）→ **真实入口冒烟**（[scripts](../checks/README.md) 的 smoke 与
+三层：**秒级回归**（`pnpm test`）→ **真实入口冒烟**（[检查索引](../checks/README.md) 的 smoke 与
 audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.md)）。改完东西选最窄检查：
 按改动面查表。
 
@@ -40,7 +40,8 @@ audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.m
 - **skills**：`packages/company-pack/presets/<角色>/skills/`——盘上可见，一角色一目录。
 - **运行态**：[runtime/](../runtime/README.md)（gitignored，跑过留下的状态全在这）；
   一条命令看全景：`pnpm orient`。
-- **run bundle**：**不落盘成文件**；要看某次运行的证据链，按需算视图：
+- **run bundle**：**一次运行 = 四件套**（代码与组合 / DSH 运行状态 / 会话 cwd / 证据）——
+  `pnpm orient` 默认全景直接显示这四件；某次运行的证据链按需算视图：
   `pnpm orient --scenario replay/r2-motion`（引用不复制，防第二权威）。
 
 → 时序与四条状态轴：[运行态地图](runtime-map.md)
@@ -48,5 +49,5 @@ audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.m
 ## 现在就想看点什么？
 
 `pnpm orient`——keyless、秒级、只读：当前 home（含「没 source env.sh = 用了日用 home」警告）、
-在场 profiles、最近会话、公司盘概览、待核工作候选（R3′ 口径扫描——零容忍未达门槛，只显示不进待办）、
-便宜检查清单。不用为了「看看现在什么状态」拉起整个公司。
+在场 profiles、最近会话、公司盘概览、run bundle 四件套、待核工作候选（R3′ 口径扫描——零容忍未达门槛，
+只显示不进待办）、便宜检查清单。不用为了「看看现在什么状态」拉起整个公司。

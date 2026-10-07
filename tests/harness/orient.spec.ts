@@ -93,7 +93,7 @@ describe('公司盘概览', () => {
 })
 
 describe('orientState + renderOrient', () => {
-  it('ok 态渲染含 home / profiles / 会话 / 公司盘 / 便宜检查五节', () => {
+  it('ok 态渲染含 home / profiles / 会话 / 公司盘 / run bundle 四件套 / 便宜检查节', () => {
     const state = orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace, gitStatus: 3 })
     const text = renderOrient(state)
     expect(text).toContain(home)
@@ -101,6 +101,8 @@ describe('orientState + renderOrient', () => {
     expect(text).toContain('slug-company')
     expect(text).toContain('new-motion')
     expect(text).toContain('3')
+    expect(text).toContain('run bundle 四件套')
+    expect(text).toContain('pnpm orient --scenario')
     expect(text).toContain('pnpm verify')
     expect(text).toContain('pnpm test')
     expect(text).not.toContain('source run/env.sh')

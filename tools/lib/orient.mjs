@@ -9,7 +9,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { devHomeStatus } from './runtime-home.mjs'
 import { scanR3Dual } from './candidate-scan.mjs'
-import { snapshotScenes } from './repository-layout.mjs'
+import { repositoryRoot, snapshotScenes } from './repository-layout.mjs'
 
 /** 双 home 判定的观测包装：只分类与警告，不拒绝执行。 */
 export function homeStatus(env = process.env, { dailyHome } = {}) {
@@ -116,18 +116,37 @@ export function parseSessionPreset(text) {
   return parseSessionHead(text)?.preset
 }
 
+/**
+ * run bundle 四件套（RFC driver-purpose-top-level S4）：把「一次运行 = 哪四件状态」默认显性化。
+ * 只导航不复制——逐轴权威唯一家 = run/README 与 docs/runtime-map §二；引用不复制（不落盘 manifest）。
+ */
+export function fourPieceState({ home, profiles, workspaceRoot, root = repositoryRoot }) {
+  const scenes = snapshotScenes(root)
+  const byKind = {}
+  for (const scene of scenes) byKind[scene.kind] = (byKind[scene.kind] ?? 0) + 1
+  const kinds = Object.entries(byKind).map(([kind, count]) => `${kind} ${count}`).join(' · ')
+  return {
+    code: 'vendor/dsh（钉 SHA 只读）+ packages/company-pack（bundle 行 + 五角色组合）',
+    runState: `DSH_HOME ${home.kind === 'ok' ? home.home : `（${home.kind}）`}${profiles.length > 0 ? ` · profiles: ${profiles.join(', ')}` : ''}`,
+    sessionCwd: `${workspaceRoot}（排练 = runtime/rehearsal-workspace/，gitignored）`,
+    evidence: `snapshots/ 共 ${scenes.length} 场景${kinds ? `（${kinds}）` : ''}`,
+  }
+}
+
 /** 组装观测态。gitStatus / sessionPresets 由调用方注入（lib 不起进程）：前者=数字或 null，
  *  后者 = slug→preset 映射或 null（null = 不渲染 preset 列；映射内 undefined = 「不可用」）。 */
-export function orientState({ env = process.env, dailyHome, workspaceRoot, gitStatus = null, sessionPresets = null, sessionLimit = 5 } = {}) {
+export function orientState({ env = process.env, dailyHome, workspaceRoot, gitStatus = null, sessionPresets = null, sessionLimit = 5, root } = {}) {
   const home = homeStatus(env, { dailyHome })
   const effective = home.kind === 'ok' ? home.home : null
+  const profiles = effective ? listProfiles(effective) : []
   return {
     home,
-    profiles: effective ? listProfiles(effective) : [],
+    profiles,
     sessions: effective ? listSessions(effective, sessionLimit) : { total: 0, recent: [] },
     workspace: { root: workspaceRoot, ...workspaceOverview(workspaceRoot), gitStatus },
     scan: scanDeliverables(workspaceRoot),
     sessionPresets,
+    fourPiece: fourPieceState({ home, profiles, workspaceRoot, root }),
     checks: CHECKS,
   }
 }
@@ -177,6 +196,12 @@ export function renderOrient(state) {
     }
     lines.push('  （ᵈ = 依赖由盘上稿推断满足，* = 稿与状态行矛盾待核实；全部 needsVerify 恒真——真伪人核）')
   }
+  lines.push('', '== run bundle 四件套（一次运行 = 这四件状态；权威家 = run/README + docs/runtime-map §二）==')
+  lines.push(`代码与组合   ${state.fourPiece.code}`)
+  lines.push(`运行状态     ${state.fourPiece.runState}`)
+  lines.push(`会话 cwd     ${state.fourPiece.sessionCwd}`)
+  lines.push(`证据         ${state.fourPiece.evidence}`)
+  lines.push('深看某次运行 pnpm orient --scenario <kind>/<场景>')
   lines.push('', '== 便宜检查（keyless，现在就能跑）==')
   for (const check of state.checks) lines.push(`  ${check.cmd} — ${check.what}`)
   return lines.join('\n')
