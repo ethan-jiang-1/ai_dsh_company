@@ -24,8 +24,9 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 - **前台一次出稿**：调用即等结果，child 的最终正文直接回到 CEO 的对话流。
 - **per-instance persona**：`dsh-tool-subagent` 的教义——"another persona … requires another
   distinctly named tool"；两个工具各带自己的职能 persona（文案见 preset ④）。
-- **`maxDepth: 1`**：委托 child 不能再委托 `vp_eng`/`vp_sales`（禁止 VP→VP 平级派活）；它仍可用
-  `subagent` 生自己的 workers。
+- **`maxDepth: 1`**：委托 child 不能再委托 `vp_eng`/`vp_sales`（禁止 VP→VP 平级派活）；也不能经通用
+  `subagent` 再生 worker——通用行未设 `maxDepth`，rc.2 默认 = **1**（`subagent` 包 Config，vendor
+  `subagent/src/index.ts`；0.1.7 时代「默认 3」已过期）。要嵌套需在行上显式写 `maxDepth`。
 - **改稿方式**：再委派一次，把上一稿一起给它（one-shot 语义）。
 - **工具行归属**：写在 `presets/ceo/agent.cordis.yml` 的 `delegation` 组内（preset 自包含，
   DSH 无 patch 继承——见 [presets.md](./presets.md) §工具面）。

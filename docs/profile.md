@@ -42,6 +42,8 @@ preset roster 走 **`agent-preset-registry` 一行 + 每预设一行声明**（0
 | `agent-team` + `tool-agent-team`（insert） | 团队协作主通道（M4/D4；直插行，无续驶冲突，architecture §3 冲突注①） | ✅ dump 实测在列 |
 | `ui-agent-team`（insert） | 团队 Web 可视面：Team 按钮 / 名册 / 实时任务板 / 点进 VP 会话 | ✅ 前端加载列表含其 client 模块 |
 | `company-client`（insert，`name: dsh-company-pack`） | 本包 client 面：浏览器半注册 `sidebar.brand.name`（品牌皮肤） | ✅ 前端加载列表含 `dsh-company-pack/client.js` |
+| `session-query-sqlite`（**替换**出厂行；批 2 收割） | 会话日志 SQL 查询（`tool-session-query` ×5 的 host 侧；`openAt: first-search` 懒开） | ✅ 行在 [cordis.patch.yml](../packages/company-pack/cordis.patch.yml) |
+| `time-context`（**替换**出厂行；批 3 收割） | 日期通道（注入日期供记账与 journal 命名；pack 侧钉 `timeZone: Asia/Shanghai`） | ✅ 行在 [cordis.patch.yml](../packages/company-pack/cordis.patch.yml) |
 
 工具行走 preset 的自包含组合，不随 host bundle 增补（R1 实证，机制见 [architecture §6 要点 1](./design/architecture.md)）。
 
@@ -53,7 +55,8 @@ preset roster 走 **`agent-preset-registry` 一行 + 每预设一行声明**（0
 - `plugin add` 的行注册顺序：pnpm 成功后 CLI 才写 bundles 列表——若中途失败，手动补
   `dsh.profile.bundles`（R1 实证一次）。
 
-**Team 容量与信箱背压（rc.2 可调参数，收割 #11）**：编制上限（`maxMembers`，默认 8）与信箱背压
+**Team 容量与信箱背压（rc.2 可调参数，收割 #11）**：编制上限（`maxMembers`：代码默认 16，官方 bundle
+与本仓 patch 均显式钉 8）与信箱背压
 （`maxPendingMessagesPerMember` / `maxMessageBytes`）在组合层调——行清单与默认值见
 `vendor/dsh/packages/experimental/agent-team/src/mailbox.ts` 与 `agent-team-profile`；调参 = bundle 行
 config，不动 preset。

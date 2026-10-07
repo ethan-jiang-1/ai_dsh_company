@@ -167,7 +167,7 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回�
    在 **DSH 的 coding 会话里跑 bash** 时，`DSH_HOME` 是**继承且带值的**，值就是日用 home
    `~/.dsh`（实测：不 source 直接 `echo $DSH_HOME` → `/Users/bowhead/.dsh`）。后果比"没设"更坏：
    脚本里"未设则报错"的那道防线**根本不触发**，会安静地拿日用 home 的会话库当输入。
-   所以：**判据/审计类脚本要自己拒绝日用 home**。**判据/审计类脚本一律接入 `tools/lib/runtime-home.mjs`**（在启动前拒绝日用目录、重叠路径及其符号链接；清单唯一源 = 各脚本自己的 import，`rg -l runtime-home scripts -g '*.mjs'` 即得——**别在文档里列名单**，2026-09-26 实测旧名单只列了 6 个而实际已有 17 个）；
+   所以：**判据/审计类脚本要自己拒绝日用 home**。**判据/审计类脚本一律接入 `tools/lib/runtime-home.mjs`**（在启动前拒绝日用目录、重叠路径及其符号链接；清单唯一源 = 各脚本自己的 import，`rg -l runtime-home checks tools -g '*.mjs'` 即得——**别在文档里列名单**，2026-09-26 实测旧名单只列了 6 个而实际已有 17 个）；
    `deliverables-check` / `release-smoke`、`entry-probe` / `snapshot-motion` 均在运行前调用 `requireDevHome`，拒绝缺失或与日用 home 重叠的路径；`sync-dsh --pin` 也要求隔离 home。守卫不涵盖未接入该 helper 的任意脚本，也不防守检查后的并发符号链接替换。
 6. **端口与实例隔离（部署事实）**：headless 形态（探针/动议）**无端口**——单次任务
    进程，stdout 出结果，日志落 `$DSH_HOME/sessions/`。web 形态（观察窗）起**本地**
@@ -196,7 +196,7 @@ preset 只在 Web 面挂载（§2 第 3.6 层），所以**验证角色行为必
 可以脚本化建会话、发 prompt、列会话：
 
 ```sh
-# ① token → cookie（cookie 按 origin 隔离：换端口/换实例都要重新换一次）
+# ① token → cookie（cookie 按 origin 隔离：换端口/换实例都要重新换一次；3081 = 示例值，端口是环境状态、从启动横幅读）
 #    从响应头抓 set-cookie 显式带上——`curl -c jar` 抓不稳，别用（脚本同法 = [harvest-probe.mjs](../../tools/archive/harvest-probe.mjs) 的 getSetCookie）
 COOKIE=$(curl -s -D - -o /dev/null "http://127.0.0.1:3081/?token=<TOKEN>" | grep -i '^set-cookie:' | head -1 | cut -d' ' -f2 | cut -d';' -f1)
 
@@ -283,8 +283,8 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 
 1. **真模型 / 真浏览器不进迭代环的秒级回归档**：keyless 单测与结构检查保持快速；认证档仅在受影响面或验收要求时运行，不按“轮末/每轮”机械触发。需要真入口 → 写 `checks/smoke/*-smoke.mjs`，别塞进 `tests/`。**这条有机械门禁**：`tests/harness/layering.spec.ts` 扫 `tests/**`，出现 `node:child_process` / `spawn(` / playwright /
    `fetch(` / 密钥即红（已反证：塞一行 `import { spawn } from 'node:child_process'` 立刻变红）。**R5a 起另禁两条**（均双红证）：tests/
-   不得 import `scripts/` 下的驱动脚本（`tools/lib/` 纯逻辑库除外）；任何 vitest 配置不得把
-   `scripts/` 编进测试发现——重放 lane 是第三档，只由 `checks/smoke/replay-smoke.mjs` 驱动。
+   不得 import `tools/` 下的驱动脚本（`tools/lib/` 纯逻辑库除外）；任何 vitest 配置不得把
+   `checks|probes|tools` 编进测试发现——重放 lane 是第三档，只由 `checks/smoke/replay-smoke.mjs` 驱动。
 2. **能做成纯函数就做成纯函数**：UI 组件把"展示事实"抽成纯函数（范本 `delegationCardModel`），
    keyless 单测直接断言它——组件层就永远不需要模型与浏览器。
 3. **认证档要能"重放"而不是"重跑"**：真模型跑一次 → 会话日志归档 → 后续用归档做回放断言

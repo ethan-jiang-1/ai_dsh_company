@@ -127,7 +127,7 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
 `@deepseek-ai/dsh-experimental-tool-agent-team`；Web UI 侧 = `@deepseek-ai/dsh-experimental-client-ui-agent-team`
 （名册/任务板/teammate 导航）。**本仓不装官方 profile bundle，改为在 pack 的 `cordis.patch.yml` 里直插这些行**
 （R1 起，避免 bundle 关掉全局续驶控制——见 [architecture §3 冲突注](./architecture.md)）。
-（旧文引的 `dsh-experimental-agent-team-profile` / `agent-team-web-profile` 两包在 0.1.7 已不存在。）
+（`agent-team-profile` / `agent-team-web-profile` 两 bundle 包在 rc.2 vendor `experimental/` 均在；直插的取舍理由见上行与 [architecture §3 冲突注](./architecture.md)。）
 
 - 代价（§2）：teammates **共享 Lead 的组合**——独立降级为"独立会话上下文 + per-child 无、
   靠 name/description + `team:policy` + KB 目录约定"。工具/skills 面是 CEO preset 的。

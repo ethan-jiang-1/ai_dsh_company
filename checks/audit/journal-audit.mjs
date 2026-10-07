@@ -19,21 +19,18 @@
 // 退出码：0 = 无违规；1 = 有违规（红）；2 = 环境问题（缺 DSH_HOME / 无 zstd）。
 import { execFileSync, execSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
-import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { snapshotScenes } from '../../tools/lib/repository-layout.mjs'
 import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
+import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 
 const args = process.argv.slice(2)
 const argOf = name => {
   const index = args.indexOf(name)
   return index === -1 ? undefined : args[index + 1]
 }
-const HOME = process.env.DSH_HOME ?? ''
-if (HOME === '' || resolve(HOME) === resolve(join(homedir(), '.dsh'))) {
-  console.error('journal-audit: 需要开发 home（先 `source run/env.sh`）；拒绝在日用 home 上跑')
-  process.exit(2)
-}
+// 日用 home 拒绝走家族守卫（2026-10-07 体检轮接线：原手搓等值检查只挡精确命中，漏双向重叠与符号链接别名）
+const HOME = (() => { try { return requireDevHome('journal-audit') } catch (error) { console.error(error.message); process.exit(2) } })()
 try {
   execFileSync('zstd', ['--version'], { stdio: 'ignore' })
 } catch {

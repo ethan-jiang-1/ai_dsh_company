@@ -26,8 +26,8 @@
 
 装 `@deepseek-ai/dsh-experimental-agent-team` + `@deepseek-ai/dsh-experimental-tool-agent-team`（Host 侧）
 + `@deepseek-ai/dsh-experimental-client-ui-agent-team`（Web 侧）后，Web GUI 免费获得（本包**已按
-architecture §3 冲突注直插这些行**，R1 起，UI 不受影响；旧文的 `agent-team-profile` /
-`agent-team-web-profile` 两包在 0.1.7 已不存在）：
+architecture §3 冲突注直插这些行**，R1 起，UI 不受影响；`agent-team-profile` /
+`agent-team-web-profile` 两 bundle 包在 rc.2 vendor `experimental/` 均在——直插是取舍不是缺货）。
 
 | 可视面 | 机制（已核实） |
 |---|---|
@@ -95,7 +95,7 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 
 1. 开 `pnpm dsh web -- --port 0 --no-open`（web profile；**端口是环境状态**，系统分配后从启动横幅读——见 guides/bootstrap），侧栏开 CEO 会话（ceo preset）。
 2. 输入一个公司级动议（"评估把 X 产品线扩展到欧洲"）。
-3. 观众看到 CEO：拆解（todo/plan）→ `spawn_teammate` 建出三位 VP（名册出现四行）→
+3. 观众看到 CEO：拆解（todo/plan）→ `spawn_teammate` 建出四位职能 VP（名册五行 = CEO + 四职能）→
    任务板落任务（blockedBy 依赖可视化）→ 给各 VP 发初始 brief。
 4. 点开 VP-Eng 会话：看它消化 brief、读自己 KB、`subagent` 生 workers 深挖、
    给 VP-Sales 发消息对齐；VP-Sales 会话里看它回消息。

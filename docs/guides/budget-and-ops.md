@@ -13,9 +13,9 @@
 |---|---|---|---|
 | team `maxMembers` | 8 | host 行 config（startup 校验 fail-loud） | CEO+4 职能=5，留 3 个余量；扩编制才调 |
 | team `maxTasks` / `maxPendingMessagesPerMember` / `maxMessageBytes` | 256 / 64 / 64KiB | 同上 | 默认够一场 demo；消息超 64KiB 会拒（长稿走文件+消息里给路径） |
-| workflow `maxTotalAgents` | per-run 上限（tool/consumer 可压低） | `dsh-tool-workflow` 行 / 调用参数 | CEO 写循环脚本时的 runaway 保险；冲刺前显式设小 |
-| workflow 并发槽 | engine 配置（`acquireSlot`） | workflow-worker-thread 行 | 限制同时跑的 agent() 数 |
-| subagent `maxDepth` | 3 | `dsh-tool-subagent` 行 | 组织深度：CEO(0)→VP(1)→worker(2)→grand-worker(3)——默认够 4 层，别乱调大 |
+| workflow `maxTotalAgents` | per-run 上限（tool/consumer 可压低） | CEO preset `tool-workflow` 行 / 调用参数 | CEO 写循环脚本时的 runaway 保险；冲刺前显式设小 |
+| workflow 并发槽 | engine 配置（`acquireSlot`） | 同 `workflow-ptc` 行的 engine 配置 | 限制同时跑的 agent() 数 |
+| subagent `maxDepth` | **1**（rc.2 默认；0.1.7 曾为 3） | `tool-subagent` 行（本仓 VP 委托行显式 `maxDepth: 1`） | 组织深度：默认只一层（root→child），child 再生 worker 需显式调大——调大前想清楚失控半径 |
 | `maxTokens`（每次请求输出上限） | adapter/route 默认 | 会话创建 `agentOptions` / 委托工具行 | 防单角色长篇失控（路由 = 全员同模型默认，D16） |
 | compaction 阈值 | preset 行配置 | 各角色 preset 的 compaction 行 | VP 长会话靠压缩保上下文；按角色差异化 |
 
@@ -52,8 +52,8 @@
 
 ## 4. 回放与复盘
 
-- **一切皆日志**：roster/task/mailbox 事件 log-only 存 Lead 会话 JSONL；`foldTeam()` 可重放
-  整场（`docs/subsystems/agent-team.md` §Replay）。复盘 = 读日志，不靠记忆。
+- **一切皆日志**：roster/task/mailbox 事件 log-only 存 Lead 会话 JSONL；agentTeam 投影可重放
+  整场（rc.2 API = `foldSubagentDescriptor`；`docs/subsystems/agent-team.md` §Replay）。复盘 = 读日志，不靠记忆。
 - 每场 demo 收尾动作：CEO `present` 交付物；人（你）把"值得留的教训"追加进对应角色
   journal——这是组织学习闭环的 v0。
 - 升级纪律（experimental 漂移、`sync-dsh.mjs` 升级环、兼容矩阵）见 [10](../design/architecture.md) §8，

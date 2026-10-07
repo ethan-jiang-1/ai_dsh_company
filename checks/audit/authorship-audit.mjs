@@ -31,12 +31,13 @@ import { execFileSync } from 'node:child_process'
 import { join, relative, resolve } from 'node:path'
 import { deliverableId, normalizeRel } from '../../tools/lib/deliverables.mjs'
 import { classifyAuthorship, crossCheckVersions, currentVersionOf } from '../../tools/lib/authorship.mjs'
+import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 
 const WS_FLAG = process.argv.indexOf('--workspace')
 const WS = WS_FLAG === -1 ? join(ROOT, 'company-workspace') : resolve(process.argv[WS_FLAG + 1])
 
-const HOME = process.env.DSH_HOME
-if (HOME === undefined) { console.error('authorship-audit: 先 source run/env.sh（需要 DSH_HOME）'); process.exit(2) }
+// 日用 home 拒绝走家族守卫（2026-10-07 体检轮接线：原先只查 DSH_HOME 存在，日用 home 直读）
+const HOME = (() => { try { return requireDevHome('authorship-audit') } catch (error) { console.error(error.message); process.exit(2) } })()
 const SESSIONS = join(HOME, 'sessions')
 
 /** 读 zstd 会话日志（多帧，用 zstd -dc；读不了就跳过）。 */

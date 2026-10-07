@@ -149,5 +149,5 @@ _backlog/
   户口（plans 卡含「毕业门判断」；bugs 卡含状态）；② 制度目录在场；③ **索引交叉核对**：每张卡/
   材料文件必须被 plans/bugs/reference/_done 四份 README 之一点名（升格依据 = 本轮实测两处活违规：
   两张已毕业卡不在归档索引、两张活跃卡不在活跃列表；反向——索引行指向不存在的文件——由
-  md-links 硬档扫描覆盖）。清单唯一源 = `scripts/run-gates.mjs`。
+  md-links 硬档扫描覆盖）。清单唯一源 = `checks/run-gates.mjs`。
 - **有压力再借**：见「明确不借」表末行。

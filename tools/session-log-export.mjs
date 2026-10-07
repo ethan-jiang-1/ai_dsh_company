@@ -15,6 +15,7 @@ import { pickSessionLog } from './lib/session-log-generation.mjs'
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { requireDevHome } from './lib/runtime-home.mjs'
 
 const arg = (name) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -22,8 +23,9 @@ const arg = (name) => {
 }
 const OUT = arg('out')
 if (OUT === undefined) { console.error('session-log-export: 必须给 --out <dir>'); process.exit(2) }
-const HOME = arg('home') ?? process.env.DSH_HOME
-if (HOME === undefined) { console.error('session-log-export: 需要 $DSH_HOME（先 source run/env.sh）或 --home <path>'); process.exit(2) }
+// env 路径过家族守卫（拒绝缺失/与日用 home 重叠/符号链接别名；2026-10-07 体检轮接线）；
+// --home = 显式跨 home 逃生口（第二 home / 归档导出——明示传入不做日用拒绝）
+const HOME = arg('home') ?? (() => { try { return requireDevHome('session-log-export') } catch (error) { console.error(error.message); process.exit(2) } })()
 const SESSIONS = join(HOME, 'sessions')
 if (!existsSync(SESSIONS)) { console.error(`session-log-export: 会话根不存在：${SESSIONS}`); process.exit(2) }
 

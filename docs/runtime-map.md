@@ -2,7 +2,7 @@
 
 > 性质：顶层合同——profile / bundle / preset / session / cwd / 日志 / workspace / snapshot 的**时序关系**与
 > **四条状态轴**的唯一家（RFC entry-runtime-map 2026-10-05 立）。什么时候读 = 排查运行链时序、确认某状态在哪条轴、或分不清「现场 vs 证据」时。空间导航 = [项目地图](project-map.md)；
-> runtime/ 运行残留逐件 owner = [runtime/README](../runtime/README.md)、dev/ 启动配置 = [dev/README](../run/README.md)；证据政策 = [testing.md](testing.md)；
+> runtime/ 运行残留逐件 owner = [runtime/README](../runtime/README.md)、run/ 启动配置 = [run/README](../run/README.md)；证据政策 = [testing.md](testing.md)；
 > 四种会话形态 = [presets.md](presets.md) 四形态矩阵。
 
 ## 一、完整 Web 链（时序）

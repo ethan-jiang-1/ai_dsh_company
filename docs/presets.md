@@ -20,7 +20,7 @@
 | `coo` | wochen COO | system | — | R2 定稿 |
 | `cfo` | wochen CFO | system | — | R2 定稿（增设） |
 
-实测方式：web 观察窗的 `agentPresets/list` RPC（返回 10 条 = DSH 出厂 5 + 本 pack 5，零 broken）。
+实测方式：web 观察窗的 `agentPresets/list` RPC（返回 9 条 = DSH 出厂 4〔cordis/minimal/ptc/standard，vendor `web-app/presets/`〕+ 本 pack 5，零 broken）。
 UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSection.tsx`）。
 
 ## 四形态矩阵：身份、工具与 skills 从哪来（RFC preset-skill-matrix 2026-10-05 立）
@@ -117,7 +117,8 @@ UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSecti
 | CEO（0.2.0 harvest 批4，2026-09-30） | delegation 组内 **`workflow-ptc` + `tool-workflow`**（`workflow` 工具：JS 编排脚本 fan-out 子代理；行形状照抄 standard） | **编排位归 CEO**（组织语义：同题多路并行调研 / 多稿同时出稿后聚合）；persona 派活从两条路扩为三条——workflow 是**编排面不是分工面**，谁做什么仍由 team / 命名委托定（[delegation.md](./delegation.md) §4.4）。VP/COO/CFO 不给：深挖调研走各自 `subagent`，跨职能编排升级 CEO |
 | 全体（0.2.0 harvest 批2，2026-09-30） | **`tool-session-query`**（session_search 等 ×5：会话全文检索）；host 侧 = bundle 替换行翻开 `session-query-sqlite`（`openAt: first-search` 懒开 + 索引库锚 profile 目录） | 「上次动议定了什么」先查会话全文再问人——journal 是摘要、会话库是全文；授权域 = 本工作区（五角色共用共享盘 ⇒ 跨角色可查，合稿引用校对受益）；persona 开工动作句已同步 |
 | 全体（0.2.0 harvest 批3，2026-09-30） | **schedule 工具 ×4**（schedule_create/list/delete/update，宿主级 cron/定频定时）+ **ui-schedule** 任务页 + **time-context** 日期通道——三行归 `dsh-experimental-schedule-bundle` 所有，部署启用 = bundle 进 profile bundles 列表（真安装 `plugin add` 该包即自动启用；导出手册已写明）；pack 侧只留**替换行钉 `timeZone: Asia/Shanghai`**（回落不依赖进程时区） | 「自主节律」（原搁置池复活项，批 3 落地）：到点投递回原会话、宿主恢复冷会话——seam 实证（schedule README）；工具按 agent 作用域落位（角色根会话有、瞬态委派 child 无——实测 r3 夹具，正合"立节奏的是角色本体"）；persona 节律句已同步 |
-| 全局（pack bundle） | `agent-presets` roster 替换 + `tool-present` / `agent-team` / `tool-agent-team` insert | 只放全局行；**工具面不靠它**（见 [architecture §6](./design/architecture.md) 要点 1） |
+| 全体（0.2.0 harvest 批5a）+ VP-Sales（批5b，2026-09-30） | **`planning` 组**（`plan-mode`：section 公司化改写——先探索后落笔 / 计划决策完整 / `exit_plan_mode` 唯一收尾）；VP-Sales 另有 **browser-use**（playwright-mcp 实现） | 计划模式与真浏览器面进角色组合（判收与验证 = [harvest 台账](../notes/implemented/2026-09-30-plugin-harvest-round.md) 批5a/5b） |
+| 全局（pack bundle） | `agent-preset-registry` roster 替换 + 全局行 insert（`tool-present` / `agent-team` / `tool-agent-team` / `ui-agent-team` / `company-client` / `session-query-sqlite` / `time-context` 等——行清单唯一源 = [cordis.patch.yml](../packages/company-pack/cordis.patch.yml)） | 只放全局行；**工具面不靠它**（见 [architecture §6](./design/architecture.md) 要点 1） |
 
 ⚠ **preset 是自包含组合**：DSH 无 patch 继承，工具行必须写在 preset 里——R1 首跑就是漏了这一步，
 CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）。`pnpm test` 已加门禁检查（R2 起覆盖五角色）。
@@ -133,7 +134,7 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 | 层 | 手段 | 现状 |
 |---|---|---|
 | keyless | `pnpm test`（roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义、必填 config） | ✅ 五角色覆盖 |
-| 运行时 roster | web 观察窗 `agentPresets/list` RPC | ✅ 实测 10 条零 broken |
+| 运行时 roster | web 观察窗 `agentPresets/list` RPC | ✅ 实测 9 条零 broken（出厂 4 + pack 5） |
 | **挂载（上线前门禁）** | `node checks/smoke/preset-smoke.mjs`：boot 真 web，逐个 preset `session/create` | ✅ 五角色 ALL PASS（反证过：去掉必填 config 即红） |
 | 会话级（persona 生效、连通） | `node checks/smoke/probe-smoke.mjs`（默认快速档 ~6s：真会话发一句 ping，断言挂载/轮次/回话/**人格进 prompt**）；`--full` = 五角色三探针内容断言（慢，按需） | ✅ R2 建：快速档 5/5 PASS；内容档曾 14/15（KB 事实与 veto 语义均命中） |
 | 回归资产 | 动议会话 + 期望工作区归档 | ✅ `snapshots/`（r1–r4 motion + scenario-b + r3 replay 场景；replay harness R5a） |

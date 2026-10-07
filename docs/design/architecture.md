@@ -106,8 +106,9 @@ host 层共享行 + N 个角色 preset + 共享 KB + 模板。插件包（代码
 
 demo 形态"事件从 CEO 进、从 CEO 出"首选 **Agent Teams（M4）**——只有 Lead 能创建/interrupt
 teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱、teammates 保留 one-shot
-`subagent` 工具给各自 workers（`agent-team-profile/cordis.patch.yml` 核实：disable 的只是
-全局 continuable 控制，`tool-subagent` 压成 one-shot 后仍可用）。
+`subagent` 工具给各自 workers（rc.2 复核：官方 `agent-team-profile/cordis.patch.yml` 对
+`tool-subagent-control` / `tool-subagent-list-agents` / `tool-subagent` 均 `disabled: true`——
+续驶控制与 one-shot 委派一并被关，故本仓直插这些行自配；直插取舍见 §3 冲突注）。
 因此 demo 第 0 天不需要任何自定义 provider——层② 是组合隔离的增强，不是 demo 门槛。
 
 ### 2.3 装但不写的行（cordis.patch.yml / profile 的行清单，全是现成包）
@@ -287,7 +288,7 @@ ai_dsh_company/
 ├── tools/                        # 工具面（维护工具 + lib 纯逻辑 + drivers 真实驱动 + archive）
 │   └── sync-dsh.mjs              # vendor 换 tag + SHA 簿记 + typecheck + 矩阵加列
 ├── docs/                         # 当前合同（只写 now）：preset 语义、KB 布局、协作通道选择
-├── notes/                        # intents.md + proposed/ + implemented/
+├── notes/                        # 决策记忆：proposed/（已批 RFC）+ implemented/ + rejected/ + archived/ + postmortem/（分类 owner = notes/README）
 └── snapshots/                    # 自建最小 replay（JSONL 日志 diff 起步，够用再升）
 ```
 
@@ -336,7 +337,7 @@ ai_dsh_company/
 
 - **experimental 漂移**：agent-team 无稳定性承诺，契约可自由变。→ vendor 钉 tag + SHA 簿记 +
   `sync-dsh.mjs` 升级环 + compatibility 矩阵；升级前看 `_digested/_change_log/`。
-- **maxMembers 默认 8**：CEO + 3 VP 没问题；要扩编制就调 config（startup 校验，fail loud）。
+- **maxMembers 本仓钉 8**（代码默认 16，官方 bundle 同钉 8）：CEO + 4 职能 = 5 没问题；要扩编制就调 config（startup 校验，fail loud）。
 - **共享 checkout 的越界写**：writeScopes/KB 私有目录都是约定级；要硬隔离用独立 preset 会话或
   sdk child。
 - **日志税**：以后写自定义工具时，每个模型可见的新状态都要配 `SessionEventMap` 成员，否则

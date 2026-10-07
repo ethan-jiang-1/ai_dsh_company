@@ -144,8 +144,9 @@
           #    "先加载 tech-feasibility-review skill"——那个 skill 不在它的 catalog 里。
           #    "child 拿到角色完整 skills/工具面"是 M2 自定义 provider 才有的能力（design/roles-isolation §3）。
           #
-          #    maxDepth: 1 ⇒ 委托 child 不能再委托 vp_eng/vp_sales（禁止 VP→VP 平级派活）；它仍可用
-          #    `subagent` 生自己的 workers（那行的 maxDepth 是默认 3）。
+          #    maxDepth: 1 ⇒ 委托 child 不能再委托 vp_eng/vp_sales（禁止 VP→VP 平级派活），也不能经通用
+          #    `subagent` 再生 worker——通用行未设 maxDepth，rc.2 默认 = 1（vendor subagent/src/index.ts；
+          #    0.1.7 时代「默认 3」已过期）。要嵌套需在行上显式写 maxDepth。
           - id: delegation
             name: cordis:group
             group: true

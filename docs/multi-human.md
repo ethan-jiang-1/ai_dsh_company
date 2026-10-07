@@ -15,7 +15,7 @@
 | 事实 | 证据 |
 |---|---|
 | **卡按"发起它的那个 agent 的会话"作用域** ⇒ 只有那个会话的 owner 看得到 | 两门实测：让其中一扇门的 agent 发 `request_signoff`，面板只在"请求所属会话"那扇门显示（A=true / B=false） |
-| **被委派的成员（含 team teammate）一律拉不到人**——问询在服务层被拒、审批硬编码 `never` | `probes/team/member-inquiry-probe.mjs` 逐字报错：`human interaction is unavailable while the calling agent is owned by another live agent`；`user-questions/src/index.ts:101-106` + `child-agent.ts:254` |
+| **被委派的成员（含 team teammate）一律拉不到人**——问询在服务层被拒、审批硬编码 `never` | `probes/team/member-inquiry-probe.mjs` 逐字报错：`human interaction is unavailable while the calling agent is owned by another live agent`；`packages/interaction/user-questions/src/index.ts`（:140 附近）+ `child-agent.ts:254` |
 | **任务板 per-team**：每根会话一个 team（`TeamId(root.id)`）⇒ `team_task_*` 工具看到的板**互不可见**——两门各自创建的任务对方看不到 | S5 实测（2026-10-06 `taskboard-scope-probe`）：CFO 门 `team_task_create` renewal-z + `team_task_list` 确认可见；COO 门 `team_task_list` 返回空数组——跨门 CAS 仲裁不可用，协调只能靠文件层约定（占位/让位 + 派活行，BUG-004 的面） |
 | **日志只读半旁路**：根会话能通过 `session_event_read`/`session_event_search` 读到别门根会话的事件（含审批请求的存在与等待状态），但**看不到人面面板、也调不了批准服务**——可见性半旁路、处理通道为零 | BUG-005 现场实测（2026-10-06 `dual-signoff-probe`）：CEO 根会话逐 seq 查到 CFO 门的 pending 请求 + "Not accessible to me" + "I can't call services" |
 
@@ -146,7 +146,7 @@ CEO 门、人应答 → final + present）。判据与证据 = [E2E Note](../not
    `出稿：<角色>｜版本 v<N>｜任务书 = deliverables/<slug>/drafts/ceo.md`；
    若稿经他人代笔后由本人复核收回署名，**必须**加一行
    `本稿由 <角色> 根会话复核并署名（首版系 <谁的会话> 代笔）`——
-   真实先例：`deliverables/sea-reconcile-2026/drafts/cfo.md`。
+   真实先例：`deliverables-archive/2026-09-26-sea-reconcile-2026/drafts/cfo.md`（已归档；live `deliverables/` 不留旧稿）。
    **机器核对** = `checks/audit/authorship-audit.mjs`（比对署名行与实际写入会话的 preset）。
 
 ## 5. 迁移清单（搬共享目录到真实多人环境）

@@ -73,7 +73,7 @@
 |---|---|---|
 | persona | `presets/<role>/agent.cordis.yml` 的 persona row | 每请求计 token，控制在 ~300 字内 |
 | 角色方法 skills | `presets/<role>/skills/<name>/SKILL.md` | per-preset layer，硬隔离（别的角色看不见） |
-| 公司手册（稳定部分） | 全局 skills root | 全员可见 |
+| 公司手册 | `company-workspace/AGENTS.md`（随会话经 `agent-instructions` 注入） | 全员可见（D7/D17 三载体；手册本体即合同，见 [index](../index.md) 文档路由） |
 | 事实/客户/历史 | `company-workspace/kb/<role>/` | 活数据，fs 工具读取 |
 | journal（角色记忆） | `company-workspace/kb/<role>/journal/<日期>-<slug>.md`（取不到真日期用 `日期待核-<slug>.md`，见公司手册「日期口径」） | D8：文件即记忆 |
 
