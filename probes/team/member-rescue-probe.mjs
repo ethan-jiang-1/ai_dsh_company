@@ -15,7 +15,7 @@
 //   J4 走查者应答后，lead 日志含向 res 的转达 send_message
 //   J5 lead 日志含 res 的完成回执（第二次成员消息）
 //   J6 lead 收口（turn/end）
-// 用法：source run/env.sh && node probes/member-rescue-probe.mjs
+// 用法：source run/env.sh && node probes/team/member-rescue-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'

@@ -12,7 +12,7 @@
 //   A2 成员先认领后动笔——∃(认领事件, 成员稿)：认领事件 time ≤ 稿 mtime + 2s
 //   A3 完成闭环——completed 任务 ≥2 + journal 回执 .md 在场
 //   A4 排练不污染——final.md 落指定排练路径 + 公司共享盘 deliverables/ 零新增
-// 用法：source run/env.sh && node probes/motion-taskboard-probe.mjs
+// 用法：source run/env.sh && node probes/fs-taskboard/motion-taskboard-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'

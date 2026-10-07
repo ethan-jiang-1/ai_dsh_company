@@ -17,7 +17,7 @@
 //       经名册 id→name 映射后与其被派任务对应（claim-a→w1 / claim-b→w2）
 //   P2b 成员回报链在场（≥2 条成员→lead 消息）
 //   P3 writeScope 重叠警告原文在场（C5a 同场复核，任务 writeScopes 故意重叠，零成本）
-// 用法：source run/env.sh && node probes/taskboard-presence-probe.mjs
+// 用法：source run/env.sh && node probes/fs-taskboard/taskboard-presence-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'

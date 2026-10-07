@@ -14,7 +14,7 @@
 //   R2 标记消息有下落：team/message/delivered ≥1（崩溃前已投 或 重启后补投——两分支都算 durable）
 //   R3 无重复投递（同一 messageId 的 delivered ≤1）
 //   R4 res 的恢复后回报被 lead 转述（续行通路在崩溃后仍通）
-// 用法：source run/env.sh && node probes/team-recovery-probe.mjs
+// 用法：source run/env.sh && node probes/team/team-recovery-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'

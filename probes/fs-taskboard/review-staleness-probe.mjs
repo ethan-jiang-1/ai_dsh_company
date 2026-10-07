@@ -12,7 +12,7 @@
 //     = 理想路径；引用过期版本（盘面 v2 但互审稿写「对 v1 的意见」）= 版本穿透缺口。
 //   B2（观察）：互审稿是否标注「评审对象版本 = v<N>」——手册互审稿命名只有 -review.md 后缀约定，
 //     没有要求标注版本——这是设计缺口还是可接受约定？记录为观察。
-// 用法：DSH_HOME=runtime/harness-home node probes/review-staleness-probe.mjs
+// 用法：DSH_HOME=runtime/harness-home node probes/fs-taskboard/review-staleness-probe.mjs
 // 退出码：0 = B1 过（CEO 互审引用了当前版本或显式标注了版本差）；1 = B1 失败（穿透）；2 = 环境。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'

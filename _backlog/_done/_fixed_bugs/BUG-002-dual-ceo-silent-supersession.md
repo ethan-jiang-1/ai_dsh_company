@@ -4,7 +4,7 @@
 
 ## 症状
 
-multi-human 开门配方默认 preset = ceo（multi-human.md §2.4 已知踩坑点）⇒ 人乙开门忘选时，共享盘出现**两个 CEO 根会话**。实测（`scripts/probes/dual-ceo-probe.mjs` run1，2026-10-06，排练盘，真模型）：
+multi-human 开门配方默认 preset = ceo（multi-human.md §2.4 已知踩坑点）⇒ 人乙开门忘选时，共享盘出现**两个 CEO 根会话**。实测（`scripts/probes/session-context/dual-ceo-probe.mjs` run1，2026-10-06，排练盘，真模型）：
 
 - `session/create` ×2（同 cwd、同 `agentPreset: 'ceo'`）**双双成功，零警示**；
 - 人甲的 CEO 门先收口 final（方案甲）；人乙的 CEO 门随后收口（方案乙）——**人甲的收口被静默易主**：无卡、无 inbox、无停手询问；人甲回到盘前只会发现 final 已是 v2（方案乙）。
@@ -22,7 +22,7 @@ DSH 单操作者设计、无账号体系；审批/问询路由键 = agent 会话
 ## 复现
 
 ```sh
-DSH_HOME=dev/harness-home node scripts/probes/dual-ceo-probe.mjs
+DSH_HOME=dev/harness-home node scripts/probes/session-context/dual-ceo-probe.mjs
 # 退出码 1 = 缺口在场（判据已按 run1 证据校准：跨门信号缺失 = FAIL）
 ```
 

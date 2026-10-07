@@ -14,7 +14,7 @@
 //   T4 跨进程占位抢注竞态（尽力而为，不计红绿；2026-10-05 试探轮加）：两进程对同一**新路径**
 //       createIfAbsent 同时放行 ×20 轮 ⇒ 出现"双双创建"即实证创建竞态窗（手册「占位=认领」的机器
 //       可查抢注在跨进程下不闭合——败者占位被静默顶替；E2 只测过覆盖写，创建竞态从未测过）。
-// 用法：node probes/cross-process-fs-probe.mjs
+// 用法：node probes/fs-taskboard/cross-process-fs-probe.mjs
 // 退出码：0 = T1 过且 T2 实证互踩；1 = 任一判据翻车；2 = 环境失败。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'

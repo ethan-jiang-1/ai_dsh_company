@@ -4,7 +4,7 @@
 
 ## 症状
 
-排练实测（`scripts/probes/claim-race-probe.mjs` run1，cfo/coo 两根会话同时竞速先到先得的 T1）：
+排练实测（`scripts/probes/team/claim-race-probe.mjs` run1，cfo/coo 两根会话同时竞速先到先得的 T1）：
 
 - **行为面成立（正面半边）**：两会话都先在自己文件落「占位=认领」→ 都去读了对方的文件（盘面可见性路径都走了）→ **后见者（CFO 门）读到 COO 占位后正式让位**——文件升级 v2 写「让位记录 · T1」并转干自己的 T2；COO 完整拿下 T1。约定的仲裁途径真实生效。
 - **缺口半边一（可机判性）**：手册钉死了占位行格式（首行一字不差「占位=认领，非出稿」——机器可查），**让位没有任何规定格式**——CFO 的让位是自由文本（「让位记录」标题）。结果：任何机械判读（审计、探针判据、未来的门级提示）都无法把「占位后让位」与「占位持认」分开——本次探针 v1 判据就把让了位的 cfo.md 误判成持认领，报了假 FAIL。
@@ -21,7 +21,7 @@
 ## 复现
 
 ```sh
-DSH_HOME=dev/harness-home node scripts/probes/claim-race-probe.mjs
+DSH_HOME=dev/harness-home node scripts/probes/team/claim-race-probe.mjs
 # 判据 v2：让位标记（文本含「让位」）从认领中排除；run1 在 v2 判据下 = PASS（恰一人持认领）
 ```
 

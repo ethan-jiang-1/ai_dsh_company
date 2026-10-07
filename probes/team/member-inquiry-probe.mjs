@@ -16,7 +16,7 @@
 //   · **ALLOWED**：成员发出 `ask_user_question` 后**轮不结束**（问询挂起等人答）
 //     ⇒ 成员能拉人 ⇒ "卡落到各自的门"在 team 形态下成立（RFC 的头号待实测项就答"成立"）。
 //   · 两者都没有 ⇒ 无法判定（打印证据，人工看）。
-// 用法：source run/env.sh && node probes/member-inquiry-probe.mjs
+// 用法：source run/env.sh && node probes/team/member-inquiry-probe.mjs
 // 退出码：0 = 判定成功（REFUSED 或 ALLOWED 都算"答了这个问题"）；1 = 无法判定；2 = 环境/启动失败。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'

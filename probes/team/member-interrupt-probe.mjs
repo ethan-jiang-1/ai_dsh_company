@@ -12,7 +12,7 @@
 //   J2 打断后的 send_message 投递成功（team/message/delivered 在 interrupt 之后）
 //   J3 res 按**新指示**回报（收口转述含新指示产物，非原任务全量完成）
 //   J4 lead 收口（turn/end）
-// 用法：source run/env.sh && node probes/member-interrupt-probe.mjs
+// 用法：source run/env.sh && node probes/team/member-interrupt-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'

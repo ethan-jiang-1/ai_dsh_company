@@ -20,7 +20,7 @@
 //     0 违规 ALL PASS，present 面未触发 BUG-003 观察因为发起者是 CEO）。
 //   E6 事后审计：deliverables-check 0 违规 + journal-audit 0 新缺席 + 非 CEO present = 0。
 //   观察：workspace_doors 工具是否被任何门调用（BUG-002 修复面——检测面可用性）。
-// 用法：DSH_HOME=runtime/harness-home node probes/multi-user-e2e-probe.mjs
+// 用法：DSH_HOME=runtime/harness-home node probes/team/multi-user-e2e-probe.mjs
 // 退出码：0 = E1–E6 全过；1 = 任一判据失败；2 = 环境。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'

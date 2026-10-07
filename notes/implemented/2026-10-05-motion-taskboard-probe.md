@@ -1,6 +1,6 @@
 # 2026-10-05 · 真动议首验：手册「动议任务板」行被模型真实执行（motion-taskboard-probe）
 
-状态：已交付（2026-10-05 用户点名「跑 A」；probe = [motion-taskboard-probe.mjs](../../probes/motion-taskboard-probe.mjs)
+状态：已交付（2026-10-05 用户点名「跑 A」；probe = [motion-taskboard-probe.mjs](../../probes/fs-taskboard/motion-taskboard-probe.mjs)
 常驻；两次真动议：第一次被问询纪律正确阻塞——probe 设计缺陷非模型缺陷；第二次零歧义动议全流程走通）
 
 ## 交付

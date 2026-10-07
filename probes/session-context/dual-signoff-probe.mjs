@@ -17,7 +17,7 @@
 //     但**知道该怎么补签**——防线从「机制可见」移到「流程可知」。
 //   注：探针不替人答审批（那会改变被测系统状态）；CFO 会话停在等待审批 = 预期形态，探测其
 //   request 事件即止。
-// 用法：DSH_HOME=runtime/harness-home node probes/dual-signoff-probe.mjs
+// 用法：DSH_HOME=runtime/harness-home node probes/session-context/dual-signoff-probe.mjs
 // 退出码：0 = B2 不成立（CEO 侧可见/可处理——防线在场）；1 = B2 成立（缺口确认）；2 = 环境失败。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'

@@ -6,7 +6,7 @@
 //   ③升 pin / 收割后 UI 回归。成本：默认档零模型（真实渲染断言面）；`--ask` 加一次真实模型调用。
 // 前置：GUI URL（demo.md §前置：source run/env.sh → pnpm dsh web -- --port 0 --no-open → 横幅 URL）；
 //   Chrome 二进制：DSH_PROBE_CHROME 环境变量或系统 Chrome（run/env.sh 已指 Chrome for Testing）。
-// 用法：node probes/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser]
+// 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser]
 //   默认断言面 = composer + 品牌 + 右栏 8 公司页签逐个开（Start-chip 回切）+ console/异常捕获。
 //   --ask 会真建会话（registry default = ceo）输入问题发送并等待轮次收口——完整产品环，留测试会话。
 // 退出码：0 = 全部断言成立；1 = 有断言失败（JSON verdict 已打印，含 consoleProblems/exceptions）。

@@ -36,7 +36,7 @@
 //      配置面 workaround = provider env 透传 HOME（os.homedir() 认 $HOME ⇒ 标记落 workspace）。
 //      本 probe 两个旋钮都拧上做机制验证（全程无沙箱升级）。
 //
-// 用法：node probes/browser-behavior-probe.mjs（栅栏内自证，无需沙箱升级）
+// 用法：node probes/browser-visual/browser-behavior-probe.mjs（栅栏内自证，无需沙箱升级）
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'

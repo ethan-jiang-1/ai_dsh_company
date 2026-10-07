@@ -4,7 +4,7 @@
 
 ## 症状
 
-排练实测（`scripts/probes/dual-signoff-probe.mjs` run1，CFO/CEO 两根会话，28.125% 毛利触线）：
+排练实测（`scripts/probes/session-context/dual-signoff-probe.mjs` run1，CFO/CEO 两根会话，28.125% 毛利触线）：
 
 - **B1 正例稳定**：CFO 根会话自己发 `request_signoff`（args 完整：line/summary/数字精确到 28.1250%、差额 $1,800）——multi-human.md §0 的正例复验通过。
 - **B2 缺口确认**：CEO 根会话被问及该请求时的实测回答（原文）：
@@ -24,7 +24,7 @@ DSH 单操作者设计：审批/问询的路由键 = 发起 agent 的会话（mu
 ## 复现
 
 ```sh
-DSH_HOME=dev/harness-home node scripts/probes/dual-signoff-probe.mjs
+DSH_HOME=dev/harness-home node scripts/probes/session-context/dual-signoff-probe.mjs
 # 退出码 1 = 缺口在场（B1 发卡 + B2 CEO 侧不可见不可处理）
 ```
 

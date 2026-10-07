@@ -21,7 +21,7 @@
 
 ## 资产与后续
 
-- 四探针常驻（[dual-ceo](../../probes/dual-ceo-probe.mjs) / [task-discovery](../../probes/task-discovery-probe.mjs) / [claim-race](../../probes/claim-race-probe.mjs) / [dual-signoff](../../probes/dual-signoff-probe.mjs)，触发条件各在头注；bug 修复落地后复跑转绿即闭环）；证据 = `snapshots/probes/<题>/2026-10-06/` 各 run 目录；testing.md §5 未覆盖面行已更新。
+- 四探针常驻（[dual-ceo](../../probes/session-context/dual-ceo-probe.mjs) / [task-discovery](../../probes/fs-taskboard/task-discovery-probe.mjs) / [claim-race](../../probes/team/claim-race-probe.mjs) / [dual-signoff](../../probes/session-context/dual-signoff-probe.mjs)，触发条件各在头注；bug 修复落地后复跑转绿即闭环）；证据 = `snapshots/probes/<题>/2026-10-06/` 各 run 目录；testing.md §5 未覆盖面行已更新。
 - 后续（2026-10-06 已闭环）：BUG-002..005 修复**已全部落地**（用户授权后同日修复轮完成——各卡在 [_fixed_bugs](../../_backlog/_done/_fixed_bugs/) 带修复内容与复验；BUG-005 的 multi-human §0 登记日志半旁路随修复一并处理；本行原写「待用户授权」，修复落地后按「实现事实变化时同步更新」改写）。
 
 ## 验证记录

@@ -10,7 +10,7 @@
 //   ① 新建 journal 文件名以**今天的真日期**开头（YYYY-MM-DD-…，与探针本机日期一致 = 日期通道供给）；
 //   ② 不得出现 `日期待核` 占位（通道健康时占位即异常：注入缺失或文案回潮）；
 //   ③ 不得为日期去问人（`ask_user_question` = 违规：注入在场，不该把日期问题推给人）。
-// 用法：source run/env.sh && node probes/date-rule-probe.mjs
+// 用法：source run/env.sh && node probes/session-context/date-rule-probe.mjs
 // 退出码：0 = PASS；1 = FAIL（红证，按「文案不够需机制」处置）；2 = 环境/启动失败。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'

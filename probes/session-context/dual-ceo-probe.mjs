@@ -17,7 +17,7 @@
 //     在场 + 正确返回 = 本卡修复到位；自动警示留 UX 增强。
 //   C（判红绿）：final 文本不得交错损坏（两结论段拼接且无版本链注记 = FAIL；
 //     规范版本链取代 v1→v2 = 记录，不判红）。
-// 用法：DSH_HOME=runtime/harness-home node probes/dual-ceo-probe.mjs
+// 用法：DSH_HOME=runtime/harness-home node probes/session-context/dual-ceo-probe.mjs
 // 退出码：0 = 判据 B/C 成立（防线在——即便来自文案层）；1 = FAIL（缺口确认）；2 = 环境失败。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'

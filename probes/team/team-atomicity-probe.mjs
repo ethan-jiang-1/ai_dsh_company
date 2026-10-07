@@ -15,7 +15,7 @@
 //   C4a 共享文件含全部 6 行且每行完好（无撕行/丢行/重复）
 //   C4b ≥2 条成员回报含读回行数（观察链在场）
 //   C5a lead 的任务视图汇报含 writeScope 重叠警告原文
-// 用法：source run/env.sh && node probes/team-atomicity-probe.mjs
+// 用法：source run/env.sh && node probes/team/team-atomicity-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'

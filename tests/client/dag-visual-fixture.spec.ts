@@ -1,7 +1,7 @@
 /**
  * DAG 视觉夹具的**发射器**（2026-09-26 立）：
  *
- * 视觉认证档 `probes/dag-visual-probe.mjs` 需要"真组件渲染出的 SVG + 真 CSS"这两样，
+ * 视觉认证档 `probes/browser-visual/dag-visual-probe.mjs` 需要"真组件渲染出的 SVG + 真 CSS"这两样，
  * 而它们只能在本仓的转换链里拿到（组件 import vendor 的 `*.module.css`，plain node 解不了）。
  * 所以：本测试**默认只断言夹具能渲染**（`pnpm test` 里零副作用）；设了 `DAG_VISUAL_EMIT=<路径>`
  * 时把 `{svg, css}` 发射到该路径，供认证档注入真 web app 截图。

@@ -8,7 +8,7 @@
 // 这个用**真动议**取深链可读性（⑥）——真数据、真任务板、真中间态，成本 = 真模型 5 角色。
 // 无人值守安全：动议文本明确禁止 `ask_user_question` / `request_signoff`（会挂住会话等真人），
 // 需要裁决的一律写「未决项」fail-closed。
-// 用法：source run/env.sh && node probes/dag-midflight-probe.mjs [--waves 6]
+// 用法：source run/env.sh && node probes/browser-visual/dag-midflight-probe.mjs [--waves 6]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'

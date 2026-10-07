@@ -9,7 +9,7 @@
 //   ② 读回：模型把注入原文转写进纪要文件正文（证明模型可见、不是只进日志）；
 //   ③ 观察（不计红绿）：纪要文件名是否用注入日期开头——若模型仍写「日期待核」，
 //      说明机制通了但公司手册/skill 文案还教它占位 ⇒ 属于 D2' 落地的"改文面"工作项，不是机制失败。
-// 用法：source run/env.sh && node probes/time-context-probe.mjs
+// 用法：source run/env.sh && node probes/session-context/time-context-probe.mjs
 // 退出码：0 = PASS（①+②）；1 = FAIL；2 = 环境/启动失败。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { spawn } from 'node:child_process'

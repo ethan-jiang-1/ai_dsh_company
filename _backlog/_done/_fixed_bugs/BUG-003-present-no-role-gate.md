@@ -4,7 +4,7 @@
 
 ## 症状
 
-排练实测（`scripts/probes/task-discovery-probe.mjs` run1，CFO 根会话执行 T1 经济性测算）：CFO 完成高质量过程稿后，自行推理「present the draft as the main deliverable for visibility」并调用 `present` 把 **drafts/cfo.md（自己的过程稿）**直呈用户。推理原文（会话日志 session-0515fb44 step 32）：
+排练实测（`scripts/probes/fs-taskboard/task-discovery-probe.mjs` run1，CFO 根会话执行 T1 经济性测算）：CFO 完成高质量过程稿后，自行推理「present the draft as the main deliverable for visibility」并调用 `present` 把 **drafts/cfo.md（自己的过程稿）**直呈用户。推理原文（会话日志 session-0515fb44 step 32）：
 
 > "I should present the draft as the main deliverable for visibility … so I'll finalize with the file presented."
 
@@ -21,7 +21,7 @@ vendor `tool-present` 无角色/文件形状门禁（本 pack 只是把它 inser
 ## 复现
 
 ```sh
-DSH_HOME=dev/harness-home node scripts/probes/task-discovery-probe.mjs
+DSH_HOME=dev/harness-home node scripts/probes/fs-taskboard/task-discovery-probe.mjs
 # 判据 B3 捕捉（run1 = present 在场 ⇒ FAIL；探针判据已按 run1 校准 v2）
 ```
 

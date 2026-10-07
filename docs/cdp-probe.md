@@ -11,15 +11,15 @@
 | 文件 | 职责 | 可移植性 |
 |---|---|---|
 | `tools/drivers/cdp-driver.mjs` | **通用驱动**：起无头 Chrome（port 0 + DevToolsActivePort）、CDP 连接、evaluate/click（20s 超时竞速）、console 错误与未捕获异常捕获、清理。Node 22 内建（原生 WebSocket/fetch），零 npm 依赖 | 任何有 web UI 的项目直接拷走（本项目已验证逐字可用） |
-| `probes/cdp-probe.mjs` | **本仓场景**：composer + 品牌 + 右栏 8 公司页签逐个开（Start-chip 回切）+ `--ask` 全环（真建会话输入发送等收口） | 换成你自己页面的选择器和断言 |
+| `probes/browser-visual/cdp-probe.mjs` | **本仓场景**：composer + 品牌 + 右栏 8 公司页签逐个开（Start-chip 回切）+ `--ask` 全环（真建会话输入发送等收口） | 换成你自己页面的选择器和断言 |
 
 ## 本仓用法
 
 ```sh
 source run/env.sh   # 提供 DSH_PROBE_CHROME 备选；二进制默认复用 loadChromium 解析（ms-playwright 缓存）
 pnpm dsh web -- --port 0 --no-open        # 起观察窗，横幅拿 URL（demo.md §前置）
-node probes/cdp-probe.mjs 'http://127.0.0.1:<port>/?token=<t>'          # 默认断言面（零模型）
-node probes/cdp-probe.mjs '<url>' --ask '用一句话自报角色与职责。'      # + 完整产品环（真模型一次调用）
+node probes/browser-visual/cdp-probe.mjs 'http://127.0.0.1:<port>/?token=<t>'          # 默认断言面（零模型）
+node probes/browser-visual/cdp-probe.mjs '<url>' --ask '用一句话自报角色与职责。'      # + 完整产品环（真模型一次调用）
 ```
 
 stdout 打一个 JSON verdict；exit 0 = 全部断言成立。`--ask` 会在 GUI 里真建会话（registry

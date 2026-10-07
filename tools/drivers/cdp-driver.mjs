@@ -4,7 +4,7 @@
  * the page's own console problems and uncaught exceptions.
  *
  * This module is project-agnostic — copy it into any repo that ships a web
- * UI and write a scenario against it (see probes/cdp-probe.mjs for the
+ * UI and write a scenario against it (see probes/browser-visual/cdp-probe.mjs for the
  * loop-advisor scenario and docs/cdp-probe.md for the pattern and the
  * environment gotchas this driver already handles).
  *

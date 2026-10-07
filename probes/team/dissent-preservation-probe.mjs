@@ -13,7 +13,7 @@
 //   J2 journal/h7-dissent.md 三要素齐：最终决定 + 成员结论引用 + 显式「分歧/不一致」标注
 //   J3 lead 收口陈述提及成员评估或分歧（人端呈现）
 //   J4 lead 收口（turn/end）
-// 用法：source run/env.sh && node probes/dissent-preservation-probe.mjs
+// 用法：source run/env.sh && node probes/team/dissent-preservation-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'

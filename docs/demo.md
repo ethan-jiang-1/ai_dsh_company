@@ -16,7 +16,7 @@
 ## 前置（本机）
 
 **呈现即验证**（2026-09-30 立，用户裁定；规则唯一见 [dev-loop §1](./guides/dev-loop.md)）：替人起观察窗 = 先自己跑通本节（boot 横幅 + roster + client 零挂载失败），红了当场修，全绿才交 URL——用户不当第一次验收员。
-**机器腿 = [cdp-probe](./cdp-probe.md)**：`node probes/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/8 页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
+**机器腿 = [cdp-probe](./cdp-probe.md)**：`node probes/browser-visual/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/8 页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
 
 1. `source run/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒，自检代替警告）**：
    `pnpm dsh --profile web --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 就说明你起的是日用 `~/.dsh`
@@ -208,7 +208,7 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 ⚠ **"根会话 vs 被委派成员"是这一步的分水岭**：被委派的成员发审批**必被自动拒**
 （`child-agent.ts:254` 硬编码 `never`），所以手册那条"成员触线一律升级 CEO"对它们成立；
 而**每扇门都是根会话**（它自己就是那个角色的 owner）⇒ **该由它自己发起**，卡才会落到它门上。
-（实测：`probes/budget-signoff-probe.mjs` 正例——CFO 根会话确实会发 `request_signoff`。）
+（实测：`probes/session-context/budget-signoff-probe.mjs` 正例——CFO 根会话确实会发 `request_signoff`。）
 
 ⚠ **别在门乙/门丙那边说"你以 CEO 的身份…"**——每扇门只用**它自己角色**的权限；越权的话，
 `owners.md` 的授权面就成了摆设（demo 的卖点正是"谁签得动"按人分）。
