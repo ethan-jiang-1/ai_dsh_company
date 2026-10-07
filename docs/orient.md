@@ -34,11 +34,11 @@ audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.m
 
 ## 五问：怎么知道「做完了」且质量可靠？（2026-10-07 补，plugin-corpus-realignment）
 
-四条链各要独立证据，前一条绿不豁免后一条：**挂得上**（preset-smoke）→ **行为对**（场景/判据，
-[testing.md](testing.md) §2）→ **装得上**（release-smoke）→ **批得下**（语义审 + 你验收——机器全绿
-只证断言通过，「做的是不是这件事」由这两道把关，形状 = [开发环 §13](guides/dev-loop.md)）。测试资产
-**双向反查**：改动面 → 最窄检查（[tests/README](../tests/README.md)）；场景 → 固定住什么行为
-（[snapshots 索引](../snapshots/README.md)）。
+四条链各要独立证据，前一条绿不豁免后一条：**挂得上 → 行为对 → 装得上 → 批得下**——机器全绿
+只证断言通过，「做的是不是这件事」由语义审和你验收把关。哪条链跑哪个检查、语义审按什么形状走 =
+[开发环 §1 完成判断链 + §13 最小清单](guides/dev-loop.md)（唯一家，此处不复制门名——防漂）。
+测试资产**双向反查**：改动面 → 最窄检查（[tests/README](../tests/README.md)）；场景 → 固定住
+什么行为（[snapshots 索引](../snapshots/README.md)）。
 
 ## 六问：agent loop、skills、运行态、run bundle 在哪？
 
