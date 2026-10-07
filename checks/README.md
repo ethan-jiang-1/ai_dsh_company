@@ -102,4 +102,4 @@
 
 [lib](../tools/lib/) 保存可由隔离夹具验证的会话日志、workspace oracle、交付物/作者判据、排练输入、发布事务和仓库布局逻辑；[drivers](../tools/drivers/) 保存真实进程、CDP 和 Playwright 驱动。驱动不进入 keyless spec；准入由 [分层守卫](../tests/harness/layering.spec.ts) 检查。
 
-完整门禁 [run-gates](run-gates.mjs) 住本目录根，pin 事实不拆；keyless spec 按 company/client/presets/harness 领域归位。新增入口同 diff 增加索引，触发条件、成本和状态仍留在脚本头注。三轮目录史：2026-10-05 职责分区（[Note](../notes/implemented/2026-10-05-repository-responsibility-layout.md)）→ 2026-10-07 四用途升顶层（RFC [driver-purpose-top-level](../notes/proposed/2026-10-07-driver-purpose-top-level.md)）。
+完整门禁 [run-gates](run-gates.mjs) 住本目录根，pin 事实不拆；keyless spec 按 company/client/presets/harness 领域归位。新增入口同 diff 增加索引，触发条件、成本和状态仍留在脚本头注。三轮目录史：2026-10-05 职责分区（[Note](../notes/implemented/2026-10-05-repository-responsibility-layout.md)）→ 2026-10-07 四用途升顶层（RFC [driver-purpose-top-level](../notes/implemented/2026-10-07-driver-purpose-top-level.md)）。
