@@ -108,6 +108,10 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 - pack 版本 `0.2.0`（`private: true`——**尚未发布到任何 registry**；真实发布动作
   （npm publish）等出现第二个消费者/部署需求时再定，当前 release-smoke 验证的是
   `file:` tarball 安装形状）。
+- 真实发布落定时的已判要件（2026-10-07 借语料 sdlc-11 登记；未到触发不预建脚本）：
+  **registry 三态幂等**（无 → publish / sha512 同 → skip / 异 → fail「改内容没升版」）；
+  **改内容必 bump 版本**；**发布字节 = 冒烟字节**（publish 的产物必须就是 release-smoke
+  验过的那份，不另打包）。
 - 发布前必跑：`pnpm verify` + `pnpm test`（迭代环）+ `release-smoke`（认证档）；
   preset/内容改动另跑 `preset-smoke`（guides/dev-loop §9.1 分层）。
 

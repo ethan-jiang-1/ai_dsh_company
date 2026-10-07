@@ -234,7 +234,8 @@ if (!barePathBad) {
 //   ① AGENTS.md §vendor 簿记必须逐字声明该 tag 与 SHA（簿记是给 agent 读的那一份，不能漂）；
 //   ② 现在时文件里出现的 `dsh-v<x.y.z>` 字面量必须等于 expectedTag，除非该行自带历史/外部标记。
 // 收窄理由（避免假阳性）：只认 `dsh-v` 前缀形式——裸 `x.y.z-rc.n` 在本仓多为历史叙述或外部语料；
-//   外研树 `_agent_ready_development` 钉的是另一个 tag，登记在 EXTERNAL_PINS（同 RETIRED_PATHS 的显式豁免体例）。
+//   外研语料 `_dsh_plugin_agent_ready_development`（更名前 `_agent_ready_development`）现钉 rc.2 = 本仓
+//   pin 无需豁免；EXTERNAL_PINS 只兜旧名时代 0.1.7-rc.1 的历史提及（同 RETIRED_PATHS 的显式豁免体例）。
 // 结构性排除（不是内容白名单，而是尊重文件自述的性质）：
 //   · 原 `notes/intents.md`（时序意图日志）与 `ROADMAP.md` §历史维护记录两个特例，均随各自文件
 //     退役移除（D32 / D34）——现在无结构性排除项，集合留空备用。

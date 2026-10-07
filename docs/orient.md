@@ -32,6 +32,14 @@ audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.m
 
 → 查表：[tests/README「改动面 → 最窄检查」](../tests/README.md) · 证据政策：[testing.md](testing.md)
 
+## 补一问：怎么知道「做完了」且质量可靠？（2026-10-07 补）
+
+四条链各要独立证据，前一条绿不豁免后一条：**挂得上**（preset-smoke）→ **行为对**（场景/判据，
+[testing.md](testing.md) §2）→ **装得上**（release-smoke）→ **批得下**（语义审 + 你验收——机器全绿
+只证断言通过，「做的是不是这件事」由这两道把关，形状 = [开发环 §13](guides/dev-loop.md)）。测试资产
+**双向反查**：改动面 → 最窄检查（[tests/README](../tests/README.md)）；场景 → 固定住什么行为
+（[snapshots 索引](../snapshots/README.md)）。
+
 ## 五问：agent loop、skills、运行态、run bundle 在哪？
 
 - **loop 本体不在本仓库**——它在 [vendor/dsh](../vendor/dsh/)（钉版本、只读）；本仓只拥有

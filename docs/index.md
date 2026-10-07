@@ -106,8 +106,8 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 
 本 repo 的形态与机制结论大量借鉴三处 repo 外材料（均在 `/Users/bowhead/deepseek-harness/`
 工作树内、已被该 repo 的 git 跟踪；不在本 repo 版本控制范围，引用时注明是外部研究材料）：
-`_faq_on_digested/`、`_digested/`、`_agent_ready_development/`（后者 = Agent-ready Development 语料，
-第三视角"Development Harness"专题；已逐篇对照完毕——判定台账见下表该行）；
+`_faq_on_digested/`、`_digested/`、`_dsh_plugin_agent_ready_development/`（后者 = Agent-ready 语料，更名自
+`_agent_ready_development` 并随上游 re-pin 演进，判定台账见下表该行）；
 另有第四处**独立外部仓** = `/Users/bowhead/ai_deerflow_deep_research_v2`（`_backlog` 借鉴源，见下表与 D31）；第五处 = `/Users/bowhead/ai_dsh_loop_advisor/_backlog`（D31 制度的演进宿主，D33 回借源，见下表）；第六处 = `/Users/bowhead/ai_dsh_assitant/notes`（notes/ 分类 owner 精神借源，D35——本仓 notes/README 同日落地后日常不依赖原文）。
 该研究树 HEAD 持续演进（本地 FAQ/docs 工作）；引用以各材料注册行核对的版本为准，`_digested` 审计基线
 已同 pin（2026-10-02 核对其 00-index：`dsh-v0.2.0-rc.2`，0009 轮随升）——引外部笔记时以基线对齐，不追研究树新提交。
@@ -121,8 +121,8 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | `…/dual-home-isolation.md` | 双 home 机制、崩溃半径、迁移方向 | run/env.sh；guides/dev-loop §6 |
 | `…/research.md` | 第三方生态证据（peers/兼容矩阵/自包含/真实安装形状） | guides/dev-loop §5 发布纪律时点；design/architecture §8 |
 | `_digested/`（源码消化笔记） | DSH 源码机制笔记（审计基线，版本唯一见 `AGENTS.md` §vendor 簿记——**基线可能落后当前钉住一代**，升 pin 未重审时以簿记注记为准） | design/ 各篇（architecture / roles-isolation / ui-demo）的机制核对引文；**权威仍在 `vendor/dsh/` 本体** |
-| `_agent_ready_development/sdlc-reference/01-agent-note-lifecycle.md` | DSH Agent Note 生命周期（状态/路径/格式/取代/归档；基于上游 0.1.7-rc.1 树） | [notes/README.md](../notes/README.md)（D35 迁入）+ [implemented/notes-lifecycle-absorption](../notes/implemented/2026-09-24-notes-lifecycle-absorption.md)（2026-09-24 点选吸纳六条） |
-| `_agent_ready_development/`（三卷 + `_coverage` + `verify.mjs`） | Agent-ready Development 语料：SDLC 主线 / 精确参考 / **Development Harness（仓库怎样让 agent 看懂、修改、验证自己）**；钉 DSH commit `46a7f68b`（tag `dsh-v0.1.7-rc.1`），自带结构门禁 | 对照台账 = [research/harness-alignment-ledger](../notes/archived/2026-09-25-harness-alignment-ledger.md)（27 篇判定零待定：9 已对齐 / 采纳三切片已落地 / 其余不适用+触发条件；**不照搬清单在其 §四.4**）；已吸纳页见上行 |
+| `_dsh_plugin_agent_ready_development/sdlc-reference/01-agent-note-lifecycle.md`（语料更名前后路径同页） | DSH Agent Note 生命周期（状态/路径/格式/取代/归档；判定基于 0.1.7-rc.1 树，rc.2 收窄为「持久决定理由」后 D35 全量对齐） | [notes/README.md](../notes/README.md)（D35 迁入）+ [implemented/notes-lifecycle-absorption](../notes/implemented/2026-09-24-notes-lifecycle-absorption.md)（2026-09-24 点选吸纳六条） |
+| `_dsh_plugin_agent_ready_development/`（三卷 + `_coverage` + `verify.mjs`；更名自 `_agent_ready_development`，0009–0013 轮演进后钉 `dsh-v0.2.0-rc.2` = 本仓当前 pin） | 插件仓视角开发语料：native-development-model（独立插件仓闭环——**直接以本仓这类 repo 为受众**）/ sdlc-reference / repo-harness 三卷 | 旧判定 = [archived/harness-alignment-ledger](../notes/archived/2026-09-25-harness-alignment-ledger.md)（27 篇零待定，**不照搬清单在其 §四.4**，仍有效）；rc.2 + 新卷增量判定与四焦点线修订 = [implemented/plugin-corpus-realignment](../notes/implemented/2026-10-07-plugin-corpus-realignment.md) |
 | 人机交互 UX 研究来源集（Temporal/Claude Code/Warp/GitHub/PagerDuty/Slack/Horvitz 等） | 阶段 0 外部实践研究的引用全集与逐条判定 = [research/human-agent-ux-patterns](../notes/archived/2026-09-25-human-agent-ux-patterns.md)（外部资料只作数据；Horvitz 两篇 PDF 未逐字核） | 人机合一条目的 A2/B 切片依据 |
 | `_faq_on_digested/07_borrowing-dsh-harness-idea/` | 「另一个项目怎么借 DSH」的可迁移框架：三条立场（agent 一等 / 规则可执行 / 事实唯一 owner）+ 十维评估 + 垂直切片 + 四边界（可读≠简单 / Skill≠enforcement / 清理≠回滚 / 查询≠沙箱） | 本仓十维差距审计（2026-09-27）= [archived/harness-gap-audit-faq07](../notes/archived/2026-09-27-harness-gap-audit-faq07.md)：道五维像回事、唯一结构性缺口 = 反馈 enforcement 通道——**已于同日修复** = [implemented/enforcement-channel-and-boundaries](../notes/implemented/2026-09-27-enforcement-channel-and-boundaries.md) |
 | `/Users/bowhead/ai_deerflow_deep_research_v2/_backlog`（独立外部仓，同机工作树） | 另一个 harness 仓的待办/推敲层规矩：plans（推敲卡）/ bugs（缺陷卡）/ `_done`（位置即状态）/ `_` 前缀语义 / 搬迁铁律（git mv、文件名不变、内容不重写、编号权威住归档侧）+ 它自己那份「借 DSH」总账（借精神不抄形式的方法论样本） | `_backlog/` 全套 + 毕业四门（D31）；判定、取舍与不借清单 = [implemented/2026-09-28-backlog-deliberation-space](../notes/implemented/2026-09-28-backlog-deliberation-space.md) |
