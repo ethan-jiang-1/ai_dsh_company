@@ -1,7 +1,7 @@
 # AGENTS.md — 本仓库的入口链
 
 wochen 虚拟公司 DSH 插件：一个 company pack 提供五个角色 preset 与 host/client 面。
-**初入仓库**：[项目地图](docs/project-map.md)（空间）+ [运行态地图](docs/runtime-map.md)（时序与四状态轴）——驾驭者白话速读 = [orient 五问](docs/orient.md)；**开始变更**：[开发环 §0.5/§1](docs/guides/dev-loop.md)；**选验证**：[测试宪法](docs/testing.md) + [tests/README](tests/README.md)（改动面→最窄检查）+ [脚本索引](scripts/README.md)；**新 Agent 首跑验收** = [tests/README](tests/README.md) 首跑节。
+**初入仓库**：[项目地图](docs/project-map.md)（空间）+ [运行态地图](docs/runtime-map.md)（时序与四状态轴）——驾驭者白话速读 = [orient 五问](docs/orient.md)；**开始变更**：[开发环 §0.5/§1](docs/guides/dev-loop.md)；**选验证**：[测试宪法](docs/testing.md) + [tests/README](tests/README.md)（改动面→最窄检查）+ [脚本索引](checks/README.md)；**新 Agent 首跑验收** = [tests/README](tests/README.md) 首跑节。
 
 **你（读者）= 维护本 repo 的开发 agent**；五个 wochen 角色是你**维护的产物**（跑在 DSH 会话里，由 `pnpm dsh` / web 观察窗驱动）——别把自己混进公司角色，也别替角色执行公司手册。
 
@@ -31,14 +31,14 @@ snapshots/              回归证据资产；规则与分类 = snapshots/README.
 git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 corepack enable pnpm && pnpm install   # workspace 解析；全配方（含 vendor 构建）见 guides/bootstrap
 source run/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 接线（⚠ coding 会话 DSH_HOME 带日用值——dev-loop §6）
-pnpm verify                            # 结构门禁（清单唯一源 = scripts/run-gates.mjs）
+pnpm verify                            # 结构门禁（清单唯一源 = checks/run-gates.mjs）
 pnpm test                              # keyless 回归（真模型/浏览器不进；layering 守卫）
 pnpm orient                            # 运行态全景（keyless 只读；--scenario = run bundle 视图）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）
-node scripts/smoke/preset-smoke.mjs    # preset 改动的完成定义（真挂载）
+node checks/smoke/preset-smoke.mjs    # preset 改动的完成定义（真挂载）
 ```
 
-逐脚本触发/成本/状态唯一源 = 脚本头注（门禁强制自述）；索引见 [scripts/README](scripts/README.md)——**别抄回本文件，复述必漂**。web 观察窗开门步骤唯一见 [demo.md §前置](docs/demo.md)：**先 `source run/env.sh`**——日用 `~/.dsh` 另有同名 `web` profile（起得来不报错、五角色不出现）；端口是环境状态，token URL 从启动横幅读；现场运维 = [budget-and-ops](docs/guides/budget-and-ops.md)。**push 走 `ssh.github.com:443`**（origin 已配好）。
+逐脚本触发/成本/状态唯一源 = 脚本头注（门禁强制自述）；索引见 [scripts/README](checks/README.md)——**别抄回本文件，复述必漂**。web 观察窗开门步骤唯一见 [demo.md §前置](docs/demo.md)：**先 `source run/env.sh`**——日用 `~/.dsh` 另有同名 `web` profile（起得来不报错、五角色不出现）；端口是环境状态，token URL 从启动横幅读；现场运维 = [budget-and-ops](docs/guides/budget-and-ops.md)。**push 走 `ssh.github.com:443`**（origin 已配好）。
 
 ## 密钥
 
@@ -58,8 +58,8 @@ node scripts/smoke/preset-smoke.mjs    # preset 改动的完成定义（真挂�
 | docs = 当前合同（一处事实一个家，只写 now）；文档卫生 | `docs/AGENTS.md` | docs/ 分层；行预算 = run-gates `DOC_LINE_BUDGETS`；细则 = dev-loop §12 |
 | 非平凡变更同 diff 带 Note（决定/输掉的方案/验证什么）；日志税 | `.agents/notes/README.md` / `AGENTS.md` Conventions | notes/proposed/ → notes/implemented/；写什么 = [notes/README.md](notes/README.md) |
 | 完成定义 = 最小真检查；测试分层；真实入口与安装形状 | `docs/testing.md` / `docs/postmortem/0003-web-agent-gui-feedback-loop.md` | 本仓 [测试宪法](docs/testing.md) + layering 守卫；preset = preset-smoke；安装 = release-smoke（[release.md](docs/release.md)） |
-| 源码/产物面不混；vendor 钉版本，升 pin 时流程合同重校 | `AGENTS.md` Conventions / `vendor/README.md` | 根 tsconfig extends vendor base；簿记见下节 + `scripts/tools/sync-dsh.mjs` |
-| 机械不变量进执行门禁 + 每门带反证（红→还原→绿） | `AGENTS.md` Conventions | `scripts/run-gates.mjs`（清单唯一源 = 它自己；本表不复述） |
+| 源码/产物面不混；vendor 钉版本，升 pin 时流程合同重校 | `AGENTS.md` Conventions / `vendor/README.md` | 根 tsconfig extends vendor base；簿记见下节 + `tools/sync-dsh.mjs` |
+| 机械不变量进执行门禁 + 每门带反证（红→还原→绿） | `AGENTS.md` Conventions | `checks/run-gates.mjs`（清单唯一源 = 它自己；本表不复述） |
 
 ### vendor 铁律（`pnpm verify` 双门禁强制）
 

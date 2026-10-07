@@ -1,8 +1,8 @@
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
-import { repositoryRoot } from '../../scripts/lib/repository-layout.mjs'
+import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
 import { join, relative } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { inspectKeylessGraph, isForbiddenKeylessModule, localImportPath, parseKeylessImports } from '../../scripts/lib/keyless-imports.mjs'
+import { inspectKeylessGraph, isForbiddenKeylessModule, localImportPath, parseKeylessImports } from '../../tools/lib/keyless-imports.mjs'
 
 const fixtures: string[] = []
 const fixture = (files: Record<string, string>) => {
@@ -45,7 +45,7 @@ describe('keyless local import analysis', () => {
     })
     const libRoot = join(root, 'lib')
     const report = inspectKeylessGraph([join(libRoot, 'entry.mjs')], { libRoot })
-    expect(report.violations.map(item => item.reason)).toContain('local dependency leaves scripts/lib')
+    expect(report.violations.map(item => item.reason)).toContain('local dependency leaves tools/lib')
     const canonicalRoot = realpathSync(libRoot)
     expect(report.files.map(path => relative(canonicalRoot, path)).sort()).toEqual(['entry.mjs', 'nested/leaf.mjs', 'nested/middle.mjs'])
   })
@@ -72,6 +72,6 @@ describe('keyless local import analysis', () => {
     expect(isForbiddenKeylessModule('node:child_process')).toBe(true)
     expect(isForbiddenKeylessModule('node:http')).toBe(true)
     expect(isForbiddenKeylessModule('mdast-util-from-markdown')).toBe(false)
-    expect(localImportPath('/repo/scripts/lib/a.mjs', 'mdast-util-from-markdown')).toBeUndefined()
+    expect(localImportPath('/repo/tools/lib/a.mjs', 'mdast-util-from-markdown')).toBeUndefined()
   })
 })

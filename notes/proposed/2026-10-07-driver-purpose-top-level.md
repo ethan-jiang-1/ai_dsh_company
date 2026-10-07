@@ -12,10 +12,10 @@
 [改动面→最窄检查](../../tests/README.md)），病在**顶层按形态命名不按用途命名**：
 
 - `scripts/` 是形态词（"脚本"），smoke/probes/audit/tools 挤在其下，顶层读不出"验证/调试/工具"；
-  smoke 与 probe 的分层边界（如 presence-e2e-smoke vs multi-user-e2e-probe）只能靠 [脚本索引](../../scripts/README.md) 解释。
+  smoke 与 probe 的分层边界（如 presence-e2e-smoke vs multi-user-e2e-probe）只能靠 [脚本索引](../../checks/README.md) 解释。
 - `dev/` 名实不符：装的是运行面（env.sh + overlay），名字叫 dev；运行面知识散在
   [demo](../../docs/demo.md)、[dev-loop §6](../../docs/guides/dev-loop.md)、runtime/README 三处。
-- [probes/](../../scripts/probes/) 26 文件混四种机制域（团队/文件任务板/浏览器视觉/会话上下文）——上轮整理自造的新混合目录。
+- [probes/](../../probes/) 26 文件混四种机制域（团队/文件任务板/浏览器视觉/会话上下文）——上轮整理自造的新混合目录。
 - run bundle 有工具（`pnpm orient --scenario`）没有默认可见面：默认全景不显示"一次运行 = 哪四件套"。
 - 驾驭者唯一可用把手因此退化为端到端（其原话："最差劲的做法"）——分层已建，但对驾驭者不可见不可操作。
 
@@ -49,7 +49,7 @@ docs/ notes/ _backlog/ company-workspace/ vendor/（不动）
 - **S4 驾驭者面板**：`pnpm orient` 默认输出新增「run bundle 四件套」段（home/profile 来源/组合层/cwd/日志位）；
   [orient.md](../../docs/orient.md) 五问同步指向；orient.spec 红先行。
 - **S5 导航收口**：根 [AGENTS.md](../../AGENTS.md) 布局节、[项目地图](../../docs/project-map.md)、
-  [脚本索引](../../scripts/README.md)、entry-probe-smoke 基线题同步；snapshot-path 兼容查询核对。
+  [脚本索引](../../checks/README.md)、entry-probe-smoke 基线题同步；snapshot-path 兼容查询核对。
 
 ## 输掉的方案
 

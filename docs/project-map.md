@@ -15,7 +15,7 @@
 | 查组合和工具装载 | [profile 合同](profile.md)、[开发环](guides/dev-loop.md) §2 | dump 组合、检查名册与实际会话挂载 |
 | 修改角色内容 | [preset 合同](presets.md) | 找到 persona、skill 与 workspace 事实的各自 owner |
 | 修改 host 或 Web | [源码地图](../packages/company-pack/src/README.md) | 找到注册入口、读模型与渲染实现 |
-| 选择验证 | [测试宪法](testing.md)、[tests/README](../tests/README.md)、[脚本索引](../scripts/README.md) | 选择证明当前性质的最窄检查 |
+| 选择验证 | [测试宪法](testing.md)、[tests/README](../tests/README.md)、[脚本索引](../checks/README.md) | 选择证明当前性质的最窄检查 |
 | 查证据与归档 | [快照规则](../snapshots/README.md) | 区分录制、副本、独立 oracle、视觉夹具和归档 |
 | 查设计理由或旧决定 | [主题导航与决策台账](index.md) | 从主题进入合同和关联 Note |
 
@@ -26,10 +26,10 @@
 | 自写运行包 | [company-pack](../packages/company-pack/) | 五个角色 preset、bundle 行、host 注册与 client 面；发布形状由 [包声明](../packages/company-pack/package.json) 决定 |
 | 真实公司盘 | [company-workspace](../company-workspace/) | 公司角色会话 cwd；手册、公司事实、模板、交付物和 journal；不是开发 docs 的镜像 |
 | 启动配置 | [run](../run/)、[env.sh](../run/env.sh) | tracked 启动配置；源码验证使用开发 DSH_HOME |
-| 运行残留 | [runtime](../runtime/)、[runtime/README](../runtime/README.md) | 开发 DSH_HOME、第二 home、浏览器工具态与排练盘（全部 gitignored；逐件 owner = runtime/README；排练盘成型见 [rehearsal 实现](../scripts/lib/rehearsal.mjs)） |
+| 运行残留 | [runtime](../runtime/)、[runtime/README](../runtime/README.md) | 开发 DSH_HOME、第二 home、浏览器工具态与排练盘（全部 gitignored；逐件 owner = runtime/README；排练盘成型见 [rehearsal 实现](../tools/lib/rehearsal.mjs)） |
 | 上游机制 | [vendor/dsh](../vendor/dsh/) | 钉住的只读 submodule；开发 `pnpm dsh` 的源码基线 |
 | keyless 回归 | [tests](../tests/)、[Vitest 配置](../vitest.config.ts) | 模块逻辑、静态渲染、隔离文件夹具；分层守卫见 [layering.spec.ts](../tests/harness/layering.spec.ts) |
-| 维护工具 | [scripts](../scripts/README.md) | 门禁、真实入口、窄探针、审计、回放与导出；共享实现位于 [scripts/lib](../scripts/lib/) |
+| 维护工具 | [检查与工具索引](../checks/README.md) | 门禁、真实入口、窄探针、审计、回放与导出；共享实现位于 [tools/lib](../tools/lib/) |
 | 固化证据 | [snapshots](../snapshots/README.md) | 按场景保留日志、sidecar、工作区与判据；按日期保存归档证据 |
 | 当前合同 | [docs](index.md) | 当前语义与操作方式；本地图负责路由 |
 | 决策记忆 | [notes](../notes/) | 按主题检索决定、被否决方案与复验依据 |
@@ -63,7 +63,7 @@ flowchart TD
 - [根包命令](../package.json) 将 `pnpm dsh` 接到 [vendor CLI](../vendor/dsh/apps/cli/src/bin.ts)；[profile boot](../vendor/dsh/apps/cli/src/profile-boot.ts) 按选择的 profile 装配 patch 层；home patch（`$DSH_HOME/cordis.patch.yml`）在 profile patch 之后生效，随后是命令行 `--patch` 与 telemetry switch。
 - [company-pack 包声明](../packages/company-pack/package.json) 的 `dsh.bundle.patch` 合并 [共享 patch](../packages/company-pack/cordis.patch.yml) 与五个 preset 文件；[CEO preset](../packages/company-pack/presets/ceo/agent.cordis.yml) 声明 persona、角色 skills 和会话工具。
 - `company-client` 行接到 [host 入口](../packages/company-pack/src/index.ts)，注册签字工具；[client 入口](../packages/company-pack/src/client/index.ts) 注册品牌、卡片和公司视图，并读取官方会话投影。
-- 公司手册与事实由会话 cwd 进入；[排练实现](../scripts/lib/rehearsal.mjs) 为实验换 cwd、刷新参考输入并保留排练产物。
+- 公司手册与事实由会话 cwd 进入；[排练实现](../tools/lib/rehearsal.mjs) 为实验换 cwd、刷新参考输入并保留排练产物。
 
 **公司完整操作走 Web profile。** shipped headless 是通用 CLI 面，单独运行它不会自动得到公司组合。headless 实验需要显式组合；[company overlay](../run/company.overlay.yml) 只补部分宿主行，实际组合还由调用脚本的 preset patches 决定。不要把“CLI 可启动”当作“五角色公司已装配”。
 
@@ -76,12 +76,12 @@ Web 操作按 [动议合同 §前置](demo.md) 执行：启动输出给出当前
 | 现象 | 从哪一层查 | 下一步证据 |
 |---|---|---|
 | 公司角色没有出现 | profile 与最终组合 | `pnpm dsh --profile web --dump-config`，核对 bundle/preset 行 |
-| 名册有角色但创建失败 | 实际 preset 挂载 | [preset-smoke](../scripts/smoke/preset-smoke.mjs)，dump/名册扫描不能证明 schema 挂载成功 |
-| 工具缺失或委派续驶不可达 | 会话组合、工具目录、团队名册 | [delegation-smoke](../scripts/smoke/delegation-smoke.mjs) 与对应机制探针 |
+| 名册有角色但创建失败 | 实际 preset 挂载 | [preset-smoke](../checks/smoke/preset-smoke.mjs)，dump/名册扫描不能证明 schema 挂载成功 |
+| 工具缺失或委派续驶不可达 | 会话组合、工具目录、团队名册 | [delegation-smoke](../checks/smoke/delegation-smoke.mjs) 与对应机制探针 |
 | 改动没进入当前会话或页面 | 生效方式与构建产物 | [开发环 §2](guides/dev-loop.md)、[构建指南](guides/bootstrap.md)、[培养合同](presets.md) |
-| 页面挂载或面板异常 | client 装配与真实渲染 | [client-load-smoke](../scripts/smoke/client-load-smoke.mjs)、[cdp-probe](../scripts/probes/cdp-probe.mjs) |
-| 交付物、作者或 journal 不对 | 会话日志与实际工作区 | [deliverables-check](../scripts/audit/deliverables-check.mjs)、[authorship-audit](../scripts/audit/authorship-audit.mjs)、[journal-audit](../scripts/audit/journal-audit.mjs) |
-| 会话行为回归 | 录制场景与明确判据 | [replay-smoke](../scripts/smoke/replay-smoke.mjs)，按场景声明检查 oracle |
+| 页面挂载或面板异常 | client 装配与真实渲染 | [client-load-smoke](../checks/smoke/client-load-smoke.mjs)、[cdp-probe](../probes/cdp-probe.mjs) |
+| 交付物、作者或 journal 不对 | 会话日志与实际工作区 | [deliverables-check](../checks/audit/deliverables-check.mjs)、[authorship-audit](../checks/audit/authorship-audit.mjs)、[journal-audit](../checks/audit/journal-audit.mjs) |
+| 会话行为回归 | 录制场景与明确判据 | [replay-smoke](../checks/smoke/replay-smoke.mjs)，按场景声明检查 oracle |
 
 ## 测试资产怎样串起来
 
@@ -91,4 +91,4 @@ Web 操作按 [动议合同 §前置](demo.md) 执行：启动输出给出当前
 
 ## 目录整理结论
 
-脚本已按 smoke/probes/audit/tools/archive 职责分区，keyless spec 按 company/client/presets/harness 领域归位；真实进程和浏览器驱动独立于可测逻辑。长期收益是目录本身回答“该改哪类资产”，索引回答“该选哪个入口”；不把一次搬迁成本当作保持平铺的理由。根 [run-gates](../scripts/run-gates.mjs) 保持完整稳定入口及 pin 来源。映射、兼容边界与验证见 [职责分区迁移 Note](../notes/implemented/2026-10-05-repository-responsibility-layout.md)。
+脚本已按 smoke/probes/audit/tools/archive 职责分区，keyless spec 按 company/client/presets/harness 领域归位；真实进程和浏览器驱动独立于可测逻辑。长期收益是目录本身回答“该改哪类资产”，索引回答“该选哪个入口”；不把一次搬迁成本当作保持平铺的理由。根 [run-gates](../checks/run-gates.mjs) 保持完整稳定入口及 pin 来源。映射、兼容边界与验证见 [职责分区迁移 Note](../notes/implemented/2026-10-05-repository-responsibility-layout.md)。

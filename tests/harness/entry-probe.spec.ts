@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { assistantMessageText, collectText } from '../../scripts/lib/session-log.mjs'
-import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from '../../scripts/lib/entry-probe.mjs'
+import { assistantMessageText, collectText } from '../../tools/lib/session-log.mjs'
+import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from '../../tools/lib/entry-probe.mjs'
 
 // 通配证据路径：单测桩对它返回 quote 自身（自洽），与下方真夹具（AGENTS.md）不撞车
 const evidence = { path: 'docs/index.md', quote: '逐字可核的证据原文至少八字符' }
@@ -124,10 +124,10 @@ describe('入口探针不使用全文兜底', () => {
 
   it('引用比对忽略排版空白，但文字仍须真实存在', () => {
     // 忠实复刻 Q5 现场：源文件用空格对齐，模型引用时把它规范化了。
-    const aligned = 'node scripts/smoke/preset-smoke.mjs          # preset 改动的完成定义'
+    const aligned = 'node checks/smoke/preset-smoke.mjs          # preset 改动的完成定义'
     const reader = (path: string) => (path === 'AGENTS.md' ? aligned : evidence.quote)
     const spaced = good()
-    spaced.answers[4].evidence = [{ path: 'AGENTS.md', quote: 'node scripts/smoke/preset-smoke.mjs # preset 改动的完成定义' }]
+    spaced.answers[4].evidence = [{ path: 'AGENTS.md', quote: 'node checks/smoke/preset-smoke.mjs # preset 改动的完成定义' }]
     expect(evaluateEntryProbe(JSON.stringify(spaced), reader).failures).toEqual([])
     const wrong = good()
     wrong.answers[4].evidence = [{ path: 'AGENTS.md', quote: '这段原文其实并不存在于任何文件里' }]

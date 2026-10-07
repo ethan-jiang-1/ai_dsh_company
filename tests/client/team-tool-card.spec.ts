@@ -1,5 +1,5 @@
 /** 团队工具卡（S2 keyless：纯函数视图模型 + 与官方工具名的防漂移守卫）。 */
-import { repositoryRoot as ROOT } from '../../scripts/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { createElement } from 'react'

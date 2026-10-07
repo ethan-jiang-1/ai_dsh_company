@@ -2,7 +2,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { assertProcessReview, pinTransaction, replaceOne } from '../../scripts/lib/pin-transaction.mjs'
+import { assertProcessReview, pinTransaction, replaceOne } from '../../tools/lib/pin-transaction.mjs'
 
 const dirs: string[] = []
 function fixture() {

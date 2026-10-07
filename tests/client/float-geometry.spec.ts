@@ -2,7 +2,7 @@
  * 浮窗几何记忆 keyless 回归（RFC proposed/2026-09-28-float-geometry-memory）：
  * clampRect 是还原路径的安全闸——存档可能来自上一窗口尺寸（甚至写坏的值），还原时必须
  * 钳进当前视口且不产生 NaN/负尺寸/零可见；存取层对损坏数据 fail-soft（回平台默认位）。
- * 真浮出/还原链路由 scripts/ 侧的真入口验收覆盖（RFC 验收节），本档只锁纯函数面。
+ * 真浮出/还原链路由 checks/ 侧的真入口验收覆盖（RFC 验收节），本档只锁纯函数面。
  */
 import { describe, expect, it } from 'vitest'
 import { clampRect, loadFloatRect, MIN_VISIBLE, saveFloatRect, storageKey } from '../../packages/company-pack/src/client/float-geometry.ts'

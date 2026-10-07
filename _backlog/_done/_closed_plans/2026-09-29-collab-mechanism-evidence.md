@@ -1,6 +1,6 @@
 # 推敲（调研）：协作机制证据底座——原生栈实测 E1/E2/E3 + 生态与先例扫描 Q1/Q2/Q3
 
-> 状态：已毕业（2026-10-03，消化——六项全答，Q3 未触发不算欠账）｜去向 = E1/Q2 结论已写回消费卡 [writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md)（R0 地基闭合）；E1 认证档 = [scripts/fs-guard-probe.mjs](../../../scripts/probes/fs-guard-probe.mjs)（真模型 ×4 轮，收据 = 会话日志 841c3f68/14dbbd15/70b8cb04/ed1f4b1a，见下文结论节）｜原毕业门判断 = 跑完 E1/Q2 即毕业消化
+> 状态：已毕业（2026-10-03，消化——六项全答，Q3 未触发不算欠账）｜去向 = E1/Q2 结论已写回消费卡 [writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md)（R0 地基闭合）；E1 认证档 = [scripts/fs-guard-probe.mjs](../../../probes/fs-guard-probe.mjs)（真模型 ×4 轮，收据 = 会话日志 841c3f68/14dbbd15/70b8cb04/ed1f4b1a，见下文结论节）｜原毕业门判断 = 跑完 E1/Q2 即毕业消化
 
 ## 背景 / 触发
 

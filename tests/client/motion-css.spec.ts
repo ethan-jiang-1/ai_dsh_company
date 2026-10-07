@@ -8,7 +8,7 @@
  *
  * 反证：把 reduced-motion 块里的 `.wk-node` 删掉，本测试即红。
  */
-import { repositoryRoot as ROOT } from '../../scripts/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'

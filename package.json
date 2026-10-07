@@ -8,8 +8,8 @@
   },
   "scripts": {
     "dsh": "node --import tsx/esm vendor/dsh/apps/cli/src/bin.ts",
-    "orient": "node scripts/tools/orient.mjs",
-    "verify": "node scripts/run-gates.mjs",
+    "orient": "node tools/orient.mjs",
+    "verify": "node checks/run-gates.mjs",
     "test": "vitest run"
   },
   "devDependencies": {

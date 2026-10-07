@@ -32,7 +32,7 @@ UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSecti
 | 独立角色 preset 根会话（人选 preset 开门） | `presets/<role>/agent.cordis.yml` persona row | **preset 自声明**（自包含、无继承——见下「工具面」） | 人连接的 workspace；手册经 `agent-instructions` 注入、KB = cwd 的 `kb/<role>/` | `$DSH_HOME/sessions/<slug>/<id>/`（世代选择唯一口径 = session-log-generation） | `tool-ask-user` 直问人 |
 | CEO Lead 动议会话 | `presets/ceo/`（同上） | 同上（ceo 自声明，含 delegation 组） | `company-workspace`；spawn 队友 | 同上（Lead 目录） | Lead 直问人；成员升级 CEO |
 | teammate（Agent Teams 成员） | **继承 Lead 组合**（composeFrom ⇒ `agentPreset=ceo`）——身份来自成员名、任务书与手册注入，**不是成员角色的 preset** | 继承 Lead 组合（delegation 行无 `toolFilter` 不裁剪） | 同 Lead 工作区；读自己的 CHARTER | 各自 sessionId 目录（authorship 按 `team/member` 事件建 sessionId→成员名映射） | 动议内升级 CEO（不直问） |
-| 命名 child / one-shot subagent | 继承 Lead（`agentPreset=ceo`）；**名册角色名 ≠ 加载 preset**（反例 = 2026-09-26 sea-reconcile：CFO 稿实为 ceo preset 会话代笔，[authorship-audit](../scripts/audit/authorship-audit.mjs) 头注） | 继承；⚠ 目录看得见 Team 工具但调不通（上游已登记限制，[pack README](../packages/company-pack/README.md) 已知限制节） | 同 Lead | child 自带 sessionId 日志 | 经 Lead |
+| 命名 child / one-shot subagent | 继承 Lead（`agentPreset=ceo`）；**名册角色名 ≠ 加载 preset**（反例 = 2026-09-26 sea-reconcile：CFO 稿实为 ceo preset 会话代笔，[authorship-audit](../checks/audit/authorship-audit.mjs) 头注） | 继承；⚠ 目录看得见 Team 工具但调不通（上游已登记限制，[pack README](../packages/company-pack/README.md) 已知限制节） | 同 Lead | child 自带 sessionId 日志 | 经 Lead |
 
 改哪一列 → 哪个文件：persona/工具/skills → `presets/<role>/`（owner 表 = [pack README](../packages/company-pack/README.md)）；手册/CHARTER/KB → `company-workspace/`；生效时点 = 下文「生效边界按面」表。
 
@@ -134,8 +134,8 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 |---|---|---|
 | keyless | `pnpm test`（roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义、必填 config） | ✅ 五角色覆盖 |
 | 运行时 roster | web 观察窗 `agentPresets/list` RPC | ✅ 实测 10 条零 broken |
-| **挂载（上线前门禁）** | `node scripts/smoke/preset-smoke.mjs`：boot 真 web，逐个 preset `session/create` | ✅ 五角色 ALL PASS（反证过：去掉必填 config 即红） |
-| 会话级（persona 生效、连通） | `node scripts/smoke/probe-smoke.mjs`（默认快速档 ~6s：真会话发一句 ping，断言挂载/轮次/回话/**人格进 prompt**）；`--full` = 五角色三探针内容断言（慢，按需） | ✅ R2 建：快速档 5/5 PASS；内容档曾 14/15（KB 事实与 veto 语义均命中） |
+| **挂载（上线前门禁）** | `node checks/smoke/preset-smoke.mjs`：boot 真 web，逐个 preset `session/create` | ✅ 五角色 ALL PASS（反证过：去掉必填 config 即红） |
+| 会话级（persona 生效、连通） | `node checks/smoke/probe-smoke.mjs`（默认快速档 ~6s：真会话发一句 ping，断言挂载/轮次/回话/**人格进 prompt**）；`--full` = 五角色三探针内容断言（慢，按需） | ✅ R2 建：快速档 5/5 PASS；内容档曾 14/15（KB 事实与 veto 语义均命中） |
 | 回归资产 | 动议会话 + 期望工作区归档 | ✅ `snapshots/`（r1–r4 motion + scenario-b + r3 replay 场景；replay harness R5a） |
 
 ## 培养回路与学习载体（分身成长条目出生，2026-09-24）
@@ -154,7 +154,7 @@ preset 即对 profile 可见、无需重装；真实安装形状（`file:`）归
 | skill 条目（增删改名） | 下一轮（pre-step digest 重算 → 替换目录注入） | vendor 源码层（[研究笔记 §5.2/§6](../notes/implemented/2026-09-22-digital-twin-cultivation-and-self-learning.md)） |
 
 **培养验收（把"培养"从感觉变成检查）**：改任何 preset 内容后，`pnpm test` + `pnpm verify` +
-`node scripts/smoke/preset-smoke.mjs`（真挂载）+ `node scripts/smoke/probe-smoke.mjs --full`（入戏探针）全绿，
+`node checks/smoke/preset-smoke.mjs`（真挂载）+ `node checks/smoke/probe-smoke.mjs --full`（入戏探针）全绿，
 才算培养成功（首例 = 2026-09-24，CEO `chairing-staff-meeting` +4 行）。
 
 **学习载体 = workspace journal 唯一**（D8：`kb/<role>/journal/`，经工具调用进日志）。

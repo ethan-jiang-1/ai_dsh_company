@@ -1,4 +1,4 @@
-import { repositoryRoot as ROOT } from '../../scripts/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -33,7 +33,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   it('preset 行引用的插件都在 pack 依赖声明里（DSH verify-cordis-config 同构；R5a 起 deps ∪ peers）', () => {
     const manifest = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')) as { dependencies?: Record<string, string>, peerDependencies?: Record<string, string> }
     // R5a 起 runtime 依赖 = peerDependencies（docs/release.md：不精确钉死）；本断言按包名归一，
-    // 两种声明都算"在列"——与 scripts/run-gates.mjs §7 的门禁同口径。
+    // 两种声明都算"在列"——与 checks/run-gates.mjs §7 的门禁同口径。
     const deps = new Set([...Object.keys(manifest.dependencies ?? {}), ...Object.keys(manifest.peerDependencies ?? {})])
     const missing = [...new Set(['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'].flatMap(rowPlugins))].filter(name => !deps.has(name))
     expect(missing).toEqual([])
@@ -179,12 +179,12 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
 
   it('交付物三态（R4）：手册写清成品归 CEO、职能写 drafts；模板不再是占位', () => {
     const handbook = readFileSync(join(ROOT, 'company-workspace/AGENTS.md'), 'utf8')
-    // 三态的字面形状必须与判据实现一致（scripts/lib/deliverables.mjs 的 FINAL_BASENAME / DRAFTS_DIRNAME）
+    // 三态的字面形状必须与判据实现一致（tools/lib/deliverables.mjs 的 FINAL_BASENAME / DRAFTS_DIRNAME）
     expect(handbook, '三态必须点明成品路径').toContain('deliverables/<slug>/final.md')
     expect(handbook, '三态必须点明过程稿路径').toContain('deliverables/<slug>/drafts/<角色>.md')
     expect(handbook, '必须写明成品只归 CEO').toMatch(/只有 CEO/)
     // 判据必须可被模型自行跑（发现权在代理一侧，D15）
-    expect(handbook, '三态要指向机器判据入口').toContain('scripts/audit/deliverables-check.mjs')
+    expect(handbook, '三态要指向机器判据入口').toContain('checks/audit/deliverables-check.mjs')
 
     const presetGuide = readFileSync(join(ROOT, 'docs/presets.md'), 'utf8')
     expect(presetGuide, 'COO 运营核查必须路由到 COO 专用模板').toContain('产出=运营方案 + 预算核查（`templates/ops-review-note.md`）')

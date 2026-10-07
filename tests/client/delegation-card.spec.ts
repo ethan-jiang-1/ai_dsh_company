@@ -7,7 +7,7 @@ import { DelegationCard, delegationCardModel } from '../../packages/company-pack
  * 委派工具卡的 keyless 层（R3）。
  *
  * 为什么这层是主门禁：卡片是 **call/result 切片的纯函数**——不需要浏览器、不需要模型、
- * 毫秒级。真模型 + 真浏览器的 e2e（`scripts/smoke/replay-smoke.mjs --ui`）是**认证档**，
+ * 毫秒级。真模型 + 真浏览器的 e2e（`checks/smoke/replay-smoke.mjs --ui`）是**认证档**，
  * 按受影响面运行，不进回归（它分钟级、还依赖模型配合；R3 实测 240s 都没等到）。
  */
 

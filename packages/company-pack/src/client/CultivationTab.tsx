@@ -6,7 +6,7 @@
  * 人的赞/踩经出厂 message-feedback 落 `feedback/message-put|delete` 会话事件，折算见 lib
  * `feedbackItems`；注入缺席或流不可达时该块降级、journal 面不受影响）。
  * 「journal/ 里的条目 = 待审素材」的语义见 lib/cultivation.ts 头注。**v1 登记缺口**：「最近提升
- * skill」与「探针状态」住仓库侧（presets/ + scripts/ 产物），浏览器数据面够不到——等有 host 读面
+ * skill」与「探针状态」住仓库侧（presets/ + checks|probes 产物），浏览器数据面够不到——等有 host 读面
  * 或收敛条目定标记约定再补。
  */
 import { useEffect, useState } from 'react'

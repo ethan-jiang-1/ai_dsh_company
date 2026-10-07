@@ -128,7 +128,7 @@
           #    请求起**就是 team-scoped——`tool-agent-team` 把 `send_message` / `list_agents` /
           #    `interrupt_agent` 三个名字**按成员作用域 shadow 掉了全局版**，而 Lead（CEO）自己也是
           #    team member（`snapshots/replay/r2-motion/sessions/lead.jsonl` 的第一帧 request/header 即是团队版；
-          #    R3 `scripts/smoke/delegation-smoke.mjs` 在全新会话复现）。更硬的一层：团队版 `send_message` 的
+          #    R3 `checks/smoke/delegation-smoke.mjs` 在全新会话复现）。更硬的一层：团队版 `send_message` 的
           #    参数是 `target`（"Team member **name**, or lead"），按名册名字寻址；而全局版是 `agent_id`
           #    （"any exact live Agent may target its **direct continuable child**"）。subagent child 不在
           #    名册上 ⇒ **continuable child 在 CEO 会话里无法被续驶**（既不能发消息也不能中断/列出）。
@@ -136,7 +136,7 @@
           #    "快捷出稿"语义；**连续对话/续驶归 team（spawn_teammate）**，那才是它的机制。
           #    并行快捷派活的 seam 已随 0.2.0 harvest 到位（subagent_fork 可续分叉——批1；workflow 编排——批4）；
           #    连续对话/续驶仍归 team（spawn_teammate），那是它的机制。
-          #    出处：docs/delegation.md；探针 scripts/smoke/delegation-smoke.mjs（默认档 = 这条边界的回归守卫）。
+          #    出处：docs/delegation.md；探针 checks/smoke/delegation-smoke.mjs（默认档 = 这条边界的回归守卫）。
           #
           #    ⚠ 能力边界（诚实记账，别写进 persona 骗模型）：委托 child **继承 CEO 的组合**（design/roles-isolation
           #    §2/§4），所以它拿到的是 **CEO 的 skills**（chairing-staff-meeting），不是 vp-eng/vp-sales

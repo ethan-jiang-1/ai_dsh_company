@@ -2,7 +2,7 @@
 
 状态：已交付（2026-10-04 用户令「去推进…最好是测试驱动…测试完资产到最后汇报」；**判据先行**——
 头注 P1a/P1b/P2a/P2b/P3 写死后真跑；probe =
-[taskboard-presence-probe.mjs](../../scripts/probes/taskboard-presence-probe.mjs)）
+[taskboard-presence-probe.mjs](../../probes/taskboard-presence-probe.mjs)）
 
 ## 交付
 

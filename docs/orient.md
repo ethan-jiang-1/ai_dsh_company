@@ -26,7 +26,7 @@ COO、CFO 各自是独立 preset，跑在 DSH 会话里，你通过 web 观察�
 
 ## 四问：测试资产在哪、怎么选？
 
-三层：**秒级回归**（`pnpm test`）→ **真实入口冒烟**（[scripts](../scripts/README.md) 的 smoke 与
+三层：**秒级回归**（`pnpm test`）→ **真实入口冒烟**（[scripts](../checks/README.md) 的 smoke 与
 audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.md)）。改完东西选最窄检查：
 按改动面查表。
 

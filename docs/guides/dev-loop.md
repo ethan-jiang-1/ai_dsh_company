@@ -68,7 +68,7 @@
 | 3.6 **表面层（R1 实证）** | **症状"角色没入戏 / persona 不生效"→ 先问跑在哪个面** | **preset 只在 Web 面挂载**：只有 `web-app` 组合 `session-controller`（其 `composeAgent` 负责"未指定 preset 时挂 default"），headless / sdk / acp 的一次性驱动直接经 core agent registry 建 agent、**绕过 preset**。所以在 headless 里验角色内容永远失败，换 Web 会话（选 preset）验证 |
 | 3.7 **工具面层（R1 实证）** | **症状"角色会话只能协调、不能读写文件 / 加载 skill / 写交付物"→ 查 preset 是否声明了工具行** | preset composition 是**自包含**的：工具行不随 profile/bundle 继承（shipped `standard` 自己声明全部工具行）。查证手段：**会话日志 `request/header.tools`** 列出的工具名（`--dump-config` 看不出来——它只打印 profile 树）。⚠ 会话日志是**多 frame zstd**：Node `zstdDecompressSync` 只解第一 frame（读到 200 字节就停），用 `zstd -d -c`（homebrew）读全量 |
 | 3.8 **Web RPC 层（R1 实证）** | **UI 静默失败（"新建会话没反应"）→ 直接打 `session/create` RPC 拿真实错误** | UI 不显示 preset mount 失败；RPC 会返回 `agent-preset/invalid` + 具体行与缺失字段（R1 实证：工具行缺必填 config，如 `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`——**抄 shipped preset 的行要连 config 一起抄**）。驱动方法见 §8 |
-| 3.9 **客户端模块层（R1 误诊 → R2 更正，postmortem 0003）** | **症状"整窗只剩 HARNESS / Failed to load plugins 错误屏"→ 某个 client 入口 apply 抛错，砖的是全 app** | ① client 入口失败**不静默**：BootPage 错误屏 + 浏览器 console 有 `failed to apply loader entry <id> (<name>)`；先跑 `node scripts/smoke/client-load-smoke.mjs`（headless 浏览器断言零挂载失败 + 品牌在场）。② `dsh.client.inject` 是 **informational only**（vendor `packages/client/AGENTS.md`）：不排序、不 gate 加载——"inject 引用了不在 entries 里的包" ≠ 挂不上；shell baseline（`platform.ts` 的 `PLATFORM_MODULES`：react/cordis/store/ui-slots/ui-primitives/ui-dockkit）隐式回答这些名字（R1 曾据此误诊"官方 Team UI 挂不上"，实为可用）。③ 真正"挂不上但没报错"的形态是 fiber **PENDING**（声明的服务无人提供，无超时，贡献安静不出现）。④ 复用别人已挂的贡献（如官方 Team remote）：走服务 inject 等它，**别重复 `$mount`**——同一描述符挂两次 = `already mounted` = 全 UI 砖（2026-09-22 实证） |
+| 3.9 **客户端模块层（R1 误诊 → R2 更正，postmortem 0003）** | **症状"整窗只剩 HARNESS / Failed to load plugins 错误屏"→ 某个 client 入口 apply 抛错，砖的是全 app** | ① client 入口失败**不静默**：BootPage 错误屏 + 浏览器 console 有 `failed to apply loader entry <id> (<name>)`；先跑 `node checks/smoke/client-load-smoke.mjs`（headless 浏览器断言零挂载失败 + 品牌在场）。② `dsh.client.inject` 是 **informational only**（vendor `packages/client/AGENTS.md`）：不排序、不 gate 加载——"inject 引用了不在 entries 里的包" ≠ 挂不上；shell baseline（`platform.ts` 的 `PLATFORM_MODULES`：react/cordis/store/ui-slots/ui-primitives/ui-dockkit）隐式回答这些名字（R1 曾据此误诊"官方 Team UI 挂不上"，实为可用）。③ 真正"挂不上但没报错"的形态是 fiber **PENDING**（声明的服务无人提供，无超时，贡献安静不出现）。④ 复用别人已挂的贡献（如官方 Team remote）：走服务 inject 等它，**别重复 `$mount`**——同一描述符挂两次 = `already mounted` = 全 UI 砖（2026-09-22 实证） |
 | 4 会话层 | 读会话 JSONL，不猜 | model-visible ⟺ logged：上下文组装问题从日志（`$DSH_HOME` 下 sessions）重建；读不全 = 欠了 §3 第②问的债。⚠ bash 沙箱对会话文件有**间歇视图抖动**（列出得、打开不得），且 headless 会话收尾会删目录——分析要趁进程活着时做（R1 实证） |
 | 5 回归层 | snapshot 重放（R5a 起） | `snapshots/`；回答"行为为什么变了"的最快路径 |
 
@@ -118,7 +118,7 @@
 
 ## 5. 升级环与发布纪律时点
 
-升级环（AGENTS.md 纪律的展开；执行器 `scripts/tools/sync-dsh.mjs`，R5a 建——默认检查簿记一致，
+升级环（AGENTS.md 纪律的展开；执行器 `tools/sync-dsh.mjs`，R5a 建——默认检查簿记一致，
 `--pin <tag>` 走完整程序）：
 
 ```text
@@ -161,14 +161,14 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回�
    在 **DSH 的 coding 会话里跑 bash** 时，`DSH_HOME` 是**继承且带值的**，值就是日用 home
    `~/.dsh`（实测：不 source 直接 `echo $DSH_HOME` → `/Users/bowhead/.dsh`）。后果比"没设"更坏：
    脚本里"未设则报错"的那道防线**根本不触发**，会安静地拿日用 home 的会话库当输入。
-   所以：**判据/审计类脚本要自己拒绝日用 home**。**判据/审计类脚本一律接入 `scripts/lib/runtime-home.mjs`**（在启动前拒绝日用目录、重叠路径及其符号链接；清单唯一源 = 各脚本自己的 import，`rg -l runtime-home scripts -g '*.mjs'` 即得——**别在文档里列名单**，2026-09-26 实测旧名单只列了 6 个而实际已有 17 个）；
+   所以：**判据/审计类脚本要自己拒绝日用 home**。**判据/审计类脚本一律接入 `tools/lib/runtime-home.mjs`**（在启动前拒绝日用目录、重叠路径及其符号链接；清单唯一源 = 各脚本自己的 import，`rg -l runtime-home scripts -g '*.mjs'` 即得——**别在文档里列名单**，2026-09-26 实测旧名单只列了 6 个而实际已有 17 个）；
    `deliverables-check` / `release-smoke`、`entry-probe` / `snapshot-motion` 均在运行前调用 `requireDevHome`，拒绝缺失或与日用 home 重叠的路径；`sync-dsh --pin` 也要求隔离 home。守卫不涵盖未接入该 helper 的任意脚本，也不防守检查后的并发符号链接替换。
 6. **端口与实例隔离（部署事实）**：headless 形态（探针/动议）**无端口**——单次任务
    进程，stdout 出结果，日志落 `$DSH_HOME/sessions/`。web 形态（观察窗）起**本地**
    HTTP 端口（值见启动横幅）；因 `DSH_HOME` 指 dev home，它与日用 DSH 的 web 实例
    （若同时开）是两个完全独立进程：profile、会话、凭据、端口互不可见。
 7. **排练场 ≠ 运行场（轮间待办②，2026-09-22 落地）**：排练/探针会话的默认 cwd 是
-   `runtime/rehearsal-workspace/`（`node scripts/tools/rehearsal-init.mjs` 幂等成型；排练/探针脚本（清单见各脚本头注「何时跑」）
+   `runtime/rehearsal-workspace/`（`node tools/rehearsal-init.mjs` 幂等成型；排练/探针脚本（清单见各脚本头注「何时跑」）
    `preset/probe/handbook/delegation` 已默认指这里并会自建，`--cwd` 可显式覆盖）。
    **真盘 `company-workspace/` 只收真实动议的产物**——排练产物不受三态判据约束
    （`drafts/` 本就不需要 `present`），跑在真盘会安静积污（R4 W2 删过 15 份）。
@@ -191,7 +191,7 @@ preset 只在 Web 面挂载（§2 第 3.6 层），所以**验证角色行为必
 
 ```sh
 # ① token → cookie（cookie 按 origin 隔离：换端口/换实例都要重新换一次）
-#    从响应头抓 set-cookie 显式带上——`curl -c jar` 抓不稳，别用（脚本同法 = [harvest-probe.mjs](../../scripts/archive/harvest-probe.mjs) 的 getSetCookie）
+#    从响应头抓 set-cookie 显式带上——`curl -c jar` 抓不稳，别用（脚本同法 = [harvest-probe.mjs](../../tools/archive/harvest-probe.mjs) 的 getSetCookie）
 COOKIE=$(curl -s -D - -o /dev/null "http://127.0.0.1:3081/?token=<TOKEN>" | grep -i '^set-cookie:' | head -1 | cut -d' ' -f2 | cut -d';' -f1)
 
 # ② 建会话（带 agentPreset 即挂角色 preset）
@@ -220,7 +220,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - 这条通道也是 R5a「web 快照 lane」的雏形。
 
 
-- **读会话日志**用 `scripts/lib/session-log.mjs`（page 与事件解析的共用实现）。两个坑：`session/page`
+- **读会话日志**用 `tools/lib/session-log.mjs`（page 与事件解析的共用实现）。两个坑：`session/page`
   的 `throughSeq` 必须是**有效 seq**（`-1` 实测返回 0 条；当前游标可从越界报错 `… is past cursor N` 取），
   完成信号取**持久事件 `turn/end`**（`session/list.running` 是“会话有活着的 agent”，idle 也为 true；用它等会假超时）。
 
@@ -230,14 +230,14 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 30 分钟没跑完；改并发后仍 3 分钟以上，慢轮次实测 150s+ 会把超时判定拖垮。用户裁定：
 **"先要它通，对不对没那么重要。"**
 
-**做法**：同一个门禁脚本分两档，默认快档（`scripts/smoke/probe-smoke.mjs` 是范例）。
+**做法**：同一个门禁脚本分两档，默认快档（`checks/smoke/probe-smoke.mjs` 是范例）。
 
 | 档 | 判据 | 成本 |
 |---|---|---|
 | **连通档（默认）** | 每角色一句 ping（"只回复两个字：在岗，不要调用工具"），断言四件事：① `session/create` 成功（preset 行 config 全过）② 日志出现新 `turn/end` ③ assistant 正文非空 ④ **人格进 prompt**（`system/message` 含角色标记） | 5 角色并发 **≈6s** |
 | 内容档（`--full`） | 身份 / 知识 / 产出三探针，按 KB 事实与 veto 语义断言 | 5–10min，按需 |
 
-**要点（可迁移到别的面）**：五条设计要点（"通"不考内容／从权威日志读事实／问句要短／完成信号用持久事件／慢是常态）写在范例脚本头注 = [`scripts/smoke/probe-smoke.mjs`](../../scripts/smoke/probe-smoke.mjs)（2026-09-26 从本节搬出，一处事实一个家）。
+**要点（可迁移到别的面）**：五条设计要点（"通"不考内容／从权威日志读事实／问句要短／完成信号用持久事件／慢是常态）写在范例脚本头注 = [`checks/smoke/probe-smoke.mjs`](../../checks/smoke/probe-smoke.mjs)（2026-09-26 从本节搬出，一处事实一个家）。
 
 **门禁升格判据（2026-09-28 借 FAQ 15，防门禁膨胀）**：新门禁准入 = 那个具体错误本仓**复发过** + 可机械判定 + 负例已证会失败；语义要求（"每任务都该立卡"一类）不做成 gate——gates 本身是要维护的代码。
 
@@ -259,7 +259,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 | 装配 keyless | ~10s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） |
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
 | **重放 lane（第三档，无 key）** | ~11s | `replay-smoke`（会话日志 + sidecar；已声明 workspace oracle 的场景另比完整工作区）；`--ui`（+真浏览器端到端）——要起进程/浏览器，不进 `pnpm test` |
-| CLI 集成（keyless，需子进程） | 秒级 | `node scripts/smoke/snapshot-motion-smoke.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） |
+| CLI 集成（keyless，需子进程） | 秒级 | `node checks/smoke/snapshot-motion-smoke.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） |
 | 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../release.md)） |
 | 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件与成本见其头注「何时跑」**；`script-triggers` 门禁强制） |
 | 行为质量档（认证） | 分钟级 | `probe --full`（内容档三探针）+ `candidate-scan-eval`（语料判据家 = testing.md §4） |
@@ -275,10 +275,10 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 
 **三条硬规矩**：
 
-1. **真模型 / 真浏览器不进迭代环的秒级回归档**：keyless 单测与结构检查保持快速；认证档仅在受影响面或验收要求时运行，不按“轮末/每轮”机械触发。需要真入口 → 写 `scripts/smoke/*-smoke.mjs`，别塞进 `tests/`。**这条有机械门禁**：`tests/harness/layering.spec.ts` 扫 `tests/**`，出现 `node:child_process` / `spawn(` / playwright /
+1. **真模型 / 真浏览器不进迭代环的秒级回归档**：keyless 单测与结构检查保持快速；认证档仅在受影响面或验收要求时运行，不按“轮末/每轮”机械触发。需要真入口 → 写 `checks/smoke/*-smoke.mjs`，别塞进 `tests/`。**这条有机械门禁**：`tests/harness/layering.spec.ts` 扫 `tests/**`，出现 `node:child_process` / `spawn(` / playwright /
    `fetch(` / 密钥即红（已反证：塞一行 `import { spawn } from 'node:child_process'` 立刻变红）。**R5a 起另禁两条**（均双红证）：tests/
-   不得 import `scripts/` 下的驱动脚本（`scripts/lib/` 纯逻辑库除外）；任何 vitest 配置不得把
-   `scripts/` 编进测试发现——重放 lane 是第三档，只由 `scripts/smoke/replay-smoke.mjs` 驱动。
+   不得 import `scripts/` 下的驱动脚本（`tools/lib/` 纯逻辑库除外）；任何 vitest 配置不得把
+   `scripts/` 编进测试发现——重放 lane 是第三档，只由 `checks/smoke/replay-smoke.mjs` 驱动。
 2. **能做成纯函数就做成纯函数**：UI 组件把"展示事实"抽成纯函数（范本 `delegationCardModel`），
    keyless 单测直接断言它——组件层就永远不需要模型与浏览器。
 3. **认证档要能"重放"而不是"重跑"**：真模型跑一次 → 会话日志归档 → 后续用归档做回放断言

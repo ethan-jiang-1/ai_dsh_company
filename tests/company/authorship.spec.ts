@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { classifyAuthorship, citedVersionsOf, crossCheckVersions, currentVersionOf, nominalRoleOf, RECLAIM, SIG } from '../../scripts/lib/authorship.mjs'
+import { classifyAuthorship, citedVersionsOf, crossCheckVersions, currentVersionOf, nominalRoleOf, RECLAIM, SIG } from '../../tools/lib/authorship.mjs'
 
 const BODY_SIGNED = (role: string) => `# 标题\n\n> 出稿：${role}｜版本 v1｜任务书 = deliverables/x/drafts/ceo.md\n\n正文`
 const BODY_LEGACY = '> 出稿：CFO（wochen 财务职能）｜正文 42 非空行｜状态：现行意见'
 
-describe('署名核对：档位判定（判据单一来源 = scripts/lib/authorship.mjs）', () => {
+describe('署名核对：档位判定（判据单一来源 = tools/lib/authorship.mjs）', () => {
   it('署名与写入者一致 ⇒ match', () => {
     const r = classifyAuthorship(BODY_SIGNED('cfo'), 'cfo.md', 'cfo')
     expect(r.level).toBe('match')
@@ -70,7 +70,7 @@ describe('RECLAIM 正则', () => {
   })
 })
 
-// 版本一致交叉核对（R0-3，2026-10-03；判据单一来源 = scripts/lib/authorship.mjs）
+// 版本一致交叉核对（R0-3，2026-10-03；判据单一来源 = tools/lib/authorship.mjs）
 // fixture 形状 = quote-z-2026 盘上真实文本（引用行 4 连引 + 审批记录表两种引用形状）。
 describe('版本一致交叉核对（R0-3）', () => {
   const FINAL_QUOTEZ = [

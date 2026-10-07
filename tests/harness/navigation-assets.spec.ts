@@ -9,7 +9,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot } from '../../scripts/lib/repository-layout.mjs'
+import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
 
 const read = (rel: string) => readFileSync(join(repositoryRoot, rel), 'utf8')
 
@@ -29,7 +29,7 @@ describe('tests/README 导航骨架', () => {
   it('改动面→最窄检查映射在场（含四类代表锚点）', () => {
     const text = read('tests/README.md')
     expect(text).toContain('最窄检查')
-    for (const anchor of ['persona', 'client 面板', '读模型', '运行态脚本']) {
+    for (const anchor of ['persona', 'client 面板', '读模型', '检查与工具入口']) {
       expect(text).toContain(anchor)
     }
   })

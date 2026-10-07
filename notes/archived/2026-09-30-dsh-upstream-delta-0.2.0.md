@@ -101,7 +101,7 @@ ui-workspace 的 src 变更全在本仓不用到的面：`forkSession(sessionId,
 
 ### 面⑤ replay/快照基建 —— **稳**
 
-- `materializeProfilePatch` 签名：`git show 639ed015:packages/test-support/session-snapshot/src/launcher.ts` L417-419 = `materializeProfilePatch(source: string, cwd: string, profile: string, targetDir: string, index: number)` —— 与 [replay-smoke.mjs](../../scripts/smoke/replay-smoke.mjs) 依赖的五参签名**逐字一致**；该包区间内仅 package.json 变更。
+- `materializeProfilePatch` 签名：`git show 639ed015:packages/test-support/session-snapshot/src/launcher.ts` L417-419 = `materializeProfilePatch(source: string, cwd: string, profile: string, targetDir: string, index: number)` —— 与 [replay-smoke.mjs](../../checks/smoke/replay-smoke.mjs) 依赖的五参签名**逐字一致**；该包区间内仅 package.json 变更。
 - client 模块表注入（`dsh.client` roster → `window.__DSH_BOOT__`）：`packages/client/modules` 仅 package.json 变更；web-app 补丁的 `dsh.client` 段落 diff 只增 3 行（见面②）、删 3 行（time-context 组），扫描机制行未动。
 - web-app 默认 bundle 行（`dsh-web-app` / base 组合）：base bundle diff 仅 telemetry otel 行重构（`dsh-otel` 改名进场、collector URL 变更）+ optional bundle 清单加 `experimental-schedule-bundle`，与本仓行无交集。
 

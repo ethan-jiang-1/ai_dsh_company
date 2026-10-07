@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { canonicalSnapshotScenes, inspectScripts, repositoryRoot, scriptEntries, snapshotOutput, snapshotOutputPath, snapshotReference, snapshotScene, snapshotScenes } from '../../scripts/lib/repository-layout.mjs'
+import { canonicalSnapshotScenes, inspectScripts, repositoryRoot, scriptEntries, snapshotOutput, snapshotOutputPath, snapshotReference, snapshotScene, snapshotScenes } from '../../tools/lib/repository-layout.mjs'
 
 let root: string
 beforeEach(() => {
@@ -11,7 +11,7 @@ beforeEach(() => {
 })
 afterEach(() => rmSync(root, { recursive: true, force: true }))
 const script = (name: string, text = '// 状态：常驻\n// 何时跑：fixture\n') => {
-  const path = join(root, 'scripts', name)
+  const path = join(root, name)
   mkdirSync(join(path, '..'), { recursive: true })
   writeFileSync(path, text)
 }
@@ -19,26 +19,26 @@ const scene = (path: string) => mkdirSync(join(root, 'snapshots', path), { recur
 
 describe('maintenance entry discovery', () => {
   it('finds nested active and archived entrypoints but excludes implementations and aliases', () => {
-    for (const name of ['run-gates.mjs', 'smoke/preset-smoke.mjs', 'probes/team/recovery-probe.mjs', 'archive/harvest-probe.mjs']) script(name)
-    for (const name of ['lib/private.mjs', 'drivers/browser.mjs', '.cache/ignored.mjs']) script(name, '')
-    symlinkSync('smoke/preset-smoke.mjs', join(root, 'scripts/preset-smoke.mjs'))
-    expect(scriptEntries(root)).toEqual(['archive/harvest-probe.mjs', 'probes/team/recovery-probe.mjs', 'run-gates.mjs', 'smoke/preset-smoke.mjs'])
+    for (const name of ['checks/run-gates.mjs', 'checks/smoke/preset-smoke.mjs', 'probes/team/recovery-probe.mjs', 'tools/archive/harvest-probe.mjs']) script(name)
+    for (const name of ['tools/lib/private.mjs', 'tools/drivers/browser.mjs', '.cache/ignored.mjs']) script(name, '')
+    symlinkSync('checks/smoke/preset-smoke.mjs', join(root, 'checks/preset-smoke.mjs'))
+    expect(scriptEntries(root)).toEqual(['checks/run-gates.mjs', 'checks/smoke/preset-smoke.mjs', 'probes/team/recovery-probe.mjs', 'tools/archive/harvest-probe.mjs'])
   })
 
   it('rejects bad trigger, lifecycle and fixed-port fields at nested depth', () => {
     script('probes/nested/bad-probe.mjs', "// 状态：obsolete\nconst PORT = arg('port', '3099')\n")
-    script('archive/missing-smoke.mjs', '// 何时跑：fixture\n')
+    script('checks/smoke/missing-smoke.mjs', '// 何时跑：fixture\n')
     const report = inspectScripts(root)
     expect(report.missingTriggers).toEqual(['probes/nested/bad-probe.mjs'])
-    expect(report.missingStatus).toEqual(['archive/missing-smoke.mjs'])
+    expect(report.missingStatus).toEqual(['checks/smoke/missing-smoke.mjs'])
     expect(report.invalidStatus).toEqual(['probes/nested/bad-probe.mjs: 状态：obsolete'])
     expect(report.fixedPorts).toEqual(["probes/nested/bad-probe.mjs → '3099'"])
   })
 
   it('accepts current and dated retired instruments without counting driver code', () => {
     script('tools/export.mjs')
-    script('archive/retired-probe.mjs', '// 状态：已耗（2026-10-05 fixture）\n// 何时跑：历史复验\n')
-    script('drivers/private.mjs', '')
+    script('tools/archive/retired-probe.mjs', '// 状态：已耗（2026-10-07 fixture）\n// 何时跑：历史复验\n')
+    script('tools/drivers/private.mjs', '')
     const report = inspectScripts(root)
     expect(report.entries).toHaveLength(2)
     expect([report.missingTriggers, report.missingStatus, report.invalidStatus, report.fixedPorts]).toEqual([[], [], [], []])

@@ -5,7 +5,7 @@
 # （DSH 自己的 test 脚本 = build && vitest），负担不成比例 ⇒ test 的 enforcement 挪进
 # pre-push hook（本地 dev 树按 bootstrap 必然已构建，test 1.3s 便宜高置信）。触发条件
 # （上游提供免构建 test 路径 / 第二贡献者进场值得付构建链）成立再回 CI。
-# ⚠ verify 不是零依赖：scripts/lib/markdown-links.mjs 复用 vendor 工作区的解析器依赖
+# ⚠ verify 不是零依赖：tools/lib/markdown-links.mjs 复用 vendor 工作区的解析器依赖
 # （mdast-util-from-markdown 等，经 vendor/dsh/package.json 解析——首跑失败的根因即此），
 # 所以走标准引导（dev-loop §7 第 3 步）：corepack + pnpm install --frozen-lockfile。
 name: ci

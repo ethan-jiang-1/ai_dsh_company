@@ -13,7 +13,7 @@
  * 反证：把 `styles.ts` 里的 `state-warn-primary` 改回 `state-warning-primary` ⇒ ① 红；
  *       把完成态降透明写回 `.wk-node { opacity: .55 }` ⇒ ② 红。
  */
-import { repositoryRoot as ROOT } from '../../scripts/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'

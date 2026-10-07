@@ -1,9 +1,9 @@
-import { repositoryRoot as ROOT } from '../../scripts/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, afterEach, describe, expect, it, vi } from 'vitest'
-import { requireDevHome } from '../../scripts/lib/runtime-home.mjs'
+import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 
 vi.mock('node:os', async (importOriginal) => ({
   ...await importOriginal<typeof import('node:os')>(),
@@ -79,7 +79,7 @@ describe('排练场镜像：kb 根三件事实家必须在场', () => {
   // 排练动议要按 owners 路由或要看台账就缺料。这条守"kb 根三件一件都不能少"。
   // 纯夹具（不碰真仓、不写 runtime/rehearsal-workspace）：造一个最小 repo 根，只看镜像面。
   it('ensureRehearsalWorkspace 镜像 kb/{org,owners,motion-ledger}.md', async () => {
-    const { ensureRehearsalWorkspace } = await import('../../scripts/lib/rehearsal.mjs')
+    const { ensureRehearsalWorkspace } = await import('../../tools/lib/rehearsal.mjs')
     const repo = mkdtempSync(join(tmpdir(), 'company-rehearsal-mirror-'))
     try {
       mkdirSync(join(repo, 'company-workspace/kb/ceo'), { recursive: true })
@@ -105,7 +105,7 @@ describe('录制工作区参考镜像（BUG-006：模板缺料 ⇒ meta 词表�
   // AGENTS.md（相对符号链接）+ kb 事实三件 + 各角色 CHARTER + templates/（meta.md 词表模板在列）；
   // journal 不镜像（记忆不混）、deliverables 不触碰。镜像是幂等纯 fs，红 = 函数不存在。
   it('mirrorCompanyReference 镜像 templates/ 与 kb 事实家，不混 journal', async () => {
-    const { mirrorCompanyReference } = await import('../../scripts/lib/rehearsal.mjs')
+    const { mirrorCompanyReference } = await import('../../tools/lib/rehearsal.mjs')
     const company = mkdtempSync(join(tmpdir(), 'company-ref-src-'))
     const workspace = mkdtempSync(join(tmpdir(), 'company-ref-ws-'))
     try {

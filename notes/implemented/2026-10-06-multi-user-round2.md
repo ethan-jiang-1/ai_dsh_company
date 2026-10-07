@@ -36,10 +36,10 @@
 
 ## 新增常驻探针（本轮）
 
-- [taskboard-scope-probe](../../scripts/probes/taskboard-scope-probe.mjs)（S5）
-- [review-staleness-probe](../../scripts/probes/review-staleness-probe.mjs)（S6）
-- [journal-boundary-probe](../../scripts/probes/journal-boundary-probe.mjs)（S8）
-- [multi-user-e2e-probe](../../scripts/probes/multi-user-e2e-probe.mjs)（方向 B）
+- [taskboard-scope-probe](../../probes/taskboard-scope-probe.mjs)（S5）
+- [review-staleness-probe](../../probes/review-staleness-probe.mjs)（S6）
+- [journal-boundary-probe](../../probes/journal-boundary-probe.mjs)（S8）
+- [multi-user-e2e-probe](../../probes/multi-user-e2e-probe.mjs)（方向 B）
 
 资产 = snapshots/probes/{taskboard-scope,review-staleness,journal-boundary,multi-user-e2e}-probe/2026-10-06/。
 

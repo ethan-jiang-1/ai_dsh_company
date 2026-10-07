@@ -30,7 +30,7 @@ H6 悬案（2026-10-04 走查）：注意力中心只推「需要你」四类（
 ## 后果 / 验证
 
 - 合同行已落；`tests/presence-board.spec.ts` 16/16 PASS（本轮实跑）；`pnpm verify` 绿。
-- **待真实验证 → 已判收（2026-10-04 probe 首跑 5/5）**：[taskboard-presence-probe](../../scripts/probes/taskboard-presence-probe.mjs)
+- **待真实验证 → 已判收（2026-10-04 probe 首跑 5/5）**：[taskboard-presence-probe](../../probes/taskboard-presence-probe.mjs)
   真会话实证 P2a/P2b（名册 w1/w2 在册；in_progress 快照 subject↔owner 经名册映射对上 2/2；成员回报链
   7 条）；渲染半边 keyless 已钉（presence-board.spec 16/16）——两态（已领走 / 加工中）在真会话流转中
   可读成立。资产 =

@@ -45,9 +45,9 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack
 #   bundles 数组加 `@deepseek-ai/dsh-experimental-schedule-bundle`（时间通道/schedule/ui-schedule 三行归它）。
 #   历史：file: 拷贝时代，presets/*.yml 用编辑工具改会换 inode、安装副本是真拷贝（link count 1），
 #   不重装则改动不可见——该坑随 link: 消失。
-node scripts/smoke/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）
-node scripts/smoke/handbook-smoke.mjs        # agent-instructions 注入完成定义：指令基线 = 公司手册（默认只跑 ceo 一次小调用）
-node scripts/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
+node checks/smoke/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）
+node checks/smoke/handbook-smoke.mjs        # agent-instructions 注入完成定义：指令基线 = 公司手册（默认只跑 ceo 一次小调用）
+node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
 ```
 
 实证过的坑与解法（细节见 notes/implemented/2026-09-22-r0-loop-acceptance.md）：
@@ -89,7 +89,7 @@ node scripts/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名
   `dsh-skill-filesystem`）会**按安装域解析**——不在 pack dependencies（profile 安装）或根
   devDeps workspace 链接（源码域）里，行就解析不到 → **preset 被标记 broken → UI 给不出可用角色**
   （扫描得到、名字也对，就是不能用；`discoverPresets` 的 `broken` 字段是唯一线索）。
-  对应 DSH 的 `verify-cordis-config` 门禁；我们同构到 `scripts/run-gates.mjs` 检查 7。
+  对应 DSH 的 `verify-cordis-config` 门禁；我们同构到 `checks/run-gates.mjs` 检查 7。
 - **patchReload**：headless 用途的自定义 profile 必须 `"startup"`（见 [开发环 §2](./dev-loop.md) 第 3.5 层）；web 形态
   才用 `"live"`。
 - **品牌（皮肤第一笔，零代码）**：`DSH_CLIENT_TITLE` 是构建期环境变量，同时决定**浏览器标签页标题**
@@ -99,7 +99,7 @@ node scripts/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名
 - **上线前必跑 preset 冒烟**（R1 起，两道防线）：
   1. **防线一（快，`pnpm test`）**：已知必填 config 字段必须随工具行给出（如
      `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`）。
-  2. **防线二（真，`node scripts/smoke/preset-smoke.mjs`）**：boot 真 web profile → `agentPresets/list`
+  2. **防线二（真，`node checks/smoke/preset-smoke.mjs`）**：boot 真 web profile → `agentPresets/list`
      断言五角色零 broken → **逐个 `session/create` 真挂一次**。
   **只有防线二能抓"preset 挂载失败"**：行 config 校验发生在挂载时，roster 扫描与 `--dump-config`
   都看不到，UI 还会吞掉错误（症状就是"新建会话点了没反应"）。已反证：去掉一个必填 config 即变红

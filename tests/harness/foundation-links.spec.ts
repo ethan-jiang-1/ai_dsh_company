@@ -1,8 +1,8 @@
-import { repositoryRoot as ROOT } from '../../scripts/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { sourceMarkdownFiles, validateMarkdownLinks } from '../../scripts/lib/markdown-links.mjs'
+import { sourceMarkdownFiles, validateMarkdownLinks } from '../../tools/lib/markdown-links.mjs'
 
 const scratch = join(ROOT, 'node_modules/.cache/company-markdown-links')
 let root: string
@@ -26,7 +26,7 @@ const check = (source: string) => {
 describe('bounded source discovery', () => {
   it('checks all root Markdown, active Notes, pack source and current company documents', () => {
     const sources = ['README.md', 'README.zh.md', 'AGENTS.md',
-      'docs/guides/new.md', 'scripts/README.md', 'scripts/guides/README.md', 'snapshots/README.md', 'notes/proposed/new.md',
+      'docs/guides/new.md', 'checks/README.md', 'checks/guides/README.md', 'snapshots/README.md', 'notes/proposed/new.md',
       'notes/implemented/new.md', 'notes/rejected/new.md', 'notes/postmortem/new.md',
       '_backlog/new.md', '_backlog/plans/new.md', 'packages/company-pack/README.md',
       'packages/company-pack/src/README.md', 'packages/company-pack/presets/ceo/skills/new/SKILL.md',
@@ -120,12 +120,12 @@ describe('GFM local paths and references', () => {
   })
 
   it('leaves external/root-absolute URLs and non-Markdown fragments to their renderer', () => {
-    put('scripts/source.ts', 'export {}\n')
+    put('tools/source.ts', 'export {}\n')
     const report = check('[https](https://example.invalid/missing) [mail](mailto:a@example.invalid)\n'
       + '[protocol](//example.invalid/missing) [root](/missing.md) [scheme](vscode:open)\n'
-      + '[line](scripts/source.ts#L100) [missing source](scripts/missing.ts#L100)\n')
+      + '[line](tools/source.ts#L100) [missing source](tools/missing.ts#L100)\n')
     expect(report.linkCount).toBe(2)
-    expect(report.violations.map(v => v.url)).toEqual(['scripts/missing.ts#L100'])
+    expect(report.violations.map(v => v.url)).toEqual(['tools/missing.ts#L100'])
   })
 
   it('does not invent links from unresolved reference-looking prose or raw HTML hrefs', () => {

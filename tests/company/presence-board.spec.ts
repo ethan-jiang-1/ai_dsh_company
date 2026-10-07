@@ -1,5 +1,5 @@
 /** 在场板读模型（R5b，Q5–Q8 定案的 keyless 完成定义——提案验收判据 1/4）。 */
-import { repositoryRoot as ROOT } from '../../scripts/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'

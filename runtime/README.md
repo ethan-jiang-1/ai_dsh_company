@@ -9,7 +9,7 @@
 
 | 件 | 是什么 | 标记 |
 |---|---|---|
-| `harness-home/` | **开发主 DSH_HOME**：`sessions/`（会话日志 = 数据层证据源，世代选择唯一口径 = [session-log-generation](../scripts/lib/session-log-generation.mjs)）、`profiles/`（`headless` / `web` = current）、`storages/`、`cache/`、`oracle-tests/`、`replay-runs/` + `replay-diagnosis/`（replay 现场与失败诊断）、`repository-migration-hashes.json`（迁移校验基线）；内部细则见其 [README](./harness-home/README.md) | runtime·current |
+| `harness-home/` | **开发主 DSH_HOME**：`sessions/`（会话日志 = 数据层证据源，世代选择唯一口径 = [session-log-generation](../tools/lib/session-log-generation.mjs)）、`profiles/`（`headless` / `web` = current）、`storages/`、`cache/`、`oracle-tests/`、`replay-runs/` + `replay-diagnosis/`（replay 现场与失败诊断）、`repository-migration-hashes.json`（迁移校验基线）；内部细则见其 [README](./harness-home/README.md) | runtime·current |
 | ~~`harness-home/profiles/company/`~~ | **已删除**（2026-10-05 裁决轮：零功能消费面终核 + 48M 死重；理论重建 = git/vendor 历史 + `file:` 安装程序有文档）——若再现同名目录 = 异常，查来历 | deleted·2026-10-05 |
 | `harness-home/b/`、`harness-home-b/` | 第二/嵌套 home——多 home 实验与跨 home 审计视角（authorship 口径：每家导出各审一次再拼结果） | runtime·实验面 |
 | `pw-browsers/` | 浏览器二进制与 profile（`PLAYWRIGHT_BROWSERS_PATH` 重定向落点）；**UI 布局记忆按 origin 隔离**存在浏览器 profile——换端口重启即新 origin、记忆清零 | runtime |
@@ -27,7 +27,7 @@
 
 | 出口 | 写入者 | 策略 |
 |---|---|---|
-| `tmpdir()/dsh-replay-<场景>-*` | [replay-smoke](../scripts/smoke/replay-smoke.mjs) | 进程级 mkdtemp：进程内自清、重启即失；诊断需跨进程保留时按 §11 受控重定向进 repo gitignored 区（触发条件，不预建） |
+| `tmpdir()/dsh-replay-<场景>-*` | [replay-smoke](../checks/smoke/replay-smoke.mjs) | 进程级 mkdtemp：进程内自清、重启即失；诊断需跨进程保留时按 §11 受控重定向进 repo gitignored 区（触发条件，不预建） |
 | `tmpdir()/dag-visual-fixture-<pid>.json` | dag-visual-probe | 同上 |
 | `tmpdir()/e2-cross-*` | cross-process-fs-probe | 同上 |
 | `tmpdir()/dsh-export-dist-*` | export-dist | 同上 |

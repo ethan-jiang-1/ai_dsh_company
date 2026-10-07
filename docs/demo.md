@@ -16,7 +16,7 @@
 ## 前置（本机）
 
 **呈现即验证**（2026-09-30 立，用户裁定；规则唯一见 [dev-loop §1](./guides/dev-loop.md)）：替人起观察窗 = 先自己跑通本节（boot 横幅 + roster + client 零挂载失败），红了当场修，全绿才交 URL——用户不当第一次验收员。
-**机器腿 = [cdp-probe](./cdp-probe.md)**：`node scripts/probes/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/8 页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
+**机器腿 = [cdp-probe](./cdp-probe.md)**：`node probes/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/8 页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
 
 1. `source run/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒，自检代替警告）**：
    `pnpm dsh --profile web --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 就说明你起的是日用 `~/.dsh`
@@ -32,7 +32,7 @@
    用户与代理都卡过）。平台 UI（vendor 只读）改不了，写进 runbook 代偿。
 4. 新建会话：preset 选 **wochen CEO**（`ceo` 是 profile 默认）；工作目录 `company-workspace`
 5. 进“另一位成员的空间”：**teammate 的会话不在顶层列表**——在会话头部点 **Team 名册**，点成员名打开其会话（`sessions.openSubagent`，子会话）。显式入口 = 右栏「在场」页签的在场板**行可点**（条目 ② 起为平台页签，可拖出成浮窗并看）。
-6. 收场验收：`node scripts/audit/deliverables-check.mjs`（交付物三态；审归档快照要配 `--only <slug>`，
+6. 收场验收：`node checks/audit/deliverables-check.mjs`（交付物三态；审归档快照要配 `--only <slug>`，
    因为快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只有本轮日志）
 
 ## 分镜 v0（两空间镜头：谁在哪个空间、活怎么交接）
@@ -62,7 +62,7 @@
 
 **R4 加判据（交付物三态，整场通用，机器判）**：
 
-- 收场跑 `node scripts/audit/deliverables-check.mjs` 必须 **0 违规**——即 `deliverables/` 下每个
+- 收场跑 `node checks/audit/deliverables-check.mjs` 必须 **0 违规**——即 `deliverables/` 下每个
   `<slug>/final.md` 都能回溯到**一次 CEO 的 `present`**；`drafts/` 里的稿子不算成品；
   `kb/**` 不在判据射程内。判据语义与三个设计决定见 `notes/implemented/2026-09-22-r4-workshop-flow.md`。
 - 审**归档快照**要加 `--only <slug>`：快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只装
@@ -77,7 +77,7 @@
   要让团队内成员拿到完整 preset 面，走 R3 命名委托或上游 seam（D9）。
 - 五人同时在线时模型调用量上升；预算口径见 `kb/org.md`（AI 试点每案 $200/月硬顶）。
 - **交付物三态是硬约定，不是习惯**：`company-workspace/AGENTS.md` 的「交付物三态」一节随每个成员
-  会话首帧注入，`node scripts/audit/deliverables-check.mjs` 机器核对。写错位置（比如职能自己写 `final.md`、
+  会话首帧注入，`node checks/audit/deliverables-check.mjs` 机器核对。写错位置（比如职能自己写 `final.md`、
   或把排练产物平铺在 `deliverables/` 根下）会被判据报出来。
 
 ## 场景 B · 三角色应急协作（CEO / COO / VP-Eng）——专看"活怎么交接"
@@ -208,7 +208,7 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 ⚠ **"根会话 vs 被委派成员"是这一步的分水岭**：被委派的成员发审批**必被自动拒**
 （`child-agent.ts:254` 硬编码 `never`），所以手册那条"成员触线一律升级 CEO"对它们成立；
 而**每扇门都是根会话**（它自己就是那个角色的 owner）⇒ **该由它自己发起**，卡才会落到它门上。
-（实测：`scripts/probes/budget-signoff-probe.mjs` 正例——CFO 根会话确实会发 `request_signoff`。）
+（实测：`probes/budget-signoff-probe.mjs` 正例——CFO 根会话确实会发 `request_signoff`。）
 
 ⚠ **别在门乙/门丙那边说"你以 CEO 的身份…"**——每扇门只用**它自己角色**的权限；越权的话，
 `owners.md` 的授权面就成了摆设（demo 的卖点正是"谁签得动"按人分）。

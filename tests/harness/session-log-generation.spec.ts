@@ -9,8 +9,8 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { repositoryRoot } from '../../scripts/lib/repository-layout.mjs'
-import { pickSessionLog } from '../../scripts/lib/session-log-generation.mjs'
+import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
+import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
 
 let dir: string
 beforeEach(() => {

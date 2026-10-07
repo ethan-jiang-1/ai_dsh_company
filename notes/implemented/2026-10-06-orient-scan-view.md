@@ -8,9 +8,9 @@ R2′/R3′ 已采用（2026-10-06 裁决）但只活在打分腿（`candidate-s
 
 ## 方案
 
-- **lib 侧**（[scripts/lib/orient.mjs](../../scripts/lib/orient.mjs)，keyless 纯逻辑）：新增 `scanDeliverables(workspaceRoot)`——遍历 `deliverables/<slug>/`：`final.md` 在场与否、任务书 = `drafts/ceo.md`（CEO 派活行家）、`draftFiles` = drafts 清单；调已采用的 `scanR3Dual`。`orientState` 挂 `scan` 节，`renderOrient` 渲染。
+- **lib 侧**（[scripts/lib/orient.mjs](../../tools/lib/orient.mjs)，keyless 纯逻辑）：新增 `scanDeliverables(workspaceRoot)`——遍历 `deliverables/<slug>/`：`final.md` 在场与否、任务书 = `drafts/ceo.md`（CEO 派活行家）、`draftFiles` = drafts 清单；调已采用的 `scanR3Dual`。`orientState` 挂 `scan` 节，`renderOrient` 渲染。
 - **视图**：公司盘节后加「== 待核工作候选（R3′ 口径）==」——每 slug 一行：已关闭（final 在场，不报）/ 进行中（候选 N · 阻塞 M；`depByDisk` 标 ᵈ 降档、`stale` 标「待核实」）；空盘如实显示。**命名纪律照抄扫描器头注**：未达零容忍门槛（当前违规 26）只显示「待核候选」，不叫待办、不进个人待办、不自动通知；`needsVerify` 恒真。
-- **CLI 侧**（[scripts/tools/orient.mjs](../../scripts/tools/orient.mjs)）零新进程效果——扫描纯 fs 只读，走 lib；脚本头注自述同步。
+- **CLI 侧**（[scripts/tools/orient.mjs](../../tools/orient.mjs)）零新进程效果——扫描纯 fs 只读，走 lib；脚本头注自述同步。
 - **范围**：只动默认全景；`--session` / `--scenario` 不动。B 包（r6 真运行闭环）另行 RFC。
 
 ## 输掉的方案（备选必载，留尸）

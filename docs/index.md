@@ -15,7 +15,7 @@
 | 指南 | `guides/` | **怎么操作**：runbook、预算限流 | 活（随操作方式演进） |
 | 合同 | 顶层（按主题） | **是什么**：某子系统现在时语义 | 随代码同 diff，只写 now |
 
-项目运行、目录、调试和测试导航见 [project-map.md](./project-map.md)；驾驭者白话五问见 [orient.md](./orient.md)；脚本用途索引见 [scripts/README.md](../scripts/README.md)，触发条件与成本以脚本头注为准。
+项目运行、目录、调试和测试导航见 [project-map.md](./project-map.md)；驾驭者白话五问见 [orient.md](./orient.md)；脚本用途索引见 [checks/README.md](../checks/README.md)，触发条件与成本以脚本头注为准。
 
 ### 现有文档
 
@@ -70,9 +70,9 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | D15 | **完成定义 = 该面最小"真检查"通过；发现权在代理一侧，不在人**：真入口路径 > dump/扫描；"伺服了"≠"能加载"；给人看 UI 前先机器验证。**同时否决**：为此引入 spec 流程、把指令文件写更长 | notes/implemented/2026-09-22-agent-workflow-community-practice.md（17 个一手来源）；vendor `docs/testing.md` + postmortem 0001–0003；落点：guides/dev-loop §1/§2 + guides/bootstrap、AGENTS.md 纪律表 |
 | D16 | **Q2 定案（2026-09-22）**：角色模型路由 = R2 全员同模型（默认路由，不写 `agentOptions`）。理由：当前瓶颈是内容质量与协作可见性，成本无差异化证据；需要差异路由时 R3 在委托工具 `agentOptions` 层做，不动 persona | tests/presets/presets.spec.ts；presets.md |
 | D17 | **Q3 定案（2026-09-22）**：公司事实（CHARTER / journal / 客户 / 预算基准）全部留 workspace 活数据（D7 三载体）；随 pack 发布的只有方法论 skills 与结构模板——pack 不含公司事实，换公司复用 = 只换 workspace | presets.md；company-workspace/kb/ |
-| D18 | **R3 汇报线（2026-09-22）**：CEO 命名委托工具 = **one-shot 前台**；continuable 在本组合不可用（child 不在 team 名册，续驶/中断/列举不可达）⇒ 续驶归 team（M4）；CEO preset 不放全局控制行（有反向守卫）；并行派活等上游 seam（不自建，D13） | [delegation.md](./delegation.md) 全文；`scripts/smoke/delegation-smoke.mjs`（守卫）；`snapshots/replay/r2-motion/sessions/lead.jsonl` 第一帧 |
+| D18 | **R3 汇报线（2026-09-22）**：CEO 命名委托工具 = **one-shot 前台**；continuable 在本组合不可用（child 不在 team 名册，续驶/中断/列举不可达）⇒ 续驶归 team（M4）；CEO preset 不放全局控制行（有反向守卫）；并行派活等上游 seam（不自建，D13） | [delegation.md](./delegation.md) 全文；`checks/smoke/delegation-smoke.mjs`（守卫）；`snapshots/replay/r2-motion/sessions/lead.jsonl` 第一帧 |
 | D19+D21 | **R5 拆轮（R5a 门禁/R5b 驾驶舱）+ 搁置池准入（缺上游 seam 或缺明确需求才进池，复活条件写进池内每行；被否决方案不进池）+ 轮次调整**——轮次制均已由 D23/D24 退役，细节只作历史（原 r5-plus-readiness.md 已删，全文在 git `d159b0228e2b`） | 搁置池表现居 [_backlog/_done/_misc/suspended.md](../_backlog/_done/_misc/suspended.md)（D32 迁入，2026-09-28 整池退役）；[r6-content-remediation](../notes/implemented/2026-09-23-r6-content-remediation.md) |
-| D20 | **交付物三态判据（R4）**：成品 = Lead 的 `present`（`agentPreset=ceo` 且 depth=0）；比对按 `slug`+角色身份不按路径（桥 = 身份比对 + slug 剥日期前缀归一，2026-10-03 起覆盖改名与归档根）；反向检查只追 Lead 声明、非 Lead 只查此刻在盘。实现 = `scripts/lib/deliverables.mjs` + `deliverables-check`（审快照配 `--only <slug>`）；合同家 = 公司手册「交付物三态」 | [r4-workshop-flow](../notes/implemented/2026-09-22-r4-workshop-flow.md) 全文 |
+| D20 | **交付物三态判据（R4）**：成品 = Lead 的 `present`（`agentPreset=ceo` 且 depth=0）；比对按 `slug`+角色身份不按路径（桥 = 身份比对 + slug 剥日期前缀归一，2026-10-03 起覆盖改名与归档根）；反向检查只追 Lead 声明、非 Lead 只查此刻在盘。实现 = `tools/lib/deliverables.mjs` + `deliverables-check`（审快照配 `--only <slug>`）；合同家 = 公司手册「交付物三态」 | [r4-workshop-flow](../notes/implemented/2026-09-22-r4-workshop-flow.md) 全文 |
 | D22 | **R5b 驾驶舱（2026-09-23，Q5–Q8 四定案）**：在场板主键 = team roster（"会话×preset"被 r2/r3 录制证伪）；冷启动 = 拉式 RPC `remote.agentTeams.view(lead)` + 5s 轮询；status 中文映射；成员入口照官方 openTeammate。同轮 r2-motion replay 场景出生 + presence 判据档 | [org-presence-board §四个定案](../notes/implemented/2026-09-22-org-presence-board.md)；[r5b-cockpit](../notes/implemented/2026-09-23-r5b-cockpit.md) |
 | D23+D24 | **开发流条目制 + 队列 owner = 根部 `ROADMAP.md`（2026-09-23）**：轮次流程与 `plans/` 退役；AGENTS 存常设路由，ROADMAP 只调度、完成即离队、证据留 Note；队列条目默认新对话上下文接手。授权 / Plan Mode 规则唯一见[开发环 §0.5/§1](./guides/dev-loop.md)。**D32 退役**：队列层删除，职能去向见 D32 行 | [转型与依据](../notes/implemented/2026-09-23-dsh-inround-task-surface.md) |
 | D25 | **培养/学习回路（2026-09-24）**：培养 = 改 `presets/<role>/`（生效边界按面：persona / 组合文件 = 新会话，skill 正文 = 同会话下一轮——活体实证修正 U1 旧结论）；验收四绿（verify/test/preset-smoke/probe --full）。学习 = journal 唯一载体（D8）+ 人审提升；否决分身自改 skill | [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) 全文（含 U1 修正证据）；[digital-twin §6](../notes/implemented/2026-09-22-digital-twin-cultivation-and-self-learning.md) |
@@ -100,7 +100,7 @@ D 号用于追溯，不表示所有旧句仍是当前指令。D5 为第 0 天历
 | 机制——公司怎么组装、角色怎么隔离、UI 往哪挂 | design/architecture + design/roles-isolation + design/ui-demo；源码与运行结论按对应合同核对 |
 | 内容——角色说什么话、带什么技能、KB 放哪 | design/role-content-plan + presets.md + `company-workspace/kb/` + `company-workspace/AGENTS.md` |
 | 运营——token 怎么省、现场出状况怎么办 | guides/budget-and-ops |
-| 流程——任务怎么进、证据怎么交、门禁怎么守 | guides/dev-loop + `notes/` + `scripts/run-gates.mjs` |
+| 流程——任务怎么进、证据怎么交、门禁怎么守 | guides/dev-loop + `notes/` + `checks/run-gates.mjs` |
 
 ## 外部研究材料登记（repo 外，只读引用）
 

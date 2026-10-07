@@ -1,8 +1,8 @@
-import { repositoryRoot as ROOT } from '../../scripts/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { captureWorkspace, compareWorkspace, seedWorkspace, workspaceOracle } from '../../scripts/lib/workspace-oracle.mjs'
+import { captureWorkspace, compareWorkspace, seedWorkspace, workspaceOracle } from '../../tools/lib/workspace-oracle.mjs'
 
 let root: string
 beforeEach(() => {

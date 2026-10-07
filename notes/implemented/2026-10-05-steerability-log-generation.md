@@ -4,7 +4,7 @@
 
 ## 交付（现在时）
 
-- **[scripts/lib/session-log-generation.mjs](../../scripts/lib/session-log-generation.mjs) 立**：`pickSessionLog` = 会话日志选择的唯一口径——版本化 `session.vN` 优先于无版本 `session`、N 按**数值**取最高（v10 > v4）、同代 zstd 优先、child（`session.k[.vN]`）排除、缺失返回 undefined（跳过/报错政策归调用方显式决定）。
+- **[scripts/lib/session-log-generation.mjs](../../tools/lib/session-log-generation.mjs) 立**：`pickSessionLog` = 会话日志选择的唯一口径——版本化 `session.vN` 优先于无版本 `session`、N 按**数值**取最高（v10 > v4）、同代 zstd 优先、child（`session.k[.vN]`）排除、缺失返回 undefined（跳过/报错政策归调用方显式决定）。
 - **合同 spec [tests/harness/session-log-generation.spec.ts](../../tests/harness/session-log-generation.spec.ts)**（11 例，红→绿落地，进 `pnpm test`）：并存取最高、数值序、版本化优先、同代 zstd、legacy 无版本兼容、child 排除、缺失、元数据形态。
 - **五调用点全迁**：snapshot-motion（读会话日志）、session-log-export（logOf）、deliverables-check（`--sessions` 子目录扫描）、authorship-audit（原 readdir 迭代序）、journal-audit（原字典序取末位）。解压与坏压缩处理留在调用方（纯选择逻辑无子进程 → keyless 可测；各站已有自己的 fail-loud/report）。
 

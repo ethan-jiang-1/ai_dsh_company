@@ -11,7 +11,7 @@
 - 保留根 AGENTS.md 的章节、入口顺序与纪律表，仅补四行 Notes 读写原则、调整布局说明并去除过期测试计数。Notes 是按主题读取的决策输入，也是同 diff 的交付证据；implemented 的实现事实继续维护，明确归档后才作为历史读取。
 - 开发指南保留既有生命周期、Plan Mode、todo 和收尾检查，仅补 Notes 检索、取舍、事实维护及证据时效说明。没有据研究结论自动重定本仓流程。
 - README 修正角色列表；五份 CHARTER 的工具路径与公司手册/角色 skills 一致，以会话 cwd 为基准使用 `kb/...`、`templates/...`、`deliverables/...`。不改业务数值、职责、历史 journal 或交付物。
-- 六个现有 smoke（preset / probe / handbook / delegation / client-load / presence-e2e）共用 [runtime-home.mjs](../../scripts/lib/runtime-home.mjs)。未设 home 或与日用 `~/.dsh` 树重叠即 exit 2；检查符号链接和不存在路径的现有祖先。在创建排练场及启动服务前检查，不改服务启动器或正常测试流程。
+- 六个现有 smoke（preset / probe / handbook / delegation / client-load / presence-e2e）共用 [runtime-home.mjs](../../tools/lib/runtime-home.mjs)。未设 home 或与日用 `~/.dsh` 树重叠即 exit 2；检查符号链接和不存在路径的现有祖先。在创建排练场及启动服务前检查，不改服务启动器或正常测试流程。
 - [foundation-safety.spec.ts](../../tests/harness/foundation-safety.spec.ts) 将上述隔离与当前章程路径纳入既有 `pnpm test`，不新增执行层。
 
 ## Alternatives considered

@@ -3,7 +3,7 @@
 > 什么时候读：发布、打包、装进真实 profile、升 vendor pin 时。路线 = §vendor 政策 → release-smoke。
 > 顶层合同：vendor 政策、pack 的依赖姿态、兼容矩阵、真实安装冒烟程序、升 pin 程序。
 > 依据：guides/dev-loop §5（发布纪律时点表）+ FAQ 13（外部研究：dsh-market / dsh-im 生态姿态）。
-> 执行器：`scripts/smoke/release-smoke.mjs`（发布冒烟）与 `scripts/tools/sync-dsh.mjs`（升 pin）。
+> 执行器：`checks/smoke/release-smoke.mjs`（发布冒烟）与 `tools/sync-dsh.mjs`（升 pin）。
 
 ## 依赖姿态（R5a 起的现在时）
 
@@ -54,14 +54,14 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 | 想要 | 正路 |
 |---|---|
 | 组合/配置层面的差异 | 本 pack 的 bundle `cordis.patch.yml`（`- id:` 替换 / `- insert:` 新增）或 profile patch |
-| 需要上游修的行为 | 改 **DSH upstream** → 升 pin（`scripts/tools/sync-dsh.mjs`，见下节）；期间在本仓记入 `notes/` |
+| 需要上游修的行为 | 改 **DSH upstream** → 升 pin（`tools/sync-dsh.mjs`，见下节）；期间在本仓记入 `notes/` |
 | 上游功能在本形态下不可用 | **先证伪"不可用"再自建**：R1 曾误诊"官方团队 UI 挂不上"→ 自建任务板 + 重复挂 remote → 全 UI 砖（postmortem 0003；实为可用，`dsh.client.inject` 是 informational only）。确属不可用才在本 pack 自己实现等价面 |
 
 - **为什么用 SHA 而不用 tag**：tag 可被移动/别名，SHA 才是钉住的合同。
 - **submodule 首次克隆技巧**：本地路径 + `-c protocol.file.allow=always`（单命令放行，未改全局
   配置）；`.gitmodules` 的 URL 已指上游，别改回去。
 
-## 发布冒烟（`node scripts/smoke/release-smoke.mjs`，认证档）
+## 发布冒烟（`node checks/smoke/release-smoke.mjs`，认证档）
 
 程序（脚本按序执行，任一步失败即红）：
 
@@ -80,9 +80,9 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 
 全绿证明本次已有 vendor 产物配合真 tarball 安装可用；不证明 vendor 新鲜构建，也不覆盖完整浏览器交互。dev profile 的 `link:` 安装不替代这条验证。
 
-## 升 pin 程序（`node scripts/tools/sync-dsh.mjs`，认证档）
+## 升 pin 程序（`node tools/sync-dsh.mjs`，认证档）
 
-默认只读核对四处簿记，不做流程语义审计。升级使用 `source run/env.sh && node scripts/tools/sync-dsh.mjs --pin <tag> --process-review <repo-relative.json>`；证据文件先经人审提交，两个工作树须干净。
+默认只读核对四处簿记，不做流程语义审计。升级使用 `source run/env.sh && node tools/sync-dsh.mjs --pin <tag> --process-review <repo-relative.json>`；证据文件先经人审提交，两个工作树须干净。
 
 **证据文件命名与落点**（2026-09-26 补；**2026-10-02 迁 archived/**——原"顶层 notes/"与自家先例打架：0.1.7 的孤儿 JSON 早已迁 archived/，且同轮 delta 报告也住 archived/，顶层还会随 pin 无限堆积）：`notes/archived/<YYYY-MM-DD>-pin-review-<目标 tag>.json`（完结流程物证的家，与 delta 报告同住；`--process-review` 传该 repo 相对路径即可——sync-dsh 只要求 git 已跟踪、不限于子目录）。
 人审证据 JSON 必含 `fromSha`、`toSha`（完整 SHA）、`reviewedBy`、`reviewedAt`（YYYY-MM-DD）、`processContractReview`（核对 vendor 纪律与本地流程合同的结论，可引用既有 Note）。脚本核对文件受版本控制、字段非空及 SHA 对应；**这是人审声明，不是自动语义审计，也不认证签名者身份**。
@@ -95,7 +95,7 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 2. **货架过账**：对照外部研究树当轮 `_digested/plugin-inventory`（基线对齐新 pin；不对齐时按其
    `_change_log/` 判定影响面），新增/退役能力按判收四档（追平 standard / 未挂载现货 / 评估 / 刻意排除）
    记入收割台账 Note——先查货架再动手是 FAQ 17 四步流程，升 pin 是它的固定触发点。
-3. **语料回放全绿**：vendor 换 tag 后先跑 `scripts/smoke/replay-smoke.mjs`（r2/r3 会话判据 + foundation workspace
+3. **语料回放全绿**：vendor 换 tag 后先跑 `checks/smoke/replay-smoke.mjs`（r2/r3 会话判据 + foundation workspace
    oracle；资格与缺口见[快照合同](../snapshots/README.md)）再谈语义结论——replay = 升 pin 回归网第一道（[testing.md](./testing.md) §4）。
     已知漂移红（r3 ×2 / foundation ×3 = 录制期组合演进，2026-10-05 裁决维持为漂移金丝雀、不弱化断言不重录掩盖）；升 pin 重校时顺带评估是否以新版本场景重录换更宽绿网（新录不覆盖旧锚，payload 冻结不破）。
 
@@ -111,7 +111,7 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 - 发布前必跑：`pnpm verify` + `pnpm test`（迭代环）+ `release-smoke`（认证档）；
   preset/内容改动另跑 `preset-smoke`（guides/dev-loop §9.1 分层）。
 
-## 手动分发（`node scripts/tools/export-dist.mjs`，无 key、秒级；2026-09-28 立，精神借 ai_dsh_architect）
+## 手动分发（`node tools/export-dist.mjs`，无 key、秒级；2026-09-28 立，精神借 ai_dsh_architect）
 
 一条命令产出仓库外可装的两件套到 `_dist/`：`dsh-company-pack-<version>.tgz` + 生成式《安装手册》。
 三条规矩：

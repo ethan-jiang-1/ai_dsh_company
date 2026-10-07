@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { parseLabelsText, scoreLabels, scanR2, scanR2Closed, scanR3, scanR3Dual, roleHasDraft } from '../../scripts/lib/candidate-scan.mjs'
+import { parseLabelsText, scoreLabels, scanR2, scanR2Closed, scanR3, scanR3Dual, roleHasDraft } from '../../tools/lib/candidate-scan.mjs'
 
-// 实验B打分腿的纯逻辑（判据单一来源 = scripts/lib/candidate-scan.mjs；格式约定见标注文件头部）。
-// IO（读标注文件/语料/deliverables）在 scripts/audit/candidate-scan-eval.mjs——tests/ 不碰驱动脚本的文件面。
+// 实验B打分腿的纯逻辑（判据单一来源 = tools/lib/candidate-scan.mjs；格式约定见标注文件头部）。
+// IO（读标注文件/语料/deliverables）在 checks/audit/candidate-scan-eval.mjs——tests/ 不碰驱动脚本的文件面。
 
 const LABELS_TEXT = `# 实验 B 金标准
 
