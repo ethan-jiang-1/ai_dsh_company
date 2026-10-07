@@ -1,6 +1,6 @@
-# orient：驾驭者五问（白话入口）
+# orient：驾驭者六问（白话入口）
 
-> 这页给**驾驭本仓库的人**：五问各一跳直达唯一家。正文只导航与白话定义，不复述事实（防漂）；
+> 这页给**驾驭本仓库的人**：六问各一跳直达唯一家。正文只导航与白话定义，不复述事实（防漂）；
 > 一切细节以链接目标为准。维护本仓库的 coding agent 从 [AGENTS.md](../AGENTS.md) 进。
 
 ## 一问：这仓库是什么？
@@ -32,7 +32,7 @@ audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.m
 
 → 查表：[tests/README「改动面 → 最窄检查」](../tests/README.md) · 证据政策：[testing.md](testing.md)
 
-## 补一问：怎么知道「做完了」且质量可靠？（2026-10-07 补）
+## 五问：怎么知道「做完了」且质量可靠？（2026-10-07 补，plugin-corpus-realignment）
 
 四条链各要独立证据，前一条绿不豁免后一条：**挂得上**（preset-smoke）→ **行为对**（场景/判据，
 [testing.md](testing.md) §2）→ **装得上**（release-smoke）→ **批得下**（语义审 + 你验收——机器全绿
@@ -40,7 +40,7 @@ audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.m
 **双向反查**：改动面 → 最窄检查（[tests/README](../tests/README.md)）；场景 → 固定住什么行为
 （[snapshots 索引](../snapshots/README.md)）。
 
-## 五问：agent loop、skills、运行态、run bundle 在哪？
+## 六问：agent loop、skills、运行态、run bundle 在哪？
 
 - **loop 本体不在本仓库**——它在 [vendor/dsh](../vendor/dsh/)（钉版本、只读）；本仓只拥有
   喂给 loop 的输入（preset、skills、patch）和接住 loop 的输出（会话日志、workspace、证据）。

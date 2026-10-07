@@ -15,7 +15,7 @@
 | 指南 | `guides/` | **怎么操作**：runbook、预算限流 | 活（随操作方式演进） |
 | 合同 | 顶层（按主题） | **是什么**：某子系统现在时语义 | 随代码同 diff，只写 now |
 
-项目运行、目录、调试和测试导航见 [project-map.md](./project-map.md)；驾驭者白话五问见 [orient.md](./orient.md)；脚本用途索引见 [checks/README.md](../checks/README.md)，触发条件与成本以脚本头注为准。
+项目运行、目录、调试和测试导航见 [project-map.md](./project-map.md)；驾驭者白话六问见 [orient.md](./orient.md)；脚本用途索引见 [checks/README.md](../checks/README.md)，触发条件与成本以脚本头注为准。
 
 ### 现有文档
 
