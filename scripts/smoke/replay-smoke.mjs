@@ -36,6 +36,7 @@ import { basename, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { createRequire } from 'node:module'
 import { compareWorkspace, seedWorkspace, workspaceOracle } from '../lib/workspace-oracle.mjs'
+import { mirrorCompanyReference } from '../lib/rehearsal.mjs'
 import {
   normalizeSessionLog,
   normalizeSessionSnapshots,
@@ -265,7 +266,7 @@ async function driveScenario({ patchSource, env, tasks }) {
   mkdirSync(join(runRoot, '.dsh'), { recursive: true })
   mkdirSync(join(runRoot, '.agents'), { recursive: true })
   if (oracle) seedWorkspace(oracle.before, workspace)
-  else cpSync(join(ROOT, 'company-workspace/AGENTS.md'), join(workspace, 'AGENTS.md'))
+  else mirrorCompanyReference(workspace, join(ROOT, 'company-workspace'))   // BUG-006：参考镜像含 templates/（AGENTS 实拷贝——oracle 拒符号链接）
   const patchRoot = join(runRoot, '.snapshot-patches')
   mkdirSync(patchRoot, { recursive: true })
   // rc.2：启动器签名多了 profile 参数（`materializeProfilePatch(source, cwd, profile, targetDir, index)`）

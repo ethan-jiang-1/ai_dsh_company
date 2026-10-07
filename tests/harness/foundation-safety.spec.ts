@@ -99,3 +99,35 @@ describe('排练场镜像：kb 根三件事实家必须在场', () => {
     }
   })
 })
+
+describe('录制工作区参考镜像（BUG-006：模板缺料 ⇒ meta 词表自由发挥）', () => {
+  // 判据（RFC r7-motion-final BUG-006 修复）：录制/临时工作区与排练场吃**同一份参考镜像**——
+  // AGENTS.md（相对符号链接）+ kb 事实三件 + 各角色 CHARTER + templates/（meta.md 词表模板在列）；
+  // journal 不镜像（记忆不混）、deliverables 不触碰。镜像是幂等纯 fs，红 = 函数不存在。
+  it('mirrorCompanyReference 镜像 templates/ 与 kb 事实家，不混 journal', async () => {
+    const { mirrorCompanyReference } = await import('../../scripts/lib/rehearsal.mjs')
+    const company = mkdtempSync(join(tmpdir(), 'company-ref-src-'))
+    const workspace = mkdtempSync(join(tmpdir(), 'company-ref-ws-'))
+    try {
+      writeFileSync(join(company, 'AGENTS.md'), '# 手册\n')
+      mkdirSync(join(company, 'kb/ceo/journal'), { recursive: true })
+      writeFileSync(join(company, 'kb/org.md'), '# org\n')
+      writeFileSync(join(company, 'kb/ceo/CHARTER.md'), '# ceo\n')
+      writeFileSync(join(company, 'kb/ceo/journal/private.md'), '# 真记忆\n')
+      mkdirSync(join(company, 'templates'), { recursive: true })
+      writeFileSync(join(company, 'templates/meta.md'), '类型: <决策｜生产｜诊断｜口径问答>\n')
+      mkdirSync(join(workspace, 'deliverables'), { recursive: true })
+      writeFileSync(join(workspace, 'deliverables/keep.md'), '# 不触碰\n')
+      mirrorCompanyReference(workspace, company)
+      expect(existsSync(join(workspace, 'templates/meta.md')), '缺 meta.md 词表模板').toBe(true)
+      expect(existsSync(join(workspace, 'kb/org.md'))).toBe(true)
+      expect(existsSync(join(workspace, 'kb/ceo/CHARTER.md'))).toBe(true)
+      expect(existsSync(join(workspace, 'AGENTS.md'))).toBe(true)
+      expect(existsSync(join(workspace, 'kb/ceo/journal/private.md')), 'journal 不得混入').toBe(false)
+      expect(existsSync(join(workspace, 'deliverables/keep.md')), '既有产物不触碰').toBe(true)
+    } finally {
+      rmSync(company, { recursive: true, force: true })
+      rmSync(workspace, { recursive: true, force: true })
+    }
+  })
+})

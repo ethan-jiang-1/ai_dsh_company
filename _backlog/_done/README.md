@@ -51,6 +51,7 @@
 | [BUG-003-present-no-role-gate.md](_fixed_bugs/BUG-003-present-no-role-gate.md) | present 无角色门禁——判据层补 DRAFT_PRESENTED_BY_NON_LEAD 观察档（非 Lead present 过程稿每次提醒、成品侧越权照旧违规；多人形态修正单操作者语境的历史容忍） | 修复轮 commit（spec 3 例红→绿 + live 复验违规 0 保持） | 2026-10-06 |
 | [BUG-004-claim-yield-not-machine-readable.md](_fixed_bugs/BUG-004-claim-yield-not-machine-readable.md) | 占位让位不可机判——手册补让位行格式与重读规矩 + PLACEHOLDER_YIELD_LINE/isPlaceholderYield 机查面 + claim-race 3 轮行为验证（run3 PASS：恰一人持认，标准让位行格式完美） | 修复轮 commit | 2026-10-06 |
 | [BUG-005-dual-signoff-single-door-routing.md](_fixed_bugs/BUG-005-dual-signoff-single-door-routing.md) | 双签多门退化单签——手册补多人双签补签流程（两签齐才完整）+ multi-human §0 登记日志半旁路 + dual-signoff probe 复验 PASS（CEO 知道流程并能执行） | 修复轮 commit | 2026-10-06 |
+| [BUG-006-ceo-meta-vocab-drift.md](_fixed_bugs/BUG-006-ceo-meta-vocab-drift.md) | CEO 产出 meta.md 词表外值——初判"生成侧无词表"被证伪（templates/meta.md 早钉了词表），真根因 = 录制临时工作区只镜像 AGENTS.md ⇒ mirrorCompanyReference 统一录制/排练镜像语义 + replay-smoke 接线（spec 红→绿 + vitest 355） | 修复 commit（c202c0e 前身，见卡状态行） | 2026-10-07 |
 
 ## 搁置缺陷卡（查实——修复未确认）
 

@@ -6,4 +6,4 @@
 
 ## Next BUG ID
 
-**BUG-007** — 已分配：BUG-001..005（本目录）、BUG-006（活跃，ceo-meta-vocab-drift，2026-10-07 r7 归档审计发现）。
+**BUG-007** — 已分配：BUG-001..006（本目录；006 = ceo-meta-vocab-drift，2026-10-07 当日发现当日修复）。
