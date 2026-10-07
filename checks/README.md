@@ -1,4 +1,4 @@
-# 维护者脚本索引
+# 检查与工具索引（验证 · 调试 · 工具三面）
 
 按要证明的对象选择下面的入口，再读目标脚本的头注确认触发条件、成本、状态和参数。脚本头注是这些事实的唯一家；本索引提供分类和可点击入口。证据政策见 [测试宪法](../docs/testing.md)，开发环境见 [开发环](../docs/guides/dev-loop.md)。
 
@@ -18,7 +18,7 @@
 
 模型调用与浏览器是两种独立成本。keyless 表示无需模型密钥：真实进程、浏览器或安装链仍有成本，保留在独立脚本 lane。文件名用来定位层，参数和头注决定实际运行模式；例如 replay 默认回放，`--ui` 加浏览器，`--record` 才重录模型调用。`presence-e2e` 检查 RPC 投影，不启动浏览器。
 
-分区三标签速记：**验证** = `smoke/` + `audit/`（证明装配、行为、回放与留痕）｜**调试** = `probes/`（窄机制与视觉探查）｜**工具** = `tools/` + `drivers/` + `lib/`（导出、真实驱动、共享纯逻辑）。
+顶层按用途读（2026-10-07 S2 起）：**验证面 = checks/**（本目录：`smoke/` 真实入口冒烟 + `audit/` 盘面日志判据 + run-gates 门禁）｜**调试面 = [probes/](../probes/)**（窄机制与视觉探查，按机制域四子目录：team / fs-taskboard / browser-visual / session-context）｜**工具面 = [tools/](../tools/)**（维护工具 + `lib/` 共享纯逻辑 + `drivers/` 真实驱动 + `archive/` 已耗仪器）。
 
 ## 结构、装载与发布
 
@@ -102,4 +102,4 @@
 
 [lib](../tools/lib/) 保存可由隔离夹具验证的会话日志、workspace oracle、交付物/作者判据、排练输入、发布事务和仓库布局逻辑；[drivers](../tools/drivers/) 保存真实进程、CDP 和 Playwright 驱动。驱动不进入 keyless spec；准入由 [分层守卫](../tests/harness/layering.spec.ts) 检查。
 
-职责分区已落地：[smoke](smoke/) 是真实入口验收，[probes](../probes/) 是窄机制/行为探针，[audit](audit/) 是盘面与日志判据，[tools](../tools/) 是维护工具，[archive](../tools/archive/) 是已耗入口。完整门禁仍在根 [run-gates](run-gates.mjs)，pin 来源不拆；旧 根部旧 deliverables-check symlink 已随 S2 移除（消费者已改用规范路径）。keyless spec 按 company/client/presets/harness 领域归位。一次迁移换取长期按职责发现与清晰准入，理由见 [职责分区迁移 Note](../notes/implemented/2026-10-05-repository-responsibility-layout.md)；新增入口同 diff 增加索引，触发条件、成本和状态仍留在头注。
+完整门禁 [run-gates](run-gates.mjs) 住本目录根，pin 事实不拆；keyless spec 按 company/client/presets/harness 领域归位。新增入口同 diff 增加索引，触发条件、成本和状态仍留在脚本头注。三轮目录史：2026-10-05 职责分区（[Note](../notes/implemented/2026-10-05-repository-responsibility-layout.md)）→ 2026-10-07 四用途升顶层（RFC [driver-purpose-top-level](../notes/proposed/2026-10-07-driver-purpose-top-level.md)）。

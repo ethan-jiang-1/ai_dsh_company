@@ -91,4 +91,4 @@ Web 操作按 [动议合同 §前置](demo.md) 执行：启动输出给出当前
 
 ## 目录整理结论
 
-脚本已按 smoke/probes/audit/tools/archive 职责分区，keyless spec 按 company/client/presets/harness 领域归位；真实进程和浏览器驱动独立于可测逻辑。长期收益是目录本身回答“该改哪类资产”，索引回答“该选哪个入口”；不把一次搬迁成本当作保持平铺的理由。根 [run-gates](../checks/run-gates.mjs) 保持完整稳定入口及 pin 来源。映射、兼容边界与验证见 [职责分区迁移 Note](../notes/implemented/2026-10-05-repository-responsibility-layout.md)。
+顶层按**用途**读（2026-10-07 S1–S3，RFC [driver-purpose-top-level](../notes/proposed/2026-10-07-driver-purpose-top-level.md)）：**运行 = run/**（env.sh + overlay）、**验证 = checks/**（smoke + audit + run-gates）、**调试 = probes/**（按机制域四子目录）、**工具 = tools/**（含 lib/drivers/archive）；keyless spec 按 company/client/presets/harness 领域归位；`scripts/`、`dev/` 两个形态名目录已退役。长期收益是目录本身回答“该改哪类资产、从哪个用途进”，索引回答“该选哪个入口”；不把搬迁成本当作保持平铺的理由。根 [run-gates](../checks/run-gates.mjs) 保持完整稳定入口及 pin 来源。上轮分区映射见 [职责分区迁移 Note](../notes/implemented/2026-10-05-repository-responsibility-layout.md)。

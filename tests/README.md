@@ -2,7 +2,7 @@
 
 > 四区各测什么、**不证明什么**、改动面 → 最窄检查怎么选——本文件只做导航。分层与证据政策唯一家 =
 > [docs/testing.md](../docs/testing.md)（九层证明边界 / 证据纪律 / 改动面→最小证据）；逐脚本触发/成本/状态
-> 唯一源 = 脚本头注（[scripts/README](../checks/README.md) 只索引，门禁强制自述）——本文件不复述，防漂移。
+> 唯一源 = 脚本头注（[检查索引](../checks/README.md) 只索引，门禁强制自述）——本文件不复述，防漂移。
 > 真模型 / 真浏览器**不进本树**（[harness/layering.spec](./harness/layering.spec.ts) 机械守卫）。
 > 行业三分 → 本仓层的对照：**单元 ≈ keyless 单测（本树）；集成 ≈ 装配/机制冒烟与 CLI 集成（[checks/smoke/](../checks/smoke/)）；
 > 端到端 ≈ 重放 lane 与认证档（录制回放 / 真模型）**——逐层证明边界唯一家 = [testing.md §1](../docs/testing.md)。
