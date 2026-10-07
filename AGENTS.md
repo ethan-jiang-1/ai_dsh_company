@@ -56,7 +56,7 @@ node checks/smoke/preset-smoke.mjs    # preset 改动的完成定义（真挂载
 
 | 纪律 | 权威（vendor 树） | 本仓落点 |
 |---|---|---|
-| 任务反馈面；按变更选检查、只报告实跑过的 | `packages/todo` / `packages/plan` / `AGENTS.md` | dev-loop §0.5/§1/§9.1/§12 |
+| 任务反馈面；按变更选检查、只报告实跑过的 | `packages/todo` / `packages/plan` / `AGENTS.md` | dev-loop §0.5/§1/§9.1/§12（收尾含语义审，清单 = §13） |
 | docs = 当前合同（一处事实一个家，只写 now）；文档卫生 | `docs/AGENTS.md` | docs/ 分层；行预算 = run-gates `DOC_LINE_BUDGETS`；细则 = dev-loop §12 |
 | 非平凡变更同 diff 带 Note（决定/输掉的方案/验证什么）；日志税 | `.agents/notes/README.md` / `AGENTS.md` Conventions | notes/proposed/ → notes/implemented/；写什么 = [notes/README.md](notes/README.md) |
 | 完成定义 = 最小真检查；测试分层；真实入口与安装形状 | `docs/testing.md` / `docs/postmortem/0003-web-agent-gui-feedback-loop.md` | 本仓 [测试宪法](docs/testing.md) + layering 守卫；preset = preset-smoke；安装 = release-smoke（[release.md](docs/release.md)） |

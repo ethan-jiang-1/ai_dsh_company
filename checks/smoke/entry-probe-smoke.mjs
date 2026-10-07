@@ -48,12 +48,15 @@ const sourceHashes = new Map()
 // 而只有引 `docs/index.md` 的代理句才能过——那是在奖励绕路、惩罚直答。首跑实测踩到（基线 8/12 的 Q3）。
 // 为什么加 `checks|probes|tools/` 与 `tests/`：③ 把"何时跑"的家搬进了**脚本自己的头注**，于是"该跑哪个脚本"这类
 // 问题的最权威证据就是脚本本身；旧允许面只收 .md ⇒ 引脚本一律"来源不可读"（实测 Q4/Q5/Q7/Q10 同挂）。
-// **允许面必须跟着事实的家走。**
+// **允许面必须跟着事实的家走。** 2026-10-07 再实证同病：Q7/Q10 的正确答案家 = `tests/README.md`
+// （改动面→最窄检查）与 `checks/README.md`（脚本索引）——两者都在 AGENTS 入口链里被点名，却是
+// .md 不在允许模式里 ⇒ 模型直答被罚"来源不可读"（首跑 9/13 的两题即栽于此）。加两行 README 模式。
 // 写成一张模式表（而不是一串 || 条件）：后缀约束与路径约束同处一处，避免"后缀检查排在允许面前面"
 // 这类顺序 bug（实测踩过一次：`!path.endsWith('.md')` 把 .mjs 全挡在门外）。
 const ALLOWED_SOURCE = [
   /^AGENTS\.md$/, /^company-workspace\/AGENTS\.md$/, /^_backlog\/[\w./-]+\.md$/,
   /^(docs|notes)\/[\w./-]+\.md$/, /^snapshots\/README\.md$/,
+  /^tests\/README\.md$/, /^checks\/README\.md$/,
   /^(checks|probes|tools)\/[\w./-]+\.(mjs|ts)$/,
   /^tests\/[\w./-]+\.ts$/,
 ]

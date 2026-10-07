@@ -19,6 +19,10 @@ export const ENTRY_QUESTIONS = [
   { id: 'Q10', ask: '依赖图/面板里那些**只能看、不能 keyless 断言**的视觉事实、人机接口三载体（补料落盘／建议非阻塞落稿／规矩缺口回流 journal）、日期口径行为面，各该跑哪个脚本？', expect: [/dag-visual/, /human-loop-e2e/, /date-rule/] },
   { id: 'Q11', ask: '一个非平凡变更收尾时，除了改实现，还要动哪些文件或登记处？', expect: [/Note|implemented/, /docs|合同|owner/] },
   { id: 'Q12', ask: '长程自主执行的 goal 有哪两种写法？停止条件有哪几类？', expect: [/交付型/, /打磨型/, /预算|枯竭|卡住/] },
+  // ── 完成判断链（2026-10-07 plugin-corpus-realignment 接线：四不等式与语义审形状从此进认证面）──
+  // 措辞要点：不问「怎么算完成」那种宽问题（D15 已被 Q5/Q7 侧覆盖）——问四条链 + 语义审清单位置，
+  // 答案锚在 dev-loop §1 完成判断链与 §13 最小清单，唯一。
+  { id: 'Q13', ask: '完成判断链的四条（挂载/行为/安装/批准）各对应什么检查？语义审按哪个清单走、结果记在哪？', expect: [/preset-smoke/, /release-smoke|场景|判据/, /语义审/, /§13|清单/, /Note|收尾/] },
 ]
 
 /**
