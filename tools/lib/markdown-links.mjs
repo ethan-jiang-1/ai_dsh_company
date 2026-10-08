@@ -48,6 +48,9 @@ export function sourceMarkdownFiles(root) {
   }
   walk(root, false)
   for (const dir of ['docs', 'notes', '_backlog', 'checks', 'probes', 'tools', 'packages/company-pack', 'company-workspace/templates']) walk(join(root, dir))
+  // Agent skills are live agent-facing instructions whose links must not rot; the generic
+  // walk above skips dot-directories, so the skills root is named explicitly (2026-10-08 dev-skills-pilot).
+  walk(join(root, '.agents/skills'))
   // The evidence payload remains frozen; the root contract is current navigation.
   for (const file of ['snapshots/README.md', 'company-workspace/AGENTS.md', 'company-workspace/kb/org.md']) {
     if (existsSync(join(root, file))) add(join(root, file))

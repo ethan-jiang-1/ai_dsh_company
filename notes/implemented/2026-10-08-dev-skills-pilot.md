@@ -1,6 +1,6 @@
 # 开发 Skills 试点：`.agents/skills/` 落两个多步程序
 
-状态：已批准、待实施（2026-10-08 立项；批准：用户 2026-10-08 在第三轮诊断收口对话中逐条审批通过「条目 C：开发 Skills 试点」，并指定实施次序「A+B 先做，C 独立一轮」——本 RFC 即那个独立轮；判定依据 = [driver-receipt-round](../implemented/2026-10-08-driver-receipt-round.md) §H1 唯一翻案项。开工 = TDD 红绿环，见 proposed/README）。
+状态：已消化（2026-10-08；批准链见原状态行 + 上级对话呈批批准——原状态行批准链 = 用户 2026-10-08 在第三轮诊断收口对话中逐条审批通过「条目 C：开发 Skills 试点」，并指定实施次序「A+B 先做，C 独立一轮」，本 RFC 即那个独立轮；判定依据 = [driver-receipt-round](2026-10-08-driver-receipt-round.md) §H1 唯一翻案项。开工 = TDD 红绿环，见 [proposed/README](../proposed/README.md)；红/绿收据与实跑命令见文末验证记录）。
 
 ## 问题
 
@@ -30,3 +30,26 @@ dev-loop 对应节同步瘦身为指针（渐进披露；瘦身轮顺带释放�
 - **真入口证据**：起一次真会话（profile 取实际挂 tool-skill 的面——headless 若无 tool-skill 行则用 web；单跑预算），会话 catalog（available_skills）出现两个新 skill 名，且模型对其中一个完成一次 skill 调用（会话日志 skill tool call 为证）——**实施者不看对话就能复现**：命令、断言、红（catalog 缺名）长什么样写在实施 Note 验证节。
 - dev-loop 对应节收缩后 `pnpm verify` doc-budget 全绿（行数只降不升）；`pnpm test` 全绿。
 - 先**不设** skill 类新门禁（无复发不建 gate；现有 `script-triggers` / `skill-file` 覆盖面不变）。
+
+## 验证记录（2026-10-08 实施）
+
+真模型会话共 **2 次**（预算 ≤3，余量未用）：红 1 + 绿 1（绿兼真调用，同会话双收据）。断言器 = 读会话
+JSONL 的 durable `user/message`（`data.source.kind == "skill-catalog"` 的 `entries[].name`）与 `tool/call`
+事件——从权威日志取事实，不采信模型正文自述；headless 会话 cwd = 仓根（`project-agents` 根由此发现）。
+
+| 步 | 实跑命令 | 判据与结果 |
+|---|---|---|
+| 红 | `source run/env.sh && pnpm dsh --profile headless "只回复两个字：收到。不要调用任何工具。"`（建 `.agents/skills/` **前**） | catalog 12 条，`preset-change-definition` / `web-window-ops` **均缺席 = 红**；收据 = session `d98c02b9…` 日志，归档 [skill-catalog-pilot](../../snapshots/probes/skill-catalog-pilot/2026-10-08/README.md) |
+| 绿 + 真调用 | 建 2 个 SKILL.md 后另起 `pnpm dsh --profile headless "加载 web-window-ops …只执行它的第 1 步…"` | 同一断言器复跑：catalog 14 条，两名**在场 = 绿**；且日志出现 `tool/call` `"name": "skill", "arguments": "{\"name\": \"web-window-ops\"}"`，随后 bash 执行 skill 第 1 步（env 隔离自检 `grep -c company-pack` = 9 ≥ 1）= **真调用证据**；收据 = session `1072fe2d…`，同归档 |
+| 结构面 | `pnpm verify` + `pnpm test`（`set -o pipefail` 链） | 全绿；md-links 扫描面覆盖新 SKILL.md；doc-budget 各行见门禁 PASS 输出 |
+
+同 diff 伴生改动与取舍：
+
+- `tools/lib/markdown-links.mjs`：扫描面显式加 `.agents/skills`（通用 walk 跳过点目录）——md-links
+  门禁自此覆盖新 SKILL.md；这是现有门禁的发现面补口，不是新门禁（验收明文要求覆盖新文件）。
+- dev-loop 瘦身：§1「呈现即验证」的过程性叙述收缩为 web-window-ops skill 指针（渐进披露）。其余被两
+  skill 收拢的叙述（demo.md §前置、budget-and-ops §3、tests/README 表、dev-loop §9.1/§12）本就是规则
+  owner 形态、事实家不迁——dev-loop 净行数不变，故 `DOC_LINE_BUDGETS` 棘轮不动（只降不升，无净降无可
+  下移；毕业不以瘦身行数为条件，事实承载优先）。
+- 收割三问：①异常 = 无；②值得钉 = skill-catalog 红/绿断言已钉成归档证据 + 本节复现命令；③运行态事实 =
+  本次两例 headless 会话收尾**均未删**自己的 session 目录（历史「删目录」未复现，日志直接留存可读）。
