@@ -13,7 +13,7 @@ CEO、VP-Eng、VP-Sales、COO、CFO 各自是独立 preset，事件从 CEO 进�
   [demo.md](./docs/demo.md)）；`pnpm dsh --profile headless` 只证明通用 CLI，**不是**公司运行。
 - **新 Agent 首跑验收**（推荐、非强制）= [tests/README](./tests/README.md) 首跑节（有 key / 无 key 两条路径）；改东西选检查 = 同文件「改动面 → 最窄检查」表。
 
-- 入口：[驾驭者六问](./docs/orient.md)（白话速读）· [项目地图](./docs/project-map.md)（空间导航）· [运行态地图](./docs/runtime-map.md)（时序与状态轴）·
+- 入口：[驾驭者七问](./docs/orient.md)（白话速读）· [项目地图](./docs/project-map.md)（空间导航）· [运行态地图](./docs/runtime-map.md)（时序与状态轴）·
   [脚本索引](./checks/README.md)（按用途选入口）· [AGENTS.md](./AGENTS.md)（coding agent）· [设计与决策](./docs/index.md)
 - 安装：`pnpm dsh plugin --profile <名> add link:./packages/company-pack`（开发联调）；发布形状 =
   `npm pack` → 干净 profile `add file:<tarball>`（验收 = release-smoke，[docs/release.md](./docs/release.md)）——装后 profile 的 roster 可见五角色 preset
