@@ -67,8 +67,8 @@ DSH 给的载体就是 skill：procedural memory，按上下文触发加载。
 | 门禁面 | `pnpm verify` | `PASS md-links (含 notes) ×1176 / 238 files`（扫描面含 `.agents/skills`）；`verify: ALL PASS` |
 | **真 catalog（绿）** | `source run/env.sh && pnpm dsh --profile headless "只回复两个字：收到。不要调用任何工具。"` 然后 `zstd -dc <session>.jsonl.zstd` 读 `skill-catalog` 事件 | catalog **17** 条；三名在场：`agent-note-definition` / `gate-change-definition` / `close-out-definition` |
 | 红基线对照 | 2026-10-08 试点轮同一断言器 | 建 `.agents/skills/` 前 **12** 条 → 建两个 skill 后 **14** 条 → 本轮 **17** 条（增量 = 3，与预期一致） |
+| **独立红（本轮补）** | 把三个 skill 目录 `mv` 出 `.agents/skills/` → 起真会话 → 读 catalog | **14** 条，三个名字**全部不在场**（`NONE — red confirmed`）；会话内 catalog 同步由 17 掉到 14（当场可见） |
+| **还原即绿（本轮补）** | `mv` 回三个目录 → 起真会话 → 读 catalog | **17** 条，三名齐在 ⇒ 红→还原→绿三步闭环，不再依赖 2026-10-08 的历史读数 |
 | 回归 | `pnpm test` | 36 files / 355 tests 绿 |
 
-**注**：真会话只起 **1** 次（绿）。**没有单独造红**——红基线取自 2026-10-08 试点轮已归档的同断言器读数
-（12 → 14），本轮增量方向与数量都对得上，足以证明发现链走通；再花一次真模型会话重造「删掉 skill → catalog 少 3 条」
-的收益不抵成本。**这是本条的已知薄弱处，如实记在这里**：三个新 skill 各自没有独立的红收据。
+**注**：真会话共起 **3** 次（红 1 / 绿 2），**已补齐独立红证**（见下）。
