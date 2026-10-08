@@ -409,6 +409,8 @@ describe('反向门禁（布局卡评审修正 6：present 在而结果≠终态
   })
 })
 
+// 负例留证 2026-10-09：把该观察项的 code 从 WARNING.DRAFT_PRESENTED_BY_NON_LEAD 换成别的字面量
+//（= 静默吞掉观察项，BUG-003 要防的失效）→ 本条红（1 failed）；还原 → 绿。
 describe('非 Lead present 过程稿的观察档（BUG-003，2026-10-06 多人 UX 猎捕立——观察项不判违规）', () => {
   const cfoPresentsDraft = {
     id: 's-cfo', agentPreset: 'cfo', delegationDepth: 0,
@@ -449,6 +451,9 @@ describe('非 Lead present 过程稿的观察档（BUG-003，2026-10-06 多人 U
   })
 })
 
+// 负例留证 2026-10-09：把 isPlaceholderYield 改成 `body.includes(PLACEHOLDER_YIELD_LINE)`
+//（子串匹配 = BUG-004 要防的「措辞走样也认」）→ 本条红（改动前全套 355 项仍全绿，故本条是本轮新加的钉子）；
+// 也让 `持认 ∧ 让位` 同时为真。还原 → 绿。
 describe('让位行的机器可查面（BUG-004，2026-10-06 修复轮立——持认判定 = 占位 ∧ ¬让位）', () => {
   it('首行恰好「让位=认领撤销，非出稿」⇒ isPlaceholderYield 为真', async () => {
     const { isPlaceholderYield, PLACEHOLDER_YIELD_LINE } = await import('../../tools/lib/deliverables.mjs')
@@ -462,8 +467,24 @@ describe('让位行的机器可查面（BUG-004，2026-10-06 修复轮立——�
     expect(isPlaceholderClaim('占位=认领，非出稿\n')).toBe(true)
     expect(isPlaceholderYield('占位=认领，非出稿\n')).toBe(false)
   })
+
+  // 关键盲点（2026-10-09 实测发现并补上）：上一条的 fixture 正文**不含让位行原文**，
+  // 所以「首行相等」与「正文包含」两种实现都返回 false —— 拿它验不出实现被弱化成子串匹配。
+  // 复现：把 isPlaceholderYield 改成 `body.includes(PLACEHOLDER_YIELD_LINE)`（正是 BUG-004
+  // 要防的「措辞走样也认」失效），全套 355 项**依然全绿**，且能让 持认 ∧ 让位 同时为真
+  // （`'占位=认领，非出稿\n\n讨论：我本可以写 让位=认领撤销，非出稿 来放弃'`）——
+  // 那正是 BUG-004 存在要防的互斥失效。⇒ 本条 fixture 必须让让位行**原文出现在正文、
+  // 但不在首个非空行**：只有这样，子串实现才会返回 true 而被抓住。
+  it('让位行原文出现在正文但不在首个非空行 ⇒ 非让位（钉死「首行相等」，防子串实现）', async () => {
+    const { isPlaceholderYield, PLACEHOLDER_YIELD_LINE } = await import('../../tools/lib/deliverables.mjs')
+    const bodyBesideYieldLine = `占位=认领，非出稿\n\n讨论：我本可以写 ${PLACEHOLDER_YIELD_LINE} 来放弃`
+    expect(bodyBesideYieldLine.includes(PLACEHOLDER_YIELD_LINE), 'fixture 必须真的含让位行原文，否则本条验不出子串实现').toBe(true)
+    expect(isPlaceholderYield(bodyBesideYieldLine)).toBe(false)
+  })
 })
 
+// 负例留证 2026-10-09：把 doors.ts 的 `duplicateWarning: entry.ids.length >= 2` 改成 `false`
+//（= 双 CEO 静默易主，BUG-002 要防的失效）→ 本条红（2 failed）；还原 → 绿。
 describe('工作区门投影——双 CEO 检测面（BUG-002 修复轮，2026-10-06）', () => {
   it('两 CEO 根会话同 cwd ⇒ duplicateWarning 行 + hasDuplicate = true', async () => {
     const { doorsFromSessions } = await import('../../packages/company-pack/src/lib/doors.ts')

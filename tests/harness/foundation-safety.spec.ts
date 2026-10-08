@@ -100,6 +100,8 @@ describe('排练场镜像：kb 根三件事实家必须在场', () => {
   })
 })
 
+// 负例留证 2026-10-09：把 rehearsal.mjs 的 templates/ 镜像两行删掉
+//（= 录制工作区看不到 templates/meta.md，正是 BUG-006 的真缺口）→ 本文件红（2 failed）；还原 → 绿。
 describe('录制工作区参考镜像（BUG-006：模板缺料 ⇒ meta 词表自由发挥）', () => {
   // 判据（RFC r7-motion-final BUG-006 修复）：录制/临时工作区与排练场吃**同一份参考镜像**——
   // AGENTS.md（相对符号链接）+ kb 事实三件 + 各角色 CHARTER + templates/（meta.md 词表模板在列）；

@@ -68,7 +68,7 @@ const DOC_LINE_BUDGETS = [
   ['docs/index.md', 143],        // 2026-09-26 升至 149（D29/D30 行）；2026-09-27 瘦身轮：合同落点段删并、D19+D21 / D23+D24 并行、肥行压一行指针（当时 149→139），棘轮 149→146；2026-10-04 升至 147（文档地图加 testing.md 宪法行，Note 同 diff）；2026-10-05 升至 148（D35 台账行，Note 同 diff）；2026-10-09 D36 台账降级纯路由表（33 行 8.8KB → 34 行一句话，最长行 644→≤100）+ N1 分层规矩迁 docs/AGENTS.md（原 §文档组织原则 表 + 生命周期列搬出，本文件只留现状登记），棘轮 148→143（当时 141，留 ≥5% 头寸）；2026-10-09 N4 加 D37–D40 四行台账（+4），**同 diff 压回 143 顶格**——压掉的都是已被 docs/AGENTS.md 或下表接管的复述（导航句、§文档路由 前言、外部研究段三行折两行）。⚠ **结构张力已到顶**：台账每加一个 D 号就要腾一行，而 D1–D9 的「家」仍指向 design/（N1 章程说落地决定该归 Note，迁移是独立一轮）。下一轮再加 D 号前，先做 D1–D9 的家迁移（腾 9 行），不提额
   ['docs/orient.md', 80],        // 2026-10-06 立（RFC driver-surface-package 条目 C：驾驭者白话五问单页，只导航不复述事实；反证 = 初稿超限红）
   ['docs/guides/dev-loop.md', 395], // 2026-09-26/27 升至 467（§13、inspect 句）后同日瘦身轮：§7 整段迁 guides/bootstrap.md、§7 留指针防断链（当时 467→376），棘轮 467→395
-  ['docs/testing.md', 75],       // 2026-10-04 立测试宪法（_digested/test-strategy 消化采纳轮；政策唯一家，只写 now——膨胀先迁，不加预算）；同日 61（§3.8 红/场景先行）；同日 75（§1.1 资产命名语法，用户点破 DSH「后缀即层」实践）
+  ['docs/testing.md', 75],       // 2026-10-04 立测试宪法（_digested/test-strategy 消化采纳轮；政策唯一家，只写 now——膨胀先迁，不加预算）；同日 61（§3.8 红/场景先行）；同日 75（§1.1 资产命名语法，用户点破 DSH「后缀即层」实践）；2026-10-09 §3.7 prove-it-red 补「标题带 BUG-nnn 的 describe/it = 守卫声明」判据句（guard-red-record 门禁接上；原句只写「三步留证」没给可判形状），**同 diff 压回 75 顶格**（引用链改「见该 Note」，不重复路径）。⚠ 顶格：下一句加进来前先迁——§1 分层表与 tests/README「改动面→最窄检查」有重叠面可搬
   ['docs/AGENTS.md', 62],        // 2026-10-09 N1 立（docs/ 分层规矩唯一家：一处事实一个家表 + 长度棘轮 + 更新时机 + 负知识；行数上限唯一源在 run-gates 不复述数字）；反证 = doc-taxonomy 门禁（表头/不属于这层 列缺失即红）
   ['company-workspace/AGENTS.md', 195], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面（186 行 ≈ 16.4KB × 每会话），同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates
 ]
@@ -863,6 +863,75 @@ if (existsSync(replayRoot)) {
   problems.length === 0
     ? ok(`replay-scene-liveness ×${scenes.length}（声明↔磁盘一致；runnable ${tally.runnable} / archived ${tally.archived} / baseline ${tally.baseline}）`)
     : fail('replay-scene-liveness', `重放场景声明与磁盘不符或元数据缺字段（三态事实家 = 各场景 snapshot.yml，散文旧记 = snapshots/README.md §快照与 live 盘差异的语义）：${problems.join('；')}`)
+}
+
+// ── 守卫负例门禁（guard-red-record，2026-10-09 立）──────────────────────────────
+// 为什么：门禁有 23 处「负例留证」，而 36 个 spec **一处都没有**——同样是"守卫"，
+// 一边强制证明自己能红、一边不强制。testing.md §3.7 明文要求 prove-it-red
+// （「守卫只有挡得住回归才算守卫——制造回归看红、还原看绿，三步留证」），但只写在散文里。
+// **实测触发（不是推测）**：`tests/company/deliverables.spec.ts` 的 BUG-004 守卫
+// （让位行机器可查面）被弱化成子串匹配——即它自己声称要防的"措辞走样也认"失效——
+// 全套 355 项**依然全绿**，且能让「持认 ∧ 让位」同时为真（BUG-004 存在要防的互斥失效）。
+// 那条守卫的 fixture 正文不含让位行原文，所以两种实现都返回 false，验不出弱化。
+// ⇒ 一条从没红过的守卫，就是一条**没人知道能不能红**的守卫。
+// 判据（机械可判，不靠关键词猜测）：
+//   ① **守卫声明** = 某个 `describe('…')` / `it('…')` 的**标题里带 `BUG-nnn`**。
+//      标题是"我在这里守一条具体不变量"的正式声明；正文注释里提 BUG 号只是解释
+//      （反例：`signoff-tool.spec.ts` 用注释解释 mock 为何要 no-op，它不声称守卫 BUG-002）。
+//   ② **事故必须可解析**：`BUG-nnn` 必须能对到 `_backlog/_done/_fixed_bugs/BUG-nnn-*.md`
+//      真卡（悬空编号 = 声称守一个不存在的过去 → 红）。
+//   ③ **每个声明必须有对应的负例留证行**：文件里存在 `// 负例留证 YYYY-MM-DD：…BUG-nnn…`
+//      （按编号对齐——一篇 spec 声明守卫 N 个事故，就要 N 条，不许一条笼统行糊过去）。
+// 判据源 = `tests/**/*.spec.ts` 自身 + `_backlog/_done/_fixed_bugs/` 真卡。
+// ⚠ 本门禁**不证明**的：它不制造回归、不跑 vitest，所以**不证明**那条留证是真的
+//   （留证写了但假的，本门禁看不出来——那要靠人复现）。它证明的是"**声称守卫具体事故的
+//   spec 必须交出可复现的红的配方**"，把"没人知道能不能红"变成"红法写在守卫旁边"。
+// 负例留证 2026-10-09（实地造红→还原→绿）：
+//   ① 新增一个 `describe('…（BUG-006）', …)` 但文件里没有对应留证行 → 红；
+//   ② 把某条留证的 BUG 编号改错（BUG-004 → BUG-009，卡不存在）→ 红（悬空编号）；
+//   ③ 把留证行整行删掉 → 红。还原 → 全绿（见 implemented/2026-10-09-guard-red-record.md）。
+{
+  const specFiles = []
+  const walkSpecs = d => {
+    if (!existsSync(d)) return
+    for (const e of readdirSync(d, { withFileTypes: true })) {
+      const p = join(d, e.name)
+      if (e.isDirectory()) walkSpecs(p)
+      else if (e.name.endsWith('.spec.ts')) specFiles.push(p)
+    }
+  }
+  walkSpecs(join(root, 'tests'))
+  const bugCardExists = n => existsSync(join(root, '_backlog/_done/_fixed_bugs')) &&
+    readdirSync(join(root, '_backlog/_done/_fixed_bugs')).some(f => f.startsWith(`BUG-${n}-`))
+  const problems = []
+  let claims = 0
+  for (const file of specFiles.sort()) {
+    const text = readFileSync(file, 'utf8')
+    const rel = file.slice(root.length + 1)
+    // ① 标题里的 BUG 号 = 守卫声明
+    const claimed = new Set()
+    for (const m of text.matchAll(/^\s*(?:describe|it)\(\s*['"`][^'"`]*?(BUG-\d{3})/gm)) claimed.add(m[1])
+    if (claimed.size === 0) continue
+    // ② 事故必须可解析 + ③ 每个声明要自己的留证行
+    for (const id of [...claimed].sort()) {
+      claims++
+      const num = id.slice(4)
+      if (!bugCardExists(num)) {
+        problems.push(`${rel}：标题声称守卫 ${id}，但 _backlog/_done/_fixed_bugs/ 里没有 ${id}-* 卡（悬空事故号）`)
+        continue
+      }
+      // 留证是**块**（首行「// 负例留证 日期：…」，续行是 // …）——与 run-gates 自身同形，
+      // 故按块找：本行或其后紧邻的 // 续行里出现该 ID 即可。
+      const record = new RegExp(
+        `^\\s*//\\s*负例留证\\s+\\d{4}-\\d{2}-\\d{2}：(?:[^\\n]*\\n(?:\\s*//[^\\n]*\\n)*)?[^\\n]*${id}`,
+        'm')
+      if (!record.test(text)) {
+        problems.push(`${rel}：标题声称守卫 ${id}，但文件里没有「// 负例留证 YYYY-MM-DD：…${id}…」行（这条守卫没人知道能不能红）`)
+      }    }
+  }
+  problems.length === 0
+    ? ok(`guard-red-record ×${claims} 条守卫声明（${specFiles.length} 个 spec；每条都对到真事故卡 + 自带红配方）`)
+    : fail('guard-red-record', `这些 spec 声称守卫具体事故却没交出可复现的红配方（testing.md §3.7 prove-it-red；留证形状照 run-gates 自身的「负例留证」）：${problems.join('；')}`)
 }
 
 console.log(failures.length === 0 ? '\nverify: ALL PASS' : `\nverify: ${failures.length} FAILURE(S)`)
