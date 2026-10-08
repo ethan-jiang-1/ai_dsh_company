@@ -45,6 +45,8 @@
 
 ## 取代检查
 
+- **后续延伸（2026-10-08）**：同请求第三现的体感实证裁决（零增量判定之上，改验执行面与驾驶座体感）=
+  [driver-receipt-round](2026-10-08-driver-receipt-round.md)（部分延伸，互链不合并）。
 - 与 [plugin-corpus-realignment](2026-10-07-plugin-corpus-realignment.md)：**部分延伸**——10-07 Note 继续拥有 rc.2 语料的判定本体与四焦点线修订；本 Note 拥有「28 页全亲读复核、验产执行面、零增量与 considered-skipped 清单」。互链不合并。
 - 与 [harness-alignment-ledger](../archived/2026-09-25-harness-alignment-ledger.md)：无重叠（旧台账拥有 0.1.7-rc.1 逐页判定与不照搬清单 §四.4，仍有效）。
 

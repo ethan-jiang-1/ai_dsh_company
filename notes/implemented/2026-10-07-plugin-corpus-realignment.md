@@ -65,6 +65,8 @@ sdlc-reference 9 页（README/index + 02/03/05/07/08/09/10）——旧台账判�
 
 ## 取代检查
 
+- **后续延伸（2026-10-08）**：同请求第三现的体感实证裁决（H1/H2/H3）+ 轮次回执、驾驶七问落地 =
+  [driver-receipt-round](2026-10-08-driver-receipt-round.md)（部分延伸，互链不合并）。
 - 与 [harness-alignment-ledger](../archived/2026-09-25-harness-alignment-ledger.md)：**部分取代**——旧台账继续拥有 0.1.7-rc.1 逐页判定与不照搬清单（§四.4 仍被 dev-loop §9.1 等四处活引用）；本 Note 拥有 rc.2 语料 + 新卷的增量判定与四焦点线修订。互链不合并。
 - 与 [entry-execution-chain-debt](2026-09-26-entry-execution-chain-debt.md)：其「semantic review pending」边界声明仍有效；执行形状由本 Note §决定 2 接续。
 - 与 [notes-lifecycle-absorption](2026-09-24-notes-lifecycle-absorption.md)：无重叠——它拥有 sdlc-01 页六条点选吸纳；该页 rc.2 收窄的判定归本 Note。

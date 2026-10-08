@@ -78,3 +78,8 @@ docs/ notes/ _backlog/ company-workspace/ vendor/（不动）
   其路径允许面已随 S2 扩为 checks|probes|tools。
 - **收口**：最终 `pnpm verify` ALL PASS；`pnpm test` 36 文件 355 项全绿（3.85s）。冻结收据
   （notes 历史、snapshots、_backlog/_done、runtime/cold-storage JSONL）中的旧路径一律未改写。
+
+## 延伸（2026-10-08）
+
+驾驶座视图后续演进 = [driver-receipt-round](2026-10-08-driver-receipt-round.md)（orient 第七问「四脚踩刹车」+
+轮次回执进 dev-loop §12；本页 S5 单页导航结构的延续，互链不合并）。
