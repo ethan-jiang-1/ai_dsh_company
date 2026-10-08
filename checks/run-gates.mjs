@@ -65,13 +65,20 @@ if (links.violations.length === 0) ok(`md-links (含 notes) ×${links.linkCount}
 //   原注释写"后 107 行"/"整治后 131"，实为 108 / 142，属"枚举型事实写两处"那一类腐化）。
 const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 84],             // 2026-09-23 二次收口；2026-09-27 瘦身轮 108→100、棘轮 115→105；2026-10-06 条目 D 纯路由化（删复述与括号链，纪律指针化；当时 95→72），棘轮 105→84
-  ['docs/index.md', 148],        // 2026-09-26 升至 149（D29/D30 行）；2026-09-27 瘦身轮：合同落点段删并、D19+D21 / D23+D24 并行、肥行压一行指针（当时 149→139），棘轮 149→146；2026-10-04 升至 147（文档地图加 testing.md 宪法行，Note 同 diff）；2026-10-05 升至 148（D35 台账行，Note 同 diff）
+  ['docs/index.md', 143],        // 2026-09-26 升至 149（D29/D30 行）；2026-09-27 瘦身轮：合同落点段删并、D19+D21 / D23+D24 并行、肥行压一行指针（当时 149→139），棘轮 149→146；2026-10-04 升至 147（文档地图加 testing.md 宪法行，Note 同 diff）；2026-10-05 升至 148（D35 台账行，Note 同 diff）；2026-10-09 D36 台账降级纯路由表（33 行 8.8KB → 34 行一句话，最长行 644→≤100）+ N1 分层规矩迁 docs/AGENTS.md（原 §文档组织原则 表 + 生命周期列搬出，本文件只留现状登记），棘轮 148→143（当时 141，留 ≥5% 头寸）；2026-10-09 N4 加 D37–D40 四行台账（+4），**同 diff 压回 143 顶格**——压掉的都是已被 docs/AGENTS.md 或下表接管的复述（导航句、§文档路由 前言、外部研究段三行折两行）。⚠ **结构张力已到顶**：台账每加一个 D 号就要腾一行，而 D1–D9 的「家」仍指向 design/（N1 章程说落地决定该归 Note，迁移是独立一轮）。下一轮再加 D 号前，先做 D1–D9 的家迁移（腾 9 行），不提额
   ['docs/orient.md', 80],        // 2026-10-06 立（RFC driver-surface-package 条目 C：驾驭者白话五问单页，只导航不复述事实；反证 = 初稿超限红）
   ['docs/guides/dev-loop.md', 395], // 2026-09-26/27 升至 467（§13、inspect 句）后同日瘦身轮：§7 整段迁 guides/bootstrap.md、§7 留指针防断链（当时 467→376），棘轮 467→395
   ['docs/testing.md', 75],       // 2026-10-04 立测试宪法（_digested/test-strategy 消化采纳轮；政策唯一家，只写 now——膨胀先迁，不加预算）；同日 61（§3.8 红/场景先行）；同日 75（§1.1 资产命名语法，用户点破 DSH「后缀即层」实践）
+  ['docs/AGENTS.md', 62],        // 2026-10-09 N1 立（docs/ 分层规矩唯一家：一处事实一个家表 + 长度棘轮 + 更新时机 + 负知识；行数上限唯一源在 run-gates 不复述数字）；反证 = doc-taxonomy 门禁（表头/不属于这层 列缺失即红）
   ['company-workspace/AGENTS.md', 195], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面（186 行 ≈ 16.4KB × 每会话），同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
+  // 文件缺失时报「缺失」而不是抛异常：抛异常会**中断整个 run-gates**，
+  // 后面所有门禁一行都不出（2026-10-09 红证：删 docs/AGENTS.md 时 doc-taxonomy 的失败菜单没机会打印）。
+  if (!existsSync(join(root, rel))) {
+    fail('doc-budget', `${rel} 不在盘上——受预算管的常驻文档不许消失（内容该搬去哪就搬，文件本身留着）`)
+    continue
+  }
   const lines = readFileSync(join(root, rel), 'utf8').split('\n').length - 1
   lines <= cap
     ? ok(`doc-budget ${rel} (${lines}/${cap})`)
@@ -96,6 +103,108 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
   handbookBytes + margin <= maxBytes
     ? ok(`handbook-budget 手册 ${handbookBytes}B + ${margin}B 余量 ≤ maxBytes ${maxBytes}`)
     : fail('handbook-budget', `手册 ${handbookBytes}B + ${margin}B > maxBytes ${maxBytes}——agent-instructions 正在静默截断手册尾部（升 preset maxBytes 或先瘦身手册）`)
+}
+
+// ── 2c-bis. 决策台账路由门禁（ledger-routing，2026-10-09 D36 立）────────────────
+// 为什么：docs/index.md 的 D 台账曾是**第三本账**——D34 以「内容 100% 派生自 Note 状态行 +
+// 胖行病史 + 违反上游 no-index 教义」退役 intents.md，而台账是同一个病的主犯（实测 33 行 8.8KB，
+// 最长行 644 字符，D1–D17 共 16 行**没有任何可解析的家**——决定的唯一住处就是那张表）。
+// 处置与 D34 同款：降级为**纯路由表**（D 号 → 一句话 → 链接），决定正文归各自 Note。
+// 本门禁挡住回潮——没有它，「一句话」会再次长回段落。
+// 负例留证（实跑，红→还原→绿）：① 任一行「一句话」超过 100 字符 → 红；② 任一行「家」格无
+// 可解析链接/路径 → 红；③ 删表头行 → 红；④ 把某行加成四列 → 红。四例均还原即绿。
+// ⚠ 形状守卫必须锚定表头：首版只查「行数 ≥ 20」是**假守卫**——数据行的正则与表头无关，删掉表头
+//   照样 34 行全解析、门禁全绿。红 C 实证该漏洞后改为「表头在场 + 表头下面才是数据行 + 恰三列」。
+{
+  const LEDGER_CELL_MAX = 100
+  const LEDGER_MIN_ROWS = 20
+  const LEDGER_HEADER = /^\|\s*#\s*\|\s*一句话\s*\|\s*决定的家\s*\|\s*$/
+  const LEDGER_SEPARATOR = /^\|(?:\s*-{3,}\s*\|){3}\s*$/
+  const dataRow = /^\|\s*(D\d+(?:\+D\d+)?)\s*\|(.*)\|\s*$/
+  const indexLines = readFileSync(join(root, 'docs/index.md'), 'utf8').split('\n')
+  const headerAt = indexLines.findIndex(line => LEDGER_HEADER.test(line))
+  const problems = []
+  if (headerAt === -1) {
+    problems.push('找不到台账表头「| # | 一句话 | 决定的家 |」——表头是本门禁的形状锚，删了它下面的行就不再是台账')
+  } else if (!LEDGER_SEPARATOR.test(indexLines[headerAt + 1] ?? '')) {
+    problems.push(`台账表头下一行不是三列分隔行（第 ${headerAt + 2} 行）`)
+  }
+  // 数据行只从表头之后算起，防止别处的 | D 号 | 形式的表格蹭进来。
+  const rows = headerAt === -1 ? [] : indexLines
+    .slice(headerAt + 1)
+    .map((line, i) => ({ line, no: headerAt + 2 + i }))
+    .filter(({ line }) => dataRow.test(line))
+  const tooLong = []
+  const malformed = []
+  const noHome = []
+  for (const { line, no } of rows) {
+    const cells = line.split('|').map(c => c.trim())
+    // cells[0]/[cells.length-1] 为空段（来自行首尾的 |）⇒ 合法列数 = 5 段
+    if (cells.length !== 5) {
+      malformed.push(`第 ${no} 行（${cells.length - 2} 列）`)
+      continue
+    }
+    const summary = cells[2]
+    const home = cells[3]
+    if (summary.length > LEDGER_CELL_MAX) tooLong.push(`第 ${no} 行（${summary.length} 字符）`)
+    const targets = [...home.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]).filter(p => !p.startsWith('http'))
+    const resolvable = targets.some(p => existsSync(join(root, 'docs', p)) || existsSync(join(root, p)))
+    if (targets.length === 0 || !resolvable) noHome.push(`第 ${no} 行`)
+  }
+  if (headerAt !== -1 && rows.length < LEDGER_MIN_ROWS) {
+    problems.push(`表头之下只解析到 ${rows.length} 行（< ${LEDGER_MIN_ROWS}）——台账被削或行形状被改坏`)
+  }
+  problems.push(
+    ...(malformed.length ? [`行必须是三列（# / 一句话 / 决定的家）：${malformed.join('、')}`] : []),
+    ...(tooLong.length ? [`「一句话」超 ${LEDGER_CELL_MAX} 字符（决定正文归 Note，本表只路由）：${tooLong.join('、')}`] : []),
+    ...(noHome.length ? [`「家」格无可解析链接（决定的唯一住处不许是本表）：${noHome.join('、')}`] : []),
+  )
+  problems.length === 0
+    ? ok(`ledger-routing ×${rows.length}（表头锚在场，每行三列、一句话 ≤${LEDGER_CELL_MAX} 字符、家可解析）`)
+    : fail('ledger-routing', problems.join('；'))
+}
+
+// ── 2c-bis-2. 文档层规范门禁（doc-taxonomy，2026-10-09 N1 立）─────────────────────
+// 为什么：docs/ 有地图（index.md）但**没有分层规矩的家**——「哪层放什么」写在 index §文档组织原则里
+// （表只有「性质」列，没有「不属于这层」列），而 DSH docs/AGENTS.md 的 tier 表**必须有一列说反例**
+// （"Does NOT belong there"）：只写正向职责，边界就靠读的人自己猜，实测后果 = docs/design/ 长出
+// 「动工前的设计决策记录」（已落地决定的叙述留在设计层，正是 tier 表说该归 Note 的那一格）。
+// 本门禁守两件事：① docs/AGENTS.md 在场且带「不属于这层」列（分层的**反例半边**不许丢）；
+// ② docs/ 下每个 .md 都在 index §现有文档 登记（实测漏登 2 份：cdp-probe / runtime-map）。
+// 负例留证（实跑，红→还原→绿）：① 删 docs/AGENTS.md → 红；② 删「不属于这层」表头 → 红；
+// ③ 新建一个未登记的 docs/*.md → 红（点名该文件）→ 还原 → 绿。
+{
+  const taxonomyPath = join(root, 'docs/AGENTS.md')
+  const docTaxProblems = []
+  if (!existsSync(taxonomyPath)) {
+    docTaxProblems.push('docs/AGENTS.md 缺失——docs/ 分层规矩没有家（规矩会散回 index 与各文件的散文里）')
+  } else {
+    const taxonomy = readFileSync(taxonomyPath, 'utf8')
+    if (!taxonomy.includes('不属于这层')) {
+      docTaxProblems.push('docs/AGENTS.md 的 tier 表缺「不属于这层」列——只写正向职责则边界靠猜（DSH tier 表的反例半边）')
+    }
+  }
+  const indexForDocs = readFileSync(join(root, 'docs/index.md'), 'utf8')
+  const allDocsMd = []
+  const walkDocs = (dir, rel) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const next = join(dir, entry.name)
+      const relNext = rel ? `${rel}/${entry.name}` : entry.name
+      if (entry.isDirectory()) walkDocs(next, relNext)
+      else if (entry.name.endsWith('.md')) allDocsMd.push(relNext)
+    }
+  }
+  walkDocs(join(root, 'docs'), '')
+  const unregistered = allDocsMd
+    .filter(rel => rel !== 'index.md')
+    .filter(rel => !indexForDocs.includes(`./${rel}`) && !indexForDocs.includes(`](${rel})`))
+    .sort()
+  if (unregistered.length) {
+    docTaxProblems.push(`这些 docs/ 文件未在 index.md §现有文档 登记（登记是路由，一件一行）：${unregistered.join('、')}`)
+  }
+  docTaxProblems.length === 0
+    ? ok(`doc-taxonomy（分层规矩在场 + ${allDocsMd.length} 份 docs 全登记）`)
+    : fail('doc-taxonomy', docTaxProblems.join('；'))
 }
 
 // ── 2c-ter. intents 行预算门禁——已随 intents.md 退役拆除（2026-10-04，D34，用户令）────
@@ -136,6 +245,12 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
 
 // ── 2d. 裸路径门禁（notebook-hygiene §机械防线，2026-09-25；2026-09-26 扩面）─────────
 // 负例留证 2026-09-27：公司手册反引号死路径 → bare-path 红（⚠ 负例要真破坏子串——includes 是子串匹配）。
+// 负例留证 2026-10-09（N5 生效日分档）：`notes/implemented/2099-01-01-x.md` 内写死路径 → 红（见 N5 Note 验证表）。
+// **N5 事实落点时效（currency）生效日**：文件名日期 ≥ 此日的 implemented/ Note 进入硬档——里面的
+// 仓库裸路径必须指到现行家（DSH `.agents/notes/implemented/AGENTS.md`："Keep paths, symbols, defaults,
+// and mechanisms current in the same change that alters them"）。此日之前的存量祖父豁免（历史负债，
+// 清理是独立一轮）。选 2026-10-09 = 本政策落地日，此后新写/改动的 Note 一律受约束。
+const NOTES_CURRENCY_EFFECTIVE_DATE = '2026-10-09'
 // 为什么：活指针腐化有复发史（AGENTS 写 `notes/rejected/` 而目录不存在；升 pin 后旧机制引用漂移）。
 // md-links 门禁只管 Markdown 链接，管不到反引号里的裸路径。
 // **2026-09-26 扩面**（技术债清扫 B 组）：原范围只有导航五文件，而腐化实际长在 docs/design、
@@ -162,12 +277,37 @@ const NOW_FILES = (() => {
   return out.concat(
     walkMd(join(root, 'tests')),
     walkMd(join(root, 'docs')),
-    // `notes/**` 分**两档**（2026-09-26 补盲区 + 分档）：
-    // · **硬档**（`proposed/` + `_backlog/` 活跃推敲卡）= **活文档**——fresh agent 会照着它去干活，死指针代价高；
-    // · **观察档**（`implemented/` `postmortem/`）= **记录当时事实**的档案——里面引的路径**当时是对的**
-    //   （实测 36/39 条是 vendor 上游改过名）。**改它就是篡改记录** ⇒ 每次提醒、不判红。
+    // `notes/**` 分**两档**（2026-09-26 补盲区 + 分档；2026-10-09 N5 **重新划线**）：
+    // · **硬档**（`proposed/` + `implemented/` + `_backlog/` 活跃推敲卡）= **活文档**——fresh agent 会照着它去干活；
+    // · **观察档**（`postmortem/` + 明确冻结的 `_backlog/_done/`）= **记录当时事实**的档案，只提醒不判红。
+    //
+    // ⚠ 2026-10-09 把 `implemented/` 从观察档移入硬档（N5 修复）。原注释说「改它就是篡改记录」，**这句是错的**：
+    //   vendor `.agents/notes/implemented/AGENTS.md` 明文区分两件事——
+    //     "Keep paths, symbols, defaults, and mechanisms current in the same change that alters them.
+    //      Rewrite stale facts in place; do not append change history." +
+    //     "**This is not a license to rewrite the *decision*** … A reversal of the decision or its rationale
+    //      requires a new Agent Note and cross-link."
+    //   即：**决定的正文不动**（改了要新 Note + 交叉链接），**事实的落点（路径/符号/默认值）要就地改新**。
+    //   我们此前把这两件事一起冻住，等于把"当时的路径"当成了决定的一部分。
+    // 实测代价（2026-10-09，同一把尺子）：本仓 574 处仓库裸路径提及里 **122 处（21.3%）盘上不存在**，
+    //   52/135 个文件（38.5%）至少含一处死指针；vendor 自己的 implemented 树是 9/247（3.6%）与 7/527（1.3%）。
+    //   **6 倍差距不是"历史必然"，是这条政策造出来的**——死了 6 倍，说明它一直在批量生产误导。
+    // 反面证据（那条"36/39 是 vendor 上游改名"的观察）：只对**vendor 内部**路径成立。本仓自己的树
+    //   （`notes/research`→退役、`snapshots/r2-motion`→重定位、`tests/*.spec.ts`→改名）是**本仓改名**造成的，
+    //   改指针到现行家成本极低，没有任何"篡改记录"问题。指向 vendor 的路径若上游已删，写清"上游 X 版已删"
+    //   或引向现行家即可，同样不是篡改——**篡改是把当时的结论改成另一套，不是把门牌号改成新的**。
+    // 例外（仍是观察档）：`postmortem/` = 事故故事，DSH 语料明说它是**唯一**该有 war-story narrative 的层；
+    //   `_backlog/_done/` = 明确冻结且不是任务源（dev-loop §0.5）。
     // 此前只扫 `notes/` 直接子文件（`p.split('/').length === 2`）⇒ `proposed/` 与 `implemented/` 全在面外。
     walkMd(join(root, 'notes/proposed')),
+    // ⚠ `notes/implemented/` 分**生效日两档**（2026-10-09 N5）——不能整棵拉进硬档：
+    //   DSH 规矩是**前瞻性**的（"in the same change that alters them"），只管**改动发生的那一刻起**。
+    //   生效日之前的存量是历史负债，一次性全判红会逼出一场 122 处的大清理，而不是建立一条会自己维持的规矩。
+    //   （与 notes-liveness 同款口径：存量祖父豁免、新写从严。存量清理是独立一轮的事，见 N5 Note「未做」。）
+    ...walkMd(join(root, 'notes/implemented')).filter(p => {
+      const m = /\/(\d{4}-\d{2}-\d{2})-/.exec(p)
+      return m !== null && m[1] >= NOTES_CURRENCY_EFFECTIVE_DATE
+    }),
     walkMd(join(root, '_backlog')).filter(p => !p.startsWith('_backlog/_done/')),
     walkMd(join(root, 'company-workspace')).filter(p => !/^company-workspace\/(deliverables|deliverables-archive|kb\/[^/]+\/journal)\//.test(p)),
   )
@@ -175,20 +315,28 @@ const NOW_FILES = (() => {
 /** Historical bare receipts are observed; rendered Markdown navigation still uses the hard link gate. */
 // 2026-10-05：_backlog/_done 明确冻结且不是任务源（dev-loop §0.5），其历史裸命令不能按活指针改写。
 // 不豁免活跃 plans/bugs/reference，也不豁免这些历史文件的 Markdown 导航目标。
-/** 观察档：notes implemented/postmortem 与明确冻结的 _backlog/_done；保留当时裸路径并提醒。 */
+/** 观察档 = 事故故事与冻结归档：`notes/postmortem/`（DSH 语料：唯一该有 war-story narrative 的层）+
+ *  明确冻结的 `_backlog/_done/`；保留当时裸路径并提醒。
+ *  ⚠ 2026-10-09 起 **`notes/implemented/` 不在此列**（N5）：它受「随改动就地更新事实落点」约束，见上方硬档注释。 */
 const WARN_FILES = (() => {
   const walkMd = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const path = join(dir, entry.name)
     if (entry.isDirectory()) return ['node_modules', '.git', 'lib'].includes(entry.name) ? [] : walkMd(path)
     return entry.name.endsWith('.md') ? [path.slice(root.length + 1)] : []
   })
-  return [...walkMd(join(root, 'notes/implemented')), ...walkMd(join(root, 'notes/postmortem')), ...walkMd(join(root, '_backlog/_done'))]
+  return [...walkMd(join(root, 'notes/postmortem')), ...walkMd(join(root, '_backlog/_done'))]
 })()
 const TOP_DIRS = ['notes/', 'docs/', 'checks/', 'probes/', 'tools/', 'packages/', 'snapshots/', 'run/', 'runtime/', 'tests/', 'company-workspace/', 'vendor/']
 const RUNTIME_PREFIXES = ['runtime/harness-home', 'runtime/harness-home-b', 'runtime/rehearsal-workspace', 'runtime/pw-browsers', '.pnpm-store']   // gitignored 运行态（2026-10-06 条目 A：dev/ 拆分，运行残留随迁顶层 runtime/）
 // 双树查：本仓根 **或** vendor/dsh 命中即过（AGENTS 纪律表的"权威（vendor 树）"列合法使用 vendor 相对写法）。
 // 白名单 = 历史性退役路径的叙述性提及（自带"现迁至…"说明的历史段）。
 const RETIRED_PATHS = new Set(['docs/plans/roadmap.md'])
+// 负例自重（2026-10-09 N5 立）：**故意写出来给人复现的假路径**，与「腐化指针」形状完全相同，静态扫描
+// 分不开（实测：N5 生效后头两条命中就是我自己 Note 里描述负例用的 `docs/zz-tmp-unregistered.md`）。
+// 约定 = 假路径里带 `zz-`/`zzz-`（本仓从未有过以 zz 开头的真实路径；见命名自带"这是测试值"的语义）。
+// 为什么要放行而不能改措辞绕开：负例必须**逐字可复现**——把路径写成 `docs/zz‑tmp…`（换字符）或
+// 「某个不存在的 docs 文件」就复现不了了。天真的做法是让作者改文风，正确做法是给假路径一个可判别的记号。
+const FIXTURE_PATH = /(^|\/)zz+-/
 let barePathCount = 0
 let barePathBad = false
 const barePathWarn = []
@@ -203,6 +351,7 @@ const scanBarePaths = (files, hit) => {
         if (/[*<>…{}]/.test(raw) || raw.includes(' ')) continue          // 通配/占位/花括号展开/命令行不是路径
         raw = raw.replace(/:\d+(?:-\d+)?$/, '')                          // 引文行号不是路径的一部分
         if (RUNTIME_PREFIXES.some(p => raw.startsWith(p))) continue
+        if (FIXTURE_PATH.test(raw)) continue                             // 负例假路径（见上）
         barePathCount++
         if (!existsSync(join(root, raw)) && !existsSync(join(root, 'vendor/dsh', raw)) && !RETIRED_PATHS.has(raw)) {
           hit(`${rel}:${i + 1}`, raw)
@@ -341,6 +490,98 @@ for (const role of roles) {
   }
 }
 ok(`presets ×${roles.length}`)
+
+// ── 3-bis. preset 行 schema 必填字段门禁（preset-required-config，2026-10-09 N4 立）────
+// 复发依据（**已实地复发**，不是推测）：postmortem 0001（preset 挂载失败、用户浏览器里才发现）
+// 明文把「`scripts/verify.mjs` check 8 — rows with known schema-required fields must carry them」
+// 列为它产出的护栏之一；**该门禁现已不存在**（N4 实测：删掉 0001 的元凶字段
+// `sampleOverCapGlobResults`，`pnpm verify` 依然 ALL PASS，只有真挂载的 preset-smoke 才红）。
+// ⇒ 事故留下的护栏在改名/重构中**静默丢失**，而没有任何机制发现它丢了。
+// 判据源 = vendor **committed** 生成物 `docs/config-catalog.md`（145 个 catalog 块 / 56 包有必填字段）：
+// 结构即事实——`  name: type` = 必填，`  name?: type` = 有默认值。不用 import vendor TS（免构建、免越界）。
+// 病灶形状 = 行**声明了 config 却漏字段**；行压根没 config（如 tool-todo 在别处）不归本门禁管
+// （那是"该不该配"的设计问题，preset-smoke 的真挂载覆盖）。
+// 负例留证 2026-10-09：删 ceo 行 `sampleOverCapGlobResults: false` → preset-required-config 红 + preset-smoke 红
+//（3 FAILURE）；还原 → 双绿。收据 = implemented/2026-10-09-postmortem-guard-restoration.md。
+{
+  // 空转下限：声明了 config 的行数不该莫名缩水（形状变了要报，不是静默少查几行）。
+  const MIN_EXPECTED_CONFIG_ROWS = 20
+  const catalogPath = join(root, 'vendor/dsh/docs/config-catalog.md')
+  const presetRequired = new Map()   // '@scope/pkg' → ['field', ...]
+  if (existsSync(catalogPath)) {
+    const catalog = readFileSync(catalogPath, 'utf8')
+    const blockRe = /<!-- BEGIN GENERATED config-catalog:(@\S+) -->([\s\S]*?)<!-- END GENERATED config-catalog:\1 -->/g
+    for (const [, pkg, body] of catalog.matchAll(blockRe)) {
+      const fence = /```ts config-catalog\n([\s\S]*?)```/.exec(body)
+      if (fence === null) continue
+      // 只认顶层 `export interface Config {`（缩进 0）里的字段（缩进恰 2 空格）；嵌套对象/其它接口不算。
+      const iface = /^export interface Config \{\n([\s\S]*?)^\}/m.exec(fence[1])
+      if (iface === null) continue
+      const fields = []
+      for (const line of iface[1].split('\n')) {
+        const m = /^ {2}([A-Za-z_][A-Za-z0-9_]*):/.exec(line)   // 无 `?` = 必填
+        if (m !== null) fields.push(m[1])
+      }
+      if (fields.length > 0) presetRequired.set(pkg, fields)
+    }
+  }
+  if (presetRequired.size === 0) {
+    fail('preset-required-config', '解析不出 vendor docs/config-catalog.md 的必填字段（判据源没了：catalog 格式改了还是文件被移走了？）')
+  } else {
+    const missing = []
+    let checkedRows = 0
+    for (const role of roles) {
+      const file = join(root, 'packages/company-pack/presets', role, 'agent.cordis.yml')
+      if (!existsSync(file)) continue
+      const lines = readFileSync(file, 'utf8').split('\n')
+      // 逐行找 `- id:` 行块，取块的 name 与 config 子键（YAML 子集：够读本仓自写的 preset 文件）
+      for (let i = 0; i < lines.length; i++) {
+        const idm = /^\s*-\s*id:\s*(\S+)/.exec(lines[i])
+        if (idm === null) continue
+        const indent = /^(\s*)/.exec(lines[i])[1].length
+        let name = null
+        const configKeys = []
+        let sawConfig = false
+        let inConfig = false
+        let configIndent = -1
+        for (let j = i + 1; j < lines.length; j++) {
+          const raw = lines[j]
+          if (raw.trim() === '') continue
+          const ind = /^(\s*)/.exec(raw)[1].length
+          if (ind <= indent && /^\s*-/.test(raw)) break        // 下一个兄弟行
+          if (ind <= indent && /\S/.test(raw)) break
+          const nm = /^\s*name:\s*'?"?([^'"\s]+)'?"?\s*$/.exec(raw)
+          if (nm !== null && name === null) { name = nm[1]; continue }
+          const cfg = /^(\s*)config:\s*$/.exec(raw)
+          if (cfg !== null) { sawConfig = true; inConfig = true; configIndent = cfg[1].length; continue }
+          if (inConfig === true) {
+            const km = /^(\s*)([A-Za-z_][A-Za-z0-9_]*):/.exec(raw)
+            if (km !== null) {
+              if (km[1].length <= configIndent) { inConfig = false; continue }   // config 块结束
+              configKeys.push(km[2])
+            }
+          }
+        }
+        // ⚠ 判据必须是「这一行**声明了** config」，不是「config 里还剩几个键」——后者会让
+        //   "删掉最后一个必填键"变成"这行不再有 config ⇒ 跳过"，**门禁静默放行**（N4 实测首版就栽在这，
+        //   删元凶字段后只看到计数 32→30 而全绿）。声明了 config 的行一律受判，哪怕 config 已空。
+        if (name === null || sawConfig === false) continue    // 压根没 config 行 = 不归本门禁（见上）
+        const required = presetRequired.get(name)
+        if (required === undefined) continue
+        checkedRows++
+        const lacked = required.filter(f => !configKeys.includes(f))
+        if (lacked.length > 0) missing.push(`${role}: ${name}（${lacked.length} 个必填字段缺）${lacked.join(', ')}`)
+      }
+    }
+    if (checkedRows < MIN_EXPECTED_CONFIG_ROWS) {
+      fail('preset-required-config', `只识别到 ${checkedRows} 个「声明了 config」的行（期望 ≥${MIN_EXPECTED_CONFIG_ROWS}）——解析退化了（YAML 形状改了？），门禁可能在空转`)
+    } else {
+      missing.length === 0
+        ? ok(`preset-required-config ×${checkedRows} 行（声明了 config 的行，必填字段齐——判据 = vendor config-catalog）`)
+        : fail('preset-required-config', `这些 preset 行的 config 漏 schema 必填字段（挂载时整份 preset 失败且 UI 静默——事故 0001 复原）：${missing.join('；')}`)
+    }
+  }
+}
 
 // ── 4. CLAUDE.md symlink → AGENTS.md ────────────────────────────────────────
 // 负例留证 2026-09-27：CLAUDE.md 换成普通文件 → claude-symlink 红。

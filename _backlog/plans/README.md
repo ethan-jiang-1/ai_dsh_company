@@ -11,7 +11,8 @@
 
 | 卡 | 一句话 | 毕业门判断 |
 |---|---|---|
-| （空——活跃卡全部毕业，新卡按章程立） | | |
+| [2026-10-09-decision-ledger-home-migration](2026-10-09-decision-ledger-home-migration.md) | D1–D9 决策的家从 design/ 迁到 Note（N1 章程 + 台账顶格双力） | 该做：先出九条→候选 Note 映射表，再改台账第三列 |
+| [2026-10-09-stale-pointer-cleanup](2026-10-09-stale-pointer-cleanup.md) | 存量 122 处死指针清理（N5 留的欠账）+ 事故护栏存活检查机制 | 待触发：有人真走错 ≥1 次，或下次大改 implemented/ |
 
 ## 卡片模板
 

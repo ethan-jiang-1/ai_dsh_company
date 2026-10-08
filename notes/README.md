@@ -12,7 +12,7 @@
 | 位置 | 装什么 | 状态行怎么读 | 读者怎么用 |
 |---|---|---|---|
 | [proposed/](proposed/README.md) | 未实施的**已批 RFC**（问题/方案/输掉的方案/验收） | 状态行自带「批准：」标记 + 「## 验收」节（门禁双查） | 看验收与方案；**不能当已交付**；实施次序 = 用户逐条给（D32） |
-| [implemented/](implemented/) | 已交付决定 + 击败的备选 + 后果与验证 | `状态：` 行以 implemented / 已交付 / 已消化 开头（门禁查新写） | **当前 rationale owner**，随实现保持 current |
+| [implemented/](implemented/) | 已交付决定 + 击败的备选 + 后果与验证 | `状态：` 行以 implemented / 已交付 / 已消化 开头（门禁查新写） | **当前 rationale owner**——决定正文冻结，**事实落点（路径/符号/默认值）随改动就地改新**（§三 bare-path） |
 | [rejected/](rejected/README.md) | 被否决提案 + 一行拒绝原因 | `rejected` | 只在还能阻止同一个可信错误时保留；失效即删 |
 | [archived/](archived/README.md) | 冻结证据台账（研究收卷、intents 终档） | 冻结 | 只作历史引用，**不再编辑**，不是当前权威 |
 | [postmortem/](postmortem/README.md) | 事故复盘（编号 000N） | — | 事故 ≠ 设计推敲（[_backlog 章程](../_backlog/README.md)同款区分） |
@@ -49,8 +49,13 @@ Markdown 链接（md-links 门禁硬查）。**生命周期是移动不是复制
 - `notes-liveness`（D35 立）：`implemented/` 文件名日期 ≥ 2026-10-05 的 Note，前 6 行必须有 `状态：` 行
   且以生命周期词（implemented/已交付/已消化）开头——存量按生效日祖父豁免；反证 =
   [implemented/notes-taxonomy-owner](implemented/2026-10-05-notes-taxonomy-owner.md)。
-- `md-links`（notes 全树硬查）/ `bare-path`（proposed/ 硬档；implemented、postmortem、archived = 观察档
-  ——记录当时事实，改它就是篡改记录）。
+- `md-links`（notes 全树硬查）/ `bare-path`（**proposed/ + implemented/ 新写为硬档**；`postmortem/`、
+  `archived/`、`_backlog/_done/` = 观察档）。**事实落点时效**（2026-10-09 N5 修）：implemented/ 的
+  **决定正文不动**，但**路径/符号/默认值这类事实落点随改动就地改新**——依据 = vendor
+  `.agents/notes/implemented/AGENTS.md`「keep paths … current in the same change that alters them；
+  This is not a license to rewrite the *decision*」。分生效日：文件名日期 ≥ 2026-10-09 的进硬档，
+  存量祖父豁免（清存量是独立一轮，见 [currency Note](implemented/2026-10-09-implemented-note-currency.md)）。
+  负例里的**假路径**带 `zz-`/`zzz-` 记号（门禁放行，保证负例逐字可复现）。
 - **升级触发（不预铺）**：implemented 无真证据落档复发 → 「真证据」升机械门禁（负例夹具同 diff）；
   状态词表新增 → 词表与门禁同 diff 更新。
 

@@ -87,8 +87,15 @@ mount.
   `session/create` for **every** preset. This is the only check that exercises row config
   validation. Proven by regression injection: removing `sampleOverCapGlobResults` turns it red with
   the exact host error, while the other three presets stay green.
-- `scripts/verify.mjs` check 8 — rows with known schema-required fields must carry them (fast, runs
-  in `pnpm test`'s neighbourhood).
+- `preset-required-config` 门禁（`checks/run-gates.mjs`，**2026-10-09 N4 复原**）— rows that declare a
+  `config:` must carry that plugin's schema-required fields. Fast, keyless, in `pnpm verify`.
+  判据源 = vendor committed `docs/config-catalog.md`（`  name: type` = 必填）。
+  ⚠ **本条的原始承诺曾静默失效**：此处原写 `` `scripts/verify.mjs` check 8 — rows with known
+  schema-required fields must carry them``，该检查在 `verify.mjs` → `checks/run-gates.mjs` 的改名/重构中
+  丢失且无人发现（N4 实测：删掉本事故的元凶字段，`pnpm verify` 依然全绿，只剩 `preset-smoke` 的红）。
+  复原时的负例 = 删 `sampleOverCapGlobResults` + `allowParallelInProgress` → 该门禁红 → 还原 → 绿；
+  收据 = [implemented/2026-10-09-postmortem-guard-restoration](../implemented/2026-10-09-postmortem-guard-restoration.md)。
+  **教训（事故的第二层）**：事故留下的护栏本身也需要护栏——"这条护栏还在吗"没有任何机制在查。
 - 收尾清单第 6 条（时为 `docs/plans/roadmap.md`，D24 后随收尾程序住
   [guides/dev-loop §12](../../docs/guides/dev-loop.md)）— every round ends with `verify` + `test` +
   `preset-smoke`.
