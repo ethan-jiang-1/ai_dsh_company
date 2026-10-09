@@ -328,9 +328,7 @@ ai_dsh_company/
 
 ## 7. 落地节奏（现在时）
 
-开发队列已退役（D32，2026-09-28）：没有中心排序文件——任务源 = `notes/proposed/` 已批 RFC 与
-[_backlog/_done/_misc/polish.md](../../_backlog/_done/_misc/polish.md)（磨活，2026-09-28 整池退役迁入），实施次序由用户逐条给；裁决前的思考住
-[_backlog/plans/](../../_backlog/plans/README.md)（推敲卡，D31）。**本节保留节号**：§8–§10 的编号被多篇
+开发队列已退役（D32，2026-09-28）：没有中心排序文件——任务源 = `notes/proposed/` 已批 RFC 与用户点名，实施次序由用户逐条给。尚未成熟的问题在 [_backlog/issues/](../../_backlog/issues/README.md) 推敲；旧磨清单已归档在 [_backlog/_archive/legacy/](../../_backlog/_archive/legacy/README.md)，不是现行任务源。**本节保留节号**：§8–§10 的编号被多篇
 文档与 Note 交叉引用，删号会级联改十几处引用，不值当。
 
 ## 8. 风险与先验证清单

@@ -1,7 +1,7 @@
 # 浮窗几何记忆——浮出位置/大小下次还原 + 视口不足时钳入（已交付）
 
 状态：已交付（2026-09-28 实施同日真入口验收 ALL PASS；含两处**实施期事实修正**，见下。
-源卡 [_backlog/_done/_closed_plans/2026-09-28-float-geometry-memory.md](../../_backlog/_done/_closed_plans/2026-09-28-float-geometry-memory.md)）
+源卡 [_backlog/_done/_closed_plans/2026-09-28-float-geometry-memory.md](../../_backlog/_archive/settled_issues/2026-09-28-float-geometry-memory.md)）
 
 ## 问题
 

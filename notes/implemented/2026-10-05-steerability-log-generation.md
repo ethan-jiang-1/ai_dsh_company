@@ -1,6 +1,6 @@
 # 2026-10-05 · 会话日志世代选择修复（steerability 毕业拆分 5/6，已实施）
 
-状态：已消化（2026-10-05 实施完成：红→绿 + 真数据双基线验证；来源 = 推敲卡 [repository-steerability](../../_backlog/_done/_closed_plans/2026-10-05-repository-steerability.md) 毕业拆分第 5 条——用户令「继续下面的 5 条 RFC」后按依赖序首个实施）
+状态：已消化（2026-10-05 实施完成：红→绿 + 真数据双基线验证；来源 = 推敲卡 [repository-steerability](../../_backlog/_archive/settled_issues/2026-10-05-repository-steerability.md) 毕业拆分第 5 条——用户令「继续下面的 5 条 RFC」后按依赖序首个实施）
 
 ## 交付（现在时）
 

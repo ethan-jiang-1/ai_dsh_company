@@ -1,6 +1,6 @@
 # 2026-10-05 · company-pack 的 pack/source/generated 边界（steerability 毕业拆分 2/6，已实施）
 
-状态：已消化（2026-10-05 实施完成；来源 = 推敲卡 [repository-steerability](../../_backlog/_done/_closed_plans/2026-10-05-repository-steerability.md) 毕业拆分第 2 条；含同批拍板：src/lib 的 host/domain 物理拆分延后——重启条件见文末）
+状态：已消化（2026-10-05 实施完成；来源 = 推敲卡 [repository-steerability](../../_backlog/_archive/settled_issues/2026-10-05-repository-steerability.md) 毕业拆分第 2 条；含同批拍板：src/lib 的 host/domain 物理拆分延后——重启条件见文末）
 
 ## 交付（现在时）
 

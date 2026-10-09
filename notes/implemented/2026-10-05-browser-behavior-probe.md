@@ -2,7 +2,7 @@
 
 状态：已交付（2026-10-05 用户令「你已经有自己测试浏览器的能力，先测试一遍，系统性的测试一遍，替我
 测试一遍」；**判据先行**——probe 头注 B0–B5 写死后真跑；deferred-verifications 卡两笔全判收毕业 =
-[卡](../../_backlog/_done/_closed_plans/2026-10-02-deferred-verifications.md)）
+[卡](../../_backlog/_archive/settled_issues/2026-10-02-deferred-verifications.md)）
 
 ## 交付
 
@@ -75,7 +75,7 @@ sandbox 联动。**选型维持用户 2026-10-03 拍板的「暂缓登记」，�
 
 ## 依据
 
-- deferred-verifications 卡（两笔债的出处与判收口径）：[卡](../../_backlog/_done/_closed_plans/2026-10-02-deferred-verifications.md)
+- deferred-verifications 卡（两笔债的出处与判收口径）：[卡](../../_backlog/_archive/settled_issues/2026-10-02-deferred-verifications.md)
 - 批5b 首验与 EPERM 首证：[plugin-harvest-round §风险](./2026-09-30-plugin-harvest-round.md)
 - 机制语义（写判据前源码定位）：playwright-core coreBundle（serverRegistry / registryDirectory
   env 感知 / defaultCacheDirectory2 直连）；experimental/browser-use-playwright-mcp/src/index.ts

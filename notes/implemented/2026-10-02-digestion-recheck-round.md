@@ -68,7 +68,7 @@ preset-smoke / delegation-smoke --delegate（含 [3] 守卫输出）四项各一
 ## 未完成与下一步
 
 - **feedback 家族收割**（message-feedback / ui-message-feedback 出厂已挂零消费 + command-feedback，
-  喂培养回路）= 推敲卡 [_backlog/plans/2026-10-02-feedback-channel-cultivation.md](../../_backlog/_done/_closed_plans/2026-10-02-feedback-channel-cultivation.md)
+  喂培养回路）= 推敲卡 [_backlog/plans/2026-10-02-feedback-channel-cultivation.md](../../_backlog/_archive/settled_issues/2026-10-02-feedback-channel-cultivation.md)
   （毕业门 = 消费面选型/语义权重/demo 叙事三问）。
 - 中档货架候选（web-search-exa、session-log-export、session-title-llm、inspector）登记在该卡附录，
   触发条件各自成立再议。

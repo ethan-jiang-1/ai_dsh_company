@@ -15,8 +15,8 @@
 3. **第三批**：C6（interrupt 竞态）/C7（cold-resume 邮箱恢复）——prompt 最难驱动，可能需要更
    确定的驱动器。
 4. **挂起**：C8（跨进程——等产品决策 `dsh-atomic-write`；**推敲卡已立** =
-   [_backlog/_done/_closed_plans/2026-10-04-cross-process-shared-disk](../../_backlog/_done/_closed_plans/2026-10-04-cross-process-shared-disk.md)）、
-   H6（注意力中心是否报成员动态——**已裁决进卡** = [_backlog/_done/_closed_plans/2026-10-04-work-status-visibility](../../_backlog/_done/_closed_plans/2026-10-04-work-status-visibility.md)）、H8（多人开门常态化触发）。
+   [_backlog/_done/_closed_plans/2026-10-04-cross-process-shared-disk](../../_backlog/_archive/settled_issues/2026-10-04-cross-process-shared-disk.md)）、
+   H6（注意力中心是否报成员动态——**已裁决进卡** = [_backlog/_done/_closed_plans/2026-10-04-work-status-visibility](../../_backlog/_archive/settled_issues/2026-10-04-work-status-visibility.md)）、H8（多人开门常态化触发）。
 
 ## 交付
 
@@ -38,7 +38,7 @@
 - 两张推敲卡毕业迁 `_done/_closed_plans/`（状态行补去向）；后续批次（上表 2/3/挂起）由本 Note 接续跟踪。
 - [multi-user-concurrency-lane Note](./2026-10-04-multi-user-concurrency-lane.md) 的 S1–S6 =
   粗粒度跟踪；本 Note 的 C/H 系 = 细粒度展开（S4 双门与 H2 同物；S5/S6 与 H8/C8 交叠处以后到者为准）。
-- redis 判定树与 [writing-collab-locks-redis 毕业卡](../../_backlog/_done/_closed_plans/2026-09-29-writing-collab-locks-redis.md)
+- redis 判定树与 [writing-collab-locks-redis 毕业卡](../../_backlog/_archive/settled_issues/2026-09-29-writing-collab-locks-redis.md)
   同宗（R0 四条原生协作已落地）：单进程内建够 → 跨进程规矩层 → dsh-atomic-write → redis 最后手段。
 
 ## 输掉的方案

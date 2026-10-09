@@ -5,7 +5,7 @@
 > 登记行 = [index §外部研究材料登记](../docs/index.md)）；DSH 原生定义 =
 > [vendor Agent Notes](../vendor/dsh/.agents/notes/README.md)；收尾动作清单 = [dev-loop §12](../docs/guides/dev-loop.md)；
 > RFC 层合同与实施 TDD 红绿环 = [proposed/README](proposed/README.md)（条目开工必读）；上游推敲/缺陷卡 =
-> [_backlog/](../_backlog/README.md)（推敲卡不是任务源，D32）。
+> [_backlog/issues/](../_backlog/issues/README.md)（未成熟问题的澄清与交接，卡片状态不授权实施；规则见 [_backlog/](../_backlog/README.md)）。
 
 ## 一、状态轴：一眼怎么读
 

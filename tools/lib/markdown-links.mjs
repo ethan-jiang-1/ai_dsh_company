@@ -100,6 +100,21 @@ function documentAnchors(tree) {
   return anchors
 }
 
+/** Resolve local Markdown link/definition targets for index membership; prose names are not links. */
+export function markdownLinkTargets(file, source = readFileSync(file, 'utf8')) {
+  const targets = new Set()
+  visit(parse(source), (node) => {
+    if (!['link', 'definition'].includes(node.type)) return
+    const url = node.url
+    if (url.startsWith('/') || /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(url)) return
+    try {
+      const path = decodeURIComponent(url.split('#')[0].split('?')[0])
+      targets.add(path === '' ? resolve(file) : resolve(dirname(file), path))
+    } catch { /* Malformed escapes are reported by validateMarkdownLinks. */ }
+  })
+  return targets
+}
+
 /**
  * Check Markdown links/images/definitions with cached target headings and source line diagnostics.
  * Root-absolute URLs and schemes are renderer-owned; non-Markdown fragments are not interpreted.

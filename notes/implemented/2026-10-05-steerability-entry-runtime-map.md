@@ -1,6 +1,6 @@
 # 2026-10-05 · 入口与运行态地图——人与 Coding Agent 共用的首屏（steerability 毕业拆分 1/6，已实施）
 
-状态：已消化（2026-10-05 实施完成，终局 fresh-agent 五问走查验收通过；来源 = 推敲卡 [repository-steerability](../../_backlog/_done/_closed_plans/2026-10-05-repository-steerability.md) 毕业拆分第 1 条——steerability 系列六条 RFC 至此全部实施完毕）
+状态：已消化（2026-10-05 实施完成，终局 fresh-agent 五问走查验收通过；来源 = 推敲卡 [repository-steerability](../../_backlog/_archive/settled_issues/2026-10-05-repository-steerability.md) 毕业拆分第 1 条——steerability 系列六条 RFC 至此全部实施完毕）
 
 ## 交付（现在时）
 

@@ -1,7 +1,7 @@
 # 2026-10-04 · 共享盘写完整性收敛：动议任务板认领立进手册（小修，无 RFC）
 
 状态：已交付（2026-10-04 用户拍板走 Agent Teams 协调面并点名推进；**小修不设 RFC**——章程毕业四门
-明文「小修可不设 RFC，由用户点名直接做」；推敲全程 = [cross-process-shared-disk 卡](../../_backlog/_done/_closed_plans/2026-10-04-cross-process-shared-disk.md)）
+明文「小修可不设 RFC，由用户点名直接做」；推敲全程 = [cross-process-shared-disk 卡](../../_backlog/_archive/settled_issues/2026-10-04-cross-process-shared-disk.md)）
 
 ## 问题
 
@@ -35,7 +35,7 @@ E2 实测（2026-10-03，双进程 fs-local）：同版本守卫写 ×20 = 20/20
   真实工作形态。
 - **把 Agent Teams 任务所有权/writeScopes 当锁**：上游裁决否决（「假互斥比明示警告更危险」；
   README 三处声明 process-local、无文件锁）——它的正确用法是协调面，不是互斥面。
-- **redis/TTL 锁家族**：上游两连否，见 [writing-collab-locks-redis 卡事实 8](../../_backlog/_done/_closed_plans/2026-09-29-writing-collab-locks-redis.md)。
+- **redis/TTL 锁家族**：上游两连否，见 [writing-collab-locks-redis 卡事实 8](../../_backlog/_archive/settled_issues/2026-09-29-writing-collab-locks-redis.md)。
 - **dsh-atomic-write 脚本侧采纳**：形状已复核属实（`withFileLock` 跨进程写锁，同机可用），但当前
   无常驻脚本写者——指针住 [multi-human.md §4](../../docs/multi-human.md)，需求出现再采纳。
 
@@ -51,7 +51,7 @@ E2 实测（2026-10-03，双进程 fs-local）：同版本守卫写 ×20 = 20/20
 
 ## 依据
 
-- 推敲全过程与形状复核证据：[cross-process-shared-disk 卡](../../_backlog/_done/_closed_plans/2026-10-04-cross-process-shared-disk.md)
-- E1 守卫实证 + E2 互踩实证：[collab-mechanism-evidence 卡](../../_backlog/_done/_closed_plans/2026-09-29-collab-mechanism-evidence.md)
+- 推敲全过程与形状复核证据：[cross-process-shared-disk 卡](../../_backlog/_archive/settled_issues/2026-10-04-cross-process-shared-disk.md)
+- E1 守卫实证 + E2 互踩实证：[collab-mechanism-evidence 卡](../../_backlog/_archive/settled_issues/2026-09-29-collab-mechanism-evidence.md)
 - Agent Teams 能力与边界（process-local / advisory writeScopes / 无文件锁）：vendor 树
   `packages/experimental/agent-team/README.md`（pin dsh-v0.2.0-rc.2）

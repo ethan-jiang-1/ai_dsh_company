@@ -20,14 +20,14 @@
 - **①录制**：`replay-smoke --record --keep --wall 7200` 真模型完成（任务源 session.v3.jsonl = r6 同题，1 段 514s）——**final 在盘**，1 lead（771 行）+ 4 child；`snapshot-motion` 因 `/var` 符号链接拒工（oracle 纪律行为正确）改手工簿记：sessions/（zstd 多帧走 CLI 解，§3.7 教义）+ workspace.expected + snapshot.yml（代码锚 = `68e42ac`）。归档 = `snapshots/replay/r7-motion-final/`（README 记运行态事实）。
 - **②预算**：红 = `snapshots-budget 68.4M > 64M` → 处置 = r6 四个 child fixtures（≈15M，登记债点名物）外置 `runtime/cold-storage/`（runtime/README 登记；仓内 raw.tar.zst 承担恢复与备份连续性；r6 不声明 replay 故无消费面断裂）→ 绿 = `54.5M/64M`。附带红 = r7 journal 两份尾换行（r6 同款教训，gate 红→规范→绿）。
 - **③走查**：切片 `orient --workspace` 单独 commit（`20d32a4`，红绿环+反证收据在彼 commit）；本包对归档快照复跑 = 「已关闭（final 在场，不报）」——**关闭门在完整真终局上的活体验证**；`--scenario replay/r7-motion-final` 视图字段全解析。
-- **④审计**：`deliverables-check --only recon-pack` = 成品 1（final，Lead ceo depth0 present）+ 过程稿 7 + **违规 1 条 `meta-shape-bad`**（真发现 → [BUG-006](../../_backlog/_done/_fixed_bugs/BUG-006-ceo-meta-vocab-drift.md)：CEO 词表外值，生成侧修，快照不重写）；中途踩 T-7 教义（--only 须给剥日期前缀的归一 slug）。
+- **④审计**：`deliverables-check --only recon-pack` = 成品 1（final，Lead ceo depth0 present）+ 过程稿 7 + **违规 1 条 `meta-shape-bad`**（真发现 → [BUG-006](../../_backlog/_archive/fixed_bugs/BUG-006-ceo-meta-vocab-drift.md)：CEO 词表外值，生成侧修，快照不重写）；中途踩 T-7 教义（--only 须给剥日期前缀的归一 slug）。
 - **⑤语料**：case 16 fixture（cases/16-r7-recon-pack，brief = 真模型 CEO 原文）+ labels 真盘行（slug = `recon-pack`）判据先行；自检腿 ALL PASS（16 case，三规则全不报 = 真盘真阴性）；`--labels --variants` 全表 exit 0，聚合指标与收口时数字一致（case 16 无新增 TP/FP）；**机器标注待人复核 = 呈批停止点**。真盘产物归业务历史家 `deliverables-archive/2026-10-07-recon-pack/`（打分腿输入契约）。
 - **⑥收割三问**：①异常 = BUG-006（meta 词表越表）+ T-7/--only 踩坑（既有教义，未新增卡）；②值得钉 = r7 场景本身 + case 16；③运行态事实 = **同题 8.5 分钟到 final vs r6 60 分钟无 final（模型侧方差，wall 兜底纪律保留）**、**CEO 本场回写了状态行（case 14 反形状——两种真盘形状齐了）**、/var 符号链接拒 captureWorkspace。均入场景 README。
 
 ## 边界与未做
 
 - ~~case 16 机器标注待人复核~~ → **已复核 2026-10-07**：用户裁定无修改，维持机器标注——全表数字转无条件值（16 case + 3 真盘行全部人复核）。
-- ~~BUG-006 修复未做~~ → **同日修复**：生成侧 meta.md 模板钉词表枚举（红绿收据见 [BUG-006 卡](../../_backlog/_done/_fixed_bugs/BUG-006-ceo-meta-vocab-drift.md) 状态行与对应 commit）。
+- ~~BUG-006 修复未做~~ → **同日修复**：生成侧 meta.md 模板钉词表枚举（红绿收据见 [BUG-006 卡](../../_backlog/_archive/fixed_bugs/BUG-006-ceo-meta-vocab-drift.md) 状态行与对应 commit）。
 - r7 未声明可运行 replay（同 r6 先例）；fixtures 消费面 = 审计/对照，非重放。
 
 ## 输掉的方案（备选必载，留尸）

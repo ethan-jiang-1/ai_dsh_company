@@ -1,7 +1,7 @@
 # 依赖图渲染质量三轮定稿——车道分离、跨层边边缘通道、foreignObject 移除（已交付）
 
 状态：已交付（2026-09-28 实施同日全验收链通过。源卡
-[_backlog/_done/_closed_plans/2026-09-28-dag-edge-routing.md](../../_backlog/_done/_closed_plans/2026-09-28-dag-edge-routing.md)）
+[_backlog/_done/_closed_plans/2026-09-28-dag-edge-routing.md](../../_backlog/_archive/settled_issues/2026-09-28-dag-edge-routing.md)）
 
 ## 问题
 

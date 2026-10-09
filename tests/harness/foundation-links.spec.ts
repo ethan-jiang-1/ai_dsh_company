@@ -2,7 +2,7 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { sourceMarkdownFiles, validateMarkdownLinks } from '../../tools/lib/markdown-links.mjs'
+import { markdownLinkTargets, sourceMarkdownFiles, validateMarkdownLinks } from '../../tools/lib/markdown-links.mjs'
 
 const scratch = join(ROOT, 'node_modules/.cache/company-markdown-links')
 let root: string
@@ -28,7 +28,8 @@ describe('bounded source discovery', () => {
     const sources = ['README.md', 'README.zh.md', 'AGENTS.md',
       'docs/guides/new.md', 'checks/README.md', 'checks/guides/README.md', 'snapshots/README.md', 'notes/proposed/new.md',
       'notes/implemented/new.md', 'notes/rejected/new.md', 'notes/postmortem/new.md',
-      '_backlog/new.md', '_backlog/plans/new.md', 'packages/company-pack/README.md',
+      '_backlog/new.md', '_backlog/issues/new.md', '_backlog/bugs/new.md', '_backlog/research/new.md',
+      '_backlog/methods/new.md', '_backlog/_archive/README.md', '_backlog/_archive/fixed_bugs/old.md', 'packages/company-pack/README.md',
       'packages/company-pack/src/README.md', 'packages/company-pack/presets/ceo/skills/new/SKILL.md',
       'company-workspace/AGENTS.md', 'company-workspace/kb/org.md',
       'company-workspace/kb/new-role/CHARTER.md', 'company-workspace/templates/nested/new.md']
@@ -61,6 +62,19 @@ describe('bounded source discovery', () => {
     const report = validateMarkdownLinks(root)
     expect(report.files).toEqual([join(root, 'AGENTS.md')])
     expect(report.violations).toHaveLength(1)
+  })
+})
+
+describe('index targets resolved from GFM', () => {
+  it('resolves nested and percent-encoded destinations, not basename mentions or examples', () => {
+    const index = put('_backlog/research/README.md', 'same.md is only prose.\n\n'
+      + '[nested](tech-exploration/same.md#evidence) [space][material]\n\n'
+      + '[material]: upstream/a%20b.md?raw=1\n\n'
+      + '`[example](same.md)`\n<!-- [hidden](same.md) -->\n')
+    expect([...markdownLinkTargets(index)].sort()).toEqual([
+      join(root, '_backlog/research/tech-exploration/same.md'),
+      join(root, '_backlog/research/upstream/a b.md'),
+    ].sort())
   })
 })
 

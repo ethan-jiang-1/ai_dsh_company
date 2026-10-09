@@ -9,10 +9,21 @@
 // 约 20 行/门禁，分区头（── 编号 ──）即目录。
 import { readFileSync, existsSync, lstatSync, readdirSync, readlinkSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
-import { dirname, join, resolve } from 'node:path'
+import { basename, dirname, join, resolve } from 'node:path'
+import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
-import { validateMarkdownLinks } from '../tools/lib/markdown-links.mjs'
+import { markdownLinkTargets, validateMarkdownLinks } from '../tools/lib/markdown-links.mjs'
 import { inspectScripts, canonicalSnapshotScenes } from '../tools/lib/repository-layout.mjs'
+// Reuse a declared parser from the pinned vendor; member fallback covers root-workspace CI installs.
+const loadYaml = (() => {
+  for (const base of ['../vendor/dsh/package.json', '../vendor/dsh/packages/preset/agent-preset/package.json']) {
+    try {
+      const yaml = createRequire(new URL(base, import.meta.url))('js-yaml')
+      return text => yaml.load(text, { schema: yaml.CORE_SCHEMA })
+    } catch { /* next declared owner */ }
+  }
+  throw new Error('js-yaml 缺失：先按 bootstrap 安装 workspace 依赖')
+})()
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const failures = []
@@ -261,7 +272,7 @@ const NOW_FILES = (() => {
   const out = ['AGENTS.md', 'README.md', 'ROADMAP.md', 'company-workspace/AGENTS.md',
     'snapshots/README.md', 'runtime/README.md', 'runtime/harness-home/README.md', 'packages/company-pack/README.md',
     'packages/company-pack/src/README.md'].filter(f => existsSync(join(root, f)))
-  const walkMd = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+  const walkMd = (dir) => !existsSync(dir) || !lstatSync(dir).isDirectory() ? [] : readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const path = join(dir, entry.name)
     if (entry.isDirectory()) return ['node_modules', '.git', 'lib'].includes(entry.name) ? [] : walkMd(path)
     return entry.name.endsWith('.md') ? [path.slice(root.length + 1)] : []
@@ -279,7 +290,7 @@ const NOW_FILES = (() => {
     walkMd(join(root, 'docs')),
     // `notes/**` 分**两档**（2026-09-26 补盲区 + 分档；2026-10-09 N5 **重新划线**）：
     // · **硬档**（`proposed/` + `implemented/` + `_backlog/` 活跃推敲卡）= **活文档**——fresh agent 会照着它去干活；
-    // · **观察档**（`postmortem/` + 明确冻结的 `_backlog/_done/`）= **记录当时事实**的档案，只提醒不判红。
+    // · **观察档**（`postmortem/` + 明确冻结的 `_backlog/_archive/`）= **记录当时事实**的档案，只提醒不判红。
     //
     // ⚠ 2026-10-09 把 `implemented/` 从观察档移入硬档（N5 修复）。原注释说「改它就是篡改记录」，**这句是错的**：
     //   vendor `.agents/notes/implemented/AGENTS.md` 明文区分两件事——
@@ -297,7 +308,7 @@ const NOW_FILES = (() => {
     //   改指针到现行家成本极低，没有任何"篡改记录"问题。指向 vendor 的路径若上游已删，写清"上游 X 版已删"
     //   或引向现行家即可，同样不是篡改——**篡改是把当时的结论改成另一套，不是把门牌号改成新的**。
     // 例外（仍是观察档）：`postmortem/` = 事故故事，DSH 语料明说它是**唯一**该有 war-story narrative 的层；
-    //   `_backlog/_done/` = 明确冻结且不是任务源（dev-loop §0.5）。
+    //   `_backlog/_archive/` = 明确冻结且不是任务源（dev-loop §0.5）。
     // 此前只扫 `notes/` 直接子文件（`p.split('/').length === 2`）⇒ `proposed/` 与 `implemented/` 全在面外。
     walkMd(join(root, 'notes/proposed')),
     // ⚠ `notes/implemented/` 分**生效日两档**（2026-10-09 N5）——不能整棵拉进硬档：
@@ -308,23 +319,23 @@ const NOW_FILES = (() => {
       const m = /\/(\d{4}-\d{2}-\d{2})-/.exec(p)
       return m !== null && m[1] >= NOTES_CURRENCY_EFFECTIVE_DATE
     }),
-    walkMd(join(root, '_backlog')).filter(p => !p.startsWith('_backlog/_done/')),
+    walkMd(join(root, '_backlog')).filter(p => !p.startsWith('_backlog/_archive/')),
     walkMd(join(root, 'company-workspace')).filter(p => !/^company-workspace\/(deliverables|deliverables-archive|kb\/[^/]+\/journal)\//.test(p)),
   )
 })()
 /** Historical bare receipts are observed; rendered Markdown navigation still uses the hard link gate. */
-// 2026-10-05：_backlog/_done 明确冻结且不是任务源（dev-loop §0.5），其历史裸命令不能按活指针改写。
-// 不豁免活跃 plans/bugs/reference，也不豁免这些历史文件的 Markdown 导航目标。
+// 2026-10-05：_backlog/_archive 明确冻结且不是任务源（dev-loop §0.5），其历史裸命令不能按活指针改写。
+// 不豁免活跃 issues/bugs/research/methods，也不豁免这些历史文件的 Markdown 导航目标。
 /** 观察档 = 事故故事与冻结归档：`notes/postmortem/`（DSH 语料：唯一该有 war-story narrative 的层）+
- *  明确冻结的 `_backlog/_done/`；保留当时裸路径并提醒。
+ *  明确冻结的 `_backlog/_archive/`；保留当时裸路径并提醒。
  *  ⚠ 2026-10-09 起 **`notes/implemented/` 不在此列**（N5）：它受「随改动就地更新事实落点」约束，见上方硬档注释。 */
 const WARN_FILES = (() => {
-  const walkMd = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+  const walkMd = (dir) => !existsSync(dir) || !lstatSync(dir).isDirectory() ? [] : readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const path = join(dir, entry.name)
     if (entry.isDirectory()) return ['node_modules', '.git', 'lib'].includes(entry.name) ? [] : walkMd(path)
     return entry.name.endsWith('.md') ? [path.slice(root.length + 1)] : []
   })
-  return [...walkMd(join(root, 'notes/postmortem')), ...walkMd(join(root, '_backlog/_done'))]
+  return [...walkMd(join(root, 'notes/postmortem')), ...walkMd(join(root, '_backlog/_archive'))]
 })()
 const TOP_DIRS = ['notes/', 'docs/', 'checks/', 'probes/', 'tools/', 'packages/', 'snapshots/', 'run/', 'runtime/', 'tests/', 'company-workspace/', 'vendor/']
 const RUNTIME_PREFIXES = ['runtime/harness-home', 'runtime/harness-home-b', 'runtime/rehearsal-workspace', 'runtime/pw-browsers', '.pnpm-store']   // gitignored 运行态（2026-10-06 条目 A：dev/ 拆分，运行残留随迁顶层 runtime/）
@@ -368,7 +379,7 @@ scanBarePaths(WARN_FILES, (where, raw) => { barePathWarn.push(`${where} → \`${
 if (!barePathBad) {
   ok(`bare-path ×${barePathCount}（${NOW_FILES.length} 文件反引号裸路径存在性；另观察档 ${WARN_FILES.length} 文件）`)
   if (barePathWarn.length > 0) {
-    console.log(`  观察项 ${barePathWarn.length} 条（观察档 = \`notes/implemented|postmortem/**\` 与 \`_backlog/_done/**\`：`
+    console.log(`  观察项 ${barePathWarn.length} 条（观察档 = \`notes/postmortem/**\` 与 \`_backlog/_archive/**\`：`
       + '记录**当时**事实的档案，里面引的路径当时是对的——**改它就是篡改记录**，故只提醒不判红）：')
     for (const w of barePathWarn) console.log(`    ${w}`)
   }
@@ -691,7 +702,7 @@ ok(`client-halves ×${clientHalves.length}`)
 // 负例留证 2026-09-27：无归宿提案 → proposal-scheduled 红；「已交付」状态滞留 proposed → proposal-graduated 红。
 // 2026-09-28 D32 重构（队列层退役）：原判据「提案必须在 ROADMAP 出现」的防病机理 = 防"登记了但没人做"。
 // 队列没了，病根不变 ⇒ 判据换成等价物：**每份 RFC 状态行必须带「批准」标记**（用户令 / Plan Mode 通过 +
-// 日期）——没批准的思考属于 _backlog/plans/ 推敲卡，不配住 proposed/；
+// 日期）——没批准的思考属于 _backlog/issues/ 推敲卡，不配住 proposed/；
 //   ① proposal-scheduled：状态行（逻辑行，含缩进续行）带「批准」；
 //   ② proposal-graduated（不变）：已消化的不许赖在 proposed/——毕业 ≠ 全部实现，而是"每一条都有归宿"。
 //   ③ proposal-scheduled 扩展（2026-10-05 TDD 环立，用户令「一定 TDD 手段、全程证据、不随性发挥」）：
@@ -710,7 +721,7 @@ const unapproved = proposals.filter(name => {
 const noAcceptance = proposals.filter(name =>
   !/^##\s*验收/m.test(readFileSync(join(proposedDir, name), 'utf8')))
 const scheduledProblems = [
-  ...unapproved.map(name => `${name} 缺「批准：」标记（未批准的思考住 _backlog/plans/ 推敲卡）`),
+  ...unapproved.map(name => `${name} 缺「批准：」标记（未批准的思考住 _backlog/issues/ 推敲卡）`),
   ...noAcceptance.map(name => `${name} 缺「## 验收」节（验收 = RFC 三件之一，「怎么测」先行的载体——见 notes/proposed/README 生命周期段）`),
 ]
 scheduledProblems.length === 0
@@ -763,48 +774,119 @@ notGraduated.length === 0
     : fail('notes-liveness', `这些 implemented/ Note 前 6 行缺合规「状态：」行（须以 implemented/已交付/已消化 开头——词表与规则 = notes/README）：${badNotes.join(', ')}`)
 }
 
-// ── _backlog 活状态 + 索引交叉核对门禁（backlog-liveness；原 plans-liveness，2026-10-03 D33 章制回借升格）──
-// 复发依据：① 状态行侧 = D30 起因（未完结思考稿缺户口挂着不动；负例留证 2026-09-27 research 稿 /
-//   2026-09-28 plans 卡复测）；② 索引侧 = D33 轮实测活违规两处——两张已毕业卡不在 _done/README
-//   索引、两张活跃卡不在 plans/README 活跃列表：「位置即状态」只护文件搬迁没护索引同步，
-//   FAQ 15 升格判据成立（负例 = 本轮红→还原→绿，见 D33 Note）。
-// 规则（D33 章程 _backlog/README.md）：① 制度目录在场；② 活跃卡状态行——plans 卡前 12 行含
-//   「状态：」且含「毕业」，bugs 卡含「状态：」；③ 索引交叉核对——每张卡/材料文件必须被
-//   plans|bugs|reference|_done 四份 README 之一点名（反向——索引行指向不存在的文件——由
-//   md-links 硬档扫描覆盖，此处不重复）。
-{
-  const bl = '_backlog'
-  const dirs = [`${bl}/plans`, `${bl}/bugs`, `${bl}/reference`,
-    `${bl}/_done/_closed_plans`, `${bl}/_done/_suspended_plans`, `${bl}/_done/_fixed_bugs`,
-    `${bl}/_done/_suspended_bugs`, `${bl}/_done/_reference`, `${bl}/_done/_misc`]
-  const listMd = d => existsSync(join(root, d))
-    ? readdirSync(join(root, d)).filter(n => n.endsWith('.md') && n !== 'README.md')
-    : []
-  const missingDirs = dirs.filter(d => !existsSync(join(root, d)))
-  missingDirs.length === 0
-    ? ok(`backlog-liveness 制度目录 ×${dirs.length}`)
-    : fail('backlog-liveness', `制度目录缺失（章程的目录形状，别删）：${missingDirs.join(', ')}`)
-
-  const badPlans = listMd(`${bl}/plans`).filter(name => {
-    const head = readFileSync(join(root, `${bl}/plans`, name), 'utf8').split('\n').slice(0, 12).join('\n')
-    return !(head.includes('状态：') && head.includes('毕业'))
+// ── _backlog 活状态 + 索引交叉核对门禁（backlog-liveness；D33 原门唯一家）───────
+// 为什么：D30 未完结卡缺户口、D33 搬卡未同步索引，两类真漂移要求位置、头与索引一起检查。
+// 2026-10-09 整体借入 ai_dsh_assitant/scripts/checks/verify-checks.mjs 的
+// backlogLivenessProblems + backlogGraduationProblems；method 字段形状来自源 methods/README。
+// 本仓适配：制度目录与 README 必需；递归材料按 owner README 解析后的真实目标核对，不能用
+// basename 跨桶碰巧满足。活跃区各桶根 README 持有索引，归档统一由 _archive/README 持有。归档旧讨论保留原文、不追补头；新研究与新归档自生效日起从严。
+// 既有负例留证 2026-09-27/28：旧状态头缺失 → 红；D33 搬卡漏索引 → 红。
+// 迁移新增判据真实负例由主线程执行并留证；本线程只跑隔离形状测试，不冒充真文件反证。
+function backlogLivenessProblems(backlogRoot) {
+  const problems = []
+  const effectiveDate = '2026-10-09'
+  const pools = ['issues', 'bugs', 'research', 'methods', '_archive/settled_issues',
+    '_archive/suspended_issues', '_archive/fixed_bugs', '_archive/suspended_bugs',
+    '_archive/research', '_archive/legacy']
+  const isDir = path => existsSync(path) && lstatSync(path).isDirectory()
+  const isFile = path => existsSync(path) && lstatSync(path).isFile()
+  for (const dir of ['', '_archive', ...pools]) {
+    const full = join(backlogRoot, dir)
+    const where = `_backlog${dir ? `/${dir}` : ''}`
+    if (!isDir(full)) problems.push(`${where} 制度目录缺失或不是目录`)
+    if (!isFile(join(full, 'README.md'))) problems.push(`${where}/README.md 必需索引缺失或不是文件`)
+  }
+  const markdownFiles = (dir, prefix = '') => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+    if (entry.isDirectory()) return markdownFiles(join(dir, entry.name), join(prefix, entry.name))
+    return entry.isFile() && entry.name.endsWith('.md') ? [join(prefix, entry.name)] : []
   })
-  const badBugs = listMd(`${bl}/bugs`).filter(name =>
-    !readFileSync(join(root, `${bl}/bugs`, name), 'utf8').split('\n').slice(0, 12).join('\n').includes('状态：'))
-  const livenessBad = [...badPlans.map(n => `${bl}/plans/${n}（缺状态行/毕业门判断）`),
-    ...badBugs.map(n => `${bl}/bugs/${n}（缺状态行）`)]
-  livenessBad.length === 0
-    ? ok(`backlog-liveness 状态行 ×${listMd(`${bl}/plans`).length + listMd(`${bl}/bugs`).length}（每张活跃卡自带户口）`)
-    : fail('backlog-liveness', `这些活跃卡缺活状态行——按 _backlog/README.md 毕业四门处置，别挂着：${livenessBad.join(', ')}`)
-
-  const indexHaystack = [`${bl}/plans/README.md`, `${bl}/bugs/README.md`,
-    `${bl}/reference/README.md`, `${bl}/_done/README.md`]
-    .map(p => readFileSync(join(root, p), 'utf8')).join('\n')
-  const unindexed = dirs.flatMap(d => listMd(d).map(name => `${d}/${name}`))
-    .filter(rel => !indexHaystack.includes(rel.split('/').pop()))
-  unindexed.length === 0
-    ? ok('backlog-liveness 索引交叉核对（每张卡/材料件都被索引点名）')
-    : fail('backlog-liveness', `这些卡/材料件没被任何索引点名（位置即状态必须连索引同步）：${unindexed.join(', ')}`)
+  const statuses = {
+    issues: ['推敲中', '等人拍板'], bugs: ['活跃'],
+    '_archive/settled_issues': ['已结'], '_archive/suspended_issues': ['叫停'],
+    '_archive/fixed_bugs': ['已修'], '_archive/suspended_bugs': ['待修'],
+  }
+  const topicByDir = { positioning: '定位', upstream: '上游', 'tech-exploration': '技术' }
+  const isFresh = (name, undated = true) => {
+    // Both the existing YYYY-MM-DD filenames and the borrowed YYMMDD card names are accepted.
+    const long = /^(\d{4}-\d{2}-\d{2})-/.exec(basename(name))
+    const short = /^(\d{2})(\d{2})(\d{2})-/.exec(basename(name))
+    const date = long?.[1] ?? (short ? `20${short[1]}-${short[2]}-${short[3]}` : undefined)
+    // Undated new material cannot use the historical exemption.
+    return date === undefined ? undated : date >= effectiveDate
+  }
+  const frontmatter = (text, where) => {
+    const match = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text)
+    if (!match) { problems.push(`${where}:1 缺 frontmatter`); return }
+    let data
+    try { data = loadYaml(match[1]) } catch (error) {
+      problems.push(`${where}:1 frontmatter YAML 不可解析：${String(error).split('\n')[0]}`)
+      return
+    }
+    if (data === null || typeof data !== 'object' || Array.isArray(data)) {
+      problems.push(`${where}:1 frontmatter 须为字段映射`)
+      return
+    }
+    return data
+  }
+  // Source graduation checks inspect only the first 12 lines: historical discussion is not a verdict.
+  const closureSignals = [
+    /可关闭\s*[：:=＝]\s*是\s*(?=[｜|\n（(]|$)/,
+    /关闭条件(?:判断)?\s*[：:=＝]\s*(?:已满足|已通过|已过)\s*(?=[｜|\n（(]|$)/,
+    /毕业门(?:判断)?\s*[=＝]\s*(?:已过|已通过|已毕业)/,
+    /状态：\s*(?:已全部实施|已消化|已毕业|已完成|已实施)/,
+    /状态：\s*[^｜|\n]*已交付\s*(?=｜|$)/,
+  ]
+  for (const pool of pools) {
+    const fullDir = join(backlogRoot, pool)
+    if (!isDir(fullDir)) continue
+    const files = markdownFiles(fullDir)
+    const indexPath = pool.startsWith('_archive/') ? '_archive/README.md' : `${pool}/README.md`
+    const indexFile = join(backlogRoot, indexPath)
+    const indexed = isFile(indexFile) ? markdownLinkTargets(indexFile) : new Set()
+    for (const name of files.filter(name => basename(name) !== 'README.md')) {
+      const full = join(fullDir, name)
+      const where = `_backlog/${pool}/${name}`
+      if (!indexed.has(resolve(full))) problems.push(`${where} 未被 ${indexPath} 索引链接点名`)
+      const text = readFileSync(full, 'utf8')
+      if (pool === 'issues' || pool === 'bugs') {
+        const head = text.split('\n').slice(0, 12).join('\n').replaceAll('**', '')
+        if (closureSignals.some(signal => signal.test(head))) {
+          problems.push(`${where}:1 声明可关闭/关闭条件已满足却仍在活跃区；移至 _archive/${pool === 'issues' ? 'settled_issues' : 'fixed_bugs'}/ 并同步索引`)
+        }
+      }
+      if (pool === '_archive/legacy') continue
+      const hasHead = text.startsWith('---\n') || text.startsWith('---\r\n')
+      // Active issue/bug headers are migrated now; old archived prose and research keep their text.
+      if (pool !== 'issues' && pool !== 'bugs' && pool !== 'methods' && !hasHead && !isFresh(name, !pool.startsWith('_archive/'))) continue
+      const data = frontmatter(text, where)
+      if (!data) continue
+      const keys = Object.keys(data)
+      if (statuses[pool]) {
+        if (keys[0] !== 'status') problems.push(`${where}:2 frontmatter 首字段须为 status`)
+        else if (!statuses[pool].includes(String(data.status))) problems.push(`${where}:2 status ${JSON.stringify(data.status)} 不属于此桶`)
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(String(data.opened ?? ''))) problems.push(`${where}:1 缺 opened: YYYY-MM-DD`)
+        if (pool.endsWith('bugs') && !['P0', 'P1', 'P2'].includes(data.severity)) problems.push(`${where}:1 缺 severity: P0/P1/P2`)
+      } else if (pool.endsWith('research')) {
+        if (keys[0] !== 'topic' || typeof data.topic !== 'string' || !data.topic.trim()) problems.push(`${where}:2 frontmatter 首字段须为非空 topic`)
+        const topic = topicByDir[name.split('/')[0]]
+        if (topic !== undefined && data.topic !== topic) problems.push(`${where}:2 topic 应与子目录匹配（${topic}）`)
+        if (typeof data.intent !== 'string' || !data.intent.trim() || /[\r\n]/.test(data.intent)) problems.push(`${where}:1 缺单行非空 intent`)
+      } else if (pool === 'methods') {
+        if (data.name !== basename(name, '.md')) problems.push(`${where}:2 name 须匹配文件名 ${basename(name, '.md')}`)
+        for (const key of ['description', 'whenToUse']) {
+          if (typeof data[key] !== 'string' || !data[key].trim()) problems.push(`${where}:1 缺非空 ${key}`)
+        }
+      }
+    }
+  }
+  return problems
+}
+// Runner stays in the owning gate; the read-only function is also used by isolated shape tests.
+{
+  const problems = backlogLivenessProblems(join(root, '_backlog'))
+  problems.length === 0
+    ? ok('backlog-liveness（制度目录/README、卡头、关闭判断、method 形状、递归索引）')
+    : fail('backlog-liveness', problems.join('；'))
 }
 
 // ── 重放场景活性门禁（replay-scene-liveness，2026-10-09 立）─────────────────────
@@ -885,11 +967,11 @@ if (existsSync(replayRoot)) {
 //   ① **守卫声明** = 某个 `describe('…')` / `it('…')` 的**标题里带 `BUG-nnn`**。
 //      标题是"我在这里守一条具体不变量"的正式声明；正文注释里提 BUG 号只是解释
 //      （反例：`signoff-tool.spec.ts` 用注释解释 mock 为何要 no-op，它不声称守卫 BUG-002）。
-//   ② **事故必须可解析**：`BUG-nnn` 必须能对到 `_backlog/_done/_fixed_bugs/BUG-nnn-*.md`
+//   ② **事故必须可解析**：`BUG-nnn` 必须能对到 `_backlog/_archive/fixed_bugs/BUG-nnn-*.md`
 //      真卡（悬空编号 = 声称守一个不存在的过去 → 红）。
 //   ③ **每个声明必须有对应的负例留证行**：文件里存在 `// 负例留证 YYYY-MM-DD：…BUG-nnn…`
 //      （按编号对齐——一篇 spec 声明守卫 N 个事故，就要 N 条，不许一条笼统行糊过去）。
-// 判据源 = `tests/**/*.spec.ts` 自身 + `_backlog/_done/_fixed_bugs/` 真卡。
+// 判据源 = `tests/**/*.spec.ts` 自身 + `_backlog/_archive/fixed_bugs/` 真卡。
 // ⚠ 本门禁**不证明**的：它不制造回归、不跑 vitest，所以**不证明**那条留证是真的
 //   （留证写了但假的，本门禁看不出来——那要靠人复现）。它证明的是"**声称守卫具体事故的
 //   spec 必须交出可复现的红的配方**"，把"没人知道能不能红"变成"红法写在守卫旁边"。
@@ -908,8 +990,8 @@ if (existsSync(replayRoot)) {
     }
   }
   walkSpecs(join(root, 'tests'))
-  const bugCardExists = n => existsSync(join(root, '_backlog/_done/_fixed_bugs')) &&
-    readdirSync(join(root, '_backlog/_done/_fixed_bugs')).some(f => f.startsWith(`BUG-${n}-`))
+  const bugCardExists = n => existsSync(join(root, '_backlog/_archive/fixed_bugs')) &&
+    readdirSync(join(root, '_backlog/_archive/fixed_bugs')).some(f => f.startsWith(`BUG-${n}-`))
   const problems = []
   let claims = 0
   for (const file of specFiles.sort()) {
@@ -924,7 +1006,7 @@ if (existsSync(replayRoot)) {
       claims++
       const num = id.slice(4)
       if (!bugCardExists(num)) {
-        problems.push(`${rel}：标题声称守卫 ${id}，但 _backlog/_done/_fixed_bugs/ 里没有 ${id}-* 卡（悬空事故号）`)
+        problems.push(`${rel}：标题声称守卫 ${id}，但 _backlog/_archive/fixed_bugs/ 里没有 ${id}-* 卡（悬空事故号）`)
         continue
       }
       // 留证是**块**（首行「// 负例留证 日期：…」，续行是 // …）——与 run-gates 自身同形，

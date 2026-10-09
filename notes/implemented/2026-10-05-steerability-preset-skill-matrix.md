@@ -1,6 +1,6 @@
 # 2026-10-05 · preset/skill/child 矩阵与 agent-loop seam（steerability 毕业拆分 3/6，已实施）
 
-状态：已消化（2026-10-05 实施完成；来源 = 推敲卡 [repository-steerability](../../_backlog/_done/_closed_plans/2026-10-05-repository-steerability.md) 毕业拆分第 3 条）
+状态：已消化（2026-10-05 实施完成；来源 = 推敲卡 [repository-steerability](../../_backlog/_archive/settled_issues/2026-10-05-repository-steerability.md) 毕业拆分第 3 条）
 
 ## 交付（现在时）
 

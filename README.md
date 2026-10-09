@@ -18,4 +18,4 @@ CEO、VP-Eng、VP-Sales、COO、CFO 各自是独立 preset，事件从 CEO 进�
 - 安装：`pnpm dsh plugin --profile <名> add link:./packages/company-pack`（开发联调）；发布形状 =
   `npm pack` → 干净 profile `add file:<tarball>`（验收 = release-smoke，[docs/release.md](./docs/release.md)）——装后 profile 的 roster 可见五角色 preset
 - 纪律：**默认严格照做钉住的 DSH 研发纪律，偏离必须登记**（权威对照表见 [AGENTS.md](./AGENTS.md) §纪律；操作手册 [guides/dev-loop](./docs/guides/dev-loop.md)）
-- 任务与推敲：任务源 = 已批 RFC（`notes/proposed/`）与用户点名；裁决前的思考住 [_backlog/](./_backlog/README.md)（推敲卡 D31 / 队列层退役 D32 / 搁置池·磨清单退役 2026-09-28，归档 [_backlog/_done/_misc/](./_backlog/_done/_misc/)）
+- 任务与推敲：实施任务源 = 已批 RFC（`notes/proposed/`）与用户点名；尚未明确的问题住 [_backlog/issues/](./_backlog/issues/README.md)，按需使用 methods/ 与 research/；历史材料见 [_backlog/_archive/](./_backlog/_archive/README.md)，均不是任务队列

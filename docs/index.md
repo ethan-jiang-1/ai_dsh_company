@@ -37,7 +37,7 @@
 
 | 位置 | 回答什么 |
 |---|---|
-| `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含实际跑过的验证 + 环境状态）。提案纪律 / 状态轴 / 毕业规则 / 分类规矩唯一家 = [notes/README](../notes/README.md)；未成熟思考的上游 = `_backlog/plans/`（毕业四门 = [_backlog/README](../_backlog/README.md)） |
+| `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含实际跑过的验证 + 环境状态）。提案纪律 / 状态轴 / 毕业规则 / 分类规矩唯一家 = [notes/README](../notes/README.md)；未成熟问题由 [_backlog/issues/](../_backlog/issues/README.md) 推敲，制度 = [_backlog/README](../_backlog/README.md) |
 | [notes/archived/](../notes/archived/) · [notes/rejected/](../notes/rejected/) · [notes/postmortem/](../notes/postmortem/README.md) | 离场两桶（D30）：archived = 完结仍被引用，rejected = 过时/被推翻（负知识）；postmortem = **事故复盘**（为什么流程放过了它 + 加了什么护栏） |
 | [agent-workflow-community-practice](../notes/implemented/2026-09-22-agent-workflow-community-practice.md) | 外部研究：代理工作流的社区/厂商一手证据（结论已吸纳为 D15，否决项也记在里面） |
 
@@ -65,7 +65,7 @@
 | D16 | 角色模型路由 = 全员同模型（不写 `agentOptions`） | [presets](./presets.md)；[tests/presets](../tests/presets/presets.spec.ts) |
 | D17 | 公司事实全部留 workspace 活数据；pack 不含公司事实 | [presets](./presets.md)；[company-workspace/kb](../company-workspace/kb/) |
 | D18 | CEO 命名委托 = one-shot 前台；续驶归 team；CEO preset 不放全局控制行 | [delegation](./delegation.md) |
-| D19+D21 | R5 拆轮 + 搁置池准入 **历史**：轮次制已由 D23/D24 退役，整池已随 D32 退役 | [_misc/suspended.md](../_backlog/_done/_misc/suspended.md) |
+| D19+D21 | R5 拆轮 + 搁置池准入 **历史**：轮次制已由 D23/D24 退役，整池已随 D32 退役 | [_misc/suspended.md](../_backlog/_archive/legacy/suspended.md) |
 | D20 | 交付物三态判据：成品 = Lead 的 `present`；比对按 slug+角色身份不按路径 | [r4-workshop-flow](../notes/implemented/2026-09-22-r4-workshop-flow.md) |
 | D22 | 在场板主键 = team roster；冷启动 = 拉式 RPC + 5s 轮询 | [org-presence-board](../notes/implemented/2026-09-22-org-presence-board.md) |
 | D23+D24 | 开发流条目制 **历史**：队列 owner ROADMAP.md 已由 D32 退役 | [dsh-inround-task-surface](../notes/implemented/2026-09-23-dsh-inround-task-surface.md) |
@@ -75,7 +75,7 @@
 | D28 | 枚举型事实的家 = 实现自己（文档只留分层原则 + 指针） | [entry-execution-chain-debt](../notes/implemented/2026-09-26-entry-execution-chain-debt.md) |
 | D29 | 自主优先协议：先探索后发明、借鉴成熟插件、REVIEW 分级 | [dev-loop §13](./guides/dev-loop.md) |
 | D30 | research 层三态：完结迁 archived、过时迁 rejected、死稿删除 **历史**：D31 起 research 目录退役 | [dev-loop §12](./guides/dev-loop.md) |
-| D31 | 推敲空间 `_backlog/`（plans/bugs/_done，位置即状态）；只承载判断材料不承载授权 | [_backlog/README](../_backlog/README.md) |
+| D31 | 推敲空间 `_backlog/`；只承载判断材料、不承载授权 | [_backlog/README](../_backlog/README.md) |
 | D32 | 队列层退役（ROADMAP.md 删除）；已批→RFC 状态行「批准：」标记 | [roadmap-retirement](../notes/implemented/2026-09-28-roadmap-retirement.md) |
 | D33 | `_backlog` 章制回借（主干框架/章程账本二分/索引交叉核对门禁/全日期卡名） | [_backlog/README](../_backlog/README.md) |
 | D34 | intents.md 退役（第三本账 + 胖行病史 + 违反上游 no-index 教义） | [doc-snr-cleanup-round](../notes/implemented/2026-10-04-doc-snr-cleanup-round.md) |
@@ -88,7 +88,7 @@
 
 ### 待定与活动提案
 
-旧问题 Q1–Q8 均已闭合（Q1→D18、Q2→D16、Q3→D17、Q4 于 2026-09-22 定案、Q5–Q8→D22）。这只结算该组问题；当前任务源 = [notes/proposed/](../notes/proposed/README.md) 已批 RFC 与用户点名（D32，无中心队列；磨活走 [_backlog/plans/](../_backlog/plans/README.md) 推敲卡）；旧磨清单/搁置池整池退役归 [_backlog/_done/_misc/](../_backlog/_done/_misc/)，点名才读（条目名不在此复述——复述会过期，2026-09-24 探针实证）；D33 复立的 `_done/_suspended_*` 搁置卡桶同非任务源（重启须用户明确决定）。
+旧问题 Q1–Q8 均已闭合（Q1→D18、Q2→D16、Q3→D17、Q4 于 2026-09-22 定案、Q5–Q8→D22）。这只结算该组问题；当前任务源 = [notes/proposed/](../notes/proposed/README.md) 已批 RFC 与用户点名（D32，无中心队列）；未成熟的问题在 [_backlog/issues/](../_backlog/issues/README.md) 澄清，不是实施任务。旧磨清单与搁置池按历史记录归 [_backlog/_archive/legacy/](../_backlog/_archive/legacy/README.md)，不是任务源；当前问题关闭、暂停和触发规则见 [_backlog/README](../_backlog/README.md)。
 
 ## 文档路由
 

@@ -1,7 +1,7 @@
 # 2026-10-04 · 多用户全交互走查实录（人机合一 journey + 并发观察）
 
-> 性质：reference——喂 [plans/2026-10-04-multi-user-concurrency-bdd](../_closed_plans/2026-10-04-multi-user-concurrency-bdd.md)
-> 与 [plans/2026-10-04-human-agent-unity-ux-bdd](../_closed_plans/2026-10-04-human-agent-unity-ux-bdd.md) 的证据半边。
+> 性质：reference——喂 [issue 2026-10-04-multi-user-concurrency-bdd](../settled_issues/2026-10-04-multi-user-concurrency-bdd.md)
+> 与 [issue 2026-10-04-human-agent-unity-ux-bdd](../settled_issues/2026-10-04-human-agent-unity-ux-bdd.md) 的证据半边。
 > 走查仪器 = 一次性驱动脚本（仓外 /tmp，产出本文件后即弃；场景转正时按宪法 §1.1 重新立项命名）。
 > 截图：/tmp/multi-user-walk/（问询卡/审批卡/待办面板/终态 ×5）。
 

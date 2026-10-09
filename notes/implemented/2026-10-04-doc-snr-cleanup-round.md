@@ -1,7 +1,7 @@
 # 打扫卫生轮：入口链信噪比与一致性清扫（批次①+② 落地）
 
 状态：implemented（2026-10-04 一次会话内完成批次①机械修复 + 批次②三裁断落地 + ④ intents.md 退役（D34，进行中追加）；判定材料 =
-[_backlog 卡](../../_backlog/_done/_closed_plans/2026-10-04-doc-snr-cleanup-audit.md)（同日毕业迁档））
+[_backlog 卡](../../_backlog/_archive/settled_issues/2026-10-04-doc-snr-cleanup-audit.md)（同日毕业迁档））
 
 ## 决定（用户三拍板，2026-10-04）
 

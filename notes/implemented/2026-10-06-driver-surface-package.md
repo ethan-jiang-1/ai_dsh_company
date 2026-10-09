@@ -1,6 +1,6 @@
 # 2026-10-06 · 驾驭者表面包：目录显性化 + 运行态观测 + 导航减密
 
-状态：implemented（五条目全部毕业：A `5aeb2ab` / B `1119111` / C `15a3e12` / D `05aeff6` / E `8f35ab2`；授权链 = 用户 2026-10-06 驾驭轮七点诊断 → 三工作面合并立项 + AGENTS 减密、docs 可读性两追加 → 次序 A→B→C→D→E + ongoing goal 推进；归档卡 = [driver-surface-package](../../_backlog/_done/_closed_plans/2026-10-06-driver-surface-package.md)）
+状态：implemented（五条目全部毕业：A `5aeb2ab` / B `1119111` / C `15a3e12` / D `05aeff6` / E `8f35ab2`；授权链 = 用户 2026-10-06 驾驭轮七点诊断 → 三工作面合并立项 + AGENTS 减密、docs 可读性两追加 → 次序 A→B→C→D→E + ongoing goal 推进；归档卡 = [driver-surface-package](../../_backlog/_archive/settled_issues/2026-10-06-driver-surface-package.md)）
 
 ## 背景（驾驭轮诊断，为什么立这包）
 

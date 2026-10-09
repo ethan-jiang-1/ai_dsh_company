@@ -39,7 +39,7 @@
 | 三 | C6 打断恢复 + C7 崩溃恢复 | member-interrupt-probe / team-recovery-probe | 4/4（三跑）+ 4/4（八跑） |
 
 **挂起（需用户决策，不在 probe 范围）**：C8 跨进程（dsh-atomic-write 决策）、H6 成员动态是否进
-注意力中心（**已裁决进卡** = [_backlog/_done/_closed_plans/2026-10-04-work-status-visibility](../../_backlog/_done/_closed_plans/2026-10-04-work-status-visibility.md)）、H8 多人开门常态化真场。
+注意力中心（**已裁决进卡** = [_backlog/_done/_closed_plans/2026-10-04-work-status-visibility](../../_backlog/_archive/settled_issues/2026-10-04-work-status-visibility.md)）、H8 多人开门常态化真场。
 
 ## 输掉的方案
 

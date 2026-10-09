@@ -2,7 +2,7 @@
 
 状态：已交付（2026-10-04 用户令「如法炮制」推动落地；形状 (a) 按用户既定原则「最正确、不短视」
 选定——零新代码；**小修不设 RFC**——章程毕业四门明文；推敲卡 =
-[work-status-visibility](../../_backlog/_done/_closed_plans/2026-10-04-work-status-visibility.md)）
+[work-status-visibility](../../_backlog/_archive/settled_issues/2026-10-04-work-status-visibility.md)）
 
 ## 问题
 
@@ -38,5 +38,5 @@ H6 悬案（2026-10-04 走查）：注意力中心只推「需要你」四类（
 
 ## 依据
 
-- 推敲卡（H6 裁决原文与两态已知）：[work-status-visibility](../../_backlog/_done/_closed_plans/2026-10-04-work-status-visibility.md)
+- 推敲卡（H6 裁决原文与两态已知）：[work-status-visibility](../../_backlog/_archive/settled_issues/2026-10-04-work-status-visibility.md)
 - 行为判据：`tests/presence-board.spec.ts`（D-a/D-b）

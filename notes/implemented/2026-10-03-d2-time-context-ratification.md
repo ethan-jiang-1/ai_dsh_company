@@ -8,7 +8,7 @@
 web-app 替换行）：**schedule-bundle**（自带 time-context / schedule / ui-schedule 三行，profile 级手动
 安装）+ pack 侧替换行钉 `timeZone: Asia/Shanghai`（行不存在组合该行 not-found 丢弃）。
 
-- 推敲全程 = [布局卡姊妹卡（已毕业）](../../_backlog/_done/_closed_plans/2026-09-29-date-channel-mechanism.md)。
+- 推敲全程 = [布局卡姊妹卡（已毕业）](../../_backlog/_archive/settled_issues/2026-09-29-date-channel-mechanism.md)。
 - 实现事实家：[升 pin Note](2026-09-30-pin-upgrade-0.2.0-rc.2.md)（载体换家 + 两步走落地）；
   [收割轮批3](2026-09-30-plugin-harvest-round.md)（schedule-bundle 落地 + 行归属）。
 - 验收证据（均已绿）：`time-context-probe`（注入在场 + 模型转写）、`date-rule-probe`（写真日期、

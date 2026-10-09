@@ -1,6 +1,6 @@
 # 2026-10-05 · 测试资产导航与历史 oracle 标注（steerability 毕业拆分 6/6，已实施）
 
-状态：已消化（2026-10-05 同日实施完成，红→绿收口；来源 = 推敲卡 [repository-steerability](../../_backlog/_done/_closed_plans/2026-10-05-repository-steerability.md) 毕业拆分第 6 条——用户点名「测试资产的思考……起码有一个套路，不能太随便」后开工；同批拍板：entry-probe = 推荐首跑、非强制、不进 pnpm test，另给无 key 替代路径；原卡阶段 6 收口走查折入本条验收，人类走查留给用户收尾）
+状态：已消化（2026-10-05 同日实施完成，红→绿收口；来源 = 推敲卡 [repository-steerability](../../_backlog/_archive/settled_issues/2026-10-05-repository-steerability.md) 毕业拆分第 6 条——用户点名「测试资产的思考……起码有一个套路，不能太随便」后开工；同批拍板：entry-probe = 推荐首跑、非强制、不进 pnpm test，另给无 key 替代路径；原卡阶段 6 收口走查折入本条验收，人类走查留给用户收尾）
 
 ## 交付（现在时）
 

@@ -3,15 +3,15 @@
 > 一文件一条目：问题 / 方案 / **输掉的方案留尸** / 验收（**验收必须先行点名「怎么测」，且可执行**——哪条命令、
 > 断言什么、红长什么样，**实施者不看对话就能复现**；机制面 = 实现前先红的检查；行为/UX 面 = Given/When/Then
 > 场景判据；文档/流程面 = 走查判据。写不出可执行验收 = 提案未成熟，回
-> [_backlog/plans/](../../_backlog/plans/README.md) 推敲，不进实施。分层判据唯一家 =
+> [_backlog/issues/](../../_backlog/issues/README.md) 推敲，不进实施。分层判据唯一家 =
 > [docs/testing.md](../../docs/testing.md) §3.7/§3.8，此处不复述）。文件名 = `YYYY-MM-DD-<主题>.md`
 > （日期 = 登记时点，时间层约定）。
 >
-> **没成熟到能写齐三件的思考不进这里**——那是 [`_backlog/plans/`](../../_backlog/plans/README.md)
+> **没成熟到能写齐三件的思考不进这里**——那是 [`_backlog/issues/`](../../_backlog/issues/README.md)
 > 推敲卡的事（D31）：卡可以只有问题没有方案，RFC 必须有问题/方案/验收。
 >
 > **批准与状态都在 RFC 自己的状态行**（「批准：」标记 = 机械门禁 `proposal-scheduled` 查；
-> 未批准的思考住 [`_backlog/plans/`](../../_backlog/plans/README.md) 推敲卡）。实施次序 = 用户逐条给
+> 未批准的思考住 [`_backlog/issues/`](../../_backlog/issues/README.md) 推敲卡）。实施次序 = 用户逐条给
 > （D32，无中心排序文件）。
 > 机械门禁：`proposal-scheduled`（每个 RFC 状态行带「批准：」标记——D32 起查标记不查队列；+「## 验收」节
 > 在场——2026-10-05 TDD 环立，反证 = [implemented/rfc-tdd-loop](../implemented/2026-10-05-rfc-tdd-loop.md)）/
