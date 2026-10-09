@@ -30,6 +30,17 @@ describe('probe required checks determine the actual exit code', () => {
     expect(judged.process.exitCode).toBe(failed === 'none' ? 0 : 1)
     expect(judged.results.filter(row => !row.ok)).toHaveLength(failed === 'none' ? 0 : 1)
   })
+  it.each(['claimRaceOwner', 'winnerPublishes', 'loserYields', 'reports', 'claimRaceShared', 'sharedControl', 'noLeadWrites', 'membersEnded', 'complete', 'none'])('claim-loser refuses missing %s', failed => {
+    const evidence = { claimRaceOwner: failed !== 'claimRaceOwner', winnerPublishes: failed !== 'winnerPublishes',
+      loserYields: failed !== 'loserYields', reports: failed !== 'reports', claimRaceShared: failed !== 'claimRaceShared',
+      sharedControl: failed !== 'sharedControl', noLeadWrites: failed !== 'noLeadWrites', membersEnded: failed !== 'membersEnded',
+      ownerWinner: 'w1', ownerLoser: 'w2', ownerClaims: [], sharedClaims: [] }
+    const judged = verdict('probes/team/team-claim-loser-probe.mjs', "  check('A1", '\n} catch (error)',
+      { evidence, complete: failed !== 'complete', ownerContent: '', sharedContent: '' })
+    expect(judged.results).toHaveLength(8)
+    expect(judged.process.exitCode).toBe(failed === 'none' ? 0 : 1)
+    expect(judged.results.filter(row => !row.ok)).toHaveLength(failed === 'none' ? 0 : 1)
+  })
   it.each(['fileExact', 'readbackW1', 'readbackW2', 'warningVisible', 'complete'])('atomicity refuses missing %s', failed => {
     const evidence = { fileExact: failed !== 'fileExact', readbacks: { w1: failed !== 'readbackW1', w2: failed !== 'readbackW2' }, warningVisible: failed !== 'warningVisible' }
     const judged = verdict('probes/team/team-atomicity-probe.mjs', "  check('C4a", '\n} catch (error)', { evidence, complete: failed !== 'complete', file: '' })

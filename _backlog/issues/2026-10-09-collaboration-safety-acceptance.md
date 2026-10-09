@@ -11,9 +11,57 @@ opened: 2026-10-09
 
 **当前情况：** [本轮研究](../research/collaboration/2026-10-09-teamagent-locks-and-acceptance-audit.md)已复跑跨进程文件竞争、上游任务板测试及跨根会话真模型观察；5 类探针判据假绿已执行反例复现，归 [BUG-007](../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)。旧“全绿／已毕业”不能直接继承为本轮安全验收。
 
-**未决问题：** 多人根会话竞争同一逻辑任务时，接受人工指定单 owner 还是要求原子仲裁？正常返工期间的允许覆盖／禁止覆盖如何定义？这两项是产品选择，不由本轮试验替用户决定。
+**未决问题：** 四问已裁决（2026-10-10，均选 A，见「澄清」节）：①协议层仲裁（预指定+占位/让位兜底）；②分产物类型覆盖权（owner-bound 归 owner/显式改派，共享产物归被授权成员）；③跨根共享写维持现行边界（单写进程+freshness+占位；跨进程不承诺）；④立「认领失败让位」规矩。裁4 落实层别已有行为事实：受控单次运行中任务书层让位规矩被真实遵循、且与共享语义同场区分（[研究](../research/collaboration/2026-10-10-claim-loser-yield-acceptance.md)）——落在「人工 owner 政策文档化即可，无需生产机制」一侧，执行层强制未被本轮证据触发。剩余未决 = methods ③验收矩阵与④综合结论/关闭条件，以及四项裁决落实文档（手册/多人合同）是否补句——属下游申请。
 
-**下一步：** 用户已批准先推进可控竞写实验。[确定性交错研究](../research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)与[机制探针](../../probes/fs-taskboard/observed-write-conflict-probe.mjs)已验证同实例同版本一胜一stale及脚本重读合并，取消版本条件的对照实际被判拒。[真实成员验收研究](../research/collaboration/2026-10-09-member-stale-write-acceptance.md)已补同轮旧观察写实际stale与模型重读合并；[双成员同轮共同放行研究](../research/collaboration/2026-10-09-team-read-barrier-acceptance.md)已补原入口5/5 exit0，BUG-007修复验收完成；旧4/5继续作为历史保留，不继承旧安全毕业承诺。认领失败让位是独立行为研究，不能替代BUG-007的文件C1b；若做该实验，需明确任务书「认领失败就让位」，核对真实成员是否仍写该任务产物，不得拿原竞写任务书推断角色违规。生产行为、preset或上游seam变更另需授权。
+**下一步：** 判据与驱动修复已收口（证据链见 [BUG-007](../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)与[双成员验收研究](../research/collaboration/2026-10-09-team-read-barrier-acceptance.md)）；四问已裁决（2026-10-10，见「澄清」节）；claim-loser 有界探针已完成：keyless 判据红→绿（含两处变异反证）+ 真实入口 8/8 exit0（[研究](../research/collaboration/2026-10-10-claim-loser-yield-acceptance.md)），裁4 层别结论已回未决问题节。下一步按 methods：③设计验收矩阵（四项裁决对应的可核对验收）→ ④综合结论与关闭条件 → ⑤下游申请（手册/合同补句或 Note，仅当需要）。生产行为、preset或上游seam变更另需授权。
+
+## 澄清：词汇与四问裁决稿（2026-10-10）
+
+按 [澄清需求](../methods/requirements-elicitation.md) 上卡：词汇对钉住源码与现行合同核过（本节不复述实验，证据链见 BUG-007 与协作审计）；四个产品问题已成裁决稿，**全部待用户裁决**——事实归 agent，可接受风险与产品语义必须显式人类判断，不从文件 freshness 证据推断。
+
+### 词汇（机制义与房间义分开）
+
+| 词汇 | 定义 | 主源 |
+|---|---|---|
+| 任务 owner（机制义） | 任务快照 `ownerId`：claim 成功或 Lead reassign 写入，revision 随事务 +1。授权面**仅任务生命周期操作**（release/edit/complete/reopen/delete 需 owner 或 Lead；reassign 仅 Lead）；不绑定文件写权限、不自动释放（release/reassign/reopen 是仅有的显式去除途径）、不是锁 | [task-board](../../vendor/dsh/packages/experimental/agent-team/src/task-board.ts#L105-L209)、[上游限制](../../vendor/dsh/packages/experimental/agent-team/README.md#known-limitations-and-deferred-work) |
+| 负责人（房间义 owner） | 一份产物/逻辑任务的唯一负责人：署名行 + 对终态负责。跨根无共同任务板 ⇒ 负责人 = 派活预指定 + 占位/让位协议（持认 = 占位 ∧ ¬让位） | [multi-human §3/§4](../../docs/multi-human.md)、[BUG-004](../_archive/fixed_bugs/BUG-004-claim-yield-not-machine-readable.md)、[公司手册](../../company-workspace/AGENTS.md) :87-88 |
+| 认领失败（claim failure） | 同 Team claim 事务被拒，两码：revision CAS 落败 = `TEAM_TASK_STALE_REVISION`（他人先以同 revision 认领成功）；owner 已占 = `TEAM_TASK_ALREADY_CLAIMED`（拿新 revision 重试仍拒）。败者侧无自动状态、无通知；重试夺不回被持有任务 | [task-board](../../vendor/dsh/packages/experimental/agent-team/src/task-board.ts#L115-L136)；真实双成员事件见[双成员验收研究](../research/collaboration/2026-10-09-team-read-barrier-acceptance.md) |
+| owner-bound 产物 | 只应由该任务 owner（或显式改派的新负责人）写的目标文件；房间形状 = `drafts/<角色>.md`、个人 journal、`final.md` 归 CEO。机制不拦（守卫不管授权），约束住任务书/手册层 | [multi-human §4](../../docs/multi-human.md)、[公司手册](../../company-workspace/AGENTS.md) :87-88 |
+| 共享产物（shared artifact） | **显式授权**多名成员共写的目标文件；协调靠 freshness guard（一胜一 stale、败者重读合并）+ 合并纪律，不靠 owner；≠「谁都能写」 | [fs-local](../../vendor/dsh/packages/fs/fs-local/src/index.ts#L101-L131)、[双成员验收研究](../research/collaboration/2026-10-09-team-read-barrier-acceptance.md) |
+| 返工（rework） | 房间概念：已出稿/已合稿产物需再修改；现行合同 = 显式通知合稿人 + 新版本号（署名行 `版本 v<N>`）。机制层无返工概念，只有读/写/守卫 | [multi-human §4](../../docs/multi-human.md) |
+| 覆盖（overwrite） | 对已存在文件的写，三条路径：`replaceIfVersion` 版本不符 → `FS_STALE_VERSION`；`createIfAbsent` 撞已有 → `FS_NOT_OBSERVED`；**不带期望 → 无条件原子覆盖**（edit 同构：无 expected 版本即无守卫）。守卫管新鲜度不管授权——重读后覆盖别人工作机制合法（「后写者静默胜出」）；跨进程检查与发布无原子性（E2/T3：20/20 互踩），`createIfAbsent` 跨进程仍原子（T4：一胜一拒） | [fs-local writeText/editText](../../vendor/dsh/packages/fs/fs-local/src/index.ts#L202-L291)、[multi-human §4](../../docs/multi-human.md) |
+
+### 四问裁决稿（已裁决 2026-10-10）
+
+> **用户裁决（2026-10-10）：裁1=A 协议层仲裁；裁2=A 分产物类型；裁3=A 维持现行边界；裁4=A 立规矩——落实层别待探针事实。**
+
+**裁1 · 多根会话竞争同一逻辑任务的仲裁**
+- 事实：跨根任务板互不可见（每根会话一个 Team，无共同 CAS 点）；跨进程覆盖写无互斥、`createIfAbsent` 占位是唯一跨进程原子抢注；现行房间合同 = 派活预指定 + 占位/让位兜底（机器可查、行为验证过）；上游明确「concurrent harness processes over one Team are unsupported」；真原子仲裁需跨根共享状态（Redis/协调器）= 本卡排除项。
+- 选项：**A** 接受协议层仲裁（预指定为主、占位/让位兜底并发窗口）；**B** 要求原子系统仲裁（跨根任务板共享或协调服务 → 上游 seam + 基础设施）。
+- 影响：A 零机制成本，残余风险 = 并发窗口靠「占位后必读对手」纪律（BUG-004 已升为规矩）；B 超本轮授权与排除项。
+- 建议：**A**——与审计「多 root 明示退化：优先预先指定唯一负责人」一致；若产品日后要求自动抢占/无人值守接管，再申请上游共享协作 seam。
+
+**裁2 · 返工期间谁可覆盖已有产物**
+- 事实：机制只管新鲜度不管授权——任何成员重读后可整文件覆盖他人工作；现行房间合同 = 单稿负责人（署名行）+ 返工显式通知 + 新版本号 + `final.md` 归 CEO；同 Team 内 Lead reassign 是显式改派的现成机制。
+- 选项：**A** owner-bound 产物仅原 owner（或显式改派的新 owner）可覆盖，共享产物允许被授权成员（新鲜读 + 合并纪律）；**B** 任何持新鲜读者可覆盖（= 机制现状，无产品约束）。
+- 影响：A = 把五纪律的「单稿负责人」升为明确产品规则，机制不拦、审计可查（署名行/版本号）；B = 返工冲突完全靠自觉。
+- 建议：**A**——与现行合同同构，只是把隐含语义显式化。
+
+**裁3 · 跨根会话共享写是否为受支持形态**
+- 事实：拓扑分两层——跨根同服务（多门协作）：实例内 freshness 真实生效（E1），多门协作已按 [multi-human](../../docs/multi-human.md) 合同真盘验收（2026-10-04）；跨进程同盘：守卫窗 20/20 互踩（E2/T3），手册已要求「写共享盘的 DSH 进程保持一个」，跨 home 无消息寻址。
+- 选项：**A** 继续支持·维持现行边界（跨根共享写受支持，约束 = 单写进程 + freshness + 占位协议；跨进程不承诺）；**B** 收窄为不支持（多门协作退化为单门 + 文件交接）；**C** 升级为跨进程机制支持（协调服务 = 排除项）。
+- 建议：**A**——现行合同已按此验收；B 推翻已批准的多人形态且无新证据；C 超授权。
+
+**裁4 · 认领失败后败者的写义务**
+- 事实：task owner 不绑定文件写权限（writeScopes advisory；手册原话「任务所有权不是锁」）；同 Team CAS 一胜一 stale 真实有效；**败者遇明确让位指令是否真的不写——无行为证据**（旧竞写任务书要求败者继续写，不能反推角色违规）→ 待 claim-loser 探针补事实。
+- 选项：**A** 立规矩「认领失败让位：不写该任务 owner-bound 产物，回报后转干别的」，落实层别（任务书/手册 = prompt 层，还是执行层强制）由探针结果定；**B** 不立规矩（owner 弱化为记名，败者可继续写）。
+- 建议：**A**——与手册「先认领后动笔」同构；执行层强制仅在探针证明遵循性不可靠时再申请。
+
+### 已授权（2026-10-10）：claim-loser 有界探针（独立于 C1b）
+
+设计（按 2026-10-10 handoff 上卡）：一个任务带 owner-bound 目标产物 → 两成员同初始 revision 同时 claim → 胜者写 owner-bound 产物 → 败者收真实 CAS 拒绝后应**回报且不发目标 write/edit**；判据只认配对工具 call/result 事件与目标路径归因，不看模型正文；另设**正对照**（双成员显式授权写共享产物）防 owner-bound 与共享语义混淆。任务书必须明确「认领失败就让位」。结局四选一：仅 prompt/工作流行为／产品规则缺口／需执行层强制／人工 owner 政策只需文档化。裁决前不引入 Redis、跨进程协调或生产协议变更。授权（2026-10-10）：按本设计实施，先 keyless 判据回归（tdd 红→绿），再真模型实跑 owner-bound 主景与共享正对照；负证如实保留，不为绿重跑。
+
+结果（2026-10-10，[研究](../research/collaboration/2026-10-10-claim-loser-yield-acceptance.md)）：真实入口 8/8 exit0。两场竞争胜负互换：owner-bound 败者 w2 全程零目标 write/edit 调用；shared 败者 w1 仍正常发布共享行——同场只翻授权变量、两语义零混淆，排除「败者胆小」与「反正都写」两个混淆解释。受控单次运行（钉住 provider、1 Lead + 2 teammate、显式措辞），不外推任意遵循性与跨根拓扑。
 
 ## 范围与排除项
 
