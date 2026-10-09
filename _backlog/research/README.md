@@ -27,3 +27,4 @@ intent: "为什么需要这份依据。"
 
 | 文件 | 活卡与用途 |
 |---|---|
+| [teamagent、锁与验收复核](collaboration/2026-10-09-teamagent-locks-and-acceptance-audit.md) | [协作安全问题](../issues/2026-10-09-collaboration-safety-acceptance.md)、[BUG-007](../bugs/BUG-007-collaboration-probe-false-positives.md)：机制边界、旧落地断点与实际反例 |

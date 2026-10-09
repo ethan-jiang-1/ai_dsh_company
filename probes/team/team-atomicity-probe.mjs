@@ -4,17 +4,12 @@
 // 何时跑：fs-local 原子发布/agent-team 任务视图（writeScopeWarnings）语义要复核时；
 //         vendor 升 pin 涉及其上时复跑
 //
-// 为什么存在（两个预期行为的观察固化）：
-//   C4 原子发布读侧——并发多轮追加同一文件时，读者永远见完整行集、无半截行
-//     （vendor fsio：私有临时目录 stage + 'wx' 独占 + 原子 publish）；
-//   C5 writeScopes advisory——**两个不同 in_progress 任务的 writeScopes 前缀重叠**时，
-//     任务视图出「write scopes overlap with task-N」警告（task-view.ts：警告是任务间比對，
-//     不是同任务双成员；advisory 不阻断）。
-//
-// 判据（verify the world：文件终态 + lead 日志）：
-//   C4a 共享文件含全部 6 行且每行完好（无撕行/丢行/重复）
-//   C4b ≥2 条成员回报含读回行数（观察链在场）
-//   C5a lead 的任务视图汇报含 writeScope 重叠警告原文
+// 采样观测而非全过程证明：验证终态六行、每次成功追加后的完整read结果；不证明任意读者永不见半截行。
+// 判据仅来自真实事件及终态文件：
+//   C4a 六个预期行各一次，无重复/额外行
+//   C4b 两成员各三轮成功追加后、下次追加前有完整read结果，所有返回行均合法且不重复
+//   C5a 成功team_task_list结果含scope重叠warning，指向另一项in_progress任务
+//   C5b Lead与两成员最新turn均completed；一次Lead轮足够，超时exit2，不以部分数据判绿
 // 用法：source run/env.sh && node probes/team/team-atomicity-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
@@ -22,6 +17,7 @@ import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
+import { atomicityEvidence, teamRunComplete } from '../../tools/lib/collaboration-evidence.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const TARGET = join(REHEARSAL, 'journal', 'atomicity-probe.md')
@@ -37,15 +33,16 @@ try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('
 const child = spawn(process.execPath,
   ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
   { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
-let output = ''
-const banner = await new Promise((res, rej) => {
-  const on = c => { output += String(c); const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output); if (m) res({ port: +m[1], token: m[2] }) }
-  child.stdout.on('data', on); child.stderr.on('data', on)
-  child.on('exit', c => rej(new Error(`web 提前退出 ${c}`))); setTimeout(() => rej(new Error('boot 超时')), 120_000)
-})
-const base = `http://127.0.0.1:${banner.port}`
-console.log(`web up: ${base}`)
 try {
+  let output = ''
+  const banner = await new Promise((res, rej) => {
+    const timer = setTimeout(() => rej(new Error('boot 超时')), 120_000)
+    const on = c => { output += String(c); const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output); if (m) { clearTimeout(timer); res({ port: +m[1], token: m[2] }) } }
+    child.stdout.on('data', on); child.stderr.on('data', on)
+    child.on('exit', c => { clearTimeout(timer); rej(new Error(`web 提前退出 ${c}`)) })
+  })
+  const base = `http://127.0.0.1:${banner.port}`
+  console.log(`web up: ${base}`)
   const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
   const cookie = auth.headers.getSetCookie().map(c => c.split(';')[0]).join('; ')
   let rpcId = 0
@@ -60,19 +57,20 @@ try {
   const sessionId = created.sessionId
   console.log('ceo session', sessionId)
 
-  const MEMBER_PROMPT = name => `你的任务（按序四步，做完立即收口）：
-a) 用 team_task_list 找到主题含「${name === 'w1' ? 'scope-a' : 'scope-b'}」的任务并 claim（owner 设为你，用当前 revision；被拒就 re-list 重试一次）。
-b) 做 3 轮追加（i = 1,2,3）：每轮把一行「${name} round i」追加进 journal/atomicity-probe.md（不存在创建；已存在读出再追加），**每轮追加后读一遍全文**记下总行数。
+  const MEMBER_PROMPT = name => `你是 ${name}（本次排练的成员之一）。工作目录 = 排练盘共享根。
+你的任务（按序四步，做完立即收口）：
+a) 用 team_task_list 找到主题含「${name === 'w1' ? 'scope-a' : 'scope-b'}」的任务；通过 task get 核对自己的任务描述，使用当前 revision claim（被拒则 re-list 并如实报告）。
+b) 做 3 轮追加（i = 1,2,3）：每轮把一行「${name} round i」追加进 journal/atomicity-probe.md（不存在创建；已存在读出再追加），每轮追加后读全文。
 c) 把一行「${name} scope-note」写进 journal/${name}-scope.md（新建）。
-d) 用 send_message 给 lead 回报：三轮各自读到的**总行数**、任何写入被拒与错误原文。`
+d) 用 send_message 给 lead 回报三轮读回的总行数、任何写入被拒与错误原文；完成后把自己认领的任务标记 complete。`
 
-  const MOTION = `排练动议（写完整性与 scope 警告观察，严格按步做，自己不要写那些文件、不要 claim）：
-1. team_task_create 两个任务：
-   任务一主题『scope-a 观察位』，writeScopes 为 ["journal"]；
-   任务二主题『scope-b 观察位』，writeScopes 为 ["journal/notes"]（**故意与前一个重叠**——本测试要观察的就是重叠警告）。
-2. 连续 spawn_teammate 两个成员：w1、w2，任务指令一字不差用这段：「${MEMBER_PROMPT('<你的名字>')}」（<你的名字> 分别换成 w1 / w2；指令里的 scope-a/scope-b 由成员按自己名字对应）。
-3. wait_agent 等两位都回报。
-4. 用 team_task_list 看两个任务视图，**把任何 writeScope 警告的原文逐字报给我**（没有警告也要明说）；再读出 journal/atomicity-probe.md 全文原样回复。`
+  const memberPromptA = MEMBER_PROMPT('w1')
+  const memberPromptB = MEMBER_PROMPT('w2')
+  const MOTION = `排练动议（写完整性与 scope 警告观察）：
+1. 用 team_task_create 建立两个任务：scope-a（description 明确其 owner w1 要执行 MEMBER_PROMPT 的三轮追加及 scope-note 步骤，writeScopes=["journal"]）；scope-b（description 明确其 owner w2 做相同步骤，writeScopes=["journal/notes"]）。两个 scope 有前缀重叠；scope 仅为 advisory。
+2. 连续 spawn_teammate 两个成员：w1 指令为「${memberPromptA}」，w2 指令为「${memberPromptB}」。不要改动任务范围或代成员写文件/认领任务。
+3. wait_agent 等两位成员都回报。
+4. 用 team_task_list 检查真实状态与writeScopeWarnings，并读出 journal/atomicity-probe.md 全文原样回复。`
 
   await rpc('session/prompt', { request: { requestId: `tap-${Date.now()}`, sessionId, mode: 'queue',
     content: [{ type: 'text', text: MOTION }], clientTimeZone: 'Asia/Shanghai' } })
@@ -80,31 +78,52 @@ d) 用 send_message 给 lead 回报：三轮各自读到的**总行数**、任�
 
   const deadline = Date.now() + 15 * 60_000
   let evs = []
-  while (Date.now() < deadline) {
-    evs = (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })).map(r => r.event).filter(Boolean)
-    if (evs.filter(e => e?.type === 'turn/end').length >= 2 && existsSync(TARGET)) break
-    await sleep(6_000)
+  let memberEvents = {}
+  let complete = false
+  const readMemberEvents = async events => {
+    const members = new Map(events.filter(event => event?.type === 'team/member' && event.data?.member?.name && event.data?.member?.id)
+      .map(event => [event.data.member.name, event.data.member.id]))
+    const collected = {}
+    for (const name of ['w1', 'w2']) {
+      const id = members.get(name)
+      if (id) collected[name] = (await readRecords(request => rpc('session/page', { request }), { kind: 'subagent', parentSessionId: sessionId, childSessionId: id, mode: 'continuable' }))
+        .map(record => record.event).filter(Boolean)
+    }
+    return { members, collected }
   }
-  await sleep(10_000)
-  evs = (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })).map(r => r.event).filter(Boolean)
+  while (Date.now() < deadline) {
+    evs = (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })).map(record => record.event).filter(Boolean)
+    const memberState = await readMemberEvents(evs)
+    memberEvents = memberState.collected
+    complete = teamRunComplete(evs, memberEvents, ['w1', 'w2'], existsSync(TARGET))
+    if (complete) break
+    await sleep(4_000)
+  }
+  evs = (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })).map(record => record.event).filter(Boolean)
+  const memberState = await readMemberEvents(evs)
+  memberEvents = memberState.collected
+  complete = teamRunComplete(evs, memberEvents, ['w1', 'w2'], existsSync(TARGET))
+  if (!complete) throw new Error('15 分钟内未满足 lead 与 w1/w2 completed 且目标文件存在')
 
   const file = existsSync(TARGET) ? readFileSync(TARGET, 'utf8') : ''
-  const lines = file.split('\n').filter(l => l.trim() !== '')
-  const expected = ['w1 round 1', 'w1 round 2', 'w1 round 3', 'w2 round 1', 'w2 round 2', 'w2 round 3']
-  const allPresent = expected.every(l => lines.includes(l))
-  const allWellFormed = lines.every(l => /^(w1|w2) (round [1-3]|scope-note)$/.test(l.trim()))
-  check('C4a 共享文件 6 行俱全且无撕行/异物', allPresent && allWellFormed, `实际行=${JSON.stringify(lines)}`)
-  const memberMsgs = evs.filter(e => e?.type === 'user/message' && /轮|行数|round/i.test(JSON.stringify(e.data)))
-  check('C4b 成员读回观察链在场（≥2 条回报）', memberMsgs.length >= 2, `${memberMsgs.length} 条`)
-  const leadText = evs.filter(e => e?.type === 'assistant/message').map(e => JSON.stringify(e.data)).join(' ')
-  check('C5a 任务视图 writeScope 重叠警告原文在场（advisory 可见）',
-    /write scopes overlap with task-/i.test(leadText), leadText.match(/write scopes overlap[^"\\]*/i)?.[0] ?? '未见警告——核对语义或模型遗漏')
-  console.log('\natomicity-probe.md：\n' + (file || '(不存在)'))
-  const failed = results.filter(r => !r.ok)
+  const evidence = atomicityEvidence({ leadEvents: evs, memberEvents, file })
+  check('C4a 共享文件恰含六个预期行（无重复/额外行）', evidence.fileExact, JSON.stringify(file))
+  check('C4b w1/w2 各三轮均有追加后真实读回', evidence.readbacks.w1 && evidence.readbacks.w2, JSON.stringify(evidence.readbacks))
+  check('C5a 成功 team_task_list 结果含 scope overlap warning', evidence.warningVisible, '')
+  check('C5b lead 与两成员 turn 均正常结束', complete, '')
+  const failed = results.filter(result => !result.ok)
   console.log(failed.length === 0
-    ? `\nteam-atomicity-probe: ALL PASS（${results.length}/${results.length}）——C4 原子发布读侧 + C5 scope 警告`
-    : `\nteam-atomicity-probe: ${failed.length} FAILURE(S)`)
+    ? `\nteam-atomicity-probe: ALL PASS（${results.length}/${results.length}）`
+    : `\nteam-atomicity-probe: ${failed.length} FAILURE(S)（${results.length - failed.length}/${results.length}）`)
   process.exitCode = failed.length === 0 ? 0 : 1
+  console.log('\natomicity-probe.md：\n' + (file || '(不存在)'))
+} catch (error) {
+  console.error('ERROR:', error.message)
+  process.exitCode = 2
 } finally {
-  child.kill('SIGTERM'); await sleep(1_000); child.kill('SIGKILL')
+  if (child.exitCode === null && child.signalCode === null) {
+    child.kill('SIGTERM')
+    await Promise.race([new Promise(resolve => child.once('exit', resolve)), sleep(5_000)])
+    if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL')
+  }
 }

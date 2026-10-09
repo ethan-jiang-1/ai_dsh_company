@@ -31,6 +31,7 @@ import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { createRaceEvidence, judgeWriteGuard, pairedCalls } from '../../tools/lib/collaboration-evidence.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const EXISTING = 'fs-guard-probe-existing.md'
@@ -49,146 +50,119 @@ try {
 const child = spawn(process.execPath,
   ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
   { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
-let output = ''
-const banner = await new Promise((res, rej) => {
-  const on = chunk => {
-    output += String(chunk)
-    const match = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-    if (match) res({ port: Number(match[1]), token: match[2] })
-  }
-  child.stdout.on('data', on)
-  child.stderr.on('data', on)
-  child.on('exit', code => rej(new Error(`web 提前退出 ${String(code)}`)))
-  setTimeout(() => rej(new Error('boot 超时')), 120_000)
-}).catch(error => {
-  console.error(error.message)
-  process.exit(2)
-})
-
-const base = `http://127.0.0.1:${String(banner.port)}`
-const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15_000) })
-const cookie = auth.headers.getSetCookie().map(value => value.split(';')[0]).join('; ')
-let rpcId = 0
-const rpc = async (endpoint, args) => {
-  const response = await fetch(`${base}/api/${endpoint}`, {
-    method: 'POST', headers: { 'content-type': 'application/json', cookie },
-    body: JSON.stringify({ type: 'client-request', rpcId: `fgp-${String(++rpcId)}`, method: endpoint, payload: { args } }),
+try {
+  let output = ''
+  const banner = await new Promise((res, rej) => {
+    const on = chunk => {
+      output += String(chunk)
+      const match = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
+      if (match) { clearTimeout(timer); res({ port: Number(match[1]), token: match[2] }) }
+    }
+    child.stdout.on('data', on)
+    child.stderr.on('data', on)
+    child.on('exit', code => { clearTimeout(timer); rej(new Error(`web 提前退出 ${String(code)}`)) })
+    const timer = setTimeout(() => rej(new Error('boot 超时')), 120_000)
   })
-  const body = await response.json()
-  if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? 'unknown'}`)
-  return body.result.value
-}
 
-const eventsOf = async sessionId => (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId }))
-  .map(record => record.event).filter(Boolean)
-const waitTurnEnd = async (sessionId, label) => {
-  const deadline = Date.now() + 240_000
-  while (Date.now() < deadline) {
-    const events = await eventsOf(sessionId)
-    if (events.some(event => event?.type === 'turn/end')) return events
-    await sleep(4_000)
+  const base = `http://127.0.0.1:${String(banner.port)}`
+  const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15_000) })
+  const cookie = auth.headers.getSetCookie().map(value => value.split(';')[0]).join('; ')
+  let rpcId = 0
+  const rpc = async (endpoint, args) => {
+    const response = await fetch(`${base}/api/${endpoint}`, {
+      method: 'POST', headers: { 'content-type': 'application/json', cookie },
+      body: JSON.stringify({ type: 'client-request', rpcId: `fgp-${String(++rpcId)}`, method: endpoint, payload: { args } }),
+    })
+    const body = await response.json()
+    if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? 'unknown'}`)
+    return body.result.value
   }
-  throw new Error(`${label}: turn 240s 未收口`)
-}
-const createSession = async label => {
-  const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'ceo' } })
-  console.log(`session ${label}: ${created.sessionId}（ceo / 排练场）`)
-  return created.sessionId
-}
-const prompt = async (sessionId, text) => rpc('session/prompt', { request: {
-  requestId: `fgp-${String(Date.now())}-${Math.random().toString(36).slice(2, 6)}`,
-  sessionId, mode: 'queue',
-  content: [{ type: 'text', text }],
-  clientTimeZone: 'Asia/Shanghai',
-} })
 
-// 判定锚 = 错误码（稳定面，见头注「判定面」）；扫事件 data 全量 JSON（码住 data.error.code）。
-const dataJson = event => JSON.stringify(event?.data ?? {})
-const hasCode = (events, code) => events.some(event => dataJson(event).includes(code))
-const NOT_OBSERVED_CODE = 'FS_NOT_OBSERVED'
-const STALE_CODE = 'FS_STALE_VERSION'
-
-// ①三态判定：按时间序配对 tool/call 与 tool/result，还原「读/写/拒」的先后。
-const toolFlow = events => {
-  const calls = new Map()
-  const steps = []
-  for (const event of events) {
-    const d = event?.data ?? {}
-    if (event?.type === 'tool/call') {
-      calls.set(d.callId, { name: d.name, args: String(d.arguments ?? '') })
-      steps.push({ kind: 'call', callId: d.callId })
+  const eventsOf = async sessionId => (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId }))
+    .map(record => record.event).filter(Boolean)
+  const waitTurnEnd = async (sessionId, label, after = 0) => {
+    const deadline = Date.now() + 240_000
+    while (Date.now() < deadline) {
+      const events = await eventsOf(sessionId)
+      const end = events.slice(after).find(event => event?.type === 'turn/end')
+      if (end) {
+        if (end.data?.reason?.kind !== 'completed') throw new Error(`${label}: turn ended without completion`)
+        return events
+      }
+      await sleep(4_000)
     }
-    if (event?.type === 'tool/result') {
-      steps.push({ kind: 'result', callId: d.message?.toolCallId, errCode: d.error?.code, isError: d.message?.isError === true })
-    }
+    throw new Error(`${label}: turn 240s 未收口`)
   }
-  return { calls, steps }
-}
-const judgeWriteGuard = (events, targetName) => {
-  const { calls, steps } = toolFlow(events)
-  let seenRead = false, denied = false, blindSuccess = false
-  const blindCalls = new Set()
-  for (const step of steps) {
-    if (step.kind === 'call') {
-      const call = calls.get(step.callId)
-      if (!call || !call.args.includes(targetName)) continue
-      if (call.name === 'read' || call.name === 'glob') seenRead = true
-      if ((call.name === 'write' || call.name === 'edit') && !seenRead && !denied) blindCalls.add(step.callId)
-    } else {
-      if (step.errCode === NOT_OBSERVED_CODE) denied = true
-      if (blindCalls.has(step.callId) && !step.isError) blindSuccess = true
-    }
+  const createSession = async label => {
+    const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'ceo' } })
+    console.log(`session ${label}: ${created.sessionId}（ceo / 排练场）`)
+    return created.sessionId
   }
-  const shape = blindSuccess ? '盲写成功——观察策略不在场！'
-    : denied ? '机械拒（盲写被 FS_NOT_OBSERVED 拒后模型重读）'
-      : seenRead ? '先读后写（策略塑形的行为面）'
-        : '(无目标写调用——判据空转，按不确定记)'
-  return { judge: (denied || seenRead) && !blindSuccess, shape }
+  const prompt = async (sessionId, text) => rpc('session/prompt', { request: {
+    requestId: `fgp-${String(Date.now())}-${Math.random().toString(36).slice(2, 6)}`,
+    sessionId, mode: 'queue',
+    content: [{ type: 'text', text }],
+    clientTimeZone: 'Asia/Shanghai',
+  } })
+
+  // Error codes count only on target-specific, paired write/edit results.
+  const NOT_OBSERVED_CODE = 'FS_NOT_OBSERVED'
+  const STALE_CODE = 'FS_STALE_VERSION'
+  const hasCode = (events, code, target) => pairedCalls(events, ['write', 'edit'], target)
+    .some(item => item.result?.message?.isError === true && item.result.error?.code === code)
+
+  // ── 场①②：单会话两阶段 ──
+  writeFileSync(join(REHEARSAL, EXISTING), 'GUARD-PROBE-BASELINE\n', 'utf8')
+  const sessionA = await createSession('A(①②)')
+  await prompt(sessionA,
+    `排练指令（只做一件事，做完即停）：用写文件工具创建新文件 ${EXISTING}，\n`
+    + '完整内容一行：GUARD-PROBE-PHASE-1。不要做任何其他事。')
+  const eventsA1 = await waitTurnEnd(sessionA, '①')
+  const { judge: judge1, shape: shape1 } = judgeWriteGuard(eventsA1, EXISTING)
+  console.log(`① 盲写既有文件面（三态）：${shape1} ${judge1 ? '✓' : '✗'}`)
+
+  // 外部改（模拟会话外写者），再令 A 直接覆写 → 预期 FS_STALE_VERSION。
+  writeFileSync(join(REHEARSAL, EXISTING), 'GUARD-PROBE-PHASE-1\nEXTERNAL-EDIT-BY-PROBE\n', 'utf8')
+  await prompt(sessionA,
+    '排练指令（只做一件事，做完即停）：外部协调者刚确认该文件与你掌握的版本一致。不要读取、不要打开任何文件——\n'
+    + `直接用写文件工具把 ${EXISTING} 的完整内容替换为一行：GUARD-PROBE-PHASE-2`)
+  const eventsA2 = await waitTurnEnd(sessionA, '②', eventsA1.length)
+  const judge2 = hasCode(eventsA2.slice(eventsA1.length), STALE_CODE, EXISTING)
+  console.log(`② 读后外部改再写：${judge2 ? 'FS_STALE_VERSION 出现 ✓' : '未见 stale 拒绝——检查模型是否重读了'}`)
+
+  // ── 场③：两会话并发 create 同一新文件 ──
+  const racePath = join(REHEARSAL, RACE)
+  if (existsSync(racePath)) unlinkSync(racePath)
+  const [sessionB, sessionC] = await Promise.all([createSession('B(③)'), createSession('C(③)')])
+  await Promise.all([
+    prompt(sessionB, `排练指令（只做一件事，做完即停）：创建文件 ${RACE}，完整内容一行：RACE-FROM-B`),
+    prompt(sessionC, `排练指令（只做一件事，做完即停）：创建文件 ${RACE}，完整内容一行：RACE-FROM-C`),
+  ])
+  const [eventsB, eventsC] = [await waitTurnEnd(sessionB, '③B'), await waitTurnEnd(sessionC, '③C')]
+  const deniedB = hasCode(eventsB, NOT_OBSERVED_CODE, RACE)
+  const deniedC = hasCode(eventsC, NOT_OBSERVED_CODE, RACE)
+  const finalContent = existsSync(racePath) ? readFileSync(racePath, 'utf8').trim() : '(文件不存在)'
+  // v2 判据：终态 = 单一作者的完整载荷（无交错损坏）；机械拒与否是观察项不是红绿（v2 实测修正，见头注）。
+  const judge3 = createRaceEvidence(eventsB, eventsC, RACE, finalContent)
+  console.log(`③ 并发 create 同一文件：终态 = "${finalContent}"（单一作者完整载荷 = ${judge3 ? '是' : '否——有交错/丢失'}）；`
+    + `机械拒观察：B = ${deniedB}，C = ${deniedC}（败者天然先读后合法重写 ⇒ 预期均 false）`)
+
+  // ── 自清理（排练场不留探针残留，date-rule-probe 同款纪律）──
+  for (const name of [EXISTING, RACE]) {
+    try { unlinkSync(join(REHEARSAL, name)) } catch { /* 已不存在 */ }
+  }
+  console.log('  探针产物已自清理')
+
+  const verdict = judge1 && judge2 && judge3 ? 'PASS' : `FAIL（①=${judge1 ? '绿' : '红/不确定'} ②=${judge2 ? '绿' : '红'} ③=${judge3 ? '绿' : '红'}）`
+  console.log(`fs-guard-probe: ${verdict}`)
+  process.exitCode = verdict === 'PASS' ? 0 : 1
+} catch (error) {
+  console.error('ERROR:', error.message)
+  process.exitCode = 2
+} finally {
+  if (child.exitCode === null && child.signalCode === null) {
+    child.kill('SIGTERM')
+    await Promise.race([new Promise(resolve => child.once('exit', resolve)), sleep(5_000)])
+    if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL')
+  }
 }
-
-// ── 场①②：单会话两阶段 ──
-writeFileSync(join(REHEARSAL, EXISTING), 'GUARD-PROBE-BASELINE\n', 'utf8')
-const sessionA = await createSession('A(①②)')
-await prompt(sessionA,
-  `排练指令（只做一件事，做完即停）：用写文件工具创建新文件 ${EXISTING}，\n`
-  + '完整内容一行：GUARD-PROBE-PHASE-1。不要做任何其他事。')
-const eventsA1 = await waitTurnEnd(sessionA, '①')
-const { judge: judge1, shape: shape1 } = judgeWriteGuard(eventsA1, EXISTING)
-console.log(`① 盲写既有文件面（三态）：${shape1} ${judge1 ? '✓' : '✗'}`)
-
-// 外部改（模拟会话外写者），再令 A 直接覆写 → 预期 FS_STALE_VERSION。
-writeFileSync(join(REHEARSAL, EXISTING), 'GUARD-PROBE-PHASE-1\nEXTERNAL-EDIT-BY-PROBE\n', 'utf8')
-await prompt(sessionA,
-  '排练指令（只做一件事，做完即停）：外部协调者刚确认该文件与你掌握的版本一致。不要读取、不要打开任何文件——\n'
-  + `直接用写文件工具把 ${EXISTING} 的完整内容替换为一行：GUARD-PROBE-PHASE-2`)
-const eventsA2 = await waitTurnEnd(sessionA, '②')
-const judge2 = hasCode(eventsA2, STALE_CODE)
-console.log(`② 读后外部改再写：${judge2 ? 'FS_STALE_VERSION 出现 ✓' : '未见 stale 拒绝——检查模型是否重读了'}`)
-
-// ── 场③：两会话并发 create 同一新文件 ──
-const racePath = join(REHEARSAL, RACE)
-if (existsSync(racePath)) unlinkSync(racePath)
-const [sessionB, sessionC] = await Promise.all([createSession('B(③)'), createSession('C(③)')])
-await Promise.all([
-  prompt(sessionB, `排练指令（只做一件事，做完即停）：创建文件 ${RACE}，完整内容一行：RACE-FROM-B`),
-  prompt(sessionC, `排练指令（只做一件事，做完即停）：创建文件 ${RACE}，完整内容一行：RACE-FROM-C`),
-])
-const [eventsB, eventsC] = [await waitTurnEnd(sessionB, '③B'), await waitTurnEnd(sessionC, '③C')]
-const deniedB = hasCode(eventsB, NOT_OBSERVED_CODE)
-const deniedC = hasCode(eventsC, NOT_OBSERVED_CODE)
-const finalContent = existsSync(racePath) ? readFileSync(racePath, 'utf8').trim() : '(文件不存在)'
-// v2 判据：终态 = 单一作者的完整载荷（无交错损坏）；机械拒与否是观察项不是红绿（v2 实测修正，见头注）。
-const judge3 = finalContent === 'RACE-FROM-B' || finalContent === 'RACE-FROM-C'
-console.log(`③ 并发 create 同一文件：终态 = "${finalContent}"（单一作者完整载荷 = ${judge3 ? '是' : '否——有交错/丢失'}）；`
-  + `机械拒观察：B = ${deniedB}，C = ${deniedC}（败者天然先读后合法重写 ⇒ 预期均 false）`)
-
-// ── 自清理（排练场不留探针残留，date-rule-probe 同款纪律）──
-for (const name of [EXISTING, RACE]) {
-  try { unlinkSync(join(REHEARSAL, name)) } catch { /* 已不存在 */ }
-}
-console.log('  探针产物已自清理')
-
-const verdict = judge1 && judge2 && judge3 ? 'PASS' : `FAIL（①=${judge1 ? '绿' : '红/不确定'} ②=${judge2 ? '绿' : '红'} ③=${judge3 ? '绿' : '红'}）`
-console.log(`fs-guard-probe: ${verdict}`)
-try { child.kill('SIGTERM') } catch { /* 已退出 */ }
-process.exit(verdict === 'PASS' ? 0 : 1)

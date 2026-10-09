@@ -9,17 +9,18 @@
 // 消息要么已投递（日志在案）、要么留在 queued-minus-delivered 恢复邮箱，**绝不静默丢失**
 // ——这是「不需要 redis」结论的持久化半边（单进程内建协调是否连崩溃都扛得住）。
 //
-// 判据（verify the world：lead 会话日志跨崩溃前后是同一份）：
-//   R1 重启后团队状态恢复（lead 报告名册含 res）
-//   R2 标记消息有下落：team/message/delivered ≥1（崩溃前已投 或 重启后补投——两分支都算 durable）
-//   R3 无重复投递（同一 messageId 的 delivered ≤1）
-//   R4 res 的恢复后回报被 lead 转述（续行通路在崩溃后仍通）
+// 判据（只认 lead 日志里的 durable 事件与成对工具结果）：
+//   R1 重启 prompt 后的 list_agents 成功结果含 target=res
+//   R2 崩溃前 lead→res marker queued，精确 messageId 在全日志恰有一次 delivered
+//   R3 重启 prompt 后 res→lead 新回复含 MARKER，精确 messageId 已 queued 且 delivered
+//   R4 重启 prompt 后出现 completed turn；deadline 未完成明确失败
 // 用法：source run/env.sh && node probes/team/team-recovery-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
+import { recoveryEvidence } from '../../tools/lib/recovery-scope-evidence.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const MARKER = `R7-恢复标记-${String(Date.now() % 100000)}`
@@ -34,13 +35,14 @@ const run = async () => {
     const ch = spawn(process.execPath,
       ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
       { cwd: ROOT, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] })
+    proc = ch
     let out = ''
     const bn = await new Promise((res, rej) => {
-      const on = c => { out += String(c); const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(out); if (m) res({ port: +m[1], token: m[2] }) }
+      const on = c => { out += String(c); const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(out); if (m) { clearTimeout(timer); res({ port: +m[1], token: m[2] }) } }
+      const timer = setTimeout(() => rej(new Error('boot 超时')), 120_000)
       ch.stdout.on('data', on); ch.stderr.on('data', on)
-      ch.on('exit', c => rej(new Error(`web 提前退出 ${c}`))); setTimeout(() => rej(new Error('boot 超时')), 120_000)
+      ch.on('exit', c => { clearTimeout(timer); rej(new Error(`web 提前退出 ${c}`)) })
     })
-    proc = ch
     return { child: ch, base: `http://127.0.0.1:${bn.port}`, token: bn.token }
   })()
   console.log(`web up (pre-kill): ${base1}`)
@@ -56,9 +58,11 @@ const run = async () => {
   }
   let rpc = mkRpc(base1, cookie)
   const events = async () => (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })).map(r => r.event).filter(Boolean)
+  let leadId
 
   const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'ceo' } })
   const sessionId = created.sessionId
+  leadId = sessionId
   console.log('ceo session', sessionId)
 
   const MEMBER_PROMPT = `你的任务（多步长任务，逐步执行）：依次完整阅读 kb/ceo/CHARTER.md → kb/org.md → kb/cfo/CHARTER.md，
@@ -75,22 +79,39 @@ const run = async () => {
 
   // 盯 queued（标记消息入 durable 日志）→ 立刻 SIGKILL（投递竞态窗口越小越好）
   let killAt = -1
+  let queuedMessageId
+  let watermarkSeq = -1
   const deadline = Date.now() + 10 * 60_000
   while (Date.now() < deadline) {
     const evs = await events()
-    const qi = evs.findIndex(e => e?.type === 'team/message/queued' && JSON.stringify(e.data ?? {}).includes(MARKER))
-    if (qi >= 0) {
-      killAt = qi
-      const deliveredAlready = evs.slice(qi).some(e => e?.type === 'team/message/delivered')
-      console.log(`  queued 在案（index ${qi}，delivered=${String(deliveredAlready)}）→ SIGKILL`)
+    const queued = evs.filter(e => e?.type === 'team/message/queued'
+      && JSON.stringify(e.data?.message?.content ?? []).includes(MARKER))
+    if (queued.length > 0) {
+      if (queued.length !== 1 || typeof queued[0].data?.message?.id !== 'string') {
+        throw new Error(`标记消息入队形态异常：queued=${queued.length}`)
+      }
+      killAt = evs.indexOf(queued[0])
+      queuedMessageId = queued[0].data.message.id
+      watermarkSeq = Math.max(queued[0].seq ?? -1, ...evs.filter(e => Number.isSafeInteger(e?.seq)).map(e => e.seq))
+      console.log(`  queued 在案（seq ${queued[0].seq}，messageId=${queuedMessageId}，watermark=${watermarkSeq}）→ SIGKILL`)
       break
     }
     await sleep(800)
   }
-  if (killAt < 0) throw new Error('10 分钟内未见标记消息入队')
+  if (killAt < 0) throw new Error('deadline: 10 分钟内未见崩溃前 marker message 入队')
   const preKill = await events()
-  kill9(proc)
-  await sleep(2_000)
+  const markerQueue = preKill.find(e => e?.type === 'team/message/queued' && e.data?.message?.id === queuedMessageId)
+  if (!markerQueue || markerQueue.seq > watermarkSeq) throw new Error('marker message 不在强杀前已捕获的日志水位内')
+  watermarkSeq = Math.max(watermarkSeq, ...preKill.map(e => Number.isSafeInteger(e?.seq) ? e.seq : -1))
+  if (watermarkSeq < 0 || !queuedMessageId) throw new Error('SIGKILL 前无法固定有效日志水位和 marker messageId')
+  console.log(`  crash watermark seq=${watermarkSeq}`)
+  const crashedProcess = proc
+  kill9(crashedProcess)
+  const killed = crashedProcess.exitCode !== null || crashedProcess.signalCode !== null || await Promise.race([
+    new Promise(resolve => crashedProcess.once('exit', () => resolve(true))),
+    sleep(5_000).then(() => false),
+  ])
+  if (!killed) throw new Error('SIGKILL 后旧 web 进程未在 5 秒内退出')
   console.log('process SIGKILLed（崩溃点）')
   proc = null
 
@@ -101,48 +122,79 @@ const run = async () => {
   proc = ch2
   let out2 = ''
   const bn2 = await new Promise((res, rej) => {
-    const on = c => { out2 += String(c); const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(out2); if (m) res({ port: +m[1], token: m[2] }) }
+    const on = c => { out2 += String(c); const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(out2); if (m) { clearTimeout(timer); res({ port: +m[1], token: m[2] }) } }
+    const timer = setTimeout(() => rej(new Error('web 重启 boot 超时（120s）')), 120_000)
     ch2.stdout.on('data', on); ch2.stderr.on('data', on)
-    ch2.on('exit', c => rej(new Error(`web(重启) 提前退出 ${c}`))); setTimeout(() => rej(new Error('boot 超时')), 120_000)
+    ch2.on('exit', c => { clearTimeout(timer); rej(new Error(`web(重启) 提前退出 ${c}`)) })
   })
   const base2 = `http://127.0.0.1:${bn2.port}`
   console.log(`web up (post-restart): ${base2}`)
   const auth2 = await fetch(`${base2}/?token=${bn2.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
   const cookie2 = auth2.headers.getSetCookie().map(c => c.split(';')[0]).join('; ')
   rpc = mkRpc(base2, cookie2)
+  const restartPrompt = `恢复检查（前一进程被强杀）：1) 使用 list_agents 工具报告真实名册（res 的精确 target/name 和状态）；2) 给 res 发一条消息：「恢复检查：请回报你收到的最后一条指示原文与当前进度，以及标记「${MARKER}」」；3) 把 res 的恢复后回报转述给我，不能用崩溃前正文代替。`
   await rpc('session/prompt', { request: { requestId: `trp-re-${Date.now()}`, sessionId, mode: 'queue',
-    content: [{ type: 'text', text: `恢复检查（前一进程被强杀）：1) 报告你的团队名册（res 在不在、什么状态）；2) 给 res 发一条消息：「恢复检查：请回报你收到的最后一条指示原文与当前进度」；3) 把 res 的回报转述给我（含它是否提到「${MARKER}」）。` }], clientTimeZone: 'Asia/Shanghai' } })
+    content: [{ type: 'text', text: restartPrompt }], clientTimeZone: 'Asia/Shanghai' } })
   console.log('recovery check sent')
 
-  const deadline2 = Date.now() + 12 * 60_000
+  const promptDeadline = Date.now() + 20_000
   let evs2 = []
+  let restartPromptSeq = -1
+  while (Date.now() < promptDeadline) {
+    evs2 = await events()
+    const prompts = evs2.filter(e => Number.isSafeInteger(e?.seq) && e.seq > watermarkSeq
+      && e?.type === 'user/message' && JSON.stringify(e.data?.content ?? []).includes(restartPrompt))
+    if (prompts.length > 1) throw new Error(`恢复 prompt 在水位后重复出现 ${prompts.length} 次`)
+    if (prompts.length === 1) { restartPromptSeq = prompts[0].seq; break }
+    await sleep(500)
+  }
+  if (restartPromptSeq < 0) throw new Error(`deadline: 恢复 prompt 未在 watermark ${watermarkSeq} 后写入 durable 日志（20s）`)
+  const recoveryWatermark = restartPromptSeq
+  console.log(`  recovery prompt seq=${restartPromptSeq}; 等待其后的 completed turn + roster/reply 事件`)
+
+  const deadline2 = Date.now() + 12 * 60_000
+  let evidence
   while (Date.now() < deadline2) {
     evs2 = await events()
-    if (evs2.filter(e => e?.type === 'turn/end').length >= 2) break
-    await sleep(6_000)
+    evidence = recoveryEvidence({ events: evs2, marker: MARKER, markerMessageId: queuedMessageId, restartPrompt, watermarkSeq, leadId })
+    if (evidence.completedTurn) break
+    await sleep(2_000)
   }
-  await sleep(8_000)
   evs2 = await events()
+  evidence = recoveryEvidence({ events: evs2, marker: MARKER, markerMessageId: queuedMessageId, restartPrompt, watermarkSeq, leadId })
+  if (!evidence.completedTurn) {
+    console.error(`deadline: recovery prompt watermark ${recoveryWatermark} 之后没有 completed turn（12 分钟）；证据=${JSON.stringify(evidence)}`)
+    process.exitCode = 1
+    return
+  }
+  if (!evidence.roster || !evidence.reply) {
+    console.error(`FAIL: 恢复 turn 已结束，但缺少真实 roster 或 res→lead delivered 回复；证据=${JSON.stringify(evidence)}`)
+    process.exitCode = 1
+    return
+  }
 
-  // ── 判据（evs2 = 重启后全量日志，本就含崩溃前事件——与 preKill 拼接会重复计数，run5 教训）──
-  const queued = evs2.find(e => e?.type === 'team/message/queued' && JSON.stringify(e.data ?? {}).includes(MARKER))
-  const msgId = (JSON.stringify(queued?.data ?? {}).match(/team-message-[0-9a-f-]{36}/) ?? [null])[0]
-  const delivered = evs2.filter(e => e?.type === 'team/message/delivered' && msgId && JSON.stringify(e.data ?? {}).includes(msgId))
-  const restartIdx = evs2.findIndex(e => e?.type === 'user/message' && JSON.stringify(e.data ?? {}).includes('恢复检查（前一进程被强杀）'))
-  const deliveredPost = restartIdx >= 0 ? delivered.filter(e => evs2.indexOf(e) >= restartIdx) : []
-  console.log(`\n观察：标记=${MARKER} messageId=${msgId ?? '未取到'}；delivered 总数=${delivered.length}（崩溃前 ${delivered.length - deliveredPost.length} / 重启后 ${deliveredPost.length}）`)
-
-  check('R2 标记消息有下落（崩溃前已投 或 重启后补投）', msgId !== null && delivered.length >= 1,
-    msgId ? `delivered ×${delivered.length}` : '队列事件里没有取到 messageId')
-  check('R3 无重复投递（同一 messageId delivered ≤1）', msgId === null || delivered.length <= 1, `delivered ×${delivered.length}`)
-  const postText = evs2.filter(e => e?.type === 'assistant/message').map(e => (e.data?.message?.content ?? []).filter(b => b?.type === 'text').map(b => b.text).join(' ')).join(' ')
-  check('R1 重启后团队状态恢复（名册含 res）', /res/.test(postText), postText.slice(0, 120))
-  check('R4 res 的恢复后回报被 lead 转述', /收到|进度|CHARTER|恢复标记|指示/.test(postText), postText.slice(-150))
+  check('R1 重启后 list_agents 工具结果含 res', evidence.roster, `prompt seq>${watermarkSeq}; prompt seq=${evidence.restartPromptSeq}`)
+  check('R2 崩溃前 marker messageId 恰有一次 delivered', evidence.markerQueuedOnce && evidence.markerDeliveredExactlyOnce,
+    `messageId=${evidence.markerMessageId ?? 'missing'}; delivered exactly once=${String(evidence.markerDeliveredExactlyOnce)}`)
+  check('R3 重启后 res→lead 回报已 queued 且 delivered', evidence.reply,
+    `reply messageIds=${JSON.stringify(evidence.replyMessageIds)}`)
+  check('R4 恢复 prompt 后 lead turn completed', evidence.completedTurn, `turn after prompt seq ${evidence.restartPromptSeq}`)
   const failed = results.filter(r => !r.ok)
   console.log(failed.length === 0
-    ? `\nteam-recovery-probe: ALL PASS（${results.length}/${results.length}）——SIGKILL 后团队状态与邮箱 durable`
+    ? `\nteam-recovery-probe: ALL PASS（${results.length}/${results.length}）——watermark 后真实 roster、唯一 marker delivery、恢复回复与完成 turn 均在案`
     : `\nteam-recovery-probe: ${failed.length} FAILURE(S)`)
   process.exitCode = failed.length === 0 ? 0 : 1
 }
 
-try { await run().catch(e => { console.error('ERROR:', e.message); process.exitCode = 2 }) } finally { try { kill9(proc) } catch {} }
+try {
+  await run()
+} catch (error) {
+  console.error('team-recovery-probe: ERROR', error.message)
+  process.exitCode = 2
+} finally {
+  if (proc) {
+    kill9(proc)
+    await Promise.race([new Promise(resolve => proc.once('exit', resolve)), sleep(5_000)])
+    proc = null
+  }
+}
