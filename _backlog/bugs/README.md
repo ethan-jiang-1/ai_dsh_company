@@ -8,9 +8,7 @@
 
 ## 活跃清单
 
-| Bug | 标题 | 严重级 | 发现 |
-|---|---|---|---|
-| [BUG-007](BUG-007-collaboration-probe-false-positives.md) | 协作探针接受无操作/错误状态，且等待不存在的第2轮 | P1 | 2026-10-09 |
+当前无活跃缺陷。
 
 ## frontmatter 与模板
 

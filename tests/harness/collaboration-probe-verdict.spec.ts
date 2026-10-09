@@ -19,12 +19,16 @@ function verdict(path: string, from: string, through: string, input: object) {
 }
 
 describe('probe required checks determine the actual exit code', () => {
-  it.each(['fileExact', 'attemptedWriteRejected', 'claimRace', 'reports', 'membersEnded', 'complete'])('concurrency refuses missing %s', failed => {
-    const evidence = { fileExact: failed !== 'fileExact', attemptedWriteRejected: failed !== 'attemptedWriteRejected',
-      claimRace: failed !== 'claimRace', reports: failed !== 'reports', membersEnded: failed !== 'membersEnded', writes: [], claims: [], task: {} }
-    const judged = verdict('probes/team/team-concurrency-probe.mjs', "  check('C1a", '\n} catch (error)', { evidence, complete: failed !== 'complete', file: '' })
+  it.each(['fileExact', 'claimRace', 'reports', 'membersEnded', 'complete', 'publications', 'noLeadWrites', 'barrierReads', 'recovery', 'barrierReleased', 'none'])('concurrency verdict handles missing %s independently', failed => {
+    const evidence = { fileExact: failed !== 'fileExact', claimRace: failed !== 'claimRace',
+      reports: failed !== 'reports', membersEnded: failed !== 'membersEnded', writes: [], claims: [], task: {} }
+    const barrier = { publications: failed !== 'publications', noLeadWrites: failed !== 'noLeadWrites',
+      barrierReads: failed !== 'barrierReads', recovery: failed !== 'recovery' }
+    const judged = verdict('probes/team/team-concurrency-probe.mjs', "  check('C1a", '\n} catch (error)',
+      { evidence, barrier, barrierReleased: failed !== 'barrierReleased', complete: failed !== 'complete', file: '' })
     expect(judged.results).toHaveLength(5)
-    expect(judged.process.exitCode).toBe(1)
+    expect(judged.process.exitCode).toBe(failed === 'none' ? 0 : 1)
+    expect(judged.results.filter(row => !row.ok)).toHaveLength(failed === 'none' ? 0 : 1)
   })
   it.each(['fileExact', 'readbackW1', 'readbackW2', 'warningVisible', 'complete'])('atomicity refuses missing %s', failed => {
     const evidence = { fileExact: failed !== 'fileExact', readbacks: { w1: failed !== 'readbackW1', w2: failed !== 'readbackW2' }, warningVisible: failed !== 'warningVisible' }

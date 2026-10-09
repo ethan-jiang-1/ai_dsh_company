@@ -5,7 +5,7 @@ intent: "复核多人协作的锁与 teamagent 保证、历史研究的落地和
 
 # 多人协作：teamagent、锁与验收资产复核
 
-消费者：[协作安全问题卡](../../issues/2026-10-09-collaboration-safety-acceptance.md)、[BUG-007](../../bugs/BUG-007-collaboration-probe-false-positives.md)。授权：用户要求先研究、实验，不默认旧研究正常落地，并明确研究 MD 先落本目录。本轮没有改生产代码、preset 或 vendor。
+消费者：[协作安全问题卡](../../issues/2026-10-09-collaboration-safety-acceptance.md)、[BUG-007](../../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)。授权：用户要求先研究、实验，不默认旧研究正常落地，并明确研究 MD 先落本目录。本轮没有改生产代码、preset 或 vendor。
 
 ## 结论先行
 
@@ -99,7 +99,7 @@ node /Users/bowhead/ai_dsh_company/node_modules/vitest/vitest.mjs run packages/e
 | recovery R1/R4 | 只提供崩溃前含 res/收到恢复标记的正文 | 两项 true | 全历史扫词，缺 kill/resume 水位与新事件证据；不证明整个 recovery probe 全绿 |
 | taskboard B3 | 两 root 回答均含 renewal-z，B3=false | process.exit(0) | 实际退出只看 b1，与头注 B1+B3 承诺不一致 |
 
-以上归 [BUG-007](../../bugs/BUG-007-collaboration-probe-false-positives.md)，本轮未修原探针。与“模型会出错”无关：坏样本是给独立 oracle 的，接受它们就是验收代码缺陷。
+以上归 [BUG-007](../../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)，本轮未修原探针。与“模型会出错”无关：坏样本是给独立 oracle 的，接受它们就是验收代码缺陷。
 
 语义审另发现新仪器若提取片段仍在、check已移出，空集合可能被误记PASS；本轮已修新仪器，强制核对check名称、数量、布尔类型，并验证E1结果形状与B3出口实际执行。实际在内存读取替身中对concurrency/atomicity/recovery各移除check调用（未改原文件），三项均以明确 `oracle check set changed` 返回exit2；真实原文件仍5/5 FAIL exit1。此验证只证明仪器不会把这三种空检查当绿，不证明BUG-007已修。
 

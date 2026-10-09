@@ -45,6 +45,7 @@
 | [BUG-004-claim-yield-not-machine-readable.md](fixed_bugs/BUG-004-claim-yield-not-machine-readable.md) | 占位让位不可机判 | 2026-10-06 |
 | [BUG-005-dual-signoff-single-door-routing.md](fixed_bugs/BUG-005-dual-signoff-single-door-routing.md) | 双签多门退化单签 | 2026-10-06 |
 | [BUG-006-ceo-meta-vocab-drift.md](fixed_bugs/BUG-006-ceo-meta-vocab-drift.md) | CEO 产出 meta 词表漂移 | 2026-10-07 |
+| [BUG-007-collaboration-probe-false-positives.md](fixed_bugs/BUG-007-collaboration-probe-false-positives.md) | 协作探针接受无操作/错误状态，且等待不存在的第2轮 | 2026-10-10 |
 
 ## 随卡归档的研究
 

@@ -2,7 +2,7 @@
 // 状态：常驻
 // 团队并发机制探针（C 系 C1+C2 固化，多用户 BDD 第一批，2026-10-04；真模型 ≈$2–4 / 5–10min，排练场）
 // 何时跑：fs-local/agent-team 并发语义要复核时（改动或 vendor 升 pin 涉及其上时）；
-//         首固化 = 2026-10-04 走查二（C1 单次观察）的可重复化——多次采样才叫证明
+//         实验overlay仅在成员首次真实read完成后等待两边到场，共同放行；不把重复采样当证明。
 //
 // 为什么存在：用户 #1 担忧 = 并发把共享盘数据搞乱；走查二已观察「双成员同文件并发写 = 一胜一拒、
 // 零静默互踩」（单次）。本 probe 把 C1 变成可重复判据，并加 C2（同任务并发 claim = CAS 冲突；败者可re-list，但已有owner不会因重读而释放）。
@@ -16,11 +16,12 @@
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
-import { mkdirSync, existsSync, readFileSync, rmSync } from 'node:fs'
+import { mkdirSync, existsSync, readFileSync, rmSync, writeFileSync, mkdtempSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { concurrencyEvidence, teamRunComplete } from '../../tools/lib/collaboration-evidence.mjs'
 
+import { teamBarrierEvidence } from '../../tools/lib/team-barrier-evidence.mjs'
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const TARGET = join(REHEARSAL, 'journal', 'team-concurrency-probe.md')
 mkdirSync(dirname(TARGET), { recursive: true })
@@ -31,16 +32,20 @@ try { rmSync(TARGET, { force: true }) } catch {}
 let home
 try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('team-concurrency-probe') } catch (e) { console.error(e.message); process.exit(2) }
 
+const barrierDir = mkdtempSync(join(home, 'team-read-barrier-'))
+const overlay = join(barrierDir, 'barrier.patch.yml')
+writeFileSync(overlay, `- insert:\n    - id: probe-read-barrier\n      name: ${JSON.stringify(join(ROOT, 'probes/team/read-barrier/index.mjs'))}\n`)
+writeFileSync(TARGET, '', 'utf8')
 const child = spawn(process.execPath,
-  ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-  { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
+  ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--patch', overlay, '--', '--port', '0', '--no-open'],
+  { cwd: ROOT, env: { ...process.env, DSH_HOME: home, DSH_PROBE_BARRIER_DIR: barrierDir, DSH_PROBE_BARRIER_TARGET: TARGET, DSH_PROBE_BARRIER_CWD: REHEARSAL }, stdio: ['ignore', 'pipe', 'pipe'] })
 try {
   let output = ''
   const banner = await new Promise((res, rej) => {
-    const timer = setTimeout(() => rej(new Error('boot 超时')), 120_000)
+    const timer = setTimeout(() => rej(new Error(`boot 超时\\n${output}`)), 120_000)
     const on = c => { output += String(c); const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output); if (m) { clearTimeout(timer); res({ port: +m[1], token: m[2] }) } }
     child.stdout.on('data', on); child.stderr.on('data', on)
-    child.on('exit', c => { clearTimeout(timer); rej(new Error(`web 提前退出 ${c}`)) })
+    child.on('exit', c => { clearTimeout(timer); rej(new Error(`web 提前退出 ${c}\\n${output}`)) })
   })
   const base = `http://127.0.0.1:${banner.port}`
   console.log(`web up: ${base}`)
@@ -59,16 +64,15 @@ try {
   const sessionId = created.sessionId
   console.log('ceo session', sessionId)
 
-  const MEMBER_PROMPT = name => `你的任务（按序三步，做完立即收口）：
-a) 用 team_task_list 找到主题含「竞写观察」的任务，用 team_task_update 把 owner 认领为你（认领时用你看到的当前 revision）。若认领被拒（revision 冲突等），重新 team_task_list 看最新状态；已有 owner 就让位并回报，不把重读当成释放权限。
-b) 把一行「${name} was here」写进 journal/team-concurrency-probe.md——文件不存在就创建写入；已存在就读出再追加。若写入被拒，**重读最新内容后**把你要写的那行补上（重试用 edit 或再写），确保你的那行最终在文件里。
-c) 用 send_message 给 lead 一句回报，**如实**包含：claim 是否一次成功/被拒重试、写盘是否一次成功/被拒重试、任何错误原文。`
-
-  const MOTION = `排练动议（团队并发机制探针，严格按步做，自己不要写那个文件、不要 claim 那个任务）：
-1. 用 team_task_create 建一个任务，主题：『竞写观察（w1/w2 双成员并发认领与写盘）』。
-2. **紧接着连续** spawn_teammate 两个成员：名字 w1、w2，两者的任务指令一字不差用这段：「${MEMBER_PROMPT('<你的名字>')}」（<你的名字> 分别换成 w1 / w2）。
-3. 用 wait_agent 等两位成员都回报。
-4. 读出 journal/team-concurrency-probe.md 的完整最终内容原样回复，并汇总两位成员回报里的 claim/写盘结局。`
+  const MEMBER_PROMPT = name => `你是${name}，按序执行：
+a) team_task_list找到竞写观察任务；这次首次claim必须使用expected_revision=1。task claim是一项独立CAS实验：失败后让位，不要再claim；任务描述授权双方参加下面的文件实验，不以task owner限制本实验写入。
+b) 用read读取journal/team-concurrency-probe.md全文。工具可能等待实验驱动共同放行，留在本轮等待，不要另开工具绕过。
+c) read返回后，先不要再次read，直接用write把自己的一行「${name} was here」加换行写入该文件。若实际工具拒绝，read最新全文，保留他人行再追加自己的行，write发布；自己的行已有就不重复。不使用bash或外部写者。
+d) send_message回报lead实际claim/write结果后结束。`
+  const MOTION = `受控并发实验：你不读写journal/team-concurrency-probe.md，不claim任务。
+1. team_task_create建一个任务，主题『竞写观察』；description说明claim验证CAS，文件实验独立授权w1/w2双方各写一行。
+2. spawn_teammate w1指令「${MEMBER_PROMPT('w1')}」，spawn_teammate w2指令「${MEMBER_PROMPT('w2')}」。
+3. wait_agent等成员回报并结束本轮，不读目标文件，不发送额外写盘命令。`
 
   await rpc('session/prompt', { request: { requestId: `tcp-${Date.now()}`, sessionId, mode: 'queue',
     content: [{ type: 'text', text: MOTION }], clientTimeZone: 'Asia/Shanghai' } })
@@ -79,8 +83,10 @@ c) 用 send_message 给 lead 一句回报，**如实**包含：claim 是否一�
   let evs = []
   let memberEvents = {}
   let complete = false
+  let barrierReleased = false
   while (Date.now() < deadline) {
     evs = (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })).map(r => r.event).filter(Boolean)
+    if (evs.some(event => event.type === 'turn/end' && event.data?.reason?.kind !== 'completed')) throw new Error('Lead非正常结束，检查原始日志')
     const members = new Map(evs.filter(e => e?.type === 'team/member' && e.data?.member?.name && e.data?.member?.id)
       .map(e => [e.data.member.name, e.data.member.id]))
     memberEvents = {}
@@ -88,6 +94,20 @@ c) 用 send_message 给 lead 一句回报，**如实**包含：claim 是否一�
       const id = members.get(name)
       if (id) memberEvents[name] = (await readRecords(request => rpc('session/page', { request }), { kind: 'subagent', parentSessionId: sessionId, childSessionId: id, mode: 'continuable' }))
         .map(record => record.event).filter(Boolean)
+    }
+    if (!barrierReleased && ['w1', 'w2'].every(name => {
+      const id = members.get(name)
+      const path = id && join(barrierDir, `${id}.ready.json`)
+      if (!path || !existsSync(path)) return false
+      const marker = JSON.parse(readFileSync(path, 'utf8'))
+      const events = memberEvents[name] ?? []
+      const read = events.find(event => event.type === 'tool/call' && event.data?.callId === marker.callId && event.data?.name === 'read')
+      return marker.sessionId === id && marker.path === TARGET && read
+    })) {
+      if (readFileSync(TARGET, 'utf8') !== '') throw new Error('barrier基线已被修改')
+      writeFileSync(join(barrierDir, 'release'), 'both member reads staged\n')
+      barrierReleased = true
+      console.log('both member reads completed in same turn; driver released barrier')
     }
     complete = teamRunComplete(evs, memberEvents, ['w1', 'w2'], existsSync(TARGET))
     if (complete) break
@@ -107,8 +127,19 @@ c) 用 send_message 给 lead 一句回报，**如实**包含：claim 是否一�
 
   const file = existsSync(TARGET) ? readFileSync(TARGET, 'utf8') : ''
   const evidence = concurrencyEvidence({ leadEvents: evs, memberEvents, memberIds: Object.fromEntries(members), file })
-  check('C1a 文件终态精确含 w1/w2 各一行（无重复/额外行）', evidence.fileExact, JSON.stringify(file))
-  check('C1b 至少一条目标写入被 freshness guard 拒绝', evidence.attemptedWriteRejected, JSON.stringify(evidence.writes.map(write => ({ name: write.name, code: write.result?.error?.code }))))
+  const loadMarker = (name, suffix) => {
+    const path = join(barrierDir, `${members.get(name)}.${suffix}.json`)
+    return existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : undefined
+  }
+  const arrivals = Object.fromEntries(['w1', 'w2'].map(name => [name, loadMarker(name, 'ready')]))
+  const released = Object.fromEntries(['w1', 'w2'].map(name => [name, loadMarker(name, 'released')]))
+  const barrier = teamBarrierEvidence({ leadEvents: evs, memberEvents, memberIds: Object.fromEntries(members), target: TARGET, arrivals, released, file })
+  writeFileSync(join(barrierDir, 'evidence.json'), JSON.stringify({ sessionId, memberIds: Object.fromEntries(members), arrivals, released, file, barrier }, null, 2) + '\n')
+  writeFileSync(join(barrierDir, 'lead.json'), JSON.stringify(evs) + '\n')
+  for (const name of ['w1', 'w2']) writeFileSync(join(barrierDir, `${name}.json`), JSON.stringify(memberEvents[name]) + '\n')
+  console.log('barrier evidence', barrierDir, barrier)
+  check('C1a 文件终态精确含 w1/w2 各一行（无重复/额外行）', evidence.fileExact && barrier.publications && barrier.noLeadWrites, JSON.stringify(file))
+  check('C1b 同轮屏障读取后真实stale且重读合并发布', barrierReleased && barrier.barrierReads && barrier.recovery, JSON.stringify(barrier))
   check('C2a 同 revision claim 一胜一拒且owner归属匹配', evidence.claimRace, JSON.stringify({ task: evidence.task, claims: evidence.claims.map(claim => ({ name: claim.name, revision: claim.expectedRevision, code: claim.result?.error?.code })) }))
   check('C2b w1/w2 回报均有真实 queued + delivered 事件', evidence.reports, '')
   check('C2c lead 与两成员 turn 均正常结束', complete && evidence.membersEnded, '')

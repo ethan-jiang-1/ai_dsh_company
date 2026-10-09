@@ -9,11 +9,11 @@ opened: 2026-10-09
 
 **问题与期望结果：** 用户要求先研究、实验多人协作，尤其锁、teamagent 使用与测试资产，按 methods 推敲验收；指出历史研究的落地不可信。目标是划清实际保证、发现具体缺陷，提出可接受的最小改进，而非预先决定引入 Redis 或新调度器。
 
-**当前情况：** [本轮研究](../research/collaboration/2026-10-09-teamagent-locks-and-acceptance-audit.md)已复跑跨进程文件竞争、上游任务板测试及跨根会话真模型观察；5 类探针判据假绿已执行反例复现，归 [BUG-007](../bugs/BUG-007-collaboration-probe-false-positives.md)。旧“全绿／已毕业”不能直接继承为本轮安全验收。
+**当前情况：** [本轮研究](../research/collaboration/2026-10-09-teamagent-locks-and-acceptance-audit.md)已复跑跨进程文件竞争、上游任务板测试及跨根会话真模型观察；5 类探针判据假绿已执行反例复现，归 [BUG-007](../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)。旧“全绿／已毕业”不能直接继承为本轮安全验收。
 
 **未决问题：** 多人根会话竞争同一逻辑任务时，接受人工指定单 owner 还是要求原子仲裁？正常返工期间的允许覆盖／禁止覆盖如何定义？这两项是产品选择，不由本轮试验替用户决定。
 
-**下一步：** 用户已批准先推进可控竞写实验。[确定性交错研究](../research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)与[机制探针](../../probes/fs-taskboard/observed-write-conflict-probe.mjs)已验证同实例同版本一胜一stale及脚本重读合并，取消版本条件的对照实际被判拒。[真实成员验收研究](../research/collaboration/2026-10-09-member-stale-write-acceptance.md)已补同轮旧观察写实际stale与模型重读合并；原双成员concurrency仍是历史4/5，不继承全绿。认领失败让位是独立行为研究，不能替代BUG-007的文件C1b；若做该实验，需明确任务书「认领失败就让位」，核对真实成员是否仍写该任务产物，不得拿原竞写任务书推断角色违规。生产行为、preset或上游seam变更另需授权。
+**下一步：** 用户已批准先推进可控竞写实验。[确定性交错研究](../research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)与[机制探针](../../probes/fs-taskboard/observed-write-conflict-probe.mjs)已验证同实例同版本一胜一stale及脚本重读合并，取消版本条件的对照实际被判拒。[真实成员验收研究](../research/collaboration/2026-10-09-member-stale-write-acceptance.md)已补同轮旧观察写实际stale与模型重读合并；[双成员同轮共同放行研究](../research/collaboration/2026-10-09-team-read-barrier-acceptance.md)已补原入口5/5 exit0，BUG-007修复验收完成；旧4/5继续作为历史保留，不继承旧安全毕业承诺。认领失败让位是独立行为研究，不能替代BUG-007的文件C1b；若做该实验，需明确任务书「认领失败就让位」，核对真实成员是否仍写该任务产物，不得拿原竞写任务书推断角色违规。生产行为、preset或上游seam变更另需授权。
 
 ## 范围与排除项
 

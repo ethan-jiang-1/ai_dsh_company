@@ -5,7 +5,7 @@ intent: "补BUG-007真实成员freshness拒写与恢复子路径，区分同轮s
 
 # 真实成员同轮拒写与重读合并
 
-消费者：[BUG-007](../../bugs/BUG-007-collaboration-probe-false-positives.md)、[协作安全issue](../../issues/2026-10-09-collaboration-safety-acceptance.md)。授权：用户要求继续推进BUG-007；本轮不改生产协议、preset或vendor，也不把认领失败让位当C1b。
+消费者：[BUG-007](../../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)、[协作安全issue](../../issues/2026-10-09-collaboration-safety-acceptance.md)。授权：用户要求继续推进BUG-007；本轮不改生产协议、preset或vendor，也不把认领失败让位当C1b。
 
 ## 结论与边界
 

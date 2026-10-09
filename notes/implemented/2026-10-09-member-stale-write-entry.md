@@ -4,7 +4,7 @@
 
 ## 决定
 
-BUG-007 保留活跃卡的唯一剩余缺口是 concurrency C1b——模型入口从未在真实会话里触发过写拒绝。本 Note 记录补这个入口的仪器取舍：一个 lead + 一个成员的同轮受控场景，用「外部改盘」制造真实版本漂移，而不是靠两个成员并发竞写撞运气。
+本Note形成时BUG-007唯一剩余入口缺口是concurrency C1b；当前已由另一个双成员同轮屏障实验覆盖，归档和证据指针见后果节。本 Note 记录补这个入口的仪器取舍：一个 lead + 一个成员的同轮受控场景，用「外部改盘」制造真实版本漂移，而不是靠两个成员并发竞写撞运气。
 
 判据落在 [成员 stale evidence](../../tools/lib/member-stale-evidence.mjs)（纯函数，不变量自身），真实驱动 [member-stale-write-probe](../../probes/team/member-stale-write-probe.mjs) 与 keyless 回归 [spec](../../tests/harness/member-stale-evidence.spec.ts) 复用同一实现。七个条件全为真才算通过：
 
@@ -27,7 +27,9 @@ BUG-007 保留活跃卡的唯一剩余缺口是 concurrency C1b——模型入�
 
 ## 后果与既有 owner
 
-判据 Note = [协作探针的事实判据与退出条件](./2026-10-09-collaboration-probe-evidence.md)（本 Note 只补 C1b 模型入口这一个面，不重述其退出码与配对规则）；机制侧 owner = [可控同版本竞写研究](../../_backlog/research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)；缺陷范围仍归 [BUG-007](../../_backlog/bugs/BUG-007-collaboration-probe-false-positives.md)。
+原BUG-007已修并迁入[fixed bugs归档](../../_backlog/_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)，双成员完整链见[验收研究](../../_backlog/research/collaboration/2026-10-09-team-read-barrier-acceptance.md)。本Note的跨轮与单成员结论仍是补充证据，不是双成员入口替代品。
+
+判据 Note = [协作探针的事实判据与退出条件](./2026-10-09-collaboration-probe-evidence.md)（本 Note 只补 C1b 模型入口这一个面，不重述其退出码与配对规则）；机制侧 owner = [可控同版本竞写研究](../../_backlog/research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)；缺陷范围仍归 [BUG-007](../../_backlog/_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)。
 
 本 Note 只证明「模型在受控场景下会撞到真实 stale 并重读合并」，**不**证明：两个成员同时竞写的仲裁、认领败者让位、跨进程文件仲裁、连续 reader 的原子发布、或 concurrency 探针全项 PASS。BUG-007 不因本 Note 关闭。
 
