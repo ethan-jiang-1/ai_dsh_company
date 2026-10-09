@@ -51,6 +51,8 @@ node probes/fs-taskboard/collaboration-oracle-probe.mjs
 
 当前保留活跃卡仅表示严格的并发探针全项真实入口验收未完成：最新concurrency正常结束4/5 exit1，C1b未触发写拒绝；CAS一胜一stale、精确终态、两成员投递与正常结束均已通过。已有真实冲突日志回放各项通过，但不冒充新入口全绿。atomicity4/4、recovery4/4、scope3/3、fs-guard三项真实入口均PASS；当前完整报告见研究补充。无生产锁/协作协议/preset/vendor变更。
 
+补充机制证据：[可控同版本竞写研究](../research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)已实际得到两种提交顺序的一胜一FS_STALE_VERSION及败者重读合并；取消version条件的对照双成功，被同一套验收断言判为exit1。这补齐可控机制路径，不关闭本卡的模型入口C1b缺口；FS_NOT_OBSERVED不单独证明读后竞争。
+
 1. 本复现5类坏样本全部拒绝，且对应正常样本均通过；不得删除反例或只改文案。
 2. 缺工具结果、其他任务/成员/path错误、仅正文宣称完成、重复行、预恢复事件、无第2轮等反例都fail或证据不足，绝不自动pass。
 3. 修复后的真实最窄入口正常结束；原C4读侧性质若继续承诺，补正确seam观察而不是只验末尾文件。

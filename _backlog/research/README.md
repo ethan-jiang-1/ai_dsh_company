@@ -27,4 +27,5 @@ intent: "为什么需要这份依据。"
 
 | 文件 | 活卡与用途 |
 |---|---|
+| [确定性同版本竞写与合并](collaboration/2026-10-09-deterministic-write-conflict-seam.md) | [协作安全问题](../issues/2026-10-09-collaboration-safety-acceptance.md)、[BUG-007](../bugs/BUG-007-collaboration-probe-false-positives.md)：控制真实发布交错、区分stale与未观察拒绝、记录重读合并边界 |
 | [teamagent、锁与验收复核](collaboration/2026-10-09-teamagent-locks-and-acceptance-audit.md) | [协作安全问题](../issues/2026-10-09-collaboration-safety-acceptance.md)、[BUG-007](../bugs/BUG-007-collaboration-probe-false-positives.md)：机制边界、旧落地断点与实际反例 |

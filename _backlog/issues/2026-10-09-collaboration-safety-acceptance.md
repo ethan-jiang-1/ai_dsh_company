@@ -13,7 +13,7 @@ opened: 2026-10-09
 
 **未决问题：** 多人根会话竞争同一逻辑任务时，接受人工指定单 owner 还是要求原子仲裁？正常返工期间的允许覆盖／禁止覆盖如何定义？这两项是产品选择，不由本轮试验替用户决定。
 
-**下一步：** 先交付研究结论、实际证据与分层验收建议；需要改生产行为、preset 或上游 seam 时另按授权进入实施。本卡不授予实施权限。
+**下一步：** 用户已批准先推进可控竞写实验。[确定性交错研究](../research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)与[机制探针](../../probes/fs-taskboard/observed-write-conflict-probe.mjs)已验证同实例同版本一胜一stale及脚本重读合并，取消版本条件的对照实际被判拒。下一实验应明确任务书「认领失败就让位」，核对真实成员是否仍写该任务产物；不得拿原竞写任务书推断角色违规。生产行为、preset或上游seam变更另需授权。
 
 ## 范围与排除项
 
@@ -26,7 +26,7 @@ opened: 2026-10-09
 - 同 Team 的 task revision CAS／owner 校验有实际覆盖；文件 write 不使用 task owner。
 - 不同根会话不共享 Team 任务板；一个 DSH 进程也不能改变这个事实。
 - 同一 fs-local 实例能拒旧版本写；不能阻止“重读后合法覆盖别人工作”的语义冲突。
-- 多进程同版本替换，本轮 20/20 双成功覆盖；新文件 createIfAbsent 本轮 20/20 一胜一拒，两条路径不可混说。
+- 旧多进程替换探针观察到20/20双成功覆盖；其GO按各worker到场放行、没有核对双方version，不能称严格同版本认证。新文件createIfAbsent观察到20/20一胜一拒，钉住实现用hard-link no-replace，两条路径不可混说；仪器局限见确定性交错研究。
 - writeScopes 是提示，不是锁或写权限；占位在不同角色文件中，没有共同原子认领点。
 - [历史研究](../_archive/research/2026-10-04-multi-user-ux-walk.md)的单次追加收敛有参考价值，但“多次采样=全排列证明”不成立；[旧毕业卡](../_archive/settled_issues/2026-10-04-cross-process-shared-disk.md)“丢更新机制上无法静默发生”超出 freshness guard 的保证。
 
