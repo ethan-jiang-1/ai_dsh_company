@@ -20,9 +20,9 @@ BUG-007 保留活跃卡的唯一剩余缺口是 concurrency C1b——模型入�
 
 ## 输掉的方案
 
-- 靠两个成员并发竞写触发 C1b：同实例 per-target 锁把两笔写串行化，第二次提交时首写者通常已发布完，能否撞上同版本取决于时序，靠重复跑取绿。已有 [可控机制探针](../../probes/fs-taskboard/observed-write-conflict-probe.mjs)在 provider 层用测试钩子做确定性机制证明；本探针要的是**模型入口**证据，故改为单成员 + 外部改盘，把竞写变成必然的时间序，不依赖运气。
+- 靠两个成员并发竞写触发 C1b：同实例 per-target 锁把两笔写串行化，第二次提交时首写者通常已发布完，能否撞上同版本取决于时序，靠重复跑取绿。已有 [可控机制探针](../../probes/fs-taskboard/observed-write-conflict-probe.mjs)在 provider 层用测试钩子做确定性机制证明；本探针要的是**模型入口**证据，故改为单成员 + 外部改盘，用观察read结果后的外部改盘提供可核对的顺序。轮询不是原子屏障，若时序错过仍判失败，不声称任意运行必然触发。
 - 让 lead 也去写目标文件：会把「成员是否守住新鲜度」和「lead 行为」混在一起，`noLeadWrites` 明确排除。
-- 接受 `FS_NOT_OBSERVED` 当冲突拒绝：它只说明「没读就写」，不证明读后竞争，[既有机制研究](../../_backlog/research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)已明确不认可。首跑正是栽在这里（见验证），探针如实判红。
+- 接受 `FS_NOT_OBSERVED` 当冲突拒绝：它只说明「没读就写」，不证明读后竞争，[既有机制研究](../../_backlog/research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)已明确不认可。跨轮首跑收到这一错误（见验证），探针如实判红；成员上一轮实际读过，不能把错误码归因为全程没读。
 - 把 run 目录留在 rehearsal 盘：会污染 `pnpm verify` 的 `md-newline` 门禁（见验证末条），故失败现场保留在 gitignored 的 `runtime/harness-home/member-stale-evidence/`，rehearsal 下的 run 目录属可清残留。
 
 ## 后果与既有 owner
@@ -35,8 +35,8 @@ BUG-007 保留活跃卡的唯一剩余缺口是 concurrency C1b——模型入�
 
 - `pnpm test`：41 文件 / 413 用例全过（新增 spec 4 例）。spec 覆盖四组反例——缺水位、错误码 `FS_NOT_OBSERVED` 冒充、只读无写、部分读元数据（`totalLines` 与行数不符）、载荷错但盘对、中间插入重读、预算超时、成员未结束、lead 写目标、终态多一个换行。
 - `pnpm verify`：ALL PASS。
-- 真模型首跑（session `...56290b3c`）**判红**：成员没有先读就写，得到 `FS_NOT_OBSERVED`，`firstWriteStale`/`recovery`/`finalExact` 全 false；终态还多一个空行。这是探针如实区分「没读」与「读后竞争」的证据，未记为通过。
+- 真模型首跑（session `...56290b3c`）**判红**：成员第一轮真实read后结束，恢复新轮首次写得到 `FS_NOT_OBSERVED`，`firstWriteStale`/`recovery`/`finalExact` 全 false；终态还多一个空行。该组合的跨轮读取未给新轮写授权，不能说成员全程没读；错误码仍不能当读后stale，未记为通过。
 - 真模型第二跑（session `...5f0732ef`）**判绿**：`FS_STALE_VERSION` + 重读 + 合并，七项全 true，盘上精确 `BASE\nEXTERNAL\nMEMBER\n`。
-- 两跑的现场 JSON 保留在 gitignored 的 `runtime/harness-home/member-stale-evidence/`。注意它们的判据键名是**改名前**的 `phase2Complete`/`noPhase2ReadBeforeWrite`（已提交的 [证据库](../../tools/lib/member-stale-evidence.mjs)与驱动里均已不存在这对键，改用 `completed`/`noReadBeforeWrite`），故这两跑不证明本次提交的那一版代码；改名后的同实现只有 keyless spec 覆盖，真实入口重跑未执行。
+- 两跑的现场 JSON 保留在 gitignored 的 `runtime/harness-home/member-stale-evidence/`。注意它们的判据键名是**改名前**的 `phase2Complete`/`noPhase2ReadBeforeWrite`（已提交的 [证据库](../../tools/lib/member-stale-evidence.mjs)与驱动里均已不存在这对键，改用 `completed`/`noReadBeforeWrite`），故这两跑不证明本次提交的那一版代码；收紧后的当前helper除keyless spec外，已重放第二跑的真实Lead/member JSON，七项全true；这属于真实日志回放，真实入口重跑未执行。
 - 未执行：concurrency 探针全项、改名后版本的真实入口重跑、跨进程仲裁、多 root 拓扑、安装认证。
 - 收尾时 `pnpm verify` 曾红一次：`md-newline` 指向 `runtime/rehearsal-workspace/journal/member-stale-nGtHJ4/target.md`——首跑留下的探针残留（该路径被 gitignore）。删除该残留目录后 ALL PASS；残留成因与「run 目录不放 rehearsal 盘」的取舍见上节。
