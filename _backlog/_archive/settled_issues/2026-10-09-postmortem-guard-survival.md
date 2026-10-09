@@ -31,7 +31,7 @@ opened: 2026-10-09
 | [0001](../../../notes/postmortem/0001-preset-required-config-mount-failure.md) | preset 工具行具备 schema-required config；同时要求真 session mount | `preset-required-config`（`checks/run-gates.mjs`）+ `checks/smoke/preset-smoke.mjs` | N4 已证明旧快检查真实丢失；现门禁检查声明 config 行的必填字段，preset-smoke 对五角色逐个 session/create。复原 Note 记有删除元凶字段后的红→绿。当前实现存在。 |
 | [0002](../../../notes/postmortem/0002-client-plugin-module-table-gap.md) | 原文曾声称要检查 inject 闭包、client-half 声明 | 原 closure 假说在同篇 correction 与 0003 中被证伪；本地 `client-halves` 检查 `exports['./client']` 与 `dsh.client` 对称性；`preset-smoke` 仅对本包依赖缺失 fail，外部基线 warn | 0002 不是独立事故；旧“closure 为根因”的承诺不应继续作为规范追踪。仍有效的是包本身 client-half 声明及当前本包依赖检查，机制已在对应 owner 实现。 |
 | [0003](../../../notes/postmortem/0003-duplicate-remote-mount.md) | 真浏览器加载应捕获 client apply throw / BootPage plugin failure | `checks/smoke/client-load-smoke.mjs` | 脚本仍存在，头注写明 0003 的因果、失败形状与修复前 RED/修复后 GREEN 证据。当前实现存在；检查是按需运行，不属于默认 `pnpm verify`。 |
-| [0004](../../../notes/implemented/2026-09-24-foundation-remediation.md) | 交接材料，非事故复盘、非护栏承诺 | 不适用 | README 明确排除在事故编号之外；不应纳入“事故护栏存活率”分母。 |
+| 0004（已删，历史在 git） | 交接材料，非事故复盘、非护栏承诺 | 不适用 | README 明确排除在事故编号之外；不应纳入“事故护栏存活率”分母。 |
 
 另有 `checks/run-gates.mjs` 的 `guard-red-record`：检查声明自己在守具体事故的 spec 是否带可复现负例，当前报告 4 条声明。它证明“已声明的事故守卫”有红配方，不会证明复盘遗漏了护栏、护栏实现仍接线或某脚本仍在默认流程运行；不等同于 postmortem-to-guard 的存活链接。
 

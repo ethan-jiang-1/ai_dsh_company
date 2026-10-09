@@ -1,6 +1,6 @@
 # 文档地图、组织原则与决策台账
 
-本目录是"虚拟公司多角色插件"项目的文档层。什么时候读 = 找某主题的事实家、查决策台账、或不确定该信哪份文档时（驾驭者白话速读 = [orient.md](./orient.md)）。性质：**当前合同 + 设计依据**——只写 now、随代码同 diff；决定、替代方案与验证证据归 `notes/`（`implemented/` 实现事实仍维护——归档按未来指导价值另择，非必经）。
+本目录是"虚拟公司多角色插件"项目的文档层。什么时候读 = 找某主题的事实家、查决策台账、或不确定该信哪份文档时（驾驭者白话速读 = [orient.md](./orient.md)）。性质：**当前合同 + 设计依据**——只写 now、随代码同 diff；决定、替代方案与验证证据归 `notes/`（`implemented/` 是当前 rationale owner；已落地且合同才是权威的冻结判定在 `archived/`）。
 
 ## 文档组织原则（为什么不是"初始化/"）
 
@@ -39,7 +39,7 @@
 |---|---|
 | `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含实际跑过的验证 + 环境状态）。提案纪律 / 状态轴 / 毕业规则 / 分类规矩唯一家 = [notes/README](../notes/README.md)；未成熟问题由 [_backlog/issues/](../_backlog/issues/README.md) 推敲，制度 = [_backlog/README](../_backlog/README.md) |
 | [notes/archived/](../notes/archived/) · [notes/rejected/](../notes/rejected/) · [notes/postmortem/](../notes/postmortem/README.md) | 离场两桶（D30）：archived = 仍能阻止重开的判定与现行 pin 人审证据，rejected = 过时/被推翻（负知识）；postmortem = **事故复盘**（为什么流程放过了它 + 加了什么护栏） |
-| [agent-workflow-community-practice](../notes/implemented/2026-09-22-agent-workflow-community-practice.md) | D15 的否决：规格流程与加长指令文件拦不住「装不上」 |
+| [agent-workflow-community-practice](../notes/archived/2026-09-22-agent-workflow-community-practice.md) | D15 的否决：规格流程与加长指令文件拦不住「装不上」 |
 
 ## 决策台账（路由表）
 
@@ -57,28 +57,28 @@
 | D8 | 跨会话角色记忆 = workspace journal 文件（`kb/<role>/journal/`） | [roles-isolation](./design/roles-isolation.md) §4.2 |
 | D9 | 上游缺口若成刚需→提 seam，不 vendor patch | [roles-isolation](./design/roles-isolation.md) §4.1 |
 | D10 | docs/ 按性质分层，不按时间分层；否决「初始化/」目录方案 | [docs/AGENTS.md](./AGENTS.md) |
-| D11 | 迭代单位 = 垂直轮 **历史**：轮次制已退役 | [roadmap-retirement](../notes/implemented/2026-09-28-roadmap-retirement.md) |
+| D11 | 迭代单位 = 垂直轮 **历史**：轮次制已退役 | [roadmap-retirement](../notes/archived/2026-09-28-roadmap-retirement.md) |
 | D12 | patch 语义：`- id:` 只替换已有行，新增行必须 `- insert:` 子列表 | [dev-loop §4](./guides/dev-loop.md) |
 | D13 | 开发纪律沿用 DSH；偏离须登记。默认适配自由已收紧 | [AGENTS.md](../AGENTS.md) |
-| D14 | 公司名 = wochen；显示名 `<公司名> <角色>`；preset id 保持 kebab | [wochen-naming](../notes/implemented/2026-09-22-wochen-naming.md) |
-| D15 | 完成定义 = 该面最小「真检查」通过；发现权在代理一侧不在人 | [agent-workflow-community-practice](../notes/implemented/2026-09-22-agent-workflow-community-practice.md) |
+| D14 | 公司名 = wochen；显示名 `<公司名> <角色>`；preset id 保持 kebab | [wochen-naming](../notes/archived/2026-09-22-wochen-naming.md) |
+| D15 | 完成定义 = 该面最小「真检查」通过；发现权在代理一侧不在人 | [agent-workflow-community-practice](../notes/archived/2026-09-22-agent-workflow-community-practice.md) |
 | D16 | 角色模型路由 = 全员同模型（不写 `agentOptions`） | [presets](./presets.md)；[tests/presets](../tests/presets/presets.spec.ts) |
 | D17 | 公司事实全部留 workspace 活数据；pack 不含公司事实 | [presets](./presets.md)；[company-workspace/kb](../company-workspace/kb/) |
 | D18 | CEO 命名委托 = one-shot 前台；续驶归 team；CEO preset 不放全局控制行 | [delegation](./delegation.md) |
 | D19+D21 | R5 拆轮 + 搁置池准入 **历史**：轮次制已由 D23/D24 退役，整池已随 D32 退役 | [_misc/suspended.md](../_backlog/_archive/legacy/suspended.md) |
-| D20 | 交付物三态判据：成品 = Lead 的 `present`；比对按 slug+角色身份不按路径 | [r4-workshop-flow](../notes/implemented/2026-09-22-r4-workshop-flow.md) |
-| D22 | 在场板主键 = team roster；冷启动 = 拉式 RPC + 5s 轮询 | [org-presence-board](../notes/implemented/2026-09-22-org-presence-board.md) |
-| D23+D24 | 开发流条目制 **历史**：队列 owner ROADMAP.md 已由 D32 退役 | [roadmap-retirement](../notes/implemented/2026-09-28-roadmap-retirement.md) |
+| D20 | 交付物三态判据：成品 = Lead 的 `present`；比对按 slug+角色身份不按路径 | [r4-workshop-flow](../notes/archived/2026-09-22-r4-workshop-flow.md) |
+| D22 | 在场板主键 = team roster；冷启动 = 拉式 RPC + 5s 轮询 | [org-presence-board](../notes/archived/2026-09-22-org-presence-board.md) |
+| D23+D24 | 开发流条目制 **历史**：队列 owner ROADMAP.md 已由 D32 退役 | [roadmap-retirement](../notes/archived/2026-09-28-roadmap-retirement.md) |
 | D25 | 培养 = 改 `presets/<role>/`（生效边界按面）；学习 = journal 唯一载体 | [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) |
-| D26 | 文档卫生按指导价值取舍；文件/行数仅观察，不是完成门槛 | [foundation-remediation](../notes/implemented/2026-09-24-foundation-remediation.md) |
-| D27 | 升 pin 偏离官方事务（嵌套工作区不能 vendor 自建）⇒ 手工簿记 + 门禁留证 | [pin-upgrade-0.1.7-rc.2](../notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md) |
+| D26 | 文档卫生按指导价值取舍；文件/行数仅观察，不是完成门槛 | [dev-loop](./guides/dev-loop.md) |
+| D27 | 升 pin 偏离官方事务（嵌套工作区不能 vendor 自建）⇒ 手工簿记 + 门禁留证 | [pin-upgrade-0.2.0-rc.2](../notes/implemented/2026-09-30-pin-upgrade-0.2.0-rc.2.md) |
 | D28 | 枚举型事实的家 = 实现自己（文档只留分层原则 + 指针） | [entry-execution-chain-debt](../notes/implemented/2026-09-26-entry-execution-chain-debt.md) |
 | D29 | 自主优先协议：先探索后发明、借鉴成熟插件、REVIEW 分级 | [dev-loop §13](./guides/dev-loop.md) |
 | D30 | research 层三态：完结迁 archived、过时迁 rejected、死稿删除 **历史**：D31 起 research 目录退役 | [dev-loop §12](./guides/dev-loop.md) |
 | D31 | 推敲空间 `_backlog/`；只承载判断材料、不承载授权 | [_backlog/README](../_backlog/README.md) |
-| D32 | 队列层退役（ROADMAP.md 删除）；已批→RFC 状态行「批准：」标记 | [roadmap-retirement](../notes/implemented/2026-09-28-roadmap-retirement.md) |
+| D32 | 队列层退役（ROADMAP.md 删除）；已批→RFC 状态行「批准：」标记 | [roadmap-retirement](../notes/archived/2026-09-28-roadmap-retirement.md) |
 | D33 | `_backlog` 章制回借（主干框架/章程账本二分/索引交叉核对门禁/全日期卡名） | [_backlog/README](../_backlog/README.md) |
-| D34 | intents.md 退役（第三本账 + 胖行病史 + 违反上游 no-index 教义） | [doc-snr-cleanup-round](../notes/implemented/2026-10-04-doc-snr-cleanup-round.md) |
+| D34 | intents.md 退役（第三本账 + 胖行病史 + 违反上游 no-index 教义） | [notes/README](../notes/README.md) |
 | D35 | notes/ 分类 owner 文件 + `notes-liveness` 门禁 | [notes/README](../notes/README.md) |
 | D36 | 决策台账降级为纯路由表（第三本账同 D34 病）+ `ledger-routing` 门禁 | [ledger-routing-table](../notes/implemented/2026-10-09-ledger-routing-table.md) |
 | D37 | `docs/` 分层规则唯一家住 `docs/AGENTS.md`（含「不属于这层」列）+ `doc-taxonomy` 门禁 | [docs-tier-taxonomy](../notes/implemented/2026-10-09-docs-tier-taxonomy.md) |
@@ -116,13 +116,13 @@
 | `…/dual-home-isolation.md` | 双 home 机制、崩溃半径、迁移方向 | run/env.sh；guides/dev-loop §6 |
 | `…/research.md` | 第三方生态证据（peers/兼容矩阵/自包含/真实安装形状） | guides/dev-loop §5 发布纪律时点；design/architecture §8 |
 | `_digested/`（源码消化笔记） | DSH 源码机制笔记（审计基线，版本唯一见 `AGENTS.md` §vendor 簿记——**基线可能落后当前钉住一代**，升 pin 未重审时以簿记注记为准） | design/ 各篇（architecture / roles-isolation / ui-demo）的机制核对引文；**权威仍在 `vendor/dsh/` 本体** |
-| `_dsh_plugin_agent_ready_development/sdlc-reference/01-agent-note-lifecycle.md`（语料更名前后路径同页） | DSH Agent Note 生命周期（状态/路径/格式/取代/归档；判定基于 0.1.7-rc.1 树，rc.2 收窄为「持久决定理由」后 D35 全量对齐） | [notes/README.md](../notes/README.md)（D35 迁入）+ [implemented/notes-lifecycle-absorption](../notes/implemented/2026-09-24-notes-lifecycle-absorption.md)（2026-09-24 点选吸纳六条） |
-| `_dsh_plugin_agent_ready_development/`（三卷 + `_coverage` + `verify.mjs`；更名自 `_agent_ready_development`，0009–0013 轮演进后钉 `dsh-v0.2.0-rc.2` = 本仓当前 pin） | 插件仓视角开发语料：native-development-model（独立插件仓闭环——**直接以本仓这类 repo 为受众**）/ sdlc-reference / repo-harness 三卷 | 判定 = [plugin-corpus-realignment](../notes/implemented/2026-10-07-plugin-corpus-realignment.md)（不照搬清单在该 Note；2026-10-08 全亲读零增量）；其后翻案 = [driver-receipt-round](../notes/implemented/2026-10-08-driver-receipt-round.md) |
-| 人机交互 UX 研究来源集（Temporal/Claude Code/Warp/GitHub/PagerDuty/Slack/Horvitz 等） | 阶段 0 外部实践的决定在 [human-agent-integration](../notes/implemented/2026-09-25-human-agent-integration.md)；引用全集已删（Horvitz 两篇 PDF 未逐字核） | 人机合一条目的 A2/B 切片依据 |
-| `_faq_on_digested/07_borrowing-dsh-harness-idea/` | 「另一个项目怎么借 DSH」的可迁移框架：三条立场（agent 一等 / 规则可执行 / 事实唯一 owner）+ 十维评估 + 垂直切片 + 四边界（可读≠简单 / Skill≠enforcement / 清理≠回滚 / 查询≠沙箱） | 十维审计（2026-09-27）的唯一结构性缺口 = 反馈 enforcement 通道，同日修复 = [enforcement-channel-and-boundaries](../notes/implemented/2026-09-27-enforcement-channel-and-boundaries.md) |
-| `/Users/bowhead/ai_deerflow_deep_research_v2/_backlog`（独立外部仓，同机工作树） | 另一个 harness 仓的待办/推敲层规矩：plans（推敲卡）/ bugs（缺陷卡）/ `_done`（位置即状态）/ `_` 前缀语义 / 搬迁铁律（git mv、文件名不变、内容不重写、编号权威住归档侧）+ 它自己那份「借 DSH」总账（借精神不抄形式的方法论样本） | `_backlog/` 全套 + 毕业四门（D31）；判定、取舍与不借清单 = [implemented/2026-09-28-backlog-deliberation-space](../notes/implemented/2026-09-28-backlog-deliberation-space.md) |
+| `_dsh_plugin_agent_ready_development/sdlc-reference/01-agent-note-lifecycle.md`（语料更名前后路径同页） | DSH Agent Note 生命周期（状态/路径/格式/取代/归档；判定基于 0.1.7-rc.1 树，rc.2 收窄为「持久决定理由」后 D35 全量对齐） | [notes/README.md](../notes/README.md)（D35；六条点选已收进本文件，吸收稿已删） |
+| `_dsh_plugin_agent_ready_development/`（三卷 + `_coverage` + `verify.mjs`；更名自 `_agent_ready_development`，0009–0013 轮演进后钉 `dsh-v0.2.0-rc.2` = 本仓当前 pin） | 插件仓视角开发语料：native-development-model（独立插件仓闭环——**直接以本仓这类 repo 为受众**）/ sdlc-reference / repo-harness 三卷 | 判定 = [plugin-corpus-realignment](../notes/implemented/2026-10-07-plugin-corpus-realignment.md)（不照搬清单在该 Note；全亲读零增量。体感不对的翻案 = 驾驶座缺仪表，见 orient 第七问与 dev-loop 轮次回执） |
+| 人机交互 UX 研究来源集（Temporal/Claude Code/Warp/GitHub/PagerDuty/Slack/Horvitz 等） | 阶段 0 外部实践的决定在 [human-agent-integration](../notes/archived/2026-09-25-human-agent-integration.md)；引用全集已删（Horvitz 两篇 PDF 未逐字核） | 人机合一条目的 A2/B 切片依据 |
+| `_faq_on_digested/07_borrowing-dsh-harness-idea/` | 「另一个项目怎么借 DSH」的可迁移框架：三条立场（agent 一等 / 规则可执行 / 事实唯一 owner）+ 十维评估 + 垂直切片 + 四边界（可读≠简单 / Skill≠enforcement / 清理≠回滚 / 查询≠沙箱） | 十维审计（2026-09-27）的唯一结构性缺口 = 反馈 enforcement 通道，同日修复 = [enforcement-channel-and-boundaries](../notes/archived/2026-09-27-enforcement-channel-and-boundaries.md) |
+| `/Users/bowhead/ai_deerflow_deep_research_v2/_backlog`（独立外部仓，同机工作树） | 另一个 harness 仓的待办/推敲层规矩：plans（推敲卡）/ bugs（缺陷卡）/ `_done`（位置即状态）/ `_` 前缀语义 / 搬迁铁律（git mv、文件名不变、内容不重写、编号权威住归档侧）+ 它自己那份「借 DSH」总账（借精神不抄形式的方法论样本） | `_backlog/` 全套 + 毕业四门（D31）；判定、取舍与不借清单 = [implemented/2026-09-28-backlog-deliberation-space](../notes/archived/2026-09-28-backlog-deliberation-space.md) |
 | `_faq_on_digested/04/05/11/15`（4 目录） | 根入口文档静态/运行时设计 + 原生开发环 + loop 工程 vs SDD | 判定 = [archived/faq-04-05-11-15-judgment](../notes/archived/2026-09-28-faq-04-05-11-15-judgment.md)：立即借的九条已在现行合同（dev-loop 等），有压力再借的六条带触发条件；「防重复评估」节防重读全文 |
-| `/Users/bowhead/ai_dsh_loop_advisor/_backlog`（独立外部仓，同机工作树；2026-10-03 当日态） | D31 制度的直系后代（本仓 → ai_dsh_architect → advisor，其间又借 ai_deerflow_dr_v3 主干框架）：四门/主干框架/三条硬规则/章程账本二分/搁置池新纪律（搁置 = 队列决定，agent 不得自行判搁置）/索引交叉核对门禁/随卡归档的 reference/ | 章制回借（D33）：主干框架与硬规则、章程账本二分、backlog-liveness 升格、两桶解禁、全日期卡名；判定与不借边界 = [implemented/2026-10-03-backlog-charter-refit](../notes/implemented/2026-10-03-backlog-charter-refit.md) |
+| `/Users/bowhead/ai_dsh_loop_advisor/_backlog`（独立外部仓，同机工作树；2026-10-03 当日态） | D31 制度的直系后代（本仓 → ai_dsh_architect → advisor，其间又借 ai_deerflow_dr_v3 主干框架）：四门/主干框架/三条硬规则/章程账本二分/搁置池新纪律（搁置 = 队列决定，agent 不得自行判搁置）/索引交叉核对门禁/随卡归档的 reference/ | 章制回借（D33）：主干框架与硬规则、章程账本二分、backlog-liveness 升格、两桶解禁、全日期卡名；判定与不借边界 = [implemented/2026-10-03-backlog-charter-refit](../notes/archived/2026-10-03-backlog-charter-refit.md) |
 
 ## 术语映射（本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达）
 
@@ -133,7 +133,7 @@ package README——机制结论的权威在 vendor 树。
 | 本项目 | DSH 官方 | vendor/dsh 落点（读源码从这进） |
 |---|---|---|
 | 角色（CEO/VP…） | agent preset（`presets/<id>/agent.cordis.yml` + persona + skills） | `packages/preset/agent-preset`（每预设一行声明，rc.2 形）+ `packages/preset/persona`；出厂范本 = `packages/bundle/web-app/presets/` |
-| 组织/公司 | 一个 host profile + preset roster（rc.2：`agent-preset-registry` 装配，roots 目录扫描已废） | `packages/preset/agent-preset-registry`（default 装配）+ `docs/architecture.md`（组合链）；升 pin迁移实证 = [pin-upgrade](../notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md) |
+| 组织/公司 | 一个 host profile + preset roster（rc.2：`agent-preset-registry` 装配，roots 目录扫描已废） | `packages/preset/agent-preset-registry`（default 装配）+ `docs/architecture.md`（组合链）；升 pin 迁移实证 = [pin-upgrade-0.2.0](../notes/implemented/2026-09-30-pin-upgrade-0.2.0-rc.2.md) |
 | worker（角色底下干活的一次性代理） | one-shot subagent（`dsh-tool-subagent`，spawn provider） | `packages/subagent/tool-subagent/README.md` |
 | 派活/汇报线 | 命名委托工具（通道 A / M2） | 同上（per-instance persona 教义在其 README） |
 | 会议/任务板/邮箱 | Agent Teams（`ctx.agentTeams`，experimental） | `packages/experimental/agent-team` + `packages/experimental/tool-agent-team` + `docs/subsystems/agent-team.md` |

@@ -8,7 +8,7 @@
 
 ## 决定
 
-整体将 ai_dsh_assitant `_backlog` 的问题卡、缺陷卡、研究、按需方法、结论交接与触发索引模式迁入本仓。前序 D33 记录 [backlog-charter-refit](2026-10-03-backlog-charter-refit.md) 保留为历史决策；本 Note 与当前 `_backlog/` 合同更新其活跃流程约束，不改写 D33 当时的理由与验证证据：
+整体将 ai_dsh_assitant `_backlog` 的问题卡、缺陷卡、研究、按需方法、结论交接与触发索引模式迁入本仓。前序 D33 记录 [backlog-charter-refit](../archived/2026-10-03-backlog-charter-refit.md) 保留为历史决策；本 Note 与当前 `_backlog/` 合同更新其活跃流程约束，不改写 D33 当时的理由与验证证据：
 
 - `plans/` 改为 `issues/`；`reference/` 改为 `research/`；`_done/` 改为 `_archive/`，其 closed/suspended 桶改 settled/suspended issues，缺陷桶改 fixed/suspended bugs，随卡研究材料归档；旧退役池归 `legacy/`，只保留历史意义。
 - 问题单位是一个可描述的期望结果或待判问题。简单问题可以简写；大问题先列粗粒度判断依赖和范围外，本轮只细化当前分支。只有能独立决策、独立关闭且结果或触发不同，才考虑拆卡；来源同一不强迫并卡。拆分是说明清楚 owner 与结果的判断，不按行数或大小标签机械拆分，不引入执行票据或队列。

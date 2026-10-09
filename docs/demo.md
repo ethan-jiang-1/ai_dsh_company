@@ -64,7 +64,7 @@
 
 - 收场跑 `node checks/audit/deliverables-check.mjs` 必须 **0 违规**——即 `deliverables/` 下每个
   `<slug>/final.md` 都能回溯到**一次 CEO 的 `present`**；`drafts/` 里的稿子不算成品；
-  `kb/**` 不在判据射程内。判据语义与三个设计决定见 `notes/implemented/2026-09-22-r4-workshop-flow.md`。
+  `kb/**` 不在判据射程内。判据语义与三个设计决定见 `notes/archived/2026-09-22-r4-workshop-flow.md`。
 - 审**归档快照**要加 `--only <slug>`：快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只装
   本轮日志，不给作用域会把历史成品误报成"无 Lead 背书"（那是输入不成对，不是违规）。
 - 一条反证基线：往 `deliverables/<slug>/` 塞一份没被 `present` 过的 `final.md`，该检查必须变红。

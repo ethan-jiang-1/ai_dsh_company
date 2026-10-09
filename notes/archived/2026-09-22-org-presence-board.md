@@ -119,6 +119,7 @@ shell 会话列表语义）；头部动作位已有官方名册（order 20）与
 - **host 自建 Typert Remote 做消息级动态流**：客户端 stub 由 vendor codegen 管线生成，本 pack
   无接线。v1 动态流 = 快照差分；消息级留到有现成 stub 再开。
 - **用 `paceMs` 修 queued 差异**：vendor 写明 correctness must never depend on it。
+- **注意力中心加态势条或主动推送成员进度**：进度面 = 在场板；注意力只留「需要你」。没人要「不点开就看总数」之前不加态势条。ETA 不做。
 
 ## 验收判据
 

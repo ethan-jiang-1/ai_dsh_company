@@ -4,7 +4,7 @@
 > 第 2 笔 2026-10-03 补跑判收（14/15、TRANSPORT 零复发）；第 1 笔 = browser-behavior-probe 首跑 5/5——
 > 导航/读内容/点击/输入真调用断言落资产，角色会话沙箱两层墙精确定位（EPERM 缓存标记层已被 env 重定向
 > 击穿：HOME + PLAYWRIGHT_BROWSERS_PATH，B0 栅栏内实证；chromium 子进程沙箱内崩溃层待 seam ②）｜
-> **去向指针 = [implemented/2026-10-05-browser-behavior-probe](../../../notes/implemented/2026-10-05-browser-behavior-probe.md)**
+> **去向指针 = implemented/2026-10-05-browser-behavior-probe（已删，历史在 git）**
 > （分层判据、seam 选型证据、上游一行修复点住那里）
 
 ## 挂起项

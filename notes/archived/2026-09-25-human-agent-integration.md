@@ -11,7 +11,7 @@ Agent ↔ Agent 这一层已经通了：团队成型、汇报线、任务板、�
 
 - **审批闸门**（`request_signoff` → `ctx.approval`）：一次性、轮内有效、**无应答 fail-closed**，事件对
   `approval/asked` + `approval/decided` 入日志，浏览器官方 `ui-approval` 应答，注意力中心跨会话显示
-  （[cockpit-human-loop](../implemented/2026-09-24-cockpit-human-loop.md) 切片二）。
+  （cockpit-human-loop（已删，历史在 git） 切片二）。
 - **问人两条路**（手册明文）：动议内成员用 `send_message` 升级 CEO 带【待澄清】前缀、**不直接问用户**；
   独立会话（无动议上下文）直接用 `ask_user_question`。五个 preset 均已挂 `tool-ask-user`。
 - **收件人模型 v1 = 单操作者**：条目带 `owner` 字段但全部路由到唯一操作者；多人在数据模型上不堵死，
@@ -79,7 +79,7 @@ A1（人侧建模）是组织事实、不依赖 UX 结论，可与阶段 0 **并
 - **阶段 0（前置）**：UX 研究 → `notes/research/` 候选集（问题与来源见上节）。
 - **内容层（先做）**：A1 人侧建模（可与阶段 0 并行）、A2 规矩落地进手册 / CHARTER / skill（阶段 0 之后）。
 - **机制层（升 pin 之后）**：B1 收件人路由、B2 三类接口载体、B3 不在场机制化、B4 证据与回看。
-  前置 = [pin-upgrade-0.1.7-rc.2](../implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md) 落地。
+  前置 = pin-upgrade-0.1.7-rc.2（已删，历史在 git） 落地。
 
 ## 方案 · 内容层（A，先做）
 
@@ -167,7 +167,7 @@ A1（人侧建模）是组织事实、不依赖 UX 结论，可与阶段 0 **并
 - **规矩回流的维护成本**：裁决回流若不收敛（每次问答都改手册），手册会膨胀且互相矛盾；回流需带"取代
   检查"（dev-loop §12），并在轮末收敛时并入 CHARTER 历史纪要。
 - **与人不在场现实的关系**：本 RFC 只定"带假设继续"的纪律，不解决"没人时怎么自动续跑"——那仍受上游
-  seam 限制（见 [longrun-goal-shape](../implemented/2026-09-25-longrun-goal-shape.md) 与搁置池「自主节律」）。
+  seam 限制（见 [longrun-goal-shape](./2026-09-25-longrun-goal-shape.md) 与搁置池「自主节律」）。
 
 
 ## 实施实况（2026-09-25 全链交付）

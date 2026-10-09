@@ -20,7 +20,7 @@
 **状态行**：新写或**再编辑**的 Note 首部有「状态：」行（存量不回扫；`notes-liveness` 门禁查 implemented/ 新写侧）。
 **命名** = `YYYY-MM-DD-<slug>.md`（全日期；时间轴 = 文件名日期 + git log，D34）。**互引**只用相对
 Markdown 链接（md-links 门禁硬查）。**生命周期是移动不是复制**：`proposed → implemented` 同 diff 把正文
-改写成现在时的已交付事实（删迁移计划与未来时态）。低价值稿不冻进 `archived/`：那边与 `implemented/` 同一条记录判据，失效即删，历史在 git。
+改写成现在时的已交付事实（删迁移计划与未来时态）。决定已落地、现行合同才是权威、但否决仍能阻止重开的，移到 `archived/`（冻结，不再当 rationale owner）。没有这条否决的收据与追认戳删除，历史在 git。
 
 ## 二、何时写、取代与真证据（规则唯一家在本文件）
 
@@ -37,7 +37,7 @@ Markdown 链接（md-links 门禁硬查）。**生命周期是移动不是复制
   理由/备选/后果/验证后**同 diff 删除旧的**（历史归 git）；部分取代：双方保留互链并更新仍有效的事实。
   同一决定的事实变化更新原文；决定逆转另写新 Note 互链，不把旧文改写成相反。
 - **备选必载**：决定类 Note 必带「输掉的方案」——没记录击败了什么的决定会重新开讼；备选只记录、不编造。
-- **范式**：收尾 Note 的写法样板 = [journal-presence-mechanism](implemented/2026-09-26-journal-presence-mechanism.md)（决定、输掉的方案、验证三件齐；2026-10-06 条目 D 自 AGENTS 纪律表迁来，指针随家）。
+- **范式**：收尾 Note 的写法样板 = [journal-presence-mechanism](./archived/2026-09-26-journal-presence-mechanism.md)（决定、输掉的方案、验证三件齐；2026-10-06 条目 D 自 AGENTS 纪律表迁来，指针随家）。
 - **真证据（D35 吸收）**：毕业 Note 必须记录**真跑过的命令与红/绿形态**（含造红的红）；被阻断的检查
   如实写「阻断 + 原因」，不得写成绿；**未验项不得写 implemented**。改动面 → 最小证据选择 =
   [testing.md §2](../docs/testing.md)；实施序列（红绿环）= [proposed/README](proposed/README.md)；
@@ -50,7 +50,7 @@ Markdown 链接（md-links 门禁硬查）。**生命周期是移动不是复制
 - `proposal-scheduled` / `proposal-graduated`（proposed 侧：批准标记 + 「## 验收」节 + 该毕业的毕业）。
 - `notes-liveness`（D35 立）：`implemented/` 文件名日期 ≥ 2026-10-05 的 Note，前 6 行必须有 `状态：` 行
   且以生命周期词（implemented/已交付/已消化）开头——存量按生效日祖父豁免；反证 =
-  [implemented/notes-taxonomy-owner](implemented/2026-10-05-notes-taxonomy-owner.md)。
+  [notes-taxonomy-owner](./archived/2026-10-05-notes-taxonomy-owner.md)。
 - `md-links`（notes 全树硬查）/ `bare-path`（**proposed/ + implemented/ 新写为硬档**；`postmortem/`、
   `archived/`、`_backlog/_archive/` = 观察档）。**事实落点时效**（2026-10-09 N5 修）：implemented/ 的
   **决定正文不动**，但**路径/符号/默认值这类事实落点随改动就地改新**——依据 = vendor
@@ -67,9 +67,8 @@ Markdown 链接（md-links 门禁硬查）。**生命周期是移动不是复制
 不看对话就能复现，落 [proposed/README](proposed/README.md)）；「implemented 只收真证据」表述；
 取代检查/备选必载收进 owner 文件。
 **适配**：TDD 红绿环住 proposed/README（RFC 执行合同，2026-10-05 同日先立，见
-[rfc-tdd-loop](implemented/2026-10-05-rfc-tdd-loop.md)），本文件只管分类与证据门槛——两文件分工不重叠；
-生命周期细则从 dev-loop §12 迁来（原吸纳记录 =
-[2026-09-24 notes-lifecycle-absorption](implemented/2026-09-24-notes-lifecycle-absorption.md)，取舍仍有效）。
+[rfc-tdd-loop](./archived/2026-10-05-rfc-tdd-loop.md)），本文件只管分类与证据门槛——两文件分工不重叠；
+生命周期细则从 dev-loop §12 迁来。sdlc-01 里明确不吸纳的（class 子目录、seal manifest、中心索引、状态值域门禁）已过时或已由本文件 §四写明，吸收稿已删。
 **偏离**：① `postmortem/` 独立保留（借源仓并入 implemented；本仓 _backlog 章程已立「事故复盘 ≠ 设计
 推敲」区分，0001–0004 在档）；② 不借「文件名日期 == 状态行日期」门禁——本仓时间轴 = 文件名日期 +
 git log（D34），状态行不重复载日期；③ 不借 `{lifecycle}/{class}/` 两级路径（生命周期轴已够用，class

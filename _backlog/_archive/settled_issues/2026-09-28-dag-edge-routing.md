@@ -1,12 +1,12 @@
 # 推敲：依赖图边线路由（中段打结的视觉缓解）
 
-> 状态：已毕业（2026-09-28，用户批准转入 RFC）｜去向 = [notes/implemented/2026-09-28-dag-edge-routing.md](../../../notes/implemented/2026-09-28-dag-edge-routing.md)｜原毕业门判断 = 待触发——用户作为次序权威直接点名「都要修改掉」，方案走车道分离（纯布局函数）
+> 状态：已毕业（2026-09-28，用户批准转入 RFC）｜去向 = notes/implemented/2026-09-28-dag-edge-routing.md（已删，历史在 git）｜原毕业门判断 = 待触发——用户作为次序权威直接点名「都要修改掉」，方案走车道分离（纯布局函数）
 
 ## 背景 / 触发
 
 2026-09-28 试用反馈「依赖图画的乱」复现环的第二发现：实测动议（T7 前置 = T1 最左 + T4 最右、
 T6 前置居中）行布局下限 = **2 对交叉**，barycenter 单遍已到下限——排序无解，形状固有，非 bug。
-裁切主犯另修：[implemented/2026-09-28-dag-pane-fit-scaling.md](../../../notes/implemented/2026-09-28-dag-pane-fit-scaling.md)。
+裁切主犯另修：implemented/2026-09-28-dag-pane-fit-scaling.md（已删，历史在 git）。
 
 ## 已知与未决
 

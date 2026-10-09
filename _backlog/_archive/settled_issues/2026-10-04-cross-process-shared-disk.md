@@ -2,7 +2,7 @@
 
 > 状态：**已毕业（2026-10-04 用户确认方案并点名推进；小修不设 RFC——章程明文）**｜毕业门判断 =
 > 该做（轻）：部署约定 + 三层已在场零新代码；落地 = 手册「协作规矩」新增「动议任务板」行 + 收尾 Note｜
-> **去向指针 = [implemented/2026-10-04-shared-disk-taskboard-coordination](../../../notes/implemented/2026-10-04-shared-disk-taskboard-coordination.md)**
+> **去向指针 = implemented/2026-10-04-shared-disk-taskboard-coordination（已删，历史在 git）**
 > （手册行文本、输掉的方案留尸、待验证项住那里）
 
 ## 背景（怎么回事儿）

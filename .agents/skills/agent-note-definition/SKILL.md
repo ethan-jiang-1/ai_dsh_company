@@ -38,5 +38,5 @@ description: Use when writing or updating a file under notes/ and before claimin
 ## 指针（别复述）
 
 规则与词表 = [notes/README.md](../../../notes/README.md)；收尾动作清单 = [dev-loop §12](../../../docs/guides/dev-loop.md)；
-范式样板 = [journal-presence-mechanism](../../../notes/implemented/2026-09-26-journal-presence-mechanism.md)；
+范式样板 = [journal-presence-mechanism](../../../notes/archived/2026-09-26-journal-presence-mechanism.md)；
 RFC 执行合同（TDD 红绿环）= [proposed/README](../../../notes/proposed/README.md)。

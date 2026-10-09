@@ -48,6 +48,7 @@ demo 叙事与这套 UI 的对应：**事情从 CEO 出来** = 在 CEO 会话里
 
 Web Client 的扩展系统是**类型化 React 槽位**（`docs/subsystems/slots.md`）：
 feature 插件经 `ctx.slots.register()` 贡献 UI，绝不 import 别的 feature 包的运行时。
+公司视图不装社区任务板或图库：那些包不读官方 team 数据，git 安装还会在沙箱外跑 prepare。零依赖 SVG/CSS 够用；图真变大再按采用度另议。
 shipped 槽位树里我们值得占的位置：
 
 | 槽位 | 我们放什么 | demo 价值 |

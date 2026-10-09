@@ -3,7 +3,7 @@
 > 状态：**已毕业（2026-10-04 用户令「如法炮制」推动落地；形状 (a) 现状钉死按既定「最正确不短视」
 > 原则选定；小修不设 RFC——章程明文）**｜毕业门判断 = 该做（轻）：零新代码，行为判据
 > presence-board.spec 16/16 PASS，合同行落 multi-human.md §2 第 6 条｜
-> **去向指针 = [implemented/2026-10-04-presence-board-progress-surface](../../../notes/implemented/2026-10-04-presence-board-progress-surface.md)**
+> **去向指针 = implemented/2026-10-04-presence-board-progress-surface（已删，历史在 git）**
 > （(b) 态势条 / (c) 推送的留尸与复活触发住那里）
 
 ## 背景 / 触发

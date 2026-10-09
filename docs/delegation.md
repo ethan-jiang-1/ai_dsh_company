@@ -4,7 +4,7 @@
 > 顶层合同：CEO 的"派活"现在时语义——哪条路走什么、边界在哪、被什么检查守住。
 > 机制依据 [design/architecture.md](./design/architecture.md) §3（通道 A/B）与
 > [design/roles-isolation.md](./design/roles-isolation.md) §2–§3；R3 的实证记录在
-> `notes/implemented/2026-09-22-r3-*.md`。台账 Q1 由本篇闭合。
+> R3 实证：CEO 会话里 continuable 的续驶前提不成立，连续对话归 team。台账 Q1 由本篇闭合。
 
 ## 0. 一句话
 

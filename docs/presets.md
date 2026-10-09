@@ -150,7 +150,7 @@ preset 即对 profile 可见、无需重装；真实安装形状（`file:`）归
 
 | 改动面 | 生效时点 | 依据 |
 |---|---|---|
-| persona / 组合文件（工具行、skill 根） | **新会话**（运行中的会话保持自己的 generation）；⚠ **新增依赖模块 / 新行解析时还须重启观察窗**——2026-09-29 实测：旧进程上新开会话仍是 25 工具（无 `web_search`），重启后 27 工具含之（该轮两个变量同时变，故取稳妥口径） | vendor `agent-presets` README stamp 机制；**活体已跑**（2026-09-29 联网整治，见 [role-web-access](../notes/implemented/2026-09-29-role-web-access.md)） |
+| persona / 组合文件（工具行、skill 根） | **新会话**（运行中的会话保持自己的 generation）；⚠ **新增依赖模块 / 新行解析时还须重启观察窗**——2026-09-29 实测：旧进程上新开会话仍是 25 工具（无 `web_search`），重启后 27 工具含之（该轮两个变量同时变，故取稳妥口径） | vendor `agent-presets` README stamp 机制；**活体已跑**（2026-09-29 联网整治，见 [role-web-access](../notes/archived/2026-09-29-role-web-access.md)） |
 | skill 正文（`SKILL.md` body） | **同会话下一轮**（`get()` 每次读盘） | 活体实证（日志工具结果层）+ vendor 源码一致；**修正** 2026-09-22 U1"只有新会话变"（U1 量的是模型转述） |
 | skill 条目（增删改名） | 下一轮（pre-step digest 重算 → 替换目录注入） | vendor skill digest；培养决定 = [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) |
 

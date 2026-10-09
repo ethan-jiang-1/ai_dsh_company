@@ -23,7 +23,7 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
 | P2 | **撞 slug / 撞稿**：两场动议共用 `renewal-y-2026`，产物互相覆盖、两场混装，三态判据看不出 | [memory-convergence-2026-09-26 §边界 1](../../../snapshots/archive/memory-convergence-2026-09-26/README.md)；已有观察项 `slug-collision`（纯逻辑，带回归） |
 | P3 | **版本一致性**：quote-z-2026 双签 allowed-once 但**只对 cfo v2 生效**，盘面已 v3，final 只能记"版号待对齐"；署名行版号是手写的 | 台账 `quote-z-2026` 行结论；`scripts/authorship-audit.mjs` 头注 |
 | P4 | **感知/通知**：根会话之间**没有消息通道**（Agent Teams 按队伍作用域，不同根会话是不同队）；"我写完了"靠人开口说；实时卡刷新即丢 | [multi-human.md §0+§3](../../../docs/multi-human.md)（§0 证卡按会话作用域，§3 证非团队会话互不通信）；手册「待办」节"刷新即丢" |
-| P5 | **审计与日期**：谁在何时写了什么，唯一权威 = `$DSH_HOME` 会话日志（zstd 多帧），**按 home 分桶**（跨 home 审计要每家跑一遍）、~~快照里没有日志（导出缺口）~~ **导出缺口已闭合（2026-09-30 E3：`session-log-export.mjs` + 09-26 快照 4 场审计 0 违规）**，日期要靠它回填 | [journal-date-mechanism](../../../notes/implemented/2026-09-26-journal-date-mechanism.md)；memory-convergence README"登记一条缺口"；**E3 收据 = 研究卡 E3 结论** |
+| P5 | **审计与日期**：谁在何时写了什么，唯一权威 = `$DSH_HOME` 会话日志（zstd 多帧），**按 home 分桶**（跨 home 审计要每家跑一遍）、~~快照里没有日志（导出缺口）~~ **导出缺口已闭合（2026-09-30 E3：`session-log-export.mjs` + 09-26 快照 4 场审计 0 违规）**，日期要靠它回填 | [journal-date-mechanism](../../../notes/archived/2026-09-26-journal-date-mechanism.md)；memory-convergence README"登记一条缺口"；**E3 收据 = 研究卡 E3 结论** |
 | P6 | **派活状态回写滞后**：任务书状态行不回写，扫盘把过期待办报成活 | 公司手册「机器可读派活行」节（实验实证） |
 
 ### 关键机制事实（vendor 只读核实 + 本仓实证，2026-09-29 复核）

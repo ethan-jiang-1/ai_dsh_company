@@ -1,6 +1,6 @@
 # 推敲：deliverables 的日期、元数据与生命周期归宿（archived / rejected / implemented 怎么落进目录）
 
-> 状态：已毕业（2026-10-03，五决策点拍定并同 diff 落地）｜批准：用户 2026-10-03 拍 C1 搬迁 + A1/B1/分型/归档家/并步（对话在案）｜去向 = [notes/implemented/2026-10-03-deliverables-lifecycle-landing.md](../../../notes/implemented/2026-10-03-deliverables-lifecycle-landing.md)（存量 22 话题已迁入 deliverables-archive/，check 违规 0）｜原毕业门判断 = 方向该做（五点拍定即落地）
+> 状态：已毕业（2026-10-03，五决策点拍定并同 diff 落地）｜批准：用户 2026-10-03 拍 C1 搬迁 + A1/B1/分型/归档家/并步（对话在案）｜去向 = notes/implemented/2026-10-03-deliverables-lifecycle-landing.md（已删，历史在 git）（存量 22 话题已迁入 deliverables-archive/，check 违规 0）｜原毕业门判断 = 方向该做（五点拍定即落地）
 
 ## 评审修正（2026-09-30，三路盲审合并；原文保留于下文各节，本节为准）
 
@@ -150,7 +150,7 @@
   每次提醒，见 [entry-execution-chain-debt](../../../notes/implemented/2026-09-26-entry-execution-chain-debt.md)）。
   这正是"中心表手工同步"模式的固有漂移，不是执行疏忽。
 - **公司角色没有任何取真日期的通道**（无 shell、无时钟工具、runtime context 无日期、fs 模型面无 mtime——
-  机制核实见 [journal-date-mechanism](../../../notes/implemented/2026-09-26-journal-date-mechanism.md)）⇒
+  机制核实见 [journal-date-mechanism](../../../notes/archived/2026-09-26-journal-date-mechanism.md)）⇒
   现行口径 = 文件名与首行用占位 `日期待核`，真日期由**轮末收敛或人**从会话日志（`session.createdAt`）
   回填。日期曾链式漂移复利三代（09-25 动议被记 09-28 → 次日 09-29 → 09-30），红证在案。
   **日期从哪来**（机制层）已拆出独立卡 [date-channel-mechanism](./2026-09-29-date-channel-mechanism.md)：

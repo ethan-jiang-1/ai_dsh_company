@@ -81,5 +81,4 @@ docs/ notes/ _backlog/ company-workspace/ vendor/（不动）
 
 ## 延伸（2026-10-08）
 
-驾驶座视图后续演进 = [driver-receipt-round](2026-10-08-driver-receipt-round.md)（orient 第七问「四脚踩刹车」+
-轮次回执进 dev-loop §12；本页 S5 单页导航结构的延续，互链不合并）。
+驾驶座视图的后续 = orient 第七问与 dev-loop 轮次回执（收据稿已删）。

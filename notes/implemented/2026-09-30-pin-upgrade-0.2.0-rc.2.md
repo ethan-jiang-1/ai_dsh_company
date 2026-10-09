@@ -14,7 +14,7 @@
 - **唯一硬破面** = [cordis.patch.yml](../../packages/company-pack/cordis.patch.yml) 的 `time-context`
   替换行：0.2.0 的 web-app 出厂补丁删了 `time-context`/`schedule`/`ui-schedule` 三行，整体迁入新可选
   bundle `dsh-experimental-schedule-bundle`（upstream `64a361ee44`）⇒ 替换语义下该行 not found 丢弃，
-  日期通道断。
+  日期通道断。用户 2026-10-03 追认启用这条通道（追认戳已删，机制以本段为准）。
 
 ## 方案（对照 0.1.7 先例的三步走，本轮实测后简化为两步）
 

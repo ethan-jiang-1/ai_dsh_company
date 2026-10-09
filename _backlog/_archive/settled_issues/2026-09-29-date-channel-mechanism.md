@@ -1,11 +1,11 @@
 # 推敲：日期通道——启用出厂 time-context，让角色开局即有真日期
 
-> 状态：已毕业（2026-10-03，D2' 追认）｜批准：用户 2026-10-03 追认 D2'（对话在案；追认记录 = [notes/implemented/2026-10-03-d2-time-context-ratification.md](../../../notes/implemented/2026-10-03-d2-time-context-ratification.md)——机制形状按现行 schedule-bundle 载体记档）｜原毕业门判断 = 倾向该做 D2'（已兑现并追认）——机制/文面/探针均已于 09-30 落地全绿；下文「⚠ 半实施状态」保留为当时的风险论证（历史，勿当现役）
+> 状态：已毕业（2026-10-03，D2' 追认）｜批准：用户 2026-10-03 追认 D2'（对话在案；追认记录已删，机制形状见 [升 pin Note](../../../notes/implemented/2026-09-30-pin-upgrade-0.2.0-rc.2.md)）｜原毕业门判断 = 倾向该做 D2'（已兑现并追认）——机制/文面/探针均已于 09-30 落地全绿；下文「⚠ 半实施状态」保留为当时的风险论证（历史，勿当现役）
 
 ## 背景 / 触发
 
 - 用户 2026-09-29 点名：deliverables 的话题**至少要有 kick-off 日期**。
-- [journal-date-mechanism](../../../notes/implemented/2026-09-26-journal-date-mechanism.md) 当时只批了
+- [journal-date-mechanism](../../../notes/archived/2026-09-26-journal-date-mechanism.md) 当时只批了
   C 文案止损，留案了 A（pack 侧自建 `systemPrompt.context` 注入）与 B（上游 seam）两个未批方案，
   触发条件 = "日期缺失再次造成问题，或用户点名"——**已 fired**（用户点名）。
 - 拆卡理由不变：本卡是机制问题（company-pack 组合面），与姊妹卡
@@ -117,7 +117,7 @@ CEO skill 记账步（SKILL.md:30）**无条件**教占位（把机制收益挡�
 - **该做门**：用户裁 D2' ⇒ ① 探针（分钟级）**已过（2026-09-30，见上节结果）**；
   ② RFC 三件（问题/方案/验收）——问题与方案已在本卡成熟，验收 = preset-smoke + time-context-probe
   （已立）+ 手册「日期口径」改文 + `date-rule-probe` 判据升级同 diff。**只差用户一句话。**
-- **放弃门**：用户裁"回填税可忍" ⇒ 本卡结论并回 [journal-date-mechanism](../../../notes/implemented/2026-09-26-journal-date-mechanism.md)
+- **放弃门**：用户裁"回填税可忍" ⇒ 本卡结论并回 [journal-date-mechanism](../../../notes/archived/2026-09-26-journal-date-mechanism.md)
   「输掉的方案」节（留案 A/B 关死为"出厂件存在亦不启用"，防重复推敲），本卡迁 `_done`。
 - **不阻塞声明**：姊妹卡（布局）不需要本卡结论；但本卡若毕业为 D2'，姊妹卡需回头重看 A1/A2 取舍
   （那条耦合注在两边都已登记）。

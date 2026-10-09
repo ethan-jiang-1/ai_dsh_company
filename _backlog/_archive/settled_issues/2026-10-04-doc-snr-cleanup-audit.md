@@ -1,6 +1,6 @@
 # 推敲：入口链信噪比与一致性清扫批（2026-10-04 四线审计）
 
-> 状态：已毕业（2026-10-04 用户三拍板 + 点名执行，批次①+② 同日全落地；去向 = [implemented/2026-10-04-doc-snr-cleanup-round](../../../notes/implemented/2026-10-04-doc-snr-cleanup-round.md)；残余观察项见该 Note「未做」节）｜毕业门判断 = 该做→已消化｜下一步 = 无（重启以新卡回场引用本卡）
+> 状态：已毕业（2026-10-04 用户三拍板 + 点名执行，批次①+② 同日全落地；去向 = implemented/2026-10-04-doc-snr-cleanup-round（已删，历史在 git）；残余观察项见该 Note「未做」节）｜毕业门判断 = 该做→已消化｜下一步 = 无（重启以新卡回场引用本卡）
 
 ## 背景 / 触发
 
@@ -17,7 +17,7 @@
 ### A. 误导级（fresh agent 会被引向不存在/已废对象）
 
 1. **死 ROADMAP 指针 ×3**：[demo.md L53](../../../docs/demo.md)、[ui-demo.md L54](../../../docs/design/ui-demo.md)、[index.md L53](../../../docs/index.md)（台账前言「搁置池准入条件见 ROADMAP」）。D32 声称「痕迹彻底清理」仍有漏网；index.md 台账行内 `plans/roadmap` 属历史语境可留。
-2. **pre-D32 Note 无「已废」横幅**：重 ×2——[foundation-remediation L9](../../../notes/implemented/2026-09-24-foundation-remediation.md)（「ROADMAP.md 是活动/暂停项的唯一调度家」，读作现行路由）、[multi-human-ux L5](../../../notes/implemented/2026-09-26-multi-human-ux.md)（「已入搁置池并成提案稿」，所指两物现均不存在、无前向链接）；轻 ×3——notebook-hygiene、enforcement-channel-and-boundaries、client-review-fixes（修法 = 仿 research-notes-lifecycle L3（已删，历史在 git） 的 ⚠ 一行横幅）。
+2. **pre-D32 Note 无「已废」横幅**：重 ×2——foundation-remediation L9（已删，历史在 git）（「ROADMAP.md 是活动/暂停项的唯一调度家」，读作现行路由）、[multi-human-ux L5](../../../notes/archived/2026-09-26-multi-human-ux.md)（「已入搁置池并成提案稿」，所指两物现均不存在、无前向链接）；轻 ×3——notebook-hygiene、enforcement-channel-and-boundaries、client-review-fixes（修法 = 仿 research-notes-lifecycle L3（已删，历史在 git） 的 ⚠ 一行横幅）。
 3. **`scripts/migration-rehearsal.mjs`**：C1 迁移已执行（2026-10-03，卡已毕业），头注仍是活触发器口径且 `--execute` 写真盘——最危险的一件。
 4. **[motion-ledger L3](../../../company-workspace/kb/motion-ledger.md)**：成品口径仍写 `deliverables/<slug>/final.md`，而 27 个动议全已迁 `deliverables-archive/`——台账自己的定义在当前盘上为假。
 5. **[demo.md L180](../../../docs/demo.md)**：场景 F 可粘贴脚本教人写「日期待核」占位——违反手册 2026-09-30 日期口径（真日期；占位仅限注入故障 fail-closed）。照脚本执行 = 违反手册。

@@ -5,7 +5,7 @@
 > 来源：FAQ 13 `dev-loop.md` + `dual-home-isolation.md`（repo 外研究材料，落点登记见
 > [index.md](../index.md) §外部研究材料登记）；机制结论以 `vendor/dsh/` 工作树为权威，
 > 本篇引用的旗标与行为均已在**钉住的 vendor 基线**上核对——基线版本与 SHA 的唯一事实家 = 根
-> `AGENTS.md` §vendor 簿记（升 pin 时的重校记录 = [pin-upgrade Note](../../notes/implemented/2026-09-25-pin-upgrade-0.1.7-rc.2.md)）。
+> `AGENTS.md` §vendor 簿记（升 pin 时的重校记录 = pin-upgrade Note（已删，历史在 git））。
 
 ## 0. 开发环导航
 
@@ -94,7 +94,7 @@
 | ① 占哪个 ctx 键 / 发哪些事件 | 每个新能力一个自己的键，`inject` 声明依赖，不劫持别人的 | company-pack `src/` 的设计节 |
 | ② 模型会看见什么新状态 | **日志税**：每个新的模型可见输入配 `SessionEventMap` 成员（并定 `ignorable`），否则 JSONL 回放不出来 | [architecture.md](../design/architecture.md) §8 已预警；漏了在第 5 阶段以"日志读不全"还债 |
 | ③ UI 走哪层 | presenter 纯函数 → `tool.call.toolview` 槽 → `dsh.client.inject`，不一步到顶 | [ui-demo.md](../design/ui-demo.md) 分层（D6） |
-| ④ 证据是什么 | **红/场景先行**（2026-10-04 升格）：机制面 = 实现前那个测试已写且红；行为/UX 面 = 场景先立（Given/When/Then + 判据点名）；口头担忧第二次提起 → 立卡或明确否决，不留复发性话题 | 该变更的 Note"需验证什么"；场景规格家 = lane Note（如 [multi-user-concurrency-lane](../../notes/implemented/2026-10-04-multi-user-concurrency-lane.md)） |
+| ④ 证据是什么 | **红/场景先行**（2026-10-04 升格）：机制面 = 实现前那个测试已写且红；行为/UX 面 = 场景先立（Given/When/Then + 判据点名）；口头担忧第二次提起 → 立卡或明确否决，不留复发性话题 | 该变更的 Note"需验证什么"；场景规格写在该变更自己的 Note 或探针头注 |
 
 ## 4. 插拔速查
 
@@ -335,7 +335,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - **语义审过一遍再收口**（2026-10-07 plugin-corpus-realignment；四输入清单 = §13）——结论与发现一句话记进收尾 Note：机器绿灯到此为止，质量判断这道不空转。
 - **被证伪的已落地切片整片 revert**（实现+测试+docs+Note 同退），修正另起新条目；不做半 revert 的外科修补——半退留"文档说 A、代码是 B"漂移态，结构门禁查 HEAD 不查语义一致，抓不住（2026-09-28 借 FAQ 11）。
 - 完成条目：验收通过后其 `_backlog` 表行/卡即离场（`git mv` 或删行，证据留 Note）；未完成项写清阻塞与下一步留在原处。不要把完成标记或过期环境状态堆回任务源。
-- **轮次回执（2026-10-08 立，[driver-receipt-round](../../notes/implemented/2026-10-08-driver-receipt-round.md) 条目 A；非平凡收尾必发——交接的标准形状，驾驶座可见面）**：固定六行——
+- **轮次回执（2026-10-08 立，driver-receipt-round（已删，历史在 git） 条目 A；非平凡收尾必发——交接的标准形状，驾驶座可见面）**：固定六行——
   ①外部行为与影响面（含改动 owner）；②四链证据（挂得上/行为对/装得上〔适用时〕/批准：各点名实跑的检查，
   未跑如实标「未执行」，不混入"应该跑了"的暗示）；③语义审结论（四输入过了一遍、发现 N 条及处置）；
   ④资产增量（场景/夹具/门禁/语料涨了什么，没涨如实写——§0.5 goal 轮简报同此形状）；
@@ -354,7 +354,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
   清单不另写 Note。
 - 文档卫生按指导价值：移除失效/重复指令与无行动价值的历史噪声；保留仍指导当前决策、解释约束或支持复验的证据。不以净减行数为目标（D26）。
 - **授权链与时间轴（intents.md 已退役，D34 2026-10-04）**：授权线索（用户点名/裁定原话）记在**对应 Note 的状态行**；时间轴 = `notes/implemented/` 文件名日期 + git log。月度冻结表已在 2026-10-09 清扫中删除（那是账本身）。退役理由 = 第三本账与 Note 双写、膨胀病史三次、违反上游 no-index 教义（vendor notes README）。
-- **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链一律 `set -o pipefail` + `&&`（不带 pipefail 的 `cmd | tail` 退出码是 `tail` 的 = 假绿）。push 由 **pre-push hook 强制跑全量 `pnpm verify` + `pnpm test`**（verify 2026-09-27 立；test 09-28 加，不进 CI 的定界见 [ci-test-lane Note](../../notes/implemented/2026-09-28-ci-test-lane.md)；接线 = `source run/env.sh` 幂等设 `core.hooksPath`；bypass = `--no-verify`，用后须在收尾 Note 说明原因）。
+- **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链一律 `set -o pipefail` + `&&`（不带 pipefail 的 `cmd | tail` 退出码是 `tail` 的 = 假绿）。push 由 **pre-push hook 强制跑全量 `pnpm verify` + `pnpm test`**（verify 2026-09-27 立；test 09-28 加，不进 CI 的定界见 [n7-ci-narrowing](../../notes/implemented/2026-10-09-n7-ci-narrowing.md)；接线 = `source run/env.sh` 幂等设 `core.hooksPath`；bypass = `--no-verify`，用后须在收尾 Note 说明原因）。
 - **复盘一问：本轮有没有 agent 遵守的"未成文规则"**（从代码模式推断出的伪规则，跨会话会扩散）？三选一收口：升格 verify 门禁 / 写进 owner Note / 显式作废——规则不留空气（2026-09-28 借 FAQ 11）。
 
 ## 13. 自主优先协议（2026-09-26 立，用户令；D29）

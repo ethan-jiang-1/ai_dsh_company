@@ -14,7 +14,7 @@
 > 未批准的思考住 [`_backlog/issues/`](../../_backlog/issues/README.md) 推敲卡）。实施次序 = 用户逐条给
 > （D32，无中心排序文件）。
 > 机械门禁：`proposal-scheduled`（每个 RFC 状态行带「批准：」标记——D32 起查标记不查队列；+「## 验收」节
-> 在场——2026-10-05 TDD 环立，反证 = [implemented/rfc-tdd-loop](../implemented/2026-10-05-rfc-tdd-loop.md)）/
+> 在场——2026-10-05 TDD 环立，反证 = [implemented/rfc-tdd-loop](../archived/2026-10-05-rfc-tdd-loop.md)）/
 > `proposal-graduated`
 > （该毕业的不许赖在 proposed/）。发现方式 = 浏览本文件夹 + 文件名（DSH 纪律：
 > "the lifecycle/class filesystem tree is the inventory"；不建集中索引——共享文件必漂移，

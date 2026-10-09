@@ -707,7 +707,7 @@ ok(`client-halves ×${clientHalves.length}`)
 //   ② proposal-graduated（不变）：已消化的不许赖在 proposed/——毕业 ≠ 全部实现，而是"每一条都有归宿"。
 //   ③ proposal-scheduled 扩展（2026-10-05 TDD 环立，用户令「一定 TDD 手段、全程证据、不随性发挥」）：
 //      RFC 必须带「## 验收」节——「怎么测」先行的载体；红绿环序列合同 = notes/proposed/README 生命周期段。
-//      负例留证：无验收节的 fixture RFC → red → 还原 → green（三步 = implemented/2026-10-05-rfc-tdd-loop.md）。
+//      负例留证：无验收节的 fixture RFC → red → 还原 → green（三步 = archived/2026-10-05-rfc-tdd-loop.md）。
 // ⚠ 门禁只保证"被批准 + 该毕业的毕业"，不保证"会实现"——实施由用户指令逐条进入。
 const proposedDir = join(root, 'notes/proposed')
 // README.md 是文件夹说明书（curated entry point，非提案）——DSH 同款：notes 层的 README 不在提案命名空间
@@ -755,7 +755,7 @@ notGraduated.length === 0
 // （implemented/已交付/已消化——词表唯一家 = notes/README §一）；存量按生效日祖父豁免
 // （存量不回扫 = 状态行规矩的既有口径，2026-09-24）。
 // 负例留证（2026-10-05 实跑，红→还原→绿三步）：fixture A 无状态行 / fixture B 状态词错位
-// （proposed 开头）双红 → 删 fixture 还原 → green；收据 = implemented/2026-10-05-notes-taxonomy-owner.md。
+// （proposed 开头）双红 → 删 fixture 还原 → green；收据 = archived/2026-10-05-notes-taxonomy-owner.md。
 {
   const NOTES_EFFECTIVE_DATE = '2026-10-05'
   const implDir = join(root, 'notes/implemented')

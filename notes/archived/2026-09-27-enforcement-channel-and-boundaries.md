@@ -33,7 +33,7 @@ ROADMAP 磨清单两条对应行已磨即离队。）
   verify 全量归 pre-push 一道即最小形状（本仓 verify 本身秒级，无需再分档）。
 - **CI 跑 test lane**：需 §7 全量构建链（typert / native / 前端 dist），成本重；verify-only 已覆盖结构面，
   test lane 留触发条件（第二贡献者进场，或「忘跑」成为实际频率）。〔2026-09-28 终态：CI 首跑红实证
-  「需构建链」判断正确，test 的 enforcement 挪进 pre-push hook（verify+test）——见 [ci-test-lane](./2026-09-28-ci-test-lane.md)〕
+  「需构建链」判断正确，test 的 enforcement 挪进 pre-push hook（verify+test）——见 ci-test-lane（已删，历史在 git）〕
 
 ## 验证（实际跑过的）
 
