@@ -10,9 +10,9 @@ opened: 2026-10-09
 
 ## 症状
 
-修复结论：原五类判据假绿已修复，required判据接入实际退出码；双成员原入口改为实验overlay同轮共同read放行，真实复跑5/5、exit0。旧4/5样本继续保留为修复前的工具时序不足事实，不替代修复后验收。可复现实验、marker/callId配对、败者read/write顺序和限制见[双成员验收研究](../../research/collaboration/2026-10-09-team-read-barrier-acceptance.md)及[屏障接入源研究](../../research/collaboration/2026-10-09-team-read-barrier-seam.md)。claim让位是否符合产品行为仍属独立协作issue问题。
+修复结论：原五类判据假绿已修复，required判据接入实际退出码；双成员原入口改为实验overlay同轮共同read放行，真实复跑5/5、exit0。旧4/5样本继续保留为修复前的工具时序不足事实，不替代修复后验收。可复现实验、marker/callId配对、败者read/write顺序和限制见[双成员验收研究](../research/collaboration/2026-10-09-team-read-barrier-acceptance.md)及[屏障接入源研究](../research/collaboration/2026-10-09-team-read-barrier-seam.md)。claim让位是否符合产品行为仍属独立协作issue问题。
 
-用户要求复核多人协作与历史落地；调查阶段执行原真实判据片段，5类独立坏样本仍被接受。完整研究、基线、工具事件定位与解释见 [协作研究](../../research/collaboration/2026-10-09-teamagent-locks-and-acceptance-audit.md)，问题范围归 [协作安全卡](../../issues/2026-10-09-collaboration-safety-acceptance.md)。用户随后批准先修 BUG-007；五条探针判据与驱动均已修正。修复前未触发的并发写冲突由修复后的受控双成员入口覆盖，结果见本卡结论和双成员研究。
+用户要求复核多人协作与历史落地；调查阶段执行原真实判据片段，5类独立坏样本仍被接受。完整研究、基线、工具事件定位与解释见 [协作研究](../research/collaboration/2026-10-09-teamagent-locks-and-acceptance-audit.md)，问题范围归 [协作安全卡](../settled_issues/2026-10-09-collaboration-safety-acceptance.md)。用户随后批准先修 BUG-007；五条探针判据与驱动均已修正。修复前未触发的并发写冲突由修复后的受控双成员入口覆盖，结果见本卡结论和双成员研究。
 
 | 位置 | 反例/实际观察 | 错误判据 |
 |---|---|---|
@@ -53,9 +53,9 @@ node probes/fs-taskboard/collaboration-oracle-probe.mjs
 
 本卡修复验收完成：修复后原双成员concurrency真实入口正常结束5/5、exit0；此前4/5是修复前没有共同read放行机制的历史样本，继续保留但不代表当前入口。atomicity4/4、recovery4/4、scope3/3、fs-guard三项真实入口此前均PASS。没有改生产锁/协作协议/preset/vendor。
 
-补充机制证据：[可控同版本竞写研究](../../research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)已实际得到两种提交顺序的一胜一FS_STALE_VERSION及败者重读合并；取消version条件的对照双成功，被同一套验收断言判为exit1。这补齐可控机制路径。FS_NOT_OBSERVED不单独证明读后竞争。
+补充机制证据：[可控同版本竞写研究](../research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)已实际得到两种提交顺序的一胜一FS_STALE_VERSION及败者重读合并；取消version条件的对照双成功，被同一套验收断言判为exit1。这补齐可控机制路径。FS_NOT_OBSERVED不单独证明读后竞争。
 
-补充模型入口证据：[成员 stale 写入口探针](../../../probes/team/member-stale-write-probe.mjs)（决定与判据取舍见 [Note](../../../notes/implemented/2026-10-09-member-stale-write-entry.md)）在单成员 + 外部改盘的受控场景下，真实模型第二次运行确实拿到 FS_STALE_VERSION、重读并合并出精确终态；首跑成员上一轮实际read过，但恢复新轮首次write得到 FS_NOT_OBSERVED，被如实判红；它证明跨轮未观察拒绝不能冒充读后stale。场景与真实事件见[成员验收研究](../../research/collaboration/2026-10-09-member-stale-write-acceptance.md)。这是**独立仪器**的 C1b 模型入口演示；双成员同轮入口及当前全项复跑见[双成员验收研究](../../research/collaboration/2026-10-09-team-read-barrier-acceptance.md)。
+补充模型入口证据：[成员 stale 写入口探针](../../../probes/team/member-stale-write-probe.mjs)（决定与判据取舍见 [Note](../../../notes/implemented/2026-10-09-member-stale-write-entry.md)）在单成员 + 外部改盘的受控场景下，真实模型第二次运行确实拿到 FS_STALE_VERSION、重读并合并出精确终态；首跑成员上一轮实际read过，但恢复新轮首次write得到 FS_NOT_OBSERVED，被如实判红；它证明跨轮未观察拒绝不能冒充读后stale。场景与真实事件见[成员验收研究](../research/collaboration/2026-10-09-member-stale-write-acceptance.md)。这是**独立仪器**的 C1b 模型入口演示；双成员同轮入口及当前全项复跑见[双成员验收研究](../research/collaboration/2026-10-09-team-read-barrier-acceptance.md)。
 
 1. 本复现5类坏样本全部拒绝，且对应正常样本均通过；不得删除反例或只改文案。
 2. 缺工具结果、其他任务/成员/path错误、仅正文宣称完成、重复行、预恢复事件、无第2轮等反例都fail或证据不足，绝不自动pass。

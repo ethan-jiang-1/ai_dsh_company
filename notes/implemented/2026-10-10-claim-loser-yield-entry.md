@@ -18,7 +18,7 @@
 
 ## 后果与既有 owner
 
-判据纪律 owner = [协作探针的事实判据与退出条件](./2026-10-09-collaboration-probe-evidence.md)（本 Note 只补 claim-loser 让位判据这一个面，不重述其 callId 配对与退出码规则）；C1b 模型入口仪器 = [成员 stale 写入口](./2026-10-09-member-stale-write-entry.md)。行为事实与边界 owner = [认领让位对照研究](../../_backlog/research/collaboration/2026-10-10-claim-loser-yield-acceptance.md)；问题范围与裁4 结论归 [协作安全 issue](../../_backlog/issues/2026-10-09-collaboration-safety-acceptance.md)。真实运行的单次结论不外推遵循性；未来运行若出现败者违规写目标，以该次红为准，不以本次绿覆盖。
+判据纪律 owner = [协作探针的事实判据与退出条件](./2026-10-09-collaboration-probe-evidence.md)（本 Note 只补 claim-loser 让位判据这一个面，不重述其 callId 配对与退出码规则）；C1b 模型入口仪器 = [成员 stale 写入口](./2026-10-09-member-stale-write-entry.md)。行为事实与边界 owner = [认领让位对照研究](../../_backlog/_archive/research/collaboration/2026-10-10-claim-loser-yield-acceptance.md)；问题范围与裁4 结论归 [协作安全 issue](../../_backlog/_archive/settled_issues/2026-10-09-collaboration-safety-acceptance.md)。真实运行的单次结论不外推遵循性；未来运行若出现败者违规写目标，以该次红为准，不以本次绿覆盖。
 
 ## 验证
 

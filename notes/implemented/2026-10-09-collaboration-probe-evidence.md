@@ -19,12 +19,12 @@
 
 ## 后果与既有 owner
 
-活跃 notes 按协作探针、concurrency、writeScopeWarnings 检索，无同决定 owner；当前研究与问题范围继续由 [协作研究](../../_backlog/research/collaboration/2026-10-09-teamagent-locks-and-acceptance-audit.md)拥有，本 Note 只记判据取舍。真实模型没有触发冲突时保持失败证据，不靠重复运行随机取绿；机制和模型质量不能互相替代。scope warning 的任务本身可 completed，只有所指另一任务必须 in_progress，判据遵循钉住的 [task-view](../../vendor/dsh/packages/experimental/agent-team/src/task-view.ts)。
+活跃 notes 按协作探针、concurrency、writeScopeWarnings 检索，无同决定 owner；当前研究与问题范围继续由 [协作研究](../../_backlog/_archive/research/collaboration/2026-10-09-teamagent-locks-and-acceptance-audit.md)拥有，本 Note 只记判据取舍。真实模型没有触发冲突时保持失败证据，不靠重复运行随机取绿；机制和模型质量不能互相替代。scope warning 的任务本身可 completed，只有所指另一任务必须 in_progress，判据遵循钉住的 [task-view](../../vendor/dsh/packages/experimental/agent-team/src/task-view.ts)。
 
 ## 验证
 
 - 旧 [零模型 oracle](../../probes/fs-taskboard/collaboration-oracle-probe.mjs)实际执行原判据，修前 exit1、5/5 坏样本接受；修后直接用驱动共享判据，exit0、0/11 坏样本接受。若只读、无配对写入、重复/额外行、历史恢复正文或缺真实任务结果被接受，它返回1。
 - `pnpm test tests/harness/collaboration-evidence.spec.ts tests/harness/collaboration-probe-verdict.spec.ts tests/harness/recovery-scope-evidence.spec.ts`：3 files、30 tests passed；正例、路径/任务/成员错误、未配对调用、无第二轮、每项required失败退出均有覆盖。实施中先观察到2项失败，随后实际接口核验发现 ownerId/ownerName、子会话地址和warning状态条件问题并修正；具体现场证据在研究。
 - 已存真实日志回放：同 Team CAS 一胜一stale与owner一致、写拒绝、两个回报投递、六行末态、三轮读回及warning均通过；该回放使用已测文件载荷，不冒充新模型运行。
-- 修复前真模型 `source run/env.sh && node probes/team/team-concurrency-probe.mjs`：正常结束4/5 exit1，C1b未触发写拒绝；该历史样本不改写。修复后同一原入口以本地read-post-execute barrier overlay执行，首次启动在Lead工具前 `REQUEST_EXTENSION`，修正实验插件package identity后实际5/5 exit0：w1/w2同轮成功read、共同放行、一笔 `FS_STALE_VERSION`、败者完整read/成功合并、双方目标write成功、Lead无目标写、CAS、消息投递与completed皆满足；完整真实事件和边界见[双成员研究](../../_backlog/research/collaboration/2026-10-09-team-read-barrier-acceptance.md)。当前helper重放首个成功会话日志五项全true；最终驱动调整放行条件后，另一个真实会话session-1ed110bf也正常5/5、exit0。`source run/env.sh && node probes/team/team-atomicity-probe.mjs`：最终4/4 exit0；`source run/env.sh && node probes/fs-taskboard/fs-guard-probe.mjs`：三项PASS exit0。
+- 修复前真模型 `source run/env.sh && node probes/team/team-concurrency-probe.mjs`：正常结束4/5 exit1，C1b未触发写拒绝；该历史样本不改写。修复后同一原入口以本地read-post-execute barrier overlay执行，首次启动在Lead工具前 `REQUEST_EXTENSION`，修正实验插件package identity后实际5/5 exit0：w1/w2同轮成功read、共同放行、一笔 `FS_STALE_VERSION`、败者完整read/成功合并、双方目标write成功、Lead无目标写、CAS、消息投递与completed皆满足；完整真实事件和边界见[双成员研究](../../_backlog/_archive/research/collaboration/2026-10-09-team-read-barrier-acceptance.md)。当前helper重放首个成功会话日志五项全true；最终驱动调整放行条件后，另一个真实会话session-1ed110bf也正常5/5、exit0。`source run/env.sh && node probes/team/team-atomicity-probe.mjs`：最终4/4 exit0；`source run/env.sh && node probes/fs-taskboard/fs-guard-probe.mjs`：三项PASS exit0。
 - 恢复与跨根真实入口结果、最终结构/回归检查由研究收据记录；纯事件回归不替代真实恢复认证，也不证明跨进程文件仲裁。

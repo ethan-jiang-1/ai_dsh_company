@@ -34,6 +34,7 @@
 | [2026-10-09-postmortem-guard-survival.md](settled_issues/2026-10-09-postmortem-guard-survival.md) | 不新增通用存活机制；按需 owner 验证，重大重构时人工对照 | 2026-10-10 |
 | [2026-10-09-decision-ledger-home-migration.md](settled_issues/2026-10-09-decision-ledger-home-migration.md) | D1–D9 保留 design 路由；不迁 Note、不为此提额 | 2026-10-10 |
 | [2026-10-09-stale-pointer-cleanup.md](settled_issues/2026-10-09-stale-pointer-cleanup.md) | 不单独清理祖父存量；按需修实际阻断导航的指针 | 2026-10-10 |
+| [2026-10-09-collaboration-safety-acceptance.md](settled_issues/2026-10-09-collaboration-safety-acceptance.md) | 四问裁决均 A；维持现行合同＋裁2/裁4 文档化申请（待用户授权） | 2026-10-10 |
 
 ## 已修缺陷
 
@@ -52,6 +53,12 @@
 | 文件 | 曾服务于 | 日期 |
 |---|---|---|
 | [2026-10-04-multi-user-ux-walk.md](research/2026-10-04-multi-user-ux-walk.md) | 多用户 BDD 两张卡的走查与能力盘点 | 2026-10-04 |
+| [2026-10-09-teamagent-locks-and-acceptance-audit.md](research/collaboration/2026-10-09-teamagent-locks-and-acceptance-audit.md) | 协作安全卡＋BUG-007 的机制边界、旧落地断点与验收复核 | 2026-10-10 |
+| [2026-10-09-deterministic-write-conflict-seam.md](research/collaboration/2026-10-09-deterministic-write-conflict-seam.md) | 协作安全卡＋BUG-007 的确定性同版本竞写与合并 | 2026-10-10 |
+| [2026-10-09-member-stale-write-acceptance.md](research/collaboration/2026-10-09-member-stale-write-acceptance.md) | BUG-007＋协作安全卡的成员 stale 拒写闭环 | 2026-10-10 |
+| [2026-10-09-team-read-barrier-seam.md](research/collaboration/2026-10-09-team-read-barrier-seam.md) | BUG-007＋协作安全卡的 post-execute 屏障接入点与限制 | 2026-10-10 |
+| [2026-10-09-team-read-barrier-acceptance.md](research/collaboration/2026-10-09-team-read-barrier-acceptance.md) | BUG-007＋协作安全卡的双成员同轮放行与冲突恢复验收 | 2026-10-10 |
+| [2026-10-10-claim-loser-yield-acceptance.md](research/collaboration/2026-10-10-claim-loser-yield-acceptance.md) | 协作安全卡裁4 的认领让位行为对照 | 2026-10-10 |
 
 ## 暂停卡
 

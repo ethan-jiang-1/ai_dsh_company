@@ -5,7 +5,7 @@ intent: "记录BUG-007双成员真实入口的共同read放行、freshness拒写
 
 # 双成员同轮read放行与冲突恢复
 
-消费者：[BUG-007](../../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)、[协作安全issue](../../issues/2026-10-09-collaboration-safety-acceptance.md)。本工作按用户批准的BUG-007收口goal完成；不改生产协作协议、preset或vendor。
+消费者：[BUG-007](../../fixed_bugs/BUG-007-collaboration-probe-false-positives.md)、[协作安全issue](../../settled_issues/2026-10-09-collaboration-safety-acceptance.md)。本工作按用户批准的BUG-007收口goal完成；不改生产协作协议、preset或vendor。
 
 ## 结论与仪器
 
@@ -29,7 +29,7 @@ intent: "记录BUG-007双成员真实入口的共同read放行、freshness拒写
 
 ## 判据与反证回归
 
-[纯判据](../../../tools/lib/team-barrier-evidence.mjs)把marker的成员ID、path、read callId与该成员配对的成功全文read结果关联，要求初始target全文为空、read后first write前同turn且无另一目标read；每成员要成功发布本行或成为唯一stale败者；stale后完整读到对方行、同turn成功发布精确合并；Lead无目标write/edit，独立终态精确。驱动也在release前核对marker身份、路径、callId确实是member event中的成功read，结束时需要matching released record。
+[纯判据](../../../../tools/lib/team-barrier-evidence.mjs)把marker的成员ID、path、read callId与该成员配对的成功全文read结果关联，要求初始target全文为空、read后first write前同turn且无另一目标read；每成员要成功发布本行或成为唯一stale败者；stale后完整读到对方行、同turn成功发布精确合并；Lead无目标write/edit，独立终态精确。驱动也在release前核对marker身份、路径、callId确实是member event中的成功read，结束时需要matching released record。
 
 - `pnpm test tests/harness/team-barrier-evidence.spec.ts tests/harness/collaboration-probe-verdict.spec.ts`：27/27通过，覆盖callId不匹配、失败read、跨turn读/恢复、首写前额外read、错误路径、缺失winner成功write、败者未成功恢复、合并载荷错误、partial read、Lead代写、各required判据单独缺失后的exit1与全真exit0。
 - 收紧后的helper对上述真实成员/Lead event logs回放：exit0，五项全true。

@@ -16,7 +16,7 @@
 
 ## 后果与既有owner
 
-活跃notes检索同版本/inspectTemp后，[判据Note](2026-10-09-collaboration-probe-evidence.md)仍拥有事件判据决定，本Note只拥有可控交错取舍，两者无取代关系。[研究](../../_backlog/research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)给出源码与现场数据，服务既有协作issue与BUG-007；这个机制结果不能替代BUG-007的模型入口C1b，也不证明跨实例/跨进程同文件安全。合并由脚本显式执行，fs服务不会替调用者自动合并。
+活跃notes检索同版本/inspectTemp后，[判据Note](2026-10-09-collaboration-probe-evidence.md)仍拥有事件判据决定，本Note只拥有可控交错取舍，两者无取代关系。[研究](../../_backlog/_archive/research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)给出源码与现场数据，服务既有协作issue与BUG-007；这个机制结果不能替代BUG-007的模型入口C1b，也不证明跨实例/跨进程同文件安全。合并由脚本显式执行，fs服务不会替调用者自动合并。
 
 ## 验证
 

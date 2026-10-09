@@ -27,9 +27,5 @@ intent: "为什么需要这份依据。"
 
 | 文件 | 活卡与用途 |
 |---|---|
-| [认领让位行为对照](collaboration/2026-10-10-claim-loser-yield-acceptance.md) | [协作安全问题](../issues/2026-10-09-collaboration-safety-acceptance.md)：owner-bound 败者零写与 shared 败者仍写的同会话对照，裁4 落实层别依据 |
-| [read barrier 接入点](collaboration/2026-10-09-team-read-barrier-seam.md) | [BUG-007](../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)、[协作安全问题](../issues/2026-10-09-collaboration-safety-acceptance.md)：pinned DSH工具流水线可用的等待接入位置与限制 |
-| [双成员同轮放行与冲突恢复](collaboration/2026-10-09-team-read-barrier-acceptance.md) | [BUG-007](../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)、[协作安全问题](../issues/2026-10-09-collaboration-safety-acceptance.md)：真实双成员共读后放行、FS_STALE_VERSION、败者重读合并与逐成员发布证据 |
-| [真实成员stale拒写与合并](collaboration/2026-10-09-member-stale-write-acceptance.md) | [BUG-007](../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)、[协作安全问题](../issues/2026-10-09-collaboration-safety-acceptance.md)：真实成员同轮拒写闭环，跨轮FS_NOT_OBSERVED不能代替stale |
-| [确定性同版本竞写与合并](collaboration/2026-10-09-deterministic-write-conflict-seam.md) | [协作安全问题](../issues/2026-10-09-collaboration-safety-acceptance.md)、[BUG-007](../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)：控制真实发布交错、区分stale与未观察拒绝、记录重读合并边界 |
-| [teamagent、锁与验收复核](collaboration/2026-10-09-teamagent-locks-and-acceptance-audit.md) | [协作安全问题](../issues/2026-10-09-collaboration-safety-acceptance.md)、[BUG-007](../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)：机制边界、旧落地断点与实际反例 |
+
+目前无活跃研究材料；随卡归档的研究见 [研究归档](../_archive/research/README.md)。

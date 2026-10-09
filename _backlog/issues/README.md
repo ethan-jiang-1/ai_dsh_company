@@ -6,7 +6,8 @@
 
 | 卡 | 要解决什么 | 当前环节与未完成项 |
 |---|---|---|
-| [协作安全与验收](2026-10-09-collaboration-safety-acceptance.md) | 复核 teamagent、文件保护与旧落地是否支撑多人安全承诺 | 四问已裁决（2026-10-10 均 A）；claim-loser 探针 8/8 exit0、裁4 层别=文档化侧；剩验收矩阵与综合收口 |
+
+目前无活跃问题卡；已结问题见 [归档](../_archive/settled_issues/README.md)。
 
 ## 边界与尺寸
 

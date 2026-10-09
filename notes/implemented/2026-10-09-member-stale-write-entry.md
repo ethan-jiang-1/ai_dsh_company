@@ -22,14 +22,14 @@
 
 - 靠两个成员并发竞写触发 C1b：同实例 per-target 锁把两笔写串行化，第二次提交时首写者通常已发布完，能否撞上同版本取决于时序，靠重复跑取绿。已有 [可控机制探针](../../probes/fs-taskboard/observed-write-conflict-probe.mjs)在 provider 层用测试钩子做确定性机制证明；本探针要的是**模型入口**证据，故改为单成员 + 外部改盘，用观察read结果后的外部改盘提供可核对的顺序。轮询不是原子屏障，若时序错过仍判失败，不声称任意运行必然触发。
 - 让 lead 也去写目标文件：会把「成员是否守住新鲜度」和「lead 行为」混在一起，`noLeadWrites` 明确排除。
-- 接受 `FS_NOT_OBSERVED` 当冲突拒绝：它只说明「没读就写」，不证明读后竞争，[既有机制研究](../../_backlog/research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)已明确不认可。跨轮首跑收到这一错误（见验证），探针如实判红；成员上一轮实际读过，不能把错误码归因为全程没读。
+- 接受 `FS_NOT_OBSERVED` 当冲突拒绝：它只说明「没读就写」，不证明读后竞争，[既有机制研究](../../_backlog/_archive/research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)已明确不认可。跨轮首跑收到这一错误（见验证），探针如实判红；成员上一轮实际读过，不能把错误码归因为全程没读。
 - 把 run 目录留在 rehearsal 盘：会污染 `pnpm verify` 的 `md-newline` 门禁（见验证末条），故失败现场保留在 gitignored 的 `runtime/harness-home/member-stale-evidence/`，rehearsal 下的 run 目录属可清残留。
 
 ## 后果与既有 owner
 
-原BUG-007已修并迁入[fixed bugs归档](../../_backlog/_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)，双成员完整链见[验收研究](../../_backlog/research/collaboration/2026-10-09-team-read-barrier-acceptance.md)。本Note的跨轮与单成员结论仍是补充证据，不是双成员入口替代品。
+原BUG-007已修并迁入[fixed bugs归档](../../_backlog/_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)，双成员完整链见[验收研究](../../_backlog/_archive/research/collaboration/2026-10-09-team-read-barrier-acceptance.md)。本Note的跨轮与单成员结论仍是补充证据，不是双成员入口替代品。
 
-判据 Note = [协作探针的事实判据与退出条件](./2026-10-09-collaboration-probe-evidence.md)（本 Note 只补 C1b 模型入口这一个面，不重述其退出码与配对规则）；机制侧 owner = [可控同版本竞写研究](../../_backlog/research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)；缺陷范围仍归 [BUG-007](../../_backlog/_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)。
+判据 Note = [协作探针的事实判据与退出条件](./2026-10-09-collaboration-probe-evidence.md)（本 Note 只补 C1b 模型入口这一个面，不重述其退出码与配对规则）；机制侧 owner = [可控同版本竞写研究](../../_backlog/_archive/research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)；缺陷范围仍归 [BUG-007](../../_backlog/_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)。
 
 本 Note 只证明「模型在受控场景下会撞到真实 stale 并重读合并」，**不**证明：两个成员同时竞写的仲裁、认领败者让位、跨进程文件仲裁、连续 reader 的原子发布、或 concurrency 探针全项 PASS。BUG-007 不因本 Note 关闭。
 

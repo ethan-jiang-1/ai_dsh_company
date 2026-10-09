@@ -5,7 +5,7 @@ intent: "复核多人协作的锁与 teamagent 保证、历史研究的落地和
 
 # 多人协作：teamagent、锁与验收资产复核
 
-消费者：[协作安全问题卡](../../issues/2026-10-09-collaboration-safety-acceptance.md)、[BUG-007](../../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)。授权：用户要求先研究、实验，不默认旧研究正常落地，并明确研究 MD 先落本目录。本轮没有改生产代码、preset 或 vendor。
+消费者：[协作安全问题卡](../../settled_issues/2026-10-09-collaboration-safety-acceptance.md)、[BUG-007](../../fixed_bugs/BUG-007-collaboration-probe-false-positives.md)。授权：用户要求先研究、实验，不默认旧研究正常落地，并明确研究 MD 先落本目录。本轮没有改生产代码、preset 或 vendor。
 
 ## 结论先行
 
@@ -16,18 +16,18 @@ intent: "复核多人协作的锁与 teamagent 保证、历史研究的落地和
 ## 基线、方法与限制
 
 - 日期：2026-10-09（实际运行 `date +%Y-%m-%d`）；仓库 HEAD `6d9117f6844e7f2c1a2e997cafa57af73992c2ec`；vendor pin `639ed015397290b3745d163aafe02ffee4aa3f84`。vendor tracked 工作树检查无改动。
-- 按 [validation-design](../../methods/validation-design.md)、[validation-evidence](../../methods/validation-evidence.md)、[validation-judgment](../../methods/validation-judgment.md) 选择行为、输入/状态、独立信号与反例；[测试宪法](../../../docs/testing.md)禁止把模型自述当事实。
+- 按 [validation-design](../../../methods/validation-design.md)、[validation-evidence](../../../methods/validation-evidence.md)、[validation-judgment](../../../methods/validation-judgment.md) 选择行为、输入/状态、独立信号与反例；[测试宪法](../../../../docs/testing.md)禁止把模型自述当事实。
 - 独立子代理做源码研究与事件核验；父代理实跑机制/模型探针，并复读关键原始事件。主源来自钉住的源码、工具结果、任务事件、终态文件，不从归档状态继承通过。
-- 此文保留命令、样本、摘要与事件定位；原始导出位于本机 [实验目录](../../../runtime/harness-home/collab-audit/)，gitignored，不是 fresh clone 可依赖的证据资产。无新 snapshot 类型、无模型可靠性百分比推断。
+- 此文保留命令、样本、摘要与事件定位；原始导出位于本机 [实验目录](../../../../runtime/harness-home/collab-audit/)，gitignored，不是 fresh clone 可依赖的证据资产。无新 snapshot 类型、无模型可靠性百分比推断。
 
 ## 1. 先分清四种保证与三个拓扑
 
 | 性质 | 实际保证 | 不保证 | 主源 |
 |---|---|---|---|
-| task CAS / owner | 同 Team 日志中旧 revision 被拒；任务生命周期有 owner 权限 | 文件写权限、跨 root 仲裁、owner 自动释放 | [task-board](../../../vendor/dsh/packages/experimental/agent-team/src/task-board.ts)、[上游限制](../../../vendor/dsh/packages/experimental/agent-team/README.md#known-limitations-and-deferred-work) |
-| freshness guard | 同实例 read-check-publish 串行；读后版本变化拒写 | 重读后的业务覆盖是否合理；非参与写者；跨实例事务 | [fs-local:101–130](../../../vendor/dsh/packages/fs/fs-local/src/index.ts#L101-L130)、[write:202–254](../../../vendor/dsh/packages/fs/fs-local/src/index.ts#L202-L254) |
-| atomic publish | 替换文件只发布完整载荷；createIfAbsent 用 hard-link no-replace | 多次读改写之间互斥、两个更新都保留 | [fsio:573–586](../../../vendor/dsh/packages/fs/fs-local/src/fsio.ts#L573-L586) |
-| 逻辑单 owner | 手册要求先认领再动笔、占位后重读让位 | 机制强制只一个人干活、没有重复劳动 | [公司手册](../../../company-workspace/AGENTS.md)、[多人合同](../../../docs/multi-human.md) |
+| task CAS / owner | 同 Team 日志中旧 revision 被拒；任务生命周期有 owner 权限 | 文件写权限、跨 root 仲裁、owner 自动释放 | [task-board](../../../../vendor/dsh/packages/experimental/agent-team/src/task-board.ts)、[上游限制](../../../../vendor/dsh/packages/experimental/agent-team/README.md#known-limitations-and-deferred-work) |
+| freshness guard | 同实例 read-check-publish 串行；读后版本变化拒写 | 重读后的业务覆盖是否合理；非参与写者；跨实例事务 | [fs-local:101–130](../../../../vendor/dsh/packages/fs/fs-local/src/index.ts#L101-L130)、[write:202–254](../../../../vendor/dsh/packages/fs/fs-local/src/index.ts#L202-L254) |
+| atomic publish | 替换文件只发布完整载荷；createIfAbsent 用 hard-link no-replace | 多次读改写之间互斥、两个更新都保留 | [fsio:573–586](../../../../vendor/dsh/packages/fs/fs-local/src/fsio.ts#L573-L586) |
+| 逻辑单 owner | 手册要求先认领再动笔、占位后重读让位 | 机制强制只一个人干活、没有重复劳动 | [公司手册](../../../../company-workspace/AGENTS.md)、[多人合同](../../../../docs/multi-human.md) |
 
 | 拓扑 | Team 层 | 文件层 | 判断 |
 |---|---|---|---|
@@ -35,7 +35,7 @@ intent: "复核多人协作的锁与 teamagent 保证、历史研究的落地和
 | 多人各自 root，同一服务 | 各 root 一个 Team；跨门 task list 不共享 | 是否共享 provider 不能只凭“同进程”概括；本轮仅在同 team 观察到 stale | task CAS 不构成跨门认领 |
 | 多 DSH 进程同盘 | 无共享进程内事务队列 | 同版本替换会双成功覆盖；新路径创建是另一个操作 | 不能承诺该形态更新安全 |
 
-[TeamJournal:11–52](../../../vendor/dsh/packages/experimental/agent-team/src/journal.ts#L11-L52) 的 tails 是实例内 Map。[task-view:43–48](../../../vendor/dsh/packages/experimental/agent-team/src/task-view.ts#L43-L48) 只对其他 in_progress 任务计算 warning。上游明确无文件锁、owner 不自动释放、多个 harness 进程操作一个 Team 不受支持。不要把“root 不同”和“进程不同”混成同一件事。
+[TeamJournal:11–52](../../../../vendor/dsh/packages/experimental/agent-team/src/journal.ts#L11-L52) 的 tails 是实例内 Map。[task-view:43–48](../../../../vendor/dsh/packages/experimental/agent-team/src/task-view.ts#L43-L48) 只对其他 in_progress 任务计算 warning。上游明确无文件锁、owner 不自动释放、多个 harness 进程操作一个 Team 不受支持。不要把“root 不同”和“进程不同”混成同一件事。
 
 ## 2. 本轮实跑结果
 
@@ -50,7 +50,7 @@ intent: "复核多人协作的锁与 teamagent 保证、历史研究的落地和
 | T3 两进程同版本替换 ×20 | 双成功 20，一胜一 stale 0 | 检查与发布不形成跨进程事务 |
 | T4 两进程同新路径创建 ×20 | 双创建 0，一胜一拒 20 | 不能套用 T3 的结论；源码 no-replace 与此结果一致 |
 
-T3 是 barrier 同时放行的机制采样，不是模型服从性评分。T4 探针头注暗示“创建竞态窗”，但当前 pin 的 [fsio](../../../vendor/dsh/packages/fs/fs-local/src/fsio.ts#L584-L586)已明确 hard-link no-replace；不能用“本轮未命中”抹掉操作语义，更不能宣称所有 create 都不安全。
+T3 是 barrier 同时放行的机制采样，不是模型服从性评分。T4 探针头注暗示“创建竞态窗”，但当前 pin 的 [fsio](../../../../vendor/dsh/packages/fs/fs-local/src/fsio.ts#L584-L586)已明确 hard-link no-replace；不能用“本轮未命中”抹掉操作语义，更不能宣称所有 create 都不安全。
 
 ### 2.2 上游 task board（零模型）
 
@@ -61,7 +61,7 @@ T3 是 barrier 同时放行的机制采样，不是模型服从性评分。T4 �
 node /Users/bowhead/ai_dsh_company/node_modules/vitest/vitest.mjs run packages/experimental/agent-team/tests/team.spec.ts -t 'Team shared task DAG'
 ```
 
-实际结果：**7 passed / 39 按 -t 未选中**，退出 0，3.65 秒。覆盖 task CAS、owner、依赖、状态变更、scope warning；不是文件或跨门安全验收。原始 [team.spec:597–671](../../../vendor/dsh/packages/experimental/agent-team/tests/team.spec.ts#L597-L671)拒 stale revision 与别人成员重复 claim；[854–874](../../../vendor/dsh/packages/experimental/agent-team/tests/team.spec.ts#L854-L874)允许重叠范围两任务均 claim，再断言 advisory warning。
+实际结果：**7 passed / 39 按 -t 未选中**，退出 0，3.65 秒。覆盖 task CAS、owner、依赖、状态变更、scope warning；不是文件或跨门安全验收。原始 [team.spec:597–671](../../../../vendor/dsh/packages/experimental/agent-team/tests/team.spec.ts#L597-L671)拒 stale revision 与别人成员重复 claim；[854–874](../../../../vendor/dsh/packages/experimental/agent-team/tests/team.spec.ts#L854-L874)允许重叠范围两任务均 claim，再断言 advisory warning。
 
 ### 2.3 跨 root 真会话
 
@@ -89,7 +89,7 @@ node /Users/bowhead/ai_dsh_company/node_modules/vitest/vitest.mjs run packages/e
 
 ## 3. 已执行的判据反例：5 类假绿
 
-保留最窄复现：[collaboration-oracle-probe](../../../probes/fs-taskboard/collaboration-oracle-probe.mjs)。它执行当前原探针的判据片段，用独立坏样本喂入，不修改生产实现。命令 `node probes/fs-taskboard/collaboration-oracle-probe.mjs`：**退出1，5/5 FAIL**；这里 FAIL 才准确表示验收漏洞。未来源码变形时提取失败返回2，不把失效静默算绿。
+保留最窄复现：[collaboration-oracle-probe](../../../../probes/fs-taskboard/collaboration-oracle-probe.mjs)。它执行当前原探针的判据片段，用独立坏样本喂入，不修改生产实现。命令 `node probes/fs-taskboard/collaboration-oracle-probe.mjs`：**退出1，5/5 FAIL**；这里 FAIL 才准确表示验收漏洞。未来源码变形时提取失败返回2，不把失效静默算绿。
 
 | 原子项 | 独立反例 | 实际判据输出 | 失败原因 |
 |---|---|---|---|
@@ -99,7 +99,7 @@ node /Users/bowhead/ai_dsh_company/node_modules/vitest/vitest.mjs run packages/e
 | recovery R1/R4 | 只提供崩溃前含 res/收到恢复标记的正文 | 两项 true | 全历史扫词，缺 kill/resume 水位与新事件证据；不证明整个 recovery probe 全绿 |
 | taskboard B3 | 两 root 回答均含 renewal-z，B3=false | process.exit(0) | 实际退出只看 b1，与头注 B1+B3 承诺不一致 |
 
-以上归 [BUG-007](../../_archive/fixed_bugs/BUG-007-collaboration-probe-false-positives.md)，本轮未修原探针。与“模型会出错”无关：坏样本是给独立 oracle 的，接受它们就是验收代码缺陷。
+以上归 [BUG-007](../../fixed_bugs/BUG-007-collaboration-probe-false-positives.md)，本轮未修原探针。与“模型会出错”无关：坏样本是给独立 oracle 的，接受它们就是验收代码缺陷。
 
 语义审另发现新仪器若提取片段仍在、check已移出，空集合可能被误记PASS；本轮已修新仪器，强制核对check名称、数量、布尔类型，并验证E1结果形状与B3出口实际执行。实际在内存读取替身中对concurrency/atomicity/recovery各移除check调用（未改原文件），三项均以明确 `oracle check set changed` 返回exit2；真实原文件仍5/5 FAIL exit1。此验证只证明仪器不会把这三种空检查当绿，不证明BUG-007已修。
 
@@ -107,11 +107,11 @@ node /Users/bowhead/ai_dsh_company/node_modules/vitest/vitest.mjs run packages/e
 
 | 历史材料 | 可保留 | 不能继承的判断 |
 |---|---|---|
-| [旧走查](../../_archive/research/2026-10-04-multi-user-ux-walk.md) | 一次交错里盲写被拒、重读追加，两行俱全 | “多次采样=全排列证明”；没 barrier、没完整独立 oracle 的采样只能增加观察 |
-| [C系毕业卡](../../_archive/settled_issues/2026-10-04-multi-user-concurrency-bdd.md) | C1–C7 是有用的待验行为类别 | “C1–C7 内建够”；C2 retry-success 对 owner 占用不成立；C4 从同时读改成终态六行丢失原验收性质 |
-| [跨进程毕业方案](../../_archive/settled_issues/2026-10-04-cross-process-shared-disk.md) | 一个写服务、task scope 提示、审计分层可减风险 | “丢更新机制上无法静默发生”过强：重读后完整覆盖仍合法，task owner 也不拦写；多人 root 无共同 Team |
-| [R0落地 Note](../../../notes/implemented/2026-10-03-redis-r0-native-collab.md) | 手册声明 freshness≠独占、引用版号审计、出厂变更卡边界 | E1全绿不是所有安全性质成立；占位是可观察声明，不是逻辑任务原子抢占 |
-| [BUG-004已修卡](../../_archive/fixed_bugs/BUG-004-claim-yield-not-machine-readable.md) | 让位首行规范改善机器判读，重读要求改善流程 | 不等于已解决全过程双工作；双方对同一逻辑任务写不同文件，并无共同争用点或确定 tie-break |
+| [旧走查](../2026-10-04-multi-user-ux-walk.md) | 一次交错里盲写被拒、重读追加，两行俱全 | “多次采样=全排列证明”；没 barrier、没完整独立 oracle 的采样只能增加观察 |
+| [C系毕业卡](../../settled_issues/2026-10-04-multi-user-concurrency-bdd.md) | C1–C7 是有用的待验行为类别 | “C1–C7 内建够”；C2 retry-success 对 owner 占用不成立；C4 从同时读改成终态六行丢失原验收性质 |
+| [跨进程毕业方案](../../settled_issues/2026-10-04-cross-process-shared-disk.md) | 一个写服务、task scope 提示、审计分层可减风险 | “丢更新机制上无法静默发生”过强：重读后完整覆盖仍合法，task owner 也不拦写；多人 root 无共同 Team |
+| [R0落地 Note](../../../../notes/implemented/2026-10-03-redis-r0-native-collab.md) | 手册声明 freshness≠独占、引用版号审计、出厂变更卡边界 | E1全绿不是所有安全性质成立；占位是可观察声明，不是逻辑任务原子抢占 |
+| [BUG-004已修卡](../../fixed_bugs/BUG-004-claim-yield-not-machine-readable.md) | 让位首行规范改善机器判读，重读要求改善流程 | 不等于已解决全过程双工作；双方对同一逻辑任务写不同文件，并无共同争用点或确定 tie-break |
 
 旧归档保持冻结，不“改写历史以让新结论绿”；当前复核结论在本问题卡/研究上。原计划是否实施、原验收是否足够、当前事实是否仍成立，是三个独立判断。
 
@@ -150,7 +150,7 @@ node /Users/bowhead/ai_dsh_company/node_modules/vitest/vitest.mjs run packages/e
 1. **先使绿可信**：BUG-007 中的实际坏输入都必须拒绝，正常样本必须接受；真实 task/工具事件按 callId、caller、路径与顺序归因，恢复按水位；修复>=2轮等错条件。不要只把正则换一个更复杂正则。
 2. **同 Team 满载原生**：每份独立稿一个任务、真实 scope；认领失败不写该任务稿，重叠warning要lead明确协调，blocker把合稿放在依赖完成之后。独立role稿避免不必要同文件写。completion须真事件，不接受“完成”正文。
 3. **多 root 明示退化**：CAS跨门不可用；优先预先指定唯一负责人，而不是在不同role稿里竞速“先到先得”。若产品要求自动抢占/超时接管，再申请上游共享协作seam；完整说清进程、workspace、task identity、权限及恢复。
-4. **不急上 Redis**：它不能修正oracle假绿，也不会自动介入所有file writer。[atomic-write库](../../../vendor/dsh/packages/util/atomic-write/README.md)能协调合作脚本的完整read-modify-write，限同host/PID namespace、无fsync durability；不是角色工具即插锁，也不是网络盘/多机协调。
+4. **不急上 Redis**：它不能修正oracle假绿，也不会自动介入所有file writer。[atomic-write库](../../../../vendor/dsh/packages/util/atomic-write/README.md)能协调合作脚本的完整read-modify-write，限同host/PID namespace、无fsync durability；不是角色工具即插锁，也不是网络盘/多机协调。
 
 需要用户决定：多人模式是否接受“明确分工+人工裁决”的运行合同，还是需要机制保证任务自动认领、无人值守接管。用户尚未批准产品方案；本轮研究不写已实施Note。
 
@@ -166,10 +166,10 @@ node /Users/bowhead/ai_dsh_company/node_modules/vitest/vitest.mjs run packages/e
 
 ## 7. BUG-007 已批准修复与复验
 
-授权原文：「先按 BUG-007 修复判据与驱动退出条件，再用可信证据决定协作协议或机制要补到哪一层」。本节是后续实施收据，前文的调查失败是修前证据，不继承为当前判据状态。实现取舍见 [判据 Note](../../../notes/implemented/2026-10-09-collaboration-probe-evidence.md)；未改生产代码、preset、vendor、协作协议或锁服务。
+授权原文：「先按 BUG-007 修复判据与驱动退出条件，再用可信证据决定协作协议或机制要补到哪一层」。本节是后续实施收据，前文的调查失败是修前证据，不继承为当前判据状态。实现取舍见 [判据 Note](../../../../notes/implemented/2026-10-09-collaboration-probe-evidence.md)；未改生产代码、preset、vendor、协作协议或锁服务。
 
-- 当前 [纯事件判据](../../../tools/lib/collaboration-evidence.mjs)与[恢复/跨根判据](../../../tools/lib/recovery-scope-evidence.mjs)位于既有keyless seam；真实驱动与回归共用。旧五类坏样本被拒，现oracle完整11项均拒绝（exit0）；缺反例清单会报错，不允许0/0假绿。
-- [事实回归](../../../tests/harness/collaboration-evidence.spec.ts)、[恢复跨根回归](../../../tests/harness/recovery-scope-evidence.spec.ts)、[实际退出连接](../../../tests/harness/collaboration-probe-verdict.spec.ts)验证正例、路径/任务/成员错归因、无结果/仅read、重复/额外行、旧恢复事件、单轮结束及required行失败退出。
+- 当前 [纯事件判据](../../../../tools/lib/collaboration-evidence.mjs)与[恢复/跨根判据](../../../../tools/lib/recovery-scope-evidence.mjs)位于既有keyless seam；真实驱动与回归共用。旧五类坏样本被拒，现oracle完整11项均拒绝（exit0）；缺反例清单会报错，不允许0/0假绿。
+- [事实回归](../../../../tests/harness/collaboration-evidence.spec.ts)、[恢复跨根回归](../../../../tests/harness/recovery-scope-evidence.spec.ts)、[实际退出连接](../../../../tests/harness/collaboration-probe-verdict.spec.ts)验证正例、路径/任务/成员错归因、无结果/仅read、重复/额外行、旧恢复事件、单轮结束及required行失败退出。
 - 原子读承诺明确收窄：验证每轮三次独立成功追加后的完整read采样与精确末态，不证明任意reader全过程永不见半截。一次写入全三行/一次read不能冒充三轮，审阅反例实际先红（expected false收到true），修后绿。
 - warning合同校正：钉住的task-view只要求被指的另一任务in_progress，发warning的当前任务可以completed；不是两个任务必须同时active，也不是completed任务保留了过期warning。模型正文不参与此判定。
 
