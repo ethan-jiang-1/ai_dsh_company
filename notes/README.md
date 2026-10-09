@@ -50,7 +50,7 @@ Markdown 链接（md-links 门禁硬查）。**生命周期是移动不是复制
   且以生命周期词（implemented/已交付/已消化）开头——存量按生效日祖父豁免；反证 =
   [implemented/notes-taxonomy-owner](implemented/2026-10-05-notes-taxonomy-owner.md)。
 - `md-links`（notes 全树硬查）/ `bare-path`（**proposed/ + implemented/ 新写为硬档**；`postmortem/`、
-  `archived/`、`_backlog/_done/` = 观察档）。**事实落点时效**（2026-10-09 N5 修）：implemented/ 的
+  `archived/`、`_backlog/_archive/` = 观察档）。**事实落点时效**（2026-10-09 N5 修）：implemented/ 的
   **决定正文不动**，但**路径/符号/默认值这类事实落点随改动就地改新**——依据 = vendor
   `.agents/notes/implemented/AGENTS.md`「keep paths … current in the same change that alters them；
   This is not a license to rewrite the *decision*」。分生效日：文件名日期 ≥ 2026-10-09 的进硬档，

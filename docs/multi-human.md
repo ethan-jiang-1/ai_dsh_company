@@ -115,7 +115,7 @@ CEO 门、人应答 → final + present）。判据与证据 = [E2E Note](../not
 3. **同盘并发**——**"一个文件同一时刻一个写者"是本仓的流程政策，不是文件系统的保证**。
    机制实况（2026-09-26 复核；**2026-10-03 E1/E2 实测更新**，证据 =
    `notes/archived/2026-09-26-multi-human-ux-evidence.md` + 推敲卡 E1/E2 结论
-   `_backlog/_done/_closed_plans/2026-09-29-collab-mechanism-evidence.md`）：
+   `_backlog/_archive/settled_issues/2026-09-29-collab-mechanism-evidence.md`）：
    - **有**：`fs-local` 的**实例内** per-target 排队锁 + 版本守卫（读过再写时版本变了报 `FS_STALE_VERSION`，
      "一胜一 stale"有官方测试）。**E1 实测（真角色会话 ×4 轮全绿，`probes/fs-taskboard/fs-guard-probe.mjs`）**：
      守卫在角色会话真实生效——盲写既有文件被拒（`FS_NOT_OBSERVED`，模型被拒后重读重写）、stale 拒 4/4；

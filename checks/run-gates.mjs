@@ -781,7 +781,9 @@ notGraduated.length === 0
 // 本仓适配：制度目录与 README 必需；递归材料按 owner README 解析后的真实目标核对，不能用
 // basename 跨桶碰巧满足。活跃区各桶根 README 持有索引，归档统一由 _archive/README 持有。归档旧讨论保留原文、不追补头；新研究与新归档自生效日起从严。
 // 既有负例留证 2026-09-27/28：旧状态头缺失 → 红；D33 搬卡漏索引 → 红。
-// 迁移新增判据真实负例由主线程执行并留证；本线程只跑隔离形状测试，不冒充真文件反证。
+// 迁移反例留证 2026-10-09（真实仓文件，pnpm verify 红→逐项还原绿）：issues 卡删 opened →
+//   backlog-liveness 报「缺 opened」；归档总索引改掉一条 settled issue 目标 → 报该卡未被 _archive/README.md 索引；
+//   issues/README.md 暂移 → 报必需索引缺失；新 research 文件缺 frontmatter → 报缺 frontmatter。四项各自还原后 ALL PASS。
 function backlogLivenessProblems(backlogRoot) {
   const problems = []
   const effectiveDate = '2026-10-09'

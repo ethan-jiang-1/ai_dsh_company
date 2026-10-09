@@ -8,7 +8,7 @@
 
 ## 决定
 
-整体将 ai_dsh_assitant `_backlog` 的问题卡、缺陷卡、研究、按需方法、结论交接与触发索引模式迁入本仓：
+整体将 ai_dsh_assitant `_backlog` 的问题卡、缺陷卡、研究、按需方法、结论交接与触发索引模式迁入本仓。前序 D33 记录 [backlog-charter-refit](2026-10-03-backlog-charter-refit.md) 保留为历史决策；本 Note 与当前 `_backlog/` 合同更新其活跃流程约束，不改写 D33 当时的理由与验证证据：
 
 - `plans/` 改为 `issues/`；`reference/` 改为 `research/`；`_done/` 改为 `_archive/`，其 closed/suspended 桶改 settled/suspended issues，缺陷桶改 fixed/suspended bugs，随卡研究材料归档；旧退役池归 `legacy/`，只保留历史意义。
 - 问题单位是一个可描述的期望结果或待判问题。简单问题可以简写；大问题先列粗粒度判断依赖和范围外，本轮只细化当前分支。只有能独立决策、独立关闭且结果或触发不同，才考虑拆卡；来源同一不强迫并卡。拆分是说明清楚 owner 与结果的判断，不按行数或大小标签机械拆分，不引入执行票据或队列。
@@ -34,12 +34,11 @@
 
 ## 验证
 
-- `git status --short`（2026-10-09）：起始工作树干净。
-- `git mv`（8 次已检查目标后迁移）：目录结构及文件保留，归档原文件未重写；普通历史卡链接在迁移后机械更新。
-- 方法文件共 8 个 Markdown（README + 7 方法），另有 `triggers.md`；由子代理报告检查存在。
-- 子代理报告：`tests/harness/foundation-links.spec.ts` 与 `tests/harness/backlog-liveness.spec.ts` 共 39/39 通过；`node --check checks/run-gates.mjs` 通过。
-- 主线程实测（2026-10-09，提交前）：`pnpm verify` → ALL PASS（`backlog-liveness` 已按新结构核 issues/methods/_archive 目录、卡头、方法形状、递归索引）；`pnpm test` → 37 文件 / 379 用例全通过。文档链接、行预算与验收路径同轮覆盖。
-- 负例尚待依据门禁变更完成定义实测：破坏一条实际索引链接；移除活卡 status/opened；加入无效方法 frontmatter；破坏研究 frontmatter 生效日边界；分别恢复后全绿。未完成实测前不声称该门禁已按反证验收。
+- 起始 `git status --short`（2026-10-09）为空；8 次 `git mv` 后保留原文件名，归档讨论正文不重写。链接修复只针对 Markdown 目标。
+- `pnpm verify`（最终）：ALL PASS，包含 md-links ×1246/255 files、doc budgets 与 `backlog-liveness`。过程首轮发现并修复旧卡/研究互链与本仓不存在的外仓方法路径；裸路径门禁另报告 5 条历史观察，不是失败。
+- `pnpm exec vitest run tests/harness/backlog-liveness.spec.ts tests/harness/foundation-links.spec.ts`：39/39 通过。
+- 真实文件反例，逐项 `pnpm verify` 红后恢复并重跑绿：问题卡删 `opened` → 报缺字段；归档索引改一个真实目标 → 报卡未被 owner README 索引；暂移 `issues/README.md` → 报必需索引缺失；当天新 research 文件缺 frontmatter → 报缺头。四项恢复后均 ALL PASS。首次错误造红（重复 YAML key、缺失父目录）不计有效证据，修正后重跑。
+- `set -o pipefail; pnpm test`：37 个测试文件、379 个用例通过。出现一条 React SSR `useLayoutEffect` 警告，测试退出码为 0；真模型与浏览器验收不适用于本次纯流程/文档变更。
 
 ## 适配与来源
 
