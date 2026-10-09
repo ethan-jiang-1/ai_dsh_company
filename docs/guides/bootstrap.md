@@ -50,7 +50,7 @@ node checks/smoke/handbook-smoke.mjs        # agent-instructions 注入完成定
 node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
 ```
 
-实证过的坑与解法（细节见 notes/implemented/2026-09-22-r0-loop-acceptance.md）：
+实证过的坑与解法：
 
 - **pnpm 入口**：`/usr/local` 老 corepack shim 执行新 pnpm 会 VM 崩
   （ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING）——`corepack enable pnpm` 换 nvm 自带
@@ -59,7 +59,9 @@ node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名�
   报 `errno.h not found` 时，`export SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk`
   兜底；不需要完整 Xcode。
 - **workspace 形状**：glob 必须 `packages/*/*` 两层 + `vendor/*`（vendored cordis 全家）+
-  `native/system*`（node-addon-system）；见 pnpm-workspace.yaml 注释。
+  `native/system*`（node-addon-system）；见 pnpm-workspace.yaml 注释。**不要把 vendor 根
+  收成 workspace 项目**来补根 devDeps——它的 postinstall（lefthook）会改写 submodule 的
+  git 内部状态。根 devDeps 用镜像声明，不纳 vendor 根。
 - **根 devDeps**（tsx/tsdown/typescript/@types/node/@types/js-yaml/lightningcss/vitest）
   版本逐字镜像 vendor 根声明；vendor 换 tag 时随升级环 diff 对齐。
 - **凭据**：`cp ~/.dsh/.credentials.yaml runtime/harness-home/ && chmod 600`（gitignored）。

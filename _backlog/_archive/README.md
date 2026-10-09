@@ -31,6 +31,9 @@
 | [2026-10-04-work-status-visibility.md](settled_issues/2026-10-04-work-status-visibility.md) | 用户确定可见性方向 | 2026-10-04 |
 | [2026-10-05-repository-steerability.md](settled_issues/2026-10-05-repository-steerability.md) | 六条工作已分别交付；一项延后触发留 owner | 2026-10-05 |
 | [2026-10-06-driver-surface-package.md](settled_issues/2026-10-06-driver-surface-package.md) | 五项全部交付 | 2026-10-06 |
+| [2026-10-09-postmortem-guard-survival.md](settled_issues/2026-10-09-postmortem-guard-survival.md) | 不新增通用存活机制；按需 owner 验证，重大重构时人工对照 | 2026-10-10 |
+| [2026-10-09-decision-ledger-home-migration.md](settled_issues/2026-10-09-decision-ledger-home-migration.md) | D1–D9 保留 design 路由；不迁 Note、不为此提额 | 2026-10-10 |
+| [2026-10-09-stale-pointer-cleanup.md](settled_issues/2026-10-09-stale-pointer-cleanup.md) | 不单独清理祖父存量；按需修实际阻断导航的指针 | 2026-10-10 |
 
 ## 已修缺陷
 

@@ -45,7 +45,7 @@
 | 死指针目标 | 次数 | 现行家 |
 |---|---|---|
 | notes/research（**已退役**） | 12 | 退役并入 `_backlog/plans/` + `_backlog/reference/`（D30/D31） |
-| notes/intents.md（**已退役**） | 4 | 退役归档 `notes/archived/intents-2026-10.md`（D34） |
+| notes/intents.md（**已退役**） | 4 | 曾冻进月度表；2026-10-09 清扫删表，历史在 git（D34） |
 | `packages/preset/agent-presets/*` | 9 | vendor 上游重新分包（本仓路径改写即可） |
 | `tests/*.spec.ts`（根级） | ~18 | 已分子目录：`tests/client/`、`tests/presets/`、`tests/harness/`、`tests/company/` |
 | `snapshots/r{1,2,3,4}-motion`、`snapshots/dag-*` | ~17 | 已归 `snapshots/replay/`、`snapshots/probes/` |
@@ -93,8 +93,8 @@
 - `pnpm verify`：`PASS bare-path ×N（…另观察档 M 文件）`，且观察档文件数**下降**（原 120+，现 37）。
 - **红/绿双向**（都实跑）：
   1. **红**：新建 `notes/implemented/2099-01-01-*.md` 写死路径 → `FAIL bare-path` 点名文件:行 → 删除 → 绿。
-  2. **豁免仍生效**：给生效日前的 Note（`2026-09-21-repo-scaffolding.md`）追加死路径 → **仍然 ALL PASS**
-     （证明祖父档真的豁免，不是"碰巧没扫到"）→ 还原 → 绿。
+  2. **豁免仍生效**：给生效日前的 Note 追加死路径 → **仍然 ALL PASS**
+     （当时样本是一篇 2026-09-21 的日记，该文件已在同日清扫中删除；豁免按文件名日期，不绑定某一篇）→ 还原 → 绿。
   3. `zz-` 记号：负例假路径不再命中（N1/N3 的两条 Note 由红转绿即是证据）。
 - 注释与本条 Note 一致：`run-gates.mjs` 里那句「改它就是篡改记录」已删除并写明为什么错。
 
@@ -104,7 +104,7 @@
 |---|---|---|
 | 两边量尺 | 本仓 vs vendor 同一匹配逻辑 | 122/574（21.3%）与 52/135 文件 **vs** 9/247（3.6%）与 7/527 文件；**6 倍** |
 | 红（硬档） | 建 `2099-01-01-currency-probe.md` 含 `docs/zz-not-real-currency-probe.md` | `FAIL bare-path: notes/implemented/2099-01-01-currency-probe.md:7 → …` → 删除 → 绿 |
-| 绿（祖父档） | 给 `2026-09-21-repo-scaffolding.md` 追加 `docs/zz-also-not-real.md` | **`verify: ALL PASS`**（豁免生效，确认不是漏扫）→ 还原 → 绿 |
+| 绿（祖父档） | 给一篇 2026-09-21 的 Note 追加 `docs/zz-also-not-real.md` | **`verify: ALL PASS`**（豁免生效，确认不是漏扫）→ 还原 → 绿。该样本文件后来删了，规则仍按日期 |
 | 假路径记号 | 检查全仓 `zz` 前缀 | 无任何真实路径以 `zz` 开头 ⇒ 记号安全，不会掩蔽真腐化；N1/N3 两 Note 由红转绿 |
 | 观察档收缩 | `pnpm verify` | 观察档文件数 120+ → **37**；`PASS bare-path ×308（52 文件…另观察档 37 文件）` |
 | 全量 | `pnpm verify` + `pnpm test` | `verify: ALL PASS`；36 files / 355 tests 绿 |

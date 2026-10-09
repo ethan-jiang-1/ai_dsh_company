@@ -17,8 +17,8 @@
    头注改退役口径）、harvest-probe（收割证据件）；**candidate-scan-eval 判常驻**（testing.md §4
    在引用它，审计怀疑"实验 B 已耗"不成立）；sync-dsh 补齐唯一缺失的「何时跑」头注。
 4. **intents.md 退役（D34，用户裁定「有了 `_backlog` 还放在这儿是噪声」，本轮进行中追加）**：
-   整表按月冻结（09 余 44 行补进 `notes/archived/intents-2026-09.md`、14 行 10 月入新建终档
-   `intents-2026-10.md`）后删文件；拆 `intents-row-budget` 门禁（verify.mjs 留墓碑注记）与
+   整表先按月冻结再删活文件；拆 `intents-row-budget` 门禁（verify.mjs 留墓碑注记）与
+   （2026-10-09 清扫删掉那两份冻结表：它们仍是账，不是决定。历史在 git。）
    dev-loop §12 窗口规矩（换一行"授权链与时间轴"负知识）；指针重接 = AGENTS 布局行 + 纪律行、
    dev-loop §12 ×2、index.md notes 行、verify NOW_FILES/PIN_SKIP_FILES、entry-probe Q11 +
    两个 spec。理由三条：第三本账（内容 100% 派生自 Note 状态行，反双记账同款病）、膨胀病史三次

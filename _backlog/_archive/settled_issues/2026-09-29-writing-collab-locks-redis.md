@@ -19,7 +19,7 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
 
 | # | 痛点 | 证据 |
 |---|---|---|
-| P1 | **同文件并发写**：跨进程/跨 home/外部编辑器没有共享租约——"一个文件同一时刻一个写者"只是流程政策，不是机制保证 | [multi-human.md §4](../../../docs/multi-human.md)；机制核实 = [multi-human-ux-evidence](../../../notes/archived/2026-09-26-multi-human-ux-evidence.md)「文件并发语义」节 |
+| P1 | **同文件并发写**：跨进程/跨 home/外部编辑器没有共享租约——"一个文件同一时刻一个写者"只是流程政策，不是机制保证 | [multi-human.md §4](../../../docs/multi-human.md) |
 | P2 | **撞 slug / 撞稿**：两场动议共用 `renewal-y-2026`，产物互相覆盖、两场混装，三态判据看不出 | [memory-convergence-2026-09-26 §边界 1](../../../snapshots/archive/memory-convergence-2026-09-26/README.md)；已有观察项 `slug-collision`（纯逻辑，带回归） |
 | P3 | **版本一致性**：quote-z-2026 双签 allowed-once 但**只对 cfo v2 生效**，盘面已 v3，final 只能记"版号待对齐"；署名行版号是手写的 | 台账 `quote-z-2026` 行结论；`scripts/authorship-audit.mjs` 头注 |
 | P4 | **感知/通知**：根会话之间**没有消息通道**（Agent Teams 按队伍作用域，不同根会话是不同队）；"我写完了"靠人开口说；实时卡刷新即丢 | [multi-human.md §0+§3](../../../docs/multi-human.md)（§0 证卡按会话作用域，§3 证非团队会话互不通信）；手册「待办」节"刷新即丢" |

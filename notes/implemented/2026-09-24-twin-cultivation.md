@@ -1,8 +1,6 @@
 # 2026-09-24 · 条目收尾：分身成长（培养 + 学习一次完整回路）
 
-状态：✅ 已交付并收尾（队列条目「分身成长」完成即离队）
-RFC：[2026-09-22-twin-cultivation-and-self-learning.md](./2026-09-22-twin-cultivation-and-self-learning.md)（已毕业，状态「已消化」；条目去向表在其末节）
-研究依据：[2026-09-22-digital-twin-cultivation-and-self-learning.md](./2026-09-22-digital-twin-cultivation-and-self-learning.md)（研究已毕业；**§6 = 交付期修订**）
+状态：已交付（队列条目「分身成长」收尾。2026-10-09 吸收 RFC 里仍有效的否决后删掉研究长文与 RFC，决定不变。）
 
 ## ① Motivation（外部可观察行为）
 
@@ -40,18 +38,16 @@ RFC：[2026-09-22-twin-cultivation-and-self-learning.md](./2026-09-22-twin-culti
 | `node scripts/probe-smoke.mjs --full`（入戏探针，认证档一次） | **15/15 PASS**（coo#2 知识首轮 90s 超时，按 guides/dev-loop §9「失败重试一次换新会话」通过；**CEO 三探针全过 = 培养后入戏不受损**） |
 | coo#2 单题重试（`/tmp/probe-coo2-retry.mjs`，1 次调用） | PASS（回复 3207 字符，/8/ + /CEO/ 命中） |
 
-## ④ 环境状态（下条会话判断"哪些已就绪"只读这里）
+## 输掉的方案（RFC 吸收后仍有效的；RFC 正文已删，历史在 git）
 
-- 两观察窗仍在（**3084 实时**真 key / **3085 重放**无 key；关闭 `pkill -f "dsh web"` / `pkill -f dsh-observe`）。
-- 一次性脚本（/tmp，非仓库资产）：`cultivation-boundary.mjs`（边界探针）、`probe-coo2-retry.mjs`
-  （coo#2 重试）、`dump-toolcalls.mjs`（日志工具调用诊断）。
-- 边界探针两会话留 dev home 排练场目录（证据源）；`ent-agent-platform` 的 journal/deliverables 仍在
-  排练场（教训源，教训候选 C/D/E/F 的证据也在那里）。
-- dev `web` profile = `link:` 安装（改 preset 无需重装）；`company` profile = `file:`（本轮未用）。
-- **已 push**（2026-09-24 当夜 443 通道成功，`06e7634..2f0f316`——历史积压 113+ 一并推净；
-  push 命令见 AGENTS.md 命令表）。
+- **自建 memory 子系统**：vendor 无 memory seam，自建等于在 pack 里造第二套状态。
+- **分身自改 skill 当学习**：会覆盖全公司共享 skill 根，且 preset 子树 `write()` 是 no-op。
+- **自建 cron / 调度器**：缺的是接缝不是调度器；节律后来走宿主 schedule bundle，不在本条重开。
 
-## ⑤ 条目去向（RFC 表之外的增量；全文见 RFC 末节）
+RFC 曾把「培养 = 新会话才生效」写成机制事实。本 Note 的活体探针证伪了 skill **正文**这条
+（同会话下一轮即生效）；persona / 组合文件仍是新会话。不要把被证伪的那句再当否决理由。
+
+## ⑤ 条目去向
 
 | 项 | 归宿 |
 |---|---|

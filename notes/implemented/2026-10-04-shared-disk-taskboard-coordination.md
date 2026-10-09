@@ -45,7 +45,7 @@ E2 实测（2026-10-03，双进程 fs-local）：同版本守卫写 ×20 = 20/20
 - **零代码变更** ⇒ 无回归面；`pnpm test` 不适用（未跑）。
 - **待真实验证 → 已判收（2026-10-04 probe 首跑 5/5）**：[taskboard-presence-probe](../../probes/fs-taskboard/taskboard-presence-probe.mjs)
   真会话实证 P1a/P1b（认领两态：两任务各有 ownerId 非空快照 + 视图回报含 ownerName；in_progress+owner
-  每任务 ≥1）与 P3（`writeScopeWarnings` 真重叠在场——另叠加 [batch2](./2026-10-04-multi-user-bdd-batch2.md)
+  每任务 ≥1）与 P3（`writeScopeWarnings` 真重叠在场——另叠加 batch2（已删，历史在 git）
   C5a 首跑逐字证据）；资产 =
   [snapshots/taskboard-presence-probe/2026-10-04](../../snapshots/probes/taskboard-presence-probe/2026-10-04/probe-stdout.md)。
 

@@ -1,8 +1,8 @@
 # demo 可视表达（公司整页视图 · 皮肤 · 动效）
 
-状态：已消化（2026-09-23 交付并收尾；收尾 Note = [2026-09-23-company-view.md](./2026-09-23-company-view.md)）
+状态：已消化（2026-09-23 交付并收尾；收尾 Note = 2026-09-23-company-view.md（已删，历史在 git））
 类型：feature（原队列序 1；完成即离队）
-研究依据：[implemented/2026-09-23-visual-expression-for-demo.md](./2026-09-23-visual-expression-for-demo.md)
+研究依据：implemented/2026-09-23-visual-expression-for-demo.md（已删，历史在 git）
 
 ## 打磨点销账（收尾时补，用户 2026-09-23 走查后）
 
@@ -113,6 +113,6 @@
 
 ## 条目去向（吸收原「UX 打磨」）
 
-原 [UX 打磨](../implemented/2026-09-23-ux-polish.md) 三条 → 本条目：
+原 UX 打磨（已删，历史在 git） 三条 → 本条目：
 驾驶舱/在场板交互细节 → 切片 1 + 2；demo 分镜顺滑度 → 验收人工轴；打磨清单逐项落地 → 切片 2 + 验收销账。
 原提案已毕业（`notes/implemented/2026-09-23-ux-polish.md`，状态「已消化」）。

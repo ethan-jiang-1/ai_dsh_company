@@ -79,6 +79,6 @@ GitHub flow 的核心是先推敲一阵子才知道该不该做、何时做、�
 - 台账：docs/index.md D31 行（D30 行加修订互链）+ 外部材料登记表 +1 行（第四处外部源）；
   dev-loop §0.5（计划先落盘段 + 打磨型输入源）与 §12（research 段改写）；AGENTS.md 布局 +1 行；
   ROADMAP 头部防误取句；proposed/README 上游边界句；旧 Note
-  [research-notes-lifecycle](./2026-09-25-research-notes-lifecycle.md) 加再修订互链。
+  research-notes-lifecycle（已删，历史在 git） 加再修订互链。
 - 并行会话备忘：本轮与「打磨轮 2」（同日另一会话）交错执行——其 owners.md 指针修复按协议移交
   本轮提交（commit `63f8024`）；双方各自整轮提交，零互相吞并。

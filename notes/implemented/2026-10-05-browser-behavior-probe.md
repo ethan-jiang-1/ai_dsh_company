@@ -76,6 +76,6 @@ sandbox 联动。**选型维持用户 2026-10-03 拍板的「暂缓登记」，�
 ## 依据
 
 - deferred-verifications 卡（两笔债的出处与判收口径）：[卡](../../_backlog/_archive/settled_issues/2026-10-02-deferred-verifications.md)
-- 批5b 首验与 EPERM 首证：[plugin-harvest-round §风险](./2026-09-30-plugin-harvest-round.md)
+- 批5b 首验与 EPERM 首证：plugin-harvest-round §风险（已删，历史在 git）
 - 机制语义（写判据前源码定位）：playwright-core coreBundle（serverRegistry / registryDirectory
   env 感知 / defaultCacheDirectory2 直连）；experimental/browser-use-playwright-mcp/src/index.ts

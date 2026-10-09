@@ -14,13 +14,13 @@
 | [proposed/](proposed/README.md) | 未实施的**已批 RFC**（问题/方案/输掉的方案/验收） | 状态行自带「批准：」标记 + 「## 验收」节（门禁双查） | 看验收与方案；**不能当已交付**；实施次序 = 用户逐条给（D32） |
 | [implemented/](implemented/) | 已交付决定 + 击败的备选 + 后果与验证 | `状态：` 行以 implemented / 已交付 / 已消化 开头（门禁查新写） | **当前 rationale owner**——决定正文冻结，**事实落点（路径/符号/默认值）随改动就地改新**（§三 bare-path） |
 | [rejected/](rejected/README.md) | 被否决提案 + 一行拒绝原因 | `rejected` | 只在还能阻止同一个可信错误时保留；失效即删 |
-| [archived/](archived/README.md) | 冻结证据台账（研究收卷、intents 终档） | 冻结 | 只作历史引用，**不再编辑**，不是当前权威 |
+| [archived/](archived/README.md) | 仍能阻止重开的冻结判定，加现行 pin 人审证据 | 冻结 | 与 implemented 同一条记录判据；失效即删，不是当前权威 |
 | [postmortem/](postmortem/README.md) | 事故复盘（编号 000N） | — | 事故 ≠ 设计推敲（[_backlog 章程](../_backlog/README.md)同款区分） |
 
 **状态行**：新写或**再编辑**的 Note 首部有「状态：」行（存量不回扫；`notes-liveness` 门禁查 implemented/ 新写侧）。
 **命名** = `YYYY-MM-DD-<slug>.md`（全日期；时间轴 = 文件名日期 + git log，D34）。**互引**只用相对
 Markdown 链接（md-links 门禁硬查）。**生命周期是移动不是复制**：`proposed → implemented` 同 diff 把正文
-改写成现在时的已交付事实（删迁移计划与未来时态）；`implemented → archived` 只对低未来决策价值者且冻结。
+改写成现在时的已交付事实（删迁移计划与未来时态）。低价值稿不冻进 `archived/`：那边与 `implemented/` 同一条记录判据，失效即删，历史在 git。
 
 ## 二、何时写、取代与真证据（规则唯一家在本文件）
 
@@ -30,7 +30,9 @@ Markdown 链接（md-links 门禁硬查）。**生命周期是移动不是复制
 - **记录判据（不是 diff 大小）**：需要 Note 的信号 = **存在真实替代方案 + 持久取舍**；豁免的实质 =
   除决定理由无处安放外，其余事实都已有 owner（代码、测试、现有文档能承载的不重复记）。非平凡变更同 diff
   新增或更新相关 Note；pack 行为面变更同 diff 更新 [company-pack README](../packages/company-pack/README.md)
-  已知限制段。
+  已知限制段。**不是 Note**（2026-10-09 存量清扫立的负例，历史在 git）：轮次/会话收尾日记、探针或
+  E2E 首跑收据、批次「已毕业」流水、被合同或后一篇决定完整吸收的研究长文、已退役流程的操作记录。
+  这些不再指导行动，写进来只会让 rationale owner 被噪声淹没。
 - **取代检查（每新增一篇 Note 触发）**：搜活跃树找同决定/同机制的既有 owner——完整取代：吸收其独有
   理由/备选/后果/验证后**同 diff 删除旧的**（历史归 git）；部分取代：双方保留互链并更新仍有效的事实。
   同一决定的事实变化更新原文；决定逆转另写新 Note 互链，不把旧文改写成相反。

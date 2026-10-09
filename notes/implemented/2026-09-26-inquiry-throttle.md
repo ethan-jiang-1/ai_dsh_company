@@ -43,4 +43,4 @@ UX 实验场一（`renewal-x-2026`，日志 `session-306dafdf` seq 97/98/103/104
 
 - 证据坐标：会话 id `session-306dafdf-…`（dev home 会话库 `$DSH_HOME/sessions/`，**运行时残留不入 git**）
   seq 97/98/103/104——原话与选项可逐条回溯。
-- 来源轮：[ux-experiment-round](./2026-09-25-ux-experiment-round.md) §最值钱的一条。
+- 来源轮：ux-experiment-round（已删，历史在 git） §最值钱的一条。

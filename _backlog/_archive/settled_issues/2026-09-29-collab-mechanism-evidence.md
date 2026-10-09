@@ -60,7 +60,7 @@ Team 寻址、多机只剩共享盘（[multi-human.md](../../../docs/multi-human
 - **"现成未用件"归宿（盲审 B12：无归宿=毕业即埋，逐件定案如下；复活任一件须重读本节）**：
   - `schedule`：~~登记待触发~~ **已收（09-30 收割轮批3）**——schedule-bundle 落地（cron/定频 + 到点投递
     回原会话 + **宿主恢复冷会话**；行归 bundle 所有，pack 只留替换行钉 timeZone）；旧搁置池「自主节律」
-    复活条件实证闭合（[harvest Note](../../../notes/implemented/2026-09-30-plugin-harvest-round.md) 批3）；
+    复活条件实证闭合（harvest Note（已删，历史在 git） 批3）；
   - `session-reference`：**登记待触发**（仍未收）——跨角色交接出现"引用他会话上下文"真实需求时评估；
   - `goal`：~~登记待触发~~ **已收（批1）**——tool-goal + `/goal` 落地（动议跨轮推进 create/get/update）；
   - `workflow` + `ralph`：~~登记为场景 C 类候选通道~~ **workflow 已收（批4，仅 CEO 编排位——persona

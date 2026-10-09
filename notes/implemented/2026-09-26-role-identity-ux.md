@@ -118,4 +118,4 @@ keyless 单测 6 项 + 真浏览器自主验收 ALL PASS）。残余项「每角
 - 会话摘要无 preset：`vendor/dsh/packages/api/session-controller/src/types.ts:177-188`。
 - 本包 client 先例：`packages/company-pack/src/client/index.ts`（inject / installStyles /
   useSessions 读 agentTeam 投影）与 `styles.ts`（令牌纪律）。
-- 用户体验原话与现场：`notes/archived/2026-09-26-experiment-c-quote-z.md`（实验 D 活体数据）。
+- 用户体验原话：实验 D 活体（记录已删；同色药丸方向感勉强能，结论在多人 UX 毕业稿）。

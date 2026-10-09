@@ -221,8 +221,8 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
 // ── 2c-ter. intents 行预算门禁——已随 intents.md 退役拆除（2026-10-04，D34，用户令）────
 // 为什么拆：该文件是第三本账（内容 100% 派生自 Note 状态行，_backlog 章程反双记账同款病），
 // 且违反上游 no-index 教义（vendor notes README："Do not add a centralized INDEX.md"）——两道规矩
-// （行预算 + 窗口冻结）都是在给派生索引续命。退役 = 整表冻结进 notes/archived/intents-2026-10.md
-// （终档）后删除文件；授权链线索住 Note 状态行。依据 = cleanup-round Note 决定 ④。
+// （行预算 + 窗口冻结）都是在给派生索引续命。退役 = 删掉活表；授权链线索住 Note 状态行。
+// 2026-10-09 清扫再删掉月度冻结表（账本身）。依据 = cleanup-round Note 决定 ④。
 
 // ── 2c-quater. snapshots 体积预算（2026-10-05 立，复跑轮用户拍板「无法承受没完没了的增长」）──
 // 为什么：memory-convergence-*（轮末收敛整盘拷贝）是**唯一无界增长源**——每轮一份、两周 7 目录，

@@ -1,6 +1,6 @@
 # 2026-09-27 · enforcement 通道 + 反证账 + skill 边界三件套（FAQ 07 审计行动项落地）
 
-状态：implemented（2026-09-27。起因 = [archived/harness-gap-audit-faq07](../archived/2026-09-27-harness-gap-audit-faq07.md)
+状态：implemented（2026-09-27。起因 = FAQ 07 十维审计（稿已删，历史在 git）
 §反馈维——审计认定的唯一结构性缺口：门禁全备而「何时跑」靠 prose；用户点名「接下来要修复」后同日落地。
 ROADMAP 磨清单两条对应行已磨即离队。）
 

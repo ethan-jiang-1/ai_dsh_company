@@ -2,7 +2,7 @@
 
 ## 背景
 
-研究笔记（[implemented/2026-09-22-digital-twin-cultivation-and-self-learning.md](./2026-09-22-digital-twin-cultivation-and-self-learning.md)）
+研究笔记（implemented/2026-09-22-digital-twin-cultivation-and-self-learning.md（已删，历史在 git））
 发现：五个角色 preset 的 `skill-filesystem` 只写了 `customSkillDirs`，`includeDefaultRoots` 取默认
 true ⇒ 角色私有目录（rank 300）与项目根（100/200）、用户级（400/500）根**同处一个 layer**。
 preset 文件里那句注释"角色专属 skills……其他角色不可见（**硬隔离**）"与行为相反。
@@ -50,5 +50,5 @@ preset 文件里那句注释"角色专属 skills……其他角色不可见（**
   的改动下一轮就生效（不必等新会话）。这让"分身自我学习"在机制上可行，也让本条的隔离更关键：
   一旦允许自改 skill，改动会立刻进入下一次模型请求。
 - 与 R6 的关系：本条的隔离是 R6"培养/学习"的前置条件之一（见
-  [implemented/2026-09-22-twin-cultivation-and-self-learning.md](./2026-09-22-twin-cultivation-and-self-learning.md)
+  implemented/2026-09-22-twin-cultivation-and-self-learning.md（已删，历史在 git）
   与 roadmap 的轮间待办）。

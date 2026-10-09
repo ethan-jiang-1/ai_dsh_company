@@ -355,8 +355,7 @@ ai_dsh_company/
 
 ## 10. 改动归属表：改什么 → 去哪个面 → 该面验收
 
-> 对照《Agent-ready Development》repo-harness/04 的 "Where new behavior goes"（判定与理由 =
-> [harness-alignment 台账](../../notes/archived/2026-09-25-harness-alignment-ledger.md) §C）：
+> 对照《Agent-ready Development》repo-harness/04 的 "Where new behavior goes"：
 > fresh agent 不该拼三处文档才答出"这个改动放哪、什么算完成"。
 
 | 改什么 | 首选落点 | 该面最小验收 |

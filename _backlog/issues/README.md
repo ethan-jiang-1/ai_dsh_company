@@ -6,9 +6,6 @@
 
 | 卡 | 要解决什么 | 当前环节与未完成项 |
 |---|---|---|
-| [2026-10-09-decision-ledger-home-migration.md](2026-10-09-decision-ledger-home-migration.md) | 核对 D1–D9 决策的归属与台账空间处置 | 未完成九条逐项映射；“改指针能腾九行”尚未成立，需核对再形成结论 |
-| [2026-10-09-stale-pointer-cleanup.md](2026-10-09-stale-pointer-cleanup.md) | 是否值得清理存量死指针，及清理范围 | 原卡含两个独立问题；本卡仅继续清理判断，护栏问题已分卡；原触发未等同确认结论 |
-| [2026-10-09-postmortem-guard-survival.md](2026-10-09-postmortem-guard-survival.md) | 是否需要事故护栏的持续存活检查 | 来源于清理卡第二件；仍需判断人工核对成本与机制边界，不实施新门禁 |
 
 ## 边界与尺寸
 

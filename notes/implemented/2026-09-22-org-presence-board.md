@@ -1,7 +1,7 @@
 # 2026-09-22 · 组织在场板（物理人看得见谁在忙、忙什么）
 
 状态：**已消化（2026-09-23，R5b 收尾毕业——条目全有归宿**：在场板 / 差分动态流 / 行可点入口 =
-R5b 交付，见 [implemented/2026-09-23-r5b-cockpit.md](./2026-09-23-r5b-cockpit.md)；消息级动态流 =
+R5b 交付，见 implemented/2026-09-23-r5b-cockpit.md（已删，历史在 git）；消息级动态流 =
 进 [roadmap 搁置池](../../_backlog/_archive/legacy/suspended.md)（stub codegen 归 vendor 管线；界面外推送 = 搁置池**，2026-09-28 整池退役迁入**）**
 进轮：**R5b 驾驶舱**（2026-09-22 起，见 [roadmap](2026-09-28-roadmap-retirement.md)）
 梳理（2026-09-22 晚）：R5 已按 D19 拆成 **R5a 门禁与发布 / R5b 驾驶舱**，本提案属 **R5b**
@@ -14,7 +14,7 @@ Q5–Q8](../../docs/index.md)，内容与选项见 r5-plus-readiness（原审计
 
 数字分身是实际公司职位的对应物，所以物理人必须能回答两个问题：**我的分身此刻在不在忙**、
 **它在忙哪件事**。R1 已经暴露过一次同类失败——CEO 把活丢给 VP-Eng 后，人察觉不出 VP 是一个
-独立空间（[../implemented/2026-09-22-r2-ui-slice-replan.md](../implemented/2026-09-22-r2-ui-slice-replan.md)）：
+独立空间（../implemented/2026-09-22-r2-ui-slice-replan.md（已删，历史在 git））：
 机制上线了，人却看不见。R2 的任务板活面板解决了**一场动议之内**的可见性（成员状态 + 任务修订），
 但回答不了"公司里四个分身此刻各自在干什么"。
 
@@ -116,6 +116,9 @@ shell 会话列表语义）；头部动作位已有官方名册（order 20）与
   部署方选。
 - **给每个分身开一个常驻会话当"在线状态"**：DSH 的会话不是常驻进程，空会话没有"在线"语义，
   成本换不来信息。
+- **host 自建 Typert Remote 做消息级动态流**：客户端 stub 由 vendor codegen 管线生成，本 pack
+  无接线。v1 动态流 = 快照差分；消息级留到有现成 stub 再开。
+- **用 `paceMs` 修 queued 差异**：vendor 写明 correctness must never depend on it。
 
 ## 验收判据
 

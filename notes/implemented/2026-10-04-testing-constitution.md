@@ -63,9 +63,9 @@ D15/门禁注释，新会话沿纪律表落点进 vendor 语境错配的 testing
 **① 规矩层**：[docs/testing.md](../../docs/testing.md)（新建，75 行宪法）＋ [tests/pack-exports.spec.ts](../../tests/harness/pack-exports.spec.ts)、
 [tests/signoff-tool.spec.ts](../../tests/company/signoff-tool.spec.ts)（守卫+行为资产）＋ dev-loop/release/AGENTS/index/verify 接线（§1.1 命名语法、§3.8 红场景先行、script-triggers 扩 eval、行预算 ×2）。
 **② 多用户 BDD 五 Note 六 probe**：[lane 立项+S1-S6 规格](./2026-10-04-multi-user-concurrency-lane.md) →
-[batch1](./2026-10-04-multi-user-bdd-batch1.md)（member-rescue-probe 6/6 + team-concurrency-probe 4/4）→
-[batch2](./2026-10-04-multi-user-bdd-batch2.md)（dissent-preservation-probe 4/4 + team-atomicity-probe 3/3）→
-[batch3](./2026-10-04-multi-user-bdd-batch3.md)（member-interrupt-probe 4/4 + team-recovery-probe 4/4）——
+batch1（已删，历史在 git）（member-rescue-probe 6/6 + team-concurrency-probe 4/4）→
+batch2（已删，历史在 git）（dissent-preservation-probe 4/4 + team-atomicity-probe 3/3）→
+batch3（已删，历史在 git）（member-interrupt-probe 4/4 + team-recovery-probe 4/4）——
 probe 本体全在 `scripts/`（六个，命名语法 §1.1）。
 **③ 推敲卡生→死**：两卡一材料从 `_backlog/plans|reference/` 毕业迁 `_backlog/_done/`（_closed_plans ×2 + _reference ×1，状态行补去向、索引三处同步）。
 **④ 未动（等用户）**：[_backlog/_done/_closed_plans/2026-10-02-deferred-verifications](../../_backlog/_archive/settled_issues/2026-10-02-deferred-verifications.md)

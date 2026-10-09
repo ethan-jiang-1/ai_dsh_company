@@ -214,7 +214,6 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 `owners.md` 的授权面就成了摆设（demo 的卖点正是"谁签得动"按人分）。
 
 **实测基线**：两扇门排练 PASS（2026-09-26，排练场）；**真盘三扇门已跑**（2026-10-04，
-firstdeal-v-2026：双签两半各落各门均人应答 allowed-once、16 分钟含一次服务中断重试——判据与
-证据 = [E2E Note](../notes/implemented/2026-10-04-e2e-multihuman-firstdeal.md)，快照 =
+firstdeal-v-2026：双签两半各落各门均人应答 allowed-once。快照 =
 `snapshots/archive/memory-convergence-2026-10-04-3/`）。
 **预算**：3 人、每人单轮出稿、工具 ≤10/人、总墙钟 ≤10 分钟；不新增调研。

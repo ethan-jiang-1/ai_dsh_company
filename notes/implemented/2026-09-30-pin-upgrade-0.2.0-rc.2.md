@@ -7,7 +7,7 @@
 本仓钉住 `vendor/dsh` = `dsh-v0.1.7-rc.2`（`477b4f42`）。上游已发 `dsh-v0.2.0-rc.2`（`639ed015`），
 区间 **448 commit**（0.1.7 那次 rc.1→rc.2 是 346——这次是小版本级跨越，非纯发布 bump）。
 
-- 消费面 delta 报告 = [archived/2026-09-30-dsh-upstream-delta-0.2.0.md](../archived/2026-09-30-dsh-upstream-delta-0.2.0.md)：
+- 消费面核对（delta 长文已删，结论留在本段）：
   **纯适配、无 install 级阻塞**——24 个 `dsh-*` peer 包全部存在（版本 0.2.0-rc.2）、cordis 4.0.2→4.0.4
   （仍在本仓 range 内）、preset 声明形状零变化、client 数据层零 breaking、`materializeProfilePatch`
   五参签名逐字一致、host import 符号 25 个逐个核对全在。

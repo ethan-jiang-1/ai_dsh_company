@@ -4,7 +4,7 @@
 
 ## 问题
 
-同一请求 34 小时内第三现：10-07 [realignment](2026-10-07-plugin-corpus-realignment.md)（28 页全判 + 五决定落地）→ 10-08 03:00 [strengthened-read](2026-10-08-plugin-corpus-strengthened-read.md)（验产 + 28 页亲读 + **零增量**判定）→ 03:34 用户再问且自述体感照旧（「驾驭感觉确实很糟糕」）。开工前核账三事实：① 语料零变化（外部树 HEAD `bbcf346ddb` = 10-07 0013 轮，工作树 clean，`verify.mjs` 过，`_coverage` 无 0014+）；② 前两轮判定产出全是 agent 侧事实；③ **「零增量」判定与「还是很糟糕」体感打架**——这个打架是本轮真正的诊断对象，第三次全量逐页判定被否（见输掉的方案）。
+同一请求 34 小时内第三现：10-07 [realignment](2026-10-07-plugin-corpus-realignment.md)（28 页全判 + 五决定落地）→ 10-08 03:00 strengthened-read（已删，历史在 git）（验产 + 28 页亲读 + **零增量**判定）→ 03:34 用户再问且自述体感照旧（「驾驭感觉确实很糟糕」）。开工前核账三事实：① 语料零变化（外部树 HEAD `bbcf346ddb` = 10-07 0013 轮，工作树 clean，`verify.mjs` 过，`_coverage` 无 0014+）；② 前两轮判定产出全是 agent 侧事实；③ **「零增量」判定与「还是很糟糕」体感打架**——这个打架是本轮真正的诊断对象，第三次全量逐页判定被否（见输掉的方案）。
 
 ## 读法（可核验）
 
@@ -50,12 +50,12 @@
 
 ## 取代检查
 
-- 与 [realignment](2026-10-07-plugin-corpus-realignment.md) / [strengthened-read](2026-10-08-plugin-corpus-strengthened-read.md)：**部分延伸**——两 Note 继续拥有 rc.2 语料判定本体与执行合规账；本 Note 拥有第三轮体感实证裁决（H1/H2/H3）与驾驶座修订。互链不合并。
+- 与 [realignment](2026-10-07-plugin-corpus-realignment.md) / strengthened-read（已删，历史在 git）：**部分延伸**——两 Note 继续拥有 rc.2 语料判定本体与执行合规账；本 Note 拥有第三轮体感实证裁决（H1/H2/H3）与驾驶座修订。互链不合并。
 - 与 [driver-purpose-top-level](2026-10-07-driver-purpose-top-level.md)：其 S5 拥有 orient 单页导航结构；七问是该页之后驾驶者视图线的延续（五问 = 质量视图，七问 = 流程视图），互链不合并。
 
 ## 中立体清扫（2026-10-08，commit 2044a29 收口后）
 
-独立子代理盲扫（输入 = diff + 本 Note + RFC，按 [notebook-hygiene](2026-09-25-notebook-hygiene.md) 清单契约）：**blocker 0 / suggestion 3 / 判非 8**——全部机械可查声称（计数/预算/门禁/时间线/机制引文）独立复核零失配。3 条 suggestion 已同日修复：S1 三篇旧 Note 补前向互链（取代检查「互链」此前实为单向，恰是 H3「产出到不了读者眼前」的复发点，最优先修）；S2 取代检查「第四问」指称落空 → 改「五问 = 质量视图、七问 = 流程视图」的线描述；S3 计数口径三处不对齐 → 统一为 F2 同款文件级四处（六行）。判非 8 条留档防重查（全文见清扫报告）。
+独立子代理盲扫（输入 = diff + 本 Note + RFC，按 notebook-hygiene（已删，历史在 git） 清单契约）：**blocker 0 / suggestion 3 / 判非 8**——全部机械可查声称（计数/预算/门禁/时间线/机制引文）独立复核零失配。3 条 suggestion 已同日修复：S1 三篇旧 Note 补前向互链（取代检查「互链」此前实为单向，恰是 H3「产出到不了读者眼前」的复发点，最优先修）；S2 取代检查「第四问」指称落空 → 改「五问 = 质量视图、七问 = 流程视图」的线描述；S3 计数口径三处不对齐 → 统一为 F2 同款文件级四处（六行）。判非 8 条留档防重查（全文见清扫报告）。
 
 ## 语义审记录（§13 四输入，收尾自查）
 

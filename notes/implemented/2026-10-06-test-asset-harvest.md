@@ -1,6 +1,6 @@
 # 2026-10-06 · 测试资产收割机制：运行→收割→钉住
 
-状态：implemented（两条目全部毕业：A `976e792` / B `ba2b3d7`；授权链 = 用户采纳「收割三问 + 资产层投资」框架并令设 ongoing goal；前包 = [observation-closeout](2026-10-06-observation-closeout.md)，三债全清后本包立「让资产增长机制化」）
+状态：implemented（两条目全部毕业：A `976e792` / B `ba2b3d7`；授权链 = 用户采纳「收割三问 + 资产层投资」框架并令设 ongoing goal；前包 = observation-closeout（已删，历史在 git），三债全清后本包立「让资产增长机制化」）
 
 ## 已交付（两条目）
 

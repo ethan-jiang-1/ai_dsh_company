@@ -17,7 +17,7 @@
 //   （默认）       重放组合（replay/cordis.snapshot.yml，llm-replay）复演 → 归一化比对 + sidecar
 //                 比对 + 在场板判据（R5b：重放 lead 的 team/* 事件喂 pack 读模型，非空且与录制
 //                 同形；提案验收 4。场景不带 team 事件时自动跳过）
-// 机制依据：notes/implemented/2026-09-23-replay-harness-feasibility.md（P1.1 §0–§3 + P1.2 §7 + P1.3 §8）。
+// 机制依据：本脚本头注 + snapshots/replay 场景的 snapshot.yml。可行性研究长文已删（历史在 git）。
 // ⚠ 录/放组合必须同构（vendor 教义：cordis.yml 与 cordis.snapshot.yml 仅差 LLM 行）——
 //   title-llm 两侧都禁：其 LLM 调用不进重放脚本（deriveReplayScript 只收 assistant 流），
 //   吃条目会造成供条错位；两侧都走截断回退 ⇒ 事件形态一致。

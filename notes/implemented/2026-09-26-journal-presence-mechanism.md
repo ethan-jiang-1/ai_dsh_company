@@ -79,5 +79,5 @@
 ## 依据
 
 - 磨清单项与红证：[ROADMAP §磨清单](../../_backlog/_archive/legacy/polish.md)；打磨轮收尾 =
-  [polish-round](./2026-09-25-polish-round.md) §实施实况。
+  polish-round（已删，历史在 git） §实施实况。
 - 同族审计脚本形态：[deliverables-check.mjs](../../checks/audit/deliverables-check.mjs)。

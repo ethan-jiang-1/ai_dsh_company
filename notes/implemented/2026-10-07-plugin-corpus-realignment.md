@@ -4,10 +4,12 @@
 
 > 语料：`/Users/bowhead/deepseek-harness/_dsh_plugin_agent_ready_development/`（repo 外只读树），
 > 钉 tag `dsh-v0.2.0-rc.2` = 本仓当前 vendor pin；前代 `_agent_ready_development`（更名前）钉
-> `dsh-v0.1.7-rc.1`，旧判定 = [harness-alignment-ledger](../archived/2026-09-25-harness-alignment-ledger.md)。
+> `dsh-v0.1.7-rc.1`。0.1.7 逐页表已删，历史在 git。
 > 读法 = 主会话亲读 15 篇内容页（native README/00/01/02；sdlc README/00/01/04/06；repo README/00/01/02/05/07）
 > 并自查根 README/_coverage/verify 特殊件；其余 13 篇（sdlc 02/03/05/07/08/09/10/11 + repo 03/04/06/08/09）
 > 由一路子代理判定——15+13 = 28 与判定矩阵全覆盖，两组结论交叉一致。
+> 2026-10-08 加强轮把 28 页再亲读一遍，增量判定为零，不另留 Note。其后的翻案只在
+> [driver-receipt-round](2026-10-08-driver-receipt-round.md)（H1 一处翻案 / H2 证伪 / H3 驾驶座）。
 
 ## 问题
 
@@ -23,9 +25,10 @@
 ## 判定（新语料 28 内容页 + 特殊文件；三态 = 已对齐 / 采纳 / 不适用+触发）
 
 **延续旧判（20 页，rc.2 复核无新形状）**：repo-harness 全卷 11 页（01–09 + README/index）与
-sdlc-reference 9 页（README/index + 02/03/05/07/08/09/10）——旧台账判定全部成立；不照搬清单
-（旧台账 §四.4：生成 catalog、双语 pairing、CI/PR/加权评审面、skills 家、change-scope 脚本等）
-全部维持，触发条件不变（第二贡献者 / PR 面 / 真实 npm 发布）。
+sdlc-reference 9 页（README/index + 02/03/05/07/08/09/10）——逐页旧判成立，长表在 git。不照搬：
+生成 catalog、双语 pairing、文档站投影、CI/PR/加权评审/hooks、per-directory owner 文件、
+change-scope 脚本、集中式维护台账。触发 = 第二贡献者 / PR 面 / 真实 npm 发布。
+`.agents/skills/` 家后来由 [dev-skills-pilot](2026-10-08-dev-skills-pilot.md) 落地，不再在此清单。
 
 **本轮重判（8 页 = 语料演进的 4 页 + 新卷 4 页）**：
 
@@ -61,13 +64,13 @@ sdlc-reference 9 页（README/index + 02/03/05/07/08/09/10）——旧台账判�
 - **吸收 sdlc-07「push 后 fetch 核对 remote==HEAD」**：单分支直推 + git 自带 non-fast-forward 报错，机械化收益低于维护成本；触发 = 历史改写或并行分支时再评。
 - **TODO/FIXME 语义档**：旧台账已登记触发（TODO 开始累积时先定义）；当前无存量，不预建。
 - **语义审做成 gate（收尾 Note 必含「语义审：」行一类）**：无复发证据不建 gate；且形式化空行恰是语料点名的「空 invariant」负资产。观察 2–3 轮，语义审仍空转再升格。
-- **旧台账追加 rc.2 增补节**：archived = 冻结，改它就是篡改记录；由本 Note 承接增量判定并互链（部分取代，双方保留）。
+- **把 rc.2 判定写回 0.1.7 逐页台账**：那份长表已删；增量判定住本 Note。
 
 ## 取代检查
 
 - **后续延伸（2026-10-08）**：同请求第三现的体感实证裁决（H1/H2/H3）+ 轮次回执、驾驶七问落地 =
   [driver-receipt-round](2026-10-08-driver-receipt-round.md)（部分延伸，互链不合并）。
-- 与 [harness-alignment-ledger](../archived/2026-09-25-harness-alignment-ledger.md)：**部分取代**——旧台账继续拥有 0.1.7-rc.1 逐页判定与不照搬清单（§四.4 仍被 dev-loop §9.1 等四处活引用）；本 Note 拥有 rc.2 语料 + 新卷的增量判定与四焦点线修订。互链不合并。
+- 0.1.7 逐页台账已删（历史在 git）。不照搬清单与 rc.2 判定的家是本 Note；registry 三态在 [release.md](../../docs/release.md)。
 - 与 [entry-execution-chain-debt](2026-09-26-entry-execution-chain-debt.md)：其「semantic review pending」边界声明仍有效；执行形状由本 Note §决定 2 接续。
 - 与 [notes-lifecycle-absorption](2026-09-24-notes-lifecycle-absorption.md)：无重叠——它拥有 sdlc-01 页六条点选吸纳；该页 rc.2 收窄的判定归本 Note。
 

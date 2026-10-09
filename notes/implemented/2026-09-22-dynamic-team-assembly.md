@@ -2,7 +2,7 @@
 
 状态：**已消化（2026-09-22）**——双向行为对照两场全过（两职能不超编 / 四职能不漏人），
 本文件从 `notes/proposed/` **毕业**到 `notes/implemented/`。实现与实测见
-[implemented/2026-09-22-team-assembly-and-rehearsal-split.md](./2026-09-22-team-assembly-and-rehearsal-split.md)。
+implemented/2026-09-22-team-assembly-and-rehearsal-split.md（已删，历史在 git）。
 归属：轮间待办①（R4 收尾后做，不占轮）；兼作 R6「分身成长」的 U1 活体探针实操（**R6 前置全清**）
 
 ## 背景（用户原话）

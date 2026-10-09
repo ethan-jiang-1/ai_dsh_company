@@ -23,7 +23,7 @@
 
 ## Consequences 与范围
 
-本次补充而非替代 [R6 开发流程记录](./2026-09-23-r6-content-remediation.md)，保留原有决定和验证历史。研究依据 = DSH 开发记忆（研究稿 2026-09-25 按 research 层生命周期毕业删除，全文见 git `335901e`；其基线为旧 pin rc.2，机制细节以现行 vendor 树为准）：Notes 原则部分采纳；生命周期适配已由 [notes-lifecycle-absorption](./2026-09-24-notes-lifecycle-absorption.md) 与开发环 §12 细则收口。
+本次补充而非替代 R6 开发流程记录（已删，历史在 git），保留原有决定和验证历史。研究依据 = DSH 开发记忆（研究稿 2026-09-25 按 research 层生命周期毕业删除，全文见 git `335901e`；其基线为旧 pin rc.2，机制细节以现行 vendor 树为准）：Notes 原则部分采纳；生命周期适配已由 [notes-lifecycle-absorption](./2026-09-24-notes-lifecycle-absorption.md) 与开发环 §12 细则收口。
 
 隔离守卫仅覆盖列出的六个入口，不等于全仓安全边界，也不防守检查后发生的并发符号链接替换。`entry-probe`、`snapshot-motion` 尚未统一；原 `release-smoke`、`deliverables-check` 守卫未改。本次没有扩展 Markdown 链接门禁，没有修改快照 expected、重放比较、发布启动器、vendor pin、client 生命周期或业务内容。
 

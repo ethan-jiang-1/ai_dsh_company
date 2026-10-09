@@ -270,8 +270,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 （2026-10-04 立测试宪法时自本节迁入——宪法还拥有：改动面→最小证据映射、证据纪律（条数以宪法 §3
 实列为准，别在此复述数字）、资产
 三分法、自测轮授权、已知未覆盖面、升级地图；本节只留命令与预算）。换档先问"这一层能证明我关心的
-性质吗"，不为安心堆档（对照《Agent-ready Development》05 六层反馈；判定见
-[harness-alignment 台账](../../notes/archived/2026-09-25-harness-alignment-ledger.md) §B）。
+性质吗"，不为安心堆档。
 
 **三条硬规矩**：
 
@@ -325,9 +324,8 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 3. **确需越界（重定向覆盖不了的场景）**：先问人，一次说清"写哪个路径、为什么没有替代"；
    沙箱是最后防线（§6 第 5 条），不拿它当默认方案。
 
-**反例存档**：`~/Library/Caches/pnpm` 合成元数据事故（2026-09-22，见
-[implemented/2026-09-22-team-assembly-and-rehearsal-split.md](../../notes/implemented/2026-09-22-team-assembly-and-rehearsal-split.md)
-环境状态节；清理按 etag `synthetic-from-store` 标记识别）。
+**反例**：`~/Library/Caches/pnpm` 合成元数据（2026-09-22）。清理按 etag `synthetic-from-store` 识别；
+缓存与 store 必须先钉进仓库 gitignored 区。
 
 ## 12. 记录与收尾
 
@@ -352,9 +350,10 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - 按改动面选择验证（§9.1）；结构门禁不替代运行验收。入口探针机器通过不等于语义审阅通过。
 - 新门禁反证的操作口径 = **只回滚实现、保留新测试**——连测试一起回滚会得全绿假象；红→还原→绿三步留证。
 - 收到人审/用户反馈：成立就修复并补证据；不成立用技术事实反驳，**不作表演式同意**。
-- 条目收尾后可派**中立体清扫**（独立子代理；输入 = diff + 收尾 Note + 关联 `_backlog` 行/卡；固定清单格式与首跑样例见 [implemented/notebook-hygiene](../../notes/implemented/2026-09-25-notebook-hygiene.md) 实况）——扫与修分家。
+- 条目收尾后可派**中立体清扫**（独立子代理；输入 = diff + 收尾 Note + 关联卡；扫与修分家）。
+  清单不另写 Note。
 - 文档卫生按指导价值：移除失效/重复指令与无行动价值的历史噪声；保留仍指导当前决策、解释约束或支持复验的证据。不以净减行数为目标（D26）。
-- **授权链与时间轴（intents.md 已退役，D34 2026-10-04）**：授权线索（用户点名/裁定原话）记在**对应 Note 的状态行**；时间轴 = `notes/implemented/` 文件名日期 + git log；冻结档案 = `notes/archived/intents-*.md`（2026-10 为终档，只读）。退役理由 = 第三本账与 Note 双写、膨胀病史三次、违反上游 no-index 教义（vendor notes README）。
+- **授权链与时间轴（intents.md 已退役，D34 2026-10-04）**：授权线索（用户点名/裁定原话）记在**对应 Note 的状态行**；时间轴 = `notes/implemented/` 文件名日期 + git log。月度冻结表已在 2026-10-09 清扫中删除（那是账本身）。退役理由 = 第三本账与 Note 双写、膨胀病史三次、违反上游 no-index 教义（vendor notes README）。
 - **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链一律 `set -o pipefail` + `&&`（不带 pipefail 的 `cmd | tail` 退出码是 `tail` 的 = 假绿）。push 由 **pre-push hook 强制跑全量 `pnpm verify` + `pnpm test`**（verify 2026-09-27 立；test 09-28 加，不进 CI 的定界见 [ci-test-lane Note](../../notes/implemented/2026-09-28-ci-test-lane.md)；接线 = `source run/env.sh` 幂等设 `core.hooksPath`；bypass = `--no-verify`，用后须在收尾 Note 说明原因）。
 - **复盘一问：本轮有没有 agent 遵守的"未成文规则"**（从代码模式推断出的伪规则，跨会话会扩散）？三选一收口：升格 verify 门禁 / 写进 owner Note / 显式作废——规则不留空气（2026-09-28 借 FAQ 11）。
 

@@ -103,7 +103,7 @@ CEO 门落任务书 `drafts/ceo.md` → CFO 门读它、出 `drafts/cfo.md`、�
 `日期待核-<slug>.md` 占位，日期口径也守住了）⇒ **PASS**。
 **真盘首跑已完成（2026-10-04，firstdeal-v-2026）**：三扇门全链（CEO 派活不 spawn → CFO/COO 各自
 根会话出稿 → CFO 半边 `request_signoff` 卡落 CFO 门、人经浏览器应答 allowed-once → CEO 半边卡落
-CEO 门、人应答 → final + present）。判据与证据 = [E2E Note](../notes/implemented/2026-10-04-e2e-multihuman-firstdeal.md)。
+CEO 门、人应答 → final + present）。证据快照 = `snapshots/archive/memory-convergence-2026-10-04-3/`。
 
 ## 4. 协作前提（多人在同一盘上必须先约定）
 
@@ -113,8 +113,7 @@ CEO 门、人应答 → final + present）。判据与证据 = [E2E Note](../not
 2. **写入边界**——各自只写 `drafts/<角色>.md` + 自己的 `kb/<角色>/journal/`；`final.md` 只有 CEO 写。
    三态判据盯着"成品有没有 present 背书"，但**盯不住"是谁写的"** ⇒ 靠手册纪律 + 互审。
 3. **同盘并发**——**"一个文件同一时刻一个写者"是本仓的流程政策，不是文件系统的保证**。
-   机制实况（2026-09-26 复核；**2026-10-03 E1/E2 实测更新**，证据 =
-   `notes/archived/2026-09-26-multi-human-ux-evidence.md` + 推敲卡 E1/E2 结论
+   机制实况（2026-09-26 复核；**2026-10-03 E1/E2 实测更新**，推敲卡 =
    `_backlog/_archive/settled_issues/2026-09-29-collab-mechanism-evidence.md`）：
    - **有**：`fs-local` 的**实例内** per-target 排队锁 + 版本守卫（读过再写时版本变了报 `FS_STALE_VERSION`，
      "一胜一 stale"有官方测试）。**E1 实测（真角色会话 ×4 轮全绿，`probes/fs-taskboard/fs-guard-probe.mjs`）**：
@@ -183,5 +182,4 @@ CEO 门、人应答 → final + present）。判据与证据 = [E2E Note](../not
 （`deliverables-check` 0 违规 + journal 各自在场）；迁移清单随本合同交付；`pnpm verify` / `pnpm test` 保持绿。
 **已完成（2026-10-04）**：firstdeal-v-2026 三扇门真盘动议——双签两半各落各门均人应答、
 根会话归属 ✓×3（cfo/coo/ceo 各自会话写各自稿）、0 spawn、check 违规 0、journal 三在场。
-证据 = [E2E Note](../notes/implemented/2026-10-04-e2e-multihuman-firstdeal.md)；快照 =
-`snapshots/archive/memory-convergence-2026-10-04-3/`。
+快照 = `snapshots/archive/memory-convergence-2026-10-04-3/`。

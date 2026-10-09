@@ -1,7 +1,0 @@
-{
-  "fromSha": "fb2c4b9e698e30edb738bca4cf0618587db7d203",
-  "toSha": "477b4f420553e8a52c2fbccc464d7561b239c443",
-  "reviewedBy": "ethanmac",
-  "reviewedAt": "2026-09-25",
-  "processContractReview": "vendor 纪律核对：本仓 vendor 铁律 = vendor 树零改动 + SHA-not-tag，升 pin 走 docs/release.md 升 pin 程序。本次取证操作只把候选 tag 的对象抓进 vendor/dsh 的 git 缓存（https 官方 GitHub，7.7s），未改 submodule origin（仍指本机研究树）、未移动 vendor HEAD、未建树，tracked 内容零改动；pnpm verify 的 vendor-pin + vendor-clean 在旧 pin 上仍绿。本地流程合同核对：升 pin 程序要求（a）证据 JSON 先经人审并提交（即本文件）、（b）两个工作树干净、（c）事务式暂存在内存，待 install + vendor 自建 + test + built release-smoke 全过后才写簿记与兼容矩阵，失败回滚且不回滚 node_modules/ignored 产物，运行期间不并行编辑或安装——本次遵照执行。增量证据：rc.1→rc.2 = 346 commit / 3429 文件 / +136,313 −24,518（非纯发布 bump），落六面：user-questions（含 timed waits and late replies）、approval（说明本地化、auto-review）、preset ×19、schedule ×20（含禁用 shipped schedule 与 time context 插件）、projection、workspace-files（目录链接按解析目标列举）；明细见 notes/research/2026-09-24-dsh-upstream-delta.md §⑦ 与 notes/proposed/2026-09-25-pin-upgrade-0.1.7-rc.2.md。已知破面接受为本次升级代价：peerDependencies 名在 0.1.7 不存在（dsh-agent-presets 拆为 dsh-agent-preset + dsh-agent-preset-registry）、preset 声明迁移工程量、V4 单向门（增量报告 §⑤）。声明边界：这是人审声明，不是自动脚本的语义审计，也不认证签名者身份。"
-}

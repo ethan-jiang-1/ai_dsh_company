@@ -28,7 +28,7 @@ README 自述 "gives the model a clock"）——随 web-app bundle 挂载但 **`
    release-smoke 预置 bundles 断言、dev web profile 手动加行见 bootstrap.md），pack 只留**替换行钉
    `timeZone: Asia/Shanghai`**（[pack cordis.patch.yml:39-42](../../../packages/company-pack/cordis.patch.yml)；
    bundle 不在场的组合该行 not-found 丢弃）。机制结论不变（durable user-role 注入），出处换家 =
-   收割轮批3（[harvest Note](../../../notes/implemented/2026-09-30-plugin-harvest-round.md)）。
+   收割轮批3（harvest Note（已删，历史在 git））。
    **RFC 追认时机制形状须按现行载体写**，不是 0.1.7 的 web-app 替换行。
 
 其形状（[README](../../../vendor/dsh/packages/context/time-context/README.md) 核实）恰好比留案 A 想做的更好：
