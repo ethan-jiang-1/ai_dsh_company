@@ -27,8 +27,9 @@ schedule.json 可审计）+ playbook 第 8 步。**未验证：schedule 工具�
    用 schedule 工具立 `after 60s` 提醒 → **schedule.json 出现 probe-wake 任务（绑原 sessionId）** →
    到点 **follow-up 已送达原会话**（lastDelivery 现态）。主动唤醒闭环端到端全通 ⇒ 早上的空头支票
    纯属"说了没做"（工具一直在场），闸门④审计即为全部解药。
-2. follow-up 回原会话时的窗口呈现：用户不在场时是积累还是丢失（"卡是实时事件、刷新即丢"的
-   已知边界对 follow-up 是否同样成立）？——**待人拍板**。
+2. follow-up 回原会话时的窗口呈现 —— **已裁定（2026-10-10 用户拍板）：执行类照跑，决策类排队**。
+   执行类 = 报告 / 查料 / 读档类 follow-up 到点自动跑；决策类 = 花钱、对外承诺、砍项、签字类
+   进待办面板等人——与待办四格哲学一致。模板（未决 3）按此分类写。
 3. "查料 → 复算"的 follow-up prompt 模板（查 `sources/` 有料 → 重启动议；无料 → 顺延再立）。
 4. 审计判据挂哪：deliverables-check 扫「待补料」↔ schedule.json 交叉核对（行动幻觉 = 违规）？
 
