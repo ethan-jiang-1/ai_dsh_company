@@ -6,6 +6,7 @@
 // No keyless regression claim: true-model certification, 不进 pnpm test.
 // Usage: source run/env.sh && node checks/smoke/entry-probe-smoke.mjs [--port 0] [--timeout 240000]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
@@ -76,17 +77,6 @@ function readSource(path) {
 for (const path of ['AGENTS.md', 'docs/index.md', 'docs/guides/dev-loop.md']) readSource(path)
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
-let rpcId = 0
-async function rpc(base, cookie, endpoint, args) {
-  const response = await fetch(`${base}/api/${endpoint}`, {
-    method: 'POST', headers: { 'content-type': 'application/json', cookie },
-    body: JSON.stringify({ type: 'client-request', rpcId: `entryprobe-${++rpcId}`, method: endpoint, payload: { args } }),
-    signal: AbortSignal.timeout(15000),
-  })
-  const body = await response.json()
-  if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? JSON.stringify(body).slice(0, 200)}`)
-  return body.result.value
-}
 async function stop(child) {
   if (!child || child.exitCode !== null || child.signalCode !== null) return
   const exited = new Promise(r => child.once('exit', r))
@@ -94,26 +84,21 @@ async function stop(child) {
   await Promise.race([exited, sleep(1500)])
   if (child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await exited }
 }
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+// 既有差异当参数保留：--patch 钉 entry-probe 场景（string 形态）、env 钉 DSH_PERMISSION_MODE:
+// 'read-only'（有意的 fail-closed 档，一个字节不许动）；banner 等待的 error 事件/16000 输出上限/
+// 120s 定时器已收进模块，不再本地重复。注入的 spawn 顺手捕获 child——boot 失败（banner 等不到）
+// 仍走本函数既有的 stop 收尾再上抛（team-concurrency 先例）。
 async function boot() {
-  const child = spawn(process.execPath,
-    ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--patch', join(ROOT, 'run/entry-probe.patch.yml'), '--', '--port', String(PORT), '--no-open'],
-    { cwd: ROOT, env: { ...process.env, DSH_HOME: home, DSH_PERMISSION_MODE: 'read-only' }, stdio: ['ignore', 'pipe', 'pipe'] })
-  let output = ''
-  let timer
+  let child
   try {
-    const banner = await new Promise((res, rej) => {
-      const onData = chunk => {
-        output = `${output}${String(chunk)}`.slice(-16000)
-        const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-        if (m) res({ port: Number(m[1]), token: m[2] })
-      }
-      child.stdout.on('data', onData); child.stderr.on('data', onData)
-      child.once('error', rej)
-      child.once('exit', code => rej(new Error(`web 提前退出 ${code}\n${output.slice(-800)}`)))
-      timer = setTimeout(() => rej(new Error(`boot 超时\n${output.slice(-800)}`)), 120000)
+    const { port, token } = await startWeb({
+      spawn: (...args) => (child = spawn(...args)), root: ROOT, home,
+      patch: join(ROOT, 'run/entry-probe.patch.yml'), port: PORT,
+      env: { ...process.env, DSH_PERMISSION_MODE: 'read-only' },
     })
-    return { child, ...banner }
-  } catch (error) { await stop(child); throw error } finally { clearTimeout(timer) }
+    return { child, port, token }
+  } catch (error) { await stop(child); throw error }
 }
 
 let child
@@ -127,6 +112,11 @@ try {
   const auth = await fetch(`${base}/?token=${booted.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
   const cookie = auth.headers.getSetCookie().map(c => c.split(';')[0]).join('; ')
   if (!cookie) throw new Error('认证缺 cookie')
+  // RPC 收成 companyRpc（2026-10-10 卡）：既有差异当参数保留——rpcId 前缀 `entryprobe-` + 失败
+  // 回退转储响应体（dumpBodyOnError）、逐调用 15s 超时信号 ⇒ 工厂产物外包一层传 { signal }
+  // （member-stale-write 先例）。四参旧签名保留给下方既有调用点，调用点一字不动。
+  const rpcFactory = companyRpc({ fetch, base, cookie, prefix: 'entryprobe-', dumpBodyOnError: true })
+  const rpc = (b, ck, endpoint, args) => rpcFactory(endpoint, args, { signal: AbortSignal.timeout(15000) })
   const created = await rpc(base, cookie, 'session/create', { request: { cwd: ROOT, agentPreset: 'standard' } })
   if (created.agentPreset !== 'standard') throw new Error(`未创建 coding standard 会话：${created.agentPreset}`)
   sessionId = created.sessionId

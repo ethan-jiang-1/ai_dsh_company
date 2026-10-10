@@ -29,6 +29,7 @@
 // 前置：DSH_HOME + 已装 pack + 模型凭据。
 // 用法：source run/env.sh && node checks/smoke/delegation-smoke.mjs [--port 0] [--wall 180]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { spawn } from 'node:child_process'
 import { join, resolve } from 'node:path'
 import { collectText, readRecords } from '../../tools/lib/session-log.mjs'
@@ -46,7 +47,6 @@ const DELEGATE = process.argv.includes('--delegate')
 // 练习场 ≠ 运行场（轮间待办②）：默认 cwd 在排练场，排练/探针产物不再积进真盘；
 // `--cwd` 可显式覆盖（确需指回真盘时）。
 const CWD = resolve(arg('cwd', join(ROOT, REHEARSAL_REL)))
-const BOOT_TIMEOUT_MS = 120_000
 
 let home
 try {
@@ -58,50 +58,16 @@ try {
 if (!process.argv.includes('--cwd')) ensureRehearsalWorkspace(ROOT)
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
-let rpcId = 0
 const deadline = Date.now() + WALL_MS
 
-async function rpc(base, cookie, endpoint, args) {
-  const response = await fetch(`${base}/api/${endpoint}`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', cookie },
-    body: JSON.stringify({ type: 'client-request', rpcId: `deleg-${++rpcId}`, method: endpoint, payload: { args } }),
-  })
-  const body = await response.json()
-  if (body?.result?.ok !== true) {
-    const message = body?.result?.error?.message ?? JSON.stringify(body).slice(0, 200)
-    throw new Error(`${endpoint} 失败: ${message}`)
-  }
-  return body.result.value
-}
-
-async function boot() {
-  const child = spawn(
-    process.execPath,
-    ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', String(PORT), '--no-open'],
-    { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] },
-  )
-  let output = ''
-  const banner = new Promise((resolveBanner, rejectBanner) => {
-    const onData = (chunk) => {
-      output += String(chunk)
-      const match = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-      if (match !== null) resolveBanner({ port: Number(match[1]), token: match[2] })
-    }
-    child.stdout.on('data', onData)
-    child.stderr.on('data', onData)
-    child.on('exit', (code) => rejectBanner(new Error(`web 进程提前退出（code ${String(code)}）\n${output.slice(-800)}`)))
-    setTimeout(() => rejectBanner(new Error(`等待启动横幅超时\n${output.slice(-800)}`)), BOOT_TIMEOUT_MS)
-  })
-  return { child, ...(await banner) }
-}
-
-async function authenticate(port, token) {
-  const response = await fetch(`http://127.0.0.1:${String(port)}/?token=${token}`, { redirect: 'manual' })
-  const cookies = response.headers.getSetCookie?.() ?? []
-  if (cookies.length === 0) throw new Error('token 交换没有拿到 cookie')
-  return cookies.map(c => c.split(';')[0]).join('; ')
-}
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+// 既有差异当参数保留：空 cookie 即抛（onEmptyCookie: 'throw'）、rpcId 前缀 `deleg-` + 失败回退转储
+// 响应体（dumpBodyOnError；rpc 错误措辞统一为模块的 `${endpoint}: …`，boot 失败文案同——卡内
+// 接受的文本统一，判据标签与退出码不变）。askOnce 是模块顶层的既有调用点，用的是四参旧签名
+// rpc(base, cookie, endpoint, args) ⇒ 工厂留到 boot 后的 try 里赋值，包装适配器常驻模块层
+// 保留旧签名（base/cookie 由工厂闭包持有），调用点一字不动。
+let rpcFactory
+const rpc = (base, cookie, endpoint, args) => rpcFactory(endpoint, args)
 
 /** 发一条 prompt 并等**新的** `turn/end`（完成信号用持久事件，不用状态位——guides/dev-loop §9）。
  *  ⚠ 必须比较 turn/end 的**数量**：只看"有没有"会在第二次调用时立刻被上一次的 turn/end 满足
@@ -153,10 +119,10 @@ function toolRuns(records) {
 }
 
 const problems = []
-const { child, port, token } = await boot()
+const { child, base, token } = await startWeb({ spawn, root: ROOT, home, port: PORT })
 try {
-  const base = `http://127.0.0.1:${String(port)}`
-  const cookie = await authenticate(port, token)
+  const cookie = await companyCookie({ fetch, base, token, onEmptyCookie: 'throw' })
+  rpcFactory = companyRpc({ fetch, base, cookie, prefix: 'deleg-', dumpBodyOnError: true })
   const page = (request) => rpc(base, cookie, 'session/page', { request })
 
   console.log(`delegation-smoke: 预算 = 墙钟 ${String(WALL_MS / 1000)}s / prompt ${DELEGATE ? '2' : '1'} 条（${DELEGATE ? '边界守卫 + 真委派' : '边界守卫'}档）`)

@@ -16,6 +16,7 @@
 //   产物落排练场，真盘零接触）。
 // 用法：source run/env.sh && node checks/smoke/presence-e2e-smoke.mjs [--wall 600]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
@@ -28,7 +29,6 @@ const arg = (name, fallback) => {
 const WALL_MS = Number(arg('wall', '600')) * 1000
 const POLL_MS = 2_000
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
-const BOOT_TIMEOUT_MS = 120_000
 
 let home
 try {
@@ -40,21 +40,11 @@ try {
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 
-const child = spawn(process.execPath,
-  ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-  { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
-let output = ''
-const banner = await new Promise((res, rej) => {
-  const on = (c) => {
-    output += String(c)
-    const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-    if (m !== null) res({ port: Number(m[1]), token: m[2] })
-  }
-  child.stdout.on('data', on); child.stderr.on('data', on)
-  child.on('exit', (code) => rej(new Error(`web 提前退出 ${String(code)}\n${output.slice(-800)}`)))
-  setTimeout(() => rej(new Error(`等待启动横幅超时\n${output.slice(-800)}`)), BOOT_TIMEOUT_MS)
-})
-const base = `http://127.0.0.1:${String(banner.port)}`
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+// 既有差异当参数保留：空 cookie 静默拼空串（companyCookie 默认 'join'）、rpcId 前缀 `pe2e-` +
+// 失败回退转储响应体（dumpBodyOnError）；boot 失败文案统一为模块款（卡内接受的文本统一，
+// 退出码与清理路径不变）。
+const { child, base, token } = await startWeb({ spawn, root: ROOT, home })
 console.log(`web up: ${base}（cwd = ${REHEARSAL_REL}）`)
 
 const startedAt = Date.now()
@@ -65,17 +55,8 @@ const check = (label, ok, detail = '') => {
 }
 
 try {
-  const cookie = (await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual' })).headers.getSetCookie()?.map(c => c.split(';')[0]).join('; ') ?? ''
-  let rpcId = 0
-  const rpc = async (endpoint, args) => {
-    const response = await fetch(`${base}/api/${endpoint}`, {
-      method: 'POST', headers: { 'content-type': 'application/json', cookie },
-      body: JSON.stringify({ type: 'client-request', rpcId: `pe2e-${++rpcId}`, method: endpoint, payload: { args } }),
-    })
-    const body = await response.json()
-    if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? JSON.stringify(body).slice(0, 200)}`)
-    return body.result.value
-  }
+  const cookie = await companyCookie({ fetch, base, token })
+  const rpc = companyRpc({ fetch, base, cookie, prefix: 'pe2e-', dumpBodyOnError: true })
 
   /**
    * 读 Lead 会话的 `agentTeam` 投影（0.1.7 起 `agentTeams/view` RPC 已移除）。

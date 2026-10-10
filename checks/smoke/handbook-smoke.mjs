@@ -13,6 +13,7 @@
 // 前置：DSH_HOME + 已装 pack + 模型凭据（每个角色 1 次小调用）。
 // 用法：source run/env.sh && node checks/smoke/handbook-smoke.mjs [--roles ceo,vp-eng] [--port 0]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { spawn } from 'node:child_process'
 import { join, resolve } from 'node:path'
 import { collectText, readRecords } from '../../tools/lib/session-log.mjs'
@@ -29,7 +30,6 @@ const ROLES = arg('roles', 'ceo').split(',').map(role => role.trim()).filter(rol
 // `--cwd` 可显式覆盖。排练场的 AGENTS.md 是指向真盘手册的符号链接 ⇒ 注入基线仍是手册，
 // projectRootMarkers: [] ⇒ 指令链只认 cwd，不会向上混入开发仓库 AGENTS.md——断言语义不变。
 const CWD = resolve(arg('cwd', join(ROOT, REHEARSAL_REL)))
-const BOOT_TIMEOUT_MS = 120_000
 const BASELINE_TIMEOUT_MS = 120_000
 
 /** 手册里必须出现、且**只**可能来自 `company-workspace/AGENTS.md` 的字符串。 */
@@ -47,50 +47,6 @@ try {
 if (!process.argv.includes('--cwd')) ensureRehearsalWorkspace(ROOT)
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
-let rpcId = 0
-
-/** 向运行中的 web 实例发一条 Typert RPC（与 preset-smoke / probe-smoke 同一封套）。 */
-async function rpc(base, cookie, endpoint, args) {
-  const response = await fetch(`${base}/api/${endpoint}`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', cookie },
-    body: JSON.stringify({ type: 'client-request', rpcId: `handbook-${++rpcId}`, method: endpoint, payload: { args } }),
-  })
-  const body = await response.json()
-  if (body?.result?.ok !== true) {
-    const message = body?.result?.error?.message ?? JSON.stringify(body).slice(0, 200)
-    throw new Error(`${endpoint} 失败: ${message}`)
-  }
-  return body.result.value
-}
-
-async function boot() {
-  const child = spawn(
-    process.execPath,
-    ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', String(PORT), '--no-open'],
-    { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] },
-  )
-  let output = ''
-  const banner = new Promise((resolveBanner, rejectBanner) => {
-    const onData = (chunk) => {
-      output += String(chunk)
-      const match = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-      if (match !== null) resolveBanner({ port: Number(match[1]), token: match[2] })
-    }
-    child.stdout.on('data', onData)
-    child.stderr.on('data', onData)
-    child.on('exit', (code) => rejectBanner(new Error(`web 进程提前退出（code ${String(code)}）\n${output.slice(-800)}`)))
-    setTimeout(() => rejectBanner(new Error(`等待启动横幅超时\n${output.slice(-800)}`)), BOOT_TIMEOUT_MS)
-  })
-  return { child, ...(await banner) }
-}
-
-async function authenticate(port, token) {
-  const response = await fetch(`http://127.0.0.1:${String(port)}/?token=${token}`, { redirect: 'manual' })
-  const cookies = response.headers.getSetCookie?.() ?? []
-  if (cookies.length === 0) throw new Error('token 交换没有拿到 cookie')
-  return cookies.map(c => c.split(';')[0]).join('; ')
-}
 
 /** 等指令基线事件出现（它由首个请求的 pre-step 追加，早于模型回复）。 */
 async function waitBaseline(page, address, deadline) {
@@ -113,10 +69,16 @@ const check = (label, fn) => fn().then(
   (error) => { failures.push(`${label}: ${error.message}`); console.log(`  FAIL ${label}: ${error.message}`) },
 )
 
-const { child, port, token } = await boot()
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+// 既有差异当参数保留：--port 走 PORT（默认 0）、空 cookie 即抛（onEmptyCookie: 'throw'）、rpcId 前缀
+// `handbook-` + 失败回退转储响应体（dumpBodyOnError；rpc 错误措辞统一为模块的 `${endpoint}: …`，
+// boot 失败文案同——卡内接受的文本统一，判据标签与退出码不变）。
+const { child, base, token } = await startWeb({ spawn, root: ROOT, home, port: PORT })
 try {
-  const base = `http://127.0.0.1:${String(port)}`
-  const cookie = await authenticate(port, token)
+  const cookie = await companyCookie({ fetch, base, token, onEmptyCookie: 'throw' })
+  // 四参旧签名保留给下方既有调用点（base/cookie 已由工厂闭包持有），调用点一字不动。
+  const rpcFactory = companyRpc({ fetch, base, cookie, prefix: 'handbook-', dumpBodyOnError: true })
+  const rpc = (b, ck, endpoint, args) => rpcFactory(endpoint, args)
 
   for (const role of ROLES) {
     await check(`${role} 注入公司手册（且不是开发仓库的 AGENTS.md）`, async () => {

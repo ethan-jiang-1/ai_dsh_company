@@ -6,7 +6,7 @@
 
 | 卡 | 期望结果 | 状态 |
 |---|---|---|
-| [下游：checks/smoke 十个 web 启动块同款收成](2026-10-10-smoke-boot-extraction.md) | 10 个 smoke 的启动块收进 tools/lib/probe-web.mjs，判据与请求形状不变 | 推敲中（已获实施授权） |
+| （无活跃卡） | | |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)。
 

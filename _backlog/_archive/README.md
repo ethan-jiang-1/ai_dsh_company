@@ -21,6 +21,7 @@
 | [2026-10-10-plain-language-closing.md](settled_issues/2026-10-10-plain-language-closing.md) | 已实施并真验收通过（说人话收口：四模板一分钟摘要 + present description 通道） | 2026-10-10 |
 | [2026-10-10-multi-instance-guard.md](settled_issues/2026-10-10-multi-instance-guard.md) | 已实施并双实例实测通过（多实例警告横幅）；跨浏览器检测边界如需另立卡 | 2026-10-10 |
 | [2026-10-10-extract-without-behavior-change.md](settled_issues/2026-10-10-extract-without-behavior-change.md) | 已实施并验收通过（探针 web 启动与 backlog 活状态收成模块，行为不变） | 2026-10-10 |
+| [2026-10-10-smoke-boot-extraction.md](settled_issues/2026-10-10-smoke-boot-extraction.md) | 已实施并验收通过（10 个 smoke 启动块迁 probe-web，两处钉值未动） | 2026-10-10 |
 | [2026-10-10-proactive-wake-loop.md](settled_issues/2026-10-10-proactive-wake-loop.md) | 已实施并拍板 B（保持 ask+开局预热；机制全通：schedule 主动唤醒 + HITL 正确跳出） | 2026-10-10 |
 | [2026-09-29-collab-mechanism-evidence.md](settled_issues/2026-09-29-collab-mechanism-evidence.md) | 消化；证据归消费卡与 probe | 2026-10-03 |
 | [2026-09-29-date-channel-mechanism.md](settled_issues/2026-09-29-date-channel-mechanism.md) | 已实施并获追认 | 2026-10-03 |

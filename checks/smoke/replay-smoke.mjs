@@ -30,6 +30,7 @@
 // 分层（guides/dev-loop §9.1 + readiness P1.4）：第三档（无 key、但要起进程与浏览器），不进 pnpm test。
 // 预算（§10）：墙钟 ≤ --wall。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { spawn, spawnSync } from 'node:child_process'
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
@@ -100,7 +101,6 @@ const goldenUi = join(replayDir, 'ui.expected.md')
 /** vendor suite.ts 的 sidecar 命名：lead 无后缀，child 按 fixture 序号（session.1 → .1）。 */
 const sidecarPrompt = (index) => join(replayDir, index === 0 ? 'system-prompt.expected.md' : `system-prompt.${String(index)}.expected.md`)
 const sidecarTools = (index) => join(replayDir, index === 0 ? 'tool-schemas.expected.json' : `tool-schemas.${String(index)}.expected.json`)
-const BOOT_TIMEOUT_MS = 120_000
 
 const records = (text) => text.split(/\r?\n/).filter(l => l.trim() !== '').map(l => JSON.parse(l))
 const headerOf = (text) => records(text)[0] ?? {}
@@ -293,44 +293,31 @@ async function driveScenario({ patchSource, env, tasks }) {
     copyFileSync(env.credentials, join(runRoot, '.dsh', '.credentials.yaml'))
     delete env.credentials
   }
-  const child = spawn(process.execPath,
-    ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--patch', patch, ...PRESET_PATCHES, '--', '--port', '0', '--no-open'],
-    {
-      cwd: ROOT,
+  // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+  // 既有差异当参数保留：场景 patch + 五个预设行 ⇒ patch 数组；空 cookie 静默拼空串（companyCookie
+  // 默认 'join'）；rpcId 前缀 `replay-` + 失败回退转储响应体（dumpBodyOnError）。banner 等待与
+  // 600 上限的失败转储已收进模块：失败文案统一为模块款、输出上限 16000（卡内接受，报告已注记）。
+  // 注入的 spawn 顺手捕获 child——boot 失败（banner 等不到）时下方 catch 仍能 kill（team-concurrency 先例）。
+  let child
+  try {
+    const { base, token } = await startWeb({
+      spawn: (...args) => (child = spawn(...args)),
+      root: ROOT,
+      home: join(runRoot, '.dsh'),
       env: {
         ...process.env,
-        DSH_HOME: join(runRoot, '.dsh'),
         DSH_AGENTS_HOME: join(runRoot, '.agents'),
         ...env,
         NODE_OPTIONS: [process.env.NODE_OPTIONS, '--disable-warning=ExperimentalWarning'].filter(Boolean).join(' '),
       },
-      stdio: ['ignore', 'pipe', 'pipe'],
+      // PRESET_PATCHES 是 '--patch'/路径交错的平铺表（上方 spawnSync CLI lane 复用同一常量，不重构它）；
+      // filter 取奇数位 = 平铺表里的路径项。
+      patch: [patch, ...PRESET_PATCHES.filter((_, i) => i % 2 === 1)],
+      port: 0,
     })
-  let output = ''
-  try {
-    const banner = await new Promise((resolveBanner, rejectBanner) => {
-      const onData = (chunk) => {
-        output += String(chunk)
-        const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-        if (m !== null) resolveBanner({ port: Number(m[1]), token: m[2] })
-      }
-      child.stdout.on('data', onData); child.stderr.on('data', onData)
-      child.on('exit', (code) => rejectBanner(new Error(`web 提前退出 code ${String(code)}\n${output.slice(-600)}`)))
-      setTimeout(() => rejectBanner(new Error(`boot 超时\n${output.slice(-600)}`)), BOOT_TIMEOUT_MS)
-    })
-    const base = `http://127.0.0.1:${String(banner.port)}`
-    const url = `${base}/?token=${banner.token}` // 浏览器档直接带 token 进页面
-    const cookie = (await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual' })).headers.getSetCookie()?.map(c => c.split(';')[0]).join('; ') ?? ''
-    let rpcId = 0
-    const rpc = async (endpoint, args) => {
-      const response = await fetch(`${base}/api/${endpoint}`, {
-        method: 'POST', headers: { 'content-type': 'application/json', cookie },
-        body: JSON.stringify({ type: 'client-request', rpcId: `replay-${++rpcId}`, method: endpoint, payload: { args } }),
-      })
-      const body = await response.json()
-      if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? JSON.stringify(body).slice(0, 200)}`)
-      return body.result.value
-    }
+    const url = `${base}/?token=${token}` // 浏览器档直接带 token 进页面
+    const cookie = await companyCookie({ fetch, base, token })
+    const rpc = companyRpc({ fetch, base, cookie, prefix: 'replay-', dumpBodyOnError: true })
     const created = await rpc('session/create', { request: { cwd: workspace, agentPreset: 'ceo' } })
     const sessionId = created.sessionId
     const readPage = async () => {

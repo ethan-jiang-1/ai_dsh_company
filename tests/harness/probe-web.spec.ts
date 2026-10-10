@@ -107,6 +107,22 @@ describe('startWeb：进程参数与 banner 解析', () => {
     child.emit('exit', 3)
     await expect(started).rejects.toThrow(/web 提前退出 3/)
   })
+
+  it('child error 事件被接住转为拒绝（不是未处理异常）；banner 解析后 120s 定时器被清掉', async () => {
+    const { spawn, child } = fakeSpawn()
+    const started = startWeb({ spawn, root: '/repo', home: '/repo/h', port: 0 })
+    child.emit('error', new Error('spawn ENOENT'))
+    await expect(started).rejects.toThrow(/ENOENT/)
+    // 定时器清理：解析成功后 pending 的 boot 定时器不应再挂着
+    const { spawn: s2, child: c2, emit } = fakeSpawn()
+    vi.useFakeTimers()
+    const done = startWeb({ spawn: s2, root: '/repo', home: '/h', port: 0 })
+    emit(BANNER)
+    await done
+    // 若定时器未清，这里会再等 120s（fake timer 下即抛）；已清则立刻返回
+    await vi.advanceTimersByTimeAsync(200_000)
+    vi.useRealTimers()
+  })
 })
 
 describe('companyCookie：token 交换', () => {
@@ -185,5 +201,21 @@ describe('companyRpc：请求形状', () => {
     const second = companyRpc({ base: 'http://127.0.0.1:2', cookie: '', fetch: fetchImpl, prefix: 'trp-', counter })
     await second('c', {})
     expect(ids).toEqual(['trp-1', 'trp-2', 'trp-3'])
+  })
+
+  it('dumpBodyOnError：message 缺失时回退转储响应体前 200 字符（7 个 smoke 的既有形态）', async () => {
+    const fetchImpl = vi.fn(async () => ({
+      json: async () => ({ result: { ok: false, error: {}, extra: 'x'.repeat(300) } }),
+    }))
+    const rpc = companyRpc({ base: 'http://127.0.0.1:1', cookie: '', fetch: fetchImpl, prefix: 'smoke-', dumpBodyOnError: true })
+    await expect(rpc('session/create', {})).rejects.toThrow(
+      `session/create: ${JSON.stringify({ result: { ok: false, error: {}, extra: 'x'.repeat(300) } }).slice(0, 200)}`,
+    )
+    // 有 message 时仍优先 message（与 smoke 的 `message ?? 转储` 同序）
+    const withMessage = companyRpc({
+      base: 'http://127.0.0.1:1', cookie: '', dumpBodyOnError: true, prefix: 'smoke-',
+      fetch: vi.fn(async () => ({ json: async () => ({ result: { ok: false, error: { message: 'boom' } } }) })),
+    })
+    await expect(withMessage('x', {})).rejects.toThrow('x: boom')
   })
 })

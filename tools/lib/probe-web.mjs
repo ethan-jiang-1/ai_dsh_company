@@ -52,15 +52,19 @@ export function startWeb({ spawn: spawnProcess, root, home, env = process.env, p
     { cwd: root, env: home === undefined ? { ...env } : { ...env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
   let output = ''
   return new Promise((res, rej) => {
+    const settle = fn => value => { clearTimeout(timer); fn(value) }
     const on = chunk => {
-      output += String(chunk)
+      // 输出上限 16000 字符（entry-probe-smoke 既有形态）：防失败路径上无界累积，成功路径无影响。
+      output = `${output}${String(chunk)}`.slice(-16_000)
       const match = BANNER_RE.exec(output)
-      if (match) res({ child, port: Number(match[1]), token: match[2], base: `http://127.0.0.1:${match[1]}` })
+      if (match) settle(res)({ child, port: Number(match[1]), token: match[2], base: `http://127.0.0.1:${match[1]}` })
     }
     child.stdout.on('data', on)
     child.stderr.on('data', on)
-    child.on('exit', code => rej(new Error(`web 提前退出 ${String(code)}`)))
-    setTimeout(() => rej(new Error('boot 超时：未在输出里读到 banner')), BOOT_TIMEOUT_MS)
+    child.on('exit', code => settle(rej)(new Error(`web 提前退出 ${String(code)}`)))
+    // spawn 失败（如 ENOENT）发 error 事件；不接会变成未处理异常（entry-probe-smoke 既有防护）。
+    child.once('error', error => settle(rej)(error))
+    const timer = setTimeout(() => settle(rej)(new Error('boot 超时：未在输出里读到 banner')), BOOT_TIMEOUT_MS)
   })
 }
 
@@ -93,13 +97,16 @@ export async function companyCookie({ fetch: fetchImpl, base, token, onEmptyCook
  * @param {string} options.prefix - rpcId 前缀（`mip-` / `tcp-` / `trp-` …）——由调用方传入，不推导。
  * @param {string} [options.errorFallback] - `result.error.message` 缺失时的回退文案；
  *   既有探针两种写法（`'unknown'` 多数 / `'?'` 8 个）都当参数保留，默认 `'unknown'`。
+ * @param {boolean} [options.dumpBodyOnError] - true 时 message 缺失的回退改为
+ *   `JSON.stringify(body).slice(0, 200)`（7 个 smoke 的既有形态：失败时响应体是唯一线索，
+ *   静态文案会丢诊断信息）。默认 false = 探针面现状。
  * @param {{n: number}} [options.counter] - rpcId 计数器。默认每个实例自持一个（从 1 开始）；
  *   **起两次 web 且要沿用同一条编号序列的调用方**（team-recovery：重启后 rpcId 继续往下数，
  *   不重置）传同一个对象共享。
  * @returns {(endpoint: string, args: object, options?: {signal?: AbortSignal}) => Promise<any>}
  *   默认**不加**超时信号；要超时的调用方自己传 `{ signal }`。
  */
-export function companyRpc({ fetch: fetchImpl, base, cookie, prefix, errorFallback = 'unknown', counter = { n: 0 } } = {}) {
+export function companyRpc({ fetch: fetchImpl, base, cookie, prefix, errorFallback = 'unknown', dumpBodyOnError = false, counter = { n: 0 } } = {}) {
   return async (endpoint, args, { signal } = {}) => {
     const response = await fetchImpl(`${base}/api/${endpoint}`, {
       method: 'POST', headers: { 'content-type': 'application/json', cookie },
@@ -107,7 +114,7 @@ export function companyRpc({ fetch: fetchImpl, base, cookie, prefix, errorFallba
       ...(signal === undefined ? {} : { signal }),
     })
     const body = await response.json()
-    if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? errorFallback}`)
+    if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? (dumpBodyOnError ? JSON.stringify(body).slice(0, 200) : errorFallback)}`)
     return body.result.value
   }
 }
