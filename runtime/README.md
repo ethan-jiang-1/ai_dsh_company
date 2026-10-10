@@ -1,7 +1,7 @@
 # runtime/ —— 运行残留家（gitignored，不是版本控制面、不是证据权威）
 
 > 2026-10-06 条目 A拆分（RFC driver-surface-package）：跑过留下的状态全部住这里，「怎么启动」的
-> tracked 配置住 [dev/](../run/README.md)。本文件是 runtime/ 树逐件的分类 owner。
+> tracked 配置住 [run/](../run/README.md)。本文件是 runtime/ 树逐件的分类 owner。
 > ⚠ 本树全部 gitignored——fresh clone 后为空属正常，运行态按需再生；不是公司业务事实，也不是证据快照
 > （四条状态轴的家 = [运行态地图](../docs/runtime-map.md)）。
 

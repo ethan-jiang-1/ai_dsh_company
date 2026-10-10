@@ -34,7 +34,7 @@ isPlaceholderYield(body) === true   // 让位  ← 两者本该互斥（BUG-004 
 
 1. **守卫声明** = 某个 `describe('…')` / `it('…')` 的**标题里带 `BUG-nnn`**。
    标题是"我在这里守一条具体不变量"的正式声明。
-2. **事故必须可解析** = `BUG-nnn` 要对得到 `_backlog/_done/_fixed_bugs/BUG-nnn-*.md` 真卡
+2. **事故必须可解析** = `BUG-nnn` 要对得到 `_backlog/_archive/fixed_bugs/BUG-nnn-*.md` 真卡
    （悬空编号 = 声称守一个不存在的过去 → 红）。
 3. **每个声明必须有自己的负例留证** = 文件里有 `// 负例留证 YYYY-MM-DD：…BUG-nnn…`
    （**按编号对齐**——一篇 spec 守 N 个事故就要 N 条，不许一条笼统行糊过去）。

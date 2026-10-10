@@ -44,7 +44,7 @@
 
 | 死指针目标 | 次数 | 现行家 |
 |---|---|---|
-| notes/research（**已退役**） | 12 | 退役并入 `_backlog/plans/` + `_backlog/reference/`（D30/D31） |
+| notes/research（**已退役**） | 12 | 退役并入 `_backlog/issues/` + `_backlog/research/`（D30/D31） |
 | notes/intents.md（**已退役**） | 4 | 曾冻进月度表；2026-10-09 清扫删表，历史在 git（D34） |
 | `packages/preset/agent-presets/*` | 9 | vendor 上游重新分包（本仓路径改写即可） |
 | `tests/*.spec.ts`（根级） | ~18 | 已分子目录：`tests/client/`、`tests/presets/`、`tests/harness/`、`tests/company/` |
@@ -62,7 +62,7 @@
 - **此日之前的存量**：祖父豁免（历史负债）。一次性判红 122 处会逼出一场大清理，而目标不是清理一次，
   是建立一条**会自己维持**的规矩。这与 `notes-liveness` 的存量口径一致（2026-10-05 立，同款豁免）。
 - **仍是观察档**：`notes/postmortem/`（DSH 语料明说它是**唯一**该有 war-story narrative 的层）+
-  明确冻结的 `_backlog/_done/`（不是任务源，dev-loop §0.5）。
+  明确冻结的 `_backlog/_archive/`（不是任务源，dev-loop §0.5）。
 
 配套：**负例假路径记号 `zz-`/`zzz-`**。负例必须逐字可复现，因此必然写出「形状上像死路径」的字符串；
 静态扫描分不开它与真腐化（N5 生效后头两条命中就是我自己 Note 里的负例）。约定 = 假路径带 `zz+-`，

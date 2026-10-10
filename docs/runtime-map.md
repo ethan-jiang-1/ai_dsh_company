@@ -16,7 +16,7 @@ repo（pnpm dsh；代码唯一权威 = vendor/dsh 钉 SHA 只读）
   → 浏览器 client（client 入口：品牌 / 卡片 / 公司视图页签）
   → 人连接工作区（session cwd = company-workspace/）
   → session/create（选 agentPreset）
-  → preset persona / 工具 / skills 进会话（自包含组合，无继承）
+  → preset persona / 工具 / skills 进会话（自包含组合，无继承；spawn 成员例外见下段）
   → vendor agent loop（机制属 vendor，本仓不拥有）
   → 会话日志（$DSH_HOME/sessions/<slug>/<id>/；世代选择唯一口径 = session-log-generation）
   → workspace 产物（手册 / KB / drafts / final / journal）
@@ -25,7 +25,8 @@ repo（pnpm dsh；代码唯一权威 = vendor/dsh 钉 SHA 只读）
 
 并列的三种面别混：**headless 通用 CLI**（无 preset 装配——只证明 CLI 本身）；**Web 观察窗**（完整公司面）；
 **会话四形态**（独立 preset 根会话 / CEO Lead / teammate / 命名 child——来源矩阵见
-[presets.md](presets.md)；**名字像 VP-Eng ≠ 加载了 VP-Eng preset**）。
+[presets.md](presets.md)；**名字像 VP-Eng ≠ 加载了 VP-Eng preset**；spawn 成员**继承 Lead 组合**
+≠ 根会话的「自包含、无继承」——分水岭 = [roles-isolation §2](design/roles-isolation.md)）。
 
 ## 二、四条状态轴（权威位置、生命周期、不能从这里推断什么）
 

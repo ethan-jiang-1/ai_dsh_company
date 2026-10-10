@@ -5,7 +5,9 @@
 > 来源：FAQ 13 `dev-loop.md` + `dual-home-isolation.md`（repo 外研究材料，落点登记见
 > [index.md](../index.md) §外部研究材料登记）；机制结论以 `vendor/dsh/` 工作树为权威，
 > 本篇引用的旗标与行为均已在**钉住的 vendor 基线**上核对——基线版本与 SHA 的唯一事实家 = 根
-> `AGENTS.md` §vendor 簿记（升 pin 时的重校记录 = pin-upgrade Note（已删，历史在 git））。
+> `AGENTS.md` §vendor 簿记（升 pin 时的重校记录 = [pin-upgrade Note](../../notes/implemented/2026-09-30-pin-upgrade-0.2.0-rc.2.md)，本仓现行先例；其 delta 长文已删，历史在 git）。
+> 行注记 `R1`–`R5b` = 已退役轮次制（D11）的**历史出处标记**，只作 git 考古索引、不承载现行义务；
+> 与 snapshots 场景号（`replay/r1-motion`…）是两套序号，别互推。
 
 ## 0. 开发环导航
 

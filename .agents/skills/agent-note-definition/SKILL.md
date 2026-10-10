@@ -16,7 +16,7 @@ description: Use when writing or updating a file under notes/ and before claimin
    - 都没搜就写 = 大概率造出第二本账（D34/D36 两次实地案例）。
 2. **定生命周期与位置。** 决定**已随本次变更落地** → 直接 `implemented/`（不必从 `proposed/` 起）；
    提案**尚未实施** → `proposed/`，且状态行必须带「批准：」标记 + 有「## 验收」节（两道门禁查）；
-   被否 → `rejected/`。未成熟的思考不进 `notes/`，住 `_backlog/plans/` 推敲卡。
+   被否 → `rejected/`。未成熟的思考不进 `notes/`，住 `_backlog/issues/` 推敲卡。
 3. **写四件**：决定 / **输掉的方案**（必载——没写击败了什么的决定会重新开讼）/ 后果 / **验证**。
    备选只记录真实考虑过的，不编造。
 4. **验证必须来自真跑过的命令**，写明命令、断言什么、**红长什么样**——让实施者不看对话就能复现。

@@ -337,7 +337,7 @@ const WARN_FILES = (() => {
   })
   return [...walkMd(join(root, 'notes/postmortem')), ...walkMd(join(root, '_backlog/_archive'))]
 })()
-const TOP_DIRS = ['notes/', 'docs/', 'checks/', 'probes/', 'tools/', 'packages/', 'snapshots/', 'run/', 'runtime/', 'tests/', 'company-workspace/', 'vendor/']
+const TOP_DIRS = ['notes/', 'docs/', 'checks/', 'probes/', 'tools/', 'packages/', 'snapshots/', 'run/', 'runtime/', 'tests/', 'company-workspace/', 'vendor/', '_backlog/']   // 2026-10-10 补 '_backlog/'：NOW_FILES 本就含 _backlog 活跃卡，此前漏它 = 扫描面内一半路径从未被存在性检查（retired-path 门禁同轮立的同源盲区）
 const RUNTIME_PREFIXES = ['runtime/harness-home', 'runtime/harness-home-b', 'runtime/rehearsal-workspace', 'runtime/pw-browsers', '.pnpm-store']   // gitignored 运行态（2026-10-06 条目 A：dev/ 拆分，运行残留随迁顶层 runtime/）
 // 双树查：本仓根 **或** vendor/dsh 命中即过（AGENTS 纪律表的"权威（vendor 树）"列合法使用 vendor 相对写法）。
 // 白名单 = 历史性退役路径的叙述性提及（自带"现迁至…"说明的历史段）。
@@ -383,6 +383,52 @@ if (!barePathBad) {
       + '记录**当时**事实的档案，里面引的路径当时是对的——**改它就是篡改记录**，故只提醒不判红）：')
     for (const w of barePathWarn) console.log(`    ${w}`)
   }
+}
+
+// ── 2d-ter. 退役路径门禁（retired-path，2026-10-10 立）────────────────────────────
+// 为什么：目录改名后，旧前缀会在 bare-path 三个盲区里全绿存活——① TOP_DIRS 曾漏 `_backlog/`（同轮补）；
+// ② glob/占位内容被 `[*<>…{}]` 过滤跳过（`BUG-nnn-*.md` 类）；③ `.agents/skills/`、checks/README、
+// run/README 不在 NOW_FILES 扫描面。实测 2026-10-10 一轮清出五处改名残留（agent-note-definition skill 的
+// 旧 plans 池、guard-red-record 与 pack README 的旧 _done 池、runtime README 的 dev/ 字面量、
+// currency Note 表行旧池名），门禁全绿通过——错误类复发过（2026-10-09 backlog 大改名一轮即产）、
+// 可机械判定，符合门禁升格判据（dev-loop §9）。
+// 规则：**活跃面**（= NOW_FILES ∪ `.agents/skills/**` ∪ checks/README.md ∪ run/README.md）的反引号内容
+// 命中退役前缀 → 红，失败信息点名文件:行与现行家。**退役前缀清单唯一家 = 下面的数组**（D28：枚举的家 =
+// 实现自己；Note 与文档描述本门禁时不逐字复述清单）。归档树（postmortem / _backlog/_archive /
+// notes/archived）不扫——记录当时事实的档案，判红即逼篡改记录（与 bare-path 观察档同边界）。
+// 负例留证 2026-10-10（实跑原话）：docs/orient.md 临时插负例A（反引号内旧 plans 池前缀路径）→
+//   `FAIL retired-path: docs/orient.md:61 → \`_backlog/plans/zz-demo.md\` 用了退役路径——改指现行家 \`_backlog/issues/\``；
+//   还原即绿。豁免方向：同一行放进 notes/archived/ 临时文件 → retired-path 不红（不在扫描面；探针文件已删）。
+// 同轮 TOP_DIRS 补 `'_backlog/'` 的红证：负例B（反引号内不存在路径）→
+//   `FAIL bare-path: docs/orient.md:62 → \`_backlog/issues/2026-99-99-nonexistent.md\` 不存在（双树均无……）`；还原即绿。
+{
+  const walkMd3 = (dir) => !existsSync(dir) || !lstatSync(dir).isDirectory() ? [] : readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+    const p = join(dir, entry.name)
+    if (entry.isDirectory()) return ['node_modules', '.git', 'lib'].includes(entry.name) ? [] : walkMd3(p)
+    return entry.name.endsWith('.md') ? [p.slice(root.length + 1)] : []
+  })
+  const RETIRED_PATH_PREFIXES = [
+    ['_backlog/_done', '_backlog/_archive'],
+    ['_backlog/plans/', '_backlog/issues/'],
+  ]
+  const retiredScanFiles = [...new Set([
+    ...NOW_FILES, ...walkMd3(join(root, '.agents/skills')), 'checks/README.md', 'run/README.md',
+  ])].filter(f => existsSync(join(root, f)))
+  let retiredBad = false
+  for (const rel of retiredScanFiles) {
+    const lines = readFileSync(join(root, rel), 'utf8').split('\n')
+    lines.forEach((line, i) => {
+      for (const m of line.matchAll(/`([^`\n]+)`/g)) {
+        for (const [retired, current] of RETIRED_PATH_PREFIXES) {
+          if (m[1].includes(retired)) {
+            retiredBad = true
+            fail('retired-path', `${rel}:${i + 1} → \`${m[1]}\` 用了退役路径——改指现行家 \`${current}\``)
+          }
+        }
+      }
+    })
+  }
+  if (!retiredBad) ok(`retired-path ×${retiredScanFiles.length} 文件（退役目录前缀扫描：活跃面零残留）`)
 }
 
 // ── 2e. pin 版本一致性门禁（2026-09-26 立，技术债清扫 B2/B3/B4 类）───────────────
