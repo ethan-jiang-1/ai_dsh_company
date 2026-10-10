@@ -22,14 +22,18 @@ schedule.json 可审计）+ playbook 第 8 步。**未验证：schedule 工具�
 （从未驱动真会话调用过；头部证据 = 源码 + 服务挂载）。
 
 **未决问题：**
-1. 真会话探针：创建 CEO 会话调 schedule 工具立 60s 提醒 → schedule.json 出现条目 → 到点
-   follow-up 是否真回会话（决定性验证；此前卡在 send-message RPC 形状未定位）。
+1. ~~真会话探针~~ **已解决（2026-10-10 12:40 实测）**：`runtime/probe-schedule.mjs`（一次性探针，gitignored）——
+   真 CEO 会话经 `session/prompt`（`{ requestId, sessionId, mode:'queue', content:[{type:'text',text}] }`）让模型
+   用 schedule 工具立 `after 60s` 提醒 → **schedule.json 出现 probe-wake 任务（绑原 sessionId）** →
+   到点 **follow-up 已送达原会话**（lastDelivery 现态）。主动唤醒闭环端到端全通 ⇒ 早上的空头支票
+   纯属"说了没做"（工具一直在场），闸门④审计即为全部解药。
 2. follow-up 回原会话时的窗口呈现：用户不在场时是积累还是丢失（"卡是实时事件、刷新即丢"的
-   已知边界对 follow-up 是否同样成立）？
+   已知边界对 follow-up 是否同样成立）？——**待人拍板**。
 3. "查料 → 复算"的 follow-up prompt 模板（查 `sources/` 有料 → 重启动议；无料 → 顺延再立）。
 4. 审计判据挂哪：deliverables-check 扫「待补料」↔ schedule.json 交叉核对（行动幻觉 = 违规）？
 
-**下一步：** 真会话探针（未决 1）→ 模板定稿（3）→ 审计判据（4）→ 真盘一单带待补料的动议全链验证。
+**下一步：** 拍板（未决 2 + 卡②姿势 + BUG-008 口径，一次打包）→ 模板定稿（3）→ 审计判据（4）→
+真盘一单带待补料的动议全链验证。
 
 ## 范围与排除项
 
