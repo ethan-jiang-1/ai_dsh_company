@@ -18,6 +18,7 @@
 | [2026-09-28-dag-edge-routing.md](settled_issues/2026-09-28-dag-edge-routing.md) | 已实施；决定稿已删，历史在 git | 2026-09-28 |
 | [2026-09-28-float-geometry-memory.md](settled_issues/2026-09-28-float-geometry-memory.md) | 已实施；决定稿已删，历史在 git | 2026-09-28 |
 | [2026-09-28-sidebar-split-budget.md](settled_issues/2026-09-28-sidebar-split-budget.md) | 不做 | 2026-09-28 |
+| [2026-10-10-plain-language-closing.md](settled_issues/2026-10-10-plain-language-closing.md) | 已实施并真验收通过（说人话收口：四模板一分钟摘要 + present description 通道） | 2026-10-10 |
 | [2026-09-29-collab-mechanism-evidence.md](settled_issues/2026-09-29-collab-mechanism-evidence.md) | 消化；证据归消费卡与 probe | 2026-10-03 |
 | [2026-09-29-date-channel-mechanism.md](settled_issues/2026-09-29-date-channel-mechanism.md) | 已实施并获追认 | 2026-10-03 |
 | [2026-09-29-deliverables-lifecycle-metadata.md](settled_issues/2026-09-29-deliverables-lifecycle-metadata.md) | 已实施并记录于 Note | 2026-10-03 |
