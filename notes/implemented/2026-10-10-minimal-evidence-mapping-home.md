@@ -27,7 +27,8 @@ fresh-agent 审计（本日）发现三类结构性问题：
 
 ## 后果
 
-testing.md 降至约 71/75（顶格缓解一档）；tests/README 成为行级映射单家（骨架锚点 persona / client 面板 / 读模型 / 检查与工具入口由 navigation-assets spec 继续钉住）；runtime-map、notes/README、orient、根 AGENTS.md 对「查表去 tests/README、政策去 testing.md」的既有指针全部仍然成立，无需改。
+testing.md 降至约 71/75（顶格缓解一档）；tests/README 成为行级映射单家（骨架锚点 persona / client 面板 / 读模型 / 检查与工具入口由 navigation-assets spec 继续钉住）；runtime-map、orient、根 AGENTS.md 对「查表去 tests/README、政策去 testing.md」的既有指针仍然成立，无需改。
+⚠ **纠正（2026-10-10 独立盲审实测抓到，同轮已修）**：上句对 `notes/README.md` 的指控**不成立**——该文件那行问的是「改动面 → 最小证据**选择**」（= 已迁走的**行级映射**），却仍单点指 `testing.md §2`（现只剩政策），fresh agent 照它点进去选检查会扑空。已改指 `tests/README.md`（政策指针另列）。**教训**：迁移后「既有指针是否仍成立」要按**每处指针的语义意图**逐条核（它想取的是被迁走的东西、还是留下的东西），不能按"关键词仍在目标文件出现"批量判成立。
 
 ## 验证
 
