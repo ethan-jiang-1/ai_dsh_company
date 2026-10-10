@@ -22,8 +22,10 @@ description: CEO 的外部取证打法清单：动议要外部事实时的换通
 6. **浏览器兜底**：JS 重页面 / 反爬站用 browser-use（真实 Chromium）——curl 拿不到再上，成本最高。
 7. **DoH + IP 直连（TLS SNI 墙时的招）**：`curl -sS 'https://223.5.5.5/resolve?name=<域>&type=A'`
    拿真 IP，再 `curl --resolve <域>:443:<IP>` 钉 SNI（上轮取证已验证网络层可用）。
-8. **HITL（最后手段）**：以上穷尽仍拿不到 ⇒ 走「事实阻塞闸门」：任务标**「待补料」**、
-   发一张补料卡（料落 `deliverables/<slug>/drafts/sources/`）——**不许跳过 1-7 直接求助人**。
+8. **HITL（最后手段）+ 主动唤醒**：以上穷尽仍拿不到 ⇒ 走「事实阻塞闸门」：任务标**「待补料」**、
+   发一张补料卡（料落 `deliverables/<slug>/drafts/sources/`），**并用 schedule 工具立一条真跟进**
+   （如 after 2h：查 `sources/` 是否有料，有则复算）——到点 follow-up 自动回本会话，**不等踢**；
+   口头"已立提醒"而无任务为证 = 行动幻觉（schedule.json 可审计）。
 
 ## 落盘形状
 

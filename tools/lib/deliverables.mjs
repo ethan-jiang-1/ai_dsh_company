@@ -29,6 +29,7 @@ export const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
 /** 成品文件名与过程稿目录名（三态的字面约定）。 */
 export const FINAL_BASENAME = 'final.md'
 export const DRAFTS_DIRNAME = 'drafts'
+export const SOURCES_DIRNAME = 'sources'
 
 /** 活跃根与归档根（C1，2026-10-03 拍板：收敛件整目录 git mv 进归档家，判据跟随扩根——T-11 处置 = 跟随扩根）。 */
 export const ACTIVE_ROOT = 'deliverables/'
@@ -241,7 +242,7 @@ export function deliverableId(relPath) {
  * 判一个**盘上文件**的形状合法性（与 `deliverableId` 分开：这里才管"允不允许平铺"）。
  * @param relPath - 工作区相对路径（正斜杠）。
  * @param options - `legacyFlat: true` 时把平铺旧形状也算合法（只给已归档快照用）。
- * @returns `{ state, slug, role? }`；`state` ∈ `final` / `draft` / `other`。
+ * @returns `{ state, slug, role? }`；`state` ∈ `final` / `draft` / `meta` / `source` / `other`。
  */
 export function classifyDeliverable(relPath, options = {}) {
   const path = normalizeRel(relPath)
@@ -249,6 +250,12 @@ export function classifyDeliverable(relPath, options = {}) {
   if (root === undefined || !path.endsWith('.md')) return { state: 'other' }
   const flat = !path.slice(root.length).includes('/')
   if (flat && (root === ARCHIVE_ROOT || options.legacyFlat !== true)) return { state: 'other' }
+  // 取证落盘点（2026-10-10 立，手册「事实阻塞闸门」③/HITL）：drafts/sources/ 是合法证据目录——
+  // 原文/文件按来源命名、FETCH-LOG 记通道（ai-transformation-2026 实证立）。不算 unshaped。
+  const parts = path.slice(root.length).split('/')
+  if (parts.length >= 4 && parts[1] === DRAFTS_DIRNAME && parts[2] === SOURCES_DIRNAME) {
+    return { state: 'source', slug: slugFromDirName(parts[0]) }
+  }
   const id = deliverableId(path)
   if (id === undefined) return { state: 'other' }
   if (id.kind === 'meta') return { state: 'meta', slug: id.slug }
@@ -321,6 +328,7 @@ export function auditDeliverables(input) {
   const finals = []
   const drafts = []
   const metas = []
+  const sources = []
   const unshaped = []
   for (const file of onDisk) {
     const id = deliverableId(file)
@@ -329,6 +337,7 @@ export function auditDeliverables(input) {
     if (verdict.state === 'final') finals.push({ path: file, slug: verdict.slug })
     else if (verdict.state === 'draft') drafts.push({ path: file, slug: verdict.slug, role: verdict.role })
     else if (verdict.state === 'meta') metas.push({ path: file, slug: verdict.slug })
+    else if (verdict.state === 'source') sources.push({ path: file, slug: verdict.slug })
     else if ((file.startsWith(ACTIVE_ROOT) || file.startsWith(ARCHIVE_ROOT)) && file.endsWith('.md')) unshaped.push(file)
   }
 
@@ -446,5 +455,5 @@ export function auditDeliverables(input) {
       detail: `非 Lead 会话（${entry.preset}）present 了过程稿 \`${entry.path}\`——多人形态下这会把它当 final deliverable 直呈该门上的人（BUG-003）；present 应留在 CEO 收口步`,
     })
   }
-  return { finals, drafts, metas, violations, warnings, leadFinalSlugs: [...leadFinalSessions.keys()] }
+  return { finals, drafts, metas, sources, violations, warnings, leadFinalSlugs: [...leadFinalSessions.keys()] }
 }

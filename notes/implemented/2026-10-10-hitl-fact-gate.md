@@ -1,11 +1,11 @@
 # 2026-10-10 · 事实阻塞闸门（HITL）——外部正文读不到时的全链冻结规则
 
+状态：implemented
+
 > 2026-10-10 **同日修订**：HITL 从「唯一获取通道」改判**「最后手段」**——preset 全员挂
 > `tool-bash` + browser（shell 出网不受 web_fetch 的 DNS 拦截，通道穷举优先）→
 > [fact-finding-ladder](./2026-10-10-fact-finding-ladder.md)。本 Note 的闸门骨架（探针 →
 > 待补料 → 依赖链冻结 → 收口规则）与扫描仪器语义**仍然有效**。
-
-状态：implemented
 
 ## 决定
 

@@ -194,6 +194,11 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
     expect(classifyDeliverable('deliverables/x/data.json')).toEqual({ state: 'other' })
   })
 
+  it('drafts/sources/ = 取证落盘点（HITL 闸门③，2026-10-10）：source 态而非 unshaped；slug 剥 A1 日期前缀', () => {
+    expect(classifyDeliverable('deliverables/x/drafts/sources/README.md')).toEqual({ state: 'source', slug: 'x' })
+    expect(classifyDeliverable('deliverables/2026-10-10-ai-transformation-2026/drafts/sources/khazix-skill-leader.md')).toEqual({ state: 'source', slug: 'ai-transformation-2026' })
+  })
+
   it('身份解析认平铺旧形状的两条约定：名字中段的角色、尾部 -final', () => {
     expect(deliverableId('deliverables/kb-rag-assessment.md')).toEqual({ slug: 'kb-rag-assessment', kind: 'final' })
     expect(deliverableId('deliverables/kb-rag-assessment-vp-eng.md'))

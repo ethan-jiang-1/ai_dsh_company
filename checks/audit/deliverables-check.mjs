@@ -220,6 +220,7 @@ console.log(`deliverables-check: ${workspaceRel}${LEGACY_FLAT ? '（平铺旧形
 console.log(`  会话日志 ${sessions.length} 份（其中 Lead ${leadSessions} 份）`)
 console.log(`  成品 ${result.finals.length} 份：${result.finals.map(f => f.path).join(' / ') || '（无）'}`)
 console.log(`  过程稿 ${result.drafts.length} 份`)
+  if (result.sources.length > 0) console.log(`  取证源 ${result.sources.length} 份（drafts/sources/，HITL 落盘点）`)
 if (warnings.length > 0) {
   console.log(`  观察项 ${warnings.length} 条（不判违规，但每次都提醒）：`)
   for (const w of warnings) console.log(`    ${w.code} | ${w.detail}`)

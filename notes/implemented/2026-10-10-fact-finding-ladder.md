@@ -50,3 +50,17 @@
 - **通道实录**：`drafts/sources/FETCH-LOG.md`（7 条命令：501 / 200×6 / 403——正文 15.9KB 提取成功）。
 - `pnpm test`：**43 文件 / 445 测试全绿**（1 红后修复：pack peers 补 tool-bash）。
 - `pnpm verify`：**ALL PASS**（doc-budget 手册 189/195；notes-liveness；ledger 全套）。
+
+## 同日追加（主动唤醒与取证源形状）
+
+- **schedule 是"主动唤醒"的出厂载体**：`@deepseek-ai/dsh-schedule` 自带模型面工具
+  （`registerScheduleTools`：at/after/every/daily/weekly/cron 建删改查），schedule-bundle 已在本
+  profile 挂载，到点以 follow-up **送回原会话**——"信息源头变动 → 主动复议"的正确载体是它，
+  不是自由文本记忆。卡兹克案的"6 小时后跟进提醒"是**空头支票**（schedule.json 为空 ⇒ 说了没做），
+  闸门④据此升级：复算触发必须以 schedule 任务为证（可审计），口头"已立提醒" = 行动幻觉。
+- **skill vs memory 的分工裁定**（用户问，待 review）：行为规则进 **skill**（playbook 八条），
+  单案状态进**机器可查载体**（派活行「待补料」+ schedule 任务 + journal 叙事）——自由文本
+  memory 恰是空头支票的病灶：写了"已立"却无可执行载体背书。
+- **deliverables 门禁补 `source` 态**：`drafts/sources/` 认作合法证据目录（红证 = 8 条
+  unshaped、exit 1 → 修复后"取证源 8 份"；反咬测试 drafts/sub/x.md 仍咬 ✔；单测 40/40）。
+  存量 2 条（10-07 recon-pack：final 无 present 事件 + meta 词表漂移）非本轮引入，另行处置。
