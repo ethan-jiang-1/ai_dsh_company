@@ -40,6 +40,26 @@ opened: 2026-10-10
 
 **下一步：** 用户 review 拟实施清单 → 拍板（照单 / 改单）→ 按 preset-change-definition + 模板流程实施。
 
+## 验收标准（2026-10-10 批单"可以"后补，validation-design）
+
+| 件 | 怎么算完成 |
+|---|---|
+| 四模板首屏「一分钟摘要」 | 每模板有该段（三段式 + 黑话禁令注）；实读一遍顺口 |
+| CEO persona 收口原则 | 含三句（final 首屏摘要 / present description 同款 / 成员回报三件套）；preset-smoke 挂载不红 |
+| chairing-staff-meeting 收口步 | step 5 增两行（首屏说人话 + present description） |
+| 手册交付物三态 | 一条 bullet；行预算 ≤195 |
+| 真验收（关闭条件） | 下一个真实动议收口，用户确认"说人话了" |
+
+## 实施 receipt（2026-10-10，批单后即实施）
+
+- 四模板「一分钟摘要」段 ✔（decision-memo / ops-review-note / prd / review-note，统一插在
+  fail-closed 行后、首个 ## 节前）
+- CEO persona 收口原则 ✔（首屏说人话 + present description 同款 + 成员回报三件套）
+- chairing-staff-meeting step 5 ✔（首屏说人话 + present description 两行）
+- 手册交付物三态 bullet ✔（191/195）
+- 验证：452 tests / 44 files 全绿；preset-smoke ALL PASS；verify ALL PASS。提交 088b273。
+- **剩余 = 真验收（关闭条件）**：下一个真实动议收口，用户确认"说人话了"→ 卡迁已结。
+
 ## 范围与排除项
 
 不做窗口/vendor 层改造（present 卡与待办面板是现成面）；不动 turn-outline/compaction（导航与
