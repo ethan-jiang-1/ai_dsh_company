@@ -181,6 +181,8 @@ export const VIOLATION = {
   META_SHAPE_BAD: 'meta-shape-bad',
   /** `present` 提及的过程稿在盘上找不到（反向检查）。 */
   DANGLING_PRESENT: 'dangling-present',
+  /** 「待补料」派活行无 schedule 任务为证（闸门④：行动幻觉 = 口头已立提醒而 schedule.json 无锚）。 */
+  PENDING_MATERIAL_WITHOUT_SCHEDULE: 'pending-material-without-schedule',
   /** 反向门禁：Lead present 过的成品，meta「结果」仍非终态（留空/进行中——布局卡评审修正 6）。 */
   PRESENT_RESULT_NOT_FINAL: 'present-result-not-final',
 }
@@ -256,6 +258,11 @@ export function classifyDeliverable(relPath, options = {}) {
   if (parts.length >= 4 && parts[1] === DRAFTS_DIRNAME && parts[2] === SOURCES_DIRNAME) {
     return { state: 'source', slug: slugFromDirName(parts[0]) }
   }
+  // 过程物料（2026-10-10 ai-sprint 实证立）：drafts/ 下的主题工作子目录（sprint/ 等）是
+  // 团队的自然工作形状——合法物料，不该被官僚 policing（UX：让团队自然干活）。
+  if (parts.length >= 4 && parts[1] === DRAFTS_DIRNAME) {
+    return { state: 'material', slug: slugFromDirName(parts[0]), dir: parts[2] }
+  }
   const id = deliverableId(path)
   if (id === undefined) return { state: 'other' }
   if (id.kind === 'meta') return { state: 'meta', slug: id.slug }
@@ -267,6 +274,22 @@ export function classifyDeliverable(relPath, options = {}) {
 /** Lead 会话的判据：`delegationDepth === 0` 且挂了公司入口角色的 preset。 */
 export function isLeadSession(identity, leadPreset = 'ceo') {
   return identity.delegationDepth === 0 && identity.agentPreset === leadPreset
+}
+
+/**
+ * 事实阻塞闸门④审计纯逻辑（2026-10-10）：「待补料」派活行必须有 schedule 任务为证——
+ * 任务 title/prompt 含 `待补料·<slug>·<T号>` 即为已锚；缺锚 = 行动幻觉
+ * （卡兹克案实证：口头"已立提醒"而 schedule.json 为空）。schedule 任务形状兼容
+ * `{ record: { title, prompt } }`（storages/schedule.json 现形状）与平铺 `{ title, prompt }`。
+ * @returns 未锚的 T 号清单（空 = 全部已锚）。
+ */
+export function uncoveredPendingMaterial(pendingTaskIds, scheduleTasks, slug) {
+  const anchor = `待补料·${slug}·`
+  const texts = (scheduleTasks ?? []).map(t => {
+    const rec = t?.record ?? t ?? {}
+    return `${rec.title ?? ''}\n${rec.prompt ?? ''}`
+  })
+  return (pendingTaskIds ?? []).filter(id => !texts.some(text => text.includes(`${anchor}${id}`)))
 }
 
 /**
@@ -350,6 +373,7 @@ export function auditDeliverables(input) {
   const drafts = []
   const metas = []
   const sources = []
+  const materials = {}
   const unshaped = []
   for (const file of onDisk) {
     const id = deliverableId(file)
@@ -359,6 +383,9 @@ export function auditDeliverables(input) {
     else if (verdict.state === 'draft') drafts.push({ path: file, slug: verdict.slug, role: verdict.role })
     else if (verdict.state === 'meta') metas.push({ path: file, slug: verdict.slug })
     else if (verdict.state === 'source') sources.push({ path: file, slug: verdict.slug })
+    else if (verdict.state === 'material') {
+      (materials[verdict.dir] ??= []).push(file)
+    }
     else if ((file.startsWith(ACTIVE_ROOT) || file.startsWith(ARCHIVE_ROOT)) && file.endsWith('.md')) unshaped.push(file)
   }
 
@@ -477,5 +504,5 @@ export function auditDeliverables(input) {
     })
   }
   const archived = partitionArchiveViolations(violations)
-  return { finals, drafts, metas, sources, violations: archived.violations, warnings: [...warnings, ...archived.warnings], leadFinalSlugs: [...leadFinalSessions.keys()] }
+  return { finals, drafts, metas, sources, materials, violations: archived.violations, warnings: [...warnings, ...archived.warnings], leadFinalSlugs: [...leadFinalSessions.keys()] }
 }

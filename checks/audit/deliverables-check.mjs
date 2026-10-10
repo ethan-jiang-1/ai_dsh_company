@@ -27,7 +27,8 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { join, resolve } from 'node:path'
-import { VIOLATION, WARNING, auditDeliverables, isPlaceholderClaim, parseSessionLog, partitionArchiveViolations, presentResultRows, validateMeta } from '../../tools/lib/deliverables.mjs'
+import { VIOLATION, WARNING, auditDeliverables, isPlaceholderClaim, parseSessionLog, partitionArchiveViolations, presentResultRows, uncoveredPendingMaterial, validateMeta } from '../../tools/lib/deliverables.mjs'
+import { parseAssignments } from '../../tools/lib/candidate-scan.mjs'
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -221,6 +222,35 @@ console.log(`  会话日志 ${sessions.length} 份（其中 Lead ${leadSessions}
 console.log(`  成品 ${result.finals.length} 份：${result.finals.map(f => f.path).join(' / ') || '（无）'}`)
 console.log(`  过程稿 ${result.drafts.length} 份`)
   if (result.sources.length > 0) console.log(`  取证源 ${result.sources.length} 份（drafts/sources/，HITL 落盘点）`)
+  const materialDirs = Object.keys(result.materials ?? {})
+  if (materialDirs.length > 0) {
+    const materialCount = materialDirs.reduce((n, d) => n + result.materials[d].length, 0)
+    console.log(`  过程物料 ${materialCount} 份（drafts/ 主题子目录：${materialDirs.map(d => `${d}/ ×${result.materials[d].length}`).join('，')}）`)
+  }
+// 事实阻塞闸门④审计（2026-10-10）：drafts 出现「待补料」派活行 ⇒ schedule.json 必须有
+// `待补料·<slug>·<T号>` 任务为证——无锚 = 行动幻觉（口头"已立提醒"，卡兹克案实证）。
+{
+  let scheduleTasks = []
+  try {
+    const schedulePath = join(requireDevHome('deliverables-check'), 'storages', 'schedule.json')
+    if (existsSync(schedulePath)) scheduleTasks = Object.values(JSON.parse(readFileSync(schedulePath, 'utf8'))?.tables?.tasks ?? {})
+  } catch { /* 无 dev home = 空库 ⇒ 待补料全未锚（fail-closed，与闸门④同向） */ }
+  let pendingSeen = 0
+  for (const draft of result.drafts.filter(row => row.role === 'ceo')) {
+    const body = readFileSync(join(workspace, draft.path), 'utf8')
+    const pending = parseAssignments(body).filter(t => t.status === '待补料')
+    if (pending.length === 0) continue
+    pendingSeen += pending.length
+    for (const id of uncoveredPendingMaterial(pending.map(t => t.id), scheduleTasks, draft.slug)) {
+      violations.push({
+        code: VIOLATION.PENDING_MATERIAL_WITHOUT_SCHEDULE,
+        path: draft.path,
+        detail: `「待补料」任务 ${id} 无 schedule 跟进为证（schedule.json 无 \`待补料·${draft.slug}·${id}\`）——口头"已立提醒" = 行动幻觉（闸门④）；补立任务或改回待办`,
+      })
+    }
+  }
+  if (pendingSeen > 0) console.log(`  待补料 ${pendingSeen} 条（↔ schedule.json 审计锚交叉核对完成）`)
+}
 // 归档件存量豁免（BUG-008 口径）：落在 deliverables-archive/ 的违规（含脚本自加的 meta/present-result
 // 判据）一律降观察项——审计主战场是 active deliverables/，归档件历史就历史。
 {

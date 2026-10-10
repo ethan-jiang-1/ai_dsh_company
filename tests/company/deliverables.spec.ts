@@ -16,6 +16,7 @@ import {
   partitionArchiveViolations,
   presentResultRows,
   slugFromDirName,
+  uncoveredPendingMaterial,
   validateMeta,
 } from '../../tools/lib/deliverables.mjs'
 
@@ -198,6 +199,27 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
   it('drafts/sources/ = 取证落盘点（HITL 闸门③，2026-10-10）：source 态而非 unshaped；slug 剥 A1 日期前缀', () => {
     expect(classifyDeliverable('deliverables/x/drafts/sources/README.md')).toEqual({ state: 'source', slug: 'x' })
     expect(classifyDeliverable('deliverables/2026-10-10-ai-transformation-2026/drafts/sources/khazix-skill-leader.md')).toEqual({ state: 'source', slug: 'ai-transformation-2026' })
+  })
+
+  it('drafts/ 主题子目录 = 过程物料（2026-10-10 ai-sprint 实证）：material 态而非 unshaped', () => {
+    // 负例留证 2026-10-10：红形态 = ai-sprint-2026/drafts/sprint/samples/*.md ×12 被 unshaped-file
+    // 判违规（exit=1）——团队在 drafts/ 下建工作子目录是自然形状，不该被官僚 policing。
+    expect(classifyDeliverable('deliverables/x/drafts/sprint/samples/sample-01.md')).toEqual({ state: 'material', slug: 'x', dir: 'sprint' })
+    expect(classifyDeliverable('deliverables/x/other/x.md')).toEqual({ state: 'other' }) // drafts 之外的主题目录不豁免
+  })
+
+  it('待补料 ↔ schedule 审计（闸门④）：title 含 待补料·<slug>·<T号> 即为已锚；缺锚 = 行动幻觉违规', () => {
+    // 负例留证 2026-10-10：BUG 候选红形态 = 卡兹克案"已立 6 小时提醒"而 schedule.json 为空
+    // （行动幻觉）；本判据把「待补料派活行 ↔ schedule 任务锚」交叉核对变成机器可查。
+    const tasks = [
+      { record: { title: '待补料·ai-transformation-2026·T1', prompt: '查 sources/ 复算' } },
+      { record: { title: 'probe-wake', prompt: 'x' } },
+    ]
+    expect(uncoveredPendingMaterial(['T1'], tasks, 'ai-transformation-2026')).toEqual([])
+    expect(uncoveredPendingMaterial(['T1', 'T3'], tasks, 'ai-transformation-2026')).toEqual(['T3'])
+    expect(uncoveredPendingMaterial([], tasks, 'ai-transformation-2026')).toEqual([])
+    expect(uncoveredPendingMaterial(['T1'], tasks, 'another-slug')).toEqual(['T1']) // slug 不匹配不算锚（防串场）
+    expect(uncoveredPendingMaterial(['T1'], [], 'ai-transformation-2026')).toEqual(['T1']) // 空库 = 全未锚
   })
 
   // 负例留证 2026-10-10：BUG-008 红形态 = recon-pack 归档件两条违规（final-not-presented +
