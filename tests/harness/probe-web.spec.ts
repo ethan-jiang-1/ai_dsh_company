@@ -69,6 +69,18 @@ describe('startWeb：进程参数与 banner 解析', () => {
     expect(options.env).toEqual({ KEEP: 'yes', DSH_PROBE_BARRIER_DIR: '/tmp/bd', DSH_HOME: '/repo/h' })
   })
 
+  it('patch 接受数组：逐个插 --patch（replay-smoke 的场景 patch + PRESET_PATCHES 组合）', async () => {
+    const { spawn, calls, emit } = fakeSpawn()
+    const started = startWeb({ spawn, root: '/repo', patch: ['/p/scene.yml', '/p/cEO.yml', '/p/cfo.yml'], port: 43210 })
+    emit(BANNER)
+    await started
+    expect(calls[0][1]).toEqual([
+      '--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web',
+      '--patch', '/p/scene.yml', '--patch', '/p/cEO.yml', '--patch', '/p/cfo.yml',
+      '--', '--port', '43210', '--no-open',
+    ])
+  })
+
   it('环境在现有环境上只加 DSH_HOME，不改动权限档（后端探测归 env.sh）', async () => {
     const { spawn, calls, emit } = fakeSpawn()
     const started = startWeb({ spawn, root: '/repo', home: '/repo/h', env: { KEEP: 'yes' } })
@@ -106,6 +118,14 @@ describe('companyCookie：token 交换', () => {
     })
     const cookie = await companyCookie({ base: 'http://127.0.0.1:43219', token: 'T', fetch: fetchImpl })
     expect(cookie).toBe('a=1; b=2')
+  })
+
+  it('默认空 cookie 拼出空串（探针面现状）；onEmptyCookie: throw 时立刻抛（四个 smoke 既有形态）', async () => {
+    const empty = vi.fn(async () => ({ headers: { getSetCookie: () => [] } }))
+    const joined = await companyCookie({ base: 'http://127.0.0.1:1', token: 'T', fetch: empty })
+    expect(joined).toBe('')
+    await expect(companyCookie({ base: 'http://127.0.0.1:1', token: 'T', fetch: empty, onEmptyCookie: 'throw' }))
+      .rejects.toThrow('token 交换没有拿到 cookie')
   })
 })
 

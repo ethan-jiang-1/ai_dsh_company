@@ -37,15 +37,17 @@ const COOKIE_TIMEOUT_MS = 15_000
  *   （不动权限档——那归 run/env.sh 的探测）。
  * @param {object} [options.env] - 基础环境（默认 `process.env`）。要加额外键（如 team-concurrency 的
  *   `DSH_PROBE_BARRIER_*`）就传展开后的基础环境，`home` 会再叠加 `DSH_HOME`。
- * @param {string} [options.patch] - Cordis patch overlay 路径；给出时在 `web` 后插 `--patch <path>`
- *   （team-concurrency 的读屏障实验 overlay 是唯一既有用例；不给出则 argv 与其余探针逐字一致）。
+ * @param {string|string[]} [options.patch] - Cordis patch overlay；给出时在 `web` 后逐个插
+ *   `--patch <path>`（`--patch` 可重复——replay-smoke 的场景 patch + PRESET_PATCHES 组合是数组
+ *   用例；不给出则 argv 与其余调用方逐字一致）。
  * @param {number} [options.port] - 传给 `--port` 的值；默认 0（端口是环境状态，交系统分配）。
  * @returns {Promise<{child: object, port: number, token: string, base: string}>}
  */
 export function startWeb({ spawn: spawnProcess, root, home, env = process.env, patch, port = 0 } = {}) {
+  const patches = patch === undefined ? [] : (Array.isArray(patch) ? patch : [patch])
   const child = spawnProcess(process.execPath,
     ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web',
-      ...(patch === undefined ? [] : ['--patch', patch]),
+      ...patches.flatMap(entry => ['--patch', entry]),
       '--', '--port', String(port), '--no-open'],
     { cwd: root, env: home === undefined ? { ...env } : { ...env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
   let output = ''
@@ -69,11 +71,16 @@ export function startWeb({ spawn: spawnProcess, root, home, env = process.env, p
  * @param {Function} options.fetch - fetch 实现（调用方传全局 fetch）。
  * @param {string} options.base - `startWeb` 返回的 base。
  * @param {string} options.token - `startWeb` 返回的 token。
+ * @param {('join'|'throw')} [options.onEmptyCookie] - 空 cookie 的处置。默认 `'join'`（探针面现状：
+ *   拼出空串，失败留给后续 RPC 报）；`'throw'` = 四个 smoke（delegation/handbook/preset/probe）
+ *   既有形态：立刻抛错，失败点更早更明确。
  * @returns {Promise<string>} 每个 set-cookie 取分号前一段、以 `"; "` 拼接。
  */
-export async function companyCookie({ fetch: fetchImpl, base, token } = {}) {
+export async function companyCookie({ fetch: fetchImpl, base, token, onEmptyCookie = 'join' } = {}) {
   const auth = await fetchImpl(`${base}/?token=${token}`, { redirect: 'manual', signal: AbortSignal.timeout(COOKIE_TIMEOUT_MS) })
-  return auth.headers.getSetCookie().map(value => value.split(';')[0]).join('; ')
+  const cookies = auth.headers.getSetCookie().map(value => value.split(';')[0])
+  if (cookies.length === 0 && onEmptyCookie === 'throw') throw new Error('token 交换没有拿到 cookie')
+  return cookies.join('; ')
 }
 
 /**

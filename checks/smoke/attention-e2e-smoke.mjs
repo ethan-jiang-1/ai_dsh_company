@@ -23,6 +23,7 @@
 // 排练场 cwd，真盘零接触。
 // 用法：source run/env.sh && node checks/smoke/attention-e2e-smoke.mjs [--dual-gate]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
@@ -49,36 +50,14 @@ try {
   console.error(error.message); process.exit(2)
 }
 
-const child = spawn(process.execPath,
-  ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-  { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
-let output = ''
-const banner = await new Promise((res, rej) => {
-  const on = c => {
-    output += String(c)
-    const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-    if (m) res({ port: Number(m[1]), token: m[2] })
-  }
-  child.stdout.on('data', on); child.stderr.on('data', on)
-  child.on('exit', c => rej(new Error(`web 提前退出 ${c}`)))
-  setTimeout(() => rej(new Error('boot 超时')), 120_000)
-})
-const base = `http://127.0.0.1:${banner.port}`
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless
+// 纯逻辑缝）；rpcId 前缀 `e2e-` 由调用方传入，不推导。
+const { child, base, token } = await startWeb({ spawn, root: ROOT, home })
 console.log(`web up: ${base}${DUAL ? '（--dual-gate 双门）' : ''}`)
 let browser
 try {
-  const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
-  const cookie = auth.headers.getSetCookie().map(c => c.split(';')[0]).join('; ')
-  let rpcId = 0
-  const rpc = async (endpoint, args) => {
-    const r = await fetch(`${base}/api/${endpoint}`, {
-      method: 'POST', headers: { 'content-type': 'application/json', cookie },
-      body: JSON.stringify({ type: 'client-request', rpcId: `e2e-${++rpcId}`, method: endpoint, payload: { args } }),
-    })
-    const body = await r.json()
-    if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? 'unknown'}`)
-    return body.result.value
-  }
+  const cookie = await companyCookie({ fetch, base, token })
+  const rpc = companyRpc({ fetch, base, cookie, prefix: 'e2e-' })
 
   /** 建一个会话并发触线 prompt（preset 角色 + prompt 由调用方给——触发文本是已验证资产）。 */
   const createSignoffSession = async (preset, title, text) => {
@@ -141,7 +120,7 @@ try {
   const chromium = await loadChromium(ROOT)
   browser = await launchChromium(chromium)
   const page = await browser.newPage()
-  await page.goto(`${base}/?token=${banner.token}`)
+  await page.goto(`${base}/?token=${token}`)
   // 首启通告模态（遮罩会拦截后续 click）：0.1.7 = Internal Testing Notice；0.2.0 增 Preview
   // Notice（vendor ui-settings-models welcomeTitle，按钮同为 Continue）——都要等出现再关
   // （goto 返回时常未挂载完，条件检查会扑空；replay-smoke --ui 同款处理）。

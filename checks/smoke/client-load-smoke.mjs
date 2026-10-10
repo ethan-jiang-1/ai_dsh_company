@@ -19,6 +19,7 @@
 //       chromium（缺 playwright 期望的版本时自动回退缓存里最新一份）。
 // 用法：source run/env.sh && node checks/smoke/client-load-smoke.mjs [--port 0]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb } from '../../tools/lib/probe-web.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
@@ -30,7 +31,6 @@ const arg = (name, fallback) => {
 }
 const PORT = Number(arg('port', '0'))
 const BRAND = 'DSH 梦之队'
-const BOOT_TIMEOUT_MS = 120_000
 
 let home
 try {
@@ -42,30 +42,10 @@ try {
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 
-/** boot web profile，等到启动横幅打印带 token 的 URL（与 preset-smoke 同一入口）。 */
-async function boot() {
-  const child = spawn(
-    process.execPath,
-    ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', String(PORT), '--no-open'],
-    { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] },
-  )
-  let output = ''
-  const banner = new Promise((resolveBanner, rejectBanner) => {
-    const onData = (chunk) => {
-      output += String(chunk)
-      const match = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-      if (match !== null) resolveBanner({ port: Number(match[1]), token: match[2] })
-    }
-    child.stdout.on('data', onData)
-    child.stderr.on('data', onData)
-    child.on('exit', (code) => rejectBanner(new Error(`web 进程提前退出（code ${String(code)}）\n${output.slice(-800)}`)))
-    setTimeout(() => rejectBanner(new Error(`等待启动横幅超时\n${output.slice(-800)}`)), BOOT_TIMEOUT_MS)
-  })
-  return { child, ...(await banner) }
-}
-
 const chromiumApi = await loadChromium(ROOT)
-const { child, port, token } = await boot()
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：本 smoke 只 boot——token 直接进浏览器 URL，
+// 不取 cookie、不发 RPC ⇒ 只走 startWeb 这一层；spawn 注入（tools/lib 是 keyless 纯逻辑缝）。
+const { child, port, token } = await startWeb({ spawn, root: ROOT, home, port: PORT })
 let failures = 0
 const fail = (label, detail) => { failures++; console.log(`  FAIL ${label}: ${detail}`) }
 try {
