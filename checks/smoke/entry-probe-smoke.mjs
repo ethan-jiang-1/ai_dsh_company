@@ -6,7 +6,7 @@
 // No keyless regression claim: true-model certification, 不进 pnpm test.
 // Usage: source run/env.sh && node checks/smoke/entry-probe-smoke.mjs [--port 0] [--timeout 240000]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
@@ -109,9 +109,10 @@ let result = { passed: 0, failures: [] }
 try {
   const booted = await boot(); child = booted.child
   const base = `http://127.0.0.1:${booted.port}`
-  const auth = await fetch(`${base}/?token=${booted.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
-  const cookie = auth.headers.getSetCookie().map(c => c.split(';')[0]).join('; ')
-  if (!cookie) throw new Error('认证缺 cookie')
+  // token 交换也收进 companyCookie（2026-10-10 补收，下游卡当时留的 3 行本地块）：onEmptyCookie:
+  // 'throw' 保留「空 cookie 即抛」的既有语义；空 cookie 报文从「认证缺 cookie」统一为模块文案
+  // （与下游卡已批准的失败路径文本统一同类——只进诊断输出，退出码 2 不变）。
+  const cookie = await companyCookie({ fetch, base, token: booted.token, onEmptyCookie: 'throw' })
   // RPC 收成 companyRpc（2026-10-10 卡）：既有差异当参数保留——rpcId 前缀 `entryprobe-` + 失败
   // 回退转储响应体（dumpBodyOnError）、逐调用 15s 超时信号 ⇒ 工厂产物外包一层传 { signal }
   // （member-stale-write 先例）。四参旧签名保留给下方既有调用点，调用点一字不动。

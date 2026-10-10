@@ -113,9 +113,27 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 // （"Elapsed since …" 后面的值随节奏漂）→ <time-context-elapsed>。录制侧与重放侧同管道对称生效。
 const TIME_CONTEXT_SAMPLE = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?[+-]\d{2}:\d{2}\[[^\]"]*\]/g
 const TIME_CONTEXT_ELAPSED = /(Elapsed since the preceding model-visible message: )[^"\\\n]*/g
+// 姿态事件值脱敏（2026-10-10 加，r3-delegation 两次实跑红证后立）：sandbox/mode、approval/policy、
+// permission/preset 的**值**是机器策略——run/env.sh 探测 Seatbelt 后端的结果（可用=workspace-write，
+// 损坏=danger-full-access），不是场景语义。钉 workspace-write 在后端损坏的机器上会让 permission
+// 事件整体不发射（实测三条全消失 ⇒ 更红），唯一对机器无关的姿势是脱敏值。类型、位置与 source
+// 字段（delegation 语义）仍参与比较——序列漂移照样红。
+const POSTURE_EVENT_TYPES = new Set(['sandbox/mode', 'approval/policy', 'permission/preset'])
 const normalizeTimeContext = (text) => text
   .replace(TIME_CONTEXT_SAMPLE, '<time-context-sample>')
   .replace(TIME_CONTEXT_ELAPSED, '$1<time-context-elapsed>')
+  .split(/\r?\n/)
+  .map(line => {
+    if (!line.includes('"sandbox/mode"') && !line.includes('"approval/policy"') && !line.includes('"permission/preset"')) return line
+    try {
+      const parsed = JSON.parse(line)
+      if (!POSTURE_EVENT_TYPES.has(parsed.type)) return line
+      const data = {}
+      for (const [key, value] of Object.entries(parsed.data ?? {})) data[key] = key === 'source' ? value : '{{posture}}'
+      return JSON.stringify({ ...parsed, data })
+    } catch { return line } // 非 JSON 行原样（两侧对称，不会单侧漂）
+  })
+  .join('\n')
 
 function normalizeFixtures(raws) {
   const scrubbed = raws

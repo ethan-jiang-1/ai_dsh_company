@@ -85,9 +85,15 @@ switch the consumer to `danger-full-access`*（`vendor/dsh/packages/sandbox/sand
     环境变量）产出**逐字节相同**的 `sandbox/mode`、`approval/policy` 与内嵌的
     `Current DSH file policy: workspace-write` ⇒ 改它**既不能变红也不能变绿**，所以留原样。
   - 由此更正前一句的措辞：本 Note 说"replay-smoke 用 workspace-write"**只是就环境变量而言**；真正驱动
-    录制事件的是各场景自己的 profile patch。replay-smoke 与沙箱后端**无关**（它当前在本机是红的，但
-    那三个失败项——归一化日志、system-prompt sidecar、tool-schemas sidecar 的 bash 描述漂移——都不是
-    沙箱问题，且该场景早已声明 `replayEligible: archived`）。
+    录制事件的是各场景自己的 profile patch。
+  - **再次更正（2026-10-10 晚，第三次实跑证伪）**：上面"replay-smoke 与沙箱后端无关"一句**只对
+    headless lane（foundation-workspace，场景 patch 钉了 sandbox-policy）成立**，web lane
+    （r3-delegation）**姿态敏感**——无钉值场景下会话事件 `sandbox/mode` 的值直接来自 env.sh 的探测
+    结果，本机 danger-full-access vs 录制时 workspace-write ⇒ 归一化比对红。修法不是钉值（钉
+    workspace-write 在后端损坏的机器上会让 permission 事件整体不发射，实测三条全消失），而是
+    `replay-smoke` 的 `normalizeTimeContext` 把姿态事件**值**脱敏为 `{{posture}}`（类型/位置/`source`
+    保留），r3 随 diff 重录 ⇒ 判据对机器姿态无关。见
+    [2026-10-10-replay-posture-redaction](2026-10-10-replay-posture-redaction.md)。
   - **未做的事**：要让 replay 反映本机真实沙箱姿态，得逐个改场景 `cordis.snapshot.yml` 并重录——那是
     测试面变更，按 [测试宪法](../../docs/testing.md)需另立证据。本 Note 不授权它。
 - 后端恢复（或换 Linux）后无需改代码：探测会自动回到 `workspace-write`，届时本 Note 的事实落点
