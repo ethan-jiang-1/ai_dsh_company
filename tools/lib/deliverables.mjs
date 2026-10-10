@@ -270,6 +270,27 @@ export function isLeadSession(identity, leadPreset = 'ceo') {
 }
 
 /**
+ * 归档件违规降观察项（BUG-008 存量豁免口径，2026-10-10 用户拍板：注记豁免）：
+ * `deliverables-archive/` 是只读历史——落在它上面的违规（如前审计时代的 final 无 present、
+ * meta 词表漂移）转为 `legacy-archive:<原码>` 观察项并注记存量豁免；**active `deliverables/`
+ * 照旧严判**。审计主战场是活盘，不是改写历史。
+ */
+export function partitionArchiveViolations(violations) {
+  const active = []
+  const legacy = []
+  for (const v of violations) {
+    (typeof v.path === 'string' && v.path.startsWith(ARCHIVE_ROOT) ? legacy : active).push(v)
+  }
+  return {
+    violations: active,
+    warnings: legacy.map(v => ({
+      code: `legacy-archive:${v.code}`,
+      detail: `${v.path}｜${v.detail}——存量豁免（BUG-008 口径：归档件历史就历史，审计主战场 = active deliverables/）`,
+    })),
+  }
+}
+
+/**
  * 解析一份会话日志文本，取出判据要用的两件事：会话身份 + 全部 `deliverables/presented` 事件。
  * 纯函数（不读文件），未识别/损坏的行直接跳过——判据只认结构化事件，不猜。
  * @param text - 会话 JSONL 全文（可含多行）。
@@ -455,5 +476,6 @@ export function auditDeliverables(input) {
       detail: `非 Lead 会话（${entry.preset}）present 了过程稿 \`${entry.path}\`——多人形态下这会把它当 final deliverable 直呈该门上的人（BUG-003）；present 应留在 CEO 收口步`,
     })
   }
-  return { finals, drafts, metas, sources, violations, warnings, leadFinalSlugs: [...leadFinalSessions.keys()] }
+  const archived = partitionArchiveViolations(violations)
+  return { finals, drafts, metas, sources, violations: archived.violations, warnings: [...warnings, ...archived.warnings], leadFinalSlugs: [...leadFinalSessions.keys()] }
 }

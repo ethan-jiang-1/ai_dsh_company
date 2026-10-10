@@ -13,6 +13,7 @@ import {
   isPlaceholderClaim,
   parseMeta,
   parseSessionLog,
+  partitionArchiveViolations,
   presentResultRows,
   slugFromDirName,
   validateMeta,
@@ -197,6 +198,20 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
   it('drafts/sources/ = 取证落盘点（HITL 闸门③，2026-10-10）：source 态而非 unshaped；slug 剥 A1 日期前缀', () => {
     expect(classifyDeliverable('deliverables/x/drafts/sources/README.md')).toEqual({ state: 'source', slug: 'x' })
     expect(classifyDeliverable('deliverables/2026-10-10-ai-transformation-2026/drafts/sources/khazix-skill-leader.md')).toEqual({ state: 'source', slug: 'ai-transformation-2026' })
+  })
+
+  // 负例留证 2026-10-10：BUG-008 红形态 = recon-pack 归档件两条违规（final-not-presented +
+  // meta-shape-bad）使 deliverables-check exit=1；实现 partitionArchiveViolations 后归档件转
+  // legacy-archive 观察项、exit=0；反咬测试（drafts/sub/x.md）仍报 unshaped-file——门没钝。
+  it('归档件违规降观察项（BUG-008 存量豁免口径）：active 照旧判违规，archive 转 legacy-archive 观察项', () => {
+    const archived = { code: 'final-not-presented', path: 'deliverables-archive/2026-10-07-recon-pack/final.md', detail: '成品在盘上，但没有任何 Lead 会话的 present 事件' }
+    const active = { code: 'unshaped-file', path: 'deliverables/x/drafts/sub/x.md', detail: '形状不合法' }
+    const { violations, warnings } = partitionArchiveViolations([archived, active])
+    expect(violations).toEqual([active])
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0].code).toBe('legacy-archive:final-not-presented')
+    expect(warnings[0].detail).toContain('deliverables-archive/2026-10-07-recon-pack/final.md')
+    expect(warnings[0].detail).toContain('存量豁免')
   })
 
   it('身份解析认平铺旧形状的两条约定：名字中段的角色、尾部 -final', () => {

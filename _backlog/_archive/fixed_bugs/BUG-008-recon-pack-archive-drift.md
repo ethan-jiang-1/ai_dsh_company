@@ -1,12 +1,17 @@
 ---
-status: 活跃
+status: 已修
 severity: P2
 opened: 2026-10-10
 ---
 
 # BUG-008：recon-pack 存量判据漂移（final 无 present 事件 + meta 词表过时）
 
-> 严重级别：P2（次要）｜发现：2026-10-10｜状态：活跃
+> 严重级别：P2（次要）｜发现：2026-10-10｜状态：已修（2026-10-10 注记豁免落地）
+
+**修复判定**：deliverables-check 对 `deliverables-archive/` 存量降 `legacy-archive:<码>` 观察项——
+lib 增 `partitionArchiveViolations`（active 照旧严判）+ 脚本对自加判据同口径套壳。红绿：改前
+exit=1（final-not-presented + meta-shape-bad 两条违规）→ 改后 exit=0、违规 0 条、观察项 +2、
+反咬测试（drafts/sub/x.md）仍咬 ✔、单测 41/41。口径 = 用户拍板「注记豁免」（历史就历史）。
 
 ## 症状
 

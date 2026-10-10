@@ -4,4 +4,4 @@
 
 ## Next BUG ID
 
-**BUG-008** — BUG-007 于 2026-10-10 修复并归档；原双成员真实入口现5/5通过。
+**BUG-009** — BUG-008 于 2026-10-10 修复并归档：deliverables-check 归档件存量降 `legacy-archive` 观察项（exit 1→0）；原 recon-pack 判据漂移清零。

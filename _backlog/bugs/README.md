@@ -8,9 +8,7 @@
 
 ## 活跃清单
 
-| 卡 | 严重级 | 症状一句话 |
-|---|---|---|
-| [BUG-008](BUG-008-recon-pack-archive-drift.md) | P2 | recon-pack 存量判据漂移：final 无 present 事件 + meta 词表过时（归档件，不阻塞现行动议） |
+当前无活跃缺陷。（BUG-008 已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。）
 
 ## frontmatter 与模板
 

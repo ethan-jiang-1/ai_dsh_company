@@ -27,7 +27,7 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { join, resolve } from 'node:path'
-import { VIOLATION, WARNING, auditDeliverables, isPlaceholderClaim, parseSessionLog, presentResultRows, validateMeta } from '../../tools/lib/deliverables.mjs'
+import { VIOLATION, WARNING, auditDeliverables, isPlaceholderClaim, parseSessionLog, partitionArchiveViolations, presentResultRows, validateMeta } from '../../tools/lib/deliverables.mjs'
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -221,6 +221,14 @@ console.log(`  会话日志 ${sessions.length} 份（其中 Lead ${leadSessions}
 console.log(`  成品 ${result.finals.length} 份：${result.finals.map(f => f.path).join(' / ') || '（无）'}`)
 console.log(`  过程稿 ${result.drafts.length} 份`)
   if (result.sources.length > 0) console.log(`  取证源 ${result.sources.length} 份（drafts/sources/，HITL 落盘点）`)
+// 归档件存量豁免（BUG-008 口径）：落在 deliverables-archive/ 的违规（含脚本自加的 meta/present-result
+// 判据）一律降观察项——审计主战场是 active deliverables/，归档件历史就历史。
+{
+  const archived = partitionArchiveViolations(violations)
+  violations.length = 0
+  violations.push(...archived.violations)
+  warnings.push(...archived.warnings)
+}
 if (warnings.length > 0) {
   console.log(`  观察项 ${warnings.length} 条（不判违规，但每次都提醒）：`)
   for (const w of warnings) console.log(`    ${w.code} | ${w.detail}`)
