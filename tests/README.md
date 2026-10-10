@@ -1,6 +1,6 @@
 # tests/ · keyless 回归的领域分区与导航
 
-> 四区各测什么、**不证明什么**、改动面 → 最窄检查怎么选——本文件只做导航。分层与证据政策唯一家 =
+> 四区各测什么、**不证明什么**、改动面 → 最窄检查怎么选——本文件做导航 + 改动面映射表（单家，2026-10-10 自 testing.md §2 迁入行级表）。分层与证据政策唯一家 =
 > [docs/testing.md](../docs/testing.md)（九层证明边界 / 证据纪律 / 改动面→最小证据）；逐脚本触发/成本/状态
 > 唯一源 = 脚本头注（[检查索引](../checks/README.md) 只索引，门禁强制自述）——本文件不复述，防漂移。
 > 真模型 / 真浏览器**不进本树**（[harness/layering.spec](./harness/layering.spec.ts) 机械守卫）。
@@ -18,23 +18,24 @@
 
 ## 改动面 → 最窄检查
 
-| 改动 | 最窄检查（先跑这个） | 受影响时升档 |
-|---|---|---|
-| persona / skill 文案（`packages/company-pack/presets/`） | `pnpm test tests/presets` | [preset-smoke](../checks/smoke/preset-smoke.mjs)；行为判据面 → 场景同 diff |
-| client 面板（视图模型/组件/CSS，`src/client/`） | `pnpm test tests/client`（按模块点名 spec） | [client-load-smoke](../checks/smoke/client-load-smoke.mjs) + 视觉夹具 |
-| company 读模型逻辑（`src/lib/`） | `pnpm test tests/company`（按模块点名 spec） | oracle 反证（真样本钉列，testing.md §2）；**新增模块/影响导出面 → 加 `pnpm test tests/harness`（pack-exports 守卫）** |
-| host 注册 / 打包 / 发布形状 | `pnpm test tests/harness`（pack-exports 等） | [release-smoke](../checks/smoke/release-smoke.mjs)（合同 = [release.md](../docs/release.md)） |
-| 检查与工具入口（`checks/**`、`probes/**`、`tools/**`） | 消费它的 keyless spec + `pnpm verify`（头注/结构门禁） | 真实入口冒烟按脚本头注「何时跑」 |
-| 文档 / 指针 | `pnpm verify`（md-links / bare-path / doc-budget） | [entry-probe-smoke](../checks/smoke/entry-probe-smoke.mjs)（入口链文档改动后） |
+| 改动面 | 最窄检查（先跑这个） | 受影响时升档 | 同 diff 义务（政策原则 = [testing.md §2](../docs/testing.md)） |
+|---|---|---|---|
+| persona / skill 文案（`packages/company-pack/presets/`） | `pnpm test tests/presets` | [preset-smoke](../checks/smoke/preset-smoke.mjs) | **行为判据面**改动（改变"模型被要求做什么/判据怎么落"）→ 场景同 diff 必带；纯措辞润色 → 连通档 + 内容档兜 |
+| bundle / preset 行 config（机制面） | `pnpm test tests/presets` | + [delegation-smoke](../checks/smoke/delegation-smoke.mjs)（工具行） | 同 diff 必带 |
+| client 面板（用户可见面：视图模型/组件/文案/CSS，`src/client/`） | `pnpm test tests/client`（按模块点名 spec，含 `client-face` / `style-lifecycle`） | [client-load-smoke](../checks/smoke/client-load-smoke.mjs) + 视觉夹具 | 用户可见改动 → 同 diff 场景或视觉夹具 |
+| company 读模型逻辑（`src/lib/` 判据：deliverables / authorship / ledger） | `pnpm test tests/company`（按模块点名 spec） | oracle 反证（真样本钉列）；**新增模块/影响导出面 → 加 `pnpm test tests/harness`（pack-exports 守卫）** | — |
+| pack 导出/注册面（host / client 两半 exports；host 注册改动从这进） | `pnpm test tests/harness`（[pack-exports](./harness/pack-exports.spec.ts) 导出形态守卫）+ `pnpm test tests/client`（`client-face` / `style-lifecycle`） | [release-smoke](../checks/smoke/release-smoke.mjs)（真实安装形状） | — |
+| 发布 / 升 pin | `pnpm test tests/harness`（release-foundation 等） | [release-smoke](../checks/smoke/release-smoke.mjs) + 升 pin 程序（合同 = [release.md](../docs/release.md)；**语料回放全绿 = 升 pin 回归网第一道**） | — |
+| 检查与工具入口（`checks/**`、`probes/**`、`tools/**`） | 消费它的 keyless spec + `pnpm verify`（头注/结构门禁） | 真实入口冒烟按脚本头注「何时跑」 | — |
+| 文档 / 指针 | `pnpm verify`（md-links / bare-path / doc-budget） | [entry-probe-smoke](../checks/smoke/entry-probe-smoke.mjs)（入口链文档改动后） | — |
 
-换档原则与每层证明边界唯一家 = [testing.md §1](../docs/testing.md)；命令与预算速查 = [dev-loop §9.1](../docs/guides/dev-loop.md)。
+换档原则与每层证明边界唯一家 = [testing.md §1](../docs/testing.md)；同 diff 义务列的政策（含「不替代组装转录」）= [testing.md §2](../docs/testing.md)；命令与预算速查 = [dev-loop §9.1](../docs/guides/dev-loop.md)。
 
 ## 新 Agent 首跑验收（推荐，非强制）
 
 - **有 `DEEPSEEK_API_KEY`**：`source run/env.sh && node checks/smoke/entry-probe-smoke.mjs`——真模型认证档，
   逐题验证入口链路由与证据（机器分 + 来源哈希；成本与触发见头注）；不进 `pnpm test`、**不作门禁**。
-- **无 key**：`pnpm verify` + `pnpm test` + `node checks/smoke/client-load-smoke.mjs`——结构门禁 + keyless
-  回归 + client 真挂载三件套。
+- **无 key**：`pnpm verify` + `pnpm test` + `node checks/smoke/client-load-smoke.mjs`——结构门禁 + keyless 回归 + client 真挂载三件套（前置：[bootstrap](../docs/guides/bootstrap.md) 配方已跑完——pack 已装、client/前端 dist 已构建，否则末件报 client bundles not found）。
 
 ## 新 spec 落点
 

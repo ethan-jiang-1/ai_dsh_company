@@ -1,6 +1,6 @@
 # AGENTS.md — 本仓库的入口链
 
-梦之队（Dream Team）虚拟公司 DSH 插件：一个 company pack 提供五个角色 preset 与 host/client 面。
+梦之队（Dream Team）虚拟公司 DSH 插件（DSH = DeepSeek Harness，唯一权威 = `vendor/dsh` 钉 SHA 子模块，见下「DSH 源码」节）：一个 company pack 提供五个角色 preset 与 host/client 面。
 **初入仓库**：[项目地图](docs/project-map.md)（空间）+ [运行态地图](docs/runtime-map.md)（时序与四状态轴）——驾驭者白话速读 = [orient 七问](docs/orient.md)；**开始变更**：[开发环 §0.5/§1](docs/guides/dev-loop.md)；**选验证**：[测试宪法](docs/testing.md) + [tests/README](tests/README.md)（改动面→最窄检查）+ [脚本索引](checks/README.md)；**新 Agent 首跑验收** = [tests/README](tests/README.md) 首跑节。
 
 **你（读者）= 维护本 repo 的开发 agent**；五个梦之队角色是你**维护的产物**（跑在 DSH 会话里，由 `pnpm dsh` / web 观察窗驱动）——别把自己混进公司角色，也别替角色执行公司手册。
@@ -9,6 +9,7 @@
 
 ```
 CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 校验）
+.agents/skills/          三个完成定义 skill（写 Note / 加门禁 / 收尾）+ web-window-ops 的宿主；DSH 会话技能从这里装载（D39）
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml、src/（host R3+）+ src/client/（client 面）
 company-workspace/      运行时公司共享盘（会话 cwd）：AGENTS.md（公司手册，随会话注入）、kb/、templates/、deliverables/
 vendor/dsh/             DSH 源码 submodule（钉 SHA，只读铁律见下节）
@@ -39,7 +40,7 @@ pnpm verify                            # 结构门禁（清单唯一源 = checks
 pnpm test                              # keyless 回归（真模型/浏览器不进；layering 守卫）
 pnpm orient                            # 运行态全景（keyless 只读；--scenario = run bundle 视图）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）
-node checks/smoke/preset-smoke.mjs    # preset 改动的完成定义（真挂载）
+source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的完成定义（真挂载；前置 = bootstrap 构建完成）
 ```
 
 逐脚本触发/成本/状态唯一源 = 脚本头注（门禁强制自述）；索引见 [检查索引](checks/README.md)——**别抄回本文件，复述必漂**。web 观察窗开门步骤唯一见 [demo.md §前置](docs/demo.md)：**先 `source run/env.sh`**——日用 `~/.dsh` 另有同名 `web` profile（起得来不报错、五角色不出现）；端口是环境状态，token URL 从启动横幅读；现场运维 = [budget-and-ops](docs/guides/budget-and-ops.md)。**push 走 `ssh.github.com:443`**（origin 已配好）。

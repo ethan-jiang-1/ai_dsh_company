@@ -4,10 +4,13 @@
 > 一切细节以链接目标为准。维护本仓库的 coding agent 从 [AGENTS.md](../AGENTS.md) 进。
 > 词表：「观察窗」=「驾驶舱」=「驾驶座」同指人侧 web 窗口——「驾驶舱」是 UI 切片的历史名
 > （驾驶舱①–④，多数页签后来并入右栏五页签），「驾驶座」是维护文档的比喻用法。
+> 词表补：「research」在本仓——活跃调研 = `_backlog/research/`（随最后一张活卡迁 `_archive/research/`）；
+> notes 侧旧 research 层已退役（D30）；「外部研究材料」= repo 外登记（index §外部研究材料登记）。
+> 层数口径：四问的「三层」是粗分组，testing.md §1 的「九层」是细表——前者是后者的视图，不是两套制度。
 
 ## 一问：这仓库是什么？
 
-一句话：一个 DSH 插件包（company-pack）扮演一家五角色虚拟公司——梦之队（Dream Team）；CEO、VP-Eng、VP-Sales、
+一句话：一个 DSH 插件包（company-pack；DSH = DeepSeek Harness，钉在 `vendor/dsh` 子模块）扮演一家五角色虚拟公司——梦之队（Dream Team）；CEO、VP-Eng、VP-Sales、
 COO、CFO 各自是独立 preset，跑在 DSH 会话里，你通过 web 观察窗驾驭。
 
 → 全貌：[README](../README.md) · 空间导航：[项目地图](project-map.md)

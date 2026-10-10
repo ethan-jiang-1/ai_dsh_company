@@ -5,7 +5,8 @@
 > 依据：FAQ 13（`_faq_on_digested/13_expert-plugin-repo-organization`）+ DSH 源码工作树逐条核实
 > （`packages/preset/*`、`packages/subagent/*`、`packages/experimental/agent-team/*`、`packages/workflow/*`、
 > `docs/subsystems/{agent-team,subagent,skills,workflow,spill}.md`）。
-> 性质：动工前的设计决策记录；实现开始后"当前合同"归本目录维护，单次决策归 `notes/`。
+> 性质：设计层——只保留仍指导未来选择的机制依据（为什么选 A 不选 B）；已落地的现在时语义归
+> docs 顶层合同，单次决策归 `notes/`（分层规矩唯一家 = [docs/AGENTS.md](../AGENTS.md)）。
 
 ---
 

@@ -36,16 +36,12 @@
 
 ## 2. 改动面 → 最小证据（同 diff 交付）
 
-| 改动面 | 最小证据 | 回放场景 |
-|---|---|---|
-| persona/skill 文案 | `presets.spec` + `preset-smoke` | **行为判据面**改动（改变"模型被要求做什么/判据怎么落"）→ 同 diff 必带；纯措辞润色 → 连通档 + 内容档兜 |
-| bundle/preset 行 config（机制面） | 上行 + `delegation-smoke`（工具行） | 同 diff 必带 |
-| client 用户可见面（面板/卡片/文案/CSS） | 视图模型 spec + 静态渲染 + `client-load-smoke` + CSS 守卫 | 用户可见改动 → 同 diff 场景或视觉夹具 |
-| lib 判据（deliverables / authorship / ledger） | 单测 + oracle 反证（真样本钉列） | — |
-| pack 导出/注册面 | 导出形态守卫 + `client-face` + `style-lifecycle` | — |
-| 发布/升 pin | `release-smoke` + 升 pin 程序 | **语料回放全绿 = 升 pin 回归网第一道**（release.md 人审项） |
+**行级映射**（哪个改动面跑哪个检查、何时升档、回放/视觉夹具的义务）唯一家 =
+[tests/README「改动面 → 最窄检查」](../tests/README.md)——2026-10-10 自本节迁入消双写，取舍 =
+[该轮 Note](../notes/implemented/2026-10-10-minimal-evidence-mapping-home.md)。本节只留政策：
 
-单测、smoke、rationale **不替代组装转录**——会话级行为的固化证据只有回放场景。
+- **同 diff 交付**：最小证据与被证明的改动同一 diff 出现，不欠账到"以后补"；
+- 单测、smoke、rationale **不替代组装转录**——会话级行为的固化证据只有回放场景。
 
 ## 3. 证据纪律（DSH 教义的本仓投影）
 
