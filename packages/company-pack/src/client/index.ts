@@ -14,6 +14,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { FloatRectLike } from './float-geometry.ts'
 import { DreamTeamBrandName } from './Brand.tsx'
+import { startInstanceGuard } from './instance-guard.ts'
 import { AttentionTab } from './AttentionTab.tsx'
 import { createAttentionRegistry } from './attention-registry.ts'
 import { createCompanyView } from './CompanyView.tsx'
@@ -61,6 +62,10 @@ const COMPANY_VIEW_ID = 'dsh-company-pack/company'
 export async function apply(ctx: ClientContext): Promise<void> {
   // CSS 与 fiber 同寿命；重新挂载读取新样式，卸载仅清理本次节点。
   ctx.effect(installStyles)
+
+  // 多实例探活横幅（卡②，2026-10-10 拍板：警告横幅）：同一浏览器多实例并存 = 静默互踩
+  // （E2 实证）⇒ localStorage 心跳互见即挂横幅。纯 DOM、无服务依赖，apply 即启。
+  startInstanceGuard(document)
 
   // 角色身份 UX · C 段：窗口标题带角色 + 整窗角色色条（2026-09-26 立，提案 §五 C）。
   // vendor 的 DocumentTitle 只在 activePanelId===null 时显示会话标题（用户真实用法下不可靠，
