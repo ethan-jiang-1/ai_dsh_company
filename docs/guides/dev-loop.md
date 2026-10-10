@@ -178,6 +178,11 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回�
    排练场里手册是指向真盘的**符号链接**（注入基线不变），CHARTER/org/templates 每次刷新，
    **journal 不镜像**（排练记忆不混真记忆）。`snapshot-motion` / `deliverables-check`
    默认仍指真盘——归档与审计本来就属于运行场。
+8. **沙箱后端探测**：`env.sh` 实跑一次 `sandbox-exec` 探测，**不可用则自动导出
+   `DSH_PERMISSION_MODE=danger-full-access`**（macOS 26 本机禁了 Seatbelt；不落则每条 bash 都退化
+   成「请求升级」，连 `ls` 也一样，且批准一次只买通一条命令）。探测结果是**明示**的（stderr 一行取舍）；
+   逃生阀 = `DSH_SKIP_SANDBOX_PROBE=1` 或自行设 `DSH_PERMISSION_MODE`；后端恢复自动回到 `workspace-write`。
+   理由、输掉的方案与红绿证据见 [sandbox-backend-probe](../../notes/implemented/2026-10-10-sandbox-backend-probe.md)。
 
 ## 7. 环境引导（配方已迁 [guides/bootstrap.md](./bootstrap.md)）
 
