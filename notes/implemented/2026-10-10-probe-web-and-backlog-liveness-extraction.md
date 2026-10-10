@@ -1,7 +1,7 @@
 # 探针 web 启动收成模块 + 背压活状态检查搬家（行为不变重构）
 
 状态：已交付（2026-10-10；授权 = 用户点名实施
-[_backlog/issues/2026-10-10-extract-without-behavior-change.md](../../_backlog/issues/2026-10-10-extract-without-behavior-change.md)，
+[_backlog/issues/2026-10-10-extract-without-behavior-change.md](../../_backlog/_archive/settled_issues/2026-10-10-extract-without-behavior-change.md)，
 决定已随本次变更落地 ⇒ 本 Note 直落 `implemented/`，未从 `proposed/` 起——那是给未实施提案的）。
 
 ## 决定
@@ -59,6 +59,6 @@
 
 ## 指针
 
-- 卡：[_backlog/issues/2026-10-10-extract-without-behavior-change.md](../../_backlog/issues/2026-10-10-extract-without-behavior-change.md)（实施后按其关闭条件归档）
+- 卡：[_backlog/issues/2026-10-10-extract-without-behavior-change.md](../../_backlog/_archive/settled_issues/2026-10-10-extract-without-behavior-change.md)（实施后按其关闭条件归档）
 - keyless 缝规则：[tests/harness/layering.spec.ts](../../tests/harness/layering.spec.ts)
 - 形状 spec：[tests/harness/probe-web.spec.ts](../../tests/harness/probe-web.spec.ts)
