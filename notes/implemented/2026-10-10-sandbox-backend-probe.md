@@ -71,7 +71,24 @@ switch the consumer to `danger-full-access`*（`vendor/dsh/packages/sandbox/sand
 
 - **核账：本机此后 bash 无围栏。** 这是有意的取舍，不是疏漏：该围栏在本机**本就不存在**，
   此前每次 `allowed-once` 事实上已在给全权，却还要人点一次。危险面**没有变大**，只是不再假装有闸门。
-- 本改动**只治本机观察窗的启动环境**，未改 `checks/` 的取数（`replay-smoke` 用 `workspace-write`、
-  `entry-probe-smoke` 用 `read-only` 仍是原样）——测试面取数是独立问题，要动需按 [测试宪法](../../docs/testing.md)另立证据。
+- 本改动**只治本机观察窗的启动环境**，未改 `checks/` 的取数——详见下条的两处更正。
+- **`checks/` 取数核查（2026-10-10 收口，两次独立查证）**：原先怀疑的"同源隐患"经查**都不成立**，故未动：
+  - `checks/smoke/entry-probe-smoke.mjs`：它的 `read-only` 不在脚本里，而在
+    `run/entry-probe.patch.yml` 的 profile 层（`sandbox-policy.mode: read-only` + `approval.policy: never`），
+    是**有意**的 fail-closed 档。实测该探针**容忍** fail-closed：最近一次归档
+    （`snapshots/probes/entry-probe/2026-10-10/answer-10-00-01-310Z.md`）得 12/13，唯一失败项是 Q1
+    引文不匹配（内容问题）；那次会话 1 条 bash 撞 fail-closed，agent 改用 read/grep/glob 完成，
+    `approval/asked` = 0。历史分数本就在 0/12–12/12 间波动 ⇒ 是这个探针的固有噪声，不是 sandbox 回归。
+  - `checks/smoke/replay-smoke.mjs:238` 的 `DSH_PERMISSION_MODE: 'workspace-write'` 是**死代码**：
+    `snapshots/replay/*/replay/cordis.snapshot.yml` 在更外层把 `sandbox-policy.mode` 钉成
+    `workspace-write`，覆盖 base bundle 对环境变量的读取。A/B 实跑（同一个真实 headless 命令，只差
+    环境变量）产出**逐字节相同**的 `sandbox/mode`、`approval/policy` 与内嵌的
+    `Current DSH file policy: workspace-write` ⇒ 改它**既不能变红也不能变绿**，所以留原样。
+  - 由此更正前一句的措辞：本 Note 说"replay-smoke 用 workspace-write"**只是就环境变量而言**；真正驱动
+    录制事件的是各场景自己的 profile patch。replay-smoke 与沙箱后端**无关**（它当前在本机是红的，但
+    那三个失败项——归一化日志、system-prompt sidecar、tool-schemas sidecar 的 bash 描述漂移——都不是
+    沙箱问题，且该场景早已声明 `replayEligible: archived`）。
+  - **未做的事**：要让 replay 反映本机真实沙箱姿态，得逐个改场景 `cordis.snapshot.yml` 并重录——那是
+    测试面变更，按 [测试宪法](../../docs/testing.md)需另立证据。本 Note 不授权它。
 - 后端恢复（或换 Linux）后无需改代码：探测会自动回到 `workspace-write`，届时本 Note 的事实落点
   = `run/env.sh` 那段探测的注释，随改动就地更新。

@@ -15,6 +15,7 @@
 // 用法：DSH_HOME=runtime/harness-home node probes/fs-taskboard/review-staleness-probe.mjs
 // 退出码：0 = B1 过（CEO 互审引用了当前版本或显式标注了版本差）；1 = B1 失败（穿透）；2 = 环境。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -39,32 +40,11 @@ const CFO_V1 = `出稿：cfo｜版本 v1｜任务书 = deliverables/${SLUG}/draf
 const CFO_V2 = `出稿：cfo｜版本 v2｜任务书 = deliverables/${SLUG}/drafts/ceo.md\n\n# CFO 稿 · 报价经济性（v2：修正成本口径）\n\n## 结论\n\n**毛利 24.7%**（破 30% 底线，-5.3pp）——$85k 合同额，$64k 交付成本（v1 漏了 $6.5k 外包费）。\n\n## 算式\n\ng = (85,000 - 64,000) / 85,000 = 21,000 / 85,000 = 24.71% < 30% ⇒ **触双签线**\n\n## v2 改动\n\n- 成本修正：$57.5k → $64k（补外包费 $6.5k——v1 漏项）\n- 结论翻转：过线 → 破线（32.4% → 24.7%）\n`
 writeFileSync(join(DELIV, 'drafts', 'cfo.md'), CFO_V1)
 
-const child = spawn(process.execPath,
-  ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-  { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
-let output = ''
-const banner = await new Promise((res, rej) => {
-  const on = chunk => { output += String(chunk)
-    const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-    if (m) res({ port: Number(m[1]), token: m[2] }) }
-  child.stdout.on('data', on); child.stderr.on('data', on)
-  child.on('exit', code => rej(new Error(`web 提前退出 ${String(code)}`)))
-  setTimeout(() => rej(new Error('boot 超时')), 120_000)
-}).catch(e => { console.error(e.message); process.exit(2) })
-
-const base = `http://127.0.0\.1:${String(banner.port)}`
-const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15_000) })
-const cookie = auth.headers.getSetCookie().map(v => v.split(';')[0]).join('; ')
-let rpcId = 0
-const rpc = async (endpoint, args) => {
-  const r = await fetch(`${base}/api/${endpoint}`, {
-    method: 'POST', headers: { 'content-type': 'application/json', cookie },
-    body: JSON.stringify({ type: 'client-request', rpcId: `rsp-${String(++rpcId)}`, method: endpoint, payload: { args } }),
-  })
-  const b = await r.json()
-  if (b?.result?.ok !== true) throw new Error(`${endpoint}: ${b?.result?.error?.message ?? 'unknown'}`)
-  return b.result.value
-}
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `rsp-` 由调用方传入，不推导；
+// spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
+const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(e => { console.error(e.message); process.exit(2) })
+const cookie = await companyCookie({ fetch, base, token })
+const rpc = companyRpc({ fetch, base, cookie, prefix: 'rsp-' })
 
 console.log(`review-staleness-probe: 场景 = CEO 互审 CFO v1 期间盘面变 v2（${SLUG}，排练盘）`)
 const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'ceo' } })

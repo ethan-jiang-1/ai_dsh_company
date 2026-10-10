@@ -14,6 +14,7 @@
 //   C2b 两名成员各有一条真实 queued 且 delivered 的 team message
 // 用法：source run/env.sh && node probes/team/team-concurrency-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, existsSync, readFileSync, rmSync, writeFileSync, mkdtempSync } from 'node:fs'
@@ -36,29 +37,22 @@ const barrierDir = mkdtempSync(join(home, 'team-read-barrier-'))
 const overlay = join(barrierDir, 'barrier.patch.yml')
 writeFileSync(overlay, `- insert:\n    - id: probe-read-barrier\n      name: ${JSON.stringify(join(ROOT, 'probes/team/read-barrier/index.mjs'))}\n`)
 writeFileSync(TARGET, '', 'utf8')
-const child = spawn(process.execPath,
-  ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--patch', overlay, '--', '--port', '0', '--no-open'],
-  { cwd: ROOT, env: { ...process.env, DSH_HOME: home, DSH_PROBE_BARRIER_DIR: barrierDir, DSH_PROBE_BARRIER_TARGET: TARGET, DSH_PROBE_BARRIER_CWD: REHEARSAL }, stdio: ['ignore', 'pipe', 'pipe'] })
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）。本探针的既有差异全当参数传：
+//   ① 读屏障 overlay 走 startWeb 的 patch 参数（argv 在 web 后插 --patch overlay）；
+//   ② DSH_PROBE_BARRIER_* 三个键随基础环境传入（home 会再叠加 DSH_HOME）；
+//   ③ finally 里未防护地引用 child ⇒ 用 spawn 捕获适配器：startWeb 起进程是同步的，
+//     即使 banner 等待失败 child 也已捕获，finally 照旧杀进程、catch 照旧退 2。
+let child
 try {
-  let output = ''
-  const banner = await new Promise((res, rej) => {
-    const timer = setTimeout(() => rej(new Error(`boot 超时\\n${output}`)), 120_000)
-    const on = c => { output += String(c); const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output); if (m) { clearTimeout(timer); res({ port: +m[1], token: m[2] }) } }
-    child.stdout.on('data', on); child.stderr.on('data', on)
-    child.on('exit', c => { clearTimeout(timer); rej(new Error(`web 提前退出 ${c}\\n${output}`)) })
+  // startWeb 起进程先于等 banner，boot 失败时 child 已在手；await 在 try 内 ⇒ boot 失败走
+  // catch（exitCode 2）+ finally 杀进程，与原实现一致。
+  const { base, token } = await startWeb({
+    spawn: (...args) => (child = spawn(...args)), root: ROOT, home, patch: overlay,
+    env: { ...process.env, DSH_PROBE_BARRIER_DIR: barrierDir, DSH_PROBE_BARRIER_TARGET: TARGET, DSH_PROBE_BARRIER_CWD: REHEARSAL },
   })
-  const base = `http://127.0.0.1:${banner.port}`
   console.log(`web up: ${base}`)
-  const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
-  const cookie = auth.headers.getSetCookie().map(c => c.split(';')[0]).join('; ')
-  let rpcId = 0
-  const rpc = async (endpoint, args) => {
-    const r = await fetch(`${base}/api/${endpoint}`, { method: 'POST', headers: { 'content-type': 'application/json', cookie },
-      body: JSON.stringify({ type: 'client-request', rpcId: `tcp-${++rpcId}`, method: endpoint, payload: { args } }) })
-    const body = await r.json()
-    if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? '?'}`)
-    return body.result.value
-  }
+  const cookie = await companyCookie({ fetch, base, token })
+  const rpc = companyRpc({ fetch, base, cookie, prefix: 'tcp-', errorFallback: '?' })
 
   const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'ceo' } })
   const sessionId = created.sessionId

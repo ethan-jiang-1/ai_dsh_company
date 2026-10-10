@@ -20,6 +20,7 @@
 // 用法：DSH_HOME=runtime/harness-home node probes/session-context/dual-signoff-probe.mjs
 // 退出码：0 = B2 不成立（CEO 侧可见/可处理——防线在场）；1 = B2 成立（缺口确认）；2 = 环境失败。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
@@ -37,38 +38,14 @@ try {
   process.exit(2)
 }
 
-const child = spawn(process.execPath,
-  ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-  { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
-let output = ''
-const banner = await new Promise((res, rej) => {
-  const on = chunk => {
-    output += String(chunk)
-    const match = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-    if (match) res({ port: Number(match[1]), token: match[2] })
-  }
-  child.stdout.on('data', on)
-  child.stderr.on('data', on)
-  child.on('exit', code => rej(new Error(`web 提前退出 ${String(code)}`)))
-  setTimeout(() => rej(new Error('boot 超时')), 120_000)
-}).catch(error => {
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `dsp-` 由调用方传入，不推导；
+// spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
+const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)
   process.exit(2)
 })
-
-const base = `http://127.0.0.1:${String(banner.port)}`
-const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15_000) })
-const cookie = auth.headers.getSetCookie().map(value => value.split(';')[0]).join('; ')
-let rpcId = 0
-const rpc = async (endpoint, args) => {
-  const response = await fetch(`${base}/api/${endpoint}`, {
-    method: 'POST', headers: { 'content-type': 'application/json', cookie },
-    body: JSON.stringify({ type: 'client-request', rpcId: `dsp-${String(++rpcId)}`, method: endpoint, payload: { args } }),
-  })
-  const body = await response.json()
-  if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? 'unknown'}`)
-  return body.result.value
-}
+const cookie = await companyCookie({ fetch, base, token })
+const rpc = companyRpc({ fetch, base, cookie, prefix: 'dsp-' })
 
 async function openDoor(role) {
   const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: role } })

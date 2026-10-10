@@ -14,6 +14,7 @@
 //   A4 排练不污染——final.md 落指定排练路径 + 公司共享盘 deliverables/ 零新增
 // 用法：source run/env.sh && node probes/fs-taskboard/motion-taskboard-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readdir, statSync, writeFileSync } from 'node:fs'
@@ -45,28 +46,13 @@ const deliverablesBefore = existsSync(DELIVERABLES) ? readdirSync(DELIVERABLES).
 let home
 try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('motion-taskboard-probe') } catch (e) { console.error(e.message); process.exit(2) }
 
-const child = spawn(process.execPath,
-  ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-  { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
-let output = ''
-const banner = await new Promise((res, rej) => {
-  const on = c => { output += String(c); const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output); if (m) res({ port: +m[1], token: m[2] }) }
-  child.stdout.on('data', on); child.stderr.on('data', on)
-  child.on('exit', c => rej(new Error(`web 提前退出 ${c}`))); setTimeout(() => rej(new Error('boot 超时')), 120_000)
-})
-const base = `http://127.0.0.1:${banner.port}`
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `mtp-` 由调用方传入，不推导；
+// spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
+const { child, base, token } = await startWeb({ spawn, root: ROOT, home })
 console.log(`web up: ${base}`)
 try {
-  const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
-  const cookie = auth.headers.getSetCookie().map(c => c.split(';')[0]).join('; ')
-  let rpcId = 0
-  const rpc = async (endpoint, args) => {
-    const r = await fetch(`${base}/api/${endpoint}`, { method: 'POST', headers: { 'content-type': 'application/json', cookie },
-      body: JSON.stringify({ type: 'client-request', rpcId: `mtp-${++rpcId}`, method: endpoint, payload: { args } }) })
-    const body = await r.json()
-    if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? '?'}`)
-    return body.result.value
-  }
+  const cookie = await companyCookie({ fetch, base, token })
+  const rpc = companyRpc({ fetch, base, cookie, prefix: 'mtp-', errorFallback: '?' })
 
   const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'ceo' } })
   const sessionId = created.sessionId

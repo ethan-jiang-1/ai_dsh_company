@@ -19,6 +19,7 @@
 // 用法：DSH_HOME=runtime/harness-home node probes/fs-taskboard/task-discovery-probe.mjs
 // 退出码：0 = 三判据全过；1 = FAIL（按判据定性）；2 = 环境失败。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -52,38 +53,14 @@ writeFileSync(join(DELIV, 'drafts', 'ceo.md'),
 writeFileSync(join(DELIV, 'drafts', 'vp-eng.md'),
   `出稿：vp-eng｜版本 v1｜任务书 = deliverables/2026-09-30-renewal-w-2026/drafts/ceo.md\n\n（上一场 renewal-w 的旧稿残留——非本场内容。）\n`)
 
-const child = spawn(process.execPath,
-  ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-  { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
-let output = ''
-const banner = await new Promise((res, rej) => {
-  const on = chunk => {
-    output += String(chunk)
-    const match = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-    if (match) res({ port: Number(match[1]), token: match[2] })
-  }
-  child.stdout.on('data', on)
-  child.stderr.on('data', on)
-  child.on('exit', code => rej(new Error(`web 提前退出 ${String(code)}`)))
-  setTimeout(() => rej(new Error('boot 超时')), 120_000)
-}).catch(error => {
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `tdp-` 由调用方传入，不推导；
+// spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
+const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)
   process.exit(2)
 })
-
-const base = `http://127.0.0.1:${String(banner.port)}`
-const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15_000) })
-const cookie = auth.headers.getSetCookie().map(value => value.split(';')[0]).join('; ')
-let rpcId = 0
-const rpc = async (endpoint, args) => {
-  const response = await fetch(`${base}/api/${endpoint}`, {
-    method: 'POST', headers: { 'content-type': 'application/json', cookie },
-    body: JSON.stringify({ type: 'client-request', rpcId: `tdp-${String(++rpcId)}`, method: endpoint, payload: { args } }),
-  })
-  const body = await response.json()
-  if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? 'unknown'}`)
-  return body.result.value
-}
+const cookie = await companyCookie({ fetch, base, token })
+const rpc = companyRpc({ fetch, base, cookie, prefix: 'tdp-' })
 
 console.log(`task-discovery-probe: 场景 = 多人模式 CFO 根会话按任务书认领（${SLUG}，排练盘）`)
 const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'cfo' } })

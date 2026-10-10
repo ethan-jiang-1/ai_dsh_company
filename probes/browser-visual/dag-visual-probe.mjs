@@ -14,6 +14,7 @@
 //   ② **图像判据**（人/多模态看图）：出 `snapshots/visual/dag-visual/{light,dark}.png`，逐张判"看起来对不对"。
 // 用法：source run/env.sh && node probes/browser-visual/dag-visual-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb } from '../../tools/lib/probe-web.mjs'
 import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -44,21 +45,9 @@ if (emitted.status !== 0) {
 const { svg, css } = JSON.parse(readFileSync(FIXTURE, 'utf8'))
 
 // ── 起真 web（真主题令牌的来源）──
-const child = spawn(process.execPath,
-  ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-  { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
-let output = ''
-const banner = await new Promise((res, rej) => {
-  const on = chunk => {
-    output += String(chunk)
-    const match = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-    if (match) res({ port: Number(match[1]), token: match[2] })
-  }
-  child.stdout.on('data', on)
-  child.stderr.on('data', on)
-  child.on('exit', code => rej(new Error(`web 提前退出 ${String(code)}`)))
-  setTimeout(() => rej(new Error('boot 超时')), 120_000)
-}).catch(error => {
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：本探针只等 banner、不取 cookie ⇒ 只走 startWeb 这一层。
+// spawn 注入：tools/lib 是 keyless 纯逻辑缝（layering 守卫），真进程由本驱动层自己带。
+const { child, port, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)
   process.exit(2)
 })
@@ -73,7 +62,7 @@ const { loadChromium, launchChromium } = await import('../../tools/drivers/playw
 const chromium = await loadChromium(ROOT)
 const browser = await launchChromium(chromium)
 const page = await browser.newPage({ viewport: { width: 1100, height: 560 } })
-await page.goto(`http://127.0.0.1:${String(banner.port)}/?token=${banner.token}`, { waitUntil: 'domcontentloaded' })
+await page.goto(`http://127.0.0.1:${String(port)}/?token=${token}`, { waitUntil: 'domcontentloaded' })
 await page.waitForTimeout(3000)
 
 const injected = await page.evaluate(({ svg, css }) => {

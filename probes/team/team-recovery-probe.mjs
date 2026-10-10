@@ -16,6 +16,7 @@
 //   R4 重启 prompt 后出现 completed turn；deadline 未完成明确失败
 // 用法：source run/env.sh && node probes/team/team-recovery-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
@@ -31,31 +32,17 @@ const kill9 = child => { try { child.kill('SIGKILL') } catch { /* 已死 */ } }
 let proc = null // 当前 web 进程持有者（run 内赋值，finally 兜杀）
 // 直接顺序实现（不用上面的占位）
 const run = async () => {
-  const { child: c1, base: base1, token: token1 } = await (async () => {
-    const ch = spawn(process.execPath,
-      ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-      { cwd: ROOT, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] })
-    proc = ch
-    let out = ''
-    const bn = await new Promise((res, rej) => {
-      const on = c => { out += String(c); const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(out); if (m) { clearTimeout(timer); res({ port: +m[1], token: m[2] }) } }
-      const timer = setTimeout(() => rej(new Error('boot 超时')), 120_000)
-      ch.stdout.on('data', on); ch.stderr.on('data', on)
-      ch.on('exit', c => { clearTimeout(timer); rej(new Error(`web 提前退出 ${c}`)) })
-    })
-    return { child: ch, base: `http://127.0.0.1:${bn.port}`, token: bn.token }
-  })()
+  // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：本探针起**两次** web，函数各调一次
+  // （不做进程级单例）。既有差异保留：环境原样传 `process.env`（不另加 DSH_HOME）；
+  // rpcId 计数器**跨两次启动共用**⇒ 每次调用传入同一个 rpc 工厂持有的闭包。
+  // spawn/fetch 注入：tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带。
+  const { child: c1, base: base1, token: token1 } = await startWeb({ spawn, root: ROOT, env: process.env })
+  proc = c1
   console.log(`web up (pre-kill): ${base1}`)
-  const auth = await fetch(`${base1}/?token=${token1}`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
-  const cookie = auth.headers.getSetCookie().map(c => c.split(';')[0]).join('; ')
-  let rpcId = 0
-  const mkRpc = (base, ck) => async (endpoint, args) => {
-    const r = await fetch(`${base}/api/${endpoint}`, { method: 'POST', headers: { 'content-type': 'application/json', cookie: ck },
-      body: JSON.stringify({ type: 'client-request', rpcId: `trp-${++rpcId}`, method: endpoint, payload: { args } }) })
-    const body = await r.json()
-    if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? '?'}`)
-    return body.result.value
-  }
+  const cookie = await companyCookie({ fetch, base: base1, token: token1 })
+  // rpcId 计数器跨两次启动**共用**（原实现 rpcId 在外层声明一次）⇒ 重启后继续往下数，不重置。
+  const rpcCounter = { n: 0 }
+  const mkRpc = (base, ck) => companyRpc({ fetch, base, cookie: ck, prefix: 'trp-', errorFallback: '?', counter: rpcCounter })
   let rpc = mkRpc(base1, cookie)
   const events = async () => (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })).map(r => r.event).filter(Boolean)
   let leadId
@@ -115,22 +102,11 @@ const run = async () => {
   console.log('process SIGKILLed（崩溃点）')
   proc = null
 
-  // ── 相二：重启 → 恢复检查 ──
-  const ch2 = spawn(process.execPath,
-    ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-    { cwd: ROOT, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] })
+  // ── 相二：重启 → 恢复检查 ──（同一个 startWeb，第二次调用——不做进程级单例）
+  const { child: ch2, base: base2, token: token2 } = await startWeb({ spawn, root: ROOT, env: process.env })
   proc = ch2
-  let out2 = ''
-  const bn2 = await new Promise((res, rej) => {
-    const on = c => { out2 += String(c); const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(out2); if (m) { clearTimeout(timer); res({ port: +m[1], token: m[2] }) } }
-    const timer = setTimeout(() => rej(new Error('web 重启 boot 超时（120s）')), 120_000)
-    ch2.stdout.on('data', on); ch2.stderr.on('data', on)
-    ch2.on('exit', c => { clearTimeout(timer); rej(new Error(`web(重启) 提前退出 ${c}`)) })
-  })
-  const base2 = `http://127.0.0.1:${bn2.port}`
   console.log(`web up (post-restart): ${base2}`)
-  const auth2 = await fetch(`${base2}/?token=${bn2.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
-  const cookie2 = auth2.headers.getSetCookie().map(c => c.split(';')[0]).join('; ')
+  const cookie2 = await companyCookie({ fetch, base: base2, token: token2 })
   rpc = mkRpc(base2, cookie2)
   const restartPrompt = `恢复检查（前一进程被强杀）：1) 使用 list_agents 工具报告真实名册（res 的精确 target/name 和状态）；2) 给 res 发一条消息：「恢复检查：请回报你收到的最后一条指示原文与当前进度，以及标记「${MARKER}」」；3) 把 res 的恢复后回报转述给我，不能用崩溃前正文代替。`
   await rpc('session/prompt', { request: { requestId: `trp-re-${Date.now()}`, sessionId, mode: 'queue',

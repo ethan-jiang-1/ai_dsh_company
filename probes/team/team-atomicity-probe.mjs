@@ -12,6 +12,7 @@
 //   C5b Lead与两成员最新turn均completed；一次Lead轮足够，超时exit2，不以部分数据判绿
 // 用法：source run/env.sh && node probes/team/team-atomicity-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
@@ -30,29 +31,15 @@ try { rmSync(TARGET, { force: true }); rmSync(join(REHEARSAL, 'journal', 'w1-sco
 let home
 try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('team-atomicity-probe') } catch (e) { console.error(e.message); process.exit(2) }
 
-const child = spawn(process.execPath,
-  ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-  { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
+let child
 try {
-  let output = ''
-  const banner = await new Promise((res, rej) => {
-    const timer = setTimeout(() => rej(new Error('boot 超时')), 120_000)
-    const on = c => { output += String(c); const m = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output); if (m) { clearTimeout(timer); res({ port: +m[1], token: m[2] }) } }
-    child.stdout.on('data', on); child.stderr.on('data', on)
-    child.on('exit', c => { clearTimeout(timer); rej(new Error(`web 提前退出 ${c}`)) })
-  })
-  const base = `http://127.0.0.1:${banner.port}`
+  // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `tap-` 由调用方传入；spawn/fetch 注入
+  // （tools/lib 是 keyless 纯逻辑缝）。下方 finally 兜杀引用 child ⇒ 经注入的 spawn 顺手捕获：
+  // startWeb 起进程先于等 banner，boot 失败时 child 已在手，清理路径与原实现一致。
+  const { base, token } = await startWeb({ spawn: (...args) => (child = spawn(...args)), root: ROOT, home })
   console.log(`web up: ${base}`)
-  const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15000) })
-  const cookie = auth.headers.getSetCookie().map(c => c.split(';')[0]).join('; ')
-  let rpcId = 0
-  const rpc = async (endpoint, args) => {
-    const r = await fetch(`${base}/api/${endpoint}`, { method: 'POST', headers: { 'content-type': 'application/json', cookie },
-      body: JSON.stringify({ type: 'client-request', rpcId: `tap-${++rpcId}`, method: endpoint, payload: { args } }) })
-    const body = await r.json()
-    if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? '?'}`)
-    return body.result.value
-  }
+  const cookie = await companyCookie({ fetch, base, token })
+  const rpc = companyRpc({ fetch, base, cookie, prefix: 'tap-', errorFallback: '?' })
   const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'ceo' } })
   const sessionId = created.sessionId
   console.log('ceo session', sessionId)

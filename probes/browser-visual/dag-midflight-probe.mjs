@@ -10,6 +10,7 @@
 // 需要裁决的一律写「未决项」fail-closed。
 // 用法：source run/env.sh && node probes/browser-visual/dag-midflight-probe.mjs [--waves 6]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -54,37 +55,14 @@ const MOTION = `动议（真盘评估，今天要结论）：**东南亚市场�
 每波只出一页纸（结论先行），互审一轮即可，别扩写。`
 
 // ── 起 web（真盘会话 + 浏览器截图共用）──
-const child = spawn(process.execPath,
-  ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-  { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
-let output = ''
-const banner = await new Promise((res, rej) => {
-  const on = chunk => {
-    output += String(chunk)
-    const match = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-    if (match) res({ port: Number(match[1]), token: match[2] })
-  }
-  child.stdout.on('data', on)
-  child.stderr.on('data', on)
-  child.on('exit', code => rej(new Error(`web 提前退出 ${String(code)}｜${output.slice(-800)}`)))
-  setTimeout(() => rej(new Error('boot 超时')), 120_000)
-}).catch(error => {
+// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `dm-` 由调用方传入，不推导；
+// spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
+const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)
   process.exit(2)
 })
-const base = `http://127.0.0.1:${String(banner.port)}`
-const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15_000) })
-const cookie = auth.headers.getSetCookie().map(value => value.split(';')[0]).join('; ')
-let rpcId = 0
-const rpc = async (endpoint, args_) => {
-  const response = await fetch(`${base}/api/${endpoint}`, {
-    method: 'POST', headers: { 'content-type': 'application/json', cookie },
-    body: JSON.stringify({ type: 'client-request', rpcId: `dm-${String(++rpcId)}`, method: endpoint, payload: { args: args_ } }),
-  })
-  const body = await response.json()
-  if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? 'unknown'}`)
-  return body.result.value
-}
+const cookie = await companyCookie({ fetch, base, token })
+const rpc = companyRpc({ fetch, base, cookie, prefix: 'dm-' })
 
 let sessionId = EXISTING
 let TITLE
@@ -122,7 +100,7 @@ const { loadChromium, launchChromium } = await import('../../tools/drivers/playw
 const chromium = await loadChromium(ROOT)
 const browser = await launchChromium(chromium)
 const page = await browser.newPage({ viewport: { width: 1680, height: 1000 } })
-await page.goto(`${base}/?token=${banner.token}`)
+await page.goto(`${base}/?token=${token}`)
 await page.locator('[data-composer-input][contenteditable="true"]').waitFor({ timeout: 20_000 })
 const welcome = page.locator('[class*="onboardingOverlay"]')
 if (await welcome.count() > 0 && await welcome.isVisible()) {

@@ -10,6 +10,7 @@ import { spawn } from 'node:child_process'
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { pairedCalls, toolResultText, toolArguments, hasCompletedTurn } from '../../tools/lib/collaboration-evidence.mjs'
@@ -28,33 +29,17 @@ const evidenceDir = join(home, 'member-stale-evidence')
 mkdirSync(evidenceDir, { recursive: true })
 const evidence = { target: relative, baseline: BASE, external: EXTERNAL, expected: FINAL }
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-const child = spawn(process.execPath, ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web', '--', '--port', '0', '--no-open'],
-  { cwd: ROOT, env: { ...process.env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })
+let child
 let budgetExpired = false
 const budget = setTimeout(() => { budgetExpired = true; child.kill('SIGTERM'); console.error('ERROR: 12分钟总预算到限'); process.exitCode = 2 }, 12 * 60_000)
 try {
-  let output = ''
-  const banner = await new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('boot超时')), 120_000)
-    const on = chunk => {
-      output += String(chunk)
-      const match = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
-      if (match) { clearTimeout(timer); resolve({ port: Number(match[1]), token: match[2] }) }
-    }
-    child.stdout.on('data', on); child.stderr.on('data', on)
-    child.on('exit', code => { clearTimeout(timer); reject(new Error(`web提前退出${code}`)) })
-  })
-  const base = `http://127.0.0.1:${banner.port}`
-  const auth = await fetch(`${base}/?token=${banner.token}`, { redirect: 'manual', signal: AbortSignal.timeout(15_000) })
-  const cookie = auth.headers.getSetCookie().map(value => value.split(';')[0]).join('; ')
-  let rpcId = 0
-  const rpc = async (endpoint, args) => {
-    const response = await fetch(`${base}/api/${endpoint}`, { method: 'POST', headers: { 'content-type': 'application/json', cookie },
-      body: JSON.stringify({ type: 'client-request', rpcId: `ms-${++rpcId}`, method: endpoint, payload: { args } }), signal: AbortSignal.timeout(30_000) })
-    const body = await response.json()
-    if (body?.result?.ok !== true) throw new Error(`${endpoint}: ${body?.result?.error?.message ?? 'unknown'}`)
-    return body.result.value
-  }
+  // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+  // 既有差异当参数保留：RPC 逐调用 30s 超时 ⇒ companyRpc 产物外包一层传 { signal }；budget 定时器与
+  // finally 都引用 child ⇒ 经注入的 spawn 顺手捕获——起进程先于等 banner，12 分钟总预算仍含 boot。
+  const { base, token } = await startWeb({ spawn: (...args) => (child = spawn(...args)), root: ROOT, home })
+  const cookie = await companyCookie({ fetch, base, token })
+  const rpcImpl = companyRpc({ fetch, base, cookie, prefix: 'ms-' })
+  const rpc = (endpoint, args) => rpcImpl(endpoint, args, { signal: AbortSignal.timeout(30_000) })
   const events = async address => (await readRecords(request => rpc('session/page', { request }), address)).map(record => record.event).filter(Boolean)
   const { sessionId } = await rpc('session/create', { request: { cwd, agentPreset: 'ceo' } })
   evidence.sessionId = sessionId

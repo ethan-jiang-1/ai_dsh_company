@@ -1,21 +1,13 @@
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
-import { createRequire } from 'node:module'
-import { runInNewContext } from 'node:vm'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { backlogLivenessProblems } from '../../tools/lib/backlog-liveness.mjs'
 import { markdownLinkTargets } from '../../tools/lib/markdown-links.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 
 // Exercise the owning gate's read-only function without running the repository-wide gate runner.
-const source = readFileSync(join(ROOT, 'checks/run-gates.mjs'), 'utf8')
-const start = source.indexOf('function backlogLivenessProblems(backlogRoot) {')
-const end = source.indexOf('// Runner stays in the owning gate;', start)
-if (start < 0 || end < 0) throw new Error('backlog-liveness function boundary missing')
-const yaml = createRequire(join(ROOT, 'vendor/dsh/packages/preset/agent-preset/package.json'))('js-yaml')
-const check = runInNewContext(`${source.slice(start, end)}\nbacklogLivenessProblems`, {
-  existsSync, lstatSync, readFileSync, readdirSync, basename, join, resolve, markdownLinkTargets,
-  loadYaml: (text: string) => yaml.load(text, { schema: yaml.CORE_SCHEMA }),
-}) as (root: string) => string[]
+// 2026-10-10：改为直接 import（原先是切 checks/run-gates.mjs 源码 + vm 求值，改一处注释就假红）。
+const check = backlogLivenessProblems as (root: string) => string[]
 
 const scratch = join(ROOT, 'node_modules/.cache/company-backlog-liveness')
 const pools = ['issues', 'bugs', 'research', 'methods', '_archive/settled_issues',
