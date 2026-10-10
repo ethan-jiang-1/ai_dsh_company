@@ -118,5 +118,5 @@ export function assertCodingBaseline(baseline) {
   if (!baseline.includes('AGENTS.md — 本仓库的入口链') || !baseline.includes('vendor 铁律')) {
     throw new Error('指令基线缺开发仓库入口')
   }
-  if (baseline.includes('# wochen · 公司手册')) throw new Error('指令基线混入公司运行手册')
+  if (baseline.includes('# 梦之队 · 公司手册')) throw new Error('指令基线混入公司运行手册')
 }

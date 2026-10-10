@@ -159,7 +159,7 @@ describe('入口探针不使用全文兜底', () => {
 describe('coding 指令与公司运行指令分开', () => {
   it('只接受开发入口基线', () => {
     expect(() => assertCodingBaseline('# AGENTS.md — 本仓库的入口链\nvendor 铁律')).not.toThrow()
-    expect(() => assertCodingBaseline('# wochen · 公司手册')).toThrow('缺开发仓库入口')
-    expect(() => assertCodingBaseline('# AGENTS.md — 本仓库的入口链\nvendor 铁律\n# wochen · 公司手册')).toThrow('混入')
+    expect(() => assertCodingBaseline('# 梦之队 · 公司手册')).toThrow('缺开发仓库入口')
+    expect(() => assertCodingBaseline('# AGENTS.md — 本仓库的入口链\nvendor 铁律\n# 梦之队 · 公司手册')).toThrow('混入')
   })
 })

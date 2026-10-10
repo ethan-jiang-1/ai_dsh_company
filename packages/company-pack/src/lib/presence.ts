@@ -50,11 +50,11 @@ function isPresetRole(name: string): name is PresetRoleId {
  * 的 `name` 同源——`tests/company/presence-board.spec.ts` 有防漂移断言。
  */
 export const PRESET_DISPLAY_NAMES: Record<PresetRoleId, string> = {
-  ceo: 'wochen CEO',
-  'vp-eng': 'wochen VP-Eng',
-  'vp-sales': 'wochen VP-Sales',
-  coo: 'wochen COO',
-  cfo: 'wochen CFO',
+  ceo: '梦之队 CEO',
+  'vp-eng': '梦之队 VP-Eng',
+  'vp-sales': '梦之队 VP-Sales',
+  coo: '梦之队 COO',
+  cfo: '梦之队 CFO',
 }
 
 /** 成员名 → 显示名（lead 行特殊：name 恒为 'lead'，按角色映射）。 */

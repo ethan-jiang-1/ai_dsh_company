@@ -97,7 +97,7 @@ try {
 
   // 品牌（AppFrame 主标题，DSH_CLIENT_TITLE 构建期注入）
   verdict.brandPresent = await evaluate(
-    `document.body.innerText.includes('DSH Wochen Team')`) === true;
+    `document.body.innerText.includes('DSH 梦之队')`) === true;
 
   // 右栏 8 公司页签：guide 清点 → 逐个开（Start-chip 回切——开一个页签后 guide 列表被
   // 页签条替换，必须回 Start 再开下一个；dock 为每会话保留前后台子树 ⇒ 断言用 includes 扫全文）。

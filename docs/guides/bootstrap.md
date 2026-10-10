@@ -22,8 +22,8 @@ node ./node_modules/typescript/bin/tsc -b \
 (cd vendor/dsh/native/system && ../../node_modules/.bin/tsx scripts/build.ts)
 # web 观察窗（可选；三件事缺一不可）：
 node ./node_modules/typescript/bin/tsc -b vendor/dsh/tsconfig.client.json   # client 面（测试面报错可忽略）
-(cd vendor/dsh && DSH_CLIENT_TITLE="DSH Wochen Team" ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE client)
-DSH_CLIENT_TITLE="DSH Wochen Team" pnpm --filter @deepseek-ai/dsh-web-frontend run build   # 前端 dist
+(cd vendor/dsh && DSH_CLIENT_TITLE="DSH 梦之队" ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE client)
+DSH_CLIENT_TITLE="DSH 梦之队" pnpm --filter @deepseek-ai/dsh-web-frontend run build   # 前端 dist
 source run/env.sh && pnpm dsh plugin --profile web add link:./packages/company-pack          # dev 用 link:（内容改动即刻生效）；真实形状归 release-smoke
 pnpm dsh web -- --port 0 --no-open                                         # 端口是环境状态：系统分配，从横幅读端口/token
 

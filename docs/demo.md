@@ -30,7 +30,7 @@
    粘贴 `company-workspace` 的绝对路径 → 回车 → `Open`。
    ⚠ **这一步最容易漏**：对话框默认是目录浏览器，不点 `Edit path` 看不到粘贴框（2026-09-23 实测，
    用户与代理都卡过）。平台 UI（vendor 只读）改不了，写进 runbook 代偿。
-4. 新建会话：preset 选 **wochen CEO**（`ceo` 是 profile 默认）；工作目录 `company-workspace`
+4. 新建会话：preset 选 **梦之队 CEO**（`ceo` 是 profile 默认）；工作目录 `company-workspace`
 5. 进“另一位成员的空间”：**teammate 的会话不在顶层列表**——在会话头部点 **Team 名册**，点成员名打开其会话（`uiWorkspace.openSession`，子会话；rc.2 现行 API，旧 `sessions.openSubagent` 已移除）。显式入口 = 右栏「在场」页签的在场板**行可点**（条目 ② 起为平台页签，可拖出成浮窗并看）。
 6. 收场验收：`node checks/audit/deliverables-check.mjs`（交付物三态；审归档快照要配 `--only <slug>`，
    因为快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只有本轮日志）

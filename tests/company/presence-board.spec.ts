@@ -98,9 +98,9 @@ describe('presenceFromEvents（回放 / 离线路径，验收判据 4：非空�
   it('折出 lead + 4 分身共五行，主键 = team roster（D-a）', () => {
     expect(board.rows).toHaveLength(5)
     expect(board.rows[0]!.role).toBe('lead')
-    expect(board.rows[0]!.displayName).toBe('wochen CEO')
+    expect(board.rows[0]!.displayName).toBe('梦之队 CEO')
     expect(board.rows.slice(1).map(row => row.displayName)).toEqual([
-      'wochen VP-Sales', 'wochen VP-Eng', 'wochen COO', 'wochen CFO',
+      '梦之队 VP-Sales', '梦之队 VP-Eng', '梦之队 COO', '梦之队 CFO',
     ])
   })
 
@@ -120,12 +120,12 @@ describe('presenceFromEvents（回放 / 离线路径，验收判据 4：非空�
 
   it('动态流含成员上线 / 任务生命周期 / 消息投递（sender → target + 首行预览）', () => {
     const texts = board.activity.map(entry => entry.text)
-    expect(texts.some(text => text.includes('wochen VP-Sales') && text.includes('上线'))).toBe(true)
+    expect(texts.some(text => text.includes('梦之队 VP-Sales') && text.includes('上线'))).toBe(true)
     expect(texts.some(text => text.includes('新任务 task-1'))).toBe(true)
     expect(texts.some(text => text.includes('认领 task-1'))).toBe(true)
     expect(texts.some(text => text.includes('完成 task-1'))).toBe(true)
     const message = texts.find(text => text.includes('→'))
-    expect(message).toContain('wochen VP-Sales → wochen CEO')
+    expect(message).toContain('梦之队 VP-Sales → 梦之队 CEO')
     expect(message).toContain('回执 · task-1')
   })
 })
@@ -147,9 +147,9 @@ describe('rowsFromTeamView（live 路径：Lead 的 agentTeam 投影 → 行）'
   it('lead 行显示 CEO 显示名；phase 按 D-c 中文映射（active → 待命）', () => {
     const rows = rowsFromTeamView(view)
     expect(rows).toHaveLength(3)
-    expect(rows[0]).toMatchObject({ displayName: 'wochen CEO', statusLabel: '待命', currentTask: null })
+    expect(rows[0]).toMatchObject({ displayName: '梦之队 CEO', statusLabel: '待命', currentTask: null })
     const eng = rows.find(row => row.name === 'vp-eng')
-    expect(eng).toMatchObject({ displayName: 'wochen VP-Eng', statusLabel: '待命' })
+    expect(eng).toMatchObject({ displayName: '梦之队 VP-Eng', statusLabel: '待命' })
     expect(eng!.currentTask).toBe('VP-Eng：技术可行性结论')
     expect(rows.find(row => row.name === 'coo')).toMatchObject({ statusLabel: '启动中', currentTask: null })
   })
@@ -202,10 +202,10 @@ describe('diffActivity（live 动态流 = 快照差分）', () => {
     const t0 = { members: [member('s1', 'vp-eng', 'teammate', 'active')], tasks: [] }
     const t1 = { members: [member('s1', 'vp-eng', 'teammate', 'provisioning'), member('s2', 'coo', 'teammate', 'active')], tasks: [] }
     const texts = diffActivity(t0, t1, 5).map(entry => entry.text)
-    expect(texts).toContain('wochen VP-Eng 转启动中')
-    expect(texts).toContain('wochen COO 上线')
+    expect(texts).toContain('梦之队 VP-Eng 转启动中')
+    expect(texts).toContain('梦之队 COO 上线')
     const t2 = { members: [member('s1', 'vp-eng', 'teammate', 'failed')], tasks: [] }
-    expect(diffActivity(t1, t2, 9).map(entry => entry.text)).toEqual(['wochen VP-Eng 故障'])
+    expect(diffActivity(t1, t2, 9).map(entry => entry.text)).toEqual(['梦之队 VP-Eng 故障'])
   })
 
   it('任务：新任务 / 认领 / 完成；仅 revision 变化不产动态', () => {
@@ -213,9 +213,9 @@ describe('diffActivity（live 动态流 = 快照差分）', () => {
     const t1: TeamViewLike = { members: [], tasks: [task('task-1', '定价结论', 'in_progress', 'vp-sales')] }
     const t2: TeamViewLike = { members: [], tasks: [task('task-1', '定价结论（修订）', 'in_progress', 'vp-sales')] }
     const t3: TeamViewLike = { members: [], tasks: [task('task-1', '定价结论（修订）', 'completed', 'vp-sales')] }
-    expect(diffActivity(t0, t1, 1).map(entry => entry.text)).toEqual(['wochen VP-Sales 认领 task-1'])
+    expect(diffActivity(t0, t1, 1).map(entry => entry.text)).toEqual(['梦之队 VP-Sales 认领 task-1'])
     expect(diffActivity(t1, t2, 2)).toEqual([])
-    expect(diffActivity(t2, t3, 3).map(entry => entry.text)).toEqual(['wochen VP-Sales 完成 task-1'])
+    expect(diffActivity(t2, t3, 3).map(entry => entry.text)).toEqual(['梦之队 VP-Sales 完成 task-1'])
     const fresh: TeamViewLike = { members: [], tasks: [task('task-2', '承接结论', 'pending')] }
     expect(diffActivity({ members: [], tasks: [] }, fresh, 4).map(entry => entry.text)).toEqual(['新任务 task-2：承接结论'])
   })
@@ -244,7 +244,7 @@ describe('presenceFromEvents · nameById 名册补充表', () => {
     const events = [messageEvent('session-sender', 'vp-eng', 'session-target', '对齐一下', 5)]
     expect(presenceFromEvents(events).activity[0]?.text).toContain('session-target')
     const names = new Map([['session-target', 'coo']])
-    expect(presenceFromEvents(events, names).activity[0]?.text).toContain('wochen COO')
+    expect(presenceFromEvents(events, names).activity[0]?.text).toContain('梦之队 COO')
   })
 
   it('memberNames 从 agentTeam 投影建 id → 成员名表', () => {

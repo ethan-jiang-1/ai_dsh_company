@@ -13,7 +13,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { FloatRectLike } from './float-geometry.ts'
-import { WocheBrandName } from './Brand.tsx'
+import { DreamTeamBrandName } from './Brand.tsx'
 import { AttentionTab } from './AttentionTab.tsx'
 import { createAttentionRegistry } from './attention-registry.ts'
 import { createCompanyView } from './CompanyView.tsx'
@@ -147,7 +147,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
 
   ctx.inject(['sessions', 'sidebarRight', 'slots'], (scoped) => {
     scoped.slots.inject('sidebar.brand.name', () =>
-      scoped.slots.register({ name: 'sidebar.brand.name' }, WocheBrandName))
+      scoped.slots.register({ name: 'sidebar.brand.name' }, DreamTeamBrandName))
 
     // 角色身份 UX · B 段：侧栏会话行首的角色徽标（官方 ambient 行装饰位，仅 idle 行渲染）。
     // root 作用域只给 sessionId（槽合同原话"nothing else"）⇒ 数据经 inject 面注入

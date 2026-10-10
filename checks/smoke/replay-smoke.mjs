@@ -681,7 +681,7 @@ async function runUiFlow(page, { url, workspace }) {
  * 右栏打开 → guide 胶囊进「在场」页签 → 在场板 5 行（D-a：lead + 4 分身；D-c：团队内状态列头）
  * → 点 VP-Eng 行 → 断言当前会话切进该成员的空间（D-d；行可点 = 提案验收 5）。
  * 锚点（en 页面 + 本包中文文案）：'Open right sidebar' / guide '在场' /
- * list '组织在场板' / text '团队内状态' / 行 aria-label 'wochen <角色>，…' /
+ * list '组织在场板' / text '团队内状态' / 行 aria-label '梦之队 <角色>，…' /
  * 成员会话标记 = lineage tree 'Subagent sessions' 或 read-only composer。
  */
 async function runCockpitFlow(page) {
@@ -695,7 +695,7 @@ async function runCockpitFlow(page) {
   const rows = board.getByRole('listitem')
   const rowCount = await rows.count()
   check('「在场」页签打开且在场板渲染（平台页签形态，提案验收 2）', rowCount === 5, `${String(rowCount)} 行`)
-  for (const role of ['wochen CEO', 'wochen VP-Sales', 'wochen VP-Eng', 'wochen COO', 'wochen CFO']) {
+  for (const role of ['梦之队 CEO', '梦之队 VP-Sales', '梦之队 VP-Eng', '梦之队 COO', '梦之队 CFO']) {
     const hit = await rows.filter({ has: page.getByText(role, { exact: false }) }).count()
     check(`在场板行：${role}`, hit === 1, `${String(hit)} 行命中`)
   }
@@ -704,7 +704,7 @@ async function runCockpitFlow(page) {
   // D-d：点 VP-Eng 行 → 该成员会话成为当前会话。实证锚点（2026-09-23）：child 视图的
   // 会话头出现 "Session hierarchy" 面包屑，含 "Switch subagent: <成员 label>"——
   // 直接断言目标成员身份（不只断言"切走了"）。只读 composer 仅 persisted-only child 才有。
-  const engRow = rows.filter({ has: page.getByText('wochen VP-Eng', { exact: false }) }).first()
+  const engRow = rows.filter({ has: page.getByText('梦之队 VP-Eng', { exact: false }) }).first()
   console.log(`  （ui 诊断）点击前 URL = ${page.url()}`)
   await engRow.click()
   await sleep(1_500)

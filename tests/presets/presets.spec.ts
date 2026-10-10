@@ -87,7 +87,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       expect(match, `${role} 行内 config.name 缺失`).not.toBeNull()
       return (match as RegExpExecArray)[1]!.trim()
     })
-    expect(names.every(name => name.startsWith('wochen ')), `显示名未共用 wochen 前缀：${names.join(' / ')}`).toBe(true)
+    expect(names.every(name => name.startsWith('梦之队 ')), `显示名未共用 梦之队 前缀：${names.join(' / ')}`).toBe(true)
   })
 
   it('bundle 行：agent-preset-registry 用替换语义（覆盖 web-app 出厂行 default），其余新增走 insert', () => {

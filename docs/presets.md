@@ -3,7 +3,7 @@
 > 什么时候读：改 persona、skills 或角色语义时。路线 = 五角色表 → 验证方式节。
 > 顶层合同：五个角色 preset 的"现在时"语义（persona 定稿、skills 清单、验证方式）。
 > 内容来源 [design/role-content-plan.md](./design/role-content-plan.md)；命名约定见台账 D14
-> （显示名 `wochen <角色>`，preset id 保持 kebab）。R1 定稿 CEO / VP-Eng；R2 定稿 VP-Sales / COO，
+> （显示名 `梦之队 <角色>`，preset id 保持 kebab）。R1 定稿 CEO / VP-Eng；R2 定稿 VP-Sales / COO，
 > 并增设 CFO（用户 2026-09-22 定案：50 人高科技公司，软件开发 / 服务 / 系统集成）。
 > **编制唯一事实家 = `company-workspace/kb/org.md`**（细到岗位）；各角色 CHARTER 只留本条线事实
 > 并引用它（Q3：公司事实活数据留 workspace，pack 不含公司事实——D17）。
@@ -14,11 +14,11 @@
 
 | id | 显示名 | trust | 默认 | 状态 |
 |---|---|---|---|---|
-| `ceo` | wochen CEO | system | ✅ `isDefault` | R1 定稿 |
-| `vp-eng` | wochen VP-Eng | system | — | R1 定稿 |
-| `vp-sales` | wochen VP-Sales | system | — | R2 定稿 |
-| `coo` | wochen COO | system | — | R2 定稿 |
-| `cfo` | wochen CFO | system | — | R2 定稿（增设） |
+| `ceo` | 梦之队 CEO | system | ✅ `isDefault` | R1 定稿 |
+| `vp-eng` | 梦之队 VP-Eng | system | — | R1 定稿 |
+| `vp-sales` | 梦之队 VP-Sales | system | — | R2 定稿 |
+| `coo` | 梦之队 COO | system | — | R2 定稿 |
+| `cfo` | 梦之队 CFO | system | — | R2 定稿（增设） |
 
 实测方式：web 观察窗的 `agentPresets/list` RPC（返回 9 条 = DSH 出厂 4〔cordis/minimal/ptc/standard，vendor `web-app/presets/`〕+ 本 pack 5，零 broken）。
 UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSection.tsx`）。

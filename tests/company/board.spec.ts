@@ -27,7 +27,7 @@ describe('tasksFromTeamView', () => {
       { id: 't3', subject: '无主的', status: 'pending' },
     ]))
     expect(rows.map(row => row.id)).toEqual(['t1', 't3'])
-    expect(rows[0]?.ownerName).toBe('wochen VP-Eng')
+    expect(rows[0]?.ownerName).toBe('梦之队 VP-Eng')
     expect(rows[0]?.revision).toBe(3)
     expect(rows[1]?.ownerName).toBeNull()
     expect(rows[1]?.revision).toBe(0)
@@ -35,7 +35,7 @@ describe('tasksFromTeamView', () => {
 
   it('ownerName = lead 时按 CEO 映射（任务归 lead 不显示裸 lead）', () => {
     const rows = tasksFromTeamView(view([{ id: 't1', subject: '收口', status: 'in_progress', ownerName: 'lead' }]))
-    expect(rows[0]?.ownerName).toBe('wochen CEO')
+    expect(rows[0]?.ownerName).toBe('梦之队 CEO')
   })
 
   it('ready 缺省时按 blockedBy 现算（官方 taskReady 同义）', () => {
@@ -94,7 +94,7 @@ describe('boardColumns', () => {
     ])))
     const doing = columns.find(column => column.status === 'in_progress')
     expect(doing?.cards[0]).toMatchObject({
-      id: 't1', subject: '前置', ownerLabel: 'wochen VP-Eng', revision: 2, ready: true,
+      id: 't1', subject: '前置', ownerLabel: '梦之队 VP-Eng', revision: 2, ready: true,
     })
     const todo = columns.find(column => column.status === 'pending')
     expect(todo?.cards[0]).toMatchObject({

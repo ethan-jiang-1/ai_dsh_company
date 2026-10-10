@@ -29,7 +29,7 @@ const arg = (name, fallback) => {
   return i === -1 ? fallback : process.argv[i + 1]
 }
 const PORT = Number(arg('port', '0'))
-const BRAND = 'DSH Wochen Team'
+const BRAND = 'DSH 梦之队'
 const BOOT_TIMEOUT_MS = 120_000
 
 let home
