@@ -12,7 +12,7 @@ description: Use when changing persona or skill copy under packages/company-pack
 
 1. **keyless 回归**：`pnpm test tests/presets`。
 2. **真挂载冒烟**：`source run/env.sh && node checks/smoke/preset-smoke.mjs`——触发条件、前置与成本见[脚本头注](../../../checks/smoke/preset-smoke.mjs)；挂载失败为什么只有它能在上线前抓住 = 同处头注。
-3. **行为判据面改动**（改变"模型被要求做什么/判据怎么落"）→ 同 diff 必带回放场景；与纯措辞润色的分流判据 = [docs/testing.md §2](../../../docs/testing.md#2-改动面--最小证据同-diff-交付)。
+3. **行为判据面改动**（改变"模型被要求做什么/判据怎么落"）→ 同 diff 必带回放场景；与纯措辞润色的分流判据 = [tests/README「改动面 → 最窄检查」persona/skill 行](../../../tests/README.md)（行级映射单家；§2 只留政策）。
 4. **收尾收割三问**：清单唯一家 = [dev-loop §12](../../../docs/guides/dev-loop.md#12-记录与收尾)；三问全「无」也是合法答案，如实记。
 
 ## 判据
