@@ -30,11 +30,18 @@ schedule.json 可审计）+ playbook 第 8 步。**未验证：schedule 工具�
 2. follow-up 回原会话时的窗口呈现 —— **已裁定（2026-10-10 用户拍板）：执行类照跑，决策类排队**。
    执行类 = 报告 / 查料 / 读档类 follow-up 到点自动跑；决策类 = 花钱、对外承诺、砍项、签字类
    进待办面板等人——与待办四格哲学一致。模板（未决 3）按此分类写。
-3. "查料 → 复算"的 follow-up prompt 模板（查 `sources/` 有料 → 重启动议；无料 → 顺延再立）。
-4. 审计判据挂哪：deliverables-check 扫「待补料」↔ schedule.json 交叉核对（行动幻觉 = 违规）？
+3. ~~follow-up 模板~~ **已落**（playbook 第 8 步 + 手册闸门④：title 锚 `待补料·<slug>·<T号>` + 两型分写）。
+4. ~~审计判据~~ **已落**（deliverables-check：待补料派活行 ↔ schedule.json 交叉核对，缺锚 =
+   `pending-material-without-schedule` 违规；单测红绿 + 真检查无待补料时静默）。
+5. **排练场全链演练 receipt 与新发现**（`runtime/probe-drill.mjs`，2026-10-10）：演练走到 bash
+   探针时 **bash 首用触发权限升级卡**（`approval/asked`：sandbox-exec 在本机不可用 ⇒ bash-sandbox
+   executor 无法沙箱化 ⇒ 请求 danger-full-access，fail-closed 等人）——**HITL 跳出正确发生**
+   （模型 todo 计划 → 探针 → 卡壳即弹出 → 静默等待，完全按章办事）；演练 PARTIAL 是因为
+   无人点卡 + 脚本 6 分钟窗口后杀服务器。⇒ **新张力**："零踢全自动"撞上 bash 权限面——
+   要么公司会话 bash 审批设 never（全自动达成，安全代价登记），要么保持 ask（唤醒后首用
+   bash 弹一次卡，点一次即畅）。**待人拍板**。
 
-**下一步：** 拍板（未决 2 + 卡②姿势 + BUG-008 口径，一次打包）→ 模板定稿（3）→ 审计判据（4）→
-真盘一单带待补料的动议全链验证。
+**下一步：** 拍板未决 5（bash 权限面三选一）→ 按拍板收口本卡（机制面已全部就绪）。
 
 ## 范围与排除项
 
