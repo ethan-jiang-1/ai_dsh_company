@@ -14,9 +14,11 @@ export const ROLE_IDS = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
  *   `派活｜T1｜vp-sales｜市场门证据｜依赖：无｜状态：待办`
  *   `派活｜T6｜coo｜审 VP-Sales 交付承诺｜依赖：T1,T3｜状态：待办`
  *   `派活｜T2｜vp-eng｜技术可行性｜依赖：无｜状态：取消`
- * 状态枚举：待办 / 已出稿 / 完成 / 取消。
+ *   `派活｜T1｜vp-sales｜外部事实包｜依赖：无｜状态：待补料`
+ * 状态枚举：待办 / 已出稿 / 完成 / 取消 / 待补料（事实阻塞闸门 2026-10-10 HITL：要外部正文
+ * 而本部署读不到 ⇒ 该任务与其依赖链冻结——待补料不算完成、不算依赖满足、盘上有稿也不解锁）。
  */
-export const ASSIGN_LINE = /^派活｜(T\d+)｜(vp-eng|vp-sales|coo|cfo|ceo)｜([^｜]*)｜依赖：([^｜]*)｜状态：(待办|已出稿|完成|取消)/
+export const ASSIGN_LINE = /^派活｜(T\d+)｜(vp-eng|vp-sales|coo|cfo|ceo)｜([^｜]*)｜依赖：([^｜]*)｜状态：(待办|已出稿|完成|取消|待补料)/
 
 /** 自然语言"点名"（R1 用）：任务书正文里出现 `角色 —` 或 `T<n> · 角色` 的地方。 */
 export const MENTION = /^(?:###\s*)?(?:T\d+\s*·\s*|\*\*)?(VP-Eng|VP-Sales|COO|CFO|CEO|vp-eng|vp-sales|coo|cfo|ceo)\b/
@@ -89,6 +91,10 @@ export function scanR3(briefText, draftFiles, motionHasFinal) {
   const candidates = []
   const blocked = []
   for (const t of tasks) {
+    if (t.status === '待补料') {
+      blocked.push({ rule: 'R3', role: t.role, task: t.id, title: t.title, missingDeps: [], why: '状态=待补料（事实阻塞闸门：外部事实未到位，不许标完成）', needsVerify: true })
+      continue
+    }
     if (t.status !== '待办') continue
     const missing = t.deps.filter(d => !done.has(d))
     if (missing.length === 0) candidates.push({ rule: 'R3', role: t.role, task: t.id, title: t.title, why: '状态=待办且依赖已齐', needsVerify: true, stale: roleHasDraft(t.role, draftFiles) })
@@ -114,16 +120,21 @@ export function scanR2Closed(briefText, draftFiles, motionHasFinal) {
  * 依赖任务的角色稿在盘上。修 case 14 真实漂移形状（CEO 不回写状态行 ⇒ R3 把四个待核实任务
  * 沉入不可见 blocked）；**代价由 case 15 钉住**——返工与漂移文件层面同签名（状态待办+稿在场），
  * 盘上稿会在返工形状上假满足依赖。经盘上稿推断满足的候选带 `depByDisk: true` 且
- * `needsVerify` 恒真（降档显示，不升级为干净候选）。
+ * `needsVerify` 恒真（降档显示，不升级为干净候选）。**待补料任务的盘上稿同样不满足依赖**
+ * （事实没回来 ≠ 稿在盘上；2026-10-10 HITL 闸门同款语义）。
  */
 export function scanR3Dual(briefText, draftFiles, motionHasFinal) {
   if (motionHasFinal) return { candidates: [], blocked: [], closed: true }
   const tasks = parseAssignments(briefText)
   const doneStatus = new Set(tasks.filter(t => t.status === '已出稿' || t.status === '完成').map(t => t.id))
-  const diskDone = new Set(tasks.filter(t => roleHasDraft(t.role, draftFiles)).map(t => t.id))
+  const diskDone = new Set(tasks.filter(t => t.status !== '待补料' && roleHasDraft(t.role, draftFiles)).map(t => t.id))
   const candidates = []
   const blocked = []
   for (const t of tasks) {
+    if (t.status === '待补料') {
+      blocked.push({ rule: 'R3′', role: t.role, task: t.id, title: t.title, missingDeps: [], why: '状态=待补料（事实阻塞闸门：外部事实未到位，不许标完成）', needsVerify: true })
+      continue
+    }
     if (t.status !== '待办') continue
     const missing = t.deps.filter(d => !doneStatus.has(d))
     const byDisk = missing.filter(d => diskDone.has(d))

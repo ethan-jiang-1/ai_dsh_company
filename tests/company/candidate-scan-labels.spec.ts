@@ -245,3 +245,34 @@ describe('规则变体（RFC scan-rule-iteration，2026-10-06：R2′ 关闭检�
     expect(without.M.R2.reported).toBe(1)
   })
 })
+
+describe('事实阻塞闸门状态「待补料」（2026-10-10 HITL，ai-transformation-2026 实证）', () => {
+  const BRIEF = [
+    '派活｜T1｜vp-sales｜外部事实包（要读外部网页正文）｜依赖：无｜状态：待补料',
+    '派活｜T2｜coo｜承接方案｜依赖：T1｜状态：待办',
+    '派活｜T3｜cfo｜钱与闸门｜依赖：T1｜状态：待办',
+  ].join('\n')
+
+  it('待补料浮出 blocked（不静默丢、不当候选）——闸门的可见性要求', () => {
+    const r = scanR3(BRIEF, [], false)
+    expect(r.candidates).toEqual([])
+    expect(r.blocked.map(t => t.task)).toEqual(['T1', 'T2', 'T3'])
+    expect(r.blocked[0]!.why).toContain('待补料')
+  })
+
+  it('待补料不算依赖满足（只有 已出稿/完成 算），盘上有稿也不解锁', () => {
+    const r = scanR3(BRIEF, ['vp-sales.md'], false)
+    expect(r.candidates.map(t => t.task)).toEqual([])
+    expect(r.blocked.map(t => t.task)).toEqual(['T1', 'T2', 'T3'])
+  })
+
+  it('待补料不进 R2 候选（它不是待办；依赖齐不齐是 R3 的事）', () => {
+    expect(scanR2(BRIEF, []).map(t => t.task)).toEqual(['T2', 'T3'])
+  })
+
+  it('R3′ 双源：待补料的盘上稿不假满足依赖（事实没回来 ≠ 稿在盘上）', () => {
+    const r = scanR3Dual(BRIEF, ['vp-sales.md'], false)
+    expect(r.candidates.map(t => t.task)).toEqual([])
+    expect(r.blocked.map(t => t.task)).toEqual(['T1', 'T2', 'T3'])
+  })
+})
