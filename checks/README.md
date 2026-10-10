@@ -68,6 +68,12 @@
 | [member-stale-write-probe.mjs](../probes/team/member-stale-write-probe.mjs) | 成员同轮旧观察写被真实 stale 拒后的重读合并 |
 | [team-atomicity-probe.mjs](../probes/team/team-atomicity-probe.mjs) | 并发追加完整性与跨任务 writeScopes 重叠警告 |
 | [team-recovery-probe.mjs](../probes/team/team-recovery-probe.mjs) | 崩溃重启后的团队状态、持久邮箱与消息续行 |
+| [dual-ceo-probe.mjs](../probes/session-context/dual-ceo-probe.mjs) | 多人模式下是否出现双 CEO；开门配方或默认 preset 行为改动时 |
+| [claim-race-probe.mjs](../probes/team/claim-race-probe.mjs) | 占位抢注竞速（写盘守卫 / 占位=认领 约定改动时） |
+| [dual-signoff-probe.mjs](../probes/session-context/dual-signoff-probe.mjs) | 双签线多门落卡（手册审批三档 / multi-human §0 边界改动时） |
+| [journal-boundary-probe.mjs](../probes/session-context/journal-boundary-probe.mjs) | journal 目录边界（手册收工留痕 / 角色目录结构改动时） |
+| [multi-user-e2e-probe.mjs](../probes/team/multi-user-e2e-probe.mjs) | 多人 UX 端到端动议（真模型 ≈$1–2，排练场） |
+| [read-barrier/index.mjs](../probes/team/read-barrier/index.mjs) | 实验专用监听器，由并发探针 overlay 装载（不进任何 profile） |
 
 ## 文件与任务板协作
 
@@ -77,6 +83,11 @@
 | [fs-guard-probe.mjs](../probes/fs-taskboard/fs-guard-probe.mjs) | 角色会话的先读后写、过期版本拒绝与并发创建终态 |
 | [taskboard-presence-probe.mjs](../probes/fs-taskboard/taskboard-presence-probe.mjs) | 任务认领、加工中状态与在场板所需团队事件 |
 | [motion-taskboard-probe.mjs](../probes/fs-taskboard/motion-taskboard-probe.mjs) | 无额外流程提示的真实动议中，模型是否执行手册任务板协作 |
+| [taskboard-scope-probe.mjs](../probes/fs-taskboard/taskboard-scope-probe.mjs) | 任务板跨门共享性（multi-human §0 机制事实表 / 手册动议任务板行改动时） |
+| [task-discovery-probe.mjs](../probes/fs-taskboard/task-discovery-probe.mjs) | 机器可读派活行的任务发现率（真模型 ≈$0.05–0.1，排练场） |
+| [review-staleness-probe.mjs](../probes/fs-taskboard/review-staleness-probe.mjs) | 互审稿版本穿透（手册互审稿命名 / 稿首署名行改动时） |
+| [observed-write-conflict-probe.mjs](../probes/fs-taskboard/observed-write-conflict-probe.mjs) | 同 fs-local 实例同版本竞写与败者重读合并；升 pin 后复验 |
+| [collaboration-oracle-probe.mjs](../probes/fs-taskboard/collaboration-oracle-probe.mjs) | 协作判据的完整坏样本集均被判拒（零模型、秒级） |
 
 ## 审计与语料评估
 

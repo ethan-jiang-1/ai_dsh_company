@@ -25,7 +25,7 @@
 | [presets.md](./presets.md) | 合同 | 角色 preset 语义（R2：五角色定稿——CEO / VP-Eng / VP-Sales / COO / CFO）；名册运行时实测；验证分层；培养回路与学习载体（D25） |
 | [demo.md](./demo.md) | 合同 | demo 操作合同（R4 立场景 C，2026-09-25 补场景 D 季度经营会 / E 事件复盘）：动议、前置、分镜与观测点、验收判据（含**交付物三态**的机器判据）、已知边界 |
 | [release.md](./release.md) | 合同 | 发布形状现在时（R5a 出生）：peers / 兼容矩阵 / 真实安装冒烟（release-smoke）/ 升 pin 程序（sync-dsh） |
-| [testing.md](./testing.md) | 合同 | **测试宪法**（2026-10-04 立）：什么算证据——分层与证明边界、改动面→最小证据、证据纪律、资产三分法、自测轮授权、已知未覆盖面与升级地图 |
+| [testing.md](./testing.md) | 合同 | **测试宪法**（2026-10-04 立）：什么算证据——分层与证明边界、改动面→最小证据**政策**（行级映射 = tests/README，2026-10-10 迁家）、证据纪律、资产三分法、自测轮授权、已知未覆盖面与升级地图 |
 | [multi-human.md](./multi-human.md) | 合同 | **多人协作现在时**（2026-09-26 出生）：机制边界（卡按会话作用域、成员拉不到人）/ 形态 / 开门 runbook / 协作前提三条 / 迁移清单 / 边界 |
 | [runtime-map.md](./runtime-map.md) | 合同 | **运行态地图**：profile / bundle / preset / session / cwd / 日志 / workspace / snapshot 的时序关系与四条状态轴 |
 | [project-map.md](./project-map.md) | 合同 | 空间导航：目录逐件 owner、产物落点 |
@@ -38,7 +38,7 @@
 | 位置 | 回答什么 |
 |---|---|
 | `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含实际跑过的验证 + 环境状态）。提案纪律 / 状态轴 / 毕业规则 / 分类规矩唯一家 = [notes/README](../notes/README.md)；未成熟问题由 [_backlog/issues/](../_backlog/issues/README.md) 推敲，制度 = [_backlog/README](../_backlog/README.md) |
-| [notes/archived/](../notes/archived/) · [notes/rejected/](../notes/rejected/) · [notes/postmortem/](../notes/postmortem/README.md) | 离场两桶（D30）：archived = 仍能阻止重开的判定与现行 pin 人审证据，rejected = 过时/被推翻（负知识）；postmortem = **事故复盘**（为什么流程放过了它 + 加了什么护栏） |
+| [notes/archived/](../notes/archived/) · [notes/rejected/](../notes/rejected/) · [notes/postmortem/](../notes/postmortem/README.md) | 离场与复盘目录（D30 起；逐桶判据唯一家 = [notes/README](../notes/README.md)）：archived = 仍能阻止重开的冻结判定，rejected = 负知识，postmortem = **事故复盘** |
 
 ## 决策台账（路由表）
 
@@ -82,7 +82,7 @@
 | D36 | 决策台账降级为纯路由表（第三本账同 D34 病）+ `ledger-routing` 门禁 | [ledger-routing-table](../notes/implemented/2026-10-09-ledger-routing-table.md) |
 | D37 | `docs/` 分层规则唯一家住 `docs/AGENTS.md`（含「不属于这层」列）+ `doc-taxonomy` 门禁 | [docs-tier-taxonomy](../notes/implemented/2026-10-09-docs-tier-taxonomy.md) |
 | D38 | implemented/ Note 的**事实落点**随改动就地改新（决定正文仍冻结）；生效日分档 + `zz-` 假路径记号 | [implemented-note-currency](../notes/implemented/2026-10-09-implemented-note-currency.md) |
-| D39 | 三个完成定义住 `.agents/skills/`（写 Note / 加门禁 / 收尾）；程序进 skill、可机械判断的才进 gate | [completion-definition-skills](../notes/implemented/2026-10-09-completion-definition-skills.md) |
+| D39 | 完成定义 skills 住 `.agents/skills/`（清单 = 目录本身）；程序进 skill、可机械判断的才进 gate | [completion-definition-skills](../notes/implemented/2026-10-09-completion-definition-skills.md) |
 | D40 | 事故护栏复原：`preset-required-config` 门禁（判据 = vendor committed config-catalog） | [postmortem-guard-restoration](../notes/implemented/2026-10-09-postmortem-guard-restoration.md) |
 | D41 | 公司名 = 梦之队（Dream Team）；D14 显示名前缀序列化沿用，前缀随名换代 | [dreamteam-naming](../notes/implemented/2026-10-10-dreamteam-naming.md) |
 

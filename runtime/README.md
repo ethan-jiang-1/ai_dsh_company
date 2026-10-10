@@ -2,7 +2,10 @@
 
 > 2026-10-06 条目 A拆分（RFC driver-surface-package）：跑过留下的状态全部住这里，「怎么启动」的
 > tracked 配置住 [run/](../run/README.md)。本文件是 runtime/ 树逐件的分类 owner。
-> ⚠ 本树全部 gitignored——fresh clone 后为空属正常，运行态按需再生；不是公司业务事实，也不是证据快照
+> ⚠ **本树绝大部分 gitignored（含 harness-home 内容、pw-browsers、排练盘），但不是整树**：按 `.gitignore`
+> 逐条规则，`runtime/README.md`、`harness-home/README.md`、`cold-storage/snapshots/replay/r6-baseline/`
+> 与 `probe-*.mjs` 是 **tracked**（fresh clone 后那几件在场）。fresh clone 后其余为空属正常，运行态按需
+> 再生；不是公司业务事实，也不是证据快照
 > （四条状态轴的家 = [运行态地图](../docs/runtime-map.md)）。
 
 ## 一、逐件（按权威性与生命周期标记）

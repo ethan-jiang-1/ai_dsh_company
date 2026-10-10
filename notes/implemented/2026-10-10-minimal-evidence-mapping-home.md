@@ -17,7 +17,7 @@ fresh-agent 审计（本日）发现三类结构性问题：
 1. **行级映射的家 = tests/README**（合并两表为一，增「同 diff 义务」列承载 testing.md §2 的政策判据）；testing.md §2 只留政策原则（同 diff 交付 / 不替代组装转录）并留一行指针。导航面是 AGENTS.md/orient/README「选验证」路由的实际落点，agent 查表就在那里；宪法管"什么算证据"，导航管"先跑哪个"。
 2. dev-loop §1/§12 收口措辞改为指针（`_backlog` 卡关闭条件唯一家 = 其 README），删除「表行」残词。
 3. index.md：外部材料登记补第七处行；D31 行补 2026-10-09 重立路由；D30 行家改 notes/README 并消歧义；台账前言登记「反向（制度级重立必有台账行/登记行）无门禁」的已知缺口与升格触发条件。
-4. 机械教导面修正：根 [AGENTS.md](../../AGENTS.md) 布局补 `.agents/skills/`（三个完成定义 skill 的家，D39）+ 命令表 preset-smoke 补 `source run/env.sh` 前缀；tests/README 无 key 首跑补 bootstrap 前置；dev-loop §9.1 预算口径改新（tests 阶段 vs 进程全程）；orient 词表补 research 四义与三层/九层口径；README/orient/AGENTS 展开 DSH = DeepSeek Harness；[architecture](../../docs/design/architecture.md) 性质句改写（原句「当前合同归本目录维护」与 docs/AGENTS.md 分层相抵）。
+4. 机械教导面修正：根 [AGENTS.md](../../AGENTS.md) 布局补 `.agents/skills/`（完成定义 skill 的家，D39——计数不入文档，清单 = 目录本身）+ 命令表 preset-smoke 补 `source run/env.sh` 前缀；tests/README 无 key 首跑补 bootstrap 前置；dev-loop §9.1 预算口径改新（tests 阶段 vs 进程全程）；orient 词表补 research 四义与三层/九层口径；README/orient/AGENTS 展开 DSH = DeepSeek Harness；[architecture](../../docs/design/architecture.md) 性质句改写（原句「当前合同归本目录维护」与 docs/AGENTS.md 分层相抵）。
 
 ## 输掉的方案
 

@@ -364,7 +364,13 @@ const scanBarePaths = (files, hit) => {
         if (RUNTIME_PREFIXES.some(p => raw.startsWith(p))) continue
         if (FIXTURE_PATH.test(raw)) continue                             // 负例假路径（见上）
         barePathCount++
-        if (!existsSync(join(root, raw)) && !existsSync(join(root, 'vendor/dsh', raw)) && !RETIRED_PATHS.has(raw)) {
+        // 双树查的**例外**（2026-10-10 补盲区，entry-probe 语义审实测）：raw 已带 `vendor/` 前缀时
+        // **不再**往 `vendor/dsh/` 下重挂——否则 `vendor/README.md` 会命中 `vendor/dsh/vendor/README.md`
+        // （Cordis 自己的 vendoring manifest，语义完全不同的另一个文件）而判绿。实测本仓纪律表正是
+        // 靠这条重挂藏了一处死指针（`vendor/README.md` 本仓根本不存在），三条门禁全绿放过。
+        // 双树查仍保留：纪律表"权威（vendor 树）"列合法地写 vendor 相对写法（如 `packages/todo`）。
+        const inSubmodule = raw.startsWith('vendor/') ? false : existsSync(join(root, 'vendor/dsh', raw))
+        if (!existsSync(join(root, raw)) && !inSubmodule && !RETIRED_PATHS.has(raw)) {
           hit(`${rel}:${i + 1}`, raw)
         }
       }
@@ -383,6 +389,46 @@ if (!barePathBad) {
       + '记录**当时**事实的档案，里面引的路径当时是对的——**改它就是篡改记录**，故只提醒不判红）：')
     for (const w of barePathWarn) console.log(`    ${w}`)
   }
+}
+
+// ── 2d-quater. 入口布局块门禁（layout-block，2026-10-10 立）──────────────────────
+// 为什么：AGENTS.md 的 fenced 布局块是**全仓最常被读的指针块**（fresh agent 第一眼），但它此前
+// **不在任何门禁射程**——bare-path 只吃单反引号 + TOP_DIRS 前缀，fenced 块里的路径既无反引号、
+// 又按列对齐带尾随空格注释，两条都不满足。后果实测过两次（同轮）：① 幽灵指针 `vendor/README.md`
+// 类腐化能在纪律表存活；② `runtime/` 行声称"整树 gitignored"而实际 9 个文件 tracked（"整树豁免"
+// 正建立在这句话上）。两处都是"最多人读的一页写着盘上没有/不对的事实"，而门禁全绿。
+// 规则：取布局块每行**首列路径 token**（`^\S+`，忽略其后的对齐空格与说明），存在性检查（双树口径同
+// bare-path）。跳过三类非"存在性断言"的行：symlink 形态（含 `->`）、说明性续行（不以已知顶层目录/
+// 文件形态开头）、以及带 `zz` 夹具记号的负例行。只查存在性——**不查"这句话对不对"**（散文语义不做机械
+// 判定，那是本仓既有边界：计数/措辞类靠纪律与审读，不靠门禁）。
+// 负例留证 2026-10-10（实跑原话）：布局块临时插 `vendor/README.md` 行 →
+//   `FAIL layout-block: AGENTS.md:N → \`vendor/README.md\` 不存在（布局块指了盘上没有的路径）`；还原即绿。
+{
+  const layoutRel = 'AGENTS.md'
+  const layoutLines = readFileSync(join(root, layoutRel), 'utf8').split('\n')
+  let inFence = false
+  let layoutChecked = 0
+  let layoutBad = false
+  const KNOWN_TOP = /^(CLAUDE\.md|\.agents\/|packages\/|company-workspace\/|vendor\/|docs\/|notes\/|_backlog\/|checks\/|tests\/|probes\/|tools\/|_dist\/|run\/|runtime\/|snapshots\/)/
+  for (let i = 0; i < layoutLines.length; i++) {
+    const line = layoutLines[i]
+    if (/^```/.test(line)) { inFence = !inFence; continue }
+    if (!inFence) continue
+    const m = line.match(/^(\S+)/)
+    if (!m) continue
+    const raw = m[1]
+    if (line.includes('->')) continue                      // symlink 形态：右侧才是目标，另由 symlink 门禁查
+    if (!KNOWN_TOP.test(raw)) continue                     // 说明性续行/非路径开头
+    if (FIXTURE_PATH.test(raw)) continue                   // 负例夹具记号
+    if (RUNTIME_PREFIXES.some(p => raw.startsWith(p))) continue
+    if (RETIRED_PATHS.has(raw)) continue
+    layoutChecked++
+    if (!existsSync(join(root, raw))) {
+      layoutBad = true
+      fail('layout-block', `${layoutRel}:${i + 1} → \`${raw}\` 不存在（布局块指了盘上没有的路径）`)
+    }
+  }
+  if (!layoutBad) ok(`layout-block ×${layoutChecked}（AGENTS.md fenced 布局块首列路径存在性）`)
 }
 
 // ── 2d-ter. 退役路径门禁（retired-path，2026-10-10 立）────────────────────────────
@@ -428,7 +474,33 @@ if (!barePathBad) {
       }
     })
   }
-  if (!retiredBad) ok(`retired-path ×${retiredScanFiles.length} 文件（退役目录前缀扫描：活跃面零残留）`)
+  // 2026-10-10 扩第四盲区（entry-probe 语义审 C2 实证）：checks|probes|tools|tests 的脚本**注释行**
+  // 也运载指针（头注「研究卡 <路径>」），且不在任何 .md 扫描面——cross-process-fs-probe 头注引用
+  // 已迁 `_backlog/_archive/settled_issues/` 的旧 plans 卡，三门禁全绿存活。只扫注释行（// 或块注释行），
+  // 不扫代码体：模板字符串/映射表是逻辑不是指针（本门禁自己的退役前缀映射表就在单引号字符串里）。
+  const walkScripts = (dir) => !existsSync(dir) || !lstatSync(dir).isDirectory() ? [] : readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+    const p = join(dir, entry.name)
+    if (entry.isDirectory()) return ['node_modules', '.git'].includes(entry.name) ? [] : walkScripts(p)
+    return /\.(mjs|ts)$/.test(entry.name) ? [p.slice(root.length + 1)] : []
+  })
+  let retiredScriptCount = 0
+  for (const dir of ['checks', 'probes', 'tools', 'tests']) {
+    for (const rel of walkScripts(join(root, dir))) {
+      if (rel === 'checks/run-gates.mjs') continue // 退役前缀映射表 = 本文件（清单唯一家）
+      const lines = readFileSync(join(root, rel), 'utf8').split('\n')
+      lines.forEach((line, i) => {
+        if (!/^\s*(\/\/|\*|\/\*)/.test(line)) return
+        for (const [retired, current] of RETIRED_PATH_PREFIXES) {
+          if (line.includes(retired)) {
+            retiredBad = true
+            fail('retired-path', `${rel}:${i + 1} → 注释引用退役路径 \`${retired}\`——改指现行家 \`${current}\``)
+          }
+        }
+      })
+      retiredScriptCount++
+    }
+  }
+  if (!retiredBad) ok(`retired-path ×${retiredScanFiles.length} 文件 + ${retiredScriptCount} 脚本注释面（退役目录前缀扫描：活跃面零残留）`)
 }
 
 // ── 2e. pin 版本一致性门禁（2026-09-26 立，技术债清扫 B2/B3/B4 类）───────────────

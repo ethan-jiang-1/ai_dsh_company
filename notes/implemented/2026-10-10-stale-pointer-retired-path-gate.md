@@ -19,7 +19,7 @@ implemented-note-currency 的观察档锚与表行（旧池名）。另有 dev-l
 1. **五处事实落点就地改新**（D38 口径：决定正文不动、路径/符号/默认值锚随改动改新）；dev-loop 头部
    误标一并修正为链接现行 Note。
 2. **新门禁 `retired-path`**（run-gates 2d-ter）：活跃面（NOW_FILES ∪ `.agents/skills/**` ∪
-   `checks/README.md` ∪ `run/README.md`）的反引号内容命中退役前缀 → 红，失败信息点名文件:行与现行家。
+   `checks/README.md` ∪ `run/README.md`；**2026-10-10 后续轮再扩** | `.md` 之外还有 `checks|probes|tools|tests` 的**脚本注释行**、以及 bare-path 的「已带 `vendor/` 前缀不再重挂子模块」例外——扩面与红证 = [fresh-agent-map-sweep](2026-10-10-fresh-agent-map-sweep.md)）的反引号内容命中退役前缀 → 红，失败信息点名文件:行与现行家。
    退役前缀清单唯一家 = 门禁内数组（D28：枚举的家 = 实现自己；本文不复述清单）。
 3. **bare-path TOP_DIRS 补 `'_backlog/'`**：同源盲区，`_backlog` 反引号路径自此进存在性检查。
 4. **随卡收尾**：multi-instance-guard 卡按 issues/README 自家关闭规则归档（status 已结、单一关闭条件节、

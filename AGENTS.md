@@ -9,12 +9,12 @@
 
 ```
 CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 校验）
-.agents/skills/          三个完成定义 skill（写 Note / 加门禁 / 收尾）+ web-window-ops 的宿主；DSH 会话技能从这里装载（D39）
+.agents/skills/          完成定义 skill 与 web-window-ops 的宿主（清单 = 目录本身，DSH 会话 catalog 自动发现）；DSH 会话技能从这里装载（D39）
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml、src/（host R3+）+ src/client/（client 面）
-company-workspace/      运行时公司共享盘（会话 cwd）：AGENTS.md（公司手册，随会话注入）、kb/、templates/、deliverables/
+company-workspace/      运行时公司共享盘（会话 cwd）：AGENTS.md（公司手册，随会话注入）、kb/、templates/、deliverables/ + deliverables-archive/（已收敛产物，只读归档）
 vendor/dsh/             DSH 源码 submodule（钉 SHA，只读铁律见下节）
 docs/                   当前合同与导航：index（地图+台账）→ design/ guides/ + 顶层合同
-notes/                  开发记忆：proposed/（RFC）→ implemented/（活跃决策记忆）；分类规则 = notes/README.md
+notes/                  开发记忆：proposed/（RFC）→ implemented/（活跃决策记忆）；离场目录不复述于此——分类规则唯一家 = notes/README.md
 _backlog/               推敲层：issues/bugs/research/methods/_archive；章程与账本 = 其 README
 checks/                 验证面：run-gates 门禁；smoke/（真实入口冒烟）+ audit/（盘面日志判据）
 tests/                  keyless 回归（company/client/presets/harness 四区 spec）；真模型/浏览器不进本树——分区导航 = tests/README.md
@@ -22,7 +22,7 @@ probes/                 调试面：窄机制与视觉探针，按机制域四�
 tools/                  工具面：维护工具；lib/ 纯逻辑、drivers/ 真实驱动、archive/ 已耗仪器
 _dist/                  导出目的地：tarball（gitignored）+ 生成式《安装手册》（唯一 tracked 例外）；owner = docs/release.md
 run/                    运行面（tracked 启动配置）：env.sh（双 home+裸 dsh 拦截）+ 实验 overlay
-runtime/                运行残留家（gitignored）：harness-home（开发 DSH_HOME）、第二 home、pw-browsers、排练盘；owner = runtime/README.md
+runtime/                运行残留家（mostly gitignored，少数 tracked：两份 README + cold-storage r6 基线 + probe-*.mjs）：harness-home（开发 DSH_HOME）、第二 home、pw-browsers、排练盘；owner = runtime/README.md
 snapshots/              回归证据资产；规则与分类 = snapshots/README.md
 ```
 
@@ -63,7 +63,7 @@ source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的完
 | docs = 当前合同（一处事实一个家，只写 now）；文档卫生 | `docs/AGENTS.md` | docs/ 分层；行预算 = run-gates `DOC_LINE_BUDGETS`；细则 = dev-loop §12 |
 | 非平凡变更同 diff 带 Note（决定/输掉的方案/验证什么）；日志税 | `.agents/notes/README.md` / `AGENTS.md` Conventions | notes/proposed/ → notes/implemented/；写什么 = [notes/README.md](notes/README.md) |
 | 完成定义 = 最小真检查；测试分层；真实入口与安装形状 | `docs/testing.md` / `docs/postmortem/0003-web-agent-gui-feedback-loop.md` | 本仓 [测试宪法](docs/testing.md) + layering 守卫；preset = preset-smoke；安装 = release-smoke（[release.md](docs/release.md)） |
-| 源码/产物面不混；vendor 钉版本，升 pin 时流程合同重校 | `AGENTS.md` Conventions / `vendor/README.md` | 根 tsconfig extends vendor base；簿记见下节 + `tools/sync-dsh.mjs` |
+| 源码/产物面不混；vendor 钉版本，升 pin 时流程合同重校 | `AGENTS.md` Conventions / [release.md §vendor 政策](docs/release.md) | 根 tsconfig extends vendor base；簿记见下节 + `tools/sync-dsh.mjs` |
 | 机械不变量进执行门禁 + 每门带反证（红→还原→绿） | `AGENTS.md` Conventions | `checks/run-gates.mjs`（清单唯一源 = 它自己；本表不复述） |
 
 ### vendor 铁律（`pnpm verify` 双门禁强制）

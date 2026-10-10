@@ -19,3 +19,6 @@ runtime/harness-home-b/
 # 手册是唯一 tracked 例外（版本由 verify 的 dist-manual 门禁对 pack package.json 核对）
 _dist/*
 !_dist/安装手册.md
+# 外部工具的任务态（.pi/tasks/，写入者在本仓之外）：此前只靠机器级全局 gitignore 隐身，
+# fresh clone 到别的机器会露出 untracked——本仓内声明掉
+.pi/
