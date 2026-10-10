@@ -1,11 +1,16 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-10-10
 ---
 
 # 推敲：主动唤醒闭环——公司到点自己醒，用户不当闹钟
 
-> 立卡：2026-10-10 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 可关闭：否
+> 立卡：2026-10-10 ｜ 状态：已结 ｜ 类型：Feature ｜ 可关闭：是
+> **结论与去向（2026-10-10 用户拍板：B 保持 ask + 开局预热）**：机制面全通——真会话探针
+> （立 schedule 任务 → 到点 → follow-up 送回原会话，`runtime/probe-schedule.mjs`）；排练演练
+> 证到权限卡即 HITL 正确跳出（`approval/asked` fail-closed，`runtime/probe-drill.mjs`）。
+> B 的使用形状 = 新会话开局用户点一次 bash 权限批准，之后整场顺畅；闸不拆、零配置改动。
+> 未单测的细节：批准后自动续跑复算（组件已分别验证；下一单真动议自然核）。
 
 **问题与期望结果：** 卡兹克案（ai-transformation-2026，2026-10-10）三连教训：①会话收口即停机，
 补料 11:06 落盘无人知；②CEO 说"已立 6 小时跟进提醒"但 schedule.json 为空（**行动幻觉**）；
@@ -47,7 +52,7 @@ schedule.json 可审计）+ playbook 第 8 步。**未验证：schedule 工具�
 
 单操作者模式优先（CEO 代表公司立任务）；不做常驻 watcher 进程（不发明——用出厂载体）；
 不接 `*_PROXY` 代理（另案，见 fact-finding-ladder Note 后果节）；不写自由文本 memory
-（空头支票病灶，裁定见同日 [fact-finding-ladder Note](../../notes/implemented/2026-10-10-fact-finding-ladder.md)）。
+（空头支票病灶，裁定见同日 [fact-finding-ladder Note](../../../notes/implemented/2026-10-10-fact-finding-ladder.md)）。
 
 ## 方案与取舍
 
