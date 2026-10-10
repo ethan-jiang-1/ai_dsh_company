@@ -119,6 +119,28 @@
             config:
               fetch: true
               searchTimeoutMs: 60000
+          # ── 取证之手（2026-10-10）：web_fetch 的域名拦截是工具层 DNS 检查，不挡 shell
+          #    出网（curl+UA 直取 200 实证）。bash 由 base 的 bash-sandbox executor 驱动，
+          #    preset 只声明工具行（自包含原则：bundle 工具到不了会话——R1 教训）。
+          #    CEO 挂它还有一层：单操作者模式分身继承 Lead 组合 ⇒ Lead 有手 = 分身有手。
+          - id: tool-bash
+            name: '@deepseek-ai/dsh-tool-bash'
+          # ── 真实浏览器（第一手核证位，2026-10-10 全员化）：JS 重页面 / 反爬站 / 公众号文章
+          #    的兜底通道；playwright-mcp 零模型 key，Chromium 与本仓 .pnpm store 同源。
+          #    ⚠ browserUse 是需要 isolate realm 的服务 ⇒ 两行包组（shape 照 vp-sales 首挂）。
+          - id: browser-use
+            name: cordis:group
+            group: true
+            isolate:
+              browserUse: true
+            config:
+              - id: browser-use-def
+                name: '@deepseek-ai/dsh-browser-use'
+              - id: browser-use-playwright
+                name: '@deepseek-ai/dsh-experimental-browser-use-playwright-mcp'
+                config:
+                  mode: launch
+                  headless: true
 
           # ④ 汇报线（通道 A，R3）：每个直接汇报对象一个**命名委托工具**——CEO 的模型看到的就是
           #    `vp_eng` / `vp_sales` 两个工具（per-instance persona 是 dsh-tool-subagent 的教义：
