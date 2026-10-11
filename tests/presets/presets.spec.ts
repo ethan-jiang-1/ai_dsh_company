@@ -195,6 +195,17 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
+  it('CEO 人话出口规则必须覆盖阻塞、非阻塞和取证表达', () => {
+    const ceo = readFileSync(join(PRESETS_DIR, 'ceo', 'agent.cordis.yml'), 'utf8')
+    const chairing = readFileSync(join(PRESETS_DIR, 'ceo/skills/chairing-staff-meeting/SKILL.md'), 'utf8')
+    expect(ceo, 'CEO prefix 必须说明阻塞选择用 ask_user_question').toContain('阻塞型选择')
+    expect(ceo, 'CEO prefix 必须说明非阻塞缺口带假设继续').toContain('非阻塞')
+    expect(chairing, '收口规则必须保留三件套').toContain('结论（≤3 条业务语言）')
+    expect(chairing, '规则必须说明比较结构按场景选择').toMatch(/GFM 表格|短列表/)
+    expect(chairing, '规则必须说明关键数字取证入口').toMatch(/行号锚|文件行锚|关键数字/)
+    expect(chairing, '规则必须保护 Agent 间内部密度').toMatch(/drafts|任务书|成员消息/)
+  })
+
   it('职能 preset 一律指向 drafts/，不许自己写 final.md（成品是对外承诺，归 CEO）', () => {
     for (const role of ['vp-eng', 'vp-sales', 'coo', 'cfo']) {
       const dir = join(PRESETS_DIR, role)
