@@ -10,6 +10,7 @@ opened: 2026-10-11
 > 拓扑不动（成员不横向通信维持为纪律），缺陷只剩：**纵向结构里的对账步骤缺失**。
 
 > 严重级别：P1（重要）｜发现：2026-10-11（V4 `ai-transformation-2026-v4` 复盘协作审计）｜状态：活跃
+> **B 为何未做（2026-10-11 如实记）**：原候选 B =「final 模板加『对账留痕』必填栏位」，但 `company-workspace/templates/` 里**没有 final 模板**（五份都是角色件：decision-memo / review-note / prd / weekly-report / ops-review-note + meta）——加栏位等于新建一份 CEO final 模板，属独立决定，未擅自扩围。
 > **修复（2026-10-11）**：规则（手册:102）+ **行为验证（红→绿）**：判据 = `probes/session-context/reconcile-round-probe.mjs`。V4 反例（`session-354109f1`）= `no-reconcile（两造不同值但没人转述）`；新版场景（`session-6bd3d1d3`，COO/CFO 各报同一指标）= `reconciled`，CEO 双向转述（给 CFO 转 COO 的 77.5、给 COO 转 CFO 的 175–409）。机械面只证「转述过没有」，「是否真对齐」仍需人读；下一步观察点 = 下一场真动议的 final 是否出现对账留痕。
 
 ## 症状（实测：lead 会话 `session-354109f1` 全量 team 消息 14 条）
