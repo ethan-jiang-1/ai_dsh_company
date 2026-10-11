@@ -24,7 +24,10 @@ const index = (pool: string, path: string) => {
     put(owner, readFileSync(join(root, owner), 'utf8') + `\n[material](<${pool.slice('_archive/'.length)}/${path}>)\n`)
   } else put(`${pool}/README.md`, `# Index\n\n[material](<${path}>)\n`)
 }
-const issue = (extra = '') => `---\nstatus: 推敲中\nopened: 2026-10-09\n---\n\n# Issue\n\n${extra}\n`
+// 2026-10-12（借鉴卡落地）：夹具带上 > 状态行（立卡/状态/类型/毕业/可关闭）——镜像互查与
+// 「毕业：」封闭头是活状态门禁的一部分，正例夹具必须长成现行模板的样子。
+const issue = (extra = '', status = '推敲中', graduation = '未定') =>
+  `---\nstatus: ${status}\nopened: 2026-10-09\n---\n\n# Issue\n\n> 立卡：2026-10-09 ｜ 状态：${status} ｜ 类型：Task ｜ 毕业：${graduation} ｜ 可关闭：否\n\n${extra}\n`
 beforeEach(() => {
   mkdirSync(scratch, { recursive: true })
   root = mkdtempSync(join(scratch, 'fixture-'))
@@ -39,7 +42,7 @@ describe('backlog institution, migrated headers and recursive membership', () =>
   it('accepts valid active cards, research, methods and untouched historical archive', () => {
     put('issues/261009-demo.md', issue())
     index('issues', '261009-demo.md')
-    put('bugs/BUG-007-demo.md', '---\nstatus: 活跃\nseverity: P1\nopened: 2026-10-09\n---\n# Bug\n')
+    put('bugs/BUG-007-demo.md', '---\nstatus: 调查中\nseverity: P1\nopened: 2026-10-09\n---\n\n# Bug\n\n> 严重级别：P1（重要）｜发现：2026-10-09｜状态：调查中\n')
     index('bugs', 'BUG-007-demo.md')
     put('research/tech-exploration/2026-10-09-demo.md', '---\ntopic: 技术\nintent: Test the actual route.\n---\n# Research\n')
     index('research', 'tech-exploration/2026-10-09-demo.md')
@@ -78,7 +81,7 @@ describe('backlog institution, migrated headers and recursive membership', () =>
   })
 
   it('requires bug severity and the borrowed method field shape', () => {
-    put('bugs/BUG-007-demo.md', '---\nstatus: 活跃\nopened: 2026-10-09\n---\n')
+    put('bugs/BUG-007-demo.md', '---\nstatus: 调查中\nopened: 2026-10-09\n---\n\n# Bug\n\n> 严重级别：P1（重要）｜发现：2026-10-09｜状态：调查中\n')
     index('bugs', 'BUG-007-demo.md')
     put('methods/demo.md', '---\nname: wrong\ndescription: ""\n---\n')
     index('methods', 'demo.md')
@@ -126,5 +129,32 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     put('issues/demo.md', issue('可关闭：否') + '\n'.repeat(12) + '## 历史讨论\n旧记录写可关闭：是\n')
     index('issues', 'demo.md')
     expect(check(root)).toEqual([])
+  })
+
+  // 2026-10-12（借鉴卡落地）：状态行↔frontmatter 镜像互查 + 「毕业：」封闭头——负例控制。
+  it('enforces the line↔frontmatter mirror and the graduation closed head on active issues', () => {
+    put('issues/mirror.md', '---\nstatus: 推敲中\nopened: 2026-10-09\n---\n\n# Issue\n\n> 立卡：2026-10-09 ｜ 状态：等人拍板 ｜ 类型：Task ｜ 毕业：未定 ｜ 可关闭：否\n')
+    put('issues/noline.md', '---\nstatus: 推敲中\nopened: 2026-10-09\n---\n\n# Issue\n\n正文没有状态行。\n')
+    put('issues/nograd.md', '---\nstatus: 推敲中\nopened: 2026-10-09\n---\n\n# Issue\n\n> 立卡：2026-10-09 ｜ 状态：推敲中 ｜ 类型：Task ｜ 可关闭：否\n')
+    put('issues/badgrad.md', '---\nstatus: 推敲中\nopened: 2026-10-09\n---\n\n# Issue\n\n> 立卡：2026-10-09 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：马上做 ｜ 可关闭：否\n')
+    put('issues/README.md', '# Index\n\n' + ['mirror.md', 'noline.md', 'nograd.md', 'badgrad.md'].map(name => `[material](<${name}>)`).join('\n') + '\n')
+    const problems = check(root).join('\n')
+    expect(problems).toContain('状态行「等人拍板」与 frontmatter「推敲中」不一致（镜像互查）')
+    expect(problems).toContain('缺状态行')
+    expect(problems).toContain('状态行缺「毕业：」字段')
+    expect(problems).toContain('「毕业：马上做」头不在封闭集')
+  })
+
+  // 2026-10-12：缺陷轨「活跃」→「调查中」改名 + 三新值；修复就绪缺 ## 已修判定如实不查（验收在场族按用户裁定延后）。
+  // 注：index() 对活跃池是覆写不是追加——多卡时一次写全索引。
+  it('renames the bug active value, accepts the new bug enums with mirrored lines, defers acceptance presence', () => {
+    put('bugs/BUG-013-old.md', '---\nstatus: 活跃\nseverity: P2\nopened: 2026-10-09\n---\n\n# Bug\n\n> 严重级别：P2（次要）｜发现：2026-10-09｜状态：活跃\n')
+    index('bugs', 'BUG-013-old.md')
+    expect(check(root).join('\n')).toContain('status "活跃" 不属于此桶')
+    for (const [id, value] of [['014', '调查中'], ['015', '修复就绪'], ['016', '修复已落地'], ['017', '等人拍板']]) {
+      put(`bugs/BUG-${id}-demo.md`, `---\nstatus: ${value}\nseverity: P2\nopened: 2026-10-09\n---\n\n# Bug\n\n> 严重级别：P2（次要）｜发现：2026-10-09｜状态：${value}\n`)
+    }
+    put('bugs/README.md', '# Index\n\n' + ['BUG-013-old.md', 'BUG-014-demo.md', 'BUG-015-demo.md', 'BUG-016-demo.md', 'BUG-017-demo.md'].map(name => `[material](<${name}>)`).join('\n') + '\n')
+    expect(check(root).filter(problem => problem.includes('BUG-0'))).toEqual(['_backlog/bugs/BUG-013-old.md:2 status "活跃" 不属于此桶'])
   })
 })

@@ -4,11 +4,7 @@
 
 ## 活跃清单
 
-| 卡 | 期望结果 | 状态 |
-|---|---|---|
-| [2026-10-12-backlog-process-made-explicit](2026-10-12-backlog-process-made-explicit.md) | 借鉴 ai_dsh_loop_advisor 同名卡：把 _backlog 制度写显性——处理门票、缺陷修复流、状态生命周期、agent 面 | 等人拍板 🔒（五补充/例外边界/两组枚举待用户扫，与源卡同一次评审；点头后一轮落地） |
-
-已结问题见 [归档](../_archive/settled_issues/README.md)。
+当前无活跃问题卡。已结问题见 [归档](../_archive/settled_issues/README.md)。
 
 ## 边界与尺寸
 
@@ -33,7 +29,7 @@ opened: YYYY-MM-DD
 
 # 推敲：<标题>
 
-> 立卡：YYYY-MM-DD ｜ 状态：推敲中 ｜ 类型：未定 ｜ 可关闭：否
+> 立卡：YYYY-MM-DD ｜ 状态：推敲中 ｜ 类型：未定 ｜ 毕业：未定 ｜ 可关闭：否
 
 **问题与期望结果：** 触发、期望结果、如何判断本轮推敲完成。
 **当前情况：** 已确认的事实与出处。
@@ -51,9 +47,11 @@ opened: YYYY-MM-DD
 
 决定做的按 [验收设计](../methods/validation-design.md) 在同卡加 `## 验收标准`。这描述下游做成什么算合格，不要求未来检查已执行；`关闭条件` 不复制实施验收。
 
+双轨处理门票与全部翻转规则唯一家 = [章程](../README.md)「双轨状态生命周期」：门票 = **把问题说清 + 给出验收手段，由格式承载**（问题轨 = 毕业时 `## 验收标准`；缺陷轨 = 修复就绪时 `## 已修判定`）；`毕业：` 封闭头 `未定｜做｜以后做｜不做｜消化`；状态行镜像 frontmatter（门禁互查）。
+
 ## 关闭或叫停
 
-按 [关闭条件](../README.md#关闭条件) 检查。需要后续处理的提交申请并记录去向；是否成为 Note 由下游决定。满足条件后写 `可关闭：是` 并同次归档，不留活跃清单。
+按 [关闭条件](../README.md#关闭条件) 检查；翻转的守卫、谁翻、记录什么 = [章程](../README.md)「双轨状态生命周期」翻转表。需要后续处理的提交申请并记录去向；是否成为 Note 由下游决定。满足条件后写 `可关闭：是` 并同次归档，不留活跃清单。
 
 - 有结论：`git mv` 进 [settled_issues](../_archive/settled_issues/README.md)，frontmatter `status: 已结`，状态行补结论与去向。
 - 用户叫停且无结论：进 [suspended_issues](../_archive/suspended_issues/README.md)，`status: 叫停`；重启需用户明确新决定。

@@ -42,4 +42,4 @@
 
 ## 适配与来源
 
-借源 `/Users/bowhead/ai_dsh_assitant/_backlog/` 的工作树文件，来源日 2026-10-09，方法定义和目录合同整体适配；无对外部主分支 HEAD 的独立 pin。保留本仓全日期命名、notes 的授权/RFC 边界、本仓测试 owner 以及 `_archive/legacy` 的历史池性质。事故复盘仍属于 `notes/postmortem/`，不迁入问题卡。
+借源 `/Users/bowhead/ai_dsh_assitant/_backlog/` 的工作树文件，来源日 2026-10-09，方法定义和目录合同整体适配；无对外部主分支 HEAD 的独立 pin。保留本仓全日期命名、notes 的授权/RFC 边界、本仓测试 owner 以及 `_archive/legacy` 的历史池性质。事故复盘仍属于 `notes/postmortem/`，不迁入问题卡。2026-10-12 制度显性化（缺陷通道、双轨状态生命周期、agent 门牌）在此制度之上扩展，见 [显性化 Note](./2026-10-12-backlog-process-made-explicit.md)。

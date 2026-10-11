@@ -9,6 +9,10 @@
 //   挪进 lib 后 spec 直接 import，判据仍在同一个函数里（没有第二份实现）。
 //
 // 函数体逐字是门禁里的原文（含原有的「为什么」注释）——本卡只搬位置，不改判据、不改问题句。
+// 2026-10-12（借鉴卡 _backlog/issues/2026-10-12-backlog-process-made-explicit.md 落地）：修订判据——
+//   ① 缺陷轨「活跃」改名「调查中」并扩到四活跃值（修复就绪/修复已落地/等人拍板）；② 新增状态行↔
+//   frontmatter 镜像互查；③ 问题卡状态行「毕业：」封闭头。制度唯一家 = _backlog/README.md
+//   「双轨状态生命周期」「缺陷的通道」；负例留证见新增块注释。
 import { existsSync, lstatSync, readFileSync, readdirSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 import { createRequire } from 'node:module'
@@ -45,7 +49,10 @@ export function backlogLivenessProblems(backlogRoot) {
     return entry.isFile() && entry.name.endsWith('.md') ? [join(prefix, entry.name)] : []
   })
   const statuses = {
-    issues: ['推敲中', '等人拍板'], bugs: ['活跃'],
+    issues: ['推敲中', '等人拍板'],
+    // 2026-10-12（借鉴卡落地）：缺陷轨四活跃值——「活跃」改名「调查中」（与目录「活跃清单」撞词），
+    //   修复就绪 = 门票且授权的翻转点，修复已落地 = 修复落树、验收未满，等人拍板 = 通道/用户选择。
+    bugs: ['调查中', '修复就绪', '修复已落地', '等人拍板'],
     '_archive/settled_issues': ['已结'], '_archive/suspended_issues': ['叫停'],
     '_archive/fixed_bugs': ['已修'], '_archive/suspended_bugs': ['待修'],
   }
@@ -110,6 +117,32 @@ export function backlogLivenessProblems(backlogRoot) {
         else if (!statuses[pool].includes(String(data.status))) problems.push(`${where}:2 status ${JSON.stringify(data.status)} 不属于此桶`)
         if (!/^\d{4}-\d{2}-\d{2}$/.test(String(data.opened ?? ''))) problems.push(`${where}:1 缺 opened: YYYY-MM-DD`)
         if (pool.endsWith('bugs') && !['P0', 'P1', 'P2'].includes(data.severity)) problems.push(`${where}:1 缺 severity: P0/P1/P2`)
+      }
+      // 2026-10-12 立（借鉴卡落地）：状态行↔frontmatter 镜像互查 + 问题卡「毕业：」封闭头。
+      // 为什么：frontmatter `status` 是当前阶段的唯一家，状态行是它的镜像 + 历史（章程「双轨状态
+      //   生命周期」的分工）——两处不一致 = 读者与门禁各信一份。只查活跃区（issues/bugs）：归档区
+      //   离场时按关闭法在状态行补结论与去向，历史卡不回填。🔒 后缀放行（仅用户可判触发的标记）。
+      // 「毕业：」封闭头 未定|做|以后做|不做|消化 = 章程关闭条件四结论的倾向词——逼门早命名；它是
+      //   倾向不是状态，frontmatter 仍是状态的唯一家。
+      // 负例留证 2026-10-12（真树植入，实跑原话，还原即绿；全录见毕业 Note 验证节）：
+      //   ① 问题卡 frontmatter 推敲中 + 状态行「状态：等人拍板」→ `状态行「等人拍板」与 frontmatter「推敲中」不一致（镜像互查）` 红；
+      //   ② 状态行「毕业：马上做」→ `「毕业：马上做」头不在封闭集（未定|做|以后做|不做|消化）` 红；
+      //   ③ 活跃卡无 > 状态行 → `缺状态行（> … ｜ 状态：<frontmatter 值> ｜ …）` 红；
+      //   ④ 缺陷卡 frontmatter 旧值 活跃 → `status "活跃" 不属于此桶` 红；
+      //   ⑤ 修复就绪卡缺 ## 已修判定 → 不报警（验收在场检查族按用户裁定延后，记承压候选——如实不查）。
+      if (pool === 'issues' || pool === 'bugs') {
+        const statusLine = text.split('\n').slice(0, 12).find(line => line.trimStart().startsWith('>') && line.includes('状态：'))
+        if (!statusLine) problems.push(`${where}:1 缺状态行（> … ｜ 状态：<frontmatter 值> ｜ …）`)
+        else {
+          const token = (/状态：\s*([^｜|\n]+)/.exec(statusLine)?.[1] ?? '').replace(/🔒/g, '').trim()
+          if (token !== String(data.status)) problems.push(`${where}:1 状态行「${token}」与 frontmatter「${data.status}」不一致（镜像互查）`)
+          if (pool === 'issues') {
+            const graduation = /毕业：\s*([^｜|\n]+)/.exec(statusLine)?.[1]?.trim() ?? ''
+            if (!graduation) problems.push(`${where}:1 状态行缺「毕业：」字段（封闭头：未定|做|以后做|不做|消化）`)
+            else if (!['以后做', '不做', '消化', '未定', '做'].some(head => graduation.startsWith(head)))
+              problems.push(`${where}:1 「毕业：${graduation}」头不在封闭集（未定|做|以后做|不做|消化）`)
+          }
+        }
       } else if (pool.endsWith('research')) {
         if (keys[0] !== 'topic' || typeof data.topic !== 'string' || !data.topic.trim()) problems.push(`${where}:2 frontmatter 首字段须为非空 topic`)
         const topic = topicByDir[name.split('/')[0]]

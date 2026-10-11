@@ -43,6 +43,7 @@
 | [2026-10-11-plain-language-human-exits.md](settled_issues/2026-10-11-plain-language-human-exits.md) | 已实施并验收（人话出口规范：摘要来源治理 + 阻塞/非阻塞/表达行为证据） | 2026-10-11 |
 | [2026-10-11-human-exits-expression.md](settled_issues/2026-10-11-human-exits-expression.md) | 已实施并验收（表达层：台账全文入口、compact 显示模式、open-in-app 现场链路） | 2026-10-11 |
 | [2026-10-11-human-exits-replay-scene.md](settled_issues/2026-10-11-human-exits-replay-scene.md) | 已建成并零 diff 复演（阻塞拍板 replay 场景 + 场景级浏览器答题人） | 2026-10-11 |
+| [2026-10-12-backlog-process-made-explicit.md](settled_issues/2026-10-12-backlog-process-made-explicit.md) | 已实施并验收（制度显性化：缺陷通道＋双轨状态生命周期＋agent 门牌＋门禁镜像互查；去向 = implemented Note） | 2026-10-12 |
 
 ## 已修缺陷
 

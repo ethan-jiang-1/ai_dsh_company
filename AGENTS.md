@@ -15,7 +15,7 @@ company-workspace/      运行时公司共享盘（会话 cwd）：AGENTS.md（�
 vendor/dsh/             DSH 源码 submodule（钉 SHA，只读铁律见下节）
 docs/                   当前合同与导航：index（地图+台账）→ design/ guides/ + 顶层合同
 notes/                  开发记忆：proposed/（RFC）→ implemented/（活跃决策记忆）；离场目录不复述于此——分类规则唯一家 = notes/README.md
-_backlog/               推敲层：issues/bugs/research/methods/_archive；章程与账本 = 其 README
+_backlog/               推敲层：issues/bugs/research/methods/_archive；章程与账本 = 其 README；agent 门牌 = AGENTS.md
 checks/                 验证面：run-gates 门禁；smoke/（真实入口冒烟）+ audit/（盘面日志判据）
 tests/                  keyless 回归（company/client/presets/harness 四区 spec）；真模型/浏览器不进本树——分区导航 = tests/README.md
 probes/                 调试面：窄机制与视觉探针，按机制域四子目录（team/fs-taskboard/browser-visual/session-context）
