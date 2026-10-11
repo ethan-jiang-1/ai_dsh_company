@@ -6,8 +6,8 @@
 
 | 卡 | 期望结果 | 状态 |
 |---|---|---|
-| [2026-10-11-plain-language-human-exits](2026-10-11-plain-language-human-exits.md) | 语言规范层：双轨制与对人出口规范，含来源治理、行为验收及分批实施申请 | 等下游接收（用户确认三批次序；不设硬字数门禁） |
-| [2026-10-11-human-exits-expression](2026-10-11-human-exits-expression.md) | 表达层：四层漏斗与 DSH 支撑映射，和语言卡共用分批申请（open-in-app 已证伪原判断） | 等下游接收（依语言卡批次） |
+| [2026-10-11-plain-language-human-exits](2026-10-11-plain-language-human-exits.md) | 语言规范层：双轨制与对人出口规范，含来源治理、行为验收及分批实施申请 | 等具体实施授权（批次顺序已确认；不设 meta 硬字数门禁） |
+| [2026-10-11-human-exits-expression](2026-10-11-human-exits-expression.md) | 表达层：四层漏斗与 DSH 支撑映射，和语言卡共用分批申请（open-in-app 已证伪原判断） | 等具体实施授权（依语言卡批次；表格/锚点强度待选） |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)。
 

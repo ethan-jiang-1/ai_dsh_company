@@ -15,6 +15,8 @@
 
 ## 前置（本机）
 
+**启动口令约定**：在本仓库上下文中，“启动一下这个插件”“启动一下这个”或“把这个跑起来”，默认指启动当前 Dream Team company pack 的独立 DSH Web 环境。完成定义是：使用仓库隔离 home，启动一个非 3080 的新 DSH 端口，拿到带 token 的 URL，并通过插件挂载冒烟；这一步不包含创建会话或运行 demo，除非用户另行指定。
+
 **呈现即验证**（2026-09-30 立，用户裁定；规则唯一见 [dev-loop §1](./guides/dev-loop.md)）：替人起观察窗 = 先自己跑通本节（boot 横幅 + roster + client 零挂载失败），红了当场修，全绿才交 URL——用户不当第一次验收员。
 **机器腿 = [cdp-probe](./cdp-probe.md)**：`node probes/browser-visual/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/8 页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
 
