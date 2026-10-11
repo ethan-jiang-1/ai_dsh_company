@@ -3,7 +3,10 @@
 // 何时跑：LedgerTab 摘要显示/全文入口变更后；真实浏览器，不进入 pnpm test。
 // 前置：已启动公司观察窗 URL 和含台账的历史会话标题；用法：node 本脚本 '<token-url>' '<title>'。
 // 断言面（RFC 批 3 第 1 条）：宽/窄视口的行高都稳定在两行内；被裁切的行必有全文入口；
-//   鼠标、键盘、触屏都能取到全文；短摘要直接可读。截图与判定落 runtime/human-exits-evidence/。
+//   鼠标、键盘、触屏都能取到全文；短摘要直接可读。
+// 产物两处：判定 JSON 与过程截图落 `runtime/human-exits-evidence/`（gitignored，随跑随新）；
+//   `--fixture` 时另把两档视口截图 + computed.json 写进 `snapshots/visual/ledger-summary/`（提交的视觉夹具，
+//   消费入口 = snapshots/README 的 visual 场景行；用户可见客户端改动按 tests/README 要同 diff 交视觉夹具）。
 import assert from 'node:assert/strict'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -12,7 +15,9 @@ import { loadChromium, launchChromium } from '../../tools/drivers/playwright.mjs
 
 const [url, title] = process.argv.slice(2)
 assert(url && title, '需要观察窗 URL 与会话标题')
+const fixture = process.argv.includes('--fixture')
 const outDir = join(repositoryRoot, 'runtime', 'human-exits-evidence')
+const fixtureDir = join(repositoryRoot, 'snapshots', 'visual', 'ledger-summary')
 await mkdir(outDir, { recursive: true })
 const browser = await launchChromium(await loadChromium(process.cwd()))
 const verdicts = []
@@ -62,7 +67,18 @@ try {
       // clamp 后无全文入口 = 失败（RFC 明写）。
       const orphan = metrics.filter(x => x.clipped && !x.button)
       assert.equal(orphan.length, 0, `被裁切却没有全文入口：${JSON.stringify(orphan.map(x => x.length))}`)
-      await page.screenshot({ path: join(outDir, `ledger-${String(width)}.png`), fullPage: false })
+      // 夹具要能直接看到验收面：把第一条**被裁**的行滚进视野（省略号 + 全文入口同框）。
+      const firstClipped = metrics.findIndex(x => x.clipped)
+      if (firstClipped >= 0) {
+        await ledger.locator('.wk-row').nth(firstClipped).scrollIntoViewIfNeeded()
+        await page.waitForTimeout(300)
+      }
+      const shotName = `ledger-${String(width)}.png`
+      await page.screenshot({ path: join(outDir, shotName), fullPage: false })
+      if (fixture) {
+        await mkdir(fixtureDir, { recursive: true })
+        await page.screenshot({ path: join(fixtureDir, shotName), fullPage: false })
+      }
       const button = ledger.getByRole('button', { name: '查看完整结论' }).first()
       const collapse = ledger.getByRole('button', { name: '收起完整结论' }).first()
       const rowText = () => collapse.locator('..').locator('.wk-row-task').innerText()
@@ -96,5 +112,10 @@ try {
       console.log(JSON.stringify(verdict))
     } finally { await context.close() }
   }
-  await writeFile(join(outDir, 'ledger-summary-verdict.json'), JSON.stringify({ title, verdicts }, null, 2) + '\n')
+  const verdict = { title, capturedAt: new Date().toISOString(), verdicts }
+  await writeFile(join(outDir, 'ledger-summary-verdict.json'), JSON.stringify(verdict, null, 2) + '\n')
+  if (fixture) {
+    await mkdir(fixtureDir, { recursive: true })
+    await writeFile(join(fixtureDir, 'computed.json'), JSON.stringify(verdict, null, 2) + '\n')
+  }
 } finally { await browser.close() }

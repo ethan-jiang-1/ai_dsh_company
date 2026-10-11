@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 无 key 会话重放（R5a P1.2 + P1.3；R5b 扩多 child 场景与在场板判据）——四方协作 ——
+// 前置：**先 source run/env.sh 再跑**（或显式给同样的 DSH_PERMISSION_MODE）。姿态事件的**值**已脱敏，
+//   但它们的**在场与位置**随机器姿态变（Seatbelt 可用 = workspace-write，损坏 = danger-full-access，
+//   权限事件序列不同）——裸跑会在那些行上红，那是设计内的「序列漂移照样红」，不是夹具坏。
 // 何时跑：录制行为、组合、委派 UI 或 workspace replay 改动时（第三档，无 key ~11s；--ui 另起浏览器）
 //   --prepare     原始录制（replay/raw/，lead.jsonl + 任意名 child）→ 归一化 fixture
 //                 （session.v3.jsonl + session.<k>.v3.jsonl，child 按 header createdAt 排序）

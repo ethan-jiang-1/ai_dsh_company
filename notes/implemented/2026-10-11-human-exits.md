@@ -109,7 +109,7 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 | 批 2｜非阻塞缺口 | 同上：显式默认假设 + 轮末待确认项 | `probes/session-context/human-exits-nonblocking-probe.mjs`：`asked:false`、显式假设、轮末「待你拍板」，事件落盘 `runtime/human-exits-evidence/` |
 | 批 2｜比较结构与数字锚 | 同上：条件 GFM 表格/列表 + 关键数字文件行锚 | `probes/session-context/human-exits-expression-probe.mjs`：短表 + `#L` 行锚 PASS |
 | 批 3｜LedgerTab 有界显示与全文入口 | [批 3 Note](2026-10-11-human-exits-batch3-ui.md)：`LedgerTab.tsx` 全文切换、`styles.ts` 台账专属布局 | 红：摘要宽度归零且短摘要被隐藏无入口 → 修复；绿：`probes/browser-visual/ledger-summary-probe.mjs` 1440/390px、键盘/触屏全文 PASS |
-| 批 3｜compact 显示模式 | 同上 + `docs/demo.md` §前置步骤 5 | `probes/browser-visual/compact-view-probe.mjs`：简洁/标准/详细 2472 字符且 198 条过程行折叠，完全展开 19875 字符，助手最终长回复逐字保留 |
+| 批 3｜compact 显示模式 | 同上 + `docs/demo.md` §前置步骤 5 | `probes/browser-visual/compact-view-probe.mjs`：简洁/标准/详细 2471 字符且 198 条过程行折叠，完全展开 19874 字符，助手最终长回复逐字保留（1257 字，切回后逐字一致） |
 | 批 3｜open-in-app 现场 | 同上 + `docs/demo.md` §前置步骤 6 | `probes/browser-visual/open-in-app-probe.mjs`：`final.md` 进侧栏预览后 `POST /api/session/openWorkspacePath` 200 且携带目标绝对路径，无 alert |
 
 仍按 RFC 暂缓或未单测的两项：长期语料评估；简单二选/窄屏列表场景。两张 issue 已随本 RFC 毕业离场到 `_backlog/_archive/settled_issues/`。
@@ -118,7 +118,7 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 
 复核抓到的真缺陷与处置（都改了实现/资产，不是只写说明）：
 
-- **keyless replay lane 红**：`checks/smoke/replay-smoke.mjs` 在 r3-delegation 上报 2 条 FAIL——sidecar 还是旧 CEO prefix、两处注入体还是旧公司手册。复核实测确认：**该 lane 在本轮之前已经红过**（同日更早的手册改动新增 4 条协作规矩，没人跑这条 lane），本轮又加了 CEO 措辞与手册一行两处。处置 = 同步夹具（sidecar 文本、注入体正文、`source.changes[0].digest`）后 `replay-smoke: ALL PASS`；这是**夹具同步不是重录**（本机无 key），已在 `snapshots/replay/r3-delegation/snapshot.yml` 的资格理由里写明并要求此后改手册/persona 同 diff 跑该 lane。
+- **keyless replay lane 红**：`checks/smoke/replay-smoke.mjs` 在 r3-delegation 上报 2 条 FAIL——sidecar 还是旧 CEO prefix、两处注入体还是旧公司手册。复核实测确认：**该 lane 在本轮之前已经红过**（同日更早的手册改动新增 4 条协作规矩，没人跑这条 lane），本轮又加了 CEO 措辞与手册一行两处。处置 = 同步夹具（sidecar 文本、注入体正文、`source.changes[0].digest`）后 `replay-smoke: ALL PASS`；这是**夹具同步不是重录**（本机无 key），已在 `snapshots/replay/r3-delegation/snapshot.yml` 的资格理由里写明并要求此后改手册/persona 同 diff 跑该 lane。**该 lane 有姿态前提**：脱敏只盖姿态事件的**值**，它们的在场/位置随机器姿态变 ⇒ 必须先 `source run/env.sh`；裸跑实测 1 FAILURE（复现脚本自己声明的「序列漂移照样红」，非夹具漂），前置已写进脚本头注与场景说明。
 - **台账行高不稳**（批 3 实现缺陷）：按字符阈值决定裁不裁 ⇒ 22/29 行不裁，1440px 高到 102px（≈6 行）、390px 到 155px（≈9 行）。改为**所有行两行边界 + 按量出的溢出给入口**后，两档视口 maxLines=2 且 buttons == clipped。
 - **空转断言**：`tests/client/client-face.spec.ts` 原有两条断言在基线上恒绿（`/summary/` 命中 `row.summary`、`/height:/` 命中 `line-height:`）；已改写成逐条在 6094d67 上转红的 7 条，并补「不许给短行开免裁口子」。
 - **探针弱于其声称**：`human-exits-probe` 用全文 grep 判三件套（「埋在尾部」反例照样绿）⇒ 收紧到正文前 400 字 + 机制黑话负判据；`human-exits-nonblocking-probe` 的假设/待确认项改为分别落**开头 400 字**与**末 500 字**，收紧后重跑 PASS。
@@ -126,4 +126,16 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 - **索引缺口**：`checks/README.md` 漏登记 `human-exits-nonblocking-probe.mjs`，已补。
 - **越界与孤儿**：公司手册里我加的 compact 一句未被 RFC 授权（授权只到 demo.md §前置）⇒ 已删；`snapshots/probes/human-loop-e2e/2026-10-11/*.png` 无 Note 消费 ⇒ 已在批 2 Note 里点名。
 
-仍然存在的边界（未修，如实记）：批 2「代表场景固化为 replay」未做（只有真模型探针 + 会话日志断言）；本机应用是否真打开文件只能由人确认；夹具同步不等于重录，攒够改动后应做一次真重录。
+### 第二轮复核（2026-10-11 深夜，两轴复审 + 换路径实测）
+
+新增抓到并按上面同款标准处置的：
+
+- **replay lane 的姿态前提**：`snapshot.yml` 原文「判据不随机器沙箱姿态漂」过头——脱敏只盖姿态事件的**值**，在场/位置随机器姿态变。裸跑实测 1 FAILURE（session#0 runtime-context 行 + session#1 权限/inbox 事件错位），`source run/env.sh` 后 ALL PASS。已把前置写进 `checks/smoke/replay-smoke.mjs` 头注与场景说明（那是复现脚本自己声明的「序列漂移照样红」，不是夹具漂）。
+- **阻塞支探针遇到真·模型路径故障**：一次实跑 `turn/end.reason = error / MALFORMED_RESPONSE`（模型想调 `ask_user_question` 但工具入参 JSON 坏了），旧探针把它报成「行为不符」。已加**错误识别 + 有界重试一次 + 退出码 2（环境/模型路径失败，非行为判据）**，并把判定与事件落盘；重跑 PASS。稳定性实录：非阻塞支 4/4 通过；阻塞支 2 场有记录的观察里 1 通过 1 场模型路径错误（样本太小，不足以下频率结论）。
+- **首帧无入口**（判据）：60–120 字在窄栏会被裁，却不满足字符提示 ⇒ 量溢出改用 `useLayoutEffect`（绘制前跑）。
+- **无障碍名不含可见标签**（WCAG 2.5.3，A 级）：`全文` vs `查看完整结论` ⇒ 改成 `全文（查看完整结论）`／`收起（收起完整结论）`。
+- **死钩子**：`is-long` 类没有任何 CSS 消费 ⇒ 从 DOM 去掉（只留 `hinted` 布尔），相应断言改成查入口本身。
+- **视觉夹具缺位**（tests/README 第 25 行：用户可见客户端改动要同 diff 交场景或视觉夹具）：台账截图原先只落 gitignored 目录 ⇒ 新增 `snapshots/visual/ledger-summary/`（两档视口截图 + computed.json，探针 `--fixture` 写入）并登记进 snapshots/README；390px 图上可直接看到两行边界、省略号与「全文」入口同框。
+- **换路径实测新增覆盖**（都过）：容器级宽度变化（浮出成浮窗 356px ⇒ 入口 7→17；收回复原）、窗口连续缩放无抖动（同宽度两次采样一致）、展开态下收窄再收起不丢入口（被裁且无入口 = 0）、`deliverables-check` 违规 0、`preset-smoke`／`handbook-smoke`/`cdp-probe` 全绿。
+
+仍然存在的边界（未修，如实记）：批 2「代表场景固化为 replay」未做（只有真模型探针 + 会话日志断言）；本机应用是否真打开文件只能由人确认；夹具同步不等于重录，攒够改动后应做一次真重录；阻塞支真实模型行为样本仍小（1 通过 / 1 模型路径错误），要谈稳定率得再跑几场；探针间有重复脚手架（未抽取）。

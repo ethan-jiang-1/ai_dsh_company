@@ -8,6 +8,8 @@
 - 长台账摘要不再只依赖 `title` hover：摘要本体不挂 `title`，全文由显式控件给。
 - **所有**摘要行都吃两行边界（行高稳定）；**是否给「全文/收起」入口按布局量出的溢出决定**，字符数只用于首屏就亮出入口。按钮带 `aria-expanded`，展开后在面板内显示完整文本。
 - 短摘要不预置多余入口；窄栏里被折行的短摘要由量出的溢出补入口。
+- 量溢出跑在**绘制前**（`useLayoutEffect`）：否则窄栏里 60–120 字的行会闪出一帧「有裁切、没入口」。
+- 入口的可访问名包含可见标签（`全文（查看完整结论）`／`收起（收起完整结论）`），满足 WCAG 2.5.3。
 - Settings 的「工作步骤展示」选择 `compact` 只收窄工具调用细节；`/compact` 是另一条历史压缩命令，不把两者混为一谈。
 - open-in-app 的现场链路是先「在侧边栏打开」进入文档预览，再由预览控件把**目标文件绝对路径**交给本机应用；源码或 endpoint 存在不替代现场验收。
 
@@ -48,7 +50,8 @@
 
 - compact：`compact-view-probe` 同一会话内简洁/标准/详细 2471 字符、198 条过程行折叠 0 可见，完全展开 19874 字符、35 条可见；答案节点（`data-turn-process-answer`）在切回简洁后**逐字一致**（1257 字）⇒ 折叠过程行但不折叠助手最终长文。判定落 `runtime/human-exits-evidence/compact-view-verdict.json`。
 - open-in-app：`open-in-app-probe` 让交付物进侧栏预览后，点 `sidebar.right.tab.document.actions` 槽的控件发出 `POST /api/session/openWorkspacePath` `200`，**请求体里的绝对路径** = `.../deliverables/2026-10-10-ai-transformation-2026-v4/final.md`，无 alert。会话头部「Open in Finder」另走 `POST /open-in-app/open`（200，工作区根），交付物卡上的控件走 `POST /api/present.open`（204）。
-- 三条浏览器探针的判定与截图都落 `runtime/human-exits-evidence/`（gitignored；`/compact` 历史压缩命令收尾仍有 `session/writer-held` 观察项，与本 RFC 的显示模式判据无关）。
+- 三条浏览器探针**判定**都落 `runtime/human-exits-evidence/`（gitignored）；**截图只有台账探针**拍（两档视口），其余两条只写 JSON。`/compact` 历史压缩命令收尾仍有 `session/writer-held` 观察项，与本 RFC 的显示模式判据无关。
+- 提交的视觉夹具 = `snapshots/visual/ledger-summary/`（两档视口截图 + computed.json，`ledger-summary-probe --fixture` 写入）：390px 截图里能直接看到两行边界、**省略号**与「全文」入口同框，短行无入口；computed.json 记 `maxLines:2`、`buttons == clipped`（7/7、16/16）与键盘/鼠标/触屏三路取全文。
 - 现场曾挂载旧 bundle（无入口），故此前 smoke 不能证明新源码行为；每次改 client 源码后按 `tsc -b` + 包内 `tsdown` 重打包再验。
 
 ## 已知边界

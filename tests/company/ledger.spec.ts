@@ -34,7 +34,9 @@ describe('parseMotionLedger', () => {
     expect(row!.summary).toBe(summary)
     // 逐字同源只证明两边一致；再钉住**内容本身**（RFC 批 1 第 1 条：不再是 835 字原句、
     // 三项核心事实都在、不出现新的硬字数门禁式截断）。
-    expect(summary!.length, 'V4 一句话结论不该退回 835 字长句').toBeLessThan(200)
+    // 只钉「不许退回那条 835 字原句」这一条历史回归（批 1 禁的是**新增内容字数门禁**，
+    // 不是不许测试记住旧缺陷的规模）；别把它读成对台账结论的字数政策。
+    expect(summary!.length, 'V4 一句话结论不该退回 835 字原句').toBeLessThan(400)
     for (const fact of [/V4 达标/, /反事实未达标/, /缺陷已修复/]) {
       expect(summary!, `结论必须保留「${String(fact)}」这项事实`).toMatch(fact)
     }

@@ -4,7 +4,7 @@
  * 素材与场景分镜（demo.md 场景 D/E + 快照）已由新动议条目交付；本页签是"公司累计干了什么、
  * 值不值"的常驻答案。
  */
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
@@ -34,8 +34,9 @@ const FULL_TEXT_HINT = 120
  * 为什么边界按布局量、不按字符数（2026-10-11 真浏览器实测）：同一条 103 字摘要在 390px 栏里
  * 会折成 4 行，而 60 字也可能折 3 行——按字数决定裁不裁时，这些行既不裁也没有入口，行高在
  * 6–9 行间跳（实测 22/29 行如此）。改成「一律两行 + 量出溢出才加入口」后，行高稳定，且
- * **被裁必有入口**（RFC 批 3：clamp 后无全文入口 = 失败）。字符数只用来首屏就亮出入口，
- * 免得先渲染一帧无入口的裁切文本。
+ * **被裁必有入口**（RFC 批 3：clamp 后无全文入口 = 失败）。
+ * 量溢出用 `useLayoutEffect`（在浏览器绘制前跑）：首帧就不会闪出「有裁切、没入口」的样子——
+ * 60–120 字在窄栏里会被裁，它们不满足字符提示，只靠这一层兜住（`useEffect` 会晚一帧，实测可见闪）。
  * 导出供 keyless 层做静态渲染断言（同 `DelegationCard` 的测试面）。
  * @param props - 摘要文本。
  * @returns 摘要行元素。
@@ -45,7 +46,7 @@ export function LedgerSummary({ summary }: { readonly summary: string }) {
   const [clipped, setClipped] = useState(false)
   const textRef = useRef<HTMLSpanElement | null>(null)
   const hinted = summary.length > FULL_TEXT_HINT
-  useEffect(() => {
+  useLayoutEffect(() => {
     const node = textRef.current
     if (node === null || expanded) return
     const measure = (): void => { setClipped(node.scrollHeight > node.clientHeight + 1) }
@@ -55,14 +56,15 @@ export function LedgerSummary({ summary }: { readonly summary: string }) {
     return () => { observer.disconnect() }
   }, [summary, expanded])
   return (
-    <span className={`wk-row-summary${hinted ? ' is-long' : ''}${expanded ? ' is-expanded' : ''}`}>
+    <span className={`wk-row-summary${expanded ? ' is-expanded' : ''}`}>
       <span className="wk-row-task" ref={textRef}>{summary}</span>
       {(hinted || clipped || expanded) && (
         <Button
           size="sm"
           variant="ghost"
           title={expanded ? '收起完整结论' : '查看完整结论'}
-          aria-label={expanded ? '收起完整结论' : '查看完整结论'}
+          // WCAG 2.5.3（Label in Name）：可访问名要包含可见标签（「全文」/「收起」）。
+          aria-label={expanded ? '收起（收起完整结论）' : '全文（查看完整结论）'}
           aria-expanded={expanded}
           onClick={() => { setExpanded(value => !value) }}
         >
