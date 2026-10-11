@@ -68,9 +68,27 @@
 `source run/env.sh && node probes/session-context/human-exits-nonblocking-probe.mjs '<token-url>'`：真实 CEO 会话里给一个非阻塞缺口（会议时长未给、且不涉预算/对外承诺/授权），跑完一轮并把会话事件落盘到 `runtime/human-exits-evidence/<sessionId>.json`。结果 `human-exits-nonblocking-probe: PASS`，落盘事实为 `ended: true`、`asked: false`（没有 `ask_user_question` 阻停）、`assumption: true`（「默认口径：60 分钟…会议时长未给 → 按此假设，可改」）、`confirmation: true`（轮末「待你拍板：会议时长…」）、`draft: true`（三个议题照常出齐）。这是 RFC「非阻塞缺口带显式假设继续 + 轮末列待确认」的直接会话日志证据，不是规则文本推定。
 复核轮（2026-10-11）把两条断言**分开落位**：假设必须出现在正文**前 400 字**、待确认项必须出现在**末 500 字**；此前全文 grep 会把「埋在尾部」和「写在开头」混为一谈。收紧后重跑仍 `PASS`（三次独立会话：`session-6bfc0f7e`、`session-8ab59af8`、`session-73c905ce`）。
 
+## 代表场景已固化为 replay（2026-10-11 补齐）
+
+- 场景 = [snapshots/replay/human-exits-ask](../../snapshots/replay/human-exits-ask/)：阻塞拍板（首段三件套 + `ask_user_question`）。
+  夹具 27 行，含 ask 调用（4 选项）与首段三件套，`turn/end` 为完成态。
+- 无 key 复演：`source run/env.sh && node checks/smoke/replay-smoke.mjs --scenario human-exits-ask`
+  → `ALL PASS（归一化零 diff + 2 sidecar 零 diff，20s）`。
+- 为什么以前录不成（三个实测卡点，都已解）：① ask 是前景等待，**没人作答整轮不收口、会话日志不封盘**；
+  ② RPC `userQuestions/answer` 对未被 Client 认领的问询返回 `false`；③ UI 会话搜索按**名字**匹配，自动标题搜不到。
+- 机制：`snapshot.yml` 的 `answerer: browser` 开关 —— 录/放两侧都由驱动用真 UI 认领作答（规则 = 第一项 ⇒ 对称）；
+  驱动另需确定性标题（带时间戳会写进日志、重放必红，实测过）。开关只对本场景生效，r3/r2 不受影响。
+
+## 行为样本（2026-10-11 汇总，探针落盘可复核）
+
+阻塞支共 **11 场**有落盘的观察：**10 场通过**（`ask_user_question` 在场 + 首段三件套齐 + 无机制黑话），
+1 场失败——即上文那场 `MALFORMED_RESPONSE`（模型想调 ask 但工具入参 JSON 坏了），探针现已把它归到
+「环境/模型路径失败（退出码 2）」而不是行为不符。非阻塞支 4/4 通过。样本口径 = `runtime/human-exits-evidence/*.json`。
+
 ## 未验与缺口
 
-- **代表场景未固化为 replay**：RFC 批 2 写的是「代表场景先固化为 replay/会话断言」。现状 = 真模型认证档 + **会话日志断言**（探针读 `session/page` 事件判据，落盘可复核），但**没有** `snapshots/replay/` 场景；keyless 层只有规则文本在场断言（`tests/presets/presets.spec.ts`），它证不了模型行为。要补 replay 需一次带 key 的录制，属独立一轮。
+- keyless 层仍只有规则文本在场断言（`tests/presets/presets.spec.ts`）——模型行为由上面那条 replay 场景钉；
+  简单二选/窄屏列表场景仍未单独做。
 
 - 简单二选和窄屏退化为列表尚未单独做真实模型场景；规则文本已明确该例外，后续若出现反例再单独补探针。
 - 尚未完成长期语料评估；这仍按 RFC 暂缓。
@@ -80,4 +98,4 @@
 
 - 阻塞支探针升级为**尽力用真 UI 答题收口**（产品路径：浏览器认领卡片 → 点选项 + Enter）；本机 fresh profile 里页面没有排练场工作区入口，按标题搜不到会话 ⇒ 这一步目前只打印失败、不改判据。探针同时加了「模型/传输错误识别 + 有界重试一次 + 退出码 2」，并把判定与事件落盘。
 - 实测记录：ask 是前景等待，**没人作答整轮不收口、会话日志不封盘**（`session.vN.jsonl.zstd` 只解出 header）；RPC `userQuestions/answer` 形状为 `{agentId, callId, answer}`，但对未认领的问询返回 `false`，整轮仍不收口。
-- 因此「把阻塞支固化成 replay 场景」不是探针小改，需要先决定**答题人放哪一侧**：已立卡 [_backlog/issues/2026-10-11-human-exits-replay-scene.md](../../_backlog/issues/2026-10-11-human-exits-replay-scene.md)，含 enable 材料与三条互斥方案。
+- 因此「把阻塞支固化成 replay 场景」不是探针小改，需要先决定**答题人放哪一侧**：已立卡 [_backlog/issues/2026-10-11-human-exits-replay-scene.md](../../_backlog/_archive/settled_issues/2026-10-11-human-exits-replay-scene.md)，含 enable 材料与三条互斥方案。

@@ -45,6 +45,10 @@ const prompt = `排练指令（只做这一件事，做完即停；不要 spawn 
 const runScene = async () => {
   const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'ceo' } })
   const sessionId = created.sessionId
+  // 改名成唯一标题再搜：UI 的会话搜索按**名字**匹配，自动兜底标题搜不到（2026-10-11 实测 0 结果；
+  // human-loop-e2e-smoke 也是先 rename 再搜，那是能跑通的同款做法）。
+  const uiTitle = `human-exits 阻塞支 ${String(Date.now() % 100000)}`
+  try { await rpc('session/rename', { request: { sessionId, title: uiTitle } }) } catch { /* 兜底 */ }
   await rpc('session/prompt', { request: {
     requestId: `hep-${String(Date.now())}`, sessionId, mode: 'queue',
     content: [{ type: 'text', text: prompt }], clientTimeZone: 'Asia/Shanghai',
@@ -60,7 +64,7 @@ const runScene = async () => {
     if (events.some(event => event?.type === 'turn/end')) break
     await sleep(4_000)
   }
-  return { sessionId, events }
+  return { sessionId, uiTitle, events }
 }
 
 /**
@@ -82,22 +86,32 @@ const answerInBrowser = async ({ base, token, title, optionLabel, shotPath }) =>
     // 先连排练场工作区：会话列表按【工作目录】过滤，不连就搜不到本场会话（demo.md §前置步骤 3）。
     const ws = page.getByText('rehearsal-workspace', { exact: true })
     if (await ws.count() > 0) {
-      await ws.last().click().catch(() => {})
-      await sleep(800)
+      await ws.first().click().catch(() => {})
+      await page.waitForTimeout(1_500)
+    } else {
+      throw new Error('页面里没有 rehearsal-workspace 入口（fresh profile 未登记该工作区）')
     }
     const search = page.getByRole('button', { name: 'Search sessions' })
     if (await search.getAttribute('aria-expanded') !== 'true') await search.click()
     await page.getByPlaceholder('Search session names').fill(title)
-    const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: title })
-    await result.first().waitFor({ timeout: 15_000 })
+    const tree = page.getByRole('tree', { name: 'Search results' })
+    const result = tree.getByRole('treeitem').filter({ hasText: title.slice(0, 12) })
+    try {
+      await result.first().waitFor({ timeout: 20_000 })
+    } catch (error) {
+      const seen = (await tree.getByRole('treeitem').allInnerTexts().catch(() => [])).slice(0, 5).map(t => t.split('\n')[0])
+      throw new Error(`搜不到本场会话（搜「${title.slice(0, 12)}」；结果前 5 条：${JSON.stringify(seen)}）`, { cause: error })
+    }
     await result.first().click()
     await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
-    const option = page.getByRole('radio', { name: optionLabel })
+    // 选项名按前缀匹配：工具入参里的 label 可能带「（推荐）」这类后缀，UI 渲染成独立徽标
+    // ⇒ 用全长会 strict/找不到（2026-10-11 实测）。
+    const option = page.getByRole('radio', { name: optionLabel.slice(0, 10) }).first()
     await option.waitFor({ state: 'visible', timeout: 90_000 })
     await page.screenshot({ path: shotPath, fullPage: false })
     await option.click()
     await option.press('Enter')            // 组件明写：选项上 Enter 即提交
-    await page.getByRole('radio', { name: optionLabel }).waitFor({ state: 'detached', timeout: 60_000 }).catch(() => {})
+    await option.waitFor({ state: 'detached', timeout: 60_000 }).catch(() => {})
   } finally { await browser.close() }
 }
 
@@ -113,12 +127,14 @@ const evidenceDirShot = join(ROOT, 'runtime', 'human-exits-evidence')
 
 // 有界重试一次：模型/传输错误不是行为证据，重跑一次再定性（RFC 只说「有界单场观察」，不是「一场定生死」）。
 let sessionId = ''
+let uiTitle = ''
 let events = []
 let attempt = 0
 let failure = null
 for (attempt = 1; attempt <= 2; attempt++) {
   const run = await runScene()
   sessionId = run.sessionId
+  uiTitle = run.uiTitle
   events = run.events
   failure = turnError(events) ?? null
   const askedNow = events.some(event => event?.type === 'tool/call' && event?.data?.name === 'ask_user_question')
@@ -134,8 +150,7 @@ for (attempt = 1; attempt <= 2; attempt++) {
   }
   // 有 ask ⇒ 用真 UI 作答把这一轮收口（否则日志不封盘、证据不可复核）
   const askCall = events.find(event => event?.type === 'tool/call' && event?.data?.name === 'ask_user_question')
-  const titleEvent = events.find(event => event?.type === 'session/title')
-  const title = titleEvent?.data?.title ?? titleEvent?.data?.message?.title ?? askCall?.data?.title ?? ''
+  const title = uiTitle
   try {
     const args = JSON.parse(String(askCall.data.arguments ?? '{}'))
     const first = args.questions?.[0]

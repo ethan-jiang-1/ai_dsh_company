@@ -1,13 +1,16 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-10-11
 ---
 
 # 推敲：阻塞型问询场景固化成 replay——先给重放侧一个答题人
 
-> 立卡：2026-10-11 ｜ 状态：推敲中 ｜ 类型：Task ｜ 可关闭：否
+> 立卡：2026-10-11 ｜ 状态：已结 ｜ 类型：Task ｜ 可关闭：是 ｜ 结论日期：2026-10-11
+> **结论与去向**：场景已建成并零 diff 复演——[snapshots/replay/human-exits-ask](../../../snapshots/replay/human-exits-ask/)
+> （`answerer: browser`：录/放两侧都用真 UI 认领作答，规则 = 第一项）。harness 改动落在 `checks/smoke/replay-smoke.mjs`
+> （场景级答题人开关 + 确定性标题 + 按 `session.children` 算期望会话数）。机制依据与实测卡点见文末「落地记录」。
 > 来源：Human Exits RFC 批 2 验收「代表场景先固化为 replay/会话断言」的未落地项
-> （[毕业 Note](../../notes/implemented/2026-10-11-human-exits.md) §收口后复核）。
+> （[毕业 Note](../../../notes/implemented/2026-10-11-human-exits.md) §收口后复核）。
 
 **问题与期望结果：** 批 2 的三类行为证据里，阻塞支只有**真模型探针 + 运行期 RPC 读到的会话事件**，
 没有可无 key 重放的固化场景；非阻塞支同理。期望结果 = 阻塞型问询（CEO 首段三件套 + `ask_user_question`）
@@ -52,5 +55,19 @@ enable 材料：`cordis.yml` / `cordis.snapshot.yml` 可直接从 r3-delegation 
 
 ## 关闭条件
 
-场景能被 `replay-smoke` 零 diff 复演并登记进 [snapshots/README](../../snapshots/README.md)（或用户裁定改走 (c) 形态并写明理由）
+场景能被 `replay-smoke` 零 diff 复演并登记进 [snapshots/README](../../../snapshots/README.md)（或用户裁定改走 (c) 形态并写明理由）
 ⇒ `可关闭：是` 并同次归档。
+
+## 落地记录（2026-10-11，结卡时补）
+
+三个卡点逐个实测解掉：
+
+1. **日志不封盘** = ask 前景等待没人作答。解 = 给驱动装**真 UI 认领作答**（浏览器：连排练场工作区 → 按唯一标题搜会话 → 点选项 + Enter）。
+   实测：作答后整轮收口（30–170s），会话日志从 20 行截断变 27 行完整（含 `turn/end: completed`）。
+2. **RPC 直答无效**。`userQuestions/answer` 的形状是 `{agentId, callId, answer}`，但对未被 Client 认领的问询返回 `false`、整轮仍不收口 ⇒ 走浏览器。
+3. **UI 搜索按名字匹配**，自动兜底标题搜不到（实测 0 结果）。解 = 驱动先 `session/rename` 成一个**确定性**标题
+   （带时间戳会写进日志、重放必红——首轮实测 `…场景会话` 前那版用 `Date.now()%100000`，重放报 `48098 vs 25030`）。
+4. 顺带：`--record` 守卫原写死「≥1 child」，单轮场景录完必被判失败 ⇒ 改成按 `snapshot.yml` 的 `session.children` 声明算。
+
+验收：`source run/env.sh && node checks/smoke/replay-smoke.mjs --scenario human-exits-ask` → `ALL PASS（无 key 重放，归一化零 diff + 2 sidecar 零 diff，20s）`。
+夹具钉住的形态：27 行里含 `ask_user_question`（4 选项）与首段三件套（结论/下一步/拍板），`turn/end` 为完成态。

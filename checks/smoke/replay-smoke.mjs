@@ -10,6 +10,9 @@
 //                 + sidecar（system-prompt.expected.md / tool-schemas.expected.json；child 带 .k. 后缀）
 //   --refresh     headless authored 场景无 key 刷新会话/sidecar，完整 workspace oracle 必须先通过且永不重写。
 //   --record      场景组合（replay/cordis.yml，真模型认证档）下重录 → replay/raw/ → 顺带 prepare
+//   answerer: browser（场景 snapshot.yml 可选项）：本场景的问询由**真 UI 认领并作答**（第一项），
+//     录/放两侧同规则 ⇒ 对称。为什么需要它：ask 是前景等待，没人作答整轮不收口、会话日志不封盘，
+//     阻塞型场景因此既录不成也重放不成（2026-10-11 human-exits-ask 实测）。默认不开，r3/r2 不受影响。
 //   --ui          默认重放的全部检查 + 委派卡端到端（P1.3，r3-delegation 场景）：playwright
 //                 加载真页面 → 连接工作区 → 搜索打开 lead 会话 → 展开轮次组 → ariaSnapshot
 //                 金样比对 + 委派卡可访问名断言（断言口径 = 可访问名/文本，不是 data-*——
@@ -352,6 +355,13 @@ async function driveScenario({ patchSource, env, tasks }) {
     const rpc = companyRpc({ fetch, base, cookie, prefix: 'replay-', dumpBodyOnError: true })
     const created = await rpc('session/create', { request: { cwd: workspace, agentPreset: 'ceo' } })
     const sessionId = created.sessionId
+    // UI 的会话搜索按**名字**匹配，自动兜底标题搜不到（2026-10-11 实测 0 结果）⇒ 先改成一个**确定**标题。
+    // ⚠ 必须确定：标题进会话日志，带时间戳会让重放必红（首轮实测 `…-ask 48098` vs `…-ask 25030`）。
+    //   每次重放都在临时 DSH home 里，只有本场一个会话 ⇒ 同名不冲突。
+    const uiTitle = `${SCENARIO} 场景会话`
+    if (metadata.answerer === 'browser') {
+      try { await rpc('session/rename', { request: { sessionId, title: uiTitle } }) } catch { /* 兜底 */ }
+    }
     const readPage = async () => {
       let cursor = -1
       try {
@@ -366,7 +376,75 @@ async function driveScenario({ patchSource, env, tasks }) {
       for (const record of page.records ?? []) if (record.event?.type === 'turn/end') turnEnds++
       return { turnEnds }
     }
+    /**
+     * 当前未作答的 ask 调用（取第一条）；没有则 undefined。
+     * ⚠ 读法与 readPage 一致（先探 cursor 再按 cursor 读）：直接拿 `throughSeq: MAX_SAFE_INTEGER` 读会抛，
+     *   而抛错若被静默吞掉就表现为"没有待答问询"——2026-10-11 实测：答题人因此一次都没被叫醒。
+     */
+    const pendingAsk = async () => {
+      try {
+        // 探 cursor 的请求本身会以「past cursor N」被拒（readPage 同款）——从错误里取 N，别当失败。
+        let cursor = -1
+        try {
+          const probe = await rpc('session/page', { request: { address: { kind: 'session', sessionId }, throughSeq: Number.MAX_SAFE_INTEGER, maxMessages: 1 } })
+          cursor = probe.records?.at(-1)?.event?.seq ?? -1
+        } catch (error) {
+          const m = /past cursor (\d+)/.exec(String(error.message))
+          if (m === null) throw error
+          cursor = Number(m[1])
+        }
+        if (cursor < 0) return undefined
+        const page = await rpc('session/page', { request: { address: { kind: 'session', sessionId }, throughSeq: cursor, maxMessages: 500 } })
+        const events = (page.records ?? []).map(r => r.event).filter(Boolean)
+        const call = events.find(e => e?.type === 'tool/call' && e?.data?.name === 'ask_user_question')
+        if (call === undefined) return undefined
+        const settled = events.some(e => e?.type === 'tool/result' && e?.data?.callId === call.data.callId)
+        if (settled) return undefined
+        const parsed = JSON.parse(String(call.data.arguments ?? '{}'))
+        const option = parsed.questions?.[0]?.options?.[0]?.label
+        return typeof option === 'string' && option !== '' ? { callId: String(call.data.callId), option } : undefined
+      } catch (error) {
+        console.log(`  待答问询检查失败（当作没有，会继续等）：${String(error.message).slice(0, 120)}`)
+        return undefined
+      }
+    }
+
+    /**
+     * 用真浏览器认领并作答（产品路径：先连工作区，再按唯一标题搜会话，点选项 + Enter 提交）。
+     * 为什么不是 RPC：`userQuestions/answer` 对未被 Client 认领的问询返回 false，整轮仍不收口（实测）。
+     */
+    const answerViaBrowser = async ({ url: guiUrl, title, option }) => {
+      const chromium = await loadChromium(ROOT)
+      const browser = await launchChromium(chromium)
+      try {
+        const page = await browser.newPage()
+        await page.goto(guiUrl)
+        await page.waitForTimeout(2_500)
+        for (const name of ['Internal Testing Notice', 'Preview Notice']) {
+          const dialog = page.locator('[role=dialog]').filter({ hasText: name })
+          if (await dialog.count() === 0) continue
+          const button = dialog.getByRole('button', { name: /Continue/ })
+          if (await button.count() > 0) await button.first().click()
+          await page.waitForTimeout(400)
+        }
+        const ws = page.getByText('rehearsal-workspace', { exact: true })
+        if (await ws.count() > 0) { await ws.first().click(); await page.waitForTimeout(1_500) }
+        const search = page.getByRole('button', { name: 'Search sessions' })
+        if (await search.getAttribute('aria-expanded') !== 'true') await search.click()
+        await page.getByPlaceholder('Search session names').fill(title)
+        const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: title })
+        await result.first().waitFor({ timeout: 20_000 })
+        await result.first().click()
+        await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
+        const radio = page.getByRole('radio', { name: option.slice(0, 10) }).first()
+        await radio.waitFor({ state: 'visible', timeout: 90_000 })
+        await radio.click()
+        await radio.press('Enter')
+      } finally { await browser.close() }
+    }
+
     let seenTurnEnds = 0
+    const answeredCalls = new Set()
     for (const [index, task] of tasks.entries()) {
       await rpc('session/prompt', {
         request: { requestId: `replay-${index}-${Date.now()}`, sessionId, mode: 'queue', content: [{ type: 'text', text: task }], clientTimeZone: 'Asia/Shanghai' },
@@ -376,6 +454,13 @@ async function driveScenario({ patchSource, env, tasks }) {
         await sleep(3000)
         const { turnEnds } = await readPage()
         if (turnEnds > seenTurnEnds) { seenTurnEnds = turnEnds; break }
+        // 场景声明了浏览器答题人：等不到收口时看有没有未作答的问询，有就认领作答（录/放同规则）。
+        if (metadata.answerer !== 'browser') continue
+        const pending = await pendingAsk()
+        if (pending === undefined || answeredCalls.has(pending.callId)) continue
+        answeredCalls.add(pending.callId)
+        console.log(`  问询在场（${pending.option.slice(0, 24)}…）→ 用真 UI 认领作答`)
+        await answerViaBrowser({ url, title: uiTitle, option: pending.option })
       }
       console.log(`  第 ${String(index + 1)}/${String(tasks.length)} 段完成（${String(Math.round((Date.now() - startedAt) / 1000))}s）`)
     }
@@ -400,7 +485,7 @@ async function driveScenario({ patchSource, env, tasks }) {
       // （r2 实证：4 child 的归一化比对全对不上行）。
       .sort((a, b) => ((a.header.parentSession ? 1 : 0) - (b.header.parentSession ? 1 : 0))
         || Number(a.header.createdAt ?? 0) - Number(b.header.createdAt ?? 0))
-    return { workspace, runRoot, child, parsed, sessionId, url, baseUrl: base }
+    return { workspace, runRoot, child, parsed, sessionId, url, baseUrl: base, token, uiTitle, rpc }
   } catch (error) {
     child.kill('SIGTERM')
     throw error

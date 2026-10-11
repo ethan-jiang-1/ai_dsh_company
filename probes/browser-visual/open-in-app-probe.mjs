@@ -2,7 +2,14 @@
 // 状态：常驻
 // 何时跑：改交付物预览/文件动作/open-in-app 入口后；真实浏览器，不进入 pnpm test。
 // 前置：已启动公司观察窗 URL、会话标题与目标交付物路径；用法：node 本脚本 '<token-url>' '<session-title>' '<file-suffix>'。
-// 断言面（RFC 批 3）：交付物在侧栏预览；预览上的 open-in-app 控件发出真实请求并成功，且不依赖源码或 endpoint 存在。
+// 断言面（RFC 批 3）：交付物在侧栏预览；预览上的控件把**目标文件绝对路径**交给 Host，且 Host 判启动成功。
+// ⚠ 「成功」的强度（vendor host/open-in-app/src/index.ts:295-306 读代码确认）：`/open-in-app/open`
+//   只在启动器 outcome=launched（spawn 成功 **且熬过 launchWatchMs 早失败观察窗**）时才回
+//   `200 {"ok":true}`；启动失败回 `502 launch-failed`、目录不存在回 `404 not-found`。
+//   ⇒ 断言 body.ok 才是「操作系统层面真启动了那个应用并带上那个路径」，不是「请求被收下」。
+//   预览控件走的是 Session Remote `session/openWorkspacePath`（不是那条 HTTP 路由），它的判词 =
+//   返回 `{opened:true}`（vendor api/session-controller/src/index.ts:347-356：原生打开器接受该路径
+//   才返回，失败抛 RemoteError）⇒ 也要断言 `"opened":true`，不能只看 RPC 2xx。
 import assert from 'node:assert/strict'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -24,6 +31,7 @@ try {
         status: response.status(),
         route: target.replace(new URL(url).origin, '').split('?')[0],
         request: response.request().postData() ?? '',
+        body: (await response.text().catch(() => '')).slice(0, 200),
       })
     }
   })
@@ -42,6 +50,9 @@ try {
   await page.waitForTimeout(3000)
   const ok = calls.filter(c => c.status >= 200 && c.status < 300)
   assert(ok.length, `点击 open-in-app 控件没有成功请求：${JSON.stringify(calls)}`)
+  // Host 自己的成功判词（熬过观察窗才给），不是「HTTP 通了」。
+  const accepted = ok.filter(c => /"ok"\s*:\s*true/.test(c.body ?? '') || /"opened"\s*:\s*true/.test(c.body ?? ''))
+  assert(accepted.length, `Host 未回成功判词（ok:true / opened:true）——拿到的 body：${JSON.stringify(ok.map(c => c.body))}`)
   // 取请求体里**真正的目标路径**（不是"正文里出现过文件名"）：必须是绝对路径且指向目标交付物。
   const paths = ok.map(c => {
     try { return JSON.parse(c.request).payload.args.request.path } catch { return undefined }
@@ -52,7 +63,7 @@ try {
   const verdict = {
     previewed: suffix,
     openedPath: carried,
-    calls: ok.map(c => ({ status: c.status, route: c.route })),
+    calls: ok.map(c => ({ status: c.status, route: c.route, hostVerdict: c.body })),
     alerts: 0,
     verdict: '目标文件进入侧栏预览、open-in-app 请求携带其绝对路径且成功：PASS',
   }

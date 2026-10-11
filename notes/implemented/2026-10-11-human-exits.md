@@ -145,7 +145,7 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 | 夹具同步 ≠ 重录 | **做了真重录**（`replay-smoke --record`，真模型 2 段）：r3-delegation 的 raw + fixture 换成真录制，`replay-smoke` 复跑 ALL PASS。附带验证：**重录产出的 sidecar 与我手同步的那份逐字节一致**——那次同步没有造假。 |
 | 探针脚手架重复（约 25 行 × 3～4 份） | 抽到 [tools/lib/probe-window.mjs](../../tools/lib/probe-window.mjs)（关首启提示、开会话、开公司页签），三条浏览器探针改用它；cdp-probe 保持驱动层逐字拷贝契约不动。 |
 | 本机应用是否真打开 | 边界不变（机器只证到 Host 成功 + 目标绝对路径）；见下方"仍然存在"。 |
-| 批 2 代表场景固化为 replay | **仍没做成，但卡点已实测定位**，并立成卡：ask 是前景等待 ⇒ 没人作答整轮不收口、**会话日志不封盘**（解压只出 header）；RPC `userQuestions/answer` 形状正确也对未认领问询返回 `false`；浏览器答题这条路在 `human-loop-e2e-smoke` 是通的，但需要先把排练场工作区连上。enable 材料与三条互斥方案写进 [_backlog/issues/2026-10-11-human-exits-replay-scene.md](../../_backlog/issues/2026-10-11-human-exits-replay-scene.md)。 |
+| 批 2 代表场景固化为 replay | **做成了**：[snapshots/replay/human-exits-ask](../../snapshots/replay/human-exits-ask/)（阻塞拍板），`--scenario human-exits-ask` 无 key 重放 ALL PASS、零 diff。三个卡点逐个解掉：日志不封盘（ask 前景等待没人作答）⇒ 给驱动装**真 UI 认领作答**（`answerer: browser` 场景开关，录/放对称）；RPC 直答对未认领问询返回 `false` ⇒ 走浏览器；UI 搜索按名字匹配 ⇒ 驱动先 rename 成**确定性**标题（带时间戳会写进日志、重放必红，实测过）。卡 [human-exits-replay-scene](../../_backlog/_archive/settled_issues/2026-10-11-human-exits-replay-scene.md) 同次结掉。 |
 | 顺带修掉的harness缺陷 | `--record` 的守卫原先写死「≥1 child」⇒ 单轮场景录完必被判失败且不落盘；改成按 `snapshot.yml` 的 `session.children` 声明算期望。 |
 
-仍然存在的边界（未修，如实记）：批 2「代表场景固化为 replay」未做（已立卡 [human-exits-replay-scene](../../_backlog/issues/2026-10-11-human-exits-replay-scene.md)，卡点实测在案）；本机应用是否真打开文件只能由人确认；夹具同步不等于重录，攒够改动后应做一次真重录；阻塞支真实模型行为样本仍小（1 通过 / 1 模型路径错误），要谈稳定率得再跑几场；探针间有重复脚手架（未抽取）。
+仍然存在的边界（未修，如实记）：批 2「代表场景固化为 replay」未做（已立卡 [human-exits-replay-scene](../../_backlog/_archive/settled_issues/2026-10-11-human-exits-replay-scene.md)，卡点实测在案）；本机应用是否真打开文件只能由人确认；夹具同步不等于重录，攒够改动后应做一次真重录；阻塞支真实模型行为样本仍小（1 通过 / 1 模型路径错误），要谈稳定率得再跑几场；探针间有重复脚手架（未抽取）。
