@@ -28,9 +28,10 @@ persona 表达款）而非新机制；本仓自建件（八页签/委派卡/公�
 | **取证层** | 信任：出处、复算 | drafts/sources（只有争议时才进） |
 
 **五机制（漏斗的运转件，全部有底层支撑）：**
-1. **决策成卡**：凡"要拍板"必 `ask_user_question`（选项 label=动作、description=一句后果），
-   散文只给背景——拍板从阅读任务变点击任务，卡自然进「待办」收件箱。
-   （V4 反例：拍板事埋在 1473 字收口回复尾部的散文里。）
+1. **决策成卡**：**阻塞型中途拍板 + 收口时的拍板事**必 `ask_user_question`（选项 label=动作、
+   description=一句后果），散文只给背景——拍板从阅读任务变点击任务，卡自然进「待办」收件箱；
+   **非阻塞中途项不拦人**（带显式默认假设继续、轮末摘要列「待人确认」——与手册「问询节流」
+   对齐，防"别烦我"复发）。（V4 反例：拍板事埋在 1473 字收口回复尾部的散文里。）
 2. **对比成表**：≥2 选项的取舍一律 GFM 表格（选项×维度、每格短語）——聊天原生渲染
    （ui-primitives `MarkdownText` = GFM+TeX）。V4 final 四象限表已是正例。
 3. **数字带锚**：人话段关键数字挂 `[数字](final.md#L24-L30)` 锚链接——一步到依据，
@@ -42,16 +43,44 @@ persona 表达款）而非新机制；本仓自建件（八页签/委派卡/公�
    长形住 final/drafts；侧栏预览全家桶兜底（markdown 分页、**电子表格浏览器直开**、
    Word/PPT 本地转 PDF、PDF/HTML/图片——ui-sidebar-documentpreview，支持面比手册 rc.2 收割条目写的宽）。
 
-**未决问题：**
-1. 机制 1/2/3 是 persona/手册文案款（与语言卡 A3 同 diff 可落）——确认即做？
-2. 机制 4 的 runbook 落点：demo.md §前置 vs multi-human.md 开门节（合同层一处，实施时定）。
-3. open-in-app 挂不挂：host+client 两包成对（`dsh-host-open-in-app` + `ui-open-in-app`，
-   会话头/预览头"在默认应用打开"）——Excel 党一键原生打开交付物；两行 + client-load 验证。
-4. LedgerTab 长行 clamp（自语言卡迁来，治标小补）随哪批做。
-5. 观察项（不立项）：聊天内嵌图表——`MarkdownText` 不渲染 mermaid；本地图片可内联
-   （pathImages 词汇），CEO 写 SVG 图表文件+引用理论可行；先看表格+台账够不够再议。
+**推敲结论（建议默认，待用户确认）：**
+1. 机制 1/2/3/5 的内容和表达合同与语言层卡同批定义；由 CEO persona/手册落规则，不增加第二事实源，不做自建 UI。
+2. 机制 4（紧凑 TranscriptView + 钉住常用页签）操作说明并入 `docs/demo.md` §前置，因为这是公司观察窗的统一开门操作，属于 demo 合同；`multi-human.md` 只在多人形态专属流程需要时链接，不复制步骤。
+3. `open-in-app` 不需配置改动；作为批 3 的现场观察，核实出厂入口实际可用，再把已验证的出厂能力补进公司手册。若现场不成立，先记录环境/运行态证据，不自行改上游或假设机制坏了。
+4. LedgerTab clamp 与可访问全文入口归批 3，不当作内容长度治理替代。现状 title 只提供悬停提示，不能作为键盘/触屏全文查看的验收。
+5. 聊天图表继续观察，不纳入本次实施申请；仅当表格+链接无法支持真实动议表达时，凭样本另开推敲。
 
-**下一步：** 用户挑定未决 1–4（5 留观察）⇒ 与语言卡同 diff 或分批出实施申请。
+**未决问题（保留为用户可改的建议，不阻塞独立技术准备）：**
+- 用户是否接受三批顺序以及本卡与语言卡共用实施 RFC。
+- 真实模型行为是否接受“场景先立 + 有界单场观察”，长期语料/遵从率暂缓；规范不等于行为已证明。
+
+**技术支撑核对（2026-10-11 源码级，承重断言逐条对源；受 methods/requirements-probes 敲打）：**
+
+| 断言 | 证据落点（vendor tag dsh-v0.2.0-rc.2） | 结论 |
+|---|---|---|
+| 助手消息走 GFM 渲染（表格可用） | `ui-chat/src/client/chat/AssistantMarkdown.tsx` → ui-primitives `markdown/render.tsx`（`case 'table'`）；deps 含 `micromark-extension-gfm`/`mdast-util-gfm` | ✅ |
+| ask 卡渲染选项 label+description | `ui-user-questions/src/client/QuestionReplyView.tsx:79`（`label — description` 列表） | ✅ |
+| 行号锚链接（#L24/#L24-L30） | ui-primitives `MarkdownText.tsx` JSDoc（range 开在首行）+ ui-chat MarkdownDelegateProvider | ✅ |
+| 紧凑档（过程折叠）可达 | ui-chat `presentation-policy.ts` POLICIES（compact/standard/detailed/verbose，persisted）+ web-app bundle 挂 `ui-settings-general`（`cordis.patch.yml:291`） | ✅ |
+| 电子表格侧栏预览 | ui-sidebar-documentpreview `excel/xlsx.ts`（FortuneSheet 转换、保留公式不重算） | ✅ |
+| open-in-app 需要我们挂 | web-app bundle **已含并启用**（`cordis.patch.yml:81-88`） | ❌ 原判断证伪 → 未决3 撤销 |
+| 聊天内联本地图（观察项前提） | AssistantMarkdown `pathImages`（按 cwd 解码解析，settle 后渲染） | ✅ |
+
+**验收标准（下游验收定义，尚未执行）：**
+
+| 行为 | 类别 | 通过/失败信号 | 证据 owner | 人工判断 |
+|---|---|---|---|---|
+| 拍板、选项比较、数字依据和长文分流与语言规范一致 | 模型行为 | 代表场景含阻塞拍板与非阻塞默认两种状态；阻塞项出现 ask 事件且卡面是动作+后果；两选项以上的取舍以短表呈现；关键数字锚链接指向真实文件行；反例为拍板藏在长收口散文里或链接目标不存在 | 有录制能力时用 replay 事件/正文断言；否则 bounded 真模型单次观察与会话日志；Markdown 渲染本身由上游测试负责 | 用户判定业务可读性与打扰度 |
+| 紧凑浏览流程可执行，说明位于唯一 owner | 编排/文档 | 新人依 `docs/demo.md` 可开启 Settings → General → compact，观察过程行折叠而最终回复仍可见；说明不声称折叠助手长文 | `web-window-ops` 真实观察窗走查 + `pnpm verify` 文档结构 | 无 |
+| 台账窄行能扫描且完整摘要可访问 | 用户界面/确定性 | 长摘要不撑宽/撑高列表，完整文本有鼠标、键盘、触屏可达的操作；短摘要保持直接可读；反例是只有 `title` hover 提示 | `tests/client`（组件/视图模型）；`client-load-smoke` 真实挂载；浏览器走查 | 需判断扫描密度和可发现性 |
+| 出厂 open-in-app 能用 | 编排/环境 | 真实观察窗对交付物执行打开操作并在侧栏预览目标文档；若现场能力因环境缺失而失败，不以源码 presence 判通过 | 运行观察窗 + 一次性现场记录；不为既有上游功能另建本仓单测 | 预览流程是否够顺畅需走查 |
+
+**与语言层卡的批次交接（2026-10-11，本轮向用户提出）：**
+- **批 1｜来源治理**：本卡不增加独立实现；遵循语言卡批 1，摘要来源和长度判据归 meta/台账 owner。
+- **批 2｜表达规范**：采用四层漏斗；阻塞拍板用 `ask_user_question`；多选项比较用短 GFM 表格；关键数字提供可定位依据链接；会话回复给短首段，详情进入 final/drafts；对话流自身不承诺折叠 assistant 长文。
+- **批 3｜浏览和显示**：紧凑模式开窗走查与 runbook；LedgerTab 有界行显示 + 非 hover 全文入口；核实 open-in-app 后补公司手册说明。不新增插件/渲染器、不引图表依赖。
+
+本卡与语言卡共用同一份实施申请，不另起第二份 RFC；申请尚未进入 `notes/proposed/`，不表示实施获批。下一步等用户确认或修订四层漏斗、批次顺序及行为验收边界。
 
 ## 范围与排除项
 
@@ -72,8 +101,8 @@ persona 表达款）而非新机制；本仓自建件（八页签/委派卡/公�
 
 ## 方案与取舍
 
-- **做（建议默认全收未决 1/2/4；3 听刚需）**：机制 1–5 的文案款与 runbook 句（零代码）；
-  open-in-app 两行收割（视未决 3）；LedgerTab clamp（未决 4）。
+- **做（建议默认全收未决 1/2/4）**：机制 1–5 的文案款与 runbook 句（零代码）；
+  open-in-app 无需动作（已在组合，现场核实 + 收割清单补记）；LedgerTab clamp（未决 4）。
 - **不做**（输掉的方案，防重议）：
   - turnDataSource 轮末"摘要脚注"扩展位（ui-chat §Completed-turn footer）——CEO 回复已是摘要，
     再挂脚注 = 同信息第二事实源；
