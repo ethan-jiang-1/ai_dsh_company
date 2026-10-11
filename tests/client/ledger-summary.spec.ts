@@ -44,3 +44,20 @@ describe('台账摘要行（Human Exits 批 3 keyless：长短 fixture 静态渲
     expect(overThreshold).toContain('查看完整结论')
   })
 })
+
+describe('台账摘要的内联加粗（2026-10-11 复核轮自查发现）', () => {
+  // 现象：历史台账行里的 `**今天不进**` 这类 Markdown 记号被**原样显示**（截图上肉眼可见），
+  // 而台账行是给人扫的 ⇒ 呈现层把成对 `**` 渲染成 <strong>，不改数据（历史行照旧不动）。
+  const MARKED = '**今天不进**：不投一分钱、不增一人、不设一点、不对外承诺一个价一个日期'
+
+  it('成对的 ** 渲染成粗体，而不是把记号原样吐出来', () => {
+    const html = renderToStaticMarkup(createElement(LedgerSummary, { summary: MARKED }))
+    expect(html, '字面 ** 不该出现在渲染结果里').not.toContain('**')
+    expect(html, '加粗意图要保留').toContain('<strong>今天不进</strong>')
+  })
+
+  it('落单的 ** 不吞字（宁可原样留着，也不吃掉内容）', () => {
+    const html = renderToStaticMarkup(createElement(LedgerSummary, { summary: '单边记号 ** 后面还有正文' }))
+    expect(html, '内容不许被吃掉').toContain('后面还有正文')
+  })
+})

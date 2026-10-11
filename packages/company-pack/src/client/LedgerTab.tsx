@@ -5,6 +5,7 @@
  * 值不值"的常驻答案。
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
@@ -27,6 +28,27 @@ export type LedgerTabProps = PropsRuntime<'sidebar.right.pane.tab'> & LedgerTabI
 const REFRESH_MS = 30_000
 /** 首屏即给全文入口的字符数（**只是提示**：真裁没裁由布局量出来，见 `LedgerSummary`）。 */
 const FULL_TEXT_HINT = 120
+
+
+/**
+ * 台账摘要的内联加粗：历史行里带 `**…**` 这类记号，直接吐出来在面板上是噪声（呈现层的事，
+ * 不动数据）。只认**成对**的 `**…**` → `<strong>`；落单的记号原样保留（宁可难看，不许吞字）。
+ * @param text - 摘要原文。
+ * @returns 文本与粗体片段交替的节点数组。
+ */
+function ledgerInline(text: string): ReactNode[] {
+  const parts: ReactNode[] = []
+  const pattern = /\*\*([^*]+)\*\*/g
+  let cursor = 0
+  for (const match of text.matchAll(pattern)) {
+    const at = match.index ?? 0
+    if (at > cursor) parts.push(text.slice(cursor, at))
+    parts.push(<strong key={`b${String(at)}`}>{match[1]}</strong>)
+    cursor = at + match[0].length
+  }
+  if (cursor < text.length) parts.push(text.slice(cursor))
+  return parts
+}
 
 /**
  * 台账摘要行：**所有**行都保持两行边界，被裁掉的行给可聚焦的全文/收起入口。
@@ -57,7 +79,7 @@ export function LedgerSummary({ summary }: { readonly summary: string }) {
   }, [summary, expanded])
   return (
     <span className={`wk-row-summary${expanded ? ' is-expanded' : ''}`}>
-      <span className="wk-row-task" ref={textRef}>{summary}</span>
+      <span className="wk-row-task" ref={textRef}>{ledgerInline(summary)}</span>
       {(hinted || clipped || expanded) && (
         <Button
           size="sm"
