@@ -54,6 +54,8 @@
 | [human-exits-probe.mjs](../probes/session-context/human-exits-probe.mjs) | 阻塞拍板的人话首段三件套与 `ask_user_question` 认证档 |
 | [human-exits-expression-probe.mjs](../probes/session-context/human-exits-expression-probe.mjs) | 多选项短 GFM 表格与关键数字行锚认证档 |
 | [human-exits-nonblocking-probe.mjs](../probes/session-context/human-exits-nonblocking-probe.mjs) | 非阻塞缺口带显式默认假设继续、轮末列待确认；会话事件落盘供复核 |
+| [hitl-dispatch-order-probe.mjs](../probes/session-context/hitl-dispatch-order-probe.mjs) | 「HITL 前排空」判据：首个建任务与首个 ask 的先后（`--session` 判已有会话，默认真跑一场） |
+| [reconcile-round-probe.mjs](../probes/session-context/reconcile-round-probe.mjs) | 「对账回合」判据：两造不同值后 CEO 是否把对方数值转述回去（`--session` 或真跑一场） |
 | [date-rule-probe.mjs](../probes/session-context/date-rule-probe.mjs) | 注入日期用于记账和 journal 命名的实际行为 |
 | [time-context-probe.mjs](../probes/session-context/time-context-probe.mjs) | 日期通道进入会话并被模型读回落盘 |
 | [dissent-preservation-probe.mjs](../probes/team/dissent-preservation-probe.mjs) | lead 收口保留成员独立结论与有依据的分歧 |

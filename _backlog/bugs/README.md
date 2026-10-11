@@ -10,12 +10,8 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-009 对账回合缺失](BUG-009-star-topology-no-lateral-channel.md) | 汇报制为设计（用户裁定）；缺的是总裁决前经 CEO 的两造对齐与专业域尊重 | P1 |
-| [BUG-010 调度单点](BUG-010-scheduler-single-point-hitl-freeze.md) | lead 被 HITL 阻塞则全队冻结，授权无关的已就绪工作也停摆 | P1 |
-| [BUG-011 指令夹带猜测](BUG-011-instruction-carries-unverified-guess.md) | 任务书带未证假设、同分钟补正撤回；发送前自证不足 | P2 |
-| [BUG-012 同模五帽](BUG-012-same-model-hats-independent-review-overclaim.md) | 「异人复核」独立性未分层声明；关键因果结论边际 0.74pp 未披露 | P2 |
 
-（BUG-008 已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。）
+当前无活跃缺陷卡。BUG-008/009/010/011/012 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

@@ -56,6 +56,10 @@
 | [BUG-006-ceo-meta-vocab-drift.md](fixed_bugs/BUG-006-ceo-meta-vocab-drift.md) | CEO 产出 meta 词表漂移 | 2026-10-07 |
 | [BUG-007-collaboration-probe-false-positives.md](fixed_bugs/BUG-007-collaboration-probe-false-positives.md) | 协作探针接受无操作/错误状态，且等待不存在的第2轮 | 2026-10-10 |
 | [BUG-008-recon-pack-archive-drift.md](fixed_bugs/BUG-008-recon-pack-archive-drift.md) | recon-pack 存量判据漂移（归档件降 legacy-archive 观察项） | 2026-10-10 |
+| [BUG-009-star-topology-no-lateral-channel.md](fixed_bugs/BUG-009-star-topology-no-lateral-channel.md) | 对账回合缺失：规则 + 行为验证（V4 红 → 新场景 CEO 双向转述） | 2026-10-11 |
+| [BUG-010-scheduler-single-point-hitl-freeze.md](fixed_bugs/BUG-010-scheduler-single-point-hitl-freeze.md) | 调度单点：HITL 前排空规则 + 行为验证（V4 ask 先于建任务 → 新场景先建 10 任务） | 2026-10-11 |
+| [BUG-011-instruction-carries-unverified-guess.md](fixed_bugs/BUG-011-instruction-carries-unverified-guess.md) | 指令夹带未证猜测：规则 + 派活行可选「假设」段（机器可读落点 + 解析断言） | 2026-10-11 |
+| [BUG-012-same-model-hats-independent-review-overclaim.md](fixed_bugs/BUG-012-same-model-hats-independent-review-overclaim.md) | 同模五帽：5 份模板加「复核独立性层级 + 边际宽度」两栏 + keyless 断言 | 2026-10-11 |
 
 ## 随卡归档的研究
 

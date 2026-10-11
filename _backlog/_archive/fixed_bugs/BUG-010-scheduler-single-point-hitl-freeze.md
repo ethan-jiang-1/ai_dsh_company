@@ -1,5 +1,5 @@
 ---
-status: 活跃
+status: 已修
 severity: P1
 opened: 2026-10-11
 ---
@@ -7,6 +7,7 @@ opened: 2026-10-11
 # BUG-010：调度单点——lead 被 HITL 阻塞则全队冻结，授权无关的工作也停摆
 
 > 严重级别：P1（重要）｜发现：2026-10-11（V4 复盘协作审计）｜状态：活跃
+> **修复（2026-10-11）**：规则（手册:93）+ **行为验证（红→绿）**：判据 = `probes/session-context/hitl-dispatch-order-probe.mjs`。V4 反例（`session-354109f1`）= `ask-before-dispatch`（ask seq 85 < 首个任务 seq 158，问人前建 0 个任务，全队冻结 11 小时）；新版场景（`session-9d100f5b`）= `dispatch-before-ask`（首个任务 seq 100 < ask seq 226，问人前已建 10 个任务）。机制方案（自调度/事件唤醒）维持不采；若后续再出现「有可派活却先问人」新开卡。
 
 ## 症状（实测时间线）
 

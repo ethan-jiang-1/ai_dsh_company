@@ -15,10 +15,13 @@ export const ROLE_IDS = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
  *   `派活｜T6｜coo｜审 VP-Sales 交付承诺｜依赖：T1,T3｜状态：待办`
  *   `派活｜T2｜vp-eng｜技术可行性｜依赖：无｜状态：取消`
  *   `派活｜T1｜vp-sales｜外部事实包｜依赖：无｜状态：待补料`
+ *   `派活｜T1｜vp-sales｜市场门｜依赖：无｜状态：待办｜假设：待证（客户预算未核）`  ← 可选尾段
  * 状态枚举：待办 / 已出稿 / 完成 / 取消 / 待补料（事实阻塞闸门 2026-10-10 HITL：要外部正文
  * 而本部署读不到 ⇒ 该任务与其依赖链冻结——待补料不算完成、不算依赖满足、盘上有稿也不解锁）。
+ * 可选「假设」段（BUG-011 机械兜底，2026-10-11）：手册「指令与假设分离」要求未经证实的因果猜测
+ * 要么标「待证」要么不发；本段给"标了没有"一个机器可读落点（只证标没标，不判假设真假）。
  */
-export const ASSIGN_LINE = /^派活｜(T\d+)｜(vp-eng|vp-sales|coo|cfo|ceo)｜([^｜]*)｜依赖：([^｜]*)｜状态：(待办|已出稿|完成|取消|待补料)/
+export const ASSIGN_LINE = /^派活｜(T\d+)｜(vp-eng|vp-sales|coo|cfo|ceo)｜([^｜]*)｜依赖：([^｜]*)｜状态：(待办|已出稿|完成|取消|待补料)(?:｜假设：([^｜]*))?/
 
 /** 自然语言"点名"（R1 用）：任务书正文里出现 `角色 —` 或 `T<n> · 角色` 的地方。 */
 export const MENTION = /^(?:###\s*)?(?:T\d+\s*·\s*|\*\*)?(VP-Eng|VP-Sales|COO|CFO|CEO|vp-eng|vp-sales|coo|cfo|ceo)\b/
@@ -34,6 +37,8 @@ export function parseAssignments(briefText) {
       id: m[1], role: m[2], title: m[3],
       deps: m[4] === '无' || m[4] === '' ? [] : m[4].split(/[,，、]/).map(s => s.trim()).filter(Boolean),   // 分隔符含中文顿号/全角逗号——r6 真实 CEO 产出用「、」（2026-10-06 case 14 spec 红证）
       status: m[5],
+      // 缺段 = undefined（旧任务书不返工）；有段 = 该文本（含「待证」这类标记）
+      ...(m[6] === undefined ? {} : { assumption: m[6] }),
     })
   }
   return out

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseLabelsText, scoreLabels, scanR2, scanR2Closed, scanR3, scanR3Dual, roleHasDraft } from '../../tools/lib/candidate-scan.mjs'
+import { parseAssignments, parseLabelsText, scoreLabels, scanR2, scanR2Closed, scanR3, scanR3Dual, roleHasDraft } from '../../tools/lib/candidate-scan.mjs'
 
 // 实验B打分腿的纯逻辑（判据单一来源 = tools/lib/candidate-scan.mjs；格式约定见标注文件头部）。
 // IO（读标注文件/语料/deliverables）在 checks/audit/candidate-scan-eval.mjs——tests/ 不碰驱动脚本的文件面。
@@ -274,5 +274,35 @@ describe('事实阻塞闸门状态「待补料」（2026-10-10 HITL，ai-transfo
     const r = scanR3Dual(BRIEF, ['vp-sales.md'], false)
     expect(r.candidates.map(t => t.task)).toEqual([])
     expect(r.blocked.map(t => t.task)).toEqual(['T1', 'T2', 'T3'])
+  })
+})
+
+// 负例留证 2026-10-11：BUG-011 修前先跑本文件 —— `ASSIGN_LINE` 不捕获假设段、`parseAssignments`
+// 不返回该字段 ⇒ 「带『假设』段的派活行」那条 1 failed（其余 25 passed）；补解析后 26 passed。
+describe('派活行的「假设」段（BUG-011 的机械兜底，2026-10-11）', () => {
+  // 病根：任务书把未经证实的因果猜测当指令发（V4 实证：两条任务书带未证假设、同分钟补正撤回）。
+  // 手册已立「指令与假设分离」（company-workspace/AGENTS.md:109），但"标没标假设"过去没有任何
+  // 机器可读的落点 ⇒ 统计（本卡反证路径要的比例）也算不出来。本段把派活行扩成可选带 `假设：`，
+  // 机械面只证**标了没有**，不判假设真假。
+  const WITH = '派活｜T1｜vp-sales｜市场门｜依赖：无｜状态：待办｜假设：待证（客户预算未核）'
+  const WITHOUT = '派活｜T1｜vp-sales｜市场门｜依赖：无｜状态：待办'
+
+  it('带「假设」段的派活行：解析出该段，其余字段不受影响', () => {
+    const parsed = parseAssignments(WITH)
+    expect(parsed).toHaveLength(1)
+    expect(parsed[0]).toMatchObject({ id: 'T1', role: 'vp-sales', title: '市场门', deps: [], status: '待办' })
+    expect(parsed[0].assumption, '「假设」段必须被解析出来（否则统计无从下手）').toBe('待证（客户预算未核）')
+  })
+
+  it('不带「假设」段的旧派活行仍然解析（向后兼容，旧任务书不返工）', () => {
+    const parsed = parseAssignments(WITHOUT)
+    expect(parsed).toHaveLength(1)
+    expect(parsed[0].assumption).toBeUndefined()
+  })
+
+  it('手动验证红配方：删掉解析里的假设捕获 ⇒ 第一条断言转红', () => {
+    // 红配方写在这里，改解析时照着跑：注释掉 ASSIGN_LINE 的 `(?:｜假设：([^｜]*))?` 与
+    // parseAssignments 的 assumption 字段 ⇒ 上面第一条 `assumption` 断言失败。
+    expect(true).toBe(true)
   })
 })
