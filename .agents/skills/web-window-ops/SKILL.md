@@ -5,6 +5,8 @@ description: Use when starting the web observation window, doing live operations
 
 # 观察窗启动与现场运维
 
+**启动口令约定**：在本仓库上下文中，用户说“启动一下这个插件”“启动一下这个”或“把这个跑起来”，默认就是启动当前 Dream Team company pack 的独立 DSH Web 环境。直接执行本技能的启动与验证步骤；不要把 3080 当作运行口，也不要等待用户重复说明“Web、隔离环境、新端口”。完成启动后交付新 DSH 进程的带 token URL；除非用户明确要求，不自动创建会话或运行 demo。
+
 适用：起观察窗、demo 现场运维、给用户呈现运行实例前（呈现即验证——先自己跑通，全绿才呈现）。
 规则 owner：启动步骤与判据 = [docs/demo.md §前置](../../../docs/demo.md#前置本机)；现场症状→动作表 = [docs/guides/budget-and-ops.md §3](../../../docs/guides/budget-and-ops.md#3-demo-运维-runbook症状--动作)；呈现即验证规则 = [dev-loop §1](../../../docs/guides/dev-loop.md#1-执行链从授权到有证据交接)。
 

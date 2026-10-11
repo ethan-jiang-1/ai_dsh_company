@@ -6,8 +6,8 @@
 
 | 卡 | 期望结果 | 状态 |
 |---|---|---|
-| [2026-10-11-plain-language-human-exits](2026-10-11-plain-language-human-exits.md) | 语言规范层：对人的出口面统一「人话翻译段」（双轨制），出口清单+规范落点+判据方案成稿，用户拍板后转实施 | 等人拍板（未决 1–4 各带建议默认） |
-| [2026-10-11-human-exits-expression](2026-10-11-human-exits-expression.md) | 表达层：高管消化漏斗（四层+五机制）映射 DSH 底层支撑（已源码级核对，open-in-app 证伪撤销），借用/不做清单成稿，用户挑定后转实施 | 推敲中（未决 1/2/4；验证设计已预排） |
+| [2026-10-11-plain-language-human-exits](2026-10-11-plain-language-human-exits.md) | 语言规范层：双轨制与对人出口规范，含来源治理、行为验收及分批实施申请 | 等下游接收（用户确认三批次序；不设硬字数门禁） |
+| [2026-10-11-human-exits-expression](2026-10-11-human-exits-expression.md) | 表达层：四层漏斗与 DSH 支撑映射，和语言卡共用分批申请（open-in-app 已证伪原判断） | 等下游接收（依语言卡批次） |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)。
 
