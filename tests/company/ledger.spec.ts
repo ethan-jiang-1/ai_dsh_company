@@ -24,6 +24,16 @@ describe('parseMotionLedger', () => {
     }
   })
 
+  it('V4 活跃 meta 必须有对应台账行且结论逐字同源', () => {
+    const rows = parseMotionLedger(REAL_LEDGER)
+    const meta = readFileSync(join(ROOT, 'company-workspace/deliverables/2026-10-10-ai-transformation-2026-v4/meta.md'), 'utf8')
+    const summary = meta.match(/^一句话结论: (.+)$/m)?.[1]
+    expect(summary).toBeDefined()
+    const row = rows.find(candidate => candidate.slug === 'ai-transformation-2026-v4')
+    expect(row, 'V4 活跃交付物必须在台账登记').toBeDefined()
+    expect(row!.summary).toBe(summary)
+  })
+
   it('真台账：抽真样本逐列核对（字段解析不漂移）', () => {
     const rows = parseMotionLedger(REAL_LEDGER)
     expect(rows[0]).toMatchObject({ slug: 'agentic-coworker', date: '2026-09-22', kind: '评估', final: '✅' })
