@@ -9,6 +9,7 @@ import assert from 'node:assert/strict'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
+import { dismissNotices, openSession } from '../../tools/lib/probe-window.mjs'
 import { loadChromium, launchChromium } from '../../tools/drivers/playwright.mjs'
 
 const [url, title, marker = 'V4 收口了'] = process.argv.slice(2)
@@ -38,16 +39,8 @@ try {
   const page = await browser.newPage()
   await page.goto(url)
   await page.waitForTimeout(2500)
-  for (const name of ['Internal Testing Notice', 'Preview Notice']) {
-    const dialog = page.locator('[role=dialog]').filter({ hasText: name })
-    if (await dialog.count()) {
-      const button = dialog.getByRole('button', { name: /Continue/ })
-      if (await button.count()) await button.first().click()
-      await page.waitForTimeout(500)
-    }
-  }
-  await page.getByText(title, { exact: true }).first().click()
-  await page.waitForTimeout(2500)
+  await dismissNotices(page, ms => page.waitForTimeout(ms))
+  await openSession(page, title, ms => page.waitForTimeout(ms))
   // 最终回复取 vendor 的 compact 答案节点（`data-turn-process-answer`，只在折叠态出现）——
   // 不靠自定义正则切正文：三种模式各取一次全文做**逐字比对**，比"某些片段还在"强。
   const answerText = () => page.evaluate(() => {

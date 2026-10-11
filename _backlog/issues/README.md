@@ -4,7 +4,11 @@
 
 ## 活跃清单
 
-当前无活跃问题卡。已结问题见 [归档](../_archive/settled_issues/README.md)。
+| 卡 | 期望结果 | 状态 |
+|---|---|---|
+| [2026-10-11-human-exits-replay-scene](2026-10-11-human-exits-replay-scene.md) | 阻塞型问询场景固化成 replay；实测卡点 = ask 前景等待致日志不封盘、RPC 直答无效 | 推敲中（答题人放哪一侧待拍板） |
+
+已结问题见 [归档](../_archive/settled_issues/README.md)。
 
 ## 边界与尺寸
 

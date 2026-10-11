@@ -189,6 +189,17 @@ function sidecarsOf(rawText, ctx, webUrl) {
   }
 }
 
+/**
+ * 场景声明的子会话数：`snapshot.yml` 的 `session.children`（缺省 = 0，单轮场景合法）。
+ * 为什么按声明算：--record 原先把「≥2 个会话」写死，等于假定每个场景都有委派 ⇒ 单轮场景
+ * （如 human-exits-ask 的阻塞拍板）录完必被判失败、录制还不落盘（2026-10-11 实测）。
+ */
+const declaredChildren = (meta) => {
+  const children = meta?.session?.children
+  if (children === undefined || children === null) return 0
+  return Array.isArray(children) ? children.length : 1
+}
+
 /** 一个 run 的归一化 ctx：全部会话 id（prompt 里会互相引用）+ lead 的 cwd。 */
 const runCtx = (texts) => ({
   sessionIds: texts.map(t => String(headerOf(t).id)).filter(id => id !== ''),
@@ -412,8 +423,9 @@ if (RECORD) {
   })
   child.kill('SIGTERM'); await sleep(300)
   try {
-    if (parsed.length < 2) {
-      console.error(`--record：期望 lead + ≥1 child，实际 ${String(parsed.length)}：${parsed.map(p => JSON.stringify(p.header)).join('\n')}`)
+    const want = 1 + declaredChildren(metadata)
+    if (parsed.length !== want) {
+      console.error(`--record：期望 lead + ${String(want - 1)} child（按 snapshot.yml 的 session.children 声明），实际 ${String(parsed.length)}：${parsed.map(p => JSON.stringify(p.header)).join('\n')}`)
       process.exit(1)
     }
     mkdirSync(join(replayDir, 'raw'), { recursive: true })

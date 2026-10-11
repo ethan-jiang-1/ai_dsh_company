@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 // 状态：常驻
 // Human Exits 批2行为认证档：阻塞拍板的人话首段与 ask_user_question（真模型，排练场）
+// ⚠ 为什么要用**真 UI 答题**收口（2026-10-11 实测）：ask 是前景等待，没人作答整轮就不收口、
+//   会话日志也不封盘（此前证据只能靠 RPC 现场读，事后不可复核）。RPC 的 userQuestions/answer
+//   对未认领的问询返回 false（产品路径是浏览器里认领卡片）⇒ 这里照 human-loop-e2e-smoke 的
+//   做法：开页面、找选项 radio、点选 + Enter 提交，轮收口后日志才有终态。
 // 何时跑：CEO persona/主持动议 skill 的人话出口、阻塞拍板或三件套规则改动时。
 // 用法：source run/env.sh && node probes/session-context/human-exits-probe.mjs
 // 退出码：0 = ask 事件与首段三件套均满足；1 = 行为不符；2 = 环境/启动失败。
@@ -8,6 +12,7 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
+import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { mkdir, writeFile } from 'node:fs/promises'
@@ -58,6 +63,44 @@ const runScene = async () => {
   return { sessionId, events }
 }
 
+/**
+ * 用真浏览器认领并作答（产品路径；RPC 直答对未认领问询无效）。
+ * @param args - 场景参数：base/token/title/optionLabel/shotPath。
+ * @returns 无；失败即抛（调用方据此判环境失败）。
+ */
+const answerInBrowser = async ({ base, token, title, optionLabel, shotPath }) => {
+  const browser = await launchChromium(await loadChromium(ROOT))
+  try {
+    const page = await browser.newPage()
+    await page.goto(`${base}/?token=${token}`)
+    await page.locator('[data-composer-input][contenteditable="true"]').waitFor({ timeout: 20_000 })
+    const welcome = page.locator('[class*="onboardingOverlay"]')
+    if (await welcome.count() > 0 && await welcome.isVisible()) {
+      await welcome.getByRole('button').click()
+      await welcome.waitFor({ state: 'detached', timeout: 15_000 })
+    }
+    // 先连排练场工作区：会话列表按【工作目录】过滤，不连就搜不到本场会话（demo.md §前置步骤 3）。
+    const ws = page.getByText('rehearsal-workspace', { exact: true })
+    if (await ws.count() > 0) {
+      await ws.last().click().catch(() => {})
+      await sleep(800)
+    }
+    const search = page.getByRole('button', { name: 'Search sessions' })
+    if (await search.getAttribute('aria-expanded') !== 'true') await search.click()
+    await page.getByPlaceholder('Search session names').fill(title)
+    const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: title })
+    await result.first().waitFor({ timeout: 15_000 })
+    await result.first().click()
+    await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
+    const option = page.getByRole('radio', { name: optionLabel })
+    await option.waitFor({ state: 'visible', timeout: 90_000 })
+    await page.screenshot({ path: shotPath, fullPage: false })
+    await option.click()
+    await option.press('Enter')            // 组件明写：选项上 Enter 即提交
+    await page.getByRole('radio', { name: optionLabel }).waitFor({ state: 'detached', timeout: 60_000 }).catch(() => {})
+  } finally { await browser.close() }
+}
+
 /** 取消息正文（只 text 块，不含 reasoning）——RFC 的失败反例针对的是**给人看的正文**。 */
 const messageText = event => (event?.data?.message?.content ?? [])
   .filter(block => block?.type === 'text').map(block => block.text).join('\n')
@@ -65,6 +108,8 @@ const messageText = event => (event?.data?.message?.content ?? [])
 const turnError = events => events
   .filter(event => event?.type === 'turn/end')
   .map(event => event?.data?.reason).find(reason => reason?.kind === 'error')?.error
+
+const evidenceDirShot = join(ROOT, 'runtime', 'human-exits-evidence')
 
 // 有界重试一次：模型/传输错误不是行为证据，重跑一次再定性（RFC 只说「有界单场观察」，不是「一场定生死」）。
 let sessionId = ''
@@ -78,8 +123,37 @@ for (attempt = 1; attempt <= 2; attempt++) {
   failure = turnError(events) ?? null
   const askedNow = events.some(event => event?.type === 'tool/call' && event?.data?.name === 'ask_user_question')
   const messaged = events.some(event => event?.type === 'assistant/message')
-  if (failure === null && (askedNow || messaged)) break
-  if (attempt === 1) console.log(`  第 1 次观察以错误收口（${failure?.code ?? '无模型输出'}）——重试一次`)
+  if (failure !== null) {
+    if (attempt === 1) console.log(`  第 1 次观察以错误收口（${failure.code ?? '无模型输出'}）——重试一次`)
+    continue
+  }
+  if (!askedNow) {
+    if (messaged) break            // 模型没问人：这是行为判据，交给下面判 FAIL
+    if (attempt === 1) console.log('  第 1 次观察没等到 ask——重试一次')
+    continue
+  }
+  // 有 ask ⇒ 用真 UI 作答把这一轮收口（否则日志不封盘、证据不可复核）
+  const askCall = events.find(event => event?.type === 'tool/call' && event?.data?.name === 'ask_user_question')
+  const titleEvent = events.find(event => event?.type === 'session/title')
+  const title = titleEvent?.data?.title ?? titleEvent?.data?.message?.title ?? askCall?.data?.title ?? ''
+  try {
+    const args = JSON.parse(String(askCall.data.arguments ?? '{}'))
+    const first = args.questions?.[0]
+    const optionLabel = first?.options?.[0]?.label ?? ''
+    if (title === '' || optionLabel === '') throw new Error('问询卡缺标题或选项，无法在 UI 定位')
+    console.log(`  用真 UI 答题收口（选项「${optionLabel}」）…`)
+    await answerInBrowser({ base, token, title, optionLabel, shotPath: join(evidenceDirShot, `${sessionId}-ask-card.png`) })
+    for (let waited = 0; waited < 60; waited++) {
+      await sleep(3_000)
+      events = (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId }))
+        .map(record => record.event).filter(Boolean)
+      if (events.some(event => event?.type === 'turn/end')) break
+    }
+  } catch (error) {
+    console.log(`  UI 答题失败：${String(error.message).slice(0, 160)}`)
+  }
+  if (events.some(event => event?.type === 'turn/end')) break
+  if (attempt === 1) console.log('  第 1 次观察未收口——重试一次')
 }
 
 const asked = events.some(event => event?.type === 'tool/call' && event?.data?.name === 'ask_user_question')

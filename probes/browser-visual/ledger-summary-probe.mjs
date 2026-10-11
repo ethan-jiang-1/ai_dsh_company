@@ -11,6 +11,7 @@ import assert from 'node:assert/strict'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
+import { dismissNotices, openCompanyTab, openSession } from '../../tools/lib/probe-window.mjs'
 import { loadChromium, launchChromium } from '../../tools/drivers/playwright.mjs'
 
 const [url, title] = process.argv.slice(2)
@@ -28,20 +29,9 @@ try {
       const page = await context.newPage()
       await page.goto(url)
       await page.waitForTimeout(2500)
-      for (const name of ['Internal Testing Notice', 'Preview Notice']) {
-        const dialog = page.locator('[role=dialog]').filter({ hasText: name })
-        if (await dialog.count()) {
-          const button = dialog.getByRole('button', { name: /Continue/ })
-          if (await button.count()) await button.first().click()
-          await page.waitForTimeout(400)
-        }
-      }
-      await page.getByText(title, { exact: true }).first().click()
-      await page.waitForTimeout(2000)
-      const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
-      if (await opener.count()) await opener.click()
-      await page.waitForTimeout(800)
-      await page.locator('.wk-guide-entry-label').filter({ hasText: '台账' }).click()
+      await dismissNotices(page, ms => page.waitForTimeout(ms))
+      await openSession(page, title, ms => page.waitForTimeout(ms))
+      await openCompanyTab(page, '台账', ms => page.waitForTimeout(ms))
       const ledger = page.getByRole('list', { name: '动议台账' })
       await ledger.locator('.wk-row-task').first().waitFor()
       // 先在选择会话之后收窄：折叠导航里选不中会话（390px 实测）。

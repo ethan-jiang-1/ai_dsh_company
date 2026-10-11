@@ -138,4 +138,14 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 - **视觉夹具缺位**（tests/README 第 25 行：用户可见客户端改动要同 diff 交场景或视觉夹具）：台账截图原先只落 gitignored 目录 ⇒ 新增 `snapshots/visual/ledger-summary/`（两档视口截图 + computed.json，探针 `--fixture` 写入）并登记进 snapshots/README；390px 图上可直接看到两行边界、省略号与「全文」入口同框。
 - **换路径实测新增覆盖**（都过）：容器级宽度变化（浮出成浮窗 356px ⇒ 入口 7→17；收回复原）、窗口连续缩放无抖动（同宽度两次采样一致）、展开态下收窄再收起不丢入口（被裁且无入口 = 0）、`deliverables-check` 违规 0、`preset-smoke`／`handbook-smoke`/`cdp-probe` 全绿。
 
-仍然存在的边界（未修，如实记）：批 2「代表场景固化为 replay」未做（只有真模型探针 + 会话日志断言）；本机应用是否真打开文件只能由人确认；夹具同步不等于重录，攒够改动后应做一次真重录；阻塞支真实模型行为样本仍小（1 通过 / 1 模型路径错误），要谈稳定率得再跑几场；探针间有重复脚手架（未抽取）。
+### 第三轮：把"没做的"逐条做掉（2026-10-11 深夜）
+
+| 欠账 | 处置 |
+|---|---|
+| 夹具同步 ≠ 重录 | **做了真重录**（`replay-smoke --record`，真模型 2 段）：r3-delegation 的 raw + fixture 换成真录制，`replay-smoke` 复跑 ALL PASS。附带验证：**重录产出的 sidecar 与我手同步的那份逐字节一致**——那次同步没有造假。 |
+| 探针脚手架重复（约 25 行 × 3～4 份） | 抽到 [tools/lib/probe-window.mjs](../../tools/lib/probe-window.mjs)（关首启提示、开会话、开公司页签），三条浏览器探针改用它；cdp-probe 保持驱动层逐字拷贝契约不动。 |
+| 本机应用是否真打开 | 边界不变（机器只证到 Host 成功 + 目标绝对路径）；见下方"仍然存在"。 |
+| 批 2 代表场景固化为 replay | **仍没做成，但卡点已实测定位**，并立成卡：ask 是前景等待 ⇒ 没人作答整轮不收口、**会话日志不封盘**（解压只出 header）；RPC `userQuestions/answer` 形状正确也对未认领问询返回 `false`；浏览器答题这条路在 `human-loop-e2e-smoke` 是通的，但需要先把排练场工作区连上。enable 材料与三条互斥方案写进 [_backlog/issues/2026-10-11-human-exits-replay-scene.md](../../_backlog/issues/2026-10-11-human-exits-replay-scene.md)。 |
+| 顺带修掉的harness缺陷 | `--record` 的守卫原先写死「≥1 child」⇒ 单轮场景录完必被判失败且不落盘；改成按 `snapshot.yml` 的 `session.children` 声明算期望。 |
+
+仍然存在的边界（未修，如实记）：批 2「代表场景固化为 replay」未做（已立卡 [human-exits-replay-scene](../../_backlog/issues/2026-10-11-human-exits-replay-scene.md)，卡点实测在案）；本机应用是否真打开文件只能由人确认；夹具同步不等于重录，攒够改动后应做一次真重录；阻塞支真实模型行为样本仍小（1 通过 / 1 模型路径错误），要谈稳定率得再跑几场；探针间有重复脚手架（未抽取）。

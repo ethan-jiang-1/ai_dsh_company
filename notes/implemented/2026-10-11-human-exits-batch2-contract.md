@@ -75,3 +75,9 @@
 - 简单二选和窄屏退化为列表尚未单独做真实模型场景；规则文本已明确该例外，后续若出现反例再单独补探针。
 - 尚未完成长期语料评估；这仍按 RFC 暂缓。
 - 批 2 的有限行为验收已完成；批 3 见[批 3 Note](2026-10-11-human-exits-batch3-ui.md)（LedgerTab、compact 显示模式与 open-in-app 现场均已取证）。
+
+## 收口后补记（2026-10-11，第三轮）
+
+- 阻塞支探针升级为**尽力用真 UI 答题收口**（产品路径：浏览器认领卡片 → 点选项 + Enter）；本机 fresh profile 里页面没有排练场工作区入口，按标题搜不到会话 ⇒ 这一步目前只打印失败、不改判据。探针同时加了「模型/传输错误识别 + 有界重试一次 + 退出码 2」，并把判定与事件落盘。
+- 实测记录：ask 是前景等待，**没人作答整轮不收口、会话日志不封盘**（`session.vN.jsonl.zstd` 只解出 header）；RPC `userQuestions/answer` 形状为 `{agentId, callId, answer}`，但对未认领的问询返回 `false`，整轮仍不收口。
+- 因此「把阻塞支固化成 replay 场景」不是探针小改，需要先决定**答题人放哪一侧**：已立卡 [_backlog/issues/2026-10-11-human-exits-replay-scene.md](../../_backlog/issues/2026-10-11-human-exits-replay-scene.md)，含 enable 材料与三条互斥方案。
