@@ -2,13 +2,20 @@
 
 当场修掉的不建卡。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。
 
-**下一个缺陷号**：Next BUG ID = 9；已分配 BUG-001..008。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 13；已分配 BUG-001..012。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，修相对链接并更新两边清单。
 
 ## 活跃清单
 
-当前无活跃缺陷。（BUG-008 已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。）
+| 卡 | 一句话 | 严重级 |
+|---|---|---|
+| [BUG-009 对账回合缺失](BUG-009-star-topology-no-lateral-channel.md) | 汇报制为设计（用户裁定）；缺的是总裁决前经 CEO 的两造对齐与专业域尊重 | P1 |
+| [BUG-010 调度单点](BUG-010-scheduler-single-point-hitl-freeze.md) | lead 被 HITL 阻塞则全队冻结，授权无关的已就绪工作也停摆 | P1 |
+| [BUG-011 指令夹带猜测](BUG-011-instruction-carries-unverified-guess.md) | 任务书带未证假设、同分钟补正撤回；发送前自证不足 | P2 |
+| [BUG-012 同模五帽](BUG-012-same-model-hats-independent-review-overclaim.md) | 「异人复核」独立性未分层声明；关键因果结论边际 0.74pp 未披露 | P2 |
+
+（BUG-008 已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。）
 
 ## frontmatter 与模板
 
