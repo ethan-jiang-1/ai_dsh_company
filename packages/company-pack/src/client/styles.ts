@@ -153,10 +153,16 @@ const CSS = `
   font-size: 12px;
   line-height: 1.4;
 }
+.wk-row-summary:not(.is-long) .wk-row-task,
 .wk-row-summary.is-expanded .wk-row-task {
   display: block;
   overflow: visible;
 }
+.wk-ledger-list .wk-row { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; }
+.wk-ledger-list .wk-row-name,
+.wk-ledger-list .wk-row-status { min-width: 0; overflow-wrap: anywhere; }
+.wk-ledger-list .wk-row-summary { width: 100%; }
+.wk-ledger-list .wk-row-task { overflow-wrap: anywhere; }
 .wk-activity { margin: 4px 0 0; padding-left: 18px; color: var(--dsw-alias-label-secondary); font-size: 12px; }
 .wk-activity li { margin: 2px 0; }
 

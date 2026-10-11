@@ -1,7 +1,8 @@
 # Human Exits：双轨人话出口与高管消化漏斗
 
-状态：批准：仅 RFC 起草与呈批（不批准产品代码实施；2026-10-11）
-来源：[语言层 issue](../../_backlog/issues/2026-10-11-plain-language-human-exits.md)；[表达层 issue](../../_backlog/issues/2026-10-11-human-exits-expression.md)
+状态：已消化（2026-10-11；批 1/2/3 逐条验收均取得真实证据，条目去向见文末）
+来源：[语言层 issue](../../_backlog/_archive/settled_issues/2026-10-11-plain-language-human-exits.md)；[表达层 issue](../../_backlog/_archive/settled_issues/2026-10-11-human-exits-expression.md)
+批次证据：[批 1](2026-10-11-human-exits-batch1.md)｜[批 2](2026-10-11-human-exits-batch2-contract.md)｜[批 3](2026-10-11-human-exits-batch3-ui.md)
 
 ## 问题
 
@@ -118,3 +119,19 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 ### 4. 最终收口
 
 全部已授权批次完成后，运行与改动面匹配的最窄检查及 `pnpm verify`，逐条对照本 RFC 做语义审查；把真实红/绿证据、未完成项和现场阻断写入毕业 Note，更新两张 issue 的去向，并在全部验收完成后将本 RFC 从 `notes/proposed/` 毕业到 `notes/implemented/`。代码完成不等于验收完成，未验收项不得提前归档。
+
+## 条目去向
+
+本 RFC 已毕业到 `notes/implemented/`；正文冻结，各条的现行归宿与证据如下。
+
+| 条目 | 归宿 | 真证据 |
+|---|---|---|
+| 批 1｜摘要与台账来源治理 | [批 1 Note](2026-10-11-human-exits-batch1.md)：`templates/meta.md` 规格、`kb/motion-ledger.md` 同源规矩、V4 活跃 meta 改写 | 红：V4 meta 无对应台账行 → focused ledger test 失败；绿：`tests/company/ledger.spec.ts` 6 passed + `pnpm verify` |
+| 批 2｜阻塞型选择 | [批 2 Note](2026-10-11-human-exits-batch2-contract.md)：CEO preset 与主持动议 skill 的 ask 规则 | `probes/session-context/human-exits-probe.mjs`：真实 CEO 会话记录到 `ask_user_question` + 首段结论/下一步/拍板 |
+| 批 2｜非阻塞缺口 | 同上：显式默认假设 + 轮末待确认项 | `probes/session-context/human-exits-nonblocking-probe.mjs`：`asked:false`、显式假设、轮末「待你拍板」，事件落盘 `runtime/human-exits-evidence/` |
+| 批 2｜比较结构与数字锚 | 同上：条件 GFM 表格/列表 + 关键数字文件行锚 | `probes/session-context/human-exits-expression-probe.mjs`：短表 + `#L` 行锚 PASS |
+| 批 3｜LedgerTab 有界显示与全文入口 | [批 3 Note](2026-10-11-human-exits-batch3-ui.md)：`LedgerTab.tsx` 全文切换、`styles.ts` 台账专属布局 | 红：摘要宽度归零且短摘要被隐藏无入口 → 修复；绿：`probes/browser-visual/ledger-summary-probe.mjs` 1440/390px、键盘/触屏全文 PASS |
+| 批 3｜compact 显示模式 | 同上 + `docs/demo.md` §前置步骤 5 | `probes/browser-visual/compact-view-probe.mjs`：简洁/标准/详细 2472 字符且 198 条过程行折叠，完全展开 19875 字符，助手最终长回复逐字保留 |
+| 批 3｜open-in-app 现场 | 同上 + `docs/demo.md` §前置步骤 6 | `probes/browser-visual/open-in-app-probe.mjs`：`final.md` 进侧栏预览后 `POST /api/session/openWorkspacePath` 200 且携带目标绝对路径，无 alert |
+
+仍按 RFC 暂缓或未单测的两项：长期语料评估；简单二选/窄屏列表场景。两张 issue 已随本 RFC 毕业离场到 `_backlog/_archive/settled_issues/`。

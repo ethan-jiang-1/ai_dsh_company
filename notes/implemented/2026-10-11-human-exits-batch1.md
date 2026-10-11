@@ -1,7 +1,7 @@
 # Human Exits 批 1：摘要与台账来源治理
 
-状态：已交付（2026-10-11；Human Exits RFC 的批 1，批 2/3 未实施）
-来源：[Human Exits RFC](../proposed/2026-10-11-human-exits.md)；[语言层 issue](../../_backlog/issues/2026-10-11-plain-language-human-exits.md)；[表达层 issue](../../_backlog/issues/2026-10-11-human-exits-expression.md)
+状态：已交付（2026-10-11；Human Exits RFC 的批 1，批 2/3 见同目录两份 Note）
+来源：[Human Exits RFC](2026-10-11-human-exits.md)；[语言层 issue](../../_backlog/_archive/settled_issues/2026-10-11-plain-language-human-exits.md)；[表达层 issue](../../_backlog/_archive/settled_issues/2026-10-11-human-exits-expression.md)
 
 ## 决定
 

@@ -40,6 +40,8 @@
 | [2026-10-09-decision-ledger-home-migration.md](settled_issues/2026-10-09-decision-ledger-home-migration.md) | D1–D9 保留 design 路由；不迁 Note、不为此提额 | 2026-10-10 |
 | [2026-10-09-stale-pointer-cleanup.md](settled_issues/2026-10-09-stale-pointer-cleanup.md) | 不单独清理祖父存量；按需修实际阻断导航的指针 | 2026-10-10 |
 | [2026-10-09-collaboration-safety-acceptance.md](settled_issues/2026-10-09-collaboration-safety-acceptance.md) | 四问裁决均 A；维持现行合同＋裁2/裁4 文档化申请（待用户授权） | 2026-10-10 |
+| [2026-10-11-plain-language-human-exits.md](settled_issues/2026-10-11-plain-language-human-exits.md) | 已实施并验收（人话出口规范：摘要来源治理 + 阻塞/非阻塞/表达行为证据） | 2026-10-11 |
+| [2026-10-11-human-exits-expression.md](settled_issues/2026-10-11-human-exits-expression.md) | 已实施并验收（表达层：台账全文入口、compact 显示模式、open-in-app 现场链路） | 2026-10-11 |
 
 ## 已修缺陷
 

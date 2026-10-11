@@ -1,7 +1,7 @@
 # Human Exits 批 2：表达合同切片
 
-状态：已交付（2026-10-11；仅规则文本切片，模型行为场景未验）
-来源：[Human Exits RFC](../proposed/2026-10-11-human-exits.md)；[批 2 issue](../../_backlog/issues/2026-10-11-human-exits-expression.md)
+状态：已交付（2026-10-11；规则文本 + 阻塞/非阻塞/表达三类行为证据齐）
+来源：[Human Exits RFC](2026-10-11-human-exits.md)；[批 2 issue](../../_backlog/_archive/settled_issues/2026-10-11-human-exits-expression.md)
 
 ## 决定
 
@@ -62,8 +62,12 @@
 - `checks/smoke/human-loop-e2e-smoke.mjs`：非阻塞建议继续且无问询闸门；规矩缺口真实问询回流。
 - `probes/session-context/human-exits-expression-probe.mjs`：共同维度比较使用短 GFM 表格，关键数字使用文件行锚。
 
+## 非阻塞支的持久日志证据
+
+`source run/env.sh && node probes/session-context/human-exits-nonblocking-probe.mjs '<token-url>'`：真实 CEO 会话里给一个非阻塞缺口（会议时长未给、且不涉预算/对外承诺/授权），跑完一轮并把会话事件落盘到 `runtime/human-exits-evidence/<sessionId>.json`。结果 `human-exits-nonblocking-probe: PASS`，落盘事实为 `ended: true`、`asked: false`（没有 `ask_user_question` 阻停）、`assumption: true`（「默认口径：60 分钟…会议时长未给 → 按此假设，可改」）、`confirmation: true`（轮末「待你拍板：会议时长…」）、`draft: true`（三个议题照常出齐）。这是 RFC「非阻塞缺口带显式假设继续 + 轮末列待确认」的直接会话日志证据，不是规则文本推定。
+
 ## 未验
 
 - 简单二选和窄屏退化为列表尚未单独做真实模型场景；规则文本已明确该例外，后续若出现反例再单独补探针。
 - 尚未完成长期语料评估；这仍按 RFC 暂缓。
-- 批 2 的有限行为验收已完成；批 3 见[批 3 Note](2026-10-11-human-exits-batch3-ui.md)（LedgerTab UI 切片已绿，open-in-app 现场验收环境阻断）。
+- 批 2 的有限行为验收已完成；批 3 见[批 3 Note](2026-10-11-human-exits-batch3-ui.md)（LedgerTab、compact 显示模式与 open-in-app 现场均已取证）。

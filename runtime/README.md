@@ -17,6 +17,7 @@
 | `harness-home/b/`、`harness-home-b/` | 第二/嵌套 home——多 home 实验与跨 home 审计视角（authorship 口径：每家导出各审一次再拼结果） | runtime·实验面 |
 | `pw-browsers/` | 浏览器二进制与 profile（`PLAYWRIGHT_BROWSERS_PATH` 重定向落点）；**UI 布局记忆按 origin 隔离**存在浏览器 profile——换端口重启即新 origin、记忆清零 | runtime |
 | `rehearsal-workspace/` | **排练盘**：排练/探针 cwd——**绝不写 live 公司盘**（`company-workspace/`） | runtime·排练 |
+| `human-exits-evidence/` | 行为探针（[human-exits 非阻塞支](../probes/session-context/human-exits-nonblocking-probe.mjs)）落盘的会话事件 JSON，供人工复核判定；gitignored，可从会话日志再生 | runtime·探针证据 |
 | `cold-storage/` | **外置冷存**（2026-10-07，RFC r7-motion-final 预算处置）：snapshots 超线时按 [snapshots/README](../snapshots/README.md) 政策外置的大件。现持 r6-baseline 的四个归一化 child fixtures（`cold-storage/snapshots/replay/r6-baseline/replay/`，≈15M；仓内 raw.tar.zst 可解包+`--prepare` 恢复，r6 不声明可运行 replay 故无 replay 消费面断裂）；**本目录是仓内证据的本地副本、不进 git 备份**——remote 备份连续性由仓内 raw.tar.zst 承担 | runtime·冷存 |
 
 ## 二、层级事实（四条，钉死）

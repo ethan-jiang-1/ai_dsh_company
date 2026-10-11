@@ -27,11 +27,17 @@ export type LedgerTabProps = PropsRuntime<'sidebar.right.pane.tab'> & LedgerTabI
 const REFRESH_MS = 30_000
 const FULL_TEXT_THRESHOLD = 120
 
-function LedgerSummary({ summary }: { readonly summary: string }) {
+/**
+ * 台账摘要行：默认两行边界，超长摘要提供可聚焦的全文/收起入口。
+ * 导出供 keyless 层用长短 fixture 做静态渲染断言（同 `DelegationCard` 的测试面）。
+ * @param props - 摘要文本。
+ * @returns 摘要行元素。
+ */
+export function LedgerSummary({ summary }: { readonly summary: string }) {
   const [expanded, setExpanded] = useState(false)
   const long = summary.length > FULL_TEXT_THRESHOLD
   return (
-    <span className={`wk-row-summary${expanded ? ' is-expanded' : ''}`}>
+    <span className={`wk-row-summary${long ? ' is-long' : ''}${expanded ? ' is-expanded' : ''}`}>
       <span className="wk-row-task" title={long ? undefined : summary}>{summary}</span>
       {long && (
         <Button
@@ -89,7 +95,7 @@ export function LedgerTab(props: LedgerTabProps) {
       {rows === null
         ? (error === null && <div className="wk-meta">读取中…</div>)
         : (
-          <div role="list" aria-label="动议台账" className="wk-list">
+          <div role="list" aria-label="动议台账" className="wk-list wk-ledger-list">
             {rows.map(row => (
               <div key={row.slug} role="listitem" className="wk-row" aria-label={`${row.slug}，${row.kind}，${row.date}`}>
                 <span className="wk-row-name">

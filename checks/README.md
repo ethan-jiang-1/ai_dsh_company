@@ -39,6 +39,9 @@
 | [browser-behavior-probe.mjs](../probes/browser-visual/browser-behavior-probe.mjs) | 自行拉起 MCP，以真实调用验证 browser-use 导航、读取、点击与输入 |
 | [dag-visual-probe.mjs](../probes/browser-visual/dag-visual-probe.mjs) | 合成任务驱动的 DAG 主题、样式与视觉判据 |
 | [dag-midflight-probe.mjs](../probes/browser-visual/dag-midflight-probe.mjs) | 真实动议或既有会话的 DAG 中途/终局形态和长链可读性 |
+| [ledger-summary-probe.mjs](../probes/browser-visual/ledger-summary-probe.mjs) | 台账摘要在宽/窄视口的可读性与键盘/触屏全文入口 |
+| [compact-view-probe.mjs](../probes/browser-visual/compact-view-probe.mjs) | compact 折叠过程行但保留助手最终长回复的现场对照 |
+| [open-in-app-probe.mjs](../probes/browser-visual/open-in-app-probe.mjs) | 交付物进侧栏预览后 open-in-app 控件的真实请求与目标路径 |
 
 ## 角色、手册与行为规则
 

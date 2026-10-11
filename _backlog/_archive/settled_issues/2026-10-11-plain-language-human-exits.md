@@ -1,11 +1,11 @@
 ---
-status: 等人拍板
+status: 已结
 opened: 2026-10-11
 ---
 
 # 推敲：对人的出口面统一「人话翻译段」——语言规范层（双轨制）
 
-> 立卡：2026-10-11 ｜ 状态：等人拍板 ｜ 类型：Feature ｜ 可关闭：否
+> 立卡：2026-10-11 ｜ 状态：已结（2026-10-11；三批验收完成） ｜ 类型：Feature ｜ 结论与去向 = [Human Exits 毕业 Note](../../../notes/implemented/2026-10-11-human-exits.md)
 > 同日拆卡：呈现/渲染与 DSH 表达件支撑 = [表达层卡](2026-10-11-human-exits-expression.md)；本卡只管语言。
 
 **问题与期望结果：** 用户 2026-10-11 两轮裁决：①「Agent 上下文对 Agent 挺好，对人不行——CEO
@@ -22,10 +22,10 @@ opened: 2026-10-11
   仅尾部漏「机制事实」黑话（workspace_doors=2、闸门 grep 误伤）。
 - **重灾区 = meta「一句话结论」→ 台账行 → 台账页签链**：V4 meta 一句话结论实测 **835 字**单链句
   （多数历史行约 72–184 字，非强制规范；吸收 handoff 2026-10-11 §3 待落卡项①），直灌管理层常驻面板
-  （[LedgerTab](../../packages/company-pack/src/client/LedgerTab.tsx) 整行渲染 `row.summary`，无 clamp）。
+  （[LedgerTab](../../../packages/company-pack/src/client/LedgerTab.tsx) 整行渲染 `row.summary`，无 clamp）。
   台账行随动议复杂度退化：最长 sea-entry 184 字、realtime-recon 165、renewal-u 157，
   夹 κ>0.70 / allowed-once / fail-closed 等内部术语。
-- 模板在推密度：[templates/meta.md](../../company-workspace/templates/meta.md) 要求「一句话结论」
+- 模板在推密度：[templates/meta.md](../../../company-workspace/templates/meta.md) 要求「一句话结论」
   「数字带【事实/假设】标注」——诚实标注的义务该住 final 报告体，灌进行内人话正是 835 字的成分之一。
 - ask 卡文案：手册已有「把上下文备到人能一眼决定」总则；V4 无 live 样本（授权走普通用户消息），未核。
 
@@ -84,7 +84,7 @@ corpora 独立标注先例。
 | 台账行（motion-ledger） | ✗ 最长 184 字 + 内部术语，随复杂度退化 |
 | 台账页签渲染（LedgerTab） | △ 长行无 clamp（呈现面 → 表达层卡） |
 
-- 手册双门禁事实：行 195/195 顶格（[run-gates DOC_LINE_BUDGETS](../../checks/run-gates.mjs)），
+- 手册双门禁事实：行 195/195 顶格（[run-gates DOC_LINE_BUDGETS](../../../checks/run-gates.mjs)），
   字节 25330B+1024 ≤ 32768B 有余 ⇒ 手册侧加内容必须先搬/压或并入既有行。
 
 ## 方案与取舍
