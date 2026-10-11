@@ -15,6 +15,15 @@ describe('client 面（R3：委派工具卡）', () => {
     expect([...DELEGATION_TOOL_KEYS].sort(), 'key 与 preset 的 toolName 不一致 → 卡片永远不渲染').toEqual(toolNames)
   })
 
+  it('LedgerTab 长摘要必须有非 hover 的键盘/触屏全文入口和稳定展示边界', () => {
+    const ledger = readFileSync(join(PACK, 'src/client/LedgerTab.tsx'), 'utf8')
+    const styles = readFileSync(join(PACK, 'src/client/styles.ts'), 'utf8')
+    expect(ledger, '长摘要不能只依赖 title hover').toContain("aria-label={expanded ? '收起完整结论' : '查看完整结论'}")
+    expect(ledger, '全文入口必须是可聚焦控件').toMatch(/<button|<Button/)
+    expect(ledger, '全文必须能在面板内展开').toMatch(/expanded|details|full.?text|summary/)
+    expect(styles, '摘要行必须有稳定的行数/高度边界').toMatch(/line-clamp|max-height|block-size|height:/)
+  })
+
   it('client 入口确实注册了 tool.call.toolview，且 key 走共享常量（不写死）', () => {
     const index = readFileSync(join(PACK, 'src/client/index.ts'), 'utf8')
     expect(index, 'client 入口没有注册 tool.call.toolview').toContain("'tool.call.toolview'")

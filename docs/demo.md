@@ -33,8 +33,10 @@
    ⚠ **这一步最容易漏**：对话框默认是目录浏览器，不点 `Edit path` 看不到粘贴框（2026-09-23 实测，
    用户与代理都卡过）。平台 UI（vendor 只读）改不了，写进 runbook 代偿。
 4. 新建会话：preset 选 **梦之队 CEO**（`ceo` 是 profile 默认）；工作目录 `company-workspace`
-5. 进“另一位成员的空间”：**teammate 的会话不在顶层列表**——在会话头部点 **Team 名册**，点成员名打开其会话（`uiWorkspace.openSession`，子会话；rc.2 现行 API，旧 `sessions.openSubagent` 已移除）。显式入口 = 右栏「在场」页签的在场板**行可点**（条目 ② 起为平台页签，可拖出成浮窗并看）。
-6. 收场验收：`node checks/audit/deliverables-check.mjs`（交付物三态；审归档快照要配 `--only <slug>`，
+5. 长会话需要压缩时，在会话输入框执行 `/compact` 并等待压缩轮完成；观察窗应看到过程行折叠、压缩结果回到会话流。该步骤只验证过程记录收敛，**不声称 compact 会折叠助手最终长文**；最终回复仍从会话流或文件预览读取。
+6. 在会话或台账页签中需要查看交付物时，使用文件链接的 **Open in app / 在应用中打开** 入口；目标文档应在右栏文档预览中出现。若入口不可用，记录现场环境和失败位置，不以源码存在或静态配置代替验收。
+7. 进“另一位成员的空间”：**teammate 的会话不在顶层列表**——在会话头部点 **Team 名册**，点成员名打开其会话（`uiWorkspace.openSession`，子会话；rc.2 现行 API，旧 `sessions.openSubagent` 已移除）。显式入口 = 右栏「在场」页签的在场板**行可点**（条目 ② 起为平台页签，可拖出成浮窗并看）。
+8. 收场验收：`node checks/audit/deliverables-check.mjs`（交付物三态；审归档快照要配 `--only <slug>`，
    因为快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只有本轮日志）
 
 ## 分镜 v0（两空间镜头：谁在哪个空间、活怎么交接）

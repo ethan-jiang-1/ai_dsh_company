@@ -135,14 +135,27 @@ const CSS = `
   border-bottom: 1px solid var(--dsw-alias-border-l1);
 }
 .wk-row-name { flex: 0 0 11rem; display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.wk-row-summary {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
 .wk-row-task {
   flex: 1;
   min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   color: var(--dsw-alias-label-secondary);
   font-size: 12px;
+  line-height: 1.4;
+}
+.wk-row-summary.is-expanded .wk-row-task {
+  display: block;
+  overflow: visible;
 }
 .wk-activity { margin: 4px 0 0; padding-left: 18px; color: var(--dsw-alias-label-secondary); font-size: 12px; }
 .wk-activity li { margin: 2px 0; }

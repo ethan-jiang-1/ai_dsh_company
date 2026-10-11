@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
-import { Tag } from '@deepseek-ai/dsh-client-ui-primitives'
+import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import { ledgerStats, parseMotionLedger, type MotionRow } from '../lib/ledger.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import type { FloatRectLike } from './float-geometry.ts'
@@ -25,6 +25,29 @@ export type LedgerTabProps = PropsRuntime<'sidebar.right.pane.tab'> & LedgerTabI
 
 /** 刷新间隔（台账随当轮收敛更新，低频）。 */
 const REFRESH_MS = 30_000
+const FULL_TEXT_THRESHOLD = 120
+
+function LedgerSummary({ summary }: { readonly summary: string }) {
+  const [expanded, setExpanded] = useState(false)
+  const long = summary.length > FULL_TEXT_THRESHOLD
+  return (
+    <span className={`wk-row-summary${expanded ? ' is-expanded' : ''}`}>
+      <span className="wk-row-task" title={long ? undefined : summary}>{summary}</span>
+      {long && (
+        <Button
+          size="sm"
+          variant="ghost"
+          title={expanded ? '收起完整结论' : '查看完整结论'}
+          aria-label={expanded ? '收起完整结论' : '查看完整结论'}
+          aria-expanded={expanded}
+          onClick={() => { setExpanded(value => !value) }}
+        >
+          {expanded ? '收起' : '全文'}
+        </Button>
+      )}
+    </span>
+  )
+}
 
 /**
  * 台账页签体。
@@ -74,7 +97,7 @@ export function LedgerTab(props: LedgerTabProps) {
                   {row.slug}
                 </span>
                 <span className="wk-row-status">{row.date} · {row.kind} · {row.roles}</span>
-                <span className="wk-row-task" title={row.summary}>{row.summary}</span>
+                <LedgerSummary summary={row.summary} />
               </div>
             ))}
           </div>
