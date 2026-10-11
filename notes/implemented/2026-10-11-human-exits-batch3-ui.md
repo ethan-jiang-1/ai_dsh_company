@@ -54,7 +54,21 @@
 - 提交的视觉夹具 = `snapshots/visual/ledger-summary/`（两档视口截图 + computed.json，`ledger-summary-probe --fixture` 写入）：390px 截图里能直接看到两行边界、**省略号**与「全文」入口同框，短行无入口；computed.json 记 `maxLines:2`、`buttons == clipped`（7/7、16/16）与键盘/鼠标/触屏三路取全文。
 - 现场曾挂载旧 bundle（无入口），故此前 smoke 不能证明新源码行为；每次改 client 源码后按 `tsc -b` + 包内 `tsdown` 重打包再验。
 
+## 应用侧证据（2026-10-11 补：不再甩给"人确认"）
+
+「文件真在应用里打开」现在是**机器判据**，不是靠人看：
+
+- 判据链：侧栏预览 → 预览控件发出 `POST /api/session/openWorkspacePath` → Host 回 `{opened:true}`（原生打开器接受该路径才回）
+  → **目标应用自己的热退出状态文件**（`~/Library/Application Support/Sublime Text/Local/Auto Save Session.sublime_session`）
+  里出现该文件的绝对路径。
+- 干净归因：用探针的 `--tree` 模式从右栏文件树挑一个**应用里还没打开过**的交付物 ⇒ 点击前不在册、点击后在册
+  （`cleanFlip: true`）。实测两份：`2026-10-10-ai-sprint-2026/final.md` 与 `2026-10-10-ai-transformation-2026-v2/final.md`。
+- 若目标点击前已在册，探针**不声称**本次点击的效果（打印警告 + `cleanFlip:false`），只保留 Host 判词——不做无法归因的断言。
+- 命令：`node probes/browser-visual/open-in-app-probe.mjs '<token-url>' '研究AI改造公司方案V4' 'final.md' '<交付物目录>' --tree`
+
 ## 已知边界
 
-- 真被本机应用打开（Finder/Sublime 里看到文件）只能由人确认；机器侧只验到成功请求与目标绝对路径。
+- 屏幕像素级「内容画出来了」仍然证不到：本机 `screencapture` 报 `could not create image from display`、
+  System Events 报 privilege violation（macOS TCC 权限）⇒ 走文件级判据。**OS 层"应用打开了这个文件"已证**；
+  未证的是"窗口里画出的像素长什么样"。
 - 简单二选/窄屏列表场景未单独做真实模型探针（规则文本已覆盖）。
