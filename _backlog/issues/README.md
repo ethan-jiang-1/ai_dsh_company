@@ -4,6 +4,9 @@
 
 ## 活跃清单
 
+| 卡 | 期望结果 | 状态 |
+|---|---|---|
+| [2026-10-12-backlog-process-made-explicit](2026-10-12-backlog-process-made-explicit.md) | 借鉴 ai_dsh_loop_advisor 同名卡：把 _backlog 制度写显性——处理门票、缺陷修复流、状态生命周期、agent 面 | 等人拍板 🔒（五补充/例外边界/两组枚举待用户扫，与源卡同一次评审；点头后一轮落地） |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)。
 
