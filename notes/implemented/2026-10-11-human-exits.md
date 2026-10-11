@@ -84,41 +84,19 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 
 每个切片遵守：先让最窄判据红，再做最小实现，再用同一判据转绿；验证命令、红/绿输出、未执行的现场前提写入毕业 Note。未获得下一批授权不得跨批实现。
 
-## 落地计划
+## 执行方式（已执行，现存为约束）
 
-### 0. 实施前勘查
+三批按批 1 → 批 2 → 批 3 顺序落地，每片都先只读勘查 owner 与最窄验收入口，再走「先红 → 最小实现 → 同判据转绿」；红/绿收据在 [批 1](2026-10-11-human-exits-batch1.md) / [批 2](2026-10-11-human-exits-batch2-contract.md) / [批 3](2026-10-11-human-exits-batch3-ui.md) 三份 Note。
 
-先只读核对每批的实际 owner、现有约定和最窄检查入口，不在勘查阶段改实现：
+执行期仍成立的停止条件（越界即停、先改 RFC 再动手）：来源关系不确定、验收不可执行、红测试未真实失败、修改超出本 RFC、preset 规则与既有角色合同冲突、模型观察显示规则不稳定、UI 全文入口无法同时满足键盘/触屏，或现场依赖缺失且无替代证据。
 
-- 批 1：核对 `company-workspace/templates/meta.md`、`company-workspace/kb/motion-ledger.md`、V4 活跃 meta、ledger parser 与 `tests/company/ledger.spec.ts`，确认摘要来源关系、V4 对应台账行和历史文件保护范围。
-- 批 2：核对 CEO preset 的实际文件和加载路径、相关 persona/skill/手册、已有 ask/replay 场景、preset 测试与真挂载 smoke，确认规则唯一 owner，避免重复写第二事实源。
-- 批 3：核对 `packages/company-pack/src/client/LedgerTab.tsx`、相关 CSS/primitive、`tests/client`、`client-load-smoke`、`docs/demo.md` §前置和 `open-in-app` 运行入口，确认全文入口、UI 状态和现场证据路径。
+批次完成定义（现已兑现，判据仍可用于回归）：
 
-勘查产出是每批精确修改文件、不得修改的文件、最窄验收入口和需要真实环境才能获得的证据；若 owner 或验收入口不成立，停在当前批并回到 RFC/issue 修订，不隐式扩张范围。
+- 批 1：meta 与台账逐字同源，V4 活跃摘要准确，历史范围未扩大，`pnpm verify` 通过。
+- 批 2：阻塞与非阻塞代表场景通过，preset keyless 检查与真挂载 smoke 通过；有界真实模型观察单独记录，不冒充确定性回归；内部协作内容密度未被改写。
+- 批 3：LedgerTab 宽/窄视口行高稳定、被裁必有入口，键盘/触屏可达全文，`client-load-smoke` 通过；compact runbook 可执行；`open-in-app` 有现场证据。
 
-### 1. 批次执行环
-
-严格按批 1 → 批 2 → 批 3 执行，每个切片遵守同一循环：
-
-1. 从本 RFC 抽取本切片的通过/失败判据，写成最窄测试、回放场景或走查步骤。
-2. 先运行判据并确认真实红结果；不能证明判据会拒绝旧行为，就不能进入实现。
-3. 做最小修改，只让当前切片从红变绿，不提前实现后续批次。
-4. 用同一命令/场景复验绿，并运行本批规定的回归检查。
-5. 记录实际命令、红/绿输出、未执行项和环境阻断，再决定是否进入下一个切片。
-
-### 2. 各批停止条件
-
-任一情况出现即停在当前批：来源关系不确定、验收不可执行、红测试未真实失败、修改超出 RFC、preset 规则与既有角色合同冲突、模型观察显示规则不稳定、UI 全文入口无法同时满足键盘/触屏，或现场依赖缺失且无替代证据。需要扩大范围时先修订 RFC/issue，再继续实现。
-
-### 3. 批次完成定义
-
-- 批 1：meta 与台账逐字同源，V4 活跃摘要准确，历史范围未扩大，`pnpm verify` 通过，并记录批 1 实现 Note。
-- 批 2：阻塞与非阻塞代表场景通过，preset keyless 检查与真挂载 smoke 通过；有界真实模型观察单独记录，不冒充确定性回归；内部协作内容密度未被改写，并按 `preset-change-definition` 收口。
-- 批 3：LedgerTab 宽/窄视口和短/长摘要均通过，键盘/触屏可达全文入口，`client-load-smoke` 通过；compact runbook 可执行；`open-in-app` 有现场证据或明确环境阻断，并按 `cordis-plugin-development` 收口。
-
-### 4. 最终收口
-
-全部已授权批次完成后，运行与改动面匹配的最窄检查及 `pnpm verify`，逐条对照本 RFC 做语义审查；把真实红/绿证据、未完成项和现场阻断写入毕业 Note，更新两张 issue 的去向，并在全部验收完成后将本 RFC 从 `notes/proposed/` 毕业到 `notes/implemented/`。代码完成不等于验收完成，未验收项不得提前归档。
+最终收口按 §条目去向执行：逐条对照本 RFC 做语义审查，真实验收证据写进毕业 Note 与三份批次 Note，两张 issue 随之离场。
 
 ## 条目去向
 
@@ -135,3 +113,17 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 | 批 3｜open-in-app 现场 | 同上 + `docs/demo.md` §前置步骤 6 | `probes/browser-visual/open-in-app-probe.mjs`：`final.md` 进侧栏预览后 `POST /api/session/openWorkspacePath` 200 且携带目标绝对路径，无 alert |
 
 仍按 RFC 暂缓或未单测的两项：长期语料评估；简单二选/窄屏列表场景。两张 issue 已随本 RFC 毕业离场到 `_backlog/_archive/settled_issues/`。
+
+## 收口后复核（2026-10-11，两轴独立审 + 本人复跑）
+
+复核抓到的真缺陷与处置（都改了实现/资产，不是只写说明）：
+
+- **keyless replay lane 红**：`checks/smoke/replay-smoke.mjs` 在 r3-delegation 上报 2 条 FAIL——sidecar 还是旧 CEO prefix、两处注入体还是旧公司手册。复核实测确认：**该 lane 在本轮之前已经红过**（同日更早的手册改动新增 4 条协作规矩，没人跑这条 lane），本轮又加了 CEO 措辞与手册一行两处。处置 = 同步夹具（sidecar 文本、注入体正文、`source.changes[0].digest`）后 `replay-smoke: ALL PASS`；这是**夹具同步不是重录**（本机无 key），已在 `snapshots/replay/r3-delegation/snapshot.yml` 的资格理由里写明并要求此后改手册/persona 同 diff 跑该 lane。
+- **台账行高不稳**（批 3 实现缺陷）：按字符阈值决定裁不裁 ⇒ 22/29 行不裁，1440px 高到 102px（≈6 行）、390px 到 155px（≈9 行）。改为**所有行两行边界 + 按量出的溢出给入口**后，两档视口 maxLines=2 且 buttons == clipped。
+- **空转断言**：`tests/client/client-face.spec.ts` 原有两条断言在基线上恒绿（`/summary/` 命中 `row.summary`、`/height:/` 命中 `line-height:`）；已改写成逐条在 6094d67 上转红的 7 条，并补「不许给短行开免裁口子」。
+- **探针弱于其声称**：`human-exits-probe` 用全文 grep 判三件套（「埋在尾部」反例照样绿）⇒ 收紧到正文前 400 字 + 机制黑话负判据；`human-exits-nonblocking-probe` 的假设/待确认项改为分别落**开头 400 字**与**末 500 字**，收紧后重跑 PASS。
+- **证据不可复核**：三条浏览器探针只打印、不落盘 ⇒ 现在都把判定 JSON（含 open-in-app 的**目标绝对路径**、台账两档视口的行高/按钮/裁切计数）写进 `runtime/human-exits-evidence/`。
+- **索引缺口**：`checks/README.md` 漏登记 `human-exits-nonblocking-probe.mjs`，已补。
+- **越界与孤儿**：公司手册里我加的 compact 一句未被 RFC 授权（授权只到 demo.md §前置）⇒ 已删；`snapshots/probes/human-loop-e2e/2026-10-11/*.png` 无 Note 消费 ⇒ 已在批 2 Note 里点名。
+
+仍然存在的边界（未修，如实记）：批 2「代表场景固化为 replay」未做（只有真模型探针 + 会话日志断言）；本机应用是否真打开文件只能由人确认；夹具同步不等于重录，攒够改动后应做一次真重录。

@@ -27,11 +27,16 @@ while (Date.now() < deadline) {
   await new Promise(resolve => setTimeout(resolve, 3000))
 }
 const events = records.map(r => r.event).filter(Boolean)
-const text = events.filter(e => e.type === 'assistant/message').map(e => JSON.stringify(e.data)).join('\n')
+const text = events.filter(e => e.type === 'assistant/message')
+  .flatMap(e => (e.data?.message?.content ?? []).filter(b => b?.type === 'text').map(b => b.text)).join('\n')
+// ⚠ 两条断言分开落在**该在的位置**（2026-10-11 复核修）：假设要在**开头**就亮明，
+// 待确认项要在**轮末**；原先全文 grep，反例「埋在尾部」照样绿。
+const opening = text.slice(0, 400)
+const closing = text.slice(-500)
 const result = {
   sessionId, ended: events.some(e => e.type === 'turn/end'),
   asked: events.some(e => e.type === 'tool/call' && e.data?.name === 'ask_user_question'),
-  assumption: /默认|假设|暂按/.test(text), confirmation: /待.*确认|确认.*时长|时长.*确认/.test(text),
+  assumption: /默认|假设|暂按/.test(opening), confirmation: /待.*确认|待你拍板|确认.*时长|时长.*确认/.test(closing),
   draft: /交付进度/.test(text) && /风险/.test(text) && /下周/.test(text), text,
 }
 const dir = join(root, 'runtime', 'human-exits-evidence')

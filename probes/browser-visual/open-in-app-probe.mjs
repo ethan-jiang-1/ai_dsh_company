@@ -4,10 +4,14 @@
 // 前置：已启动公司观察窗 URL、会话标题与目标交付物路径；用法：node 本脚本 '<token-url>' '<session-title>' '<file-suffix>'。
 // 断言面（RFC 批 3）：交付物在侧栏预览；预览上的 open-in-app 控件发出真实请求并成功，且不依赖源码或 endpoint 存在。
 import assert from 'node:assert/strict'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
 import { loadChromium, launchChromium } from '../../tools/drivers/playwright.mjs'
 
 const [url, title, suffix] = process.argv.slice(2)
 assert(url && title && suffix, '需要观察窗 URL、会话标题、目标文件后缀')
+const outDir = join(repositoryRoot, 'runtime', 'human-exits-evidence')
 const browser = await launchChromium(await loadChromium(process.cwd()))
 try {
   const page = await browser.newPage()
@@ -45,13 +49,21 @@ try {
   await page.waitForTimeout(3000)
   const ok = calls.filter(c => c.status >= 200 && c.status < 300)
   assert(ok.length, `点击 open-in-app 控件没有成功请求：${JSON.stringify(calls)}`)
-  const carried = ok.find(c => c.request.includes(suffix))
-  assert(carried, `成功请求未携带目标文件路径（${suffix}）：${JSON.stringify(calls)}`)
+  // 取请求体里**真正的目标路径**（不是"正文里出现过文件名"）：必须是绝对路径且指向目标交付物。
+  const paths = ok.map(c => {
+    try { return JSON.parse(c.request).payload.args.request.path } catch { return undefined }
+  }).filter(p => typeof p === 'string')
+  const carried = paths.find(p => p.startsWith('/') && p.endsWith(suffix))
+  assert(carried, `成功请求未携带目标文件的绝对路径（${suffix}）：请求里拿到 ${JSON.stringify(paths)}`)
   assert.equal(await page.locator('[role=alert]').count(), 0, 'open-in-app 出现错误提示')
-  console.log(JSON.stringify({
+  const verdict = {
     previewed: suffix,
-    calls: ok,
+    openedPath: carried,
+    calls: ok.map(c => ({ status: c.status, route: c.route })),
     alerts: 0,
-    verdict: '目标文件进入侧栏预览且 open-in-app 真实请求成功：PASS',
-  }, null, 2))
+    verdict: '目标文件进入侧栏预览、open-in-app 请求携带其绝对路径且成功：PASS',
+  }
+  await mkdir(outDir, { recursive: true })
+  await writeFile(join(outDir, 'open-in-app-verdict.json'), JSON.stringify(verdict, null, 2) + '\n')
+  console.log(JSON.stringify(verdict, null, 2))
 } finally { await browser.close() }

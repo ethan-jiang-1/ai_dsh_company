@@ -153,7 +153,7 @@ const CSS = `
   font-size: 12px;
   line-height: 1.4;
 }
-.wk-row-summary:not(.is-long) .wk-row-task,
+/* 所有摘要行都吃两行边界（行高稳定）；只有展开态解除——是否给「全文」入口由组件量出的溢出决定。 */
 .wk-row-summary.is-expanded .wk-row-task {
   display: block;
   overflow: visible;

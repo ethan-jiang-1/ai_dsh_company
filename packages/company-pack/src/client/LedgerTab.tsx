@@ -4,7 +4,7 @@
  * 素材与场景分镜（demo.md 场景 D/E + 快照）已由新动议条目交付；本页签是"公司累计干了什么、
  * 值不值"的常驻答案。
  */
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
@@ -25,21 +25,39 @@ export type LedgerTabProps = PropsRuntime<'sidebar.right.pane.tab'> & LedgerTabI
 
 /** 刷新间隔（台账随当轮收敛更新，低频）。 */
 const REFRESH_MS = 30_000
-const FULL_TEXT_THRESHOLD = 120
+/** 首屏即给全文入口的字符数（**只是提示**：真裁没裁由布局量出来，见 `LedgerSummary`）。 */
+const FULL_TEXT_HINT = 120
 
 /**
- * 台账摘要行：默认两行边界，超长摘要提供可聚焦的全文/收起入口。
- * 导出供 keyless 层用长短 fixture 做静态渲染断言（同 `DelegationCard` 的测试面）。
+ * 台账摘要行：**所有**行都保持两行边界，被裁掉的行给可聚焦的全文/收起入口。
+ *
+ * 为什么边界按布局量、不按字符数（2026-10-11 真浏览器实测）：同一条 103 字摘要在 390px 栏里
+ * 会折成 4 行，而 60 字也可能折 3 行——按字数决定裁不裁时，这些行既不裁也没有入口，行高在
+ * 6–9 行间跳（实测 22/29 行如此）。改成「一律两行 + 量出溢出才加入口」后，行高稳定，且
+ * **被裁必有入口**（RFC 批 3：clamp 后无全文入口 = 失败）。字符数只用来首屏就亮出入口，
+ * 免得先渲染一帧无入口的裁切文本。
+ * 导出供 keyless 层做静态渲染断言（同 `DelegationCard` 的测试面）。
  * @param props - 摘要文本。
  * @returns 摘要行元素。
  */
 export function LedgerSummary({ summary }: { readonly summary: string }) {
   const [expanded, setExpanded] = useState(false)
-  const long = summary.length > FULL_TEXT_THRESHOLD
+  const [clipped, setClipped] = useState(false)
+  const textRef = useRef<HTMLSpanElement | null>(null)
+  const hinted = summary.length > FULL_TEXT_HINT
+  useEffect(() => {
+    const node = textRef.current
+    if (node === null || expanded) return
+    const measure = (): void => { setClipped(node.scrollHeight > node.clientHeight + 1) }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(node)
+    return () => { observer.disconnect() }
+  }, [summary, expanded])
   return (
-    <span className={`wk-row-summary${long ? ' is-long' : ''}${expanded ? ' is-expanded' : ''}`}>
-      <span className="wk-row-task" title={long ? undefined : summary}>{summary}</span>
-      {long && (
+    <span className={`wk-row-summary${hinted ? ' is-long' : ''}${expanded ? ' is-expanded' : ''}`}>
+      <span className="wk-row-task" ref={textRef}>{summary}</span>
+      {(hinted || clipped || expanded) && (
         <Button
           size="sm"
           variant="ghost"

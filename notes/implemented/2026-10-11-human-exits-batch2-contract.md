@@ -41,7 +41,7 @@
 
 ## 行为证据边界
 
-已运行既有认证档：`source run/env.sh && node checks/smoke/human-loop-e2e-smoke.mjs`，结果 `human-loop-e2e: ALL PASS（12/12）`。
+已运行既有认证档：`source run/env.sh && node checks/smoke/human-loop-e2e-smoke.mjs`，结果 `human-loop-e2e: ALL PASS（12/12）`；该轮的问询卡与收口截图存 `snapshots/probes/human-loop-e2e/2026-10-11/{question-card,after-answer}.png`，本 Note 就是它们的消费入口。
 
 该认证档提供了两类可复用证据：
 
@@ -51,6 +51,7 @@
 这证明了非阻塞继续和真实问询回路的运行能力，但不等同于 Human Exits 全部行为验收。
 
 另新增并运行 `probes/session-context/human-exits-probe.mjs`：真实 CEO 会话中，阻塞拍板场景记录到 `ask_user_question`，首条 assistant 消息同时包含“结论”“下一步”和“拍板/决定/选择”。结果：`human-exits-probe: PASS（阻塞 ask + 三件套）`。该探针是认证档，不进入 `pnpm test`。
+⚠ 复核轮（2026-10-11）把断言收紧到**首段**（正文前 400 字）并加了机制黑话负判据——此前用全文 grep，「三件套齐但埋在长散文尾部」这个 RFC 点名的反例照样绿，属于探针弱于其声称。
 
 ## 表达行为证据
 
@@ -65,8 +66,11 @@
 ## 非阻塞支的持久日志证据
 
 `source run/env.sh && node probes/session-context/human-exits-nonblocking-probe.mjs '<token-url>'`：真实 CEO 会话里给一个非阻塞缺口（会议时长未给、且不涉预算/对外承诺/授权），跑完一轮并把会话事件落盘到 `runtime/human-exits-evidence/<sessionId>.json`。结果 `human-exits-nonblocking-probe: PASS`，落盘事实为 `ended: true`、`asked: false`（没有 `ask_user_question` 阻停）、`assumption: true`（「默认口径：60 分钟…会议时长未给 → 按此假设，可改」）、`confirmation: true`（轮末「待你拍板：会议时长…」）、`draft: true`（三个议题照常出齐）。这是 RFC「非阻塞缺口带显式假设继续 + 轮末列待确认」的直接会话日志证据，不是规则文本推定。
+复核轮（2026-10-11）把两条断言**分开落位**：假设必须出现在正文**前 400 字**、待确认项必须出现在**末 500 字**；此前全文 grep 会把「埋在尾部」和「写在开头」混为一谈。收紧后重跑仍 `PASS`（三次独立会话：`session-6bfc0f7e`、`session-8ab59af8`、`session-73c905ce`）。
 
-## 未验
+## 未验与缺口
+
+- **代表场景未固化为 replay**：RFC 批 2 写的是「代表场景先固化为 replay/会话断言」。现状 = 真模型认证档 + **会话日志断言**（探针读 `session/page` 事件判据，落盘可复核），但**没有** `snapshots/replay/` 场景；keyless 层只有规则文本在场断言（`tests/presets/presets.spec.ts`），它证不了模型行为。要补 replay 需一次带 key 的录制，属独立一轮。
 
 - 简单二选和窄屏退化为列表尚未单独做真实模型场景；规则文本已明确该例外，后续若出现反例再单独补探针。
 - 尚未完成长期语料评估；这仍按 RFC 暂缓。

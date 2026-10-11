@@ -32,6 +32,13 @@ describe('parseMotionLedger', () => {
     const row = rows.find(candidate => candidate.slug === 'ai-transformation-2026-v4')
     expect(row, 'V4 活跃交付物必须在台账登记').toBeDefined()
     expect(row!.summary).toBe(summary)
+    // 逐字同源只证明两边一致；再钉住**内容本身**（RFC 批 1 第 1 条：不再是 835 字原句、
+    // 三项核心事实都在、不出现新的硬字数门禁式截断）。
+    expect(summary!.length, 'V4 一句话结论不该退回 835 字长句').toBeLessThan(200)
+    for (const fact of [/V4 达标/, /反事实未达标/, /缺陷已修复/]) {
+      expect(summary!, `结论必须保留「${String(fact)}」这项事实`).toMatch(fact)
+    }
+    expect(summary!, '结论层不该把内部机制名当主体').not.toMatch(/workspace_doors|grep|闸门误伤/)
   })
 
   it('真台账：抽真样本逐列核对（字段解析不漂移）', () => {

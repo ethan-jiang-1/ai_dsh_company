@@ -56,13 +56,20 @@ while (Date.now() < deadline) {
 
 const asked = events.some(event => event?.type === 'tool/call' && event?.data?.name === 'ask_user_question')
 const firstMessage = events.find(event => event?.type === 'assistant/message')
-const content = firstMessage ? JSON.stringify(firstMessage.data) : ''
-const hasConclusion = /结论/.test(content)
-const hasNextStep = /下一步/.test(content)
-const hasDecision = /拍板|决定|选择/.test(content)
-const pass = asked && hasConclusion && hasNextStep && hasDecision
+/** 取消息正文（只 text 块，不含 reasoning）——RFC 的失败反例针对的是**给人看的正文**。 */
+const messageText = event => (event?.data?.message?.content ?? [])
+  .filter(block => block?.type === 'text').map(block => block.text).join('\n')
+const text = messageText(firstMessage)
+// ⚠ 断言落在**首段**（前 400 字）：三件套齐但埋在长散文尾部正是 RFC 点名的失败反例，
+// 早先版本用全文 grep，反例照样绿（2026-10-11 复核修）。
+const opening = text.slice(0, 400)
+const hasConclusion = /结论/.test(opening)
+const hasNextStep = /下一步/.test(opening)
+const hasDecision = /拍板|决定|选择/.test(opening)
+const jargon = /workspace_doors|T\d+\b|判据号|闸门 |grep /.test(opening)
+const pass = asked && hasConclusion && hasNextStep && hasDecision && !jargon
 console.log(`  阻塞拍板：ask_user_question = ${String(asked)}`)
-console.log(`  人话首段：结论=${String(hasConclusion)} 下一步=${String(hasNextStep)} 拍板=${String(hasDecision)}`)
+console.log(`  人话首段（前 400 字）：结论=${String(hasConclusion)} 下一步=${String(hasNextStep)} 拍板=${String(hasDecision)} 机制黑话=${String(jargon)}`)
 console.log(`human-exits-probe: ${pass ? 'PASS（阻塞 ask + 三件套）' : 'FAIL（需人工检查会话日志）'}`)
 try { child.kill('SIGTERM') } catch { /* 已退出 */ }
 process.exit(pass ? 0 : 1)

@@ -18,10 +18,19 @@ describe('client 面（R3：委派工具卡）', () => {
   it('LedgerTab 长摘要必须有非 hover 的键盘/触屏全文入口和稳定展示边界', () => {
     const ledger = readFileSync(join(PACK, 'src/client/LedgerTab.tsx'), 'utf8')
     const styles = readFileSync(join(PACK, 'src/client/styles.ts'), 'utf8')
+    // ⚠ 每条断言都要能在**改造前**的源码上转红（2026-10-11 复核：此前「展开态」用 /summary/ 命中
+    // `row.summary`、「展示边界」用 /height:/ 命中 `line-height:` ⇒ 两条恒绿的空转断言）。
     expect(ledger, '长摘要不能只依赖 title hover').toContain("aria-label={expanded ? '收起完整结论' : '查看完整结论'}")
-    expect(ledger, '全文入口必须是可聚焦控件').toMatch(/<button|<Button/)
-    expect(ledger, '全文必须能在面板内展开').toMatch(/expanded|details|full.?text|summary/)
-    expect(styles, '摘要行必须有稳定的行数/高度边界').toMatch(/line-clamp|max-height|block-size|height:/)
+    expect(ledger, '全文入口必须是可聚焦控件（不是 span/div 假按钮）').toMatch(/<Button|<button/)
+    expect(ledger, '全文必须能在面板内展开（真状态位，不是 summary 字段名）').toMatch(/const \[expanded, setExpanded\] = useState\(false\)/)
+    expect(ledger, '展开态要真的驱到样式类上（否则按钮点了没变化）').toMatch(/expanded \? ' is-expanded' : ''/)
+    expect(styles, '摘要行必须有行数边界（line-clamp，不是任意 height:）').toMatch(/-webkit-line-clamp/)
+    // 行高稳定 = 所有行都吃边界；不许留「短行免裁」的口子（那正是行高在 6–9 行间跳的成因）。
+    expect(styles, '不许给短行开免裁的口子（否则窄栏里 80 字的行也会长到 3–4 行）')
+      .not.toMatch(/\.wk-row-summary:not\(/)
+    expect(ledger, '入口要按布局量出的溢出给（被裁必有入口），不能只按字符数')
+      .toMatch(/scrollHeight > node\.clientHeight/)
+    expect(ledger, '栏宽变化要重量（侧栏可拖宽/浮出）').toMatch(/ResizeObserver/)
   })
 
   it('client 入口确实注册了 tool.call.toolview，且 key 走共享常量（不写死）', () => {
