@@ -10,13 +10,12 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-013-e2e-driver-token-committed](BUG-013-e2e-driver-token-committed.md) | 观察窗 token 随无关 e2e driver 入库（误 add；token 重启即换，无历史重写） | P1 |
 | [BUG-014-charter-backfill-dedupe-false-skip](BUG-014-charter-backfill-dedupe-false-skip.md) | backfill 子串查重假跳过——COO 缺 ai-sprint-2026 历史纪要且验收表记了假绿 | P1 |
 | [BUG-015-charter-backfill-evidence-date-coupling](BUG-015-charter-backfill-evidence-date-coupling.md) | backfill 证据路径写死「今天」——隔天补登必写断链 | P2 |
 | [BUG-016-converge-self-description-drift](BUG-016-converge-self-description-drift.md) | converge 自述三处失真（幽灵旗标 --plan / plan 文案 / 完成 TODO） | P2 |
 | [BUG-017-record-hygiene-residue](BUG-017-record-hygiene-residue.md) | 记录残留——缺陷计数 3/4/5 并存、stray 断链、台账叙述出入、缺 convergence Note | P2 |
 
-当前活跃缺陷卡 5 张（BUG-013..017，2026-10-12 评审立卡）。BUG-001..012 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+当前活跃缺陷卡 4 张（BUG-014..017，2026-10-12 评审立卡；BUG-013 已修归档）。BUG-001..012 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

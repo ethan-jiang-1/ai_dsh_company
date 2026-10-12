@@ -1,5 +1,5 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P1
 opened: 2026-10-12
 ---
@@ -8,6 +8,7 @@ opened: 2026-10-12
 
 > 严重级别：P1（重要）｜发现：2026-10-12（f8bc123...HEAD 双轴代码评审 Spec 轴）｜状态：修复就绪
 > **翻转记录（2026-10-12）**：复现实跑见红（收据在复现节）+ 修法选定 + 已修判定在场——缺陷轨翻转表「调查中 → 修复就绪」（P1 修复型自授权通道）。
+> **修复（2026-10-12）**：`git rm --cached` + .gitignore 显式规则（`runtime/e2e/`，防再犯）；token 随下次观察窗启动轮换，无历史重写。判定实跑：`git ls-files runtime/e2e/` = 0；tracked 四区 `git grep "const TOKEN ="` 零命中；`git check-ignore -v` 命中新规则；`pnpm verify` ALL PASS + `pnpm test` 484/484——已修判定满足，修复已落地 → 已修归档。
 
 ## 症状
 

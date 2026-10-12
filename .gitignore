@@ -17,6 +17,8 @@ runtime/pw-browsers/
 runtime/harness-home-b/
 # 行为探针的会话事件落盘（human-exits 非阻塞支等；证据可从会话日志再生，不入库）
 runtime/human-exits-evidence/
+# e2e 临时驱动的工具态（§11；BUG-013：观察窗 token 不入库，driver 留本地）
+runtime/e2e/
 # 手动分发导出（精神借 ai_dsh_architect）：_dist/ 是导出目的地不是源——tgz 忽略，
 # 手册是唯一 tracked 例外（版本由 verify 的 dist-manual 门禁对 pack package.json 核对）
 _dist/*

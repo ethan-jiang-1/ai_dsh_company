@@ -63,6 +63,7 @@
 | [BUG-010-scheduler-single-point-hitl-freeze.md](fixed_bugs/BUG-010-scheduler-single-point-hitl-freeze.md) | 调度单点：HITL 前排空规则 + 行为验证（V4 ask 先于建任务 → 新场景先建 10 任务） | 2026-10-11 |
 | [BUG-011-instruction-carries-unverified-guess.md](fixed_bugs/BUG-011-instruction-carries-unverified-guess.md) | 指令夹带未证猜测：规则 + 派活行可选「假设」段（机器可读落点 + 解析断言） | 2026-10-11 |
 | [BUG-012-same-model-hats-independent-review-overclaim.md](fixed_bugs/BUG-012-same-model-hats-independent-review-overclaim.md) | 同模五帽：5 份模板加「复核独立性层级 + 边际宽度」两栏 + keyless 断言 | 2026-10-11 |
+| [BUG-013-e2e-driver-token-committed.md](fixed_bugs/BUG-013-e2e-driver-token-committed.md) | 观察窗 token 随无关 e2e driver 入库：untrack + .gitignore 显式规则（token 重启轮换，无历史重写） | 2026-10-12 |
 
 ## 随卡归档的研究
 
