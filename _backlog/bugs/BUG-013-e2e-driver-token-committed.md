@@ -1,12 +1,13 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P1
 opened: 2026-10-12
 ---
 
 # BUG-013：观察窗 token 随无关 e2e driver 入库——「永不提交密钥」被误 add 击穿
 
-> 严重级别：P1（重要）｜发现：2026-10-12（f8bc123...HEAD 双轴代码评审 Spec 轴）｜状态：调查中
+> 严重级别：P1（重要）｜发现：2026-10-12（f8bc123...HEAD 双轴代码评审 Spec 轴）｜状态：修复就绪
+> **翻转记录（2026-10-12）**：复现实跑见红（收据在复现节）+ 修法选定 + 已修判定在场——缺陷轨翻转表「调查中 → 修复就绪」（P1 修复型自授权通道）。
 
 ## 症状
 
@@ -37,6 +38,9 @@ opened: 2026-10-12
 git ls-files runtime/e2e/        # → runtime/e2e/assembly-e2e-driver.mjs（应空）
 grep -n "TOKEN" runtime/e2e/assembly-e2e-driver.mjs   # → :11 命中
 ```
+
+**实跑收据（2026-10-12）**：两条均命中——`git ls-files runtime/e2e/` 输出该文件；`grep -n` 定位
+`:11`（token 值不转录进卡，防二次扩散）。
 
 ## 修复关联
 

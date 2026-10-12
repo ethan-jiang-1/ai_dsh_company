@@ -1,12 +1,13 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-10-12
 ---
 
 # BUG-015：backfill 证据路径写死「今天」——隔天补登必写断链
 
-> 严重级别：P2（次要）｜发现：2026-10-12（评审聚合者独立巡检）｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-10-12（评审聚合者独立巡检）｜状态：修复就绪
+> **翻转记录（2026-10-12）**：沙箱对照实验坐实（收据在复现节）+ 修法选定 + 已修判定在场——缺陷轨翻转表「调查中 → 修复就绪」（P2 修复型自授权通道）。
 
 ## 症状
 
@@ -28,13 +29,20 @@ notes 重指/backfill），无单一出处。
 「今日」耦合仅此一家；门禁侧 bare-path 会兜红（缓解：错路径活不过下一次 verify），
 但工具应自己写对，不能靠门禁擦屁股。
 
-## 复现
+## 复现（沙箱对照实验，2026-10-12 实跑）
+
+真仓不能动盘，按 §11 在仓外沙箱复刻最小树（目录 /tmp/bug015-repro：tools/ 副本 +
+deliverables-archive/2026-10-01-ai-demo/meta.md + 无该 slug 字样的 CHARTER + 证据目录
+snapshots/archive/convergence-2026-10-01/…/journal/coo/——**证据日期 = 10-01，运行日 = 10-12**）：
 
 ```sh
-# 模拟隔日（真实验证在修复轮做，用 dry-run 不动盘）：
-node tools/converge.mjs --charter-backfill 2026-10-10-ai-sprint-2026 --dry-run
-# 打印的 journal 路径含 convergence-<运行日>/——与真实证据目录（convergence-2026-10-12/）不符
+node $SB/tools/converge.mjs --charter-backfill 2026-10-01-ai-demo      # exit=0
+grep -o "convergence-[0-9-]*" $SB/company-workspace/kb/coo/CHARTER.md  # → convergence-2026-10-12
+ls $SB/snapshots/archive/                                              # → convergence-2026-10-01
 ```
+
+写入的指针指向 convergence-2026-10-12/（运行日），真实证据在 convergence-2026-10-01/——
+**断链坐实，且工具 exit=0 未报警**（无 fail-loud）。沙箱已清理。
 
 ## 修复关联
 

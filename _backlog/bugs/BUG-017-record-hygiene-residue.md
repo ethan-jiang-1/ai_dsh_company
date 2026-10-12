@@ -1,18 +1,19 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-10-12
 ---
 
 # BUG-017：评审面记录残留——缺陷计数 3/4/5 并存、stray 断链、台账叙述与 diff 出入、缺 convergence Note
 
-> 严重级别：P2（次要）｜发现：2026-10-12（f8bc123...HEAD 双轴代码评审 Standards 轴 + Spec 轴③）｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-10-12（f8bc123...HEAD 双轴代码评审 Standards 轴 + Spec 轴③）｜状态：修复就绪
+> **翻转记录（2026-10-12）**：四条复现实跑见红（收据在复现节）+ 修法选定 + 已修判定在场——缺陷轨翻转表「调查中 → 修复就绪」（P2 修复型自授权通道）。
 
 ## 症状
 
 1. **归档卡缺陷计数三值并存**：结论行（L10）「四缺陷」、推敲记录标题（L18）「三个实跑缺陷」、
    实列五条（缺陷 1–5，L29 起含缺陷 5）——追加式写作没回改旧计数。
-2. **stray 断链残留**：[_backlog/issues/README.md:8](../issues/README.md) 旧裸链接
+2. **stray 断链残留**：[_backlog/issues/README.md:9](../issues/README.md) 旧裸链接
    `(../_archive/settled_issues/README.md)。` 未清、新文直接续接其后。
 3. **台账叙述与 diff 出入**：卡 L17「台账 4 行已追加」，`git diff f8bc123...HEAD -- …/motion-ledger.md`
    实际 +3 行（V4 行系既有、被查重守卫跳过）。
@@ -39,6 +40,10 @@ sed -n '8p' _backlog/issues/README.md
 git diff f8bc123...HEAD --stat -- company-workspace/kb/motion-ledger.md   # +3
 ls notes/implemented/ | grep -ci 收敛                                      # 0
 ```
+
+**实跑收据（2026-10-12）**：① grep 命中 L10「四缺陷」+ L18「三个实跑缺陷」（实列五条）；② stray
+裸链接在 issues/README **L9**（立卡时误记 :8——复现即校正）；③ `git diff f8bc123...HEAD --
+…/motion-ledger.md` = 1 file changed, 3 insertions(+)；④ implemented/ 无 convergence 条目（grep 计 0）。
 
 ## 修复关联
 

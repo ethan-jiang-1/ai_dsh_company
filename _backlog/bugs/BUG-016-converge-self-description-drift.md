@@ -1,19 +1,21 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-10-12
 ---
 
 # BUG-016：converge 自述三处失真——幽灵旗标 --plan、plan 文案、完成 TODO
 
-> 严重级别：P2（次要）｜发现：2026-10-12（f8bc123...HEAD 双轴代码评审，两轴独立命中②）｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-10-12（f8bc123...HEAD 双轴代码评审，两轴独立命中②）｜状态：修复就绪
+> **翻转记录（2026-10-12）**：三条复现实跑见红（收据在复现节）+ 修法选定 + 已修判定在场——缺陷轨翻转表「调查中 → 修复就绪」（P2 修复型自授权通道）。
 
 ## 症状
 
 1. **幽灵旗标 `--plan`**：[dev-loop §12](../../docs/guides/dev-loop.md)、[checks/README](../../checks/README.md)、
    归档卡都教 `node tools/converge.mjs --plan`；工具头注（:6-10）只定义无参计划模式 + `--slug`/
    `--dry-run`/`--charter-backfill`。传 `--plan` 被静默忽略（「碰巧能跑」），未知旗标一律不报错。
-2. **plan 文案与实行两张皮**：plan/dry-run 打印「证据副本…（交付物整目录 + N 篇 journal）」（:131），
+2. **动作清单文案与实行两张皮**：`--slug`（含 --dry-run）打印的动作清单「证据副本…（交付物整目录
+   + N 篇 journal）」（:131），
    而缺陷 1 修复后 copyEvidence **只拷 journal**（:81-93 及同函数 ⚠ 注释）——双份存储修复改了行为没改文案。
 3. **完成 TODO 过时**：converge 完成提示仍打「CHARTER 历史纪要…CLI 不代写」（:135/:196），
    与归档卡 L74 已裁「书写者 = 维护者 CLI（--charter-backfill）」相左——该子命令已落地，提示没跟上。
@@ -28,12 +30,24 @@ opened: 2026-10-12
 工具自述漂移类。横切排查：本 diff 面内唯一新脚本已扫尽；run-gates 的头注自述检查只覆盖 checks/
 脚本，tools/ 不在其列——本卡不扩门禁（三处失真一次修完即可），留意即可。
 
-## 复现
+## 复现（2026-10-12 实跑）
+
+① 幽灵旗标（真仓，只读计划模式）：
 
 ```sh
-node tools/converge.mjs --plan --dry-run   # 「证据副本」行含「交付物整目录」（与实行相左）
-node tools/converge.mjs --no-such-flag     # 静默按计划模式跑（应报未知旗标）
+node tools/converge.mjs --plan --dry-run   # 实跑：正常按无参计划模式出清单——--plan 被静默收下
+node tools/converge.mjs --no-such-flag     # 实跑：exit=0——未知旗标不报错
 ```
+
+②③ 文案失真（动作清单只在 --slug 路径打印；真仓现无 ✓ 可收敛 slug，按 §11 沙箱复刻 ready slug
+实跑 --slug <slug> --dry-run，沙箱已清理），实跑动作清单两行：
+
+```text
+· 证据副本 → snapshots/archive/convergence-2026-10-12/<slug>/（交付物整目录 + 1 篇 journal 副本）
+· 语义 TODO（CLI 不做）：CHARTER 历史纪要（各角色把本轮教训压进 kb/<role>/CHARTER.md）
+```
+
+第一行与 journal-only 实行相左（②）；第二行与已裁「书写者 = 维护者 CLI」相左（③）。
 
 ## 修复关联
 

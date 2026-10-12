@@ -1,12 +1,13 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P1
 opened: 2026-10-12
 ---
 
 # BUG-014：--charter-backfill 查重假跳过——COO 缺 ai-sprint-2026 历史纪要，卡上记了假绿
 
-> 严重级别：P1（重要）｜发现：2026-10-12（f8bc123...HEAD 双轴代码评审 Spec 轴）｜状态：调查中
+> 严重级别：P1（重要）｜发现：2026-10-12（f8bc123...HEAD 双轴代码评审 Spec 轴）｜状态：修复就绪
+> **翻转记录（2026-10-12）**：根因动态复现坐实（收据在复现节）+ 修法选定 + 已修判定在场——缺陷轨翻转表「调查中 → 修复就绪」（P1 修复型自授权通道）。
 
 ## 症状
 
@@ -35,6 +36,13 @@ grep -c "ai-sprint-2026" company-workspace/kb/coo/CHARTER.md          # ≥1（�
 sed -n '/## 历史纪要/,$p' company-workspace/kb/coo/CHARTER.md \
   | grep -c "· ai-sprint-2026（"                                       # 0（条目缺失）
 ```
+
+**实跑收据（2026-10-12，零写入动态复现）**：
+- 五份 CHARTER 对 `ai-sprint-2026` 的提及数：ceo 2 / vp-eng 2 / vp-sales 2 / **coo 1（唯一提及 = L14
+  的证据路径，非条目）** / cfo 2；COO 历史纪要条目计数 = **0**；
+- 无改动 re-run `--charter-backfill 2026-10-10-ai-sprint-2026`：五角色**全部**打印「CHARTER 已有
+  ai-sprint-2026 记载——跳过」并报「✓ backfill 完成」exit=0——COO 在零条目情况下被报「已有」，
+  假跳过坐实；`git status` 确认零写入（re-run 本身安全）。
 
 ## 修复关联
 
