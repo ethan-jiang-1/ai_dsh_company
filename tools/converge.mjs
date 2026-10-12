@@ -13,18 +13,17 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, rmSync } from 'node:fs'
 import { join, basename } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { charterHasEntry, journalSlug, resolveEvidenceDir } from './lib/converge-rules.mjs'
+import { charterHasEntry, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
 import { spawnSync } from 'node:child_process'
 
 const args = process.argv.slice(2)
-const argOf = name => { const i = args.indexOf(`--${name}`); return i === -1 ? undefined : args[i + 1] }
-// 未知旗标 fail-loud（BUG-016①：`--plan` 曾被文档发明出来，传了还被静默「碰巧能跑」）
-for (const a of args) if (a.startsWith('--') && !['--slug', '--dry-run', '--charter-backfill'].includes(a)) {
-  console.error(`✗ 未知旗标 ${a}——认识：--slug <目录名> / --dry-run / --charter-backfill <目录名>；无参 = 计划模式`)
-  process.exit(1)
-}
-const DRY = args.includes('--dry-run')
-const SLUG_ARG = argOf('slug')
+// 旗标解析单源 = tools/lib/converge-rules.mjs parseFlags（未知旗标 fail-loud——BUG-016①：
+// `--plan` 曾被文档发明出来，传了还被静默「碰巧能跑」）
+let DRY, SLUG_ARG, BACKFILL_ARG
+try {
+  const flags = parseFlags(args)
+  DRY = flags.dryRun; SLUG_ARG = flags.slug; BACKFILL_ARG = flags.charterBackfill
+} catch (e) { console.error(`✗ ${e.message}`); process.exit(1) }
 const WS = join(ROOT, 'company-workspace')
 const ACTIVE = join(WS, 'deliverables')
 const ARCHIVE = join(WS, 'deliverables-archive')
@@ -231,7 +230,7 @@ const charterBackfill = (dirName) => {
   console.log(`✓ backfill 完成：${slug} → ${roles.length} 角色 CHARTER`)
 }
 
-if (argOf('charter-backfill')) { charterBackfill(argOf('charter-backfill')); process.exit(0) }
+if (BACKFILL_ARG) { charterBackfill(BACKFILL_ARG); process.exit(0) }
 if (SLUG_ARG) { converge(SLUG_ARG); process.exit(0) }
 console.log(`收敛计划 @ ${today}${DRY ? '（dry-run）' : ''}\n`)
 const slugs = scanSlugs()

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mkdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { charterHasEntry, journalSlug, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
+import { charterHasEntry, journalSlug, parseFlags, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
 
 // converge.mjs 的纯判定规则（判据单一来源 = tools/lib/converge-rules.mjs；IO 在驱动脚本，tests/ 不碰文件面
 // ——沙箱对照实验与真仓复现收据见 _backlog 卡 BUG-014 / BUG-015）。
@@ -48,6 +48,26 @@ describe('converge-rules · CHARTER 历史纪要查重锚（BUG-014 假跳过）
   it('条目行锚不吞别家 slug 的条目（ai-sprint-2026-v4 ≠ ai-sprint-2026）', () => {
     const other = '- 2026-10-10 · ai-sprint-2026-v4（评审）—— 别家\n'
     expect(charterHasEntry(other, 'ai-sprint-2026')).toBe(false)
+  })
+})
+
+describe('converge-rules · 旗标解析（BUG-016 幽灵旗标）', () => {
+  // 负例留证 2026-10-12：BUG-016 —— 修复前未知旗标被静默收下（--plan / --no-such-flag 都「碰巧能跑」，
+  //   exit 0；收据 = 卡复现节）；本文件实现前实跑 = parseFlags 导出不存在红。
+  it('未知旗标 throw（--plan 不是旗标，无参即计划模式）', () => {
+    expect(() => parseFlags(['--plan'])).toThrow(/未知旗标/)
+    expect(() => parseFlags(['--no-such-flag'])).toThrow(/未知旗标/)
+  })
+  it('已知旗标全部接受并解析取值', () => {
+    expect(parseFlags(['--slug', '2026-10-02-ai-ready', '--dry-run'])).toEqual({
+      slug: '2026-10-02-ai-ready', dryRun: true, charterBackfill: undefined,
+    })
+    expect(parseFlags(['--charter-backfill', '2026-10-10-ai-sprint-2026'])).toEqual({
+      slug: undefined, dryRun: false, charterBackfill: '2026-10-10-ai-sprint-2026',
+    })
+  })
+  it('无参 = 计划模式（dryRun false、无 slug）', () => {
+    expect(parseFlags([])).toEqual({ slug: undefined, dryRun: false, charterBackfill: undefined })
   })
 })
 

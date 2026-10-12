@@ -24,6 +24,18 @@ export function charterHasEntry(charterText, slug) {
   return new RegExp(`^\\s*-\\s*\\d{4}-\\d{2}-\\d{2}\\s*·\\s*${esc}（`, 'm').test(charterText)
 }
 
+/** CLI 旗标解析（纯函数）——参数唯一源在 converge.mjs 头注（BUG-016：未知旗标曾静默收下）。 */
+const KNOWN_FLAGS = ['--slug', '--dry-run', '--charter-backfill']
+export function parseFlags(args) {
+  for (const a of args) {
+    if (a.startsWith('--') && !KNOWN_FLAGS.includes(a)) {
+      throw new Error(`未知旗标 ${a}——认识：--slug <目录名> / --dry-run / --charter-backfill <目录名>；无参 = 计划模式`)
+    }
+  }
+  const argOf = name => { const i = args.indexOf(`--${name}`); return i === -1 ? undefined : args[i + 1] }
+  return { slug: argOf('slug'), dryRun: args.includes('--dry-run'), charterBackfill: argOf('charter-backfill') }
+}
+
 /** 解析某已收敛 slug 的证据目录名（convergence-<日期>）。
  *  扫 snapshots/archive/ 下各 convergence-* 目录，认「<目录>/<dirName> 在场」为证据；
  *  多日并存取最新（ISO 日期字典序 = 时间序）；无证据目录 = throw（fail-loud——

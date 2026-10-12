@@ -10,7 +10,7 @@ live 公司盘随动议持续堆积（journal 曾达 39 篇跨 5 角色、live d
 
 - **CLI = 机械执行器，政策家不变**：`tools/converge.mjs` 实现 §归档动作的可机械化子集——无参计划模式（列可收敛/未闭合 slug + journal 收割预览）、`--slug` 收敛单个（证据副本 → `snapshots/archive/convergence-<收敛日>/<slug>/` → 归档家 git mv → journal 清出留 .gitkeep → 台账行逐字自动追加）、`--dry-run`、`--charter-backfill` 补登 CHARTER 历史纪要。语义判断与政策仍归 snapshots/README §归档动作与人。
 - **常态化入轮末**：`docs/guides/dev-loop.md` §12 收尾清单含收敛步（无参计划 → 逐个 --slug → --charter-backfill）；工具入口登记 = `checks/README.md`。
-- **判定规则单源**：`tools/lib/converge-rules.mjs`（journal 归属 / CHARTER 条目查重锚 / 证据目录解析），回归锚 = `tests/company/converge-rules.spec.ts`（guard-red-record 双负例留证）。
+- **判定规则单源**：`tools/lib/converge-rules.mjs`（journal 归属 / CHARTER 条目查重锚 / 证据目录解析 / CLI 旗标解析），回归锚 = `tests/company/converge-rules.spec.ts`（负例留证 ×3）+ `tests/harness/gitignore-guards.spec.ts`（BUG-013 的 ignore 规则守卫）。
 - **证据副本只收 journal**（被从 live 删除的才需留底）；交付物本体 git mv 进 `company-workspace/deliverables-archive/`，不双份拷贝。
 
 ## 输掉的方案
@@ -32,5 +32,5 @@ live 公司盘随动议持续堆积（journal 曾达 39 篇跨 5 角色、live d
 
 - 首轮全量收敛：4 slug 收完、journal 39→12、snapshots 回预算（`pnpm verify` snapshots-budget 56.5M/64M PASS）。
 - 缺陷红绿：实跑暴露缺陷 1–5，红绿收据逐条在归档卡验收表；后续评审缺陷落卡 BUG-013..017（复现收据在卡复现节），013–016 已修归档。
-- 回归锚：`pnpm test tests/company/converge-rules.spec.ts` = 10/10（实现前模块缺红）；全量 `pnpm verify` ALL PASS + `pnpm test` 48 文件 / 494 用例绿。
+- 回归锚：`pnpm test tests/company/converge-rules.spec.ts` = 13/13（parseFlags 用例实现前函数缺红）；`tests/harness/gitignore-guards.spec.ts` = 1/1（留证含删规则红 → 还原绿实跑）；全量 `pnpm verify` ALL PASS + `pnpm test` 49 文件 / 498 用例绿。
 - 未验留观：隔天补登的真实现场首跑（机制已被 spec 与 fail-loud 覆盖，未自然发生——triggers 无此观察项，属低风险常态）。
