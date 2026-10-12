@@ -7,6 +7,7 @@
 //   node tools/converge.mjs                     # 计划模式：列出可收敛/未闭合 slug + journal 收割预览 + 语义 TODO
 //   node tools/converge.mjs --slug <目录名>     # 收敛单个（前提：final + meta.closed + 一句话结论）
 //   node tools/converge.mjs --slug <目录名> --dry-run  # 只打印动作清单，不动盘
+//   node tools/converge.mjs --charter-backfill <目录名>  # 为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步）
 // 成本：秒级、无模型（纯文件/git 操作）；git mv/git rm 只动 tracked 文件。
 // 退出码：0 = 成功（计划或执行）；1 = 前置不满足/用法错误。
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, rmSync } from 'node:fs'
@@ -157,7 +158,31 @@ const converge = (dirName) => {
     }
     if (touched) writeFileSync(charter, ct)
   }
-  for (const r of refRewrites) console.log('  · CHARTER 引用重指：' + r)
+  // notes/implemented 的路径 currency 同属本改动（D38：keep paths current in the same change）
+  const implDir = join(ROOT, 'notes', 'implemented')
+  if (existsSync(implDir)) for (const n of readdirSync(implDir)) {
+    if (!n.endsWith('.md')) continue
+    const nf = join(implDir, n)
+    let nt = readFileSync(nf, 'utf8')
+    let touched = false
+    for (const j of journal) {
+      const ref = `company-workspace/kb/${j.role}/journal/${j.file}`
+      if (nt.includes(ref)) {
+        nt = nt.split(ref).join(`snapshots/archive/convergence-${today}/${dirName}/journal/${j.role}/${j.file}`)
+        touched = true
+        refRewrites.push(`notes/implemented/${n}：journal 路径 → 证据副本`)
+      }
+    }
+    for (const dref of [`company-workspace/deliverables/${dirName}/`]) {
+      if (nt.includes(dref)) {
+        nt = nt.split(dref).join(`company-workspace/deliverables-archive/${dirName}/`)
+        touched = true
+        refRewrites.push(`notes/implemented/${n}：交付物路径 → 归档家`)
+      }
+    }
+    if (touched) writeFileSync(nf, nt)
+  }
+  for (const r of refRewrites) console.log('  · 引用重指：' + r)
   git(['mv', join('company-workspace', 'deliverables', dirName), join('company-workspace', 'deliverables-archive', dirName)])
   const removed = []
   for (const j of journal) {
@@ -171,6 +196,42 @@ const converge = (dirName) => {
   console.log(`  语义 TODO：各角色 CHARTER 历史纪要（本轮教训压进 kb/<role>/CHARTER.md）——CLI 不代写`)
 }
 
+const ROLE_KEY = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo' }
+// --charter-backfill <目录名>：为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步机械化）。
+//   纪要素材逐字取 meta（结论不转写）；条目 = 日期 + slug（类型）+ 结论 + 两个归档位。
+//   已登记（CHARTER 里已有该 slug 字样）则跳过；「历史纪要」节缺失则新建。
+const charterBackfill = (dirName) => {
+  const slugDir = join(ARCHIVE, dirName)
+  if (!existsSync(join(slugDir, 'meta.md'))) { console.error(`✗ ${dirName}: 归档家无此目录`); process.exit(1) }
+  const mf = field => { const m = readFileSync(join(slugDir, 'meta.md'), 'utf8').match(new RegExp(`^${field}:\\s*(.*)$`, 'm')); return m ? m[1].trim() : '' }
+  const slug = mf('slug') || dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '')
+  const kickoff = mf('kickoff') || dirName.slice(0, 10)
+  const kind = mf('类型') || '—'
+  const concl = mf('一句话结论')
+  const roles = [...new Set((mf('参与').match(/CEO|VP-Eng|VP-Sales|COO|CFO/g) ?? []).map(r => ROLE_KEY[r]).filter(Boolean))]
+  if (roles.length === 0) { console.error(`✗ ${dirName}: meta.参与 无可解析角色`); process.exit(1) }
+  if (DRY) { console.log(`backfill 计划：${slug} → ${roles.join(', ')} 的 CHARTER 历史纪要（结论 ${concl.length} 字）`); return }
+  for (const role of roles) {
+    const charter = join(WS, 'kb', role, 'CHARTER.md')
+    let ct = existsSync(charter) ? readFileSync(charter, 'utf8') : ''
+    if (ct.includes(slug)) { console.log(`  · ${role}: CHARTER 已有 ${slug} 记载——跳过`); continue }
+    const BT = String.fromCharCode(96)
+    const entry = `- ${kickoff} · ${slug}（${kind}）—— ${concl}\n  （journal 全文：${BT}snapshots/archive/convergence-${today}/${dirName}/journal/${role}/${BT}；交付物：${BT}deliverables-archive/${dirName}/${BT}）`
+    const hdr = ct.match(/^## 历史纪要.*$/m)
+    if (hdr) {
+      const after = ct.indexOf('\n## ', hdr.index + 1)
+      const insertAt = after === -1 ? ct.length : after
+      ct = ct.slice(0, insertAt).replace(/\n$/, '') + '\n' + entry + '\n' + ct.slice(insertAt)
+    } else {
+      ct = ct.replace(/\n$/, '') + '\n\n## 历史纪要（2026-10-12 起由收敛 CLI 登记）\n\n' + entry + '\n'
+    }
+    writeFileSync(charter, ct)
+    console.log(`  · ${role} CHARTER 历史纪要 +1（${slug}）`)
+  }
+  console.log(`✓ backfill 完成：${slug} → ${roles.length} 角色 CHARTER`)
+}
+
+if (argOf('charter-backfill')) { charterBackfill(argOf('charter-backfill')); process.exit(0) }
 if (SLUG_ARG) { converge(SLUG_ARG); process.exit(0) }
 console.log(`收敛计划 @ ${today}${DRY ? '（dry-run）' : ''}\n`)
 const slugs = scanSlugs()
