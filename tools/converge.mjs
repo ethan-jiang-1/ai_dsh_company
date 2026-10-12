@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 收敛执行器：把 snapshots/README §归档动作 的五步手工流程机械化——
-//   证据副本 → git mv 交付物进归档家 → 清 live journal（留 .gitkeep）→ 台账行自动追加（逐字取 meta）→ 语义 TODO 打印。
+//   证据副本 → git mv 交付物进归档家 → 清 live journal（留 .gitkeep）→ 台账行自动追加（逐字取 meta，查重跳过）→ 打印 CHARTER 补登指引（--charter-backfill）。
 // 何时跑：用户说「收敛/清理工作区」时；或轮末维护者收敛已闭合动议时（维护者专用——分身不自行删改，见手册「轮末收敛」）。
 // 用法（参数唯一源 = 本头注；未知旗标 = 退出 1——`--plan` 不是旗标，无参即计划模式）：
 //   node tools/converge.mjs                     # 计划模式：列出可收敛/未闭合 slug + journal 收割预览
