@@ -6,7 +6,7 @@
 
 | 卡 | 一句话 |
 |---|---|
-| [2026-10-12-ceo-minimal-assembly](2026-10-12-ceo-minimal-assembly.md) | 单域动议 CEO 全员组队（负例 ai-coding-security-2026）——最小在屋起步的组队判断力显性化；探针两轮未复现红，判据形状待定 |
+| [2026-10-12-ceo-minimal-assembly](2026-10-12-ceo-minimal-assembly.md) | 组队健壮性三层防御：CEO 第一下抓对（最小在屋）／容忍多抓／成员可打回（域内核对义务）；负例 ai-coding-security-2026，探针两轮未复现红 |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)。
 
