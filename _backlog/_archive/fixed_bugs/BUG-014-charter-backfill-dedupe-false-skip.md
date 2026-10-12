@@ -1,5 +1,5 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P1
 opened: 2026-10-12
 ---
@@ -8,6 +8,7 @@ opened: 2026-10-12
 
 > 严重级别：P1（重要）｜发现：2026-10-12（f8bc123...HEAD 双轴代码评审 Spec 轴）｜状态：修复就绪
 > **翻转记录（2026-10-12）**：根因动态复现坐实（收据在复现节）+ 修法选定 + 已修判定在场——缺陷轨翻转表「调查中 → 修复就绪」（P1 修复型自授权通道）。
+> **修复（2026-10-12）**：查重判据迁 `tools/lib/converge-rules.mjs` 的 `charterHasEntry`（条目行形「- <日期> · <slug>（」锚），converge.mjs 不再整文件子串查重。红绿 = tests/company/converge-rules.spec.ts（实现前模块缺红 → 10 用例绿，含 COO 反例钉住 includes 误报）。真仓重跑 backfill：ceo/vp-eng/vp-sales/cfo 真条目精确跳过、**coo +1**（缺的 ai-sprint-2026 条目补登，逐字取 meta，指针解析到真实证据目录）；`pnpm verify` ALL PASS + `pnpm test` 494/494——已修判定满足，修复已落地 → 已修归档。
 
 ## 症状
 
@@ -18,7 +19,7 @@ opened: 2026-10-12
 
 ## 根因（假设→已证）
 
-[tools/converge.mjs:217](../../tools/converge.mjs) 的查重判据 = `ct.includes(slug)`（整文件子串包含）。
+[tools/converge.mjs:217](../../../tools/converge.mjs) 的查重判据 = `ct.includes(slug)`（整文件子串包含）。
 缺陷 3 的引用重指把含 slug 字样的**证据路径**写进了 CHARTER——coo/CHARTER.md L14 有
 `…/convergence-2026-10-12/2026-10-10-ai-sprint-2026/journal/coo/…`，子串 `ai-sprint-2026` 命中 →
 backfill 误判「已登记」。子串查重对「路径恰好含 slug」零免疫力；COO 恰好是缺陷 3 重指的受害者。

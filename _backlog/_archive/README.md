@@ -64,6 +64,8 @@
 | [BUG-011-instruction-carries-unverified-guess.md](fixed_bugs/BUG-011-instruction-carries-unverified-guess.md) | 指令夹带未证猜测：规则 + 派活行可选「假设」段（机器可读落点 + 解析断言） | 2026-10-11 |
 | [BUG-012-same-model-hats-independent-review-overclaim.md](fixed_bugs/BUG-012-same-model-hats-independent-review-overclaim.md) | 同模五帽：5 份模板加「复核独立性层级 + 边际宽度」两栏 + keyless 断言 | 2026-10-11 |
 | [BUG-013-e2e-driver-token-committed.md](fixed_bugs/BUG-013-e2e-driver-token-committed.md) | 观察窗 token 随无关 e2e driver 入库：untrack + .gitignore 显式规则（token 重启轮换，无历史重写） | 2026-10-12 |
+| [BUG-015-charter-backfill-evidence-date-coupling.md](fixed_bugs/BUG-015-charter-backfill-evidence-date-coupling.md) | backfill 证据路径写死运行日：按 slug 解析真实收敛目录 + fail-loud | 2026-10-12 |
+| [BUG-014-charter-backfill-dedupe-false-skip.md](fixed_bugs/BUG-014-charter-backfill-dedupe-false-skip.md) | backfill 子串查重假跳过：查重改条目行锚，COO 缺失条目补登 | 2026-10-12 |
 
 ## 随卡归档的研究
 

@@ -13,6 +13,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, rmSync } from 'node:fs'
 import { join, basename } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
+import { charterHasEntry, journalSlug, resolveEvidenceDir } from './lib/converge-rules.mjs'
 import { spawnSync } from 'node:child_process'
 
 const args = process.argv.slice(2)
@@ -35,15 +36,6 @@ const metaField = (dir, field) => {
   const m = readFileSync(join(dir, 'meta.md'), 'utf8').match(new RegExp(`^${field}:\\s*(.*)$`, 'm'))
   return m ? m[1].trim() : ''
 }
-/** journal 文件名 → 所属 slug。规则：剥日期后精确等于 slug，或以 slug- 开头且**不与任何其他 slug 精确同名**
- *   （前缀匹配会误吞后继 slug——2026-10-12 实测：收敛 ai-coding-security-2026 时前缀匹配把未闭合的
- *   -light / -v2 两个 slug 的 journal 一并清了）。无属主 = null（当轮散件，不清）。 */
-const journalSlug = (fileName, slug, allSlugs = []) => {
-  const stripped = fileName.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '')
-  if (stripped !== slug && allSlugs.includes(stripped)) return null  // 它是另一个 slug 的正主
-  return stripped === slug || stripped.startsWith(`${slug}-`) ? fileName : null
-}
-
 const scanSlugs = () => {
   const out = []
   if (existsSync(ACTIVE)) for (const d of readdirSync(ACTIVE)) {
@@ -78,11 +70,10 @@ const harvestJournal = (slug) => {
   return moved
 }
 
-const copyEvidence = (slugDir, slug, journal) => {
+const copyEvidence = (evDir, journal) => {
   // ⚠ 证据副本只收 **journal**（它们被从 live 删除，需要留底）；交付物本体 = git mv 进
   //   deliverables-archive（持久拷贝）——再拷一份进 snapshots 是双份存储（2026-10-12 实测把
-  //   snapshots 顶爆 64M 预算，84.1M）。
-  const evDir = join(ROOT, 'snapshots', 'archive', `convergence-${today}`, slug)
+  //   snapshots 顶爆 64M 预算，84.1M）。evDir 由调用方构造（converge() 内 evName 单一出处）。
   mkdirSync(join(evDir, 'journal'), { recursive: true })
   for (const j of journal) {
     const src = join(WS, j.path)
@@ -127,8 +118,10 @@ const converge = (dirName) => {
     类型: metaField(slugDir, '类型'), 参与: metaField(slugDir, '参与'), 墙钟: metaField(slugDir, '墙钟'), 结论: concl,
   }
   const journal = harvestJournal(fields.slug)
+  const evName = `convergence-${today}` // 证据目录 = 创建日（本函数创建；backfill 补登走 resolveEvidenceDir——BUG-015）
+  const evDir = join(ROOT, 'snapshots', 'archive', evName, dirName)
   const actions = [
-    `证据副本 → snapshots/archive/convergence-${today}/${dirName}/（交付物整目录 + ${journal.length} 篇 journal 副本）`,
+    `证据副本 → snapshots/archive/${evName}/${dirName}/（交付物整目录 + ${journal.length} 篇 journal 副本）`,
     `git mv deliverables/${dirName} → deliverables-archive/${dirName}`,
     ...journal.map(j => `git rm kb/${j.role}/journal/${j.file}（副本已入证据目录）`),
     `台账追加一行（逐字取 meta：${fields.结论.slice(0, 40)}…）`,
@@ -137,7 +130,7 @@ const converge = (dirName) => {
   console.log(`收敛计划 · ${dirName}${DRY ? '（dry-run）' : ''}`)
   actions.forEach(a => console.log('  · ' + a))
   if (DRY) { console.log('dry-run 结束，未动盘'); return }
-  const evDir = copyEvidence(slugDir, dirName, journal)
+  copyEvidence(evDir, journal)
   // ⚠ CHARTER 引用重指：CHARTER 里若有指向被清 journal 的反引号路径，清出即断链
   //   （foundation-safety 钉「CHARTER 的 kb/ 路径必须存在」）。指向一律改写为证据副本路径，
   //   并逐条打印供人复核（决定内容应已 inline 在 CHARTER 句里，此处只动指针）。
@@ -150,7 +143,7 @@ const converge = (dirName) => {
     for (const j of journal) {
       const ref = `kb/${j.role}/journal/${j.file}`
       if (ct.includes('`' + ref + '`') || ct.includes(ref)) {
-        const to = `snapshots/archive/convergence-${today}/${dirName}/journal/${j.role}/${j.file}`
+        const to = `snapshots/archive/${evName}/${dirName}/journal/${j.role}/${j.file}`
         ct = ct.split('`' + ref + '`').join(`'${to}'（原稿）`).split(ref).join(to)
         touched = true
         refRewrites.push(`kb/${role}/CHARTER.md：${ref} → ${to}`)
@@ -168,7 +161,7 @@ const converge = (dirName) => {
     for (const j of journal) {
       const ref = `company-workspace/kb/${j.role}/journal/${j.file}`
       if (nt.includes(ref)) {
-        nt = nt.split(ref).join(`snapshots/archive/convergence-${today}/${dirName}/journal/${j.role}/${j.file}`)
+        nt = nt.split(ref).join(`snapshots/archive/${evName}/${dirName}/journal/${j.role}/${j.file}`)
         touched = true
         refRewrites.push(`notes/implemented/${n}：journal 路径 → 证据副本`)
       }
@@ -199,24 +192,26 @@ const converge = (dirName) => {
 const ROLE_KEY = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo' }
 // --charter-backfill <目录名>：为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步机械化）。
 //   纪要素材逐字取 meta（结论不转写）；条目 = 日期 + slug（类型）+ 结论 + 两个归档位。
-//   已登记（CHARTER 里已有该 slug 字样）则跳过；「历史纪要」节缺失则新建。
+//   已登记（charterHasEntry 条目行锚——BUG-014）则跳过；「历史纪要」节缺失则新建；
+//   证据日期按 slug 解析真实收敛目录（BUG-015），无证据目录 fail-loud。
 const charterBackfill = (dirName) => {
   const slugDir = join(ARCHIVE, dirName)
   if (!existsSync(join(slugDir, 'meta.md'))) { console.error(`✗ ${dirName}: 归档家无此目录`); process.exit(1) }
-  const mf = field => { const m = readFileSync(join(slugDir, 'meta.md'), 'utf8').match(new RegExp(`^${field}:\\s*(.*)$`, 'm')); return m ? m[1].trim() : '' }
-  const slug = mf('slug') || dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '')
-  const kickoff = mf('kickoff') || dirName.slice(0, 10)
-  const kind = mf('类型') || '—'
-  const concl = mf('一句话结论')
-  const roles = [...new Set((mf('参与').match(/CEO|VP-Eng|VP-Sales|COO|CFO/g) ?? []).map(r => ROLE_KEY[r]).filter(Boolean))]
+  const slug = metaField(slugDir, 'slug') || dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '')
+  const kickoff = metaField(slugDir, 'kickoff') || dirName.slice(0, 10)
+  const kind = metaField(slugDir, '类型') || '—'
+  const concl = metaField(slugDir, '一句话结论')
+  const roles = [...new Set((metaField(slugDir, '参与').match(/CEO|VP-Eng|VP-Sales|COO|CFO/g) ?? []).map(r => ROLE_KEY[r]).filter(Boolean))]
   if (roles.length === 0) { console.error(`✗ ${dirName}: meta.参与 无可解析角色`); process.exit(1) }
-  if (DRY) { console.log(`backfill 计划：${slug} → ${roles.join(', ')} 的 CHARTER 历史纪要（结论 ${concl.length} 字）`); return }
+  let evName
+  try { evName = resolveEvidenceDir(join(ROOT, 'snapshots', 'archive'), dirName) }
+  catch (e) { console.error(`✗ ${dirName}: ${e.message}`); process.exit(1) }
+  if (DRY) { console.log(`backfill 计划：${slug} → ${roles.join(', ')} 的 CHARTER 历史纪要（journal 全文：snapshots/archive/${evName}/${dirName}/journal/<role>/）`); return }
   for (const role of roles) {
     const charter = join(WS, 'kb', role, 'CHARTER.md')
     let ct = existsSync(charter) ? readFileSync(charter, 'utf8') : ''
-    if (ct.includes(slug)) { console.log(`  · ${role}: CHARTER 已有 ${slug} 记载——跳过`); continue }
-    const BT = String.fromCharCode(96)
-    const entry = `- ${kickoff} · ${slug}（${kind}）—— ${concl}\n  （journal 全文：${BT}snapshots/archive/convergence-${today}/${dirName}/journal/${role}/${BT}；交付物：${BT}deliverables-archive/${dirName}/${BT}）`
+    if (charterHasEntry(ct, slug)) { console.log(`  · ${role}: CHARTER 历史纪要已有 ${slug} 条目——跳过`); continue }
+    const entry = `- ${kickoff} · ${slug}（${kind}）—— ${concl}\n  （journal 全文：\`snapshots/archive/${evName}/${dirName}/journal/${role}/\`；交付物：\`deliverables-archive/${dirName}/\`）`
     const hdr = ct.match(/^## 历史纪要.*$/m)
     if (hdr) {
       const after = ct.indexOf('\n## ', hdr.index + 1)
