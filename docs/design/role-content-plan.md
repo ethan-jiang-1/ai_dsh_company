@@ -17,55 +17,12 @@
    与最近 3 篇 `kb/<role>/journal/`，收工追加 journal"。这是 D8 决策（无 memory seam）的落点。
 4. **模板即流程**：写作类工作流的第一版就是"模板 + skill 指引"，不写代码。
 
-## 1. 五个角色的内容骨架
+## 1. 五角色现时内容（指针）
 
-### CEO（个体，demo 的入口与出口）
-
-- **persona 要素**：只对全局负责；接到动议先澄清目标与约束，再拆解（WBS 倾向）；指挥权
-  （创建/打断 teammates 是 Lead-only 权威，persona 里明说"你组建会议、分派任务、收口合稿"）；
-  收口时亲自合成并 `present` 交付物；语气简短、决断。
-- **skills（初版 3 个）**：`chairing-staff-meeting`（会议节奏：brief→并行→互审→收口）、
-  `task-decomposition`（拆任务到"单一 owner + 可验收"粒度，配 blockedBy 建议）、
-  `synthesizing-deliverables`（合稿规则：保留各职能的结论与分歧点，不抹平）。
-- **skills（2026-09-22 增补，轮间待办①按问题组队落地）**：`assembling-the-team`
-  （组队五步：要不要叫人 / 叫谁 / 不叫谁 / 哪条通道 / 定 slug），**排在 chairing 之前**，
-  职能归属从 chairing 步骤 2 搬进它（不并存）；`task-decomposition` / `synthesizing-deliverables`
-  未建——其职责实际由 chairing 步骤 2 / 5 承担。
-- **KB**：`kb/ceo/`（决策原则、对外文风样例）；journal 由本人追加。
-
-### VP of Engineering（职能：研发）
-
-- **persona 要素**：视角=可行性/成本/技术风险；对 PRD 有技术 veto；产出=评审意见+研发计划；
-  需要 deep-dive 时生 workers（one-shot subagent）并行调研。
-- **skills**（盘上现状）：`eng-workflow`（1 号端到端工作流）、`tech-feasibility-review`。
-  （旧文列的 `engineering-plan` / `spawning-research-workers` **从未落地**——2026-09-26 按盘核对更正；
-  需要时按 `<role>-workflow-<主题>` 追加。）
-- **KB**：`kb/vp-eng/`（技术栈事实、历史评审标准）。
-
-### VP of Sales（职能：销售/市场）
-
-- **persona 要素**：视角=客户/市场/定价；对"没人买"有 veto；产出=市场判断+定价建议。
-- **skills**（盘上现状）：`sales-workflow`（1 号端到端工作流）、`market-sizing`（假设→估算→敏感度）、`customer-voice`（从 KB 客户访谈提炼）。
-- **KB**：`kb/vp-sales/`（客户画像、竞品事实）。
-
-### COO（职能：运营）
-
-- **persona 要素**：视角=落地/预算/流程合规；对"运营接不住"有 veto；产出=运营方案+预算核查。
-- **skills**（盘上现状）：`ops-workflow`（1 号端到端工作流）、`ops-feasibility`（人力/流程/时程核查）、`budget-check`。
-- **KB**：`kb/coo/`（流程手册、预算基准）。
-
-### CFO（职能：财务，R2 增设）
-
-- **persona 要素**：视角=现金/成本/合规；对"现金流撑不住 / 毛利低于底线 / 账务不合规"有 veto；
-  产出=项目经济性测算 + 财务合规意见（SoD 与留痕是硬闸门）。
-- **skills**（盘上现状）：`cfo-workflow`（1 号端到端工作流）、`project-economics`（毛利底线 30%
-  签字线、人·周分摊、里程碑收款曲线）、`finance-compliance`（SoD、留痕字段、四流一致、AI 产出不得入账）。
-- **KB**：`kb/cfo/`（财务条线事实、SoD 纪律、双签线、现金流原则）。
-
-### 共享层（全员）
-
-- 全局指令：公司手册经 `agent-instructions` 行注入（基线 = `company-workspace/AGENTS.md`，D17；守卫 = `checks/smoke/handbook-smoke.mjs`）。
-- `templates/`（workspace）：`prd.md`、`review-note.md`、`decision-memo.md`、`weekly-report.md`、`ops-review-note.md`（COO 专用运营核查）。
+persona 要点 / 工作流与打法 skills / KB 骨架 / 逐角色验证的**现时语义唯一家 = [presets.md](../presets.md)**
+（内容本体 = [presets/](../../packages/company-pack/presets/) 各角色文件）。本篇曾复刻一份逐角色
+清单，实测漂移过一次（2026-09-26 按盘核对：旧文列的 skills 名从未落地）——2026-10-12 退役复刻面，
+只留设计原则（§0）、落点政策（§2）与探针设计（§3）。
 
 ## 2. skills / KB 的落点（对照 architecture §5 三载体）
 

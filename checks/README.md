@@ -13,7 +13,7 @@
 | 确认 client 真的装配 | [client-load-smoke](smoke/client-load-smoke.mjs) |
 | 确认录制行为与工作区判据 | [replay-smoke](smoke/replay-smoke.mjs) |
 | 审计动议输出和角色留痕 | [deliverables-check](audit/deliverables-check.mjs)、[authorship-audit](audit/authorship-audit.mjs)、[journal-audit](audit/journal-audit.mjs) |
-| 查看运行中页面 | [cdp-probe](../probes/browser-visual/cdp-probe.mjs)；操作合同见 [CDP 指南](../docs/cdp-probe.md) |
+| 查看运行中页面 | [cdp-probe](../probes/browser-visual/cdp-probe.mjs)；操作指南见 [CDP 指南](../docs/guides/cdp-probe.md) |
 | 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs)、[export-dist](../tools/export-dist.mjs) |
 
 模型调用与浏览器是两种独立成本。keyless 表示无需模型密钥：真实进程、浏览器或安装链仍有成本，保留在独立脚本 lane。文件名用来定位层，参数和头注决定实际运行模式；例如 replay 默认回放，`--ui` 加浏览器，`--record` 才重录模型调用。`presence-e2e` 检查 RPC 投影，不启动浏览器。

@@ -156,7 +156,7 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
    skill 指引"开工先读自己的 journal"。这反而贴合公司隐喻：离职换人（换 preset/换模型），
    公司资产（KB/journal/deliverables）留在盘上。
 
-## 5. 落到本 repo 的增量（对 [architecture.md](./architecture.md) §6 目录树的补丁）
+## 5. 落到本 repo 的增量（M2 落地时的形状假设，未实施——触发条件见 §3 选型速查）
 
 ```text
 packages/company-pack/

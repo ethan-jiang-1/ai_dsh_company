@@ -251,47 +251,16 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
 
 ---
 
-## 6. 推荐目录树（Option A，单 pack 起步）
+## 6. repo 形态（Option A，单 pack 起步）
 
-```text
-ai_dsh_company/
-├── AGENTS.md                     # 入口链：怎么跑、DSH 源在 vendor/dsh、探索路由、DSH_HOME 兜底
-├── CLAUDE.md -> AGENTS.md
-├── pnpm-workspace.yaml           # packages/* + vendor/dsh 全树（packages/*/* + apps/* + vendor/* + native/system*）
-├── package.json                  # private root；dsh script 指向 vendor/dsh 的 CLI 入口；
-│                                 #   devDeps 含四个 insert 行的 workspace:* 链接（require.resolve 解析需要，R1 实证）
-├── tsconfig.json                 # 源码面门面：extends vendor base（paths → vendor src）
-├── packages/
-│   └── company-pack/             # 唯一发布载体（自包含），第 0 天就这一个包
-│       ├── package.json          # dsh.bundle.patch + runtime 依赖（peerDependencies，不钉死版本）
-│       ├── cordis.patch.yml      # bundle 行（host 共享面）：agent-preset-registry 替换 + 团队/present insert
-│       ├── presets/
-│       │   ├── ceo/              # agent.cordis.yml（persona + delegation 工具行 + team 使用策略）
-│       │   │   └── skills/       # CEO 专属 skills（战略、会议主持、任务拆解……）
-│       │   ├── vp-eng/           # 同构：persona + skills/（研发管线、技术评审……）
-│       │   ├── vp-sales/
-│       │   ├── coo/
-│       │   └── cfo/
-│       └── src/                  # 自定义工具/服务（org_chart、公司检索……有了再建）
-├── company-workspace/            # 运行时"公司共享盘"：会话的 cwd（gitignore 运行残留）
-│   ├── kb/                       #   活 KB（handbook、各角色 wiki……）
-│   ├── templates/                #   文档模板（PRD/周报/评审……）
-│   └── deliverables/             #   产出物落这里，用 present 标记
-├── vendor/dsh/                   # git submodule 钉 release tag（agent 探索 DSH 源码的红利）
-├── run/                          # 运行面（tracked 启动配置；2026-10-07 S1 起，原 dev/）
-│   ├── env.sh                    # 双 home 兜底（DSH_HOME）+ 裸 dsh 拦截
-│   └── company.overlay.yml       # headless + --patch 实验/动议用的 insert overlay（无 web-app 行的组合）
-├── runtime/                      # 运行残留家（gitignored）：harness-home（开发 DSH_HOME）、排练盘……
-├── checks/                       # 验证面（真实入口冒烟 + 盘面判据 + run-gates 门禁）
-│   ├── run-gates.mjs                # 结构/链接/自包含门禁
-│   └── smoke/release-smoke.mjs   # npm pack → 干净 profile → dsh plugin add → 冒烟会话
-├── probes/                       # 调试面（窄机制与视觉探针）
-├── tools/                        # 工具面（维护工具 + lib 纯逻辑 + drivers 真实驱动 + archive）
-│   └── sync-dsh.mjs              # vendor 换 tag + SHA 簿记 + typecheck + 矩阵加列
-├── docs/                         # 当前合同（只写 now）：preset 语义、KB 布局、协作通道选择
-├── notes/                        # 决策记忆：proposed/（已批 RFC）+ implemented/ + rejected/ + archived/ + postmortem/（分类 owner = notes/README）
-└── snapshots/                    # 自建最小 replay（JSONL 日志 diff 起步，够用再升）
-```
+形态一句话：**独立 repo + `vendor/dsh` 钉 SHA submodule + 单 company-pack（唯一发布载体）+
+`company-workspace/` 共享盘 + 双 home**（日用 `~/.dsh` 不动，开发 `DSH_HOME=runtime/harness-home`，
+环境脚本兜底）。装法与取舍的判定依据 = FAQ 13 `option-a-standalone-with-pinned-dsh.md`
+（外部研究材料，登记见 [index §外部研究材料登记](../index.md)）。**本节不复刻目录树**：
+现行目录逐件 owner 与产物落点的唯一家 = [项目地图](../project-map.md)（秒级快览 = 根
+[AGENTS.md 布局块](../../AGENTS.md)，受 layout-block 门禁钉住）——第二张空间地图必漂
+（实测：本树漏 tests/_backlog/_dist 三面，snapshots 与 company-workspace 两行注释过期，
+2026-10-12 退役）。
 
 要点：
 

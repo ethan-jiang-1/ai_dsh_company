@@ -26,7 +26,7 @@ runtime/                运行残留家（mostly gitignored，少数 tracked：�
 snapshots/              回归证据资产；规则与分类 = snapshots/README.md
 ```
 
-设计全貌与决策台账：`docs/index.md`。任务入口与执行规则唯一见 [开发环 §0.5/§1](docs/guides/dev-loop.md)；任务源 = 已批 RFC（notes/proposed/ 状态行带「批准：」）与用户点名。**条目状态不镜像进本文件**（只收常设指令）。
+设计全貌与决策台账：`docs/index.md`。任务入口与执行规则唯一见 [开发环 §0.5/§1](docs/guides/dev-loop.md)；任务源 = 已批 RFC（notes/proposed/ 状态行带「批准：」）与用户点名；唯一例外 = 缺陷卡「修复就绪」自授权（规则唯一家 = [开发环 §0.5](docs/guides/dev-loop.md)、[_backlog 章程](_backlog/README.md)）。**条目状态不镜像进本文件**（只收常设指令）。
 
 **notes/ 是开发流程核心数据**：开工按主题检索相关 Note；非平凡变更同 diff 更新对应 Note；分类与收尾规则唯一家 = [notes/README.md](notes/README.md)。
 

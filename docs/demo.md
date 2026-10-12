@@ -18,7 +18,7 @@
 **启动口令约定**：在本仓库上下文中，“启动一下这个插件”“启动一下这个”或“把这个跑起来”，默认指启动当前 Dream Team company pack 的独立 DSH Web 环境。完成定义是：使用仓库隔离 home，启动一个非 3080 的新 DSH 端口，拿到带 token 的 URL，并通过插件挂载冒烟；这一步不包含创建会话或运行 demo，除非用户另行指定。
 
 **呈现即验证**（2026-09-30 立，用户裁定；规则唯一见 [dev-loop §1](./guides/dev-loop.md)）：替人起观察窗 = 先自己跑通本节（boot 横幅 + roster + client 零挂载失败），红了当场修，全绿才交 URL——用户不当第一次验收员。
-**机器腿 = [cdp-probe](./cdp-probe.md)**：`node probes/browser-visual/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/8 页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
+**机器腿 = [cdp-probe](./guides/cdp-probe.md)**：`node probes/browser-visual/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/全部公司页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
 
 1. `source run/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒，自检代替警告）**：
    `pnpm dsh --profile web --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 就说明你起的是日用 `~/.dsh`
@@ -70,8 +70,8 @@
   `<slug>/final.md` 都能回溯到**一次 CEO 的 `present`**；`drafts/` 里的稿子不算成品；
   `kb/**` 不在判据射程内。判据语义与三个设计决定见 `notes/archived/2026-09-22-r4-workshop-flow.md`。
   「CEO 的 present」按**会话形状**核 = Lead 根会话（`agentPreset=ceo` 且 `delegationDepth=0`）的
-  present——公司手册「只有 CEO」的角色措辞与此同指（单操作者与多人模式成品都只从 CEO 门出）；
-  本句 = 角色措辞与会话判据的单点映射家。
+  present；本句 = 角色措辞与会话判据的**单点映射家**——公司手册「只有 CEO」的角色措辞与此同指
+  （单操作者与多人模式成品都只从 CEO 门出），手册侧的「映射单家」即指此处。
 - 审**归档快照**要加 `--only <slug>`：快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只装
   本轮日志，不给作用域会把历史成品误报成"无 Lead 背书"（那是输入不成对，不是违规）。
 - 一条反证基线：往 `deliverables/<slug>/` 塞一份没被 `present` 过的 `final.md`，该检查必须变红。

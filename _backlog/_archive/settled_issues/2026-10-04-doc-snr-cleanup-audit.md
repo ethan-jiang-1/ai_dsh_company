@@ -24,7 +24,7 @@
 
 ### B. 概念相左（同一事实两处说法不一）
 
-6. **公司页签数 5 vs 8**：[ui-demo.md L131/L138](../../../docs/design/ui-demo.md) + [index.md L146](../../../docs/index.md) 说五个平台页签；[cdp-probe.md L12](../../../docs/cdp-probe.md) 说八个，代码 `packages/company-pack/src/client/index.ts` L250 起注册八个（待办/看板/依赖图/在场/用量/任务板/培养/台账）。探针文档对，设计合同 + 地图过期。
+6. **公司页签数 5 vs 8**：[ui-demo.md L131/L138](../../../docs/design/ui-demo.md) + [index.md L146](../../../docs/index.md) 说五个平台页签；[cdp-probe.md L12](../../../docs/guides/cdp-probe.md) 说八个，代码 `packages/company-pack/src/client/index.ts` L250 起注册八个（待办/看板/依赖图/在场/用量/任务板/培养/台账）。探针文档对，设计合同 + 地图过期。
 7. **[presets.md](../../../docs/presets.md) 自相矛盾**：L102 说自主节律已由 0.2.0 收割批 3 落地；L149 说缺上游 seam 住退役搁置池——批 3 落地后尾行没跟上。
 8. **[multi-human.md L38-39](../../../docs/multi-human.md)**「手册缺这条区分——已登记待补」：手册 L91-94、L149-150 早已含该区分（根会话 vs 被委派成员的分水岭）——「待补」已失效。
 9. **证据纪律条数三说**：[dev-loop L267](../../../docs/guides/dev-loop.md)「七条」/ [testing.md L50](../../../docs/testing.md) 标题「九条教义」/ 实列 8 条（testing.md L52-59）。

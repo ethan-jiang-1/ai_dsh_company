@@ -7,11 +7,11 @@
 // 前置：GUI URL（demo.md §前置：source run/env.sh → pnpm dsh web -- --port 0 --no-open → 横幅 URL）；
 //   Chrome 二进制：DSH_PROBE_CHROME 环境变量或系统 Chrome（run/env.sh 已指 Chrome for Testing）。
 // 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser]
-//   默认断言面 = composer + 品牌 + 右栏 8 公司页签逐个开（Start-chip 回切）+ console/异常捕获。
+//   默认断言面 = composer + 品牌 + 右栏全部公司页签逐个开（Start-chip 回切）+ console/异常捕获。
 //   --ask 会真建会话（registry default = ceo）输入问题发送并等待轮次收口——完整产品环，留测试会话。
 // 退出码：0 = 全部断言成立；1 = 有断言失败（JSON verdict 已打印，含 consoleProblems/exceptions）。
 // 出处：驱动 = ai_dsh_loop_advisor/tools/drivers/cdp-driver.mjs（2026-10-01 owner 指令内化，
-//   docs/cdp-probe.md 记模式与环境坑）；场景选择器与本仓坑（首启双模态、Start-chip 回切、
+//   docs/guides/cdp-probe.md 记模式与环境坑）；场景选择器与本仓坑（首启双模态、Start-chip 回切、
 //   dock 前后台子树 .some() 扫描）为本仓 2026-09/10 走查实证。
 import { repositoryRoot } from '../../tools/lib/repository-layout.mjs';
 import { launchCdpBrowser } from '../../tools/drivers/cdp-driver.mjs';
@@ -99,7 +99,7 @@ try {
   verdict.brandPresent = await evaluate(
     `document.body.innerText.includes('DSH 梦之队')`) === true;
 
-  // 右栏 8 公司页签：guide 清点 → 逐个开（Start-chip 回切——开一个页签后 guide 列表被
+  // 右栏全部公司页签：guide 清点 → 逐个开（Start-chip 回切——开一个页签后 guide 列表被
   // 页签条替换，必须回 Start 再开下一个；dock 为每会话保留前后台子树 ⇒ 断言用 includes 扫全文）。
   await evaluate(`(() => {
     const btn = [...document.querySelectorAll('button')].find(b => /Open right sidebar|打开右侧边栏/.test(b.getAttribute('aria-label') ?? ''));

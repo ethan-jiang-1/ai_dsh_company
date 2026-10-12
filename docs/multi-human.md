@@ -4,7 +4,7 @@
 > 顶层合同：**多个物理人**在同一家公司共享盘上协作的**形态、开门配方、边界与迁移清单**。
 > 人侧归属与授权面的事实家 = [`company-workspace/kb/owners.md`](../company-workspace/kb/owners.md)；
 > 成员侧的协作规矩 = [`company-workspace/AGENTS.md`](../company-workspace/AGENTS.md)。
-> 来源与取舍（含输掉的方案）= [proposed/multi-human-role-routing](../notes/archived/2026-09-26-multi-human-role-routing.md)。
+> 来源与取舍（含输掉的方案）= [multi-human-role-routing（已归档）](../notes/archived/2026-09-26-multi-human-role-routing.md)。
 > **不许复杂化**（用户定的）：不搞 client/server、不搞账号体系、**不在 DSH 里造"人"这一层**。
 
 ## 0. 先读这条：机制边界（决定一切怎么摆）

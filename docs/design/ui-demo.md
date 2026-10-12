@@ -137,7 +137,7 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 | 层 | 正式名 | UI 标签 | 代码实体 | 平台载体 |
 |---|---|---|---|---|
 | 整页视图 | **公司视图** | 「公司」 | `CompanyView.tsx` / id `dsh-company-pack/company` | `conversation.view` 条目（官方术语 target View） |
-| 右栏页签（五个） | **公司页签**：看板 / 依赖图 / 在场 / 用量 / 任务板 | 同名 | `company-tabs.tsx` / id `dsh-company-pack/<name>` | `sidebar.right.pane.tab` + `ctx.sidebarRightTabs`（可 `float()` 浮出） |
+| 右栏公司页签 | **公司页签**（清单 = 客户端注册面，随切片持续增长——不在此枚举） | 每页签名即 UI 标签 | id `dsh-company-pack/<name>`（注册面 = [src/client](../../packages/company-pack/src/README.md)） | `sidebar.right.pane.tab` + `ctx.sidebarRightTabs`（可 `float()` 浮出） |
 | 视图内四面板 | **看板 / 依赖图 / 在场 / 用量** | 同名 | `BoardPanel` / `DagPanel` / `PresencePanel` / `BudgetPanel`（`company-panels.tsx`） | 无独立名分（公司视图内子页签 + 公司页签体共用组件） |
 
 **改名映射**（历史层不改写，能对上即可）：旧「Company 驾驶舱」→ 旧「公司驾驶舱」（R5b–条目 ①）→

@@ -11,10 +11,12 @@
 
 | 区 | 测什么 | 不证明什么 |
 |---|---|---|
-| [tests/company](./company/) | 公司读模型判据：board / dag / ledger / presence / deliverables / authorship / budget / signoff / cultivation 纯逻辑与 oracle | 装配、真挂载、会话级行为 |
-| [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫（delegation-card / dag-panel / attention / float-geometry …） | 真浏览器渲染交互（→ client-load-smoke） |
-| [tests/presets](./presets/) | persona / skills 声明内容（presets.spec） | 组合装配与工具行实际生效（→ preset-smoke + 会话日志证据） |
-| [tests/harness](./harness/) | 结构与合同守卫：layering / keyless-imports / pack-exports / release-foundation / foundation-links / workspace-oracle / entry-probe / repository-layout / navigation-assets | 运行行为（结构检查不证明行为） |
+| [tests/company](./company/) | 公司读模型与审计判据的纯逻辑与 oracle（对象面 = [company-pack 共享读模型](../packages/company-pack/src/README.md)与审计口径） | 装配、真挂载、会话级行为 |
+| [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫 | 真浏览器渲染交互（→ client-load-smoke） |
+| [tests/presets](./presets/) | persona / skills 声明内容 | 组合装配与工具行实际生效（→ preset-smoke + 会话日志证据） |
+| [tests/harness](./harness/) | 仓库级结构与合同守卫（分层、导入导出、导航骨架、发布地基、证据活性这类断言） | 运行行为（结构检查不证明行为） |
+
+spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随仓库增长，写进文档必过期）；导航到区，不到件。
 
 ## 改动面 → 最窄检查
 

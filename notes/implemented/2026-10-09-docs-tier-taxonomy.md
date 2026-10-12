@@ -10,7 +10,7 @@
 
 - **`docs/design/` 长成「动工前的设计决策记录」**（[architecture.md](../../docs/design/architecture.md):8 自述），共 4 份 791 行。这正是 DSH tier 表说**该归 Note** 的那一格：「decision rationale → Agent Notes」「migration plans / acceptance checklists / spec-speak excluded once shipped」。
 - **[role-content-plan.md](../../docs/design/role-content-plan.md) 自己声明「已定稿——五角色内容随 R2 全员落地」**——一份已完成的历史叙述留在设计层，而设计层的职责是「仍在指导未来选择的机制依据」。
-- **两份 docs 从未登记进 index §现有文档**：`cdp-probe.md`、`runtime-map.md`（后者是顶层合同，还挂在根 AGENTS.md 的入口链上）。登记全靠人记得，没有任何检查。
+- **两份 docs 从未登记进 index §现有文档**：`docs/guides/cdp-probe.md`、`runtime-map.md`（后者是顶层合同，还挂在根 AGENTS.md 的入口链上）。登记全靠人记得，没有任何检查。
 
 全仓只有 **2 个** subtree `AGENTS.md`（根 + `company-workspace/`），vendor 有 **11 个**——按目录就近声明规矩的机制本仓基本没用。
 
@@ -54,7 +54,7 @@
 | 红 2 | 删表头「不属于这层」 | `FAIL doc-taxonomy: … tier 表缺「不属于这层」列——只写正向职责则边界靠猜` → 还原 → 绿 |
 | 红 3 | 新建 `docs/zz-tmp-unregistered.md` | `FAIL doc-taxonomy: 这些 docs/ 文件未在 index.md §现有文档 登记…：zz-tmp-unregistered.md` → 删除 → 绿 |
 | 绿 | `pnpm verify` | `PASS doc-taxonomy（分层规矩在场 + 20 份 docs 全登记）`、`verify: ALL PASS` |
-| 登记补口 | index §现有文档 +6 行 | `cdp-probe.md` / `runtime-map.md` / `project-map.md` / `orient.md` / `AGENTS.md` 补登（前两份为本轮**实测**的漏登） |
+| 登记补口 | index §现有文档 +6 行 | `docs/guides/cdp-probe.md` / `runtime-map.md` / `project-map.md` / `orient.md` / `AGENTS.md` 补登（前两份为本轮**实测**的漏登） |
 | 棘轮 | `DOC_LINE_BUDGETS` 148→143；新增 `docs/AGENTS.md` 62 | `PASS doc-budget docs/index.md (143/143)`、`PASS doc-budget docs/AGENTS.md (55/62)` |
 
 **红 1 第一次跑没有输出，暴露了一个真 bug（已修）**：`DOC_LINE_BUDGETS` 循环直接 `readFileSync`，
