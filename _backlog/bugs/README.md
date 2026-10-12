@@ -2,7 +2,7 @@
 
 当场修掉的不建卡。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。
 
-**下一个缺陷号**：Next BUG ID = 13；已分配 BUG-001..012。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 18；已分配 BUG-001..017。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，修相对链接并更新两边清单。
 
@@ -10,8 +10,13 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
+| [BUG-013-e2e-driver-token-committed](BUG-013-e2e-driver-token-committed.md) | 观察窗 token 随无关 e2e driver 入库（误 add；token 重启即换，无历史重写） | P1 |
+| [BUG-014-charter-backfill-dedupe-false-skip](BUG-014-charter-backfill-dedupe-false-skip.md) | backfill 子串查重假跳过——COO 缺 ai-sprint-2026 历史纪要且验收表记了假绿 | P1 |
+| [BUG-015-charter-backfill-evidence-date-coupling](BUG-015-charter-backfill-evidence-date-coupling.md) | backfill 证据路径写死「今天」——隔天补登必写断链 | P2 |
+| [BUG-016-converge-self-description-drift](BUG-016-converge-self-description-drift.md) | converge 自述三处失真（幽灵旗标 --plan / plan 文案 / 完成 TODO） | P2 |
+| [BUG-017-record-hygiene-residue](BUG-017-record-hygiene-residue.md) | 记录残留——缺陷计数 3/4/5 并存、stray 断链、台账叙述出入、缺 convergence Note | P2 |
 
-当前无活跃缺陷卡。BUG-008/009/010/011/012 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+当前活跃缺陷卡 5 张（BUG-013..017，2026-10-12 评审立卡）。BUG-001..012 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

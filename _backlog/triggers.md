@@ -12,3 +12,4 @@
 
 | 对象 | 裁决 | 触发条件（单次观察及其位置） | Owner |
 |---|---|---|---|
+| snapshots 证据副本体积（`convergence-*/` 的 journal 留底，每 slug 收敛各拷一份） | 维持现行政策（不预外置）；外置冷存的家 = snapshots/README 冷存政策 | 下一次 `pnpm verify` 的 snapshots 体积门禁（≤64M）红 | 当轮收敛执行者（维护者） |
