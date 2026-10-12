@@ -221,3 +221,25 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 })
+
+describe('组队健壮性三层防御（2026-10-12 用户裁定；issue 2026-10-12-ceo-minimal-assembly）', () => {
+  it('B3 · CEO 组队技能带结构性硬条款（最小在屋起步 / 菜单算术 / 字段≠入屋 / 收打回=纠错）', () => {
+    const skill = readFileSync(join(PRESETS_DIR, 'ceo', 'skills', 'assembling-the-team', 'SKILL.md'), 'utf8')
+    expect(skill, '缺「最小在屋起步」硬条款——单 owner 起步为推荐默认（负例：17 场 ~15 场四职起手）')
+      .toMatch(/最小在屋|单 owner 起步/)
+    expect(skill, '缺「菜单算术一致性」——选项名单 = 工作项 owner 全集，spawn ⊆ 选中名单')
+      .toMatch(/菜单算术|在屋名单.*全集|spawn ⊆/)
+    expect(skill, '缺「验收字段 ≠ 入屋理由」——跨域字段初稿 + 待确认，不为字段拉人')
+      .toMatch(/字段.{0,6}入屋|待.{0,3}确认/)
+    expect(skill, '缺「收打回 = 纠错信号」处理句（andon：不追责）').toMatch(/打回.{0,12}(纠错|响应|不追责|三选一)/)
+  })
+
+  it('B3 · 成员侧打回规范在场（手册：域内核对义务 + 打回三件套 + 不追责）', () => {
+    const handbook = readFileSync(join(ROOT, 'company-workspace', 'AGENTS.md'), 'utf8')
+    expect(handbook, '缺成员「域内核对」义务（收到分派先答：我的域？判据给我了吗？）')
+      .toMatch(/域内核对/)
+    expect(handbook, '打回缺三件套形状（为什么不是我 / 缺什么 / 建议谁接）')
+      .toMatch(/建议谁接|为什么不是我/)
+    expect(handbook, '打回缺不追责句（andon：纠错贡献不是冒犯）').toMatch(/不追责|纠错贡献|不是冒犯/)
+  })
+})

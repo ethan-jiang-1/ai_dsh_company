@@ -27,6 +27,6 @@ intent: "为什么需要这份依据。"
 
 | 文件 | 活卡与用途 |
 |---|---|
-| [ceo-minimal-assembly/2026-10-12-assembly-evidence.md](ceo-minimal-assembly/2026-10-12-assembly-evidence.md) | 活卡 [issues/2026-10-12-ceo-minimal-assembly](../issues/2026-10-12-ceo-minimal-assembly.md)：三层防御的证据基线（触点盘点 / 17 场组队全景 / 失败链 / andon 与 RACI / 判据形状） |
 
-目前无其他活跃研究材料；随卡归档的研究见 [研究归档](../_archive/research/README.md)。
+目前无活跃研究材料（ceo-minimal-assembly 证据稿已随结案卡迁
+[研究归档](../_archive/research/ceo-minimal-assembly/2026-10-12-assembly-evidence.md)）；随卡归档的研究见 [研究归档](../_archive/research/README.md)。；随卡归档的研究见 [研究归档](../_archive/research/README.md)。

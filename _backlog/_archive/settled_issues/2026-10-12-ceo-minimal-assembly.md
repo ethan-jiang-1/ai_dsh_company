@@ -1,11 +1,14 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-10-12
 ---
 
 # 推敲：单域动议的最小在屋组队判断（CEO 不全员铺开）
 
-> 立卡：2026-10-12 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 毕业：做（验收标准已立） ｜ 可关闭：否
+> 立卡：2026-10-12 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
+> 结论与去向：**做，已落地**（2026-10-12）——三层防御实现于 assembling-the-team（第一层 + 收打回句）、
+> chairing（互审门槛）、公司手册「域内核对与打回」（第三层）；RFC = [implemented/2026-10-12-assembly-robustness-three-layers](../../../notes/implemented/2026-10-12-assembly-robustness-three-layers.md)
+> （含 B1–B4 红/绿收据）；验收记录见下方附录。🔒 项（僵死动议 ai-coding-security-2026 处置）仍待用户。
 > 授权链：用户 2026-10-12「那就setup goal 来推动整个落地吧，步步为营……我回来就希望看你都做完」——
 > research/敲打/验收/落地实施按次序自主推进；分叉由 agent 带证据决策、本卡留追认点。
 
@@ -116,3 +119,13 @@ opened: 2026-10-12
 按 [章程](../README.md) 四结论：**做** = 修复落点 + `## 验收标准`（含负例复现手段）+ 申请去向记录；
 **以后做** = 触发条件（下次单域动议再全员铺开时）；**不做** = 理由（如判定现状条款够用——需新证据支撑）；
 **结论已在别处** = 指向既有决定。🔒 僵死动议的处置与修复实施均需用户点名。
+
+
+## 验收记录（2026-10-12 落地实跑）
+
+- B1 红：--session 判 live 实录 session-6cce7fb4 → over-assembly（spawns=4）；绿：新 skill 真跑 →
+  minimal-assembly（session-dacbb0a5，exit 0）。
+- B2 红：live T5 零质疑出稿（旧规范）；绿：新规范真跑 → bounce-back（session-cfe1d55f，exit 0，
+  产物留排练场、live 零污染——首版场景未钉路径致一次 live 污染已删并修正）。
+- B3 红：两断言缺条款；绿：16/16。B4：preset-smoke ALL PASS。
+- 全量：verify ALL PASS；pnpm test 全绿（含新 B3 锚两条）。

@@ -2,6 +2,7 @@
 // 状态：常驻
 // 何时跑：改 assembling-the-team / chairing-staff-meeting 的组队与互审判断后；或一场真跑动议后核对。
 // 用法：node 本脚本            # 起排练场真跑一场再判（真模型，分钟级；ask 用真 UI 答首选项让轮收口）
+//       node 本脚本 --session <会话目录>  # 判既有会话（红证/复盘用，不起进程；负例实录可直接判红）
 // 成本：真模型 1–2 轮（≈$0.05–0.2）；cwd = 排练场（绝不写 live 公司盘）。
 // 判据：「最小在屋起步」（2026-10-12 用户裁定）——单域技术动议，CEO 第一响应**不得全员组队**。
 //   负例 = ai-coding-security-2026 真跑（在屋四职 + 8 派活行 + 3 互审链；四职稿后续均已出稿——
@@ -12,8 +13,8 @@
 //   ⚠ 机械面只管「叫了几个 / 路由给谁」；「扩容触发条件写得对不对」是判断，人核。
 //   ⚠ **红方向未复现**（2026-10-12 两跑：单轮给思路 / 两轮开工指令，旧 skill 均 0 spawn、路由
 //   VP-Eng）——失败形状依赖真人多轮范围裁定交互（live 负例 = ai-coding-security-2026 四职）。
-//   现役用途 = 修复落地后的回归观察 + 真人交互形状复核；判据形状待定 =
-//   [_backlog/issues/2026-10-12-ceo-minimal-assembly](../../../_backlog/issues/2026-10-12-ceo-minimal-assembly.md)。
+//   现役用途 = 修复落地后的回归观察；红方向已由 --session 模式实证（2026-10-12：live 实录
+//   session-6cce7fb4 判 over-assembly，见 [issue 卡](../../../_backlog/issues/2026-10-12-ceo-minimal-assembly.md) 验收表 B1）。
 // 退出码：0 = 最小在屋；1 = 全员组队或未路由 VP-Eng；2 = 读不到会话/判据不成立。
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -50,6 +51,27 @@ const judge = (events) => {
   // 命名委托 one-shot（vp_eng/vp_sales 直委）不算组队——那是 skill 教的便宜路径。
   const verdict = spawns <= 1 && routed ? 'minimal-assembly' : (spawns >= 2 ? 'over-assembly' : 'not-routed')
   return { spawns, subagents, routed, replyChars: reply.length, verdict }
+}
+
+// --session <会话目录>：判既有会话（session.v4.jsonl.zstd 或明文 jsonl）——红证/复盘用，不起进程。
+const sessionArg = process.argv.includes('--session') ? process.argv[process.argv.indexOf('--session') + 1] : undefined
+if (sessionArg) {
+  const fs = await import('node:fs')
+  const { spawnSync } = await import('node:child_process')
+  const found = ['session.v4.jsonl.zstd', 'session.v3.jsonl.zstd', 'session.jsonl', 'session.v4.jsonl']
+    .map(f => join(sessionArg, f)).find(c => fs.existsSync(c))
+  if (!found) { console.error(`找不到会话日志于 ${sessionArg}`); process.exit(2) }
+  const raw = found.endsWith('.zstd')
+    ? spawnSync('zstd', ['-d', '-c', found], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).stdout
+    : fs.readFileSync(found, 'utf8')
+  const events = []
+  for (const l of raw.split('\n')) { if (!l.trim()) continue; try { events.push(JSON.parse(l)) } catch { /* 坏帧跳过（多帧拼接边界） */ } }
+  const result = { sessionId: sessionArg, rows: events.length, ...judge(events) }
+  await mkdir(outDir, { recursive: true })
+  await writeFile(join(outDir, `ceo-assembly-judged-${sessionArg.split('/').pop()}.json`), JSON.stringify(result, null, 2) + '\n')
+  console.log(JSON.stringify(result, null, 2))
+  console.log(`ceo-assembly-probe(--session): ${result.verdict}`)
+  process.exit(result.verdict === 'minimal-assembly' ? 0 : 1)
 }
 
 const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')

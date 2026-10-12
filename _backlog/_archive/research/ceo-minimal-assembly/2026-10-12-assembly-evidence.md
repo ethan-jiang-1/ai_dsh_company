@@ -5,7 +5,7 @@ intent: "为组队健壮性三层防御卡提供证据基线：系统触点盘�
 
 # 组队健壮性三层防御 · 证据基线（2026-10-12）
 
-> 消费卡：[_backlog/issues/2026-10-12-ceo-minimal-assembly](../../issues/2026-10-12-ceo-minimal-assembly.md)。
+> 消费卡：[_backlog/issues/2026-10-12-ceo-minimal-assembly](../../settled_issues/2026-10-12-ceo-minimal-assembly.md)。
 > 本文只放证据与方法出处；结论与取舍在卡上。研究方法 = requirements-probes（外部事实 → research skill；
 > 系统内事实 → 读码；人的选择 → 不在本文，留卡上收敛点）。
 

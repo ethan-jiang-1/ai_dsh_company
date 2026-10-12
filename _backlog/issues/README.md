@@ -4,11 +4,9 @@
 
 ## 活跃清单
 
-| 卡 | 一句话 |
-|---|---|
-| [2026-10-12-ceo-minimal-assembly](2026-10-12-ceo-minimal-assembly.md) | 组队健壮性三层防御：CEO 第一下抓对（最小在屋）／容忍多抓／成员可打回（域内核对义务）；负例 ai-coding-security-2026，探针两轮未复现红 |
-
-已结问题见 [归档](../_archive/settled_issues/README.md)。
+活跃清单当前为空（2026-10-12-ceo-minimal-assembly 已结归档：
+[_archive/settled_issues/](../_archive/settled_issues/2026-10-12-ceo-minimal-assembly.md)——三层防御已落地）。
+已结问题见 [归档](../_archive/settled_issues/README.md)。(../_archive/settled_issues/README.md)。
 
 ## 边界与尺寸
 

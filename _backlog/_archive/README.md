@@ -19,6 +19,7 @@
 | [2026-09-28-float-geometry-memory.md](settled_issues/2026-09-28-float-geometry-memory.md) | 已实施；决定稿已删，历史在 git | 2026-09-28 |
 | [2026-09-28-sidebar-split-budget.md](settled_issues/2026-09-28-sidebar-split-budget.md) | 不做 | 2026-09-28 |
 | [2026-10-10-plain-language-closing.md](settled_issues/2026-10-10-plain-language-closing.md) | 已实施并真验收通过（说人话收口：四模板一分钟摘要 + present description 通道） | 2026-10-10 |
+| [2026-10-12-ceo-minimal-assembly.md](settled_issues/2026-10-12-ceo-minimal-assembly.md) | 已实施（组队健壮性三层防御：最小在屋/菜单算术/成员打回权；RFC 与探针收据在卡） | 2026-10-12 |
 | [2026-10-10-multi-instance-guard.md](settled_issues/2026-10-10-multi-instance-guard.md) | 已实施并双实例实测通过（多实例警告横幅）；跨浏览器检测边界如需另立卡 | 2026-10-10 |
 | [2026-10-10-extract-without-behavior-change.md](settled_issues/2026-10-10-extract-without-behavior-change.md) | 已实施并验收通过（探针 web 启动与 backlog 活状态收成模块，行为不变） | 2026-10-10 |
 | [2026-10-10-smoke-boot-extraction.md](settled_issues/2026-10-10-smoke-boot-extraction.md) | 已实施并验收通过（10 个 smoke 启动块迁 probe-web，两处钉值未动） | 2026-10-10 |
@@ -73,6 +74,7 @@
 | [2026-10-09-team-read-barrier-seam.md](research/collaboration/2026-10-09-team-read-barrier-seam.md) | BUG-007＋协作安全卡的 post-execute 屏障接入点与限制 | 2026-10-10 |
 | [2026-10-09-team-read-barrier-acceptance.md](research/collaboration/2026-10-09-team-read-barrier-acceptance.md) | BUG-007＋协作安全卡的双成员同轮放行与冲突恢复验收 | 2026-10-10 |
 | [2026-10-10-claim-loser-yield-acceptance.md](research/collaboration/2026-10-10-claim-loser-yield-acceptance.md) | 协作安全卡裁4 的认领让位行为对照 | 2026-10-10 |
+| [2026-10-12-assembly-evidence.md](research/ceo-minimal-assembly/2026-10-12-assembly-evidence.md) | 组队健壮性卡的证据基线（触点盘点/17 场全景/失败链/andon 与 RACI） | 2026-10-12 |
 
 ## 暂停卡
 
