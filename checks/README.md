@@ -118,6 +118,7 @@
 | [session-log-export.mjs](../tools/session-log-export.mjs) | 将压缩日志导成明文 JSONL，供审计与跨 home 汇总 |
 | [export-dist.mjs](../tools/export-dist.mjs) | 导出 tarball、生成安装手册并核对产物清单 |
 | [sync-dsh.mjs](../tools/sync-dsh.mjs) | vendor 簿记、候选验证、元数据发布与受控失败恢复 |
+| [converge.mjs](../tools/converge.mjs) | 工作区收敛执行器：已闭合动议的证据副本 → 归档家 git mv → journal 清出 → 台账行自动追加（`--plan` 计划 / `--slug` 收敛 / `--dry-run`） |
 | [harvest-probe.mjs](../tools/archive/harvest-probe.mjs) | 既有上游收割轮的审阅卡与 Office 预览取证仪器；复跑资格先读状态头注 |
 | [migration-rehearsal.mjs](../tools/archive/migration-rehearsal.mjs) | 既有交付物目录迁移的排练/执行与审计视野；复跑资格先读状态头注 |
 
