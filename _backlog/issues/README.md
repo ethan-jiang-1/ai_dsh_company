@@ -4,9 +4,11 @@
 
 ## 活跃清单
 
-活跃清单当前为空（2026-10-12-ceo-minimal-assembly 已结归档：
-[_archive/settled_issues/](../_archive/settled_issues/2026-10-12-ceo-minimal-assembly.md)——三层防御已落地）。
-已结问题见 [归档](../_archive/settled_issues/README.md)。(../_archive/settled_issues/README.md)。
+| 卡 | 一句话 |
+|---|---|
+| [2026-10-12-workspace-convergence](2026-10-12-workspace-convergence.md) | company-workspace 堆积治理：converge.mjs 已落地（首轮 ai-sprint 已收敛），3 slug 待收敛；未决 = 收敛是否入轮末常设 |
+
+已结问题见 [归档](../_archive/settled_issues/README.md)（含 2026-10-12-ceo-minimal-assembly——三层防御已落地）。
 
 ## 边界与尺寸
 

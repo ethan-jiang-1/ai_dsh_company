@@ -24,9 +24,9 @@ describe('parseMotionLedger', () => {
     }
   })
 
-  it('V4 活跃 meta 必须有对应台账行且结论逐字同源', () => {
+  it('V4 meta（已收敛归档）必须有对应台账行且结论逐字同源', () => {
     const rows = parseMotionLedger(REAL_LEDGER)
-    const meta = readFileSync(join(ROOT, 'company-workspace/deliverables/2026-10-10-ai-transformation-2026-v4/meta.md'), 'utf8')
+    const meta = readFileSync(join(ROOT, 'company-workspace/deliverables-archive/2026-10-10-ai-transformation-2026-v4/meta.md'), 'utf8')
     const summary = meta.match(/^一句话结论: (.+)$/m)?.[1]
     expect(summary).toBeDefined()
     const row = rows.find(candidate => candidate.slug === 'ai-transformation-2026-v4')

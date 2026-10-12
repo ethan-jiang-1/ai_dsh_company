@@ -22,7 +22,7 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 
 - 重写 `company-workspace/templates/meta.md` 中「一句话结论」的业务语言规格：准确、适合台账扫描、避免机制术语；事实/假设的详细标注留在 final 报告体，行内用自然语言说明条件或未实测状态。
 - 在 `company-workspace/kb/motion-ledger.md` 维护规矩中声明台账摘要是 meta 字段的逐字引用，不在台账另写第二个结论。
-- 只修 `company-workspace/deliverables/2026-10-10-ai-transformation-2026-v4/meta.md` 的活跃长行，保留“V4 达标、反事实未达标、真实缺陷已修复”核心事实；不批量改其他历史行或 archive。
+- 只修 `company-workspace/deliverables-archive/2026-10-10-ai-transformation-2026-v4/meta.md` 的活跃长行，保留“V4 达标、反事实未达标、真实缺陷已修复”核心事实；不批量改其他历史行或 archive。
 - 不增加 100/120 字等硬限制，不以 UI 截断代替内容治理。
 
 ### 批 2：人话回复与决策表达
@@ -60,7 +60,7 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 
 1. 在 V4 meta 中断言：活跃「一句话结论」不再是原 835 字段，仍准确包含 V4 达标、反事实未达标、真实缺陷已修复三项事实；不得出现新的硬字数门禁。
 2. 读取 meta 与 motion ledger，断言对应台账行与 meta 字段逐字一致，且新增/修正内容使用业务语言，不把内部机制术语作为常驻结论主体。
-3. 运行 `git diff -- company-workspace/deliverables/2026-10-10-ai-transformation-2026-v4/meta.md company-workspace/kb/motion-ledger.md company-workspace/templates/meta.md`，断言历史台账行、archive 和非 V4 活跃行没有被批量改写。
+3. 运行 `git diff -- company-workspace/deliverables-archive/2026-10-10-ai-transformation-2026-v4/meta.md company-workspace/kb/motion-ledger.md company-workspace/templates/meta.md`，断言历史台账行、archive 和非 V4 活跃行没有被批量改写。
 4. 运行 `pnpm verify`；通过信号为文档、链接、预算和 backlog 门禁全绿。失败信号包括来源不一致、路径失效或文档预算超限。
 
 ### 批 2：模型行为与表达验收

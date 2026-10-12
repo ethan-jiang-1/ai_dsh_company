@@ -34,9 +34,12 @@ const metaField = (dir, field) => {
   const m = readFileSync(join(dir, 'meta.md'), 'utf8').match(new RegExp(`^${field}:\\s*(.*)$`, 'm'))
   return m ? m[1].trim() : ''
 }
-/** journal 文件名 → 所属 slug（剥日期后：等于 slug 或以 slug- 开头）。无属主 = null（当轮散件，不清）。 */
-const journalSlug = (fileName, slug) => {
+/** journal 文件名 → 所属 slug。规则：剥日期后精确等于 slug，或以 slug- 开头且**不与任何其他 slug 精确同名**
+ *   （前缀匹配会误吞后继 slug——2026-10-12 实测：收敛 ai-coding-security-2026 时前缀匹配把未闭合的
+ *   -light / -v2 两个 slug 的 journal 一并清了）。无属主 = null（当轮散件，不清）。 */
+const journalSlug = (fileName, slug, allSlugs = []) => {
   const stripped = fileName.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '')
+  if (stripped !== slug && allSlugs.includes(stripped)) return null  // 它是另一个 slug 的正主
   return stripped === slug || stripped.startsWith(`${slug}-`) ? fileName : null
 }
 
@@ -58,23 +61,28 @@ const scanSlugs = () => {
   return out
 }
 
+const allSlugs = () => [...new Set([...(existsSync(ACTIVE) ? readdirSync(ACTIVE) : []),
+  ...(existsSync(ARCHIVE) ? readdirSync(ARCHIVE) : [])].map(d => d.replace(/^\d{4}-\d{2}-\d{2}-/, '')))]
 const harvestJournal = (slug) => {
   const moved = []
+  const known = allSlugs().filter(s => s !== slug)
   for (const role of ROLES) {
     const dir = join(WS, 'kb', role, 'journal')
     if (!existsSync(dir)) continue
     for (const f of readdirSync(dir)) {
       if (!f.endsWith('.md')) continue
-      if (journalSlug(f, slug)) moved.push({ role, file: f, path: join('kb', role, 'journal', f) })
+      if (journalSlug(f, slug, known)) moved.push({ role, file: f, path: join('kb', role, 'journal', f) })
     }
   }
   return moved
 }
 
 const copyEvidence = (slugDir, slug, journal) => {
+  // ⚠ 证据副本只收 **journal**（它们被从 live 删除，需要留底）；交付物本体 = git mv 进
+  //   deliverables-archive（持久拷贝）——再拷一份进 snapshots 是双份存储（2026-10-12 实测把
+  //   snapshots 顶爆 64M 预算，84.1M）。
   const evDir = join(ROOT, 'snapshots', 'archive', `convergence-${today}`, slug)
   mkdirSync(join(evDir, 'journal'), { recursive: true })
-  cpSync(slugDir, join(evDir, 'deliverable'), { recursive: true })
   for (const j of journal) {
     const src = join(WS, j.path)
     mkdirSync(join(evDir, 'journal', j.role), { recursive: true })
@@ -84,6 +92,12 @@ const copyEvidence = (slugDir, slug, journal) => {
 }
 
 const appendLedger = (fields) => {
+  // 查重：台账可能已有该 slug 的行（动议闭合时已登记过）——重复追加 = slug 唯一性断言红
+  //   （2026-10-12 实测）。已有行 = 跳过（台账为准）。
+  if (readFileSync(LEDGER, 'utf8').includes(`| ${fields.slug} |`)) {
+    console.log(`  · 台账已有 ${fields.slug} 行——跳过追加（不重复登记）`)
+    return null
+  }
   const row = `| ${fields.slug} | ${fields.kickoff} | ${fields.类型 || '—'} | ${fields.参与 || '—'} | ${fields.墙钟 || '未记'} | ✅ | ${fields.结论} |`
   const t = readFileSync(LEDGER, 'utf8')
   const lines = t.split('\n')
