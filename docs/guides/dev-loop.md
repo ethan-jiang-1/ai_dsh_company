@@ -1,13 +1,12 @@
 # 开发环：一个变更从意图到调整的操作手册
 
 > 什么时候读：开工前定任务与授权（§0.5）、实施中选检查（§1/§9.1）、收尾交证据（§12）——其余章节按改动面查。
-> 性质：指南层——"怎么操作"的展开与查表处；纪律压缩版在根 AGENTS.md。
-> 来源：FAQ 13 `dev-loop.md` + `dual-home-isolation.md`（repo 外研究材料，落点登记见
-> [index.md](../index.md) §外部研究材料登记）；机制结论以 `vendor/dsh/` 工作树为权威，
-> 本篇引用的旗标与行为均已在**钉住的 vendor 基线**上核对——基线版本与 SHA 的唯一事实家 = 根
-> `AGENTS.md` §vendor 簿记（升 pin 时的重校记录 = [pin-upgrade Note](../../notes/implemented/2026-09-30-pin-upgrade-0.2.0-rc.2.md)，本仓现行先例；其 delta 长文已删，历史在 git）。
-> 行注记 `R1`–`R5b` = 已退役轮次制（D11）的**历史出处标记**，只作 git 考古索引、不承载现行义务；
-> 与 snapshots 场景号（`replay/r1-motion`…）是两套序号，别互推。
+> 性质：指南层——"怎么操作"的展开与查表处；纪律压缩版在根 AGENTS.md。来源 = FAQ 13 `dev-loop.md` +
+> `dual-home-isolation.md`（外部材料，登记见 [index.md](../index.md) §外部研究材料登记）；机制结论以
+> `vendor/dsh/` 工作树为权威，旗标与行为已在**钉住的 vendor 基线**核对——基线版本与 SHA 的唯一事实家 =
+> 根 `AGENTS.md` §vendor 簿记（升 pin 重校记录 = [pin-upgrade Note](../../notes/implemented/2026-09-30-pin-upgrade-0.2.0-rc.2.md)）。
+> 行注记 `R1`–`R5b` = 退役轮次制的历史出处标记（D11），只作 git 考古索引；与 snapshots 场景号
+> （`replay/r1-motion`…）是两套序号，别互推。
 
 ## 0. 开发环导航
 
@@ -50,11 +49,10 @@
 
 **交付记录**：feature 或非平凡变更同 diff 更新实现、当前合同、必要验证与 Note；机械单步只改事实 owner 并运行相关检查，不新建意图或 RFC。
 
-**完成判断链（四不等式；2026-10-07 借语料 native 卷收口"门禁全绿即完成"错觉）**：
-**挂得上 ≠ 行为对 ≠ 装得上 ≠ 已获批**——四条各需独立观察，前一条绿不豁免后一条：挂载 =
-`preset-smoke`；行为 = 该面场景/判据（§9.1 选层）；安装 = `release-smoke`（发布/导出面变更时）；
-批准 = 语义审（§13 最小清单）+ 用户验收（§12 对照授权原文）。机器全绿只证断言通过，不证
-「做的是不是这件事」——每层的证明边界唯一家 = [testing.md §1](../testing.md)。
+**完成判断链（四不等式；2026-10-07 立以收口"门禁全绿即完成"错觉）**：**挂得上 ≠ 行为对 ≠ 装得上 ≠ 已获批**——
+四条各需独立观察，前一条绿不豁免后一条：挂载 = `preset-smoke`；行为 = 该面场景/判据（§9.1 选层）；
+安装 = `release-smoke`（发布/导出面变更时）；批准 = 语义审（§13 最小清单）+ 用户验收（§12 对照授权原文）。
+机器全绿只证断言通过，不证「做的是不是这件事」——每层的证明边界唯一家 = [testing.md §1](../testing.md)。
 
 ## 2. 调试阶梯（组合层 → 会话层，不跳层）
 
@@ -74,15 +72,14 @@
 | 4 会话层 | 读会话 JSONL，不猜 | model-visible ⟺ logged：上下文组装问题从日志（`$DSH_HOME` 下 sessions）重建；读不全 = 欠了 §3 第②问的债。⚠ bash 沙箱对会话文件有**间歇视图抖动**（列出得、打开不得），且 headless 会话收尾会删目录——分析要趁进程活着时做（R1 实证） |
 | 5 回归层 | snapshot 重放（R5a 起） | `snapshots/`；回答"行为为什么变了"的最快路径 |
 
-诊断方法论补一条（R1 血泪）：**栈采样先于二分**——`sample <pid> 3` 看主线程，kevent 空转 =
-"等一个不会来的事件"（watcher/未 resolve 的 Promise），CPU 满载 = 死循环；这比砍配置二分快得多
-（R1 三刀二分全白切，问题在 profile 形态默认值而非内容）。
+诊断方法论补一条（R1 血泪）：**栈采样先于二分**——`sample <pid> 3` 看主线程：kevent 空转 = "等一个不会来的事件"，
+CPU 满载 = 死循环；比砍配置二分快得多（R1 三刀二分全白切，问题在 profile 形态默认值而非内容）。
 
 一次性实验不落盘：`pnpm dsh --profile <p> --patch ./run/try-x.patch.yml`——`--patch` 是
 "profile 层之后再叠一层"的可重复旗标（`vendor/dsh/apps/cli/src/args.ts`），风险半径一次
 进程，连 dev home 都不落。指令层的同款临时叠加 = `AGENTS.local.md` / `CLAUDE.local.md`
-（vendor `packages/context/agent-instructions` 支持）——不动 git 的本地指令叠加，调试/演示
-现场用；长期规则必须给它正式的家，不留 local 叠加里。
+（vendor `packages/context/agent-instructions` 支持）——不动 git 的本地叠加，调试/演示现场用；
+长期规则必须给它正式的家，不留 local 叠加里。
 
 
 **进程内查询（rc.2 收割）**：角色会话里 `cordis_inspect_list` 发现 Inspect Provider 与方法、
@@ -155,32 +152,28 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回�
    基线版本唯一见 `AGENTS.md` §vendor 簿记）。验证一律 `pnpm dsh`；`env.sh` 已把裸 `dsh` 设为拦截提醒（bypass：`command dsh`）。
    注意 `DSH_HOME` 只护数据层：source 过 env.sh 后裸 `dsh` 也落在 dev home，但跑的
    仍是全局代码。
-5. **新 shell 陷阱（R1 实证 + R4 更正）**：任何 `pnpm dsh` / `node bin.ts` 调用前必须先
-   `source run/env.sh`，否则**静默**落日用 home `~/.dsh`（写 profile、装包都进日用数据）。
-   实证：R1 部署时一次 `plugin add` 在未 source 的 shell 里试图 `mkdir ~/.dsh/profiles/company`，
-   被沙箱 EPERM 拦下（日用 home 未被污染）——沙箱是最后防线，不是第一防线。
-   ⚠ **R4 更正一处过期表述**：这里原先写"`DSH_HOME` **不继承**"。那只在**普通终端**成立。
-   在 **DSH 的 coding 会话里跑 bash** 时，`DSH_HOME` 是**继承且带值的**，值就是日用 home
-   `~/.dsh`（实测：不 source 直接 `echo $DSH_HOME` → `/Users/bowhead/.dsh`）。后果比"没设"更坏：
-   脚本里"未设则报错"的那道防线**根本不触发**，会安静地拿日用 home 的会话库当输入。
-   所以：**判据/审计类脚本要自己拒绝日用 home**。**判据/审计类脚本一律接入 `tools/lib/runtime-home.mjs`**（在启动前拒绝日用目录、重叠路径及其符号链接；清单唯一源 = 各脚本自己的 import，`rg -l runtime-home checks tools -g '*.mjs'` 即得——**别在文档里列名单**，2026-09-26 实测旧名单只列了 6 个而实际已有 17 个）；
-   `deliverables-check` / `release-smoke`、`entry-probe` / `snapshot-motion` 均在运行前调用 `requireDevHome`，拒绝缺失或与日用 home 重叠的路径；`sync-dsh --pin` 也要求隔离 home。守卫不涵盖未接入该 helper 的任意脚本，也不防守检查后的并发符号链接替换。
+5. **新 shell 陷阱（R1 实证 + R4 更正）**：任何 `pnpm dsh` / `node bin.ts` 调用前必须先 `source run/env.sh`，
+   否则**静默**落日用 home `~/.dsh`（写 profile、装包都进日用数据；R1 实证一次未 source 的 `plugin add` 被
+   沙箱 EPERM 拦下——沙箱是最后防线，不是第一防线）。⚠ **coding 会话里 `DSH_HOME` 是继承且带值的**
+   （值 = 日用 home `~/.dsh`，实测不 source 直接 `echo $DSH_HOME` 可证）——后果比"没设"更坏：脚本里
+   "未设则报错"的防线**根本不触发**，会安静地拿日用 home 的会话库当输入。所以：**判据/审计类脚本一律接入
+   `tools/lib/runtime-home.mjs`**（启动前拒绝日用目录、重叠路径及其符号链接；接入清单 = 各脚本自己的 import，
+   `rg -l runtime-home checks tools -g '*.mjs'` 即得——**别在文档里列名单**，实测名单必漂）；
+   `deliverables-check` / `release-smoke` / `entry-probe` / `snapshot-motion` 均已调用 `requireDevHome`，
+   `sync-dsh --pin` 也要求隔离 home；守卫不涵盖未接入该 helper 的任意脚本，也不防守检查后的并发符号链接替换。
 6. **端口与实例隔离（部署事实）**：headless 形态（探针/动议）**无端口**——单次任务
    进程，stdout 出结果，日志落 `$DSH_HOME/sessions/`。web 形态（观察窗）起**本地**
    HTTP 端口（值见启动横幅）；因 `DSH_HOME` 指 dev home，它与日用 DSH 的 web 实例
    （若同时开）是两个完全独立进程：profile、会话、凭据、端口互不可见。
-7. **排练场 ≠ 运行场（轮间待办②，2026-09-22 落地）**：排练/探针会话的默认 cwd 是
-   `runtime/rehearsal-workspace/`（`node tools/rehearsal-init.mjs` 幂等成型；排练/探针脚本（清单见各脚本头注「何时跑」）
-   `preset/probe/handbook/delegation` 已默认指这里并会自建，`--cwd` 可显式覆盖）。
-   **真盘 `company-workspace/` 只收真实动议的产物**——排练产物不受三态判据约束
-   （`drafts/` 本就不需要 `present`），跑在真盘会安静积污（R4 W2 删过 15 份）。
-   验收判据 = 新默认跑一次探针后 `git status --porcelain company-workspace/` 为空。
-   排练场里手册是指向真盘的**符号链接**（注入基线不变），CHARTER/org/templates 每次刷新，
-   **journal 不镜像**（排练记忆不混真记忆）。`snapshot-motion` / `deliverables-check`
-   默认仍指真盘——归档与审计本来就属于运行场。
-8. **沙箱后端探测**：`env.sh` 实跑一次 `sandbox-exec` 探测，**不可用则自动导出
-   `DSH_PERMISSION_MODE=danger-full-access`**（macOS 26 本机禁了 Seatbelt；不落则每条 bash 都退化
-   成「请求升级」，连 `ls` 也一样，且批准一次只买通一条命令）。探测结果是**明示**的（stderr 一行取舍）；
+7. **排练场 ≠ 运行场**：排练/探针会话的默认 cwd 是 `runtime/rehearsal-workspace/`（`node tools/rehearsal-init.mjs`
+   幂等成型；preset/probe/handbook/delegation 探针已默认指这里并会自建，`--cwd` 可显式覆盖）。
+   **真盘 `company-workspace/` 只收真实动议的产物**——排练产物不受三态判据约束（`drafts/` 本就不需要
+   `present`），跑在真盘会安静积污（实测删过 15 份）；验收判据 = 新默认跑一次探针后
+   `git status --porcelain company-workspace/` 为空。排练场里手册是指向真盘的**符号链接**（注入基线不变），
+   CHARTER/org/templates 每次刷新，**journal 不镜像**（排练记忆不混真记忆）；`snapshot-motion` /
+   `deliverables-check` 默认仍指真盘——归档与审计本来就属于运行场。
+8. **沙箱后端探测**：`env.sh` 实跑一次 `sandbox-exec` 探测，**不可用则自动导出 `DSH_PERMISSION_MODE=danger-full-access`**
+   （macOS 26 本机禁了 Seatbelt；不落则每条 bash 都退化成「请求升级」，连 `ls` 也一样）。探测结果**明示**（stderr 一行取舍）；
    逃生阀 = `DSH_SKIP_SANDBOX_PROBE=1` 或自行设 `DSH_PERMISSION_MODE`；后端恢复自动回到 `workspace-write`。
    理由、输掉的方案与红绿证据见 [sandbox-backend-probe](../../notes/implemented/2026-10-10-sandbox-backend-probe.md)。
 
@@ -233,9 +226,8 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 
 ## 9. 门禁分层：连通档（默认，秒级）vs 内容档（按需，分钟级）
 
-**教训（R2，2026-09-22）**：会话级门禁最初写成"五角色 × 三探针按 KB 事实断言内容"——串行跑
-30 分钟没跑完；改并发后仍 3 分钟以上，慢轮次实测 150s+ 会把超时判定拖垮。用户裁定：
-**"先要它通，对不对没那么重要。"**
+**教训（R2）**：会话级门禁最初写成"五角色 × 三探针按 KB 事实断言内容"——串行 30 分钟没跑完，慢轮次
+150s+ 会把超时判定拖垮。用户裁定：**"先要它通，对不对没那么重要。"**
 
 **做法**：同一个门禁脚本分两档，默认快档（`checks/smoke/probe-smoke.mjs` 是范例）。
 
@@ -250,9 +242,8 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 
 ### 9.1 测试分层与预算（R3 立，回答"回归不能跑这么慢"）
 
-**教训（R3）**：把"真浏览器 + 真模型 + 真 UI"的委派卡 e2e 当回归门禁——240s 都没等到
-（CEO persona 的开工仪式先烧 5–6 步模型往返），而且**依赖模型配合**：模型不调那个工具就永远绿不了。
-**这是层次放错，不是脚本写得不好。**
+**教训（R3）**：把"真浏览器 + 真模型 + 真 UI"的委派卡 e2e 当回归门禁——240s 都没等到（CEO persona 的
+开工仪式先烧 5–6 步模型往返），且**依赖模型配合**：模型不调那个工具就永远绿不了。**这是层次放错，不是脚本写得不好。**
 
 **分层（按"要不要模型"切，不按"重不重要"切）**：**层定义与证明边界唯一见 [testing.md §1](../../docs/testing.md)**；
 本表只给**命令与预算速查**。每个脚本自己的触发条件与成本在它头注里（`// 何时跑：…`，
@@ -295,8 +286,8 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 
 ## 10. 自动化只许是轻任务（硬上限，不许无限跑）
 
-**教训（R2，2026-09-22）**：把"跑一场五人动议"当成自动化任务启动，没有预算也没有刹车——
-它一路跑了几十步、几十条消息还不见底。用户裁定：**"自动化的任务都一定要变成轻任务，别跑得没完没了。"**
+**教训（R2）**：把"跑一场五人动议"当自动化任务启动，没有预算也没有刹车——一路跑了几十步、几十条消息不见底。
+用户裁定：**"自动化的任务都一定要变成轻任务，别跑得没完没了。"**
 
 **纪律（写进所有脚本/后台任务）**：
 
@@ -312,9 +303,8 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 
 ## 11. 工具态与越界写入（2026-09-23 立）
 
-**教训（R4→R5a 轮间，2026-09-22）**：断网弄坏 dev profile 后，离线恢复需要写 pnpm 的 registry
-元数据缓存——它默认在 `~/Library/Caches/pnpm`（workspace 之外）。为了它走了"从 store 合成元数据"
-的弯路，还产生了一串越界写入授权。
+**教训（R4→R5a 轮间）**：断网弄坏 dev profile 后，离线恢复要写 pnpm 的 registry 元数据缓存（默认在
+`~/Library/Caches/pnpm`，workspace 之外）——为它走过"从 store 合成元数据"的弯路与一串越界写入授权。
 
 **原则（三条）**：
 
@@ -356,8 +346,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - 按改动面选择验证（§9.1）；结构门禁不替代运行验收。入口探针机器通过不等于语义审阅通过。
 - 新门禁反证的操作口径 = **只回滚实现、保留新测试**——连测试一起回滚会得全绿假象；红→还原→绿三步留证。
 - 收到人审/用户反馈：成立就修复并补证据；不成立用技术事实反驳，**不作表演式同意**。
-- 条目收尾后可派**中立体清扫**（独立子代理；输入 = diff + 收尾 Note + 关联卡；扫与修分家）。
-  清单不另写 Note。
+- 条目收尾后可派**中立体清扫**（独立子代理；输入 = diff + 收尾 Note + 关联卡；扫与修分家），清单不另写 Note。
 - 文档卫生按指导价值：移除失效/重复指令与无行动价值的历史噪声；保留仍指导当前决策、解释约束或支持复验的证据。不以净减行数为目标（D26）。
 - **授权链与时间轴（intents.md 已退役，D34 2026-10-04）**：授权线索（用户点名/裁定原话）记在**对应 Note 的状态行**；时间轴 = `notes/implemented/` 文件名日期 + git log。月度冻结表已在 2026-10-09 清扫中删除（那是账本身）。退役理由 = 第三本账与 Note 双写、膨胀病史三次、违反上游 no-index 教义（vendor notes README）。
 - **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链一律 `set -o pipefail` + `&&`（不带 pipefail 的 `cmd | tail` 退出码是 `tail` 的 = 假绿）。push 由 **pre-push hook 强制跑全量 `pnpm verify` + `pnpm test`**（verify 2026-09-27 立；test 09-28 加，不进 CI 的定界见 [n7-ci-narrowing](../../notes/implemented/2026-10-09-n7-ci-narrowing.md)；接线 = `source run/env.sh` 幂等设 `core.hooksPath`；bypass = `--no-verify`，用后须在收尾 Note 说明原因）。

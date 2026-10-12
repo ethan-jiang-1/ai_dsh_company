@@ -4,10 +4,9 @@
 
 ## 文档组织原则（为什么不是"初始化/"）
 
-**docs/ 按"性质"分层，不按"时间"分层。** 分层规矩（哪层放什么、哪层**不放**什么、长度棘轮、
-更新时机）唯一家 = [docs/AGENTS.md](./AGENTS.md)；下面是本目录的**现状登记**，不是规矩。
-
-项目运行与目录导航 = [project-map.md](./project-map.md)；脚本索引 = [checks/README.md](../checks/README.md)（触发与成本以脚本头注为准）。
+**docs/ 按"性质"分层，不按"时间"分层**；分层规矩（放什么/不放什么/长度棘轮/更新时机）唯一家 =
+[docs/AGENTS.md](./AGENTS.md)——下面是本目录的**现状登记**，不是规矩。项目运行与目录导航 =
+[project-map.md](./project-map.md)；脚本索引 = [checks/README.md](../checks/README.md)（触发与成本以脚本头注为准）。
 
 ### 现有文档
 
@@ -103,10 +102,9 @@
 
 ## 外部研究材料登记（repo 外，只读引用）
 
-本 repo 的形态与机制结论大量借鉴三处 repo 外材料（均在 `/Users/bowhead/deepseek-harness/`
-工作树内、已被该 repo 的 git 跟踪；不在本 repo 版本控制范围，引用时注明是外部研究材料）：
-`_faq_on_digested/`、`_digested/`、`_dsh_plugin_agent_ready_development/`（后者 = Agent-ready 语料，更名自 `_agent_ready_development` 并随上游 re-pin 演进）；另有第四处**独立外部仓** = `/Users/bowhead/ai_deerflow_deep_research_v2`（`_backlog` 借鉴源，D31）；第五处 = `/Users/bowhead/ai_dsh_loop_advisor/_backlog`（D31 制度演进宿主，D33 回借源）；第六处 = `/Users/bowhead/ai_dsh_assitant/notes`（notes/ 分类 owner 精神借源，D35——本仓 notes/README 落地后日常不依赖原文）；第七处 = `/Users/bowhead/ai_dsh_assitant/_backlog`（`_backlog` 现行制度整体借源，2026-10-09 重立——路由见 D31 行）。各材料的版本核对与其"想法落在哪儿"见下表；研究树 HEAD 持续演进，引用以注册行为准、不追新提交。
-**思想吸收进本 repo 文档后，日常不再依赖原文**；下表是"哪个想法落在了哪儿"的地图：
+本 repo 的形态与机制结论借鉴七处 repo 外材料（前三处在 `/Users/bowhead/deepseek-harness/` 工作树内、
+已被其 git 跟踪；其余为独立外部仓；均不在本 repo 版本控制范围，引用时注明是外部研究材料）：
+`_faq_on_digested/`、`_digested/`、`_dsh_plugin_agent_ready_development/`、`/Users/bowhead/ai_deerflow_deep_research_v2`（`_backlog` 借鉴源，D31）、`/Users/bowhead/ai_dsh_loop_advisor/_backlog`（D31 制度演进宿主，D33 回借源）、`/Users/bowhead/ai_dsh_assitant/notes`（notes/ 分类 owner 精神借源，D35）、`/Users/bowhead/ai_dsh_assitant/_backlog`（`_backlog` 现行制度整体借源，2026-10-09 重立——路由见 D31 行）。各材料的版本核对与其"想法落在哪儿"见下表；研究树 HEAD 持续演进，引用以注册行为准、不追新提交。**思想吸收进本 repo 文档后，日常不再依赖原文**；下表是"哪个想法落在了哪儿"的地图：
 
 | 材料 | 内容 | 吸收落点 |
 |---|---|---|
