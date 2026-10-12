@@ -1,5 +1,5 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-10-12
 ---
@@ -8,17 +8,18 @@ opened: 2026-10-12
 
 > 严重级别：P2（次要）｜发现：2026-10-12（f8bc123...HEAD 双轴代码评审 Standards 轴 + Spec 轴③）｜状态：修复就绪
 > **翻转记录（2026-10-12）**：四条复现实跑见红（收据在复现节）+ 修法选定 + 已修判定在场——缺陷轨翻转表「调查中 → 修复就绪」（P2 修复型自授权通道）。
+> **修复（2026-10-12）**：①归档卡计数统一为「五个实跑缺陷」（结论行 + 推敲记录标题——只动数字与台账叙述，不动讨论正文）；②issues/README L9 stray 裸链接删除；③台账叙述校正为「4 slug 入账（3 行新增；V4 行系既有、查重跳过）」；④落地决定补 implemented Note `notes/implemented/2026-10-12-workspace-convergence-executor.md`（按 agent-note-definition：决定/输掉的方案/后果/验证四件 + 全实跑收据）——「卡承载推敲、Note 承载落地决定」的分工就此表态。门禁归属核实：md-links / bare-path 均不扫裸括号链接（stray 此前两门禁都放行）——按卡上预案不立新门禁，修掉即止。`pnpm verify` ALL PASS + `pnpm test` 494/494——已修判定满足，修复已落地 → 已修归档。
 
 ## 症状
 
 1. **归档卡缺陷计数三值并存**：结论行（L10）「四缺陷」、推敲记录标题（L18）「三个实跑缺陷」、
    实列五条（缺陷 1–5，L29 起含缺陷 5）——追加式写作没回改旧计数。
-2. **stray 断链残留**：[_backlog/issues/README.md:9](../issues/README.md) 旧裸链接
+2. **stray 断链残留**：[_backlog/issues/README.md:9](../../issues/README.md) 旧裸链接
    `(../_archive/settled_issues/README.md)。` 未清、新文直接续接其后。
 3. **台账叙述与 diff 出入**：卡 L17「台账 4 行已追加」，`git diff f8bc123...HEAD -- …/motion-ledger.md`
    实际 +3 行（V4 行系既有、被查重守卫跳过）。
 4. **非平凡变更零 Note**：246 行新工具 + 流程常设化，`notes/implemented/` 无 convergence 条目
-   （[notes/README](../../notes/README.md) §二「非平凡变更同 diff 新增或更新相关 Note」）；同日
+   （[notes/README](../../../notes/README.md) §二「非平凡变更同 diff 新增或更新相关 Note」）；同日
    另三件工作均有 Note，唯独此件默认走了「卡即记录」，与成文规则相左。
 
 ## 根因（假设→已证）

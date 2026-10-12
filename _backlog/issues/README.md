@@ -6,7 +6,7 @@
 
 活跃清单当前为空（2026-10-12-workspace-convergence 已结归档：
 [_archive/settled_issues/](../_archive/settled_issues/2026-10-12-workspace-convergence.md)——收敛执行器落地 + 首轮全量收敛完成）。
-已结问题见 [归档](../_archive/settled_issues/README.md)。(../_archive/settled_issues/README.md)（含 2026-10-12-ceo-minimal-assembly——三层防御已落地）。
+已结问题见 [归档](../_archive/settled_issues/README.md)（含 2026-10-12-ceo-minimal-assembly——三层防御已落地）。
 
 ## 边界与尺寸
 
