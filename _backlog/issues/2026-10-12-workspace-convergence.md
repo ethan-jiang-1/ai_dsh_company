@@ -18,6 +18,12 @@ opened: 2026-10-12
    - **缺陷 2 · journal 前缀误收割**：slug 前缀匹配把**未闭合** light/-v2 的 11 篇 journal 一并清了（`-light`/`-v2` 以已收敛 slug 为前缀）——未闭合动议的当轮记忆被误删。修 = 匹配规则加「与任何其他 slug 精确同名则排除」；11 篇已从 git 恢复。
    - **缺陷 3 · 跨引用时效**：收敛迁移路径后，COO CHARTER 与 2 篇 implemented Note 指向旧位（bare-path 红、foundation-safety 红）。修 = CHARTER 引用 CLI 自动重指（打印清单）、Note 指针就地改新（D38 currency）。
    - **新增未决**：CLI 重指范围目前只覆盖 CHARTER——notes/implemented 的指针重指靠 bare-path 逼出来手工修；要不要进 CLI？（边界问题：notes currency 是实施者义务 D38，CLI 代做的界限需裁定。）
+   - **缺陷 4 · 台账耦合未盘点**（全量收敛后 ledger.spec 红）：CLI 追加台账行没查重（动议闭合时台账
+     可能已有该行 → slug 唯一性断言红：34 行 32 唯一）；且 ledger.spec 把 V4 meta 锚在 live
+     deliverables（收敛后应读归档位）。修 = CLI 查重守卫（已有行跳过）+ spec 锚随迁归档位。
+     **教训：收敛的爆炸半径 = 所有以「live deliverables 路径」为锚的断言与引用**（CHARTER、
+     implemented Note、ledger spec——bare-path / foundation-safety / ledger 三道门禁依次抓出三类，
+     第四类本轮补齐）；收敛后立即全量验证（pre-push hook 正好兜住）。
 
 **未决问题：**
 - **收敛是否入轮末常设**：目前 = 用户说一句才收敛。候选 = 维护者轮末收尾固定跑 `converge --plan`（有可收敛就报）——改 dev-loop §12 收尾清单还是收割三问的邻居？涉及流程常设，需用户裁定。
