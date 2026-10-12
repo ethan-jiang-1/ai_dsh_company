@@ -71,7 +71,7 @@ const DOC_LINE_BUDGETS = [
   ['docs/guides/dev-loop.md', 395], // 2026-09-26/27 升至 467（§13、inspect 句）后同日瘦身轮：§7 整段迁 guides/bootstrap.md、§7 留指针防断链（当时 467→376），棘轮 467→395
   ['docs/testing.md', 75],       // 2026-10-04 立测试宪法（_digested/test-strategy 消化采纳轮；政策唯一家，只写 now——膨胀先迁，不加预算）；同日 61（§3.8 红/场景先行）；同日 75（§1.1 资产命名语法，用户点破 DSH「后缀即层」实践）；2026-10-09 §3.7 prove-it-red 补「标题带 BUG-nnn 的 describe/it = 守卫声明」判据句（guard-red-record 门禁接上；原句只写「三步留证」没给可判形状），**同 diff 压回 75 顶格**（引用链改「见该 Note」，不重复路径）。⚠ 顶格：下一句加进来前先迁——§1 分层表与 tests/README「改动面→最窄检查」有重叠面可搬
   ['docs/AGENTS.md', 62],        // 2026-10-09 N1 立（docs/ 分层规矩唯一家：一处事实一个家表 + 长度棘轮 + 更新时机 + 负知识；行数上限唯一源在 run-gates 不复述数字）；反证 = doc-taxonomy 门禁（表头/不属于这层 列缺失即红）
-  ['company-workspace/AGENTS.md', 195], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面（186 行 ≈ 16.4KB × 每会话），同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates
+  ['company-workspace/AGENTS.md', 190], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面，同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates；2026-10-12 瘦身轮 195→190（内容 180：机制证据段收指针、证据叙事压缩、陈旧日期戳退役——同 diff Note）
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
   // 文件缺失时报「缺失」而不是抛异常：抛异常会**中断整个 run-gates**，
