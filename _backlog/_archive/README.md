@@ -66,6 +66,7 @@
 | [BUG-013-e2e-driver-token-committed.md](fixed_bugs/BUG-013-e2e-driver-token-committed.md) | 观察窗 token 随无关 e2e driver 入库：untrack + .gitignore 显式规则（token 重启轮换，无历史重写） | 2026-10-12 |
 | [BUG-015-charter-backfill-evidence-date-coupling.md](fixed_bugs/BUG-015-charter-backfill-evidence-date-coupling.md) | backfill 证据路径写死运行日：按 slug 解析真实收敛目录 + fail-loud | 2026-10-12 |
 | [BUG-014-charter-backfill-dedupe-false-skip.md](fixed_bugs/BUG-014-charter-backfill-dedupe-false-skip.md) | backfill 子串查重假跳过：查重改条目行锚，COO 缺失条目补登 | 2026-10-12 |
+| [BUG-016-converge-self-description-drift.md](fixed_bugs/BUG-016-converge-self-description-drift.md) | converge 自述三处失真：参数唯一源归工具头注（未知旗标 fail-loud）+ 文案对齐 journal-only 与 --charter-backfill | 2026-10-12 |
 
 ## 随卡归档的研究
 

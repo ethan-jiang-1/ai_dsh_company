@@ -10,10 +10,9 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-016-converge-self-description-drift](BUG-016-converge-self-description-drift.md) | converge 自述三处失真（幽灵旗标 --plan / plan 文案 / 完成 TODO） | P2 |
 | [BUG-017-record-hygiene-residue](BUG-017-record-hygiene-residue.md) | 记录残留——缺陷计数 3/4/5 并存、stray 断链、台账叙述出入、缺 convergence Note | P2 |
 
-当前活跃缺陷卡 2 张（BUG-016..017，2026-10-12 评审立卡；BUG-013..015 已修归档）。BUG-001..012 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+当前活跃缺陷卡 1 张（BUG-017，2026-10-12 评审立卡；BUG-013..016 已修归档）。BUG-001..012 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

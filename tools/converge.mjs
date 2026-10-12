@@ -3,8 +3,8 @@
 // 收敛执行器：把 snapshots/README §归档动作 的五步手工流程机械化——
 //   证据副本 → git mv 交付物进归档家 → 清 live journal（留 .gitkeep）→ 台账行自动追加（逐字取 meta）→ 语义 TODO 打印。
 // 何时跑：用户说「收敛/清理工作区」时；或轮末维护者收敛已闭合动议时（维护者专用——分身不自行删改，见手册「轮末收敛」）。
-// 用法：
-//   node tools/converge.mjs                     # 计划模式：列出可收敛/未闭合 slug + journal 收割预览 + 语义 TODO
+// 用法（参数唯一源 = 本头注；未知旗标 = 退出 1——`--plan` 不是旗标，无参即计划模式）：
+//   node tools/converge.mjs                     # 计划模式：列出可收敛/未闭合 slug + journal 收割预览
 //   node tools/converge.mjs --slug <目录名>     # 收敛单个（前提：final + meta.closed + 一句话结论）
 //   node tools/converge.mjs --slug <目录名> --dry-run  # 只打印动作清单，不动盘
 //   node tools/converge.mjs --charter-backfill <目录名>  # 为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步）
@@ -18,6 +18,11 @@ import { spawnSync } from 'node:child_process'
 
 const args = process.argv.slice(2)
 const argOf = name => { const i = args.indexOf(`--${name}`); return i === -1 ? undefined : args[i + 1] }
+// 未知旗标 fail-loud（BUG-016①：`--plan` 曾被文档发明出来，传了还被静默「碰巧能跑」）
+for (const a of args) if (a.startsWith('--') && !['--slug', '--dry-run', '--charter-backfill'].includes(a)) {
+  console.error(`✗ 未知旗标 ${a}——认识：--slug <目录名> / --dry-run / --charter-backfill <目录名>；无参 = 计划模式`)
+  process.exit(1)
+}
 const DRY = args.includes('--dry-run')
 const SLUG_ARG = argOf('slug')
 const WS = join(ROOT, 'company-workspace')
@@ -121,11 +126,11 @@ const converge = (dirName) => {
   const evName = `convergence-${today}` // 证据目录 = 创建日（本函数创建；backfill 补登走 resolveEvidenceDir——BUG-015）
   const evDir = join(ROOT, 'snapshots', 'archive', evName, dirName)
   const actions = [
-    `证据副本 → snapshots/archive/${evName}/${dirName}/（交付物整目录 + ${journal.length} 篇 journal 副本）`,
+    `证据副本 → snapshots/archive/${evName}/${dirName}/（journal ×${journal.length} 留底；交付物本体 git mv 进归档家，不双份拷贝）`,
     `git mv deliverables/${dirName} → deliverables-archive/${dirName}`,
     ...journal.map(j => `git rm kb/${j.role}/journal/${j.file}（副本已入证据目录）`),
     `台账追加一行（逐字取 meta：${fields.结论.slice(0, 40)}…）`,
-    `语义 TODO（CLI 不做）：CHARTER 历史纪要（各角色把本轮教训压进 kb/<role>/CHARTER.md）`,
+    `CHARTER 历史纪要补登：node tools/converge.mjs --charter-backfill ${dirName}（结论逐字取 meta）`,
   ]
   console.log(`收敛计划 · ${dirName}${DRY ? '（dry-run）' : ''}`)
   actions.forEach(a => console.log('  · ' + a))
@@ -186,7 +191,7 @@ const converge = (dirName) => {
   }
   const row = appendLedger(fields)
   console.log(`✓ 收敛完成：交付物已入归档家、${journal.length} 篇 journal 清入证据副本、台账行已追加`)
-  console.log(`  语义 TODO：各角色 CHARTER 历史纪要（本轮教训压进 kb/<role>/CHARTER.md）——CLI 不代写`)
+  console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/converge.mjs --charter-backfill ${dirName}（教训性文字仍由人把守——纪要素材逐字取 meta）`)
 }
 
 const ROLE_KEY = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo' }

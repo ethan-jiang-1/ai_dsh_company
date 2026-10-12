@@ -1,5 +1,5 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-10-12
 ---
@@ -8,10 +8,11 @@ opened: 2026-10-12
 
 > 严重级别：P2（次要）｜发现：2026-10-12（f8bc123...HEAD 双轴代码评审，两轴独立命中②）｜状态：修复就绪
 > **翻转记录（2026-10-12）**：三条复现实跑见红（收据在复现节）+ 修法选定 + 已修判定在场——缺陷轨翻转表「调查中 → 修复就绪」（P2 修复型自授权通道）。
+> **修复（2026-10-12）**：参数唯一源归工具头注——未知旗标 fail-loud（`--plan` 即报错 exit 1），dev-loop §12 与 checks/README 改无参计划口径（归档卡 `--plan` 字样按历史稿不追改）；动作清单文案对齐 journal-only（「journal ×N 留底；交付物本体 git mv 进归档家，不双份拷贝」）；完成/动作清单 TODO 改指 `--charter-backfill`（已机械化）。绿收据：`--plan` / `--no-such-flag` 均 exit 1、无参计划正常、沙箱动作清单新文案（复现节同法）；`pnpm verify` ALL PASS + `pnpm test` 494/494——已修判定满足，修复已落地 → 已修归档。
 
 ## 症状
 
-1. **幽灵旗标 `--plan`**：[dev-loop §12](../../docs/guides/dev-loop.md)、[checks/README](../../checks/README.md)、
+1. **幽灵旗标 `--plan`**：[dev-loop §12](../../../docs/guides/dev-loop.md)、[checks/README](../../../checks/README.md)、
    归档卡都教 `node tools/converge.mjs --plan`；工具头注（:6-10）只定义无参计划模式 + `--slug`/
    `--dry-run`/`--charter-backfill`。传 `--plan` 被静默忽略（「碰巧能跑」），未知旗标一律不报错。
 2. **动作清单文案与实行两张皮**：`--slug`（含 --dry-run）打印的动作清单「证据副本…（交付物整目录
