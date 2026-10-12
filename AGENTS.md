@@ -51,7 +51,7 @@ source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的完
 
 ## DSH 源码：三个实体，别混
 
-**① 唯一权威 = `vendor/dsh/`**（钉 SHA 只读；机制核对一律 `pnpm dsh`）。**② 裸 `dsh` = 日用全局安装**（版本随全局漂移，不作本仓依据；已被 env.sh 拦截，确要日用 `command dsh`）。**③ 外部研究树** `/Users/bowhead/deepseek-harness/`（`_digested`/FAQ 宿主，只读；登记见 [index §外部研究材料登记](docs/index.md)）。全局不变量 = `vendor/dsh/AGENTS.md` Conventions 节；概念→源码直达 = [index §术语映射](docs/index.md)。
+**① 唯一权威 = `vendor/dsh/`**（钉 SHA 只读；机制核对一律 `pnpm dsh`）。**② 裸 `dsh` = 日用全局安装**（版本随全局漂移，不作本仓依据；已被 env.sh 拦截，确要日用 `command dsh`）。**③ 外部研究树** `/Users/bowhead/deepseek-harness/`（`_digested`/FAQ 宿主，只读；登记见 [index §外部研究材料登记](docs/index.md)）。全局不变量 = `vendor/dsh/AGENTS.md` Conventions 节；概念→源码直达 = [术语映射](docs/terminology.md)。
 
 ## 纪律（沿 DSH 研发纪律；默认严格照做，偏离必须登记）
 

@@ -30,7 +30,7 @@
 
 preset roster 走 **`agent-preset-registry` 一行 + 每预设一行声明**（0.1.7 起的模型；旧模型的
 `roots` 目录扫描已废，见 [cordis.patch.yml](../packages/company-pack/cordis.patch.yml) 头注与
-[index §术语映射](./index.md)）。
+[术语映射](./terminology.md)）。
 
 ## host 行清单（现在时，bundle 承载）
 

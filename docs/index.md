@@ -29,6 +29,8 @@
 | [runtime-map.md](./runtime-map.md) | 合同 | **运行态地图**：profile / bundle / preset / session / cwd / 日志 / workspace / snapshot 的时序关系与四条状态轴 |
 | [project-map.md](./project-map.md) | 合同 | 空间导航：目录逐件 owner、产物落点 |
 | [guides/cdp-probe.md](./guides/cdp-probe.md) | 指南 | 观察窗「呈现即验证」机器腿：client 面改动后的呈现前走查、页面异常定位 |
+| [guides/web-rpc.md](./guides/web-rpc.md) | 指南 | 驱动 Web 面会话的 HTTP RPC runbook：脚本化建会话/发 prompt/读日志 |
+| [terminology.md](./terminology.md) | 导航 | 术语映射查表：本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达 |
 | [orient.md](./orient.md) | 导航 | 驾驭者白话七问（只导航，不复述事实） |
 | [AGENTS.md](./AGENTS.md) | 规范 | 本层分层规矩唯一家（一处事实一个家 / 长度棘轮 / 更新时机 / 负知识） |
 
@@ -112,7 +114,7 @@
 | `…/option-a-standalone-with-pinned-dsh.md` | **本 repo 形态依据（Option A）**：目录树、装法、取舍、升级阶梯 | design/architecture §6、§8–§9；AGENTS.md 布局块 + [project-map](./project-map.md)（现行目录逐件） |
 | `…/dev-loop.md` | 开发过程生命周期（六步闭环/调试阶梯/设计四问/插拔速查） | guides/dev-loop（全文吸收）；AGENTS.md 纪律 |
 | `…/dual-home-isolation.md` | 双 home 机制、崩溃半径、迁移方向 | run/env.sh；guides/dev-loop §6 |
-| `…/research.md` | 第三方生态证据（peers/兼容矩阵/自包含/真实安装形状） | guides/dev-loop §5 发布纪律时点；design/architecture §8 |
+| `…/research.md` | 第三方生态证据（peers/兼容矩阵/自包含/真实安装形状） | release.md（依赖姿态/兼容矩阵/发布冒烟）；design/architecture §8 |
 | `_digested/`（源码消化笔记） | DSH 源码机制笔记（审计基线，版本唯一见 `AGENTS.md` §vendor 簿记——**基线可能落后当前钉住一代**，升 pin 未重审时以簿记注记为准） | design/ 各篇（architecture / roles-isolation / ui-demo）的机制核对引文；**权威仍在 `vendor/dsh/` 本体** |
 | `_dsh_plugin_agent_ready_development/sdlc-reference/01-agent-note-lifecycle.md`（语料更名前后路径同页） | DSH Agent Note 生命周期（状态/路径/格式/取代/归档；判定基于 0.1.7-rc.1 树，rc.2 收窄为「持久决定理由」后 D35 全量对齐） | [notes/README.md](../notes/README.md)（D35；六条点选已收进本文件，吸收稿已删） |
 | `_dsh_plugin_agent_ready_development/`（三卷 + `_coverage` + `verify.mjs`；更名自 `_agent_ready_development`，0009–0013 轮演进后钉 `dsh-v0.2.0-rc.2` = 本仓当前 pin） | 插件仓视角开发语料：native-development-model（独立插件仓闭环——**直接以本仓这类 repo 为受众**）/ sdlc-reference / repo-harness 三卷 | 判定 = [plugin-corpus-realignment](../notes/implemented/2026-10-07-plugin-corpus-realignment.md)（不照搬清单在该 Note；全亲读零增量。体感不对的翻案 = 驾驶座缺仪表，见 orient 第七问与 dev-loop 轮次回执） |
@@ -122,20 +124,3 @@
 | `_faq_on_digested/04/05/11/15`（4 目录） | 根入口文档静态/运行时设计 + 原生开发环 + loop 工程 vs SDD | 判定 = [archived/faq-04-05-11-15-judgment](../notes/archived/2026-09-28-faq-04-05-11-15-judgment.md)：立即借的九条已在现行合同（dev-loop 等），有压力再借的六条带触发条件；「防重复评估」节防重读全文 |
 | `/Users/bowhead/ai_dsh_loop_advisor/_backlog`（独立外部仓，同机工作树；2026-10-03 当日态） | D31 制度的直系后代（本仓 → ai_dsh_architect → advisor，其间又借 ai_deerflow_dr_v3 主干框架）：四门/主干框架/三条硬规则/章程账本二分/搁置池新纪律（搁置 = 队列决定，agent 不得自行判搁置）/索引交叉核对门禁/随卡归档的 reference/ | 章制回借（D33）：主干框架与硬规则、章程账本二分、backlog-liveness 升格、两桶解禁、全日期卡名；判定与不借边界 = [implemented/2026-10-03-backlog-charter-refit](../notes/archived/2026-10-03-backlog-charter-refit.md) |
 | `/Users/bowhead/ai_dsh_assitant/_backlog`（独立外部仓，同机工作树；2026-10-09 当日态） | 问题卡/缺陷卡/研究/按需方法/结论交接/触发索引的完整章制（第七处借源，D31/D33 前朝制度的后继） | `_backlog/` 现行制度整体重立：判定、适配与验证 = [implemented/2026-10-09-backlog-issue-lifecycle](../notes/implemented/2026-10-09-backlog-issue-lifecycle.md) |
-
-## 术语映射（本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达）
-
-新会话查 DSH 机制先查这张表：概念 → 官方载体 → 源码路径一步到位（路径均核实存在于钉住 tag）。
-探索路由（进 vendor 树）：`vendor/dsh/docs/architecture.md` → `docs/capability-seams.md` → 具体 package README——机制结论的权威在 vendor 树。
-
-| 本项目 | DSH 官方 | vendor/dsh 落点（读源码从这进） |
-|---|---|---|
-| 角色（CEO/VP…） | agent preset（`presets/<id>/agent.cordis.yml` + persona + skills） | `packages/preset/agent-preset`（每预设一行声明，rc.2 形）+ `packages/preset/persona`；出厂范本 = `packages/bundle/web-app/presets/` |
-| 组织/公司 | 一个 host profile + preset roster（rc.2：`agent-preset-registry` 装配，roots 目录扫描已废） | `packages/preset/agent-preset-registry`（default 装配）+ `docs/architecture.md`（组合链）；升 pin 迁移实证 = [pin-upgrade-0.2.0](../notes/implemented/2026-09-30-pin-upgrade-0.2.0-rc.2.md) |
-| worker（角色底下干活的一次性代理） | one-shot subagent（`dsh-tool-subagent`，spawn provider） | `packages/subagent/tool-subagent/README.md` |
-| 派活/汇报线 | 命名委托工具（通道 A / M2） | 同上（per-instance persona 教义在其 README） |
-| 会议/任务板/邮箱 | Agent Teams（`ctx.agentTeams`，experimental） | `packages/experimental/agent-team` + `packages/experimental/tool-agent-team` + `docs/subsystems/agent-team.md` |
-| 通道 A/B/C/D（机制） | 命名委托 / Agent Teams / dsh-sdk 子进程 / workflow 脚本（architecture §3） | [architecture.md](./design/architecture.md) §3 篇首映射表（各通道包清单） |
-| M1–M4（用法/编排） | 人中继 / 隔离委托 / SDK 编排器 / 团队（roles-isolation §3） | [roles-isolation.md](./design/roles-isolation.md) §3 选型速查 |
-| 公司页签 / 公司视图 | 右栏公司页签（可 `float()` 拖出成浮窗）+ 整页视图（`conversation.view` 条目；命名原则 = ui-demo §5）——页签清单 = 客户端注册面（[src/client](../packages/company-pack/src/README.md)），随切片增长、不在此枚举 | `packages/client/ui-sidebar-right`（tab 注册与浮窗）+ `docs/subsystems/sidebar-right.md` + `packages/client/ui-dockkit`（浮窗手势） |
-| 交付物 | `present` 工具的 explicit deliveries（ui-demo §1） | `packages/client/ui-deliverables` |

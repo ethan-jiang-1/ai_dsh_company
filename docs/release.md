@@ -2,7 +2,7 @@
 
 > 什么时候读：发布、打包、装进真实 profile、升 vendor pin 时。路线 = §vendor 政策 → release-smoke。
 > 顶层合同：vendor 政策、pack 的依赖姿态、兼容矩阵、真实安装冒烟程序、升 pin 程序。
-> 依据：guides/dev-loop §5（发布纪律时点表）+ FAQ 13（外部研究：dsh-market / dsh-im 生态姿态）。
+> 依据：FAQ 13（外部研究：dsh-market / dsh-im 生态姿态）；原 dev-loop §5 发布时点表已全部落地随迁本文件（2026-10-12）。
 > 执行器：`checks/smoke/release-smoke.mjs`（发布冒烟）与 `tools/sync-dsh.mjs`（升 pin）。
 
 ## 依赖姿态（R5a 起的现在时）
@@ -112,6 +112,7 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
   **registry 三态幂等**（无 → publish / sha512 同 → skip / 异 → fail「改内容没升版」）；
   **改内容必 bump 版本**；**发布字节 = 冒烟字节**（publish 的产物必须就是 release-smoke
   验过的那份，不另打包）。
+- **OpenSpec 引入**（原 dev-loop §5 时点表随迁）：触发条件 = **第二贡献者进场**或**向 DSH 上游提 seam**（配合 D9 走方案 B）；此前 notes/ 纪律够用（FAQ 13 answer.md 决策 5）。
 - 发布前必跑：`pnpm verify` + `pnpm test`（迭代环）+ `release-smoke`（认证档）；
   preset/内容改动另跑 `preset-smoke`（guides/dev-loop §9.1 分层）。
 

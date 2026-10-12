@@ -14,8 +14,18 @@
 |---|---|
 | 选择任务、判断授权与 Plan Mode | §0.5 |
 | 实施、验证、交接 | §1；验证触发条件见 §9.1 |
-| 排查运行问题 | §2 |
+| 排查运行问题 | §2（组合层→会话层阶梯） |
+| 写新代码前的四问 | §3 |
+| 插拔与装法速查 | §4 |
+| 升级环与发布 | §5；程序唯一家 = release.md |
+| 双 home 与双 DSH | §6 |
+| 环境引导 | §7（= bootstrap.md 指针） |
+| 驱动 Web 面会话（RPC） | §8 = [web-rpc 指南](./web-rpc.md) |
+| 门禁分层与测试预算 | §9 / §9.1 |
+| 自动化轻任务纪律 | §10 |
+| 工具态与越界写入 | §11 |
 | 更新 Notes 与收尾队列项 | §12 |
+| 自主优先协议与语义审 | §13 |
 
 ## 0.5 任务入口与交接
 
@@ -61,7 +71,7 @@
 
 | 层 | 手段 | 核对什么 |
 |---|---|---|
-| 1 组合层 | `pnpm dsh --profile <p> --dump-config` | 打印最终组合树，确认"我以为挂上的行"真的在、config 是我以为的；层级顺序 bundle → profile patch → home patch → `--patch` overlay（`vendor/dsh/apps/cli/src/dump-config.ts`）。⚠ patch 语法：`- id:` 只替换已有行，**新增行必须 `- insert:`**（教义源自 shipped dsh-headless 的 cordis.patch.yml；R1 实证） |
+| 1 组合层 | `pnpm dsh --profile <p> --dump-config` | 打印最终组合树，确认"我以为挂上的行"真的在、config 是我以为的；层级顺序 bundle → profile patch → home patch → `--patch` overlay（`vendor/dsh/apps/cli/src/dump-config.ts`）。⚠ patch 语法两条（`- id:` 替换 / `- insert:` 新增）唯一家 = §4 |
 | 2 装载层 | preset 装不上时看 roster 报错 | roster **连原因一起列出**（fail-loud），报错即诊断，不静默跳过 |
 | 3 生效层 | 改 patch 行后要不要重启 | 自定义 profile 的 user patch 层**热重载**（长驻面默认开）；headless/sdk 一次性成型，调试它们要重启（`vendor/dsh/packages/boot/app-boot/src/profile.ts`） |
 | 3.5 **退出层（R1 实证）** | **症状"任务似已跑完但进程不退 + stdout 零输出"→ 先查 `patchReload`** | **自定义 profile（非 shipped 名字）默认 `'live'`**（源码注释："Custom profiles retain the historical live patch-file behavior"）——live watcher 常驻，一次性 headless 任务跑完进程也不退、stdout 不 flush。修法：profile 的 package.json 改 `"patchReload": "startup"`。shipped 名字（headless/web/sdk…）走模板不受此扰。第一分叉点永远是 **shipped 名字 vs 自定义名字** |
@@ -115,10 +125,9 @@ CPU 满载 = 死循环；比砍配置二分快得多（R1 三刀二分全白切�
 求值）→ 卸载（registrations are effects，无残留）。异常时先 `--dump-config` 对照实际组合
 再下结论。
 
-## 5. 升级环与发布纪律时点
+## 5. 升级环与发布纪律
 
-升级环（AGENTS.md 纪律的展开；执行器 `tools/sync-dsh.mjs`，R5a 建——默认检查簿记一致，
-`--pin <tag>` 走完整程序）：
+升级环（AGENTS.md 纪律的展开；执行器 `tools/sync-dsh.mjs`，R5a 建——默认检查簿记一致，`--pin <tag>` 走完整程序）：
 
 ```text
 vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回放全绿（升 pin 回归网第一道，
@@ -127,16 +136,8 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回�
 
 升 pin 重校含**旧机制引用扫描**：`grep` 仓内文档对已退役／改名机制（旧工具名、旧包名、旧行形态）的
 引用——换基座实证三处漂移（pack README 旧 bundle 行模型／ui-demo 旧 `cordis_inspect` 形／R5 待办过时，
-2026-09-25 收割）。
-
-发布纪律的时点表（不提前、不欠账）：
-
-| 时点 | 必须补上 | 依据 |
-|---|---|---|
-| ~~现在（零 JS，R0–R2）~~ | 无——pack 无代码，不存在依赖声明错误面 | [architecture.md](../design/architecture.md) §2.1 |
-| R3+（pack 有 `src/`）✅ R5a 已补 | `@deepseek-ai/cordis` + 用到的 `@deepseek-ai/dsh-*` 作 **peerDependencies**；拒绝精确钉死（pre-stable API，钉死 = 每次上游同步逼发版） | FAQ 13 research.md 生态失败样本 |
-| R5a（发布）✅ 已补 | `dsh.compatibility` 矩阵；`npm pack` → 干净 profile → `dsh plugin add` 冒烟（`release-smoke`） | [release.md](../release.md)；R5a 收尾 Note |
-| OpenSpec 引入 | 触发条件：**第二贡献者进场**或**向 DSH 上游提 seam**（配合 D9 走方案 B）；此前 notes/ 纪律够用 | FAQ 13 answer.md 决策 5 |
+2026-09-25 收割）。**发布程序、人审三项、依赖姿态、兼容矩阵与版本/触发纪律的唯一家 = [release.md](../release.md)**
+（本节原载的发布时点表已全部落地为历史，OpenSpec 触发条件随迁 release.md；原文在 git 与各轮 Note）。
 
 ## 6. 双 home 与双 DSH 操作细节
 
@@ -184,45 +185,10 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回�
 何时读 = 新 clone、重建 dev home、vendor 换 tag、任何「跑不起来」的第一站；§11 的工具态重定向
 纪律是引导的一部分，配合读。
 
-## 8. 驱动 Web 面会话（RPC；R1 实证）
+## 8. 驱动 Web 面会话（RPC）
 
-preset 只在 Web 面挂载（§2 第 3.6 层），所以**验证角色行为必须驱动 Web 面**。Web 面有 HTTP RPC，
-可以脚本化建会话、发 prompt、列会话：
-
-```sh
-# ① token → cookie（cookie 按 origin 隔离：换端口/换实例都要重新换一次；3081 = 示例值，端口是环境状态、从启动横幅读）
-#    从响应头抓 set-cookie 显式带上——`curl -c jar` 抓不稳，别用（脚本同法 = [harvest-probe.mjs](../../tools/archive/harvest-probe.mjs) 的 getSetCookie）
-COOKIE=$(curl -s -D - -o /dev/null "http://127.0.0.1:3081/?token=<TOKEN>" | grep -i '^set-cookie:' | head -1 | cut -d' ' -f2 | cut -d';' -f1)
-
-# ② 建会话（带 agentPreset 即挂角色 preset）
-curl -s -X POST "http://127.0.0.1:3081/api/session/create" \
-  -H 'Content-Type: application/json' -H "Cookie: $COOKIE" \
-  -d '{"type":"client-request","rpcId":"c1","method":"session/create",
-       "payload":{"args":{"request":{"cwd":"<绝对 cwd>","agentPreset":"ceo"}}}}'
-
-# ③ 发动议
-curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
-  -H 'Content-Type: application/json' -H "Cookie: $COOKIE" \
-  -d '{"type":"client-request","rpcId":"p1","method":"session/prompt",
-       "payload":{"args":{"request":{"requestId":"r-1","sessionId":"<sid>","mode":"queue",
-                                    "content":[{"type":"text","text":"<动议>"}]}}}}'
-```
-
-规则（都是实证踩出来的）：
-
-- **endpoint = `<namespace>/<method>`**（斜杠，不是点；见 gateway `claimsEndpoint` 的两段校验）。
-  namespace 来自服务键：`session-controller` → `session`，`agent-presets` → `agentPresets`。
-- **信封固定** `{"type":"client-request","rpcId":…,"method":…,"payload":{"args":{…}}}`。
-- **`args` 是位置参数的具名对象**，名字取自源码参数名：`create(request)` → `args.request`；
-  `list(_request, signal)` → **`args._request`**（占位参数的下划线也要照写）。
-- 常用：`session/create`、`session/prompt`、`session/list`、`agentPresets/list`。
-- **`ask_user_question` 的回答不走 RPC**（走 wire）——脚本化跑到提问就会停下等真人；此时去 UI 里答。
-- 这条通道也是 R5a「web 快照 lane」的雏形。
-
-
-- **读会话日志**用 `tools/lib/session-log.mjs`（page 与事件解析的共用实现）。两个坑：`session/page`
-  的 `throughSeq` 必须是**有效 seq**（`-1` 实测返回 0 条；当前游标可从越界报错 `… is past cursor N` 取），
-  完成信号取**持久事件 `turn/end`**（`session/list.running` 是“会话有活着的 agent”，idle 也为 true；用它等会假超时）。
+唯一家 = [web-rpc 指南](./web-rpc.md)（2026-10-12 自本节整段迁出——常驻层瘦身轮，节号保留防断链；
+§2 第 3.6/3.8 层的验证入口随它）。
 
 ## 9. 门禁分层：连通档（默认，秒级）vs 内容档（按需，分钟级）
 
@@ -349,7 +315,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - 条目收尾后可派**中立体清扫**（独立子代理；输入 = diff + 收尾 Note + 关联卡；扫与修分家），清单不另写 Note。
 - 文档卫生按指导价值：移除失效/重复指令与无行动价值的历史噪声；保留仍指导当前决策、解释约束或支持复验的证据。不以净减行数为目标（D26）。
 - **授权链与时间轴（intents.md 已退役，D34 2026-10-04）**：授权线索（用户点名/裁定原话）记在**对应 Note 的状态行**；时间轴 = `notes/implemented/` 文件名日期 + git log。月度冻结表已在 2026-10-09 清扫中删除（那是账本身）。退役理由 = 第三本账与 Note 双写、膨胀病史三次、违反上游 no-index 教义（vendor notes README）。
-- **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链一律 `set -o pipefail` + `&&`（不带 pipefail 的 `cmd | tail` 退出码是 `tail` 的 = 假绿）。push 由 **pre-push hook 强制跑全量 `pnpm verify` + `pnpm test`**（verify 2026-09-27 立；test 09-28 加，不进 CI 的定界见 [n7-ci-narrowing](../../notes/implemented/2026-10-09-n7-ci-narrowing.md)；接线 = `source run/env.sh` 幂等设 `core.hooksPath`；bypass = `--no-verify`，用后须在收尾 Note 说明原因）。
+- **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链纪律 = §1（证据不许假绿）。push 由 **pre-push hook 强制跑全量 `pnpm verify` + `pnpm test`**（verify 2026-09-27 立；test 09-28 加，不进 CI 的定界见 [n7-ci-narrowing](../../notes/implemented/2026-10-09-n7-ci-narrowing.md)；接线 = `source run/env.sh` 幂等设 `core.hooksPath`；bypass = `--no-verify`，用后须在收尾 Note 说明原因）。
 - **复盘一问：本轮有没有 agent 遵守的"未成文规则"**（从代码模式推断出的伪规则，跨会话会扩散）？三选一收口：升格 verify 门禁 / 写进 owner Note / 显式作废——规则不留空气（2026-09-28 借 FAQ 11）。
 
 ## 13. 自主优先协议（2026-09-26 立，用户令；D29）
