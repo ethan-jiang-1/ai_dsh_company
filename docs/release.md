@@ -82,6 +82,8 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 
 ## 升 pin 程序（`node tools/sync-dsh.mjs`，认证档）
 
+**触发政策（2026-10-12 用户写死）**：升 pin = **用户策动制**——agent 不主动盯上游 tag、不评估、不建议、不记录候选；只有用户明确指示升 pin 才进本节程序。渠道**只认 RC 与正式版（stable）**；alpha/beta 及其他预发布 tag 通通不管（即使被点名也不作为升 pin 对象——改政策须新 Note，见 D42）。
+
 默认只读核对四处簿记，不做流程语义审计。升级使用 `source run/env.sh && node tools/sync-dsh.mjs --pin <tag> --process-review <repo-relative.json>`；证据文件先经人审提交，两个工作树须干净。
 
 **证据文件命名与落点**（2026-09-26 补；**2026-10-02 迁 archived/**——原"顶层 notes/"与自家先例打架：0.1.7 的孤儿 JSON 早已迁 archived/，且同轮 delta 报告也住 archived/，顶层还会随 pin 无限堆积）：`notes/archived/<YYYY-MM-DD>-pin-review-<目标 tag>.json`（完结流程物证的家，与 delta 报告同住；`--process-review` 传该 repo 相对路径即可——sync-dsh 只要求 git 已跟踪、不限于子目录）。
