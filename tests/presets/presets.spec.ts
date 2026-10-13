@@ -206,6 +206,25 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(chairing, '规则必须保护 Agent 间内部密度').toMatch(/drafts|任务书|成员消息/)
   })
 
+  it('任务依赖必须教"两拍落"（板面 id 由板子发号；2026-10-13 实证：同批并行建任务时猜 id）', () => {
+    /**
+     * 现场（2026-10-13，会话 session-663ff4b6 / turn1 step9）：CEO 在同一批并行里建 T1–T4，
+     * T4 的 `blocked_by` 写了 `["3","1","2"]`（自己的纸面 T 号）⇒ 板子精确匹配失败：
+     * `blocker task "3" not found`（vendor agent-team task-board.ts:226，TEAM_TASK_NOT_FOUND）；
+     * T3 的依赖更因同批无处可取 id 而**静默缺边**（subject 写"依赖 T1,T2"，板面 blockedBy 一直 = []）。
+     * 反证：把 skill 里的 `blocked_by` 改回驼峰 `blockedBy`（或删掉 set_dependencies 两句）⇒ 本测试红。
+     */
+    const chairing = readFileSync(join(PRESETS_DIR, 'ceo/skills/chairing-staff-meeting/SKILL.md'), 'utf8')
+    expect(chairing, '必须写工具真参数名 blocked_by（驼峰 blockedBy 不是板子的参数）').toContain('blocked_by')
+    expect(chairing, '不许再出现驼峰 blockedBy（真缺陷原形）').not.toContain('blockedBy')
+    expect(chairing, '必须教第二拍 = team_task_update 的 set_dependencies').toContain('set_dependencies')
+    expect(chairing, '必须说明板面 id 形状 task-N').toContain('task-N')
+    expect(chairing, '必须点破"同批建的还没有 id、不许猜"').toMatch(/不许猜|还没有 id/)
+    expect(chairing, '必须区分纸面号与板面 id').toContain('纸面号')
+    const handbook = readFileSync(join(ROOT, 'company-workspace/AGENTS.md'), 'utf8')
+    expect(handbook, '派活行格式 owner（手册）必须点明 T 号是纸面号').toMatch(/`T<N>` 是纸面号/)
+  })
+
   it('职能 preset 一律指向 drafts/，不许自己写 final.md（成品是对外承诺，归 CEO）', () => {
     for (const role of ['vp-eng', 'vp-sales', 'coo', 'cfo']) {
       const dir = join(PRESETS_DIR, role)
