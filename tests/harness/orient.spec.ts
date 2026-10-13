@@ -94,8 +94,12 @@ describe('公司盘概览', () => {
 
 describe('orientState + renderOrient', () => {
   it('ok 态渲染含 home / profiles / 会话 / 公司盘 / run bundle 四件套 / 便宜检查节', () => {
-    const state = orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace, gitStatus: 3 })
+    // gitIgnored 一并注入：2026-10-13 瘦身轮起 drafts/sources 是 ignored 的**本地过程稿**，
+    // 只看 tracked 会把它报成"零改动"（静默失真）⇒ 概览必须两行都有（反证：删 lib/orient 的
+    // 那一行 push ⇒ 本断言红）。
+    const state = orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace, gitStatus: 3, gitIgnored: 33 })
     const text = renderOrient(state)
+    expect(text, 'ignored 面（本地过程稿）也要报，别让瘦身把这一层藏起来').toContain('本地过程稿     33 项')
     expect(text).toContain(home)
     expect(text).toContain('headless, web')
     expect(text).toContain('slug-company')
