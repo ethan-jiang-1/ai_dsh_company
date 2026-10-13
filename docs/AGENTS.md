@@ -23,7 +23,7 @@
 
 ## 长度：顶点即信号
 
-行数上限唯一源 = [`checks/run-gates.mjs`](../checks/run-gates.mjs) 的 `DOC_LINE_BUDGETS`（本文件不复述数字）。
+行数上限唯一源 = [`checks/gates/doc-budget.mjs`](../checks/gates/doc-budget.mjs) 的 `DOC_LINE_BUDGETS`（本文件不复述数字）。
 语义 = **棘轮**：
 
 - 只降不升——瘦身轮后上限随内容下调（留 ≥5% 头寸）。

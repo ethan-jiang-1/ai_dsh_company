@@ -26,12 +26,12 @@ DSH 给的载体就是 skill：procedural memory，按上下文触发加载。
 | skill | 触发面 | 完成判据的关键一条 |
 |---|---|---|
 | [`agent-note-definition`](../../.agents/skills/agent-note-definition/SKILL.md) | 写/改 `notes/**`；非平凡变更宣布完成前 | 第 1 步**先搜再写**（D34/D36 两次造第二本账的实地案例）+ 「输掉的方案」非空且非稻草人 |
-| [`gate-change-definition`](../../.agents/skills/gate-change-definition/SKILL.md) | 加/改 `checks/run-gates.mjs` | **先造红，再相信绿**；分档门禁**两个方向都跑** |
+| [`gate-change-definition`](../../.agents/skills/gate-change-definition/SKILL.md) | 加/改 `checks/gates/` 门禁模块 | **先造红，再相信绿**；分档门禁**两个方向都跑** |
 | [`close-out-definition`](../../.agents/skills/close-out-definition/SKILL.md) | 任何非平凡变更收尾前 | 语义审**真跑过并写出结论**（不是"已阅"）；四链证据未跑的显式标「未执行」 |
 
 三者的 `description` 按 DSH 五步形状写（触发分支前置），正文只链规则 owner 不复述——
 `agent-note-definition` 指向 `notes/README.md`，`close-out-definition` 指向 dev-loop §12/§13，
-`gate-change-definition` 指向 run-gates 自己（门禁清单唯一源）。
+`gate-change-definition` 指向 checks/gates/ 目录（门禁清单唯一源；2026-10-14 拆分轮起门禁一文件一门）。
 
 **为什么先写这三个**：它们的失败模式在本仓都**已实地发生**（36/135 缺备选、两次假守卫、24 次空转），
 不是推测出来的需求。DSH 试点轮的判据同样适用：「无复发证据不建满载」。

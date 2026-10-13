@@ -30,10 +30,10 @@ try {
   const pkg = JSON.parse(readFileSync(join(packDir, 'package.json'), 'utf8'))
   const version = pkg.version
   const tarballName = `dsh-company-pack-${version}.tgz`
-  // 验证基线的事实家 = run-gates.mjs；先核对输入，再替换已有导出。
-  const gatesText = readFileSync(join(repoRoot, 'scripts', 'run-gates.mjs'), 'utf8')
-  const expectedTag = /const expectedTag = '([^']+)'/.exec(gatesText)?.[1]
-  if (!expectedTag) throw new Error('run-gates.mjs 缺 expectedTag；未替换已有导出')
+  // 验证基线的事实家 = checks/gates/lib/pin.mjs（2026-10-14 拆分轮自 run-gates.mjs §0 迁出）；先核对输入，再替换已有导出。
+  const pinText = readFileSync(join(repoRoot, 'checks', 'gates', 'lib', 'pin.mjs'), 'utf8')
+  const expectedTag = /const expectedTag = '([^']+)'/.exec(pinText)?.[1]
+  if (!expectedTag) throw new Error('pin.mjs 缺 expectedTag；未替换已有导出')
 
   // 只清本脚本自己的旧产物，不动 _dist/ 里别人放的东西
   mkdirSync(distDir, { recursive: true })

@@ -29,7 +29,7 @@ try {
   processes = releaseProcesses({ cwd: ROOT, env })
   const run = (cmd, argv, options) => processes.run(cmd, argv, options)
   const gitVendor = async argv => (await run('git', ['-C', VENDOR, ...argv])).trim()
-  const verifyPath = join(ROOT, 'checks/run-gates.mjs')
+  const verifyPath = join(ROOT, 'checks/gates/lib/pin.mjs')
   const agentsPath = join(ROOT, 'AGENTS.md')
   const manifestPath = join(ROOT, 'packages/company-pack/package.json')
   const lockPath = join(ROOT, 'pnpm-lock.yaml')
@@ -41,9 +41,9 @@ try {
   const matrix = manifest?.dsh?.compatibility?.dshReleases
   const head = await gitVendor(['rev-parse', 'HEAD'])
   const problems = []
-  if (v.sha !== head) problems.push(`run-gates.mjs SHA ${v.sha} ≠ HEAD ${head}`)
+  if (v.sha !== head) problems.push(`pin.mjs SHA ${v.sha} ≠ HEAD ${head}`)
   if (a?.[2] !== head) problems.push(`AGENTS.md SHA ${a?.[2]} ≠ HEAD ${head}`)
-  if (!v.tag || a?.[1] !== v.tag) problems.push('run-gates.mjs 与 AGENTS.md tag 缺失或不一致')
+  if (!v.tag || a?.[1] !== v.tag) problems.push('pin.mjs 与 AGENTS.md tag 缺失或不一致')
   if (!Array.isArray(matrix) || !matrix.includes(v.tag)) problems.push(`兼容矩阵缺当前 tag ${v.tag}`)
   if (problems.length) throw new Error(`簿记漂移：\n  ${problems.join('\n  ')}`)
   if (pin === undefined) {

@@ -1,11 +1,11 @@
 ---
 name: gate-change-definition
-description: Use when adding or changing a gate in checks/run-gates.mjs, to run the definition of done for that change — put the rule in its single owning gate, record why it exists next to the check, and drive it red by breaking the real thing before trusting it, since a gate you never saw fail is not evidence.
+description: Use when adding or changing a gate in checks/gates/ (one gate per module, assembled by run-gates.mjs), to run the definition of done for that change — put the rule in its single owning gate, record why it exists next to the check, and drive it red by breaking the real thing before trusting it, since a gate you never saw fail is not evidence.
 ---
 
 # 加/改门禁的完成定义
 
-适用：`checks/run-gates.mjs` 里新增或修改任何门禁。纪律权威 = 根 [AGENTS.md](../../../AGENTS.md) 纪律表
+适用：`checks/gates/` 门禁模块里新增或修改任何门禁（装配入口 = `checks/run-gates.mjs`）。纪律权威 = 根 [AGENTS.md](../../../AGENTS.md) 纪律表
 （「机械不变量进执行门禁 + 每门带反证」→ vendor `AGENTS.md` Conventions）；本 skill 只管次序与判据。
 
 ## 为什么这一步不能跳
@@ -48,7 +48,7 @@ description: Use when adding or changing a gate in checks/run-gates.mjs, to run 
 
 ## 指针（别复述）
 
-门禁清单唯一源 = [checks/run-gates.mjs](../../../checks/run-gates.mjs) 自己（本 skill 不复述门禁清单）；
+门禁清单唯一源 = [checks/gates/](../../../checks/gates/) 目录（每门禁一文件；本 skill 不复述门禁清单）；
 负例留证口径与两次实地教训 = [ledger-routing Note](../../../notes/implemented/2026-10-09-ledger-routing-table.md)、
 [docs-tier-taxonomy Note](../../../notes/implemented/2026-10-09-docs-tier-taxonomy.md)；
 测试分层与证据纪律 = [testing.md](../../../docs/testing.md)。

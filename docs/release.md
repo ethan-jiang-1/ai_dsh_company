@@ -29,13 +29,13 @@
 ```json
 "dsh": { "compatibility": { "dshReleases": ["<历史 tag>", "<当前钉住 tag>"] } }
 ```
-**形状 = 数组，含历史版本 + 当前钉住的那一个**（`run-gates.mjs` 的 `pack-compat` 门禁强制矩阵含当前
+**形状 = 数组，含历史版本 + 当前钉住的那一个**（`pack-shape.mjs` 的 `pack-compat` 门禁强制矩阵含当前
 tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具体值）。
 
 - 语义：**每个列名都是真实验证过的 vendor pin tag**（升 pin 走 sync-dsh，冒烟过了才加列）。
 - 机械门禁：`pnpm verify` 的 `pack-compat`——当前钉住 tag 不在矩阵里就红
   （升 pin 忘加列 = 没验证过就装作验证过）。`sync-dsh` 检查模式同时核对四处簿记一致
-  （submodule HEAD / run-gates.mjs 常量 / AGENTS.md 簿记行 / 矩阵）。
+  （submodule HEAD / pin.mjs（checks/gates/lib/pin.mjs）常量 / AGENTS.md 簿记行 / 矩阵）。
 
 ## vendor 政策（钉住的上游；AGENTS.md 只留铁律与指针）
 

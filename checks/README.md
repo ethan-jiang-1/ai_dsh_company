@@ -24,7 +24,7 @@
 
 | 脚本 | 证明对象 / 用途 |
 |---|---|
-| [run-gates.mjs](run-gates.mjs) | 仓库结构、文档引用、vendor 簿记与脚本约束；门禁清单以实现为准 |
+| [run-gates.mjs](run-gates.mjs) | 结构门禁装配 runner：按原顺序跑 gates/ 各门禁（仓库结构、文档引用、vendor 簿记与脚本约束；清单唯一源 = gates/ 目录） |
 | [preset-smoke.mjs](smoke/preset-smoke.mjs) | 通过真实会话创建验证各角色 preset 挂载 |
 | [client-load-smoke.mjs](smoke/client-load-smoke.mjs) | 加载真实 Web 页面，验证 client 挂载、品牌与零装配错误 |
 | [replay-smoke.mjs](smoke/replay-smoke.mjs) | 录制会话、sidecar、团队投影与场景声明的工作区 oracle；另有录制和 UI 模式 |
@@ -127,4 +127,4 @@
 
 [lib](../tools/lib/) 保存可由隔离夹具验证的会话日志、workspace oracle、交付物/作者判据、排练输入、发布事务和仓库布局逻辑；[drivers](../tools/drivers/) 保存真实进程、CDP 和 Playwright 驱动。驱动不进入 keyless spec；准入由 [分层守卫](../tests/harness/layering.spec.ts) 检查。
 
-完整门禁 [run-gates](run-gates.mjs) 住本目录根，pin 事实不拆；keyless spec 按 company/client/presets/harness 领域归位。新增入口同 diff 增加索引，触发条件、成本和状态仍留在脚本头注。目录取舍 = [driver-purpose-top-level](../notes/implemented/2026-10-07-driver-purpose-top-level.md)（`scripts/`、`dev/` 形态名已退役）。
+门禁装配入口 [run-gates](run-gates.mjs) 住本目录根，每道门禁一个模块（清单唯一源 = gates/ 目录；pin 常量 = gates/lib/pin.mjs）；keyless spec 按 company/client/presets/harness 领域归位。新增入口同 diff 增加索引，触发条件、成本和状态仍留在脚本头注。目录取舍 = [driver-purpose-top-level](../notes/implemented/2026-10-07-driver-purpose-top-level.md)（`scripts/`、`dev/` 形态名已退役）。

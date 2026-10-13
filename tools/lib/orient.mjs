@@ -79,7 +79,7 @@ export function scanDeliverables(workspaceRoot) {
 
 /** 现在就能跑的便宜检查（静态清单：全部 keyless/秒级；逐脚本触发条件唯一源 = 脚本头注）。 */
 export const CHECKS = [
-  { cmd: 'pnpm verify', what: '结构门禁（清单唯一源 = checks/run-gates.mjs）' },
+  { cmd: 'pnpm verify', what: '结构门禁（清单唯一源 = checks/gates/ 目录）' },
   { cmd: 'pnpm test', what: 'keyless 回归（vitest，秒级）' },
   { cmd: 'pnpm orient --scenario <kind>/<场景>', what: 'run bundle 视图（引用合同 = snapshots/README）' },
 ]

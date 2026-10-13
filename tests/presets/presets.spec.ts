@@ -40,7 +40,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   it('preset 行引用的插件都在 pack 依赖声明里（DSH verify-cordis-config 同构；R5a 起 deps ∪ peers）', () => {
     const manifest = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')) as { dependencies?: Record<string, string>, peerDependencies?: Record<string, string> }
     // R5a 起 runtime 依赖 = peerDependencies（docs/release.md：不精确钉死）；本断言按包名归一，
-    // 两种声明都算"在列"——与 checks/run-gates.mjs §7 的门禁同口径。
+    // 两种声明都算"在列"——与 checks/gates/preset-row-deps.mjs 的门禁同口径。
     const deps = new Set([...Object.keys(manifest.dependencies ?? {}), ...Object.keys(manifest.peerDependencies ?? {})])
     const missing = [...new Set(ROLES.flatMap(rowPlugins))].filter(name => !deps.has(name))
     expect(missing).toEqual([])
