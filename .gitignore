@@ -26,3 +26,10 @@ _dist/*
 # 外部工具的任务态（.pi/tasks/，写入者在本仓之外）：此前只靠机器级全局 gitignore 隐身，
 # fresh clone 到别的机器会露出 untracked——本仓内声明掉
 .pi/
+
+# 公司盘业务数据（2026-10-13 瘦身轮）：**过程物料与原始取证不进 git**——入库的只有成品（final/meta）、
+# 制度件（pack workspace）与证据副本（snapshots/）。量级：drafts/**（含 sources/ 的 PDF/HTML/raw）
+# 实测 531 件 tracked / ≈70MB；它们归档价值由 meta.md/final.md 与 snapshots/archive 承担。
+# ⚠ 规则按目录点名（不是 blanket）：deliverables 的成品与公司盘其它面照旧 tracked。
+company-workspace/deliverables/*/drafts/
+company-workspace/deliverables-archive/*/drafts/

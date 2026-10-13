@@ -12,4 +12,12 @@ describe('gitignore-guards（BUG-013）', () => {
     const gitignore = readFileSync(join(repositoryRoot, '.gitignore'), 'utf8')
     expect(gitignore).toMatch(/^runtime\/e2e\/$/m)
   })
+  // 2026-10-13 瘦身轮：公司盘过程物料（drafts 含 sources）不进 git；成品（final/meta）照旧入库。
+  // 进程级核查（index 里零 drafts）在 verify 的 drafts-untracked 门禁——本 spec 只钉规则在场。
+  it('.gitignore 点名忽略公司盘 drafts/（交付物过程物料），且不 blanket 整个 deliverables', () => {
+    const gitignore = readFileSync(join(repositoryRoot, '.gitignore'), 'utf8')
+    expect(gitignore).toMatch(/^company-workspace\/deliverables\/\*\/drafts\/$/m)
+    expect(gitignore).toMatch(/^company-workspace\/deliverables-archive\/\*\/drafts\/$/m)
+    expect(gitignore, 'blanket 掉整个 deliverables 会把成品也挡在门外').not.toMatch(/^company-workspace\/deliverables\/?$/m)
+  })
 })

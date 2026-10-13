@@ -135,7 +135,7 @@ export function fourPieceState({ home, profiles, workspaceRoot, root = repositor
 
 /** 组装观测态。gitStatus / sessionPresets 由调用方注入（lib 不起进程）：前者=数字或 null，
  *  后者 = slug→preset 映射或 null（null = 不渲染 preset 列；映射内 undefined = 「不可用」）。 */
-export function orientState({ env = process.env, dailyHome, workspaceRoot, gitStatus = null, sessionPresets = null, sessionLimit = 5, root } = {}) {
+export function orientState({ env = process.env, dailyHome, workspaceRoot, gitStatus = null, gitIgnored = null, sessionPresets = null, sessionLimit = 5, root } = {}) {
   const home = homeStatus(env, { dailyHome })
   const effective = home.kind === 'ok' ? home.home : null
   const profiles = effective ? listProfiles(effective) : []
@@ -143,7 +143,7 @@ export function orientState({ env = process.env, dailyHome, workspaceRoot, gitSt
     home,
     profiles,
     sessions: effective ? listSessions(effective, sessionLimit) : { total: 0, recent: [] },
-    workspace: { root: workspaceRoot, ...workspaceOverview(workspaceRoot), gitStatus },
+    workspace: { root: workspaceRoot, ...workspaceOverview(workspaceRoot), gitStatus, gitIgnored },
     scan: scanDeliverables(workspaceRoot),
     sessionPresets,
     fourPiece: fourPieceState({ home, profiles, workspaceRoot, root }),
@@ -177,6 +177,7 @@ export function renderOrient(state) {
     ? `（共 ${state.workspace.deliverables.length}）: ${state.workspace.deliverables.join(', ')}`
     : '（空）'}`)
   lines.push(`git 改动       ${state.workspace.gitStatus === null ? '（不可用——git 未起或不在仓库内）' : `${state.workspace.gitStatus} 处（company-workspace 面）`}`)
+  lines.push(`本地过程稿     ${state.workspace.gitIgnored === null ? '（不可用）' : `${state.workspace.gitIgnored} 项（ignored：drafts/sources，2026-10-13 起不进 git）`}`)
   lines.push('', '== 待核工作候选（R3′ 口径；零容忍未达门槛——只显示，不进个人待办、不自动通知）==')
   const slugs = Object.entries(state.scan ?? {})
   if (slugs.length === 0) {

@@ -58,7 +58,7 @@ host 半（`packages/company-pack/src/index.ts` 的 `apply`）在每次装载时
 ## 仍未做（本 goal 的后续切片）
 
 - **把落点登记成工作区**（GUI 里自动出现"梦之队公司盘"）：未做——现在要人手点一次"添加工作区"。
-- 仓库瘦身（`deliverables*/**/drafts` 出 git + converge/orient/排练判据适配）。
+- ~~仓库瘦身~~ → 已做完：[公司盘瘦身](2026-10-13-workspace-slimming.md)。
 - 制度件升级策略（见"后果与边界"第 1 条）。
 
 ## 落点

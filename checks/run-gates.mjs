@@ -108,6 +108,23 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
     : fail('handbook-budget', `手册 ${handbookBytes}B + ${margin}B > maxBytes ${maxBytes}——agent-instructions 正在静默截断手册尾部（升 preset maxBytes 或先瘦身手册）`)
 }
 
+// ── 2c-quater. 公司盘过程物料不进 git（drafts-untracked，2026-10-13 瘦身轮）──────────
+// 为什么：`drafts/**`（含 `sources/` 的 PDF/HTML/raw 原始取证）是**过程物料**（实测 531 件 / ≈70MB
+// tracked），入库价值由 `final.md`/`meta.md` 与 `snapshots/archive` 承担。规则写在 .gitignore，
+// 但 `git add -f` 能绕过（gitignore-guards spec 已登记这个盲点）⇒ 这里做**进程级**核查：
+// index 里出现任何 drafts 路径即红，并点名具体文件。
+// 负例留证（实跑，红→还原→绿）：`git add -f company-workspace/deliverables/<slug>/drafts/<文件>`
+// ⇒ `FAIL drafts-untracked: index 里有 1 件 drafts…`（实测：`git restore --staged` 对 ignored 的新增项**不解除**
+// 暂存，要用 `git rm --cached -- <路径>`）⇒ 绿。
+{
+  const draftsTracked = execFileSync('git', ['-C', root, 'ls-files', '--', 'company-workspace'], { encoding: 'utf8' })
+    .split('\n').filter(Boolean).filter(path => path.includes('/drafts/'))
+  draftsTracked.length === 0
+    ? ok('drafts-untracked 公司盘过程物料零 tracked（drafts/sources 不进 git）')
+    : fail('drafts-untracked', `index 里有 ${draftsTracked.length} 件 drafts（过程物料；git add -f 可绕过 .gitignore）：`
+      + draftsTracked.slice(0, 5).join(', ') + (draftsTracked.length > 5 ? ' …' : ''))
+}
+
 // ── 2c-ter. 公司盘骨架单源（company-skeleton-single-source，2026-10-13 立）────────────
 // 为什么：插件是要给**不同人安装**的，而角色跑起来读的全是"公司盘里的文件"——手册（agent-instructions
 // 从会话 cwd 注入）、岗位章程、编制、模板。此前这些只活在本仓 `company-workspace/`（一个部署的运行盘），

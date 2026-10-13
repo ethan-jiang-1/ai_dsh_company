@@ -4,7 +4,7 @@
  * 查重锚 = BUG-014（子串查重假跳过）；证据目录解析 = BUG-015（日期耦合写断链）。
  */
 import { existsSync, readdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, sep } from 'node:path'
 
 /** journal 文件名 → 所属 slug；无属主 = null（当轮散件，不清）。
  *  规则：剥日期后精确等于 slug，或以 slug- 开头且**不与任何其他 slug 精确同名**
@@ -53,4 +53,18 @@ export function resolveEvidenceDir(archiveRoot, dirName) {
   }
   matches.sort()
   return matches[matches.length - 1]
+}
+
+/**
+ * 归档搬移的**步骤计划**（2026-10-13）。为什么不再用 `git mv`：自本日起交付物的 `drafts/**`
+ * （含 `sources/`）**不进 git**（仓库瘦身，见 Note 2026-10-13-workspace-slimming），
+ * 而 `git mv <目录>` 遇到未跟踪文件会 fatal（`not under version control`）——目录必须用
+ * **文件系统搬**，tracked 面（final/meta 等）再用 `git add -A` 收进索引（删除+新增一起 stage）。
+ * @param dirName - deliverables/ 下的目录名（`<日期>-<slug>`）。
+ * @returns 相对仓库根的 from/to + git 参数（执行留在驱动脚本；spec 在临时 git 仓里真跑同一份计划）。
+ */
+export function archiveMovePlan(dirName) {
+  const from = join('company-workspace', 'deliverables', dirName).split(sep).join('/')
+  const to = join('company-workspace', 'deliverables-archive', dirName).split(sep).join('/')
+  return { from, to, gitArgs: ['add', '-A', '--', from, to] }
 }

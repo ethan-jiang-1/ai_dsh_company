@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { mkdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { charterHasEntry, journalSlug, parseFlags, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
+import { archiveMovePlan, charterHasEntry, journalSlug, parseFlags, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
 
-// converge.mjs 的纯判定规则（判据单一来源 = tools/lib/converge-rules.mjs；IO 在驱动脚本，tests/ 不碰文件面
+// converge.mjs 的纯判定规则（判据单一来源 = tools/lib/converge-rules.mjs；IO 在驱动脚本
 // ——沙箱对照实验与真仓复现收据见 _backlog 卡 BUG-014 / BUG-015）。
+// ⚠ 2026-10-13：归档搬移那条初版在此**真跑 git**，被 layering 守卫当场拦下（回归层不许起子进程）——
+// 真跑那半已搬去 probes/fs-taskboard/archive-move-probe.mjs；本文件只留纯计划断言。
 // 负例留证 2026-10-12：BUG-014 —— 修复前判据（整文件 includes）对下方 COO 反例恒真阳性
 //   （「旧判据 includes 误报」用例钉住它）；真仓零写入 re-run 五角色全报「已有——跳过」而 COO 条目为 0
 //   （收据 = 卡复现节）；本文件实现前实跑 = 模块不存在红。
@@ -95,5 +97,21 @@ describe('converge-rules · 收敛证据目录解析（BUG-015 日期耦合）',
       mkdirSync(join(root, 'convergence-2026-10-11', '2026-10-01-ai-demo'), { recursive: true })
       expect(resolveEvidenceDir(root, '2026-10-01-ai-demo')).toBe('convergence-2026-10-11')
     } finally { rmSync(root, { recursive: true, force: true }) }
+  })
+})
+
+describe('converge-rules · 归档搬移计划（2026-10-13：drafts 不进 git 后 git mv 不再可用）', () => {
+  /**
+   * 现场：`git mv <交付物目录>` 遇到未跟踪文件会 fatal（`not under version control`）——
+   * 而 drafts/sources 自瘦身轮起正是未跟踪的 ⇒ 计划改成"fs rename + `git add -A`"。
+   * 本 spec 只钉**计划形状**（纯逻辑，无子进程——回归层不许起进程，layering 守卫）；
+   * "真 git 里跑得通"那半住探针：probes/fs-taskboard/archive-move-probe.mjs（真 .gitignore / 真未跟踪件 / 真 add）。
+   * 反证：把计划换成 `['mv', from, to]` ⇒ 探针 A2/A3 红。
+   */
+  it('计划 = deliverables → deliverables-archive，git 参数 = add -A -- <旧> <新>', () => {
+    const plan = archiveMovePlan('2026-10-13-demo-slug')
+    expect(plan.from).toBe('company-workspace/deliverables/2026-10-13-demo-slug')
+    expect(plan.to).toBe('company-workspace/deliverables-archive/2026-10-13-demo-slug')
+    expect(plan.gitArgs).toEqual(['add', '-A', '--', plan.from, plan.to])
   })
 })

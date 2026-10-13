@@ -10,10 +10,10 @@
 //   node tools/converge.mjs --charter-backfill <目录名>  # 为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步）
 // 成本：秒级、无模型（纯文件/git 操作）；git mv/git rm 只动 tracked 文件。
 // 退出码：0 = 成功（计划或执行）；1 = 前置不满足/用法错误。
-import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, rmSync } from 'node:fs'
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, renameSync, rmSync } from 'node:fs'
 import { join, basename } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { charterHasEntry, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
+import { archiveMovePlan, charterHasEntry, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
 import { spawnSync } from 'node:child_process'
 
 const args = process.argv.slice(2)
@@ -180,7 +180,11 @@ const converge = (dirName) => {
     if (touched) writeFileSync(nf, nt)
   }
   for (const r of refRewrites) console.log('  · 引用重指：' + r)
-  git(['mv', join('company-workspace', 'deliverables', dirName), join('company-workspace', 'deliverables-archive', dirName)])
+  // 归档搬移（2026-10-13 起）：`git mv` → **fs rename + git add -A**。原因见 archiveMovePlan 注释
+  // （drafts 不再 tracked，`git mv` 遇未跟踪文件 fatal）；计划住 lib 纯逻辑缝，spec 在临时仓真跑过。
+  const move = archiveMovePlan(dirName)
+  renameSync(join(ROOT, move.from), join(ROOT, move.to))
+  git(move.gitArgs)
   const removed = []
   for (const j of journal) {
     const p = join('company-workspace', j.path)

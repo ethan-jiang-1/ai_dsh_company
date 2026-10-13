@@ -111,9 +111,14 @@ if (scenarioIndex !== -1) {
   }
 } else {
   let gitStatus = null
+  let gitIgnored = null
   try {
     gitStatus = execFileSync('git', ['-C', ROOT, 'status', '--porcelain', '--', 'company-workspace'],
       { encoding: 'utf8' }).split('\n').filter(Boolean).length
+    // 2026-10-13 瘦身轮起 drafts/**（含 sources/）**不进 git** ⇒ 只数 tracked 面会把本地过程稿
+    // 报成"零改动"（静默失真）。这里另数一行 ignored 面：它是**正常的本地工作件**，不是脏。
+    gitIgnored = execFileSync('git', ['-C', ROOT, 'status', '--porcelain', '--ignored=matching', '--', 'company-workspace'],
+      { encoding: 'utf8' }).split('\n').filter(line => line.startsWith('!! ')).length
   } catch { /* git 不可用（如非 git 环境）→ 概览里如实报不可用 */ }
   const home = homeStatus(process.env)
   let sessionPresets = null
@@ -135,6 +140,7 @@ if (scenarioIndex !== -1) {
     env: process.env,
     workspaceRoot,
     gitStatus,
+    gitIgnored,
     sessionPresets,
   })))
 }
