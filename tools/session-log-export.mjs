@@ -12,7 +12,7 @@
 // 退出码：0 = 导出完成；1 = 无可导日志或全部失败；2 = 参数/环境失败。
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
 import { pickSessionLog } from './lib/session-log-generation.mjs'
-import { execFileSync } from 'node:child_process'
+import { zstdText } from './drivers/zstd.mjs'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { requireDevHome } from './lib/runtime-home.mjs'
@@ -40,7 +40,7 @@ const logOf = (sessionDir) => pickSessionLog(sessionDir)?.name
 function readLogText(file) {
   if (!file.endsWith('.zstd')) return { text: readFileSync(file, 'utf8') }
   try {
-    return { text: execFileSync('zstd', ['-dc', file], { maxBuffer: 256 * 1024 * 1024 }).toString('utf8') }
+    return { text: zstdText(file, { maxBuffer: 256 * 1024 * 1024 }) }
   } catch (error) {
     return { error: error.message }
   }

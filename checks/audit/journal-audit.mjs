@@ -24,6 +24,7 @@ import { snapshotScenes } from '../../tools/lib/repository-layout.mjs'
 import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
+import { zstdText } from '../../tools/drivers/zstd.mjs'
 
 const args = process.argv.slice(2)
 const argOf = name => {
@@ -66,7 +67,7 @@ const isKnownMiss = (entry, role) =>
 // 本文件的角色序 = 字母序（显示口径沿旧），成员资格从唯一事实家派生（company-roles.mjs 保语义序）。
 const ROLES = [...COMPANY_ROLE_IDS].sort()
 /** 全量解压（team/task 事件在流中后段，必须读全）。 */
-const read = file => execFileSync('zstd', ['-d', '-c', file], { maxBuffer: 512 * 1024 * 1024 }).toString('utf8')
+const read = file => zstdText(file, { maxBuffer: 512 * 1024 * 1024 })
 
 /** 只取表头（会话元数据在首行）——不为此解压整个日志。 */
 const readHeader = file => execSync(`zstd -d -c ${JSON.stringify(file)} 2>/dev/null | head -c 8000`, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })

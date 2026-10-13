@@ -10,7 +10,7 @@
 //         --session session-<lead-id> --out snapshots/replay/r2-motion --motion "动议原文" [--cwd company-workspace]
 import { repositoryRoot as ROOT, snapshotOutput, snapshotOutputPath } from './lib/repository-layout.mjs'
 import { pickSessionLog } from './lib/session-log-generation.mjs'
-import { execFileSync } from 'node:child_process'
+import { zstdText } from './drivers/zstd.mjs'
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { requireDevHome } from './lib/runtime-home.mjs'
@@ -53,7 +53,7 @@ function readSession(sessionId) {
   const log = pickSessionLog(dir)
   if (log === undefined) throw new Error(`${sessionId} 里没有会话日志（canonical 形状见 session-log-generation.mjs）`)
   if (!log.zstd) return readFileSync(join(dir, log.name), 'utf8')
-  return execFileSync('zstd', ['-dc', join(dir, log.name)], { maxBuffer: 64 * 1024 * 1024 }).toString('utf8')
+  return zstdText(join(dir, log.name), { maxBuffer: 64 * 1024 * 1024 })
 }
 
 /** 会话头（第一行）里的元数据。 */

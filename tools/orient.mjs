@@ -15,6 +15,7 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { repositoryRoot } from './lib/repository-layout.mjs'
+import { zstdText } from './drivers/zstd.mjs'
 import { homeStatus, listSessions, listSlugSessions, orientState, parseSessionHead, renderOrient, renderRunBundle, renderSessionView, runBundleView } from './lib/orient.mjs'
 
 const ROOT = repositoryRoot
@@ -35,7 +36,7 @@ function decodeSessionHead(homePath, slug, sessionId) {
     const log = newestLogFile(join(homePath, 'sessions', slug, sessionId))
     if (!log) return undefined
     const head = log.endsWith('.zstd')
-      ? execFileSync('zstd', ['-d', '-c', log], { encoding: 'utf8', maxBuffer: 512 * 1024 * 1024 }).slice(0, 65536)
+      ? zstdText(log, { maxBuffer: 512 * 1024 * 1024 }).slice(0, 65536)
       : readFileSync(log, 'utf8').slice(0, 65536)
     return parseSessionHead(head)
   } catch {
