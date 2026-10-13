@@ -18,15 +18,18 @@
 //   G4 同格时钟图标（12px 图元，在场时）不越标题盒（icon.right ≤ title.left + 0.5）
 //   G5 零挂载失败（无 "Failed to load plugins" 错误屏）
 //   G0 非空守卫：真侧栏里至少 1 个标记（零标记 = 判据空转，按红处理）
+//   G6 五角色对照夹具（末段）：真组件渲出的 C/F/O/E/S 五个标记齐、渲染宽 12px、**五个底色互异**、
+//      每个标记的字/底对比度 ≥ 4.5（WCAG AA，页面里对真 computed 色现算）
 // 腿：① desktop 1280（侧栏随流）② narrow 356（点 "Open sidebar" 展开——用户截图那种窄窗）
 //     ③ full-bleed（在 ① 上注入 `--dsh-sidebar-inline-padding:0px`，复现"无侧栏内边距"的布局条件）
 // 图像判据（人/多模态看图）：出 snapshots/visual/sidebar-role-mark/{desktop,narrow,full-bleed}.png
-//   + computed.json（逐行盒与判据结论）。
+//   + roles.png（五角色对照图，1× / 6× 两条）；computed.json 另写逐行盒与判据结论。
 // 用法：source run/env.sh && node probes/browser-visual/sidebar-role-mark-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb } from '../../tools/lib/probe-web.mjs'
-import { spawn } from 'node:child_process'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { spawn, spawnSync } from 'node:child_process'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 const SHOTS = join(ROOT, 'snapshots/visual/sidebar-role-mark')
@@ -168,6 +171,82 @@ failures.push(...judge('full-bleed', rows, await mountBroken()))
 await shoot('full-bleed')
 
 writeFileSync(join(SHOTS, 'computed.json'), JSON.stringify({ seatCeiling: SEAT_CEILING, legs, failures }, null, 2), 'utf8')
+
+// ── 末段：五角色对照图（G6；真组件 + 真 CSS，经 vitest 发射器现算）──
+console.log('── 五角色对照夹具（G6）──')
+const FIXTURE = join(tmpdir(), `sidebar-role-mark-fixture-${String(process.pid)}.json`)
+const emitted = spawnSync('npx', ['vitest', 'run', 'tests/client/role-mark-fixture.spec.ts'],
+  { cwd: ROOT, env: { ...process.env, SIDEBAR_ROLE_MARK_EMIT: FIXTURE }, encoding: 'utf8' })
+if (emitted.status !== 0) {
+  console.error(emitted.stdout?.slice(-1500) ?? '')
+  console.error(emitted.stderr?.slice(-1500) ?? '')
+  failures.push('夹具发射失败（tests/client/role-mark-fixture.spec.ts）')
+} else {
+  const fixture = JSON.parse(readFileSync(FIXTURE, 'utf8'))
+  // 1×/6× 两条叠起来比 800px 视口高：元素截图会被裁掉后几格（实测只拍到 3 格），先给足高度。
+  await page.setViewportSize({ width: 1280, height: 1700 })
+  await page.waitForTimeout(300)
+  const fixtureMarks = await page.evaluate(({ css, diagramCss, html }) => {
+    for (const id of ['role-mark-fixture-css', 'role-mark-fixture-diagram-css']) document.getElementById(id)?.remove()
+    document.getElementById('role-mark-fixture')?.remove()
+    const shipped = document.createElement('style')
+    shipped.id = 'role-mark-fixture-css'
+    shipped.textContent = css
+    const diagram = document.createElement('style')
+    diagram.id = 'role-mark-fixture-diagram-css'
+    diagram.textContent = diagramCss
+    document.head.append(shipped, diagram)
+    const host = document.createElement('div')
+    host.setAttribute('style', 'position:fixed;inset:0;z-index:99999;overflow:auto;background:var(--dsw-alias-bg-base)')
+    host.innerHTML = html
+    document.body.append(host)
+    // WCAG 相对亮度对比度（在页面里现算真 computed 色）
+    const lin = (v) => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4) }
+    const lum = (rgb) => 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2])
+    const parse = (value) => (value.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number)
+    return [...document.querySelectorAll('#role-mark-fixture [data-strip="1x"] .wk-role-badge')].map((el) => {
+      const cs = getComputedStyle(el)
+      const bg = parse(cs.backgroundColor); const fg = parse(cs.color)
+      const [hi, lo] = [lum(bg), lum(fg)].sort((a, b) => b - a)
+      return {
+        preset: el.getAttribute('data-wk-role'), mark: el.textContent, title: el.getAttribute('title'),
+        shared: el.closest('.fx-row')?.hasAttribute('data-fx-shared') === true,
+        w: +el.getBoundingClientRect().width.toFixed(2),
+        background: cs.backgroundColor, color: cs.color, contrast: +((hi + 0.05) / (lo + 0.05)).toFixed(2),
+      }
+    })
+  }, fixture)
+  console.log(`  夹具标记：${fixtureMarks.map(m => `${m.preset ?? '?'}=${m.mark ?? '?'}(${String(m.w)}px ${m.background})`).join(' / ')}`)
+  const expectPresets = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']
+  const check = (label, ok, detail = '') => {
+    console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`)
+    if (!ok) failures.push(label)
+  }
+  check('G6 五角色标记齐（ceo/cfo/coo/vp-eng/vp-sales）',
+    expectPresets.every(preset => fixtureMarks.some(m => m.preset === preset)),
+    fixtureMarks.map(m => m.preset ?? '?').join(','))
+  check('G6 每个对照标记渲染宽 = 12px',
+    fixtureMarks.length > 0 && fixtureMarks.every(m => Math.abs(m.w - 12) < 0.05),
+    fixtureMarks.map(m => String(m.w)).join(','))
+  check('G6 标记带全称 title', fixtureMarks.every(m => (m.title ?? '').length >= 3), fixtureMarks.map(m => m.title ?? '?').join(','))
+  // 第二通道：五角色底色互异（同色 = 字母之外的通道失效）
+  // 只取五行"角色行"（同格时钟那一行复用 ceo，不进互异判据）
+  const roleRows = fixtureMarks.filter(m => m.shared !== true)
+  check('G6 五角色底色互不相同',
+    roleRows.length === expectPresets.length && new Set(roleRows.map(m => m.background)).size === roleRows.length,
+    roleRows.map(m => `${m.preset ?? '?'}:${m.background}`).join(' '))
+  // 每个标记的字母/底色对比度 ≥ WCAG AA 4.5（字色是设计选择，这里是它在真样式下的实测值）
+  const lowContrast = fixtureMarks.filter(m => m.contrast < 4.5)
+  check('G6 每个标记的字/底对比度 ≥ 4.5（WCAG AA）', lowContrast.length === 0,
+    fixtureMarks.map(m => `${m.preset ?? '?'}:${String(m.contrast)}`).join(' '))
+  // 字母互异（第一通道）
+  check('G6 五个字母互不相同',
+    new Set(roleRows.map(m => m.mark)).size === roleRows.length,
+    roleRows.map(m => m.mark ?? '?').join(''))
+  await page.locator('#role-mark-fixture').screenshot({ path: join(SHOTS, 'roles.png') })
+  console.log('  出图 snapshots/visual/sidebar-role-mark/roles.png')
+}
+
 console.log(`\nsidebar-role-mark-probe: ${failures.length === 0 ? 'ALL PASS' : `FAIL ${String(failures.length)} 项`}`)
 if (failures.length > 0) console.log(failures.map(f => `  × ${f}`).join('\n'))
 await browser.close()

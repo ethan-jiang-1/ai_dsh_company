@@ -26,8 +26,7 @@ const CSS = `
    右溢 8.23px：左溢把标记推出行框（窄窗被容器切字）、右溢吃掉 4px 标题间隙压到
    标题首字盒上（2026-10-13 修，真 DOM 判据 = probes/browser-visual/sidebar-role-mark-probe.mjs；
    守卫 = tests/client/client-css.spec.ts「座位上限」）。
-   颜色一律平台令牌（品牌底 + 反色字）；每角色不同色需上游补分类色板
-   （提案开放问题 2），feature 包不写字面色。 */
+   颜色纪律见下方「角色色调」块（只用平台令牌；feature 包不写字面色）。 */
 .wk-role-badge {
   flex: none;
   box-sizing: border-box;
@@ -44,6 +43,31 @@ const CSS = `
   background: var(--dsw-alias-brand-primary);
   color: var(--dsw-alias-label-primary-inverted);
   user-select: none;
+}
+
+/* 角色色调（2026-10-13 从"五角色同一品牌色"放开为**五色**）：
+   **两个通道**——上面的字母管"是谁"，底下的颜色管"一眼扫过是谁"（12px 的字母在侧栏快速
+   扫读时面积太小，底色是更大的色块；CEO 也是唯一用 adaptive 品牌色的一格，与 C 段窗口色条同源）。
+   颜色纪律：只用平台令牌。CEO = **adaptive** 的 --dsw-alias-* 对（浅主题近黑底/白字，
+   深主题自动反转，实测对比 18.9 / 18.1）；其余四色 = **static** 色相（固定值，两主题同一观感），
+   字色按"该底色上对比度更高的那一侧"选：blue-600 + 白 5.17 / green-500 + 黑 9.22 /
+   amber-500 + 黑 9.78 / red-600 + 黑 4.67（全 ≥ WCAG AA 4.5）。
+   真判据（五底色互异 + 逐色对比度 ≥ 4.5）= sidebar-role-mark-probe 的 G6（读真 computed 值现算）。 */
+.wk-role-badge[data-wk-role='cfo'] {
+  background: var(--dsw-static-blue-600);
+  color: var(--dsw-static-neutral-00);
+}
+.wk-role-badge[data-wk-role='coo'] {
+  background: var(--dsw-static-green-500);
+  color: var(--dsw-static-neutral-1000);
+}
+.wk-role-badge[data-wk-role='vp-eng'] {
+  background: var(--dsw-static-amber-500);
+  color: var(--dsw-static-neutral-1000);
+}
+.wk-role-badge[data-wk-role='vp-sales'] {
+  background: var(--dsw-static-red-600);
+  color: var(--dsw-static-neutral-1000);
 }
 
 /* 整窗角色色条（角色身份 UX · C 段）：当前会话有角色时，窗口最顶出现一条品牌色细带

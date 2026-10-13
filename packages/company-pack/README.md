@@ -20,6 +20,7 @@ release-smoke ALL PASS（[docs/release.md](../../docs/release.md)）。pack 保�
 
 ## 已知限制（随行为变更同 diff 更新；2026-09-28 立，借 FAQ 04 package README tier）
 
+- **侧栏角色色调只借平台令牌**（2026-10-13）：CEO 用 adaptive 的 `--dsw-alias-*` 品牌对（浅/深主题自动反转），其余四色用 **static 色相**（blue/green/amber/red，固定值、两主题同观感）+ 按底色选的黑/白字（对比度实测见探针 G6）——**不是**上游策展的分类色板（那份仍缺，见角色身份 UX 提案开放问题 2），换主题观感不一致处即此债。
 - **侧栏角色标记受 16px 座位约束**（2026-10-13）：行首座位是**可共存的 list 格**（同格还有计划任务时钟，16px 跨度），故标记按 12px 设计、单字母（C/F/O/E/S）。与时钟同格时两者合计 28px > 座位 16px，靠"座位居中溢出 + 标题前 4px 间隙"恰好不撞标题盒（几何判据 = [sidebar-role-mark-probe](../../probes/browser-visual/sidebar-role-mark-probe.mjs)）；**再加第三个同格占用者、或把标记改宽，这条就破**。
 - 机制与出厂行替换已对钉版 `dsh-v0.2.0-rc.2` 验证（2026-09-30 升 pin + 插件收割：pack-compat / release-smoke / 全套门禁；本仓嵌套工作区 vendor 自建偏离 = D27）。
 - 委派子会话的签字审批到不了人（子会话审批面宿主侧受限）——人机审批实际是 Lead 专属（上游 seam 候选，见[归档搁置池](../../_backlog/_archive/legacy/suspended.md)）。

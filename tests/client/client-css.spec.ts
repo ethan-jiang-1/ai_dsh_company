@@ -126,3 +126,38 @@ describe('客户端 CSS：行首座位的尺寸上限（2026-10-13 立）', () =
     expect(badge!.body, 'box-sizing 不是 border-box：padding 会把渲染盒撑过座位').toContain('box-sizing: border-box')
   })
 })
+
+describe('客户端 CSS：角色色调（字母之外的第二个通道，2026-10-13 立）', () => {
+  /**
+   * 起因：只有单字母时，12px 的标记在侧栏快速扫读时区分度不够（用户 2026-10-13：*"他们 5 个
+   * 必须有区别"*）。法 = 底色做第二通道：五角色各一条 `[data-wk-role='…']` 规则，底色令牌两两不同。
+   * 真判据（底色互异 + 字/底对比度 ≥ 4.5 的**实测**值）= probes/browser-visual/
+   * sidebar-role-mark-probe.mjs G6；本门禁只钉"五条规则在场且令牌不撞"。
+   * 反证：把 vp-sales 的底色改成 `--dsw-static-amber-500`（与 vp-eng 同色）⇒ 本门禁红。
+   */
+  const tones = () => rules(STYLES)
+    .filter(rule => /^\.wk-role-badge\[data-wk-role='[a-z-]+'\]$/.test(rule.selector))
+    .map(rule => ({
+      selector: rule.selector,
+      background: /(^|;|\s)background:\s*([^;]+)/.exec(rule.body)?.[2]?.trim() ?? '',
+      color: /(^|;|\s)color:\s*([^;]+)/.exec(rule.body)?.[2]?.trim() ?? '',
+    }))
+
+  it('五角色各有色调规则（cfo/coo/vp-eng/vp-sales 走 static 色相，ceo 走 adaptive 品牌对）', () => {
+    const found = tones()
+    expect(found.map(t => t.selector)).toEqual([
+      ".wk-role-badge[data-wk-role='cfo']",
+      ".wk-role-badge[data-wk-role='coo']",
+      ".wk-role-badge[data-wk-role='vp-eng']",
+      ".wk-role-badge[data-wk-role='vp-sales']",
+    ])
+    expect(found.every(t => t.background.includes('var(--dsw-') && t.color.includes('var(--dsw-')),
+      `色调必须只用令牌：${found.map(t => `${t.selector} ${t.background}`).join('；')}`).toBe(true)
+  })
+
+  it('四个 static 底色两两不同，且都不等于 CEO 的品牌底（同色 = 第二通道失效）', () => {
+    const backgrounds = tones().map(t => t.background)
+    expect(new Set(backgrounds).size).toBe(backgrounds.length)
+    expect(backgrounds).not.toContain('var(--dsw-alias-brand-primary)')
+  })
+})

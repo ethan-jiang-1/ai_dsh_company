@@ -3,7 +3,7 @@
  * 提案：notes/archived/2026-09-26-role-identity-ux.md §五 B。
  *
  * 挂载点 = 官方 ambient 行装饰位 `sidebar.session.row.leading`（vendor
- * `ui-workspace/contract/slots.ts:117`；仅 idle 行渲染，archived/blank 行留空）。
+ * `ui-workspace/contract/slots.ts:129`；仅 idle 行渲染，archived/blank 行留空）。
  *
  * ⚠ **座位是 16px 格**（合同原话 "the 16px cell before the title that the row's own state
  * dot otherwise occupies"；vendor `ui-workspace/src/client/rows/Rows.module.css` 的

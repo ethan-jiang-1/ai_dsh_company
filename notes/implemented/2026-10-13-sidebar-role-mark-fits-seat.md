@@ -13,6 +13,12 @@
 - 标记 = **12px 方形**（= 同格既有 occupant 的尺寸）+ **单字母** `C/F/O/E/S`
   （`ROLE_MARK`，`packages/company-pack/src/client/RoleBadge.tsx`）；
   `ROLE_SHORT`（CEO/CFO/COO/VPE/VPS）保留给窗口标题前缀、会话头 preset 标签与标记自身的 `title`。
+- **两个通道**（2026-10-13 用户追加要求「他们 5 个必须有区别」）：字母管"是谁"，**底色**管
+  "一眼扫过是谁"——12px 的字母在侧栏快速扫读时面积太小。CEO 走 adaptive 的 `--dsw-alias-*`
+  品牌对（浅主题近黑底/白字、深主题自动反转），CFO/COO/VPE/VPS 走 **static 色相**
+  blue-600 / green-500 / amber-500 / red-600，字色取该底色上对比度更高的一侧（白/白/黑/黑）。
+  色值全部是平台令牌（`packages/company-pack/src/client/styles.ts` 的「角色色调」块），
+  我方零字面色。
 - CSS 在 `packages/company-pack/src/client/styles.ts` 的 `.wk-role-badge`：`box-sizing: border-box`
   + `width/height: 12px` + `padding: 0`（座位占用者的宽度自此是**声明**的事实，不再由字号/内边距悄悄决定）。
 
@@ -37,12 +43,15 @@
 3. **16px 方形 + 两字**（`CE/CF/CO/VE/VS`）：单占用时完美，但与时钟同格时合计 32px，在无内边距布局里标记左缘 −6px 仍被容器切——同一症状换个尺寸复发。
 4. **`slot:has([data-session-schedule-mark])` 自适应收窄**：耦合 vendor 私有 DOM（该属性不在座位合同里承诺），上游一改就静默失效；否决。
 5. **不动**（"官方座位太窄"）：真 DOM 证明是我方占用者 2.03 倍宽，责任在我方。
+6. **只靠字母、不加色**：字母已互异，但 12px 字母在扫读时区分度不够（用户实测反馈即此）；底色改五色后，字母退为第二通道（色盲/灰度下仍可用）。
+7. **五色全用 static 深档**（如 green-900/amber-900/red-900 + 白字）：字色统一，但深档彼此接近（green-900 与 amber-900 的 RGB 距离仅 28）⇒ 底色通道失效；故取中档色相 + 按色选字色（green-500+黑 9.22 / amber-500+黑 9.78 / red-600+黑 4.67 / blue-600+白 5.17，全 ≥ AA 4.5）。
+8. **给每个角色造一套 `--wk-role-*` 私有色变量**：等于把字面色搬进本包私有变量，违反"颜色只用平台令牌"纪律；改用平台 static 色相 + adaptive 品牌对。
 
 ## 后果与边界
 
 - **信息量下降**：单字母不如三字缩写自明；补偿 = 标记 `title`（全称缩写）、窗口标题【角色】前缀（C 段）、会话头 preset 标签；docs 的开门 runbook 同步写了字母表。
 - **同格共存仍是紧的**：标记 12px + 时钟 16px 跨度 = 28px > 16px 座位，靠"座位居中溢出 + 标题前 4px 间隙"恰好不撞标题盒（实测 `icon.right == title.left`）。**再加第三个同格占用者、或把标记改宽，这条就破**——已记 [company-pack README 已知限制](../../packages/company-pack/README.md)。
-- **颜色纪律未动**：仍只用 `--dsw-*` 令牌（每角色不同色仍等上游分类色板，见[角色身份 UX 提案](../archived/2026-09-26-role-identity-ux.md)开放问题 2）。
+- **色调债（仍在）**：五色借的是**通用 static 色相**，不是上游策展的**分类色板**（语义、成对前景/背景、深浅主题一致性都没人担保）⇒ 深主题下四色观感与浅主题相同（CEO 那格自适应反转），换主题时这一处会显得不齐。分类色板仍是[角色身份 UX 提案](../archived/2026-09-26-role-identity-ux.md)的开放问题 2。
 
 ## 验证（都真跑过）
 
@@ -55,6 +64,9 @@
 - 探针反证（红→还原→绿）：同一次 `width: 32px` + 重建（`tsc -b packages/company-pack` + `tsdown`）
   ⇒ 探针 **12 条 FAIL（G1/G2/G4）、exit 1**（`badge.w=32 seat.w=16`、`badge.l=4 row.l=12`、`icon.r=50 title.l=40`）→ 还原重建 ⇒ ALL PASS。
 - 修前基线取自旧构建的同口径真 DOM 实测（上表三行）；现场截图证据 = 用户 2026-10-13 那一张。
+- 色调判据（G6，真 computed 值现算）：五底色互异（`rgb(15,17,21)/rgb(37,99,235)/rgb(34,197,94)/rgb(245,158,11)/rgb(236,19,19)`）+ 逐色字/底对比度 `18.9 / 5.17 / 9.22 / 9.78 / 4.67`（全 ≥ WCAG AA 4.5）+ 五字母互异。
+- keyless 色调守卫反证：把 `vp-sales` 的底色改成与 `vp-eng` 相同的 `--dsw-static-amber-500` ⇒ `client-css.spec.ts`「四个 static 底色两两不同」红 → 还原绿。
+- 图像判据（人/多模态看图）：`snapshots/visual/sidebar-role-mark/roles.png`（1× 行内观感 + 6× 座位格放大，五角色五色齐）——本 Note 的颜色选择是照这张图 + 上表对比度定的，不是照色号想象。
 - `node checks/smoke/client-load-smoke.mjs` —— 真页面零挂载失败（client 面完成定义；本变更的"挂得上"链）。
 - `pnpm verify` —— 结构门禁全绿。
 - **未跑**（如实登记）：`preset-smoke`（未动 presets/ 与组合行）、`release-smoke`（未动导出/安装面）、真模型档（本变更零模型面）。
@@ -63,6 +75,6 @@
 
 - 实现：`packages/company-pack/src/client/RoleBadge.tsx`（`ROLE_MARK`）、`packages/company-pack/src/client/styles.ts`（`.wk-role-badge`）。
 - keyless 守卫：`tests/client/client-css.spec.ts`、`tests/client/role-badge.spec.ts`。
-- 真几何判据 + 图像判据：`probes/browser-visual/sidebar-role-mark-probe.mjs`、`snapshots/visual/sidebar-role-mark/`。
+- 真几何判据 + 图像判据：`probes/browser-visual/sidebar-role-mark-probe.mjs`（发射器 = `tests/client/role-mark-fixture.spec.ts`，真组件 + 真 CSS）、`snapshots/visual/sidebar-role-mark/`。
 - 合同/runbook：`docs/multi-human.md` §2 第 4 条、`packages/company-pack/README.md` 已知限制。
 - 前身：`notes/archived/2026-09-26-role-identity-ux.md` B 段（标记形态由本 Note 部分取代；A/C 段与其数据来源结论仍现行）。

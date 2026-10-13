@@ -68,7 +68,9 @@ CI=true pnpm dsh web -- --port 0 --no-open         # 端口是环境状态；见
 3. **协作全部走共享盘 + 邮箱**：分身之间用 Agent Teams 消息；人对人用文件
    （`drafts/<角色>.md`、`kb/<角色>/journal/`、`final.md` 归 CEO）+ 说一声"我写完了"。
 4. **角色一眼可辨（2026-09-26 起 client 面自带）**：侧栏每个公司会话行首有**角色标记**
-   （座位 12px、单字母 C/F/O/E/S，悬停出全称缩写；几何判据 = [sidebar-role-mark-probe](../probes/browser-visual/sidebar-role-mark-probe.mjs)）；
+   （座位 12px、单字母 C/F/O/E/S + **五色底色**——字母管是谁、底色管一眼扫过是谁，悬停出全称缩写；
+   几何与色调/对比度判据 = [sidebar-role-mark-probe](../probes/browser-visual/sidebar-role-mark-probe.mjs)）：
+   CEO 黑、CFO 蓝、COO 绿、VPE 橙、VPS 红；
    当前会话的**浏览器窗口标题**带【角色】前缀、窗口最顶有一条细色带——多窗并排也不会认错门。
    **开每扇门时记得选对 preset**（默认是 `ceo`，已实测踩坑）。
 5. **人该动的时候**：谁的门上出现卡，就由**那个人**答/批。
