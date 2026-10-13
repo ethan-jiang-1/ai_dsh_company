@@ -19,6 +19,7 @@
   "files": [
     "lib/**",
     "presets/**",
+    "workspace/**",
     "cordis.patch.yml"
   ],
   "peerDependencies": {

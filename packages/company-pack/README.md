@@ -4,6 +4,7 @@
 
 | 件 | 是什么 | 消费方向 | 出生 |
 |---|---|---|---|
+| `workspace/` | **出厂公司盘骨架**（手册 `AGENTS.md`、`templates/`、`kb/org.md`、五份 `CHARTER.md` + 起动件 `kb/owners.md`/`kb/motion-ledger.md` + 空目录）：角色跑起来读的全在这里——**随包分发**，否则第三方装完没手册没章程（2026-10-13 立；单源判据 = verify 的 `company-skeleton`） | 安装后落到使用者的公司盘（会话 cwd） | D43 |
 | `presets/<role>/` | persona + skills **声明**（改它 = 改角色；生效边界见 [docs/presets.md](../../docs/presets.md)） | loader 组合 → 角色会话 | R0–R2 |
 | `src/` | **自写实现**两半：host 半 = `index.ts`（工具注册入口）+ `src/lib/`（共享读模型纯逻辑）；client 半 = `src/client/`（浏览器面）——布局唯一家 = [src/README](./src/README.md) | vendor runtime + `tests/company`（源码直测） | R3+ |
 | `lib/` | **generated 发布产物（read-only）**：`tsc -b packages/company-pack` → tsdown 两面产出；**改 `src/` ≠ 浏览器已重建**——dsh web 常驻面必须重跑构建（事实家 = [bootstrap](../../docs/guides/bootstrap.md)） | `npm pack` → profile 安装（`exports`：`.` → `lib/index.js`、`./client` → `lib/client.js`） | R5 |
@@ -17,6 +18,10 @@
 `npm pack` → 干净 profile → `dsh plugin add` 真实安装冒烟 =
 release-smoke ALL PASS（[docs/release.md](../../docs/release.md)）。pack 保持 `private: true`——
 真实 npm 发布等第二个消费者出现再定。
+
+**装完第一步**：把包内 `workspace/` 落到你的公司盘（会话 cwd）——`cp -R <包>/workspace/. <公司盘>/`，
+再填 `kb/owners.md`（谁答什么）。本仓自己的 `company-workspace/` 是**我们这一家的运行盘**：
+制度件用符号链接指回本目录（单源），业务数据（owners、台账、journal、交付物）留在运行盘。
 
 ## 已知限制（随行为变更同 diff 更新；2026-09-28 立，借 FAQ 04 package README tier）
 

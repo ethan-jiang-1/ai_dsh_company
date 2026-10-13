@@ -29,6 +29,15 @@ const { gfm } = await import(pathToFileURL(resolveParser('micromark-extension-gf
 const EXCLUDED = new Set(['node_modules', 'vendor', 'lib', 'dist', 'build', 'generated', 'dev',
   'snapshots', 'journal', 'deliverables', 'deliverables-archive', 'archived', 'archive', 'historical'])
 
+/**
+ * 出厂公司盘骨架（2026-10-13 立）：它是**要发布到任意磁盘的运行语料**，不是本仓的源文档——
+ * 手册里的相对指针（`../docs/*`）是**部署相对**的：在运行盘 `company-workspace/AGENTS.md`
+ * 读到才成立，在 pack 家（`packages/company-pack/workspace/`）读到的深度没有意义。
+ * 所以这里按**路径**排除（不按名字，避免误伤任何叫 workspace 的目录），链接校验落在运行盘那份
+ * ——它已在下面显式加入（符号链接读到同一份内容，校验基准 = 读者看到的位置）。
+ */
+const EXCLUDED_PATHS = new Set(['packages/company-pack/workspace'])
+
 /** Discover current Markdown from disk, including untracked/new Notes; never follow directory symlinks. */
 export function sourceMarkdownFiles(root) {
   const files = new Map()
@@ -39,6 +48,7 @@ export function sourceMarkdownFiles(root) {
   }
   const walk = (dir, recursive = true) => {
     if (!existsSync(dir) || !lstatSync(dir).isDirectory()) return
+    if (EXCLUDED_PATHS.has(relative(root, dir))) return
     for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
       if (entry.name.startsWith('.') || EXCLUDED.has(entry.name)) continue
       const file = join(dir, entry.name)

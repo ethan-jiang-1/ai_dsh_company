@@ -14,7 +14,7 @@
 //     deliverables/、排练会话写出的任何文件
 //   - AGENTS.md 是指向真盘手册的**符号链接**（相对目标）：手册即注入基线，单一事实家不搬家；
 //     preset 的 projectRootMarkers: [] ⇒ 指令链只认 cwd，不会向上混入开发仓库 AGENTS.md
-import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readlinkSync, rmSync, symlinkSync } from 'node:fs'
+import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readlinkSync, realpathSync, rmSync, symlinkSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 export const REHEARSAL_REL = join('runtime', 'rehearsal-workspace')
@@ -32,24 +32,29 @@ export function mirrorCompanyReference(workspace, companyRoot, { agents = 'copy'
     throw new Error(`mirror: 找不到真盘手册 ${join(companyRoot, 'AGENTS.md')}——companyRoot 传对了吗？`)
   }
   mkdirSync(workspace, { recursive: true })
+  // ⚠ 2026-10-13 起真盘的制度件**本身是符号链接**（住 packages/company-pack/workspace，出厂骨架单源）。
+  // 镜像要的是"每次刷新的一份**实文件**"（指向 pack 的链接会让排练场跟着仓库走，且二次刷新崩）。
+  // ⚠ Node 的 cpSync 对「符号链接源 + 已存在目标」会抛误导错（`Cannot overwrite non-directory … with
+  // directory …`，dereference 与否都实测复现）⇒ 先 `realpathSync` 解引用再拷，是唯一稳的路。
+  const copyRef = (source, dest, recursive = false) => { cpSync(realpathSync(source), dest, { recursive, force: true }) }
   if (agents === 'symlink') refreshSymlink(join(workspace, 'AGENTS.md'), relative(workspace, join(companyRoot, 'AGENTS.md')))
-  else cpSync(join(companyRoot, 'AGENTS.md'), join(workspace, 'AGENTS.md'))
+  else copyRef(join(companyRoot, 'AGENTS.md'), join(workspace, 'AGENTS.md'))
 
   mkdirSync(join(workspace, 'deliverables'), { recursive: true })
   mkdirSync(join(workspace, 'kb'), { recursive: true })
   const realKb = join(companyRoot, 'kb')
   // kb 根的**事实家三件**：编制 / 人侧授权面 / 经营台账。少镜像一件，场里就有一处事实缺料。
   for (const name of ['org.md', 'owners.md', 'motion-ledger.md']) {
-    if (existsSync(join(realKb, name))) cpSync(join(realKb, name), join(workspace, 'kb', name))
+    if (existsSync(join(realKb, name))) copyRef(join(realKb, name), join(workspace, 'kb', name))
   }
   for (const entry of existsSync(realKb) ? readdirSync(realKb, { withFileTypes: true }) : []) {
     if (!entry.isDirectory()) continue
     mkdirSync(join(workspace, 'kb', entry.name, 'journal'), { recursive: true })
     const charter = join(realKb, entry.name, 'CHARTER.md')
-    if (existsSync(charter)) cpSync(charter, join(workspace, 'kb', entry.name, 'CHARTER.md'))
+    if (existsSync(charter)) copyRef(charter, join(workspace, 'kb', entry.name, 'CHARTER.md'))
   }
   if (existsSync(join(companyRoot, 'templates'))) {
-    cpSync(join(companyRoot, 'templates'), join(workspace, 'templates'), { recursive: true })
+    copyRef(join(companyRoot, 'templates'), join(workspace, 'templates'), true)
   }
   return workspace
 }

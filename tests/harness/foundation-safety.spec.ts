@@ -1,7 +1,7 @@
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { join, relative } from 'node:path'
 import { afterAll, afterEach, describe, expect, it, vi } from 'vitest'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 
@@ -94,6 +94,35 @@ describe('排练场镜像：kb 根三件事实家必须在场', () => {
       }
       expect(existsSync(join(rehearsal, 'kb/ceo/CHARTER.md'))).toBe(true)
       expect(existsSync(join(rehearsal, 'kb/ceo/journal'))).toBe(true)
+    } finally {
+      rmSync(repo, { recursive: true, force: true })
+    }
+  })
+
+  // 2026-10-13 立（出厂骨架单源轮）：真盘的制度件本身是**符号链接**（住 packages/company-pack/workspace）。
+  // 镜像必须解引用成实文件——否则排练场里躺着指回 pack 的链接，二次刷新还会 EEXIST 崩（preset-smoke 首跑现场）。
+  // 反证：把 tools/lib/rehearsal.mjs 的 REF 去掉 `dereference: true` ⇒ 本条红（拿到的仍是链接）。
+  it('真盘制度件是符号链接时，镜像落的是实文件（不是指回 pack 的链接）', async () => {
+    const { ensureRehearsalWorkspace } = await import('../../tools/lib/rehearsal.mjs')
+    const repo = mkdtempSync(join(tmpdir(), 'company-rehearsal-link-'))
+    try {
+      const pack = join(repo, 'packages/company-pack/workspace/kb')
+      mkdirSync(join(pack, 'ceo'), { recursive: true })
+      mkdirSync(join(repo, 'company-workspace/kb/ceo'), { recursive: true })
+      writeFileSync(join(repo, 'company-workspace/AGENTS.md'), '# 手册\n')
+      // pack 家 = 真实文件；运行盘 = 符号链接（就是本仓现在的形状）
+      writeFileSync(join(pack, 'org.md'), '# org\n')
+      symlinkSync(relative(join(repo, 'company-workspace/kb'), join(pack, 'org.md')), join(repo, 'company-workspace/kb/org.md'))
+      writeFileSync(join(pack, 'ceo/CHARTER.md'), '# ceo 章程\n')
+      symlinkSync(relative(join(repo, 'company-workspace/kb/ceo'), join(pack, 'ceo/CHARTER.md')), join(repo, 'company-workspace/kb/ceo/CHARTER.md'))
+      for (const name of ['owners.md', 'motion-ledger.md']) writeFileSync(join(repo, 'company-workspace/kb', name), `# ${name}\n`)
+
+      const first = ensureRehearsalWorkspace(repo)
+      expect(lstatSync(join(first, 'kb/org.md')).isSymbolicLink(), 'org.md 落成了链接（应解引用成实文件）').toBe(false)
+      expect(lstatSync(join(first, 'kb/ceo/CHARTER.md')).isSymbolicLink(), 'CHARTER 落成了链接').toBe(false)
+      expect(readFileSync(join(first, 'kb/org.md'), 'utf8')).toBe('# org\n')
+      // 幂等：第二次刷新不许崩（EEXIST 现场）
+      expect(() => ensureRehearsalWorkspace(repo)).not.toThrow()
     } finally {
       rmSync(repo, { recursive: true, force: true })
     }

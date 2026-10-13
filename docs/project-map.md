@@ -24,7 +24,7 @@
 | 面 | 位置 | 所有权与用途 |
 |---|---|---|
 | 自写运行包 | [company-pack](../packages/company-pack/) | 五个角色 preset、bundle 行、host 注册与 client 面；发布形状由 [包声明](../packages/company-pack/package.json) 决定 |
-| 真实公司盘 | [company-workspace](../company-workspace/) | 公司角色会话 cwd；手册、公司事实、模板、交付物和 journal；不是开发 docs 的镜像 |
+| 真实公司盘 | [company-workspace](../company-workspace/) | 公司角色会话 cwd；本部署的业务数据（owners、台账、journal、交付物）+ 制度件的**符号链接入口**；制度的家 = [pack workspace](../packages/company-pack/workspace/)（出厂骨架、随包分发） |
 | 启动配置 | [run](../run/)、[env.sh](../run/env.sh) | tracked 启动配置；源码验证使用开发 DSH_HOME |
 | 运行残留 | [runtime](../runtime/)、[runtime/README](../runtime/README.md) | 开发 DSH_HOME、第二 home、浏览器工具态与排练盘（全部 gitignored；逐件 owner = runtime/README；排练盘成型见 [rehearsal 实现](../tools/lib/rehearsal.mjs)） |
 | 上游机制 | [vendor/dsh](../vendor/dsh/) | 钉住的只读 submodule；开发 `pnpm dsh` 的源码基线 |
