@@ -12,11 +12,12 @@ import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { plainNodeEnv, releaseProcesses } from '../../tools/drivers/release-process.mjs'
+import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 
 const KEEP = process.argv.includes('--keep')
 const PACK_DIR = join(ROOT, 'packages/company-pack')
 const PROFILE = 'release-check'
-const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
+const ROLES = COMPANY_ROLE_IDS
 const BOOT_TIMEOUT_MS = 120_000
 const failures = []
 const check = (label, ok, detail = '') => {

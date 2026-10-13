@@ -23,6 +23,7 @@ import { join, resolve } from 'node:path'
 import { snapshotScenes } from '../../tools/lib/repository-layout.mjs'
 import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 
 const args = process.argv.slice(2)
 const argOf = name => {
@@ -62,7 +63,8 @@ const KNOWN_MISSES = [
 const isKnownMiss = (entry, role) =>
   KNOWN_MISSES.some(k => entry.sessionId.startsWith(`session-${k.sessionIdPrefix}`) && k.role === role)
 
-const ROLES = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']
+// 本文件的角色序 = 字母序（显示口径沿旧），成员资格从唯一事实家派生（company-roles.mjs 保语义序）。
+const ROLES = [...COMPANY_ROLE_IDS].sort()
 /** 全量解压（team/task 事件在流中后段，必须读全）。 */
 const read = file => execFileSync('zstd', ['-d', '-c', file], { maxBuffer: 512 * 1024 * 1024 }).toString('utf8')
 

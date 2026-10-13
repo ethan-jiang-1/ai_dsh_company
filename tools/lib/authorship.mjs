@@ -1,9 +1,7 @@
 // 署名核对的纯逻辑（2026-09-26 立；IO 在 checks/audit/authorship-audit.mjs）。
 // 为什么抽出来：判据本身值得单测（三档 + 文件名归属不判红），而完整审计要读会话日志（有 DSH_HOME
 // 依赖、秒级），不进 `pnpm test` ⇒ 纯逻辑放这里，keyless 可测。
-
-/** 五角色 id（与 `kb/<role>/` 目录名同轴）。 */
-export const ROLE_IDS = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
+import { COMPANY_ROLE_IDS } from './company-roles.mjs'
 
 /** 稿首署名行（兼容两种形状：早期模板 `出稿：CFO（wochen 财务职能）…` 与新形状 `出稿：<角色>｜版本 vN`）。 */
 export const SIG = /出稿[:：]\s*(?:(VP-Eng|VP-Sales|COO|CFO|CEO)|(vp-eng|vp-sales|coo|cfo|ceo))/
@@ -13,7 +11,7 @@ export const RECLAIM = /本稿由\s*(vp-eng|vp-sales|coo|cfo|ceo)\s*根会话复
 
 /** 文件名里的名义角色（`<角色>.md` / `<角色>-review.md`）。 */
 export function nominalRoleOf(fileName) {
-  return ROLE_IDS.includes(fileName.replace(/\.md$/, '').replace(/-review$/, ''))
+  return COMPANY_ROLE_IDS.includes(fileName.replace(/\.md$/, '').replace(/-review$/, ''))
     ? fileName.replace(/\.md$/, '').replace(/-review$/, '')
     : undefined
 }

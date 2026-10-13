@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url'
 import { markdownLinkTargets, validateMarkdownLinks } from '../tools/lib/markdown-links.mjs'
 import { backlogLivenessProblems } from '../tools/lib/backlog-liveness.mjs'
 import { inspectScripts, canonicalSnapshotScenes } from '../tools/lib/repository-layout.mjs'
+import { COMPANY_ROLE_IDS } from '../tools/lib/company-roles.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const failures = []
@@ -735,7 +736,7 @@ statusMissing.length === 0 && statusBad.length === 0
 // 负例留证 2026-09-27：移走一个 SKILL.md → skill-file 红。
 // 0.1.7 起显示名/描述/order 内联进 `agent.cordis.yml` 的 `dsh-agent-preset` 行（原 preset.yml 并入），
 // 故这里只要求声明文件；挂载验证归 preset-smoke（真 web 逐角色建会话）。
-const roles = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
+const roles = COMPANY_ROLE_IDS
 for (const role of roles) {
   const dir = join(root, 'packages/company-pack/presets', role)
   if (!existsSync(join(dir, 'agent.cordis.yml'))) fail('preset-file', `${role}/agent.cordis.yml 缺失`)

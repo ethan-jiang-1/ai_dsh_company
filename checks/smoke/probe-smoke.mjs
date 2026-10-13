@@ -28,6 +28,7 @@
 //   · **慢是常态**：内容档超时 ≥5min；快档 90s 足够；失败重试一次（换新会话）。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 import { spawn } from 'node:child_process'
 import { join, resolve } from 'node:path'
 import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
@@ -45,7 +46,7 @@ const PROBE_TIMEOUT_MS = Number(arg('timeout', '90000'))
 const CONCURRENCY = Number(arg('concurrency', '5'))
 const FULL = process.argv.includes('--full')
 
-const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
+const ROLES = COMPANY_ROLE_IDS
 
 /** 人格是否进 prompt 的标记（system/message 里的角色特征串）。 */
 const PERSONA_MARKERS = {

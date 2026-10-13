@@ -22,9 +22,7 @@
 // 本模块**不做 I/O**：调用方把"工作区文件清单"与"会话日志文本"喂进来。于是同一份逻辑
 // 既能在回归层（`tests/`，秒级、无 key）被直接断言，也能被运行场脚本（`checks/`，可起进程）
 // 复用——分层纪律见 `docs/guides/dev-loop.md` §9.1。
-
-/** 公司五个角色 id，与 `packages/company-pack/presets/` 一致。 */
-export const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
+import { COMPANY_ROLE_IDS } from './company-roles.mjs'
 
 /** 成品文件名与过程稿目录名（三态的字面约定）。 */
 export const FINAL_BASENAME = 'final.md'
@@ -233,7 +231,7 @@ export function deliverableId(relPath) {
   // 角色记号至少出现在第 2 段起（`coo-...` 这类前缀不许被吃掉，否则 slug 会变空）。
   for (let i = 1; i < segments.length; i++) {
     const tail = segments.slice(i).join('-')
-    const role = ROLES.find(candidate => tail === candidate || tail.startsWith(`${candidate}-`))
+    const role = COMPANY_ROLE_IDS.find(candidate => tail === candidate || tail.startsWith(`${candidate}-`))
     if (role === undefined) continue
     return { slug: segments.slice(0, i).join('-'), kind: 'draft', role: tail }
   }

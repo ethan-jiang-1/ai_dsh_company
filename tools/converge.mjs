@@ -14,6 +14,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync
 import { join, basename } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
 import { archiveMovePlan, charterHasEntry, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
+import { COMPANY_ROLE_IDS } from './lib/company-roles.mjs'
 import { spawnSync } from 'node:child_process'
 
 const args = process.argv.slice(2)
@@ -28,7 +29,7 @@ const WS = join(ROOT, 'company-workspace')
 const ACTIVE = join(WS, 'deliverables')
 const ARCHIVE = join(WS, 'deliverables-archive')
 const LEDGER = join(WS, 'kb', 'motion-ledger.md')
-const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
+const ROLES = COMPANY_ROLE_IDS
 const today = new Date().toISOString().slice(0, 10)
 
 const git = (args_, opts = {}) => {

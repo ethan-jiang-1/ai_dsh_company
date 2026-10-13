@@ -14,6 +14,7 @@
 // 用法：source run/env.sh && node checks/smoke/preset-smoke.mjs [--port 0] [--profile web]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 import { spawn } from 'node:child_process'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -29,7 +30,7 @@ const PROFILE = arg('profile', 'web')
 // 练习场 ≠ 运行场（轮间待办②）：默认 cwd 在排练场，排练/探针产物不再积进真盘；
 // `--cwd` 可显式覆盖（确需指回真盘时）。
 const CWD = resolve(arg('cwd', join(ROOT, REHEARSAL_REL)))
-const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
+const ROLES = COMPANY_ROLE_IDS
 const OUR_PACKAGE = 'dsh-company-pack'
 
 /** 该角色目录里实际存在的 skill（preset 约定：目录名 = skill 名）。 */

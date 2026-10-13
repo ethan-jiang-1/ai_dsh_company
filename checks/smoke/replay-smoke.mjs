@@ -37,6 +37,7 @@
 // 预算（§10）：墙钟 ≤ --wall。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 import { spawn, spawnSync } from 'node:child_process'
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
@@ -78,7 +79,7 @@ const oracle = workspaceOracle(scenarioDir, metadata)
 const HEADLESS = metadata.profile === 'headless'
 // rc.2：五个角色预设行住在 pack 的 `presets/<role>/agent.cordis.yml`（各自是 patch 文件）；
 // `--patch` 可重复 ⇒ 组合夹具只声明 registry，预设行由这里追加（单一事实 = pack 的文件）。
-const PRESET_PATCHES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
+const PRESET_PATCHES = COMPANY_ROLE_IDS
   .flatMap(role => ['--patch', join(ROOT, 'packages/company-pack/presets', role, 'agent.cordis.yml')])
 if (HEADLESS && (RECORD || UI || REFRESH_UI)) throw new Error('Headless workspace fixture supports keyless replay, --prepare, and --refresh only')
 if (HEADLESS && !oracle) throw new Error('Headless workspace replay requires workspace.final with before/expected trees')
