@@ -7,7 +7,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { BoardColumn, TaskRow } from '../lib/board.ts'
-import { UNASSIGNED_LABEL } from '../lib/board.ts'
+import { UNASSIGNED_LABEL, driftLabel } from '../lib/board.ts'
 import type { BudgetSummary } from '../lib/budget.ts'
 import { formatTokens } from '../lib/budget.ts'
 import type { DagLayout } from '../lib/dag.ts'
@@ -119,6 +119,9 @@ export function BoardPanel({ columns }: { readonly columns: readonly BoardColumn
                       {card.ready ? '依赖已就绪' : `等 ${card.blockedBy.join('、')}`}
                     </Tag>
                   )}
+                  {/* 声明 vs 板面：任务文本里写了"依赖 T1,T2"而板面没有这条边 ⇒ 上面那句
+                      "依赖已就绪"是**假信号**（2026-10-13 真事故：静默缺边）。这条 tag 拆穿它。 */}
+                  {card.drift !== null && <Tag tone="warning">⚠ {driftLabel(card.drift)}</Tag>}
                   <span className="wk-card-id">{card.id}@{card.revision}</span>
                 </div>
               </article>

@@ -4,7 +4,10 @@ import {
   BOARD_STATUS_ORDER,
   UNASSIGNED_LABEL,
   boardColumns,
+  declaredDependencyLabels,
+  dependencyDrift,
   dependencyEdges,
+  driftLabel,
   readyOf,
   tasksFromTeamView,
   toTaskStatus,
@@ -117,5 +120,71 @@ describe('toTaskStatus', () => {
   it('已知值原样、未知值落 pending（不显示英文裸值）', () => {
     expect(toTaskStatus('in_progress')).toBe('in_progress')
     expect(toTaskStatus('weird')).toBe('pending')
+  })
+})
+
+describe('dependencyDrift（声明 vs 板面：2026-10-13 真事故的机器判据）', () => {
+  /**
+   * 夹具 = 真事故原文（会话 session-663ff4b6 / turn1 step9）：T3 的 subject 只写 T3，
+   * 依赖写在 description 里（"依赖 T1,T2（等它们出稿后动笔…）"），板面 blockedBy 却是 `[]`
+   * —— 看板当时把它报成"依赖已就绪"。反证：删掉 `dependencyDrift` 的调用（boardColumns 里
+   * `drift: null`）⇒ 下面「看板卡带分叉」那条红；把 `declaredDependencyLabels` 的
+   * 「不依赖」守卫去掉 ⇒ "可先做不依赖它们的部分" 那条红。
+   */
+  const incident = view([
+    { id: 'task-1', subject: 'T1 · VP-Sales：中美 token 工厂差异外化', status: 'in_progress' },
+    { id: 'task-2', subject: 'T2 · CFO：单位经济可判性', status: 'in_progress' },
+    {
+      id: 'task-3',
+      subject: 'T3 · VP-Eng：差异的技术解释与技术实现要求',
+      description: '依赖 T1,T2（等它们出稿后动笔，可先做不依赖它们的部分）。',
+      status: 'in_progress',
+    },
+  ])
+
+  it('声明了依赖、板面无边 ⇒ 报 missing（真事故形态）', () => {
+    const rows = tasksFromTeamView(incident)
+    const drifts = dependencyDrift(rows)
+    expect(drifts).toHaveLength(1)
+    expect(drifts[0]).toMatchObject({ taskId: 'task-3', declared: ['T1', 'T2'], missing: ['T1', 'T2'] })
+    expect(driftLabel(drifts[0]!)).toBe('声明依赖未落板：T1、T2')
+  })
+
+  it('依赖已落板 ⇒ 不出分叉（T4 自我修复后的形态）', () => {
+    const rows = tasksFromTeamView(view([
+      { id: 'task-1', subject: 'T1 · 甲', status: 'completed' },
+      { id: 'task-2', subject: 'T2 · 乙', status: 'completed' },
+      {
+        id: 'task-4',
+        subject: 'T4 · VP-Eng：技术-事实互审',
+        description: '依赖 T1,T2。',
+        status: 'pending',
+        blockedBy: ['task-1', 'task-2'],
+      },
+    ]))
+    expect(dependencyDrift(rows)).toEqual([])
+  })
+
+  it('纸面号没有对应任务 ⇒ 报 unmapped（无法核对也要露出来）', () => {
+    const drifts = dependencyDrift(tasksFromTeamView(view([
+      { id: 'task-9', subject: 'T9 · 丙', description: '依赖 T7。', status: 'pending' },
+    ])))
+    expect(drifts[0]).toMatchObject({ taskId: 'task-9', missing: [], unmapped: ['T7'] })
+    expect(driftLabel(drifts[0]!)).toBe('声明依赖无法核对：T7')
+  })
+
+  it('「不依赖 T1」不算声明（假阳性守卫）', () => {
+    expect(declaredDependencyLabels('可先做不依赖它们的部分')).toEqual([])
+    expect(declaredDependencyLabels('此项不依赖 T1，直接开工')).toEqual([])
+    expect(declaredDependencyLabels('依赖 T1、T2')).toEqual(['T1', 'T2'])
+    expect(declaredDependencyLabels('依赖：T1/T2/T3')).toEqual(['T1', 'T2', 'T3'])
+  })
+
+  it('看板卡带分叉（面板据此标"假就绪"）', () => {
+    const columns = boardColumns(tasksFromTeamView(incident))
+    const card = columns.flatMap(column => column.cards).find(item => item.id === 'task-3')
+    expect(card?.drift).not.toBeNull()
+    expect(card?.blockedBy).toEqual([])
+    expect(card?.ready).toBe(true) // ← 板面说"就绪"，分叉 tag 说"声明依赖未落板"：两个信号并存
   })
 })

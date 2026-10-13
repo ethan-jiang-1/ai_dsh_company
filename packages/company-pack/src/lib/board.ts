@@ -33,6 +33,11 @@ const KNOWN_STATUS: readonly TaskStatus[] = ['pending', 'in_progress', 'complete
 export interface TaskRow {
   readonly id: string
   readonly subject: string
+  /**
+   * 任务描述原文。**依赖意图可能只活在这里**——板面只认 `blockedBy`，而 CEO 的任务书/描述里
+   * 用纸面号写"依赖 T1,T2"（2026-10-13 真事故：两处不一致，板面把该任务报成"依赖已就绪"）。
+   */
+  readonly description: string
   readonly status: BoardStatus
   /** 负责人显示名；未分配 = null。 */
   readonly ownerName: string | null
@@ -40,6 +45,87 @@ export interface TaskRow {
   readonly blockedBy: readonly string[]
   /** 依赖全部完成（官方 `taskReady` 同义：`blockedBy.every(completed)`；悬空 id 视为未完成）。 */
   readonly ready: boolean
+}
+
+/**
+ * 一条"声明了依赖、板面却没有这条边"的分叉（2026-10-13 立，起因 = 真事故）。
+ * 为什么需要机器判据：声明活在自由文本里、板面只认 `blockedBy`，两者分叉时**没有任何信号**——
+ * 看板照样报"依赖已就绪"、依赖图照样少画边，人看到的是假图（T3 那场：subject 写"依赖 T1,T2"、
+ * 板面 `blockedBy` 一路 `[]`，静默到人工扫盘才发现）。
+ */
+export interface DependencyDrift {
+  readonly taskId: string
+  /** 文本里声明的纸面号（`依赖 T1、T2` ⇒ `['T1','T2']`）。 */
+  readonly declared: readonly string[]
+  /** 声明了、但 `blockedBy` 里没有对应板面 id —— **真缺陷形态**。 */
+  readonly missing: readonly string[]
+  /** 声明了、但文本里找不到"纸面号 → 板面 id"的映射（无法核对，也要报出来）。 */
+  readonly unmapped: readonly string[]
+}
+
+/** 纸面号 → 板面 id：任务 subject 形如 `T1 · …`（派活行同款约定；认不出就不映射）。 */
+export function paperToTaskId(tasks: readonly TaskRow[]): ReadonlyMap<string, string> {
+  const map = new Map<string, string>()
+  for (const task of tasks) {
+    const matched = /^\s*T(\d+)\b/.exec(task.subject)
+    if (matched !== null) map.set(`T${matched[1] ?? ''}`, task.id)
+  }
+  return map
+}
+
+/**
+ * 从任务文本里抽"声明的依赖纸面号"。
+ * 只认显式声明（`依赖 T1、T2` / `依赖：T1/T2` / `依赖 T1,T2,T3`）；**`不依赖 T1` 不算**
+ * （前一字是 不/无/非/勿/未 时跳过），避免把"可先做不依赖它们的部分"这类句子当成声明。
+ * @param text - subject + description 的合并文本。
+ * @returns 去重后的纸面号（出现序）。
+ */
+export function declaredDependencyLabels(text: string): string[] {
+  const found: string[] = []
+  for (const match of text.matchAll(/依赖\s*[:：]?\s*((?:T\d+[\s、,，/]*)+)/g)) {
+    const before = text.slice(0, match.index).trimEnd().slice(-1)
+    // ⚠ before 为空串时 `'不无非勿未'.includes('')` 为真——会把行首的"依赖 T1"整条丢掉。
+    if (before !== '' && '不无非勿未'.includes(before)) continue
+    for (const token of match[1]?.match(/T\d+/g) ?? []) {
+      if (!found.includes(token)) found.push(token)
+    }
+  }
+  return found
+}
+
+/**
+ * 声明 vs 板面：逐任务比对"文本里声明的依赖"与"`blockedBy` 里的板面边"。
+ * @param tasks - 任务行（同一批；纸面号映射只在这批内解析）。
+ * @returns 有分叉的任务（无分叉的不出现；顺序 = 输入序）。
+ */
+export function dependencyDrift(tasks: readonly TaskRow[]): DependencyDrift[] {
+  const paperToId = paperToTaskId(tasks)
+  const drifts: DependencyDrift[] = []
+  for (const task of tasks) {
+    const declared = declaredDependencyLabels(`${task.subject}\n${task.description}`)
+    if (declared.length === 0) continue
+    const missing: string[] = []
+    const unmapped: string[] = []
+    for (const label of declared) {
+      const id = paperToId.get(label)
+      if (id === undefined) unmapped.push(label)
+      else if (!task.blockedBy.includes(id) && id !== task.id) missing.push(label)
+    }
+    if (missing.length > 0 || unmapped.length > 0) drifts.push({ taskId: task.id, declared, missing, unmapped })
+  }
+  return drifts
+}
+
+/**
+ * 分叉的一句话文案（面板与审计共用；**文案的家 = 这里**）。
+ * @param drift - 一条分叉。
+ * @returns 中文警示语；无分叉时返回 null。
+ */
+export function driftLabel(drift: DependencyDrift): string | null {
+  const parts: string[] = []
+  if (drift.missing.length > 0) parts.push(`声明依赖未落板：${drift.missing.join('、')}`)
+  if (drift.unmapped.length > 0) parts.push(`声明依赖无法核对：${drift.unmapped.join('、')}`)
+  return parts.length === 0 ? null : parts.join('；')
 }
 
 /** 一张卡（列的渲染单元；不含 React 概念）。 */
@@ -50,6 +136,8 @@ export interface BoardCard {
   readonly revision: number
   readonly blockedBy: readonly string[]
   readonly ready: boolean
+  /** 声明 vs 板面的分叉（无分叉 = null）；看板据此把"假就绪"标出来。 */
+  readonly drift: DependencyDrift | null
 }
 
 /** 一列。 */
@@ -94,6 +182,7 @@ export function tasksFromTeamView(view: TeamViewLike): TaskRow[] {
     rows.push({
       id: task.id,
       subject: task.subject,
+      description: task.description ?? '',
       status,
       // ownerName 是**成员名**（`TeamTaskView` 不带 ownerId）；'lead' 按 CEO 映射，其余按 preset id 映射。
       ownerName: owner === undefined || owner === ''
@@ -113,6 +202,7 @@ export function tasksFromTeamView(view: TeamViewLike): TaskRow[] {
  * @returns 三列（pending / in_progress / completed）。
  */
 export function boardColumns(tasks: readonly TaskRow[]): BoardColumn[] {
+  const driftByTask = new Map(dependencyDrift(tasks).map(drift => [drift.taskId, drift]))
   return BOARD_STATUS_ORDER.map(status => ({
     status,
     label: TASK_STATUS_LABEL[status],
@@ -125,6 +215,7 @@ export function boardColumns(tasks: readonly TaskRow[]): BoardColumn[] {
         revision: task.revision,
         blockedBy: task.blockedBy,
         ready: task.ready,
+        drift: driftByTask.get(task.id) ?? null,
       })),
   }))
 }

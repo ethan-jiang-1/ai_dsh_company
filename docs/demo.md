@@ -44,7 +44,7 @@
 | # | 空间 | 镜头内容 | 观测点（外部可验证，不讲解也能看懂） |
 |---|---|---|---|
 | 1 | CEO | 收到动议，先澄清目标/约束/验收 | CEO 复述动议并列出三点，不直接开写 |
-| 2 | CEO | DAG 拆解：建任务 + `blockedBy` 依赖 + 指定 owner | 头部「任务板」按钮（开右栏页签）或「公司」视图·看板出现多行任务：owner 分别是 VP-Sales/VP-Eng/COO/CFO，依赖徽章非空 |
+| 2 | CEO | DAG 拆解：建任务 + `blockedBy` 依赖 + 指定 owner | 头部「任务板」按钮（开右栏页签）或「公司」视图·看板出现多行任务：owner 分别是 VP-Sales/VP-Eng/COO/CFO，依赖徽章非空；任务文本声明了依赖而板面没有边时，卡上另带 `⚠ 声明依赖未落板：…` |
 | 3 | CEO | `spawn_teammate` 拉起四个职能 | 名册出现 CEO + 四行成员，状态 running/idle 实时变化；任务板成员栏同步 |
 | 4 | **切到 VP-Eng 会话** | 它读自己的 KB、消化 brief、出稿 | 会话里能看到读 `kb/vp-eng/CHARTER.md` 的工具调用；产出写入 `deliverables/` |
 | 5 | **切到 VP-Sales 会话** | 市场与定价判断（MEDDIC 六问 / 双向估算） | 引用 `kb/vp-sales/` 客户事实；数字带【事实/假设】标注 |
