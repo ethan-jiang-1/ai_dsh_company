@@ -1,20 +1,25 @@
-# workspace/ —— 出厂公司盘骨架（随 pack 分发）
+# 你的公司盘
 
-公司角色会话说到底只是"读工作目录里的人写的东西"：手册（`AGENTS.md`，由 `agent-instructions`
-从会话 cwd 注入）、岗位章程（`kb/<角色>/CHARTER.md`）、编制与授权面（`kb/org.md` / `kb/owners.md`）、
-动议台账（`kb/motion-ledger.md`）、写作模板（`templates/`）、交付物与归档空目录。
+这是梦之队角色会话的工作目录（会话 cwd）——角色读它、写它。装好插件后**第一次启动会自动建立**本目录
+（`workspace/` 骨架落到这里）；已经建好就一个字节都不动，只补缺件。
 
-**为什么在这里**：这些是**产品的一部分**（第三方装同一个插件，该拿到同一份手册与章程），
-而本仓 `company-workspace/` 是**我们这一家的运行盘**——制度件在本目录（唯一真源），
-运行盘用**符号链接**指回来；本部署自己的数据（owners 填写、台账行、journal、交付物）留在运行盘。
+## 什么随插件升级，什么是你的
 
-**装完怎么落盘**（安装步骤，详见 `docs/guides/release.md`）：
+| 件 | 谁维护 | 说明 |
+|---|---|---|
+| `AGENTS.md`（公司手册） | **随插件**（pack 内 `workspace/` 是唯一真源） | 每个成员会话的首个请求都会注入它；改它 = 改公司共识 |
+| `kb/org.md`（编制）、`kb/<角色>/CHARTER.md`（岗位章程）、`templates/`（写作模板） | **随插件** | 升级插件即拿到新版 |
+| `kb/owners.md`（人侧归属与授权面） | **你的**（起动件已带骨架，**待填**） | 哪个物理人对应哪个角色、各自能答什么；问询与审批按它路由 |
+| `kb/motion-ledger.md`（动议台账） | **你的** | 每场动议收口时追加一行（结论逐字取自该动议的 `meta.md`） |
+| `kb/<角色>/journal/`（角色纪要） | **你的** | 当轮记忆；轮末收敛时清出 live（摘要进 CHARTER） |
+| `deliverables/<日期>-<slug>/` | **你的** | 一场动议一个目录：`drafts/<角色>.md` 过程稿、`final.md` 成品（只有 CEO 能落，且必须来自一次 `present`）、`meta.md` 户口 |
+| `deliverables-archive/` | **你的** | 已收敛的交付物（只读历史） |
 
-```sh
-# 你的公司盘（会话 cwd）——目录骨架 + 制度件 + 起动件
-mkdir -p <你的公司盘> && cp -R <安装的包>/workspace/. <你的公司盘>/
-# 然后填 <你的公司盘>/kb/owners.md（谁答什么），把公司盘连到会话里即可
-```
+## 开工前
 
-⚠ 起动件 vs 制度件：`kb/owners.md` 与 `kb/motion-ledger.md` 是**待填/待写**的部署件（复制后归你），
-其余（手册/章程/org/模板）用同一份即可——本仓运行盘对它们用符号链接保持单源。
+1. 填 `kb/owners.md`（谁答什么）。
+2. 把本目录作为工作区连到 DSH（Web：侧栏 `Workspaces` → 添加/打开本目录）。
+3. 开 CEO 会话、选 `ceo` preset；动议怎么走见公司手册 `AGENTS.md`。
+
+> 落点与开关（部署面）：默认 `<DSH_HOME>/company-workspace`；`DSH_COMPANY_HOME` 换落点，
+> `DSH_COMPANY_BOOTSTRAP=off` 关掉自举（自管盘的部署用）。

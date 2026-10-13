@@ -48,3 +48,7 @@ git -C "$_repo_root" config core.hooksPath "$_repo_root/.githooks" \
 unset _repo_root
 
 echo "DSH_HOME=$DSH_HOME（日用 home ~/.dsh 不受影响）；验证用 pnpm dsh（vendor 基线），裸 dsh 已拦截。"
+
+# 出厂骨架首启自举（2026-10-13）：本仓的公司盘就在仓库里（company-workspace/，制度件是符号链接），
+# 不需要插件在 DSH_HOME 下再建一份 ⇒ 关掉；模拟安装（release-smoke）会自己把它翻回 if-missing。
+export DSH_COMPANY_BOOTSTRAP=off

@@ -42,8 +42,10 @@
    directory …`，`dereference: true` 与否都实测复现——所以不能靠 `dereference` 旗子）。
    排练场拿到的是**实文件**（每次刷新），不跟着仓库走。
 
-**仍未做**（后续切片，见 goal）：②首启自举（装完第一次启动就落盘）、③模拟安装验证（release-smoke 断言骨架随包落盘）、
-④仓库瘦身（drafts/sources 出 git + converge/orient/排练判据适配）、⑤防回潮门禁扩展。
+**同轮已接着做完**：②首启自举 = [首启自举](2026-10-13-first-run-bootstrap.md)；③模拟安装 =
+release-smoke ④⑥（骨架随包 + 首启落盘 + 二次启动零变更，ALL PASS）。
+**仍未做**（后续切片，见 goal）：④仓库瘦身（drafts/sources 出 git + converge/orient/排练判据适配）、
+⑤落点自动登记成工作区、⑥制度件升级策略。
 
 ## 验证（都真跑过）
 

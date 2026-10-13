@@ -6,6 +6,9 @@
   声明依赖、`apply(ctx)` 注册 host 工具（`request_signoff` 活范本 + `workspace_doors` 门控工具，
   2026-10-06 BUG-002 修复落地）、`export * from './lib/presence.ts'` 等再导出读模型。
   消费方向 = vendor runtime → 本入口。
+- `host/` —— **host-only 逻辑**（用 node 内建，浏览器面不许进）：目前只有 `bootstrap.ts`（出厂骨架首启自举：
+  只补缺 / 不抛 / 可重入）。**为什么单开一层**：`src/lib/` 同时被 client 叶编译（`tsconfig.client.json`），
+  带 node 内建的模块住那儿会让 client 叶报 TS2591（2026-10-13 现场）——host-only 的东西住 `host/`。
 - `lib/` —— **host/client 共享读模型与纯逻辑**，keyless 单测（`tests/company/` 11 spec）的直接对象：
   `attention / board / budget / cultivation / dag / doors / ledger / presence / signoff / tool-card` 十模块
   （`doors` = 多人门控归属判据，2026-10-06 加入）。内部依赖链一条：`dag → board → presence`
@@ -17,5 +20,6 @@
   构建走 tsdown client 半（产物 `lib/client.js`）。
 
 **构建**：`tsc -b packages/company-pack` + tsdown 两面（事实家 = [bootstrap](../../../docs/guides/bootstrap.md)）。
-⚠ 本目录**不进 tarball**（`files` 只含 `lib/**`、`presets/**`、`cordis.patch.yml`）——发布面是
+⚠ 本目录**不进 tarball**（`files` = `lib/**`、`presets/**`、`workspace/**`、`cordis.patch.yml`；
+  `workspace/**` = 出厂公司盘骨架，2026-10-13 起随包）——发布面是
 `lib/`（generated，owner 表 = [pack README](../README.md)）。

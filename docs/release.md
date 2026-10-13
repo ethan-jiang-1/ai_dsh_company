@@ -73,8 +73,9 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
    `package.json`（bundles = web 模板形状 `[dsh-base, dsh-web-app]` + `patchReload: startup`——
    自定义 profile 名走 DEFAULT 只有 dsh-base，起不了 web）+ `pnpm-workspace.yaml`
    （hoisted + autoInstallPeers: false，vendor 模板镜像）+ `.npmrc`（store/cache 钉 repo 内，§11）。
-4. **真安装**：`node <bin.dsh> plugin --profile release-check add file:<tarball>` → 断言 bundles reconcile、安装副本的 presets/client、peers 与矩阵。`--profile` 挂在 plugin 子命令上。
+4. **真安装**：`node <bin.dsh> plugin --profile release-check add file:<tarball>` → 断言 bundles reconcile、安装副本的 presets/client/**出厂骨架 `workspace/`**、peers 与矩阵。`--profile` 挂在 plugin 子命令上。
 5. **boot + RPC**：`node <bin.dsh> --profile release-check -- --port 0 --no-open` → roster 五角色零 broken、`session/create` 挂上 ceo、浏览器模块表含本包 client。随机端口的临时实例不替换开发 GUI。
+6. **首启自举**（2026-10-13 加）：干净 `DSH_COMPANY_HOME` 下第一次 boot 必须把骨架落到位（手册/章程/模板/起动件），**第二次 boot 零变更**——"建立好了就不用再建立了"的模拟安装判据。
 
 两个 DSH 调用均为 plain Node，清除继承的 `NODE_OPTIONS`、`NODE_PATH`、`TSX_*`，不走 `pnpm dsh`/tsx。构建和打包各限 120 秒，安装 180 秒，boot 120 秒、实例总寿命 180 秒、每个 HTTP 请求 15 秒；POSIX 子进程组 TERM 后等待，1 秒后 KILL。确认退出才回收 profile（`--keep` 保留）；同 home 的锁目录拒绝并发运行。强杀脚本留下的锁须确认无进程后人工移除。
 

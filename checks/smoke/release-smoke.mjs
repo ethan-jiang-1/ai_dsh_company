@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 认证档（不进 pnpm test）：company-pack 构建 → npm pack → 干净 profile 真安装 → built CLI boot/RPC。
+// 认证档自 2026-10-13 起同时认「出厂骨架随包 + 首启自举（落盘 / 二次启动零变更）」。
 // 何时跑：pack 依赖、安装形状、built 启动器改动时；或它属于关键验收时（无 key，分钟级）
 // vendor 产物是前置条件，不由此脚本重建；存在/运行通过不代表新鲜。构建配方见 guides/bootstrap。
 // 用法：source run/env.sh && node checks/smoke/release-smoke.mjs [--keep]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
-import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
@@ -45,7 +46,13 @@ try {
     }
   }
   console.log(`built CLI：${cli}（plain Node；vendor 产物新鲜度未证明，本脚本只重建 company-pack）`)
+  // 首启自举的验收落点（2026-10-13）：**隔离目录** + 显式打开开关（本仓 run/env.sh 为自管盘设
+  // DSH_COMPANY_BOOTSTRAP=off，那条会随环境继承进来——模拟安装必须自己把它翻回来）。
+  const companyHome = join(home, 'tmp/release-company-workspace')
+  rmSync(companyHome, { recursive: true, force: true })
   const env = plainNodeEnv({ ...process.env, DSH_HOME: home,
+    DSH_COMPANY_HOME: companyHome,
+    DSH_COMPANY_BOOTSTRAP: 'if-missing',
     npm_config_cache: join(home, 'tmp/npm-cache'), npm_config_store_dir: join(ROOT, '.pnpm-store'),
     npm_config_verify_deps_before_run: 'false',
   })
@@ -104,6 +111,12 @@ try {
   check('真实安装副本在场（node_modules/dsh-company-pack）', existsSync(join(installedPack, 'package.json')))
   check('安装副本带 presets/', existsSync(join(installedPack, 'presets/ceo')))
   check('安装副本带 client 产物', existsSync(join(installedPack, 'lib/client.js')))
+  // 出厂骨架（2026-10-13）：少了它，第三方装完插件就是"没有手册与章程"的裸奔（见该 Note）
+  check('安装副本带出厂骨架 workspace/（手册 + 章程 + 模板 + 起动件）',
+    ['workspace/AGENTS.md', 'workspace/templates/meta.md', 'workspace/kb/org.md', 'workspace/kb/owners.md',
+      'workspace/kb/motion-ledger.md', 'workspace/kb/ceo/CHARTER.md', 'workspace/deliverables'].every(rel =>
+      existsSync(join(installedPack, rel))),
+    `根目录 = ${readdirSync(installedPack).sort().join(', ')}`)
   const installedManifest = JSON.parse(readFileSync(join(installedPack, 'package.json'), 'utf8'))
   check('安装副本 peers 进 tarball', Object.keys(installedManifest.peerDependencies ?? {}).length >= 15 && installedManifest.dependencies === undefined)
   check('安装副本带兼容矩阵', Array.isArray(installedManifest?.dsh?.compatibility?.dshReleases))
@@ -143,6 +156,37 @@ try {
   check('session/create 挂上 ceo', created?.agentPreset === 'ceo' || created?.preset === 'ceo', JSON.stringify(created).slice(0, 120))
   const html = await (await request('/', { headers: { cookie } })).text()
   check('浏览器模块表含 dsh-company-pack/client.js', html.includes('dsh-company-pack/client.js') || html.includes('"dsh-company-pack"'))
+
+  // ── ⑥ 首启自举（2026-10-13）：干净 home 的第一次启动就把公司盘落到位；再启动一次零变更 ──
+  console.log('⑥ 首启自举（干净落点 → boot 落盘 → 二次 boot 零变更）')
+  const fingerprint = (dir) => {
+    if (!existsSync(dir)) return null
+    const rows = []
+    const walk = (rel) => {
+      for (const entry of readdirSync(join(dir, rel), { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+        const child = rel === '' ? entry.name : `${rel}/${entry.name}`
+        if (entry.isDirectory()) { rows.push(`${child}/`); walk(child) }
+        else rows.push(`${child}:${String(statSync(join(dir, child)).size)}`)
+      }
+    }
+    walk('')
+    return rows
+  }
+  const first = fingerprint(companyHome)
+  const has = (rows, rel) => rows !== null && rows.some(row => row.startsWith(`${rel}:`))
+  check('首启把出厂公司盘落到 DSH_COMPANY_HOME（含手册/章程/起动件）',
+    ['AGENTS.md', 'kb/org.md', 'kb/owners.md', 'kb/motion-ledger.md', 'kb/ceo/CHARTER.md', 'templates/meta.md']
+      .every(rel => has(first, rel)),
+    first === null ? `落点不存在：${companyHome}` : `共 ${String(first.length)} 件`)
+  const beforeSecond = fingerprint(companyHome)
+  await processes.close()
+  const second = processes.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
+  await second.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
+  await new Promise(resolve => { setTimeout(resolve, 1500) })
+  const afterSecond = fingerprint(companyHome)
+  check('第二次启动零变更（建立好了就不用再建立了）',
+    JSON.stringify(beforeSecond) === JSON.stringify(afterSecond),
+    `before=${String(beforeSecond?.length ?? -1)} after=${String(afterSecond?.length ?? -1)}`)
 } catch (error) {
   failures.push(error.message)
   console.error(`release-smoke: ${error.message}`)
@@ -160,6 +204,6 @@ try {
   if (ownsLock && stopped) rmSync(lockDir, { recursive: true, force: true })
 }
 console.log(failures.length === 0
-  ? '\nrelease-smoke: ALL PASS（plain Node built CLI → npm pack → 干净 profile 真安装 → RPC）'
+  ? '\nrelease-smoke: ALL PASS（plain Node built CLI → npm pack → 干净 profile 真安装 → RPC → 首启自举落盘/幂等）'
   : `\nrelease-smoke: ${failures.length} FAILURE(S)`)
 process.exitCode = failures.length === 0 ? 0 : 1

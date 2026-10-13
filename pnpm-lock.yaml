@@ -174,6 +174,9 @@ importers:
       '@deepseek-ai/dsh-experimental-tool-agent-team':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/experimental/tool-agent-team
+      '@deepseek-ai/dsh-home-paths':
+        specifier: ^0.2.0-rc.2
+        version: link:../../vendor/dsh/packages/util/home-paths
       '@deepseek-ai/dsh-persona':
         specifier: ^0.2.0-rc.2
         version: link:../../vendor/dsh/packages/preset/persona
@@ -15428,10 +15431,12 @@ packages:
 
   '@modelcontextprotocol/server-everything@2026.8.31':
     resolution: {integrity: sha512-5U3OZh8Xq0Li4nA26l6uNvV9/1suMDuWSn+NjLZIhzinhMY6N3A4DCrxVecBGPf2PsNFKTEv5krxGPRwzxc7jQ==}
+    deprecated: 'Date-based versions are no longer published. This package has resumed semantic versioning at 1.0.0: install the latest version.'
     hasBin: true
 
   '@modelcontextprotocol/server-filesystem@2026.8.31':
     resolution: {integrity: sha512-kKaFkyAh6oipvc9+EAbJ552JafnMnOq5nzmzWkp1jJdBhTAAGpmIpWihUG1+rfNhmEFM98gUZDdCHCDD4v6a7Q==}
+    deprecated: 'Date-based versions are no longer published. This package has resumed semantic versioning at 1.0.0: install the latest version.'
     hasBin: true
 
   '@modelcontextprotocol/server@2.0.0':

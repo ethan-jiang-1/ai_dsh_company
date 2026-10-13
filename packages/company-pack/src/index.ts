@@ -5,8 +5,10 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 // 纯类型导入：只需要 `ctx.approval` 的 Context 类型增强（服务本体由 web profile 挂载）。
 // ⚠ 不做值导入——那会把 host 侧核心包的类型图拉进本程序，遮掉 client 面的 sessions 增强（实测）。
 import type {} from '@deepseek-ai/dsh-user-approval'
+import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
 import { signoffDecisionNote, signoffReason } from './lib/signoff.ts'
 import { doorsFromSessions } from './lib/doors.ts'
+import { bootstrapCompanyWorkspace, bootstrapEnabled, resolveCompanyHome, resolveSkeletonDir } from './host/bootstrap.ts'
 
 /**
  * 在场板读模型（R5b）从 host 入口再导出：`checks/smoke/replay-smoke.mjs` 用它把重放会话的
@@ -153,4 +155,25 @@ export function apply(ctx: Context): void {
       }
     },
   }))
+
+  // ── 出厂公司盘骨架的**首启自举**（2026-10-13 立；用户令：「company-workspace 不在就建立一下，
+  //    建立好了就不用再建立了」）。规则与纪律 = ./lib/bootstrap.ts 头注（只补缺 / 不抛 / 可重入）：
+  //    默认落到 `<DSH_HOME>/company-workspace`（第三方装完即有盘可连）；已存在的盘一个字节都不动
+  //    ——本仓自己的 `company-workspace/` 因此天然免疫（那里的制度件还是符号链接）。
+  //    `DSH_COMPANY_HOME` 换落点、`DSH_COMPANY_BOOTSTRAP=off` 关掉（自管盘的部署用，见 run/env.sh）。
+  if (bootstrapEnabled()) {
+    try {
+      const skeleton = resolveSkeletonDir(import.meta.url)
+      const { plan, result } = bootstrapCompanyWorkspace(skeleton, resolveCompanyHome(resolveDshHome()))
+      if (plan.error !== undefined) {
+        ctx.logger?.warn?.(`company-pack 骨架自举跳过：${plan.error}`)
+      } else if (result.created.length > 0) {
+        ctx.logger?.info?.(`company-pack：出厂公司盘骨架已落到 ${plan.companyHome}`
+          + `（新建 ${String(result.created.length)} 件）——填 kb/owners.md 后即可开工`)
+      }
+    } catch (error) {
+      // 首发自举绝不许连累应用（postmortem 0003：apply 期抛错会砖整窗）
+      ctx.logger?.warn?.(`company-pack 骨架自举失败（不影响运行）：${(error as Error).message}`)
+    }
+  }
 }

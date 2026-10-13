@@ -19,9 +19,11 @@
 release-smoke ALL PASS（[docs/release.md](../../docs/release.md)）。pack 保持 `private: true`——
 真实 npm 发布等第二个消费者出现再定。
 
-**装完第一步**：把包内 `workspace/` 落到你的公司盘（会话 cwd）——`cp -R <包>/workspace/. <公司盘>/`，
-再填 `kb/owners.md`（谁答什么）。本仓自己的 `company-workspace/` 是**我们这一家的运行盘**：
-制度件用符号链接指回本目录（单源），业务数据（owners、台账、journal、交付物）留在运行盘。
+**装完第一步（自动）**：插件第一次跑起来会把包内 `workspace/` 骨架落到 `<DSH_HOME>/company-workspace`
+（**只补缺、绝不覆盖**，已建好则一个字节不动；见 host 半 `src/host/bootstrap.ts`）——装完即有盘可连，
+填 `kb/owners.md` 就能开工。落点用 `DSH_COMPANY_HOME` 换、`DSH_COMPANY_BOOTSTRAP=off` 关
+（**自管盘的部署**这么用；本仓 `run/env.sh` 就是关的——我们的盘在 `company-workspace/`，制度件是
+指向本目录的符号链接，业务数据留在运行盘）。
 
 ## 已知限制（随行为变更同 diff 更新；2026-09-28 立，借 FAQ 04 package README tier）
 
