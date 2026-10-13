@@ -4,9 +4,11 @@
 
 ## 活跃清单
 
-活跃清单当前为空（2026-10-12-workspace-convergence 已结归档：
-[_archive/settled_issues/](../_archive/settled_issues/2026-10-12-workspace-convergence.md)——收敛执行器落地 + 首轮全量收敛完成）。
-已结问题见 [归档](../_archive/settled_issues/README.md)（含 2026-10-12-ceo-minimal-assembly——三层防御已落地）。
+| 问题 | 当前情况与下一步 |
+|---|---|
+| [公司面 Agent 培养](2026-10-13-agent-cultivation.md) | 推敲中；现状、钉版机制与外部证据已整理，先收敛本人教学的第一版闭环与持久生效预期 |
+
+已结问题见 [归档](../_archive/settled_issues/README.md)（含 workspace-convergence 与 ceo-minimal-assembly）。
 
 ## 边界与尺寸
 

@@ -27,6 +27,8 @@ intent: "为什么需要这份依据。"
 
 | 文件 | 活卡与用途 |
 |---|---|
+| [培养产品研究](agent-cultivation/2026-10-13-cultivation-design.md) | [Agent 培养](../issues/2026-10-13-agent-cultivation.md)：对象、关系、用户路径和候选取舍 |
+| [DSH 培养能力](agent-cultivation/2026-10-13-dsh-capabilities.md) | [Agent 培养](../issues/2026-10-13-agent-cultivation.md)：钉版源码边界与待探针事项 |
+| [外部培养实践](agent-cultivation/2026-10-13-external-patterns.md) | [Agent 培养](../issues/2026-10-13-agent-cultivation.md)：一手案例、评估依据与反证 |
 
-目前无活跃研究材料（ceo-minimal-assembly 证据稿已随结案卡迁
-[研究归档](../_archive/research/ceo-minimal-assembly/2026-10-12-assembly-evidence.md)）；随卡归档的研究见 [研究归档](../_archive/research/README.md)。；随卡归档的研究见 [研究归档](../_archive/research/README.md)。
+随卡归档的材料见 [研究归档](../_archive/research/README.md)。
