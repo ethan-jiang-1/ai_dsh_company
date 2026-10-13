@@ -17,8 +17,8 @@ import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.m
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 const arg = name => { const i = process.argv.indexOf(`--${name}`); return i === -1 ? undefined : process.argv[i + 1] }
 const existing = arg('session')
 const outDir = join(ROOT, 'runtime', 'human-exits-evidence')

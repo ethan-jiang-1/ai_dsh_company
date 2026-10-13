@@ -22,12 +22,12 @@ import { spawn } from 'node:child_process'
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { recoveryEvidence } from '../../tools/lib/recovery-scope-evidence.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const MARKER = `R7-恢复标记-${String(Date.now() % 100000)}`
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 const results = []
-const check = (label, ok, detail = '') => { results.push({ label, ok }); console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`) }
+const check = makeCheck(results)
 const kill9 = child => { try { child.kill('SIGKILL') } catch { /* 已死 */ } }
 let proc = null // 当前 web 进程持有者（run 内赋值，finally 兜杀）
 // 直接顺序实现（不用上面的占位）

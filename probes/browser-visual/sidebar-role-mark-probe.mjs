@@ -31,6 +31,7 @@ import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { makeFailingCheck } from '../../tools/lib/probe-kit.mjs'
 
 const SHOTS = join(ROOT, 'snapshots/visual/sidebar-role-mark')
 const SEAT_CEILING = 16
@@ -73,10 +74,7 @@ const READ_ROWS = `(() => {
 /** 判据：逐行核对，返回 { failures, rows }。腿名进 label 便于定位。 */
 function judge(leg, rows, mountBroken) {
   const failures = []
-  const check = (label, ok, detail = '') => {
-    console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`)
-    if (!ok) failures.push(label)
-  }
+  const check = makeFailingCheck(failures)
   if (mountBroken) check(`${leg} G5 零挂载失败`, false, '页面出现 "Failed to load plugins"')
   else check(`${leg} G5 零挂载失败`, true)
   check(`${leg} G0 非空守卫：真侧栏里有标记`, rows.length > 0, `标记数=${String(rows.length)}`)
@@ -218,10 +216,7 @@ if (emitted.status !== 0) {
   }, fixture)
   console.log(`  夹具标记：${fixtureMarks.map(m => `${m.preset ?? '?'}=${m.mark ?? '?'}(${String(m.w)}px ${m.background})`).join(' / ')}`)
   const expectPresets = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']
-  const check = (label, ok, detail = '') => {
-    console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`)
-    if (!ok) failures.push(label)
-  }
+  const check = makeFailingCheck(failures)
   check('G6 五角色标记齐（ceo/cfo/coo/vp-eng/vp-sales）',
     expectPresets.every(preset => fixtureMarks.some(m => m.preset === preset)),
     fixtureMarks.map(m => m.preset ?? '?').join(','))

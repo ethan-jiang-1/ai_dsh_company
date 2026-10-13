@@ -15,6 +15,7 @@ import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { pairedCalls, toolResultText, toolArguments, hasCompletedTurn } from '../../tools/lib/collaboration-evidence.mjs'
 import { fullRead, memberStaleEvidence } from '../../tools/lib/member-stale-evidence.mjs'
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 const home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('member-stale-write-probe')
 const cwd = join(ROOT, REHEARSAL_REL)
 mkdirSync(join(cwd, 'journal'), { recursive: true })
@@ -28,7 +29,6 @@ writeFileSync(target, BASE)
 const evidenceDir = join(home, 'member-stale-evidence')
 mkdirSync(evidenceDir, { recursive: true })
 const evidence = { target: relative, baseline: BASE, external: EXTERNAL, expected: FINAL }
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 let child
 let budgetExpired = false
 const budget = setTimeout(() => { budgetExpired = true; child.kill('SIGTERM'); console.error('ERROR: 12分钟总预算到限'); process.exitCode = 2 }, 12 * 60_000)

@@ -21,12 +21,12 @@ import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const TARGET = join(REHEARSAL, 'journal', 'h7-dissent.md')
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 const results = []
-const check = (label, ok, detail = '') => { results.push({ label, ok }); console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`) }
+const check = makeCheck(results)
 
 try { rmSync(TARGET, { force: true }) } catch {}
 let home

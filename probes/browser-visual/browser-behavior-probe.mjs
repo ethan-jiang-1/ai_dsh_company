@@ -44,14 +44,14 @@ import { createRequire } from 'node:module'
 import { existsSync, mkdirSync, readdirSync, symlinkSync, writeFileSync } from 'node:fs'
 import http from 'node:http'
 import { dirname, join, resolve } from 'node:path'
+import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const ASSETS = join(ROOT, 'snapshots/probes/browser-behavior-probe/2026-10-04')
 mkdirSync(join(REHEARSAL, 'browser-probe'), { recursive: true })
 mkdirSync(ASSETS, { recursive: true })
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 const results = []
-const check = (label, ok, detail = '') => { results.push({ label, ok }); console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`) }
+const check = makeCheck(results)
 
 // 自含交互 fixture：导航/读内容/点击/输入四个行为各有断言锚点（排练场 = gitignored 运行残留）
 const FIXTURE = join(REHEARSAL, 'browser-probe', 'fixture.html')

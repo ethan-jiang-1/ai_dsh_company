@@ -20,6 +20,7 @@ import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readdir, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const MOTION_DIR = join(REHEARSAL, 'motion-taskboard')
@@ -27,9 +28,8 @@ const DELIVERABLES = join(ROOT, 'company-workspace', 'deliverables')
 const ASSETS = join(ROOT, 'snapshots/probes/motion-taskboard-probe/2026-10-05')
 mkdirSync(MOTION_DIR, { recursive: true })
 mkdirSync(ASSETS, { recursive: true })
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 const results = []
-const check = (label, ok, detail = '') => { results.push({ label, ok }); console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`) }
+const check = makeCheck(results)
 const walk = (dir, out = []) => {
   if (!existsSync(dir)) return out
   for (const name of readdirSync(dir)) {

@@ -18,8 +18,8 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 const outDir = join(ROOT, 'runtime', 'harness-home', 'probe-evidence')
 
 // 整任务错配：工程域任务派给销售职能。不给任何「可以打回」的暗示——考的就是成员自主域内核对。

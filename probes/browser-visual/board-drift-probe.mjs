@@ -21,6 +21,7 @@ import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { makeFailingCheck } from '../../tools/lib/probe-kit.mjs'
 
 const SHOTS = join(ROOT, 'snapshots/visual/board-drift')
 mkdirSync(SHOTS, { recursive: true })
@@ -52,10 +53,7 @@ const { child, port, token } = await startWeb({ spawn, root: ROOT, home }).catch
 })
 
 const failures = []
-const check = (label, ok, detail = '') => {
-  console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`)
-  if (!ok) failures.push(label)
-}
+const check = makeFailingCheck(failures)
 
 const { loadChromium, launchChromium } = await import('../../tools/drivers/playwright.mjs')
 const browser = await launchChromium(await loadChromium(ROOT))

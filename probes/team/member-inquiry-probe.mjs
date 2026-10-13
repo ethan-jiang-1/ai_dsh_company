@@ -24,9 +24,9 @@ import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 const REFUSAL = /human interaction is unavailable|DELEGATED_CALLER/
 
 let home

@@ -26,6 +26,7 @@ import { dirname, join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { teamRunComplete } from '../../tools/lib/collaboration-evidence.mjs'
 import { claimLoserEvidence } from '../../tools/lib/claim-loser-evidence.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const OWNER_REL = 'journal/claim-loser-owner.md'
@@ -33,9 +34,8 @@ const SHARED_REL = 'journal/claim-loser-shared.md'
 const OWNER = join(REHEARSAL, OWNER_REL)
 const SHARED = join(REHEARSAL, SHARED_REL)
 mkdirSync(dirname(OWNER), { recursive: true })
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 const results = []
-const check = (label, ok, detail = '') => { results.push({ label, ok }); console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`) }
+const check = makeCheck(results)
 try { rmSync(OWNER, { force: true }); rmSync(SHARED, { force: true }) } catch {}
 let home
 try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('team-claim-loser-probe') } catch (e) { console.error(e.message); process.exit(2) }

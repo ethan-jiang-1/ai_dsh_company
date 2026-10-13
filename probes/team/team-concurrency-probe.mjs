@@ -24,12 +24,12 @@ import { concurrencyEvidence, teamRunComplete } from '../../tools/lib/collaborat
 import { concurrencyVerdict, verdictOutcome } from '../../tools/lib/team-concurrency-verdict.mjs'
 
 import { teamBarrierEvidence } from '../../tools/lib/team-barrier-evidence.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const TARGET = join(REHEARSAL, 'journal', 'team-concurrency-probe.md')
 mkdirSync(dirname(TARGET), { recursive: true })
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 const results = []
-const check = (label, ok, detail = '') => { results.push({ label, ok }); console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`) }
+const check = makeCheck(results)
 try { rmSync(TARGET, { force: true }) } catch {}
 let home
 try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('team-concurrency-probe') } catch (e) { console.error(e.message); process.exit(2) }

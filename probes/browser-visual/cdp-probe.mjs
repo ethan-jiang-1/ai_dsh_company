@@ -18,6 +18,7 @@ import { launchCdpBrowser } from '../../tools/drivers/cdp-driver.mjs';
 import { loadChromium } from '../../tools/drivers/playwright.mjs';
 import { existsSync } from 'node:fs';
 import process from 'node:process';
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 
 const args = process.argv.slice(2);
 const guiUrl = args.find(a => !a.startsWith('--'));
@@ -61,7 +62,6 @@ const { evaluate, consoleProblems, exceptions } = handle;
 verdict.consoleProblems = consoleProblems;
 verdict.exceptions = exceptions;
 
-const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms) });
 
 try {
   // 主动导航（两段式——实测教训：冷 profile 直接带 token URL，303 换 cookie 链会丢状态、

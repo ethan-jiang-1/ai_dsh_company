@@ -21,11 +21,11 @@ import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const SLUG = '2026-10-06-review-staleness'
 const DELIV = join(REHEARSAL, 'deliverables', SLUG)
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 let home
 try {

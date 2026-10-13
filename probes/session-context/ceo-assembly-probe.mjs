@@ -24,8 +24,8 @@ import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.m
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 const outDir = join(ROOT, 'runtime', 'harness-home', 'probe-evidence')
 
 // 单域动议 = 两轮复刻真实现场的失败形状（负例 ai-coding-security-2026）：

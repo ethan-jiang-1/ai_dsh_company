@@ -21,12 +21,10 @@ import { tmpdir } from 'node:os'
 import { spawnSync } from 'node:child_process'
 import { join } from 'node:path'
 import { archiveMovePlan } from '../../tools/lib/converge-rules.mjs'
+import { makeFailingCheck } from '../../tools/lib/probe-kit.mjs'
 
 const failures = []
-const check = (label, ok, detail = '') => {
-  console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`)
-  if (!ok) failures.push(label)
-}
+const check = makeFailingCheck(failures)
 
 const repo = mkdtempSync(join(tmpdir(), 'archive-move-probe-'))
 const run = (args) => {

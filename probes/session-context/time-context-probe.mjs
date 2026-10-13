@@ -18,11 +18,11 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const CEO_JOURNAL = join(REHEARSAL, 'kb/ceo/journal')
 const INJECTION_MARK = 'Time sampled while preparing turn'
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 let home
 try {

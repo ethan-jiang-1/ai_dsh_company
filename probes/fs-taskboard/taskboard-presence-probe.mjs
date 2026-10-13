@@ -25,13 +25,13 @@ import { spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const ASSETS = join(ROOT, 'snapshots/probes/taskboard-presence-probe/2026-10-04')
 mkdirSync(ASSETS, { recursive: true })
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 const results = []
-const check = (label, ok, detail = '') => { results.push({ label, ok }); console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`) }
+const check = makeCheck(results)
 
 let home
 try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('taskboard-presence-probe') } catch (e) { console.error(e.message); process.exit(2) }

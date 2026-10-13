@@ -15,11 +15,11 @@ import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 
 const WORKSPACE = join(ROOT, 'company-workspace')
 const SHOTS = join(ROOT, 'snapshots/visual/dag-midflight')
 mkdirSync(SHOTS, { recursive: true })
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 const args = process.argv.slice(2)
 const WAVES = Number(args[args.indexOf('--waves') + 1] ?? '6')
 // `--session <id>` = **只截既有会话**（不发动议）：动议跑完后补收官图，或复看某场的历史形态。

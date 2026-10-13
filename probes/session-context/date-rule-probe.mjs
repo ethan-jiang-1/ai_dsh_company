@@ -19,10 +19,10 @@ import { spawn } from 'node:child_process'
 import { readdirSync, readFileSync, statSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const CEO_JOURNAL = join(REHEARSAL, 'kb/ceo/journal')
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 let home
 try {

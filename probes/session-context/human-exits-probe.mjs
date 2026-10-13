@@ -16,9 +16,9 @@ import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs
 import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { mkdir, writeFile } from 'node:fs/promises'
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 let home
 try {

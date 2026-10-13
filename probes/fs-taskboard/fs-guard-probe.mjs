@@ -33,11 +33,11 @@ import { join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { createRaceEvidence, judgeWriteGuard, pairedCalls } from '../../tools/lib/collaboration-evidence.mjs'
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const EXISTING = 'fs-guard-probe-existing.md'
 const RACE = 'fs-guard-probe-race.md'
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 let home
 try {

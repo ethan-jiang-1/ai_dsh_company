@@ -38,8 +38,8 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 import { join } from 'node:path'
 import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { sleep } from '../../tools/lib/probe-kit.mjs'
 
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 const FULL = process.argv.includes('--full')
 const SEED_METHOD = 'probe-seeded-method'
 

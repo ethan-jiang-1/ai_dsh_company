@@ -19,13 +19,13 @@ import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { atomicityEvidence, teamRunComplete } from '../../tools/lib/collaboration-evidence.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const TARGET = join(REHEARSAL, 'journal', 'atomicity-probe.md')
 mkdirSync(dirname(TARGET), { recursive: true })
-const sleep = ms => new Promise(r => setTimeout(r, ms))
 const results = []
-const check = (label, ok, detail = '') => { results.push({ label, ok }); console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`) }
+const check = makeCheck(results)
 
 try { rmSync(TARGET, { force: true }); rmSync(join(REHEARSAL, 'journal', 'w1-scope.md'), { force: true }); rmSync(join(REHEARSAL, 'journal', 'w2-scope.md'), { force: true }) } catch {}
 let home
