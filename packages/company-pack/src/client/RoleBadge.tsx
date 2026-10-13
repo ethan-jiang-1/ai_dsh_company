@@ -1,9 +1,18 @@
 /**
- * 侧栏会话行首的角色徽标（角色身份 UX · B 段，2026-09-26 立）。
- * 提案：notes/proposed/2026-09-26-role-identity-ux.md §五 B。
+ * 侧栏会话行首的角色标记（角色身份 UX · B 段，2026-09-26 立；2026-10-13 收进座位）。
+ * 提案：notes/archived/2026-09-26-role-identity-ux.md §五 B。
  *
  * 挂载点 = 官方 ambient 行装饰位 `sidebar.session.row.leading`（vendor
- * `ui-workspace/contract/slots.ts:129`；仅 idle 行渲染，archived/blank 行留空）。
+ * `ui-workspace/contract/slots.ts:117`；仅 idle 行渲染，archived/blank 行留空）。
+ *
+ * ⚠ **座位是 16px 格**（合同原话 "the 16px cell before the title that the row's own state
+ * dot otherwise occupies"；vendor `ui-workspace/src/client/rows/Rows.module.css` 的
+ * `.slot{flex:none;width:16px;justify-content:center}`），且是 **list 座位**——同格还住着
+ * 计划任务时钟图标（`data-session-schedule-mark`，12px）。B 段首版的 3 字药丸（`CEO`）实测
+ * 宽 32.45px = 座位的 2.03 倍：居中后左溢 8.22px（把标记推出行框，窄窗里被容器边界切掉字母）、
+ * 右溢 8.23px（吃掉整条 4px 标题间隙、压到标题首字盒上）——现场与真 DOM 实测见
+ * `probes/browser-visual/sidebar-role-mark-probe.mjs`。故座位标记改按 **12px** 设计
+ * （= 同格既有 occupant 的尺寸，与时钟图标同居一格仍不越界）。
  *
  * 数据 = **上游现成的 `agentPreset` 投影**（vendor `agent-preset-registry/src/session.ts`：
  * "Current Session preset, initialized from its header and advanced by selection events"——
@@ -47,7 +56,7 @@ export interface RoleBadgeProps extends RoleBadgeInjected {
   readonly sessionId: SessionId
 }
 
-/** 角色 → 徽标缩写；不在表内的 preset 不渲染（非公司盘优雅降级）。 */
+/** 角色 → 全称缩写（窗口标题【角色】前缀、标记 title、会话头 preset 标签用）。 */
 export const ROLE_SHORT: Readonly<Record<string, string>> = {
   ceo: 'CEO',
   cfo: 'CFO',
@@ -57,13 +66,27 @@ export const ROLE_SHORT: Readonly<Record<string, string>> = {
 }
 
 /**
- * 侧栏一行的角色徽标：小品牌色徽标 + 角色缩写。
+ * 角色 → **座位标记字母**（16px 格子里放得下的那一格；不在表内的 preset 不渲染）。
+ * 取**可区分**的单个字母：C/F/O 来自 CEO/CFO/COO 的区分位，E/S 来自 VPE/VPS——
+ * 三字缩写（21.6px 文本 + 10.24px 内边距 = 32.45px）塞不进 16px 座位（见文件头实测）。
+ * 全称不丢：窗口标题【角色】前缀、外界面的 preset 标签、以及标记自身的 `title`（= `ROLE_SHORT`）。
+ */
+export const ROLE_MARK: Readonly<Record<string, string>> = {
+  ceo: 'C',
+  cfo: 'F',
+  coo: 'O',
+  'vp-eng': 'E',
+  'vp-sales': 'S',
+}
+
+/**
+ * 侧栏一行的角色标记：座位尺度的单字母标记（`title` 带全称缩写）。
  * @param props - 行 sessionId + 注入的会话列表快照。
- * @returns 徽标；无角色痕迹时 null。
+ * @returns 标记；无角色痕迹时 null。
  */
 /**
  * 读一个会话的当前角色（上游 agentPreset 投影；无/空/非字符串 ⇒ null）。
- * 徽标与 C 段窗口标题共用。
+ * 标记与 C 段窗口标题共用。
  */
 export function readPresetOf(source: SnapshotLike<RoleBadgeSourceFace>, sessionId: SessionId): string | null {
   const value = source.getSnapshot().projectionsBySession[sessionId]?.values.agentPreset
@@ -86,7 +109,11 @@ export function RoleBadge({ sessionId, roleSource }: RoleBadgeProps) {
   // useSyncExternalStore 的完整性（缺了在静态渲染/测试里直接抛错）。
   const getPreset = useCallback(() => readPresetOf(roleSource, sessionId), [roleSource, sessionId])
   const preset = useSyncExternalStore(subscribe, getPreset, getPreset)
-  const short = preset === null ? undefined : ROLE_SHORT[preset]
-  if (short === undefined) return null
-  return <span className="wk-role-badge" data-wk-role={preset}>{short}</span>
+  const mark = preset === null ? undefined : ROLE_MARK[preset]
+  if (mark === undefined) return null
+  return (
+    <span className="wk-role-badge" data-wk-role={preset} title={preset === null ? undefined : ROLE_SHORT[preset]}>
+      {mark}
+    </span>
+  )
 }

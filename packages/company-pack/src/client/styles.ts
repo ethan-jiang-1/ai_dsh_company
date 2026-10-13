@@ -19,17 +19,27 @@ const CSS = `
   --wk-row-gap: 0.35rem;
 }
 
-/* 侧栏会话行首的角色徽标（角色身份 UX · B 段）：
-   品牌色小徽标 + 角色缩写——每个会话行一眼可辨"这扇门是谁"。
+/* 侧栏会话行首的角色标记（角色身份 UX · B 段）：
+   品牌色小标记 + 单字母——每个会话行一眼可辨"这扇门是谁"。
+   ⚠ 尺寸由**座位**定，不由审美定：座位是 16px 格，且是 list 座位（与 12px 的计划任务
+   时钟图标同格共存），故标记按 12px 设计 —— 3 字药丸（32.45px）实测左溢 8.22px /
+   右溢 8.23px：左溢把标记推出行框（窄窗被容器切字）、右溢吃掉 4px 标题间隙压到
+   标题首字盒上（2026-10-13 修，真 DOM 判据 = probes/browser-visual/sidebar-role-mark-probe.mjs；
+   守卫 = tests/client/client-css.spec.ts「座位上限」）。
    颜色一律平台令牌（品牌底 + 反色字）；每角色不同色需上游补分类色板
    （提案开放问题 2），feature 包不写字面色。 */
 .wk-role-badge {
   flex: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  padding: 0;
   font-size: 0.625rem;
   font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.02em;
-  padding: 0.22rem 0.32rem;
   border-radius: var(--dsw-radius-xs);
   background: var(--dsw-alias-brand-primary);
   color: var(--dsw-alias-label-primary-inverted);

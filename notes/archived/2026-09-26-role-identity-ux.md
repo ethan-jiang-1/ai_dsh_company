@@ -81,13 +81,16 @@ keyless 单测 6 项 + 真浏览器自主验收 ALL PASS）。残余项「每角
   `useSyncExternalStore`——subscribe 用 useMemo 绑一次，getServerSnapshot 补齐否则静态渲染抛错）。
   **验收（2026-09-26 真浏览器自主验收 ALL PASS）**：徽标 5 个（cfo×2 / ceo×3）行首在场、缩写全对
   （CEO/CFO/…）；非公司会话零痕迹（单测覆盖）；**未连工作区也渲染**（Ungrouped 组直接出）。
+  **形态更正（2026-10-13）**：座位只有 16px，三字药丸实宽 32.45px ⇒ 两侧各溢出 ~8.2px
+  （窄窗里被容器切掉字母、右溢压进标题首字盒）⇒ 标记改 **12px 单字母** `C/F/O/E/S`（全称走 `title`
+  与窗口标题）；决定、实测与判据 = [侧栏角色标记收进 16px 座位](../implemented/2026-10-13-sidebar-role-mark-fits-seat.md)。
 - **C · 窗口标题 + 整窗色条（client）= ✅ 已交付并验收**：根级 effect 无条件接管
   `document.title = 【角色】会话标题` + `:root[data-wk-role]` + 3px 顶部色条。
   **验收**：初始 `【CEO】company-workspace` → 点开 CFO 行即变 `【CFO】你好`、
   `data-wk-role=cfo`、顶条 3px——**与 vendor DocumentTitle 并存无闪烁**（开放问题 3 定案）。
 
 **顺序与状态**：A ✅（零代码）→ B ✅ → C ✅（验收 `ee7b8b5` + 一次性自主验收脚本——真浏览器
-连 UI 断言，未入库；单测 6 项在 `tests/role-badge.spec.ts`）→ ③ 收尾 ✅（2026-09-26 提案毕业；
+连 UI 断言，未入库；单测在 `tests/client/role-badge.spec.ts`）→ ③ 收尾 ✅（2026-09-26 提案毕业；
 「角色可见」已并入 [multi-human.md](../../docs/multi-human.md) 开门 runbook 第 4 条）。
 
 ## 六、明确不做
