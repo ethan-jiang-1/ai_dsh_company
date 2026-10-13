@@ -2,8 +2,12 @@ import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { concurrencyVerdict, verdictOutcome } from '../../tools/lib/team-concurrency-verdict.mjs'
 
 // Exercise the actual verdict block: a helper test alone cannot catch a dropped required check.
+// （2026-10-14 重构轮：team-concurrency 的判分已抽 tools/lib/team-concurrency-verdict.mjs，
+//  本文件对它用**普通 import** 直测；其余探针 verdict 仍内联、仍走下面的源码切片 vm 求值——
+//  各自抽出时照 backlog-liveness 2026-10-10 的同款修法迁过来。）
 function verdict(path: string, from: string, through: string, input: object) {
   const source = readFileSync(`${ROOT}/${path}`, 'utf8')
   const start = source.indexOf(from)
@@ -24,11 +28,10 @@ describe('probe required checks determine the actual exit code', () => {
       reports: failed !== 'reports', membersEnded: failed !== 'membersEnded', writes: [], claims: [], task: {} }
     const barrier = { publications: failed !== 'publications', noLeadWrites: failed !== 'noLeadWrites',
       barrierReads: failed !== 'barrierReads', recovery: failed !== 'recovery' }
-    const judged = verdict('probes/team/team-concurrency-probe.mjs', "  check('C1a", '\n} catch (error)',
-      { evidence, barrier, barrierReleased: failed !== 'barrierReleased', complete: failed !== 'complete', file: '' })
-    expect(judged.results).toHaveLength(5)
-    expect(judged.process.exitCode).toBe(failed === 'none' ? 0 : 1)
-    expect(judged.results.filter(row => !row.ok)).toHaveLength(failed === 'none' ? 0 : 1)
+    const rows = concurrencyVerdict({ evidence, barrier, barrierReleased: failed !== 'barrierReleased', complete: failed !== 'complete', file: '' })
+    expect(rows).toHaveLength(5)
+    expect(verdictOutcome(rows).exitCode).toBe(failed === 'none' ? 0 : 1)
+    expect(rows.filter(row => !row.ok)).toHaveLength(failed === 'none' ? 0 : 1)
   })
   it.each(['claimRaceOwner', 'winnerPublishes', 'loserYields', 'reports', 'claimRaceShared', 'sharedControl', 'noLeadWrites', 'membersEnded', 'complete', 'none'])('claim-loser refuses missing %s', failed => {
     const evidence = { claimRaceOwner: failed !== 'claimRaceOwner', winnerPublishes: failed !== 'winnerPublishes',

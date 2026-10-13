@@ -21,6 +21,7 @@ import { mkdirSync, existsSync, readFileSync, rmSync, writeFileSync, mkdtempSync
 import { dirname, join } from 'node:path'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { concurrencyEvidence, teamRunComplete } from '../../tools/lib/collaboration-evidence.mjs'
+import { concurrencyVerdict, verdictOutcome } from '../../tools/lib/team-concurrency-verdict.mjs'
 
 import { teamBarrierEvidence } from '../../tools/lib/team-barrier-evidence.mjs'
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
@@ -132,18 +133,15 @@ d) send_message回报lead实际claim/write结果后结束。`
   writeFileSync(join(barrierDir, 'lead.json'), JSON.stringify(evs) + '\n')
   for (const name of ['w1', 'w2']) writeFileSync(join(barrierDir, `${name}.json`), JSON.stringify(memberEvents[name]) + '\n')
   console.log('barrier evidence', barrierDir, barrier)
-  check('C1a 文件终态精确含 w1/w2 各一行（无重复/额外行）', evidence.fileExact && barrier.publications && barrier.noLeadWrites, JSON.stringify(file))
-  check('C1b 同轮屏障读取后真实stale且重读合并发布', barrierReleased && barrier.barrierReads && barrier.recovery, JSON.stringify(barrier))
-  check('C2a 同 revision claim 一胜一拒且owner归属匹配', evidence.claimRace, JSON.stringify({ task: evidence.task, claims: evidence.claims.map(claim => ({ name: claim.name, revision: claim.expectedRevision, code: claim.result?.error?.code })) }))
-  check('C2b w1/w2 回报均有真实 queued + delivered 事件', evidence.reports, '')
-  check('C2c lead 与两成员 turn 均正常结束', complete && evidence.membersEnded, '')
+  // 判分 = lib 纯函数（keyless spec 直测；2026-10-14 前内联在此，spec 只能切片求值）。
+  for (const row of concurrencyVerdict({ evidence, barrier, barrierReleased, complete, file })) check(row.label, row.ok, row.detail)
   console.log('成员/任务终态来自日志事件；模型正文仅供诊断，不参与判分。')
   console.log('\n文件终态：\n' + (file || '(不存在)'))
-  const failed = results.filter(r => !r.ok)
-  console.log(failed.length === 0
-    ? `\nteam-concurrency-probe: ALL PASS（${results.length}/${results.length}）`
-    : `\nteam-concurrency-probe: ${failed.length} FAILURE(S)（${results.length - failed.length}/${results.length}）`)
-  process.exitCode = failed.length === 0 ? 0 : 1
+  const outcome = verdictOutcome(results)
+  console.log(outcome.failed === 0
+    ? `\nteam-concurrency-probe: ALL PASS（${outcome.total}/${outcome.total}）`
+    : `\nteam-concurrency-probe: ${outcome.failed} FAILURE(S)（${outcome.total - outcome.failed}/${outcome.total}）`)
+  process.exitCode = outcome.exitCode
 } catch (error) {
   console.error('ERROR:', error.message)
   process.exitCode = 2
