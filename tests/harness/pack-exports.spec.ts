@@ -25,7 +25,9 @@ describe('pack 导出形态守卫（Loader unwrapExports round-trip）', () => {
     expect('default' in hostEntry).toBe(false)
     const unwrapped = unwrap(hostEntry)
     expect(unwrapped).toBe(hostEntry)
-    expect(unwrapped.inject).toEqual(['tools', 'approval'])
+    // 2026-10-13 培养卡：host 半多注册 /cultivation 命令族 ⇒ inject 加 'commands'
+    //（服务本体由 base bundle 挂载；preset-spec 的 deps ∪ peers 已覆盖 dsh-commands）。
+    expect(unwrapped.inject).toEqual(['tools', 'approval', 'commands'])
     expect(typeof unwrapped.apply).toBe('function')
   })
 

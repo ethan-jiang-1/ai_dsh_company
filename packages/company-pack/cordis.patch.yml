@@ -65,7 +65,14 @@
     #    实时任务板 / 点进 VP 会话 / 交付物卡片——观察与调试任务起止的最简途径（R1 补）──
     - id: ui-agent-team
       name: '@deepseek-ai/dsh-experimental-client-ui-agent-team'
-    # ── 本包自己的 client 面（皮肤第一笔）：host 半是空壳，浏览器半注册
-    #    `sidebar.brand.name` 槽（侧栏品牌名）。行的 name 就是本包名。──
+    # ── 本包自己的 client 面：host 半 = 签字工具 + 培养回路（提案工具/命令族/方法层写入），
+    #    浏览器半 = 品牌、任务板、公司页签与培养视图。行的 name 就是本包名。──
     - id: company-client
       name: 'dsh-company-pack'
+      config:
+        # 培养方法层根（2026-10-13 培养卡 C 路径）：!!js 锚 baseUrl = loader 树根（profile
+        # 目录——同文件 session-query 行的 session-search.db 落位即此锚的实证）。与各角色
+        # preset 的第二 customSkillDirs（company-cultivation/<role>/）同一前缀，host 写入与
+        # preset 加载构造上对齐；端到端实证 = probes/session-context/cultivation-method-layer-probe.mjs。
+        # 目录在 pack 安装树之外 ⇒ 升级不擦；在会话 workspace 之外 ⇒ 分身写不了（D25 维持）。
+        cultivationRoot: !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('company-cultivation/', baseUrl))"

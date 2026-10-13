@@ -2,38 +2,61 @@
  * 公司整页视图（条目 ① S1，`conversation.view` id `company`）：把机制"演"出来。
  *
  * 数据面自条目 ② S1a 起抽到 `useCompanyData`（公司视图与五个平台页签体共用同一实现）；
- * 本文件只剩"页内子页签 + 四个面板"的展示编排。
+ * 本文件只剩"页内子页签 + 面板"的展示编排。
+ *
+ * 2026-10-13 培养卡：第四子页由「用量」改为「培养」——同一领域视图（`CultivationBoard`）
+ * 也住侧栏/浮窗页签；培养数据**不依赖 team 加载成功**（独立角色根会话可看，V1）；用量
+ * 保留在平台页签 `company-budget`（换入口 ≠ 删统计）。
  */
-import { useState } from 'react'
+import { useCallback, useMemo, useState, useSyncExternalStore } from 'react'
 import type { ReactNode } from 'react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
-import { BoardPanel, BudgetPanel, DagPanel, LOADING_NOTE, PresencePanel, StateNote } from './company-panels.tsx'
-import { DagGlyph, GaugeGlyph, GridGlyph, PeopleGlyph } from './tab-icons.tsx'
+import { BoardPanel, DagPanel, LOADING_NOTE, PresencePanel, StateNote } from './company-panels.tsx'
+import { DagGlyph, GridGlyph, PeopleGlyph, SproutGlyph } from './tab-icons.tsx'
 import { useCompanyData, type CompanyDataInjected } from './use-company-data.ts'
+import { CultivationBoard } from './CultivationBoard.tsx'
+import {
+  useCultivationFeedback,
+  useCultivationPanelData,
+  type CultivationFiles,
+  type CultivationFollowEvents,
+} from './cultivation-data.ts'
+import { readPresetOf, type RoleBadgeInjected } from './RoleBadge.tsx'
+import { roleLabel } from '../lib/cultivation.ts'
 
 /** 本视图的 props（标准 session kit + owner props）。 */
 export type CompanyViewProps = PropsRuntime<'conversation.view'>
 
-/** 注册处闭包注入的数据面 + 浮出入口（条目 ② S4）。 */
+/** 注册处闭包注入的数据面 + 浮出入口（条目 ② S4）+ 培养数据面（2026-10-13 培养卡）。 */
 export interface CompanyViewInjected extends CompanyDataInjected {
   /** 打开 `kind` 对应的平台页签并拽出成浮窗（注册处经 `openTab` + `active()` + `float` 实现）。 */
   readonly floatPanel: (kind: string) => void
+  /** 培养数据闭包（journal + 记录；工厂见 `cultivation-data.ts`）。 */
+  readonly cultivationFiles: CultivationFiles
+  /** 本会话事件流（赞/踩块；缺席 = 该块降级）。 */
+  readonly followEvents?: CultivationFollowEvents
+  /** 会话列表快照（viewer 角色经上游 agentPreset 投影订阅）。 */
+  readonly roleSource: RoleBadgeInjected['roleSource']
 }
 
-type PanelKey = 'board' | 'dag' | 'presence' | 'budget'
+type PanelKey = 'board' | 'dag' | 'presence' | 'cultivation'
 
-const PANELS: readonly { readonly key: PanelKey; readonly label: string; readonly kind: string; readonly tone: string; readonly Glyph: (props: { readonly size?: number | undefined; readonly className?: string | undefined }) => ReactNode }[] = [
+/**
+ * 页内子页签表（导出给 keyless spec：第四子页 = 培养、培养面板不依赖 team——V1）。
+ * 用量保留在平台页签 `company-budget`，本表不再占用第四位（培养卡：换入口不删统计）。
+ */
+export const COMPANY_PANELS: readonly { readonly key: PanelKey; readonly label: string; readonly kind: string; readonly tone: string; readonly Glyph: (props: { readonly size?: number | undefined; readonly className?: string | undefined }) => ReactNode }[] = [
   { key: 'board', label: '看板', kind: 'company-board', tone: 'overview', Glyph: GridGlyph },
   { key: 'dag', label: '依赖图', kind: 'company-dag', tone: 'structure', Glyph: DagGlyph },
   { key: 'presence', label: '在场', kind: 'company-presence', tone: 'people', Glyph: PeopleGlyph },
-  { key: 'budget', label: '用量', kind: 'company-budget', tone: 'burn', Glyph: GaugeGlyph },
+  { key: 'cultivation', label: '培养', kind: 'company-cultivation', tone: 'growth', Glyph: SproutGlyph },
 ]
 
 /**
  * 造公司视图组件（闭包捕获数据面 + 浮出入口）。
- * @param injected - team 视图拉取 + 事件流 + 浮出（注册处已绑好 lead 会话寻址）。
+ * @param injected - team 视图拉取 + 事件流 + 浮出 + 培养数据面（注册处已绑好 Lead 寻址）。
  * @returns 可注册到 `conversation.view` 的组件。
  */
 export function createCompanyView(injected: CompanyViewInjected) {
@@ -41,12 +64,20 @@ export function createCompanyView(injected: CompanyViewInjected) {
     const { sessionId, useProjection, useSessions } = props
     const [panel, setPanel] = useState<PanelKey>('board')
     const data = useCompanyData(injected, sessionId, useProjection, useSessions, { stream: true })
-    const current = PANELS.find(entry => entry.key === panel)
+    const current = COMPANY_PANELS.find(entry => entry.key === panel)
+
+    // 培养面（2026-10-13）：数据独立于 team（V1——team 断流时培养子页仍可看）；只在子页
+    // 激活时读盘。viewer 角色 = 当前会话 preset（上游投影订阅，照 RoleBadge 手法）。
+    const subscribe = useMemo(() => injected.roleSource.subscribe.bind(injected.roleSource), [injected.roleSource])
+    const getPreset = useCallback(() => readPresetOf(injected.roleSource, sessionId), [injected.roleSource, sessionId])
+    const viewerRole = useSyncExternalStore(subscribe, getPreset, getPreset)
+    const cultivation = useCultivationPanelData(injected.cultivationFiles, sessionId, { enabled: panel === 'cultivation' })
+    const feedback = useCultivationFeedback(injected.followEvents, sessionId, panel === 'cultivation')
 
     return (
       <div className="wk-view">
         <div className="wk-view-tabs" role="tablist" aria-label="公司视图">
-          {PANELS.map(entry => (
+          {COMPANY_PANELS.map(entry => (
             <button
               key={entry.key}
               type="button"
@@ -83,7 +114,19 @@ export function createCompanyView(injected: CompanyViewInjected) {
               <PresencePanel rows={data.rows} activity={data.activity} />
             </>
           )}
-          {panel === 'budget' && <BudgetPanel summary={data.summary} />}
+          {/* 培养子页不依赖 team（V1：独立角色根会话无需组队也可查看）；用量 = 平台页签 company-budget。 */}
+          {panel === 'cultivation' && (
+            <div className="wk-cultivation-pane">
+              <CultivationBoard
+                viewerRole={viewerRole}
+                viewerLabel={viewerRole === null ? null : roleLabel(viewerRole)}
+                journalRows={cultivation.journalRows}
+                records={cultivation.records}
+                feedback={feedback}
+                feedbackReachable={injected.followEvents !== undefined}
+              />
+            </div>
+          )}
         </div>
       </div>
     )

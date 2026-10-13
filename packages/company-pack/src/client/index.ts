@@ -19,6 +19,7 @@ import { AttentionTab } from './AttentionTab.tsx'
 import { createAttentionRegistry } from './attention-registry.ts'
 import { createCompanyView } from './CompanyView.tsx'
 import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from './company-tabs.tsx'
+import { makeCultivationFiles } from './cultivation-data.ts'
 import { CultivationTab } from './CultivationTab.tsx'
 import { LedgerTab } from './LedgerTab.tsx'
 import {
@@ -265,27 +266,14 @@ export async function apply(ctx: ClientContext): Promise<void> {
     registerType('dsh-company-pack/tasks', 'company-tasks', '任务板',
       '共享任务表：状态 / owner / 依赖 / 修订号', 55, TasksGuideIcon)
     registerType('dsh-company-pack/cultivation', 'company-cultivation', '培养',
-      '养 Agent：journal 待审收件箱 + 提升流程', 56, CultivationGuideIcon)
+      '养自己的角色分身：待处理建议 / 已采纳方法 / journal 待审 / 赞踩', 56, CultivationGuideIcon)
     registerType('dsh-company-pack/ledger', 'company-ledger', '台账',
       '动议台账：公司累计干了什么（日期/类型/参与/成品/结论）', 57, LedgerGuideIcon)
 
-    // 培养面板的文件读取闭包（驾驶舱④）：经会话身份读当前工作区；失败降级 null（面板如实显示）。
-    const listJournal = async (sessionId: SessionId, role: string, signal: AbortSignal): Promise<readonly string[] | null> => {
-      try {
-        const result = await scoped.remote.workspaceFiles.list(leadOf(sessionId), `kb/${role}/journal`, signal)
-        if (!result.ok) return null
-        return result.value.entries
-          .filter(entry => entry.type === 'file' && entry.name.endsWith('.md'))
-          .map(entry => entry.name)
-      } catch { return null }
-    }
-    const readHead = async (sessionId: SessionId, path: string, signal: AbortSignal): Promise<string | null> => {
-      try {
-        const result = await scoped.remote.workspaceFiles.read(leadOf(sessionId), path, { limit: 240 }, signal)
-        if (!result.ok) return null
-        return result.value.text
-      } catch { return null }
-    }
+    // 培养面板的文件读取闭包（驾驶舱④ → 2026-10-13 培养卡扩记录面）：经会话身份读当前
+    // 工作区；失败降级 null（面板如实显示「不可达」，不折 0——工厂与 hook 见 cultivation-data.ts，
+    // 公司整页的第四子页用同一闭包语义）。
+    const cultivationFiles = makeCultivationFiles(scoped.remote, leadOf)
     const readLedger = async (sessionId: SessionId, signal: AbortSignal): Promise<string | null> => {
       try {
         const result = await scoped.remote.workspaceFiles.read(leadOf(sessionId), 'kb/motion-ledger.md', { limit: 240 }, signal)
@@ -322,7 +310,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
         { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/tasks', inject: () => ({ leadOf, follow, floatTab, unfloatTab }) },
         TasksTab),
       scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/cultivation', inject: () => ({ floatTab, unfloatTab, listJournal, readHead, followEvents: follow }) },
+        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/cultivation', inject: () => ({ floatTab, unfloatTab, cultivationFiles, followEvents: follow, roleSource: sessions.list }) },
         CultivationTab),
       scoped.slots.register(
         { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/ledger', inject: () => ({ floatTab, unfloatTab, readLedger }) },
@@ -393,14 +381,17 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // 公司整页视图（条目 ① S1）：`conversation.view` 的第三个页签（Chat / Trajectory / 公司）。
   // 该槽**没有 inject 面**（catalog registerOptions 只有 id/order/label）且 team 投影是 host-only
   // ⇒ 数据面用注册处闭包注入（见 CompanyView 头注）；跨插件值导入仍被禁。
-  // ⚠ remote 按命名空间 inject：`remote.session`（follow 流）。
-  ctx.inject(['sessions', 'remote.session', 'sidebarRight', 'slots'], (scoped) => {
+  // ⚠ remote 按命名空间 inject：`remote.session`（follow 流）+ `remote.workspaceFiles`
+  //   （2026-10-13 培养卡：第四子页培养的 journal/记录读取——与侧栏页签同一工厂语义）。
+  ctx.inject(['sessions', 'remote.session', 'remote.workspaceFiles', 'sidebarRight', 'slots'], (scoped) => {
     const sessions = scoped.sessions
     /** 子代理会话归到它的 Lead：团队状态挂在 Lead 上。 */
     const leadOf = (sessionId: SessionId): SessionId => {
       const address = sessions.subagentAddress(sessionId)
       return address?.parentSessionId ?? sessionId
     }
+    /** 培养数据闭包（2026-10-13 培养卡）：与侧栏页签同一工厂（journal + 记录 + Lead 寻址）。 */
+    const cultivationFiles = makeCultivationFiles(scoped.remote, leadOf)
     // 条目 ② S4：从公司视图直接浮出某个面板 = 打开对应平台页签 + `float`。
     // ⚠ openTab 的落位对 `active()` 的可见性有延迟（实测：同步读拿不到刚开的页签，float 静默
     // no-op）⇒ 推迟到宏任务并重试；带 kind 守卫防浮错别人的页签。重试耗尽 = 优雅降级
@@ -432,6 +423,20 @@ export async function apply(ctx: ClientContext): Promise<void> {
         }
       },
       floatPanel,
+      // 培养数据面（2026-10-13 培养卡）：同一 follow 流喂赞/踩块；文件闭包与 viewer 角色源
+      // 与侧栏页签同语义（领域视图两个壳一处事实）。
+      cultivationFiles,
+      followEvents: async function* (sessionId: SessionId, signal: AbortSignal) {
+        const address = { kind: 'session' as const, sessionId: leadOf(sessionId) }
+        for await (const frame of scoped.remote.session.follow({ address }, signal)) {
+          if (frame.type === 'snapshot') {
+            yield { kind: 'history' as const, events: frame.records.map(record => record.event) }
+          } else if (frame.type === 'event') {
+            yield { kind: 'event' as const, event: frame.event }
+          }
+        }
+      },
+      roleSource: sessions.list,
     })
     scoped.slots.inject('conversation.view', () => scoped.slots.register({
       name: 'conversation.view',

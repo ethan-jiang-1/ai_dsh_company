@@ -51,6 +51,7 @@
 | [probe-smoke.mjs](smoke/probe-smoke.mjs) | 角色连通、persona 入 prompt；内容档检查身份、知识与产出 |
 | [entry-probe-smoke.mjs](smoke/entry-probe-smoke.mjs) | 维护者入口链的路由、证据引用与 coding 基线 |
 | [budget-signoff-probe.mjs](../probes/session-context/budget-signoff-probe.mjs) | 文件预算会签与工具审批线的正反场景 |
+| [cultivation-method-layer-probe.mjs](../probes/session-context/cultivation-method-layer-probe.mjs) | 培养方法层机制六判据：目录发现/角色隔离/缺目录容忍/命令族 wiring/采纳落盘/跨会话生效（keyless 真 boot） |
 | [human-exits-probe.mjs](../probes/session-context/human-exits-probe.mjs) | 阻塞拍板的人话首段三件套与 `ask_user_question` 认证档 |
 | [human-exits-expression-probe.mjs](../probes/session-context/human-exits-expression-probe.mjs) | 多选项短 GFM 表格与关键数字行锚认证档 |
 | [human-exits-nonblocking-probe.mjs](../probes/session-context/human-exits-nonblocking-probe.mjs) | 非阻塞缺口带显式默认假设继续、轮末列待确认；会话事件落盘供复核 |

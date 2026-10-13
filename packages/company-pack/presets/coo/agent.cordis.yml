@@ -38,6 +38,11 @@
               includeDefaultRoots: false
               customSkillDirs:
                 - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/coo/skills/', baseUrl))"
+                # 角色方法层（2026-10-13 培养卡 C 路径）：本人经 /cultivation adopt 部署的做法落
+                # profile 根下 company-cultivation/<role>/，新开的本角色会话加载；目录在分身
+                # workspace 沙箱之外（D25 自改否决维持）；缺目录容忍（skill-filesystem ENOENT
+                # 按 absent 处理）。与 host config.cultivationRoot 同一 baseUrl 前缀，构造上对齐。
+                - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('company-cultivation/coo/', baseUrl))"
 
           # ③ 工具面（preset 自包含，必须自己声明；R1 实证：不声明则会话无 fs/skill 工具）
           - id: tool-fs

@@ -1,4 +1,4 @@
-/** Host half of the company pack: signoff tool (驾驶舱②) + workspace doors tool (BUG-002) + presence read-model re-export.
+/** Host half of the company pack: signoff tool (驾驶舱②) + workspace doors tool (BUG-002) + cultivation loop (2026-10-13 培养卡) + presence read-model re-export.
  * The browser half lives in `./client`. */
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
@@ -9,6 +9,7 @@ import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
 import { signoffDecisionNote, signoffReason } from './lib/signoff.ts'
 import { doorsFromSessions } from './lib/doors.ts'
 import { bootstrapCompanyWorkspace, bootstrapEnabled, resolveCompanyHome, resolveSkeletonDir } from './host/bootstrap.ts'
+import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
 
 /**
  * 在场板读模型（R5b）从 host 入口再导出：`checks/smoke/replay-smoke.mjs` 用它把重放会话的
@@ -22,8 +23,15 @@ export * from './lib/presence.ts'
  */
 export * from './lib/doors.ts'
 
-/** Host half now registers a tool: needs the tool registry and the approval service. */
-export const inject = ['tools', 'approval']
+/** Host half now registers tools and the cultivation command family: tool registry + approval + commands services. */
+export const inject = ['tools', 'approval', 'commands']
+
+/**
+ * bundle patch 行可注入的 host config（`cordis.patch.yml` 的 `company-client` 行）。
+ * 2026-10-13 培养卡：`cultivationRoot` = 方法层根（!!js 锚 baseUrl = profile 根下的
+ * `company-cultivation/`），与各角色 preset 的第二 customSkillDirs 同前缀构造对齐。
+ */
+export type HostConfig = CultivationHostConfig
 
 /**
  * Host plugin body：注册 `request_signoff` 工具——公司签字线（双签 / 会签）的机制停点。
@@ -34,7 +42,10 @@ export const inject = ['tools', 'approval']
  * 挂载面 = 既有 `company-client` 行（bundle 级）⇒ 全部会话与 teammate 可见——r2-motion 实证
  * teammate 可见全局工具行（20 工具清单里有 fs / present / ask_user_question）。
  */
-export function apply(ctx: Context): void {
+export function apply(ctx: Context, config: HostConfig = {}): void {
+  // 培养回路（2026-10-13 培养卡）：分身提案工具 + /cultivation 人侧命令族 + 方法层写入。
+  // 机制与权限分工见 ./host/cultivation.ts 头注。
+  registerCultivation(ctx, config)
   ctx.tools.register(defineTool({
     name: 'request_signoff',
     description: 'Request human sign-off for a company sign-line (双签 / 会签线). '

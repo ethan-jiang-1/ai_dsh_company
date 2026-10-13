@@ -5,7 +5,7 @@ intent: "为 Agent 培养方案比较外部反馈、记忆与评估实践。"
 
 # Agent 培养：外部反馈、记忆与评估的一手证据
 
-服务活卡：[Agent 培养](../../issues/2026-10-13-agent-cultivation.md)。读取日期：2026-10-13。
+服务活卡：[Agent 培养](../../settled_issues/2026-10-13-agent-cultivation.md)。读取日期：2026-10-13。
 本文为外部研究原料；未验证 DSH 当前能力，未实施培养机制。
 
 ## 获取范围与限制
@@ -225,4 +225,4 @@ URL：https://www.anthropic.com/engineering/multi-agent-research-system
 
 ## 证据的验证边界
 
-逐项复核原句与已获取源文，未做模型或浏览器实验。仓库结构与回归检查由 [活卡](../../issues/2026-10-13-agent-cultivation.md) 记录；文件格式正确与现有测试通过不能证明培养有效。
+逐项复核原句与已获取源文，未做模型或浏览器实验。仓库结构与回归检查由 [活卡](../../settled_issues/2026-10-13-agent-cultivation.md) 记录；文件格式正确与现有测试通过不能证明培养有效。

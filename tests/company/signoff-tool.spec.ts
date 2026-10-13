@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest'
 import { apply } from '../../packages/company-pack/src/index.ts'
 import { signoffDecisionNote, signoffReason } from '../../packages/company-pack/src/lib/signoff.ts'
 
-/** 只实现 apply/execute 用到的两个面；其余 cast 掉——stand-in 的是 ctx 壳，不是被测逻辑。 */
+/** 只实现 apply/execute 用到的面（tools/approval/commands）；其余 cast 掉——stand-in 的是 ctx 壳，不是被测逻辑。 */
 function harness(approve: 'allowed-once' | 'denied') {
   const registered: Array<{
     name: string
@@ -31,12 +31,15 @@ function harness(approve: 'allowed-once' | 'denied') {
         return approve
       },
     },
+    // 2026-10-13 培养卡：apply 里新增 /cultivation 命令族注册（ctx.commands.register）——
+    // no-op stand-in（本 spec 只测 request_signoff；命令族判据 = 机制探针）。
+    commands: { register: () => () => {} },
     // BUG-002 修复：apply 里新加了 api-session 事件监听 + workspace_doors 工具注册——
     // 两个 ctx.tools.register 调用都被上面捕获，但 harness 只测第一个（signoff）。
     // ctx.on 是 Cordis 标准 API——mock 一个 no-op 让事件监听不炸即可。
     on: () => () => {},
   }
-  apply(ctx as unknown as Parameters<typeof apply>[0])
+  apply(ctx as unknown as Parameters<typeof apply>[0], {})
   const signoff = registered.find(r => r.name === 'request_signoff')
   if (signoff === undefined) throw new Error('apply 没有注册 request_signoff 工具')
   return { captured: signoff, requests, signal: new AbortController().signal }

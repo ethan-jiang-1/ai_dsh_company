@@ -49,6 +49,14 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       for (const skill of skills) {
         expect(readFileSync(join(PRESETS_DIR, role, 'skills', skill.name, 'SKILL.md'), 'utf8')).toContain(`name: ${skill.name}`)
       }
+      // 2026-10-13 培养卡（C 路径）：第二 skill 根 = 部署本地角色方法层（profile 根下
+      // company-cultivation/<role>/，本人采纳的方法落这里、新会话加载；分身在 workspace
+      // 沙箱外不可写）。锚点与 host config 同一 baseUrl 前缀，构造上对齐。
+      const compose = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
+      expect(
+        compose.includes(`company-cultivation/${role}/`),
+        `${role} preset 声明角色方法层根（company-cultivation/${role}/）`,
+      ).toBe(true)
     }
   })
 

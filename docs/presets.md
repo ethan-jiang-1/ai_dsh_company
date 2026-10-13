@@ -139,30 +139,45 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 | 会话级（persona 生效、连通） | `node checks/smoke/probe-smoke.mjs`（默认快速档 ~6s：真会话发一句 ping，断言挂载/轮次/回话/**人格进 prompt**）；`--full` = 五角色三探针内容断言（慢，按需） | ✅ R2 建：快速档 5/5 PASS；内容档曾 14/15（KB 事实与 veto 语义均命中） |
 | 回归资产 | 动议会话 + 期望工作区归档 | ✅ `snapshots/`（r1–r4 motion + scenario-b + r3 replay 场景；replay harness R5a） |
 
-## 培养回路与学习载体（分身成长条目出生，2026-09-24）
+## 培养回路与学习载体（分身成长条目出生，2026-09-24；2026-10-13 培养卡扩三面）
 
-**培养动作 = 改 `packages/company-pack/presets/<role>/`**：人格 = `agent.cordis.yml` 的 persona row，
-能力 = `skills/*/SKILL.md`。培养权就是 repo 写权限——DSH 没有原生"培养授权"动作，这是权限事实。
-dev `web` profile 用 `link:` 符号链接装 pack（[guides/bootstrap](./guides/bootstrap.md)）——改仓库
-preset 即对 profile 可见、无需重装；真实安装形状（`file:`）归 release-smoke。
+**培养动作分三面**（2026-10-13 培养卡拍板：对象 = 公司盘×角色，人人培养自己的分身）：
+
+| 面 | 动作 | 谁 |
+|---|---|---|
+| **通用方法**（pack skills） | 改 `packages/company-pack/presets/<role>/skills/`——跨公司可复用的方法论 | 维护者（repo 写权限 = 培养权不变） |
+| **角色方法层**（2026-10-13 新增） | 本人采纳培养记录 ⇒ host 写 `<profile>/company-cultivation/<role>/<slug>/SKILL.md`——部署本地、按角色隔离、pack 升级不擦 | 角色驾驭者（人）经 `/cultivation adopt`；分身只能用 `cultivation_propose` 工具提案 |
+| **素材**（journal） | 角色会话收工纪要，人审后按「轮末收敛」压进 CHARTER | 分身写、人收敛 |
+
+**培养记录 = 公司盘 `cultivation/records/*.md`**（纠正/建议/采纳回执/验证引用；UI 经
+`workspaceFiles` 读、分身经 fs 读——写留日志）。闭环：纠正或跨角色建议（CEO 仅建议权，
+目标角色本人采纳）→ 本人采纳 → 方法落方法层 → 新会话生效 → 同类任务验证回填（`verify`）
+→ 不灵可撤回（`revoke`）。数据诚实 = 不可达 ≠ 0、未验证 ≠ 已掌握。机制与判据 =
+[cultivation-method-layer-probe](../probes/session-context/cultivation-method-layer-probe.mjs)。
 
 **生效边界按面**（D25；依据 = vendor 源码 + [2026-09-24 活体探针](../notes/implemented/2026-09-24-twin-cultivation.md)）：
 
 | 改动面 | 生效时点 | 依据 |
 |---|---|---|
 | persona / 组合文件（工具行、skill 根） | **新会话**（运行中的会话保持自己的 generation）；⚠ **新增依赖模块 / 新行解析时还须重启观察窗**——2026-09-29 实测：旧进程上新开会话仍是 25 工具（无 `web_search`），重启后 27 工具含之（该轮两个变量同时变，故取稳妥口径） | vendor `agent-presets` README stamp 机制；**活体已跑**（2026-09-29 联网整治，见 [role-web-access](../notes/archived/2026-09-29-role-web-access.md)） |
-| skill 正文（`SKILL.md` body） | **同会话下一轮**（`get()` 每次读盘） | 活体实证（日志工具结果层）+ vendor 源码一致；**修正** 2026-09-22 U1"只有新会话变"（U1 量的是模型转述） |
-| skill 条目（增删改名） | 下一轮（pre-step digest 重算 → 替换目录注入） | vendor skill digest；培养决定 = [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) |
+| skill 正文（`SKILL.md` body，含方法层） | **同会话下一轮**（`get()` 每次读盘） | 活体实证（日志工具结果层）+ vendor 源码一致；**修正** 2026-09-22 U1"只有新会话变"（U1 量的是模型转述） |
+| skill 条目（增删改名，含方法层） | 下一轮（pre-step digest 重算 → 替换目录注入）；2026-10-13 实测 watcher 连**运行中会话**的 catalog 都会刷新（探针 NOTE 行） | vendor skill digest；培养决定 = [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) |
+| 方法层撤回（`revoke` 删目录） | 删除后新会话不再加载；已加载进历史的正文不回改（append-only） | 2026-10-13 机制探针 |
 
 **培养验收（把"培养"从感觉变成检查）**：改任何 preset 内容后，`pnpm test` + `pnpm verify` +
 `node checks/smoke/preset-smoke.mjs`（真挂载）+ `node checks/smoke/probe-smoke.mjs --full`（入戏探针）全绿，
-才算培养成功（首例 = 2026-09-24，CEO `chairing-staff-meeting` +4 行）。
+才算培养成功（首例 = 2026-09-24，CEO `chairing-staff-meeting` +4 行）。方法层机制改动另跑
+[cultivation-method-layer-probe](../probes/session-context/cultivation-method-layer-probe.mjs)（keyless 真 boot；
+判写隔离前先钉 `DSH_PERMISSION_MODE=workspace-write`——本机 Seatbelt 禁用时 env.sh 的
+danger-full-access 处方会让围栏缺席，这是机器条件不是机制缺口）。
 
 **学习载体 = workspace journal 唯一**（D8：`kb/<role>/journal/`，经工具调用进日志）。
 提升回路 = **人读 journal → 提炼 → 写进 pack skills**：只采纳有证据的教训、不自动提升、
 单人维护者的 bus factor 写进风险（照 DSH `human-review-skill-maintenance` 提案取舍）；
 提升文本只写方法论、不含公司事实与出处（D17——出处留收尾 Note，pack 换公司可复用）。
-**分身运行时自改 skill 已否决且为机制事实**（角色 skill 根隔离后，分身可写的共享根不进任何
-角色的技能面 + 角色私有目录被沙箱拒 + preset 子树 loader `write()` 是 no-op）；
+**分身运行时自改 skill 已否决**；写隔离实测口径（2026-10-13）：**workspace-write 部署下**
+分身 fs 写方法层被沙箱拒（`[sandbox: file access denied]` 活体留证），danger-full-access
+部署无围栏——不宣称绝对隔离；采纳/拒绝/撤回/验证只走 `/cultivation` 人侧命令
+（不经模型、run 进会话日志），模型侧无这些动作的工具；
 **自主节律**已由 0.2.0 收割批 3 落地（schedule 工具 ×4 + time-context 日期通道，见上文工具面「批 3」行；
 原搁置池复活项随 D32 队列层退役而消化）。

@@ -46,6 +46,7 @@
 | [2026-10-11-human-exits-expression.md](settled_issues/2026-10-11-human-exits-expression.md) | 已实施并验收（表达层：台账全文入口、compact 显示模式、open-in-app 现场链路） | 2026-10-11 |
 | [2026-10-11-human-exits-replay-scene.md](settled_issues/2026-10-11-human-exits-replay-scene.md) | 已建成并零 diff 复演（阻塞拍板 replay 场景 + 场景级浏览器答题人） | 2026-10-11 |
 | [2026-10-12-backlog-process-made-explicit.md](settled_issues/2026-10-12-backlog-process-made-explicit.md) | 已实施并验收（制度显性化：缺陷通道＋双轨状态生命周期＋agent 门牌＋门禁镜像互查；去向 = implemented Note） | 2026-10-12 |
+| [2026-10-13-agent-cultivation.md](settled_issues/2026-10-13-agent-cultivation.md) | 已实施并验收（培养回路 C 路径首版：公司页培养入口＋记录闭环＋角色方法层跨会话生效；拍板三项与验证收据在卡；去向 = implemented Note D43） | 2026-10-13 |
 
 ## 已修缺陷
 
@@ -81,6 +82,9 @@
 | [2026-10-09-team-read-barrier-acceptance.md](research/collaboration/2026-10-09-team-read-barrier-acceptance.md) | BUG-007＋协作安全卡的双成员同轮放行与冲突恢复验收 | 2026-10-10 |
 | [2026-10-10-claim-loser-yield-acceptance.md](research/collaboration/2026-10-10-claim-loser-yield-acceptance.md) | 协作安全卡裁4 的认领让位行为对照 | 2026-10-10 |
 | [2026-10-12-assembly-evidence.md](research/ceo-minimal-assembly/2026-10-12-assembly-evidence.md) | 组队健壮性卡的证据基线（触点盘点/17 场全景/失败链/andon 与 RACI） | 2026-10-12 |
+| [2026-10-13-cultivation-design.md](research/agent-cultivation/2026-10-13-cultivation-design.md) | 培养卡的产品研究：对象、关系、用户路径和 A/B/C/D 候选取舍 | 2026-10-13 |
+| [2026-10-13-dsh-capabilities.md](research/agent-cultivation/2026-10-13-dsh-capabilities.md) | 培养卡的钉版 DSH 能力边界与待探针事项 | 2026-10-13 |
+| [2026-10-13-external-patterns.md](research/agent-cultivation/2026-10-13-external-patterns.md) | 培养卡的外部一手实践（记忆/教学/评估与反证） | 2026-10-13 |
 
 ## 暂停卡
 

@@ -6,9 +6,9 @@
 
 | 问题 | 当前情况与下一步 |
 |---|---|
-| [公司面 Agent 培养](2026-10-13-agent-cultivation.md) | 推敲中；现状、钉版机制与外部证据已整理，先收敛本人教学的第一版闭环与持久生效预期 |
+| （无——最近一张 [公司面 Agent 培养](../_archive/settled_issues/2026-10-13-agent-cultivation.md) 已于 2026-10-13 拍板三项后同日实施结卡） | — |
 
-已结问题见 [归档](../_archive/settled_issues/README.md)（含 workspace-convergence 与 ceo-minimal-assembly）。
+已结问题见 [归档](../_archive/settled_issues/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 
 ## 边界与尺寸
 
