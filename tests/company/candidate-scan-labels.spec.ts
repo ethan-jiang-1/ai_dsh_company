@@ -4,6 +4,19 @@ import { parseAssignments, parseLabelsText, scoreLabels, scanR2, scanR2Closed, s
 // 实验B打分腿的纯逻辑（判据单一来源 = tools/lib/candidate-scan.mjs；格式约定见标注文件头部）。
 // IO（读标注文件/语料/deliverables）在 checks/audit/candidate-scan-eval.mjs——tests/ 不碰驱动脚本的文件面。
 
+/** case 14（r6-baseline 录制收割，2026-10-06）的真实漂移形状：六条结构化派活行全程「待办」未回写、
+ * 六任务稿（含互审稿）全部落盘、动议开着（无 final）。金标准（labels.md case 14 行）= 六任务全「待核实」。
+ * 两个 describe 共用同一形状（漂移判定 vs 变体规则），故提文件级单一事实家。 */
+const CASE14_BRIEF = [
+  '派活｜T1｜vp-sales｜出定价与买点分层结论｜依赖：无｜状态：待办',
+  '派活｜T2｜vp-eng｜出交付包技术可行性｜依赖：无｜状态：待办',
+  '派活｜T3｜coo｜出产能承接结论｜依赖：T2｜状态：待办',
+  '派活｜T4｜cfo｜出毛利口径与合规闸门结论｜依赖：T1｜状态：待办',
+  '派活｜T5｜cfo｜审定价与毛利并出评审稿｜依赖：T1、T4｜状态：待办',
+  '派活｜T6｜coo｜审交付承接并出评审稿｜依赖：T1、T2、T3｜状态：待办',
+].join('\n')
+const CASE14_DRAFTS = ['ceo.md', 'cfo-review.md', 'cfo.md', 'coo-review.md', 'coo.md', 'vp-eng.md', 'vp-sales.md']
+
 const LABELS_TEXT = `# 实验 B 金标准
 
 前置说明行（非表格，应被忽略）。
@@ -142,32 +155,22 @@ describe('双源核对（2026-09-26 采纳结论的一部分）', () => {
 })
 
 describe('真实状态漂移形状（case 14 = r6-baseline 录制收割，2026-10-06）', () => {
-  // 真实材料形状：六条结构化派活行全程「待办」未回写，六任务稿（含互审稿）全部落盘，
-  // 动议开着（无 final）。金标准（labels.md case 14 行，待人复核）= 六任务全「待核实」。
-  const BRIEF = [
-    '派活｜T1｜vp-sales｜出定价与买点分层结论｜依赖：无｜状态：待办',
-    '派活｜T2｜vp-eng｜出交付包技术可行性｜依赖：无｜状态：待办',
-    '派活｜T3｜coo｜出产能承接结论｜依赖：T2｜状态：待办',
-    '派活｜T4｜cfo｜出毛利口径与合规闸门结论｜依赖：T1｜状态：待办',
-    '派活｜T5｜cfo｜审定价与毛利并出评审稿｜依赖：T1、T4｜状态：待办',
-    '派活｜T6｜coo｜审交付承接并出评审稿｜依赖：T1、T2、T3｜状态：待办',
-  ].join('\n')
-  const DRAFTS = ['ceo.md', 'cfo-review.md', 'cfo.md', 'coo-review.md', 'coo.md', 'vp-eng.md', 'vp-sales.md']
+  // 形状与金标准说明见文件级 CASE14_BRIEF/CASE14_DRAFTS 注释。
   const goldRow = (statuses: string[]) => ({
     id: 'drift', kind: 'synthetic', closed: false, approvals: 0, remind: '', zeroNote: '',
     tasks: statuses.map((status, i) => ({ role: ['vp-sales', 'vp-eng', 'coo', 'cfo', 'cfo', 'coo'][i], task: `T${String(i + 1)}`, status })),
   })
   const scans = () => {
-    const r2 = scanR2(BRIEF, DRAFTS)
-    const r3 = scanR3(BRIEF, DRAFTS, false)
-    return new Map([['drift', { r1: [], r2, r3, drafts: DRAFTS }]])
+    const r2 = scanR2(CASE14_BRIEF, CASE14_DRAFTS)
+    const r3 = scanR3(CASE14_BRIEF, CASE14_DRAFTS, false)
+    return new Map([['drift', { r1: [], r2, r3, drafts: CASE14_DRAFTS }]])
   }
 
   it('R2 六候选全 stale；R3 两候选 + 四任务沉入 blocked（依赖完成判定被漂移污染）', () => {
-    expect(scanR2(BRIEF, DRAFTS).map(t => [t.task, t.stale])).toEqual([
+    expect(scanR2(CASE14_BRIEF, CASE14_DRAFTS).map(t => [t.task, t.stale])).toEqual([
       ['T1', true], ['T2', true], ['T3', true], ['T4', true], ['T5', true], ['T6', true],
     ])
-    const r3 = scanR3(BRIEF, DRAFTS, false)
+    const r3 = scanR3(CASE14_BRIEF, CASE14_DRAFTS, false)
     expect(r3.candidates.map(t => t.task)).toEqual(['T1', 'T2'])
     expect(r3.blocked.map(t => t.task)).toEqual(['T3', 'T4', 'T5', 'T6'])
   })
@@ -191,15 +194,6 @@ describe('真实状态漂移形状（case 14 = r6-baseline 录制收割，2026-1
 })
 
 describe('规则变体（RFC scan-rule-iteration，2026-10-06：R2′ 关闭检查 + R3′ 双源依赖）', () => {
-  const DRIFT_BRIEF = [
-    '派活｜T1｜vp-sales｜出定价与买点分层结论｜依赖：无｜状态：待办',
-    '派活｜T2｜vp-eng｜出交付包技术可行性｜依赖：无｜状态：待办',
-    '派活｜T3｜coo｜出产能承接结论｜依赖：T2｜状态：待办',
-    '派活｜T4｜cfo｜出毛利口径与合规闸门结论｜依赖：T1｜状态：待办',
-    '派活｜T5｜cfo｜审定价与毛利并出评审稿｜依赖：T1、T4｜状态：待办',
-    '派活｜T6｜coo｜审交付承接并出评审稿｜依赖：T1、T2、T3｜状态：待办',
-  ].join('\n')
-  const DRIFT_DRAFTS = ['ceo.md', 'cfo-review.md', 'cfo.md', 'coo-review.md', 'coo.md', 'vp-eng.md', 'vp-sales.md']
   const REWORK_BRIEF = [
     '派活｜T1｜vp-eng｜可行性 v2 返工（v1 有结构性缺口须重写）｜依赖：无｜状态：待办',
     '派活｜T2｜coo｜出承接排期与人力窗口｜依赖：T1｜状态：待办',
@@ -213,7 +207,7 @@ describe('规则变体（RFC scan-rule-iteration，2026-10-06：R2′ 关闭检�
   })
 
   it('scanR3Dual（case 14 漂移形状）：四个沉没任务浮出且带 depByDisk 标记', () => {
-    const r = scanR3Dual(DRIFT_BRIEF, DRIFT_DRAFTS, false)
+    const r = scanR3Dual(CASE14_BRIEF, CASE14_DRAFTS, false)
     expect(r.candidates.map(t => t.task)).toEqual(['T1', 'T2', 'T3', 'T4', 'T5', 'T6'])
     expect(r.candidates.filter(t => t.depByDisk).map(t => t.task)).toEqual(['T3', 'T4', 'T5', 'T6'])
     expect(r.candidates.every(t => t.needsVerify)).toBe(true)   // 降档显示：全部仍带待核实标记

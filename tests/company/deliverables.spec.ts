@@ -56,6 +56,20 @@ function r1Sessions() {
   return readSessions([join(R1, 'session.jsonl')])
 }
 
+/** Lead 会话夹具：present 过 `deliverables/<slug>/final.md`（id / delegationDepth / presented 可覆写）。
+ *  原先各 describe 内联手写同形对象 ×9（2026-10-14 重构轮收敛；teammate = 同 preset + depth 1 覆写）。 */
+const leadSession = (slug: string, over: {
+  id?: string
+  delegationDepth?: number
+  presented?: { path: string }[]
+} = {}) => ({
+  id: 's1',
+  agentPreset: 'ceo',
+  delegationDepth: 0,
+  presented: [{ path: `deliverables/${slug}/final.md` }],
+  ...over,
+})
+
 const TMP_DIRS: string[] = []
 /** 把 r1 期望工作区拷到临时目录，供反证就地改。 */
 function r1CopyWith(mutate: (dir: string) => void): string {
@@ -139,7 +153,7 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
   // 互相覆盖，而三态判据看不出）。判红会让门禁永久带伤，故只警告；但必须每次都提醒。
   it('观察项：同一 slug 的成品被多个 Lead 会话声明过 ⇒ 警告（不判违规）', () => {
     const workspaceFiles = ['deliverables/pilot/final.md']
-    const lead = id => ({ id, agentPreset: 'ceo', delegationDepth: 0, presented: [{ path: 'deliverables/pilot/final.md' }] })
+    const lead = (id: string) => leadSession('pilot', { id })
     const one = auditDeliverables({ workspaceFiles, sessions: [lead('s1')] })
     expect(one.warnings).toEqual([])                                  // 单来源：不报
     const two = auditDeliverables({ workspaceFiles, sessions: [lead('s1'), lead('s2')] })
@@ -150,8 +164,8 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
 
   it('承诺权：非 Lead 会话 present 成品路径即越权（新形状下才判，legacy 是假阳性）', () => {
     const workspaceFiles = ['deliverables/pilot/final.md']
-    const lead = { id: 's1', agentPreset: 'ceo', delegationDepth: 0, presented: [{ path: 'deliverables/pilot/final.md' }] }
-    const teammate = { id: 's2', agentPreset: 'ceo', delegationDepth: 1, presented: [{ path: 'deliverables/pilot/final.md' }] }
+    const lead = leadSession('pilot')
+    const teammate = leadSession('pilot', { id: 's2', delegationDepth: 1 })
     expect(auditDeliverables({ workspaceFiles, sessions: [lead, teammate] }).violations.map(v => v.code))
       .toContain(VIOLATION.FINAL_PRESENTED_BY_NON_LEAD)
     expect(auditDeliverables({ workspaceFiles, sessions: [lead, teammate], legacyFlat: true }).violations)
@@ -254,8 +268,8 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
 
   it('反向检查只追 Lead 声明：非 Lead 的过程稿声明丢了不报（否则历史噪音永久污染审计）', () => {
     const missing = { path: 'deliverables/pilot/drafts/coo.md' }
-    const lead = { id: 's1', agentPreset: 'ceo', delegationDepth: 0, presented: [missing] }
-    const teammate = { id: 's2', agentPreset: 'ceo', delegationDepth: 1, presented: [missing] }
+    const lead = leadSession('pilot', { presented: [missing] })
+    const teammate = leadSession('pilot', { id: 's2', delegationDepth: 1, presented: [missing] })
     // Lead 声明的过程稿丢了 → 报
     expect(auditDeliverables({ workspaceFiles: [], sessions: [lead] }).violations.map(v => v.code))
       .toContain(VIOLATION.DANGLING_PRESENT)
@@ -270,7 +284,7 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
         'deliverables/old-round/final.md',
       ],
       sessions: [
-        { id: 's1', agentPreset: 'ceo', delegationDepth: 0, presented: [{ path: 'deliverables/this-round/final.md' }] },
+        leadSession('this-round'),
       ],
       onlySlug: 'this-round',
     })
@@ -330,7 +344,7 @@ describe('占位抢注判定（isPlaceholderClaim）', () => {
 // ── C1 布局（2026-10-03 拍板）：日期前缀 + 归档根 + meta 户口 ──
 // 评审修正 1 的 slug 归一化前置 + T-11 跟随扩根 + T-2/T-7/T-9 的机器面；判据单一来源 = lib。
 describe('C1 布局：日期前缀、归档根、meta 形状', () => {
-  const lead = { id: 's1', agentPreset: 'ceo', delegationDepth: 0, presented: [{ path: 'deliverables/foo/final.md' }] }
+  const lead = leadSession('foo')
 
   it('slugFromDirName：剥 A1 日期前缀', () => {
     expect(slugFromDirName('2026-09-22-agentic-coworker')).toBe('agentic-coworker')
@@ -375,7 +389,7 @@ describe('C1 布局：日期前缀、归档根、meta 形状', () => {
   })
 
   it('同 slug 双根并存 ⇒ slug-collision 照报（查重扫双根）', () => {
-    const duplicate = { id: 's2', agentPreset: 'ceo', delegationDepth: 0, presented: [{ path: 'deliverables/foo/final.md' }] }
+    const duplicate = leadSession('foo', { id: 's2' })
     const result = auditDeliverables({
       workspaceFiles: ['deliverables/foo/final.md', 'deliverables-archive/2026-09-22-foo/final.md'],
       sessions: [lead, duplicate],
@@ -428,15 +442,10 @@ describe('meta.md 形状校验（validateMeta / parseMeta）', () => {
 })
 
 describe('反向门禁（布局卡评审修正 6：present 在而结果≠终态 → 红；2026-10-04 code-review 补落）', () => {
-  const leadOf = (slug: string) => ({
-    id: 's1', agentPreset: 'ceo', delegationDepth: 0,
-    presented: [{ path: `deliverables/${slug}/final.md` }],
-  })
-
   it('auditDeliverables 交回 leadFinalSlugs（Lead present 过的成品 slug 面）', () => {
     const result = auditDeliverables({
       workspaceFiles: ['deliverables/pilot/final.md', 'deliverables/pilot/meta.md'],
-      sessions: [leadOf('pilot')],
+      sessions: [leadSession('pilot')],
     })
     expect(result.leadFinalSlugs).toEqual(['pilot'])
   })

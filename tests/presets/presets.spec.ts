@@ -6,9 +6,16 @@ import { describe, expect, it } from 'vitest'
 const PACK = join(ROOT, 'packages/company-pack')
 const PRESETS_DIR = join(PACK, 'presets')
 
+/** 公司五角色（本文件持独立字面量 = 独立事实源：与 presets/ 目录内容互相印证——若改为 import
+ * 共享常量，常量被误删一角时本文件会静默跳过该角色的全部断言，守卫即失效）。 */
+const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'] as const
+
+/** 读一个角色的 preset 声明文件（本文件各断言共用的唯一读盘入口）。 */
+const roleYml = (role: string): string => readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
+
 /** 一个 preset 目录里声明的行插件名（`name: '@deepseek-ai/...'`），按包名归一（去 subpath）。 */
 function rowPlugins(role: string): string[] {
-  const text = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
+  const text = roleYml(role)
   // 行名可带 subpath（`@scope/pkg/sub`，如 tool-subagent-control/list-agents）；
   // dependencies 里登记的是包名，所以按 `@scope/name` 归一后再比对（R3 实证）。
   return [...text.matchAll(/name:\s*'(@deepseek-ai\/[^']+)'/g)]
@@ -19,10 +26,10 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   it('五个角色各声明一个 dsh-agent-preset 行，且都列进 dsh.bundle.patch 数组（0.1.7 声明模型）', () => {
     const patch = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')).dsh.bundle.patch as string[]
     expect(Array.isArray(patch), '0.1.7 起 dsh.bundle.patch 为数组（registry 一行 + 每预设一行）').toBe(true)
-    for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']) {
+    for (const role of ROLES) {
       const rel = `./presets/${role}/agent.cordis.yml`
       expect(patch, `${role} 未列进 dsh.bundle.patch`).toContain(rel)
-      const text = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
+      const text = roleYml(role)
       expect(text, `${role} 缺 preset-${role} 声明行`).toMatch(new RegExp(`^\\s+- id: preset-${role}$`, 'm'))
       expect(text, `${role} 的 config.id 必须等于角色 id`).toMatch(new RegExp(`^\\s+id: ${role}$`, 'm'))
       expect(text, `${role} 缺 config.plugins`).toMatch(/^\s+plugins:$/m)
@@ -35,13 +42,13 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     // R5a 起 runtime 依赖 = peerDependencies（docs/release.md：不精确钉死）；本断言按包名归一，
     // 两种声明都算"在列"——与 checks/run-gates.mjs §7 的门禁同口径。
     const deps = new Set([...Object.keys(manifest.dependencies ?? {}), ...Object.keys(manifest.peerDependencies ?? {})])
-    const missing = [...new Set(['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'].flatMap(rowPlugins))].filter(name => !deps.has(name))
+    const missing = [...new Set(ROLES.flatMap(rowPlugins))].filter(name => !deps.has(name))
     expect(missing).toEqual([])
   })
 
   it('五角色文案定稿（R1 两角色守卫扩展），skill 目录名与 frontmatter 一致', () => {
-    for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']) {
-      const decl = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
+    for (const role of ROLES) {
+      const decl = roleYml(role)
       expect(decl, `${role} persona 仍是占位`).not.toContain('占位')
       expect(/^ {8}description:\s*\S/m.test(decl), `${role} 行内缺 description（原 preset.yml 字段已内联）`).toBe(true)
       const skills = readdirSync(join(PRESETS_DIR, role, 'skills'), { withFileTypes: true }).filter(e => e.isDirectory())
@@ -52,7 +59,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       // 2026-10-13 培养卡（C 路径）：第二 skill 根 = 部署本地角色方法层（profile 根下
       // company-cultivation/<role>/，本人采纳的方法落这里、新会话加载；分身在 workspace
       // 沙箱外不可写）。锚点与 host config 同一 baseUrl 前缀，构造上对齐。
-      const compose = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
+      const compose = roleYml(role)
       expect(
         compose.includes(`company-cultivation/${role}/`),
         `${role} preset 声明角色方法层根（company-cultivation/${role}/）`,
@@ -62,8 +69,8 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
 
   it('五角色必须声明基础工具行（preset 自包含；R1 首跑：无工具行 → 读不了文件、写不出交付物）', () => {
     const required = ['tool-fs', 'tool-fs-search', 'tool-skill', 'tool-todo', 'tool-present']
-    for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']) {
-      const composition = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
+    for (const role of ROLES) {
+      const composition = roleYml(role)
       const declared = new Set([...composition.matchAll(/^\s+- id:\s*([a-z0-9-]+)$/gm)].map(m => m[1] as string))
       const missing = required.filter(row => !declared.has(row))
       expect(missing, `${role} 缺工具行：${missing.join(', ')}（preset 是自包含组合，DSH 无 patch 继承）`).toEqual([])
@@ -78,8 +85,8 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       'tool-fs-search': ['sampleOverCapGlobResults'],
       'tool-todo': ['allowParallelInProgress'],
     }
-    for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']) {
-      const text = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
+    for (const role of ROLES) {
+      const text = roleYml(role)
       for (const [row, fields] of Object.entries(requiredConfig)) {
         if (!new RegExp(`^\\s+- id: ${row}$`, 'm').test(text)) continue
         for (const field of fields) {
@@ -90,8 +97,8 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   })
 
   it('五角色显示名共用公司前缀（D14 系列命名，R2 补角色时不许忘）', () => {
-    const names = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'].map(role => {
-      const match = /^ {8}name:\s*(.+)$/m.exec(readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8'))
+    const names = ROLES.map(role => {
+      const match = /^ {8}name:\s*(.+)$/m.exec(roleYml(role))
       expect(match, `${role} 行内 config.name 缺失`).not.toBeNull()
       return (match as RegExpExecArray)[1]!.trim()
     })
@@ -124,7 +131,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   })
 
   it('CEO 汇报线（R3）：命名委托工具是 one-shot 前台；续驶控制行不得回填（team shadow 实证）', () => {
-    const ceo = readFileSync(join(PRESETS_DIR, 'ceo', 'agent.cordis.yml'), 'utf8')
+    const ceo = roleYml('ceo')
     // 每个直接汇报对象一个 distinct toolName（per-instance persona 教义）。
     for (const tool of ['vp_eng', 'vp_sales']) {
       const match = new RegExp(`toolName: ${tool}([\\s\\S]*?)(?=\\n\\s*- id: |$)`).exec(ceo)
@@ -157,7 +164,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     //     这两行在那里被团队版 shadow 成死行（R3 实证，见 docs/delegation.md §2）。
     const controlRows = ['tool-subagent-control', 'tool-subagent-list-agents']
     for (const role of ['vp-eng', 'vp-sales', 'coo', 'cfo']) {
-      const text = readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
+      const text = roleYml(role)
       for (const row of controlRows) {
         expect(text, `${role} 缺 ${row}：它的根会话不是团队成员，团队版控制名不会装，continuable child 会失联`)
           .toMatch(new RegExp(`^\\s*- id: ${row}$`, 'm'))
@@ -165,7 +172,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       expect(text, `${role} 的 subagent 是 continuable，却没有控制面——要么补控制行，要么改 one-shot`)
         .toContain('backgroundMode: continuable')
     }
-    const ceo = readFileSync(join(PRESETS_DIR, 'ceo', 'agent.cordis.yml'), 'utf8')
+    const ceo = roleYml('ceo')
     for (const row of controlRows) {
       expect(ceo, `CEO 会话里 ${row} 被团队版 shadow，是死行（别修回来）`)
         .not.toMatch(new RegExp(`^\\s*- id: ${row}$`, 'm'))
@@ -204,7 +211,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   })
 
   it('CEO 人话出口规则必须覆盖阻塞、非阻塞和取证表达', () => {
-    const ceo = readFileSync(join(PRESETS_DIR, 'ceo', 'agent.cordis.yml'), 'utf8')
+    const ceo = roleYml('ceo')
     const chairing = readFileSync(join(PRESETS_DIR, 'ceo/skills/chairing-staff-meeting/SKILL.md'), 'utf8')
     expect(ceo, 'CEO prefix 必须说明阻塞选择用 ask_user_question').toContain('阻塞型选择')
     expect(ceo, 'CEO prefix 必须说明非阻塞缺口带假设继续').toContain('非阻塞')
