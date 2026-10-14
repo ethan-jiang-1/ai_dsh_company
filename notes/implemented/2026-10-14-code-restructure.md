@@ -42,4 +42,4 @@
   guard-red-record 的 11 例「缺 X ⇒ 恰一红」本身即内建红配方。
 - **语义审（独立盲审，§13 四输入）**：结论 = 六项完整兑现、零行为破坏证据链成立（独立复现基线→HEAD 测试全名差恰为 3 搬移 + 3 新增、verify 逐字节一致、replay 双 lane 逐字节一致、388 条注释行机械核对、zstd/sync-dsh 实测）；**blocker 无**；5 条建议已处置 3（漏改 docs-tier-taxonomy Note 指针→本轮修；Note ⑥ 补顺带收敛与申报点名→本轮补；红测原话入 Note→本轮补），2 记录在案（阶段存档有缺口——verify-after-B/E 与 test-after-C/D/E 未存盘，主张见各 commit message、计数链跨存档点对账为间接证；c2ae9ee 后探针尾段 4 行布线不再 keyless 覆盖——判分本体已由 lib 直测 + backlog-liveness 同款先例）。
 - **run-gates 拆分等价**：46 条 PASS 行对拆分前基线**除两条实测计数（script-status 72→103、retired-path 158→190）外逐字节一致**；`pnpm exec vitest run` 56 文件/541 条全绿（新增 probe-kit.spec 3 条）。
-- **未验面**：37 个探针的真模型/真浏览器运行属认证档未实跑（静态 node --check 全过 + kit 语义 keyless 钉住 + 迁移为定义行替换调用点零改动）；export-dist 改路径后未跑（避免重写 tracked 手册的打包日期），其 pin.mjs 正则与 sync-dsh 同款已由后者代证。
+- **后续结构收敛**（Client tabs/session adapters、Host cultivation seam、replay pure helpers）：[2026-10-14-client-host-replay-locality](./2026-10-14-client-host-replay-locality.md)。本 Note 原六项决定与验证收据保持本轮历史原文。

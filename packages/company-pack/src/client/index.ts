@@ -1,6 +1,5 @@
 /** 浏览器半：部署品牌（侧栏）+ 团队任务板（会话头部）+ 公司驾驶舱页签（右栏，R5b）。 */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
-import type { ReactNode } from 'react'
 import type { PaneId, TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
@@ -15,21 +14,11 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { FloatRectLike } from './float-geometry.ts'
 import { DreamTeamBrandName } from './Brand.tsx'
 import { startInstanceGuard } from './instance-guard.ts'
-import { AttentionTab } from './AttentionTab.tsx'
 import { createAttentionRegistry } from './attention-registry.ts'
 import { createCompanyView } from './CompanyView.tsx'
-import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from './company-tabs.tsx'
 import { makeCultivationFiles } from './cultivation-data.ts'
-import { CultivationTab } from './CultivationTab.tsx'
-import { LedgerTab } from './LedgerTab.tsx'
-import {
-  AttentionTabTitle, BoardTabTitle, BudgetTabTitle, CultivationTabTitle,
-  DagTabTitle, LedgerTabTitle, PresenceTabTitle, TasksTabTitle,
-  AttentionGuideIcon, BoardGuideIcon, BudgetGuideIcon, CultivationGuideIcon,
-  DagGuideIcon, LedgerGuideIcon, PresenceGuideIcon, TasksGuideIcon,
-  AttentionGuideEntry, BoardGuideEntry, BudgetGuideEntry, CultivationGuideEntry,
-  DagGuideEntry, LedgerGuideEntry, PresenceGuideEntry, TasksGuideEntry,
-} from './tab-icons.tsx'
+import { createCompanySessionAdapters, createLeadLookup } from './company-session-adapters.ts'
+import { registerCompanyTabs } from './company-tab-registration.ts'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
 import { installStyles } from './styles.ts'
@@ -168,11 +157,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
       }, RoleBadge))
 
     const sessions = scoped.sessions
-    /** 子代理会话归到它的 Lead：团队状态挂在 Lead 上。 */
-    const leadSessionId = (sessionId: SessionId): SessionId => {
-      const address = sessions.subagentAddress(sessionId)
-      return address?.parentSessionId ?? sessionId
-    }
+    const leadSessionId = createLeadLookup(sessions)
     // 条目 ② S3：头部按钮从 anchored 弹窗改为打开右栏平台页签（与官方 Agent Team 弹窗不再互盖）。
     scoped.slots.inject('conversation.session.header.actions', () =>
       scoped.slots.register({
@@ -186,35 +171,13 @@ export async function apply(ctx: ClientContext): Promise<void> {
       }, TasksAction))
   })
 
-  // 公司页签（条目 ② S1b）：五个**平台页签**——看板 / 依赖图 / 在场 / 用量 / 任务板。
-  // 只有平台级 tab 才能被 `ctx.sidebarRight.float(tabId)` 拖出成浮窗（可移动/可缩放/最小 220×140/
-  // 点击置顶），也才能被 split 并看（A1 决定）。原「公司驾驶舱」页签（R5b）与新的「在场」重复，
-  // 按"一处事实一个家"合并：驾驶舱内容升级为「在场」页签（行可点 + 流式动态），旧 tab 退役。
-  // ⚠ remote 按命名空间 inject：`remote.session`（follow 流）
-  //    + `remote.workspaceFiles`（培养面板读 kb/<role>/journal/）。
+  // Company workspace files are read through this injected session Remote; the
+  // tab-registration module keeps the four matching contribution surfaces local.
   ctx.inject(['sessions', 'uiWorkspace', 'remote.session', 'remote.workspaceFiles', 'slots', 'sidebarRight', 'sidebarRightTabs'], (scoped) => {
     const sessions = scoped.sessions
-    /** 子代理会话归到它的 Lead：团队状态挂在 Lead 上。 */
-    const leadOf = (sessionId: SessionId): SessionId => {
-      const address = sessions.subagentAddress(sessionId)
-      return address?.parentSessionId ?? sessionId
-    }
-    /** 平台浮出（S2）：把页签拽出成浮窗；rect = 记忆摆位（浮窗几何记忆 RFC，缺省 = 平台级联位）；收回由浮窗自带的 dock 按钮负责（平台能力，不自造）。 */
+    const { leadOf, follow } = createCompanySessionAdapters(sessions, scoped.remote.session)
     const floatTab = (tabId: TabId, rect?: FloatRectLike): void => { scoped.sidebarRight.float(tabId, rect) }
     const unfloatTab = (paneId: string): void => { scoped.sidebarRight.dock(paneId as PaneId) }
-    // 协作动态的流式源：`session/follow` 是 WebSocket 流，快照给历史、其后给实时；
-    // 只取团队事件（wire 形状 → 领域形状的最小投影），assistant-stream 帧与视图无关。
-    const follow = async function* (sessionId: SessionId, signal: AbortSignal) {
-      const address = { kind: 'session' as const, sessionId: leadOf(sessionId) }
-      for await (const frame of scoped.remote.session.follow({ address }, signal)) {
-        if (frame.type === 'snapshot') {
-          yield { kind: 'history' as const, events: frame.records.map(record => record.event) }
-        } else if (frame.type === 'event') {
-          yield { kind: 'event' as const, event: frame.event }
-        }
-      }
-    }
-    /** D-d 成员空间入口（rc.2：导航统一走 `uiWorkspace.openSession`；`sessions.open/openSubagent` 已移除）。 */
     const openMember = async (
       sessionId: SessionId,
       member: { readonly id: string; readonly role: 'lead' | 'teammate' },
@@ -224,55 +187,10 @@ export async function apply(ctx: ClientContext): Promise<void> {
         scoped.uiWorkspace.openSession(lead)
         return
       }
-      // 官方同款守卫：主视图没保留这个会话时不导航（避免把视图拽到不可见会话）。
       if ((sessions.retainInfo(sessionId).getSnapshot().retainedBy.mainView ?? 0) === 0) return
       await sessions.refresh()
       scoped.uiWorkspace.openSession({ parentSessionId: lead, childSessionId: member.id as SessionId, mode: 'continuable' })
     }
-
-    /**
-     * 注册一个公司页签**类型**（tab registry 静态半边；keyed 槽体在下面一起登记）。
-     * @param id - tab 类型 id（= keyed 槽的 key）。
-     * @param kind - `openTab` 用的 kind。
-     * @param title - 页签与 guide 的标题。
-     * @param description - guide 描述。
-     * @param order - guide 排序。
-     * @param icon - guide 条目 icon（右栏 Start 页那排胶囊；不填则出厂立方体占位——
-     *   RFC icon × 语义色向：与页签 chip / 浮窗头同一 glyph 同一 tone）。
-     */
-    const registerType = (
-      id: string, kind: string, title: string, description: string, order: number,
-      icon: (props: { readonly size?: number | undefined; readonly className?: string | undefined }) => ReactNode,
-    ): void => {
-      scoped.effect(() => scoped.sidebarRightTabs.register({
-        id,
-        kind,
-        priority: 'extension',
-        title: () => title,
-        guide: [{ id, order, title: () => title, description: () => description, icon }],
-      }), `company-pack: ${kind} tab type`)
-    }
-
-    registerType('dsh-company-pack/attention', 'company-attention', '待办',
-      '人的待办收件箱：待批审批 / 待答问询 / 升级 + 完成通知', 50, AttentionGuideIcon)
-    registerType('dsh-company-pack/board', 'company-board', '看板',
-      '任务看板：活到哪一步（owner / 依赖 / 修订号）', 51, BoardGuideIcon)
-    registerType('dsh-company-pack/dag', 'company-dag', '依赖图',
-      '任务依赖图：谁依赖谁、关键路径', 52, DagGuideIcon)
-    registerType('dsh-company-pack/presence', 'company-presence', '在场',
-      '组织在场板：谁在忙、忙什么；点行进成员空间', 53, PresenceGuideIcon)
-    registerType('dsh-company-pack/budget', 'company-budget', '用量',
-      '令牌用量与占比（只做令牌，不做美元）', 54, BudgetGuideIcon)
-    registerType('dsh-company-pack/tasks', 'company-tasks', '任务板',
-      '共享任务表：状态 / owner / 依赖 / 修订号', 55, TasksGuideIcon)
-    registerType('dsh-company-pack/cultivation', 'company-cultivation', '培养',
-      '养自己的角色分身：待处理建议 / 已采纳方法 / journal 待审 / 赞踩', 56, CultivationGuideIcon)
-    registerType('dsh-company-pack/ledger', 'company-ledger', '台账',
-      '动议台账：公司累计干了什么（日期/类型/参与/成品/结论）', 57, LedgerGuideIcon)
-
-    // 培养面板的文件读取闭包（驾驶舱④ → 2026-10-13 培养卡扩记录面）：经会话身份读当前
-    // 工作区；失败降级 null（面板如实显示「不可达」，不折 0——工厂与 hook 见 cultivation-data.ts，
-    // 公司整页的第四子页用同一闭包语义）。
     const cultivationFiles = makeCultivationFiles(scoped.remote, leadOf)
     const readLedger = async (sessionId: SessionId, signal: AbortSignal): Promise<string | null> => {
       try {
@@ -282,100 +200,17 @@ export async function apply(ctx: ClientContext): Promise<void> {
       } catch { return null }
     }
 
-    // keyed 槽体：与上面的类型共享同一 id；回调返回 disposer 数组（同工具卡那段写法）。
-    // 「待办」的注入面另有挂起项快照（apply 登记处）与 sessions.open 跳转。
-    scoped.slots.inject('sidebar.right.pane.tab', () => [      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/attention', inject: () => ({
-          follow,
-          floatTab,
-          unfloatTab,
-          getPending: () => attention.list(),
-          openSession: (sessionId: SessionId) => { scoped.uiWorkspace.openSession(sessionId) },
-          leadOf,
-        }) },
-        AttentionTab),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/board', inject: () => ({ leadOf, follow, floatTab, unfloatTab }) },
-        BoardTab),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/dag', inject: () => ({ leadOf, follow, floatTab, unfloatTab }) },
-        DagTab),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/presence', inject: () => ({ leadOf, follow, openMember, floatTab, unfloatTab }) },
-        PresenceTab),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/budget', inject: () => ({ leadOf, follow, floatTab, unfloatTab }) },
-        BudgetTab),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/tasks', inject: () => ({ leadOf, follow, floatTab, unfloatTab }) },
-        TasksTab),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/cultivation', inject: () => ({ floatTab, unfloatTab, cultivationFiles, followEvents: follow, roleSource: sessions.list }) },
-        CultivationTab),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab', key: 'dsh-company-pack/ledger', inject: () => ({ floatTab, unfloatTab, readLedger }) },
-        LedgerTab),
-    ])
-
-    // 页签标题槽（RFC 2026-09-27 icon × 语义色向）：keyed 槽 sidebar.right.pane.tab.title
-    // （vendor 契约注册可选、fallback 纯文本）——**一处注册两处生效**：页签条 chip 与
-    // 浮窗头（FloatHeader 同一 renderer）都走这里。组件 = tab-icons.tsx 的 icon+文字。
-    scoped.slots.inject('sidebar.right.pane.tab.title', () => [
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/attention' },
-        AttentionTabTitle),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/board' },
-        BoardTabTitle),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/dag' },
-        DagTabTitle),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/presence' },
-        PresenceTabTitle),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/budget' },
-        BudgetTabTitle),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/tasks' },
-        TasksTabTitle),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/cultivation' },
-        CultivationTabTitle),
-      scoped.slots.register(
-        { name: 'sidebar.right.pane.tab.title', key: 'dsh-company-pack/ledger' },
-        LedgerTabTitle),
-    ])
-
-    // guide 条目槽（Start 页胶囊接管；用户令 2026-09-27：挂 hover tooltip）：vendor guide
-    // 只在条目 ≤4 时显示描述（MAX_DESCRIBED_ENTRIES=4），我们 8 条全被折叠成纯标题 ⇒
-    // 走 keyed 槽 sidebar.right.tab.guide.entry 接管胶囊（vendor Tooltip + 点击 openTab）。
-    scoped.slots.inject('sidebar.right.tab.guide.entry', () => [
-      scoped.slots.register(
-        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/attention', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
-        AttentionGuideEntry),
-      scoped.slots.register(
-        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/board', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
-        BoardGuideEntry),
-      scoped.slots.register(
-        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/dag', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
-        DagGuideEntry),
-      scoped.slots.register(
-        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/presence', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
-        PresenceGuideEntry),
-      scoped.slots.register(
-        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/budget', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
-        BudgetGuideEntry),
-      scoped.slots.register(
-        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/tasks', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
-        TasksGuideEntry),
-      scoped.slots.register(
-        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/cultivation', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
-        CultivationGuideEntry),
-      scoped.slots.register(
-        { name: 'sidebar.right.tab.guide.entry', key: 'dsh-company-pack/ledger', inject: () => ({ openTab: (kind: string) => { scoped.sidebarRight.openTab(kind) } }) },
-        LedgerGuideEntry),
-    ])
+    registerCompanyTabs(scoped, {
+      attention,
+      leadOf,
+      follow,
+      floatTab,
+      unfloatTab,
+      openMember,
+      cultivationFiles,
+      roleSource: sessions.list,
+      readLedger,
+    })
   })
 
   // 公司整页视图（条目 ① S1）：`conversation.view` 的第三个页签（Chat / Trajectory / 公司）。
@@ -385,12 +220,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
   //   （2026-10-13 培养卡：第四子页培养的 journal/记录读取——与侧栏页签同一工厂语义）。
   ctx.inject(['sessions', 'remote.session', 'remote.workspaceFiles', 'sidebarRight', 'slots'], (scoped) => {
     const sessions = scoped.sessions
-    /** 子代理会话归到它的 Lead：团队状态挂在 Lead 上。 */
-    const leadOf = (sessionId: SessionId): SessionId => {
-      const address = sessions.subagentAddress(sessionId)
-      return address?.parentSessionId ?? sessionId
-    }
-    /** 培养数据闭包（2026-10-13 培养卡）：与侧栏页签同一工厂（journal + 记录 + Lead 寻址）。 */
+    const { leadOf, follow } = createCompanySessionAdapters(sessions, scoped.remote.session)
     const cultivationFiles = makeCultivationFiles(scoped.remote, leadOf)
     // 条目 ② S4：从公司视图直接浮出某个面板 = 打开对应平台页签 + `float`。
     // ⚠ openTab 的落位对 `active()` 的可见性有延迟（实测：同步读拿不到刚开的页签，float 静默
@@ -410,32 +240,12 @@ export async function apply(ctx: ClientContext): Promise<void> {
     }
     const CompanyView = createCompanyView({
       leadOf,
-      // 协作动态的流式源（S1 收尾）：`session/follow` 是 WebSocket 流，快照给历史、其后给实时。
-      // 只取团队事件（wire 形状 → 领域形状的最小投影）；assistant-stream 帧与视图无关，丢弃。
-      follow: async function* (sessionId: SessionId, signal: AbortSignal) {
-        const address = { kind: 'session' as const, sessionId: leadOf(sessionId) }
-        for await (const frame of scoped.remote.session.follow({ address }, signal)) {
-          if (frame.type === 'snapshot') {
-            yield { kind: 'history' as const, events: frame.records.map(record => record.event) }
-          } else if (frame.type === 'event') {
-            yield { kind: 'event' as const, event: frame.event }
-          }
-        }
-      },
+      follow,
       floatPanel,
       // 培养数据面（2026-10-13 培养卡）：同一 follow 流喂赞/踩块；文件闭包与 viewer 角色源
-      // 与侧栏页签同语义（领域视图两个壳一处事实）。
+      // 与侧栏页签同一语义（领域视图两个壳一处事实）。
       cultivationFiles,
-      followEvents: async function* (sessionId: SessionId, signal: AbortSignal) {
-        const address = { kind: 'session' as const, sessionId: leadOf(sessionId) }
-        for await (const frame of scoped.remote.session.follow({ address }, signal)) {
-          if (frame.type === 'snapshot') {
-            yield { kind: 'history' as const, events: frame.records.map(record => record.event) }
-          } else if (frame.type === 'event') {
-            yield { kind: 'event' as const, event: frame.event }
-          }
-        }
-      },
+      followEvents: follow,
       roleSource: sessions.list,
     })
     scoped.slots.inject('conversation.view', () => scoped.slots.register({

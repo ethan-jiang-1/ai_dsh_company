@@ -47,6 +47,7 @@ import { tmpdir } from 'node:os'
 import { createRequire } from 'node:module'
 import { compareWorkspace, seedWorkspace, workspaceOracle } from '../../tools/lib/workspace-oracle.mjs'
 import { mirrorCompanyReference } from '../../tools/lib/rehearsal.mjs'
+import { judgeReplaySessions, normalizeReplayTimeContext } from '../../tools/lib/replay-logic.mjs'
 import {
   normalizeSessionLog,
   normalizeSessionSnapshots,
@@ -116,40 +117,12 @@ const headerOf = (text) => records(text)[0] ?? {}
 // sleep / check 收敛自 probe-kit（2026-10-14 重构轮；原内联定义与 kit 逐字同义）。
 
 /** vendor writeSessionFixtures 生产线的裁剪版（stabilize 需先代 fixture，首录无先代跳过；redact 收数组）。 */
-// 场景自有替换（webUrl 同款先例）：日期通道（0.2.0 升 pin 起随 pack bundle insert 启用）把
-// **当前时间**作为 durable user/message 注入会话——时间戳是墙钟，录制与重放必然不同（这正是
-// 机制在工作的证据）。归一化两件：采样时刻（ISO 带时区）→ <time-context-sample>；相对时长
-// （"Elapsed since …" 后面的值随节奏漂）→ <time-context-elapsed>。录制侧与重放侧同管道对称生效。
-const TIME_CONTEXT_SAMPLE = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?[+-]\d{2}:\d{2}\[[^\]"]*\]/g
-const TIME_CONTEXT_ELAPSED = /(Elapsed since the preceding model-visible message: )[^"\\\n]*/g
-// 姿态事件值脱敏（2026-10-10 加，r3-delegation 两次实跑红证后立）：sandbox/mode、approval/policy、
-// permission/preset 的**值**是机器策略——run/env.sh 探测 Seatbelt 后端的结果（可用=workspace-write，
-// 损坏=danger-full-access），不是场景语义。钉 workspace-write 在后端损坏的机器上会让 permission
-// 事件整体不发射（实测三条全消失 ⇒ 更红），唯一对机器无关的姿势是脱敏值。类型、位置与 source
-// 字段（delegation 语义）仍参与比较——序列漂移照样红。
-const POSTURE_EVENT_TYPES = new Set(['sandbox/mode', 'approval/policy', 'permission/preset'])
-const normalizeTimeContext = (text) => text
-  .replace(TIME_CONTEXT_SAMPLE, '<time-context-sample>')
-  .replace(TIME_CONTEXT_ELAPSED, '$1<time-context-elapsed>')
-  .split(/\r?\n/)
-  .map(line => {
-    if (!line.includes('"sandbox/mode"') && !line.includes('"approval/policy"') && !line.includes('"permission/preset"')) return line
-    try {
-      const parsed = JSON.parse(line)
-      if (!POSTURE_EVENT_TYPES.has(parsed.type)) return line
-      const data = {}
-      for (const [key, value] of Object.entries(parsed.data ?? {})) data[key] = key === 'source' ? value : '{{posture}}'
-      return JSON.stringify({ ...parsed, data })
-    } catch { return line } // 非 JSON 行原样（两侧对称，不会单侧漂）
-  })
-  .join('\n')
-
 function normalizeFixtures(raws) {
   const scrubbed = raws
     .map(raw => tokenizeSessionFixtureCwd(raw))
     .map(stable => prepareSessionSnapshotFixtureForComparison(stable))
     .map(prepared => scrubSessionSnapshot(prepared))
-    .map(text => normalizeTimeContext(text))
+    .map(text => normalizeReplayTimeContext(text))
   return redactSessionSnapshotIds(scrubbed)
 }
 
@@ -633,24 +606,19 @@ try {
     sessionIds: items.map(i => String(i.header.id)).filter(id => id !== ''),
     cwd: typeof items[0]?.header.cwd === 'string' ? items[0].header.cwd : '',
   })
-  const actualN = normalizeSessionSnapshots(parsed.map(p => normalizeTimeContext(p.text)), ctxOf(parsed))
+  const actualN = normalizeSessionSnapshots(parsed.map(p => normalizeReplayTimeContext(p.text)), ctxOf(parsed))
   const expectedN = normalizeSessionSnapshots(fixtures, ctxOf(fixtures.map(t => ({ header: headerOf(t) }))))
+  const actualRows = actualN.map(records)
+  const expectedRows = expectedN.map(records)
+  const sessionDifferences = judgeReplaySessions(actualRows, expectedRows, 'full')
   let diffLine = ''
-  let sessionDiffs = 0
-  for (const [index, actual] of actualN.entries()) {
-    const a = records(actual)
-    const e = records(expectedN[index] ?? '')
-    for (let i = 0; i < Math.max(a.length, e.length); i++) {
-      if (JSON.stringify(a[i]) !== JSON.stringify(e[i])) {
-        sessionDiffs++
-        diffLine = `session#${index} 第 ${String(i + 1)} 行：期望 ${e[i]?.type ?? '(缺)'} / 实际 ${a[i]?.type ?? '(缺)'}`
-        console.log(`    差异：${diffLine}`)
-        if (e[i] !== undefined) console.log(`      期望: ${JSON.stringify(e[i]).slice(0, 700)}`)
-        if (a[i] !== undefined) console.log(`      实际: ${JSON.stringify(a[i]).slice(0, 700)}`)
-        break
-      }
-    }
+  for (const { sessionIndex, rowIndex, expected, actual } of sessionDifferences) {
+    diffLine = `session#${sessionIndex} 第 ${String(rowIndex + 1)} 行：期望 ${expected?.type ?? '(缺)'} / 实际 ${actual?.type ?? '(缺)'}`
+    console.log(`    差异：${diffLine}`)
+    if (expected !== undefined) console.log(`      期望: ${JSON.stringify(expected).slice(0, 700)}`)
+    if (actual !== undefined) console.log(`      实际: ${JSON.stringify(actual).slice(0, 700)}`)
   }
+  const sessionDiffs = sessionDifferences.length
   if (JUDGES === 'full') {
     check('归一化日志零 diff', sessionDiffs === 0, sessionDiffs === 0 ? `${String(actualN.length)} 个会话逐行一致` : diffLine)
   } else {
@@ -659,28 +627,18 @@ try {
     // 投递有固有差（r2 五轮实证：COO 最后 2 条收口消息在重放里被拒，27 → 25；录制侧为真
     // 模型节奏）。delivered（投递确认竞态面）、逐行交错序（TeamJournal 并发 append）、
     // 事件类型序列（title-llm 代差）同理不作判据；全量形态保真归 r3-delegation full 档。
-    let teamDiffs = 0
-    for (const [index, actual] of actualN.entries()) {
-      const a = records(actual)
-      const e = records(expectedN[index] ?? '')
-      const pick = (rows) => rows
-        .filter(r => typeof r.type === 'string' && ['team/member', 'team/task'].includes(r.type))
-        .map(r => JSON.stringify(r)).sort()
-      const aTeam = pick(a)
-      const eTeam = pick(e)
-      if (JSON.stringify(aTeam) !== JSON.stringify(eTeam)) {
-        teamDiffs++
-        const at = aTeam.findIndex((r, i) => r !== eTeam[i])
-        console.log(`    team 集合差异：session#${index} 第 ${String(at + 1)} 条（排序后）`)
-        if (eTeam[at] !== undefined) console.log(`      期望: ${eTeam[at].slice(0, 500)}`)
-        if (aTeam[at] !== undefined) console.log(`      实际: ${aTeam[at].slice(0, 500)}`)
-      }
+    const teamDifferences = judgeReplaySessions(actualRows, expectedRows, 'presence')
+    for (const { sessionIndex, differingIndex, expectedRows: expectedTeam, actualRows: actualTeam } of teamDifferences) {
+      console.log(`    team 集合差异：session#${sessionIndex} 第 ${String(differingIndex + 1)} 条（排序后）`)
+      if (expectedTeam[differingIndex] !== undefined) console.log(`      期望: ${expectedTeam[differingIndex].slice(0, 500)}`)
+      if (actualTeam[differingIndex] !== undefined) console.log(`      实际: ${actualTeam[differingIndex].slice(0, 500)}`)
     }
+    const teamDiffs = teamDifferences.length
     check('member/task 事件集合等价（在场板数据路径，验收判据 4）', teamDiffs === 0, teamDiffs === 0 ? '' : `${String(teamDiffs)} 个会话的 member/task 事件集合不同`)
     // queued 差异显式记录（不判据、不静默）：见上方注释。
-    for (const [index, actual] of actualN.entries()) {
-      const a = records(actual).filter(r => r.type === 'team/message/queued')
-      const eQueued = records(expectedN[index] ?? '').filter(r => r.type === 'team/message/queued')
+    for (const [index, actual] of actualRows.entries()) {
+      const a = actual.filter(r => r.type === 'team/message/queued')
+      const eQueued = (expectedRows[index] ?? []).filter(r => r.type === 'team/message/queued')
       if (a.length !== eQueued.length) {
         const key = (r) => `${r.data.message.senderName}→${String(r.data.message.content?.[0]?.text ?? '').split('\n')[0].slice(0, 30)}`
         const aKeys = new Set(a.map(key))

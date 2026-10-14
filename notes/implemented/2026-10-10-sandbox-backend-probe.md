@@ -91,7 +91,7 @@ switch the consumer to `danger-full-access`*（`vendor/dsh/packages/sandbox/sand
     （r3-delegation）**姿态敏感**——无钉值场景下会话事件 `sandbox/mode` 的值直接来自 env.sh 的探测
     结果，本机 danger-full-access vs 录制时 workspace-write ⇒ 归一化比对红。修法不是钉值（钉
     workspace-write 在后端损坏的机器上会让 permission 事件整体不发射，实测三条全消失），而是
-    `replay-smoke` 的 `normalizeTimeContext` 把姿态事件**值**脱敏为 `{{posture}}`（类型/位置/`source`
+    `tools/lib/replay-logic.mjs` 的 `normalizeReplayTimeContext`（由 `replay-smoke` 调用）把姿态事件**值**脱敏为 `{{posture}}`（类型/位置/`source`
     保留），r3 随 diff 重录 ⇒ 判据对机器姿态无关。见
     [2026-10-10-replay-posture-redaction](2026-10-10-replay-posture-redaction.md)。
   - **未做的事**：要让 replay 反映本机真实沙箱姿态，得逐个改场景 `cordis.snapshot.yml` 并重录——那是

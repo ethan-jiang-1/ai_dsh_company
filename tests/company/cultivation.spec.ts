@@ -1,5 +1,12 @@
-/** 培养面板读模型（驾驶舱④切片四 + 2026-10-13 培养卡的 keyless 完成定义）。 */
+/** 培养读模型 + 已注册 host 工具/命令对临时真实文件的行为（keyless 完成定义）。 */
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import type { CommandDefinition } from '@deepseek-ai/dsh-commands'
+import type { Context } from '@deepseek-ai/cordis'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import { describe, expect, it } from 'vitest'
+import { registerCultivation, type CultivationHostConfig } from '../../packages/company-pack/src/host/cultivation.ts'
 import {
   CULTIVATION_ROLES,
   PREVIEW_LIMIT,
@@ -203,5 +210,146 @@ describe('feedbackItems', () => {
       { type: 'feedback/message-put', data: {} },
       null,
     ])).toEqual([])
+  })
+})
+
+/** 注册真正的培养工具/命令；只替身 Cordis 注册面，回调仍是生产实现。 */
+type RegisteredCultivationTool = Parameters<Context['tools']['register']>[0]
+
+function cultivationRegistrations(config: CultivationHostConfig): {
+  readonly command: CommandDefinition['handler']
+  readonly proposal: RegisteredCultivationTool
+} {
+  const commands: CommandDefinition[] = []
+  const tools: RegisteredCultivationTool[] = []
+  const ctx = {
+    tools: { register: (definition: RegisteredCultivationTool) => { tools.push(definition); return () => {} } },
+    commands: { register: (definition: CommandDefinition) => { commands.push(definition); return () => {} } },
+  }
+  registerCultivation(ctx as Parameters<typeof registerCultivation>[0], config)
+  const command = commands.find(definition => definition.name === 'cultivation')
+  const proposal = tools.find(definition => definition.name === 'cultivation_propose')
+  if (command === undefined) throw new Error('registerCultivation 没有注册 /cultivation')
+  if (proposal === undefined) throw new Error('registerCultivation 没有注册 cultivation_propose')
+  return { command: command.handler, proposal }
+}
+
+/** 临时培养盘只属于当前用例，vitest fork 并发执行时互不共用路径。 */
+async function withCultivationWorkspace<T>(run: (workspace: string, methods: string) => Promise<T>): Promise<T> {
+  const root = mkdtempSync(join(tmpdir(), 'cultivation-command-'))
+  const workspace = join(root, 'workspace')
+  const methods = join(root, 'methods')
+  try {
+    mkdirSync(join(workspace, 'cultivation', 'records'), { recursive: true })
+    return await run(workspace, methods)
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+}
+
+function invokeCultivation(
+  handler: CommandDefinition['handler'],
+  role: string,
+  cwd: string,
+  rawInput: string,
+) {
+  return handler({
+    commandId: 'cultivation-test' as never,
+    agent: { session: { header: { agentPreset: role, cwd } } } as never,
+    rawInput,
+    attachments: [],
+    signal: new AbortController().signal,
+  })
+}
+
+describe('/cultivation 注册命令的 host 行为', () => {
+  const suggestion = {
+    kind: 'suggestion',
+    targetRole: 'cfo',
+    proposerRole: 'ceo',
+    proposerKind: 'human',
+    source: 'test fixture',
+    expectation: '复核数字口径',
+    body: '先对照底稿，再给出数字结论。',
+  } as const
+
+  it('已注册提案工具把分身纠正写入公司盘，并保留来源与角色归属', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const { proposal } = cultivationRegistrations({ cultivationRoot: methods })
+      // Invoke the registered body without the registry-created Agent execution token;
+      // cultivation reads only the agent session header and the caller signal here.
+      const outcome = await proposal.execute({
+        kind: 'correction',
+        targetRole: 'ceo',
+        expectation: '收口前列出未决项',
+        body: '先列清单，再下结论。',
+        source: 'deliverables/brief.md',
+      }, {
+        agent: { session: { header: { agentPreset: 'ceo', cwd: workspace } } },
+        signal: new AbortController().signal,
+      } as never)
+      if (outcome === null || typeof outcome !== 'object'
+        || !('id' in outcome) || typeof outcome.id !== 'string'
+        || !('recorded' in outcome) || typeof outcome.recorded !== 'boolean'
+        || !('note' in outcome) || typeof outcome.note !== 'string') {
+        throw new Error('cultivation_propose returned an invalid result')
+      }
+
+      expect(outcome.recorded).toBe(true)
+      expect(outcome.note).toContain('纠正')
+      const recordPath = join(workspace, 'cultivation', 'records', `${outcome.id}.md`)
+      const text = readFileSync(recordPath, 'utf8')
+      const saved = parseRecord(outcome.id, text)
+      expect(saved).toMatchObject({
+        kind: 'correction',
+        targetRole: 'ceo',
+        proposerRole: 'ceo',
+        proposerKind: 'agent',
+        source: 'deliverables/brief.md',
+        expectation: '收口前列出未决项',
+        status: 'open',
+      })
+      expect(text).toContain('先列清单，再下结论。')
+      expect(existsSync(join(methods, 'ceo'))).toBe(false)
+    })
+  })
+
+  it('跨角色采纳被拒绝，记录保持 open 且不部署方法', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordPath = join(workspace, 'cultivation', 'records', 'r1.md')
+      writeFileSync(recordPath, recordText(suggestion))
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+
+      const result = await invokeCultivation(handler, 'ceo', workspace, 'adopt r1')
+
+      expect(result).toEqual({
+        kind: 'error',
+        text: '仅建议权：r1 的培养对象是 CFO，请在 CFO 的会话里采纳。',
+      })
+      expect(parseRecord('r1', readFileSync(recordPath, 'utf8'))?.status).toBe('open')
+      expect(existsSync(join(methods, 'cfo', 'method-r1', 'SKILL.md'))).toBe(false)
+    })
+  })
+
+  it('目标角色采纳仍按当前命令输入生成方法文件，并将记录持久化为 adopted', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordPath = join(workspace, 'cultivation', 'records', 'r1.md')
+      writeFileSync(recordPath, recordText(suggestion))
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+
+      const result = await invokeCultivation(handler, 'cfo', workspace, 'adopt r1 as review-numbers')
+
+      expect(result).toEqual({
+        kind: 'success',
+        text: '已采纳 r1：方法 review-numbers 部署到 CFO 方法层。新开的 CFO 会话会加载它；运行中的会话不受影响。验证后用 verify 回填结果；不灵了用 revoke review-numbers 撤回。',
+      })
+      expect(readFileSync(join(methods, 'cfo', 'review-numbers', 'SKILL.md'), 'utf8')).toBe(
+        '---\nname: review-numbers\ndescription: 复核数字口径\n---\n\n# review-numbers\n\n\n',
+      )
+      const adopted = parseRecord('r1', readFileSync(recordPath, 'utf8'))
+      expect(adopted?.status).toBe('adopted')
+      expect(adopted?.methodSlug).toBe('review-numbers')
+      expect(adopted?.decidedAt).toBeDefined()
+    })
   })
 })

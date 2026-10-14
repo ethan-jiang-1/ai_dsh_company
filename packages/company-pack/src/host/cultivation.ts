@@ -15,7 +15,7 @@
  *   pack 升级不擦。生效边界：**新开的该角色会话**加载（运行中会话不吃热更新——presets.md
  *   生效边界表）。
  *
- * keyless 判据 = `tests/company/cultivation.spec.ts`（读写模型纯函数）；真机制（目录发现/
+ * keyless 判据 = `tests/company/cultivation.spec.ts`（读模型 + 已注册命令与临时文件行为）；真机制（目录发现/
  * 隔离/命令 wiring/跨会话生效）= `probes/session-context/cultivation-method-layer-probe.mjs`。
  */
 import type { Context } from '@deepseek-ai/cordis'
@@ -118,8 +118,172 @@ function writeRecord(recordsDir: string, draft: Parameters<typeof recordText>[0]
   return id
 }
 
+/** 命令核心与提案工具共用的培养文件操作；Node fs 实现保持在本模块内部。 */
+interface CultivationStorage {
+  writeRecord(recordsDir: string, draft: Parameters<typeof recordText>[0]): string
+  readRecord(recordsDir: string, id: string): { readonly path: string, readonly text: string } | null
+  updateRecord(path: string, updates: Readonly<Record<string, string>>): void
+  loadRecords(recordsDir: string): ReturnType<typeof loadRecords>
+  installMethod(root: string, role: string, slug: string, text: string): void
+  removeMethod(root: string, role: string, slug: string): string | null
+}
+
+/** Host 文件系统适配器；记录与方法均保留原有落盘格式和路径。 */
+const nodeCultivationStorage: CultivationStorage = {
+  writeRecord,
+  readRecord(recordsDir, id) {
+    const path = join(recordsDir, `${id}.md`)
+    return existsSync(path) ? { path, text: readFileSync(path, 'utf8') } : null
+  },
+  updateRecord: updateRecordFile,
+  loadRecords,
+  installMethod(root, role, slug, text) {
+    const methodDir = join(root, role, slug)
+    mkdirSync(methodDir, { recursive: true })
+    writeFileSync(join(methodDir, 'SKILL.md'), text)
+  },
+  removeMethod(root, role, slug) {
+    const methodDir = join(root, role, slug)
+    if (!existsSync(methodDir)) return null
+    rmSync(methodDir, { recursive: true, force: true })
+    return methodDir
+  },
+}
+
+/** 命令行为只依赖会话输入、配置与培养存储；Cordis 注册留在外层适配器。 */
+function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage) {
+  return ({ agent, rawInput }: { readonly agent?: AgentLike, readonly rawInput: string }) => {
+    const face = sessionFaceOf(agent)
+    if (face === null) {
+      return { kind: 'error' as const, text: '培养命令需要公司角色会话（当前会话不是五角色 preset，或 cwd 缺席）。' }
+    }
+    const { head, body } = splitBody(rawInput)
+    const tokens = head.split(/\s+/).filter(t => t !== '')
+    const sub = tokens[0] ?? ''
+    const recordsDir = join(face.cwd, RECORDS_REL)
+
+    // correct <期望行为一句话> :: <做法与证据正文>
+    if (sub === 'correct' || sub === 'suggest') {
+      const isSuggest = sub === 'suggest'
+      const targetRole = isSuggest ? tokens[1] : face.role
+      const expectation = (isSuggest ? tokens.slice(2) : tokens.slice(1)).join(' ').trim()
+      if (isSuggest && !ROSTER.has(targetRole ?? '')) {
+        return { kind: 'error' as const, text: '用法：suggest <角色> <期望行为一句话> :: <建议与证据>；角色须在名册。' }
+      }
+      if (expectation === '') return { kind: 'error' as const, text: '期望行为不能为空（:: 之前的一句话）。' }
+      if (body === '') return { kind: 'error' as const, text: '正文不能为空（:: 之后写做法与证据）。' }
+      if (isSuggest && targetRole === face.role) {
+        return { kind: 'error' as const, text: '给自己的角色用 correct；suggest 指向别的角色。' }
+      }
+      const id = storage.writeRecord(recordsDir, {
+        kind: isSuggest ? 'suggestion' : 'correction',
+        targetRole: targetRole!,
+        proposerRole: face.role,
+        proposerKind: 'human',
+        source: '（会话内提交）',
+        expectation,
+        body,
+      })
+      return {
+        kind: 'success' as const,
+        text: `已提交培养记录 ${id}（${isSuggest ? `建议 → ${roleLabel(targetRole!)}，待其本人在 ${roleLabel(targetRole!)} 会话里处理` : '纠正，待你采纳'}）。培养页可查收件箱。`,
+      }
+    }
+
+    // adopt <id> [as <slug>]
+    if (sub === 'adopt') {
+      const id = tokens[1]
+      if (id === undefined) return { kind: 'error' as const, text: '用法：adopt <记录id> [as <方法slug>]。' }
+      const found = storage.readRecord(recordsDir, id)
+      if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在（cultivation/records/ 里没有 ${id}.md）。` }
+      const { path, text } = found
+      const record = parseRecord(id, text)
+      if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏，无法采纳。` }
+      if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已是 ${record.status === 'adopted' ? '已采纳' : '已拒绝'}，不重复处理。` }
+      if (record.targetRole !== face.role) {
+        return { kind: 'error' as const, text: `仅建议权：${record.id} 的培养对象是 ${roleLabel(record.targetRole)}，请在 ${roleLabel(record.targetRole)} 的会话里采纳。` }
+      }
+      if (config.cultivationRoot === undefined) {
+        return { kind: 'error' as const, text: '方法层根未配置（bundle patch 行 config.cultivationRoot 缺席）——无法部署方法。' }
+      }
+      let slug = tokens[2] === 'as' ? tokens[3] : undefined
+      if (slug === undefined) slug = `method-${id}`
+      if (!SLUG_RE.test(slug)) {
+        return { kind: 'error' as const, text: `方法 slug 只认小写字母/数字/连字符（≤64 位）：${slug}。` }
+      }
+      storage.installMethod(config.cultivationRoot, record.targetRole, slug, methodSkillText({ slug, expectation: record.expectation, body }))
+      storage.updateRecord(path, { status: 'adopted', methodSlug: slug, decidedAt: new Date().toISOString() })
+      return {
+        kind: 'success' as const,
+        text: `已采纳 ${id}：方法 ${slug} 部署到 ${roleLabel(record.targetRole)} 方法层。新开的 ${roleLabel(record.targetRole)} 会话会加载它；运行中的会话不受影响。验证后用 verify 回填结果；不灵了用 revoke ${slug} 撤回。`,
+      }
+    }
+
+    // reject <id> :: <理由>
+    if (sub === 'reject') {
+      const id = tokens[1]
+      if (id === undefined || body === '') return { kind: 'error' as const, text: '用法：reject <记录id> :: <一句话理由>。' }
+      const found = storage.readRecord(recordsDir, id)
+      if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在。` }
+      const record = parseRecord(id, found.text)
+      if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏。` }
+      if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已处理过（${record.status}）。` }
+      if (record.targetRole !== face.role) {
+        return { kind: 'error' as const, text: `${record.id} 的培养对象是 ${roleLabel(record.targetRole)}，请在该角色会话里处理。` }
+      }
+      storage.updateRecord(found.path, { status: 'rejected', reason: body.split('\n')[0]!, decidedAt: new Date().toISOString() })
+      return { kind: 'success' as const, text: `已拒绝 ${id}（理由已留档，提出者可在培养页查回执）。` }
+    }
+
+    // verify <id> <pass|fail>
+    if (sub === 'verify') {
+      const id = tokens[1]
+      const outcome = tokens[2]
+      if (id === undefined || (outcome !== 'pass' && outcome !== 'fail')) {
+        return { kind: 'error' as const, text: '用法：verify <记录id> <pass|fail>——在真实同类任务上验证后回填。' }
+      }
+      const found = storage.readRecord(recordsDir, id)
+      if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在。` }
+      const record = parseRecord(id, found.text)
+      if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏。` }
+      if (record.status !== 'adopted') return { kind: 'error' as const, text: `只有已采纳的方法才能回填验证（${id} 现为 ${record.status}）。` }
+      if (record.targetRole !== face.role) {
+        return { kind: 'error' as const, text: `${record.id} 归 ${roleLabel(record.targetRole)}，请在该角色会话里回填。` }
+      }
+      storage.updateRecord(found.path, { verification: outcome })
+      return { kind: 'success' as const, text: `已回填验证：${id} → ${outcome === 'pass' ? '已验证（在同类任务上见过效）' : '验证未通过（建议修订或撤回）'}。` }
+    }
+
+    // revoke <slug>
+    if (sub === 'revoke') {
+      const slug = tokens[1]
+      if (slug === undefined) return { kind: 'error' as const, text: '用法：revoke <方法slug>。' }
+      if (config.cultivationRoot === undefined) {
+        return { kind: 'error' as const, text: '方法层根未配置（config.cultivationRoot 缺席）。' }
+      }
+      const methodDir = storage.removeMethod(config.cultivationRoot, face.role, slug)
+      if (methodDir === null) return { kind: 'error' as const, text: `${roleLabel(face.role)} 方法层里没有方法 ${slug}。` }
+      const { records } = storage.loadRecords(recordsDir)
+      let marked = 0
+      for (const record of records) {
+        if (record.status === 'adopted' && record.methodSlug === slug && record.targetRole === face.role) {
+          storage.updateRecord(join(recordsDir, `${record.id}.md`), { revokedAt: new Date().toISOString() })
+          marked++
+        }
+      }
+      return { kind: 'success' as const, text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(marked)} 条记录）。新开的 ${roleLabel(face.role)} 会话不再加载它。` }
+    }
+
+    return {
+      kind: 'error' as const,
+      text: '子命令只认：correct / suggest / adopt / reject / verify / revoke（培养页有各命令的一句话用法）。',
+    }
+  }
+}
+
 /** 「/cultivation」命令族与提案工具的注册面。 */
 export function registerCultivation(ctx: Context, config: CultivationHostConfig): void {
+  const storage = nodeCultivationStorage
   // ── 分身提案工具（V3）：只开提案，不开采纳 ──────────────────────────────────
   ctx.tools.register(defineTool({
     name: 'cultivation_propose',
@@ -182,7 +346,7 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig)
       if (args.kind !== 'correction' && args.kind !== 'suggestion') {
         return { id: '', recorded: false, note: 'kind 只认 correction / suggestion。' }
       }
-      const id = writeRecord(join(face.cwd, RECORDS_REL), {
+      const id = storage.writeRecord(join(face.cwd, RECORDS_REL), {
         kind: args.kind,
         targetRole: args.targetRole,
         proposerRole: face.role,
@@ -204,134 +368,6 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig)
     name: 'cultivation',
     description: '培养回路：给自己的角色提交纠正、给别的角色提建议、采纳/拒绝/验证/撤回方法（采纳仅目标角色本人）',
     input: { hint: 'correct <期望行为> :: <做法与证据> | suggest <角色> <期望行为> :: <建议> | adopt <id> [as <slug>] | reject <id> :: <理由> | verify <id> <pass|fail> | revoke <slug>' },
-    handler: ({ agent, rawInput }) => {
-      const face = sessionFaceOf(agent)
-      if (face === null) {
-        return { kind: 'error' as const, text: '培养命令需要公司角色会话（当前会话不是五角色 preset，或 cwd 缺席）。' }
-      }
-      const { head, body } = splitBody(rawInput)
-      const tokens = head.split(/\s+/).filter(t => t !== '')
-      const sub = tokens[0] ?? ''
-      const recordsDir = join(face.cwd, RECORDS_REL)
-
-      // correct <期望行为一句话> :: <做法与证据正文>
-      if (sub === 'correct' || sub === 'suggest') {
-        const isSuggest = sub === 'suggest'
-        const targetRole = isSuggest ? tokens[1] : face.role
-        const expectation = (isSuggest ? tokens.slice(2) : tokens.slice(1)).join(' ').trim()
-        if (isSuggest && !ROSTER.has(targetRole ?? '')) {
-          return { kind: 'error' as const, text: '用法：suggest <角色> <期望行为一句话> :: <建议与证据>；角色须在名册。' }
-        }
-        if (expectation === '') return { kind: 'error' as const, text: '期望行为不能为空（:: 之前的一句话）。' }
-        if (body === '') return { kind: 'error' as const, text: '正文不能为空（:: 之后写做法与证据）。' }
-        if (isSuggest && targetRole === face.role) {
-          return { kind: 'error' as const, text: '给自己的角色用 correct；suggest 指向别的角色。' }
-        }
-        const id = writeRecord(recordsDir, {
-          kind: isSuggest ? 'suggestion' : 'correction',
-          targetRole: targetRole!,
-          proposerRole: face.role,
-          proposerKind: 'human',
-          source: '（会话内提交）',
-          expectation,
-          body,
-        })
-        return {
-          kind: 'success' as const,
-          text: `已提交培养记录 ${id}（${isSuggest ? `建议 → ${roleLabel(targetRole!)}，待其本人在 ${roleLabel(targetRole!)} 会话里处理` : '纠正，待你采纳'}）。培养页可查收件箱。`,
-        }
-      }
-
-      // adopt <id> [as <slug>]
-      if (sub === 'adopt') {
-        const id = tokens[1]
-        if (id === undefined) return { kind: 'error' as const, text: '用法：adopt <记录id> [as <方法slug>]。' }
-        const path = join(recordsDir, `${id}.md`)
-        if (!existsSync(path)) return { kind: 'error' as const, text: `记录 ${id} 不存在（cultivation/records/ 里没有 ${id}.md）。` }
-        const record = parseRecord(id, readFileSync(path, 'utf8'))
-        if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏，无法采纳。` }
-        if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已是 ${record.status === 'adopted' ? '已采纳' : '已拒绝'}，不重复处理。` }
-        if (record.targetRole !== face.role) {
-          return { kind: 'error' as const, text: `仅建议权：${record.id} 的培养对象是 ${roleLabel(record.targetRole)}，请在 ${roleLabel(record.targetRole)} 的会话里采纳。` }
-        }
-        if (config.cultivationRoot === undefined) {
-          return { kind: 'error' as const, text: '方法层根未配置（bundle patch 行 config.cultivationRoot 缺席）——无法部署方法。' }
-        }
-        let slug = tokens[2] === 'as' ? tokens[3] : undefined
-        if (slug === undefined) slug = `method-${id}`
-        if (!SLUG_RE.test(slug)) {
-          return { kind: 'error' as const, text: `方法 slug 只认小写字母/数字/连字符（≤64 位）：${slug}。` }
-        }
-        const skillPath = join(config.cultivationRoot, record.targetRole, slug, 'SKILL.md')
-        mkdirSync(join(config.cultivationRoot, record.targetRole, slug), { recursive: true })
-        writeFileSync(skillPath, methodSkillText({ slug, expectation: record.expectation, body }))
-        updateRecordFile(path, { status: 'adopted', methodSlug: slug, decidedAt: new Date().toISOString() })
-        return {
-          kind: 'success' as const,
-          text: `已采纳 ${id}：方法 ${slug} 部署到 ${roleLabel(record.targetRole)} 方法层。新开的 ${roleLabel(record.targetRole)} 会话会加载它；运行中的会话不受影响。验证后用 verify 回填结果；不灵了用 revoke ${slug} 撤回。`,
-        }
-      }
-
-      // reject <id> :: <理由>
-      if (sub === 'reject') {
-        const id = tokens[1]
-        if (id === undefined || body === '') return { kind: 'error' as const, text: '用法：reject <记录id> :: <一句话理由>。' }
-        const path = join(recordsDir, `${id}.md`)
-        if (!existsSync(path)) return { kind: 'error' as const, text: `记录 ${id} 不存在。` }
-        const record = parseRecord(id, readFileSync(path, 'utf8'))
-        if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏。` }
-        if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已处理过（${record.status}）。` }
-        if (record.targetRole !== face.role) {
-          return { kind: 'error' as const, text: `${record.id} 的培养对象是 ${roleLabel(record.targetRole)}，请在该角色会话里处理。` }
-        }
-        updateRecordFile(path, { status: 'rejected', reason: body.split('\n')[0]!, decidedAt: new Date().toISOString() })
-        return { kind: 'success' as const, text: `已拒绝 ${id}（理由已留档，提出者可在培养页查回执）。` }
-      }
-
-      // verify <id> <pass|fail>
-      if (sub === 'verify') {
-        const id = tokens[1]
-        const outcome = tokens[2]
-        if (id === undefined || (outcome !== 'pass' && outcome !== 'fail')) {
-          return { kind: 'error' as const, text: '用法：verify <记录id> <pass|fail>——在真实同类任务上验证后回填。' }
-        }
-        const path = join(recordsDir, `${id}.md`)
-        if (!existsSync(path)) return { kind: 'error' as const, text: `记录 ${id} 不存在。` }
-        const record = parseRecord(id, readFileSync(path, 'utf8'))
-        if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏。` }
-        if (record.status !== 'adopted') return { kind: 'error' as const, text: `只有已采纳的方法才能回填验证（${id} 现为 ${record.status}）。` }
-        if (record.targetRole !== face.role) {
-          return { kind: 'error' as const, text: `${record.id} 归 ${roleLabel(record.targetRole)}，请在该角色会话里回填。` }
-        }
-        updateRecordFile(path, { verification: outcome })
-        return { kind: 'success' as const, text: `已回填验证：${id} → ${outcome === 'pass' ? '已验证（在同类任务上见过效）' : '验证未通过（建议修订或撤回）'}。` }
-      }
-
-      // revoke <slug>
-      if (sub === 'revoke') {
-        const slug = tokens[1]
-        if (slug === undefined) return { kind: 'error' as const, text: '用法：revoke <方法slug>。' }
-        if (config.cultivationRoot === undefined) {
-          return { kind: 'error' as const, text: '方法层根未配置（config.cultivationRoot 缺席）。' }
-        }
-        const methodDir = join(config.cultivationRoot, face.role, slug)
-        if (!existsSync(methodDir)) return { kind: 'error' as const, text: `${roleLabel(face.role)} 方法层里没有方法 ${slug}。` }
-        rmSync(methodDir, { recursive: true, force: true })
-        const { records } = loadRecords(recordsDir)
-        let marked = 0
-        for (const record of records) {
-          if (record.status === 'adopted' && record.methodSlug === slug && record.targetRole === face.role) {
-            updateRecordFile(join(recordsDir, `${record.id}.md`), { revokedAt: new Date().toISOString() })
-            marked++
-          }
-        }
-        return { kind: 'success' as const, text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(marked)} 条记录）。新开的 ${roleLabel(face.role)} 会话不再加载它。` }
-      }
-
-      return {
-        kind: 'error' as const,
-        text: '子命令只认：correct / suggest / adopt / reject / verify / revoke（培养页有各命令的一句话用法）。',
-      }
-    },
+    handler: cultivationCommandHandler(config, storage),
   })
 }

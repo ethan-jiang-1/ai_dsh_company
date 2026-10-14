@@ -9,7 +9,7 @@ replay 5 失败与 entry-probe 残留 token 交换）。
 1 个是**机器姿态敏感**，4 个是**内容演进**（persona 改名 wochen→梦之队 ×2、工具表
 cordis_inspect_list→bash ×2）。
 
-1. **姿态事件值脱敏**（`checks/smoke/replay-smoke.mjs` 的 `normalizeTimeContext`）：
+1. **姿态事件值脱敏**（`tools/lib/replay-logic.mjs` 的 `normalizeReplayTimeContext`，由 replay runner 调用）：
    `sandbox/mode` / `approval/policy` / `permission/preset` 的**值**脱敏为 `{{posture}}`，`source`
    字段（delegation 语义）保留，事件类型与位置照比。理由：值 = env.sh 探测 Seatbelt 的结果，
    是机器策略不是场景语义；与该缝已有的 time-context 脱敏同一哲学（「录制与重放必然不同且非
@@ -64,5 +64,5 @@ cordis_inspect_list→bash ×2）。
 ## 指针
 
 - 场景声明：[snapshots/replay/r3-delegation/snapshot.yml](../../snapshots/replay/r3-delegation/snapshot.yml)
-- 脱敏实现：[checks/smoke/replay-smoke.mjs](../../checks/smoke/replay-smoke.mjs) 的 `normalizeTimeContext`
-- 被更正的结论：[2026-10-10-sandbox-backend-probe](2026-10-10-sandbox-backend-probe.md)
+- 脱敏实现：[tools/lib/replay-logic.mjs](../../tools/lib/replay-logic.mjs) 的 `normalizeReplayTimeContext`（runner 调用：[checks/smoke/replay-smoke.mjs](../../checks/smoke/replay-smoke.mjs)）
+- 后续结构整理：[2026-10-14-code-restructure](2026-10-14-code-restructure.md)；本轮 replay helper 迁移见 [2026-10-14-client-host-replay-locality](2026-10-14-client-host-replay-locality.md)。

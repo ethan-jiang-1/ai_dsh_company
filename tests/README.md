@@ -11,10 +11,10 @@
 
 | 区 | 测什么 | 不证明什么 |
 |---|---|---|
-| [tests/company](./company/) | 公司读模型与审计判据的纯逻辑与 oracle（对象面 = [company-pack 共享读模型](../packages/company-pack/src/README.md)与审计口径） | 装配、真挂载、会话级行为 |
-| [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫 | 真浏览器渲染交互（→ client-load-smoke） |
+| [tests/company](./company/) | 公司读模型与审计判据的 keyless 逻辑 + 已注册 Host 工具/命令对临时真实文件的行为（对象面 = [company-pack 源码图](../packages/company-pack/src/README.md)与审计口径） | Cordis 真装配、profile 挂载、会话级行为 |
+| [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫；Lead/follow 适配器与 tab 类型/body/title/guide keyed 注册对齐；用真实 Cordis `Context` 与 `SlotRegistry` 分别覆盖声明等待、折叠重装与插件卸载 | 真浏览器渲染交互（→ client-load-smoke） |
 | [tests/presets](./presets/) | persona / skills 声明内容 | 组合装配与工具行实际生效（→ preset-smoke + 会话日志证据） |
-| [tests/harness](./harness/) | 仓库级结构与合同守卫（分层、导入导出、导航骨架、发布地基、证据活性这类断言） | 运行行为（结构检查不证明行为） |
+| [tests/harness](./harness/) | 仓库结构与测试分层合同 + `tools/lib/` 纯逻辑判据（如 replay normalization/judges） | 运行时或 CLI 端到端行为 |
 
 spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随仓库增长，写进文档必过期）；导航到区，不到件。
 
@@ -26,7 +26,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | bundle / preset 行 config（机制面） | `pnpm test tests/presets` | + [delegation-smoke](../checks/smoke/delegation-smoke.mjs)（工具行） | 同 diff 必带 |
 | client 面板（用户可见面：视图模型/组件/文案/CSS，`src/client/`） | `pnpm test tests/client`（按模块点名 spec，含 `client-face` / `style-lifecycle`） | [client-load-smoke](../checks/smoke/client-load-smoke.mjs) + 视觉夹具 | 用户可见改动 → 同 diff 场景或视觉夹具 |
 | company 读模型逻辑（`src/lib/` 判据：deliverables / authorship / ledger） | `pnpm test tests/company`（按模块点名 spec） | oracle 反证（真样本钉列）；**新增模块/影响导出面 → 加 `pnpm test tests/harness`（pack-exports 守卫）** | — |
-| pack 导出/注册面（host / client 两半 exports；host 注册改动从这进） | `pnpm test tests/harness`（[pack-exports](./harness/pack-exports.spec.ts) 导出形态守卫）+ `pnpm test tests/client`（`client-face` / `style-lifecycle`） | [release-smoke](../checks/smoke/release-smoke.mjs)（真实安装形状） | — |
+| pack 导出/注册面（Host / Client 注册改动） | `pnpm test tests/harness`（导出形态）+ `pnpm test tests/company`（Host 注册回调行为）+ `pnpm test tests/client`（Client 槽注册） | [release-smoke](../checks/smoke/release-smoke.mjs)（真实安装形状） | — |
 | 发布 / 升 pin | `pnpm test tests/harness`（release-foundation 等） | [release-smoke](../checks/smoke/release-smoke.mjs) + 升 pin 程序（合同 = [release.md](../docs/release.md)；**语料回放全绿 = 升 pin 回归网第一道**） | — |
 | 检查与工具入口（`checks/**`、`probes/**`、`tools/**`） | 消费它的 keyless spec + `pnpm verify`（头注/结构门禁） | 真实入口冒烟按脚本头注「何时跑」 | — |
 | 文档 / 指针 | `pnpm verify`（md-links / bare-path / doc-budget） | [entry-probe-smoke](../checks/smoke/entry-probe-smoke.mjs)（入口链文档改动后） | — |
