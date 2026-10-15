@@ -12,7 +12,7 @@
 | 区 | 测什么 | 不证明什么 |
 |---|---|---|
 | [tests/company](./company/) | 公司读模型与审计判据的 keyless 逻辑 + 已注册 Host 工具/命令对临时真实文件的行为（对象面 = [company-pack 源码图](../packages/company-pack/src/README.md)与审计口径） | Cordis 真装配、profile 挂载、会话级行为 |
-| [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫；Lead/follow 适配器与 tab 注册目录（真实 Cordis `Context`/`SlotRegistry` 覆盖声明等待、折叠重装与插件卸载）；多实例探活 disposer 契约（清心跳/横幅/定时器） | 完整 `apply()` 组合与真浏览器渲染交互（→ client-load-smoke；页签行点选 → replay `--ui`） |
+| [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫；Lead/follow 适配器与 tab 注册目录（真实 Cordis `Context`/`SlotRegistry`）；多实例探活 disposer 契约；whole-client 档（真 `bootClient` × web profile bundle roster）覆盖 `apply` 组合与 fiber 卸载/重载（company-client-composition） | 真浏览器渲染交互（→ client-load-smoke；页签行点选 → replay `--ui`） |
 | [tests/presets](./presets/) | persona / skills 声明内容 | 组合装配与工具行实际生效（→ preset-smoke + 会话日志证据） |
 | [tests/harness](./harness/) | 仓库结构与测试分层合同 + `tools/lib/` 纯逻辑判据（如 replay normalization/judges） | 运行时或 CLI 端到端行为 |
 

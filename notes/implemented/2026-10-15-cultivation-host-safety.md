@@ -25,7 +25,7 @@
 ## 后果与覆盖边界
 
 - 命令族 keyless 覆盖从 3 条路径扩到：提案写盘、跨角色采纳拒绝、目标角色采纳（部署持久化正文）、reject/verify（frontmatter 更新且正文保留）、revoke（非法 slug 拒、目录删除 + 记录标注）、记录 id 路径穿越拒绝、记录/方法碰撞不覆盖不落 adopted、symlink 记录与方法不被跟随且外部目标原样。**不证明**：完整 Host Loader/profile 装配（→ preset-smoke / [cultivation-method-layer-probe](../../probes/session-context/cultivation-method-layer-probe.mjs)）、对抗性并发竞态、Windows 保留名。
-- guard 卸载：keyless 钉的是 disposer 自身契约；`apply`→`ctx.effect` 接线由类型检查 + client-load-smoke 装载证据覆盖，整 fiber 卸载/重载仍属浏览器档。
+- guard 卸载：disposer 契约与 `apply`→`ctx.effect` 接线的整 fiber 卸载/重载均已 keyless 钉住——whole-client 档 [company-client-composition.spec](../../tests/client/company-client-composition.spec.ts)（2026-10-16 落地，接线 owner = [2026-10-16-client-composition-tier](./2026-10-16-client-composition-tier.md)）；丢弃 disposer 的旧缺陷在该档红证被抓（泄漏心跳数组）。
 
 ## 验证（实际执行）
 
