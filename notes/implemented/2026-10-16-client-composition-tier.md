@@ -13,8 +13,7 @@
 1. **roster 组合**：`bundleRoster([...WEB_PROFILE_BUNDLES, 'dsh-company-pack'], undefined, profileContext 求值面).closure(['dsh-company-pack'])`
    ——与 profile 启动器同一套 bundle patch 组合；本包行经 tier 的 `provide` 从**源码面**供给（`src/client/index.ts` 直导入）。
 2. **vitest 别名基建**：根 [vitest.config.ts](../../vitest.config.ts) 把 `vendor/dsh/tsconfig.base.json` 加为 tsconfigPaths 原生项目
-   ——extends 链继承的 paths 在本仓根解析时基址错位（`@deepseek-ai/dsh-client-modules/client` 实测解析出 `packages/packages`
-   翻倍路径并落到构建产物 lib），原生项目让同一份映射以 vendor 根为基址正确落 src。
+   ——extends 链继承的 paths 在本仓根解析时基址错位（`@deepseek-ai/dsh-client-modules/client` 实测把 `packages` 路径段拼了两次、落到构建产物 lib），原生项目让同一份映射以 vendor 根为基址正确落 src。
 3. **`remote.workspaceFiles` 命名空间**：tier 丢掉 api-remotes 行后按「模块 inject 声明 + mock 端点前缀」推导命名空间；真实组合里
    `remote.workspaceFiles` 由 api-remotes 生成客户端提供，闭包内无模块声明它 ⇒ spec 在 boot 前给 mock 挂一条
    `workspaceFiles/read` 规则让命名空间在场（注册面本身不调用该端点）。

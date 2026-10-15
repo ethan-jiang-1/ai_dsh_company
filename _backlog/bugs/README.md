@@ -11,7 +11,7 @@
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
 
-当前无活跃缺陷卡。BUG-001..017 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。BUG-001..012 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+当前无活跃缺陷卡。BUG-001..017 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

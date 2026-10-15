@@ -3,7 +3,7 @@
 > 什么时候读：要启动公司看效果、演示前核对判据时。路线 = §前置（起观察窗）→ 分镜 → 验收判据。
 > 顶层合同：demo 的剧本、分镜与观测点。R1 雏形（两人公司单动议）已并入本篇；R2 按
 > [design/ui-demo.md](./design/ui-demo.md) §3 分镜 v0 重排为**两空间镜头**并加场景 B；
-> **R4 定稿、后补场景 D/E**：R4 立的是场景 C（写作流水线）+ 交付物三态的落盘形状与**机器验收**（`deliverables/<slug>/`）；
+> **R4 定稿、后补场景 D/E**：R4 立的是场景 C（写作流水线）+ 交付物三态的落盘形状与**机器验收**（`deliverables/<日期>-<slug>/`，A1 命名）；
 > 场景 D（季度经营会）与 E（事件复盘）是 2026-09-25 新增动议类型的实战（见下方对应节）。
 
 ## 动议（R2）
@@ -74,7 +74,7 @@
   （单操作者与多人模式成品都只从 CEO 门出），手册侧的「映射单家」即指此处。
 - 审**归档快照**要加 `--only <slug>`：快照的 `workspace.expected/` 是整盘拷贝而 `sessions/` 只装
   本轮日志，不给作用域会把历史成品误报成"无 Lead 背书"（那是输入不成对，不是违规）。
-- 一条反证基线：往 `deliverables/<slug>/` 塞一份没被 `present` 过的 `final.md`，该检查必须变红。
+- 一条反证基线：往 `deliverables/<日期>-<slug>/` 塞一份没被 `present` 过的 `final.md`，该检查必须变红。
 
 ## 已知边界
 
@@ -117,9 +117,9 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 |---|---|---|---|
 | 1 | CEO | 收动议，定 slug 与三条约束 | CEO 会话里出现 slug 与约束；**没有**反问用户 |
 | 2 | CEO | 建任务板（含 owner / blocked_by）+ `spawn_teammate(vp-sales)` + `spawn_teammate(coo)`，slug 与口径一起下发 | 名册 3 行；侧栏多出两个会话 |
-| 3 | **切 VP-Sales** | 出市场与定价口径稿 | 落在 `deliverables/support-sla-page/drafts/vp-sales.md`——**不是 `final.md`** |
-| 4 | **切 COO** | 出承接与成本稿 | 落在 `deliverables/support-sla-page/drafts/coo.md` |
-| 5 | 跨空间互审 | COO 质疑 VP-Sales 的时限承诺 | `deliverables/support-sla-page/drafts/review-coo.md`；两个会话都有消息与回执 |
+| 3 | **切 VP-Sales** | 出市场与定价口径稿 | 落在 `deliverables/<日期>-support-sla-page/drafts/vp-sales.md`——**不是 `final.md`** |
+| 4 | **切 COO** | 出承接与成本稿 | 落在 `deliverables/<日期>-support-sla-page/drafts/coo.md` |
+| 5 | 跨空间互审 | COO 质疑 VP-Sales 的时限承诺 | `deliverables/<日期>-support-sla-page/drafts/review-coo.md`；两个会话都有消息与回执 |
 | 6 | 回 CEO | 合稿 → `final.md` → `present` | 交付卡片出现；`final.md` 有“保留分歧”节，不抹平 |
 | 7 | 收尾 | 三个 journal 各一篇 | `kb/{ceo,coo,vp-sales}/journal/support-sla-page.md` |
 
@@ -184,7 +184,7 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 
 | # | 门（谁） | 镜头 | 观测点（外部可验证） |
 |---|---|---|---|
-| 0 | 甲 | 开场声明 **「这场是多人模式」**；CEO 建 `deliverables/<slug>/`，把**任务书**落 `drafts/ceo.md` | 盘上出现 `drafts/ceo.md`；**CEO 没有 spawn 成员代劳** |
+| 0 | 甲 | 开场声明 **「这场是多人模式」**；CEO 建 `deliverables/<日期>-<slug>/`（A1 命名），把**任务书**落 `drafts/ceo.md` | 盘上出现 `drafts/ceo.md`；**CEO 没有 spawn 成员代劳** |
 | 1 | 乙 | 在自己的 **CFO 根会话**里读 `drafts/ceo.md` → 出 `drafts/cfo.md` + 自己的 journal | `drafts/cfo.md` 在场；`kb/cfo/journal/` 有本轮纪要（文件名用注入的真日期；`日期待核` 仅限注入故障 fail-closed，见手册「日期口径」） |
 | 2 | 丙 | 在自己的 **COO 根会话**里读同一份任务书 → 出 `drafts/coo.md` + journal | `drafts/coo.md` 在场 |
 | 3 | **乙** | **在自己的门里撞签字线**（8.8 折 < 9 折）⇒ 发起 `request_signoff` | **卡只弹在乙的门上**——这就是"谁该批的事落到谁的门"的**唯一成立形态** |
@@ -194,22 +194,22 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 **人之间的交接**（机制上没有通道，这是流程级）：说一句话——"CEO 派了 `<slug>`，你看一下" /
 "我写完了"。协议五步见 [multi-human.md](./multi-human.md) §3。
 
-**可直接粘贴的开场白**（把 `<slug>` 换成当场用的，如 `frame-z-2026`；先确认 `deliverables/` 没有同名）：
+**可直接粘贴的开场白**（把 `<日期>-<slug>` 换成当场用的，如 `2026-10-16-frame-z`；查重按**剥日期前缀的 slug**（手册 A1 命名），两处目录都看）：
 
 ```
 【门甲 · CEO】这场是多人模式。动议：客户 Z 要一份 8.8 折的三年框架协议，今天要结论。
-请立项并写任务书到 deliverables/<slug>/drafts/ceo.md，分派 CFO 出经济性、COO 出承接；
+请立项并写任务书到 deliverables/<日期>-<slug>/drafts/ceo.md，分派 CFO 出经济性、COO 出承接；
 不要 spawn 成员代劳。写完任务书就停，等人回话。
 
-【门乙 · CFO】读 deliverables/<slug>/drafts/ceo.md（CEO 给你的任务书），
-按它出你的稿 deliverables/<slug>/drafts/cfo.md，并按手册「收工留痕」写你的 journal。
+【门乙 · CFO】读 deliverables/<日期>-<slug>/drafts/ceo.md（CEO 给你的任务书），
+按它出你的稿 deliverables/<日期>-<slug>/drafts/cfo.md，并按手册「收工留痕」写你的 journal。
 ⚠ 你是 **CFO 的根会话**（不是被委派的成员）⇒ 撞签字线时**由你自己发起 `request_signoff`**
 （卡会落到你这扇门）；不要"升级给 CEO"——那是被委派成员的走法。
 
-【门丙 · COO】读 deliverables/<slug>/drafts/ceo.md，出 deliverables/<slug>/drafts/coo.md + 写你的 journal。
+【门丙 · COO】读 deliverables/<日期>-<slug>/drafts/ceo.md，出 deliverables/<日期>-<slug>/drafts/coo.md + 写你的 journal。
 
-【门甲 · CEO（收口）】CFO 与 COO 的稿已就位，读 deliverables/<slug>/drafts/ 下的稿，
-合稿 deliverables/<slug>/final.md 并 present。
+【门甲 · CEO（收口）】CFO 与 COO 的稿已就位，读 deliverables/<日期>-<slug>/drafts/ 下的稿，
+合稿 deliverables/<日期>-<slug>/final.md 并 present。
 ```
 
 ⚠ **"根会话 vs 被委派成员"是这一步的分水岭**：被委派的成员发审批**必被自动拒**
