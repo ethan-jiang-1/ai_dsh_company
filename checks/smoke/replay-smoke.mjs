@@ -35,6 +35,8 @@
 //   import vitest 不能直接 import，normalizeAria/captureStableAria 等为逐行转写（出处注在该文件函数头）。
 // 分层（guides/dev-loop §9.1 + readiness P1.4）：第三档（无 key、但要起进程与浏览器），不进 pnpm test。
 // 预算（§10）：墙钟 ≤ --wall。
+// 触发线（2026-10-16 立，来源 `_backlog/issues/2026-10-16-code-structure-round3.md` Item 3）：本文件 >800 行，
+//   或再增第 5 个 mode ⇒ 判据 / 驱动器分家（沿 2026-10-14 replay-ui 拆出先例，不再往本文件叠模式）。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'

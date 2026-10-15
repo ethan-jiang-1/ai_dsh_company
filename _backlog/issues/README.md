@@ -6,7 +6,7 @@
 
 | 问题 | 当前情况与下一步 |
 |---|---|
-| [代码结构第三轮改善：宽接口模块接缝 + 触发线](2026-10-16-code-structure-round3.md) | 计划已呈批（推荐 A = Item 1 + 触发线）；等用户圈定范围与开工令 🔒 |
+| [代码结构第三轮改善：宽接口模块接缝 + 触发线](2026-10-16-code-structure-round3.md) | 已拍范围 A（Item 1 两拆 + Item 3 触发线）+ 已下开工令；实施中（触发线与卡已入库，待 spec/lib 拆分与收尾） |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 
