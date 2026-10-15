@@ -7,8 +7,9 @@
   （接线在 `host/cultivation.ts`）与公司盘首启自举（接线在 `host/bootstrap.ts`），并再导出共享读模型。
   消费方向 = vendor runtime → 本入口。
 - `host/` —— **host-only 逻辑**（用 node 内建，浏览器面不许进）：`bootstrap.ts` 负责公司盘骨架首启自举
-  （只补缺 / 不抛 / 可重入）；`cultivation.ts` 负责培养提案工具、人侧 `/cultivation` 命令及记录/方法层写入；其私有存储适配器
-  （路径安全：id 与各目录组件校验、拒 symlink、独占建文件、原子改写）与命令处理器共用文件操作面，注册仍留在入口。
+  （只补缺 / 不抛 / 可重入）；`cultivation.ts` 负责培养提案工具与人侧 `/cultivation` 命令语义；
+  `cultivation-storage.ts` = 存储适配器（路径安全：id 与各目录组件校验、拒 symlink、独占建文件、原子改写），
+  注册仍留在入口。
   **为什么单开一层**：`src/lib/` 同时被 client 叶编译（`tsconfig.client.json`），带 node 内建的模块住那儿
   会让 client 叶报 TS2591（2026-10-13 现场）——host-only 的东西住 `host/`。
 - `lib/` —— **host/client 共享读模型与纯逻辑**，keyless 单测（`tests/company/`）的直接对象：
