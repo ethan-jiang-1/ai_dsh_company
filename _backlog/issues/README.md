@@ -6,7 +6,7 @@
 
 | 问题 | 当前情况与下一步 |
 |---|---|
-| （无——最近一张 [公司面 Agent 培养](../_archive/settled_issues/2026-10-13-agent-cultivation.md) 已于 2026-10-13 拍板三项后同日实施结卡） | — |
+| [代码结构第三轮改善：宽接口模块接缝 + 触发线](2026-10-16-code-structure-round3.md) | 计划已呈批（推荐 A = Item 1 + 触发线）；等用户圈定范围与开工令 🔒 |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 
