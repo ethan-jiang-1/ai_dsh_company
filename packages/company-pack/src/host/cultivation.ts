@@ -22,12 +22,25 @@ import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 // 纯类型导入：ctx.commands 的 Context 增强（服务本体由 base bundle 挂载，vendor patch 钉行）。
 import type {} from '@deepseek-ai/dsh-commands'
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import {
+  linkSync,
+  lstatSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  rmdirSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs'
+import { randomUUID } from 'node:crypto'
+import { dirname, isAbsolute, join, win32 } from 'node:path'
 import {
   CULTIVATION_ROLES,
   methodSkillText,
   parseRecord,
+  recordBody,
   recordText,
   roleLabel,
   type CultivationRecord,
@@ -69,6 +82,13 @@ function sessionFaceOf(agent: AgentLike | undefined): SessionFace | null {
   return { role, cwd }
 }
 
+/** Record IDs may be legacy text, but never a path, drive prefix, or dot segment. */
+function isSafeRecordId(id: string): boolean {
+  return id !== '' && id.length <= 128 && id !== '.' && id !== '..'
+    && !id.includes('/') && !id.includes('\\') && !id.includes('\0') && !id.includes(':')
+    && !isAbsolute(id) && !win32.isAbsolute(id)
+}
+
 /** 记录 id：时间戳 + 短随机（文件名倒序 ≈ 最新在前）。 */
 function newRecordId(now = new Date()): string {
   const pad = (n: number): string => String(n).padStart(2, '0')
@@ -83,21 +103,110 @@ function splitBody(raw: string): { readonly head: string, readonly body: string 
   return { head: raw.slice(0, at).trim(), body: raw.slice(at + 2).trim() }
 }
 
-/** 读全部记录（文件名倒序 = 最新在前；坏形状跳过并计数——不撒谎也不崩）。 */
+class UnsafeCultivationPathError extends Error {
+  constructor(path: string) {
+    super(`拒绝不安全的培养路径：${path}`)
+    this.name = 'UnsafeCultivationPathError'
+  }
+}
+
+/** Return null only when a path component is absent; propagate other filesystem failures. */
+function lstatOrNull(path: string): NonNullable<ReturnType<typeof lstatSync>> | null {
+  try {
+    return lstatSync(path) ?? null
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
+    throw error
+  }
+}
+
+/** Require a real directory at this app-owned path component; never accept a symlink. */
+function ensureDirectory(path: string): void {
+  let info = lstatOrNull(path)
+  if (info === null) {
+    mkdirSync(path)
+    info = lstatOrNull(path)
+  }
+  if (info === null || info.isSymbolicLink() || !info.isDirectory()) throw new UnsafeCultivationPathError(path)
+}
+
+/** The configured profile root is trusted; all role/slug components below it are checked individually. */
+function ensureMethodRoot(root: string): void {
+  let info = lstatOrNull(root)
+  if (info === null) {
+    mkdirSync(root)
+    info = lstatOrNull(root)
+  }
+  if (info === null || info.isSymbolicLink() || !info.isDirectory()) throw new UnsafeCultivationPathError(root)
+}
+
+/** Publish a new file without replacing an existing destination. Both paths share one directory/filesystem. */
+function writeNewFile(path: string, text: string): void {
+  const temporary = `${path}.${randomUUID()}.tmp`
+  try {
+    writeFileSync(temporary, text, { flag: 'wx' })
+    linkSync(temporary, path)
+  } catch (error) {
+    try { unlinkSync(temporary) } catch { /* Temporary was not created or the link already moved. */ }
+    throw error
+  }
+  try { unlinkSync(temporary) } catch { /* The new hard link is already published; a stale temporary is harmless. */ }
+}
+
+function recordPath(recordsDir: string, id: string): string | null {
+  if (!isSafeRecordId(id)) return null
+  return join(recordsDir, `${id}.md`)
+}
+
+function recordsDirectoryState(recordsDir: string): 'missing' | 'ready' {
+  const workspaceCultivationDir = dirname(recordsDir)
+  const parentInfo = lstatOrNull(workspaceCultivationDir)
+  if (parentInfo === null) return 'missing'
+  if (parentInfo.isSymbolicLink() || !parentInfo.isDirectory()) throw new UnsafeCultivationPathError(workspaceCultivationDir)
+  const recordsInfo = lstatOrNull(recordsDir)
+  if (recordsInfo === null) return 'missing'
+  if (recordsInfo.isSymbolicLink() || !recordsInfo.isDirectory()) throw new UnsafeCultivationPathError(recordsDir)
+  return 'ready'
+}
+
+function ensureRecordsDirectory(recordsDir: string): void {
+  const cultivationDir = dirname(recordsDir)
+  if (lstatOrNull(cultivationDir) === null) mkdirSync(cultivationDir)
+  ensureDirectory(cultivationDir)
+  ensureDirectory(recordsDir)
+}
+
+/** 读全部记录（文件名倒序 = 最新在前；坏形状或非普通文件跳过并计数）。 */
 function loadRecords(recordsDir: string): { readonly records: readonly CultivationRecord[], readonly broken: number, readonly reachable: boolean } {
-  if (!existsSync(recordsDir)) return { records: [], broken: 0, reachable: false }
+  if (recordsDirectoryState(recordsDir) === 'missing') return { records: [], broken: 0, reachable: false }
   const records: CultivationRecord[] = []
   let broken = 0
   for (const name of readdirSync(recordsDir).filter(n => n.endsWith('.md')).sort().reverse()) {
-    const record = parseRecord(name.replace(/\.md$/, ''), readFileSync(join(recordsDir, name), 'utf8'))
+    const id = name.replace(/\.md$/, '')
+    const path = recordPath(recordsDir, id)
+    if (path === null) {
+      broken++
+      continue
+    }
+    const info = lstatOrNull(path)
+    if (info === null || info.isSymbolicLink() || !info.isFile()) {
+      broken++
+      continue
+    }
+    const record = parseRecord(id, readFileSync(path, 'utf8'))
     if (record === null) broken++
     else records.push(record)
   }
   return { records, broken, reachable: true }
 }
 
-/** 改写一条记录的 frontmatter 字段（upsert；正文原样保留）。 */
-function updateRecordFile(path: string, updates: Readonly<Record<string, string>>): void {
+/** 改写 frontmatter 字段（upsert）；正文原样保留，并以 sibling-temp + rename 避免截断。 */
+function updateRecordFile(recordsDir: string, id: string, updates: Readonly<Record<string, string>>): void {
+  const path = recordPath(recordsDir, id)
+  if (path === null) throw new Error(`不安全的记录 id：${id}`)
+  if (recordsDirectoryState(recordsDir) !== 'ready') throw new Error(`记录目录不可达：${recordsDir}`)
+  const info = lstatOrNull(path)
+  if (info === null || info.isSymbolicLink() || !info.isFile()) throw new Error(`拒绝更新非普通记录：${path}`)
   const text = readFileSync(path, 'utf8')
   const match = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text)
   if (match === null) throw new Error(`记录 ${path} 没有 frontmatter，无法改写`)
@@ -107,45 +216,90 @@ function updateRecordFile(path: string, updates: Readonly<Record<string, string>
     if (at === -1) lines.push(`${key}: ${value}`)
     else lines[at] = `${key}: ${value}`
   }
-  writeFileSync(path, `---\n${lines.join('\n')}\n---${text.slice(match[0].length).startsWith('\n') ? '' : '\n'}${text.slice(match[0].length)}`)
+  const next = `---\n${lines.join('\n')}\n---${text.slice(match[0].length).startsWith('\n') ? '' : '\n'}${text.slice(match[0].length)}`
+  const temporary = join(recordsDir, `.${id}.${randomUUID()}.tmp`)
+  try {
+    writeFileSync(temporary, next, { flag: 'wx' })
+    renameSync(temporary, path)
+  } catch (error) {
+    try { unlinkSync(temporary) } catch { /* Not created, already renamed, or cleanup denied. */ }
+    throw error
+  }
 }
 
-/** 写一条新记录，返回记录 id。 */
+/** Write a record without replacing a colliding filename. */
 function writeRecord(recordsDir: string, draft: Parameters<typeof recordText>[0]): string {
-  mkdirSync(recordsDir, { recursive: true })
-  const id = newRecordId()
-  writeFileSync(join(recordsDir, `${id}.md`), recordText(draft))
-  return id
+  ensureRecordsDirectory(recordsDir)
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const id = newRecordId()
+    const path = recordPath(recordsDir, id)
+    if (path === null) throw new Error(`Generated an unsafe cultivation record id: ${id}`)
+    try {
+      writeNewFile(path, recordText(draft))
+      return id
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+    }
+  }
+  throw new Error('Unable to allocate a unique cultivation record id after 8 attempts')
 }
 
-/** 命令核心与提案工具共用的培养文件操作；Node fs 实现保持在本模块内部。 */
+/** Command/storage contract stays private; Node fs remains the only production implementation. */
 interface CultivationStorage {
   writeRecord(recordsDir: string, draft: Parameters<typeof recordText>[0]): string
-  readRecord(recordsDir: string, id: string): { readonly path: string, readonly text: string } | null
-  updateRecord(path: string, updates: Readonly<Record<string, string>>): void
+  readRecord(recordsDir: string, id: string): { readonly text: string } | null
+  updateRecord(recordsDir: string, id: string, updates: Readonly<Record<string, string>>): void
   loadRecords(recordsDir: string): ReturnType<typeof loadRecords>
-  installMethod(root: string, role: string, slug: string, text: string): void
+  installMethod(root: string, role: string, slug: string, text: string): boolean
   removeMethod(root: string, role: string, slug: string): string | null
 }
 
-/** Host 文件系统适配器；记录与方法均保留原有落盘格式和路径。 */
+/** Host filesystem adapter; IDs and every app-owned path component are checked before I/O. */
 const nodeCultivationStorage: CultivationStorage = {
   writeRecord,
   readRecord(recordsDir, id) {
-    const path = join(recordsDir, `${id}.md`)
-    return existsSync(path) ? { path, text: readFileSync(path, 'utf8') } : null
+    const path = recordPath(recordsDir, id)
+    if (path === null || recordsDirectoryState(recordsDir) !== 'ready') return null
+    const info = lstatOrNull(path)
+    if (info === null || info.isSymbolicLink() || !info.isFile()) return null
+    return { text: readFileSync(path, 'utf8') }
   },
   updateRecord: updateRecordFile,
   loadRecords,
   installMethod(root, role, slug, text) {
-    const methodDir = join(root, role, slug)
-    mkdirSync(methodDir, { recursive: true })
-    writeFileSync(join(methodDir, 'SKILL.md'), text)
+    if (!ROSTER.has(role) || !SLUG_RE.test(slug)) throw new Error(`不安全的方法路径：${role}/${slug}`)
+    ensureMethodRoot(root)
+    const roleDir = join(root, role)
+    ensureDirectory(roleDir)
+    const methodDir = join(roleDir, slug)
+    try {
+      mkdirSync(methodDir)
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'EEXIST') return false
+      throw error
+    }
+    try {
+      writeNewFile(join(methodDir, 'SKILL.md'), text)
+      return true
+    } catch (error) {
+      try { rmdirSync(methodDir) } catch { /* Remove only the empty directory created above. */ }
+      throw error
+    }
   },
   removeMethod(root, role, slug) {
-    const methodDir = join(root, role, slug)
-    if (!existsSync(methodDir)) return null
-    rmSync(methodDir, { recursive: true, force: true })
+    if (!ROSTER.has(role) || !SLUG_RE.test(slug)) throw new Error(`不安全的方法路径：${role}/${slug}`)
+    const rootInfo = lstatOrNull(root)
+    if (rootInfo === null) return null
+    if (rootInfo.isSymbolicLink() || !rootInfo.isDirectory()) throw new UnsafeCultivationPathError(root)
+    const roleDir = join(root, role)
+    const roleInfo = lstatOrNull(roleDir)
+    if (roleInfo === null) return null
+    if (roleInfo.isSymbolicLink() || !roleInfo.isDirectory()) throw new UnsafeCultivationPathError(roleDir)
+    const methodDir = join(roleDir, slug)
+    const methodInfo = lstatOrNull(methodDir)
+    if (methodInfo === null) return null
+    if (methodInfo.isSymbolicLink() || !methodInfo.isDirectory()) throw new UnsafeCultivationPathError(methodDir)
+    rmSync(methodDir, { recursive: true })
     return methodDir
   },
 }
@@ -196,7 +350,7 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       if (id === undefined) return { kind: 'error' as const, text: '用法：adopt <记录id> [as <方法slug>]。' }
       const found = storage.readRecord(recordsDir, id)
       if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在（cultivation/records/ 里没有 ${id}.md）。` }
-      const { path, text } = found
+      const { text } = found
       const record = parseRecord(id, text)
       if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏，无法采纳。` }
       if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已是 ${record.status === 'adopted' ? '已采纳' : '已拒绝'}，不重复处理。` }
@@ -211,8 +365,22 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       if (!SLUG_RE.test(slug)) {
         return { kind: 'error' as const, text: `方法 slug 只认小写字母/数字/连字符（≤64 位）：${slug}。` }
       }
-      storage.installMethod(config.cultivationRoot, record.targetRole, slug, methodSkillText({ slug, expectation: record.expectation, body }))
-      storage.updateRecord(path, { status: 'adopted', methodSlug: slug, decidedAt: new Date().toISOString() })
+      const proposalBody = recordBody(text)
+      if (proposalBody === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏，无法采纳。` }
+      let installed: boolean
+      try {
+        installed = storage.installMethod(config.cultivationRoot, record.targetRole, slug, methodSkillText({ slug, expectation: record.expectation, body: proposalBody }))
+      } catch (error) {
+        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+        throw error
+      }
+      if (!installed) return { kind: 'error' as const, text: `方法 ${slug} 已存在，未覆盖任何文件或记录。` }
+      try {
+        storage.updateRecord(recordsDir, id, { status: 'adopted', methodSlug: slug, decidedAt: new Date().toISOString() })
+      } catch (error) {
+        try { storage.removeMethod(config.cultivationRoot, record.targetRole, slug) } catch { /* Preserve the original record-update failure. */ }
+        throw error
+      }
       return {
         kind: 'success' as const,
         text: `已采纳 ${id}：方法 ${slug} 部署到 ${roleLabel(record.targetRole)} 方法层。新开的 ${roleLabel(record.targetRole)} 会话会加载它；运行中的会话不受影响。验证后用 verify 回填结果；不灵了用 revoke ${slug} 撤回。`,
@@ -231,7 +399,7 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       if (record.targetRole !== face.role) {
         return { kind: 'error' as const, text: `${record.id} 的培养对象是 ${roleLabel(record.targetRole)}，请在该角色会话里处理。` }
       }
-      storage.updateRecord(found.path, { status: 'rejected', reason: body.split('\n')[0]!, decidedAt: new Date().toISOString() })
+      storage.updateRecord(recordsDir, id, { status: 'rejected', reason: body.split('\n')[0]!, decidedAt: new Date().toISOString() })
       return { kind: 'success' as const, text: `已拒绝 ${id}（理由已留档，提出者可在培养页查回执）。` }
     }
 
@@ -250,7 +418,7 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       if (record.targetRole !== face.role) {
         return { kind: 'error' as const, text: `${record.id} 归 ${roleLabel(record.targetRole)}，请在该角色会话里回填。` }
       }
-      storage.updateRecord(found.path, { verification: outcome })
+      storage.updateRecord(recordsDir, id, { verification: outcome })
       return { kind: 'success' as const, text: `已回填验证：${id} → ${outcome === 'pass' ? '已验证（在同类任务上见过效）' : '验证未通过（建议修订或撤回）'}。` }
     }
 
@@ -261,13 +429,21 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       if (config.cultivationRoot === undefined) {
         return { kind: 'error' as const, text: '方法层根未配置（config.cultivationRoot 缺席）。' }
       }
-      const methodDir = storage.removeMethod(config.cultivationRoot, face.role, slug)
+      if (!SLUG_RE.test(slug)) return { kind: 'error' as const, text: `方法 slug 不安全：${slug}。` }
+      let records: readonly CultivationRecord[]
+      let methodDir: string | null
+      try {
+        records = storage.loadRecords(recordsDir).records
+        methodDir = storage.removeMethod(config.cultivationRoot, face.role, slug)
+      } catch (error) {
+        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+        throw error
+      }
       if (methodDir === null) return { kind: 'error' as const, text: `${roleLabel(face.role)} 方法层里没有方法 ${slug}。` }
-      const { records } = storage.loadRecords(recordsDir)
       let marked = 0
       for (const record of records) {
         if (record.status === 'adopted' && record.methodSlug === slug && record.targetRole === face.role) {
-          storage.updateRecord(join(recordsDir, `${record.id}.md`), { revokedAt: new Date().toISOString() })
+          storage.updateRecord(recordsDir, record.id, { revokedAt: new Date().toISOString() })
           marked++
         }
       }

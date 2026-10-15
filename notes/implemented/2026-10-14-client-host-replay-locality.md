@@ -20,7 +20,7 @@
 ## 后果与覆盖边界
 
 - 页签身份与三种贡献集中在一个目录；Cordis slot 声明 epoch 仍彼此独立。真实 `Context`/`SlotRegistry`/`SidebarRightTabRegistry` 测试覆盖声明等待、key/component/props、折叠后独立重装与卸载，但不代替完整 Client Loader/profile 装配。
-- cultivation handler 可在隔离的真实临时文件上观察；当前新增命令行为仅覆盖提案纠正写盘、跨角色 adoption 拒绝、目标角色 adoption 成功，不声称 reject/verify/revoke 全分支覆盖，也不声称完整 Host runtime 装配。
+- cultivation handler 可在隔离的真实临时文件上观察；命令行为覆盖面已随后续安全加固轮扩至 reject/verify/revoke、路径穿越拒绝、碰撞与 symlink 不跟随（事实 owner = [2026-10-15-cultivation-host-safety](./2026-10-15-cultivation-host-safety.md)），仍不声称完整 Host runtime 装配。
 - replay 纯规则可 keyless 直测；第三档 runner 与 fixture 未拆分，未刷新 snapshots。默认 r3 重放仍有基线中三类 FAIL（normalized log、两个 tool-schema sidecars）；UI lane 有相同三类再加 centerCol 金样差异。
 
 ## 验证（实际执行）

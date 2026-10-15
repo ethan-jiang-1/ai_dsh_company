@@ -55,7 +55,8 @@ export async function apply(ctx: ClientContext): Promise<void> {
 
   // 多实例探活横幅（卡②，2026-10-10 拍板：警告横幅）：同一浏览器多实例并存 = 静默互踩
   // （E2 实证）⇒ localStorage 心跳互见即挂横幅。纯 DOM、无服务依赖，apply 即启。
-  startInstanceGuard(document)
+  // 探活的清理函数挂 fiber（effect 惯例）：卸载/重载时移除心跳、横幅与定时器，不泄漏。
+  ctx.effect(() => startInstanceGuard(document))
 
   // 角色身份 UX · C 段：窗口标题带角色 + 整窗角色色条（2026-09-26 立，提案 §五 C）。
   // vendor 的 DocumentTitle 只在 activePanelId===null 时显示会话标题（用户真实用法下不可靠，

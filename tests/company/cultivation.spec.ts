@@ -1,5 +1,5 @@
 /** 培养读模型 + 已注册 host 工具/命令对临时真实文件的行为（keyless 完成定义）。 */
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { CommandDefinition } from '@deepseek-ai/dsh-commands'
@@ -331,7 +331,106 @@ describe('/cultivation 注册命令的 host 行为', () => {
     })
   })
 
-  it('目标角色采纳仍按当前命令输入生成方法文件，并将记录持久化为 adopted', async () => {
+  it('记录 id 不能通过路径穿越读取并改写培养目录外的文件', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const outsideRecord = join(workspace, '..', 'outside.md')
+      const original = recordText(suggestion)
+      writeFileSync(outsideRecord, original)
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+
+      const result = await invokeCultivation(handler, 'cfo', workspace, 'adopt ../../../outside as escaped')
+
+      expect(result.kind).toBe('error')
+      expect(readFileSync(outsideRecord, 'utf8')).toBe(original)
+      expect(existsSync(join(methods, 'cfo', 'escaped', 'SKILL.md'))).toBe(false)
+    })
+  })
+
+  it('reject 与 verify 更新 frontmatter，同时保留原记录正文', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordsDir = join(workspace, 'cultivation', 'records')
+      const openPath = join(recordsDir, 'r-reject.md')
+      writeFileSync(openPath, recordText(suggestion))
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+
+      expect(await invokeCultivation(handler, 'cfo', workspace, 'reject r-reject :: 数字证据不足')).toMatchObject({ kind: 'success' })
+      const rejectedText = readFileSync(openPath, 'utf8')
+      expect(parseRecord('r-reject', rejectedText)).toMatchObject({ status: 'rejected', reason: '数字证据不足' })
+      expect(rejectedText).toContain(suggestion.body)
+
+      const adoptedDraft = recordText(suggestion).replace('status: open', 'status: adopted\nmethodSlug: review-numbers')
+      const adoptedPath = join(recordsDir, 'r-verify.md')
+      writeFileSync(adoptedPath, adoptedDraft)
+      expect(await invokeCultivation(handler, 'cfo', workspace, 'verify r-verify pass')).toMatchObject({ kind: 'success' })
+      const verifiedText = readFileSync(adoptedPath, 'utf8')
+      expect(parseRecord('r-verify', verifiedText)).toMatchObject({ status: 'adopted', verification: 'pass' })
+      expect(verifiedText).toContain(suggestion.body)
+    })
+  })
+
+  it('revoke validates the slug, removes only the target method and annotates a matching record', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordsDir = join(workspace, 'cultivation', 'records')
+      const recordPath = join(recordsDir, 'r-revoke.md')
+      const adopted = recordText(suggestion).replace('status: open', 'status: adopted\nmethodSlug: review-numbers')
+      writeFileSync(recordPath, adopted)
+      const methodDir = join(methods, 'cfo', 'review-numbers')
+      mkdirSync(methodDir, { recursive: true })
+      writeFileSync(join(methodDir, 'SKILL.md'), 'installed method')
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+
+      expect(await invokeCultivation(handler, 'cfo', workspace, 'revoke ../review-numbers')).toMatchObject({ kind: 'error' })
+      expect(readFileSync(join(methodDir, 'SKILL.md'), 'utf8')).toBe('installed method')
+      expect(await invokeCultivation(handler, 'cfo', workspace, 'revoke review-numbers')).toMatchObject({ kind: 'success' })
+      expect(existsSync(methodDir)).toBe(false)
+      expect(parseRecord('r-revoke', readFileSync(recordPath, 'utf8'))?.revokedAt).toBeDefined()
+      expect(readFileSync(recordPath, 'utf8')).toContain(suggestion.body)
+    })
+  })
+
+  it('record and method collisions preserve existing files and leave the proposal open', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordsDir = join(workspace, 'cultivation', 'records')
+      const recordPath = join(recordsDir, 'r-collision.md')
+      writeFileSync(recordPath, recordText(suggestion))
+      const methodDir = join(methods, 'cfo', 'review-numbers')
+      mkdirSync(methodDir, { recursive: true })
+      writeFileSync(join(methodDir, 'SKILL.md'), 'user-owned method')
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+
+      expect(await invokeCultivation(handler, 'cfo', workspace, 'adopt r-collision as review-numbers')).toMatchObject({ kind: 'error' })
+      expect(readFileSync(join(methodDir, 'SKILL.md'), 'utf8')).toBe('user-owned method')
+      expect(parseRecord('r-collision', readFileSync(recordPath, 'utf8'))?.status).toBe('open')
+    })
+  })
+
+  it('record and method symlinks are not followed when reading, listing, or revoking', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordsDir = join(workspace, 'cultivation', 'records')
+      const externalRecord = join(workspace, '..', 'outside-record.md')
+      const externalText = recordText(suggestion).replace('status: open', 'status: adopted\nmethodSlug: follow-test')
+      writeFileSync(externalRecord, externalText)
+      symlinkSync(externalRecord, join(recordsDir, 'linked.md'))
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+      const linkedResult = await invokeCultivation(handler, 'cfo', workspace, 'adopt linked')
+      expect(linkedResult).toMatchObject({ kind: 'error' })
+
+      const methodParent = join(methods, 'cfo')
+      mkdirSync(join(methodParent, 'follow-test'), { recursive: true })
+      writeFileSync(join(methodParent, 'follow-test', 'SKILL.md'), 'installed')
+      expect(await invokeCultivation(handler, 'cfo', workspace, 'revoke follow-test')).toMatchObject({ kind: 'success' })
+      expect(readFileSync(externalRecord, 'utf8')).toBe(externalText)
+
+      const outsideMethod = join(workspace, '..', 'outside-method')
+      mkdirSync(outsideMethod)
+      writeFileSync(join(outsideMethod, 'SKILL.md'), 'outside')
+      symlinkSync(outsideMethod, join(methodParent, 'review-numbers'))
+      expect(await invokeCultivation(handler, 'cfo', workspace, 'revoke review-numbers')).toMatchObject({ kind: 'error' })
+      expect(readFileSync(join(outsideMethod, 'SKILL.md'), 'utf8')).toBe('outside')
+    })
+  })
+
+  it('目标角色采纳从记录部署已存正文，并将记录持久化为 adopted', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
       const recordPath = join(workspace, 'cultivation', 'records', 'r1.md')
       writeFileSync(recordPath, recordText(suggestion))
@@ -344,7 +443,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
         text: '已采纳 r1：方法 review-numbers 部署到 CFO 方法层。新开的 CFO 会话会加载它；运行中的会话不受影响。验证后用 verify 回填结果；不灵了用 revoke review-numbers 撤回。',
       })
       expect(readFileSync(join(methods, 'cfo', 'review-numbers', 'SKILL.md'), 'utf8')).toBe(
-        '---\nname: review-numbers\ndescription: 复核数字口径\n---\n\n# review-numbers\n\n\n',
+        '---\nname: review-numbers\ndescription: 复核数字口径\n---\n\n# review-numbers\n\n先对照底稿，再给出数字结论。\n',
       )
       const adopted = parseRecord('r1', readFileSync(recordPath, 'utf8'))
       expect(adopted?.status).toBe('adopted')

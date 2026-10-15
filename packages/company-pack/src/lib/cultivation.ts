@@ -245,7 +245,7 @@ export function recordText(draft: RecordDraft): string {
  * 解析一条培养记录。坏形状（无 frontmatter / 枚举外值 / 缺必填）给 null——
  * 收件箱不撒谎也不崩（wire 边界不信任，同 {@link feedbackItems} 纪律）。
  */
-export function parseRecord(id: string, text: string): CultivationRecord | null {
+function recordFrontmatter(text: string): { readonly fields: Map<string, string>, readonly body: string } | null {
   const match = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text)
   if (match === null) return null
   const fields = new Map<string, string>()
@@ -253,6 +253,18 @@ export function parseRecord(id: string, text: string): CultivationRecord | null 
     const field = /^([a-zA-Z]+):\s*(.*)$/.exec(line)
     if (field !== null) fields.set(field[1]!, field[2]!.trim())
   }
+  return { fields, body: text.slice(match[0].length) }
+}
+
+/** Return the persisted proposal body without exposing it in the Client record view. */
+export function recordBody(text: string): string | null {
+  return recordFrontmatter(text)?.body ?? null
+}
+
+export function parseRecord(id: string, text: string): CultivationRecord | null {
+  const parsed = recordFrontmatter(text)
+  if (parsed === null) return null
+  const { fields } = parsed
   const kind = fields.get('kind')
   const targetRole = fields.get('targetRole')
   const proposerRole = fields.get('proposerRole')
@@ -266,7 +278,7 @@ export function parseRecord(id: string, text: string): CultivationRecord | null 
   if (status !== 'open' && status !== 'adopted' && status !== 'rejected') return null
   const verification = fields.get('verification')
   if (verification !== undefined && verification !== 'pending' && verification !== 'pass' && verification !== 'fail') return null
-  const body = text.slice(match[0].length)
+  const body = parsed.body
   // 可选字段先聚成普通对象再收窄成领域形状（避免对 readonly 接口的索引签名强转）。
   const loose: Record<string, unknown> = {
     id,
