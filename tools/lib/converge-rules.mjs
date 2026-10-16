@@ -51,6 +51,30 @@ export function convergenceSlices(input) {
   return { scenes, bytes }
 }
 
+/**
+ * 半态续跑判定（2026-10-16 立，BUG-020：崩溃在收敛中途且工具认不出半态）。
+ *
+ * 现场：收敛是一串有副作用的顺序操作（证据副本 → 交付物 fs rename + git add → 清 live journal
+ * → 台账行 → 打印 backfill 指引）。`git rm` 撞未跟踪 journal 时抛在**第 3 步**，盘面停在
+ * 「交付物已入归档家、journal 清一半、台账未追加」；而 `converge(slug)` 的前置只认**活跃区**的
+ * slug ⇒ 重跑得「deliverables/ 下无此目录」，半态无法被工具自己接手。
+ *
+ * 判据只读**可观察状态**（两处目录在不在 + 还有几篇 live journal 可收割），不猜过程。
+ * @param input - `{ dirName, journalled, hasFinal }`
+ *   - `hasFinal`：活跃区**存在该目录**（正常收敛的入口；与半态互斥）；
+ *   - `journalled`：**还有** live journal 可收割（`harvestJournal` 非空）。
+ * @returns `{ resumable, reason, remaining }`；`reason ∈ 'ok' | 'still-active' | 'directions-missing'`。
+ *   `remaining` 只列**还需做**的步骤（journal 步在零篇时视为已完成——续跑幂等）。
+ */
+export function convergenceResume(input) {
+  if (input.hasFinal) return { resumable: false, reason: 'still-active', remaining: [] }
+  if (!input.archived) return { resumable: false, reason: 'directions-missing', remaining: [] }
+  const remaining = []
+  if (input.journalled) remaining.push('journal')
+  remaining.push('ledger', 'backfill')
+  return { resumable: true, reason: 'ok', remaining }
+}
+
 /** CHARTER 是否已有该 slug 的历史纪要**条目**。
  *  锚 = 条目行形「- <YYYY-MM-DD> · <slug>（」——整文件子串查重（includes）会被
  *  引用路径里的 slug 字样误触（BUG-014：COO 的证据路径含 slug → 假跳过、条目漏登）。 */
@@ -60,15 +84,15 @@ export function charterHasEntry(charterText, slug) {
 }
 
 /** CLI 旗标解析（纯函数）——参数唯一源在 converge.mjs 头注（BUG-016：未知旗标曾静默收下）。 */
-const KNOWN_FLAGS = ['--slug', '--dry-run', '--charter-backfill', '--allow-no-journal', '--allow-open-findings']
+const KNOWN_FLAGS = ['--slug', '--dry-run', '--charter-backfill', '--resume', '--allow-no-journal', '--allow-open-findings']
 export function parseFlags(args) {
   for (const a of args) {
     if (a.startsWith('--') && !KNOWN_FLAGS.includes(a)) {
-      throw new Error(`未知旗标 ${a}——认识：--slug <目录名> / --dry-run / --charter-backfill <目录名> / --allow-no-journal / --allow-open-findings；无参 = 计划模式`)
+      throw new Error(`未知旗标 ${a}——认识：--slug <目录名> / --dry-run / --charter-backfill <目录名> / --allow-no-journal / --allow-open-findings / --resume <目录名>；无参 = 计划模式`)
     }
   }
   const argOf = name => { const i = args.indexOf(`--${name}`); return i === -1 ? undefined : args[i + 1] }
-  return { slug: argOf('slug'), dryRun: args.includes('--dry-run'), charterBackfill: argOf('charter-backfill'), allowNoJournal: args.includes('--allow-no-journal'), allowOpenFindings: args.includes('--allow-open-findings') }
+  return { slug: argOf('slug'), dryRun: args.includes('--dry-run'), charterBackfill: argOf('charter-backfill'), allowNoJournal: args.includes('--allow-no-journal'), allowOpenFindings: args.includes('--allow-open-findings'), resume: argOf('resume') }
 }
 
 /** 解析某已收敛 slug 的证据目录名（convergence-<日期>）。

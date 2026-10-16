@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mkdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { archiveMovePlan, charterHasEntry, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
+import { archiveMovePlan, charterHasEntry, convergenceResume, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
 
 // converge.mjs 的纯判定规则（判据单一来源 = tools/lib/converge-rules.mjs；IO 在驱动脚本
 // ——沙箱对照实验与真仓复现收据见 _backlog 卡 BUG-014 / BUG-015）。
@@ -38,6 +38,37 @@ describe('converge-rules · 收敛前置：journal 有无（2026-10-16 立，事
   it('有一篇即满足（不规定篇数——角色数由动议形状决定，不在判据里拍）', () => {
     expect(journalPresence({ slug: 'x', journals: [{ role: 'ceo', file: '2026-10-13-x.md' }] }))
       .toEqual({ count: 1, missing: false })
+  })
+})
+
+// 负例留证 2026-10-16：把 `convergenceResume` 的归档家分支去掉 → 本块「已入归档家 ⇒ 可续跑」红
+//（`expected 'directions-missing' to be 'ok'`）；还原 → 绿。另一半（`git rm` 撞未跟踪 ⇒ 收敛崩在半途）
+// 没有纯函数可断言面，其红证 = 真现场原文（BUG-020 症状节）。
+describe('converge-rules · 半态续跑（BUG-020；2026-10-16 真现场：崩溃在半途且工具认不出）', () => {
+  it('交付物已入归档家 ⇒ 可续跑，剩余 = 清 journal + 台账行（+ backfill 指引）', () => {
+    expect(convergenceResume({ dirName: 'x', journalled: true, hasFinal: false, archived: true }).remaining)
+      .toEqual(['journal', 'ledger', 'backfill'])
+  })
+
+  it('交付物还在活跃区 ⇒ 不可续跑（那是正常收敛，不是半态）', () => {
+    expect(convergenceResume({ dirName: 'x', journalled: false, hasFinal: true, archived: false }).reason)
+      .toBe('still-active')
+  })
+
+  it('两处都不在 ⇒ 不可续跑（目录名错或从未收敛）', () => {
+    expect(convergenceResume({ dirName: 'x', journalled: false, hasFinal: false, archived: false }).reason)
+      .toBe('directions-missing')
+  })
+
+  it('零 live journal ⇒ 续跑仍可（journal 步已完成是幂等的），剩余不含 journal', () => {
+    const r = convergenceResume({ dirName: 'x', journalled: false, hasFinal: false, archived: true })
+    expect(r.reason).toBe('ok')
+    expect(r.remaining).toEqual(['ledger', 'backfill'])
+  })
+
+  it('已挂号（journalled=true）⇒ remaining 含 journal；这是「崩在 journal 前」的现场', () => {
+    expect(convergenceResume({ dirName: 'x', journalled: true, hasFinal: false, archived: true }).remaining)
+      .toContain('journal')
   })
 })
 

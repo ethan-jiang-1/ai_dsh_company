@@ -10,6 +10,7 @@
 //   node tools/converge.mjs --slug <目录名> --allow-open-findings # 显式接受未结审计发现（照记，不静默放行）
 //   node tools/converge.mjs --slug <目录名> --dry-run  # 只打印动作清单，不动盘
 //   node tools/converge.mjs --charter-backfill <目录名>  # 为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步）
+//   node tools/converge.mjs --resume <目录名>   # **半态续跑**：交付物已在归档家但 journal/台账未做完时接手（BUG-020；不搬移交付物）
 // 成本：秒级~十秒级、无模型；交付物走 git mv（tracked）；journal 已跟踪的走 git rm、**未跟踪的走 rmSync**
 //   （角色刚写、尚未入库的 journal 是常态；2026-10-16 实测 git rm 会以 pathspec 不匹配中断收敛）。
 // ⚠ 环境：需 **`source run/env.sh`**（DSH_HOME 指向开发 home）——「无未结审计发现」这道前置要调
@@ -19,17 +20,17 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, renameSync, rmSync } from 'node:fs'
 import { join, basename } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { archiveMovePlan, charterHasEntry, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
+import { archiveMovePlan, charterHasEntry, convergenceResume, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
 import { COMPANY_ROLE_IDS } from './lib/company-roles.mjs'
 import { spawnSync } from 'node:child_process'
 
 const args = process.argv.slice(2)
 // 旗标解析单源 = tools/lib/converge-rules.mjs parseFlags（未知旗标 fail-loud——BUG-016①：
 // `--plan` 曾被文档发明出来，传了还被静默「碰巧能跑」）
-let DRY, SLUG_ARG, BACKFILL_ARG, ALLOW_NO_JOURNAL, ALLOW_OPEN_FINDINGS
+let DRY, SLUG_ARG, BACKFILL_ARG, RESUME_ARG, ALLOW_NO_JOURNAL, ALLOW_OPEN_FINDINGS
 try {
   const flags = parseFlags(args)
-  DRY = flags.dryRun; SLUG_ARG = flags.slug; BACKFILL_ARG = flags.charterBackfill; ALLOW_NO_JOURNAL = flags.allowNoJournal; ALLOW_OPEN_FINDINGS = flags.allowOpenFindings
+  DRY = flags.dryRun; SLUG_ARG = flags.slug; BACKFILL_ARG = flags.charterBackfill; RESUME_ARG = flags.resume; ALLOW_NO_JOURNAL = flags.allowNoJournal; ALLOW_OPEN_FINDINGS = flags.allowOpenFindings
 } catch (e) { console.error(`✗ ${e.message}`); process.exit(1) }
 const WS = join(ROOT, 'company-workspace')
 const ACTIVE = join(WS, 'deliverables')
@@ -108,6 +109,30 @@ const harvestJournal = (slug) => {
   return moved
 }
 
+/**
+ * 清 live journal（幂等；收敛与续跑共用）。
+ * ⚠ 未跟踪的 journal 不能走 `git rm`（刚由角色写入、尚未入库时是常态）——2026-10-16 实测：
+ * 真会话补做收口时新建 `kb/<role>/journal/<日期>-<slug>-收口补记.md`，`git rm` 直接抛
+ * `fatal: pathspec … did not match`，**收敛中断在半途**（BUG-020）。
+ * 判据 = `git ls-files --error-unmatch`；未跟踪的用 rmSync 清，语义等价（都进证据副本）。
+ * ⚠ `.gitkeep` 只在缺时写——幂等（重写会让一个未改动的 tracked 文件凭空出现在 `git status`）。
+ * @returns 已清路径清单（相对仓库根）。
+ */
+const clearLiveJournal = journal => {
+  const removed = []
+  for (const j of journal) {
+    const p = join('company-workspace', j.path)
+    const tracked = spawnSync('git', ['ls-files', '--error-unmatch', '--', p], { cwd: ROOT, encoding: 'utf8' }).status === 0
+    if (tracked) git(['rm', '-q', p])
+    else rmSync(join(ROOT, p), { force: true })
+    removed.push(p)
+    const roleDir = join(WS, 'kb', j.role, 'journal')
+    const keep = join(roleDir, '.gitkeep')
+    if (readdirSync(roleDir).length === 0 && !existsSync(keep)) writeFileSync(keep, '')
+  }
+  return removed
+}
+
 const copyEvidence = (evDir, journal) => {
   // ⚠ 证据副本只收 **journal**（它们被从 live 删除，需要留底）；交付物本体 = git mv 进
   //   deliverables-archive（持久拷贝）——再拷一份进 snapshots 是双份存储（2026-10-12 实测把
@@ -137,6 +162,43 @@ const appendLedger = (fields) => {
   lines.splice(last + 1, 0, row)
   writeFileSync(LEDGER, lines.join('\n'))
   return row
+}
+
+/**
+ * 半态续跑（BUG-020，2026-10-16）。只做**剩余步骤**（清 live journal → 台账行 → 打印 backfill），
+ * **不搬移已归档的交付物**；不可续跑时 fail-loud 并给恢复指引。
+ * 判定纯逻辑 = `convergenceResume`（keyless spec = tests/company/converge-rules.spec.ts）。
+ */
+const resume = (dirName) => {
+  const slug = dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '')
+  const journal = harvestJournal(slug)
+  const state = convergenceResume({
+    dirName,
+    journalled: journal.length > 0,
+    hasFinal: existsSync(join(ACTIVE, dirName)),
+    archived: existsSync(join(ARCHIVE, dirName)),
+  })
+  if (!state.resumable) {
+    console.error(`✗ ${dirName}: 不可续跑（${state.reason}）——` + (state.reason === 'still-active'
+      ? `交付物还在活跃区，请走正常收敛：node tools/converge.mjs --slug ${dirName}`
+      : '活跃区与归档家都没有它：核对目录名，或从未收敛过'))
+    process.exit(1)
+  }
+  const metaBody = readFileSync(join(ARCHIVE, dirName, 'meta.md'), 'utf8')
+  const field = k => (metaBody.match(new RegExp(`^${k}:\\s*(.*)$`, 'm'))?.[1] ?? '').trim()
+  const fields = { slug: field('slug') || slug, kickoff: field('kickoff') || dirName.slice(0, 10),
+    类型: field('类型'), 参与: field('参与'), 墙钟: field('墙钟'), 结论: field('一句话结论') }
+  console.log(`续跑收敛 · ${dirName}（剩余：${state.remaining.join(' / ')}）`)
+  if (journal.length > 0) {
+    const evDir = join(ROOT, 'snapshots', 'archive', `convergence-${today}`, dirName)
+    copyEvidence(evDir, journal)
+    console.log(`  · 证据副本 → snapshots/archive/convergence-${today}/${dirName}/（journal ×${journal.length}）`)
+    const removed = clearLiveJournal(journal)
+    console.log(`  · 清 live journal ×${removed.length}`)
+  } else console.log('  · 零 live journal 可清（journal 步已完成——续跑幂等）')
+  appendLedger(fields)
+  console.log('✓ 续跑完成：交付物仍在归档家（本命令不搬移）、台账行已处理')
+  console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/converge.mjs --charter-backfill ${dirName}`)
 }
 
 const converge = (dirName) => {
@@ -234,20 +296,7 @@ const converge = (dirName) => {
   const move = archiveMovePlan(dirName)
   renameSync(join(ROOT, move.from), join(ROOT, move.to))
   git(move.gitArgs)
-  const removed = []
-  for (const j of journal) {
-    const p = join('company-workspace', j.path)
-    // ⚠ 未跟踪的 journal 不能走 `git rm`（刚由角色写入、尚未入库时是常态）——2026-10-16 实测：
-    // 真会话补做收口时新建 `kb/<role>/journal/<日期>-<slug>-收口补记.md`，收敛器 `git rm` 直接抛
-    // `fatal: pathspec … did not match`，**中断在半途**（交付物已搬、journal 清了一半）。
-    // 判据 = `git ls-files --error-unmatch`；未跟踪的用 rmSync 清，语义与 git rm 等价（都进证据副本）。
-    const tracked = spawnSync('git', ['ls-files', '--error-unmatch', '--', p], { cwd: ROOT, encoding: 'utf8' }).status === 0
-    if (tracked) git(['rm', '-q', p])
-    else rmSync(join(ROOT, p), { force: true })
-    removed.push(p)
-    const roleDir = join(WS, 'kb', j.role, 'journal')
-    if (readdirSync(roleDir).length === 0) writeFileSync(join(roleDir, '.gitkeep'), '')
-  }
+  const removed = clearLiveJournal(journal)
   const row = appendLedger(fields)
   console.log(`✓ 收敛完成：交付物已入归档家、${journal.length} 篇 journal 清入证据副本、台账行已追加`)
   console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/converge.mjs --charter-backfill ${dirName}（教训性文字仍由人把守——纪要素材逐字取 meta）`)
@@ -290,6 +339,7 @@ const charterBackfill = (dirName) => {
   console.log(`✓ backfill 完成：${slug} → ${roles.length} 角色 CHARTER`)
 }
 
+if (RESUME_ARG) { resume(RESUME_ARG); process.exit(0) }
 if (BACKFILL_ARG) { charterBackfill(BACKFILL_ARG); process.exit(0) }
 if (SLUG_ARG) { converge(SLUG_ARG); process.exit(0) }
 console.log(`收敛计划 @ ${today}${DRY ? '（dry-run）' : ''}\n`)

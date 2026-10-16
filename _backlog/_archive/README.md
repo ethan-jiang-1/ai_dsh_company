@@ -72,6 +72,7 @@
 | [BUG-016-converge-self-description-drift.md](fixed_bugs/BUG-016-converge-self-description-drift.md) | converge 自述三处失真：参数唯一源归工具头注（未知旗标 fail-loud）+ 文案对齐 journal-only 与 --charter-backfill | 2026-10-12 |
 | [BUG-017-record-hygiene-residue.md](fixed_bugs/BUG-017-record-hygiene-residue.md) | 记录残留：归档卡计数统一、stray 断链删、台账叙述校正、补 convergence implemented Note | 2026-10-12 |
 | [BUG-018-authorship-instance-preset-false-positive.md](fixed_bugs/BUG-018-authorship-instance-preset-false-positive.md) | 署名审计把同角色多实例 preset（coo vs coo-2）判成署名不实：写入者归属补基础角色规范化，真盘 10 条假阳性清零 | 2026-10-16 |
+| [BUG-020-converge-crash-untracked-journal.md](fixed_bugs/BUG-020-converge-crash-untracked-journal.md) | 收敛半态可续跑：清 journal 判 tracked（未跟踪不再致崩）＋converge --resume（只做剩余步骤） | 2026-10-16 |
 
 ## 随卡归档的研究
 

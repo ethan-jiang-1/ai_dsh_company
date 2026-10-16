@@ -1,6 +1,6 @@
 # 收口机制端到端质检（2026-10-16）：真 CEO 会话补做收口＋撞出 converge 崩溃缺陷
 
-状态：implemented（授权 = 用户 2026-10-16「你来模拟做, 你有测试能力, 然后看看实际质量如何, 我授权你…完整完成」；现场 = [settled_issues/2026-10-16-all-in-ai-ceo-closeout](../../_backlog/_archive/settled_issues/2026-10-16-all-in-ai-ceo-closeout.md)；新缺陷 = [BUG-020](../../_backlog/bugs/BUG-020-converge-crash-untracked-journal.md)；commit = 见本 Note 同轮）
+状态：implemented（授权 = 用户 2026-10-16「你来模拟做, 你有测试能力, 然后看看实际质量如何, 我授权你…完整完成」；现场 = [settled_issues/2026-10-16-all-in-ai-ceo-closeout](../../_backlog/_archive/settled_issues/2026-10-16-all-in-ai-ceo-closeout.md)；新缺陷 = [BUG-020](../../_backlog/_archive/fixed_bugs/BUG-020-converge-crash-untracked-journal.md)；commit = 见本 Note 同轮）
 
 ## 做了什么（方法）
 
@@ -28,7 +28,7 @@
 
 ## 撞出的基础设施缺陷（本轮主要收获）
 
-真会话一跑，收敛路径立刻暴露两处，已立 [BUG-020](../../_backlog/bugs/BUG-020-converge-crash-untracked-journal.md)：
+真会话一跑，收敛路径立刻暴露两处，已立 [BUG-020](../../_backlog/_archive/fixed_bugs/BUG-020-converge-crash-untracked-journal.md)：
 
 1. **`converge` 崩在未跟踪的 journal 上（本轮已修）**：CEO 新建的收口补记是**未跟踪**文件，而清 live journal 走 `git rm` ⇒ `fatal: pathspec … did not match`，收敛**中断在半途**（交付物已搬、journal 清一半、台账未追加）。修法 = 先 `git ls-files --error-unmatch` 判 tracked，未跟踪走 `rmSync`；头注里那句「git rm 只动 tracked 文件」的**假设**改成明示分支。此文同时更正了工具头注与自身合同的失真。
 2. **崩后无续跑（未修，BUG-020 主项）**：重跑同命令得 `✗ deliverables/ 下无此目录或缺 meta.md`——收敛器只从活跃区找 slug，认不出半态。本轮只能**按证据手工补完**（证据副本与 live 原件逐字节 `cmp` 全同 ⇒ `git rm` 清 4 份副本；台账行用收敛器自己的口径逐字取 meta 结论补 1 行）。**「人按证据手工补完」正是该被 ② 消掉的那件事。**
