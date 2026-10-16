@@ -3,7 +3,7 @@
  * 三条规则各有自己的事故卡：journal 归属 = 2026-10-12 前缀误吞教训（BUG-014 卡引用）；
  * 查重锚 = BUG-014（子串查重假跳过）；证据目录解析 = BUG-015（日期耦合写断链）。
  */
-import { existsSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, sep } from 'node:path'
 
 /** journal 文件名 → 所属 slug；无属主 = null（当轮散件，不清）。
@@ -73,6 +73,62 @@ export function convergenceResume(input) {
   if (input.journalled) remaining.push('journal')
   remaining.push('ledger', 'backfill')
   return { resumable: true, reason: 'ok', remaining }
+}
+
+/**
+ * 归档区里找一场动议的 journal（converge 的证据副本形状）。
+ *
+ * 事故（2026-10-16）：`converge.mjs` 把 journal 留底到 `<场景>/<dirName>/journal/<role>/`，
+ * 而 `journal-audit` 只查老形状 `<场景>/workspace.actual/kb/<role>/journal/`（那是
+ * `memory-convergence-*` 时代的整盘拷贝形状）⇒ **命名换代时这条链接断了**：收敛过的场次
+ * 明明有证据在盘，审计却报「五职全缺席」。实测 16 条缺席里 9 场有证据。
+ * @param input - `{ dirs, slug }`：`dirs` = 候选目录（由调用方按形状枚举）；`slug` = 目标动议。
+ * @returns 命中文件的**绝对路径**；未命中 = null。
+ */
+export function pickArchivedJournal(input) {
+  // ⚠ **只认文件名命中**（2026-10-16 两次实测定的口径）：
+  //   ① 先试「文件名含 slug」——最强证据，唯一可靠；
+  //   ② 文件名认不出 slug 时（`日期待核-<slug>.md` 这类历史命名）**才**退回「文件名末尾段 == slug」
+  //      的精确等值，不做**正文包含**。
+  // 为什么不做正文包含：journal 正文常引用别的 slug（判决、交叉引用），包含式匹配会把 A 场的
+  // 纪要当成 B 场的证据——实测 `emergency-x` 的 coo 行被解析到 `role-boundary-diagnosis-2026/journal/coo/…`
+  // （完全无关的一份文件），那是**假阳性在场**：比漏报更坏，因为它会静默掩盖真缺口。
+  for (const dir of input.dirs ?? []) {
+    if (!existsSync(dir)) continue
+    let names
+    try { names = readdirSync(dir) } catch { continue }
+    for (const name of names) {
+      const path = join(dir, name)
+      let isFile = false
+      try { isFile = statSync(path).isFile() } catch { continue }
+      if (!isFile) continue
+      if (name.includes(input.slug)) return path
+      // 历史命名：`<前缀>-<slug>.md` / `日期待核-<slug>.md` ⇒ 剥 `.md` 后按 `-` 分段做**精确尾段**判等
+      const base = name.replace(/\.md$/, '')
+      if (base === input.slug || base.endsWith(`-${input.slug}`)) return path
+    }
+  }
+  return null
+}
+
+/**
+ * 台账「参与」列的规范写法（2026-10-16 立；口径唯一家 = 门禁 `checks/gates/ledger-participation.mjs` 注释）。
+ *
+ * 为什么住这里：**写入点（`converge.mjs` 追加台账行）与守卫（门禁）必须同一把尺**——否则
+ * 收敛写进去的行会被自家门禁判红（2026-10-16 实测：真动议收敛后新增一行即触发
+ * `ledger-participation` 红，因为写入点照抄 meta 的「参与」原文 `CEO+VP-Eng+VP-Sales+COO+CFO`）。
+ * @param raw - meta 的「参与」字段原文（如 `CEO+VP-Eng+VP-Sales+COO+CFO`、`CEO+全职能`）。
+ * @returns 规范写法：五角色集合 ⇒ `全员五人`；否则按固定序 `+` 连接；含非角色名 ⇒ `—`。
+ */
+export function canonicalParticipation(raw) {
+  const ROLES = ['CEO', 'VP-Eng', 'VP-Sales', 'COO', 'CFO']
+  const value = String(raw ?? '').trim()
+  if (value === '') return '—'
+  if (value === '全员五人' || value === 'CEO+全职能') return '全员五人'
+  const parts = value.replace(/（[^）]*）/g, '').split('+').map(part => part.trim()).filter(Boolean)
+  const uniq = [...new Set(parts)]
+  if (uniq.length === 0 || uniq.some(role => !ROLES.includes(role))) return '—'
+  return uniq.length === ROLES.length ? '全员五人' : uniq.sort((a, b) => ROLES.indexOf(a) - ROLES.indexOf(b)).join('+')
 }
 
 /** CHARTER 是否已有该 slug 的历史纪要**条目**。

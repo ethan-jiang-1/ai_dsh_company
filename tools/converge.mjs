@@ -20,7 +20,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, renameSync, rmSync } from 'node:fs'
 import { join, basename } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { archiveMovePlan, charterHasEntry, convergenceResume, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
+import { archiveMovePlan, canonicalParticipation, charterHasEntry, convergenceResume, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
 import { COMPANY_ROLE_IDS } from './lib/company-roles.mjs'
 import { spawnSync } from 'node:child_process'
 
@@ -153,7 +153,8 @@ const appendLedger = (fields) => {
     console.log(`  · 台账已有 ${fields.slug} 行——跳过追加（不重复登记）`)
     return null
   }
-  const row = `| ${fields.slug} | ${fields.kickoff} | ${fields.类型 || '—'} | ${fields.参与 || '—'} | ${fields.墙钟 || '未记'} | ✅ | ${fields.结论} |`
+  // 参与列按口径规范化（写入点与门禁同一把尺；照抄 meta 原文会被自家门禁判红——2026-10-16 实测）
+  const row = `| ${fields.slug} | ${fields.kickoff} | ${fields.类型 || '—'} | ${canonicalParticipation(fields.参与)} | ${fields.墙钟 || '未记'} | ✅ | ${fields.结论} |`
   const t = readFileSync(LEDGER, 'utf8')
   const lines = t.split('\n')
   let last = -1

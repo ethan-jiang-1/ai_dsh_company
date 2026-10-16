@@ -21,6 +21,7 @@ import { execFileSync, execSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { snapshotScenes } from '../../tools/lib/repository-layout.mjs'
+import { pickArchivedJournal } from '../../tools/lib/converge-rules.mjs'
 import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
@@ -54,12 +55,19 @@ const SINCE = Date.parse(argOf('--since') ?? '2026-09-24T00:00:00Z')
 /**
  * 已知历史缺口名册（2026-10-05 立；观察项档，不进退出码）。入册三条件：①缺席为真且角色侧
  * 已承认（CHARTER/Note 既成记录）；②场次早于纪律强制面落地（journal 硬闸门语气 2026-09-25
- * 才进 skill——journal-presence-mechanism Note）；③经标定期判例确认（同 Note：emergency-x 的
- * coo 缺席与 CHARTER「当轮未留 journal（W8 同款缺口）」一致）。**删本条 = 掩盖已承认的事实**；
- * 它挡的只是「退出码被永远已知的一条历史缺席占住、新信号被淹」这一种病。
+ * 才进 skill——journal-presence-mechanism Note）；③经标定期判例确认。
+ *
+ * ⚠ **2026-10-16 二次标定（检索口径收紧后复核）**：当日先修「只认老归档形状」的检索盲区，
+ * 中途一度据「内容命中」判 coo 在场并清了名册——**那是假阳性**（内容匹配把别的场的纪要当成
+ * 本场证据）。收紧为**只认文件名命中**后复核：`emergency-x-incident-review` 的归档区**确实只有
+ * ceo 一篇**（`workspace.actual/kb/ceo/journal/…`），coo 与 vp-eng 当轮真没留 journal——
+ * 与 `kb/coo/CHARTER.md:34`、`kb/vp-eng/CHARTER.md:30` 的「当轮未留 journal，W8 同款缺口」
+ * 逐字对上 ⇒ **两处都是已承认的真缺口，名册该收两条（原来只收了 coo，漏了 vp-eng）**。
+ * 教训写在这里：**在场判据宁可收紧**——假阳性在场会比漏报更坏，它会静默掩盖真缺口。
  */
 const KNOWN_MISSES = [
   { sessionIdPrefix: '6a0e551f', role: 'coo', reason: 'emergency-x 09-24：硬闸门（09-25 落地）前的场次，CHARTER 已承认（W8 同款缺口）' },
+  { sessionIdPrefix: '6a0e551f', role: 'vp-eng', reason: 'emergency-x 09-24：同场同因，CHARTER「当轮未留 journal，W8 同款缺口」已承认（2026-10-16 补入）' },
 ]
 const isKnownMiss = (entry, role) =>
   KNOWN_MISSES.some(k => entry.sessionId.startsWith(`session-${k.sessionIdPrefix}`) && k.role === role)
@@ -155,16 +163,25 @@ function motionOf(entry) {
 function archived(workspace, role, slug) {
   if (slug === undefined) return null
   const repoRoot = resolve(workspace, '..')
+  // 两种归档形状都认（判据纯逻辑 = lib `pickArchivedJournal`，keyless spec 在
+  // tests/company/converge-rules.spec.ts）：
+  //   ① 老：`<场景>/workspace.actual/kb/<角色>/journal/`（memory-convergence-* 的整盘拷贝形状）；
+  //   ② 新：`<场景>/<dirName>/journal/<角色>/`（现行 converge 的证据副本形状）。
+  // ⚠ 2026-10-16 实测：只认形状① ⇒ 命名换代后**收敛过的场次全被误报缺席**（16 条缺席里 9 场有证据）。
   for (const scene of snapshotScenes(repoRoot)) {
-    const dir = join(scene.path, 'workspace.actual', 'kb', role, 'journal')
-    if (!existsSync(dir)) continue
-    for (const name of readdirSync(dir)) {
-      const path = join(dir, name)
-      if (!statSync(path).isFile()) continue
-      if (name.includes(slug) || readFileSync(path, 'utf8').includes(slug)) return `${scene.kind}/${scene.name}/${name}`
-    }
+    const dirs = [
+      join(scene.path, 'workspace.actual', 'kb', role, 'journal'),
+      ...readdirSyncSafe(scene.path).map(entry => join(scene.path, entry, 'journal', role)),
+    ]
+    const hit = pickArchivedJournal({ dirs, slug })
+    if (hit !== null) return `${scene.kind}/${scene.name}/${hit.slice(scene.path.length + 1)}`
   }
   return null
+}
+
+/** 列目录，失败给空数组（场景目录可能被清过 / 无权限）。 */
+function readdirSyncSafe(dir) {
+  try { return readdirSync(dir, { withFileTypes: true }).filter(e => e.isDirectory()).map(e => e.name) } catch { return [] }
 }
 
 /** 三级匹配：确认 / 存疑 / 违规。 */

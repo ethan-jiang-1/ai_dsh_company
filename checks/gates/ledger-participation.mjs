@@ -1,6 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { canonicalParticipation } from '../../tools/lib/converge-rules.mjs'
 
 // ── 台账「参与」列口径门禁（ledger-participation，2026-10-16 立）──────────────────
 // 为什么：2026-10-16 真动议诊断实测——`kb/motion-ledger.md` 的「参与」列 **36 行 18 种写法**，
@@ -20,17 +21,13 @@ import { join } from 'node:path'
 //   ③ 把某行改成 `全员` （集合不完整）→ 红。还原 → 全绿。
 export function run({ root, ok, fail }) {
   const LEDGER = join(root, 'company-workspace', 'kb', 'motion-ledger.md')
-  const ROLES = ['CEO', 'VP-Eng', 'VP-Sales', 'COO', 'CFO']
+  // 判据单一来源 = lib `canonicalParticipation`（写入点 converge.mjs 与门禁同一把尺）；
+  // 非角色名/空 ⇒ lib 给 `—`，在本门禁里视为不合规。
   const canonical = raw => {
     const value = raw.trim()
     if (value === '') return undefined
-    if (value === '全员五人') return '全员五人'   // 集合恰五人的规范写法（不是角色名拼接）
-    const parts = value.replace(/（[^）]*）/g, '').split('+').map(part => part.trim()).filter(Boolean)
-    if (parts.length === 0) return undefined
-    const uniq = [...new Set(parts)]
-    if (uniq.some(role => !ROLES.includes(role))) return undefined
-    if (uniq.length === ROLES.length) return '全员五人'
-    return [...uniq].sort((a, b) => ROLES.indexOf(a) - ROLES.indexOf(b)).join('+')
+    const want = canonicalParticipation(value)
+    return want === '—' ? undefined : want
   }
   let text
   try {

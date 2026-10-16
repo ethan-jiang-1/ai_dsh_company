@@ -1,8 +1,11 @@
-import { describe, expect, it } from 'vitest'
-import { mkdirSync, rmSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { archiveMovePlan, charterHasEntry, convergenceResume, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
+import { afterAll, describe, expect, it } from 'vitest'
+
+import { archiveMovePlan, canonicalParticipation, charterHasEntry, convergenceResume, journalPresence, journalSlug, parseFlags, pickArchivedJournal, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
+const TMP: string[] = []
+afterAll(() => { for (const d of TMP) rmSync(d, { recursive: true, force: true }) })
 
 // converge.mjs 的纯判定规则（判据单一来源 = tools/lib/converge-rules.mjs；IO 在驱动脚本
 // ——沙箱对照实验与真仓复现收据见 _backlog 卡 BUG-014 / BUG-015）。
@@ -26,6 +29,69 @@ describe('converge-rules · journal 归属（2026-10-12 前缀误吞教训）', 
   })
   it('当轮散件（无属主）不清', () => {
     expect(journalSlug('2026-10-12-loose-note.md', 'ai-coding-security-2026', allSlugs)).toBeNull()
+  })
+})
+
+describe('converge-rules · 台账「参与」列规范化（2026-10-16 立；事故 = 收敛写进去的行被自家门禁判红）', () => {
+  it('五角色全集 ⇒ 全员五人（无论拼写与顺序）', () => {
+    expect(canonicalParticipation('CEO+VP-Eng+VP-Sales+COO+CFO')).toBe('全员五人')
+    expect(canonicalParticipation('CEO+VP-Sales+VP-Eng+COO+CFO')).toBe('全员五人')
+    expect(canonicalParticipation('CEO+全职能')).toBe('全员五人')
+    expect(canonicalParticipation('全员五人')).toBe('全员五人')
+  })
+
+  it('子集 ⇒ 按固定序 CEO→VP-Eng→VP-Sales→COO→CFO 连接', () => {
+    expect(canonicalParticipation('CEO+CFO+COO')).toBe('CEO+COO+CFO')
+    expect(canonicalParticipation('CEO+VP-Sales+CFO')).toBe('CEO+VP-Sales+CFO')
+  })
+
+  it('去注解（括号内容）后再判', () => {
+    expect(canonicalParticipation('CEO+CFO+COO（VP 缺席如实）')).toBe('CEO+COO+CFO')
+  })
+
+  it('非角色名 / 空 ⇒ —（写入点不写垃圾进台账）', () => {
+    expect(canonicalParticipation('全员')).toBe('—')
+    expect(canonicalParticipation('')).toBe('—')
+    expect(canonicalParticipation(undefined)).toBe('—')
+  })
+})
+
+describe('converge-rules · 归档 journal 检索（2026-10-16 立；事故 = 命名换代后收敛场次全被误报缺席）', () => {
+  // 真现场：converge 把 journal 留底到 `<场景>/<dirName>/journal/<role>/`，而 journal-audit 只查
+  // 老形状 `<场景>/workspace.actual/kb/<role>/journal/`（memory-convergence-* 时代）⇒ 16 条缺席里
+  // 9 场其实有证据。判据 = pickArchivedJournal（文件名命中优先于内容命中）。
+  const dir = mkdtempSync(join(tmpdir(), 'archived-journal-'))
+  TMP.push(dir)
+  mkdirSync(join(dir, 'ceo'), { recursive: true })
+  writeFileSync(join(dir, 'ceo', '2026-10-16-target-slug.md'), '# 目标场自己的 journal\n')
+  writeFileSync(join(dir, 'ceo', '2026-10-10-other.md'), '# 别的场\n\n正文提到 target-slug（交叉引用）\n')
+
+  it('文件名命中即返回（不被同目录里「正文提到该 slug」的别的文件抢走）', () => {
+    const hit = pickArchivedJournal({ dirs: [join(dir, 'ceo')], slug: 'target-slug' })
+    expect(hit, '必须命中文件名本身就是目标 slug 的那份').toContain('2026-10-16-target-slug.md')
+  })
+
+  it('只有「正文提到该 slug」⇒ **不算在场**（假阳性在场会静默掩盖真缺口）', () => {
+    // 这是 2026-10-16 二次标定的产物：首版按「正文包含 slug」判定，于是 emergency-x 的 coo 行
+    // 被解析到 `role-boundary-diagnosis-2026/journal/coo/…`（完全无关的一份文件）——假阳性在场。
+    // 收紧为只认文件名命中后：目标文件删掉、只剩「别的场正文提到该 slug」时，必须给 null。
+    rmSync(join(dir, 'ceo', '2026-10-16-target-slug.md'))
+    expect(pickArchivedJournal({ dirs: [join(dir, 'ceo')], slug: 'target-slug' })).toBeNull()
+  })
+
+  it('历史命名（`<前缀>-<slug>.md`）按精确尾段命中', () => {
+    writeFileSync(join(dir, 'ceo', '日期待核-target-slug.md'), '# 日期待核的历史场次\n')
+    expect(pickArchivedJournal({ dirs: [join(dir, 'ceo')], slug: 'target-slug' }))
+      .toContain('日期待核-target-slug.md')
+    rmSync(join(dir, 'ceo', '日期待核-target-slug.md'))
+  })
+
+  it('都没命中 ⇒ null（不误报在场）', () => {
+    expect(pickArchivedJournal({ dirs: [join(dir, 'ceo')], slug: 'no-such-slug' })).toBeNull()
+  })
+
+  it('目录不存在 ⇒ null（不抛）', () => {
+    expect(pickArchivedJournal({ dirs: [join(dir, 'nope')], slug: 'x' })).toBeNull()
   })
 })
 
