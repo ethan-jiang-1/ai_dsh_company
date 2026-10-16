@@ -2,7 +2,7 @@
 
 当场修掉的不建卡。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。
 
-**下一个缺陷号**：Next BUG ID = 19；已分配 BUG-001..018。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 20；已分配 BUG-001..019。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，修相对链接并更新两边清单。
 
@@ -10,6 +10,7 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
+| [BUG-019](BUG-019-final-present-evidence-lost.md) | 会话日志被清理后 `final-not-presented` 变成不可证伪的红——判据分不清「真没 present」与「证据已丢失」，活跃件无豁免档 | P2 |
 
 BUG-001..018 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
