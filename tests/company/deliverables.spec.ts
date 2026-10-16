@@ -1,8 +1,4 @@
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { cpSync, mkdtempSync, readdirSync, rmSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join, relative } from 'node:path'
-import { afterAll, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { classifyDeliverable, deliverableId, isPlaceholderClaim, parseMeta, slugFromDirName, validateMeta } from '../../tools/lib/deliverables.mjs'
 
 /**
@@ -18,41 +14,10 @@ import { classifyDeliverable, deliverableId, isPlaceholderClaim, parseMeta, slug
  * （读 `$DSH_HOME` 的多帧 zstd 日志）是认证档，归 `checks/audit/deliverables-check.mjs`。
  */
 
-const R1 = join(ROOT, 'snapshots/replay/r1-motion')
-
-/** 递归列出目录下全部文件的相对路径（正斜杠）。 */
-function listFiles(dir: string, base: string = dir, out: string[] = []): string[] {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const path = join(dir, entry.name)
-    if (entry.isDirectory()) listFiles(path, base, out)
-    else out.push(relative(base, path).replaceAll('\\', '/'))
-  }
-  return out
-}
-
-// ⚠ 以下夹具（TMP_DIRS / r1CopyWith / afterAll）当前只被 ./deliverables-audit.spec.ts 的反证用例
-// 使用；2026-10-16 拆分按「逐字搬移」口径留在两侧（清理归后续轮，避免结构轮混入夹具去重）。
-const TMP_DIRS: string[] = []
-/** 把 r1 期望工作区拷到临时目录，供反证就地改。 */
-function r1CopyWith(mutate: (dir: string) => void): string {
-  const dir = mkdtempSync(join(tmpdir(), 'deliverables-spec-'))
-  TMP_DIRS.push(dir)
-  cpSync(join(R1, 'workspace.expected'), dir, { recursive: true })
-  mutate(dir)
-  return dir
-}
-
-afterAll(() => {
-  for (const dir of TMP_DIRS) rmSync(dir, { recursive: true, force: true })
-})
-
 // 本块原为「交付物三态判据（R4）」主 describe 的形状半边：2026-10-16 第三轮结构收敛把
 // **声明对账**半边按 describe 域机械拆去 ./deliverables-audit.spec.ts（测试体逐字搬移），
 // 留下的这些只断言形状与身份，不喂会话日志、不碰违规/观察码。
 
-// 本块原为「交付物三态判据（R4）」主 describe 的形状半边：2026-10-16 第三轮结构收敛把
-// **声明对账**半边按 describe 域机械拆去 ./deliverables-audit.spec.ts（测试体逐字搬移），
-// 留下的这些只断言形状与身份，不喂会话日志、不碰违规/观察码。
 describe('交付物形状与身份（R4 判据的基座半边）', () => {
   it('身份解析认平铺旧形状的两条约定：名字中段的角色、尾部 -final', () => {
     expect(deliverableId('deliverables/kb-rag-assessment.md')).toEqual({ slug: 'kb-rag-assessment', kind: 'final' })
