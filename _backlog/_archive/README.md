@@ -47,6 +47,7 @@
 | [2026-10-11-human-exits-replay-scene.md](settled_issues/2026-10-11-human-exits-replay-scene.md) | 已建成并零 diff 复演（阻塞拍板 replay 场景 + 场景级浏览器答题人） | 2026-10-11 |
 | [2026-10-12-backlog-process-made-explicit.md](settled_issues/2026-10-12-backlog-process-made-explicit.md) | 已实施并验收（制度显性化：缺陷通道＋双轨状态生命周期＋agent 门牌＋门禁镜像互查；去向 = implemented Note） | 2026-10-12 |
 | [2026-10-13-agent-cultivation.md](settled_issues/2026-10-13-agent-cultivation.md) | 已实施并验收（培养回路 C 路径首版：公司页培养入口＋记录闭环＋角色方法层跨会话生效；拍板三项与验证收据在卡；去向 = implemented Note D43） | 2026-10-13 |
+| [2026-10-16-code-structure-round3.md](settled_issues/2026-10-16-code-structure-round3.md) | 已实施并验收（deliverables 拆「形状与身份 / 声明对账」两模块＋spec 一一对应＋触发线；导出普查守恒与四条红证在 Note；Item 2 留独立第二轮） | 2026-10-16 |
 
 ## 已修缺陷
 
