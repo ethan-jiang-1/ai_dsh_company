@@ -449,6 +449,47 @@ describe('非 Lead present 过程稿的观察档（BUG-003，2026-10-06 多人 U
   })
 })
 
+// 负例留证 2026-10-16：把 `auditDeliverables` 里 `evidenceMissingBefore` 的分支去掉 →
+// 本块「声明给不可考」那条红（`expected [ 'final-not-presented' ] to deeply equal []`）；还原 → 绿。
+describe('证据可得性：声明给「这段时期拿不到」时，判据不再把「证据不可考」报成「声明缺失」（BUG-019 的可修部分）', () => {
+  // ⚠ 射程（如实）：**只有能从路径/slug 认出日期的件**才吃这条声明——
+  //   ① 活跃形状的目录名前缀（`deliverables/<日期>-<slug>/…`，本块用的就是它）；
+  //   ② 归档形状同款（`deliverables-archive/<日期>-<slug>/…`，但归档件另有 BUG-008 存档豁免）；
+  //   ③ 认不出日期的 slug ⇒ 视为**未覆盖**、维持严格判红（宁可判红，不静默放过）。
+  const UNCOVERED = ['deliverables/2026-09-22-pilot/final.md']
+
+  it('未声明 ⇒ 照旧判红（默认严格：没证据 ≠ 没问题）', () => {
+    const r = auditDeliverables({ workspaceFiles: UNCOVERED, sessions: [] })
+    expect(r.violations.map(v => v.code)).toEqual([VIOLATION.FINAL_NOT_PRESENTED])
+    expect(r.warnings.map(w => w.code)).toEqual([])
+  })
+
+  it('声明给「不可考」⇒ 该件转观察档 present-evidence-missing，违规面不再含它', () => {
+    const r = auditDeliverables({ workspaceFiles: UNCOVERED, sessions: [], evidenceMissingBefore: '2026-10-16' })
+    expect(r.violations.map(v => v.code)).toEqual([])
+    expect(r.warnings.map(w => w.code)).toEqual([WARNING.PRESENT_EVIDENCE_MISSING])
+  })
+
+  it('守卫：证据**可得**的件（present 在场）不受该声明影响', () => {
+    const r = auditDeliverables({
+      workspaceFiles: ['deliverables/2026-09-22-pilot/final.md'],
+      sessions: [leadSession('pilot', { presented: [{ path: 'deliverables/2026-09-22-pilot/final.md' }] })],
+      evidenceMissingBefore: '2026-10-16',
+    })
+    expect(r.violations).toEqual([])
+    expect(r.warnings.filter(w => w.code === WARNING.PRESENT_EVIDENCE_MISSING)).toEqual([])
+  })
+
+  it('守卫：声明期**之后**的件照旧判红（声明不是万能豁免）', () => {
+    const r = auditDeliverables({
+      workspaceFiles: ['deliverables/2026-10-20-late/final.md'],
+      sessions: [],
+      evidenceMissingBefore: '2026-10-16',
+    })
+    expect(r.violations.map(v => v.code)).toEqual([VIOLATION.FINAL_NOT_PRESENTED])
+  })
+})
+
 // 负例留证 2026-10-09：把 isPlaceholderYield 改成 `body.includes(PLACEHOLDER_YIELD_LINE)`
 //（子串匹配 = BUG-004 要防的「措辞走样也认」）→ 本条红（改动前全套 355 项仍全绿，故本条是本轮新加的钉子）；
 // 也让 `持认 ∧ 让位` 同时为真。还原 → 绿。

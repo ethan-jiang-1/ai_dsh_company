@@ -235,6 +235,8 @@ export function parseSessionLog(text) {
  *   - `sessions`：`parseSessionLog` 的产物数组；
  *   - `legacyFlat`：把平铺旧形状也算合法（只给已归档快照用）；
  *   - `leadPreset`：入口角色 preset id，默认 `ceo`；
+ *   - `evidenceMissingBefore`：声明「该日期之前的会话日志不可得」——落在该期内的「无 present 背书」
+ *     降为观察项 `present-evidence-missing`（证据不可考 ≠ 声明缺失，BUG-019）。不声明 = 严格判红；
  *   - `onlySlug`：只审这一个交付物。**审归档快照时必须给**——快照的 `workspace.expected/`
  *     是整盘拷贝，而 `sessions/` 只装本轮的日志；不给作用域就会把历史成品误报成
  *     "无 Lead 背书"（那是输入不成对，不是违规）。
@@ -247,6 +249,30 @@ export function auditDeliverables(input) {
   const leadPreset = input.leadPreset ?? 'ceo'
   // 只审一个 slug：按**归一后的 slug** 匹配（T-7——A1 日期前缀目录名 ≠ slug，字面前缀匹配会静默零匹配）。
   const onlySlug = input.onlySlug === undefined ? undefined : String(input.onlySlug)
+  // 证据可得性（BUG-019，2026-10-16）：调用方声明「该日期之前的会话日志不可得」⇒ 落在该期内的
+  // 「无 present 背书」从违规降为观察档（证据不可考 ≠ 声明缺失）。不声明 = 维持严格判红。
+  const evidenceMissingBefore = input.evidenceMissingBefore === undefined ? undefined : String(input.evidenceMissingBefore)
+  // 成品的「日期」按两类真实形状取：① **归档件**在目录名前缀里（`deliverables-archive/<日期>-<slug>/…`）；
+  // ② 活跃件**没有**日期在路径里，回落到 slug 内嵌的日期（`<...>-<YYYY>-<MM>` 这类命名）。
+  // 取不到日期 ⇒ 视为**未覆盖**（有待判证据地判红，不静默放过）。
+  const motionDateOf = relPath => {
+    const pathMatch = /(\d{4}-\d{2}-\d{2})-/.exec(relPath)
+    if (pathMatch !== null) return pathMatch[1]
+    const slug = deliverableId(relPath)?.slug
+    if (slug === undefined) return undefined
+    const parts = slug.split('-')
+    for (let i = 0; i + 1 < parts.length; i++) {
+      if (/^\d{4}$/.test(parts[i]) && /^\d{2}$/.test(parts[i + 1])) return `${parts[i]}-${parts[i + 1]}`
+    }
+    return undefined
+  }
+  const evidenceUncovered = relPath => {
+    if (evidenceMissingBefore === undefined) return false
+    const date = motionDateOf(relPath)
+    if (date === undefined) return false
+    // 前缀比较：日期同为 `YYYY-MM-DD` 形状时字典序即时间序（缺日的 `YYYY-MM` 视为该月首日，早于任何同日之后）。
+    return date < evidenceMissingBefore
+  }
   const inScope = path => onlySlug === undefined || deliverableId(path)?.slug === onlySlug
 
   const onDisk = new Set(workspaceFiles.map(normalizeRel).filter(inScope))
@@ -316,14 +342,23 @@ export function auditDeliverables(input) {
   }
 
   const violations = []
+  /** 证据不可考而降档的件（观察项，不判红）——见基座 `WARNING.PRESENT_EVIDENCE_MISSING`。 */
+  const evidenceMissing = []
   for (const final of finals) {
-    if (!leadFinalIds.has(idKey({ slug: final.slug, kind: 'final' }))) {
-      violations.push({
-        code: VIOLATION.FINAL_NOT_PRESENTED,
-        path: final.path,
-        detail: '成品在盘上，但没有任何 Lead 会话的 deliverables/presented 事件声明过这份交付物',
+    if (leadFinalIds.has(idKey({ slug: final.slug, kind: 'final' }))) continue
+    if (evidenceUncovered(final.path)) {
+      evidenceMissing.push({
+        code: WARNING.PRESENT_EVIDENCE_MISSING,
+        slug: final.slug,
+        detail: `成品 \`${final.path}\` 没有 present 背书，但审计源声明 \`${String(evidenceMissingBefore)}\` 之前的会话日志不可得 ⇒ **证据不可考，不判红**（要判红就把可得日志喂全：\`--sessions <dir>\`）`,
       })
+      continue
     }
+    violations.push({
+      code: VIOLATION.FINAL_NOT_PRESENTED,
+      path: final.path,
+      detail: '成品在盘上，但没有任何 Lead 会话的 deliverables/presented 事件声明过这份交付物',
+    })
   }
   for (const key of leadFinalIds) {
     if (!onDiskIds.has(key)) {
@@ -386,5 +421,5 @@ export function auditDeliverables(input) {
     })
   }
   const archived = partitionArchiveViolations(violations)
-  return { finals, drafts, metas, sources, materials, violations: archived.violations, warnings: [...warnings, ...archived.warnings], leadFinalSlugs: [...leadFinalSessions.keys()] }
+  return { finals, drafts, metas, sources, materials, violations: archived.violations, warnings: [...warnings, ...evidenceMissing, ...archived.warnings], leadFinalSlugs: [...leadFinalSessions.keys()] }
 }

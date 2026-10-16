@@ -16,6 +16,8 @@
 //        --sessions snapshots/replay/r1-motion --legacy-flat      # 审已归档快照（平铺旧形状）
 //   node checks/audit/deliverables-check.mjs --workspace snapshots/replay/r4-motion/workspace.expected \
 //        --sessions snapshots/replay/r4-motion --only support-sla-page   # 审快照里本轮那一件
+//   node checks/audit/deliverables-check.mjs --evidence-from 2026-10-01   # 声明「该日期前的日志不可得」
+//        ⇒ 该期内无 present 背书的成品降为观察项 present-evidence-missing（不判红；BUG-019）
 //
 // ⚠ 审归档快照必须配 `--only <slug>`：快照的 `workspace.expected/` 是**整盘拷贝**，而
 //   `sessions/` 只装本轮日志——不给作用域会把历史成品误报成"无 Lead 背书"（输入不成对）。
@@ -39,6 +41,8 @@ const arg = (name, fallback) => {
 const LEGACY_FLAT = process.argv.includes('--legacy-flat')
 /** 只审一个交付物（审归档快照必给，见文件头）。 */
 const ONLY_SLUG = arg('only')
+/** 证据可得性（BUG-019）：声明「该日期之前的会话日志不可得」⇒ 该期内无 present 背书的成品降观察档。 */
+const EVIDENCE_FROM = arg('evidence-from')
 
 const workspaceRel = arg('workspace', 'company-workspace')
 const workspace = resolve(ROOT, workspaceRel)
@@ -130,6 +134,7 @@ const result = auditDeliverables({
   sessions,
   legacyFlat: LEGACY_FLAT,
   ...(ONLY_SLUG === undefined ? {} : { onlySlug: ONLY_SLUG }),
+  ...(EVIDENCE_FROM === undefined ? {} : { evidenceMissingBefore: EVIDENCE_FROM }),
 })
 
 // 观察项②（本脚本侧，不进纯逻辑库）：盘上每个 slug 都该在动议台账里有行。

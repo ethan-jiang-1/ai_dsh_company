@@ -58,6 +58,13 @@ export const WARNING = {
    * 历史行为不追溯红（观察项每次提醒），成品侧越权仍是既有违规（两档并存不互吞）。
    */
   DRAFT_PRESENTED_BY_NON_LEAD: 'draft-presented-by-non-lead',
+  /**
+   * 成品没有 present 背书，但**调用方声明这段时期拿不到会话日志** ⇒ 证据不可考、不判红
+   * （BUG-019，2026-10-16）。与 `VIOLATION.FINAL_NOT_PRESENTED` 的分工：那条是「**有**证据而
+   * 证据里没有声明」，这条是「**没有**证据可查」。只有调用方显式给 `evidenceMissingBefore` 才可能
+   * 出现——不声明则维持严格判红（**没证据 ≠ 没问题**）。
+   */
+  PRESENT_EVIDENCE_MISSING: 'present-evidence-missing',
 }
 
 /** 占位抢注的首行形状（R0-2，2026-10-03；「一字不差」是机器可查的前提，合同家 = multi-human.md §3 纪律 5）。 */

@@ -10,9 +10,8 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-019](BUG-019-final-present-evidence-lost.md) | `final-not-presented` 的判别盲区（日志残缺时不可证伪）——**本案经深挖为真阳性**（收口会话从未调 present）；盲区 latent，待优先级 | P2 |
 
-BUG-001..018 与 BUG-020 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；BUG-019 仍活跃。
+BUG-001..020 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

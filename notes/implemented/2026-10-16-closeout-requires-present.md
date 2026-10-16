@@ -4,7 +4,7 @@
 
 ## 事故（先把事实钉死）
 
-`deliverables/2026-10-13-all-in-ai-2026/final.md` 在真盘常红 `final-not-presented`。深挖结论（证据链见 [BUG-019](../../_backlog/bugs/BUG-019-final-present-evidence-lost.md)）：
+`deliverables/2026-10-13-all-in-ai-2026/final.md` 在真盘常红 `final-not-presented`。深挖结论（证据链见 [BUG-019](../../_backlog/_archive/fixed_bugs/BUG-019-final-present-evidence-lost.md)）：
 
 - 收口会话 `session-350eb581`（557 行）**95 次 `tool/call` 里没有 `present`**；收口靠 `write` 写 final + `team_task_update` 收任务；
 - **`present` 当时就在工具表里**（该会话 `request/header` 含 `{"name":"present","description":"Declare existing files as final del…`）⇒ 工具在手、没用；
