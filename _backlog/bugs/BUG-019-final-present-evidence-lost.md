@@ -4,76 +4,66 @@ severity: P2
 opened: 2026-10-16
 ---
 
-# BUG-019：会话日志被清理后 `final-not-presented` 变成不可证伪的红（活跃件无豁免档）
+# BUG-019：`final-not-presented` 的判别盲区（会话日志残缺时不可证伪）——**本案经查为真阳性**
 
-> 严重级别：P2（次要——不阻断任何验收，但把「证据不可考」报成「声明缺失」，且活跃件没有 2026-10-10 那类存量豁免档）｜发现：2026-10-16｜状态：调查中
+> 严重级别：P2（次要——不阻断验收；且**本案不是它的实例**，见下）｜发现：2026-10-16｜状态：调查中
+>
+> ⚠ **本卡经 2026-10-16 深挖后，首版诊断被推翻一半**：原假设「证据已随会话日志清理丢失」**不成立**——本案的 `final-not-presented` 是**真阳性**（收口会话从未调用 `present`，见「深挖结论」）。工具**判对了**。卡保留，因为「分不清『真没声明』与『证据不可考』」这个**判别盲区仍然存在**，只是本案没命中它。
 
-## 症状
+## 深挖结论（2026-10-16；推翻本卡首版的诊断）
 
-真盘 `source run/env.sh && node checks/audit/deliverables-check.mjs` exit 1，剩一条违规：
+**首版诊断（错）**：会话日志被轮换/清理 ⇒ `present` 证据永久丢失 ⇒ 判据把「证据不可考」报成「声明缺失」。
+**实测结论（对）**：**`present` 声明从未发生**。证据链：
 
-```
-违规 1 条：
-  final-not-presented | deliverables/2026-10-13-all-in-ai-2026/final.md
-    成品在盘上，但没有任何 Lead 会话的 deliverables/presented 事件声明过这份交付物
-```
+1. **收口会话 = `session-350eb581`**（journal-audit 认得它，`all-in-ai-2026 @ 2026-10-13T09:51`），日志在 `runtime/harness-home/sessions/--Users-bowhead-ai_dsh_company-company-workspace--/session-350eb581-…/session.v4.jsonl.zstd`，557 行。
+2. **该会话调过 16 类工具、95 次 `tool/call`，其中没有 `present`**：
+   `skill, bash, read, session_search, web_search, write, edit, team_task_create, spawn_teammate, send_message, wait_agent, list_agents, team_task_list, team_task_update, schedule_create, ask_user_question`
+   ——收口靠 `write` 把 `final.md` 写进盘，再 `team_task_update` 收任务。
+3. **`present` 当时确实在工具表里**（该会话 `request/header` 的工具清单含 `{"name":"present","description":"Declare existing files as final del…`）⇒ **工具在手、没用**，不是能力缺失。
+4. **全量严格重扫 = 0 条真 present**：用判据自己的解析器（`parseSessionLog`）扫遍本机**两个 home 的全部会话日志 2783 份**（v3 610 + v4 2173），解析出 `presented` 路径含 `all-in-ai-2026` 的会话 = **0**。
+5. 该会话的 `meta.md` 写着 `结果: 已完成（final v2 已 present）`——**公司侧自述与工具侧事实相反**：自述里的 present 是**纸面声明**，没有对应的机器动作。
 
-而该件的 `meta.md` 自己写着 `结果: 已完成（final v2 已 present）`——**公司侧声称 present 发生过**，工具侧说没有任何声明。
+⇒ `final-not-presented` **判得对**（公司手册的收口纪律 = CEO 用 `present` 声明成品，本场跳过了这一步）。本条**不是工具假阳性**。
 
-## 根因（假设）
+## 保留下来的真缺陷（判别盲区）
 
-判据的输入是「工作区文件清单」+「会话日志」两件（`tools/lib/deliverables.mjs` 头注：本模块不做 I/O，调用方喂进来）。
-`final-not-presented` 的判法是「盘上有成品 ∧ 喂进来的会话里没有对应 present 事件」——**它无法区分**：
+判据的输入是「盘上文件清单 + 喂进来的会话日志」两件（`tools/lib/deliverables.mjs` 头注）。`final-not-presented` 的判法是「盘上有成品 ∧ 审计源里没有对应 present 事件」——它**分不清**：
 
-- ① 真的没 present（越权直写成品）；与
-- ② present 发生过，但**那份会话日志已不在审计源里**。
+- ① 真没 present（**本案**，已实测证实）；与
+- ② present 发生过，但那段时间的会话日志不在审计源里（归档件靠路径豁免，活跃件无档）。
 
-本件是 ②。取证（2026-10-16 全量实扫）：
+盲区②是 **latent**（本案没命中），但机制上真实存在：`deliverables-check` 只有 `--sessions <dir>`「我把日志喂给你」这一种表达，**没有「该时段的日志我拿不到」的表达**。一旦真发生②，判据会把「证据不可考」报成「声明缺失」。
 
-- 扫遍本机**两处 DSH home 的全部会话日志（`session.v3.jsonl.zstd` 逐份 zstd 解帧）**：`runtime/harness-home` 57 份 + `~/.dsh` 553 份 = **610 份，`all-in-ai-2026` 命中 0**。
-- 同期的其他会话日志**在**（例如 `journal-audit` 仍能认出本件的会话号 `350eb581`，且 10-10 那次 hard-gate 缺口是它记录的历史事实）。
-- 本件的收口 commit `6f18aaa`「chore(backlog+公司盘): … + all-in-ai-2026 收口产物」**只提交了 `final.md` / `meta.md`，没有同时归档会话日志**——而仓库对已审动议是有先例的：`snapshots/archive/<slug>/sessions/*.jsonl`（q3-business-review、emergency-x-incident-review 等），配套工具 = `tools/session-log-export.mjs`。
+## 本案暴露的另两条（不在本卡射程，已另立）
 
-⇒ **本件的 present 证据已随会话日志的清理而永久丢失**，本机无法重建。这条红是「证据不可考」，不是「声明缺失」。
-
-## 暴露的失败类
-
-「判据把**证据不可得**当成**事实不成立**」——同一族的两条已修先例：
-- [BUG-008](../_archive/fixed_bugs/BUG-008-recon-pack-archive-drift.md)（归档件存量降 `legacy-archive` 观察档）；
-- [BUG-018](../_archive/fixed_bugs/BUG-018-authorship-instance-preset-false-positive.md)（同一原因二次报 / 判别面误判）。
-
-区别在于：BUG-008 的豁免键是**路径形态**（`deliverables-archive/` 前缀），而本条的键是**证据可得性**（审计源里有没有那个时间段的会话日志）——后者没有判据，于是「活跃区 + 日志已清理」的件永远红。
-
-**是否需要横切排查**：是，范围 = 所有以「会话声明」为输入的判据（`final-not-presented` / `presented-final-missing` / `dangling-present` / `present-result-not-final` / 署名与版本核对）——它们都有同一个盲区：**输入不成对**（盘是全量、日志可能残缺）时报的是「事实缺失」而不是「证据缺失」。
+- **公司的收口流程缺口**：动议可以「`结果=已完成` + 写盘 final」收口，**不经 `present`**，而判据要求 present ⇒ 这类动议必然红。见 [issues/2026-10-16-all-in-ai-ceo-closeout](../issues/2026-10-16-all-in-ai-ceo-closeout.md)。
+- **首版取证方法缺陷**（自省，供后续同类取证参考）：按文件名模式 `session.v3.jsonl.zstd` 扫，漏了同目录下的 **v4** 日志（2783 中的 2173）。凡「扫遍会话日志」的取证，**动作必须按目录遍历 + 版本无关**，或直接用 `tools/session-log-export.mjs`。
 
 ## 复现
 
 ```sh
-# ① 本机两处 home 全扫，命中 0（今天的现场）
+# ① 全量严格重扫：真 present = 0（用判据解析器，不靠 grep）
 source run/env.sh && node -e "
-const { execFileSync } = require('node:child_process'); const { readdirSync, statSync, existsSync } = require('node:fs'); const { join } = require('node:path')
-for (const home of ['runtime/harness-home', process.env.HOME + '/.dsh']) {
-  const root = join(home, 'sessions'); if (!existsSync(root)) continue
-  let n = 0, hit = 0
-  const walk = (d, depth) => { if (depth > 3) return
+const { execFileSync } = require('node:child_process'); const { readdirSync, existsSync } = require('node:fs'); const { join } = require('node:path')
+;(async () => { const { parseSessionLog } = await import('./tools/lib/deliverables-audit.mjs')
+let n = 0, hits = 0
+for (const home of ['runtime/harness-home', process.env.HOME + '/.dsh']) { const root = join(home, 'sessions'); if (!existsSync(root)) continue
+  const walk = (d, dep) => { if (dep > 3) return
     for (const e of readdirSync(d, { withFileTypes: true })) { const p = join(d, e.name)
-      if (e.isDirectory()) walk(p, depth + 1)
-      else if (e.name === 'session.v3.jsonl.zstd') { let t; try { t = execFileSync('zstd', ['-dc', p], { maxBuffer: 5e8 }).toString() } catch { continue }
-        n++; if (t.includes('all-in-ai-2026')) hit++ } } }
-  walk(root, 0); console.log(home, '扫描', n, '命中', hit)
-}"
-# ② 判据侧：活跃件没有豁免档（归档前缀才有）
-source run/env.sh && node checks/audit/deliverables-check.mjs   # exit 1，final-not-presented
+      if (e.isDirectory()) { walk(p, dep + 1); continue }
+      if (!/^session\.v[34]\.jsonl\.zstd\$/u.test(e.name)) continue
+      let t; try { t = execFileSync('zstd', ['-dc', p], { maxBuffer: 8e8 }).toString('utf8') } catch { continue }
+      n++; if (parseSessionLog(t).presented.some(x => x.path.includes('all-in-ai-2026'))) hits++ } }
+  walk(root, 0) }
+console.log('扫描', n, '份；真 present 事件', hits, '条') })()"
+# ② 判据现状
+source run/env.sh && node checks/audit/deliverables-check.mjs --only all-in-ai-2026   # exit 1：final-not-presented
 ```
 
 ## 修复关联
 
-**待定（本卡只记发现与判据，未修）**。候选方向（实施前须补 keyless 红测）：
+**未实施**。修法取决定位：本案是真阳性 ⇒ **不能**给判据加「无证据即放行」的救济（那会掩盖真违规）。盲区②若要有机制，正路是**显式表达证据不可得**（审计源声明覆盖时段；缺证据时报新观察码而非判红），并配守卫钉「证据可得时照旧判红」。**在本案里，正确动作是补做 `present` 而不是改判据**（该动作归公司侧，见 issues 卡）。
 
-- **A（推荐）**：判据输入扩一个「证据可得性」维度——例如调用方显式声明本次审计的**会话日志覆盖时段**（或喂进来的日志里该 slug 所属动议日期**全天**无任何日志）；此时「成品在盘 ∧ 无 present ∧ 该时段证据不可得」报**新观察码**（如 `present-evidence-missing`，不判红），而不是 `final-not-presented`。守卫必须钉住：证据**可得**时照旧判红（否则真越权被放过）。
-- **B**：把「收口时同批归档会话日志」变成硬动作（`converge.mjs` 或收口清单加一步 + 门禁查「已收敛 slug 必有 `snapshots/archive/<slug>/sessions/`」）——治新增，但本机这件的历史证据不会回来。
-- **C**：给活跃件也开 `--sessions` 缺证据豁免（照 BUG-008 的注记口径）——最省，但豁免键是人工声明，**不给判据**，等于把红改成靠人记得传旗标。
+**本卡当下不修的理由**：判别盲区是 latent（无实测中招实例），修它要动 `deliverables-check` 的输入契约与退出码语义 ⇒ 按「无复发证据不改判据」与「不在顺手修里夹带结构性变更」两条纪律，留在 `bugs/` 待按优先级决定。
 
-建议 **B + A**（B 防再犯、A 修判别），并明确本件的处置：证据确已丢失 ⇒ 应在判据上落成 A 的观察档，而不是人工把它改成绿。
-
-**本件的当下状态**：形状腐化已归零（`cdd0919`），剩这一条 `final-not-presented` 未处置——它需要 A 类判据（工具变更）或人裁决（是否接受「证据不可考」作为离场理由）。
+**状态说明**：本卡**不是 `修复就绪`**——查清了但**给不出可机械判定的「已修判定」**（盲区是 latent；修法要动判据的输入契约，而贸然加「无证据即放行」的救济反而会掩盖真违规）。按章程「修复就绪 = 门票 + 授权」的口径，这里没有合格门票，故留 `调查中`，等优先级或用户点名。

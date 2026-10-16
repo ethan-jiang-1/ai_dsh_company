@@ -10,7 +10,7 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-019](BUG-019-final-present-evidence-lost.md) | 会话日志被清理后 `final-not-presented` 变成不可证伪的红——判据分不清「真没 present」与「证据已丢失」，活跃件无豁免档 | P2 |
+| [BUG-019](BUG-019-final-present-evidence-lost.md) | `final-not-presented` 的判别盲区（日志残缺时不可证伪）——**本案经深挖为真阳性**（收口会话从未调 present）；盲区 latent，待优先级 | P2 |
 
 BUG-001..018 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
