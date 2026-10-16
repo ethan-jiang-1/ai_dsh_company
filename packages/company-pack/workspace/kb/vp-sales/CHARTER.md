@@ -59,3 +59,5 @@
   （journal 全文：`snapshots/archive/convergence-2026-10-16/2026-10-16-role-boundary-diagnosis-2026/journal/vp-sales/`；交付物：`deliverables-archive/2026-10-16-role-boundary-diagnosis-2026/`）
 - 2026-10-16 · ai-coding-tooling-budget-2026（决策）—— $200/月 内批订阅 5 席团队档、月付起步（席位费 + 溢出上限合计顶格 $200：首选 Copilot Business $95 + 上限 $105，Claude Team 与 ChatGPT Business 各 $125 + 上限 $75 为等价备选）；自建 API 现金可更低（低用量 $26.40–142.20/月）但中用量配好模型档即 2.37 倍破顶、且需 29.0 人天与具名负责人（今天没有）⇒ 本批不采，三条触发条件齐了再谈；不锁年付，30 天后按首月实测基线（撞限次数 / 日交互次数 / 单次任务时长）复算。
   （journal 全文：`snapshots/archive/convergence-2026-10-16/2026-10-16-ai-coding-tooling-budget-2026/journal/vp-sales/`；交付物：`deliverables-archive/2026-10-16-ai-coding-tooling-budget-2026/`）
+- 2026-10-17 · nearshore-annual-quote-2026（决策）—— 内部沙盘演练：标准年费 ¥120,000 毛利率 −126.50%、客户要的 25% 折扣价 ¥90,000 毛利率 −200.67%，两条签字线同时命中且只破一条也不免双签，CEO 门发起的双签请求结果为 rejected，按 fail-closed 不得落价；25% 折扣下通过毛利线的可行域为空集（两线全过需价格 ≥ ¥404,545.45/年），结论是内部预审、不是对客报价。
+  （journal 全文：`snapshots/archive/convergence-2026-10-16/2026-10-17-nearshore-annual-quote-2026/journal/vp-sales/`；交付物：`deliverables-archive/2026-10-17-nearshore-annual-quote-2026/`）
