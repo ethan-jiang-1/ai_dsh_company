@@ -36,7 +36,7 @@ opened: 2026-10-16
 
 ## 本案暴露的另两条（不在本卡射程，已另立）
 
-- **公司的收口流程缺口**：动议可以「`结果=已完成` + 写盘 final」收口，**不经 `present`**，而判据要求 present ⇒ 这类动议必然红。见 [issues/2026-10-16-all-in-ai-ceo-closeout](../issues/2026-10-16-all-in-ai-ceo-closeout.md)。
+- **公司的收口流程缺口**：动议可以「`结果=已完成` + 写盘 final」收口，**不经 `present`**，而判据要求 present ⇒ 这类动议必然红。见 [_archive/settled_issues/2026-10-16-all-in-ai-ceo-closeout](../_archive/settled_issues/2026-10-16-all-in-ai-ceo-closeout.md)。
 - **首版取证方法缺陷**（自省，供后续同类取证参考）：按文件名模式 `session.v3.jsonl.zstd` 扫，漏了同目录下的 **v4** 日志（2783 中的 2173）。凡「扫遍会话日志」的取证，**动作必须按目录遍历 + 版本无关**，或直接用 `tools/session-log-export.mjs`。
 
 ## 复现

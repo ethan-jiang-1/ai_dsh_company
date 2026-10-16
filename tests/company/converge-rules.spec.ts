@@ -68,6 +68,11 @@ describe('converge-rules · CHARTER 历史纪要查重锚（BUG-014 假跳过）
 describe('converge-rules · 旗标解析（BUG-016 幽灵旗标）', () => {
   // 负例留证 2026-10-12：BUG-016 —— 修复前未知旗标被静默收下（--plan / --no-such-flag 都「碰巧能跑」，
   //   exit 0；收据 = 卡复现节）；本文件实现前实跑 = parseFlags 导出不存在红。
+  it('--allow-open-findings 已认（未结审计发现的显式放行面，2026-10-16 立）', () => {
+    expect(parseFlags(['--slug', 'x', '--allow-open-findings']).allowOpenFindings).toBe(true)
+    expect(parseFlags(['--slug', 'x']).allowOpenFindings).toBe(false)
+  })
+
   it('--allow-no-journal 已认（零 journal 缺口的显式放行面）', () => {
     expect(parseFlags(['--slug', 'x', '--allow-no-journal']).allowNoJournal).toBe(true)
     expect(parseFlags(['--slug', 'x']).allowNoJournal).toBe(false)
@@ -79,14 +84,14 @@ describe('converge-rules · 旗标解析（BUG-016 幽灵旗标）', () => {
   })
   it('已知旗标全部接受并解析取值', () => {
     expect(parseFlags(['--slug', '2026-10-02-ai-ready', '--dry-run'])).toEqual({
-      slug: '2026-10-02-ai-ready', dryRun: true, charterBackfill: undefined, allowNoJournal: false,
+      slug: '2026-10-02-ai-ready', dryRun: true, charterBackfill: undefined, allowNoJournal: false, allowOpenFindings: false,
     })
     expect(parseFlags(['--charter-backfill', '2026-10-10-ai-sprint-2026'])).toEqual({
-      slug: undefined, dryRun: false, charterBackfill: '2026-10-10-ai-sprint-2026', allowNoJournal: false,
+      slug: undefined, dryRun: false, charterBackfill: '2026-10-10-ai-sprint-2026', allowNoJournal: false, allowOpenFindings: false,
     })
   })
   it('无参 = 计划模式（dryRun false、无 slug）', () => {
-    expect(parseFlags([])).toEqual({ slug: undefined, dryRun: false, charterBackfill: undefined, allowNoJournal: false })
+    expect(parseFlags([])).toEqual({ slug: undefined, dryRun: false, charterBackfill: undefined, allowNoJournal: false, allowOpenFindings: false })
   })
 })
 

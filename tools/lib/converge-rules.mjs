@@ -60,15 +60,15 @@ export function charterHasEntry(charterText, slug) {
 }
 
 /** CLI 旗标解析（纯函数）——参数唯一源在 converge.mjs 头注（BUG-016：未知旗标曾静默收下）。 */
-const KNOWN_FLAGS = ['--slug', '--dry-run', '--charter-backfill', '--allow-no-journal']
+const KNOWN_FLAGS = ['--slug', '--dry-run', '--charter-backfill', '--allow-no-journal', '--allow-open-findings']
 export function parseFlags(args) {
   for (const a of args) {
     if (a.startsWith('--') && !KNOWN_FLAGS.includes(a)) {
-      throw new Error(`未知旗标 ${a}——认识：--slug <目录名> / --dry-run / --charter-backfill <目录名> / --allow-no-journal；无参 = 计划模式`)
+      throw new Error(`未知旗标 ${a}——认识：--slug <目录名> / --dry-run / --charter-backfill <目录名> / --allow-no-journal / --allow-open-findings；无参 = 计划模式`)
     }
   }
   const argOf = name => { const i = args.indexOf(`--${name}`); return i === -1 ? undefined : args[i + 1] }
-  return { slug: argOf('slug'), dryRun: args.includes('--dry-run'), charterBackfill: argOf('charter-backfill'), allowNoJournal: args.includes('--allow-no-journal') }
+  return { slug: argOf('slug'), dryRun: args.includes('--dry-run'), charterBackfill: argOf('charter-backfill'), allowNoJournal: args.includes('--allow-no-journal'), allowOpenFindings: args.includes('--allow-open-findings') }
 }
 
 /** 解析某已收敛 slug 的证据目录名（convergence-<日期>）。

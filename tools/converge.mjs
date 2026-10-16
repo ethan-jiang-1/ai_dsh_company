@@ -5,11 +5,15 @@
 // 何时跑：用户说「收敛/清理工作区」时；或轮末维护者收敛已闭合动议时（维护者专用——分身不自行删改，见手册「轮末收敛」）。
 // 用法（参数唯一源 = 本头注；未知旗标 = 退出 1——`--plan` 不是旗标，无参即计划模式）：
 //   node tools/converge.mjs                     # 计划模式：列出可收敛/未闭合 slug + journal 收割预览
-//   node tools/converge.mjs --slug <目录名>     # 收敛单个（前提：final + meta.closed + 一句话结论 + **至少一篇 journal**）
+//   node tools/converge.mjs --slug <目录名>     # 收敛单个（前提：final + meta.closed + 一句话结论 + 至少一篇 journal + **无未结审计发现**）
 //   node tools/converge.mjs --slug <目录名> --allow-no-journal  # 显式接受零 journal 缺口（照记，不静默放行）
+//   node tools/converge.mjs --slug <目录名> --allow-open-findings # 显式接受未结审计发现（照记，不静默放行）
 //   node tools/converge.mjs --slug <目录名> --dry-run  # 只打印动作清单，不动盘
 //   node tools/converge.mjs --charter-backfill <目录名>  # 为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步）
-// 成本：秒级、无模型（纯文件/git 操作）；git mv/git rm 只动 tracked 文件。
+// 成本：秒级~十秒级、无模型；git mv/git rm 只动 tracked 文件。
+// ⚠ 环境：需 **`source run/env.sh`**（DSH_HOME 指向开发 home）——「无未结审计发现」这道前置要调
+//   `checks/audit/deliverables-check.mjs --only <slug>`（判据单一来源 = 那个审计档，收敛器不重写）。
+//   环境不可用时 fail-closed（报一条不可评估的发现），不放行。
 // 退出码：0 = 成功（计划或执行）；1 = 前置不满足/用法错误。
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, renameSync, rmSync } from 'node:fs'
 import { join, basename } from 'node:path'
@@ -21,10 +25,10 @@ import { spawnSync } from 'node:child_process'
 const args = process.argv.slice(2)
 // 旗标解析单源 = tools/lib/converge-rules.mjs parseFlags（未知旗标 fail-loud——BUG-016①：
 // `--plan` 曾被文档发明出来，传了还被静默「碰巧能跑」）
-let DRY, SLUG_ARG, BACKFILL_ARG, ALLOW_NO_JOURNAL
+let DRY, SLUG_ARG, BACKFILL_ARG, ALLOW_NO_JOURNAL, ALLOW_OPEN_FINDINGS
 try {
   const flags = parseFlags(args)
-  DRY = flags.dryRun; SLUG_ARG = flags.slug; BACKFILL_ARG = flags.charterBackfill; ALLOW_NO_JOURNAL = flags.allowNoJournal
+  DRY = flags.dryRun; SLUG_ARG = flags.slug; BACKFILL_ARG = flags.charterBackfill; ALLOW_NO_JOURNAL = flags.allowNoJournal; ALLOW_OPEN_FINDINGS = flags.allowOpenFindings
 } catch (e) { console.error(`✗ ${e.message}`); process.exit(1) }
 const WS = join(ROOT, 'company-workspace')
 const ACTIVE = join(WS, 'deliverables')
@@ -42,6 +46,24 @@ const metaField = (dir, field) => {
   const m = readFileSync(join(dir, 'meta.md'), 'utf8').match(new RegExp(`^${field}:\\s*(.*)$`, 'm'))
   return m ? m[1].trim() : ''
 }
+/**
+ * 本 slug 的**未结审计发现**（复用 `checks/audit/deliverables-check.mjs --only <slug>` 的裁决）。
+ *
+ * 为什么不在这里重写判据：`present` 背书 / meta 形状 / 占位抢注这些裁决的单一来源是那个审计档；
+ * 在收敛器里复述一遍 = 两处判据必然漂移。收敛只要一个「通过/未通过 + 为什么」。
+ * 环境不可用（缺 DSH_HOME 等）时**fail-closed**：报一条不可评估的发现——收敛需要能审计。
+ * @returns `{ ok, detail, violations }`
+ */
+const checkSlugFindings = slug => {
+  const r = spawnSync(process.execPath, [join(ROOT, 'checks', 'audit', 'deliverables-check.mjs'), '--only', slug], { encoding: 'utf8' })
+  const text = `${r.stdout ?? ''}${r.stderr ?? ''}`
+  if (r.status === 2 || /工作区不存在|缺 DSH_HOME|requireDevHome/.test(text)) {
+    return { ok: false, detail: '审计档跑不起来（环境不满足）——收敛前须能审计', violations: [] }
+  }
+  const violations = [...text.matchAll(/^\s+([a-z][a-z-]+) \| (deliverables[^\n]*)$/gm)].map(m => `${m[1]} ${m[2]}`)
+  return { ok: r.status === 0, detail: violations.join('；') || '（见审计档输出）', violations }
+}
+
 const scanSlugs = () => {
   const out = []
   if (existsSync(ACTIVE)) for (const d of readdirSync(ACTIVE)) {
@@ -52,14 +74,19 @@ const scanSlugs = () => {
     const hasFinal = existsSync(join(dir, 'final.md'))
     const archived = existsSync(join(ARCHIVE, d))
     const slugOf = d.replace(/^\d{4}-\d{2}-\d{2}-/, '')
-    const presence = journalPresence({ slug: slugOf, journals: harvestJournal(slugOf) })
-    const ready = /\d{4}-\d{2}-\d{2}/.test(closed) && concl && !concl.includes('回填') && hasFinal && !archived && !presence.missing
-    out.push({ dir: d, closed, hasFinal, archived, ready, journals: presence.count, reason: !hasFinal ? '无 final'
-      : !/\d{4}-\d{2}-\d{2}/.test(closed) ? 'meta.closed 未回填'
-      : !concl || concl.includes('回填') ? '一句话结论未回填'
-      : archived ? '已存在同名归档'
-      : presence.missing ? '零 journal（收工留痕缺口）——补齐或显式 --allow-no-journal'
-      : '可收敛' })
+    const journals = harvestJournal(slugOf)
+    const findings = hasFinal ? checkSlugFindings(slugOf) : { ok: true, detail: '' }
+    const gates = [
+      [/\d{4}-\d{2}-\d{2}/.test(closed), 'meta.closed 未回填'],
+      [Boolean(concl) && !concl.includes('回填'), '一句话结论未回填'],
+      [hasFinal, '无 final'],
+      [!archived, '已存在同名归档'],
+      [journalPresence({ slug: slugOf, journals }).missing === false, '零 journal（收工留痕缺口）——补齐或显式 --allow-no-journal'],
+      [findings.ok, `有未结审计发现：${findings.detail}`],
+    ]
+    const failed = gates.find(([pass]) => !pass)
+    out.push({ dir: d, closed, hasFinal, archived, journals: journals.length, findings, ready: failed === undefined,
+      reason: failed === undefined ? '可收敛' : failed[1] })
   }
   return out
 }
@@ -136,6 +163,13 @@ const converge = (dirName) => {
     process.exit(1)
   }
   if (presence.missing) console.error(`⚠ ${dirName}: 零 journal，--allow-no-journal 显式放行（缺口照记：收敛后 live 不再有留痕）`)
+  // 收敛前置（2026-10-16 立，事故 = all-in-ai-2026）：未结审计发现不放行。
+  const findings = checkSlugFindings(fields.slug)
+  if (!findings.ok && !ALLOW_OPEN_FINDINGS) {
+    console.error(`✗ ${dirName}: 有未结审计发现——${findings.detail}\n  先按审计档处置（例如缺 present 就补 present），或确认接受后加 --allow-open-findings 显式放行`)
+    process.exit(1)
+  }
+  if (!findings.ok) console.error(`⚠ ${dirName}: 有未结审计发现，--allow-open-findings 显式放行——${findings.detail}`)
   const evName = `convergence-${today}` // 证据目录 = 创建日（本函数创建；backfill 补登走 resolveEvidenceDir——BUG-015）
   const evDir = join(ROOT, 'snapshots', 'archive', evName, dirName)
   const actions = [

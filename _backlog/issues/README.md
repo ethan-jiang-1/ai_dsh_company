@@ -6,7 +6,6 @@
 
 | 问题 | 当前情况与下一步 |
 |---|---|
-| [收口纪律缺口：动议可「已完成」而不经 present](2026-10-16-all-in-ai-ceo-closeout.md) | 深挖证实 all-in-ai-2026 的收口会话从未调用 present（工具在手）；等用户拍板纪律落在公司侧/工具侧（A/B/C/D）🔒 |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 

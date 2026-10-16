@@ -221,6 +221,15 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(chairing, '规则必须保护 Agent 间内部密度').toMatch(/drafts|任务书|成员消息/)
   })
 
+  it('CEO 收口必须教「先 present、后标已完成」（2026-10-16 立，事故 = all-in-ai-2026 跳步收口）', () => {
+    // 事故：那次收口会话把 final.md 写进盘、把 meta「结果」标成已完成，**95 次工具调用里没有 present**
+    //（present 当时就在工具表里）⇒ 审计判 final-not-presented，真凶是跳步。skill 原本只写「用 present
+    // 声明交付」，没有把顺序与「没 present 就没有已完成」写成硬约束 ⇒ 补钉子，防措辞被改回去。
+    const chairing = readFileSync(join(PRESETS_DIR, 'ceo/skills/chairing-staff-meeting/SKILL.md'), 'utf8')
+    expect(chairing, '收口步必须点名 present 工具').toContain('present')
+    expect(chairing, '必须钉住顺序：先 present、后标终态（缺 present 不得标「已完成」）').toMatch(/present[^\n]{0,40}(先|前)[^\n]{0,20}(标|改)[^\n]{0,20}(已完成|终态)|没有 present/)
+  })
+
   it('任务依赖必须教"两拍落"（板面 id 由板子发号；2026-10-13 实证：同批并行建任务时猜 id）', () => {
     /**
      * 现场（2026-10-13，会话 session-663ff4b6 / turn1 step9）：CEO 在同一批并行里建 T1–T4，
