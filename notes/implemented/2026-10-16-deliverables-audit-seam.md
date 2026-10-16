@@ -1,6 +1,6 @@
 # 代码结构第三轮（2026-10-16）：deliverables 宽接口拆「形状与身份 / 声明对账」＋触发线落档
 
-状态：implemented（授权 = 用户 2026-10-16 圈定卡 `2026-10-16-code-structure-round3` 范围 A 并下开工令「计划这么详细了, 就setup goal 推动落地」；来源卡与拍板记录 = [_archive/settled_issues](../../_backlog/_archive/settled_issues/2026-10-16-code-structure-round3.md)；收据 = 三个 commit `fa9801f` / `2e73269` / `3f0af0b`）
+状态：implemented（授权 = 用户 2026-10-16 圈定卡 `2026-10-16-code-structure-round3` 范围 A 并下开工令「计划这么详细了, 就setup goal 推动落地」；来源卡与拍板记录 = [_archive/settled_issues](../../_backlog/_archive/settled_issues/2026-10-16-code-structure-round3.md)；收据 = `fa9801f` 触发线＋毕业 / `2e73269` spec 拆分 / `3f0af0b` lib 拆分 / `00da92e` 收尾＋卡归档 / `4f51bb2` 语义审处置）
 
 ## 决定
 

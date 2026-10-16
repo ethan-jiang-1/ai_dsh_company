@@ -1,6 +1,6 @@
 # presence 内部接缝（2026-10-16）：状态与显示名词汇独立成模块＋facade 保外观
 
-状态：implemented（授权 = 用户 2026-10-16 对来源卡 Item 2 令「继续」；来源卡 = [_archive/settled_issues](../../_backlog/_archive/settled_issues/2026-10-16-code-structure-round3.md) 的 Item 2（该卡按自身条件已结档，本 Note 是它的实施收据）；commit `969f01d`）
+状态：implemented（授权 = 用户 2026-10-16 对来源卡 Item 2 令「继续」；来源卡 = [_archive/settled_issues](../../_backlog/_archive/settled_issues/2026-10-16-code-structure-round3.md) 的 Item 2（该卡按自身条件已结档，本 Note 是它的实施收据）；commit `b1af109` 实施 + `a2ed20b` 收尾）
 
 ## 决定
 
