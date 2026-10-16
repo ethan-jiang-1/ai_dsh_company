@@ -67,3 +67,5 @@
   （journal 全文：`snapshots/archive/convergence-2026-10-16/2026-10-13-agri-agent-county-2026/journal/cfo/`；交付物：`deliverables-archive/2026-10-13-agri-agent-county-2026/`）
 - 2026-10-13 · token-factory-us-cn-2026（决策）—— 中美 token 工厂的差异不在技术可得性而在两处结构（美国侧稳定的渠道费层已被云厂商占位、中国侧价格由财政补贴与国企集采定义）；我方是两种买方的加工厂而非 token 供应商，复制不了便宜、只复制得了计量与可争议性；判词=能做但不现在做，先动的一步是计量账本前期与一次零成本的需求验证。
   （journal 全文：`snapshots/archive/convergence-2026-10-16/2026-10-13-token-factory-us-cn-2026/journal/cfo/`；交付物：`deliverables-archive/2026-10-13-token-factory-us-cn-2026/`）
+- 2026-10-13 · all-in-ai-2026（决策）—— 「全员一块儿跑」不是培训问题而是复制问题——**测基线（W1，1.5–1.75 人天）→ 每周沉淀 1 件（把已做完的活多写半步，0.25–0.5 人天/件）→ 别人照卡自跑（30–60 分钟、不用人带）**，四周 3.5–5.5 人天、$0 新增现金、不新增人头与课表（上课式补课 35 人天 > 可挤的 12 人天 ⇒ 不成立）；可复制的分界线 = **判据能不能写死**（数据面/权限与判断力搬不走）；钱不是瓶颈、替代率才是（`c_b* = Ω − µ`；档 1 本季唯一可执行，档 2 $1,250/月破 $0 授权 + 触 ≥$500/月会签线，Premium 确定不可回本）；**COO 对 13 岗位行 / 14 人行使"接不住"** ⇒ 裁定走"全员有入口、不承诺全员上量"
+  （journal 全文：`snapshots/archive/convergence-2026-10-16/2026-10-13-all-in-ai-2026/journal/cfo/`；交付物：`deliverables-archive/2026-10-13-all-in-ai-2026/`）
