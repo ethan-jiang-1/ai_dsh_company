@@ -4,7 +4,7 @@
 // 「事件流怎么折成板」住 ./presence.ts（它 re-export 本模块，外观零变化，见该文件头注）。
 //
 // 为什么单开一个家：这两张表是**对外呈现的合同面**（客户端直接显示它们；`STATUS_LABEL` 的
-// 「未知值落未知」与 `PRESET_DISPLAY_NAMES` 与各 `presets/<role>/preset.yml` 的 `name` 同源，
+// 「未知值落未知」与 `PRESET_DISPLAY_NAMES` 与各 `presets/<role>/agent.cordis.yml` 的 `config.name` 同源，
 // 有防漂移断言钉着）——与 300 多行事件折算混住时，改文案的人要翻整个读模型。
 //
 // 依赖：本文件**零 import**（叶子模块）；presence.ts → 本文件单向。
@@ -47,7 +47,7 @@ export function statusLabelFor(status: string): string {
   return STATUS_LABEL[status as PresenceStatus] ?? STATUS_LABEL.unknown
 }
 
-/** 五个 preset id（有限键，索引安全；与 `presets/<role>/preset.yml` 一一对应）。 */
+/** 五个 preset id（有限键，索引安全；与 `presets/<role>/agent.cordis.yml` 一一对应）。 */
 const PRESET_KEYS = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'] as const
 
 type PresetRoleId = typeof PRESET_KEYS[number]
@@ -58,8 +58,8 @@ function isPresetRole(name: string): name is PresetRoleId {
 
 /**
  * D-a：显示名映射。member.name 命中 preset id → 系列化显示名；`role === 'lead'` → CEO
- * （本组织 lead 恒为 CEO）；未命中原样显示（任意组队名不崩）。与各 `presets/<role>/preset.yml`
- * 的 `name` 同源——`tests/company/presence-board.spec.ts` 有防漂移断言。
+ * （本组织 lead 恒为 CEO）；未命中原样显示（任意组队名不崩）。与各 `presets/<role>/agent.cordis.yml`
+ * 的 `config.name` 同源——`tests/company/presence-board.spec.ts` 有防漂移断言。
  */
 export const PRESET_DISPLAY_NAMES: Record<PresetRoleId, string> = {
   ceo: '梦之队 CEO',
