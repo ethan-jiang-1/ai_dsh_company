@@ -35,6 +35,22 @@ export function journalPresence(input) {
   return { count, missing: count === 0 }
 }
 
+/**
+ * 收敛切片的识别与计量（2026-10-16 立；事故 = 预算门禁的过滤器只认旧命名）。
+ *
+ * 为什么住这里：**收敛切片的命名有两代**——旧 `memory-convergence-<日期>[-N]`（至 2026-10-07）、
+ * 新 `convergence-<日期>`（本文件同目录的 `tools/converge.mjs` 现行 `evName`）。命名知识属收敛面，
+ * 所以过滤器住这里、由预算门禁（`checks/gates/snapshots-budget.mjs`）消费；判据单一来源，
+ * 且可被 keyless 单测直接钉（`checks/**` 不许被 tests 导入 ⇒ 住在门禁里就测不到）。
+ * @param input - `{ scenes, bytesOf }`：`scenes` = `canonicalSnapshotScenes(root)`；`bytesOf` = 目录 → 字节数。
+ * @returns `{ scenes, bytes }`——属于收敛代际的场景与合计字节。
+ */
+export function convergenceSlices(input) {
+  const scenes = (input.scenes ?? []).filter(scene => /^(?:memory-)?convergence-/.test(scene.name))
+  const bytes = scenes.reduce((sum, scene) => sum + input.bytesOf(scene.path), 0)
+  return { scenes, bytes }
+}
+
 /** CHARTER 是否已有该 slug 的历史纪要**条目**。
  *  锚 = 条目行形「- <YYYY-MM-DD> · <slug>（」——整文件子串查重（includes）会被
  *  引用路径里的 slug 字样误触（BUG-014：COO 的证据路径含 slug → 假跳过、条目漏登）。 */
