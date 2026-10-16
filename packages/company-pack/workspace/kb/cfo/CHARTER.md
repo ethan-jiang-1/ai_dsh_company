@@ -63,3 +63,7 @@
   （journal 全文：`snapshots/archive/convergence-2026-10-12/2026-10-10-ai-transformation-2026-v4/journal/cfo/`；交付物：`deliverables-archive/2026-10-10-ai-transformation-2026-v4/`）
 - 2026-10-12 · ai-coding-security-2026（诊断）—— AI 写码的安全风险不在「AI 写的代码」而在「agent 手里的权限」；最要紧的 9 条闸门 $0 即可落地、本批不花一分钱，但有三件料必须人给（真名／个人账号范围／合同正文）
   （journal 全文：`snapshots/archive/convergence-2026-10-12/2026-10-12-ai-coding-security-2026/journal/cfo/`；交付物：`deliverables-archive/2026-10-12-ai-coding-security-2026/`）
+- 2026-10-13 · agri-agent-county-2026（诊断）—— 县城农业整套智能体平台 = 财政项目制市场（实测单 245–1,066 万元、中位 312.3 万），技术上有条件可行（单县 MVP-整套 1,180–2,330 研发人天，但「数据与 AI」2 人成关键路径 7.1–15.0 个月、加人换不来时间），判词「有能力做、今天不进」——卡点是零农业业绩/资质、交付 210–300 天且现行 SLA 覆盖不了农时窗口、合规三件缺失；建议零成本动作 = 向有农业政务业绩方问组队或分包，或砍到单场景最小闭环先跑一县。
+  （journal 全文：`snapshots/archive/convergence-2026-10-16/2026-10-13-agri-agent-county-2026/journal/cfo/`；交付物：`deliverables-archive/2026-10-13-agri-agent-county-2026/`）
+- 2026-10-13 · token-factory-us-cn-2026（决策）—— 中美 token 工厂的差异不在技术可得性而在两处结构（美国侧稳定的渠道费层已被云厂商占位、中国侧价格由财政补贴与国企集采定义）；我方是两种买方的加工厂而非 token 供应商，复制不了便宜、只复制得了计量与可争议性；判词=能做但不现在做，先动的一步是计量账本前期与一次零成本的需求验证。
+  （journal 全文：`snapshots/archive/convergence-2026-10-16/2026-10-13-token-factory-us-cn-2026/journal/cfo/`；交付物：`deliverables-archive/2026-10-13-token-factory-us-cn-2026/`）
