@@ -16,6 +16,25 @@ export function journalSlug(fileName, slug, allSlugs = []) {
   return stripped === slug || stripped.startsWith(`${slug}-`) ? fileName : null
 }
 
+/**
+ * 收敛前置：本动议**是否有可收割的 journal**（2026-10-16 立，事故 = ai-transformation-2026-v4）。
+ *
+ * 为什么需要它：`converge.mjs` 的 journal 收割预览**只报数、不设前置**——一场动议即使
+ * 五职零留痕也照样「可收敛」，收敛动作把 live journal 清掉（`git rm`）之后，**没有任何
+ * 痕迹**能证明它曾经缺留痕。实测现场：`ai-transformation-2026-v4`（10-10 kickoff、10-11
+ * closed、已归档）在 live 与 `kb/archive/` 两处**都没有任何 journal**，而 `journal-audit`
+ * 只能事后按会话报**缺席 6 条**——坑在收敛这一步，闸门却只在事后响。
+ *
+ * ⚠ 只数、不判性质：函数回答「有几篇 journal 可收割」；「缺留痕该不该放行」是人的判断
+ * （`--allow-no-journal` 显式放行即留痕），不在纯函数里替人拍。
+ * @param input - `{ slug, journals }`；`journals` = 该动议可收割的 journal（`harvestJournal` 的产物）。
+ * @returns `{ count, missing }`；`missing === true` ⇒ 零篇，收敛前置未满足。
+ */
+export function journalPresence(input) {
+  const count = (input.journals ?? []).length
+  return { count, missing: count === 0 }
+}
+
 /** CHARTER 是否已有该 slug 的历史纪要**条目**。
  *  锚 = 条目行形「- <YYYY-MM-DD> · <slug>（」——整文件子串查重（includes）会被
  *  引用路径里的 slug 字样误触（BUG-014：COO 的证据路径含 slug → 假跳过、条目漏登）。 */
@@ -25,15 +44,15 @@ export function charterHasEntry(charterText, slug) {
 }
 
 /** CLI 旗标解析（纯函数）——参数唯一源在 converge.mjs 头注（BUG-016：未知旗标曾静默收下）。 */
-const KNOWN_FLAGS = ['--slug', '--dry-run', '--charter-backfill']
+const KNOWN_FLAGS = ['--slug', '--dry-run', '--charter-backfill', '--allow-no-journal']
 export function parseFlags(args) {
   for (const a of args) {
     if (a.startsWith('--') && !KNOWN_FLAGS.includes(a)) {
-      throw new Error(`未知旗标 ${a}——认识：--slug <目录名> / --dry-run / --charter-backfill <目录名>；无参 = 计划模式`)
+      throw new Error(`未知旗标 ${a}——认识：--slug <目录名> / --dry-run / --charter-backfill <目录名> / --allow-no-journal；无参 = 计划模式`)
     }
   }
   const argOf = name => { const i = args.indexOf(`--${name}`); return i === -1 ? undefined : args[i + 1] }
-  return { slug: argOf('slug'), dryRun: args.includes('--dry-run'), charterBackfill: argOf('charter-backfill') }
+  return { slug: argOf('slug'), dryRun: args.includes('--dry-run'), charterBackfill: argOf('charter-backfill'), allowNoJournal: args.includes('--allow-no-journal') }
 }
 
 /** 解析某已收敛 slug 的证据目录名（convergence-<日期>）。
