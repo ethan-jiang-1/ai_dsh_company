@@ -171,13 +171,16 @@ for (const r of versionRows) {
 }
 for (const r of rows) {
   COUNT[r.level] += 1
-  const desc = r.level === 'match' ? `署名=${r.claimed}｜写入=${r.writer}`
-    : r.level === 'reclaimed' ? `署名=${r.claimed}｜写入=${r.writer}｜**已收回署名**（有更正行）`
-    : r.level === 'fail' ? `署名=${r.claimed}｜**实际写入=${r.writer}**（无更正行——声明了作者却对不上）`
+  // 写入者显示：基础角色 + 实例后缀（同角色多实例时看得出是哪个成员写的；BUG-018 起 writer 已规范化）
+  const w = r.writer === null ? null
+    : r.writerRaw !== undefined && r.writerRaw !== r.writer ? `${r.writer}(${r.writerRaw})` : r.writer
+  const desc = r.level === 'match' ? `署名=${r.claimed}｜写入=${w}`
+    : r.level === 'reclaimed' ? `署名=${r.claimed}｜写入=${w}｜**已收回署名**（有更正行）`
+    : r.level === 'fail' ? `署名=${r.claimed}｜**实际写入=${w}**（无更正行——声明了作者却对不上）`
     : r.level === 'unknown' ? `署名=${r.claimed}｜写入者不可考（历史稿）`
     : r.level === 'unsigned-mismatch'
-      ? `无署名行｜名义(${r.byName})≠写入(${r.writer})——早期单操作者运作或代笔，**文件名不构成作者声明**`
-      : `无署名行｜实际写入=${r.writer ?? '?'}`
+      ? `无署名行｜名义(${r.byName})≠写入(${w})——早期单操作者运作或代笔，**文件名不构成作者声明**`
+      : `无署名行｜实际写入=${w ?? '?'}`
   console.log(`  ${MARK[r.level]} ${r.slug}/${r.file}｜${desc}`)
 }
 console.log(`\nauthorship-audit: 一致 ${String(COUNT.match)}｜已收回 ${String(COUNT.reclaimed)}｜无署名(观察) ${String(COUNT.unsigned + COUNT['unsigned-mismatch'])}｜写入者不可考(观察) ${String(COUNT.unknown)}｜**署名不实 ${String(COUNT.fail)}**｜版本引用 ${String(versionRows.length)}（✗过期 ${String(staleRefs.length)}｜？无版号 ${String(unversionedRefs.length)}）`)

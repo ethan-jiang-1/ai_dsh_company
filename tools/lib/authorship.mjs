@@ -16,6 +16,26 @@ export function nominalRoleOf(fileName) {
     : undefined
 }
 
+/**
+ * 写入者 preset → 基础角色（**只抹掉团队实例后缀**，BUG-018，2026-10-16）。
+ *
+ * 为什么需要：团队插件给同角色的第 2、3 个成员发的 preset 带实例后缀（`coo-2` / `vp-eng-3`），
+ * 这些 id 不在 `packages/company-pack/presets/` 的五个 preset 里。署名行写的是角色名
+ * （`出稿：coo`），而写入者归属在「队友会话 → 成员名」映射缺失时会回落到 preset 原文 ⇒
+ * 精确字符串相等把**同一角色的两个实例**判成「署名不实」（真盘实测 10 条假阳性）。
+ *
+ * ⚠ 规范化**只作用在实例后缀这一维**：比较仍要求角色相等 ⇒ `vp-eng-2` 写 `coo` 稿照旧判红
+ * （守卫断言见 tests/company/authorship.spec.ts「规范化只抹实例后缀，不吞跨角色差异」）。
+ * @param preset - 会话的 agentPreset（或任意字符串）。
+ * @returns 去掉 `<角色>-<数字>` 后缀的 preset；不含实例后缀时原样返回。
+ */
+export function baseRoleOf(preset) {
+  for (const id of COMPANY_ROLE_IDS) {
+    if (new RegExp(`^${id}-\\d+$`).test(preset)) return id
+  }
+  return preset
+}
+
 /** 稿首署名行里的当前版号（`版本 v<N>`）；无版号行 = undefined。 */
 export const DRAFT_VERSION = /版本\s*v(\d+)/
 
@@ -65,21 +85,25 @@ export function crossCheckVersions(finalBody, currentByDraft) {
  *   'fail'     **真写了署名行**且不符且无更正行（判红）；
  *   'unsigned-mismatch' / 'unsigned'  无署名行（观察；mismatch = 名义归属≠写入者）；
  *   'unknown'  有署名行但写入者不可考（观察——证据不可考不判红）。
+ * 返回的 `writer` = **基础角色**（`coo-2` → `coo`，BUG-018 起）；`writerRaw` = 原始 preset。
  */
 export function classifyAuthorship(body, fileName, writerPreset) {
   const sig = SIG.exec(body)
   const reclaim = RECLAIM.exec(body)
   const claimed = sig === null ? undefined : String(sig[1] ?? sig[2]).toLowerCase()
   const byName = nominalRoleOf(fileName)
+  // writer = 基础角色（判档与显示都用它）；writerRaw = 原始 preset（保留实例信息，如 coo-2）。
+  const writer = writerPreset === null ? null : baseRoleOf(writerPreset)
+  const writerRaw = writerPreset
   if (claimed === undefined) {
-    return writerPreset !== null && byName !== undefined && byName !== writerPreset
-      ? { level: 'unsigned-mismatch', claimed: undefined, byName, writer: writerPreset }
-      : { level: 'unsigned', claimed: undefined, byName, writer: writerPreset }
+    return writer !== null && byName !== undefined && byName !== writer
+      ? { level: 'unsigned-mismatch', claimed: undefined, byName, writer, writerRaw }
+      : { level: 'unsigned', claimed: undefined, byName, writer, writerRaw }
   }
-  if (writerPreset === null) return { level: 'unknown', claimed, byName, writer: null }
-  if (claimed === writerPreset) return { level: 'match', claimed, byName, writer: writerPreset }
+  if (writer === null) return { level: 'unknown', claimed, byName, writer: null, writerRaw }
+  if (claimed === writer) return { level: 'match', claimed, byName, writer, writerRaw }
   if (reclaim !== null && String(reclaim[1]).toLowerCase() === claimed) {
-    return { level: 'reclaimed', claimed, byName, writer: writerPreset }
+    return { level: 'reclaimed', claimed, byName, writer, writerRaw }
   }
-  return { level: 'fail', claimed, byName, writer: writerPreset }
+  return { level: 'fail', claimed, byName, writer, writerRaw }
 }

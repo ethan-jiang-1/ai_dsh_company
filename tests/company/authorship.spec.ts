@@ -5,6 +5,24 @@ const BODY_SIGNED = (role: string) => `# 标题\n\n> 出稿：${role}｜版本 v
 const BODY_LEGACY = '> 出稿：CFO（wochen 财务职能）｜正文 42 非空行｜状态：现行意见'
 
 describe('署名核对：档位判定（判据单一来源 = tools/lib/authorship.mjs）', () => {
+  // 负例留证 2026-10-16：把 baseRoleOf 改成恒等（`return preset`，即取消实例后缀规范化）→ BUG-018
+  // 这条正例红（`expected 'fail' to be 'match'`，与真盘 10 条假阳性的失败面一致）；还原 → 绿。
+  // 同一变异下「不吞跨角色差异」那条守卫仍绿——两条一起才钉住「只抹实例后缀」这个边界。
+  it('同角色的多实例写入者（coo-2 / vp-eng-3）⇒ match，不是署名不实（BUG-018）', () => {
+    // 真盘 2026-10-16 实测：ai-sprint / ai-transformation 两场 10 条「署名不实」，全部是同角色
+    // 多实例（团队插件给第 2、3 个成员发的 preset 带实例后缀，不在 pack 的五个 preset 里）。
+    const r = classifyAuthorship(BODY_SIGNED('coo'), 'coo.md', 'coo-2')
+    expect(r.level).toBe('match')
+    expect(r.claimed).toBe('coo')
+    expect(r.writer).toBe('coo')       // 判档与显示用基础角色
+    expect(r.writerRaw).toBe('coo-2')  // 实例信息不丢（诊断要看得出是哪个实例写的）
+  })
+
+  it('规范化只抹实例后缀，不吞跨角色差异：vp-eng-2 写 coo 稿仍判 fail（BUG-018 的守卫）', () => {
+    expect(classifyAuthorship(BODY_SIGNED('coo'), 'coo.md', 'vp-eng-2').level).toBe('fail')
+    expect(classifyAuthorship(BODY_SIGNED('cfo'), 'cfo.md', 'ceo').level).toBe('fail')
+  })
+
   it('署名与写入者一致 ⇒ match', () => {
     const r = classifyAuthorship(BODY_SIGNED('cfo'), 'cfo.md', 'cfo')
     expect(r.level).toBe('match')

@@ -10,9 +10,8 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-018](BUG-018-authorship-instance-preset-false-positive.md) | 署名审计把同角色的多实例 preset（`coo` vs `coo-2`）判成「署名不实」——真盘 10 条假阳性，仪器常年带伤红 | P2 |
 
-BUG-001..017 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+BUG-001..018 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

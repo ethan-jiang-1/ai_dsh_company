@@ -1,12 +1,13 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-10-16
 ---
 
 # BUG-018：署名审计把同角色的多实例 preset 判成「署名不实」（假阳性 10 条）
 
-> 严重级别：P2（次要——不阻断任何验收，但让该仪器常年带伤红，真信号被噪音淹没）｜发现：2026-10-16｜状态：调查中
+> 严重级别：P2（次要——不阻断任何验收，但让该仪器常年带伤红，真信号被噪音淹没）｜发现：2026-10-16｜状态：已修（2026-10-16 同日修复）
+> **修复**：候选 A 落地——`tools/lib/authorship.mjs` 新增 `baseRoleOf`（只抹 `<角色>-<数字>` 实例后缀）并用于判档，原始 preset 另存 `writerRaw` 保留诊断信息；真盘 `authorship-audit` 由「署名不实 10 + exit 1」变「署名不实 0 + ALL PASS」。收据 = [implemented/2026-10-16-authorship-instance-preset.md](../../../notes/implemented/2026-10-16-authorship-instance-preset.md)（红→绿原文、守卫用例、输掉的方案在内）。候选 B（修 `sessionId → 成员名` 映射构建路径）留作后续。
 
 ## 症状
 
@@ -47,7 +48,7 @@ FAIL（署名不实 10｜版本引用过期 0）
 
 ## 暴露的失败类
 
-「审计仪器的判别面没跟上被观测系统的命名演进」——与 [BUG-003](../_archive/fixed_bugs/BUG-003-present-no-role-gate.md) 同族（当时是「非 Lead 的 present 语义变了，判据没跟上」）。**是否需要横切排查**：是，但范围限于「把 preset id 当作者身份」的三处——`authorship.mjs` 的比较面、`authorship-audit.mjs` 的回落面、以及任何按 preset 名做归属的判据（建议顺手 grep 一遍）。
+「审计仪器的判别面没跟上被观测系统的命名演进」——与 [BUG-003](../../_archive/fixed_bugs/BUG-003-present-no-role-gate.md) 同族（当时是「非 Lead 的 present 语义变了，判据没跟上」）。**是否需要横切排查**：是，但范围限于「把 preset id 当作者身份」的三处——`authorship.mjs` 的比较面、`authorship-audit.mjs` 的回落面、以及任何按 preset 名做归属的判据（建议顺手 grep 一遍）。
 
 **为什么不是 P1**：它不阻断任何验收（`authorship-audit` 不进 `pnpm verify`、不进 `pnpm test`），且真跨角色冒名仍会被抓到（`vp-eng-2` 写 `coo` 稿依然判红）——**判别力没丢，丢的是精度**。但它是「真信号被噪音淹没」的典型：一条常红仪器会被读成"background noise"而失去作用。
 
@@ -72,7 +73,7 @@ console.log(classifyAuthorship('出稿：coo｜版本 v1', 'coo.md', 'vp-eng-2')
 
 ## 修复关联
 
-**待定（本卡只记发现与判据，未修）**。候选方向（实施前需先补 keyless 红测，见 [测试宪法 §3.7](../../docs/testing.md)）：
+**待定（本卡只记发现与判据，未修）**。候选方向（实施前需先补 keyless 红测，见 [测试宪法 §3.7](../../../docs/testing.md)）：
 
 - **A（推荐）**：在作者归属处把 `<role>-<n>` 规范化为 `<role>` 再比较——规范化只作用在**角色名**这一维，比较仍要求角色相等 ⇒ 跨角色冒名照旧判红（上节最小复现的第二条即是它的守卫）。
 - **B**：修 `memberBySession` 映射的构建路径（让队友写盘能解析出成员名）——治根，但依赖会话日志在场，老动议的假阳性不会消失。
