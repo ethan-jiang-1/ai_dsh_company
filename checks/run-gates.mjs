@@ -25,6 +25,7 @@ import * as handbookBudget from './gates/handbook-budget.mjs'
 import * as draftsUntracked from './gates/drafts-untracked.mjs'
 import * as companySkeleton from './gates/company-skeleton.mjs'
 import * as ledgerRouting from './gates/ledger-routing.mjs'
+import * as ledgerParticipation from './gates/ledger-participation.mjs'
 import * as docTaxonomy from './gates/doc-taxonomy.mjs'
 import * as snapshotsBudget from './gates/snapshots-budget.mjs'
 import * as barePath from './gates/bare-path.mjs'
@@ -63,6 +64,7 @@ handbookBudget.run(ctx)
 draftsUntracked.run(ctx)
 companySkeleton.run(ctx)
 ledgerRouting.run(ctx)
+ledgerParticipation.run(ctx)
 docTaxonomy.run(ctx)
 snapshotsBudget.run(ctx)
 barePath.run(ctx)

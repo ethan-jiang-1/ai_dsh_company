@@ -47,7 +47,7 @@ describe('parseMotionLedger', () => {
     const rows = parseMotionLedger(REAL_LEDGER)
     expect(rows[0]).toMatchObject({ slug: 'agentic-coworker', date: '2026-09-22', kind: '评估', final: '✅' })
     const q3 = rows.find(row => row.slug === 'q3-business-review')
-    expect(q3).toMatchObject({ wallClock: '241s', roles: 'CEO+CFO+COO' })
+    expect(q3).toMatchObject({ wallClock: '241s', roles: 'CEO+COO+CFO' })
     expect(q3!.summary).toContain('判不了')
     const untimed = rows.find(row => row.slug === 'integration-50w-signoff')
     expect(untimed).toMatchObject({ final: '—', wallClock: '—' })
