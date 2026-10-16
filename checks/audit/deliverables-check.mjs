@@ -7,7 +7,8 @@
 //   - 回归层（vitest）守判据本身，只读**明文**归档日志，秒级、无 key；
 //   - 本脚本跑**运行场**——`company-workspace/` + `$DSH_HOME/sessions/`，那里的日志是
 //     多帧 zstd（Node 内置 zstd 只解首帧，实测 329KB 只吐出 1 行），所以这里起 `zstd` 解帧。
-//   判据逻辑一份，两处复用：`tools/lib/deliverables.mjs`。
+//   判据逻辑一份，两处复用：形状与身份 = `tools/lib/deliverables.mjs`，
+//   声明对账 = `tools/lib/deliverables-audit.mjs`（2026-10-16 第三轮结构收敛按域拆出）。
 //
 // 用法：
 //   source run/env.sh && node checks/audit/deliverables-check.mjs
@@ -27,7 +28,8 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { join, resolve } from 'node:path'
-import { VIOLATION, WARNING, auditDeliverables, isPlaceholderClaim, parseSessionLog, partitionArchiveViolations, presentResultRows, uncoveredPendingMaterial, validateMeta } from '../../tools/lib/deliverables.mjs'
+import { WARNING, isPlaceholderClaim, validateMeta } from '../../tools/lib/deliverables.mjs'
+import { VIOLATION, auditDeliverables, parseSessionLog, partitionArchiveViolations, presentResultRows, uncoveredPendingMaterial } from '../../tools/lib/deliverables-audit.mjs'
 import { parseAssignments } from '../../tools/lib/candidate-scan.mjs'
 
 const arg = (name, fallback) => {
@@ -207,7 +209,7 @@ for (const [slug, meta] of metaBySlug) {
 
 // 反向门禁（布局卡评审修正 6，2026-10-04 补落）：present 在而结果≠终态 → 红——
 // present 是收口动作，收了口状态必须落终态词（留空/进行中 = P6 病复发：结果靠自觉回写没人盯）。
-// 判据纯逻辑 = lib presentResultRows（keyless spec 在 tests/company/deliverables.spec.ts）；无 meta 不在射程（T-9 观察项管）。
+// 判据纯逻辑 = lib presentResultRows（keyless spec 在 tests/company/deliverables-audit.spec.ts）；无 meta 不在射程（T-9 观察项管）。
 const metaResultBySlug = new Map([...metaBySlug].map(([slug, meta]) => [slug, meta.fields.get('结果') ?? '']))
 for (const row of presentResultRows(result.leadFinalSlugs, metaResultBySlug)) {
   violations.push({

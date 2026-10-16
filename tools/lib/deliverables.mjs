@@ -1,27 +1,15 @@
-// 交付物三态判据的**纯逻辑**实现（R4「成品流程」轮）。
+// 交付物判据的**形状与身份**基座（R4「成品流程」轮；2026-10-16 第三轮结构收敛按
+// 「形状与身份 / 声明对账」自原 deliverables.mjs 拆出）。
 //
-// 判据的合同家 = `company-workspace/AGENTS.md`「交付物三态」一节；动机与依据 =
-// `notes/proposed/2026-09-22-workspace-hygiene.md`（验收判据 1）。
+// 本文件管：一份交付物是什么（`deliverableId` 的身份解析，认新形状与平铺旧形状）、
+// 住在盘上哪（活跃根 / 归档根 / drafts / sources / sources 子目录）、形状合不合法
+// （`classifyDeliverable`）、meta.md 的行形状与词表（`parseMeta` / `validateMeta`）、
+// 占位/让位首行判定，以及观察项与 meta 词表（`WARNING` / `META_TYPES` / `META_RESULTS`）。
+// **会话声明与盘上对账**（`auditDeliverables`、`parseSessionLog`、`presentResultRows`、
+// `VIOLATION`）住 ./deliverables-audit.mjs，依赖方向单向：audit → 本文件，本文件不反向 import。
 //
-// 三态：
-//   成品    `deliverables/<slug>/final.md`          —— 必须来自一次 Lead 会话的 `present`
-//   过程稿  `deliverables/<slug>/drafts/<role>.md`  —— 角色自己的稿子，不是对外文本
-//   排练    `snapshots/<round>-*/` 或删除            —— 不进 `deliverables/`
-//
-// 为什么"成品"限定 **Lead 会话**：`company-workspace/AGENTS.md` 的承诺权已写明"只有 CEO 能
-// 对外发布结论……任何对外文本在 CEO `present` 之前都只是草稿"。实测（R2 归档）CFO 调用过 3 次
-// `present`、VP-Sales 1 次——若不限归属，过程稿会与 CEO 定稿平级，"哪些是成品"仍答不上来。
-//
-// 判据按**交付物身份**（`slug` + 角色）比对，不按字面路径——这是为"三态迁移"留的口子：
-// CEO 在 R1 声明的 `deliverables/kb-rag-assessment.md` 搬家成
-// `deliverables/kb-rag-assessment/final.md` 之后，**那次声明依然成立**（同一份交付物、同一个
-// 作者、同一个声明），否则迁移一次就把历史证据全判成 dangling——那是假阳性，不是违规。
-// 身份解析同时认新形状与平铺旧形状（见 `deliverableId`）；**盘上文件的形状合法性**另由
-// `classifyDeliverable` 判，两者分开，互不污染。
-//
-// 本模块**不做 I/O**：调用方把"工作区文件清单"与"会话日志文本"喂进来。于是同一份逻辑
-// 既能在回归层（`tests/`，秒级、无 key）被直接断言，也能被运行场脚本（`checks/`，可起进程）
-// 复用——分层纪律见 `docs/guides/dev-loop.md` §9.1。
+// 本模块**不做 I/O**、不读文件系统：调用方把"工作区文件清单"喂进来——分层纪律见
+// `docs/guides/dev-loop.md` §9.1。
 import { COMPANY_ROLE_IDS } from './company-roles.mjs'
 
 /** 成品文件名与过程稿目录名（三态的字面约定）。 */
@@ -93,36 +81,12 @@ export function isPlaceholderYield(body) {
   return first !== undefined && first.trim() === PLACEHOLDER_YIELD_LINE
 }
 
-// ── meta.md（B1 事实家，2026-10-03 拍板；机器可读行风格照「派活行」先例）──
+
 
 /** 动议分型（决策点③：先分型再定词——试金 22 话题全覆盖的四型）。 */
 export const META_TYPES = ['决策', '生产', '诊断', '口径问答']
 /** 决议结果枚举（跨型共用；单值装不下的历史由「落地事件」多行字段承载）。 */
 export const META_RESULTS = ['进行中', '已采纳', '已否决', '已搁置', '已废弃', '判不了', '已完成']
-/**
- * 终态词表（反向门禁用，布局卡评审修正 6）：present 是收口动作 ⇒ 收口后「结果」必须是终态词。
- * 「进行中」合法但非终态——present 在而结果=进行中 = P6 病（收口了还挂着进行中）⇒ 红。
- */
-export const META_FINAL_RESULTS = META_RESULTS.filter(word => word !== '进行中')
-
-/**
- * 反向门禁（布局卡评审修正 6：present 在而结果≠终态 → 红；2026-10-04 code-review 补落）。
- * 射程：**Lead present 过的成品** × 其 meta 的「结果」字段——留空或「进行中」判红
- * （收口动作已发生，状态必须落终态）；无 meta 的成品不在射程（final-without-meta 观察项
- * T-9 盯守，避免同一条双报）。纯逻辑，IO 接线在 deliverables-check。
- * @param leadFinalSlugs - Lead present 过的成品 slug（`auditDeliverables().leadFinalSlugs`）。
- * @param metaResultBySlug - slug → meta「结果」字段值（缺行按留空）。
- * @returns 违规行数组：`{ slug, result }`。
- */
-export function presentResultRows(leadFinalSlugs, metaResultBySlug) {
-  const rows = []
-  for (const slug of leadFinalSlugs) {
-    const result = metaResultBySlug.get(slug)
-    if (result === undefined) continue
-    if (!META_FINAL_RESULTS.includes(result)) rows.push({ slug, result })
-  }
-  return rows
-}
 
 /**
  * 解析 meta.md 全文：`字段: 值` 行进 fields（取首现），`落地事件:` 行逐条进 events（多值）。
@@ -165,34 +129,9 @@ export function validateMeta(body) {
   return { ok: problems.length === 0, problems, fields }
 }
 
-/** 判据违规代码（测试与脚本都按这些码断言，别用自由文本）。 */
-export const VIOLATION = {
-  /** 盘上有成品，但没有任何 Lead 会话的 `present` 提及它。 */
-  FINAL_NOT_PRESENTED: 'final-not-presented',
-  /** Lead 的 `present` 提及某成品，但盘上没有该交付物的成品。 */
-  PRESENTED_FINAL_MISSING: 'presented-final-missing',
-  /** 非 Lead 会话 `present` 了成品——越权（承诺权在 CEO）。 */
-  FINAL_PRESENTED_BY_NON_LEAD: 'final-presented-by-non-lead',
-  /** `deliverables/` 下的 `.md` 既不是成品也不是过程稿形状。 */
-  UNSHAPED_FILE: 'unshaped-file',
-  /** meta.md 形状不合法（缺必填行 / 枚举外取值 / 日期格式不对——validateMeta 的判红面）。 */
-  META_SHAPE_BAD: 'meta-shape-bad',
-  /** `present` 提及的过程稿在盘上找不到（反向检查）。 */
-  DANGLING_PRESENT: 'dangling-present',
-  /** 「待补料」派活行无 schedule 任务为证（闸门④：行动幻觉 = 口头已立提醒而 schedule.json 无锚）。 */
-  PENDING_MATERIAL_WITHOUT_SCHEDULE: 'pending-material-without-schedule',
-  /** 反向门禁：Lead present 过的成品，meta「结果」仍非终态（留空/进行中——布局卡评审修正 6）。 */
-  PRESENT_RESULT_NOT_FINAL: 'present-result-not-final',
-}
-
 /** 把路径归一成工作区相对的正斜杠形式，便于两侧比较。 */
 export function normalizeRel(path) {
   return path.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/{2,}/g, '/')
-}
-
-/** 身份比较用的键（`kind` 参与比较：成品与过程稿不能互相顶替）。 */
-function idKey(id) {
-  return id.kind === 'final' ? `${id.slug}\u0000final` : `${id.slug}\u0000draft\u0000${id.role}`
 }
 
 /**
@@ -269,238 +208,3 @@ export function classifyDeliverable(relPath, options = {}) {
     : { state: 'draft', slug: id.slug, role: id.role }
 }
 
-/** Lead 会话的判据：`delegationDepth === 0` 且挂了公司入口角色的 preset。 */
-export function isLeadSession(identity, leadPreset = 'ceo') {
-  return identity.delegationDepth === 0 && identity.agentPreset === leadPreset
-}
-
-/**
- * 事实阻塞闸门④审计纯逻辑（2026-10-10）：「待补料」派活行必须有 schedule 任务为证——
- * 任务 title/prompt 含 `待补料·<slug>·<T号>` 即为已锚；缺锚 = 行动幻觉
- * （卡兹克案实证：口头"已立提醒"而 schedule.json 为空）。schedule 任务形状兼容
- * `{ record: { title, prompt } }`（storages/schedule.json 现形状）与平铺 `{ title, prompt }`。
- * @returns 未锚的 T 号清单（空 = 全部已锚）。
- */
-export function uncoveredPendingMaterial(pendingTaskIds, scheduleTasks, slug) {
-  const anchor = `待补料·${slug}·`
-  const texts = (scheduleTasks ?? []).map(t => {
-    const rec = t?.record ?? t ?? {}
-    return `${rec.title ?? ''}\n${rec.prompt ?? ''}`
-  })
-  return (pendingTaskIds ?? []).filter(id => !texts.some(text => text.includes(`${anchor}${id}`)))
-}
-
-/**
- * 归档件违规降观察项（BUG-008 存量豁免口径，2026-10-10 用户拍板：注记豁免）：
- * `deliverables-archive/` 是只读历史——落在它上面的违规（如前审计时代的 final 无 present、
- * meta 词表漂移）转为 `legacy-archive:<原码>` 观察项并注记存量豁免；**active `deliverables/`
- * 照旧严判**。审计主战场是活盘，不是改写历史。
- */
-export function partitionArchiveViolations(violations) {
-  const active = []
-  const legacy = []
-  for (const v of violations) {
-    (typeof v.path === 'string' && v.path.startsWith(ARCHIVE_ROOT) ? legacy : active).push(v)
-  }
-  return {
-    violations: active,
-    warnings: legacy.map(v => ({
-      code: `legacy-archive:${v.code}`,
-      detail: `${v.path}｜${v.detail}——存量豁免（BUG-008 口径：归档件历史就历史，审计主战场 = active deliverables/）`,
-    })),
-  }
-}
-
-/**
- * 解析一份会话日志文本，取出判据要用的两件事：会话身份 + 全部 `deliverables/presented` 事件。
- * 纯函数（不读文件），未识别/损坏的行直接跳过——判据只认结构化事件，不猜。
- * @param text - 会话 JSONL 全文（可含多行）。
- * @returns `{ id, agentPreset, delegationDepth, cwd, presented: { path, description }[] }`。
- */
-export function parseSessionLog(text) {
-  const identity = { id: undefined, agentPreset: undefined, delegationDepth: undefined, cwd: undefined }
-  const presented = []
-  for (const line of text.split('\n')) {
-    if (line === '') continue
-    let event
-    try {
-      event = JSON.parse(line)
-    } catch {
-      continue
-    }
-    if (event.type === 'session' && identity.id === undefined) {
-      identity.id = event.id
-      identity.agentPreset = event.agentPreset
-      identity.delegationDepth = event.delegationDepth
-      identity.cwd = event.cwd
-      continue
-    }
-    if (event.type !== 'deliverables/presented') continue
-    for (const file of event.data?.files ?? []) {
-      if (typeof file?.path !== 'string') continue
-      presented.push({ path: normalizeRel(file.path), description: file.description })
-    }
-  }
-  return { ...identity, presented }
-}
-
-/**
- * 审计一个工作区的交付物三态。
- * @param input - `{ workspaceFiles, sessions, legacyFlat?, leadPreset?, onlySlug? }`
- *   - `workspaceFiles`：工作区相对路径清单（调用方列目录得到，本模块不碰文件系统）；
- *   - `sessions`：`parseSessionLog` 的产物数组；
- *   - `legacyFlat`：把平铺旧形状也算合法（只给已归档快照用）；
- *   - `leadPreset`：入口角色 preset id，默认 `ceo`；
- *   - `onlySlug`：只审这一个交付物。**审归档快照时必须给**——快照的 `workspace.expected/`
- *     是整盘拷贝，而 `sessions/` 只装本轮的日志；不给作用域就会把历史成品误报成
- *     "无 Lead 背书"（那是输入不成对，不是违规）。
- * @returns `{ finals, drafts, violations }`——`finals`/`drafts` 是形状分类结果，
- *   `violations` 每条 `{ code, path, detail }`。
- */
-export function auditDeliverables(input) {
-  const { workspaceFiles, sessions } = input
-  const legacyFlat = input.legacyFlat === true
-  const leadPreset = input.leadPreset ?? 'ceo'
-  // 只审一个 slug：按**归一后的 slug** 匹配（T-7——A1 日期前缀目录名 ≠ slug，字面前缀匹配会静默零匹配）。
-  const onlySlug = input.onlySlug === undefined ? undefined : String(input.onlySlug)
-  const inScope = path => onlySlug === undefined || deliverableId(path)?.slug === onlySlug
-
-  const onDisk = new Set(workspaceFiles.map(normalizeRel).filter(inScope))
-  const onDiskIds = new Set()
-  const finals = []
-  const drafts = []
-  const metas = []
-  const sources = []
-  const materials = {}
-  const unshaped = []
-  for (const file of onDisk) {
-    const id = deliverableId(file)
-    if (id !== undefined) onDiskIds.add(idKey(id))
-    const verdict = classifyDeliverable(file, { legacyFlat })
-    if (verdict.state === 'final') finals.push({ path: file, slug: verdict.slug })
-    else if (verdict.state === 'draft') drafts.push({ path: file, slug: verdict.slug, role: verdict.role })
-    else if (verdict.state === 'meta') metas.push({ path: file, slug: verdict.slug })
-    else if (verdict.state === 'source') sources.push({ path: file, slug: verdict.slug })
-    else if (verdict.state === 'material') {
-      (materials[verdict.dir] ??= []).push(file)
-    }
-    else if ((file.startsWith(ACTIVE_ROOT) || file.startsWith(ARCHIVE_ROOT)) && file.endsWith('.md')) unshaped.push(file)
-  }
-
-  // 声明面：判据只追 **Lead 声明**——`company-workspace/AGENTS.md` 的承诺权写明只有 CEO 的
-  // `present` 才算交付物声明，其他会话的 `present` 只是过程稿的可见化，不构成交付物。
-  // ⚠ 多人形态修正（BUG-003，2026-10-06）：非 Lead 的 present 在单操作者语境下是「过程稿
-  // 可见化」（当时的有意容忍——每个门后是同一个人）；多人形态下每扇门后是**不同的人** ⇒
-  // 非 Lead 直呈过程稿升为**观察项**（DRAFT_PRESENTED_BY_NON_LEAD，不判违规、每次提醒），
-  // 成品侧越权照旧判违规。
-  // 非 Lead 声明的成品只在**它此刻真的躺在盘上**时判越权（历史行为不追着报，否则一次越权
-  // 会永久污染此后每一轮审计）。
-  const leadFinalIds = new Set()
-  const leadDraftIds = new Set()
-  /** slug → 声明过它成品的 Lead 会话 id 集合（撞车检测用）。 */
-  const leadFinalSessions = new Map()
-  const onDiskFinalIds = new Set()
-  for (const file of onDisk) {
-    const id = deliverableId(file)
-    if (id?.kind === 'final') onDiskFinalIds.add(idKey(id))
-  }
-  const nonLeadFinalIds = new Set()
-  /** presenter preset + 过程稿 id → 观察行（去重：同一会话反复 present 同稿只提醒一次）。 */
-  const nonLeadDraftPresents = new Map()
-  for (const session of sessions) {
-    const lead = isLeadSession(session, leadPreset)
-    for (const { path } of session.presented) {
-      if (!path.startsWith('deliverables/')) continue // kb/** 等不在判据射程内
-      if (!inScope(path)) continue
-      const id = deliverableId(path)
-      if (id === undefined) continue
-      if (id.kind === 'final') {
-        if (lead) {
-          leadFinalIds.add(idKey(id))
-          const who = leadFinalSessions.get(id.slug) ?? new Set()
-          who.add(session.id ?? '(会话无 id)')
-          leadFinalSessions.set(id.slug, who)
-        } else if (onDiskFinalIds.has(idKey(id))) nonLeadFinalIds.add(idKey(id))
-      } else if (lead) {
-        leadDraftIds.add(idKey(id))
-      } else if (id.kind === 'draft') {
-        nonLeadDraftPresents.set(`${String(session.agentPreset ?? '?')}\u0000${idKey(id)}`, {
-          slug: id.slug, role: id.role, preset: session.agentPreset ?? '?', path,
-        })
-      }
-    }
-  }
-
-  const violations = []
-  for (const final of finals) {
-    if (!leadFinalIds.has(idKey({ slug: final.slug, kind: 'final' }))) {
-      violations.push({
-        code: VIOLATION.FINAL_NOT_PRESENTED,
-        path: final.path,
-        detail: '成品在盘上，但没有任何 Lead 会话的 deliverables/presented 事件声明过这份交付物',
-      })
-    }
-  }
-  for (const key of leadFinalIds) {
-    if (!onDiskIds.has(key)) {
-      const [slug] = key.split('\u0000')
-      violations.push({
-        code: VIOLATION.PRESENTED_FINAL_MISSING,
-        path: `deliverables/${slug}/${FINAL_BASENAME}`,
-        detail: 'Lead 声明过这份交付物的成品，但盘上找不到它的成品（迁移漏了？还是被删了？）',
-      })
-    }
-  }
-  // legacy 模式下不判越权：平铺形状里"成品 vs 过程稿"是名字启发式，把 VP 自己声明的草稿
-  // 也当成成品路径，据此判越权是**假阳性**。越权只在新形状下判（过程稿有自己的家 `drafts/`）。
-  if (!legacyFlat) {
-    for (const key of nonLeadFinalIds) {
-      const [slug] = key.split('\u0000')
-      violations.push({
-        code: VIOLATION.FINAL_PRESENTED_BY_NON_LEAD,
-        path: `deliverables/${slug}/${FINAL_BASENAME}`,
-        detail: '非 Lead 会话把这份东西声明成了成品——承诺权在 CEO（company-workspace/AGENTS.md）',
-      })
-    }
-  }
-  for (const path of unshaped) {
-    violations.push({
-      code: VIOLATION.UNSHAPED_FILE,
-      path,
-      detail: `deliverables(-archive)/ 下的 .md 必须是 <slug>/${FINAL_BASENAME}、<slug>/meta.md 或 <slug>/${DRAFTS_DIRNAME}/<role>.md`,
-    })
-  }
-  // 反向检查：Lead 声明过的过程稿必须还在盘上（过程稿是 CEO 引用的证据，丢了要报）。
-  for (const key of leadDraftIds) {
-    if (onDiskIds.has(key)) continue
-    const [slug, , role] = key.split('\u0000')
-    violations.push({
-      code: VIOLATION.DANGLING_PRESENT,
-      path: `deliverables/${slug}/${DRAFTS_DIRNAME}/${role}.md`,
-      detail: 'Lead 的 present 声明过这份过程稿，但盘上找不到',
-    })
-  }
-
-  // 观察项（不判违规）：同一 slug 的成品被多个 Lead 会话声明过 ⇒ 产物互相覆盖。
-  const warnings = []
-  for (const [slug, who] of leadFinalSessions) {
-    if (who.size > 1) {
-      warnings.push({
-        code: WARNING.SLUG_COLLISION,
-        slug,
-        detail: `slug \`${slug}\` 的成品被 ${who.size} 个不同的 Lead 会话声明过（产物会互相覆盖，而三态判据看不出撞车）——开新动议前先看 deliverables/ 有没有同名`,
-      })
-    }
-  }
-  // 观察项（BUG-003）：非 Lead 会话 present 过程稿——多人形态下直呈其门上的人即绕过成品
-  // 专属性（vendor 工具语义 = final deliverables 声明）；历史容忍不追溯红，每次提醒。
-  for (const entry of nonLeadDraftPresents.values()) {
-    warnings.push({
-      code: WARNING.DRAFT_PRESENTED_BY_NON_LEAD,
-      slug: entry.slug,
-      detail: `非 Lead 会话（${entry.preset}）present 了过程稿 \`${entry.path}\`——多人形态下这会把它当 final deliverable 直呈该门上的人（BUG-003）；present 应留在 CEO 收口步`,
-    })
-  }
-  const archived = partitionArchiveViolations(violations)
-  return { finals, drafts, metas, sources, materials, violations: archived.violations, warnings: [...warnings, ...archived.warnings], leadFinalSlugs: [...leadFinalSessions.keys()] }
-}

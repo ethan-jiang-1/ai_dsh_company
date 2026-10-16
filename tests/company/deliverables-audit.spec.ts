@@ -12,7 +12,7 @@ import {
   partitionArchiveViolations,
   presentResultRows,
   uncoveredPendingMaterial,
-} from '../../tools/lib/deliverables.mjs'
+} from '../../tools/lib/deliverables-audit.mjs'
 
 /**
  * 交付物**声明对账**面的回归层（R4「成品流程」轮；2026-10-16 第三轮结构收敛自
