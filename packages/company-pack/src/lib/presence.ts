@@ -1,67 +1,30 @@
-/** 组织在场板读模型（R5b）：纯函数，host 折事件 / client 渲染快照共用（Q5–Q8 定案，见提案 §四个定案）。 */
+// 组织在场板读模型（R5b）：纯函数，host 折事件 / client 渲染快照共用（Q5–Q8 定案，见提案 §四个定案）。
+//
+// 本文件管**折算**：事件 / 快照 → 板（行与动态）；读取的 wire 结构与板形状类型也在这里。
+// 状态与显示名词汇（`PresenceStatus` / `STATUS_LABEL` / `presenceStatusFromPhase` /
+// `statusLabelFor` / `PRESET_DISPLAY_NAMES` / `displayNameFor`）住 ./presence-status.ts，
+// 由本文件**再导出**——所以 `export * from './lib/presence.ts'`（src/index.ts）与各 client
+// importer 的取用面一个字节都不变（2026-10-16 第三轮结构收敛：facade 拆法，见
+// notes/implemented/2026-10-16-presence-status-seam.md）。
+// 依赖方向单向：本文件 → presence-status.ts（后者零 import，是叶子）。
+import {
+  PRESET_DISPLAY_NAMES,
+  STATUS_LABEL,
+  displayNameFor,
+  presenceStatusFromPhase,
+  statusLabelFor,
+  type PresenceStatus,
+} from './presence-status.ts'
 
-/**
- * D-c：状态文案。`status` 是 agent driver 的**团队内**忙闲，不等于"这个人此刻在工作"——
- * 值一律走中文映射，未知值落「未知」，不直显英文裸值。
- */
-export type PresenceStatus = 'running' | 'idle' | 'inactive' | 'provisioning' | 'failed' | 'unknown'
-
-export const STATUS_LABEL: Record<PresenceStatus, string> = {
-  running: '执行中',
-  idle: '待命',
-  inactive: '未上线',
-  provisioning: '启动中',
-  failed: '故障',
-  unknown: '未知',
+// 词汇再导出（facade 的对外半边）：消费方继续从 `lib/presence.ts` 取这些名字。
+export {
+  PRESET_DISPLAY_NAMES,
+  STATUS_LABEL,
+  displayNameFor,
+  presenceStatusFromPhase,
+  statusLabelFor,
 }
-
-/**
- * 0.1.7 投影的成员生命周期 → 本读模型的状态（未知值落 `unknown`，不抛）。
- * `active` 落 `idle`（待命）：投影不表达 live turn 活动，别把它读成"正在工作"。
- * @param phase - `TeamMemberPhase`（或任意字符串）。
- * @returns 本仓的在场状态。
- */
-export function presenceStatusFromPhase(phase: string): PresenceStatus {
-  switch (phase) {
-    case 'provisioning': return 'provisioning'
-    case 'active': return 'idle'
-    case 'failed': return 'failed'
-    default: return 'unknown'
-  }
-}
-
-/** 状态 → 文案（未知值不抛）。 */
-export function statusLabelFor(status: string): string {
-  return STATUS_LABEL[status as PresenceStatus] ?? STATUS_LABEL.unknown
-}
-
-/** 五个 preset id（有限键，索引安全；与 `presets/<role>/preset.yml` 一一对应）。 */
-const PRESET_KEYS = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'] as const
-
-type PresetRoleId = typeof PRESET_KEYS[number]
-
-function isPresetRole(name: string): name is PresetRoleId {
-  return (PRESET_KEYS as readonly string[]).includes(name)
-}
-
-/**
- * D-a：显示名映射。member.name 命中 preset id → 系列化显示名；`role === 'lead'` → CEO
- * （本组织 lead 恒为 CEO）；未命中原样显示（任意组队名不崩）。与各 `presets/<role>/preset.yml`
- * 的 `name` 同源——`tests/company/presence-board.spec.ts` 有防漂移断言。
- */
-export const PRESET_DISPLAY_NAMES: Record<PresetRoleId, string> = {
-  ceo: '梦之队 CEO',
-  'vp-eng': '梦之队 VP-Eng',
-  'vp-sales': '梦之队 VP-Sales',
-  coo: '梦之队 COO',
-  cfo: '梦之队 CFO',
-}
-
-/** 成员名 → 显示名（lead 行特殊：name 恒为 'lead'，按角色映射）。 */
-export function displayNameFor(name: string, role: 'lead' | 'teammate'): string {
-  if (role === 'lead') return PRESET_DISPLAY_NAMES.ceo
-  return isPresetRole(name) ? PRESET_DISPLAY_NAMES[name] : name
-}
+export type { PresenceStatus }
 
 /** 在场板一行：D-a 主键 = team roster，一行一个成员（lead + teammate）。 */
 export interface PresenceRow {
@@ -90,6 +53,7 @@ export interface PresenceBoardModel {
   readonly rows: readonly PresenceRow[]
   readonly activity: readonly ActivityEntry[]
 }
+
 
 // ---- wire 事实的宽松结构类型（只声明读到的字段；多出的字段忽略，少掉的按缺省处理） ----
 

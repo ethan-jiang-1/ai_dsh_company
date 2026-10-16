@@ -13,9 +13,11 @@
   **为什么单开一层**：`src/lib/` 同时被 client 叶编译（`tsconfig.client.json`），带 node 内建的模块住那儿
   会让 client 叶报 TS2591（2026-10-13 现场）——host-only 的东西住 `host/`。
 - `lib/` —— **host/client 共享读模型与纯逻辑**，keyless 单测（`tests/company/`）的直接对象：
-  `attention / board / budget / cultivation / dag / doors / ledger / presence / signoff / tool-card` 十模块
-  （`doors` = 多人门控归属判据，2026-10-06 加入）。内部依赖链一条：`dag → board → presence`
-  （2026-10-05 盘点）。host 入口消费 `signoff / presence / doors`；
+  `attention / board / budget / cultivation / dag / doors / ledger / presence / presence-status / signoff / tool-card` 十一模块
+  （`doors` = 多人门控归属判据，2026-10-06 加入；`presence-status` = 在场状态与显示名词汇，2026-10-16 自 `presence` 拆出，
+  `presence` 保留折算并再导出它 = facade）。内部依赖链：`dag → board → presence`（2026-10-05 盘点）
+  ＋ `presence → presence-status`（2026-10-16；后者零 import，是叶子）。
+  host 入口消费 `signoff / presence / doors`；
   client 半消费 `presence / board / budget`（类型为主 + 少量纯函数）。
 - `client/` —— **client 注册入口与浏览器面**：`index.ts`（`dsh.client` 注入面及组合）调用
   `company-session-adapters.ts` 统一 Lead 归并与 follow 帧投影，调用 `company-tab-registration.ts` 以一个固定页签目录
