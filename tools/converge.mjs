@@ -10,7 +10,8 @@
 //   node tools/converge.mjs --slug <目录名> --allow-open-findings # 显式接受未结审计发现（照记，不静默放行）
 //   node tools/converge.mjs --slug <目录名> --dry-run  # 只打印动作清单，不动盘
 //   node tools/converge.mjs --charter-backfill <目录名>  # 为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步）
-// 成本：秒级~十秒级、无模型；git mv/git rm 只动 tracked 文件。
+// 成本：秒级~十秒级、无模型；交付物走 git mv（tracked）；journal 已跟踪的走 git rm、**未跟踪的走 rmSync**
+//   （角色刚写、尚未入库的 journal 是常态；2026-10-16 实测 git rm 会以 pathspec 不匹配中断收敛）。
 // ⚠ 环境：需 **`source run/env.sh`**（DSH_HOME 指向开发 home）——「无未结审计发现」这道前置要调
 //   `checks/audit/deliverables-check.mjs --only <slug>`（判据单一来源 = 那个审计档，收敛器不重写）。
 //   环境不可用时 fail-closed（报一条不可评估的发现），不放行。
@@ -236,7 +237,14 @@ const converge = (dirName) => {
   const removed = []
   for (const j of journal) {
     const p = join('company-workspace', j.path)
-    git(['rm', '-q', p]); removed.push(p)
+    // ⚠ 未跟踪的 journal 不能走 `git rm`（刚由角色写入、尚未入库时是常态）——2026-10-16 实测：
+    // 真会话补做收口时新建 `kb/<role>/journal/<日期>-<slug>-收口补记.md`，收敛器 `git rm` 直接抛
+    // `fatal: pathspec … did not match`，**中断在半途**（交付物已搬、journal 清了一半）。
+    // 判据 = `git ls-files --error-unmatch`；未跟踪的用 rmSync 清，语义与 git rm 等价（都进证据副本）。
+    const tracked = spawnSync('git', ['ls-files', '--error-unmatch', '--', p], { cwd: ROOT, encoding: 'utf8' }).status === 0
+    if (tracked) git(['rm', '-q', p])
+    else rmSync(join(ROOT, p), { force: true })
+    removed.push(p)
     const roleDir = join(WS, 'kb', j.role, 'journal')
     if (readdirSync(roleDir).length === 0) writeFileSync(join(roleDir, '.gitkeep'), '')
   }

@@ -2,7 +2,7 @@
 
 当场修掉的不建卡。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。
 
-**下一个缺陷号**：Next BUG ID = 20；已分配 BUG-001..019。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 21；已分配 BUG-001..020。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，修相对链接并更新两边清单。
 
@@ -10,6 +10,7 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
+| [BUG-020](BUG-020-converge-crash-untracked-journal.md) | converge 撞「角色刚写未入库的 journal」崩在半途，且无续跑路径（`git rm` 撞未跟踪已修；续跑面未修） | P2 |
 | [BUG-019](BUG-019-final-present-evidence-lost.md) | `final-not-presented` 的判别盲区（日志残缺时不可证伪）——**本案经深挖为真阳性**（收口会话从未调 present）；盲区 latent，待优先级 | P2 |
 
 BUG-001..018 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
