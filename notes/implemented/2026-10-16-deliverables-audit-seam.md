@@ -33,7 +33,7 @@
 - 回归层新增一个结构不变量：`<模块>.spec.ts` 一一对应（形状 spec 只 import 基座，对账 spec import 两家）。
 - 触发线可绊人：`runtime/e2e/round3-receipts/trigger-check.mjs` 是那条触发线的可跑判据（读真文件、5 mode/717 行 ⇒ PASS；注入第 6、7 个 mode ⇒ FAIL），红证见验证节。它不进 `pnpm test`（读真项目文件，属认证档口径）。
 - **收割一件常驻资产**：本轮反复手搓的「全名清单 diff」沉淀为 [checks/smoke/refactor-drift-oracle.mjs](../../checks/smoke/refactor-drift-oracle.mjs)——`--names` 出人读清单、`--hashes` 出「归一全名 + 测试体指纹」档（**判等价用这档**：除改名/增删外还拦测试体改动），`--compare` 自动识别档位；两档都放行文件与 describe 归属搬家。索引见 [checks/README](../../checks/README.md)。下一次结构轮的「零漂移」判据不必再手搓 sed。**判别力边界**：它证「这些测试体一字未动」，不证「体里的断言仍有意义」——后者归语义审。
-- 待清残留：基座 spec 里 6 个夹具/辅助（`R1`、`listFiles`、`readSessions`、`r1WorkspaceFiles`、`r1Sessions`、`TMP_DIRS`、`r1CopyWith`、`afterAll`）当前只被对账 spec 的反证用例使用——已在基座 spec 注释点名，清理归后续轮。
+- ~~待清残留：基座 spec 里的死夹具/辅助~~ **已清偿（`5765be8`）**：拆分后基座 spec 侧 **15 个**夹具/导入零消费者（`R1` `R2` `listFiles` `readSessions` `r1WorkspaceFiles` `r1Sessions` `TMP_DIRS` `r1CopyWith` `afterAll` `cpSync` `mkdtempSync` `readdirSync` `rmSync` `tmpdir` `relative`，外加当时也已无用的 `ROOT` 导入），同轮还修掉了该文件 rebuild 时留下的重复注释块；基座 spec 132 → 98 行。判据 = `--hashes` 档清前/清后 ALL PASS（559 = 559、零测试体改动）——**证明清掉的是零消费者夹具、没有一个测试被顺手改掉**。
 - 未做（本轮范围外、来源卡已排除）：`presence.ts` 内部接缝（Item 2，留独立第二轮）、模块大小门禁、`src/client/` 与 `tools/lib/` 分组。
 
 ## 验证
