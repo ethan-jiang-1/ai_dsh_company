@@ -8,6 +8,7 @@ import {
   VIOLATION,
   auditDeliverables,
   isLeadSession,
+  metaLedgerFindings,
   parseSessionLog,
   partitionArchiveViolations,
   presentResultRows,
@@ -260,6 +261,28 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
       .toContain(VIOLATION.DANGLING_PRESENT)
     // 只有 teammate 声明过 → 不报（它不是交付物声明，只是可见化）
     expect(auditDeliverables({ workspaceFiles: [], sessions: [teammate] }).violations).toEqual([])
+  })
+
+  it('形状坏也登记户口：不因「meta 形状不合法」再报一条「没有 meta.md」（2026-10-16 真盘二次报）', () => {
+    // 真盘现场：all-in-ai-2026 的 meta 用列表符写，旧实现形状坏就 continue、不登记 slug，
+    // 于是又报一条 final-without-meta「盘上没有 meta.md」——meta 明明在盘上。判据 = lib 纯函数。
+    const badBody = '- slug: `bad`\n- kickoff: 2026-10-13\n- 类型: 决策\n- 结果: 已完成\n'
+    const { metas, results } = metaLedgerFindings({
+      finalSlugs: ['bad'],
+      metas: [{ slug: 'bad', path: 'deliverables/bad/meta.md' }],
+      readMeta: () => badBody,
+    })
+    expect(metas.has('bad'), '形状坏也必须登记「这个 slug 有户口」').toBe(true)
+    expect(results.map(r => r.code)).toEqual([VIOLATION.META_SHAPE_BAD])
+  })
+
+  it('户口缺失（成品在盘、meta 真不在）仍照报 final-without-meta——两档分开报的守卫', () => {
+    const { results } = metaLedgerFindings({
+      finalSlugs: ['ghost'],
+      metas: [],
+      readMeta: () => undefined,
+    })
+    expect(results.map(r => r.code)).toEqual([WARNING.FINAL_WITHOUT_META])
   })
 
   it('meta.md 是白名单形状（T-2），且不进 finals/drafts', () => {

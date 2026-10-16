@@ -29,7 +29,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { join, resolve } from 'node:path'
 import { WARNING, isPlaceholderClaim, validateMeta } from '../../tools/lib/deliverables.mjs'
-import { VIOLATION, auditDeliverables, parseSessionLog, partitionArchiveViolations, presentResultRows, uncoveredPendingMaterial } from '../../tools/lib/deliverables-audit.mjs'
+import { VIOLATION, auditDeliverables, metaLedgerFindings, parseSessionLog, partitionArchiveViolations, presentResultRows, uncoveredPendingMaterial } from '../../tools/lib/deliverables-audit.mjs'
 import { parseAssignments } from '../../tools/lib/candidate-scan.mjs'
 
 const arg = (name, fallback) => {
@@ -179,32 +179,21 @@ const violations = [...result.violations]
 // ── meta.md 户口面（布局卡 B1，2026-10-03 拍板：meta 是家、台账过渡期人工 + 一致性观察）──
 // 形状红：parse/validate 判据在 lib（validateMeta）；观察三项：final-without-meta（T-9）、
 // 结果留空（存量回填态）、kickoff 与台账日期不一致（两笔账对不上）。
-const finalSlugs = [...new Set(result.finals.map(f => f.slug))]
-const metaBySlug = new Map()
-for (const row of result.metas) {
-  const bodyPath = join(workspace, row.path)
-  if (!existsSync(bodyPath)) continue
-  const body = readFileSync(bodyPath, 'utf8')
-  const verdict = validateMeta(body)
-  if (!verdict.ok) {
-    violations.push({ code: VIOLATION.META_SHAPE_BAD, path: row.path, detail: `meta.md 形状不合法：${verdict.problems.join('；')}` })
-    continue
-  }
-  metaBySlug.set(row.slug, { path: row.path, fields: verdict.fields })
-}
-for (const slug of finalSlugs) {
-  if (!metaBySlug.has(slug)) {
-    warnings.push({ code: WARNING.FINAL_WITHOUT_META, detail: `成品 \`${slug}/final.md\` 在盘上但没有 meta.md（T-9：没有户口的成品绕过一切新检查）——补 \`meta.md\`（形状 = lib validateMeta）` })
-  }
-}
-for (const [slug, meta] of metaBySlug) {
-  if (meta.fields.get('结果') === '') {
-    warnings.push({ code: WARNING.META_RESULT_PENDING, detail: `\`${slug}/meta.md\` 的「结果」留空（存量迁移回填态）——收敛时维护者回填（词表 = lib META_RESULTS）` })
-  }
-  const ledgerDate = ledgerDateBySlug.get(slug)
-  if (ledgerDate !== undefined && ledgerDate !== '日期待核' && meta.fields.get('kickoff') !== ledgerDate) {
-    warnings.push({ code: WARNING.META_LEDGER_MISMATCH, detail: `\`${slug}/meta.md\` kickoff = ${meta.fields.get('kickoff')} ≠ 台账日期列 ${ledgerDate}——两笔账对不上，以会话日志 createdAt 复核后对齐一处` })
-  }
+// 判据纯逻辑 = lib metaLedgerFindings（keyless spec 在 tests/company/deliverables-audit.spec.ts）；
+// 本脚本只做 IO（读 meta 正文）与分档（violation → violations / warning → warnings）。
+const metaLedger = metaLedgerFindings({
+  finalSlugs: [...new Set(result.finals.map(f => f.slug))],
+  metas: result.metas,
+  ledgerDateBySlug,
+  readMeta: relPath => {
+    const bodyPath = join(workspace, relPath)
+    return existsSync(bodyPath) ? readFileSync(bodyPath, 'utf8') : undefined
+  },
+})
+const metaBySlug = metaLedger.metas
+for (const finding of metaLedger.results) {
+  if (finding.kind === 'violation') violations.push({ code: finding.code, path: finding.path, detail: finding.detail })
+  else warnings.push({ code: finding.code, detail: finding.detail })
 }
 
 // 反向门禁（布局卡评审修正 6，2026-10-04 补落）：present 在而结果≠终态 → 红——

@@ -29,6 +29,7 @@ import {
   FINAL_BASENAME,
   META_RESULTS,
   WARNING,
+  validateMeta,
   classifyDeliverable,
   deliverableId,
   normalizeRel,
@@ -125,6 +126,73 @@ export function partitionArchiveViolations(violations) {
       detail: `${v.path}｜${v.detail}——存量豁免（BUG-008 口径：归档件历史就历史，审计主战场 = active deliverables/）`,
     })),
   }
+}
+
+/**
+ * meta.md **户口面**的纯判据（2026-10-03 布局卡 B1；2026-10-16 自 deliverables-check 抽出成
+ * lib 纯逻辑，使这条判据能被 keyless 单测直接断言而不是只能靠真入口档）。
+ *
+ * 射程与两档分开报的原则：
+ *   - **形状红**（`META_SHAPE_BAD`）：meta 在盘上但 `validateMeta` 不过 ⇒ 违规；
+ *   - **户口缺失观察**（`FINAL_WITHOUT_META`）：成品在盘上但**根本没有** meta ⇒ 观察项；
+ *   - 结果留空（`META_RESULT_PENDING`）与 kickoff ≠ 台账（`META_LEDGER_MISMATCH`）⇒ 观察项。
+ *
+ * ⚠ **「有没有户口」与「户口填得对不对」是两件事**（2026-10-16 真盘实测的二次报）：
+ * `all-in-ai-2026` 的 meta 用 Markdown 列表符写（核心字段行全解析不出），旧实现形状坏就
+ * `continue`、不登记该 slug，于是同一条因由**又报**一条「盘上没有 meta.md」——meta 明明在盘上。
+ * 本函数把两者分开：形状坏**也**登记户口，只报形状红。
+ * @param input - `{ finalSlugs, metas, ledgerDateBySlug?, readMeta }`
+ *   - `finalSlugs`：盘上成品 slug（`auditDeliverables().finals` 去重）；
+ *   - `metas`：`auditDeliverables().metas`（`{ path, slug }[]`）；
+ *   - `ledgerDateBySlug`：`slug → 台账日期列`（可选；缺省不查两笔账一致性）；
+ *   - `readMeta`：`(relPath) => string | undefined`（读不到给 undefined ⇒ 跳过，不算缺户口）。
+ * @returns `{ metas: Map<slug, {path, fields}>, results: {kind:'violation'|'warning', code, path?, detail}[] }`
+ */
+export function metaLedgerFindings(input) {
+  const ledgerDateBySlug = input.ledgerDateBySlug ?? new Map()
+  const metas = new Map()
+  const results = []
+  for (const row of input.metas) {
+    const body = input.readMeta(row.path)
+    if (body === undefined) continue
+    const verdict = validateMeta(body)
+    metas.set(row.slug, { path: row.path, fields: verdict.fields })
+    if (!verdict.ok) {
+      results.push({
+        kind: 'violation',
+        code: VIOLATION.META_SHAPE_BAD,
+        path: row.path,
+        detail: `meta.md 形状不合法：${verdict.problems.join('；')}`,
+      })
+    }
+  }
+  for (const slug of input.finalSlugs) {
+    if (!metas.has(slug)) {
+      results.push({
+        kind: 'warning',
+        code: WARNING.FINAL_WITHOUT_META,
+        detail: `成品 \`${slug}/final.md\` 在盘上但没有 meta.md（T-9：没有户口的成品绕过一切新检查）——补 \`meta.md\`（形状 = lib validateMeta）`,
+      })
+    }
+  }
+  for (const [slug, meta] of metas) {
+    if (meta.fields.get('结果') === '') {
+      results.push({
+        kind: 'warning',
+        code: WARNING.META_RESULT_PENDING,
+        detail: `\`${slug}/meta.md\` 的「结果」留空（存量迁移回填态）——收敛时维护者回填（词表 = lib META_RESULTS）`,
+      })
+    }
+    const ledgerDate = ledgerDateBySlug.get(slug)
+    if (ledgerDate !== undefined && ledgerDate !== '日期待核' && meta.fields.get('kickoff') !== ledgerDate) {
+      results.push({
+        kind: 'warning',
+        code: WARNING.META_LEDGER_MISMATCH,
+        detail: `\`${slug}/meta.md\` kickoff = ${meta.fields.get('kickoff')} ≠ 台账日期列 ${ledgerDate}——两笔账对不上，以会话日志 createdAt 复核后对齐一处`,
+      })
+    }
+  }
+  return { metas, results }
 }
 
 /**
