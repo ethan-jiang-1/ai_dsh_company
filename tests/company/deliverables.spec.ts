@@ -49,36 +49,40 @@ afterAll(() => {
 // 本块原为「交付物三态判据（R4）」主 describe 的形状半边：2026-10-16 第三轮结构收敛把
 // **声明对账**半边按 describe 域机械拆去 ./deliverables-audit.spec.ts（测试体逐字搬移），
 // 留下的这些只断言形状与身份，不喂会话日志、不碰违规/观察码。
+
+// 本块原为「交付物三态判据（R4）」主 describe 的形状半边：2026-10-16 第三轮结构收敛把
+// **声明对账**半边按 describe 域机械拆去 ./deliverables-audit.spec.ts（测试体逐字搬移），
+// 留下的这些只断言形状与身份，不喂会话日志、不碰违规/观察码。
 describe('交付物形状与身份（R4 判据的基座半边）', () => {
-it('身份解析认平铺旧形状的两条约定：名字中段的角色、尾部 -final', () => {
-  expect(deliverableId('deliverables/kb-rag-assessment.md')).toEqual({ slug: 'kb-rag-assessment', kind: 'final' })
-  expect(deliverableId('deliverables/kb-rag-assessment-vp-eng.md'))
-    .toEqual({ slug: 'kb-rag-assessment', kind: 'draft', role: 'vp-eng' })
-  // R2 的互审稿：角色后面还带限定词
-  expect(deliverableId('deliverables/reconcile-package-cfo-review.md'))
-    .toEqual({ slug: 'reconcile-package', kind: 'draft', role: 'cfo-review' })
-  // R2 的定稿标记
-  expect(deliverableId('deliverables/reconcile-package-final.md'))
-    .toEqual({ slug: 'reconcile-package', kind: 'final' })
-  // 角色前缀不许被吃掉（`coo-...` 若当角色，slug 会变空）
-  expect(deliverableId('deliverables/coo-parallel-capacity-signoff.md'))
-    .toEqual({ slug: 'coo-parallel-capacity-signoff', kind: 'final' })
-  expect(deliverableId('kb/ceo/journal/x.md')).toBeUndefined()
-})
-it('slugFromDirName：剥 A1 日期前缀', () => {
-  expect(slugFromDirName('2026-09-22-agentic-coworker')).toBe('agentic-coworker')
-  expect(slugFromDirName('agentic-coworker')).toBe('agentic-coworker')
-})
-it('A1 日期前缀目录的身份 = 剥前缀 slug（deliverableId）', () => {
-  expect(deliverableId('deliverables/2026-09-22-foo/final.md')).toEqual({ slug: 'foo', kind: 'final' })
-  expect(deliverableId('deliverables/2026-09-22-foo/drafts/cfo.md')).toEqual({ slug: 'foo', kind: 'draft', role: 'cfo' })
-})
-it('归档根交付物与活跃根同构（跟随扩根）', () => {
-  expect(deliverableId('deliverables-archive/2026-09-22-foo/final.md')).toEqual({ slug: 'foo', kind: 'final' })
-  expect(classifyDeliverable('deliverables-archive/2026-09-22-foo/final.md')).toEqual({ state: 'final', slug: 'foo' })
-  expect(classifyDeliverable('deliverables-archive/2026-09-22-foo/drafts/cfo.md')).toEqual({ state: 'draft', slug: 'foo', role: 'cfo' })
-  expect(classifyDeliverable('deliverables-archive/foo-final.md')).toEqual({ state: 'other' }) // 归档根不认平铺
-})
+  it('身份解析认平铺旧形状的两条约定：名字中段的角色、尾部 -final', () => {
+    expect(deliverableId('deliverables/kb-rag-assessment.md')).toEqual({ slug: 'kb-rag-assessment', kind: 'final' })
+    expect(deliverableId('deliverables/kb-rag-assessment-vp-eng.md'))
+      .toEqual({ slug: 'kb-rag-assessment', kind: 'draft', role: 'vp-eng' })
+    // R2 的互审稿：角色后面还带限定词
+    expect(deliverableId('deliverables/reconcile-package-cfo-review.md'))
+      .toEqual({ slug: 'reconcile-package', kind: 'draft', role: 'cfo-review' })
+    // R2 的定稿标记
+    expect(deliverableId('deliverables/reconcile-package-final.md'))
+      .toEqual({ slug: 'reconcile-package', kind: 'final' })
+    // 角色前缀不许被吃掉（`coo-...` 若当角色，slug 会变空）
+    expect(deliverableId('deliverables/coo-parallel-capacity-signoff.md'))
+      .toEqual({ slug: 'coo-parallel-capacity-signoff', kind: 'final' })
+    expect(deliverableId('kb/ceo/journal/x.md')).toBeUndefined()
+  })
+  it('slugFromDirName：剥 A1 日期前缀', () => {
+    expect(slugFromDirName('2026-09-22-agentic-coworker')).toBe('agentic-coworker')
+    expect(slugFromDirName('agentic-coworker')).toBe('agentic-coworker')
+  })
+  it('A1 日期前缀目录的身份 = 剥前缀 slug（deliverableId）', () => {
+    expect(deliverableId('deliverables/2026-09-22-foo/final.md')).toEqual({ slug: 'foo', kind: 'final' })
+    expect(deliverableId('deliverables/2026-09-22-foo/drafts/cfo.md')).toEqual({ slug: 'foo', kind: 'draft', role: 'cfo' })
+  })
+  it('归档根交付物与活跃根同构（跟随扩根）', () => {
+    expect(deliverableId('deliverables-archive/2026-09-22-foo/final.md')).toEqual({ slug: 'foo', kind: 'final' })
+    expect(classifyDeliverable('deliverables-archive/2026-09-22-foo/final.md')).toEqual({ state: 'final', slug: 'foo' })
+    expect(classifyDeliverable('deliverables-archive/2026-09-22-foo/drafts/cfo.md')).toEqual({ state: 'draft', slug: 'foo', role: 'cfo' })
+    expect(classifyDeliverable('deliverables-archive/foo-final.md')).toEqual({ state: 'other' }) // 归档根不认平铺
+  })
 })
 
 describe('meta.md 形状校验（validateMeta / parseMeta）', () => {

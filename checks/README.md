@@ -30,7 +30,7 @@
 | [replay-smoke.mjs](smoke/replay-smoke.mjs) | 录制会话、sidecar、团队投影与场景声明的工作区 oracle；另有录制和 UI 模式 |
 | [snapshot-motion-smoke.mjs](smoke/snapshot-motion-smoke.mjs) | 真实 CLI 子进程中的快照采集与 workspace capture 接线 |
 | [release-smoke.mjs](smoke/release-smoke.mjs) | 构建、打包、干净 profile 安装与 built CLI 启动 |
-| [refactor-drift-oracle.mjs](smoke/refactor-drift-oracle.mjs) | 纯搬移/拆分的零行为漂移：拆前/拆后 vitest 全名清单比对（放行文件与 describe 归属搬家，拦改名/增删） |
+| [refactor-drift-oracle.mjs](smoke/refactor-drift-oracle.mjs) | 纯搬移/拆分的零行为漂移：拆前/拆后 vitest 清单比对（`--hashes` 档含测试体指纹 ⇒ 拦改名/增删/**测试体改动**；两档都放行文件与 describe 归属搬家） |
 
 ## 浏览器与视觉
 

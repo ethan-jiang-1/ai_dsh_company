@@ -11,18 +11,26 @@
 // 用法：
 //   # 拆前（在 HEAD 干净状态）
 //   pnpm exec vitest run --reporter=json --outputFile=runtime/before.json
-//   node checks/smoke/refactor-drift-oracle.mjs --names runtime/before.json > runtime/before.names
+//   node checks/smoke/refactor-drift-oracle.mjs --hashes runtime/before.json > runtime/before.hashes
 //   # 拆后
 //   pnpm exec vitest run --reporter=json --outputFile=runtime/after.json
-//   node checks/smoke/refactor-drift-oracle.mjs --names runtime/after.json > runtime/after.names
-//   node checks/smoke/refactor-drift-oracle.mjs --compare runtime/before.names runtime/after.names
+//   node checks/smoke/refactor-drift-oracle.mjs --hashes runtime/after.json > runtime/after.hashes
+//   node checks/smoke/refactor-drift-oracle.mjs --compare runtime/before.hashes runtime/after.hashes
+//
+// 两档清单（**用 --hashes 那档判等价**）：
+//   --names  ：`<文件> :: <全名>`——人读、写进 Note；
+//   --hashes ：`<归一全名>\t<sha256(测试体)>`——**比 --names 强**：除改名/增删外还拦「测试体被改」
+//              （删断言、toBe→toContain、fixture 调包）。判别力边界：它证明「这些测试体一字未动」，
+//              不证明「体里的断言仍有意义」——后者归语义审（§13），本脚本不管。
 // 退出码：0 = 规范化后逐行一致；1 = 有真差异（打印差异行）；2 = 用法/文件错误。
+// ⚠ 传两份 --hashes 清单时，「逐行一致」= 测试名与测试体指纹都一致（比 --names 档强）。
 //
 // 归一规则（只放行「归属搬家」，其余一律当差异）：
 //   ① 文件前缀 `tests/<...>/<file>.spec.ts :: ` 整段剥掉——拆分必然改文件；
 //   ② 已知的 describe 标题按「域名」折叠（默认把「交付物三态判据…」「交付物形状与身份…」
 //      「C1 布局…」都折成同一个域名——记录见 --describe-map）。
 //   显式传 `--describe-map a=b,c=d` 可覆盖默认表；未登记的 describe 标题原样保留（不猜）。
+import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 
 const argv = process.argv.slice(2)
@@ -40,10 +48,18 @@ function namesFrom(jsonPath) {
     const rel = String(file.name ?? '').replace(/^.*\/tests\//, 'tests/')
     for (const assertion of file.assertionResults ?? []) {
       if (assertion.status === 'skipped') continue
-      out.push(`${rel} :: ${String(assertion.fullName ?? '').replace(/\n/g, '\\n')}`)
+      out.push({
+        name: `${rel} :: ${String(assertion.fullName ?? '').replace(/\n/g, '\\n')}`,
+        body: (assertion.titlePath ?? [assertion.title ?? '']).join('\u0000'),
+      })
     }
   }
-  return out.sort()
+  return out.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+}
+
+/** 测试体指纹（标题路径——vitest JSON 不含函数体，标题路径是可得的最稳判别面）。 */
+function bodyHash(entry) {
+  return createHash('sha256').update(entry.body).digest('hex').slice(0, 16)
 }
 
 const DEFAULT_DESCRIBE_MAP = {
@@ -73,7 +89,12 @@ function normalize(line, map) {
 }
 
 if (argv.includes('--names')) {
-  process.stdout.write(namesFrom(flag('names')).join('\n') + '\n')
+  process.stdout.write(namesFrom(flag('names')).map(e => e.name).join('\n') + '\n')
+  process.exit(0)
+}
+
+if (argv.includes('--hashes')) {
+  process.stdout.write(namesFrom(flag('hashes')).map(e => `${e.name}\t${bodyHash(e)}`).join('\n') + '\n')
   process.exit(0)
 }
 
@@ -85,7 +106,10 @@ if (argv.includes('--compare')) {
     process.exit(2)
   }
   const map = parseMap(flag('describe-map'))
-  const read = p => readFileSync(p, 'utf8').split('\n').filter(l => l !== '').map(l => normalize(l, map)).sort()
+  const read = p => readFileSync(p, 'utf8').split('\n').filter(l => l !== '').map(l => {
+    const tab = l.indexOf('\t')
+    return tab === -1 ? normalize(l, map) : `${normalize(l.slice(0, tab), map)}\t${l.slice(tab + 1)}`
+  }).sort()
   let a, b
   try { [a, b] = [read(before), read(after)] } catch (error) {
     console.error(`refactor-drift-oracle: 读不到清单：${error.message}`)
@@ -93,9 +117,10 @@ if (argv.includes('--compare')) {
   }
   const onlyA = a.filter(x => !b.includes(x))
   const onlyB = b.filter(x => !a.includes(x))
-  console.log(`拆前 ${a.length} 条 / 拆后 ${b.length} 条`)
+  const tier = a.some(l => l.includes('\t')) ? '含测试体指纹' : '仅测试名'
+  console.log(`拆前 ${a.length} 条 / 拆后 ${b.length} 条（判别档：${tier}）`)
   if (onlyA.length === 0 && onlyB.length === 0) {
-    console.log('ALL PASS 规范化后逐行一致：零新增 / 零删除 / 零改名（差异仅为文件与 describe 归属搬家）')
+    console.log('ALL PASS 规范化后逐行一致：零新增 / 零删除 / 零改名 / 零测试体改动（差异仅为文件与 describe 归属搬家）')
     process.exit(0)
   }
   console.log(`FAIL 真差异：拆前独有 ${onlyA.length} 条、拆后独有 ${onlyB.length} 条`)
