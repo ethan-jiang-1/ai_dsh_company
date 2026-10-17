@@ -6,6 +6,7 @@ opened: 2026-10-17
 
 # BUG-021：`ask_user_question` 的脚本化回答通道缺失——RPC 驱动会永久挂在问询上
 
+> **二轮深挖结论（2026-10-17）**：应答的 RPC 通道**是存在的**（），但它**只匹配  态**的问询，而  态只能由前台 UI 认领/应答 ⇒ **在没有可脚本化 UI 的环境里，问询永远停在 **。详见「深挖」节。
 > 严重级别：P2（次要——不损坏数据、不误导判据，但**让「RPC 驱动的真会话」在遇到问询时无法自行收口**，只能靠人在 UI 里点）｜发现：2026-10-17｜状态：调查中
 
 ## 症状（真现场）
@@ -40,6 +41,54 @@ opened: 2026-10-17
 
 **这条比「挂住」更硬**：挂起是不可脚本化，**掉线是这活直接丢了**（那场动议的诊断结论没落地）。
 所以本卡的严重级虽为 P2（不损坏数据、不误导判据），**但它会静默吃掉一场已经跑了 26 步的动议**。
+
+## 深挖（2026-10-17 二轮，走通了第一段、卡在第二段）
+
+**已确认的正面事实**（原诊断需要修正：**应答的 RPC 通道是存在的**，不是「没有通道」）：
+
+1. `userQuestions` 服务由 web profile 挂载（`pnpm dsh --profile web --dump-config` 可见
+   `@deepseek-ai/dsh-user-questions` + `dsh-client-ui-user-questions` + `dsh-tool-ask-user`）；
+2. host 侧 `@Remote answer(agent, callId, answer)` 生成 endpoint **`userQuestions/answer`**，
+   远程客户端的类型声明（`user-questions/lib/typert.remote-client.d.ts:13`）写明签名是
+   **`(agentId: SessionId, callId: ToolCallId, answer: AskUserQuestionAnswer)`** ——**`agentId` 就是 SessionId 字符串**；
+3. 实测：带 `sessionId` 调用 ⇒ 网关报 `missing "agentId"; unexpected "sessionId"`（**参数名确证**）；
+   改成 `agentId: "session-…"` ⇒ **网关接受、返回 `{ok:true, value:false}`**（**通道可用，语义未命中**）。
+
+**卡住的第二段：`answer()` 只匹配 `'continued'` 态的问询**。源码写明
+（`interaction/user-questions/src/types.ts:71`）：
+
+> `UserQuestionState`: **`'open'`** while the tool call may still return the answer;
+> **`'continued'`** once the answer can only arrive as a new turn.
+
+而 `answer()` 的实现是 `this.continued(agent).find(item => item.callId === callId)` ——
+**只查 `continued`**。`'open'` 态的问询由**前台 composer 的 waterfall** 应答（客户端
+`slots.ts` 的 `answer()`：`if (waterfall !== undefined) … ; if (this.#state === 'continued' && rpc !== undefined) … ;
+return Promise.reject('no channel accepts an answer yet')`）⇒ **RPC 通道的前提是问询已由 UI 认领并转 `continued`**。
+
+**实测复现**（本轮第二次实验，`session-8dec9aeb`）：构造一条会触发问询的提示 ⇒ 问询发出
+（`callId=call_00_2mW23…`、`question.id=scope_tech_vs_biz`）⇒ 用 `agentId=<SessionId>` 调
+`userQuestions/answer` ⇒ **`value:false`**（会话仍挂、`turn/end` 不出现、日志停在 23 行）。
+**为什么转不了 `continued`**：本机 Web UI 的会话列表**不渲染目标会话行**
+（`document.querySelectorAll('[data-session-id]').length === 0`，列表虚拟化 + 懒加载）⇒
+**脚本化点不开那条会话** ⇒ 认领不发生 ⇒ 问询永停 `'open'` ⇒ RPC 应答永远 `false`。
+
+⇒ **缺陷的准确表述**：不是「没有应答通道」，而是**「应答通道被 UI 认领前置卡住」**——
+`'open'` 态只能前台答、`'continued'` 态才能 RPC 答，而**在没有可脚本化 UI 的环境里，
+问询永远停在 `'open'`**。
+
+## 推荐修法（据此更新）
+
+- **A（首选）**：让 `userQuestions/answer` 也能解 `'open'` 态——即 host 侧允许「无 UI 认领时
+  直接以 RPC 应答收口」。守卫：必须精确绑定 `callId` + 每个 `question.id` 各答一次（现有
+  `BAD_ANSWER` 校验已在）；且**不改变有人值守时的前台优先**（waterfall 在场仍走 waterfall）。
+- **B**：给 Web 加**深链路由**（`?session=<id>`）+ 让会话列表可寻址（虚拟化列表也要能按 id 定位），
+  使「UI 认领」这一步可脚本化——它是 A 的替代路径，成本更高但不动 host 语义。
+- **C**：文档面——把「RPC 通道存在但被 `'open'` 态前置」写进 `docs/guides/web-rpc.md`
+  （现在只有一句「回答不走 RPC」，既不准确也不足以指导）。
+- **D（不建议）**：`--answer-default` 自动按推荐项作答——等于让驱动替用户拍板。
+
+**严重级上调考虑**：原 P2 基于「不损坏数据」。二轮实测看到**两场动议因此丢失**
+（`55b7d662` 跑到 26 步掉线、`8dec9aeb` 停在 23 行）⇒ 建议维持 P2 但**注明「会静默吃掉动议」**（已在「追加证据」节）。
 
 ## 复现
 
