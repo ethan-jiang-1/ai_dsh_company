@@ -1,0 +1,89 @@
+{
+  "frozen": {
+    "source": "deliverables/2026-10-12-ai-coding-security-2026-v2/drafts/vp-eng/gates/",
+    "copied_at": "2026-10-13",
+    "mounted_at": "2026-10-15",
+    "omitted": [
+      "evidence/negative-tests.txt",
+      "evidence/real-workspace-run.txt",
+      "evidence/tuning-before-after.txt"
+    ],
+    "omitted_reason": "v2 的历史运行输出 = v2 场证据，随 v2 冻结归档；挂载件只冻结可执行判据面与自测夹具（不含运行记录，故也不含运行记录里的样本字面量，避免制造新的命中源）",
+    "divergence": "**三处已登记差异**（其余件与 v2 原件逐字节相同）：① `README.md` 含 v3 挂载增补（横幅 + §8，2026-10-15）——文档而非判据件；② `README.md` 又含 2026-10-17 面分类规则更新（旧口径「锚在闸门自身安装目录」已过时，留着就是下一轮的误读源）——仍是文档；③ `g-a2-secret-scan.mjs` 含 2026-10-17 面分类修复——**本副本唯一落在判据件上的有意差异**。逐字登记见下 `divergence_detail`",
+    "divergence_detail": {
+      "README.md": {
+        "kind": "文档（两处变更）",
+        "v2_frozen_original_sha": "170c2047c1e05a4083c54d8630a7ae673a4b8e5a",
+        "sha_chain": "v2 原件 170c2047… →（2026-10-15 v3 挂载增补）→ 52f6a5a7… →（2026-10-17 面分类更新）→ 5e5614ae…（= 现部署副本）",
+        "changes": [
+          {
+            "at": "2026-10-15",
+            "what": "v3 挂载横幅 + §8",
+            "resulting_sha": "52f6a5a79811da0fa5f6c36c72afadadaa2b7326",
+            "risk": "无（文档；不参与判据）"
+          },
+          {
+            "at": "2026-10-17",
+            "by": "VP-Eng（CEO 2026-10-17 批准补文档面）",
+            "what": "§「面分类规则（v2 修正后）」改为「**锚点 ∪ 形态**」：新增②形态（`gates` 或以 `-gates` 结尾的段名 + 任意层 + `fixtures`）与「为什么补形态 / 有意让路 / 边界实测」三段；把旧口径「面分类锚在闸门自身安装目录的绝对路径」就地改新（事实落点随改动更新，不追加变更史）",
+            "why": "旧口径在代码改了之后即为**过时事实**——留着就是下一轮的误读源（同族：文档写的判据 ≠ 代码里的判据）",
+            "not_changed": "只动 §「面分类规则」那一段；其余段落（含 R0/R4/R5 复跑剧本的读数）一字未改",
+            "deployed_sha": "5e5614aefaf337c6a11f5fb1a225bc35a1d165a9",
+            "risk": "无（文档；不参与判据）"
+          }
+        ]
+      },
+      "g-a2-secret-scan.mjs": {
+        "kind": "判据件",
+        "at": "2026-10-17",
+        "by": "VP-Eng（CEO 2026-10-17 批准：修分类器，不动阈值/不加白名单/不删归档）",
+        "what": "面分类器 `surfaceOf()`：夹具面判据由「锚死在自身安装目录」扩为「锚点 ∪ 结构性形态」——新增一行 `if (FIXTURE_SHAPE_RE.test(abs)) return 'fixture'`，形态 = `/(^|\\/)(?:[^/]*-)?gates\\/(?:[^/]+\\/)*fixtures\\//`（段名 `gates` 或以 `-gates` 结尾者，其后任意层出现 `fixtures` 段）",
+        "why": "同批**合成夹具**被复制到 v2 归档家（`…-v2/drafts/vp-eng/gates/fixtures/**`）与 v3 载体（`…/carrier/checks/lib/ci-security-gates/fixtures/**`）后，锚点判据认不出它们 ⇒ 面从 `fixture`(report) 掉进 `self`(block) ⇒ 本机盘恒红 11 条**假红**（实跑自证：`surface_fixture=0`）",
+        "not_changed": "阈值（entropy/minlen）未动｜confidence 未动｜`block`/`report` 语义未动（夹具面仍 report）｜a1/b1/b2/b3 未动｜出栏判据与自测期望表未动｜MANIFEST 指纹机制未动",
+        "side_effect": "有意让路：今后任何合法仓库里出现 `gates/**/fixtures/**` 形状的路径 ⇒ 判夹具面（默认 advisory、不拦提交）；与锚点树原有的同一类让路同源，非新开洞",
+        "frozen_original_sha": "58de8bd6de52eebd29dc2a246daf2b5c66d4dfe0",
+        "deployed_sha": "b70395b0ae9de227a4cd1f962f30ca6c4f9fcede",
+        "frozen_trees_untouched": "deliverables-archive/…-v2/ 与 drafts/vp-eng/carrier/ 一个字节未改（本差异只存在于部署副本）"
+      }
+    },
+    "self_excluded": "MANIFEST.json 不登记自身指纹（自指会让清单写一次即自我失效）",
+    "archive_note": "v2 原件归档进 deliverables-archive/ 后，本清单与副本自足：归档断链不影响 CI 运行；本清单是漂移判据（判「挂载件是否被就地改过」）"
+  },
+  "sha_algorithm": "git hash-object (blob sha1)",
+  "files": {
+    "README.md": "5e5614aefaf337c6a11f5fb1a225bc35a1d165a9",
+    "fixtures/boundary/a2-sources-only/drafts/sources/example-fetched-page.txt": "875e52d68d2f8ee87c63fa1ece8fa150d4352046",
+    "fixtures/clean/artifacts/benign-skill/LICENSE": "c89469f83fce609f2a1510a38fb77e4878204a66",
+    "fixtures/clean/artifacts/benign-skill/SKILL.md": "4e023342dc1d36a030e77368b641c331c7173f23",
+    "fixtures/clean/artifacts/benign-skill/install.sh": "20b93da83cf774bdee8321a41a911543ef4b218b",
+    "fixtures/clean/artifacts/benign-skill/manifest.json": "846b00bb2ef269acb095bf02710f20b003b905cf",
+    "fixtures/clean/commands.txt": "3a4a308633916728deff383cac91b2c5be9f9243",
+    "fixtures/clean/commands/serial-check.txt": "fe0152d5deedd1c2745a17051e070d0c27cd5185",
+    "fixtures/clean/home/.ssh/config": "8dd557b19406070723aa7d172f8894cdfd346e55",
+    "fixtures/clean/home/.ssh/id_rsa.pub": "83fcb374c811dcffaa1cb91da4dcd632b0aee64b",
+    "fixtures/clean/register.jsonl": "48afa68761f12fb244673cf879b18a7aa0268cdc",
+    "fixtures/clean/traces/clean.jsonl": "c713a8eeb22efc470bdf0890faee1978fda8822d",
+    "fixtures/evasion/a2-header-deep/big.txt": "3e91992fe98bd70b6100c12ad50deb3b4dda2a29",
+    "fixtures/evasion/a2-headerless/blob.dat": "6f36764935665b5c0d0ce5047a70c59fe474da55",
+    "fixtures/evasion/a2-low-entropy/config/lowentropy.env": "68f9b72a57e2443fcb3a2b5ffbbb44a8558ae0fb",
+    "fixtures/evasion/b2-obfuscated/commands.txt": "1f4adccf7a77050f13f4bd18f524f24da54e7edb",
+    "fixtures/violations/a1-cred-reachable/home/.ssh/id_ed25519": "8eee623e9c7dcee70a658415488607340e5995c4",
+    "fixtures/violations/a2-high-entropy-secret/config/deploy.env": "f21a20a478f92a59eb3f1e7967210e065ac316bb",
+    "fixtures/violations/a2-key-in-tracked-path/.tracked-list": "e73cc1578a83550f0e5b3edc4450df5f080ded9f",
+    "fixtures/violations/a2-key-in-tracked-path/lib/id_rsa": "d3a854e546a4a89ae07d3959eaaf913b1e5fe233",
+    "fixtures/violations/b1-unregistered-untrusted/artifacts/sketchy-skill/SKILL.md": "732dc800d348cc8d6071aedaab558d3f562d0ffa",
+    "fixtures/violations/b1-unregistered-untrusted/artifacts/sketchy-skill/install.sh": "981e852e39ce6ddd5177a07ffe6efe739ac78235",
+    "fixtures/violations/b1-unregistered-untrusted/register.jsonl": "263a92e5720059fba6f36ccdb751c7313e96a1b6",
+    "fixtures/violations/b2-dangerous-commands/commands.txt": "01dfc64e69d7357499d9317bdc07c80d386a74da",
+    "fixtures/violations/b3-taint-trace/traces/tainted.jsonl": "14e3148fa428bc9904a7bb58245aad07dbe1af96",
+    "g-a1-cred-reach.mjs": "89b942e0f6def19b223e237089bbc479af0d4324",
+    "g-a2-secret-scan.mjs": "b70395b0ae9de227a4cd1f962f30ca6c4f9fcede",
+    "g-b1-artifact.mjs": "9d140bdcad5b06fb771c980c7657187d4d3ee46d",
+    "g-b2-preexec.mjs": "475c5ccb35fc14af7d32710fe3ca1b9861bb2f07",
+    "g-b3-trace.mjs": "1d6408b1842195eb426e48390a5e4f8bd173a9cf",
+    "lib.mjs": "bb7999821c2c41ab192dd40c10eb30aa736c68ad",
+    "negative-tests.sh": "fe9bf2fbccd3e5110c47e7da91c24791428e6577",
+    "run-gates.mjs": "59dbe9f691286fd1d2caaafc6bc3c397772b0abb",
+    "run-gates.sh": "511712eaa4ca3813659b4948162b9c002e40b9da"
+  }
+}

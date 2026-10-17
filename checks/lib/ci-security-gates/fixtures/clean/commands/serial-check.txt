@@ -1,0 +1,2 @@
+find . -name "*.mjs" -type f
+node gates/g-a2-secret-scan.mjs --target fixtures/clean

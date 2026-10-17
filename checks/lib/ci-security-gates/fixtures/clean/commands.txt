@@ -1,0 +1,6 @@
+# 干净命令行：全部为本地只读动作（本闸门的策略是“任何出网动作 = 需确认”，故干净面不含 curl/wget）
+ls -la
+node --version
+git status --porcelain
+grep -rn "TODO" kb/ | head -20
+wc -l kb/org.md

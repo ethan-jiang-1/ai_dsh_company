@@ -1,0 +1,7 @@
+{
+  "name": "benign-skill",
+  "version": "1.0.0",
+  "license": "internal",
+  "net": ["cdn.example.com"],
+  "dependencies": []
+}

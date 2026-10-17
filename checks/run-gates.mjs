@@ -50,6 +50,7 @@ import * as notesLiveness from './gates/notes-liveness.mjs'
 import * as backlogLiveness from './gates/backlog-liveness.mjs'
 import * as replaySceneLiveness from './gates/replay-scene-liveness.mjs'
 import * as guardRedRecord from './gates/guard-red-record.mjs'
+import * as securityScan from './gates/security-scan.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const failures = []
@@ -89,6 +90,7 @@ notesLiveness.run(ctx)
 backlogLiveness.run(ctx)
 replaySceneLiveness.run(ctx)
 guardRedRecord.run(ctx)
+securityScan.run(ctx)
 
 console.log(failures.length === 0 ? '\nverify: ALL PASS' : `\nverify: ${failures.length} FAILURE(S)`)
 process.exit(failures.length === 0 ? 0 : 1)

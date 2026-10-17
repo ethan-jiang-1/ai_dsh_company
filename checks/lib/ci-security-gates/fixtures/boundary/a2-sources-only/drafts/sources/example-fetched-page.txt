@@ -1,0 +1,2 @@
+# 合成夹具：模拟“外部取证件里带示例串”的取证面
+token_example = "ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
