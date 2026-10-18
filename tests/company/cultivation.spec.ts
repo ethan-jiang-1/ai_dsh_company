@@ -114,6 +114,16 @@ describe('培养记录：写读往返与坏形状', () => {
     expect(record!.title).toBe('做法：收口盘点先列未决清单，再下结论。')
   })
 
+  it('正文进客户端读模型（S4）：多行原样带出——判断必须先有材料', () => {
+    const text = recordText({
+      ...draft,
+      body: '做法：先列未决清单，按 owner 分行。\n证据：deliverables/x/final.md 第 3 节；口径 A :: 口径 B。',
+    })
+    const record = parseRecord('r-body', text)!
+    expect(record.body).toBe('做法：先列未决清单，按 owner 分行。\n证据：deliverables/x/final.md 第 3 节；口径 A :: 口径 B。')
+    expect(record.title).toBe('做法：先列未决清单，按 owner 分行。')
+  })
+
   it('采纳后的记录：status/methodSlug/decidedAt/verification/reason 带出', () => {
     const text = recordText(draft)
       .replace('status: open', 'status: adopted\nmethodSlug: closing-checklist\ndecidedAt: 2026-10-13T12:05:00.000Z')

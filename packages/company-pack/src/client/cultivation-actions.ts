@@ -33,6 +33,10 @@ export const CULTIVATION_COPY = {
   verifyFail: '没起作用',
   revoke: '撤回…',
   revokeConfirm: '确认撤回',
+  /** 撤回是四个动作里唯一的破坏性动作：后果说全再让人点确认（比"再点一次"更有安全价值）。 */
+  revokeConsequence: '撤回 = 删掉这个方法（新开的该角色会话不再加载它），并且这条记录不能再被采纳。运行中的会话不受影响。',
+  /** 创作提交成功、刷新后给新记录打的标记（G4：让"刚记下"的那条看得见）。 */
+  justSaved: '刚记下',
   cancel: '取消',
   running: '处理中…',
   // ── 创作入口与表单 ───────────────────────────────────────────────────────
@@ -101,6 +105,9 @@ export interface CultivationActions {
   /** 发一条培养命令；永不抛——失败折成 `ok: false` + 原因。 */
   readonly run: (line: string) => Promise<ActionOutcome>
 }
+
+/** 按会话取动作面（容器渲染时以 `props.sessionId` 取；注册处给的是这个工厂）。 */
+export type CultivationActionsFactory = (sessionId: SessionId) => CultivationActions
 
 /** 校验期望行为一句话（非空、不含 `::`）。 */
 function expectationProblem(expectation: string): DraftProblem | null {

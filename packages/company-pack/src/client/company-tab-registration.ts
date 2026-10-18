@@ -7,6 +7,7 @@ import { AttentionTab } from './AttentionTab.tsx'
 import type { AttentionRegistry } from './attention-registry.ts'
 import type { FloatRectLike } from './float-geometry.ts'
 import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from './company-tabs.tsx'
+import type { CultivationActionsFactory } from './cultivation-actions.ts'
 import type { CultivationFiles } from './cultivation-data.ts'
 import { CultivationTab } from './CultivationTab.tsx'
 import { LedgerTab } from './LedgerTab.tsx'
@@ -41,6 +42,8 @@ export interface CompanyTabRegistrationData {
   readonly openMember: (sessionId: SessionId, member: { readonly id: string; readonly role: 'lead' | 'teammate' }) => Promise<void>
   /** Company workspace files read by cultivation views. */
   readonly cultivationFiles: CultivationFiles
+  /** 人侧动作面（GUI 版 /cultivation；工厂见 `cultivation-actions.ts`）。 */
+  readonly cultivationActions: CultivationActionsFactory
   /** Session list used as the role-projection source. */
   readonly roleSource: RoleBadgeInjected['roleSource']
   /** Read the current motion ledger for a session. */
@@ -143,6 +146,7 @@ const TAB_REGISTRATIONS = [
         floatTab: data.floatTab,
         unfloatTab: data.unfloatTab,
         cultivationFiles: data.cultivationFiles,
+        cultivationActions: data.cultivationActions,
         followEvents: data.follow,
         roleSource: data.roleSource,
       }),

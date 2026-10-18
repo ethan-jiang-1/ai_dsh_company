@@ -17,6 +17,7 @@ import { BoardPanel, DagPanel, LOADING_NOTE, PresencePanel, StateNote } from './
 import { DagGlyph, GridGlyph, PeopleGlyph, SproutGlyph } from './tab-icons.tsx'
 import { useCompanyData, type CompanyDataInjected } from './use-company-data.ts'
 import { CultivationBoard } from './CultivationBoard.tsx'
+import type { CultivationActionsFactory } from './cultivation-actions.ts'
 import {
   useCultivationFeedback,
   useCultivationPanelData,
@@ -35,6 +36,8 @@ export interface CompanyViewInjected extends CompanyDataInjected {
   readonly floatPanel: (kind: string) => void
   /** 培养数据闭包（journal + 记录；工厂见 `cultivation-data.ts`）。 */
   readonly cultivationFiles: CultivationFiles
+  /** 人侧动作面工厂（GUI 版 /cultivation；注册处必给）。 */
+  readonly cultivationActions: CultivationActionsFactory
   /** 本会话事件流（赞/踩块；缺席 = 该块降级）。 */
   readonly followEvents?: CultivationFollowEvents
   /** 会话列表快照（viewer 角色经上游 agentPreset 投影订阅）。 */
@@ -73,6 +76,7 @@ export function createCompanyView(injected: CompanyViewInjected) {
     const viewerRole = useSyncExternalStore(subscribe, getPreset, getPreset)
     const cultivation = useCultivationPanelData(injected.cultivationFiles, sessionId, { enabled: panel === 'cultivation' })
     const feedback = useCultivationFeedback(injected.followEvents, sessionId, panel === 'cultivation')
+    const actions = useMemo(() => injected.cultivationActions(sessionId), [injected.cultivationActions, sessionId])
 
     return (
       <div className="wk-view">
@@ -124,6 +128,8 @@ export function createCompanyView(injected: CompanyViewInjected) {
                 records={cultivation.records}
                 feedback={feedback}
                 feedbackReachable={injected.followEvents !== undefined}
+                actions={actions}
+                onRefresh={cultivation.refresh}
               />
             </div>
           )}

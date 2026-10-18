@@ -201,6 +201,12 @@ export interface CultivationRecord {
   readonly revokedAt?: string
   /** 正文首句（收件箱预览标题）。 */
   readonly title: string
+  /**
+   * 提案正文（做法与证据全文，trim 后）。
+   * 2026-10-17 修订（培养 GUI 卡 S4）：原先**刻意不暴露给客户端**（人只看得到首句 `title`），
+   * 结果是人只能盲判。判断必须先有材料 ⇒ 正文进客户端读模型、面板就地展开。
+   */
+  readonly body: string
 }
 
 /** 记录 frontmatter 的可选透传字段（解析 → 领域形状）。 */
@@ -256,7 +262,10 @@ function recordFrontmatter(text: string): { readonly fields: Map<string, string>
   return { fields, body: text.slice(match[0].length) }
 }
 
-/** Return the persisted proposal body without exposing it in the Client record view. */
+/**
+ * 取记录正文（原文，未 trim）。
+ * host 侧部署方法用原文；客户端读模型另走 {@link parseRecord} 的 `body`（trim 后）。
+ */
 export function recordBody(text: string): string | null {
   return recordFrontmatter(text)?.body ?? null
 }
@@ -290,6 +299,7 @@ export function parseRecord(id: string, text: string): CultivationRecord | null 
     expectation,
     status,
     title: journalTitle(body),
+    body: body.trim(),
   }
   for (const key of OPTIONAL_FIELDS) {
     const value = fields.get(key)

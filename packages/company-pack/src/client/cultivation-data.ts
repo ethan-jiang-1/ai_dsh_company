@@ -8,7 +8,7 @@
  * keyless 判据 = `tests/client/cultivation-board.spec.ts`（纯渲染）+ `tests/company/cultivation.spec.ts`
  * （读模型）。
  */
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import {
   CULTIVATION_ROLES,
@@ -89,6 +89,8 @@ export interface CultivationPanelData {
   readonly journalRows: readonly CultivationRow[] | null
   /** 培养记录（null = 目录不可达或首读未完成——不折成 0 条）。 */
   readonly records: readonly CultivationRecord[] | null
+  /** 立即重读（动作/创作成功后台账已变，不等 30s 轮询）。 */
+  readonly refresh: () => void
 }
 
 /** 刷新间隔（journal/记录都不高频变化；30s 足够）。 */
@@ -109,6 +111,9 @@ export function useCultivationPanelData(
   const enabled = options.enabled ?? true
   const [journalRows, setJournalRows] = useState<readonly CultivationRow[] | null>(null)
   const [records, setRecords] = useState<readonly CultivationRecord[] | null>(null)
+  // 动作后立即重读的抓手（2026-10-17 GUI 行动面 S2）：bump 一次 = 重跑下面的读盘 effect。
+  const [nonce, setNonce] = useState(0)
+  const refresh = useCallback(() => { setNonce(value => value + 1) }, [])
 
   useEffect(() => {
     if (!enabled) return
@@ -146,9 +151,9 @@ export function useCultivationPanelData(
     void load()
     const timer = setInterval(() => { void load() }, REFRESH_MS)
     return () => { controller.abort(); clearInterval(timer) }
-  }, [enabled, sessionId, files])
+  }, [enabled, sessionId, files, nonce])
 
-  return { journalRows, records }
+  return { journalRows, records, refresh }
 }
 
 /** 事件流闭包的形状（`session/follow`：快照给历史、其后实时；侧栏与公司页共用）。 */

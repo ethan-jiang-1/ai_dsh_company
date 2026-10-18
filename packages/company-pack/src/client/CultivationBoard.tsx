@@ -1,13 +1,23 @@
 /**
- * 培养领域视图（2026-10-13 培养卡）：公司页第四子页、侧栏页签与浮窗共用的**纯展示**板——
- * 「我的分身 → 需要我处理 → 我提交的/我已处理 → 已采纳的方法 → journal 待审 → 赞踩 → 怎么养」。
+ * 培养领域视图（2026-10-13 培养卡；2026-10-17 GUI 行动面 S2–S5 重写）：公司页第四子页、
+ * 侧栏页签与浮窗共用的**单一控制台**——人给分身的外部输入都在这一个面上完成：
  *
- * 展示纪律（卡 §7/V2/V8/V9/V10）：空态与失败态分开（不可达 ≠ 0、未验证 ≠ 已掌握）；
- * 操作指引只给人话产品命令（/cultivation 族），不出现仓库开发命令与内部门禁编号；
- * CEO 委派 child 继承 CEO 组合的边界如实写明。数据折行在 `cultivation-data.ts`。
- * keyless 判据 = `tests/client/cultivation-board.spec.ts`。
+ *   创作入口（纠正 / 建议）→ 需要我处理（就地把手）→ 已采纳的方法（有用 / 没用 / 撤回）→
+ *   素材（不用你操作）→ 我提交的（等对方处理）→ 人的赞 / 踩 → 熟手命令行（折叠）
+ *
+ * 纪律（UX 卡判据 ①②③）：
+ * - **看到却不知道去哪操作**的条目不许存在：要么就地有把手，要么明写"不用你操作 / 等谁处理"；
+ * - 文案一律取 `CULTIVATION_COPY`（迭代改文案不动逻辑）；组件不发命令，只调 `actions.run`（永不抛）；
+ * - `actions` 缺席 = 只读降级（照旧给命令原文，不给死按钮）；viewer 角色与目标不符不出按钮
+ *   ——客户端隐藏只是 UX，**真闸在 host**；
+ * - 撤回 = 唯一破坏性动作：先讲后果（删方法 + 记录不能再被采纳 + 运行中会话不受影响）再确认；
+ * - 空态与失败态分开（不可达 ≠ 0 条；未验证 ≠ 已掌握）。
+ *
+ * 数据折行在 `cultivation-data.ts`；keyless 判据 = `tests/client/cultivation-board.spec.ts`（静态渲染）
+ * 与 `tests/client/cultivation-board-actions.spec.ts`（交互：点了发什么线、失败怎么显示）。
  */
-import { Tag } from '@deepseek-ai/dsh-client-ui-primitives'
+import { Tag, Button } from '@deepseek-ai/dsh-client-ui-primitives'
+import { useState } from 'react'
 import {
   recordInbox,
   roleLabel,
@@ -15,6 +25,16 @@ import {
   type CultivationRow,
   type FeedbackItem,
 } from '../lib/cultivation.ts'
+import {
+  CULTIVATION_COPY,
+  adoptLine,
+  rejectLine,
+  revokeLine,
+  verifyLine,
+  type ActionOutcome,
+  type CultivationActions,
+} from './cultivation-actions.ts'
+import { CultivationCompose } from './CultivationCompose.tsx'
 
 /** 领域视图 props（三个容器同形喂入；数据加载在各容器）。 */
 export interface CultivationBoardProps {
@@ -30,9 +50,13 @@ export interface CultivationBoardProps {
   readonly feedback: readonly FeedbackItem[] | null
   /** 赞/踩块的事件流是否可达（注入缺席 = false）。 */
   readonly feedbackReachable: boolean
+  /** 人侧动作面（缺席 = 只读降级：给命令原文，不给死按钮）。 */
+  readonly actions?: CultivationActions | undefined
+  /** 动作成功后重读数据（容器喂 `refresh`）。 */
+  readonly onRefresh?: (() => void) | undefined
 }
 
-/** 一条记录的操作行文案（待办给命令、已处理给回执）。 */
+/** 一条记录的操作行文案（待办给命令、已处理给回执）——**只在没有动作面时**当降级文案用。 */
 function recordKindLabel(record: CultivationRecord): string {
   if (record.kind === 'suggestion') return `${roleLabel(record.proposerRole)}的建议`
   return record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)}分身的纠正` : '我的纠正'
@@ -46,13 +70,51 @@ function verificationTag(record: CultivationRecord): { readonly tone: 'success' 
 }
 
 /**
- * 培养领域视图（纯展示）。
+ * 培养领域视图。
  * @param props - 见 {@link CultivationBoardProps}。
  * @returns 面板内容（容器自己套壳：公司页直接放、侧栏套 PanelFrame）。
  */
 export function CultivationBoard(props: CultivationBoardProps) {
   const viewer = props.viewerRole
+  const actions = props.actions
   const inbox = recordInbox(props.records ?? [], viewer ?? '')
+  /** 正在执行的记录 id（飞行中禁按钮，防重复点击）。 */
+  const [pendingId, setPendingId] = useState<string | null>(null)
+  /** 每条记录的回执/失败原话（key = 记录 id；不吞失败原因）。 */
+  const [outcomes, setOutcomes] = useState<Readonly<Record<string, ActionOutcome>>>({})
+  /** 正在写理由的记录 id。 */
+  const [rejectingId, setRejectingId] = useState<string | null>(null)
+  const [reason, setReason] = useState('')
+  const [reasonProblem, setReasonProblem] = useState<string | null>(null)
+  /** 正在确认撤回的方法 slug（两步：先讲后果再确认）。 */
+  const [revokingSlug, setRevokingSlug] = useState<string | null>(null)
+  /** 刚创作提交、待高亮的记录 id。 */
+  const [highlightId, setHighlightId] = useState<string | null>(null)
+
+  const run = async (key: string, line: string, after?: () => void): Promise<void> => {
+    if (actions === undefined) return
+    setPendingId(key)
+    setReasonProblem(null)
+    const result = await actions.run(line)
+    setPendingId(null)
+    setOutcomes(previous => ({ ...previous, [key]: result }))
+    if (result.ok) {
+      after?.()
+      props.onRefresh?.()
+    }
+  }
+
+  const confirmReject = async (id: string): Promise<void> => {
+    const draft = rejectLine(id, reason)
+    if (!draft.ok) {
+      setReasonProblem(draft.problem.message)
+      return
+    }
+    await run(id, draft.line, () => { setRejectingId(null); setReason('') })
+  }
+
+  const outcomeOf = (id: string): ActionOutcome | undefined => outcomes[id]
+
   return (
     <>
       <div className="wk-activity-block" aria-label="我的分身">
@@ -64,6 +126,15 @@ export function CultivationBoard(props: CultivationBoardProps) {
         </div>
       </div>
 
+      {viewer !== null && actions !== undefined && (
+        <CultivationCompose
+          viewerRole={viewer}
+          actions={actions}
+          onRefresh={props.onRefresh}
+          onSubmitted={setHighlightId}
+        />
+      )}
+
       <div className="wk-activity-block" aria-label="需要我处理">
         <strong>需要我处理</strong>
         {props.records === null
@@ -72,18 +143,70 @@ export function CultivationBoard(props: CultivationBoardProps) {
             ? <div className="wk-meta">没有给我的建议或纠正。</div>
             : (
               <div role="list" aria-label="待我处理的培养记录" className="wk-list">
-                {inbox.needsDecision.map(record => (
-                  <div key={record.id} role="listitem" className="wk-row" aria-label={`待处理 ${record.id}`}>
-                    <span className="wk-row-name">
-                      {recordKindLabel(record)}
-                      <Tag tone="info">{record.expectation}</Tag>
-                    </span>
-                    <span className="wk-row-task">
-                      {record.title}{record.source !== '（会话内提交）' ? `（出处：${record.source}）` : ''}
-                      {`　采纳：/cultivation adopt ${record.id}　拒绝：/cultivation reject ${record.id} :: 理由`}
-                    </span>
-                  </div>
-                ))}
+                {inbox.needsDecision.map(record => {
+                  const outcome = outcomeOf(record.id)
+                  return (
+                    <div key={record.id} role="listitem" className="wk-row" aria-label={`待处理 ${record.id}`}>
+                      <span className="wk-row-name">
+                        {recordKindLabel(record)}
+                        <Tag tone="info">{record.expectation}</Tag>
+                        {highlightId === record.id && <Tag tone="success">{CULTIVATION_COPY.justSaved}</Tag>}
+                      </span>
+                      <span className="wk-row-task">
+                        {record.title}{record.source !== '（会话内提交）' ? `（出处：${record.source}）` : ''}
+                      </span>
+                      {/* 判断要有材料（S4）：正文就地可见，不藏按钮。 */}
+                      {record.body !== '' && <div className="wk-cultivation-body">{record.body}</div>}
+                      {actions === undefined
+                        ? (
+                          <span className="wk-row-task">
+                            {`　采纳：/cultivation adopt ${record.id}　拒绝：/cultivation reject ${record.id} :: 理由`}
+                          </span>
+                        )
+                        : (
+                          <div className="wk-cultivation-actions">
+                            <Button
+                              variant="primary"
+                              disabled={pendingId === record.id}
+                              onClick={() => { void run(record.id, adoptLine(record.id)) }}
+                            >
+                              {pendingId === record.id ? CULTIVATION_COPY.running : CULTIVATION_COPY.adopt}
+                            </Button>
+                            <Button
+                              disabled={pendingId === record.id}
+                              onClick={() => { setRejectingId(record.id); setReason(''); setReasonProblem(null) }}
+                            >
+                              {CULTIVATION_COPY.reject}
+                            </Button>
+                          </div>
+                        )}
+                      {rejectingId === record.id && (
+                        <div className="wk-cultivation-reject">
+                          <input
+                            className="wk-cultivation-reason"
+                            value={reason}
+                            placeholder={CULTIVATION_COPY.rejectPlaceholder}
+                            aria-label={CULTIVATION_COPY.rejectPlaceholder}
+                            onChange={event => { setReason(event.target.value) }}
+                          />
+                          <Button
+                            disabled={pendingId === record.id}
+                            onClick={() => { void confirmReject(record.id) }}
+                          >
+                            {CULTIVATION_COPY.rejectConfirm}
+                          </Button>
+                          <Button onClick={() => { setRejectingId(null); setReasonProblem(null) }}>{CULTIVATION_COPY.cancel}</Button>
+                          {reasonProblem !== null && <div className="wk-meta wk-cultivation-problem">{reasonProblem}</div>}
+                        </div>
+                      )}
+                      {outcome !== undefined && (
+                        <div className={outcome.ok ? 'wk-meta wk-cultivation-outcome' : 'wk-meta wk-cultivation-problem'}>
+                          {outcome.text}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             )}
       </div>
@@ -91,6 +214,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
       {(inbox.mine.length > 0 || inbox.processedForViewer.length > 0) && (
         <div className="wk-activity-block" aria-label="我提交的与我已处理">
           <strong>我提交的 · 我已处理</strong>
+          <div className="wk-meta">等对方处理；你无需操作。</div>
           <div role="list" aria-label="提案与处理回执" className="wk-list">
             {inbox.processedForViewer.map(record => (
               <div key={record.id} role="listitem" className="wk-row" aria-label={`已拒绝 ${record.id}`}>
@@ -121,28 +245,69 @@ export function CultivationBoard(props: CultivationBoardProps) {
           ? <div className="wk-meta">我的分身还没有已采纳的方法。</div>
           : props.records !== null && (
             <div role="list" aria-label="已采纳的方法" className="wk-list">
-              {inbox.adoptedForViewer.map(record => (
-                <div key={record.id} role="listitem" className="wk-row" aria-label={`方法 ${record.methodSlug ?? record.id}`}>
-                  <span className="wk-row-name">
-                    {record.methodSlug ?? record.id}
-                    {record.revokedAt !== undefined ? <Tag tone="warning">已撤回</Tag> : <Tag tone="info">已采纳</Tag>}
-                    {record.revokedAt === undefined && (() => {
-                      const v = verificationTag(record)
-                      return <Tag tone={v.tone}>{v.text}</Tag>
-                    })()}
-                  </span>
-                  <span className="wk-row-task">
-                    {record.expectation}
-                    {record.revokedAt === undefined ? '——新开的本角色会话会加载它；运行中的会话不受影响。' : '——方法已删除，新会话不再加载。'}
-                  </span>
-                </div>
-              ))}
+              {inbox.adoptedForViewer.map(record => {
+                const slug = record.methodSlug ?? record.id
+                const outcome = outcomeOf(record.id)
+                const revoked = record.revokedAt !== undefined
+                return (
+                  <div key={record.id} role="listitem" className="wk-row" aria-label={`方法 ${slug}`}>
+                    <span className="wk-row-name">
+                      {slug}
+                      {revoked ? <Tag tone="warning">已撤回</Tag> : <Tag tone="info">已采纳</Tag>}
+                      {!revoked && (() => {
+                        const v = verificationTag(record)
+                        return <Tag tone={v.tone}>{v.text}</Tag>
+                      })()}
+                    </span>
+                    <span className="wk-row-task">
+                      {record.expectation}
+                      {revoked ? '——方法已删除，新会话不再加载。' : '——新开的本角色会话会加载它；运行中的会话不受影响。'}
+                    </span>
+                    {!revoked && actions !== undefined && (
+                      <div className="wk-cultivation-actions">
+                        <Button
+                          variant="primary"
+                          disabled={pendingId === record.id}
+                          onClick={() => { void run(record.id, verifyLine(record.id, 'pass')) }}
+                        >
+                          {CULTIVATION_COPY.verifyPass}
+                        </Button>
+                        <Button
+                          disabled={pendingId === record.id}
+                          onClick={() => { void run(record.id, verifyLine(record.id, 'fail')) }}
+                        >
+                          {CULTIVATION_COPY.verifyFail}
+                        </Button>
+                        {revokingSlug === slug
+                          ? (
+                            <>
+                              <span className="wk-meta wk-cultivation-consequence">{CULTIVATION_COPY.revokeConsequence}</span>
+                              <Button
+                                disabled={pendingId === record.id}
+                                onClick={() => { void run(record.id, revokeLine(slug), () => { setRevokingSlug(null) }) }}
+                              >
+                                {CULTIVATION_COPY.revokeConfirm}
+                              </Button>
+                              <Button onClick={() => { setRevokingSlug(null) }}>{CULTIVATION_COPY.cancel}</Button>
+                            </>
+                          )
+                          : <Button onClick={() => { setRevokingSlug(slug) }}>{CULTIVATION_COPY.revoke}</Button>}
+                      </div>
+                    )}
+                    {outcome !== undefined && (
+                      <div className={outcome.ok ? 'wk-meta wk-cultivation-outcome' : 'wk-meta wk-cultivation-problem'}>
+                        {outcome.text}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           )}
       </div>
 
-      <div className="wk-activity-block" aria-label="journal 待审">
-        <strong>journal 待审素材</strong>
+      <div className="wk-activity-block" aria-label="journal 素材">
+        <strong>journal 素材（不用你操作）</strong>
         {props.journalRows === null
           ? <div className="wk-meta">读取中…</div>
           : (
@@ -169,7 +334,9 @@ export function CultivationBoard(props: CultivationBoardProps) {
               ))}
             </div>
           )}
-        <div className="wk-meta">各角色的 journal = 待审素材（人审后按「轮末收敛」压进 CHARTER 历史纪要）。</div>
+        <div className="wk-meta">
+          各角色的 journal = 角色自己攒的素材：轮末收敛时由该角色的驾驭者压进 CHARTER 历史纪要，**这里不用你操作**。
+        </div>
       </div>
 
       <div className="wk-activity-block" aria-label="人的赞踩">
@@ -195,13 +362,22 @@ export function CultivationBoard(props: CultivationBoardProps) {
       <div className="wk-activity-block">
         <strong>怎么养</strong>
         <ul className="wk-activity">
-          <li>给自己的角色提交纠正：在角色会话输入框敲 /cultivation correct 期望行为一句话 :: 做法与证据。</li>
-          <li>给别的角色提建议：/cultivation suggest 角色 期望行为一句话 :: 建议与证据——由对方本人在它的会话里采纳。</li>
-          <li>采纳一条：在目标角色的会话里敲 /cultivation adopt 记录编号——方法部署进该角色的方法层，新开的会话就会带着它开工。</li>
-          <li>同类任务上见效后回填 /cultivation verify 记录编号 pass；不灵了 /cultivation revoke 方法名 撤回。</li>
-          <li>分身自己也能提案（cultivation_propose 工具，署它的角色）；采纳、拒绝、撤回、验证只能由人来。</li>
+          <li>要它改做法：点上面「{CULTIVATION_COPY.composeCorrect}」，写清期望与证据；它进「需要我处理」，你确认后点「{CULTIVATION_COPY.adopt}」。</li>
+          <li>要别的角色改：点「{CULTIVATION_COPY.composeSuggest}」选角色——由对方本人在它的会话里采纳，你这边只留回执。</li>
+          <li>采纳 = 把做法写进那个角色的方法层：**新开的**该角色会话才带着它开工，当前这段对话不受影响。</li>
+          <li>同类任务上见效后回填「{CULTIVATION_COPY.verifyPass}」；不灵了「{CULTIVATION_COPY.revoke}」撤回（会删掉方法，记录也不能再被采纳）。</li>
+          <li>分身自己也能提案（工具里叫 cultivation_propose）；采纳、拒绝、撤回、验证只能由人在这里点。</li>
           <li>CEO 委派出去的分身继承 CEO 组合——职能角色的方法不会进委派 child，要用职能方法就开那个角色的会话。</li>
         </ul>
+        <details className="wk-cultivation-commands">
+          <summary>熟手命令行</summary>
+          <ul className="wk-activity">
+            <li>纠正：/cultivation correct 期望行为一句话 :: 做法与证据</li>
+            <li>建议：/cultivation suggest 角色 期望行为一句话 :: 建议与证据</li>
+            <li>采纳：/cultivation adopt 记录编号　拒绝：/cultivation reject 记录编号 :: 理由</li>
+            <li>验证：/cultivation verify 记录编号 pass｜fail　撤回：/cultivation revoke 方法名</li>
+          </ul>
+        </details>
       </div>
     </>
   )

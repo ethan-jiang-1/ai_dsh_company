@@ -6,6 +6,7 @@ import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-api-session-controller/client'
 import type {} from '@deepseek-ai/dsh-api-workspace-files/remote'
+import type {} from '@deepseek-ai/dsh-commands/remote'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
@@ -16,6 +17,7 @@ import { DreamTeamBrandName } from './Brand.tsx'
 import { startInstanceGuard } from './instance-guard.ts'
 import { createAttentionRegistry } from './attention-registry.ts'
 import { createCompanyView } from './CompanyView.tsx'
+import { makeCultivationActions, type CultivationActionsFactory } from './cultivation-actions.ts'
 import { makeCultivationFiles } from './cultivation-data.ts'
 import { createCompanySessionAdapters, createLeadLookup } from './company-session-adapters.ts'
 import { registerCompanyTabs } from './company-tab-registration.ts'
@@ -174,7 +176,10 @@ export async function apply(ctx: ClientContext): Promise<void> {
 
   // Company workspace files are read through this injected session Remote; the
   // tab-registration module keeps the four matching contribution surfaces local.
-  ctx.inject(['sessions', 'uiWorkspace', 'remote.session', 'remote.workspaceFiles', 'slots', 'sidebarRight', 'sidebarRightTabs'], (scoped) => {
+  // ⚠ `remote.commands` = 人侧动作面（2026-10-17 培养 GUI 卡）：面板按钮/创作表单经它发
+  //   `/cultivation …`（平台原生命令执行面，host 照旧记 source: user、角色闸在 host）。
+  //   与 remote.session / remote.workspaceFiles 同款：按命名空间 inject，vendor 装配。
+  ctx.inject(['sessions', 'uiWorkspace', 'remote.session', 'remote.workspaceFiles', 'remote.commands', 'slots', 'sidebarRight', 'sidebarRightTabs'], (scoped) => {
     const sessions = scoped.sessions
     const { leadOf, follow } = createCompanySessionAdapters(sessions, scoped.remote.session)
     const floatTab = (tabId: TabId, rect?: FloatRectLike): void => { scoped.sidebarRight.float(tabId, rect) }
@@ -193,6 +198,8 @@ export async function apply(ctx: ClientContext): Promise<void> {
       scoped.uiWorkspace.openSession({ parentSessionId: lead, childSessionId: member.id as SessionId, mode: 'continuable' })
     }
     const cultivationFiles = makeCultivationFiles(scoped.remote, leadOf)
+    // 动作面按会话取（命令作用在面板所在会话；跨角色会被 host 角色闸拒，错误原话回到面板行内）。
+    const cultivationActions: CultivationActionsFactory = (sessionId) => makeCultivationActions(scoped.remote.commands, sessionId)
     const readLedger = async (sessionId: SessionId, signal: AbortSignal): Promise<string | null> => {
       try {
         const result = await scoped.remote.workspaceFiles.read(leadOf(sessionId), 'kb/motion-ledger.md', { limit: 240 }, signal)
@@ -209,6 +216,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
       unfloatTab,
       openMember,
       cultivationFiles,
+      cultivationActions,
       roleSource: sessions.list,
       readLedger,
     })
@@ -219,10 +227,11 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // ⇒ 数据面用注册处闭包注入（见 CompanyView 头注）；跨插件值导入仍被禁。
   // ⚠ remote 按命名空间 inject：`remote.session`（follow 流）+ `remote.workspaceFiles`
   //   （2026-10-13 培养卡：第四子页培养的 journal/记录读取——与侧栏页签同一工厂语义）。
-  ctx.inject(['sessions', 'remote.session', 'remote.workspaceFiles', 'sidebarRight', 'slots'], (scoped) => {
+  ctx.inject(['sessions', 'remote.session', 'remote.workspaceFiles', 'remote.commands', 'sidebarRight', 'slots'], (scoped) => {
     const sessions = scoped.sessions
     const { leadOf, follow } = createCompanySessionAdapters(sessions, scoped.remote.session)
     const cultivationFiles = makeCultivationFiles(scoped.remote, leadOf)
+    const cultivationActions: CultivationActionsFactory = (sessionId) => makeCultivationActions(scoped.remote.commands, sessionId)
     // 条目 ② S4：从公司视图直接浮出某个面板 = 打开对应平台页签 + `float`。
     // ⚠ openTab 的落位对 `active()` 的可见性有延迟（实测：同步读拿不到刚开的页签，float 静默
     // no-op）⇒ 推迟到宏任务并重试；带 kind 守卫防浮错别人的页签。重试耗尽 = 优雅降级
@@ -246,6 +255,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
       // 培养数据面（2026-10-13 培养卡）：同一 follow 流喂赞/踩块；文件闭包与 viewer 角色源
       // 与侧栏页签同一语义（领域视图两个壳一处事实）。
       cultivationFiles,
+      cultivationActions,
       followEvents: follow,
       roleSource: sessions.list,
     })

@@ -314,6 +314,38 @@ const CSS = `
 .wk-pane-body { overflow-x: auto; }
 .wk-pane-head { display: flex; align-items: baseline; gap: 8px; }
 .wk-list { display: grid; gap: 4px; }
+
+/* 培养 GUI 行动面（2026-10-17 S2–S5）：创作入口 / 治理按钮 / 判断材料 / 后果说明 */
+.wk-cultivation-compose-entry { display: flex; flex-wrap: wrap; gap: 8px; }
+.wk-cultivation-compose-form { display: grid; gap: 8px; }
+.wk-cultivation-roles { display: flex; flex-wrap: wrap; gap: 6px; }
+.wk-cultivation-body-input,
+.wk-cultivation-reason {
+  font: inherit;
+  color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-bg-base);
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+.wk-cultivation-body-input { width: 100%; resize: vertical; font-size: 12px; line-height: 1.5; }
+.wk-cultivation-reason { flex: 1; min-width: 12rem; font-size: 12px; }
+.wk-cultivation-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+  border-left: 2px solid var(--dsw-alias-border-l2);
+  padding-left: 8px;
+}
+.wk-cultivation-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.wk-cultivation-reject { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.wk-cultivation-outcome { color: var(--dsw-alias-state-success-primary); }
+.wk-cultivation-problem { color: var(--dsw-alias-state-warn-primary); }
+.wk-cultivation-consequence { flex: 1 1 16rem; }
+.wk-cultivation-commands { margin-top: 6px; }
+.wk-cultivation-commands > summary { cursor: pointer; color: var(--dsw-alias-label-tertiary); font-size: 12px; }
 .wk-row-head { color: var(--dsw-alias-label-tertiary); font-size: 12px; border-bottom: 0; }
 .wk-row-status { flex: 0 0 auto; }
 .wk-row-button {

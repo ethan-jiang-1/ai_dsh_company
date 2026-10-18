@@ -9,6 +9,7 @@ import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { roleLabel } from '../lib/cultivation.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { CultivationBoard } from './CultivationBoard.tsx'
+import type { CultivationActionsFactory } from './cultivation-actions.ts'
 import {
   useCultivationFeedback,
   useCultivationPanelData,
@@ -24,6 +25,8 @@ export interface CultivationTabInjected {
   readonly unfloatTab: (paneId: string) => void
   /** 培养数据闭包（journal + 记录；工厂见 `cultivation-data.ts`）。 */
   readonly cultivationFiles: CultivationFiles
+  /** 人侧动作面工厂（GUI 版 /cultivation；缺席不会发生——注册处必给）。 */
+  readonly cultivationActions: CultivationActionsFactory
   /** 本会话事件流（快照给历史 + 实时追加）；缺席 = 赞/踩块降级。 */
   readonly followEvents?: CultivationFollowEvents
   /** 会话列表快照（viewer 角色经上游 agentPreset 投影订阅，照 RoleBadge 手法）。 */
@@ -42,8 +45,10 @@ export function CultivationTab(props: CultivationTabProps) {
   const subscribe = useMemo(() => props.roleSource.subscribe.bind(props.roleSource), [props.roleSource])
   const getPreset = useCallback(() => readPresetOf(props.roleSource, props.sessionId), [props.roleSource, props.sessionId])
   const viewerRole = useSyncExternalStore(subscribe, getPreset, getPreset)
-  const { journalRows, records } = useCultivationPanelData(props.cultivationFiles, props.sessionId)
+  const { journalRows, records, refresh } = useCultivationPanelData(props.cultivationFiles, props.sessionId)
   const feedback = useCultivationFeedback(props.followEvents, props.sessionId)
+  // 动作面按会话取（页签槽 scope=session ⇒ sessionId 就是本会话；角色闸在 host）。
+  const actions = useMemo(() => props.cultivationActions(props.sessionId), [props.cultivationActions, props.sessionId])
 
   return (
     <PanelFrame tone="growth" title="培养" tabProps={props satisfies PanelFrameProps}>
@@ -54,6 +59,8 @@ export function CultivationTab(props: CultivationTabProps) {
         records={records}
         feedback={feedback}
         feedbackReachable={props.followEvents !== undefined}
+        actions={actions}
+        onRefresh={refresh}
       />
     </PanelFrame>
   )
