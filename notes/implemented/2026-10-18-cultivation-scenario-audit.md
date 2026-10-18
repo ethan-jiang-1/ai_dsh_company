@@ -167,6 +167,17 @@
 **仪器教训（第四类）**：打开公司页的场景**必须把视图切回去**——S23 起初没还原，后面所有场景都因为"两份同名行"炸出
 strict mode violation（假红一片）。已加 `backToSessionView()` 助手 + 把行查询一律**限定在侧栏面板内**。
 
+## 追加十：素材区真数据 + 并发反向判据（2026-10-19）
+
+| 轴 | 结论 |
+|---|---|
+| **S25 journal 素材区** | ✅ 真数据渲染：角色（CEO/VP-Eng/…）+ 待审数 + 文件名（日期）在场，并明标「不用你操作」 |
+| **S27 不同行并发** | ✅ 同一个 tick 点**两不同行**的采纳 ⇒ **两条都落盘**（双击护栏按行判，不误伤并发）——这是双击护栏的反向判据（只验"连点两次只发一条"会漏掉"收得太紧把并发也挡了"） |
+| S26「真清空后的空态」 | **撤掉**：共享盘上"清场"不可控（会误伤同盘其他记录），空态文案由 keyless 档钉住 |
+
+**探针新增机制**：`unverified[]` —— "未验成（入口/前置不足）"**单独成列**，不再混在 PASS 里冒充绿
+（本轮 S25 一开始就是"PASS 但实际未验成"，靠这条规矩被我自己抓出来）。
+
 ## 指针
 
 - 探针：[cultivation-ux-scenarios.mjs](../../probes/browser-visual/cultivation-ux-scenarios.mjs)（`--shots`）｜顺路档：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough.mjs)

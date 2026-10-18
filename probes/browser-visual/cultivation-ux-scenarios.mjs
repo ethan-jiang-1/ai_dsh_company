@@ -66,6 +66,8 @@ try {
 
 const failures = []
 const notes = []
+/** 未验成（入口不可达/前置不足）：**必须单独列出**，不许混在 PASS 里冒充绿。 */
+const unverified = []
 const check = (label, fn) => fn().then(
   () => console.log(`  PASS ${label}`),
   error => { failures.push(`${label}: ${error.message}`); console.log(`  FAIL ${label}: ${error.message}`) },
@@ -675,6 +677,51 @@ try {
     notes.push('S18：已撤回记录说清状态且不再给验证/撤回把手 ✓')
   })
 
+  // ── S27 双击护栏的反向判据：**不同行**连点两次必须各发一条（护栏不许误伤并发）──────────
+  await check('S27 不同行并发采纳：两条都落盘（双击护栏不误伤）', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const a = `${P}-para-a`
+    const b = `${P}-para-b`
+    seedRecord(a, { targetRole: role, expectation: 'UX场景：并发 A', body: '做法：A。' })
+    seedRecord(b, { targetRole: role, expectation: 'UX场景：并发 B', body: '做法：B。' })
+    seeded.push(a, b)
+    await wake()
+    const rowA = rowOf(a)
+    const rowB = rowOf(b)
+    await rowA.waitFor({ timeout: 25_000 })
+    await rowB.waitFor({ timeout: 25_000 })
+    // 同一个 tick 里点两**不同**行：护栏按 key 判，必须都放行
+    await Promise.all([
+      rowA.getByRole('button', { name: COPY.adopt, exact: true }).click(),
+      rowB.getByRole('button', { name: COPY.adopt, exact: true }).click(),
+    ])
+    const deadline = Date.now() + 25_000
+    while (Date.now() < deadline) {
+      if (recordTextOf(a).includes('status: adopted') && recordTextOf(b).includes('status: adopted')) break
+      await sleep(500)
+    }
+    const okA = recordTextOf(a).includes('status: adopted')
+    const okB = recordTextOf(b).includes('status: adopted')
+    if (!okA || !okB) throw new Error(`不同行并发被误伤（A=${String(okA)} B=${String(okB)}）——护栏收得太紧`)
+    notes.push('S27：不同行并发采纳两条都落盘（护栏按行判，不误伤）✓')
+  })
+
+  // ── S25 journal 素材区真数据渲染：角色 + 待审数 + 文件名都在场，且明说"不用你操作" ──────────
+  await check('S25 journal 素材区：真数据（角色/待审数/文件名）在场且标"不用你操作"', async () => {
+    const block = page.getByLabel('journal 素材').first()
+    if (await block.count() === 0) { notes.push('S25 未验成：测试 home 的 company 盘没有 journal 素材块'); return }
+    await block.scrollIntoViewIfNeeded()
+    const text = await block.innerText()
+    await shot(page, 'S25-journal')
+    if (!/不用你操作|无需操作/.test(text)) throw new Error(`素材区没标"不用你操作"（人可能以为要做点什么）：${text.slice(0, 120)}`)
+    const rows = await block.getByRole('listitem').count()
+    if (rows === 0) { unverified.push('S25：素材块在场但没有行（该 home 的 journal 是空的）'); return }
+    const first = await block.getByRole('listitem').first().innerText()
+    if (!/(CEO|CFO|COO|VP-Eng|VP-Sales)/.test(first)) throw new Error(`素材行没显示角色：${first.slice(0, 80)}`)
+    if (!/\d{4}-\d{2}-\d{2}/.test(first)) throw new Error(`素材行没显示文件名（日期）：${first.slice(0, 80)}`)
+    notes.push(`S25：素材区真数据渲染（${String(rows)} 行，角色+文件名+待审数在场）且标明不用你操作 ✓`)
+  })
+
   // ── S23 三实例并存（浮窗 + 公司页）：在**浮窗**里采纳，公司页实例也要 ≤8s 同步 ────────────
   await check('S23 三实例并存：浮窗里采纳，公司页实例 ≤8s 同步', async () => {
     if (role === null) throw new Error('未拿到角色')
@@ -692,7 +739,7 @@ try {
       await wake()
     }
     const viewTab = page.getByText('公司', { exact: true }).first()
-    if (await viewTab.count() === 0) { notes.push('S23 未验成：会话视图入口没出现（同 S13 的原因）'); return }
+    if (await viewTab.count() === 0) { unverified.push('S23：会话视图入口没出现（同 S13 的原因）'); return }
     await viewTab.click()
     await sleep(1500)
     const sub = page.locator('.wk-view-tabs').getByRole('tab', { name: '培养' }).first()
@@ -997,6 +1044,10 @@ for (const roleDir of [role, 'ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']) {
 
 console.log('\n观察记录（口径：机制/文案，不含真人困惑度）：')
 for (const line of notes) console.log(`  · ${line}`)
+if (unverified.length > 0) {
+  console.log('\n未验成（不算绿，也不是红——入口/前置不足）：')
+  for (const line of unverified) console.log(`  · ${line}`)
+}
 console.log(failures.length === 0
   ? '\ncultivation-ux-scenarios: ALL PASS（S1–S6 边角场景机制与文案可执行）'
   : `\ncultivation-ux-scenarios: ${String(failures.length)} FAILURE(S)\n${failures.join('\n')}`)
