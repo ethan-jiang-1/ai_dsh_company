@@ -10,7 +10,7 @@
  * - 文案一律取 `CULTIVATION_COPY`（迭代改文案不动逻辑）；组件不发命令，只调 `actions.run`（永不抛）；
  * - `actions` 缺席 = 只读降级（照旧给命令原文，不给死按钮）；viewer 角色与目标不符不出按钮
  *   ——客户端隐藏只是 UX，**真闸在 host**；
- * - 撤回 = 唯一破坏性动作：先讲后果（删方法 + 记录不能再被采纳 + 运行中会话不受影响）再确认；
+ * - 撤回 = 唯一破坏性动作：先讲后果（删方法 + 记录不能再被采纳）再确认；
  * - 空态与失败态分开（不可达 ≠ 0 条；未验证 ≠ 已掌握）。
  *
  * 数据折行在 `cultivation-data.ts`；keyless 判据 = `tests/client/cultivation-board.spec.ts`（静态渲染）
@@ -332,7 +332,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
                     </span>
                     <span className="wk-row-task">
                       {record.expectation}
-                      {revoked ? '——方法已删除，新会话不再加载。' : '——新开的本角色会话会加载它；运行中的会话不受影响。'}
+                      {revoked ? '——方法已删除，本角色会话不再加载。' : '——新开的本角色会话带着它开工；已经在跑的会话也会随技能目录刷新看到它。'}
                     </span>
                     {stampOf(record.id) !== null && <span className="wk-meta">{`${String(stampOf(record.id))} 提出`}</span>}
                     {!revoked && actions !== undefined && (

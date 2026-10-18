@@ -161,12 +161,16 @@ try {
     if (!names.includes(`method-${recordId}`)) {
       throw new Error(`新 cfo 会话缺已采纳方法（实际：${names.join(', ').slice(0, 200)}）`)
     }
-    // 观察项（不判红绿）：运行中会话的 catalog 复查——watcher 刷新时点供卡参考。
-    try {
-      await sleep(1500)
+    // ⑧ 判据（2026-10-19 由"观察项"升级）：**已经在跑的会话会随 watcher 刷新看到新方法**。
+    //   这条直接决定面板文案：此前写"运行中的会话不受影响"= 未兑现的承诺，已按实测改写。
+    await check('⑧ 已经在跑的会话会随目录刷新看到新方法（面板文案据此修正）', async () => {
+      await sleep(2000)
       const liveNames = await catalogOf('cfo')
-      console.log(`  NOTE 运行中的 cfo 会话复查：${liveNames.includes(`method-${recordId}`) ? '已见（watcher 已刷新 catalog）' : '未见（watcher 未及/仅后续模型步骤生效）'}——${liveNames.join(', ').slice(0, 120)}`)
-    } catch { /* 观察项失败不判红 */ }
+      if (!liveNames.includes(`method-${recordId}`)) {
+        throw new Error(`已在跑的 cfo 会话复查未见到新方法（watcher 未刷新？）——若平台改了这条语义，`
+          + `面板文案需同步回"运行中不受影响"：${liveNames.join(', ').slice(0, 160)}`)
+      }
+    })
   })
 
   // 反例（角色闸）：ceo 会话采纳 cfo 的记录 → 拒绝（仅建议权，目标本人采纳）
