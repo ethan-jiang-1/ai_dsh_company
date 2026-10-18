@@ -10,9 +10,8 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-024](BUG-024-cultivation-row-loses-action-after-failure.md) | 命令面失败后该行按钮停在「处理中…」：`finally` + 20s 超时都没治住（>35s 仍卡）⇒ 回翻，先定位 H4/H5 | P2 |
 
-BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 **回翻调查中**（修法被证伪） [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**无活跃缺陷卡**；BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 已修（定位后判定：产品修法成立，S12 红=探针侧残留） [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

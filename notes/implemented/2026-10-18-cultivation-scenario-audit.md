@@ -101,6 +101,15 @@
 - **仍留的一处偶发（如实）**：场景档开场偶发"未拿到角色"（新建会话继承**持久化**的默认 preset：前几轮切过 PTC/Standard）。
   根治 = S0 选完 CEO 后再**新建一条会话**（本轮补丁没命中文件，未落地）——下一轮第一件事。
 
+## 追加四：BUG-024 定位收口（2026-10-19）
+
+一次真浏览器诊断（网络层 `page.on('request')` + 页面内包 `fetch` + 行文本打点）**同时否掉两条假设**：
+真端点就是 `POST /api/commands/execute`（路由命中、abort 生效 ⇒ H5 否）；abort 后行文本在 3/10/22/35s
+都是「…采纳 | 拒绝 | 命令面报错（gateway/internal）：client api: commands/execute…」⇒ 错误行内可见、
+**按钮回到可用**（⇒ H4 否，产品修法成立）。卡按证据归档 `已修`。
+**留下的探针侧残留**：同一路径在场景档 S12 里仍表现为「处理中…」——下一轮在 S12 里 dump 点击次数与行文本定位
+（纪律：探针失败路径必须带现场，别再靠猜）。另：`cultivation-gui-probe` 的开场自愈循环**复跑 8/8 PASS**，那一档回绿。
+
 ## 指针
 
 - 探针：[cultivation-ux-scenarios.mjs](../../probes/browser-visual/cultivation-ux-scenarios.mjs)（`--shots`）｜顺路档：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough.mjs)
