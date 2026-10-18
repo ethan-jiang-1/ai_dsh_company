@@ -82,12 +82,32 @@ describe('questionStopOf：停在问询上吗？这个停点驱动能不能自�
     expect(verdict.questionIds).toEqual(['a', 'b'])
   })
 
-  it('坏 arguments / 缺时间戳不炸：按默认窗口判，且给得出 verdict', () => {
+  it('缺时间戳不炸（按 now 计，等 0ms）', () => {
+    const noTime = { type: 'tool/call', seq: 1, data: { callId: 'c2', name: 'ask_user_question', arguments: '{}' } }
+    expect(questionStopOf([noTime], { now: T0 })).toMatchObject({ callId: 'c2', window: 'bounded', action: 'wait', waitingMs: 0 })
+  })
+
+  // ── 形状漂移加固（2026-10-18 第二轮）：判定认不出形状时必须**停下并点名**，不许静默判"无停点"
+  //    （静默 = 驱动继续干等 = BUG-021/022 的危害原样复现）。
+  it('name 命中但缺 callId ⇒ 停并点名（形状漂移，不许当没停点）', () => {
+    const broken = { type: 'tool/call', seq: 1, time: T0, data: { name: 'ask_user_question', arguments: '{"questions":[]}' } }
+    const verdict = questionStopOf([broken], { now: T0 + 1_000 })
+    expect(verdict).toMatchObject({ window: 'unknown', action: 'stop', callId: null })
+    expect(verdict.reason).toContain('callId')
+  })
+
+  it('name 命中但 arguments 不是 JSON ⇒ 停并点名（窗口无从判定，不许按默认窗口陪等）', () => {
     const broken = { type: 'tool/call', seq: 1, time: T0, data: { callId: 'c1', name: 'ask_user_question', arguments: '不是 JSON' } }
     const verdict = questionStopOf([broken], { now: T0 + 1_000 })
-    expect(verdict).toMatchObject({ callId: 'c1', window: 'bounded', action: 'wait', questionIds: [] })
-    const noTime = { type: 'tool/call', seq: 1, data: { callId: 'c2', name: 'ask_user_question', arguments: '{}' } }
-    expect(questionStopOf([noTime], { now: T0 }).waitingMs).toBe(0)
+    expect(verdict).toMatchObject({ window: 'unknown', action: 'stop' })
+    expect(verdict.reason).toContain('arguments')
+  })
+
+  it('name 丢了但参数里就是 questions ⇒ 停并点名（工具改名/字段搬家也要被抓到）', () => {
+    const drifted = { type: 'tool/call', seq: 1, time: T0, data: { callId: 'c9', arguments: JSON.stringify({ questions: [{ id: 'q' }] }) } }
+    const verdict = questionStopOf([drifted], { now: T0 + 1_000 })
+    expect(verdict).toMatchObject({ window: 'unknown', action: 'stop', callId: 'c9' })
+    expect(verdict.reason).toContain('形状')
   })
 
   it('非问询工具的未配对调用不算停点（别的工具挂住是别的问题）', () => {

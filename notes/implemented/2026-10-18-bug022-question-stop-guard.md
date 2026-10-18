@@ -46,8 +46,12 @@ if (verdict?.action === 'stop') {
 
 ## 未验残留（显式）
 
-- **判定只覆盖已知事件形状**：`tool/call.arguments`（JSON 字符串）与 `tool/result.data.message.toolCallId` 是实测形状；
-  上游若改形状，判定会退化成"没有停点"（spec 有坏形状兜底但覆盖不到未来新形状）——形变时同 diff 更新判定与 spec。
+- **形状漂移已加固为 fail-loud**（2026-10-18 二轮）：`name` 命中却缺 `callId`、`arguments` 不是 JSON 对象、
+  或"只靠参数里的 `questions` 才认出问询"（工具改名/字段搬家）三种情形，判定一律给
+  `window: 'unknown'` + `action: 'stop'` 并**点名形状**，不再静默判"无停点"（静默 = 驱动继续干等 = 原始危害复现）；
+  spec 从 10 例扩到 **13 例**（新增三例，另把"坏 arguments 按默认窗口陪等"的旧行为改判为 fail-loud）。
+  **剩余边界**：完全不认识的新形状（既不叫 `ask_user_question`、参数里也没有 `questions`）仍会判"无停点"——
+  那种形变只能靠人/新的形状识别补，本档不假装覆盖。
 - **守则的使用者目前只有本仓探针**：外部/临时驱动脚本要自己 `import` 该纯逻辑（文档指针在 `web-rpc.md` 与上「驱动用法」节）。
 - 窗口秒数的**体验调参**仍未做（preset 钉 120s；`-1`/超长窗由模型按需覆盖）——需要真人体验一轮再定。
 

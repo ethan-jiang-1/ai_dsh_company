@@ -66,7 +66,11 @@ args:   { "agentId": "<SessionId>", "callId": "<toolCallId>",
   before proceeding"*）——真跑实测：该路径下无 `pending`、无 `turn/end`、`userQuestions/answer` 返回 false
   ⇒ 无人值守驱动仍会静默停住。**残留已由 [BUG-022 的驱动侧停点判定](../../notes/implemented/2026-10-18-bug022-question-stop-guard.md) 收掉**
   （`tools/lib/question-stop.mjs`：看到无界停点就停并报，不再干等；卡 = [BUG-022（已归档）](../../_backlog/_archive/fixed_bugs/BUG-022-ask-user-unbounded-timeout-override.md)）。
-- 窗口秒数（120）未按体验实测调过：`timeout` 是可调项（行 config 一处或单次调用参数），本期取 vendor 默认并显式钉住。
+- 窗口秒数（120）**已在 2026-10-18 用真数据核过，结论 = 维持不改**：分析器 `tools/ask-latency.mjs` 扫 dev home
+  645 份日志得 **41 条真人作答**样本——p50 **42s**、p75 **138s**、p90 1559s（尾部是"人隔了很久回来答"）；
+  候选窗口覆盖率 120s→68%、180s→76%、600s→83%。**120s 落在 p50 与 p75 之间**，且窗口到点不等于丢答案
+  （人仍可后答，答案以新 turn 进入）；模型还能单次覆盖、无界的由 BUG-022 的驱动守则立刻拦下 ⇒ 无证据支持改动。
+  要复核/换窗口：`source run/env.sh && node tools/ask-latency.mjs`（只读报数，不改配置）。
 
 ## 指针
 
