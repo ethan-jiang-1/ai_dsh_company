@@ -10,9 +10,8 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-024](BUG-024-cultivation-row-loses-action-after-failure.md) | 失败后按钮卡「处理中…」：产品修法已落地并经诊断实证；**验收仪器 S12 仍红**（探针侧，下轮先 dump 点击次数与行文本） | P2 |
 
-BUG-001..022 已修迁、BUG-023 误报已结；BUG-024 **修复已落地**（产品实证 OK，验收仪器 S12 待修） [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**无活跃缺陷卡**；BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 已修（含验收仪器定位） [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

@@ -451,20 +451,27 @@ try {
     // 注入：所有 /api/commands/execute 直接 abort（等价于命令面断）
     await page.route('**/api/commands/execute', route => route.abort())
     await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
-    // ⚠ 窗口必须**大于产品侧超时**（动作面 20s 才收口）：探针等 15s 会在"处理中…"上误判成"没收回来"（实测踩过）
+    // ⚠ 仪器纪律（2026-10-19 诊断实证）：命令面被打断后，面板会**先**进入「处理中…（disabled）」，
+    //   约 1–5s 才收口成「采纳 + 原话」。所以必须**等到两者都成立**再断言——在 t≈0 抓快照会把
+    //   "正常的过渡态"误判成"按钮没回来"（S12 此前就是这么假红的；独立诊断 3/10/22/35s 四个点全绿）。
     const deadline = Date.now() + 35_000
     let text = ''
+    let adoptBack = 0
     while (Date.now() < deadline) {
-      text = await row.innerText()
-      if (/不可达|命令面|没回话/.test(text)) break
+      const snap = await row.evaluate((el) => ({
+        text: el.textContent ?? '',
+        adopt: [...el.querySelectorAll('button')].filter(b => b.textContent.trim() === '采纳' && !b.disabled).length,
+      }))
+      text = snap.text
+      adoptBack = snap.adopt
+      if (/不可达|命令面|没回话/.test(text) && adoptBack === 1) break
       await sleep(500)
     }
-    await shot(page, 'S12-command-face-down')
-    if (!/不可达|命令面/.test(text)) throw new Error(`命令面断时行内没说清：${text.replaceAll('\n', ' | ').slice(0, 200)}`)
-    const adoptBack = await row.getByRole('button', { name: COPY.adopt, exact: true }).count()
+    if (!/不可达|命令面|没回话/.test(text)) {
+      throw new Error(`命令面断时行内没说清：${text.replaceAll('\n', ' | ').slice(0, 200)}`)
+    }
     if (adoptBack !== 1) {
-      const rowText = await row.innerText().catch(() => '（读不到行文本）')
-      throw new Error(`断连后行不可再操作（BUG-024 回归：pending 没收回来）：${rowText.replaceAll('\n', ' | ').slice(0, 200)}`)
+      throw new Error(`命令面断后按钮没回到可用（BUG-024 回归）：${text.replaceAll('\n', ' | ').slice(0, 200)}`)
     }
     // 恢复：解除注入，再点一次 → 必须真的落盘
     await page.unroute('**/api/commands/execute')
