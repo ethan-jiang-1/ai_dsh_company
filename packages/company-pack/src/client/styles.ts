@@ -316,6 +316,10 @@ const CSS = `
 .wk-list { display: grid; gap: 4px; }
 
 /* 培养 GUI 行动面（2026-10-17 S2–S5）：创作入口 / 治理按钮 / 判断材料 / 后果说明 */
+/* 培养行 = 堆叠块：名字/正文/按钮各占整行（窄列会把「我的纠正」挤成一字一行——2026-10-18 夹具实测）。 */
+.wk-cultivation-list .wk-row { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; row-gap: 4px; }
+.wk-cultivation-list .wk-row-name { flex: none; flex-wrap: wrap; min-width: 0; overflow-wrap: anywhere; }
+.wk-cultivation-list .wk-row-task { width: 100%; overflow-wrap: anywhere; }
 .wk-cultivation-compose-entry { display: flex; flex-wrap: wrap; gap: 8px; }
 .wk-cultivation-compose-form { display: grid; gap: 8px; }
 .wk-cultivation-roles { display: flex; flex-wrap: wrap; gap: 6px; }

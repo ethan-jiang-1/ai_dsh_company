@@ -142,7 +142,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
           : inbox.needsDecision.length === 0
             ? <div className="wk-meta">没有给我的建议或纠正。</div>
             : (
-              <div role="list" aria-label="待我处理的培养记录" className="wk-list">
+              <div role="list" aria-label="待我处理的培养记录" className="wk-list wk-cultivation-list">
                 {inbox.needsDecision.map(record => {
                   const outcome = outcomeOf(record.id)
                   return (
@@ -215,7 +215,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
         <div className="wk-activity-block" aria-label="我提交的与我已处理">
           <strong>我提交的 · 我已处理</strong>
           <div className="wk-meta">等对方处理；你无需操作。</div>
-          <div role="list" aria-label="提案与处理回执" className="wk-list">
+          <div role="list" aria-label="提案与处理回执" className="wk-list wk-cultivation-list">
             {inbox.processedForViewer.map(record => (
               <div key={record.id} role="listitem" className="wk-row" aria-label={`已拒绝 ${record.id}`}>
                 <span className="wk-row-name">
@@ -244,7 +244,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
         {props.records !== null && inbox.adoptedForViewer.length === 0
           ? <div className="wk-meta">我的分身还没有已采纳的方法。</div>
           : props.records !== null && (
-            <div role="list" aria-label="已采纳的方法" className="wk-list">
+            <div role="list" aria-label="已采纳的方法" className="wk-list wk-cultivation-list">
               {inbox.adoptedForViewer.map(record => {
                 const slug = record.methodSlug ?? record.id
                 const outcome = outcomeOf(record.id)
