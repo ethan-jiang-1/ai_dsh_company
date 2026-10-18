@@ -152,9 +152,12 @@ try {
   const rowOf = (id) => page.getByRole('listitem', { name: `待处理 ${id}` })
   const button = (scope, label) => scope.getByRole('button', { name: label, exact: true })
 
-  await task('T1', '找出待办并看懂一条（期望行为 + 正文就地可见）', async (step) => {
+  await task('T1', '找出待办并看懂一条（期望行为 + 正文就地可见；回到窗口即刷新）', async (step) => {
     const row = rowOf(IDS.adopt)
-    await row.waitFor({ timeout: 30_000 })
+    // 种子是"外部"写进来的（模拟队友刚提案）⇒ 打一次 focus，面板应**秒级**刷出来，而不是等 30s 轮询。
+    await page.evaluate(() => { window.dispatchEvent(new Event('focus')) })
+    step()
+    await row.waitFor({ timeout: 5_000 })
     step()
     const text = await row.innerText()
     if (!text.includes('收口前逐项列出未决项')) throw new Error('待办行没显示期望行为（一句话）')
@@ -177,6 +180,13 @@ try {
     const text = await page.locator('body').innerText()
     step()
     if (!/新开的[^\n]*会话[^\n]*加载/.test(text)) throw new Error('面板没有"新开的…会话才加载"这条生效边界')
+    step()
+  })
+
+  await task('T3b', '新鲜度文案说真话（培养数据 30s 轮询，不许写 5 秒）', async (step) => {
+    const head = await page.locator('.wk-pane-head, .wk-tabstrip-meta').first().innerText()
+    step()
+    if (!head.includes('30 秒')) throw new Error(`页签头没写真实间隔（写成"5 秒"就是骗人）：${head.replaceAll('\n', ' ').slice(0, 120)}`)
     step()
   })
 

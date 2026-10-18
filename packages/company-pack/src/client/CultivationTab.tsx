@@ -11,6 +11,7 @@ import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { CultivationBoard } from './CultivationBoard.tsx'
 import type { CultivationActionsFactory } from './cultivation-actions.ts'
 import {
+  CULTIVATION_REFRESH_MS,
   useCultivationFeedback,
   useCultivationPanelData,
   type CultivationFiles,
@@ -51,7 +52,12 @@ export function CultivationTab(props: CultivationTabProps) {
   const actions = useMemo(() => props.cultivationActions(props.sessionId), [props.cultivationActions, props.sessionId])
 
   return (
-    <PanelFrame tone="growth" title="培养" tabProps={props satisfies PanelFrameProps}>
+    <PanelFrame
+      tone="growth"
+      title="培养"
+      tabProps={props satisfies PanelFrameProps}
+      refreshLabel={`每 ${String(CULTIVATION_REFRESH_MS / 1000)} 秒自动刷新`}
+    >
       <CultivationBoard
         viewerRole={viewerRole}
         viewerLabel={viewerRole === null ? null : roleLabel(viewerRole)}

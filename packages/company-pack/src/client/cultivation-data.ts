@@ -93,8 +93,8 @@ export interface CultivationPanelData {
   readonly refresh: () => void
 }
 
-/** 刷新间隔（journal/记录都不高频变化；30s 足够）。 */
-const REFRESH_MS = 30_000
+/** 刷新间隔（journal/记录都不高频变化；30s 足够）——**导出**：页签头文案要照它说真话（别再写死"5 秒"）。 */
+export const CULTIVATION_REFRESH_MS = 30_000
 
 /** 预览条数（与读模型 PREVIEW_LIMIT 同口径：只读每角色前 3 篇的首段）。 */
 const HEAD_LIMIT = 3
@@ -149,8 +149,18 @@ export function useCultivationPanelData(
       setRecords(nextRecords)
     }
     void load()
-    const timer = setInterval(() => { void load() }, REFRESH_MS)
-    return () => { controller.abort(); clearInterval(timer) }
+    const timer = setInterval(() => { void load() }, CULTIVATION_REFRESH_MS)
+    // 注意力回来就刷新（2026-10-18 走查抓到：只靠 30s 轮询时，外部刚提的记录最长要等 30s 才出现）。
+    // 只读、幂等、跟着 effect 的 abort 走——不是第二个轮询源，是"人看向面板"这个事件的一次触发。
+    const wake = (): void => { if (!controller.signal.aborted) void load() }
+    window.addEventListener('focus', wake)
+    document.addEventListener('visibilitychange', wake)
+    return () => {
+      controller.abort()
+      clearInterval(timer)
+      window.removeEventListener('focus', wake)
+      document.removeEventListener('visibilitychange', wake)
+    }
   }, [enabled, sessionId, files, nonce])
 
   return { journalRows, records, refresh }

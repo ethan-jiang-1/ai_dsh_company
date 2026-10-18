@@ -19,6 +19,7 @@ import { useCompanyData, type CompanyDataInjected } from './use-company-data.ts'
 import { CultivationBoard } from './CultivationBoard.tsx'
 import type { CultivationActionsFactory } from './cultivation-actions.ts'
 import {
+  CULTIVATION_REFRESH_MS,
   useCultivationFeedback,
   useCultivationPanelData,
   type CultivationFiles,
@@ -97,7 +98,9 @@ export function createCompanyView(injected: CompanyViewInjected) {
             </button>
           ))}
           <span style={{ flex: 1 }} />
-          <span className="wk-meta wk-tabstrip-meta">每 5 秒刷新</span>
+          <span className="wk-meta wk-tabstrip-meta">
+            {panel === 'cultivation' ? `每 ${String(CULTIVATION_REFRESH_MS / 1000)} 秒刷新` : '每 5 秒刷新'}
+          </span>
           <Button
             size="sm"
             variant="ghost"
