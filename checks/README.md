@@ -137,3 +137,16 @@
 [lib](../tools/lib/) 保存可由隔离夹具验证的会话日志、workspace oracle、交付物/作者判据、排练输入、发布事务和仓库布局逻辑；[drivers](../tools/drivers/) 保存真实进程、CDP 和 Playwright 驱动。驱动不进入 keyless spec；准入由 [分层守卫](../tests/harness/layering.spec.ts) 检查。
 
 门禁装配入口 [run-gates](run-gates.mjs) 住本目录根，每道门禁一个模块（清单唯一源 = gates/ 目录；pin 常量 = gates/lib/pin.mjs）；keyless spec 按 company/client/presets/harness 领域归位。新增入口同 diff 增加索引，触发条件、成本和状态仍留在脚本头注。目录取舍 = [driver-purpose-top-level](../notes/implemented/2026-10-07-driver-purpose-top-level.md)（`scripts/`、`dev/` 形态名已退役）。
+
+## 待触发复查（触发条件 → 该做什么）
+
+培养面的几处"留给未来"都写死了触发条件——**条件与依据留在各自 Note（一处事实一个家）**，本表只做指针：
+
+| 触发条件 | 该做什么 |
+|---|---|
+| 真实盘 **待处理 > 30 条**（或已采纳 > 5 个） | 折叠开始挡东西 ⇒ 再决定上**筛选**（优先于分页）。量法 `ls company-workspace/cultivation/records \| wc -l`；依据 = [场景轮 Note](../notes/implemented/2026-10-18-cultivation-scenario-audit.md) 追加十四 |
+| 再攒 **~20 场真实收口仍 0 次自发提案** | 考虑在 persona/技能加一句引导（先查是不是被别的机制压住）。先跑 `node tools/propose-sampler.mjs` 看分箱；依据 = 同上 追加十六 |
+| **升 pin** 或动培养面（面板 / host / preset 工具行） | 复跑四档真入口：`cultivation-gui-probe`、`cultivation-ux-walkthrough`、`cultivation-ux-scenarios`、`cultivation-method-layer-probe`；动 preset 另跑 `preset-smoke` |
+| 想复核**问询窗口 120s** 还要不要改 | `node tools/ask-latency.mjs`（只读报数，不改配置）；依据 = [BUG-021 Note](../notes/implemented/2026-10-18-bug021-timed-user-question.md) |
+| 命令面行为 / 事件形状要变 | 先看 S12（故障注入恢复）与 `tools/lib/question-stop.mjs` 的形状漂移判据——它们会先红；依据 = [BUG-022 Note](../notes/implemented/2026-10-18-bug022-question-stop-guard.md) |
+| **真人**愿意跑一轮体验 | `node probes/browser-visual/cultivation-ux-walkthrough.mjs --protocol` 打印协议卡（"新人困惑度"只有真人能填，模拟不替代） |
