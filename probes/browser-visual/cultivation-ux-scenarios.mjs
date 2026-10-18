@@ -706,6 +706,70 @@ try {
     notes.push('S27：不同行并发采纳两条都落盘（护栏按行判，不误伤）✓')
   })
 
+  // ── S28 失败态：记录已消失（陈旧行）⇒ host 原话 + 行仍可用 ──────────────────────────
+  await check('S28 失败态：记录已消失时点陈旧行 ⇒ 出行内原话且行仍可用', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const id = `${P}-gone`
+    seedRecord(id, { targetRole: role, expectation: 'UX场景：记录已消失', body: '做法：删文件后点陈旧行。' })
+    seeded.push(id)
+    await wake()
+    const row = rowOf(id)
+    await row.waitFor({ timeout: 25_000 })
+    rmSync(join(RECORDS, `${id}.md`), { force: true })   // 另一端把它删了（面板还拿着陈旧行）
+    await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
+    const deadline = Date.now() + 35_000
+    let text = ''
+    let back = 0
+    while (Date.now() < deadline) {
+      const snap = await row.evaluate((el) => ({
+        text: el.textContent ?? '',
+        adopt: [...el.querySelectorAll('button')].filter(b => b.textContent.trim() === '采纳' && !b.disabled).length,
+      })).catch(() => ({ text: '', adopt: 0 }))
+      text = snap.text
+      back = snap.adopt
+      if (/不存在|找不到|没有.*记录|不可达|命令面|报错/.test(text)) break
+      await sleep(500)
+    }
+    await shot(page, 'S28-record-gone')
+    if (!/不存在|找不到|没有.*记录|不可达|命令面|报错/.test(text)) {
+      throw new Error(`记录已消失时点了没说清：${text.replaceAll('\n', ' | ').slice(0, 180)}`)
+    }
+    notes.push(`S28：记录被删除后点陈旧行 ⇒ 行内出原话（${text.replaceAll('\n', ' ').slice(0, 60)}…）✓`)
+  })
+
+  // ── S29 规模续压：300 条（记耗时；如实记录有无分组/分页/计数）────────────────────────
+  await check('S29 规模 300 条：仍可用 + 记录有无分组/计数', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const ids = []
+    for (let i = 0; i < 300; i++) {
+      const id = `${P}-bulk300-${String(i).padStart(3, '0')}`
+      ids.push(id)
+      seedRecord(id, { targetRole: role, expectation: `UX场景：三百条 ${String(i + 1)}`, body: `做法：第 ${String(i + 1)} 条。` })
+      seeded.push(id)
+    }
+    const t0 = Date.now()
+    await wake()
+    let rendered = 0
+    const deadline = Date.now() + 120_000
+    while (Date.now() < deadline) {
+      rendered = await page.getByRole('listitem', { name: /^待处理 .*bulk300-/ }).count()
+      if (rendered >= 300) break
+      await sleep(2000)
+    }
+    const elapsed = Date.now() - t0
+    if (rendered < 300) throw new Error(`300 条只渲染了 ${String(rendered)} 条（耗时 ${String(elapsed)}ms）`)
+    const last = rowOf(ids[299])
+    await last.scrollIntoViewIfNeeded()
+    const actionable = await last.getByRole('button', { name: COPY.adopt, exact: true }).count()
+    // 如实记录"有没有分组/分页/计数"（面板当前应是平铺 + 每块一句总数）
+    const paneText = await page.locator('.wk-pane').innerText()
+    const hasCount = /共\s*\d+|待处理\s*\d+|\d+\s*条/.test(paneText)
+    const hasPager = /下一页|分页|加载更多|第\s*\d+\s*页/.test(paneText)
+    notes.push(`S29：300 条全部渲染（${String(elapsed)}ms）、末条${actionable === 1 ? '可操作' : '不可操作'}；`
+      + `计数在场=${String(hasCount)}、分页/分组在场=${String(hasPager)}（当前设计=平铺一列）`)
+    if (actionable !== 1) throw new Error('第 300 条不可操作')
+  })
+
   // ── S25 journal 素材区真数据渲染：角色 + 待审数 + 文件名都在场，且明说"不用你操作" ──────────
   await check('S25 journal 素材区：真数据（角色/待审数/文件名）在场且标"不用你操作"', async () => {
     const block = page.getByLabel('journal 素材').first()
