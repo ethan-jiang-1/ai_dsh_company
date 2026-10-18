@@ -18,6 +18,9 @@
 //   S6 键盘可达性 → 从面板起 Tab 到「采纳」≤ 6 步、焦点可见（有 outline）、Enter 能真触发
 //   S9 时间感 → 每条记录说得出"什么时候提的"（id 里带时间戳；此前面板完全没有时间信息）
 //   S10 并发/陈旧 → 另一端先处理后，本端收件箱同步；陈旧副本再动手被 host 状态守卫拒
+//   S13 多入口并存 → 侧栏 + 公司页第四子页同开：一侧动作后另一实例 **≤8s 同步**（动作面广播；撤掉广播应红）
+//   S14 会话级掉线 → 全量断 /api/：面板不崩、旧数据保留、动作收口（错误话+按钮回可用）、恢复即好
+//   S15 时间序 → 三条不同时间戳记录：列表**新在前**且时间标签有序
 //   S11 极端文案 → 超长期望句 + emoji 不挤坏排版（按钮仍在行内）
 //   S12 错误恢复 → 命令面被打断时行内说"不可达"且**按钮回到可用**；解除注入后重试即成功
 //   S13 多入口并存 → 侧栏 + 公司页第四子页同开：一端处理完，另一处要么同步、要么被 host 明确拒绝（不许静默）
@@ -348,10 +351,11 @@ try {
     seeded.push(id)   // 本档自己产生的记录也清掉
     if (!found.text.includes('targetRole: cfo')) throw new Error('记录 targetRole 不是 cfo')
     await wake()
-    await sleep(1000)
+    // 仪器纪律：等它上屏（最多 15s），别用固定 sleep + 整页文本比对
+    await page.getByText('给 CFO 的建议', { exact: false }).first().waitFor({ timeout: 15_000 }).catch(() => {
+      throw new Error('CEO 的「我提交的」15s 内没出现这条建议')
+    })
     await shot(page, 'S5-cross-role')
-    const bodyText = await page.locator('body').innerText()
-    if (!bodyText.includes('给 CFO 的建议')) throw new Error('CEO 的「我提交的」里看不到这条建议')
     const asTodo = await page.getByRole('listitem', { name: `待处理 ${id}` }).count()
     if (asTodo > 0) throw new Error('给别人的建议出现在自己的「需要我处理」里（归属串了）')
   })
@@ -501,6 +505,123 @@ try {
     if (box.x + box.width > rowBox.x + rowBox.width + 1) throw new Error('按钮被超长文案挤出行的右边界')
     notes.push(`S11 观察：超长期望句（约 ${String(longExpectation.length)} 字 + emoji）行高 ${String(Math.round(rowBox.height))}px，按钮仍在行内（x+w=${String(Math.round(box.x + box.width))} ≤ ${String(Math.round(rowBox.x + rowBox.width))}）`)
   })
+
+  // ── S13 多入口并存（硬判）：侧栏培养页签 + 公司页第四子页同开 ⇒ 一侧动作，另一侧必须**秒级同步** ──
+  //   判据要能红能绿：撤掉动作面的广播（CULTIVATION_CHANGED_EVENT）应红——不许靠 30s 轮询蒙过去。
+  await check('S13 多入口并存：一侧动作后，另一实例 ≤8s 同步（广播生效）', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const id = `${P}-multi`
+    seedRecord(id, { targetRole: role, expectation: 'UX场景：多入口并存', body: '做法：两侧同开看同步。' })
+    seeded.push(id)
+    await wake()
+    const sidebarRow = page.locator('.wk-pane').getByRole('listitem', { name: `待处理 ${id}` }).first()
+    // 仪器纪律：先等它出现（读盘/刷新有延迟），别在 t≈0 断言
+    await sidebarRow.waitFor({ timeout: 25_000 }).catch(() => {
+      throw new Error('侧栏实例 25s 内没看到这条（面板不在会话视图？读盘失败？）')
+    })
+    // 「公司」视图页签由平台渲染（不是 role=tab）⇒ 用可见文本找；找不到 = 这条轴没验，必须**报红**而不是静默跳过
+    const viewTab = page.getByText('公司', { exact: true }).first()
+    if (await viewTab.count() === 0) throw new Error('找不到「公司」视图入口（这条轴没验成，不许算绿）')
+    await viewTab.click()
+    await sleep(1800)
+    const sub = page.locator('.wk-view-tabs').getByRole('tab', { name: '培养' }).first()
+    if (await sub.count() === 0) throw new Error('公司页里找不到「培养」子页（这条轴没验成，不许算绿）')
+    await sub.click()
+    await sleep(2500)
+    await wake()
+    const pageRow = page.locator('.wk-cultivation-pane').getByRole('listitem', { name: `待处理 ${id}` }).first()
+    await pageRow.waitFor({ timeout: 25_000 }).catch(() => {
+      throw new Error('公司页实例 25s 内没看到这条（同一公司盘应两侧都见）')
+    })
+    await shot(page, 'S13-two-instances', { full: true })
+    await sidebarRow.getByRole('button', { name: COPY.adopt, exact: true }).click()
+    const d1 = Date.now() + 20_000
+    while (Date.now() < d1 && !recordTextOf(id).includes('status: adopted')) await sleep(500)
+    if (!recordTextOf(id).includes('status: adopted')) throw new Error('侧栏实例采纳没落盘')
+    const d2 = Date.now() + 8_000
+    let synced = false
+    while (Date.now() < d2) {
+      const stillOffer = await pageRow.getByRole('button', { name: COPY.adopt, exact: true }).count()
+      const rowText = await pageRow.innerText().catch(() => '')
+      if (stillOffer === 0 || /已采纳|已处理/.test(rowText)) { synced = true; break }
+      await sleep(400)
+    }
+    await shot(page, 'S13-two-instances-synced', { full: true })
+    if (!synced) {
+      const rowText = await pageRow.innerText().catch(() => '（读不到）')
+      throw new Error(`跨实例没同步（广播没生效？）：公司页实例仍给可用的「采纳」——${rowText.replaceAll('\n', ' | ').slice(0, 180)}`)
+    }
+    notes.push('S13：侧栏采纳后公司页实例 ≤8s 同步（广播生效，不再等 30s 轮询）✓')
+    // 收尾：切回会话视图，免得后面的场景在主视图里找面板
+    const chat = page.getByRole('tab', { name: /Chat|对话/ }).first()
+    if (await chat.count() > 0) { await chat.click().catch(() => {}); await sleep(1200) }
+  })
+
+  // ── S14 会话级掉线：/api/ 全断 ⇒ 面板不崩、旧数据在、动作收口、恢复即好 ──────────────
+  await check('S14 会话级掉线：面板不崩、旧数据还在、动作收口、恢复即好', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const id = `${P}-outage`
+    seedRecord(id, { targetRole: role, expectation: 'UX场景：会话级掉线', body: '做法：全量断 /api/。' })
+    seeded.push(id)
+    await wake()
+    const row = rowOf(id)
+    await row.waitFor({ timeout: 20_000 })
+    await page.route('**/api/**', route => route.abort())
+    if (await row.count() !== 1) throw new Error('掉线后面板把已有数据也丢了（应保留上次读到的）')
+    await shot(page, 'S14-session-down')
+    await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
+    const deadline = Date.now() + 35_000
+    let text = ''
+    let back = 0
+    while (Date.now() < deadline) {
+      const snap = await row.evaluate((el) => ({
+        text: el.textContent ?? '',
+        adopt: [...el.querySelectorAll('button')].filter(b => b.textContent.trim() === '采纳' && !b.disabled).length,
+      }))
+      text = snap.text
+      back = snap.adopt
+      if (/不可达|命令面|没回话|报错/.test(text) && back === 1) break
+      await sleep(500)
+    }
+    if (!/不可达|命令面|没回话|报错/.test(text)) throw new Error(`掉线时点了没说清：${text.slice(0, 160)}`)
+    if (back !== 1) throw new Error(`掉线时按钮没回到可用：${text.replaceAll('\n', ' | ').slice(0, 160)}`)
+    await page.unroute('**/api/**')
+    await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
+    const d2 = Date.now() + 25_000
+    while (Date.now() < d2 && !recordTextOf(id).includes('status: adopted')) await sleep(500)
+    if (!recordTextOf(id).includes('status: adopted')) throw new Error('恢复后重试没落盘')
+    notes.push('S14：全量断 /api/ 时旧数据保留、动作收口（错误话 + 按钮回可用）、恢复后重试成功 ✓')
+  })
+
+  // ── S15 时间序：三条不同时间戳 ⇒ 列表新在前（时间标签随之有序）────────────────────────
+  await check('S15 时间序：列表新在前（时间标签随之有序）', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const pad = (n) => String(n).padStart(2, '0')
+    const base = new Date()
+    const stampOf = (minusHours) => {
+      const d = new Date(base.getTime() - minusHours * 3_600_000)
+      return `${String(d.getFullYear())}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}-ux15`
+    }
+    const ids = [stampOf(0), stampOf(3), stampOf(30)]
+    for (const [i, id] of ids.entries()) {
+      seedRecord(id, { targetRole: role, expectation: `UX场景：时间序 ${String(i)}`, body: '做法：排序。' })
+      seeded.push(id)
+    }
+    await wake()
+    await rowOf(ids[0]).waitFor({ timeout: 20_000 })
+    await sleep(1500)
+    const order = await page.evaluate((list) => {
+      const rows = [...document.querySelectorAll('[role=listitem][aria-label^="待处理 "]')].map(r => r.getAttribute('aria-label') ?? '')
+      return list.map(id => rows.findIndex(label => label.includes(id)))
+    }, ids)
+    await shot(page, 'S15-time-order')
+    if (order.some(i => i < 0)) throw new Error(`三条没都在场：${JSON.stringify(order)}`)
+    if (!(order[0] < order[1] && order[1] < order[2])) {
+      throw new Error(`顺序不是新在前：新=${String(order[0])} 中=${String(order[1])} 旧=${String(order[2])}`)
+    }
+    notes.push(`S15：列表新在前（${order.join(' < ')}）✓`)
+  })
+
 
   // ── S7 无角色会话（观察档，最后跑）：把预设切成非公司角色，看面板怎么说 ────────────────
   await check('S7 非公司 preset（PTC/Standard）⇒ 当未选角色：说清怎么进、不出死按钮、不猜身份', async () => {
