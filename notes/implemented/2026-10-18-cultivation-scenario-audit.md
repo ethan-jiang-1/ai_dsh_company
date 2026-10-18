@@ -218,7 +218,8 @@ strict mode violation（假红一片）。已加 `backToSessionView()` 助手 + 
 | 素材（不用你操作） | S25（真数据 + 明标） | ✅ |
 | 每 30 秒自动刷新 | 走查 T3b（文案 = 常量）+ T1（回到窗口即刷新，实测 28s→0.1s） | ✅ |
 | 我的分身：<角色>（不是公司角色就说清） | 场景档 S0/S7（非名册 preset 当「未选角色」） | ✅ |
-| 分身自己也能提案（工具 `cultivation_propose`） | 记录以 `proposerKind: agent` 落盘并进收件箱（探针种子同形状）；**工具本身的端到端调用未验**（需真模型自主调用） | ⚠ 部分 |
+| 分身自己也能提案（工具 `cultivation_propose`） | **真模型档** `probes/session-context/cultivation-propose-probe.mjs`（2026-10-19 ALL PASS）：模型**自己**调了工具 ⇒ 新记录落公司盘，`proposerKind: agent` / `status: open` / `targetRole: cfo` / 期望行为与正文逐字对得上 | ✅ 已验（工具路径） |
+| 分身会**自发**提案（没人叫它调工具时） | 本轮只验了"被明确要求时能正确调用"；**日常自发提案未验**（要靠真实会话观察，不是探针能证） | ⚠ 未验（边界已写清） |
 | 撤回 = 删掉这个方法（该角色会话不再加载它，**已经在跑的也会随目录刷新去掉**） | 方法层档 **⑨**（本轮新增）：方法目录真删 + 记录标 `revokedAt` + **新会话不再加载** + **运行中会话目录被 watcher 摘除**（实测 NOTE：已去掉）⇒ 文案据此加强 | ✅ 已验 |
 
 ### 300 条续压（S29）
@@ -264,6 +265,18 @@ strict mode violation（假红一片）。已加 `backToSessionView()` 助手 + 
 折叠（10/5/5）作为**廉价保险**留着即可。**触发条件写死**：真实盘出现 **待处理 > 30 条**（或已采纳 > 5 个，
 即折叠真的开始挡住东西）时，再按当时的真实困惑决定上什么（优先考虑筛选而非分页——"最新在前 + 折叠"已覆盖浏览，
 筛选才解决"找特定一条"）。复核命令：`ls company-workspace/cultivation/records | wc -l`。
+
+## 追加十五：「分身自己也能提案」真模型端到端（2026-10-19）
+
+新增真模型档 `probes/session-context/cultivation-propose-probe.mjs`（头注写清 何时跑/成本/判据/清理）：
+
+- 起 cfo 会话（cwd = 公司盘）→ 提示词只要它**调一次** `cultivation_propose`（kind/targetRole/expectation/body 都给）→
+  轮询公司盘对比 id 快照 → 断言 frontmatter（`proposerKind: agent`、`status: open`、`targetRole: cfo`）+ 内容逐字一致。
+- **实跑 ALL PASS**：会话日志出现 `tool/call name=cultivation_propose`；记录 `20261018-233437-85zp.md` 落地，四判据全过；
+  探针把产物**自清**（留着会出现在真人面板上）——`--keep` 可保留现场。
+- **诚实边界**：本档证的是"**被明确要求时，模型能自主完成工具调用与参数**"；"没人叫它时会不会自发提案"是另一回事，
+  只能靠真实会话观察（已作为单独一条 ⚠ 留在对照表，不混进 ✅）。
+- 凭据：跑前 `pnpm orient` 的「凭据」行确认（本轮实测 `DEEPSEEK_API_KEY ✓（共 6 个键）`）——**不是**环境变量。
 
 ## 指针
 
