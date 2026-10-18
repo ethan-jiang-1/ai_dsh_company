@@ -149,4 +149,5 @@
 | **升 pin** 或动培养面（面板 / host / preset 工具行） | 复跑四档真入口：`cultivation-gui-probe`、`cultivation-ux-walkthrough`、`cultivation-ux-scenarios`、`cultivation-method-layer-probe`；动 preset 另跑 `preset-smoke` |
 | 想复核**问询窗口 120s** 还要不要改 | `node tools/ask-latency.mjs`（只读报数，不改配置）；依据 = [BUG-021 Note](../notes/implemented/2026-10-18-bug021-timed-user-question.md) |
 | 命令面行为 / 事件形状要变 | 先看 S12（故障注入恢复）与 `tools/lib/question-stop.mjs` 的形状漂移判据——它们会先红；依据 = [BUG-022 Note](../notes/implemented/2026-10-18-bug022-question-stop-guard.md) |
+| 想开**公司面其它面板**的 UX 深挖 | 先看 [公司面 UX 优先级卡](../_backlog/issues/2026-10-19-company-panels-ux-priority.md)（Top 1 台账 / Top 2 看板+依赖图 / Top 3 任务板；依据在 [调研](../_backlog/research/company-panels-ux/2026-10-19-panel-inventory-and-priority.md)） |
 | **真人**愿意跑一轮体验 | `node probes/browser-visual/cultivation-ux-walkthrough.mjs --protocol` 打印协议卡（"新人困惑度"只有真人能填，模拟不替代） |

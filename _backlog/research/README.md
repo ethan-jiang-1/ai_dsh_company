@@ -27,6 +27,6 @@ intent: "为什么需要这份依据。"
 
 | 文件 | 活卡与用途 |
 |---|---|
-| （无——最近一组「培养」材料已随 [Agent 培养](../_archive/settled_issues/2026-10-13-agent-cultivation.md) 卡迁 [研究归档](../_archive/research/README.md)） | — |
+| [company-panels-ux/2026-10-19-panel-inventory-and-priority.md](company-panels-ux/2026-10-19-panel-inventory-and-priority.md) | [公司面 UX 深挖——先做哪几个面板](../issues/2026-10-19-company-panels-ux-priority.md)：真实数据量/交互面/历史痛点与 Top 3 依据 |
 
 随卡归档的材料见 [研究归档](../_archive/research/README.md)。

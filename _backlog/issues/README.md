@@ -6,6 +6,7 @@
 
 | 问题 | 当前情况与下一步 |
 |---|---|
+| [公司面 UX 深挖——先做哪几个面板](2026-10-19-company-panels-ux-priority.md) | 调研已出：**Top 1 台账**（993 条真数据/痛点 7）、Top 2 看板+依赖图（379 任务、指挥视图）、Top 3 任务板；**等你点一个方向** |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 
