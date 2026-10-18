@@ -47,7 +47,7 @@ source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的完
 
 ## 密钥
 
-`pnpm dsh` 与真模型冒烟需 `DEEPSEEK_API_KEY`；凭据按 home 隔离（`runtime/harness-home` 配一次，dev-loop §6）；永不提交密钥。
+`pnpm dsh` 与真模型冒烟需 `DEEPSEEK_API_KEY`；**密钥住凭据库 `<home>/.credentials.yaml`，不是环境变量**——`env | grep DEEPSEEK` 为空**不代表**没配（2026-10-18 实证：真模型探针曾因此被误判搁置）；自检 = `pnpm orient` 的「凭据」行。凭据按 home 隔离（`runtime/harness-home` 配一次，dev-loop §6）；永不提交密钥。
 
 ## DSH 源码：三个实体，别混
 

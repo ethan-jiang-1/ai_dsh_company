@@ -141,8 +141,11 @@ returned the pending payload, or …"*），而 **`userQuestions/answer` 恰好�
       **均 ALL PASS**。台账记在 `snapshots/replay/r3-delegation/snapshot.yml`。
 - [x] `docs/guides/web-rpc.md` 口径改正（「回答不走 RPC」→ 依形态：legacy 挂住 / timed 转 `continued` 可 RPC 答），
       详细配方住毕业 Note（文档行预算门禁强制：指南只留结论与指针）。
-- [ ] **真模型行为（本机无 key ⇒ 显式缺口）**：配方与判据见毕业 Note「未验」节——一条会触发问询的动议 ⇒
-      窗口过后不永久 `running`、`turn/end` 出现；再用 `userQuestions/answer` 作答 ⇒ 答案以新 turn 进入会话。
+- [x] **真模型行为（2026-10-18 补跑，走 DSH 凭据库的 key）**：`probes/session-context/ask-user-timed-probe.mjs`
+      **ALL PASS**——窗口到点 → `tool/result` 含 `pending` → `turn/end` → `userQuestions/answer` 返回 true →
+      答案以新消息回会话（同轮另有两次实跑：默认 120s / 模型自取 180s，均按窗口收口）。
+      ⚠ **但判据只覆盖"窗口有界"这条路**：模型单次传 `timeout: -1` 时窗口回到无界、驱动仍会停住
+      ——残留另立 [BUG-022](../../bugs/BUG-022-ask-user-unbounded-timeout-override.md)（已修卡不重开，新卡引用旧卡）。
 
 ## 修复关联
 

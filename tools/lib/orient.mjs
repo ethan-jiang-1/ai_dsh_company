@@ -135,6 +135,46 @@ export function fourPieceState({ home, profiles, workspaceRoot, root = repositor
 
 /** 组装观测态。gitStatus / sessionPresets 由调用方注入（lib 不起进程）：前者=数字或 null，
  *  后者 = slug→preset 映射或 null（null = 不渲染 preset 列；映射内 undefined = 「不可用」）。 */
+/** 凭据库文件名（字面量的单一事实：spec 引它，不在回归层写死）。 */
+export const CREDENTIALS_FILE = '.credentials.yaml'
+/** 真模型要的那把钥匙的键名（渲染 ✓/✗ 用；同样是字面量的单一事实）。 */
+export const DEEPSEEK_CREDENTIAL = 'DEEPSEEK_API_KEY'
+
+/**
+ * 解析凭据库文本里的键名（纯函数；值一律不取）。键**嵌在顶层 `refs:` 块里**。
+ * @param text - 凭据库文件内容。
+ * @returns `refs:` 块里的键名（字典序、去重）。
+ */
+export function parseCredentialKeys(text) {
+  const lines = text.split('\n')
+  const refsAt = lines.findIndex(line => /^refs:\s*$/.test(line))
+  const keys = []
+  for (let i = refsAt + 1; refsAt !== -1 && i < lines.length; i++) {
+    const line = lines[i]
+    if (line.trim() === '') continue
+    if (!/^\s/.test(line)) break   // 回到顶层缩进 = refs 块结束
+    const name = /^\s+([A-Z][A-Z0-9_]+):/.exec(line)?.[1]
+    if (name !== undefined) keys.push(name)
+  }
+  return [...new Set(keys)].sort()
+}
+
+/**
+ * 读 DSH 凭据库的**键名**（`<home>/.credentials.yaml`）。值一律不读、不外泄。
+ *
+ * 为什么要有这一行：密钥住凭据库、**不是环境变量**——`env | grep DEEPSEEK` 为空不代表没配
+ * （2026-10-18 实证：真模型探针被误判成"本机无 key"而搁置）。键名扫描不引 YAML 解析器（本模块零依赖）；
+ * ⚠ 键**嵌在顶层 `refs:` 块里**（缩进 2），照顶层键扫会得到 0 个（实测踩过）——所以按块读。
+ * @param home - 生效的 DSH home（缺失/未初始化给 present:false）。
+ * @returns 凭据库是否存在，以及 `refs:` 块里的键名（字典序）。
+ */
+export function credentialsState(home) {
+  if (home === null || home === undefined) return { present: false, keys: [] }
+  const path = join(home, CREDENTIALS_FILE)
+  if (!existsSync(path)) return { present: false, keys: [] }
+  return { present: true, keys: parseCredentialKeys(readFileSync(path, 'utf8')) }
+}
+
 export function orientState({ env = process.env, dailyHome, workspaceRoot, gitStatus = null, gitIgnored = null, sessionPresets = null, sessionLimit = 5, root } = {}) {
   const home = homeStatus(env, { dailyHome })
   const effective = home.kind === 'ok' ? home.home : null
@@ -142,6 +182,7 @@ export function orientState({ env = process.env, dailyHome, workspaceRoot, gitSt
   return {
     home,
     profiles,
+    credentials: credentialsState(effective),
     sessions: effective ? listSessions(effective, sessionLimit) : { total: 0, recent: [] },
     workspace: { root: workspaceRoot, ...workspaceOverview(workspaceRoot), gitStatus, gitIgnored },
     scan: scanDeliverables(workspaceRoot),
@@ -158,6 +199,9 @@ export function renderOrient(state) {
   lines.push('== 开发环境 ==')
   lines.push(`DSH_HOME   ${state.home.kind === 'ok' ? state.home.home : state.home.kind === 'daily' ? '（与日用 home 重叠——见上方警告）' : '（未设置）'}`)
   lines.push(`profiles   ${state.profiles.length > 0 ? state.profiles.join(', ') : '（无——home 未初始化或未生效）'}`)
+  lines.push(state.credentials.present
+    ? `凭据       ${state.credentials.keys.includes(DEEPSEEK_CREDENTIAL) ? `${DEEPSEEK_CREDENTIAL} ✓` : `${DEEPSEEK_CREDENTIAL} ✗`}（共 ${String(state.credentials.keys.length)} 个键；住 .credentials.yaml，不是环境变量）`
+    : '凭据       （无 .credentials.yaml——真模型跑不了；配法见 dev-loop §6）')
   lines.push('', '== 会话（按工作区 slug 汇总）==')
   if (state.sessions.total === 0) {
     lines.push('（无会话记录——home 未生效或尚未起过会话）')

@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { homeStatus, listProfiles, listSessions, listSlugSessions, orientState, parseSessionHead, parseSessionPreset, renderOrient, renderSessionView, runBundleView, scanDeliverables, workspaceOverview } from '../../tools/lib/orient.mjs'
+import { CREDENTIALS_FILE, DEEPSEEK_CREDENTIAL, credentialsState, homeStatus, listProfiles, listSessions, listSlugSessions, orientState, parseCredentialKeys, parseSessionHead, parseSessionPreset, renderOrient, renderSessionView, runBundleView, scanDeliverables, workspaceOverview } from '../../tools/lib/orient.mjs'
 
 // 条目 B 判据（RFC driver-surface-package）：pnpm orient 的 keyless 只读核心——
 // home 判定（requireDevHome 同款但只警告不抛）/ profiles / 会话清单 / 公司盘概览 /
@@ -110,6 +110,25 @@ describe('orientState + renderOrient', () => {
     expect(text).toContain('pnpm verify')
     expect(text).toContain('pnpm test')
     expect(text).not.toContain('source run/env.sh')
+  })
+
+  it('凭据行只说键名不说值（密钥住凭据库、不是环境变量——env 里没有不代表没配）', () => {
+    // 红证（2026-10-18 实测两道）：① 真模型探针曾因 `env | grep DEEPSEEK` 为空被判"本机无 key"而搁置；
+    // 事实 = 密钥在 <home> 的凭据库里。② 首版实现按**顶层键**扫，对着真有 key 的库报 ✗（共 0 个键）——
+    // 真实形状是键**嵌在 `refs:` 块里**（缩进 2）⇒ 下面的 fixture 照真实形状，纯函数与渲染各断言一次。
+    const secret = 'never-render-this-placeholder'
+    const text = `version: 1\nrefs:\n  ${DEEPSEEK_CREDENTIAL}: ${secret}\n  OTHER_API_KEY: x\nrecords: {}\n`
+    expect(parseCredentialKeys(text), '嵌套 refs 块里的键名要读出来').toEqual([DEEPSEEK_CREDENTIAL, 'OTHER_API_KEY'].sort())
+    writeFileSync(join(home, CREDENTIALS_FILE), text)
+    const state = orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace })
+    expect(state.credentials.keys).toContain(DEEPSEEK_CREDENTIAL)
+    const rendered = renderOrient(state)
+    expect(rendered).toContain('凭据')
+    expect(rendered).toContain(`${DEEPSEEK_CREDENTIAL} ✓`)
+    expect(rendered).toContain('不是环境变量')
+    expect(rendered, '密钥值绝不能进报告').not.toContain(secret)
+    rmSync(join(home, CREDENTIALS_FILE), { force: true })
+    expect(credentialsState(home).present).toBe(false)
   })
 
   it('unset 态渲染带警告且不误报 profiles（日用 home 的内容不算）', () => {

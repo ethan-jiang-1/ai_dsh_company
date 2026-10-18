@@ -51,11 +51,21 @@ args:   { "agentId": "<SessionId>", "callId": "<toolCallId>",
 注入体与当前 `company-workspace/AGENTS.md` **逐字节一致**（digest 取现场同值）。台账记于
 `snapshots/replay/r3-delegation/snapshot.yml`（2026-10-18 条）。
 
+## 真模型验收（2026-10-18 补跑；探针 = `probes/session-context/ask-user-timed-probe.mjs`）
+
+**ALL PASS**（ceo 会话 · 排练盘）：窗口到点 → `tool/result` 含 `pending` → `turn/end` → `userQuestions/answer` 返回 **true**
+→ 答案以新消息回会话。同轮另有两次实跑佐证：模型不传 timeout（用配置默认）→ **+120.0s** 收口；模型自取 **180** → **+180.0s** 收口。
+
+> ⚠ **key 在哪**（本 Note 的教训，已固化）：密钥住 **DSH 凭据库 `<home>/.credentials.yaml`（嵌在顶层 `refs:` 块里）**，
+> **不是环境变量**——`env | grep DEEPSEEK` 为空**不代表**没配。自检 = `pnpm orient` 的「凭据」行（2026-10-18 新增）；
+> 事实唯一家 = 根 [AGENTS.md §密钥](../../AGENTS.md) + [dev-loop §6](../../docs/guides/dev-loop.md)。
+
 ## 未验残留（显式）
 
-- **真模型行为未跑**（本机无 `DEEPSEEK_API_KEY`）：判据 = 一条会触发问询的动议 ⇒ 窗口过后 `session/list` 不永久
-  `running`、日志出现 `turn/end`；再用上面的配方作答 ⇒ 答案以新 turn 进入会话。复现步骤 = BUG-021 卡「复现」节 +
-  本 Note 配方；跑之前先 `source run/env.sh`。
+- **模型可单次把窗口要回无界**（顶层 `timeout: -1`，vendor schema 允许：*"Use -1 only when an answer is required
+  before proceeding"*）——真跑实测：该路径下无 `pending`、无 `turn/end`、`userQuestions/answer` 返回 false
+  ⇒ 无人值守驱动仍会静默停住。**残留另立 [BUG-022](../../_backlog/bugs/BUG-022-ask-user-unbounded-timeout-override.md)**
+  （已修卡不重开，新卡引用旧卡；候选修法 A 驱动侧"看到 open 就停并报"最省）。
 - 窗口秒数（120）未按体验实测调过：`timeout` 是可调项（行 config 一处或单次调用参数），本期取 vendor 默认并显式钉住。
 
 ## 指针
