@@ -6,7 +6,6 @@
 
 | 问题 | 当前情况与下一步 |
 |---|---|
-| [2026-10-17-cultivation-gui-actions.md](2026-10-17-cultivation-gui-actions.md) | 培养面板 GUI 行动面（采纳/拒绝/验证/撤回）。两问已查实：①「没挂上」= 那个实例是日用 home、没装 pack；②面板命令是纯文本、板无动作面。原否决前提（钉版无 UI→host 通道）经读码证伪。方案/推敲/验收齐备，等用户裁定四个待裁点（动作集/通道/形态/撤回确认）。 |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 

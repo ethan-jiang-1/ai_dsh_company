@@ -14,6 +14,8 @@
   会让 client 叶报 TS2591（2026-10-13 现场）——host-only 的东西住 `host/`。
 - `lib/` —— **host/client 共享读模型与纯逻辑**，keyless 单测（`tests/company/`）的直接对象：
   `attention / board / budget / cultivation / dag / doors / ledger / presence / presence-status / signoff / tool-card` 十一模块
+  （client 面另有 `cultivation-actions`＝人侧动作面纯模块：命令线构造 + host 结果折算 + 文案表；
+  `CultivationCompose.tsx`＝创作面表单——2026-10-17 培养 GUI 卡）
   （`doors` = 多人门控归属判据，2026-10-06 加入；`presence-status` = 在场状态与显示名词汇，2026-10-16 自 `presence` 拆出，
   `presence` 保留折算并再导出它 = facade）。内部依赖链：`dag → board → presence`（2026-10-05 盘点）
   ＋ `presence → presence-status`（2026-10-16；后者零 import，是叶子）。

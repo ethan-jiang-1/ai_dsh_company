@@ -34,6 +34,8 @@ UI 半边，不是独立过渡）；③ CEO 跨角色 = **仅建议权，目标�
 - **UI 按钮采纳**（浏览器→host 业务 Remote）：弃——钉版 DSH 无 pack 自有 UI→host 动作通道
   （remotes 选择面由 vendor 组装、dynamic cordis = session-scoped 且 trust 等同 bash）⇒ v1 用
   命令族 = 平台原生「人侧直控面」；按钮留待上游开放通道后另立卡引用本 Note。
+  **2026-10-17 后续**：该前提经读码证伪——平台有通用人侧命令执行面（`remote.commands.execute`，vendor 的 `/permission` 即此路，
+  host 一律记 `source: user`）⇒ 按钮/创作表单已落地 = [培养 GUI 行动面](./2026-10-17-cultivation-gui-actions.md)。
 - **workspace 作方法层根**：弃——workspace 是分身可写区，违反 D25「可写共享根不进任何角色技能面」
   不变量；profile 根在会话 workspace 之外。
 

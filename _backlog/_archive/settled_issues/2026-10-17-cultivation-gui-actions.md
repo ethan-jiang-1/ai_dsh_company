@@ -1,11 +1,15 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-10-17
 ---
 
 # 推敲：培养面板的 GUI 行动面（采纳 / 拒绝 / 验证 / 撤回）
 
-> 立卡：2026-10-17 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 毕业：做（2026-10-17 用户令：按推荐开工、推进到完全结束）｜ 可关闭：否
+> 立卡：2026-10-17 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
+>
+> **结论（2026-10-17 当日结）**：六条待裁点由用户令采推荐项，S1–S6 全部实施并验收（真浏览器点按 → 真落盘 + 真日志）。
+> 去向 = 毕业 Note [2026-10-17-cultivation-gui-actions](../../../notes/implemented/2026-10-17-cultivation-gui-actions.md)（决定/证据/未验残留）；
+> 本卡保留 UX 推敲与体验协议原文（下一轮迭代的输入）。
 
 **问题与期望结果：** 用户 2026-10-17 读「怎么养」后提两问——①「命令行没挂上」②「可以支持 GUI 培养体验吗」；
 随后补充三轮口径：**先计划、推敲，不用落地**；**换位思考做 UX——难度在于做对，接受长期迭代，写好后会找人体验、按反馈继续调整，
@@ -31,7 +35,7 @@ UX 视角、人的输入清单（把手审计）、迭代框架与落地切片 S
 | 5 | 验证时机 | v1 只做实「未验证」+ 一键回填（推荐项） |
 | 6 | S3 无困惑重排 | 进 v1（推荐项） |
 
-实施契约 = [RFC：培养面板 GUI 行动面 v1](../../notes/proposed/2026-10-17-cultivation-gui-actions.md)（六片 S1–S6 + 验收）；
+实施契约 = [毕业 Note：培养面板 GUI 行动面 v1](../../../notes/implemented/2026-10-17-cultivation-gui-actions.md)（六片 S1–S6 + 验收 + 实跑证据）；
 本卡在实施完成后按章程归档（去向写进毕业 Note）。
 
 ## 现场事实（两问的答案）
@@ -44,16 +48,16 @@ UX 视角、人的输入清单（把手审计）、迭代框架与落地切片 S
 `lsof` 实测全机两个 HTTP 实例 = 3080（日用）与 3083（`/Users/bowhead/ai_dsh_deep_research` 的 research profile，cwd 实证），
 **本仓没有 dev web 在跑**。⇒ 在那儿敲 `/cultivation …` 只是一行普通文本，不解析；不是命令面坏了。
 
-这条事实的既有唯一家 = [demo.md §前置 1](../../docs/demo.md)（原话：日用 `~/.dsh` 里也有个同名 `web` profile，
+这条事实的既有唯一家 = [demo.md §前置 1](../../../docs/demo.md)（原话：日用 `~/.dsh` 里也有个同名 `web` profile，
 装的是日用插件集、没有公司五角色）；自检一行 = `source run/env.sh && pnpm dsh --profile web --dump-config | grep -c company-pack` ≥ 1。
 
 dev 组合里命令面确实是挂着的：培养机制探针判据④（`commands/list` 含 `cultivation`，且 `correct` 真落记录到公司盘）
-在 2026-10-13/15 实跑 ALL PASS——收据 = [agent-cultivation-loop](../../notes/implemented/2026-10-13-agent-cultivation-loop.md) ⑤，
-探针 = [cultivation-method-layer-probe.mjs](../../probes/session-context/cultivation-method-layer-probe.mjs)。
+在 2026-10-13/15 实跑 ALL PASS——收据 = [agent-cultivation-loop](../../../notes/implemented/2026-10-13-agent-cultivation-loop.md) ⑤，
+探针 = [cultivation-method-layer-probe.mjs](../../../probes/session-context/cultivation-method-layer-probe.mjs)。
 
 ### ② 面板里的命令是**纯文本**，板没有动作面
 
-三壳（公司页第四子页 / 侧栏页签 / 浮窗）共用 [CultivationBoard.tsx](../../packages/company-pack/src/client/CultivationBoard.tsx)，
+三壳（公司页第四子页 / 侧栏页签 / 浮窗）共用 [CultivationBoard.tsx](../../../packages/company-pack/src/client/CultivationBoard.tsx)，
 其头注自称「纯展示」板；待处理行只渲染 `采纳：/cultivation adopt <id>　拒绝：/cultivation reject <id> :: 理由` 这类文案
 （:83），既无按钮也无回调面。所以「点不动」是当前事实、不是缺陷。
 
@@ -140,7 +144,7 @@ UI→host 动作通道（remotes 选择面由 vendor 组装、dynamic cordis = s
 - **G1 创作没有入口**（判据 ①）：纠正/建议只能敲命令。**我上一轮建议"v1 不做创作面"是错的判断**——它把
   「人给分身输入」的一半留在命令里，正是判据 ① 要消掉的东西。⇒ 创作面进 v1。
 - **G2 判断没有材料**（判据 ②③）：正文（提案全文）**被读模型刻意挡在客户端之外**——
-  [cultivation.ts](../../packages/company-pack/src/lib/cultivation.ts) 的 `recordBody` 注记写着
+  [cultivation.ts](../../../packages/company-pack/src/lib/cultivation.ts) 的 `recordBody` 注记写着
   「Return the persisted proposal body without exposing it in the Client record view」，所以面板只能显示正文首句
   （`title`）。人只能盲判。⇒ v1 要把正文带进读模型 + 就地展开；这条要**修订那条设计注记**，理由写进 Note。
 - **G3 不需要你动的条目没有标注**（判据 ②）：journal 素材块和「我提交的 · 待对方处理」行看起来都像待办，
@@ -247,7 +251,7 @@ method-r-2026… ［未验证］
    按在错会话上会被 host 角色闸拒（安全），但用户看不到原因 ⇒ 回到第 2 条。
 4. **并发/重复点击**：host 侧 `installMethod` 独占建文件（返回 false 即不覆盖）+ 记录 `open` 态守卫 ⇒ 第二击不会损坏数据；
    客户端仍要飞行中禁用 + 完成后重读。
-5. **误触面变大**：多人合同早写了「同一台机器上谁都能按那个按钮」（[multi-human.md](../../docs/multi-human.md)「多人合同」节）；
+5. **误触面变大**：多人合同早写了「同一台机器上谁都能按那个按钮」（[multi-human.md](../../../docs/multi-human.md)「多人合同」节）；
    按钮把「一键采纳」摆进待办列表。UX 缓解 = 待办行只放两个主动作、撤回进次要位置且说明后果、按钮带对象（`采纳`后面跟着期望行为）。
 6. **两个互动面**：面板按钮与裸 `/cultivation` 弹窗（`commandUi.decorate`，vendor 有 `/permission` 的 `popupSelect` 先例）
    服务不同时刻；v1 只做面板，弹窗列为第 2 轮候选（预案 4），避免一份行为两套交互同时返工。
@@ -274,7 +278,7 @@ method-r-2026… ［未验证］
   要能填出处就得改命令语法）；拒绝理由可空（host 现要求非空）；「记下来并采纳」（要 host 回结构化 id）；
   「撤回我提的建议」（状态机没有撤回态）；批量采纳；跨角色代判；自动采纳阈值。
 - **不做**：盲弹窗装饰（第 2 轮候选）；多人身份/认证隔离；把 pack 装进日用 `~/.dsh`
-  （release 安装路径另议，见 [安装手册](../../_dist/安装手册.md)）。
+  （release 安装路径另议，见 [安装手册](../../../_dist/安装手册.md)）。
 
 ## 落地切片（S1–S6；每片一个红绿环、一片一 commit）
 
@@ -303,7 +307,7 @@ S4 必须早于"逼人下判"的完整体验（没有材料就是逼人盲判）
 
 ## 验收标准
 
-> 判据分层唯一家 = [testing.md](../../docs/testing.md)；实施按 [proposed 合同](../../notes/proposed/README.md) 的红绿环走：
+> 判据分层唯一家 = [testing.md](../../../docs/testing.md)；实施按 [proposed 合同](../../../notes/proposed/README.md) 的红绿环走：
 > **先红后绿、判据先行**。外观与体验交给真浏览器档，keyless 只钉行为。
 
 1. **机制/keyless（先红）**：`pnpm test tests/client`
@@ -342,7 +346,7 @@ S4 必须早于"逼人下判"的完整体验（没有材料就是逼人盲判）
 
 ## 关闭条件
 
-- 用户裁定待裁点并批准 ⇒ `毕业：做`，按合同进 RFC / 实施；实施完成后按 [_backlog 章程](../README.md) 归档，
+- 用户裁定待裁点并批准 ⇒ `毕业：做`，按合同进 RFC / 实施；实施完成后按 [_backlog 章程](../../README.md) 归档，
   去向写进毕业 Note。
 - 用户判定不做 ⇒ `毕业：不做`，同次归档并写明理由。
 - 被别的卡或合同吸收 ⇒ `毕业：消化`，注明承接方。

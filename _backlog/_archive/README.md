@@ -90,6 +90,7 @@
 | [2026-10-13-cultivation-design.md](research/agent-cultivation/2026-10-13-cultivation-design.md) | 培养卡的产品研究：对象、关系、用户路径和 A/B/C/D 候选取舍 | 2026-10-13 |
 | [2026-10-13-dsh-capabilities.md](research/agent-cultivation/2026-10-13-dsh-capabilities.md) | 培养卡的钉版 DSH 能力边界与待探针事项 | 2026-10-13 |
 | [2026-10-13-external-patterns.md](research/agent-cultivation/2026-10-13-external-patterns.md) | 培养卡的外部一手实践（记忆/教学/评估与反证） | 2026-10-13 |
+| [2026-10-17-cultivation-gui-actions.md](settled_issues/2026-10-17-cultivation-gui-actions.md) | 培养 GUI 行动面的 UX 推敲（时刻地图/输入清单把手审计/迭代框架/体验协议）——已实施，去向 = 同名毕业 Note | 2026-10-17 |
 
 ## 暂停卡
 
