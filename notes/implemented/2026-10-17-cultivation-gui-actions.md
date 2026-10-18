@@ -68,6 +68,8 @@
   T5 2 步（`verification: pass` 落记录）、T6 4 步（先见后果说明再确认 → 方法目录被删 + `revokedAt` 落记录）。
   **它证明的是机制与文案可执行，证明不了"新人会不会困惑"**——那一格要真人：`node … --protocol` 打印并落
   `runtime/human-exits-evidence/cultivation-ux-protocol.md`（任务表 + 三个必答问题 + 回执口径），直接交给人跑。
+  **2026-10-18 补：第一人称模拟走查已做**（真浏览器 + 逐张读图 + 七条判据自评 + 抓到四处真缺陷并修），
+  记录 = [firsttimer-audit](./2026-10-18-cultivation-firsttimer-audit.md)；它仍是模拟，真人档继续留。
   **走查当场抓到并修掉两处真 UX 缺陷**（2026-10-18，都在同一 diff 内钉了防回归）：
   ① **新鲜度文案骗人**——培养页签沿用通用壳文案「每 5 秒自动刷新」，而培养数据是 30s 轮询；现改为从
   `CULTIVATION_REFRESH_MS` 派生（页签头与公司视图子页各按真实间隔说），走查加 T3b 断言"必须写 30 秒"。

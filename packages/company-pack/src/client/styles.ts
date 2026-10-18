@@ -347,7 +347,10 @@ const CSS = `
 .wk-cultivation-reject { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .wk-cultivation-outcome { color: var(--dsw-alias-state-success-primary); }
 .wk-cultivation-problem { color: var(--dsw-alias-state-warn-primary); }
-.wk-cultivation-consequence { flex: 1 1 16rem; }
+.wk-cultivation-confirm { display: grid; gap: 6px; width: 100%; }
+.wk-cultivation-consequence { display: block; width: 100%; }
+.wk-cultivation-field { display: grid; gap: 2px; }
+.wk-cultivation-hint { margin: 0; }
 .wk-cultivation-commands { margin-top: 6px; }
 .wk-cultivation-commands > summary { cursor: pointer; color: var(--dsw-alias-label-tertiary); font-size: 12px; }
 .wk-row-head { color: var(--dsw-alias-label-tertiary); font-size: 12px; border-bottom: 0; }

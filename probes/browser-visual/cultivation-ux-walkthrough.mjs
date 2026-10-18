@@ -6,7 +6,8 @@
 // 何时跑：改培养面板的交互/文案（CultivationBoard / CultivationCompose / cultivation-actions）之后；
 //   或要复核「判据 ①②③」（输入进得去 / 没有看不懂的条目 / 不熟悉的人能上手）时。
 // 成本：keyless（boot ~20–60s + chromium，零模型调用）。前置：source run/env.sh + pack 与前端已构建。
-// 用法：source run/env.sh && node probes/browser-visual/cultivation-ux-walkthrough.mjs [--protocol]
+// 用法：source run/env.sh && node probes/browser-visual/cultivation-ux-walkthrough.mjs [--protocol] [--shots]
+//   --shots 每步截图到 runtime/human-exits-evidence/ux-shots/（我逐张读图做"第一次用"的观察；也给真人档留现场）
 //
 // ⚠ 边界（诚实口径）：本档证明的是**机制与文案可执行**——按钮在哪、点了发什么、关键说明在不在场、几步能完成。
 //   **证明不了"新人会不会困惑"**：那要真人（协议卡 `--protocol` 就是给这一步用的）。别拿本档冒充体验结论。
@@ -29,11 +30,14 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 
 const PROTOCOL = process.argv.includes('--protocol')
+/** 每步截图（我逐张读图做"第一次用"的观察；也给真人档留现场）。 */
+const SHOTS = process.argv.includes('--shots')
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 const STAMP = new Date().toISOString().slice(0, 10).replaceAll('-', '')
 const WORKSPACE = join(ROOT, 'company-workspace')
 const RECORDS = join(WORKSPACE, 'cultivation', 'records')
 const OUT_DIR = join(ROOT, 'runtime', 'human-exits-evidence')
+const SHOT_DIR = join(OUT_DIR, 'ux-shots')
 const IDS = { reject: `uxwalk-${STAMP}-reject`, adopt: `uxwalk-${STAMP}-adopt`, verify: `uxwalk-${STAMP}-verify`, revoke: `uxwalk-${STAMP}-revoke` }
 const SLUG = { verify: `uxwalk-${STAMP}-mv`, revoke: `uxwalk-${STAMP}-mr` }
 const COPY = { adopt: '采纳', reject: '拒绝', rejectConfirm: '确认拒绝', verifyPass: '这条有用', revoke: '撤回…', revokeConfirm: '确认撤回', compose: '给你的角色留一条方法' }
@@ -81,6 +85,15 @@ if (PROTOCOL) {
 }
 
 const results = []
+/** 截一张（`--shots` 才动）：面板局部优先（小、聚焦），必要时全页。 */
+async function shot(page, name, { full = false } = {}) {
+  if (!SHOTS) return
+  mkdirSync(SHOT_DIR, { recursive: true })
+  const target = full ? page : (page.locator('.wk-pane').first())
+  try {
+    await target.screenshot({ path: join(SHOT_DIR, `${name}.png`), fullPage: false, timeout: 10_000 })
+  } catch { /* 面板不在场（如空态前期）就跳过，不因截图失败判红 */ }
+}
 const failures = []
 /** 记录一个任务的观察（步数/耗时/关键文案/结论）。 */
 async function task(id, what, fn) {
@@ -134,6 +147,7 @@ try {
   await page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first().click()
   await sleep(2500)
 
+  await shot(page, '00-first-view', { full: true })
   const short = /我的分身：([^\n|]+)/.exec(await page.locator('body').innerText())?.[1]?.trim() ?? null
   role = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo' }[short] ?? null
   if (role === null) throw new Error(`面板没报出会话角色（我的分身 = ${String(short)}）`)
@@ -149,6 +163,7 @@ try {
     writeFileSync(join(dir, 'SKILL.md'), `---\nname: ${slug}\ndescription: UX 走查占位方法\n---\n\n占位。\n`)
   }
 
+  await shot(page, '01-empty-and-compose')   // 还没种数据：空态 + 创作入口长什么样
   const rowOf = (id) => page.getByRole('listitem', { name: `待处理 ${id}` })
   const button = (scope, label) => scope.getByRole('button', { name: label, exact: true })
 
@@ -163,6 +178,7 @@ try {
     if (!text.includes('收口前逐项列出未决项')) throw new Error('待办行没显示期望行为（一句话）')
     if (await row.locator('.wk-cultivation-body').count() !== 1) throw new Error('待办行没有就地显示正文（判断无材料）')
     step()
+    await shot(page, '02-t1-todo')
   })
 
   await task('T2', '采纳一条（点一下 → 记录翻 adopted + 行移到已采纳）', async (step) => {
@@ -174,6 +190,7 @@ try {
     if (!recordTextOf(IDS.adopt).includes('status: adopted')) throw new Error('记录未翻 adopted')
     await page.getByRole('listitem', { name: `方法 method-${IDS.adopt}` }).waitFor({ timeout: 15_000 })
     step()
+    await shot(page, '03-t2-adopted')
   })
 
   await task('T3', '能说出"什么时候生效"（边界文案在场，不用翻文档）', async (step) => {
@@ -194,6 +211,7 @@ try {
     const row = rowOf(IDS.reject)
     await button(row, COPY.reject).click()
     step()
+    await shot(page, '04-t4-reject-form')
     await row.locator('input').fill('UX走查：口径不符')
     step()
     await button(row, COPY.rejectConfirm).click()
@@ -223,6 +241,7 @@ try {
     const panel = await page.locator('body').innerText()
     if (!panel.includes('不能再被采纳')) throw new Error('撤回前没讲后果（"不能再被采纳"缺席）')
     step()
+    await shot(page, '05-t6-revoke-consequence')
     await button(row, COPY.revokeConfirm).click()
     step()
     const methodDir = join(home, 'profiles', 'web', 'company-cultivation', role, SLUG.revoke)
@@ -232,6 +251,12 @@ try {
     if (!recordTextOf(IDS.revoke).includes('revokedAt')) throw new Error('记录没标 revokedAt')
     step()
   })
+
+  // 创作面（判据 ① 的另一半）：点开看一眼表单长什么样（不提交，只看可发现性）
+  await page.getByRole('button', { name: COPY.compose, exact: true }).click()
+  await sleep(600)
+  await shot(page, '06-compose-form')
+  await page.keyboard.press('Escape')
 
   if (loaderErrors.length > 0) throw new Error(`loader 错误：${loaderErrors.slice(0, 2).join(' | ')}`)
   mkdirSync(OUT_DIR, { recursive: true })

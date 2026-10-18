@@ -235,6 +235,38 @@ describe('创作面：不看说明也能提交一条（S5，判据 ①/G1）', (
   })
 })
 
+describe('走查抓到的四处 UX 缺陷（2026-10-18，图为证）', () => {
+  it('正文在下面就地展开时，不再重复首句（同一句话出现两次 = 噪音）', () => {
+    const { container } = mount({ records: [record({ body: '做法：先列未决清单，按 owner 分行。' } as Partial<CultivationRecord>)] })
+    const text = container.textContent ?? ''
+    expect(text.split('做法：先列未决清单，按 owner 分行。').length - 1, '首句只应出现一次').toBe(1)
+  })
+
+  it('撤回：后果说明独占一行且在「确认撤回」**之前**（先读后点）', async () => {
+    const { actions } = stubActions()
+    const { container } = mount({ records: [record({ id: 'r-9', status: 'adopted', methodSlug: 'method-r-9' })], actions })
+    await click(button(container, CULTIVATION_COPY.revoke)!)
+    const warning = container.querySelector('.wk-cultivation-consequence')
+    const confirm = button(container, CULTIVATION_COPY.revokeConfirm)
+    expect(warning, '后果说明要在场').not.toBeNull()
+    expect(confirm).not.toBeNull()
+    // DOM 顺序：警告在前（compareDocumentPosition 的 FOLLOWING 位）
+    expect(warning!.compareDocumentPosition(confirm!) & Node.DOCUMENT_POSITION_FOLLOWING, '确认按钮必须在警告之后').toBeTruthy()
+    expect(warning!.textContent).toContain('不能再被采纳')
+  })
+
+  it('创作面：标签常驻（不是只在 placeholder 里），正文栏带做法提示', async () => {
+    const { actions } = stubActions()
+    const { container } = mount({ actions })
+    await click(button(container, CULTIVATION_COPY.composeCorrect)!)
+    await type(container.querySelector('input') as HTMLInputElement, '写了字标签也在')
+    const text = container.textContent ?? ''
+    expect(text, '期望行为标签常驻').toContain(CULTIVATION_COPY.expectationLabel)
+    expect(text, '正文标签常驻').toContain(CULTIVATION_COPY.bodyLabel)
+    expect(text, '正文栏带做法/出处提示').toContain(CULTIVATION_COPY.bodyHint)
+  })
+})
+
 describe('无困惑重排与判断材料（S3/S4）', () => {
   it('journal 块明确写着不用我操作（素材 ≠ 待办）', () => {
     const { container } = mount({ journalRows: [] })

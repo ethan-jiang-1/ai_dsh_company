@@ -112,20 +112,25 @@ export function CultivationCompose(props: CultivationComposeProps) {
                 ))}
               </div>
             )}
-            <Input
-              value={expectation}
-              placeholder={CULTIVATION_COPY.expectationLabel}
-              aria-label={CULTIVATION_COPY.expectationLabel}
-              onChange={event => { setExpectation(event.target.value) }}
-            />
-            <textarea
-              className="wk-cultivation-body-input"
-              value={body}
-              placeholder={CULTIVATION_COPY.bodyLabel}
-              aria-label={CULTIVATION_COPY.bodyLabel}
-              rows={4}
-              onChange={event => { setBody(event.target.value) }}
-            />
+            {/* 标签常驻（placeholder 一打字就消失，走查里"打完就不记得这栏是什么"）。 */}
+            <label className="wk-cultivation-field">
+              <span className="wk-meta">{CULTIVATION_COPY.expectationLabel}</span>
+              <Input
+                value={expectation}
+                placeholder={CULTIVATION_COPY.expectationPlaceholder}
+                onChange={event => { setExpectation(event.target.value) }}
+              />
+            </label>
+            <label className="wk-cultivation-field">
+              <span className="wk-meta">{CULTIVATION_COPY.bodyLabel}</span>
+              <textarea
+                className="wk-cultivation-body-input"
+                value={body}
+                rows={4}
+                onChange={event => { setBody(event.target.value) }}
+              />
+              <span className="wk-meta wk-cultivation-hint">{CULTIVATION_COPY.bodyHint}</span>
+            </label>
             <div className="wk-cultivation-actions">
               <Button variant="primary" disabled={pending} onClick={() => { void submit() }}>
                 {pending ? CULTIVATION_COPY.running : CULTIVATION_COPY.submit}

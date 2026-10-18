@@ -450,7 +450,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
 
       expect(result).toEqual({
         kind: 'success',
-        text: '已采纳 r1：方法 review-numbers 部署到 CFO 方法层。新开的 CFO 会话会加载它；运行中的会话不受影响。验证后用 verify 回填结果；不灵了用 revoke review-numbers 撤回。',
+        text: '已采纳 r1：方法 review-numbers 部署到 CFO 方法层。新开的 CFO 会话会加载它；运行中的会话不受影响。见效后在培养面板点「这条有用」回填，不灵了点「撤回…」（命令行：/cultivation verify r1 pass|fail、/cultivation revoke review-numbers）。',
       })
       expect(readFileSync(join(methods, 'cfo', 'review-numbers', 'SKILL.md'), 'utf8')).toBe(
         '---\nname: review-numbers\ndescription: 复核数字口径\n---\n\n# review-numbers\n\n先对照底稿，再给出数字结论。\n',

@@ -152,9 +152,9 @@ export function CultivationBoard(props: CultivationBoardProps) {
                         <Tag tone="info">{record.expectation}</Tag>
                         {highlightId === record.id && <Tag tone="success">{CULTIVATION_COPY.justSaved}</Tag>}
                       </span>
-                      <span className="wk-row-task">
-                        {record.title}{record.source !== '（会话内提交）' ? `（出处：${record.source}）` : ''}
-                      </span>
+                      {/* 首句只在正文**没显示**时当摘要用；正文在下面就地展开时不再重复（走查抓到的重复行）。 */}
+                      {record.body === '' && <span className="wk-row-task">{record.title}</span>}
+                      {record.source !== '（会话内提交）' && <span className="wk-meta">出处：{record.source}</span>}
                       {/* 判断要有材料（S4）：正文就地可见，不藏按钮。 */}
                       {record.body !== '' && <div className="wk-cultivation-body">{record.body}</div>}
                       {actions === undefined
@@ -280,16 +280,19 @@ export function CultivationBoard(props: CultivationBoardProps) {
                         </Button>
                         {revokingSlug === slug
                           ? (
-                            <>
-                              <span className="wk-meta wk-cultivation-consequence">{CULTIVATION_COPY.revokeConsequence}</span>
-                              <Button
-                                disabled={pendingId === record.id}
-                                onClick={() => { void run(record.id, revokeLine(slug), () => { setRevokingSlug(null) }) }}
-                              >
-                                {CULTIVATION_COPY.revokeConfirm}
-                              </Button>
-                              <Button onClick={() => { setRevokingSlug(null) }}>{CULTIVATION_COPY.cancel}</Button>
-                            </>
+                            <div className="wk-cultivation-confirm">
+                              {/* 先读后点：后果独占一行、在确认按钮之前（走查抓到的"警告夹在按钮中间"）。 */}
+                              <div className="wk-meta wk-cultivation-consequence">{CULTIVATION_COPY.revokeConsequence}</div>
+                              <div className="wk-cultivation-actions">
+                                <Button
+                                  disabled={pendingId === record.id}
+                                  onClick={() => { void run(record.id, revokeLine(slug), () => { setRevokingSlug(null) }) }}
+                                >
+                                  {CULTIVATION_COPY.revokeConfirm}
+                                </Button>
+                                <Button onClick={() => { setRevokingSlug(null) }}>{CULTIVATION_COPY.cancel}</Button>
+                              </div>
+                            </div>
                           )
                           : <Button onClick={() => { setRevokingSlug(slug) }}>{CULTIVATION_COPY.revoke}</Button>}
                       </div>

@@ -157,7 +157,7 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       }
       return {
         kind: 'success' as const,
-        text: `已采纳 ${id}：方法 ${slug} 部署到 ${roleLabel(record.targetRole)} 方法层。新开的 ${roleLabel(record.targetRole)} 会话会加载它；运行中的会话不受影响。验证后用 verify 回填结果；不灵了用 revoke ${slug} 撤回。`,
+        text: `已采纳 ${id}：方法 ${slug} 部署到 ${roleLabel(record.targetRole)} 方法层。新开的 ${roleLabel(record.targetRole)} 会话会加载它；运行中的会话不受影响。见效后在培养面板点「这条有用」回填，不灵了点「撤回…」（命令行：/cultivation verify ${id} pass|fail、/cultivation revoke ${slug}）。`,
       }
     }
 

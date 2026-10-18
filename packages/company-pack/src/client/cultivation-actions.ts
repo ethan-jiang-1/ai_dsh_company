@@ -44,7 +44,9 @@ export const CULTIVATION_COPY = {
   composeSuggest: '给别的角色提建议',
   submit: '记下来',
   expectationLabel: '期望它怎么做（一句话）',
+  expectationPlaceholder: '例如：收口前逐项列出未决项',
   bodyLabel: '做法与证据',
+  bodyHint: '写清做法；有出处就带上文件路径或会话坐标——采纳后它会成为这个角色以后的做法。',
   targetRoleLabel: '给哪个角色',
   // ── 校验提示 ─────────────────────────────────────────────────────────────
   problemExpectationEmpty: '先写一句「期望它怎么做」。',
