@@ -374,6 +374,22 @@ describe('时间感（场景轮 S9：此前行内没有任何时间信息）', (
   })
 })
 
+describe('重复提交（探索方向③：连点两次不许双发）', () => {
+  it('同一行连点两次「采纳」⇒ 只发一条命令（pending 期间第二次要被挡住）', async () => {
+    let calls = 0
+    const actions: CultivationActions = {
+      run: async () => { calls++; await new Promise(resolve => setTimeout(resolve, 50)); return { ok: true, text: '已采纳 r-1' } },
+    }
+    const { container } = mount({ records: [record()], actions })
+    const btn = button(container, CULTIVATION_COPY.adopt)!
+    // 同一个 tick 里点两次（模拟手快 / 双击）：React 状态还没重渲染，靠 disabled 挡不住
+    btn.click()
+    btn.click()
+    await new Promise(resolve => setTimeout(resolve, 200))
+    expect(calls, '连点两次必须只发一条命令').toBe(1)
+  })
+})
+
 describe('长正文折叠（2026-10-18 场景轮：60 行正文撑满面板）', () => {
   const longBody = Array.from({ length: 60 }, (_, i) => `第 ${String(i + 1)} 行`).join('\n')
 

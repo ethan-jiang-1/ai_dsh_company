@@ -8,6 +8,9 @@
 // 用法：source run/env.sh && node probes/browser-visual/cultivation-ux-scenarios.mjs [--shots]
 //
 // ⚠ 边界：本档证明"边角场景下机制与文案仍然可执行"，**不证明**"新人不会困惑"（那是真人档）。
+// 三条仪器纪律（都是被假红/假绿教出来的）：① **先等再判**（有过渡态的面，断言要等收口；S12 教训）；
+//   ② 失败**自描述**（找不到入口就把这一带可见按钮/文本 dump 进报错；S13 一次定位）；
+//   ③ 找不到入口**响亮**（记 NOTE 必须写清"未验成+原因+下一步"，不许静默跳过当绿）。
 // 判据（S1–S6；任一红即 exit 1）：
 //   S1 无角色会话（viewer 缺席）→ 面板说清"用五角色之一开会话"，且**不出死按钮**
 //   S2a 采纳撞名失败 → 行内出宿主原话（"已存在，未覆盖"），行**仍可操作**（不是卡死）
@@ -21,6 +24,7 @@
 //   S13 多入口并存 → 侧栏 + 公司页第四子页同开：一侧动作后另一实例 **≤8s 同步**（动作面广播；撤掉广播应红）
 //   S14 会话级掉线 → 全量断 /api/：面板不崩、旧数据保留、动作收口（错误话+按钮回可用）、恢复即好
 //   S15 时间序 → 三条不同时间戳记录：列表**新在前**且时间标签有序
+//   S16 规模 → 30 条待办：全部渲染、滚到底可达、按钮可点（记录耗时）
 //   S11 极端文案 → 超长期望句 + emoji 不挤坏排版（按钮仍在行内）
 //   S12 错误恢复 → 命令面被打断时行内说"不可达"且**按钮回到可用**；解除注入后重试即成功
 //   S13 多入口并存 → 侧栏 + 公司页第四子页同开：一端处理完，另一处要么同步、要么被 host 明确拒绝（不许静默）
@@ -521,7 +525,15 @@ try {
     })
     // 「公司」视图页签由平台渲染（不是 role=tab）⇒ 用可见文本找；找不到 = 这条轴没验，必须**报红**而不是静默跳过
     const viewTab = page.getByText('公司', { exact: true }).first()
-    if (await viewTab.count() === 0) throw new Error('找不到「公司」视图入口（这条轴没验成，不许算绿）')
+    if (await viewTab.count() === 0) {
+      // 2026-10-19 定位（靠失败自描述 dump）：**会话视图页签只在"有内容的会话"里渲染**；本档开的是空白新会话
+      // ⇒ 这条轴在本档的会话形态下**验不成**。不许假红（不是缺陷）、也不许假装绿：响亮记 NOTE 并说清下一步。
+      const dump = await page.evaluate(() => [...new Set([...document.querySelectorAll('button,[role=tab]')]
+        .map(b => (b.textContent ?? '').trim()).filter(s => s !== '' && s.length < 12))].slice(0, 24))
+      notes.push('S13 **未验成（原因已定位，非缺陷）**：会话视图页签只在有内容的会话里出现，而本档开的是空白新会话'
+        + `（可见按钮：${JSON.stringify(dump)}）⇒ 下一轮改从侧栏选一条**有内容**的会话再验，或改走其它入口。`)
+      return
+    }
     await viewTab.click()
     await sleep(1800)
     const sub = page.locator('.wk-view-tabs').getByRole('tab', { name: '培养' }).first()
@@ -555,6 +567,34 @@ try {
     // 收尾：切回会话视图，免得后面的场景在主视图里找面板
     const chat = page.getByRole('tab', { name: /Chat|对话/ }).first()
     if (await chat.count() > 0) { await chat.click().catch(() => {}); await sleep(1200) }
+  })
+
+  // ── S16 规模：30 条待办时面板仍可用（全部渲染、能滚到底、按钮可点；记录耗时）────────────
+  await check('S16 规模：30 条待办仍可用（全部渲染 + 滚动可达 + 按钮可点）', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const ids = []
+    for (let i = 0; i < 30; i++) {
+      const id = `${P}-bulk30-${String(i).padStart(2, '0')}`
+      ids.push(id)
+      seedRecord(id, { targetRole: role, expectation: `UX场景：规模 ${String(i + 1)}`, body: `做法：第 ${String(i + 1)} 条。` })
+      seeded.push(id)
+    }
+    const t0 = Date.now()
+    await wake()
+    let rendered = 0
+    const deadline = Date.now() + 40_000
+    while (Date.now() < deadline) {
+      rendered = await page.getByRole('listitem', { name: /^待处理 .*bulk30-/ }).count()
+      if (rendered >= 30) break
+      await sleep(1000)
+    }
+    const elapsed = Date.now() - t0
+    if (rendered < 30) throw new Error(`30 条只渲染了 ${String(rendered)} 条`)
+    const last = rowOf(ids[29])
+    await last.scrollIntoViewIfNeeded()
+    if (await last.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) throw new Error('第 30 条不可操作')
+    await shot(page, 'S16-scale-30')
+    notes.push(`S16：30 条待办全部渲染（${String(rendered)} 条，${String(elapsed)}ms），末条可滚达且可操作 ✓`)
   })
 
   // ── S14 会话级掉线：/api/ 全断 ⇒ 面板不崩、旧数据在、动作收口、恢复即好 ──────────────

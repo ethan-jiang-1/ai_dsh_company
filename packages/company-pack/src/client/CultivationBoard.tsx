@@ -17,7 +17,7 @@
  * 与 `tests/client/cultivation-board-actions.spec.ts`（交互：点了发什么线、失败怎么显示）。
  */
 import { Tag, Button } from '@deepseek-ai/dsh-client-ui-primitives'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   CULTIVATION_ROLES,
   recordInbox,
@@ -103,6 +103,8 @@ export function CultivationBoard(props: CultivationBoardProps) {
   const [highlightId, setHighlightId] = useState<string | null>(null)
   /** 哪些记录的长正文被展开（默认折叠前 {@link BODY_PREVIEW_LINES} 行）。 */
   const [expandedBodies, setExpandedBodies] = useState<Readonly<Record<string, boolean>>>({})
+  /** 同一行**在飞的**动作 key（双击护栏：`disabled` 要等重渲染，同一 tick 的第二次点击挡不住）。 */
+  const inFlight = useRef<string | null>(null)
   /** 时间标签的锚点：挂载时取一次（轮询重渲染不跳动；跨小时误差可接受，30s 轮询会带新 now）。 */
   const now = Date.now()
   /** 记录的时间标签（id 形状不符给 null——不猜）。 */
@@ -113,6 +115,9 @@ export function CultivationBoard(props: CultivationBoardProps) {
 
   const run = async (key: string, line: string, after?: () => void): Promise<void> => {
     if (actions === undefined) return
+    // 双击护栏（探索方向③）：同一行已在飞时忽略后续点击——否则同一 tick 的两次点击会发两条命令。
+    if (inFlight.current === key) return
+    inFlight.current = key
     setPendingId(key)
     setReasonProblem(null)
     let result: ActionOutcome
@@ -123,6 +128,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
       // 人连重试入口都没有（BUG-024：间歇复现的正是这条路径）。
       result = { ok: false, text: CULTIVATION_COPY.unexpected(renderThrown(error)) }
     } finally {
+      inFlight.current = null
       setPendingId(null)
     }
     setOutcomes(previous => ({ ...previous, [key]: result }))

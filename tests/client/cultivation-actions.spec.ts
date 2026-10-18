@@ -144,6 +144,16 @@ describe('结果折算：host 原话必须到人眼前，命令面缺席要明�
   // 负例留证 2026-10-18（事故卡见 _backlog/bugs/「失败后按钮卡处理中」，调查中）：修前动作面没有超时，桩 `execute: () => new Promise(() => {})`（不回话）
   //   会让本用例**挂住直到 vitest 超时**（实测 30s 红）；补 `Promise.race` 截止边后绿。
   //   注意：只 `controller.abort()` 不够——桩无视 signal 照样挂住（这也是真机那条路径的写照）。
+  it('期望句含命令分隔符 `::` ⇒ 拦下并说清（host 按第一个 `::` 切，客户端是唯一防线）', () => {
+    const draft = correctLine('先查 :: 再改', '正文')
+    expect(draft.ok).toBe(false)
+    expect(draft.ok ? '' : draft.problem.message).toBe(CULTIVATION_COPY.problemExpectationSeparator)
+    // suggest 走同一守卫（它内部复用 correctLine）
+    expect(suggestLine('cfo', '先查 :: 再改', '正文', 'ceo').ok).toBe(false)
+    // 正文里含 `::` 是合法的（第一刀已在期望句之后）
+    expect(correctLine('先查再改', '做法：a :: b').ok).toBe(true)
+  })
+
   it('命令面**不回话**：超时即取消并告人（不许无限「处理中…」——失败后按钮卡「处理中…」 的真根因）', async () => {
     const never = {
       execute: () => new Promise(() => {}),
