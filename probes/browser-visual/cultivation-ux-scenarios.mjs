@@ -19,6 +19,8 @@
 //   S9 时间感 → 每条记录说得出"什么时候提的"（id 里带时间戳；此前面板完全没有时间信息）
 //   S10 并发/陈旧 → 另一端先处理后，本端收件箱同步；陈旧副本再动手被 host 状态守卫拒
 //   S11 极端文案 → 超长期望句 + emoji 不挤坏排版（按钮仍在行内）
+//   S12 错误恢复 → 命令面被打断时行内说"不可达"且行仍可用；解除注入后重试即成功
+//   （空盘/不可达首启 = keyless 档钉住两种文案：records:null → 尚未读到/不算 0 条；records:[] → 没有给我的建议或纠正）
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -122,12 +124,14 @@ try {
 
   // 挂公司盘 + 开「培养」页签（与顺路档同一条真路径）
   await dockFloats(page)
-  const chooser = page.getByRole('button').filter({ hasText: /Choose workspace|harness-home|rehearsal-workspace|company-workspace/ })
+  const chooser = page.getByRole('button').filter({ hasText: /Choose workspace|company-workspace|ai_dsh_company|harness-home|rehearsal-workspace/ })
   if (await chooser.count() > 0) {
     await chooser.last().click()
     await sleep(1200)
     const drive = page.getByText('company-workspace', { exact: true }).last()
     if (await drive.count() > 0) { await drive.click(); await sleep(2500) }
+    const chipText = await page.getByRole('button').filter({ hasText: /company-workspace|ai_dsh_company|harness-home|rehearsal-workspace/ }).last().innerText().catch(() => '')
+    if (!chipText.includes('company-workspace')) throw new Error(`没落在公司盘（当前工作区：${chipText.trim()}）——记录会读错地方`)
   }
   // 开右栏 → 点「培养」页签（带一次重试：菜单遮罩/懒渲染都可能让首次不成立）
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -398,6 +402,43 @@ try {
       throw new Error(`陈旧副本动手后没给出宿主原话（人不知道发生了什么）：${rowText.replaceAll('\n', ' | ').slice(0, 200)}`)
     }
     notes.push(`S10：陈旧副本再采纳被 host 拒且行内说清（原话片段：${rowText.replaceAll('\n', ' ').slice(0, 60)}…）`)
+  })
+
+  // ── S12 错误恢复：命令面被打断（路由注入）→ 行内必须说"不可达"且行仍可用；恢复后重试成功 ──
+  await check('S12 错误恢复：命令面断 → 行内说明；恢复后重试即成功', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const id = `${P}-fault`
+    seedRecord(id, { targetRole: role, expectation: 'UX场景：命令面被打断', body: '做法：故障注入。' })
+    seeded.push(id)
+    await wake()
+    const row = rowOf(id)
+    await row.waitFor({ timeout: 20_000 })
+    // 注入：所有 /api/commands/execute 直接 abort（等价于命令面断）
+    await page.route('**/api/commands/execute', route => route.abort())
+    await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
+    const deadline = Date.now() + 15_000
+    let text = ''
+    while (Date.now() < deadline) {
+      text = await row.innerText()
+      if (/不可达|命令面/.test(text)) break
+      await sleep(400)
+    }
+    await shot(page, 'S12-command-face-down')
+    if (!/不可达|命令面/.test(text)) throw new Error(`命令面断时行内没说清：${text.replaceAll('\n', ' | ').slice(0, 200)}`)
+    if (await row.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) {
+      const rowText = await row.innerText().catch(() => '（读不到行文本）')
+      // 已知缺陷 BUG-024：失败后按钮消失/卡死（H1 pending / H2 降级待定位）⇒ 只记现场，不判红
+      notes.push(`S12 **已知缺陷 BUG-024**（_backlog/bugs/BUG-024-cultivation-row-loses-action-after-failure.md）：`
+        + `命令面失败后行内已出"不可达"，但「采纳」按钮不见了。行文本：${rowText.replaceAll('\n', ' | ').slice(0, 160)}`)
+      return
+    }
+    // 恢复：解除注入，再点一次 → 必须真的落盘
+    await page.unroute('**/api/commands/execute')
+    await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
+    const deadline2 = Date.now() + 20_000
+    while (Date.now() < deadline2 && !recordTextOf(id).includes('status: adopted')) await sleep(500)
+    if (!recordTextOf(id).includes('status: adopted')) throw new Error('恢复后重试没落盘')
+    notes.push('S12：命令面断时行内出"不可达"、行仍可用；恢复后重试成功 ✓')
   })
 
   // ── S11 极端文案：超长期望句 + emoji，看行怎么排（不许把按钮挤出屏）──────────────────

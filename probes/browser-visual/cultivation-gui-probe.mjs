@@ -164,12 +164,24 @@ try {
   // 开场自愈：会话 preset 是**持久**的（别的探针/人可能把它切成 PTC/Standard）⇒ 先归位到公司角色。
   await (async () => {
     const chip = page.getByRole('button').filter({ hasText: /梦之队 (CEO|CFO|COO|VP-Eng|VP-Sales)|Standard mode|PTC mode|Minimal mode/ })
-    if (await chip.count() === 0) return
-    if (/我的分身：CEO/.test(await page.locator('body').innerText())) return
+    if (await chip.count() === 0) throw new Error('找不到 preset chip——无法确保会话是公司角色（模式残留）')
     await chip.last().click()
     await sleep(1000)
     const ceo = page.getByText('梦之队 CEO', { exact: true }).last()
-    if (await ceo.count() > 0) { await ceo.click(); await sleep(1800) }
+    if (await ceo.count() === 0) throw new Error('preset 菜单里没有「梦之队 CEO」')
+    await ceo.click()
+    await sleep(1500)
+    await page.keyboard.press('Escape')          // 收菜单遮罩
+    await page.reload({ waitUntil: 'load' })     // 重载：让 host 侧会话也吃到公司角色（实测切完不重载会留非公司角色）
+    await sleep(4500)
+    await dismissNotices(page, sleep)
+    await sleep(1200)
+    // 再**新建一个会话**：host 侧 preset 是建会话时定的，旧会话可能仍是漂移前那个（实测只切 chip 不够）。
+    const newSession = page.getByRole('button').filter({ hasText: 'New Session' }).first()
+    if (await newSession.count() > 0) {
+      await newSession.click()
+      await sleep(3500)
+    }
   })()
 
     const pane = page.locator('.wk-cultivation-compose').first()

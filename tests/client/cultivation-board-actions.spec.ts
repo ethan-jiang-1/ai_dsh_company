@@ -14,6 +14,12 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { CultivationBoard } from '../../packages/company-pack/src/client/CultivationBoard.tsx'
 import {
   CULTIVATION_COPY,
+  adoptLine,
+  correctLine,
+  rejectLine,
+  revokeLine,
+  suggestLine,
+  verifyLine,
   type ActionOutcome,
   type CultivationActions,
 } from '../../packages/company-pack/src/client/cultivation-actions.ts'
@@ -274,6 +280,42 @@ describe('走查抓到的四处 UX 缺陷（2026-10-18，图为证）', () => {
     expect(text, '期望行为标签常驻').toContain(CULTIVATION_COPY.expectationLabel)
     expect(text, '正文标签常驻').toContain(CULTIVATION_COPY.bodyLabel)
     expect(text, '正文栏带做法/出处提示').toContain(CULTIVATION_COPY.bodyHint)
+  })
+})
+
+describe('首启两态（探索轴 ③：读不到 ≠ 0 条）', () => {
+  it('记录不可达（null）⇒ 说"尚未读到/不算 0 条"，不假装空', () => {
+    const { container } = mount({ records: null, journalRows: null })
+    const text = container.textContent ?? ''
+    expect(text).toMatch(/尚未读到|目录缺失|读取失败/)
+    expect(text).toContain('不算 0 条')
+  })
+
+  it('空盘（可达但 0 条）⇒ 说"没有给我的建议或纠正"', () => {
+    const { container } = mount({ records: [] })
+    expect(container.textContent).toContain('没有给我的建议或纠正')
+    expect(container.textContent, '空盘不该说"读不到"').not.toContain('不算 0 条')
+  })
+})
+
+describe('命令折叠区与按钮一一对应（探索轴 ④：文案与控件不许再漂）', () => {
+  it('折叠区列出的子命令 = 面板按钮/表单实际能发的子命令（六条全覆盖）', () => {
+    const { container } = mount({ records: [record({ status: 'adopted', methodSlug: 'm-1' })], actions: stubActions().actions })
+    const fold = container.querySelector('details')
+    expect(fold, '熟手命令行应折叠在场').not.toBeNull()
+    const text = fold!.textContent ?? ''
+    for (const sub of ['correct', 'suggest', 'adopt', 'reject', 'verify', 'revoke']) {
+      expect(text, `折叠区缺子命令 ${sub}`).toContain(`/cultivation ${sub}`)
+    }
+    // 反向：面板发得出来的子命令，折叠区都得有对应的"熟手写法"（防只在按钮里有、折叠区漏写）
+    const emittable = [
+      adoptLine('r-1'), rejectLine('r-1', '理由').ok ? '/cultivation reject' : '', verifyLine('r-1', 'pass'),
+      revokeLine('m-1'), correctLine('期望', '正文').ok ? '/cultivation correct' : '', suggestLine('cfo', '期望', '正文', 'ceo').ok ? '/cultivation suggest' : '',
+    ].filter(line => line !== '')
+    for (const line of emittable) {
+      const sub = /^\/cultivation ([a-z]+)/.exec(line)?.[1]
+      expect(text, `折叠区缺 ${String(sub)} 的熟手写法（按钮能发、文档没写 = 漂）`).toContain(`/cultivation ${String(sub)}`)
+    }
   })
 })
 
