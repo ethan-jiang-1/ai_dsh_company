@@ -7,7 +7,9 @@
 // 成本：真模型，约 3–6 分钟（含 120s 前台窗口等待），≈3–6 次模型调用（用户自付 key）；凭据取自 DSH 凭据库
 //   （`runtime/harness-home/.credentials.yaml`，**不是**环境变量——`env | grep DEEPSEEK` 为空不代表没配）。
 // 前置：`source run/env.sh`（dev home + 权限档）。
-// 用法：source run/env.sh && node probes/session-context/ask-user-timed-probe.mjs [--keep-session]
+// 用法：source run/env.sh && node probes/session-context/ask-user-timed-probe.mjs [--unbounded]
+//   --unbounded 档（BUG-022 的驱动侧验收）：让模型传 `timeout: -1`，判定须**立刻**给出
+//   「需人参与（callId / question.id / 为什么）」——证明驱动不会陪着干等到会话掉线。
 //
 // 首次验收（2026-10-18）：ALL PASS——并顺带抓出**残留**：模型可在单次调用里传 `timeout: -1`
 //   （vendor schema 允许："必须先得到答案"时用），窗口因此回到无界、驱动静默停住 ⇒ 立 BUG-022
@@ -26,11 +28,14 @@ import { spawn } from 'node:child_process'
 import { join } from 'node:path'
 import { companyCookie, companyRpc, startWeb } from '../../tools/lib/probe-web.mjs'
 import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { questionStopOf } from '../../tools/lib/question-stop.mjs'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+/** BUG-022 档：让模型要一个无界窗口，验驱动的"看到停点就停并报"。 */
+const UNBOUNDED = process.argv.includes('--unbounded')
 /** 前台窗口默认 120s（preset 钉的值）；模型可在单次调用里覆盖（实测见过 180）。 */
 const DEFAULT_WINDOW_S = 120
 /** 窗口到点后给工具/模型的额外宽容（结果落盘 + 这一轮收尾）。 */
@@ -71,7 +76,9 @@ try {
     sessionId,
     mode: 'queue',
     content: [{ type: 'text', text: '只做一件事：用 ask_user_question 问我一个三选一的问题（三个选项写清楚），'
-      + '**调用时显式传 timeout: 30**，问完就停，不要做别的、不要自己作答。' }],
+      + (UNBOUNDED
+        ? '**调用时显式传 timeout: -1**（我要求你必须等到我回答），问完就停，不要做别的、不要自己作答。'
+        : '**调用时显式传 timeout: 30**，问完就停，不要做别的、不要自己作答。') }],
     clientTimeZone: 'Asia/Shanghai',
   } })
 
@@ -103,6 +110,41 @@ try {
     console.log(`  NOTE callId=${String(callId)}；question.id=${questionIds.join(', ')}`)
   })
 
+  await check(UNBOUNDED
+    ? '②（BUG-022 档）驱动看到无界停点立刻报「需人参与」，不干等'
+    : '②（预判）驱动判定为有界等待（还剩窗口）', async () => {
+    if (callId === null) throw new Error('① 未拿到 callId')
+    const started = Date.now()
+    let verdict = null
+    while (Date.now() - started < 30_000) {
+      verdict = questionStopOf(await eventsOf(), { now: Date.now() })
+      if (verdict !== null && verdict.action === (UNBOUNDED ? 'stop' : 'wait')) break
+      await sleep(2000)
+    }
+    if (verdict === null) throw new Error('判定说没有停点——问询调用没被识别（形状变了？）')
+    if (UNBOUNDED) {
+      if (verdict.action !== 'stop') throw new Error(`--unbounded 档应判 stop，实得 ${verdict.action}：${verdict.reason}`)
+      if (verdict.window !== 'unbounded') throw new Error(`窗口应判无界，实得 ${verdict.window}：${verdict.reason}`)
+      const waited = Date.now() - started
+      console.log(`  NOTE 判定在 ${String(Math.round(waited / 1000))}s 内给出「需人参与」：${verdict.reason}`)
+      console.log(`  NOTE 报给人的坐标：callId=${String(verdict.callId)} question.id=${verdict.questionIds.join(', ')}`)
+    } else {
+      if (verdict.action !== 'wait') throw new Error(`默认档应判 wait，实得 ${verdict.action}：${verdict.reason}`)
+      console.log(`  NOTE 判定：${verdict.reason}`)
+    }
+    if (UNBOUNDED) return
+  })
+
+  if (UNBOUNDED) {
+    // 无界档到此为止：不做 ②③④⑤（那些判的是"有界窗口"这条路），换成确认"确实停住"（判定说的与现场一致）。
+    const events = await eventsOf()
+    const ended = events.some(event => event?.type === 'turn/end')
+    const pendingResult = events.some(event => event?.type === 'tool/result')
+    if (ended || pendingResult) {
+      throw new Error(`--unbounded 档预期会话停住（无 turn/end、无 tool/result），实得 turn/end=${String(ended)} result=${String(pendingResult)}`)
+    }
+    console.log('  PASS 现场与判定一致：会话确实停在无界问询上（不干等的价值就在这里）')
+  } else {
   await check('② 窗口有界：tool/result 出现且含 pending（legacy 形态下永不出现）', async () => {
     if (callId === null) throw new Error('① 未拿到 callId')
     if (callTimeoutS === -1) {
@@ -167,12 +209,15 @@ try {
     }
     throw new Error('容忍期内没看到携带作答的消息——答案没回到会话')
   })
+  }
 } finally {
   child.kill('SIGTERM')
   await sleep(300)
 }
 
 console.log(failures.length === 0
-  ? '\nask-user-timed-probe: ALL PASS（真模型：问询窗口有界 → pending → turn 收口 → RPC 可答 → 答案回会话）'
-  : `\nask-user-timed-probe: ${failures.length} FAILURE(S)\n${failures.join('\n')}`)
+  ? (UNBOUNDED
+    ? '\nask-user-timed-probe(--unbounded): ALL PASS（真模型：模型要 -1 ⇒ 驱动判定立刻报「需人参与」，不干等）'
+    : '\nask-user-timed-probe: ALL PASS（真模型：问询窗口有界 → pending → turn 收口 → RPC 可答 → 答案回会话）')
+  : `\nask-user-timed-probe: ${String(failures.length)} FAILURE(S)\n${failures.join('\n')}`)
 process.exit(failures.length === 0 ? 0 : 1)

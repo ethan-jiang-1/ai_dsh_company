@@ -64,8 +64,8 @@ args:   { "agentId": "<SessionId>", "callId": "<toolCallId>",
 
 - **模型可单次把窗口要回无界**（顶层 `timeout: -1`，vendor schema 允许：*"Use -1 only when an answer is required
   before proceeding"*）——真跑实测：该路径下无 `pending`、无 `turn/end`、`userQuestions/answer` 返回 false
-  ⇒ 无人值守驱动仍会静默停住。**残留另立 [BUG-022](../../_backlog/bugs/BUG-022-ask-user-unbounded-timeout-override.md)**
-  （已修卡不重开，新卡引用旧卡；候选修法 A 驱动侧"看到 open 就停并报"最省）。
+  ⇒ 无人值守驱动仍会静默停住。**残留已由 [BUG-022 的驱动侧停点判定](../../notes/implemented/2026-10-18-bug022-question-stop-guard.md) 收掉**
+  （`tools/lib/question-stop.mjs`：看到无界停点就停并报，不再干等；卡 = [BUG-022（已归档）](../../_backlog/_archive/fixed_bugs/BUG-022-ask-user-unbounded-timeout-override.md)）。
 - 窗口秒数（120）未按体验实测调过：`timeout` 是可调项（行 config 一处或单次调用参数），本期取 vendor 默认并显式钉住。
 
 ## 指针

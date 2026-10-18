@@ -10,9 +10,8 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-022](BUG-022-ask-user-unbounded-timeout-override.md) | 模型可单次传 `timeout: -1` 把问询窗口要回无界——驱动会静默停住（BUG-021 的残留；真模型三次实跑留证） | P2 |
 
-BUG-001..021 已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**无活跃缺陷卡**；BUG-001..022 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

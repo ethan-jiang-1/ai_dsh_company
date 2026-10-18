@@ -145,7 +145,7 @@ returned the pending payload, or …"*），而 **`userQuestions/answer` 恰好�
       **ALL PASS**——窗口到点 → `tool/result` 含 `pending` → `turn/end` → `userQuestions/answer` 返回 true →
       答案以新消息回会话（同轮另有两次实跑：默认 120s / 模型自取 180s，均按窗口收口）。
       ⚠ **但判据只覆盖"窗口有界"这条路**：模型单次传 `timeout: -1` 时窗口回到无界、驱动仍会停住
-      ——残留另立 [BUG-022](../../bugs/BUG-022-ask-user-unbounded-timeout-override.md)（已修卡不重开，新卡引用旧卡）。
+      ——残留另立 [BUG-022](BUG-022-ask-user-unbounded-timeout-override.md)（已修卡不重开，新卡引用旧卡）；**该卡当日已修**（驱动侧停点判定，见其毕业 Note）。
 
 ## 修复关联
 

@@ -75,6 +75,7 @@
 | [BUG-020-converge-crash-untracked-journal.md](fixed_bugs/BUG-020-converge-crash-untracked-journal.md) | 收敛半态可续跑：清 journal 判 tracked（未跟踪不再致崩）＋converge --resume（只做剩余步骤） | 2026-10-16 |
 | [BUG-019-final-present-evidence-lost.md](fixed_bugs/BUG-019-final-present-evidence-lost.md) | 判据加证据可得性声明（--evidence-from）：证据不可考降观察档、不声明照旧判红；首版「证据丢失」诊断经深挖推翻为真阳性 | 2026-10-16 |
 | [BUG-021-ask-user-question-no-scripted-answer-path.md](fixed_bugs/BUG-021-ask-user-question-no-scripted-answer-path.md) | 问询能自行收口：五角色 preset 钉 `tool-ask-user` 的 timed 形态（legacy 无界前台窗 ⇒ RPC 只吃 continued ⇒ 驱动永久挂起丢活） | 2026-10-18 |
+| [BUG-022-ask-user-unbounded-timeout-override.md](fixed_bugs/BUG-022-ask-user-unbounded-timeout-override.md) | 驱动侧停点判定：问询无配对结果时分类"有界等待/无界卡死/逾期"，看到无界就停并报（模型传 `timeout: -1` 那条路） | 2026-10-18 |
 
 ## 随卡归档的研究
 
