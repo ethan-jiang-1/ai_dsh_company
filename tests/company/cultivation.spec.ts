@@ -16,7 +16,9 @@ import {
   methodSkillText,
   parseRecord,
   recordInbox,
+  recordStampOf,
   recordText,
+  timeLabel,
   type CultivationRecord,
 } from '../../packages/company-pack/src/lib/cultivation.ts'
 
@@ -24,6 +26,31 @@ import {
  * 只测纯函数（毫秒级）。真数据渲染（company-workspace 真 journal 进面板）是认证档：
  * 浏览器开真页面走查（guides/dev-loop §9.1 分层）。
  */
+
+describe('recordStampOf / timeLabel（S9 场景轮：面板此前完全没有时间信息）', () => {
+  it('真实形状的 id 解析出本地时间；非该形状给 null（不猜）', () => {
+    const at = recordStampOf('20261018-141107-ux9a')
+    expect(at).not.toBeNull()
+    const d = new Date(at!)
+    expect([d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()])
+      .toEqual([2026, 10, 18, 14, 11, 7])
+    expect(recordStampOf('r-1')).toBeNull()
+    expect(recordStampOf('uxwalk-20261018-reject')).toBeNull()   // 前缀有日期但缺 HHMMSS ⇒ 不认
+  })
+
+  it('标签从"刚刚"到"年-月-日"分档（越近越粗，人一眼能比新旧）', () => {
+    const at = new Date(2026, 9, 18, 14, 11, 7).getTime()
+    const at2 = (ms: number) => at + ms
+    expect(timeLabel(at, at2(10_000))).toBe('刚刚')
+    expect(timeLabel(at, at2(5 * 60_000))).toBe('5 分钟前')
+    expect(timeLabel(at, at2(3 * 3_600_000))).toBe('3 小时前')
+    // 24h 内一律"N 小时前"（比"昨天"更精确）；"昨天"留给跨过一个日历日但仍相关的那些
+    expect(timeLabel(at, new Date(2026, 9, 19, 9, 0, 0).getTime())).toBe('18 小时前')
+    expect(timeLabel(at, new Date(2026, 9, 19, 23, 0, 0).getTime())).toBe('昨天 14:11')
+    expect(timeLabel(at, new Date(2026, 9, 25, 9, 0, 0).getTime())).toBe('10-18 14:11')
+    expect(timeLabel(at, new Date(2027, 0, 3, 9, 0, 0).getTime())).toBe('2026-10-18 14:11')
+  })
+})
 
 describe('journalTitle', () => {
   it('优先取首个标题行；无标题取首段非空行', () => {

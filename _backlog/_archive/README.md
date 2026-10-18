@@ -93,6 +93,7 @@
 | [2026-10-13-dsh-capabilities.md](research/agent-cultivation/2026-10-13-dsh-capabilities.md) | 培养卡的钉版 DSH 能力边界与待探针事项 | 2026-10-13 |
 | [2026-10-13-external-patterns.md](research/agent-cultivation/2026-10-13-external-patterns.md) | 培养卡的外部一手实践（记忆/教学/评估与反证） | 2026-10-13 |
 | [2026-10-17-cultivation-gui-actions.md](settled_issues/2026-10-17-cultivation-gui-actions.md) | 培养 GUI 行动面的 UX 推敲（时刻地图/输入清单把手审计/迭代框架/体验协议）——已实施，去向 = 同名毕业 Note | 2026-10-17 |
+| [BUG-023-cultivation-float-actions-dead.md](settled_issues/BUG-023-cultivation-float-actions-dead.md) | 培养面板浮窗"点了没反应"= **误报**（浮窗正常；真凶是探针跨轮复用 id 撞上遗留方法目录 + 诊断漏读行内原话）⇒ 修的是探针卫生 | 2026-10-18 |
 
 ## 暂停卡
 

@@ -46,7 +46,7 @@ source run/env.sh && node probes/browser-visual/cultivation-ux-walkthrough.mjs -
 ## 后续（2026-10-18 同日）
 
 - **场景轮已做**：[cultivation-scenario-audit](./2026-10-18-cultivation-scenario-audit.md)——换轴（失败态/校验/规模与长文本/窄窗/浮窗/跨角色/键盘/非名册 preset），
-  又修 3 处（非名册 preset 当角色、长正文撑满面板、夹具骗类型）、立卡 1 张（[BUG-023](../../_backlog/bugs/BUG-023-cultivation-float-actions-dead.md) 浮窗内动作静默失效）。
+  又修 3 处（非名册 preset 当角色、长正文撑满面板、夹具骗类型）、立卡 1 张（[BUG-023](../../_backlog/_archive/settled_issues/BUG-023-cultivation-float-actions-dead.md) 浮窗内动作静默失效）。
   本记录里"下一件建议窄窗/浮窗"那格**已跑**：窄窗 ✅、浮窗 ⚠ 已知缺陷。
 
 ## 指针

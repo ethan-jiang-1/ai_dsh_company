@@ -277,6 +277,18 @@ describe('走查抓到的四处 UX 缺陷（2026-10-18，图为证）', () => {
   })
 })
 
+describe('时间感（场景轮 S9：此前行内没有任何时间信息）', () => {
+  it('真实时间戳 id 的记录显示"提出时间"（人话标签）', () => {
+    const { container } = mount({ records: [record({ id: '20261018-141107-ux9a' })] })
+    expect(container.textContent, '待办行要说得清什么时候提的').toMatch(/提出/)
+  })
+
+  it('非时间戳 id（测试/手写）不猜时间、也不崩', () => {
+    const { container } = mount({ records: [record({ id: 'r-1' })] })
+    expect(container.textContent).not.toContain('提出')
+  })
+})
+
 describe('长正文折叠（2026-10-18 场景轮：60 行正文撑满面板）', () => {
   const longBody = Array.from({ length: 60 }, (_, i) => `第 ${String(i + 1)} 行`).join('\n')
 

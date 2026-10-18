@@ -16,7 +16,7 @@
 | S2 校验：拒绝空理由 | ✅ 行内校验提示、命令不发 |
 | S3 规模与长文本 | ✅ 12 条待办 + 60 行正文：折叠后行高 **195px**（修复前 1156px），展开/收起正常 |
 | S4a 窄视口 | ✅ 按钮不重叠、尺寸可点 |
-| S4b 浮窗 | ⚠ **已知缺陷** → [BUG-023](../../_backlog/bugs/BUG-023-cultivation-float-actions-dead.md)（见下） |
+| S4b 浮窗 | ⚠ **已知缺陷** → [BUG-023](../../_backlog/_archive/settled_issues/BUG-023-cultivation-float-actions-dead.md)（见下） |
 | S5 跨角色流向 | ✅ CEO 提给 CFO 的建议：`targetRole: cfo`、只在「我提交的」、不进「需要我处理」 |
 | S6 键盘可达 | ✅ 页首 Tab **1 步**进面板内可操作控件；键盘模态下焦点可见（平台全局 `:focus-visible`）；Enter 能真触发采纳 |
 | S7 非公司 preset（PTC/Standard） | ✅ 按"未选角色"处理（**本轮修的**，见下） |
@@ -31,11 +31,18 @@
 3. **夹具骗类型**（修 1、2 时暴露）：`record()` fixture 缺 `body`（类型上必填）⇒ 长正文折叠一上线就 `undefined.split` 崩。
    修夹具而不是加防御分支（类型面可信，别用运行期兜底掩盖夹具错误）。
 
-## 立卡的一处（不装好）
+## 当时立卡的那处 → **当日复盘：误报**（教训比 bug 值钱）
 
-**BUG-023：培养面板浮出成浮窗后行内动作静默失效。** 现场：浮出后浮窗容器内同名行 **2 份**，逐份 `force` 点击都**不生效**
-（记录不翻、行内无任何回执 ⇒ handler 压根没跑）；**停靠态一切正常**（同轮 S1/S3/S6 都点得动）。
-探针里该场景标成"已知缺陷、只记现场不判红"（修好后自动转硬判）——不把红留成常态，也不假装它能用。
+当时看到的：浮出后浮窗容器内同名行 **2 份**、逐份 `force` 点击都不生效（记录不翻、行内无回执）。
+立了 [BUG-023](../../_backlog/_archive/settled_issues/BUG-023-cultivation-float-actions-dead.md)（P2，浮窗内动作静默失效）。
+
+**同日澄清：浮窗功能正常，是我的探针/诊断错了三处。** ① 记录 id **跨轮复用**，上一轮采纳留下的 `method-<id>` 没清 ⇒
+这一点「采纳」被 host **明确拒绝**；② 我的判据只查**记录文件状态**（仍 open），没读**行内原话**——而那行原话一直写着
+「方法 method-… 已存在，未覆盖任何文件或记录。」；③ 失败路径没把行内文本带进报错，于是"host 拒绝"被我读成"handler 没跑"。
+
+**处置**：卡按"问题轨已结"归档（章程无"误报"出口，用 `已修` 会失真声明）；探针修三处——每轮**唯一 id**、
+失败**必读行内原话**再报错、收尾连**方法层残留**一起清。改完 S4b 从"已知缺陷档"**恢复硬判并 PASS**。
+**教训（写进纪律）**：探针的失败路径必须把**被测面自己说的话**带进报错；只断言副作用状态，会把"明确拒绝"误诊成"静默失效"。
 
 ## 四条观察（不判红，供下一轮取舍）
 
@@ -44,7 +51,21 @@
 - 从页首 Tab 1 步就能进面板，但面板内控件顺序未逐项量（要不要做焦点顺序清单）。
 - 12 条待办目前是"平铺一长列"（无分组/无计数徽标）——规模再大（30+）要不要分组，等真人反馈。
 
+## 追加：探索轮（同日 B 段，用户令「继续探索实验看看还有什么BUG，尤其UX类型的」）
+
+新增三个场景轴（都并进同一探针，`--shots` 出图）：
+
+| 轴 | 结果 |
+|---|---|
+| S9 **时间感** | **真缺陷（已修）**：待办行**完全没有时间信息**——人分不清谁新谁旧、该先处理哪条；而记录 id 里一直带着时间戳（`<YYYYMMDD>-<HHMMSS>-xxxx`，host `newRecordId` 口径）。修：`lib/cultivation.ts` 新增 `recordStampOf`（id→本地时间，形状不符给 null 不猜）+ `timeLabel`（刚刚/N 分钟前/N 小时前/昨天 HH:MM/MM-DD HH:MM/年-月-日），待办与已采纳行都显示「… 提出」；判据 = tests/company 两条 + 交互档两条 + 场景档 S9 硬判（截图 `S9-time-perception.png`，行内实测「刚刚 提出」） |
+| S10 并发/陈旧 | ✅ 另一端（直接改记录文件 = 另一个窗口先动手）之后，本端**陈旧副本**再点采纳 → host 明确拒绝且**行内说清**（不是静默失效） |
+| S11 极端文案 | ✅ 超长期望句（82 字 + emoji）：行高 124px，按钮仍在行内（不挤坏排版） |
+
+**探针卫生三连（这轮全是它咬人）**：① 跨轮复用 id ⇒ 撞上遗留方法目录，制造了 BUG-023 假阳性；
+② **浮出状态跨会话恢复** ⇒ 上轮浮出的面板出现在下轮，挡住导航（开场/收尾各加一次"收回浮窗"自愈）；
+③ preset 菜单的遮罩会吞掉随后的开栏点击 ⇒ 选完按 Escape + 开栏带重试。**规律**：探针要假设"世界带着上一轮的痕迹"。
+
 ## 指针
 
 - 探针：[cultivation-ux-scenarios.mjs](../../probes/browser-visual/cultivation-ux-scenarios.mjs)（`--shots`）｜顺路档：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough.mjs)
-- 新卡：[BUG-023](../../_backlog/bugs/BUG-023-cultivation-float-actions-dead.md)｜前一轮：[firsttimer-audit](./2026-10-18-cultivation-firsttimer-audit.md)
+- 新卡：[BUG-023](../../_backlog/_archive/settled_issues/BUG-023-cultivation-float-actions-dead.md)｜前一轮：[firsttimer-audit](./2026-10-18-cultivation-firsttimer-audit.md)

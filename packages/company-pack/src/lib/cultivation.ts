@@ -309,6 +309,43 @@ export function parseRecord(id: string, text: string): CultivationRecord | null 
   return loose as unknown as CultivationRecord
 }
 
+/**
+ * 从记录 id 里取提出时间（真实记录 id = `<YYYYMMDD>-<HHMMSS>-<4位随机>`，**本地时区**，
+ * 与 host 的 `newRecordId` 同口径）。非该形状（如测试/手写 id）给 null——不猜时间。
+ * @param id - 记录 id（文件名去 `.md`）。
+ * @returns epoch 毫秒；形状不符给 null。
+ */
+export function recordStampOf(id: string): number | null {
+  const match = /^(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})-/.exec(id)
+  if (match === null) return null
+  const [, y, mo, d, h, mi, s] = match
+  const at = new Date(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s)).getTime()
+  return Number.isNaN(at) ? null : at
+}
+
+/**
+ * 时间的人话标签（新到旧：刚刚 / N 分钟前 / N 小时前 / 昨天 HH:MM / MM-DD HH:MM / YYYY-MM-DD HH:MM）。
+ * 为什么要它：面板此前**完全没有时间信息**（场景轮 S9 实测），人分不清谁新谁旧、该先处理哪条。
+ * @param at - epoch 毫秒。
+ * @param now - 当前时间（epoch 毫秒；注入以便测试）。
+ * @returns 人话标签。
+ */
+export function timeLabel(at: number, now: number): string {
+  const pad = (n: number): string => String(n).padStart(2, '0')
+  const date = new Date(at)
+  const hhmm = `${pad(date.getHours())}:${pad(date.getMinutes())}`
+  const delta = now - at
+  if (delta < 60_000) return '刚刚'
+  if (delta < 3_600_000) return `${String(Math.floor(delta / 60_000))} 分钟前`
+  if (delta < 86_400_000) return `${String(Math.floor(delta / 3_600_000))} 小时前`
+  const today = new Date(now)
+  const sameDay = (a: Date, b: Date): boolean => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+  const yesterday = new Date(now - 86_400_000)
+  if (sameDay(date, yesterday)) return `昨天 ${hhmm}`
+  const md = `${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+  return date.getFullYear() === today.getFullYear() ? `${md} ${hhmm}` : `${String(date.getFullYear())}-${md} ${hhmm}`
+}
+
 /** 按目标角色分箱后的收件箱（培养卡 V7：归属过滤 + 回执）。 */
 export interface RecordInbox {
   /** 待我决策：open 且目标是我（跨角色建议进我屋也算）。 */

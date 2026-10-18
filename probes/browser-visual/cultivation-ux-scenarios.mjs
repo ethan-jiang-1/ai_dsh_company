@@ -16,11 +16,14 @@
 //   S4a 窄视口 → 按钮与警告不重叠、警告仍读得到；S4b 浮窗 → 浮窗里动作仍可用（点到就落盘）
 //   S5 跨角色流向 → CEO 提交给 CFO 的建议：记录 targetRole=cfo、只在「我提交的」、不进「需要我处理」
 //   S6 键盘可达性 → 从面板起 Tab 到「采纳」≤ 6 步、焦点可见（有 outline）、Enter 能真触发
+//   S9 时间感 → 每条记录说得出"什么时候提的"（id 里带时间戳；此前面板完全没有时间信息）
+//   S10 并发/陈旧 → 另一端先处理后，本端收件箱同步；陈旧副本再动手被 host 状态守卫拒
+//   S11 极端文案 → 超长期望句 + emoji 不挤坏排版（按钮仍在行内）
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { loadChromium, launchChromium } from '../../tools/drivers/playwright.mjs'
-import { startWeb } from '../../tools/lib/probe-web.mjs'
+import { companyCookie, companyRpc, startWeb } from '../../tools/lib/probe-web.mjs'
 import { dismissNotices } from '../../tools/lib/probe-window.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
@@ -32,7 +35,10 @@ const WORKSPACE = join(ROOT, 'company-workspace')
 const RECORDS = join(WORKSPACE, 'cultivation', 'records')
 const OUT_DIR = join(ROOT, 'runtime', 'human-exits-evidence')
 const SHOT_DIR = join(OUT_DIR, 'ux-scenarios')
-const P = `uxsc-${STAMP}`
+// ⚠ 每轮唯一 token：id 跨轮复用会撞上**上一轮遗留的方法目录**（`method-<id>` 已存在 ⇒ host 拒采纳，
+//   看起来就像"按钮点了没反应"——2026-10-18 BUG-023 假阳性就是这么来的）。唯一 id + 收尾清理双保险。
+const TOKEN = Math.random().toString(36).slice(2, 6)
+const P = `uxsc-${STAMP}-${TOKEN}`
 const COPY = { adopt: '采纳', reject: '拒绝', rejectConfirm: '确认拒绝', verifyPass: '这条有用', composeSuggest: '给别的角色提建议', submit: '记下来' }
 
 let home
@@ -71,10 +77,28 @@ function seedRecord(id, { status = 'open', targetRole, expectation, body, method
 const recordTextOf = (id) => existsSync(join(RECORDS, `${id}.md`)) ? readFileSync(join(RECORDS, `${id}.md`), 'utf8') : ''
 const seeded = []
 
+/**
+ * 把已有浮窗收回停靠位（**探针卫生**：浮出状态跨会话恢复——上轮 S4b 浮出的面板会出现在下一轮，
+ * 挡住导航/让同名行出现多份；2026-10-18 实测两次翻车）。开场与收尾各调一次。
+ * @param page - Playwright 页面。
+ */
+async function dockFloats(page) {
+  const floats = page.locator('[data-dockkit-float]')
+  for (let i = (await floats.count()) - 1; i >= 0; i--) {
+    const dock = floats.nth(i).getByRole('button', { name: /收回|Send back/i }).first()
+    if (await dock.count() > 0) { await dock.click().catch(() => {}); await sleep(700) }
+  }
+}
+
 const { child, port, token } = await startWeb({ spawn, root: ROOT, home, port: 0 })
 const browser = await launchChromium(await loadChromium(ROOT))
 let role = null
 try {
+  const base = `http://127.0.0.1:${String(port)}`
+  const cookie = await companyCookie({ fetch, base, token, onEmptyCookie: 'throw' })
+  const rpc = companyRpc({ fetch, base, cookie, prefix: 'uxs-', dumpBodyOnError: true })
+  const sessionOf = async () => (await rpc('session/list', { _request: {} }))?.items
+    ?.find(item => item.cwd === WORKSPACE)?.sessionId ?? null
   const page = await browser.newPage()
   const loaderErrors = []
   page.on('console', (m) => { if (m.type() === 'error' && m.text().includes('failed to apply loader entry')) loaderErrors.push(m.text()) })
@@ -92,9 +116,12 @@ try {
     if (await ceo.count() === 0) throw new Error('preset 菜单里没有「梦之队 CEO」')
     await ceo.click()
     await sleep(2000)
+    await page.keyboard.press('Escape')   // 收掉可能残留的菜单遮罩（它会吞掉后面的开栏/点页签）
+    await sleep(500)
   })
 
   // 挂公司盘 + 开「培养」页签（与顺路档同一条真路径）
+  await dockFloats(page)
   const chooser = page.getByRole('button').filter({ hasText: /Choose workspace|harness-home|rehearsal-workspace|company-workspace/ })
   if (await chooser.count() > 0) {
     await chooser.last().click()
@@ -102,10 +129,19 @@ try {
     const drive = page.getByText('company-workspace', { exact: true }).last()
     if (await drive.count() > 0) { await drive.click(); await sleep(2500) }
   }
-  const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
-  if (await opener.count() > 0) { await opener.first().click(); await sleep(900) }
-  await page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first().click()
-  await sleep(2500)
+  // 开右栏 → 点「培养」页签（带一次重试：菜单遮罩/懒渲染都可能让首次不成立）
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
+    if (await opener.count() > 0) { await opener.first().click().catch(() => {}); await sleep(900) }
+    const entry = page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first()
+    if (await entry.count() > 0) {
+      await entry.click().catch(() => {})
+      await sleep(2000)
+      if (await page.locator('.wk-pane').count() > 0) break
+    }
+    await page.keyboard.press('Escape').catch(() => {})
+    await sleep(800)
+  }
   const wake = async () => { await page.evaluate(() => { window.dispatchEvent(new Event('focus')) }); await sleep(700) }
   const roleShort = async () => /我的分身：([^\n|]+)/.exec(await page.locator('body').innerText())?.[1]?.trim() ?? null
   role = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo' }[await roleShort()] ?? null
@@ -168,8 +204,14 @@ try {
       seeded.push(`${P}-bulk-${String(i)}`)
     }
     await wake()
-    await sleep(1200)
-    const rows = await page.getByRole('listitem', { name: /^待处理 uxsc-/ }).count()
+    // 读盘是逐条的（12 条要几秒）⇒ 等到齐再判，别用固定 sleep 赌
+    let rows = 0
+    const rowDeadline = Date.now() + 25_000
+    while (Date.now() < rowDeadline) {
+      rows = await page.getByRole('listitem', { name: /^待处理 uxsc-/ }).count()
+      if (rows >= 12) break
+      await sleep(1000)
+    }
     await shot(page, 'S3-scale-top')
     if (rows < 12) throw new Error(`12 条待办没都渲染（实际 ${String(rows)}）`)
     // 最后一条要在场且可点（滚动可达性）
@@ -217,8 +259,8 @@ try {
     if (boxes.some(b => b.w < 20 || b.h < 16)) throw new Error(`按钮被压到不可点：${JSON.stringify(boxes.filter(b => b.w < 20 || b.h < 16))}`)
   })
 
-  // ── S4b 浮窗（当前 = 已知缺陷 BUG-023：浮窗内动作静默失效）────────────────────────
-  await check('S4b 浮窗：拽出后动作仍可用（已知缺陷 BUG-023 ⇒ 只记现场，不判红）', async () => {
+  // ── S4b 浮窗：浮出后行内动作仍可用（BUG-023 假阳性已澄清：浮窗正常，"点了没反应"来自遗留方法目录撞名）──
+  await check('S4b 浮窗：拽出后动作仍可用（点到就落盘）', async () => {
     await page.setViewportSize({ width: 1440, height: 1000 })
     await sleep(600)
     const panesBefore = await page.locator('[data-dockkit-float]').count()
@@ -226,28 +268,20 @@ try {
     if (await floatBtn.count() === 0) throw new Error('找不到「浮出」按钮')
     await floatBtn.first().click()
     await sleep(1800)
-    const target = `${P}-bulk-1`   // 本档刚种的（旧副本里不会有它）
+    const target = `${P}-bulk-1`
     const floatPane = page.locator('[data-dockkit-float]').filter({ has: page.getByRole('listitem', { name: `待处理 ${target}` }) }).last()
     if (await floatPane.count() === 0) throw new Error('浮窗里看不到待办行')
     await shot(page, 'S4b-float', { full: true })
-    const rowsInPane = await floatPane.getByRole('listitem', { name: `待处理 ${target}` }).count()
-    // 逐份试（force 点击），看有没有一份是活的
-    let live = false
-    for (let i = 0; i < rowsInPane && !live; i++) {
-      const btn = floatPane.getByRole('listitem', { name: `待处理 ${target}` }).nth(i)
-        .getByRole('button', { name: COPY.adopt, exact: true }).first()
-      if (await btn.count() === 0) continue
-      await btn.click({ force: true }).catch(() => {})
-      const deadline = Date.now() + 5_000
-      while (Date.now() < deadline && !recordTextOf(target).includes('status: adopted')) await sleep(400)
-      live = recordTextOf(target).includes('status: adopted')
+    const row = floatPane.getByRole('listitem', { name: `待处理 ${target}` }).last()
+    await row.getByRole('button', { name: COPY.adopt, exact: true }).first().click()
+    const deadline = Date.now() + 20_000
+    while (Date.now() < deadline && !recordTextOf(target).includes('status: adopted')) await sleep(500)
+    if (!recordTextOf(target).includes('status: adopted')) {
+      // ⚠ 失败时**必读行内原话**（BUG-023 的教训：只查文件状态会把"host 明确拒绝"误读成"按钮死了"）
+      const rowText = await row.innerText().catch(() => '（读不到行文本）')
+      throw new Error(`浮窗里点采纳没落盘。行内原话：${rowText.replaceAll('\n', ' | ').slice(0, 240)}`)
     }
-    if (live) {
-      notes.push(`S4b：浮窗内动作可用（容器内同名行 ${String(rowsInPane)} 份；第 ${String(rowsInPane)} 份生效）——BUG-023 若已修，删掉本档的例外并把断言恢复成硬判`)
-      return
-    }
-    notes.push(`S4b **已知缺陷 BUG-023**（_backlog/bugs/BUG-023-cultivation-float-actions-dead.md）：`
-      + `浮出后容器内同名行 ${String(rowsInPane)} 份、逐份 force 点击均不生效（停靠态正常）；只记现场不判红，修好后本档自动转硬判`)
+    notes.push(`S4b：浮窗内动作正常（浮出前已有浮窗 ${String(panesBefore)} 个）`)
   })
 
   // ── S5 跨角色流向（CEO 侧可见性）─────────────────────────────────────────────
@@ -321,6 +355,71 @@ try {
     if (!recordTextOf(target).includes('status: adopted')) throw new Error('Enter 没触发采纳')
   })
 
+  // ── S9 时间感：真实形状的时间戳 id ⇒ 行内必须说得出"什么时候提的"（此前面板完全没有时间信息）──
+  await check('S9 时间感：真实时间戳 id 的记录说得出"什么时候提的"', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    // 真实记录 id = <YYYYMMDD>-<HHMMSS>-<4位随机>（host `newRecordId` 同口径）——时间戳一直在文件名里。
+    const clock = new Date()
+    const pad = (n) => String(n).padStart(2, '0')
+    const datedId = `${String(clock.getFullYear())}${pad(clock.getMonth() + 1)}${pad(clock.getDate())}-${pad(clock.getHours())}${pad(clock.getMinutes())}${pad(clock.getSeconds())}-ux9a`
+    seedRecord(datedId, { targetRole: role, expectation: 'UX场景：时间感（真实时间戳 id）', body: '做法：看面板有没有时间信息。' })
+    seeded.push(datedId)
+    await wake()
+    const datedRow = page.getByRole('listitem', { name: `待处理 ${datedId}` })
+    await datedRow.waitFor({ timeout: 20_000 })
+    await datedRow.scrollIntoViewIfNeeded()
+    const rowText = (await datedRow.innerText()).replaceAll('\n', ' ')
+    await shot(page, 'S9-time-perception')
+    if (!/(刚刚|\d+ 分钟前|\d+ 小时前|昨天 \d{2}:\d{2}|\d{2}-\d{2} \d{2}:\d{2})/.test(rowText)) {
+      throw new Error(`行内没有时间信息（人分不清谁新谁旧）：${rowText.slice(0, 200)}`)
+    }
+    notes.push(`S9：时间标签已上屏（${rowText.slice(0, 80)}）`)
+  })
+
+  // ── S10 并发/陈旧：另一端（直接改记录文件 = 另一个窗口/驱动处理过）之后，本端陈旧副本再动手 ──
+  await check('S10 并发/陈旧：另一端处理过之后，本端陈旧副本再点采纳要被 host 拒并说清', async () => {
+    const target = `${P}-bulk-3`
+    const row = rowOf(target)
+    await row.waitFor({ timeout: 20_000 })
+    // "另一端"处理：直接把记录翻 rejected（等价于另一个窗口/驱动先动手）
+    const text = recordTextOf(target).replace('status: open', 'status: rejected\nreason: 另一端先拒绝')
+    writeFileSync(join(RECORDS, `${target}.md`), text)
+    // 本端**还没刷新**（30s 轮询 + focus 才刷）⇒ 行仍是陈旧副本上的「采纳」，点它
+    await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
+    const deadline = Date.now() + 15_000
+    let rowText = ''
+    while (Date.now() < deadline) {
+      rowText = await row.innerText().catch(() => '')
+      if (/已处理过|已拒绝|不重复/.test(rowText)) break
+      await sleep(400)
+    }
+    await shot(page, 'S10-stale-after-other-side')
+    if (!/已处理过|已拒绝|不重复/.test(rowText)) {
+      throw new Error(`陈旧副本动手后没给出宿主原话（人不知道发生了什么）：${rowText.replaceAll('\n', ' | ').slice(0, 200)}`)
+    }
+    notes.push(`S10：陈旧副本再采纳被 host 拒且行内说清（原话片段：${rowText.replaceAll('\n', ' ').slice(0, 60)}…）`)
+  })
+
+  // ── S11 极端文案：超长期望句 + emoji，看行怎么排（不许把按钮挤出屏）──────────────────
+  await check('S11 极端文案：超长期望句 + emoji 不挤坏排版', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const longExpectation = `UX场景：${'很长的期望句'.repeat(12)}🙂🚀✅`
+    const id = `${P}-longexpect`
+    seedRecord(id, { targetRole: role, expectation: longExpectation, body: '做法：极端文案。' })
+    seeded.push(id)
+    await wake()
+    const row = rowOf(id)
+    await row.waitFor({ timeout: 20_000 })
+    await row.scrollIntoViewIfNeeded()
+    const btn = row.getByRole('button', { name: COPY.adopt, exact: true })
+    const box = await btn.boundingBox()
+    const rowBox = await row.boundingBox()
+    await shot(page, 'S11-long-expectation')
+    if (box === null || rowBox === null) throw new Error('量不到行/按钮几何')
+    if (box.x + box.width > rowBox.x + rowBox.width + 1) throw new Error('按钮被超长文案挤出行的右边界')
+    notes.push(`S11 观察：超长期望句（约 ${String(longExpectation.length)} 字 + emoji）行高 ${String(Math.round(rowBox.height))}px，按钮仍在行内（x+w=${String(Math.round(box.x + box.width))} ≤ ${String(Math.round(rowBox.x + rowBox.width))}）`)
+  })
+
   // ── S7 无角色会话（观察档，最后跑）：把预设切成非公司角色，看面板怎么说 ────────────────
   await check('S7 非公司 preset（PTC/Standard）⇒ 当未选角色：说清怎么进、不出死按钮、不猜身份', async () => {
     const chip = page.getByRole('button').filter({ hasText: /梦之队 (CEO|CFO|COO|VP-Eng|VP-Sales)|Standard/ })
@@ -358,6 +457,7 @@ try {
     if (!/我的分身：CEO/.test(text)) throw new Error(`还原失败：${text.replaceAll('\n', ' | ').slice(0, 160)}`)
   })
 
+  await dockFloats(page)   // 收尾还原（谁浮出谁收回）
   if (loaderErrors.length > 0) throw new Error(`loader 错误：${loaderErrors.slice(0, 2).join(' | ')}`)
   mkdirSync(OUT_DIR, { recursive: true })
 } catch (error) {
@@ -376,6 +476,13 @@ if (role !== null) {
   try { require('node:fs').rmdirSync(join(home, 'profiles', 'web', 'company-cultivation', role)) } catch { /* 非空则留 */ }
 }
 if (existsSync(RECORDS)) for (const name of readdirSync(RECORDS)) if (name.startsWith(`uxsc-${STAMP}-`)) rmSync(join(RECORDS, name), { force: true })
+// 方法层里本轮的残留也清（唯一 id 下不会有别人的东西）
+for (const roleDir of [role, 'ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']) {
+  if (roleDir === null) continue
+  const base = join(home, 'profiles', 'web', 'company-cultivation', roleDir)
+  if (!existsSync(base)) continue
+  for (const name of readdirSync(base)) if (name.includes(`uxsc-${STAMP}`)) rmSync(join(base, name), { recursive: true, force: true })
+}
 
 console.log('\n观察记录（口径：机制/文案，不含真人困惑度）：')
 for (const line of notes) console.log(`  · ${line}`)

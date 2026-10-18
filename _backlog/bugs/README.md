@@ -10,9 +10,8 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-023](BUG-023-cultivation-float-actions-dead.md) | 培养面板浮出成浮窗后行内动作静默失效（浮窗容器内同一行两份副本、点哪份都不生效；停靠态正常） | P2 |
 
-BUG-001..022 已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**无活跃缺陷卡**；BUG-001..022 已修迁、BUG-023 误报已结 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

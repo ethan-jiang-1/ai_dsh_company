@@ -21,7 +21,9 @@ import { useState } from 'react'
 import {
   CULTIVATION_ROLES,
   recordInbox,
+  recordStampOf,
   roleLabel,
+  timeLabel,
   type CultivationRecord,
   type CultivationRow,
   type FeedbackItem,
@@ -100,6 +102,13 @@ export function CultivationBoard(props: CultivationBoardProps) {
   const [highlightId, setHighlightId] = useState<string | null>(null)
   /** 哪些记录的长正文被展开（默认折叠前 {@link BODY_PREVIEW_LINES} 行）。 */
   const [expandedBodies, setExpandedBodies] = useState<Readonly<Record<string, boolean>>>({})
+  /** 时间标签的锚点：挂载时取一次（轮询重渲染不跳动；跨小时误差可接受，30s 轮询会带新 now）。 */
+  const now = Date.now()
+  /** 记录的时间标签（id 形状不符给 null——不猜）。 */
+  const stampOf = (id: string): string | null => {
+    const at = recordStampOf(id)
+    return at === null ? null : timeLabel(at, now)
+  }
 
   const run = async (key: string, line: string, after?: () => void): Promise<void> => {
     if (actions === undefined) return
@@ -164,7 +173,10 @@ export function CultivationBoard(props: CultivationBoardProps) {
                       </span>
                       {/* 首句只在正文**没显示**时当摘要用；正文在下面就地展开时不再重复（走查抓到的重复行）。 */}
                       {record.body === '' && <span className="wk-row-task">{record.title}</span>}
-                      {record.source !== '（会话内提交）' && <span className="wk-meta">出处：{record.source}</span>}
+                      <span className="wk-meta">
+                        {stampOf(record.id) === null ? '' : `${String(stampOf(record.id))} 提出`}
+                        {record.source !== '（会话内提交）' ? `${stampOf(record.id) === null ? '' : ' · '}出处：${record.source}` : ''}
+                      </span>
                       {/* 判断要有材料（S4）：正文就地可见；但**长正文默认只展前几行**（场景轮实测 60 行撑出
                           1156px 行高，把后面 12 条待办顶到看不见的地方）⇒ 给明确的「展开全文（共 N 行）」。 */}
                       {record.body !== '' && (() => {
@@ -293,6 +305,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
                       {record.expectation}
                       {revoked ? '——方法已删除，新会话不再加载。' : '——新开的本角色会话会加载它；运行中的会话不受影响。'}
                     </span>
+                    {stampOf(record.id) !== null && <span className="wk-meta">{`${String(stampOf(record.id))} 提出`}</span>}
                     {!revoked && actions !== undefined && (
                       <div className="wk-cultivation-actions">
                         <Button
