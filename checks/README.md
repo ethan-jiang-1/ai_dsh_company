@@ -54,6 +54,7 @@
 | [probe-smoke.mjs](smoke/probe-smoke.mjs) | 角色连通、persona 入 prompt；内容档检查身份、知识与产出 |
 | [entry-probe-smoke.mjs](smoke/entry-probe-smoke.mjs) | 维护者入口链的路由、证据引用与 coding 基线 |
 | [budget-signoff-probe.mjs](../probes/session-context/budget-signoff-probe.mjs) | 文件预算会签与工具审批线的正反场景 |
+| [ask-user-timed-probe.mjs](../probes/session-context/ask-user-timed-probe.mjs) | 问询能自行收口（真模型）：定时窗口→pending→turn 收口→RPC 可答→答案回会话；`--unbounded` 档验驱动停点判定（模型传 `-1` 时 0s 报「需人参与」） |
 | [cultivation-method-layer-probe.mjs](../probes/session-context/cultivation-method-layer-probe.mjs) | 培养方法层机制六判据：目录发现/角色隔离/缺目录容忍/命令族 wiring/采纳落盘/跨会话生效（keyless 真 boot） |
 | [cultivation-gui-probe.mjs](../probes/browser-visual/cultivation-gui-probe.mjs) | 培养 GUI 行动面判据：真浏览器点「采纳」→ 记录翻 adopted + 方法落方法层 + 会话日志 command/run·done（source=user）/ 跨角色被 host 拒 / 创作表单提交落记录 / 零挂载失败（keyless，出视觉夹具） |
 | [human-exits-probe.mjs](../probes/session-context/human-exits-probe.mjs) | 阻塞拍板的人话首段三件套与 `ask_user_question` 认证档 |
