@@ -1,5 +1,5 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-10-17
 ---
@@ -7,7 +7,10 @@ opened: 2026-10-17
 # BUG-021：`ask_user_question` 的脚本化回答通道缺失——RPC 驱动会永久挂在问询上
 
 > **二轮深挖结论（2026-10-17）**：应答的 RPC 通道**是存在的**（`userQuestions/answer`），但它**只匹配 `continued` 态**的问询，而 `open` 态只能由前台 UI 认领/应答 ⇒ **在没有可脚本化 UI 的环境里，问询永远停在 `open`**。详见「深挖」节。
-> 严重级别：P2（次要——不损坏数据、不误导判据，但**让「RPC 驱动的真会话」在遇到问询时无法自行收口**，只能靠人在 UI 里点）｜发现：2026-10-17｜状态：调查中
+> 严重级别：P2（次要——不损坏数据、不误导判据，但**让「RPC 驱动的真会话」在遇到问询时无法自行收口**，只能靠人在 UI 里点）｜发现：2026-10-17｜状态：修复就绪
+>
+> **授权（2026-10-18）**：本修复触碰 **company-pack 公开行为**（改 preset 行 ⇒ 改角色行为），按章程不自授权、需用户明确指示——
+> 用户令：「只剩 BUG-021…按我们的流程落地吧」= 该指示。修法选定见下「修复就绪（2026-10-18）」节。
 
 ## 症状（真现场）
 
@@ -101,6 +104,37 @@ return Promise.reject('no channel accepts an answer yet')`）⇒ **RPC 通道的
 #      -d '{"type":"client-request","rpcId":"p4","method":"session/prompt","payload":{"args":{"request":{"requestId":"r-4","sessionId":"<sid>","mode":"queue","content":[{"type":"text","text":"回答你的问询：选第 1 项"}]}}}}'
 # ④ 观察：会话日志不再增长；session/list 仍 running:true；turn/end 不出现
 ```
+
+## 修复就绪（2026-10-18）：用 timed 形态解掉「永久 open」，不动 vendor
+
+**根因收敛到一行配置**：`tool-ask-user` 默认 `mode: 'legacy'`（无限期前台阻塞），而 vendor 同包提供
+**`mode: 'timed'`** 形态——前台窗口有界，超时后工具返回 `pending` 结果、问询由 projection 转
+**`continued`**（`user-question` 投影注释原文：*"answerable as `continued` in exactly two cases: the tool
+returned the pending payload, or …"*），而 **`userQuestions/answer` 恰好只吃 `continued`**
+⇒ **RPC 应答通道在该形态下是通的**，本卡「深挖」节卡住的那一段正是被 `legacy` 形态挡住的。
+前台 UI 不受损：客户端对 `continued` 有现成卡片（`wait.continued`＝「已继续工作，仍可回答」），迟到的答案以新 turn 进入。
+
+**修法（选定 A′，等价于原推荐 A 但不需要改 vendor 语义）**：
+
+1. 五角色 preset 的 `tool-ask-user` 行加 `config: { mode: timed, timeout: 120 }`——
+   与 vendor 默认值一致但**显式钉住**（上游改默认不再静默漂进本仓；本仓 agent-team 行同款纪律）；
+   模型仍可在单次调用里传 `timeout` 覆盖。
+2. `docs/guides/web-rpc.md` 改成准确口径：不是「回答不走 RPC」，而是「legacy 形态下前台窗口无界 ⇒ RPC 答不了；
+   本包钉 timed ⇒ 窗口过后 `continued`，`userQuestions/answer`（`agentId`=SessionId、`callId`、按 `question.id` 各答一次）可用」，
+   并给驱动配方。
+3. 回放/金样的工具 schema 快照按**有意变更**刷新（legacy→timed 是模型可见面），同 diff 说明。
+
+**不做**：改 vendor（铁律）；`--answer-default` 之类替用户拍板（本卡 D 项，仍不建议）；深链路由（B 项，独立成本，另议）。
+
+## 已修判定
+
+- [ ] 五角色 preset 的 `tool-ask-user` 行带 `mode: timed` + 显式 `timeout`；`pnpm test tests/presets` 有断言（先红后绿）。
+- [ ] 组合自检可见：`source run/env.sh && pnpm dsh --profile web --dump-config` 里该行 config 在场。
+- [ ] 真挂载：`node checks/smoke/preset-smoke.mjs` 五角色 ALL PASS（timed schema 与工具行组合无误）。
+- [ ] 回放 lane 的工具 schema 快照按有意变更刷新，且 diff 只含 ask_user_question 形态变化。
+- [ ] `docs/guides/web-rpc.md` 口径改正 + 驱动配方（窗口 → `continued` → `userQuestions/answer`）。
+- [ ] 真模型行为（本机**无 key ⇒ 显式缺口**，配方留在卡上）：一条会触发问询的动议 ⇒ 窗口过后不永久 `running`、
+      `turn/end` 出现；再用 `userQuestions/answer` 作答 ⇒ 答案以新 turn 进入会话。
 
 ## 修复关联
 
