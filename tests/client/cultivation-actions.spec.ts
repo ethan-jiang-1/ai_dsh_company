@@ -140,6 +140,18 @@ describe('结果折算：host 原话必须到人眼前，命令面缺席要明�
     })
   })
 
+  // 负例留证 2026-10-18：BUG-024——修前动作面没有超时，桩 `execute: () => new Promise(() => {})`（不回话）
+  //   会让本用例**挂住直到 vitest 超时**（实测 30s 红）；补 `Promise.race` 截止边后绿。
+  //   注意：只 `controller.abort()` 不够——桩无视 signal 照样挂住（这也是真机那条路径的写照）。
+  it('命令面**不回话**：超时即取消并告人（不许无限「处理中…」——BUG-024 的真根因）', async () => {
+    const never = {
+      execute: () => new Promise(() => {}),
+    } as unknown as CommandsRemoteFace
+    const outcome = await makeCultivationActions(never, SESSION, { timeoutMs: 30 }).run('/cultivation adopt r-1')
+    expect(outcome.ok).toBe(false)
+    expect(outcome.text).toBe(CULTIVATION_COPY.timedOut(0))
+  })
+
   it('动作面缺席（某组合没挂命令远程面）：不装作成功，明说改用命令行', async () => {
     await expect(actionsOf(undefined).run('/cultivation adopt r-1')).resolves.toEqual({
       ok: false,

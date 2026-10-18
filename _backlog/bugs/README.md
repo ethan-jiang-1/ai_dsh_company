@@ -10,9 +10,8 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-024](BUG-024-cultivation-row-loses-action-after-failure.md) | 命令面失败后该行的「采纳」按钮消失（疑似 pending 卡死 H1 / 行降级 H2）——失败后连重试入口都没了 | P2 |
 
-BUG-001..022 已修迁、BUG-023 误报已结 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**无活跃缺陷卡**；BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 已修 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

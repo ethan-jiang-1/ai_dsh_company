@@ -64,6 +64,10 @@ export const CULTIVATION_COPY = {
   remoteFailed: (code: string, message: string): string => `命令面报错（${code}）：${message}`,
   unreachable: (reason: string): string => `命令面不可达：${reason}`,
   done: '已完成。',
+  /** 动作面契约上永不抛；真抛了也得说清楚（BUG-024：抛错曾让按钮永久停在「处理中…」）。 */
+  unexpected: (reason: string): string => `面板内部出错（已收回按钮，可重试）：${reason}`,
+  /** 命令面**不回话**（断连时可能既不 resolve 也不 reject——实测过一次）：不能无限等，必须能自己收口。 */
+  timedOut: (seconds: number): string => `命令面 ${String(seconds)} 秒没回话（可能断连）——已收回按钮，可重试。`,
 } as const
 
 /** 人写文本的校验问题（字段 + 给用户看的一句话）。 */
@@ -98,6 +102,9 @@ export interface CommandsRemoteFace {
     | { readonly ok: false, readonly error: { readonly code: string, readonly message: string } }
   >
 }
+
+/** 面板等命令面的上限（超过即取消并告人；断连时不设上限 = 按钮永久「处理中…」）。 */
+export const DEFAULT_ACTION_TIMEOUT_MS = 20_000
 
 /** 一次动作的结果：`ok` 只表示 host 判成功；`text` 一律给可读句子（成功回执或失败原因）。 */
 export interface ActionOutcome {
@@ -177,7 +184,7 @@ export function suggestLine(targetRole: string, expectation: string, body: strin
 }
 
 /** 抛出来的东西折成一句可读原因（不信任 toString：照 vendor `renderThrown` 的手法）。 */
-function renderThrown(value: unknown): string {
+export function renderThrown(value: unknown): string {
   try {
     return String(value)
   } catch {
@@ -191,15 +198,38 @@ function renderThrown(value: unknown): string {
  * @param sessionId - 命令作用会话（= 面板所在会话；角色闸在 host）。
  * @returns 动作面（`run` 永不抛）。
  */
-export function makeCultivationActions(face: CommandsRemoteFace | undefined, sessionId: SessionId): CultivationActions {
+export function makeCultivationActions(
+  face: CommandsRemoteFace | undefined,
+  sessionId: SessionId,
+  options: { readonly timeoutMs?: number } = {},
+): CultivationActions {
+  const timeoutMs = options.timeoutMs ?? DEFAULT_ACTION_TIMEOUT_MS
   return {
     async run(line: string): Promise<ActionOutcome> {
       if (face === undefined) return { ok: false, text: CULTIVATION_COPY.unavailable }
       let result: Awaited<ReturnType<CommandsRemoteFace['execute']>>
+      // 断连时命令面可能**既不 resolve 也不 reject**（实测）⇒ 超时即取消：面板永远能自己收口。
+      const controller = new AbortController()
+      let timer: ReturnType<typeof setTimeout> | undefined
+      // ⚠ 不能只 abort 就指望对方 reject：实测**命令面可以既不 settle 也不理 signal**。
+      //   所以自己抢一个 race 的拒绝边（abort 只是尽力而为的取消）。
+      const deadline = new Promise<never>((_resolve, reject) => {
+        timer = setTimeout(() => {
+          controller.abort()
+          reject(new Error('command face did not answer before the panel deadline'))
+        }, timeoutMs)
+      })
       try {
-        result = await face.execute(sessionId, line, [])
+        result = await Promise.race([face.execute(sessionId, line, [], controller.signal), deadline])
       } catch (error) {
-        return { ok: false, text: CULTIVATION_COPY.unreachable(renderThrown(error)) }
+        return {
+          ok: false,
+          text: controller.signal.aborted
+            ? CULTIVATION_COPY.timedOut(Math.round(timeoutMs / 1000))
+            : CULTIVATION_COPY.unreachable(renderThrown(error)),
+        }
+      } finally {
+        if (timer !== undefined) clearTimeout(timer)
       }
       if (!result.ok) return { ok: false, text: CULTIVATION_COPY.remoteFailed(result.error.code, result.error.message) }
       if (result.value === undefined) return { ok: false, text: CULTIVATION_COPY.unmatched }

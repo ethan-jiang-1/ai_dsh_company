@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-10-18
 ---
 
 # BUG-024：命令面失败后，那一行的「采纳」按钮消失（疑似 pending 卡死或行降级）
 
-> 立卡：2026-10-18 ｜ 状态：调查中 ｜ 发现：探索轴②（`probes/browser-visual/cultivation-ux-scenarios.mjs` S12 故障注入）
+> 立卡：2026-10-18 ｜ 状态：已修 ｜ 发现：探索轴②（`probes/browser-visual/cultivation-ux-scenarios.mjs` S12 故障注入）
 > 严重级别：P2（不损坏数据；但"失败之后连重试的入口都没了"= 人只能刷新页面，且看不出为什么）
 
 ## 症状
@@ -33,8 +33,24 @@ source run/env.sh && node probes/browser-visual/cultivation-ux-scenarios.mjs --s
 # S12；截图 runtime/human-exits-evidence/ux-scenarios/S12-command-face-down.png
 ```
 
-## 已修判定（待写：定位到 H1/H2 之后补）
+## 结论（2026-10-18 当日修）：**H1 成立**——`run()` 的 pending 清理不在 `finally`
 
-- [ ] S12 恢复硬判并稳定 ALL PASS（连跑两轮不复现"按钮消失"）；
-- [ ] 失败路径明确：要么按钮回到可用态（可重试），要么行内明说不可用原因；
-- [ ] 若 H1 成立：`run()` 的 pending 清理放进 `finally`（并补一条"命令面抛异常时按钮回到可用"的交互档断言）。
+读码坐实（`CultivationBoard.tsx` 的 `run()` 原文）：
+
+```ts
+setPendingId(key)
+const result = await actions.run(line)   // ← 这里抛错的话…
+setPendingId(null)                       // ← …这行永远不执行 ⇒ 按钮永久 disabled + 文案「处理中…」
+```
+
+`makeCultivationActions.run` 契约上"永不抛"，但**连接层在断连/竞态下确实可能让 await 抛**（S12 的路由 abort 复现）
+⇒ 按钮永久停在「处理中…」：**人连重试入口都没有**。间歇性也解释得通：只有走到抛错那条路径才复现。
+
+**修**：`run()` 改成 `try { … } catch { 折成"面板内部出错…可重试"这一条显式结果 } finally { setPendingId(null) }`；
+新增文案 `CULTIVATION_COPY.unexpected(reason)`（单一事实）+ 复用 `renderThrown`。
+
+## 已修判定
+
+- [x] S12 恢复硬判（去掉"已知缺陷档"）：**两轮连跑均 PASS**（第一轮硬判前先跑过一次绿、硬判后复跑绿），不再复现"按钮消失"。
+- [x] 失败路径明确：抛错折成「面板内部出错（已收回按钮，可重试）：boom」，行内可见、按钮回到可用。
+- [x] `finally` 收 pending + 交互档断言：「抛错 ⇒ pending 收回、按钮可再点、行内说清原因」（点第二次必须真的再发一次命令）。

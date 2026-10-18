@@ -251,6 +251,28 @@ describe('创作面：不看说明也能提交一条（S5，判据 ①/G1）', (
   })
 })
 
+// 负例留证 2026-10-18：BUG-024——修前 `run()` 的 `setPendingId(null)` 在 await 之后、无 finally，
+//   抛错路径下按钮永久 disabled +「处理中…」⇒ 本用例红（找不到可点的「采纳」/文案里没有"可重试"）；
+//   改成 try/catch/finally + 显式「面板内部出错…可重试」后绿。还原配方 = 删掉 run() 的 try/finally 包装。
+describe('BUG-024：动作面抛错时按钮必须回到可用（不许永久停在「处理中…」）', () => {
+  it('抛错 ⇒ pending 收回、按钮可再点、行内说清原因', async () => {
+    let calls = 0
+    const actions: CultivationActions = {
+      run: async () => { calls++; throw new Error('boom') },
+    }
+    const { container } = mount({ records: [record()], actions })
+    await click(button(container, CULTIVATION_COPY.adopt)!)
+    const text = container.textContent ?? ''
+    expect(text, '抛错要说明（面板内部出错…可重试）').toContain('可重试')
+    expect(text, '不该把内部错误当成成功').not.toContain('已采纳 r-1')
+    const again = button(container, CULTIVATION_COPY.adopt)
+    expect(again, '按钮必须回到可用（不是永久「处理中…」）').not.toBeNull()
+    expect(again!.disabled, '按钮不该还禁用着').toBe(false)
+    await click(again!)
+    expect(calls, '再点一次要真的再发').toBe(2)
+  })
+})
+
 describe('走查抓到的四处 UX 缺陷（2026-10-18，图为证）', () => {
   it('正文在下面就地展开时，不再重复首句（同一句话出现两次 = 噪音）', () => {
     const { container } = mount({ records: [record({ body: '做法：先列未决清单，按 owner 分行。' } as Partial<CultivationRecord>)] })

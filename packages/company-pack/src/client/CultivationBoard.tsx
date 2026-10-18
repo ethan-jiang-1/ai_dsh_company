@@ -32,6 +32,7 @@ import {
   CULTIVATION_COPY,
   adoptLine,
   rejectLine,
+  renderThrown,
   revokeLine,
   verifyLine,
   type ActionOutcome,
@@ -114,8 +115,16 @@ export function CultivationBoard(props: CultivationBoardProps) {
     if (actions === undefined) return
     setPendingId(key)
     setReasonProblem(null)
-    const result = await actions.run(line)
-    setPendingId(null)
+    let result: ActionOutcome
+    try {
+      result = await actions.run(line)
+    } catch (error) {
+      // 契约上 `run` 永不抛；真抛了**也必须**把 pending 收回来——否则按钮永久停在「处理中…」，
+      // 人连重试入口都没有（BUG-024：间歇复现的正是这条路径）。
+      result = { ok: false, text: CULTIVATION_COPY.unexpected(renderThrown(error)) }
+    } finally {
+      setPendingId(null)
+    }
     setOutcomes(previous => ({ ...previous, [key]: result }))
     if (result.ok) {
       after?.()

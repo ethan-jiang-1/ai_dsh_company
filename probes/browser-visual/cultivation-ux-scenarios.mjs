@@ -19,7 +19,8 @@
 //   S9 时间感 → 每条记录说得出"什么时候提的"（id 里带时间戳；此前面板完全没有时间信息）
 //   S10 并发/陈旧 → 另一端先处理后，本端收件箱同步；陈旧副本再动手被 host 状态守卫拒
 //   S11 极端文案 → 超长期望句 + emoji 不挤坏排版（按钮仍在行内）
-//   S12 错误恢复 → 命令面被打断时行内说"不可达"且行仍可用；解除注入后重试即成功
+//   S12 错误恢复 → 命令面被打断时行内说"不可达"且**按钮回到可用**；解除注入后重试即成功
+//   S13 多入口并存 → 侧栏 + 公司页第四子页同开：一端处理完，另一处要么同步、要么被 host 明确拒绝（不许静默）
 //   （空盘/不可达首启 = keyless 档钉住两种文案：records:null → 尚未读到/不算 0 条；records:[] → 没有给我的建议或纠正）
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
@@ -78,6 +79,28 @@ function seedRecord(id, { status = 'open', targetRole, expectation, body, method
 }
 const recordTextOf = (id) => existsSync(join(RECORDS, `${id}.md`)) ? readFileSync(join(RECORDS, `${id}.md`), 'utf8') : ''
 const seeded = []
+
+/**
+ * 开右栏 + 点「培养」页签（带重试：菜单遮罩/懒渲染/刚切过会话都可能让首次不成立）。
+ * S7/S8 新建会话后要重开面板，故抽成助手。
+ * @param page - Playwright 页面。
+ */
+async function openPanel(page) {
+  await sleep(200)
+  const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
+  if (await opener.count() > 0) { await opener.first().click().catch(() => {}); await sleep(900) }
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const entry = page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first()
+    if (await entry.count() > 0) {
+      await entry.click().catch(() => {})
+      await sleep(2000)
+      if (await page.locator('.wk-pane').count() > 0) return
+    }
+    await page.keyboard.press('Escape').catch(() => {})
+    await sleep(800)
+  }
+  throw new Error('打不开培养面板（开右栏 + 点页签三次都没成）')
+}
 
 /**
  * 把已有浮窗收回停靠位（**探针卫生**：浮出状态跨会话恢复——上轮 S4b 浮出的面板会出现在下一轮，
@@ -425,12 +448,10 @@ try {
     }
     await shot(page, 'S12-command-face-down')
     if (!/不可达|命令面/.test(text)) throw new Error(`命令面断时行内没说清：${text.replaceAll('\n', ' | ').slice(0, 200)}`)
-    if (await row.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) {
+    const adoptBack = await row.getByRole('button', { name: COPY.adopt, exact: true }).count()
+    if (adoptBack !== 1) {
       const rowText = await row.innerText().catch(() => '（读不到行文本）')
-      // 已知缺陷 BUG-024：失败后按钮消失/卡死（H1 pending / H2 降级待定位）⇒ 只记现场，不判红
-      notes.push(`S12 **已知缺陷 BUG-024**（_backlog/bugs/BUG-024-cultivation-row-loses-action-after-failure.md）：`
-        + `命令面失败后行内已出"不可达"，但「采纳」按钮不见了。行文本：${rowText.replaceAll('\n', ' | ').slice(0, 160)}`)
-      return
+      throw new Error(`断连后行不可再操作（BUG-024 回归：pending 没收回来）：${rowText.replaceAll('\n', ' | ').slice(0, 200)}`)
     }
     // 恢复：解除注入，再点一次 → 必须真的落盘
     await page.unroute('**/api/commands/execute')
@@ -463,6 +484,11 @@ try {
 
   // ── S7 无角色会话（观察档，最后跑）：把预设切成非公司角色，看面板怎么说 ────────────────
   await check('S7 非公司 preset（PTC/Standard）⇒ 当未选角色：说清怎么进、不出死按钮、不猜身份', async () => {
+    // ⚠ 治漂移源头：preset 是**建会话时定**的，而共享会话上切模式会把它永久改成非公司角色
+    //   （下一轮/下一个探针全崩——2026-10-18 实测）。所以先新建一条**专用会话**再切。
+    await page.getByRole('button').filter({ hasText: 'New Session' }).first().click().catch(() => {})
+    await sleep(3000)
+    await openPanel(page)
     const chip = page.getByRole('button').filter({ hasText: /梦之队 (CEO|CFO|COO|VP-Eng|VP-Sales)|Standard/ })
     if (await chip.count() === 0) throw new Error('找不到 preset chip')
     await chip.last().click()
@@ -494,8 +520,16 @@ try {
     await ceo.click()
     await sleep(2000)
     await wake()
-    const text = await page.locator('body').innerText()
-    if (!/我的分身：CEO/.test(text)) throw new Error(`还原失败：${text.replaceAll('\n', ' | ').slice(0, 160)}`)
+    // 再新建一条会话把干净的（公司角色）留给下一个探针/下一轮——谁改谁还原，别把漂移传下去
+    // 新建一条会话，把干净的（公司角色）留给下一个探针——**不强求重开面板**（S8 的判据是"别把漂移传下去"，
+    // 面板开不开是下一个探针自己的开场事）。
+    await page.getByRole('button').filter({ hasText: 'New Session' }).first().click().catch(() => {})
+    await sleep(3000)
+    const chipAfter = await page.getByRole('button')
+      .filter({ hasText: /梦之队 (CEO|CFO|COO|VP-Eng|VP-Sales)|Standard mode|PTC mode|Minimal mode/ })
+      .last().innerText().catch(() => '')
+    if (!chipAfter.includes('梦之队 CEO')) throw new Error(`还原失败：会话 preset 仍是 ${chipAfter.trim()}`)
+    notes.push(`S8：已还原到「梦之队 CEO」并新建会话交给后续（chip=${chipAfter.trim()}）`)
   })
 
   await dockFloats(page)   // 收尾还原（谁浮出谁收回）

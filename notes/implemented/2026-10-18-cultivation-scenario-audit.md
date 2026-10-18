@@ -86,6 +86,21 @@
 **下一轮第一件事**：preset 切走前**新建专用会话**（或切回后经 UI 新建会话再跑），别在同一条共享会话上切模式；
 并把该档的失败信息补上"面板当前文本"，免得再靠猜。
 
+## 追加三：BUG-024 修透 + 漂移治源 + 多入口轴（同日第三轮）
+
+- **BUG-024 定位到真根因（H3，比 H1 更深）**：`run()` 的 pending 清理不在 `finally` 只是表层；**真根因是命令面可以
+  "既不 resolve 也不 reject"**（路由 abort 那条路）⇒ `await` 永不 settle，`finally` 也等不到，按钮永久「处理中…」、
+  连重试入口都没有。**修法 = 动作面自带超时并自己收口**：`Promise.race(执行, 截止边)` + `AbortController` 尽力取消
+  （实测不能只靠 abort——桩就无视 signal）+ 新文案「命令面 N 秒没回话…已收回按钮，可重试」；`run()` 另加
+  `try/catch/finally` 兜"抛错"那条路。判据：动作面档「永不 settle ⇒ 超时文案」+ 交互档「抛错 ⇒ 按钮回到可用、可再点」
+  + 场景档 S12 **恢复硬判**（去掉已知缺陷档）。
+- **漂移治源**：场景轮 S7 改成**先在新建会话上切非公司 preset**（切共享会话会把它永久改成 ptc，害下一个探针 —— 实测两次），
+  S8 收尾"切回 CEO + 再新建会话"交给后续；改完 `cultivation-gui-probe` **复跑全绿**（此前红）。
+- **多入口轴（S13，新）**：侧栏培养页签 + 公司页第四子页同开同一面板 —— 侧栏采纳后，公司页实例**仍持陈旧副本**，
+  再点被 host **明确拒绝**（行内出原话）⇒ **不静默**；两实例各轮询、无跨实例通知（30s 内可能读到旧态，值得下一轮考虑广播刷新）。
+- **仍留的一处偶发（如实）**：场景档开场偶发"未拿到角色"（新建会话继承**持久化**的默认 preset：前几轮切过 PTC/Standard）。
+  根治 = S0 选完 CEO 后再**新建一条会话**（本轮补丁没命中文件，未落地）——下一轮第一件事。
+
 ## 指针
 
 - 探针：[cultivation-ux-scenarios.mjs](../../probes/browser-visual/cultivation-ux-scenarios.mjs)（`--shots`）｜顺路档：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough.mjs)
