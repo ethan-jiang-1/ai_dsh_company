@@ -51,6 +51,9 @@ export const CULTIVATION_COPY = {
   bodyHint: '写清做法；有出处就带上文件路径或会话坐标——采纳后它会成为这个角色以后的做法。',
   /** 长正文折叠（2026-10-18 场景轮：60 行正文撑出 1156px 的行高，把别的待办全顶到看不见的地方）。 */
   bodyExpand: (lines: number): string => `展开全文（共 ${String(lines)} 行）`,
+  /** 列表折叠（2026-10-19：300 条待办一屏滚 = 能用但不好用）——默认只显示最近若干条。 */
+  listShowAll: (count: number): string => `显示全部（共 ${String(count)} 条）`,
+  listShowLess: '只看最近的',
   bodyCollapse: '收起',
   targetRoleLabel: '给哪个角色',
   // ── 校验提示 ─────────────────────────────────────────────────────────────

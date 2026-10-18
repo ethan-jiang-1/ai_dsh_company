@@ -362,6 +362,31 @@ describe('命令折叠区与按钮一一对应（探索轴 ④：文案与控件
   })
 })
 
+describe('大规模折叠（2026-10-19：300 条一屏滚 = 能用但不好用）', () => {
+  const many = (n: number) => Array.from({ length: n }, (_, i) => record({ id: `20261018-1411${String(i).padStart(2, '0')}-x`, expectation: `第 ${String(i + 1)} 条` }))
+  const rowsIn = (container: HTMLElement) => container.querySelectorAll('[aria-label="待我处理的培养记录"] [role=listitem]').length
+
+  it('待办 12 条 ⇒ 默认只给最近 10 条 + 「显示全部（共 12 条）」', () => {
+    const { container } = mount({ records: many(12) })
+    expect(rowsIn(container)).toBe(10)
+    expect(container.textContent).toContain(CULTIVATION_COPY.listShowAll(12))
+  })
+
+  it('点「显示全部」⇒ 12 条都在 + 换成「只看最近的」；再点收回 10 条', async () => {
+    const { container } = mount({ records: many(12) })
+    await click(button(container, CULTIVATION_COPY.listShowAll(12))!)
+    expect(rowsIn(container)).toBe(12)
+    await click(button(container, CULTIVATION_COPY.listShowLess)!)
+    expect(rowsIn(container)).toBe(10)
+  })
+
+  it('不超过阈值（10 条）⇒ 不给折叠控件', () => {
+    const { container } = mount({ records: many(10) })
+    expect(rowsIn(container)).toBe(10)
+    expect(container.textContent).not.toContain('显示全部')
+  })
+})
+
 describe('时间感（场景轮 S9：此前行内没有任何时间信息）', () => {
   it('真实时间戳 id 的记录显示"提出时间"（人话标签）', () => {
     const { container } = mount({ records: [record({ id: '20261018-141107-ux9a' })] })

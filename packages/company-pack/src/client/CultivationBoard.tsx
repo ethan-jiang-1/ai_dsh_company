@@ -17,7 +17,7 @@
  * 与 `tests/client/cultivation-board-actions.spec.ts`（交互：点了发什么线、失败怎么显示）。
  */
 import { Tag, Button } from '@deepseek-ai/dsh-client-ui-primitives'
-import { useRef, useState } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import {
   CULTIVATION_ROLES,
   recordInbox,
@@ -42,6 +42,9 @@ import { CultivationCompose } from './CultivationCompose.tsx'
 
 /** 正文折叠阈值：超过这么多行就先只展前几行（长正文不该把别的待办顶走）。 */
 const BODY_PREVIEW_LINES = 4
+
+/** 三个列表的默认可见条数（超过就给「显示全部（共 N 条）」）——300 条一屏滚 = 能用但不好用。 */
+const LIST_CAPS = { inbox: 10, mine: 5, adopted: 5 } as const
 
 /** 领域视图 props（三个容器同形喂入；数据加载在各容器）。 */
 export interface CultivationBoardProps {
@@ -101,12 +104,31 @@ export function CultivationBoard(props: CultivationBoardProps) {
   const [revokingSlug, setRevokingSlug] = useState<string | null>(null)
   /** 刚创作提交、待高亮的记录 id。 */
   const [highlightId, setHighlightId] = useState<string | null>(null)
+  /** 哪些列表被展开（默认按 {@link LIST_CAPS} 截断）。 */
+  const [expandedLists, setExpandedLists] = useState<Readonly<Record<string, boolean>>>({})
   /** 哪些记录的长正文被展开（默认折叠前 {@link BODY_PREVIEW_LINES} 行）。 */
   const [expandedBodies, setExpandedBodies] = useState<Readonly<Record<string, boolean>>>({})
   /** 同一行**在飞的**动作 key（双击护栏：`disabled` 要等重渲染，同一 tick 的第二次点击挡不住）。 */
   const inFlight = useRef<string | null>(null)
   /** 时间标签的锚点：挂载时取一次（轮询重渲染不跳动；跨小时误差可接受，30s 轮询会带新 now）。 */
   const now = Date.now()
+  /**
+   * 列表折叠：默认只给最近的 `LIST_CAPS[key]` 条，超出部分用「显示全部（共 N 条）」打开。
+   * 全展开的开关是**每块独立**的（用户可能只想展开已采纳那份）。
+   */
+  const capList = <T,>(key: keyof typeof LIST_CAPS, list: readonly T[]): readonly T[] =>
+    expandedLists[key] === true ? list : list.slice(0, LIST_CAPS[key])
+  /** 折叠控件的渲染（未超阈值就不给）。 */
+  const capControl = (key: keyof typeof LIST_CAPS, total: number): ReactNode =>
+    total <= LIST_CAPS[key]
+      ? null
+      : (
+        <div className="wk-cultivation-actions">
+          <Button size="sm" onClick={() => { setExpandedLists(previous => ({ ...previous, [key]: previous[key] !== true })) }}>
+            {expandedLists[key] === true ? CULTIVATION_COPY.listShowLess : CULTIVATION_COPY.listShowAll(total)}
+          </Button>
+        </div>
+      )
   /** 记录的时间标签（id 形状不符给 null——不猜）。 */
   const stampOf = (id: string): string | null => {
     const at = recordStampOf(id)
@@ -176,8 +198,9 @@ export function CultivationBoard(props: CultivationBoardProps) {
           : inbox.needsDecision.length === 0
             ? <div className="wk-meta">没有给我的建议或纠正。</div>
             : (
+              <>
               <div role="list" aria-label="待我处理的培养记录" className="wk-list wk-cultivation-list">
-                {inbox.needsDecision.map(record => {
+                {capList('inbox', inbox.needsDecision).map(record => {
                   const outcome = outcomeOf(record.id)
                   return (
                     <div key={record.id} role="listitem" className="wk-row" aria-label={`待处理 ${record.id}`}>
@@ -279,6 +302,8 @@ export function CultivationBoard(props: CultivationBoardProps) {
                   )
                 })}
               </div>
+              {capControl('inbox', inbox.needsDecision.length)}
+              </>
             )}
       </div>
 
@@ -316,7 +341,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
           ? <div className="wk-meta">我的分身还没有已采纳的方法。</div>
           : props.records !== null && (
             <div role="list" aria-label="已采纳的方法" className="wk-list wk-cultivation-list">
-              {inbox.adoptedForViewer.map(record => {
+              {capList('adopted', inbox.adoptedForViewer).map(record => {
                 const slug = record.methodSlug ?? record.id
                 const outcome = outcomeOf(record.id)
                 const revoked = record.revokedAt !== undefined
@@ -379,6 +404,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
               })}
             </div>
           )}
+            {capControl('adopted', inbox.adoptedForViewer.length)}
       </div>
 
       <div className="wk-activity-block" aria-label="journal 素材">
@@ -439,7 +465,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
         <ul className="wk-activity">
           <li>要它改做法：点上面「{CULTIVATION_COPY.composeCorrect}」，写清期望与证据；它进「需要我处理」，你确认后点「{CULTIVATION_COPY.adopt}」。</li>
           <li>要别的角色改：点「{CULTIVATION_COPY.composeSuggest}」选角色——由对方本人在它的会话里采纳，你这边只留回执。</li>
-          <li>采纳 = 把做法写进那个角色的方法层：**新开的**该角色会话才带着它开工，当前这段对话不受影响。</li>
+          <li>采纳 = 把做法写进那个角色的方法层：新开的该角色会话带着它开工；已经在跑的会话也会随技能目录刷新看到它。当前这段对话不受影响。</li>
           <li>同类任务上见效后回填「{CULTIVATION_COPY.verifyPass}」；不灵了「{CULTIVATION_COPY.revoke}」撤回（会删掉方法，记录也不能再被采纳）。</li>
           <li>分身自己也能提案（工具里叫 cultivation_propose）；采纳、拒绝、撤回、验证只能由人在这里点。</li>
           <li>CEO 委派出去的分身继承 CEO 组合——职能角色的方法不会进委派 child，要用职能方法就开那个角色的会话。</li>

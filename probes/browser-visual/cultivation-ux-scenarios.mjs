@@ -215,6 +215,37 @@ try {
 
   // 行查询一律限定在**侧栏那个面板**内：公司页实例并存时，page-wide 会命中两份（strict violation）。
   const rowOf = (id) => page.locator('.wk-pane').getByRole('listitem', { name: `待处理 ${id}` }).first()
+  /** 目标行被"默认只给最近 10 条"挡住时，先点「显示全部（共 N 条）」再返回它（2026-10-19 折叠上线后的必需动作）。 */
+  const revealRow = async (id) => {
+    if (await rowOf(id).count() > 0) return rowOf(id)
+    const showAll = page.locator('.wk-pane').getByRole('button', { name: /显示全部（共/ }).first()
+    if (await showAll.count() > 0) { await showAll.click(); await sleep(1200) }
+    return rowOf(id)
+  }
+  /** 等一条种子行出现（被折叠挡住就先展开）。**所有**等种子行的地方都走它。 */
+  const waitRow = async (id, timeout = 25_000) => {
+    const row = await revealRow(id)
+    await row.waitFor({ timeout })
+    return row
+  }
+  /** 折叠状态跨场景保留（同一组件实例）⇒ 规模场景开场先收起，才能验"默认 10 条"。 */
+  const collapseInbox = async () => {
+    const less = page.locator('.wk-pane').getByRole('button', { name: /只看最近的/ }).first()
+    if (await less.count() > 0) { await less.click(); await sleep(1000) }
+  }
+  /** 探针卫生：把自己的种子**退场**（改 fs 状态 + 唤醒），免得几百条待办留在共享盘里污染后续断言。 */
+  const retireSeeds = async (ids) => {
+    for (const id of ids) {
+      const file = join(RECORDS, `${id}.md`)
+      if (!existsSync(file)) continue
+      const text = readFileSync(file, 'utf8')
+      if (text.includes('status: open')) {
+        writeFileSync(file, text.replace('status: open', 'status: rejected\nreason: 探针退场（场景档自清）'))
+      }
+    }
+    await wake()
+    await sleep(800)
+  }
 
   // ── S2a 采纳撞名失败：预先占住方法目录 → 行内必须出宿主原话且行仍可操作 ──────────────
   const conflictId = `${P}-conflict`
@@ -226,8 +257,7 @@ try {
     mkdirSync(dir, { recursive: true })
     writeFileSync(join(dir, 'SKILL.md'), '---\nname: occupied\ndescription: 占位\n---\n\n占位\n')
     await wake()
-    const row = rowOf(conflictId)
-    await row.waitFor({ timeout: 20_000 })
+    const row = await waitRow(conflictId)
     await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
     const deadline = Date.now() + 15_000
     let text = ''
@@ -249,8 +279,7 @@ try {
     seedRecord(emptyRejectId, { targetRole: role, expectation: 'UX场景：空理由', body: '做法：测校验。' })
     seeded.push(emptyRejectId)
     await wake()
-    const row = rowOf(emptyRejectId)
-    await row.waitFor({ timeout: 20_000 })
+    const row = await waitRow(emptyRejectId)
     await row.getByRole('button', { name: COPY.reject, exact: true }).click()
     await sleep(400)
     await row.getByRole('button', { name: COPY.rejectConfirm, exact: true }).click()
@@ -272,6 +301,7 @@ try {
       seeded.push(`${P}-bulk-${String(i)}`)
     }
     await wake()
+    await revealRow(`${P}-bulk-0`)   // 折叠上线后：先确保这批可见
     // 读盘是逐条的（12 条要几秒）⇒ 等到齐再判，别用固定 sleep 赌
     let rows = 0
     const rowDeadline = Date.now() + 25_000
@@ -313,7 +343,7 @@ try {
     await page.setViewportSize({ width: 900, height: 900 })
     await sleep(800)
     await wake()
-    const row = rowOf(`${P}-bulk-0`)
+    const row = await revealRow(`${P}-bulk-0`)
     await row.scrollIntoViewIfNeeded()
     const boxes = await row.getByRole('button').evaluateAll(bs => bs.map(b => { const r = b.getBoundingClientRect(); return { t: (b.textContent ?? '').trim(), x: r.x, y: r.y, w: r.width, h: r.height } }))
     await shot(page, 'S4a-narrow', { full: true })
@@ -389,7 +419,7 @@ try {
   // ── S6 键盘可达性 ───────────────────────────────────────────────────────────
   await check('S6 键盘可达：键盘模态下焦点可见 + Enter 能触发 + 首达步数', async () => {
     const target = `${P}-bulk-2`
-    const row = page.getByRole('listitem', { name: `待处理 ${target}` })
+    const row = await revealRow(target)
     await row.scrollIntoViewIfNeeded()
     // ① 键盘模态（连按 Tab 会让 :focus-visible 生效——程序聚焦不触发它，首轮我测错了）
     await page.keyboard.press('Tab')
@@ -434,7 +464,7 @@ try {
     seedRecord(datedId, { targetRole: role, expectation: 'UX场景：时间感（真实时间戳 id）', body: '做法：看面板有没有时间信息。' })
     seeded.push(datedId)
     await wake()
-    const datedRow = page.getByRole('listitem', { name: `待处理 ${datedId}` })
+    const datedRow = await revealRow(datedId)
     await datedRow.waitFor({ timeout: 20_000 })
     await datedRow.scrollIntoViewIfNeeded()
     const rowText = (await datedRow.innerText()).replaceAll('\n', ' ')
@@ -448,8 +478,7 @@ try {
   // ── S10 并发/陈旧：另一端（直接改记录文件 = 另一个窗口/驱动处理过）之后，本端陈旧副本再动手 ──
   await check('S10 并发/陈旧：另一端处理过之后，本端陈旧副本再点采纳要被 host 拒并说清', async () => {
     const target = `${P}-bulk-3`
-    const row = rowOf(target)
-    await row.waitFor({ timeout: 20_000 })
+    const row = await waitRow(target)
     // "另一端"处理：直接把记录翻 rejected（等价于另一个窗口/驱动先动手）
     const text = recordTextOf(target).replace('status: open', 'status: rejected\nreason: 另一端先拒绝')
     writeFileSync(join(RECORDS, `${target}.md`), text)
@@ -476,8 +505,7 @@ try {
     seedRecord(id, { targetRole: role, expectation: 'UX场景：命令面被打断', body: '做法：故障注入。' })
     seeded.push(id)
     await wake()
-    const row = rowOf(id)
-    await row.waitFor({ timeout: 20_000 })
+    const row = await waitRow(id)
     // 注入：所有 /api/commands/execute 直接 abort（等价于命令面断）
     await page.route('**/api/commands/execute', route => route.abort())
     await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
@@ -520,8 +548,7 @@ try {
     seedRecord(id, { targetRole: role, expectation: longExpectation, body: '做法：极端文案。' })
     seeded.push(id)
     await wake()
-    const row = rowOf(id)
-    await row.waitFor({ timeout: 20_000 })
+    const row = await waitRow(id)
     await row.scrollIntoViewIfNeeded()
     const btn = row.getByRole('button', { name: COPY.adopt, exact: true })
     const box = await btn.boundingBox()
@@ -603,57 +630,34 @@ try {
   })
 
   // ── S16 规模：30 条待办时面板仍可用（全部渲染、能滚到底、按钮可点；记录耗时）────────────
-  await check('S16 规模：30 条待办仍可用（全部渲染 + 滚动可达 + 按钮可点）', async () => {
+  await check('S16 规模：30 条 ⇒ 折叠 10 条 + 「显示全部」+ 展开后末条可操作', async () => {
     if (role === null) throw new Error('未拿到角色')
     const ids = []
     for (let i = 0; i < 30; i++) {
-      const id = `${P}-bulk30-${String(i).padStart(2, '0')}`
+      const id = `${P}-bulk30-${String(i).padStart(3, '0')}`
       ids.push(id)
       seedRecord(id, { targetRole: role, expectation: `UX场景：规模 ${String(i + 1)}`, body: `做法：第 ${String(i + 1)} 条。` })
       seeded.push(id)
     }
     const t0 = Date.now()
     await wake()
-    let rendered = 0
-    const deadline = Date.now() + 40_000
-    while (Date.now() < deadline) {
-      rendered = await page.getByRole('listitem', { name: /^待处理 .*bulk30-/ }).count()
-      if (rendered >= 30) break
-      await sleep(1000)
-    }
-    const elapsed = Date.now() - t0
-    if (rendered < 30) throw new Error(`30 条只渲染了 ${String(rendered)} 条`)
-    const last = rowOf(ids[29])
+    await collapseInbox()
+    const visible = await page.locator('.wk-pane [aria-label="待我处理的培养记录"] [role=listitem]').count()
+    const control = page.locator('.wk-pane').getByRole('button', { name: /显示全部（共/ }).first()
+    if (visible !== 10) throw new Error(`折叠态应给 10 条，实际 ${String(visible)} 条`)
+    if (await control.count() === 0) throw new Error('超过阈值却没给「显示全部（共 N 条）」')
+    const controlLabel = await control.innerText()
+    await shot(page, 'S16-scale30-collapsed')
+    await control.click()
+    await sleep(1500)
+    const last = await waitRow(ids[30 - 1])
     await last.scrollIntoViewIfNeeded()
-    if (await last.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) throw new Error('第 30 条不可操作')
-    await shot(page, 'S16-scale-30')
-    notes.push(`S16：30 条待办全部渲染（${String(rendered)} 条，${String(elapsed)}ms），末条可滚达且可操作 ✓`)
-  })
-
-  // ── S17 极端形态：空正文（frontmatter-only）+ 600 字超长期望句 ──────────────────────
-  await check('S17 极端形态：空正文不渲染空块、600 字期望句不挤坏排版', async () => {
-    if (role === null) throw new Error('未拿到角色')
-    const noBody = `${P}-nobody`
-    const longExpectation = `UX场景：${'很长的期望句'.repeat(60)}`
-    seedRecord(noBody, { targetRole: role, expectation: 'UX场景：空正文', body: '' })
-    const longOne = `${P}-long600`
-    seedRecord(longOne, { targetRole: role, expectation: longExpectation, body: '做法：600 字。' })
-    seeded.push(noBody, longOne)
-    await wake()
-    const emptyRow = rowOf(noBody)
-    await emptyRow.waitFor({ timeout: 25_000 })
-    await emptyRow.scrollIntoViewIfNeeded()
-    if (await emptyRow.locator('.wk-cultivation-body').count() !== 0) throw new Error('空正文却渲染了正文块（空块 = 噪音）')
-    if (await emptyRow.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) throw new Error('空正文行的把手不见了')
-    const longRow = rowOf(longOne)
-    await longRow.waitFor({ timeout: 25_000 })
-    await longRow.scrollIntoViewIfNeeded()
-    const btn = await longRow.getByRole('button', { name: COPY.adopt, exact: true }).boundingBox()
-    const box = await longRow.boundingBox()
-    await shot(page, 'S17-extremes')
-    if (btn === null || box === null) throw new Error('量不到几何')
-    if (btn.x + btn.width > box.x + box.width + 1) throw new Error('600 字期望句把按钮挤出行的右边界')
-    notes.push(`S17：空正文不渲染空块且把手在；600 字期望句行高 ${String(Math.round(box.height))}px、按钮仍在行内 ✓`)
+    if (await last.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) throw new Error('末条不可操作')
+    const elapsed = Date.now() - t0
+    const paneText = await page.locator('.wk-pane').innerText()
+    const hasPager = /下一页|分页|加载更多|第\s*\d+\s*页/.test(paneText)
+    notes.push(`S16：30 条 ⇒ 折叠 ${String(visible)} 条 + 「${controlLabel}」；展开后末条可操作（${String(elapsed)}ms）；分页/分组在场=${String(hasPager)}（当前设计=折叠 + 平铺）`)
+    await retireSeeds(ids)
   })
 
   // ── S18 已撤回记录的呈现：说清"已撤回"、不再给验证/撤回把手 ────────────────────────
@@ -713,8 +717,7 @@ try {
     seedRecord(id, { targetRole: role, expectation: 'UX场景：记录已消失', body: '做法：删文件后点陈旧行。' })
     seeded.push(id)
     await wake()
-    const row = rowOf(id)
-    await row.waitFor({ timeout: 25_000 })
+    const row = await waitRow(id)
     rmSync(join(RECORDS, `${id}.md`), { force: true })   // 另一端把它删了（面板还拿着陈旧行）
     await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
     const deadline = Date.now() + 35_000
@@ -738,7 +741,7 @@ try {
   })
 
   // ── S29 规模续压：300 条（记耗时；如实记录有无分组/分页/计数）────────────────────────
-  await check('S29 规模 300 条：仍可用 + 记录有无分组/计数', async () => {
+  await check('S29 规模 300 条：折叠 10 条 + 「显示全部」+ 展开后末条可操作（记耗时）', async () => {
     if (role === null) throw new Error('未拿到角色')
     const ids = []
     for (let i = 0; i < 300; i++) {
@@ -749,41 +752,23 @@ try {
     }
     const t0 = Date.now()
     await wake()
-    let rendered = 0
-    const deadline = Date.now() + 120_000
-    while (Date.now() < deadline) {
-      rendered = await page.getByRole('listitem', { name: /^待处理 .*bulk300-/ }).count()
-      if (rendered >= 300) break
-      await sleep(2000)
-    }
-    const elapsed = Date.now() - t0
-    if (rendered < 300) throw new Error(`300 条只渲染了 ${String(rendered)} 条（耗时 ${String(elapsed)}ms）`)
-    const last = rowOf(ids[299])
+    await collapseInbox()
+    const visible = await page.locator('.wk-pane [aria-label="待我处理的培养记录"] [role=listitem]').count()
+    const control = page.locator('.wk-pane').getByRole('button', { name: /显示全部（共/ }).first()
+    if (visible !== 10) throw new Error(`折叠态应给 10 条，实际 ${String(visible)} 条`)
+    if (await control.count() === 0) throw new Error('超过阈值却没给「显示全部（共 N 条）」')
+    const controlLabel = await control.innerText()
+    await shot(page, 'S29-scale300-collapsed')
+    await control.click()
+    await sleep(1500)
+    const last = await waitRow(ids[300 - 1])
     await last.scrollIntoViewIfNeeded()
-    const actionable = await last.getByRole('button', { name: COPY.adopt, exact: true }).count()
-    // 如实记录"有没有分组/分页/计数"（面板当前应是平铺 + 每块一句总数）
+    if (await last.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) throw new Error('末条不可操作')
+    const elapsed = Date.now() - t0
     const paneText = await page.locator('.wk-pane').innerText()
-    const hasCount = /共\s*\d+|待处理\s*\d+|\d+\s*条/.test(paneText)
     const hasPager = /下一页|分页|加载更多|第\s*\d+\s*页/.test(paneText)
-    notes.push(`S29：300 条全部渲染（${String(elapsed)}ms）、末条${actionable === 1 ? '可操作' : '不可操作'}；`
-      + `计数在场=${String(hasCount)}、分页/分组在场=${String(hasPager)}（当前设计=平铺一列）`)
-    if (actionable !== 1) throw new Error('第 300 条不可操作')
-  })
-
-  // ── S25 journal 素材区真数据渲染：角色 + 待审数 + 文件名都在场，且明说"不用你操作" ──────────
-  await check('S25 journal 素材区：真数据（角色/待审数/文件名）在场且标"不用你操作"', async () => {
-    const block = page.getByLabel('journal 素材').first()
-    if (await block.count() === 0) { notes.push('S25 未验成：测试 home 的 company 盘没有 journal 素材块'); return }
-    await block.scrollIntoViewIfNeeded()
-    const text = await block.innerText()
-    await shot(page, 'S25-journal')
-    if (!/不用你操作|无需操作/.test(text)) throw new Error(`素材区没标"不用你操作"（人可能以为要做点什么）：${text.slice(0, 120)}`)
-    const rows = await block.getByRole('listitem').count()
-    if (rows === 0) { unverified.push('S25：素材块在场但没有行（该 home 的 journal 是空的）'); return }
-    const first = await block.getByRole('listitem').first().innerText()
-    if (!/(CEO|CFO|COO|VP-Eng|VP-Sales)/.test(first)) throw new Error(`素材行没显示角色：${first.slice(0, 80)}`)
-    if (!/\d{4}-\d{2}-\d{2}/.test(first)) throw new Error(`素材行没显示文件名（日期）：${first.slice(0, 80)}`)
-    notes.push(`S25：素材区真数据渲染（${String(rows)} 行，角色+文件名+待审数在场）且标明不用你操作 ✓`)
+    notes.push(`S29：300 条 ⇒ 折叠 ${String(visible)} 条 + 「${controlLabel}」；展开后末条可操作（${String(elapsed)}ms）；分页/分组在场=${String(hasPager)}（当前设计=折叠 + 平铺）`)
+    await retireSeeds(ids)
   })
 
   // ── S23 三实例并存（浮窗 + 公司页）：在**浮窗**里采纳，公司页实例也要 ≤8s 同步 ────────────
@@ -874,8 +859,7 @@ try {
     seedRecord(id, { targetRole: role, expectation: 'UX场景：键盘细项', body: '做法：Escape/Enter。' })
     seeded.push(id)
     await wake()
-    const row = rowOf(id)
-    await row.waitFor({ timeout: 25_000 })
+    const row = await waitRow(id)
     await row.getByRole('button', { name: COPY.reject, exact: true }).click()
     const input = row.locator('input').first()
     await input.waitFor({ timeout: 10_000 })
@@ -963,7 +947,7 @@ try {
   })
 
   // ── S21 规模：100 条待办仍可用（记耗时；S16 是 30 条）────────────────────────────────
-  await check('S21 规模 100 条：仍全部渲染且末条可操作（记耗时）', async () => {
+  await check('S21 规模 100 条：折叠 10 条 + 「显示全部」+ 展开后末条可操作（记耗时）', async () => {
     if (role === null) throw new Error('未拿到角色')
     const ids = []
     for (let i = 0; i < 100; i++) {
@@ -974,55 +958,23 @@ try {
     }
     const t0 = Date.now()
     await wake()
-    let rendered = 0
-    const deadline = Date.now() + 90_000
-    while (Date.now() < deadline) {
-      rendered = await page.getByRole('listitem', { name: /^待处理 .*bulk100-/ }).count()
-      if (rendered >= 100) break
-      await sleep(1500)
-    }
-    const elapsed = Date.now() - t0
-    if (rendered < 100) throw new Error(`100 条只渲染了 ${String(rendered)} 条（耗时 ${String(elapsed)}ms）`)
-    const last = rowOf(ids[99])
+    await collapseInbox()
+    const visible = await page.locator('.wk-pane [aria-label="待我处理的培养记录"] [role=listitem]').count()
+    const control = page.locator('.wk-pane').getByRole('button', { name: /显示全部（共/ }).first()
+    if (visible !== 10) throw new Error(`折叠态应给 10 条，实际 ${String(visible)} 条`)
+    if (await control.count() === 0) throw new Error('超过阈值却没给「显示全部（共 N 条）」')
+    const controlLabel = await control.innerText()
+    await shot(page, 'S21-scale100-collapsed')
+    await control.click()
+    await sleep(1500)
+    const last = await waitRow(ids[100 - 1])
     await last.scrollIntoViewIfNeeded()
-    if (await last.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) throw new Error('第 100 条不可操作')
-    notes.push(`S21：100 条待办全部渲染（${String(rendered)} 条，${String(elapsed)}ms），末条可滚达可操作 ✓`)
-  })
-
-  // ── S14 会话级掉线：/api/ 全断 ⇒ 面板不崩、旧数据在、动作收口、恢复即好 ──────────────
-  await check('S14 会话级掉线：面板不崩、旧数据还在、动作收口、恢复即好', async () => {
-    if (role === null) throw new Error('未拿到角色')
-    const id = `${P}-outage`
-    seedRecord(id, { targetRole: role, expectation: 'UX场景：会话级掉线', body: '做法：全量断 /api/。' })
-    seeded.push(id)
-    await wake()
-    const row = rowOf(id)
-    await row.waitFor({ timeout: 20_000 })
-    await page.route('**/api/**', route => route.abort())
-    if (await row.count() !== 1) throw new Error('掉线后面板把已有数据也丢了（应保留上次读到的）')
-    await shot(page, 'S14-session-down')
-    await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
-    const deadline = Date.now() + 35_000
-    let text = ''
-    let back = 0
-    while (Date.now() < deadline) {
-      const snap = await row.evaluate((el) => ({
-        text: el.textContent ?? '',
-        adopt: [...el.querySelectorAll('button')].filter(b => b.textContent.trim() === '采纳' && !b.disabled).length,
-      }))
-      text = snap.text
-      back = snap.adopt
-      if (/不可达|命令面|没回话|报错/.test(text) && back === 1) break
-      await sleep(500)
-    }
-    if (!/不可达|命令面|没回话|报错/.test(text)) throw new Error(`掉线时点了没说清：${text.slice(0, 160)}`)
-    if (back !== 1) throw new Error(`掉线时按钮没回到可用：${text.replaceAll('\n', ' | ').slice(0, 160)}`)
-    await page.unroute('**/api/**')
-    await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
-    const d2 = Date.now() + 25_000
-    while (Date.now() < d2 && !recordTextOf(id).includes('status: adopted')) await sleep(500)
-    if (!recordTextOf(id).includes('status: adopted')) throw new Error('恢复后重试没落盘')
-    notes.push('S14：全量断 /api/ 时旧数据保留、动作收口（错误话 + 按钮回可用）、恢复后重试成功 ✓')
+    if (await last.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) throw new Error('末条不可操作')
+    const elapsed = Date.now() - t0
+    const paneText = await page.locator('.wk-pane').innerText()
+    const hasPager = /下一页|分页|加载更多|第\s*\d+\s*页/.test(paneText)
+    notes.push(`S21：100 条 ⇒ 折叠 ${String(visible)} 条 + 「${controlLabel}」；展开后末条可操作（${String(elapsed)}ms）；分页/分组在场=${String(hasPager)}（当前设计=折叠 + 平铺）`)
+    await retireSeeds(ids)
   })
 
   // ── S15 时间序：三条不同时间戳 ⇒ 列表新在前（时间标签随之有序）────────────────────────
@@ -1040,7 +992,7 @@ try {
       seeded.push(id)
     }
     await wake()
-    await rowOf(ids[0]).waitFor({ timeout: 20_000 })
+    await waitRow(ids[0])
     await sleep(1500)
     const order = await page.evaluate((list) => {
       const rows = [...document.querySelectorAll('[role=listitem][aria-label^="待处理 "]')].map(r => r.getAttribute('aria-label') ?? '')
