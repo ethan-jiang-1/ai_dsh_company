@@ -10,9 +10,8 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-021](BUG-021-ask-user-question-no-scripted-answer-path.md) | `ask_user_question` 的脚本化回答通道缺失——RPC 驱动会永久挂在问询上（实测三次 RPC 作答无效、UI 无深链） | P2 |
 
-BUG-001..020 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**无活跃缺陷卡**；BUG-001..021 均已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

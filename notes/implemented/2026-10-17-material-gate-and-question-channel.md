@@ -1,6 +1,6 @@
 # 第四场真动议（2026-10-17）：事实阻塞闸门——「不假装知道」被压到，并撞出问询通道缺陷
 
-状态：implemented（授权 = 用户 2026-10-16「再来一场?…遇到问题自己解决」；缺陷卡 = [BUG-021](../../_backlog/bugs/BUG-021-ask-user-question-no-scripted-answer-path.md)；commit = 见本 Note 同轮）
+状态：implemented（授权 = 用户 2026-10-16「再来一场?…遇到问题自己解决」；缺陷卡 = [BUG-021](../../_backlog/_archive/fixed_bugs/BUG-021-ask-user-question-no-scripted-answer-path.md)；commit = 见本 Note 同轮）
 
 ## 这场押的是哪一格
 
@@ -26,7 +26,7 @@
 2. **UI 深链**：Web 应用**无 `?session=<id>` 之类路由**（`apps/web/src` 无 `URLSearchParams`/hash 消费面）⇒ 打不开指定会话。
 3. **UI 手工点**：会话列表**懒加载**（«Show N more sessions» 逐段展开），本机 **620 个会话**，靠 CDP 点开目标会话再点选项不现实（本轮试 3 轮，标题始终不在可见列表内）。
 
-⇒ 立 [BUG-021](../../_backlog/bugs/BUG-021-ask-user-question-no-scripted-answer-path.md)（P2，`调查中`），推荐修法 **A**（RPC 加显式应答通道，绑定 question id）+ **B**（Web 加深链路由），并把「每个停点都要能回答『脚本化驱动怎么解它』」立为横切口径。**明确不建议**「无人值守时按推荐项自动作答」——那等于让驱动替用户拍板。
+⇒ 立 [BUG-021](../../_backlog/_archive/fixed_bugs/BUG-021-ask-user-question-no-scripted-answer-path.md)（P2，`调查中`），推荐修法 **A**（RPC 加显式应答通道，绑定 question id）+ **B**（Web 加深链路由），并把「每个停点都要能回答『脚本化驱动怎么解它』」立为横切口径。**明确不建议**「无人值守时按推荐项自动作答」——那等于让驱动替用户拍板。
 
 ## 四场累加（同一张表看到底压到了什么）
 

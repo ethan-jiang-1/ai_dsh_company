@@ -22,6 +22,24 @@ function rowPlugins(role: string): string[] {
     .map(m => /^(@[^/]+\/[^/]+)/.exec(m[1] as string)?.[1] ?? (m[1] as string))
 }
 
+/**
+ * 取一行插件在 preset 里的声明块（从 `- id: <rowId>` 到下一个同级 `- id:` 或 EOF）。
+ * 为什么需要它：config 是**行的属性**——用全文 includes 会把别行的 config 误算进来。
+ */
+function rowBlock(role: string, rowId: string): string {
+  const lines = roleYml(role).split('\n')
+  const start = lines.findIndex(line => new RegExp(`^\\s+- id: ${rowId}$`).test(line))
+  if (start === -1) return ''
+  const indent = /^(\s*)/.exec(lines[start] as string)?.[1]?.length ?? 0
+  const out = [lines[start] as string]
+  for (let i = start + 1; i < lines.length; i++) {
+    const line = lines[i] as string
+    if (new RegExp(`^\\s{${String(indent)}}- id: `).test(line)) break
+    out.push(line)
+  }
+  return out.join('\n')
+}
+
 describe('company roster（R1 回归：preset 必须可挂载）', () => {
   it('五个角色各声明一个 dsh-agent-preset 行，且都列进 dsh.bundle.patch 数组（0.1.7 声明模型）', () => {
     const patch = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')).dsh.bundle.patch as string[]
@@ -284,5 +302,28 @@ describe('组队健壮性三层防御（2026-10-12 用户裁定；issue 2026-10-
     expect(handbook, '打回缺三件套形状（为什么不是我 / 缺什么 / 建议谁接）')
       .toMatch(/建议谁接|为什么不是我/)
     expect(handbook, '打回缺不追责句（andon：纠错贡献不是冒犯）').toMatch(/不追责|纠错贡献|不是冒犯/)
+  })
+})
+
+// 负例留证 2026-10-18：BUG-021——五角色 preset 未加 `mode: timed` 时本断言实跑红
+//   （`pnpm exec vitest run tests/presets` → 1 failed / 18 passed，失败文案「…的 ask_user_question 仍是 legacy：
+//   前台窗口无界 ⇒ 脚本化驱动会永久挂在问询上（BUG-021）」）；补配置后复跑绿（19/19）。还原配方 = 删任一行 config。
+describe('BUG-021：问询必须能自行收口（timed 形态）', () => {
+  // 根因（卡上「修复就绪」节）：`tool-ask-user` 默认 `mode: legacy` = 无限期前台阻塞，
+  // 'open' 态只能前台答、`userQuestions/answer` 只吃 'continued' ⇒ 无 UI 认领的环境里问询永停 open
+  // （现场：一场跑到 26 步的动议挂 40 分钟后掉线）。timed 形态让窗口有界：超时后工具返回 pending、
+  // 问询转 continued（RPC 可答），前台 UI 的卡片也仍在（"已继续工作，仍可回答"）。
+  it('五角色的 ask_user_question 都钉 timed 形态 + 显式 timeout', () => {
+    for (const role of ROLES) {
+      const block = rowBlock(role, 'tool-ask-user')
+      expect(block, `${role} preset 缺 tool-ask-user 行`).not.toBe('')
+      expect(
+        block,
+        `${role} 的 ask_user_question 仍是 legacy：前台窗口无界 ⇒ 脚本化驱动会永久挂在问询上（BUG-021）`,
+      ).toMatch(/^\s+mode: timed$/m)
+      const timeout = /^\s+timeout: (\d+)$/m.exec(block)?.[1]
+      expect(timeout, `${role} 缺显式 timeout（上游默认值不许静默漂进本仓）`).toBeDefined()
+      expect(Number(timeout), `${role} timeout 必须是正整数（秒）`).toBeGreaterThan(0)
+    }
   })
 })

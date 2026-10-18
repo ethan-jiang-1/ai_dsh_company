@@ -111,6 +111,14 @@
           # 问询（驾驶舱③乙）：独立会话可直接问人；动议内仍升级 CEO（见公司手册「问人两条路」）。
           - id: tool-ask-user
             name: '@deepseek-ai/dsh-tool-ask-user'
+            # BUG-021（2026-10-18）：legacy 形态下前台窗口无界 ⇒ 'open' 态只能前台答、
+            # 而 userQuestions/answer 只吃 'continued' ⇒ 无 UI 认领的环境里问询永停 open
+            # （现场：一场跑到 26 步的动议挂 40 分钟后掉线丢活）。timed 是 vendor 既有形态：
+            # 窗口过后工具返回 pending、问询转 continued（RPC 可答），前台 UI 卡片仍在
+            # （"已继续工作，仍可回答"）。timeout 显式钉住 = 上游改默认不静默漂进本仓。
+            config:
+              mode: timed
+              timeout: 120
           - id: tool-present
             name: '@deepseek-ai/dsh-tool-present'
           # 上网（web_search + web_fetch）：web-app bundle 把 host 上的 `tool-web` 行 `disabled: true` 了，

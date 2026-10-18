@@ -35,7 +35,10 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" \
 - **`args` 是位置参数的具名对象**，名字取自源码参数名：`create(request)` → `args.request`；
   `list(_request, signal)` → **`args._request`**（占位参数的下划线也要照写）。
 - 常用：`session/create`、`session/prompt`、`session/list`、`agentPresets/list`。
-- **`ask_user_question` 的回答不走 RPC**（走 wire）——脚本化跑到提问就会停下等真人；此时去 UI 里答。
+- **`ask_user_question` 的应答能力取决于工具形态**（2026-10-18 改正；原句「回答不走 RPC」不准确）：vendor 默认的
+  `legacy` 形态前台窗口无界，问询停 `'open'` 而 `userQuestions/answer` 只吃 `'continued'` ⇒ 脚本化驱动会永久挂住；
+  本包五角色 preset 已钉 `mode: timed`（窗口过后转 `continued`，RPC 与 UI 都能答）。应答配方与判据 =
+  [BUG-021 毕业 Note](../../notes/implemented/2026-10-18-bug021-timed-user-question.md)。
 - 这条通道也是 R5a「web 快照 lane」的雏形。
 
 

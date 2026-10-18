@@ -1,5 +1,5 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-10-17
 ---
@@ -7,10 +7,14 @@ opened: 2026-10-17
 # BUG-021：`ask_user_question` 的脚本化回答通道缺失——RPC 驱动会永久挂在问询上
 
 > **二轮深挖结论（2026-10-17）**：应答的 RPC 通道**是存在的**（`userQuestions/answer`），但它**只匹配 `continued` 态**的问询，而 `open` 态只能由前台 UI 认领/应答 ⇒ **在没有可脚本化 UI 的环境里，问询永远停在 `open`**。详见「深挖」节。
-> 严重级别：P2（次要——不损坏数据、不误导判据，但**让「RPC 驱动的真会话」在遇到问询时无法自行收口**，只能靠人在 UI 里点）｜发现：2026-10-17｜状态：修复就绪
+> 严重级别：P2（次要——不损坏数据、不误导判据，但**让「RPC 驱动的真会话」在遇到问询时无法自行收口**，只能靠人在 UI 里点）｜发现：2026-10-17｜状态：已修
 >
 > **授权（2026-10-18）**：本修复触碰 **company-pack 公开行为**（改 preset 行 ⇒ 改角色行为），按章程不自授权、需用户明确指示——
-> 用户令：「只剩 BUG-021…按我们的流程落地吧」= 该指示。修法选定见下「修复就绪（2026-10-18）」节。
+> 用户令：「只剩 BUG-021…按我们的流程落地吧」= 该指示。
+>
+> **结论（2026-10-18 已修）**：根因收敛到一行配置——`tool-ask-user` 的 `legacy` 形态前台窗口无界，而 RPC 只吃 `continued`；
+> 五角色 preset 改钉 vendor 既有的 `mode: timed`（`timeout: 120`），**不改 vendor**。证据、未验残留与去向（真模型档缺口）
+> = [毕业 Note](../../../notes/implemented/2026-10-18-bug021-timed-user-question.md)。
 
 ## 症状（真现场）
 
@@ -31,7 +35,7 @@ opened: 2026-10-17
 
 ## 暴露的失败类
 
-**「人机回路的前景等待，只有一条通道能解，而那条通道不是为自动化设计的」**——与 [BUG-005](../_archive/fixed_bugs/BUG-005-dual-signoff-single-door-routing.md)（双签的另一签不会自动路由到 CEO 门）同族：**都是「机制停点存在、但停点的应答路径没跟上多门/自动化形态」**。
+**「人机回路的前景等待，只有一条通道能解，而那条通道不是为自动化设计的」**——与 [BUG-005](BUG-005-dual-signoff-single-door-routing.md)（双签的另一签不会自动路由到 CEO 门）同族：**都是「机制停点存在、但停点的应答路径没跟上多门/自动化形态」**。
 
 **是否需要横切排查**：是，范围限「所有前景等待类停点的应答通道」——`ask_user_question`（本条）、`request_signoff`（BUG-005 已修文件层补签，但 `request_signoff` 本身在无人值守时按 `approval/policy=never` 直接 `rejected`，见第三场实测）。建议口径：**每个停点都要能回答「脚本化驱动怎么解它」**；答不出就该在手册里写明「此停点必须人参与，自动化跑到这里就停」。
 
@@ -128,13 +132,17 @@ returned the pending payload, or …"*），而 **`userQuestions/answer` 恰好�
 
 ## 已修判定
 
-- [ ] 五角色 preset 的 `tool-ask-user` 行带 `mode: timed` + 显式 `timeout`；`pnpm test tests/presets` 有断言（先红后绿）。
-- [ ] 组合自检可见：`source run/env.sh && pnpm dsh --profile web --dump-config` 里该行 config 在场。
-- [ ] 真挂载：`node checks/smoke/preset-smoke.mjs` 五角色 ALL PASS（timed schema 与工具行组合无误）。
-- [ ] 回放 lane 的工具 schema 快照按有意变更刷新，且 diff 只含 ask_user_question 形态变化。
-- [ ] `docs/guides/web-rpc.md` 口径改正 + 驱动配方（窗口 → `continued` → `userQuestions/answer`）。
-- [ ] 真模型行为（本机**无 key ⇒ 显式缺口**，配方留在卡上）：一条会触发问询的动议 ⇒ 窗口过后不永久 `running`、
-      `turn/end` 出现；再用 `userQuestions/answer` 作答 ⇒ 答案以新 turn 进入会话。
+- [x] 五角色 preset 的 `tool-ask-user` 行带 `mode: timed` + 显式 `timeout`；`pnpm test tests/presets` 断言**先红**
+      （1 failed / 18 passed）→ 补配置后绿（19/19）。
+- [x] 组合自检：`pnpm dsh --profile web --dump-config` 里五角色的该行 config 在场（`mode: timed` / `timeout: 120`）。
+- [x] 真挂载：`node checks/smoke/preset-smoke.mjs` ALL PASS（5 个 preset 全部可挂载）。
+- [x] 回放 lane：两份 tool-schemas sidecar 按**有意变更**同步（diff 恰为 `ask_user_question` 块：描述 + questions 描述 +
+      新增 `timeout` 参数）；同时归因并同步了既有的手册漂移（正文 + `source.digest`）⇒ 默认 lane 与 `--ui` 档
+      **均 ALL PASS**。台账记在 `snapshots/replay/r3-delegation/snapshot.yml`。
+- [x] `docs/guides/web-rpc.md` 口径改正（「回答不走 RPC」→ 依形态：legacy 挂住 / timed 转 `continued` 可 RPC 答），
+      详细配方住毕业 Note（文档行预算门禁强制：指南只留结论与指针）。
+- [ ] **真模型行为（本机无 key ⇒ 显式缺口）**：配方与判据见毕业 Note「未验」节——一条会触发问询的动议 ⇒
+      窗口过后不永久 `running`、`turn/end` 出现；再用 `userQuestions/answer` 作答 ⇒ 答案以新 turn 进入会话。
 
 ## 修复关联
 
