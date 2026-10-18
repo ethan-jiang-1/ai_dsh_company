@@ -19,6 +19,7 @@
 import { Tag, Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useState } from 'react'
 import {
+  CULTIVATION_ROLES,
   recordInbox,
   roleLabel,
   type CultivationRecord,
@@ -35,6 +36,9 @@ import {
   type CultivationActions,
 } from './cultivation-actions.ts'
 import { CultivationCompose } from './CultivationCompose.tsx'
+
+/** 正文折叠阈值：超过这么多行就先只展前几行（长正文不该把别的待办顶走）。 */
+const BODY_PREVIEW_LINES = 4
 
 /** 领域视图 props（三个容器同形喂入；数据加载在各容器）。 */
 export interface CultivationBoardProps {
@@ -75,7 +79,11 @@ function verificationTag(record: CultivationRecord): { readonly tone: 'success' 
  * @returns 面板内容（容器自己套壳：公司页直接放、侧栏套 PanelFrame）。
  */
 export function CultivationBoard(props: CultivationBoardProps) {
-  const viewer = props.viewerRole
+  // 会话 preset 不在五角色名册（Standard / PTC / 自建 mode）⇒ 与"未选角色"同处理：
+  // 否则面板会把它**当成一个角色**（实测显示"我的分身：ptc"、还开创作入口——提了也会被 host 拒）。
+  const viewer = props.viewerRole !== null && (CULTIVATION_ROLES as readonly string[]).includes(props.viewerRole)
+    ? props.viewerRole
+    : null
   const actions = props.actions
   const inbox = recordInbox(props.records ?? [], viewer ?? '')
   /** 正在执行的记录 id（飞行中禁按钮，防重复点击）。 */
@@ -90,6 +98,8 @@ export function CultivationBoard(props: CultivationBoardProps) {
   const [revokingSlug, setRevokingSlug] = useState<string | null>(null)
   /** 刚创作提交、待高亮的记录 id。 */
   const [highlightId, setHighlightId] = useState<string | null>(null)
+  /** 哪些记录的长正文被展开（默认折叠前 {@link BODY_PREVIEW_LINES} 行）。 */
+  const [expandedBodies, setExpandedBodies] = useState<Readonly<Record<string, boolean>>>({})
 
   const run = async (key: string, line: string, after?: () => void): Promise<void> => {
     if (actions === undefined) return
@@ -155,8 +165,28 @@ export function CultivationBoard(props: CultivationBoardProps) {
                       {/* 首句只在正文**没显示**时当摘要用；正文在下面就地展开时不再重复（走查抓到的重复行）。 */}
                       {record.body === '' && <span className="wk-row-task">{record.title}</span>}
                       {record.source !== '（会话内提交）' && <span className="wk-meta">出处：{record.source}</span>}
-                      {/* 判断要有材料（S4）：正文就地可见，不藏按钮。 */}
-                      {record.body !== '' && <div className="wk-cultivation-body">{record.body}</div>}
+                      {/* 判断要有材料（S4）：正文就地可见；但**长正文默认只展前几行**（场景轮实测 60 行撑出
+                          1156px 行高，把后面 12 条待办顶到看不见的地方）⇒ 给明确的「展开全文（共 N 行）」。 */}
+                      {record.body !== '' && (() => {
+                        const lines = record.body.split('\n')
+                        const clipped = lines.length > BODY_PREVIEW_LINES
+                        const expanded = expandedBodies[record.id] === true
+                        return (
+                          <div className="wk-cultivation-body">
+                            {expanded || !clipped ? record.body : `${lines.slice(0, BODY_PREVIEW_LINES).join('\n')}\n…`}
+                            {clipped && (
+                              <div className="wk-cultivation-actions">
+                                <Button
+                                  size="sm"
+                                  onClick={() => { setExpandedBodies(previous => ({ ...previous, [record.id]: !expanded })) }}
+                                >
+                                  {expanded ? CULTIVATION_COPY.bodyCollapse : CULTIVATION_COPY.bodyExpand(lines.length)}
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })()}
                       {actions === undefined
                         ? (
                           <span className="wk-row-task">

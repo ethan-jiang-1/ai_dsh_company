@@ -34,6 +34,7 @@ function record(over: Partial<CultivationRecord> = {}): CultivationRecord {
     expectation: '收口前逐项列出未决项',
     status: 'open',
     title: '做法：收口盘点先列未决清单。',
+    body: '',
     ...over,
   } as CultivationRecord
 }
@@ -180,6 +181,15 @@ describe('治理动作：点一下就发出对那条记录的命令（S2）', ()
     expect(button(container, CULTIVATION_COPY.adopt)).toBeNull()
   })
 
+  it('会话 preset 不在名册（如 PTC/Standard）⇒ 当未选角色：不猜身份、不给把手、不开创作入口', () => {
+    const { actions } = stubActions()
+    const { container } = mount({ viewerRole: 'ptc', viewerLabel: 'ptc', records: [record()], actions })
+    expect(container.textContent).toContain('请选择负责的角色')
+    expect(container.textContent, '不该把非名册 preset 当成角色显示').not.toContain('我的分身：ptc')
+    expect(button(container, CULTIVATION_COPY.adopt)).toBeNull()
+    expect(button(container, CULTIVATION_COPY.composeCorrect)).toBeNull()
+  })
+
   it('没注入动作面（命令面缺席）⇒ 退回只读：给命令原文，不给死按钮', () => {
     const { container } = mount({ records: [record()] })
     expect(button(container, CULTIVATION_COPY.adopt)).toBeNull()
@@ -264,6 +274,32 @@ describe('走查抓到的四处 UX 缺陷（2026-10-18，图为证）', () => {
     expect(text, '期望行为标签常驻').toContain(CULTIVATION_COPY.expectationLabel)
     expect(text, '正文标签常驻').toContain(CULTIVATION_COPY.bodyLabel)
     expect(text, '正文栏带做法/出处提示').toContain(CULTIVATION_COPY.bodyHint)
+  })
+})
+
+describe('长正文折叠（2026-10-18 场景轮：60 行正文撑满面板）', () => {
+  const longBody = Array.from({ length: 60 }, (_, i) => `第 ${String(i + 1)} 行`).join('\n')
+
+  it('长正文默认只展前 4 行 + 给「展开全文（共 60 行）」', () => {
+    const { container } = mount({ records: [record({ body: longBody } as Partial<CultivationRecord>)] })
+    const text = container.textContent ?? ''
+    expect(text).toContain('第 1 行')
+    expect(text).toContain('展开全文（共 60 行）')
+    expect(text, '默认不该把 60 行全渲染出来').not.toContain('第 60 行')
+  })
+
+  it('点「展开全文」后能看到最后一行；再点「收起」回到摘要', async () => {
+    const { container } = mount({ records: [record({ body: longBody } as Partial<CultivationRecord>)] })
+    await click(button(container, CULTIVATION_COPY.bodyExpand(60))!)
+    expect(container.textContent).toContain('第 60 行')
+    await click(button(container, CULTIVATION_COPY.bodyCollapse)!)
+    expect(container.textContent).not.toContain('第 60 行')
+  })
+
+  it('短正文（≤4 行）不显示折叠开关', () => {
+    const { container } = mount({ records: [record({ body: '第 1 行\n第 2 行' } as Partial<CultivationRecord>)] })
+    expect(container.textContent).toContain('第 2 行')
+    expect(container.textContent).not.toContain('展开全文')
   })
 })
 

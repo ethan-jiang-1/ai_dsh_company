@@ -47,6 +47,9 @@ export const CULTIVATION_COPY = {
   expectationPlaceholder: '例如：收口前逐项列出未决项',
   bodyLabel: '做法与证据',
   bodyHint: '写清做法；有出处就带上文件路径或会话坐标——采纳后它会成为这个角色以后的做法。',
+  /** 长正文折叠（2026-10-18 场景轮：60 行正文撑出 1156px 的行高，把别的待办全顶到看不见的地方）。 */
+  bodyExpand: (lines: number): string => `展开全文（共 ${String(lines)} 行）`,
+  bodyCollapse: '收起',
   targetRoleLabel: '给哪个角色',
   // ── 校验提示 ─────────────────────────────────────────────────────────────
   problemExpectationEmpty: '先写一句「期望它怎么做」。',

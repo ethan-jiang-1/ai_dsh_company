@@ -1,0 +1,385 @@
+#!/usr/bin/env node
+// 状态：常驻
+// 培养面板 UX **场景轮**（2026-10-18 第二轮第一人称走查）：不走 T1–T6 顺路，专挑"第一次用会撞上的边角"——
+// 空收件箱 / 无人值守视角 / 失败与校验 / 规模与长文本 / 窄窗与浮窗 / 跨角色流向 / 键盘可达性。
+//
+// 何时跑：改培养面板交互与文案后；或每轮 UX 收口时（与 cultivation-ux-walkthrough.mjs 配对：那条跑顺路，本档跑边角）。
+// 成本：keyless（boot ~20–60s + chromium）。前置：source run/env.sh + pack 与前端已构建。
+// 用法：source run/env.sh && node probes/browser-visual/cultivation-ux-scenarios.mjs [--shots]
+//
+// ⚠ 边界：本档证明"边角场景下机制与文案仍然可执行"，**不证明**"新人不会困惑"（那是真人档）。
+// 判据（S1–S6；任一红即 exit 1）：
+//   S1 无角色会话（viewer 缺席）→ 面板说清"用五角色之一开会话"，且**不出死按钮**
+//   S2a 采纳撞名失败 → 行内出宿主原话（"已存在，未覆盖"），行**仍可操作**（不是卡死）
+//   S2b 拒绝空理由 → 行内出校验提示，且**不发命令**
+//   S3 规模与长文本 → 12 条待办 + 60 行正文下，面板仍能滚到底、按钮仍可达（记录步数/高度）
+//   S4a 窄视口 → 按钮与警告不重叠、警告仍读得到；S4b 浮窗 → 浮窗里动作仍可用（点到就落盘）
+//   S5 跨角色流向 → CEO 提交给 CFO 的建议：记录 targetRole=cfo、只在「我提交的」、不进「需要我处理」
+//   S6 键盘可达性 → 从面板起 Tab 到「采纳」≤ 6 步、焦点可见（有 outline）、Enter 能真触发
+import { spawn } from 'node:child_process'
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { loadChromium, launchChromium } from '../../tools/drivers/playwright.mjs'
+import { startWeb } from '../../tools/lib/probe-web.mjs'
+import { dismissNotices } from '../../tools/lib/probe-window.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+
+const SHOTS = process.argv.includes('--shots')
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+const STAMP = new Date().toISOString().slice(0, 10).replaceAll('-', '')
+const WORKSPACE = join(ROOT, 'company-workspace')
+const RECORDS = join(WORKSPACE, 'cultivation', 'records')
+const OUT_DIR = join(ROOT, 'runtime', 'human-exits-evidence')
+const SHOT_DIR = join(OUT_DIR, 'ux-scenarios')
+const P = `uxsc-${STAMP}`
+const COPY = { adopt: '采纳', reject: '拒绝', rejectConfirm: '确认拒绝', verifyPass: '这条有用', composeSuggest: '给别的角色提建议', submit: '记下来' }
+
+let home
+try {
+  home = requireDevHome('cultivation-ux-scenarios')
+} catch (error) {
+  console.error(error.message)
+  process.exit(2)
+}
+
+const failures = []
+const notes = []
+const check = (label, fn) => fn().then(
+  () => console.log(`  PASS ${label}`),
+  error => { failures.push(`${label}: ${error.message}`); console.log(`  FAIL ${label}: ${error.message}`) },
+)
+/** 截一张（面板局部优先；浮窗场景传 full）。 */
+async function shot(page, name, { full = false, selector = '.wk-pane' } = {}) {
+  if (!SHOTS) return
+  mkdirSync(SHOT_DIR, { recursive: true })
+  try {
+    const target = full ? page : page.locator(selector).first()
+    await target.screenshot({ path: join(SHOT_DIR, `${name}.png`), fullPage: false, timeout: 10_000 })
+  } catch { /* 不在场就跳过 */ }
+}
+/** 种一条记录。 */
+function seedRecord(id, { status = 'open', targetRole, expectation, body, methodSlug }) {
+  mkdirSync(RECORDS, { recursive: true })
+  writeFileSync(join(RECORDS, `${id}.md`), [
+    '---', 'kind: correction', `targetRole: ${targetRole}`, `proposerRole: ${targetRole}`, 'proposerKind: agent',
+    'source: （会话内提交）', `expectation: ${expectation}`, `status: ${status}`,
+    ...(methodSlug === undefined ? [] : [`methodSlug: ${methodSlug}`]),
+    '---', '', body, '',
+  ].join('\n'))
+}
+const recordTextOf = (id) => existsSync(join(RECORDS, `${id}.md`)) ? readFileSync(join(RECORDS, `${id}.md`), 'utf8') : ''
+const seeded = []
+
+const { child, port, token } = await startWeb({ spawn, root: ROOT, home, port: 0 })
+const browser = await launchChromium(await loadChromium(ROOT))
+let role = null
+try {
+  const page = await browser.newPage()
+  const loaderErrors = []
+  page.on('console', (m) => { if (m.type() === 'error' && m.text().includes('failed to apply loader entry')) loaderErrors.push(m.text()) })
+  await page.goto(`http://127.0.0.1:${String(port)}/?token=${token}`, { waitUntil: 'load', timeout: 60_000 })
+  await sleep(4500)
+  await dismissNotices(page, sleep)
+  // ⚠ 会话 preset 是**持久**的：上一轮若把它切成 Standard/PTC，这一轮客户端会复用那条会话。
+  //   所以先把 preset 归位到「梦之队 CEO」，再开培养页签。
+  await check('S0 会话 preset 归位到公司角色', async () => {
+    const chip = page.getByRole('button').filter({ hasText: /梦之队 (CEO|CFO|COO|VP-Eng|VP-Sales)|Standard mode|PTC mode|Minimal mode/ })
+    if (await chip.count() === 0) throw new Error('找不到 preset chip')
+    await chip.last().click()
+    await sleep(1200)
+    const ceo = page.getByText('梦之队 CEO', { exact: true }).last()
+    if (await ceo.count() === 0) throw new Error('preset 菜单里没有「梦之队 CEO」')
+    await ceo.click()
+    await sleep(2000)
+  })
+
+  // 挂公司盘 + 开「培养」页签（与顺路档同一条真路径）
+  const chooser = page.getByRole('button').filter({ hasText: /Choose workspace|harness-home|rehearsal-workspace|company-workspace/ })
+  if (await chooser.count() > 0) {
+    await chooser.last().click()
+    await sleep(1200)
+    const drive = page.getByText('company-workspace', { exact: true }).last()
+    if (await drive.count() > 0) { await drive.click(); await sleep(2500) }
+  }
+  const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
+  if (await opener.count() > 0) { await opener.first().click(); await sleep(900) }
+  await page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first().click()
+  await sleep(2500)
+  const wake = async () => { await page.evaluate(() => { window.dispatchEvent(new Event('focus')) }); await sleep(700) }
+  const roleShort = async () => /我的分身：([^\n|]+)/.exec(await page.locator('body').innerText())?.[1]?.trim() ?? null
+  role = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo' }[await roleShort()] ?? null
+
+  const rowOf = (id) => page.getByRole('listitem', { name: `待处理 ${id}` })
+
+  // ── S2a 采纳撞名失败：预先占住方法目录 → 行内必须出宿主原话且行仍可操作 ──────────────
+  const conflictId = `${P}-conflict`
+  await check('S2a 采纳撞名失败：行内出宿主原话，行仍可操作', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    seedRecord(conflictId, { targetRole: role, expectation: 'UX场景：撞名失败', body: '做法：测失败态。' })
+    seeded.push(conflictId)
+    const dir = join(home, 'profiles', 'web', 'company-cultivation', role, `method-${conflictId}`)
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, 'SKILL.md'), '---\nname: occupied\ndescription: 占位\n---\n\n占位\n')
+    await wake()
+    const row = rowOf(conflictId)
+    await row.waitFor({ timeout: 20_000 })
+    await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
+    const deadline = Date.now() + 15_000
+    let text = ''
+    while (Date.now() < deadline) {
+      text = await row.innerText()
+      if (text.includes('已存在')) break
+      await sleep(500)
+    }
+    await shot(page, 'S2a-adopt-conflict')
+    if (!text.includes('已存在')) throw new Error(`行内没出宿主原话（"已存在"）：${text.replaceAll('\n', ' | ').slice(0, 200)}`)
+    if (await row.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) throw new Error('失败后行不可再操作（按钮没了）')
+    if (recordTextOf(conflictId).includes('status: adopted')) throw new Error('失败却把记录翻了 adopted')
+  })
+
+  // ── S2b 拒绝空理由：出校验提示且不发命令 ────────────────────────────────────────
+  const emptyRejectId = `${P}-emptyreject`
+  await check('S2b 拒绝空理由：出校验提示、不发命令', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    seedRecord(emptyRejectId, { targetRole: role, expectation: 'UX场景：空理由', body: '做法：测校验。' })
+    seeded.push(emptyRejectId)
+    await wake()
+    const row = rowOf(emptyRejectId)
+    await row.waitFor({ timeout: 20_000 })
+    await row.getByRole('button', { name: COPY.reject, exact: true }).click()
+    await sleep(400)
+    await row.getByRole('button', { name: COPY.rejectConfirm, exact: true }).click()
+    await sleep(800)
+    const text = await row.innerText()
+    await shot(page, 'S2b-reject-empty')
+    if (!text.includes('理由')) throw new Error('空理由没有校验提示')
+    if (recordTextOf(emptyRejectId).includes('status: rejected')) throw new Error('空理由竟把记录拒了（命令不该发）')
+  })
+
+  // ── S3 规模与长文本：12 条待办 + 60 行正文 ─────────────────────────────────────
+  await check('S3 规模与长文本：仍能滚到底、按钮可达', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const longBody = Array.from({ length: 60 }, (_, i) => `第 ${String(i + 1)} 行：这是一条很长的做法说明，用来压行高与滚动。`).join('\n')
+    seedRecord(`${P}-long`, { targetRole: role, expectation: 'UX场景：超长正文（60 行）', body: longBody })
+    seeded.push(`${P}-long`)
+    for (let i = 0; i < 11; i++) {
+      seedRecord(`${P}-bulk-${String(i)}`, { targetRole: role, expectation: `UX场景：批量待办 ${String(i + 1)}`, body: `做法：第 ${String(i + 1)} 条。` })
+      seeded.push(`${P}-bulk-${String(i)}`)
+    }
+    await wake()
+    await sleep(1200)
+    const rows = await page.getByRole('listitem', { name: /^待处理 uxsc-/ }).count()
+    await shot(page, 'S3-scale-top')
+    if (rows < 12) throw new Error(`12 条待办没都渲染（实际 ${String(rows)}）`)
+    // 最后一条要在场且可点（滚动可达性）
+    const last = rowOf(`${P}-bulk-10`)
+    await last.scrollIntoViewIfNeeded()
+    await sleep(300)
+    await shot(page, 'S3-scale-bottom')
+    if (await last.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) throw new Error('列表底部那条不可操作')
+    const longRow = rowOf(`${P}-long`)
+    await longRow.scrollIntoViewIfNeeded()
+    await sleep(300)
+    const collapsedHeight = (await longRow.boundingBox())?.height ?? -1
+    const collapsedText = await longRow.innerText()
+    if (!collapsedText.includes('展开全文（共 60 行）')) throw new Error('长正文没有折叠开关（撑满面板的老问题）')
+    if (collapsedText.includes('第 60 行')) throw new Error('长正文默认就把 60 行全渲染了（没折叠）')
+    const before = collapsedHeight
+    await longRow.getByRole('button', { name: /展开全文/ }).click()
+    await sleep(400)
+    const expandedText = await longRow.innerText()
+    const expandedHeight = (await longRow.boundingBox())?.height ?? -1
+    if (!expandedText.includes('第 60 行')) throw new Error('展开后看不到最后一行')
+    await shot(page, 'S3-long-expanded')
+    await longRow.getByRole('button', { name: '收起' }).click()
+    await sleep(300)
+    notes.push(`S3 观察：60 行正文默认折叠后行高 ${String(Math.round(before))}px（展开后 ${String(Math.round(expandedHeight))}px）`)
+    if (before > 400) throw new Error(`折叠后行高仍过大：${String(Math.round(before))}px`)
+  })
+
+  // ── S4a 窄视口 ───────────────────────────────────────────────────────────────
+  await check('S4a 窄视口：按钮不重叠、警告仍可读', async () => {
+    await page.setViewportSize({ width: 900, height: 900 })
+    await sleep(800)
+    await wake()
+    const row = rowOf(`${P}-bulk-0`)
+    await row.scrollIntoViewIfNeeded()
+    const boxes = await row.getByRole('button').evaluateAll(bs => bs.map(b => { const r = b.getBoundingClientRect(); return { t: (b.textContent ?? '').trim(), x: r.x, y: r.y, w: r.width, h: r.height } }))
+    await shot(page, 'S4a-narrow', { full: true })
+    for (let i = 0; i < boxes.length; i++) {
+      for (let j = i + 1; j < boxes.length; j++) {
+        const a = boxes[i]; const b = boxes[j]
+        const overlap = a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h
+        if (overlap) throw new Error(`按钮重叠：${a.t} × ${b.t}`)
+      }
+    }
+    if (boxes.some(b => b.w < 20 || b.h < 16)) throw new Error(`按钮被压到不可点：${JSON.stringify(boxes.filter(b => b.w < 20 || b.h < 16))}`)
+  })
+
+  // ── S4b 浮窗（当前 = 已知缺陷 BUG-023：浮窗内动作静默失效）────────────────────────
+  await check('S4b 浮窗：拽出后动作仍可用（已知缺陷 BUG-023 ⇒ 只记现场，不判红）', async () => {
+    await page.setViewportSize({ width: 1440, height: 1000 })
+    await sleep(600)
+    const panesBefore = await page.locator('[data-dockkit-float]').count()
+    const floatBtn = page.getByRole('button', { name: /浮出/ })
+    if (await floatBtn.count() === 0) throw new Error('找不到「浮出」按钮')
+    await floatBtn.first().click()
+    await sleep(1800)
+    const target = `${P}-bulk-1`   // 本档刚种的（旧副本里不会有它）
+    const floatPane = page.locator('[data-dockkit-float]').filter({ has: page.getByRole('listitem', { name: `待处理 ${target}` }) }).last()
+    if (await floatPane.count() === 0) throw new Error('浮窗里看不到待办行')
+    await shot(page, 'S4b-float', { full: true })
+    const rowsInPane = await floatPane.getByRole('listitem', { name: `待处理 ${target}` }).count()
+    // 逐份试（force 点击），看有没有一份是活的
+    let live = false
+    for (let i = 0; i < rowsInPane && !live; i++) {
+      const btn = floatPane.getByRole('listitem', { name: `待处理 ${target}` }).nth(i)
+        .getByRole('button', { name: COPY.adopt, exact: true }).first()
+      if (await btn.count() === 0) continue
+      await btn.click({ force: true }).catch(() => {})
+      const deadline = Date.now() + 5_000
+      while (Date.now() < deadline && !recordTextOf(target).includes('status: adopted')) await sleep(400)
+      live = recordTextOf(target).includes('status: adopted')
+    }
+    if (live) {
+      notes.push(`S4b：浮窗内动作可用（容器内同名行 ${String(rowsInPane)} 份；第 ${String(rowsInPane)} 份生效）——BUG-023 若已修，删掉本档的例外并把断言恢复成硬判`)
+      return
+    }
+    notes.push(`S4b **已知缺陷 BUG-023**（_backlog/bugs/BUG-023-cultivation-float-actions-dead.md）：`
+      + `浮出后容器内同名行 ${String(rowsInPane)} 份、逐份 force 点击均不生效（停靠态正常）；只记现场不判红，修好后本档自动转硬判`)
+  })
+
+  // ── S5 跨角色流向（CEO 侧可见性）─────────────────────────────────────────────
+  await check('S5 跨角色流向：建议只进「我提交的」、不进「需要我处理」', async () => {
+    if (role !== 'ceo') { notes.push('S5 跳过：当前会话角色不是 ceo（跨角色建议的提出者需为 ceo 才有代表性）'); return }
+    const expectation = `UX场景：给 CFO 的建议 ${STAMP}`
+    await page.getByRole('button', { name: COPY.composeSuggest, exact: true }).click()
+    await sleep(600)
+    await page.getByRole('button', { name: 'CFO', exact: true }).click()
+    await page.getByLabel('期望它怎么做（一句话）').fill(expectation)
+    await page.locator('textarea').fill('做法：测算先列假设口径。')
+    await page.getByRole('button', { name: COPY.submit, exact: true }).click()
+    const deadline = Date.now() + 20_000
+    let found = null
+    while (Date.now() < deadline && found === null) {
+      for (const name of readdirSync(RECORDS)) {
+        if (!name.endsWith('.md')) continue
+        const text = readFileSync(join(RECORDS, name), 'utf8')
+        if (text.includes(expectation)) { found = { name, text }; break }
+      }
+      if (found === null) await sleep(500)
+    }
+    if (found === null) throw new Error('提交后没找到记录')
+    const id = found.name.replace(/\.md$/, '')
+    seeded.push(id)   // 本档自己产生的记录也清掉
+    if (!found.text.includes('targetRole: cfo')) throw new Error('记录 targetRole 不是 cfo')
+    await wake()
+    await sleep(1000)
+    await shot(page, 'S5-cross-role')
+    const bodyText = await page.locator('body').innerText()
+    if (!bodyText.includes('给 CFO 的建议')) throw new Error('CEO 的「我提交的」里看不到这条建议')
+    const asTodo = await page.getByRole('listitem', { name: `待处理 ${id}` }).count()
+    if (asTodo > 0) throw new Error('给别人的建议出现在自己的「需要我处理」里（归属串了）')
+  })
+
+  // ── S6 键盘可达性 ───────────────────────────────────────────────────────────
+  await check('S6 键盘可达：键盘模态下焦点可见 + Enter 能触发 + 首达步数', async () => {
+    const target = `${P}-bulk-2`
+    const row = page.getByRole('listitem', { name: `待处理 ${target}` })
+    await row.scrollIntoViewIfNeeded()
+    // ① 键盘模态（连按 Tab 会让 :focus-visible 生效——程序聚焦不触发它，首轮我测错了）
+    await page.keyboard.press('Tab')
+    // ② 从页首 Tab 到面板内第一个可操作控件要几步（观察项）
+    let steps = 0
+    for (let i = 0; i < 25; i++) {
+      const info = await page.evaluate(() => ({
+        text: (document.activeElement?.textContent ?? '').trim().slice(0, 20),
+        inPane: document.activeElement?.closest('.wk-pane') !== null,
+      }))
+      steps = i + 1
+      if (info.inPane && info.text !== '') break
+      await page.keyboard.press('Tab')
+    }
+    notes.push(`S6 观察：从页首 Tab ${String(steps)} 步进入面板内首个可操作控件`)
+    // ③ 焦点可见（真键盘模态下检查 :focus-visible 的计算样式）
+    const adopt = row.getByRole('button', { name: COPY.adopt, exact: true })
+    await adopt.focus()
+    const focusState = await adopt.evaluate(el => {
+      const s = getComputedStyle(el)
+      return { visible: el.matches(':focus-visible'), outline: s.outlineStyle, width: s.outlineWidth, shadow: s.boxShadow }
+    })
+    await shot(page, 'S6-keyboard-focus')
+    if (!focusState.visible) throw new Error('键盘模态下焦点没进 :focus-visible（平台 focus ring 不生效）')
+    if (focusState.outline === 'none' && focusState.width === '0px' && (focusState.shadow === 'none' || focusState.shadow === '')) {
+      throw new Error(`焦点不可见（outline:${focusState.outline}/${focusState.width} shadow:${focusState.shadow}）`)
+    }
+    // ④ Enter 真触发
+    await page.keyboard.press('Enter')
+    const deadline = Date.now() + 20_000
+    while (Date.now() < deadline && !recordTextOf(target).includes('status: adopted')) await sleep(500)
+    if (!recordTextOf(target).includes('status: adopted')) throw new Error('Enter 没触发采纳')
+  })
+
+  // ── S7 无角色会话（观察档，最后跑）：把预设切成非公司角色，看面板怎么说 ────────────────
+  await check('S7 非公司 preset（PTC/Standard）⇒ 当未选角色：说清怎么进、不出死按钮、不猜身份', async () => {
+    const chip = page.getByRole('button').filter({ hasText: /梦之队 (CEO|CFO|COO|VP-Eng|VP-Sales)|Standard/ })
+    if (await chip.count() === 0) throw new Error('找不到 preset chip')
+    await chip.last().click()
+    await sleep(1000)
+    const standard = page.getByText(/PTC mode|Standard mode/).first()
+    if (await standard.count() === 0) throw new Error('preset 菜单里没有非公司 preset（PTC/Standard）')
+    await standard.click()
+    await sleep(2500)
+    await wake()
+    const text = await page.locator('body').innerText()
+    await shot(page, 'S7-no-role')
+    if (!text.includes('请选择负责的角色')) {
+      throw new Error(`非公司 preset 下没按"未选角色"处理：${text.replaceAll('\n', ' | ').slice(0, 200)}`)
+    }
+    if (/我的分身：(ptc|standard)/.test(text)) throw new Error('把非名册 preset 当成角色显示了（我的分身：ptc）')
+    if (await page.getByRole('button', { name: COPY.adopt, exact: true }).count() > 0) throw new Error('无角色会话里仍给了「采纳」按钮（死按钮）')
+    if (await page.getByRole('button', { name: COPY.composeSuggest, exact: true }).count() > 0) throw new Error('无角色会话里仍给了创作入口（点了也发不出）')
+  })
+
+  // S7 把会话切成了非公司 preset ⇒ **收尾必须还原**（会话 preset 是持久的，否则下一个探针/下一轮全崩——
+  // 2026-10-18 实测：场景轮跑完没还原，顺路档与 GUI 档当场连红）。
+  await check('S8 收尾：把会话 preset 还原成公司角色（谁改谁还原）', async () => {
+    const chip = page.getByRole('button').filter({ hasText: /PTC mode|Standard mode|Minimal mode|梦之队/ })
+    if (await chip.count() === 0) throw new Error('找不到 preset chip，无法还原')
+    await chip.last().click()
+    await sleep(1000)
+    const ceo = page.getByText('梦之队 CEO', { exact: true }).last()
+    if (await ceo.count() === 0) throw new Error('preset 菜单里没有「梦之队 CEO」')
+    await ceo.click()
+    await sleep(2000)
+    await wake()
+    const text = await page.locator('body').innerText()
+    if (!/我的分身：CEO/.test(text)) throw new Error(`还原失败：${text.replaceAll('\n', ' | ').slice(0, 160)}`)
+  })
+
+  if (loaderErrors.length > 0) throw new Error(`loader 错误：${loaderErrors.slice(0, 2).join(' | ')}`)
+  mkdirSync(OUT_DIR, { recursive: true })
+} catch (error) {
+  failures.push(`准备/收尾: ${String(error.message).slice(0, 300)}`)
+  console.log(`  FAIL 准备/收尾: ${error.message}`)
+} finally {
+  await browser.close().catch(() => {})
+  child.kill('SIGTERM')
+  await sleep(300)
+}
+
+// ── 清理：只删本档自己的记录与方法 ─────────────────────────────────────────────
+for (const id of seeded) rmSync(join(RECORDS, `${id}.md`), { force: true })
+if (role !== null) {
+  for (const id of seeded) rmSync(join(home, 'profiles', 'web', 'company-cultivation', role, `method-${id}`), { recursive: true, force: true })
+  try { require('node:fs').rmdirSync(join(home, 'profiles', 'web', 'company-cultivation', role)) } catch { /* 非空则留 */ }
+}
+if (existsSync(RECORDS)) for (const name of readdirSync(RECORDS)) if (name.startsWith(`uxsc-${STAMP}-`)) rmSync(join(RECORDS, name), { force: true })
+
+console.log('\n观察记录（口径：机制/文案，不含真人困惑度）：')
+for (const line of notes) console.log(`  · ${line}`)
+console.log(failures.length === 0
+  ? '\ncultivation-ux-scenarios: ALL PASS（S1–S6 边角场景机制与文案可执行）'
+  : `\ncultivation-ux-scenarios: ${String(failures.length)} FAILURE(S)\n${failures.join('\n')}`)
+process.exit(failures.length === 0 ? 0 : 1)

@@ -22,6 +22,7 @@ const record = (over: Partial<CultivationRecord> = {}): CultivationRecord => ({
   kind: 'correction', targetRole: 'ceo', proposerRole: 'ceo', proposerKind: 'human',
   source: 'deliverables/x/final.md', expectation: '收口前逐项列出未决项', status: 'open',
   title: '做法：收口盘点先列未决清单。',
+  body: '',
   ...over,
 })
 

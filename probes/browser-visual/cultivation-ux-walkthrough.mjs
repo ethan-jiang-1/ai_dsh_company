@@ -144,6 +144,17 @@ try {
   }
   const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
   if (await opener.count() > 0) { await opener.first().click(); await sleep(900) }
+  // 开场自愈：会话 preset 是**持久**的（别的探针/人可能把它切成 PTC/Standard）⇒ 先归位到公司角色。
+  await (async () => {
+    const chip = page.getByRole('button').filter({ hasText: /梦之队 (CEO|CFO|COO|VP-Eng|VP-Sales)|Standard mode|PTC mode|Minimal mode/ })
+    if (await chip.count() === 0) return
+    if (/我的分身：CEO/.test(await page.locator('body').innerText())) return
+    await chip.last().click()
+    await sleep(1000)
+    const ceo = page.getByText('梦之队 CEO', { exact: true }).last()
+    if (await ceo.count() > 0) { await ceo.click(); await sleep(1800) }
+  })()
+
   await page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first().click()
   await sleep(2500)
 
