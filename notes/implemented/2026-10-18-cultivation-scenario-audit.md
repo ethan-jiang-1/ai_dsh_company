@@ -178,6 +178,19 @@ strict mode violation（假红一片）。已加 `backToSessionView()` 助手 + 
 **探针新增机制**：`unverified[]` —— "未验成（入口/前置不足）"**单独成列**，不再混在 PASS 里冒充绿
 （本轮 S25 一开始就是"PASS 但实际未验成"，靠这条规矩被我自己抓出来）。
 
+## 追加十一：三实例同开 + 清单收口（2026-10-19）
+
+- **S23 升到三实例**：浮窗 + 公司页第四子页 + 侧栏（浮出后原页签空出来，指南再点一次会新开一个）——
+  在**浮窗**里采纳后，**另外两个实例都 ≤8s 同步** ✓（广播在多实例下成立，不是两两特例）。
+- **生效边界文案复核**：`probes/session-context/cultivation-method-layer-probe.mjs` 复跑 **ALL PASS**
+  （方法层六判据 + 角色闸反例）⇒ 面板写的「新开的该角色会话会加载它；运行中的会话不受影响」与 host 行为一致。
+
+**目标清单状态（①–⑧）**：① S13 真绿（/help 破局）② 撤回全链路 ✅（S20/S22 + 顺路档 T6 + 方法层档）
+③ 多角色隔离 ✅（S22 + GUI 档）④ 验证负路 ✅（S19）⑤ 规模 100 条 ✅（S21，714ms）
+⑥ 新轴已开：键盘（S24，抓到并修了 Escape 缺陷）、多实例（S13/S23 三实例）、素材区真数据（S25）、
+并发反向（S27）、失败/陈旧态（S2a/S10/S12/S14/S18/S19）、规模（S16/S21）⑦ 发现即处置（S24 同 diff 修 + 判据；
+无遗留活跃卡）⑧ 纪律全绿并逐片 push。**清单清空。**
+
 ## 指针
 
 - 探针：[cultivation-ux-scenarios.mjs](../../probes/browser-visual/cultivation-ux-scenarios.mjs)（`--shots`）｜顺路档：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough.mjs)

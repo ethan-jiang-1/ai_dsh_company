@@ -757,7 +757,19 @@ try {
     const floatPane = page.locator('[data-dockkit-float]').filter({ has: page.getByRole('listitem', { name: `待处理 ${id}` }) }).last()
     if (await floatPane.count() === 0) throw new Error('浮窗里没看到这条')
     await shot(page, 'S23-three-instances', { full: true })
-    // ③ 在浮窗里采纳 → 公司页实例必须同步
+    // ③ 再开**第三个**实例：浮出后原侧栏页签空出来，指南里再点一次「培养」会新开一个侧栏面板
+    let third = null
+    const entry = page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first()
+    if (await entry.count() > 0) {
+      await entry.click().catch(() => {})
+      await sleep(2000)
+      const panes = page.locator('.wk-pane')
+      if (await panes.count() >= 2) {
+        third = panes.filter({ has: page.getByRole('listitem', { name: `待处理 ${id}` }) }).first()
+        if (await third.count() === 0) third = null
+      }
+    }
+    // ④ 在浮窗里采纳 → 公司页（与第三个实例，若有）必须同步
     await floatPane.getByRole('listitem', { name: `待处理 ${id}` }).last()
       .getByRole('button', { name: COPY.adopt, exact: true }).first().click()
     const d1 = Date.now() + 20_000
@@ -772,7 +784,21 @@ try {
       await sleep(400)
     }
     if (!synced) throw new Error('公司页实例没同步（浮窗 → 公司页 的广播没生效？）')
-    notes.push('S23：浮窗采纳 ⇒ 公司页实例 ≤8s 同步 ✓（浮窗 + 公司页两实例并存）')
+    if (third !== null) {
+      const d3 = Date.now() + 8_000
+      let thirdSynced = false
+      while (Date.now() < d3) {
+        const still = await third.getByRole('button', { name: COPY.adopt, exact: true }).count()
+        const text = await third.innerText().catch(() => '')
+        if (still === 0 || /已采纳|已处理/.test(text)) { thirdSynced = true; break }
+        await sleep(400)
+      }
+      if (!thirdSynced) throw new Error('第三个实例（侧栏）没同步')
+      notes.push('S23：**三实例**并存（浮窗 + 公司页 + 侧栏）——浮窗采纳后两个实例都 ≤8s 同步 ✓')
+    } else {
+      notes.push('S23：浮窗 + 公司页两实例同步 ✓（第三个侧栏实例没开成，本轮按两实例验）')
+      unverified.push('S23 三实例：第三个侧栏实例没开成（浮出后指南再点没新开面板）——按两实例验')
+    }
     await dockFloats(page)
     await backToSessionView(page)   // 还原：别把公司页留着害后面的场景
   })
