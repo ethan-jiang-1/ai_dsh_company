@@ -149,7 +149,7 @@ try {
 
   await check('① 打开会话的「培养」面板（走人在界面上的真路径）', async () => {
     await dismissNotices(page, sleep)
-    const chooser = page.getByRole('button').filter({ hasText: /Choose workspace|harness-home|rehearsal-workspace|company-workspace/ })
+    const chooser = page.getByRole('button').filter({ hasText: /Choose workspace|company-workspace|ai_dsh_company|harness-home|rehearsal-workspace/ })
     if (await chooser.count() > 0) {
       await chooser.last().click()
       await sleep(1200)
@@ -162,26 +162,39 @@ try {
     await entry.first().click()
     await sleep(2000)
   // 开场自愈：会话 preset 是**持久**的（别的探针/人可能把它切成 PTC/Standard）⇒ 先归位到公司角色。
+  // 开场自愈循环（与场景档同一条纪律）：选「梦之队 CEO」→ 新建会话 → 开面板 → 读「我的分身」；
+  // 新建会话继承**持久化默认 preset**，只切一次 chip 治不了漂移（实测连红两轮）⇒ 3 轮不成 fail-loud。
   await (async () => {
-    const chip = page.getByRole('button').filter({ hasText: /梦之队 (CEO|CFO|COO|VP-Eng|VP-Sales)|Standard mode|PTC mode|Minimal mode/ })
-    if (await chip.count() === 0) throw new Error('找不到 preset chip——无法确保会话是公司角色（模式残留）')
-    await chip.last().click()
-    await sleep(1000)
-    const ceo = page.getByText('梦之队 CEO', { exact: true }).last()
-    if (await ceo.count() === 0) throw new Error('preset 菜单里没有「梦之队 CEO」')
-    await ceo.click()
-    await sleep(1500)
-    await page.keyboard.press('Escape')          // 收菜单遮罩
-    await page.reload({ waitUntil: 'load' })     // 重载：让 host 侧会话也吃到公司角色（实测切完不重载会留非公司角色）
-    await sleep(4500)
-    await dismissNotices(page, sleep)
-    await sleep(1200)
-    // 再**新建一个会话**：host 侧 preset 是建会话时定的，旧会话可能仍是漂移前那个（实测只切 chip 不够）。
-    const newSession = page.getByRole('button').filter({ hasText: 'New Session' }).first()
-    if (await newSession.count() > 0) {
-      await newSession.click()
-      await sleep(3500)
+    for (let attempt = 0; attempt < 3; attempt++) {
+      // ① 先落公司盘（工作区芯片的正则要覆盖所有已注册工作区名；漏一个就静默留在别的工作区）
+      const chooser = page.getByRole('button').filter({ hasText: /Choose workspace|company-workspace|ai_dsh_company|harness-home|rehearsal-workspace/ })
+      if (await chooser.count() > 0) {
+        await chooser.last().click().catch(() => {})
+        await sleep(1200)
+        const drive = page.getByText('company-workspace', { exact: true }).last()
+        if (await drive.count() > 0) { await drive.click().catch(() => {}); await sleep(2500) }
+      }
+      // ② 再选 preset
+      const chip = page.getByRole('button').filter({ hasText: /梦之队 (CEO|CFO|COO|VP-Eng|VP-Sales)|Standard mode|PTC mode|Minimal mode/ })
+      if (await chip.count() === 0) throw new Error('找不到 preset chip——无法确保会话是公司角色（模式残留）')
+      await chip.last().click()
+      await sleep(1200)
+      const ceo = page.getByText('梦之队 CEO', { exact: true }).last()
+      if (await ceo.count() === 0) throw new Error('preset 菜单里没有「梦之队 CEO」')
+      await ceo.click()
+      await sleep(1500)
+      await page.keyboard.press('Escape')
+      await page.getByRole('button').filter({ hasText: 'New Session' }).first().click().catch(() => {})
+      await sleep(3000)
+      const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
+      if (await opener.count() > 0) { await opener.first().click().catch(() => {}); await sleep(900) }
+      const entry = page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first()
+      if (await entry.count() > 0) { await entry.click().catch(() => {}); await sleep(2000) }
+      const short = /我的分身：([^\n|]+)/.exec(await page.locator('body').innerText())?.[1]?.trim() ?? null
+      if (short !== null && short !== '' && short !== 'ptc' && short !== 'standard') return
+      console.log(`  NOTE 开场自愈第 ${String(attempt + 1)} 轮仍未归位（我的分身=${String(short)}）——重试`)
     }
+    throw new Error(`3 轮自愈仍拿不到公司角色：${(await page.locator('body').innerText()).replaceAll('\n', ' | ').slice(0, 200)}`)
   })()
 
     const pane = page.locator('.wk-cultivation-compose').first()

@@ -132,17 +132,29 @@ try {
   await dismissNotices(page, sleep)
   // ⚠ 会话 preset 是**持久**的：上一轮若把它切成 Standard/PTC，这一轮客户端会复用那条会话。
   //   所以先把 preset 归位到「梦之队 CEO」，再开培养页签。
-  await check('S0 会话 preset 归位到公司角色', async () => {
-    const chip = page.getByRole('button').filter({ hasText: /梦之队 (CEO|CFO|COO|VP-Eng|VP-Sales)|Standard mode|PTC mode|Minimal mode/ })
-    if (await chip.count() === 0) throw new Error('找不到 preset chip')
-    await chip.last().click()
-    await sleep(1200)
-    const ceo = page.getByText('梦之队 CEO', { exact: true }).last()
-    if (await ceo.count() === 0) throw new Error('preset 菜单里没有「梦之队 CEO」')
-    await ceo.click()
-    await sleep(2000)
-    await page.keyboard.press('Escape')   // 收掉可能残留的菜单遮罩（它会吞掉后面的开栏/点页签）
-    await sleep(500)
+  // ── S0 会话归位（**自愈循环**）：选「梦之队 CEO」→ 新建会话 → 开面板 → 读「我的分身」
+  //   为什么要循环：新建会话继承**持久化的默认 preset**——前几轮切过 PTC/Standard 就会一路传下去，
+  //   只做一次"切 chip"治不了（实测两轮开场"未拿到角色"）。3 轮不成即 fail-loud 并打印面板文本。
+  await check('S0 会话归位（自愈循环：选 CEO → 新建会话 → 开面板 → 读角色）', async () => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const chip = page.getByRole('button').filter({ hasText: /梦之队 (CEO|CFO|COO|VP-Eng|VP-Sales)|Standard mode|PTC mode|Minimal mode/ })
+      if (await chip.count() === 0) throw new Error('找不到 preset chip（会话面异常）')
+      await chip.last().click()
+      await sleep(1200)
+      const ceo = page.getByText('梦之队 CEO', { exact: true }).last()
+      if (await ceo.count() === 0) throw new Error('preset 菜单里没有「梦之队 CEO」')
+      await ceo.click()
+      await sleep(1800)
+      await page.keyboard.press('Escape')   // 收掉菜单遮罩（它会吞掉后面的开栏/点页签）
+      await page.getByRole('button').filter({ hasText: 'New Session' }).first().click().catch(() => {})
+      await sleep(3000)
+      // 新建会话会把面板关上 ⇒ 重开再读角色（openPanel 定义在本文件上方）
+      try { await openPanel(page) } catch { /* 下一轮再来 */ }
+      const short = /我的分身：([^\n|]+)/.exec(await page.locator('body').innerText())?.[1]?.trim() ?? null
+      if (short !== null && short !== '' && short !== 'ptc' && short !== 'standard') return
+      console.log(`  NOTE S0 第 ${String(attempt + 1)} 轮仍未归位（我的分身=${String(short)}）——重试`)
+    }
+    throw new Error(`3 轮自愈仍拿不到公司角色：${(await page.locator('body').innerText()).replaceAll('\n', ' | ').slice(0, 200)}`)
   })
 
   // 挂公司盘 + 开「培养」页签（与顺路档同一条真路径）
@@ -439,12 +451,13 @@ try {
     // 注入：所有 /api/commands/execute 直接 abort（等价于命令面断）
     await page.route('**/api/commands/execute', route => route.abort())
     await row.getByRole('button', { name: COPY.adopt, exact: true }).click()
-    const deadline = Date.now() + 15_000
+    // ⚠ 窗口必须**大于产品侧超时**（动作面 20s 才收口）：探针等 15s 会在"处理中…"上误判成"没收回来"（实测踩过）
+    const deadline = Date.now() + 35_000
     let text = ''
     while (Date.now() < deadline) {
       text = await row.innerText()
-      if (/不可达|命令面/.test(text)) break
-      await sleep(400)
+      if (/不可达|命令面|没回话/.test(text)) break
+      await sleep(500)
     }
     await shot(page, 'S12-command-face-down')
     if (!/不可达|命令面/.test(text)) throw new Error(`命令面断时行内没说清：${text.replaceAll('\n', ' | ').slice(0, 200)}`)

@@ -10,6 +10,7 @@
  */
 import { useCallback, useEffect, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import { CULTIVATION_CHANGED_EVENT } from './cultivation-actions.ts'
 import {
   CULTIVATION_ROLES,
   feedbackItems,
@@ -155,11 +156,14 @@ export function useCultivationPanelData(
     const wake = (): void => { if (!controller.signal.aborted) void load() }
     window.addEventListener('focus', wake)
     document.addEventListener('visibilitychange', wake)
+    // 兄弟实例的动作广播（同页多实例：侧栏页签 + 公司页 + 浮窗）⇒ 秒级同步，不等轮询
+    window.addEventListener(CULTIVATION_CHANGED_EVENT, wake)
     return () => {
       controller.abort()
       clearInterval(timer)
       window.removeEventListener('focus', wake)
       document.removeEventListener('visibilitychange', wake)
+      window.removeEventListener(CULTIVATION_CHANGED_EVENT, wake)
     }
   }, [enabled, sessionId, files, nonce])
 

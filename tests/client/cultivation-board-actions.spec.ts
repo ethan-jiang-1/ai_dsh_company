@@ -13,8 +13,11 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it } from 'vitest'
 import { CultivationBoard } from '../../packages/company-pack/src/client/CultivationBoard.tsx'
 import {
+  CULTIVATION_CHANGED_EVENT,
   CULTIVATION_COPY,
   adoptLine,
+  makeCultivationActions,
+  type CommandsRemoteFace,
   correctLine,
   rejectLine,
   revokeLine,
@@ -251,10 +254,28 @@ describe('创作面：不看说明也能提交一条（S5，判据 ①/G1）', (
   })
 })
 
-// 负例留证 2026-10-18：BUG-024——修前 `run()` 的 `setPendingId(null)` 在 await 之后、无 finally，
+// 负例留证 2026-10-18（事故卡见 _backlog/bugs/「失败后按钮卡处理中」，调查中）：修前 `run()` 的 `setPendingId(null)` 在 await 之后、无 finally，
 //   抛错路径下按钮永久 disabled +「处理中…」⇒ 本用例红（找不到可点的「采纳」/文案里没有"可重试"）；
 //   改成 try/catch/finally + 显式「面板内部出错…可重试」后绿。还原配方 = 删掉 run() 的 try/finally 包装。
-describe('BUG-024：动作面抛错时按钮必须回到可用（不许永久停在「处理中…」）', () => {
+describe('跨实例刷新广播（S13 观察落地：侧栏 + 公司页同开 ⇒ 秒级同步，不等 30s 轮询）', () => {
+  it('动作成功即广播 CULTIVATION_CHANGED_EVENT；失败不广播', async () => {
+    const seen: string[] = []
+    const listener = (): void => { seen.push('hit') }
+    window.addEventListener(CULTIVATION_CHANGED_EVENT, listener)
+    try {
+      const okFace = { execute: async () => ({ ok: true as const, value: { result: { kind: 'success' as const, text: '已采纳 r-1' } } }) } as CommandsRemoteFace
+      await makeCultivationActions(okFace, 'session-1' as never).run('/cultivation adopt r-1')
+      expect(seen, '成功要广播（兄弟实例靠它重读）').toHaveLength(1)
+      const badFace = { execute: async () => ({ ok: true as const, value: { result: { kind: 'error' as const, text: '仅建议权' } } }) } as CommandsRemoteFace
+      await makeCultivationActions(badFace, 'session-1' as never).run('/cultivation adopt r-1')
+      expect(seen, '失败没有状态变化可同步，不该广播').toHaveLength(1)
+    } finally {
+      window.removeEventListener(CULTIVATION_CHANGED_EVENT, listener)
+    }
+  })
+})
+
+describe('失败后按钮卡「处理中…」：动作面抛错时按钮必须回到可用（不许永久停在「处理中…」）', () => {
   it('抛错 ⇒ pending 收回、按钮可再点、行内说清原因', async () => {
     let calls = 0
     const actions: CultivationActions = {

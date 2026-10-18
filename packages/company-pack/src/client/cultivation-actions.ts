@@ -103,6 +103,13 @@ export interface CommandsRemoteFace {
   >
 }
 
+/**
+ * 动作成功后广播的窗口事件名（常量单一事实）：同页可能同时开着**多个培养面板实例**
+ * （侧栏页签 + 公司页第四子页 + 浮窗），各自 30s 轮询 ⇒ 一端改完另一端最多 30s 才同步（S13 实测）。
+ * 广播让兄弟实例**秒级**重读；名字带包前缀，避免与平台事件撞。
+ */
+export const CULTIVATION_CHANGED_EVENT = 'dsh-company-pack/cultivation-changed'
+
 /** 面板等命令面的上限（超过即取消并告人；断连时不设上限 = 按钮永久「处理中…」）。 */
 export const DEFAULT_ACTION_TIMEOUT_MS = 20_000
 
@@ -235,7 +242,12 @@ export function makeCultivationActions(
       if (result.value === undefined) return { ok: false, text: CULTIVATION_COPY.unmatched }
       const { kind, text } = result.value.result
       const readable = text === undefined || text === '' ? CULTIVATION_COPY.done : text
-      return { ok: kind === 'success', text: readable }
+      const outcome = { ok: kind === 'success', text: readable }
+      // 成功才广播（失败没有状态变化可同步；广播本身也只在浏览器里——SSR/测试环境没有 window 就跳过）
+      if (outcome.ok && typeof window !== 'undefined') {
+        window.dispatchEvent(new Event(CULTIVATION_CHANGED_EVENT))
+      }
+      return outcome
     },
   }
 }

@@ -135,7 +135,7 @@ try {
   await page.goto(`http://127.0.0.1:${String(port)}/?token=${token}`, { waitUntil: 'load', timeout: 60_000 })
   await sleep(4500)
   await dismissNotices(page, sleep)
-  const chooser = page.getByRole('button').filter({ hasText: /Choose workspace|harness-home|rehearsal-workspace|company-workspace/ })
+  const chooser = page.getByRole('button').filter({ hasText: /Choose workspace|company-workspace|ai_dsh_company|harness-home|rehearsal-workspace/ })
   if (await chooser.count() > 0) {
     await chooser.last().click()
     await sleep(1200)
@@ -155,8 +155,28 @@ try {
     if (await ceo.count() > 0) { await ceo.click(); await sleep(1800) }
   })()
 
-  await page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first().click()
-  await sleep(2500)
+  // 落公司盘 → 新建会话 → 开右栏点「培养」（带重试）：没会话时指南条目根本不渲染（实测连红两轮）
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const chooser = page.getByRole('button').filter({ hasText: /Choose workspace|company-workspace|ai_dsh_company|harness-home|rehearsal-workspace/ })
+    if (await chooser.count() > 0 && attempt === 0) {
+      await chooser.last().click().catch(() => {})
+      await sleep(1200)
+      const drive = page.getByText('company-workspace', { exact: true }).last()
+      if (await drive.count() > 0) { await drive.click().catch(() => {}); await sleep(2500) }
+    }
+    await page.getByRole('button').filter({ hasText: 'New Session' }).first().click().catch(() => {})
+    await sleep(3000)
+    const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
+    if (await opener.count() > 0) { await opener.first().click().catch(() => {}); await sleep(900) }
+    const entry = page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first()
+    if (await entry.count() > 0) {
+      await entry.click().catch(() => {})
+      await sleep(2200)
+      if (await page.locator('.wk-pane').count() > 0) break
+    }
+    await page.keyboard.press('Escape').catch(() => {})
+    await sleep(800)
+  }
 
   await shot(page, '00-first-view', { full: true })
   const short = /我的分身：([^\n|]+)/.exec(await page.locator('body').innerText())?.[1]?.trim() ?? null
