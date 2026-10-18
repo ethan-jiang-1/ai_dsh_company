@@ -390,6 +390,31 @@ describe('重复提交（探索方向③：连点两次不许双发）', () => {
   })
 })
 
+describe('拒绝表单的键盘可用（场景轮 S24：Escape 被困）', () => {
+  it('Escape 取消拒绝表单（不落盘、不发命令）', async () => {
+    const { actions, lines } = stubActions()
+    const { container } = mount({ records: [record()], actions })
+    await click(button(container, CULTIVATION_COPY.reject)!)
+    const input = container.querySelector('input') as HTMLInputElement
+    await type(input, '键盘取消')
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    await new Promise(resolve => setTimeout(resolve, 20))
+    expect(container.querySelector('input'), 'Escape 后表单应收起').toBeNull()
+    expect(lines, 'Escape 不该发命令').toHaveLength(0)
+  })
+
+  it('Enter 确认拒绝（理由进命令行）', async () => {
+    const { actions, lines } = stubActions()
+    const { container } = mount({ records: [record()], actions })
+    await click(button(container, CULTIVATION_COPY.reject)!)
+    const input = container.querySelector('input') as HTMLInputElement
+    await type(input, '键盘确认')
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    await new Promise(resolve => setTimeout(resolve, 50))
+    expect(lines.join('')).toContain('键盘确认')
+  })
+})
+
 describe('长正文折叠（2026-10-18 场景轮：60 行正文撑满面板）', () => {
   const longBody = Array.from({ length: 60 }, (_, i) => `第 ${String(i + 1)} 行`).join('\n')
 

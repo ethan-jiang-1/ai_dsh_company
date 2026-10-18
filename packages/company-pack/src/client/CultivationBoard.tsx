@@ -245,6 +245,20 @@ export function CultivationBoard(props: CultivationBoardProps) {
                             placeholder={CULTIVATION_COPY.rejectPlaceholder}
                             aria-label={CULTIVATION_COPY.rejectPlaceholder}
                             onChange={event => { setReason(event.target.value) }}
+                            // 键盘可用（2026-10-19 场景轮 S24 抓到：此前 Escape 不取消 = 键盘用户被困在表单里）：
+                            // Escape 取消（不落盘）、Enter 确认（空理由仍走既有校验）。
+                            onKeyDown={event => {
+                              if (event.key === 'Escape') {
+                                event.preventDefault()
+                                setRejectingId(null)
+                                setReasonProblem(null)
+                                return
+                              }
+                              if (event.key === 'Enter') {
+                                event.preventDefault()
+                                void confirmReject(record.id)
+                              }
+                            }}
                           />
                           <Button
                             disabled={pendingId === record.id}

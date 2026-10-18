@@ -157,6 +157,16 @@
 **本轮无新缺陷**（S13 曾长期"未验成"，破局靠的是**换入口而不是放宽判据**——这条值得记：仪器到不了的地方，
 先想"怎么让被验面可达"，而不是把断言改成观察）。
 
+## 追加九：三实例并存 + 键盘细项（2026-10-19）
+
+| 轴 | 结论 |
+|---|---|
+| **S23 三实例并存** | ✅ 有了 `/help` 破局法后能同时开「浮窗 + 公司页第四子页」：**在浮窗里采纳 ⇒ 公司页实例 ≤8s 同步**（第二对实例也验过广播） |
+| **S24 键盘细项** | 🐛 **抓到真缺陷并修好**：拒绝表单**按 Escape 不取消** ⇒ 键盘用户被困（只能动鼠标点「取消」）。修 = 输入框 `onKeyDown`：Escape 取消（不落盘）、Enter 确认（空理由仍走既有校验）；同 diff 加两条交互档判据（Escape 后表单收起且**没发命令**；Enter 后理由进命令行）。修完 S24 复跑绿 |
+
+**仪器教训（第四类）**：打开公司页的场景**必须把视图切回去**——S23 起初没还原，后面所有场景都因为"两份同名行"炸出
+strict mode violation（假红一片）。已加 `backToSessionView()` 助手 + 把行查询一律**限定在侧栏面板内**。
+
 ## 指针
 
 - 探针：[cultivation-ux-scenarios.mjs](../../probes/browser-visual/cultivation-ux-scenarios.mjs)（`--shots`）｜顺路档：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough.mjs)

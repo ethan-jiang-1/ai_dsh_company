@@ -115,6 +115,20 @@ async function openPanel(page) {
 }
 
 /**
+ * 切回会话视图（S13/S23 打开过公司页第四子页 ⇒ 不退出来的话，后面所有场景都会看到**两份同名行**，
+ * 触发 strict mode violation——2026-10-19 实测）。找不到入口就退化为按 Escape，不判红（还原动作本身不是判据）。
+ * @param page - Playwright 页面。
+ */
+async function backToSessionView(page) {
+  for (const name of [/Chat/, /对话/, /Start/]) {
+    const tab = page.getByRole('tab', { name }).first()
+    if (await tab.count() > 0) { await tab.click().catch(() => {}); await sleep(1200); return }
+  }
+  await page.keyboard.press('Escape').catch(() => {})
+  await sleep(600)
+}
+
+/**
  * 把已有浮窗收回停靠位（**探针卫生**：浮出状态跨会话恢复——上轮 S4b 浮出的面板会出现在下一轮，
  * 挡住导航/让同名行出现多份；2026-10-18 实测两次翻车）。开场与收尾各调一次。
  * @param page - Playwright 页面。
@@ -197,7 +211,8 @@ try {
   const roleShort = async () => /我的分身：([^\n|]+)/.exec(await page.locator('body').innerText())?.[1]?.trim() ?? null
   role = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo' }[await roleShort()] ?? null
 
-  const rowOf = (id) => page.getByRole('listitem', { name: `待处理 ${id}` })
+  // 行查询一律限定在**侧栏那个面板**内：公司页实例并存时，page-wide 会命中两份（strict violation）。
+  const rowOf = (id) => page.locator('.wk-pane').getByRole('listitem', { name: `待处理 ${id}` }).first()
 
   // ── S2a 采纳撞名失败：预先占住方法目录 → 行内必须出宿主原话且行仍可操作 ──────────────
   const conflictId = `${P}-conflict`
@@ -582,9 +597,7 @@ try {
       throw new Error(`跨实例没同步（广播没生效？）：公司页实例仍给可用的「采纳」——${rowText.replaceAll('\n', ' | ').slice(0, 180)}`)
     }
     notes.push('S13：侧栏采纳后公司页实例 ≤8s 同步（广播生效，不再等 30s 轮询）✓')
-    // 收尾：切回会话视图，免得后面的场景在主视图里找面板
-    const chat = page.getByRole('tab', { name: /Chat|对话/ }).first()
-    if (await chat.count() > 0) { await chat.click().catch(() => {}); await sleep(1200) }
+    await backToSessionView(page)   // 还原：别把公司页留着害后面的场景
   })
 
   // ── S16 规模：30 条待办时面板仍可用（全部渲染、能滚到底、按钮可点；记录耗时）────────────
@@ -660,6 +673,91 @@ try {
     if (await row.getByRole('button', { name: COPY.verifyPass, exact: true }).count() !== 0) throw new Error('已撤回记录仍给「这条有用」（验证一个已删的方法 = 死按钮）')
     if (await row.getByRole('button', { name: /撤回/ }).count() !== 0) throw new Error('已撤回记录仍给「撤回」')
     notes.push('S18：已撤回记录说清状态且不再给验证/撤回把手 ✓')
+  })
+
+  // ── S23 三实例并存（浮窗 + 公司页）：在**浮窗**里采纳，公司页实例也要 ≤8s 同步 ────────────
+  await check('S23 三实例并存：浮窗里采纳，公司页实例 ≤8s 同步', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const id = `${P}-multi3`
+    seedRecord(id, { targetRole: role, expectation: 'UX场景：三实例并存', body: '做法：浮窗采纳看公司页。' })
+    seeded.push(id)
+    await wake()
+    // ① 先让会话有内容（/help）并打开公司页第四子页（复刻 S13 的破局路径）
+    const composer = page.locator('textarea, [contenteditable=true]').first()
+    if (await composer.count() > 0) {
+      await composer.click().catch(() => {})
+      await composer.fill('/help').catch(async () => { await page.keyboard.type('/help') })
+      await page.keyboard.press('Enter')
+      await sleep(3000)
+      await wake()
+    }
+    const viewTab = page.getByText('公司', { exact: true }).first()
+    if (await viewTab.count() === 0) { notes.push('S23 未验成：会话视图入口没出现（同 S13 的原因）'); return }
+    await viewTab.click()
+    await sleep(1500)
+    const sub = page.locator('.wk-view-tabs').getByRole('tab', { name: '培养' }).first()
+    if (await sub.count() === 0) throw new Error('公司页里找不到「培养」子页（未验成，不许算绿）')
+    await sub.click()
+    await sleep(2500)
+    await wake()
+    const pageRow = page.locator('.wk-cultivation-pane').getByRole('listitem', { name: `待处理 ${id}` }).first()
+    await pageRow.waitFor({ timeout: 25_000 }).catch(() => { throw new Error('公司页实例没看到这条') })
+    // ② 把侧栏那个面板浮出去（成为第二个实例）
+    const floatBtn = page.getByRole('button', { name: /浮出/ })
+    if (await floatBtn.count() === 0) throw new Error('找不到「浮出」按钮')
+    await floatBtn.first().click()
+    await sleep(1800)
+    const floatPane = page.locator('[data-dockkit-float]').filter({ has: page.getByRole('listitem', { name: `待处理 ${id}` }) }).last()
+    if (await floatPane.count() === 0) throw new Error('浮窗里没看到这条')
+    await shot(page, 'S23-three-instances', { full: true })
+    // ③ 在浮窗里采纳 → 公司页实例必须同步
+    await floatPane.getByRole('listitem', { name: `待处理 ${id}` }).last()
+      .getByRole('button', { name: COPY.adopt, exact: true }).first().click()
+    const d1 = Date.now() + 20_000
+    while (Date.now() < d1 && !recordTextOf(id).includes('status: adopted')) await sleep(500)
+    if (!recordTextOf(id).includes('status: adopted')) throw new Error('浮窗实例采纳没落盘')
+    const d2 = Date.now() + 8_000
+    let synced = false
+    while (Date.now() < d2) {
+      const still = await pageRow.getByRole('button', { name: COPY.adopt, exact: true }).count()
+      const text = await pageRow.innerText().catch(() => '')
+      if (still === 0 || /已采纳|已处理/.test(text)) { synced = true; break }
+      await sleep(400)
+    }
+    if (!synced) throw new Error('公司页实例没同步（浮窗 → 公司页 的广播没生效？）')
+    notes.push('S23：浮窗采纳 ⇒ 公司页实例 ≤8s 同步 ✓（浮窗 + 公司页两实例并存）')
+    await dockFloats(page)
+    await backToSessionView(page)   // 还原：别把公司页留着害后面的场景
+  })
+
+  // ── S24 键盘细项：拒绝表单的 Escape（取消）与 Enter（确认）──────────────────────────
+  await check('S24 键盘细项：拒绝表单 Escape 取消、Enter 确认', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const id = `${P}-kbd`
+    seedRecord(id, { targetRole: role, expectation: 'UX场景：键盘细项', body: '做法：Escape/Enter。' })
+    seeded.push(id)
+    await wake()
+    const row = rowOf(id)
+    await row.waitFor({ timeout: 25_000 })
+    await row.getByRole('button', { name: COPY.reject, exact: true }).click()
+    const input = row.locator('input').first()
+    await input.waitFor({ timeout: 10_000 })
+    await input.fill('键盘取消试试')
+    await page.keyboard.press('Escape')
+    await sleep(800)
+    const afterEscape = await row.locator('input').count()
+    if (afterEscape !== 0) throw new Error('Escape 没有取消拒绝表单（键盘用户被困在表单里）')
+    if (recordTextOf(id).includes('status: rejected')) throw new Error('Escape 竟把记录拒了')
+    await row.getByRole('button', { name: COPY.reject, exact: true }).click()
+    const input2 = row.locator('input').first()
+    await input2.waitFor({ timeout: 10_000 })
+    await input2.fill('键盘确认试试')
+    await page.keyboard.press('Enter')
+    const d = Date.now() + 20_000
+    while (Date.now() < d && !recordTextOf(id).includes('status: rejected')) await sleep(500)
+    if (!recordTextOf(id).includes('status: rejected')) throw new Error('Enter 没有确认拒绝（键盘用户提交不了）')
+    if (!recordTextOf(id).includes('键盘确认试试')) throw new Error('理由没进记录')
+    notes.push('S24：拒绝表单键盘可用（Escape 取消不落盘、Enter 确认且理由进记录）✓')
   })
 
   // ── S22 角色闸：非本角色撤回被 host 拒；别的角色的已采纳记录不进我的「已采纳的方法」──────
