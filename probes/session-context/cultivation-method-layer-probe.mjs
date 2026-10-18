@@ -173,6 +173,28 @@ try {
     })
   })
 
+  // ⑨ 撤回方向（2026-10-19 新增）：目录真删 + 记录标 revokedAt + **运行中会话的目录是否也摘除**
+  //   这条直接决定面板文案「撤回 = 删掉这个方法（该角色会话不再加载它）」是否准确：
+  //   若运行中会话仍见 ⇒ 文案该收敛成"新开的会话不再加载"。
+  await check('⑨ 撤回：方法目录真删 + 记录标 revokedAt + 新会话不再加载', async () => {
+    if (recordId === null) throw new Error('没有可用的记录 id')
+    const slug = `method-${recordId}`
+    const dir = join(METHOD_ROOT, 'cfo', slug)
+    const run = await rpc('commands/execute', { agentId: cfoSession, line: `/cultivation revoke ${slug}`, submittedAttachments: [] })
+    if (run?.result?.kind !== 'success') throw new Error(`revoke 未成功：${JSON.stringify(run).slice(0, 240)}`)
+    if (existsSync(dir)) throw new Error(`方法目录没删：${dir}`)
+    const text = readFileSync(join(RECORDS_DIR, `${recordId}.md`), 'utf8')
+    if (!text.includes('revokedAt')) throw new Error('记录没标 revokedAt')
+    const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'cfo' } })
+    const value = await rpc('skills/list', { request: { sessionId: created.id ?? created.sessionId } })
+    const names = (value.skills ?? []).map(skill => skill.name)
+    if (names.includes(slug)) throw new Error(`新开的 cfo 会话仍加载已撤回方法：${names.join(', ').slice(0, 200)}`)
+    // 运行中会话（早于撤回建立的那条）复查：如实记录，供面板文案对齐
+    await sleep(2000)
+    const live = await catalogOf('cfo')
+    console.log(`  NOTE ⑨ 运行中会话撤回后目录：${live.includes(slug) ? '仍见（watcher 未摘除）' : '已去掉（watcher 摘除）'}`)
+  })
+
   // 反例（角色闸）：ceo 会话采纳 cfo 的记录 → 拒绝（仅建议权，目标本人采纳）
   let suggestionRecordId = null
   await check('反例：ceo 会话代采纳 cfo 的记录被拒（仅建议权）', async () => {
@@ -252,6 +274,6 @@ if (existsSync(RECORDS_DIR)) {
 try { require('node:fs').rmdirSync(join(METHOD_ROOT, 'cfo')) } catch { /* 非空/缺失则留着 */ }
 
 console.log(failures.length === 0
-  ? '\ncultivation-method-layer-probe: ALL PASS（方法层机制六判据 + 角色闸反例全过）'
+  ? '\ncultivation-method-layer-probe: ALL PASS（方法层机制判据 + 角色闸反例全过）'
   : `\ncultivation-method-layer-probe: ${failures.length} FAILURE(S)\n${failures.join('\n')}`)
 process.exit(failures.length === 0 ? 0 : 1)
