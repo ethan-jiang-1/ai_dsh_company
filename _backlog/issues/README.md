@@ -6,7 +6,10 @@
 
 | 问题 | 当前情况与下一步 |
 |---|---|
-| [公司面 UX 深挖——先做哪几个面板](2026-10-19-company-panels-ux-priority.md) | 调研已出：**Top 1 台账**（993 条真数据/痛点 7）、Top 2 看板+依赖图（379 任务、指挥视图）、Top 3 任务板；**等你点一个方向** |
+| [公司面 UX 深挖——先做哪几个面板](2026-10-19-company-panels-ux-priority.md) | 优先级与依据（父卡，含"不做"段）；Top 3 已拆成下面三张独立卡 |
+| [① 台账面板 UX 深挖](2026-10-19-ledger-ux-deep-dive.md) | 993 条真数据 / 文件驱动 / 痛点 7 ⇒ 先摘的大果；**等你点** |
+| [② 看板 + 依赖图 UX 深挖](2026-10-19-board-dag-ux-deep-dive.md) | 指挥视图 ⇒ 核心是"板面 = 投影真值"的**正确性判据**；**等你点** |
+| [③ 任务板 UX 深挖](2026-10-19-taskboard-table-ux-deep-dive.md) | 与看板同源 ⇒ 核心是**口径一致性** + 入口可发现性；**等你点** |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 
