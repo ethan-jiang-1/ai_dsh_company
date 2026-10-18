@@ -27,6 +27,9 @@
 //   S16 规模 → 30 条待办：全部渲染、滚到底可达、按钮可点（记录耗时）
 //   S17 极端形态 → 空正文（不渲染空块）+ 600 字期望句（按钮仍在行内）
 //   S18 已撤回记录 → 说清"已撤回"、不再给验证/撤回把手
+//   S19 验证负路 → 「没起作用」⇒ verification: fail + 回执
+//   S20 撤回后不可再采纳 → host 拒绝 + 面板不再列
+//   S21 规模 100 条 → 全部渲染 + 末条可操作（记耗时）
 //   S11 极端文案 → 超长期望句 + emoji 不挤坏排版（按钮仍在行内）
 //   S12 错误恢复 → 命令面被打断时行内说"不可达"且**按钮回到可用**；解除注入后重试即成功
 //   S13 多入口并存 → 侧栏 + 公司页第四子页同开：一端处理完，另一处要么同步、要么被 host 明确拒绝（不许静默）
@@ -528,13 +531,15 @@ try {
     // 「公司」视图页签由平台渲染（不是 role=tab）⇒ 用可见文本找；找不到 = 这条轴没验，必须**报红**而不是静默跳过
     let viewTab = page.getByText('公司', { exact: true }).first()
     if (await viewTab.count() === 0) {
-      // 视图页签只在**有内容的会话**里渲染 ⇒ 先从侧栏点一条已有会话（标题型文本行），再找一次
-      const candidate = page.locator('button, [role=treeitem], a').filter({ hasText: /[\u4e00-\u9fa5A-Za-z]{4,}/ }).first()
-      if (await candidate.count() > 0) {
-        await candidate.click().catch(() => {})
-        await sleep(2500)
+      // 视图页签只在**有内容的会话**里渲染。给会话造内容最便宜的办法 = 发一条**本地命令**（`/help` 不走模型）。
+      const composer = page.locator('textarea, [contenteditable=true]').first()
+      if (await composer.count() > 0) {
+        await composer.click().catch(() => {})
+        await composer.fill('/help').catch(async () => { await page.keyboard.type('/help') })
+        await page.keyboard.press('Enter')
+        await sleep(3500)
         await wake()
-        await sleep(1000)
+        await sleep(800)
         viewTab = page.getByText('公司', { exact: true }).first()
       }
     }
@@ -655,6 +660,98 @@ try {
     if (await row.getByRole('button', { name: COPY.verifyPass, exact: true }).count() !== 0) throw new Error('已撤回记录仍给「这条有用」（验证一个已删的方法 = 死按钮）')
     if (await row.getByRole('button', { name: /撤回/ }).count() !== 0) throw new Error('已撤回记录仍给「撤回」')
     notes.push('S18：已撤回记录说清状态且不再给验证/撤回把手 ✓')
+  })
+
+  // ── S22 角色闸：非本角色撤回被 host 拒；别的角色的已采纳记录不进我的「已采纳的方法」──────
+  await check('S22 角色闸：非本角色撤回被拒 + 别的角色的已采纳不进我的列表', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const other = { ceo: 'cfo', cfo: 'coo', coo: 'vp-eng', 'vp-eng': 'vp-sales', 'vp-sales': 'ceo' }[role]
+    const otherId = `${P}-other`
+    const otherSlug = `${P}-oslug`
+    seedRecord(otherId, { status: 'adopted', targetRole: other, expectation: 'UX场景：别的角色的已采纳', body: '做法：隔离。', methodSlug: otherSlug })
+    seeded.push(otherId)
+    const sid = await sessionOf()
+    if (sid === null) throw new Error('拿不到会话 id（RPC 桥）')
+    const refusal = await rpc('commands/execute', { agentId: sid, line: `/cultivation revoke ${otherSlug}`, submittedAttachments: [] })
+    if (refusal?.result?.kind !== 'error') throw new Error(`非本角色撤回本应被拒：${JSON.stringify(refusal).slice(0, 160)}`)
+    await wake()
+    await sleep(1000)
+    const inMine = await page.getByRole('listitem', { name: `方法 ${otherSlug}` }).count()
+    if (inMine > 0) throw new Error('别的角色的已采纳记录出现在我的「已采纳的方法」里（隔离破了）')
+    notes.push(`S22：非本角色撤回被拒（原话：${String(refusal.result.text).slice(0, 50)}…）+ 别的角色的已采纳不进我的列表 ✓`)
+  })
+
+  // ── S19 验证负路：「没起作用」⇒ verification: fail + 行内回执 ────────────────────────
+  await check('S19 验证负路：点「没起作用」⇒ verification: fail + 回执', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const id = `${P}-verifyfail`
+    const slug = `${P}-vf`
+    seedRecord(id, { status: 'adopted', targetRole: role, expectation: 'UX场景：验证负路', body: '做法：点没起作用。', methodSlug: slug })
+    seeded.push(id)
+    await wake()
+    const row = page.getByRole('listitem', { name: `方法 ${slug}` })
+    await row.waitFor({ timeout: 25_000 }).catch(() => { throw new Error('已采纳记录没出现在方法列表') })
+    await row.getByRole('button', { name: '没起作用', exact: true }).click()
+    const deadline = Date.now() + 25_000
+    let text = ''
+    while (Date.now() < deadline) {
+      text = await row.innerText().catch(() => '')
+      if (/verification: fail|没起作用|未见效/.test(text) && /已回填|回填/.test(text)) break
+      await sleep(500)
+    }
+    await shot(page, 'S19-verify-fail')
+    if (!recordTextOf(id).includes('verification: fail')) {
+      throw new Error(`记录没回填 verification: fail（行内：${text.replaceAll('\n', ' | ').slice(0, 140)}）`)
+    }
+    if (!/回填/.test(text)) throw new Error('行内没有回执（人不知道发生了什么）')
+    notes.push('S19：验证负路可用（记录 verification: fail + 行内回执）✓')
+  })
+
+  // ── S20 撤回后不可再采纳：host 必须拒绝（记录已不是 open）──────────────────────────
+  await check('S20 撤回后不可再采纳：host 拒绝且面板不再给把手', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const id = `${P}-revoked2`
+    const slug = `${P}-rv2`
+    seedRecord(id, { status: 'adopted', targetRole: role, expectation: 'UX场景：撤回后不可再采纳', body: '做法：验 host 拒绝。', methodSlug: slug })
+    const f = join(RECORDS, `${id}.md`)
+    writeFileSync(f, readFileSync(f, 'utf8').replace('status: adopted', 'status: adopted\nrevokedAt: 2026-10-19T00:00:00.000Z'))
+    seeded.push(id)
+    const sid = await sessionOf()
+    if (sid === null) throw new Error('拿不到会话 id（RPC 桥）')
+    const again = await rpc('commands/execute', { agentId: sid, line: `/cultivation adopt ${id}`, submittedAttachments: [] })
+    if (again?.result?.kind !== 'error') throw new Error(`撤回后再采纳本应被拒：${JSON.stringify(again).slice(0, 160)}`)
+    await wake()
+    await sleep(800)
+    const inTodo = await page.getByRole('listitem', { name: `待处理 ${id}` }).count()
+    if (inTodo > 0) throw new Error('撤回的记录又出现在「需要我处理」里（不该再可采纳）')
+    notes.push(`S20：撤回后再采纳被 host 拒（原话：${String(again.result.text).slice(0, 60)}…），面板也不再列它 ✓`)
+  })
+
+  // ── S21 规模：100 条待办仍可用（记耗时；S16 是 30 条）────────────────────────────────
+  await check('S21 规模 100 条：仍全部渲染且末条可操作（记耗时）', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const ids = []
+    for (let i = 0; i < 100; i++) {
+      const id = `${P}-bulk100-${String(i).padStart(3, '0')}`
+      ids.push(id)
+      seedRecord(id, { targetRole: role, expectation: `UX场景：百条 ${String(i + 1)}`, body: `做法：第 ${String(i + 1)} 条。` })
+      seeded.push(id)
+    }
+    const t0 = Date.now()
+    await wake()
+    let rendered = 0
+    const deadline = Date.now() + 90_000
+    while (Date.now() < deadline) {
+      rendered = await page.getByRole('listitem', { name: /^待处理 .*bulk100-/ }).count()
+      if (rendered >= 100) break
+      await sleep(1500)
+    }
+    const elapsed = Date.now() - t0
+    if (rendered < 100) throw new Error(`100 条只渲染了 ${String(rendered)} 条（耗时 ${String(elapsed)}ms）`)
+    const last = rowOf(ids[99])
+    await last.scrollIntoViewIfNeeded()
+    if (await last.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) throw new Error('第 100 条不可操作')
+    notes.push(`S21：100 条待办全部渲染（${String(rendered)} 条，${String(elapsed)}ms），末条可滚达可操作 ✓`)
   })
 
   // ── S14 会话级掉线：/api/ 全断 ⇒ 面板不崩、旧数据在、动作收口、恢复即好 ──────────────
