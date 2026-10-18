@@ -56,6 +56,7 @@
 | [budget-signoff-probe.mjs](../probes/session-context/budget-signoff-probe.mjs) | 文件预算会签与工具审批线的正反场景 |
 | [ask-user-timed-probe.mjs](../probes/session-context/ask-user-timed-probe.mjs) | 问询能自行收口（真模型）：定时窗口→pending→turn 收口→RPC 可答→答案回会话；`--unbounded` 档验驱动停点判定（模型传 `-1` 时 0s 报「需人参与」） |
 | [cultivation-propose-probe.mjs](../probes/session-context/cultivation-propose-probe.mjs) | 「分身自己也能提案」**真模型端到端**：起 cfo 会话让它自己调 `cultivation_propose` ⇒ 记录落公司盘且形状/内容正确（默认清理探针产物；`--keep` 留现场） |
+| [propose-sampler.mjs](../tools/propose-sampler.mjs) | 「自发提案」取样器：扫会话日志找 `cultivation_propose` 调用，按人侧有没有要求分箱（自发候选带人话证据；只读秒级） |
 | [cultivation-method-layer-probe.mjs](../probes/session-context/cultivation-method-layer-probe.mjs) | 培养方法层机制六判据：目录发现/角色隔离/缺目录容忍/命令族 wiring/采纳落盘/跨会话生效（keyless 真 boot） |
 | [cultivation-gui-probe.mjs](../probes/browser-visual/cultivation-gui-probe.mjs) | 培养 GUI 行动面判据：真浏览器点「采纳」→ 记录翻 adopted + 方法落方法层 + 会话日志 command/run·done（source=user）/ 跨角色被 host 拒 / 创作表单提交落记录 / 零挂载失败（keyless，出视觉夹具） |
 | [cultivation-ux-walkthrough.mjs](../probes/browser-visual/cultivation-ux-walkthrough.mjs) | 培养面板 UX 走查（体验协议 T1–T6 的自动化替身）：六任务逐步计时/步数/关键文案在场；`--protocol` 出给人跑的一页协议卡 |
