@@ -25,6 +25,8 @@
 //   S14 会话级掉线 → 全量断 /api/：面板不崩、旧数据保留、动作收口（错误话+按钮回可用）、恢复即好
 //   S15 时间序 → 三条不同时间戳记录：列表**新在前**且时间标签有序
 //   S16 规模 → 30 条待办：全部渲染、滚到底可达、按钮可点（记录耗时）
+//   S17 极端形态 → 空正文（不渲染空块）+ 600 字期望句（按钮仍在行内）
+//   S18 已撤回记录 → 说清"已撤回"、不再给验证/撤回把手
 //   S11 极端文案 → 超长期望句 + emoji 不挤坏排版（按钮仍在行内）
 //   S12 错误恢复 → 命令面被打断时行内说"不可达"且**按钮回到可用**；解除注入后重试即成功
 //   S13 多入口并存 → 侧栏 + 公司页第四子页同开：一端处理完，另一处要么同步、要么被 host 明确拒绝（不许静默）
@@ -524,7 +526,18 @@ try {
       throw new Error('侧栏实例 25s 内没看到这条（面板不在会话视图？读盘失败？）')
     })
     // 「公司」视图页签由平台渲染（不是 role=tab）⇒ 用可见文本找；找不到 = 这条轴没验，必须**报红**而不是静默跳过
-    const viewTab = page.getByText('公司', { exact: true }).first()
+    let viewTab = page.getByText('公司', { exact: true }).first()
+    if (await viewTab.count() === 0) {
+      // 视图页签只在**有内容的会话**里渲染 ⇒ 先从侧栏点一条已有会话（标题型文本行），再找一次
+      const candidate = page.locator('button, [role=treeitem], a').filter({ hasText: /[\u4e00-\u9fa5A-Za-z]{4,}/ }).first()
+      if (await candidate.count() > 0) {
+        await candidate.click().catch(() => {})
+        await sleep(2500)
+        await wake()
+        await sleep(1000)
+        viewTab = page.getByText('公司', { exact: true }).first()
+      }
+    }
     if (await viewTab.count() === 0) {
       // 2026-10-19 定位（靠失败自描述 dump）：**会话视图页签只在"有内容的会话"里渲染**；本档开的是空白新会话
       // ⇒ 这条轴在本档的会话形态下**验不成**。不许假红（不是缺陷）、也不许假装绿：响亮记 NOTE 并说清下一步。
@@ -595,6 +608,53 @@ try {
     if (await last.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) throw new Error('第 30 条不可操作')
     await shot(page, 'S16-scale-30')
     notes.push(`S16：30 条待办全部渲染（${String(rendered)} 条，${String(elapsed)}ms），末条可滚达且可操作 ✓`)
+  })
+
+  // ── S17 极端形态：空正文（frontmatter-only）+ 600 字超长期望句 ──────────────────────
+  await check('S17 极端形态：空正文不渲染空块、600 字期望句不挤坏排版', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const noBody = `${P}-nobody`
+    const longExpectation = `UX场景：${'很长的期望句'.repeat(60)}`
+    seedRecord(noBody, { targetRole: role, expectation: 'UX场景：空正文', body: '' })
+    const longOne = `${P}-long600`
+    seedRecord(longOne, { targetRole: role, expectation: longExpectation, body: '做法：600 字。' })
+    seeded.push(noBody, longOne)
+    await wake()
+    const emptyRow = rowOf(noBody)
+    await emptyRow.waitFor({ timeout: 25_000 })
+    await emptyRow.scrollIntoViewIfNeeded()
+    if (await emptyRow.locator('.wk-cultivation-body').count() !== 0) throw new Error('空正文却渲染了正文块（空块 = 噪音）')
+    if (await emptyRow.getByRole('button', { name: COPY.adopt, exact: true }).count() !== 1) throw new Error('空正文行的把手不见了')
+    const longRow = rowOf(longOne)
+    await longRow.waitFor({ timeout: 25_000 })
+    await longRow.scrollIntoViewIfNeeded()
+    const btn = await longRow.getByRole('button', { name: COPY.adopt, exact: true }).boundingBox()
+    const box = await longRow.boundingBox()
+    await shot(page, 'S17-extremes')
+    if (btn === null || box === null) throw new Error('量不到几何')
+    if (btn.x + btn.width > box.x + box.width + 1) throw new Error('600 字期望句把按钮挤出行的右边界')
+    notes.push(`S17：空正文不渲染空块且把手在；600 字期望句行高 ${String(Math.round(box.height))}px、按钮仍在行内 ✓`)
+  })
+
+  // ── S18 已撤回记录的呈现：说清"已撤回"、不再给验证/撤回把手 ────────────────────────
+  await check('S18 已撤回记录：说清已撤回、不再给验证/撤回把手', async () => {
+    if (role === null) throw new Error('未拿到角色')
+    const id = `${P}-revoked`
+    const slug = `${P}-mv`
+    seedRecord(id, { status: 'adopted', targetRole: role, expectation: 'UX场景：已撤回的记录', body: '做法：撤回后呈现。', methodSlug: slug })
+    const file = join(RECORDS, `${id}.md`)
+    writeFileSync(file, `${readFileSync(file, 'utf8').replace('status: adopted', 'status: adopted\nrevokedAt: 2026-10-19T00:00:00.000Z')}`)
+    seeded.push(id)
+    await wake()
+    const row = page.getByRole('listitem', { name: `方法 ${slug}` })
+    await row.waitFor({ timeout: 25_000 }).catch(() => { throw new Error('已撤回记录没出现在方法列表里') })
+    await row.scrollIntoViewIfNeeded()
+    const text = await row.innerText()
+    await shot(page, 'S18-revoked')
+    if (!/已撤回|不再加载/.test(text)) throw new Error(`没说明"已撤回"：${text.replaceAll('\n', ' | ').slice(0, 160)}`)
+    if (await row.getByRole('button', { name: COPY.verifyPass, exact: true }).count() !== 0) throw new Error('已撤回记录仍给「这条有用」（验证一个已删的方法 = 死按钮）')
+    if (await row.getByRole('button', { name: /撤回/ }).count() !== 0) throw new Error('已撤回记录仍给「撤回」')
+    notes.push('S18：已撤回记录说清状态且不再给验证/撤回把手 ✓')
   })
 
   // ── S14 会话级掉线：/api/ 全断 ⇒ 面板不崩、旧数据在、动作收口、恢复即好 ──────────────
