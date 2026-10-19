@@ -83,12 +83,12 @@ try {
 
 \`\`\`sh
 dsh plugin --profile web add /path/to/${tarballName}
-dsh plugin --profile web add @deepseek-ai/dsh-experimental-schedule-bundle
 \`\`\`
 
-第二行装**节律 bundle**（日期通道 time-context + 定时提醒 schedule + 任务页 ui-schedule——
-行归它所有，装完自动启用）。不开它角色会话就没有日期注入与定时能力（公司手册「日期口径」
-按 fail-closed 口径执行）；之后想关，网页插件页一键开关即可。
+日期通道（time-context）与定时提醒（schedule_create/list/update/delete）自 0.2.1 起
+**随五个角色 preset 自带**（宿主 schedule 服务由 web-app 组合提供），不再需要另装节律
+bundle；装完这一个包，角色会话就有日期注入与定时能力（公司手册「日期口径」按 fail-closed
+口径执行）。
 \`\`\`sh
 \`\`\`
 

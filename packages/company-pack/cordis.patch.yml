@@ -27,19 +27,13 @@
     openAt: first-search
 
 - insert:
-    # ── 日期通道 + 自主节律（0.2.0 harvest 批3）：行归 schedule-bundle 所有 ──
-    # schedule-bundle 是 **profile 级手动安装**（`dsh plugin --profile <name> add
-    # @deepseek-ai/dsh-experimental-schedule-bundle` / Web 插件页开关），带来 time-context /
-    # schedule / ui-schedule 三行（schedule = 宿主级 cron 定时 + 到点恢复冷会话投递——搁置池
-    # 「自主节律」的复活 seam；ui-schedule = 任务页 UI）。本包**不 insert、不依赖**它：
-    # 「pack dependencies ⇒ reconcile 自动启用」实测证伪（reconcile 只认直接安装的 bundle 包，
-    # harvest Note §输掉的方案）；自己 insert 三行则与手动开关撞重复 id 硬拒。
-    # 这里只留**替换行钉 config**：timeZone 回落不依赖 Node 进程时区（显式 Asia/Shanghai；
-    # 浏览器时区存在时仍优先——vendor 教义）。行不存在的组合（无 bundle 层）该行 not-found 丢弃。
-    - id: time-context
-      name: '@deepseek-ai/dsh-time-context'
-      config:
-        timeZone: Asia/Shanghai
+    # ── 日期通道 + 自主节律（0.2.0 harvest 批3；**0.2.1 改址**）──
+    # 0.2.1 起实验性 schedule bundle 退役：宿主级 `schedule` 服务由
+    # web-app 组合直接挂，`ui-schedule` 任务页随 web-app 一起出，而 `time-context` 与
+    # `tool-schedule` 变成 **preset 行所有权**（上游升档指南 schedule-bundle-retired）。
+    # ⇒ 本包不再在这里替换/插入任何 schedule 行：五个角色 preset 各自声明一个 `preset-clock`
+    # 组（time-context 钉 Asia/Shanghai + tool-schedule），理由与「行必须随 preset 声明」同源
+    # （R1 实证：bundle 工具到不了会话）。此处保持空 = 组合层只说"我不再拥有它"。
     # ── 交付物声明工具（base 无此行）──
     - id: tool-present
       name: '@deepseek-ai/dsh-tool-present'
@@ -53,7 +47,6 @@
       config:
         maxMembers: 8
         maxTasks: 256
-        maxPendingMessagesPerMember: 64
         maxMessageBytes: 65536
         disposalTimeoutMs: 5000
     - id: tool-agent-team

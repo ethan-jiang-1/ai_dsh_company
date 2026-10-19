@@ -19,8 +19,14 @@
 | `vp-sales` | 梦之队 VP-Sales | system | — | R2 定稿 |
 | `coo` | 梦之队 COO | system | — | R2 定稿 |
 | `cfo` | 梦之队 CFO | system | — | R2 定稿（增设） |
+| `researcher` | 梦之队 Researcher | system | — | 0.2.1 增设（委派用，不是第五个职能——见下） |
 
-实测方式：web 观察窗的 `agentPresets/list` RPC（返回 9 条 = DSH 出厂 4〔cordis/minimal/ptc/standard，vendor `web-app/presets/`〕+ 本 pack 5，零 broken）。
+实测方式：web 观察窗的 `agentPresets/list` RPC（DSH 出厂 4〔cordis/minimal/ptc/standard，vendor `web-app/presets/`〕+ 本 pack 6，零 broken）。
+
+**`researcher` 为什么存在（0.2.1）**：委托 child 的人格只能由 `agentPreset` 给。CEO 的通用委托工具
+（`subagent_research`）若不钉 preset，child 继承 CEO 组合——一个没有 CEO 判断材料、却带着 CEO 职责的
+"迷你 CEO"。researcher = 只读工具面（fs / search / web / session-query）+ 一次调研一页纸，**没有**
+职责边界、没有 journal 义务、不替任何职能下结论；它是**手**，不是第五个职能。
 UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSection.tsx`）。
 
 ## 四形态矩阵：身份、工具与 skills 从哪来（RFC preset-skill-matrix 2026-10-05 立）
@@ -32,7 +38,7 @@ UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSecti
 | 独立角色 preset 根会话（人选 preset 开门） | `presets/<role>/agent.cordis.yml` persona row | **preset 自声明**（自包含、无继承——见下「工具面」） | 人连接的 workspace；手册经 `agent-instructions` 注入、KB = cwd 的 `kb/<role>/` | `$DSH_HOME/sessions/<slug>/<id>/`（世代选择唯一口径 = session-log-generation） | `tool-ask-user` 直问人 |
 | CEO Lead 动议会话 | `presets/ceo/`（同上） | 同上（ceo 自声明，含 delegation 组） | `company-workspace`；spawn 队友 | 同上（Lead 目录） | Lead 直问人；成员升级 CEO |
 | teammate（Agent Teams 成员） | **继承 Lead 组合**（composeFrom ⇒ `agentPreset=ceo`）——身份来自成员名、任务书与手册注入，**不是成员角色的 preset** | 继承 Lead 组合（delegation 行无 `toolFilter` 不裁剪） | 同 Lead 工作区；读自己的 CHARTER | 各自 sessionId 目录（authorship 按 `team/member` 事件建 sessionId→成员名映射） | 动议内升级 CEO（不直问） |
-| 命名 child / one-shot subagent | 继承 Lead（`agentPreset=ceo`）；**名册角色名 ≠ 加载 preset**（反例 = 2026-09-26 sea-reconcile：CFO 稿实为 ceo preset 会话代笔，[authorship-audit](../checks/audit/authorship-audit.mjs) 头注） | 继承；⚠ 目录看得见 Team 工具但调不通（上游已登记限制，[pack README](../packages/company-pack/README.md) 已知限制节） | 同 Lead | child 自带 sessionId 日志 | 经 Lead |
+| 命名 child（activation） | **工具行钉的 `agentPreset`**（`vp_eng`→vp-eng / `vp_sales`→vp-sales / `subagent_research`→researcher；0.2.1 起人格与组合都由 preset 给，不再继承 Lead）——child 日志首帧 `agentPreset` 是唯一取证件，**名册角色名 ≠ 加载 preset** 这条旧坑以此字段核对（旧反例 = 2026-09-26 sea-reconcile，[authorship-audit](../checks/audit/authorship-audit.mjs) 头注） | 该 preset 自声明的那一套（role skills 随 preset 一起到） | 同 Lead | child 自带 sessionId 日志 | 经 Lead |
 
 改哪一列 → 哪个文件：persona/工具/skills → `presets/<role>/`（owner 表 = [pack README](../packages/company-pack/README.md)）；手册/CHARTER/KB → `company-workspace/`；生效时点 = 下文「生效边界按面」表。
 
@@ -53,7 +59,7 @@ UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSecti
 ## VP of Engineering（职能化身：研发）
 
 - **persona 要点**：视角=可行性 / 成本 / 技术风险；对技术方案有 veto；产出结论先行的一页纸；
-  需要深挖时生 one-shot workers 并署自己的判断；**不替别的职能下结论**。
+  需要深挖时生 workers 并署自己的判断；**不替别的职能下结论**。
 - **工作流（1 号）**：`eng-workflow`（接活→备料→深挖→出稿→回执）；打法 skill =
   `tech-feasibility-review`（选项枚举 ≥3 → 逐项可行性·成本·风险 → 结论先行）。
 - **KB**：`kb/vp-eng/CHARTER.md`（研发条线 18 人、SRE 2 / 无 DBA、Node 22 + SQLite、AI 试点
@@ -111,12 +117,12 @@ UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSecti
 
 | 角色 | 工具行 | 说明 |
 |---|---|---|
-| CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` / **`tool-web`** + `delegation` 组（`tool-subagent` spawn + **`vp_eng` / `vp_sales` 命名委托**） | 读 KB、写交付物、加载 skill、澄清提问、声明交付、**上网（搜/取）**；**汇报线两条路**（R3）：命名委托 = one-shot 前台快捷出稿，协作走 team；语义见 [delegation.md](./delegation.md) |
+| CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` / **`tool-web`** + `delegation` 组（`subagent_research` / `subagent_fork` / `vp_eng` / `vp_sales` 四行 + `workflow-ptc` + `tool-workflow`） | 读 KB、写交付物、加载 skill、澄清提问、声明交付、**上网（搜/取）**；**汇报线两条路**（R3）：命名委托 = activation 快捷出稿（终稿走完成通知），协作走 team；编排面 = workflow；语义见 [delegation.md](./delegation.md) |
 | VP-Eng / VP-Sales / COO / CFO | 同 VP-Eng（R2 起）+ **`tool-ask-user`（2026-09-25 驾驶舱③乙）** + **`tool-web`（2026-09-29）** | 独立会话可直接问人；动议内仍升级 CEO——手册「问人两条路」两模式约束（承诺权与单一对外口径不动，R3/D18 维持）；`delegation` 供深挖调研 / 盘点 / 测算；VPS 引客户事实时可用 web 核价/竞品 |
 | 全体（0.2.0 harvest 批1，2026-09-30） | **`tool-jobs`**（后台任务）/ **`tool-goal` + `/goal`**（跨轮目标）/ **`compaction` 组**（compaction-basic + `/compact` + tool-result-pruner：长会话历史压缩）/ delegation 组内 **`subagent_fork`**（可续跑自身分叉） | 行形状逐字照抄 `vendor/dsh/packages/bundle/web-app/presets/standard.patch.yml`（0.1.7→0.2.0 间 standard 长出的面，本仓 preset 原为 0.1.7 形状）；fork 的编排位 = [delegation.md](./delegation.md) §4.4 |
 | CEO（0.2.0 harvest 批4，2026-09-30） | delegation 组内 **`workflow-ptc` + `tool-workflow`**（`workflow` 工具：JS 编排脚本 fan-out 子代理；行形状照抄 standard） | **编排位归 CEO**（组织语义：同题多路并行调研 / 多稿同时出稿后聚合）；persona 派活从两条路扩为三条——workflow 是**编排面不是分工面**，谁做什么仍由 team / 命名委托定（[delegation.md](./delegation.md) §4.4）。VP/COO/CFO 不给：深挖调研走各自 `subagent`，跨职能编排升级 CEO |
 | 全体（0.2.0 harvest 批2，2026-09-30） | **`tool-session-query`**（session_search 等 ×5：会话全文检索）；host 侧 = bundle 替换行翻开 `session-query-sqlite`（`openAt: first-search` 懒开 + 索引库锚 profile 目录） | 「上次动议定了什么」先查会话全文再问人——journal 是摘要、会话库是全文；授权域 = 本工作区（五角色共用共享盘 ⇒ 跨角色可查，合稿引用校对受益）；persona 开工动作句已同步 |
-| 全体（0.2.0 harvest 批3，2026-09-30） | **schedule 工具 ×4**（schedule_create/list/delete/update，宿主级 cron/定频定时）+ **ui-schedule** 任务页 + **time-context** 日期通道——三行归 `dsh-experimental-schedule-bundle` 所有，部署启用 = bundle 进 profile bundles 列表（真安装 `plugin add` 该包即自动启用；导出手册已写明）；pack 侧只留**替换行钉 `timeZone: Asia/Shanghai`**（回落不依赖进程时区） | 「自主节律」（原搁置池复活项，批 3 落地）：到点投递回原会话、宿主恢复冷会话——seam 实证（schedule README）；工具按 agent 作用域落位（角色根会话有、瞬态委派 child 无——实测 r3 夹具，正合"立节奏的是角色本体"）；persona 节律句已同步 |
+| 全体（0.2.1） | `preset-clock` 组：**`time-context`**（日期通道，钉 `timeZone: Asia/Shanghai`）+ **`tool-schedule`**（schedule_create/list/update/delete）；宿主 `schedule` 服务与 **ui-schedule** 任务页由 web-app 组合提供，不再需要另装节律 bundle | 「自主节律」现在时：0.2.1 把这两行从 bundle 层**收归 preset 行所有权**（上游升档指南 schedule-bundle-retired）——persona 点名 `schedule_create` 的角色，preset 里就必须真给工具；组合层不再替换/插入任何 schedule 行 |
 | 全体（0.2.0 harvest 批5a）+ VP-Sales（批5b，2026-09-30） | **`planning` 组**（`plan-mode`：section 公司化改写——先探索后落笔 / 计划决策完整 / `exit_plan_mode` 唯一收尾）；VP-Sales 另有 **browser-use**（playwright-mcp 实现） | 计划模式与真浏览器面进角色组合；判据 = 本表各行，不另立收割台账 |
 | 全局（pack bundle） | `agent-preset-registry` roster 替换 + 全局行 insert（`tool-present` / `agent-team` / `tool-agent-team` / `ui-agent-team` / `company-client` / `session-query-sqlite` / `time-context` 等——行清单唯一源 = [cordis.patch.yml](../packages/company-pack/cordis.patch.yml)） | 只放全局行；**工具面不靠它**（见 [architecture §6](./design/architecture.md) 要点 1） |
 
@@ -159,7 +165,7 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 
 | 改动面 | 生效时点 | 依据 |
 |---|---|---|
-| persona / 组合文件（工具行、skill 根） | **新会话**（运行中的会话保持自己的 generation）；⚠ **新增依赖模块 / 新行解析时还须重启观察窗**——2026-09-29 实测：旧进程上新开会话仍是 25 工具（无 `web_search`），重启后 27 工具含之（该轮两个变量同时变，故取稳妥口径） | vendor `agent-presets` README stamp 机制；**活体已跑**（2026-09-29 联网整治，见 [role-web-access](../notes/archived/2026-09-29-role-web-access.md)） |
+| persona / 组合文件（工具行、skill 根） | **新会话**（运行中的会话保持自己的 generation）；⚠ **新增依赖模块 / 新行解析时还须重启观察窗**——2026-09-29 实测：旧进程上新开会话仍是 25 工具（无 `web_search`），重启后 27 工具含之（该轮两个变量同时变，故取稳妥口径） | vendor `agent-preset` 的 preset stamp 机制；**活体已跑**（2026-09-29 联网整治，见 [role-web-access](../notes/archived/2026-09-29-role-web-access.md)） |
 | skill 正文（`SKILL.md` body，含方法层） | **同会话下一轮**（`get()` 每次读盘） | 活体实证（日志工具结果层）+ vendor 源码一致；**修正** 2026-09-22 U1"只有新会话变"（U1 量的是模型转述） |
 | skill 条目（增删改名，含方法层） | 下一轮（pre-step digest 重算 → 替换目录注入）；2026-10-13 实测 watcher 连**运行中会话**的 catalog 都会刷新（探针 NOTE 行） | vendor skill digest；培养决定 = [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) |
 | 方法层撤回（`revoke` 删目录） | 删除后新会话不再加载；已加载进历史的正文不回改（append-only） | 2026-10-13 机制探针 |

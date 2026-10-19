@@ -14,7 +14,7 @@
 // 用法：source run/env.sh && node checks/smoke/preset-smoke.mjs [--port 0] [--profile web]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
+import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
 import { spawn } from 'node:child_process'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -31,6 +31,9 @@ const PROFILE = arg('profile', 'web')
 // `--cwd` 可显式覆盖（确需指回真盘时）。
 const CWD = resolve(arg('cwd', join(ROOT, REHEARSAL_REL)))
 const ROLES = COMPANY_ROLE_IDS
+// 0.2.1：委派子人格（researcher）也随包发布 ⇒ 它必须能真挂上（CEO 的 subagent_research 依赖它）。
+// 它不是职能 ⇒ 只断言 roster/挂载，不断言 skills 面（它没有专属 skills）。
+const SUPPORT_PRESETS = COMPANY_SUPPORT_PRESET_IDS
 const OUR_PACKAGE = 'dsh-company-pack'
 
 /** 该角色目录里实际存在的 skill（preset 约定：目录名 = skill 名）。 */
@@ -109,7 +112,7 @@ try {
   //    `agentPresets/list` 无参数 → args 就是空对象；`session/create(request)` → args 是 { request }
   const roster = await rpc(base, cookie, 'agentPresets/list', {})
   const presets = roster.presets ?? []
-  for (const role of ROLES) {
+  for (const role of [...ROLES, ...SUPPORT_PRESETS]) {
     await check(`roster 含 ${role}`, async () => {
       const row = presets.find(p => p.id === role)
       if (row === undefined) throw new Error(`roster 里没有 ${role}（共 ${presets.length} 条）`)
@@ -119,7 +122,7 @@ try {
 
   // ② 真入口：逐个 preset 建会话——**这一步才会触发行 config 校验**
   const sessionIds = new Map()
-  for (const role of ROLES) {
+  for (const role of [...ROLES, ...SUPPORT_PRESETS]) {
     await check(`session/create 挂上 ${role}`, async () => {
       const created = await rpc(base, cookie, 'session/create', { request: { cwd: CWD, agentPreset: role } })
       if (created?.agentPreset !== role) throw new Error(`返回的 preset 不是 ${role}：${JSON.stringify(created)}`)
@@ -169,6 +172,6 @@ try {
 }
 
 console.log(failures.length === 0
-  ? `\npreset-smoke: ALL PASS（${ROLES.length} 个 preset 全部可挂载）`
+  ? `\npreset-smoke: ALL PASS（${ROLES.length} 个角色 + ${SUPPORT_PRESETS.length} 个委派子人格全部可挂载）`
   : `\npreset-smoke: ${failures.length} FAILURE(S)\n${failures.join('\n')}`)
 process.exit(failures.length === 0 ? 0 : 1)

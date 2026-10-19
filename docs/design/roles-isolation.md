@@ -78,7 +78,7 @@ realm 行（角色可各自选压缩策略）、token 计量按 session 键控�
 - **官方裂缝**：`ctx.agentPresets.mount(agentCtx, id)` 是公开 API，JSDoc 明说
   "Call from the agent factory's `setup(agentCtx)`"，而 `ctx.agents.create` 的 setup
   **是可 await 的**（`CreateAgentOptions.setup`：factory awaits setup after minting agentCtx，
-  注册完成后才发布会话）。也就是说：**自定义 one-shot SubagentProvider 完全可以在子代理
+  注册完成后才发布会话）。也就是说：**自定义 SubagentProvider 完全可以在子代理
   创建窗口里 mount 一个跟父会话不同的 preset**——child 拿到该角色完整的工具/skills/persona/
   workflow realm，同一进程内。session-controller 每会话挂 preset 用的就是同一个 API。
 - **SDK 面**：SDK server 明确不按会话选 preset（`packages/sdk/server/src/server.ts:274-278`
@@ -92,12 +92,12 @@ realm 行（角色可各自选压缩策略）、token 计量按 session 键控�
 一个 `dsh web` 进程，N 个会话各挂各的角色 preset，你在标签页之间当"总机"。
 零代码，五个独立面满格。适合：早期验证角色人设/知识库质量、你自己就是 CEO 的"人肉编排"模式。
 
-### M2 · CEO 会话 + 每角色 one-shot 委托工具（自定义 provider，§2 裂缝）
+### M2 · CEO 会话 + 每角色委托工具（自定义 provider，§2 官方裂缝）
 
 > 定位（对齐决策 D4）：demo/组织模拟的**主通道是 M4**；M2 是"组合硬隔离"的增强——当某次
 > 委派必须让 child 拿到该角色完整的 skills/工具面（而不只是人格）时才需要它。
 
-写一个 `company-delegation` 插件：注册 N 个 one-shot SubagentProvider（`vp-eng`/`vp-sales`/…），
+写一个 `company-delegation` 插件：注册 N 个 SubagentProvider（`vp-eng`/`vp-sales`/…），
 每个 provider 的 `start()` 里 `ctx.agents.create({ ..., setup: async (childCtx) => {
 await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
 再给 CEO preset 配 N 个 `dsh-tool-subagent` 行（`toolName: vp_eng`，provider 指向对应 provider）。
@@ -105,7 +105,11 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
 - **组合完全独立**：每次委托的 child 拿到该角色的完整 preset 面（工具/skills/persona/workflow）。
 - 走的是正式 seam（subagent registry）：descriptor、深度记账、`subagent/start|end` 事件、
   权限收窄（delegated child approval 钉死 `'never'`、sandbox 沿父覆盖——角色天然最小权限）全免费。
-- 代价：one-shot——每次 brief 是一个新会话，没有"跟 VP 的连续对话记忆"。要连续对话见 M3/M4。
+- 代价：每次 brief 是一个新会话，没有"跟 VP 的连续对话记忆"。要连续对话见 M3/M4。
+- **0.2.1 更新（写这一节之后上游前进了一步）**：`dsh-tool-subagent` 的配置位现在带
+  **`agentPreset`**——官方 provider 就能让 child 按另一个 preset 组合，M2 的"自己写 provider"
+  那条路在本仓**已不需要**：五个角色 preset 各自可选，CEO 的三行委派工具直接钉 `agentPreset`
+  （现在时见 [delegation.md §1](../delegation.md)）。本节保留为 seam 来路的记录。
 - 实现提示：自定义 provider 不要从零拼创建窗口——复用 `packages/subagent/subagent-in-process-driver`
   的组合路径（`applyChildComposition` / `appendDelegatedPolicyOverrides` / descriptor 追加），
   只把其中的 `composeFrom` 换成 `mount(childCtx, '<role-preset>')`，深度记账与权限收窄语义保持一致。
@@ -140,14 +144,14 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
 |---|---|
 | 验证角色内容（人设/KB/skills 质量） | M1 |
 | **demo 主循环：事件从 CEO 进出、任务板分派、VP 互发消息（决策 D4）** | **M4**（接受组合共享） |
-| 某次委派必须带该角色完整 skills/工具面（深度专业出稿） | M2（one-shot） |
+| 某次委派必须带该角色完整 skills/工具面（深度专业出稿） | 委派工具行的 `agentPreset`（官方 seam；M2 自写 provider 已不需要） |
 | 需要角色间连续多轮谈判、且组合隔离不可让 | M3 |
 | 全都要 | M4 打底，M2 按任务叠加（同一 CEO 会话两者可共存：团队工具 + 委托工具各占各的行） |
 
 ## 4. 两个诚实的缺口（写进 repo 的 notes/，别假装没有）
 
-1. **"常驻角色对话 + 每角色组合独立"同时成立**——现在不存在。M2 独立但 one-shot；
-   M4 常驻但共享组合；M3 常驻且独立但跨进程、无邮箱。若这成为刚需，正确姿势是照 FAQ 13
+1. **"常驻角色对话 + 每角色组合独立"同时成立**——现在不存在。委派工具（`agentPreset`）独立但
+   一次性；M4 常驻但共享组合；M3 常驻且独立但跨进程、无邮箱。若这成为刚需，正确姿势是照 FAQ 13
    的方案 B 路径向 DSH 上游提 seam：*continuable/teammate composition accepts a preset id*
    （`ChildComposition` 加一个 `preset` 字段，`materializeTracked` 的 setup 里按它 mount）。
    这个提案的自然落点已经存在——`applyChildComposition` 就是唯一收口处，上游改动面很小。
@@ -162,7 +166,7 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
 packages/company-pack/
 ├── presets/<role>/            # 不变：persona + skills/ + 工具行 + workflow realm
 ├── src/
-│   ├── delegation/            # 新增：M2 的 one-shot providers（每角色一个，
+│   ├── delegation/            # 新增：角色委托 provider（每角色一个，
 │   │                          #   start() 里 mount 该角色 preset）
 │   └── tools/                 # 可选：org_chart 等公司级工具
 └── cordis.patch.yml           # bundle 行（host 共享面）：registry 替换 + 团队两行 + present + client

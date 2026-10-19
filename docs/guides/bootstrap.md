@@ -40,9 +40,9 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack
 #   ——改 presets/** persona / skills 即刻生效，**无需重装**；只有改 pack 依赖或 bundle 行才需要
 #   `plugin --profile web remove` + `add`。profile 的 `.npmrc` 把 store/cache 钉在 repo 内
 #   （`~/Library` 不被碰）。**真实安装形状的验证归 R5a release-smoke**（干净 profile + file:/registry）。
-#   **节律 bundle（harvest 批3）在 dev web profile 的 bundles 列表手动启用**（profile package.json 是
-#   dev 工件）：link: 形态不落 pack 传递依赖，OPTIONAL_BUNDLE 从安装闭包解析、无需安装——启用 =
-#   bundles 数组加 `@deepseek-ai/dsh-experimental-schedule-bundle`（时间通道/schedule/ui-schedule 三行归它）。
+#   **日期通道与定时提醒不再需要额外 bundle（0.2.1）**：`time-context` + `tool-schedule` 由五个
+#   角色 preset 各自声明（`preset-clock` 组），宿主 schedule 服务随 web-app 组合而来 ⇒ profile 的
+#   bundles 列表里若还留着已退役的 schedule bundle，删掉那一项即可。
 #   历史：file: 拷贝时代，presets/*.yml 用编辑工具改会换 inode、安装副本是真拷贝（link count 1），
 #   不重装则改动不可见——该坑随 link: 消失。
 node checks/smoke/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）

@@ -14,7 +14,6 @@
       name: '@deepseek-ai/dsh-experimental-agent-team'
     - id: tool-agent-team
       name: '@deepseek-ai/dsh-experimental-tool-agent-team'
-    # 日期通道：行归 schedule-bundle 所有（0.2.0 harvest 批3）——**profile 级手动安装**
-    # （release-smoke 预置 bundles 断言；dev web profile 手动加行见 guides/bootstrap.md）。
-    # 本 overlay 不插：与已装 bundle 的行撞重复行 id 硬拒；「pack dependencies 声明 ⇒ reconcile
-    # 自动启用」已实测证伪并撤销（harvest Note §输掉的方案）——勿再走 dependencies 路。
+    # 日期通道与定时提醒（0.2.1）：`time-context` + `tool-schedule` 归**角色 preset 行所有权**
+    # （五个 preset 各自声明 `preset-clock` 组）——headless overlay 不插，插了就是重复行 id 硬拒。
+    # 它们的宿主 `schedule` 服务随组合而来；web 面另有 ui-schedule 任务页（web-app 组合）。

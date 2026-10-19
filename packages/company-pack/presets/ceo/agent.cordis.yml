@@ -14,6 +14,21 @@
         description: '动议的唯一入口与出口——澄清目标、拆解分派、组建会议、收口合稿；只对全局负责'
         order: 1
         plugins:
+          # ② 时钟与自主节律（0.2.1：schedule-bundle 退役；上游升档指南把 time-context 与
+          #    tool-schedule 的所有权下放到 preset，宿主 schedule 服务由 web-app 组合挂）。
+          #    persona 里点名 schedule_create ⇒ 这里必须真给工具，否则是标志面谎报。
+          - id: preset-clock
+            name: cordis:group
+            group: true
+            config:
+              # 日期通道：显式 Asia/Shanghai = 回落不依赖 Node 进程时区（浏览器时区存在时仍优先）。
+              - id: time-context
+                name: '@deepseek-ai/dsh-time-context'
+                config:
+                  timeZone: Asia/Shanghai
+              # 自主节律：schedule_create / list / update / delete，按 agent 作用域落位。
+              - id: tool-schedule
+                name: '@deepseek-ai/dsh-tool-schedule'
           - id: persona
             name: '@deepseek-ai/dsh-persona'
             config:
@@ -21,7 +36,7 @@
                 你是这家公司（梦之队）的 CEO——一个具体的人，不是职能模板。你对全局结果负责，是所有动议的唯一入口与出口。
                 语气简短、决断、结论先行，不用形容词代替判断；一页纸能说完的不要写三页。
                 你的直接汇报对象是四个职能：VP-Eng（研发）、VP-Sales（销售）、COO（运营）、CFO（财务）。技术派 VP-Eng、市场与定价派 VP-Sales、落地与承接派 COO、钱与合规派 CFO；你不代笔。
-                派活两条路：多职能协作（要任务板、互审、会议上下文，能反复追加意见）用 spawn_teammate 组队；单职能快捷出稿用 vp_eng / vp_sales 直接委派——**前台等结果**，要改稿就再委派一次、把上一稿一起给它。要并行编排多路活（同题多路调研、多人同时出稿后聚合）用 workflow 写编排脚本一次 fan-out——它是编排面不是分工面，谁做什么仍由前两条路定。
+                派活两条路：多职能协作（要任务板、互审、会议上下文，能反复追加意见）用 spawn_teammate 组队；单职能快捷出稿用 vp_eng / vp_sales 直接委派——**前台等结果**，要改稿就再委派一次、把上一稿一起给它。
                 接到任何动议，先澄清目标、约束与验收标准，再拆解分派；阻塞型选择必须用 ask_user_question，选项写可执行动作和关键后果；非阻塞缺口带明示默认假设继续，并在收口列待确认项。你亲自组建会议、亲自分派任务、亲自收口。
                 分派原则：每个任务单一 owner、可验收；稿子由 VP 出，你只合成。
                 接到动议先加载 assembling-the-team skill——先定这间屋子有谁（要不要叫人、叫谁、不叫谁、走哪条通道），再主持；组队定下来之前不 spawn 任何 teammate。名单里没有的职能一个都不叫——超编与漏编都是你的失败。
@@ -33,7 +48,7 @@
               # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（R2 内容稳定后评估）
               # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
 
-          # ② 角色专属 skills：落在本 preset 的 scope layer，其他角色不可见（硬隔离）
+          # ③ 角色专属 skills：落在本 preset 的 scope layer，其他角色不可见（硬隔离）
           - id: skill-filesystem
             name: '@deepseek-ai/dsh-skill-filesystem'
             config:
@@ -156,95 +171,54 @@
                   mode: launch
                   headless: true
 
-          # ④ 汇报线（通道 A，R3）：每个直接汇报对象一个**命名委托工具**——CEO 的模型看到的就是
-          #    `vp_eng` / `vp_sales` 两个工具（per-instance persona 是 dsh-tool-subagent 的教义：
-          #    "another persona … requires another distinctly named tool"）。
+          # ④ 汇报线（通道 A，R3；**0.2.1 变形**）：每个直接汇报对象一个**命名委托工具**——
+          #    CEO 的模型看到的仍是 `vp_eng` / `vp_sales` 两个工具。
           #
-          #    ⚠ **为什么是 one-shot 而不是 continuable（R3 实证，别再改回去）**：CEO 会话从**第一个
-          #    请求起**就是 team-scoped——`tool-agent-team` 把 `send_message` / `list_agents` /
-          #    `interrupt_agent` 三个名字**按成员作用域 shadow 掉了全局版**，而 Lead（CEO）自己也是
-          #    team member（`snapshots/replay/r2-motion/sessions/lead.jsonl` 的第一帧 request/header 即是团队版；
-          #    R3 `checks/smoke/delegation-smoke.mjs` 在全新会话复现）。更硬的一层：团队版 `send_message` 的
-          #    参数是 `target`（"Team member **name**, or lead"），按名册名字寻址；而全局版是 `agent_id`
-          #    （"any exact live Agent may target its **direct continuable child**"）。subagent child 不在
-          #    名册上 ⇒ **continuable child 在 CEO 会话里无法被续驶**（既不能发消息也不能中断/列出）。
-          #    所以这里用 `backgroundMode: one-shot` + `enableRunInBackground: false`：前台拿结果，
-          #    "快捷出稿"语义；**连续对话/续驶归 team（spawn_teammate）**，那才是它的机制。
-          #    并行快捷派活的 seam 已随 0.2.0 harvest 到位（subagent_fork 可续分叉——批1；workflow 编排——批4）；
-          #    连续对话/续驶仍归 team（spawn_teammate），那是它的机制。
-          #    出处：docs/delegation.md；探针 checks/smoke/delegation-smoke.mjs（默认档 = 这条边界的回归守卫）。
+          #    ⚠ 0.2.1 起 `dsh-tool-subagent` 删掉了 `backgroundMode` / `enableRunInBackground` /
+          #    `persona` / `toolFilter` 四个配置位（upstream 升档指南 subagent-activations +
+          #    subagent-preset-composition）：**每次委托都是 activation**——工具立即返回
+          #    `{kind:'activation', subagentId}`，child 的终稿由**完成通知**送回父会话；
+          #    「前台同步拿结果」这条通道整体消失，没有可得回配置开关。
+          #    child 的人格/工具面改由 **agentPreset** 选：这里选 `vp-eng` / `vp-sales` 两个角色 preset
+          #    （它们本来就是本包五角色之二，人格与 skills 一字不差地复用，不再维护第二份 persona 文案）。
+          #    上游 fork 语义：fork 继承父 preset，不能单独换人格 ⇒ vp_* 只能是 spawn。
           #
-          #    ⚠ 能力边界（诚实记账，别写进 persona 骗模型）：委托 child **继承 CEO 的组合**（design/roles-isolation
-          #    §2/§4），所以它拿到的是 **CEO 的 skills**（chairing-staff-meeting），不是 vp-eng/vp-sales
-          #    preset 里的角色 skills。因此 persona 必须**自带方法论**（写清产出形态与判据），不能指路到
-          #    "先加载 tech-feasibility-review skill"——那个 skill 不在它的 catalog 里。
-          #    "child 拿到角色完整 skills/工具面"是 M2 自定义 provider 才有的能力（design/roles-isolation §3）。
+          #    ⚠ 能力边界（诚实记账，别写进 persona 骗模型）：child 现在**继承 vp-eng / vp-sales 角色 preset**
+          #    ⇒ 拿到的是 VP 自己的 skills 与工具面（不再是 CEO 的 skills）——比 0.2.0 时代更接近
+          #    "真把活派给了那个 VP"。
           #
-          #    maxDepth: 1 ⇒ 委托 child 不能再委托 vp_eng/vp_sales（禁止 VP→VP 平级派活），也不能经通用
-          #    `subagent` 再生 worker——通用行未设 maxDepth，rc.2 默认 = 1（vendor subagent/src/index.ts；
-          #    0.1.7 时代「默认 3」已过期）。要嵌套需在行上显式写 maxDepth。
+          #    maxDepth: 1 ⇒ VP child 不能再往下派活（禁止 VP→VP 平级派活）。
+          #    出处：docs/delegation.md；探针 checks/smoke/delegation-smoke.mjs（= 这条边界的回归守卫）。
           - id: delegation
             name: cordis:group
             group: true
-            isolate:
-              workflowEngine: true
             config:
+              # 通用委托（CEO 的并行调研手）。0.2.1 起所有委托都是 activation，且 CEO 会话里的
+              # send_message / list_agents / interrupt_agent 仍被 team 版 shadow（见下方能力边界）⇒
+              # **不挂续驶控制行**（挂了也是死行，只会骗模型）；child 终稿由完成通知送回。
+              # spawn 必须钉 agentPreset：不指定会继承 CEO preset（一个没有 CEO 判断材料的"迷你 CEO"）。
+              # `researcher` = 无职能人格 + 只读：给 brief、查证据、交一页，不越权下职能结论。
+              # 工具名从 `subagent` 改为 `subagent_research`：名即语义（child 不是"任意分身"）。
               - id: tool-subagent
                 name: '@deepseek-ai/dsh-tool-subagent'
                 config:
                   provider: spawn
-                  toolName: subagent
-                  modelSelectionSettings: true
-                  backgroundMode: continuable
-              # 0.2.0 harvest 批1：subagent_fork 可续跑的自身分叉（行形状照抄 standard）——
-              # 并行快捷派活的上游 seam 到位（搁置池复活判据之一）；编排面（workflow）批4 再接。
-              - id: tool-subagent-fork
-                name: '@deepseek-ai/dsh-tool-subagent'
-                config:
-                  provider: fork
-                  toolName: subagent_fork
-                  backgroundMode: continuable
-              # 0.2.0 harvest 批4：workflow 编排（JS 脚本 fan-out 子代理，行形状照抄 standard）。
-              # 编排位归 CEO（组织语义：同题多路并行调研 / 多稿同时出稿再聚合）；
-              # 分工与续驶语义仍归 team / 命名委托两条路——workflow 是一次性的编排面。
-              - id: workflow-ptc
-                name: '@deepseek-ai/dsh-workflow-ptc'
-                config:
-                  provider: spawn
-              - id: tool-workflow
-                name: '@deepseek-ai/dsh-tool-workflow'
+                  toolName: subagent_research
+                  agentPreset: researcher
               - id: tool-vp-eng
                 name: '@deepseek-ai/dsh-tool-subagent'
                 config:
                   provider: spawn
                   toolName: vp_eng
-                  backgroundMode: one-shot
-                  enableRunInBackground: false
                   maxDepth: 1
-                  persona: |-
-                    你是这家公司（梦之队）的 VP of Engineering——研发职能的化身。你的视角只有三件事：可行性、成本、技术风险。
-                    你对 PRD 与技术方案有 veto 权：技术不可行、成本失控、风险不可接受，直接说不并给一句话理由。
-                    产出形态：评审意见与技术评估——结论先行、一页纸为限，写完落 deliverables/<slug>/drafts/vp-eng.md。
-                    需要深挖时用 subagent 生 workers 并行调研：给清晰 brief，汇总后署你自己的判断。
-                    目录里若见 team 工具（spawn_teammate / team_task_* / wait_agent）——对一次性委托调不通（机制限制，上游已登记），别碰；并行调研只用 subagent。
-                    你不替别的职能下结论——"有没有人买"问销售，"接不接得住"问运营，"钱撑不撑得住"问财务。
-                    开工动作：先读 kb/vp-eng/CHARTER.md 与 kb/vp-eng/journal/ 最近 3 篇；收工向 journal 追加纪要。
+                  agentPreset: vp-eng
               - id: tool-vp-sales
                 name: '@deepseek-ai/dsh-tool-subagent'
                 config:
                   provider: spawn
                   toolName: vp_sales
-                  backgroundMode: one-shot
-                  enableRunInBackground: false
                   maxDepth: 1
-                  persona: |-
-                    你是这家公司（梦之队）的 VP of Sales——销售职能的化身。梦之队 是高科技公司，三类业务：软件开发 / 服务 / 系统集成。你的视角只有三件事：客户、市场、定价。
-                    你对"没人买"有 veto 权：需求不成立、商机不成熟、定价撑不住交付成本——直接说不，给一句话理由。
-                    产出形态：市场判断与定价建议——结论先行、一页纸为限，写完落 deliverables/<slug>/drafts/vp-sales.md；引用 kb/vp-sales/CHARTER.md 的客户与竞品事实，禁止虚构客户。
-                    需要深挖时用 subagent 生 workers 并行调研：给清晰 brief，汇总后署你自己的判断。
-                    目录里若见 team 工具（spawn_teammate / team_task_* / wait_agent）——对一次性委托调不通（机制限制，上游已登记），别碰；并行调研只用 subagent。
-                    你不替别的职能下结论——"做不做得出"问研发，"接不接得住"问运营。
-                    开工动作：先读 kb/vp-sales/CHARTER.md 与 kb/vp-sales/journal/ 最近 3 篇；收工向 journal 追加纪要。
+                  agentPreset: vp-sales
 
           # ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）
           # projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= company-workspace/）；

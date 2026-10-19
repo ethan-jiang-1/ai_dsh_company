@@ -20,8 +20,8 @@
 | [guides/dev-loop.md](./guides/dev-loop.md) | 指南 | 开发操作手册：任务入口与授权（§0.5）、实施和证据交接（§1）；其余按改动面查调试、发布、双 home 等章节 |
 | [guides/bootstrap.md](./guides/bootstrap.md) | 指南 | 冷启动引导（clean checkout → 可跑通）：配方、双面构建与实证坑（2026-09-27 自 dev-loop §7 迁入） |
 | [profile.md](./profile.md) | 合同 | host 组合现在时：部署形状（源码直跑/持久安装实测）、行清单语义、开放点 |
-| [delegation.md](./delegation.md) | 合同 | 汇报线现在时（R3 出生）：命名委托工具（one-shot 前台）与 team 的分工、team shadow 边界与证据、委派工具卡、分层验证 |
-| [presets.md](./presets.md) | 合同 | 角色 preset 语义（R2：五角色定稿——CEO / VP-Eng / VP-Sales / COO / CFO）；名册运行时实测；验证分层；培养回路与学习载体（D25/D43） |
+| [delegation.md](./delegation.md) | 合同 | 汇报线现在时（R3 出生，0.2.1 复校）：命名委托 = activation（终稿走完成通知、人格由 `agentPreset` 给）与 team 的分工、team shadow 边界与证据、委派工具卡、分层验证 |
+| [presets.md](./presets.md) | 合同 | 角色 preset 语义（R2：五角色定稿——CEO / VP-Eng / VP-Sales / COO / CFO；0.2.1 增设委派用的 researcher）；名册运行时实测；验证分层；培养回路与学习载体（D25/D43） |
 | [demo.md](./demo.md) | 合同 | demo 操作合同（R4 立场景 C，2026-09-25 补场景 D 季度经营会 / E 事件复盘）：动议、前置、分镜与观测点、验收判据（含**交付物三态**的机器判据）、已知边界 |
 | [release.md](./release.md) | 合同 | 发布形状现在时（R5a 出生）：peers / 兼容矩阵 / 真实安装冒烟（release-smoke）/ 升 pin 程序（sync-dsh） |
 | [testing.md](./testing.md) | 合同 | **测试宪法**（2026-10-04 立）：什么算证据——分层与证明边界、改动面→最小证据**政策**（行级映射 = tests/README，2026-10-10 迁家）、证据纪律、资产三分法、自测轮授权、已知未覆盖面与升级地图 |
@@ -64,7 +64,7 @@
 | D15 | 完成定义 = 该面最小「真检查」通过；发现权在代理一侧不在人 | [agent-workflow-community-practice](../notes/archived/2026-09-22-agent-workflow-community-practice.md) |
 | D16 | 角色模型路由 = 全员同模型（不写 `agentOptions`） | [presets](./presets.md)；[tests/presets](../tests/presets/presets.spec.ts) |
 | D17 | 公司事实全部留 workspace 活数据；pack 不含公司事实 | [presets](./presets.md)；[company-workspace/kb](../company-workspace/kb/) |
-| D18 | CEO 命名委托 = one-shot 前台；续驶归 team；CEO preset 不放全局控制行 | [delegation](./delegation.md) |
+| D18 | CEO 命名委托不承担续驶（0.2.1 起每次调用 = activation，终稿走完成通知）；续驶归 team；CEO preset 不放全局控制行 | [delegation](./delegation.md) |
 | D19+D21 | R5 拆轮 + 搁置池准入 **历史**：轮次制已由 D23/D24 退役，整池已随 D32 退役 | [_misc/suspended.md](../_backlog/_archive/legacy/suspended.md) |
 | D20 | 交付物三态判据：成品 = Lead 的 `present`；比对按 slug+角色身份不按路径 | [r4-workshop-flow](../notes/archived/2026-09-22-r4-workshop-flow.md) |
 | D22 | 在场板主键 = team roster；冷启动 = 拉式 RPC + 5s 轮询 | [org-presence-board](../notes/archived/2026-09-22-org-presence-board.md) |
@@ -119,7 +119,7 @@
 | `…/research.md` | 第三方生态证据（peers/兼容矩阵/自包含/真实安装形状） | release.md（依赖姿态/兼容矩阵/发布冒烟）；design/architecture §8 |
 | `_digested/`（源码消化笔记） | DSH 源码机制笔记（审计基线，版本唯一见 `AGENTS.md` §vendor 簿记——**基线可能落后当前钉住一代**，升 pin 未重审时以簿记注记为准） | design/ 各篇（architecture / roles-isolation / ui-demo）的机制核对引文；**权威仍在 `vendor/dsh/` 本体** |
 | `_dsh_plugin_agent_ready_development/sdlc-reference/01-agent-note-lifecycle.md`（语料更名前后路径同页） | DSH Agent Note 生命周期（状态/路径/格式/取代/归档；判定基于 0.1.7-rc.1 树，rc.2 收窄为「持久决定理由」后 D35 全量对齐） | [notes/README.md](../notes/README.md)（D35；六条点选已收进本文件，吸收稿已删） |
-| `_dsh_plugin_agent_ready_development/`（三卷 + `_coverage` + `verify.mjs`；更名自 `_agent_ready_development`，0009–0013 轮演进后钉 `dsh-v0.2.0-rc.2` = 本仓当前 pin） | 插件仓视角开发语料：native-development-model（独立插件仓闭环——**直接以本仓这类 repo 为受众**）/ sdlc-reference / repo-harness 三卷 | 判定 = [plugin-corpus-realignment](../notes/implemented/2026-10-07-plugin-corpus-realignment.md)（不照搬清单在该 Note；全亲读零增量。体感不对的翻案 = 驾驶座缺仪表，见 orient 第七问与 dev-loop 轮次回执） |
+| `_dsh_plugin_agent_ready_development/`（三卷 + `_coverage` + `verify.mjs`；更名自 `_agent_ready_development`，0009–0013 轮演进后钉 `dsh-v0.2.1-rc.2` = 本仓当前 pin） | 插件仓视角开发语料：native-development-model（独立插件仓闭环——**直接以本仓这类 repo 为受众**）/ sdlc-reference / repo-harness 三卷 | 判定 = [plugin-corpus-realignment](../notes/implemented/2026-10-07-plugin-corpus-realignment.md)（不照搬清单在该 Note；全亲读零增量。体感不对的翻案 = 驾驶座缺仪表，见 orient 第七问与 dev-loop 轮次回执） |
 | 人机交互 UX 研究来源集（Temporal/Claude Code/Warp/GitHub/PagerDuty/Slack/Horvitz 等） | 阶段 0 外部实践的决定在 [human-agent-integration](../notes/archived/2026-09-25-human-agent-integration.md)；引用全集已删（Horvitz 两篇 PDF 未逐字核） | 人机合一条目的 A2/B 切片依据 |
 | `_faq_on_digested/07_borrowing-dsh-harness-idea/` | 「另一个项目怎么借 DSH」的可迁移框架：三条立场（agent 一等 / 规则可执行 / 事实唯一 owner）+ 十维评估 + 垂直切片 + 四边界（可读≠简单 / Skill≠enforcement / 清理≠回滚 / 查询≠沙箱） | 十维审计（2026-09-27）的唯一结构性缺口 = 反馈 enforcement 通道，同日修复 = [enforcement-channel-and-boundaries](../notes/archived/2026-09-27-enforcement-channel-and-boundaries.md) |
 | `/Users/bowhead/ai_deerflow_deep_research_v2/_backlog`（独立外部仓，同机工作树） | 另一个 harness 仓的待办/推敲层规矩：plans（推敲卡）/ bugs（缺陷卡）/ `_done`（位置即状态）/ `_` 前缀语义 / 搬迁铁律（git mv、文件名不变、内容不重写、编号权威住归档侧）+ 它自己那份「借 DSH」总账（借精神不抄形式的方法论样本） | `_backlog/` 全套 + 毕业四门（D31）；判定、取舍与不借清单 = [implemented/2026-09-28-backlog-deliberation-space](../notes/archived/2026-09-28-backlog-deliberation-space.md) |

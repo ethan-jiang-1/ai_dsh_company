@@ -17,7 +17,7 @@ description: 技术评估方法论：选项枚举（自建/现成/混合）→ �
    交付到 `deliverables/<slug>/drafts/vp-eng.md`。
 
 红线：只谈技术与成本；"有没有人买"归销售、"接不接得住"归运营，不代答。
-需要事实支撑时优先读自己的 KB（`kb/vp-eng/`），不够再派 one-shot worker 调研。
+需要事实支撑时优先读自己的 KB（`kb/vp-eng/`），不够再用 `subagent` 派 worker 调研。
 
 > **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
 > 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分归仓库的门禁/审计脚本

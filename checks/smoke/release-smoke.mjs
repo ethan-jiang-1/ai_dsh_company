@@ -94,11 +94,11 @@ try {
   mkdirSync(profileDir, { recursive: true })
   ownsProfile = true
   // Custom names default to dsh-base only. Match the vendor web template explicitly.
-  // schedule-bundle（harvest 批3）：行归它所有（time-context/schedule/ui-schedule），
-  // 从安装闭包解析、无需安装——启用 = 进 bundles 列表（OPTIONAL_BUNDLES 的开关面）。
+  // 0.2.1：实验性 schedule bundle 退役（宿主 schedule/ui-schedule 由 web-app 挂，
+  // time-context/tool-schedule 归 preset 行所有权）⇒ 安装形状回到 base + web-app 两件。
   writeFileSync(join(profileDir, 'package.json'), `${JSON.stringify({
     name: `dsh-profile-${PROFILE}`, private: true,
-    dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', '@deepseek-ai/dsh-experimental-schedule-bundle'], patchReload: 'startup' } },
+    dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app'], patchReload: 'startup' } },
   }, null, 2)}\n`)
   writeFileSync(join(profileDir, 'pnpm-workspace.yaml'), 'packages:\n  - .\n\nnodeLinker: hoisted\nautoInstallPeers: false\n')
   writeFileSync(join(profileDir, '.npmrc'), `store-dir=${join(ROOT, '.pnpm-store')}\ncache-dir=${join(home, 'cache/pnpm')}\n`)

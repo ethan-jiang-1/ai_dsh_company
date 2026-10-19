@@ -56,7 +56,7 @@ preset roster 走 **`agent-preset-registry` 一行 + 每预设一行声明**（0
   `dsh.profile.bundles`（R1 实证一次）。
 
 **Team 容量与信箱背压（rc.2 可调参数，收割 #11）**：编制上限（`maxMembers`：代码默认 16，官方 bundle
-与本仓 patch 均显式钉 8）与信箱背压
-（`maxPendingMessagesPerMember` / `maxMessageBytes`）在组合层调——行清单与默认值见
-`vendor/dsh/packages/experimental/agent-team/src/mailbox.ts` 与 `agent-team-profile`；调参 = bundle 行
-config，不动 preset。
+与本仓 patch 均显式钉 8）与单条消息体积上限（`maxMessageBytes`）在组合层调——行清单与默认值见
+`vendor/dsh/packages/experimental/agent-team/src/index.ts`（Config）与 `agent-team-profile`；调参 = bundle
+行 config，不动 preset。0.2.1 起 `maxPendingMessagesPerMember` 被删除（activation 世界里成员信箱不再按
+条数背压），本仓 patch 已同步去掉该键。

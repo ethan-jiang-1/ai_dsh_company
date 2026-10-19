@@ -106,10 +106,10 @@ host 层共享行 + N 个角色 preset + 共享 KB + 模板。插件包（代码
 ### 2.2 编排主通道（已核定，见 index 决策台账 D4）
 
 demo 形态"事件从 CEO 进、从 CEO 出"首选 **Agent Teams（M4）**——只有 Lead 能创建/interrupt
-teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱、teammates 保留 one-shot
-`subagent` 工具给各自 workers（rc.2 复核：官方 `agent-team-profile/cordis.patch.yml` 对
-`tool-subagent-control` / `tool-subagent-list-agents` / `tool-subagent` 均 `disabled: true`——
-续驶控制与 one-shot 委派一并被关，故本仓直插这些行自配；直插取舍见 §3 冲突注）。
+teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱、teammates 保留 `subagent` 工具
+给各自 workers（官方 `agent-team-profile/cordis.patch.yml` 对 `tool-subagent-control` /
+`tool-subagent-list-agents` / `tool-subagent` 均 `disabled: true`——续驶控制与委派一并被关，
+故本仓直插这些行自配；直插取舍见 §3 冲突注）。
 因此 demo 第 0 天不需要任何自定义 provider——层② 是组合隔离的增强，不是 demo 门槛。
 
 ### 2.3 装但不写的行（cordis.patch.yml / profile 的行清单，全是现成包）
@@ -148,31 +148,29 @@ CEO preset 里给每个直接汇报对象配一个 `dsh-tool-subagent` 实例（
   config:
     provider: spawn
     toolName: vp_eng          # CEO 的模型看到的就是一个叫 vp_eng 的工具
-    backgroundMode: continuable
-    persona: |-
-      你是公司 VP of Engineering……管理研发管线……
-    # toolFilter: …           # 可裁掉该角色不该用的工具
+    maxDepth: 1               # 禁止 VP→VP 平级派活
+    agentPreset: vp-eng       # 0.2.1：child 的人格与工具面只能由 preset 给
 - id: tool-vp-sales
   name: '@deepseek-ai/dsh-tool-subagent'
-  config: { provider: spawn, toolName: vp_sales, backgroundMode: continuable, persona: … }
+  config: { provider: spawn, toolName: vp_sales, maxDepth: 1, agentPreset: vp-sales }
 ```
 
-- continuable child 是**持久会话**，可被 `send_message` / `interrupt_agent` / `list_agents`
-  （`dsh-tool-subagent-control`）继续驱动；cold-resume 支持。
-- 子代理可有自己的 persona（shadow 部署人格）和 toolFilter——但见 §4：**工具/skills 面继承父会话**。
+- 每次调用 = 一次 **activation**：立即回执 `{ kind: 'activation', subagentId }`，child 的最终正文
+  以**父会话完成通知**送达；`job_output` / `job_kill` 不再代收 subagent。
+- child 按 `agentPreset` 组合 ⇒ 拿到的是**角色自己的** skills 与工具面（0.2.1 的收益；旧模型
+  "继承父会话、persona 写在行上" 已随 activation 移除）。
 - 消息只能相邻层级（父↔子）；VP 之间不能直接通信，要经 CEO 中转——这恰好就是"汇报线"的形状。
 - **与 team bundle 的组合冲突（核实过 patch 源）**：`agent-team-profile` 会 disable 全局
-  `tool-subagent-control`（send_message/interrupt_agent/list_agents）并把 `tool-subagent`
-  压成 one-shot，而团队的九个工具**只覆盖 team 成员**——若装着 bundle 再加 continuable
-  命名委托行，这些 child 将无法被续驶。两条解法：① **已定（R1 起就是这么做的）**：不装官方
+  `tool-subagent-control`（send_message/interrupt_agent/list_agents）并关掉 `tool-subagent`，
+  而团队的九个工具**只覆盖 team 成员**——若装着 bundle 再加命名委托行，这些 child 将无法被续驶。
+  两条解法：① **已定（R1 起就是这么做的）**：不装官方
   bundle，把 `agent-team` + `tool-agent-team` 两行直接 insert 进本包 `cordis.patch.yml`
-  （仍是零 JS；R3 的"改直插行"因此已完成，只剩验证）；② 保持 bundle，把命名委托行也设为
-  one-shot（放弃续驶）。
+  （仍是零 JS；R3 的"改直插行"因此已完成）；② 保持 bundle，放弃命名委托的续驶能力。
   ✅ **R3 的待验证点已判定（2026-09-22，别再当开放问题读）**：当时问的是"CEO 会话 spawn 过
   teammate 之后，还能不能用团队版 `send_message`/`list_agents` 驱动命名委托生出来的非 team
-  child"。**结论 = 不能**——child 不在名册上，续驶/中断/列举全不可达，故命名委托定为
-  **one-shot 前台**（D18）。结论与证据在 [delegation.md §2](../delegation.md)（"为什么不是
-  continuable——别改回去"），回归守卫 = `checks/smoke/delegation-smoke.mjs`。
+  child"。**结论 = 不能**——child 不在名册上，续驶/中断/列举全不可达，故命名委托不承担
+  "反复追加意见"（D18；team 才是连续对话的载体）。结论与证据在
+  [delegation.md §2](../delegation.md)，回归守卫 = `checks/smoke/delegation-smoke.mjs`。
 
 ### 通道 B · Agent Teams（experimental，最贴近"公司开会"）
 

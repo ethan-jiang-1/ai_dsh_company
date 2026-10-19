@@ -129,6 +129,32 @@ function normalizeFixtures(raws) {
 }
 
 /**
+ * 把一份归一化日志拆成「严格序列」+「投递内容集合」。
+ * 为什么要拆：`session-log-deepseek/delivery-accepted`（日志屏障）与 `agent/inbox/spliced`（inbox 落地）
+ * 是**同一次投递的两半**，位置取决于上一轮流的分块时机（录制带 200ms 间隔 ⇒ 屏障先、splice 在 step/start
+ * 后；重放瞬间收口 ⇒ splice 先、甚至跨过 step/start）。位置是簿记、内容是语义 ⇒ 序列判据剔掉这两类，
+ * `deliveries` 按 JSON 排序后逐会话比对（内容/条数/来源变了仍然红）。空 splice（removedCount）不是投递。
+ * @param {string} log normalized session log
+ * @returns {{ sequence: object[], deliveries: string[] }}
+ */
+function splitDeliveryPlumbing(log) {
+  const sequence = []
+  const deliveries = []
+  for (const line of log.split('\n')) {
+    if (line.trim() === '') continue
+    const record = JSON.parse(line)
+    if (record.type === 'session-log-deepseek/delivery-accepted') continue
+    if (record.type === 'agent/inbox/spliced') {
+      const inserted = record.data?.inserted
+      if (Array.isArray(inserted) && inserted.length > 0) deliveries.push(JSON.stringify(inserted))
+      continue
+    }
+    sequence.push(record)
+  }
+  return { sequence, deliveries: deliveries.sort() }
+}
+
+/**
  * sidecar 提取：system prompt（system/message 首文本块）与 tool schemas（request/header 的
  * header.tools），从 **normalizeSessionLog(log, ctx) 之后**的日志里取（vendor suite.ts
  * normalizedSystemPrompts / toolSchemasFrom 同款管线）——ctx 必须带**全 run 的 session ids**
@@ -291,15 +317,12 @@ async function driveScenario({ patchSource, env, tasks }) {
   // 于是品牌槽与委派卡一起缺席。这里给临时 profile 补最小安装形状：node_modules 符号链接 + bundles 声明。
   mkdirSync(join(profileDir, 'node_modules'), { recursive: true })
   symlinkSync(join(ROOT, 'packages', 'company-pack'), join(profileDir, 'node_modules', 'dsh-company-pack'), 'dir')
-  // 批3（harvest）：pack 的 dependencies 声明 schedule-bundle，真实安装由 reconcile 自动启用为
-  // profile layer；临时 profile 镜像该形状——bundle 进 node_modules（vendor 工作区包自带依赖闭包）
-  // + bundles 列表。缺它则 time-context/schedule/ui-schedule 三行全体缺席（pack 侧只剩 config 钉行）。
-  mkdirSync(join(profileDir, 'node_modules', '@deepseek-ai'), { recursive: true })
-  symlinkSync(join(ROOT, 'vendor', 'dsh', 'packages', 'experimental', 'schedule-bundle'), join(profileDir, 'node_modules', '@deepseek-ai', 'dsh-experimental-schedule-bundle'), 'dir')
+  // 0.2.1：实验性 schedule bundle 退役——宿主 schedule / ui-schedule 行由 web-app 组合挂，
+  // time-context + tool-schedule 由五个 preset 各自声明（`preset-clock` 组）⇒ 临时 profile 不再需要它。
   writeFileSync(join(profileDir, 'package.json'), `${JSON.stringify({
     name: 'dsh-replay-profile',
     private: true,
-    dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', '@deepseek-ai/dsh-experimental-schedule-bundle', 'dsh-company-pack'] } },
+    dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', 'dsh-company-pack'] } },
   }, null, 2)}\n`, 'utf8')
   const patch = materializeProfilePatch(patchSource, runRoot, 'web', patchRoot, 0)
   if (env.credentials) {
@@ -544,8 +567,15 @@ const childFixtures = readdirSync(replayDir)
 for (const p of [fixLead, ...childFixtures, join(replayDir, 'cordis.snapshot.yml')]) {
   if (!existsSync(p)) { console.error(`replay-smoke: 缺 ${p}（先 --record 或 --prepare）`); process.exit(2) }
 }
-const leadFixture = readFileSync(fixLead, 'utf8')
-const childFixtureTexts = childFixtures.map(p => readFileSync(p, 'utf8'))
+// 投递屏障的 `throughSeq` 是**派生簿记**（"到第几行为止已交给模型"，随上一轮流的分块时机浮动：
+// 同一次投递录制 38 / 重放 37）。它是唯一无法在写盘侧归一化的字段——vendor 的 snapshot 归一化会校验
+// 它必须是数字（`delivery throughSeq must be a non-negative safe integer`），所以 token 只能在
+// **写盘之后、读回时**做：盘上仍是合法录制，比对视图里两张都取同一个 token。
+// marker 本身（位置/条数/sessionFormatVersion/sessionId）原样保留 ⇒ 少一条仍然红。
+const tokenizeDeliveryBarrier = (text) => text.replace(/(\{"type":"session-log-deepseek\/delivery-accepted","data":\{[^}]*?"throughSeq":)\d+/g, '$1"<delivery-barrier>"')
+const readFixture = (path) => tokenizeDeliveryBarrier(readFileSync(path, 'utf8'))
+const leadFixture = readFixture(fixLead)
+const childFixtureTexts = childFixtures.map(readFixture)
 const fixtures = [leadFixture, ...childFixtureTexts]
 const { provider, model } = modelOf(leadFixture)
 const tasks = tasksFromSession(leadFixture)
@@ -610,8 +640,13 @@ try {
   })
   const actualN = normalizeSessionSnapshots(parsed.map(p => normalizeReplayTimeContext(p.text)), ctxOf(parsed))
   const expectedN = normalizeSessionSnapshots(fixtures, ctxOf(fixtures.map(t => ({ header: headerOf(t) }))))
-  const actualRows = actualN.map(records)
-  const expectedRows = expectedN.map(records)
+  // 投递两半（屏障 + inbox splice）是**时序簿记**：位置随上一轮流的分块时机漂（录制/重放两向都实测过），
+  // 但内容不是。序列判据里剔掉它们，另用「投递内容集合」判据保内容；两边对称，其他事件逐行仍然严格。
+  const actualStream = actualN.map(splitDeliveryPlumbing)
+  const expectedStream = expectedN.map(splitDeliveryPlumbing)
+  const deliveryMismatch = actualStream.findIndex((s, i) => JSON.stringify(s.deliveries) !== JSON.stringify(expectedStream[i]?.deliveries ?? []))
+  const actualRows = actualStream.map(s => s.sequence)
+  const expectedRows = expectedStream.map(s => s.sequence)
   const sessionDifferences = judgeReplaySessions(actualRows, expectedRows, 'full')
   let diffLine = ''
   for (const { sessionIndex, rowIndex, expected, actual } of sessionDifferences) {
@@ -622,7 +657,8 @@ try {
   }
   const sessionDiffs = sessionDifferences.length
   if (JUDGES === 'full') {
-    check('归一化日志零 diff', sessionDiffs === 0, sessionDiffs === 0 ? `${String(actualN.length)} 个会话逐行一致` : diffLine)
+    check('归一化日志零 diff（投递簿记除外）', sessionDiffs === 0, sessionDiffs === 0 ? `${String(actualN.length)} 个会话逐行一致` : diffLine)
+    check('投递内容集合等价', deliveryMismatch === -1, deliveryMismatch === -1 ? '' : `session#${String(deliveryMismatch)} 的 inbox 投递内容不同（内容/条数/来源变了）`)
   } else {
     // presence 档：**member/task 集合等价**（= 在场板 rows 的数据路径，验收判据 4 的合同面）
     // + 在场板终态同形。queued（动态流数据源）不作判据、只显式记录差异——重放时序下尾部

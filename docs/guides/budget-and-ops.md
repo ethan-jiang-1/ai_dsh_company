@@ -12,7 +12,7 @@
 | 旋钮 | 默认 | 在哪调 | 对本项目的意义 |
 |---|---|---|---|
 | team `maxMembers` | 8 | host 行 config（startup 校验 fail-loud） | CEO+4 职能=5，留 3 个余量；扩编制才调 |
-| team `maxTasks` / `maxPendingMessagesPerMember` / `maxMessageBytes` | 256 / 64 / 64KiB | 同上 | 默认够一场 demo；消息超 64KiB 会拒（长稿走文件+消息里给路径） |
+| team `maxTasks` / `maxMessageBytes` | 256 / 64KiB | 同上 | 默认够一场 demo；消息超 64KiB 会拒（长稿走文件+消息里给路径）。0.2.1 删了 `maxPendingMessagesPerMember` |
 | workflow `maxTotalAgents` | per-run 上限（tool/consumer 可压低） | CEO preset `tool-workflow` 行 / 调用参数 | CEO 写循环脚本时的 runaway 保险；冲刺前显式设小 |
 | workflow 并发槽 | engine 配置（`acquireSlot`） | 同 `workflow-ptc` 行的 engine 配置 | 限制同时跑的 agent() 数 |
 | subagent `maxDepth` | **1**（rc.2 默认；0.1.7 曾为 3） | `tool-subagent` 行（本仓 VP 委托行显式 `maxDepth: 1`） | 组织深度：默认只一层（root→child），child 再生 worker 需显式调大——调大前想清楚失控半径 |

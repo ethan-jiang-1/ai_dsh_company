@@ -1,14 +1,21 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
+import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
 
-// ── 3. preset 结构：5 角色 × (声明文件 + ≥1 skill) ─────────────────────────
+// ── 3. preset 结构：五角色 × (声明文件 + ≥1 skill，含第二 skill 根) + 委派子人格 × 声明文件 ───
 // 负例留证 2026-09-27：移走一个 SKILL.md → skill-file 红。
 // 0.1.7 起显示名/描述/order 内联进 `agent.cordis.yml` 的 `dsh-agent-preset` 行（原 preset.yml 并入），
 // 故这里只要求声明文件；挂载验证归 preset-smoke（真 web 逐角色建会话）。
 export const roles = COMPANY_ROLE_IDS
+/** 子人格 preset 只要求声明文件 + 行能挂（skills 由 preset-smoke 真挂载验证）。 */
+export const supportPresets = COMPANY_SUPPORT_PRESET_IDS
 export function run({ root, ok, fail }) {
+for (const preset of supportPresets) {
+  if (!existsSync(join(root, 'packages/company-pack/presets', preset, 'agent.cordis.yml'))) {
+    fail('preset-file', `${preset}/agent.cordis.yml 缺失（委派子人格 preset 必须随包发布）`)
+  }
+}
 for (const role of roles) {
   const dir = join(root, 'packages/company-pack/presets', role)
   if (!existsSync(join(dir, 'agent.cordis.yml'))) fail('preset-file', `${role}/agent.cordis.yml 缺失`)
@@ -22,5 +29,5 @@ for (const role of roles) {
     if (!body.includes(`name: ${s.name}`)) fail('skill-name', `${role}/${s.name} frontmatter name 不匹配目录名`)
   }
 }
-ok(`presets ×${roles.length}`)
+ok(`presets ×${roles.length} + 子人格 ×${supportPresets.length}`)
 }

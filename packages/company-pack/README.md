@@ -8,7 +8,7 @@
 | `presets/<role>/` | persona + skills **声明**（改它 = 改角色；生效边界见 [docs/presets.md](../../docs/presets.md)） | loader 组合 → 角色会话 | R0–R2 |
 | `src/` | **自写实现**两半：Host = `src/index.ts` 注册入口 + `src/host/`（Node-only 自举与培养注册/文件操作）+ `src/lib/`（共享读模型纯逻辑）；Client = `src/client/` 注册入口与浏览器面——具体布局唯一家 = [src/README](./src/README.md) | vendor runtime + `tests/company`（Host 源码直测）/ `tests/client`（Client 注册与视图） | R3+ |
 | `lib/` | **generated 发布产物（read-only）**：`tsc -b packages/company-pack` → tsdown 两面产出；**改 `src/` ≠ 浏览器已重建**——dsh web 常驻面必须重跑构建（事实家 = [bootstrap](../../docs/guides/bootstrap.md)） | `npm pack` → profile 安装（`exports`：`.` → `lib/index.js`、`./client` → `lib/client.js`） | R5 |
-| `cordis.patch.yml` | **bundle 装配行**：`agent-preset-registry` 替换出厂行；`dsh.bundle.patch` 为**数组** = registry 1 + 五角色预设行 | profile 组合层 | R0–R2 |
+| `cordis.patch.yml` | **bundle 装配行**：`agent-preset-registry` 替换出厂行；`dsh.bundle.patch` 为**数组** = registry 1 + 五角色预设行 + 委派子人格 `researcher` 一行（0.2.1） | profile 组合层 | R0–R2 |
 | `package.json` | **发布/注入声明**：peerDependencies（**版本以此为准，此处不复述**——复述必漂）、`dsh.compatibility` 矩阵（`pack-compat` 门禁强制含当前 tag）、`files` 白名单、`dsh.client` 字段 | 包管理器 + loader | R0–R2 |
 
 ⚠ `lib/` 是生成产物：`git diff` 里它先变 = 你改了构建或忘了它由 `src/` 生成——永远改 `src/`，构建产 `lib/`（物理拆分 host/domain 的重启条件 = implemented/pack-boundaries（已删，历史在 git） 重启条件节）。
@@ -29,7 +29,7 @@ release-smoke ALL PASS（[docs/release.md](../../docs/release.md)）。pack 保�
 
 - **侧栏角色色调只借平台令牌**（2026-10-13）：CEO 用 adaptive 的 `--dsw-alias-*` 品牌对（浅/深主题自动反转），其余四色用 **static 色相**（blue/green/amber/red，固定值、两主题同观感）+ 按底色选的黑/白字（对比度实测见探针 G6）——**不是**上游策展的分类色板（那份仍缺，见角色身份 UX 提案开放问题 2），换主题观感不一致处即此债。
 - **侧栏角色标记受 16px 座位约束**（2026-10-13）：行首座位是**可共存的 list 格**（同格还有计划任务时钟，16px 跨度），故标记按 12px 设计、单字母（C/F/O/E/S）。与时钟同格时两者合计 28px > 座位 16px，靠"座位居中溢出 + 标题前 4px 间隙"恰好不撞标题盒（几何判据 = [sidebar-role-mark-probe](../../probes/browser-visual/sidebar-role-mark-probe.mjs)）；**再加第三个同格占用者、或把标记改宽，这条就破**。
-- 机制与出厂行替换已对钉版 `dsh-v0.2.0-rc.2` 验证（2026-09-30 升 pin + 插件收割：pack-compat / release-smoke / 全套门禁；本仓嵌套工作区 vendor 自建偏离 = D27）。
+- 机制与出厂行替换已对钉版 `dsh-v0.2.1-rc.2` 验证（2026-09-30 升 pin + 插件收割：pack-compat / release-smoke / 全套门禁；本仓嵌套工作区 vendor 自建偏离 = D27）。
 - 委派子会话的签字审批到不了人（子会话审批面宿主侧受限）——人机审批实际是 Lead 专属（上游 seam 候选，见[归档搁置池](../../_backlog/_archive/legacy/suspended.md)）。
 - 浮窗 raise 置顶依赖 CSS 垫片（vendor rc.2 缺陷；上游修复后撤垫片）。
 - 依赖图画布按栏宽等比缩放（`transform: scale()`，fitScale 下限 0.75；**不用 CSS 宽度缩放**——Safari 里 foreignObject 文字不跟缩，会堆向左上角）；更宽的图（约 ≥5 个并行根任务）缩到下限后横向滚动。

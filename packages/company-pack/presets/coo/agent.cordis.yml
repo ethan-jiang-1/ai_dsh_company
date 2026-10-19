@@ -13,6 +13,21 @@
         description: '运营职能的化身——视角：落地/预算/流程合规；对"运营接不住"有 veto；产出运营方案与预算核查'
         order: 4
         plugins:
+          # ② 时钟与自主节律（0.2.1：schedule-bundle 退役；上游升档指南把 time-context 与
+          #    tool-schedule 的所有权下放到 preset，宿主 schedule 服务由 web-app 组合挂）。
+          #    persona 里点名 schedule_create ⇒ 这里必须真给工具，否则是标志面谎报。
+          - id: preset-clock
+            name: cordis:group
+            group: true
+            config:
+              # 日期通道：显式 Asia/Shanghai = 回落不依赖 Node 进程时区（浏览器时区存在时仍优先）。
+              - id: time-context
+                name: '@deepseek-ai/dsh-time-context'
+                config:
+                  timeZone: Asia/Shanghai
+              # 自主节律：schedule_create / list / update / delete，按 agent 作用域落位。
+              - id: tool-schedule
+                name: '@deepseek-ai/dsh-tool-schedule'
           - id: persona
             name: '@deepseek-ai/dsh-persona'
             config:
@@ -22,14 +37,14 @@
                 你对"运营接不住"有 veto 权：人力撑不住、流程没有、合规过不去——直接说不，给一句话理由。
                 产出形态：运营方案与预算核查，按 templates/ops-review-note.md 的结构写——结论先行，一页纸为限，写完落 deliverables/<slug>/drafts/coo.md。
                 接方案先加载 ops-feasibility skill（SOW / 里程碑验收 / RACI 是你的核查语言）；花钱的事用 budget-check skill。引用 kb/coo/CHARTER.md 的编制与预算基准。
-                需要深挖时你可以用 subagent 生 one-shot workers 并行盘点：给清晰 brief，汇总后署你自己的判断。
+                需要深挖时你可以用 subagent 生 workers 并行盘点：给清晰 brief，汇总后署你自己的判断。
                 纪律：被问到事实性问题（编制、并行上限、签字线、预算基准这类 CHARTER 已有答案的），直接引用 KB 作答——不起团队、不生 worker、不写盘；只有正式动议才开工。
                 你不替别的职能下结论——"做不做得出"问研发，"有没有人买"问销售。
                 开工动作：先读 kb/coo/CHARTER.md 与 kb/coo/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。可用 schedule_create 给自己立节奏（cron/定频提醒会回到本会话，宿主会恢复冷会话投递）——如定期复盘 journal、重估在池动议。
               # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（内容稳定后评估）
               # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
 
-          # ② 角色专属 skills：落在本 preset 的 scope layer，其他角色不可见（硬隔离）
+          # ③ 角色专属 skills：落在本 preset 的 scope layer，其他角色不可见（硬隔离）
           - id: skill-filesystem
             name: '@deepseek-ai/dsh-skill-filesystem'
             config:
@@ -175,7 +190,6 @@
                   provider: spawn
                   toolName: subagent
                   modelSelectionSettings: true
-                  backgroundMode: continuable
               # 0.2.0 harvest 批1：subagent_fork 可续跑的自身分叉（行形状照抄 standard）——
               # 并行快捷派活的上游 seam 到位（搁置池复活判据之一）；编排面（workflow）批4 再接。
               - id: tool-subagent-fork
@@ -183,7 +197,6 @@
                 config:
                   provider: fork
                   toolName: subagent_fork
-                  backgroundMode: continuable
 
           # ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）
           # projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= company-workspace/）；

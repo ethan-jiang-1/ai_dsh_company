@@ -61,7 +61,7 @@ flowchart TD
 图中实体对应以下真实入口：
 
 - [根包命令](../package.json) 将 `pnpm dsh` 接到 [vendor CLI](../vendor/dsh/apps/cli/src/bin.ts)；[profile boot](../vendor/dsh/apps/cli/src/profile-boot.ts) 按选择的 profile 装配 patch 层；home patch（`$DSH_HOME/cordis.patch.yml`）在 profile patch 之后生效，随后是命令行 `--patch` 与 telemetry switch。
-- [company-pack 包声明](../packages/company-pack/package.json) 的 `dsh.bundle.patch` 合并 [共享 patch](../packages/company-pack/cordis.patch.yml) 与五个 preset 文件；[CEO preset](../packages/company-pack/presets/ceo/agent.cordis.yml) 声明 persona、角色 skills 和会话工具。
+- [company-pack 包声明](../packages/company-pack/package.json) 的 `dsh.bundle.patch` 合并 [共享 patch](../packages/company-pack/cordis.patch.yml) 与五个角色 preset + 一个委派子人格 preset（`researcher`）文件；[CEO preset](../packages/company-pack/presets/ceo/agent.cordis.yml) 声明 persona、角色 skills 和会话工具。
 - `company-client` 行接到 [host 入口](../packages/company-pack/src/index.ts)，注册签字工具；[client 入口](../packages/company-pack/src/client/index.ts) 注册品牌、卡片和公司视图，并读取官方会话投影。
 - 公司手册与事实由会话 cwd 进入；[排练实现](../tools/lib/rehearsal.mjs) 为实验换 cwd、刷新参考输入并保留排练产物。
 

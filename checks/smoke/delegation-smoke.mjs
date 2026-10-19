@@ -1,33 +1,35 @@
 #!/usr/bin/env node
 // 状态：常驻
-// R3 汇报线边界守卫（S2 结论的回归检查）：回答并守住一个**会决定设计**的事实——
+// R3 汇报线边界守卫（S2 结论的回归检查；0.2.1 重校）：回答并守住决定设计的事实——
 // 何时跑：委托边界/模型可见工具目录改变，或该验收明确要求时；升 pin 时按发布合同复核
-//   「CEO 会话里，命名委托工具（vp_eng/vp_sales）生出来的 child，能不能被续驶？」
+//   「CEO 会话里，命名委托工具（vp_eng/vp_sales）生出来的 child，能不能被前台拿到结果、能不能被续驶？」
 //
-// 答案（R3 实证）：**不能**。证据三层，全部来自权威日志/源码，不依赖模型配合：
-//   ① 模型可见目录：CEO 会话**第一个** request/header 里，`send_message` / `list_agents` /
-//      `interrupt_agent` 已经是**团队版**——`tool-agent-team` 按成员作用域 shadow 掉全局版，
-//      而 Lead（CEO）自己也是 team member（R2 归档 lead.jsonl 第一帧即是；本脚本复现）。
-//   ② 工具 schema：团队版 `send_message` 的参数是 `target`（"Team member **name**, or lead"），
-//      按名册名字寻址；全局版是 `agent_id`（"any exact live Agent may target its **direct
-//      continuable child**"）。subagent child 不在名册上 ⇒ 机械上不可达。
-//   ③ 服务实现：`agentTeams.sendMessage(caller, { target: <name> })` 走 roster 成员解析
-//      （vendor packages/experimental/agent-team/src/index.ts:163，"target name"），
-//      非成员不在 roster。
-// 推论（写进 docs/delegation.md）：CEO preset 的 vp_eng/vp_sales 必须是 **one-shot 前台**；
-//   续驶/连续对话归 team（spawn_teammate）。控制行（tool-subagent-control）在 CEO 会话里是**死行**。
+// 答案（0.2.1 起，上游机制变了，本脚本随机制重写）：
+//   ① 委托一律是 **activation**：工具立即返回 `{kind:'activation', subagentId}`（wire 上渲染成
+//      `started subagent <id>`），**终稿由完成通知送回父会话**（vendor 升档指南
+//      v0.2.1-alpha.1/subagent-activations）。`backgroundMode` / `enableRunInBackground` /
+//      `run_in_background` 全删 ⇒ **"前台同步拿结果"这条通道整体不存在**，不是配置问题。
+//   ② 人格/工具面改由 `agentPreset` 选（同批 subagent-preset-composition）：per-tool 的
+//      `persona` / `toolFilter` 被硬拒。我们的 vp_eng/vp_sales 因此选 `vp-eng` / `vp-sales`
+//      两个角色 preset，通用委托选 `researcher`。
+//   ③ 续驶：**CEO 会话里仍然不通**。team 的 `send_message` / `list_agents` / `interrupt_agent`
+//      按成员作用域 shadow 掉全局版（`tool-agent-team`），`resolveActiveMember` 只认名册成员；
+//      subagent child 不在名册上（vendor agent-team/src/index.ts `sendAdmitted`）。上游确实新增了
+//      `steerHostSubagentPrompt`（「同 Session root 的活 child 可续」），但 team 授权层先把它挡在门外。
+//      推论：CEO preset **不挂**续驶控制行（挂了也是死行）；续驶/连续对话归 team（spawn_teammate）。
 //
 // 本脚本的判据（边界变了就红，提示重新评估设计）：
-//   - vp_eng / vp_sales / subagent / spawn_teammate 必须在模型可见目录里（挂载没坏）
-//   - 三个控制名必须仍是**团队版**（若变回全局版 ⇒ 续驶可能重新可用 ⇒ 重评 one-shot 决定）
-//   -（--delegate 档）child 目录里的 Team 工具**在场**（上游已登记限制：one-shot child 在拿到
-//     subagent descriptor 前被 Team 安装误当 Lead，看得见、调不通——vendor tool-agent-team README
-//     "Known Limitations · One-shot child tool visibility"，时序修正 deferred；2026-10-02 消化对账轮
-//     钉住）。若消失 ⇒ 上游修了安装时序 ⇒ 重评 docs/delegation.md §4 记账
+//   - vp_eng / vp_sales / subagent_research / spawn_teammate 必须在模型可见目录里（挂载没坏）
+//   - 三个控制名必须仍是**团队版**（若变回全局版 ⇒ 续驶可能重新可用 ⇒ 重评 delegation §4）
+//   -（--delegate 档）vp_eng 必须返回 **activation 回执**（`{kind:'activation', subagentId}`
+//     或 wire 的 `started subagent`）；返回 child 正文反而是边界倒退
+//   -（--delegate 档）child 必须由 **vp-eng 角色 preset** 组合（人格/工具面不再由幻影 persona 给）
+//   -（--delegate 档）child 目录里 **没有** Team 工具——0.2.1 的 install-timing 修掉了 0.2.0 的
+//     "one-shot child 误当 Lead"污染；Team 工具若回来 ⇒ 重评 docs/delegation.md §4 的记账
 //
-// 预算（guides/dev-loop §10）：墙钟 ≤ `--wall`（默认 180s）；模型 prompt **1 条**；可中断（Ctrl-C）。
+// 预算（guides/dev-loop §10）：墙钟 ≤ `--wall`（默认 300s）；模型 prompt 1 条（--delegate 档 2 条）。
 // 前置：DSH_HOME + 已装 pack + 模型凭据。
-// 用法：source run/env.sh && node checks/smoke/delegation-smoke.mjs [--port 0] [--wall 180]
+// 用法：source run/env.sh && node checks/smoke/delegation-smoke.mjs [--port 0] [--wall 300]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { spawn } from 'node:child_process'
@@ -41,8 +43,8 @@ const arg = (name, fallback) => {
   return i === -1 ? fallback : process.argv[i + 1]
 }
 const PORT = Number(arg('port', '0'))
-const WALL_MS = Number(arg('wall', '180')) * 1000
-// `--delegate`：多花 1 条 prompt 真委派一次，断言**前台拿到稿子**（R3 验收里「委派出稿」的真检查）。
+const WALL_MS = Number(arg('wall', '300')) * 1000
+// `--delegate`：多花 1 条 prompt 真委派一次，断言 **0.2.1 activation 契约**（回执形状 / child preset / child 面）。
 const DELEGATE = process.argv.includes('--delegate')
 // 练习场 ≠ 运行场（轮间待办②）：默认 cwd 在排练场，排练/探针产物不再积进真盘；
 // `--cwd` 可显式覆盖（确需指回真盘时）。
@@ -137,7 +139,7 @@ try {
   const catalog = records.filter(r => r.event?.type === 'request/header').map(r => r.event.data.header).at(-1)
   const names = catalog?.tools?.map(t => t.name) ?? []
   console.log(`\n[1] 工具目录（${String(names.length)} 个）：${names.join(', ')}`)
-  for (const tool of ['vp_eng', 'vp_sales', 'subagent', 'spawn_teammate']) {
+  for (const tool of ['vp_eng', 'vp_sales', 'subagent_research', 'spawn_teammate']) {
     if (!names.includes(tool)) problems.push(`模型可见工具目录里没有 ${tool}（R3 行没挂上？）`)
   }
 
@@ -153,9 +155,7 @@ try {
     else if (owner !== 'team') problems.push(`${name} 不再是团队版（现在是 ${owner}）——shadow 边界变了，重评 docs/delegation.md 的 one-shot 决定`)
   }
 
-  // ── 档 2（--delegate）：真委派一次，断言**前台拿到稿子** ──
-  // 这是 R3 验收「委派出稿」的真检查：one-shot 前台 ⇒ 结果里应该是 child 的正文，
-  // 而不是 continuable 的 "started subagent <id>"（后者意味着续驶路径被误开）。
+  // ── 档 2（--delegate）：真委派一次，断言 **0.2.1 activation 契约** ──
   if (DELEGATE) {
     const after = await askOnce(
       page, address, base, cookie,
@@ -166,23 +166,21 @@ try {
       problems.push('CEO 没有调用 vp_eng（--delegate 档无法判定）')
     } else {
       const result = run.result ?? '(无结果)'
-      console.log(`[2] vp_eng 结果：${result.slice(0, 200)}`)
-      if (/started subagent/i.test(result)) {
-        problems.push('vp_eng 返回了 "started subagent"——它是 continuable 而不是 one-shot 前台（配置被改回去了？）')
-      } else if (result.trim() === '' || result === '(无结果)') {
-        problems.push('vp_eng 没有返回正文（前台 one-shot 应该直接拿到 child 的稿子）')
+      console.log(`[2] vp_eng 回执：${result.slice(0, 200)}`)
+      // 0.2.1 唯一合法结果：activation 回执。返回 child 正文 = 边界倒退（前台通道又回来了）。
+      const activation = /started subagent\s+([0-9a-f-]{8,})/i.exec(result)
+      if (activation === null) {
+        problems.push(`vp_eng 没有返回 activation 回执（0.2.1 契约 = {kind:'activation', subagentId} / "started subagent <id>"；实际：${result.slice(0, 120)}）`)
       }
     }
 
-    // ── [3] child 面守卫（2026-10-02 立，消化对账轮；同日真跑实证）──
-    // 上游已登记限制：one-shot child 在拿到 subagent descriptor 前被 Team 安装误当 Lead ⇒
-    // 目录里看得到 Team 工具、调用在身份确认后被拒（vendor tool-agent-team README
-    // "Known Limitations · One-shot child tool visibility"）。实证（2026-10-02 真跑）：child 目录
-    // 41 工具含全部六个 Team 工具，且 child 会话头 agentPreset=ceo（组合继承的同一证据）。
-    // child 定位 = CEO 日志的 subagent/catalog（parent-owned direct-child 目录，data.childId 裸 UUID
-    // + data.mode；subagent/start 的 data.id 作兜底、mode 记 unknown）；读 child 日志用 subagent
-    // 地址（session/page 拒绝裸 child id："subagent Sessions require their durable parent address"）。
-    // 读 child 日志不加 prompt 预算。
+    // ── [3] child 面守卫（0.2.0 立、0.2.1 换方向）──
+    // 0.2.0 时 child 是 one-shot 前台、用 CEO 的 persona，且被 Team 安装误当 Lead（目录里看得见
+    // 六个 Team 工具、调用被拒，vendor tool-agent-team README "Known Limitations"）。
+    // 0.2.1：child 改由 agentPreset 组合 ⇒ ① 组合来源不再是 CEO preset；② Team 工具污染消失。
+    // 这两条都是"边界动了"的信号，任一条回退都要重评 docs/delegation.md。
+    // 读 child 日志不加 prompt 预算；child 定位 = CEO 日志的 subagent/catalog（data.childId 裸 UUID
+    // + data.mode；subagent/start 的 data.id 作兜底），读日志用 subagent 地址（session/page 拒绝裸 child id）。
     const childEntries = after.flatMap(r => {
       const e = r.event
       if (e?.type === 'subagent/catalog' && typeof e.data?.childId === 'string') {
@@ -206,11 +204,20 @@ try {
         problems.push(`child ${childId.slice(0, 8)} 的会话日志读不到 request/header——child 面守卫失效`)
         continue
       }
+      // preset 身份在**日志首帧**（session record 的 `agentPreset`）上，不在 request/header 里：
+      // 读 child 日志不能走 session/page（0.2.1 的 child 地址在 gateway 侧被边界校验拒绝，
+      // "wire field request failed boundary validation"），直接解 zstd jsonl 首帧。
+      // 首条记录是 `{seq, event: {type:'session', data:{agentPreset}}}`。
+      const sessionRecord = childRecords.find(r => r.event?.type === 'session') ?? childRecords[0]
+      const presetOf = sessionRecord?.event?.data?.agentPreset ?? sessionRecord?.agentPreset ?? '(未知)'
       const childNames = childHeader.tools?.map(t => t.name) ?? []
       const teamTools = childNames.filter(n => /^(spawn_teammate|team_task_|wait_agent)/.test(n))
-      console.log(`[3] child ${childId.slice(0, 8)} 目录（${String(childNames.length)} 个工具）：Team 工具${teamTools.length > 0 ? `在场：${teamTools.join(', ')}` : '不在场'}`)
-      if (teamTools.length === 0) {
-        problems.push(`child ${childId.slice(0, 8)} 目录里没有 Team 工具——上游修了 one-shot child 的安装时序（README Known Limitations），重评 docs/delegation.md §4 的记账`)
+      console.log(`[3] child ${childId.slice(0, 8)}：preset=${String(presetOf)}，目录 ${String(childNames.length)} 个工具，Team 工具${teamTools.length > 0 ? `在场：${teamTools.join(', ')}` : '不在场'}`)
+      if (String(presetOf) !== 'vp-eng') {
+        problems.push(`child preset = ${String(presetOf)}（期望 vp-eng：per-tool persona 已删，人格只能由 agentPreset 给）`)
+      }
+      if (teamTools.length > 0) {
+        problems.push(`child ${childId.slice(0, 8)} 目录里又出现 Team 工具（${teamTools.join(', ')}）——0.2.1 修掉的 install-timing 污染回来了，重评 docs/delegation.md §4`)
       }
     }
   }
@@ -220,9 +227,9 @@ try {
 }
 
 console.log('\n─── 结论 ───')
-console.log('CEO 会话的三个控制名归团队版（按成员名字寻址）⇒ 命名委托 child 不可续驶 ⇒ vp_eng/vp_sales 必须 one-shot 前台。')
+console.log('0.2.1：委托=activation（终稿走完成通知），child 人格由 agentPreset 给；CEO 会话的控制名仍归团队版 ⇒ 命名委托 child 不可续驶，续驶归 team。')
 if (problems.length > 0) {
   console.log(`\ndelegation-smoke: ${String(problems.length)} 个问题\n- ${problems.join('\n- ')}`)
   process.exit(1)
 }
-console.log('\ndelegation-smoke: ALL PASS（R3 汇报线边界未变）')
+console.log('\ndelegation-smoke: ALL PASS（R3 汇报线在 0.2.1 的边界成立）')

@@ -6,15 +6,27 @@ describe('replay fixture normalization and judgements', () => {
     const raw = [
       '{"type":"assistant/message","data":{"text":"sampled 2026-10-14T09:08:07.123+08:00[Asia/Shanghai]; Elapsed since the preceding model-visible message: 12s"}}',
       '{"type":"permission/preset","data":{"source":"agent","preset":"ceo","mode":"workspace-write"}}',
+      '{"type":"session-log-deepseek/delivery-accepted","seq":39,"data":{"sessionId":"session-abc","sessionFormatVersion":4,"throughSeq":37}}',
       '{"type":"user/message","data":{"content":[{"type":"text","text":"permission/preset is ordinary user text"}]}}',
+      // 与真实 fixture 同形：整行是序列化结果，内层引号必须转义（否则不是合法 JSONL）。
+      JSON.stringify({ type: 'user/message', data: { content: [{ type: 'text', text: 'Current runtime context. Current DeepSeek Harness implementation checkout: "/Users/someone/vendor/dsh/". Current DeepSeek Harness Web GUI URL: "http://127.0.0.1:52770".' }], source: { sections: [
+        { name: 'harness:source', text: 'Current DeepSeek Harness implementation checkout: "/Users/someone/vendor/dsh/".' },
+        { name: 'app:web-surface', text: 'Current DeepSeek Harness Web GUI URL: "http://127.0.0.1:52770".' },
+      ] } } }),
     ].join('\n')
     const expected = [
       '{"type":"assistant/message","data":{"text":"sampled <time-context-sample>; Elapsed since the preceding model-visible message: <time-context-elapsed>"}}',
       '{"type":"permission/preset","data":{"source":"agent","preset":"{{posture}}","mode":"{{posture}}"}}',
+      '{"type":"session-log-deepseek/delivery-accepted","seq":39,"data":{"sessionId":"session-abc","sessionFormatVersion":4,"throughSeq":37}}',
       '{"type":"user/message","data":{"content":[{"type":"text","text":"permission/preset is ordinary user text"}]}}',
+      JSON.stringify({ type: 'user/message', data: { content: [{ type: 'text', text: 'Current runtime context. Current DeepSeek Harness implementation checkout: "<harness-source>". Current DeepSeek Harness Web GUI URL: "<web-surface>".' }], source: { sections: [
+        { name: 'harness:source', text: '<harness-source>' },
+        { name: 'app:web-surface', text: '<web-surface>' },
+      ] } } }),
     ].join('\n')
 
     expect(normalizeReplayTimeContext(raw)).toBe(expected)
+
   })
 
   it('reports the first differing record per session in the full replay judge', () => {

@@ -114,6 +114,29 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
+  it('researcher preset（0.2.1）：只读工具面、无职责边界、进 bundle 数组——委托 child 的人格载体', () => {
+    // 为什么需要它：0.2.1 起委托 child 的人格只能由 agentPreset 给；CEO 的通用委托行不钉 preset
+    // 就会生出"迷你 CEO"。researcher 是**手**不是第五个职能 ⇒ 它不该有写盘工具、不该有 journal 义务。
+    const patch = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')).dsh.bundle.patch as string[]
+    expect(patch, 'researcher/preset 未列进 dsh.bundle.patch（真挂载会缺这个 preset）')
+      .toContain('./presets/researcher/agent.cordis.yml')
+    const text = roleYml('researcher')
+    expect(text, 'researcher 缺 preset-researcher 声明行').toMatch(/^\s+- id: preset-researcher$/m)
+    expect(text, 'researcher 的 config.id 必须等于 researcher').toMatch(/^\s+id: researcher$/m)
+    // 「只读」不能只写在 persona 里：tool-fs 行必须显式关掉 write/edit（vendor Config 的开关）。
+    const fsRow = rowBlock('researcher', 'tool-fs')
+    expect(fsRow, 'researcher 缺 tool-fs 行（读盘面）').not.toBe('')
+    expect(fsRow, 'researcher 的 tool-fs 必须 write: false（只读手的写能力面）').toContain('write: false')
+    expect(fsRow, 'researcher 的 tool-fs 必须 edit: false').toContain('edit: false')
+    for (const row of ['tool-fs-search', 'tool-web', 'tool-todo']) {
+      expect(text, `researcher 缺 ${row}（调研手没有检索面就等于没有手）`).toMatch(new RegExp(`^\\s+- id: ${row}$`, 'm'))
+    }
+    // 它是手不是职能：不能带角色职责（journal 纪要义务、CHARTER 开场）。注释里解释"没有这些义务"不算。
+    const personaRow = rowBlock('researcher', 'persona')
+    expect(personaRow, 'researcher 的 persona 不得给 journal 纪要义务').not.toMatch(/journal/i)
+    expect(personaRow, 'researcher 的 persona 不得给 CHARTER 开场仪式').not.toMatch(/CHARTER/)
+  })
+
   it('五角色显示名共用公司前缀（D14 系列命名，R2 补角色时不许忘）', () => {
     const names = ROLES.map(role => {
       const match = /^ {8}name:\s*(.+)$/m.exec(roleYml(role))
@@ -148,53 +171,68 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
-  it('CEO 汇报线（R3）：命名委托工具是 one-shot 前台；续驶控制行不得回填（team shadow 实证）', () => {
+  it('CEO 汇报线（R3；0.2.1 重校）：命名委托走 activation + agentPreset；per-tool persona / one-shot 配置位已不存在', () => {
     const ceo = roleYml('ceo')
-    // 每个直接汇报对象一个 distinct toolName（per-instance persona 教义）。
-    for (const tool of ['vp_eng', 'vp_sales']) {
+    // 0.2.1 机制（vendor 升档指南 subagent-activations + subagent-preset-composition）：
+    // `backgroundMode` / `enableRunInBackground` / `persona` / `toolFilter` 被 Config 硬拒
+    // （"tool-subagent: persona is no longer supported"），child 的人格只能由 agentPreset 选。
+    // ⇒ 每个直接汇报对象仍是一个 distinct toolName，但贴身配置 = provider + toolName + maxDepth + agentPreset。
+    for (const [tool, preset] of [['vp_eng', 'vp-eng'], ['vp_sales', 'vp-sales']] as const) {
       const match = new RegExp(`toolName: ${tool}([\\s\\S]*?)(?=\\n\\s*- id: |$)`).exec(ceo)
       expect(match, `CEO 缺命名委托工具 ${tool}`).not.toBeNull()
       const block = (match as RegExpExecArray)[1] as string
-      // R3 实证：CEO 会话从第一帧起就是 team-scoped，团队版 send_message/list_agents/
-      // interrupt_agent 按成员**名字**寻址 ⇒ subagent child 无法被续驶。所以命名委托必须是
-      // one-shot 前台（拿结果），不能是 continuable（会生出管不了的孤儿 child）。
-      expect(block, `${tool} 必须 one-shot（continuable 的续驶在 CEO 会话里不可用）`).toContain('backgroundMode: one-shot')
-      expect(block, `${tool} 必须关掉 run_in_background（没有 job_output 工具可收后台 one-shot）`).toContain('enableRunInBackground: false')
-      expect(block, `${tool} 缺 per-instance persona`).toContain('persona: |-')
+      expect(block, `${tool} 必须用角色 preset 给人格（per-tool persona 已删）`).toContain(`agentPreset: ${preset}`)
       expect(block, `${tool} 缺 maxDepth（禁止 VP→VP 平级派活）`).toContain('maxDepth: 1')
+      // 反向守卫：这些位在 0.2.1 会把 preset 标 broken，别再"修"回来。
+      expect(block, `${tool} 仍有 0.2.1 已删除的配置位（preset 会被标 broken）`).not.toMatch(/^\s+(backgroundMode|enableRunInBackground|persona|toolFilter):/m)
     }
-    // 反向守卫：这两个控制行在 CEO 会话里会被团队版 shadow（是死行），别再"修"回来。
-    expect(ceo, 'tool-subagent-control 在 CEO 会话被 team shadow，是死行（见 docs/delegation.md）')
-      .not.toMatch(/^\s*- id: tool-subagent-control$/m)
-    expect(ceo, 'list-agents 同理是死行')
-      .not.toMatch(/^\s*- id: tool-subagent-list-agents$/m)
+    // 通用委托：必须钉 agentPreset（否则 spawn 继承 CEO preset），且工具名即语义。
+    const generic = /toolName: subagent_research([\s\S]*?)(?=\n\s*- id: |$)/.exec(ceo)?.[1] ?? ''
+    expect(generic, 'CEO 通用委托的 child 必须钉 researcher 人格（spawn 不钉会继承 CEO）').toContain('agentPreset: researcher')
+    // 反向守卫：两个续驶控制行在 CEO 会话里被团队版 shadow（是死行），别再"修"回来。
+    for (const row of ['tool-subagent-control', 'tool-subagent-list-agents']) {
+      expect(ceo, `${row} 在 CEO 会话被 team shadow，是死行（见 docs/delegation.md）`)
+        .not.toMatch(new RegExp(`^\\s*- id: ${row}$`, 'm'))
+    }
   })
 
-  it('续驶控制面与 subagent 成对（R4 关闭 footgun）：职能 preset 必须有，CEO preset 必须没有', () => {
-    // 机制（vendor 实证）：`tool-agent-team` 的 maybeInstall 只在
-    // `ctx.agentTeams.tryMembership(agent) !== undefined`（= 团队成员）时才装**团队版**控制名
-    // （vendor/dsh/packages/experimental/tool-agent-team/src/index.ts:397-402）。
-    //   - 职能**根**会话不是团队成员 ⇒ 团队版不会装；若 preset 自己也不声明全局版，会话里就
-    //     既没有团队版也没有全局版 ⇒ `subagent`(continuable) 生出来的 child 失联
-    //     （既发不了消息、也中断不了、也列不出来）——这正是 R3→R4 的轮间待办。
-    //   - 上游 standard / ptc / cordis 三个 preset 都是**成对**声明这两行 + tool-subagent。
-    //   - CEO preset 反过来不能有：CEO 从第一帧起就是 team-scoped（Lead 自己是成员），
-    //     这两行在那里被团队版 shadow 成死行（R3 实证，见 docs/delegation.md §2）。
+  it('委托控制面（R4；0.2.1 不动机制）：职能 preset 声明控制行，CEO 不声明', () => {
+    // 机制（vendor 实证）：`tool-agent-team` 的 maybeInstall 只在 `ctx.agentTeams.tryMembership(agent)`
+    // 命中（= 团队成员）时才装**团队版**控制名。职能**根**会话不是团队成员 ⇒ 必须自己声明全局版，
+    // 否则 0.2.1 的 activation child 在职能会话里既发不了消息、也中断不了、也列不出来。
+    // 0.2.1 删的是 `backgroundMode` 配置位，不删这条机制（控制面仍是"可续 child"的唯一入口）。
     const controlRows = ['tool-subagent-control', 'tool-subagent-list-agents']
     for (const role of ['vp-eng', 'vp-sales', 'coo', 'cfo']) {
       const text = roleYml(role)
       for (const row of controlRows) {
-        expect(text, `${role} 缺 ${row}：它的根会话不是团队成员，团队版控制名不会装，continuable child 会失联`)
+        expect(text, `${role} 缺 ${row}：它的根会话不是团队成员，团队版控制名不会装，activation child 会失联`)
           .toMatch(new RegExp(`^\\s*- id: ${row}$`, 'm'))
       }
-      expect(text, `${role} 的 subagent 是 continuable，却没有控制面——要么补控制行，要么改 one-shot`)
-        .toContain('backgroundMode: continuable')
+      expect(text, `${role} 的委托 child 现在只能走 activation + 完成通知——别再写回 0.2.1 已删除的 backgroundMode`)
+        .not.toMatch(/^\s+(backgroundMode|enableRunInBackground):/m)
     }
     const ceo = roleYml('ceo')
     for (const row of controlRows) {
       expect(ceo, `CEO 会话里 ${row} 被团队版 shadow，是死行（别修回来）`)
         .not.toMatch(new RegExp(`^\\s*- id: ${row}$`, 'm'))
     }
+  })
+
+  it('时钟与节律（0.2.1：schedule-bundle 退役 ⇒ preset 自持 time-context + tool-schedule）', () => {
+    // 上游升档指南 schedule-bundle-retired：宿主 schedule 服务由 web-app 挂，time-context 与
+    // tool-schedule 变成 preset 行所有权。persona 点名 schedule_create 的角色，preset 里就必须有工具，
+    // 否则是"标志面谎报"。组合层不再替换/插入 time-context（旧替换行已删）。
+    for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']) {
+      const text = roleYml(role)
+      expect(text, `${role} 缺 time-context 行（0.2.1 起归 preset 所有）`).toMatch(/^\s*- id: time-context$/m)
+      expect(text, `${role} 的 time-context 必须钉住 Asia/Shanghai（回落不依赖进程时区）`).toContain('timeZone: Asia/Shanghai')
+      expect(text, `${role} 缺 tool-schedule 行`).toMatch(/^\s*- id: tool-schedule$/m)
+    }
+    const patch = readFileSync(join(ROOT, 'packages/company-pack/cordis.patch.yml'), 'utf8')
+    expect(patch, '组合层不得再拥有 time-context 行（与 preset 行撞重复 id）')
+      .not.toMatch(/^\s*- id: time-context$/m)
+    expect(patch, '组合层不得再引用退役的 schedule-bundle')
+      .not.toMatch(/dsh-experimental-schedule-bundle/)
   })
 
   it('公司手册（模型可见）覆盖五角色职责边界、路由与升级规则——不随内容改动悄悄失效', () => {
