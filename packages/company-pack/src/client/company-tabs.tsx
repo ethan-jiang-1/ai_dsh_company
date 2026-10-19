@@ -59,13 +59,13 @@ export interface PanelFrameProps {
  *   `useTabInfo()` 的 layout 是 observable，浮出/收回都会触发本组件重渲染，检查自然保持新鲜。
  *   浮窗的移动（grip）、缩放、置顶仍是平台能力，我们不自造窗口管理（D13）。
  */
-export function PanelFrame({ title, tone, tabProps, action, children, refreshLabel = '每 5 秒自动刷新' }: {
+export function PanelFrame({ title, tone, tabProps, action, children, refreshLabel = '投影更新' }: {
   readonly title: string
   readonly tone: string
   readonly tabProps: PanelFrameProps
   readonly action?: ReactNode
   readonly children: ReactNode
-  /** 页签头的新鲜度文案；**必须说真话**（各面板的数据轮询间隔不同——2026-10-18 走查抓到培养页签写 5 秒实际 30 秒）。 */
+  /** 页签头的新鲜度文案；**必须说真话**（推送面板用默认「投影更新」；轮询面板各自传真实间隔——2026-10-18 走查抓到培养页签写 5 秒实际 30 秒）。 */
   readonly refreshLabel?: string
 }) {
   const info = tabProps.useTabInfo()

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 依赖图**中途形态**采集档（2026-09-26 立，A 案）：跑一场刻意串成深链的动议，在"完成 / 进行中 /
-// 何时跑：依赖图**中途形态**（长链动议进行中）改动时；真动议 ≈$2 无人值守，`--session` 可复看既有会话
+// 何时跑：依赖图**中途形态**（长链动议进行中）改动时；真动议 ≈$2 无人值守，`--session` 可复看既有会话；
+//   `--session ... --narrow` = 零模型窄栏双滚动度量（390×900，落 narrow-metrics.json + 截图）。
 // 等待"三态同屏的**中途**截依赖图页签，供图像判据逐张读（A 案判据 ⑥：一眼看出卡在哪一拨）。
 //
 // 与 `dag-visual-probe.mjs` 的分工：那个用**合成数据**验渲染（①–⑤，零模型成本、可复跑）；
@@ -24,6 +25,8 @@ const args = process.argv.slice(2)
 const WAVES = Number(args[args.indexOf('--waves') + 1] ?? '6')
 // `--session <id>` = **只截既有会话**（不发动议）：动议跑完后补收官图，或复看某场的历史形态。
 const EXISTING = args.indexOf('--session') === -1 ? undefined : args[args.indexOf('--session') + 1]
+// `--narrow` = 在 390×900 下量依赖图页签的横向/纵向滚动，判窄栏是否双滚动（配合 `--session`，零模型）。
+const NARROW = args.includes('--narrow')
 // `--prompt-file <path>` = 用外部动议文本（默认是本档内置的"长链动议"）。动议设计随用途变，
 // 采集/截图逻辑不变 ⇒ 同一档既能采"深链可读性"，也能采"会拉人进来的动议"。
 const PROMPT_FILE = args.indexOf('--prompt-file') === -1 ? undefined : args[args.indexOf('--prompt-file') + 1]
@@ -163,8 +166,42 @@ const completedOf = async () => {
   return { done: done.size, turnEnded: events.some(event => event?.type === 'turn/end') }
 }
 
+const measureNarrow = async () => {
+  await page.setViewportSize({ width: 390, height: 900 })
+  await page.waitForTimeout(500)
+  await openDag()
+  await page.waitForTimeout(800)
+  const metrics = await page.evaluate(() => {
+    const image = document.querySelector('[aria-label="任务依赖图"]')
+    const pane = image?.closest('.wk-pane-body') ?? null
+    const rect = image?.getBoundingClientRect() ?? null
+    return {
+      viewport: { width: innerWidth, height: innerHeight },
+      image: rect === null ? null : { width: Math.round(rect.width), height: Math.round(rect.height) },
+      pane: pane === null ? null : {
+        clientWidth: pane.clientWidth,
+        scrollWidth: pane.scrollWidth,
+        clientHeight: pane.clientHeight,
+        scrollHeight: pane.scrollHeight,
+        overflowX: pane.scrollWidth > pane.clientWidth + 1,
+        overflowY: pane.scrollHeight > pane.clientHeight + 1,
+      },
+      document: {
+        clientHeight: document.documentElement.clientHeight,
+        scrollHeight: document.documentElement.scrollHeight,
+      },
+    }
+  })
+  writeFileSync(join(SHOTS, 'narrow-metrics.json'), JSON.stringify(metrics, null, 2), 'utf8')
+  await page.getByRole('img', { name: '任务依赖图' }).first().screenshot({ path: join(SHOTS, 'narrow.png') })
+  await page.screenshot({ path: join(SHOTS, 'narrow-full.png') })
+  console.log(`  窄栏度量: ${JSON.stringify(metrics)}`)
+  console.log('  出图 snapshots/visual/dag-midflight/narrow.png（+ 全页）')
+}
+
 if (EXISTING !== undefined) {
   await shoot('final')
+  if (NARROW) await measureNarrow()
   console.log('\ndag-midflight-probe: 既有会话截图完成')
   try { child.kill('SIGTERM') } catch { /* 已退出 */ }
   await browser.close()

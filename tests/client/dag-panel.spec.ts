@@ -77,7 +77,8 @@ describe('DagPanel 画布自适应栏宽（2026-09-28 两轮试用反馈：右�
       children: null,
     }))
     expect(html).toContain('重画') // action 槽进页签头（与「浮出」同簇）
-    expect(html).toContain('每 5 秒自动刷新') // 既有头元素不受影响
+    expect(html).toContain('投影更新') // 默认新鲜度文案：推送面板说真话，不再假装 5 秒轮询
+    expect(html).not.toContain('每 5 秒')
   })
 
   it('节点内容禁用 foreignObject（「文字堆左上角」整类问题的根因，2026-09-28 移除防回潮）', () => {
@@ -117,6 +118,15 @@ describe('DagPanel 状态徽章与箭头（2026-09-26 code-review 补的钉子�
     const pending = renderToString(createElement(DagPanel, { layout: layoutDag([task('a')]) }))
     expect(pending).toContain('可开工')
     expect(pending).not.toContain('进行中')
+  })
+
+  it('进行中徽章用独立样式，不与可开工共用 wk-dag-ready', () => {
+    const inProgress = renderToString(createElement(DagPanel, { layout: layoutDag([task('a', [], 'in_progress')]) }))
+    expect(inProgress).toContain('wk-dag-progress')
+    expect(inProgress, '进行中再穿可开工的绿色 = 同一枚徽章两个意思').not.toContain('wk-dag-ready')
+    const pending = renderToString(createElement(DagPanel, { layout: layoutDag([task('a')]) }))
+    expect(pending).toContain('wk-dag-ready')
+    expect(pending).not.toContain('wk-dag-progress')
   })
 
   it('箭头 = 双 marker 显式上色（不依赖 SVG2 context-stroke）', () => {

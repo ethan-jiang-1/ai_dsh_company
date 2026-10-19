@@ -127,7 +127,12 @@ export function LedgerTab(props: LedgerTabProps) {
   const stats = rows === null ? null : ledgerStats(rows)
 
   return (
-    <PanelFrame tone="archive" title="台账" tabProps={props satisfies PanelFrameProps}>
+    <PanelFrame
+      tone="archive"
+      title="台账"
+      tabProps={props satisfies PanelFrameProps}
+      refreshLabel={`每 ${String(REFRESH_MS / 1000)} 秒自动刷新`}
+    >
       {error !== null && <div className="wk-error">{error}</div>}
       {stats !== null && (
         <div className="wk-meta" aria-label="台账统计">

@@ -112,7 +112,12 @@ export function AttentionTab(props: AttentionTabProps) {
   }
 
   return (
-    <PanelFrame title="待办" tone="attention" tabProps={props satisfies PanelFrameProps}>
+    <PanelFrame
+      title="待办"
+      tone="attention"
+      tabProps={props satisfies PanelFrameProps}
+      refreshLabel="每 2 秒自动刷新"
+    >
       {streamError !== null && <div className="wk-error">动态流不可用：{streamError}</div>}
       <div className="wk-activity-block">
         <strong>等你处理</strong>

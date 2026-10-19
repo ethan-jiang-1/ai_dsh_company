@@ -99,7 +99,7 @@ export function createCompanyView(injected: CompanyViewInjected) {
           ))}
           <span style={{ flex: 1 }} />
           <span className="wk-meta wk-tabstrip-meta">
-            {panel === 'cultivation' ? `每 ${String(CULTIVATION_REFRESH_MS / 1000)} 秒刷新` : '每 5 秒刷新'}
+            {panel === 'cultivation' ? `每 ${String(CULTIVATION_REFRESH_MS / 1000)} 秒刷新` : '投影更新'}
           </span>
           <Button
             size="sm"

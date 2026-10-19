@@ -247,3 +247,15 @@ describe('layoutDag 边线车道分离（圆弧 + 带中车道；2026-09-28 两�
     }
   })
 })
+
+describe('layoutDag 长链尺寸（2026-10-19 看板卡：只缩宽不缩高）', () => {
+  it('21 节点串行链高 > 视口（当前实测 2366px）', () => {
+    const chain = Array.from({ length: 21 }, (_, index) =>
+      task(`t${String(index)}`, index === 0 ? [] : [`t${String(index - 1)}`]))
+    const layout = layoutDag(chain)
+    expect(layout.nodes).toHaveLength(21)
+    expect(layout.height, '21 节点串行链应高于单屏（fitScale 只缩宽、不缩高）').toBeGreaterThan(900)
+    expect(layout.width).toBeGreaterThan(0)
+  })
+})
+

@@ -64,7 +64,7 @@ export function wrapTitle(subject: string, maxWidth: number, fontSize = 11): rea
 function statusBadge(node: DagLayout['nodes'][number]): { text: string; className: string } {
   if (node.waitingOn > 0) return { text: `等 ${String(node.waitingOn)} 项`, className: 'wk-dag-wait' }
   if (node.status === 'completed') return { text: '已完成', className: 'wk-dag-done' }
-  if (node.status === 'in_progress') return { text: '进行中', className: 'wk-dag-ready' }
+  if (node.status === 'in_progress') return { text: '进行中', className: 'wk-dag-progress' }
   return { text: '可开工', className: 'wk-dag-ready' }
 }
 

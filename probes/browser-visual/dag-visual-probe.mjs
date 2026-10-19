@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：常驻
 // DAG 面板**视觉夹具认证档**（2026-09-26 立）：把真组件 + 真 CSS 注入真 web app（借真主题令牌），
-// 何时跑：依赖图视觉（三处只能看不能 keyless 断言的事实）改动时；零模型成本，自带 12 条机器判据
+// 何时跑：依赖图视觉（三处只能看不能 keyless 断言的事实）改动时；零模型成本，自带机器判据
 // 用合成任务数据造出"完成 / 进行中 / 等待（含悬空 blocker）"三态同屏，浅深两主题各截一张。
 //
 // 为什么需要它：三处视觉缺陷（完成态降透明被动画吃掉 / 箭头 context-stroke 跨浏览器 / 徽章文案）
@@ -43,7 +43,7 @@ if (emitted.status !== 0) {
   console.error('夹具发射失败（tests/client/dag-visual-fixture.spec.ts）')
   process.exit(2)
 }
-const { svg, css } = JSON.parse(readFileSync(FIXTURE, 'utf8'))
+const { svg, css, chainSvg, chainHeight } = JSON.parse(readFileSync(FIXTURE, 'utf8'))
 
 // ── 起真 web（真主题令牌的来源）──
 // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：本探针只等 banner、不取 cookie ⇒ 只走 startWeb 这一层。
@@ -104,6 +104,11 @@ const readStyles = () => page.evaluate(() => {
     已通箭头: style('.wk-arrow-tip-done', 'fill'),
     动画名: style('.wk-node', 'animationName'),
     徽章: [...document.querySelectorAll('#dag-fixture .wk-dag-meta .wk-dag-status')].map(el => el.textContent),
+    徽章样式: [...document.querySelectorAll('#dag-fixture .wk-dag-meta .wk-dag-status')].map(el => ({
+      text: el.textContent,
+      cls: el.getAttribute('class') ?? '',
+      fill: getComputedStyle(el).fill,
+    })),
   }
 })
 
@@ -141,9 +146,50 @@ for (const [theme, values] of [['浅色', light], ['深色', dark]]) {
   // ⑤ 四态文案齐（含悬空 blocker 计入"等 N 项"）
   const badges = values.徽章
   check(`${theme} 徽章四态文案齐`, ['已完成', '进行中', '可开工', '等 1 项', '等 2 项'].every(text => badges.includes(text)), badges.join(' / '))
+  // ⑥ 进行中徽章颜色 ≠ 可开工（同族 BUG-027：同一枚徽章不能两个意思）
+  const runningBadge = values.徽章样式.find(item => item.text === '进行中')
+  const readyBadge = values.徽章样式.find(item => item.text === '可开工')
+  check(`${theme} 进行中徽章与可开工不同样式`,
+    runningBadge !== undefined && readyBadge !== undefined
+      && runningBadge.cls.includes('wk-dag-progress')
+      && readyBadge.cls.includes('wk-dag-ready')
+      && runningBadge.fill !== readyBadge.fill,
+    `${JSON.stringify(runningBadge)} vs ${JSON.stringify(readyBadge)}`)
 }
 
-writeFileSync(join(SHOTS, 'computed.json'), JSON.stringify({ light, dark }, null, 2), 'utf8')
+// ⑦ 21 节点串行链的窄栏形态：合成样本（真 app 的 7 节点样本另见 dag-midflight --narrow）。
+//   这里只钉「只缩宽不缩高」：SVG 的 height 必须仍是布局高度；纵向/横向滚动作为度量记录，不擅自判缺陷。
+const narrow = await page.evaluate(({ chainSvg }) => {
+  const pane = document.createElement('div')
+  pane.id = 'dag-narrow-fixture'
+  pane.className = 'wk-pane-body'
+  pane.setAttribute('style', 'position:fixed;left:0;top:0;width:390px;height:520px;z-index:100000;background:var(--dsw-alias-bg-base);')
+  pane.innerHTML = chainSvg
+  document.body.append(pane)
+  const image = pane.querySelector('svg[aria-label="任务依赖图"]')
+  return {
+    pane: {
+      clientWidth: pane.clientWidth,
+      scrollWidth: pane.scrollWidth,
+      clientHeight: pane.clientHeight,
+      scrollHeight: pane.scrollHeight,
+      overflowX: pane.scrollWidth > pane.clientWidth + 1,
+      overflowY: pane.scrollHeight > pane.clientHeight + 1,
+    },
+    image: image === null ? null : {
+      width: Number(image.getAttribute('width')),
+      height: Number(image.getAttribute('height')),
+    },
+  }
+}, { chainSvg })
+console.log(`── 21 节点窄栏 ──`)
+console.log(`  度量: ${JSON.stringify({ chainHeight, ...narrow })}`)
+await page.locator('#dag-narrow-fixture').screenshot({ path: join(SHOTS, 'narrow-21.png') })
+check('21 节点窄栏：SVG 高度 = 布局高度（只缩宽不缩高）',
+  narrow.image !== null && narrow.image.height === chainHeight,
+  `${String(narrow.image?.height)} vs ${String(chainHeight)}`)
+
+writeFileSync(join(SHOTS, 'computed.json'), JSON.stringify({ light, dark, narrow: { chainHeight, ...narrow } }, null, 2), 'utf8')
 console.log(`\ndag-visual-probe: ${failures.length === 0 ? 'ALL PASS' : `FAIL ${String(failures.length)} 项`}`)
 try { child.kill('SIGTERM') } catch { /* 已退出 */ }
 await browser.close()

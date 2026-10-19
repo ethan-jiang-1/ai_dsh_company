@@ -223,6 +223,7 @@ const CSS = `
 .wk-dag-dot[data-status='pending'] { fill: var(--dsw-alias-state-idle-primary); }
 .wk-dag-wait { font-size: 10px; fill: var(--dsw-alias-state-warn-primary); }
 .wk-dag-ready { font-size: 10px; fill: var(--dsw-alias-state-success-primary); }
+.wk-dag-progress { font-size: 10px; fill: var(--dsw-alias-state-business-primary); }
 .wk-dag-done { font-size: 10px; fill: var(--dsw-alias-label-secondary); }
 /* 状态化：进行中 = 主色描边；完成 = 整卡降透明度（依赖图一眼看出"卡在哪一拨"）。
    ⚠ 降透明度**不能写在 .wk-node 自己身上**：它带入场动画（animation: wk-node-in … both，

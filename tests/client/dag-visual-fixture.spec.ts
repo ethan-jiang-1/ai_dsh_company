@@ -32,6 +32,10 @@ export const FIXTURE_TASKS: readonly TaskRow[] = [
   task('7', ['ghost'], 'pending', 'coo'),
 ]
 
+/** 21 节点串行链：窄栏/长链尺寸的合成样本（与看板卡「21 节点 = 2366px」同源）。 */
+export const CHAIN_TASKS: readonly TaskRow[] = Array.from({ length: 21 }, (_, index) =>
+  task(String(index + 1), index === 0 ? [] : [String(index)], 'pending', 'vp-eng'))
+
 describe('DAG 视觉夹具', () => {
   it('渲染出三态同屏（7 节点 / 6 边），并可按 DAG_VISUAL_EMIT 发射', () => {
     const layout = layoutDag(FIXTURE_TASKS)
@@ -41,6 +45,11 @@ describe('DAG 视觉夹具', () => {
     expect(svg).toContain('wk-node')
     expect(svg).toContain('wk-arrow-tip-done')
 
+    const chainLayout = layoutDag(CHAIN_TASKS)
+    const chainSvg = renderToString(createElement(DagPanel, { layout: chainLayout }))
+    expect(chainLayout.nodes).toHaveLength(21)
+    expect(chainSvg).toContain('wk-node')
+
     const stylesSource = readFileSync(join(ROOT, 'packages', 'company-pack', 'src', 'client', 'styles.ts'), 'utf8')
     const start = stylesSource.indexOf('const CSS = `') + 'const CSS = `'.length
     const css = stylesSource.slice(start, stylesSource.indexOf('`', start))
@@ -48,7 +57,15 @@ describe('DAG 视觉夹具', () => {
 
     const emit = process.env.DAG_VISUAL_EMIT
     if (emit !== undefined && emit !== '') {
-      writeFileSync(emit, JSON.stringify({ svg, css, tasks: FIXTURE_TASKS.length, edges: layout.edges.length }), 'utf8')
+      writeFileSync(emit, JSON.stringify({
+        svg,
+        css,
+        tasks: FIXTURE_TASKS.length,
+        edges: layout.edges.length,
+        chainSvg,
+        chainNodes: chainLayout.nodes.length,
+        chainHeight: chainLayout.height,
+      }), 'utf8')
     }
   })
 })
