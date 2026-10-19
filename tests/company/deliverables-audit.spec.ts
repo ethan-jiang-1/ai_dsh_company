@@ -238,6 +238,50 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
     expect(uncoveredPendingMaterial(['T1'], [], 'ai-transformation-2026')).toEqual(['T1']) // 空库 = 全未锚
   })
 
+  it('待补料锚粒度（BUG-028）：一条总锚覆盖它点名的下游 T 号 ⇒ 不判幻觉；未点到名的照旧判红', () => {
+    // 负例留证 2026-10-19：BUG-028 锚粒度守卫。红配方 = 把 lib 的锚匹配退回旧的整句字面匹配
+    // （`texts.some(t => t.includes(`${anchor}${id}`))`）⇒ 本 case 报
+    // `expected [ 'T4', 'T6' ] to deeply equal []`，还原 ⇒ 绿。现场 = lingang-recon：
+    // CEO 立了一条覆盖全部缺料的总锚
+    // `待补料·lingang-recon·T1｜补料落地复查（M1–M12）`，prompt 里逐项点名到点后派 T4/T6 定稿；
+    // 而 T4/T5/T6 三条派活行自身 T 号不在锚文本里 ⇒ 旧判据报 3 条「行动幻觉」。
+    // 真锚在库时违规数仍为 3（把锚临时移除也不变）= 判据根本没读到它：它只看 T 号字面。
+    const broad = [
+      {
+        record: {
+          title: '待补料·lingang-recon·T1｜补料落地复查（M1–M12）',
+          prompt: '① 查 sources/ 是否落了 M1–M12；② 若 M1–M4、M8 到位 ⇒ 派 T4 接入方案定稿；③ 若 M6、M7 到位 ⇒ 派 T6 账务口径定稿',
+        },
+      },
+    ]
+    // 锚文本里被点名的下游 T 号算已锚
+    expect(uncoveredPendingMaterial(['T1', 'T4', 'T6'], broad, 'lingang-recon')).toEqual([])
+    // 没被任何锚点名的 T 号照旧判红（守卫：真幻觉必须抓）
+    expect(uncoveredPendingMaterial(['T1', 'T4', 'T5', 'T6'], broad, 'lingang-recon')).toEqual(['T5'])
+    // 该 slug 一条锚都没有 ⇒ 全部判红（不许因为"别的 slug 有锚"就放行）
+    expect(uncoveredPendingMaterial(['T4'], [], 'lingang-recon')).toEqual(['T4'])
+    expect(uncoveredPendingMaterial(['T4'], broad, 'another-slug')).toEqual(['T4'])
+    // 前缀匹配不算点名：T1 的锚不许顺带给 T10 作证（否则 T 号退化成 slug 级判据）
+    const t1Only = [{ record: { title: '待补料·x·T1', prompt: '到点查 sources/' } }]
+    expect(uncoveredPendingMaterial(['T10'], t1Only, 'x')).toEqual(['T10'])
+  })
+
+  it('待补料依赖链（BUG-028 后半）：依赖已被锚覆盖的待补料任务跟随已覆盖；不沿已完成的依赖走', () => {
+    // 负例留证 2026-10-19：BUG-028 依赖链传递守卫。红配方 = 删掉 lib 的依赖链闭包循环 ⇒ 本 case 报
+    // `expected [ 'T4', 'T5' ] to deeply equal []`；还原 ⇒ 绿。现场 = T5 的依赖是 T4（「依赖：T4」）——T4 被总锚点名后，T5 的卡点是 T4 不是客户补料。
+    const broad = [{ record: { title: '待补料·lingang-recon·T1｜补料落地复查', prompt: '到位后派 T4 定稿' } }]
+    // T5 没被锚点名，但它的前序 T4 被点名 ⇒ 跟随已覆盖
+    expect(uncoveredPendingMaterial(['T1', 'T4', 'T5'], broad, 'lingang-recon', { T4: [], T5: ['T4'] })).toEqual([])
+    // 缺省不传依赖 = 只看字面（向后兼容旧调用面）
+    expect(uncoveredPendingMaterial(['T4', 'T5'], broad, 'lingang-recon')).toEqual(['T5'])
+    // 依赖本身没被覆盖 ⇒ 后继也照旧判红（不许靠链路白拿）
+    expect(uncoveredPendingMaterial(['T4', 'T5'], [{ record: { title: '待补料·x·T1', prompt: '' } }], 'x', { T4: [], T5: ['T4'] })).toEqual(['T4', 'T5'])
+    // 依赖不在待补料集合里（已完成/取消）不构成覆盖证明
+    expect(uncoveredPendingMaterial(['T5'], broad, 'lingang-recon', { T5: ['T7'] })).toEqual(['T5'])
+    // 环安全：互相依赖但谁都没被锚覆盖 ⇒ 都判红，不死循环
+    expect(uncoveredPendingMaterial(['T8', 'T9'], broad, 'lingang-recon', { T8: ['T9'], T9: ['T8'] })).toEqual(['T8', 'T9'])
+  })
+
   // 负例留证 2026-10-10：BUG-008 红形态 = recon-pack 归档件两条违规（final-not-presented +
   // meta-shape-bad）使 deliverables-check exit=1；实现 partitionArchiveViolations 后归档件转
   // legacy-archive 观察项、exit=0；反咬测试（drafts/sub/x.md）仍报 unshaped-file——门没钝。

@@ -79,6 +79,7 @@
 | [BUG-024-cultivation-row-loses-action-after-failure.md](fixed_bugs/BUG-024-cultivation-row-loses-action-after-failure.md) | 失败后按钮卡「处理中…」：真根因=命令面可永不回话（`finally`+20s 截止边修好）；另修**验收仪器**竞态（断言要等收口，别在 t≈0 抓快照） | 2026-10-19 |
 | [BUG-025-ledger-reads-wrong-data-face.md](fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) | 台账数据面口径错配：面板读的是 40 行动议表，调研与四卡把「993 份成品」记在台账名下 ⇒ 订正文档口径 + 补一条钉住「数据面 = `kb/motion-ledger.md`」的判据 | 2026-10-19 |
 | [BUG-027-false-dependency-ready-badge.md](fixed_bugs/BUG-027-false-dependency-ready-badge.md) | 依赖徽章不看 status ⇒ 131 枚「等 …」噪声挂在已完成/进行中的卡上；**卡上原根因（`ready ?? readyOf()` 回落）经实证不可达**，真缺陷是渲染门槛 ⇒ 门槛加 pending 判据 + 回落补 pending 半句 + 两条 keyless 判据 | 2026-10-19 |
+| [BUG-028-pending-material-anchor-granularity.md](fixed_bugs/BUG-028-pending-material-anchor-granularity.md) | 闸门④锚粒度与纪律不一致——总锚覆盖多任务被判行动幻觉 | 2026-10-19 |
 
 ## 随卡归档的研究
 

@@ -54,7 +54,7 @@
 ⇒ **「缺料不假装完成 → 列清单 → `待补料` 枚举 → 立 schedule 锚」四段全部走通**。
 （第五段「补料落盘 → 复算」要等客户真给料，属未来触发，不在本轮射程。）
 
-**但同时压出一个新缺陷**（已立 [BUG-028](../../_backlog/bugs/BUG-028-pending-material-anchor-granularity.md)）：
+**但同时压出一个新缺陷**（已立 [BUG-028](../../_backlog/_archive/fixed_bugs/BUG-028-pending-material-anchor-granularity.md)）：
 闸门④要求**逐 T 号**一条锚（`待补料·<slug>·T4`），而 CEO 立的是**一条覆盖全部缺料的总锚**
 （`…·T1`，prompt 里点名 M1–M12）⇒ 判 3 条「行动幻觉」**误报**。实测佐证：把锚临时移除，违规数**仍是 3**
 （判据只认 T 号字面出现，与锚在不在无关）。

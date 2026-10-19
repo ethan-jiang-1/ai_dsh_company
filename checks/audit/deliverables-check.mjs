@@ -224,7 +224,8 @@ console.log(`  过程稿 ${result.drafts.length} 份`)
     console.log(`  过程物料 ${materialCount} 份（drafts/ 主题子目录：${materialDirs.map(d => `${d}/ ×${result.materials[d].length}`).join('，')}）`)
   }
 // 事实阻塞闸门④审计（2026-10-10）：drafts 出现「待补料」派活行 ⇒ schedule.json 必须有
-// `待补料·<slug>·<T号>` 任务为证——无锚 = 行动幻觉（口头"已立提醒"，卡兹克案实证）。
+// `待补料·<slug>·…` 任务为证（title/prompt 点名该 T 号，或写明"全部缺料"）——无锚 = 行动幻觉
+// （口头"已立提醒"，卡兹克案实证）。锚粒度 = 判据唯一家 tools/lib/deliverables-audit.mjs（BUG-028）。
 {
   let scheduleTasks = []
   try {
@@ -232,18 +233,23 @@ console.log(`  过程稿 ${result.drafts.length} 份`)
     if (existsSync(schedulePath)) scheduleTasks = Object.values(JSON.parse(readFileSync(schedulePath, 'utf8'))?.tables?.tasks ?? {})
   } catch { /* 无 dev home = 空库 ⇒ 待补料全未锚（fail-closed，与闸门④同向） */ }
   let pendingSeen = 0
+  // 同一 slug 的锚只算一次：锚表述的是该 slug 的跟进面，不是某条派活行的专属物（BUG-028）。
+  const anchorsBySlug = new Map()
   for (const draft of result.drafts.filter(row => row.role === 'ceo')) {
     const body = readFileSync(join(workspace, draft.path), 'utf8')
     const pending = parseAssignments(body).filter(t => t.status === '待补料')
     if (pending.length === 0) continue
     pendingSeen += pending.length
-    for (const id of uncoveredPendingMaterial(pending.map(t => t.id), scheduleTasks, draft.slug)) {
-      violations.push({
-        code: VIOLATION.PENDING_MATERIAL_WITHOUT_SCHEDULE,
-        path: draft.path,
-        detail: `「待补料」任务 ${id} 无 schedule 跟进为证（schedule.json 无 \`待补料·${draft.slug}·${id}\`）——口头"已立提醒" = 行动幻觉（闸门④）；补立任务或改回待办`,
-      })
-    }
+    const depsById = Object.fromEntries(pending.map(t => [t.id, t.deps ?? []]))
+    const uncovered = uncoveredPendingMaterial(pending.map(t => t.id), scheduleTasks, draft.slug, depsById)
+    if (uncovered.length === 0) continue
+    if (anchorsBySlug.has(draft.slug)) continue
+    anchorsBySlug.set(draft.slug, true)
+    violations.push({
+      code: VIOLATION.PENDING_MATERIAL_WITHOUT_SCHEDULE,
+      path: draft.path,
+      detail: `「待补料」任务 ${uncovered.join('、')} 无 schedule 跟进为证（schedule.json 里没有 \`待补料·${draft.slug}·…\` 的锚点名它们）——口头"已立提醒" = 行动幻觉（闸门④）；补立任务、在该 slug 的锚里点名，或改回待办`,
+    })
   }
   if (pendingSeen > 0) console.log(`  待补料 ${pendingSeen} 条（↔ schedule.json 审计锚交叉核对完成）`)
 }

@@ -93,18 +93,54 @@ export function isLeadSession(identity, leadPreset = 'ceo') {
 
 /**
  * 事实阻塞闸门④审计纯逻辑（2026-10-10）：「待补料」派活行必须有 schedule 任务为证——
- * 任务 title/prompt 含 `待补料·<slug>·<T号>` 即为已锚；缺锚 = 行动幻觉
- * （卡兹克案实证：口头"已立提醒"而 schedule.json 为空）。schedule 任务形状兼容
- * `{ record: { title, prompt } }`（storages/schedule.json 现形状）与平铺 `{ title, prompt }`。
+ * 缺锚 = 行动幻觉（卡兹克案实证：口头"已立提醒"而 schedule.json 为空）。
+ *
+ * **锚的粒度（BUG-028，2026-10-19）**：纪律要的是"缺料有真跟进任务为证"，不是"每个 T 号各立一条"。
+ * 所以某个 T 号满足**任一**条件即算已锚：
+ *   ① 某条 `待补料·<slug>·…` 任务的 title/prompt 里**点名**了它；或
+ *   ② 锚**写明**它（⇒ 该锚是总锚，覆盖全部缺料）。
+ * 点名 = 整 T 号边界匹配（`T4` 不吃 `T40`），title 与 prompt 都算——总锚的省法正是"title 挂复查、
+ * prompt 里逐项写到位后派哪个 T 号复算"，lingang-recon 现场即此形状。
+ *
+ * ③ **依赖链传递**：某待补料任务的依赖（`｜依赖：T4`）已被锚覆盖 ⇒ 它自己也已覆盖——它的卡点是
+ * 那条前序任务，不是客户补料；前序任务到点复算后它自然解锁。只认**同样在待补料集合里**的依赖
+ * （已完成的依赖不构成"谁盯着它"的问题），链路带环安全。
+ *
+ * slug 严格匹配（防串场），该 slug 一条锚都没有时照旧全判红。
+ *
+ * schedule 任务形状兼容 `{ record: { title, prompt } }`（storages/schedule.json 现形状）与平铺。
+ * @param {string[]} pendingTaskIds
+ * @param {Array<object>} scheduleTasks
+ * @param {string} slug
+ * @param {Record<string, string[]>} [depsById] 待补料任务 → 它依赖的 T 号（缺省 = 不看链路）
  * @returns 未锚的 T 号清单（空 = 全部已锚）。
  */
-export function uncoveredPendingMaterial(pendingTaskIds, scheduleTasks, slug) {
-  const anchor = `待补料·${slug}·`
-  const texts = (scheduleTasks ?? []).map(t => {
-    const rec = t?.record ?? t ?? {}
-    return `${rec.title ?? ''}\n${rec.prompt ?? ''}`
-  })
-  return (pendingTaskIds ?? []).filter(id => !texts.some(text => text.includes(`${anchor}${id}`)))
+export function uncoveredPendingMaterial(pendingTaskIds, scheduleTasks, slug, depsById = {}) {
+  const anchors = (scheduleTasks ?? [])
+    .map(t => {
+      const rec = t?.record ?? t ?? {}
+      return { title: String(rec.title ?? ''), text: `${rec.title ?? ''}\n${rec.prompt ?? ''}` }
+    })
+    .filter(anchor => anchor.title.includes(`待补料·${slug}·`))
+  // T 号边界：前面不许接字母数字/连字符（`T-1` 是合法号），后面不许接数字（T1 ≠ T10）。
+  const names = (id, text) => new RegExp(`(?<![A-Za-z0-9-])${id}(?!\\d)`).test(text)
+  const ids = pendingTaskIds ?? []
+  const covered = new Set(ids.filter(id => anchors.some(anchor => anchor.text.includes('全部缺料') || names(id, anchor.text))))
+  // 依赖链闭包：pending 内的前序任务已覆盖 ⇒ 后继也覆盖（只沿 pending 集合走，防把已完成任务当锚）。
+  const pending = new Set(ids)
+  let grew = true
+  while (grew) {
+    grew = false
+    for (const id of ids) {
+      if (covered.has(id)) continue
+      const deps = (depsById?.[id] ?? []).filter(dep => pending.has(dep))
+      if (deps.length > 0 && deps.some(dep => covered.has(dep))) {
+        covered.add(id)
+        grew = true
+      }
+    }
+  }
+  return ids.filter(id => !covered.has(id))
 }
 
 /**

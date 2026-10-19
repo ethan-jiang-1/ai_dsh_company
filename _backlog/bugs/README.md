@@ -10,7 +10,12 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-028](BUG-028-pending-material-anchor-granularity.md) | 闸门④锚粒度与纪律不一致——一条总锚覆盖多任务时被判「行动幻觉」（lingang-recon 实测 3 条误报） | P2 |
+| —（无活跃缺陷卡） | 2026-10-19 BUG-028 已修迁 [fixed_bugs](../_archive/fixed_bugs/BUG-028-pending-material-anchor-granularity.md) | — |
+
+**2026-10-19 BUG-028 收口**：闸门④认总锚（title 或 prompt 点名即算，依赖链一并传递），lingang-recon 由 3 条误报 → 0 条违规；
+守卫 = `tests/company/deliverables-audit.spec.ts` 两条 keyless 断言（锚粒度 + 依赖链）。教训同 BUG-014：
+**锚的粒度选错**——判据把纪律的意图（有真跟进为证）翻译成了一种形状（每个 T 号各一条锚），
+于是纪律自己鼓励的"一条复查盯全部缺料"反倒撞红。
 
 **2026-10-19 三张卡收口**：BUG-025 四条判定逐条成立，已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；
 BUG-026 经实证为**误报**（wire 视图 ownerName 273/273 齐全，卡读的是 projcache 的 **state** 行）
