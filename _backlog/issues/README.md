@@ -6,10 +6,10 @@
 
 | 问题 | 当前情况与下一步 |
 |---|---|
-| [公司面 UX 深挖——先做哪几个面板](2026-10-19-company-panels-ux-priority.md) | 优先级与依据（父卡，含"不做"段）；Top 3 已拆成下面三张独立卡 |
-| [① 台账面板 UX 深挖](2026-10-19-ledger-ux-deep-dive.md) | 993 条真数据 / 文件驱动 / 痛点 7 ⇒ 先摘的大果；**等你点** |
-| [② 看板 + 依赖图 UX 深挖](2026-10-19-board-dag-ux-deep-dive.md) | 指挥视图 ⇒ 核心是"板面 = 投影真值"的**正确性判据**；**等你点** |
-| [③ 任务板 UX 深挖](2026-10-19-taskboard-table-ux-deep-dive.md) | 与看板同源 ⇒ 核心是**口径一致性** + 入口可发现性；**等你点** |
+| [公司面 UX 深挖——先做哪几个面板](2026-10-19-company-panels-ux-priority.md) | 优先级已按本轮读码+真数据**重排**（看板第一、台账降到第三）；**等你拍**先做哪张 + BUG-026 走哪条路 |
+| [① 看板 + 依赖图 UX 深挖](2026-10-19-board-dag-ux-deep-dive.md) | 指挥视图 ⇒ 已确认两条真缺陷 BUG-026/027（owner 全缺、假就绪徽章）；验收已从"板面=投影"换底为 golden 快照；**等你点** |
+| [② 任务板 UX 深挖](2026-10-19-taskboard-table-ux-deep-dive.md) | 表格答不了"谁在等谁"（owner 空/依赖裸 id）；原"一致性判据"作废（同源恒一致）；**等你点** |
+| [③ 台账 UX 深挖](2026-10-19-ledger-ux-deep-dive.md) | 订正：读的是 40 行动议表不是 993 份成品（BUG-025）；真问题是 663 字单行摘要；**等你点** |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 

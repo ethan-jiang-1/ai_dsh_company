@@ -27,6 +27,7 @@ intent: "为什么需要这份依据。"
 
 | 文件 | 活卡与用途 |
 |---|---|
-| [company-panels-ux/2026-10-19-panel-inventory-and-priority.md](company-panels-ux/2026-10-19-panel-inventory-and-priority.md) | [公司面 UX 深挖——先做哪几个面板](../issues/2026-10-19-company-panels-ux-priority.md)：真实数据量/交互面/历史痛点与 Top 3 依据 |
+| [company-panels-ux/2026-10-19-panel-inventory-and-priority.md](company-panels-ux/2026-10-19-panel-inventory-and-priority.md) | [公司面 UX 深挖——先做哪几个面板](../issues/2026-10-19-company-panels-ux-priority.md)：真实数据量/交互面/历史痛点与 Top 3 依据（**§二 数据量归属 / §四 痛点计数已被下一行订正**） |
+| [company-panels-ux/2026-10-19-panel-truth-audit.md](company-panels-ux/2026-10-19-panel-truth-audit.md) | 同一父卡 + 三张深挖卡 + [BUG-025](../bugs/BUG-025-ledger-reads-wrong-data-face.md) / [BUG-026](../bugs/BUG-026-owner-missing-from-team-projection.md) / [BUG-027](../bugs/BUG-027-false-dependency-ready-badge.md)：面板真实数据面、真投影字段实况与可复跑脚本（四张卡验收换底的依据） |
 
 随卡归档的材料见 [研究归档](../_archive/research/README.md)。

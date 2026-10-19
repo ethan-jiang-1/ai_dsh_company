@@ -2,7 +2,7 @@
 
 当场修掉的不建卡。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。
 
-**下一个缺陷号**：Next BUG ID = 25；已分配 BUG-001..024。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 28；已分配 BUG-001..027。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，修相对链接并更新两边清单。
 
@@ -10,8 +10,11 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
+| [BUG-025](BUG-025-ledger-reads-wrong-data-face.md) | 台账面板读的是 40 行动议表，不是 993 份成品——父卡第一优先级论据作废 | P1 |
+| [BUG-026](BUG-026-owner-missing-from-team-projection.md) | `agentTeam` 投影不带 `ownerName`（ownerId 有 344/379）⇒ 看板/依赖图/任务板 owner 全「未分配」 | P1 |
+| [BUG-027](BUG-027-false-dependency-ready-badge.md) | `ready ?? readyOf()` 把官方语义放宽 ⇒ 131 张已完成卡白挂「依赖已就绪」 | P1 |
 
-**无活跃缺陷卡**；BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 已修（含验收仪器定位） [fixed_bugs](../_archive/fixed_bugs/README.md)。
+三条均**无浏览器、读码+真数据即可复核**；修法与判定见各卡。BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 已修 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

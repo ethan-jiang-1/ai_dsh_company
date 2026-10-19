@@ -8,6 +8,14 @@ intent: "为『公司面 UX 深挖先做哪几个面板』提供可复核的数�
 服务活卡：[公司面 UX 深挖——先做哪几个面板](../../issues/2026-10-19-company-panels-ux-priority.md)。
 **口径**：本轮只做"读码 + 真数据 + 历史痛点"的**优先级判断**，尚未真跑任何面板；面板的具体缺陷要等真浏览器那一轮才作数。
 
+> ⚠ **本文已部分订正（2026-10-19，同轮复核）**：[真相复核](2026-10-19-panel-truth-audit.md) 实测出两处错——
+> ① **§二 第一行**把「993」记在"台账条目"名下是错的：台账面板读的是 `kb/motion-ledger.md`（**40 行动议**），
+> 993 是 `deliverables*` 的**文件数**（见 [BUG-025](../../bugs/BUG-025-ledger-reads-wrong-data-face.md)）；
+> ② **§四 历史痛点**按同一命令复跑已是 `LedgerTab` **10** 份（含本轮新卡），且其中 7 份是**同一件事**
+> （human-exits 批 3 的摘要显示线，已交付）⇒「痛点最多」不成立。
+> 另：§二 与 §六 给的 `agentTeam` 取法少了 `record` 一层，真路径 = `record.rows.agentTeam.val`。
+> **本文其余部分（交互面、验证计划、反证限制）仍有效**；读优先级请看父卡（已重排）。
+
 ## 一、面板清单与规模（`packages/company-pack/src/client/`，实测 `wc -l`）
 
 | 面板 | 实现 | 规模 | 数据源 | 可写动作（`onClick`/`onSubmit`/`onChange` 计数） |
