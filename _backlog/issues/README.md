@@ -8,13 +8,12 @@
 
 | 问题 | 状态 | 当前一步 |
 |---|---|---|
-| [公司面 UX 深挖——先做哪几个面板](2026-10-19-company-panels-ux-priority.md) | 等人拍板 🔒 | 拍第一张；拍完本卡收口 |
-| [① 看板 + 依赖图 UX 深挖](2026-10-19-board-dag-ux-deep-dive.md) | 推敲中，blockedBy 父卡 | 等父卡选定 |
-| [② 任务板 UX 深挖](2026-10-19-taskboard-table-ux-deep-dive.md) | 推敲中，blockedBy 父卡 | 等父卡选定 |
-| [③ 台账 UX 深挖](2026-10-19-ledger-ux-deep-dive.md) | 推敲中，blockedBy 父卡 | 等父卡选定 |
-| [成品台账——要不要列公司产出](2026-10-19-deliverables-ledger.md) | 推敲中，blockedBy 父卡 | 等父卡/台账轮后独立推敲 |
+| [① 看板 + 依赖图 UX 深挖](2026-10-19-board-dag-ux-deep-dive.md) | 推敲中，已选中 | 进 plan mode 呈实施计划 |
+| [② 任务板 UX 深挖](2026-10-19-taskboard-table-ux-deep-dive.md) | 推敲中，blockedBy 看板 | 等看板收口 |
+| [③ 台账 UX 深挖](2026-10-19-ledger-ux-deep-dive.md) | 推敲中，blockedBy 任务板 | 等任务板收口 |
+| [成品台账——要不要列公司产出](2026-10-19-deliverables-ledger.md) | 推敲中，blockedBy 台账 | 等三张面板卡收口 |
 
-已结问题见 [归档](../_archive/README.md)（含 issue 卡质量、agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
+已结问题见 [归档](../_archive/README.md)（含 issue 卡质量、公司面优先级、agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 
 ## 边界与尺寸
 

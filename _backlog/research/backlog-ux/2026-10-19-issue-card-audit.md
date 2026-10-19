@@ -30,7 +30,7 @@ intent: "为 issue 卡质量审与 DSH-native 收口提供逐条证据：四张�
 | A1 | P1 | [看板卡](../../issues/2026-10-19-board-dag-ux-deep-dive.md) §「已确立的事实 / 本轮范围」 | 「两个致命结论」仍说“正确性缺陷已确认两条”；“本轮范围”第 1 条仍写“先修数据 BUG-026/027” | 与同卡「核心不再是修正确性缺陷」直接冲突；026 是误报、027 已修。当前段应只留呈现层 + golden 判据 |
 | A2 | P1 | [看板卡](../../issues/2026-10-19-board-dag-ux-deep-dive.md) §「验收标准」 | 仍把 BUG-026/027 的「已修判定」当验收条目 | 两个 BUG 已归档；026 的“已修判定”是在误报结论之前写的。条目要么已满足，要么不可执行 |
 | A3 | P1 | [任务板卡](../../issues/2026-10-19-taskboard-table-ux-deep-dive.md) §「已确立的事实 / 本轮范围」 | 「修 owner 后要重测（BUG-026 不修…）」；「BUG-027 修好后需同步复核」 | 同卡 §「已确立的事实 / 验收标准」说 026 是误报、无需修复；`（阻塞）` 已在 [TasksPanel.tsx](../../../packages/company-pack/src/client/TasksPanel.tsx) 的 `TasksTableView` 修掉并有 [spec](../../../tests/client/tasks-table.spec.ts) 的 describe 块 |
-| A4 | P1 | [优先级卡](../../issues/2026-10-19-company-panels-ux-priority.md) §「建议 Top 3 / 依据」 | “owner 列空”“先依赖 ① 修 owner”；还说在场连带 BUG-026 | owner 在 wire 上齐全；① 没有 owner 修复任务；026 已结。“三条已确认缺陷…不需要浏览器就能修”也已过期 |
+| A4 | P1 | [优先级卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) §「建议 Top 3 / 依据」 | “owner 列空”“先依赖 ① 修 owner”；还说在场连带 BUG-026 | owner 在 wire 上齐全；① 没有 owner 修复任务；026 已结。“三条已确认缺陷…不需要浏览器就能修”也已过期 |
 | A5 | P1 | [issues/README](../../issues/README.md) §活跃清单 | 旧版还写“BUG-026 走哪条路”“owner 空”“已确认两条真缺陷 BUG-026/027” | 三条都已撤回/关闭；本轮已先改这三行，但正文/状态仍未收口 |
 | A6 | P1 | [真相复核 §五/§六](../company-panels-ux/2026-10-19-panel-truth-audit.md) | §五仍以被证伪的 §三为依据说“真值缺 owner、ready 放宽、必须换底”；§六仍说 owner 全缺可能是开发 home 特有 | 与文首补正相反；正文仍在判断路径上。本轮已加失效指针，未重写 |
 | A7 | P1 | [盘点 §五](../company-panels-ux/2026-10-19-panel-inventory-and-priority.md) + [research 索引](../README.md) | §五仍推荐台账 Top 1；索引只说 §二/§四订正 | §五正是建立在 §二/§四上，也失效了；本轮已加指针，未重写 |
@@ -42,9 +42,9 @@ intent: "为 issue 卡质量审与 DSH-native 收口提供逐条证据：四张�
 |---|---|---|---|---|
 | B1 | P1 | 三张子卡 + [章程](../../README.md) §双轨状态生命周期 | 子卡 `推敲中`，但 README/下一步都说“等你点”；父卡 `等人拍板` 原缺 🔒（本轮已补） | 下一步是用户选择：按章程应 `等人拍板` + 🔒，或用 `blockedBy` 父卡把“等另一张卡”与“等用户”分开。现在四张都像在等同一个用户 |
 | B2 | P1 | 三张子卡 + [章程](../../README.md) §双轨状态生命周期 | `## 验收标准`（自称“毕业门票”）+ `毕业：未定` | 章程：`## 验收标准` 是“做”的毕业门票；门票已写、倾向未定，读者不知道该不该开工。应暂标“草案”或翻 `毕业：做` |
-| B3 | P1 | [优先级卡](../../issues/2026-10-19-company-panels-ux-priority.md) §未决问题 | “先做哪张”+“台账要不要重定位成成品台账”混在一张卡 | 两个独立决定；卡不能单独关闭；成品台账是新功能，不是 UX 轮 |
+| B3 | P1 | [优先级卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) §未决问题 | “先做哪张”+“台账要不要重定位成成品台账”混在一张卡 | 两个独立决定；卡不能单独关闭；成品台账是新功能，不是 UX 轮 |
 | B4 | P2 | 四张卡 | 没有 `owner` / `blockedBy` / `blocker` / `updated` | 父卡和子卡的依赖是隐式的；`推敲中`/`等人拍板` 两值表达不了“等另一张卡”与“等一个具体答案”的区别 |
-| B5 | P2 | [优先级卡](../../issues/2026-10-19-company-panels-ux-priority.md) §建议 Top 3 | 排序标准在段落间漂移：一会儿“证据强度”，一会儿“能 keyless 验且代价低”，一会儿“指挥视图重要性” | 三种标准会给出三个不同的第一；卡片没有说清用哪条，读者无法判断“看板第一”是事实还是口味 |
+| B5 | P2 | [优先级卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) §建议 Top 3 | 排序标准在段落间漂移：一会儿“证据强度”，一会儿“能 keyless 验且代价低”，一会儿“指挥视图重要性” | 三种标准会给出三个不同的第一；卡片没有说清用哪条，读者无法判断“看板第一”是事实还是口味 |
 
 ### C. 证据层 / 数字 / 多 owner
 

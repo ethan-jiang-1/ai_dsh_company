@@ -50,6 +50,7 @@
 | [2026-10-16-code-structure-round3.md](settled_issues/2026-10-16-code-structure-round3.md) | 已实施并验收（deliverables 拆「形状与身份 / 声明对账」两模块＋spec 一一对应＋触发线；导出普查守恒与四条红证在 Note；Item 2 留独立第二轮） | 2026-10-16 |
 | [2026-10-16-all-in-ai-ceo-closeout.md](settled_issues/2026-10-16-all-in-ai-ceo-closeout.md) | 已拍板并实施 A+B（收口必须先 present 入手册；converge 拦未结审计发现）；本条真实收口仍归公司侧 | 2026-10-16 |
 | [2026-10-19-issue-card-quality.md](settled_issues/2026-10-19-issue-card-quality.md) | 已结（A 内容收口执行：四卡当前态/修订史、blockedBy、README 薄索引、研究稿失效标记、成品台账拆卡、wire golden 订正）；B 以后做，C = 后续卡执行协议 | 2026-10-19 |
+| [2026-10-19-company-panels-ux-priority.md](settled_issues/2026-10-19-company-panels-ux-priority.md) | 已结（用户拍：看板+依赖图 → 任务板 → 台账；成品台账已拆新卡；判据 = 证据可复用 × 影响 × 代价） | 2026-10-19 |
 
 ## 已修缺陷
 

@@ -1,6 +1,6 @@
 ---
 status: 推敲中
-blockedBy: [2026-10-19-company-panels-ux-priority]
+blockedBy: [2026-10-19-board-dag-ux-deep-dive]
 opened: 2026-10-19
 ---
 
@@ -24,7 +24,7 @@ opened: 2026-10-19
 - 依赖列显示什么？建议 `owner · id`（title 给 subject），或 `owner · subject`。要能一次答出「谁在等谁」，不是只把 id 换成标题。
 - `已删`：删掉映射，还是取消过滤让墓碑真显示？建议删映射（本轮不做墓碑视图）。
 
-**下一步：** 父卡选中本卡后按下面验证计划进 `exit_plan_mode`；未选中前只维护卡面。
+**下一步：** 父卡已拍顺序（看板 → 任务板 → 台账）；等看板卡收口后按下面验证计划进 `exit_plan_mode`。
 
 ## 官方 layer 0 与 compact skin（边界声明）
 

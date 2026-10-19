@@ -5,7 +5,7 @@ intent: "为『公司面 UX 深挖先做哪几个面板』提供可复核的数�
 
 # 公司面六面板盘点与 UX 优先级依据（2026-10-19）
 
-服务活卡：[公司面 UX 深挖——先做哪几个面板](../../issues/2026-10-19-company-panels-ux-priority.md)。
+服务：[已结公司面优先级卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md)。
 **口径**：本轮只做"读码 + 真数据 + 历史痛点"的**优先级判断**，尚未真跑任何面板；面板的具体缺陷要等真浏览器那一轮才作数。
 
 > ⚠ **本文已部分订正（2026-10-19，同轮复核）**：[真相复核](2026-10-19-panel-truth-audit.md) 实测出两处错——
@@ -71,7 +71,7 @@ intent: "为『公司面 UX 深挖先做哪几个面板』提供可复核的数�
 
 ## 五、评分与推荐（依据上文，不含口味）
 
-> ⚠ **本节已失效（2026-10-19 A 收口）**：台账「993 / Top 1」与任务板「同源不一致」的前提已被 [真相复核](2026-10-19-panel-truth-audit.md) 与 [BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) 订正；当前排序见 [父卡](../../issues/2026-10-19-company-panels-ux-priority.md)。下表保留为旧版依据，**不要按它排优先级**。
+> ⚠ **本节已失效（2026-10-19 A 收口）**：台账「993 / Top 1」与任务板「同源不一致」的前提已被 [真相复核](2026-10-19-panel-truth-audit.md) 与 [BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) 订正；当前排序见 [已结父卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md)。下表保留为旧版依据，**不要按它排优先级**。
 
 | 面板 | 真实数据 | 看错代价 | 测试成本（越低越好） | 历史痛点 | 结论 |
 |---|---|---|---|---|---|
