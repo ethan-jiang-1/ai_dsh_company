@@ -52,6 +52,16 @@ describe('client 面（R3：委派工具卡）', () => {
     expect(tab, 'LedgerTab 必须经 parseMotionLedger 解析（否则读的可能是别的表）').toContain('parseMotionLedger')
   })
 
+  it('成品目录的数据面 = kb/deliverables-index.json（生成索引，不是面板自己扫盘）', () => {
+    const index = readFileSync(join(PACK, 'src/client/index.ts'), 'utf8')
+    const read = /const readCatalog = async[\s\S]*?\n {4}\}/.exec(index)?.[0] ?? ''
+    expect(read, 'index.ts 里找不到 readCatalog（数据面接线被改过，复核本断言）').not.toBe('')
+    expect(read, '成品目录必须读生成索引 kb/deliverables-index.json').toContain("'kb/deliverables-index.json'")
+    expect(read, '成品目录不许直接扫 deliverables 目录').not.toMatch(/'deliverables\/'/)
+    const tab = readFileSync(join(PACK, 'src/client/DeliverablesTab.tsx'), 'utf8')
+    expect(tab, 'DeliverablesTab 必须经 parseCatalog 解析（否则读的可能是别的东西）').toContain('parseCatalog')
+  })
+
   it('client 入口确实注册了 tool.call.toolview，且 key 走共享常量（不写死）', () => {
     const index = readFileSync(join(PACK, 'src/client/index.ts'), 'utf8')
     expect(index, 'client 入口没有注册 tool.call.toolview').toContain("'tool.call.toolview'")

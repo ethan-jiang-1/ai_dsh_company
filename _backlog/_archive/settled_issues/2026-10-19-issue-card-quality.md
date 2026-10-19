@@ -15,7 +15,7 @@ opened: 2026-10-19
 
 - 四张公司面卡各加 `## 当前结论（只写 now）` / `## 修订史（只追加）`；旧矛盾段移入修订史，不留在判断路径。
 - 三张子卡加 `blockedBy` 父卡；下一步从「等你点」改成「等父卡选定」；验收标「草案」。
-- 父卡的「成品台账」拆成 [新卡](../../issues/2026-10-19-deliverables-ledger.md)。
+- 父卡的「成品台账」拆成 [新卡](2026-10-19-deliverables-ledger.md)。
 - `issues/README` 减成薄索引（只列位置与下一步）；研究稿 §五/§六/§五加失效标记。
 - 看板卡 golden 改 **wire**，不再用 `record.rows.agentTeam.val`（state）；台账卡补 `PanelFrame` 默认 5 秒的错标事实；刷新文案共享事实归 [看板卡](2026-10-19-board-dag-ux-deep-dive.md)（共享事实唯一 owner）。
 - 本卡迁入 `_archive/settled_issues/`；活跃清单、归档索引、研究索引同步。
@@ -24,7 +24,7 @@ opened: 2026-10-19
 
 **C 是什么**：`ask_user_question` 拍选择、`exit_plan_mode` 呈计划、`todo_write` 管本轮切片、`goal` 管长程；它是执行协议，不是 A/B 之外的第三个内容方案。后续每张卡按它跑。
 
-**收口去向**：本卡结论与 A 的落点写在这张卡；B 的触发条件写在这里；下游实施归四张公司面卡与 [成品台账](../../issues/2026-10-19-deliverables-ledger.md)，不另建 Note 证明本卡已交接。
+**收口去向**：本卡结论与 A 的落点写在这张卡；B 的触发条件写在这里；下游实施归四张公司面卡与 [成品台账](2026-10-19-deliverables-ledger.md)，不另建 Note 证明本卡已交接。
 
 ## 证据（本轮实跑）
 

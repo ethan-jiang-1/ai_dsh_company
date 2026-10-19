@@ -4,13 +4,7 @@
 
 ## 活跃清单
 
-只列位置与下一步；当前态、事实与验收在卡上，不在这里复述。
-
-| 问题 | 状态 | 当前一步 |
-|---|---|---|
-| [成品台账——要不要列公司产出](2026-10-19-deliverables-ledger.md) | 推敲中，可动 | 等你定：现在推敲 / 以后做 / 不做 |
-
-已结问题见 [归档](../_archive/README.md)（含 issue 卡质量、公司面优先级、看板+依赖图、任务板、台账、agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
+当前无活跃问题。六张卡（issue 卡质量 / 公司面优先级 / 看板+依赖图 / 任务板 / 台账 / 成品台账）均已归档，见 [归档](../_archive/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 
 ## 边界与尺寸
 

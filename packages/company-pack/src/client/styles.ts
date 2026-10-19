@@ -197,6 +197,24 @@ const CSS = `
 .wk-ledger-list .wk-row-status { min-width: 0; overflow-wrap: anywhere; }
 .wk-ledger-list .wk-row-summary { width: 100%; }
 .wk-ledger-list .wk-row-task { overflow-wrap: anywhere; }
+
+/* 成品目录（2026-10-19）：摘要 2 行 + 四列；窄视口单列堆叠。 */
+.wk-catalog-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 6px; }
+.wk-catalog-filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
+.wk-catalog-foot { margin-top: 10px; }
+.wk-catalog-foot code { font-size: 11px; }
+.wk-deliverable-list .wk-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "head action" "summary summary";
+  align-items: start;
+  gap: 2px 8px;
+}
+.wk-deliverable-list .wk-row-name { grid-area: head; flex: none; min-width: 0; flex-wrap: wrap; align-items: baseline; }
+.wk-deliverable-slug { min-width: 0; overflow-wrap: anywhere; }
+.wk-deliverable-meta { flex: 1 0 100%; color: var(--dsw-alias-label-tertiary); font-size: 12px; }
+.wk-deliverable-list .wk-row-summary { grid-area: summary; width: 100%; min-width: 0; }
+.wk-deliverable-open { grid-area: action; justify-self: end; align-self: start; }
 .wk-activity { margin: 4px 0 0; padding-left: 18px; color: var(--dsw-alias-label-secondary); font-size: 12px; }
 .wk-activity li { margin: 2px 0; }
 
@@ -328,7 +346,10 @@ const CSS = `
 /* 内容区横向滚动（UX 走查 2026-09-28）：窄浮窗（最小 220px 钳制）下任务板表格横向溢出、
    overflow:visible 会把内容裁到够不着——滚动而不是裁切。 */
 .wk-pane-body { overflow-x: auto; }
-.wk-pane-head { display: flex; align-items: baseline; gap: 8px; }
+.wk-pane-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: nowrap; }
+.wk-pane-head > strong { flex: none; white-space: nowrap; }
+.wk-pane-head .wk-meta { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wk-pane-head > button { flex: none; white-space: nowrap; }
 .wk-list { display: grid; gap: 4px; }
 
 /* 培养 GUI 行动面（2026-10-17 S2–S5）：创作入口 / 治理按钮 / 判断材料 / 后果说明 */

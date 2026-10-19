@@ -6,7 +6,7 @@
  * 与浮窗头（FloatLayer 的 FloatHeader 同一 renderer）都渲染这里的输出。
  *
  * 设计口诀：**琥珀喊你（要人/烧量），蓝在干活（总览/工作台），紫管机制（结构/账），绿是人心（在场/成长）。**
- * 色 = 方向（四色族 × 主/次两档），icon = 面板身份（八个独特 glyph）；只给 icon 上色
+ * 色 = 方向（四色族 × 主/次两档），icon = 面板身份（九个独特 glyph）；只给 icon 上色
  * （tone 类挂 span、glyph 吃 currentColor），标题文字保持平台默认前景。
  * 颜色一律平台静态色相族令牌（--dsw-static-*，跨浅/深主题稳定的识别色；alias 墨色层在
  * 暗色下退化为墨/白，不可作识别色——RFC §色令牌）。
@@ -97,6 +97,17 @@ export function LedgerGlyph({ size, className }: GlyphProps): ReactNode {
   )
 }
 
+/** 成品：带盖的产出箱（机制方向·账本次档；与台账的账本一眼区分）。 */
+export function CatalogGlyph({ size, className }: GlyphProps): ReactNode {
+  return (
+    <Glyph size={size} className={className}>
+      <path d="M2.9 5.3 8 3l5.1 2.3v5.4L8 13 2.9 10.7Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M2.9 5.3 8 7.6l5.1-2.3M8 7.6V13" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M5.2 4.2 10.3 6.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </Glyph>
+  )
+}
+
 /** 在场：双人（前全后半；人方向·在线主档）。 */
 export function PeopleGlyph({ size, className }: GlyphProps): ReactNode {
   return (
@@ -135,7 +146,7 @@ function TabTitle({ tone, glyph: GlyphComponent, label, tooltip }: {
   )
 }
 
-/* 八个页签的标题组件：注册在 keyed 槽 sidebar.right.pane.tab.title（key = 页签类型 id）。 */
+/* 九个页签的标题组件：注册在 keyed 槽 sidebar.right.pane.tab.title（key = 页签类型 id）。 */
 
 /** 「待办」页签标题（注意·amber-500；2026-09-27 由「需要你」更名，用户语感裁定）。 */
 export function AttentionTabTitle(): ReactNode {
@@ -149,7 +160,7 @@ export function BudgetTabTitle(): ReactNode {
 
 /** 「看板」页签标题（执行·blue-600）。 */
 export function BoardTabTitle(): ReactNode {
-  return <TabTitle tone="overview" glyph={GridGlyph} label="看板" tooltip="任务推进全景：每张卡到哪一步（owner / 依赖 / 修订号），5 秒自动刷新" />
+  return <TabTitle tone="overview" glyph={GridGlyph} label="看板" tooltip="任务推进全景：每张卡到哪一步（owner / 依赖 / 修订号），投影更新" />
 }
 
 /** 「任务板」页签标题（执行·blue-500）。 */
@@ -165,6 +176,11 @@ export function DagTabTitle(): ReactNode {
 /** 「台账」页签标题（机制·deepseek-400）。 */
 export function LedgerTabTitle(): ReactNode {
   return <TabTitle tone="archive" glyph={LedgerGlyph} label="台账" tooltip="公司大事记：每场动议的日期 / 类型 / 参与 / 成品 / 结论" />
+}
+
+/** 「成品」页签标题（机制·账本次档；静态索引）。 */
+export function CatalogTabTitle(): ReactNode {
+  return <TabTitle tone="archive" glyph={CatalogGlyph} label="成品" tooltip="公司成品目录：按 final.md 列成品（日期 / 类型 / 结果 / 一句话结论）；静态索引，生成后重读" />
 }
 
 /** 「在场」页签标题（人·green-500）。 */
@@ -207,9 +223,11 @@ export const TasksGuideIcon = guideIcon('work', KanbanGlyph)
 export const CultivationGuideIcon = guideIcon('growth', SproutGlyph)
 /** 「台账」guide icon（紫次档）。 */
 export const LedgerGuideIcon = guideIcon('archive', LedgerGlyph)
+/** 「成品」guide icon（赭色次档；产出箱）。 */
+export const CatalogGuideIcon = guideIcon('archive', CatalogGlyph)
 
 /* ── guide 条目胶囊（Start 页；用户令 2026-09-27：挂 hover tooltip）──────────────────
-   背景：vendor guide 只在条目 ≤4 时显示描述（MAX_DESCRIBED_ENTRIES=4），我们 8 条
+   背景：vendor guide 只在条目 ≤4 时显示描述（MAX_DESCRIBED_ENTRIES=4），我们 9 条
    全被折叠成纯标题 ⇒ 走 keyed 槽 sidebar.right.tab.guide.entry 接管胶囊，挂 vendor
    Tooltip；点击 = openTab（与 vendor EntryBox 同语义，kind 由槽 owner props 给）。 */
 
@@ -248,7 +266,7 @@ export function AttentionGuideEntry(props: GuideEntryProps): ReactNode {
 
 /** 「看板」guide 条目。 */
 export function BoardGuideEntry(props: GuideEntryProps): ReactNode {
-  return <GuideEntry {...props} tone="overview" glyph={GridGlyph} label="看板" tooltip="任务推进全景：每张卡到哪一步（owner / 依赖 / 修订号），5 秒自动刷新" />
+  return <GuideEntry {...props} tone="overview" glyph={GridGlyph} label="看板" tooltip="任务推进全景：每张卡到哪一步（owner / 依赖 / 修订号），投影更新" />
 }
 
 /** 「依赖图」guide 条目。 */
@@ -279,4 +297,9 @@ export function CultivationGuideEntry(props: GuideEntryProps): ReactNode {
 /** 「台账」guide 条目。 */
 export function LedgerGuideEntry(props: GuideEntryProps): ReactNode {
   return <GuideEntry {...props} tone="archive" glyph={LedgerGlyph} label="台账" tooltip="公司大事记：每场动议的日期 / 类型 / 参与 / 成品 / 结论" />
+}
+
+/** 「成品」guide 条目。 */
+export function CatalogGuideEntry(props: GuideEntryProps): ReactNode {
+  return <GuideEntry {...props} tone="archive" glyph={CatalogGlyph} label="成品" tooltip="公司成品目录：按 final.md 列成品（日期 / 类型 / 结果 / 一句话结论）；静态索引，生成后重读" />
 }

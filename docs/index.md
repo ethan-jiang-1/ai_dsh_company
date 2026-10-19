@@ -88,6 +88,7 @@
 | D41 | 公司名 = 梦之队（Dream Team）；D14 显示名前缀序列化沿用，前缀随名换代 | [dreamteam-naming](../notes/implemented/2026-10-10-dreamteam-naming.md) |
 | D42 | vendor 升 pin＝用户策动制（agent 不盯不评不建议）＋渠道只认 RC/正式版，alpha/beta 通通不管 | [pin-upgrade-policy](../notes/implemented/2026-10-12-pin-upgrade-policy.md) |
 | D43 | 培养回路三面：公司页第四子页＝培养；本人采纳 → 角色方法层（profile 根下按角色隔离）；CEO 仅建议权（D25 部分取代） | [agent-cultivation-loop](../notes/implemented/2026-10-13-agent-cultivation-loop.md) |
+| D44 | 成品目录 = 盘上 meta/final 的**生成索引** + 只读右栏页签；并列台账不替代；`present` 审计仍归 deliverables-check | [deliverables-catalog](../notes/implemented/2026-10-19-deliverables-catalog.md) |
 
 ### 待定与活动提案
 

@@ -54,6 +54,7 @@
 | [2026-10-19-board-dag-ux-deep-dive.md](settled_issues/2026-10-19-board-dag-ux-deep-dive.md) | 已结（新鲜度文案说真话 + DAG 进行中徽章独立样式 + 窄栏/长链实测；用户接受 pane 自身纵向滚动；真 21 节点整页双滚动留未执行） | 2026-10-19 |
 | [2026-10-19-taskboard-table-ux-deep-dive.md](settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md) | 已结（依赖列 owner · subject + id 次要；行 id 并入任务列；已删死映射移除；入口探针 1440/390 PASS） | 2026-10-19 |
 | [2026-10-19-ledger-ux-deep-dive.md](settled_issues/2026-10-19-ledger-ux-deep-dive.md) | 已结（40 行 = parseMotionLedger 真文件；全文入口 16/27；刷新 30s；人读 60s/5 步/复述难/总体还行 → 接受） | 2026-10-19 |
+| [2026-10-19-deliverables-ledger.md](settled_issues/2026-10-19-deliverables-ledger.md) | 已结（成品目录 = 生成索引 kb/deliverables-index.json + 只读第 9 页签；44 份/活跃 5/归档 39/台账外 5；present 审计仍归 deliverables-check） | 2026-10-19 |
 
 ## 已修缺陷
 

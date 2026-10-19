@@ -10,13 +10,15 @@ import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from './company-ta
 import type { CultivationActionsFactory } from './cultivation-actions.ts'
 import type { CultivationFiles } from './cultivation-data.ts'
 import { CultivationTab } from './CultivationTab.tsx'
+import { DeliverablesTab } from './DeliverablesTab.tsx'
 import { LedgerTab } from './LedgerTab.tsx'
+import { sessionFileAddress } from '../lib/deliverables-catalog.ts'
 import {
-  AttentionTabTitle, BoardTabTitle, BudgetTabTitle, CultivationTabTitle,
+  AttentionTabTitle, BoardTabTitle, BudgetTabTitle, CatalogTabTitle, CultivationTabTitle,
   DagTabTitle, LedgerTabTitle, PresenceTabTitle, TasksTabTitle,
-  AttentionGuideEntry, BoardGuideEntry, BudgetGuideEntry, CultivationGuideEntry,
+  AttentionGuideEntry, BoardGuideEntry, BudgetGuideEntry, CatalogGuideEntry, CultivationGuideEntry,
   DagGuideEntry, LedgerGuideEntry, PresenceGuideEntry, TasksGuideEntry,
-  AttentionGuideIcon, BoardGuideIcon, BudgetGuideIcon, CultivationGuideIcon,
+  AttentionGuideIcon, BoardGuideIcon, BudgetGuideIcon, CatalogGuideIcon, CultivationGuideIcon,
   DagGuideIcon, LedgerGuideIcon, PresenceGuideIcon, TasksGuideIcon,
 } from './tab-icons.tsx'
 import type { TeamStreamFrame } from '../lib/presence.ts'
@@ -48,6 +50,8 @@ export interface CompanyTabRegistrationData {
   readonly roleSource: RoleBadgeInjected['roleSource']
   /** Read the current motion ledger for a session. */
   readonly readLedger: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>
+  /** Read the generated deliverables index for a session. */
+  readonly readCatalog: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>
 }
 
 interface TabRegistration {
@@ -164,6 +168,24 @@ const TAB_REGISTRATIONS = [
     }, LedgerTab),
     registerTitle: (scoped, id) => scoped.slots.register({ name: 'sidebar.right.pane.tab.title', key: id }, LedgerTabTitle),
     registerGuide: (scoped, id, openTab) => scoped.slots.register({ name: 'sidebar.right.tab.guide.entry', key: id, inject: () => ({ openTab }) }, LedgerGuideEntry),
+  },
+  {
+    id: 'dsh-company-pack/deliverables', kind: 'company-deliverables', title: '成品',
+    description: '公司成品目录：按 final.md 列成品（日期/类型/结果/结论）', order: 58,
+    icon: CatalogGuideIcon,
+    registerBody: (scoped, id, data) => scoped.slots.register({
+      name: 'sidebar.right.pane.tab', key: id,
+      inject: () => ({
+        floatTab: data.floatTab,
+        unfloatTab: data.unfloatTab,
+        readCatalog: data.readCatalog,
+        openFinal: (sessionId: SessionId, path: string) => {
+          scoped.sidebarRight.openResource(sessionFileAddress(sessionId, path))
+        },
+      }),
+    }, DeliverablesTab),
+    registerTitle: (scoped, id) => scoped.slots.register({ name: 'sidebar.right.pane.tab.title', key: id }, CatalogTabTitle),
+    registerGuide: (scoped, id, openTab) => scoped.slots.register({ name: 'sidebar.right.tab.guide.entry', key: id, inject: () => ({ openTab }) }, CatalogGuideEntry),
   },
 ] satisfies readonly TabRegistration[]
 

@@ -207,6 +207,13 @@ export async function apply(ctx: ClientContext): Promise<void> {
         return result.value.text
       } catch { return null }
     }
+    const readCatalog = async (sessionId: SessionId, signal: AbortSignal): Promise<string | null> => {
+      try {
+        const result = await scoped.remote.workspaceFiles.read(leadOf(sessionId), 'kb/deliverables-index.json', { limit: 2000 }, signal)
+        if (!result.ok) return null
+        return result.value.text
+      } catch { return null }
+    }
 
     registerCompanyTabs(scoped, {
       attention,
@@ -219,6 +226,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
       cultivationActions,
       roleSource: sessions.list,
       readLedger,
+      readCatalog,
     })
   })
 

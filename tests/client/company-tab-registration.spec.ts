@@ -9,14 +9,15 @@ import type { CompanyTabRegistrationData } from '../../packages/company-pack/src
 import { AttentionTab } from '../../packages/company-pack/src/client/AttentionTab.tsx'
 import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from '../../packages/company-pack/src/client/company-tabs.tsx'
 import { CultivationTab } from '../../packages/company-pack/src/client/CultivationTab.tsx'
+import { DeliverablesTab } from '../../packages/company-pack/src/client/DeliverablesTab.tsx'
 import { LedgerTab } from '../../packages/company-pack/src/client/LedgerTab.tsx'
 import {
-  AttentionTabTitle, BoardTabTitle, BudgetTabTitle, CultivationTabTitle,
+  AttentionTabTitle, BoardTabTitle, BudgetTabTitle, CatalogTabTitle, CultivationTabTitle,
   DagTabTitle, LedgerTabTitle, PresenceTabTitle, TasksTabTitle,
-  AttentionGuideEntry, BoardGuideEntry, BudgetGuideEntry, CultivationGuideEntry,
+  AttentionGuideEntry, BoardGuideEntry, BudgetGuideEntry, CatalogGuideEntry, CultivationGuideEntry,
   DagGuideEntry, LedgerGuideEntry, PresenceGuideEntry, TasksGuideEntry,
   AttentionGuideIcon, BoardGuideIcon, DagGuideIcon, PresenceGuideIcon,
-  BudgetGuideIcon, TasksGuideIcon, CultivationGuideIcon, LedgerGuideIcon,
+  BudgetGuideIcon, TasksGuideIcon, CultivationGuideIcon, LedgerGuideIcon, CatalogGuideIcon,
 } from '../../packages/company-pack/src/client/tab-icons.tsx'
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
 import { registerCompanyTabs } from '../../packages/company-pack/src/client/company-tab-registration.ts'
@@ -30,12 +31,13 @@ const EXPECTED_TYPES = [
   { id: 'dsh-company-pack/tasks', kind: 'company-tasks', title: '任务板', order: 55, description: '共享任务表：状态 / owner / 依赖 / 修订号' },
   { id: 'dsh-company-pack/cultivation', kind: 'company-cultivation', title: '培养', order: 56, description: '养自己的角色分身：待处理建议 / 已采纳方法 / journal 待审 / 赞踩' },
   { id: 'dsh-company-pack/ledger', kind: 'company-ledger', title: '台账', order: 57, description: '动议台账：公司累计干了什么（日期/类型/参与/成品/结论）' },
+  { id: 'dsh-company-pack/deliverables', kind: 'company-deliverables', title: '成品', order: 58, description: '公司成品目录：按 final.md 列成品（日期/类型/结果/结论）' },
 ] as const
 
-const BODY_COMPONENTS = [AttentionTab, BoardTab, DagTab, PresenceTab, BudgetTab, TasksTab, CultivationTab, LedgerTab]
-const TITLE_COMPONENTS = [AttentionTabTitle, BoardTabTitle, DagTabTitle, PresenceTabTitle, BudgetTabTitle, TasksTabTitle, CultivationTabTitle, LedgerTabTitle]
-const GUIDE_COMPONENTS = [AttentionGuideEntry, BoardGuideEntry, DagGuideEntry, PresenceGuideEntry, BudgetGuideEntry, TasksGuideEntry, CultivationGuideEntry, LedgerGuideEntry]
-const GUIDE_ICONS = [AttentionGuideIcon, BoardGuideIcon, DagGuideIcon, PresenceGuideIcon, BudgetGuideIcon, TasksGuideIcon, CultivationGuideIcon, LedgerGuideIcon]
+const BODY_COMPONENTS = [AttentionTab, BoardTab, DagTab, PresenceTab, BudgetTab, TasksTab, CultivationTab, LedgerTab, DeliverablesTab]
+const TITLE_COMPONENTS = [AttentionTabTitle, BoardTabTitle, DagTabTitle, PresenceTabTitle, BudgetTabTitle, TasksTabTitle, CultivationTabTitle, LedgerTabTitle, CatalogTabTitle]
+const GUIDE_COMPONENTS = [AttentionGuideEntry, BoardGuideEntry, DagGuideEntry, PresenceGuideEntry, BudgetGuideEntry, TasksGuideEntry, CultivationGuideEntry, LedgerGuideEntry, CatalogGuideEntry]
+const GUIDE_ICONS = [AttentionGuideIcon, BoardGuideIcon, DagGuideIcon, PresenceGuideIcon, BudgetGuideIcon, TasksGuideIcon, CultivationGuideIcon, LedgerGuideIcon, CatalogGuideIcon]
 const BODY_SLOT = 'sidebar.right.pane.tab'
 const TITLE_SLOT = 'sidebar.right.pane.tab.title'
 const GUIDE_SLOT = 'sidebar.right.tab.guide.entry'
@@ -66,6 +68,7 @@ function tabData() {
     cultivationFiles,
     roleSource,
     readLedger: vi.fn(async () => 'ledger text'),
+    readCatalog: vi.fn(async () => 'catalog text'),
   }
   return { data, pending }
 }
@@ -179,6 +182,14 @@ describe('company tab registration', () => {
     const signal = new AbortController().signal
     await expect((ledgerProps.readLedger as CompanyTabRegistrationData['readLedger'])('lead-session' as SessionId, signal)).resolves.toBe('ledger text')
     expect(data.readLedger).toHaveBeenCalledWith('lead-session', signal)
+
+    const catalogProps = bodyProps[8]!
+    expect(catalogProps.floatTab).toBe(data.floatTab)
+    expect(catalogProps.unfloatTab).toBe(data.unfloatTab)
+    expect(catalogProps.readCatalog).toBe(data.readCatalog)
+    expect(typeof catalogProps.openFinal).toBe('function')
+    await expect((catalogProps.readCatalog as CompanyTabRegistrationData['readCatalog'])('lead-session' as SessionId, signal)).resolves.toBe('catalog text')
+    expect(data.readCatalog).toHaveBeenCalledWith('lead-session', signal)
 
     const titleFiber = mountKeyedDeclaration(ctx, TITLE_OWNER, TITLE_SLOT)
     onTestFinished(async () => { await titleFiber.dispose() })

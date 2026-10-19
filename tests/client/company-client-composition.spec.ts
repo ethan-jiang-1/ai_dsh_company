@@ -4,7 +4,7 @@
  * Boots the production `bootClient` over the real web-profile bundle roster
  * (dsh-base + dsh-web-app + dsh-company-pack, composed by bundleRoster the way
  * the profile launcher composes patch layers) with the pack's dependency cone,
- * then asserts the actual `apply` surface: the eight company tab types, the
+ * then asserts the actual `apply` surface: the nine company tab types, the
  * three keyed slot groups, and the instance guard's fiber-owned heartbeat —
  * including their removal on unload and return on reload. Remote endpoints are
  * answered by the tier's RemoteMock (network boundary only; real composition
@@ -33,6 +33,7 @@ const COMPANY_TAB_IDS = [
   'dsh-company-pack/tasks',
   'dsh-company-pack/cultivation',
   'dsh-company-pack/ledger',
+  'dsh-company-pack/deliverables',
 ] as const
 
 const COMPANY_SLOTS = [
@@ -56,7 +57,7 @@ function declareWorkspaceFilesNamespace(mock: { load(rules: unknown): unknown })
 const test = createClientTest({ roster, provide: { 'dsh-company-pack': companyClient } })
 
 describe('company client apply through the whole-client tier', () => {
-  test('boots the pack row and registers the eight company tabs with keyed slots', async ({ mock, start }) => {
+  test('boots the pack row and registers the nine company tabs with keyed slots', async ({ mock, start }) => {
     declareWorkspaceFilesNamespace(mock)
     const client = await start()
 
