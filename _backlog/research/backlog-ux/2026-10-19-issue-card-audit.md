@@ -5,7 +5,7 @@ intent: "为 issue 卡质量审与 DSH-native 收口提供逐条证据：四张�
 
 # issue 卡质量审：当前态为什么看不清，以及怎样接回 DSH 结构（2026-10-19）
 
-服务活卡：[issue 卡本身的质量——当前态被历史埋住](../../issues/2026-10-19-issue-card-quality.md)。
+服务：[已结质量卡](../../_archive/settled_issues/2026-10-19-issue-card-quality.md) 与四张公司面卡（A 收口依据）；本文的 A/B/C 取舍中 A 已执行，B 以后做，C = 执行协议。
 
 **口径**：只读审计。读了四张活跃卡、[issues/README](../../issues/README.md)、两份公司面调研、[research/README](../README.md)、[_backlog 章程](../../README.md)、三张缺陷卡结论（[BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) / [BUG-026](../../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) / [BUG-027](../../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)）与相关源码；实跑 `node checks/run-gates.mjs`（**ALL PASS**）、`wc -l`、若干只读 `node` 脚本与 `grep`。**没开浏览器**；凡浏览器结论都标“未执行”。
 

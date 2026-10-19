@@ -1,101 +1,72 @@
 ---
 status: 推敲中
+blockedBy: [2026-10-19-company-panels-ux-priority]
 opened: 2026-10-19
 ---
 
-# 推敲：看板 + 依赖图的 UX 深挖（正确性优先：板面必须等于投影真值）
+# 推敲：看板 + 依赖图的 UX 深挖（呈现层 + 可读性，按 wire 真值）
 
 > 立卡：2026-10-19 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：未定 ｜ 可关闭：否
->
-> ⚠ 2026-10-19 质量审：本卡有已知陈旧段（BUG-026/027 残留、golden 层待校）；收口方案见 [issue 卡质量审](2026-10-19-issue-card-quality.md)。
 
-## 这是什么（自说明）
+## 当前结论（只写 now）
 
-「看板」与「依赖图」是公司整页视图的两个子页，实现都在 `packages/company-pack/src/client/company-panels.tsx`
-（`BoardPanel` / `DagPanel`，与在场、用量合在同一文件，共 374 行）。数据面 = 会话的**团队投影** `agentTeam`
-（`rows.agentTeam.val`：成员 + 共享任务列表，含 owner / 状态 / 依赖 / 修订号）。
-**谁在用**：CEO/维护者把它当"公司现在在干什么"的**指挥视图**——看错 owner、状态或依赖，就会**指挥错**。
-**渲染**：看板 = 按状态分列的任务卡；依赖图 = 任务节点 + 依赖边（`fitScale` 缩放适配宽度）。
+本卡**不再是「修正确性缺陷」**：BUG-026 是误报、BUG-027 已按真根因修复。当前要处理的是呈现/可读性：
 
-## 已确立的事实（读码 + 真投影级，本轮实测；上一版没有这些）
+1. 依赖图 `statusBadge` 对 in_progress 也吐「可开工」样式（[`company-panels.tsx:67`](../../packages/company-pack/src/client/company-panels.tsx#L67)）。
+2. 「每 5 秒刷新」文案不实（共享事实，归 Wave 1「新鲜度文案」小卡（待立）；本卡只验显示结果）。
+3. 21 节点长链的窄栏双滚动未实测（读码推断会）。
+4. drift 徽章需要真图复验（已有 [`board-drift-probe`](../../probes/browser-visual/board-drift-probe.mjs)）。
+5. golden 若用 `record.rows.agentTeam.val`（state）会假绿；必须用 wire。
 
-**上一版把"正确性断言"当成本卡的核心，但没验过"真值本身"是什么样。本轮验了，结果改变了本卡的底：**
+**未决问题**：
 
-> **2026-10-19 晚订正（本卡第三版）**：下表前三行曾据 projcache 的 **state** 行得出"owner 全缺、ready 放宽"，
-> 那读错了层——浏览器收的是 **wire 视图**（ownerName 273/273 齐全、ready 语义正确）。
-> 前两行**已作废**（[BUG-026](../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) 是误报），
-> 第三行**已修**（[BUG-027](../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md) 真根因 = 徽章门槛）。
-> ⇒ **本卡的核心不再是"修正确性缺陷"**（那些不成立），而是**呈现层 + 可读性**（刷新文案、依赖图措辞、窄栏）。
+- 窄栏下是否接受纵向双滚动？（视觉判断，要图）
+- 长链 2366px 高是否要拆/缩？（产品选择；本轮只记录，不扩功能）
 
-| 事实 | 实测 | 取法/出处 |
+**下一步：** 父卡选中本卡后，按下面验证计划进 `exit_plan_mode`；未选中前只维护卡面，不实施。
+
+## 当前事实（带样本/层；不同层的数不要相加）
+
+| 事实 | 样本/层 | 出处 |
 |---|---|---|
-| 非空板数 / 任务总数 | **84 / 379**；最大板 **21**；非空板中位 **4**（"中位 0"是含 1638 个空板算的） | [调研 §三](../research/company-panels-ux/2026-10-19-panel-truth-audit.md) |
-| ~~**投影里 `ownerName` 覆盖率**~~ | ~~**0 / 379**~~ ⇒ **❌ 作废：wire 视图 273/273 齐全，读模型解析出 344/379**（其余 35 张投影里真无 owner） | ~~同上~~ → 误报，见 [BUG-026 结论](../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) |
-| ~~板面 owner 现状~~ | ~~**379/379 全部「未分配」**~~ ⇒ **❌ 作废：未分配的只有真没 owner 的 35 张** | 同上 |
-| ~~**「依赖已就绪」徽章**~~ | ~~131 张带在已完成卡上~~ ⇒ **订正：那 131 张显示的是「等 …」噪声**（不是「依赖已就绪」）；真缺陷 = 徽章门槛不看 status，**已修**（现在 0 枚噪声） | [BUG-027](../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md) |
-| 声明 vs 板面分叉（drift） | **2/84 板、4 个任务**（稀有但真实） | 调研 §3.3 |
-| 「每 5 秒刷新」文案 | **假**：看板/依赖图/在场走 `useSessions` 投影推送，**无轮询** | 读码 `CompanyView.tsx:102` + `use-company-data.ts:103` |
-| 依赖图竖向尺寸 | 串行链 21 节点 = **高 2366px**（`fitScale` 只缩宽度、不缩高度） | 实跑 `layoutDag`（调研 §四） |
-| 依赖图状态词 | `statusBadge` 对 pending 说「可开工」、对 in_progress 说「进行中」，共享同一 `wk-dag-ready` 样式 | 读码 `company-panels.tsx:64-69` |
+| 非空板 84 / 任务 379；最大板 21；非空板中位 4 | projcache **state** 全量（1738 会话），**不是** wire | [真相复核 §三](../research/company-panels-ux/2026-10-19-panel-truth-audit.md) |
+| drift 2/84 板、4 个任务 | 同上；drift 只读 subject/description/blockedBy/status，state 与 wire 同值 | 调研 §3.3 |
+| 「每 5 秒刷新」不实 | 代码：看板/依赖图/在场走 `useSessions` 投影推送，无轮询 | [`CompanyView.tsx:102`](../../packages/company-pack/src/client/CompanyView.tsx#L102) |
+| 21 节点串行链 = 高 2366px；`fitScale` 只缩宽、不缩高 | 实跑 `layoutDag` | 调研 §四 |
+| `statusBadge` 的 in_progress 与 pending 共用 `wk-dag-ready` | 代码 | [`company-panels.tsx:64-69`](../../packages/company-pack/src/client/company-panels.tsx#L64-L69) |
+| wire 上 ownerName 齐全、`ready` 官方语义成立；35 张是真没 owner | `ver === 4` wire；样本分层见 Note | [BUG-026 结论](../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md)、[BUG-027](../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)、[projection-state-vs-wire Note](../../notes/implemented/2026-10-19-projection-state-vs-wire.md) |
 
-⇒ **两个致命结论**：
+## 范围与排除项
 
-1. **本卡原验收「板面 owner = 投影真值」会假绿**——真值和板面都是"未分配"，断言"相等"通过，
-   但两边错得一样。**必须换底**（见下）。
-2. **正确性缺陷已经不必等浏览器就确认了两条**（BUG-026 / BUG-027），而且都是**数据与读模型**层，
-   浏览器截图证明不了什么也修不了。
+- **范围内**：DAG 徽章样式；刷新文案的显示结果（共享修复归 Wave 1）；窄栏/长链可读性实测；drift 真图复验；wire golden/夹具。
+- **范围外**：正确性缺陷修复（已做完）；不改任务投影本身（vendor）；不做拖拽改状态/任务编辑；不碰任务板表格（另卡）；不做成品台账（[新卡](2026-10-19-deliverables-ledger.md)）。
 
-## 本轮范围（重排后）
+## 验证计划（按现有证据 owner，不新写手工五态）
 
-1. **先修数据**（读模型层，keyless 可验）：BUG-026（owner 从 `ownerId` 解，或升 pin）、
-   BUG-027（`ready` 与官方 `taskProjectView` 同义）。**这一步不需要浏览器**，是本卡现在最实的产出。
-2. **正确性断言换底**：用 `session_projcache` 里挑出的 1 大 + 2 中板做 **golden 快照**（落 `snapshots/`），
-   断言 `tasksFromTeamView(golden)` 逐字段 == 期望；浏览器只验"DOM 渲染 == 纯函数输出"。
-3. 三态：空板（1638 个空板是多数）/ 加载态 / 21 条大板 —— 各一张截图 + 读图记录。
-4. 窄栏（右栏拖到最小可用宽度）下看板列与依赖边；**特别验**：2366px 高的依赖图在窄栏里是否出现
-   双滚动（读码推断"会"，未实测）。
-5. 刷新语义与图例文案：**文案已经确认是假的**，修 `CompanyView.tsx:102`（或改成按面板真值），带判据。
-6. 分叉（drift）4 个真样本：截图确认看板的 ⚠ 徽章是否真的把它们标出来了（这是 2026-10-13 事故的
-   防回归线，值得看一眼真图）。
+0. 前置：读 [projection-state-vs-wire Note](../../notes/implemented/2026-10-19-projection-state-vs-wire.md)；`pnpm test tests/company/board.spec.ts tests/client/board-panel.spec.ts`；不读 state 当 golden。
+1. **DAG 徽章**：扩 [`dag-visual-probe`](../../probes/browser-visual/dag-visual-probe.mjs)，断言 in_progress 的 class/style 与 pending ready 不同，文本四态仍齐。
+2. **窄栏/长链**：`dag-visual-probe` 加窄视口断言；[`dag-midflight-probe --session`](../../probes/browser-visual/dag-midflight-probe.mjs) 复看 21 节点；记录双滚动结论。
+3. **drift**：复跑 [`board-drift-probe`](../../probes/browser-visual/board-drift-probe.mjs)；图落 `snapshots/visual/board-drift`。
+4. **空/加载/大板**：`client-load-smoke` + `dag-visual` 合成夹具；不新写无主截图。
+5. **收口**：`pnpm verify` + `pnpm test` + `client-load-smoke`（`set -o pipefail`）；结论回填本卡与调研。
 
-## 范围外
+## 验收标准（草案；父卡选中后转正）
 
-- 不改任务投影本身（`agentTeam` 的产生面）与其 schema——**那是 vendor 的**，改它 = 升 pin，走 BUG-026。
-- 不做拖拽改状态、不做任务编辑（新功能）。
-- 不碰任务板表格（另卡：`2026-10-19-taskboard-table-ux-deep-dive.md`）。
-- 不做"好看"的视觉打磨；不一致才算缺陷。
+- [ ] **DAG 徽章**：in_progress 的样式与 pending 的「可开工」不同；pending「可开工」、completed「已完成」、waiting「等 N 项」文案不变；keyless 或视觉探针断言。
+- [ ] **golden 层**：用 wire（`TeamTaskView`）或现有 `board.spec.ts` 真 wire 夹具；不用 `record.rows.agentTeam.val`；断言 ownerName 映射；真无 owner 的卡显示「未分配」（当前样本 35 张）。
+- [ ] **窄栏/长链**：双滚动结论有实测（接受/不接受都要写明）；长链可读性有图或有度量。
+- [ ] **drift**：`board-drift-probe` 通过；图落 `snapshots/visual/board-drift`。
+- [ ] **刷新文案**：看板/依赖图显示与真实推送一致（共享修复归 Wave 1；本卡验显示结果）。
+- [ ] 门禁 + `pnpm test` + `client-load-smoke` 绿；记录/索引同步。
 
-## 验证计划（步骤级）
+## 修订史（只追加）
 
-0. 前置（分两段，第一段不需要浏览器）：
-   - **A 段（keyless）**：从 `session_projcache` 抽 3 个板的 `agentTeam` 原样落 `snapshots/`；
-     断言 `tasksFromTeamView` 输出；跑 BUG-026/027 的判据。
-   - **B 段（浏览器）**：`source run/env.sh` → 起 web → 公司页 → 看板/依赖图子页。
-1. A 段：逐字段断言（id/subject/status/ownerLabel/revision/blockedBy/ready），**owner 断言用 golden
-   的 `ownerId` 反推**，不许用"投影里也没有"当通过条件。
-2. B 段：按 aria/结构取出板面任务数与每张卡的 owner/状态 ⇒ 与 A 段纯函数输出比对（**不是**与投影比）。
-3. 依赖边：golden 里挑 3 条真实边，断言图上 `path[data-done]` 存在且方向对。
-4. 三态截图（空板 / 加载 / 21 条）+ 窄栏一张 + drift 板一张；逐张读图。
-5. 收口：门禁 + 真入口复跑 + 结论回填。
-
-## 验收标准（毕业门票，已换底）
-
-- [ ] **owner 在真投影下不再是「未分配」**：golden 里带 `ownerId` 的 344 个任务，板面 owner 显示
-      成员名（或明示"无法解析 N 项"），**断言通过**（BUG-026 的已修判定即本条）。
-- [ ] **`ready` 与官方同义**：`status !== 'pending'` 时 `ready === false`；看板「依赖已就绪」徽章
-      只出现在 pending 卡（BUG-027 的已修判定即本条）。
-- [ ] **可复跑的 golden 断言**：3 个真板快照 + `tasksFromTeamView` 逐字段断言，keyless 跑绿；浏览器
-      只验"DOM == 纯函数输出"。
-- [ ] 空板 / 加载 / 21 条 / 窄栏 / drift 板 五态有截图 + 读图记录；窄栏双滚动结论有实测。
-- [ ] 「每 5 秒刷新」文案与真实刷新方式一致（改文案或改行为，带判据）。
-- [ ] 明确缺陷：同 diff 修 + 判据，或立 BUG 卡；门禁与真入口复跑绿；记录/索引同步 + push。
+- rev 1 2026-10-19：立卡；核心假设 =「板面必须等于投影真值」，并据此要求先修数据 BUG-026/027。
+- rev 2 2026-10-19 晚：该前提被证伪——BUG-026 是误报（wire ownerName 齐全），BUG-027 根因不成立、真缺陷是徽章门槛（已修）。「两个致命结论」撤回；核心转为呈现层。
+- rev 3 2026-10-19 A 收口：当前路径重写为 now；验收标草案；golden 改 wire；验证计划改现有探针。**已撤回、不要再证**：owner 全缺（state 当 wire）、131 张假就绪（真因已修）、「板面 = 投影真值」断言（state 当 golden 会假绿）、「先修数据 BUG-026/027」（已结/已修）。
 
 ## Review 指南（给 review 的人/Agent）
 
-- **要证伪的假设**：① ~~"板面与投影一致"已被证伪（owner 全缺、ready 放宽）~~ **❌ 该"证伪"本身被证伪**：
-  wire 视图上 owner 齐全、ready 语义正确（读的是 projcache state 行，见顶部订正）；② "21 条在窄栏糊"
-  （要图，但已算出 2366px 高）；③ ~~"白带徽章是指挥错误"~~ ⇒ 订正为**呈现噪声**（131 枚「等 …」在已完成的卡上），已修。
-- **口径**：本卡只认**读模型 + golden 快照**做基准；截图审美争议不算缺陷，**不一致才算**。
-- **复核命令**：见[调研 §三](../research/company-panels-ux/2026-10-19-panel-truth-audit.md)。
-  ⚠ **取法警告**：`record.rows.agentTeam.val` 是投影的 **state**，**不是**浏览器收到的 wire 视图；
-  量 owner/ready 必须先过 `wire.view`（复刻 `projectTaskView` + `buildTeamProjection`），否则会重犯本轮误报。
+- **要证伪的假设**：①「板面已经对了，没什么可做」——剩下的是呈现层；②「21 条在窄栏糊」——要图/度量，读码只推断；③「golden 用 state 也行」——不行，会重犯 BUG-026。
+- **口径**：本卡只认 **wire**（`TeamTaskView`）+ 现有探针输出；截图只用于视觉判断，审美争议不算缺陷，**不一致才算**。
+- **别再证**：owner 全缺、ready 放宽、两视图一致性——前两条已证伪/已修，第三条同一函数恒真。

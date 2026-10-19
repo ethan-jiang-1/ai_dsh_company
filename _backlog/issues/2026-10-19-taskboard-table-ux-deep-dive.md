@@ -1,79 +1,78 @@
 ---
 status: 推敲中
+blockedBy: [2026-10-19-company-panels-ux-priority]
 opened: 2026-10-19
 ---
 
-# 推敲：任务板的 UX 深挖（与看板口径一致性 + 入口可发现性）
+# 推敲：任务板的 UX 深挖（表格可读性 + 入口可发现性）
 
 > 立卡：2026-10-19 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：未定 ｜ 可关闭：否
->
-> ⚠ 2026-10-19 质量审：「修 owner 后重测」已作废（BUG-026 是误报、无需修复）；`（阻塞）` 已修；见 [issue 卡质量审](2026-10-19-issue-card-quality.md)。
 
-## 这是什么（自说明）
+## 当前结论（只写 now）
 
-「任务板」有两副面孔，都在 `packages/company-pack/src/client/TasksPanel.tsx`（99 行）：
-① **会话头部的入口按钮**（点开 = 打开右栏的平台任务板页签）；
-② **页签体表格视图** `TasksTableView`（纯展示）：成员行 + 共享任务表（owner / 依赖 / **修订号** / 状态标签 待办·进行中·完成·已删）。
-数据面与看板**同源**（`agentTeam` 团队投影）。
-**谁在用**：角色/维护者在会话里想"我该干什么、谁在等谁"时点开它。
+「任务板」有两副面孔，都在 [`TasksPanel.tsx`](../../packages/company-pack/src/client/TasksPanel.tsx)：① 会话头部入口按钮；② 右栏页签体表格 `TasksTableView`。数据面与看板同源（`agentTeam` 投影）。
 
-## 已确立的事实（读码 + 真投影级，本轮实测）
+**owner 不是缺陷**：wire 视图 `ownerName` 齐全（BUG-026 是误报）；`（阻塞）` 已按 BUG-027 同族修复（只在待办行显示）。当前要处理的是：
 
-| 事实 | 实测/代码 | 影响 |
+1. **依赖列显示裸 `task-N`**，人问「T3 在等谁」要二次查询——真问题。
+2. **入口可发现性/键盘可达/落点**未实测（Tab 焦点、Enter 是否打开右栏任务板页签）。
+3. **`已删` 是死字面量**：`STATUS_LABEL` 有 `deleted: '已删'`，但 `tasksFromTeamView` 在到表格前已过滤 deleted。
+4. **刷新文案**默认「每 5 秒自动刷新」不实（共享事实，归 Wave 1「新鲜度文案」小卡（待立））。
+
+**未决问题（产品选择）**：
+
+- 依赖列显示什么？建议 `owner · id`（title 给 subject），或 `owner · subject`。要能一次答出「谁在等谁」，不是只把 id 换成标题。
+- `已删`：删掉映射，还是取消过滤让墓碑真显示？建议删映射（本轮不做墓碑视图）。
+
+**下一步：** 父卡选中本卡后按下面验证计划进 `exit_plan_mode`；未选中前只维护卡面。
+
+## 官方 layer 0 与 compact skin（边界声明）
+
+官方 [`client-ui-agent-team`](../../vendor/dsh/packages/experimental/client-ui-agent-team/README.md) 的任务板已覆盖 roster、owner、blockers、readiness、writeScopes、overlap warnings、description、failure；本表是**紧凑 skin**，只画 id / 任务 / 状态 / owner / 依赖。**不重复**官方已覆盖的 writeScopes/overlap/description，也不自建任务存储；若只为「可浮出的右栏」而保留本表，按 [release.md](../../docs/release.md) §vendor 政策先记录「官方面板不能 dock」的证伪，再决定留 skin 或提上游 seam。
+
+## 当前事实（带层；不把 state 当 wire）
+
+| 事实 | 样本/层 | 出处 |
 |---|---|---|
-| 与看板同源 | 都走 `tasksFromTeamView`（任务板经 `use-company-data.ts` → `data.team` → `TasksTableView`） | **两处一起错、不会互相对不上**——这恰恰说明"两视图互相校验"是**假安全** |
-| owner 列 | ~~**379/379 全「未分配」**~~ ⇒ **❌ 作废**：wire 视图 ownerName 齐全，读模型解析出 **344/379**（[BUG-026](../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) 是误报） | 表格 owner 列**有**信息；剩余 35 张是真没 owner |
-| 「依赖」列 | **显示裸任务 id**（`task-1`、`task-3`），不是 owner 名或标题 | 人读起来是"等 task-1"，得再去别处查 task-1 是谁的什么 |
-| 「已删」状态 | `STATUS_LABEL` 有 `deleted: '已删'`，但 `tasksFromTeamView` **在到达表格前就把 deleted 过滤掉了**（`board.ts:178-179`） | **映射永远不命中**——是一个死字面量，卡说得对但原因和"呈现不好"不同 |
-| 修订号 | `{task.id}@{task.revision ?? 0}` | 真投影 379/379 都有 revision ⇒ 实际上不会显示 0 |
-| 与看板的口径差 | 看板用 `ready` 算徽章文案，任务板用 `task.status` + `(task.ready === false ? '（阻塞）' : '')` | **两边对 `ready` 的用法不同** ⇒ BUG-027 修好后需同步复核这一列 |
-| 入口按钮 | `TasksAction` 用 `useSessions` 读**同一次**投影算 `live` 计数，`title` 已写明"右栏页签，可拖出成浮窗" | 按钮文案「任务板 (N)」随真值变化；可发现性/键盘可达**仍需浏览器实测** |
-| 刷新文案 | 任务板页签用 `PanelFrame` 默认 `refreshLabel = '每 5 秒自动刷新'` | 同看板：数据是投影推送，**文案不实**（`PanelFrame` 注释自己要求"必须说真话"） |
+| 与看板同源 | 代码：都走 `tasksFromTeamView` | [`use-company-data.ts`](../../packages/company-pack/src/client/use-company-data.ts)、[`board.ts`](../../packages/company-pack/src/lib/board.ts#L183) |
+| owner 列有信息 | wire：`ownerName` 齐全；真无 owner 的卡显示「未分配」（当前样本 35 张） | [BUG-026 结论](../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) |
+| 依赖列裸 id | 代码 + 渲染 | [`TasksPanel.tsx:60`](../../packages/company-pack/src/client/TasksPanel.tsx#L60) |
+| `已删` 死字面量 | 代码：过滤发生在到表格之前 | [`board.ts:183`](../../packages/company-pack/src/lib/board.ts#L183) + [`TasksPanel.tsx:12`](../../packages/company-pack/src/client/TasksPanel.tsx#L12) |
+| 「（阻塞）」已修 | 代码 + spec | [`TasksPanel.tsx:56-57`](../../packages/company-pack/src/client/TasksPanel.tsx#L56-L57) + [`tasks-table.spec.ts`](../../tests/client/tasks-table.spec.ts) |
+| 入口按钮文案随真值变化 | 代码：`useSessions` 读 Lead 投影 | [`TasksPanel.tsx:90-100`](../../packages/company-pack/src/client/TasksPanel.tsx#L90-L100) |
+| 刷新文案不实 | 代码：`PanelFrame` 默认 5 秒；实际投影推送 | [`company-tabs.tsx:62`](../../packages/company-pack/src/client/company-tabs.tsx#L62) |
 
-⇒ **上一版的核心假设「同源两视图必然一致」的答案是：它们当然一致——因为它们是同一个函数画的。**
-这意味着"三方一致性（任务板 vs 看板 vs 投影）"这条验收标准**恒真**，测不出任何东西。
-真正的失败面在别处，见下。
+## 范围与排除项
 
-## 本轮范围（重排后）
+- **范围内**：依赖列可读性；入口可发现性/键盘/落点；`已删` 死字面量；刷新显示结果（共享修复归 Wave 1）；官方 parity 边界。
+- **范围外**：不改任务投影（vendor）；不做任务编辑/拖拽/筛选；不写「任务板 vs 看板一致性」断言（同一函数，恒真无鉴别力）；不重复看板卡的渲染问题；不做成品台账（[新卡](2026-10-19-deliverables-ledger.md)）。
 
-1. **表格可读性**（真问题）：21 条表格下依赖列全是裸 id（owner 列**不是**问题，见上表订正）⇒ **这张表现在能不能回答
-   "谁在等谁"**？这是本卡最有价值的实测，且**修 owner 后要重测**（BUG-026 不修，测出来的结论是"废表"）。
-2. **入口可发现性**（浏览器）：按钮在会话头部首屏可见吗、Tab 能否到达、Enter 是否打开**右栏任务板页签**
-   （不是别处）、浮出/收回是否可用。
-3. **刷新文案**（读码已确认不实）：与看板卡同类，**同一处修改不要两卡各改一遍**——约定：由看板卡统一改
-   `PanelFrame`/`CompanyView` 的文案面，本卡只验任务板页签那处的显示结果。
-4. 21 条表格下的列宽/换行/横向滚动（`styles.ts:306-307` 对四列 `nowrap` + `subject` 最小 16rem ⇒
-   **窄栏必横向滚动**，读码级已知）。
-5. 「已删」死字面量：要么让它真能显示（取消过滤）+ 判据，要么删掉映射——**二选一，别留着骗读者**。
+## 验证计划（按现有证据 owner）
 
-## 范围外
+0. 前置：`pnpm test tests/client/tasks-table.spec.ts`；读 [`probe-window.mjs`](../../tools/lib/probe-window.mjs) 的共享开场步骤。
+1. **依赖列**：改 `TasksTableView` 后，用 `tasks-table.spec.ts` 断言「T3 在等谁」能从单元格一次读出（不是裸 id）；产品格式先拍。
+2. **入口**：新开一个 `probes/browser-visual/` 探针（待建，命名按该目录惯例；复用 `probe-window.mjs`）：按钮可见、Tab 可达、焦点可见、Enter 打开右栏任务板页签、`aria-expanded`/标题正确。
+3. **`已删`**：删映射或真显示，二选一；同 diff 测试。
+4. **刷新**：验任务板页签显示与真实推送一致（共享修复归 Wave 1）。
+5. **收口**：`pnpm verify` + `pnpm test` + `client-load-smoke`（`set -o pipefail`）；结论回填。
 
-- 不做任务编辑/拖拽/筛选（新功能）；不改投影（vendor）；不重复看板卡的渲染问题。
-- **不写"任务板 vs 看板一致性"的断言**（见上：恒真，无鉴别力）。
+## 验收标准（草案；父卡选中后转正）
 
-## 验证计划（步骤级）
+- [ ] **依赖列可读性**：「T3 在等谁 / 谁在等 T3」能直接在表里答出（依赖列显示 owner 名 + id 或 owner + 标题，不是裸 `task-N`）；有 keyless 断言与实测记录。
+- [ ] **入口三件**：可发现性 + Tab 焦点可见 + Enter 落点 = 右栏任务板页签；浏览器探针断言。
+- [ ] **`已删`**：死字面量已处理（删映射或真显示），带判据。
+- [ ] **刷新文案**：任务板页签显示与真实推送一致（共享修复归 Wave 1）。
+- [ ] **官方 parity**：卡面写明官方 layer 0 与 compact skin 边界；不自建任务存储。
+- [ ] 门禁 + `pnpm test` + `client-load-smoke` 绿；记录/索引同步。
 
-0. 前置：`source run/env.sh` → 起 web → 进一条**有任务**的会话（用 BUG-026 里那个 21 条板的会话）。
-1. 取真值快照（golden，与看板卡共用同一份）→ 打开任务板页签 → 读表格行。
-2. **可读性实测**（人的任务）：只给表格，回答"T3 在等谁、谁在等 T3"——记步数与能否答对。
-3. 与看板同一个任务卡比对**文案差异**（不是"数据是否一致"——那是恒真的；而是"两边说给同一件事的话
-   是否互相矛盾"，尤其 `ready`/「阻塞」的措辞）。
-4. 入口按钮：Tab 到它 → 焦点可见？Enter → 落点是否右栏任务板页签？
-5. 截图 + 读图；收口门禁与复跑。
+## 修订史（只追加）
 
-## 验收标准（毕业门票，已换底）
-
-- [ ] **可读性判据**：「T3 在等谁 / 谁在等 T3」在表格里**能直接答出**（依赖列显示 owner 名或标题，
-      不是裸 `task-N`；owner 列本就是成员名——BUG-026 是误报、无需修复）——有实测记录与截图。
-- [ ] 入口按钮：可发现性 + 键盘可达（Tab 焦点可见）+ 落点正确三件都有断言。
-- [ ] 任务板页签的刷新文案与真实刷新方式一致（搭看板卡的统一修改）。
-- [ ] 「已删」死字面量已处理（修好可显示 or 删除），带判据。
-- [ ] 三态截图 + 读图记录；明确缺陷同 diff 修 + 判据或立 BUG 卡；门禁与复跑绿；记录同步 + push。
+- rev 1 2026-10-19：立卡；核心假设 =「同源两视图不一致即 bug」，并计划「修 owner 后重测」。
+- rev 2 2026-10-19 晚：两视图同一函数，恒一致——该验收无鉴别力；BUG-026 是误报（owner 不是缺陷）；BUG-027 同族已修 `（阻塞）`。旧版「owner 列空」「修 owner 后重测」撤回。
+- rev 3 2026-10-19 A 收口：当前路径重写为 now；依赖列/入口/死字面量/刷新分开；官方 parity 边界补上；验收标草案。
 
 ## Review 指南（给 review 的人/Agent）
 
-- **要证伪的假设**：① "入口按钮显然看得见"（没跑的人不知道）；② "依赖列显示 id 也够用"——
-  真用户任务是"谁在等谁"，id 需要二次查询。
-- **已被证伪、不要再证的**：① "同源两视图可能不一致"——同一个函数画的，恒一致；
-  ② "修订号可能显示 0"——真投影 379/379 都有 revision。
-- **口径**：以 golden 快照为基准；**"两处一致"不是判据**，可读性与落点才是。
+- **要证伪的假设**：①「入口按钮显然看得见」——没跑的人不知道；②「依赖列显示 id 也够用」——真用户任务是「谁在等谁」，id 要二次查询；③「任务板可以直接替掉看板」——两副面孔，数据同源但任务不同。
+- **已被证伪、不要再证**：① 同源两视图可能不一致；② 修订号可能显示 0；③ owner 列空是缺陷。
+- **口径**：以 wire 为准；「两处一致」不是判据，可读性与落点才是。
