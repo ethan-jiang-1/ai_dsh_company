@@ -36,7 +36,7 @@
 - pack 双面构建：`node ./node_modules/typescript/bin/tsc -b packages/company-pack && (cd packages/company-pack && ../../node_modules/.bin/tsdown)` ⇒ 成功；之后复跑 `client-load-smoke` **ALL PASS**（不重建 = web 读旧 `lib/`，label/徽章改动不生效）。
 - `source run/env.sh && node checks/smoke/client-load-smoke.mjs` ⇒ **ALL PASS**（零挂载失败 + 品牌在场）。
 - `source run/env.sh && node probes/browser-visual/dag-visual-probe.mjs` ⇒ **ALL PASS**；浅/深主题徽章类与 fill 不同；21 节点窄栏 `{"chainHeight":2366,"pane":{"clientWidth":390,"scrollWidth":390,"clientHeight":520,"scrollHeight":2366,"overflowX":false,"overflowY":true},"image":{"width":208,"height":2366}}`。
-- `source run/env.sh && node probes/browser-visual/dag-midflight-probe.mjs --session session-41515cf5-c4c3-4aa2-8814-b85d80560d1c --narrow` ⇒ 真 7 节点：`{"image":{"width":468,"height":236},"pane":{"clientWidth":365,"scrollWidth":468,"clientHeight":236,"scrollHeight":236,"overflowX":true,"overflowY":false}}`。
+- `source run/env.sh && node probes/browser-visual/dag-midflight-probe.mjs --session session-41515cf5-c4c3-4aa2-8814-b85d80560d1c --narrow` ⇒ 真 7 节点：页签头读到「投影更新」（构建产物，不是 SSR）；`{"image":{"width":468,"height":236},"pane":{"clientWidth":365,"scrollWidth":468,"clientHeight":236,"scrollHeight":236,"overflowX":true,"overflowY":false}}`。
 - `source run/env.sh && node probes/browser-visual/board-drift-probe.mjs` ⇒ **ALL PASS**，图落 `snapshots/visual/board-drift/board.png`。
 - **未执行**：真 21 节点会话（`session-133c5cde-c411-442b-99e4-fb17029e259b`）的浏览器打开——`dag-midflight-probe --session` 在标题搜索处超时（Session search 找不到该标题）。恢复线索 = 换可搜索标题的 21 节点会话，或给 probe 加按 sessionId 打开的路径。
 

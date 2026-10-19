@@ -140,6 +140,9 @@ const openDag = async () => {
 
 const shoot = async name => {
   await openDag()
+  // 真 app 的构建产物读的是 lib/client.js：顺带把页签头的新鲜度文案读出来（label 改动必须真到页面上，不只 keyless）。
+  const freshness = await page.locator('.wk-pane-head .wk-meta').allInnerTexts()
+  console.log(`  页签新鲜度文案: ${freshness.join(' / ') || '（未读到）'}`)
   // 顺带 dump 节点文本（小图里 CEO/CFO 这种一字之差靠肉眼不可靠——文本才作数）
   const labels = await page.evaluate(() => [...document.querySelectorAll('.wk-node')].map(node => ({
     owner: node.querySelector('.wk-dag-owner')?.textContent ?? null,

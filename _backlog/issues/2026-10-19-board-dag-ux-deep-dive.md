@@ -36,7 +36,8 @@ opened: 2026-10-19
 |---|---|---|
 | keyless：新鲜度 + 徽章 + 长链 | 674 tests / 68 files 全绿 | `pnpm test` |
 | 结构门禁 | ALL PASS | `pnpm verify` |
-| 真挂载 | 零挂载失败 + 品牌在场 | `client-load-smoke` |
+| 真挂载 | 零挂载失败 + 品牌在场 | `client-load-smoke`（重建 `lib/` 后复跑） |
+| 真 app 文案 | 依赖图页签头读到「投影更新」（构建产物，不是 SSR） | `dag-midflight-probe` 日志 |
 | DAG 视觉 | 浅/深两主题：进行中徽章 `wk-dag-progress` fill `rgb(65,118,230)`，可开工 `wk-dag-ready` fill `rgb(34,197,94)`；21 节点窄栏 `overflowY=true` | `dag-visual-probe`（ALL PASS） |
 | 真 app 窄栏（7 节点） | `scrollWidth=468 / clientWidth=365`、`overflowX=true`、`overflowY=false` | `dag-midflight-probe --session session-41515cf5… --narrow` |
 | 真 21 节点会话 | **未执行**：`session-133c5cde…` 标题搜索超时，未打开 | 同上，如实标未执行 |
