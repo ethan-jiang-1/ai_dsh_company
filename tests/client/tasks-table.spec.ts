@@ -13,7 +13,10 @@
 //   还原后 3 passed。
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { TasksTableView } from '../../packages/company-pack/src/client/TasksPanel.tsx'
 import type { TeamViewLike } from '../../packages/company-pack/src/lib/presence.ts'
 
@@ -30,6 +33,9 @@ const VIEW: TeamViewLike = {
     { id: 't4', subject: '真被卡', status: 'pending', revision: 1, ready: false, ownerName: 'vp-sales', blockedBy: ['t9'] },
     // 待办 + 依赖全完成 ⇒ 官方 ready === true，不该标
     { id: 't5', subject: '可开工', status: 'pending', revision: 1, ready: true, ownerName: 'coo', blockedBy: ['t1'] },
+    { id: 't6', subject: '悬空依赖', status: 'pending', revision: 1, ready: false, ownerName: 'cfo', blockedBy: ['ghost'] },
+    // deleted 墓碑：上游读模型过滤后不该进表格
+    { id: 't7', subject: '已删的', status: 'deleted', revision: 1, ready: false, ownerName: 'coo', blockedBy: [] },
     { id: 't9', subject: '没做完的前置', status: 'in_progress', revision: 1, ready: false, ownerName: 'coo', blockedBy: [] },
   ],
 }
@@ -56,5 +62,28 @@ describe('TasksTableView：「（阻塞）」只在待办行上（BUG-027 同族
   it('真被卡的待办行仍标阻塞（门槛别把真信号一起吞掉）', () => {
     expect(row('t4'), '待办 + 依赖未完成的行丢了「（阻塞）」').toContain('（阻塞）')
     expect(row('t5'), '待办 + 依赖已就绪的行不该标「（阻塞）」').not.toContain('（阻塞）')
+  })
+})
+
+describe('TasksTableView：依赖列人读优先（owner · subject + id 次要）', () => {
+  it('依赖列能直接回答「谁在等什么」，不是裸 task-N', () => {
+    const blocked = row('t4')
+    expect(blocked, '依赖列缺 owner，读的人还得二次查').toContain('梦之队 COO')
+    expect(blocked, '依赖列缺 subject，读的人还得二次查').toContain('没做完的前置')
+    expect(blocked, 'id 只做 title/data 次要信息，不占可见列宽').toContain('data-dep-id="t9"')
+    expect(blocked).not.toContain('wk-dep-id')
+    expect(blocked, 'title 给全量文本（hover 增强，不是唯一入口）').toContain('title="梦之队 COO · 没做完的前置 · t9"')
+  })
+
+  it('悬空依赖显式标「未找到」，不静默丢', () => {
+    expect(row('t6')).toContain('ghost（未找到）')
+  })
+
+  it('deleted 墓碑不进表格；「已删」死字面量已移除', () => {
+    const html = render()
+    expect(html, 'deleted 任务应被读模型过滤，不该出现在表格里').not.toContain('已删的')
+    expect(html).not.toContain('已删')
+    const source = readFileSync(join(ROOT, 'packages/company-pack/src/client/TasksPanel.tsx'), 'utf8')
+    expect(source, 'STATUS_LABEL 不再保留 deleted: 已删（映射永远不命中）').not.toContain("deleted: '已删'")
   })
 })

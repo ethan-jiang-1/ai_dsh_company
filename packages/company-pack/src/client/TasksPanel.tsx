@@ -7,46 +7,88 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { presenceStatusFromPhase, statusLabelFor, type TeamViewLike } from '../lib/presence.ts'
+import { tasksFromTeamView, type TaskRow } from '../lib/board.ts'
 import { LOADING_NOTE, StateNote } from './company-panels.tsx'
 
 const STATUS_LABEL: Record<string, string> = {
   pending: '待办',
   in_progress: '进行中',
   completed: '完成',
-  deleted: '已删',
+}
+
+/**
+ * 依赖 cell 的一项：**人读优先**——`owner · subject` 为主体，`task-N` 降为灰字次要。
+ * 为什么不全用 id：`task-N` 是机器键，人问的是「谁在等什么」；subject 放 title 是 hover-only，
+ * 触屏/键盘读不到（台账 Human Exits 已踩过这个坑）。全量 subject 留在 DOM，CSS 只做 2 行钳制；
+ * 找不到的依赖显式标「未找到」，不静默丢。
+ * @param props.id - 依赖任务 id。
+ * @param props.byId - 本板归一化任务索引（`tasksFromTeamView` 的产物）。
+ * @returns 一项依赖标签。
+ */
+function DependencyLabel({ id, byId }: { readonly id: string; readonly byId: ReadonlyMap<string, TaskRow> }) {
+  const dependency = byId.get(id)
+  if (dependency === undefined) {
+    return (
+      <span className="wk-dep wk-dep-missing" title={`${id}（未找到）`}>
+        <span className="wk-dep-subject">{id}（未找到）</span>
+      </span>
+    )
+  }
+  const owner = dependency.ownerName ?? '未分配'
+  return (
+    <span className="wk-dep" title={`${owner} · ${dependency.subject} · ${id}`} data-dep-id={id}>
+      <span className="wk-dep-owner">{owner}</span>
+      <span className="wk-dep-sep">·</span>
+      <span className="wk-dep-subject">{dependency.subject}</span>
+    </span>
+  )
 }
 
 /**
  * 任务板表格视图（纯展示）：成员行 + 共享任务表（owner / 依赖 / 修订号）。
  * 「任务板」平台页签体（`company-tabs.tsx` 的 `TasksTab`）用它渲染。
+ *
+ * 行与看板同源：走 `tasksFromTeamView`（过滤 deleted、owner 显示名、revision 归一），
+ * 不再直接吃 raw `view.tasks`——否则 deleted 会进表、deleted 的映射永远不命中。
  * @param props.view - 团队视图（可空：未加载时给空态）。
  * @returns 表格。
  */
 export function TasksTableView({ view }: { readonly view: TeamViewLike | null }) {
   if (view === null) return <StateNote kind="loading" text={LOADING_NOTE} />
+  const tasks = tasksFromTeamView(view)
+  const byId = new Map(tasks.map(task => [task.id, task]))
   return (
     <>
       <div className="wk-meta wk-mb-xs">
         成员：{view.members.map(member => `${member.name}(${statusLabelFor(presenceStatusFromPhase(member.phase))})`).join('、') || '（无）'}
       </div>
-      {view.tasks.length === 0
+      {tasks.length === 0
         ? <StateNote text="还没有共享任务。" />
         : (
             <table className="wk-table">
               <thead>
                 <tr>
-                  <th>id</th>
                   <th>任务</th>
+                  <th>依赖</th>
                   <th>状态</th>
                   <th>owner</th>
-                  <th>依赖</th>
                 </tr>
               </thead>
               <tbody>
-                {view.tasks.map(task => (
+                {tasks.map(task => (
                   <tr key={task.id}>
-                    <td data-col="id"><span className="wk-cell-id">{task.id}@{task.revision ?? 0}</span></td>
-                    <td data-col="subject">{task.subject}</td>
+                    <td data-col="subject">
+                      <span className="wk-cell-id">{task.id}@{task.revision}</span> {task.subject}
+                    </td>
+                    <td data-col="blocked">
+                      {task.blockedBy.length === 0
+                        ? '—'
+                        : (
+                            <span className="wk-deps">
+                              {task.blockedBy.map(id => <DependencyLabel key={id} id={id} byId={byId} />)}
+                            </span>
+                          )}
+                    </td>
                     <td data-col="status">
                       {/* 「（阻塞）」只在**待办**行上有意义：`ready` 的官方语义是
                           `status === 'pending' && taskReady(...)`（`task-view.ts:56`），
@@ -57,7 +99,6 @@ export function TasksTableView({ view }: { readonly view: TeamViewLike | null })
                       {task.status === 'pending' && task.ready === false ? '（阻塞）' : ''}
                     </td>
                     <td data-col="owner">{task.ownerName ?? '未分配'}</td>
-                    <td data-col="blocked">{(task.blockedBy ?? []).join(',') || '—'}</td>
                   </tr>
                 ))}
               </tbody>

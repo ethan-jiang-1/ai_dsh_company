@@ -43,6 +43,7 @@
 | [dag-visual-probe.mjs](../probes/browser-visual/dag-visual-probe.mjs) | 合成任务驱动的 DAG 主题、样式与视觉判据 |
 | [dag-midflight-probe.mjs](../probes/browser-visual/dag-midflight-probe.mjs) | 真实动议或既有会话的 DAG 中途/终局形态和长链可读性 |
 | [ledger-summary-probe.mjs](../probes/browser-visual/ledger-summary-probe.mjs) | 台账摘要在宽/窄视口的可读性与键盘/触屏全文入口 |
+| [tasks-panel-probe.mjs](../probes/browser-visual/tasks-panel-probe.mjs) | 任务板入口可见/可聚焦/Tab 序/Enter 落点（真 web，1440/390） |
 | [compact-view-probe.mjs](../probes/browser-visual/compact-view-probe.mjs) | compact 折叠过程行但保留助手最终长回复的现场对照 |
 | [open-in-app-probe.mjs](../probes/browser-visual/open-in-app-probe.mjs) | 交付物进侧栏预览 → Host 判词（`ok:true`/`opened:true`）→ **目标应用状态文件登记该路径**；`--tree` 挑未打开过的文件可拿干净翻转 |
 

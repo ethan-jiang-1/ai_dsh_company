@@ -305,8 +305,23 @@ const CSS = `
 /* 任务正文列：给足宽度再换行——原实现 26rem 弹窗把长标题挤成竖排 */
 .wk-table td[data-col='subject'] { min-width: 16rem; white-space: normal; word-break: break-word; }
 .wk-table td[data-col='id'], .wk-table td[data-col='status'],
-.wk-table td[data-col='owner'], .wk-table td[data-col='blocked'] { white-space: nowrap; }
-.wk-cell-id { color: var(--dsw-alias-label-tertiary); font-size: 12px; font-variant-numeric: tabular-nums; }
+.wk-table td[data-col='owner'] { white-space: nowrap; }
+/* 依赖列：人读优先（owner · subject），id 灰字次要；窄栏允许换行，2 行钳制后仍保留全量 DOM 文本。 */
+.wk-table td[data-col='blocked'] { min-width: 10rem; white-space: normal; }
+.wk-deps { display: inline-flex; flex-wrap: wrap; gap: 2px 8px; }
+.wk-dep { display: inline-flex; align-items: baseline; gap: 3px; min-width: 0; }
+.wk-dep-owner { flex: none; }
+.wk-dep-sep { color: var(--dsw-alias-label-tertiary); }
+.wk-dep-subject {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  word-break: break-word;
+  max-width: 14rem;
+}
+.wk-dep-missing { color: var(--dsw-alias-state-warn-primary); }
+.wk-cell-id { color: var(--dsw-alias-label-tertiary); font-size: 12px; font-variant-numeric: tabular-nums; margin-right: 4px; }
 
 /* 右栏驾驶舱（Company 页签）：在场板 + 动态流 */
 .wk-pane { padding: 8px 12px; font-size: 13px; line-height: 1.5; text-align: left; color: var(--dsw-alias-label-primary); }

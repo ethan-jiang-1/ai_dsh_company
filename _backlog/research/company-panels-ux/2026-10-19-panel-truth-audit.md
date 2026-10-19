@@ -7,7 +7,7 @@ intent: "把『公司面面板 UX 深挖』四张卡里可机械复核的事实�
 
 服务：[已结公司面优先级卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) 与它拆出的三张深挖卡
 （[台账](../../issues/2026-10-19-ledger-ux-deep-dive.md)｜[看板 + 依赖图](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)｜
-[任务板](../../issues/2026-10-19-taskboard-table-ux-deep-dive.md)）及三张缺陷卡
+[任务板](../../_archive/settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md)）及三张缺陷卡
 （[BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md)｜[BUG-026](../../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md)｜
 [BUG-027](../../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)）。
 

@@ -52,6 +52,7 @@
 | [2026-10-19-issue-card-quality.md](settled_issues/2026-10-19-issue-card-quality.md) | 已结（A 内容收口执行：四卡当前态/修订史、blockedBy、README 薄索引、研究稿失效标记、成品台账拆卡、wire golden 订正）；B 以后做，C = 后续卡执行协议 | 2026-10-19 |
 | [2026-10-19-company-panels-ux-priority.md](settled_issues/2026-10-19-company-panels-ux-priority.md) | 已结（用户拍：看板+依赖图 → 任务板 → 台账；成品台账已拆新卡；判据 = 证据可复用 × 影响 × 代价） | 2026-10-19 |
 | [2026-10-19-board-dag-ux-deep-dive.md](settled_issues/2026-10-19-board-dag-ux-deep-dive.md) | 已结（新鲜度文案说真话 + DAG 进行中徽章独立样式 + 窄栏/长链实测；用户接受 pane 自身纵向滚动；真 21 节点整页双滚动留未执行） | 2026-10-19 |
+| [2026-10-19-taskboard-table-ux-deep-dive.md](settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md) | 已结（依赖列 owner · subject + id 次要；行 id 并入任务列；已删死映射移除；入口探针 1440/390 PASS） | 2026-10-19 |
 
 ## 已修缺陷
 
