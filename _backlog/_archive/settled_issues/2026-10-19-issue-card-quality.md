@@ -17,7 +17,7 @@ opened: 2026-10-19
 - 三张子卡加 `blockedBy` 父卡；下一步从「等你点」改成「等父卡选定」；验收标「草案」。
 - 父卡的「成品台账」拆成 [新卡](../../issues/2026-10-19-deliverables-ledger.md)。
 - `issues/README` 减成薄索引（只列位置与下一步）；研究稿 §五/§六/§五加失效标记。
-- 看板卡 golden 改 **wire**，不再用 `record.rows.agentTeam.val`（state）；台账卡补 `PanelFrame` 默认 5 秒的错标事实；刷新文案共享事实归 Wave 1「新鲜度文案」小卡（待立）。
+- 看板卡 golden 改 **wire**，不再用 `record.rows.agentTeam.val`（state）；台账卡补 `PanelFrame` 默认 5 秒的错标事实；刷新文案共享事实归 [看板卡](../../issues/2026-10-19-board-dag-ux-deep-dive.md)（共享事实唯一 owner）。
 - 本卡迁入 `_archive/settled_issues/`；活跃清单、归档索引、研究索引同步。
 
 **B 为什么以后做**：Card v2（`owner/blockedBy/blocker/touches` + 派生视图 + 语义审 skill + 不变量）是结构变更，需门禁红/绿与迁移成本。触发条件：A 收口 + 第一张面板落地后，仍出现同类「当前态被历史埋住」或跨卡事实多 owner；到时新开卡引用本卡，不在这张卡上继续扩。

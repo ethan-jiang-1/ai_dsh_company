@@ -12,7 +12,7 @@ opened: 2026-10-19
 本卡**不再是「修正确性缺陷」**：BUG-026 是误报、BUG-027 已按真根因修复。当前要处理的是呈现/可读性：
 
 1. 依赖图 `statusBadge` 对 in_progress 也吐「可开工」样式（[`company-panels.tsx:67`](../../packages/company-pack/src/client/company-panels.tsx#L67)）。
-2. 「每 5 秒刷新」文案不实（共享事实，归 Wave 1「新鲜度文案」小卡（待立）；本卡只验显示结果）。
+2. 「每 5 秒刷新」文案不实（共享事实，**本卡是唯一 owner**：`PanelFrame`/`CompanyView` + 7 个调用方；任务板/台账只引用）。
 3. 21 节点长链的窄栏双滚动未实测（读码推断会）。
 4. drift 徽章需要真图复验（已有 [`board-drift-probe`](../../probes/browser-visual/board-drift-probe.mjs)）。
 5. golden 若用 `record.rows.agentTeam.val`（state）会假绿；必须用 wire。
@@ -37,7 +37,7 @@ opened: 2026-10-19
 
 ## 范围与排除项
 
-- **范围内**：DAG 徽章样式；刷新文案的显示结果（共享修复归 Wave 1）；窄栏/长链可读性实测；drift 真图复验；wire golden/夹具。
+- **范围内**：DAG 徽章样式；刷新文案（本卡统一改 `PanelFrame`/`CompanyView` + 7 个调用方；任务板/台账只引用）；窄栏/长链可读性实测；drift 真图复验；wire golden/夹具。
 - **范围外**：正确性缺陷修复（已做完）；不改任务投影本身（vendor）；不做拖拽改状态/任务编辑；不碰任务板表格（另卡）；不做成品台账（[新卡](2026-10-19-deliverables-ledger.md)）。
 
 ## 验证计划（按现有证据 owner，不新写手工五态）
@@ -55,7 +55,7 @@ opened: 2026-10-19
 - [ ] **golden 层**：用 wire（`TeamTaskView`）或现有 `board.spec.ts` 真 wire 夹具；不用 `record.rows.agentTeam.val`；断言 ownerName 映射；真无 owner 的卡显示「未分配」（当前样本 35 张）。
 - [ ] **窄栏/长链**：双滚动结论有实测（接受/不接受都要写明）；长链可读性有图或有度量。
 - [ ] **drift**：`board-drift-probe` 通过；图落 `snapshots/visual/board-drift`。
-- [ ] **刷新文案**：看板/依赖图显示与真实推送一致（共享修复归 Wave 1；本卡验显示结果）。
+- [ ] **刷新文案**：`PanelFrame`/`CompanyView` 与 7 个调用方全部说真话（看板/依赖图/在场/任务板/用量=投影更新；台账 30s；待办 2s）；keyless 断言。
 - [ ] 门禁 + `pnpm test` + `client-load-smoke` 绿；记录/索引同步。
 
 ## 修订史（只追加）

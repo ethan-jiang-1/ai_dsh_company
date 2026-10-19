@@ -14,7 +14,7 @@ opened: 2026-10-19
 
 **真问题**是「**行太长**」，不是「行太多」：最长单行摘要 663 字，超过 120 字（`FULL_TEXT_HINT`）的有 16/40 行。两行钳制 + 「全文」入口已经做过，且 [`ledger-summary-probe`](../../probes/browser-visual/ledger-summary-probe.mjs) 已覆盖宽/窄视口的行高稳定、被裁必有入口、键盘/鼠标/触屏取全文。
 
-**新发现（A 收口轮读码）**：台账页签**没有**传 `refreshLabel`（[`LedgerTab.tsx:130`](../../packages/company-pack/src/client/LedgerTab.tsx#L130)），`PanelFrame` 默认显示「每 5 秒自动刷新」，但台账是 `REFRESH_MS = 30_000`（[`LedgerTab.tsx:28`](../../packages/company-pack/src/client/LedgerTab.tsx#L28)）。旧卡说「`PanelFrame` 已按真值写 `refreshLabel`」是**错的**。该事实与看板/任务板共享，归 **Wave 1「新鲜度文案」小卡**，本卡只验台账页签的显示结果。
+**新发现（A 收口轮读码）**：台账页签**没有**传 `refreshLabel`（[`LedgerTab.tsx:130`](../../packages/company-pack/src/client/LedgerTab.tsx#L130)），`PanelFrame` 默认显示「每 5 秒自动刷新」，但台账是 `REFRESH_MS = 30_000`（[`LedgerTab.tsx:28`](../../packages/company-pack/src/client/LedgerTab.tsx#L28)）。旧卡说「`PanelFrame` 已按真值写 `refreshLabel`」是**错的**。该事实与看板/任务板共享，owner = [看板卡](2026-10-19-board-dag-ux-deep-dive.md)；本卡只验台账页签的显示结果。
 
 **剩余**：① 行数判据不要硬写 40（当前样本，会随动议增长）；② 「读清一场动议」的人读计时；③ 用现有探针复跑，不新写三态截图。
 
@@ -35,12 +35,12 @@ opened: 2026-10-19
 | 行长度已受控 | 是：`-webkit-line-clamp: 2` + 量溢出给「全文」 | 代码 + 真浏览器探针 | [`styles.ts:179-184`](../../packages/company-pack/src/client/styles.ts#L179-L184) + `ledger-summary-probe` |
 | 折叠/筛选/搜索/按日期分组 | 无 | 读码 | 面板源码 grep |
 | 刷新间隔 | **30 秒**；但页签显示默认「每 5 秒自动刷新」 | 代码 | [`LedgerTab.tsx:28`](../../packages/company-pack/src/client/LedgerTab.tsx#L28) / [`:130`](../../packages/company-pack/src/client/LedgerTab.tsx#L130) |
-| 公司视图顶部「每 5 秒刷新」 | 文不对板（看板/依赖图/在场是推送） | 代码 | [`CompanyView.tsx:102`](../../packages/company-pack/src/client/CompanyView.tsx#L102)；归 Wave 1 |
+| 公司视图顶部「每 5 秒刷新」 | 文不对板（看板/依赖图/在场是推送） | 代码 | [`CompanyView.tsx:102`](../../packages/company-pack/src/client/CompanyView.tsx#L102)；归看板卡（共享事实 owner） |
 | 「成品」列的 ✅ | 文本代理，不是 D20 的 `present` 机器判据 | 代码 | [`ledger.ts:61`](../../packages/company-pack/src/lib/ledger.ts#L61) |
 
 ## 范围与排除项
 
-- **范围内**：动议台账面板的可读性（行数/全文入口/人读计时）；刷新文案的显示结果（共享修复归 Wave 1）。
+- **范围内**：动议台账面板的可读性（行数/全文入口/人读计时）；刷新文案的显示结果（owner = 看板卡）。
 - **范围外**：**不做成品台账**（已拆 [成品台账](2026-10-19-deliverables-ledger.md)）；不改动议表的信息架构（日期分组/合并列）；不动 `meta.md` 与归档流程；不把 ✅ 文本代理改造成 `present` 判据。
 
 ## 验证计划（按现有证据 owner）
@@ -49,7 +49,7 @@ opened: 2026-10-19
 1. **行数**：keyless 读真文件 `parseMotionLedger` 得 N（当前 40）；探针 `metrics.length` 与 N 相等。**不硬写 40**。
 2. **全文入口**：复用 [`ledger-summary-probe --fixture`](../../probes/browser-visual/ledger-summary-probe.mjs)：两行稳定、被裁必有入口、键盘/鼠标/触屏取全文；产物落 `snapshots/visual/ledger-summary`。
 3. **人读计时**：从动议表挑一行（如 `role-boundary-diagnosis-2026`，摘要 525 字），读完全文、一句话复述，记步数/秒数。这是本卡唯一人工项；未做就写「未执行」，不冒充绿。
-4. **刷新**：台账页签显示与 30s 轮询一致（共享修复归 Wave 1）。
+4. **刷新**：台账页签显示与 30s 轮询一致（owner = 看板卡）。
 5. **收口**：`pnpm verify` + `pnpm test` + 探针复跑（`set -o pipefail`）；结论回填本卡与调研。
 
 ## 验收标准（草案；父卡选中后转正）
@@ -57,7 +57,7 @@ opened: 2026-10-19
 - [ ] **行数**：面板行数 = `parseMotionLedger(真文件)` 的输出行数（当前样本 40）；有不一致就带证据立缺陷。
 - [ ] **全文入口**：被两行钳制裁切的行都有「全文」入口；宽/窄视口行高稳定；键盘/鼠标/触屏都能取到全文（复用探针）。
 - [ ] **人读**：「读清一场动议」有步数/秒数记录，结论写明 663 字摘要会不会看不完/看错；未执行则标「未执行」。
-- [ ] **刷新**：台账页签显示与 30s 轮询一致（共享修复归 Wave 1）。
+- [ ] **刷新**：台账页签显示与 30s 轮询一致（owner = 看板卡）。
 - [ ] **成品口径**：本卡不把 ✅ 文本代理写成 D20 的 present 判据；成品台账归新卡。
 - [ ] 门禁 + `pnpm test` + 探针复跑绿；记录/索引同步。
 
