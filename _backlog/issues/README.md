@@ -6,10 +6,11 @@
 
 | 问题 | 当前情况与下一步 |
 |---|---|
-| [公司面 UX 深挖——先做哪几个面板](2026-10-19-company-panels-ux-priority.md) | 优先级已按本轮读码+真数据**重排**（看板第一、台账降到第三）；**等你拍**先做哪张 + BUG-026 走哪条路 |
-| [① 看板 + 依赖图 UX 深挖](2026-10-19-board-dag-ux-deep-dive.md) | 指挥视图 ⇒ 已确认两条真缺陷 BUG-026/027（owner 全缺、假就绪徽章）；验收已从"板面=投影"换底为 golden 快照；**等你点** |
-| [② 任务板 UX 深挖](2026-10-19-taskboard-table-ux-deep-dive.md) | 表格答不了"谁在等谁"（owner 空/依赖裸 id）；原"一致性判据"作废（同源恒一致）；**等你点** |
-| [③ 台账 UX 深挖](2026-10-19-ledger-ux-deep-dive.md) | 订正：读的是 40 行动议表不是 993 份成品（BUG-025）；真问题是 663 字单行摘要；**等你点** |
+| [issue 卡质量——当前态被历史埋住](2026-10-19-issue-card-quality.md) | 四张公司面卡的历史/证据层待收口（README 三行与父卡 🔒 已先修）；**等你拍** A 内容收口 / B Card v2 / C 先试点 |
+| [公司面 UX 深挖——先做哪几个面板](2026-10-19-company-panels-ux-priority.md) | 优先级已重排（看板第一、台账第三）；**等你拍**先做哪张；BUG-026 已结，不再等它；排序标准待说清 |
+| [① 看板 + 依赖图 UX 深挖](2026-10-19-board-dag-ux-deep-dive.md) | 旧结论已撤回（BUG-026 误报 / BUG-027 已修）；有已知陈旧段，质量审卡负责收口；**等你点**（状态待收口） |
+| [② 任务板 UX 深挖](2026-10-19-taskboard-table-ux-deep-dive.md) | 依赖列裸 id；owner 已证伪（BUG-026 误报）；`（阻塞）` 已修；**等你点**（状态待收口） |
+| [③ 台账 UX 深挖](2026-10-19-ledger-ux-deep-dive.md) | 读的是 40 行动议表；真问题是 663 字单行摘要；刷新文案与看板卡共有；**等你点**（状态待收口） |
 
 已结问题见 [归档](../_archive/settled_issues/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 

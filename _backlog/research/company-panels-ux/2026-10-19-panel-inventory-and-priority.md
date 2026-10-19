@@ -15,6 +15,8 @@ intent: "为『公司面 UX 深挖先做哪几个面板』提供可复核的数�
 > （human-exits 批 3 的摘要显示线，已交付）⇒「痛点最多」不成立。
 > 另：§二 与 §六 给的 `agentTeam` 取法少了 `record` 一层，真路径 = `record.rows.agentTeam.val`。
 > **本文其余部分（交互面、验证计划、反证限制）仍有效**；读优先级请看父卡（已重排）。
+>
+> **2026-10-19 质量审补充**：§五「台账 Top 1」同样建立在 §二/§四 的旧数据上，已失效；当前排序见父卡与 [issue 卡质量审](../../issues/2026-10-19-issue-card-quality.md)。
 
 ## 一、面板清单与规模（`packages/company-pack/src/client/`，实测 `wc -l`）
 
