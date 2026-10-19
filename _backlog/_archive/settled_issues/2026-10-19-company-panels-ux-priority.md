@@ -11,7 +11,7 @@ opened: 2026-10-19
 
 用户按建议判据拍定顺序：
 
-1. **看板 + 依赖图**（[卡](../../issues/2026-10-19-board-dag-ux-deep-dive.md)）——现有 `dag-visual` / `dag-midflight` / `board-drift` 探针 + 真 wire 夹具；指挥视图；剩余修复小。
+1. **看板 + 依赖图**（[卡](2026-10-19-board-dag-ux-deep-dive.md)）——现有 `dag-visual` / `dag-midflight` / `board-drift` 探针 + 真 wire 夹具；指挥视图；剩余修复小。
 2. **任务板**（[卡](../../issues/2026-10-19-taskboard-table-ux-deep-dive.md)）——依赖列显示格式是产品选择；入口键盘/落点要新探针。
 3. **台账**（[卡](../../issues/2026-10-19-ledger-ux-deep-dive.md)）——布局/键盘/触屏已有 `ledger-summary-probe`；主要剩人读计时。
 
@@ -21,7 +21,7 @@ opened: 2026-10-19
 
 **拆出**：「成品台账」已独立成 [新卡](../../issues/2026-10-19-deliverables-ledger.md)，不在本卡范围。
 
-**共享事实（不归本卡实现）**：看板/依赖图/在场/任务板走投影推送；台账 30s 轮询；待办 2s。`PanelFrame` 默认「每 5 秒自动刷新」对 7 个调用方不真（台账页签还误显示 5s）。此事实归 [看板卡](../../issues/2026-10-19-board-dag-ux-deep-dive.md)（共享事实唯一 owner）；任务板/台账只引用，不各改一遍。
+**共享事实（不归本卡实现）**：看板/依赖图/在场/任务板走投影推送；台账 30s 轮询；待办 2s。`PanelFrame` 默认「每 5 秒自动刷新」对 7 个调用方不真（台账页签还误显示 5s）。此事实归 [看板卡](2026-10-19-board-dag-ux-deep-dive.md)（共享事实唯一 owner）；任务板/台账只引用，不各改一遍。
 
 ## 范围与排除项
 

@@ -27,8 +27,8 @@ intent: "为 issue 卡质量审与 DSH-native 收口提供逐条证据：四张�
 
 | # | 严重度 | 位置 | 问题 | 证据 / 建议 |
 |---|---|---|---|---|
-| A1 | P1 | [看板卡](../../issues/2026-10-19-board-dag-ux-deep-dive.md) §「已确立的事实 / 本轮范围」 | 「两个致命结论」仍说“正确性缺陷已确认两条”；“本轮范围”第 1 条仍写“先修数据 BUG-026/027” | 与同卡「核心不再是修正确性缺陷」直接冲突；026 是误报、027 已修。当前段应只留呈现层 + golden 判据 |
-| A2 | P1 | [看板卡](../../issues/2026-10-19-board-dag-ux-deep-dive.md) §「验收标准」 | 仍把 BUG-026/027 的「已修判定」当验收条目 | 两个 BUG 已归档；026 的“已修判定”是在误报结论之前写的。条目要么已满足，要么不可执行 |
+| A1 | P1 | [看板卡](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §「已确立的事实 / 本轮范围」 | 「两个致命结论」仍说“正确性缺陷已确认两条”；“本轮范围”第 1 条仍写“先修数据 BUG-026/027” | 与同卡「核心不再是修正确性缺陷」直接冲突；026 是误报、027 已修。当前段应只留呈现层 + golden 判据 |
+| A2 | P1 | [看板卡](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §「验收标准」 | 仍把 BUG-026/027 的「已修判定」当验收条目 | 两个 BUG 已归档；026 的“已修判定”是在误报结论之前写的。条目要么已满足，要么不可执行 |
 | A3 | P1 | [任务板卡](../../issues/2026-10-19-taskboard-table-ux-deep-dive.md) §「已确立的事实 / 本轮范围」 | 「修 owner 后要重测（BUG-026 不修…）」；「BUG-027 修好后需同步复核」 | 同卡 §「已确立的事实 / 验收标准」说 026 是误报、无需修复；`（阻塞）` 已在 [TasksPanel.tsx](../../../packages/company-pack/src/client/TasksPanel.tsx) 的 `TasksTableView` 修掉并有 [spec](../../../tests/client/tasks-table.spec.ts) 的 describe 块 |
 | A4 | P1 | [优先级卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) §「建议 Top 3 / 依据」 | “owner 列空”“先依赖 ① 修 owner”；还说在场连带 BUG-026 | owner 在 wire 上齐全；① 没有 owner 修复任务；026 已结。“三条已确认缺陷…不需要浏览器就能修”也已过期 |
 | A5 | P1 | [issues/README](../../issues/README.md) §活跃清单 | 旧版还写“BUG-026 走哪条路”“owner 空”“已确认两条真缺陷 BUG-026/027” | 三条都已撤回/关闭；本轮已先改这三行，但正文/状态仍未收口 |
@@ -50,11 +50,11 @@ intent: "为 issue 卡质量审与 DSH-native 收口提供逐条证据：四张�
 
 | # | 严重度 | 位置 | 问题 | 证据 / 建议 |
 |---|---|---|---|---|
-| C1 | P1 | [看板卡](../../issues/2026-10-19-board-dag-ux-deep-dive.md) §验证计划 + [研究 §五](../company-panels-ux/2026-10-19-panel-truth-audit.md) | 把 `record.rows.agentTeam.val`（state）原样当 golden，又用 `ownerId` 反推 owner | 生产读模型 `tasksFromTeamView` 读的是 wire 的 `ownerName`（[board.ts](../../../packages/company-pack/src/lib/board.ts)，形状见 [presence.ts](../../../packages/company-pack/src/lib/presence.ts) 的 `TeamViewLike`）。测试会再造一条生产不走的 owner 解析路径，可能再次假绿。golden 应存 wire，或测试先跑与 host 相同的 `projectTaskView` |
+| C1 | P1 | [看板卡](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §验证计划 + [研究 §五](../company-panels-ux/2026-10-19-panel-truth-audit.md) | 把 `record.rows.agentTeam.val`（state）原样当 golden，又用 `ownerId` 反推 owner | 生产读模型 `tasksFromTeamView` 读的是 wire 的 `ownerName`（[board.ts](../../../packages/company-pack/src/lib/board.ts)，形状见 [presence.ts](../../../packages/company-pack/src/lib/presence.ts) 的 `TeamViewLike`）。测试会再造一条生产不走的 owner 解析路径，可能再次假绿。golden 应存 wire，或测试先跑与 host 相同的 `projectTaskView` |
 | C2 | P2 | 看板卡 §已确立的事实 / 任务板卡 §本轮范围 / 台账卡 §已确立的事实、验收标准 | “每 5 秒刷新”三张卡各写一遍 | 一个事实三个 owner；如果没先选看板卡，台账的验收条就满足不了。应合成一张小卡或明确归一个 owner |
 | C3 | P2 | 看板卡 §这是什么 / 任务板卡 §这是什么 / [盘点](../company-panels-ux/2026-10-19-panel-inventory-and-priority.md) §一 | 行数 374/379、99/105、162/105；`styles.ts:179` 实际 184 | 引用已漂移；数字本身可能都对，但读者无法复算。改引用符号/命令，别只写行号 |
 | C4 | P2 | 研究文首 | 同时出现 61 板/298 任务、379 行/344 owner、273/273 ownerName | 没标各自样本：全量 state、`ver === 4` wire、读模型全量。没有“样本/层”列，数字越多越像噪声 |
-| C5 | P2 | [任务板卡](../../issues/2026-10-19-taskboard-table-ux-deep-dive.md) §验证计划（[看板卡](../../issues/2026-10-19-board-dag-ux-deep-dive.md) §验证计划 的 golden 也依赖未冻结样本） | 验证计划依赖“BUG-026 里那个 21 条板的会话” | 会话可能已删/换 home；计划不可复跑。应先冻结 golden 夹具，再写浏览器步骤 |
+| C5 | P2 | [任务板卡](../../issues/2026-10-19-taskboard-table-ux-deep-dive.md) §验证计划（[看板卡](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §验证计划 的 golden 也依赖未冻结样本） | 验证计划依赖“BUG-026 里那个 21 条板的会话” | 会话可能已删/换 home；计划不可复跑。应先冻结 golden 夹具，再写浏览器步骤 |
 | C6 | P2 | 四张卡 | “本轮/上一版/现在”没有绝对日期锚 | 新读者不知道“本轮”是哪一轮；这是自说明卡的反面。用日期 + 修订号，不用 deixis |
 
 ## 三、根因

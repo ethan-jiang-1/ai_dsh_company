@@ -14,7 +14,7 @@ opened: 2026-10-19
 
 **真问题**是「**行太长**」，不是「行太多」：最长单行摘要 663 字，超过 120 字（`FULL_TEXT_HINT`）的有 16/40 行。两行钳制 + 「全文」入口已经做过，且 [`ledger-summary-probe`](../../probes/browser-visual/ledger-summary-probe.mjs) 已覆盖宽/窄视口的行高稳定、被裁必有入口、键盘/鼠标/触屏取全文。
 
-**新发现（A 收口轮读码）**：台账页签**没有**传 `refreshLabel`（[`LedgerTab.tsx:130`](../../packages/company-pack/src/client/LedgerTab.tsx#L130)），`PanelFrame` 默认显示「每 5 秒自动刷新」，但台账是 `REFRESH_MS = 30_000`（[`LedgerTab.tsx:28`](../../packages/company-pack/src/client/LedgerTab.tsx#L28)）。旧卡说「`PanelFrame` 已按真值写 `refreshLabel`」是**错的**。该事实与看板/任务板共享，owner = [看板卡](2026-10-19-board-dag-ux-deep-dive.md)；本卡只验台账页签的显示结果。
+**新发现（A 收口轮读码）**：台账页签**没有**传 `refreshLabel`（[`LedgerTab.tsx:130`](../../packages/company-pack/src/client/LedgerTab.tsx#L130)），`PanelFrame` 默认显示「每 5 秒自动刷新」，但台账是 `REFRESH_MS = 30_000`（[`LedgerTab.tsx:28`](../../packages/company-pack/src/client/LedgerTab.tsx#L28)）。旧卡说「`PanelFrame` 已按真值写 `refreshLabel`」是**错的**。该事实与看板/任务板共享，owner = [看板卡](../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)；本卡只验台账页签的显示结果。
 
 **剩余**：① 行数判据不要硬写 40（当前样本，会随动议增长）；② 「读清一场动议」的人读计时；③ 用现有探针复跑，不新写三态截图。
 

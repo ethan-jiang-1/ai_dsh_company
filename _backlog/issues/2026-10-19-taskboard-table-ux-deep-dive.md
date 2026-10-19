@@ -1,6 +1,5 @@
 ---
 status: 推敲中
-blockedBy: [2026-10-19-board-dag-ux-deep-dive]
 opened: 2026-10-19
 ---
 
@@ -17,14 +16,14 @@ opened: 2026-10-19
 1. **依赖列显示裸 `task-N`**，人问「T3 在等谁」要二次查询——真问题。
 2. **入口可发现性/键盘可达/落点**未实测（Tab 焦点、Enter 是否打开右栏任务板页签）。
 3. **`已删` 是死字面量**：`STATUS_LABEL` 有 `deleted: '已删'`，但 `tasksFromTeamView` 在到表格前已过滤 deleted。
-4. **刷新文案**默认「每 5 秒自动刷新」不实（共享事实，owner = [看板卡](2026-10-19-board-dag-ux-deep-dive.md)；本卡只验显示）。
+4. **刷新文案**默认「每 5 秒自动刷新」不实（共享事实，owner = [看板卡](../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)；本卡只验显示）。
 
 **未决问题（产品选择）**：
 
 - 依赖列显示什么？建议 `owner · id`（title 给 subject），或 `owner · subject`。要能一次答出「谁在等谁」，不是只把 id 换成标题。
 - `已删`：删掉映射，还是取消过滤让墓碑真显示？建议删映射（本轮不做墓碑视图）。
 
-**下一步：** 父卡已拍顺序（看板 → 任务板 → 台账）；等看板卡收口后按下面验证计划进 `exit_plan_mode`。
+**下一步：** 看板卡已收口，本卡可动。先拍依赖列显示格式（`owner · id` / `owner · subject`），再按下面验证计划进 `exit_plan_mode`。
 
 ## 官方 layer 0 与 compact skin（边界声明）
 

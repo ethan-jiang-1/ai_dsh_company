@@ -1,14 +1,14 @@
 # 公司面新鲜度文案与 DAG 徽章：按数据源说真话（2026-10-19）
 
-状态：implemented（2026-10-19；看板卡 3 切片；窄栏接受度仍待用户判）
+状态：implemented（2026-10-19；看板卡 3 切片；窄栏接受度 = 用户接受 pane 自身纵向滚动）
 
 ## 决定
 
-看板卡（[卡](../../_backlog/issues/2026-10-19-board-dag-ux-deep-dive.md)）把三件共享事实收成一个 owner：
+看板卡（[卡](../../_backlog/_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)）把三件共享事实收成一个 owner：
 
 1. **新鲜度文案 = 数据源的事实**。`PanelFrame` 默认从「每 5 秒自动刷新」改成「投影更新」；看板/依赖图/在场/用量/任务板吃默认（投影推送），台账显式 `每 30 秒自动刷新`，待办显式 `每 2 秒自动刷新`，培养保持 30s。`CompanyView` 顶部非培养子页同步「投影更新」；`docs/design/ui-demo.md` 的「挂载即拉 + 5s 轮询」与 `docs/index.md` D22 的旧说法同 diff 订正。
 2. **DAG 的 in_progress 徽章用独立样式**。`statusBadge` 对进行中返回 `wk-dag-progress`，颜色用 `--dsw-alias-state-business-primary`；pending 的「可开工」继续 `wk-dag-ready`（success）。文案不变，变的只是同一文案不再穿两种意思的绿色。
-3. **窄栏/长链只做度量，不改布局**。合成 21 节点串行链：布局高 2366px；390×520 的 `.wk-pane-body` 里 `scrollHeight=2366`、`overflowY=true`。真 7 节点样本（`session-41515cf5…`）在 390px 下 `scrollWidth=468 / clientWidth=365`、`overflowX=true`。是否接受 pane 自身纵向滚动 = 用户判断；本轮不改 DAG 布局。
+3. **窄栏/长链只做度量，不改布局**。合成 21 节点串行链：布局高 2366px；390×520 的 `.wk-pane-body` 里 `scrollHeight=2366`、`overflowY=true`。真 7 节点样本（`session-41515cf5…`）在 390px 下 `scrollWidth=468 / clientWidth=365`、`overflowX=true`。用户已判：接受 pane 自身纵向滚动；不改 DAG 布局。
 
 ## 输掉的方案
 

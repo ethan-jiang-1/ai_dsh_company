@@ -6,7 +6,7 @@ intent: "把『公司面面板 UX 深挖』四张卡里可机械复核的事实�
 # 公司面面板真相复核：四张卡的前提有几条站得住（2026-10-19）
 
 服务：[已结公司面优先级卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) 与它拆出的三张深挖卡
-（[台账](../../issues/2026-10-19-ledger-ux-deep-dive.md)｜[看板 + 依赖图](../../issues/2026-10-19-board-dag-ux-deep-dive.md)｜
+（[台账](../../issues/2026-10-19-ledger-ux-deep-dive.md)｜[看板 + 依赖图](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)｜
 [任务板](../../issues/2026-10-19-taskboard-table-ux-deep-dive.md)）及三张缺陷卡
 （[BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md)｜[BUG-026](../../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md)｜
 [BUG-027](../../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)）。
@@ -200,7 +200,7 @@ console.log({boards,boardsWithDrift:withDrift,driftTasks:n});"
 
 ## 五、三张深挖卡的验收标准要换底（本轮最重要的结论）
 
-> ⚠ **本节已失效（2026-10-19 A 收口）**：第 1 步的 golden 取法读的是 **state**，不是 wire；按此做会重犯 BUG-026。当前建议的验收方案见 [看板卡](../../issues/2026-10-19-board-dag-ux-deep-dive.md)（wire golden + 现有探针；待父卡选定）。下文保留为错误样本，**不要照做**。
+> ⚠ **本节已失效（2026-10-19 A 收口）**：第 1 步的 golden 取法读的是 **state**，不是 wire；按此做会重犯 BUG-026。当前建议的验收方案见已结的 [看板卡](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)（wire golden + 现有探针）。下文保留为错误样本，**不要照做**。
 
 三张卡现在把验收压在"**板面 = 投影真值**"上。§三证明**真值本身缺 owner 字段、ready 语义被放宽**——
 直接照卡里的写法去跑，**会跑出假绿**（真值也是"未分配"，断言"相等"通过）。
@@ -221,7 +221,7 @@ console.log({boards,boardsWithDrift:withDrift,driftTasks:n});"
 
 ## 六、反证与限制（如实）
 
-> ⚠ **本节基于 §三 的已证伪前提**：owner 全缺不成立（wire 273/273 齐全）。下面的 owner 推测保留为错误样本；当前结论见 [已结质量卡](../../_archive/settled_issues/2026-10-19-issue-card-quality.md) 与 [看板卡](../../issues/2026-10-19-board-dag-ux-deep-dive.md)。
+> ⚠ **本节基于 §三 的已证伪前提**：owner 全缺不成立（wire 273/273 齐全）。下面的 owner 推测保留为错误样本；当前结论见 [已结质量卡](../../_archive/settled_issues/2026-10-19-issue-card-quality.md) 与 [看板卡](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)。
 
 - **没开浏览器**：所有"长什么样"的结论都是读码推的，**截图证据一份没有**。上一份调研的口径
   （"未跑前全是假设"）依然适用。

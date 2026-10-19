@@ -33,7 +33,7 @@ release-smoke ALL PASS（[docs/release.md](../../docs/release.md)）。pack 保�
 - 委派子会话的签字审批到不了人（子会话审批面宿主侧受限）——人机审批实际是 Lead 专属（上游 seam 候选，见[归档搁置池](../../_backlog/_archive/legacy/suspended.md)）。
 - 浮窗 raise 置顶依赖 CSS 垫片（vendor rc.2 缺陷；上游修复后撤垫片）。
 - 依赖图画布按栏宽等比缩放（`transform: scale()`，fitScale 下限 0.75；**不用 CSS 宽度缩放**——Safari 里 foreignObject 文字不跟缩，会堆向左上角）；更宽的图（约 ≥5 个并行根任务）缩到下限后横向滚动。
-- **依赖图串行长链高度可超单屏**（2026-10-19）：`fitScale` 只缩宽、不缩高；21 节点串行链高 2366px，窄 pane 自带纵向滚动（真 21 节点整页双滚动未测；接受度待用户判，见[看板卡](../../_backlog/issues/2026-10-19-board-dag-ux-deep-dive.md)）。
+- **依赖图串行长链高度可超单屏**（2026-10-19）：`fitScale` 只缩宽、不缩高；21 节点串行链高 2366px，窄 pane 自带纵向滚动（真 21 节点整页双滚动未测；接受度待用户判，见[看板卡](../../_backlog/_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)）。
 - 浮窗几何记忆（位置/大小按页签 contentId 存 localStorage）按 **origin** 隔离：同一次服务运行 + 页面刷新有效；换端口重启即新 origin、记忆清零（vendor 侧栏布局持久化同此边界）。
 - 成员会话常驻注入基线 ≈ 手册 17.4KB（2026-10-02 实测；随手册增长）：preset `agent-instructions.maxBytes` 钉 32768 且 **verify `handbook-budget` 门禁强制"手册字节 + 1024B ≤ maxBytes"**（超限 = agent-instructions **静默截断**手册尾部——2026-10-02 曾实测活 bug：预算 16384 落地时手册仅 1.2KB，手册长过预算后"工作纪律"节从未注入、行数栅栏与 overlay 层核对都没抓到；负例即该门禁出生现场）。
 - **上网能力（`web_search` / `web_fetch`）必须随每个 preset 声明**：web-app bundle 把 host 上的 `tool-web` 行 `disabled: true`，改为按 agent preset 组合（vendor base 注释原文）——所以它**不是**全局继承来的；漏声明时角色与它 spawn 的 child 都静默无联网。子会话（`subagent` / team teammate）**继承 Lead 的组合**（`composeFrom`；roles-isolation §2/§4），故 Lead 有即可，不必另配。

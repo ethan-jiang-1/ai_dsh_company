@@ -8,12 +8,11 @@
 
 | 问题 | 状态 | 当前一步 |
 |---|---|---|
-| [① 看板 + 依赖图 UX 深挖](2026-10-19-board-dag-ux-deep-dive.md) | 等人拍板 🔒 | 判窄栏接受度；接受则收口 |
-| [② 任务板 UX 深挖](2026-10-19-taskboard-table-ux-deep-dive.md) | 推敲中，blockedBy 看板 | 等看板收口 |
+| [② 任务板 UX 深挖](2026-10-19-taskboard-table-ux-deep-dive.md) | 推敲中，可动 | 先拍依赖列格式，再进 plan mode |
 | [③ 台账 UX 深挖](2026-10-19-ledger-ux-deep-dive.md) | 推敲中，blockedBy 任务板 | 等任务板收口 |
 | [成品台账——要不要列公司产出](2026-10-19-deliverables-ledger.md) | 推敲中，blockedBy 台账 | 等三张面板卡收口 |
 
-已结问题见 [归档](../_archive/README.md)（含 issue 卡质量、公司面优先级、agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
+已结问题见 [归档](../_archive/README.md)（含 issue 卡质量、公司面优先级、看板+依赖图、agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 
 ## 边界与尺寸
 
