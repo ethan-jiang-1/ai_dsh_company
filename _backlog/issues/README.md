@@ -8,10 +8,9 @@
 
 | 问题 | 状态 | 当前一步 |
 |---|---|---|
-| [③ 台账 UX 深挖](2026-10-19-ledger-ux-deep-dive.md) | 等人拍板 🔒 | 人读计时：你读一行或标未执行 |
-| [成品台账——要不要列公司产出](2026-10-19-deliverables-ledger.md) | 推敲中，blockedBy 台账 | 等台账收口 |
+| [成品台账——要不要列公司产出](2026-10-19-deliverables-ledger.md) | 推敲中，可动 | 等你定：现在推敲 / 以后做 / 不做 |
 
-已结问题见 [归档](../_archive/README.md)（含 issue 卡质量、公司面优先级、看板+依赖图、任务板、agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
+已结问题见 [归档](../_archive/README.md)（含 issue 卡质量、公司面优先级、看板+依赖图、任务板、台账、agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 
 ## 边界与尺寸
 

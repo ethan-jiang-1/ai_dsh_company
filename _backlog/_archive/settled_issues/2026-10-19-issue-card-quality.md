@@ -9,7 +9,7 @@ opened: 2026-10-19
 
 ## 当前结论（只写 now）
 
-四张公司面卡（[父卡](2026-10-19-company-panels-ux-priority.md)、[看板/依赖图](2026-10-19-board-dag-ux-deep-dive.md)、[任务板](2026-10-19-taskboard-table-ux-deep-dive.md)、[台账](../../issues/2026-10-19-ledger-ux-deep-dive.md)）的**证据不差**；收口前的问题是当前态/历史混写、状态/门票/依赖不匹配、索引与研究稿旧结论没清、证据层/样本口径不标。**用户拍 A（内容收口）**，本轮已执行；B（Card v2 结构）以后做，C（ask/plan/todo/goal）不是三选一，而是后续每张卡的执行协议。
+四张公司面卡（[父卡](2026-10-19-company-panels-ux-priority.md)、[看板/依赖图](2026-10-19-board-dag-ux-deep-dive.md)、[任务板](2026-10-19-taskboard-table-ux-deep-dive.md)、[台账](2026-10-19-ledger-ux-deep-dive.md)）的**证据不差**；收口前的问题是当前态/历史混写、状态/门票/依赖不匹配、索引与研究稿旧结论没清、证据层/样本口径不标。**用户拍 A（内容收口）**，本轮已执行；B（Card v2 结构）以后做，C（ask/plan/todo/goal）不是三选一，而是后续每张卡的执行协议。
 
 **A 已完成**：
 

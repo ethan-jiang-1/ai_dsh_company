@@ -13,7 +13,7 @@ opened: 2026-10-19
 
 1. **看板 + 依赖图**（[卡](2026-10-19-board-dag-ux-deep-dive.md)）——现有 `dag-visual` / `dag-midflight` / `board-drift` 探针 + 真 wire 夹具；指挥视图；剩余修复小。
 2. **任务板**（[卡](2026-10-19-taskboard-table-ux-deep-dive.md)）——依赖列显示格式是产品选择；入口键盘/落点要新探针。
-3. **台账**（[卡](../../issues/2026-10-19-ledger-ux-deep-dive.md)）——布局/键盘/触屏已有 `ledger-summary-probe`；主要剩人读计时。
+3. **台账**（[卡](2026-10-19-ledger-ux-deep-dive.md)）——布局/键盘/触屏已有 `ledger-summary-probe`；主要剩人读计时。
 
 **排序判据**（本卡采用）：① 现有证据 owner 能否直接复用（keyless spec / 视觉探针 / 夹具）；② 用户可感知影响（指挥视图 > 表格可读性 > 归档查阅）；③ 单张卡的实施代价。三项一起看，不单看「缺陷数量」。
 
