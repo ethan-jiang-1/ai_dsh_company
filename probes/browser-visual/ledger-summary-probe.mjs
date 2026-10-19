@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 何时跑：LedgerTab 摘要显示/全文入口变更后；真实浏览器，不进入 pnpm test。
-// 前置：已启动公司观察窗 URL 和含台账的历史会话标题；用法：node 本脚本 '<token-url>' '<title>'。
+// 前置：已启动公司观察窗 URL 和含台账的历史会话标题；用法：node 本脚本 '<token-url>' '<title>' [--expected-rows N] [--fixture]。
 // 断言面（RFC 批 3 第 1 条）：宽/窄视口的行高都稳定在两行内；被裁切的行必有全文入口；
-//   鼠标、键盘、触屏都能取到全文；短摘要直接可读。
+//   鼠标、键盘、触屏都能取到全文；短摘要直接可读；台账页签新鲜度 = 每 30 秒自动刷新。
 // 产物两处：判定 JSON 与过程截图落 `runtime/human-exits-evidence/`（gitignored，随跑随新）；
 //   `--fixture` 时另把两档视口截图 + computed.json 写进 `snapshots/visual/ledger-summary/`（提交的视觉夹具，
 //   消费入口 = snapshots/README 的 visual 场景行；用户可见客户端改动按 tests/README 要同 diff 交视觉夹具）。
@@ -11,12 +11,15 @@ import assert from 'node:assert/strict'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
-import { dismissNotices, openCompanyTab, openSession } from '../../tools/lib/probe-window.mjs'
+import { dismissNotices, openCompanyTab, openSessionBySearch } from '../../tools/lib/probe-window.mjs'
 import { loadChromium, launchChromium } from '../../tools/drivers/playwright.mjs'
 
 const [url, title] = process.argv.slice(2)
 assert(url && title, '需要观察窗 URL 与会话标题')
 const fixture = process.argv.includes('--fixture')
+const expectedRows = process.argv.indexOf('--expected-rows') === -1
+  ? undefined
+  : Number(process.argv[process.argv.indexOf('--expected-rows') + 1])
 const outDir = join(repositoryRoot, 'runtime', 'human-exits-evidence')
 const fixtureDir = join(repositoryRoot, 'snapshots', 'visual', 'ledger-summary')
 await mkdir(outDir, { recursive: true })
@@ -30,9 +33,11 @@ try {
       await page.goto(url)
       await page.waitForTimeout(2500)
       await dismissNotices(page, ms => page.waitForTimeout(ms))
-      await openSession(page, title, ms => page.waitForTimeout(ms))
+      await openSessionBySearch(page, title, ms => page.waitForTimeout(ms))
       await openCompanyTab(page, '台账', ms => page.waitForTimeout(ms))
       const ledger = page.getByRole('list', { name: '动议台账' })
+      const label = await page.locator('.wk-pane-head .wk-meta').first().innerText().catch(() => '')
+      assert.equal(label, '每 30 秒自动刷新', `台账页签新鲜度文案不符（读到「${label}」）`)
       await ledger.locator('.wk-row-task').first().waitFor()
       // 先在选择会话之后收窄：折叠导航里选不中会话（390px 实测）。
       await page.setViewportSize({ width, height: 900 })
@@ -48,6 +53,9 @@ try {
         }
       }))
       assert(metrics.length > 20, `台账行太少（${metrics.length}）——会话选错或台账没加载`)
+      if (expectedRows !== undefined) {
+        assert.equal(metrics.length, expectedRows, `面板行数 ${metrics.length} ≠ parseMotionLedger(真文件) ${expectedRows}`)
+      }
       assert(metrics.some(x => x.button), '缺长摘要样本')
       assert(metrics.some(x => !x.button), '缺短摘要样本')
       assert(metrics.every(x => x.width > 40), `摘要宽度不足：${JSON.stringify(metrics.filter(x => x.width <= 40))}`)
@@ -92,7 +100,7 @@ try {
       await collapse.tap()
       assert.equal(await button.getAttribute('aria-expanded'), 'false', '触屏收起失败')
       const verdict = {
-        width, rows: metrics.length,
+        width, rows: metrics.length, label,
         maxLines: Math.max(...metrics.map(x => x.lines)),
         buttons: metrics.filter(x => x.button).length,
         clipped: metrics.filter(x => x.clipped).length,

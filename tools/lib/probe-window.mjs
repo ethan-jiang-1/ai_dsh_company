@@ -45,6 +45,28 @@ export async function openSession(page, title, sleep) {
 }
 
 /**
+ * 用会话搜索打开历史会话（侧栏标题被折叠/截断/虚拟化时，比按可见文字点更稳）。
+ * @param page - Playwright 页面。
+ * @param title - 会话标题（搜索框按子串匹配）。
+ * @param sleep - 探针自己的 sleep。
+ * @returns 无。
+ */
+export async function openSessionBySearch(page, title, sleep) {
+  const searchButton = page.getByRole('button', { name: 'Search sessions' })
+  if (await searchButton.count() > 0) {
+    if (await searchButton.getAttribute('aria-expanded') !== 'true') await searchButton.click()
+  }
+  await page.getByPlaceholder('Search session names').fill(title)
+  const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: title })
+  await result.first().waitFor({ state: 'visible', timeout: 20_000 })
+  await result.first().click()
+  await sleep(2000)
+  const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
+  if (await opener.count() > 0) await opener.click()
+  await sleep(800)
+}
+
+/**
  * 打开右栏的公司页签（按左侧指南条目的标签点）。
  * @param page - Playwright 页面。
  * @param label - 页签标签，如 `台账`。
