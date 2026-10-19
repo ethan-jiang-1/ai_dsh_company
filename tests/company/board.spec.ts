@@ -1,4 +1,9 @@
 /** 任务看板读模型（条目 ① S1）：列 / 卡 / 就绪 / 依赖边的 keyless 完成定义。 */
+// 负例留证 2026-10-19：守卫 BUG-027（`ready` 必须与官方 `projectTaskView` 同义）。
+//   实地造红→还原→绿：把 `board.ts` 的 `ready: task.ready ?? (status === 'pending' && readyOf(...))`
+//   改回 `ready: task.ready ?? readyOf(...)`（去掉 pending 半句）⇒ 本文件 2 条红
+//   （「真 wire 形状：非 pending 任务一律不报 ready」与「ready 字段缺失时回落值也不许比官方宽松」）；
+//   还原后 17 passed。配方可逐字复现：sed 那一行 → npx vitest run tests/company/board.spec.ts。
 import { describe, expect, it } from 'vitest'
 import {
   BOARD_STATUS_ORDER,
@@ -67,6 +72,44 @@ describe('tasksFromTeamView', () => {
     ]))
     expect(rows.find(row => row.id === 't2')?.ready).toBe(true)
   })
+
+  it('真 wire 形状：非 pending 任务一律不报 ready（官方语义，BUG-027 判据）', () => {
+    // 夹具 = 浏览器**真收到**的 wire 视图形状（`TeamTaskView`：带 ownerName、ready、writeScopes），
+    // 不是手造的宽松对象。官方 `ready = status === 'pending' && taskReady(...)`（task-view.ts:56）
+    // ⇒ 非 pending 恒 false。旧读模型在 `ready` 缺失时回落 `readyOf()`（只查依赖、不看 status），
+    // 会把已完成的卡报成"依赖已就绪"——本条就是那个 bug 的机器判据。
+    // 反证：把 board.ts 的 `status === 'pending' && readyOf(...)` 改回 `readyOf(...)` ⇒ 本条红。
+    const realWireShape = [
+      // 已完成的卡，依赖全完成，官方 ready === false（它就是官方给的值，不是缺失）
+      { id: 't1', subject: '前置', status: 'completed', revision: 1, ready: false, ownerName: 'vp-eng', writeScopes: [] },
+      { id: 't2', subject: '做完了', status: 'completed', revision: 2, blockedBy: ['t1'], ready: false, ownerName: 'coo', writeScopes: [] },
+      // 进行中的卡，依赖全完成，官方同样 ready === false
+      { id: 't3', subject: '在跑', status: 'in_progress', revision: 1, blockedBy: ['t1'], ready: false, ownerName: 'cfo', writeScopes: [] },
+      // 待办的卡，依赖全完成 ⇒ 官方 ready === true（唯一合法为真的形态）
+      { id: 't4', subject: '可开工', status: 'pending', revision: 1, blockedBy: ['t1'], ready: true, ownerName: 'vp-sales', writeScopes: [] },
+    ]
+    const rows = tasksFromTeamView({ members: [], tasks: realWireShape })
+    for (const row of rows) {
+      if (row.status === 'pending') continue
+      expect(row.ready, `${row.id}（${row.status}）不该报 ready`).toBe(false)
+    }
+    expect(rows.find(row => row.id === 't4')?.ready).toBe(true)
+    // owner 也要一个不丢（BUG-026 的判据：真 wire 形状上 ownerName 齐全 ⇒ 全部解析出显示名）
+    expect(rows.map(row => row.ownerName)).toEqual(['梦之队 VP-Eng', '梦之队 COO', '梦之队 CFO', '梦之队 VP-Sales'])
+  })
+
+  it('真 wire 形状：ready 字段缺失时回落值也不许比官方宽松（非 pending 不报 ready）', () => {
+    // 第二条独立判据：即便 wire 没给 `ready`（例如将来投影改版），回落也必须守住 pending 这一半。
+    const rows = tasksFromTeamView(view([
+      { id: 't1', subject: '前置', status: 'completed' },
+      { id: 't2', subject: '已完成的卡', status: 'completed', blockedBy: ['t1'] },
+      { id: 't3', subject: '进行中的卡', status: 'in_progress', blockedBy: ['t1'] },
+      { id: 't4', subject: '待办可开工', status: 'pending', blockedBy: ['t1'] },
+    ]))
+    expect(rows.find(row => row.id === 't2')?.ready).toBe(false)
+    expect(rows.find(row => row.id === 't3')?.ready).toBe(false)
+    expect(rows.find(row => row.id === 't4')?.ready).toBe(true)
+  })
 })
 
 describe('readyOf', () => {
@@ -96,8 +139,11 @@ describe('boardColumns', () => {
       { id: 't2', subject: '被卡', status: 'pending', blockedBy: ['t1'] },
     ])))
     const doing = columns.find(column => column.status === 'in_progress')
+    // ⚠ `ready: false` 是 2026-10-19 订正后的**正确**值（此前这条断言写的是 `true`，那正是 BUG-027）：
+    // 官方 `ready = status === 'pending' && taskReady(...)`，进行中的任务不可能是"可以开工"。
+    // 旧值 `true` 来自 `readyOf([])` 对空依赖恒真 + 不看自己的 status。
     expect(doing?.cards[0]).toMatchObject({
-      id: 't1', subject: '前置', ownerLabel: '梦之队 VP-Eng', revision: 2, ready: true,
+      id: 't1', subject: '前置', ownerLabel: '梦之队 VP-Eng', revision: 2, ready: false,
     })
     const todo = columns.find(column => column.status === 'pending')
     expect(todo?.cards[0]).toMatchObject({
@@ -185,6 +231,9 @@ describe('dependencyDrift（声明 vs 板面：2026-10-13 真事故的机器判�
     const card = columns.flatMap(column => column.cards).find(item => item.id === 'task-3')
     expect(card?.drift).not.toBeNull()
     expect(card?.blockedBy).toEqual([])
-    expect(card?.ready).toBe(true) // ← 板面说"就绪"，分叉 tag 说"声明依赖未落板"：两个信号并存
+    // ⚠ 2026-10-19 订正：此卡是 `in_progress`，`ready` 必须是 `false`（旧断言写 `true`，那是 BUG-027）。
+    // 分叉信号本身不受影响——drift tag 与 ready 是**两个独立信号**：前者说"文本里声明了依赖、板面没落边"，
+    // 后者说"这活现在能不能开工"。任务在跑 ⇒ 后者当然 false，与分叉无关。
+    expect(card?.ready).toBe(false)
   })
 })

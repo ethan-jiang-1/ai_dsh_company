@@ -114,7 +114,12 @@ export function BoardPanel({ columns }: { readonly columns: readonly BoardColumn
                 <div className="wk-card-subject">{card.subject}</div>
                 <div className="wk-card-foot">
                   <Tag tone={taskTone(column.status)}>{card.ownerLabel}</Tag>
-                  {card.blockedBy.length > 0 && (
+                  {/* 「依赖已就绪 / 等 …」只在**待办**卡上有意义：它是"这活现在能不能开工"的答案。
+                      已完成/进行中的卡挂这枚徽章只会制造噪声——2026-10-19 真投影实测：147 枚徽章里
+                      129 枚挂在已完成的卡上、2 枚挂在进行中的卡上，全是「等 …」的死信息（BUG-027）。
+                      门槛看 `column.status` 而不是 `card.ready`：后者对非 pending 恒 false，单看它会
+                      把 pending 的「等 …」也一起吞掉。 */}
+                  {column.status === 'pending' && card.blockedBy.length > 0 && (
                     <Tag tone={card.ready ? 'success' : 'warning'}>
                       {card.ready ? '依赖已就绪' : `等 ${card.blockedBy.join('、')}`}
                     </Tag>

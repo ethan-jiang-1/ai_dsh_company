@@ -155,9 +155,16 @@ export function toTaskStatus(value: string): TaskStatus {
 /**
  * 依赖是否全部完成——官方 `taskReady` 的同义实现（`task-board.ts:255-257`）：
  * `blockedBy.every(id => status(id) === 'completed')`；**悬空 id 视为未完成**（与官方 `.find` 语义一致）。
+ *
+ * ⚠ **本函数 ≠ 官方的 `ready`**（2026-10-19 订正，起因 = BUG-027）：官方
+ * `ready = task.status === 'pending' && taskReady(state, task)`（`task-view.ts:56`）——
+ * 它是「依赖检查 **∧ 自己是 pending**」，本函数**只做前半**，**不看自己的 status**。
+ * 一句话：`readyOf` 对一张已完成的卡也可能返回 `true`，那不是官方 `ready` 的意思。
+ * 所以调用方必须自己补上 pending 这一半（`tasksFromTeamView` 就是这么用的），
+ * 别把本函数当成 `ready` 的同义物。
  * @param blockedBy - 该任务的依赖 id 列表。
  * @param statusById - 当前全部任务的状态索引。
- * @returns 是否就绪。
+ * @returns 依赖是否全部完成（**不含**"自己是否 pending"）。
  */
 export function readyOf(blockedBy: readonly string[], statusById: ReadonlyMap<string, TaskStatus>): boolean {
   return blockedBy.every(id => statusById.get(id) === 'completed')
@@ -165,7 +172,11 @@ export function readyOf(blockedBy: readonly string[], statusById: ReadonlyMap<st
 
 /**
  * live 路径：`agentTeam` 投影 → 归一化任务行（过滤 `deleted`）。
- * `ready` 优先取官方 view 的值；缺失时按 `blockedBy` 现算（同一语义）。
+ *
+ * `ready` 与官方 `projectTaskView`（`task-view.ts:56`）**逐字同义**：
+ * `status === 'pending' && taskReady(...)`。wire 字段 `ready` 已带这个语义，缺失时才现算——
+ * **现算也必须补上 pending 这一半**，否则回落值比官方宽松（BUG-027 的教训：`??` 的右值
+ * 必须与左值同义，不能只是"看起来差不多"）。
  * @param view - 官方 `TeamView` 的读取子集。
  * @returns 任务行（顺序 = wire 顺序）。
  */
@@ -190,7 +201,8 @@ export function tasksFromTeamView(view: TeamViewLike): TaskRow[] {
         : displayNameFor(owner, owner === 'lead' ? 'lead' : 'teammate'),
       revision: task.revision ?? 0,
       blockedBy,
-      ready: task.ready ?? readyOf(blockedBy, statusById),
+      // ⚠ 右侧必须带 `status === 'pending'`：`readyOf` 只查依赖，官方 `ready` 还要求自己是 pending。
+      ready: task.ready ?? (status === 'pending' && readyOf(blockedBy, statusById)),
     })
   }
   return rows

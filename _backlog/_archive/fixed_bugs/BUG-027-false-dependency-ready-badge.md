@@ -1,12 +1,15 @@
 ---
-status: 调查中
+status: 已修
 severity: P1
 opened: 2026-10-19
 ---
 
 # BUG-027：「依赖已就绪」是假信号——徽章口径被放宽成"依赖都完成了"，与实际假信号正相反
 
-> 严重级别：P1（重要）｜发现：2026-10-19｜状态：调查中
+> 严重级别：P1（重要）｜发现：2026-10-19｜状态：已修
+>
+> **2026-10-19 已修**：根因经实证重写（见「结论」节）——卡上原写的 `ready ?? readyOf()` 回落**不可达**，
+> 真缺陷是**徽章渲染门槛不看 status**。修法 = 门槛加 `column.status === 'pending'` + 回落补 pending 半句 + 两条判据。
 
 ## 症状
 
@@ -102,3 +105,69 @@ console.log({cardsShowing_dependencyReadyTag_on_nonPending:falseReady, legit_pen
 - 依赖图同源（`dag.ts` 的 `waitingOn`）复核一遍：`会显示「可开工」的节点必须真的可开工`
   （现 `statusBadge` 对 pending 与 in_progress 都吐 `wk-dag-ready` 样式——见调研 §四，
   这是**同一族**的文案问题，是否搭车修由实施者判）。
+
+## 结论（2026-10-19 结）：症状真实，**根因不成立**，已按真根因修复
+
+### 一、卡上的根因链有一处硬错：`??` 那个回落**不可达**
+
+卡写「投影 field `ready` 在**已完成**任务上恒为 `false`，**触发了 `??` 的回落**」。
+**`false` 不会触发 `??`**——`??` 只在左值是 `null`/`undefined` 时回落。官方在非 pending 上给的是
+`false`（`task-view.ts:56` 的有效值），所以 `task.ready ?? readyOf(...)` 在真 wire 视图上**永远走左边**。
+
+实测（`tasksFromTeamView` 吃真 wire 视图）：`readyOnNonPending = 0`。构造用例也证实：
+官方 `false` 进 ⇒ 我们出 `false`，**没有回落**。所以「`??` 写成了 `||`」这个诊断是错的。
+
+### 二、真根因：**徽章渲染门槛不看 status**
+
+`company-panels.tsx:117` 的条件是 `card.blockedBy.length > 0`——**只要卡有依赖就挂徽章**，
+不管它是待办、进行中还是已完成。真 wire 数据实测 147 枚徽章：
+
+| 卡的 status | 徽章数 | 文案 |
+|---|---|---|
+| 待办 + 依赖已就绪 | **6** | 「依赖已就绪」← 唯一有意义的一档 |
+| 待办 + 依赖未完成 | 10 | 「等 …」← 有意义 |
+| **已完成** | **129** | 「等 …」← **噪声**（活早干完了） |
+| **进行中** | **2** | 「等 …」← 噪声 |
+
+⇒ 卡说的「131 张已完成卡白挂『依赖已就绪』」**也不对**：那 131 张显示的是「等 …」，不是「依赖已就绪」。
+噪声是真的，但形态与卡写的不一样。
+
+### 三、修了什么
+
+1. `company-panels.tsx`：门槛加 `column.status === 'pending'` ⇒ 徽章只在待办卡上出现
+   （129+2 枚噪声归零，6 枚「依赖已就绪」与 10 枚「等 …」保留）。
+2. `board.ts`：回落值补上 pending 半句（`status === 'pending' && readyOf(...)`）——
+   当前**不可达**，但一旦投影改版去掉 `ready` 就会生效，不补就是个埋着的同款陷阱。
+3. `board.ts`：`readyOf` 注释订正——它同义的是 **`taskReady`**（只查依赖），**不是 `ready`**。
+4. `presence.ts`：注释补上"别去 projcache 找 ownerName"（BUG-026 的成因，防下一个人再被带偏）。
+
+### 四、判据（全部红/绿实证过）
+
+- `tests/company/board.spec.ts`：**真 wire 形状**夹具（带 ownerName/ready/writeScopes）断言非 pending
+  一律不报 `ready`；另一条断言 `ready` 缺失时回落也不许放宽。
+  **反证**：把回落改回 `readyOf(...)` ⇒ 2 failed；还原 ⇒ 17 passed。
+- `tests/client/board-panel.spec.ts`：渲染面断言已完成的卡与进行中的卡**都不出现**依赖徽章，
+  且待办卡的两种真信号都还在（防门槛把合法标签一起吞掉）。
+  **反证**：门槛改回无条件 `blockedBy.length > 0` ⇒ 2 failed；还原 ⇒ 5 passed。
+
+### 五、同族第二处：任务板表格的「（阻塞）」（本轮搭车修了）
+
+`TasksPanel.tsx` 直接吃 wire 的 `ready`，判据是 `task.ready === false ? '（阻塞）' : ''`——
+与看板徽章**同一个 bug**（不看 status）。真 wire 实测：298 行里 **280 行**挂「（阻塞）」，
+其中 **273 行是非 pending**（活都干完了还标阻塞）。已修（条件加 `task.status === 'pending'`），
+判据 = `tests/client/tasks-table.spec.ts`（红/绿实证：门槛退回 ⇒ 2 failed，还原 ⇒ 3 passed）。
+
+### 六、未搭车（如实留缺口）
+
+- `dag.ts` / `statusBadge` 的「可开工」文案问题（in_progress 也吐 `wk-dag-ready`）**本轮未修**——
+  它是文案层同族问题，与本卡的假信号不是同一处；卡上原本就写"由实施者判"，本轮判**不搭车**，
+  留给依赖图那张深挖卡。
+- 真浏览器未开（本轮口径 = 读码 + 真数据 + keyless 渲染）；DOM 面另有 `board-panel.spec.ts` 的
+  静态渲染覆盖，视觉走查归 UX 深挖卡。
+
+### 七、暴露的失败类
+
+**回落值必须与官方语义等价，而不是"看起来差不多"。** `readyOf` 的注释自称与官方同义，
+但它同义的是 `taskReady`（依赖检查），而字段是 `ready`（依赖检查 ∧ 自己是 pending）——
+差一个合取项，读者就以为可以互换。这与 BUG-026/025 是同一族的第三例：
+**名实不符的"同义实现"注释，比没有注释更危险。**

@@ -10,7 +10,7 @@ intent: "为『公司面 UX 深挖先做哪几个面板』提供可复核的数�
 
 > ⚠ **本文已部分订正（2026-10-19，同轮复核）**：[真相复核](2026-10-19-panel-truth-audit.md) 实测出两处错——
 > ① **§二 第一行**把「993」记在"台账条目"名下是错的：台账面板读的是 `kb/motion-ledger.md`（**40 行动议**），
-> 993 是 `deliverables*` 的**文件数**（见 [BUG-025](../../bugs/BUG-025-ledger-reads-wrong-data-face.md)）；
+> 993 是 `deliverables*` 的**文件数**（见 [BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md)）；
 > ② **§四 历史痛点**按同一命令复跑已是 `LedgerTab` **10** 份（含本轮新卡），且其中 7 份是**同一件事**
 > （human-exits 批 3 的摘要显示线，已交付）⇒「痛点最多」不成立。
 > 另：§二 与 §六 给的 `agentTeam` 取法少了 `record` 一层，真路径 = `record.rows.agentTeam.val`。

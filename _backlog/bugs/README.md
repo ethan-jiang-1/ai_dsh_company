@@ -8,13 +8,19 @@
 
 ## 活跃清单
 
-| 卡 | 一句话 | 严重级 |
-|---|---|---|
-| [BUG-025](BUG-025-ledger-reads-wrong-data-face.md) | 台账面板读的是 40 行动议表，不是 993 份成品——父卡第一优先级论据作废 | P1 |
-| [BUG-026](BUG-026-owner-missing-from-team-projection.md) | `agentTeam` 投影不带 `ownerName`（ownerId 有 344/379）⇒ 看板/依赖图/任务板 owner 全「未分配」 | P1 |
-| [BUG-027](BUG-027-false-dependency-ready-badge.md) | `ready ?? readyOf()` 把官方语义放宽 ⇒ 131 张已完成卡白挂「依赖已就绪」 | P1 |
+目前无活跃缺陷卡。
 
-三条均**无浏览器、读码+真数据即可复核**；修法与判定见各卡。BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 已修 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**2026-10-19 三张卡收口**：BUG-025 四条判定逐条成立，已修迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；
+BUG-026 经实证为**误报**（wire 视图 ownerName 273/273 齐全，卡读的是 projcache 的 **state** 行）
+已结迁 [settled_issues](../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md)；
+BUG-027 症状真实但**根因不成立**（`ready ?? readyOf()` 在真 wire 上不可达），按真根因（徽章渲染门槛不看
+status）修复后迁 [fixed_bugs](../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)。
+
+⚠ **三张卡共用的教训**：复现脚本必须指到**消费者真正读的那一层**。025 量的是盘上的 deliverables
+（面板读的是动议表）、026/027 量的是 projcache 的 state（浏览器收的是 wire 视图）——
+量得再准，量的也是别的东西。
+
+BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 已修 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## frontmatter 与模板
 

@@ -77,6 +77,8 @@
 | [BUG-021-ask-user-question-no-scripted-answer-path.md](fixed_bugs/BUG-021-ask-user-question-no-scripted-answer-path.md) | 问询能自行收口：五角色 preset 钉 `tool-ask-user` 的 timed 形态（legacy 无界前台窗 ⇒ RPC 只吃 continued ⇒ 驱动永久挂起丢活） | 2026-10-18 |
 | [BUG-022-ask-user-unbounded-timeout-override.md](fixed_bugs/BUG-022-ask-user-unbounded-timeout-override.md) | 驱动侧停点判定：问询无配对结果时分类"有界等待/无界卡死/逾期"，看到无界就停并报（模型传 `timeout: -1` 那条路） | 2026-10-18 |
 | [BUG-024-cultivation-row-loses-action-after-failure.md](fixed_bugs/BUG-024-cultivation-row-loses-action-after-failure.md) | 失败后按钮卡「处理中…」：真根因=命令面可永不回话（`finally`+20s 截止边修好）；另修**验收仪器**竞态（断言要等收口，别在 t≈0 抓快照） | 2026-10-19 |
+| [BUG-025-ledger-reads-wrong-data-face.md](fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) | 台账数据面口径错配：面板读的是 40 行动议表，调研与四卡把「993 份成品」记在台账名下 ⇒ 订正文档口径 + 补一条钉住「数据面 = `kb/motion-ledger.md`」的判据 | 2026-10-19 |
+| [BUG-027-false-dependency-ready-badge.md](fixed_bugs/BUG-027-false-dependency-ready-badge.md) | 依赖徽章不看 status ⇒ 131 枚「等 …」噪声挂在已完成/进行中的卡上；**卡上原根因（`ready ?? readyOf()` 回落）经实证不可达**，真缺陷是渲染门槛 ⇒ 门槛加 pending 判据 + 回落补 pending 半句 + 两条 keyless 判据 | 2026-10-19 |
 
 ## 随卡归档的研究
 
@@ -95,6 +97,7 @@
 | [2026-10-13-external-patterns.md](research/agent-cultivation/2026-10-13-external-patterns.md) | 培养卡的外部一手实践（记忆/教学/评估与反证） | 2026-10-13 |
 | [2026-10-17-cultivation-gui-actions.md](settled_issues/2026-10-17-cultivation-gui-actions.md) | 培养 GUI 行动面的 UX 推敲（时刻地图/输入清单把手审计/迭代框架/体验协议）——已实施，去向 = 同名毕业 Note | 2026-10-17 |
 | [BUG-023-cultivation-float-actions-dead.md](settled_issues/BUG-023-cultivation-float-actions-dead.md) | 培养面板浮窗"点了没反应"= **误报**（浮窗正常；真凶是探针跨轮复用 id 撞上遗留方法目录 + 诊断漏读行内原话）⇒ 修的是探针卫生 | 2026-10-18 |
+| [BUG-026-owner-missing-from-team-projection.md](settled_issues/BUG-026-owner-missing-from-team-projection.md) | owner「全线缺失」= **误报**（wire 视图 ownerName 273/273 齐全；卡读的是 projcache 的 **state** 行，而 state = `TeamTaskSnapshot`，本就不含 ownerName/ready）⇒ 失败类 = 读盘上存了什么 ≠ 读消费者那一层 | 2026-10-19 |
 
 ## 暂停卡
 

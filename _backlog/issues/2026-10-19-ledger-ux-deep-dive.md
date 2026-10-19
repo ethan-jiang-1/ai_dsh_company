@@ -30,7 +30,7 @@ opened: 2026-10-19
 | 页面顶部「每 5 秒刷新」 | **文不对板**（`CompanyView.tsx:102` 对看板/依赖图/在场写 5 秒，三者实际是订阅推送） | 读码；**已在看板卡结算** |
 | 那份"2026-10-17 临港预审成品" | **不在动议表里**（`grep lingang-recon kb/motion-ledger.md` = 0）；它在 `deliverables/2026-10-17-lingang-recon/` | 实测 |
 
-⇒ **上一版「993 条 / 数据最大 / 成本最低」的前提作废**，见 [BUG-025](../bugs/BUG-025-ledger-reads-wrong-data-face.md)。
+⇒ **上一版「993 条 / 数据最大 / 成本最低」的前提作废**，见 [BUG-025](../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md)。
 **规模论据没消失，换了对象**：不是"行太多"，是"**行太长**"（663 字的摘要 ≈ 十屏），而这恰恰是台账
 2026-10-11 那条线（human-exits 批 3）已经在处理的事——所以"痛点 7 份"其实是**这个面板唯一被认真做过的一处**。
 

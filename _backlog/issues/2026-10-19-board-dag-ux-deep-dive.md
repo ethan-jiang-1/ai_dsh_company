@@ -19,12 +19,18 @@ opened: 2026-10-19
 
 **上一版把"正确性断言"当成本卡的核心，但没验过"真值本身"是什么样。本轮验了，结果改变了本卡的底：**
 
+> **2026-10-19 晚订正（本卡第三版）**：下表前三行曾据 projcache 的 **state** 行得出"owner 全缺、ready 放宽"，
+> 那读错了层——浏览器收的是 **wire 视图**（ownerName 273/273 齐全、ready 语义正确）。
+> 前两行**已作废**（[BUG-026](../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) 是误报），
+> 第三行**已修**（[BUG-027](../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md) 真根因 = 徽章门槛）。
+> ⇒ **本卡的核心不再是"修正确性缺陷"**（那些不成立），而是**呈现层 + 可读性**（刷新文案、依赖图措辞、窄栏）。
+
 | 事实 | 实测 | 取法/出处 |
 |---|---|---|
 | 非空板数 / 任务总数 | **84 / 379**；最大板 **21**；非空板中位 **4**（"中位 0"是含 1638 个空板算的） | [调研 §三](../research/company-panels-ux/2026-10-19-panel-truth-audit.md) |
-| **投影里 `ownerName` 覆盖率** | **0 / 379**（`ownerId` 却有 344） | 同上 → [BUG-026](../bugs/BUG-026-owner-missing-from-team-projection.md) |
-| 板面 owner 现状 | **379/379 全部「未分配」** | 读码 `board.ts:181-190` + 上游 `projection.ts:321-332` 剥字段 |
-| **「依赖已就绪」徽章** | 真投影上 **131 张带在已完成卡上**（假信号）、只有 6 张落在 pending 卡上 | [BUG-027](../bugs/BUG-027-false-dependency-ready-badge.md) |
+| ~~**投影里 `ownerName` 覆盖率**~~ | ~~**0 / 379**~~ ⇒ **❌ 作废：wire 视图 273/273 齐全，读模型解析出 344/379**（其余 35 张投影里真无 owner） | ~~同上~~ → 误报，见 [BUG-026 结论](../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) |
+| ~~板面 owner 现状~~ | ~~**379/379 全部「未分配」**~~ ⇒ **❌ 作废：未分配的只有真没 owner 的 35 张** | 同上 |
+| ~~**「依赖已就绪」徽章**~~ | ~~131 张带在已完成卡上~~ ⇒ **订正：那 131 张显示的是「等 …」噪声**（不是「依赖已就绪」）；真缺陷 = 徽章门槛不看 status，**已修**（现在 0 枚噪声） | [BUG-027](../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md) |
 | 声明 vs 板面分叉（drift） | **2/84 板、4 个任务**（稀有但真实） | 调研 §3.3 |
 | 「每 5 秒刷新」文案 | **假**：看板/依赖图/在场走 `useSessions` 投影推送，**无轮询** | 读码 `CompanyView.tsx:102` + `use-company-data.ts:103` |
 | 依赖图竖向尺寸 | 串行链 21 节点 = **高 2366px**（`fitScale` 只缩宽度、不缩高度） | 实跑 `layoutDag`（调研 §四） |
@@ -84,8 +90,10 @@ opened: 2026-10-19
 
 ## Review 指南（给 review 的人/Agent）
 
-- **要证伪的假设**：① "板面与投影一致"——**已被证伪**（owner 全缺、ready 放宽）；② "21 条在窄栏糊"
-  （要图，但已算出 2366px 高）；③ "白带徽章只是难看"——131 张卡在说"这活可以开始了"，是**指挥错误**。
+- **要证伪的假设**：① ~~"板面与投影一致"已被证伪（owner 全缺、ready 放宽）~~ **❌ 该"证伪"本身被证伪**：
+  wire 视图上 owner 齐全、ready 语义正确（读的是 projcache state 行，见顶部订正）；② "21 条在窄栏糊"
+  （要图，但已算出 2366px 高）；③ ~~"白带徽章是指挥错误"~~ ⇒ 订正为**呈现噪声**（131 枚「等 …」在已完成的卡上），已修。
 - **口径**：本卡只认**读模型 + golden 快照**做基准；截图审美争议不算缺陷，**不一致才算**。
-- **复核命令**：见[调研 §三](../research/company-panels-ux/2026-10-19-panel-truth-audit.md)
-  （注意上一版给的取法 `rows.agentTeam` 少了 `record` 一层，真实路径 = `record.rows.agentTeam.val`）。
+- **复核命令**：见[调研 §三](../research/company-panels-ux/2026-10-19-panel-truth-audit.md)。
+  ⚠ **取法警告**：`record.rows.agentTeam.val` 是投影的 **state**，**不是**浏览器收到的 wire 视图；
+  量 owner/ready 必须先过 `wire.view`（复刻 `projectTaskView` + `buildTeamProjection`），否则会重犯本轮误报。

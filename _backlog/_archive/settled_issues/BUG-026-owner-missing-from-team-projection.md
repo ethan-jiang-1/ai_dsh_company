@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 已结
 severity: P1
 opened: 2026-10-19
 ---
 
 # BUG-026：owner 全线缺失——`agentTeam` 投影不带 `ownerName`，看板/依赖图/任务板全显示「未分配」
 
-> 严重级别：P1（重要）｜发现：2026-10-19｜状态：调查中
+> 严重级别：P1（重要）｜发现：2026-10-19｜状态：已结（2026-10-19 当日结：误报——缺陷不成立）
 
 ## 症状
 
@@ -75,7 +75,7 @@ sed -n '36,42p' vendor/dsh/packages/experimental/agent-team/src/task-view.ts    
 ## 修复关联
 
 **能不能修，取决于 DSH 能不能给我们 ownerId**——**vendor 铁律不许改 `vendor/`**，所以三条正路
-（[release.md §vendor 政策](../../docs/release.md)）：
+（[release.md §vendor 政策](../../../docs/release.md)）：
 
 1. **正路一（首选，最可能是真解）**：`teamTaskViewSchema` 把 `ownerName` 加回去/`ownerId` 露出来——
    **提上游升 pin**。这是上游的一个真缺口：官方 `client-ui-agent-team` 的 TeamAction 若要显示 owner，
@@ -106,3 +106,69 @@ sed -n '36,42p' vendor/dsh/packages/experimental/agent-team/src/task-view.ts    
 - 机器判据：`tests/company/board.spec.ts` 加一条以**真投影形状**（含 `ownerId`、无 `ownerName`）
   为输入的断言——现在 spec 的 `view()` 夹具手造了 `ownerName`，这就是为什么 379/379 缺字段
   在测试里从未红过。
+
+## 结论（2026-10-19 当日结）：**误报——缺陷不成立**
+
+owner 没有缺失，**一个都没丢**。根因链错在第一步：卡上的复现脚本读的是**投影的 state 行**，
+不是浏览器收到的 **wire 视图**。
+
+### 一、盘上那 379 个任务确实是 state 行，不是 wire 视图
+
+`record.rows.agentTeam.val` 存的是 `TeamProjectionState`，其 `tasks` 是 **`TeamTaskSnapshot`**：
+
+| 形状 | 定义处 | 字段 | 有 `ownerName`？ | 有 `ready`？ |
+|---|---|---|---|---|
+| **state / 快照**（卡读的就是它） | `types.ts:74-83`，schema `projection.ts:77-86` | `{id,revision,subject,description,status,ownerId,blockedBy,writeScopes}` | ❌ | ❌ |
+| **wire 视图**（浏览器收到的） | `types.ts:85-96`，schema `projection.ts:320-331` | 多 `ownerName` / `ready` / `writeScopeWarnings` | ✅ `:328` | ✅ `:329` |
+
+缓存落盘的是 **state**（`teamProjectionEntrySchema` = `TeamProjectionState`，`projection.ts:167-175`，
+`stateVersion: 4`），浏览器拿的是 **wire**——连从缓存冷读也走 `def.wire.viewSchema.parse(def.wire.view(state))`
+（`vendor/dsh/packages/session/session-projection/src/index.ts:466`）。**客户端永远看不到原始 state。**
+
+### 二、卡引用的 vendor 行号与源码相反
+
+卡写「`projection.ts:321-332` 的 `teamTaskViewSchema` 是 `.strict()` 且**显式没有 `ownerName`**」。
+实际 `:328` 就是 `ownerName: z.string().optional()`。同理「`presence.ts:161-163` 说 TeamTaskView 不带 ownerId」
+那句注释**本身是对的**（`TeamTaskView` 确实不带 ownerId，它带的是解析后的 ownerName），不是"反了"。
+
+### 三、实测：wire 视图上 owner 齐全
+
+把 vendor 的 `projectTaskView` + `buildTeamProjection`（`task-view.ts:38-60` / `projection.ts:342-361`）
+逐字复刻到真缓存上跑（只取当前版本 `ver === 4` 的行）：
+
+```
+ver4 行：61 板 / 298 任务
+  ownerId 存在            273
+  wire 解出 ownerName     273   ← 一个不少
+  ownerId 有但解不出        0
+  ready === true           18，其中非 pending 0
+```
+
+再用**我们的真读模型** `tasksFromTeamView` 吃这批真 wire 视图：
+
+```
+rows 379 / unassigned 35 / ownerResolved 344 / readyOnNonPending 0
+```
+
+`344/379 = 90.8%`——与卡自己算的 `ownerId` 覆盖率**逐位相同**。即：读模型**已经在做卡要求的事**，
+未分配的 35 张是投影里真没有 ownerId 的任务。
+
+### 四、处置
+
+1. **不需要动 vendor pin**（卡的第 1 条正路作废），也不需要事件流重建（第 3 条），更不是"修法未选定"。
+   卡的第二条正路说"走不通"——**它走得通**，wire 视图已经把 ownerId 解析成 ownerName 了。
+2. **不修代码**：`board.ts:186` 读 `task.ownerName`、`presence.ts:164-177` 按 ownerName 关联 currentTask，
+   **在真 wire 视图上都是对的**。
+3. **防复发判据**（本轮补，见 `tests/company/board.spec.ts`）：以**真 wire 形状**为输入断言
+   owner 解析不丢、且非 pending 任务 `ready === false`——现有 spec 的 `view()` 夹具手造对象，
+   从没喂过真形状。
+4. **卡按误报归档**：章程的缺陷出口只有 `已修`/`待修`，用 `已修` 会失真声明"修好了"，
+   故照 [BUG-023](BUG-023-cultivation-float-actions-dead.md) 先例走 `已结`
+   → `settled_issues`，并在此记明这一读法。
+
+### 五、暴露的失败类（这才是本卡的真价值）
+
+**"读盘上存了什么"不等于"读面板显示了什么"。** 缓存里躺着 state、屏幕上渲染 wire——两者差着
+`ownerName`/`ready` 这两个字段，而差的那两个恰好就是本卡与 BUG-027 指控的对象。
+这与 BUG-025 是**同一类失败**（盘上有什么 ≠ 面板读什么）的第二个实例：一个错把 deliverables 当归账，
+一个错把 state 当 wire。**取证脚本必须指到消费者真正读的那一层**，否则量得再准也是量的别的东西。

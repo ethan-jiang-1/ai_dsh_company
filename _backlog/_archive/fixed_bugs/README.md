@@ -4,6 +4,7 @@
 
 ## 修复流水（倒序）
 
+- **BUG-025**（2026-10-19）：台账数据面的口径错配——面板一直读 `kb/motion-ledger.md`（40 行动议表），而调研与四张卡把「993 份成品」记在台账名下，下游论证全线继承。修法 = 订正文档口径（面板代码本就正确）+ 补一条钉住「面板数据面 = `kb/motion-ledger.md`」的判据（`tests/client/client-face.spec.ts`；红/绿实证：改路径 ⇒ 1 failed，还原 ⇒ 5 passed）。真正的收获是失败类：**盘上有什么 ≠ 面板读什么**，那条连线此前无人查。详见 [卡](BUG-025-ledger-reads-wrong-data-face.md)。
 - **BUG-019**（2026-10-16）：判据加「证据可得性」维——显式声明 `evidenceMissingBefore`（CLI `--evidence-from`）后，该期内无 present 背书的成品由违规降为观察项 `present-evidence-missing`；不声明维持严格判红。深挖同时推翻首版诊断（本案是**真阳性**：收口会话从未调 `present`）。详见 [卡](BUG-019-final-present-evidence-lost.md)。
 - **BUG-020**（2026-10-16）：收敛半态可续跑——清 live journal 判 tracked（未跟踪走 `rmSync`，不再因「角色刚写未入库的 journal」崩在半途）＋新增 `converge --resume <目录名>`（只做剩余步骤、不搬移交付物；不可续跑时 fail-loud 给恢复指引）；判定纯函数 = `convergenceResume`。详见 [卡](BUG-020-converge-crash-untracked-journal.md)。
 - **BUG-018**（2026-10-16）：署名审计的写入者归属补「基础角色」规范化——`tools/lib/authorship.mjs` 新增 `baseRoleOf`（只抹 `<角色>-<数字>` 实例后缀），判档与显示用基础角色、原始 preset 存 `writerRaw`；真盘 `authorship-audit` 由「署名不实 10 + exit 1」变「署名不实 0 + ALL PASS」。守卫 = 同 spec 的「规范化只抹实例后缀，不吞跨角色差异」。详见 [卡](BUG-018-authorship-instance-preset-false-positive.md)。

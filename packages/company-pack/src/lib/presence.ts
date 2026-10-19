@@ -159,7 +159,10 @@ function firstText(content: readonly { type: string; text?: string }[]): string 
 
 /**
  * live 路径：`TeamView` 快照 → 在场板行（D-a/D-c）。当前任务按 **ownerName** 关联——
- * `TeamTaskView` 不带 ownerId，只有 ownerName（vendor types.ts:85-97）。
+ * `TeamTaskView` 不带 ownerId，只有 ownerName（vendor types.ts:85-97）。**这是正确的**：
+ * ownerName 由 host 侧 `projectTaskView` 从 ownerId 解析（含 lead 特判），到 wire 时已经解好了。
+ * ⚠ 别去 `session_projcache` 里找 ownerName——那里存的是 `TeamTaskSnapshot`（有 ownerId、无 ownerName），
+ * 是投影的 **state**，不是本函数吃的 wire 视图（2026-10-19 BUG-026 误报的成因）。
  */
 export function rowsFromTeamView(view: TeamViewLike): PresenceRow[] {
   return view.members.map(member => ({

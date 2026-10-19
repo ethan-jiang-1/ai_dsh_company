@@ -8,12 +8,35 @@ intent: "把『公司面面板 UX 深挖』四张卡里可机械复核的事实�
 服务活卡：[公司面 UX 深挖——先做哪几个面板](../../issues/2026-10-19-company-panels-ux-priority.md) 与它拆出的三张深挖卡
 （[台账](../../issues/2026-10-19-ledger-ux-deep-dive.md)｜[看板 + 依赖图](../../issues/2026-10-19-board-dag-ux-deep-dive.md)｜
 [任务板](../../issues/2026-10-19-taskboard-table-ux-deep-dive.md)）及三张缺陷卡
-（[BUG-025](../../bugs/BUG-025-ledger-reads-wrong-data-face.md)｜[BUG-026](../../bugs/BUG-026-owner-missing-from-team-projection.md)｜
-[BUG-027](../../bugs/BUG-027-false-dependency-ready-badge.md)）。
+（[BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md)｜[BUG-026](../../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md)｜
+[BUG-027](../../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)）。
 
 **口径**：本轮 = **读码 + 真数据实跑**，**没开浏览器**。凡标「实测」的都有本文件给出的可复跑命令；
 凡标「待真浏览器」的仍是假设。上一份调研（`2026-10-19-panel-inventory-and-priority.md`）的**数据量数字有两条要改**
 （见 §一），本文件是它的增补与订正，不是替代。
+
+> ## ⚠ §三 的取法错了（2026-10-19 晚补正，结论反转）
+>
+> 本文件 §三 的脚本读 `record.rows.agentTeam.val.tasks`——那是投影的 **state**（`TeamTaskSnapshot`），
+> **不是浏览器收到的 wire 视图**（`TeamTaskView`）。缓存落盘的是 state，wire 视图由 `wire.view(state)`
+> 现算（`session-projection/src/index.ts:466`）。两者差着 `ownerName` 与 `ready` 两个字段——
+> **恰好就是 §3.1/§3.2 指控的对象**。
+>
+> 按 wire 视图重跑（复刻 vendor `projectTaskView` + `buildTeamProjection`，只取当前版本 `ver === 4` 的行）：
+>
+> ```
+> 61 板 / 298 任务：ownerId 273 → wire ownerName 273（解不出 0）
+>                   ready === true 18，其中非 pending 0
+> 我们的真读模型 tasksFromTeamView 吃这批真 wire：379 行 / 已解析 owner 344 / readyOnNonPending 0
+> ```
+>
+> ⇒ **§3.1 的结论作废**（owner 一个都没丢；[BUG-026](../../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) 是误报）；
+> **§3.2 的根因作废**（`??` 回落不可达——官方给的是 `false` 这个有效值，不触发回落），但**症状是真的**，
+> 真根因是**徽章渲染门槛不看 status**（147 枚徽章里 129 枚挂在已完成的卡上、2 枚挂在进行中的卡上），
+> 已按真根因修复，见 [BUG-027](../../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)「结论」节。
+> 下面 §三 的脚本与两节原文**保留作为错误样本**（根因纪律：被证伪的假设留在原地，不抹掉），
+> 但**不要再用它们做判断**。§3.3 的 drift 脚本只读 subject/description/blockedBy/status——这四个字段
+> state 与 wire 都有且同值，**该节结论不受影响**。
 
 ---
 
@@ -21,7 +44,7 @@ intent: "把『公司面面板 UX 深挖』四张卡里可机械复核的事实�
 
 | 上份调研的说法 | 本轮实测 | 订正理由 |
 |---|---|---|
-| 「台账条目 **993**（当前 98 + 归档 895）」 | 台账面板实渲染 **40 行**（`kb/motion-ledger.md` 的动议表）；993 = `deliverables*` 目录的**文件数** | 两个面混用了。见 [BUG-025](../../bugs/BUG-025-ledger-reads-wrong-data-face.md) |
+| 「台账条目 **993**（当前 98 + 归档 895）」 | 台账面板实渲染 **40 行**（`kb/motion-ledger.md` 的动议表）；993 = `deliverables*` 目录的**文件数** | 两个面混用了。见 [BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) |
 | `LedgerTab` 命中 **7** 份文档 | 按同一命令 `grep -rl LedgerTab notes/ _backlog/ docs/` 实测 **10** 份（含（_backlog 里 3 份是这轮刚写的卡/research） | 数字本身没钉脚本与时点，复跑已不同频；"痛点 7 份"多半是**现在的卡在自我引用**，不是历史痛点 |
 | 最大板 21 条、中位 **0** | 最大 21 条、非空会话 84、**非空板的中位 4 条**（"中位 0"是含 1638 个空板一起算的） | 两个中位数说的是不同问题；对"最大板有多难受"应该看 84 个非空板 |
 
@@ -98,7 +121,7 @@ console.log({files:files.length,withTeam,total,nonEmpty,max:Math.max(...sizes),
 #        tasksWithOwnerId:344, tasksWithOwnerName:0}
 ```
 
-### 3.1 owner 100% 缺失 ⇒ [BUG-026](../../bugs/BUG-026-owner-missing-from-team-projection.md)
+### 3.1 owner 100% 缺失 ⇒ ~~BUG-026~~ **【已证伪，见顶部补正】**
 
 真任务对象长这样（storage 里**有** ownerId，**无** ownerName）：
 
@@ -111,10 +134,11 @@ console.log({files:files.length,withTeam,total,nonEmpty,max:Math.max(...sizes),
 上游 `projection.ts:321-332` 的 `teamTaskViewSchema` 是 `.strict()` 且**不含** `ownerName`/`ownerId`；
 而 `task-view.ts:38` 的工具视图**带** ownerName——**两个形状，我们读错了那个**。
 
-⇒ 「看板的正确性（板面 owner = 投影真值）能否断言」这个问题的诚**实答案是：真值为空，
-渲染也为空——断言会假绿**。这就是为什么看板卡的验收标准必须**换底**（见 §五）。
+⇒ ~~「看板的正确性（板面 owner = 投影真值）能否断言」这个问题的诚**实答案是：真值为空，
+渲染也为空——断言会假绿**。这就是为什么看板卡的验收标准必须**换底**（见 §五）。~~
+**❌ 这段已证伪**：wire 视图上 owner 齐全，断言不会假绿。看板卡的验收标准**不必**因本条换底。
 
-### 3.2 ready 语义被放宽 ⇒ [BUG-027](../../bugs/BUG-027-false-dependency-ready-badge.md)
+### 3.2 ready 语义被放宽 ⇒ ~~该根因~~ **【已证伪；症状真，真根因 = 徽章门槛，见顶部补正】**
 
 ```sh
 node -e "

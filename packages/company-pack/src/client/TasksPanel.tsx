@@ -48,7 +48,13 @@ export function TasksTableView({ view }: { readonly view: TeamViewLike | null })
                     <td data-col="id"><span className="wk-cell-id">{task.id}@{task.revision ?? 0}</span></td>
                     <td data-col="subject">{task.subject}</td>
                     <td data-col="status">
-                      {STATUS_LABEL[task.status] ?? task.status}{task.ready === false ? '（阻塞）' : ''}
+                      {/* 「（阻塞）」只在**待办**行上有意义：`ready` 的官方语义是
+                          `status === 'pending' && taskReady(...)`（`task-view.ts:56`），
+                          非 pending 时恒 false——单看 `ready === false` 会给**已完成/进行中**的行
+                          也挂上「（阻塞）」。2026-10-19 真 wire 实测：298 行里 280 行挂了该标记，
+                          其中 273 行是非 pending（活都干完了还标阻塞）。同 BUG-027 族的第二处。 */}
+                      {STATUS_LABEL[task.status] ?? task.status}
+                      {task.status === 'pending' && task.ready === false ? '（阻塞）' : ''}
                     </td>
                     <td data-col="owner">{task.ownerName ?? '未分配'}</td>
                     <td data-col="blocked">{(task.blockedBy ?? []).join(',') || '—'}</td>
