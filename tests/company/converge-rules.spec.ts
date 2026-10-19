@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { archiveMovePlan, canonicalParticipation, charterHasEntry, convergenceResume, journalPresence, journalSlug, parseFlags, pickArchivedJournal, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
+import { archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalPresence, journalSlug, parseFlags, pickArchivedJournal, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
 const TMP: string[] = []
 afterAll(() => { for (const d of TMP) rmSync(d, { recursive: true, force: true }) })
 
@@ -232,5 +232,14 @@ describe('converge-rules · 归档搬移计划（2026-10-13：drafts 不进 git 
     expect(plan.from).toBe('company-workspace/deliverables/2026-10-13-demo-slug')
     expect(plan.to).toBe('company-workspace/deliverables-archive/2026-10-13-demo-slug')
     expect(plan.gitArgs).toEqual(['add', '-A', '--', plan.from, plan.to])
+  })
+})
+
+describe('converge-rules · 成品索引重建命令（2026-10-20；收敛后自动重建）', () => {
+  it('命令指向生成器，cwd = 仓库根；收敛器不重写扫描逻辑', () => {
+    const invocation = catalogIndexInvocation({ root: '/repo', execPath: '/node' })
+    expect(invocation.command).toBe('/node')
+    expect(invocation.args).toEqual(['/repo/tools/deliverables-index.mjs'])
+    expect(invocation.cwd).toBe('/repo')
   })
 })

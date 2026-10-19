@@ -91,7 +91,10 @@ if (sessionId === undefined) {
     const file = join(bucket, dir, sessionId, 'session.v4.jsonl.zstd')
     if (!existsSync(file)) continue
     const text = execFileSync('zstd', ['-d', '-c', file], { maxBuffer: 256 * 1024 * 1024 }).toString('utf8')
-    const line = text.split('\n').find(entry => entry.includes('"session/title"'))
+    // 一个会话可能有多次 title 事件（首题生成 + 后续改名）；UI 显示的是**最后一条**。
+    // 旧实现取第一条，导致 21 节点真样本 session-133c5cde 的搜索标题对不上、probe 超时。
+    const lines = text.split('\n').filter(entry => entry.includes('"session/title"'))
+    const line = lines.at(-1)
     if (line !== undefined) TITLE = JSON.parse(line).data?.title ?? TITLE
     break
   }
@@ -204,6 +207,8 @@ const measureNarrow = async () => {
 
 if (EXISTING !== undefined) {
   await shoot('final')
+  // 既有会话复看：run.json 记录本次实际复看的会话（final/narrow 与它一致；waves/completed 无新跑动议 = 0）。
+  writeFileSync(join(SHOTS, 'run.json'), JSON.stringify({ sessionId, title: TITLE, waves: 0, completed: 0, note: '既有会话复看（非新跑动议）' }, null, 2) + '\n', 'utf8')
   if (NARROW) await measureNarrow()
   console.log('\ndag-midflight-probe: 既有会话截图完成')
   try { child.kill('SIGTERM') } catch { /* 已退出 */ }

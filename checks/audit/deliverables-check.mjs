@@ -17,6 +17,7 @@
 //   node checks/audit/deliverables-check.mjs --workspace snapshots/replay/r4-motion/workspace.expected \
 //        --sessions snapshots/replay/r4-motion --only support-sla-page   # 审快照里本轮那一件
 //   node checks/audit/deliverables-check.mjs --evidence-from 2026-10-01   # 声明「该日期前的日志不可得」
+//   node checks/audit/deliverables-check.mjs --json   # 人类报告 + 最后一行 JSON:{finals,presented,...}（成品目录生成器用）
 //        ⇒ 该期内无 present 背书的成品降为观察项 present-evidence-missing（不判红；BUG-019）
 //
 // ⚠ 审归档快照必须配 `--only <slug>`：快照的 `workspace.expected/` 是**整盘拷贝**，而
@@ -43,6 +44,8 @@ const LEGACY_FLAT = process.argv.includes('--legacy-flat')
 const ONLY_SLUG = arg('only')
 /** 证据可得性（BUG-019）：声明「该日期之前的会话日志不可得」⇒ 该期内无 present 背书的成品降观察档。 */
 const EVIDENCE_FROM = arg('evidence-from')
+/** 机器可读摘要（成品目录生成器用）：人类报告之后追加一行 `JSON:{...}`。 */
+const JSON_OUT = process.argv.includes('--json')
 
 const workspaceRel = arg('workspace', 'company-workspace')
 const workspace = resolve(ROOT, workspaceRel)
@@ -261,16 +264,30 @@ console.log(`  过程稿 ${result.drafts.length} 份`)
   violations.push(...archived.violations)
   warnings.push(...archived.warnings)
 }
+/** 机器可读摘要（成品目录生成器消费）：人类报告之后追加一行 `JSON:{...}`，含 finals/presented。 */
+const emitJson = () => {
+  console.log(`JSON:${JSON.stringify({
+    workspace: workspaceRel,
+    sessions: sessions.length,
+    finals: result.finals.map(row => ({ slug: row.slug, path: row.path })),
+    presented: [...result.leadFinalSlugs].sort(),
+    violations: violations.map(row => ({ code: row.code, path: row.path })),
+    warnings: warnings.map(row => row.code),
+  })}`)
+}
+
 if (warnings.length > 0) {
   console.log(`  观察项 ${warnings.length} 条（不判违规，但每次都提醒）：`)
   for (const w of warnings) console.log(`    ${w.code} | ${w.detail}`)
 }
 if (violations.length === 0) {
   console.log('  违规 0 条 —— ALL PASS')
+  if (JSON_OUT) emitJson()
   process.exit(0)
 }
 console.log(`  违规 ${violations.length} 条：`)
 for (const violation of violations) {
   console.log(`    ${violation.code} | ${violation.path}\n      ${violation.detail}`)
 }
+if (JSON_OUT) emitJson()
 process.exit(1)

@@ -18,22 +18,22 @@ import { sessionFileAddress } from '../../packages/company-pack/src/lib/delivera
 const CATALOG = parseCatalog(JSON.stringify({
   schema: 1,
   generatedAt: '2026-10-19T15:14:50.242Z',
-  counts: { total: 3, active: 2, archive: 1, unledgered: 2 },
+  counts: { total: 3, active: 2, archive: 1, unledgered: 2, presented: 1, notPresented: 1, presentUnknown: 1 },
   entries: [
     {
       slug: 'ledgered-one', kickoff: '2026-10-19', type: '诊断', result: '已完成',
       summary: '一句结论一：这是看板上的成品摘要。', root: 'deliverables',
-      dir: '2026-10-19-ledgered-one', path: 'deliverables/2026-10-19-ledgered-one/final.md', ledgered: true,
+      dir: '2026-10-19-ledgered-one', path: 'deliverables/2026-10-19-ledgered-one/final.md', ledgered: true, presented: true,
     },
     {
       slug: 'archive-two', kickoff: '2026-10-12', type: '生产', result: '已采纳',
       summary: '一句结论二：归档件。', root: 'deliverables-archive',
-      dir: '2026-10-12-archive-two', path: 'deliverables-archive/2026-10-12-archive-two/final.md', ledgered: false,
+      dir: '2026-10-12-archive-two', path: 'deliverables-archive/2026-10-12-archive-two/final.md', ledgered: false, presented: false,
     },
     {
       slug: 'active-three', kickoff: '2026-10-19', type: '口径问答', result: '判不了',
       summary: '一句结论三：台账外。', root: 'deliverables',
-      dir: '2026-10-19-active-three', path: 'deliverables/2026-10-19-active-three/final.md', ledgered: false,
+      dir: '2026-10-19-active-three', path: 'deliverables/2026-10-19-active-three/final.md', ledgered: false, presented: null,
     },
   ],
 })) as DeliverablesCatalog
@@ -52,6 +52,7 @@ describe('parseCatalog', () => {
     }))
     expect(parsed?.entries).toHaveLength(1)
     expect(parsed?.entries[0]?.ledgered).toBe(true)
+    expect(parsed?.entries[0]?.presented).toBeNull()
   })
 })
 
@@ -76,11 +77,14 @@ describe('DeliverablesView（静态渲染）', () => {
     openFinal: () => {},
   }))
 
-  it('先给统计：共 3 份 / 活跃 2 / 归档 1 / 台账外 2', () => {
+  it('先给统计：共 3 份 / 活跃 2 / 归档 1 / 台账外 2 / present 1 / 未 present 1 / 未核 1', () => {
     expect(html).toContain('共 <strong>3</strong> 份成品')
     expect(html).toContain('活跃 2')
     expect(html).toContain('归档 1')
     expect(html).toContain('台账外 2')
+    expect(html).toContain('present 1')
+    expect(html).toContain('未 present 1')
+    expect(html).toContain('present 未核 1')
   })
 
   it('按月分组，行里同时有 slug、日期/类型、结论、结果 tag 与「打开」', () => {
@@ -91,6 +95,8 @@ describe('DeliverablesView（静态渲染）', () => {
     expect(html).toContain('打开')
     expect(html).toContain('归档')
     expect(html).toContain('台账外')
+    expect(html).toContain('未 present')
+    expect(html).toContain('present 未核')
   })
 
   it('有可访问的目录与筛选面；行/打开按钮不是纯视觉', () => {

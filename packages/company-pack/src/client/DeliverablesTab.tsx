@@ -32,13 +32,15 @@ export interface DeliverablesCatalogEntry {
   readonly dir: string
   readonly path: string
   readonly ledgered: boolean
+  /** Lead `present` 背书：true/false；null = 审计不可得（未核，不冒充）。 */
+  readonly presented: boolean | null
 }
 
 /** 生成索引的完整形状。 */
 export interface DeliverablesCatalog {
   readonly schema: 1
   readonly generatedAt: string
-  readonly counts: { readonly total: number; readonly active: number; readonly archive: number; readonly unledgered: number }
+  readonly counts: { readonly total: number; readonly active: number; readonly archive: number; readonly unledgered: number; readonly presented: number; readonly notPresented: number; readonly presentUnknown: number }
   readonly entries: readonly DeliverablesCatalogEntry[]
 }
 
@@ -108,6 +110,7 @@ export function parseCatalog(text: string): DeliverablesCatalog | null {
       dir: textOf('dir'),
       path,
       ledgered: row.ledgered !== false,
+      presented: row.presented === true ? true : row.presented === false ? false : null,
     })
   }
   const counts = value.counts !== null && typeof value.counts === 'object' ? value.counts as Record<string, unknown> : {}
@@ -120,6 +123,9 @@ export function parseCatalog(text: string): DeliverablesCatalog | null {
       active: number('active'),
       archive: number('archive'),
       unledgered: number('unledgered'),
+      presented: number('presented'),
+      notPresented: number('notPresented'),
+      presentUnknown: number('presentUnknown'),
     },
     entries,
   }
@@ -146,6 +152,9 @@ export function DeliverablesView({ catalog, sessionId, openFinal }: {
     active: entries.filter(entry => entry.root === 'deliverables').length,
     archive: entries.filter(entry => entry.root === 'deliverables-archive').length,
     unledgered: entries.filter(entry => !entry.ledgered).length,
+    presented: entries.filter(entry => entry.presented === true).length,
+    notPresented: entries.filter(entry => entry.presented === false).length,
+    presentUnknown: entries.filter(entry => entry.presented === null).length,
   }), [entries])
   const filtered = filterCatalog(entries, filter)
   const groups = useMemo(() => {
@@ -168,6 +177,9 @@ export function DeliverablesView({ catalog, sessionId, openFinal }: {
         <Tag tone="info">活跃 {counts.active}</Tag>
         <Tag tone="outline">归档 {counts.archive}</Tag>
         {counts.unledgered > 0 && <Tag tone="warning">台账外 {counts.unledgered}</Tag>}
+        {counts.presented > 0 && <Tag tone="success">present {counts.presented}</Tag>}
+        {counts.notPresented > 0 && <Tag tone="warning">未 present {counts.notPresented}</Tag>}
+        {counts.presentUnknown > 0 && <Tag tone="outline">present 未核 {counts.presentUnknown}</Tag>}
       </div>
       <div className="wk-catalog-filters" role="group" aria-label="成品筛选">
         {FILTERS.map(item => (
@@ -196,13 +208,15 @@ export function DeliverablesView({ catalog, sessionId, openFinal }: {
                       key={entry.path}
                       role="listitem"
                       className="wk-row wk-deliverable-row"
-                      aria-label={`${entry.kickoff} ${entry.slug}，${entry.type || '未分型'}，${entry.result || '未填结果'}${entry.root === 'deliverables-archive' ? '，归档' : ''}${entry.ledgered ? '' : '，台账外'}`}
+                      aria-label={`${entry.kickoff} ${entry.slug}，${entry.type || '未分型'}，${entry.result || '未填结果'}${entry.root === 'deliverables-archive' ? '，归档' : ''}${entry.ledgered ? '' : '，台账外'}${entry.presented === true ? '，已 present' : entry.presented === false ? '，未 present' : '，present 未核'}`}
                     >
                       <span className="wk-row-name">
                         <Tag tone={resultTone(entry.result)}>{entry.result || '未填'}</Tag>
                         <span className="wk-deliverable-slug" title={entry.slug}>{entry.slug}</span>
                         {entry.root === 'deliverables-archive' && <Tag tone="outline">归档</Tag>}
                         {!entry.ledgered && <Tag tone="warning">台账外</Tag>}
+                        {entry.presented === false && <Tag tone="warning">未 present</Tag>}
+                        {entry.presented === null && <Tag tone="outline">present 未核</Tag>}
                         <span className="wk-deliverable-meta">{entry.kickoff || '日期未记'} · {entry.type || '未分型'}</span>
                       </span>
                       <LedgerSummary summary={entry.summary || '（meta 无一句话结论）'} />

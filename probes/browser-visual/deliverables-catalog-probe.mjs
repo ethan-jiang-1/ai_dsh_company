@@ -67,6 +67,7 @@ try {
 
   const summary = await page.locator('.wk-catalog-summary').innerText()
   check('D1 统计行给总数', summary.includes(`共 ${String(index.entries.length)} 份成品`), summary)
+  check('D1 统计含 present / 未 present', summary.includes('present') && summary.includes('未 present'), summary)
   const filters = await page.locator('.wk-catalog-filters').innerText()
   check('D1 筛选四档在场', ['全部', '活跃', '归档'].every(label => filters.includes(label)), filters)
   const openButtons = page.getByRole('button', { name: /打开 .* 的 final\.md/ })
@@ -76,6 +77,8 @@ try {
   const firstRow = rows.first()
   const firstText = await firstRow.innerText()
   check('D1 首行含 slug 与一句话结论', firstText.includes(first.slug) && (first.summary === '' || firstText.includes(first.summary.slice(0, 12))), firstText.slice(0, 240))
+  if (first.presented === false) check('D1 首行显示未 present', firstText.includes('未 present'), firstText.slice(0, 240))
+  if (first.presented === null) check('D1 首行显示 present 未核', firstText.includes('present 未核'), firstText.slice(0, 240))
 
   record.desktop = { viewport: { width: 1440, height: 900 }, rowCount, summary, filters }
   await page.screenshot({ path: join(OUT, 'desktop.png'), fullPage: false })

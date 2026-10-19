@@ -140,11 +140,11 @@ export function charterHasEntry(charterText, slug) {
 }
 
 /** CLI 旗标解析（纯函数）——参数唯一源在 converge.mjs 头注（BUG-016：未知旗标曾静默收下）。 */
-const KNOWN_FLAGS = ['--slug', '--dry-run', '--charter-backfill', '--resume', '--allow-no-journal', '--allow-open-findings']
+const KNOWN_FLAGS = ['--slug', '--dry-run', '--charter-backfill', '--resume', '--allow-no-journal', '--allow-open-findings', '--rebuild-index']
 export function parseFlags(args) {
   for (const a of args) {
     if (a.startsWith('--') && !KNOWN_FLAGS.includes(a)) {
-      throw new Error(`未知旗标 ${a}——认识：--slug <目录名> / --dry-run / --charter-backfill <目录名> / --allow-no-journal / --allow-open-findings / --resume <目录名>；无参 = 计划模式`)
+      throw new Error(`未知旗标 ${a}——认识：--slug <目录名> / --dry-run / --charter-backfill <目录名> / --allow-no-journal / --allow-open-findings / --resume <目录名> / --rebuild-index；无参 = 计划模式`)
     }
   }
   const argOf = name => { const i = args.indexOf(`--${name}`); return i === -1 ? undefined : args[i + 1] }
@@ -182,4 +182,18 @@ export function archiveMovePlan(dirName) {
   const from = join('company-workspace', 'deliverables', dirName).split(sep).join('/')
   const to = join('company-workspace', 'deliverables-archive', dirName).split(sep).join('/')
   return { from, to, gitArgs: ['add', '-A', '--', from, to] }
+}
+
+/**
+ * 收敛/续跑后重建成品索引的**命令形状**（2026-10-20；成品目录卡的「未接 converge」）。
+ * 为什么只给形状、不在这里起进程：回归层不许起子进程（layering 守卫），真执行留在
+ * `tools/converge.mjs` 驱动层；生成器是单一来源（`tools/deliverables-index.mjs`），
+ * 收敛器不重写扫描逻辑。
+ * @param {object} input
+ * @param {string} input.root - 仓库根。
+ * @param {string} [input.execPath] - node 可执行文件（默认当前进程）。
+ * @returns {{ command: string, args: string[], cwd: string }} spawnSync 参数。
+ */
+export function catalogIndexInvocation({ root, execPath = process.execPath }) {
+  return { command: execPath, args: [join(root, 'tools', 'deliverables-index.mjs')], cwd: root }
 }

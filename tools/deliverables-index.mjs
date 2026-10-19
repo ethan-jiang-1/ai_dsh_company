@@ -3,16 +3,39 @@
 // 何时跑：新增/归档成品、改 meta.md 后，或一轮收敛末尾；维护者跑（生成物，不手改）。
 // 作用：扫描 `company-workspace/deliverables/` 与 `deliverables-archive/` 的 final.md + meta.md，
 //   生成 `company-workspace/kb/deliverables-index.json`；公司页签「成品」只读这份索引。
-// 口径：成品 = 有 final.md；present 背书不在本索引（仍归 checks/audit/deliverables-check.mjs）。
+// 口径：成品 = 有 final.md；present 状态**复用** checks/audit/deliverables-check.mjs --json 的判据（不另写一套）；
+//   审计不可得（未 source run/env.sh 等）时 presented=null，面板显示「未核」，不冒充已 present。
 // 用法：node tools/deliverables-index.mjs
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
 import { join, relative } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { parseMeta } from './lib/deliverables.mjs'
+import { parseMeta, slugFromDirName } from './lib/deliverables.mjs'
 import { buildDeliverablesCatalog, CATALOG_ROOTS } from './lib/deliverables-catalog.mjs'
 
 const WORKSPACE = join(ROOT, 'company-workspace')
 const OUT = join(WORKSPACE, 'kb', 'deliverables-index.json')
+
+/**
+ * 跑审计档拿 present 背书集合（单一判据 = checks/audit/deliverables-check.mjs）。
+ * 审计输出人类报告 + 最后一行 `JSON:{...}`；这里只取 presented。不可得 ⇒ null（未核，不冒充）。
+ * @returns {Set<string>|null} Lead present 过的 slug；null = 审计不可得。
+ */
+function presentedSlugs() {
+  const r = spawnSync(process.execPath, [join(ROOT, 'checks', 'audit', 'deliverables-check.mjs'), '--json'], { cwd: ROOT, encoding: 'utf8' })
+  const line = (r.stdout ?? '').split('\n').find(item => item.startsWith('JSON:'))
+  if (line === undefined) {
+    console.warn('⚠ 成品 present 未核：deliverables-check --json 无输出（先 source run/env.sh）；索引继续生成，presented=null')
+    return null
+  }
+  try {
+    const payload = JSON.parse(line.slice(5))
+    return new Set(Array.isArray(payload.presented) ? payload.presented : [])
+  } catch {
+    console.warn('⚠ 成品 present 未核：审计 JSON 解析失败；presented=null')
+    return null
+  }
+}
 
 /**
  * 动议台账里的 slug 集合（只认表行首列；格式家 = kb/motion-ledger.md 头注）。
@@ -41,6 +64,7 @@ if (!existsSync(WORKSPACE)) {
   process.exit(2)
 }
 
+const presentedSet = presentedSlugs()
 const entries = []
 for (const root of CATALOG_ROOTS) {
   const dir = join(WORKSPACE, root)
@@ -50,7 +74,9 @@ for (const root of CATALOG_ROOTS) {
     const final = existsSync(join(dir, item.name, 'final.md'))
     const metaPath = join(dir, item.name, 'meta.md')
     const body = existsSync(metaPath) ? readFileSync(metaPath, 'utf8') : ''
-    entries.push({ root, dir: item.name, fields: parseMeta(body).fields, final })
+    const fields = parseMeta(body).fields
+    const slug = fields.get('slug') ?? slugFromDirName(item.name)
+    entries.push({ root, dir: item.name, fields, final, presented: presentedSet === null ? null : presentedSet.has(slug) })
   }
 }
 

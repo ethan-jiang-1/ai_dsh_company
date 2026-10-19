@@ -24,15 +24,16 @@ export const CATALOG_ROOTS = ['deliverables', 'deliverables-archive']
  * @property {string} dir 目录名（含日期前缀）
  * @property {string} path final.md 的 workspace 相对路径
  * @property {boolean} ledgered 是否在动议台账里
+ * @property {boolean|null} presented 是否有 Lead `present` 背书（null = 审计不可得/未核）
  */
 
 /**
  * 把交付物扫描结果折成稳定目录（按 kickoff 倒序、同日起 slug 升序）。
  * @param {object} input
- * @param {ReadonlyArray<{ root: 'deliverables'|'deliverables-archive', dir: string, fields: Map<string,string>, final: boolean }>} input.entries 扫描结果（fields 来自 parseMeta）
+ * @param {ReadonlyArray<{ root: 'deliverables'|'deliverables-archive', dir: string, fields: Map<string,string>, final: boolean, presented?: boolean|null }>} input.entries 扫描结果（fields 来自 parseMeta）
  * @param {ReadonlySet<string>} input.ledgerSlugs 动议台账里的 slug 集合
  * @param {string} input.generatedAt ISO 时间
- * @returns {{ schema: 1, generatedAt: string, counts: { total: number, active: number, archive: number, unledgered: number }, entries: CatalogEntry[] }}
+ * @returns {{ schema: 1, generatedAt: string, counts: { total: number, active: number, archive: number, unledgered: number, presented: number, notPresented: number, presentUnknown: number }, entries: CatalogEntry[] }}
  */
 export function buildDeliverablesCatalog({ entries, ledgerSlugs, generatedAt }) {
   const rows = []
@@ -49,6 +50,7 @@ export function buildDeliverablesCatalog({ entries, ledgerSlugs, generatedAt }) 
       dir: entry.dir,
       path: `${entry.root}/${entry.dir}/final.md`,
       ledgered: ledgerSlugs.has(slug),
+      presented: entry.presented ?? null,
     })
   }
   rows.sort((left, right) => right.kickoff.localeCompare(left.kickoff) || left.slug.localeCompare(right.slug))
@@ -60,6 +62,9 @@ export function buildDeliverablesCatalog({ entries, ledgerSlugs, generatedAt }) 
       active: rows.filter(row => row.root === 'deliverables').length,
       archive: rows.filter(row => row.root === 'deliverables-archive').length,
       unledgered: rows.filter(row => !row.ledgered).length,
+      presented: rows.filter(row => row.presented === true).length,
+      notPresented: rows.filter(row => row.presented === false).length,
+      presentUnknown: rows.filter(row => row.presented === null).length,
     },
     entries: rows,
   }

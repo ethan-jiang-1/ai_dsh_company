@@ -18,13 +18,13 @@ describe('buildDeliverablesCatalog', () => {
         root: 'deliverables',
         dir: '2026-10-18-ledgered-one',
         fields: fields({ slug: 'ledgered-one', kickoff: '2026-10-18', 类型: '诊断', 结果: '已完成', 一句话结论: '一句结论一' }),
-        final: true,
+        final: true, presented: true,
       },
       {
         root: 'deliverables-archive',
         dir: '2026-10-17-archived-two',
         fields: fields({ slug: 'archived-two', kickoff: '2026-10-17', 类型: '生产', 结果: '已采纳', 一句话结论: '一句结论二' }),
-        final: true,
+        final: true, presented: false,
       },
       {
         root: 'deliverables',
@@ -37,7 +37,7 @@ describe('buildDeliverablesCatalog', () => {
         root: 'deliverables',
         dir: '2026-10-16-fallback-slug',
         fields: new Map(),
-        final: true,
+        final: true, presented: null,
       },
     ],
   })
@@ -51,7 +51,7 @@ describe('buildDeliverablesCatalog', () => {
   })
 
   it('计数分开活跃 / 归档 / 台账外', () => {
-    expect(catalog.counts).toEqual({ total: 3, active: 2, archive: 1, unledgered: 2 })
+    expect(catalog.counts).toEqual({ total: 3, active: 2, archive: 1, unledgered: 2, presented: 1, notPresented: 1, presentUnknown: 1 })
     expect(catalog.entries.find(entry => entry.slug === 'ledgered-one')?.ledgered).toBe(true)
     expect(catalog.entries.find(entry => entry.slug === 'archived-two')?.ledgered).toBe(false)
   })
@@ -65,6 +65,6 @@ describe('buildDeliverablesCatalog', () => {
 
   it('空输入给零计数，不抛', () => {
     expect(buildDeliverablesCatalog({ entries: [], ledgerSlugs: new Set(), generatedAt: 'x' }))
-      .toMatchObject({ schema: 1, counts: { total: 0, active: 0, archive: 0, unledgered: 0 }, entries: [] })
+      .toMatchObject({ schema: 1, counts: { total: 0, active: 0, archive: 0, unledgered: 0, presented: 0, notPresented: 0, presentUnknown: 0 }, entries: [] })
   })
 })

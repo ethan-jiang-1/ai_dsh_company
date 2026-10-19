@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 收敛执行器：把 snapshots/README §归档动作 的五步手工流程机械化——
-//   证据副本 → git mv 交付物进归档家 → 清 live journal（留 .gitkeep）→ 台账行自动追加（逐字取 meta，查重跳过）→ 打印 CHARTER 补登指引（--charter-backfill）。
+//   证据副本 → git mv 交付物进归档家 → 清 live journal（留 .gitkeep）→ 台账行自动追加（逐字取 meta，查重跳过）→ 成品索引重建 → 打印 CHARTER 补登指引（--charter-backfill）。
 // 何时跑：用户说「收敛/清理工作区」时；或轮末维护者收敛已闭合动议时（维护者专用——分身不自行删改，见手册「轮末收敛」）。
 // 用法（参数唯一源 = 本头注；未知旗标 = 退出 1——`--plan` 不是旗标，无参即计划模式）：
 //   node tools/converge.mjs                     # 计划模式：列出可收敛/未闭合 slug + journal 收割预览
@@ -11,6 +11,7 @@
 //   node tools/converge.mjs --slug <目录名> --dry-run  # 只打印动作清单，不动盘
 //   node tools/converge.mjs --charter-backfill <目录名>  # 为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步）
 //   node tools/converge.mjs --resume <目录名>   # **半态续跑**：交付物已在归档家但 journal/台账未做完时接手（BUG-020；不搬移交付物）
+//   node tools/converge.mjs --rebuild-index    # 只重建成品索引（等价于收敛末尾那一步；生成器跑完后重读）
 // 成本：秒级~十秒级、无模型；交付物走 git mv（tracked）；journal 已跟踪的走 git rm、**未跟踪的走 rmSync**
 //   （角色刚写、尚未入库的 journal 是常态；2026-10-16 实测 git rm 会以 pathspec 不匹配中断收敛）。
 // ⚠ 环境：需 **`source run/env.sh`**（DSH_HOME 指向开发 home）——「无未结审计发现」这道前置要调
@@ -20,7 +21,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, renameSync, rmSync } from 'node:fs'
 import { join, basename } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { archiveMovePlan, canonicalParticipation, charterHasEntry, convergenceResume, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
+import { archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
 import { COMPANY_ROLE_IDS } from './lib/company-roles.mjs'
 import { spawnSync } from 'node:child_process'
 
@@ -64,6 +65,26 @@ const checkSlugFindings = slug => {
   }
   const violations = [...text.matchAll(/^\s+([a-z][a-z-]+) \| (deliverables[^\n]*)$/gm)].map(m => `${m[1]} ${m[2]}`)
   return { ok: r.status === 0, detail: violations.join('；') || '（见审计档输出）', violations }
+}
+
+/**
+ * 收敛/续跑后重建成品索引（2026-10-20；成品目录卡「未接 converge」的收口）。
+ *
+ * 收敛改变了 `deliverables/` 根与台账 slug，`kb/deliverables-index.json` 必须同轮重建，
+ * 否则「成品」页签读旧盘。生成器是唯一扫描逻辑（`tools/deliverables-index.mjs`），
+ * 这里只起子进程；失败 fail-loud（盘上收敛可能已完成，索引可单独重跑）。
+ * @returns 无。
+ */
+const rebuildCatalogIndex = () => {
+  const invocation = catalogIndexInvocation({ root: ROOT })
+  const r = spawnSync(invocation.command, invocation.args, { cwd: invocation.cwd, encoding: 'utf8' })
+  if (r.status !== 0) {
+    console.error(`✗ 成品索引重建失败（exit ${String(r.status)}）：${(r.stderr ?? '').trim().slice(0, 300)}`)
+    console.error('  盘上收敛可能已完成；索引可单独重跑：node tools/deliverables-index.mjs')
+    process.exit(1)
+  }
+  const summary = (r.stdout ?? '').trim().split('\n').slice(0, 6).join(' ')
+  console.log(`  · 成品索引已重建：${summary}`)
 }
 
 const scanSlugs = () => {
@@ -198,6 +219,7 @@ const resume = (dirName) => {
     console.log(`  · 清 live journal ×${removed.length}`)
   } else console.log('  · 零 live journal 可清（journal 步已完成——续跑幂等）')
   appendLedger(fields)
+  rebuildCatalogIndex()
   console.log('✓ 续跑完成：交付物仍在归档家（本命令不搬移）、台账行已处理')
   console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/converge.mjs --charter-backfill ${dirName}`)
 }
@@ -241,6 +263,7 @@ const converge = (dirName) => {
     `git mv deliverables/${dirName} → deliverables-archive/${dirName}`,
     ...journal.map(j => `git rm kb/${j.role}/journal/${j.file}（副本已入证据目录）`),
     `台账追加一行（逐字取 meta：${fields.结论.slice(0, 40)}…）`,
+    `成品索引重建（node tools/deliverables-index.mjs）`,
     `CHARTER 历史纪要补登：node tools/converge.mjs --charter-backfill ${dirName}（结论逐字取 meta）`,
   ]
   console.log(`收敛计划 · ${dirName}${DRY ? '（dry-run）' : ''}`)
@@ -299,6 +322,7 @@ const converge = (dirName) => {
   git(move.gitArgs)
   const removed = clearLiveJournal(journal)
   const row = appendLedger(fields)
+  rebuildCatalogIndex()
   console.log(`✓ 收敛完成：交付物已入归档家、${journal.length} 篇 journal 清入证据副本、台账行已追加`)
   console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/converge.mjs --charter-backfill ${dirName}（教训性文字仍由人把守——纪要素材逐字取 meta）`)
 }
@@ -340,6 +364,7 @@ const charterBackfill = (dirName) => {
   console.log(`✓ backfill 完成：${slug} → ${roles.length} 角色 CHARTER`)
 }
 
+if (args.includes('--rebuild-index')) { rebuildCatalogIndex(); process.exit(0) }
 if (RESUME_ARG) { resume(RESUME_ARG); process.exit(0) }
 if (BACKFILL_ARG) { charterBackfill(BACKFILL_ARG); process.exit(0) }
 if (SLUG_ARG) { converge(SLUG_ARG); process.exit(0) }
