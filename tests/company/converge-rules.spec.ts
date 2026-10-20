@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, pickArchivedJournal, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
+import { archiveGitArgs, archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, pickArchivedJournal, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
 const TMP: string[] = []
 afterAll(() => { for (const d of TMP) rmSync(d, { recursive: true, force: true }) })
 
@@ -251,5 +251,14 @@ describe('converge-rules · 一句话结论占位判定（2026-10-20；真结论
     expect(isPlaceholderConclusion('回填')).toBe(true)
     expect(isPlaceholderConclusion('（待回填）')).toBe(true)
     expect(isPlaceholderConclusion('')).toBe(true)
+  })
+})
+
+
+describe('converge-rules · 归档后 git add 参数（2026-10-20 新交付物未 tracked 的 fatal）', () => {
+  it('旧路径有 tracked 项 ⇒ 原计划；纯未 tracked ⇒ 只 stage 归档家', () => {
+    const plan = archiveMovePlan('2026-10-20-demo')
+    expect(archiveGitArgs(plan, true)).toEqual(plan.gitArgs)
+    expect(archiveGitArgs(plan, false)).toEqual(['add', '-A', '--', plan.to])
   })
 })

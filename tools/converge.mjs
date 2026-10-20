@@ -21,7 +21,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, renameSync, rmSync } from 'node:fs'
 import { join, basename } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
+import { archiveGitArgs, archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
 import { COMPANY_ROLE_IDS } from './lib/company-roles.mjs'
 import { spawnSync } from 'node:child_process'
 
@@ -318,8 +318,11 @@ const converge = (dirName) => {
   // 归档搬移（2026-10-13 起）：`git mv` → **fs rename + git add -A**。原因见 archiveMovePlan 注释
   // （drafts 不再 tracked，`git mv` 遇未跟踪文件 fatal）；计划住 lib 纯逻辑缝，spec 在临时仓真跑过。
   const move = archiveMovePlan(dirName)
+  // 新建交付物的 final/meta 可能尚未 tracked：旧路径无 tracked 项时 `git add -A -- from to`
+  // 会 fatal（2026-10-20 token-account-pool 真现场，收敛半途崩）。按 tracked 与否选参数。
+  const fromTracked = (spawnSync('git', ['ls-files', '--', move.from], { cwd: ROOT, encoding: 'utf8' }).stdout ?? '').trim() !== ''
   renameSync(join(ROOT, move.from), join(ROOT, move.to))
-  git(move.gitArgs)
+  git(archiveGitArgs(move, fromTracked))
   const removed = clearLiveJournal(journal)
   const row = appendLedger(fields)
   rebuildCatalogIndex()

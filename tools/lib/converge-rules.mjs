@@ -210,3 +210,15 @@ export function isPlaceholderConclusion(value) {
   if (trimmed === '') return true
   return /^[（(]?\s*(?:待)?回填\s*[）)]?$/.test(trimmed)
 }
+
+/**
+ * 归档搬移后的 `git add` 参数（2026-10-20 现场：新建交付物的 final/meta 尚未 tracked，
+ * 搬走后 `git add -A -- <旧路径> <新路径>` 因旧路径无任何 tracked 项而 fatal，收敛半途崩）。
+ * 旧路径有 tracked 文件 ⇒ 用原计划（同时 stage 删除+新增）；没有 ⇒ 只 stage 归档家。
+ * @param {{ from: string, to: string, gitArgs: string[] }} plan - `archiveMovePlan` 结果。
+ * @param {boolean} fromTracked - 搬移前 `git ls-files -- <from>` 是否非空。
+ * @returns {string[]} git add 参数。
+ */
+export function archiveGitArgs(plan, fromTracked) {
+  return fromTracked ? plan.gitArgs : ['add', '-A', '--', plan.to]
+}

@@ -79,3 +79,5 @@
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-17-role-kit-2026/journal/ceo/`；交付物：`deliverables-archive/2026-10-17-role-kit-2026/`）
 - 2026-10-19 · private-deploy-reserve-2026（诊断）—— 我方在大众硬件私有化部署一线/近一线模型上的储备为认知级：本机 8B（~10.3 t/s）与 30B-A3B Q4（~19.7 t/s、4K prefill ~529 t/s）均已跑通，但都是 32GB 统一内存笔记本（非 24GB 独显）；真实业务评测、回退件、24GB 档、具名 owner 仍缺；储备 1 级、2 级只差回退路径件；今天不能接一单有交付承诺的 POC；8.5 人天不变。
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-19-private-deploy-reserve-2026/journal/ceo/`；交付物：`deliverables-archive/2026-10-19-private-deploy-reserve-2026/`）
+- 2026-10-20 · token-account-pool-2026（决策）—— 号池 token 的便宜价 = 别人的合规成本 + 刑事风险 + 客户信任：法律端（无证经营/发票/数据出境）、经济端（合规转售毛利约20%<30%、官货链无价位）、结构端（四家上游全禁转售、区域准入连授权转售商也封）三条独立成立，市场端 9 家现有客户 0 条 AI 采购诉求 ⇒ 我方不做号池/无授权中转；要做只做「合规接入服务」并按项目另立。
+  （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-20-token-account-pool-2026/journal/ceo/`；交付物：`deliverables-archive/2026-10-20-token-account-pool-2026/`）

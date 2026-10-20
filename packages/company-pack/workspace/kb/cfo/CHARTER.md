@@ -79,3 +79,5 @@
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-10-ai-transformation-2026-v2/journal/cfo/`；交付物：`deliverables-archive/2026-10-10-ai-transformation-2026-v2/`）
 - 2026-10-17 · lingang-recon（诊断）—— 「临港冷链」结算接入今天判不了能不能接——只有客户能给的接入方式、鉴权方式、时间戳口径与时区一件未到；已判的是我们做得出、但属定制活不进标准包价目，12 万单/日不构成技术阻碍，卡点在三处：稳定对账键、夜间批处理窗的故障可见性、以及合规书面授权。
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-17-lingang-recon/journal/cfo/`；交付物：`deliverables-archive/2026-10-17-lingang-recon/`）
+- 2026-10-20 · token-account-pool-2026（决策）—— 号池 token 的便宜价 = 别人的合规成本 + 刑事风险 + 客户信任：法律端（无证经营/发票/数据出境）、经济端（合规转售毛利约20%<30%、官货链无价位）、结构端（四家上游全禁转售、区域准入连授权转售商也封）三条独立成立，市场端 9 家现有客户 0 条 AI 采购诉求 ⇒ 我方不做号池/无授权中转；要做只做「合规接入服务」并按项目另立。
+  （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-20-token-account-pool-2026/journal/cfo/`；交付物：`deliverables-archive/2026-10-20-token-account-pool-2026/`）
