@@ -44,7 +44,7 @@ opened: 2026-10-19
 | present 真红清除 | 真 CEO 会话 `session-a87b177b…` 调 `present`（绝对路径）；修 `parseSessionLog` 按 cwd 归一后审计可见 | 会话日志 `deliverables/presented`；新增 audit spec |
 | 自动重建 | 收敛/续跑后自动；`--rebuild-index` 单独跑成功 | `node tools/converge.mjs --rebuild-index`；`converge-rules.spec` |
 | 纯逻辑红/绿 | 去掉 final 过滤 ⇒ 3 failed / 2 passed；还原 ⇒ 5 passed | `npx vitest run tests/company/deliverables-catalog.spec.ts` |
-| 全量 keyless | 70 files / 693 tests passed | `pnpm test` |
+| 全量 keyless | 70 files / 694 tests passed | `pnpm test` |
 | 结构门禁 | ALL PASS | `pnpm verify` |
 | 真挂载 | 零挂载失败 + 品牌在场 | `client-load-smoke`（重建 `lib/` 后） |
 | 真 app 目录 | 44 行 = 索引；统计/四档筛选/44 个「打开」；点开 final 正文出现 | `deliverables-catalog-probe --fixture`（ALL PASS） |
