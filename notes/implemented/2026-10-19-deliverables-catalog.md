@@ -46,10 +46,10 @@
 
 ## 未做 / 边界
 
-- **recon-pack 归档 legacy 未 present**：唯一 `未 present`（1/44）；历史件，审计只作 legacy 观察项，不补。
+- **recon-pack 归档 legacy 未 present**：唯一 `未 present`（1/47）；历史件，审计只作 legacy 观察项，不补。
 - **light 已废弃/无 final**：按用户轻量纪律，四稿收齐即停；目录不列，文件留 active；
-- **hefeng / kid-ai 已收口并归档**；`recon-pack` legacy 未 present。
+- **hefeng / kid-ai 已收口并归档**。
 - **实时性**：页签是静态快照 + 重读，不订阅盘变化；需求变强时再考虑 host read model/Remote。`converge` 自动重建覆盖盘变更的主路径。
-- **未跑**：`replay-smoke --ui` 的页签端到端；本轮用真 app 探针覆盖打开链路。
+- **已跑**：`replay-smoke --ui` r3-delegation **ALL PASS**（33s；委派卡/aria/金样；workspace 未认证）；成品目录打开链路仍由真 app 探针覆盖。
 
 批次句号与清理清单见 [2026-10-20-company-panel-batch-close](2026-10-20-company-panel-batch-close.md)。
