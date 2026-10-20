@@ -1,12 +1,12 @@
 # 第二轮打扫卫生：P0 反馈通路落实 + replay 注入面闭环 + notes 归档轮
 
 状态：implemented（2026-10-21；用户授权「P0 反馈通路正确性」+「r3 重录」+「notes/implemented 需要归档的处理」；
-审计证据 = [followup research note](../_backlog/research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md)；前轮 = [consistency sweep](./2026-10-20-fresh-agent-consistency-sweep.md)）
+审计证据 = [followup research note](../../_backlog/research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md)；前轮 = [consistency sweep](./2026-10-20-fresh-agent-consistency-sweep.md)）
 
 ## 决定
 
-1. **BUG-030/031 当场修**（卡与红绿详见 [BUG-030](../_backlog/_archive/fixed_bugs/BUG-030-diagnose-approval-outcome.md)、
-   [BUG-031](../_backlog/_archive/fixed_bugs/BUG-031-orient-scenario-children-file-shape.md)）：diagnose 审批判读按真 v4
+1. **BUG-030/031 当场修**（卡与红绿详见 [BUG-030](../../_backlog/_archive/fixed_bugs/BUG-030-diagnose-approval-outcome.md)、
+   [BUG-031](../../_backlog/_archive/fixed_bugs/BUG-031-orient-scenario-children-file-shape.md)）：diagnose 审批判读按真 v4
    形状（`{id,outcome}` + asked/decided 按 id 配对拿工具名 + 对象 error 序列化）；orient runBundleView 对 children
    文件形状 statSync 分流。**夹具全部改从真日志取样**（session-1d120f37 原行为样）——想象形状夹具是「套件全绿
    保释错实现」的通道。附带：diagnose `--session` 前缀两态统一（`session-<uuid>` 与裸 uuid 同义，与 orient 对齐）。
