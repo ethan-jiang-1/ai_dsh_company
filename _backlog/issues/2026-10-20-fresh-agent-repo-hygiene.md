@@ -24,7 +24,7 @@ r2 presence + `--ui` 全绿。问题集中在**总账与反馈面**：新增角�
 
 **进展（2026-10-20）：** 批次 0（BUG-029/类级 token 守卫）、批次 1（角色数/快照索引/cdp-probe 9 页签+内容/失败现场/src README/runtime/成本声明/checks 索引+script-index 门禁/release-smoke researcher）、批次 2（testing.md 分层与 mock、tests/README 映射、PASS/SKIP、`pnpm diagnose`）与结构切片（docs/index 拆 decisions/external、design 预算、firstText/memberDot、数据面工厂、catalog 契约、SSR 警告）均已完成；证据 = [consistency sweep Note](../../notes/implemented/2026-10-20-fresh-agent-consistency-sweep.md)。
 
-**剩余（不阻塞当前绿）：** ① `company-workspace/AGENTS.md` 26.4KB/190 行顶格，流程细节迁 skills/CHARTER 属产品内容重构，需 preset-smoke + handbook-smoke 复验；② 重放 2/10 的修/归档要内容成本（当前读数已在 snapshots/README 写明）；③ host 入口 `export *` 保留为已接受取舍（package private；出现第二个消费者再开 test-only 子路径）。
+**剩余（不阻塞当前绿）：** ① `company-workspace/AGENTS.md` 187/190 行、26.2KB（本轮去重 3 行；完整流程迁移仍属产品内容重构，需 preset-smoke + handbook-smoke 复验）；② 重放 2/10 的修/归档要内容成本（当前读数已在 snapshots/README 写明）；③ host 入口 `export *` 保留为已接受取舍（package private；出现第二个消费者再开 test-only 子路径）。
 
 **下一步：** 继续按授权推进剩余三件；不再逐项请示。
 

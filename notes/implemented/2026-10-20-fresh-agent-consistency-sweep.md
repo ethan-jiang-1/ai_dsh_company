@@ -33,7 +33,7 @@
 - `pnpm verify` 新增 3 道门禁（snapshot-index / script-index / tracked-token），公开入口 81 个全部入索引；文档预算新增 external/decisions/design 四篇。
 - `pnpm diagnose` 成为日志反馈入口；`cdp-probe` 现在真的覆盖 9 个页签并断言面板体有内容。
 - 代码面：`client/index.ts` 少两处重复工厂；`firstText`/`memberDot` 各一份；成品目录生成器与页签 parser 有契约测试。
-- 未解决（下一轮/用户拍板）：`company-workspace/AGENTS.md` 仍 190/190、26.4KB——流程细节迁 skills/CHARTER 属产品内容重构，需 `preset-smoke` + `handbook-smoke` 与角色行为复验，本轮只把「17.4KB」过期货和饱和风险登记；重放 2/10 的修复/归档要内容成本；host 入口 `export *` 内部读模型保留（package private，replay 读 built index 的现有 seam，另开 test-only 子路径不值得）。
+- 未解决（下一轮/用户拍板）：`company-workspace/AGENTS.md` 本轮做了一次去重（190→187 行、26,424→26,209B；删历史 rollout 句、压缩「不在场分档」重复），仍接近 190 行顶格——完整流程细节迁 skills/CHARTER 属产品内容重构，需 `preset-smoke` + `handbook-smoke` 与角色行为复验，本轮只把「17.4KB」过期货和饱和风险登记；重放 2/10 的修复/归档要内容成本；host 入口 `export *` 内部读模型保留（package private，replay 读 built index 的现有 seam，另开 test-only 子路径不值得）。
 - 证据：`pnpm verify` ALL PASS；`pnpm test` 76/711；`client-load-smoke` ALL PASS；`cdp-probe` 9/9；`release-smoke` ALL PASS（含 researcher）；`replay --ui` ALL PASS（SKIP 显式化）；`snapshot-index`/`script-index`/`tracked-token` 均红→绿留证。
 
 ## 实跑收据（2026-10-20）
