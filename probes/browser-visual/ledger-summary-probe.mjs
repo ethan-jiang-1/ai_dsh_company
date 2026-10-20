@@ -42,6 +42,7 @@ try {
       // 先在选择会话之后收窄：折叠导航里选不中会话（390px 实测）。
       await page.setViewportSize({ width, height: 900 })
       await page.waitForTimeout(800)
+      const metricsStart = Date.now()
       const metrics = await ledger.locator('.wk-row-task').evaluateAll(xs => xs.map(x => {
         const style = getComputedStyle(x)
         const line = parseFloat(style.lineHeight) || 17
@@ -105,6 +106,9 @@ try {
         buttons: metrics.filter(x => x.button).length,
         clipped: metrics.filter(x => x.clipped).length,
         keyboard: 'PASS', mouse: 'PASS', touch: 'PASS', fullTextChars: fullByKeyboard.length,
+        // 性能观察（2026-10-21 C6）：只进 runtime 判据，**不进 tracked 夹具**（computed.json 保持
+        // 确定性——墙钟每次必漂，进夹具就是永远的假 diff）。只记录不设门（升级地图触发纪律）。
+        metricsMs: Date.now() - metricsStart,
       }
       verdicts.push(verdict)
       console.log(JSON.stringify(verdict))
@@ -114,6 +118,8 @@ try {
   await writeFile(join(outDir, 'ledger-summary-verdict.json'), JSON.stringify(verdict, null, 2) + '\n')
   if (fixture) {
     await mkdir(fixtureDir, { recursive: true })
-    await writeFile(join(fixtureDir, 'computed.json'), JSON.stringify(verdict, null, 2) + '\n')
+    // tracked 夹具只收确定性判据：metricsMs（墙钟观察）剥掉——夹具一旦带墙钟就是永久的假 diff。
+    const deterministic = { ...verdict, verdicts: verdicts.map(({ metricsMs, ...rest }) => rest) }
+    await writeFile(join(fixtureDir, 'computed.json'), JSON.stringify(deterministic, null, 2) + '\n')
   }
 } finally { await browser.close() }

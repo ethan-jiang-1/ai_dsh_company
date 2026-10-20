@@ -11,7 +11,8 @@
     "orient": "node tools/orient.mjs",
     "diagnose": "node tools/diagnose.mjs",
     "verify": "node checks/run-gates.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@deepseek-ai/dsh-agent-preset": "workspace:*",
@@ -46,6 +47,7 @@
     "@deepseek-ai/dsh-workflow-ptc": "workspace:*",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.20.0",
+    "@vitest/coverage-v8": "^4.1.11",
     "dsh-company-pack": "workspace:*",
     "lightningcss": "^1.32.0",
     "react": "^18.2.0",

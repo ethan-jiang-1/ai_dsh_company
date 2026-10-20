@@ -49,6 +49,9 @@
 | [deliverables-catalog-probe.mjs](../probes/browser-visual/deliverables-catalog-probe.mjs) | 成品目录行数=索引、筛选/打开 final.md（真 web，1440/390） |
 | [board-drift-probe.mjs](../probes/browser-visual/board-drift-probe.mjs) | 看板「声明 vs 板面」分叉警示卡的真实渲染与出图（真组件注入真 web app） |
 | [sidebar-role-mark-probe.mjs](../probes/browser-visual/sidebar-role-mark-probe.mjs) | 侧栏角色标记 vs 16px 座位的渲染盒几何（desktop/narrow/full-bleed + 五角色对照图） |
+| [presence-panel-probe.mjs](../probes/browser-visual/presence-panel-probe.mjs) | 在场板行结构（Lead 行 Tag/在办任务栏）+ 点行进成员空间 + 窄栏（真 web，1440/390） |
+| [budget-panel-probe.mjs](../probes/browser-visual/budget-panel-probe.mjs) | 用量面板四路令牌行/占比合计≈100%/总量>0 + 窄栏（真 web，1440/390） |
+| [attention-panel-probe.mjs](../probes/browser-visual/attention-panel-probe.mjs) | 待办面板两段结构/诚实空态或「去处理」入口 + 窄栏（真 web，1440/390；跨会话聚合面按结构判） |
 | [compact-view-probe.mjs](../probes/browser-visual/compact-view-probe.mjs) | compact 折叠过程行但保留助手最终长回复的现场对照 |
 | [open-in-app-probe.mjs](../probes/browser-visual/open-in-app-probe.mjs) | 交付物进侧栏预览 → Host 判词（`ok:true`/`opened:true`）→ **目标应用状态文件登记该路径**；`--tree` 挑未打开过的文件可拿干净翻转 |
 

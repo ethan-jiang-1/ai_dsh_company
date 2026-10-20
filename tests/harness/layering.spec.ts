@@ -59,7 +59,9 @@ describe('测试分层纪律（guides/dev-loop §9.1：真模型/真浏览器不
     expect(pkg.scripts?.test, 'pnpm test 必须只是 vitest run').toBe('vitest run')
     const config = readFileSync(join(ROOT, 'vitest.config.ts'), 'utf8')
     expect(config, 'vitest include 只认 tests/**').toContain("include: ['tests/**/*.spec.ts']")
-    expect(config, '认证档脚本不得进 vitest include').not.toMatch(/include:.*(?:checks|probes|tools)\//)
+    // coverage 统计面可含 tools/lib（与下方 import 守卫的纯逻辑库例外同款，2026-10-21 C5 起）——
+    // 守的是**测试发现**不进驱动/认证档，不是统计面。
+    expect(config, '认证档脚本不得进 vitest include').not.toMatch(/include:.*(?:checks|probes|tools)\/(?!lib\/)/)
   })
 
   it('replay lane 是第三档：只由 checks/smoke/replay-smoke.mjs 驱动，不进 pnpm test', () => {
@@ -99,7 +101,7 @@ describe('测试分层纪律（guides/dev-loop §9.1：真模型/真浏览器不
     expect(configFiles.length, '主 vitest.config.ts 应在场').toBeGreaterThan(0)
     for (const name of configFiles) {
       const text = readFileSync(join(ROOT, name), 'utf8')
-      expect(text, `${name} 不得引用 checks/probes/tools（replay lane 起进程+浏览器，属认证档）`).not.toMatch(/include:.*(?:checks|probes|tools)\//)
+      expect(text, `${name} 不得把 checks/probes/tools 驱动编进测试发现（tools/lib 纯逻辑库例外同上）`).not.toMatch(/include:.*(?:checks|probes|tools)\/(?!lib\/)/)
     }
 
     // ③ 纪律有家：replay-smoke 自己的头注声明分层（guides/dev-loop §9.1）。

@@ -407,10 +407,14 @@ describe('重复提交（探索方向③：连点两次不许双发）', () => {
     }
     const { container } = mount({ records: [record()], actions })
     const btn = button(container, CULTIVATION_COPY.adopt)!
-    // 同一个 tick 里点两次（模拟手快 / 双击）：React 状态还没重渲染，靠 disabled 挡不住
-    btn.click()
-    btn.click()
-    await new Promise(resolve => setTimeout(resolve, 200))
+    // 同一个 tick 里点两次（模拟手快 / 双击）：同步 act 块内两次 click 之间**不发生重渲染**
+    // （React 的批处理在 act 退出时才 flush），「pending 挡住第二次」的语义原样保留——包 act 只是
+    // 不再让这次真实状态更新打「not wrapped in act」告警（2026-10-21 清理 ×12 stderr 噪声）。
+    act(() => {
+      btn.click()
+      btn.click()
+    })
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 200)) })
     expect(calls, '连点两次必须只发一条命令').toBe(1)
   })
 })
@@ -422,8 +426,8 @@ describe('拒绝表单的键盘可用（场景轮 S24：Escape 被困）', () =>
     await click(button(container, CULTIVATION_COPY.reject)!)
     const input = container.querySelector('input') as HTMLInputElement
     await type(input, '键盘取消')
-    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
-    await new Promise(resolve => setTimeout(resolve, 20))
+    act(() => { input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })) })
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)) })
     expect(container.querySelector('input'), 'Escape 后表单应收起').toBeNull()
     expect(lines, 'Escape 不该发命令').toHaveLength(0)
   })
@@ -434,8 +438,8 @@ describe('拒绝表单的键盘可用（场景轮 S24：Escape 被困）', () =>
     await click(button(container, CULTIVATION_COPY.reject)!)
     const input = container.querySelector('input') as HTMLInputElement
     await type(input, '键盘确认')
-    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
-    await new Promise(resolve => setTimeout(resolve, 50))
+    act(() => { input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })) })
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 50)) })
     expect(lines.join('')).toContain('键盘确认')
   })
 })
