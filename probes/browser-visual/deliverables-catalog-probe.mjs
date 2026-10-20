@@ -69,7 +69,16 @@ try {
   check('D1 统计行给总数', summary.includes(`共 ${String(index.entries.length)} 份成品`), summary)
   check('D1 统计含 present / 未 present', summary.includes('present') && summary.includes('未 present'), summary)
   const filters = await page.locator('.wk-catalog-filters').innerText()
-  check('D1 筛选四档在场', ['全部', '活跃', '归档'].every(label => filters.includes(label)), filters)
+  check('D1 筛选含全部/活跃/归档/未 present', ['全部', '活跃', '归档', '未 present'].every(label => filters.includes(label)), filters)
+  if (index.counts.notPresented > 0) {
+    await page.getByRole('button', { name: /未 present/ }).click()
+    await page.waitForTimeout(300)
+    const filteredRows = await rows.count()
+    check('D1 未 present 筛选只留对应行', filteredRows === index.counts.notPresented, `${String(filteredRows)} vs ${String(index.counts.notPresented)}`)
+    await page.getByRole('button', { name: `全部 ${String(index.entries.length)}`, exact: true }).click()
+    await page.waitForTimeout(300)
+    check('D1 重置全部后行数恢复', await rows.count() === index.entries.length, `${String(await rows.count())} vs ${String(index.entries.length)}`)
+  }
   const openButtons = page.getByRole('button', { name: /打开 .* 的 final\.md/ })
   check('D1 每行都有「打开 final.md」按钮', await openButtons.count() === index.entries.length, String(await openButtons.count()))
 

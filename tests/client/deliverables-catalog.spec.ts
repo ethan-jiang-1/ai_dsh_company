@@ -61,6 +61,7 @@ describe('filterCatalog / formatGeneratedAt', () => {
     expect(filterCatalog(CATALOG.entries, 'active').map(entry => entry.slug)).toEqual(['ledgered-one', 'active-three'])
     expect(filterCatalog(CATALOG.entries, 'archive').map(entry => entry.slug)).toEqual(['archive-two'])
     expect(filterCatalog(CATALOG.entries, 'unledgered').map(entry => entry.slug)).toEqual(['archive-two', 'active-three'])
+    expect(filterCatalog(CATALOG.entries, 'unpresented').map(entry => entry.slug)).toEqual(['archive-two'])
     expect(filterCatalog(CATALOG.entries, 'all')).toHaveLength(3)
   })
 

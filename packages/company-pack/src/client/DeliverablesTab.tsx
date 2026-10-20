@@ -56,13 +56,14 @@ export interface DeliverablesTabInjected {
 
 export type DeliverablesTabProps = PropsRuntime<'sidebar.right.pane.tab'> & DeliverablesTabInjected
 
-type Filter = 'all' | 'active' | 'archive' | 'unledgered'
+type Filter = 'all' | 'active' | 'archive' | 'unledgered' | 'unpresented'
 
 const FILTERS: readonly { readonly key: Filter; readonly label: string }[] = [
   { key: 'all', label: '全部' },
   { key: 'active', label: '活跃' },
   { key: 'archive', label: '归档' },
   { key: 'unledgered', label: '台账外' },
+  { key: 'unpresented', label: '未 present' },
 ]
 
 /** 结果 → Tag 色调（未知值给 outline，不猜）。 */
@@ -136,6 +137,7 @@ export function filterCatalog(entries: readonly DeliverablesCatalogEntry[], filt
   if (filter === 'active') return entries.filter(entry => entry.root === 'deliverables')
   if (filter === 'archive') return entries.filter(entry => entry.root === 'deliverables-archive')
   if (filter === 'unledgered') return entries.filter(entry => !entry.ledgered)
+  if (filter === 'unpresented') return entries.filter(entry => entry.presented === false)
   return entries
 }
 
@@ -168,7 +170,8 @@ export function DeliverablesView({ catalog, sessionId, openFinal }: {
   const filterCount = (key: Filter): number => key === 'all' ? counts.total
     : key === 'active' ? counts.active
       : key === 'archive' ? counts.archive
-        : counts.unledgered
+        : key === 'unledgered' ? counts.unledgered
+          : counts.notPresented
 
   return (
     <>
@@ -183,7 +186,8 @@ export function DeliverablesView({ catalog, sessionId, openFinal }: {
       </div>
       <div className="wk-catalog-filters" role="group" aria-label="成品筛选">
         {FILTERS.map(item => (
-          (item.key !== 'unledgered' || counts.unledgered > 0) && (
+          (item.key !== 'unledgered' || counts.unledgered > 0)
+          && (item.key !== 'unpresented' || counts.notPresented > 0) && (
             <Button
               key={item.key}
               size="sm"
