@@ -35,7 +35,7 @@ opened: 2026-10-19
 | 形状门禁全绿 | 本轮实跑 | `node checks/run-gates.mjs`（ALL PASS） |
 | keyless 回归 | 本轮实跑 | `pnpm test`（67 files / 669 tests） |
 | 旧结论分布 | source | `grep -R "BUG-026\\|BUG-027\\|等你点\\|owner 列空" -n _backlog/issues _backlog/research` |
-| 逐条发现 | source | [issue 卡质量审](../../research/backlog-ux/2026-10-19-issue-card-audit.md) |
+| 逐条发现 | source | [issue 卡质量审](../research/backlog-ux/2026-10-19-issue-card-audit.md) |
 | 状态映射的根 | source | [_backlog 章程](../../README.md)「双轨状态生命周期」 |
 
 ## 修订史（只追加）

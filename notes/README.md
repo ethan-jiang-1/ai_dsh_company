@@ -22,6 +22,11 @@
 Markdown 链接（md-links 门禁硬查）。**生命周期是移动不是复制**：`proposed → implemented` 同 diff 把正文
 改写成现在时的已交付事实（删迁移计划与未来时态）。决定已落地、现行合同才是权威、但否决仍能阻止重开的，移到 `archived/`（冻结，不再当 rationale owner）。没有这条否决的收据与追认戳删除，历史在 git。
 
+**检索配方**（「开工按主题检索相关 Note」的一步操作，2026-10-21 立）：决策级先查
+[decisions.md](../docs/decisions.md) 的 D 号路由表；机制级 `rg -l '<关键词>' notes/implemented/`
+——同义词都试一轮（别名对照 = [terminology](../docs/terminology.md)，如「在场/驾驶舱/presence」）。
+no-index 教义下没有主题索引：**目录树 + 全文检索就是清单**，检索不到 ≠ 不存在，换词再试。
+
 ## 二、何时写、取代与真证据（规则唯一家在本文件）
 
 - **义务范围**：Note 只收**承载持久决定理由**的改动——代码、测试与现行文档说不清的 why 与放弃的备选；

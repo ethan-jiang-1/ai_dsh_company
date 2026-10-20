@@ -16,4 +16,6 @@
 | 通道 A/B/C/D（机制） | 命名委托 / Agent Teams / dsh-sdk 子进程 / workflow 脚本（architecture §3） | [architecture.md](./design/architecture.md) §3 篇首映射表（各通道包清单） |
 | M1–M4（用法/编排） | 人中继 / 隔离委托 / SDK 编排器 / 团队（roles-isolation §3） | [roles-isolation.md](./design/roles-isolation.md) §3 选型速查 |
 | 公司页签 / 公司视图 | 右栏公司页签（可 `float()` 拖出成浮窗）+ 整页视图（`conversation.view` 条目；命名原则 = ui-demo §5）——页签清单 = 客户端注册面（[src/client](../packages/company-pack/src/README.md)），随切片增长、不在此枚举 | `packages/client/ui-sidebar-right`（tab 注册与浮窗）+ `docs/subsystems/sidebar-right.md` + `packages/client/ui-dockkit`（浮窗手势） |
-| 交付物 | `present` 工具的 explicit deliveries（ui-demo §1） | `packages/client/ui-deliverables` |
+| 交付物 / 成品 | `present` 工具的 explicit deliveries（**成品 = present 过的 final**；三态合同 = demo.md） | `packages/client/ui-deliverables` |
+| 观察窗 / 驾驶舱 / 驾驶座 | 同一实体（人侧 web 窗口）的三别名——「驾驶舱」是 UI 切片史名、「驾驶座」是维护文档比喻，词表家 = [orient.md](./orient.md) | `apps/web` |
+| R3 / r3 / R3′ | **三义别互推**：R3 = 退役轮次标记（dev-loop §注）· r3 = snapshots 场景号（replay/r3-*）· R3′ = 待核工作扫描口径（[hitl-fact-gate Note](../notes/archived/2026-10-10-hitl-fact-gate.md)） | — |

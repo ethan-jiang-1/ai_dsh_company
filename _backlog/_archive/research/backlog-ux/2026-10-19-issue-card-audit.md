@@ -5,9 +5,9 @@ intent: "为 issue 卡质量审与 DSH-native 收口提供逐条证据：四张�
 
 # issue 卡质量审：当前态为什么看不清，以及怎样接回 DSH 结构（2026-10-19）
 
-服务：[已结质量卡](../../_archive/settled_issues/2026-10-19-issue-card-quality.md) 与四张公司面卡（A 收口依据）；本文的 A/B/C 取舍中 A 已执行，B 以后做，C = 执行协议。
+服务：[已结质量卡](../../../_archive/settled_issues/2026-10-19-issue-card-quality.md) 与四张公司面卡（A 收口依据）；本文的 A/B/C 取舍中 A 已执行，B 以后做，C = 执行协议。
 
-**口径**：只读审计。读了四张活跃卡、[issues/README](../../issues/README.md)、两份公司面调研、[research/README](../README.md)、[_backlog 章程](../../README.md)、三张缺陷卡结论（[BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) / [BUG-026](../../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) / [BUG-027](../../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)）与相关源码；实跑 `node checks/run-gates.mjs`（**ALL PASS**）、`wc -l`、若干只读 `node` 脚本与 `grep`。**没开浏览器**；凡浏览器结论都标“未执行”。
+**口径**：只读审计。读了四张活跃卡、[issues/README](../../../issues/README.md)、两份公司面调研、[research/README](../../README.md)、[_backlog 章程](../../../README.md)、三张缺陷卡结论（[BUG-025](../../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) / [BUG-026](../../../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) / [BUG-027](../../../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)）与相关源码；实跑 `node checks/run-gates.mjs`（**ALL PASS**）、`wc -l`、若干只读 `node` 脚本与 `grep`。**没开浏览器**；凡浏览器结论都标“未执行”。
 
 ## 一、总判断
 
@@ -17,7 +17,7 @@ intent: "为 issue 卡质量审与 DSH-native 收口提供逐条证据：四张�
 
 **同一失败类在文档层重演。** BUG-026/027 的教训是“复现脚本必须指到消费者真正读的那一层”；这四张卡现在读 **state** 当 **wire**（golden 快照）、读 **旧版**当 **现状**（正文订正）、读 **索引**当 **卡片**（README）。层错了，量得再准也是别的东西。
 
-**门禁全绿不构成反证。** `backlog-liveness` 查目录、README、status 枚举、状态行镜像、`毕业：` 封闭头、索引链接与闭场信号（[gate](../../../checks/gates/backlog-liveness.mjs) 的 `run` 函数，[实现](../../../tools/lib/backlog-liveness.mjs) 的 `statuses`/状态镜像段），不查“当前结论是否成立”。章程自己写了“检查通过不证明问题结论正确或方法有效”（[README](../../README.md) §文件与维护）。
+**门禁全绿不构成反证。** `backlog-liveness` 查目录、README、status 枚举、状态行镜像、`毕业：` 封闭头、索引链接与闭场信号（[gate](../../../../checks/gates/backlog-liveness.mjs) 的 `run` 函数，[实现](../../../../tools/lib/backlog-liveness.mjs) 的 `statuses`/状态镜像段），不查“当前结论是否成立”。章程自己写了“检查通过不证明问题结论正确或方法有效”（[README](../../../README.md) §文件与维护）。
 
 ## 二、逐条发现
 
@@ -27,40 +27,40 @@ intent: "为 issue 卡质量审与 DSH-native 收口提供逐条证据：四张�
 
 | # | 严重度 | 位置 | 问题 | 证据 / 建议 |
 |---|---|---|---|---|
-| A1 | P1 | [看板卡](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §「已确立的事实 / 本轮范围」 | 「两个致命结论」仍说“正确性缺陷已确认两条”；“本轮范围”第 1 条仍写“先修数据 BUG-026/027” | 与同卡「核心不再是修正确性缺陷」直接冲突；026 是误报、027 已修。当前段应只留呈现层 + golden 判据 |
-| A2 | P1 | [看板卡](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §「验收标准」 | 仍把 BUG-026/027 的「已修判定」当验收条目 | 两个 BUG 已归档；026 的“已修判定”是在误报结论之前写的。条目要么已满足，要么不可执行 |
-| A3 | P1 | [任务板卡](../../_archive/settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md) §「已确立的事实 / 本轮范围」 | 「修 owner 后要重测（BUG-026 不修…）」；「BUG-027 修好后需同步复核」 | 同卡 §「已确立的事实 / 验收标准」说 026 是误报、无需修复；`（阻塞）` 已在 [TasksPanel.tsx](../../../packages/company-pack/src/client/TasksPanel.tsx) 的 `TasksTableView` 修掉并有 [spec](../../../tests/client/tasks-table.spec.ts) 的 describe 块 |
-| A4 | P1 | [优先级卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) §「建议 Top 3 / 依据」 | “owner 列空”“先依赖 ① 修 owner”；还说在场连带 BUG-026 | owner 在 wire 上齐全；① 没有 owner 修复任务；026 已结。“三条已确认缺陷…不需要浏览器就能修”也已过期 |
-| A5 | P1 | [issues/README](../../issues/README.md) §活跃清单 | 旧版还写“BUG-026 走哪条路”“owner 空”“已确认两条真缺陷 BUG-026/027” | 三条都已撤回/关闭；本轮已先改这三行，但正文/状态仍未收口 |
+| A1 | P1 | [看板卡](../../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §「已确立的事实 / 本轮范围」 | 「两个致命结论」仍说“正确性缺陷已确认两条”；“本轮范围”第 1 条仍写“先修数据 BUG-026/027” | 与同卡「核心不再是修正确性缺陷」直接冲突；026 是误报、027 已修。当前段应只留呈现层 + golden 判据 |
+| A2 | P1 | [看板卡](../../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §「验收标准」 | 仍把 BUG-026/027 的「已修判定」当验收条目 | 两个 BUG 已归档；026 的“已修判定”是在误报结论之前写的。条目要么已满足，要么不可执行 |
+| A3 | P1 | [任务板卡](../../../_archive/settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md) §「已确立的事实 / 本轮范围」 | 「修 owner 后要重测（BUG-026 不修…）」；「BUG-027 修好后需同步复核」 | 同卡 §「已确立的事实 / 验收标准」说 026 是误报、无需修复；`（阻塞）` 已在 [TasksPanel.tsx](../../../../packages/company-pack/src/client/TasksPanel.tsx) 的 `TasksTableView` 修掉并有 [spec](../../../../tests/client/tasks-table.spec.ts) 的 describe 块 |
+| A4 | P1 | [优先级卡](../../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) §「建议 Top 3 / 依据」 | “owner 列空”“先依赖 ① 修 owner”；还说在场连带 BUG-026 | owner 在 wire 上齐全；① 没有 owner 修复任务；026 已结。“三条已确认缺陷…不需要浏览器就能修”也已过期 |
+| A5 | P1 | [issues/README](../../../issues/README.md) §活跃清单 | 旧版还写“BUG-026 走哪条路”“owner 空”“已确认两条真缺陷 BUG-026/027” | 三条都已撤回/关闭；本轮已先改这三行，但正文/状态仍未收口 |
 | A6 | P1 | [真相复核 §五/§六](../company-panels-ux/2026-10-19-panel-truth-audit.md) | §五仍以被证伪的 §三为依据说“真值缺 owner、ready 放宽、必须换底”；§六仍说 owner 全缺可能是开发 home 特有 | 与文首补正相反；正文仍在判断路径上。本轮已加失效指针，未重写 |
-| A7 | P1 | [盘点 §五](../company-panels-ux/2026-10-19-panel-inventory-and-priority.md) + [research 索引](../README.md) | §五仍推荐台账 Top 1；索引只说 §二/§四订正 | §五正是建立在 §二/§四上，也失效了；本轮已加指针，未重写 |
+| A7 | P1 | [盘点 §五](../company-panels-ux/2026-10-19-panel-inventory-and-priority.md) + [research 索引](../../README.md) | §五仍推荐台账 Top 1；索引只说 §二/§四订正 | §五正是建立在 §二/§四上，也失效了；本轮已加指针，未重写 |
 | A8 | P2 | 看板卡标题 / 任务板卡标题 | 看板卡仍叫“正确性优先：板面必须等于投影真值”；任务板卡仍叫“与看板口径一致性” | 两张卡的内容都已转向呈现层/可读性；标题是上一版的遗留，只读标题的人会误判 |
 
 ### B. 状态 / 门票 / 依赖
 
 | # | 严重度 | 位置 | 问题 | 证据 / 建议 |
 |---|---|---|---|---|
-| B1 | P1 | 三张子卡 + [章程](../../README.md) §双轨状态生命周期 | 子卡 `推敲中`，但 README/下一步都说“等你点”；父卡 `等人拍板` 原缺 🔒（本轮已补） | 下一步是用户选择：按章程应 `等人拍板` + 🔒，或用 `blockedBy` 父卡把“等另一张卡”与“等用户”分开。现在四张都像在等同一个用户 |
-| B2 | P1 | 三张子卡 + [章程](../../README.md) §双轨状态生命周期 | `## 验收标准`（自称“毕业门票”）+ `毕业：未定` | 章程：`## 验收标准` 是“做”的毕业门票；门票已写、倾向未定，读者不知道该不该开工。应暂标“草案”或翻 `毕业：做` |
-| B3 | P1 | [优先级卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) §未决问题 | “先做哪张”+“台账要不要重定位成成品台账”混在一张卡 | 两个独立决定；卡不能单独关闭；成品台账是新功能，不是 UX 轮 |
+| B1 | P1 | 三张子卡 + [章程](../../../README.md) §双轨状态生命周期 | 子卡 `推敲中`，但 README/下一步都说“等你点”；父卡 `等人拍板` 原缺 🔒（本轮已补） | 下一步是用户选择：按章程应 `等人拍板` + 🔒，或用 `blockedBy` 父卡把“等另一张卡”与“等用户”分开。现在四张都像在等同一个用户 |
+| B2 | P1 | 三张子卡 + [章程](../../../README.md) §双轨状态生命周期 | `## 验收标准`（自称“毕业门票”）+ `毕业：未定` | 章程：`## 验收标准` 是“做”的毕业门票；门票已写、倾向未定，读者不知道该不该开工。应暂标“草案”或翻 `毕业：做` |
+| B3 | P1 | [优先级卡](../../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) §未决问题 | “先做哪张”+“台账要不要重定位成成品台账”混在一张卡 | 两个独立决定；卡不能单独关闭；成品台账是新功能，不是 UX 轮 |
 | B4 | P2 | 四张卡 | 没有 `owner` / `blockedBy` / `blocker` / `updated` | 父卡和子卡的依赖是隐式的；`推敲中`/`等人拍板` 两值表达不了“等另一张卡”与“等一个具体答案”的区别 |
-| B5 | P2 | [优先级卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) §建议 Top 3 | 排序标准在段落间漂移：一会儿“证据强度”，一会儿“能 keyless 验且代价低”，一会儿“指挥视图重要性” | 三种标准会给出三个不同的第一；卡片没有说清用哪条，读者无法判断“看板第一”是事实还是口味 |
+| B5 | P2 | [优先级卡](../../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) §建议 Top 3 | 排序标准在段落间漂移：一会儿“证据强度”，一会儿“能 keyless 验且代价低”，一会儿“指挥视图重要性” | 三种标准会给出三个不同的第一；卡片没有说清用哪条，读者无法判断“看板第一”是事实还是口味 |
 
 ### C. 证据层 / 数字 / 多 owner
 
 | # | 严重度 | 位置 | 问题 | 证据 / 建议 |
 |---|---|---|---|---|
-| C1 | P1 | [看板卡](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §验证计划 + [研究 §五](../company-panels-ux/2026-10-19-panel-truth-audit.md) | 把 `record.rows.agentTeam.val`（state）原样当 golden，又用 `ownerId` 反推 owner | 生产读模型 `tasksFromTeamView` 读的是 wire 的 `ownerName`（[board.ts](../../../packages/company-pack/src/lib/board.ts)，形状见 [presence.ts](../../../packages/company-pack/src/lib/presence.ts) 的 `TeamViewLike`）。测试会再造一条生产不走的 owner 解析路径，可能再次假绿。golden 应存 wire，或测试先跑与 host 相同的 `projectTaskView` |
+| C1 | P1 | [看板卡](../../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §验证计划 + [研究 §五](../company-panels-ux/2026-10-19-panel-truth-audit.md) | 把 `record.rows.agentTeam.val`（state）原样当 golden，又用 `ownerId` 反推 owner | 生产读模型 `tasksFromTeamView` 读的是 wire 的 `ownerName`（[board.ts](../../../../packages/company-pack/src/lib/board.ts)，形状见 [presence.ts](../../../../packages/company-pack/src/lib/presence.ts) 的 `TeamViewLike`）。测试会再造一条生产不走的 owner 解析路径，可能再次假绿。golden 应存 wire，或测试先跑与 host 相同的 `projectTaskView` |
 | C2 | P2 | 看板卡 §已确立的事实 / 任务板卡 §本轮范围 / 台账卡 §已确立的事实、验收标准 | “每 5 秒刷新”三张卡各写一遍 | 一个事实三个 owner；如果没先选看板卡，台账的验收条就满足不了。应合成一张小卡或明确归一个 owner |
 | C3 | P2 | 看板卡 §这是什么 / 任务板卡 §这是什么 / [盘点](../company-panels-ux/2026-10-19-panel-inventory-and-priority.md) §一 | 行数 374/379、99/105、162/105；`styles.ts:179` 实际 184 | 引用已漂移；数字本身可能都对，但读者无法复算。改引用符号/命令，别只写行号 |
 | C4 | P2 | 研究文首 | 同时出现 61 板/298 任务、379 行/344 owner、273/273 ownerName | 没标各自样本：全量 state、`ver === 4` wire、读模型全量。没有“样本/层”列，数字越多越像噪声 |
-| C5 | P2 | [任务板卡](../../_archive/settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md) §验证计划（[看板卡](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §验证计划 的 golden 也依赖未冻结样本） | 验证计划依赖“BUG-026 里那个 21 条板的会话” | 会话可能已删/换 home；计划不可复跑。应先冻结 golden 夹具，再写浏览器步骤 |
+| C5 | P2 | [任务板卡](../../../_archive/settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md) §验证计划（[看板卡](../../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §验证计划 的 golden 也依赖未冻结样本） | 验证计划依赖“BUG-026 里那个 21 条板的会话” | 会话可能已删/换 home；计划不可复跑。应先冻结 golden 夹具，再写浏览器步骤 |
 | C6 | P2 | 四张卡 | “本轮/上一版/现在”没有绝对日期锚 | 新读者不知道“本轮”是哪一轮；这是自说明卡的反面。用日期 + 修订号，不用 deixis |
 
 ## 三、根因
 
 1. **卡是“日志 + 投影”混写。** DSH 的 session log 与 projection 分开：最新快照是状态，历史是事件。四张卡把三版订正都留在正文，顶部本应是投影，结果成了日志。
-2. **状态有四个家。** frontmatter、状态行、README、散文；research 索引是第五个。第二清单必漂——本仓文档纪律也写了“别建集中清单（第二清单必漂）”（[docs/AGENTS.md](../../../docs/AGENTS.md)）。
+2. **状态有四个家。** frontmatter、状态行、README、散文；research 索引是第五个。第二清单必漂——本仓文档纪律也写了“别建集中清单（第二清单必漂）”（[docs/AGENTS.md](../../../../docs/AGENTS.md)）。
 3. **没有 `owner`/`blockedBy`/`blocker`/`ready`。** 父卡和子卡的依赖是隐式的；`推敲中`/`等人拍板` 两值表达不了“等另一张卡”与“等一个具体答案”的区别。
 4. **门禁只查形状。** 枚举、镜像、索引、闭场信号都不查当前结论；所以 `pnpm verify` 全绿与内容陈旧可以同时成立。
 5. **数字没有样本/层。** 行号、样本数、总/子集混用；引用会随代码漂移，而卡片没有“取法”列。
@@ -121,7 +121,7 @@ updated: 2026-10-19
 
 证据层的受控词：`source`（读码/配置）、`state`（持久投影 state）、`wire`（浏览器收到的视图）、`runtime`（真浏览器/DOM）、`human`（人读/计时/可读性判断）。每个数字标一个层，避免再犯“state 当 wire”。
 
-**门禁窗口约束（本轮实测）**：`backlog-liveness` 只在 `slice(0, 12)` 里找状态行（[实现](../../../tools/lib/backlog-liveness.mjs) 的状态行查找段）。frontmatter 超过 5 个字段（`status/owner/blockedBy/opened/updated`）就会把状态行挤到第 13 行，门禁红。B 方案若保留 `blocker/touches`，要么放正文（如元问题卡），要么同 diff 把窗口扩到标题后/前 20 行，并带红/绿证据。**这是 Card v2 的第一个实现约束，不是排版偏好。**
+**门禁窗口约束（本轮实测）**：`backlog-liveness` 只在 `slice(0, 12)` 里找状态行（[实现](../../../../tools/lib/backlog-liveness.mjs) 的状态行查找段）。frontmatter 超过 5 个字段（`status/owner/blockedBy/opened/updated`）就会把状态行挤到第 13 行，门禁红。B 方案若保留 `blocker/touches`，要么放正文（如元问题卡），要么同 diff 把窗口扩到标题后/前 20 行，并带红/绿证据。**这是 Card v2 的第一个实现约束，不是排版偏好。**
 
 ### 4.3 三条硬规则
 

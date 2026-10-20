@@ -100,6 +100,9 @@
 | [2026-10-09-member-stale-write-acceptance.md](research/collaboration/2026-10-09-member-stale-write-acceptance.md) | BUG-007＋协作安全卡的成员 stale 拒写闭环 | 2026-10-10 |
 | [2026-10-09-team-read-barrier-seam.md](research/collaboration/2026-10-09-team-read-barrier-seam.md) | BUG-007＋协作安全卡的 post-execute 屏障接入点与限制 | 2026-10-10 |
 | [2026-10-09-team-read-barrier-acceptance.md](research/collaboration/2026-10-09-team-read-barrier-acceptance.md) | BUG-007＋协作安全卡的双成员同轮放行与冲突恢复验收 | 2026-10-10 |
+| [backlog-ux/2026-10-19-issue-card-audit.md](research/backlog-ux/2026-10-19-issue-card-audit.md) | 已结质量卡＋四张公司面卡：卡面当前态/陈旧引用审计（2026-10-21 自活跃 research 随卡归档） | 2026-10-19 |
+| [company-panels-ux/2026-10-19-panel-inventory-and-priority.md](research/company-panels-ux/2026-10-19-panel-inventory-and-priority.md) | 已结公司面优先级卡：面板数据量/痛点与 Top 3 依据（⚠ §二/§四/§五已被真相复核订正） | 2026-10-19 |
+| [company-panels-ux/2026-10-19-panel-truth-audit.md](research/company-panels-ux/2026-10-19-panel-truth-audit.md) | 同一父卡＋三张深挖卡＋BUG-025/026/027：面板真实数据面复核（⚠ §三 取法已证伪——读的是 projcache state 而非 wire 视图） | 2026-10-19 |
 | [2026-10-10-claim-loser-yield-acceptance.md](research/collaboration/2026-10-10-claim-loser-yield-acceptance.md) | 协作安全卡裁4 的认领让位行为对照 | 2026-10-10 |
 | [2026-10-12-assembly-evidence.md](research/ceo-minimal-assembly/2026-10-12-assembly-evidence.md) | 组队健壮性卡的证据基线（触点盘点/17 场全景/失败链/andon 与 RACI） | 2026-10-12 |
 | [2026-10-13-cultivation-design.md](research/agent-cultivation/2026-10-13-cultivation-design.md) | 培养卡的产品研究：对象、关系、用户路径和 A/B/C/D 候选取舍 | 2026-10-13 |

@@ -43,7 +43,7 @@ opened: 2026-10-19
 | 真 21 节点会话 | **已执行**：`session-133c5cde…` 打开成功；1716×321 宽图，390 窄栏 `overflowX=true / overflowY=false`，整页无纵向双滚动 | `dag-midflight-probe --session session-133c5cde… --narrow` |
 | drift | ALL PASS；图落 `snapshots/visual/board-drift/board.png` | `board-drift-probe` |
 | golden | 真 wire 夹具在 `tests/company/board.spec.ts`；未新建 state 快照 | `pnpm test tests/company/board.spec.ts` |
-| 84 板/379 任务、max 21、非空中位 4 | projcache **state** 全量（1738 会话），非 wire | [真相复核 §三](../../research/company-panels-ux/2026-10-19-panel-truth-audit.md) |
+| 84 板/379 任务、max 21、非空中位 4 | projcache **state** 全量（1738 会话），非 wire | [真相复核 §三](../research/company-panels-ux/2026-10-19-panel-truth-audit.md) |
 
 ## 范围与排除项
 

@@ -5,18 +5,18 @@ intent: "为『公司面 UX 深挖先做哪几个面板』提供可复核的数�
 
 # 公司面六面板盘点与 UX 优先级依据（2026-10-19）
 
-服务：[已结公司面优先级卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md)。
+服务：[已结公司面优先级卡](../../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md)。
 **口径**：本轮只做"读码 + 真数据 + 历史痛点"的**优先级判断**，尚未真跑任何面板；面板的具体缺陷要等真浏览器那一轮才作数。
 
 > ⚠ **本文已部分订正（2026-10-19，同轮复核）**：[真相复核](2026-10-19-panel-truth-audit.md) 实测出两处错——
 > ① **§二 第一行**把「993」记在"台账条目"名下是错的：台账面板读的是 `kb/motion-ledger.md`（**40 行动议**），
-> 993 是 `deliverables*` 的**文件数**（见 [BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md)）；
+> 993 是 `deliverables*` 的**文件数**（见 [BUG-025](../../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md)）；
 > ② **§四 历史痛点**按同一命令复跑已是 `LedgerTab` **10** 份（含本轮新卡），且其中 7 份是**同一件事**
 > （human-exits 批 3 的摘要显示线，已交付）⇒「痛点最多」不成立。
 > 另：§二 与 §六 给的 `agentTeam` 取法少了 `record` 一层，真路径 = `record.rows.agentTeam.val`。
 > **本文其余部分（交互面、验证计划、反证限制）仍有效**；读优先级请看父卡（已重排）。
 >
-> **2026-10-19 质量审补充**：§五「台账 Top 1」同样建立在 §二/§四 的旧数据上，已失效；当前排序见父卡与 [已结质量卡](../../_archive/settled_issues/2026-10-19-issue-card-quality.md)。
+> **2026-10-19 质量审补充**：§五「台账 Top 1」同样建立在 §二/§四 的旧数据上，已失效；当前排序见父卡与 [已结质量卡](../../../_archive/settled_issues/2026-10-19-issue-card-quality.md)。
 
 ## 一、面板清单与规模（`packages/company-pack/src/client/`，实测 `wc -l`）
 
@@ -71,7 +71,7 @@ intent: "为『公司面 UX 深挖先做哪几个面板』提供可复核的数�
 
 ## 五、评分与推荐（依据上文，不含口味）
 
-> ⚠ **本节已失效（2026-10-19 A 收口）**：台账「993 / Top 1」与任务板「同源不一致」的前提已被 [真相复核](2026-10-19-panel-truth-audit.md) 与 [BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) 订正；当前排序见 [已结父卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md)。下表保留为旧版依据，**不要按它排优先级**。
+> ⚠ **本节已失效（2026-10-19 A 收口）**：台账「993 / Top 1」与任务板「同源不一致」的前提已被 [真相复核](2026-10-19-panel-truth-audit.md) 与 [BUG-025](../../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) 订正；当前排序见 [已结父卡](../../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md)。下表保留为旧版依据，**不要按它排优先级**。
 
 | 面板 | 真实数据 | 看错代价 | 测试成本（越低越好） | 历史痛点 | 结论 |
 |---|---|---|---|---|---|

@@ -29,8 +29,5 @@ intent: "为什么需要这份依据。"
 |---|---|
 | [repo-hygiene/2026-10-20-fresh-agent-audit.md](repo-hygiene/2026-10-20-fresh-agent-audit.md) | [fresh-agent 全仓打扫卫生问题卡](../issues/2026-10-20-fresh-agent-repo-hygiene.md)：六轴证据、腐化账本与 A–D 分批修复建议；关联 [BUG-029](../_archive/fixed_bugs/BUG-029-committed-web-token-recurrence.md) |
 | [repo-hygiene/2026-10-20-followup-six-dimension-audit.md](repo-hygiene/2026-10-20-followup-six-dimension-audit.md) | 同一问题卡（第二轮持续跟进）：上轮修复复核全守住 + 新发现（replay 实际 1/10、diagnose 审批判读 BUG A、orient --scenario r3 崩 BUG C）+ P0–P4 改善清单待用户选批 |
-| [backlog-ux/2026-10-19-issue-card-audit.md](backlog-ux/2026-10-19-issue-card-audit.md) | [已结质量卡](../_archive/settled_issues/2026-10-19-issue-card-quality.md) + 四张公司面卡：当前态/陈旧引用/状态问题的审计与 A 收口依据；Card v2 与 DSH 执行层映射（B 以后做） |
-| [company-panels-ux/2026-10-19-panel-inventory-and-priority.md](company-panels-ux/2026-10-19-panel-inventory-and-priority.md) | [已结公司面优先级卡](../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md)：真实数据量/交互面/历史痛点与 Top 3 依据（**§二 数据量归属 / §四 痛点计数 / §五 评分已被下一行订正**） |
-| [company-panels-ux/2026-10-19-panel-truth-audit.md](company-panels-ux/2026-10-19-panel-truth-audit.md) | 同一父卡 + 三张深挖卡 + [BUG-025](../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) / [BUG-026](../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) / [BUG-027](../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)：面板真实数据面、真投影字段实况与可复跑脚本（⚠ **§三 取法已证伪**：读的是 projcache state 行而非 wire 视图；**§五/§六 仍基于该旧前提**——见文首补正与质量审稿） |
 
 随卡归档的材料见 [研究归档](../_archive/research/README.md)。

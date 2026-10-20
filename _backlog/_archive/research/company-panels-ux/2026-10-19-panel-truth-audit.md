@@ -5,11 +5,11 @@ intent: "把『公司面面板 UX 深挖』四张卡里可机械复核的事实�
 
 # 公司面面板真相复核：四张卡的前提有几条站得住（2026-10-19）
 
-服务：[已结公司面优先级卡](../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) 与它拆出的三张深挖卡
-（[台账](../../_archive/settled_issues/2026-10-19-ledger-ux-deep-dive.md)｜[看板 + 依赖图](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)｜
-[任务板](../../_archive/settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md)）及三张缺陷卡
-（[BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md)｜[BUG-026](../../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md)｜
-[BUG-027](../../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)）。
+服务：[已结公司面优先级卡](../../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) 与它拆出的三张深挖卡
+（[台账](../../../_archive/settled_issues/2026-10-19-ledger-ux-deep-dive.md)｜[看板 + 依赖图](../../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)｜
+[任务板](../../../_archive/settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md)）及三张缺陷卡
+（[BUG-025](../../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md)｜[BUG-026](../../../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md)｜
+[BUG-027](../../../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)）。
 
 **口径**：本轮 = **读码 + 真数据实跑**，**没开浏览器**。凡标「实测」的都有本文件给出的可复跑命令；
 凡标「待真浏览器」的仍是假设。上一份调研（`2026-10-19-panel-inventory-and-priority.md`）的**数据量数字有两条要改**
@@ -30,15 +30,15 @@ intent: "把『公司面面板 UX 深挖』四张卡里可机械复核的事实�
 > 我们的真读模型 tasksFromTeamView 吃这批真 wire：379 行 / 已解析 owner 344 / readyOnNonPending 0
 > ```
 >
-> ⇒ **§3.1 的结论作废**（owner 一个都没丢；[BUG-026](../../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) 是误报）；
+> ⇒ **§3.1 的结论作废**（owner 一个都没丢；[BUG-026](../../../_archive/settled_issues/BUG-026-owner-missing-from-team-projection.md) 是误报）；
 > **§3.2 的根因作废**（`??` 回落不可达——官方给的是 `false` 这个有效值，不触发回落），但**症状是真的**，
 > 真根因是**徽章渲染门槛不看 status**（147 枚徽章里 129 枚挂在已完成的卡上、2 枚挂在进行中的卡上），
-> 已按真根因修复，见 [BUG-027](../../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)「结论」节。
+> 已按真根因修复，见 [BUG-027](../../../_archive/fixed_bugs/BUG-027-false-dependency-ready-badge.md)「结论」节。
 > 下面 §三 的脚本与两节原文**保留作为错误样本**（根因纪律：被证伪的假设留在原地，不抹掉），
 > 但**不要再用它们做判断**。§3.3 的 drift 脚本只读 subject/description/blockedBy/status——这四个字段
 > state 与 wire 都有且同值，**该节结论不受影响**。
 >
-> **2026-10-19 质量审补充**：§五/§六 的「换底」结论仍以本页已证伪的 owner/ready 前提为依据；保留作历史建议，当前判断见 [已结质量卡](../../_archive/settled_issues/2026-10-19-issue-card-quality.md)。
+> **2026-10-19 质量审补充**：§五/§六 的「换底」结论仍以本页已证伪的 owner/ready 前提为依据；保留作历史建议，当前判断见 [已结质量卡](../../../_archive/settled_issues/2026-10-19-issue-card-quality.md)。
 
 ---
 
@@ -46,7 +46,7 @@ intent: "把『公司面面板 UX 深挖』四张卡里可机械复核的事实�
 
 | 上份调研的说法 | 本轮实测 | 订正理由 |
 |---|---|---|
-| 「台账条目 **993**（当前 98 + 归档 895）」 | 台账面板实渲染 **40 行**（`kb/motion-ledger.md` 的动议表）；993 = `deliverables*` 目录的**文件数** | 两个面混用了。见 [BUG-025](../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) |
+| 「台账条目 **993**（当前 98 + 归档 895）」 | 台账面板实渲染 **40 行**（`kb/motion-ledger.md` 的动议表）；993 = `deliverables*` 目录的**文件数** | 两个面混用了。见 [BUG-025](../../../_archive/fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) |
 | `LedgerTab` 命中 **7** 份文档 | 按同一命令 `grep -rl LedgerTab notes/ _backlog/ docs/` 实测 **10** 份（含（_backlog 里 3 份是这轮刚写的卡/research） | 数字本身没钉脚本与时点，复跑已不同频；"痛点 7 份"多半是**现在的卡在自我引用**，不是历史痛点 |
 | 最大板 21 条、中位 **0** | 最大 21 条、非空会话 84、**非空板的中位 4 条**（"中位 0"是含 1638 个空板一起算的） | 两个中位数说的是不同问题；对"最大板有多难受"应该看 84 个非空板 |
 
@@ -200,7 +200,7 @@ console.log({boards,boardsWithDrift:withDrift,driftTasks:n});"
 
 ## 五、三张深挖卡的验收标准要换底（本轮最重要的结论）
 
-> ⚠ **本节已失效（2026-10-19 A 收口）**：第 1 步的 golden 取法读的是 **state**，不是 wire；按此做会重犯 BUG-026。当前建议的验收方案见已结的 [看板卡](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)（wire golden + 现有探针）。下文保留为错误样本，**不要照做**。
+> ⚠ **本节已失效（2026-10-19 A 收口）**：第 1 步的 golden 取法读的是 **state**，不是 wire；按此做会重犯 BUG-026。当前建议的验收方案见已结的 [看板卡](../../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)（wire golden + 现有探针）。下文保留为错误样本，**不要照做**。
 
 三张卡现在把验收压在"**板面 = 投影真值**"上。§三证明**真值本身缺 owner 字段、ready 语义被放宽**——
 直接照卡里的写法去跑，**会跑出假绿**（真值也是"未分配"，断言"相等"通过）。
@@ -221,7 +221,7 @@ console.log({boards,boardsWithDrift:withDrift,driftTasks:n});"
 
 ## 六、反证与限制（如实）
 
-> ⚠ **本节基于 §三 的已证伪前提**：owner 全缺不成立（wire 273/273 齐全）。下面的 owner 推测保留为错误样本；当前结论见 [已结质量卡](../../_archive/settled_issues/2026-10-19-issue-card-quality.md) 与 [看板卡](../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)。
+> ⚠ **本节基于 §三 的已证伪前提**：owner 全缺不成立（wire 273/273 齐全）。下面的 owner 推测保留为错误样本；当前结论见 [已结质量卡](../../../_archive/settled_issues/2026-10-19-issue-card-quality.md) 与 [看板卡](../../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)。
 
 - **没开浏览器**：所有"长什么样"的结论都是读码推的，**截图证据一份没有**。上一份调研的口径
   （"未跑前全是假设"）依然适用。

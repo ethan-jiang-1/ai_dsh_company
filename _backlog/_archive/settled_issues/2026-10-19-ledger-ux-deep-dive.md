@@ -30,7 +30,7 @@ opened: 2026-10-19
 |---|---|---|---|
 | 面板真实数据面 | `kb/motion-ledger.md`（动议表） | 代码接线 | [`index.ts:205`](../../../packages/company-pack/src/index.ts#L205) + [`ledger.ts`](../../../packages/company-pack/src/lib/ledger.ts) |
 | 面板实渲染行数 | **40** = `parseMotionLedger(真文件)` | 真文件 + 真浏览器 | `npx tsx` 解析 + `ledger-summary-probe --expected-rows 40` |
-| 单行摘要最长 | **663 字**；超过 120 字的 **16/40** 行 | 真文件实跑 | [调研 §二](../../research/company-panels-ux/2026-10-19-panel-truth-audit.md) |
+| 单行摘要最长 | **663 字**；超过 120 字的 **16/40** 行 | 真文件实跑 | [调研 §二](../research/company-panels-ux/2026-10-19-panel-truth-audit.md) |
 | 行长度已受控 | 是：`-webkit-line-clamp: 2` + 量溢出给「全文」 | 代码 + 真浏览器探针 | [`styles.ts:179-184`](../../../packages/company-pack/src/client/styles.ts#L179-L184) + `ledger-summary-probe` |
 | 折叠/筛选/搜索/按日期分组 | 无 | 读码 | 面板源码 grep |
 | 刷新间隔 | **30 秒**；页签显示「每 30 秒自动刷新」 | 代码 + 真 app 探针 | [`LedgerTab.tsx:28`](../../../packages/company-pack/src/client/LedgerTab.tsx#L28) / `ledger-summary-probe` label |
