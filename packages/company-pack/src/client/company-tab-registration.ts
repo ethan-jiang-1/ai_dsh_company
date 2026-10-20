@@ -12,7 +12,7 @@ import type { CultivationFiles } from './cultivation-data.ts'
 import { CultivationTab } from './CultivationTab.tsx'
 import { DeliverablesTab } from './DeliverablesTab.tsx'
 import { LedgerTab } from './LedgerTab.tsx'
-import { sessionFileAddress } from '../lib/deliverables-catalog.ts'
+import { sessionFileAddress } from '../lib/deliverables-address.ts'
 import {
   AttentionTabTitle, BoardTabTitle, BudgetTabTitle, CatalogTabTitle, CultivationTabTitle,
   DagTabTitle, LedgerTabTitle, PresenceTabTitle, TasksTabTitle,

@@ -89,6 +89,11 @@ export const PRESET_SHORT_LABELS: Record<PresetRoleId, string> = {
   cfo: 'CFO',
 }
 
+/** 角色 → 显示名（未知角色原样返回；2026-10-21 随短标签收进词汇层——培养域 facade 再导出）。 */
+export function roleLabel(role: string): string {
+  return PRESET_SHORT_LABELS[role as PresetRoleId] ?? role
+}
+
 /** 状态 → 官方 StateDot 语义（client 渲染用；2026-10-20 从 tabs/panels 两份局部映射收进词汇层）。 */
 export function memberDot(status: PresenceStatus): 'done' | 'ongoing' | 'warning' | 'error' | 'idle' {
   switch (status) {

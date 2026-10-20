@@ -8,7 +8,7 @@ import {
   parseCatalog,
   type DeliverablesCatalog,
 } from '../../packages/company-pack/src/client/DeliverablesTab.tsx'
-import { sessionFileAddress } from '../../packages/company-pack/src/lib/deliverables-catalog.ts'
+import { sessionFileAddress } from '../../packages/company-pack/src/lib/deliverables-address.ts'
 import { buildDeliverablesCatalog } from '../../tools/lib/deliverables-catalog.mjs'
 
 /**
