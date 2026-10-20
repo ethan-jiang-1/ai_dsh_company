@@ -29,9 +29,11 @@ r2 presence + `--ui` 全绿。问题集中在**总账与反馈面**：新增角�
 复评结论：上轮批次 0–2 修复全部守住（36 门 / 711 用例 / 6 preset / cdp-probe 9/9 活体复验）；新抓三件硬发现——
 ① **replay 回归网实际 1/10**：r3 full 档被 21:58 手册去重提交（589d785，纯 docs）打断，「归一化零 diff」红，改动面映射表无「注入面 → replay」行、门禁不跑进程，无人发现；② **BUG A**：diagnose 审批判读字段错位（读 decision/answer，真实 v4 日志是 {id,outcome}——session-1d120f37 一手复现 `approval ? →`，夹具用想象形状故套件绿）；③ **BUG C**：`orient --scenario replay/r3-delegation` ENOTDIR 崩（children 文件/目录假设）。语义面债务清单与改善优先级（P0 反馈通路正确性 → P4 常驻层与检索）见报告 §5，**待用户 REVIEW 选批**。另：用户点名处理 notes/implemented 归档迁移，分诊进行中。
 
-**剩余（不阻塞当前绿）：** ① 手册 187/190 行、26.2KB（同上轮）；② replay 实际 1/10 runnable（r3 待重录或翻 archived——需拍板）；③ host 入口 `export *` 已接受取舍（同上轮）；④ 新增：BUG A/C 修复、注入面 freshness 门禁、四份 ≥95% 文档与 11 份无预算合同的棘轮处置、notes 记忆层检索配方与归档。
+**落实（2026-10-21，用户批 P0 + r3 重录 + notes 归档）：** 全部完成，证据 = [implementation Note](../../notes/implemented/2026-10-21-followup-sweep-p0-implementation.md)——BUG-030/031 修复（红 6 failed → 绿；活体复验）；replay 注入面闭环四件套（tests/README 注入面映射行 + replay-fixture-freshness 门禁〔37 门，出生事故即负例〕+ r3 第五次重录〔replay lane 真实回到 2/10 runnable〕+ session diff 字符级首差定位与失败现场落诊断区）；notes 归档 31 篇（implemented 78→47，删候选 0，同 diff 改链 51 处）。`pnpm verify` ALL PASS（37 门）/ `pnpm test` 77 spec 721 tests 全绿。
 
-**下一步：** 用户 REVIEW 改善清单选批 → 按批实施（P0 为 keyless 小切片：BUG A/C + replay 映射行 + replay-fixture-freshness 门禁 + r3 处置拍板）；notes 归档分诊完成 → 复核执行（同 diff 改链 + 门禁复绿）。
+**剩余（不阻塞当前绿，P1–P4 待用户选批）：** ① 手册 187/190 行饱和（P4，产品内容重构需 preset-smoke + handbook-smoke 复验）；② P1 语义面止血（budget-and-ops:41 + notes/README:73 两实锤、bare-path 纯文本档、计数对家、orient.mjs:129 措辞、布局块三漏项）；③ P2 结构收拢（五角色名册单一化、run-gates 孤儿探测、src/README 消费面句）；④ P3 测试资产（composition 5.9s 拆分、act() ×12 清理、use-company-data spec、attention/presence/budget 视觉探针、性能最小档）；⑤ P4 常驻层与检索（terminology 别名组三行、web-rpc/手册棘轮搬家、demo/multi-human/presets 冻结预算、notes 检索配方、滞留研究稿处置）。
+
+**下一步：** 用户 REVIEW 剩余 P1–P4 选批后推进；未选批前不动。
 
 ## 范围与排除项
 
