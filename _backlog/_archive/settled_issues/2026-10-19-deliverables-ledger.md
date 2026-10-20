@@ -11,11 +11,11 @@ opened: 2026-10-19
 
 **做了，按派生视图 + 只读页签落地**：
 
-- **数据面**：盘上 `deliverables/` + `deliverables-archive/` 的 `final.md` + `meta.md` ⇒ 纯形状 `tools/lib/deliverables-catalog.mjs` ⇒ 生成器 `tools/deliverables-index.mjs` ⇒ `company-workspace/kb/deliverables-index.json`。当前 **44 份**（活跃 5 / 归档 39 / **台账外 5** / **present 42 / 未 present 2 / present 未核 0**）。`present` 状态由 `deliverables-check --json` 提供（单一判据；不可得时 `presented=null`，面板显示「present 未核」）。
+- **数据面**：盘上 `deliverables/` + `deliverables-archive/` 的 `final.md` + `meta.md` ⇒ 纯形状 `tools/lib/deliverables-catalog.mjs` ⇒ 生成器 `tools/deliverables-index.mjs` ⇒ `company-workspace/kb/deliverables-index.json`。当前 **44 份**（**活跃 1 / 归档 43 / 台账外 2** / **present 42 / 未 present 2 / present 未核 0**）。2026-10-20 已收敛 v2 / v3 / lingang / role-kit 四件；未收敛 = private-deploy（no present 真红）、light/hefeng（未闭合）。`present` 状态由 `deliverables-check --json` 提供（单一判据；不可得时 `presented=null`，面板显示「present 未核」）。
 - **页签**：右栏第 9 个公司页签「成品」（guide entry 同步）。统计（含 present / 未 present）→ 全部/活跃/归档/台账外四档筛选 → 按月分组；每行 `结果 tag + slug + 归档/台账外 + 日期·类型 + 一句话结论（2 行 + 全文） + 打开`；「打开」用 `dsh-resource://file/session/...` 在右栏预览 `final.md`。
 - **静态索引说真话**：页签头「静态索引 · 生成于 …」+「重读」；不轮询；缺索引/坏 schema 明确提示跑生成器。
 - **并列不替代**：动议台账答「决定了什么」，成品目录答「交出了哪些 final」；`present` 背书/审计仍归 [`deliverables-check`](../../../checks/audit/deliverables-check.mjs)。
-- **规模事实**：旧卡的「993」是 `deliverables*` 文件数；成品 final 只有 44；动议台账 40 行/39 ✅ 已覆盖 39/44，只有 5 份台账外（本目录把它们标出来）。
+- **规模事实**：旧卡的「993」是 `deliverables*` 文件数；成品 final 只有 44；动议台账 **43 行/42 ✅** 覆盖 42/44，只剩 2 份台账外（private-deploy、recon-pack；本目录标出来）。
 
 **剩余/触发**：
 - 生成索引已接进 `converge`（正常收敛/`--resume` 后自动重建，也可 `node tools/converge.mjs --rebuild-index`）。
@@ -33,22 +33,23 @@ opened: 2026-10-19
 - **UX 顺手修**：页签头标题/按钮 `nowrap` + 新鲜度文案省略号（窄栏不再把「重读/浮出」挤成竖排）；看板标题/guide 的旧「5 秒自动刷新」改「投影更新」。
 - **测试**：`tests/company/deliverables-catalog.spec.ts`（5）+ `tests/client/deliverables-catalog.spec.ts`（8）+ `client-face` 数据面（1）；注册/组合测试同步 9 页签。
 - **探针**：[`deliverables-catalog-probe.mjs`](../../../probes/browser-visual/deliverables-catalog-probe.mjs)（真 web；44 行 = 索引；四档筛选；44 个打开；点第一行后 final 正文出现；窄栏可见；`--fixture` 落图）。
-- **Note**：[2026-10-19-deliverables-catalog](../../../notes/implemented/2026-10-19-deliverables-catalog.md)。
+- **Note**：[2026-10-19-deliverables-catalog](../../../notes/implemented/2026-10-19-deliverables-catalog.md)｜批次句号：[2026-10-20-company-panel-batch-close](../../../notes/implemented/2026-10-20-company-panel-batch-close.md)。
 
 ## 事实与证据（本轮实跑）
 
 | 项 | 结果 | 命令/产物 |
 |---|---|---|
-| 生成索引 | 44 份 / 活跃 5 / 归档 39 / 台账外 5 / present 42 / 未 present 2 / 未核 0 | `node tools/deliverables-index.mjs`；[deliverables-index.json](../../../company-workspace/kb/deliverables-index.json) |
+| 生成索引 | 44 份 / 活跃 1 / 归档 43 / 台账外 2 / present 42 / 未 present 2 / 未核 0 | `node tools/deliverables-index.mjs`；[deliverables-index.json](../../../company-workspace/kb/deliverables-index.json) |
 | present 判据 | `deliverables-check --json` 末行 `presented` 42；audit 自身仍报 2 真违规 | `source run/env.sh && node checks/audit/deliverables-check.mjs --json` |
 | 自动重建 | 收敛/续跑后自动；`--rebuild-index` 单独跑成功 | `node tools/converge.mjs --rebuild-index`；`converge-rules.spec` |
 | 纯逻辑红/绿 | 去掉 final 过滤 ⇒ 3 failed / 2 passed；还原 ⇒ 5 passed | `npx vitest run tests/company/deliverables-catalog.spec.ts` |
-| 全量 keyless | 70 files / 692 tests passed | `pnpm test` |
+| 全量 keyless | 70 files / 693 tests passed | `pnpm test` |
 | 结构门禁 | ALL PASS | `pnpm verify` |
 | 真挂载 | 零挂载失败 + 品牌在场 | `client-load-smoke`（重建 `lib/` 后） |
 | 真 app 目录 | 44 行 = 索引；统计/四档筛选/44 个「打开」；点开 final 正文出现 | `deliverables-catalog-probe --fixture`（ALL PASS） |
 | 视觉夹具 | [desktop.png](../../../snapshots/visual/deliverables-catalog/desktop.png) / [narrow.png](../../../snapshots/visual/deliverables-catalog/narrow.png) | `snapshots/visual/deliverables-catalog/` |
-| 台账外 | 5 份（private-deploy-reserve / lingang-recon / role-kit / …）在目录里带「台账外」tag | 同上 |
+| 台账外 | 2 份（private-deploy-reserve / recon-pack）在目录里带「台账外」tag | 同上 |
+| 清理收敛 | v2 / v3 / lingang / role-kit 四件收敛；台账 43 行/42 ✅；索引自动重建（活跃 5→1） | `node tools/converge.mjs --slug …`；`--charter-backfill`；`deliverables-check --json` |
 
 ## 范围与排除项
 
@@ -65,7 +66,8 @@ opened: 2026-10-19
 - [x] **注册面**：第 9 个页签/guide/title + 组合测试 9 项；`client-load` 绿。
 - [x] 门禁 + `pnpm test` + 探针绿；Note/索引/视觉夹具同步。
 - [x] **present 状态**：由 `deliverables-check --json` 提供；不可得显示「present 未核」；真 app 探针验首行「未 present」。
-- [x] **自动重建**：接进 `converge`/`--resume`；`--rebuild-index` 单独跑成功；纯命令形状有 spec。
+- [x] **自动重建**：接进 `converge`/`--resume`；`--rebuild-index` 单独跑成功；四件真收敛各自触发重建（活跃 5→1）；纯命令形状有 spec。
+- [x] **清理收敛**：v2 / v3 / lingang / role-kit 已入归档家 + 台账行 + CHARTER 纪要；role-kit 类型修为「生产」；审计只剩 private-deploy 的 present 真红。
 
 ## 修订史（只追加）
 
@@ -74,9 +76,10 @@ opened: 2026-10-19
 - rev 3 2026-10-19：用户拍「现在做」；定为派生索引 + 只读页签，不新建 Remote/store。
 - rev 4 2026-10-19：落地生成器 + 第 9 页签 + 测试/探针/Note；本卡收口。
 - rev 5 2026-10-20：补 `present` 状态（deliverables-check --json 单一判据）与 `converge` 自动重建；本卡事实更新。
+- rev 6 2026-10-20：收敛 v2/v3/lingang/role-kit；台账 43 行/42 ✅；活跃 5→1、台账外 5→2；private-deploy present 真红保留。
 
 ## Review 指南（给 review 的人/Agent）
 
-- **要证伪的假设**：①「993 份成品」——是文件数，final 44；②「目录该实时」——首版是静态索引 + 重读，实时是后续升级；③「台账已够」——台账按动议、目录按 final，且目录把 5 份台账外标出来。
+- **要证伪的假设**：①「993 份成品」——是文件数，final 44；②「目录该实时」——首版是静态索引 + 重读，实时是后续升级；③「台账已够」——台账按动议、目录按 final，且目录把 2 份台账外标出来。
 - **口径**：成品 = 有 `final.md`；`present` 背书不由此目录判定，仍看 `deliverables-check`。
 - **别做**：不要手改 `kb/deliverables-index.json`（跑生成器）；不要把 `present` 状态塞进首版冒充审计。

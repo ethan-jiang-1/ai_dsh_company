@@ -197,3 +197,16 @@ export function archiveMovePlan(dirName) {
 export function catalogIndexInvocation({ root, execPath = process.execPath }) {
   return { command: execPath, args: [join(root, 'tools', 'deliverables-index.mjs')], cwd: root }
 }
+
+/**
+ * 收敛就绪判据里的「一句话结论未回填」判定（2026-10-20；事故 = 真结论里**提到**「未回填」
+ * 被当成占位，ai-transformation-2026-v2 明明有完整结论却被计划档判「未备」）。
+ * 只认**整值就是占位**：空串 / `回填` / `待回填` / 括号包的这两种；正文里的「未回填」是内容。
+ * @param {string} value - meta 的一句话结论。
+ * @returns {boolean} true = 占位/未回填。
+ */
+export function isPlaceholderConclusion(value) {
+  const trimmed = value.trim()
+  if (trimmed === '') return true
+  return /^[（(]?\s*(?:待)?回填\s*[）)]?$/.test(trimmed)
+}

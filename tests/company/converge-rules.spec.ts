@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalPresence, journalSlug, parseFlags, pickArchivedJournal, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
+import { archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, pickArchivedJournal, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
 const TMP: string[] = []
 afterAll(() => { for (const d of TMP) rmSync(d, { recursive: true, force: true }) })
 
@@ -241,5 +241,15 @@ describe('converge-rules · 成品索引重建命令（2026-10-20；收敛后自
     expect(invocation.command).toBe('/node')
     expect(invocation.args).toEqual(['/repo/tools/deliverables-index.mjs'])
     expect(invocation.cwd).toBe('/repo')
+  })
+})
+
+
+describe('converge-rules · 一句话结论占位判定（2026-10-20；真结论提到「未回填」被误判）', () => {
+  it('整值占位才算未回填；正文提到「未回填」是内容', () => {
+    expect(isPlaceholderConclusion('本轮 14 格是 7 件归档 meta 的参与/一句话结论未回填')).toBe(false)
+    expect(isPlaceholderConclusion('回填')).toBe(true)
+    expect(isPlaceholderConclusion('（待回填）')).toBe(true)
+    expect(isPlaceholderConclusion('')).toBe(true)
   })
 })

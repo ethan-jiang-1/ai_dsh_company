@@ -21,7 +21,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, renameSync, rmSync } from 'node:fs'
 import { join, basename } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
+import { archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
 import { COMPANY_ROLE_IDS } from './lib/company-roles.mjs'
 import { spawnSync } from 'node:child_process'
 
@@ -101,7 +101,7 @@ const scanSlugs = () => {
     const findings = hasFinal ? checkSlugFindings(slugOf) : { ok: true, detail: '' }
     const gates = [
       [/\d{4}-\d{2}-\d{2}/.test(closed), 'meta.closed 未回填'],
-      [Boolean(concl) && !concl.includes('回填'), '一句话结论未回填'],
+      [!isPlaceholderConclusion(concl), '一句话结论未回填'],
       [hasFinal, '无 final'],
       [!archived, '已存在同名归档'],
       [journalPresence({ slug: slugOf, journals }).missing === false, '零 journal（收工留痕缺口）——补齐或显式 --allow-no-journal'],
@@ -230,7 +230,7 @@ const converge = (dirName) => {
   if (existsSync(join(ARCHIVE, dirName))) { console.error(`✗ ${dirName}: 归档家已有同名目录（重复收敛？）`); process.exit(1) }
   const closed = metaField(slugDir, 'closed')
   const concl = metaField(slugDir, '一句话结论')
-  if (!existsSync(join(slugDir, 'final.md')) || !/\d{4}-\d{2}-\d{2}/.test(closed) || !concl || concl.includes('回填')) {
+  if (!existsSync(join(slugDir, 'final.md')) || !/\d{4}-\d{2}-\d{2}/.test(closed) || isPlaceholderConclusion(concl)) {
     console.error(`✗ ${dirName}: 未闭合（final=${existsSync(join(slugDir, 'final.md'))} closed=${closed} 结论=${concl ? '有' : '无'}）——收敛只收已闭合动议`)
     process.exit(1)
   }
