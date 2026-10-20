@@ -30,7 +30,7 @@
 - **recon-pack 归档 legacy 未 present**：唯一 `未 present`（1/44）；历史件，审计只作 legacy 观察项；不补。
 - **private-deploy 已不红**：2026-10-20 真 CEO 会话补了 present；`deliverables-check --json` 违规 **0**。
 - **light / hefeng 未闭合**：`meta.closed` 为空，收敛计划明确「未备」；不硬关。
-- **边界**：成品目录是静态索引 + 重读，不实时订阅；`replay-smoke --ui` 未跑（真 app 探针覆盖页签）；任务板窄栏折叠、台账日期分组/筛选是未开的可选功能，不是本轮 todo。
+- **边界**：成品目录是静态索引 + 重读，不实时订阅；任务板窄栏折叠、台账日期分组/筛选是未开的可选功能，不是本轮 todo。
 
 ## 证据
 
@@ -39,6 +39,7 @@
 - `deliverables-check --json` ⇒ **0 违规**；43/44 present（唯一未 present = recon-pack legacy）；`role-kit` 0 违规。
 - 四件收敛 + backfill 的日志在 `/tmp/converge-*.log` / `/tmp/backfill-*.log`；证据副本 `snapshots/archive/convergence-2026-10-20/`。
 - 成品目录真 app 探针 `deliverables-catalog-probe` ⇒ ALL PASS（44 行、present 统计、打开 final、窄栏）。
+- `replay-smoke --ui` ⇒ r3-delegation 与 r2-motion 均 **ALL PASS**（各连跑两次稳定）。r3 金样漂移已归因同步：重放已 settle 后「1 subagent」运行态 chip 不在捕获瞬时、header 顺序变化 + fixture 第 3 轮的「Jump to turn 3」按 `be2a480` 先例 `--refresh-ui` 重写（写入前委派卡在场断言仍强制），刷新后非刷新档连跑两绿。
 - 真 21 节点 DAG `dag-midflight-probe --session session-133c5cde… --narrow` ⇒ 1716×321、390 窄栏只横向滚动。
 
 ## 不要再重开的事
