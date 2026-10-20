@@ -87,6 +87,8 @@
 | [BUG-027-false-dependency-ready-badge.md](fixed_bugs/BUG-027-false-dependency-ready-badge.md) | 依赖徽章不看 status ⇒ 131 枚「等 …」噪声挂在已完成/进行中的卡上；**卡上原根因（`ready ?? readyOf()` 回落）经实证不可达**，真缺陷是渲染门槛 ⇒ 门槛加 pending 判据 + 回落补 pending 半句 + 两条 keyless 判据 | 2026-10-19 |
 | [BUG-028-pending-material-anchor-granularity.md](fixed_bugs/BUG-028-pending-material-anchor-granularity.md) | 闸门④锚粒度与纪律不一致——总锚覆盖多任务被判行动幻觉 | 2026-10-19 |
 | [BUG-029-committed-web-token-recurrence.md](fixed_bugs/BUG-029-committed-web-token-recurrence.md) | 观察窗 token 再次随 runtime 日志入库：untrack + `.gitignore` + 类级 tracked-token 窄扫（值不打印）+ 红绿守卫 | 2026-10-20 |
+| [BUG-030-diagnose-approval-outcome.md](fixed_bugs/BUG-030-diagnose-approval-outcome.md) | diagnose 审批判读字段错位（读想象键读不到 outcome）：按真 v4 形状判读 + asked/decided 按 id 配对 + 夹具取真日志样 | 2026-10-20 |
+| [BUG-031-orient-scenario-children-file-shape.md](fixed_bugs/BUG-031-orient-scenario-children-file-shape.md) | orient --scenario 对 children 文件形状 ENOTDIR 崩：statSync 分流（文件计 1 / 目录数 .jsonl） | 2026-10-20 |
 
 ## 随卡归档的研究
 

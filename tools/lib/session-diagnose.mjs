@@ -24,12 +24,22 @@ function textOf(value) {
   return ''
 }
 
+/** 对象安全取文：字符串原样，对象 JSON 序列化（不渲染 [object Object]）。 */
+function detailOf(value) {
+  if (value === undefined || value === null) return ''
+  if (typeof value === 'string') return value
+  try { return JSON.stringify(value) } catch { return String(value) }
+}
+
+// 审批事件的真实 v4 形状（vendor persistence-catalog）：approval/asked {id,toolName,callId?,reason?}
+// 之后必跟 approval/decided {id,outcome}（同一 id）；outcome 枚举 = allowed-once | rejected |
+// cancelled | unavailable。BUG-030 教训：不要读想象键（decision/answer）——夹具必须取真形状。
 function decisionOf(data) {
-  return data?.decision?.kind ?? data?.decision ?? data?.answer ?? data?.approval?.decision ?? ''
+  return data?.outcome ?? ''
 }
 
 function isAllowedDecision(value) {
-  return ['allowed-once', 'allowed', 'approved', 'allow', 'accept', 'accepted'].includes(String(value))
+  return value === 'allowed-once'
 }
 
 /**
@@ -59,6 +69,7 @@ export function summarizeSessionEvents(records, { recent = 1 } = {}) {
     lastAssistant: [],
   }
   const assistantTexts = []
+  const askedApprovals = new Map()
   for (const record of records) {
     const type = record?.type
     const data = record?.data ?? {}
@@ -70,7 +81,7 @@ export function summarizeSessionEvents(records, { recent = 1 } = {}) {
         summary.nonCompletedTurns.push({
           turn: data.turn ?? null,
           kind,
-          detail: redactTokenUrls(String(reason.error ?? reason.detail ?? '')).slice(0, 300),
+          detail: redactTokenUrls(detailOf(reason.error ?? reason.detail)).slice(0, 300),
         })
       }
     } else if (type === 'tool/result') {
@@ -79,14 +90,16 @@ export function summarizeSessionEvents(records, { recent = 1 } = {}) {
       if (isError) {
         summary.toolErrors.push({
           toolCallId: message.toolCallId ?? data.toolCallId ?? '',
-          text: redactTokenUrls(textOf(message.content) || message.error || data.error || '').slice(0, 400),
+          text: redactTokenUrls(textOf(message.content) || detailOf(message.error) || detailOf(data.error)).slice(0, 400),
         })
       }
+    } else if (type === 'approval/asked') {
+      askedApprovals.set(data.id, data.toolName ?? '')
     } else if (type === 'approval/decided') {
       const decision = decisionOf(data)
       if (!isAllowedDecision(decision)) {
         summary.approvals.push({
-          toolName: data.toolName ?? data.message?.toolName ?? '',
+          toolName: askedApprovals.get(data.id) ?? '',
           decision: redactTokenUrls(String(decision)).slice(0, 120),
         })
       }

@@ -291,10 +291,14 @@ export function runBundleView(root, selection) {
   const canonical = `${scene.kind}/${scene.name}`
   const fields = readSnapshotFields(scene.path)
   const ref = value => (value === undefined ? null : join(scene.path, value))
-  const childrenDir = ref(fields['session.children'])
-  const childrenCount = childrenDir && existsSync(childrenDir)
-    ? readdirSync(childrenDir).filter(name => name.endsWith('.jsonl')).length
-    : 0
+  const childrenRef = ref(fields['session.children'])
+  // children 声明两种形状都要吃（BUG-031）：目录（r2：sessions/ 数 .jsonl）与
+  // 单文件（r3：sessions/vp-eng-child.jsonl 计 1）——只当目录读会在文件形状上 ENOTDIR。
+  let childrenCount = 0
+  if (childrenRef && existsSync(childrenRef)) {
+    if (statSync(childrenRef).isFile()) childrenCount = childrenRef.endsWith('.jsonl') ? 1 : 0
+    else childrenCount = readdirSync(childrenRef).filter(name => name.endsWith('.jsonl')).length
+  }
   return {
     selection: canonical,
     path: scene.path,

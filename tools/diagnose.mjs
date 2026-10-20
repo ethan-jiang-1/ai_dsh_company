@@ -57,11 +57,12 @@ function newestSession() {
   return best
 }
 
-/** 按 `slug[/id前缀]` 找会话目录。 */
+/** 按 `slug[/id前缀]` 找会话目录；id 前缀两态都吃（`018689c9` 与 `session-018689c9` 同义——与 orient 口径一致）。 */
 function selectedSession(selection) {
   const slash = selection.lastIndexOf('/')
   const slug = slash === -1 ? selection : selection.slice(0, slash)
-  const prefix = slash === -1 ? '' : selection.slice(slash + 1)
+  const rawPrefix = slash === -1 ? '' : selection.slice(slash + 1)
+  const prefix = rawPrefix.replace(/^session-/, '')
   const slugDir = join(sessionsRoot, slug)
   if (!existsSync(slugDir)) throw new Error(`slug 不存在：${slug}`)
   const candidates = readdirSync(slugDir, { withFileTypes: true })
@@ -69,7 +70,7 @@ function selectedSession(selection) {
     .map(entry => ({ slug, id: entry.name, dir: join(slugDir, entry.name) }))
     .filter(entry => prefix === '' || entry.id.startsWith(`session-${prefix}`) || entry.id.replace(/^session-/, '').startsWith(prefix))
     .sort((left, right) => sessionStamp(right.dir) - sessionStamp(left.dir))
-  if (candidates.length === 0) throw new Error(`slug ${slug} 下没有匹配 ${prefix === '' ? '任意' : prefix} 的会话`)
+  if (candidates.length === 0) throw new Error(`slug ${slug} 下没有匹配 ${rawPrefix === '' ? '任意' : rawPrefix} 的会话`)
   return candidates[0]
 }
 

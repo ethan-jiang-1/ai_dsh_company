@@ -277,4 +277,35 @@ describe('run bundle 视图（引用合同字段，引用不复制）', () => {
   it('未知场景 fail-loud（复用 snapshotScene 判定）', () => {
     expect(() => runBundleView(ROOT, 'no-such-scene')).toThrow('not found')
   })
+
+  // BUG-031 守卫：children 声明为**文件**（r3 形状 sessions/vp-eng-child.jsonl）时不得 ENOTDIR 崩。
+  // 负例留证 2026-10-20：BUG-031 —— 旧 runBundleView 对 children 引用一律 readdirSync，
+  // `pnpm orient --scenario replay/r3-delegation` 实测 ENOTDIR exit 1（r2 目录形状才不炸）。
+  // 红配方：children 引用改回「只当目录读」即对本用例 ENOTDIR；绿 = 文件计 1、目录数 .jsonl。
+  it('真实场景 r3-delegation：children 为文件形状计 1 不崩（BUG-031）', () => {
+    const view = runBundleView(ROOT, 'replay/r3-delegation')
+    expect(view.refs.sessionLeadExists).toBe(true)
+    expect(view.refs.sessionChildrenCount).toBe(1)
+  })
+
+  it('夹具：children 指向单个 .jsonl 文件时计 1；指向目录时数 .jsonl 件数', () => {
+    const root = scratch('scene-file')
+    const scene = join(root, 'snapshots/replay/single')
+    put(join(scene, 'snapshot.yml'), [
+      'scenario: single',
+      'recordedAt: 2026-10-20',
+      'profile: web',
+      'agentPreset: ceo',
+      'cwd: company-workspace',
+      'session:',
+      '  lead: sessions/lead.jsonl',
+      '  children: sessions/vp-eng-child.jsonl',
+      'workspace:',
+      '  expected: workspace.expected/',
+    ].join('\n'))
+    put(join(scene, 'sessions/lead.jsonl'), '{}\n')
+    put(join(scene, 'sessions/vp-eng-child.jsonl'), '{}\n')
+    const view = runBundleView(root, 'single')
+    expect(view.refs.sessionChildrenCount).toBe(1)
+  })
 })
