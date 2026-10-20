@@ -10,7 +10,7 @@ opened: 2026-10-10
 > ba38ca2；第二批 7 个 + 模块扩展 = 本轮提交）。模块扩 `patch: string[]` / `onEmptyCookie` /
 > `dumpBodyOnError` + 三处 boot 健壮性；两处铁律钉值（entry-probe read-only、replay workspace-write
 > 死代码）逐字节未动；entry-probe 的 token 交换留 3 行本地块（报文不在批准统一清单）。
-> 判据与红绿证据 = [2026-10-10-smoke-boot-extraction](../../../notes/implemented/2026-10-10-smoke-boot-extraction.md)。
+> 判据与红绿证据 = [2026-10-10-smoke-boot-extraction](../../../notes/archived/2026-10-10-smoke-boot-extraction.md)。
 > **授权**：用户单选「下游卡：checks/smoke 启动块同款收成」（2026-10-10）。上游卡 =
 > [2026-10-10-extract-without-behavior-change](2026-10-10-extract-without-behavior-change.md)
 > （已结，交付 0a7977f），其关闭条件明说「下游申请另记日期和去向」——本卡即该下游申请。

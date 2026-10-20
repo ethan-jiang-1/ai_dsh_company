@@ -1,6 +1,6 @@
 # 2026-09-22 · 公司命名与角色显示名系列化（D14）
 
-> 2026-10-10 **部分取代**：公司名 `wochen` → **梦之队**（Dream Team）；显示名序列化与 id 保持 kebab 的机制原样沿用 → [dreamteam-naming](../implemented/2026-10-10-dreamteam-naming.md)。
+> 2026-10-10 **部分取代**：公司名 `wochen` → **梦之队**（Dream Team）；显示名序列化与 id 保持 kebab 的机制原样沿用 → [dreamteam-naming](2026-10-10-dreamteam-naming.md)。
 
 ## 决定
 

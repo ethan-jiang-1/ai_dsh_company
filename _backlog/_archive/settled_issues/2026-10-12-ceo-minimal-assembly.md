@@ -7,7 +7,7 @@ opened: 2026-10-12
 
 > 立卡：2026-10-12 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 > 结论与去向：**做，已落地**（2026-10-12）——三层防御实现于 assembling-the-team（第一层 + 收打回句）、
-> chairing（互审门槛）、公司手册「域内核对与打回」（第三层）；RFC = [implemented/2026-10-12-assembly-robustness-three-layers](../../../notes/implemented/2026-10-12-assembly-robustness-three-layers.md)
+> chairing（互审门槛）、公司手册「域内核对与打回」（第三层）；RFC = [implemented/2026-10-12-assembly-robustness-three-layers](../../../notes/archived/2026-10-12-assembly-robustness-three-layers.md)
 > （含 B1–B4 红/绿收据）；验收记录见下方附录。🔒 项（僵死动议 ai-coding-security-2026 处置）仍待用户。
 > 授权链：用户 2026-10-12「那就setup goal 来推动整个落地吧，步步为营……我回来就希望看你都做完」——
 > research/敲打/验收/落地实施按次序自主推进；分叉由 agent 带证据决策、本卡留追认点。

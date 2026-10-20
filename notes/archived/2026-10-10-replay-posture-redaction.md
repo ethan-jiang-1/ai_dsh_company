@@ -43,7 +43,7 @@ cordis_inspect_list→bash ×2）。
   依赖。`sessions/` 首录归档保留。
 - entry-probe 的空 cookie 报文从「认证缺 cookie」变为「token 交换没有拿到 cookie」（失败路径诊断
   文本，退出码不变）。
-- **更正前一份 Note 的错误结论**：[sandbox-backend-probe](2026-10-10-sandbox-backend-probe.md) 曾写
+- **更正前一份 Note 的错误结论**：[sandbox-backend-probe](../implemented/2026-10-10-sandbox-backend-probe.md) 曾写
   「replay-smoke 与沙箱后端无关」——本轮第三次实跑证伪：那只对 headless lane 成立，web lane 姿态
   敏感。该 Note 已就地更正并互链本 Note。
 
@@ -65,4 +65,4 @@ cordis_inspect_list→bash ×2）。
 
 - 场景声明：[snapshots/replay/r3-delegation/snapshot.yml](../../snapshots/replay/r3-delegation/snapshot.yml)
 - 脱敏实现：[tools/lib/replay-logic.mjs](../../tools/lib/replay-logic.mjs) 的 `normalizeReplayTimeContext`（runner 调用：[checks/smoke/replay-smoke.mjs](../../checks/smoke/replay-smoke.mjs)）
-- 后续结构整理：[2026-10-14-code-restructure](2026-10-14-code-restructure.md)；本轮 replay helper 迁移见 [2026-10-14-client-host-replay-locality](2026-10-14-client-host-replay-locality.md)。
+- 后续结构整理：[2026-10-14-code-restructure](../implemented/2026-10-14-code-restructure.md)；本轮 replay helper 迁移见 [2026-10-14-client-host-replay-locality](../implemented/2026-10-14-client-host-replay-locality.md)。

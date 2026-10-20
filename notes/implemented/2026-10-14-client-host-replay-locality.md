@@ -4,7 +4,7 @@
 
 ## 决定与关系
 
-这是新一轮后续决定，覆盖 Client 页签装配、Host cultivation 命令/存储、Replay 判据三个切面；对 [2026-10-14-code-restructure](./2026-10-14-code-restructure.md) **部分后续**，旧 Note 的六项决定、理由和旧验证收据保持原文不动。旧 Note 增加本轮指针；本 Note 记录新增 seam 与当前事实。Replay normalization 的历史决定仍在 [2026-10-10-replay-posture-redaction](./2026-10-10-replay-posture-redaction.md)，该 Note 的实现路径已更新到当前落点。
+这是新一轮后续决定，覆盖 Client 页签装配、Host cultivation 命令/存储、Replay 判据三个切面；对 [2026-10-14-code-restructure](./2026-10-14-code-restructure.md) **部分后续**，旧 Note 的六项决定、理由和旧验证收据保持原文不动。旧 Note 增加本轮指针；本 Note 记录新增 seam 与当前事实。Replay normalization 的历史决定仍在 [2026-10-10-replay-posture-redaction](../archived/2026-10-10-replay-posture-redaction.md)，该 Note 的实现路径已更新到当前落点。
 
 1. **Client Lead/follow 适配器**：[company-session-adapters.ts](../../packages/company-pack/src/client/company-session-adapters.ts) 集中 child→parent Lead 寻址及 follow 快照/live-event 帧投影；消费面仍按既有作用域组装。
 2. **Client 页签注册目录**：[company-tab-registration.ts](../../packages/company-pack/src/client/company-tab-registration.ts) 的固定 `TAB_REGISTRATIONS` 并置八个页签的身份/元数据与 body/title/guide keyed 回调；`index.ts` 仍是 composition root。三个 slot group 仍分别 `slots.inject`，由 Cordis 各自管理声明等待、销毁与重装。
@@ -51,6 +51,6 @@
 ## 指针
 
 - 前一轮六项结构决定（保留原文）：[2026-10-14-code-restructure](./2026-10-14-code-restructure.md)
-- Replay normalization 原始取舍：[2026-10-10-replay-posture-redaction](./2026-10-10-replay-posture-redaction.md)
+- Replay normalization 原始取舍：[2026-10-10-replay-posture-redaction](../archived/2026-10-10-replay-posture-redaction.md)
 - 当前源码导航：[company-pack src README](../../packages/company-pack/src/README.md)
 - 测试分区与改动面路由：[tests README](../../tests/README.md)

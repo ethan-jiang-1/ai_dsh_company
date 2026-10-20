@@ -49,6 +49,6 @@ description: Use when adding or changing a gate in checks/gates/ (one gate per m
 ## 指针（别复述）
 
 门禁清单唯一源 = [checks/gates/](../../../checks/gates/) 目录（每门禁一文件；本 skill 不复述门禁清单）；
-负例留证口径与两次实地教训 = [ledger-routing Note](../../../notes/implemented/2026-10-09-ledger-routing-table.md)、
-[docs-tier-taxonomy Note](../../../notes/implemented/2026-10-09-docs-tier-taxonomy.md)；
+负例留证口径与两次实地教训 = [ledger-routing Note](../../../notes/archived/2026-10-09-ledger-routing-table.md)、
+[docs-tier-taxonomy Note](../../../notes/archived/2026-10-09-docs-tier-taxonomy.md)；
 测试分层与证据纪律 = [testing.md](../../../docs/testing.md)。

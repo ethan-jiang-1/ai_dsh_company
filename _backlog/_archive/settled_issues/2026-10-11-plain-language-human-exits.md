@@ -7,7 +7,7 @@ opened: 2026-10-11
 
 > 立卡：2026-10-11 ｜ 状态：已结 ｜ 类型：Feature ｜ 可关闭：是 ｜ 结论日期：2026-10-11
 > **结论与去向**：人话出口规范三批全部实施并逐条验收（真模型/真浏览器证据见各批 Note）；
-> RFC 已从 `notes/proposed/` 毕业到 [Human Exits 毕业 Note](../../../notes/implemented/2026-10-11-human-exits.md)，本卡同次离场。
+> RFC 已从 `notes/proposed/` 毕业到 [Human Exits 毕业 Note](../../../notes/archived/2026-10-11-human-exits.md)，本卡同次离场。
 > 同日拆卡：呈现/渲染与 DSH 表达件支撑 = [表达层卡](2026-10-11-human-exits-expression.md)；本卡只管语言。
 
 **问题与期望结果：** 用户 2026-10-11 两轮裁决：①「Agent 上下文对 Agent 挺好，对人不行——CEO

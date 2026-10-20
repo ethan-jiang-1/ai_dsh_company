@@ -26,7 +26,7 @@ import { join } from 'node:path'
 // 负例留证 2026-10-09（实地造红→还原→绿）：
 //   ① 新增一个 `describe('…（BUG-006）', …)` 但文件里没有对应留证行 → 红；
 //   ② 把某条留证的 BUG 编号改错（BUG-004 → BUG-009，卡不存在）→ 红（悬空编号）；
-//   ③ 把留证行整行删掉 → 红。还原 → 全绿（见 implemented/2026-10-09-guard-red-record.md）。
+//   ③ 把留证行整行删掉 → 红。还原 → 全绿（见 archived/2026-10-09-guard-red-record.md）。
 export function run({ root, ok, fail }) {
   const specFiles = []
   const walkSpecs = d => {

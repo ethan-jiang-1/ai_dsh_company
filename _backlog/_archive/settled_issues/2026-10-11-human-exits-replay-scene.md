@@ -10,7 +10,7 @@ opened: 2026-10-11
 > （`answerer: browser`：录/放两侧都用真 UI 认领作答，规则 = 第一项）。harness 改动落在 `checks/smoke/replay-smoke.mjs`
 > （场景级答题人开关 + 确定性标题 + 按 `session.children` 算期望会话数）。机制依据与实测卡点见文末「落地记录」。
 > 来源：Human Exits RFC 批 2 验收「代表场景先固化为 replay/会话断言」的未落地项
-> （[毕业 Note](../../../notes/implemented/2026-10-11-human-exits.md) §收口后复核）。
+> （[毕业 Note](../../../notes/archived/2026-10-11-human-exits.md) §收口后复核）。
 
 **问题与期望结果：** 批 2 的三类行为证据里，阻塞支只有**真模型探针 + 运行期 RPC 读到的会话事件**，
 没有可无 key 重放的固化场景；非阻塞支同理。期望结果 = 阻塞型问询（CEO 首段三件套 + `ask_user_question`）

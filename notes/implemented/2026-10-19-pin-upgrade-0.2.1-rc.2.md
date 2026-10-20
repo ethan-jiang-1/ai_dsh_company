@@ -7,7 +7,7 @@
 本仓原钉（历史）`vendor/dsh` = `dsh-v0.2.0-rc.2`（`639ed015`），上游已发 `dsh-v0.2.1-rc.2`（`687f282e`）。
 用户点名升 pin 并要求**验证本仓插件仍兼容**，验收线 = "端到端测试过了才算升级结束"。
 
-先搜后写：本决定**部分取代** [2026-09-30 升 0.2.0 的 Note](./2026-09-30-pin-upgrade-0.2.0-rc.2.md) §收割项候选
+先搜后写：本决定**部分取代** [2026-09-30 升 0.2.0 的 Note](../archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md) §收割项候选
 （schedule-bundle 那一项**本轮判收**：退役并被 preset 行所有权接管，见 D-E）与
 [roles-isolation §2](../../docs/design/roles-isolation.md) 的"M2 需自写 provider"结论（就地补记已不需要）。
 没有同主题的第二本账。

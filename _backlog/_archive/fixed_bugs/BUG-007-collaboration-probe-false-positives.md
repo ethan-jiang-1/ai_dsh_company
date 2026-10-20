@@ -49,13 +49,13 @@ node probes/fs-taskboard/collaboration-oracle-probe.mjs
 
 ## 修复关联与验收要求（已批准、修复落地）
 
-用户批准先修判据与驱动；实现理由及输掉的方案见 [事实判据 Note](../../../notes/implemented/2026-10-09-collaboration-probe-evidence.md)。已按callId、精确目标路径、成员、任务/revision/owner、水位与messageId收紧，并将required行接到退出码。
+用户批准先修判据与驱动；实现理由及输掉的方案见 [事实判据 Note](../../../notes/archived/2026-10-09-collaboration-probe-evidence.md)。已按callId、精确目标路径、成员、任务/revision/owner、水位与messageId收紧，并将required行接到退出码。
 
 本卡修复验收完成：修复后原双成员concurrency真实入口正常结束5/5、exit0；此前4/5是修复前没有共同read放行机制的历史样本，继续保留但不代表当前入口。atomicity4/4、recovery4/4、scope3/3、fs-guard三项真实入口此前均PASS。没有改生产锁/协作协议/preset/vendor。
 
 补充机制证据：[可控同版本竞写研究](../research/collaboration/2026-10-09-deterministic-write-conflict-seam.md)已实际得到两种提交顺序的一胜一FS_STALE_VERSION及败者重读合并；取消version条件的对照双成功，被同一套验收断言判为exit1。这补齐可控机制路径。FS_NOT_OBSERVED不单独证明读后竞争。
 
-补充模型入口证据：[成员 stale 写入口探针](../../../probes/team/member-stale-write-probe.mjs)（决定与判据取舍见 [Note](../../../notes/implemented/2026-10-09-member-stale-write-entry.md)）在单成员 + 外部改盘的受控场景下，真实模型第二次运行确实拿到 FS_STALE_VERSION、重读并合并出精确终态；首跑成员上一轮实际read过，但恢复新轮首次write得到 FS_NOT_OBSERVED，被如实判红；它证明跨轮未观察拒绝不能冒充读后stale。场景与真实事件见[成员验收研究](../research/collaboration/2026-10-09-member-stale-write-acceptance.md)。这是**独立仪器**的 C1b 模型入口演示；双成员同轮入口及当前全项复跑见[双成员验收研究](../research/collaboration/2026-10-09-team-read-barrier-acceptance.md)。
+补充模型入口证据：[成员 stale 写入口探针](../../../probes/team/member-stale-write-probe.mjs)（决定与判据取舍见 [Note](../../../notes/archived/2026-10-09-member-stale-write-entry.md)）在单成员 + 外部改盘的受控场景下，真实模型第二次运行确实拿到 FS_STALE_VERSION、重读并合并出精确终态；首跑成员上一轮实际read过，但恢复新轮首次write得到 FS_NOT_OBSERVED，被如实判红；它证明跨轮未观察拒绝不能冒充读后stale。场景与真实事件见[成员验收研究](../research/collaboration/2026-10-09-member-stale-write-acceptance.md)。这是**独立仪器**的 C1b 模型入口演示；双成员同轮入口及当前全项复跑见[双成员验收研究](../research/collaboration/2026-10-09-team-read-barrier-acceptance.md)。
 
 1. 本复现5类坏样本全部拒绝，且对应正常样本均通过；不得删除反例或只改文案。
 2. 缺工具结果、其他任务/成员/path错误、仅正文宣称完成、重复行、预恢复事件、无第2轮等反例都fail或证据不足，绝不自动pass。

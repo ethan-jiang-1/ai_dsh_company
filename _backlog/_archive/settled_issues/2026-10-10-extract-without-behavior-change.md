@@ -10,7 +10,7 @@ opened: 2026-10-10
 > （startWeb/companyCookie/companyRpc，spawn/fetch 注入；25 个探针全部迁入，前缀/错误回退/共享
 > counter/读屏障 --patch/30s signal 全当参数保留）与 `tools/lib/backlog-liveness.mjs`
 > （函数体逐字节原样搬家，spec 改直接 import，期望字符串零改动）。机制交付 = commit 0a7977f；
-> 判据与红绿证据 = [2026-10-10-probe-web-and-backlog-liveness-extraction](../../../notes/implemented/2026-10-10-probe-web-and-backlog-liveness-extraction.md)。
+> 判据与红绿证据 = [2026-10-10-probe-web-and-backlog-liveness-extraction](../../../notes/archived/2026-10-10-probe-web-and-backlog-liveness-extraction.md)。
 > 卡内「已知」列之外的三个新参数（patch / errorFallback / counter）是迁移中实测发现的既有差异，
 > 全部当参数收下而非统一。下游申请（checks/smoke 启动块同款收成）另立卡，不在本轮。
 

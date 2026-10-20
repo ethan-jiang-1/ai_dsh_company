@@ -52,7 +52,7 @@ schedule.json 可审计）+ playbook 第 8 步。**未验证：schedule 工具�
 
 单操作者模式优先（CEO 代表公司立任务）；不做常驻 watcher 进程（不发明——用出厂载体）；
 不接 `*_PROXY` 代理（另案，见 fact-finding-ladder Note 后果节）；不写自由文本 memory
-（空头支票病灶，裁定见同日 [fact-finding-ladder Note](../../../notes/implemented/2026-10-10-fact-finding-ladder.md)）。
+（空头支票病灶，裁定见同日 [fact-finding-ladder Note](../../../notes/archived/2026-10-10-fact-finding-ladder.md)）。
 
 ## 方案与取舍
 

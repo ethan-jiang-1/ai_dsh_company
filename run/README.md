@@ -1,7 +1,7 @@
 # run/ —— 运行面（tracked 启动配置，非运行态）
 
 > 2026-10-06 条目 A拆分（RFC driver-surface-package）；2026-10-07 S1 起改名 run/（RFC
-> [driver-purpose-top-level](../notes/implemented/2026-10-07-driver-purpose-top-level.md)）：
+> [driver-purpose-top-level](../notes/archived/2026-10-07-driver-purpose-top-level.md)）：
 > 本目录只收「怎么启动」的 tracked 配置；跑过留下的状态一律住 [runtime/](../runtime/README.md)
 > （gitignored 运行残留，逐件 owner = 其 README）。双 home 纪律与机制 =
 > [architecture §6](../docs/design/architecture.md)；进入开发环境 = `source run/env.sh`

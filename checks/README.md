@@ -146,7 +146,7 @@
 
 [lib](../tools/lib/) 保存可由隔离夹具验证的会话日志、workspace oracle、交付物/作者判据、排练输入、发布事务和仓库布局逻辑；[drivers](../tools/drivers/) 保存真实进程、CDP 和 Playwright 驱动。驱动不进入 keyless spec；准入由 [分层守卫](../tests/harness/layering.spec.ts) 检查。
 
-门禁装配入口 [run-gates](run-gates.mjs) 住本目录根，每道门禁一个模块（清单唯一源 = gates/ 目录；pin 常量 = gates/lib/pin.mjs）；keyless spec 按 company/client/presets/harness 领域归位。新增入口同 diff 增加索引，触发条件、成本和状态仍留在脚本头注。目录取舍 = [driver-purpose-top-level](../notes/implemented/2026-10-07-driver-purpose-top-level.md)（`scripts/`、`dev/` 形态名已退役）。
+门禁装配入口 [run-gates](run-gates.mjs) 住本目录根，每道门禁一个模块（清单唯一源 = gates/ 目录；pin 常量 = gates/lib/pin.mjs）；keyless spec 按 company/client/presets/harness 领域归位。新增入口同 diff 增加索引，触发条件、成本和状态仍留在脚本头注。目录取舍 = [driver-purpose-top-level](../notes/archived/2026-10-07-driver-purpose-top-level.md)（`scripts/`、`dev/` 形态名已退役）。
 
 ## 待触发复查（触发条件 → 该做什么）
 

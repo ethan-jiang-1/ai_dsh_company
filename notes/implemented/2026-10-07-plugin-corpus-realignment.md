@@ -28,7 +28,7 @@
 sdlc-reference 9 页（README/index + 02/03/05/07/08/09/10）——逐页旧判成立，长表在 git。不照搬：
 生成 catalog、双语 pairing、文档站投影、CI/PR/加权评审/hooks、per-directory owner 文件、
 change-scope 脚本、集中式维护台账。触发 = 第二贡献者 / PR 面 / 真实 npm 发布。
-`.agents/skills/` 家后来落地，不再在此清单。形状见 [completion-definition-skills](2026-10-09-completion-definition-skills.md)。
+`.agents/skills/` 家后来落地，不再在此清单。形状见 [completion-definition-skills](../archived/2026-10-09-completion-definition-skills.md)。
 
 **本轮重判（8 页 = 语料演进的 4 页 + 新卷 4 页）**：
 
@@ -68,9 +68,9 @@ change-scope 脚本、集中式维护台账。触发 = 第二贡献者 / PR 面 
 
 ## 取代检查
 
-- **后续延伸（2026-10-08，收据已删）**：同一请求第三现。语料零增量维持；「还是驾驭无力」的翻案 = 驾驶座缺仪表，不是没吃透语料。落地 = dev-loop 轮次回执 + orient 第七问；skills 另见 [dev-skills 的后继](2026-10-09-completion-definition-skills.md)。不另建质量仪表命令，不立元轮预算门禁，entry-probe 的 JSON 畸形不靠改解析凑绿。
+- **后续延伸（2026-10-08，收据已删）**：同一请求第三现。语料零增量维持；「还是驾驭无力」的翻案 = 驾驶座缺仪表，不是没吃透语料。落地 = dev-loop 轮次回执 + orient 第七问；skills 另见 [dev-skills 的后继](../archived/2026-10-09-completion-definition-skills.md)。不另建质量仪表命令，不立元轮预算门禁，entry-probe 的 JSON 畸形不靠改解析凑绿。
 - 0.1.7 逐页台账已删（历史在 git）。不照搬清单与 rc.2 判定的家是本 Note；registry 三态在 [release.md](../../docs/release.md)。
-- 与 [entry-execution-chain-debt](2026-09-26-entry-execution-chain-debt.md)：其「semantic review pending」边界声明仍有效；执行形状由本 Note §决定 2 接续。
+- 与 [entry-execution-chain-debt](../archived/2026-09-26-entry-execution-chain-debt.md)：其「semantic review pending」边界声明仍有效；执行形状由本 Note §决定 2 接续。
 - sdlc-01 的六条点选已在 [notes/README](../../notes/README.md)；该页 rc.2 收窄的判定归本 Note。吸收稿已删。
 
 ## 验证记录（真跑过的命令与红/绿形态）

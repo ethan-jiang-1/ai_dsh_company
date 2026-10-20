@@ -31,8 +31,8 @@
 | D23+D24 | 开发流条目制 **历史**：队列 owner ROADMAP.md 已由 D32 退役 | [roadmap-retirement](../notes/archived/2026-09-28-roadmap-retirement.md) |
 | D25 | 培养 = 改 `presets/<role>/`（生效边界按面）；学习 = journal 唯一载体（2026-10-13 扩三面 → D43） | [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) |
 | D26 | 文档卫生按指导价值取舍；文件/行数仅观察，不是完成门槛 | [dev-loop](./guides/dev-loop.md) |
-| D27 | 升 pin 偏离官方事务（嵌套工作区不能 vendor 自建）⇒ 手工簿记 + 门禁留证 | [pin-upgrade-0.2.0-rc.2](../notes/implemented/2026-09-30-pin-upgrade-0.2.0-rc.2.md) |
-| D28 | 枚举型事实的家 = 实现自己（文档只留分层原则 + 指针） | [entry-execution-chain-debt](../notes/implemented/2026-09-26-entry-execution-chain-debt.md) |
+| D27 | 升 pin 偏离官方事务（嵌套工作区不能 vendor 自建）⇒ 手工簿记 + 门禁留证 | [pin-upgrade-0.2.0-rc.2](../notes/archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md) |
+| D28 | 枚举型事实的家 = 实现自己（文档只留分层原则 + 指针） | [entry-execution-chain-debt](../notes/archived/2026-09-26-entry-execution-chain-debt.md) |
 | D29 | 自主优先协议：先探索后发明、借鉴成熟插件、REVIEW 分级 | [dev-loop §13](./guides/dev-loop.md) |
 | D30 | notes 侧旧 research 层退役（triage 归 notes/README）；现行调研家 = _backlog/research/ | [notes/README](../notes/README.md) |
 | D31 | 推敲空间 `_backlog/`；只承载判断材料、不承载授权；现行制度 2026-10-09 自 ai_dsh_assitant/_backlog 整体重立 | [_backlog/README](../_backlog/README.md) · [backlog-issue-lifecycle](../notes/implemented/2026-10-09-backlog-issue-lifecycle.md) |
@@ -40,13 +40,13 @@
 | D33 | `_backlog` 章制回借（主干框架/章程账本二分/索引交叉核对门禁/全日期卡名） | [_backlog/README](../_backlog/README.md) |
 | D34 | intents.md 退役（第三本账 + 胖行病史 + 违反上游 no-index 教义） | [notes/README](../notes/README.md) |
 | D35 | notes/ 分类 owner 文件 + `notes-liveness` 门禁 | [notes/README](../notes/README.md) |
-| D36 | 决策台账降级为纯路由表（第三本账同 D34 病）+ `ledger-routing` 门禁 | [ledger-routing-table](../notes/implemented/2026-10-09-ledger-routing-table.md) |
-| D37 | `docs/` 分层规则唯一家住 `docs/AGENTS.md`（含「不属于这层」列）+ `doc-taxonomy` 门禁 | [docs-tier-taxonomy](../notes/implemented/2026-10-09-docs-tier-taxonomy.md) |
+| D36 | 决策台账降级为纯路由表（第三本账同 D34 病）+ `ledger-routing` 门禁 | [ledger-routing-table](../notes/archived/2026-10-09-ledger-routing-table.md) |
+| D37 | `docs/` 分层规则唯一家住 `docs/AGENTS.md`（含「不属于这层」列）+ `doc-taxonomy` 门禁 | [docs-tier-taxonomy](../notes/archived/2026-10-09-docs-tier-taxonomy.md) |
 | D38 | implemented/ Note 的**事实落点**随改动就地改新（决定正文仍冻结）；生效日分档 + `zz-` 假路径记号 | [implemented-note-currency](../notes/implemented/2026-10-09-implemented-note-currency.md) |
-| D39 | 完成定义 skills 住 `.agents/skills/`（清单 = 目录本身）；程序进 skill、可机械判断的才进 gate | [completion-definition-skills](../notes/implemented/2026-10-09-completion-definition-skills.md) |
+| D39 | 完成定义 skills 住 `.agents/skills/`（清单 = 目录本身）；程序进 skill、可机械判断的才进 gate | [completion-definition-skills](../notes/archived/2026-10-09-completion-definition-skills.md) |
 | D40 | 事故护栏复原：`preset-required-config` 门禁（判据 = vendor committed config-catalog） | [postmortem-guard-restoration](../notes/implemented/2026-10-09-postmortem-guard-restoration.md) |
-| D41 | 公司名 = 梦之队（Dream Team）；D14 显示名前缀序列化沿用，前缀随名换代 | [dreamteam-naming](../notes/implemented/2026-10-10-dreamteam-naming.md) |
-| D42 | vendor 升 pin＝用户策动制（agent 不盯不评不建议）＋渠道只认 RC/正式版，alpha/beta 通通不管 | [pin-upgrade-policy](../notes/implemented/2026-10-12-pin-upgrade-policy.md) |
+| D41 | 公司名 = 梦之队（Dream Team）；D14 显示名前缀序列化沿用，前缀随名换代 | [dreamteam-naming](../notes/archived/2026-10-10-dreamteam-naming.md) |
+| D42 | vendor 升 pin＝用户策动制（agent 不盯不评不建议）＋渠道只认 RC/正式版，alpha/beta 通通不管 | [pin-upgrade-policy](../notes/archived/2026-10-12-pin-upgrade-policy.md) |
 | D43 | 培养回路三面：公司页第四子页＝培养；本人采纳 → 角色方法层（profile 根下按角色隔离）；CEO 仅建议权（D25 部分取代） | [agent-cultivation-loop](../notes/implemented/2026-10-13-agent-cultivation-loop.md) |
 | D44 | 成品目录 = 盘上 meta/final 的**生成索引** + 只读右栏页签；并列台账不替代；`present` 审计仍归 deliverables-check | [deliverables-catalog](../notes/implemented/2026-10-19-deliverables-catalog.md) |
 

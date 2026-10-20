@@ -172,7 +172,7 @@ export function resolveEvidenceDir(archiveRoot, dirName) {
 
 /**
  * 归档搬移的**步骤计划**（2026-10-13）。为什么不再用 `git mv`：自本日起交付物的 `drafts/**`
- * （含 `sources/`）**不进 git**（仓库瘦身，见 Note 2026-10-13-workspace-slimming），
+ * （含 `sources/`）**不进 git**（仓库瘦身，见 archived Note 2026-10-13-workspace-slimming），
  * 而 `git mv <目录>` 遇到未跟踪文件会 fatal（`not under version control`）——目录必须用
  * **文件系统搬**，tracked 面（final/meta 等）再用 `git add -A` 收进索引（删除+新增一起 stage）。
  * @param dirName - deliverables/ 下的目录名（`<日期>-<slug>`）。

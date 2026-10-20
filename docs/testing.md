@@ -38,7 +38,7 @@
 
 **行级映射**（哪个改动面跑哪个检查、何时升档、回放/视觉夹具的义务）唯一家 =
 [tests/README「改动面 → 最窄检查」](../tests/README.md)——2026-10-10 自本节迁入消双写，取舍 =
-[该轮 Note](../notes/implemented/2026-10-10-minimal-evidence-mapping-home.md)。本节只留政策：
+[该轮 Note](../notes/archived/2026-10-10-minimal-evidence-mapping-home.md)。本节只留政策：
 
 - **同 diff 交付**：最小证据与被证明的改动同一 diff 出现，不欠账到"以后补"；
 - 单测、smoke、rationale **不替代组装转录**——会话级行为的固化证据只有回放场景。

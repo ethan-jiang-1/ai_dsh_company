@@ -7,7 +7,7 @@ opened: 2026-10-11
 
 > 立卡：2026-10-11 ｜ 状态：已结 ｜ 类型：Feature ｜ 可关闭：是 ｜ 结论日期：2026-10-11
 > **结论与去向**：表达层与浏览显示三批全部实施并逐条验收（真模型/真浏览器证据见各批 Note）；
-> RFC 已从 `notes/proposed/` 毕业到 [Human Exits 毕业 Note](../../../notes/implemented/2026-10-11-human-exits.md)，本卡同次离场。
+> RFC 已从 `notes/proposed/` 毕业到 [Human Exits 毕业 Note](../../../notes/archived/2026-10-11-human-exits.md)，本卡同次离场。
 > 同日拆卡：说什么（语言规范）= [语言层卡](2026-10-11-plain-language-human-exits.md)；本卡只管**以什么形呈现**。
 > 用户定性（2026-10-11）：「毕竟是助手，大量内容如何让高管快速消化和决策」。
 

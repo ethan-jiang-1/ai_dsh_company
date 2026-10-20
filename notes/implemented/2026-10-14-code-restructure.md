@@ -26,7 +26,7 @@
 
 - 加第 6 角色：mjs 侧改 1 处（company-roles.mjs）+ 建 preset 目录（presets 门禁强制），原 10 处 → 1 处；加门禁 = `checks/gates/` 加一个文件 + runner 两行（import + 调用），分区编号腐化（两个 2c-bis/2c-ter/2d-quater）随之消解——文件名即门禁短名，FAIL 行可直达文件。
 - 探针改输出格式：先红 `tests/harness/probe-kit.spec.ts`（3 条钉格式），不再要点几十处。
-- 判分类探针要 keyless 回归：照 team-concurrency-verdict.mjs 先例抽 lib + spec 普通 import（不再源码切片 + vm 求值——探针一改锚就假红，2026-10-10 probe-web 抽取同款病灶同款修法，互链 [2026-10-10-probe-web-and-backlog-liveness-extraction](./2026-10-10-probe-web-and-backlog-liveness-extraction.md)）。
+- 判分类探针要 keyless 回归：照 team-concurrency-verdict.mjs 先例抽 lib + spec 普通 import（不再源码切片 + vm 求值——探针一改锚就假红，2026-10-10 probe-web 抽取同款病灶同款修法，互链 [2026-10-10-probe-web-and-backlog-liveness-extraction](../archived/2026-10-10-probe-web-and-backlog-liveness-extraction.md)）。
 - 重放 lane 的 3 个预存 FAIL（cultivation_propose 进 sidecar 对比、金样「最小往返探针/Ping VP-Eng」第 35 行漂移）**属培养回路轮（fe3c0c9）遗留、非本轮造成**——本轮以「与基线逐行一致」为不变量如实保留，刷新金样归该面 owner。
 
 ## 验证（全部实跑；基线存 `runtime/e2e/refactor-baseline/`，gitignored）

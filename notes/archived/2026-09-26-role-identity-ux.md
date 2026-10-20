@@ -83,7 +83,7 @@ keyless 单测 6 项 + 真浏览器自主验收 ALL PASS）。残余项「每角
   （CEO/CFO/…）；非公司会话零痕迹（单测覆盖）；**未连工作区也渲染**（Ungrouped 组直接出）。
   **形态更正（2026-10-13）**：座位只有 16px，三字药丸实宽 32.45px ⇒ 两侧各溢出 ~8.2px
   （窄窗里被容器切掉字母、右溢压进标题首字盒）⇒ 标记改 **12px 单字母** `C/F/O/E/S`（全称走 `title`
-  与窗口标题）；决定、实测与判据 = [侧栏角色标记收进 16px 座位](../implemented/2026-10-13-sidebar-role-mark-fits-seat.md)。
+  与窗口标题）；决定、实测与判据 = [侧栏角色标记收进 16px 座位](2026-10-13-sidebar-role-mark-fits-seat.md)。
 - **C · 窗口标题 + 整窗色条（client）= ✅ 已交付并验收**：根级 effect 无条件接管
   `document.title = 【角色】会话标题` + `:root[data-wk-role]` + 3px 顶部色条。
   **验收**：初始 `【CEO】company-workspace` → 点开 CFO 行即变 `【CFO】你好`、
@@ -110,7 +110,7 @@ keyless 单测 6 项 + 真浏览器自主验收 ALL PASS）。残余项「每角
    **现况（2026-10-13）**：用户点名要区分 ⇒ 已改为**字母 + 五色底色**（CEO adaptive 品牌对，
    其余四色借通用 **static 色相** blue/green/amber/red + 按底色选的字色；对比度实测 ≥ AA）；
    "上游策展的分类色板"仍是缺口（语义、成对前景/背景、深浅主题一致性无人担保）——
-   决定与实测 = [侧栏角色标记收进 16px 座位](../implemented/2026-10-13-sidebar-role-mark-fits-seat.md)。
+   决定与实测 = [侧栏角色标记收进 16px 座位](2026-10-13-sidebar-role-mark-fits-seat.md)。
 3. ~~并存优先级~~ **已定案**：直接接管（后注册者的订阅后触发 ⇒ 稳定胜出），真浏览器实测
    标题稳定无闪烁。
 

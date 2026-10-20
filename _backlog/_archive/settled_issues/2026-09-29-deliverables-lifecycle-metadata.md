@@ -147,7 +147,7 @@
   在**轮末收敛**时手工追加（[snapshots/README.md §归档动作](../../../snapshots/README.md) 第 4 步）。
   **中心表已经在漏**：盘上 20 个目录，台账只有 16 行——09-28/29 新增的 5 场
   （token-×3、cd/sh-mz-agent-2026）**全部无行**（`deliverables-check` 的观察项 `slug-unledgered`
-  每次提醒，见 [entry-execution-chain-debt](../../../notes/implemented/2026-09-26-entry-execution-chain-debt.md)）。
+  每次提醒，见 [entry-execution-chain-debt](../../../notes/archived/2026-09-26-entry-execution-chain-debt.md)）。
   这正是"中心表手工同步"模式的固有漂移，不是执行疏忽。
 - **公司角色没有任何取真日期的通道**（无 shell、无时钟工具、runtime context 无日期、fs 模型面无 mtime——
   机制核实见 [journal-date-mechanism](../../../notes/archived/2026-09-26-journal-date-mechanism.md)）⇒

@@ -28,4 +28,4 @@ preset 改动的完成定义 = `node checks/smoke/preset-smoke.mjs`（真挂载�
 ## 验证
 
 原研究的检索与引用清单在 git 历史里，不在本文件复述。本轮清扫只改 Note 形状；
-`pnpm verify` 的结果记在 [2026-10-09 清扫 Note](../implemented/2026-10-09-notes-curation.md)。
+`pnpm verify` 的结果记在 [2026-10-09 清扫 Note](2026-10-09-notes-curation.md)。

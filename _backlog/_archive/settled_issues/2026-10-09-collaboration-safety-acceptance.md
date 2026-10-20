@@ -102,7 +102,7 @@ opened: 2026-10-09
 ## 下游申请（2026-10-10 提交，待用户授权）
 
 1. **手册/多人合同补句（裁2＋裁4 文档化）**：①「owner-bound 产物仅 owner（或显式改派的新负责人）可覆盖；共享产物需显式授权，被授权成员先读后写、被拒重读合并」②「认领失败让位：不写该任务 owner-bound 产物，回报 lead 后转干别的」。落点候选＝[公司手册](../../../company-workspace/AGENTS.md)写盘守卫/任务板行＋[multi-human §4](../../../docs/multi-human.md)纪律区；属模型可见生产内容，需用户授权后另行实施；验收＝对应文档面检查＋team-claim-loser-probe 复跑保持绿。
-2. **无 Note 申请**：判据取舍已由 [claim-loser-yield-entry](../../../notes/implemented/2026-10-10-claim-loser-yield-entry.md) 承载（2026-10-10 已交付）；本卡结论不需新 Note。
+2. **无 Note 申请**：判据取舍已由 [claim-loser-yield-entry](../../../notes/archived/2026-10-10-claim-loser-yield-entry.md) 承载（2026-10-10 已交付）；本卡结论不需新 Note。
 
 去向：2026-10-10 随收口回复向用户提交（backlog 章程默认）；未指定接收会话。申请不授予实施权限。
 **实施记录（2026-10-12 补记）**：申请 1 已于 2026-10-10 获批实施——commit bfa893e（手册动议任务板行 + multi-human §4 写入边界，两句申请原文在场），team-claim-loser-probe 复跑 8/8（提交信息自证）。本卡状态行「待用户授权」系收口后未回填的陈旧尾巴，随本补记清偿；卡内其余讨论正文不动。

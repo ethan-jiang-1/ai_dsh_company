@@ -5,7 +5,7 @@ backlog 收卡一单按其自家规则归档、retired-path 门禁 + bare-path T
 
 ## 问题
 
-2026-10-09 backlog 大改名（plans→issues、_done→_archive，[backlog-issue-lifecycle](2026-10-09-backlog-issue-lifecycle.md)）
+2026-10-09 backlog 大改名（plans→issues、_done→_archive，[backlog-issue-lifecycle](../implemented/2026-10-09-backlog-issue-lifecycle.md)）
 后，旧路径前缀在 bare-path 的三个盲区里全绿存活：① TOP_DIRS 不含 `_backlog/`——NOW_FILES 明明含
 _backlog 活跃卡，扫描面里这一半路径从未被存在性检查；② glob/占位内容被 `[*<>…{}]` 过滤跳过
 （`BUG-nnn-*.md` 形状的判据句）；③ `.agents/skills/`、checks/README.md、run/README.md 不在扫描面。
@@ -57,7 +57,7 @@ implemented-note-currency 的观察档锚与表行（旧池名）。另有 dev-l
 
 ## 关联（取代检查结论）
 
-- [implemented-note-currency](2026-10-09-implemented-note-currency.md)：本 Note 的锚修整 = D38 政策的
+- [implemented-note-currency](../implemented/2026-10-09-implemented-note-currency.md)：本 Note 的锚修整 = D38 政策的
   执行实例，不取代它；其表行与观察档锚已随本轮改新。
 - [_archive 已结卡 stale-pointer-cleanup](../../_backlog/_archive/settled_issues/2026-10-09-stale-pointer-cleanup.md)：
   该卡裁定「不批量清祖父存量、按需修实际阻断导航的指针」——本门禁只扫活跃面、祖父豁免面不进扫描面，与裁定一致。

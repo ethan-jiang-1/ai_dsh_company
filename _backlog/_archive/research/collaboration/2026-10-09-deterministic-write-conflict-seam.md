@@ -57,6 +57,6 @@ node --import tsx/esm probes/fs-taskboard/observed-write-conflict-probe.mjs
 
 授权对照：完成用户review的第一步确定性机制实验并留_backlog；未改生产角色/协议、未引锁，未执行后续角色行为认证。依据现行测试宪法选择零模型机制档；挂载是裸provider实验，不能写成会话/安装通过。
 
-独立语义审已阅读当前实现与钉住源码：无阻断；建议显式FIFO胜/败身份，已补并重跑源码入口。检查四输入为授权、测试合同、真实机制选层及[实验取舍Note](../../../../notes/implemented/2026-10-09-observed-write-conflict.md)。收割三问：①新probe未发现同实例机制异常，但旧跨进程T3屏障与T4描述问题留本研究，旧20/20双成功只作为探索观察而非严格同version认证；②值得钉=保留可控探针及实际负对照；③运行事实=inspectTemp时仍持有实例锁，不能等待两次钩子到齐。
+独立语义审已阅读当前实现与钉住源码：无阻断；建议显式FIFO胜/败身份，已补并重跑源码入口。检查四输入为授权、测试合同、真实机制选层及[实验取舍Note](../../../../notes/archived/2026-10-09-observed-write-conflict.md)。收割三问：①新probe未发现同实例机制异常，但旧跨进程T3屏障与T4描述问题留本研究，旧20/20双成功只作为探索观察而非严格同version认证；②值得钉=保留可控探针及实际负对照；③运行事实=inspectTemp时仍持有实例锁，不能等待两次钩子到齐。
 
 下一步仍是角色任务书明确「认领失败就让位」后的行为实验；先验动作，再判断是否补规则或执行层。多root fs实例共享关系、跨进程仲裁、模型合并质量、任意外部写者和持续reader原子性未验证。旧T3/T4仪器问题暂记录在[协作issue](../../settled_issues/2026-10-09-collaboration-safety-acceptance.md)，不得继承其过强承诺。最终 `set -o pipefail; pnpm verify && pnpm test && git diff --check && git -C vendor/dsh status --short` exit0：verify ALL PASS，40 files / 409 tests passed，diff卫生通过，vendor零修改。首次verify因两处Markdown文档使用行号锚而红，改为真实文档链接后绿；没有放宽门禁。

@@ -55,7 +55,7 @@ Team 寻址、多机只剩共享盘（[multi-human.md](../../../docs/multi-human
   协作机制无大件，唯一相关 = `user-questions` 支持 timed waits + late replies（对"卡刷新即丢"利好）。
   我们 pin 的 0.1.7-rc.2 仍是 0.1.x 线最新 ⇒ **为协作目的升 pin 不急**；0.2.0 正式后按 release.md 程序重校。
   （**2026-10-03 附注：本段已被超越**——09-30 用户点名升 0.2.0-rc.2，动机是 0.2.0 能力面而非协作
-  （[升 pin Note](../../../notes/implemented/2026-09-30-pin-upgrade-0.2.0-rc.2.md)）；本段按当时事实保留，
+  （[升 pin Note](../../../notes/archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md)）；本段按当时事实保留，
   `user-questions` timed waits 利好已随新基线在场。）
 - **"现成未用件"归宿（盲审 B12：无归宿=毕业即埋，逐件定案如下；复活任一件须重读本节）**：
   - `schedule`：~~登记待触发~~ **已收（09-30 收割轮批3）**——schedule-bundle 落地（cron/定频 + 到点投递
