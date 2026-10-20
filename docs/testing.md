@@ -9,7 +9,7 @@
 | 层 | 证明什么 | **不证明什么** |
 |---|---|---|
 | 结构门禁 `verify` | 结构、一致性、簿记 | 运行行为 |
-| keyless 单测 `test` | 模块正例与错误路径、纯函数视图模型、静态渲染 | 真入口、真渲染交互（whole-client 组合子层另述） |
+| keyless 单测 `test` | 模块正例与错误路径、纯函数视图模型、静态渲染 | 真入口、真渲染交互；whole-client 组合子层 = [tests/README](../tests/README.md)（无浏览器） |
 | 装配冒烟（`preset-smoke` / `client-load-smoke`） | 真挂载、零失败 | 内容语义 |
 | 机制冒烟（`delegation-smoke`） | 模型可见边界 | 设计取舍、跨面正确 |
 | 重放 lane（`replay-smoke`；会话日志 + sidecar 回放，无 key；`--ui` 另加真浏览器端到端） | 会话级行为复现与回归锚 | 录制之外的行为、设计取舍 |
@@ -17,8 +17,6 @@
 | 发布形状（`release-smoke`） | 安装形状、built 入口可达 | 语义 |
 | 认证档（真模型） | 真行为 | 跨面正确 |
 | 行为质量档（`probe --full` + candidate-scan 语料） | 角色内容质量 | 机制回归 |
-
-keyless 内另有 **whole-client 组合子层**（`company-client-composition`：真 `bootClient` × web profile roster，无浏览器）：证明 `apply` 组合与 fiber 卸载/重载，不证明真浏览器渲染交互。
 
 换档先问"这一层能证明我关心的性质吗"，不为安心堆档。
 
