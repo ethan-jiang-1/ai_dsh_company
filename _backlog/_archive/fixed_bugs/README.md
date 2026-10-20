@@ -4,6 +4,7 @@
 
 ## 修复流水（倒序）
 
+- **BUG-029**（2026-10-20）：观察窗 token 再次随 `runtime/web-logs` 日志入库（BUG-013 同类复发）。修法 = untrack + `.gitignore` 规则 + **类级 tracked-token 窄扫**（`tools/lib/tracked-token.mjs` + `checks/gates/tracked-token.mjs`）+ `.gitignore` 红绿守卫；不做历史重写。红→绿：临时 tracked 文件写合成 token URL → `FAIL tracked-token ...`；移除 → `PASS tracked-token ×1740`；`pnpm verify` ALL PASS、`pnpm test` 71/699。详见 [卡](BUG-029-committed-web-token-recurrence.md) 与 [Note](../../../notes/implemented/2026-10-20-tracked-token-guard.md)。
 - **BUG-028**（2026-10-19）：闸门④的锚粒度与纪律不一致——一条总锚覆盖多任务时被判「行动幻觉」（lingang-recon 实测 3 条误报）。修法 = 认总锚（该 slug 的锚在 title **或 prompt** 里点名 T 号即算已锚，整号边界匹配）+ 依赖链传递（`｜依赖：T4` 且 T4 已覆盖 ⇒ 连带覆盖），无锚/未点名照旧判红。红→绿：新守卫先红 `expected [ 'T4', 'T6' ] to deeply equal []`，修后 `pnpm test` 669/669；真入口 `--only lingang-recon` **3 条违规 → ALL PASS**（盘面一字未改）。同 diff 补手册一句（总锚须点名下游 T 号）。详见 [卡](BUG-028-pending-material-anchor-granularity.md)。
 - **BUG-025**（2026-10-19）：台账数据面的口径错配——面板一直读 `kb/motion-ledger.md`（40 行动议表），而调研与四张卡把「993 份成品」记在台账名下，下游论证全线继承。修法 = 订正文档口径（面板代码本就正确）+ 补一条钉住「面板数据面 = `kb/motion-ledger.md`」的判据（`tests/client/client-face.spec.ts`；红/绿实证：改路径 ⇒ 1 failed，还原 ⇒ 5 passed）。真正的收获是失败类：**盘上有什么 ≠ 面板读什么**，那条连线此前无人查。详见 [卡](BUG-025-ledger-reads-wrong-data-face.md)。
 - **BUG-019**（2026-10-16）：判据加「证据可得性」维——显式声明 `evidenceMissingBefore`（CLI `--evidence-from`）后，该期内无 present 背书的成品由违规降为观察项 `present-evidence-missing`；不声明维持严格判红。深挖同时推翻首版诊断（本案是**真阳性**：收口会话从未调 `present`）。详见 [卡](BUG-019-final-present-evidence-lost.md)。

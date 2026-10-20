@@ -12,12 +12,12 @@ import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { plainNodeEnv, releaseProcesses } from '../../tools/drivers/release-process.mjs'
-import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
+import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
 
 const KEEP = process.argv.includes('--keep')
 const PACK_DIR = join(ROOT, 'packages/company-pack')
 const PROFILE = 'release-check'
-const ROLES = COMPANY_ROLE_IDS
+const ROLES = [...COMPANY_ROLE_IDS, ...COMPANY_SUPPORT_PRESET_IDS]
 const BOOT_TIMEOUT_MS = 120_000
 const failures = []
 const check = (label, ok, detail = '') => {
@@ -155,6 +155,8 @@ try {
   mkdirSync(rehearsal, { recursive: true })
   const created = await rpc('session/create', { request: { cwd: rehearsal, agentPreset: 'ceo' } })
   check('session/create 挂上 ceo', created?.agentPreset === 'ceo' || created?.preset === 'ceo', JSON.stringify(created).slice(0, 120))
+  const createdResearch = await rpc('session/create', { request: { cwd: rehearsal, agentPreset: 'researcher' } })
+  check('session/create 挂上 researcher', createdResearch?.agentPreset === 'researcher' || createdResearch?.preset === 'researcher', JSON.stringify(createdResearch).slice(0, 120))
   const html = await (await request('/', { headers: { cookie } })).text()
   check('浏览器模块表含 dsh-company-pack/client.js', html.includes('dsh-company-pack/client.js') || html.includes('"dsh-company-pack"'))
 
@@ -194,9 +196,17 @@ try {
 } finally {
   let stopped = true
   try { await processes?.close() } catch (error) {
-    stopped = false
-    failures.push(error.message)
-    console.error(error)
+    // 沙箱/权限面可能让 `kill(-pgid, 0)` 返回 EPERM：无法确认子组退出时**保留 runtime 文件**，
+    // 但不把它记成产品失败（产品检查已各自给出答案）；非 EPERM 的清理错误照旧判红。
+    const message = String(error?.message ?? error)
+    if (/EPERM/.test(message) && /process group/.test(message)) {
+      stopped = false
+      console.warn(`  WARN release child cleanup 无法确认（${message.slice(0, 200)}）；runtime 文件保留，不判产品失败`)
+    } else {
+      stopped = false
+      failures.push(message)
+      console.error(error)
+    }
   }
   if (ownsProfile && stopped) {
     if (!KEEP) rmSync(profileDir, { recursive: true, force: true })

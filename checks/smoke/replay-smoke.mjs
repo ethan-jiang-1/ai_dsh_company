@@ -4,7 +4,7 @@
 // 前置：**先 source run/env.sh 再跑**（或显式给同样的 DSH_PERMISSION_MODE）。姿态事件的**值**已脱敏，
 //   但它们的**在场与位置**随机器姿态变（Seatbelt 可用 = workspace-write，损坏 = danger-full-access，
 //   权限事件序列不同）——裸跑会在那些行上红，那是设计内的「序列漂移照样红」，不是夹具坏。
-// 何时跑：录制行为、组合、委派 UI 或 workspace replay 改动时（第三档，无 key ~11s；--ui 另起浏览器）
+// 何时跑：录制行为、组合、委派 UI 或 workspace replay 改动时（第三档，无 key；r3 ~15s / r2 五会话 ~80–100s，--ui 另起浏览器）
 //   --prepare     原始录制（replay/raw/，lead.jsonl + 任意名 child）→ 归一化 fixture
 //                 （session.v3.jsonl + session.<k>.v3.jsonl，child 按 header createdAt 排序）
 //                 + sidecar（system-prompt.expected.md / tool-schemas.expected.json；child 带 .k. 后缀）
@@ -647,16 +647,18 @@ try {
   const deliveryMismatch = actualStream.findIndex((s, i) => JSON.stringify(s.deliveries) !== JSON.stringify(expectedStream[i]?.deliveries ?? []))
   const actualRows = actualStream.map(s => s.sequence)
   const expectedRows = expectedStream.map(s => s.sequence)
-  const sessionDifferences = judgeReplaySessions(actualRows, expectedRows, 'full')
   let diffLine = ''
-  for (const { sessionIndex, rowIndex, expected, actual } of sessionDifferences) {
-    diffLine = `session#${sessionIndex} 第 ${String(rowIndex + 1)} 行：期望 ${expected?.type ?? '(缺)'} / 实际 ${actual?.type ?? '(缺)'}`
-    console.log(`    差异：${diffLine}`)
-    if (expected !== undefined) console.log(`      期望: ${JSON.stringify(expected).slice(0, 700)}`)
-    if (actual !== undefined) console.log(`      实际: ${JSON.stringify(actual).slice(0, 700)}`)
-  }
-  const sessionDiffs = sessionDifferences.length
+  let sessionDiffs = 0
   if (JUDGES === 'full') {
+    const sessionDifferences = judgeReplaySessions(actualRows, expectedRows, 'full')
+    for (const { sessionIndex, rowIndex, expected, actual } of sessionDifferences) {
+      diffLine = `session#${sessionIndex} 第 ${String(rowIndex + 1)} 行：期望 ${expected?.type ?? '(缺)'} / 实际 ${actual?.type ?? '(缺)'}`
+      console.log(`    差异：${diffLine}`)
+      if (expected !== undefined) console.log(`      期望: ${JSON.stringify(expected).slice(0, 700)}`)
+      if (actual !== undefined) console.log(`      实际: ${JSON.stringify(actual).slice(0, 700)}`)
+    }
+    sessionDiffs = sessionDifferences.length
+
     check('归一化日志零 diff（投递簿记除外）', sessionDiffs === 0, sessionDiffs === 0 ? `${String(actualN.length)} 个会话逐行一致` : diffLine)
     check('投递内容集合等价', deliveryMismatch === -1, deliveryMismatch === -1 ? '' : `session#${String(deliveryMismatch)} 的 inbox 投递内容不同（内容/条数/来源变了）`)
   } else {
@@ -681,15 +683,19 @@ try {
         const key = (r) => `${r.data.message.senderName}→${String(r.data.message.content?.[0]?.text ?? '').split('\n')[0].slice(0, 30)}`
         const aKeys = new Set(a.map(key))
         const missing = [...new Set(eQueued.map(key))].filter(k => !aKeys.has(k))
-        console.log(`  （记录）session#${index} queued ${String(eQueued.length)} → ${String(a.length)}：${missing.map(k => `缺「${k}」`).join('、')}`)
+        if (process.argv.includes('--verbose')) {
+          console.log(`  （记录）session#${index} queued ${String(eQueued.length)} → ${String(a.length)}：${missing.map(k => `缺「${k}」`).join('、')}`)
+        } else {
+          console.log(`  （记录）session#${index} queued ${String(eQueued.length)} → ${String(a.length)}：${String(missing.length)} 条差异（--verbose 看明细）`)
+        }
       }
     }
-    check(`归一化全量比对 SKIP（presence 档：录制早于内容演进，理由见脚本头注）`, true)
+    check.skip('归一化全量比对', 'presence 档：录制早于内容演进，理由见脚本头注')
   }
   // sidecar 比对（P1.3）：system prompt 与 tool schemas 离开 fixture 后的真值对照
   const sidecarCtx = runCtx(parsed.map(p => p.text))
   if (JUDGES === 'presence') {
-    check(`sidecar SKIP（presence 档，共 ${String(parsed.length * 2)} 份：persona/手册/工具表的历史漂移不适用，见脚本头注）`, true)
+    check.skip('sidecar', `presence 档，共 ${String(parsed.length * 2)} 份：persona/手册/工具表的历史漂移不适用，见脚本头注`)
   } else {
     for (const [index, p] of parsed.entries()) {
       const actualSidecars = sidecarsOf(p.text, sidecarCtx, replayBase)

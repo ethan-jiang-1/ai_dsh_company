@@ -4,7 +4,14 @@
 
 ## 活跃清单
 
-当前无活跃问题。六张卡（issue 卡质量 / 公司面优先级 / 看板+依赖图 / 任务板 / 台账 / 成品台账）均已归档，见 [归档](../_archive/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
+当前活跃 1 张：
+
+- [2026-10-20-fresh-agent-repo-hygiene](2026-10-20-fresh-agent-repo-hygiene.md) — fresh-agent 六轴打扫卫生审计；
+  证据 = [research/repo-hygiene/2026-10-20-fresh-agent-audit.md](../research/repo-hygiene/2026-10-20-fresh-agent-audit.md)；
+  关联 [BUG-029](../_archive/fixed_bugs/BUG-029-committed-web-token-recurrence.md)。
+
+此前六张卡（issue 卡质量 / 公司面优先级 / 看板+依赖图 / 任务板 / 台账 / 成品台账）均已归档，见
+[归档](../_archive/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 
 ## 边界与尺寸
 

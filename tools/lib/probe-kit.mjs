@@ -15,7 +15,14 @@ export const makeCheck = results => (label, ok, detail = '') => {
 }
 
 /** 造「failures 收集」版 check：只记失败 label（浏览器/视觉探针的轻量形状，不打扰 results）。 */
-export const makeFailingCheck = failures => (label, ok, detail = '') => {
-  console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`)
-  if (!ok) failures.push(label)
+export const makeFailingCheck = failures => {
+  const check = (label, ok, detail = '') => {
+    console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`)
+    if (!ok) failures.push(label)
+  }
+  // 第三态：显式跳过。不要把 SKIP 写成 PASS（审计 2026-10-20：绿的含义被稀释）。
+  check.skip = (label, detail = '') => {
+    console.log(`  SKIP ${label}${detail === '' ? '' : `（${detail}）`}`)
+  }
+  return check
 }

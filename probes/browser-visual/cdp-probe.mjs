@@ -7,17 +7,23 @@
 // 前置：GUI URL（demo.md §前置：source run/env.sh → pnpm dsh web -- --port 0 --no-open → 横幅 URL）；
 //   Chrome 二进制：DSH_PROBE_CHROME 环境变量或系统 Chrome（run/env.sh 已指 Chrome for Testing）。
 // 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser]
-//   默认断言面 = composer + 品牌 + 右栏全部公司页签逐个开（Start-chip 回切）+ console/异常捕获。
+//   默认断言面 = composer + 品牌 + 右栏**全部**公司页签逐个开（Start-chip 回切）+ 面板体
+//   `data-company-tab` 可见且非空 + console/异常捕获。页签清单从注册源
+//   `company-tab-registration.ts` 解析（不再手写；2026-10-20 审计：旧清单 8 个漏「成品」）。
 //   --ask 会真建会话（registry default = ceo）输入问题发送并等待轮次收口——完整产品环，留测试会话。
-// 退出码：0 = 全部断言成立；1 = 有断言失败（JSON verdict 已打印，含 consoleProblems/exceptions）。
+// 退出码：0 = 全部断言成立；1 = 有断言失败（JSON verdict 已打印，含 consoleProblems/exceptions；
+//   失败时另写 runtime/harness-home/diagnosis/cdp-probe-<时间>/ 的截图/body/verdict/console）。
 // 出处：驱动 = ai_dsh_loop_advisor/tools/drivers/cdp-driver.mjs（2026-10-01 owner 指令内化，
 //   docs/guides/cdp-probe.md 记模式与环境坑）；场景选择器与本仓坑（首启双模态、Start-chip 回切、
 //   dock 前后台子树 .some() 扫描）为本仓 2026-09/10 走查实证。
 import { repositoryRoot } from '../../tools/lib/repository-layout.mjs';
 import { launchCdpBrowser } from '../../tools/drivers/cdp-driver.mjs';
 import { loadChromium } from '../../tools/drivers/playwright.mjs';
-import { existsSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import process from 'node:process';
+import { parseCompanyTabCatalog } from '../../tools/lib/company-tab-catalog.mjs';
+import { diagnosisDir } from '../../tools/lib/diagnosis.mjs';
 import { sleep } from '../../tools/lib/probe-kit.mjs'
 
 const args = process.argv.slice(2);
@@ -46,6 +52,21 @@ const verdict = {
   exceptions: [],
 };
 
+// 页签清单 = 注册源解析（单一事实）；解析为空直接 fail-loud，不静默退化成少一个也绿。
+let tabs = [];
+try {
+  const source = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/company-tab-registration.ts'), 'utf8');
+  tabs = parseCompanyTabCatalog(source);
+} catch (error) {
+  console.error(`cdp-probe: 读页签注册源失败：${String(error?.message ?? error)}`);
+  process.exit(2);
+}
+if (tabs.length === 0) {
+  console.error('cdp-probe: 页签注册源解析为空（格式漂移？）——拒绝以空清单通过');
+  process.exit(2);
+}
+verdict.catalog = tabs.map(tab => tab.title);
+
 // chromeBin 复用本仓 chromium 解析（loadChromium → executablePath；DSH_PROBE_CHROME 仍可覆盖——
 // 驱动的候选表不动，保持「拷贝零修改」契约）。
 const chromiumApi = await loadChromium(repositoryRoot).catch(() => undefined)
@@ -61,6 +82,20 @@ verdict.booted = true;
 const { evaluate, consoleProblems, exceptions } = handle;
 verdict.consoleProblems = consoleProblems;
 verdict.exceptions = exceptions;
+
+/** 失败现场：截图 + body 文本 + verdict + console，落到 runtime 诊断区（不再只打印 JSON）。 */
+async function writeEvidence(reason) {
+  const dir = diagnosisDir(repositoryRoot, 'cdp-probe');
+  verdict.evidenceDir = dir;
+  writeFileSync(join(dir, 'verdict.json'), JSON.stringify({ reason, ...verdict }, null, 2), 'utf8');
+  writeFileSync(join(dir, 'console.log'), [...consoleProblems, ...exceptions].join('\n'), 'utf8');
+  const body = await evaluate('document.body.innerText').catch(() => '');
+  writeFileSync(join(dir, 'body.txt'), typeof body === 'string' ? body : JSON.stringify(body), 'utf8');
+  if (typeof handle.screenshot === 'function') {
+    await handle.screenshot(join(dir, 'page.png')).catch(() => {});
+  }
+  console.error(`cdp-probe: 失败现场 = ${dir}`);
+}
 
 
 try {
@@ -108,15 +143,34 @@ try {
   await sleep(800);
   verdict.guideLabels = await evaluate(
     `Array.from(document.querySelectorAll('.wk-guide-entry-label')).map(e => e.textContent)`) ?? [];
-  const tabs = ['待办', '用量', '看板', '任务板', '依赖图', '台账', '在场', '培养'];
+  const missingGuides = tabs.filter(tab => !verdict.guideLabels.some(label => (label ?? '').includes(tab.title)));
+  if (missingGuides.length > 0) {
+    verdict.tabFailures.push(`guide 缺失：${missingGuides.map(tab => tab.title).join('、')}`);
+  }
   // ⚠ 驱动的 evaluate 不 await Promise——时序由场景侧 sleep 控制，页面动作用同步 IIFE。
   for (const tab of tabs) {
     await evaluate(`(() => { const back = [...document.querySelectorAll('[data-dockkit-tab]')].find(t => /start/i.test(t.textContent ?? '')); if (back !== undefined) back.click(); })()`);
     await sleep(400);
-    const clicked = await evaluate(`(() => { const entry = [...document.querySelectorAll('.wk-guide-entry-label')].find(e => (e.textContent ?? '').includes(${JSON.stringify(tab)})); if (entry === undefined) return false; entry.click(); return true; })()`) === true;
-    await sleep(900);
-    const rendered = await evaluate(`document.body.innerText.includes(${JSON.stringify(tab)})`) === true;
-    if (clicked && rendered) verdict.tabsOpened.push(tab); else verdict.tabFailures.push(`${tab}(${clicked ? 'render' : 'entry'})`);
+    const clicked = await evaluate(`(() => { const entry = [...document.querySelectorAll('.wk-guide-entry-label')].find(e => (e.textContent ?? '').includes(${JSON.stringify(tab.title)})); if (entry === undefined) return false; entry.click(); return true; })()`) === true;
+    // title 是面板外框自己拿到的显示名，不受 contentId/kind 语义影响；每个 catalog 条目唯一。
+    const selector = `[data-company-tab-title="${tab.title}"]`;
+    const probeBody = () => evaluate(`(() => {
+      const el = document.querySelector(${JSON.stringify(selector)});
+      if (el === null) return { present: false, visible: false, textLength: 0 };
+      const rect = el.getBoundingClientRect();
+      return { present: true, visible: rect.width > 0 && rect.height > 0, textLength: (el.innerText ?? '').trim().length };
+    })()`);
+    let rendered = await probeBody();
+    for (let i = 0; i < 6 && !(rendered?.present === true && rendered?.visible === true && rendered?.textLength > 0); i++) {
+      await sleep(500);
+      rendered = await probeBody();
+    }
+    const ok = clicked && rendered?.present === true && rendered?.visible === true && rendered?.textLength > 0;
+    if (ok) verdict.tabsOpened.push(tab.title);
+    else {
+      const why = !clicked ? 'entry' : rendered?.present !== true ? 'body' : rendered.visible !== true ? 'hidden' : 'empty';
+      verdict.tabFailures.push(`${tab.title}(${why})`);
+    }
   }
   if (verdict.tabsOpened.length !== tabs.length) {
     verdict.tabFailures.unshift(`仅 ${verdict.tabsOpened.length}/${tabs.length} 开`);
@@ -159,6 +213,13 @@ try {
 } finally {
   verdict.consoleProblems = consoleProblems.slice(0, 10);
   verdict.exceptions = exceptions.slice(0, 10);
+  const bad = verdict.composerReady !== true
+    || verdict.brandPresent !== true
+    || verdict.tabFailures.length > 0
+    || verdict.consoleProblems.some(p => p.startsWith('console.error'))
+    || verdict.exceptions.length > 0
+    || (ask !== undefined && (verdict.askError !== undefined || verdict.askTranscriptGrew !== true));
+  if (bad) await writeEvidence('assertion');
   if (!keepBrowser) await handle.settle();
 }
 
@@ -166,7 +227,7 @@ console.log(JSON.stringify(verdict, null, 2));
 let exitCode = 0;
 if (verdict.booted === false || verdict.error !== undefined) exitCode = 1;
 if (verdict.composerReady !== true || verdict.brandPresent !== true) exitCode = 1;
-if (verdict.tabsOpened.length !== 8 || verdict.tabFailures.length > 0) exitCode = 1;
+if (verdict.tabsOpened.length !== tabs.length || verdict.tabFailures.length > 0) exitCode = 1;
 if (verdict.consoleProblems.some(p => p.startsWith('console.error')) || verdict.exceptions.length > 0) exitCode = 1;
 if (ask !== undefined && (verdict.askError !== undefined || verdict.askTranscriptGrew !== true)) exitCode = 1;
 process.exit(exitCode);

@@ -27,7 +27,7 @@
 （`subagent_research`）若不钉 preset，child 继承 CEO 组合——一个没有 CEO 判断材料、却带着 CEO 职责的
 "迷你 CEO"。researcher = 只读工具面（fs / search / web / session-query）+ 一次调研一页纸，**没有**
 职责边界、没有 journal 义务、不替任何职能下结论；它是**手**，不是第五个职能。
-UI 按 trust 分组，故五张卡出现在 **Built-in** 组（`AgentPresetSection.tsx`）。
+UI 按 trust 分组，故六张卡（5 公司角色 + researcher）出现在 **Built-in** 组（`AgentPresetSection.tsx`）。
 
 ## 四形态矩阵：身份、工具与 skills 从哪来（RFC preset-skill-matrix 2026-10-05 立）
 
@@ -139,9 +139,9 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 
 | 层 | 手段 | 现状 |
 |---|---|---|
-| keyless | `pnpm test`（roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义、必填 config） | ✅ 五角色覆盖 |
-| 运行时 roster | web 观察窗 `agentPresets/list` RPC | ✅ 实测 9 条零 broken（出厂 4 + pack 5） |
-| **挂载（上线前门禁）** | `node checks/smoke/preset-smoke.mjs`：boot 真 web，逐个 preset `session/create` | ✅ 五角色 ALL PASS（反证过：去掉必填 config 即红） |
+| keyless | `pnpm test`（roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义、必填 config） | ✅ 5 公司角色 + researcher 覆盖 |
+| 运行时 roster | web 观察窗 `agentPresets/list` RPC | ✅ 实测 10 条零 broken（出厂 4 + pack 6） |
+| **挂载（上线前门禁）** | `node checks/smoke/preset-smoke.mjs`：boot 真 web，逐个 preset `session/create` | ✅ 5 公司角色 + researcher ALL PASS（反证过：去掉必填 config 即红） |
 | 会话级（persona 生效、连通） | `node checks/smoke/probe-smoke.mjs`（默认快速档 ~6s：真会话发一句 ping，断言挂载/轮次/回话/**人格进 prompt**）；`--full` = 五角色三探针内容断言（慢，按需） | ✅ R2 建：快速档 5/5 PASS；内容档曾 14/15（KB 事实与 veto 语义均命中） |
 | 回归资产 | 动议会话 + 期望工作区归档 | ✅ `snapshots/`（r1–r4 motion + scenario-b + r3 replay 场景；replay harness R5a） |
 

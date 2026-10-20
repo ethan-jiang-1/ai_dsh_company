@@ -15,6 +15,7 @@ import {
   statusLabelFor,
   type PresenceStatus,
 } from './presence-status.ts'
+import { firstText } from './text.ts'
 
 // 词汇再导出（facade 的对外半边）：消费方继续从 `lib/presence.ts` 取这些名字。
 export {
@@ -145,16 +146,6 @@ const isMessageEvent = (event: TeamEventLike): event is MessageEvent => event.ty
 /** 截断长文本（动态流一行别被任务全文撑爆）。 */
 function clip(text: string, max: number): string {
   return text.length <= max ? text : `${text.slice(0, max)}…`
-}
-
-/** 消息首段文本；取不到给空串（由调用方落「（空）」）。 */
-function firstText(content: readonly { type: string; text?: string }[]): string {
-  for (const block of content) {
-    if (block.type === 'text' && typeof block.text === 'string' && block.text.trim() !== '') {
-      return block.text.trim().split('\n')[0]!
-    }
-  }
-  return ''
 }
 
 /**

@@ -10,9 +10,10 @@
 // env 合同（主文件注入，浏览器档不自带）：{ check, firstDiff, scenario, refreshUi, goldenUi, root }——
 // check/firstDiff = 主文件的判分与差异诊断闭包；scenario/refreshUi/goldenUi/root = 旗标与路径事实。
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import { basename } from 'node:path'
+import { basename, join } from 'node:path'
 import { sleep } from '../../../tools/lib/probe-kit.mjs'
 import { launchChromium, loadChromium } from '../../../tools/drivers/playwright.mjs'
+import { diagnosisDir } from '../../../tools/lib/diagnosis.mjs'
 
 const ARIA_AGE =
   /(?:now|\d+min|\d+h|\d+d|\d+mo|\d+y|刚刚|\d+分钟|\d+小时|\d+天|\d+个月|\d+年)(?=")/g
@@ -82,6 +83,16 @@ async function expandTurnProcesses(page) {
   }
 }
 
+/** 把 URL 的 token 查询串脱敏，避免诊断日志二次扩散。 */
+function safeUrl(value) {
+  try {
+    const parsed = new URL(value)
+    return `${parsed.origin}${parsed.pathname}`
+  } catch {
+    return '(url)'
+  }
+}
+
 /** 委派卡端到端（P1.3 主判据）：金样 + 双轨断言。 */
 export async function uiPhase(env, { url, workspace }) {
   const chromiumApi = await loadChromium(env.root)
@@ -93,16 +104,28 @@ export async function uiPhase(env, { url, workspace }) {
     const consoleLog = []
     page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') consoleLog.push(`[${m.type()}] ${m.text()}`) })
     page.on('pageerror', (e) => { consoleLog.push(`[pageerror] ${String(e)}`) })
-    page.on('framenavigated', (f) => { if (f === page.mainFrame()) consoleLog.push(`[navigated] ${f.url()}`) })
+    page.on('framenavigated', (f) => { if (f === page.mainFrame()) consoleLog.push(`[navigated] ${safeUrl(f.url())}`) })
+    let failed = false
+    const originalCheck = env.check
+    env.check = (label, ok, detail) => {
+      originalCheck(label, ok, detail)
+      if (!ok) failed = true
+    }
     try {
       await runUiFlow(env, page, { url, workspace })
     } catch (error) {
-      // 失败现场保留（vendor support.ts saveFailureShot 先例）：截图 + 全页 aria，落 /tmp。
-      await page.screenshot({ path: '/tmp/replay-ui-fail.png', fullPage: false }).catch(() => {})
-      writeFileSync('/tmp/replay-ui-fail.aria', await page.locator('body').ariaSnapshot().catch(() => ''), 'utf8')
+      failed = true
       throw error
     } finally {
-      writeFileSync('/tmp/replay-ui-console.log', consoleLog.join('\n'), 'utf8')
+      if (failed) {
+        // 失败现场保留（vendor support.ts saveFailureShot 先例）：截图 + 全页 aria + console，
+        // 落 runtime/harness-home/diagnosis/（跨进程可回溯；不再覆盖 /tmp 固定名）。
+        const dir = diagnosisDir(env.root, `replay-ui-${env.scenario}`)
+        await page.screenshot({ path: join(dir, 'page.png'), fullPage: false }).catch(() => {})
+        writeFileSync(join(dir, 'body.aria'), await page.locator('body').ariaSnapshot().catch(() => ''), 'utf8')
+        writeFileSync(join(dir, 'console.log'), consoleLog.join('\n'), 'utf8')
+        console.log(`  （ui 诊断）失败现场 = ${dir}`)
+      }
     }
   } finally {
     await browser.close().catch(() => {})
@@ -235,10 +258,10 @@ async function runCockpitFlow(env, page) {
   // 会话头出现 "Session hierarchy" 面包屑，含 "Switch subagent: <成员 label>"——
   // 直接断言目标成员身份（不只断言"切走了"）。只读 composer 仅 persisted-only child 才有。
   const engRow = rows.filter({ has: page.getByText('梦之队 VP-Eng', { exact: false }) }).first()
-  console.log(`  （ui 诊断）点击前 URL = ${page.url()}`)
+  console.log(`  （ui 诊断）点击前 URL = ${safeUrl(page.url())}`)
   await engRow.click()
   await sleep(1_500)
-  console.log(`  （ui 诊断）点击后 URL = ${page.url()}`)
+  console.log(`  （ui 诊断）点击后 URL = ${safeUrl(page.url())}`)
   const memberMarker = page.getByRole('navigation', { name: 'Session hierarchy' })
     .or(page.getByRole('button', { name: /Switch subagent: VP-Eng/ }))
     .or(page.getByText('This subagent is read-only for now'))
@@ -247,8 +270,9 @@ async function runCockpitFlow(env, page) {
     const hierarchy = await page.getByRole('button', { name: /Switch subagent: VP-Eng/ }).count()
     env.check('点行进成员空间：VP-Eng 会话成为当前会话（D-d，提案验收 5）', hierarchy >= 1, `面包屑 "Switch subagent: VP-Eng…" ×${String(hierarchy)}`)
   } catch {
-    writeFileSync('/tmp/replay-ui-after-click.aria', await page.locator('body').ariaSnapshot().catch(() => ''), 'utf8')
-    console.log(`  （ui 诊断）失败现场 URL = ${page.url()}；aria 已落 /tmp/replay-ui-after-click.aria`)
+    const dir = diagnosisDir(env.root, 'replay-ui-after-click')
+    writeFileSync(join(dir, 'after-click.aria'), await page.locator('body').ariaSnapshot().catch(() => ''), 'utf8')
+    console.log(`  （ui 诊断）失败现场 URL = ${safeUrl(page.url())}；aria 已落 ${dir}`)
     env.check('点行进成员空间：VP-Eng 会话成为当前会话（D-d，提案验收 5）', false, '15s 内未出现成员会话面包屑（Session hierarchy / Switch subagent）')
   }
 }

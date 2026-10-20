@@ -9,9 +9,10 @@
  * - **lead 会话事件流**（`session/follow`）：`tool/call`(present)（完成通知）与含【待澄清】
  *   前缀的 `team/message/queued`（升级待处理 = 问询切片三甲的中继链显性化）。
  *
- * 纯函数、零依赖；wire 形状 → 领域形状，UI 只消费 {@link AttentionItem}。
+ * 纯函数、只依赖文本工具；wire 形状 → 领域形状，UI 只消费 {@link AttentionItem}。
  * keyless 单测 = `tests/client/attention.spec.ts`。
  */
+import { firstText } from './text.ts'
 
 /** 注意力条目类别。 */
 export type AttentionKind = 'question' | 'approval' | 'escalation' | 'completion'
@@ -61,16 +62,6 @@ const isToolCall = (event: AttentionEventLike):
   event is Extract<AttentionEventLike, { type: 'tool/call' }> => event.type === 'tool/call'
 const isMessage = (event: AttentionEventLike):
   event is Extract<AttentionEventLike, { type: 'team/message/queued' }> => event.type === 'team/message/queued'
-
-/** 消息首段文本（与 presence.ts 的 firstText 同义；独立成文避免跨文件私有依赖）。 */
-function firstText(content: readonly { type: string; text?: string }[]): string {
-  for (const block of content) {
-    if (block.type === 'text' && typeof block.text === 'string' && block.text.trim() !== '') {
-      return block.text.trim().split('\n')[0]!
-    }
-  }
-  return ''
-}
 
 /** present 调用参数里取可读摘要（title / slug / path 字段；取不到给「交付物」）。 */
 function presentLabel(argumentsJson: string | undefined): string {

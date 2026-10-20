@@ -12,6 +12,7 @@ import type { BudgetSummary } from '../lib/budget.ts'
 import { formatTokens } from '../lib/budget.ts'
 import type { DagLayout } from '../lib/dag.ts'
 import type { ActivityEntry, PresenceRow } from '../lib/presence.ts'
+import { memberDot } from '../lib/presence-status.ts'
 
 /** 任务状态 → Tag 色调。 */
 function taskTone(status: TaskRow['status']): 'success' | 'info' | 'outline' {
@@ -66,17 +67,6 @@ function statusBadge(node: DagLayout['nodes'][number]): { text: string; classNam
   if (node.status === 'completed') return { text: '已完成', className: 'wk-dag-done' }
   if (node.status === 'in_progress') return { text: '进行中', className: 'wk-dag-progress' }
   return { text: '可开工', className: 'wk-dag-ready' }
-}
-
-/** 成员状态 → StateDot 语义（团队内忙闲，D-c 文案在 `presence.ts`）。 */
-function memberDot(status: PresenceRow['status']): 'done' | 'ongoing' | 'warning' | 'error' | 'idle' {
-  switch (status) {
-    case 'running': return 'ongoing'
-    case 'provisioning': return 'warning'
-    case 'failed': return 'error'
-    case 'idle': return 'done'
-    default: return 'idle'
-  }
 }
 
 /**

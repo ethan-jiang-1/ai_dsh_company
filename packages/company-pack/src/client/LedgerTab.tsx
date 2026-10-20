@@ -5,6 +5,8 @@
  * 值不值"的常驻答案。
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+// 静态渲染（react-dom/server）没有布局，useLayoutEffect 会打 SSR 警告；浏览器里仍用 layout 版。
+const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 import type { ReactNode } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
@@ -68,7 +70,7 @@ export function LedgerSummary({ summary }: { readonly summary: string }) {
   const [clipped, setClipped] = useState(false)
   const textRef = useRef<HTMLSpanElement | null>(null)
   const hinted = summary.length > FULL_TEXT_HINT
-  useLayoutEffect(() => {
+  useIsoLayoutEffect(() => {
     const node = textRef.current
     if (node === null || expanded) return
     const measure = (): void => { setClipped(node.scrollHeight > node.clientHeight + 1) }

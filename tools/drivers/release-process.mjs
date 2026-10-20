@@ -29,16 +29,26 @@ export function releaseProcesses({ cwd, env = plainNodeEnv() }) {
     let outcome
     let timedOut = false
     let killTimer
+    // EPERM = 组号被别的会话/进程占用（本沙箱实测）；主进程已退出时不能把它当成我们的子组，
+    // 否则每次 release-smoke 都会留下 lock/profile，下一次误报“并发运行”。
+    const mainGone = () => outcome !== undefined || child.exitCode !== null || child.signalCode !== null
     const signalGroup = (signal) => {
       if (!child.pid) return
       try { process.kill(-child.pid, signal) } catch (error) {
-        if (error.code !== 'ESRCH') throw error
+        if (error.code === 'ESRCH') return
+        if (error.code === 'EPERM') {
+          // 组信号被沙箱/权限面拒绝时退回只杀直接子进程；主进程仍是我们的。
+          try { child.kill(signal) } catch {}
+          return
+        }
+        throw error
       }
     }
     const groupAlive = () => {
       if (!child.pid) return false
       try { process.kill(-child.pid, 0); return true } catch (error) {
         if (error.code === 'ESRCH') return false
+        if (error.code === 'EPERM') return !mainGone()
         throw new Error(`${command}: cannot confirm process group ${child.pid} exit (${error.code}); leave runtime files intact`, { cause: error })
       }
     }

@@ -8,7 +8,8 @@
 |---|---|
 | 检查结构、引用与簿记 | `pnpm verify` → [run-gates](run-gates.mjs) |
 | 看运行态全景 / 场景 run bundle / 会话历史口径 | `pnpm orient`（默认全景含「待核工作候选」扫描节，R3′ 口径，`--workspace <dir>` 换扫描根；`--scenario <kind>/<场景>` run bundle；`--session <slug>[/<id前缀>]` 历史会话 preset）→ [orient](../tools/orient.mjs)（keyless 只读；含日用 home 警告） |
-| 检查 AI 写码产出的密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs)（件 = [ci-security-gates](lib/ci-security-gates/)，判据逐道不看总码） |
+| 看最近会话的失败摘要 | `pnpm diagnose [--session <slug>[/<id前缀>]]`（只读；失败 turn / 工具错误 / 审批 / 待答问询 / present / 最后正文）→ [diagnose](../tools/diagnose.mjs) |
+| 检查 AI 写码产出的密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs)（公司盘五道闸真扫；件 = [ci-security-gates](lib/ci-security-gates/)，判据逐道不看总码）+ [tracked-token](gates/tracked-token.mjs)（跨仓 tracked 文件的 token URL 窄扫；值不打印） |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；[分层守卫](../tests/harness/layering.spec.ts) |
 | 确认角色真的挂载 | [preset-smoke](smoke/preset-smoke.mjs) |
 | 确认 client 真的装配 | [client-load-smoke](smoke/client-load-smoke.mjs) |
@@ -26,6 +27,7 @@
 | 脚本 | 证明对象 / 用途 |
 |---|---|
 | [security-scan.mjs](gates/security-scan.mjs) | AI 写码安全闸门挂载门：自测判别力 + 真扫公司盘 + 挂载件指纹（5 道闸 = 凭据可达性 / 密钥入面 / 不可信件引入前 / 命令执行前 / 动作迹） |
+| [tracked-token.mjs](gates/tracked-token.mjs) | 跨仓 tracked 文件的 token URL 窄扫（BUG-029；值不打印，vendor/ 只读除外） |
 | [run-gates.mjs](run-gates.mjs) | 结构门禁装配 runner：按原顺序跑 gates/ 各门禁（仓库结构、文档引用、vendor 簿记与脚本约束；清单唯一源 = gates/ 目录） |
 | [preset-smoke.mjs](smoke/preset-smoke.mjs) | 通过真实会话创建验证各角色 preset 挂载 |
 | [client-load-smoke.mjs](smoke/client-load-smoke.mjs) | 加载真实 Web 页面，验证 client 挂载、品牌与零装配错误 |
@@ -45,6 +47,8 @@
 | [ledger-summary-probe.mjs](../probes/browser-visual/ledger-summary-probe.mjs) | 台账摘要在宽/窄视口的可读性与键盘/触屏全文入口 |
 | [tasks-panel-probe.mjs](../probes/browser-visual/tasks-panel-probe.mjs) | 任务板入口可见/可聚焦/Tab 序/Enter 落点（真 web，1440/390） |
 | [deliverables-catalog-probe.mjs](../probes/browser-visual/deliverables-catalog-probe.mjs) | 成品目录行数=索引、筛选/打开 final.md（真 web，1440/390） |
+| [board-drift-probe.mjs](../probes/browser-visual/board-drift-probe.mjs) | 看板「声明 vs 板面」分叉警示卡的真实渲染与出图（真组件注入真 web app） |
+| [sidebar-role-mark-probe.mjs](../probes/browser-visual/sidebar-role-mark-probe.mjs) | 侧栏角色标记 vs 16px 座位的渲染盒几何（desktop/narrow/full-bleed + 五角色对照图） |
 | [compact-view-probe.mjs](../probes/browser-visual/compact-view-probe.mjs) | compact 折叠过程行但保留助手最终长回复的现场对照 |
 | [open-in-app-probe.mjs](../probes/browser-visual/open-in-app-probe.mjs) | 交付物进侧栏预览 → Host 判词（`ok:true`/`opened:true`）→ **目标应用状态文件登记该路径**；`--tree` 挑未打开过的文件可拿干净翻转 |
 
@@ -110,6 +114,7 @@
 | [review-staleness-probe.mjs](../probes/fs-taskboard/review-staleness-probe.mjs) | 互审稿版本穿透（手册互审稿命名 / 稿首署名行改动时） |
 | [observed-write-conflict-probe.mjs](../probes/fs-taskboard/observed-write-conflict-probe.mjs) | 同 fs-local 实例同版本竞写与败者重读合并；升 pin 后复验 |
 | [collaboration-oracle-probe.mjs](../probes/fs-taskboard/collaboration-oracle-probe.mjs) | 协作判据的完整坏样本集均被判拒（零模型、秒级） |
+| [archive-move-probe.mjs](../probes/fs-taskboard/archive-move-probe.mjs) | 临时 git 仓里真跑「交付物 → 归档家」搬移（drafts 未跟踪 + git mv 的失败类） |
 
 ## 审计与语料评估
 
@@ -128,6 +133,9 @@
 | [snapshot-motion.mjs](../tools/snapshot-motion.mjs) | 将动议会话与实测工作区归档成场景，显式导入独立 oracle |
 | [snapshot-path.mjs](../tools/snapshot-path.mjs) | 只读查询旧快照路径对应的现行位置；规范路径也可直接核对 |
 | [session-log-export.mjs](../tools/session-log-export.mjs) | 将压缩日志导成明文 JSONL，供审计与跨 home 汇总 |
+| [diagnose.mjs](../tools/diagnose.mjs) | 会话失败摘要（non-completed turn / tool error / 非 allow 审批 / 待答问询 / present / 最后正文；只读） |
+| [ask-latency.mjs](../tools/ask-latency.mjs) | 从会话日志量 `ask_user_question` 真人作答延迟分布（调窗口用；只读秒级） |
+| [deliverables-index.mjs](../tools/deliverables-index.mjs) | 扫描 final/meta 生成 `kb/deliverables-index.json`（成品页签只读这份索引） |
 | [export-dist.mjs](../tools/export-dist.mjs) | 导出 tarball、生成安装手册并核对产物清单 |
 | [sync-dsh.mjs](../tools/sync-dsh.mjs) | vendor 簿记、候选验证、元数据发布与受控失败恢复 |
 | [converge.mjs](../tools/converge.mjs) | 工作区收敛执行器：已闭合动议的证据副本 → 归档家 git mv → journal 清出 → 台账行自动追加（无参计划 / `--slug` 收敛 / `--dry-run` / `--charter-backfill` 补登） |

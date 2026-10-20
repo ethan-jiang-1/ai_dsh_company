@@ -49,8 +49,11 @@ import * as proposals from './gates/proposals.mjs'
 import * as notesLiveness from './gates/notes-liveness.mjs'
 import * as backlogLiveness from './gates/backlog-liveness.mjs'
 import * as replaySceneLiveness from './gates/replay-scene-liveness.mjs'
+import * as snapshotIndex from './gates/snapshot-index.mjs'
 import * as guardRedRecord from './gates/guard-red-record.mjs'
 import * as securityScan from './gates/security-scan.mjs'
+import * as trackedToken from './gates/tracked-token.mjs'
+import * as scriptIndex from './gates/script-index.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const failures = []
@@ -89,8 +92,11 @@ proposals.run(ctx)
 notesLiveness.run(ctx)
 backlogLiveness.run(ctx)
 replaySceneLiveness.run(ctx)
+snapshotIndex.run(ctx)
 guardRedRecord.run(ctx)
 securityScan.run(ctx)
+trackedToken.run(ctx)
+scriptIndex.run(ctx)
 
 console.log(failures.length === 0 ? '\nverify: ALL PASS' : `\nverify: ${failures.length} FAILURE(S)`)
 process.exit(failures.length === 0 ? 0 : 1)

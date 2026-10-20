@@ -12,6 +12,12 @@ describe('gitignore-guards（BUG-013）', () => {
     const gitignore = readFileSync(join(repositoryRoot, '.gitignore'), 'utf8')
     expect(gitignore).toMatch(/^runtime\/e2e\/$/m)
   })
+  // 负例留证 2026-10-20：BUG-029 —— 临时删 `.gitignore` 的 runtime/web-logs/ 规则 → 本 spec 红；
+  // 还原即绿（实跑见 notes/implemented/2026-10-20-tracked-token-guard.md）。
+  it('.gitignore 显式忽略 runtime/web-logs/（BUG-029：启动横幅含 token）', () => {
+    const gitignore = readFileSync(join(repositoryRoot, '.gitignore'), 'utf8')
+    expect(gitignore).toMatch(/^runtime\/web-logs\/$/m)
+  })
   // 2026-10-13 瘦身轮：公司盘过程物料（drafts 含 sources）不进 git；成品（final/meta）照旧入库。
   // 进程级核查（index 里零 drafts）在 verify 的 drafts-untracked 门禁——本 spec 只钉规则在场。
   it('.gitignore 点名忽略公司盘 drafts/（交付物过程物料），且不 blanket 整个 deliverables', () => {

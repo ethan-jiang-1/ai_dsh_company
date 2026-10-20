@@ -116,7 +116,7 @@ teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱�
 
 ```yaml
 # bundle 层（pack 的 cordis.patch.yml；profile 只选 bundle）
-- @deepseek-ai/dsh-agent-preset-registry  # roster（替换出厂行，default: ceo）；五角色各一行声明另住 presets/<role>/agent.cordis.yml
+- @deepseek-ai/dsh-agent-preset-registry  # roster（替换出厂行，default: ceo）；5 公司角色 + researcher 各一行声明另住 presets/<role>/agent.cordis.yml
 - @deepseek-ai/dsh-session-persistence-jsonl  # team 激活前提
 - @deepseek-ai/dsh-experimental-agent-team       # M4 域服务（或直接装 agent-team-profile）
 - @deepseek-ai/dsh-experimental-tool-agent-team  # M4 九个工具
@@ -294,10 +294,10 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
 
 ---
 
-## 7. 落地节奏（现在时）
+## 7. 落地节奏（指针）
 
-开发队列已退役（D32，2026-09-28）：没有中心排序文件——任务源 = `notes/proposed/` 已批 RFC 与用户点名，实施次序由用户逐条给。尚未成熟的问题在 [_backlog/issues/](../../_backlog/issues/README.md) 推敲；旧磨清单已归档在 [_backlog/_archive/legacy/](../../_backlog/_archive/legacy/README.md)，不是现行任务源。**本节保留节号**：§8–§10 的编号被多篇
-文档与 Note 交叉引用，删号会级联改十几处引用，不值当。
+开发队列已退役（D32，2026-09-28）；任务源、实施次序与未成熟问题的入口 = [开发环 §0.5](../guides/dev-loop.md) 与 [_backlog](../../_backlog/README.md)。
+本节保留节号，防既有引用断链。
 
 ## 8. 风险与先验证清单
 
@@ -321,22 +321,8 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
 - 要给 DSH 上游提 seam（比如 per-teammate composition）→ 方案 B 通道进 DSH repo 做，本 repo
   只留消费者。
 
-## 10. 改动归属表：改什么 → 去哪个面 → 该面验收
+## 10. 改动归属表（指针）
 
-> 对照《Agent-ready Development》repo-harness/04 的 "Where new behavior goes"：
-> fresh agent 不该拼三处文档才答出"这个改动放哪、什么算完成"。
-
-| 改什么 | 首选落点 | 该面最小验收 |
-|---|---|---|
-| 角色 persona / skills / KB 事实 | `presets/<role>/`（preset 只放差异，共享行走 host 层） | `preset-smoke`（真挂载）+ 内容档 probe |
-| 组合行（registry / 预设 / 工具行） | `cordis.patch.yml` + `dsh.bundle.patch` 数组 | `pnpm verify`（preset 结构 / 行依赖）+ `preset-smoke` |
-| host 行为（审批线 / org 工具） | `packages/company-pack/src/` | `pnpm test` + 边界改动加 `delegation-smoke` |
-| client 面（品牌 / 委派卡 / 在场板） | `src/client/`（两半编译，见 guides/bootstrap） | `tsc -b` + `client-load-smoke`；行为变更用 replay `--ui` |
-| 会话回放资产 | `snapshots/replay/<场景>/`（世代不删；行为变更随 diff 重录） | `replay-smoke` |
-| 文档 / 合同 / 流程 | 对应 owner（docs/ 或 notes/，路由见 [index](../index.md)） | `pnpm verify`（链接 / 预算 / 结构） |
-| vendor 行为 | **不改**——三条正路：bundle patch / 提上游升 pin / 先证伪再自建（AGENTS §vendor 铁律） | `pnpm verify`（vendor-pin/clean）+ 升 pin 走 release.md |
-| 依赖 / 安装形状 | pack manifest + peers（版本谱系唯一见 AGENTS §vendor 簿记） | `release-smoke` |
-
-业务实现仍在既有包面上；何时拆包或上 registry 见 §9。keyless 测试集中在根 `tests/`，按
-company/client/presets/harness 领域分区（每 spec 对应一面），不散入包内。职责目录降低长期查找成本，
-Vitest 与 layering 守卫递归发现 spec；真实脚本的驱动另住 `tools/drivers/`，不进入回归。
+> 2026-10-20 审计：本表是**当前操作映射**，不属设计层——改什么 → 最窄检查唯一家 =
+> [tests/README「改动面 → 最窄检查」](../../tests/README.md)；安装/发布 = [release](../release.md)；
+> vendor = [release §vendor 政策](../release.md)；文档/合同 = `pnpm verify`。本层只留指针。

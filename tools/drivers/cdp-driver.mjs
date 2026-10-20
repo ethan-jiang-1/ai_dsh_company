@@ -127,6 +127,18 @@ export async function launchCdpBrowser({ url, chromeBin, windowSize = '1600,1000
   });
 
   await send('Runtime.enable');
+  await send('Page.enable');
+
+  // Local extension (2026-10-20): failure evidence needs a screenshot from the same page the
+  // probe inspected; a second browser would prove nothing. This does not change the driver's
+  // navigation/evaluate contract.
+  const screenshot = async (file) => {
+    const reply = await send('Page.captureScreenshot', { format: 'png' });
+    const data = reply.result?.data;
+    if (typeof data !== 'string') return false;
+    fs.writeFileSync(file, Buffer.from(data, 'base64'));
+    return true;
+  };
 
   const evaluate = async (expression) => {
     const reply = await send('Runtime.evaluate', { expression, returnByValue: true });
@@ -145,6 +157,7 @@ export async function launchCdpBrowser({ url, chromeBin, windowSize = '1600,1000
   const handle = {
     evaluate,
     click,
+    screenshot,
     consoleProblems: problems,
     exceptions,
     profileDir,

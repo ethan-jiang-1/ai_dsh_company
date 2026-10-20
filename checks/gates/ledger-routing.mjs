@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 // ── 2c-bis. 决策台账路由门禁（ledger-routing，2026-10-09 D36 立）────────────────
-// 为什么：docs/index.md 的 D 台账曾是**第三本账**——D34 以「内容 100% 派生自 Note 状态行 +
+// 为什么：docs/decisions.md 的 D 台账（2026-10-20 自 index 迁出）曾是**第三本账**——D34 以「内容 100% 派生自 Note 状态行 +
 // 胖行病史 + 违反上游 no-index 教义」退役 intents.md，而台账是同一个病的主犯（实测 33 行 8.8KB，
 // 最长行 644 字符，D1–D17 共 16 行**没有任何可解析的家**——决定的唯一住处就是那张表）。
 // 处置与 D34 同款：降级为**纯路由表**（D 号 → 一句话 → 链接），决定正文归各自 Note。
@@ -18,7 +18,7 @@ export function run({ root, ok, fail }) {
   const LEDGER_HEADER = /^\|\s*#\s*\|\s*一句话\s*\|\s*决定的家\s*\|\s*$/
   const LEDGER_SEPARATOR = /^\|(?:\s*-{3,}\s*\|){3}\s*$/
   const dataRow = /^\|\s*(D\d+(?:\+D\d+)?)\s*\|(.*)\|\s*$/
-  const indexLines = readFileSync(join(root, 'docs/index.md'), 'utf8').split('\n')
+  const indexLines = readFileSync(join(root, 'docs/decisions.md'), 'utf8').split('\n')
   const headerAt = indexLines.findIndex(line => LEDGER_HEADER.test(line))
   const problems = []
   if (headerAt === -1) {

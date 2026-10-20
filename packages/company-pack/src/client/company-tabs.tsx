@@ -16,6 +16,7 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { PresenceRow } from '../lib/presence.ts'
+import { memberDot } from '../lib/presence-status.ts'
 import { clampRect, loadFloatRect, saveFloatRect, type FloatRectLike } from './float-geometry.ts'
 import { BoardPanel, BudgetPanel, DagPanel, StateNote } from './company-panels.tsx'
 import { TasksTableView } from './TasksPanel.tsx'
@@ -130,20 +131,12 @@ export function PanelFrame({ title, tone, tabProps, action, children, refreshLab
             </Button>
           )}
       </div>
-      <div className="wk-pane-body">{children}</div>
+      {/* data-company-tab-title = 面板标题，给真实页面探针一个「面板体在场」的稳定锚；
+          标题文本会出现在 tab strip，不能拿 body 里的标题词判断面板是否渲染。
+          data-company-tab 保留平台 contentId（kind/id 语义由平台定），不作 catalog id 使用。 */}
+      <div className="wk-pane-body" data-company-tab={info.tab.contentId} data-company-tab-title={title}>{children}</div>
     </div>
   )
-}
-
-/** 成员状态 → StateDot 语义。 */
-function memberDot(status: PresenceRow['status']): 'done' | 'ongoing' | 'warning' | 'error' | 'idle' {
-  switch (status) {
-    case 'running': return 'ongoing'
-    case 'provisioning': return 'warning'
-    case 'failed': return 'error'
-    case 'idle': return 'done'
-    default: return 'idle'
-  }
 }
 
 /** 成员状态 → Tag 色调。 */

@@ -19,6 +19,8 @@ runtime/harness-home-b/
 runtime/human-exits-evidence/
 # e2e 临时驱动的工具态（§11；BUG-013：观察窗 token 不入库，driver 留本地）
 runtime/e2e/
+# 观察窗启动日志（BUG-029 复发：启动横幅含 token；日志是运行残留，绝不入库）
+runtime/web-logs/
 # 手动分发导出（精神借 ai_dsh_architect）：_dist/ 是导出目的地不是源——tgz 忽略，
 # 手册是唯一 tracked 例外（版本由 verify 的 dist-manual 门禁对 pack package.json 核对）
 _dist/*

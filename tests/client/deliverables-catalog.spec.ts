@@ -9,6 +9,7 @@ import {
   type DeliverablesCatalog,
 } from '../../packages/company-pack/src/client/DeliverablesTab.tsx'
 import { sessionFileAddress } from '../../packages/company-pack/src/lib/deliverables-catalog.ts'
+import { buildDeliverablesCatalog } from '../../tools/lib/deliverables-catalog.mjs'
 
 /**
  * 成品目录的 keyless 层（2026-10-19 成品台账卡）：
@@ -105,6 +106,29 @@ describe('DeliverablesView（静态渲染）', () => {
     expect(html).toContain('role="listitem"')
     expect(html).toContain('aria-label="打开 ledgered-one 的 final.md"')
     expect(html).toContain('aria-pressed="true"')
+  })
+})
+
+describe('generator → parser 契约', () => {
+  it('工具生成的真实形状可被页签 parser 解析（含 counts 与条目字段）', () => {
+    const built = buildDeliverablesCatalog({
+      entries: [{
+        root: 'deliverables',
+        dir: '2026-10-20-contract',
+        fields: new Map([['slug', 'contract'], ['kickoff', '2026-10-20'], ['类型', '决策'], ['结果', '已采纳'], ['一句话结论', '一句结论']]),
+        final: true,
+        presented: true,
+      }],
+      ledgerSlugs: new Set(['contract']),
+      generatedAt: '2026-10-20T00:00:00.000Z',
+    })
+    const parsed = parseCatalog(JSON.stringify(built))
+    expect(parsed?.counts).toEqual(built.counts)
+    expect(parsed?.entries).toEqual([{
+      slug: 'contract', kickoff: '2026-10-20', type: '决策', result: '已采纳', summary: '一句结论',
+      root: 'deliverables', dir: '2026-10-20-contract', path: 'deliverables/2026-10-20-contract/final.md',
+      ledgered: true, presented: true,
+    }])
   })
 })
 

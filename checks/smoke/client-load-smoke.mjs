@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：常驻
 // client-load 冒烟（client 面完成定义）：headless 浏览器加载真 web 页面，断言零插件挂载失败。
-// 何时跑：客户端装配/入口改变、且接受条件涉及挂载时（真页面零挂载失败，keyless ~10s）
+// 何时跑：客户端装配/入口改变、且接受条件涉及挂载时（真页面零挂载失败，keyless ~25s；失败现场落 runtime/harness-home/diagnosis/）
 //
 // 为什么必须有它（postmortem 0003）：preset-smoke 只打 RPC 面（roster / session/create），
 // **client 入口的 apply 抛错**（如重复 `$mount`）只有浏览器能抓——这类失败不静默，会把整个
@@ -21,9 +21,11 @@
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb } from '../../tools/lib/probe-web.mjs'
 import { spawn } from 'node:child_process'
+import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
+import { diagnosisDir } from '../../tools/lib/diagnosis.mjs'
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -48,11 +50,12 @@ const chromiumApi = await loadChromium(ROOT)
 const { child, port, token } = await startWeb({ spawn, root: ROOT, home, port: PORT })
 let failures = 0
 const fail = (label, detail) => { failures++; console.log(`  FAIL ${label}: ${detail}`) }
+let page
+let loaderErrors = []
 try {
   const browser = await launchChromium(chromiumApi)
   try {
-    const page = await browser.newPage()
-    const loaderErrors = []
+    page = await browser.newPage()
     page.on('console', (m) => { if (m.type() === 'error' && m.text().includes('failed to apply loader entry')) loaderErrors.push(m.text()) })
     page.on('pageerror', (e) => { if (String(e).includes('failed to apply loader entry')) loaderErrors.push(String(e)) })
 
@@ -73,6 +76,13 @@ try {
       fail('品牌槽在场', `${BRAND} 未渲染——app 未完成渲染，或本包 client 入口未成功 apply（fiber PENDING？）`)
     }
   } finally {
+    if (failures > 0 && page !== undefined) {
+      const dir = diagnosisDir(ROOT, 'client-load-smoke')
+      await page.screenshot({ path: join(dir, 'page.png'), fullPage: false }).catch(() => {})
+      writeFileSync(join(dir, 'body.txt'), await page.locator('body').innerText().catch(() => ''), 'utf8')
+      writeFileSync(join(dir, 'loader-errors.log'), loaderErrors.join('\n'), 'utf8')
+      console.log(`  失败现场: ${dir}`)
+    }
     await browser.close().catch(() => {})
   }
 } catch (error) {

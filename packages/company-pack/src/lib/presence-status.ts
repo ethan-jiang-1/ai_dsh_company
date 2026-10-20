@@ -74,3 +74,14 @@ export function displayNameFor(name: string, role: 'lead' | 'teammate'): string 
   if (role === 'lead') return PRESET_DISPLAY_NAMES.ceo
   return isPresetRole(name) ? PRESET_DISPLAY_NAMES[name] : name
 }
+
+/** 状态 → 官方 StateDot 语义（client 渲染用；2026-10-20 从 tabs/panels 两份局部映射收进词汇层）。 */
+export function memberDot(status: PresenceStatus): 'done' | 'ongoing' | 'warning' | 'error' | 'idle' {
+  switch (status) {
+    case 'running': return 'ongoing'
+    case 'provisioning': return 'warning'
+    case 'failed': return 'error'
+    case 'idle': return 'done'
+    default: return 'idle'
+  }
+}
