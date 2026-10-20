@@ -1,7 +1,7 @@
 # 第二轮打扫卫生：P0 反馈通路落实 + replay 注入面闭环 + notes 归档轮
 
 状态：implemented（2026-10-21；用户授权「P0 反馈通路正确性」+「r3 重录」+「notes/implemented 需要归档的处理」；
-审计证据 = [followup research note](../../_backlog/research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md)；前轮 = [consistency sweep](./2026-10-20-fresh-agent-consistency-sweep.md)）
+审计证据 = [followup research note](../../_backlog/_archive/research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md)；前轮 = [consistency sweep](./2026-10-20-fresh-agent-consistency-sweep.md)）
 
 ## 决定
 

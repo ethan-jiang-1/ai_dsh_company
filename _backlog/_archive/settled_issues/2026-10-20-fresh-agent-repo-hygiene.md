@@ -1,11 +1,12 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-10-20
+closed: 2026-10-21
 ---
 
 # 推敲：fresh agent 全仓打扫卫生——六轴腐化面与修复优先级
 
-> 立卡：2026-10-20 ｜ 状态：推敲中 ｜ 类型：未定 ｜ 毕业：未定 ｜ 可关闭：否
+> 立卡：2026-10-20 ｜ 状态：已结（2026-10-21 全部发现修复完毕）｜ 类型：卫生审计+修复 ｜ 毕业：做（P0 批次 + P1–P4 全批 + notes 归档 + 母卡收口）｜ 可关闭：是
 
 **问题与期望结果：** 用户要求以 fresh agent 视角做一次「打扫卫生」，沿六轴检查：
 ①文档/代码清晰度与渐进披露；②代码结构层次与深模块；③文档-执行-验收的整体结构；
@@ -18,22 +19,22 @@ opened: 2026-10-20
 `client-load-smoke` ALL PASS、`preset-smoke` 6 个 preset 全挂、`replay-smoke` r3 full 零 diff、
 r2 presence + `--ui` 全绿。问题集中在**总账与反馈面**：新增角色/页签/场景后，手维护的
 清单和成本声明没有同步；通用「全部页签」探针是文本级且少一个页签；失败现场落 `/tmp`
-且被下一次运行覆盖。最严重的一件 [BUG-029](../_archive/fixed_bugs/BUG-029-committed-web-token-recurrence.md)
+且被下一次运行覆盖。最严重的一件 [BUG-029](../fixed_bugs/BUG-029-committed-web-token-recurrence.md)
 （观察窗 token 第二次随 runtime 日志入库）已修：untrack + `.gitignore` + tracked-token 窄扫，
 批次 0–2 + 结构切片已完成；剩余三件见下。
 
-**进展（2026-10-20）：** 批次 0（BUG-029/类级 token 守卫）、批次 1（角色数/快照索引/cdp-probe 9 页签+内容/失败现场/src README/runtime/成本声明/checks 索引+script-index 门禁/release-smoke researcher）、批次 2（testing.md 分层与 mock、tests/README 映射、PASS/SKIP、`pnpm diagnose`）与结构切片（docs/index 拆 decisions/external、design 预算、firstText/memberDot、数据面工厂、catalog 契约、SSR 警告）均已完成；证据 = [consistency sweep Note](../../notes/implemented/2026-10-20-fresh-agent-consistency-sweep.md)。
+**进展（2026-10-20）：** 批次 0（BUG-029/类级 token 守卫）、批次 1（角色数/快照索引/cdp-probe 9 页签+内容/失败现场/src README/runtime/成本声明/checks 索引+script-index 门禁/release-smoke researcher）、批次 2（testing.md 分层与 mock、tests/README 映射、PASS/SKIP、`pnpm diagnose`）与结构切片（docs/index 拆 decisions/external、design 预算、firstText/memberDot、数据面工厂、catalog 契约、SSR 警告）均已完成；证据 = [consistency sweep Note](../../../notes/implemented/2026-10-20-fresh-agent-consistency-sweep.md)。
 
 **进展（2026-10-20 第二轮，同日晚）：** 用户令持续跟进，四子代理 + 主 agent 亲跑七条 keyless lane 复评六维度，报告 =
 [research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md](../research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md)。
 复评结论：上轮批次 0–2 修复全部守住（36 门 / 711 用例 / 6 preset / cdp-probe 9/9 活体复验）；新抓三件硬发现——
 ① **replay 回归网实际 1/10**：r3 full 档被 21:58 手册去重提交（589d785，纯 docs）打断，「归一化零 diff」红，改动面映射表无「注入面 → replay」行、门禁不跑进程，无人发现；② **BUG A**：diagnose 审批判读字段错位（读 decision/answer，真实 v4 日志是 {id,outcome}——session-1d120f37 一手复现 `approval ? →`，夹具用想象形状故套件绿）；③ **BUG C**：`orient --scenario replay/r3-delegation` ENOTDIR 崩（children 文件/目录假设）。语义面债务清单与改善优先级（P0 反馈通路正确性 → P4 常驻层与检索）见报告 §5，**待用户 REVIEW 选批**。另：用户点名处理 notes/implemented 归档迁移，分诊进行中。
 
-**落实（2026-10-21，用户批 P0 + r3 重录 + notes 归档）：** 全部完成，证据 = [implementation Note](../../notes/implemented/2026-10-21-followup-sweep-p0-implementation.md)——BUG-030/031 修复（红 6 failed → 绿；活体复验）；replay 注入面闭环四件套（tests/README 注入面映射行 + replay-fixture-freshness 门禁〔37 门，出生事故即负例〕+ r3 第五次重录〔replay lane 真实回到 2/10 runnable〕+ session diff 字符级首差定位与失败现场落诊断区）；notes 归档 31 篇（implemented 78→47，删候选 0，同 diff 改链 51 处）。`pnpm verify` ALL PASS（37 门）/ `pnpm test` 77 spec 721 tests 全绿。
+**落实（2026-10-21，用户批 P0 + r3 重录 + notes 归档）：** 全部完成，证据 = [implementation Note](../../../notes/implemented/2026-10-21-followup-sweep-p0-implementation.md)——BUG-030/031 修复（红 6 failed → 绿；活体复验）；replay 注入面闭环四件套（tests/README 注入面映射行 + replay-fixture-freshness 门禁〔37 门，出生事故即负例〕+ r3 第五次重录〔replay lane 真实回到 2/10 runnable〕+ session diff 字符级首差定位与失败现场落诊断区）；notes 归档 31 篇（implemented 78→47，删候选 0，同 diff 改链 51 处）。`pnpm verify` ALL PASS（37 门）/ `pnpm test` 77 spec 721 tests 全绿。
 
 **剩余（不阻塞当前绿，P1–P4 待用户选批）：** ① 手册 187/190 行饱和（P4，产品内容重构需 preset-smoke + handbook-smoke 复验）；② P1 语义面止血（budget-and-ops:41 + notes/README:73 两实锤、bare-path 纯文本档、计数对家、orient.mjs:129 措辞、布局块三漏项）；③ P2 结构收拢（五角色名册单一化、run-gates 孤儿探测、src/README 消费面句）；④ P3 测试资产（composition 5.9s 拆分、act() ×12 清理、use-company-data spec、attention/presence/budget 视觉探针、性能最小档）；⑤ P4 常驻层与检索（terminology 别名组三行、web-rpc/手册棘轮搬家、demo/multi-human/presets 冻结预算、notes 检索配方、滞留研究稿处置）。
 
-**下一步：** 用户 REVIEW 剩余 P1–P4 选批后推进；未选批前不动。
+**下一步：** ~~用户 REVIEW 剩余 P1–P4 选批后推进~~ → 用户 2026-10-21 批全量（「所有发现的问题都要修复」+「预算加倍静默自主」）：P1（eaf37e7）/P2 B1–B4（77b960c）/B5（bdc6d26）/P3（1e24026）/P4（575fa68）/Phase E 手册重构（9e2d45e）全部落地，每 Phase 独立 commit、verify 39 门 + test 727 全绿、门禁带红绿证据；已接受取舍与缓办项登记 = [Phase B–F Note](../../../notes/implemented/2026-10-21-followup-sweep-phases-b-f.md)。母卡毕业，研究材料随卡归档。
 
 ## 范围与排除项
 

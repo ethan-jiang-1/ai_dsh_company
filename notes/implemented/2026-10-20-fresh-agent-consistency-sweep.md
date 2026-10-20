@@ -2,8 +2,8 @@
 
 状态：implemented（2026-10-20；用户授权「发现的问题都要修复」；批次 0–2 + 结构切片；`pnpm verify` ALL PASS、`pnpm test` 76 文件 / 711 用例全绿）
 
-> 审计报告 = [_backlog/research/repo-hygiene/2026-10-20-fresh-agent-audit.md](../../_backlog/research/repo-hygiene/2026-10-20-fresh-agent-audit.md)；
-> 问题卡 = [fresh-agent-repo-hygiene](../../_backlog/issues/2026-10-20-fresh-agent-repo-hygiene.md)；
+> 审计报告 = [_backlog/research/repo-hygiene/2026-10-20-fresh-agent-audit.md](../../_backlog/_archive/research/repo-hygiene/2026-10-20-fresh-agent-audit.md)；
+> 问题卡 = [fresh-agent-repo-hygiene](../../_backlog/_archive/settled_issues/2026-10-20-fresh-agent-repo-hygiene.md)；
 > token 类级守卫 = [tracked-token guard](./2026-10-20-tracked-token-guard.md) / [BUG-029](../../_backlog/_archive/fixed_bugs/BUG-029-committed-web-token-recurrence.md)。
 
 ## 决定

@@ -52,6 +52,7 @@
 | [2026-10-19-issue-card-quality.md](settled_issues/2026-10-19-issue-card-quality.md) | 已结（A 内容收口执行：四卡当前态/修订史、blockedBy、README 薄索引、研究稿失效标记、成品台账拆卡、wire golden 订正）；B 以后做，C = 后续卡执行协议 | 2026-10-19 |
 | [2026-10-19-company-panels-ux-priority.md](settled_issues/2026-10-19-company-panels-ux-priority.md) | 已结（用户拍：看板+依赖图 → 任务板 → 台账；成品台账已拆新卡；判据 = 证据可复用 × 影响 × 代价） | 2026-10-19 |
 | [2026-10-19-board-dag-ux-deep-dive.md](settled_issues/2026-10-19-board-dag-ux-deep-dive.md) | 已结（新鲜度文案说真话 + DAG 进行中徽章独立样式 + 窄栏/长链实测；用户接受 pane 自身纵向滚动；真 21 节点整页双滚动留未执行） | 2026-10-19 |
+| [2026-10-20-fresh-agent-repo-hygiene.md](settled_issues/2026-10-20-fresh-agent-repo-hygiene.md) | 已结（两轮六维度审计 + 全部发现修复：P0 反馈通路〔BUG-030/031 + replay 注入面闭环〕、P1–P4 语义/结构/测试/常驻层、notes 归档 31 篇、手册重构 187→154 行；已接受取舍登记 = Phase B–F Note；六维度评分报告随对话交付） | 2026-10-21 |
 | [2026-10-19-taskboard-table-ux-deep-dive.md](settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md) | 已结（依赖列 owner · subject + id 次要；行 id 并入任务列；已删死映射移除；入口探针 1440/390 PASS） | 2026-10-19 |
 | [2026-10-19-ledger-ux-deep-dive.md](settled_issues/2026-10-19-ledger-ux-deep-dive.md) | 已结（40 行 = parseMotionLedger 真文件；全文入口 16/27；刷新 30s；人读 60s/5 步/复述难/总体还行 → 接受） | 2026-10-19 |
 | [2026-10-19-deliverables-ledger.md](settled_issues/2026-10-19-deliverables-ledger.md) | 已结（成品目录 = 生成索引 kb/deliverables-index.json + 只读第 9 页签；44 份/活跃 5/归档 39/台账外 5；present 审计仍归 deliverables-check） | 2026-10-19 |
@@ -103,6 +104,8 @@
 | [backlog-ux/2026-10-19-issue-card-audit.md](research/backlog-ux/2026-10-19-issue-card-audit.md) | 已结质量卡＋四张公司面卡：卡面当前态/陈旧引用审计（2026-10-21 自活跃 research 随卡归档） | 2026-10-19 |
 | [company-panels-ux/2026-10-19-panel-inventory-and-priority.md](research/company-panels-ux/2026-10-19-panel-inventory-and-priority.md) | 已结公司面优先级卡：面板数据量/痛点与 Top 3 依据（⚠ §二/§四/§五已被真相复核订正） | 2026-10-19 |
 | [company-panels-ux/2026-10-19-panel-truth-audit.md](research/company-panels-ux/2026-10-19-panel-truth-audit.md) | 同一父卡＋三张深挖卡＋BUG-025/026/027：面板真实数据面复核（⚠ §三 取法已证伪——读的是 projcache state 而非 wire 视图） | 2026-10-19 |
+| [repo-hygiene/2026-10-20-fresh-agent-audit.md](research/repo-hygiene/2026-10-20-fresh-agent-audit.md) | 已结卫生审计卡：第一轮六轴证据、腐化账本与 A–D 分批修复建议 | 2026-10-20 |
+| [repo-hygiene/2026-10-20-followup-six-dimension-audit.md](research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md) | 同一卡第二轮：上轮修复复核全守住 + 新发现（replay 实际 1/10、BUG A/C）+ P0–P4 改善清单 | 2026-10-20 |
 | [2026-10-10-claim-loser-yield-acceptance.md](research/collaboration/2026-10-10-claim-loser-yield-acceptance.md) | 协作安全卡裁4 的认领让位行为对照 | 2026-10-10 |
 | [2026-10-12-assembly-evidence.md](research/ceo-minimal-assembly/2026-10-12-assembly-evidence.md) | 组队健壮性卡的证据基线（触点盘点/17 场全景/失败链/andon 与 RACI） | 2026-10-12 |
 | [2026-10-13-cultivation-design.md](research/agent-cultivation/2026-10-13-cultivation-design.md) | 培养卡的产品研究：对象、关系、用户路径和 A/B/C/D 候选取舍 | 2026-10-13 |

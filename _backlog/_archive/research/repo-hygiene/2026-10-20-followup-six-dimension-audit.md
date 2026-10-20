@@ -5,7 +5,7 @@ intent: "第二轮 fresh-agent 打扫（同日晚，母卡持续跟进）：六�
 
 # 第二轮六维度打扫卫生审计（2026-10-20 晚）
 
-> 服务：[母卡](../../issues/2026-10-20-fresh-agent-repo-hygiene.md)｜上一轮：[fresh-agent-audit](./2026-10-20-fresh-agent-audit.md)（批次 0–2+结构切片同日完成）
+> 服务：[母卡](../../settled_issues/2026-10-20-fresh-agent-repo-hygiene.md)｜上一轮：[fresh-agent-audit](./2026-10-20-fresh-agent-audit.md)（批次 0–2+结构切片同日完成）
 > 口径：fresh agent 只读评审 + 亲跑全部 keyless lane（verify / test〔子代理〕/ orient / diagnose / client-load-smoke / preset-smoke / cdp-probe 活体 / replay r2 / replay r3）+ 四个独立子代理深挖（D2 代码结构 / D4 上下文腐化 / D5 测试资产 / D6 反馈通路）；vendor/dsh 只读；真模型认证档未跑。
 > 数字基线：76 spec（company 18 / client 26 / presets 1 / harness 31）·36 门禁 ·52 探针 ·14 smoke+4 audit · tools/lib 36 模块 · src 45 文件 7853 行 · notes 记忆 ≈8300 行 · 47 快照场景 · 725 commits。
 

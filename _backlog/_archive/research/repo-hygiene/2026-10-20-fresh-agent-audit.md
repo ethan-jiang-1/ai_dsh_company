@@ -5,7 +5,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 
 # Fresh-agent 全仓打扫卫生审计（2026-10-20）
 
-> 服务：[问题卡](../../issues/2026-10-20-fresh-agent-repo-hygiene.md)｜关联：[BUG-029](../../_archive/fixed_bugs/BUG-029-committed-web-token-recurrence.md)
+> 服务：[问题卡](../../settled_issues/2026-10-20-fresh-agent-repo-hygiene.md)｜关联：[BUG-029](../../fixed_bugs/BUG-029-committed-web-token-recurrence.md)
 > 口径：**只读审计 + 实跑 keyless / 真浏览器 / 重放**；未跑真模型认证档（成本与时长）；`vendor/dsh/` 只读。
 > 本文件里的数字都来自本轮实跑，命令见 §6；历史 payload 不碰。token 值不转录。
 > 目的不是证明仓库差，而是找出「fresh agent 会在哪里看错、看漏、看瞎」。
@@ -274,7 +274,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 
 ### 批次 0 · 立刻止血（安全，已完成 2026-10-20）
 
-- 处理 [BUG-029](../../_archive/fixed_bugs/BUG-029-committed-web-token-recurrence.md)：`git rm --cached` 两件 web 日志；
+- 处理 [BUG-029](../../fixed_bugs/BUG-029-committed-web-token-recurrence.md)：`git rm --cached` 两件 web 日志；
   `.gitignore` 加 runtime/web-logs/；`runtime/README.md` 的 tracked/ignored 表同步。
 - 加一条**窄**的类级守卫：扫 `git ls-files`，只报 `https?://...token=[A-Za-z0-9_-]{20,}`；
   负例 = 临时 tracked 文件写合成 token URL，必须红；测试替身不命中。不要直接全量跑 a2，
@@ -283,8 +283,8 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 
 验收：`git ls-files runtime/web-logs` 空；`.gitignore` 命中；守卫红/绿留证；`pnpm verify` + `pnpm test` 绿。
 **结果（2026-10-20）：已完成**——两件日志 untrack 并删除；`.gitignore` + 根 `AGENTS.md` + `runtime/README.md`
-同步；`tracked-token` 门禁 + 4 条测试落地；红/绿见 [BUG-029](../../_archive/fixed_bugs/BUG-029-committed-web-token-recurrence.md)
-与 [Note](../../../notes/implemented/2026-10-20-tracked-token-guard.md)。
+同步；`tracked-token` 门禁 + 4 条测试落地；红/绿见 [BUG-029](../../fixed_bugs/BUG-029-committed-web-token-recurrence.md)
+与 [Note](../../../../notes/implemented/2026-10-20-tracked-token-guard.md)。
 
 ### 批次 1 · 一致性清扫（≈半天，低风险）
 
@@ -346,8 +346,8 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 - **批次 0**：BUG-029 已修（untrack + `.gitignore` + tracked-token 窄扫 + 红绿守卫）。
 - **批次 1**：角色数统一；`snapshots/README.md` 补 4 场景并去过期计数；`cdp-probe` 从注册源解析 9 页签、断言面板体内容、失败落诊断区；`client-load`/`replay --ui` 失败现场同落诊断区；`src/README`/`runtime`/`project-map`/成本声明同步；`checks/README.md` 补 5 入口 + script-index 门禁；`release-smoke` 覆盖 researcher。
 - **批次 2**：`docs/testing.md` whole-client/mock 声明；`tests/README.md` 映射补 cdp-probe/researcher；`PASS`/`SKIP` 分离；新增 `pnpm diagnose` 日志失败摘要。
-- **结构切片**：`docs/index.md` 拆出 [decisions.md](../../../docs/decisions.md) / [external-research.md](../../../docs/external-research.md)（129→60 行）；`docs/design` 加预算、architecture §7/§10 降指针；`firstText`/`memberDot` 收进共享层；`client/index.ts` 数据面收成 `company-data-plane.ts`；成品目录 generator→parser 契约测试；SSR layout warning 消除。
-- **证据**：`pnpm verify` ALL PASS、`pnpm test` 76/711、`client-load` ALL PASS、`cdp-probe` 9/9、`release-smoke` ALL PASS（含 researcher）、`replay --ui` ALL PASS（SKIP 显式）。详见 [consistency sweep Note](../../../notes/implemented/2026-10-20-fresh-agent-consistency-sweep.md)。
+- **结构切片**：`docs/index.md` 拆出 [decisions.md](../../../../docs/decisions.md) / [external-research.md](../../../../docs/external-research.md)（129→60 行）；`docs/design` 加预算、architecture §7/§10 降指针；`firstText`/`memberDot` 收进共享层；`client/index.ts` 数据面收成 `company-data-plane.ts`；成品目录 generator→parser 契约测试；SSR layout warning 消除。
+- **证据**：`pnpm verify` ALL PASS、`pnpm test` 76/711、`client-load` ALL PASS、`cdp-probe` 9/9、`release-smoke` ALL PASS（含 researcher）、`replay --ui` ALL PASS（SKIP 显式）。详见 [consistency sweep Note](../../../../notes/implemented/2026-10-20-fresh-agent-consistency-sweep.md)。
 ## 5. 剩余与决定（2026-10-20 更新）
 
 用户已授权全部修复；批次 0–2 + 结构切片完成。剩余三件不阻塞当前绿：

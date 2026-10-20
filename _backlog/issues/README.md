@@ -4,11 +4,12 @@
 
 ## 活跃清单
 
-当前活跃 1 张：
+当前活跃 0 张：
 
-- [2026-10-20-fresh-agent-repo-hygiene](2026-10-20-fresh-agent-repo-hygiene.md) — fresh-agent 六轴打扫卫生审计；
-  证据 = [research/repo-hygiene/2026-10-20-fresh-agent-audit.md](../research/repo-hygiene/2026-10-20-fresh-agent-audit.md)；
-  关联 [BUG-029](../_archive/fixed_bugs/BUG-029-committed-web-token-recurrence.md)。
+- （无——fresh-agent-repo-hygiene 卫生审计卡 2026-10-21 已毕业归档：两轮审计 + 全部发现修复
+  〔P0–P4 + notes 归档 + 手册重构〕，收口记录 =
+  [归档卡](../_archive/settled_issues/2026-10-20-fresh-agent-repo-hygiene.md) 与
+  [Phase B–F Note](../../notes/implemented/2026-10-21-followup-sweep-phases-b-f.md)。）
 
 此前六张卡（issue 卡质量 / 公司面优先级 / 看板+依赖图 / 任务板 / 台账 / 成品台账）均已归档，见
 [归档](../_archive/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。

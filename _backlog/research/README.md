@@ -27,7 +27,5 @@ intent: "为什么需要这份依据。"
 
 | 文件 | 活卡与用途 |
 |---|---|
-| [repo-hygiene/2026-10-20-fresh-agent-audit.md](repo-hygiene/2026-10-20-fresh-agent-audit.md) | [fresh-agent 全仓打扫卫生问题卡](../issues/2026-10-20-fresh-agent-repo-hygiene.md)：六轴证据、腐化账本与 A–D 分批修复建议；关联 [BUG-029](../_archive/fixed_bugs/BUG-029-committed-web-token-recurrence.md) |
-| [repo-hygiene/2026-10-20-followup-six-dimension-audit.md](repo-hygiene/2026-10-20-followup-six-dimension-audit.md) | 同一问题卡（第二轮持续跟进）：上轮修复复核全守住 + 新发现（replay 实际 1/10、diagnose 审批判读 BUG A、orient --scenario r3 崩 BUG C）+ P0–P4 改善清单待用户选批 |
 
 随卡归档的材料见 [研究归档](../_archive/research/README.md)。
