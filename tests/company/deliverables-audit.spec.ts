@@ -199,6 +199,14 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
     expect(isLeadSession(teammate)).toBe(false)
   })
 
+  it('present 事件绝对路径按会话 cwd 归一（2026-10-20 present 工具返回绝对路径）', () => {
+    const log = [
+      JSON.stringify({ type: 'session', id: 's1', cwd: '/repo/company-workspace', agentPreset: 'ceo', delegationDepth: 0 }),
+      JSON.stringify({ type: 'deliverables/presented', data: { files: [{ path: '/repo/company-workspace/deliverables/x/final.md', description: 'd' }] } }),
+    ].join('\n')
+    expect(parseSessionLog(log).presented.map(row => row.path)).toEqual(['deliverables/x/final.md'])
+  })
+
   it('平铺旧形状只在 legacyFlat 下算数（快照冻结、运行场走新形状）', () => {
     expect(classifyDeliverable('deliverables/x.md')).toEqual({ state: 'other' })
     expect(classifyDeliverable('deliverables/x.md', { legacyFlat: true })).toEqual({ state: 'final', slug: 'x' })

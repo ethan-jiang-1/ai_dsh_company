@@ -258,7 +258,14 @@ export function parseSessionLog(text) {
     if (event.type !== 'deliverables/presented') continue
     for (const file of event.data?.files ?? []) {
       if (typeof file?.path !== 'string') continue
-      presented.push({ path: normalizeRel(file.path), description: file.description })
+      // `present` 工具在新版本把路径解析成**绝对路径**（如 `/…/company-workspace/deliverables/x/final.md`）；
+      // 判据只认工作区相对路径。用会话 cwd 归一，否则新 present 会被误判成不存在（2026-10-20 真现场）。
+      const normalized = normalizeRel(file.path)
+      const cwd = identity.cwd?.replace(/\\/g, '/').replace(/\/$/, '')
+      const path = cwd !== undefined && normalized.startsWith(`${cwd}/`)
+        ? normalized.slice(cwd.length + 1)
+        : normalized
+      presented.push({ path, description: file.description })
     }
   }
   return { ...identity, presented }
