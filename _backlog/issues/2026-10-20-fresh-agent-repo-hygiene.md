@@ -24,9 +24,14 @@ r2 presence + `--ui` 全绿。问题集中在**总账与反馈面**：新增角�
 
 **进展（2026-10-20）：** 批次 0（BUG-029/类级 token 守卫）、批次 1（角色数/快照索引/cdp-probe 9 页签+内容/失败现场/src README/runtime/成本声明/checks 索引+script-index 门禁/release-smoke researcher）、批次 2（testing.md 分层与 mock、tests/README 映射、PASS/SKIP、`pnpm diagnose`）与结构切片（docs/index 拆 decisions/external、design 预算、firstText/memberDot、数据面工厂、catalog 契约、SSR 警告）均已完成；证据 = [consistency sweep Note](../../notes/implemented/2026-10-20-fresh-agent-consistency-sweep.md)。
 
-**剩余（不阻塞当前绿）：** ① `company-workspace/AGENTS.md` 187/190 行、26.2KB（本轮去重 3 行；完整流程迁移仍属产品内容重构，需 preset-smoke + handbook-smoke 复验）；② 重放 2/10 的修/归档要内容成本（当前读数已在 snapshots/README 写明）；③ host 入口 `export *` 保留为已接受取舍（package private；出现第二个消费者再开 test-only 子路径）。
+**进展（2026-10-20 第二轮，同日晚）：** 用户令持续跟进，四子代理 + 主 agent 亲跑七条 keyless lane 复评六维度，报告 =
+[research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md](../research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md)。
+复评结论：上轮批次 0–2 修复全部守住（36 门 / 711 用例 / 6 preset / cdp-probe 9/9 活体复验）；新抓三件硬发现——
+① **replay 回归网实际 1/10**：r3 full 档被 21:58 手册去重提交（589d785，纯 docs）打断，「归一化零 diff」红，改动面映射表无「注入面 → replay」行、门禁不跑进程，无人发现；② **BUG A**：diagnose 审批判读字段错位（读 decision/answer，真实 v4 日志是 {id,outcome}——session-1d120f37 一手复现 `approval ? →`，夹具用想象形状故套件绿）；③ **BUG C**：`orient --scenario replay/r3-delegation` ENOTDIR 崩（children 文件/目录假设）。语义面债务清单与改善优先级（P0 反馈通路正确性 → P4 常驻层与检索）见报告 §5，**待用户 REVIEW 选批**。另：用户点名处理 notes/implemented 归档迁移，分诊进行中。
 
-**下一步：** 继续按授权推进剩余三件；不再逐项请示。
+**剩余（不阻塞当前绿）：** ① 手册 187/190 行、26.2KB（同上轮）；② replay 实际 1/10 runnable（r3 待重录或翻 archived——需拍板）；③ host 入口 `export *` 已接受取舍（同上轮）；④ 新增：BUG A/C 修复、注入面 freshness 门禁、四份 ≥95% 文档与 11 份无预算合同的棘轮处置、notes 记忆层检索配方与归档。
+
+**下一步：** 用户 REVIEW 改善清单选批 → 按批实施（P0 为 keyless 小切片：BUG A/C + replay 映射行 + replay-fixture-freshness 门禁 + r3 处置拍板）；notes 归档分诊完成 → 复核执行（同 diff 改链 + 门禁复绿）。
 
 ## 范围与排除项
 
