@@ -76,3 +76,7 @@
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-17-lingang-recon/journal/coo/`；交付物：`deliverables-archive/2026-10-17-lingang-recon/`）
 - 2026-10-17 · role-kit-2026（生产）—— 档 1 开跑件已成——开跑清单 21 行（谁·哪天·交什么）+ 24 岗位行登记表（含可填 CSV）+ 5 席工具额度「算但有条件」；机制三动作与四周 3.5–5.5 人天、$0 新增现金一字未改；CEO 同轮拍三件（启动动议批准 / 判据卡落点随案迁移到本腿 drafts/kit/ / 5 席按岗位行配额定死：PMO 项目专员 1×1、系统集成或定制开发×3、数据与 AI×1，全部落 A 档 11 行 36 人内、不含 B 档单人岗）；W1 = security 案批 1 完成后的第一个完整周，D1 授权 → D1–D3 各线登记 → D4 出 B0 → D5 首件判据卡（池台账）；唯一人级卡点仍是姓名册【模拟占位】⇒ 5 席点人头与逐人级登记停在"件就绪"，不阻塞岗位行级开跑
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-17-role-kit-2026/journal/coo/`；交付物：`deliverables-archive/2026-10-17-role-kit-2026/`）
+- 2026-10-17 · hefeng-recon（诊断）—— 「和风便利店」自研结算系统接入今天判不了能不能接——接入方式、鉴权、时间戳口径与时区、流水唯一号、退款/冲正形状五件客户侧事实一件未到；已判的是我们做得出、不改内部架构，但属定制活不进标准包（档3 量级，定档须 D1 勘察后 VP-Eng 署名），8 万单/日+T+1 不构成技术阻碍；承接侧有条件接得住（先落件再开工，今天不给池位与日期），客户若要日频当日闭环/周末节假日处置/小时级响应则接不住。
+  （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-17-hefeng-recon/journal/coo/`；交付物：`deliverables-archive/2026-10-17-hefeng-recon/`）
+- 2026-10-20 · kid-ai-2026（决策）—— 家庭 AI 方案定为「主选豆包免费版 + 未成年人模式（¥0/月），备选千问、应急讯飞星火只作 ≤2 周临时档」，家长每天 2 分钟、稳态每周 40 分钟（硬顶 45）、第一周一次性 60 分钟，判词「接得住（有条件）」；不买硬件、不年付、不做隐蔽监控。
+  （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-20-kid-ai-2026/journal/coo/`；交付物：`deliverables-archive/2026-10-20-kid-ai-2026/`）

@@ -81,3 +81,7 @@
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-19-private-deploy-reserve-2026/journal/ceo/`；交付物：`deliverables-archive/2026-10-19-private-deploy-reserve-2026/`）
 - 2026-10-20 · token-account-pool-2026（决策）—— 号池 token 的便宜价 = 别人的合规成本 + 刑事风险 + 客户信任：法律端（无证经营/发票/数据出境）、经济端（合规转售毛利约20%<30%、官货链无价位）、结构端（四家上游全禁转售、区域准入连授权转售商也封）三条独立成立，市场端 9 家现有客户 0 条 AI 采购诉求 ⇒ 我方不做号池/无授权中转；要做只做「合规接入服务」并按项目另立。
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-20-token-account-pool-2026/journal/ceo/`；交付物：`deliverables-archive/2026-10-20-token-account-pool-2026/`）
+- 2026-10-17 · hefeng-recon（诊断）—— 「和风便利店」自研结算系统接入今天判不了能不能接——接入方式、鉴权、时间戳口径与时区、流水唯一号、退款/冲正形状五件客户侧事实一件未到；已判的是我们做得出、不改内部架构，但属定制活不进标准包（档3 量级，定档须 D1 勘察后 VP-Eng 署名），8 万单/日+T+1 不构成技术阻碍；承接侧有条件接得住（先落件再开工，今天不给池位与日期），客户若要日频当日闭环/周末节假日处置/小时级响应则接不住。
+  （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-17-hefeng-recon/journal/ceo/`；交付物：`deliverables-archive/2026-10-17-hefeng-recon/`）
+- 2026-10-20 · kid-ai-2026（决策）—— 家庭 AI 方案定为「主选豆包免费版 + 未成年人模式（¥0/月），备选千问、应急讯飞星火只作 ≤2 周临时档」，家长每天 2 分钟、稳态每周 40 分钟（硬顶 45）、第一周一次性 60 分钟，判词「接得住（有条件）」；不买硬件、不年付、不做隐蔽监控。
+  （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-20-kid-ai-2026/journal/ceo/`；交付物：`deliverables-archive/2026-10-20-kid-ai-2026/`）

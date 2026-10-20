@@ -17,11 +17,11 @@
 
 ## 这次清理（2026-10-20）
 
-1. **收敛六个已闭合动议**：`ai-transformation-2026-v2`、`ai-coding-security-2026-v3`、`lingang-recon`、`role-kit-2026`、`private-deploy-reserve-2026`、`token-account-pool-2026`。每个都走 dry-run → 真收敛 → `--charter-backfill`；交付物进归档家、journal 进 `snapshots/archive/convergence-2026-10-20/`、台账行/CHARTER 登记完。
-2. **成品目录数字**：45 份 = **活跃 0 / 归档 45 / 台账外 1**；present **44 / 未 present 1 / 未核 0**；台账 **45 行 / 44 ✅**。
+1. **收敛八个已闭合动议**：`ai-transformation-2026-v2`、`ai-coding-security-2026-v3`、`lingang-recon`、`role-kit-2026`、`private-deploy-reserve-2026`、`token-account-pool-2026`、`hefeng-recon-2026`、`kid-ai-2026`。每个都走 dry-run → 真收敛 → `--charter-backfill`；交付物进归档家、journal 进 `snapshots/archive/convergence-2026-10-20/`、台账行/CHARTER 登记完。
+2. **成品目录数字**：47 份 = **活跃 0 / 归档 47 / 台账外 1**；present **46 / 未 present 1 / 未核 0**；台账 **47 行 / 46 ✅**。
 3. **role-kit 类型修正**：`类型: 执行` → `生产`（合法词表 = 决策/生产/诊断/口径问答）；审计对应的 `meta-shape-bad` 消失。
 4. **收敛就绪误判修复**：旧 `concl.includes('回填')` 把 v2 真结论里提到的「未回填」当成占位，导致 v2 被计划档判「未备」。新增 `isPlaceholderConclusion`（只认整值占位），v2 由「未备」变「可收敛」；键盘可跑，spec 见 `tests/company/converge-rules.spec.ts`。
-5. **自动重建真跑**：六件收敛每次都由 `converge` 自动重建索引，活跃数 5→4→3→2→1→0；不再只靠 `--rebuild-index` 单点验证。
+5. **自动重建真跑**：八件收敛每次都由 `converge` 自动重建索引，活跃数 5→4→3→2→1→0；不再只靠 `--rebuild-index` 单点验证。
 6. **private-deploy 的 present 已补并收敛**：真 CEO 会话 `session-a87b177b…`（preset ceo，cwd = company-workspace）读取已有 final 并调 `present`，未改文件、未新建交付物；随后按正常收敛进归档家。
 7. **审计绝对路径修复**：present 工具把路径写成 `/…/company-workspace/deliverables/…`，`parseSessionLog` 原来不按 cwd 归一 ⇒ 新 present 审计不到。修为按会话 cwd 剥前缀；新增 keyless spec。修后 `presented` 43/44、**违规 0**。
 
@@ -29,15 +29,17 @@
 
 - **recon-pack 归档 legacy 未 present**：唯一 `未 present`（1/44）；历史件，审计只作 legacy 观察项；不补。
 - **private-deploy 已不红**：2026-10-20 真 CEO 会话补了 present；`deliverables-check --json` 违规 **0**。
-- **kid-ai-2026 进行中**：`meta.结果=进行中`、无 final，只有 CEO 任务书；等公司跑完再 present/收敛，维护侧不代写。
-- **light / hefeng 未闭合**：`meta.closed` 为空，收敛计划明确「未备」；不硬关。
+- **kid-ai-2026 已收口（已采纳）**：真 CEO 会话组队 VP-Sales/VP-Eng/COO，T1–T3 + R1–R3 全完成，final/present/meta 齐，已收敛。
+- **hefeng-recon-2026 已收口（判不了）**：真 CEO 会话写 final/present/meta，已收敛。
+- **light 已废弃/无 final**：按用户轻量纪律处置，四稿收齐即停；不入目录。
+- **recon-pack 归档 legacy 未 present**：唯一 `未 present`（1/47）；审计仅 legacy 观察项。
 - **边界**：成品目录是静态索引 + 重读，不实时订阅；任务板窄栏折叠、台账日期分组/筛选是未开的可选功能，不是本轮 todo。
 
 ## 证据
 
 - `pnpm verify` ⇒ **ALL PASS**；`pnpm test` ⇒ **70 files / 695 tests**。
 - `client-load-smoke` ⇒ **ALL PASS**。
-- `deliverables-check --json` ⇒ **0 违规**；44/45 present（唯一未 present = recon-pack legacy）；`role-kit` 0 违规。
+- `deliverables-check --json` ⇒ **0 违规**；46/47 present（唯一未 present = recon-pack legacy）；`role-kit` 0 违规。
 - 四件收敛 + backfill 的日志在 `/tmp/converge-*.log` / `/tmp/backfill-*.log`；证据副本 `snapshots/archive/convergence-2026-10-20/`。
 - 成品目录真 app 探针 `deliverables-catalog-probe` ⇒ ALL PASS（44 行、present 统计、打开 final、窄栏）。
 - `replay-smoke --ui` ⇒ r3-delegation 与 r2-motion 均 **ALL PASS**（各连跑两次稳定）。r3 金样漂移已归因同步：重放已 settle 后「1 subagent」运行态 chip 不在捕获瞬时、header 顺序变化 + fixture 第 3 轮的「Jump to turn 3」按 `be2a480` 先例 `--refresh-ui` 重写（写入前委派卡在场断言仍强制），刷新后非刷新档连跑两绿。

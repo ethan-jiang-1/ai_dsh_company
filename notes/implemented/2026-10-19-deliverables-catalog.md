@@ -6,8 +6,8 @@
 
 公司级「成品台账」按**派生视图**落地，不新建第二份手写事实、不新增 Remote/store：
 
-1. **数据面 = 盘上 `deliverables/` + `deliverables-archive/` 的 `final.md` + `meta.md`**。`tools/lib/deliverables-catalog.mjs` 是纯形状（只收 final、按 kickoff 倒序、计数活跃/归档/台账外），`tools/deliverables-index.mjs` 扫描并生成 `company-workspace/kb/deliverables-index.json`。当前 45 份（**活跃 0 / 归档 45 / 台账外 1** / present 44 / 未 present 1 / present 未核 0）；2026-10-20 已收敛 v2 / v3 / lingang / role-kit / private-deploy / token-account-pool 六件；private-deploy 先由真 CEO 会话补 present 再收敛。`present` 状态**不另写判据**：生成器跑 `checks/audit/deliverables-check.mjs --json`，取最后一行 `JSON.presented`；审计不可得时 `presented=null`（面板显示「present 未核」，不冒充）。
-2. **页签 = 右栏「成品」**（第 9 个公司页签，guide entry 同步）。只读：统计（共 45 / 活跃 0 / 归档 45 / 台账外 1 / present 44 / 未 present 1）→ 全部/活跃/归档/台账外四档筛选 → 按月分组 → 每行 `结果 tag + slug + 归档/台账外 + 日期·类型`，一句话结论复用 `LedgerSummary`（2 行 + 全文入口），右上「打开」用 `dsh-resource://file/session/...` 在右栏预览 `final.md`。
+1. **数据面 = 盘上 `deliverables/` + `deliverables-archive/` 的 `final.md` + `meta.md`**。`tools/lib/deliverables-catalog.mjs` 是纯形状（只收 final、按 kickoff 倒序、计数活跃/归档/台账外），`tools/deliverables-index.mjs` 扫描并生成 `company-workspace/kb/deliverables-index.json`。当前 47 份（**活跃 0 / 归档 47 / 台账外 1** / present 46 / 未 present 1 / present 未核 0）；2026-10-20 已收敛 v2 / v3 / lingang / role-kit / private-deploy / token-account-pool / hefeng / kid-ai 八件；private-deploy 先由真 CEO 会话补 present 再收敛；hefeng 判不了、kid-ai 已采纳；light 已废弃/无 final（不入目录）。`present` 状态**不另写判据**：生成器跑 `checks/audit/deliverables-check.mjs --json`，取最后一行 `JSON.presented`；审计不可得时 `presented=null`（面板显示「present 未核」，不冒充）。
+2. **页签 = 右栏「成品」**（第 9 个公司页签，guide entry 同步）。只读：统计（共 47 / 活跃 0 / 归档 47 / 台账外 1 / present 46 / 未 present 1）→ 全部/活跃/归档/台账外四档筛选 → 按月分组 → 每行 `结果 tag + slug + 归档/台账外 + 日期·类型`，一句话结论复用 `LedgerSummary`（2 行 + 全文入口），右上「打开」用 `dsh-resource://file/session/...` 在右栏预览 `final.md`。
 3. **静态索引说真话**：页签头显示「静态索引 · 生成于 …」；「重读」只重读文件，不轮询。缺索引/坏 schema 明确提示跑生成器，不静默空表。
 4. **并列不替代**：动议台账答「决定了什么」，成品目录答「交出了哪些 final」；`present` 状态由 `deliverables-check` 提供，目录只显示，不另写审计。
 
@@ -34,9 +34,9 @@
 - **生成器红**：把 `buildDeliverablesCatalog` 的 `if (!entry.final) continue` 去掉（非 final 也进目录）⇒ `npx vitest run tests/company/deliverables-catalog.spec.ts` **3 failed / 2 passed**；还原 ⇒ **5 passed**。
 - `node tools/deliverables-index.mjs` ⇒ `{ total: 44, active: 5, archive: 39, unledgered: 5, presented: 42, notPresented: 2, presentUnknown: 0 }`。
 - `source run/env.sh && node tools/converge.mjs --rebuild-index` ⇒ 收敛末尾同一路径重建成功（index 计数同上）。
-- `source run/env.sh && node checks/audit/deliverables-check.mjs --json` ⇒ 末尾 `JSON:` 行含 `finals:45 / presented:44`；清理前 2 条真违规（final-not-presented / meta-shape-bad），清理后 **0 违规**（private-deploy 已真 present；recon-pack 仅 legacy 观察项），不因目录而绿。
+- `source run/env.sh && node checks/audit/deliverables-check.mjs --json` ⇒ 末尾 `JSON:` 行含 `finals:47 / presented:46`；清理前 2 条真违规（final-not-presented / meta-shape-bad），清理后 **0 违规**（private-deploy 已真 present；recon-pack 仅 legacy 观察项），不因目录而绿。
 - 无 `DSH_HOME` 跑生成器 ⇒ 警告「present 未核」+ `presented:null`（44 unknown），不冒充；`source run/env.sh` 后重建恢复 42/2/0。
-- 2026-10-20 清理收敛：v2 / v3 / lingang / role-kit / private-deploy / token-account-pool 六件真收敛，每次自动重建索引（活跃 5→4→3→2→1→0）；台账 45 行/44 ✅；`deliverables-check --json` 违规从 2 降到 **0**。
+- 2026-10-20 清理收敛：v2 / v3 / lingang / role-kit / private-deploy / token-account-pool / hefeng / kid-ai 八件真收敛，每次自动重建索引（活跃 5→4→3→2→1→0）；台账 47 行/46 ✅；`deliverables-check --json` 违规从 2 降到 **0**。
 - private-deploy 的 present：真 CEO 会话 `session-a87b177b…` 用 `present` 呈现已有 final（未改文件）；同时修 `parseSessionLog` 把 present 工具返回的**绝对路径**按会话 cwd 归一到工作区相对路径——不修则新 present 永远审计不到。
 - 收敛计划误判修复：`isPlaceholderConclusion` 只认整值占位；v2 的真结论里提到「未回填」不再被判「未备」（修前计划 `未备`，修后 `可收敛`）。
 - `pnpm test` ⇒ **70 files / 695 tests passed**（新增 pure catalog 5 + client catalog 8 + client-face 1 + converge-rules 3 + audit 绝对路径 1）。
@@ -47,7 +47,8 @@
 ## 未做 / 边界
 
 - **recon-pack 归档 legacy 未 present**：唯一 `未 present`（1/44）；历史件，审计只作 legacy 观察项，不补。
-- **light / hefeng 未闭合**：`meta.closed` 为空，不属本轮收敛；保持活跃，不硬关。
+- **light 已废弃/无 final**：按用户轻量纪律，四稿收齐即停；目录不列，文件留 active；
+- **hefeng / kid-ai 已收口并归档**；`recon-pack` legacy 未 present。
 - **实时性**：页签是静态快照 + 重读，不订阅盘变化；需求变强时再考虑 host read model/Remote。`converge` 自动重建覆盖盘变更的主路径。
 - **未跑**：`replay-smoke --ui` 的页签端到端；本轮用真 app 探针覆盖打开链路。
 

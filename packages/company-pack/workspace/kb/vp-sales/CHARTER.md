@@ -65,3 +65,5 @@
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-10-ai-transformation-2026-v2/journal/vp-sales/`；交付物：`deliverables-archive/2026-10-10-ai-transformation-2026-v2/`）
 - 2026-10-20 · token-account-pool-2026（决策）—— 号池 token 的便宜价 = 别人的合规成本 + 刑事风险 + 客户信任：法律端（无证经营/发票/数据出境）、经济端（合规转售毛利约20%<30%、官货链无价位）、结构端（四家上游全禁转售、区域准入连授权转售商也封）三条独立成立，市场端 9 家现有客户 0 条 AI 采购诉求 ⇒ 我方不做号池/无授权中转；要做只做「合规接入服务」并按项目另立。
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-20-token-account-pool-2026/journal/vp-sales/`；交付物：`deliverables-archive/2026-10-20-token-account-pool-2026/`）
+- 2026-10-20 · kid-ai-2026（决策）—— 家庭 AI 方案定为「主选豆包免费版 + 未成年人模式（¥0/月），备选千问、应急讯飞星火只作 ≤2 周临时档」，家长每天 2 分钟、稳态每周 40 分钟（硬顶 45）、第一周一次性 60 分钟，判词「接得住（有条件）」；不买硬件、不年付、不做隐蔽监控。
+  （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-20-kid-ai-2026/journal/vp-sales/`；交付物：`deliverables-archive/2026-10-20-kid-ai-2026/`）
