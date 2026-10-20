@@ -17,16 +17,15 @@ import { join, resolve } from 'node:path'
 import { repositoryRoot } from './lib/repository-layout.mjs'
 import { zstdText } from './drivers/zstd.mjs'
 import { homeStatus, listSessions, listSlugSessions, orientState, parseSessionHead, renderOrient, renderRunBundle, renderSessionView, runBundleView } from './lib/orient.mjs'
+import { pickSessionLog } from './lib/session-log-generation.mjs'
 
 const ROOT = repositoryRoot
 
-/** slug 目录下最新会话日志文件（.jsonl 或 .jsonl.zstd，mtime 近序第一）；无则 null。 */
+/** slug 目录下 canonical 会话日志（世代选择唯一口径 = session-log-generation——2026-10-21 接线：
+ *  此前 mtime 近序自选正是该模块头注要消灭的分叉读取点，v3/v4 混装目录会静默选错代）；无则 null。 */
 function newestLogFile(sessionDir) {
-  const logs = readdirSync(sessionDir)
-    .filter(name => /\.jsonl(\.zstd)?$/.test(name))
-    .map(name => ({ path: join(sessionDir, name), mtime: statSync(join(sessionDir, name)).mtime }))
-    .sort((a, b) => b.mtime - a.mtime)
-  return logs[0]?.path ?? null
+  const picked = pickSessionLog(sessionDir)
+  return picked === undefined ? null : join(sessionDir, picked.name)
 }
 
 /** 解指定会话日志的头部（zstd 多帧用 CLI 解——Node 内置只解第一帧，教义 = dev-loop §3.7）；

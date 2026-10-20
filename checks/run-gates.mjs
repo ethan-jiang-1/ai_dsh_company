@@ -55,6 +55,7 @@ import * as securityScan from './gates/security-scan.mjs'
 import * as trackedToken from './gates/tracked-token.mjs'
 import * as scriptIndex from './gates/script-index.mjs'
 import * as replayFixtureFreshness from './gates/replay-fixture-freshness.mjs'
+import * as gateWiring from './gates/gate-wiring.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const failures = []
@@ -99,6 +100,7 @@ securityScan.run(ctx)
 trackedToken.run(ctx)
 scriptIndex.run(ctx)
 replayFixtureFreshness.run(ctx)
+gateWiring.run(ctx)
 
 console.log(failures.length === 0 ? '\nverify: ALL PASS' : `\nverify: ${failures.length} FAILURE(S)`)
 process.exit(failures.length === 0 ? 0 : 1)

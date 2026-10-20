@@ -7,21 +7,18 @@
  * 全部存量（46 篇 = 46 篇待审，不撒谎）。keyless 单测 = `tests/company/cultivation.spec.ts`。
  */
 
-/** 五角色（与 preset roster 一致）。 */
-export const CULTIVATION_ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'] as const
+import { PRESET_KEYS, PRESET_SHORT_LABELS } from './presence-status.ts'
 
-/** 角色显示名（与在场板同口径）。 */
-const ROLE_LABELS: Readonly<Record<(typeof CULTIVATION_ROLES)[number], string>> = {
-  ceo: 'CEO',
-  'vp-eng': 'VP-Eng',
-  'vp-sales': 'VP-Sales',
-  coo: 'COO',
-  cfo: 'CFO',
-}
+/**
+ * 五角色名册 = presence-status 的 pack 内唯一事实家（2026-10-21 收拢：此前同形字面量在
+ * presence-status / cultivation / host 工具串三处各一份，加角色要动 ≥4 处——pack/tools 边界的
+ * 自包含理由不覆盖 pack 内部）。此处再导出仅为保持既有 import 面。
+ */
+export const CULTIVATION_ROLES = PRESET_KEYS
 
-/** 角色 → 显示名（培养记录/面板共用；未知角色原样返回）。 */
+/** 角色 → 显示名（培养记录/面板共用；未知角色原样返回；短标签的家 = presence-status）。 */
 export function roleLabel(role: string): string {
-  return ROLE_LABELS[role as (typeof CULTIVATION_ROLES)[number]] ?? role
+  return PRESET_SHORT_LABELS[role as (typeof CULTIVATION_ROLES)[number]] ?? role
 }
 
 /** 一条 journal 待审条目。 */

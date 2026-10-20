@@ -14,9 +14,9 @@
   会让 client 叶报 TS2591（2026-10-13 现场）——host-only 的东西住 `host/`。
 - `lib/` —— **host/client 共享读模型与纯逻辑**，keyless 单测（`tests/company/`）的直接对象。
   **模块清单 = `src/lib/` 目录本身**（D28：不再手抄枚举；2026-10-20 审计抓到「十一模块」漏
-  `deliverables-catalog`）。已知依赖链 = `dag → board → presence`、`presence → presence-status`
-  （`presence` 是 facade）；host 入口消费 `signoff / presence / doors`，client 半消费
-  `presence / board / budget`（类型为主 + 少量纯函数）。
+  `deliverables-catalog`，10-21 又抓到消费面句过期——枚举必漂）。已知依赖链 =
+  `dag → board → presence`、`presence → presence-status`（`presence` 是 facade）；
+  host/client 各消费哪些**以各文件 import 为准**（host 面偏 signoff/doors，client 面占大多数）。
   （client 面另有 `cultivation-actions`＝人侧动作面纯模块：命令线构造 + host 结果折算 + 文案表；
   `CultivationCompose.tsx`＝创作面表单——2026-10-17 培养 GUI 卡）
 - `client/` —— **client 注册入口与浏览器面**：`index.ts`（`dsh.client` 注入面及组合）调用

@@ -27,6 +27,7 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 import type {} from '@deepseek-ai/dsh-commands'
 import { join } from 'node:path'
 import {
+  CULTIVATION_ROLES,
   methodSkillText,
   parseRecord,
   recordBody,
@@ -250,7 +251,7 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig)
       targetRole: {
         type: 'string',
         required: true,
-        description: 'Role id the cultivation targets: ceo / vp-eng / vp-sales / coo / cfo.',
+        description: `Role id the cultivation targets: ${CULTIVATION_ROLES.join(' / ')}.`,
       },
       expectation: {
         type: 'string',
@@ -285,7 +286,7 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig)
         return { id: '', recorded: false, note: '提案需要公司角色会话上下文（agent preset + cwd）。' }
       }
       if (!ROSTER.has(args.targetRole)) {
-        return { id: '', recorded: false, note: `目标角色 ${args.targetRole} 不在名册（ceo/vp-eng/vp-sales/coo/cfo）。` }
+        return { id: '', recorded: false, note: `目标角色 ${args.targetRole} 不在名册（${CULTIVATION_ROLES.join('/')}）。` }
       }
       if (args.kind === 'correction' && args.targetRole !== face.role) {
         return { id: '', recorded: false, note: `纠正只指向自己的角色（当前会话 = ${face.role}）；给别的角色用 suggestion。` }
