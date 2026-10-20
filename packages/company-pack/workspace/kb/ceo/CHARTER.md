@@ -77,3 +77,5 @@
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-17-lingang-recon/journal/ceo/`；交付物：`deliverables-archive/2026-10-17-lingang-recon/`）
 - 2026-10-17 · role-kit-2026（生产）—— 档 1 开跑件已成——开跑清单 21 行（谁·哪天·交什么）+ 24 岗位行登记表（含可填 CSV）+ 5 席工具额度「算但有条件」；机制三动作与四周 3.5–5.5 人天、$0 新增现金一字未改；CEO 同轮拍三件（启动动议批准 / 判据卡落点随案迁移到本腿 drafts/kit/ / 5 席按岗位行配额定死：PMO 项目专员 1×1、系统集成或定制开发×3、数据与 AI×1，全部落 A 档 11 行 36 人内、不含 B 档单人岗）；W1 = security 案批 1 完成后的第一个完整周，D1 授权 → D1–D3 各线登记 → D4 出 B0 → D5 首件判据卡（池台账）；唯一人级卡点仍是姓名册【模拟占位】⇒ 5 席点人头与逐人级登记停在"件就绪"，不阻塞岗位行级开跑
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-17-role-kit-2026/journal/ceo/`；交付物：`deliverables-archive/2026-10-17-role-kit-2026/`）
+- 2026-10-19 · private-deploy-reserve-2026（诊断）—— 我方在大众硬件私有化部署一线/近一线模型上的储备为认知级：本机 8B（~10.3 t/s）与 30B-A3B Q4（~19.7 t/s、4K prefill ~529 t/s）均已跑通，但都是 32GB 统一内存笔记本（非 24GB 独显）；真实业务评测、回退件、24GB 档、具名 owner 仍缺；储备 1 级、2 级只差回退路径件；今天不能接一单有交付承诺的 POC；8.5 人天不变。
+  （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-19-private-deploy-reserve-2026/journal/ceo/`；交付物：`deliverables-archive/2026-10-19-private-deploy-reserve-2026/`）

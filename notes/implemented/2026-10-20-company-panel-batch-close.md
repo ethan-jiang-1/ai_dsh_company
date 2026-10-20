@@ -17,12 +17,12 @@
 
 ## 这次清理（2026-10-20）
 
-1. **收敛四个已闭合动议**：`ai-transformation-2026-v2`、`ai-coding-security-2026-v3`、`lingang-recon`、`role-kit-2026`。每个都走 dry-run → 真收敛 → `--charter-backfill`；交付物进归档家、journal 进 `snapshots/archive/convergence-2026-10-20/`、台账行/CHARTER 登记完。
-2. **成品目录数字**：44 份 = **活跃 1 / 归档 43 / 台账外 2**；present **43 / 未 present 1 / 未核 0**；台账 **43 行 / 42 ✅**。
+1. **收敛五个已闭合动议**：`ai-transformation-2026-v2`、`ai-coding-security-2026-v3`、`lingang-recon`、`role-kit-2026`、`private-deploy-reserve-2026`。每个都走 dry-run → 真收敛 → `--charter-backfill`；交付物进归档家、journal 进 `snapshots/archive/convergence-2026-10-20/`、台账行/CHARTER 登记完。
+2. **成品目录数字**：44 份 = **活跃 0 / 归档 44 / 台账外 1**；present **43 / 未 present 1 / 未核 0**；台账 **44 行 / 43 ✅**。
 3. **role-kit 类型修正**：`类型: 执行` → `生产`（合法词表 = 决策/生产/诊断/口径问答）；审计对应的 `meta-shape-bad` 消失。
 4. **收敛就绪误判修复**：旧 `concl.includes('回填')` 把 v2 真结论里提到的「未回填」当成占位，导致 v2 被计划档判「未备」。新增 `isPlaceholderConclusion`（只认整值占位），v2 由「未备」变「可收敛」；键盘可跑，spec 见 `tests/company/converge-rules.spec.ts`。
-5. **自动重建真跑**：四件收敛每次都由 `converge` 自动重建索引，活跃数 5→4→3→2→1；不再只靠 `--rebuild-index` 单点验证。
-6. **private-deploy 的 present 已补**：真 CEO 会话 `session-a87b177b…`（preset ceo，cwd = company-workspace）读取已有 final 并调 `present`，未改文件、未新建交付物。
+5. **自动重建真跑**：五件收敛每次都由 `converge` 自动重建索引，活跃数 5→4→3→2→1→0；不再只靠 `--rebuild-index` 单点验证。
+6. **private-deploy 的 present 已补并收敛**：真 CEO 会话 `session-a87b177b…`（preset ceo，cwd = company-workspace）读取已有 final 并调 `present`，未改文件、未新建交付物；随后按正常收敛进归档家。
 7. **审计绝对路径修复**：present 工具把路径写成 `/…/company-workspace/deliverables/…`，`parseSessionLog` 原来不按 cwd 归一 ⇒ 新 present 审计不到。修为按会话 cwd 剥前缀；新增 keyless spec。修后 `presented` 43/44、**违规 0**。
 
 ## 只剩什么（不藏）

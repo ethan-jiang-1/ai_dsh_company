@@ -6,8 +6,8 @@
 
 公司级「成品台账」按**派生视图**落地，不新建第二份手写事实、不新增 Remote/store：
 
-1. **数据面 = 盘上 `deliverables/` + `deliverables-archive/` 的 `final.md` + `meta.md`**。`tools/lib/deliverables-catalog.mjs` 是纯形状（只收 final、按 kickoff 倒序、计数活跃/归档/台账外），`tools/deliverables-index.mjs` 扫描并生成 `company-workspace/kb/deliverables-index.json`。当前 44 份（**活跃 1 / 归档 43 / 台账外 2** / present 43 / 未 present 1 / present 未核 0）；2026-10-20 已收敛 v2 / v3 / lingang / role-kit 四件；private-deploy 已由真 CEO 会话补 present。`present` 状态**不另写判据**：生成器跑 `checks/audit/deliverables-check.mjs --json`，取最后一行 `JSON.presented`；审计不可得时 `presented=null`（面板显示「present 未核」，不冒充）。
-2. **页签 = 右栏「成品」**（第 9 个公司页签，guide entry 同步）。只读：统计（共 44 / 活跃 1 / 归档 43 / 台账外 2 / present 43 / 未 present 1）→ 全部/活跃/归档/台账外四档筛选 → 按月分组 → 每行 `结果 tag + slug + 归档/台账外 + 日期·类型`，一句话结论复用 `LedgerSummary`（2 行 + 全文入口），右上「打开」用 `dsh-resource://file/session/...` 在右栏预览 `final.md`。
+1. **数据面 = 盘上 `deliverables/` + `deliverables-archive/` 的 `final.md` + `meta.md`**。`tools/lib/deliverables-catalog.mjs` 是纯形状（只收 final、按 kickoff 倒序、计数活跃/归档/台账外），`tools/deliverables-index.mjs` 扫描并生成 `company-workspace/kb/deliverables-index.json`。当前 44 份（**活跃 0 / 归档 44 / 台账外 1** / present 43 / 未 present 1 / present 未核 0）；2026-10-20 已收敛 v2 / v3 / lingang / role-kit / private-deploy 五件；private-deploy 先由真 CEO 会话补 present 再收敛。`present` 状态**不另写判据**：生成器跑 `checks/audit/deliverables-check.mjs --json`，取最后一行 `JSON.presented`；审计不可得时 `presented=null`（面板显示「present 未核」，不冒充）。
+2. **页签 = 右栏「成品」**（第 9 个公司页签，guide entry 同步）。只读：统计（共 44 / 活跃 0 / 归档 44 / 台账外 1 / present 43 / 未 present 1）→ 全部/活跃/归档/台账外四档筛选 → 按月分组 → 每行 `结果 tag + slug + 归档/台账外 + 日期·类型`，一句话结论复用 `LedgerSummary`（2 行 + 全文入口），右上「打开」用 `dsh-resource://file/session/...` 在右栏预览 `final.md`。
 3. **静态索引说真话**：页签头显示「静态索引 · 生成于 …」；「重读」只重读文件，不轮询。缺索引/坏 schema 明确提示跑生成器，不静默空表。
 4. **并列不替代**：动议台账答「决定了什么」，成品目录答「交出了哪些 final」；`present` 状态由 `deliverables-check` 提供，目录只显示，不另写审计。
 
@@ -36,7 +36,7 @@
 - `source run/env.sh && node tools/converge.mjs --rebuild-index` ⇒ 收敛末尾同一路径重建成功（index 计数同上）。
 - `source run/env.sh && node checks/audit/deliverables-check.mjs --json` ⇒ 末尾 `JSON:` 行含 `finals:44 / presented:43`；清理前 2 条真违规（final-not-presented / meta-shape-bad），清理后 **0 违规**（private-deploy 已真 present；recon-pack 仅 legacy 观察项），不因目录而绿。
 - 无 `DSH_HOME` 跑生成器 ⇒ 警告「present 未核」+ `presented:null`（44 unknown），不冒充；`source run/env.sh` 后重建恢复 42/2/0。
-- 2026-10-20 清理收敛：v2 / v3 / lingang / role-kit 四件真收敛，每次自动重建索引（活跃 5→4→3→2→1）；台账 43 行/42 ✅；`deliverables-check --json` 违规从 2 降到 **0**。
+- 2026-10-20 清理收敛：v2 / v3 / lingang / role-kit / private-deploy 五件真收敛，每次自动重建索引（活跃 5→4→3→2→1→0）；台账 44 行/43 ✅；`deliverables-check --json` 违规从 2 降到 **0**。
 - private-deploy 的 present：真 CEO 会话 `session-a87b177b…` 用 `present` 呈现已有 final（未改文件）；同时修 `parseSessionLog` 把 present 工具返回的**绝对路径**按会话 cwd 归一到工作区相对路径——不修则新 present 永远审计不到。
 - 收敛计划误判修复：`isPlaceholderConclusion` 只认整值占位；v2 的真结论里提到「未回填」不再被判「未备」（修前计划 `未备`，修后 `可收敛`）。
 - `pnpm test` ⇒ **70 files / 694 tests passed**（新增 pure catalog 5 + client catalog 8 + client-face 1 + converge-rules 2 + audit 绝对路径 1）。

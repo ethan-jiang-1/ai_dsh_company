@@ -69,3 +69,5 @@
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-12-ai-coding-security-2026-v3/journal/vp-eng/`；交付物：`deliverables-archive/2026-10-12-ai-coding-security-2026-v3/`）
 - 2026-10-17 · lingang-recon（诊断）—— 「临港冷链」结算接入今天判不了能不能接——只有客户能给的接入方式、鉴权方式、时间戳口径与时区一件未到；已判的是我们做得出、但属定制活不进标准包价目，12 万单/日不构成技术阻碍，卡点在三处：稳定对账键、夜间批处理窗的故障可见性、以及合规书面授权。
   （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-17-lingang-recon/journal/vp-eng/`；交付物：`deliverables-archive/2026-10-17-lingang-recon/`）
+- 2026-10-19 · private-deploy-reserve-2026（诊断）—— 我方在大众硬件私有化部署一线/近一线模型上的储备为认知级：本机 8B（~10.3 t/s）与 30B-A3B Q4（~19.7 t/s、4K prefill ~529 t/s）均已跑通，但都是 32GB 统一内存笔记本（非 24GB 独显）；真实业务评测、回退件、24GB 档、具名 owner 仍缺；储备 1 级、2 级只差回退路径件；今天不能接一单有交付承诺的 POC；8.5 人天不变。
+  （journal 全文：`snapshots/archive/convergence-2026-10-20/2026-10-19-private-deploy-reserve-2026/journal/vp-eng/`；交付物：`deliverables-archive/2026-10-19-private-deploy-reserve-2026/`）

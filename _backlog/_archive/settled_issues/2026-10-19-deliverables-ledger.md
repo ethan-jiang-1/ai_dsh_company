@@ -11,11 +11,11 @@ opened: 2026-10-19
 
 **做了，按派生视图 + 只读页签落地**：
 
-- **数据面**：盘上 `deliverables/` + `deliverables-archive/` 的 `final.md` + `meta.md` ⇒ 纯形状 `tools/lib/deliverables-catalog.mjs` ⇒ 生成器 `tools/deliverables-index.mjs` ⇒ `company-workspace/kb/deliverables-index.json`。当前 **44 份**（**活跃 1 / 归档 43 / 台账外 2** / **present 43 / 未 present 1 / present 未核 0**）。2026-10-20 已收敛 v2 / v3 / lingang / role-kit 四件；private-deploy 已由真 CEO 会话 `session-a87b177b…` 补 `present`；未收敛 = light/hefeng（未闭合）；唯一未 present = recon-pack（归档 legacy）。`present` 状态由 `deliverables-check --json` 提供（单一判据；不可得时 `presented=null`，面板显示「present 未核」）。
+- **数据面**：盘上 `deliverables/` + `deliverables-archive/` 的 `final.md` + `meta.md` ⇒ 纯形状 `tools/lib/deliverables-catalog.mjs` ⇒ 生成器 `tools/deliverables-index.mjs` ⇒ `company-workspace/kb/deliverables-index.json`。当前 **44 份**（**活跃 0 / 归档 44 / 台账外 1** / **present 43 / 未 present 1 / present 未核 0**）。2026-10-20 已收敛 v2 / v3 / lingang / role-kit / private-deploy 五件；private-deploy 先由真 CEO 会话 `session-a87b177b…` 补 `present` 再收敛；唯一未 present/未入台账 = recon-pack（归档 legacy）；light/hefeng 未闭合（无 final，不入目录）。`present` 状态由 `deliverables-check --json` 提供（单一判据；不可得时 `presented=null`，面板显示「present 未核」）。
 - **页签**：右栏第 9 个公司页签「成品」（guide entry 同步）。统计（含 present / 未 present）→ 全部/活跃/归档/台账外四档筛选 → 按月分组；每行 `结果 tag + slug + 归档/台账外 + 日期·类型 + 一句话结论（2 行 + 全文） + 打开`；「打开」用 `dsh-resource://file/session/...` 在右栏预览 `final.md`。
 - **静态索引说真话**：页签头「静态索引 · 生成于 …」+「重读」；不轮询；缺索引/坏 schema 明确提示跑生成器。
 - **并列不替代**：动议台账答「决定了什么」，成品目录答「交出了哪些 final」；`present` 背书/审计仍归 [`deliverables-check`](../../../checks/audit/deliverables-check.mjs)。
-- **规模事实**：旧卡的「993」是 `deliverables*` 文件数；成品 final 只有 44；动议台账 **43 行/42 ✅** 覆盖 42/44，只剩 2 份台账外（private-deploy、recon-pack；本目录标出来）。
+- **规模事实**：旧卡的「993」是 `deliverables*` 文件数；成品 final 只有 44；动议台账 **44 行/43 ✅** 覆盖 43/44，只剩 1 份台账外（recon-pack；本目录标出来）。
 
 **剩余/触发**：
 - 生成索引已接进 `converge`（正常收敛/`--resume` 后自动重建，也可 `node tools/converge.mjs --rebuild-index`）。
@@ -39,7 +39,7 @@ opened: 2026-10-19
 
 | 项 | 结果 | 命令/产物 |
 |---|---|---|
-| 生成索引 | 44 份 / 活跃 1 / 归档 43 / 台账外 2 / present 43 / 未 present 1 / 未核 0 | `node tools/deliverables-index.mjs`；[deliverables-index.json](../../../company-workspace/kb/deliverables-index.json) |
+| 生成索引 | 44 份 / 活跃 0 / 归档 44 / 台账外 1 / present 43 / 未 present 1 / 未核 0 | `node tools/deliverables-index.mjs`；[deliverables-index.json](../../../company-workspace/kb/deliverables-index.json) |
 | present 判据 | 真 CEO present 后 `presented` 43；audit 违规 **0** | `source run/env.sh && node checks/audit/deliverables-check.mjs --json` |
 | present 真红清除 | 真 CEO 会话 `session-a87b177b…` 调 `present`（绝对路径）；修 `parseSessionLog` 按 cwd 归一后审计可见 | 会话日志 `deliverables/presented`；新增 audit spec |
 | 自动重建 | 收敛/续跑后自动；`--rebuild-index` 单独跑成功 | `node tools/converge.mjs --rebuild-index`；`converge-rules.spec` |
@@ -49,8 +49,8 @@ opened: 2026-10-19
 | 真挂载 | 零挂载失败 + 品牌在场 | `client-load-smoke`（重建 `lib/` 后） |
 | 真 app 目录 | 44 行 = 索引；统计/四档筛选/44 个「打开」；点开 final 正文出现 | `deliverables-catalog-probe --fixture`（ALL PASS） |
 | 视觉夹具 | [desktop.png](../../../snapshots/visual/deliverables-catalog/desktop.png) / [narrow.png](../../../snapshots/visual/deliverables-catalog/narrow.png) | `snapshots/visual/deliverables-catalog/` |
-| 台账外 | 2 份（private-deploy-reserve / recon-pack）在目录里带「台账外」tag | 同上 |
-| 清理收敛 | v2 / v3 / lingang / role-kit 四件收敛；台账 43 行/42 ✅；索引自动重建（活跃 5→1） | `node tools/converge.mjs --slug …`；`--charter-backfill`；`deliverables-check --json` |
+| 台账外 | 1 份（recon-pack，归档 legacy）在目录里带「台账外」tag | 同上 |
+| 清理收敛 | v2 / v3 / lingang / role-kit / private-deploy 五件收敛；台账 44 行/43 ✅；索引自动重建（活跃 5→0） | `node tools/converge.mjs --slug …`；`--charter-backfill`；`deliverables-check --json` |
 
 ## 范围与排除项
 
@@ -68,7 +68,7 @@ opened: 2026-10-19
 - [x] 门禁 + `pnpm test` + 探针绿；Note/索引/视觉夹具同步。
 - [x] **present 状态**：由 `deliverables-check --json` 提供；不可得显示「present 未核」；真 CEO present 后 43/44（recon-pack 归档 legacy）。
 - [x] **自动重建**：接进 `converge`/`--resume`；`--rebuild-index` 单独跑成功；四件真收敛各自触发重建（活跃 5→1）；纯命令形状有 spec。
-- [x] **清理收敛**：v2 / v3 / lingang / role-kit 已入归档家 + 台账行 + CHARTER 纪要；role-kit 类型修为「生产」；审计 0 违规（private-deploy 已真 present；recon-pack 仅 legacy 观察项）。
+- [x] **清理收敛**：v2 / v3 / lingang / role-kit / private-deploy 已入归档家 + 台账行 + CHARTER 纪要；role-kit 类型修为「生产」；审计 0 违规（private-deploy 已真 present；recon-pack 仅 legacy 观察项）。
 
 ## 修订史（只追加）
 
@@ -79,6 +79,7 @@ opened: 2026-10-19
 - rev 5 2026-10-20：补 `present` 状态（deliverables-check --json 单一判据）与 `converge` 自动重建；本卡事实更新。
 - rev 6 2026-10-20：收敛 v2/v3/lingang/role-kit；台账 43 行/42 ✅；活跃 5→1、台账外 5→2；private-deploy present 真红保留。
 - rev 7 2026-10-20：真 CEO 会话补 private-deploy 的 present；修 `parseSessionLog` 绝对路径归一；present 43/44、audit 0 违规；recon-pack 仍 legacy。
+- rev 8 2026-10-20：private-deploy 收敛入归档；目录活跃 0/归档 44/台账外 1；台账 44/43。
 
 ## Review 指南（给 review 的人/Agent）
 
