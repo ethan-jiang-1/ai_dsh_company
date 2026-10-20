@@ -41,6 +41,7 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 import { makeFailingCheck, sleep } from '../../tools/lib/probe-kit.mjs'
+import { diagnosisDir } from '../../tools/lib/diagnosis.mjs'
 import { uiPhase } from './lib/replay-ui.mjs'
 import { spawn, spawnSync } from 'node:child_process'
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
@@ -590,6 +591,22 @@ const firstDiff = (expected, actual) => {
   return '内容一致（可能是行尾差异）'
 }
 
+/** 单行 JSON 的字符级首差定位（2026-10-20 BUG：session 行差异只打截断头，手册注入差异在
+ *  第 ~150 行 ⇒ 期望/实际可见前缀完全相同，跑动中的 agent 看不出差异在哪——r3 断裂当晚
+ *  实测首差在字符 5545，截断头 700 字符内零线索）。 */
+const charDiff = (expected, actual) => {
+  const e = String(expected)
+  const a = String(actual)
+  let at = 0
+  while (at < e.length && at < a.length && e[at] === a[at]) at++
+  const window = (s) => s.slice(Math.max(0, at - 60), at + 120).replace(/\n/g, '\\n')
+  return `首差@字符${String(at)}：期望 …${window(e)}… / 实际 …${window(a)}…`
+}
+
+/** 本场失败现场目录（懒建）：session 行差异全文与 sidecar 全文都落这里，不再 /tmp 固定名。 */
+let failureDumpDir = null
+const dumpDir = () => (failureDumpDir ??= diagnosisDir(ROOT, `replay-${SCENARIO}`))
+
 let workspace
 let runRoot
 let parsed = []
@@ -654,9 +671,14 @@ try {
     for (const { sessionIndex, rowIndex, expected, actual } of sessionDifferences) {
       diffLine = `session#${sessionIndex} 第 ${String(rowIndex + 1)} 行：期望 ${expected?.type ?? '(缺)'} / 实际 ${actual?.type ?? '(缺)'}`
       console.log(`    差异：${diffLine}`)
-      if (expected !== undefined) console.log(`      期望: ${JSON.stringify(expected).slice(0, 700)}`)
-      if (actual !== undefined) console.log(`      实际: ${JSON.stringify(actual).slice(0, 700)}`)
+      // 截断头只作形状预览；真正的差异定位 = 字符级首差 + 全文落诊断区（跨进程可回溯）。
+      if (expected !== undefined && actual !== undefined) console.log(`      ${charDiff(JSON.stringify(expected), JSON.stringify(actual))}`)
+      const dir = dumpDir()
+      const tag = `session-${String(sessionIndex)}-row-${String(rowIndex)}`
+      if (expected !== undefined) writeFileSync(join(dir, `${tag}.expected.json`), JSON.stringify(expected, null, 2), 'utf8')
+      if (actual !== undefined) writeFileSync(join(dir, `${tag}.actual.json`), JSON.stringify(actual, null, 2), 'utf8')
     }
+    if (sessionDifferences.length > 0) console.log(`      （差异全文已落 ${dumpDir()}）`)
     sessionDiffs = sessionDifferences.length
 
     check('归一化日志零 diff（投递簿记除外）', sessionDiffs === 0, sessionDiffs === 0 ? `${String(actualN.length)} 个会话逐行一致` : diffLine)
@@ -708,10 +730,11 @@ try {
         const expected = readFileSync(path, 'utf8')
         const pass = expected === actual
         if (!pass) {
-          writeFileSync(`/tmp/replay-sidecar-${kind}-${String(index)}.expected`, expected, 'utf8')
-          writeFileSync(`/tmp/replay-sidecar-${kind}-${String(index)}.actual`, actual, 'utf8')
+          const dir = dumpDir()
+          writeFileSync(join(dir, `sidecar-${kind}-${String(index)}.expected`), expected, 'utf8')
+          writeFileSync(join(dir, `sidecar-${kind}-${String(index)}.actual`), actual, 'utf8')
         }
-        check(`sidecar ${kind}#${String(index)} 零 diff`, pass, pass ? '' : `${firstDiff(expected, actual)}（全文已落 /tmp/replay-sidecar-${kind}-${String(index)}.*）`)
+        check(`sidecar ${kind}#${String(index)} 零 diff`, pass, pass ? '' : `${firstDiff(expected, actual)}（全文已落 ${dumpDir()}/sidecar-${kind}-${String(index)}.*）`)
       }
       compareSidecar('system-prompt', sidecarPrompt(index), actualSidecars.prompt)
       compareSidecar('tool-schemas', sidecarTools(index), actualSidecars.tools)

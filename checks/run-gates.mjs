@@ -54,6 +54,7 @@ import * as guardRedRecord from './gates/guard-red-record.mjs'
 import * as securityScan from './gates/security-scan.mjs'
 import * as trackedToken from './gates/tracked-token.mjs'
 import * as scriptIndex from './gates/script-index.mjs'
+import * as replayFixtureFreshness from './gates/replay-fixture-freshness.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const failures = []
@@ -97,6 +98,7 @@ guardRedRecord.run(ctx)
 securityScan.run(ctx)
 trackedToken.run(ctx)
 scriptIndex.run(ctx)
+replayFixtureFreshness.run(ctx)
 
 console.log(failures.length === 0 ? '\nverify: ALL PASS' : `\nverify: ${failures.length} FAILURE(S)`)
 process.exit(failures.length === 0 ? 0 : 1)

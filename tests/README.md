@@ -23,6 +23,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | 改动面 | 最窄检查（先跑这个） | 受影响时升档 | 同 diff 义务（政策原则 = [testing.md §2](../docs/testing.md)） |
 |---|---|---|---|
 | persona / skill 文案（`packages/company-pack/presets/`） | `pnpm test tests/presets` | [preset-smoke](../checks/smoke/preset-smoke.mjs) | **行为判据面**改动（改变"模型被要求做什么/判据怎么落"）→ 场景同 diff 必带；纯措辞润色 → 连通档 + 内容档兜 |
+| 手册 / CHARTER / 模板（`packages/company-pack/workspace/`——**会话注入面**，company-workspace 是其符号链接） | `pnpm verify`（handbook-budget + **replay-fixture-freshness**：runnable+full 场景的注入新鲜度静态比对） | [handbook-smoke](../checks/smoke/handbook-smoke.mjs)（真注入与隔离根）+ 受影响 replay 场景重跑（[replay-smoke](../checks/smoke/replay-smoke.mjs)；2026-10-20 实证：纯 docs 手册提交曾打断 r3 full 档而无人拦） | 注入内容变化 ⇒ 受影响 runnable+full 场景**同 diff 重录**或声明降档（带日期理由）；规矩变化 ⇒ 行为判据面义务同上行 |
 | bundle / preset 行 config（机制面） | `pnpm test tests/presets` | + [delegation-smoke](../checks/smoke/delegation-smoke.mjs)（工具行） | 同 diff 必带 |
 | client 面板（用户可见面：视图模型/组件/文案/CSS，`src/client/`） | `pnpm test tests/client`（按模块点名 spec，含 `client-face` / `style-lifecycle`） | [client-load-smoke](../checks/smoke/client-load-smoke.mjs) + [cdp-probe](../probes/browser-visual/cdp-probe.mjs)（全部页签 + 面板体内容）/ 对应 visual probe | 用户可见改动 → 同 diff 场景或视觉夹具 |
 | company 读模型逻辑（`src/lib/` 判据：deliverables / authorship / ledger） | `pnpm test tests/company`（按模块点名 spec） | oracle 反证（真样本钉列）；**新增模块/影响导出面 → 加 `pnpm test tests/harness`（pack-exports 守卫）** | — |
