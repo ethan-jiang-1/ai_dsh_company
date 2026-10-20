@@ -95,7 +95,9 @@ const TOP_DIRS = ['notes/', 'docs/', 'checks/', 'probes/', 'tools/', 'packages/'
 export const RUNTIME_PREFIXES = ['runtime/harness-home', 'runtime/harness-home-b', 'runtime/rehearsal-workspace', 'runtime/pw-browsers', '.pnpm-store']   // gitignored 运行态（2026-10-06 条目 A：dev/ 拆分，运行残留随迁顶层 runtime/）
 // 双树查：本仓根 **或** vendor/dsh 命中即过（AGENTS 纪律表的"权威（vendor 树）"列合法使用 vendor 相对写法）。
 // 白名单 = 历史性退役路径的叙述性提及（自带"现迁至…"说明的历史段）。
-export const RETIRED_PATHS = new Set(['docs/plans/roadmap.md'])
+// `notes/implemented/2026-09-22-org-presence-board.md` = 2026-10-09 存量清扫迁 archived/ 的退役位置；
+// 二轮审计研究笔记逐字引用该断链现场（自带现迁说明）——按本机制放行（2026-10-21）。
+export const RETIRED_PATHS = new Set(['docs/plans/roadmap.md', 'notes/implemented/2026-09-22-org-presence-board.md'])
 // 负例自重（2026-10-09 N5 立）：**故意写出来给人复现的假路径**，与「腐化指针」形状完全相同，静态扫描
 // 分不开（实测：N5 生效后头两条命中就是我自己 Note 里描述负例用的 `docs/zz-tmp-unregistered.md`）。
 // 约定 = 假路径里带 `zz-`/`zzz-`（本仓从未有过以 zz 开头的真实路径；见命名自带"这是测试值"的语义）。
@@ -103,6 +105,7 @@ export const RETIRED_PATHS = new Set(['docs/plans/roadmap.md'])
 // 「某个不存在的 docs 文件」就复现不了了。天真的做法是让作者改文风，正确做法是给假路径一个可判别的记号。
 export const FIXTURE_PATH = /(^|\/)zz+-/
 let barePathCount = 0
+let plainNotesCount = 0
 let barePathBad = false
 const barePathWarn = []
 /** 扫一批文件的反引号裸路径；hit 回调决定"判红"还是"记观察"。 */
@@ -132,14 +135,44 @@ const scanBarePaths = (files, hit) => {
   }
 }
 
+// ── 纯文本 notes/ 引用档（2026-10-21 立，六维度第二轮 Phase A）─────────────────────
+// 为什么：budget-and-ops.md:41 曾以**纯文本**写「见 notes/implemented/2026-09-22-org-presence-board.md」
+// （无反引号、非链接）——该 note 2026-10-09 已迁 archived/，反引号档（只扫 `…`）与 md-links（只扫链接）
+// **双双失明**，断链存活到 2026-10-20 二轮审计（D4 实锤之一）。规则：活文档里
+// notes/<生命周期>/<文件>.md 的纯文本提及必须指到现行家；引原句做证据的写法用反引号（= 逐字引用标记）。
+// 负例留证 2026-10-21：本档出生红 = budget-and-ops.md:41 纯文本指已迁档的 org-presence-board（真断链，
+// 非构造——D4 审计实锤即负例）；修复后绿（×计数见 ok 行）。zz- 假路径约定沿用 FIXTURE_PATH。
+const PLAIN_NOTES_FILE = /notes\/(?:implemented|archived|proposed|rejected|postmortem)\/[A-Za-z0-9._-]+\.md/g
+const scanPlainNotes = (files, fail) => {
+  for (const rel of files) {
+    const lines = readFileSync(join(root, rel), 'utf8').split('\n')
+    lines.forEach((line, i) => {
+      // 剥掉反引号段与 Markdown 链接目标——它们归反引号档 / md-links 管，不双计。
+      const stripped = line.replace(/`[^`\n]+`/g, '').replace(/\]\([^)\n]*\)/g, '')
+      for (const m of stripped.matchAll(PLAIN_NOTES_FILE)) {
+        const raw = m[0].replace(/:\d+(?:-\d+)?$/, '')
+        if (FIXTURE_PATH.test(raw)) continue
+        plainNotesCount++
+        if (!existsSync(join(root, raw)) && !RETIRED_PATHS.has(raw)) {
+          fail(`${rel}:${i + 1}`, raw)
+        }
+      }
+    })
+  }
+}
+
 export function run({ root, ok, fail }) {
 scanBarePaths(NOW_FILES, (where, raw) => {
   barePathBad = true
   fail('bare-path', `${where} → \`${raw}\` 不存在（双树均无——活指针腐化：改指针到现行家）`)
 })
+scanPlainNotes(NOW_FILES, (where, raw) => {
+  barePathBad = true
+  fail('bare-path', `${where} → 纯文本 ${raw} 不存在（notes 引用三选一：Markdown 链接〔md-links 管〕/ 反引号〔反引号档管〕/ 指到现行家）`)
+})
 scanBarePaths(WARN_FILES, (where, raw) => { barePathWarn.push(`${where} → \`${raw}\``) })
 if (!barePathBad) {
-  ok(`bare-path ×${barePathCount}（${NOW_FILES.length} 文件反引号裸路径存在性；另观察档 ${WARN_FILES.length} 文件）`)
+  ok(`bare-path ×${barePathCount}（${NOW_FILES.length} 文件反引号裸路径存在性）+ 纯文本 notes 引用 ×${plainNotesCount}；另观察档 ${WARN_FILES.length} 文件`)
   if (barePathWarn.length > 0) {
     console.log(`  观察项 ${barePathWarn.length} 条（观察档 = \`notes/postmortem/**\` 与 \`_backlog/_archive/**\`：`
       + '记录**当时**事实的档案，里面引的路径当时是对的——**改它就是篡改记录**，故只提醒不判红）：')

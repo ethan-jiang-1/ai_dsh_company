@@ -66,7 +66,7 @@ intent: "第二轮 fresh-agent 打扫（同日晚，母卡持续跟进）：六�
 （子代理只读审计；其未查面已如实声明：design 四份与手册全文未通读、note 未全量两两比对、verify/test 未实跑而以母卡当日记录为基线逐项对盘——实锤两处由主 agent 一手复核补强）
 
 - 上轮批次 0–2 修复逐一复核：**全部真修**；死指针率 ~1/60（上轮 17 项账本 → 本轮 2.5 处）。
-- 实锤 2.5 处（均经主 agent 一手复核）：budget-and-ops.md:41 纯文本引用已迁档 note（「见 notes/implemented/2026-09-22-org-presence-board.md」而该 note 实际在 notes/archived/；bare-path 只扫反引号、md-links 只扫链接，双失明——decisions.md D22 行同事实却是对的，同事实两处陈述一处漂移的活例）；notes/README.md:73「0001–0004 在档」实际 0001–0003（0004 已随 63a0f90 删除；分类 owner 文件自带过期计数，无对家门禁）；（祖父豁免档 1 处 entry-execution-chain-debt:66，设计内豁免非门禁失败）。
+- 实锤 2.5 处（均经主 agent 一手复核）：budget-and-ops.md:41 纯文本引用已迁档 note（「见 `notes/implemented/2026-09-22-org-presence-board.md`」而该 note 实际在 notes/archived/；bare-path 只扫反引号、md-links 只扫链接，双失明——decisions.md D22 行同事实却是对的，同事实两处陈述一处漂移的活例）；notes/README.md:73「0001–0004 在档」实际 0001–0003（0004 已随 63a0f90 删除；分类 owner 文件自带过期计数，无对家门禁）；（祖父豁免档 1 处 entry-execution-chain-debt:66，设计内豁免非门禁失败）。
 - 措辞家族残留：orient.mjs:129 运行时输出串「五角色组合」（上轮修了 7 处文档，漏运行时字符串——修字必漏字符串的实例）。
 - 术语面：R3 三义重载最危险（退役轮次 R3 / 快照场景号 r3 / R3′ 扫描口径——R3′ 定义在 Note 但 terminology/orient 无声明）；观察窗=驾驶舱=驾驶座已声明但 terminology.md 无行；「成品/交付物/deliverables」边界清楚但「成品」无表行。
 - 滞留研究稿：_backlog/research/company-panels-ux（2 份）+ backlog-ux（1 份）——消费卡已归档但研究稿未随迁（章程义务未执行）；checks/README:162 触发表指针还压在活跃路径。

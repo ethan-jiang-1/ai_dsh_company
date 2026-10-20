@@ -142,7 +142,7 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 | keyless | `pnpm test`（roster 零 broken、行依赖、内容定稿、命名系列、bundle 语法、roots 语义、必填 config） | ✅ 5 公司角色 + researcher 覆盖 |
 | 运行时 roster | web 观察窗 `agentPresets/list` RPC | ✅ 实测 10 条零 broken（出厂 4 + pack 6） |
 | **挂载（上线前门禁）** | `node checks/smoke/preset-smoke.mjs`：boot 真 web，逐个 preset `session/create` | ✅ 5 公司角色 + researcher ALL PASS（反证过：去掉必填 config 即红） |
-| 会话级（persona 生效、连通） | `node checks/smoke/probe-smoke.mjs`（默认快速档 ~6s：真会话发一句 ping，断言挂载/轮次/回话/**人格进 prompt**）；`--full` = 五角色三探针内容断言（慢，按需） | ✅ R2 建：快速档 5/5 PASS；内容档曾 14/15（KB 事实与 veto 语义均命中） |
+| 会话级（persona 生效、连通） | `node checks/smoke/probe-smoke.mjs`（默认快速档 ~6s：真会话发一句 ping，断言挂载/轮次/回话/**人格进 prompt**；面 = 5 公司角色，researcher 挂载归 preset-smoke）；`--full` = 五角色三探针内容断言（慢，按需） | ✅ R2 建：快速档 5 公司角色全 PASS；内容档曾 14/15（KB 事实与 veto 语义均命中） |
 | 回归资产 | 动议会话 + 期望工作区归档 | ✅ `snapshots/`（r1–r4 motion + scenario-b + r3 replay 场景；replay harness R5a） |
 
 ## 培养回路与学习载体（分身成长条目出生，2026-09-24；2026-10-13 培养卡扩三面）
