@@ -10,6 +10,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { spawnSync } from 'node:child_process'
 import { join, relative } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
+import { parseAuditVerdict } from './lib/audit-verdict.mjs'
 import { parseMeta, slugFromDirName } from './lib/deliverables.mjs'
 import { buildDeliverablesCatalog, CATALOG_ROOTS } from './lib/deliverables-catalog.mjs'
 
@@ -23,18 +24,12 @@ const OUT = join(WORKSPACE, 'kb', 'deliverables-index.json')
  */
 function presentedSlugs() {
   const r = spawnSync(process.execPath, [join(ROOT, 'checks', 'audit', 'deliverables-check.mjs'), '--json'], { cwd: ROOT, encoding: 'utf8' })
-  const line = (r.stdout ?? '').split('\n').find(item => item.startsWith('JSON:'))
-  if (line === undefined) {
-    console.warn('⚠ 成品 present 未核：deliverables-check --json 无输出（先 source run/env.sh）；索引继续生成，presented=null')
+  const payload = parseAuditVerdict(r.stdout ?? '')
+  if (payload === null || payload.assessed === false) {
+    console.warn('⚠ 成品 present 未核：deliverables-check --json 无可用判词（先 source run/env.sh）；索引继续生成，presented=null')
     return null
   }
-  try {
-    const payload = JSON.parse(line.slice(5))
-    return new Set(Array.isArray(payload.presented) ? payload.presented : [])
-  } catch {
-    console.warn('⚠ 成品 present 未核：审计 JSON 解析失败；presented=null')
-    return null
-  }
+  return new Set(Array.isArray(payload.presented) ? payload.presented : [])
 }
 
 /**

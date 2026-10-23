@@ -17,14 +17,14 @@
 //   node checks/audit/deliverables-check.mjs --workspace snapshots/replay/r4-motion/workspace.expected \
 //        --sessions snapshots/replay/r4-motion --only support-sla-page   # 审快照里本轮那一件
 //   node checks/audit/deliverables-check.mjs --evidence-from 2026-10-01   # 声明「该日期前的日志不可得」
-//   node checks/audit/deliverables-check.mjs --json   # 人类报告 + 最后一行 JSON:{finals,presented,...}（成品目录生成器用）
+//   node checks/audit/deliverables-check.mjs --json   # 人类报告 + 最后一行 JSON 判词（assessed/finals/presented/violations/warnings，均带 detail）
 //        ⇒ 该期内无 present 背书的成品降为观察项 present-evidence-missing（不判红；BUG-019）
 //
 // ⚠ 审归档快照必须配 `--only <slug>`：快照的 `workspace.expected/` 是**整盘拷贝**，而
 //   `sessions/` 只装本轮日志——不给作用域会把历史成品误报成"无 Lead 背书"（输入不成对）。
 //   整盘审计请跑运行场（默认档：真日志全在 $DSH_HOME）。
 //
-// 退出码：0 = 零违规；1 = 有违规（打印每条 code + path）。
+// 退出码：0 = 零违规；1 = 有违规；2 = 无法判定（工作区缺失等，--json 时判词带 assessed:false + reason）。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
 import { execFileSync } from 'node:child_process'
@@ -51,6 +51,8 @@ const workspaceRel = arg('workspace', 'company-workspace')
 const workspace = resolve(ROOT, workspaceRel)
 if (!existsSync(workspace)) {
   console.error(`deliverables-check: 工作区不存在：${workspace}`)
+  // 无法判定 = exit 2，且判词里说清原因（消费者据此 fail-closed，不再嗅 stderr 词）。
+  if (JSON_OUT) console.log(`JSON:${JSON.stringify({ assessed: false, reason: 'workspace-missing', workspace: workspaceRel })}`)
   process.exit(2)
 }
 
@@ -264,29 +266,29 @@ console.log(`  过程稿 ${result.drafts.length} 份`)
   violations.push(...archived.violations)
   warnings.push(...archived.warnings)
 }
-/** 机器可读摘要（成品目录生成器消费）：人类报告之后追加一行 `JSON:{...}`，含 finals/presented。 */
-const emitJson = () => {
-  console.log(`JSON:${JSON.stringify({
-    workspace: workspaceRel,
-    sessions: sessions.length,
-    finals: result.finals.map(row => ({ slug: row.slug, path: row.path })),
-    presented: [...result.leadFinalSlugs].sort(),
-    violations: violations.map(row => ({ code: row.code, path: row.path })),
-    warnings: warnings.map(row => row.code),
-  })}`)
+/** 机器判词：唯一一份结构化裁决；下面的人读段落是它的 formatter（2026-10-23 判词结构化）。 */
+const verdict = {
+  assessed: true,
+  workspace: workspaceRel,
+  sessions: sessions.length,
+  finals: result.finals.map(row => ({ slug: row.slug, path: row.path })),
+  presented: [...result.leadFinalSlugs].sort(),
+  violations: violations.map(row => ({ code: row.code, path: row.path, detail: row.detail })),
+  warnings: warnings.map(row => ({ code: row.code, path: row.path, detail: row.detail })),
 }
+const emitJson = () => console.log(`JSON:${JSON.stringify(verdict)}`)
 
-if (warnings.length > 0) {
-  console.log(`  观察项 ${warnings.length} 条（不判违规，但每次都提醒）：`)
-  for (const w of warnings) console.log(`    ${w.code} | ${w.detail}`)
+if (verdict.warnings.length > 0) {
+  console.log(`  观察项 ${verdict.warnings.length} 条（不判违规，但每次都提醒）：`)
+  for (const w of verdict.warnings) console.log(`    ${w.code} | ${w.detail}`)
 }
-if (violations.length === 0) {
+if (verdict.violations.length === 0) {
   console.log('  违规 0 条 —— ALL PASS')
   if (JSON_OUT) emitJson()
   process.exit(0)
 }
-console.log(`  违规 ${violations.length} 条：`)
-for (const violation of violations) {
+console.log(`  违规 ${verdict.violations.length} 条：`)
+for (const violation of verdict.violations) {
   console.log(`    ${violation.code} | ${violation.path}\n      ${violation.detail}`)
 }
 if (JSON_OUT) emitJson()

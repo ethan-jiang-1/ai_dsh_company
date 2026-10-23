@@ -22,6 +22,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync
 import { join, basename } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
 import { assess, archiveGitArgs, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalSlug, parseFlags, resolveEvidenceDir, steps } from './lib/converge-rules.mjs'
+import { parseAuditVerdict } from './lib/audit-verdict.mjs'
 import { COMPANY_ROLE_IDS } from './lib/company-roles.mjs'
 import { spawnSync } from 'node:child_process'
 
@@ -58,12 +59,13 @@ const metaField = (dir, field) => {
  * @returns `{ ok, detail, violations }`
  */
 const checkSlugFindings = slug => {
-  const r = spawnSync(process.execPath, [join(ROOT, 'checks', 'audit', 'deliverables-check.mjs'), '--only', slug], { encoding: 'utf8' })
-  const text = `${r.stdout ?? ''}${r.stderr ?? ''}`
-  if (r.status === 2 || /工作区不存在|缺 DSH_HOME|requireDevHome/.test(text)) {
+  const r = spawnSync(process.execPath, [join(ROOT, 'checks', 'audit', 'deliverables-check.mjs'), '--only', slug, '--json'], { encoding: 'utf8' })
+  // 判词结构化后只读机器行：exit 2 / 无判词 / assessed:false = 无法判定，一律 fail-closed。
+  const verdict = parseAuditVerdict(r.stdout ?? '')
+  if (r.status === 2 || verdict === null || verdict.assessed === false) {
     return { ok: false, detail: '审计档跑不起来（环境不满足）——收敛前须能审计', violations: [] }
   }
-  const violations = [...text.matchAll(/^\s+([a-z][a-z-]+) \| (deliverables[^\n]*)$/gm)].map(m => `${m[1]} ${m[2]}`)
+  const violations = (verdict.violations ?? []).map(row => `${row.code} ${row.path}`)
   return { ok: r.status === 0, detail: violations.join('；') || '（见审计档输出）', violations }
 }
 
