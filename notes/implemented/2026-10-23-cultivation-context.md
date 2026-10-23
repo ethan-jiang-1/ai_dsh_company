@@ -351,7 +351,7 @@ npx vitest run tests/client/cultivation-board.spec.ts
 | 构建 | `node ./node_modules/typescript/bin/tsc -b packages/company-pack` + `(cd packages/company-pack && ../../node_modules/.bin/tsdown)` | 成功；`lib/client.js` 296KB |
 | 客户端挂载 | `node checks/smoke/client-load-smoke.mjs` | ALL PASS（真浏览器，零挂载失败） |
 | 机制探针 | `node probes/session-context/cultivation-context-probe.mjs` | ALL PASS：冷读 12ms / 2MB 日志、不激活、2,551 字符 args、6,319B contexts、agentTeam 成员、子会话 address |
-| 真浏览器行为 | `node probes/browser-visual/cultivation-gui-probe.mjs` | ALL PASS：⑤b 成品背景 + 空正文 → `contexts` + `source: 成品「kid-ai-2026」`；**⑤c 会话背景 → `contexts.kind=session` + `source: 会话「…」`（真 host `observeSession`）**；采纳/角色闸/日志全过 |
+| 真浏览器行为 | `node probes/browser-visual/cultivation-gui-probe.mjs` | ALL PASS：⑤b 成品背景 + 空正文 → `contexts` + `source: 成品「kid-ai-2026」`；**⑤c 会话背景 → `contexts.kind=session` + `source: 会话「…」`（真 host `observeSession`）**；**⑤d 审批行「打开原文」→ 右栏切到 final.md**；采纳/角色闸/日志全过 |
 
 **红/绿收据（关键）**：
 
@@ -362,10 +362,9 @@ npx vitest run tests/client/cultivation-board.spec.ts
 
 ## 残留与未验
 
-- **审批行「打开原文」真机点击未验**：keyless 只验按钮出现/回调；`openContext` 的 `workspaceFiles.stat` + `openResource` 真链路未点。**下次跑**：种一条带 `contexts` 的待办，点「打开原文」看右栏。
 - 换轮列表、journal/任意文件源、AI 起草 = v1.1/v2（未做）。
 - 100 条 `contexts` 记录在 30s 轮询下的长期体积未压测；单条 ≤8KB 已验。
-- 真浏览器视觉夹具未更新（`--fixture` 未跑）；当前截图在 `runtime/human-exits-evidence/`。
+- 真浏览器视觉夹具未更新（`--fixture` 未跑）；窄栏/浮窗档未出；当前截图在 `runtime/human-exits-evidence/`。
 - **预览 vs 记录不同源**：界面明说“以提交时服务端读到的版本为准”。
 - **teammate**：成员继承 CEO 方法层；指向成员名的 suggest 改不到成员（已在文案/合同说明）。
 - 记录是 agent 可读数据；v1 只取文字，未做不可信包装（v2 AI 起草时按 session-reference 的转义/警告）。

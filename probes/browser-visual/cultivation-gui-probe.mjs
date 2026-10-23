@@ -91,7 +91,7 @@ const check = (label, fn) => fn().then(
 )
 
 /** 种一条记录（手写 frontmatter，与 host 的 recordText 同形状——探针不 import TS 源）。 */
-function seedRecord(id, { kind, targetRole, expectation, body, proposerRole = targetRole }) {
+function seedRecord(id, { kind, targetRole, expectation, body, proposerRole = targetRole, contexts }) {
   mkdirSync(RECORDS_DIR, { recursive: true })
   writeFileSync(join(RECORDS_DIR, `${id}.md`), [
     '---',
@@ -102,6 +102,7 @@ function seedRecord(id, { kind, targetRole, expectation, body, proposerRole = ta
     'source: （会话内提交）',
     `expectation: ${expectation}`,
     'status: open',
+    ...(contexts === undefined ? [] : [`contexts: ${JSON.stringify(contexts)}`]),
     '---',
     '',
     body,
@@ -121,6 +122,7 @@ const { child, port, token } = await startWeb({ spawn, root: ROOT, home, port: 0
 let createdRecordId = null
 let contextRecordId = null
 let sessionContextRecordId = null
+let contextOpenId = null
 let own = null
 let foreignId = null
 const browser = await launchChromium(await loadChromium(ROOT))
@@ -429,6 +431,46 @@ try {
     if (!(run.result.text ?? '').includes('仅建议权')) throw new Error(`拒绝文案未点名仅建议权：${run.result.text ?? ''}`)
   })
 
+  await check('⑤d 审批行背景卡「打开原文」：stat + openResource 真链路不报错', async () => {
+    if (hostRole === null) throw new Error('前序判据未就绪')
+    const catalog = JSON.parse(readFileSync(join(WORKSPACE, 'kb', 'deliverables-index.json'), 'utf8'))
+    const entry = Array.isArray(catalog?.entries) ? catalog.entries[0] : undefined
+    if (typeof entry?.path !== 'string' || entry.path === '') throw new Error('成品目录为空，无法验打开原文')
+    const id = `guiprobe-${STAMP}-ctxopen`
+    contextOpenId = id
+    const contexts = { v: 1, items: [{
+      kind: 'deliverable', ref: entry.path, title: String(entry.slug ?? '成品'),
+      subtitle: String(entry.result ?? ''), excerpt: '探针背景（打开原文链路证据）。', truncated: false,
+    }] }
+    seedRecord(id, {
+      kind: 'correction', targetRole: hostRole, expectation: `${OWN_EXPECTATION}（背景打开）`,
+      body: '做法：背景卡的「打开原文」应打开右栏文件，不出现死按钮。', contexts,
+    })
+    const row = page.getByRole('listitem', { name: `待处理 ${id}` })
+    const deadline = Date.now() + 40_000
+    while (Date.now() < deadline && await row.count() === 0) {
+      seedRecord(id, {
+        kind: 'correction', targetRole: hostRole, expectation: `${OWN_EXPECTATION}（背景打开）`,
+        body: '做法：背景卡的「打开原文」应打开右栏文件，不出现死按钮。', contexts,
+      })
+      await sleep(4000)
+    }
+    if (await row.count() === 0) throw new Error('带背景的待办没进面板')
+    const card = row.locator('.wk-cultivation-context-card').first()
+    await card.waitFor({ timeout: 10_000 })
+    if (await card.getByRole('button', { name: '打开原文', exact: true }).count() !== 1) {
+      throw new Error('背景卡没有「打开原文」按钮')
+    }
+    await card.getByRole('button', { name: '打开原文', exact: true }).click()
+    // 打开成功 = 右栏从培养面板切到文件视图（不是靠行内文案断言——导航把行带走了）。
+    await page.waitForFunction(
+      () => document.querySelectorAll('.wk-cultivation-compose').length === 0,
+      null,
+      { timeout: 15_000 },
+    )
+    await page.getByText('final.md', { exact: true }).first().waitFor({ timeout: 15_000 })
+  })
+
   await check('⑦ 截图（视觉夹具）', async () => {
     mkdirSync(OUT_DIR, { recursive: true })
     await page.screenshot({ path: join(OUT_DIR, 'cultivation-gui.png'), fullPage: false })
@@ -452,6 +494,7 @@ if (foreignId !== null) rmSync(join(RECORDS_DIR, `${foreignId}.md`), { force: tr
 if (createdRecordId !== null) rmSync(join(RECORDS_DIR, `${createdRecordId}.md`), { force: true })
 if (contextRecordId !== null) rmSync(join(RECORDS_DIR, `${contextRecordId}.md`), { force: true })
 if (sessionContextRecordId !== null) rmSync(join(RECORDS_DIR, `${sessionContextRecordId}.md`), { force: true })
+if (contextOpenId !== null) rmSync(join(RECORDS_DIR, `${contextOpenId}.md`), { force: true })
 
 if (existsSync(RECORDS_DIR)) {
   for (const name of readdirSync(RECORDS_DIR)) {
