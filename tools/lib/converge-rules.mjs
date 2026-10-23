@@ -248,6 +248,31 @@ export function assess(state, flags = {}) {
 }
 
 /**
+ * 收敛动作序列（数据，不是 IO）——`--dry-run` 的清单与执行器消费**同一份**（2026-10-23 第二刀）。
+ *
+ * 为什么：此前计划清单是 `converge()` 里手写的 actions 数组，执行是另一段顺序代码；
+ * 改一处必漂（与上面 assess 收判据同因）。steps 只描述「有序的做什么」，副作用仍在驱动层。
+ *
+ * 每步 `{ kind, label?, ... }`：`label` 存在 = 会打印进 dry-run 清单；`rewrite-refs` 静默
+ * （历史行为：CHARTER/notes 的路径重指不进取景清单），但执行器仍按序消费它。
+ * @param {{ dirName: string, evName: string, conclusion: string, journal: Array<{role: string, file: string}> }} state
+ * @returns {Array<{kind: string, label?: string, [k: string]: unknown}>}
+ */
+export function steps(state) {
+  const journal = state.journal ?? []
+  const move = archiveMovePlan(state.dirName)
+  return [
+    { kind: 'evidence-copy', label: `证据副本 → snapshots/archive/${state.evName}/${state.dirName}/（journal ×${journal.length} 留底；交付物本体 git mv 进归档家，不双份拷贝）` },
+    { kind: 'rewrite-refs', dirName: state.dirName, evName: state.evName, journal },
+    { kind: 'archive-move', label: `git mv deliverables/${state.dirName} → deliverables-archive/${state.dirName}`, ...move },
+    ...journal.map(entry => ({ kind: 'clear-journal', label: `git rm kb/${entry.role}/journal/${entry.file}（副本已入证据目录）`, entry })),
+    { kind: 'ledger-append', label: `台账追加一行（逐字取 meta：${state.conclusion.slice(0, 40)}…）` },
+    { kind: 'rebuild-index', label: '成品索引重建（node tools/deliverables-index.mjs）' },
+    { kind: 'backfill-hint', label: `CHARTER 历史纪要补登：node tools/converge.mjs --charter-backfill ${state.dirName}（结论逐字取 meta）` },
+  ]
+}
+
+/**
  * 归档搬移后的 `git add` 参数（2026-10-20 现场：新建交付物的 final/meta 尚未 tracked，
  * 搬走后 `git add -A -- <旧路径> <新路径>` 因旧路径无任何 tracked 项而 fatal，收敛半途崩）。
  * 旧路径有 tracked 文件 ⇒ 用原计划（同时 stage 删除+新增）；没有 ⇒ 只 stage 归档家。

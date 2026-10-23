@@ -21,7 +21,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, renameSync, rmSync } from 'node:fs'
 import { join, basename } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { assess, archiveGitArgs, archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalSlug, parseFlags, resolveEvidenceDir } from './lib/converge-rules.mjs'
+import { assess, archiveGitArgs, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalSlug, parseFlags, resolveEvidenceDir, steps } from './lib/converge-rules.mjs'
 import { COMPANY_ROLE_IDS } from './lib/company-roles.mjs'
 import { spawnSync } from 'node:child_process'
 
@@ -218,53 +218,13 @@ const resume = (dirName) => {
   console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/converge.mjs --charter-backfill ${dirName}`)
 }
 
-const converge = (dirName) => {
-  const slugDir = join(ACTIVE, dirName)
-  if (!existsSync(join(slugDir, 'meta.md'))) { console.error(`✗ ${dirName}: deliverables/ 下无此目录或缺 meta.md`); process.exit(1) }
-  const archived = existsSync(join(ARCHIVE, dirName))
-  const closed = metaField(slugDir, 'closed')
-  const concl = metaField(slugDir, '一句话结论')
-  const hasFinal = existsSync(join(slugDir, 'final.md'))
-  const slugOf = metaField(slugDir, 'slug') || dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '')
-  const journal = harvestJournal(slugOf)
-  // 惰性：无 final 不调审计（audit 起子进程且 fail-closed）
-  const findings = hasFinal ? checkSlugFindings(slugOf) : undefined
-  // 判据单源 = assess（同一函数供 plan 档；此处只负责采集 state、打印与执行——2026-10-23）
-  const readiness = assess({ slug: slugOf, closed, conclusion: concl, hasFinal, archived, journals: journal, findings }, FLAGS)
-  const blocking = readiness.blocking[0]
-  if (blocking) {
-    console.error(`✗ ${dirName}: 不可收敛——${blocking.message}`)
-    if (blocking.code === 'closed-missing' || blocking.code === 'no-final' || blocking.code === 'conclusion-missing') {
-      console.error(`  现场：final=${hasFinal} closed=${closed || '（空）'} 结论=${concl ? '有' : '无'}——收敛只收已闭合动议`)
-    }
-    process.exit(1)
-  }
-  if (readiness.accepted.includes('no-journal')) console.error(`⚠ ${dirName}: 零 journal，--allow-no-journal 显式放行（缺口照记：收敛后 live 不再有留痕）`)
-  if (readiness.accepted.includes('open-findings')) console.error(`⚠ ${dirName}: 有未结审计发现，--allow-open-findings 显式放行——${findings.detail}`)
-  // ⚠ 字段必须在任何搬移前捕获——git mv 之后 meta.md 就不在原位了（2026-10-12 实测 crash 教训）
-  const fields = {
-    slug: slugOf,
-    kickoff: metaField(slugDir, 'kickoff') || dirName.slice(0, 10),
-    类型: metaField(slugDir, '类型'), 参与: metaField(slugDir, '参与'), 墙钟: metaField(slugDir, '墙钟'), 结论: concl,
-  }
-  // 零 journal / 未结审计发现两道前置已并入 assess（本函数 prologue），此处不再重复判。
-  const evName = `convergence-${today}` // 证据目录 = 创建日（本函数创建；backfill 补登走 resolveEvidenceDir——BUG-015）
-  const evDir = join(ROOT, 'snapshots', 'archive', evName, dirName)
-  const actions = [
-    `证据副本 → snapshots/archive/${evName}/${dirName}/（journal ×${journal.length} 留底；交付物本体 git mv 进归档家，不双份拷贝）`,
-    `git mv deliverables/${dirName} → deliverables-archive/${dirName}`,
-    ...journal.map(j => `git rm kb/${j.role}/journal/${j.file}（副本已入证据目录）`),
-    `台账追加一行（逐字取 meta：${fields.结论.slice(0, 40)}…）`,
-    `成品索引重建（node tools/deliverables-index.mjs）`,
-    `CHARTER 历史纪要补登：node tools/converge.mjs --charter-backfill ${dirName}（结论逐字取 meta）`,
-  ]
-  console.log(`收敛计划 · ${dirName}${DRY ? '（dry-run）' : ''}`)
-  actions.forEach(a => console.log('  · ' + a))
-  if (DRY) { console.log('dry-run 结束，未动盘'); return }
-  copyEvidence(evDir, journal)
-  // ⚠ CHARTER 引用重指：CHARTER 里若有指向被清 journal 的反引号路径，清出即断链
-  //   （foundation-safety 钉「CHARTER 的 kb/ 路径必须存在」）。指向一律改写为证据副本路径，
-  //   并逐条打印供人复核（决定内容应已 inline 在 CHARTER 句里，此处只动指针）。
+/**
+ * CHARTER / notes 里的 journal 与交付物路径重指（保持路径 currency；D38）。
+ * ⚠ CHARTER 引用重指：CHARTER 里若有指向被清 journal 的反引号路径，清出即断链
+ *   （foundation-safety 钉「CHARTER 的 kb/ 路径必须存在」）。指向一律改写为证据副本路径，
+ *   并逐条打印供人复核（决定内容应已 inline 在 CHARTER 句里，此处只动指针）。
+ */
+const rewriteRefs = ({ dirName, evName, journal }) => {
   const refRewrites = []
   for (const role of ROLES) {
     const charter = join(WS, 'kb', role, 'CHARTER.md')
@@ -307,17 +267,73 @@ const converge = (dirName) => {
     if (touched) writeFileSync(nf, nt)
   }
   for (const r of refRewrites) console.log('  · 引用重指：' + r)
-  // 归档搬移（2026-10-13 起）：`git mv` → **fs rename + git add -A**。原因见 archiveMovePlan 注释
-  // （drafts 不再 tracked，`git mv` 遇未跟踪文件 fatal）；计划住 lib 纯逻辑缝，spec 在临时仓真跑过。
-  const move = archiveMovePlan(dirName)
-  // 新建交付物的 final/meta 可能尚未 tracked：旧路径无 tracked 项时 `git add -A -- from to`
-  // 会 fatal（2026-10-20 token-account-pool 真现场，收敛半途崩）。按 tracked 与否选参数。
-  const fromTracked = (spawnSync('git', ['ls-files', '--', move.from], { cwd: ROOT, encoding: 'utf8' }).stdout ?? '').trim() !== ''
-  renameSync(join(ROOT, move.from), join(ROOT, move.to))
-  git(archiveGitArgs(move, fromTracked))
-  const removed = clearLiveJournal(journal)
-  const row = appendLedger(fields)
-  rebuildCatalogIndex()
+}
+
+/**
+ * 执行一个收敛步骤（副作用唯一入口）。步骤来自 `converge-rules.steps`，
+ * 所以 dry-run 清单与真实执行消费的是同一份序列——顺序漂移不可能发生。
+ */
+const executeStep = (step, ctx) => {
+  switch (step.kind) {
+    case 'evidence-copy': copyEvidence(ctx.evDir, ctx.journal); break
+    case 'rewrite-refs': rewriteRefs(ctx); break
+    case 'archive-move': {
+      // 归档搬移（2026-10-13 起）：`git mv` → **fs rename + git add -A**。原因见 archiveMovePlan 注释
+      // （drafts 不再 tracked，`git mv` 遇未跟踪文件 fatal）。
+      // 新建交付物的 final/meta 可能尚未 tracked：旧路径无 tracked 项时 `git add -A -- from to`
+      // 会 fatal（2026-10-20 token-account-pool 真现场，收敛半途崩）。按 tracked 与否选参数。
+      const fromTracked = (spawnSync('git', ['ls-files', '--', step.from], { cwd: ROOT, encoding: 'utf8' }).stdout ?? '').trim() !== ''
+      renameSync(join(ROOT, step.from), join(ROOT, step.to))
+      git(archiveGitArgs(step, fromTracked))
+      break
+    }
+    case 'clear-journal': clearLiveJournal([step.entry]); break
+    case 'ledger-append': appendLedger(ctx.fields); break
+    case 'rebuild-index': rebuildCatalogIndex(); break
+    case 'backfill-hint': break // 指引已在计划清单里，执行层无动作
+    default: throw new Error(`未知收敛步骤：${step.kind}`)
+  }
+}
+
+const converge = (dirName) => {
+  const slugDir = join(ACTIVE, dirName)
+  if (!existsSync(join(slugDir, 'meta.md'))) { console.error(`✗ ${dirName}: deliverables/ 下无此目录或缺 meta.md`); process.exit(1) }
+  const archived = existsSync(join(ARCHIVE, dirName))
+  const closed = metaField(slugDir, 'closed')
+  const concl = metaField(slugDir, '一句话结论')
+  const hasFinal = existsSync(join(slugDir, 'final.md'))
+  const slugOf = metaField(slugDir, 'slug') || dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '')
+  const journal = harvestJournal(slugOf)
+  // 惰性：无 final 不调审计（audit 起子进程且 fail-closed）
+  const findings = hasFinal ? checkSlugFindings(slugOf) : undefined
+  // 判据单源 = assess（同一函数供 plan 档；此处只负责采集 state、打印与执行——2026-10-23）
+  const readiness = assess({ slug: slugOf, closed, conclusion: concl, hasFinal, archived, journals: journal, findings }, FLAGS)
+  const blocking = readiness.blocking[0]
+  if (blocking) {
+    console.error(`✗ ${dirName}: 不可收敛——${blocking.message}`)
+    if (blocking.code === 'closed-missing' || blocking.code === 'no-final' || blocking.code === 'conclusion-missing') {
+      console.error(`  现场：final=${hasFinal} closed=${closed || '（空）'} 结论=${concl ? '有' : '无'}——收敛只收已闭合动议`)
+    }
+    process.exit(1)
+  }
+  if (readiness.accepted.includes('no-journal')) console.error(`⚠ ${dirName}: 零 journal，--allow-no-journal 显式放行（缺口照记：收敛后 live 不再有留痕）`)
+  if (readiness.accepted.includes('open-findings')) console.error(`⚠ ${dirName}: 有未结审计发现，--allow-open-findings 显式放行——${findings.detail}`)
+  // ⚠ 字段必须在任何搬移前捕获——git mv 之后 meta.md 就不在原位了（2026-10-12 实测 crash 教训）
+  const fields = {
+    slug: slugOf,
+    kickoff: metaField(slugDir, 'kickoff') || dirName.slice(0, 10),
+    类型: metaField(slugDir, '类型'), 参与: metaField(slugDir, '参与'), 墙钟: metaField(slugDir, '墙钟'), 结论: concl,
+  }
+  // 零 journal / 未结审计发现两道前置已并入 assess（本函数 prologue），此处不再重复判。
+  const evName = `convergence-${today}` // 证据目录 = 创建日（本函数创建；backfill 补登走 resolveEvidenceDir——BUG-015）
+  const evDir = join(ROOT, 'snapshots', 'archive', evName, dirName)
+  // 计划清单与执行动作同源（converge-rules.steps）：dry-run 打印的就是执行器要逐条消费的序列。
+  const plan = steps({ dirName, evName, conclusion: fields.结论, journal })
+  console.log(`收敛计划 · ${dirName}${DRY ? '（dry-run）' : ''}`)
+  for (const step of plan) if (step.label) console.log('  · ' + step.label)
+  if (DRY) { console.log('dry-run 结束，未动盘'); return }
+  const ctx = { dirName, evName, journal, fields, evDir }
+  for (const step of plan) executeStep(step, ctx)
   console.log(`✓ 收敛完成：交付物已入归档家、${journal.length} 篇 journal 清入证据副本、台账行已追加`)
   console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/converge.mjs --charter-backfill ${dirName}（教训性文字仍由人把守——纪要素材逐字取 meta）`)
 }

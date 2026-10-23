@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { assess, archiveGitArgs, archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, pickArchivedJournal, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
+import { assess, archiveGitArgs, archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, pickArchivedJournal, resolveEvidenceDir, steps } from '../../tools/lib/converge-rules.mjs'
 const TMP: string[] = []
 afterAll(() => { for (const d of TMP) rmSync(d, { recursive: true, force: true }) })
 
@@ -323,5 +323,58 @@ describe('converge-rules · 可收敛判据 assess（判据单源；2026-10-23�
   it('无 final 时不要求审计结果（惰性：findings 可缺席，不触碰审计）', () => {
     const r = assess({ ...base(), hasFinal: false, findings: undefined }, {})
     expect(codes(r)).toEqual(['no-final'])
+  })
+})
+
+// 2026-10-23（架构评审候选 1 第二刀）：收敛动作此前是「计划打印一套、执行另一套」——
+// dry-run 的 actions 数组与执行代码各写一份顺序，改一处必漂。steps() 把它变成数据：
+// 同一份序列既渲染 dry-run 清单，也被执行器逐条消费。
+// 红形态（实现前）：`steps is not a function`。
+describe('converge-rules · 收敛动作序列 steps（计划与执行同源；2026-10-23）', () => {
+  const state = () => ({
+    dirName: '2026-10-20-demo',
+    evName: 'convergence-2026-10-23',
+    conclusion: '做完了这件事',
+    journal: [{ role: 'ceo', file: '2026-10-20-demo.md' }],
+  })
+  const kinds = (s: ReturnType<typeof state>) => steps(s).map(step => step.kind)
+
+  it('固定序：证据 → 引用重指（静默）→ 搬移 → 清 journal → 台账 → 索引 → backfill 指引', () => {
+    expect(kinds(state())).toEqual([
+      'evidence-copy', 'rewrite-refs', 'archive-move', 'clear-journal',
+      'ledger-append', 'rebuild-index', 'backfill-hint',
+    ])
+  })
+
+  it('零 journal ⇒ 无 clear-journal 步；多篇 ⇒ 每篇一步', () => {
+    expect(kinds({ ...state(), journal: [] })).not.toContain('clear-journal')
+    expect(steps({ ...state(), journal: [
+      { role: 'ceo', file: 'a.md' }, { role: 'cfo', file: 'b.md' },
+    ] }).filter(step => step.kind === 'clear-journal')).toHaveLength(2)
+  })
+
+  it('dry-run 标签就是执行序列：只有 rewrite-refs 无 label（它不在计划清单里）', () => {
+    const plan = steps(state())
+    expect(plan.find(step => step.kind === 'rewrite-refs')?.label).toBeUndefined()
+    expect(plan.filter(step => step.label).map(step => step.label)).toEqual([
+      '证据副本 → snapshots/archive/convergence-2026-10-23/2026-10-20-demo/（journal ×1 留底；交付物本体 git mv 进归档家，不双份拷贝）',
+      'git mv deliverables/2026-10-20-demo → deliverables-archive/2026-10-20-demo',
+      'git rm kb/ceo/journal/2026-10-20-demo.md（副本已入证据目录）',
+      '台账追加一行（逐字取 meta：做完了这件事…）',
+      '成品索引重建（node tools/deliverables-index.mjs）',
+      'CHARTER 历史纪要补登：node tools/converge.mjs --charter-backfill 2026-10-20-demo（结论逐字取 meta）',
+    ])
+  })
+
+  it('搬移步带执行器要用的 from/to/gitArgs（与 archiveMovePlan 同源）', () => {
+    const move = steps(state()).find(step => step.kind === 'archive-move')!
+    const plan = archiveMovePlan('2026-10-20-demo')
+    expect(move.from).toBe(plan.from)
+    expect(move.to).toBe(plan.to)
+    expect(move.gitArgs).toEqual(plan.gitArgs)
+  })
+
+  it('backfill 指引末尾带可照抄的目录名', () => {
+    expect(steps(state()).at(-1)?.label).toContain('--charter-backfill 2026-10-20-demo')
   })
 })
