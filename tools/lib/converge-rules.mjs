@@ -178,9 +178,9 @@ export function resolveEvidenceDir(archiveRoot, dirName) {
  * @param dirName - deliverables/ 下的目录名（`<日期>-<slug>`）。
  * @returns 相对仓库根的 from/to + git 参数（执行留在驱动脚本；spec 在临时 git 仓里真跑同一份计划）。
  */
-export function archiveMovePlan(dirName) {
-  const from = join('company-workspace', 'deliverables', dirName).split(sep).join('/')
-  const to = join('company-workspace', 'deliverables-archive', dirName).split(sep).join('/')
+export function archiveMovePlan(dirName, wsRel = 'company-workspace') {
+  const from = join(wsRel, 'deliverables', dirName).split(sep).join('/')
+  const to = join(wsRel, 'deliverables-archive', dirName).split(sep).join('/')
   return { from, to, gitArgs: ['add', '-A', '--', from, to] }
 }
 
@@ -260,7 +260,7 @@ export function assess(state, flags = {}) {
  */
 export function steps(state) {
   const journal = state.journal ?? []
-  const move = archiveMovePlan(state.dirName)
+  const move = archiveMovePlan(state.dirName, state.wsRel)
   return [
     { kind: 'evidence-copy', label: `证据副本 → snapshots/archive/${state.evName}/${state.dirName}/（journal ×${journal.length} 留底；交付物本体 git mv 进归档家，不双份拷贝）` },
     { kind: 'rewrite-refs', dirName: state.dirName, evName: state.evName, journal },

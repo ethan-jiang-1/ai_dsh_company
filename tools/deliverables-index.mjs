@@ -14,7 +14,9 @@ import { parseAuditVerdict } from './lib/audit-verdict.mjs'
 import { parseMeta, slugFromDirName } from './lib/deliverables.mjs'
 import { buildDeliverablesCatalog, CATALOG_ROOTS } from './lib/deliverables-catalog.mjs'
 
-const WORKSPACE = join(ROOT, 'company-workspace')
+// 测试缝（2026-10-23）：converge 的端到端探针把工作区重定向到 runtime/ 下的临时目录。
+// 默认值不变；只有显式设了 DELIVERABLES_WS_REL 才重定向（converge 会把它传给本生成器）。
+const WORKSPACE = join(ROOT, process.env.DELIVERABLES_WS_REL ?? 'company-workspace')
 const OUT = join(WORKSPACE, 'kb', 'deliverables-index.json')
 
 /**

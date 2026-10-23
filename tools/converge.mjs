@@ -34,7 +34,10 @@ try {
   const flags = parseFlags(args)
   DRY = flags.dryRun; SLUG_ARG = flags.slug; BACKFILL_ARG = flags.charterBackfill; RESUME_ARG = flags.resume; FLAGS = flags
 } catch (e) { console.error(`✗ ${e.message}`); process.exit(1) }
-const WS = join(ROOT, 'company-workspace')
+// 测试缝（2026-10-23）：探针在 runtime/ 下的临时工作区真跑同一套步骤，不碰 live 公司盘。
+// 默认值不变，CLI 行为不变；只有显式设了 CONVERGE_WS_REL 才重定向。
+const WS_REL = process.env.CONVERGE_WS_REL ?? 'company-workspace'
+const WS = join(ROOT, WS_REL)
 const ACTIVE = join(WS, 'deliverables')
 const ARCHIVE = join(WS, 'deliverables-archive')
 const LEDGER = join(WS, 'kb', 'motion-ledger.md')
@@ -138,7 +141,7 @@ const harvestJournal = (slug) => {
 const clearLiveJournal = journal => {
   const removed = []
   for (const j of journal) {
-    const p = join('company-workspace', j.path)
+    const p = join(WS_REL, j.path)
     const tracked = spawnSync('git', ['ls-files', '--error-unmatch', '--', p], { cwd: ROOT, encoding: 'utf8' }).status === 0
     if (tracked) git(['rm', '-q', p])
     else rmSync(join(ROOT, p), { force: true })
@@ -252,16 +255,16 @@ const rewriteRefs = ({ dirName, evName, journal }) => {
     let nt = readFileSync(nf, 'utf8')
     let touched = false
     for (const j of journal) {
-      const ref = `company-workspace/kb/${j.role}/journal/${j.file}`
+      const ref = `${WS_REL}/kb/${j.role}/journal/${j.file}`
       if (nt.includes(ref)) {
         nt = nt.split(ref).join(`snapshots/archive/${evName}/${dirName}/journal/${j.role}/${j.file}`)
         touched = true
         refRewrites.push(`notes/implemented/${n}：journal 路径 → 证据副本`)
       }
     }
-    for (const dref of [`company-workspace/deliverables/${dirName}/`]) {
+    for (const dref of [`${WS_REL}/deliverables/${dirName}/`]) {
       if (nt.includes(dref)) {
-        nt = nt.split(dref).join(`company-workspace/deliverables-archive/${dirName}/`)
+        nt = nt.split(dref).join(`${WS_REL}/deliverables-archive/${dirName}/`)
         touched = true
         refRewrites.push(`notes/implemented/${n}：交付物路径 → 归档家`)
       }
@@ -330,7 +333,7 @@ const converge = (dirName) => {
   const evName = `convergence-${today}` // 证据目录 = 创建日（本函数创建；backfill 补登走 resolveEvidenceDir——BUG-015）
   const evDir = join(ROOT, 'snapshots', 'archive', evName, dirName)
   // 计划清单与执行动作同源（converge-rules.steps）：dry-run 打印的就是执行器要逐条消费的序列。
-  const plan = steps({ dirName, evName, conclusion: fields.结论, journal })
+  const plan = steps({ dirName, evName, conclusion: fields.结论, journal, wsRel: WS_REL })
   console.log(`收敛计划 · ${dirName}${DRY ? '（dry-run）' : ''}`)
   for (const step of plan) if (step.label) console.log('  · ' + step.label)
   if (DRY) { console.log('dry-run 结束，未动盘'); return }

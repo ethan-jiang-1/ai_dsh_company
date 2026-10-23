@@ -114,6 +114,7 @@
 | [taskboard-presence-probe.mjs](../probes/fs-taskboard/taskboard-presence-probe.mjs) | 任务认领、加工中状态与在场板所需团队事件 |
 | [motion-taskboard-probe.mjs](../probes/fs-taskboard/motion-taskboard-probe.mjs) | 无额外流程提示的真实动议中，模型是否执行手册任务板协作 |
 | [taskboard-scope-probe.mjs](../probes/fs-taskboard/taskboard-scope-probe.mjs) | 任务板跨门共享性（multi-human §0 机制事实表 / 手册动议任务板行改动时） |
+| [converge-e2e-probe.mjs](../probes/fs-taskboard/converge-e2e-probe.mjs) | 临时工作区真跑收敛六步：证据副本 / 归档搬移 / 清 journal / 台账 / 索引重建 |
 | [task-discovery-probe.mjs](../probes/fs-taskboard/task-discovery-probe.mjs) | 机器可读派活行的任务发现率（真模型 ≈$0.05–0.1，排练场） |
 | [review-staleness-probe.mjs](../probes/fs-taskboard/review-staleness-probe.mjs) | 互审稿版本穿透（手册互审稿命名 / 稿首署名行改动时） |
 | [observed-write-conflict-probe.mjs](../probes/fs-taskboard/observed-write-conflict-probe.mjs) | 同 fs-local 实例同版本竞写与败者重读合并；升 pin 后复验 |

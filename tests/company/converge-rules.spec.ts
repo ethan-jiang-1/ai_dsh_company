@@ -374,6 +374,15 @@ describe('converge-rules · 收敛动作序列 steps（计划与执行同源；2
     expect(move.gitArgs).toEqual(plan.gitArgs)
   })
 
+  it('自定义工作区根（CONVERGE_WS_REL 测试缝）：搬移计划跟着走', () => {
+    const plan = archiveMovePlan('2026-10-20-demo', 'runtime/probe-ws')
+    expect(plan.from).toBe('runtime/probe-ws/deliverables/2026-10-20-demo')
+    expect(plan.to).toBe('runtime/probe-ws/deliverables-archive/2026-10-20-demo')
+    const move = steps({ ...state(), wsRel: 'runtime/probe-ws' }).find(step => step.kind === 'archive-move')!
+    expect(move.from).toBe(plan.from)
+    expect(move.to).toBe(plan.to)
+  })
+
   it('backfill 指引末尾带可照抄的目录名', () => {
     expect(steps(state()).at(-1)?.label).toContain('--charter-backfill 2026-10-20-demo')
   })
