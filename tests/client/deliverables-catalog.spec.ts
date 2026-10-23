@@ -110,7 +110,7 @@ describe('DeliverablesView（静态渲染）', () => {
 })
 
 describe('generator → parser 契约', () => {
-  it('工具生成的真实形状可被页签 parser 解析（含 counts 与条目字段）', () => {
+  it('工具生成的真实形状可被页签 parser 解析（条目字段；counts 由视图现算、不解析）', () => {
     const built = buildDeliverablesCatalog({
       entries: [{
         root: 'deliverables',
@@ -123,7 +123,6 @@ describe('generator → parser 契约', () => {
       generatedAt: '2026-10-20T00:00:00.000Z',
     })
     const parsed = parseCatalog(JSON.stringify(built))
-    expect(parsed?.counts).toEqual(built.counts)
     expect(parsed?.entries).toEqual([{
       slug: 'contract', kickoff: '2026-10-20', type: '决策', result: '已采纳', summary: '一句结论',
       root: 'deliverables', dir: '2026-10-20-contract', path: 'deliverables/2026-10-20-contract/final.md',

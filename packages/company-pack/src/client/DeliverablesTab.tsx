@@ -36,11 +36,10 @@ export interface DeliverablesCatalogEntry {
   readonly presented: boolean | null
 }
 
-/** 生成索引的完整形状。 */
+/** 解析后的目录形状（counts 不解析：视图从 entries 现算，避免第二份计数）。 */
 export interface DeliverablesCatalog {
   readonly schema: 1
   readonly generatedAt: string
-  readonly counts: { readonly total: number; readonly active: number; readonly archive: number; readonly unledgered: number; readonly presented: number; readonly notPresented: number; readonly presentUnknown: number }
   readonly entries: readonly DeliverablesCatalogEntry[]
 }
 
@@ -66,13 +65,20 @@ const FILTERS: readonly { readonly key: Filter; readonly label: string }[] = [
   { key: 'unpresented', label: '未 present' },
 ]
 
+/** 结果词表（唯一家 = tools/lib/deliverables.mjs 的 META_RESULTS）→ Tag 色调。新增值必须在这里点名。 */
+const RESULT_TONES: Readonly<Record<string, 'success' | 'info' | 'warning' | 'danger'>> = {
+  已完成: 'success',
+  已采纳: 'success',
+  进行中: 'info',
+  判不了: 'warning',
+  已搁置: 'warning',
+  已否决: 'danger',
+  已废弃: 'danger',
+}
+
 /** 结果 → Tag 色调（未知值给 outline，不猜）。 */
-function resultTone(result: string): 'success' | 'info' | 'warning' | 'danger' | 'outline' {
-  if (result === '已完成' || result === '已采纳') return 'success'
-  if (result === '进行中') return 'info'
-  if (result === '判不了' || result === '已搁置') return 'warning'
-  if (result === '已否决' || result === '已废弃') return 'danger'
-  return 'outline'
+export function resultTone(result: string): 'success' | 'info' | 'warning' | 'danger' | 'outline' {
+  return RESULT_TONES[result] ?? 'outline'
 }
 
 /** 生成时间 → 稳定、可读的 UTC 文案（不依赖浏览器时区，跨机器一致）。 */
@@ -114,20 +120,9 @@ export function parseCatalog(text: string): DeliverablesCatalog | null {
       presented: row.presented === true ? true : row.presented === false ? false : null,
     })
   }
-  const counts = value.counts !== null && typeof value.counts === 'object' ? value.counts as Record<string, unknown> : {}
-  const number = (key: string): number => (typeof counts[key] === 'number' ? counts[key] as number : 0)
   return {
     schema: 1,
     generatedAt: typeof value.generatedAt === 'string' ? value.generatedAt : '',
-    counts: {
-      total: number('total'),
-      active: number('active'),
-      archive: number('archive'),
-      unledgered: number('unledgered'),
-      presented: number('presented'),
-      notPresented: number('notPresented'),
-      presentUnknown: number('presentUnknown'),
-    },
     entries,
   }
 }

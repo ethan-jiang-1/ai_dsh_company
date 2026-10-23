@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "generatedAt": "2026-10-23T00:00:00.000Z",
+  "counts": {
+    "total": 8,
+    "active": 7,
+    "archive": 1,
+    "unledgered": 5,
+    "presented": 2,
+    "notPresented": 2,
+    "presentUnknown": 4
+  },
+  "entries": [
+    {
+      "slug": "theta",
+      "kickoff": "2026-10-07",
+      "type": "",
+      "result": "未知值",
+      "summary": "",
+      "root": "deliverables",
+      "dir": "2026-10-07-theta",
+      "path": "deliverables/2026-10-07-theta/final.md",
+      "ledgered": false,
+      "presented": null
+    },
+    {
+      "slug": "eta",
+      "kickoff": "2026-10-06",
+      "type": "",
+      "result": "已采纳",
+      "summary": "",
+      "root": "deliverables",
+      "dir": "2026-10-06-eta",
+      "path": "deliverables/2026-10-06-eta/final.md",
+      "ledgered": true,
+      "presented": true
+    },
+    {
+      "slug": "zeta",
+      "kickoff": "2026-10-05",
+      "type": "",
+      "result": "判不了",
+      "summary": "",
+      "root": "deliverables",
+      "dir": "2026-10-05-zeta",
+      "path": "deliverables/2026-10-05-zeta/final.md",
+      "ledgered": false,
+      "presented": null
+    },
+    {
+      "slug": "epsilon",
+      "kickoff": "2026-10-04",
+      "type": "",
+      "result": "已废弃",
+      "summary": "",
+      "root": "deliverables",
+      "dir": "2026-10-04-epsilon",
+      "path": "deliverables/2026-10-04-epsilon/final.md",
+      "ledgered": false,
+      "presented": false
+    },
+    {
+      "slug": "delta",
+      "kickoff": "2026-10-03",
+      "type": "",
+      "result": "已搁置",
+      "summary": "",
+      "root": "deliverables",
+      "dir": "2026-10-03-delta",
+      "path": "deliverables/2026-10-03-delta/final.md",
+      "ledgered": false,
+      "presented": null
+    },
+    {
+      "slug": "beta",
+      "kickoff": "2026-10-02",
+      "type": "诊断",
+      "result": "进行中",
+      "summary": "乙",
+      "root": "deliverables",
+      "dir": "2026-10-02-beta",
+      "path": "deliverables/2026-10-02-beta/final.md",
+      "ledgered": false,
+      "presented": false
+    },
+    {
+      "slug": "alpha",
+      "kickoff": "2026-10-01",
+      "type": "决策",
+      "result": "已完成",
+      "summary": "甲",
+      "root": "deliverables",
+      "dir": "2026-10-01-alpha",
+      "path": "deliverables/2026-10-01-alpha/final.md",
+      "ledgered": true,
+      "presented": true
+    },
+    {
+      "slug": "gamma",
+      "kickoff": "2026-09-30",
+      "type": "",
+      "result": "已否决",
+      "summary": "",
+      "root": "deliverables-archive",
+      "dir": "2026-09-30-gamma",
+      "path": "deliverables-archive/2026-09-30-gamma/final.md",
+      "ledgered": true,
+      "presented": null
+    }
+  ]
+}
