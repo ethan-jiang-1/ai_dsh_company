@@ -49,7 +49,7 @@ node --import tsx/esm probes/fs-taskboard/observed-write-conflict-probe.mjs
 | 同version，A先 | A成功，B真实stale；仅1次staging | 竞写后`base\nA\n`；合并后`base\nA\nB\n` | PASS |
 | 同version，B先 | B成功，A真实stale；仅1次staging | 竞写后`base\nB\n`；合并后`base\nB\nA\n` | PASS |
 
-原始JSON/在盘文件保留在仓内gitignored运行区：[反例现场](../../../../runtime/harness-home/write-conflict-evidence/run-sJkV3S/evidence.json)、[正常现场](../../../../runtime/harness-home/write-conflict-evidence/run-GHUEKa/evidence.json)。前序built现场run-SXv6Gu/run-PzA4Qf/run-XJUsZo仅辅助对照。运行预算30秒、两种固定提交顺序、无sleep、无模型调用。JSON含双方独立version/text、两写结果、staging次数、胜者在盘载荷、败者新版本及合并终态；不会只以最终文件猜竞争。
+原始JSON/在盘文件曾保留在仓内 gitignored 运行区（`runtime/harness-home/write-conflict-evidence/run-sJkV3S/`、`run-GHUEKa/`；本地副本已于 2026-10-23 按「超过一周的生成物清理」删除，重跑探针可再生）。前序built现场run-SXv6Gu/run-PzA4Qf/run-XJUsZo仅辅助对照。运行预算30秒、两种固定提交顺序、无sleep、无模型调用。JSON含双方独立version/text、两写结果、staging次数、胜者在盘载荷、败者新版本及合并终态；不会只以最终文件猜竞争。
 
 结论：所选本地文件系统上，同实例的真实版本守卫在受控交错下拒绝第二次旧版本写。取消version条件仍由provider串行发布，却静默覆盖，说明串行发布本身不保留业务更新。败者正确合并由实验调用者实现，不能推断模型也会做对。不会用此机制绿关闭BUG-007的模型入口C1b缺口，也没有把FS_NOT_OBSERVED升级成同版本竞争证明。
 

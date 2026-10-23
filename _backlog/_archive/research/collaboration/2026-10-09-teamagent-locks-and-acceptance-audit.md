@@ -18,7 +18,7 @@ intent: "复核多人协作的锁与 teamagent 保证、历史研究的落地和
 - 日期：2026-10-09（实际运行 `date +%Y-%m-%d`）；仓库 HEAD `6d9117f6844e7f2c1a2e997cafa57af73992c2ec`；vendor pin `639ed015397290b3745d163aafe02ffee4aa3f84`。vendor tracked 工作树检查无改动。
 - 按 [validation-design](../../../methods/validation-design.md)、[validation-evidence](../../../methods/validation-evidence.md)、[validation-judgment](../../../methods/validation-judgment.md) 选择行为、输入/状态、独立信号与反例；[测试宪法](../../../../docs/testing.md)禁止把模型自述当事实。
 - 独立子代理做源码研究与事件核验；父代理实跑机制/模型探针，并复读关键原始事件。主源来自钉住的源码、工具结果、任务事件、终态文件，不从归档状态继承通过。
-- 此文保留命令、样本、摘要与事件定位；原始导出位于本机 [实验目录](../../../../runtime/harness-home/collab-audit/)，gitignored，不是 fresh clone 可依赖的证据资产。无新 snapshot 类型、无模型可靠性百分比推断。
+- 此文保留命令、样本、摘要与事件定位；原始导出曾位于本机 `runtime/harness-home/collab-audit/`（已于 2026-10-23 清理），gitignored，不是 fresh clone 可依赖的证据资产。无新 snapshot 类型、无模型可靠性百分比推断。
 
 ## 1. 先分清四种保证与三个拓扑
 
