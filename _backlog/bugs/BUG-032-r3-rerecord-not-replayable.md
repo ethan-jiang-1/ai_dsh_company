@@ -41,9 +41,16 @@ node checks/smoke/replay-smoke.mjs --scenario r3-delegation
 
 ## 影响
 
-- 手册三态表 `deliverables/<slug>/` 与本文件命名规则 `<日期>-<slug>` 的漂移**无法随修**：
-  修注入源 → 门禁红 → 重录不可重放 → 只能回滚。本轮已回滚手册改动，本卡解除阻塞后才能再修。
-- 任何未来想改手册的人都会撞同一堵墙。
+- **`--record` 这条路坏了**：三次重录产物都不可重放，而 `replay-fixture-freshness` 只认 fixture 与现行手册一致。
+- 存在一条**文档化的手工旁路**（snapshot.yml 里三次用过：2026-10-11 / 10-16×2 / 10-18）：
+  `--keep` 保留现场 → 把两处注入体（手册正文 + source digest）与 sidecar 外科同步进 fixture。它无 key、能过门禁，
+  但纯手工、易错，且每次手册改动都要重做。
+- 因此本卡**不直接挡住手册改动**，挡住的是「干净重录」；修它的价值 = 让改手册回到一条命令。
+
+## 旁路实测（2026-10-23）
+
+同一轮里手册修复就是走这条旁路落地的：`--keep` → 用实际运行的 `agent-instructions` 事件替换两份 fixture 的注入体
+→ 默认 lane + `--ui` 双 ALL PASS、freshness 门禁绿。卡仍开——它修的是 `--record` 这条路，不是旁路。
 
 ## 已修判定（解除阻塞）
 

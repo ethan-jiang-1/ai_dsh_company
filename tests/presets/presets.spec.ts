@@ -251,8 +251,8 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   it('交付物三态（R4）：手册写清成品归 CEO、职能写 drafts；模板不再是占位', () => {
     const handbook = readFileSync(join(ROOT, 'company-workspace/AGENTS.md'), 'utf8')
     // 三态的字面形状必须与判据实现一致（tools/lib/deliverables.mjs 的 FINAL_BASENAME / DRAFTS_DIRNAME）
-    expect(handbook, '三态必须点明成品路径').toContain('deliverables/<slug>/final.md')
-    expect(handbook, '三态必须点明过程稿路径').toContain('deliverables/<slug>/drafts/<角色>.md')
+    expect(handbook, '三态必须点明成品路径').toContain('deliverables/<日期>-<slug>/final.md')
+    expect(handbook, '三态必须点明过程稿路径').toContain('deliverables/<日期>-<slug>/drafts/<角色>.md')
     expect(handbook, '必须写明成品只归 CEO').toMatch(/只有 CEO/)
     // 判据必须可被模型自行跑（发现权在代理一侧，D15）
     expect(handbook, '三态要指向机器判据入口').toContain('checks/audit/deliverables-check.mjs')
