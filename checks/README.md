@@ -135,6 +135,7 @@
 | 脚本 | 证明对象 / 用途 |
 |---|---|
 | [rehearsal-init.mjs](../tools/rehearsal-init.mjs) | 初始化或刷新排练参考镜像，保留已有排练产物 |
+| [prune-runtime.mjs](../tools/prune-runtime.mjs) | 清 runtime 下 >N 天生成物（默认 dry-run；tracked / README / 被 markdown 引用的不删） |
 | [snapshot-motion.mjs](../tools/snapshot-motion.mjs) | 将动议会话与实测工作区归档成场景，显式导入独立 oracle |
 | [snapshot-path.mjs](../tools/snapshot-path.mjs) | 只读查询旧快照路径对应的现行位置；规范路径也可直接核对 |
 | [session-log-export.mjs](../tools/session-log-export.mjs) | 将压缩日志导成明文 JSONL，供审计与跨 home 汇总 |

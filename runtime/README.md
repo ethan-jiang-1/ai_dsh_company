@@ -40,3 +40,15 @@
 
 一次运行的可追溯视图 = **逻辑合同（引用不复制）**：字段与引用规则唯一家 =
 [snapshots/README](../snapshots/README.md)「Run bundle 引用合同」节；live 权威 = DSH session + workspace。
+
+## 五、保留与清扫（2026-10-23 立）
+
+- **口径**：`runtime/` 下的生成物 **>7 天即清**（用户令 2026-10-23：「7 天前的数据都不需要了」）。
+  插件内容（`packages/company-pack`）与 `docs/` `tests/` `checks/` `probes/` 不在射程；
+  **tracked 文件、README、被 tracked markdown 引用的路径永不删**。
+- **工具**：[prune-runtime.mjs](../tools/prune-runtime.mjs)（默认 dry-run，`--apply` 才删；`--days` 可调）。
+  首次 apply（2026-10-23）：删 105 项 / 22.9M；留人 = referenced×17、fresh×39。
+- **为什么留引用**：同日实测删 `write-conflict-evidence/` 与 `collab-audit/` 打断了两篇 archived research 的链接
+  （`md-links` 门禁当场红）——引用是删之前唯一的硬判据。
+- **会话日志也在射程内**（>7 天 + 无引用）：按 session id 引证的历史证据若需要长期保留，
+  应把结论搬进 Note/卡，或把关键日志复制进 `snapshots/`（冻结副本），而不是赌本机日志一直在。
