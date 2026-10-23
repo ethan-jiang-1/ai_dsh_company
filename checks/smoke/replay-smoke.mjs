@@ -50,7 +50,7 @@ import { tmpdir } from 'node:os'
 import { createRequire } from 'node:module'
 import { compareWorkspace, seedWorkspace, workspaceOracle } from '../../tools/lib/workspace-oracle.mjs'
 import { mirrorCompanyReference } from '../../tools/lib/rehearsal.mjs'
-import { judgeReplaySessions, normalizeReplayTimeContext } from '../../tools/lib/replay-logic.mjs'
+import { judgeReplaySessions, normalizeReplayTempPaths, normalizeReplayTimeContext } from '../../tools/lib/replay-logic.mjs'
 import {
   normalizeSessionLog,
   normalizeSessionSnapshots,
@@ -655,8 +655,10 @@ try {
     sessionIds: items.map(i => String(i.header.id)).filter(id => id !== ''),
     cwd: typeof items[0]?.header.cwd === 'string' ? items[0].header.cwd : '',
   })
-  const actualN = normalizeSessionSnapshots(parsed.map(p => normalizeReplayTimeContext(p.text)), ctxOf(parsed))
-  const expectedN = normalizeSessionSnapshots(fixtures, ctxOf(fixtures.map(t => ({ header: headerOf(t) }))))
+  // 顺序要紧：先让 vendor 归一化把 cwd 换成 {{cwd}}（它会覆盖 header 与 runtime-context 正文），
+  // 再对我们的临时工作区路径做 token 化（模型复述进散文里的那部分 vendor 不认）。
+  const actualN = normalizeSessionSnapshots(parsed.map(p => normalizeReplayTimeContext(p.text)), ctxOf(parsed)).map(normalizeReplayTempPaths)
+  const expectedN = normalizeSessionSnapshots(fixtures, ctxOf(fixtures.map(t => ({ header: headerOf(t) })))).map(normalizeReplayTempPaths)
   // 投递两半（屏障 + inbox splice）是**时序簿记**：位置随上一轮流的分块时机漂（录制/重放两向都实测过），
   // 但内容不是。序列判据里剔掉它们，另用「投递内容集合」判据保内容；两边对称，其他事件逐行仍然严格。
   const actualStream = actualN.map(splitDeliveryPlumbing)

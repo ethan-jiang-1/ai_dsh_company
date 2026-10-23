@@ -46,6 +46,20 @@ export function normalizeReplayTimeContext(text) {
     .join('\n')
 }
 
+// 重放工作区每次运行都是新建的临时目录（`dsh-replay-<场景>-<随机后缀>`）；模型会把 cwd 复述进回复正文
+// （2026-10-23 r3 第八次录制实测：「工作目录已切换到 …/dsh-replay-r3-delegation-avsDnB」），同一条回复
+// 在录制/重放两侧必然不同。这是环境噪音，不是场景语义——两侧对称替换成稳定 token。
+const REPLAY_TEMP_PATH = /dsh-replay-[a-z0-9-]+-[A-Za-z0-9]+(?!["A-Za-z0-9-])/g
+
+/**
+ * Stabilize the per-run replay workspace path echoed into message text.
+ * @param {string} text - JSONL session fixture text.
+ * @returns {string} Text with replay workspace paths replaced by `{{replay-root}}`.
+ */
+export function normalizeReplayTempPaths(text) {
+  return text.replace(REPLAY_TEMP_PATH, '{{replay-root}}')
+}
+
 /** @typedef {Record<string, unknown> & { type?: string }} ReplayRecord */
 /** @typedef {{ sessionIndex: number, rowIndex: number, expected: ReplayRecord | undefined, actual: ReplayRecord | undefined }} ReplayRecordDifference */
 /** @typedef {{ sessionIndex: number, differingIndex: number, expectedRows: string[], actualRows: string[] }} ReplayPresenceDifference */

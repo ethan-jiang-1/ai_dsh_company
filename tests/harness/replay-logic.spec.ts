@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { judgeReplaySessions, normalizeReplayTimeContext } from '../../tools/lib/replay-logic.mjs'
+import { judgeReplaySessions, normalizeReplayTempPaths, normalizeReplayTimeContext } from '../../tools/lib/replay-logic.mjs'
 
 describe('replay fixture normalization and judgements', () => {
   it('stabilizes volatile time and posture values while retaining posture source', () => {
@@ -109,5 +109,24 @@ describe('replay fixture normalization and judgements', () => {
       expectedRows: [],
       actualRows: ['{"type":"team/member","data":{"id":"member-2","role":"analyst"}}'],
     }])
+  })
+})
+
+// 2026-10-23：r3 第七次重录后 replay 全红——模型把「工作目录已切换到 <临时重放目录>」复述进了回复正文，
+// 而重放目录每次运行都是新的（dsh-replay-<场景>-<随机>）。这是环境噪音，不是场景语义，两侧对称 token 化。
+describe('replay temp workspace path normalization', () => {
+  it('把回复正文里的 dsh-replay-<场景>-<随机> 换成稳定 token', () => {
+    const raw = '收到（VP-Eng 已就位，工作目录已切换到 /private/var/folders/x/T/dsh-replay-r3-delegation-avsDnB）。'
+    const out = normalizeReplayTempPaths(raw)
+    expect(out).toContain('{{replay-root}}')
+    expect(out).not.toContain('avsDnB')
+  })
+})
+
+describe('replay temp path normalization · 不碰 cwd 字段', () => {
+  it('JSON 引号结尾的 cwd 留给 vendor 的 {{cwd}} 归一化', () => {
+    const header = '{"cwd":"/private/var/folders/x/T/dsh-replay-r3-delegation-avsDn"}'
+    expect(normalizeReplayTempPaths(header)).toContain('avsDn')
+    expect(normalizeReplayTempPaths(header)).not.toContain('{{replay-root}}')
   })
 })
