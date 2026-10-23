@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { archiveGitArgs, archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, pickArchivedJournal, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
+import { assess, archiveGitArgs, archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, pickArchivedJournal, resolveEvidenceDir } from '../../tools/lib/converge-rules.mjs'
 const TMP: string[] = []
 afterAll(() => { for (const d of TMP) rmSync(d, { recursive: true, force: true }) })
 
@@ -260,5 +260,68 @@ describe('converge-rules · 归档后 git add 参数（2026-10-20 新交付物�
     const plan = archiveMovePlan('2026-10-20-demo')
     expect(archiveGitArgs(plan, true)).toEqual(plan.gitArgs)
     expect(archiveGitArgs(plan, false)).toEqual(['add', '-A', '--', plan.to])
+  })
+})
+
+// 2026-10-23（架构评审候选 1）：「可收敛」判据此前在 converge.mjs 写了三份（计划 / 单 slug / 续跑），
+// 且计划模式不认两个放行旗标——计划说「未备」而带旗标执行却能收。判据收进 assess 后由两处共用。
+// 红形态（实现前）：`assess is not a function`。
+describe('converge-rules · 可收敛判据 assess（判据单源；2026-10-23）', () => {
+  const base = () => ({
+    closed: '2026-10-23',
+    conclusion: '做了事',
+    hasFinal: true,
+    archived: false,
+    journals: [{ role: 'ceo', file: '2026-10-23-slug.md' }],
+    findings: { ok: true, detail: '' },
+  })
+  const codes = (r: { reasons: Array<{ code: string }> }) => r.reasons.map(x => x.code)
+
+  it('六道闸全过 ⇒ ready 且无理由', () => {
+    const r = assess(base(), {})
+    expect(r.ready).toBe(true)
+    expect(r.reasons).toEqual([])
+  })
+
+  it.each([
+    ['closed-missing', { closed: '' }],
+    ['conclusion-missing', { conclusion: '回填' }],
+    ['no-final', { hasFinal: false }],
+    ['already-archived', { archived: true }],
+    ['no-journal', { journals: [] }],
+    ['open-findings', { findings: { ok: false, detail: '缺 present' } }],
+  ])('%s 单闸失败 ⇒ 不可收敛且原因点名', (code, patch) => {
+    const r = assess({ ...base(), ...patch }, {})
+    expect(r.ready).toBe(false)
+    expect(codes(r)).toContain(code)
+  })
+
+  it('--allow-no-journal 只放行 journal 闸，并记录 accepted', () => {
+    const r = assess({ ...base(), journals: [] }, { allowNoJournal: true })
+    expect(r.ready).toBe(true)
+    expect(r.accepted).toContain('no-journal')
+  })
+
+  it('放行不掩盖其他闸', () => {
+    const r = assess({ ...base(), journals: [], hasFinal: false }, { allowNoJournal: true })
+    expect(r.ready).toBe(false)
+    expect(codes(r)).toContain('no-final')
+  })
+
+  it('--allow-open-findings 同理', () => {
+    const r = assess({ ...base(), findings: { ok: false, detail: '缺 present' } }, { allowOpenFindings: true })
+    expect(r.ready).toBe(true)
+    expect(r.accepted).toContain('open-findings')
+  })
+
+  it('计划模式与执行同一判据：同一 state 带旗标前后结论翻转', () => {
+    const state = { ...base(), journals: [] }
+    expect(assess(state, {}).ready).toBe(false)
+    expect(assess(state, { allowNoJournal: true }).ready).toBe(true)
+  })
+
+  it('无 final 时不要求审计结果（惰性：findings 可缺席，不触碰审计）', () => {
+    const r = assess({ ...base(), hasFinal: false, findings: undefined }, {})
+    expect(codes(r)).toEqual(['no-final'])
   })
 })

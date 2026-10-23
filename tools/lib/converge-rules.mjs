@@ -212,6 +212,42 @@ export function isPlaceholderConclusion(value) {
 }
 
 /**
+ * 「可收敛」判据的单一来源（2026-10-23，架构评审候选 1）。
+ *
+ * 为什么收进来：此前六道闸在 `converge.mjs` 写了三份——计划模式 `scanSlugs` 硬编码一份、
+ * `converge()` 内联再查一份、`resume()` 自带第三份部分版本；且放行旗标只有执行路径认，
+ * 于是**计划说「未备」而带旗标执行却能收**。判据住这里，计划与执行共用同一函数；
+ * 驱动层只负责采集 state、打印、执行。
+ *
+ * state = **可观察事实**（不是过程）：
+ *   - `closed` / `conclusion`：meta 字段原文
+ *   - `hasFinal`：活跃目录里有 final.md
+ *   - `archived`：归档家已有同名目录
+ *   - `journals`：可收割的 live journal（`harvestJournal` 产物）
+ *   - `findings`：`{ ok, detail }`；`hasFinal === false` 时可缺席——**不要为此调审计**
+ * flags = `parseFlags` 的产物（只认 `allowNoJournal` / `allowOpenFindings` 两个放行面）。
+ *
+ * @returns `{ ready, reasons, blocking, accepted }`：`reasons` = 全部失败闸（计划模式可逐条展示）；
+ *   `blocking` = 未被放行的失败闸（决定 ready）；`accepted` = 被旗标放行的闸码。
+ */
+export function assess(state, flags = {}) {
+  const reasons = []
+  if (!/\d{4}-\d{2}-\d{2}/.test(state.closed ?? '')) reasons.push({ code: 'closed-missing', message: 'meta.closed 未回填' })
+  if (isPlaceholderConclusion(state.conclusion ?? '')) reasons.push({ code: 'conclusion-missing', message: '一句话结论未回填' })
+  if (!state.hasFinal) reasons.push({ code: 'no-final', message: '无 final' })
+  if (state.archived) reasons.push({ code: 'already-archived', message: '已存在同名归档' })
+  if (journalPresence({ slug: state.slug ?? '', journals: state.journals ?? [] }).missing) {
+    reasons.push({ code: 'no-journal', message: '零 journal（收工留痕缺口）——补齐或显式 --allow-no-journal', override: 'allowNoJournal' })
+  }
+  if (state.hasFinal && state.findings?.ok === false) {
+    reasons.push({ code: 'open-findings', message: `有未结审计发现：${state.findings.detail}`, override: 'allowOpenFindings' })
+  }
+  const blocking = reasons.filter(reason => !(reason.override && flags[reason.override]))
+  const accepted = reasons.filter(reason => reason.override && flags[reason.override]).map(reason => reason.code)
+  return { ready: blocking.length === 0, reasons, blocking, accepted }
+}
+
+/**
  * 归档搬移后的 `git add` 参数（2026-10-20 现场：新建交付物的 final/meta 尚未 tracked，
  * 搬走后 `git add -A -- <旧路径> <新路径>` 因旧路径无任何 tracked 项而 fatal，收敛半途崩）。
  * 旧路径有 tracked 文件 ⇒ 用原计划（同时 stage 删除+新增）；没有 ⇒ 只 stage 归档家。
