@@ -9,8 +9,9 @@
 //
 // env 合同（主文件注入，浏览器档不自带）：{ check, firstDiff, scenario, refreshUi, goldenUi, root }——
 // check/firstDiff = 主文件的判分与差异诊断闭包；scenario/refreshUi/goldenUi/root = 旗标与路径事实。
+import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import { basename, join } from 'node:path'
+import { basename, dirname, join } from 'node:path'
 import { sleep } from '../../../tools/lib/probe-kit.mjs'
 import { launchChromium, loadChromium } from '../../../tools/drivers/playwright.mjs'
 import { diagnosisDir } from '../../../tools/lib/diagnosis.mjs'
@@ -217,6 +218,12 @@ async function runUiFlow(env, page, { url, workspace }) {
     env.check('委派卡节点在 aria 树（可访问名 "委派 VP-Eng（研发）…"）', aria.includes('委派 VP-Eng（研发）'))
     if (env.refreshUi) {
       writeFileSync(env.goldenUi, `${aria}\n`, 'utf8')
+      // 金样指纹：记下它所对的 session fixture，交给 replay-ui-freshness 门禁复算（2026-10-23）
+      const fixture = join(dirname(env.goldenUi), 'session.v3.jsonl')
+      if (existsSync(fixture)) {
+        writeFileSync(join(dirname(env.goldenUi), 'ui.expected.session.sha256'),
+          `${createHash('sha256').update(readFileSync(fixture)).digest('hex')}  session.v3.jsonl\n`, 'utf8')
+      }
       console.log(`  （--refresh-ui：金样已写入 ${basename(env.goldenUi)}）`)
     } else {
       if (!existsSync(env.goldenUi)) {
