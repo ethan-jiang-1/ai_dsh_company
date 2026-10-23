@@ -8,7 +8,7 @@
 |---|---|
 | 检查结构、引用与簿记 | `pnpm verify` → [run-gates](run-gates.mjs) |
 | 看运行态全景 / 场景 run bundle / 会话历史口径 | `pnpm orient`（默认全景含「待核工作候选」扫描节，R3′ 口径，`--workspace <dir>` 换扫描根；`--scenario <kind>/<场景>` run bundle；`--session <slug>[/<id前缀>]` 历史会话 preset）→ [orient](../tools/orient.mjs)（keyless 只读；含日用 home 警告） |
-| 看最近会话的失败摘要 | `pnpm diagnose [--session <slug>[/<id前缀>]]`（只读；失败 turn / 工具错误 / 审批 / 待答问询 / present / 最后正文）→ [diagnose](../tools/diagnose.mjs) |
+| 看最近会话的失败摘要 | `pnpm diagnose [--session <slug>[/<id前缀>]] [--home <路径>]`（只读；失败 turn / 工具错误 / 审批 / 待答问询 / present / 最后正文；`--home` = 显式读日用 home 等非 dev home）→ [diagnose](../tools/diagnose.mjs) |
 | 检查 AI 写码产出的密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs)（公司盘五道闸真扫；件 = [ci-security-gates](lib/ci-security-gates/)，判据逐道不看总码）+ [tracked-token](gates/tracked-token.mjs)（跨仓 tracked 文件的 token URL 窄扫；值不打印） |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；[分层守卫](../tests/harness/layering.spec.ts) |
 | 确认角色真的挂载 | [preset-smoke](smoke/preset-smoke.mjs) |

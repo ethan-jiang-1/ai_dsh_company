@@ -3,11 +3,13 @@
 // 何时跑：一场会话/动议跑完后要回答「刚才哪里不对」时；或用户报症状、你要先读日志再猜原因时。
 // 作用：从 dev home 的会话日志里折出失败摘要——非 completed 的 turn、tool/result 错误、
 //   被拒/非 allow 的审批、待答问询、present 调用、最后 assistant 正文；只读、无模型、无浏览器。
-// 用法：source run/env.sh && node tools/diagnose.mjs [--session <slug>[/<id前缀>]] [--json]
+// 用法：source run/env.sh && node tools/diagnose.mjs [--session <slug>[/<id前缀>]] [--json] [--home <路径>]
 //   不给 --session = 选最近更新的会话；日志优先走 pickSessionLog（zstd 多帧用 CLI 解）。
 // 前置：dev home 有 sessions/；离开 dev home 时 fail-closed（requireDevHome）。
+// `--home <路径>`（2026-10-23）：显式读一个**非 dev home**（如日用 `~/.dsh`——Web GUI 会话就住那儿）的会话日志。
+//   只读、不加写；默认仍拒绝，必须显式点名——双 home 纪律不变，只是给「读一眼日用 home」一条正路。
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { requireDevHome } from './lib/runtime-home.mjs'
 import { pickSessionLog } from './lib/session-log-generation.mjs'
 import { zstdText } from './drivers/zstd.mjs'
@@ -20,12 +22,22 @@ const arg = (name) => {
 }
 const JSON_OUT = args.includes('--json')
 
+const HOME_ARG = arg('home')
 let home
-try {
-  home = requireDevHome('diagnose')
-} catch (error) {
-  console.error(error.message)
-  process.exit(2)
+if (HOME_ARG !== undefined) {
+  home = resolve(HOME_ARG)
+  if (!existsSync(home)) {
+    console.error(`diagnose: --home 路径不存在：${home}`)
+    process.exit(2)
+  }
+  console.error(`⚠ diagnose: 显式读非 dev home（只读）：${home}`)
+} else {
+  try {
+    home = requireDevHome('diagnose')
+  } catch (error) {
+    console.error(error.message)
+    process.exit(2)
+  }
 }
 
 const sessionsRoot = join(home, 'sessions')
