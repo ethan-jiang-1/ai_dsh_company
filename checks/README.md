@@ -94,6 +94,7 @@
 | [presence-e2e-smoke.mjs](smoke/presence-e2e-smoke.mjs) | 真实会话投影中的成员接活、任务执行与完成状态链 |
 | [team-concurrency-probe.mjs](../probes/team/team-concurrency-probe.mjs) | 同文件写入与同任务认领的并发冲突、重试和终态 |
 | [team-claim-loser-probe.mjs](../probes/team/team-claim-loser-probe.mjs) | 认领失败让位：owner-bound 败者不写与 shared 正对照的对照行为 |
+| [member-reject-in-team-probe.mjs](../probes/team/member-reject-in-team-probe.mjs) | 真团队里的越域打回：成员 `send_message` 三件套、未落目标稿 |
 | [member-stale-write-probe.mjs](../probes/team/member-stale-write-probe.mjs) | 成员同轮旧观察写被真实 stale 拒后的重读合并 |
 | [team-atomicity-probe.mjs](../probes/team/team-atomicity-probe.mjs) | 并发追加完整性与跨任务 writeScopes 重叠警告 |
 | [team-recovery-probe.mjs](../probes/team/team-recovery-probe.mjs) | 崩溃重启后的团队状态、持久邮箱与消息续行 |

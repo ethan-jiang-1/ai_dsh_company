@@ -1,4 +1,4 @@
-# C 项验证轮：replay --ui 金样、probe --full 词面、打回探针假绿
+# C 项验证轮：replay --ui 金样、probe --full 词面、打回（单会话假绿 + 团队真打回）
 
 状态：implemented（2026-10-23；用户令「跑推荐的 C：把三项未验变成证据，自主静默执行」；
 上游未验清单 = [Phase B–F Note](./2026-10-21-followup-sweep-phases-b-f.md) §验证·未验项；
@@ -35,11 +35,21 @@
    [claim-race](../../probes/team/claim-race-probe.mjs) 两会话同刻竞速 T1：恰一人持认领（cfo），
    coo 写标准让位行并转 T3；判据 B1 true / B2 false（无双认领缺口）。
 
+5. **团队上下文打回 = 已验（新探针 [member-reject-in-team-probe](../../probes/team/member-reject-in-team-probe.mjs)）。**
+   场景：lead 建任务「CI 密钥扫描整改技术稿」+ spawn vp-sales，成员指令只写「认领并按公司规矩推进」。
+   实跑（`session-b0a7e90b`，lead 与成员均 completed）：VP-Sales 认领后核域、判整任务错配、
+   `send_message` 回 lead——【待澄清】+ **为什么不是我**（路由表 / CHARTER 不碰技术）+ **缺什么**
+   （技术 owner 的署名与验收判据）+ **建议谁接**（VP-Eng），并释放任务（rev 3 pending）、写打回 journal、
+   **未写目标稿**。
+   首跑判据误红：`writes` 拿整段 `arguments` 匹配路径，打回 journal 的**正文**复述了目标路径 → 判成硬接；
+   改成只认 `file_path`（`toolArguments`）后，同一份证据离线复判 = `bounce-back` / `writes=0`。
+   探针带 `--evidence <dir>` 离线复判。
+
 ## 输掉的方案
 
-- **新造 team-context 打回探针**（lead + 成员，成员收越域任务 → `send_message` 到 lead → 断三件套）：
-  这是唯一能把「打回」真正验掉的形态，但属于新仪器，且它自己也要一轮真跑才可信——本轮目标是把已有结论
-  变证据，不是扩仪器。留作下一步。
+- **把打回探针直接改造成团队场景、不新建**：单会话探针测的是「独立会话里成员看清规矩后怎么动」
+  （本轮实况 = 硬接），团队探针测的是「动议里会不会打回」——两面都要；合成一个会丢掉前者。
+  所以新建团队探针，旧探针只修判据。
 - **跑 team-claim-loser-probe（≈$2–4）**：claim-race 已给出「恰一人持认领 + 标准让位行」的证据；
   更重的 A3「败者全程零 write」等下次动认领面时再跑。
 - **给 coo#3 断言补「撑不住」同义词**：追着模型措辞跑，下一轮换个词照样红；`/i` 才是根因修。
@@ -49,11 +59,10 @@
 
 - `--ui` 判据恢复有效；`--full` 首次到 15/15。
 - 打回探针不再假绿：超时样本一律 exit 2，且能区分「说打回」与「做了超域活」。
-- **仍未验**：团队上下文里的打回投递（三件套是否真的 `send_message` 到 lead）。本轮证据只到
-  「单会话场景下成员看清了规矩、仍然硬接」；而单会话里人是直接委托人、没有 CEO 可打回，
-  手册打回条款的适用前置（动议中被分派）并不成立——所以这次 hard-accept **不能判成违规**，
-  只能判成「这个场景测不了打回」。
-- `--full` 的可重复性仍受措辞漂移影响（同义词/语序），只是大写不再误杀。
+- **打回两面都验了**：独立会话（无 CEO）= 成员硬接并落稿；真团队（有 lead）= 三件套打回 + 释放任务 + 不落稿。
+  前者的 hard-accept 不能判违规（单会话里人是直接委托人、打回条款前置不成立），只能判「那个场景测不了打回」。
+- 新增团队打回探针 1 个（`probes/team/`），已进 [脚本索引](../../checks/README.md)。
+- **仍未建**：`replay --ui` 金样与 session 的配对 freshness 门禁；`--full` 的同义词漂移仍会误红（大写已不误杀）。
 
 ## 验证（全部真跑）
 
@@ -73,6 +82,9 @@ node probes/session-context/member-bounceback-probe.mjs --log <旧事件流>  # 
 #   domainWork=34, verdict=hard-accept, exit 2
 node probes/session-context/member-bounceback-probe.mjs --wall 900       # 真跑：completed=true,
 #   verdict=hard-accept, domainWork=43（技术稿落排练盘）
+
+node probes/team/member-reject-in-team-probe.mjs --wall 900             # 首跑 J2 误红（writes=1：正文匹配）
+node probes/team/member-reject-in-team-probe.mjs --evidence <证据目录>   # 修正后：bounce-back / writes=0
 ```
 
 红形态：`--ui` 那条给出「第 N 行：期望 X / 实际 Y」；`--full` 那条打印「断言未命中: /…/」加回复原文——
