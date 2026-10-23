@@ -4,6 +4,8 @@
 
 ## 修复流水（倒序）
 
+- **BUG-032**（2026-10-23）：r3 重录产不出可重放 fixture——委派完成通知落在 lead 轮内/轮后两种形状（3 vs 4 次模型调用），重放到达时机相反即 `llm-replay: script exhausted`。修法 = `--record` 录完立即 keyless 自检、红则重录（≤3 次），失败如实保留现场；不在重放侧宽容 script 用尽。红绿 = 前三次重录全红 → 修复后连续两次 `--record` 第一次即自检绿、replay ALL PASS。教训 = **录制类命令要自证可回放，别把运气交给下一次**。详见 [卡](BUG-032-r3-rerecord-not-replayable.md)。
+
 - **BUG-031**（2026-10-20）：`orient --scenario replay/r3-delegation` ENOTDIR 崩——runBundleView 对 children 引用一律 readdirSync，而 r3 声明的是单文件形状（`sessions/vp-eng-child.jsonl`）。修法 = statSync 分流（文件且 .jsonl 计 1 / 目录数 .jsonl）；守卫 = orient.spec 真实 r3 断言 + 文件形状夹具（红 2 failed → 绿 27/27，活体视图完整渲染）。教训 = 消费引用合同要枚举全部合法形状。详见 [卡](BUG-031-orient-scenario-children-file-shape.md)。
 - **BUG-030**（2026-10-20）：diagnose 审批判读字段错位——decisionOf 读想象键（decision/answer），真 v4 日志是 `{id,outcome}`（vendor persistence-catalog 权威），每条审批渲染成 `approval ? → `（无名无结论）；工具名在同 id 的 approval/asked 侧。附带同修 turn/end 对象 error 的 [object Object] 渲染。修法 = 读 outcome + asked/decided 按 id 配对 + detailOf 序列化 + 夹具改真形状；红 4 failed → 绿 27/27，活体 `approval request_signoff → rejected`（reason「毛利<30% 双签」可对勘）。教训 = **夹具用想象形状 = 绿灯保释错实现**，新工具判据夹具应从真日志取样。详见 [卡](BUG-030-diagnose-approval-outcome.md)。
 - **BUG-029**（2026-10-20）：观察窗 token 再次随 `runtime/web-logs` 日志入库（BUG-013 同类复发）。修法 = untrack + `.gitignore` 规则 + **类级 tracked-token 窄扫**（`tools/lib/tracked-token.mjs` + `checks/gates/tracked-token.mjs`）+ `.gitignore` 红绿守卫；不做历史重写。红→绿：临时 tracked 文件写合成 token URL → `FAIL tracked-token ...`；移除 → `PASS tracked-token ×1740`；`pnpm verify` ALL PASS、`pnpm test` 71/699。详见 [卡](BUG-029-committed-web-token-recurrence.md) 与 [Note](../../../notes/implemented/2026-10-20-tracked-token-guard.md)。

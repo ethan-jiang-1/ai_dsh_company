@@ -44,6 +44,7 @@ import { makeFailingCheck, sleep } from '../../tools/lib/probe-kit.mjs'
 import { diagnosisDir } from '../../tools/lib/diagnosis.mjs'
 import { uiPhase } from './lib/replay-ui.mjs'
 import { spawn, spawnSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { tmpdir } from 'node:os'
@@ -497,49 +498,64 @@ async function driveScenario({ patchSource, env, tasks }) {
 const startedAt = Date.now()
 
 if (RECORD) {
-  // 任务来源：已有 fixture（refresh 语义）→ 原始录制 → R3 历史归档（首录）
-  const taskSource = existsSync(fixLead) ? fixLead : (existsSync(rawLead) ? rawLead : archiveLead)
-  const tasks = tasksFromSession(readFileSync(taskSource, 'utf8'))
+  // 竞态（BUG-032）：委派是 activation——child 的完成通知可能落在 lead 的**轮内**（被并进最后一步）
+  // 或**轮后**（另起一轮）。前者录成 3 次模型调用、后者 4 次；重放侧的到达时机若与录制相反，
+  // llm-replay 会因「script exhausted」红，而这是**录制形状的运气**，不是代码错。
+  // 对策：录完立即用 keyless replay 自检；红就重录（最多 3 次）。命令要么产出可重放 fixture，要么如实失败。
   const credentials = join(ROOT, 'runtime/harness-home/.credentials.yaml')
   if (!existsSync(credentials)) { console.error('replay-smoke --record: 需要 dev home 凭据（真模型认证档）'); process.exit(2) }
-  console.log(`--record：场景组合下重录（任务来源 ${basename(taskSource)}，真模型，${String(tasks.length)} 段）`)
-  const { workspace, runRoot, child, parsed } = await driveScenario({
-    patchSource: join(replayDir, 'cordis.yml'),
-    env: { credentials },
-    tasks,
-  })
-  child.kill('SIGTERM'); await sleep(300)
-  try {
-    const want = 1 + declaredChildren(metadata)
-    if (parsed.length !== want) {
-      console.error(`--record：期望 lead + ${String(want - 1)} child（按 snapshot.yml 的 session.children 声明），实际 ${String(parsed.length)}：${parsed.map(p => JSON.stringify(p.header)).join('\n')}`)
-      process.exit(1)
+  const MAX_ATTEMPTS = 3
+  const scriptPath = fileURLToPath(import.meta.url)
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    const taskSource = existsSync(fixLead) ? fixLead : (existsSync(rawLead) ? rawLead : archiveLead)
+    const tasks = tasksFromSession(readFileSync(taskSource, 'utf8'))
+    console.log(`--record：第 ${String(attempt)}/${String(MAX_ATTEMPTS)} 次（任务来源 ${basename(taskSource)}，真模型，${String(tasks.length)} 段）`)
+    const { workspace: _workspace, runRoot, child, parsed } = await driveScenario({
+      patchSource: join(replayDir, 'cordis.yml'),
+      env: { credentials },
+      tasks,
+    })
+    child.kill('SIGTERM'); await sleep(300)
+    try {
+      const want = 1 + declaredChildren(metadata)
+      if (parsed.length !== want) {
+        console.error(`--record：期望 lead + ${String(want - 1)} child（按 snapshot.yml 的 session.children 声明），实际 ${String(parsed.length)}：${parsed.map(p => JSON.stringify(p.header)).join('\n')}`)
+        process.exit(1)
+      }
+      mkdirSync(join(replayDir, 'raw'), { recursive: true })
+      // child 按 header createdAt 排序（llm-replay 绑定序；与 childRaws()/fixture 序号一致）。
+      // ⚠ 先清掉旧 raw child（任意命名）再写新集：childRaws() 枚举 raw/ 全部非 lead 的 .jsonl，
+      //   残留旧 child 会让 fixture 期望数与实写数错位（2026-09-24 重录实测：旧 vp-eng-child.jsonl
+      //   与新 child-1.jsonl 并存 ⇒ replay 报"缺 session.2"）。
+      for (const stale of readdirSync(join(replayDir, 'raw')).filter(n => n !== 'lead.jsonl' && n.endsWith('.jsonl'))) {
+        rmSync(join(replayDir, 'raw', stale), { force: true })
+      }
+      const ordered = [parsed[0], ...parsed.slice(1).sort((a, b) => Number(a.header.createdAt ?? 0) - Number(b.header.createdAt ?? 0))]
+      const raws = ordered.map(p => p.text)
+      writeFileSync(rawLead, raws[0], 'utf8')
+      for (const [index, text] of raws.slice(1).entries()) {
+        writeFileSync(join(replayDir, 'raw', `child-${String(index + 1)}.jsonl`), text, 'utf8')
+      }
+      const normalized = normalizeFixtures(raws)
+      writeFileSync(fixLead, normalized[0], 'utf8')
+      for (const [index, text] of normalized.slice(1).entries()) {
+        writeFileSync(childFixture(index + 1), text, 'utf8')
+      }
+      writeSidecars(raws)
+      console.log(`--record：录制完成（1 lead + ${String(raws.length - 1)} child；lead ${String(records(raws[0]).length)} 行），自检重放…`)
+    } finally {
+      if (!KEEP) rmSync(runRoot, { recursive: true, force: true })
     }
-    mkdirSync(join(replayDir, 'raw'), { recursive: true })
-    // child 按 header createdAt 排序（llm-replay 绑定序；与 childRaws()/fixture 序号一致）。
-    // ⚠ 先清掉旧 raw child（任意命名）再写新集：childRaws() 枚举 raw/ 全部非 lead 的 .jsonl，
-    //   残留旧 child 会让 fixture 期望数与实写数错位（2026-09-24 重录实测：旧 vp-eng-child.jsonl
-    //   与新 child-1.jsonl 并存 ⇒ replay 报"缺 session.2"）。
-    for (const stale of readdirSync(join(replayDir, 'raw')).filter(n => n !== 'lead.jsonl' && n.endsWith('.jsonl'))) {
-      rmSync(join(replayDir, 'raw', stale), { force: true })
+    // 自检：子进程跑本文件的 keyless replay 档（不带 --record，不会递归）。
+    const selfCheck = spawnSync(process.execPath, [scriptPath, '--scenario', SCENARIO], { cwd: ROOT, encoding: 'utf8' })
+    if (selfCheck.status === 0) {
+      console.log(`--record：自检通过（第 ${String(attempt)} 次录制可重放）`)
+      process.exit(0)
     }
-    const ordered = [parsed[0], ...parsed.slice(1).sort((a, b) => Number(a.header.createdAt ?? 0) - Number(b.header.createdAt ?? 0))]
-    const raws = ordered.map(p => p.text)
-    writeFileSync(rawLead, raws[0], 'utf8')
-    for (const [index, text] of raws.slice(1).entries()) {
-      writeFileSync(join(replayDir, 'raw', `child-${String(index + 1)}.jsonl`), text, 'utf8')
-    }
-    const normalized = normalizeFixtures(raws)
-    writeFileSync(fixLead, normalized[0], 'utf8')
-    for (const [index, text] of normalized.slice(1).entries()) {
-      writeFileSync(childFixture(index + 1), text, 'utf8')
-    }
-    writeSidecars(raws)
-    console.log(`--record：录制 + fixture + sidecar 完成（1 lead + ${String(raws.length - 1)} child；lead ${String(records(raws[0]).length)} 行）`)
-  } finally {
-    if (!KEEP) rmSync(runRoot, { recursive: true, force: true })
+    console.log(`--record：第 ${String(attempt)} 次录制自检红——${String((selfCheck.stdout ?? '').split('\n').filter(l => l.includes('FAILURE')).slice(-1)[0] ?? '').trim()}（重录）`)
   }
-  process.exit(0)
+  console.error(`--record：连续 ${String(MAX_ATTEMPTS)} 次都产不出可重放 fixture——最后一次保留在盘上供诊断；这不是代码错，是委派通知的到达竞态`)
+  process.exit(1)
 }
 
 // ── replay（默认）──

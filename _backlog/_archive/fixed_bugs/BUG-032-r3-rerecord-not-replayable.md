@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 已修
 severity: P1
 opened: 2026-10-23
 ---
 
 # BUG-032：r3 重录不可重放——子代理显式 send_message 后，重放侧消息 id 位移
 
-> 严重级别：P1（挡住合法重录：改任何注入源后都无法把 r3 刷绿）｜发现：2026-10-23（C 项验证轮 P1）｜状态：调查中
+> 严重级别：P1（挡住合法重录：改任何注入源后都无法把 r3 刷绿）｜发现：2026-10-23（C 项验证轮 P1）｜状态：已修（2026-10-23，重录自检 + 重试）
 
 ## 症状
 
@@ -52,6 +52,29 @@ node checks/smoke/replay-smoke.mjs --scenario r3-delegation
 同一轮里手册修复就是走这条旁路落地的：`--keep` → 用实际运行的 `agent-instructions` 事件替换两份 fixture 的注入体
 → 默认 lane + `--ui` 双 ALL PASS、freshness 门禁绿。卡仍开——它修的是 `--record` 这条路，不是旁路。
 
+## 根因（已确认）
+
+委派在 rc.2 里是 **activation**：child 的完成通知可能落在 lead 的**轮内**（被并进最后一步）或**轮后**（另起一轮）。
+前者录成 3 次模型调用、后者 4 次；重放侧通知的到达时机若与录制相反，`llm-replay` 就报
+`script exhausted — session requested model call #4 but its script has only 3`。
+这是**录制形状的运气**，不是 adapter/组合缺陷——同一份代码，前三次重录全红、第四次一次就绿。
+
+## 修复
+
+`--record` 录完立即用 **keyless replay 自检**（子进程跑本文件的默认档，不带 `--record`，不会递归）：
+绿 = 收工；红 = 重录，最多 3 次。命令要么产出可重放 fixture，要么如实失败并保留最后一次现场。
+不在重放侧做“script 用尽就收尾”的宽容——那会把「多出了一步」掩盖成正常。
+
+## 验证（真跑）
+
+```text
+node checks/smoke/replay-smoke.mjs --scenario r3-delegation --record
+#   第 1/3 次 → 录制完成（lead 55 行）→ 自检重放… → 自检通过（第 1 次录制可重放）
+#   再跑一次 → 录制完成（lead 46 行）→ 自检通过（第 1 次录制可重放）
+node checks/smoke/replay-smoke.mjs --scenario r3-delegation   # ALL PASS
+```
+
 ## 已修判定（解除阻塞）
 
-`--record` 后立即 `replay-smoke`（无 `--ui`）ALL PASS，且连续两次 `--record` 都稳定复现该性质。
+`--record` 结束时自检必绿；连续两次 `--record` 都稳定复现该性质（2026-10-23 实测 2/2）。
+重试分支本身未在实测中触发（两次都第一次就绿）——代码路径存在但未观察。

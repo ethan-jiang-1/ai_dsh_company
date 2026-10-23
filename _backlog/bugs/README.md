@@ -10,8 +10,7 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-032](BUG-032-r3-rerecord-not-replayable.md) | r3 重录不可重放：子代理显式 send_message 后 lead 归一化消息 id 位移（挡住改注入源后的合法重录） | P1 |
-| —（其余无活跃缺陷卡） | 2026-10-20 BUG-030/031 当场修掉，直接立卡进 [fixed_bugs](../_archive/fixed_bugs/BUG-030-diagnose-approval-outcome.md)（守卫 spec 声明事故号，guard-red-record 要求真卡在场） | — |
+| —（无活跃缺陷卡） | 2026-10-23 BUG-032（r3 重录不可重放）当场修掉并迁 [fixed_bugs](../_archive/fixed_bugs/BUG-032-r3-rerecord-not-replayable.md)：`--record` 录完自检、红则重录（≤3 次）；2026-10-20 BUG-030/031 同模式 | — |
 
 **2026-10-19 BUG-028 收口**：闸门④认总锚（title 或 prompt 点名即算，依赖链一并传递），lingang-recon 由 3 条误报 → 0 条违规；
 守卫 = `tests/company/deliverables-audit.spec.ts` 两条 keyless 断言（锚粒度 + 依赖链）。教训同 BUG-014：

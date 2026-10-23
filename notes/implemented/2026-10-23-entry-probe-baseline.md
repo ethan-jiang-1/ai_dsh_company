@@ -31,7 +31,7 @@ entry-probe: MACHINE CHECKS PASS 13/13; semantic review pending
   `deliverables/<kickoff 日期>-<slug>/`。同一文件相隔十行，两种写法。
 - 本应修：手册 7 处统一成 `<日期>-<slug>`。实际做了一半被挡回——改完手册触发
   `replay-fixture-freshness`（正确拦截），但重录 r3 **三次都无法重放**（见
-  [BUG-032](../../_backlog/bugs/BUG-032-r3-rerecord-not-replayable.md)），只能回滚手册改动。
+  [BUG-032](../../_backlog/_archive/fixed_bugs/BUG-032-r3-rerecord-not-replayable.md)），只能回滚手册改动。
 - 现状：漂移仍在，卡已立（P1）；解除阻塞后才能修。
 
 其余抽查：Q4 tag/SHA 与 AGENTS.md 簿记一致；Q5/Q10 提到的脚本都在盘上；Q1 的「当前无活跃 RFC/卡」与实况一致。
