@@ -11,6 +11,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { CultivationBoard } from '../../packages/company-pack/src/client/CultivationBoard.tsx'
 import type { CultivationRecord, CultivationRow } from '../../packages/company-pack/src/lib/cultivation.ts'
+import type { CultivationContext } from '../../packages/company-pack/src/lib/cultivation-context.ts'
 
 /** 最小行/记录 fixture（形状见 lib/cultivation.ts）。 */
 const journalRow = (over: Partial<CultivationRow> = {}): CultivationRow => ({
@@ -94,5 +95,37 @@ describe('CultivationBoard：数据诚实与能力呈现（V2/V8/V9）', () => {
     expect(markup).not.toContain('preset-smoke')
     expect(markup).not.toContain('D25')
     expect(markup).not.toContain('D17')
+  })
+})
+
+
+describe('背景卡：有 contexts 的记录（D1=A / D2=A）', () => {
+  const background: CultivationContext = {
+    kind: 'session',
+    ref: 'session-1',
+    role: 'ceo',
+    title: '收口检查',
+    subtitle: 'CEO · 第 3 轮',
+    turn: 3,
+    excerpt: '用户：收口前把未决项列一下\n分身：已收口',
+    truncated: false,
+  }
+
+  it('显示背景标题/摘要；正文空给「未写做法；依据背景」；不再显示单独出处', () => {
+    const markup = render({ records: [record({ source: '会话「收口检查」', body: '', contexts: [background] })] })
+    expect(markup).toContain('收口检查')
+    expect(markup).toContain('用户：收口前把未决项列一下')
+    expect(markup).toContain('（未写做法；依据背景）')
+    expect(markup).not.toContain('出处：会话「收口检查」')
+  })
+
+  it('无 contexts 的旧记录仍显示「出处：…」', () => {
+    const markup = render({ records: [record({ source: 'deliverables/x/final.md' })] })
+    expect(markup).toContain('出处：deliverables/x/final.md')
+  })
+
+  it('无 openContext 时不渲染「打开会话」（不出死按钮）', () => {
+    const markup = render({ records: [record({ body: '', contexts: [background] })] })
+    expect(markup).not.toContain('打开会话')
   })
 })

@@ -25,7 +25,17 @@ import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 // 纯类型导入：ctx.commands 的 Context 增强（服务本体由 base bundle 挂载，vendor patch 钉行）。
 import type {} from '@deepseek-ai/dsh-commands'
+import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import {
+  clipExcerpt,
+  contextSummary,
+  decodeContextToken,
+  pickSessionTurn,
+  type CultivationContext,
+  type CultivationContextRef,
+  type SessionEventLike,
+} from '../lib/cultivation-context.ts'
 import {
   CULTIVATION_ROLES,
   methodSkillText,
@@ -72,6 +82,151 @@ function sessionFaceOf(agent: AgentLike | undefined): SessionFace | null {
   return { role, cwd }
 }
 
+/** 背景读取的 host 最小读面（sessionQuery 懒取；缺席 = 明确报错，不静默降级）。 */
+interface SessionObservationLike {
+  readonly header: {
+    readonly id?: string
+    readonly parentSession?: string
+    readonly origin?: string
+    readonly agentPreset?: string
+  }
+  readonly events: readonly SessionEventLike[]
+}
+
+interface SessionQueryLike {
+  observeSession(
+    sessionId: string,
+    options?: { readonly projectionMode?: 'all' | 'none', readonly signal?: AbortSignal },
+  ): Promise<SessionObservationLike>
+  readTitleSnapshots?(ids: readonly string[], signal?: AbortSignal): Promise<readonly unknown[]>
+}
+
+type ContextRead = { readonly context: CultivationContext } | { readonly problem: string }
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function errorMessage(error: unknown): string {
+  try {
+    return error instanceof Error ? error.message : String(error)
+  } catch {
+    return '未知原因'
+  }
+}
+
+function sessionQueryOf(ctx: Context): SessionQueryLike | undefined {
+  const getter = (ctx as unknown as { get?: (name: string) => unknown }).get
+  if (typeof getter !== 'function') return undefined
+  const value = getter.call(ctx, 'sessionQuery')
+  return value as SessionQueryLike | undefined
+}
+
+/** 会话背景：host 非激活读一轮文字，填自包含 `contexts`。 */
+async function readSessionContext(query: SessionQueryLike, ref: CultivationContextRef): Promise<ContextRead> {
+  const observation = await query.observeSession(ref.ref, {
+    projectionMode: 'none',
+    signal: AbortSignal.timeout(5_000),
+  })
+  if (ref.parentSessionId !== undefined) {
+    if (observation.header.parentSession !== ref.parentSessionId) return { problem: '背景会话不是这个 parent 的子会话。' }
+    if (observation.header.origin !== 'subagent') return { problem: '背景会话不是子会话（origin 不是 subagent）。' }
+  }
+  const picked = pickSessionTurn(observation.events, ref.turn)
+  if (picked === null) {
+    return {
+      problem: ref.turn === undefined
+        ? '这段会话没有可用的文字背景（可能只有工具调用）。'
+        : `第 ${String(ref.turn)} 轮没有可用的文字背景。`,
+    }
+  }
+  let title = ref.label?.trim() ?? ''
+  if (title === '' && typeof query.readTitleSnapshots === 'function') {
+    try {
+      const results = await query.readTitleSnapshots([ref.ref], AbortSignal.timeout(2_000))
+      const first = results[0]
+      if (isRecord(first) && first.status === 'fulfilled' && isRecord(first.value) && typeof first.value.title === 'string') {
+        title = first.value.title.trim()
+      }
+    } catch {
+      // Title is presentation-only; the turn text is the evidence.
+    }
+  }
+  if (title === '') title = `第 ${String(picked.turn)} 轮`
+  const preset = observation.header.agentPreset
+  const role = ref.role?.trim() !== undefined && ref.role?.trim() !== ''
+    ? ref.role.trim()
+    : preset !== undefined && ROSTER.has(preset) ? preset : undefined
+  const subtitle = [role === undefined ? '' : roleLabel(role), `第 ${String(picked.turn)} 轮`]
+    .filter(part => part !== '').join(' · ')
+  const clipped = clipExcerpt(picked.text, 1_200)
+  const context: CultivationContext = {
+    kind: 'session',
+    ref: ref.ref,
+    title,
+    subtitle,
+    excerpt: clipped.text,
+    truncated: clipped.truncated,
+    turn: picked.turn,
+    ...(ref.parentSessionId === undefined ? {} : { parentSessionId: ref.parentSessionId }),
+    ...(ref.mode === undefined ? {} : { mode: ref.mode }),
+    ...(role === undefined ? {} : { role }),
+    ...(picked.at === undefined ? {} : { at: picked.at }),
+  }
+  return { context }
+}
+
+/** 成品背景：只认 `kb/deliverables-index.json` 里的条目（不做任意文件读）。 */
+function readDeliverableContext(cwd: string, ref: CultivationContextRef): ContextRead {
+  let raw: unknown
+  try {
+    raw = JSON.parse(readFileSync(join(cwd, 'kb', 'deliverables-index.json'), 'utf8'))
+  } catch {
+    return { problem: '读不到成品目录（生成器未跑或索引缺失）——仍可选会话，或直接手写。' }
+  }
+  if (!isRecord(raw) || !Array.isArray(raw.entries)) return { problem: '成品目录形状不符（schema/entries 缺失）。' }
+  const entry = raw.entries.find(value => isRecord(value) && value.path === ref.ref)
+  if (entry === undefined || !isRecord(entry)) return { problem: '成品目录里没有这个成品（可能已归档/移动）。' }
+  const slug = typeof entry.slug === 'string' && entry.slug !== '' ? entry.slug : ref.label?.trim() ?? '成品'
+  const result = typeof entry.result === 'string' && entry.result !== '' ? entry.result : undefined
+  const summary = typeof entry.summary === 'string' && entry.summary.trim() !== ''
+    ? entry.summary.trim()
+    : `成品 ${slug}`
+  const clipped = clipExcerpt(summary, 600)
+  const role = ref.role?.trim() === undefined || ref.role?.trim() === '' ? undefined : ref.role.trim()
+  const context: CultivationContext = {
+    kind: 'deliverable',
+    ref: ref.ref,
+    title: slug,
+    excerpt: clipped.text,
+    ...(result === undefined ? {} : { subtitle: result }),
+    ...(typeof entry.kickoff === 'string' && entry.kickoff !== '' ? { at: entry.kickoff } : {}),
+    ...(role === undefined ? {} : { role }),
+    ...(clipped.truncated ? { truncated: true } : {}),
+  }
+  return { context }
+}
+
+async function readContext(ctx: Context, cwd: string, ref: CultivationContextRef): Promise<ContextRead> {
+  if (ref.kind === 'session') {
+    const query = sessionQueryOf(ctx)
+    if (query === undefined) return { problem: '这个界面读不了会话历史（sessionQuery 未挂）。' }
+    try {
+      return await readSessionContext(query, ref)
+    } catch (error) {
+      return { problem: `这段背景读不到：${errorMessage(error)}。` }
+    }
+  }
+  if (ref.kind === 'deliverable') {
+    try {
+      return readDeliverableContext(cwd, ref)
+    } catch (error) {
+      return { problem: `这段背景读不到：${errorMessage(error)}。` }
+    }
+  }
+  return { problem: '背景格式坏：不支持的 kind。' }
+}
+
 /** 把 `head :: body` 切开（分隔符两侧留白皆可；无分隔符 = body 空）。 */
 function splitBody(raw: string): { readonly head: string, readonly body: string } {
   const at = raw.indexOf('::')
@@ -80,8 +235,8 @@ function splitBody(raw: string): { readonly head: string, readonly body: string 
 }
 
 /** 命令行为只依赖会话输入、配置与培养存储；Cordis 注册留在外层适配器。 */
-function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage) {
-  return ({ agent, rawInput }: { readonly agent?: AgentLike, readonly rawInput: string }) => {
+function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context) {
+  return async ({ agent, rawInput }: { readonly agent?: AgentLike, readonly rawInput: string }) => {
     const face = sessionFaceOf(agent)
     if (face === null) {
       return { kind: 'error' as const, text: '培养命令需要公司角色会话（当前会话不是五角色 preset，或 cwd 缺席）。' }
@@ -91,31 +246,59 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
     const sub = tokens[0] ?? ''
     const recordsDir = join(face.cwd, RECORDS_REL)
 
-    // correct <期望行为一句话> :: <做法与证据正文>
+    // correct [--context=<token>] <期望行为一句话> :: <做法与证据正文>
+    // suggest <角色> [--context=<token>] <期望行为一句话> :: <建议与证据>
     if (sub === 'correct' || sub === 'suggest') {
       const isSuggest = sub === 'suggest'
       const targetRole = isSuggest ? tokens[1] : face.role
-      const expectation = (isSuggest ? tokens.slice(2) : tokens.slice(1)).join(' ').trim()
       if (isSuggest && !ROSTER.has(targetRole ?? '')) {
         return { kind: 'error' as const, text: '用法：suggest <角色> <期望行为一句话> :: <建议与证据>；角色须在名册。' }
       }
+      let from = isSuggest ? 2 : 1
+      let contextToken: string | undefined
+      const flag = tokens[from]
+      if (flag !== undefined && flag.startsWith('--context=')) {
+        contextToken = flag.slice('--context='.length)
+        from += 1
+      }
+      const expectation = tokens.slice(from).join(' ').trim()
       if (expectation === '') return { kind: 'error' as const, text: '期望行为不能为空（:: 之前的一句话）。' }
-      if (body === '') return { kind: 'error' as const, text: '正文不能为空（:: 之后写做法与证据）。' }
       if (isSuggest && targetRole === face.role) {
         return { kind: 'error' as const, text: '给自己的角色用 correct；suggest 指向别的角色。' }
       }
+      let contexts: readonly CultivationContext[] | undefined
+      if (contextToken !== undefined) {
+        const decoded = decodeContextToken(contextToken)
+        if (!decoded.ok) return { kind: 'error' as const, text: decoded.problem }
+        const item = decoded.command.items[0]
+        if (item === undefined) return { kind: 'error' as const, text: '背景只能带一段（v1）。' }
+        const read = await readContext(ctx, face.cwd, item)
+        if ('problem' in read) return { kind: 'error' as const, text: read.problem }
+        contexts = [read.context]
+      }
+      if (body === '' && contexts === undefined) {
+        return { kind: 'error' as const, text: '正文不能为空（:: 之后写做法与证据）。' }
+      }
+      const source = contexts === undefined ? '（会话内提交）' : contextSummary(contexts[0]!)
       const id = storage.writeRecord(recordsDir, {
         kind: isSuggest ? 'suggestion' : 'correction',
         targetRole: targetRole!,
         proposerRole: face.role,
         proposerKind: 'human',
-        source: '（会话内提交）',
+        source,
         expectation,
         body,
+        ...(contexts === undefined ? {} : { contexts }),
       })
+      const action = isSuggest
+        ? `建议 → ${roleLabel(targetRole!)}，待其本人在 ${roleLabel(targetRole!)} 会话里处理`
+        : '纠正，待你采纳'
+      const contextNote = contexts === undefined
+        ? ''
+        : `；背景「${contexts[0]!.title}」，以提交时服务端读到的版本为准`
       return {
         kind: 'success' as const,
-        text: `已提交培养记录 ${id}（${isSuggest ? `建议 → ${roleLabel(targetRole!)}，待其本人在 ${roleLabel(targetRole!)} 会话里处理` : '纠正，待你采纳'}）。培养页可查收件箱。`,
+        text: `已提交培养记录 ${id}（${action}${contextNote}）。培养页可查收件箱。`,
       }
     }
 
@@ -319,6 +502,6 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig)
     name: 'cultivation',
     description: '培养回路：给自己的角色提交纠正、给别的角色提建议、采纳/拒绝/验证/撤回方法（采纳仅目标角色本人）',
     input: { hint: 'correct <期望行为> :: <做法与证据> | suggest <角色> <期望行为> :: <建议> | adopt <id> [as <slug>] | reject <id> :: <理由> | verify <id> <pass|fail> | revoke <slug>' },
-    handler: cultivationCommandHandler(config, storage),
+    handler: cultivationCommandHandler(config, storage, ctx),
   })
 }

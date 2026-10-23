@@ -20,6 +20,7 @@
 | [2026-09-28-sidebar-split-budget.md](settled_issues/2026-09-28-sidebar-split-budget.md) | 不做 | 2026-09-28 |
 | [2026-10-10-plain-language-closing.md](settled_issues/2026-10-10-plain-language-closing.md) | 已实施并真验收通过（说人话收口：四模板一分钟摘要 + present description 通道） | 2026-10-10 |
 | [2026-10-12-ceo-minimal-assembly.md](settled_issues/2026-10-12-ceo-minimal-assembly.md) | 已实施（组队健壮性三层防御：最小在屋/菜单算术/成员打回权；RFC 与探针收据在卡） | 2026-10-12 |
+| [2026-10-23-cultivation-context.md](settled_issues/2026-10-23-cultivation-context.md) | 已实施（D1=A/D2=A；RFC + 实施 Note + 真浏览器 probe） | 2026-10-23 |
 | [2026-10-12-workspace-convergence.md](settled_issues/2026-10-12-workspace-convergence.md) | 已落地（收敛执行器 converge.mjs + 常态化入轮末 + 首轮 4 slug 收敛与四缺陷修复） | 2026-10-12 |
 | [2026-10-10-multi-instance-guard.md](settled_issues/2026-10-10-multi-instance-guard.md) | 已实施并双实例实测通过（多实例警告横幅）；跨浏览器检测边界如需另立卡 | 2026-10-10 |
 | [2026-10-10-extract-without-behavior-change.md](settled_issues/2026-10-10-extract-without-behavior-change.md) | 已实施并验收通过（探针 web 启动与 backlog 活状态收成模块，行为不变） | 2026-10-10 |

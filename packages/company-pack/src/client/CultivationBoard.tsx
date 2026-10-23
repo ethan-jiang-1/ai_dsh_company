@@ -39,6 +39,8 @@ import {
   type CultivationActions,
 } from './cultivation-actions.ts'
 import { CultivationCompose } from './CultivationCompose.tsx'
+import type { CultivationContextSources } from './cultivation-context-data.ts'
+import type { CultivationContext } from '../lib/cultivation-context.ts'
 
 /** 正文折叠阈值：超过这么多行就先只展前几行（长正文不该把别的待办顶走）。 */
 const BODY_PREVIEW_LINES = 4
@@ -64,6 +66,14 @@ export interface CultivationBoardProps {
   readonly actions?: CultivationActions | undefined
   /** 动作成功后重读数据（容器喂 `refresh`）。 */
   readonly onRefresh?: (() => void) | undefined
+  /** 背景源（缺席 = 创作表单不显示背景区；旧行为不变）。 */
+  readonly contextSources?: CultivationContextSources | undefined
+  /** 当前会话 id（默认带“本次会话最近一轮”）。 */
+  readonly currentSessionId?: string | undefined
+  /** 当前会话是 teammate 子会话（D2=A：界面明说按 Lead 记账）。 */
+  readonly teammate?: boolean | undefined
+  /** 打开背景原文：容器做可达性预检与导航；失败给可读原因（不出现死按钮）。 */
+  readonly openContext?: ((context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false, readonly problem: string }>) | undefined
 }
 
 /** 一条记录的操作行文案（待办给命令、已处理给回执）——**只在没有动作面时**当降级文案用。 */
@@ -98,6 +108,20 @@ export function CultivationBoard(props: CultivationBoardProps) {
   const [outcomes, setOutcomes] = useState<Readonly<Record<string, ActionOutcome>>>({})
   /** 正在写理由的记录 id。 */
   const [rejectingId, setRejectingId] = useState<string | null>(null)
+  /** 每条记录背景卡的展开状态（每个记录独立）。 */
+  const [expandedContexts, setExpandedContexts] = useState<Readonly<Record<string, boolean>>>({})
+  /** 背景原文打开中的记录 id / 失败原话。 */
+  const [openingContextId, setOpeningContextId] = useState<string | null>(null)
+  const [contextOutcomes, setContextOutcomes] = useState<Readonly<Record<string, string>>>({})
+
+  const openContextOf = async (recordId: string, context: CultivationContext): Promise<void> => {
+    if (props.openContext === undefined) return
+    setOpeningContextId(recordId)
+    setContextOutcomes(previous => ({ ...previous, [recordId]: '' }))
+    const result = await props.openContext(context)
+    setOpeningContextId(null)
+    if (!result.ok) setContextOutcomes(previous => ({ ...previous, [recordId]: result.problem }))
+  }
   const [reason, setReason] = useState('')
   const [reasonProblem, setReasonProblem] = useState<string | null>(null)
   /** 正在确认撤回的方法 slug（两步：先讲后果再确认）。 */
@@ -188,6 +212,9 @@ export function CultivationBoard(props: CultivationBoardProps) {
           actions={actions}
           onRefresh={props.onRefresh}
           onSubmitted={setHighlightId}
+          sources={props.contextSources}
+          currentSessionId={props.currentSessionId}
+          teammate={props.teammate}
         />
       )}
 
@@ -210,11 +237,56 @@ export function CultivationBoard(props: CultivationBoardProps) {
                         {highlightId === record.id && <Tag tone="success">{CULTIVATION_COPY.justSaved}</Tag>}
                       </span>
                       {/* 首句只在正文**没显示**时当摘要用；正文在下面就地展开时不再重复（走查抓到的重复行）。 */}
-                      {record.body === '' && <span className="wk-row-task">{record.title}</span>}
+                      {record.body === '' && (record.contexts?.length ?? 0) === 0 && <span className="wk-row-task">{record.title}</span>}
+                      {record.body === '' && (record.contexts?.length ?? 0) > 0 && (
+                        <span className="wk-meta">{CULTIVATION_COPY.bodyEmptyWithContext}</span>
+                      )}
                       <span className="wk-meta">
                         {stampOf(record.id) === null ? '' : `${String(stampOf(record.id))} 提出`}
-                        {record.source !== '（会话内提交）' ? `${stampOf(record.id) === null ? '' : ' · '}出处：${record.source}` : ''}
+                        {(record.contexts?.length ?? 0) === 0 && record.source !== '（会话内提交）'
+                          ? `${stampOf(record.id) === null ? '' : ' · '}出处：${record.source}`
+                          : ''}
                       </span>
+                      {(record.contexts?.length ?? 0) > 0 && (() => {
+                        const background = record.contexts![0]!
+                        const open = expandedContexts[record.id] === true
+                        const openLabel = background.kind === 'session'
+                          ? CULTIVATION_COPY.contextOpenSession
+                          : CULTIVATION_COPY.contextOpenFile
+                        return (
+                          <div className="wk-cultivation-context-card" aria-label={`背景：${background.title}`}>
+                            <div className="wk-cultivation-context-card-head">
+                              <strong>{background.title}</strong>
+                              <span className="wk-meta">
+                                {[
+                                  background.role === undefined ? '' : background.role,
+                                  background.subtitle === undefined ? '' : background.subtitle,
+                                  background.turn === undefined ? '' : `第 ${String(background.turn)} 轮`,
+                                ].filter(part => part !== '').join(' · ')}
+                              </span>
+                            </div>
+                            <div className="wk-cultivation-context-excerpt" style={{ whiteSpace: 'pre-wrap' }}>
+                              {open ? background.excerpt : background.excerpt.split('\n').slice(0, 2).join('\n')}
+                            </div>
+                            {background.truncated === true && <div className="wk-meta">{CULTIVATION_COPY.contextClipped}</div>}
+                            <div className="wk-cultivation-actions">
+                              <Button size="sm" variant="ghost" aria-expanded={open}
+                                onClick={() => { setExpandedContexts(previous => ({ ...previous, [record.id]: !open })) }}>
+                                {open ? CULTIVATION_COPY.contextCollapse : CULTIVATION_COPY.contextExpand}
+                              </Button>
+                              {props.openContext !== undefined && (
+                                <Button size="sm" variant="ghost" disabled={openingContextId === record.id}
+                                  onClick={() => { void openContextOf(record.id, background) }}>
+                                  {openingContextId === record.id ? CULTIVATION_COPY.contextLoading : openLabel}
+                                </Button>
+                              )}
+                            </div>
+                            {contextOutcomes[record.id] !== undefined && contextOutcomes[record.id] !== '' && (
+                              <div className="wk-meta wk-cultivation-problem">{contextOutcomes[record.id]}</div>
+                            )}
+                          </div>
+                        )
+                      })()}
                       {/* 判断要有材料（S4）：正文就地可见；但**长正文默认只展前几行**（场景轮实测 60 行撑出
                           1156px 行高，把后面 12 条待办顶到看不见的地方）⇒ 给明确的「展开全文（共 N 行）」。 */}
                       {record.body !== '' && (() => {
@@ -328,7 +400,14 @@ export function CultivationBoard(props: CultivationBoardProps) {
                   {record.status === 'adopted' && <Tag tone="success">已采纳{record.methodSlug !== undefined ? ` → ${record.methodSlug}` : ''}</Tag>}
                   {record.status === 'rejected' && <Tag tone="warning">被拒绝</Tag>}
                 </span>
-                <span className="wk-row-task">{record.status === 'rejected' ? `理由：${record.reason ?? '（未留）'}` : record.title}</span>
+                <span className="wk-row-task">
+                  {record.status === 'rejected'
+                    ? `理由：${record.reason ?? '（未留）'}`
+                    : record.body === '' && record.contexts?.[0] !== undefined ? record.contexts[0].title : record.title}
+                </span>
+                {record.contexts?.[0] !== undefined && (
+                  <span className="wk-meta">背景：{record.contexts[0].kind === 'session' ? '会话' : '成品'}「{record.contexts[0].title}」</span>
+                )}
               </div>
             ))}
           </div>

@@ -64,6 +64,7 @@ const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
 const STAMP = new Date().toISOString().slice(0, 10).replaceAll('-', '')
 const OWN_EXPECTATION = 'GUI探针：收口前逐项列出未决项'
 const COMPOSE_EXPECTATION = 'GUI探针：创作面提交的纠正'
+const CONTEXT_EXPECTATION = 'GUI探针：带成品背景的跨角色建议'
 const seeds = ROLES.map(role => ({
   id: `guiprobe-${STAMP}-${role}`,
   role,
@@ -118,6 +119,8 @@ const recordTextOf = (id) => existsSync(join(RECORDS_DIR, `${id}.md`)) ? readFil
 
 const { child, port, token } = await startWeb({ spawn, root: ROOT, home, port: 0 })
 let createdRecordId = null
+let contextRecordId = null
+let sessionContextRecordId = null
 let own = null
 let foreignId = null
 const browser = await launchChromium(await loadChromium(ROOT))
@@ -248,6 +251,79 @@ try {
     if (sessionId === null) throw new Error('找不到承载这次创作命令的会话（真机链路没落到 host 日志？）')
   })
 
+  await check('⑤b 可选背景：suggest + 成品背景 → 记录 contexts + 人话 source；正文可空', async () => {
+    await page.getByRole('button', { name: '给别的角色提建议', exact: true }).click()
+    await page.getByRole('button', { name: '＋ 添加背景', exact: true }).click()
+    const catalog = JSON.parse(readFileSync(join(WORKSPACE, 'kb', 'deliverables-index.json'), 'utf8'))
+    const slug = Array.isArray(catalog?.entries) ? catalog.entries[0]?.slug : undefined
+    if (typeof slug !== 'string' || slug === '') throw new Error('成品目录为空，无法验成品背景')
+    const option = page.locator('.wk-cultivation-context-option').filter({ hasText: slug }).first()
+    await option.waitFor({ timeout: 20_000 })
+    const optionText = await option.innerText()
+    await option.click()
+    await page.locator('.wk-cultivation-context-card').first().waitFor({ timeout: 10_000 })
+    await page.getByLabel('期望它怎么做（一句话）').fill(CONTEXT_EXPECTATION)
+    // 正文留空 = D3 的核心（“只写一句”）。
+    await page.getByRole('button', { name: '记下来', exact: true }).click()
+    const deadline = Date.now() + 25_000
+    let found = null
+    while (Date.now() < deadline && found === null) {
+      for (const name of readdirSync(RECORDS_DIR)) {
+        if (!name.endsWith('.md') || recordsBefore.has(name)) continue
+        const body = readFileSync(join(RECORDS_DIR, name), 'utf8')
+        if (body.includes(CONTEXT_EXPECTATION)) { found = { name, body }; break }
+      }
+      if (found === null) await sleep(500)
+    }
+    if (found === null) throw new Error(`背景提交后没找到记录（选项：${optionText.replaceAll('\n', ' ')}）`)
+    contextRecordId = found.name.replace(/\.md$/, '')
+    if (!found.body.includes('contexts: ')) throw new Error('记录缺 contexts')
+    if (!found.body.includes('"kind":"deliverable"')) throw new Error('记录 contexts 不是 deliverable')
+    if (!/source: 成品「/.test(found.body)) throw new Error('记录 source 不是成品人话摘要')
+    const bodyAfter = found.body.split('---').at(-1)?.trim() ?? ''
+    if (bodyAfter !== '') throw new Error(`正文应为空，实际：${bodyAfter.slice(0, 80)}`)
+    await page.getByText('背景：成品「').first().waitFor({ timeout: 15_000 })
+    console.log(`  NOTE 背景选项：${optionText.replaceAll('\n', ' ')}`)
+  })
+
+  await check('⑤c 会话背景：host 读真实会话 → contexts.kind=session + source=会话「…」', async () => {
+    await page.getByRole('button', { name: '给别的角色提建议', exact: true }).click()
+    let card = false
+    for (let attempt = 0; attempt < 3 && !card; attempt += 1) {
+      await page.getByRole('button', { name: '＋ 添加背景', exact: true }).click()
+      const options = page.locator('.wk-cultivation-context-option').filter({ hasText: /CEO|CFO|COO|VP-Eng|VP-Sales|成员/ })
+      await options.first().waitFor({ timeout: 20_000 })
+      if (await options.count() === 0) break
+      await options.nth(Math.min(attempt, (await options.count()) - 1)).click()
+      try {
+        await page.locator('.wk-cultivation-context-card').first().waitFor({ timeout: 10_000 })
+        card = true
+      } catch {
+        await sleep(500)
+      }
+    }
+    if (!card) throw new Error('三次会话预览都没出卡片（会话背景读不到）')
+    const expectation = 'GUI探针：带会话背景的跨角色建议'
+    await page.getByLabel('期望它怎么做（一句话）').fill(expectation)
+    await page.getByRole('button', { name: '记下来', exact: true }).click()
+    const deadline = Date.now() + 25_000
+    let found = null
+    while (Date.now() < deadline && found === null) {
+      for (const name of readdirSync(RECORDS_DIR)) {
+        if (!name.endsWith('.md') || recordsBefore.has(name)) continue
+        const body = readFileSync(join(RECORDS_DIR, name), 'utf8')
+        if (body.includes(expectation)) { found = { name, body }; break }
+      }
+      if (found === null) await sleep(500)
+    }
+    if (found === null) throw new Error('会话背景提交后没找到记录')
+    sessionContextRecordId = found.name.replace(/\.md$/, '')
+    if (!found.body.includes('"kind":"session"')) throw new Error('记录 contexts 不是 session')
+    if (!/source: 会话「/.test(found.body)) throw new Error('记录 source 不是会话人话摘要')
+    if (!found.body.includes('\n\n\n')) throw new Error('正文应为空')
+    console.log('  NOTE 会话背景：已验 host 读真实会话')
+  })
+
   // 面板的客户端投影要与 host 对齐，采纳才会被 host 认（chip 只改客户端，正好用来对齐）。
   await check('①b 面板角色与 host 对齐（点采纳前的前提）', async () => {
     if (hostRole === null) throw new Error('⑤a 未问出 host 角色')
@@ -374,6 +450,8 @@ if (own !== null) {
 }
 if (foreignId !== null) rmSync(join(RECORDS_DIR, `${foreignId}.md`), { force: true })
 if (createdRecordId !== null) rmSync(join(RECORDS_DIR, `${createdRecordId}.md`), { force: true })
+if (contextRecordId !== null) rmSync(join(RECORDS_DIR, `${contextRecordId}.md`), { force: true })
+if (sessionContextRecordId !== null) rmSync(join(RECORDS_DIR, `${sessionContextRecordId}.md`), { force: true })
 
 if (existsSync(RECORDS_DIR)) {
   for (const name of readdirSync(RECORDS_DIR)) {

@@ -49,7 +49,37 @@ export const CULTIVATION_COPY = {
   expectationLabel: '期望它怎么做（一句话）',
   expectationPlaceholder: '例如：收口前逐项列出未决项',
   bodyLabel: '做法与证据',
-  bodyHint: '写清做法；有出处就带上文件路径或会话坐标——采纳后它会成为这个角色以后的做法。',
+  bodyOptionalLabel: '做法（可选）',
+  bodyHint: '写清做法与证据；也可以先加一段参考背景，审批人能看到现场。',
+  bodyOptionalHint: '背景已带上；不写做法也能记下，审批人会看上面的背景。',
+  contextLabel: '参考背景（可选）',
+  contextAdd: '＋ 添加背景',
+  contextHint: '选一段会话或一份成品，审批人能看到现场，你不用把来龙去脉写一遍。',
+  contextPrivacy: '背景会写进公司盘的培养记录，相关角色可见；只选愿意共享的材料。',
+  contextUseCurrent: '本次会话',
+  contextPickTitle: '选择参考背景',
+  contextSearchPlaceholder: '搜会话标题 / 角色 / 成品名…',
+  contextSessions: '最近会话',
+  contextDeliverables: '最近成品',
+  contextEmpty: '还没有可引用的会话或成品。',
+  contextLoading: '正在读取这段背景…',
+  contextNoText: '这段会话没有可用的文字背景（可能只有工具调用）；换一段，或不带背景提交。',
+  contextReadFailed: (reason: string): string => `这段背景读不到：${reason}。可以换一段，或不带背景提交。`,
+  contextTimeout: '这段背景读得太慢——已停止。可以不带走背景继续，或重试。',
+  contextRemove: '移除',
+  contextChange: '更换',
+  contextExpand: '展开',
+  contextCollapse: '收起',
+  contextClipped: '摘要较长，已截取；审批人看服务端版本。',
+  bodyEmptyWithContext: '（未写做法；依据背景）',
+  contextChangeTurn: '换一轮',
+  contextOpenSession: '打开会话',
+  contextOpenFile: '打开原文',
+  contextTruncated: (turn: number, chars: number): string => `已截取最近 ${String(turn)} 轮，约 ${String(chars)} 字；原文可打开。`,
+  contextBadPayload: (reason: string): string => `背景格式坏：${reason}`,
+  contextTooLarge: (bytes: number): string => `背景太大（超过 ${String(bytes)} 字节），请选短一点的材料。`,
+  teammateBanner: '这是 CEO 团队成员的会话：这里的纠正/建议按 CEO（Lead）身份记账；成员继承 CEO 的方法层。',
+  memberBadge: (name: string): string => `成员 ${name}（CEO 团队）`,
   /** 长正文折叠（2026-10-18 场景轮：60 行正文撑出 1156px 的行高，把别的待办全顶到看不见的地方）。 */
   bodyExpand: (lines: number): string => `展开全文（共 ${String(lines)} 行）`,
   /** 列表折叠（2026-10-19：300 条待办一屏滚 = 能用但不好用）——默认只显示最近若干条。 */
@@ -60,7 +90,7 @@ export const CULTIVATION_COPY = {
   // ── 校验提示 ─────────────────────────────────────────────────────────────
   problemExpectationEmpty: '先写一句「期望它怎么做」。',
   problemExpectationSeparator: '期望行为里不能出现 `::`（它是与正文的分隔符）。',
-  problemBodyEmpty: '正文不能为空：写清做法与证据。',
+  problemBodyEmpty: '正文不能为空：写清做法与证据，或带一段背景。',
   problemReason: '拒绝要留一句理由（会留档给提出者）。',
   problemRoleUnknown: `目标角色须在名册（${CULTIVATION_ROLES.join(' / ')}）。`,
   problemRoleSelf: '给自己的角色用「留一条方法」；建议指向别的角色。',
@@ -170,11 +200,14 @@ export function revokeLine(slug: string): string {
 }
 
 /** `correct <期望行为> :: <正文>`（正文保真多行；期望句不得含 `::`）。 */
-export function correctLine(expectation: string, body: string): DraftResult {
+export function correctLine(expectation: string, body: string, contextToken?: string): DraftResult {
   const problem = expectationProblem(expectation)
   if (problem !== null) return { ok: false, problem }
-  if (body.trim() === '') return { ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemBodyEmpty } }
-  return { ok: true, line: `/cultivation correct ${expectation.trim()} :: ${body.trim()}` }
+  if (body.trim() === '' && contextToken === undefined) {
+    return { ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemBodyEmpty } }
+  }
+  const flag = contextToken === undefined ? '' : ` --context=${contextToken}`
+  return { ok: true, line: `/cultivation correct${flag} ${expectation.trim()} :: ${body.trim()}` }
 }
 
 /**
@@ -184,14 +217,14 @@ export function correctLine(expectation: string, body: string): DraftResult {
  * @param body - 建议与证据正文。
  * @param ownRole - 当前会话角色；给了就挡住"建议指向自己"（host 也会拒，这里先给人话）。
  */
-export function suggestLine(targetRole: string, expectation: string, body: string, ownRole?: string): DraftResult {
+export function suggestLine(targetRole: string, expectation: string, body: string, ownRole?: string, contextToken?: string): DraftResult {
   if (!(CULTIVATION_ROLES as readonly string[]).includes(targetRole)) {
     return { ok: false, problem: { field: 'role', message: CULTIVATION_COPY.problemRoleUnknown } }
   }
   if (ownRole !== undefined && ownRole === targetRole) {
     return { ok: false, problem: { field: 'role', message: CULTIVATION_COPY.problemRoleSelf } }
   }
-  const draft = correctLine(expectation, body)
+  const draft = correctLine(expectation, body, contextToken)
   if (!draft.ok) return draft
   return { ok: true, line: `/cultivation suggest ${targetRole}${draft.line.slice('/cultivation correct'.length)}` }
 }

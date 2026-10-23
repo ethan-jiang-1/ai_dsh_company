@@ -8,6 +8,7 @@ import {
   makeCultivationActions,
   type CultivationActionsFactory,
 } from './cultivation-actions.ts'
+import type { FollowLike } from './cultivation-context-data.ts'
 import { makeCultivationFiles, makeWorkspaceTextReader, type CultivationFiles } from './cultivation-data.ts'
 
 type CompanyRemote = Parameters<typeof makeCultivationFiles>[0]
@@ -35,6 +36,8 @@ export interface CompanyDataPlane {
   readonly follow: ReturnType<typeof createCompanySessionAdapters>['follow']
   readonly cultivationFiles: CultivationFiles
   readonly cultivationActions: CultivationActionsFactory
+  /** raw session follow（背景预览只取第一帧；不是 Lead 归并的 `follow`）。 */
+  readonly rawFollow: FollowLike
   /** 读工作区文本（失败 null）；`(path, limit) => (sessionId, signal) => text`。 */
   readonly readWorkspaceText: ReturnType<typeof makeWorkspaceTextReader>
 }
@@ -51,6 +54,7 @@ export function createCompanyDataPlane(scoped: CompanyDataPlaneContext): Company
     follow,
     cultivationFiles: makeCultivationFiles(scoped.remote, leadOf),
     cultivationActions: (sessionId) => makeCultivationActions(scoped.remote.commands, sessionId),
+    rawFollow: (request, signal) => scoped.remote.session.follow(request as never, signal) as never,
     readWorkspaceText: makeWorkspaceTextReader(scoped.remote, leadOf),
   }
 }

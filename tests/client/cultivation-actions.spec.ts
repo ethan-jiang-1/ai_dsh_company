@@ -183,3 +183,32 @@ describe('结果折算：host 原话必须到人眼前，命令面缺席要明�
     expect(CULTIVATION_COPY.revokeConfirm).toBe('确认撤回')
   })
 })
+
+
+describe('可选背景的命令线（D1=A：只带 ref token）', () => {
+  it('带 context：flag 在固定位置、正文可空；不带 context 逐字不变', () => {
+    expect(correctLine('收口前逐项列出未决项', '做法：先列清单。')).toEqual({
+      ok: true, line: '/cultivation correct 收口前逐项列出未决项 :: 做法：先列清单。',
+    })
+    expect(correctLine('收口前逐项列出未决项', '', 'tok-1')).toEqual({
+      ok: true, line: '/cultivation correct --context=tok-1 收口前逐项列出未决项 :: ',
+    })
+    expect(suggestLine('cfo', '结论先列假设', '', 'ceo', 'tok-2')).toEqual({
+      ok: true, line: '/cultivation suggest cfo --context=tok-2 结论先列假设 :: ',
+    })
+  })
+
+  it('无 context 且正文空 → 提示可带背景；有 context 则允许空正文', () => {
+    expect(correctLine('期望句', '  \n ')).toEqual({
+      ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemBodyEmpty },
+    })
+    expect(CULTIVATION_COPY.problemBodyEmpty).toContain('或带一段背景')
+    expect(correctLine('期望句', '', 'tok').ok).toBe(true)
+  })
+
+  it('期望句以 --context（无 =）开头仍按旧语法构造，不误判为 flag', () => {
+    expect(correctLine('--context is confusing', '正文')).toEqual({
+      ok: true, line: '/cultivation correct --context is confusing :: 正文',
+    })
+  })
+})

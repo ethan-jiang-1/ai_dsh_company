@@ -381,6 +381,30 @@ const CSS = `
   padding-left: 8px;
 }
 .wk-cultivation-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.wk-cultivation-teammate { border-left: 2px solid var(--dsw-alias-state-warn-primary); padding-left: 8px; }
+.wk-cultivation-context { display: grid; gap: 6px; }
+.wk-cultivation-context-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.wk-cultivation-context-card {
+  display: grid; gap: 4px; padding: 6px 8px; border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 6px; background: var(--dsw-alias-bg-layer-1); min-width: 0;
+}
+.wk-cultivation-context-card-head { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.wk-cultivation-context-excerpt { font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.wk-cultivation-context-picker {
+  display: grid; gap: 6px; padding: 8px; border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 6px; max-height: 280px; overflow: auto;
+}
+.wk-cultivation-context-picker-head { display: grid; gap: 4px; }
+.wk-cultivation-context-list { display: grid; gap: 2px; }
+.wk-cultivation-context-option {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; justify-content: space-between;
+  width: 100%; padding: 4px 6px; border: 0; border-radius: 4px; background: transparent;
+  color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.wk-cultivation-context-option:hover,
+.wk-cultivation-context-option:focus-visible { background: var(--dsw-alias-interactive-bg-hover); outline: none; }
+.wk-cultivation-context-privacy { font-size: 11px; }
+
 .wk-cultivation-reject { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .wk-cultivation-outcome { color: var(--dsw-alias-state-success-primary); }
 .wk-cultivation-problem { color: var(--dsw-alias-state-warn-primary); }

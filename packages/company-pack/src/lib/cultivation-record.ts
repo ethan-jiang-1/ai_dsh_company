@@ -8,6 +8,7 @@
  * 记录只存关系与决定——它不是第二份 KB（培养卡 §4）。
  */
 
+import { parseContextPayload, contextPayloadText, type CultivationContext } from './cultivation-context.ts'
 import { journalTitle } from './cultivation-inbox.ts'
 
 /** 一条培养记录（frontmatter 的领域投影）。 */
@@ -43,6 +44,10 @@ export interface CultivationRecord {
    * 结果是人只能盲判。判断必须先有材料 ⇒ 正文进客户端读模型、面板就地展开。
    */
   readonly body: string
+  /** 自包含背景（2026-10-23 背景卡 D1=A；host 读后写）。旧记录缺席 = `[]`。 */
+  readonly contexts?: readonly CultivationContext[]
+  /** `contexts` 坏形状时的可读原因；记录本身仍显示。 */
+  readonly contextProblem?: string | null
 }
 
 /** 记录 frontmatter 的可选透传字段（解析 → 领域形状）。 */
@@ -57,6 +62,8 @@ export interface RecordDraft {
   readonly source: string
   readonly expectation: string
   readonly body: string
+  /** 背景（host 读后填；缺席 = 不写 `contexts` 字段）。 */
+  readonly contexts?: readonly CultivationContext[]
 }
 
 /** 单行化（frontmatter 值不许换行；换行压成空格）。 */
@@ -76,6 +83,9 @@ export function recordText(draft: RecordDraft): string {
     `source: ${oneLine(draft.source)}`,
     `expectation: ${oneLine(draft.expectation)}`,
     'status: open',
+    ...(draft.contexts === undefined || draft.contexts.length === 0
+      ? []
+      : [`contexts: ${contextPayloadText(draft.contexts)}`]),
     '---',
     '',
     draft.body.trim(),
@@ -124,6 +134,7 @@ export function parseRecord(id: string, text: string): CultivationRecord | null 
   const verification = fields.get('verification')
   if (verification !== undefined && verification !== 'pending' && verification !== 'pass' && verification !== 'fail') return null
   const body = parsed.body
+  const contextRead = parseContextPayload(fields.get('contexts'))
   // 可选字段先聚成普通对象再收窄成领域形状（避免对 readonly 接口的索引签名强转）。
   const loose: Record<string, unknown> = {
     id,
@@ -136,6 +147,8 @@ export function parseRecord(id: string, text: string): CultivationRecord | null 
     status,
     title: journalTitle(body),
     body: body.trim(),
+    contexts: contextRead.contexts,
+    contextProblem: contextRead.problem,
   }
   for (const key of OPTIONAL_FIELDS) {
     const value = fields.get(key)
@@ -227,7 +240,7 @@ export function methodSkillText(input: { readonly slug: string; readonly expecta
     '',
     `# ${input.slug}`,
     '',
-    input.body.trim(),
+    input.body.trim() === '' ? oneLine(input.expectation) : input.body.trim(),
     '',
   ].join('\n')
 }

@@ -5,11 +5,14 @@
  */
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { roleLabel } from '../lib/cultivation.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { CultivationBoard } from './CultivationBoard.tsx'
 import type { CultivationActionsFactory } from './cultivation-actions.ts'
+import type { CultivationContextSources } from './cultivation-context-data.ts'
+import type { CultivationContext } from '../lib/cultivation-context.ts'
 import {
   CULTIVATION_REFRESH_MS,
   useCultivationFeedback,
@@ -32,6 +35,10 @@ export interface CultivationTabInjected {
   readonly followEvents?: CultivationFollowEvents
   /** 会话列表快照（viewer 角色经上游 agentPreset 投影订阅，照 RoleBadge 手法）。 */
   readonly roleSource: RoleBadgeInjected['roleSource']
+  /** 背景候选/预览源（注册处按会话构造；缺席 = 不显示背景区）。 */
+  readonly contextSources?: ((sessionId: SessionId) => CultivationContextSources) | undefined
+  /** 打开背景原文（注册处预检 + 导航；缺席 = 不显示打开按钮）。 */
+  readonly openContext?: ((sessionId: SessionId, context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false, readonly problem: string }>) | undefined
 }
 
 export type CultivationTabProps = PropsRuntime<'sidebar.right.pane.tab'> & CultivationTabInjected
@@ -48,6 +55,11 @@ export function CultivationTab(props: CultivationTabProps) {
   const viewerRole = useSyncExternalStore(subscribe, getPreset, getPreset)
   const { journalRows, records, refresh } = useCultivationPanelData(props.cultivationFiles, props.sessionId)
   const feedback = useCultivationFeedback(props.followEvents, props.sessionId)
+  const teammate = props.useSessions(state => state.byId[props.sessionId]?.origin === 'subagent')
+  const contextSources = useMemo(() => props.contextSources?.(props.sessionId), [props.contextSources, props.sessionId])
+  const openContext = props.openContext === undefined
+    ? undefined
+    : (context: CultivationContext) => props.openContext!(props.sessionId, context)
   // 动作面按会话取（页签槽 scope=session ⇒ sessionId 就是本会话；角色闸在 host）。
   const actions = useMemo(() => props.cultivationActions(props.sessionId), [props.cultivationActions, props.sessionId])
 
@@ -67,6 +79,10 @@ export function CultivationTab(props: CultivationTabProps) {
         feedbackReachable={props.followEvents !== undefined}
         actions={actions}
         onRefresh={refresh}
+        contextSources={contextSources}
+        currentSessionId={props.sessionId}
+        teammate={teammate}
+        openContext={openContext}
       />
     </PanelFrame>
   )

@@ -6,10 +6,14 @@
 
 当前活跃 0 张：
 
-- （无——fresh-agent-repo-hygiene 卫生审计卡 2026-10-21 已毕业归档：两轮审计 + 全部发现修复
-  〔P0–P4 + notes 归档 + 手册重构〕，收口记录 =
-  [归档卡](../_archive/settled_issues/2026-10-20-fresh-agent-repo-hygiene.md) 与
-  [Phase B–F Note](../../notes/implemented/2026-10-21-followup-sweep-phases-b-f.md)。）
+- （无——培养背景卡 2026-10-23 已交付归档：D1=A/D2=A；RFC 实施为
+  [Note](../../notes/implemented/2026-10-23-cultivation-context.md)，卡在
+  [归档](../_archive/settled_issues/2026-10-23-cultivation-context.md)。）
+
+fresh-agent-repo-hygiene 卫生审计卡（2026-10-21）已毕业归档：两轮审计 + 全部发现修复
+（P0–P4 + notes 归档 + 手册重构），收口记录 =
+[归档卡](../_archive/settled_issues/2026-10-20-fresh-agent-repo-hygiene.md) 与
+[Phase B–F Note](../../notes/implemented/2026-10-21-followup-sweep-phases-b-f.md)。
 
 此前六张卡（issue 卡质量 / 公司面优先级 / 看板+依赖图 / 任务板 / 台账 / 成品台账）均已归档，见
 [归档](../_archive/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。

@@ -12,12 +12,15 @@ import { useCallback, useMemo, useState, useSyncExternalStore } from 'react'
 import type { ReactNode } from 'react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { BoardPanel, DagPanel, LOADING_NOTE, PresencePanel, StateNote } from './company-panels.tsx'
 import { DagGlyph, GridGlyph, PeopleGlyph, SproutGlyph } from './tab-icons.tsx'
 import { useCompanyData, type CompanyDataInjected } from './use-company-data.ts'
 import { CultivationBoard } from './CultivationBoard.tsx'
 import type { CultivationActionsFactory } from './cultivation-actions.ts'
+import type { CultivationContextSources } from './cultivation-context-data.ts'
+import type { CultivationContext } from '../lib/cultivation-context.ts'
 import {
   CULTIVATION_REFRESH_MS,
   useCultivationFeedback,
@@ -43,6 +46,10 @@ export interface CompanyViewInjected extends CompanyDataInjected {
   readonly followEvents?: CultivationFollowEvents
   /** 会话列表快照（viewer 角色经上游 agentPreset 投影订阅）。 */
   readonly roleSource: RoleBadgeInjected['roleSource']
+  /** 背景候选/预览源（注册处按会话构造；缺席 = 不显示背景区）。 */
+  readonly contextSources?: ((sessionId: SessionId) => CultivationContextSources) | undefined
+  /** 打开背景原文（注册处预检 + 导航；缺席 = 不显示打开按钮）。 */
+  readonly openContext?: ((sessionId: SessionId, context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false, readonly problem: string }>) | undefined
 }
 
 type PanelKey = 'board' | 'dag' | 'presence' | 'cultivation'
@@ -77,6 +84,11 @@ export function createCompanyView(injected: CompanyViewInjected) {
     const viewerRole = useSyncExternalStore(subscribe, getPreset, getPreset)
     const cultivation = useCultivationPanelData(injected.cultivationFiles, sessionId, { enabled: panel === 'cultivation' })
     const feedback = useCultivationFeedback(injected.followEvents, sessionId, panel === 'cultivation')
+    const teammate = useSessions(state => state.byId[sessionId]?.origin === 'subagent')
+    const contextSources = useMemo(() => injected.contextSources?.(sessionId), [injected.contextSources, sessionId])
+    const openContext = injected.openContext === undefined
+      ? undefined
+      : (context: CultivationContext) => injected.openContext!(sessionId, context)
     const actions = useMemo(() => injected.cultivationActions(sessionId), [injected.cultivationActions, sessionId])
 
     return (
@@ -133,6 +145,10 @@ export function createCompanyView(injected: CompanyViewInjected) {
                 feedbackReachable={injected.followEvents !== undefined}
                 actions={actions}
                 onRefresh={cultivation.refresh}
+                contextSources={contextSources}
+                currentSessionId={sessionId}
+                teammate={teammate}
+                openContext={openContext}
               />
             </div>
           )}

@@ -18,6 +18,9 @@ import { startInstanceGuard } from './instance-guard.ts'
 import { createAttentionRegistry } from './attention-registry.ts'
 import { createCompanyView } from './CompanyView.tsx'
 import { createCompanyDataPlane, WORKSPACE_TEXT_PATHS } from './company-data-plane.ts'
+import { contextRowsFromStore, makeCultivationContextSources, type CultivationContextSources, type FollowLike } from './cultivation-context-data.ts'
+import type { CultivationContext } from '../lib/cultivation-context.ts'
+import { sessionFileAddress } from '../lib/deliverables-address.ts'
 import { createLeadLookup } from './company-session-adapters.ts'
 import { registerCompanyTabs } from './company-tab-registration.ts'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
@@ -50,6 +53,64 @@ const COMPANY_VIEW_ID = 'dsh-company-pack/company'
  * 行数据与任务板同走 slot props 的 `useSessions` 座位读 `agentTeam` 投影（升 0.1.7 时由 `remote.agentTeams.view` 改判）。
  * @param ctx - Client root context.
  */
+/** 背景读/开的最小结构面（两个注入块共用；预检与导航都在容器，领域视图不碰 RPC）。 */
+interface ContextWiringScoped {
+  readonly sessions: ClientContext['sessions']
+  readonly uiWorkspace: { openSession(target: unknown): void }
+  readonly sidebarRight: { openResource(address: string): void }
+  readonly remote: {
+    readonly workspaceFiles: {
+      stat(agentId: SessionId, path: string, signal: AbortSignal): Promise<{ readonly ok: boolean }>
+    }
+  }
+}
+
+/** 造背景源与「打开原文」（会话查 list/subagentAddress；文件先 stat 再开 file resource）。 */
+function makeContextWiring(
+  scoped: ContextWiringScoped,
+  leadOf: (sessionId: SessionId) => SessionId,
+  rawFollow: FollowLike,
+  readCatalog: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>,
+): {
+  readonly contextSources: (sessionId: SessionId) => CultivationContextSources
+  readonly openContext: (sessionId: SessionId, context: CultivationContext) => Promise<
+    { readonly ok: true } | { readonly ok: false, readonly problem: string }
+  >
+} {
+  const rows = (): ReturnType<typeof contextRowsFromStore> =>
+    contextRowsFromStore(scoped.sessions.list.getSnapshot().byId as never)
+  return {
+    contextSources: () => makeCultivationContextSources({
+      getSessions: rows,
+      follow: rawFollow,
+      readCatalog: (sessionId, signal) => readCatalog(sessionId as SessionId, signal),
+    }),
+    openContext: async (sessionId, context) => {
+      try {
+        if (context.kind === 'session') {
+          const state = scoped.sessions.list.getSnapshot()
+          const exists = state.byId[context.ref as SessionId] !== undefined
+            || (context.parentSessionId !== undefined
+              && scoped.sessions.subagentAddress(context.ref as SessionId) !== undefined)
+          if (!exists) return { ok: false, problem: '这个会话现在打不开了（可能已删除）。' }
+          const target = context.parentSessionId === undefined
+            ? context.ref
+            : { parentSessionId: context.parentSessionId, childSessionId: context.ref, mode: context.mode ?? 'unknown' }
+          scoped.uiWorkspace.openSession(target)
+          return { ok: true }
+        }
+        const lead = leadOf(sessionId)
+        const stat = await scoped.remote.workspaceFiles.stat(lead, context.ref, new AbortController().signal)
+        if (!stat.ok) return { ok: false, problem: '原文不在了（文件可能已归档/移动）。' }
+        scoped.sidebarRight.openResource(sessionFileAddress(lead, context.ref))
+        return { ok: true }
+      } catch (error) {
+        return { ok: false, problem: `打不开原文：${error instanceof Error ? error.message : String(error)}` }
+      }
+    },
+  }
+}
+
 export async function apply(ctx: ClientContext): Promise<void> {
   // CSS 与 fiber 同寿命；重新挂载读取新样式，卸载仅清理本次节点。
   ctx.effect(installStyles)
@@ -180,7 +241,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
   //   与 remote.session / remote.workspaceFiles 同款：按命名空间 inject，vendor 装配。
   ctx.inject(['sessions', 'uiWorkspace', 'remote.session', 'remote.workspaceFiles', 'remote.commands', 'slots', 'sidebarRight', 'sidebarRightTabs'], (scoped) => {
     const sessions = scoped.sessions
-    const { leadOf, follow, cultivationFiles, cultivationActions, readWorkspaceText } = createCompanyDataPlane(scoped)
+    const { leadOf, follow, cultivationFiles, cultivationActions, rawFollow, readWorkspaceText } = createCompanyDataPlane(scoped)
     const floatTab = (tabId: TabId, rect?: FloatRectLike): void => { scoped.sidebarRight.float(tabId, rect) }
     const unfloatTab = (paneId: string): void => { scoped.sidebarRight.dock(paneId as PaneId) }
     const openMember = async (
@@ -200,6 +261,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
     // 读取闭包唯一实现 = data plane 的 readWorkspaceText（Lead 寻址 + 失败 null 都在工厂里）。
     const readLedger = readWorkspaceText(WORKSPACE_TEXT_PATHS.ledger, 240)
     const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, 2000)
+    const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog)
 
     registerCompanyTabs(scoped, {
       attention,
@@ -213,6 +275,8 @@ export async function apply(ctx: ClientContext): Promise<void> {
       roleSource: sessions.list,
       readLedger,
       readCatalog,
+      contextSources: contextWiring.contextSources,
+      openContext: contextWiring.openContext,
     })
   })
 
@@ -221,9 +285,11 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // ⇒ 数据面用注册处闭包注入（见 CompanyView 头注）；跨插件值导入仍被禁。
   // ⚠ remote 按命名空间 inject：`remote.session`（follow 流）+ `remote.workspaceFiles`
   //   （2026-10-13 培养卡：第四子页培养的 journal/记录读取——与侧栏页签同一工厂语义）。
-  ctx.inject(['sessions', 'remote.session', 'remote.workspaceFiles', 'remote.commands', 'sidebarRight', 'slots'], (scoped) => {
+  ctx.inject(['sessions', 'uiWorkspace', 'remote.session', 'remote.workspaceFiles', 'remote.commands', 'sidebarRight', 'slots'], (scoped) => {
     const sessions = scoped.sessions
-    const { leadOf, follow, cultivationFiles, cultivationActions, readWorkspaceText } = createCompanyDataPlane(scoped)
+    const { leadOf, follow, cultivationFiles, cultivationActions, rawFollow, readWorkspaceText } = createCompanyDataPlane(scoped)
+    const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, 2000)
+    const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog)
     // 条目 ② S4：从公司视图直接浮出某个面板 = 打开对应平台页签 + `float`。
     // ⚠ openTab 的落位对 `active()` 的可见性有延迟（实测：同步读拿不到刚开的页签，float 静默
     // no-op）⇒ 推迟到宏任务并重试；带 kind 守卫防浮错别人的页签。重试耗尽 = 优雅降级
@@ -250,6 +316,8 @@ export async function apply(ctx: ClientContext): Promise<void> {
       cultivationActions,
       followEvents: follow,
       roleSource: sessions.list,
+      contextSources: contextWiring.contextSources,
+      openContext: contextWiring.openContext,
     })
     scoped.slots.inject('conversation.view', () => scoped.slots.register({
       name: 'conversation.view',

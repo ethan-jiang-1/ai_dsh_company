@@ -8,6 +8,8 @@ import type { FloatRectLike } from './float-geometry.ts'
 import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from './company-tabs.tsx'
 import type { CultivationActionsFactory } from './cultivation-actions.ts'
 import type { CultivationFiles } from './cultivation-data.ts'
+import type { CultivationContextSources } from './cultivation-context-data.ts'
+import type { CultivationContext } from '../lib/cultivation-context.ts'
 import { CultivationTab } from './CultivationTab.tsx'
 import { DeliverablesTab } from './DeliverablesTab.tsx'
 import { LedgerTab } from './LedgerTab.tsx'
@@ -43,6 +45,10 @@ export interface CompanyTabRegistrationData {
   readonly readLedger: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>
   /** Read the generated deliverables index for a session. */
   readonly readCatalog: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>
+  /** 背景候选/预览源（按面板所在会话取）。 */
+  readonly contextSources: (sessionId: SessionId) => CultivationContextSources
+  /** 打开背景原文：容器做可达性预检 + 导航；失败给可读原因。 */
+  readonly openContext: (sessionId: SessionId, context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false, readonly problem: string }>
 }
 
 interface TabRegistration {
@@ -123,6 +129,8 @@ const TAB_REGISTRATIONS = [
         cultivationActions: data.cultivationActions,
         followEvents: data.follow,
         roleSource: data.roleSource,
+        contextSources: data.contextSources,
+        openContext: data.openContext,
       }),
     }, CultivationTab),
   },
