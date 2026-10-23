@@ -9,7 +9,7 @@
 
 ```
 CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 校验）
-.agents/skills/          完成定义 skill 与 web-window-ops 的宿主（清单 = 目录本身，DSH 会话 catalog 自动发现）；DSH 会话技能从这里装载（D39）
+.agents/skills/          完成定义 skill 与 web-window-ops 的宿主（清单 = 目录本身，DSH 会话 catalog 自动发现；catalog 只收模型可加载项，`disable-model-invocation` 的用户命令〔/retro 等〕需用户点名）；DSH 会话技能从这里装载（D39）
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml、src/（host R3+）+ src/client/（client 面）
 company-workspace/      运行时公司共享盘（会话 cwd）：AGENTS.md（公司手册，随会话注入）、kb/、templates/、cultivation/（培养记录）、deliverables/ + deliverables-archive/（已收敛产物，只读归档）
 vendor/dsh/             DSH 源码 submodule（钉 SHA，只读铁律见下节）
