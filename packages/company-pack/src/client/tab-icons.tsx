@@ -146,53 +146,6 @@ function TabTitle({ tone, glyph: GlyphComponent, label, tooltip }: {
   )
 }
 
-/* 九个页签的标题组件：注册在 keyed 槽 sidebar.right.pane.tab.title（key = 页签类型 id）。 */
-
-/** 「待办」页签标题（注意·amber-500；2026-09-27 由「需要你」更名，用户语感裁定）。 */
-export function AttentionTabTitle(): ReactNode {
-  return <TabTitle tone="attention" glyph={BellGlyph} label="待办" tooltip="「分身做不了的事」收件箱——待批审批 / 待答问询 / 升级 / 完成通知" />
-}
-
-/** 「用量」页签标题（注意·amber-400）。 */
-export function BudgetTabTitle(): ReactNode {
-  return <TabTitle tone="burn" glyph={GaugeGlyph} label="用量" tooltip="令牌用量与占比（只做令牌，不做美元）" />
-}
-
-/** 「看板」页签标题（执行·blue-600）。 */
-export function BoardTabTitle(): ReactNode {
-  return <TabTitle tone="overview" glyph={GridGlyph} label="看板" tooltip="任务推进全景：每张卡到哪一步（owner / 依赖 / 修订号），投影更新" />
-}
-
-/** 「任务板」页签标题（执行·blue-500）。 */
-export function TasksTabTitle(): ReactNode {
-  return <TabTitle tone="work" glyph={KanbanGlyph} label="任务板" tooltip="共享任务表：状态 / owner / 依赖 / 修订号一屏看全" />
-}
-
-/** 「依赖图」页签标题（机制·deepseek-500）。 */
-export function DagTabTitle(): ReactNode {
-  return <TabTitle tone="structure" glyph={DagGlyph} label="依赖图" tooltip="任务依赖关系：谁等谁出稿、关键路径在哪" />
-}
-
-/** 「台账」页签标题（机制·deepseek-400）。 */
-export function LedgerTabTitle(): ReactNode {
-  return <TabTitle tone="archive" glyph={LedgerGlyph} label="台账" tooltip="公司大事记：每场动议的日期 / 类型 / 参与 / 成品 / 结论" />
-}
-
-/** 「成品」页签标题（机制·账本次档；静态索引）。 */
-export function CatalogTabTitle(): ReactNode {
-  return <TabTitle tone="archive" glyph={CatalogGlyph} label="成品" tooltip="公司成品目录：按 final.md 列成品（日期 / 类型 / 结果 / 一句话结论）；静态索引，生成后重读" />
-}
-
-/** 「在场」页签标题（人·green-500）。 */
-export function PresenceTabTitle(): ReactNode {
-  return <TabTitle tone="people" glyph={PeopleGlyph} label="在场" tooltip="谁在忙、忙什么——点行进成员空间；下方是流式协作动态" />
-}
-
-/** 「培养」页签标题（人·green-400）。 */
-export function CultivationTabTitle(): ReactNode {
-  return <TabTitle tone="growth" glyph={SproutGlyph} label="培养" tooltip="分身成长线：journal 待审收件箱 + 人审提升（只采纳有证据的）" />
-}
-
 /* guide 页条目 icon（右栏 Start 页那排胶囊；GuideBody 以 <Icon size={22|26}> 调用，
    不填 icon 它画出厂立方体占位）。包 tone span = 与页签 chip / 浮窗头同一 icon 同一色。 */
 
@@ -206,25 +159,6 @@ function guideIcon(tone: string, GlyphComponent: (props: GlyphProps) => ReactNod
     )
   }
 }
-
-/** 「待办」guide icon（琥珀）。 */
-export const AttentionGuideIcon = guideIcon('attention', BellGlyph)
-/** 「看板」guide icon（蓝）。 */
-export const BoardGuideIcon = guideIcon('overview', GridGlyph)
-/** 「依赖图」guide icon（紫）。 */
-export const DagGuideIcon = guideIcon('structure', DagGlyph)
-/** 「在场」guide icon（绿）。 */
-export const PresenceGuideIcon = guideIcon('people', PeopleGlyph)
-/** 「用量」guide icon（琥珀次档）。 */
-export const BudgetGuideIcon = guideIcon('burn', GaugeGlyph)
-/** 「任务板」guide icon（蓝次档）。 */
-export const TasksGuideIcon = guideIcon('work', KanbanGlyph)
-/** 「培养」guide icon（绿次档）。 */
-export const CultivationGuideIcon = guideIcon('growth', SproutGlyph)
-/** 「台账」guide icon（紫次档）。 */
-export const LedgerGuideIcon = guideIcon('archive', LedgerGlyph)
-/** 「成品」guide icon（赭色次档；产出箱）。 */
-export const CatalogGuideIcon = guideIcon('archive', CatalogGlyph)
 
 /* ── guide 条目胶囊（Start 页；用户令 2026-09-27：挂 hover tooltip）──────────────────
    背景：vendor guide 只在条目 ≤4 时显示描述（MAX_DESCRIBED_ENTRIES=4），我们 9 条
@@ -259,47 +193,81 @@ function GuideEntry({ tone, glyph: GlyphComponent, label, tooltip, kind, openTab
   )
 }
 
-/** 「待办」guide 条目。 */
-export function AttentionGuideEntry(props: GuideEntryProps): ReactNode {
-  return <GuideEntry {...props} tone="attention" glyph={BellGlyph} label="待办" tooltip="「分身做不了的事」收件箱——待批审批 / 待答问询 / 升级 / 完成通知" />
+/* ── 页签身份：一行 = 一个页签（label / tone / tooltip / glyph 唯一家）──────────────
+   2026-10-23（架构评审候选 3）：此前同一份 label/tooltip/tone/glyph 在标题、guide icon、
+   guide 胶囊三种渲染里各写一遍（9×3 处），改一个字的提示要动三处。现在三种渲染都从这一行派生；
+   新增页签 = 加一行 + 在注册处加一条 body。 */
+
+interface TabFace {
+  readonly tone: string
+  readonly glyph: (props: GlyphProps) => ReactNode
+  readonly label: string
+  readonly tooltip: string
 }
 
-/** 「看板」guide 条目。 */
-export function BoardGuideEntry(props: GuideEntryProps): ReactNode {
-  return <GuideEntry {...props} tone="overview" glyph={GridGlyph} label="看板" tooltip="任务推进全景：每张卡到哪一步（owner / 依赖 / 修订号），投影更新" />
+const FACES = {
+  attention: { tone: 'attention', glyph: BellGlyph, label: '待办', tooltip: '「分身做不了的事」收件箱——待批审批 / 待答问询 / 升级 / 完成通知' },
+  board: { tone: 'overview', glyph: GridGlyph, label: '看板', tooltip: '任务推进全景：每张卡到哪一步（owner / 依赖 / 修订号），投影更新' },
+  dag: { tone: 'structure', glyph: DagGlyph, label: '依赖图', tooltip: '任务依赖关系：谁等谁出稿、关键路径在哪' },
+  presence: { tone: 'people', glyph: PeopleGlyph, label: '在场', tooltip: '谁在忙、忙什么——点行进成员空间；下方是流式协作动态' },
+  budget: { tone: 'burn', glyph: GaugeGlyph, label: '用量', tooltip: '令牌用量与占比（只做令牌，不做美元）' },
+  tasks: { tone: 'work', glyph: KanbanGlyph, label: '任务板', tooltip: '共享任务表：状态 / owner / 依赖 / 修订号一屏看全' },
+  cultivation: { tone: 'growth', glyph: SproutGlyph, label: '培养', tooltip: '分身成长线：journal 待审收件箱 + 人审提升（只采纳有证据的）' },
+  ledger: { tone: 'archive', glyph: LedgerGlyph, label: '台账', tooltip: '公司大事记：每场动议的日期 / 类型 / 参与 / 成品 / 结论' },
+  catalog: { tone: 'archive', glyph: CatalogGlyph, label: '成品', tooltip: '公司成品目录：按 final.md 列成品（日期 / 类型 / 结果 / 一句话结论）；静态索引，生成后重读' },
+} as const satisfies Record<string, TabFace>
+
+/** 页签键（注册处按它取身份与三种渲染）。 */
+export type FaceKey = keyof typeof FACES
+
+const titleOf = (face: TabFace) => function TabFaceTitle(): ReactNode {
+  return <TabTitle tone={face.tone} glyph={face.glyph} label={face.label} tooltip={face.tooltip} />
+}
+const entryOf = (face: TabFace) => function TabFaceEntry(props: GuideEntryProps): ReactNode {
+  return <GuideEntry {...props} tone={face.tone} glyph={face.glyph} label={face.label} tooltip={face.tooltip} />
+}
+const iconOf = (face: TabFace) => guideIcon(face.tone, face.glyph)
+
+interface TabFaceComponents extends TabFace {
+  readonly Title: () => ReactNode
+  readonly Entry: (props: GuideEntryProps) => ReactNode
+  readonly Icon: (props: GlyphProps) => ReactNode
 }
 
-/** 「依赖图」guide 条目。 */
-export function DagGuideEntry(props: GuideEntryProps): ReactNode {
-  return <GuideEntry {...props} tone="structure" glyph={DagGlyph} label="依赖图" tooltip="任务依赖关系：谁等谁出稿、关键路径在哪" />
-}
+/** 九行身份 → 三种渲染组件（每行只建一次，对象恒等，测试可直接断言同一批对象）。 */
+export const TAB_IDENTITY = Object.fromEntries(
+  (Object.keys(FACES) as FaceKey[]).map((key) => {
+    const face = FACES[key]
+    return [key, { ...face, Title: titleOf(face), Entry: entryOf(face), Icon: iconOf(face) }]
+  }),
+) as Record<FaceKey, TabFaceComponents>
 
-/** 「在场」guide 条目。 */
-export function PresenceGuideEntry(props: GuideEntryProps): ReactNode {
-  return <GuideEntry {...props} tone="people" glyph={PeopleGlyph} label="在场" tooltip="谁在忙、忙什么——点行进成员空间；下方是流式协作动态" />
-}
+export const AttentionTabTitle = TAB_IDENTITY.attention.Title
+export const BudgetTabTitle = TAB_IDENTITY.budget.Title
+export const BoardTabTitle = TAB_IDENTITY.board.Title
+export const TasksTabTitle = TAB_IDENTITY.tasks.Title
+export const DagTabTitle = TAB_IDENTITY.dag.Title
+export const LedgerTabTitle = TAB_IDENTITY.ledger.Title
+export const CatalogTabTitle = TAB_IDENTITY.catalog.Title
+export const PresenceTabTitle = TAB_IDENTITY.presence.Title
+export const CultivationTabTitle = TAB_IDENTITY.cultivation.Title
 
-/** 「用量」guide 条目。 */
-export function BudgetGuideEntry(props: GuideEntryProps): ReactNode {
-  return <GuideEntry {...props} tone="burn" glyph={GaugeGlyph} label="用量" tooltip="令牌用量与占比（只做令牌，不做美元）" />
-}
+export const AttentionGuideEntry = TAB_IDENTITY.attention.Entry
+export const BoardGuideEntry = TAB_IDENTITY.board.Entry
+export const DagGuideEntry = TAB_IDENTITY.dag.Entry
+export const PresenceGuideEntry = TAB_IDENTITY.presence.Entry
+export const BudgetGuideEntry = TAB_IDENTITY.budget.Entry
+export const TasksGuideEntry = TAB_IDENTITY.tasks.Entry
+export const CultivationGuideEntry = TAB_IDENTITY.cultivation.Entry
+export const LedgerGuideEntry = TAB_IDENTITY.ledger.Entry
+export const CatalogGuideEntry = TAB_IDENTITY.catalog.Entry
 
-/** 「任务板」guide 条目。 */
-export function TasksGuideEntry(props: GuideEntryProps): ReactNode {
-  return <GuideEntry {...props} tone="work" glyph={KanbanGlyph} label="任务板" tooltip="共享任务表：状态 / owner / 依赖 / 修订号一屏看全" />
-}
-
-/** 「培养」guide 条目。 */
-export function CultivationGuideEntry(props: GuideEntryProps): ReactNode {
-  return <GuideEntry {...props} tone="growth" glyph={SproutGlyph} label="培养" tooltip="分身成长线：journal 待审收件箱 + 人审提升（只采纳有证据的）" />
-}
-
-/** 「台账」guide 条目。 */
-export function LedgerGuideEntry(props: GuideEntryProps): ReactNode {
-  return <GuideEntry {...props} tone="archive" glyph={LedgerGlyph} label="台账" tooltip="公司大事记：每场动议的日期 / 类型 / 参与 / 成品 / 结论" />
-}
-
-/** 「成品」guide 条目。 */
-export function CatalogGuideEntry(props: GuideEntryProps): ReactNode {
-  return <GuideEntry {...props} tone="archive" glyph={CatalogGlyph} label="成品" tooltip="公司成品目录：按 final.md 列成品（日期 / 类型 / 结果 / 一句话结论）；静态索引，生成后重读" />
-}
+export const AttentionGuideIcon = TAB_IDENTITY.attention.Icon
+export const BoardGuideIcon = TAB_IDENTITY.board.Icon
+export const DagGuideIcon = TAB_IDENTITY.dag.Icon
+export const PresenceGuideIcon = TAB_IDENTITY.presence.Icon
+export const BudgetGuideIcon = TAB_IDENTITY.budget.Icon
+export const TasksGuideIcon = TAB_IDENTITY.tasks.Icon
+export const CultivationGuideIcon = TAB_IDENTITY.cultivation.Icon
+export const LedgerGuideIcon = TAB_IDENTITY.ledger.Icon
+export const CatalogGuideIcon = TAB_IDENTITY.catalog.Icon

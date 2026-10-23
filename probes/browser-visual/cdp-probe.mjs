@@ -56,7 +56,8 @@ const verdict = {
 let tabs = [];
 try {
   const source = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/company-tab-registration.ts'), 'utf8');
-  tabs = parseCompanyTabCatalog(source);
+  const identity = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/tab-icons.tsx'), 'utf8');
+  tabs = parseCompanyTabCatalog(source, identity);
 } catch (error) {
   console.error(`cdp-probe: 读页签注册源失败：${String(error?.message ?? error)}`);
   process.exit(2);
