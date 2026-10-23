@@ -8,7 +8,7 @@ import {
   makeCultivationActions,
   type CultivationActionsFactory,
 } from './cultivation-actions.ts'
-import { makeCultivationFiles, type CultivationFiles } from './cultivation-data.ts'
+import { makeCultivationFiles, makeWorkspaceTextReader, type CultivationFiles } from './cultivation-data.ts'
 
 type CompanyRemote = Parameters<typeof makeCultivationFiles>[0]
 type SessionRemote = Parameters<typeof createCompanySessionAdapters>[1]
@@ -23,12 +23,20 @@ export interface CompanyDataPlaneContext {
   }
 }
 
+/** 两个静态页签的数据面路径（唯一家；面板只读这两份，不自己扫盘——BUG-025 的连线判据）。 */
+export const WORKSPACE_TEXT_PATHS = {
+  ledger: 'kb/motion-ledger.md',
+  catalog: 'kb/deliverables-index.json',
+} as const
+
 /** 数据面输出（页签与公司视图共用同一实现）。 */
 export interface CompanyDataPlane {
   readonly leadOf: ReturnType<typeof createCompanySessionAdapters>['leadOf']
   readonly follow: ReturnType<typeof createCompanySessionAdapters>['follow']
   readonly cultivationFiles: CultivationFiles
   readonly cultivationActions: CultivationActionsFactory
+  /** 读工作区文本（失败 null）；`(path, limit) => (sessionId, signal) => text`。 */
+  readonly readWorkspaceText: ReturnType<typeof makeWorkspaceTextReader>
 }
 
 /**
@@ -43,5 +51,6 @@ export function createCompanyDataPlane(scoped: CompanyDataPlaneContext): Company
     follow,
     cultivationFiles: makeCultivationFiles(scoped.remote, leadOf),
     cultivationActions: (sessionId) => makeCultivationActions(scoped.remote.commands, sessionId),
+    readWorkspaceText: makeWorkspaceTextReader(scoped.remote, leadOf),
   }
 }

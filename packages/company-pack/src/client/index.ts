@@ -17,7 +17,7 @@ import { DreamTeamBrandName } from './Brand.tsx'
 import { startInstanceGuard } from './instance-guard.ts'
 import { createAttentionRegistry } from './attention-registry.ts'
 import { createCompanyView } from './CompanyView.tsx'
-import { createCompanyDataPlane } from './company-data-plane.ts'
+import { createCompanyDataPlane, WORKSPACE_TEXT_PATHS } from './company-data-plane.ts'
 import { createLeadLookup } from './company-session-adapters.ts'
 import { registerCompanyTabs } from './company-tab-registration.ts'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
@@ -180,7 +180,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
   //   与 remote.session / remote.workspaceFiles 同款：按命名空间 inject，vendor 装配。
   ctx.inject(['sessions', 'uiWorkspace', 'remote.session', 'remote.workspaceFiles', 'remote.commands', 'slots', 'sidebarRight', 'sidebarRightTabs'], (scoped) => {
     const sessions = scoped.sessions
-    const { leadOf, follow, cultivationFiles, cultivationActions } = createCompanyDataPlane(scoped)
+    const { leadOf, follow, cultivationFiles, cultivationActions, readWorkspaceText } = createCompanyDataPlane(scoped)
     const floatTab = (tabId: TabId, rect?: FloatRectLike): void => { scoped.sidebarRight.float(tabId, rect) }
     const unfloatTab = (paneId: string): void => { scoped.sidebarRight.dock(paneId as PaneId) }
     const openMember = async (
@@ -197,20 +197,9 @@ export async function apply(ctx: ClientContext): Promise<void> {
       scoped.uiWorkspace.openSession({ parentSessionId: lead, childSessionId: member.id as SessionId, mode: 'continuable' })
     }
     // 动作面按会话取（命令作用在面板所在会话；跨角色会被 host 角色闸拒，错误原话回到面板行内）。
-    const readLedger = async (sessionId: SessionId, signal: AbortSignal): Promise<string | null> => {
-      try {
-        const result = await scoped.remote.workspaceFiles.read(leadOf(sessionId), 'kb/motion-ledger.md', { limit: 240 }, signal)
-        if (!result.ok) return null
-        return result.value.text
-      } catch { return null }
-    }
-    const readCatalog = async (sessionId: SessionId, signal: AbortSignal): Promise<string | null> => {
-      try {
-        const result = await scoped.remote.workspaceFiles.read(leadOf(sessionId), 'kb/deliverables-index.json', { limit: 2000 }, signal)
-        if (!result.ok) return null
-        return result.value.text
-      } catch { return null }
-    }
+    // 读取闭包唯一实现 = data plane 的 readWorkspaceText（Lead 寻址 + 失败 null 都在工厂里）。
+    const readLedger = readWorkspaceText(WORKSPACE_TEXT_PATHS.ledger, 240)
+    const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, 2000)
 
     registerCompanyTabs(scoped, {
       attention,
@@ -234,7 +223,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
   //   （2026-10-13 培养卡：第四子页培养的 journal/记录读取——与侧栏页签同一工厂语义）。
   ctx.inject(['sessions', 'remote.session', 'remote.workspaceFiles', 'remote.commands', 'sidebarRight', 'slots'], (scoped) => {
     const sessions = scoped.sessions
-    const { leadOf, follow, cultivationFiles, cultivationActions } = createCompanyDataPlane(scoped)
+    const { leadOf, follow, cultivationFiles, cultivationActions, readWorkspaceText } = createCompanyDataPlane(scoped)
     // 条目 ② S4：从公司视图直接浮出某个面板 = 打开对应平台页签 + `float`。
     // ⚠ openTab 的落位对 `active()` 的可见性有延迟（实测：同步读拿不到刚开的页签，float 静默
     // no-op）⇒ 推迟到宏任务并重试；带 kind 守卫防浮错别人的页签。重试耗尽 = 优雅降级

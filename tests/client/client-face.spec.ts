@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { DELEGATION_TOOL_KEYS } from '../../packages/company-pack/src/client/delegation-keys.ts'
+import { makeWorkspaceTextReader } from '../../packages/company-pack/src/client/cultivation-data.ts'
+import { WORKSPACE_TEXT_PATHS } from '../../packages/company-pack/src/client/company-data-plane.ts'
 
 const PACK = join(ROOT, 'packages/company-pack')
 const PRESETS_DIR = join(PACK, 'presets')
@@ -37,29 +39,31 @@ describe('client 面（R3：委派工具卡）', () => {
     expect(ledger, '量溢出要在绘制前跑（否则首帧闪出「有裁切、没入口」）').toMatch(/useLayoutEffect/)
   })
 
-  it('台账面板的数据面 = kb/motion-ledger.md（不是 deliverables 目录，也不是 993 份成品）', () => {
-    // 为什么钉这条：BUG-025 的成因不是面板坏了，是**卡/调研把两个数据面当成一个**——「台账 = 993 份成品」
-    // 被写进四张卡与调研，而面板一直只读 40 行的动议表。数据量那条事实来自 `find`（盘上有什么），
-    // 面板的数据面来自 `remote.workspaceFiles.read(path)`（面板读什么）——**两者之间的连线没有任何判据**，
-    // 于是同一个错传播了一轮。本断言钉住那条连线：改数据面就红，改口径不用再靠人记得。
-    const index = readFileSync(join(PACK, 'src/client/index.ts'), 'utf8')
-    const read = /const readLedger = async[\s\S]*?\n {4}\}/.exec(index)?.[0] ?? ''
-    expect(read, 'index.ts 里找不到 readLedger（数据面接线被改过，复核本断言）').not.toBe('')
-    expect(read, '台账数据面必须读 kb/motion-ledger.md').toContain("'kb/motion-ledger.md'")
-    // 反证方向：台账不许去读成品目录（那会是「路 B」，属新数据面 + 新信息架构，不是这个面板的现状）。
-    expect(read, '台账数据面不许改成读 deliverables 目录').not.toMatch(/deliverables/)
+  it('台账/成品数据面 = 两条常量路径，读取闭包按它请求（接口断言，不扫 index.ts 源码）', async () => {
+    // 为什么钉这条：BUG-025 的成因不是面板坏了，是「台账 = 993 份成品」被写进卡与调研，而面板只读 40 行的动议表。
+    // 2026-10-23 起读取闭包唯一实现 = makeWorkspaceTextReader；本测试直接调用它，断言面板真正请求的路径与 limit，
+    // 不再对 index.ts 做正则（接线一变就红，但不再依赖源码排版）。
+    const seen: Array<{ path: string; limit: number }> = []
+    const remote = {
+      workspaceFiles: {
+        read: async (_sessionId: string, path: string, options: { limit: number }) => {
+          seen.push({ path, limit: options.limit })
+          return { ok: true as const, value: { text: 'x' } }
+        },
+      },
+    }
+    const read = makeWorkspaceTextReader(remote as never, sessionId => sessionId)
+    const signal = new AbortController().signal
+    expect(await read(WORKSPACE_TEXT_PATHS.ledger, 240)('s' as never, signal)).toBe('x')
+    expect(await read(WORKSPACE_TEXT_PATHS.catalog, 2000)('s' as never, signal)).toBe('x')
+    expect(seen).toEqual([
+      { path: 'kb/motion-ledger.md', limit: 240 },
+      { path: 'kb/deliverables-index.json', limit: 2000 },
+    ])
     const tab = readFileSync(join(PACK, 'src/client/LedgerTab.tsx'), 'utf8')
     expect(tab, 'LedgerTab 必须经 parseMotionLedger 解析（否则读的可能是别的表）').toContain('parseMotionLedger')
-  })
-
-  it('成品目录的数据面 = kb/deliverables-index.json（生成索引，不是面板自己扫盘）', () => {
-    const index = readFileSync(join(PACK, 'src/client/index.ts'), 'utf8')
-    const read = /const readCatalog = async[\s\S]*?\n {4}\}/.exec(index)?.[0] ?? ''
-    expect(read, 'index.ts 里找不到 readCatalog（数据面接线被改过，复核本断言）').not.toBe('')
-    expect(read, '成品目录必须读生成索引 kb/deliverables-index.json').toContain("'kb/deliverables-index.json'")
-    expect(read, '成品目录不许直接扫 deliverables 目录').not.toMatch(/'deliverables\/'/)
-    const tab = readFileSync(join(PACK, 'src/client/DeliverablesTab.tsx'), 'utf8')
-    expect(tab, 'DeliverablesTab 必须经 parseCatalog 解析（否则读的可能是别的东西）').toContain('parseCatalog')
+    const catalogTab = readFileSync(join(PACK, 'src/client/DeliverablesTab.tsx'), 'utf8')
+    expect(catalogTab, 'DeliverablesTab 必须经 parseCatalog 解析').toContain('parseCatalog')
   })
 
   it('client 入口确实注册了 tool.call.toolview，且 key 走共享常量（不写死）', () => {

@@ -51,6 +51,31 @@ export interface CultivationFiles {
 }
 
 /**
+ * 「读一个工作区文本、失败即 null」的唯一闭包工厂（2026-10-23 架构评审候选 5）。
+ *
+ * 此前同一段 try/ok/catch 在三处各写一遍：本文件的 readText、client/index.ts 的 readLedger 与 readCatalog。
+ * 读取经 Lead 的工作区身份（子代理会话归到 Lead），任何失败（不可读/异常）都退化成 null，
+ * 由调用方决定文案——工厂不替调用方编错误话术。
+ * @param remote - 注册处的 remote 命名空间（至少含 workspaceFiles）。
+ * @param leadOf - 子会话归 Lead。
+ * @returns `(path, limit) => (sessionId, signal) => Promise<string | null>`。
+ */
+export function makeWorkspaceTextReader(
+  remote: RemoteNamespaceFace,
+  leadOf: (sessionId: SessionId) => SessionId,
+): (path: string, limit: number) => (sessionId: SessionId, signal: AbortSignal) => Promise<string | null> {
+  return (path, limit) => async (sessionId, signal) => {
+    try {
+      const result = await remote.workspaceFiles.read(leadOf(sessionId), path, { limit }, signal)
+      if (!result.ok) return null
+      return result.value.text
+    } catch {
+      return null
+    }
+  }
+}
+
+/**
  * 造培养文件闭包（两个注册块——侧栏页签与公司整页——各造一份，同一工厂保证同语义）。
  * @param remote - 注册处的 remote 命名空间（至少含 workspaceFiles）。
  * @param leadOf - 子代理会话归到 Lead（读取经 Lead 的工作区身份）。
@@ -67,20 +92,12 @@ export function makeCultivationFiles(remote: RemoteNamespaceFace, leadOf: (sessi
       return null
     }
   }
-  const readText = async (sessionId: SessionId, path: string, limit: number, signal: AbortSignal): Promise<string | null> => {
-    try {
-      const result = await remote.workspaceFiles.read(leadOf(sessionId), path, { limit }, signal)
-      if (!result.ok) return null
-      return result.value.text
-    } catch {
-      return null
-    }
-  }
+  const readText = makeWorkspaceTextReader(remote, leadOf)
   return {
     listJournal: (sessionId, role, signal) => listDir(sessionId, `kb/${role}/journal`, signal),
-    readHead: (sessionId, path, signal) => readText(sessionId, path, 240, signal),
+    readHead: (sessionId, path, signal) => readText(path, 240)(sessionId, signal),
     listRecords: (sessionId, signal) => listDir(sessionId, 'cultivation/records', signal),
-    readRecord: (sessionId, path, signal) => readText(sessionId, path, 2000, signal),
+    readRecord: (sessionId, path, signal) => readText(path, 2000)(sessionId, signal),
   }
 }
 

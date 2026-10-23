@@ -12,8 +12,9 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
-import { ledgerStats, parseMotionLedger, type MotionRow } from '../lib/ledger.ts'
+import { ledgerStats, parseMotionLedger } from '../lib/ledger.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
+import { useWorkspaceText } from './workspace-text.ts'
 import type { FloatRectLike } from './float-geometry.ts'
 
 /** 页签体注入面：台账文件读取闭包 + 浮出。 */
@@ -105,26 +106,9 @@ export function LedgerSummary({ summary }: { readonly summary: string }) {
  * @returns 动议台账面板。
  */
 export function LedgerTab(props: LedgerTabProps) {
-  const [rows, setRows] = useState<readonly MotionRow[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const controller = new AbortController()
-    const load = async (): Promise<void> => {
-      const text = await props.readLedger(props.sessionId, controller.signal)
-      if (controller.signal.aborted) return
-      if (text === null) {
-        setRows(null)
-        setError('台账不可读（kb/motion-ledger.md 缺失？）')
-        return
-      }
-      setRows([...parseMotionLedger(text)])
-      setError(null)
-    }
-    void load()
-    const timer = setInterval(() => { void load() }, REFRESH_MS)
-    return () => { controller.abort(); clearInterval(timer) }
-  }, [props.sessionId, props.readLedger])
+  const { state } = useWorkspaceText(props.readLedger, props.sessionId, { refreshMs: REFRESH_MS })
+  const rows = state.status === 'ready' ? [...parseMotionLedger(state.text)] : null
+  const error = state.status === 'unreadable' ? '台账不可读（kb/motion-ledger.md 缺失？）' : null
 
   const stats = rows === null ? null : ledgerStats(rows)
 

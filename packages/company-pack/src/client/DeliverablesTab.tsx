@@ -11,7 +11,7 @@
  * - **分组 + 筛选**：按月分组；全部/活跃/归档/台账外四档，44 条也不至于糊成一片。
  * - **空/错/加载**：缺索引不静默给空表，明确提示跑生成器。
  */
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
@@ -19,6 +19,7 @@ import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import { LOADING_NOTE, StateNote } from './company-panels.tsx'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { LedgerSummary } from './LedgerTab.tsx'
+import { useWorkspaceText } from './workspace-text.ts'
 import type { FloatRectLike } from './float-geometry.ts'
 
 /** 一条成品目录项（与 `tools/lib/deliverables-catalog.mjs` 同形）。 */
@@ -249,40 +250,13 @@ export function DeliverablesView({ catalog, sessionId, openFinal }: {
  * @returns 成品目录。
  */
 export function DeliverablesTab(props: DeliverablesTabProps) {
-  const [catalog, setCatalog] = useState<DeliverablesCatalog | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [tick, setTick] = useState(0)
-
-  const load = useCallback(async (signal: AbortSignal): Promise<void> => {
-    try {
-      const text = await props.readCatalog(props.sessionId, signal)
-      if (signal.aborted) return
-      if (text === null) {
-        setCatalog(null)
-        setError('成品索引不可读（kb/deliverables-index.json 缺失？维护者运行 node tools/deliverables-index.mjs）')
-        return
-      }
-      const parsed = parseCatalog(text)
-      if (parsed === null) {
-        setCatalog(null)
-        setError('成品索引形状不符（schema 1 / entries 缺失；重跑 node tools/deliverables-index.mjs）')
-        return
-      }
-      setCatalog(parsed)
-      setError(null)
-    } catch (cause) {
-      if (!signal.aborted) {
-        setCatalog(null)
-        setError(cause instanceof Error ? cause.message : String(cause))
-      }
-    }
-  }, [props.readCatalog, props.sessionId])
-
-  useEffect(() => {
-    const controller = new AbortController()
-    void load(controller.signal)
-    return () => { controller.abort() }
-  }, [load, tick])
+  const { state, reload } = useWorkspaceText(props.readCatalog, props.sessionId)
+  const catalog = state.status === 'ready' ? parseCatalog(state.text) : null
+  const error = state.status === 'unreadable'
+    ? '成品索引不可读（kb/deliverables-index.json 缺失？维护者运行 node tools/deliverables-index.mjs）'
+    : state.status === 'ready' && catalog === null
+      ? '成品索引形状不符（schema 1 / entries 缺失；重跑 node tools/deliverables-index.mjs）'
+      : null
 
   return (
     <PanelFrame
@@ -295,7 +269,7 @@ export function DeliverablesTab(props: DeliverablesTabProps) {
           size="sm"
           variant="ghost"
           title="重读生成索引（维护者跑完 tools/deliverables-index.mjs 后）"
-          onClick={() => { setTick(value => value + 1) }}
+          onClick={reload}
         >
           重读
         </Button>
