@@ -9,6 +9,7 @@
 git submodule update --init             # vendor/dsh 钉 tag
 corepack enable pnpm                    # 一次性：pnpm 读根 packageManager（钉 11.7.0）
 pnpm install                            # 全 workspace（vendor/dsh 全树含 vendored cordis 与 native/system）
+pnpm bundle:init                        # dev run bundle 的 workspace（company-workspace/ 整树 gitignored；制度件符号链接指回 pack）
 # host 面构建（typert 类型图产物，源码直跑需要；tsc 局部 + tsdown host 面）：
 node ./node_modules/typescript/bin/tsc -b \
   vendor/dsh/packages/typert/generator \

@@ -75,7 +75,7 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
    （hoisted + autoInstallPeers: false，vendor 模板镜像）+ `.npmrc`（store/cache 钉 repo 内，§11）。
 4. **真安装**：`node <bin.dsh> plugin --profile release-check add file:<tarball>` → 断言 bundles reconcile、安装副本的 presets/client/**出厂骨架 `workspace/`**、peers 与矩阵。`--profile` 挂在 plugin 子命令上。
 5. **boot + RPC**：`node <bin.dsh> --profile release-check -- --port 0 --no-open` → roster 五公司角色 + researcher 零 broken、`session/create` 挂上 ceo 与 researcher、浏览器模块表含本包 client。随机端口的临时实例不替换开发 GUI。
-6. **首启自举**（2026-10-13 加）：干净 `DSH_COMPANY_HOME` 下第一次 boot 必须把骨架落到位（手册/章程/模板/起动件），**第二次 boot 零变更**——"建立好了就不用再建立了"的模拟安装判据。
+6. **首启自举 + run bundle**（2026-10-13 加，2026-10-24 扩）：干净 `DSH_COMPANY_HOME` 下第一次 boot 必须把骨架落到位（手册/章程/模板/起动件），并在 `<DSH_HOME>/bundle.json` 写 bundle 身份（id / workspace 相对根 / 基部逐文件 sha256）；**新安装不许带扩张数据**（journal / 交付物 / 培养记录）；**第二次 boot 零变更且 bundle.json 字节不变**——"建立好了就不用再建立了"的模拟安装判据。
 
 两个 DSH 调用均为 plain Node，清除继承的 `NODE_OPTIONS`、`NODE_PATH`、`TSX_*`，不走 `pnpm dsh`/tsx。构建和打包各限 120 秒，安装 180 秒，boot 120 秒、实例总寿命 180 秒、每个 HTTP 请求 15 秒；POSIX 子进程组 TERM 后等待，1 秒后 KILL。确认退出才回收 profile（`--keep` 保留）；同 home 的锁目录拒绝并发运行。强杀脚本留下的锁须确认无进程后人工移除。
 
@@ -108,9 +108,10 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 
 ## 版本纪律
 
-- pack 版本 `0.2.0`（`private: true`——**尚未发布到任何 registry**；真实发布动作
+- pack 版本 `0.3.0`（`private: true`——**尚未发布到任何 registry**；真实发布动作
   （npm publish）等出现第二个消费者/部署需求时再定，当前 release-smoke 验证的是
-  `file:` tarball 安装形状）。
+  `file:` tarball 安装形状）。0.3.0 = run bundle 安装单元（bundle.json + 整盘去 tracked）；
+  改内容必 bump（见下条）。
 - 真实发布落定时的已判要件（2026-10-07 借语料 sdlc-11 登记；未到触发不预建脚本）：
   **registry 三态幂等**（无 → publish / sha512 同 → skip / 异 → fail「改内容没升版」）；
   **改内容必 bump 版本**；**发布字节 = 冒烟字节**（publish 的产物必须就是 release-smoke
@@ -126,7 +127,9 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 
 - **`_dist/` 是导出目的地不是源**：tgz 全 gitignore；《安装手册》是唯一 tracked 例外——
   由脚本生成（版本/日期/条目数注入），**永不手改**；verify 的 `dist-manual` 门禁核对手册表头
-  版本 == pack package.json（升版本忘重导即红；反证 2026-09-28 红→绿）。版本 bump 必须同 diff 重跑导出。
+  版本 == pack package.json，**且**含 `run bundle` / `bundle.json` / `company-workspace` 关键句与
+  当前 pin（升版本忘重导、或内容退回旧安装形状，都会红；反证 2026-09-28 与 2026-10-24 两次红→绿）。
+  版本 bump 必须同 diff 重跑导出。
 - **打包步 = release-smoke 同一条 `npm pack`**（npm cache 钉 scratch，§11）；导出后对产物本体
   再断言一次发布边界（cordis.patch.yml / lib 双半 / presets 在场，无 `package/` 外文件）。
 - **导出 ≠ 发布**：不 bump 版本、不跑认证档、不进 registry——按工作树现状打包；真实发布动作

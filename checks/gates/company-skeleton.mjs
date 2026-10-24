@@ -32,20 +32,28 @@ export function run({ root, ok, fail }) {
   shipped.includes('workspace/**')
     ? ok('company-skeleton 随包分发（files 含 workspace/**）')
     : problems.push('packages/company-pack/package.json 的 files 缺 workspace/**——第三方装了插件却没有公司盘骨架')
-  for (const [live, target] of LINKS) {
-    const livePath = join(root, live)
+  for (const [, target] of LINKS) {
     const targetPath = join(root, target)
     if (!existsSync(targetPath)) problems.push(`${target} 缺失（骨架件不在盘上）`)
     else if (lstatSync(targetPath).isSymbolicLink()) problems.push(`${target} 是符号链接——骨架件必须是 pack 里的真实文件`)
-    let stat
-    try { stat = lstatSync(livePath) } catch { problems.push(`${live} 缺失（运行盘少了制度件入口）`); continue }
-    if (!stat.isSymbolicLink()) problems.push(`${live} 不是符号链接（副本 = 第二本账；运行盘该指回 ${target}）`)
-    else if (realpathSync(livePath) !== realpathSync(targetPath)) problems.push(`${live} → ${readlinkSync(livePath)}（应指回 ${target}）`)
+  }
+  // 2026-10-24：dev 的 company-workspace 是 run bundle 的 workspace，整树已去 tracked。
+  // fresh clone 没有它 ⇒ 只校验 pack 单源；在场时才校验运行盘链接（dev bundle 自管盘的符号链接）。
+  const hasWorkspace = existsSync(join(root, 'company-workspace'))
+  if (hasWorkspace) {
+    for (const [live, target] of LINKS) {
+      const livePath = join(root, live)
+      const targetPath = join(root, target)
+      let stat
+      try { stat = lstatSync(livePath) } catch { problems.push(`${live} 缺失（运行盘少了制度件入口）`); continue }
+      if (!stat.isSymbolicLink()) problems.push(`${live} 不是符号链接（副本 = 第二本账；运行盘该指回 ${target}）`)
+      else if (realpathSync(livePath) !== realpathSync(targetPath)) problems.push(`${live} → ${readlinkSync(livePath)}（应指回 ${target}）`)
+    }
   }
   for (const starter of STARTERS) {
     if (!existsSync(join(root, starter))) problems.push(`${starter} 缺失（出厂起动件/空目录骨架）`)
   }
   problems.length === 0
-    ? ok(`company-skeleton 单源 ×${LINKS.length} + 起动件 ×${STARTERS.length}（制度件住 pack，运行盘符号链接指回）`)
+    ? ok(`company-skeleton 单源 ×${LINKS.length} + 起动件 ×${STARTERS.length}（制度件住 pack${hasWorkspace ? '，运行盘符号链接指回' : '；dev bundle 未初始化，跳过运行盘链接'}）`)
     : fail('company-skeleton', problems.join('；'))
 }

@@ -33,5 +33,5 @@ orient 自己宣传的「深看某次运行」在 2 个 runnable 场景之一上
 
 ## 教训
 
-**消费一种「引用合同」时要枚举合同的全部合法形状**——snapshots/README 的 Run bundle 引用合同里
+**消费一种「引用合同」时要枚举合同的全部合法形状**——snapshots/README 的 Run trace 引用合同里
 children 的两种声明形状都是真实场景在用的，视图层只测过自己造的那一种。

@@ -31,7 +31,12 @@ let lockDir
 let ownsProfile = false
 let ownsLock = false
 try {
-  const home = requireDevHome('release-smoke')
+  // 干净 home 必须在**自己的子目录**：bundle.json 写在 DSH_HOME 根，直接拿 dev home 会把
+  // release-check 的临时 workspace 记成 dev bundle 的身份（2026-10-24 实测踩到）。
+  const devHome = requireDevHome('release-smoke')
+  const home = join(devHome, 'tmp/release-smoke-home')
+  rmSync(home, { recursive: true, force: true })
+  mkdirSync(home, { recursive: true })
   const cliDir = join(ROOT, 'vendor/dsh/apps/cli')
   const cliManifest = JSON.parse(readFileSync(join(cliDir, 'package.json'), 'utf8'))
   const bin = cliManifest.bin?.dsh
@@ -181,7 +186,23 @@ try {
     ['AGENTS.md', 'kb/org.md', 'kb/owners.md', 'kb/motion-ledger.md', 'kb/ceo/CHARTER.md', 'templates/meta.md']
       .every(rel => has(first, rel)),
     first === null ? `落点不存在：${companyHome}` : `共 ${String(first.length)} 件`)
+
+  // run bundle 身份（2026-10-24）：首启写 `<DSH_HOME>/bundle.json`；workspace 记相对根、骨架指纹在场。
+  const manifestPath = join(home, 'bundle.json')
+  const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : null
+  check('首启写 bundle.json（run bundle 身份）',
+    manifest?.v === 1 && typeof manifest.id === 'string' && typeof manifest.createdAt === 'string'
+      && manifest.workspace === 'tmp/release-company-workspace'
+      && typeof manifest.skeleton?.version === 'string'
+      && Object.keys(manifest.skeleton?.files ?? {}).length >= 10,
+    manifest === null ? 'bundle.json 不存在' : JSON.stringify({ id: manifest.id, workspace: manifest.workspace, files: Object.keys(manifest.skeleton?.files ?? {}).length }))
+  // 干净底座：新安装不许带任何扩张数据（journal / 交付物 / 培养记录）。
+  const historyRows = (first ?? []).filter(row => /^kb\/[^/]+\/journal\/.+/.test(row)
+    || /^deliverables\/.+\/(final|meta)\.md/.test(row) || /^cultivation\/records\/.+/.test(row))
+  check('干净底座（无 journal / 交付物 / 培养记录）', historyRows.length === 0, `扩张数据 ${String(historyRows.length)} 件：${historyRows.slice(0, 3).join(', ')}`)
+
   const beforeSecond = fingerprint(companyHome)
+  const manifestBefore = existsSync(manifestPath) ? readFileSync(manifestPath, 'utf8') : null
   await processes.close()
   const second = processes.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
   await second.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
@@ -190,6 +211,9 @@ try {
   check('第二次启动零变更（建立好了就不用再建立了）',
     JSON.stringify(beforeSecond) === JSON.stringify(afterSecond),
     `before=${String(beforeSecond?.length ?? -1)} after=${String(afterSecond?.length ?? -1)}`)
+  check('第二次启动 bundle.json 字节不变（只创建、不覆盖）',
+    manifestBefore !== null && readFileSync(manifestPath, 'utf8') === manifestBefore,
+    manifestBefore === null ? 'bundle.json 不存在' : '字节一致')
 } catch (error) {
   failures.push(error.message)
   console.error(`release-smoke: ${error.message}`)

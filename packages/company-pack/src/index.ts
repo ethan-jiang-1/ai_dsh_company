@@ -6,9 +6,20 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 // ⚠ 不做值导入——那会把 host 侧核心包的类型图拉进本程序，遮掉 client 面的 sessions 增强（实测）。
 import type {} from '@deepseek-ai/dsh-user-approval'
 import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
+import { existsSync } from 'node:fs'
 import { signoffDecisionNote, signoffReason } from './lib/signoff.ts'
 import { doorsFromSessions } from './lib/doors.ts'
 import { bootstrapCompanyWorkspace, bootstrapEnabled, resolveCompanyHome, resolveSkeletonDir } from './host/bootstrap.ts'
+import {
+  applySkeletonUpgrade,
+  bundleManifestPath,
+  planBundleManifest,
+  planSkeletonUpgrade,
+  readBundleManifest,
+  resolvePackMetadata,
+  writeBundleManifest,
+  writeUpgradedManifest,
+} from './host/bundle-manifest.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
 
 /**
@@ -186,5 +197,36 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
       // 首发自举绝不许连累应用（postmortem 0003：apply 期抛错会砖整窗）
       ctx.logger?.warn?.(`company-pack 骨架自举失败（不影响运行）：${(error as Error).message}`)
     }
+  }
+
+  // ── run bundle 身份（2026-10-24 立；RFC run-bundle-install-unit）：与首启同一次 apply 写
+  //    `<DSH_HOME>/bundle.json`。只创建、绝不覆盖；workspace 不存在则不写（没有盘就不冒充 bundle）。
+  //    与 bootstrap 开关解耦：自管盘的部署（本仓 dev）仍需要一个身份与骨架指纹。
+  try {
+    const dshHome = resolveDshHome()
+    const companyHome = resolveCompanyHome(dshHome)
+    if (existsSync(companyHome)) {
+      const skeleton = resolveSkeletonDir(import.meta.url)
+      const pack = resolvePackMetadata(import.meta.url)
+      const existing = readBundleManifest(dshHome)
+      if (existing === null) {
+        const plan = planBundleManifest({ dshHome, companyHome, skeletonDir: skeleton, pack })
+        if (writeBundleManifest(plan).created) {
+          ctx.logger?.info?.(`company-pack：run bundle 身份已建立（${plan.path}）`)
+        }
+      } else {
+        const plan = planSkeletonUpgrade({ manifest: existing, skeletonDir: skeleton, workspace: companyHome, pack })
+        if (plan.changed) {
+          const result = applySkeletonUpgrade(plan, skeleton, companyHome)
+          writeUpgradedManifest(bundleManifestPath(dshHome), plan.manifest)
+          const modified = plan.actions.filter(action => action.reason === 'modified').map(action => action.rel)
+          ctx.logger?.info?.(`company-pack：基部升级 ${existing.skeleton.version} → ${pack.version}`
+            + `（新增 ${String(result.created.length)} / 替换 ${String(result.updated.length)}`
+            + ` / 保留用户改过 ${String(modified.length)}${modified.length > 0 ? `：${modified.join(', ')}` : ''}）`)
+        }
+      }
+    }
+  } catch (error) {
+    ctx.logger?.warn?.(`company-pack run bundle 身份写入跳过（不影响运行）：${(error as Error).message}`)
   }
 }

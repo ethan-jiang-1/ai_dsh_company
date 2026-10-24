@@ -11,7 +11,7 @@
 CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 校验）
 .agents/skills/          完成定义 skill 与 web-window-ops 的宿主（清单 = 目录本身，DSH 会话 catalog 自动发现；catalog 只收模型可加载项，`disable-model-invocation` 的用户命令〔/retro 等〕需用户点名）；DSH 会话技能从这里装载（D39）
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml、src/（host R3+）+ src/client/（client 面）
-company-workspace/      运行时公司共享盘（会话 cwd）：AGENTS.md（公司手册，随会话注入）、kb/、templates/、cultivation/（培养记录）、deliverables/ + deliverables-archive/（已收敛产物，只读归档）
+company-workspace/      **dev run bundle 的 workspace**（会话 cwd；整树 gitignored，不进 git）：AGENTS.md 等制度件是指回 pack 的符号链接（`pnpm bundle:init` 建）、kb/、templates/、cultivation/、deliverables/ + deliverables-archive/——扩张数据只住这里；bundle 身份 = runtime/harness-home/bundle.json
 vendor/dsh/             DSH 源码 submodule（钉 SHA，只读铁律见下节）
 docs/                   当前合同与导航：index（地图+台账）→ design/ guides/ + 顶层合同
 notes/                  开发记忆：proposed/（RFC）→ implemented/（活跃决策记忆）；离场目录不复述于此——分类规则唯一家 = notes/README.md
@@ -36,9 +36,10 @@ snapshots/              回归证据资产；规则与分类 = snapshots/README.
 git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 corepack enable pnpm && pnpm install   # workspace 解析；全配方（含 vendor 构建）见 guides/bootstrap
 source run/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 接线（⚠ coding 会话 DSH_HOME 带日用值——dev-loop §6）
+pnpm bundle:init                       # fresh clone：建 dev run bundle 的 workspace（制度件符号链接指回 pack；已有盘不动）
 pnpm verify                            # 结构门禁（清单唯一源 = checks/gates/ 目录）
 pnpm test                              # keyless 回归（真模型/浏览器不进；layering 守卫）
-pnpm orient                            # 运行态全景（keyless 只读；--scenario = run bundle 视图）
+pnpm orient                            # 运行态全景（keyless 只读；--scenario = run trace 场景视图）
 pnpm diagnose --session <slug>/<id>     # 会话失败摘要（只读；失败 turn/工具错误/审批/问询/present）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）
 source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的完成定义（真挂载；前置 = bootstrap 构建完成）

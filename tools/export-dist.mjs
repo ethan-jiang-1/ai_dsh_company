@@ -55,12 +55,16 @@ try {
   const tarball = join(distDir, tarballName)
   const listed = spawnSync('tar', ['-tzf', tarball], { encoding: 'utf8' })
   const entries = (listed.stdout ?? '').split('\n').filter(Boolean)
-  const must = ['package/cordis.patch.yml', 'package/package.json', 'package/lib/index.js', 'package/lib/client.js']
+  const must = ['package/cordis.patch.yml', 'package/package.json', 'package/lib/index.js', 'package/lib/client.js',
+    'package/workspace/AGENTS.md', 'package/workspace/kb/org.md', 'package/workspace/kb/owners.md']
   const missing = must.filter((entry) => !entries.includes(entry))
   const presetFiles = entries.filter((entry) => entry.startsWith('package/presets/')).length
   const outside = entries.filter((entry) => !entry.startsWith('package/'))
-  report('tarball inventory', listed.status === 0 && missing.length === 0 && outside.length === 0 && presetFiles > 0,
-    missing.length ? `missing: ${missing.join(', ')}` : `${entries.length} entries, presets ×${presetFiles}${outside.length ? `, outside package/: ${outside.join(', ')}` : ''}`)
+  // run bundle 不进包（2026-10-24）：扩张数据/凭据/会话一律不许出现在 tarball。
+  const forbidden = entries.filter((entry) => /^package\/(company-workspace|sessions|deliverables|cultivation|profiles)\//.test(entry)
+    || /credentials/.test(entry))
+  report('tarball inventory', listed.status === 0 && missing.length === 0 && outside.length === 0 && presetFiles > 0 && forbidden.length === 0,
+    missing.length ? `missing: ${missing.join(', ')}` : `${entries.length} entries, presets ×${presetFiles}${outside.length ? `, outside package/: ${outside.join(', ')}` : ''}${forbidden.length ? `, forbidden: ${forbidden.slice(0, 3).join(', ')}` : ''}`)
 
   // 3. 手册——脚本生成，版本/日期/条目数注入；步骤镜像 release-smoke 验证过的安装路径
   const date = new Date().toISOString().slice(0, 10)
@@ -73,67 +77,74 @@ try {
 | 打包日期 | ${date} |
 | 验证基线 | DSH \`${expectedTag}\`（Node ≥ 22.19） |
 
-这个安装包是自包含的：bundle 补丁（cordis.patch.yml）、五个角色 preset（presets/）、浏览器端
-（lib/）、README，共 ${entries.length} 个条目——不需要 npm registry，不需要克隆仓库，拿到这一个文件就能装。
-下面的步骤与仓库发布冒烟（release-smoke）每轮自动验证的路径一致，是被证明过的顺序。
+这个安装包是自包含的：bundle 补丁、五个角色 preset、浏览器端、**出厂公司盘骨架 workspace/**
+（手册 / 章程 / org / 模板 / 起动件），共 ${entries.length} 个条目。
 
-## 一、安装
+**一次安装 = 一个 run bundle**：一个 DSH home + 一个公司盘（\`company-workspace/\`）+ \`bundle.json\`
+（身份 / pack 版本 / 基部指纹）。bundle 不进 git；给另一个 CEO 装 = 新开一个 \`DSH_HOME\`，
+不要复用（sessions / 凭据 / 方法层 / workspace 登记都在 home 里）。
 
-默认装进你日常的 \`web\` profile（DSH 出厂默认名），装完重启就能用：
+## 一、安装（给这个 CEO 一个独立的 home）
 
 \`\`\`sh
+export DSH_HOME="$HOME/dsh-bundles/<你的 CEO 名>"
 dsh plugin --profile web add /path/to/${tarballName}
 \`\`\`
 
-日期通道（time-context）与定时提醒（schedule_create/list/update/delete）自 0.2.1 起
-**随五个角色 preset 自带**（宿主 schedule 服务由 web-app 组合提供），不再需要另装节律
-bundle；装完这一个包，角色会话就有日期注入与定时能力（公司手册「日期口径」按 fail-closed
-口径执行）。
-\`\`\`sh
-\`\`\`
+空 home 会自建 \`web\` profile。装进日常环境也可以（不设 \`DSH_HOME\`），但那样第二个 CEO
+必须另开 home——**一个 home 只装一个 CEO**。
 
-想先隔离试用、不动日常环境？换一个名字，多一步一次性初始化：
+日期通道与定时提醒随五个角色 preset 自带（0.2.1 起），不需要另装节律 bundle。
+
+## 二、第一次启动（run bundle 在这里出现）
 
 \`\`\`sh
-dsh --profile try-company --from-default-profile web --dump-config   # 只需第一次
-dsh plugin --profile try-company add /path/to/${tarballName}
+DSH_HOME="$HOME/dsh-bundles/<你的 CEO 名>" dsh web
 \`\`\`
 
-（后文以 \`web\` 为例；用了别的名字，把命令里的 \`web\` 换成它即可。）
+首次启动会：
 
-## 二、验证安装
+- 落 \`<DSH_HOME>/company-workspace\`（出厂骨架；已有盘一个字节不动，只补缺）；
+- 写 \`<DSH_HOME>/bundle.json\`（只创建、不覆盖）；
+- 你在侧栏 \`Workspaces\` 把该目录加成工作区（人手点一次），新建会话选 \`ceo\`。
+
+**干净判据**：新安装的公司盘只有骨架——没有 journal、没有交付物、没有培养记录、没有会话；
+这些是装完之后你自己长出来的（扩张能力）。
+
+## 三、验证
 
 \`\`\`sh
-dsh --profile web --dump-config
+cat "$DSH_HOME/bundle.json"          # id / pack.version / skeleton.files
+dsh --profile web --dump-config      # 插件层 + preset-ceo + company-client
 \`\`\`
 
-输出里应能看到：
+## 四、升级
 
-- 插件的补丁层（\`dsh-company-pack\`）；
-- \`id: preset-ceo\`（五个角色 preset 之一；CEO/VP-Eng/VP-Sales/COO/CFO 都应在场）；
-- \`id: company-client\`（浏览器端公司面板的挂载行）。
+替换 profile 里的包后重启。基部（手册 / 章程 / 模板 / 起动件）按哈希判定：
+**没改过的**随新包替换，**你改过的**保留并在日志里点名；扩张面（journal / 交付物 / 台账 /
+方法层 / 会话）一个字节不动。\`bundle.json\` 的 \`skeleton.version\` 随升级前移。
 
-## 三、让它出现在界面上
+## 五、备份 / 迁移
 
-重启 \`dsh web\`（浏览器刷新本身不会加载新模块），然后**硬刷新**页面（⌘⇧R / Ctrl⇧R）。之后：
+整个 \`DSH_HOME\` 就是 bundle（含公司盘、sessions、方法层、凭据）。归档时排除
+\`.credentials.yaml\` 与含启动 token 的日志；换机器时连 home 一起搬。
 
-- 侧栏出现公司面板（在场 / 依赖图 / 用量 / 任务板 / 台账）；
-- 新会话把 preset 切到任一角色（如 \`preset-ceo\`）即可按该角色工作。
-
-## 四、卸载（干净，无残留）
+## 六、卸载
 
 \`\`\`sh
 dsh plugin --profile web remove dsh-company-pack
 \`\`\`
 
-卸载后 \`--dump-config\` 不再提及插件，profile 的 package.json 也不留痕迹。
+只卸插件、不动 bundle 数据；要彻底删除一个 CEO 的 bundle，确认备份后删除它的整个
+\`DSH_HOME\`。
 
 ## 常见问题
 
 | 现象 | 原因与处理 |
 |---|---|
 | 刷新后什么都没出现 | 浏览器刷新不加载新模块：重启 \`dsh web\`，再硬刷新页面 |
-| 想确认装了什么版本 | \`dsh plugin --profile web list\`，或看本手册表头的版本号 |
+| 两个 CEO 看到彼此的历史 | 复用了同一个 \`DSH_HOME\`：新开 home，bundle 之间不共享 |
+| 想确认装了什么版本 | \`dsh plugin --profile web list\`，或看 \`bundle.json\` 的 \`pack.version\` |
 | 成员会话内容被截断 | 宿主注入预算（maxBytes）需 ≥ 常驻注入链（见 pack README 已知限制），dsh 默认 65,536B 够用 |
 `
   writeFileSync(join(distDir, manualName), manual)

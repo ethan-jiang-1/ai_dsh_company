@@ -28,7 +28,7 @@ const DOC_LINE_BUDGETS = [
   ['docs/demo.md', 237],        // 2026-10-21 冻结增长（六维度 Phase D3：无预算合同中最大三份立冻结预算，现值 226 + 5% 头寸）
   ['docs/multi-human.md', 199], // 2026-10-21 冻结增长（现值 190）
   ['docs/presets.md', 198],     // 2026-10-21 冻结增长（现值 189；工具面表同轮去历史化）
-  ['company-workspace/AGENTS.md', 190], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面，同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates；2026-10-12 瘦身轮 195→190（内容 180：机制证据段收指针、证据叙事压缩、陈旧日期戳退役——同 diff Note）
+  ['packages/company-pack/workspace/AGENTS.md', 190], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面，同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates；2026-10-12 瘦身轮 195→190（内容 180：机制证据段收指针、证据叙事压缩、陈旧日期戳退役——同 diff Note）
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
   // 文件缺失时报「缺失」而不是抛异常：抛异常会**中断整个 run-gates**，

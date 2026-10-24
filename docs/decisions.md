@@ -23,7 +23,7 @@
 | D14 | 显示名 `<公司名> <角色>` 序列化；preset id 保持 kebab；公司名现行 = 梦之队（D41） | [wochen-naming](../notes/archived/2026-09-22-wochen-naming.md) |
 | D15 | 完成定义 = 该面最小「真检查」通过；发现权在代理一侧不在人 | [agent-workflow-community-practice](../notes/archived/2026-09-22-agent-workflow-community-practice.md) |
 | D16 | 角色模型路由 = 全员同模型（不写 `agentOptions`） | [presets](./presets.md)；[tests/presets](../tests/presets/presets.spec.ts) |
-| D17 | 公司事实全部留 workspace 活数据；pack 不含公司事实 | [presets](./presets.md)；[company-workspace/kb](../company-workspace/kb/) |
+| D17 | 公司事实全部留 workspace 活数据；pack 不含公司事实 | [presets](./presets.md)；[pack workspace](../packages/company-pack/workspace/)（dev 盘 = `company-workspace/`，gitignored） |
 | D18 | CEO 命名委托不承担续驶（0.2.1 起每次调用 = activation，终稿走完成通知）；续驶归 team；CEO preset 不放全局控制行 | [delegation](./delegation.md) |
 | D19+D21 | R5 拆轮 + 搁置池准入 **历史**：轮次制已由 D23/D24 退役，整池已随 D32 退役 | [_misc/suspended.md](../_backlog/_archive/legacy/suspended.md) |
 | D20 | 交付物三态判据：成品 = Lead 的 `present`；比对按 slug+角色身份不按路径 | [r4-workshop-flow](../notes/archived/2026-09-22-r4-workshop-flow.md) |
@@ -49,6 +49,7 @@
 | D42 | vendor 升 pin＝用户策动制（agent 不盯不评不建议）＋渠道只认 RC/正式版，alpha/beta 通通不管 | [pin-upgrade-policy](../notes/archived/2026-10-12-pin-upgrade-policy.md) |
 | D43 | 培养回路三面：公司页第四子页＝培养；本人采纳 → 角色方法层（profile 根下按角色隔离）；CEO 仅建议权（D25 部分取代） | [agent-cultivation-loop](../notes/implemented/2026-10-13-agent-cultivation-loop.md) |
 | D44 | 成品目录 = 盘上 meta/final 的**生成索引** + 只读右栏页签；并列台账不替代；`present` 审计仍归 deliverables-check | [deliverables-catalog](../notes/implemented/2026-10-19-deliverables-catalog.md) |
+| D45 | run bundle = 一次安装的物理单元（bundle.json + home + workspace）；不进 git；基部随 pack、扩张住 bundle | [RFC run-bundle-install-unit](../notes/implemented/2026-10-24-run-bundle-install-unit.md) |
 
 ### 待定与活动提案
 

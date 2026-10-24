@@ -7,7 +7,7 @@
 | 当前目标 | 入口 |
 |---|---|
 | 检查结构、引用与簿记 | `pnpm verify` → [run-gates](run-gates.mjs) |
-| 看运行态全景 / 场景 run bundle / 会话历史口径 | `pnpm orient`（默认全景含「待核工作候选」扫描节，R3′ 口径，`--workspace <dir>` 换扫描根；`--scenario <kind>/<场景>` run bundle；`--session <slug>[/<id前缀>]` 历史会话 preset）→ [orient](../tools/orient.mjs)（keyless 只读；含日用 home 警告） |
+| 看运行态全景 / 场景 run bundle / 会话历史口径 | `pnpm orient`（默认全景含「待核工作候选」扫描节，R3′ 口径，`--workspace <dir>` 换扫描根；`--scenario <kind>/<场景>` run trace；`--session <slug>[/<id前缀>]` 历史会话 preset）→ [orient](../tools/orient.mjs)（keyless 只读；含日用 home 警告） |
 | 看最近会话的失败摘要 | `pnpm diagnose [--session <slug>[/<id前缀>]] [--home <路径>]`（只读；失败 turn / 工具错误 / 审批 / 待答问询 / present / 最后正文；`--home` = 显式读日用 home 等非 dev home）→ [diagnose](../tools/diagnose.mjs) |
 | 检查 AI 写码产出的密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs)（公司盘五道闸真扫；件 = [ci-security-gates](lib/ci-security-gates/)，判据逐道不看总码）+ [tracked-token](gates/tracked-token.mjs)（跨仓 tracked 文件的 token URL 窄扫；值不打印） |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；[分层守卫](../tests/harness/layering.spec.ts) |
@@ -141,6 +141,7 @@
 | [snapshot-path.mjs](../tools/snapshot-path.mjs) | 只读查询旧快照路径对应的现行位置；规范路径也可直接核对 |
 | [session-log-export.mjs](../tools/session-log-export.mjs) | 将压缩日志导成明文 JSONL，供审计与跨 home 汇总 |
 | [diagnose.mjs](../tools/diagnose.mjs) | 会话失败摘要（non-completed turn / tool error / 非 allow 审批 / 待答问询 / present / 最后正文；只读） |
+| [bundle-init.mjs](../tools/bundle-init.mjs) | 重建 dev run bundle 的 workspace（fresh clone 用）：复制 pack 骨架 + 制度件符号链接指回 pack；已有盘一个字节不动 |
 | [ask-latency.mjs](../tools/ask-latency.mjs) | 从会话日志量 `ask_user_question` 真人作答延迟分布（调窗口用；只读秒级） |
 | [deliverables-index.mjs](../tools/deliverables-index.mjs) | 扫描 final/meta 生成 `kb/deliverables-index.json`（成品页签只读这份索引） |
 | [export-dist.mjs](../tools/export-dist.mjs) | 导出 tarball、生成安装手册并核对产物清单 |

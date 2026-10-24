@@ -12,7 +12,8 @@
 
 | 件 | 是什么 | 标记 |
 |---|---|---|
-| `harness-home/` | **开发主 DSH_HOME**：`sessions/`（会话日志 = 数据层证据源，世代选择唯一口径 = [session-log-generation](../tools/lib/session-log-generation.mjs)）、`profiles/`（`headless` / `web` = current）、`storages/`、`cache/`、`oracle-tests/`、`replay-runs/` + `replay-diagnosis/`（replay 现场与失败诊断）、`diagnosis/`（浏览器探针失败截图/aria/console，2026-10-20 起）、`repository-migration-hashes.json`（迁移校验基线）；内部细则见其 [README](./harness-home/README.md) | runtime·current |
+| `harness-home/` | **开发主 DSH_HOME（dev bundle 的 home）**：`sessions/`（会话日志 = 数据层证据源，世代选择唯一口径 = [session-log-generation](../tools/lib/session-log-generation.mjs)）、`profiles/`（`headless` / `web` = current）、`storages/`、`cache/`、`oracle-tests/`、`replay-runs/` + `replay-diagnosis/`（replay 现场与失败诊断）、`diagnosis/`（浏览器探针失败截图/aria/console，2026-10-20 起）、`repository-migration-hashes.json`（迁移校验基线）；内部细则见其 [README](./harness-home/README.md) | runtime·current |
+| `harness-home/bundle.json` | **dev run bundle 身份**（2026-10-24 起）：id / createdAt / pack 版本 / workspace 根 / 基部逐文件 sha256；首次 apply 写、只创建不覆盖，之后每次启动做基部升级判定 | runtime·current |
 | ~~`harness-home/profiles/company/`~~ | **已删除**（2026-10-05 裁决轮：零功能消费面终核 + 48M 死重；理论重建 = git/vendor 历史 + `file:` 安装程序有文档）——若再现同名目录 = 异常，查来历 | deleted·2026-10-05 |
 | `harness-home/b/`、`harness-home-b/` | 第二/嵌套 home——多 home 实验与跨 home 审计视角（authorship 口径：每家导出各审一次再拼结果） | runtime·实验面 |
 | `pw-browsers/` | 浏览器二进制与 profile（`PLAYWRIGHT_BROWSERS_PATH` 重定向落点）；**UI 布局记忆按 origin 隔离**存在浏览器 profile——换端口重启即新 origin、记忆清零 | runtime |
@@ -38,8 +39,14 @@
 
 ## 四、run bundle
 
-一次运行的可追溯视图 = **逻辑合同（引用不复制）**：字段与引用规则唯一家 =
-[snapshots/README](../snapshots/README.md)「Run bundle 引用合同」节；live 权威 = DSH session + workspace。
+**run bundle = 一次安装的运行单元**：`<DSH_HOME>/bundle.json` + 一个 DSH home + 一个 company workspace。
+一次安装一个 bundle，**不在 git**；第二个 CEO 新开 `DSH_HOME`。dev bundle 的 home 就是本目录的
+`harness-home/`，workspace 是仓库根 `company-workspace/`（整树 gitignored；制度件符号链接指回 pack）。
+定义、升级口径与 base/grown 分层唯一家 = [运行态地图 §二·五](../docs/runtime-map.md)。
+
+**run trace** = 一次运行的四件套**追溯视图（引用不复制）**：字段与引用规则唯一家 =
+[snapshots/README](../snapshots/README.md)「Run trace 引用合同」节；live 权威 = DSH session + workspace。
+别把 run trace 复制成目录（那是否决过的第二权威）。
 
 ## 五、保留与清扫（2026-10-23 立）
 

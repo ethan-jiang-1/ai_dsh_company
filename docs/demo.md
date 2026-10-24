@@ -29,7 +29,7 @@
 3. 浏览器打开该 URL（**必须带 token**：直接开端口会卡鉴权）。**先连工作区**——会话列表按【工作目录】
    过滤，不连就看不到本场会话。两条入口：空态页点主区的 **Choose workspace**；已有工作区时走侧栏
    `Workspaces` 旁的 **Add workspace** 图标。对话框里**必须先点 `Edit path`** 才会出现路径输入框 →
-   粘贴 `company-workspace` 的绝对路径 → 回车 → `Open`。
+   粘贴 `company-workspace` 的绝对路径（= **dev run bundle 的 workspace**；fresh clone 先跑 `pnpm bundle:init`）→ 回车 → `Open`。
    ⚠ **这一步最容易漏**：对话框默认是目录浏览器，不点 `Edit path` 看不到粘贴框（2026-09-23 实测，
    用户与代理都卡过）。平台 UI（vendor 只读）改不了，写进 runbook 代偿。
 4. 新建会话：preset 选 **梦之队 CEO**（`ceo` 是 profile 默认）；工作目录 `company-workspace`

@@ -27,7 +27,8 @@ describe('launch config and runtime residue separation (item A)', () => {
 
   it('run/env.sh pairs with runtime/harness-home — the two homes stay disjoint', () => {
     const env = readFileSync(join(repositoryRoot, 'run/env.sh'), 'utf8')
-    expect(env).toContain('../runtime/harness-home')
+    expect(env).toContain('/runtime/harness-home')
+    expect(env).toContain('DSH_COMPANY_HOME=')
     expect(env).not.toContain("'harness-home'")
   })
 })

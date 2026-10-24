@@ -6,7 +6,7 @@ import { CREDENTIALS_FILE, DEEPSEEK_CREDENTIAL, credentialsState, homeStatus, li
 
 // 条目 B 判据（RFC driver-surface-package）：pnpm orient 的 keyless 只读核心——
 // home 判定（requireDevHome 同款但只警告不抛）/ profiles / 会话清单 / 公司盘概览 /
-// 便宜检查 / run bundle 视图（引用合同字段，引用不复制）。全部走夹具 + 真实 tracked 场景。
+// 便宜检查 / run trace 视图（引用合同字段，引用不复制）。全部走夹具 + 真实 tracked 场景。
 
 const fixtures: string[] = []
 const scratch = (name: string) => {
@@ -93,7 +93,7 @@ describe('公司盘概览', () => {
 })
 
 describe('orientState + renderOrient', () => {
-  it('ok 态渲染含 home / profiles / 会话 / 公司盘 / run bundle 四件套 / 便宜检查节', () => {
+  it('ok 态渲染含 home / profiles / 会话 / 公司盘 / run trace 四件套 / 便宜检查节', () => {
     // gitIgnored 一并注入：2026-10-13 瘦身轮起 drafts/sources 是 ignored 的**本地过程稿**，
     // 只看 tracked 会把它报成"零改动"（静默失真）⇒ 概览必须两行都有（反证：删 lib/orient 的
     // 那一行 push ⇒ 本断言红）。
@@ -105,7 +105,7 @@ describe('orientState + renderOrient', () => {
     expect(text).toContain('slug-company')
     expect(text).toContain('new-motion')
     expect(text).toContain('3')
-    expect(text).toContain('run bundle 四件套')
+    expect(text).toContain('run trace 四件套')
     expect(text).toContain('pnpm orient --scenario')
     expect(text).toContain('pnpm verify')
     expect(text).toContain('pnpm test')
@@ -236,7 +236,7 @@ describe('待核工作候选扫描（RFC orient-scan-view，R3′ 口径）', ()
   })
 })
 
-describe('run bundle 视图（引用合同字段，引用不复制）', () => {
+describe('run trace 视图（引用合同字段，引用不复制）', () => {
   it('真实 tracked 场景 r2-motion：合同字段齐全且引用可解析', () => {
     const view = runBundleView(ROOT, 'replay/r2-motion')
     expect(view.selection).toBe('replay/r2-motion')

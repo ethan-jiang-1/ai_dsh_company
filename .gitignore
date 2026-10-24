@@ -32,9 +32,10 @@ _dist/*
 # fresh clone 到别的机器会露出 untracked——本仓内声明掉
 .pi/
 
-# 公司盘业务数据（2026-10-13 瘦身轮）：**过程物料与原始取证不进 git**——入库的只有成品（final/meta）、
-# 制度件（pack workspace）与证据副本（snapshots/）。量级：drafts/**（含 sources/ 的 PDF/HTML/raw）
-# 实测 531 件 tracked / ≈70MB；它们归档价值由 meta.md/final.md 与 snapshots/archive 承担。
-# ⚠ 规则按目录点名（不是 blanket）：deliverables 的成品与公司盘其它面照旧 tracked。
-company-workspace/deliverables/*/drafts/
-company-workspace/deliverables-archive/*/drafts/
+# 本部署的 run bundle（2026-10-24 RFC run-bundle-install-unit）：`company-workspace/` 是 dev bundle 的
+# workspace——整树不进 git（成品/台账/journal/交付物/过程物料都只住 bundle）；制度件仍由
+# packages/company-pack/workspace/ 单源提供（`pnpm bundle:init` 建符号链接）。
+# 反例防线 = checks/gates/run-bundle-clean.mjs（`git add -f` 也能抓）。
+company-workspace/
+# 迁移/备份导出（git 外的本地副本；绝不入库）
+runtime/backups/

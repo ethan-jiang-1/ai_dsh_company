@@ -33,7 +33,9 @@ export function run({ root, ok, fail }) {
   try {
     text = readFileSync(LEDGER, 'utf8')
   } catch {
-    fail('ledger-participation', 'company-workspace/kb/motion-ledger.md 不在盘上——台账是经营历史唯一事实家，不许消失')
+    // 2026-10-24：台账只住 dev run bundle（company-workspace 已整树去 tracked）——fresh clone/CI 没有它。
+    // 这是 live 数据审计，不是产品门禁；缺席时如实跳过，不把“没有盘”报成“台账消失”。
+    ok('ledger-participation 跳过（本机无 dev bundle workspace；台账只住 bundle）')
     return
   }
   const offenders = []

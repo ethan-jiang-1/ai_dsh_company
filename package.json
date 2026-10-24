@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dsh": "node --import tsx/esm vendor/dsh/apps/cli/src/bin.ts",
+    "bundle:init": "node tools/bundle-init.mjs",
     "orient": "node tools/orient.mjs",
     "diagnose": "node tools/diagnose.mjs",
     "verify": "node checks/run-gates.mjs",

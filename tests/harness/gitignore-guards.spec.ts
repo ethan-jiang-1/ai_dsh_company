@@ -18,12 +18,11 @@ describe('gitignore-guards（BUG-013）', () => {
     const gitignore = readFileSync(join(repositoryRoot, '.gitignore'), 'utf8')
     expect(gitignore).toMatch(/^runtime\/web-logs\/$/m)
   })
-  // 2026-10-13 瘦身轮：公司盘过程物料（drafts 含 sources）不进 git；成品（final/meta）照旧入库。
-  // 进程级核查（index 里零 drafts）在 verify 的 drafts-untracked 门禁——本 spec 只钉规则在场。
-  it('.gitignore 点名忽略公司盘 drafts/（交付物过程物料），且不 blanket 整个 deliverables', () => {
+  // 2026-10-24 RFC run-bundle-install-unit：公司盘整树是 **dev run bundle 的 workspace**，不进 git
+  // （成品/台账/journal/交付物/过程物料都只住 bundle）。索引级反例 = run-bundle-clean 门禁。
+  it('.gitignore 整树忽略 dev bundle 的 company-workspace/（fresh clone 不带部署历史）', () => {
     const gitignore = readFileSync(join(repositoryRoot, '.gitignore'), 'utf8')
-    expect(gitignore).toMatch(/^company-workspace\/deliverables\/\*\/drafts\/$/m)
-    expect(gitignore).toMatch(/^company-workspace\/deliverables-archive\/\*\/drafts\/$/m)
-    expect(gitignore, 'blanket 掉整个 deliverables 会把成品也挡在门外').not.toMatch(/^company-workspace\/deliverables\/?$/m)
+    expect(gitignore).toMatch(/^company-workspace\/$/m)
+    expect(gitignore, '不允许给 bundle 的 workspace 开负例外').not.toMatch(/^!company-workspace\//m)
   })
 })

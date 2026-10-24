@@ -1,7 +1,18 @@
 # 开发环境兜底：coding agent 不会自己想起双 home / 双 DSH 的区别（docs/guides/dev-loop.md §6）。
 # 用法：source run/env.sh
-export DSH_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")/../runtime/harness-home" && pwd)"
+_repo_root_dev="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export DSH_HOME="$_repo_root_dev/runtime/harness-home"
 mkdir -p "$DSH_HOME"
+
+# dev run bundle 的 workspace（2026-10-24 RFC run-bundle-install-unit）：
+# company-workspace 整树 gitignored，是会话 cwd；制度件符号链接指回 pack。首启时 pack 会写
+# runtime/harness-home/bundle.json（bundle 身份 + 骨架指纹）。fresh clone 先 `pnpm bundle:init`。
+export DSH_COMPANY_HOME="$_repo_root_dev/company-workspace"
+if [ ! -d "$DSH_COMPANY_HOME" ]; then
+  echo "⚠ 未发现 dev run bundle workspace：$DSH_COMPANY_HOME" >&2
+  echo "  先跑 'pnpm bundle:init'（建骨架 + 制度件符号链接；已有盘一个字节都不动）。" >&2
+fi
+unset _repo_root_dev
 
 # 裸 dsh 拦截（代码层）：PATH 里的 dsh 是日用全局安装，与本 repo 开发基线（vendor/dsh
 # 钉 tag）是两个实体，版本会随全局升级漂移。DSH_HOME 只护数据层护不住代码层——
@@ -49,6 +60,7 @@ unset _repo_root
 
 echo "DSH_HOME=$DSH_HOME（日用 home ~/.dsh 不受影响）；验证用 pnpm dsh（vendor 基线），裸 dsh 已拦截。"
 
-# 出厂骨架首启自举（2026-10-13）：本仓的公司盘就在仓库里（company-workspace/，制度件是符号链接），
-# 不需要插件在 DSH_HOME 下再建一份 ⇒ 关掉；模拟安装（release-smoke）会自己把它翻回 if-missing。
+# 出厂骨架首启自举（2026-10-13）：本仓的 workspace 由 `pnpm bundle:init` 建（制度件符号链接指回 pack），
+# 不需要插件在 DSH_HOME 下再复制一份 ⇒ 关掉；模拟安装（release-smoke）会自己把它翻回 if-missing。
+# 注意：关的是“复制骨架”，不是 bundle 身份——pack 仍会在 workspace 在场时写 bundle.json。
 export DSH_COMPANY_BOOTSTRAP=off

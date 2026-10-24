@@ -4,7 +4,7 @@
 
 | 件 | 是什么 | 消费方向 | 出生 |
 |---|---|---|---|
-| `workspace/` | **出厂公司盘骨架**（手册 `AGENTS.md`、`templates/`、`kb/org.md`、五份 `CHARTER.md` + 起动件 `kb/owners.md`/`kb/motion-ledger.md` + 空目录）：角色跑起来读的全在这里——**随包分发**，否则第三方装完没手册没章程（2026-10-13 立；单源判据 = verify 的 `company-skeleton`） | 安装后落到使用者的公司盘（会话 cwd） | D43 |
+| `workspace/` | **出厂公司盘骨架**（手册 `AGENTS.md`、`templates/`、`kb/org.md`、五份 `CHARTER.md` + 起动件 `kb/owners.md`/`kb/motion-ledger.md` + 空目录）：角色跑起来读的全在这里——**随包分发**，否则第三方装完没手册没章程（2026-10-13 立；单源判据 = verify 的 `company-skeleton`） | 安装后落到使用者的公司盘（会话 cwd）；**基部**，升级只动没改过的文件 | D43 + RFC run-bundle-install-unit（2026-10-24） |
 | `presets/<role>/` | persona + skills **声明**（改它 = 改角色；生效边界见 [docs/presets.md](../../docs/presets.md)） | loader 组合 → 角色会话 | R0–R2 |
 | `src/` | **自写实现**两半：Host = `src/index.ts` 注册入口 + `src/host/`（Node-only 自举与培养注册/文件操作）+ `src/lib/`（共享读模型纯逻辑）；Client = `src/client/` 注册入口与浏览器面——具体布局唯一家 = [src/README](./src/README.md) | vendor runtime + `tests/company`（Host 源码直测）/ `tests/client`（Client 注册与视图） | R3+ |
 | `lib/` | **generated 发布产物（read-only）**：`tsc -b packages/company-pack` → tsdown 两面产出；**改 `src/` ≠ 浏览器已重建**——dsh web 常驻面必须重跑构建（事实家 = [bootstrap](../../docs/guides/bootstrap.md)） | `npm pack` → profile 安装（`exports`：`.` → `lib/index.js`、`./client` → `lib/client.js`） | R5 |
@@ -19,11 +19,17 @@
 release-smoke ALL PASS（[docs/release.md](../../docs/release.md)）。pack 保持 `private: true`——
 真实 npm 发布等第二个消费者出现再定。
 
-**装完第一步（自动）**：插件第一次跑起来会把包内 `workspace/` 骨架落到 `<DSH_HOME>/company-workspace`
-（**只补缺、绝不覆盖**，已建好则一个字节不动；见 host 半 `src/host/bootstrap.ts`）——装完即有盘可连，
-填 `kb/owners.md` 就能开工。落点用 `DSH_COMPANY_HOME` 换、`DSH_COMPANY_BOOTSTRAP=off` 关
-（**自管盘的部署**这么用；本仓 `run/env.sh` 就是关的——我们的盘在 `company-workspace/`，制度件是
-指向本目录的符号链接，业务数据留在运行盘）。
+**装完第一步（自动，2026-10-24 起 = 一个 run bundle）**：插件第一次跑起来会把包内 `workspace/` 骨架落到
+`<DSH_HOME>/company-workspace`（**只补缺、绝不覆盖**；见 host 半 `src/host/bootstrap.ts`），并在
+`<DSH_HOME>/bundle.json` 写 bundle 身份（id / createdAt / pack 版本 / 基部逐文件 sha256）。**一次安装 = 一个
+DSH home = 一个 bundle**；装完即有盘可连，填 `kb/owners.md` 就能开工。第二个 CEO **新开一个 `DSH_HOME`**，
+不要复用（sessions / 凭据 / 方法层 / workspace 登记都在 home 里，复用即共享历史）。
+
+- 基部升级（同一次 apply）：目标缺失 ⇒ 补建；用户改过（哈希 ≠ 上次基部哈希）⇒ 保留并记日志；没改过 ⇒ 替换。
+  扩张面（journal / 交付物 / 台账 / 方法层 / 会话）一个字节不动。manifest 只创建、绝不覆盖。
+- 落点用 `DSH_COMPANY_HOME` 换、`DSH_COMPANY_BOOTSTRAP=off` 只关“复制骨架”（**自管盘的部署**这么用；
+  本仓 `run/env.sh` 就是关的——dev 盘在 `company-workspace/`，制度件是指回本目录的符号链接，
+  由 `pnpm bundle:init` 建；bundle.json 仍会写）。
 
 ## 已知限制（随行为变更同 diff 更新；2026-09-28 立，借 FAQ 04 package README tier）
 

@@ -32,10 +32,12 @@ import { join, relative } from 'node:path'
 const GATES_REL = 'checks/lib/ci-security-gates'
 const POLICIES = ['--sources-policy=report', '--fixture-policy=report']
 const THRESHOLDS = ['--entropy=3.5', '--minlen=16']
-const SCAN_REL = 'company-workspace'
+// 2026-10-24：扫描面从 live 公司盘改为 **pack 出厂骨架**（唯一随包分发的面；live 盘只住 bundle，
+// 不进 git、也不该被产品门禁依赖）。live 盘的凭据面由维护者的每日/本机通道负责，不在这里冒充。
+const SCAN_REL = 'packages/company-pack/workspace'
 
 /** accept = 本通道下可接受的码（不属于 accept 也不属于 block ⇒ BROKEN，红）；block = 应拦提交的码。
- *  a1 的 accept 含 3：CI runner 的 HOME 无 `~/.ssh`、检出内也无 `company-workspace/home/.ssh`
+ *  a1 的 accept 含 3：CI runner 的 HOME 无 `~/.ssh`、检出内也无凭据面
  *   ⇒ a1 在此通道恒为 3（reason=no-cred-surface）——这是**如实覆盖度**，不是通过（3 ≠ 0）。
  *   真凭据面的读数归每日/本机通道（`--live-creds`，那里 a1 = 2 / hits=5）。a1 在本通道的真价值：
  *   树内一旦出现可读私钥（提交进来/误拷进来），它**当场给 2 并拦提交**。 */

@@ -170,8 +170,9 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回�
    幂等成型；preset/probe/handbook/delegation 探针已默认指这里并会自建，`--cwd` 可显式覆盖）。
    **真盘 `company-workspace/` 只收真实动议的产物**——排练产物不受三态判据约束（`drafts/` 本就不需要
    `present`），跑在真盘会安静积污（实测删过 15 份）；验收判据 = 新默认跑一次探针后
-   `git status --porcelain --ignored=matching company-workspace/` **无新增**——⚠ 2026-10-13 瘦身轮起
-   `drafts/**`（含 `sources/`）是 ignored 的本地过程稿，只看 tracked 面会把这一层漏成"零改动"。排练场里手册是指向真盘的**符号链接**（注入基线不变），
+   `git status --porcelain` **无新增**（bundle 整树 gitignored，不进 git）且
+   `find company-workspace -type f | wc -l` 与跑前一致（ignored 的本地过程稿也要看，否则这层会漏成“零改动”）。
+   排练场里手册是指向真盘的**符号链接**（注入基线不变），
    CHARTER/org/templates 每次刷新，**journal 不镜像**（排练记忆不混真记忆）；`snapshot-motion` /
    `deliverables-check` 默认仍指真盘——归档与审计本来就属于运行场。
 8. **沙箱后端探测**：`env.sh` 实跑一次 `sandbox-exec` 探测，**不可用则自动导出 `DSH_PERMISSION_MODE=danger-full-access`**

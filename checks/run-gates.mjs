@@ -22,7 +22,7 @@ import * as mdUtf8 from './gates/md-utf8.mjs'
 import * as mdLinks from './gates/md-links.mjs'
 import * as docBudget from './gates/doc-budget.mjs'
 import * as handbookBudget from './gates/handbook-budget.mjs'
-import * as draftsUntracked from './gates/drafts-untracked.mjs'
+import * as runBundleClean from './gates/run-bundle-clean.mjs'
 import * as companySkeleton from './gates/company-skeleton.mjs'
 import * as ledgerRouting from './gates/ledger-routing.mjs'
 import * as ledgerParticipation from './gates/ledger-participation.mjs'
@@ -68,7 +68,7 @@ mdUtf8.run(ctx)
 mdLinks.run(ctx)
 docBudget.run(ctx)
 handbookBudget.run(ctx)
-draftsUntracked.run(ctx)
+runBundleClean.run(ctx)
 companySkeleton.run(ctx)
 ledgerRouting.run(ctx)
 ledgerParticipation.run(ctx)

@@ -56,7 +56,12 @@
 | [2026-10-20-fresh-agent-repo-hygiene.md](settled_issues/2026-10-20-fresh-agent-repo-hygiene.md) | 已结（两轮六维度审计 + 全部发现修复：P0 反馈通路〔BUG-030/031 + replay 注入面闭环〕、P1–P4 语义/结构/测试/常驻层、notes 归档 31 篇、手册重构 187→154 行；已接受取舍登记 = Phase B–F Note；六维度评分报告随对话交付） | 2026-10-21 |
 | [2026-10-19-taskboard-table-ux-deep-dive.md](settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md) | 已结（依赖列 owner · subject + id 次要；行 id 并入任务列；已删死映射移除；入口探针 1440/390 PASS） | 2026-10-19 |
 | [2026-10-19-ledger-ux-deep-dive.md](settled_issues/2026-10-19-ledger-ux-deep-dive.md) | 已结（40 行 = parseMotionLedger 真文件；全文入口 16/27；刷新 30s；人读 60s/5 步/复述难/总体还行 → 接受） | 2026-10-19 |
+| [2026-10-24-run-bundle-clean-base.md](settled_issues/2026-10-24-run-bundle-clean-base.md) | 已实施并交付（run bundle = 安装单元：bundle.json + 整盘去 tracked + 哈希升级 + 0.3.0 分发；证据 = implemented Note） | 2026-10-24 |
 | [2026-10-19-deliverables-ledger.md](settled_issues/2026-10-19-deliverables-ledger.md) | 已结（成品目录 = 生成索引 kb/deliverables-index.json + 只读第 9 页签；44 份/活跃 5/归档 39/台账外 5；present 审计仍归 deliverables-check） | 2026-10-19 |
+
+## 研究
+
+- [run-bundle/2026-10-24-run-bundle-boundary.md](research/run-bundle/2026-10-24-run-bundle-boundary.md) — run bundle 现状排摸（安装实测 / 历史负担 / base-gown 分层 / 迁移面）；服务卡 = 上面的 2026-10-24 已结卡。
 
 ## 已修缺陷
 

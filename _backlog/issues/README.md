@@ -6,6 +6,10 @@
 
 当前活跃 0 张：
 
+- （无——run bundle 卡 2026-10-24 已结：按建议转 RFC 并实施，Note =
+  [run-bundle-install-unit](../../notes/implemented/2026-10-24-run-bundle-install-unit.md)；卡在
+  [归档](../_archive/settled_issues/2026-10-24-run-bundle-clean-base.md)。）
+
 - （无——培养背景卡 2026-10-23 已交付归档：D1=A/D2=A；RFC 实施为
   [Note](../../notes/implemented/2026-10-23-cultivation-context.md)，卡在
   [归档](../_archive/settled_issues/2026-10-23-cultivation-context.md)。）

@@ -7,7 +7,7 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
  * 复核独立性分层声明（BUG-012 的机械兜底，2026-10-11）。
  *
  * 病根：一个模型戴五顶帽子、同模异线程的复核被当成「异人复核」报出去；V4 的 final 全篇
- * grep 不到「独立性」或「边际」字样。手册已立规则（`company-workspace/AGENTS.md:104`），
+ * grep 不到「独立性」或「边际」字样。手册已立规则（`packages/company-pack/workspace/AGENTS.md`），
  * 本 spec 把**产出侧**钉住：带「AI 使用声明」的模板必须齐两条声明栏位，否则下一份 final
  * 照旧不会写——这正是 V4 的实况。
  *
@@ -15,7 +15,9 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
  */
 // 负例留证 2026-10-11：BUG-012 修前先跑本文件 —— 5 份模板都没那两栏 ⇒ 2 failed（第 1、2 条），
 // 补栏位后 3 passed；今天再删任一栏位仍会红（判据落在产出侧，不靠人记得写）。
-const TEMPLATES = join(ROOT, 'company-workspace/templates')
+// 2026-10-24：模板是基部（随包分发），读 pack 的单源；dev bundle 的 company-workspace/templates
+// 是指回它的符号链接，不再作为测试基准。
+const TEMPLATES = join(ROOT, 'packages/company-pack/workspace/templates')
 const templateFiles = readdirSync(TEMPLATES).filter(name => name.endsWith('.md'))
 const textOf = name => readFileSync(join(TEMPLATES, name), 'utf8')
 /** 复核声明的落点 = 带「AI 使用声明」的产出模板（meta.md 是户口件，不带）。 */

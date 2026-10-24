@@ -2,63 +2,24 @@
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { describe, expect, it } from 'vitest'
 import { ledgerStats, parseMotionLedger } from '../../packages/company-pack/src/lib/ledger.ts'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 /**
- * 纯函数测试 + **真台账文件**断言（fixture 即生产文件——台账是短表，直接读真盘保证解析器
- * 与事实家不漂移；文件长表结构变更会被这里抓住）。真页面渲染是认证档：浏览器开真页面走查。
+ * 纯函数测试 + **live bundle 真台账**断言（2026-10-24 起台账只住 dev run bundle，不进 git）。
+ *
+ * - 纯解析/统计：始终跑（无盘依赖）。
+ * - 真台账：只在 dev bundle 在场时跑（`company-workspace/kb/motion-ledger.md`）；fresh clone / CI
+ *   没有它，跳过而不是造一个假台账——live 数据口径由 `ledger-participation` 门禁在盘上时守。
+ *   真页面渲染是认证档：浏览器开真页面走查。
  */
 
-const REAL_LEDGER = readFileSync(join(ROOT, 'company-workspace/kb/motion-ledger.md'), 'utf8')
+const LIVE_LEDGER = join(ROOT, 'company-workspace/kb/motion-ledger.md')
+const LIVE_META = join(ROOT, 'company-workspace/deliverables-archive/2026-10-10-ai-transformation-2026-v4/meta.md')
+const hasLive = existsSync(LIVE_LEDGER) && existsSync(LIVE_META)
+const REAL_LEDGER = hasLive ? readFileSync(LIVE_LEDGER, 'utf8') : ''
 
 describe('parseMotionLedger', () => {
-  it('真台账：全部行可解析、结构不变形（不钉总行数——台账每场动议都会长一行）', () => {
-    const rows = parseMotionLedger(REAL_LEDGER)
-    expect(rows.length).toBeGreaterThan(0)
-    expect(new Set(rows.map(row => row.slug)).size).toBe(rows.length)
-    for (const row of rows) {
-      // 日期口径：真日期或占位（见公司手册「日期口径」）；不许出现推算值以外的脏值
-      expect(row.date, `行 ${row.slug} 的日期不合口径`).toMatch(/^(\d{4}-\d{2}-\d{2}|日期待核)$/)
-      expect(row.summary.length, `行 ${row.slug} 结论为空`).toBeGreaterThan(0)
-    }
-  })
-
-  it('V4 meta（已收敛归档）必须有对应台账行且结论逐字同源', () => {
-    const rows = parseMotionLedger(REAL_LEDGER)
-    const meta = readFileSync(join(ROOT, 'company-workspace/deliverables-archive/2026-10-10-ai-transformation-2026-v4/meta.md'), 'utf8')
-    const summary = meta.match(/^一句话结论: (.+)$/m)?.[1]
-    expect(summary).toBeDefined()
-    const row = rows.find(candidate => candidate.slug === 'ai-transformation-2026-v4')
-    expect(row, 'V4 活跃交付物必须在台账登记').toBeDefined()
-    expect(row!.summary).toBe(summary)
-    // 逐字同源只证明两边一致；再钉住**内容本身**（RFC 批 1 第 1 条：不再是 835 字原句、
-    // 三项核心事实都在、不出现新的硬字数门禁式截断）。
-    // 只钉「不许退回那条 835 字原句」这一条历史回归（批 1 禁的是**新增内容字数门禁**，
-    // 不是不许测试记住旧缺陷的规模）；别把它读成对台账结论的字数政策。
-    expect(summary!.length, 'V4 一句话结论不该退回 835 字原句').toBeLessThan(400)
-    for (const fact of [/V4 达标/, /反事实未达标/, /缺陷已修复/]) {
-      expect(summary!, `结论必须保留「${String(fact)}」这项事实`).toMatch(fact)
-    }
-    expect(summary!, '结论层不该把内部机制名当主体').not.toMatch(/workspace_doors|grep|闸门误伤/)
-  })
-
-  it('真台账：抽真样本逐列核对（字段解析不漂移）', () => {
-    const rows = parseMotionLedger(REAL_LEDGER)
-    expect(rows[0]).toMatchObject({ slug: 'agentic-coworker', date: '2026-09-22', kind: '评估', final: '✅' })
-    const q3 = rows.find(row => row.slug === 'q3-business-review')
-    expect(q3).toMatchObject({ wallClock: '241s', roles: 'CEO+COO+CFO' })
-    expect(q3!.summary).toContain('判不了')
-    const untimed = rows.find(row => row.slug === 'integration-50w-signoff')
-    expect(untimed).toMatchObject({ final: '—', wallClock: '—' })
-    // UX 实验场（renewal-x-2026）：双签被拒（fail-closed 实证）+ 缺口裁定进结论；日期已按会话日志修正。
-    const renewal = rows.find(row => row.slug === 'renewal-x-2026')
-    expect(renewal).toBeDefined()
-    expect(renewal!.date).toBe('2026-09-26')
-    expect(renewal!.summary).toContain('不签 8.2 折')
-    expect(renewal!.summary).toContain('≤$200')
-  })
-
   it('表头不符返回空（台账被改坏 → 面板空态而非渲染错行）', () => {
     expect(parseMotionLedger('| nope | 表 |\n|---|---|\n| a | b |')).toEqual([])
   })
@@ -75,6 +36,49 @@ describe('parseMotionLedger', () => {
     ].join('\n')
     const rows = parseMotionLedger(text)
     expect(rows.map(row => row.slug)).toEqual(['a', 'b'])
+  })
+})
+
+// dev-only：台账是 run bundle 的扩张数据，不是产品源码；fresh clone 不保证在场。
+describe.skipIf(!hasLive)('live bundle 台账（dev only）', () => {
+  it('真台账：全部行可解析、结构不变形（不钉总行数——台账每场动议都会长一行）', () => {
+    const rows = parseMotionLedger(REAL_LEDGER)
+    expect(rows.length).toBeGreaterThan(0)
+    expect(new Set(rows.map(row => row.slug)).size).toBe(rows.length)
+    for (const row of rows) {
+      expect(row.date, `行 ${row.slug} 的日期不合口径`).toMatch(/^(\d{4}-\d{2}-\d{2}|日期待核)$/)
+      expect(row.summary.length, `行 ${row.slug} 结论为空`).toBeGreaterThan(0)
+    }
+  })
+
+  it('V4 meta（已收敛归档）必须有对应台账行且结论逐字同源', () => {
+    const rows = parseMotionLedger(REAL_LEDGER)
+    const meta = readFileSync(LIVE_META, 'utf8')
+    const summary = meta.match(/^一句话结论: (.+)$/m)?.[1]
+    expect(summary).toBeDefined()
+    const row = rows.find(candidate => candidate.slug === 'ai-transformation-2026-v4')
+    expect(row, 'V4 活跃交付物必须在台账登记').toBeDefined()
+    expect(row!.summary).toBe(summary)
+    expect(summary!.length, 'V4 一句话结论不该退回 835 字原句').toBeLessThan(400)
+    for (const fact of [/V4 达标/, /反事实未达标/, /缺陷已修复/]) {
+      expect(summary!, `结论必须保留「${String(fact)}」这项事实`).toMatch(fact)
+    }
+    expect(summary!, '结论层不该把内部机制名当主体').not.toMatch(/workspace_doors|grep|闸门误伤/)
+  })
+
+  it('真台账：抽真样本逐列核对（字段解析不漂移）', () => {
+    const rows = parseMotionLedger(REAL_LEDGER)
+    expect(rows[0]).toMatchObject({ slug: 'agentic-coworker', date: '2026-09-22', kind: '评估', final: '✅' })
+    const q3 = rows.find(row => row.slug === 'q3-business-review')
+    expect(q3).toMatchObject({ wallClock: '241s', roles: 'CEO+COO+CFO' })
+    expect(q3!.summary).toContain('判不了')
+    const untimed = rows.find(row => row.slug === 'integration-50w-signoff')
+    expect(untimed).toMatchObject({ final: '—', wallClock: '—' })
+    const renewal = rows.find(row => row.slug === 'renewal-x-2026')
+    expect(renewal).toBeDefined()
+    expect(renewal!.date).toBe('2026-09-26')
+    expect(renewal!.summary).toContain('不签 8.2 折')
+    expect(renewal!.summary).toContain('≤$200')
   })
 })
 

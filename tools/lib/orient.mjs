@@ -81,7 +81,7 @@ export function scanDeliverables(workspaceRoot) {
 export const CHECKS = [
   { cmd: 'pnpm verify', what: '结构门禁（清单唯一源 = checks/gates/ 目录）' },
   { cmd: 'pnpm test', what: 'keyless 回归（vitest，秒级）' },
-  { cmd: 'pnpm orient --scenario <kind>/<场景>', what: 'run bundle 视图（引用合同 = snapshots/README）' },
+  { cmd: 'pnpm orient --scenario <kind>/<场景>', what: 'run trace 视图（引用合同 = snapshots/README）' },
 ]
 
 /** 列某 slug 下全部会话（id/mtime 近序）；slug 不存在 fail-loud（调用方决定显示条数与解码成本）。 */
@@ -241,7 +241,7 @@ export function renderOrient(state) {
     }
     lines.push('  （ᵈ = 依赖由盘上稿推断满足，* = 稿与状态行矛盾待核实；全部 needsVerify 恒真——真伪人核）')
   }
-  lines.push('', '== run bundle 四件套（一次运行 = 这四件状态；权威家 = run/README + docs/runtime-map §二）==')
+  lines.push('', '== run trace 四件套（一次运行 = 这四件状态；权威家 = run/README + docs/runtime-map §二·五）==')
   lines.push(`代码与组合   ${state.fourPiece.code}`)
   lines.push(`运行状态     ${state.fourPiece.runState}`)
   lines.push(`会话 cwd     ${state.fourPiece.sessionCwd}`)
@@ -330,7 +330,7 @@ export function renderSessionView(slug, rows, { total } = {}) {
 export function renderRunBundle(view) {
   const or = value => value === undefined ? '（未记）' : value
   const lines = [
-    `== run bundle 视图：${view.selection} ==`,
+    `== run trace 视图：${view.selection} ==`,
     `场景       ${or(view.fields.scenario)}（目录 = ${view.path}）`,
     `录制时点   ${or(view.fields.recordedAt)}`,
     `代码锚     ${or(view.fields.codeAnchor)}（新场景应记；历史场景不回填）`,
