@@ -118,6 +118,17 @@ export function backlogLivenessProblems(backlogRoot) {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(String(data.opened ?? ''))) problems.push(`${where}:1 缺 opened: YYYY-MM-DD`)
         if (pool.endsWith('bugs') && !['P0', 'P1', 'P2'].includes(data.severity)) problems.push(`${where}:1 缺 severity: P0/P1/P2`)
       }
+      // 2026-10-25（交接契约）：归档「毕业：做」卡（opened ≥ 2026-10-25）首 12 行须有 durable 去向
+      //   （`> **结论/去向**` 块；RFC/Note 路径或 `用户（YYYY-MM-DD）`）。老卡祖父豁免——归档区默认不读，
+      //   没有去向的「做」卡会把「用户是队列」的请求变成死信。反证 = spec 的 no-destination fixture 红；
+      //   with-destination fixture 绿；2026-10-24 老卡不红。
+      if (pool === '_archive/settled_issues' && String(data.opened) >= '2026-10-25') {
+        const statusLine = text.split('\n').slice(0, 12).find(line => line.trimStart().startsWith('>') && line.includes('状态：')) ?? ''
+        const head = text.split('\n').slice(0, 12).join('\n').replaceAll('**', '')
+        if (/毕业：\s*做/.test(statusLine.replaceAll('**', '')) && !/去向\s*[:：=＝]\s*\S/.test(head)) {
+          problems.push(`${where}:1 归档「毕业：做」卡缺去向（卡顶写 \`> **结论/去向**：...\`；RFC/Note 路径或 \`用户（YYYY-MM-DD）\`）`)
+        }
+      }
       // 2026-10-12 立（借鉴卡落地）：状态行↔frontmatter 镜像互查 + 问题卡「毕业：」封闭头。
       // 为什么：frontmatter `status` 是当前阶段的唯一家，状态行是它的镜像 + 历史（章程「双轨状态
       //   生命周期」的分工）——两处不一致 = 读者与门禁各信一份。只查活跃区（issues/bugs）：归档区

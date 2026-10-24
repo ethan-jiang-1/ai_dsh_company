@@ -51,6 +51,7 @@
 | D44 | 成品目录 = 盘上 meta/final 的**生成索引** + 只读右栏页签；并列台账不替代；`present` 审计仍归 deliverables-check | [deliverables-catalog](../notes/implemented/2026-10-19-deliverables-catalog.md) |
 | D46 | 产品仓历史只留产品与合成 fixtures；真实部署证据移私有仓；remote 重建为 private | [run-bundle-install-unit](../notes/implemented/2026-10-24-run-bundle-install-unit.md) |
 | D45 | run bundle = 一次安装的物理单元（bundle.json + home + workspace）；不进 git；基部随 pack、扩张住 bundle | [RFC run-bundle-install-unit](../notes/implemented/2026-10-24-run-bundle-install-unit.md) |
+| D47 | backlog→notes 交接契约：用户是队列；notes 不是收件箱；卡顶结论/去向为记录家；关闭以结论确认为准 | [handoff-contract](../notes/implemented/2026-10-25-backlog-notes-handoff-contract.md) |
 
 ### 待定与活动提案
 

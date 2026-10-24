@@ -37,7 +37,7 @@
 
 三种分支都只读相关 Notes（`implemented/` 与各 Note 的「输掉的方案」节里仍有效的决定与约束；被推翻/过时的研究稿在 [`notes/rejected/`](../../notes/rejected/README.md)（D30 修订设立——2026-09-25 的「不设目录」裁断已废），需要时一并读），不扫全树。行动前确认结果、owner、范围和验收；用户指令定义目标和授权，合同定义预期，Note 解释取舍，实现与日志证明实际。发生冲突时查关联决定并做区分“实现缺陷/事实过期”的窄检查；关键需求或授权仍不明确时先问人。扩大范围或遇到未授权的关键选择，先确认。
 
-**先澄清问题，再形成 RFC**：问题、用户结果、范围或验收尚未明确时，按 [_backlog/issues/](../../_backlog/issues/README.md) 与其 [按需方法](../../_backlog/methods/README.md) 推敲；把短结论记在问题卡，长依据放 [research](../../_backlog/research/README.md)。简单问题可简写；大问题先列粗粒度判断依赖，只细化本轮分支；能独立决定和关闭且结果/触发不同的事项才拆卡。问题卡收敛后，如需下游处理，按交接方法提交并记录去向；这不自动生成 Note，也不授权实施。申请默认向用户提出；批准后落 `notes/proposed` 的 RFC 或同轮 `notes/implemented` 的 Note；未批准留 `等人拍板`。准备实施的 RFC 仍遵循 [proposed 合同](../../notes/proposed/README.md)，其批准、验收与实施规则不变。
+**先澄清问题，再形成 RFC**：问题、用户结果、范围或验收尚未明确时，按 [_backlog/issues/](../../_backlog/issues/README.md) 与其 [按需方法](../../_backlog/methods/README.md) 推敲；把短结论记在问题卡，长依据放 [research](../../_backlog/research/README.md)。简单问题可简写；大问题先列粗粒度判断依赖，只细化本轮分支；能独立决定和关闭且结果/触发不同的事项才拆卡。问题卡收敛后，如需下游处理，按交接方法提交并记录去向；这不自动生成 Note，也不授权实施。申请默认向用户提出；**结论未确认**留 `等人拍板`；结论已确认但下游未受理时记 `去向=用户（日期）`、可关闭；受理后落 `notes/proposed` 的 RFC 或同轮 `notes/implemented` 的 Note。准备实施的 RFC 仍遵循 [proposed 合同](../../notes/proposed/README.md)，其批准、验收与实施规则不变。
 
 **Plan Mode（D23 本仓政策）**：feature 类任务默认先进入 Plan Mode 并用 `exit_plan_mode` 呈批，获批后按批准范围实施；用户已明确批准具体计划时不重复求批。明确授权的机械单步修正可直接做。需 Plan Mode 时用 `/plan` 进入；仅在模式中调用 `exit_plan_mode`。
 

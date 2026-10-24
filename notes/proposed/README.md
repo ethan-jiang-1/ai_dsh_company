@@ -14,7 +14,7 @@
 > 未批准的思考住 [`_backlog/issues/`](../../_backlog/issues/README.md) 推敲卡）。实施次序 = 用户逐条给
 > （D32，无中心排序文件）。
 >
-> 本目录只收**已批** RFC；未批准的“做”留在 `_backlog/issues` 的 `等人拍板`，批准后由用户指令进入。
+> 本目录只收**已批** RFC；**结论未确认**的“做”留 `_backlog/issues` 的 `等人拍板`，结论已确认但下游未受理的记 `去向=用户（日期）`、不进本目录；受理后由用户指令进入。
 > 机械门禁：`proposal-scheduled`（每个 RFC 状态行带「批准：」标记——D32 起查标记不查队列；+「## 验收」节
 > 在场——2026-10-05 TDD 环立，反证 = [implemented/rfc-tdd-loop](../archived/2026-10-05-rfc-tdd-loop.md)）/
 > `proposal-graduated`

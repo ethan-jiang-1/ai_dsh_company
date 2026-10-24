@@ -157,4 +157,19 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     put('bugs/README.md', '# Index\n\n' + ['BUG-013-old.md', 'BUG-014-demo.md', 'BUG-015-demo.md', 'BUG-016-demo.md', 'BUG-017-demo.md'].map(name => `[material](<${name}>)`).join('\n') + '\n')
     expect(check(root).filter(problem => problem.includes('BUG-0'))).toEqual(['_backlog/bugs/BUG-013-old.md:2 status "活跃" 不属于此桶'])
   })
+
+  // 2026-10-25（交接契约）：归档「毕业：做」卡必须留下 durable 去向；老卡祖父豁免。
+  // 反证：no-destination → 红；with-destination → 绿；2026-10-24 old → 不红。
+  it('requires a destination on freshly archived do-cards and grandfathers older cards', () => {
+    const archived = (date, graduation, extra = '') =>
+      `---\nstatus: 已结\nopened: ${date}\n---\n\n# Issue\n\n> 立卡：${date} ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：${graduation} ｜ 可关闭：是\n${extra}\n`
+    put('_archive/settled_issues/2026-10-25-no-destination.md', archived('2026-10-25', '做'))
+    put('_archive/settled_issues/2026-10-25-with-destination.md', archived('2026-10-25', '做', '\n> **结论/去向**：Note -> notes/implemented/2026-10-25-demo.md'))
+    put('_archive/settled_issues/2026-10-24-old.md', archived('2026-10-24', '做'))
+    for (const name of ['2026-10-25-no-destination.md', '2026-10-25-with-destination.md', '2026-10-24-old.md']) index('_archive/settled_issues', name)
+    const problems = check(root).join('\n')
+    expect(problems).toContain('_backlog/_archive/settled_issues/2026-10-25-no-destination.md:1 归档「毕业：做」卡缺去向')
+    expect(problems).not.toContain('2026-10-25-with-destination')
+    expect(problems).not.toContain('2026-10-24-old')
+  })
 })
