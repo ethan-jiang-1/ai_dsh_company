@@ -6,8 +6,7 @@
 > ——present 在而结果非终态 = 反向门禁 `PRESENT_RESULT_NOT_FINAL` 红。补充说明（模式/口径/风险
 > 闸门等散文）写在核心字段**之后**：非字段行解析时忽略，不进判据，留作人读。
 >
-> **入档前置检查（2026-10-11 立 · 因 G-B 病根：`deliverables-archive/` 下 7 件 / 14 格曾长期停在
-> `参与: CEO（待补）` / `一句话结论:（待补——见 final 正文）`）**：本件从 `deliverables/` 移入
+  > **入档前置检查**（曾经有入档件长期停在 `参与: CEO（待补）` / `一句话结论:（待补——见 final 正文）`）：本件从 `deliverables/` 移入
 > `deliverables-archive/` **之前**，必须四步全过——① **G1 回填**：CEO 在**收口同一动作内**填齐
 > `参与` / `一句话结论` / `结果`（终态词）/ `closed`（真日期）；② **G2 `present` 前自查**：
 > `grep -c "待补" deliverables/<slug>/meta.md` ⇒ **必须 `0`**（非 0 ⇒ **不许 `present`**）；

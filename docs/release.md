@@ -108,9 +108,9 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 
 ## 版本纪律
 
-- pack 版本 `0.3.0`（`private: true`——**尚未发布到任何 registry**；真实发布动作
+- pack 版本 `0.3.1`（`private: true`——**尚未发布到任何 registry**；真实发布动作
   （npm publish）等出现第二个消费者/部署需求时再定，当前 release-smoke 验证的是
-  `file:` tarball 安装形状）。0.3.0 = run bundle 安装单元（bundle.json + 整盘去 tracked）；
+  `file:` tarball 安装形状）。0.3.1 = run bundle 安装单元（bundle.json + 整盘去 tracked + 基部零部署历史）；
   改内容必 bump（见下条）。
 - 真实发布落定时的已判要件（2026-10-07 借语料 sdlc-11 登记；未到触发不预建脚本）：
   **registry 三态幂等**（无 → publish / sha512 同 → skip / 异 → fail「改内容没升版」）；

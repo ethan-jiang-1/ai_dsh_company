@@ -4,7 +4,7 @@
 
 | 件 | 是什么 | 消费方向 | 出生 |
 |---|---|---|---|
-| `workspace/` | **出厂公司盘骨架**（手册 `AGENTS.md`、`templates/`、`kb/org.md`、五份 `CHARTER.md` + 起动件 `kb/owners.md`/`kb/motion-ledger.md` + 空目录）：角色跑起来读的全在这里——**随包分发**，否则第三方装完没手册没章程（2026-10-13 立；单源判据 = verify 的 `company-skeleton`） | 安装后落到使用者的公司盘（会话 cwd）；**基部**，升级只动没改过的文件 | D43 + RFC run-bundle-install-unit（2026-10-24） |
+| `workspace/` | **出厂公司盘骨架**（手册 `AGENTS.md`、`templates/`、`kb/org.md`、五份 `CHARTER.md` + 起动件 `kb/owners.md`/`kb/motion-ledger.md` + 空目录）：角色跑起来读的全在这里——**随包分发**，否则第三方装完没手册没章程（2026-10-13 立；单源判据 = verify 的 `company-skeleton`） | 安装后落到使用者的公司盘（会话 cwd）；**基部起步**（CHARTER 历史纪要是扩张数据，出厂为空；升级只动没改过的文件） | D43 + RFC run-bundle-install-unit（2026-10-24） |
 | `presets/<role>/` | persona + skills **声明**（改它 = 改角色；生效边界见 [docs/presets.md](../../docs/presets.md)） | loader 组合 → 角色会话 | R0–R2 |
 | `src/` | **自写实现**两半：Host = `src/index.ts` 注册入口 + `src/host/`（Node-only 自举与培养注册/文件操作）+ `src/lib/`（共享读模型纯逻辑）；Client = `src/client/` 注册入口与浏览器面——具体布局唯一家 = [src/README](./src/README.md) | vendor runtime + `tests/company`（Host 源码直测）/ `tests/client`（Client 注册与视图） | R3+ |
 | `lib/` | **generated 发布产物（read-only）**：`tsc -b packages/company-pack` → tsdown 两面产出；**改 `src/` ≠ 浏览器已重建**——dsh web 常驻面必须重跑构建（事实家 = [bootstrap](../../docs/guides/bootstrap.md)） | `npm pack` → profile 安装（`exports`：`.` → `lib/index.js`、`./client` → `lib/client.js`） | R5 |

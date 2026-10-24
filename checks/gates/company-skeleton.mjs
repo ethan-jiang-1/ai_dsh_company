@@ -14,14 +14,15 @@ import { join } from 'node:path'
 // ② 从 package.json 的 files 里删掉 workspace/** → 红；③ 删 packages/company-pack/workspace/kb/owners.md → 红。
 export function run({ root, ok, fail }) {
   const SKELETON = 'packages/company-pack/workspace'
+  const ROLES = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']
+  // 2026-10-24 二修：CHARTER 是**基部起步 + 本部署历史**（grown），不再是符号链接——
+  // 出厂 CHARTER 不含历史；装完后的动议历史只写本盘。单源只钉真正共享的制度件。
   const LINKS = [
     ['company-workspace/AGENTS.md', `${SKELETON}/AGENTS.md`],
     ['company-workspace/templates', `${SKELETON}/templates`],
     ['company-workspace/kb/org.md', `${SKELETON}/kb/org.md`],
-    ...[...['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']].map(role => [
-      `company-workspace/kb/${role}/CHARTER.md`, `${SKELETON}/kb/${role}/CHARTER.md`,
-    ]),
   ]
+  const CHARTERS = ROLES.map(role => [`company-workspace/kb/${role}/CHARTER.md`, `${SKELETON}/kb/${role}/CHARTER.md`])
   const STARTERS = [
     `${SKELETON}/kb/owners.md`, `${SKELETON}/kb/motion-ledger.md`,
     `${SKELETON}/deliverables/.gitkeep`, `${SKELETON}/deliverables-archive/.gitkeep`,
@@ -32,7 +33,7 @@ export function run({ root, ok, fail }) {
   shipped.includes('workspace/**')
     ? ok('company-skeleton 随包分发（files 含 workspace/**）')
     : problems.push('packages/company-pack/package.json 的 files 缺 workspace/**——第三方装了插件却没有公司盘骨架')
-  for (const [, target] of LINKS) {
+  for (const [, target] of [...LINKS, ...CHARTERS]) {
     const targetPath = join(root, target)
     if (!existsSync(targetPath)) problems.push(`${target} 缺失（骨架件不在盘上）`)
     else if (lstatSync(targetPath).isSymbolicLink()) problems.push(`${target} 是符号链接——骨架件必须是 pack 里的真实文件`)
@@ -49,11 +50,14 @@ export function run({ root, ok, fail }) {
       if (!stat.isSymbolicLink()) problems.push(`${live} 不是符号链接（副本 = 第二本账；运行盘该指回 ${target}）`)
       else if (realpathSync(livePath) !== realpathSync(targetPath)) problems.push(`${live} → ${readlinkSync(livePath)}（应指回 ${target}）`)
     }
+    for (const [live] of CHARTERS) {
+      if (!existsSync(join(root, live))) problems.push(`${live} 缺失（运行盘少了角色章程；装完应有基部起步文件）`)
+    }
   }
   for (const starter of STARTERS) {
     if (!existsSync(join(root, starter))) problems.push(`${starter} 缺失（出厂起动件/空目录骨架）`)
   }
   problems.length === 0
-    ? ok(`company-skeleton 单源 ×${LINKS.length} + 起动件 ×${STARTERS.length}（制度件住 pack${hasWorkspace ? '，运行盘符号链接指回' : '；dev bundle 未初始化，跳过运行盘链接'}）`)
+    ? ok(`company-skeleton 单源 ×${LINKS.length} + 章程 ×${CHARTERS.length} + 起动件 ×${STARTERS.length}（制度件住 pack；CHARTER 是基部起步 + 本盘历史${hasWorkspace ? '' : '；dev bundle 未初始化'}）`)
     : fail('company-skeleton', problems.join('；'))
 }

@@ -22,7 +22,7 @@
 5. **manifest + 哈希升级**：首启写 `<DSH_HOME>/bundle.json`（v1：id / createdAt / pack 版本 /
    workspace 根 / 基部逐文件 sha256）。升级逐文件判定：缺失 ⇒ 补建；用户改过（当前哈希 ≠ 上次基部
    哈希）⇒ 保留并记日志；没改过 ⇒ 替换；扩张面一个字节不动。manifest 只创建、绝不覆盖。
-6. **分发件 0.3.0**：`_dist` 重导（260 条目，含 23 个 `workspace/`）；手册写清 run bundle /
+6. **分发件 0.3.1**：`_dist` 重导（260 条目，含 23 个 `workspace/`）；手册写清 run bundle /
    独立 home / 干净判据 / 升级 / 备份；`dist-manual` 门禁从“只比版本”扩到“版本 + run bundle 关键句 + pin”。
 7. **备份口径**：整个 `DSH_HOME` = bundle；归档排除 `.credentials.yaml` 与含 token 的日志；
    本轮未做自动 `bundle export` 工具（列为后续）。
@@ -63,6 +63,29 @@
   [pack README](../../packages/company-pack/README.md)、[workspace README](../../packages/company-pack/workspace/README.md)；
   决策台账 D45。
 
+## 二修（2026-10-24，验证发现第一版只做对一半）
+
+**发现**：按“干净安装”实测，装出来的 5 份 CHARTER 仍带我们 305 行动议历史（客户/价格/结论/归档路径）——
+workspace 数据层干净了，但 **pack 的基部内容本身漏历史**。这直接违反“给不同 CEO 装 = 干净底座”。
+
+**修法**：
+- dev 的 5 份 CHARTER 改为**真实文件**（grown；保留全量历史），不再是 pack 的符号链接。
+- pack 的 5 份 CHARTER 只留“角色方法与边界 + 空历史节”；内联的日期/归档引用一并清掉；
+  `templates/meta.md` 与 `kb/org.md` 去部署日期/事故计数。
+- `company-skeleton` 不再要求 CHARTER 符号链接；新增 `base-clean` 门禁（CHARTER 历史条目/归档引用 +
+  journal/交付物/培养记录实际内容）。
+- `bundle:init` 只链接 AGENTS/templates/org；CHARTER 以基部副本落盘。
+- dev 的 2026-09 历史（99 条）移到 `runtime/backups/charter-history-pre-2026-10/`（gitignored），
+  live 只留 2026-10。
+
+**证据**：
+- 新 home 装 0.3.1 后，全 workspace 搜
+  `agentic-coworker|renewal-x|token-factory|ai-transformation|snapshots/archive|^- 2026-09-|（2026-`
+  ⇒ **0 命中**（修前 CEO 一份就有 70 行日期、5 份共 305 条）。
+- `base-clean` 造红：往 pack CEO CHARTER 追加 `- 2026-09-22 · leak-test` ⇒ FAIL；删回 ⇒ PASS。
+- release-smoke 仍 ALL PASS（骨架 30 件 / bundle.json / 二次零变更）。
+- 装出的 CHARTER 行数：ceo 19 / cfo 26 / coo 24 / vp-eng 18 / vp-sales 22（修前 79–87）。
+
 ## 验证（真跑过的命令与红/绿形态）
 
 | 检查 | 结果 |
@@ -70,12 +93,12 @@
 | `node checks/run-gates.mjs` | **ALL PASS**（39 道；含新 `run-bundle-clean`、扩内容 `dist-manual`） |
 | `npx vitest run` | **85 files / 829 tests 绿**（含新 `bundle-manifest.spec.ts` 6 条） |
 | `node checks/smoke/release-smoke.mjs` | **ALL PASS**：安装副本带 `workspace/`；首启 30 件骨架；`bundle.json`（id / workspace=`tmp/release-company-workspace` / files=16）；干净底座 0 件扩张数据；二次 boot 零变更 + manifest 字节不变 |
-| `node tools/export-dist.mjs` | **ALL PASS**：`dsh-company-pack-0.3.0.tgz` 260 条目、presets ×20、workspace 在场 |
+| `node tools/export-dist.mjs` | **ALL PASS**：`dsh-company-pack-0.3.1.tgz` 260 条目、presets ×20、workspace 在场 |
 | `pnpm bundle:init`（先移走真盘，再建，再还原） | 建出 10 个普通文件 + 8 个符号链接（AGENTS/templates/org/CHARTER×5）；还原后 1880 件工作树文件 |
 | `git ls-files company-workspace` | **0**（迁移前 146 件 / 1.2MB，`git rm --cached` 保留工作树） |
 | 空 home 真装（临时 `DSH_HOME`，0.3.0 tarball） | `plugin add` 自建 profile；首启落 16 文件 + 15 目录；`bundle.json` 写入；无 sessions |
 | 两 bundle 并行（临时 `DSH_HOME` ×2，同一 tarball） | id 不同、各自 `company-workspace`、各自 `sessions/` 为空——安装单元隔离成立（keyless） |
-| 旧分发件对照 | `_dist` 0.2.0 = **139 条目 / 0 个 workspace**；当前 0.3.0 = **260 / 23** |
+| 旧分发件对照 | `_dist` 0.2.0 = **139 条目 / 0 个 workspace**；当前 0.3.1 = **260 / 23** |
 
 **红证（造红 → 还原 → 绿；都实跑）**
 - `run-bundle-clean`：`git add -f company-workspace/AGENTS.md` ⇒

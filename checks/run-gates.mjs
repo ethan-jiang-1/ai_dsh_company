@@ -24,6 +24,7 @@ import * as docBudget from './gates/doc-budget.mjs'
 import * as handbookBudget from './gates/handbook-budget.mjs'
 import * as runBundleClean from './gates/run-bundle-clean.mjs'
 import * as companySkeleton from './gates/company-skeleton.mjs'
+import * as baseClean from './gates/base-clean.mjs'
 import * as ledgerRouting from './gates/ledger-routing.mjs'
 import * as ledgerParticipation from './gates/ledger-participation.mjs'
 import * as docTaxonomy from './gates/doc-taxonomy.mjs'
@@ -70,6 +71,7 @@ docBudget.run(ctx)
 handbookBudget.run(ctx)
 runBundleClean.run(ctx)
 companySkeleton.run(ctx)
+baseClean.run(ctx)
 ledgerRouting.run(ctx)
 ledgerParticipation.run(ctx)
 docTaxonomy.run(ctx)

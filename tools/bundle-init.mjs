@@ -16,7 +16,7 @@ const LINKS = [
   ['AGENTS.md', 'AGENTS.md'],
   ['templates', 'templates'],
   ['kb/org.md', 'kb/org.md'],
-  ...['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales'].map(role => [`kb/${role}/CHARTER.md`, `kb/${role}/CHARTER.md`]),
+  // CHARTER 不在单源链接里：它是「基部起步 + 本部署历史」的 grown 文件（2026-10-24 二修）。
 ]
 
 if (existsSync(WORKSPACE)) {

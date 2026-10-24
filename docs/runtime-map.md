@@ -48,9 +48,9 @@ bundle **不在 git**：本仓的 `company-workspace/` 是 dev bundle 的 worksp
 
 | 层 | 内容 | 谁维护 | 进 git | 随包 | 升级 |
 |---|---|---|---|---|---|
-| 基部 | persona / skills；手册 / 章程 / org / 模板 / 起动件 | 维护者 | ✅（pack 源） | ✅ | 随 pack；落盘后未改的替换、改过的保留 |
+| 基部 | persona / skills；手册 / 章程起步 / org / 模板 / 起动件 | 维护者 | ✅（pack 源；**不含部署历史**） | ✅ | 随 pack；落盘后未改的替换、改过的保留 |
 | 扩张 | 方法层（`<home>/profiles/<p>/company-cultivation/<role>/`） | 用户（`/cultivation adopt`） | ❌ | ❌ | 不擦 |
-| 扩张 | journal、培养记录、交付物、台账、owners、sessions | 公司角色 / 用户 | ❌ | ❌ | 不动 |
+| 扩张 | CHARTER 历史纪要、journal、培养记录、交付物、台账、owners、sessions | 公司角色 / 用户 | ❌ | ❌ | 不动 |
 
 **run trace** = 原来那张「一次运行 = 四件套」的可追溯视图（代码与组合 / DSH 运行状态 / 会话 cwd / 证据），
 **引用** live bundle 与 `snapshots/`，不复制（合同 = [snapshots/README](../snapshots/README.md)「Run trace 引用合同」）。
