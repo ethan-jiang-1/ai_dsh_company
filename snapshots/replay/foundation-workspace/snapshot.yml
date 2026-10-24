@@ -1,0 +1,18 @@
+version: 1
+scenario: foundation-workspace
+profile: headless
+composition: foundation-file-tools
+recording: authored
+header:
+  class: foundation-file-tools
+workspace:
+  final: true
+  before: workspace.before/
+  expected: workspace.expected/
+# 回放资格（replay-scene-liveness 门禁读此字段；三态,判据源 = 磁盘 + 本场景回放实测）：
+#   runnable = 有重放输入(replay/session*.v3.jsonl) 且判据绿 —— 可作回归门；
+#   archived = 有输入但判据红或起不来 —— 归档证据，不进回归（理由必填，见下行）；
+#   baseline = 无重放输入 —— 时点基线对照。两条硬规矩：声明必须与磁盘相符 + 资格理由行必须带**判定日期**
+#   （「# 资格理由（YYYY-MM-DD）：…」）——资格是判断，判断会过期，日期让「这条还成立吗」可查。
+replayEligible: runnable
+# 资格理由（2026-10-25）：keyless replay ALL PASS（sidecars 刷新 + runtime-context cwd section 对齐）；产品仓唯一合成场景，无任何部署数据
