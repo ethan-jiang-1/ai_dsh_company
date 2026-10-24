@@ -178,3 +178,22 @@ describe('基部升级（哈希判定，S3）', () => {
     }
   })
 })
+
+
+describe('两 bundle 身份隔离（S1 自动化）', () => {
+  it('两个 home 生成不同 id；各自 workspace 记录独立', () => {
+    const skel = skeleton()
+    const a = home()
+    const b = home()
+    try {
+      const pa = planBundleManifest({ dshHome: a, companyHome: join(a, 'company-workspace'), skeletonDir: skel, pack: PACK })
+      const pb = planBundleManifest({ dshHome: b, companyHome: join(b, 'company-workspace'), skeletonDir: skel, pack: PACK })
+      expect(pa.manifest.id).not.toBe(pb.manifest.id)
+      expect(pa.manifest.workspace).toBe('company-workspace')
+      expect(pb.manifest.workspace).toBe('company-workspace')
+      expect(pa.path).not.toBe(pb.path)
+    } finally {
+      rmSync(skel, { recursive: true, force: true }); rmSync(a, { recursive: true, force: true }); rmSync(b, { recursive: true, force: true })
+    }
+  })
+})

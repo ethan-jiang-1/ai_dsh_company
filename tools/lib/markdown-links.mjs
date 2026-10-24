@@ -162,7 +162,16 @@ export function validateMarkdownLinks(root) {
         return
       }
       const target = path === '' ? file : resolve(dirname(file), path)
-      if (!existsSync(target)) { report('target'); return }
+      if (!existsSync(target)) {
+        // runtime/ 与 company-workspace/ 不是产品仓的保证：runtime 证据按政策可清（runtime/README §五），
+        // company-workspace 是 run bundle 的 workspace（整树 gitignored）。这两类按“本地证据引用”观察，
+        // 不判死链；产品源码/文档的硬链接不受影响。bare-path 的 RUNTIME_PREFIXES 同口径。
+        const targetRel = relative(root, target).split('\\').join('/')
+        const sourceRel = relative(root, file).split('\\').join('/')
+        const fromRuntimeDoc = sourceRel.startsWith('runtime/') || sourceRel.startsWith('company-workspace/')
+        if (!fromRuntimeDoc && (targetRel.startsWith('runtime/') || targetRel.startsWith('company-workspace/'))) return
+        report('target'); return
+      }
       if (fragment !== '' && extname(target).toLowerCase() === '.md' && statSync(target).isFile()
         && !anchorsOf(target).has(fragment)) report('anchor')
     })

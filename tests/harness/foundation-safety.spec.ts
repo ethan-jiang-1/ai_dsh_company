@@ -59,7 +59,8 @@ describe('smoke home 隔离：在启动和排练写入前拒绝错误 home', () 
 
 describe('当前角色章程的工具路径以会话 cwd 为基准', () => {
   it.each(['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'])('%s 的输入和输出路径可直接使用', (role) => {
-    const workspace = join(ROOT, 'company-workspace')
+    // 2026-10-25：读 pack 基部（产品随包分发的章程），不读 dev 盘——fresh clone 没有公司盘。
+    const workspace = join(ROOT, 'packages/company-pack/workspace')
     const text = readFileSync(join(workspace, 'kb', role, 'CHARTER.md'), 'utf8')
     expect(text).not.toMatch(/`(?:\.\.\/(?:templates|deliverables|org\.md)|journal\/)/)
     expect(text).toContain(`\`kb/${role}/journal/\``)

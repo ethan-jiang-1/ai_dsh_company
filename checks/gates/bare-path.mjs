@@ -92,7 +92,7 @@ const WARN_FILES = (() => {
   return [...walkMd(join(root, 'notes/postmortem')), ...walkMd(join(root, '_backlog/_archive'))]
 })()
 const TOP_DIRS = ['notes/', 'docs/', 'checks/', 'probes/', 'tools/', 'packages/', 'snapshots/', 'run/', 'runtime/', 'tests/', 'company-workspace/', 'vendor/', '_backlog/']   // 2026-10-10 补 '_backlog/'：NOW_FILES 本就含 _backlog 活跃卡，此前漏它 = 扫描面内一半路径从未被存在性检查（retired-path 门禁同轮立的同源盲区）
-export const RUNTIME_PREFIXES = ['runtime/harness-home', 'runtime/harness-home-b', 'runtime/rehearsal-workspace', 'runtime/pw-browsers', '.pnpm-store', 'company-workspace']   // gitignored 运行态（2026-10-06 条目 A：dev/ 拆分，运行残留随迁顶层 runtime/；2026-10-24：company-workspace 是 dev bundle workspace，fresh clone 不保证在场）
+export const RUNTIME_PREFIXES = ['runtime/harness-home', 'runtime/harness-home-b', 'runtime/rehearsal-workspace', 'runtime/pw-browsers', '.pnpm-store', 'company-workspace', 'runtime/']   // gitignored 运行态（2026-10-06 条目 A：dev/ 拆分，运行残留随迁顶层 runtime/；2026-10-24：company-workspace 是 dev bundle workspace，fresh clone 不保证在场）
 // 双树查：本仓根 **或** vendor/dsh 命中即过（AGENTS 纪律表的"权威（vendor 树）"列合法使用 vendor 相对写法）。
 // 白名单 = 历史性退役路径的叙述性提及（自带"现迁至…"说明的历史段）。
 // `notes/implemented/2026-09-22-org-presence-board.md` = 2026-10-09 存量清扫迁 archived/ 的退役位置；

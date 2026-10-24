@@ -112,6 +112,100 @@ workspace 数据层干净了，但 **pack 的基部内容本身漏历史**。这
 - `bundle:init` 的“已有盘不动”由脚本首行 `existsSync` 分支保证；本轮实跑“先移走 → 建 → 还原”，
   未在已有盘上跑（避免覆盖真数据）。
 
+
+## 独立验证（2026-10-25，goal = 只验证、不再堆功能）
+
+### 结论
+
+- **可靠（有可复跑证据）**：新装即干净（0 条部署历史）；基部/扩张分层成立；两 bundle 文件级隔离成立；
+  基部升级只动“没改过的基部”，扩张面与用户编辑不动；关键门禁逐一造红→还原；
+  **fresh clone 没有 `company-workspace` 也能过 `pnpm verify` + `pnpm test`**（827 过 / 3 跳）。
+- **半可靠 / 未自动化**：**同一个 `DSH_HOME` 复用给第二个 CEO 仍只是政策约束**，机制上无法分辨
+  “同一 CEO 续用”与“换人复用”；两 bundle 只做了 keyless 文件级隔离，没有真模型会话隔离；
+  安装级“双 bundle / 升级”没有进自动回归（只有单测 + 手工实验）。
+- **验证本身抓出两处“只做对一半”**：① CHARTER 历史随包分发（305 行，已修成 base/历史分层）；
+  ② fresh clone 无盘时 `md-utf8` 因悬空符号链接中断 runner、且 5 个测试依赖活盘（已修为读 pack 基部）。
+
+### 主张 → 证据矩阵
+
+| # | 主张 | 证据（实跑） | 结果 |
+|---|---|---|---|
+| C1 | 分发件只含基部，不含本部署历史 | tarball 260 条目 / 23 个 `workspace/`；`base-clean` 扫 CHARTER/模板/org；`export-dist` 禁项 | ✅ |
+| C2 | 新装公司盘只有骨架 | 新 home 装 0.3.1：16 文件 + 15 目录；CHARTER 19/26/24/18/22 行；全盘 sentinel 0 命中 | ✅ |
+| C3 | 每次安装有独立身份 | `bundle.json` id / workspace / 16 个基部 sha256；二次启动字节不变 | ✅ |
+| C4 | 两个 bundle 不共享 | 两 home 各装 0.3.1：id 不同；A 注入 journal/台账/owners/凭据标记/方法层，B 全无 A 的 sentinel；sessions 各自 0 | ✅（文件级；无真模型） |
+| C5 | 基部升级不擦用户/扩张 | 临时 0.3.2：`org.md` 被替换（未改），`AGENTS.md` 保留 USER-EDIT（改过），`new-032.md` 补建；journal/台账/owners/凭据标记/方法层全在；manifest id/createdAt 不变，版本 0.3.2 | ✅ |
+| C6 | 仓库本身干净 | `git ls-files company-workspace` = 0；fresh worktree 无 `company-workspace`；无盘 `verify` ALL PASS、`test` 827/3；`bundle:init` 后同样绿 | ✅ |
+| C7 | 测试资产能拦回归 | `run-bundle-clean` / `base-clean` / `dist-manual` / `company-skeleton` / `handbook-budget` 逐一造红还原；`wx` 与“升级强覆盖”单测红证 | ✅ |
+| C8 | 分发件 = 验过的安装形状 | `dist-manual`（版本 + run bundle 关键句 + pin）；`release-smoke` ALL PASS（骨架 / bundle.json / 干净底座 / CHARTER 无历史 / 二次零变更） | ✅ |
+
+### 实验记录（可复跑）
+
+**E1 · fresh install 干净扫描**
+```sh
+W=$(mktemp -d); DSH_HOME=$W/home node vendor/dsh/apps/cli/lib/bin.js plugin --profile web add file:$PWD/_dist/dsh-company-pack-0.3.1.tgz
+DSH_HOME=$W/home node vendor/dsh/apps/cli/lib/bin.js web -- --port 0 --no-open   # 看到 banner 后 kill
+grep -rE 'agentic-coworker|renewal-x-2026|token-factory|ai-transformation-2026|snapshots/archive|^- 2026-09-|（2026-' $W/home/company-workspace
+```
+实测：**0 命中**；`bundle.json` = 0.3.1 / `company-workspace` / 16 个文件哈希；CHARTER 行数 19/26/24/18/22。
+（修前同一命令：CEO 一份 70 行日期、5 份共 305 条历史——见「二修」。）
+
+**E2 · 两 bundle 隔离（注入 sentinel）**
+两 home 各装 0.3.1，A 注入 `kb/ceo/journal/SENTINEL-A.md`、台账行、owners 行、凭据标记、方法层
+`profiles/web/company-cultivation/ceo/SENTINEL-A/SKILL.md`；B 同路径检查全无 A 的 sentinel；
+id 不同（`bundle-9fb…` vs `bundle-22be…`），sessions 各自 0。B 自己的 `.credentials.yaml` 是
+DSH 首次 boot 生成的 browser-session grant，**不含 A 的标记**（不是泄漏）。
+
+**E3 · 基部升级（临时 0.3.2）**
+复制 pack → 改 `workspace/kb/org.md`（追加 PACK-032-ORG）、`workspace/AGENTS.md`（追加 PACK-032-HANDBOOK）、
+新增 `templates/new-032.md`、版本 0.3.2 → `npm pack` → 装进 A 的 home → boot。
+实测：`org.md` 含 PACK-032-ORG=1；`AGENTS.md` 含 USER-EDIT=1、PACK-032-HANDBOOK=0；
+`new-032.md` 新建；journal/台账/owners/凭据标记/方法层全在；manifest id/createdAt 不变、pack/skeleton=0.3.2。
+
+**E4 · 门禁变异（造红 → 还原 → 绿）**
+- `company-skeleton`：把 `company-workspace/AGENTS.md` 换成实文件 ⇒ FAIL「不是符号链接」。
+- `run-bundle-clean`：`git add -f company-workspace/AGENTS.md` ⇒ FAIL「index 里有 1 件 bundle 数据」。
+- `dist-manual`：手册删 `bundle.json` ⇒ FAIL「缺安装形状关键句」。
+- `base-clean`：pack CEO CHARTER 追加 `- 2026-09-22 · leak-test` ⇒ FAIL「含历史条目」。
+- `handbook-budget`：pack AGENTS 追加 15KB ⇒ FAIL「32937B + 1024B > maxBytes 32768」。
+每次还原后 `verify: ALL PASS`。
+
+**E5 · fresh clone（无 `company-workspace`）**
+`git worktree add /tmp/fresh-verify HEAD`：`git ls-files company-workspace` = 0，目录不存在。
+在主树把 `company-workspace` 移走后：`node checks/run-gates.mjs` **ALL PASS**；
+`npx vitest run` **827 passed | 3 skipped（830）**——3 个 skip 是 live 台账测试（按设计只在 bundle 在场时跑）。
+`pnpm bundle:init` 后同样绿（clean 盘：3 个符号链接 + 5 份真实 CHARTER，sentinel 0）。
+> 修前：无盘 `verify` 在 `md-utf8` 因 `runtime/rehearsal-workspace/AGENTS.md` 悬空链接 **中断 runner**；
+> 5 个测试读活盘 CHARTER/手册。已修：md-utf8 跳过符号链接/缺失；测试改读 pack 基部。
+
+**E6 · 分发件**
+`node tools/export-dist.mjs` ALL PASS：0.3.1 tarball 260 条目 / 23 个 workspace；手册表头 0.3.1、
+含 run bundle/bundle.json/company-workspace、pin `dsh-v0.2.1-rc.2`；`dist-manual` 绿。
+`release-smoke` ALL PASS：骨架 30 件、bundle.json（16 哈希）、干净底座 0 件扩张、CHARTER 0 条历史、二次零变更。
+
+### 测试资产审计（谁在守、哪里是空的）
+
+| 不变量 | 自动资产 | 红证 | 缺口 |
+|---|---|---|---|
+| bundle 不进 git | `run-bundle-clean` | ✅ | — |
+| 基部零历史 | `base-clean`（CHARTER/模板/org/空目录） | ✅ | 不扫 tarball 内容；由 release-smoke 安装后断言补 |
+| 新装干净 | `release-smoke`（无 journal/交付物/记录 + CHARTER 0 历史） | 逻辑覆盖（未逐条造红） | 未自动扫描任意 sentinel（只钉结构） |
+| 安装身份 | `release-smoke` + `bundle-manifest.spec` | ✅（wx 造红） | — |
+| 两 bundle 隔离 | `bundle-manifest.spec`（id/路径不同） | — | **安装级双 home 未自动回归**（手工 E2） |
+| 升级不擦扩张 | `bundle-manifest.spec`（升级算法） | ✅（强覆盖造红） | **安装级升级未自动回归**（手工 E3） |
+| 分发形状 | `dist-manual` + `export-dist` + `release-smoke` | ✅ | — |
+| fresh clone | CI 只跑 `verify`；pre-push 跑 `verify+test` | — | 无专门 fresh-clone lane；靠“无盘也能跑”与 CI |
+
+### 剩余风险（明确不假装覆盖）
+
+1. **同一 `DSH_HOME` 复用给第二个 CEO**：机制无法区分“同人续用/换人复用”；目前只有手册的
+   “一个 home 一个 CEO”政策。要机制强制，需要安装命令拒绝非空 home（或 `bundle init` 才能新建），
+   本 RFC 未做——这是“干净底座”最大的剩余缺口。
+2. **默认虚构公司画像**（org 50 人、9 家客户）仍在基部：它是 starter，不是本部署历史；新 CEO 必须自己改，
+   否则会带着一个不属于他的默认公司开工。
+3. 没有真模型下两个 bundle 的会话隔离；没有第二台机器安装；没有自动 `bundle export`；
+   GUI 仍要人手登记 workspace。
+
 ## 后果与边界
 
 - **fresh clone 没有 `company-workspace/`**：先 `pnpm bundle:init`；不建就没有会话 cwd。`pnpm verify` /

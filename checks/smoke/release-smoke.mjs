@@ -200,6 +200,15 @@ try {
   const historyRows = (first ?? []).filter(row => /^kb\/[^/]+\/journal\/.+/.test(row)
     || /^deliverables\/.+\/(final|meta)\.md/.test(row) || /^cultivation\/records\/.+/.test(row))
   check('干净底座（无 journal / 交付物 / 培养记录）', historyRows.length === 0, `扩张数据 ${String(historyRows.length)} 件：${historyRows.slice(0, 3).join(', ')}`)
+  // 2026-10-25：CHARTER 历史条目也必须为零——第一版漏的正是这一层（305 行）。
+  const charterHistory = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales'].flatMap(role => {
+    const path = join(companyHome, 'kb', role, 'CHARTER.md')
+    if (!existsSync(path)) return [`缺少 kb/${role}/CHARTER.md`]
+    return readFileSync(path, 'utf8').split('\n').filter(line => /^- 20\d\d-\d\d-\d\d · /.test(line))
+      .map(line => `kb/${role}/CHARTER.md: ${line.slice(0, 40)}`)
+  })
+  check('干净底座（CHARTER 无部署历史）', charterHistory.length === 0,
+    charterHistory.length === 0 ? '0 条历史' : `${String(charterHistory.length)} 条：${charterHistory.slice(0, 2).join('；')}`)
 
   const beforeSecond = fingerprint(companyHome)
   const manifestBefore = existsSync(manifestPath) ? readFileSync(manifestPath, 'utf8') : null

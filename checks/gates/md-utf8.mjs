@@ -10,13 +10,17 @@ const walk = (dir) => {
   for (const e of readdirSync(dir, { withFileTypes: true })) {
     if (e.name === '.git' || e.name === 'node_modules' || e.name === 'vendor') continue
     const p = join(dir, e.name)
+    // 跳过符号链接：dev 盘未初始化时 runtime/company-workspace 的制度件链接会悬空，
+    // 那不是 UTF-8 问题（2026-10-25 fresh-clone 实测：readFileSync 抛 ENOENT 会中断整个 runner）。
+    if (e.isSymbolicLink()) continue
     if (e.isDirectory()) walk(p)
     else if (e.name.endsWith('.md')) mdFiles.push(p)
   }
 }
 walk(root)
 for (const p of mdFiles) {
-  const buf = readFileSync(p)
+  let buf
+  try { buf = readFileSync(p) } catch { continue }
   try {
     const text = new TextDecoder('utf-8', { fatal: true }).decode(buf)
     if (!text.endsWith('\n') || text.endsWith('\n\n')) fail('md-newline', `${p} 需以单个换行结尾`)
