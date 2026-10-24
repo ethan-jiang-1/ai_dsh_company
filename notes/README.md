@@ -5,7 +5,7 @@
 > 登记行 = [index §外部研究材料登记](../docs/index.md)）；DSH 原生定义 =
 > [vendor Agent Notes](../vendor/dsh/.agents/notes/README.md)；收尾动作清单 = [dev-loop §12](../docs/guides/dev-loop.md)；
 > RFC 层合同与实施 TDD 红绿环 = [proposed/README](proposed/README.md)（条目开工必读）；上游推敲/缺陷卡 =
-> [_backlog/issues/](../_backlog/issues/README.md)（未成熟问题的澄清与交接，卡片状态不授权实施；规则见 [_backlog/](../_backlog/README.md)）。
+> [_backlog/issues/](../_backlog/issues/README.md)（未成熟问题的澄清与交接；卡片状态不授权实施；交接程序 = [_backlog/methods/issue-to-note.md](../_backlog/methods/issue-to-note.md)；规则见 [_backlog/](../_backlog/README.md)）。
 
 ## 一、状态轴：一眼怎么读
 
@@ -38,6 +38,7 @@ no-index 教义下没有主题索引：**目录树 + 全文检索就是清单**�
   已知限制段。**不是 Note**（2026-10-09 存量清扫立的负例，历史在 git）：轮次/会话收尾日记、探针或
   E2E 首跑收据、批次「已毕业」流水、被合同或后一篇决定完整吸收的研究长文、已退役流程的操作记录。
   这些不再指导行动，写进来只会让 rationale owner 被噪声淹没。
+- **上游回链**：由 `_backlog` 卡毕业的 Note，在状态行或开头带 `上游 = [卡](...)`；卡生 Note 的可追溯性靠这一行，不靠归档卡反查。
 - **取代检查（每新增一篇 Note 触发）**：搜活跃树找同决定/同机制的既有 owner——完整取代：吸收其独有
   理由/备选/后果/验证后**同 diff 删除旧的**（历史归 git）；部分取代：双方保留互链并更新仍有效的事实。
   同一决定的事实变化更新原文；决定逆转另写新 Note 互链，不把旧文改写成相反。
@@ -77,4 +78,4 @@ no-index 教义下没有主题索引：**目录树 + 全文检索就是清单**�
 **偏离**：① `postmortem/` 独立保留（借源仓并入 implemented；本仓 _backlog 章程已立「事故复盘 ≠ 设计
 推敲」区分，编号逐件以目录为准）；② 不借「文件名日期 == 状态行日期」门禁——本仓时间轴 = 文件名日期 +
 git log（D34），状态行不重复载日期；③ 不借 `{lifecycle}/{class}/` 两级路径（生命周期轴已够用，class
-正交——同借源仓偏离 DSH 的理由）；④ 不设计数清单（路径树即清单，D34 同款教义）。
+正交——同借源仓偏离 DSH 的理由）；④ 不设计数清单（路径树即清单，D34 同款教义）；⑤ `proposed/` 语义：本地（D32）只收已批 RFC，借源仓是待点头取舍的停车场——未批准的“做”留 `_backlog/issues` 的 `等人拍板`，不进 `proposed/`，批准后由用户指令进入。

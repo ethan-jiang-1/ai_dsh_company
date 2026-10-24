@@ -46,6 +46,8 @@ opened: YYYY-MM-DD
 # 推敲：<标题>
 
 > 立卡：YYYY-MM-DD ｜ 状态：推敲中 ｜ 类型：未定 ｜ 毕业：未定 ｜ 可关闭：否
+>
+> **结论/去向**：（关闭时写：结论 + 下游落点；状态行不承载去向）
 
 **问题与期望结果：** 触发、期望结果、如何判断本轮推敲完成。
 **当前情况：** 已确认的事实与出处。
@@ -67,9 +69,9 @@ opened: YYYY-MM-DD
 
 ## 关闭或叫停
 
-按 [关闭条件](../README.md#关闭条件) 检查；翻转的守卫、谁翻、记录什么 = [章程](../README.md)「双轨状态生命周期」翻转表。需要后续处理的提交申请并记录去向；是否成为 Note 由下游决定。满足条件后写 `可关闭：是` 并同次归档，不留活跃清单。
+按 [关闭条件](../README.md#关闭条件) 检查；翻转的守卫、谁翻、记录什么 = [章程](../README.md)「双轨状态生命周期」翻转表。需要后续处理的提交申请并记录去向；授权由用户裁决，RFC/Note 形态按 notes 规则。满足条件后写 `可关闭：是`，在卡顶补 `> **结论/去向**` 块，并同次归档，不留活跃清单。
 
-- 有结论：`git mv` 进 [settled_issues](../_archive/settled_issues/README.md)，frontmatter `status: 已结`，状态行补结论与去向。
+- 有结论：`git mv` 进 [settled_issues](../_archive/settled_issues/README.md)，frontmatter `status: 已结`，卡顶补 `结论/去向` 块（状态行只做镜像）。
 - 用户叫停且无结论：进 [suspended_issues](../_archive/suspended_issues/README.md)，`status: 叫停`；重启需用户明确新决定。
 
 搬迁保留文件名和讨论正文，修相对链接，更新两边清单。frontmatter 不复制正文长说明：`status` 活跃用 `推敲中` 或 `等人拍板`，`opened` 为立卡日；离开时只改 `status`。🔒 卡只由用户判定触发，agent 不自行删卡或实施。

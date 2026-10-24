@@ -227,3 +227,30 @@ DSH 首次 boot 生成的 browser-session grant，**不含 A 的标记**（不�
 - 没有做 GUI 自动登记 workspace（仍人手点一次）；没有搬 dev 的 home/workspace 到统一 bundle 根
   （方案 C，留后续）。
 - `release-smoke` 的 vendor 产物新鲜度仍不证明（原有限制）。
+
+## 2026-10-25 历史重写与 remote 重建（远程变小 + 隐私止损）
+
+**为什么**：HEAD 干净不等于 clone 干净——旧历史仍含 `company-workspace` 1,751 个对象、`snapshots` 1,846 个对象；
+remote 当时 **PUBLIC / 45.8MB**，`git clone` 能取回客户、journal、交付物。用户选择“重写历史、保留开发史 +
+合成 fixtures”，并把“remote 变小”列为首要目标。
+
+**做了什么**
+- 真实 `snapshots/`（974 件 / 59.5MB）移私有归档（`runtime/backups/snapshots-real-2026-10-25.tar.gz`）；
+  产品仓只留**合成** `snapshots/replay/foundation-workspace`（keyless replay ALL PASS，10 件 / 104KB）。
+- `git filter-repo` 从全部 commit 删除 `company-workspace/`、`snapshots/`、`runtime/cold-storage/`；
+  提交数 766→726（只碰被删路径的空提交被折叠）；主仓 pack **39.16MiB → 5.04MiB**。
+- 新 clone `.git` **5.5MB**；旧 blob（`90aa3c3…`）`git cat-file -e` **ABSENT**；旧 commit `5a7ff6d` ABSENT。
+- 旧 public 仓库转 private 并改名 `ai_dsh_company-legacy-2026-10-25`（45.8MB，供取证；删除需 `delete_repo` scope）；
+  同名新私有仓库 `ai_dsh_company` 已建，`master` + tag `0.0.1` 已推。
+- 公开窗口 = 2026-09-21 → 2026-10-25，`forkCount=0`；**已公开过的历史不能收回**（缓存/旧 clone/搜索索引），
+  假设它已被看到；BUG-013/BUG-029 涉及的 token 必须视为已泄露并轮换。
+
+**验证**
+- `pnpm verify` ALL PASS；`pnpm test` 828 passed；`replay-smoke`（foundation）ALL PASS。
+- 新 clone：`old paths=0`、`foundation=10`、`OLD-BLOB-ABSENT`、`.git 5.5M`。
+- `gh repo view`：新库 `visibility=PRIVATE`、`forkCount=0`（diskUsage 初始 0，GitHub 异步统计）。
+
+**剩余**
+- 旧私有归档仍占 45.8MB 且对象可达；要彻底删需 `gh auth refresh -s delete_repo` 后删库。
+- `notes/` 与 `_backlog/` 仍含公司决策/客户文本（开发记忆，未清）；若产品仓要对外，需第二轮决定。
+- GitHub 缓存/旧 clone/搜索索引无法通过重写收回。
