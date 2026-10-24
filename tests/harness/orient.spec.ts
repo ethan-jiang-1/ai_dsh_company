@@ -237,21 +237,6 @@ describe('待核工作候选扫描（RFC orient-scan-view，R3′ 口径）', ()
 })
 
 describe('run trace 视图（引用合同字段，引用不复制）', () => {
-  it('真实 tracked 场景 r2-motion：合同字段齐全且引用可解析', () => {
-    const view = runBundleView(ROOT, 'replay/r2-motion')
-    expect(view.selection).toBe('replay/r2-motion')
-    expect(view.fields.scenario).toBe('r2-five-role-motion')
-    expect(view.fields.recordedAt).toBe('2026-09-22')
-    expect(view.fields.profile).toBe('web')
-    expect(view.fields.agentPreset).toBe('ceo')
-    expect(view.fields.cwd).toBe('company-workspace')
-    expect(view.refs.sessionLeadExists).toBe(true)
-    expect(view.refs.sessionChildrenCount).toBeGreaterThan(0)
-    expect(view.refs.workspaceExpectedExists).toBe(true)
-    expect(view.verification).toContain('replay-smoke')
-    expect(view.verification).toContain('replay/r2-motion')
-  })
-
   it('夹具场景：缺 lead 引用时如实报 false，不伪造', () => {
     const root = scratch('scene')
     const scene = join(root, 'snapshots/replay/mini')
@@ -282,12 +267,6 @@ describe('run trace 视图（引用合同字段，引用不复制）', () => {
   // 负例留证 2026-10-20：BUG-031 —— 旧 runBundleView 对 children 引用一律 readdirSync，
   // `pnpm orient --scenario replay/r3-delegation` 实测 ENOTDIR exit 1（r2 目录形状才不炸）。
   // 红配方：children 引用改回「只当目录读」即对本用例 ENOTDIR；绿 = 文件计 1、目录数 .jsonl。
-  it('真实场景 r3-delegation：children 为文件形状计 1 不崩（BUG-031）', () => {
-    const view = runBundleView(ROOT, 'replay/r3-delegation')
-    expect(view.refs.sessionLeadExists).toBe(true)
-    expect(view.refs.sessionChildrenCount).toBe(1)
-  })
-
   it('夹具：children 指向单个 .jsonl 文件时计 1；指向目录时数 .jsonl 件数', () => {
     const root = scratch('scene-file')
     const scene = join(root, 'snapshots/replay/single')

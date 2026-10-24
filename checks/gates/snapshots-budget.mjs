@@ -5,6 +5,8 @@ import { canonicalSnapshotScenes } from '../../tools/lib/repository-layout.mjs'
 import { convergenceSlices } from '../../tools/lib/converge-rules.mjs'
 
 // ── 2c-quater. snapshots 体积预算（2026-10-05 立，复跑轮用户拍板「无法承受没完没了的增长」）──
+// 2026-10-25：产品仓只留合成 replay fixture（<1MB）；预算从 64M/16M 收到 2M/1M——
+// 真实证据移私有仓，产品仓再长回去即红。
 // 为什么：memory-convergence-*（轮末收敛整盘拷贝）是**唯一无界增长源**——每轮一份、两周 7 目录，
 // 无预算时增长不可见。回归基线（r1/r2/r4/r5b/scenario-b/foundation）与探针证据按设计常驻本目录，
 // 不设单项预算；总预算 + 收敛子预算让增长每次 verify 都可见。超线处置次序：tar.zst 压缩归档 →
@@ -21,8 +23,8 @@ export function run({ root, ok, fail }) {
       const p = join(dir, d.name)
       return sum + (d.isDirectory() ? walkBytes(p) : lstatSync(p).size)
     }, 0)
-  const SNAPSHOTS_TOTAL_BUDGET_MB = 64
-  const SNAPSHOTS_CONVERGENCE_BUDGET_MB = 16
+  const SNAPSHOTS_TOTAL_BUDGET_MB = 2
+  const SNAPSHOTS_CONVERGENCE_BUDGET_MB = 1
   const snapshotsDir = join(root, 'snapshots')
   const totalBytes = walkBytes(snapshotsDir)
   // 收敛切片的识别与计量判据住 tools/lib/converge-rules.mjs（命名有两代，见该函数注释）；

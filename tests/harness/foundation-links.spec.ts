@@ -36,7 +36,8 @@ describe('bounded source discovery', () => {
     for (const file of sources) put(file, '[broken](missing.md)\n')
     const report = validateMarkdownLinks(root)
     expect(report.files.map(file => relative(root, file)).sort()).toEqual(sources.sort())
-    expect(report.violations.map(v => v.file).sort()).toEqual(sources.sort())
+    // snapshots/ 是产品仓外证据路径：指向它的缺失目标按观察处理；源文件本身仍在发现面内。
+    expect(report.violations.map(v => v.file).sort()).toEqual(sources.filter(file => !file.startsWith('snapshots/')).sort())
   })
 
   it('excludes generated, vendor, runtime, journal, deliverable and explicitly historical sources', () => {

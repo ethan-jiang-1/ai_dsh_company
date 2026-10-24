@@ -57,7 +57,7 @@ audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.m
   一次安装一个，**不进 git**，第二个 CEO 新开 home。定义与 base/grown 分层 = [运行态地图 §二·五](runtime-map.md)。
   **run trace（四件套）** = 代码与组合 / DSH 运行状态 / 会话 cwd / 证据——`pnpm orient` 默认全景直接显示这四件；
   某次运行的证据链按需算视图：
-  `pnpm orient --scenario replay/r2-motion`（引用不复制，防第二权威）。
+  `pnpm orient --scenario replay/foundation-workspace`（引用不复制，防第二权威）。
 
 → 时序与四条状态轴：[运行态地图](runtime-map.md)
 

@@ -56,7 +56,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
   缺了这两行，activation child 在职能会话里同样失联。
 - 续驶/连续对话归 team（§3）。
 
-证据：`snapshots/replay/r2-motion/sessions/lead.jsonl` 的第一帧 `request/header`（R2 归档即已如此）；
+证据：`snapshots/replay/foundation-workspace/replay/session.v3.jsonl` 的第一帧 `request/header`（R2 归档即已如此）；
 `checks/smoke/delegation-smoke.mjs` 在全新会话复现并把它变成回归守卫。
 
 ## 3. 团队（通道 B，主通道 D4）

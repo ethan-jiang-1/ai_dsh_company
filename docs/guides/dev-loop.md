@@ -6,7 +6,7 @@
 > `vendor/dsh/` 工作树为权威，旗标与行为已在**钉住的 vendor 基线**核对——基线版本与 SHA 的唯一事实家 =
 > 根 `AGENTS.md` §vendor 簿记（升 pin 重校记录 = [pin-upgrade Note](../../notes/archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md)）。
 > 行注记 `R1`–`R5b` = 退役轮次制的历史出处标记（D11），只作 git 考古索引；与 snapshots 场景号
-> （`replay/r1-motion`…）是两套序号，别互推。
+> （`replay/foundation-workspace`…）是两套序号，别互推。
 
 ## 0. 开发环导航
 

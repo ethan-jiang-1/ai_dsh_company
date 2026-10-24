@@ -26,7 +26,7 @@
 1. **`DSH_HOME` 是数据层**（会话/凭据/storage），不决定代码来源——代码唯一权威 = `vendor/dsh/`（钉 SHA，只读）。
 2. **session cwd 是业务事实层**：会话读写哪个工作区由 session/create 的 cwd 决定，与 repo cwd 无关。
 3. **repo cwd 不是自动公司盘**：`company-workspace/` 只有被显式连接才成为会话 cwd。
-4. **排练盘与真盘隔离**（上表）；两个归档语义别混——`company-workspace/deliverables-archive/` = **业务产物历史**（live 演进、持续归档），`snapshots/archive/` = **证据时点副本**（冻结、按场景）。
+4. **排练盘与真盘隔离**（上表）；两个归档语义别混——`company-workspace/deliverables-archive/` = **业务产物历史**（live 演进、持续归档），`外部私有证据仓（不进产品仓）/` = **证据时点副本**（冻结、按场景）。
 
 ## 三、系统 tmp 出口（诚实登记：运行残留不都在 repo）
 

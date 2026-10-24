@@ -68,7 +68,7 @@ const sessionIndex = args.indexOf('--session')
 if (scenarioIndex !== -1) {
   const selection = args[scenarioIndex + 1]
   if (!selection) {
-    console.error('用法：pnpm orient --scenario <kind>/<场景>（如 replay/r2-motion；清单见 snapshots/README）')
+    console.error('用法：pnpm orient --scenario <kind>/<场景>（如 replay/foundation-workspace；清单见 snapshots/README）')
     process.exit(1)
   }
   try {

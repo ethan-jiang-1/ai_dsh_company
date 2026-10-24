@@ -69,7 +69,7 @@ const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
   return i === -1 ? fallback : process.argv[i + 1]
 }
-const SCENARIO_ARG = arg('scenario', 'r3-delegation')
+const SCENARIO_ARG = arg('scenario', 'foundation-workspace')
 const WALL_MS = Number(arg('wall', '240')) * 1000
 const PREPARE = process.argv.includes('--prepare')
 const RECORD = process.argv.includes('--record')
@@ -649,7 +649,9 @@ try {
   const expectedSessions = 1 + childFixtures.length
   check(`持久化会话数 = ${String(expectedSessions)}（lead + ${String(childFixtures.length)} child）`, parsed.length === expectedSessions, `实际 ${String(parsed.length)}${parsed.length !== expectedSessions ? `：${parsed.map(p => p.header.id).join(', ')}` : ''}`)
   if (REFRESH) {
-    if (failures.length > 0) throw new Error('Refusing refresh after workspace/session failure')
+    // 2026-10-25：--refresh 的语义就是“接受会话/sidecar 漂移、以实测刷新 fixture”；
+    // 只有独立 workspace oracle 失败才拒绝（那说明场景本身坏了，不是 fixture 旧）。
+    if (failures.some(f => f.startsWith('完整 workspace'))) throw new Error('Refusing refresh after workspace oracle failure')
     const raws = parsed.map(p => p.text)
     writeFileSync(rawLead, raws[0], 'utf8')
     fixtures[0] = normalizeFixtures(raws)[0]
@@ -674,7 +676,9 @@ try {
   // 顺序要紧：先让 vendor 归一化把 cwd 换成 {{cwd}}（它会覆盖 header 与 runtime-context 正文），
   // 再对我们的临时工作区路径做 token 化（模型复述进散文里的那部分 vendor 不认）。
   const actualN = normalizeSessionSnapshots(parsed.map(p => normalizeReplayTimeContext(p.text)), ctxOf(parsed)).map(normalizeReplayTempPaths)
-  const expectedN = normalizeSessionSnapshots(fixtures, ctxOf(fixtures.map(t => ({ header: headerOf(t) })))).map(normalizeReplayTempPaths)
+  // expected 侧也要过同一 time-context/posture 归一化（2026-10-25：foundation 的 permission/preset
+  // 在 actual 侧被 token 成 {{posture}}、expected 侧没 token，造成假红；两侧必须同管道）。
+  const expectedN = normalizeSessionSnapshots(fixtures.map(normalizeReplayTimeContext), ctxOf(fixtures.map(t => ({ header: headerOf(t) })))).map(normalizeReplayTempPaths)
   // 投递两半（屏障 + inbox splice）是**时序簿记**：位置随上一轮流的分块时机漂（录制/重放两向都实测过），
   // 但内容不是。序列判据里剔掉它们，另用「投递内容集合」判据保内容；两边对称，其他事件逐行仍然严格。
   const actualStream = actualN.map(splitDeliveryPlumbing)

@@ -31,8 +31,8 @@ import {
  * 运行场那份（读 `$DSH_HOME` 的多帧 zstd 日志）是认证档，归 `checks/audit/deliverables-check.mjs`。
  */
 
-const R1 = join(ROOT, 'snapshots/replay/r1-motion')
-const R2 = join(ROOT, 'snapshots/replay/r2-motion')
+// 2026-10-25：真实 r1/r2 快照已移出产品仓；用合成夹具（无客户/动议数据）保同一判据。
+const R1 = join(ROOT, 'tests/fixtures/deliverables-r1')
 
 /** 递归列出目录下全部文件的相对路径（正斜杠）。 */
 function listFiles(dir: string, base: string = dir, out: string[] = []): string[] {
@@ -188,11 +188,9 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
     expect(violations.map(v => v.path)).not.toContain('kb/ceo/journal/gone.md')
   })
 
-  it('Lead 判据：teammate 不是 Lead——R2 归档实测它与 Lead 同为 agentPreset ceo，只靠 delegationDepth 区分', () => {
-    const lead = parseSessionLog(readFileSync(join(ROOT, 'snapshots/replay/r2-motion/sessions/lead.jsonl'), 'utf8'))
-    const teammate = parseSessionLog(
-      readFileSync(join(ROOT, 'snapshots/replay/r2-motion/sessions/vp-sales-f753efb5-c4f9-4b04-b4e4-edae4bdaa173.jsonl'), 'utf8'),
-    )
+  it('Lead 判据：teammate 不是 Lead——同 agentPreset ceo，只靠 delegationDepth 区分', () => {
+    const lead = parseSessionLog(JSON.stringify({ type: 'session', id: 'lead', agentPreset: 'ceo', delegationDepth: 0 }))
+    const teammate = parseSessionLog(JSON.stringify({ type: 'session', id: 'tm', agentPreset: 'ceo', delegationDepth: 1 }))
     expect(lead.agentPreset).toBe('ceo')
     expect(teammate.agentPreset).toBe('ceo') // teammates 共享 Lead 的组合（docs/delegation.md §3）
     expect(isLeadSession(lead)).toBe(true)

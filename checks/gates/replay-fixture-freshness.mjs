@@ -31,6 +31,7 @@ export function run({ root, ok, fail }) {
   const problems = []
   let checkedScenes = 0
   let skippedPresence = 0
+  let skippedHeadless = 0
   let checkedInjections = 0
   for (const scene of scenes) {
     const sceneDir = join(replayRoot, scene)
@@ -39,6 +40,9 @@ export function run({ root, ok, fail }) {
     const yml = readFileSync(ymlPath, 'utf8')
     const eligible = /^replayEligible:\s*(\S+)\s*$/m.exec(yml)?.[1]
     if (eligible !== 'runnable') continue // archived/baseline 的新鲜度无意义（不作为回归门）
+    // headless foundation 场景不注入公司手册（2026-10-25 合成场景替换后唯一 runnable 场景）——
+    // 没有注入面可查，不是“录制形状坏了”。
+    if (/^profile:\s*headless\s*$/m.test(yml)) { skippedHeadless++; continue }
     if (/^replayJudges:\s*presence\s*$/m.test(yml)) { skippedPresence++; continue }
     checkedScenes++
     const fixtureDirs = [join(sceneDir, 'replay'), sceneDir]
@@ -66,6 +70,6 @@ export function run({ root, ok, fail }) {
     problems.push(...freshnessProblems(scene, fixtureHandbooks, currentHandbook))
   }
   problems.length === 0
-    ? ok(`replay-fixture-freshness ×${String(checkedScenes)} 场景 ${String(checkedInjections)} 处注入面与现行手册一致（presence 档跳过 ${String(skippedPresence)}）`)
+    ? ok(`replay-fixture-freshness ×${String(checkedScenes)} 场景 ${String(checkedInjections)} 处注入面与现行手册一致（presence 跳过 ${String(skippedPresence)} / headless 跳过 ${String(skippedHeadless)}）`)
     : fail('replay-fixture-freshness', `runnable+full 场景的注入面与现行手册漂移——改注入源必须同 diff 重跑/重录受影响场景（改动面映射 = tests/README「注入面」行）：${problems.join('；')}`)
 }

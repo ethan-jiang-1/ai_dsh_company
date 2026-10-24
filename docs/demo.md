@@ -62,7 +62,7 @@
 - 一场完整会话日志（`$DSH_HOME/sessions/`）——CEO + 四 VP 会话都在
 - `deliverables/` 有本动议的定稿（CEO `present` 声明过）
 - 任务板出现过 **DAG 依赖**与 **≥1 次跨 VP 互审**（消息 + 回执 + 修订号变化）
-- 归档为 `snapshots/replay/r2-motion/`（沿用 R1 形状：会话 JSONL + workspace 期望态）
+- 归档为 `snapshots/replay/foundation-workspace/`（沿用 R1 形状：会话 JSONL + workspace 期望态）
 
 **R4 加判据（交付物三态，整场通用，机器判）**：
 
@@ -123,7 +123,7 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 | 6 | 回 CEO | 合稿 → `final.md` → `present` | 交付卡片出现；`final.md` 有“保留分歧”节，不抹平 |
 | 7 | 收尾 | 三个 journal 各一篇 | `kb/{ceo,coo,vp-sales}/journal/support-sla-page.md` |
 
-**实测基线**：`snapshots/replay/r4-motion/`（lead 234 行 + vp-sales + coo + 期望态）。这一场真跑 **150 秒**
+**实测基线**：`snapshots/replay/foundation-workspace/`（合成 keyless fixture；真实动议证据已移私有仓）。这一场真跑 **150 秒**
 （预算 6 分钟）。**值得指出的一处**：互审稿路径 `drafts/review-coo.md` 是**模型自己**按三态约定放的
 （prompt 只给了另两份）——三态合同随公司手册注入首帧，所以它会生效，不靠人盯。
 

@@ -31,7 +31,7 @@
 | [run-gates.mjs](run-gates.mjs) | 结构门禁装配 runner：按原顺序跑 gates/ 各门禁（仓库结构、文档引用、vendor 簿记与脚本约束；清单唯一源 = gates/ 目录） |
 | [preset-smoke.mjs](smoke/preset-smoke.mjs) | 通过真实会话创建验证各角色 preset 挂载 |
 | [client-load-smoke.mjs](smoke/client-load-smoke.mjs) | 加载真实 Web 页面，验证 client 挂载、品牌与零装配错误 |
-| [replay-smoke.mjs](smoke/replay-smoke.mjs) | 录制会话、sidecar、团队投影与场景声明的工作区 oracle；另有录制和 UI 模式 |
+| [replay-smoke.mjs](smoke/replay-smoke.mjs) | 合成 keyless 回放（`foundation-workspace`）：session/sidecar/工作区 oracle；真实动议录制与 UI 端到端已随真实 snapshots 移出产品仓 |
 | [snapshot-motion-smoke.mjs](smoke/snapshot-motion-smoke.mjs) | 真实 CLI 子进程中的快照采集与 workspace capture 接线 |
 | [release-smoke.mjs](smoke/release-smoke.mjs) | 构建、打包、干净 profile 安装与 built CLI 启动 |
 | [refactor-drift-oracle.mjs](smoke/refactor-drift-oracle.mjs) | 纯搬移/拆分的零行为漂移：拆前/拆后 vitest 清单比对（`--hashes` 档含测试体指纹 ⇒ 拦改名/增删/**测试体改动**；两档都放行文件与 describe 归属搬家） |
