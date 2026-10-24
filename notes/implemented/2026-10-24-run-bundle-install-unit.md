@@ -175,6 +175,7 @@ DSH 首次 boot 生成的 browser-session grant，**不含 A 的标记**（不�
 在主树把 `company-workspace` 移走后：`node checks/run-gates.mjs` **ALL PASS**；
 `npx vitest run` **827 passed | 3 skipped（830）**——3 个 skip 是 live 台账测试（按设计只在 bundle 在场时跑）。
 `pnpm bundle:init` 后同样绿（clean 盘：3 个符号链接 + 5 份真实 CHARTER，sentinel 0）。
+提交后从 **HEAD** 新建 worktree（无 `company-workspace`）复跑：`verify` ALL PASS；`bundle:init` 后再次 ALL PASS（CI 等价）。
 > 修前：无盘 `verify` 在 `md-utf8` 因 `runtime/rehearsal-workspace/AGENTS.md` 悬空链接 **中断 runner**；
 > 5 个测试读活盘 CHARTER/手册。已修：md-utf8 跳过符号链接/缺失；测试改读 pack 基部。
 
