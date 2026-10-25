@@ -1,7 +1,7 @@
 # release · 发布形状的现在时（company-pack）
 
 > 什么时候读：发布、打包、装进真实 profile、升 vendor pin 时。路线 = §vendor 政策 → release-smoke。
-> 顶层合同：vendor 政策、pack 的依赖姿态、兼容矩阵、真实安装冒烟程序、升 pin 程序。
+> 顶层合同：vendor 政策、pack 的依赖姿态、兼容台账、真实安装冒烟程序、升 pin 程序。
 > 依据：FAQ 13（外部研究：dsh-market / dsh-im 生态姿态）；原 dev-loop §5 发布时点表已全部落地随迁本文件（2026-10-12）。
 > 执行器：`checks/smoke/release-smoke.mjs`（发布冒烟）与 `tools/sync-dsh.mjs`（升 pin）。
 
@@ -18,7 +18,7 @@
   out-of-tree 插件的 peers 由**安装锚兜底解析**（行解析顺序：installation anchor 先于
   profile 目录），所有插件共享 dsh 安装侧的同一份 cordis/工具包，不出现第二份单例。
   peers 是**声明语义**（"验证过的宿主 API 面"），不是安装要求。
-- **兼容窗口 = `engines.dsh`**：DSH 在安装/启动时只读这一行（存在即忽略 peers；矩阵是“已认证 tag”
+- **兼容窗口 = `engines.dsh`**：DSH 在安装/启动时只读这一行（存在即忽略 peers；台账是“已认证 tag”
   台账，不是运行时门）。当前窗口见 `package.json`；`pack-shape` 的 `pack-engines` 强制它覆盖钉住的
   pin，且 license/repository/private 在场。
 - **许可与发布**：`license: UNLICENSED`（内部交付，未授予再分发权）；`private: true` 保留到 publish。
@@ -81,7 +81,7 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
    `package.json`（bundles = web 模板形状 `[dsh-base, dsh-web-app]` + `patchReload: startup`——
    自定义 profile 名走 DEFAULT 只有 dsh-base，起不了 web）+ `pnpm-workspace.yaml`
    （hoisted + autoInstallPeers: false，vendor 模板镜像）+ `.npmrc`（store/cache 钉 repo 内，§11）。
-4. **真安装**：`node <bin.dsh> plugin --profile release-check add file:<tarball>` → 断言 bundles reconcile、安装副本的 presets/client/**出厂骨架 `workspace/`**、peers 与矩阵。`--profile` 挂在 plugin 子命令上。
+4. **真安装**：`node <bin.dsh> plugin --profile release-check add file:<tarball>` → 断言 bundles reconcile、安装副本的 presets/client/**出厂骨架 `workspace/`**、peers 与 engines 窗口。`--profile` 挂在 plugin 子命令上。
 5. **boot + RPC**：`node <bin.dsh> --profile release-check -- --port 0 --no-open` → roster 五公司角色 + researcher 零 broken、`session/create` 挂上 ceo 与 researcher、浏览器模块表含本包 client。随机端口的临时实例不替换开发 GUI。
 6. **首启自举 + run bundle**（2026-10-13 加，2026-10-24 扩）：干净 `DSH_COMPANY_HOME` 下第一次 boot 必须把骨架落到位（手册/章程/模板/起动件），并在 `<DSH_HOME>/bundle.json` 写 bundle 身份（id / workspace 相对根 / 基部逐文件 sha256）；**新安装不许带扩张数据**（journal / 交付物 / 培养记录）；**第二次 boot 零变更且 bundle.json 字节不变**——"建立好了就不用再建立了"的模拟安装判据。
 
@@ -112,15 +112,16 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
    oracle；资格与缺口见[快照合同](../snapshots/README.md)）再谈语义结论——replay = 升 pin 回归网第一道（[testing.md](./testing.md) §4）。
     已知漂移红（r3 ×2 / foundation ×3 = 录制期组合演进，2026-10-05 裁决维持为漂移金丝雀、不弱化断言不重录掩盖）；升 pin 重校时顺带评估是否以新版本场景重录换更宽绿网（新录不覆盖旧锚，payload 冻结不破）。
 
-程序：验证旧簿记及 `verify` → fetch tag 并核对证据 SHA → 在内存暂存新簿记/矩阵 → checkout 候选 → `pnpm install` → **vendor 面构建 = staging 树构建后拷回**（`git archive` 候选 → 独立 install + `pnpm run build` → 产物逐目录 `git check-ignore` 守门拷回；嵌套工作区跑不了 vendor face 构建，D27 在案且 0.2.0 逐字复现——见 [pin-upgrade Note](../notes/archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md)）→ `test` + built `release-smoke` → 验证通过才写簿记/矩阵 → 再 `verify`。候选冒烟时矩阵仍为旧值，安装检查只确认其在场；成功后矩阵才增加实测 tag。安装限 180 秒、vendor build 与 release-smoke 各 600 秒，其余命令 120 秒；子进程组等待退出。
+程序：验证旧簿记及 `verify` → fetch tag 并核对证据 SHA → 在内存暂存新簿记/台账 → checkout 候选 → `pnpm install` → **vendor 面构建 = staging 树构建后拷回**（`git archive` 候选 → 独立 install + `pnpm run build` → 产物逐目录 `git check-ignore` 守门拷回；嵌套工作区跑不了 vendor face 构建，D27 在案且 0.2.0 逐字复现——见 [pin-upgrade Note](../notes/archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md)）→ `test` + built `release-smoke` → 验证通过才写簿记/台账 → 再 `verify`。候选冒烟时台账仍为旧值，安装检查只确认其在场；成功后台账才增加实测 tag。安装限 180 秒、vendor build 与 release-smoke 各 600 秒，其余命令 120 秒；子进程组等待退出。
 
 捕获到失败或 TERM/INT 时，恢复原 vendor HEAD、AGENTS/verify/pack manifest 和安装修改的 lockfile；不使用 reset/clean，不覆盖检测到的并发修改（报出需人工恢复的路径）。锁文件以安装结束时读到的版本为受控版本；运行期间不应并行编辑或安装。`node_modules`、缓存及 ignored 构建产物不回滚，失败后须按原 pin 重装/重建；强杀/断电无自动恢复保证。checkout 已发布 tag 不修改 vendor tracked 内容。
 
 ## 版本纪律
 
-- pack 版本 `0.3.3`（`private: true`——**尚未发布到任何 registry**；真实发布动作
-  （npm publish）等出现第二个消费者/部署需求时再定，当前 release-smoke 验证的是
-  `file:` tarball 安装形状）。0.3.3 = 审查加固（bundle.json 原子写/损坏诊断、升级日志点名、
+- pack 版本 `0.3.4`（`private: true`——**尚未发布到任何 registry**；真实发布动作
+  （npm publish）等出现第二个消费者/部署需求时再定；本轮只把本地 tarball 交付内化为 `pnpm release`，未 publish。当前 release-smoke 验证的是
+  `file:` tarball 安装形状）。0.3.4 = FAQ 24 对齐（preset 去公司事实、README 六节、locale/icon、compat 台账移出 package、release runbook/脚本）；
+  0.3.3 = 审查加固（bundle.json 原子写/损坏诊断、升级日志点名、
   catalog metaProblem、standalone 接管/清理安全）；0.3.2 = 分发契约（engines/license/sha256）+
   成品目录 host 生成 + 目录独立启动（standalone）；0.3.1 = run bundle 安装单元
   （bundle.json + 整盘去 tracked + 基部零部署历史）；改内容必 bump（见下条）。

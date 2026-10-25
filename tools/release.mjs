@@ -139,7 +139,8 @@ function bump(kind) {
   const next = kind === 'major' ? `${major + 1}.0.0` : kind === 'minor' ? `${major}.${minor + 1}.0` : `${major}.${minor}.${patch + 1}`
   manifest.version = next
   writeFileSync(join(PACK, 'package.json'), `${JSON.stringify(manifest, null, 2)}\n`)
-  const today = new Date().toISOString().slice(0, 10)
+  // 发布日期按部署时区（Asia/Shanghai）落，避免 UTC 跨日把 10-26 写成 10-25。
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
   const changelogPath = join(ROOT, 'CHANGELOG.md')
   const changelog = readFileSync(changelogPath, 'utf8')
   if (!new RegExp(`^##\\s+${next.replaceAll('.', '\\.')}\\s+—`, 'm').test(changelog)) {
@@ -190,20 +191,21 @@ function verify() {
   sourceCheck(true)
   artifactCheck()
   const commands = [
-    ['verify', ['pnpm', ['verify']]],
-    ['test', ['pnpm', ['test']]],
-    ['release-smoke', [process.execPath, ['checks/smoke/release-smoke.mjs']]],
-    ['lifecycle-smoke', [process.execPath, ['checks/smoke/lifecycle-smoke.mjs']]],
-    ['standalone-smoke', [process.execPath, ['checks/smoke/standalone-smoke.mjs']]],
-    ['client-load-smoke', [process.execPath, ['checks/smoke/client-load-smoke.mjs']]],
-    ['preset-smoke', [process.execPath, ['checks/smoke/preset-smoke.mjs']]],
+    ['verify', ['pnpm', ['verify'], false]],
+    ['test', ['pnpm', ['test'], false]],
+    ['release-smoke', [process.execPath, ['checks/smoke/release-smoke.mjs'], true]],
+    ['lifecycle-smoke', [process.execPath, ['checks/smoke/lifecycle-smoke.mjs'], true]],
+    ['standalone-smoke', [process.execPath, ['checks/smoke/standalone-smoke.mjs'], true]],
+    ['client-load-smoke', [process.execPath, ['checks/smoke/client-load-smoke.mjs'], true]],
+    ['preset-smoke', [process.execPath, ['checks/smoke/preset-smoke.mjs'], true]],
   ]
-  if (withKey) commands.push(['handbook-smoke', [process.execPath, ['checks/smoke/handbook-smoke.mjs']]])
+  if (withKey) commands.push(['handbook-smoke', [process.execPath, ['checks/smoke/handbook-smoke.mjs'], true]])
   const checks = {}
-  for (const [name, [command, argv]] of commands) {
+  for (const [name, [command, argv, needsEnv]] of commands) {
     console.log(`\n── ${name} ──`)
     try {
-      run(command, argv)
+      if (needsEnv) run('bash', ['-c', 'source run/env.sh && exec "$@"', '--', command, ...argv])
+      else run(command, argv)
       checks[name] = 'pass'
     } catch (error) {
       checks[name] = 'fail'
