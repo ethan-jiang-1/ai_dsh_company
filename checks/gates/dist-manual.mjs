@@ -1,4 +1,5 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
+import { createHash } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { expectedTag } from './lib/pin.mjs'
@@ -23,11 +24,23 @@ export function run({ root, ok, fail }) {
   if (header !== packVersion) {
     problems.push(`表头版本（${header ?? '解析不到'}）≠ pack package.json（${packVersion}）——重跑 \`node tools/export-dist.mjs\` 再提交，别手改手册`)
   }
-  const required = ['run bundle', 'bundle.json', 'company-workspace', 'workspace/']
+  const required = ['run bundle', 'bundle.json', 'company-workspace', 'workspace/', 'sha256', 'Node', 'DSH', '卸载', '回退']
   const missing = required.filter(phrase => !manual.includes(phrase))
-  if (missing.length > 0) problems.push(`手册缺安装形状关键句：${missing.join(' / ')}（run bundle / bundle.json / workspace 骨架）`)
+  if (missing.length > 0) problems.push(`手册缺安装形状/契约关键句：${missing.join(' / ')}（run bundle / bundle.json / workspace 骨架 / sha256 / Node / DSH / 卸载 / 回退）`)
   if (!manual.includes(expectedTag)) problems.push(`手册缺验证基线 \`${expectedTag}\`（pin 漂了或没重导）`)
+  // 产物身份（2026-10-25，RFC distribution-lifecycle）：手册必须给出 tgz 的 sha256；
+  // 本体在场时逐字节核对，本体不在场（fresh clone / 未导出）只查形状，不冒充校验过。
+  const manualHash = /[0-9a-f]{64}/.exec(manual)?.[0]
+  if (manualHash === undefined) problems.push('手册缺 tgz 的 sha256（64 位十六进制）——重跑 `node tools/export-dist.mjs`')
+  const tarball = join(root, '_dist', `dsh-company-pack-${packVersion}.tgz`)
+  if (existsSync(tarball) && manualHash !== undefined) {
+    const digest = createHash('sha256').update(readFileSync(tarball)).digest('hex')
+    if (digest !== manualHash) problems.push(`手册 sha256（${manualHash}）≠ tgz 本体（${digest}）——重跑 \`node tools/export-dist.mjs\``)
+    const sidecar = `${tarball}.sha256`
+    if (!existsSync(sidecar)) problems.push('_dist 缺 tgz 的 .sha256 旁文件——重跑 `node tools/export-dist.mjs`')
+    else if (!readFileSync(sidecar, 'utf8').trim().startsWith(digest)) problems.push('_dist 的 .sha256 旁文件与 tgz 本体不一致——重跑 `node tools/export-dist.mjs`')
+  }
   problems.length === 0
-    ? ok(`dist-manual（版本 ${packVersion} + run bundle 安装形状 + pin ${expectedTag}）`)
+    ? ok(`dist-manual（版本 ${packVersion} + run bundle 安装形状 + sha256 + pin ${expectedTag}）`)
     : fail('dist-manual', problems.join('；'))
 }

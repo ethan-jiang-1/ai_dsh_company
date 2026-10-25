@@ -4,23 +4,31 @@
 
 ## 活跃清单
 
-当前活跃 0 张：
+当前活跃 6 张（2026-10-25 立；来源 = 用户点名的收尾三轴：分发 / 智能体与数据分离 / 独立启动）：
 
-- （无——run bundle 卡 2026-10-24 已结：按建议转 RFC 并实施，Note =
+| 卡 | 结果 | 状态 |
+|---|---|---|
+| [分发契约与产物身份](2026-10-25-distribution-contract.md) | 陌生人能识别、校验、安装、失败退出 | 推敲中 |
+| [安装生命周期证据](2026-10-25-install-lifecycle-evidence.md) | 升级/卸载/迁移有真 tarball 证据 | 推敲中 |
+| [出厂内容自足](2026-10-25-shipped-content-self-contained.md) | 注入内容不再假设仓库存在 | 推敲中 |
+| [成品目录与审计产品化](2026-10-25-deliverables-catalog-and-audit.md) | 成品页签不依赖仓库工具 | 推敲中 |
+| [独立启动形状](2026-10-25-standalone-deployment-shape.md) | 干净目录 + home 一条命令起 web | 推敲中 |
+| [部署身份与盘守卫](2026-10-25-deployment-identity-and-workspace-guard.md) | 不同公司不改源码；错盘有守卫（条件卡） | 推敲中 |
+
+## 近期归档
+
+- run bundle 卡 2026-10-24 已结：按建议转 RFC 并实施，Note =
   [run-bundle-install-unit](../../notes/implemented/2026-10-24-run-bundle-install-unit.md)；卡在
-  [归档](../_archive/settled_issues/2026-10-24-run-bundle-clean-base.md)。）
-
-- （无——培养背景卡 2026-10-23 已交付归档：D1=A/D2=A；RFC 实施为
+  [归档](../_archive/settled_issues/2026-10-24-run-bundle-clean-base.md)。
+- 培养背景卡 2026-10-23 已交付归档：D1=A/D2=A；RFC 实施为
   [Note](../../notes/implemented/2026-10-23-cultivation-context.md)，卡在
-  [归档](../_archive/settled_issues/2026-10-23-cultivation-context.md)。）
-
-fresh-agent-repo-hygiene 卫生审计卡（2026-10-21）已毕业归档：两轮审计 + 全部发现修复
-（P0–P4 + notes 归档 + 手册重构），收口记录 =
-[归档卡](../_archive/settled_issues/2026-10-20-fresh-agent-repo-hygiene.md) 与
-[Phase B–F Note](../../notes/implemented/2026-10-21-followup-sweep-phases-b-f.md)。
-
-此前六张卡（issue 卡质量 / 公司面优先级 / 看板+依赖图 / 任务板 / 台账 / 成品台账）均已归档，见
-[归档](../_archive/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
+  [归档](../_archive/settled_issues/2026-10-23-cultivation-context.md)。
+- fresh-agent-repo-hygiene 卫生审计卡（2026-10-21）已毕业归档：两轮审计 + 全部发现修复
+  （P0–P4 + notes 归档 + 手册重构），收口记录 =
+  [归档卡](../_archive/settled_issues/2026-10-20-fresh-agent-repo-hygiene.md) 与
+  [Phase B–F Note](../../notes/implemented/2026-10-21-followup-sweep-phases-b-f.md)。
+- 此前六张卡（issue 卡质量 / 公司面优先级 / 看板+依赖图 / 任务板 / 台账 / 成品台账）均已归档，见
+  [归档](../_archive/README.md)（含 agent-cultivation、workspace-convergence 与 ceo-minimal-assembly）。
 
 ## 边界与尺寸
 

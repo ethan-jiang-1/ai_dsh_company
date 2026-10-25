@@ -4,6 +4,16 @@
   "private": true,
   "type": "module",
   "description": "Virtual company multi-role plugin pack: 5 role presets (CEO / VP-Eng / VP-Sales / COO / CFO) + host bundle rows + deployment brand skin. Design docs: docs/index.md",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ethan-jiang-1/ai_dsh_company.git",
+    "directory": "packages/company-pack"
+  },
+  "engines": {
+    "node": ">=22.19.0",
+    "dsh": ">=0.2.1-rc.2 <0.3.0"
+  },
   "main": "lib/index.js",
   "exports": {
     ".": {

@@ -12,6 +12,7 @@
 // 导出 ≠ 发布：不 bump 版本、不跑门禁（除清单）、不发布任何 registry——按工作树现状打包。
 import { repositoryRoot as repoRoot } from './lib/repository-layout.mjs'
 import { spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -38,7 +39,7 @@ try {
   // 只清本脚本自己的旧产物，不动 _dist/ 里别人放的东西
   mkdirSync(distDir, { recursive: true })
   for (const name of readdirSync(distDir)) {
-    if (name === manualName || /^dsh-company-pack-.*\.tgz$/.test(name)) {
+    if (name === manualName || /^dsh-company-pack-.*\.tgz$/.test(name) || /^dsh-company-pack-.*\.tgz\.sha256$/.test(name)) {
       rmSync(join(distDir, name), { force: true })
     }
   }
@@ -66,6 +67,12 @@ try {
   report('tarball inventory', listed.status === 0 && missing.length === 0 && outside.length === 0 && presetFiles > 0 && forbidden.length === 0,
     missing.length ? `missing: ${missing.join(', ')}` : `${entries.length} entries, presets ×${presetFiles}${outside.length ? `, outside package/: ${outside.join(', ')}` : ''}${forbidden.length ? `, forbidden: ${forbidden.slice(0, 3).join(', ')}` : ''}`)
 
+  // 2b. 产物身份（2026-10-25，RFC distribution-lifecycle）：tgz 的 sha256 是收件人唯一的
+  // 字节级凭证；手册与旁文件必须同源，不靠“下载后看起来一样”。
+  const digest = createHash('sha256').update(readFileSync(tarball)).digest('hex')
+  writeFileSync(`${tarball}.sha256`, `${digest}  ${tarballName}\n`, 'utf8')
+  report('sha256', /^[0-9a-f]{64}$/.test(digest), `${digest}  ${tarballName}`)
+
   // 3. 手册——脚本生成，版本/日期/条目数注入；步骤镜像 release-smoke 验证过的安装路径
   const date = new Date().toISOString().slice(0, 10)
   const manual = `# dsh-company-pack 手动安装手册
@@ -74,8 +81,10 @@ try {
 |---|---|
 | 版本 | ${version} |
 | 安装包 | \`${tarballName}\`（与本手册同目录） |
+| 校验（sha256） | \`${digest}\` |
 | 打包日期 | ${date} |
 | 验证基线 | DSH \`${expectedTag}\`（Node ≥ 22.19） |
+| 许可 | \`UNLICENSED\`（内部交付，未授予再分发权） |
 
 这个安装包是自包含的：bundle 补丁、五个角色 preset、浏览器端、**出厂公司盘骨架 workspace/**
 （手册 / 章程 / org / 模板 / 起动件），共 ${entries.length} 个条目。
@@ -83,6 +92,14 @@ try {
 **一次安装 = 一个 run bundle**：一个 DSH home + 一个公司盘（\`company-workspace/\`）+ \`bundle.json\`
 （身份 / pack 版本 / 基部指纹）。bundle 不进 git；给另一个 CEO 装 = 新开一个 \`DSH_HOME\`，
 不要复用（sessions / 凭据 / 方法层 / workspace 登记都在 home 里）。
+
+## 零、前置
+
+- **Node.js** ≥ 22.19（与 DSH 基线一致）。
+- **DSH 运行时**：本手册只在 \`${expectedTag}\` 上验证过；用同版本安装包或源码 checkout
+  （例如 \`npx @deepseek-ai/dsh@${expectedTag.replace(/^dsh-v/, '')} web\`）。版本不匹配时安装会被拒绝。
+- **一个独立的 \`DSH_HOME\`**：不要复用日用 home，也不要让两个 CEO 共用一个 home。
+- **许可**：本包为内部交付（\`UNLICENSED\`），未授予再分发权；支持窗口 = 当前版本。
 
 ## 一、安装（给这个 CEO 一个独立的 home）
 
@@ -113,6 +130,16 @@ DSH_HOME="$HOME/dsh-bundles/<你的 CEO 名>" dsh web
 
 ## 三、验证
 
+先核对字节，再启动：
+
+\`\`\`sh
+shasum -a 256 ${tarballName}          # macOS；Linux 用 sha256sum
+cat ${tarballName}.sha256              # 必须与上行一致
+shasum -a 256 -c ${tarballName}.sha256
+\`\`\`
+
+启动后：
+
 \`\`\`sh
 cat "$DSH_HOME/bundle.json"          # id / pack.version / skeleton.files
 dsh --profile web --dump-config      # 插件层 + preset-ceo + company-client
@@ -128,6 +155,8 @@ dsh --profile web --dump-config      # 插件层 + preset-ceo + company-client
 
 整个 \`DSH_HOME\` 就是 bundle（含公司盘、sessions、方法层、凭据）。归档时排除
 \`.credentials.yaml\` 与含启动 token 的日志；换机器时连 home 一起搬。
+搬完后若 profile 的依赖目录失效，按第二节重新 \`plugin add\` 一次；公司盘、sessions、
+\`bundle.json\` 都不动。
 
 ## 六、卸载
 
@@ -137,6 +166,14 @@ dsh plugin --profile web remove dsh-company-pack
 
 只卸插件、不动 bundle 数据；要彻底删除一个 CEO 的 bundle，确认备份后删除它的整个
 \`DSH_HOME\`。
+
+## 七、安装失败与回退
+
+- **版本不匹配**：安装会被拒绝并报 \`incompatible-version\`；换匹配的 DSH，不要用
+  \`allow-version\` 绕过（会带来崩溃/数据风险）。
+- **包损坏/下载不完整**：用上面的 sha256 复核；删除 profile 里的包后重装。
+- **回退**：先备份整个 \`DSH_HOME\`；卸载当前包，装回上一个 tgz。基部升级只做
+  create/update/keep，不删除扩张面；回退不会自动降级已改过的基部文件（它们会保留）。
 
 ## 常见问题
 

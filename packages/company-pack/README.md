@@ -1,5 +1,10 @@
 # dsh-company-pack
 
+> **给收件人（先读这个）**：本包是 `dsh-company-pack` 0.3.1；只支持 DSH `>=0.2.1-rc.2 <0.3.0`
+> / Node ≥22.19。安装、sha256 校验、升级、卸载、回退见与 tarball 同目录的《安装手册》
+> （`_dist/安装手册.md`，由 `node tools/export-dist.mjs` 生成，不在 tarball 内）。
+> 许可 = `UNLICENSED`（内部交付，未授予再分发权）。
+
 唯一自写包（决策 D1：一个包；行多包少）。**owner 表**（每件东西是什么、谁消费——RFC pack-boundaries 2026-10-05 立）：
 
 | 件 | 是什么 | 消费方向 | 出生 |
@@ -9,15 +14,15 @@
 | `src/` | **自写实现**两半：Host = `src/index.ts` 注册入口 + `src/host/`（Node-only 自举与培养注册/文件操作）+ `src/lib/`（共享读模型纯逻辑）；Client = `src/client/` 注册入口与浏览器面——具体布局唯一家 = [src/README](./src/README.md) | vendor runtime + `tests/company`（Host 源码直测）/ `tests/client`（Client 注册与视图） | R3+ |
 | `lib/` | **generated 发布产物（read-only）**：`tsc -b packages/company-pack` → tsdown 两面产出；**改 `src/` ≠ 浏览器已重建**——dsh web 常驻面必须重跑构建（事实家 = [bootstrap](../../docs/guides/bootstrap.md)） | `npm pack` → profile 安装（`exports`：`.` → `lib/index.js`、`./client` → `lib/client.js`） | R5 |
 | `cordis.patch.yml` | **bundle 装配行**：`agent-preset-registry` 替换出厂行；`dsh.bundle.patch` 为**数组** = registry 1 + 五角色预设行 + 委派子人格 `researcher` 一行（0.2.1） | profile 组合层 | R0–R2 |
-| `package.json` | **发布/注入声明**：peerDependencies（**版本以此为准，此处不复述**——复述必漂）、`dsh.compatibility` 矩阵（`pack-compat` 门禁强制含当前 tag）、`files` 白名单、`dsh.client` 字段 | 包管理器 + loader | R0–R2 |
+| `package.json` | **发布/注入声明**：peerDependencies（**版本以此为准，此处不复述**——复述必漂）、`engines.dsh` 安装窗口（DSH 运行时只读这一行）、`dsh.compatibility` 矩阵（已认证 tag 台账；`pack-compat` 门禁强制含当前 tag）、`files` 白名单、`dsh.client` 字段、license/repository | 包管理器 + loader | R0–R2 |
 
 ⚠ `lib/` 是生成产物：`git diff` 里它先变 = 你改了构建或忘了它由 `src/` 生成——永远改 `src/`，构建产 `lib/`（物理拆分 host/domain 的重启条件 = implemented/pack-boundaries（已删，历史在 git） 重启条件节）。
 
-发布前清单已全部落地（2026-09-25 随升 pin ①）：cordis 在 peerDependencies、`dsh.compatibility`
-版本矩阵（历史版本 + 当前钉住，见 `package.json`；`pack-compat` 门禁强制含当前 tag）、
-`npm pack` → 干净 profile → `dsh plugin add` 真实安装冒烟 =
-release-smoke ALL PASS（[docs/release.md](../../docs/release.md)）。pack 保持 `private: true`——
-真实 npm 发布等第二个消费者出现再定。
+发布前清单已全部落地（2026-09-25 随升 pin ①）：cordis 在 peerDependencies、`engines.dsh` +
+`dsh.compatibility` 版本矩阵（历史版本 + 当前钉住，见 `package.json`；`pack-engines` / `pack-compat`
+门禁强制窗口覆盖当前 pin）、`npm pack` → 干净 profile → `dsh plugin add` 真实安装冒烟 =
+release-smoke ALL PASS（[docs/release.md](../../docs/release.md)）。pack 保持 `private: true`、
+`license: UNLICENSED`——真实 npm 发布等第二个消费者出现再定。
 
 **装完第一步（自动，2026-10-24 起 = 一个 run bundle）**：插件第一次跑起来会把包内 `workspace/` 骨架落到
 `<DSH_HOME>/company-workspace`（**只补缺、绝不覆盖**；见 host 半 `src/host/bootstrap.ts`），并在

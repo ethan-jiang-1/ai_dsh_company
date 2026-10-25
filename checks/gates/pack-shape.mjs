@@ -1,5 +1,6 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { expectedTag } from './lib/pin.mjs'
@@ -23,4 +24,34 @@ const compatReleases = pack?.dsh?.compatibility?.dshReleases
 if (!Array.isArray(compatReleases) || !compatReleases.includes(expectedTag)) {
   fail('pack-compat', `dsh.compatibility.dshReleases 必须包含当前钉住的 ${expectedTag}（升 pin 走 tools/sync-dsh.mjs 并同步加列）`)
 } else ok(`pack-compat (${expectedTag} ×${String(compatReleases.length)})`)
+
+// 分发契约（2026-10-25，RFC distribution-lifecycle）：DSH 只读 engines.dsh（存在即忽略 peers），
+// 所以兼容窗口必须有这一行；license/repository/private 是给收件人的身份，不是装饰。
+// 矩阵仍是“已认证 tag 台账”，engines 是“当前可安装窗口”——两者语义不同，别混。
+const semver = (() => {
+  for (const base of ['../../vendor/dsh/packages/boot/app-boot/package.json', '../../vendor/dsh/package.json']) {
+    try {
+      const require = createRequire(new URL(base, import.meta.url))
+      return require('semver')
+    } catch { /* next base */ }
+  }
+  return null
+})()
+const engines = pack?.engines
+const nodeRange = engines?.node
+const dshRange = engines?.dsh
+const pinVersion = expectedTag.replace(/^dsh-v/, '')
+const enginesProblems = []
+if (typeof nodeRange !== 'string' || nodeRange.trim() === '') enginesProblems.push('engines.node 缺失')
+if (typeof dshRange !== 'string' || dshRange.trim() === '') enginesProblems.push('engines.dsh 缺失（DSH 只读这一行；没有它才看 peers）')
+else if (semver === null) enginesProblems.push('semver 不可解析（vendor app-boot / vendor 根都找不到）')
+else if (!semver.satisfies(pinVersion, dshRange, { includePrerelease: true })) {
+  enginesProblems.push(`engines.dsh ${JSON.stringify(dshRange)} 不覆盖当前 pin ${pinVersion}`)
+}
+if (typeof pack?.license !== 'string' || pack.license.trim() === '') enginesProblems.push('license 缺失')
+if (pack?.repository === undefined) enginesProblems.push('repository 缺失')
+if (pack?.private !== true) enginesProblems.push('private 不是 true（未到 publish 时不应放开）')
+enginesProblems.length === 0
+  ? ok(`pack-engines（node ${nodeRange} / dsh ${dshRange} / ${pack.license} / private）`)
+  : fail('pack-engines', enginesProblems.join('；'))
 }

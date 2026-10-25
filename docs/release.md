@@ -18,6 +18,11 @@
   out-of-tree 插件的 peers 由**安装锚兜底解析**（行解析顺序：installation anchor 先于
   profile 目录），所有插件共享 dsh 安装侧的同一份 cordis/工具包，不出现第二份单例。
   peers 是**声明语义**（"验证过的宿主 API 面"），不是安装要求。
+- **兼容窗口 = `engines.dsh`**：DSH 在安装/启动时只读这一行（存在即忽略 peers；矩阵是“已认证 tag”
+  台账，不是运行时门）。当前窗口见 `package.json`；`pack-shape` 的 `pack-engines` 强制它覆盖钉住的
+  pin，且 license/repository/private 在场。
+- **许可与发布**：`license: UNLICENSED`（内部交付，未授予再分发权）；`private: true` 保留到 publish。
+  真实 npm 发布仍是“第二个消费者出现再定”。
 - **client 面自打包**：`lib/client.js` 由 tsdown 产出，react 与 `dsh-client-*`/`dsh-api-*`
   留作浏览器模块表 require（见 `packages/company-pack/tsdown.config.ts` 外置规则），
   其余内联——所以 tarball 的浏览器半零 runtime 依赖。
@@ -31,6 +36,9 @@
 ```
 **形状 = 数组，含历史版本 + 当前钉住的那一个**（`pack-shape.mjs` 的 `pack-compat` 门禁强制矩阵含当前
 tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具体值）。
+
+`engines.dsh`（运行时窗口）与 `dshReleases`（已认证 tag 台账）不是同一件事：后者可以保留历史验证
+tag，前者只承诺当前可安装范围。`pack-engines` + `pack-compat` 各查一边。
 
 - 语义：**每个列名都是真实验证过的 vendor pin tag**（升 pin 走 sync-dsh，冒烟过了才加列）。
 - 机械门禁：`pnpm verify` 的 `pack-compat`——当前钉住 tag 不在矩阵里就红
@@ -80,6 +88,8 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
 两个 DSH 调用均为 plain Node，清除继承的 `NODE_OPTIONS`、`NODE_PATH`、`TSX_*`，不走 `pnpm dsh`/tsx。构建和打包各限 120 秒，安装 180 秒，boot 120 秒、实例总寿命 180 秒、每个 HTTP 请求 15 秒；POSIX 子进程组 TERM 后等待，1 秒后 KILL。确认退出才回收 profile（`--keep` 保留）；同 home 的锁目录拒绝并发运行。强杀脚本留下的锁须确认无进程后人工移除。
 
 全绿证明本次已有 vendor 产物配合真 tarball 安装可用；不证明 vendor 新鲜构建，也不覆盖完整浏览器交互。dev profile 的 `link:` 安装不替代这条验证。
+
+**生命周期冒烟**（`node checks/smoke/lifecycle-smoke.mjs`）：真 tarball v1 → 改基部/加扩张 → v2 → 启动，再卸载、搬 home 重装；补 release-smoke 不覆盖的升级/卸载/迁移面。它不证明 registry 升级、降级、并发或跨 OS。
 
 ## 升 pin 程序（`node tools/sync-dsh.mjs`，认证档）
 
@@ -132,6 +142,8 @@ tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具
   版本 bump 必须同 diff 重跑导出。
 - **打包步 = release-smoke 同一条 `npm pack`**（npm cache 钉 scratch，§11）；导出后对产物本体
   再断言一次发布边界（cordis.patch.yml / lib 双半 / presets 在场，无 `package/` 外文件）。
+- **产物身份**：`export-dist` 算 tgz 的 sha256，写同目录 `.sha256` 并注入手册；`dist-manual` 在
+  本体在场时逐字节核对，未导出/新 clone 时只查形状，不冒充校验过。
 - **导出 ≠ 发布**：不 bump 版本、不跑认证档、不进 registry——按工作树现状打包；真实发布动作
   仍按上文「版本纪律」（第二个消费者出现再定）。
 
