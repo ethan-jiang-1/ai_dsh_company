@@ -2,6 +2,15 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.3.5 — 2026-10-26
+
+### Changed
+
+- 数据边界：README Data 补 D 平面与 session cwd 不一致的提示；catalog 的 `presented=false` 只按精确 path 保留，同 slug 新件不继承旧结论。
+- 发布复现：`release --check` 要求 manifest dirty=false 且 verify/test/所有 smoke 全 pass；新增 `release --stamp` 把 manifest 钉到发布 commit；`--verify` 拒绝验旧 HEAD 的产物。
+- 手册日期改为 Asia/Shanghai，与 CHANGELOG 一致（0.3.4 手册误写 10-25）。
+- 测试资产：移除 catalog wiring 的 mock；补空态、tarball locale/icon、两侧 metaProblems 一致性、persona 公司名断言。
+
 ## 0.3.4 — 2026-10-26
 
 ### Changed
