@@ -32,12 +32,13 @@ const valueOf = flag => {
 }
 const allowDirty = has('--allow-dirty')
 const withKey = has('--with-key')
+const allowStaleManifest = has('--allow-stale-manifest')
 
 if (has('--help') || has('-h')) {
   console.log(`用法：
   pnpm release --bump patch|minor|major
   pnpm release --prepare [--force]
-  pnpm release --verify [--with-key]
+  pnpm release --verify [--with-key] [--allow-stale-manifest]
   pnpm release --check [--allow-dirty]
   pnpm release --stamp
   pnpm release --all [--with-key]`)
@@ -203,7 +204,7 @@ function verify() {
   artifactCheck()
   const prepared = readManifest()
   if (prepared.version !== pack().version) fail(`manifest 版本 ${prepared.version} ≠ package ${pack().version}；先 --prepare`)
-  if (prepared.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest 不是当前 HEAD 的 --prepare 产物；先重跑 --prepare')
+  if (!allowStaleManifest && prepared.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest 不是当前 HEAD 的 --prepare 产物；先重跑 --prepare（仅 test/docs 改动可显式 --allow-stale-manifest）')
   const commands = [
     ['verify', ['pnpm', ['verify'], false]],
     ['test', ['pnpm', ['test'], false]],

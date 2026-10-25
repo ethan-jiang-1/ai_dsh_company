@@ -132,6 +132,18 @@ try {
     })
   }
 
+  // ②b 并发两会话：同一 profile/同一工作区同时创建，返回的 preset/id 不串。
+  await check('并发两会话创建不串', async () => {
+    const [a, b] = await Promise.all([
+      rpc(base, cookie, 'session/create', { request: { cwd: CWD, agentPreset: 'ceo' } }),
+      rpc(base, cookie, 'session/create', { request: { cwd: CWD, agentPreset: 'vp-eng' } }),
+    ])
+    if (a?.agentPreset !== 'ceo' || b?.agentPreset !== 'vp-eng') throw new Error(`preset 串了：${JSON.stringify({ a, b }).slice(0, 200)}`)
+    const aid = a?.id ?? a?.sessionId
+    const bid = b?.id ?? b?.sessionId
+    if (typeof aid !== 'string' || typeof bid !== 'string' || aid === bid) throw new Error(`会话 id 异常：${String(aid)} / ${String(bid)}`)
+  })
+
   // ③ 角色 skills 硬隔离（真入口断言）：`skills/list` 是 session 寻址的冷读 Remote，
   //    按会话的 preset scope 解析注册表。断言"恰好等于该角色目录里的 skill"——
   //    `includeDefaultRoots` 默认 true 时，角色会话会额外看见项目根/用户级技能集

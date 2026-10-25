@@ -50,7 +50,7 @@
 - `dsh.compatibility` 从 package 移除；[checks/gates/lib/compat-tags.json](../../checks/gates/lib/compat-tags.json) 成为唯一台账；`pack-compat` / `sync-dsh` / release-smoke 同步。
 - `CHANGELOG.md`、[release-ready](../../checks/gates/release-ready.mjs)、[release.mjs](../../tools/release.mjs)、[runbook](../../docs/guides/release-runbook.md)；`pnpm release` 的 bump/prepare/verify/check 已实跑。
 - 0.3.4 tarball 272 条目、sha256 `41a20619b7f8fe0b828eb0108ecb0d90a1490d6c4b8e1a74a784792ea5217e1f`；手册 0.3.4；`_dist/release-manifest.json` 记录 gitSha/各级检查。
-- 0.3.6 补齐：真 vendor `present` → session event → catalog 的 [present-catalog-smoke](../../checks/smoke/present-catalog-smoke.mjs)（并修 `/var`→`/private/var` symlink 匹配 bug）；host cwd guard；lifecycle 单字节篡改拒绝；standalone 缺 pnpm doctor 负例 + 入口搬迁（vendor/packages symlink）测试；T4/T6 断言 + T8 runbook。0.3.6 曾导出 272 条目，但因 test-only commit 后误重打包导致同版本字节漂移；已加「同版本拒绝重打」护栏，0.3.6 不再作为 handoff。0.3.7 为重新导出的交付字节：272 条目、sha256 `b808012b99ece8f59a1024767b765d5232bd48730938bc2ec4a18df573b398a3`，release --check 9 项 pass。
+- 0.3.6 补齐：真 vendor `present` → session event → catalog 的 [present-catalog-smoke](../../checks/smoke/present-catalog-smoke.mjs)（并修 `/var`→`/private/var` symlink 匹配 bug）；host cwd guard；lifecycle 单字节篡改拒绝；standalone 缺 pnpm doctor 负例 + 入口搬迁（vendor/packages symlink）测试；T4/T6 断言 + T8 runbook；preset-smoke 增加并发两会话创建不串。0.3.6 曾导出 272 条目，但因 test-only commit 后误重打包导致同版本字节漂移；已加「同版本拒绝重打」护栏，0.3.6 不再作为 handoff。0.3.7 为重新导出的交付字节：272 条目、sha256 `b808012b99ece8f59a1024767b765d5232bd48730938bc2ec4a18df573b398a3`，release --check 9 项 pass。
 
 红/绿：
 - 红：临时把 `全员 50 人` 写回 CFO persona → `FAIL tests/presets > preset 定义不携带公司数据`；还原 → 绿。
