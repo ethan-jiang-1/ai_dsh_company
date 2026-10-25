@@ -20,6 +20,7 @@ import {
   writeBundleManifest,
   writeUpgradedManifest,
 } from './host/bundle-manifest.ts'
+import { presentedFromEvent, regenerateCatalog } from './host/catalog.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
 
 /**
@@ -229,4 +230,27 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   } catch (error) {
     ctx.logger?.warn?.(`company-pack run bundle 身份写入跳过（不影响运行）：${(error as Error).message}`)
   }
+
+  // ── 成品目录（2026-10-25，RFC installed-shape-self-sufficient）──────────────────
+  // 首启生成空 catalog（页签显示“还没有成品”，而不是“维护者运行 node tools/...”）；
+  // present 事件落盘后重生成。只写 workspace 的 kb/ 索引，不碰交付物本体。
+  try {
+    const companyHome = resolveCompanyHome(resolveDshHome())
+    if (existsSync(companyHome)) {
+      const result = regenerateCatalog(companyHome)
+      if (result.written) ctx.logger?.info?.(`company-pack：成品目录已生成（${result.path}）`)
+    }
+  } catch (error) {
+    ctx.logger?.warn?.(`company-pack 成品目录生成跳过（不影响运行）：${(error as Error).message}`)
+  }
+  ctx.on('session/event', (_session, event) => {
+    if ((event as { type?: unknown }).type !== 'deliverables/presented') return
+    try {
+      const companyHome = resolveCompanyHome(resolveDshHome())
+      const observed = presentedFromEvent(event, companyHome)
+      if (observed.paths.size > 0) regenerateCatalog(companyHome, observed)
+    } catch (error) {
+      ctx.logger?.warn?.(`company-pack 成品目录 present 投影跳过（不影响运行）：${(error as Error).message}`)
+    }
+  })
 }

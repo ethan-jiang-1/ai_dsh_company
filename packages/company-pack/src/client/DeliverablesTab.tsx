@@ -4,12 +4,12 @@
  * UX 取向：
  * - **按成品列，不按动议列**：一行 = 一份 final.md；slug + meta 的一句话结论 + 类型/结果，
  *   点「打开」在右栏预览 final.md。
- * - **静态索引说真话**：数据来自维护者生成的 JSON，不轮询；页签头显示「静态索引 · 生成于 …」，
- *   提供「重读」按钮（生成器跑完后重读），不假装实时。
+ * - **静态索引说真话**：数据来自本部署 host 生成的 JSON，不轮询；页签头显示「静态索引 · 生成于 …」，
+ *   提供「重读」按钮（host 在 present 后重生成，页面只重读当前文件），不假装实时。
  * - **先看结论，再看细节**：一句话结论复用 `LedgerSummary`（2 行钳制 + 全文入口，键盘/触屏可用）；
  *   slug / 日期 / 类型 / 结果 / 活跃或归档或台账外都是可扫的次要信息。
  * - **分组 + 筛选**：按月分组；全部/活跃/归档/台账外四档，44 条也不至于糊成一片。
- * - **空/错/加载**：缺索引不静默给空表，明确提示跑生成器。
+ * - **空/错/加载**：缺索引不静默给空表，明确提示检查 host 与 workspace。
  */
 import { useMemo, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
@@ -66,7 +66,7 @@ const FILTERS: readonly { readonly key: Filter; readonly label: string }[] = [
   { key: 'unpresented', label: '未 present' },
 ]
 
-/** 结果词表（唯一家 = tools/lib/deliverables.mjs 的 META_RESULTS）→ Tag 色调。新增值必须在这里点名。 */
+/** 结果词表（唯一家 = 手册 meta 模板的枚举）→ Tag 色调。新增值必须在这里点名。 */
 const RESULT_TONES: Readonly<Record<string, 'success' | 'info' | 'warning' | 'danger'>> = {
   已完成: 'success',
   已采纳: 'success',
@@ -237,8 +237,8 @@ export function DeliverablesView({ catalog, sessionId, openFinal }: {
             </div>
           )}
       <div className="wk-meta wk-catalog-foot">
-        成品 = 目录里有 <code>final.md</code>；<code>present</code> 背书与审计仍归 <code>deliverables-check</code>。
-        索引由 <code>tools/deliverables-index.mjs</code> 生成，面板只读。
+        成品 = 目录里有 <code>final.md</code>；<code>present</code> 背书来自本部署 host 记录的 present 事件，
+        未记录的条目显示「未核」。索引由 host 生成，面板只读。
       </div>
     </>
   )
@@ -253,9 +253,9 @@ export function DeliverablesTab(props: DeliverablesTabProps) {
   const { state, reload } = useWorkspaceText(props.readCatalog, props.sessionId)
   const catalog = state.status === 'ready' ? parseCatalog(state.text) : null
   const error = state.status === 'unreadable'
-    ? '成品索引不可读（kb/deliverables-index.json 缺失？维护者运行 node tools/deliverables-index.mjs）'
+    ? '成品索引不可读（kb/deliverables-index.json 缺失？本部署 host 会在启动时生成；若仍缺失，请确认 workspace 是公司盘）'
     : state.status === 'ready' && catalog === null
-      ? '成品索引形状不符（schema 1 / entries 缺失；重跑 node tools/deliverables-index.mjs）'
+      ? '成品索引形状不符（schema 1 / entries 缺失；本部署 host 会在下次启动时重建）'
       : null
 
   return (
@@ -268,7 +268,7 @@ export function DeliverablesTab(props: DeliverablesTabProps) {
         <Button
           size="sm"
           variant="ghost"
-          title="重读生成索引（维护者跑完 tools/deliverables-index.mjs 后）"
+          title="重读当前索引（host 会在 present 后重新生成）"
           onClick={reload}
         >
           重读

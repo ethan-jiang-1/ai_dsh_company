@@ -14,5 +14,5 @@ description: 预算核查：花费逐项对照 kb/coo/CHARTER.md 预算基准；
 红线：单价未核实时不编美元数——写"未证明成立"，用档位与上界表达（公司纪律，各案交付物同此口径）。
 
 > **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
-> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分归仓库的门禁/审计脚本
-> （如署名行 = authorship-audit、交付物三态 = deliverables-check），本文只留需要上下文判断的部分。
+> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对
+> （如署名行与任务书、交付物三态与 present），本文只留需要上下文判断的部分。

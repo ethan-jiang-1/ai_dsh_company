@@ -44,5 +44,5 @@ description: CEO 的组队方法：接到动议先过这六步（要不要叫人
    过程稿落 `deliverables/<slug>/drafts/<角色>.md`，定稿只有你能 `present`。
 
 > **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
-> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分归仓库的门禁/审计脚本
-> （如署名行 = authorship-audit、交付物三态 = deliverables-check），本文只留需要上下文判断的部分。
+> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对
+> （如署名行与任务书、交付物三态与 present），本文只留需要上下文判断的部分。

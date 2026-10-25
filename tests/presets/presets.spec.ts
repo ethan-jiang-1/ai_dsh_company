@@ -250,12 +250,13 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
 
   it('交付物三态（R4）：手册写清成品归 CEO、职能写 drafts；模板不再是占位', () => {
     const handbook = readFileSync(join(ROOT, 'packages/company-pack/workspace/AGENTS.md'), 'utf8')
-    // 三态的字面形状必须与判据实现一致（tools/lib/deliverables.mjs 的 FINAL_BASENAME / DRAFTS_DIRNAME）
+    // 三态的字面形状必须与产品内词表一致（src/lib/deliverables-catalog.ts 的 META_TYPES/META_RESULTS）
     expect(handbook, '三态必须点明成品路径').toContain('deliverables/<日期>-<slug>/final.md')
     expect(handbook, '三态必须点明过程稿路径').toContain('deliverables/<日期>-<slug>/drafts/<角色>.md')
     expect(handbook, '必须写明成品只归 CEO').toMatch(/只有 CEO/)
-    // 判据必须可被模型自行跑（发现权在代理一侧，D15）
-    expect(handbook, '三态要指向机器判据入口').toContain('checks/audit/deliverables-check.mjs')
+    // 安装后的公司没有维护者仓库：核对入口必须是人/操作员，不是仓库审计脚本（D15 发现权随部署走）
+    expect(handbook, '三态要指向操作员核对入口').toContain('操作员在会话外核对')
+    expect(handbook, '注入内容不得再引用仓库审计脚本').not.toContain('checks/audit/')
 
     const presetGuide = readFileSync(join(ROOT, 'docs/presets.md'), 'utf8')
     expect(presetGuide, 'COO 运营核查必须路由到 COO 专用模板').toContain('产出=运营方案 + 预算核查（`templates/ops-review-note.md`）')

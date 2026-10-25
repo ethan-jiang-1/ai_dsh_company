@@ -17,5 +17,5 @@ description: CFO 的工作流（1 号）：接到报价 / 预算 / 合规任务�
 > 这是 CFO 的第 1 个工作流；后续新工作流按 `cfo-workflow-<主题>` 命名追加。
 
 > **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
-> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分归仓库的门禁/审计脚本
-> （如署名行 = authorship-audit、交付物三态 = deliverables-check），本文只留需要上下文判断的部分。
+> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对
+> （如署名行与任务书、交付物三态与 present），本文只留需要上下文判断的部分。

@@ -51,4 +51,4 @@ opened: 2026-10-25
 ## 裁决（2026-10-25）
 
 - Q2 = 不同公司各自部署。operator 动作优先产品化（卡 4 的 catalog/present）；其余维护者脚本引用改写成“操作员 runbook”，不再出现在注入内容里。
-- 去向：`notes/proposed/2026-10-25-installed-shape-self-sufficient.md`（与卡 4 合并）。
+- 去向：`notes/implemented/2026-10-25-installed-shape-self-sufficient.md`（与卡 4 合并）。

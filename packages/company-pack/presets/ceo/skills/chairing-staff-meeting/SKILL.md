@@ -55,7 +55,7 @@ description: CEO 的动议节奏：澄清→DAG 拆解分派→追进度→VP �
    定稿写入 `deliverables/<kickoff 日期>-<slug>/final.md`（**开局建目录就用注入的真日期**，同时写 `meta.md` 户口——**形状逐字照 `templates/meta.md` 模板**：核心字段是 `字段: 值` 平文本行、类型/结果用词表枚举值；markdown 加粗列表不合机器可查形状，会被 `META_SHAPE_BAD` 判红），用 `present` 声明交付。
    ⚠ **顺序是硬的：先 `present`、后**把 `meta.md` 的「结果」改成终态词——**没有 present 就没有「已完成」**。
    写进 `final.md` 不等于收口：那次事故（all-in-ai-2026）就是写了 final、标了已完成，却一次没调 `present`
-   ⇒ 审计判 `final-not-presented`，收敛前置会直接拦下这道口子（`node tools/converge.mjs` 点名该 slug）。
+   ⇒ 审计判 `final-not-presented`，收敛前置会直接拦下这道口子（收口时由操作员核对并点名该 slug）。
    **首屏说人话（2026-10-10 用户批单）**：final 署名行后第一段 = 「一分钟摘要」——结论（≤3 条业务语言）、
    下一步（谁/何时）、要用户拍板的事（如有）；**禁内部黑话**（闸门/T号/锚/等级进报告体）；
    **阻塞型选择**必须用 `ask_user_question`，选项 label 写可执行动作、description 写关键后果；**非阻塞缺口**写明默认假设继续，并在轮末列待确认；
@@ -66,5 +66,5 @@ description: CEO 的动议节奏：澄清→DAG 拆解分派→追进度→VP �
 新成员入会：用 `fork` teammate 下发会议上下文（已澄清的口径 + 已有任务），别让它从零追问。
 
 > **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
-> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分归仓库的门禁/审计脚本
-> （如署名行 = authorship-audit、交付物三态 = deliverables-check），本文只留需要上下文判断的部分。
+> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对
+> （如署名行与任务书、交付物三态与 present），本文只留需要上下文判断的部分。

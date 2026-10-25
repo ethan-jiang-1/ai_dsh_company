@@ -187,6 +187,14 @@ try {
       .every(rel => has(first, rel)),
     first === null ? `落点不存在：${companyHome}` : `共 ${String(first.length)} 件`)
 
+  // 成品目录（2026-10-25，RFC installed-shape-self-sufficient）：新装也要有可读空目录，
+  // 页签显示“还没有成品”，而不是“维护者运行 node tools/...”。
+  const catalogFile = join(companyHome, 'kb/deliverables-index.json')
+  const catalog = existsSync(catalogFile) ? JSON.parse(readFileSync(catalogFile, 'utf8')) : null
+  check('首启生成成品目录（空目录，不依赖仓库工具）',
+    catalog?.schema === 1 && catalog?.counts?.total === 0 && typeof catalog?.generatedAt === 'string',
+    catalog === null ? `catalog 不存在：${catalogFile}` : JSON.stringify(catalog.counts))
+
   // run bundle 身份（2026-10-24）：首启写 `<DSH_HOME>/bundle.json`；workspace 记相对根、骨架指纹在场。
   const manifestPath = join(home, 'bundle.json')
   const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : null

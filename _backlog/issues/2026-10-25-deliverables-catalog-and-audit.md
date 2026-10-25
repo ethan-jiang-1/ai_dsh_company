@@ -52,4 +52,4 @@ opened: 2026-10-25
 ## 裁决（2026-10-25）
 
 - 产品化：host 侧生成 catalog + present 投影；完整 `deliverables-check` 平移不做（第二阶段）；未核条目标 `presented: null`，不冒充已 present。
-- 去向：`notes/proposed/2026-10-25-installed-shape-self-sufficient.md`。
+- 去向：`notes/implemented/2026-10-25-installed-shape-self-sufficient.md`。

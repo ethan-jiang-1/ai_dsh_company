@@ -27,6 +27,7 @@ import * as noTrackedIgnored from './gates/no-tracked-ignored.mjs'
 import * as trackedFileSize from './gates/tracked-file-size.mjs'
 import * as gitignoreShape from './gates/gitignore-shape.mjs'
 import * as companySkeleton from './gates/company-skeleton.mjs'
+import * as shippedLinks from './gates/shipped-links.mjs'
 import * as baseClean from './gates/base-clean.mjs'
 import * as ledgerRouting from './gates/ledger-routing.mjs'
 import * as ledgerParticipation from './gates/ledger-participation.mjs'
@@ -79,6 +80,7 @@ noTrackedIgnored.run(ctx)
 trackedFileSize.run(ctx)
 gitignoreShape.run(ctx)
 companySkeleton.run(ctx)
+shippedLinks.run(ctx)
 baseClean.run(ctx)
 ledgerRouting.run(ctx)
 ledgerParticipation.run(ctx)
