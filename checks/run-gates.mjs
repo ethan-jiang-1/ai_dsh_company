@@ -48,6 +48,7 @@ import * as presetRequiredConfig from './gates/preset-required-config.mjs'
 import * as claudeSymlink from './gates/claude-symlink.mjs'
 import * as vendorPin from './gates/vendor-pin.mjs'
 import * as packShape from './gates/pack-shape.mjs'
+import * as releaseReady from './gates/release-ready.mjs'
 import * as presetRowDeps from './gates/preset-row-deps.mjs'
 import * as clientHalves from './gates/client-halves.mjs'
 import * as proposals from './gates/proposals.mjs'
@@ -101,6 +102,7 @@ presetRequiredConfig.run(ctx)
 claudeSymlink.run(ctx)
 vendorPin.run(ctx)
 packShape.run(ctx)
+releaseReady.run(ctx)
 presetRowDeps.run(ctx)
 clientHalves.run(ctx)
 proposals.run(ctx)

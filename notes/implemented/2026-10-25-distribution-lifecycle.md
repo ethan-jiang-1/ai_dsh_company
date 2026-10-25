@@ -11,14 +11,14 @@
 - 包声明 [package.json](../../packages/company-pack/package.json) 有 `private: true`，无 `engines`、`license`、`repository`；DSH 运行时不读 `dsh.compatibility.dshReleases`，真正拦安装的是 peers。
 - 手册 [_dist/安装手册.md](../../_dist/安装手册.md) 由 [tools/export-dist.mjs](../../tools/export-dist.mjs) 生成，没有 sha256/前置/回退。
 - [release-smoke.mjs](../../checks/smoke/release-smoke.mjs) 只覆盖首启/二启；升级只有 [bundle-manifest.spec.ts](../../tests/company/bundle-manifest.spec.ts) 的单测。
-- 门禁 [pack-shape.mjs](../../checks/gates/pack-shape.mjs) 只查 patch 与矩阵；[dist-manual.mjs](../../checks/gates/dist-manual.mjs) 只查版本/keywords/pin。
+- 门禁 [pack-shape.mjs](../../checks/gates/pack-shape.mjs) 只查 patch 与台账；[dist-manual.mjs](../../checks/gates/dist-manual.mjs) 只查版本/keywords/pin。
 
 ## 方案
 
 ### 1. 契约（manifest + 手册）
 
 - manifest 增加：`engines.node >=22.19.0`、`engines.dsh >=0.2.1-rc.2 <0.3.0`、`license: UNLICENSED`（内部交付；发布时再定）、`repository`（monorepo + directory）。`private: true` 保留到 publish。
-- `dsh.compatibility.dshReleases` 保留为“已认证 tag 台账”；`engines.dsh` 是安装窗口。两者语义写进 [docs/release.md](../../docs/release.md)：矩阵含历史验证 tag，engines 定义当前可安装窗口；门禁只强制当前 pin 在矩阵内且在 engines 窗口内。
+- `dsh.compatibility.dshReleases` 曾是“已认证 tag 台账”；2026-10-26 按 FAQ 24 §9.2 已迁到 [checks/gates/lib/compat-tags.json](../../checks/gates/lib/compat-tags.json) 并从 package manifest 移除。`engines.dsh` 是唯一运行时窗口；门禁只强制当前 pin 在台账内且在 engines 窗口内。
 - 手册生成器：算 tgz sha256，写同目录 `*.tgz.sha256`，把 hash、Node/DSH 前置、获取方式、校验命令、安装失败/卸载/回退、许可与支持窗口注入手册。
 - 包内 README 顶部加“给收件人”的 5 行入口（版本/前置/手册位置/许可），维护者 owner 表留在下面。
 
@@ -52,7 +52,7 @@ node checks/smoke/lifecycle-smoke.mjs
 
 断言：
 
-- `pack-shape`：manifest 有 `engines.node` / `engines.dsh` / `license` / `repository`；当前 pin 在矩阵且在 engines 窗口内。
+- `pack-shape`：manifest 有 `engines.node` / `engines.dsh` / `license` / `repository`；当前 pin 在台账且在 engines 窗口内。
 - `dist-manual`：手册含 sha256、Node/DSH 前置、校验、卸载/回退；sha256 与 tgz 本体一致；缺一项即红。
 - 不兼容安装：临时复制 pack，把 `engines.dsh` 改成 `>=99.0.0`，打包后 `plugin add` 必须非零并报 `incompatible-version`；未改的包必须安装成功。
 - `lifecycle-smoke`：升级保留/替换/扩张不动、卸载数据仍在、迁移可启动；负例（改过的基部被覆盖）必须红。
@@ -77,7 +77,7 @@ node checks/smoke/lifecycle-smoke.mjs
 - manifest：`engines.node >=22.19.0`、`engines.dsh >=0.2.1-rc.2 <0.3.0`、`license: UNLICENSED`、`repository`；`private: true` 保留。`pack-shape` 新增 `pack-engines`（semver 从 vendor app-boot 解析；窗口不覆盖当前 pin 即红）。
 - 手册生成器 [tools/export-dist.mjs](../../tools/export-dist.mjs)：算 tgz sha256、写 `*.tgz.sha256`、注入前置/校验/卸载/失败与回退/许可；[dist-manual](../../checks/gates/dist-manual.mjs) 在本体在场时逐字节核对。
 - [lifecycle-smoke.mjs](../../checks/smoke/lifecycle-smoke.mjs)：v1 真装 → 改 `AGENTS.md`/`kb/org.md` + 加 journal/交付物 → v2 真装 → 启动；断言保留/替换/扩张不动/`bundle.json` 前移/二启零变更；卸载后数据仍在；搬 home 后重装启动。另含“bad engines.dsh 真装被拒绝”与 profile 未被污染。
-- 合同：[docs/release.md](../../docs/release.md) 写明 engines 是运行时窗口、矩阵是认证台账、sha256 是产物身份；[checks/README.md](../../checks/README.md) 登记新 smoke；pack README 顶部给收件人入口。
+- 合同：[docs/release.md](../../docs/release.md) 写明 engines 是运行时窗口、台账是认证记录、sha256 是产物身份；[checks/README.md](../../checks/README.md) 登记新 smoke；pack README 顶部给收件人入口。
 
 红/绿收据（实跑）：
 

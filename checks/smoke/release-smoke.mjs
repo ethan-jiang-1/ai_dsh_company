@@ -134,7 +134,8 @@ try {
     `根目录 = ${readdirSync(installedPack).sort().join(', ')}`)
   const installedManifest = JSON.parse(readFileSync(join(installedPack, 'package.json'), 'utf8'))
   check('安装副本 peers 进 tarball', Object.keys(installedManifest.peerDependencies ?? {}).length >= 15 && installedManifest.dependencies === undefined)
-  check('安装副本带兼容矩阵', Array.isArray(installedManifest?.dsh?.compatibility?.dshReleases))
+  check('安装副本带 engines.dsh 运行时窗口', typeof installedManifest?.engines?.dsh === 'string')
+  check('安装副本不再携带 dsh.compatibility（FAQ 24 §9.2）', installedManifest?.dsh?.compatibility === undefined)
 
   console.log('⑤ boot web（built CLI，临时随机端口；不替换现有 GUI）')
   const child = processes.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })

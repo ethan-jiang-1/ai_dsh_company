@@ -17,12 +17,13 @@ const patchRels = typeof patchRel === 'string' ? [patchRel] : Array.isArray(patc
 const badPatch = patchRels.filter(rel => typeof rel !== 'string' || !existsSync(join(root, 'packages/company-pack', rel)))
 if (patchRels.length === 0 || badPatch.length > 0) fail('pack-bundle', `dsh.bundle.patch 缺失、为空或未指向真实文件：${JSON.stringify(badPatch)}`)
 else ok(`pack-bundle ×${patchRels.length}`)
-// 兼容矩阵（R5a 发布欠账，合同 = docs/release.md）：`dsh.compatibility.dshReleases` 必须包含当前
-// 钉住的 vendor tag——升 pin 不加矩阵列 = 没验证过就装作验证过。升 pin 走
+// 已认证 tag 台账（FAQ 24 §9.2：DSH 不读 `dsh.compatibility`；台账住仓库内，不随包分发）。
+// 必须包含当前钉住的 vendor tag——升 pin 不加列 = 没验证过就装作验证过。升 pin 走
 // tools/sync-dsh.mjs（它会同步加列），这条门禁保证忘加就红。
-const compatReleases = pack?.dsh?.compatibility?.dshReleases
+const compat = JSON.parse(readFileSync(join(root, 'checks/gates/lib/compat-tags.json'), 'utf8'))
+const compatReleases = compat?.dshReleases
 if (!Array.isArray(compatReleases) || !compatReleases.includes(expectedTag)) {
-  fail('pack-compat', `dsh.compatibility.dshReleases 必须包含当前钉住的 ${expectedTag}（升 pin 走 tools/sync-dsh.mjs 并同步加列）`)
+  fail('pack-compat', `checks/gates/lib/compat-tags.json 的 dshReleases 必须包含当前钉住的 ${expectedTag}（升 pin 走 tools/sync-dsh.mjs 并同步加列）`)
 } else ok(`pack-compat (${expectedTag} ×${String(compatReleases.length)})`)
 
 // 分发契约（2026-10-25，RFC distribution-lifecycle）：DSH 只读 engines.dsh（存在即忽略 peers），
@@ -54,4 +55,15 @@ if (pack?.private !== true) enginesProblems.push('private 不是 true（未到 p
 enginesProblems.length === 0
   ? ok(`pack-engines（node ${nodeRange} / dsh ${dshRange} / ${pack.license} / private）`)
   : fail('pack-engines', enginesProblems.join('；'))
+
+// 可发现性元数据（FAQ 24 §6）：locale/icon 是质量线不是硬门，但既然随包发布，files/exports
+// 少一项就会在安装后被静默降级。负例留证 2026-10-26：从 files 删 'icon.svg' → pack-meta 红。
+const metaProblems = []
+if (!Array.isArray(pack.files) || !pack.files.includes('locale/*.json')) metaProblems.push('files 缺 locale/*.json')
+if (!Array.isArray(pack.files) || !pack.files.includes('icon.svg')) metaProblems.push('files 缺 icon.svg')
+if (pack.exports?.['./locale/*.json'] === undefined) metaProblems.push('exports 缺 ./locale/*.json')
+if (pack.exports?.['./icon'] === undefined) metaProblems.push('exports 缺 ./icon')
+metaProblems.length === 0
+  ? ok('pack-meta（locale en/zh + icon 在 files/exports）')
+  : fail('pack-meta', metaProblems.join('；'))
 }

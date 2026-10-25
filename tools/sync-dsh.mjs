@@ -31,14 +31,14 @@ try {
   const gitVendor = async argv => (await run('git', ['-C', VENDOR, ...argv])).trim()
   const verifyPath = join(ROOT, 'checks/gates/lib/pin.mjs')
   const agentsPath = join(ROOT, 'AGENTS.md')
-  const manifestPath = join(ROOT, 'packages/company-pack/package.json')
+  const compatPath = join(ROOT, 'checks/gates/lib/compat-tags.json')
   const lockPath = join(ROOT, 'pnpm-lock.yaml')
   const verifyText = readFileSync(verifyPath, 'utf8')
   const agentsText = readFileSync(agentsPath, 'utf8')
-  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+  const compat = JSON.parse(readFileSync(compatPath, 'utf8'))
   const v = { tag: /const expectedTag = '([^']+)'/.exec(verifyText)?.[1], sha: /const expectedSha = '([0-9a-f]{40})'/.exec(verifyText)?.[1] }
   const a = /当前钉住：tag `([^`]+)` = `([0-9a-f]{40})`/.exec(agentsText)
-  const matrix = manifest?.dsh?.compatibility?.dshReleases
+  const matrix = compat?.dshReleases
   const head = await gitVendor(['rev-parse', 'HEAD'])
   const problems = []
   if (v.sha !== head) problems.push(`pin.mjs SHA ${v.sha} ≠ HEAD ${head}`)
@@ -69,12 +69,12 @@ try {
     if (newSha === head) throw new Error('候选与当前 SHA 相同；未进行升 pin')
     console.log(`人审声明：${review.reviewedBy} / ${review.reviewedAt} / ${reviewRel}；仅校验声明字段与 SHA，不是脚本语义审计`)
     const oldRef = await gitVendor(['rev-parse', '--abbrev-ref', 'HEAD'])
-    const nextManifest = structuredClone(manifest)
-    nextManifest.dsh.compatibility.dshReleases = [...new Set([...matrix, pin])]
+    const nextCompat = structuredClone(compat)
+    nextCompat.dshReleases = [...new Set([...matrix, pin])]
     const updates = [
       { path: verifyPath, content: replaceOne(replaceOne(verifyText, /const expectedTag = '[^']+'/, `const expectedTag = '${pin}'`), /const expectedSha = '[0-9a-f]{40}'/, `const expectedSha = '${newSha}'`) },
       { path: agentsPath, content: replaceOne(agentsText, /当前钉住：tag `[^`]+` = `[0-9a-f]{40}`/, `当前钉住：tag \`${pin}\` = \`${newSha}\``) },
-      { path: manifestPath, content: `${JSON.stringify(nextManifest, null, 2)}\n` },
+      { path: compatPath, content: `${JSON.stringify(nextCompat, null, 2)}\n` },
     ]
     let checkoutAttempted = false
     await pinTransaction({

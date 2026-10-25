@@ -112,6 +112,16 @@ describe('host catalog', () => {
     expect(catalog?.counts.unledgered).toBe(0)
   })
 
+  it('两个公司盘的 presented 不互相串（数据平面隔离）', () => {
+    const a = workspace()
+    const b = workspace()
+    deliverable(a)
+    deliverable(b)
+    regenerateCatalog(a, { paths: ['deliverables/2026-10-25-alpha/final.md'] })
+    expect(readCatalog(a)?.entries[0]?.presented).toBe(true)
+    expect(regenerateCatalog(b).catalog?.entries[0]?.presented).toBeNull()
+  })
+
   it('meta 缺行/枚举外标出 metaProblem，不冒充形状通过', () => {
     const root = workspace()
     const dir = deliverable(root)

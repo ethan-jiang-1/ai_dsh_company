@@ -57,7 +57,8 @@ try {
   const listed = spawnSync('tar', ['-tzf', tarball], { encoding: 'utf8' })
   const entries = (listed.stdout ?? '').split('\n').filter(Boolean)
   const must = ['package/cordis.patch.yml', 'package/package.json', 'package/lib/index.js', 'package/lib/client.js',
-    'package/workspace/AGENTS.md', 'package/workspace/kb/org.md', 'package/workspace/kb/owners.md']
+    'package/workspace/AGENTS.md', 'package/workspace/kb/org.md', 'package/workspace/kb/owners.md',
+    'package/locale/en.json', 'package/locale/zh.json', 'package/icon.svg']
   const missing = must.filter((entry) => !entries.includes(entry))
   const presetFiles = entries.filter((entry) => entry.startsWith('package/presets/')).length
   const outside = entries.filter((entry) => !entry.startsWith('package/'))

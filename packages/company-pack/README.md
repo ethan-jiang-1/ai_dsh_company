@@ -5,6 +5,50 @@
 > （`_dist/安装手册.md`，由 `node tools/export-dist.mjs` 生成，不在 tarball 内）。
 > 许可 = `UNLICENSED`（内部交付，未授予再分发权）。
 
+## Install
+
+把与 tarball 同目录的《安装手册》按步骤执行：独立 `DSH_HOME` → `dsh plugin --profile web add <tarball>` → 首次启动落公司盘。
+DSH/Node 前置与 sha256 校验见手册；本包不在 npm registry。
+
+## What it contributes
+
+- 五个角色 preset（CEO / VP-Eng / VP-Sales / COO / CFO）+ 委派子人格 `researcher`；
+- host 行：签字、工作区门、团队、present、日期/节律、本包 client 面；
+- `workspace/` 出厂公司盘骨架（手册 / 章程 / 编制 / 模板 / 起动件）；
+- 公司视图与五个页签（成品、台账、关注、培养等）。
+
+## Configuration
+
+- `DSH_COMPANY_HOME`：公司盘落点（默认 `<DSH_HOME>/company-workspace`）。
+- `DSH_COMPANY_BOOTSTRAP=off`：只关“复制骨架”，不关 `bundle.json` 身份（自管盘的部署用）。
+- `company-client` 行的 `cultivationRoot`：方法层根；缺席时 `/cultivation adopt|revoke` 明确报错。
+- 兼容窗口：`engines.dsh`（运行时只读这一行；没有它才看 peers）。
+- 本包不导出 Config schema（唯一可调项 `cultivationRoot` 是可选行 config，没有 schema 校验）——FAQ 24 的显式例外，见 RFC faq24-alignment。
+
+## Data
+
+| 平面 | 我们写什么 | 位置 | 升级/卸载 |
+|---|---|---|---|
+| 包 `C` | 无用户数据；`workspace/` 是只读 starter | 安装包目录 | 升级整体替换；**绝不在包目录写 data/cache/日志** |
+| 工作区 `W` | 公司盘：手册/章程/台账/交付物/`kb/company.md`；host 生成的 `kb/deliverables-index.json` | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME` | 不动；基部文件按哈希替换、你改过的保留 |
+| home `U/H` | `bundle.json`（身份/基部指纹）、`logs/company-pack-upgrade.log`、`profiles/<p>/company-cultivation/<role>/` | `<DSH_HOME>` | 不动 |
+| session `S` | 会话日志由宿主拥有；本包不自造 event 类型 | `<DSH_HOME>/sessions/` | 不动 |
+| 凭据 `X` | 不写入包；走 `<DSH_HOME>/.credentials.yaml` / 环境变量 | home | 用户管理 |
+
+说明：`bootstrap`/catalog 是**部署 provisioning 与 UI 派生索引**，用宿主 `node:fs`（不在模型工具沙箱内）；模型对工作区文件的读写仍走 `ctx.fs`/文件工具。`kb/deliverables-index.json` 是派生视图，删掉可由 host 重建。
+
+## Compatibility
+
+- 运行时硬门 = `engines.dsh`（见 `package.json`）；已认证 tag 台账只住维护者仓库、不随包分发，不是 DSH 字段。用户只需看 `engines.dsh`。
+- 本包 `private: true`、`license: UNLICENSED`（内部交付）；npm/market 发布未启用。
+
+## Uninstall
+
+`dsh plugin --profile web remove dsh-company-pack`：只摘插件与 profile 层，公司盘、sessions、`bundle.json`、方法层保留。
+要彻底删除一个部署，确认备份后删除它的整个 `<DSH_HOME>`。详见《安装手册》第六节。
+
+## Owner（维护者）
+
 唯一自写包（决策 D1：一个包；行多包少）。**owner 表**（每件东西是什么、谁消费——RFC pack-boundaries 2026-10-05 立）：
 
 | 件 | 是什么 | 消费方向 | 出生 |
@@ -14,12 +58,12 @@
 | `src/` | **自写实现**两半：Host = `src/index.ts` 注册入口 + `src/host/`（Node-only 自举与培养注册/文件操作）+ `src/lib/`（共享读模型纯逻辑）；Client = `src/client/` 注册入口与浏览器面——具体布局唯一家 = [src/README](./src/README.md) | vendor runtime + `tests/company`（Host 源码直测）/ `tests/client`（Client 注册与视图） | R3+ |
 | `lib/` | **generated 发布产物（read-only）**：`tsc -b packages/company-pack` → tsdown 两面产出；**改 `src/` ≠ 浏览器已重建**——dsh web 常驻面必须重跑构建（事实家 = [bootstrap](../../docs/guides/bootstrap.md)） | `npm pack` → profile 安装（`exports`：`.` → `lib/index.js`、`./client` → `lib/client.js`） | R5 |
 | `cordis.patch.yml` | **bundle 装配行**：`agent-preset-registry` 替换出厂行；`dsh.bundle.patch` 为**数组** = registry 1 + 五角色预设行 + 委派子人格 `researcher` 一行（0.2.1） | profile 组合层 | R0–R2 |
-| `package.json` | **发布/注入声明**：peerDependencies（**版本以此为准，此处不复述**——复述必漂）、`engines.dsh` 安装窗口（DSH 运行时只读这一行）、`dsh.compatibility` 矩阵（已认证 tag 台账；`pack-compat` 门禁强制含当前 tag）、`files` 白名单、`dsh.client` 字段、license/repository | 包管理器 + loader | R0–R2 |
+| `package.json` | **发布/注入声明**：peerDependencies（**版本以此为准，此处不复述**——复述必漂）、`engines.dsh` 安装窗口（DSH 运行时只读这一行）、`files` 白名单、`dsh.client` 字段、license/repository | 包管理器 + loader | R0–R2 |
 
 ⚠ `lib/` 是生成产物：`git diff` 里它先变 = 你改了构建或忘了它由 `src/` 生成——永远改 `src/`，构建产 `lib/`（物理拆分 host/domain 的重启条件 = implemented/pack-boundaries（已删，历史在 git） 重启条件节）。
 
 发布前清单已全部落地（2026-09-25 随升 pin ①）：cordis 在 peerDependencies、`engines.dsh` +
-`dsh.compatibility` 版本矩阵（历史版本 + 当前钉住，见 `package.json`；`pack-engines` / `pack-compat`
+已认证 tag 台账只住维护者仓库、不随包分发（历史版本 + 当前钉住；`pack-engines` / `pack-compat`
 门禁强制窗口覆盖当前 pin）、`npm pack` → 干净 profile → `dsh plugin add` 真实安装冒烟 =
 release-smoke ALL PASS（[docs/release.md](../../docs/release.md)）。pack 保持 `private: true`、
 `license: UNLICENSED`——真实 npm 发布等第二个消费者出现再定。

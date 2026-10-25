@@ -29,21 +29,21 @@
 - **exports 不说谎**：`./src/*` 出口已摘（tests 一律相对路径导入源码面；tarball 的 `files`
   不含 src，留着一个指向不存在文件的出口就是发布形状的谎言）。
 
-## 兼容矩阵（`dsh.compatibility.dshReleases`）
+## 兼容台账（`checks/gates/lib/compat-tags.json`）
 
 ```json
-"dsh": { "compatibility": { "dshReleases": ["<历史 tag>", "<当前钉住 tag>"] } }
+{ "dshReleases": ["<历史 tag>", "<当前钉住 tag>"] }
 ```
-**形状 = 数组，含历史版本 + 当前钉住的那一个**（`pack-shape.mjs` 的 `pack-compat` 门禁强制矩阵含当前
-tag；实况以 `packages/company-pack/package.json` 为准，此处不复述具体值）。
+**形状 = 数组，含历史验证 + 当前钉住的那一个**（`pack-shape.mjs` 的 `pack-compat` 门禁强制台账含当前
+tag；实况以 `checks/gates/lib/compat-tags.json` 为准，此处不复述具体值）。
 
-`engines.dsh`（运行时窗口）与 `dshReleases`（已认证 tag 台账）不是同一件事：后者可以保留历史验证
-tag，前者只承诺当前可安装范围。`pack-engines` + `pack-compat` 各查一边。
+FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读。它已从 package manifest 移除，
+台账只住 repo、不随包分发；运行时硬门只有 `engines.dsh`。`pack-engines` + `pack-compat` 各查一边。
 
 - 语义：**每个列名都是真实验证过的 vendor pin tag**（升 pin 走 sync-dsh，冒烟过了才加列）。
-- 机械门禁：`pnpm verify` 的 `pack-compat`——当前钉住 tag 不在矩阵里就红
+- 机械门禁：`pnpm verify` 的 `pack-compat`——当前钉住 tag 不在台账里就红
   （升 pin 忘加列 = 没验证过就装作验证过）。`sync-dsh` 检查模式同时核对四处簿记一致
-  （submodule HEAD / pin.mjs（checks/gates/lib/pin.mjs）常量 / AGENTS.md 簿记行 / 矩阵）。
+  （submodule HEAD / pin.mjs（checks/gates/lib/pin.mjs）常量 / AGENTS.md 簿记行 / 台账）。
 
 ## vendor 政策（钉住的上游；AGENTS.md 只留铁律与指针）
 

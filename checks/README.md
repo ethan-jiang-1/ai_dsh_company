@@ -154,6 +154,7 @@
 | [ask-latency.mjs](../tools/ask-latency.mjs) | 从会话日志量 `ask_user_question` 真人作答延迟分布（调窗口用；只读秒级） |
 | [deliverables-index.mjs](../tools/deliverables-index.mjs) | 扫描 final/meta 生成 `kb/deliverables-index.json`（成品页签只读这份索引） |
 | [export-dist.mjs](../tools/export-dist.mjs) | 导出 tarball、生成安装手册并核对产物清单 |
+| [release.mjs](../tools/release.mjs) | 发布五步入口：bump / prepare / verify / check，写 `_dist/release-manifest.json`；不 commit/push/publish |
 | [sync-dsh.mjs](../tools/sync-dsh.mjs) | vendor 簿记、候选验证、元数据发布与受控失败恢复 |
 | [converge.mjs](../tools/converge.mjs) | 工作区收敛执行器：已闭合动议的证据副本 → 归档家 git mv → journal 清出 → 台账行自动追加（无参计划 / `--slug` 收敛 / `--dry-run` / `--charter-backfill` 补登） |
 | [harvest-probe.mjs](../tools/archive/harvest-probe.mjs) | 既有上游收割轮的审阅卡与 Office 预览取证仪器；复跑资格先读状态头注 |

@@ -55,6 +55,14 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
+  it('preset 定义不携带公司数据（FAQ 24 D 平面）：样本公司事实只在 kb/company.md / kb/org.md', () => {
+    for (const role of [...ROLES, 'researcher']) {
+      const text = roleYml(role)
+      expect(text, `${role} persona 写死了样本公司事实`).not.toMatch(/这家公司（梦之队）|梦之队 是高科技|三类业务|全员 50 人|梦之队的调研手/)
+      expect(text, `${role} persona 应指向部署身份/编制`).toMatch(/kb\/(company|org)\.md/)
+    }
+  })
+
   it('preset 行引用的插件都在 pack 依赖声明里（DSH verify-cordis-config 同构；R5a 起 deps ∪ peers）', () => {
     const manifest = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')) as { dependencies?: Record<string, string>, peerDependencies?: Record<string, string> }
     // R5a 起 runtime 依赖 = peerDependencies（docs/release.md：不精确钉死）；本断言按包名归一，

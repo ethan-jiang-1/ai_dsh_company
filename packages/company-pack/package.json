@@ -24,12 +24,16 @@
       "types": "./lib/types/client/index.d.ts",
       "default": "./lib/client.js"
     },
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
     "./package.json": "./package.json"
   },
   "files": [
     "lib/**",
     "presets/**",
     "workspace/**",
+    "locale/*.json",
+    "icon.svg",
     "cordis.patch.yml"
   ],
   "peerDependencies": {
@@ -108,14 +112,6 @@
         "./presets/coo/agent.cordis.yml",
         "./presets/cfo/agent.cordis.yml",
         "./presets/researcher/agent.cordis.yml"
-      ]
-    },
-    "compatibility": {
-      "dshReleases": [
-        "dsh-v0.1.5-rc.2",
-        "dsh-v0.1.7-rc.2",
-        "dsh-v0.2.0-rc.2",
-        "dsh-v0.2.1-rc.2"
       ]
     },
     "client": {
