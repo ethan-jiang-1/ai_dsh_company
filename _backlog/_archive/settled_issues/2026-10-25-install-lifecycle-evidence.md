@@ -1,18 +1,20 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-10-25
 ---
 
 # 推敲：安装生命周期证据（升级 / 卸载 / 迁移）
 
-> 立卡：2026-10-25 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-10-25 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
+>
+> **结论/去向**：做；去向 = `notes/implemented/2026-10-25-distribution-lifecycle.md`（与卡 1 合并）
 
 **问题与期望结果：** 手册承诺“升级只动没改过的基部、改过的保留并点名；卸载不动数据；备份/迁移连 home 一起搬”。现在只有首启/二启的真安装证据，升级只有单测、卸载与迁移没有证据。期望：用真 tarball 把这三条承诺跑成可复现的 keyless 检查。
 
 **当前情况：**
-- [release-smoke.mjs](../../checks/smoke/release-smoke.mjs) 覆盖：真 tarball 安装 → 首启落骨架 + `bundle.json` → 二启零变更；没有 v1→v2、卸载、挪 home。
-- 升级逻辑在 [bundle-manifest.ts](../../packages/company-pack/src/host/bundle-manifest.ts)：逐文件 create/update/keep，`applySkeletonUpgrade` 逐文件写；单测在 [bundle-manifest.spec.ts](../../tests/company/bundle-manifest.spec.ts)。
-- 手册第四/五/六节（[_dist/安装手册.md](../../_dist/安装手册.md)）写了升级/备份/卸载，但没有对应验收。
+- [release-smoke.mjs](../../../checks/smoke/release-smoke.mjs) 覆盖：真 tarball 安装 → 首启落骨架 + `bundle.json` → 二启零变更；没有 v1→v2、卸载、挪 home。
+- 升级逻辑在 [bundle-manifest.ts](../../../packages/company-pack/src/host/bundle-manifest.ts)：逐文件 create/update/keep，`applySkeletonUpgrade` 逐文件写；单测在 [bundle-manifest.spec.ts](../../../tests/company/bundle-manifest.spec.ts)。
+- 手册第四/五/六节（[_dist/安装手册.md](../../../_dist/安装手册.md)）写了升级/备份/卸载，但没有对应验收。
 - 升级日志只到 `ctx.logger.info`（host 入口），没有断言“保留了哪些文件”。
 - 半途失败/中断时，已写文件与 `bundle.json` 可能不同步；没有恢复测试。
 

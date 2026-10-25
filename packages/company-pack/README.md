@@ -1,6 +1,6 @@
 # dsh-company-pack
 
-> **给收件人（先读这个）**：本包是 `dsh-company-pack` 0.3.1；只支持 DSH `>=0.2.1-rc.2 <0.3.0`
+> **给收件人（先读这个）**：本包是 `dsh-company-pack`（版本见 `package.json` / 手册表头）；只支持 DSH `>=0.2.1-rc.2 <0.3.0`
 > / Node ≥22.19。安装、sha256 校验、升级、卸载、回退见与 tarball 同目录的《安装手册》
 > （`_dist/安装手册.md`，由 `node tools/export-dist.mjs` 生成，不在 tarball 内）。
 > 许可 = `UNLICENSED`（内部交付，未授予再分发权）。

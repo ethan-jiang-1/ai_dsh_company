@@ -4,7 +4,7 @@
 
 ## 问题
 
-安装后的公司盘里，注入手册/技能仍引用维护者仓库的 `../docs`、`checks/`、`tools/`、`runtime/`、`snapshots/`；成品页签读的 `kb/deliverables-index.json` 由仓库工具生成，不在 tarball 里。结果：第三方公司拿到的角色会按不存在的指令行动，成品页签永久报“维护者运行 node tools/...”。对应问题卡：[出厂内容自足](../../_backlog/issues/2026-10-25-shipped-content-self-contained.md) 与 [成品目录与审计产品化](../../_backlog/issues/2026-10-25-deliverables-catalog-and-audit.md)。
+安装后的公司盘里，注入手册/技能仍引用维护者仓库的 `../docs`、`checks/`、`tools/`、`runtime/`、`snapshots/`；成品页签读的 `kb/deliverables-index.json` 由仓库工具生成，不在 tarball 里。结果：第三方公司拿到的角色会按不存在的指令行动，成品页签永久报“维护者运行 node tools/...”。对应问题卡：[出厂内容自足](../../_backlog/_archive/settled_issues/2026-10-25-shipped-content-self-contained.md) 与 [成品目录与审计产品化](../../_backlog/_archive/settled_issues/2026-10-25-deliverables-catalog-and-audit.md)。
 
 ## 当前事实
 

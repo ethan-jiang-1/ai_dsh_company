@@ -1,22 +1,24 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-10-25
 ---
 
 # 推敲：部署身份与盘守卫（不同公司共用同一产品）
 
-> 立卡：2026-10-25 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-10-25 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
+>
+> **结论/去向**：做；去向 = `notes/implemented/2026-10-25-standalone-deployment.md`（与卡 5 合并）
 >
 > 条件已满足：Q2 = 不同公司（2026-10-25 goal 裁决），本卡启用；同公司多人只保留 owners/multi-human 文档。
 
 **问题与期望结果：** 如果这个插件要装给不同公司，出厂内容现在写的是“梦之队”一家：品牌硬编码、org 是具体样例、没有公司名/编制的配置缝；同时没有“这个会话的 cwd 是不是公司盘”的守卫。期望：不同公司不改源码就能部署；角色不会在错盘上半空运行；dev 符号链接策略不会把用户改动写回产品源。
 
 **当前情况：**
-- 品牌硬编码在 [Brand.tsx](../../packages/company-pack/src/client/Brand.tsx)（`DSH 梦之队`）；手册标题也是“梦之队”。
-- 出厂 org（[org.md](../../packages/company-pack/workspace/kb/org.md)）是具体样例（50 人 / 9 客户 / $ 数字）；[owners.md](../../packages/company-pack/workspace/kb/owners.md) 是待填起动件。
+- 品牌硬编码在 [Brand.tsx](../../../packages/company-pack/src/client/Brand.tsx)（`DSH 梦之队`）；手册标题也是“梦之队”。
+- 出厂 org（[org.md](../../../packages/company-pack/workspace/kb/org.md)）是具体样例（50 人 / 9 客户 / $ 数字）；[owners.md](../../../packages/company-pack/workspace/kb/owners.md) 是待填起动件。
 - 一个 home 可注册多个 workspace；插件不校验会话 cwd 是否为 bundle 的 workspace；错盘时页签会半空。
-- dev 形状用符号链接把手册/模板/org 指回 pack（[bundle-init.mjs](../../tools/bundle-init.mjs)）；非维护者跑 dev 形状会写产品源。
-- `bundle.json` 的 workspace 在盘内记相对、盘外记绝对（[bundle-manifest.ts](../../packages/company-pack/src/host/bundle-manifest.ts)）。
+- dev 形状用符号链接把手册/模板/org 指回 pack（[bundle-init.mjs](../../../tools/bundle-init.mjs)）；非维护者跑 dev 形状会写产品源。
+- `bundle.json` 的 workspace 在盘内记相对、盘外记绝对（[bundle-manifest.ts](../../../packages/company-pack/src/host/bundle-manifest.ts)）。
 
 **未决问题：**
 - Q2：不同公司（启用本卡）还是同公司多人（关闭本卡）？

@@ -17,7 +17,13 @@ import { plainNodeEnv, releaseProcesses } from '../../tools/drivers/release-proc
 const KEEP = process.argv.includes('--keep')
 const PACK_DIR = join(ROOT, 'packages/company-pack')
 const PROFILE = 'lifecycle-check'
-const V2_VERSION = '0.3.2'
+const CURRENT_VERSION = JSON.parse(readFileSync(join(PACK_DIR, 'package.json'), 'utf8')).version
+const V2_VERSION = (() => {
+  const parts = CURRENT_VERSION.split('.')
+  const patch = Number(parts[2])
+  if (parts.length !== 3 || !Number.isSafeInteger(patch)) throw new Error(`无法从 ${CURRENT_VERSION} 生成 v2 版本`)
+  return `${parts[0]}.${parts[1]}.${String(patch + 1)}`
+})()
 const BOOT_TIMEOUT_MS = 120_000
 const failures = []
 const check = (label, ok, detail = '') => {

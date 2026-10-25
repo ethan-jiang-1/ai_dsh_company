@@ -4,7 +4,7 @@
 
 ## 问题
 
-陌生人拿到 `_dist` 的 tgz + 手册时，无法回答“要哪个 DSH/Node、怎么核对字节、装错怎么退”；手册承诺的升级/卸载/迁移也没有真安装证据。对应问题卡：[分发契约](../../_backlog/issues/2026-10-25-distribution-contract.md) 与 [安装生命周期证据](../../_backlog/issues/2026-10-25-install-lifecycle-evidence.md)。
+陌生人拿到 `_dist` 的 tgz + 手册时，无法回答“要哪个 DSH/Node、怎么核对字节、装错怎么退”；手册承诺的升级/卸载/迁移也没有真安装证据。对应问题卡：[分发契约](../../_backlog/_archive/settled_issues/2026-10-25-distribution-contract.md) 与 [安装生命周期证据](../../_backlog/_archive/settled_issues/2026-10-25-install-lifecycle-evidence.md)。
 
 ## 当前事实
 

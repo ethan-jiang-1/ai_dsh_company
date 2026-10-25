@@ -1,19 +1,21 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-10-25
 ---
 
 # 推敲：分发契约与产物身份（陌生人拿到的是什么）
 
-> 立卡：2026-10-25 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-10-25 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
+>
+> **结论/去向**：做；去向 = `notes/implemented/2026-10-25-distribution-lifecycle.md`（与卡 2 合并）
 
 **问题与期望结果：** 现在的 tgz + 生成手册能证明“装得上、首启能起”，但不能让一个陌生人回答：这包要哪个 DSH / Node / OS、怎么核对字节、装错了怎么退、谁会支持哪个版本。期望：只拿 tgz + 手册 + 一个兼容 DSH，就能走完“识别 → 校验 → 安装 → 首验 → 失败退出”，并且 `pnpm verify` 有机械门禁。
 
 **当前情况：**
-- 包声明（[package.json](../../packages/company-pack/package.json)）有 `private: true`，没有 `engines`、`license`、`repository`；`dsh.compatibility.dshReleases` 是本地台账，DSH 运行时不读它，真正拦安装的是 peer 范围。
-- 手册（[_dist/安装手册.md](../../_dist/安装手册.md)）假设收件人已有 `dsh`，只写“验证基线”，没有获取方式、sha256、降级/回滚、支持窗口。
-- 导出器（[tools/export-dist.mjs](../../tools/export-dist.mjs)）生成手册与 tgz，但没有产物指纹。
-- DSH 官方兼容字段是 `engines.dsh`（[publish.md](../../vendor/dsh/docs/user/develop/basic/publish.md)）；安装期/启动期拒绝不兼容包（[app-boot](../../vendor/dsh/packages/boot/app-boot/README.md)）。
+- 包声明（[package.json](../../../packages/company-pack/package.json)）有 `private: true`，没有 `engines`、`license`、`repository`；`dsh.compatibility.dshReleases` 是本地台账，DSH 运行时不读它，真正拦安装的是 peer 范围。
+- 手册（[_dist/安装手册.md](../../../_dist/安装手册.md)）假设收件人已有 `dsh`，只写“验证基线”，没有获取方式、sha256、降级/回滚、支持窗口。
+- 导出器（[tools/export-dist.mjs](../../../tools/export-dist.mjs)）生成手册与 tgz，但没有产物指纹。
+- DSH 官方兼容字段是 `engines.dsh`（[publish.md](../../../vendor/dsh/docs/user/develop/basic/publish.md)）；安装期/启动期拒绝不兼容包（[app-boot](../../../vendor/dsh/packages/boot/app-boot/README.md)）。
 - 包内没有面向最终用户的 README；pack README 是维护者视角。
 
 **未决问题：**

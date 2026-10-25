@@ -4,7 +4,7 @@
 
 ## 问题
 
-现在只有维护者的 dev 形状：`source run/env.sh` 强制仓库内 home/workspace、dev profile 用绝对 `link:`；换目录、换机器、换 home 都要手工修，复制目录还会带上 `runtime/harness-home` 的凭据/会话。没有“干净目录 + 干净 home 一条命令起 web”的受支持入口；也没有“不同公司不改源码部署”的身份缝和错盘守卫。对应问题卡：[独立启动形状](../../_backlog/issues/2026-10-25-standalone-deployment-shape.md) 与 [部署身份与盘守卫](../../_backlog/issues/2026-10-25-deployment-identity-and-workspace-guard.md)。
+现在只有维护者的 dev 形状：`source run/env.sh` 强制仓库内 home/workspace、dev profile 用绝对 `link:`；换目录、换机器、换 home 都要手工修，复制目录还会带上 `runtime/harness-home` 的凭据/会话。没有“干净目录 + 干净 home 一条命令起 web”的受支持入口；也没有“不同公司不改源码部署”的身份缝和错盘守卫。对应问题卡：[独立启动形状](../../_backlog/_archive/settled_issues/2026-10-25-standalone-deployment-shape.md) 与 [部署身份与盘守卫](../../_backlog/_archive/settled_issues/2026-10-25-deployment-identity-and-workspace-guard.md)。
 
 ## 当前事实
 

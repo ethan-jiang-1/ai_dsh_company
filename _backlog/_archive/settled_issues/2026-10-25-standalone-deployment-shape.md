@@ -1,19 +1,21 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-10-25
 ---
 
 # 推敲：独立启动形状（目录即部署）
 
-> 立卡：2026-10-25 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-10-25 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
+>
+> **结论/去向**：做；去向 = `notes/implemented/2026-10-25-standalone-deployment.md`（与卡 6 合并）
 
 **问题与期望结果：** 现在只有维护者的 dev 形状：`source run/env.sh` 强制仓库内 home/workspace、link profile；换目录、换机器、换 home 都要手工修。期望：从干净目录 + 干净 home 一条受支持的入口起 web，五角色出现、可建会话；可迁移、可清理、前置可检，不依赖 `~/.dsh` 和维护者状态。
 
 **当前情况：**
-- [run/env.sh](../../run/env.sh) 无条件导出 `DSH_HOME` 到 `runtime/harness-home`、`DSH_COMPANY_HOME` 到仓库 `company-workspace`，并 `DSH_COMPANY_BOOTSTRAP=off`。
+- [run/env.sh](../../../run/env.sh) 无条件导出 `DSH_HOME` 到 `runtime/harness-home`、`DSH_COMPANY_HOME` 到仓库 `company-workspace`，并 `DSH_COMPANY_BOOTSTRAP=off`。
 - dev profile 的 pack 依赖是绝对 `link:`（runtime 状态，gitignored）；仓库搬家后没有 relink/repair。
-- [bundle-init.mjs](../../tools/bundle-init.mjs) 把制度件做成指回 pack 的符号链接；这是维护者 single-source，不是可移植部署。
-- [bootstrap.md](../../docs/guides/bootstrap.md) 是长配方；fresh-clone CI 只跑 install + bundle:init + verify，不构建 host/native/pack、不起 web（[fresh-clone.yml](../../.github/workflows/fresh-clone.yml)）。
+- [bundle-init.mjs](../../../tools/bundle-init.mjs) 把制度件做成指回 pack 的符号链接；这是维护者 single-source，不是可移植部署。
+- [bootstrap.md](../../../docs/guides/bootstrap.md) 是长配方；fresh-clone CI 只跑 install + bundle:init + verify，不构建 host/native/pack、不起 web（[fresh-clone.yml](../../../.github/workflows/fresh-clone.yml)）。
 - DSH 官方源码直跑 = 先 `pnpm run build`，再 `pnpm dsh`；launcher 不检查产物新鲜度。
 - 没有 doctor/preflight、`--home`/`--reset`、迁移检测。
 

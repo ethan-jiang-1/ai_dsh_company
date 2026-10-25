@@ -1,19 +1,21 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-10-25
 ---
 
 # 推敲：出厂内容自足（注入给角色的文字不再假设仓库）
 
-> 立卡：2026-10-25 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-10-25 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
+>
+> **结论/去向**：做；去向 = `notes/implemented/2026-10-25-installed-shape-self-sufficient.md`（与卡 4 合并）
 
 **问题与期望结果：** 公司手册和角色 skill 是每个成员会话的注入内容，但里面大量引用维护者仓库的 `../docs/*`、`checks/`、`tools/`、`runtime/`、`snapshots/`。装到别人的 home 后这些路径不存在，角色会按不存在的指令行动。期望：新装公司在没有本仓库的机器上，注入内容里的每条指令都能执行，或明确标成“非注入的维护者附录”。
 
 **当前情况：**
-- 手册（[AGENTS.md](../../packages/company-pack/workspace/AGENTS.md)）第 23/30/74/77/99/150 行附近引用 `../docs/*`、`checks/audit/*`、`snapshots/README.md`、`runtime/rehearsal-workspace/`。
+- 手册（[AGENTS.md](../../../packages/company-pack/workspace/AGENTS.md)）第 23/30/74/77/99/150 行附近引用 `../docs/*`、`checks/audit/*`、`snapshots/README.md`、`runtime/rehearsal-workspace/`。
 - 13/14 份 skill 结尾写“可机械核对的部分归仓库的门禁/审计脚本”；CEO chairing skill 直接写 `node tools/converge.mjs`。
-- 模板（[meta.md](../../packages/company-pack/workspace/templates/meta.md)）把词表指向 `tools/lib/deliverables.mjs`。
-- 现有 `md-links` 门禁把 pack 骨架排除、只校验 dev 盘那份（[markdown-links.mjs](../../tools/lib/markdown-links.mjs)），所以安装形状的悬空链接在结构上不可见。
+- 模板（[meta.md](../../../packages/company-pack/workspace/templates/meta.md)）把词表指向 `tools/lib/deliverables.mjs`。
+- 现有 `md-links` 门禁把 pack 骨架排除、只校验 dev 盘那份（[markdown-links.mjs](../../../tools/lib/markdown-links.mjs)），所以安装形状的悬空链接在结构上不可见。
 - `handbook-smoke` 只证明注入基线，不证明链接可解析。
 
 **未决问题：**

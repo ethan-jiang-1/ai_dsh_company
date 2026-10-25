@@ -15,6 +15,12 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-10-25-distribution-contract.md](settled_issues/2026-10-25-distribution-contract.md) | 已实施；去向 = [distribution-lifecycle](../../notes/implemented/2026-10-25-distribution-lifecycle.md) | 2026-10-25 |
+| [2026-10-25-install-lifecycle-evidence.md](settled_issues/2026-10-25-install-lifecycle-evidence.md) | 已实施；去向 = [distribution-lifecycle](../../notes/implemented/2026-10-25-distribution-lifecycle.md) | 2026-10-25 |
+| [2026-10-25-shipped-content-self-contained.md](settled_issues/2026-10-25-shipped-content-self-contained.md) | 已实施；去向 = [installed-shape-self-sufficient](../../notes/implemented/2026-10-25-installed-shape-self-sufficient.md) | 2026-10-25 |
+| [2026-10-25-deliverables-catalog-and-audit.md](settled_issues/2026-10-25-deliverables-catalog-and-audit.md) | 已实施；去向 = [installed-shape-self-sufficient](../../notes/implemented/2026-10-25-installed-shape-self-sufficient.md) | 2026-10-25 |
+| [2026-10-25-standalone-deployment-shape.md](settled_issues/2026-10-25-standalone-deployment-shape.md) | 已实施；去向 = [standalone-deployment](../../notes/implemented/2026-10-25-standalone-deployment.md) | 2026-10-25 |
+| [2026-10-25-deployment-identity-and-workspace-guard.md](settled_issues/2026-10-25-deployment-identity-and-workspace-guard.md) | 已实施；去向 = [standalone-deployment](../../notes/implemented/2026-10-25-standalone-deployment.md) | 2026-10-25 |
 | [2026-09-28-dag-edge-routing.md](settled_issues/2026-09-28-dag-edge-routing.md) | 已实施；决定稿已删，历史在 git | 2026-09-28 |
 | [2026-09-28-float-geometry-memory.md](settled_issues/2026-09-28-float-geometry-memory.md) | 已实施；决定稿已删，历史在 git | 2026-09-28 |
 | [2026-09-28-sidebar-split-budget.md](settled_issues/2026-09-28-sidebar-split-budget.md) | 不做 | 2026-09-28 |
