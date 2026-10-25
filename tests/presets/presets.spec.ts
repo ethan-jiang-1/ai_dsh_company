@@ -66,6 +66,12 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
+  it('catalog 不进模型指令面（T4：没有模型可见路径，故无新 replay 场景）', () => {
+    const agents = readFileSync(join(PACK, 'workspace/AGENTS.md'), 'utf8')
+    expect(agents).not.toContain('deliverables-index')
+    for (const role of [...ROLES, 'researcher']) expect(roleYml(role)).not.toContain('deliverables-index')
+  })
+
   it('preset 行引用的插件都在 pack 依赖声明里（DSH verify-cordis-config 同构；R5a 起 deps ∪ peers）', () => {
     const manifest = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')) as { dependencies?: Record<string, string>, peerDependencies?: Record<string, string> }
     // R5a 起 runtime 依赖 = peerDependencies（docs/release.md：不精确钉死）；本断言按包名归一，

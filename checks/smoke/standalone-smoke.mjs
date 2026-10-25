@@ -39,6 +39,13 @@ try {
   const help = await processes.run(process.execPath, [standalone, '--help'], { timeoutMs: 30_000 })
   check('--help 可用', /--home/.test(help) && /--reset/.test(help))
 
+  console.log('①b doctor 负例（缺 pnpm）')
+  const noPnpm = releaseProcesses({ cwd: ROOT, env: { ...env, PATH: '/usr/bin:/bin' } })
+  let noPnpmRefused = false
+  try { await noPnpm.run(process.execPath, [standalone, '--home', join(root, 'no-pnpm-home'), '--provision-only', '--no-build'], { timeoutMs: 30_000 }) } catch { noPnpmRefused = true }
+  check('缺 pnpm 拒绝且不建 home', noPnpmRefused && !existsSync(join(root, 'no-pnpm-home')))
+  await noPnpm.close()
+
   console.log('② provision（隔离 home + 自建 web profile + 首启前检查）')
   await run(['--home', home, '--provision-only', '--no-open'])
   check('home 有 .standalone-home 标记', existsSync(join(home, '.standalone-home')))

@@ -10,8 +10,8 @@
  *   不冒充 false——完整审计仍是操作员/第二阶段的职责。
  * - 幂等：条目未变时不重写文件（`generatedAt` 不变），否则 release-smoke 的“二启零变更”会红。
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
-import { isAbsolute, join, relative } from 'node:path'
+import { existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { isAbsolute, join, relative, resolve } from 'node:path'
 import {
   buildDeliverablesCatalog,
   CATALOG_ROOTS,
@@ -54,6 +54,10 @@ function presentedFromCatalog(catalog: DeliverablesCatalog | null): { paths: Map
   return { paths, slugs }
 }
 
+function canonicalPath(path: string): string {
+  try { return realpathSync(path) } catch { return resolve(path) }
+}
+
 /**
  * 从 `deliverables/presented` 事件里抽 workspace 相对路径。
  * @param event - 会话事件（data.files[].path 为绝对路径，present 工具写的就是这个形状）。
@@ -67,8 +71,11 @@ export function presentedFromEvent(event: unknown, companyHome: string): { paths
   for (const item of files) {
     const raw = (item as { path?: unknown })?.path
     if (typeof raw !== 'string' || raw.trim() === '') continue
-    const absolute = isAbsolute(raw) ? raw : join(companyHome, raw)
-    const rel = normalizeRel(relative(companyHome, absolute))
+    // vendor present 工具返回 realpath；companyHome 可能是 symlink（macOS /var → /private/var）。
+    // 两侧都 canonicalize，否则升级/安装路径含 symlink 时 present 永远匹配不上 catalog。
+    const root = canonicalPath(companyHome)
+    const absolute = isAbsolute(raw) ? raw : join(root, raw)
+    const rel = normalizeRel(relative(root, canonicalPath(absolute)))
     if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) continue
     const match = /^(deliverables|deliverables-archive)\/([^/]+)\/final\.md$/.exec(rel)
     if (match === null) continue

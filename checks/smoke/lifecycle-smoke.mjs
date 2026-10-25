@@ -190,6 +190,14 @@ try {
   console.log('⑤ v2 真装（remove + add，手册第四节的替换路径）')
   await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'remove', 'dsh-company-pack'], { timeoutMs: 180_000 })
   await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${v2}`], { timeoutMs: 180_000 })
+  // 单字节篡改：tarball 被改后安装必须拒绝（不是“装完才坏”）。
+  const tampered = join(home, 'tmp/packs/v2-tampered.tgz')
+  const tamperedBytes = readFileSync(v2)
+  tamperedBytes[tamperedBytes.length - 1] ^= 0xff
+  writeFileSync(tampered, tamperedBytes)
+  let tamperRefused = false
+  try { await run(process.execPath, [cli, 'plugin', '--profile', 'tamper-check', 'add', `file:${tampered}`], { timeoutMs: 180_000 }) } catch { tamperRefused = true }
+  check('单字节篡改 tarball 拒绝安装', tamperRefused)
   await boot()
   const upgradeLogPath = join(home, 'logs/company-pack-upgrade.log')
   const upgradeLog = existsSync(upgradeLogPath) ? readFileSync(upgradeLogPath, 'utf8') : ''

@@ -6,7 +6,8 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 // ⚠ 不做值导入——那会把 host 侧核心包的类型图拉进本程序，遮掉 client 面的 sessions 增强（实测）。
 import type {} from '@deepseek-ai/dsh-user-approval'
 import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
-import { existsSync } from 'node:fs'
+import { existsSync, realpathSync } from 'node:fs'
+import { isAbsolute, relative, resolve } from 'node:path'
 import { signoffDecisionNote, signoffReason } from './lib/signoff.ts'
 import { doorsFromSessions } from './lib/doors.ts'
 import { bootstrapCompanyWorkspace, bootstrapEnabled, resolveCompanyHome, resolveSkeletonDir } from './host/bootstrap.ts'
@@ -55,6 +56,10 @@ export type HostConfig = CultivationHostConfig
  * 挂载面 = 既有 `company-client` 行（bundle 级）⇒ 全部会话与 teammate 可见——r2-motion 实证
  * teammate 可见全局工具行（20 工具清单里有 fs / present / ask_user_question）。
  */
+function canonicalPath(path: string): string {
+  try { return realpathSync(path) } catch { return resolve(path) }
+}
+
 export function apply(ctx: Context, config: HostConfig = {}): void {
   // 培养回路（2026-10-13 培养卡）：分身提案工具 + /cultivation 人侧命令族 + 方法层写入。
   // 机制与权限分工见 ./host/cultivation.ts 头注。
@@ -113,6 +118,29 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   // 本 pack 拥有的面：工具 + client 视图高亮。
   // 机制：听 vendor `api-session/added/removed/status` 事件维护 cwd×preset 投影（不注入
   // sessions 服务——host 面没有直接可注入的 sessions catalog，事件是 vendor 提供的标准面）。
+  // 盘守卫（卡 6）：会话 cwd 必须落在本 run bundle 的公司盘内；不一致只告警（不拒绝会话），
+  // 页签/身份会显示「非公司盘 / 身份未配置」。bundle.json 的 workspace 是权威；没有身份时退回
+  // DSH_COMPANY_HOME/companyHome。realpath 规避符号链接假阳性。
+  const guardDshHome = resolveDshHome()
+  const guardState = readBundleManifestState(guardDshHome)
+  const guardCompanyHome = resolveCompanyHome(guardDshHome)
+  const recordedWorkspace = guardState.status === 'ok' && typeof guardState.manifest.workspace === 'string'
+    ? guardState.manifest.workspace
+    : undefined
+  const expectedWorkspace = canonicalPath(recordedWorkspace === undefined
+    ? guardCompanyHome
+    : isAbsolute(recordedWorkspace) ? recordedWorkspace : resolve(guardDshHome, recordedWorkspace))
+  ctx.on('api-session/added', (summary) => {
+    if (summary.origin === 'subagent') return
+    if (typeof summary.cwd !== 'string' || summary.cwd === '') return
+    const cwd = canonicalPath(summary.cwd)
+    const rel = relative(expectedWorkspace, cwd)
+    if (rel !== '' && (rel.startsWith('..') || isAbsolute(rel))) {
+      ctx.logger?.warn?.(`company-pack：会话 ${String(summary.sessionId)} 的 cwd ${cwd} 不在公司盘 ${expectedWorkspace}；`
+        + '页签/身份会显示「非公司盘 / 身份未配置」，不静默改读 cwd')
+    }
+  })
+
   const doorFacts = new Map<string, { cwd: string; agentPreset: string | undefined; running: boolean }>()
   ctx.on('api-session/added', (summary) => {
     if (summary.origin === 'subagent') return // 只追根会话

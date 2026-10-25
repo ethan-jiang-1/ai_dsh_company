@@ -42,11 +42,11 @@ afterEach(() => {
 
 describe('host catalog wiring', () => {
   it('apply 注册的 session/event 监听把 present 事件写进 catalog', () => {
-    const listeners = new Map<string, (...args: unknown[]) => void>()
+    const listeners = new Map<string, ((...args: unknown[]) => void)[]>()
     const ctx = {
       tools: { register: () => {} },
       commands: { register: () => {} },
-      on: (event: string, listener: (...args: unknown[]) => void) => { listeners.set(event, listener) },
+      on: (event: string, listener: (...args: unknown[]) => void) => { listeners.set(event, [...(listeners.get(event) ?? []), listener]) },
       logger: { info: () => {}, warn: () => {} },
     }
     apply(ctx as never)
@@ -54,9 +54,9 @@ describe('host catalog wiring', () => {
     expect(before.entries).toHaveLength(1)
     expect(before.entries[0]?.presented).toBeNull()
 
-    const listener = listeners.get('session/event')
-    expect(listener).toBeDefined()
-    listener?.({}, {
+    const eventListeners = listeners.get('session/event') ?? []
+    expect(eventListeners.length).toBeGreaterThan(0)
+    for (const listener of eventListeners) listener({}, {
       type: 'deliverables/presented',
       data: { files: [{ path: join(workspace, 'deliverables/2026-10-25-alpha/final.md') }] },
     })
@@ -64,6 +64,24 @@ describe('host catalog wiring', () => {
     const after = JSON.parse(readFileSync(catalogPath(workspace), 'utf8')) as { entries: { presented: boolean | null }[] }
     expect(after.entries).toHaveLength(1)
     expect(after.entries[0]?.presented).toBe(true)
+  })
+
+  it('host guard：session cwd 不在公司盘 → 告警', () => {
+    const listeners = new Map<string, ((...args: unknown[]) => void)[]>()
+    const warn = vi.fn()
+    const ctx = {
+      tools: { register: () => {} },
+      commands: { register: () => {} },
+      on: (event: string, listener: (...args: unknown[]) => void) => { listeners.set(event, [...(listeners.get(event) ?? []), listener]) },
+      logger: { info: () => {}, warn },
+    }
+    apply(ctx as never)
+    const added = listeners.get('api-session/added') ?? []
+    expect(added.length).toBeGreaterThan(0)
+    for (const listener of added) listener({ origin: 'root', sessionId: 'session-outside', cwd: join(root, 'elsewhere'), running: true })
+    expect(warn.mock.calls.some(([message]) => String(message).includes('不在公司盘'))).toBe(true)
+    for (const listener of added) listener({ origin: 'root', sessionId: 'session-inside', cwd: workspace, running: true })
+    expect(warn.mock.calls.some(([message]) => String(message).includes('session-inside'))).toBe(false)
   })
 
   it('损坏的 bundle.json 告警且不覆盖（不把损坏当首启）', () => {

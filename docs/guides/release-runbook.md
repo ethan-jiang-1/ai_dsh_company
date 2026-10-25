@@ -65,6 +65,11 @@ pnpm release --check
 | 每次交付有可追溯回执 | `_dist/release-manifest.json` |
 | 测试按失败面分层 | [testing.md](../testing.md) + `checks/` 索引 + release runbook 第 1 节 |
 
-## 5. 不在这条命令里
+## 5. 供应链（T8）
+
+`pnpm verify` 已跑 `tracked-secrets` / `security-scan`；包没有 install/postinstall 脚本；不 publish 时没有签名动作。
+npm publish 前另补：发布字节 = 冒烟字节、构建证明/签名、`npm audit signatures`——本轮不做，触发条件 = 出现 registry 消费者。
+
+## 6. 不在这条命令里
 
 npm publish、market 索引、预构建离线包、Windows、真容器：未到触发条件；出现第二个消费者时另立 RFC。
