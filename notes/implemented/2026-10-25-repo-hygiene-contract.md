@@ -129,7 +129,8 @@ CI 先按「全配方」跑，连续红，逐条暴露（都不是本仓 tracked
 - **未修 / 已知缺口**（后续 pin 升级或构建分片任务处理，不在本任务硬改 vendor）：
   vendor 双 lock 版本漂移、全 host 构建 OOM、client aggregate 测试类型、Linux musl-gcc 前置。
   CI 不用 `continue-on-error` 或降级断言来假绿。
-- 重跑记录：run 40159113068 **绿**（2026-10-25，install → `bundle:init` → `pnpm verify`；干净 Ubuntu runner）。
+- 重跑记录：run 40159113068 **绿**（Linux，install → `bundle:init` → `pnpm verify`）；
+  跨环境矩阵 run 40160414612 **绿**（Ubuntu + macOS 双跑，同一 job）。
 
 ## 跨环境合同（2026-10-25）
 
