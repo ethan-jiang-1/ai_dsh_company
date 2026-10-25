@@ -5,7 +5,7 @@
 // 用法：node checks/smoke/standalone-smoke.mjs [--keep]
 //
 // 证明边界：干净 HOME + 干净 home + 当前 repo；不证明真容器/跨 OS/离线预构建。
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node:fs'
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync, existsSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
@@ -96,6 +96,23 @@ try {
   check('session/create 挂上 ceo', created?.agentPreset === 'ceo' || created?.preset === 'ceo', JSON.stringify(created).slice(0, 120))
   check('全程不写日用 ~/.dsh', !existsSync(join(fakeHome, '.dsh')))
   await child.stop()
+
+  console.log('④b relocation（入口搬到另一目录 + vendor/packages 符号链接）')
+  const relocated = join(root, 'relocated')
+  mkdirSync(join(relocated, 'tools'), { recursive: true })
+  cpSync(join(ROOT, 'tools/lib'), join(relocated, 'tools/lib'), { recursive: true })
+  cpSync(join(ROOT, 'tools/drivers'), join(relocated, 'tools/drivers'), { recursive: true })
+  cpSync(join(ROOT, 'tools/standalone.mjs'), join(relocated, 'tools/standalone.mjs'))
+  symlinkSync(join(ROOT, 'vendor'), join(relocated, 'vendor'), 'dir')
+  symlinkSync(join(ROOT, 'packages'), join(relocated, 'packages'), 'dir')
+  const relocatedHome = join(root, 'relocated-home')
+  await processes.run(process.execPath, [join(relocated, 'tools/standalone.mjs'), '--home', relocatedHome, '--provision-only', '--no-build'], { timeoutMs: 300_000 })
+  const relocatedProfile = JSON.parse(readFileSync(join(relocatedHome, 'profiles/web/package.json'), 'utf8'))
+  check('relocated 入口可 provision（pack link 指回 relocated 树）',
+    existsSync(join(relocatedHome, '.standalone-home'))
+    && String(relocatedProfile?.dependencies?.['dsh-company-pack'] ?? '').endsWith('/relocated/packages/company-pack'))
+  await processes.run(process.execPath, [join(relocated, 'tools/standalone.mjs'), '--home', relocatedHome, '--reset'], { timeoutMs: 60_000 })
+  check('relocated reset 清理 home', !existsSync(relocatedHome))
 
   console.log('⑤ reset（只删带标记的隔离 home）')
   await run(['--home', home, '--reset'])
