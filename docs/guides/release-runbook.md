@@ -28,6 +28,7 @@ pnpm release --verify --with-key
 
 # ⑤ 提交发布字节，再在干净树上做最终核对
 git add -A && git commit -m "chore(release): 0.3.4"
+pnpm release --stamp              # 把 manifest 的 gitSha 钉到发布 commit，不改产物
 pnpm release --check
 ```
 
@@ -49,7 +50,7 @@ pnpm release --check
 | `CHANGELOG ... 顶部是 ...` | 版本 bump 与 changelog 条目不同步 |
 | `手册版本 ... ≠ package` | 忘了 `--prepare`，或 export-dist 没重跑 |
 | `tgz sha256 ... ≠ sidecar` | 产物被换过；重跑 `--prepare`，别手改 sha |
-| `manifest gitSha 不是当前 HEAD` | prepare 之后又提交/改树；重跑 prepare+verify |
+| `manifest gitSha 不是当前 HEAD` | prepare 之后又提交；在干净树上跑 `--stamp`（产物不变），再 `--check` |
 | 安装/生命周期 smoke 红 | 先看 `_dist` 产物是否最新，再按对应 smoke 的 FAIL 行定位；不要先改测试 |
 
 ## 4. 已内化的规则（不用每次重想）
@@ -62,7 +63,7 @@ pnpm release --check
 | 包目录只读；用户数据在 workspace/home/session | README Data 节 + release-smoke 包目录零写入 |
 | 版本/变化/手册/sha 必须同步 | `release-ready` 门禁 + `release --check` |
 | 每次交付有可追溯回执 | `_dist/release-manifest.json` |
-| 测试按失败面分层（T0–T8） | [testing.md](../testing.md) + `checks/` 索引 + release runbook 第 1 节 |
+| 测试按失败面分层 | [testing.md](../testing.md) + `checks/` 索引 + release runbook 第 1 节 |
 
 ## 5. 不在这条命令里
 

@@ -29,6 +29,7 @@ DSH/Node 前置与 sha256 校验见手册；本包不在 npm registry。
 
 | 平面 | 我们写什么 | 位置 | 升级/卸载 |
 |---|---|---|---|
+| 定义 `D` | preset / persona / skills：只读声明；公司事实不在这里 | 包 `presets/**`（`presets/<role>/agent.cordis.yml`，由 `dsh.bundle.patch` 显式引用，不是旧 `.agent-presets/` 扫描） | 随包版本；不同公司不改源码 |
 | 包 `C` | 无用户数据；`workspace/` 是只读 starter | 安装包目录 | 升级整体替换；**绝不在包目录写 data/cache/日志** |
 | 工作区 `W` | 公司盘：手册/章程/台账/交付物/`kb/company.md`；host 生成的 `kb/deliverables-index.json` | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME` | 不动；基部文件按哈希替换、你改过的保留 |
 | home `U/H` | `bundle.json`（身份/基部指纹）、`logs/company-pack-upgrade.log`、`profiles/<p>/company-cultivation/<role>/` | `<DSH_HOME>` | 不动 |
@@ -36,6 +37,8 @@ DSH/Node 前置与 sha256 校验见手册；本包不在 npm registry。
 | 凭据 `X` | 不写入包；走 `<DSH_HOME>/.credentials.yaml` / 环境变量 | home | 用户管理 |
 
 说明：`bootstrap`/catalog 是**部署 provisioning 与 UI 派生索引**，用宿主 `node:fs`（不在模型工具沙箱内）；模型对工作区文件的读写仍走 `ctx.fs`/文件工具。`kb/deliverables-index.json` 是派生视图，删掉可由 host 重建。
+
+公司盘根固定在 `<DSH_HOME>/company-workspace`（或 `DSH_COMPANY_HOME`）。若会话 cwd 不是这个盘，页签/身份显示「非公司盘 / 身份未配置」，host 不静默改读 cwd；需要另一个盘就换 `DSH_COMPANY_HOME` 或另起一个 run bundle。
 
 ## Compatibility
 

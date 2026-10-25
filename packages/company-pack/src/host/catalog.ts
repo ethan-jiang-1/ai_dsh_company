@@ -99,7 +99,9 @@ function scanEntries(companyHome: string, presented: { paths: ReadonlyMap<string
         dir: item.name,
         fields,
         final,
-        presented: presented.paths.get(path) ?? presented.slugs.get(slug) ?? null,
+        // true 可按 path/slug 延续（present 过就是背书）；false 只认精确 path——
+        // 同 slug 的新交付物不能继承旧 false，否则会把“审计过未 present”冒充成新件结论。
+        presented: presented.paths.get(path) ?? (presented.slugs.get(slug) === true ? true : null),
       })
     }
   }

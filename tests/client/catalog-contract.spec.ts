@@ -2,10 +2,11 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import { buildDeliverablesCatalog } from '../../tools/lib/deliverables-catalog.mjs'
+import { buildDeliverablesCatalog, metaProblemsOf as metaProblemsJs } from '../../tools/lib/deliverables-catalog.mjs'
 import { META_RESULTS } from '../../tools/lib/deliverables.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { parseCatalog, resultTone } from '../../packages/company-pack/src/client/DeliverablesTab.tsx'
+import { metaProblemsOf as metaProblemsTs } from '../../packages/company-pack/src/lib/deliverables-catalog.ts'
 
 /**
  * 成品目录的**契约夹具**（2026-10-23 架构评审候选 2）。
@@ -49,6 +50,15 @@ describe('成品目录契约（生成器 ↔ 页签 parser 共钉一份夹具）
     const parsed = parseCatalog(FIXTURE_TEXT)
     expect(parsed?.entries).toEqual(FIXTURE.entries)
     expect(parsed !== null && 'counts' in parsed).toBe(false)
+  })
+
+  it('两侧 metaProblemsOf 同判据（防复制后漂移）', () => {
+    const cases = [
+      new Map([['kickoff', '2026-10-01'], ['类型', '决策'], ['结果', '已完成']]),
+      new Map([['kickoff', '2026/10/01'], ['类型', '未知'], ['结果', '完成']]),
+      new Map(),
+    ]
+    for (const fields of cases) expect(metaProblemsTs(fields)).toEqual(metaProblemsJs(fields))
   })
 
   it('结果词表全覆盖：META_RESULTS 的每个值都有色调，未知值才落 outline', () => {

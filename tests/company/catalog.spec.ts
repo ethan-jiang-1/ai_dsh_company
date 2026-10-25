@@ -103,6 +103,23 @@ describe('host catalog', () => {
     expect(regenerateCatalog(root).catalog?.entries[0]?.presented).toBe(false)
   })
 
+  it('旧 false 只按精确 path 保留；同 slug 新件不继承未 present', () => {
+    const root = workspace()
+    deliverable(root)
+    const path = catalogPath(root)
+    writeFileSync(path, `${JSON.stringify({
+      schema: 1,
+      generatedAt: '2026-10-24T00:00:00.000Z',
+      counts: {},
+      entries: [{
+        slug: 'alpha',
+        path: 'deliverables/2026-10-24-alpha/final.md',
+        presented: false,
+      }],
+    }, null, 2)}\n`)
+    expect(regenerateCatalog(root).catalog?.entries[0]?.presented).toBeNull()
+  })
+
   it('台账命中与未命中都写进目录', () => {
     const root = workspace()
     deliverable(root)

@@ -63,8 +63,9 @@ enginesProblems.length === 0
   ? ok(`pack-engines（node ${nodeRange} / dsh ${dshRange} / ${pack.license} / private）`)
   : fail('pack-engines', enginesProblems.join('；'))
 
-// 可发现性元数据（FAQ 24 §6）：locale/icon 是质量线不是硬门，但既然随包发布，files/exports
-// 少一项就会在安装后被静默降级。负例留证 2026-10-26：从 files 删 'icon.svg' → pack-meta 红。
+// 本仓发布形状硬门（不是 DSH 硬门；FAQ 24 §6 把它列为质量线）：locale/icon 既然随包发布，
+// files/exports 少一项就会在安装后被静默降级，本仓选择升格为 fail。负例留证 2026-10-26：
+// 从 files 删 'icon.svg' → pack-meta 红；还原 → 绿。
 const metaProblems = []
 if (!Array.isArray(pack.files) || !pack.files.includes('locale/*.json')) metaProblems.push('files 缺 locale/*.json')
 if (!Array.isArray(pack.files) || !pack.files.includes('icon.svg')) metaProblems.push('files 缺 icon.svg')

@@ -18,6 +18,7 @@
     "release:check": "node tools/release.mjs --check",
     "release:prepare": "node tools/release.mjs --prepare",
     "release:verify": "node tools/release.mjs --verify",
+    "release:stamp": "node tools/release.mjs --stamp",
     "release:all": "node tools/release.mjs --all",
     "test:coverage": "vitest run --coverage"
   },

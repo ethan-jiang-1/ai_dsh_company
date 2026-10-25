@@ -60,6 +60,9 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       const text = roleYml(role)
       expect(text, `${role} persona 写死了样本公司事实`).not.toMatch(/这家公司（梦之队）|梦之队 是高科技|三类业务|全员 50 人|梦之队的调研手/)
       expect(text, `${role} persona 应指向部署身份/编制`).toMatch(/kb\/(company|org)\.md/)
+      const personaAt = text.indexOf('prefix: |-')
+      expect(personaAt, `${role} 缺 persona prefix`).toBeGreaterThan(-1)
+      expect(text.slice(personaAt), `${role} persona 不应写公司名`).not.toContain('梦之队')
     }
   })
 

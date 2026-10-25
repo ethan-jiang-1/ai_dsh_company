@@ -54,11 +54,11 @@
 红/绿：
 - 红：临时把 `全员 50 人` 写回 CFO persona → `FAIL tests/presets > preset 定义不携带公司数据`；还原 → 绿。
 - 红：从 `files` 删 `icon.svg` → `FAIL pack-meta: files 缺 icon.svg`；还原 → 绿。
-- 红：删 `CHANGELOG.md` 的 `## 0.3.3` 段 → `FAIL release-changelog: 顶部条目是 0.3.2`；还原 → 绿。
+- 红：删 `CHANGELOG.md` 的 `## 0.3.3` 段 → `FAIL release-ready: 顶部条目是 0.3.2`；还原 → 绿。
 - 绿：`pnpm verify` ALL PASS（47 gates）；`pnpm test` 90 files / 852 tests；`preset-smoke` ALL PASS。
 - 绿：`pnpm release --prepare`、`pnpm release --verify`（release/lifecycle/standalone/client-load/preset 全 pass）、`pnpm release --check` → `READY 0.3.4（tgz 272 条目）`。
 
-未验 / 边界：T6 真实 min/max DSH 版本矩阵、T4 新 catalog 的 replay 场景、T5 真两会话并发/secret 日志、T8 供应链；npm/market/预构建/Windows/容器仍排除。`agent.cordis.yml` 文件名保留（显式 bundle patch，不是旧目录扫描）；Config schema 保留为显式例外。
+未验 / 边界：兼容矩阵的真实 min/max DSH 版本、新 catalog 的 replay 场景、真两会话并发/secret 日志、供应链；npm/market/预构建/Windows/容器仍排除。`agent.cordis.yml` 文件名保留（显式 bundle patch，不是旧目录扫描）；Config schema 保留为显式例外。
 
 ## 实施顺序
 

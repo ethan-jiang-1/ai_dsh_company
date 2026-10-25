@@ -1,14 +1,12 @@
 /**
  * host 成品目录接线（2026-10-25 审查补证）：`apply()` 注册的 `session/event` 监听在收到
  * present 事件后，真的把 `presented` 写进 catalog。之前只测了纯函数，没有测接线；
- * 这里用最小 ctx 桩 + mock 培养注册，跑真 `apply`。
+ * 这里用最小 ctx 桩 + 真培养注册（tools/commands 桩），跑真 `apply`。
  */
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
-vi.mock('../../packages/company-pack/src/host/cultivation.ts', () => ({ registerCultivation: () => {} }))
 
 import { apply } from '../../packages/company-pack/src/index.ts'
 import { catalogPath } from '../../packages/company-pack/src/host/catalog.ts'
@@ -47,6 +45,7 @@ describe('host catalog wiring', () => {
     const listeners = new Map<string, (...args: unknown[]) => void>()
     const ctx = {
       tools: { register: () => {} },
+      commands: { register: () => {} },
       on: (event: string, listener: (...args: unknown[]) => void) => { listeners.set(event, listener) },
       logger: { info: () => {}, warn: () => {} },
     }
@@ -73,6 +72,7 @@ describe('host catalog wiring', () => {
     const warn = vi.fn()
     const ctx = {
       tools: { register: () => {} },
+      commands: { register: () => {} },
       on: () => {},
       logger: { info: () => {}, warn },
     }

@@ -115,17 +115,14 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 
 程序：验证旧簿记及 `verify` → fetch tag 并核对证据 SHA → 在内存暂存新簿记/台账 → checkout 候选 → `pnpm install` → **vendor 面构建 = staging 树构建后拷回**（`git archive` 候选 → 独立 install + `pnpm run build` → 产物逐目录 `git check-ignore` 守门拷回；嵌套工作区跑不了 vendor face 构建，D27 在案且 0.2.0 逐字复现——见 [pin-upgrade Note](../notes/archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md)）→ `test` + built `release-smoke` → 验证通过才写簿记/台账 → 再 `verify`。候选冒烟时台账仍为旧值，安装检查只确认其在场；成功后台账才增加实测 tag。安装限 180 秒、vendor build 与 release-smoke 各 600 秒，其余命令 120 秒；子进程组等待退出。
 
-捕获到失败或 TERM/INT 时，恢复原 vendor HEAD、AGENTS/verify/pack manifest 和安装修改的 lockfile；不使用 reset/clean，不覆盖检测到的并发修改（报出需人工恢复的路径）。锁文件以安装结束时读到的版本为受控版本；运行期间不应并行编辑或安装。`node_modules`、缓存及 ignored 构建产物不回滚，失败后须按原 pin 重装/重建；强杀/断电无自动恢复保证。checkout 已发布 tag 不修改 vendor tracked 内容。
+捕获到失败或 TERM/INT 时，恢复原 vendor HEAD、AGENTS/verify/compat-tags.json 和安装修改的 lockfile；不使用 reset/clean，不覆盖检测到的并发修改（报出需人工恢复的路径）。锁文件以安装结束时读到的版本为受控版本；运行期间不应并行编辑或安装。`node_modules`、缓存及 ignored 构建产物不回滚，失败后须按原 pin 重装/重建；强杀/断电无自动恢复保证。checkout 已发布 tag 不修改 vendor tracked 内容。
 
 ## 版本纪律
 
-- pack 版本 `0.3.4`（`private: true`——**尚未发布到任何 registry**；真实发布动作
-  （npm publish）等出现第二个消费者/部署需求时再定；本轮只把本地 tarball 交付内化为 `pnpm release`，未 publish。当前 release-smoke 验证的是
-  `file:` tarball 安装形状）。0.3.4 = FAQ 24 对齐（preset 去公司事实、README 六节、locale/icon、compat 台账移出 package、release runbook/脚本）；
-  0.3.3 = 审查加固（bundle.json 原子写/损坏诊断、升级日志点名、
-  catalog metaProblem、standalone 接管/清理安全）；0.3.2 = 分发契约（engines/license/sha256）+
-  成品目录 host 生成 + 目录独立启动（standalone）；0.3.1 = run bundle 安装单元
-  （bundle.json + 整盘去 tracked + 基部零部署历史）；改内容必 bump（见下条）。
+- pack 版本 `0.3.4`（`private: true`——**尚未发布到任何 registry**；真实发布动作（npm publish）等
+  出现第二个消费者/部署需求时再定；本轮只把本地 tarball 交付内化为 `pnpm release`，未 publish。
+  当前 release-smoke 验证的是 `file:` tarball 安装形状）。版本史与每版变化唯一家 =
+  [CHANGELOG](../CHANGELOG.md)（此处不写变更史）；改内容必 bump（见下条）。
 - 真实发布落定时的已判要件（2026-10-07 借语料 sdlc-11 登记；未到触发不预建脚本）：
   **registry 三态幂等**（无 → publish / sha512 同 → skip / 异 → fail「改内容没升版」）；
   **改内容必 bump 版本**；**发布字节 = 冒烟字节**（publish 的产物必须就是 release-smoke

@@ -39,6 +39,7 @@ if (has('--help') || has('-h')) {
   pnpm release --prepare
   pnpm release --verify [--with-key]
   pnpm release --check [--allow-dirty]
+  pnpm release --stamp
   pnpm release --all [--with-key]`)
   process.exit(0)
 }
@@ -66,6 +67,11 @@ function pack() {
 
 function sha256(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex')
+}
+
+function readManifest() {
+  if (!existsSync(MANIFEST)) fail('缺 release-manifest.json；先 --prepare/--verify')
+  return JSON.parse(readFileSync(MANIFEST, 'utf8'))
 }
 
 function entryCount(path) {
@@ -190,6 +196,9 @@ function prepare() {
 function verify() {
   sourceCheck(true)
   artifactCheck()
+  const prepared = readManifest()
+  if (prepared.version !== pack().version) fail(`manifest 版本 ${prepared.version} ≠ package ${pack().version}；先 --prepare`)
+  if (prepared.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest 不是当前 HEAD 的 --prepare 产物；先重跑 --prepare')
   const commands = [
     ['verify', ['pnpm', ['verify'], false]],
     ['test', ['pnpm', ['test'], false]],
@@ -217,11 +226,26 @@ function verify() {
   console.log('release: verify 全绿；提交后跑 --check')
 }
 
+function stamp() {
+  sourceCheck()
+  const artifact = artifactCheck()
+  const manifest = readManifest()
+  if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
+  if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
+  const checks = manifest.checks ?? {}
+  const notPass = Object.entries(checks).filter(([, status]) => status !== 'pass')
+  if (checks.verify !== 'pass' || checks.test !== 'pass' || notPass.length > 0) fail('manifest 还没有全项 pass；先 --verify')
+  manifest.gitSha = capture('git', ['rev-parse', 'HEAD']).trim()
+  manifest.dirty = false
+  manifest.generatedAt = new Date().toISOString()
+  writeFileSync(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`)
+  console.log(`release: stamp ${manifest.version} @ ${manifest.gitSha.slice(0, 8)}（不改产物，只把 manifest 钉到当前 HEAD）`)
+}
+
 function check(allowDirtyTree = allowDirty) {
   sourceCheck(allowDirtyTree)
   const artifact = artifactCheck()
-  if (!existsSync(MANIFEST)) fail('缺 release-manifest.json；先 --prepare/--verify')
-  const manifest = JSON.parse(readFileSync(MANIFEST, 'utf8'))
+  const manifest = readManifest()
   if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
   if (manifest.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest gitSha 不是当前 HEAD（发布后被改过？重跑 --prepare/--verify）')
   if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
@@ -233,11 +257,12 @@ function check(allowDirtyTree = allowDirty) {
   console.log(`release: READY ${manifest.version} @ ${manifest.gitSha.slice(0, 8)}（tgz ${artifact.entries} 条目；${String(Object.keys(checks).length)} 项检查 pass）`)
 }
 
-const mode = has('--all') ? 'all' : has('--prepare') ? 'prepare' : has('--verify') ? 'verify' : has('--bump') ? 'bump' : 'check'
+const mode = has('--all') ? 'all' : has('--prepare') ? 'prepare' : has('--verify') ? 'verify' : has('--stamp') ? 'stamp' : has('--bump') ? 'bump' : 'check'
 try {
   if (mode === 'bump') bump(valueOf('--bump'))
   else if (mode === 'prepare') prepare()
   else if (mode === 'verify') verify()
+  else if (mode === 'stamp') stamp()
   else if (mode === 'all') { prepare(); verify(); console.log('release: --all 完成；commit 后跑 --check') }
   else check()
 } catch (error) {

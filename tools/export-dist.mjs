@@ -75,7 +75,8 @@ try {
   report('sha256', /^[0-9a-f]{64}$/.test(digest), `${digest}  ${tarballName}`)
 
   // 3. 手册——脚本生成，版本/日期/条目数注入；步骤镜像 release-smoke 验证过的安装路径
-  const date = new Date().toISOString().slice(0, 10)
+  // 手册日期按部署时区（Asia/Shanghai）落；UTC 跨日会把 10-26 写成 10-25，与 CHANGELOG 不一致。
+  const date = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
   const manual = `# dsh-company-pack 手动安装手册
 
 | | |

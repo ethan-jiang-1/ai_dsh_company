@@ -73,6 +73,18 @@ describe('filterCatalog / formatGeneratedAt', () => {
   })
 })
 
+describe('DeliverablesView（空态）', () => {
+  it('空目录明确说“还没有成品”，不指维护者工具', () => {
+    const html = renderToStaticMarkup(createElement(DeliverablesView, {
+      catalog: { schema: 1, generatedAt: '', entries: [] },
+      sessionId: 'session-empty' as never,
+      openFinal: () => {},
+    }))
+    expect(html).toContain('还没有带 final.md 的成品')
+    expect(html).not.toContain('tools/deliverables')
+  })
+})
+
 describe('DeliverablesView（静态渲染）', () => {
   const html = renderToStaticMarkup(createElement(DeliverablesView, {
     catalog: CATALOG,

@@ -126,6 +126,7 @@ try {
   check('真实安装副本在场（node_modules/dsh-company-pack）', existsSync(join(installedPack, 'package.json')))
   check('安装副本带 presets/', existsSync(join(installedPack, 'presets/ceo')))
   check('安装副本带 client 产物', existsSync(join(installedPack, 'lib/client.js')))
+  check('安装副本带 locale/icon（可发现性元数据）', ['locale/en.json', 'locale/zh.json', 'icon.svg'].every(rel => existsSync(join(installedPack, rel))))
   // 出厂骨架（2026-10-13）：少了它，第三方装完插件就是"没有手册与章程"的裸奔（见该 Note）
   check('安装副本带出厂骨架 workspace/（手册 + 章程 + 模板 + 起动件）',
     ['workspace/AGENTS.md', 'workspace/templates/meta.md', 'workspace/kb/org.md', 'workspace/kb/owners.md',
