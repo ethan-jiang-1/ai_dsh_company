@@ -36,7 +36,7 @@ const withKey = has('--with-key')
 if (has('--help') || has('-h')) {
   console.log(`用法：
   pnpm release --bump patch|minor|major
-  pnpm release --prepare
+  pnpm release --prepare [--force]
   pnpm release --verify [--with-key]
   pnpm release --check [--allow-dirty]
   pnpm release --stamp
@@ -187,6 +187,11 @@ function writeManifest(checks) {
 
 function prepare() {
   sourceCheck(true)
+  const version = pack().version
+  const existing = join(DIST, `dsh-company-pack-${version}.tgz`)
+  if (existsSync(existing) && !has('--force')) {
+    fail(`已存在 ${version} 的 tgz；同版本重打会让字节漂移（npm pack 带 mtime）。改内容先 bump；确要重打加 --force`)
+  }
   build()
   artifactCheck()
   writeManifest({ verify: 'not-run', test: 'not-run' })
