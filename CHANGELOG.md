@@ -2,6 +2,15 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.3.6 — 2026-10-26
+
+### Changed
+
+- 成品目录：真 vendor `present` 工具 → session `deliverables/presented` → host catalog 的端到端 smoke；修 macOS `/var`→`/private/var` symlink 导致事件路径永远匹配不上 catalog 的 bug。
+- 盘守卫：host 在 `api-session/added` 比较会话 cwd 与 `bundle.json.workspace`，不一致记警告；新增 keyless 正/负测试。
+- 生命周期负例：单字节篡改 tarball 拒绝安装；standalone 缺 pnpm 时拒绝且不创建 home。
+- 测试矩阵：catalog 不进模型指令面（T4 无新 replay 场景）、`engines.dsh` 窗口语义（T6 真实多版本矩阵仍待环境）、发布 runbook 补供应链 checklist。
+
 ## 0.3.5 — 2026-10-26
 
 ### Changed
