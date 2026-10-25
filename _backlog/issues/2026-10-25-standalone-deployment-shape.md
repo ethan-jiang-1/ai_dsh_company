@@ -55,4 +55,4 @@ opened: 2026-10-25
 
 - Q1 = A+C（源码直跑 + 隔离 home）；B 作可迁移性验收；D 不做。
 - Q4 = 本机 clean-room 必做；CI 至少一个 OS（预算允许）；容器级只对具体目标环境做一次。
-- 去向：`notes/proposed/2026-10-25-standalone-deployment.md`（与卡 6 合并）。
+- 去向：`notes/implemented/2026-10-25-standalone-deployment.md`（与卡 6 合并）。

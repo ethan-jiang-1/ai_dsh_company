@@ -1,6 +1,7 @@
 // 状态：常驻
 // 何时跑：fresh clone、或 dev 的 company-workspace 被清掉之后——重建 dev run bundle 的 workspace；
 // 制度件做成指回 pack 的符号链接（单源），业务数据目录留空。已有 workspace 时一个字节都不动。
+// **维护者专用**：符号链接会让角色写回 pack 源；独立环境/第三方用 `pnpm standalone`（copy 骨架）。
 //
 // 为什么需要它（2026-10-24 RFC run-bundle-install-unit）：company-workspace 是 dev run bundle 的
 // workspace，整树已不进 git。fresh clone 没有它，角色会话就没有 cwd、gates/orient 也没有盘可读。

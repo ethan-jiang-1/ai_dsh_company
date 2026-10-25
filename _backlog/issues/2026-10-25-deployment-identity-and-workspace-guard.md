@@ -56,4 +56,4 @@ opened: 2026-10-25
 
 - Q2 = 不同公司各自部署，本卡启用。
 - 产品名固定（梦之队），公司名走部署配置；guard 先做“提示/降级”，不误伤维护者会话；dev 符号链接标维护者专用。
-- 去向：`notes/proposed/2026-10-25-standalone-deployment.md`。
+- 去向：`notes/implemented/2026-10-25-standalone-deployment.md`。

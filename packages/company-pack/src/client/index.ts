@@ -309,6 +309,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
     const CompanyView = createCompanyView({
       leadOf,
       follow,
+      readCompany: readWorkspaceText('kb/company.md', 40),
       floatPanel,
       // 培养数据面（2026-10-13 培养卡）：同一 follow 流喂赞/踩块；文件闭包与 viewer 角色源
       // 与侧栏页签同一语义（领域视图两个壳一处事实）。

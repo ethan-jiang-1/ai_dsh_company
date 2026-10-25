@@ -1,6 +1,6 @@
 # RFC：standalone-deployment（目录即部署）
 
-状态：已批准（批准：用户 2026-10-25；goal 授权按 2026-10-25 收尾计划自主推进）
+状态：已消化（2026-10-25 实施；批准：用户 2026-10-25；goal 授权按 2026-10-25 收尾计划自主推进）
 
 ## 问题
 
@@ -81,3 +81,25 @@ node checks/smoke/standalone-smoke.mjs
 4. 形状矩阵 + `bundle:init --copy`。
 5. 身份/错盘守卫（client + host）。
 6. 全量证据 + Note。
+
+## 实施与证据（2026-10-25）
+
+已落树：
+
+- [tools/standalone.mjs](../../tools/standalone.mjs) + `pnpm standalone`：`--home`/`--workspace`/`--port`/`--no-open`/`--provision-only`/`--no-build`/`--reset`/`--help`；doctor 查 Node/vendor CLI/web dist/vendor client bundles/pack 产物；隔离 `DSH_HOME`，自建 `web` profile，`link:` 指回当前 pack，`DSH_COMPANY_BOOTSTRAP=if-missing` 让 host copy 骨架；`--reset` 只删带 `.standalone-home` 标记的 home，拒绝接管已有 DSH 数据的 home。
+- [standalone-smoke.mjs](../../checks/smoke/standalone-smoke.mjs)：临时 `HOME` + 隔离 home；provision → 改坏 link → relink → boot/RPC（五角色 + researcher、`session/create`）→ reset；断言不写日用 `~/.dsh`。
+- 身份：新增 [kb/company.md](../../packages/company-pack/workspace/kb/company.md)（公司名/产品名/样例标记）；手册标题改为「公司手册」并指向它；[CompanyView](../../packages/company-pack/src/client/CompanyView.tsx) 读该文件显示公司名，读不到显示「非公司盘 / 身份未配置」；[DeliverablesTab](../../packages/company-pack/src/client/DeliverablesTab.tsx) 的缺索引错误提示确认 workspace。
+- 形状矩阵：[bootstrap.md](../../docs/guides/bootstrap.md) 顶部「先选形状」表；[profile.md](../../docs/profile.md) 部署形状表加「目录独立启动」行；`bundle-init` 头注标维护者专用。
+- 索引：[checks/README.md](../../checks/README.md) 登记 `standalone` 与 `standalone-smoke`。
+
+红/绿收据（实跑）：
+
+- 绿：`node checks/smoke/standalone-smoke.mjs` → `ALL PASS`（provision / relink / roster 五角色 + researcher / copy 骨架 + 身份 / bundle.json / session-create / 不写日用 `.dsh` / reset / 无标记 reset 拒绝）。
+- 绿：`pnpm verify` → `ALL PASS`；`pnpm test` → 839 passed；`release-smoke` → `ALL PASS`（32 件骨架、空 catalog、二启零变更）；`lifecycle-smoke` → `ALL PASS`；`client-load-smoke` → `ALL PASS`。
+- 红样：旧树没有 `pnpm standalone` 入口；smoke 的 relink 步骤先写入 `link:/tmp/does-not-exist/...`，入口未修复即红；`--reset` 对无标记目录必须非零。
+
+未验证 / 偏离：
+
+- 未做 `bundle:init --copy`：独立环境统一用 `pnpm standalone`（host copy 骨架）；`bundle-init` 保持维护者符号链接单源，避免 copy 模式与 `company-skeleton` 门禁冲突。原文的这一步以此替代。
+- 错盘守卫是**可见提示/空态**，不是拒绝会话（避免误伤维护者 coding 会话）；host 侧拒绝策略未做。
+- 未承诺/未验证：真容器或第二台机器、Windows、离线预构建、浏览器里公司名的视觉断言（client-load 只证零挂载失败与品牌）。

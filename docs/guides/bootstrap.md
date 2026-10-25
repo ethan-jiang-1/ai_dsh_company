@@ -5,6 +5,21 @@
 > 出生：2026-09-27 自 dev-loop §7 整段迁入（常驻层瘦身轮；dev-loop §7 留指针、编号不动防既有引用断链）。
 > 配方与坑均在钉住 vendor 基线实证（R0/R1，2026-09-22）；机制结论以 vendor/dsh 工作树为权威。
 
+## 先选形状（真插件安装 vs 目录独立启动）
+
+| | **真插件安装** | **目录独立启动** |
+|---|---|---|
+| 适用 | 给别人用、跨机器/跨部署 | 在本机隔离环境里跑本仓库的当前代码 |
+| 前置 | 有 `dsh` 运行时 + tarball；不需要本仓库 | 本仓库 + pinned vendor + Node/pnpm；按本节构建 |
+| 数据落点 | 新 `DSH_HOME` + `<home>/company-workspace` | `--home`/`--workspace`（默认 `runtime/standalone/home`） |
+| 首启 | `dsh plugin add <tgz>` → 首次 boot 落骨架 | `pnpm standalone` 自建 profile + copy 骨架 |
+| 升级 | 换 profile 包后重启（哈希判定） | 拉代码 + 重跑入口（构建/重指 link） |
+| 删除 | `plugin remove` + 删 home | `pnpm standalone --reset`（只删带标记的 home） |
+| 验收 | `release-smoke` + `lifecycle-smoke` | `standalone-smoke`（隔离 home/RPC/relink/reset） |
+| 不承诺 | 浏览器全交互、离线 | 跨 OS 构建、离线预构建、容器 |
+
+目录独立启动**不是**“复制构建产物分发包”：构建仍按 checkout 产生；换机器按本节重建。
+
 ```sh
 git submodule update --init             # vendor/dsh 钉 tag
 corepack enable pnpm                    # 一次性：pnpm 读根 packageManager（钉 11.7.0）

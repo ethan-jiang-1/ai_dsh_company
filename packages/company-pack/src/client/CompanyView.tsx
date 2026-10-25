@@ -16,6 +16,7 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { BoardPanel, DagPanel, LOADING_NOTE, PresencePanel, StateNote } from './company-panels.tsx'
 import { DagGlyph, GridGlyph, PeopleGlyph, SproutGlyph } from './tab-icons.tsx'
+import { useWorkspaceText, type WorkspaceTextLoader } from './workspace-text.ts'
 import { useCompanyData, type CompanyDataInjected } from './use-company-data.ts'
 import { CultivationBoard } from './CultivationBoard.tsx'
 import type { CultivationActionsFactory } from './cultivation-actions.ts'
@@ -50,6 +51,8 @@ export interface CompanyViewInjected extends CompanyDataInjected {
   readonly contextSources?: ((sessionId: SessionId) => CultivationContextSources) | undefined
   /** 打开背景原文（注册处预检 + 导航；缺席 = 不显示打开按钮）。 */
   readonly openContext?: ((sessionId: SessionId, context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false, readonly problem: string }>) | undefined
+  /** 读部署身份 `kb/company.md`（公司名/产品名；缺席 = 不显示公司名，仅显示产品）。 */
+  readonly readCompany: WorkspaceTextLoader
 }
 
 type PanelKey = 'board' | 'dag' | 'presence' | 'cultivation'
@@ -75,6 +78,10 @@ export function createCompanyView(injected: CompanyViewInjected) {
     const { sessionId, useProjection, useSessions } = props
     const [panel, setPanel] = useState<PanelKey>('board')
     const data = useCompanyData(injected, sessionId, useProjection, useSessions, { stream: true })
+    const company = useWorkspaceText(injected.readCompany, sessionId)
+    const companyName = company.state.status === 'ready'
+      ? (/^公司名[:：]\s*(.+)$/m.exec(company.state.text)?.[1]?.trim() ?? '')
+      : ''
     const current = COMPANY_PANELS.find(entry => entry.key === panel)
 
     // 培养面（2026-10-13）：数据独立于 team（V1——team 断流时培养子页仍可看）；只在子页
@@ -110,6 +117,11 @@ export function createCompanyView(injected: CompanyViewInjected) {
             </button>
           ))}
           <span style={{ flex: 1 }} />
+          <span className="wk-meta wk-tabstrip-meta">
+            {company.state.status === 'unreadable'
+              ? '非公司盘 / 身份未配置'
+              : `公司：${companyName === '' ? '（未填）' : companyName}`}
+          </span>
           <span className="wk-meta wk-tabstrip-meta">
             {panel === 'cultivation' ? `每 ${String(CULTIVATION_REFRESH_MS / 1000)} 秒刷新` : '投影更新'}
           </span>
