@@ -45,20 +45,21 @@
 
 已落树：
 - 6 个 preset 的 persona 去掉梦之队/高科技/三类业务/50 人，改为引用 `kb/company.md` 与 `kb/org.md`；`tests/presets` 新增 keyless 断言。
-- README 六节（Install / What / Configuration / Data / Compatibility / Uninstall）；Data 节写明 C/W/U/S/H/X 边界与 node:fs 例外。
+- README 六节（Install / What / Configuration / Data / Compatibility / Uninstall）；Data 节写明 D/C/W/U/S/H/X 边界与 node:fs 例外。
 - `locale/en.json`、`locale/zh.json`、`icon.svg`；`pack-meta` 门禁 + `export-dist` 清单 + `pack-metadata` 测试。
 - `dsh.compatibility` 从 package 移除；[checks/gates/lib/compat-tags.json](../../checks/gates/lib/compat-tags.json) 成为唯一台账；`pack-compat` / `sync-dsh` / release-smoke 同步。
 - `CHANGELOG.md`、[release-ready](../../checks/gates/release-ready.mjs)、[release.mjs](../../tools/release.mjs)、[runbook](../../docs/guides/release-runbook.md)；`pnpm release` 的 bump/prepare/verify/check 已实跑。
 - 0.3.4 tarball 272 条目、sha256 `41a20619b7f8fe0b828eb0108ecb0d90a1490d6c4b8e1a74a784792ea5217e1f`；手册 0.3.4；`_dist/release-manifest.json` 记录 gitSha/各级检查。
+- 0.3.6 补齐：真 vendor `present` → session event → catalog 的 [present-catalog-smoke](../../checks/smoke/present-catalog-smoke.mjs)（并修 `/var`→`/private/var` symlink 匹配 bug）；host cwd guard；lifecycle 单字节篡改拒绝；standalone 缺 pnpm doctor 负例；T4/T6 断言 + T8 runbook。0.3.6 tarball 272 条目、sha256 `b734e9c6fc0c3a047ae9c0a7ab2664fe1b4c13b54da3d1bcee845ecf7f37785a`。
 
 红/绿：
 - 红：临时把 `全员 50 人` 写回 CFO persona → `FAIL tests/presets > preset 定义不携带公司数据`；还原 → 绿。
 - 红：从 `files` 删 `icon.svg` → `FAIL pack-meta: files 缺 icon.svg`；还原 → 绿。
 - 红：删 `CHANGELOG.md` 的 `## 0.3.3` 段 → `FAIL release-ready: 顶部条目是 0.3.2`；还原 → 绿。
-- 绿：`pnpm verify` ALL PASS（47 gates）；`pnpm test` 90 files / 852 tests；`preset-smoke` ALL PASS。
-- 绿：`pnpm release --prepare`、`pnpm release --verify`（release/lifecycle/standalone/client-load/preset 全 pass）、`pnpm release --check` → `READY 0.3.4（tgz 272 条目）`。
+- 绿：`pnpm verify` ALL PASS（47 gates）；`pnpm test` 91 files / 858 tests；`preset-smoke` ALL PASS。
+- 绿：`pnpm release --prepare`、`pnpm release --verify`（release/lifecycle/standalone/client-load/preset 全 pass）、`pnpm release --check` → `READY 0.3.4`，0.3.6 再跑 `READY 0.3.6`。
 
-未验 / 边界：兼容矩阵的真实 min/max DSH 版本、新 catalog 的 replay 场景、真两会话并发/secret 日志、供应链；npm/market/预构建/Windows/容器仍排除。`agent.cordis.yml` 文件名保留（显式 bundle patch，不是旧目录扫描）；Config schema 保留为显式例外。
+未验 / 边界：真实多 DSH 版本安装矩阵（T6 只验窗口语义 + 坏 engines 真装拒绝）、真两会话并发/secret 日志（当前只有两盘隔离 + tracked-secrets/security-scan）、真实仓库搬迁（当前只有外部 workspace 保留 + doctor 负例）；npm/market/预构建/Windows/容器仍排除。`agent.cordis.yml` 文件名保留（显式 bundle patch，不是旧目录扫描）；Config schema 保留为显式例外。
 
 ## 实施顺序
 
