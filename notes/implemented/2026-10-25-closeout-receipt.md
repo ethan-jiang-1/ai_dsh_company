@@ -23,7 +23,7 @@
 
 - `pnpm verify` → `ALL PASS`（含 `pack-engines`、`dist-manual`、`shipped-links`、`backlog-liveness`、`gate-wiring ×46`）。
 - `pnpm test` → 89 files / 848 tests passed。
-- `node checks/smoke/release-smoke.mjs` → `ALL PASS`（0.3.3 真 tarball 安装；32 件骨架；空 catalog；内容哈希指纹下二启零变更）。
+- `node checks/smoke/release-smoke.mjs` → `ALL PASS`（0.3.3 真 tarball 安装；32 件骨架；空 catalog；内容哈希指纹下二启零变更；安装副本零写入 = 包目录不是数据目录）。
 - `node checks/smoke/lifecycle-smoke.mjs` → `ALL PASS`（0.3.3 → 0.3.4；改基部保留/未改替换/扩张不动；升级日志点名 AGENTS/CHARTER/org；卸载；搬 home）。
 - `node checks/smoke/standalone-smoke.mjs` → `ALL PASS`（隔离 home；自建 profile；copy 骨架/身份；relink；boot/RPC；reset；非空无标记目录拒绝收养；外部 workspace 保留）。
 - `node checks/smoke/client-load-smoke.mjs` → `ALL PASS`（真浏览器零挂载失败；品牌槽）。

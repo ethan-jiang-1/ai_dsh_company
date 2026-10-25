@@ -191,6 +191,8 @@ try {
   }
   await waitFor(() => existsSync(join(home, 'bundle.json')) && existsSync(join(companyHome, 'kb/deliverables-index.json')), '首启落盘')
   const first = fingerprint(companyHome)
+  // T5（FAQ 24 §8.1）：包目录只读——运行/升级不应在安装副本里新增 data/cache/日志。
+  const packBefore = fingerprint(installedPack)
   const has = (rows, rel) => rows !== null && rows.some(row => row.startsWith(`${rel}:`))
   check('首启把出厂公司盘落到 DSH_COMPANY_HOME（含手册/章程/起动件）',
     ['AGENTS.md', 'kb/org.md', 'kb/owners.md', 'kb/motion-ledger.md', 'kb/ceo/CHARTER.md', 'templates/meta.md']
@@ -237,6 +239,9 @@ try {
   check('第二次启动零变更（建立好了就不用再建立了）',
     JSON.stringify(beforeSecond) === JSON.stringify(afterSecond),
     `before=${String(beforeSecond?.length ?? -1)} after=${String(afterSecond?.length ?? -1)}`)
+  check('安装副本零写入（包目录不是数据目录）',
+    JSON.stringify(packBefore) === JSON.stringify(fingerprint(installedPack)),
+    `pack files=${String(packBefore?.length ?? -1)}`)
   check('第二次启动 bundle.json 字节不变（只创建、不覆盖）',
     manifestBefore !== null && readFileSync(manifestPath, 'utf8') === manifestBefore,
     manifestBefore === null ? 'bundle.json 不存在' : '字节一致')
