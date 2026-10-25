@@ -1,6 +1,6 @@
-# RFC：faq24-alignment（发布形态、数据平面与发布内化）
+# FAQ 24 对齐：发布形态、数据平面与发布内化
 
-状态：已批准（批准：用户 2026-10-26；goal 授权按 2026-10-26 对齐计划自主推进）
+状态：已消化（2026-10-26）
 
 ## 问题
 
@@ -17,7 +17,7 @@
 3. **catalog 的 node:fs 是显式例外**：bootstrap/catalog 是部署 provisioning 与 UI 派生索引，不是模型文件访问；模型文件访问仍走 `ctx.fs`。README Data 写明；若未来要进 model 可见面，另立 RFC 迁 `ctx.fs`。
 4. **preset 文件名保留 `agent.cordis.yml`**：它由 `dsh.bundle.patch` 显式引用，不是旧 `.agent-presets/` 目录扫描；改名到 `preset.patch.yml` 只影响可读性、会牵动大量历史指针，本轮不做，README 说明。
 5. **locale/icon 补上**：`locale/en.json`、`zh.json` 与原创 `icon.svg`，`exports`/`files` 同步；Config 本轮不引入（只有一个可选 `cultivationRoot`，引入 schemastery peer 会扩大依赖面，记录为显式例外）。
-6. **发布知识内化**：`docs/release.md` 收敛为合同；新增发布 runbook、`CHANGELOG.md`、release 入口脚本、`_dist/release-manifest.json`、`release-ready` 门禁与 `pnpm release` 脚本（文件在后续阶段落树时再写具体路径）。
+6. **发布知识内化**：`docs/release.md` 收敛为合同；[发布 runbook](../../docs/guides/release-runbook.md)、[CHANGELOG](../../CHANGELOG.md)、[release.mjs](../../tools/release.mjs)、`_dist/release-manifest.json`、[release-ready](../../checks/gates/release-ready.mjs) 与 `pnpm release` 已落树。
 7. **FAQ 24 登记**：`docs/external-research.md` 增加一行，指向该目录与吸收落点。
 
 ## 验收
@@ -40,6 +40,25 @@
 
 - 范围：preset 内容、README、locale/icon、compat 台账迁移、release runbook/脚本/manifest、测试补强。
 - 排除：npm publish、market、预构建离线、Windows、真容器、完整 `deliverables-check` 平移；不改 `vendor/dsh`。
+
+## 实施与证据（2026-10-26）
+
+已落树：
+- 6 个 preset 的 persona 去掉梦之队/高科技/三类业务/50 人，改为引用 `kb/company.md` 与 `kb/org.md`；`tests/presets` 新增 keyless 断言。
+- README 六节（Install / What / Configuration / Data / Compatibility / Uninstall）；Data 节写明 C/W/U/S/H/X 边界与 node:fs 例外。
+- `locale/en.json`、`locale/zh.json`、`icon.svg`；`pack-meta` 门禁 + `export-dist` 清单 + `pack-metadata` 测试。
+- `dsh.compatibility` 从 package 移除；[checks/gates/lib/compat-tags.json](../../checks/gates/lib/compat-tags.json) 成为唯一台账；`pack-compat` / `sync-dsh` / release-smoke 同步。
+- `CHANGELOG.md`、[release-ready](../../checks/gates/release-ready.mjs)、[release.mjs](../../tools/release.mjs)、[runbook](../../docs/guides/release-runbook.md)；`pnpm release` 的 bump/prepare/verify/check 已实跑。
+- 0.3.4 tarball 272 条目、sha256 `41a20619b7f8fe0b828eb0108ecb0d90a1490d6c4b8e1a74a784792ea5217e1f`；手册 0.3.4；`_dist/release-manifest.json` 记录 gitSha/各级检查。
+
+红/绿：
+- 红：临时把 `全员 50 人` 写回 CFO persona → `FAIL tests/presets > preset 定义不携带公司数据`；还原 → 绿。
+- 红：从 `files` 删 `icon.svg` → `FAIL pack-meta: files 缺 icon.svg`；还原 → 绿。
+- 红：删 `CHANGELOG.md` 的 `## 0.3.3` 段 → `FAIL release-changelog: 顶部条目是 0.3.2`；还原 → 绿。
+- 绿：`pnpm verify` ALL PASS（47 gates）；`pnpm test` 90 files / 852 tests；`preset-smoke` ALL PASS。
+- 绿：`pnpm release --prepare`、`pnpm release --verify`（release/lifecycle/standalone/client-load/preset 全 pass）、`pnpm release --check` → `READY 0.3.4（tgz 272 条目）`。
+
+未验 / 边界：T6 真实 min/max DSH 版本矩阵、T4 新 catalog 的 replay 场景、T5 真两会话并发/secret 日志、T8 供应链；npm/market/预构建/Windows/容器仍排除。`agent.cordis.yml` 文件名保留（显式 bundle patch，不是旧目录扫描）；Config schema 保留为显式例外。
 
 ## 实施顺序
 

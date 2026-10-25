@@ -2,6 +2,7 @@
 
 > 什么时候读：发布、打包、装进真实 profile、升 vendor pin 时。路线 = §vendor 政策 → release-smoke。
 > 顶层合同：vendor 政策、pack 的依赖姿态、兼容台账、真实安装冒烟程序、升 pin 程序。
+> 每次发布的操作步骤 = [guides/release-runbook.md](./guides/release-runbook.md)；一条命令入口 = `pnpm release`。
 > 依据：FAQ 13（外部研究：dsh-market / dsh-im 生态姿态）；原 dev-loop §5 发布时点表已全部落地随迁本文件（2026-10-12）。
 > 执行器：`checks/smoke/release-smoke.mjs`（发布冒烟）与 `tools/sync-dsh.mjs`（升 pin）。
 
