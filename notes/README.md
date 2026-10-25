@@ -1,7 +1,7 @@
 # notes/ —— 开发记忆与证据链（本目录的分类 owner）
 
 > **每个目录装什么、状态怎么读、由谁维护，以本文件为准**——职责由一个具名文件拥有，不由惯例拥有。
-> 精神借源 = 外部仓 `/Users/bowhead/ai_dsh_assitant/notes/README.md`（D35；对齐与偏离登记见 §四，
+> 精神借源 = 外部仓 ai_dsh_assitant/notes/README.md（维护者本机）（D35；对齐与偏离登记见 §四，
 > 登记行 = [index §外部研究材料登记](../docs/index.md)）；DSH 原生定义 =
 > [vendor Agent Notes](../vendor/dsh/.agents/notes/README.md)；收尾动作清单 = [dev-loop §12](../docs/guides/dev-loop.md)；
 > RFC 层合同与实施 TDD 红绿环 = [proposed/README](proposed/README.md)（条目开工必读）；上游推敲/缺陷卡 =

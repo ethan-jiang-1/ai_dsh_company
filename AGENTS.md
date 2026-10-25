@@ -13,7 +13,7 @@ CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 校验）
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml、src/（host R3+）+ src/client/（client 面）
 company-workspace/      **dev run bundle 的 workspace**（会话 cwd；整树 gitignored，不进 git）：AGENTS.md 等制度件是指回 pack 的符号链接（`pnpm bundle:init` 建）、kb/、templates/、cultivation/、deliverables/ + deliverables-archive/——扩张数据只住这里；bundle 身份 = runtime/harness-home/bundle.json
 vendor/dsh/             DSH 源码 submodule（钉 SHA，只读铁律见下节）
-docs/                   当前合同与导航：index（地图+台账）→ design/ guides/ + 顶层合同
+docs/                   当前合同与导航：index（地图+台账）→ design/ guides/ + 顶层合同（git 边界 = repo-hygiene.md）
 notes/                  开发记忆：proposed/（RFC）→ implemented/（活跃决策记忆）；离场目录不复述于此——分类规则唯一家 = notes/README.md
 _backlog/               推敲层：issues/bugs/research/methods/_archive + triggers.md（触发器）；章程与账本 = 其 README；agent 门牌 = AGENTS.md
 checks/                 验证面：run-gates 门禁；smoke/（真实入口冒烟）+ audit/（盘面日志判据）
@@ -53,7 +53,7 @@ source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的完
 
 ## DSH 源码：三个实体，别混
 
-**① 唯一权威 = `vendor/dsh/`**（钉 SHA 只读；机制核对一律 `pnpm dsh`）。**② 裸 `dsh` = 日用全局安装**（版本随全局漂移，不作本仓依据；已被 env.sh 拦截，确要日用 `command dsh`）。**③ 外部研究树** `/Users/bowhead/deepseek-harness/`（`_digested`/FAQ 宿主，只读；登记见 [index §外部研究材料登记](docs/index.md)）。全局不变量 = `vendor/dsh/AGENTS.md` Conventions 节；概念→源码直达 = [术语映射](docs/terminology.md)。
+**① 唯一权威 = `vendor/dsh/`**（钉 SHA 只读；机制核对一律 `pnpm dsh`）。**② 裸 `dsh` = 日用全局安装**（版本随全局漂移，不作本仓依据；已被 env.sh 拦截，确要日用 `command dsh`）。**③ 外部研究树**（维护者本机路径；`_digested`/FAQ 宿主，只读；登记见 [index §外部研究材料登记](docs/index.md)）。全局不变量 = `vendor/dsh/AGENTS.md` Conventions 节；概念→源码直达 = [术语映射](docs/terminology.md)。
 
 ## 纪律（沿 DSH 研发纪律；默认严格照做，偏离必须登记）
 

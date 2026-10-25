@@ -25,10 +25,10 @@
 
 ```text
 node tools/diagnose.mjs --home ~/.dsh
-#   ⚠ 显式读非 dev home（只读）：/Users/bowhead/.dsh
+#   ⚠ 显式读非 dev home（只读）：$HOME/.dsh
 #   SESSION …/session-5d46214d…；EVENTS total=3353 turns=28 toolErrors=6；FAILURES 逐条列出
 DSH_HOME=~/.dsh node tools/diagnose.mjs
-#   diagnose: DSH_HOME 与日用 home（/Users/bowhead/.dsh）重叠——拒绝执行（默认路径未放宽）
+#   diagnose: DSH_HOME 与日用 home（$HOME/.dsh）重叠——拒绝执行（默认路径未放宽）
 pnpm test     # 756 passed
 pnpm verify   # ALL PASS
 ```

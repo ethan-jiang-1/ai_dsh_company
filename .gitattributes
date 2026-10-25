@@ -1,0 +1,16 @@
+# 跨环境基线：所有文本按 LF 入库（macOS/Linux/Windows 编辑器都不改变仓库字节）。
+* text=auto eol=lf
+
+# 二进制/生成物：不做行尾转换。
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.tgz binary
+*.tar binary
+*.gz binary
+*.zst binary
+*.db binary
+*.sqlite binary
+*.node binary

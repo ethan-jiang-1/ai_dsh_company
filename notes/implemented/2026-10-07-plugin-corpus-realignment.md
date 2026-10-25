@@ -2,7 +2,7 @@
 
 状态：已交付（2026-10-07；批准：用户 2026-10-07 点名「认真读 _dsh_plugin_agent_ready_development，吸取到本 repo 避免驾驭无力」并经对话确认「判定 + 定向修订」深度；焦点四线 = 流程闭环可见性 / 交付判断·语义评审 / 测试资产地图 / 防过度吸收）
 
-> 语料：`/Users/bowhead/deepseek-harness/_dsh_plugin_agent_ready_development/`（repo 外只读树），
+> 语料：外部研究树 `_dsh_plugin_agent_ready_development/`（维护者本机）（repo 外只读树），
 > 钉 tag `dsh-v0.2.0-rc.2` = 本仓当前 vendor pin；前代 `_agent_ready_development`（更名前）钉
 > `dsh-v0.1.7-rc.1`。0.1.7 逐页表已删，历史在 git。
 > 读法 = 主会话亲读 15 篇内容页（native README/00/01/02；sdlc README/00/01/04/06；repo README/00/01/02/05/07）

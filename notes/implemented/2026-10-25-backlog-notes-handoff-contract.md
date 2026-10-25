@@ -59,6 +59,6 @@
 
 ## 适配与来源
 
-- 借源 = `/Users/bowhead/ai_dsh_assitant/_backlog`（2026-10-09，机器本地，按惯例不链接）；本地适配 = D32（`proposed/` 已批语义）+ 本 Note。
+- 借源 = 外部仓 ai_dsh_assitant 的 `_backlog`（2026-10-09，机器本地，按惯例不链接）；本地适配 = D32（`proposed/` 已批语义）+ 本 Note。
 - 方法名保留 `issue-to-note`（文件名/链接稳定），H1 改为 `Request downstream handling (RFC / Note)`。
 - D47 = 本 Note（`docs/decisions.md` 的 D46 已由同日另一决定占用）；决定正文住这里，程序住方法，权限/关闭住章程，Note/RFC 判据住 notes/README。

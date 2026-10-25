@@ -4,7 +4,7 @@
 # 范围（诚实声明）：本 job **不**构建 vendor 全量/native、不跑 pnpm test——这些在 7GB runner 上
 # 目前有已知缺口（vendor lock 双锁、全 host OOM、client aggregate 测试类型、musl-gcc），
 # 记录见 notes/implemented/2026-10-25-repo-hygiene-contract.md「已知缺口」节；不在这里假绿。
-# 手动 + 每周一 03:00 UTC。
+# 手动 + 每周一 03:00 UTC；Ubuntu + macOS 双跑（跨环境合同 = docs/repo-hygiene.md）。
 name: fresh-clone
 on:
   workflow_dispatch:
@@ -17,7 +17,11 @@ concurrency:
   cancel-in-progress: true
 jobs:
   install-verify:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4

@@ -58,6 +58,7 @@ import * as guardRedRecord from './gates/guard-red-record.mjs'
 import * as securityScan from './gates/security-scan.mjs'
 import * as trackedToken from './gates/tracked-token.mjs'
 import * as trackedSecrets from './gates/tracked-secrets.mjs'
+import * as trackedPortability from './gates/tracked-portability.mjs'
 import * as scriptIndex from './gates/script-index.mjs'
 import * as replayFixtureFreshness from './gates/replay-fixture-freshness.mjs'
 import * as replayUiFreshness from './gates/replay-ui-freshness.mjs'
@@ -109,6 +110,7 @@ guardRedRecord.run(ctx)
 securityScan.run(ctx)
 trackedToken.run(ctx)
 trackedSecrets.run(ctx)
+trackedPortability.run(ctx)
 scriptIndex.run(ctx)
 replayFixtureFreshness.run(ctx)
 replayUiFreshness.run(ctx)

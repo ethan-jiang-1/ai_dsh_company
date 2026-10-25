@@ -78,7 +78,7 @@ node run-gates.mjs --target <目录> [选项]          # 等价；env 与 --targ
 
 | 组 | 命令 | 期望 | 读法 |
 |---|---|---|---|
-| **R0 真盘面·上线参数组** | `node run-gates.mjs --target /Users/bowhead/ai_dsh_company/company-workspace --live-creds --sources-policy=report --fixture-policy=report` | **2** | a1 = 真机凭据面 **5 命中**；a2 = **0 blocking / 14 advisory**（取证面 7 + 夹具面 7）；b1/b2/b3 无输入面 ⇒ 3 |
+| **R0 真盘面·上线参数组** | `node run-gates.mjs --target "$PWD/company-workspace" --live-creds --sources-policy=report --fixture-policy=report` | **2** | a1 = 真机凭据面 **5 命中**；a2 = **0 blocking / 14 advisory**（取证面 7 + 夹具面 7）；b1/b2/b3 无输入面 ⇒ 3 |
 | **R0-b 真盘面·默认参数组** | 同上，去掉两个策略开关 | **2** | a2 变 **7 blocking**（全部落在自家 `gates/fixtures/**`）——**这就是"不指定参数组"的后果** |
 | **R1 阴性对照（有面干净）** | `./run-gates.sh --target fixtures/clean` | **0** | 五个闸门都有输入面、全部 PASS |
 | **R2 阳性对照（真违规）** | `for t in a1-cred-reachable a2-key-in-tracked-path a2-high-entropy-secret b1-unregistered-untrusted b2-dangerous-commands b3-taint-trace; do node run-gates.mjs --target fixtures/violations/$t; done` | 每条 **2** | 6 个真违规面逐个非 0 |

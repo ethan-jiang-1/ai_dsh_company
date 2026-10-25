@@ -48,4 +48,4 @@
 
 ## 适配与来源
 
-借源 = `/Users/bowhead/ai_dsh_loop_advisor/_backlog/issues/2026-10-12-backlog-process-made-explicit.md`（机器本地路径，刻意不链接）及其引用的生命周期研究（平台三台状态机读自同钉 vendor + 22 张归档卡观察；本仓归档证据另行核对：28 已结/12 已修/0 叫停待修，四结论全发生过）。前序制度落地 = [backlog-issue-lifecycle](./2026-10-09-backlog-issue-lifecycle.md)（部分取代关系：该文仍是 2026-10-09 借入决定的 rationale owner，本文扩展其制度，不重写其决定）。
+借源 = 外部仓 ai_dsh_loop_advisor 的同名卡（机器本地路径，刻意不链接）及其引用的生命周期研究（平台三台状态机读自同钉 vendor + 22 张归档卡观察；本仓归档证据另行核对：28 已结/12 已修/0 叫停待修，四结论全发生过）。前序制度落地 = [backlog-issue-lifecycle](./2026-10-09-backlog-issue-lifecycle.md)（部分取代关系：该文仍是 2026-10-09 借入决定的 rationale owner，本文扩展其制度，不重写其决定）。

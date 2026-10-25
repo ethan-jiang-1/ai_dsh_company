@@ -12,9 +12,9 @@
     "divergence": "**三处已登记差异**（其余件与 v2 原件逐字节相同）：① `README.md` 含 v3 挂载增补（横幅 + §8，2026-10-15）——文档而非判据件；② `README.md` 又含 2026-10-17 面分类规则更新（旧口径「锚在闸门自身安装目录」已过时，留着就是下一轮的误读源）——仍是文档；③ `g-a2-secret-scan.mjs` 含 2026-10-17 面分类修复——**本副本唯一落在判据件上的有意差异**。逐字登记见下 `divergence_detail`",
     "divergence_detail": {
       "README.md": {
-        "kind": "文档（两处变更）",
+        "kind": "文档（三处变更）",
         "v2_frozen_original_sha": "170c2047c1e05a4083c54d8630a7ae673a4b8e5a",
-        "sha_chain": "v2 原件 170c2047… →（2026-10-15 v3 挂载增补）→ 52f6a5a7… →（2026-10-17 面分类更新）→ 5e5614ae…（= 现部署副本）",
+        "sha_chain": "v2 原件 170c2047… →（2026-10-15 v3 挂载增补）→ 52f6a5a7… →（2026-10-17 面分类更新）→ 5e5614ae… →（2026-10-25 跨环境示例去本机化）→ b5bb6760…（= 现部署副本）",
         "changes": [
           {
             "at": "2026-10-15",
@@ -29,6 +29,15 @@
             "why": "旧口径在代码改了之后即为**过时事实**——留着就是下一轮的误读源（同族：文档写的判据 ≠ 代码里的判据）",
             "not_changed": "只动 §「面分类规则」那一段；其余段落（含 R0/R4/R5 复跑剧本的读数）一字未改",
             "deployed_sha": "5e5614aefaf337c6a11f5fb1a225bc35a1d165a9",
+            "risk": "无（文档；不参与判据）"
+          },
+          {
+            "at": "2026-10-25",
+            "by": "维护者（repo-hygiene 跨环境合同）",
+            "what": "R0 复跑示例命令的 `--target` 从维护者本机绝对路径改为 `\"$PWD/company-workspace\"`",
+            "why": "仓库转开源/多环境：活动面不写绝对 home 路径（tracked-portability 门禁）",
+            "not_changed": "只动示例命令；判据文本、阈值、闸门代码未动",
+            "deployed_sha": "b5bb67608b561e789a1cfe67cf93a0c86b0f95a0",
             "risk": "无（文档；不参与判据）"
           }
         ]
@@ -51,7 +60,7 @@
   },
   "sha_algorithm": "git hash-object (blob sha1)",
   "files": {
-    "README.md": "5e5614aefaf337c6a11f5fb1a225bc35a1d165a9",
+    "README.md": "b5bb67608b561e789a1cfe67cf93a0c86b0f95a0",
     "fixtures/boundary/a2-sources-only/drafts/sources/example-fetched-page.txt": "875e52d68d2f8ee87c63fa1ece8fa150d4352046",
     "fixtures/clean/artifacts/benign-skill/LICENSE": "c89469f83fce609f2a1510a38fb77e4878204a66",
     "fixtures/clean/artifacts/benign-skill/SKILL.md": "4e023342dc1d36a030e77368b641c331c7173f23",

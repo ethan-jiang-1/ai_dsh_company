@@ -12,9 +12,10 @@ import { join } from 'node:path'
 export function run({ root, ok, fail }) {
 const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 84],             // 2026-09-23 二次收口；2026-09-27 瘦身轮 108→100、棘轮 115→105；2026-10-06 条目 D 纯路由化（删复述与括号链，纪律指针化；当时 95→72），棘轮 105→84
-  ['docs/index.md', 70],         // 2026-10-20 台账/外部材料迁出：131→70（内容 60；只留地图 + 路由指针）
+  ['docs/index.md', 72],         // 2026-10-20 台账/外部材料迁出：131→70（内容 60；只留地图 + 路由指针）
   ['docs/decisions.md', 60],     // 2026-10-20 自 index 迁出：D 路由表独立页（内容 55）
   ['docs/external-research.md', 30], // 2026-10-20 自 index 迁出（外部材料登记；只登记吸收落点，不承载合同事实）
+  ['docs/repo-hygiene.md', 80], // 2026-10-25 立：git 边界与跨环境合同（新增门禁 tracked-portability 的解释面）
   ['docs/orient.md', 80],        // 2026-10-06 立（RFC driver-surface-package 条目 C：驾驭者白话五问单页，只导航不复述事实；反证 = 初稿超限红）
   ['docs/terminology.md', 22],   // 2026-10-12 立：术语映射查表自 index 迁出（登记型查表，随 pin 升级演进；行数稳定，头寸宽于 5% 起步）
   ['docs/guides/web-rpc.md', 47], // 2026-10-12 立：驱动 Web 面会话的 RPC runbook 自 dev-loop §8 迁出（常驻层瘦身轮；操作表行绑定，头寸起步 ≥5%）

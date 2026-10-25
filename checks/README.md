@@ -29,6 +29,7 @@
 | [security-scan.mjs](gates/security-scan.mjs) | AI 写码安全闸门挂载门：自测判别力 + 真扫公司盘 + 挂载件指纹（5 道闸 = 凭据可达性 / 密钥入面 / 不可信件引入前 / 命令执行前 / 动作迹） |
 | [tracked-token.mjs](gates/tracked-token.mjs) | 跨仓 tracked 文件的 token URL 窄扫（BUG-029；值不打印，vendor/ 只读除外） |
 | [tracked-secrets.mjs](gates/tracked-secrets.mjs) | 跨仓 tracked 文本的硬编码凭据赋值扫描（`const TOKEN = '...'` 等；值不打印；补 tracked-token 的形状缺口） |
+| [tracked-portability.mjs](gates/tracked-portability.mjs) | 跨环境守卫：活动面绝对 home 路径、CRLF、大小写冲突、macOS 专属命令（规则 = docs/repo-hygiene.md §四） |
 | [no-tracked-ignored.mjs](gates/no-tracked-ignored.mjs) | 索引级反例：tracked 文件不得命中 ignore 规则（`git add -f` 绕过的点名校验；`git ls-files -ci` 为空） |
 | [tracked-file-size.mjs](gates/tracked-file-size.mjs) | tracked 文件 2MB 上限（防截图/数据库/tgz 被当成资产提交） |
 | [gitignore-shape.mjs](gates/gitignore-shape.mjs) | `.gitignore` 形状 + 真实匹配：runtime/* 默认拒绝、5 件白名单、新残留目录（ops）默认 ignored（`git check-ignore`） |

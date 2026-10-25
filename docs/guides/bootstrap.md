@@ -56,7 +56,7 @@ node checks/smoke/handbook-smoke.mjs        # agent-instructions 注入完成定
 node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
 ```
 
-> **fresh clone 的可执行证明（范围诚实）**：CI `fresh-clone` workflow 在干净 runner 上跑
+> **fresh clone 的可执行证明（范围诚实）**：CI `fresh-clone` workflow 在干净 Ubuntu + macOS runner 上跑
 > `pnpm install` → `pnpm bundle:init` → `pnpm verify`（手动 + 每周一 03:00 UTC）——证明产品树
 > 能装、能建 dev workspace、能过全部门禁。**它不跑**下面这条 host/native/pack/test 构建链：
 > 该链在 7GB runner 上仍有已知缺口（vendor 双 lock、全 host 构建 OOM、client aggregate 测试类型、

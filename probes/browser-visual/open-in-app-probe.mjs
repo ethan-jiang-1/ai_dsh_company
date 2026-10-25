@@ -30,9 +30,10 @@ const [url, title, suffix, treeDir] = cli
 assert(url && title && suffix, '需要观察窗 URL、会话标题、目标文件后缀')
 assert(!useTree || treeDir !== undefined, '--tree 需要第 4 个参数：交付物目录名（如 2026-10-10-ai-sprint-2026）')
 /** 期望 Host 打开的绝对路径：树模式按目录名拼；默认模式 = 会话里 present 的那份（v4）。 */
+const deliverablesRoot = join(repositoryRoot, 'company-workspace', 'deliverables')
 const openedPathOf = (name, dir) => dir === undefined
-  ? '/Users/bowhead/ai_dsh_company/company-workspace/deliverables/2026-10-10-ai-transformation-2026-v4/' + name
-  : '/Users/bowhead/ai_dsh_company/company-workspace/deliverables/' + dir + '/' + name
+  ? join(deliverablesRoot, '2026-10-10-ai-transformation-2026-v4', name)
+  : join(deliverablesRoot, dir, name)
 const outDir = join(repositoryRoot, 'runtime', 'human-exits-evidence')
 const browser = await launchChromium(await loadChromium(process.cwd()))
 try {

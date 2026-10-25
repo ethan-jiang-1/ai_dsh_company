@@ -131,6 +131,18 @@ CI 先按「全配方」跑，连续红，逐条暴露（都不是本仓 tracked
   CI 不用 `continue-on-error` 或降级断言来假绿。
 - 重跑记录：run 40159113068 **绿**（2026-10-25，install → `bundle:init` → `pnpm verify`；干净 Ubuntu runner）。
 
+## 跨环境合同（2026-10-25）
+
+- **新增合同** = [docs/repo-hygiene.md](../../docs/repo-hygiene.md)：两棵树、什么进 git、跨环境规则、例外、执行面。
+- **新增基线** = `.gitattributes`：`* text=auto eol=lf` + 二进制后缀；CI 双跑 Ubuntu/macOS。
+- **新增门禁** = `tracked-portability`：活动面绝对 home 路径、CRLF、大小写冲突、macOS 专属命令。
+  例外 = `notes/archived/`、`_backlog/_archive/`、`snapshots/`、合成 fixture；活动面已去本机化
+  （AGENTS、external-research、notes/README、probes/open-in-app、security-gates README 等）。
+- **红/绿**：staged `docs/zz-portability.md` 写一个本机绝对 home 路径 → `FAIL tracked-portability:
+  docs/zz-portability.md:1 绝对 home 路径…`；删除 → 绿。删 `.gitattributes` →
+  `FAIL tracked-portability: .gitattributes 缺失…`；还原 → 绿。
+- **影响**：新活动文档/脚本若带本机绝对路径或 macOS 专属命令，`pnpm verify` 直接红；历史归档保留原样。
+
 ## 指针
 
 - 边界 = [.gitignore](../../.gitignore)；逐件 owner / 白名单 = [runtime/README.md](../../runtime/README.md)；
