@@ -1,0 +1,33 @@
+# fresh-clone：干净 checkout 上的**仓库级**验收（安装 + bundle:init + 结构门禁）。
+# 为什么独立于 ci.yml：ci.yml 不建 dev run bundle 的 workspace；本 job 证明 fresh clone 能
+# 装依赖、建 company-workspace、跑全部 verify 门禁。
+# 范围（诚实声明）：本 job **不**构建 vendor 全量/native、不跑 pnpm test——这些在 7GB runner 上
+# 目前有已知缺口（vendor lock 双锁、全 host OOM、client aggregate 测试类型、musl-gcc），
+# 记录见 notes/implemented/2026-10-25-repo-hygiene-contract.md「已知缺口」节；不在这里假绿。
+# 手动 + 每周一 03:00 UTC。
+name: fresh-clone
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'
+permissions:
+  contents: read
+concurrency:
+  group: fresh-clone-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  install-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - run: corepack enable pnpm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm bundle:init
+      - run: pnpm verify

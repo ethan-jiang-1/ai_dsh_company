@@ -2,6 +2,10 @@
 
 状态：implemented（2026-10-20；BUG-029 修复；用户授权全部修复；`pnpm verify` + `pnpm test` 全绿）
 
+> 2026-10-25 后续：[repo-hygiene-contract](2026-10-25-repo-hygiene-contract.md) **部分取代**本 Note 的
+> 「不做历史重写」裁定（用户令「不惜代价做对」；实际有两处 token 路径）。本 Note 的 URL 窄扫、
+> tracked-token 门禁与「值不打印」仍然有效。
+
 > 现场、复现与已修判定 = [BUG-029 卡（已归档）](../../_backlog/_archive/fixed_bugs/BUG-029-committed-web-token-recurrence.md)。
 > 上一同类 = [BUG-013](../../_backlog/_archive/fixed_bugs/BUG-013-e2e-driver-token-committed.md)（2026-10-12，路径级修复）。
 

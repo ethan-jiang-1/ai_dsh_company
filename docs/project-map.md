@@ -26,7 +26,7 @@
 | 自写运行包 | [company-pack](../packages/company-pack/) | 五个角色 preset、bundle 行、host 注册与 client 面；发布形状由 [包声明](../packages/company-pack/package.json) 决定 |
 | dev run bundle 的 workspace | `company-workspace/`（**gitignored**；fresh clone 用 `pnpm bundle:init`） | 公司角色会话 cwd；本部署的扩张数据（owners、台账、journal、交付物、培养记录）只住这里，不进 git。制度件的家 = [pack workspace](../packages/company-pack/workspace/)（出厂骨架、随包分发）；dev 盘里用符号链接指回。bundle 身份 = `<DSH_HOME>/bundle.json`（见 [运行态地图 §二·五](runtime-map.md)） |
 | 启动配置 | [run](../run/)、[env.sh](../run/env.sh) | tracked 启动配置；源码验证使用开发 DSH_HOME |
-| 运行残留 | [runtime](../runtime/)、[runtime/README](../runtime/README.md) | 开发 DSH_HOME、第二 home、浏览器工具态与排练盘（mostly gitignored，少数 tracked 逐件见 runtime/README；排练盘成型见 [rehearsal 实现](../tools/lib/rehearsal.mjs)） |
+| 运行残留 | [runtime](../runtime/)、[runtime/README](../runtime/README.md) | 开发 DSH_HOME、第二 home、浏览器工具态与排练盘（默认整树忽略 + 显式白名单，逐件见 runtime/README；排练盘成型见 [rehearsal 实现](../tools/lib/rehearsal.mjs)） |
 | 上游机制 | [vendor/dsh](../vendor/dsh/) | 钉住的只读 submodule；开发 `pnpm dsh` 的源码基线 |
 | keyless 回归 | [tests](../tests/)、[Vitest 配置](../vitest.config.ts) | 模块逻辑、静态渲染、隔离文件夹具；分层守卫见 [layering.spec.ts](../tests/harness/layering.spec.ts) |
 | 维护工具 | [检查与工具索引](../checks/README.md) | 门禁、真实入口、窄探针、审计、回放与导出；共享实现位于 [tools/lib](../tools/lib/) |

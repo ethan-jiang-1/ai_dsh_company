@@ -22,7 +22,7 @@ probes/                 调试面：窄机制与视觉探针，按机制域四�
 tools/                  工具面：维护工具；lib/ 纯逻辑、drivers/ 真实驱动、archive/ 已耗仪器
 _dist/                  导出目的地：tarball（gitignored）+ 生成式《安装手册》（唯一 tracked 例外）；owner = docs/release.md
 run/                    运行面（tracked 启动配置）：env.sh（双 home+裸 dsh 拦截）+ README + company/entry-probe 两 overlay
-runtime/                运行残留家（mostly gitignored，少数 tracked：两份 README + cold-storage r6 基线 + probe-*.mjs；web-logs 为 ignored 启动日志，含 token 绝不入库）：harness-home（开发 DSH_HOME）、第二 home、pw-browsers、排练盘；owner = runtime/README.md
+runtime/                运行残留家（默认整树 gitignored + 极少数 tracked 白名单；白名单唯一家 = runtime/README.md，本节不复述）：harness-home（开发 DSH_HOME）、第二 home、pw-browsers、排练盘、web-logs（含 token 绝不入库）
 snapshots/              回归证据资产；规则与分类 = snapshots/README.md
 ```
 

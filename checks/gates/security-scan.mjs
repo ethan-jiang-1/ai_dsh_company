@@ -26,9 +26,11 @@ import { join, relative } from 'node:path'
 //
 // 判据是**逐道**的、写死在下方 DECISIONS；**不读聚合总码**——v2 实证：默认参数下总码 2 来自
 // 自家样本假红，真正暴露的那道是 3 被吃掉（两个完全不同的世界给出同一个总码）。
-// 范围声明：本门禁只真扫 `company-workspace/` 的五道闸。跨仓 tracked 文件的 token URL 窄扫
-// 归 `checks/gates/tracked-token.mjs`（BUG-029 立；值不打印，vendor/ 只读除外）——两边合起来
-// 才覆盖「公司盘 + 仓库面」，不要把本门禁的 all-pass 读成「整仓无 token」。
+// 范围声明：本门禁只真扫 `packages/company-pack/workspace/` 的五道闸（live 公司盘只住 bundle，
+// 不进产品门禁）。跨仓 tracked 文本的 token URL 窄扫归 `checks/gates/tracked-token.mjs`
+// （BUG-029 立；值不打印，vendor/ 只读除外），硬编码凭据赋值窄扫归 `checks/gates/tracked-secrets.mjs`
+// （2026-10-25 立）——三者合起来才覆盖「出厂骨架 + 仓库面」，不要把本门禁的 all-pass 读成
+// 「整仓无凭据」。
 const GATES_REL = 'checks/lib/ci-security-gates'
 const POLICIES = ['--sources-policy=report', '--fixture-policy=report']
 const THRESHOLDS = ['--entropy=3.5', '--minlen=16']

@@ -2,11 +2,12 @@
 
 > 2026-10-06 条目 A拆分（RFC driver-surface-package）：跑过留下的状态全部住这里，「怎么启动」的
 > tracked 配置住 [run/](../run/README.md)。本文件是 runtime/ 树逐件的分类 owner。
-> ⚠ **本树绝大部分 gitignored（含 harness-home 内容、pw-browsers、排练盘），但不是整树**：按 `.gitignore`
-> 逐条规则，`runtime/README.md`、`harness-home/README.md`、`cold-storage/snapshots/replay/r6-baseline/`
-> 与 `probe-*.mjs` 是 **tracked**（fresh clone 后那几件在场）。`web-logs/` 是 **ignored** 的观察窗启动日志
-> （横幅含 token，绝不入库；BUG-029）。fresh clone 后其余为空属正常，运行态按需再生；不是公司业务事实，
-> 也不是证据快照（四条状态轴的家 = [运行态地图](../docs/runtime-map.md)）。
+> ⚠ **默认整树忽略**（`.gitignore` 的 `runtime/*`，2026-10-25 起）：`runtime/README.md`、
+> `harness-home/README.md`、`probe-*.mjs` 是**唯一 tracked 白名单**（fresh clone 后那几件在场；共 5 件）；
+> 其余目录/文件默认 ignored。`web-logs/` 是 **ignored** 的观察窗启动日志（横幅含 token，绝不入库；BUG-029）。
+> 新增 runtime 子目录默认就忽略；只有必须跟 fresh clone 走的文件才加 `!`，并在本表登记 owner。
+> fresh clone 后其余为空属正常，运行态按需再生；不是公司业务事实，也不是证据快照
+> （四条状态轴的家 = [运行态地图](../docs/runtime-map.md)）。
 
 ## 一、逐件（按权威性与生命周期标记）
 
@@ -19,7 +20,7 @@
 | `pw-browsers/` | 浏览器二进制与 profile（`PLAYWRIGHT_BROWSERS_PATH` 重定向落点）；**UI 布局记忆按 origin 隔离**存在浏览器 profile——换端口重启即新 origin、记忆清零 | runtime |
 | `rehearsal-workspace/` | **排练盘**：排练/探针 cwd——**绝不写 live 公司盘**（`company-workspace/`） | runtime·排练 |
 | `human-exits-evidence/` | 行为探针（[human-exits 非阻塞支](../probes/session-context/human-exits-nonblocking-probe.mjs)）落盘的会话事件 JSON，供人工复核判定；gitignored，可从会话日志再生 | runtime·探针证据 |
-| `cold-storage/` | **外置冷存**（2026-10-07，RFC r7-motion-final 预算处置）：snapshots 超线时按 [snapshots/README](../snapshots/README.md) 政策外置的大件。现持 r6-baseline 的四个归一化 child fixtures（`cold-storage/snapshots/replay/r6-baseline/replay/`，≈15M；仓内 raw.tar.zst 可解包+`--prepare` 恢复，r6 不声明可运行 replay 故无 replay 消费面断裂）；**本目录是仓内证据的本地副本、不进 git 备份**——remote 备份连续性由仓内 raw.tar.zst 承担 | runtime·冷存 |
+| `ops/` | 窗口启动/人工检查截图等一次性产物（2026-10-23 起）；ignored，7 天清扫；被 tracked markdown 引用时保留 | runtime·本机证据 |
 
 ## 二、层级事实（四条，钉死）
 
@@ -59,3 +60,4 @@
   （`md-links` 门禁当场红）——引用是删之前唯一的硬判据。
 - **会话日志也在射程内**（>7 天 + 无引用）：按 session id 引证的历史证据若需要长期保留，
   应把结论搬进 Note/卡，或把关键日志复制进 `snapshots/`（冻结副本），而不是赌本机日志一直在。
+- **历史**：cold-storage 已随真实证据移出产品仓（2026-10-24/25）；本机若有副本，属 bundle/私有归档，不 track。

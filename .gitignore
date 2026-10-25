@@ -1,41 +1,44 @@
+# ── 依赖与构建产物 ─────────────────────────────────────────────
 node_modules/
-*.tsbuildinfo
-dist/
-.DS_Store
-# 自写包的构建产物（源码面/产物面不混，同 DSH 的 lib/ 约定；构建见 docs/guides/bootstrap.md）
-packages/company-pack/lib/
-# pnpm 运行残留（store 落仓库内：沙箱拒默认位置时的回退；调试日志）
 .pnpm-store/
 .pnpm-debug.log
-# 运行残留家（2026-10-06 条目 A 从 dev/ 拆出；2026-10-07 S1 起 tracked 启动配置住 run/；逐件 owner = runtime/README）
+*.tsbuildinfo
+dist/
+# 自写包的构建产物（源码面/产物面不混，同 DSH 的 lib/ 约定；构建见 docs/guides/bootstrap.md）
+packages/company-pack/lib/
+
+# ── 运行残留家：默认整树拒绝，tracked 白名单显式列出 ─────────────
+# 2026-10-25 起从「逐条点名」改为「默认拒绝 + 白名单」（runtime/ops 漏口 + BUG-013/029 的类级教训）。
+# 新增 runtime 子目录默认就忽略；只有必须跟 fresh clone 走的文件才加 `!`，并在 runtime/README 登记 owner。
+# 目录级 negation 必须先把目录本身放出来，再放行文件（见 harness-home 两行）。
+runtime/*
+!runtime/README.md
+!runtime/probe-*.mjs
+!runtime/harness-home/
 runtime/harness-home/*
 !runtime/harness-home/README.md
-# 根层临时工件（refactor-drift-oracle 的拆前/拆后清单等工具 IO；tracked 白名单只有 README + probe-*.mjs，见 runtime/README）
-runtime/*.json
-runtime/*.hashes
-# 排练场（轮间待办②「练习场 ≠ 运行场」）：排练/探针会话的 cwd；产物不进 git，也不进真盘
-runtime/rehearsal-workspace/
-# 浏览器探针的工具态（§11：工具态先落 gitignored 区）：playwright 浏览器下载 ~300M，绝不入库
-runtime/pw-browsers/
-runtime/harness-home-b/
-# 行为探针的会话事件落盘（human-exits 非阻塞支等；证据可从会话日志再生，不入库）
-runtime/human-exits-evidence/
-# e2e 临时驱动的工具态（§11；BUG-013：观察窗 token 不入库，driver 留本地）
-runtime/e2e/
-# 观察窗启动日志（BUG-029 复发：启动横幅含 token；日志是运行残留，绝不入库）
-runtime/web-logs/
-# 手动分发导出（精神借 ai_dsh_architect）：_dist/ 是导出目的地不是源——tgz 忽略，
-# 手册是唯一 tracked 例外（版本由 verify 的 dist-manual 门禁对 pack package.json 核对）
+
+# ── dev run bundle 的 workspace ───────────────────────────────
+# 2026-10-24 RFC run-bundle-install-unit：company-workspace/ 是 dev bundle 的 workspace——整树不进 git
+# （成品/台账/journal/交付物/过程物料都只住 bundle）；制度件仍由 packages/company-pack/workspace/ 单源提供
+# （`pnpm bundle:init` 建符号链接）。反例防线 = checks/gates/run-bundle-clean.mjs（`git add -f` 也能抓）。
+company-workspace/
+
+# ── 导出目的地 ────────────────────────────────────────────────
+# _dist/ 是导出目的地不是源——tgz 忽略，手册是唯一 tracked 例外（版本由 verify 的 dist-manual 门禁对
+# pack package.json 核对）
 _dist/*
 !_dist/安装手册.md
-# 外部工具的任务态（.pi/tasks/，写入者在本仓之外）：此前只靠机器级全局 gitignore 隐身，
-# fresh clone 到别的机器会露出 untracked——本仓内声明掉
+
+# ── 外部工具的任务态 ──────────────────────────────────────────
+# .pi/tasks/，写入者在本仓之外；此前只靠机器级全局 gitignore 隐身，fresh clone 到别的机器会露出 untracked
 .pi/
 
-# 本部署的 run bundle（2026-10-24 RFC run-bundle-install-unit）：`company-workspace/` 是 dev bundle 的
-# workspace——整树不进 git（成品/台账/journal/交付物/过程物料都只住 bundle）；制度件仍由
-# packages/company-pack/workspace/ 单源提供（`pnpm bundle:init` 建符号链接）。
-# 反例防线 = checks/gates/run-bundle-clean.mjs（`git add -f` 也能抓）。
-company-workspace/
-# 迁移/备份导出（git 外的本地副本；绝不入库）
-runtime/backups/
+# ── OS/编辑器残渣 ─────────────────────────────────────────────
+.DS_Store
+*~
+*.swp
+*.bak
+*.orig
+*.rej
+.claude/settings.local.json

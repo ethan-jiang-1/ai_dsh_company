@@ -23,6 +23,9 @@ import * as mdLinks from './gates/md-links.mjs'
 import * as docBudget from './gates/doc-budget.mjs'
 import * as handbookBudget from './gates/handbook-budget.mjs'
 import * as runBundleClean from './gates/run-bundle-clean.mjs'
+import * as noTrackedIgnored from './gates/no-tracked-ignored.mjs'
+import * as trackedFileSize from './gates/tracked-file-size.mjs'
+import * as gitignoreShape from './gates/gitignore-shape.mjs'
 import * as companySkeleton from './gates/company-skeleton.mjs'
 import * as baseClean from './gates/base-clean.mjs'
 import * as ledgerRouting from './gates/ledger-routing.mjs'
@@ -54,6 +57,7 @@ import * as snapshotIndex from './gates/snapshot-index.mjs'
 import * as guardRedRecord from './gates/guard-red-record.mjs'
 import * as securityScan from './gates/security-scan.mjs'
 import * as trackedToken from './gates/tracked-token.mjs'
+import * as trackedSecrets from './gates/tracked-secrets.mjs'
 import * as scriptIndex from './gates/script-index.mjs'
 import * as replayFixtureFreshness from './gates/replay-fixture-freshness.mjs'
 import * as replayUiFreshness from './gates/replay-ui-freshness.mjs'
@@ -70,6 +74,9 @@ mdLinks.run(ctx)
 docBudget.run(ctx)
 handbookBudget.run(ctx)
 runBundleClean.run(ctx)
+noTrackedIgnored.run(ctx)
+trackedFileSize.run(ctx)
+gitignoreShape.run(ctx)
 companySkeleton.run(ctx)
 baseClean.run(ctx)
 ledgerRouting.run(ctx)
@@ -101,6 +108,7 @@ snapshotIndex.run(ctx)
 guardRedRecord.run(ctx)
 securityScan.run(ctx)
 trackedToken.run(ctx)
+trackedSecrets.run(ctx)
 scriptIndex.run(ctx)
 replayFixtureFreshness.run(ctx)
 replayUiFreshness.run(ctx)

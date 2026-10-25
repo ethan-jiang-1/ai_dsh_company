@@ -110,7 +110,7 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
   **`agentPreset`**——官方 provider 就能让 child 按另一个 preset 组合，M2 的"自己写 provider"
   那条路在本仓**已不需要**：五个角色 preset 各自可选，CEO 的三行委派工具直接钉 `agentPreset`
   （现在时见 [delegation.md §1](../delegation.md)）。本节保留为 seam 来路的记录。
-- 实现提示：自定义 provider 不要从零拼创建窗口——复用 `packages/subagent/subagent-in-process-driver`
+- 实现提示：自定义 provider 不要从零拼创建窗口——复用 `packages/subagent/subagent`
   的组合路径（`applyChildComposition` / `appendDelegatedPolicyOverrides` / descriptor 追加），
   只把其中的 `composeFrom` 换成 `mount(childCtx, '<role-preset>')`，深度记账与权限收窄语义保持一致。
 

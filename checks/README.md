@@ -9,7 +9,7 @@
 | 检查结构、引用与簿记 | `pnpm verify` → [run-gates](run-gates.mjs) |
 | 看运行态全景 / 场景 run bundle / 会话历史口径 | `pnpm orient`（默认全景含「待核工作候选」扫描节，R3′ 口径，`--workspace <dir>` 换扫描根；`--scenario <kind>/<场景>` run trace；`--session <slug>[/<id前缀>]` 历史会话 preset）→ [orient](../tools/orient.mjs)（keyless 只读；含日用 home 警告） |
 | 看最近会话的失败摘要 | `pnpm diagnose [--session <slug>[/<id前缀>]] [--home <路径>]`（只读；失败 turn / 工具错误 / 审批 / 待答问询 / present / 最后正文；`--home` = 显式读日用 home 等非 dev home）→ [diagnose](../tools/diagnose.mjs) |
-| 检查 AI 写码产出的密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs)（公司盘五道闸真扫；件 = [ci-security-gates](lib/ci-security-gates/)，判据逐道不看总码）+ [tracked-token](gates/tracked-token.mjs)（跨仓 tracked 文件的 token URL 窄扫；值不打印） |
+| 检查 AI 写码产出的密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs)（公司盘五道闸真扫；件 = [ci-security-gates](lib/ci-security-gates/)，判据逐道不看总码）+ [tracked-token](gates/tracked-token.mjs)（跨仓 tracked 文件的 token URL 窄扫；值不打印）+ [tracked-secrets](gates/tracked-secrets.mjs)（硬编码凭据赋值形状，补 `const TOKEN = '...'` 缺口） |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；[分层守卫](../tests/harness/layering.spec.ts) |
 | 确认角色真的挂载 | [preset-smoke](smoke/preset-smoke.mjs) |
 | 确认 client 真的装配 | [client-load-smoke](smoke/client-load-smoke.mjs) |
@@ -28,6 +28,10 @@
 |---|---|
 | [security-scan.mjs](gates/security-scan.mjs) | AI 写码安全闸门挂载门：自测判别力 + 真扫公司盘 + 挂载件指纹（5 道闸 = 凭据可达性 / 密钥入面 / 不可信件引入前 / 命令执行前 / 动作迹） |
 | [tracked-token.mjs](gates/tracked-token.mjs) | 跨仓 tracked 文件的 token URL 窄扫（BUG-029；值不打印，vendor/ 只读除外） |
+| [tracked-secrets.mjs](gates/tracked-secrets.mjs) | 跨仓 tracked 文本的硬编码凭据赋值扫描（`const TOKEN = '...'` 等；值不打印；补 tracked-token 的形状缺口） |
+| [no-tracked-ignored.mjs](gates/no-tracked-ignored.mjs) | 索引级反例：tracked 文件不得命中 ignore 规则（`git add -f` 绕过的点名校验；`git ls-files -ci` 为空） |
+| [tracked-file-size.mjs](gates/tracked-file-size.mjs) | tracked 文件 2MB 上限（防截图/数据库/tgz 被当成资产提交） |
+| [gitignore-shape.mjs](gates/gitignore-shape.mjs) | `.gitignore` 形状 + 真实匹配：runtime/* 默认拒绝、5 件白名单、新残留目录（ops）默认 ignored（`git check-ignore`） |
 | [run-gates.mjs](run-gates.mjs) | 结构门禁装配 runner：按原顺序跑 gates/ 各门禁（仓库结构、文档引用、vendor 簿记与脚本约束；清单唯一源 = gates/ 目录） |
 | [preset-smoke.mjs](smoke/preset-smoke.mjs) | 通过真实会话创建验证各角色 preset 挂载 |
 | [client-load-smoke.mjs](smoke/client-load-smoke.mjs) | 加载真实 Web 页面，验证 client 挂载、品牌与零装配错误 |

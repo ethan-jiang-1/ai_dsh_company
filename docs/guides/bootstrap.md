@@ -8,9 +8,10 @@
 ```sh
 git submodule update --init             # vendor/dsh 钉 tag
 corepack enable pnpm                    # 一次性：pnpm 读根 packageManager（钉 11.7.0）
-pnpm install                            # 全 workspace（vendor/dsh 全树含 vendored cordis 与 native/system）
+pnpm install                            # 根 workspace（vendor/dsh 全树含 vendored cordis 与 native/system）
+(cd vendor/dsh && pnpm install --frozen-lockfile --ignore-scripts)  # vendor 自己的 lock：pi-ai 1.1.0 / vite 8.2.2 等；根 lock 会解析到更新版 → 类型漂移
 pnpm bundle:init                        # dev run bundle 的 workspace（company-workspace/ 整树 gitignored；制度件符号链接指回 pack）
-# host 面构建（typert 类型图产物，源码直跑需要；tsc 局部 + tsdown host 面）：
+# host 面最小 dev type graph（fresh-clone CI 跑这档；源码直跑需要的 typert 产物）：
 node ./node_modules/typescript/bin/tsc -b \
   vendor/dsh/packages/typert/generator \
   vendor/dsh/packages/llm/llm \
@@ -18,8 +19,10 @@ node ./node_modules/typescript/bin/tsc -b \
   vendor/dsh/packages/feedback/command-feedback \
   vendor/dsh/packages/goal/goal \
   vendor/dsh/packages/subagent/subagent
-(cd vendor/dsh && ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE host)
-# 原生插件（flock，会话持久化刚需；macOS 用 CommandLineTools 的 cc）：
+# 全量打包（发布/本机；需要 vendor lock + 大内存；7GB GitHub runner 会 OOM，故不进 fresh-clone CI）：
+# (cd vendor/dsh && ../../node_modules/typescript/bin/tsc -b tsconfig.host.json)
+# (cd vendor/dsh && ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE host)
+# 原生插件（flock，会话持久化刚需；macOS 用 CommandLineTools 的 cc；Linux 需 musl-tools 的 musl-gcc）：
 (cd vendor/dsh/native/system && ../../node_modules/.bin/tsx scripts/build.ts)
 # web 观察窗（可选；三件事缺一不可）：
 node ./node_modules/typescript/bin/tsc -b vendor/dsh/tsconfig.client.json   # client 面（测试面报错可忽略）
@@ -30,6 +33,8 @@ pnpm dsh web -- --port 0 --no-open                                         # 端
 
 # pack 代码面构建（改 src/** 任一面都需要——host〔src/index.ts+lib〕与 client〔src/client〕双编译面，
 # 2026-09-25 起 solution root；⚠ 旧命令 `tsc -p tsconfig.json` 在 solution root 上静默不构建，即此坑的由来）：
+# 先补 vendor client 类型（pack 的 client 面依赖 @deepseek-ai/*/client 声明；fresh clone 上没有 web 构建时必跑）：
+(cd vendor/dsh && ../../node_modules/typescript/bin/tsc -b tsconfig.client.json)
 node ./node_modules/typescript/bin/tsc -b packages/company-pack
 (cd packages/company-pack && ../../node_modules/.bin/tsdown)
 # ⚠ 两步必须连跑：tsdown 的入口是 lib/types/**（tsc 的产物）——改 src 后只跑 tsdown = 打包上一次的旧产物（2026-09-27 实测：改 styles.ts 只跑 tsdown，页面仍旧色）；也别删 lib/ 再只跑 tsdown（入口没了直接红）
@@ -50,6 +55,13 @@ node checks/smoke/client-load-smoke.mjs     # client 面完成定义：真浏览
 node checks/smoke/handbook-smoke.mjs        # agent-instructions 注入完成定义：指令基线 = 公司手册（默认只跑 ceo 一次小调用）
 node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
 ```
+
+> **fresh clone 的可执行证明（范围诚实）**：CI `fresh-clone` workflow 在干净 runner 上跑
+> `pnpm install` → `pnpm bundle:init` → `pnpm verify`（手动 + 每周一 03:00 UTC）——证明产品树
+> 能装、能建 dev workspace、能过全部门禁。**它不跑**下面这条 host/native/pack/test 构建链：
+> 该链在 7GB runner 上仍有已知缺口（vendor 双 lock、全 host 构建 OOM、client aggregate 测试类型、
+> musl-gcc），登记在 [repo-hygiene Note](../../notes/implemented/2026-10-25-repo-hygiene-contract.md)；
+> 构建链按本节在开发机执行，不要把它当成 CI 已证明。
 
 实证过的坑与解法：
 
