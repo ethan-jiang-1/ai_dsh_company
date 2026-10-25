@@ -4,10 +4,11 @@
 
 - `index.ts` —— **host 注册入口**（bundle 行 `company-client` 指向它）：`inject = ['tools','approval','commands']`
   声明依赖、`apply(ctx)` 编排签字工具（`request_signoff`）、工作区门投影工具（`workspace_doors`）、培养工具/命令
-  （接线在 `host/cultivation.ts`）与公司盘首启自举（接线在 `host/bootstrap.ts`），并再导出共享读模型。
-  消费方向 = vendor runtime → 本入口。
+  （接线在 `host/cultivation.ts`）、公司盘首启自举（接线在 `host/bootstrap.ts`）与成品目录生成/present 投影
+  （接线在 `host/catalog.ts`），并再导出共享读模型。消费方向 = vendor runtime → 本入口。
 - `host/` —— **host-only 逻辑**（用 node 内建，浏览器面不许进）：`bootstrap.ts` 负责公司盘骨架首启自举
-  （只补缺 / 不抛 / 可重入）；`cultivation.ts` 负责培养提案工具与人侧 `/cultivation` 命令语义；
+  （只补缺 / 不抛 / 可重入）；`catalog.ts` 扫描成品 meta/final、按 present 事件投影并幂等写
+  `kb/deliverables-index.json`；`cultivation.ts` 负责培养提案工具与人侧 `/cultivation` 命令语义；
   `cultivation-storage.ts` = 存储适配器（路径安全：id 与各目录组件校验、拒 symlink、独占建文件、原子改写），
   注册仍留在入口。
   **为什么单开一层**：`src/lib/` 同时被 client 叶编译（`tsconfig.client.json`），带 node 内建的模块住那儿

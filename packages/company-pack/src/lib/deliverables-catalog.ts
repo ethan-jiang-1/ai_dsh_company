@@ -60,6 +60,8 @@ export interface CatalogEntry {
   readonly ledgered: boolean
   /** Lead present 背书；null = 部署 host 未观测到（未核，不冒充 false）。 */
   readonly presented: boolean | null
+  /** meta 形状问题（缺行/枚举外/日期格式）；null = 形状检查通过。 */
+  readonly metaProblem: string | null
 }
 
 export interface CatalogCounts {
@@ -87,6 +89,21 @@ export interface CatalogScanEntry {
   readonly presented?: boolean | null
 }
 
+/** meta 形状检查（与仓库 `deliverables-check` 的核心词表一致；缺行/枚举外/日期格式）。 */
+export function metaProblemsOf(fields: ReadonlyMap<string, string>): string[] {
+  const problems: string[] = []
+  for (const key of ['kickoff', '类型', '结果']) {
+    if (!fields.has(key)) problems.push(`缺行「${key}:」`)
+  }
+  const kickoff = fields.get('kickoff') ?? ''
+  if (kickoff !== '' && !/^\d{4}-\d{2}-\d{2}$/.test(kickoff)) problems.push(`kickoff 不是 YYYY-MM-DD：「${kickoff}」`)
+  const type = fields.get('类型') ?? ''
+  if (type !== '' && !META_TYPES.some(value => value === type)) problems.push(`类型不在词表：「${type}」`)
+  const result = fields.get('结果') ?? ''
+  if (result !== '' && !META_RESULTS.some(value => value === result)) problems.push(`结果不在词表：「${result}」`)
+  return problems
+}
+
 /** 把扫描结果折成稳定目录（kickoff 倒序、同日起 slug 升序）。 */
 export function buildDeliverablesCatalog(input: {
   readonly entries: readonly CatalogScanEntry[]
@@ -97,6 +114,7 @@ export function buildDeliverablesCatalog(input: {
   for (const entry of input.entries) {
     if (!entry.final) continue
     const slug = entry.fields.get('slug') ?? slugFromDirName(entry.dir)
+    const metaProblems = metaProblemsOf(entry.fields)
     rows.push({
       slug,
       kickoff: entry.fields.get('kickoff') ?? '',
@@ -108,6 +126,7 @@ export function buildDeliverablesCatalog(input: {
       path: `${entry.root}/${entry.dir}/final.md`,
       ledgered: input.ledgerSlugs.has(slug),
       presented: entry.presented ?? null,
+      metaProblem: metaProblems.length === 0 ? null : metaProblems.join('；'),
     })
   }
   rows.sort((left, right) => right.kickoff.localeCompare(left.kickoff) || left.slug.localeCompare(right.slug))

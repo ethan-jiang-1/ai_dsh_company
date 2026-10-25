@@ -35,6 +35,7 @@ const CATALOG = parseCatalog(JSON.stringify({
       slug: 'active-three', kickoff: '2026-10-19', type: '口径问答', result: '判不了',
       summary: '一句结论三：台账外。', root: 'deliverables',
       dir: '2026-10-19-active-three', path: 'deliverables/2026-10-19-active-three/final.md', ledgered: false, presented: null,
+      metaProblem: '结果不在词表：「完成」',
     },
   ],
 })) as DeliverablesCatalog
@@ -126,7 +127,7 @@ describe('generator → parser 契约', () => {
     expect(parsed?.entries).toEqual([{
       slug: 'contract', kickoff: '2026-10-20', type: '决策', result: '已采纳', summary: '一句结论',
       root: 'deliverables', dir: '2026-10-20-contract', path: 'deliverables/2026-10-20-contract/final.md',
-      ledgered: true, presented: true,
+      ledgered: true, presented: true, metaProblem: null,
     }])
   })
 })

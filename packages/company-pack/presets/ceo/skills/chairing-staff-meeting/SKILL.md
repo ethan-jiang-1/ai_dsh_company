@@ -52,7 +52,7 @@ description: CEO 的动议节奏：澄清→DAG 拆解分派→追进度→VP �
    **定稿前另盘点 journal 在场**（2026-09-26 立；**换执行者**——缺席者不会报自己缺席）：本场出过活的
    角色，逐个看 `kb/<角色>/journal/` 有没有当轮纪要；**缺席的当场退回补写，补齐前不合稿**
    （收工留痕是硬闸门：没写 = 该角色未收工）。
-   定稿写入 `deliverables/<kickoff 日期>-<slug>/final.md`（**开局建目录就用注入的真日期**，同时写 `meta.md` 户口——**形状逐字照 `templates/meta.md` 模板**：核心字段是 `字段: 值` 平文本行、类型/结果用词表枚举值；markdown 加粗列表不合机器可查形状，会被 `META_SHAPE_BAD` 判红），用 `present` 声明交付。
+   定稿写入 `deliverables/<kickoff 日期>-<slug>/final.md`（**开局建目录就用注入的真日期**，同时写 `meta.md` 户口——**形状逐字照 `templates/meta.md` 模板**：核心字段是 `字段: 值` 平文本行、类型/结果用词表枚举值；markdown 加粗列表不合机器可查形状，成品页签会标「meta 形状错」、操作员收口核对），用 `present` 声明交付。
    ⚠ **顺序是硬的：先 `present`、后**把 `meta.md` 的「结果」改成终态词——**没有 present 就没有「已完成」**。
    写进 `final.md` 不等于收口：那次事故（all-in-ai-2026）就是写了 final、标了已完成，却一次没调 `present`
    ⇒ 审计判 `final-not-presented`，收敛前置会直接拦下这道口子（收口时由操作员核对并点名该 slug）。

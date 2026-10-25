@@ -82,20 +82,21 @@ node checks/smoke/preset-smoke.mjs
 
 已落树：
 
-- 新增门禁 [shipped-links](../../checks/gates/shipped-links.mjs)：以安装读者视角扫描 30 份出厂 Markdown（16 workspace + 14 skills）；链接穿出 workspace、指向仓库顶目录、裸路径出现 `checks/`/`tools/`/`runtime/`/`snapshots/` 即红。已接入 [run-gates](../../checks/run-gates.mjs)。
+- 新增门禁 [shipped-links](../../checks/gates/shipped-links.mjs)：以安装读者视角扫描 31 份出厂 Markdown（17 workspace + 14 skills）+ 6 份 persona（`agent.cordis.yml` 非注释行）；链接/引用式定义/绝对路径穿出 workspace、指向仓库顶目录、fenced 代码块或裸路径出现 `checks/`/`tools/`/`runtime/`/`snapshots/` 即红。已接入 [run-gates](../../checks/run-gates.mjs)。
 - 内容：手册去掉 `../docs`、`checks/`、`snapshots/`、`runtime/rehearsal-workspace/` 指针，改成操作员/会话内动作；13 份 skill 的“归仓库的门禁/审计脚本”改成“操作员收口核对”；chairing skill 的 `node tools/converge.mjs` 改成人工收口；`templates/meta.md` 内联 `类型`/`结果` 词表，不再指向 `tools/lib/deliverables.mjs`。
 - 成品目录产品化：新增 [src/lib/deliverables-catalog.ts](../../packages/company-pack/src/lib/deliverables-catalog.ts)（纯逻辑）与 [src/host/catalog.ts](../../packages/company-pack/src/host/catalog.ts)（扫描/生成/幂等）；host 首启生成空 catalog，`session/event` 的 `deliverables/presented` 投影为 `presented=true`，未观测 = `null`；条目未变不重写（`generatedAt` 稳定，保二启零变更）。
-- 客户端 [DeliverablesTab.tsx](../../packages/company-pack/src/client/DeliverablesTab.tsx)：空态/错误/页脚不再提维护者工具；present 未核与已 present 分开展示。
-- 证据：`release-smoke` 首启断言 `counts.total=0` 的 catalog 在场且二启零变更；[tests/company/catalog.spec.ts](../../tests/company/catalog.spec.ts) 覆盖空目录、幂等、present path/slug、归档后保留、台账命中。
+- 客户端 [DeliverablesTab.tsx](../../packages/company-pack/src/client/DeliverablesTab.tsx)：空态/错误/页脚不再提维护者工具；present 未核与已 present 分开展示；新增 `metaProblem`（缺行/枚举外/日期格式）并在行上标「meta 形状错」。`src/lib` 与 `tools/lib` 的生成器同 schema，contract fixture 两侧共钉。
+- 证据：`release-smoke` 首启断言 `counts.total=0` 的 catalog 在场且二启零变更；[tests/company/catalog.spec.ts](../../tests/company/catalog.spec.ts) 覆盖空目录、幂等、present path/slug、归档后保留、false 保留、metaProblem、host→client parser 契约；[tests/company/catalog-wiring.spec.ts](../../tests/company/catalog-wiring.spec.ts) 用最小 ctx 桩跑真 `apply()`，证明 `session/event` 监听把 present 写进 catalog。
 
 红/绿收据（实跑）：
 
 - 红：只加 `shipped-links`、未改内容 → `FAIL shipped-links: …/AGENTS.md:23 链接指向仓库/穿出 workspace：../docs/demo.md；…templates/meta.md:3 裸路径指向仓库：tools/lib/deliverables.mjs；…chairing…:58 裸路径指向仓库：node tools/converge.mjs`。
+- 红（审查轮，当前门禁）：往 chairing skill 植入 `../../docs/release.md` 与 fenced `node tools/x.mjs` → `FAIL shipped-links: …:72 链接指向仓库/穿出 workspace；…:75 代码块指向仓库`；还原 → `ALL PASS`。
 - 绿：改完内容后 `pnpm verify` → `ALL PASS`（含 `shipped-links`、`handbook-budget`、`gate-wiring ×46`）。
 - 绿：`node checks/smoke/release-smoke.mjs` → `ALL PASS`，其中 `首启生成成品目录（空目录，不依赖仓库工具）` 与 `第二次启动零变更` 均 PASS。
-- 绿：`pnpm test` → 87 files / 839 tests passed（含新 catalog spec）。
+- 绿：`pnpm test` → 89 files / 848 tests passed（含 catalog/wiring/identity/contract）。
 - 绿：`node checks/smoke/client-load-smoke.mjs` → `ALL PASS`（真浏览器加载、品牌槽、零 loader 错误）。
 
 环境前提（不是产品 diff）：本机 vendor client 产物不齐时首启会报 `client bundles not found`；本轮按 bootstrap 补建 vendor host/client，并对 `packages/api/session-controller` 单独补 client bundle。产物在 vendor ignore 面。
 
-未验证面：真实 live 会话里 `present` 事件→catalog 刷新的端到端（当前是单测投影 + release-smoke 空目录；需要一次真模型/工具调用会话才能补）；完整 `deliverables-check` 三态审计仍在产品外（第二阶段）；非空 catalog 的浏览器视觉走查未单独做。
+未验证面：真实 vendor `present` 工具→`session/event`→catalog 的 live 端到端（当前有 `apply()` 接线单测 + release-smoke 空目录；还差一次真模型/工具调用会话）；完整 `deliverables-check` 三态审计仍在产品外（第二阶段）；非空 catalog 的浏览器视觉走查未单独做。

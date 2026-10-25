@@ -8,7 +8,7 @@
 import { spawn, spawnSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
-import { isAbsolute, join, relative, resolve } from 'node:path'
+import { join, relative, resolve } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
 import { plainNodeEnv } from './drivers/release-process.mjs'
 
@@ -30,7 +30,7 @@ if (has('help') || has('h')) {
   --workspace <dir>   公司盘（默认 <home>/company-workspace）
   --port <n>          web 端口（默认 0 = 系统分配）
   --no-open           不自动打开浏览器（默认打开；无头环境用这个）
-  --provision-only    只建 home/profile/workspace，不启动
+  --provision-only    只建 home/profile（不启动、不落骨架）
   --no-build          跳过 pack 构建（假定 lib 已新鲜）
   --reset             删除带 .standalone-home 标记的隔离 home（不碰外部 workspace）
   --help              本帮助`)
@@ -54,12 +54,12 @@ if (has('reset')) {
   process.exit(0)
 }
 
-// 防接管：已有 home 但没有本工具的标记，且看起来像别人的 DSH home ⇒ 拒绝（显式 --reset 也不行，
-// 因为没有标记就无法证明是本工具建的）。
+// 防接管：已有 home 但没有本工具的标记 ⇒ 非空就拒绝。没有标记就无法证明是本工具建的，
+// 后续 `--reset` 会整棵删除；宁可让用户换空目录，也不赌。
 if (existsSync(home) && !existsSync(marker)) {
   const entries = readdirSync(home)
-  if (entries.some(name => ['profiles', 'bundle.json', 'sessions', 'storages'].includes(name))) {
-    fail(`拒绝接管 ${home}：它已有 DSH 数据但没有 .standalone-home 标记；换一个空 --home，或先手工确认`)
+  if (entries.length > 0) {
+    fail(`拒绝接管 ${home}：目录非空且没有 .standalone-home 标记；换一个空 --home，或先手工确认`)
   }
 }
 
@@ -67,6 +67,8 @@ const nodeVersion = process.versions.node.split('.').map(Number)
 const nodeOk = nodeVersion[0] > 22
   || (nodeVersion[0] === 22 && (nodeVersion[1] > 19 || (nodeVersion[1] === 19 && nodeVersion[2] >= 0)))
 if (!nodeOk) fail(`Node ${process.versions.node} 低于 22.19；升级 Node 后重试`)
+const pnpmVersion = spawnSync('pnpm', ['--version'], { encoding: 'utf8' })
+if (pnpmVersion.status !== 0) fail('pnpm 不在 PATH（profile 的 plugin add 需要 pnpm）；先 corepack enable pnpm')
 
 const cliDir = join(ROOT, 'vendor/dsh/apps/cli')
 const cliManifest = JSON.parse(readFileSync(join(cliDir, 'package.json'), 'utf8'))
@@ -134,6 +136,11 @@ for (const artifact of [join(ROOT, 'packages/company-pack/lib/index.js'), join(R
 }
 
 mkdirSync(home, { recursive: true })
+// 标记先于 provision：首跑失败也留下“这是本工具建的 home”的证据，--reset 才能清理；
+// 反过来说，标记只在本工具创建/接管的空目录上写，不会给别人的 DSH home 打标。
+if (!existsSync(marker)) {
+  writeFileSync(marker, `${JSON.stringify({ v: 1, repo: ROOT, createdAt: new Date().toISOString() })}\n`)
+}
 const profileDir = join(home, 'profiles/web')
 mkdirSync(profileDir, { recursive: true })
 const profileManifest = join(profileDir, 'package.json')
@@ -169,8 +176,8 @@ if (resolvedDependency !== packDir) {
   spawnSync(process.execPath, [cli, 'plugin', '--profile', 'web', 'remove', 'dsh-company-pack'], { cwd: ROOT, env, encoding: 'utf8' })
   run('plugin add link', process.execPath, [cli, 'plugin', '--profile', 'web', 'add', `link:${packDir}`], { env })
 }
-if (!existsSync(marker)) {
-  writeFileSync(marker, `${JSON.stringify({ v: 1, repo: ROOT, createdAt: new Date().toISOString() })}\n`)
+if (!env.DEEPSEEK_API_KEY && !existsSync(join(home, '.credentials.yaml'))) {
+  console.warn('standalone: 未发现 DEEPSEEK_API_KEY / <home>/.credentials.yaml；角色会话需要时再配（boot 本身不需要 key）')
 }
 
 if (has('provision-only')) {
@@ -184,6 +191,6 @@ const child = spawn(process.execPath, [cli, '--profile', 'web', '--', '--port', 
   env,
   stdio: 'inherit',
 })
-child.on('exit', (code, signal) => {
-  process.exitCode = code ?? (signal === null ? 1 : 1)
+child.on('exit', (code) => {
+  process.exitCode = code ?? 1
 })

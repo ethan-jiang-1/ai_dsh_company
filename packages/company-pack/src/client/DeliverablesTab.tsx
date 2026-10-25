@@ -35,6 +35,8 @@ export interface DeliverablesCatalogEntry {
   readonly ledgered: boolean
   /** Lead `present` 背书：true/false；null = 审计不可得（未核，不冒充）。 */
   readonly presented: boolean | null
+  /** meta 形状问题（缺行/枚举外/日期格式）；null = 形状检查通过。 */
+  readonly metaProblem: string | null
 }
 
 /** 解析后的目录形状（counts 不解析：视图从 entries 现算，避免第二份计数）。 */
@@ -119,6 +121,7 @@ export function parseCatalog(text: string): DeliverablesCatalog | null {
       path,
       ledgered: row.ledgered !== false,
       presented: row.presented === true ? true : row.presented === false ? false : null,
+      metaProblem: typeof row.metaProblem === 'string' && row.metaProblem !== '' ? row.metaProblem : null,
     })
   }
   return {
@@ -217,6 +220,7 @@ export function DeliverablesView({ catalog, sessionId, openFinal }: {
                         {!entry.ledgered && <Tag tone="warning">台账外</Tag>}
                         {entry.presented === false && <Tag tone="warning">未 present</Tag>}
                         {entry.presented === null && <Tag tone="outline">present 未核</Tag>}
+                        {entry.metaProblem !== null && <span title={entry.metaProblem}><Tag tone="warning">meta 形状错</Tag></span>}
                         <span className="wk-deliverable-meta">{entry.kickoff || '日期未记'} · {entry.type || '未分型'}</span>
                       </span>
                       <LedgerSummary summary={entry.summary || '（meta 无一句话结论）'} />

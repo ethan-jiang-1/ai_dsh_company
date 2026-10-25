@@ -95,8 +95,10 @@ node checks/smoke/standalone-smoke.mjs
 红/绿收据（实跑）：
 
 - 绿：`node checks/smoke/standalone-smoke.mjs` → `ALL PASS`（provision / relink / roster 五角色 + researcher / copy 骨架 + 身份 / bundle.json / session-create / 不写日用 `.dsh` / reset / 无标记 reset 拒绝）。
-- 绿：`pnpm verify` → `ALL PASS`；`pnpm test` → 839 passed；`release-smoke` → `ALL PASS`（32 件骨架、空 catalog、二启零变更）；`lifecycle-smoke` → `ALL PASS`；`client-load-smoke` → `ALL PASS`。
+- 绿：`pnpm verify` → `ALL PASS`；`pnpm test` → 839 passed（审查加固后 848）；`release-smoke` → `ALL PASS`（32 件骨架、空 catalog、二启零变更）；`lifecycle-smoke` → `ALL PASS`；`client-load-smoke` → `ALL PASS`。
 - 红样：旧树没有 `pnpm standalone` 入口；smoke 的 relink 步骤先写入 `link:/tmp/does-not-exist/...`，入口未修复即红；`--reset` 对无标记目录必须非零。
+
+审查加固（2026-10-25，同轮补）：`.standalone-home` 标记改为 **provision 之前**写（首跑失败也能 `--reset`）；非空且无标记的目录一律拒绝接管（不再收养后整棵删除）；`--reset` 保留外部 workspace 有 smoke 覆盖；doctor 增加 pnpm 检查，缺 `DEEPSEEK_API_KEY` / `<home>/.credentials.yaml` 只 warn（boot 不需要 key）；`CompanyIdentity` 抽成可静态渲染组件并补 keyless 测试（公司名/loading/非公司盘三态）。
 
 未验证 / 偏离：
 

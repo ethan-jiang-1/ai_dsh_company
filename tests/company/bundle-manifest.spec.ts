@@ -5,7 +5,7 @@
  * ③workspace 在 home 内记相对、在外记绝对；④workspace 不存在不冒充 bundle；⑤骨架指纹跳过 dotfile/符号链接。
  * 反证：把 `writeFileSync(..., { flag: 'wx' })` 的 flag 换成默认 ⇒ 「二次不覆盖」红。
  */
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -16,6 +16,7 @@ import {
   planBundleManifest,
   planSkeletonUpgrade,
   readBundleManifest,
+  readBundleManifestState,
   resolvePackMetadata,
   skeletonDigest,
   workspaceRecord,
@@ -194,6 +195,36 @@ describe('两 bundle 身份隔离（S1 自动化）', () => {
       expect(pa.path).not.toBe(pb.path)
     } finally {
       rmSync(skel, { recursive: true, force: true }); rmSync(a, { recursive: true, force: true }); rmSync(b, { recursive: true, force: true })
+    }
+  })
+})
+
+describe('manifest 损坏与原子写（2026-10-25 审查补证）', () => {
+  it('区分 missing 与 corrupt；损坏文件原样保留', () => {
+    const dsh = home()
+    try {
+      expect(readBundleManifestState(dsh).status).toBe('missing')
+      const path = join(dsh, 'bundle.json')
+      writeFileSync(path, '{"v":1,"id":"cut')
+      const state = readBundleManifestState(dsh)
+      expect(state.status).toBe('corrupt')
+      expect(readFileSync(path, 'utf8')).toBe('{"v":1,"id":"cut')
+    } finally {
+      rmSync(dsh, { recursive: true, force: true })
+    }
+  })
+
+  it('写回走临时文件，目录里不留 .tmp', () => {
+    const dsh = home()
+    const skel = skeleton()
+    try {
+      const plan = planBundleManifest({ dshHome: dsh, companyHome: join(dsh, 'company-workspace'), skeletonDir: skel, pack: PACK })
+      writeUpgradedManifest(bundleManifestPath(dsh), { ...plan.manifest, pack: { ...PACK, version: '0.3.2' } })
+      expect(readBundleManifest(dsh)?.pack.version).toBe('0.3.2')
+      expect(readdirSync(dsh).some(name => name.endsWith('.tmp'))).toBe(false)
+    } finally {
+      rmSync(skel, { recursive: true, force: true })
+      rmSync(dsh, { recursive: true, force: true })
     }
   })
 })

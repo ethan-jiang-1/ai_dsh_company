@@ -11,11 +11,12 @@ import { signoffDecisionNote, signoffReason } from './lib/signoff.ts'
 import { doorsFromSessions } from './lib/doors.ts'
 import { bootstrapCompanyWorkspace, bootstrapEnabled, resolveCompanyHome, resolveSkeletonDir } from './host/bootstrap.ts'
 import {
+  appendUpgradeLog,
   applySkeletonUpgrade,
   bundleManifestPath,
   planBundleManifest,
   planSkeletonUpgrade,
-  readBundleManifest,
+  readBundleManifestState,
   resolvePackMetadata,
   writeBundleManifest,
   writeUpgradedManifest,
@@ -209,21 +210,28 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
     if (existsSync(companyHome)) {
       const skeleton = resolveSkeletonDir(import.meta.url)
       const pack = resolvePackMetadata(import.meta.url)
-      const existing = readBundleManifest(dshHome)
-      if (existing === null) {
+      const state = readBundleManifestState(dshHome)
+      if (state.status === 'corrupt') {
+        // 不静默：损坏的 manifest 不是首启。保留原文件（身份不丢给猜测），要求人工修复或备份后删除。
+        ctx.logger?.warn?.(`company-pack：bundle.json 损坏，已保留原文件并跳过身份/升级（${state.path}：${state.error}）；`
+          + '修好后重启，或备份后删除该文件让下次启动重建')
+      } else if (state.status === 'missing') {
         const plan = planBundleManifest({ dshHome, companyHome, skeletonDir: skeleton, pack })
         if (writeBundleManifest(plan).created) {
           ctx.logger?.info?.(`company-pack：run bundle 身份已建立（${plan.path}）`)
         }
       } else {
+        const existing = state.manifest
         const plan = planSkeletonUpgrade({ manifest: existing, skeletonDir: skeleton, workspace: companyHome, pack })
         if (plan.changed) {
           const result = applySkeletonUpgrade(plan, skeleton, companyHome)
           writeUpgradedManifest(bundleManifestPath(dshHome), plan.manifest)
           const modified = plan.actions.filter(action => action.reason === 'modified').map(action => action.rel)
-          ctx.logger?.info?.(`company-pack：基部升级 ${existing.skeleton.version} → ${pack.version}`
+          const summary = `基部升级 ${existing.skeleton.version} → ${pack.version}`
             + `（新增 ${String(result.created.length)} / 替换 ${String(result.updated.length)}`
-            + ` / 保留用户改过 ${String(modified.length)}${modified.length > 0 ? `：${modified.join(', ')}` : ''}）`)
+            + ` / 保留用户改过 ${String(modified.length)}${modified.length > 0 ? `：${modified.join(', ')}` : ''}）`
+          appendUpgradeLog(dshHome, summary)
+          ctx.logger?.info?.(`company-pack：${summary}`)
         }
       }
     }

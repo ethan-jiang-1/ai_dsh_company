@@ -148,8 +148,8 @@ dsh --profile web --dump-config      # 插件层 + preset-ceo + company-client
 ## 四、升级
 
 替换 profile 里的包后重启。基部（手册 / 章程 / 模板 / 起动件）按哈希判定：
-**没改过的**随新包替换，**你改过的**保留并在日志里点名；扩张面（journal / 交付物 / 台账 /
-方法层 / 会话）一个字节不动。\`bundle.json\` 的 \`skeleton.version\` 随升级前移。
+**没改过的**随新包替换，**你改过的**保留并在 \`<DSH_HOME>/logs/company-pack-upgrade.log\` 里点名；扩张面
+（journal / 交付物 / 台账 / 方法层 / 会话）一个字节不动。\`bundle.json\` 的 \`skeleton.version\` 随升级前移。
 
 ## 五、备份 / 迁移
 

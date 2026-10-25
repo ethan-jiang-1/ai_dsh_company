@@ -21,7 +21,8 @@
       "dir": "2026-10-07-theta",
       "path": "deliverables/2026-10-07-theta/final.md",
       "ledgered": false,
-      "presented": null
+      "presented": null,
+      "metaProblem": "缺行「类型:」；结果不在词表：「未知值」"
     },
     {
       "slug": "eta",
@@ -33,7 +34,8 @@
       "dir": "2026-10-06-eta",
       "path": "deliverables/2026-10-06-eta/final.md",
       "ledgered": true,
-      "presented": true
+      "presented": true,
+      "metaProblem": "缺行「类型:」"
     },
     {
       "slug": "zeta",
@@ -45,7 +47,8 @@
       "dir": "2026-10-05-zeta",
       "path": "deliverables/2026-10-05-zeta/final.md",
       "ledgered": false,
-      "presented": null
+      "presented": null,
+      "metaProblem": "缺行「类型:」"
     },
     {
       "slug": "epsilon",
@@ -57,7 +60,8 @@
       "dir": "2026-10-04-epsilon",
       "path": "deliverables/2026-10-04-epsilon/final.md",
       "ledgered": false,
-      "presented": false
+      "presented": false,
+      "metaProblem": "缺行「类型:」"
     },
     {
       "slug": "delta",
@@ -69,7 +73,8 @@
       "dir": "2026-10-03-delta",
       "path": "deliverables/2026-10-03-delta/final.md",
       "ledgered": false,
-      "presented": null
+      "presented": null,
+      "metaProblem": "缺行「类型:」"
     },
     {
       "slug": "beta",
@@ -81,7 +86,8 @@
       "dir": "2026-10-02-beta",
       "path": "deliverables/2026-10-02-beta/final.md",
       "ledgered": false,
-      "presented": false
+      "presented": false,
+      "metaProblem": null
     },
     {
       "slug": "alpha",
@@ -93,7 +99,8 @@
       "dir": "2026-10-01-alpha",
       "path": "deliverables/2026-10-01-alpha/final.md",
       "ledgered": true,
-      "presented": true
+      "presented": true,
+      "metaProblem": null
     },
     {
       "slug": "gamma",
@@ -105,7 +112,8 @@
       "dir": "2026-09-30-gamma",
       "path": "deliverables-archive/2026-09-30-gamma/final.md",
       "ledgered": true,
-      "presented": null
+      "presented": null,
+      "metaProblem": "缺行「类型:」"
     }
   ]
 }

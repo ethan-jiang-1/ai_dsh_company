@@ -20,6 +20,7 @@ import {
   parseMeta,
   slugFromDirName,
 } from '../../packages/company-pack/src/lib/deliverables-catalog.ts'
+import { parseCatalog } from '../../packages/company-pack/src/client/DeliverablesTab.tsx'
 
 const roots: string[] = []
 function workspace(): string {
@@ -91,6 +92,17 @@ describe('host catalog', () => {
     expect(archived.catalog?.entries[0]?.presented).toBe(true)
   })
 
+  it('保留既有 catalog 的 presented=false（审计结论不被冲成未核）', () => {
+    const root = workspace()
+    deliverable(root)
+    regenerateCatalog(root)
+    const path = catalogPath(root)
+    const raw = JSON.parse(readFileSync(path, 'utf8')) as { entries: { presented: boolean | null }[] }
+    raw.entries[0]!.presented = false
+    writeFileSync(path, `${JSON.stringify(raw, null, 2)}\n`)
+    expect(regenerateCatalog(root).catalog?.entries[0]?.presented).toBe(false)
+  })
+
   it('台账命中与未命中都写进目录', () => {
     const root = workspace()
     deliverable(root)
@@ -98,5 +110,22 @@ describe('host catalog', () => {
     const catalog = regenerateCatalog(root).catalog
     expect(catalog?.entries[0]?.ledgered).toBe(true)
     expect(catalog?.counts.unledgered).toBe(0)
+  })
+
+  it('meta 缺行/枚举外标出 metaProblem，不冒充形状通过', () => {
+    const root = workspace()
+    const dir = deliverable(root)
+    writeFileSync(join(dir, 'meta.md'), 'slug: alpha\nkickoff: 2026-10-25\n类型: 决策\n结果: 完成\n')
+    const catalog = regenerateCatalog(root).catalog
+    expect(catalog?.entries[0]?.metaProblem).toContain('结果不在词表')
+  })
+
+  it('host 生成物可被页签 parser 解析（schema 边界）', () => {
+    const root = workspace()
+    deliverable(root)
+    regenerateCatalog(root)
+    const parsed = parseCatalog(readFileSync(catalogPath(root), 'utf8'))
+    expect(parsed?.entries[0]?.slug).toBe('alpha')
+    expect(parsed?.entries[0]?.metaProblem).toBeNull()
   })
 })

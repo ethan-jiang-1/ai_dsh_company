@@ -7,10 +7,10 @@
 // 证明边界：v1 真装 → 改基部 + 加扩张数据 → v2 真装 → 启动；再卸载、搬 home 后重装。
 // 不证明：registry 升级、降级、并发升级、跨 OS；这些不在本轮范围。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
-import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
+import { isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { plainNodeEnv, releaseProcesses } from '../../tools/drivers/release-process.mjs'
 
@@ -31,13 +31,22 @@ const check = (label, ok, detail = '') => {
   if (!ok) failures.push(label)
 }
 const hashFile = path => createHash('sha256').update(readFileSync(path)).digest('hex')
+/** 轮询等待，替代固定 sleep；超时即失败。 */
+const waitFor = async (predicate, label, timeoutMs = 15_000) => {
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    if (predicate()) return
+    await new Promise(resolve => { setTimeout(resolve, 50) })
+  }
+  throw new Error(`${label} timeout（${String(timeoutMs)}ms）`)
+}
 const fingerprint = (dir) => {
   const rows = []
   const walk = (rel) => {
     for (const entry of readdirSync(join(dir, rel), { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
       const child = rel === '' ? entry.name : `${rel}/${entry.name}`
       if (entry.isDirectory()) { rows.push(`${child}/`); walk(child) }
-      else rows.push(`${child}:${String(statSync(join(dir, child)).size)}`)
+      else rows.push(`${child}:${hashFile(join(dir, child))}`)
     }
   }
   walk('')
@@ -91,8 +100,11 @@ try {
   const boot = async () => {
     const child = processes.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
     await child.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
-    await new Promise(resolve => { setTimeout(resolve, 1500) })
+    await waitFor(() => existsSync(join(home, 'bundle.json'))
+      && existsSync(join(companyHome, 'kb/deliverables-index.json')), '首启落盘')
+    const output = child.output
     await child.stop()
+    return output
   }
 
   console.log('① v1 tarball（当前 pack）')
@@ -150,6 +162,7 @@ try {
   console.log('③ 改基部 + 加扩张数据')
   appendFileSync(join(companyHome, 'AGENTS.md'), '\n<!-- lifecycle-keep -->\n')
   appendFileSync(join(companyHome, 'kb/org.md'), '\n<!-- lifecycle-org-keep -->\n')
+  appendFileSync(join(companyHome, 'kb/ceo/CHARTER.md'), '\n<!-- lifecycle-charter-keep -->\n')
   mkdirSync(join(companyHome, 'kb/ceo/journal'), { recursive: true })
   const journal = join(companyHome, 'kb/ceo/journal/2026-10-25-lifecycle.md')
   writeFileSync(journal, '# lifecycle smoke\n')
@@ -158,7 +171,7 @@ try {
   const final = join(deliverable, 'final.md')
   const meta = join(deliverable, 'meta.md')
   writeFileSync(final, '# lifecycle final\n')
-  writeFileSync(meta, 'slug: lifecycle\nkickoff: 2026-10-25\n类型: 决策\n结果: 完成\n一句话结论: lifecycle smoke\n')
+  writeFileSync(meta, 'slug: lifecycle\nkickoff: 2026-10-25\n类型: 决策\n结果: 已完成\n一句话结论: lifecycle smoke\n')
   const expansion = { journal: hashFile(journal), final: hashFile(final), meta: hashFile(meta) }
 
   console.log(`④ v2 tarball（${V2_VERSION}，改一个未改过的基部文件）`)
@@ -178,11 +191,18 @@ try {
   await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'remove', 'dsh-company-pack'], { timeoutMs: 180_000 })
   await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${v2}`], { timeoutMs: 180_000 })
   await boot()
+  const upgradeLogPath = join(home, 'logs/company-pack-upgrade.log')
+  const upgradeLog = existsSync(upgradeLogPath) ? readFileSync(upgradeLogPath, 'utf8') : ''
+  check('升级日志点名保留清单', /基部升级/.test(upgradeLog) && /保留用户改过/.test(upgradeLog)
+    && upgradeLog.includes('AGENTS.md') && upgradeLog.includes('kb/ceo/CHARTER.md'),
+    upgradeLog.split('\n').filter(Boolean).at(-1)?.slice(0, 200) ?? '无基部升级日志')
   const agents = readFileSync(join(companyHome, 'AGENTS.md'), 'utf8')
   const org = readFileSync(join(companyHome, 'kb/org.md'), 'utf8')
+  const charter = readFileSync(join(companyHome, 'kb/ceo/CHARTER.md'), 'utf8')
   const weekly = readFileSync(join(companyHome, 'templates/weekly-report.md'), 'utf8')
   check('改过的 AGENTS.md 保留', agents.includes('lifecycle-keep'))
   check('改过的 kb/org.md 保留', org.includes('lifecycle-org-keep'))
+  check('改过的 CHARTER 历史保留（基部不覆盖部署历史）', charter.includes('lifecycle-charter-keep'))
   check('未改过的模板随 v2 替换', weekly.includes('lifecycle-v2'))
   check('扩张面逐字节不变', hashFile(journal) === expansion.journal
     && hashFile(final) === expansion.final && hashFile(meta) === expansion.meta)
@@ -224,7 +244,8 @@ try {
     await movedRun(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${movedV2}`], { timeoutMs: 180_000 })
     const movedChild = movedProcesses.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
     await movedChild.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
-    await new Promise(resolve => { setTimeout(resolve, 1500) })
+    await waitFor(() => existsSync(join(movedHome, 'bundle.json'))
+      && existsSync(join(movedCompanyHome, 'kb/deliverables-index.json')), '迁移后落盘')
     await movedChild.stop()
     const movedManifest = JSON.parse(readFileSync(join(movedHome, 'bundle.json'), 'utf8'))
     check('迁移后 boot 成功且 workspace 记录仍可解析', movedManifest.workspace === 'tmp/lifecycle-company-workspace',

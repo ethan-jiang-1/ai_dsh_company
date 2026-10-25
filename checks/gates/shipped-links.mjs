@@ -1,6 +1,6 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 // 何时跑：改 pack 的 `workspace/**` 或 `presets/**/skills/**` Markdown 后；发布/导出前。
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, extname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 
 // ── 安装形状的出厂内容（shipped-links，2026-10-25，RFC installed-shape-self-sufficient）──
@@ -11,9 +11,9 @@ import { dirname, extname, isAbsolute, join, relative, resolve, sep } from 'node
 // workspace 相对（角色 cwd）解析；两类都不许出现仓库顶目录；裸路径（反引号）同样按段扫描。
 const WORKSPACE = 'packages/company-pack/workspace'
 const PRESETS = 'packages/company-pack/presets'
+const REPO_PATH = /(^|[\s"'`(])(?:\.\.\/)?(docs|notes|_backlog|checks|tests|probes|tools|run|runtime|snapshots|vendor|packages|company-workspace)\//
 const REPO_TOP = new Set(['docs', 'notes', '_backlog', 'checks', 'tests', 'probes', 'tools',
   'run', 'runtime', 'snapshots', 'vendor', 'packages', 'company-workspace'])
-const WORKSPACE_TOP = new Set(['kb', 'templates', 'deliverables', 'deliverables-archive'])
 
 const mdFiles = (root, rel = '') => {
   const dir = join(root, rel)
@@ -27,11 +27,25 @@ const mdFiles = (root, rel = '') => {
   return out
 }
 
+const yamlFiles = (root, rel = '') => {
+  const dir = join(root, rel)
+  if (!existsSync(dir)) return []
+  const out = []
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const child = rel === '' ? entry.name : `${rel}/${entry.name}`
+    if (entry.isDirectory()) out.push(...yamlFiles(root, child))
+    else if (entry.isFile() && ['.yml', '.yaml'].includes(extname(entry.name).toLowerCase())) out.push(child)
+  }
+  return out
+}
+
 const isFence = line => /^\s*(```|~~~)/.test(line)
 const linkTargets = line => {
   const out = []
   const re = /!?\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g
   for (const match of line.matchAll(re)) out.push(match[1])
+  const ref = /^\s*\[[^\]]+\]:\s*(\S+)/.exec(line)
+  if (ref !== null) out.push(ref[1])
   return out
 }
 const codeSpans = line => [...line.matchAll(/`([^`\n]+)`/g)].map(match => match[1])
@@ -43,7 +57,7 @@ const stripTarget = (raw) => {
   if (query >= 0) target = target.slice(0, query)
   try { return decodeURIComponent(target) } catch { return target }
 }
-const isExternal = target => target === '' || target.startsWith('#') || target.startsWith('/')
+const isExternal = target => target === '' || target.startsWith('#')
   || /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(target)
 const topOf = (target) => target.replace(/^\.\//, '').split('/')[0]
 
@@ -60,11 +74,24 @@ export function run({ root, ok, fail }) {
     let fenced = false
     lines.forEach((line, index) => {
       if (isFence(line)) { fenced = !fenced; return }
-      if (fenced) return
       const at = `${rel}:${String(index + 1)}`
+      if (fenced) {
+        // 代码块也是指令面：`node tools/...` / `source run/...` 在安装后的盘上同样不存在。
+        // 负例：在任一 SKILL.md 加一行 fenced `node tools/x.mjs` → 红。
+        const trimmed = line.trim()
+        if (trimmed !== '' && !/https?:\/\//.test(trimmed)
+          && REPO_PATH.test(trimmed)) {
+          problems.push(`${at} 代码块指向仓库：${trimmed.slice(0, 100)}`)
+        }
+        return
+      }
       for (const raw of linkTargets(line)) {
         const target = stripTarget(raw)
         if (isExternal(target)) continue
+        if (target.startsWith('/')) {
+          if (REPO_TOP.has(target.slice(1).split('/')[0] ?? '')) problems.push(`${at} 链接指向仓库绝对路径：${raw}`)
+          continue
+        }
         const top = topOf(target)
         if (REPO_TOP.has(top) || target.startsWith('../')) {
           problems.push(`${at} 链接指向仓库/穿出 workspace：${raw}`)
@@ -86,8 +113,6 @@ export function run({ root, ok, fail }) {
             const within = relative(presetsRoot, resolved)
             if (within.startsWith(`..${sep}`) || within === '..') problems.push(`${at} 链接穿出 pack：${raw}`)
             else if (!existsSync(resolved)) problems.push(`${at} 链接目标不在 pack：${raw}`)
-          } else if (!WORKSPACE_TOP.has(top) && !existsSync(resolved)) {
-            problems.push(`${at} 链接目标不在出厂骨架：${raw}`)
           } else if (!existsSync(resolved)) {
             problems.push(`${at} 链接目标不在出厂骨架：${raw}`)
           }
@@ -95,14 +120,23 @@ export function run({ root, ok, fail }) {
       }
       for (const span of codeSpans(line)) {
         if (/^\s*(https?:|mailto:)/.test(span)) continue
-        if (/(^|[\s`(])(?:\.\.\/)?(docs|notes|_backlog|checks|tests|probes|tools|run|runtime|snapshots|vendor|packages|company-workspace)\//.test(span)
-          || /(^|[\s`(])\.\.\/docs\//.test(span)) {
+        if (REPO_PATH.test(span)) {
           problems.push(`${at} 裸路径指向仓库：${span}`)
         }
       }
     })
   }
+  // persona 文本也进会话（agent.cordis.yml 的非注释行）；注释里的设计依据不算注入面。
+  const personas = yamlFiles(presetsRoot).filter(rel => rel.endsWith('agent.cordis.yml'))
+  for (const rel of personas) {
+    const file = join(presetsRoot, rel)
+    readFileSync(file, 'utf8').split('\n').forEach((line, index) => {
+      const trimmed = line.trim()
+      if (trimmed === '' || trimmed.startsWith('#')) return
+      if (REPO_PATH.test(trimmed)) problems.push(`${PRESETS}/${rel}:${String(index + 1)} persona 指向仓库：${trimmed.slice(0, 100)}`)
+    })
+  }
   problems.length === 0
-    ? ok(`shipped-links（${String(files.length)} 份出厂 Markdown；零仓库路径/穿出 workspace）`)
+    ? ok(`shipped-links（${String(files.length)} 份 Markdown + ${String(personas.length)} 份 persona；零仓库路径/穿出 workspace）`)
     : fail('shipped-links', problems.join('；'))
 }

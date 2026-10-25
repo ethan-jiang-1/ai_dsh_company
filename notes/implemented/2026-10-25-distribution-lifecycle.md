@@ -86,8 +86,10 @@ node checks/smoke/lifecycle-smoke.mjs
 - 绿：`pnpm verify` → `ALL PASS`（含 `pack-engines`、`dist-manual`、`script-index ×90`）。
 - 绿：`node checks/smoke/release-smoke.mjs` → `ALL PASS`（真 tarball 安装、五角色 + researcher 零 broken、首启骨架 + `bundle.json`、二启零变更）。
 - 绿：`node checks/smoke/lifecycle-smoke.mjs` → `ALL PASS`（含 `不兼容 DSH 真拒绝`、`改过的 AGENTS.md 保留`、`未改过的模板随 v2 替换`、`扩张面逐字节不变`、`卸载后数据仍在`、`迁移后 boot 成功`）。
-- 绿：`node tools/export-dist.mjs` → `ALL PASS`（`sha256 — a89f0ee5…`，tarball 260 entries）。
+- 绿：`node tools/export-dist.mjs` → `ALL PASS`（0.3.1 当时 `sha256 — a89f0ee5…`、260 entries；0.3.2 重导 `3c33dcd…`/269，0.3.3 审查重导见收尾回执）。
 
 环境前提（不是产品 diff）：本机 vendor 的 host/client 产物不完整时，首启会报 `client bundles not found` / `ERR_MODULE_NOT_FOUND`；本次按 bootstrap 重建了 vendor host（`tsdown --env.DSH_BUILD_FACE host`）与 `client/ui-tool` 的 client bundle。产物在 vendor 的 ignore 面，不产生 tracked 改动。
 
-未验证面：升级半途中断的故障注入（当前只有正向保留断言，没有“改过的基部被覆盖”注入）；registry/npm 安装、降级、并发升级、跨 OS；真实 npm 版 DSH 的安装（本轮用 built CLI）。
+审查加固（2026-10-25，同轮补）：`writeUpgradedManifest` 改为临时文件 + rename（原子替换）；`readBundleManifestState` 区分 missing/corrupt，host 对损坏的 `bundle.json` 保留原文件并 warn（不再把损坏当首启静默跳过）；升级追加 `<DSH_HOME>/logs/company-pack-upgrade.log` 点名保留清单；lifecycle-smoke 改为轮询落盘（去固定 sleep）、fingerprint 用 sha256 内容哈希、增加 CHARTER 历史保留与升级日志断言；release-smoke 的指纹也改用内容哈希。
+
+未验证面：断电/半截写入的故障注入（有 corrupt 单测与 host 告警，但没做真实 kill 注入）；registry/npm 安装、降级、并发升级、跨 OS；真实 npm 版 DSH 的安装（本轮用 built CLI）。

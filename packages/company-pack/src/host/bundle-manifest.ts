@@ -13,7 +13,7 @@
  * - 不抛：调用方按 bootstrap 同样纪律接住错误（apply 期抛错会连累应用）。
  */
 import { createHash, randomUUID } from 'node:crypto'
-import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { appendFileSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, relative, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -21,6 +21,15 @@ import { fileURLToPath } from 'node:url'
 export const BUNDLE_MANIFEST_VERSION = 1
 
 export const BUNDLE_MANIFEST_FILENAME = 'bundle.json'
+
+/** 基部升级日志（home 内、按次追加）：点名保留的用户改动，手册与 smoke 读它。 */
+export const BUNDLE_UPGRADE_LOG = 'logs/company-pack-upgrade.log'
+
+export function appendUpgradeLog(dshHome: string, message: string): void {
+  const path = join(dshHome, BUNDLE_UPGRADE_LOG)
+  mkdirSync(dirname(path), { recursive: true })
+  appendFileSync(path, `${new Date().toISOString()} ${message}\n`, 'utf8')
+}
 
 /** manifest 的绝对路径（`<DSH_HOME>/bundle.json`）。 */
 export const bundleManifestPath = (dshHome: string): string => join(dshHome, BUNDLE_MANIFEST_FILENAME)
@@ -137,12 +146,27 @@ export function writeBundleManifest(plan: ManifestPlan): { created: boolean; ski
 
 /** 读 manifest；不存在或解析失败返回 null（调用方决定告警还是忽略）。 */
 export function readBundleManifest(dshHome: string): BundleManifest | null {
+  const state = readBundleManifestState(dshHome)
+  return state.status === 'ok' ? state.manifest : null
+}
+
+export type BundleManifestState =
+  | { readonly status: 'missing'; readonly path: string }
+  | { readonly status: 'corrupt'; readonly path: string; readonly error: string }
+  | { readonly status: 'ok'; readonly path: string; readonly manifest: BundleManifest }
+
+/**
+ * 区分「没装过」与「装过但文件坏了」——两者都返回 null 会让 host 把损坏当首启、静默跳过升级。
+ * corrupt 时保留原文件，由调用方告警并要求人工修复（不覆盖身份）。
+ */
+export function readBundleManifestState(dshHome: string): BundleManifestState {
   const path = join(dshHome, BUNDLE_MANIFEST_FILENAME)
   try {
-    if (!lstatSync(path).isFile()) return null
-    return JSON.parse(readFileSync(path, 'utf8')) as BundleManifest
-  } catch {
-    return null
+    if (!existsSync(path)) return { status: 'missing', path }
+    if (!lstatSync(path).isFile()) return { status: 'corrupt', path, error: '不是普通文件' }
+    return { status: 'ok', path, manifest: JSON.parse(readFileSync(path, 'utf8')) as BundleManifest }
+  } catch (error) {
+    return { status: 'corrupt', path, error: (error as Error).message }
   }
 }
 
@@ -243,8 +267,15 @@ export function applySkeletonUpgrade(plan: SkeletonUpgradePlan, skeletonDir: str
   return { created, updated, kept }
 }
 
-/** 写回 manifest（原子替换；只在 changed 时调用）。 */
+/** 写回 manifest（原子替换：临时文件 + rename；只在 changed 时调用）。 */
 export function writeUpgradedManifest(path: string, manifest: BundleManifest): void {
   mkdirSync(dirname(path), { recursive: true })
-  writeFileSync(path, `${JSON.stringify(manifest, null, 2)}\n`)
+  const temporary = `${path}.${String(process.pid)}.${String(Date.now())}.tmp`
+  try {
+    writeFileSync(temporary, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8')
+    renameSync(temporary, path)
+  } catch (error) {
+    try { rmSync(temporary, { force: true }) } catch { /* 保留原错误 */ }
+    throw error
+  }
 }

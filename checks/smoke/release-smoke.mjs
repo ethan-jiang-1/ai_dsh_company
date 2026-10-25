@@ -8,6 +8,7 @@
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
@@ -23,6 +24,14 @@ const failures = []
 const check = (label, ok, detail = '') => {
   console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`)
   if (!ok) failures.push(label)
+}
+const waitFor = async (predicate, label, timeoutMs = 15_000) => {
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    if (predicate()) return
+    await new Promise(resolve => { setTimeout(resolve, 50) })
+  }
+  throw new Error(`${label} timeout（${String(timeoutMs)}ms）`)
 }
 
 let processes
@@ -174,12 +183,13 @@ try {
       for (const entry of readdirSync(join(dir, rel), { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
         const child = rel === '' ? entry.name : `${rel}/${entry.name}`
         if (entry.isDirectory()) { rows.push(`${child}/`); walk(child) }
-        else rows.push(`${child}:${String(statSync(join(dir, child)).size)}`)
+        else rows.push(`${child}:${createHash('sha256').update(readFileSync(join(dir, child))).digest('hex')}`)
       }
     }
     walk('')
     return rows
   }
+  await waitFor(() => existsSync(join(home, 'bundle.json')) && existsSync(join(companyHome, 'kb/deliverables-index.json')), '首启落盘')
   const first = fingerprint(companyHome)
   const has = (rows, rel) => rows !== null && rows.some(row => row.startsWith(`${rel}:`))
   check('首启把出厂公司盘落到 DSH_COMPANY_HOME（含手册/章程/起动件）',
@@ -223,7 +233,6 @@ try {
   await processes.close()
   const second = processes.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
   await second.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
-  await new Promise(resolve => { setTimeout(resolve, 1500) })
   const afterSecond = fingerprint(companyHome)
   check('第二次启动零变更（建立好了就不用再建立了）',
     JSON.stringify(beforeSecond) === JSON.stringify(afterSecond),

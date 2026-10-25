@@ -98,6 +98,17 @@ try {
   let refused = false
   try { await run(['--home', outside, '--reset']) } catch { refused = true }
   check('无标记的 --reset 被拒绝', refused && existsSync(outside))
+  writeFileSync(join(outside, 'keep.txt'), 'keep\n')
+  let adopted = false
+  try { await run(['--home', outside, '--provision-only', '--no-build']) } catch { adopted = true }
+  check('非空无标记目录拒绝收养', adopted && existsSync(join(outside, 'keep.txt')))
+  const external = join(root, 'external-workspace')
+  mkdirSync(external, { recursive: true })
+  writeFileSync(join(external, 'keep.txt'), 'keep\n')
+  const externalHome = join(root, 'home-external')
+  await run(['--home', externalHome, '--workspace', external, '--provision-only', '--no-build'])
+  await run(['--home', externalHome, '--workspace', external, '--reset'])
+  check('reset 保留外部 workspace', !existsSync(externalHome) && existsSync(join(external, 'keep.txt')))
 } catch (error) {
   failures.push(error.message)
   console.error(`standalone-smoke: ${error.message}`)

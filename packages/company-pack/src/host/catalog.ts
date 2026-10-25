@@ -10,7 +10,7 @@
  *   不冒充 false——完整审计仍是操作员/第二阶段的职责。
  * - 幂等：条目未变时不重写文件（`generatedAt` 不变），否则 release-smoke 的“二启零变更”会红。
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { isAbsolute, join, relative } from 'node:path'
 import {
   buildDeliverablesCatalog,
@@ -42,14 +42,14 @@ export function readCatalog(companyHome: string): DeliverablesCatalog | null {
   }
 }
 
-/** 既有目录里已 present 的 path/slug（升级/换版本后仍保留背书）。 */
-function presentedFromCatalog(catalog: DeliverablesCatalog | null): { paths: Set<string>; slugs: Set<string> } {
-  const paths = new Set<string>()
-  const slugs = new Set<string>()
+/** 既有目录里已核过的 path/slug → presented（true/false 都保留；升级/归档后仍保留背书）。 */
+function presentedFromCatalog(catalog: DeliverablesCatalog | null): { paths: Map<string, boolean>; slugs: Map<string, boolean> } {
+  const paths = new Map<string, boolean>()
+  const slugs = new Map<string, boolean>()
   for (const entry of catalog?.entries ?? []) {
-    if (entry.presented !== true) continue
-    paths.add(normalizeRel(entry.path))
-    slugs.add(entry.slug)
+    if (entry.presented !== true && entry.presented !== false) continue
+    paths.set(normalizeRel(entry.path), entry.presented)
+    slugs.set(entry.slug, entry.presented)
   }
   return { paths, slugs }
 }
@@ -81,7 +81,7 @@ export function presentedFromEvent(event: unknown, companyHome: string): { paths
 }
 
 /** 扫描两个交付物根；presented 由 path 或 slug 命中决定，未命中 = null。 */
-function scanEntries(companyHome: string, presented: { paths: ReadonlySet<string>; slugs: ReadonlySet<string> }): CatalogScanEntry[] {
+function scanEntries(companyHome: string, presented: { paths: ReadonlyMap<string, boolean>; slugs: ReadonlyMap<string, boolean> }): CatalogScanEntry[] {
   const entries: CatalogScanEntry[] = []
   for (const root of CATALOG_ROOTS) {
     const dir = join(companyHome, root)
@@ -99,7 +99,7 @@ function scanEntries(companyHome: string, presented: { paths: ReadonlySet<string
         dir: item.name,
         fields,
         final,
-        presented: presented.paths.has(path) || presented.slugs.has(slug) ? true : null,
+        presented: presented.paths.get(path) ?? presented.slugs.get(slug) ?? null,
       })
     }
   }
@@ -125,8 +125,8 @@ export function regenerateCatalog(
   if (!existsSync(companyHome)) return { written: false, catalog: null, path }
   const previous = readCatalog(companyHome)
   const base = presentedFromCatalog(previous)
-  for (const value of extra.paths ?? []) base.paths.add(normalizeRel(value))
-  for (const value of extra.slugs ?? []) base.slugs.add(value)
+  for (const value of extra.paths ?? []) base.paths.set(normalizeRel(value), true)
+  for (const value of extra.slugs ?? []) base.slugs.set(value, true)
   const entries = scanEntries(companyHome, base)
   const ledgerPath = join(companyHome, 'kb/motion-ledger.md')
   const catalog = buildDeliverablesCatalog({
@@ -138,8 +138,13 @@ export function regenerateCatalog(
     return { written: false, catalog: previous, path }
   }
   mkdirSync(join(companyHome, 'kb'), { recursive: true })
-  const temporary = `${path}.tmp`
-  writeFileSync(temporary, `${JSON.stringify(catalog, null, 2)}\n`, 'utf8')
-  renameSync(temporary, path)
+  const temporary = `${path}.${String(process.pid)}.${String(Date.now())}.tmp`
+  try {
+    writeFileSync(temporary, `${JSON.stringify(catalog, null, 2)}\n`, 'utf8')
+    renameSync(temporary, path)
+  } catch (error) {
+    try { rmSync(temporary, { force: true }) } catch { /* 保留原错误 */ }
+    throw error
+  }
   return { written: true, catalog, path }
 }
