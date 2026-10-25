@@ -20,11 +20,18 @@ else ok(`pack-bundle ×${patchRels.length}`)
 // 已认证 tag 台账（FAQ 24 §9.2：DSH 不读 `dsh.compatibility`；台账住仓库内，不随包分发）。
 // 必须包含当前钉住的 vendor tag——升 pin 不加列 = 没验证过就装作验证过。升 pin 走
 // tools/sync-dsh.mjs（它会同步加列），这条门禁保证忘加就红。
-const compat = JSON.parse(readFileSync(join(root, 'checks/gates/lib/compat-tags.json'), 'utf8'))
+let compat
+try {
+  compat = JSON.parse(readFileSync(join(root, 'checks/gates/lib/compat-tags.json'), 'utf8'))
+} catch (error) {
+  fail('pack-compat', `读不到 checks/gates/lib/compat-tags.json（${error instanceof Error ? error.message : String(error)}）；台账缺失不能静默通过`)
+}
 const compatReleases = compat?.dshReleases
-if (!Array.isArray(compatReleases) || !compatReleases.includes(expectedTag)) {
+if (compat !== undefined && (!Array.isArray(compatReleases) || !compatReleases.includes(expectedTag))) {
   fail('pack-compat', `checks/gates/lib/compat-tags.json 的 dshReleases 必须包含当前钉住的 ${expectedTag}（升 pin 走 tools/sync-dsh.mjs 并同步加列）`)
-} else ok(`pack-compat (${expectedTag} ×${String(compatReleases.length)})`)
+} else if (compat !== undefined) {
+  ok(`pack-compat (${expectedTag} ×${String(compatReleases.length)})`)
+}
 
 // 分发契约（2026-10-25，RFC distribution-lifecycle）：DSH 只读 engines.dsh（存在即忽略 peers），
 // 所以兼容窗口必须有这一行；license/repository/private 是给收件人的身份，不是装饰。
