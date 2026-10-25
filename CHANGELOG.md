@@ -2,6 +2,13 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.3.7 — 2026-10-26
+
+### Changed
+
+- 发布可复现护栏：同版本 tgz 已存在时 `--prepare` 拒绝重打（npm pack 带 mtime，重打会让 sha 漂移）；确要重打用 `--force`。
+- 0.3.6 因 test-only commit 后误重打包导致同版本字节漂移，不再作为 handoff；0.3.7 为重新导出的交付字节。
+
 ## 0.3.6 — 2026-10-26
 
 ### Changed
