@@ -2,6 +2,13 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.3.8 — 2026-10-26
+
+### Changed
+
+- 安装前置补 **pnpm 11 / `corepack enable pnpm`**：第二机模拟证实，只有 Node+DSH 时 `plugin add` 会报 `pnpm was not found`；手册与 README 都写明，`dist-manual` 门禁检查。
+- 手册安装步骤加 `command -v pnpm` 预检，避免装到一半才失败。
+
 ## 0.3.7 — 2026-10-26
 
 ### Changed

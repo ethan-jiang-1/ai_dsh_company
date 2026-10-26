@@ -27,6 +27,7 @@ export function run({ root, ok, fail }) {
   const required = ['run bundle', 'bundle.json', 'company-workspace', 'workspace/', 'sha256', 'Node', 'DSH', '卸载', '回退']
   const missing = required.filter(phrase => !manual.includes(phrase))
   if (missing.length > 0) problems.push(`手册缺安装形状/契约关键句：${missing.join(' / ')}（run bundle / bundle.json / workspace 骨架 / sha256 / Node / DSH / 卸载 / 回退）`)
+  if (!/\*\*pnpm 11\*\*/.test(manual)) problems.push('手册缺 pnpm 安装前置（plugin add 需要 pnpm；没有它会报 pnpm was not found）')
   if (!manual.includes(expectedTag)) problems.push(`手册缺验证基线 \`${expectedTag}\`（pin 漂了或没重导）`)
   // 产物身份（2026-10-25，RFC distribution-lifecycle）：手册必须给出 tgz 的 sha256；
   // 本体在场时逐字节核对，本体不在场（fresh clone / 未导出）只查形状，不冒充校验过。

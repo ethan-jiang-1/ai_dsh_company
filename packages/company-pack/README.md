@@ -8,7 +8,7 @@
 ## Install
 
 把与 tarball 同目录的《安装手册》按步骤执行：独立 `DSH_HOME` → `dsh plugin --profile web add <tarball>` → 首次启动落公司盘。
-DSH/Node 前置与 sha256 校验见手册；本包不在 npm registry。
+前置 = Node ≥22.19、DSH `0.2.1-rc.2`、**pnpm 11（或 `corepack enable pnpm`）**；sha256 校验见手册；本包不在 npm registry。
 
 ## What it contributes
 

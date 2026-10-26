@@ -98,6 +98,8 @@ try {
 ## 零、前置
 
 - **Node.js** ≥ 22.19（与 DSH 基线一致）。
+- **pnpm 11**（或 \`corepack enable pnpm\`）：profile 的 \`plugin add\` 需要 \`pnpm\` 在 PATH；
+  没有它时安装会报 \`dsh: pnpm was not found\`。
 - **DSH 运行时**：本手册只在 \`${expectedTag}\` 上验证过；用同版本安装包或源码 checkout
   （例如 \`npx @deepseek-ai/dsh@${expectedTag.replace(/^dsh-v/, '')} web\`）。版本不匹配时安装会被拒绝。
 - **一个独立的 \`DSH_HOME\`**：不要复用日用 home，也不要让两个 CEO 共用一个 home。
@@ -106,6 +108,7 @@ try {
 ## 一、安装（给这个 CEO 一个独立的 home）
 
 \`\`\`sh
+command -v pnpm >/dev/null 2>&1 || { echo 'pnpm 11 不在 PATH；先 corepack enable pnpm'; exit 1; }
 export DSH_HOME="$HOME/dsh-bundles/<你的 CEO 名>"
 dsh plugin --profile web add /path/to/${tarballName}
 \`\`\`
