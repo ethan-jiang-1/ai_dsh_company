@@ -44,6 +44,9 @@
 | [standalone-smoke.mjs](smoke/standalone-smoke.mjs) | 目录独立启动：隔离 home/profile、copy 骨架、boot/RPC、relink、reset（keyless） |
 | [present-catalog-smoke.mjs](smoke/present-catalog-smoke.mjs) | 真 vendor `present` 工具 → session `deliverables/presented` → host catalog（keyless；~1s） |
 | [multi-install-smoke.mjs](smoke/multi-install-smoke.mjs) | 双 home 真装隔离、非空 home 后装、同 home 多 profile 反例、自定义 profile 补 web-app、空 bundle 共存、幂等（keyless；~3-4min，发布前手动） |
+| [interrupted-install-smoke.mjs](smoke/interrupted-install-smoke.mjs) | remove 后坏 add、profile package 损坏、re-add 后数据/roster 恢复（keyless；~2min） |
+| [concurrent-home-smoke.mjs](smoke/concurrent-home-smoke.mjs) | 同 home 两进程首启后 bundle/catalog/数据可解析、单实例恢复（keyless；~1min） |
+| [external-workspace-smoke.mjs](smoke/external-workspace-smoke.mjs) | DSH_COMPANY_HOME 在 home 外、bundle.workspace 绝对路径、只搬 home 后 boot/数据不丢（keyless；~1min） |
 | [refactor-drift-oracle.mjs](smoke/refactor-drift-oracle.mjs) | 纯搬移/拆分的零行为漂移：拆前/拆后 vitest 清单比对（`--hashes` 档含测试体指纹 ⇒ 拦改名/增删/**测试体改动**；两档都放行文件与 describe 归属搬家） |
 
 ## 浏览器与视觉
