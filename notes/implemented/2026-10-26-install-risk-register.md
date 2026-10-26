@@ -36,3 +36,13 @@
 - 最高优先：并发 boot（已做）、中断安装（已做）、外部 workspace（已做）、权限（未做）、profile row（未做）。
 - 只修有证据的 BUG；没证据不改行为。
 - 未执行项不写成“支持”。
+
+## P3 静态/未执行（2026-10-26）
+
+- **Windows**：未执行。静态事实 = `tools/standalone.mjs` 显式拒绝 `win32`；`tools/drivers/release-process.mjs`
+  依赖 POSIX 进程组；smoke 还用了 `chmod`/symlink/`tar`。不能把 Darwin 结果外推成 Windows 支持。
+- **容器**：Docker CLI 在，但 daemon 不可用（`docker info` 连接 `~/.docker/run/docker.sock` 失败）；未跑 Linux 容器。
+- **预构建离线**：边界 = `_dist` tarball + 已安装 DSH/base；不把 DSH 本体打进公司包。第二机冷 store 证的是
+  “pack 安装不联网”，不是“零 DSH 离线自举”。
+- 运行中 install/remove/upgrade 的边界**未测**；只测了两个并发 boot 的完整性。session resume/catalog presented
+  跨升级也**未单独断言**，只有哨兵/文件保留。这些不冒充已证。
