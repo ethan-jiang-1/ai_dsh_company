@@ -193,7 +193,9 @@ try {
         if (WITH_BROWSER) await runCase(`global-${BROWSER}-browser`, 'global', BROWSER)
       }
     } else {
-      await runCase(`vendor-${BROWSER}`, 'vendor', BROWSER)
+      // vendor 安装侧有 browser 两包；auto 时默认开，保住全员 browser 覆盖（off 仍可显式测降级）。
+      const vendorBrowser = BROWSER === 'auto' ? 'on' : BROWSER
+      await runCase(`vendor-${vendorBrowser}`, 'vendor', vendorBrowser)
     }
   }
 } catch (error) {
