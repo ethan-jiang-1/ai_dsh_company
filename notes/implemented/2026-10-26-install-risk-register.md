@@ -18,6 +18,7 @@
 | 外部 DSH_COMPANY_HOME + 只搬 home | `external-workspace-smoke`（绝对路径、boot、数据） |
 | 只读 workspace、缺骨架、坏 catalog | `permissions-recovery-smoke`、catalog 单测 |
 | 用户 profile patch 真实改 default；第二 bundle disabled row 共存/卸载 | `profile-row-smoke`；`multi-install-smoke` 双 home 亦验证 default=vp-eng |
+| 运行中 remove/add 新版本；旧实例仍响应，重启后升级 | `upgrade-while-running-smoke`（0.3.9→0.3.10，旧 session/list 仍在） |
 | 自定义 profile 缺 web-app → presets pending；补 web-app 后可启动 | `multi-install-smoke`、合同 Note |
 | 空 bundle 与公司包共存/卸载 | `multi-install-smoke` |
 
@@ -26,8 +27,7 @@
 | 面 | 为什么没数 | 下一步 |
 |---|---|---|
 | 真实全局 DSH 安装（registry 的 base/web-app/peer） | 全程用 repo vendor built CLI | 只能在真实第二机/发布环境验；本机标未执行 |
-| 运行中 install/remove/upgrade | 没有测试；profile 与运行实例的边界未知 | 最小并发安装边界；不安全就文档化 |
-| session 跨升级 resume、catalog presented 跨升级 | 只有文件/哨兵保留 | 补 resume/presented 断言或写原因 |
+| session 跨升级 **内容 resume**、catalog presented 跨升级 | 已证 session 文件/list 保留；未做内容重开与 presented 独立断言 | 补 resume/presented 或写原因 |
 | Windows/容器/预构建 | 本机 Darwin；Docker daemon 不可用 | 静态审计；标未执行 |
 | 多 DSH 版本矩阵 | 只有当前 pin | 无现成构建，标未验证 |
 
