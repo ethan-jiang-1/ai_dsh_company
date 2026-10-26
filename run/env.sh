@@ -60,6 +60,10 @@ unset _repo_root
 
 echo "DSH_HOME=$DSH_HOME（日用 home ~/.dsh 不受影响）；验证用 pnpm dsh（vendor 基线），裸 dsh 已拦截。"
 
+# 浏览器可选面（2026-10-26）：npm 发布的 DSH meta package 不含 browser-use 两包；本仓 dev 用
+# vendor 源码树，两包在安装侧可解析，但 preset 的自动探测从 profile 看，故这里显式开。
+export DSH_COMPANY_BROWSER=on
+
 # 出厂骨架首启自举（2026-10-13）：本仓的 workspace 由 `pnpm bundle:init` 建（制度件符号链接指回 pack），
 # 不需要插件在 DSH_HOME 下再复制一份 ⇒ 关掉；模拟安装（release-smoke）会自己把它翻回 if-missing。
 # 注意：关的是“复制骨架”，不是 bundle 身份——pack 仍会在 workspace 在场时写 bundle.json。

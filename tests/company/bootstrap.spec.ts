@@ -7,8 +7,8 @@
  * ⇒ 「已有文件不被覆盖」那条红。
  */
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync, lstatSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { homedir, tmpdir } from 'node:os'
+import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   applyBootstrap,
@@ -130,6 +130,21 @@ describe('首启自举：落点与开关', () => {
       expect(resolveCompanyHome('/h', '/x/y')).toBe('/x/y')
       process.env.DSH_COMPANY_HOME = '/env/company'
       expect(resolveCompanyHome('/h')).toBe('/env/company')
+    } finally {
+      if (before === undefined) delete process.env.DSH_COMPANY_HOME
+      else process.env.DSH_COMPANY_HOME = before
+    }
+  })
+
+  it('落点归一：~ 展开、相对路径绝对化、空白回落（2026-10-26 P1）', () => {
+    const before = process.env.DSH_COMPANY_HOME
+    try {
+      delete process.env.DSH_COMPANY_HOME
+      expect(resolveCompanyHome('/h', '~/company')).toBe(join(homedir(), 'company'))
+      expect(resolveCompanyHome('/h', 'relative/company')).toBe(resolve('relative/company'))
+      expect(resolveCompanyHome('/h', '   ')).toBe('/h/company-workspace')
+      process.env.DSH_COMPANY_HOME = ' ~/env-company '
+      expect(resolveCompanyHome('/h')).toBe(join(homedir(), 'env-company'))
     } finally {
       if (before === undefined) delete process.env.DSH_COMPANY_HOME
       else process.env.DSH_COMPANY_HOME = before

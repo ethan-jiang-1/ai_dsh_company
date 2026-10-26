@@ -71,7 +71,29 @@ if (!Array.isArray(pack.files) || !pack.files.includes('locale/*.json')) metaPro
 if (!Array.isArray(pack.files) || !pack.files.includes('icon.svg')) metaProblems.push('files 缺 icon.svg')
 if (pack.exports?.['./locale/*.json'] === undefined) metaProblems.push('exports 缺 ./locale/*.json')
 if (pack.exports?.['./icon'] === undefined) metaProblems.push('exports 缺 ./icon')
-metaProblems.length === 0
-  ? ok('pack-meta（locale en/zh + icon 在 files/exports）')
-  : fail('pack-meta', metaProblems.join('；'))
+
+// 发布文件清单（2026-10-26，P1）：lib/ 是 gitignored 的构建目录，`lib/**` 会把 tsc 的中间
+// .js/.map/.tsbuildinfo 一起打进包（0.3.9 实测 216/272 条是 lib/types）；发布面只留 runtime
+// 两半 + 声明。静态检查 files/exports，不依赖 lib 是否已构建（fresh clone 也能跑）。
+const files = Array.isArray(pack.files) ? pack.files : []
+const fileProblems = []
+for (const required of ['lib/index.js', 'lib/client.js', 'lib/types/**/*.d.ts']) {
+  if (!files.includes(required)) fileProblems.push(`files 缺 ${required}`)
+}
+if (files.includes('lib/**')) fileProblems.push('files 用了 lib/**（会把 tsc 中间产物/tsbuildinfo 打进包）')
+if (files.includes('lib/types/**/*.js') || files.includes('lib/types/**')) fileProblems.push('files 把 lib/types 的 .js 打进包')
+if (pack.dependencies !== undefined && Object.keys(pack.dependencies).length > 0) {
+  fileProblems.push('dependencies 非空（运行时依赖应走 peerDependencies；browser 两包也不进 dependencies）')
+}
+for (const [label, rel] of [
+  ['exports["."].default', pack.exports?.['.']?.default],
+  ['exports["."].types', pack.exports?.['.']?.types],
+  ['exports["./client"].default', pack.exports?.['./client']?.default],
+  ['exports["./client"].types', pack.exports?.['./client']?.types],
+]) {
+  if (typeof rel !== 'string' || !rel.startsWith('./')) fileProblems.push(`${label} 缺失或不是包内相对路径`)
+}
+fileProblems.length === 0
+  ? ok('pack-files（runtime 两半 + .d.ts；无 lib/** 中间产物）')
+  : fail('pack-files', fileProblems.join('；'))
 }

@@ -16,7 +16,7 @@
 | 确认录制行为与工作区判据 | [replay-smoke](smoke/replay-smoke.mjs) |
 | 审计动议输出和角色留痕 | [deliverables-check](audit/deliverables-check.mjs)、[authorship-audit](audit/authorship-audit.mjs)、[journal-audit](audit/journal-audit.mjs) |
 | 查看运行中页面 | [cdp-probe](../probes/browser-visual/cdp-probe.mjs)；操作指南见 [CDP 指南](../docs/guides/cdp-probe.md) |
-| 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs)、[lifecycle-smoke](smoke/lifecycle-smoke.mjs)、[standalone-smoke](smoke/standalone-smoke.mjs)、[export-dist](../tools/export-dist.mjs) |
+| 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs)、[channel-matrix-smoke](smoke/channel-matrix-smoke.mjs)、[lifecycle-smoke](smoke/lifecycle-smoke.mjs)、[standalone-smoke](smoke/standalone-smoke.mjs)、[export-dist](../tools/export-dist.mjs) |
 | 从目录隔离启动公司实例 | `pnpm standalone` → [standalone](../tools/standalone.mjs)（隔离 home/profile，不动日用 home） |
 
 模型调用与浏览器是两种独立成本。keyless 表示无需模型密钥：真实进程、浏览器或安装链仍有成本，保留在独立脚本 lane。文件名用来定位层，参数和头注决定实际运行模式；例如 replay 默认回放，`--ui` 加浏览器，`--record` 才重录模型调用。`presence-e2e` 检查 RPC 投影，不启动浏览器。
@@ -41,6 +41,8 @@
 | [snapshot-motion-smoke.mjs](smoke/snapshot-motion-smoke.mjs) | 真实 CLI 子进程中的快照采集与 workspace capture 接线 |
 | [release-smoke.mjs](smoke/release-smoke.mjs) | 构建、打包、干净 profile 安装与 built CLI 启动 |
 | [lifecycle-smoke.mjs](smoke/lifecycle-smoke.mjs) | 真 tarball v1→v2 升级、卸载、搬 home 迁移（keyless；不含 registry/降级/跨 OS） |
+| [channel-matrix-smoke.mjs](smoke/channel-matrix-smoke.mjs) | vendor built CLI 与**真实全局 dsh** 的五角色 roster/session/create；`--with-browser` 验可选 browser 包自动启用（keyless；global 需要网络） |
+| [isolation-matrix-smoke.mjs](smoke/isolation-matrix-smoke.mjs) | 已有 bundle 后改 `DSH_COMPANY_HOME` 的告警/不建新盘；相对/`~` 落点归一（keyless；~1-2min） |
 | [standalone-smoke.mjs](smoke/standalone-smoke.mjs) | 目录独立启动：隔离 home/profile、copy 骨架、boot/RPC、relink、reset（keyless） |
 | [present-catalog-smoke.mjs](smoke/present-catalog-smoke.mjs) | 真 vendor `present` 工具 → session `deliverables/presented` → host catalog（keyless；~1s） |
 | [multi-install-smoke.mjs](smoke/multi-install-smoke.mjs) | 双 home 真装隔离、非空 home 后装、同 home 多 profile 反例、自定义 profile 补 web-app、空 bundle 共存、幂等（keyless；~3-4min，发布前手动） |

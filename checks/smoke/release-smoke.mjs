@@ -68,6 +68,8 @@ try {
   const env = plainNodeEnv({ ...process.env, DSH_HOME: home,
     DSH_COMPANY_HOME: companyHome,
     DSH_COMPANY_BOOTSTRAP: 'if-missing',
+    // vendor 通道安装侧有 browser 两包；显式开，避免 auto 探测从 profile 看而误关。
+    DSH_COMPANY_BROWSER: 'on',
     npm_config_cache: join(home, 'tmp/npm-cache'), npm_config_store_dir: join(ROOT, '.pnpm-store'),
     npm_config_verify_deps_before_run: 'false',
   })

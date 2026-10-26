@@ -1,17 +1,19 @@
 # dsh-company-pack
 
-> **给收件人（先读这个）**：本包是 `dsh-company-pack`（版本见 `package.json` / 手册表头）；只支持 DSH `>=0.2.1-rc.2 <0.3.0`
-> / Node ≥22.19。安装、sha256 校验、升级、卸载、回退见与 tarball 同目录的《安装手册》
+> **给收件人（先读这个）**：本包是 `dsh-company-pack`（版本见 `package.json` / 手册表头）；DSH 窗口 = `engines.dsh`
+> （`>=0.2.1-rc.2 <0.3.0`），Node ≥22.19。已验证通道 = vendor 源码构建 `dsh-v0.2.1-rc.2` 与 npm 发布版
+> `0.2.1-rc.3`；安装、sha256 校验、升级、卸载、回退见与 tarball 同目录的《安装手册》
 > （`_dist/安装手册.md`，由 `node tools/export-dist.mjs` 生成，不在 tarball 内）。
 > 许可 = `UNLICENSED`（内部交付，未授予再分发权）。
 
 ## Install
 
 把与 tarball 同目录的《安装手册》按步骤执行：独立 `DSH_HOME` → `dsh plugin --profile web add <tarball>` → 首次启动落公司盘。
-前置 = Node ≥22.19、DSH `0.2.1-rc.2`、**pnpm 11（或 `corepack enable pnpm`）**；sha256 校验见手册；本包不在 npm registry。
+前置 = Node ≥22.19、DSH 窗口内版本、**pnpm 11 或 12**（`corepack enable pnpm` 只保证有 pnpm；实际版本由 profile 目录的 corepack 解析）；sha256 校验见手册；本包不在 npm registry。
 
 - **profile 形状**：必须使用含 `@deepseek-ai/dsh-web-app` 的 web profile；自定义 profile 名可以，但必须把 `dsh-web-app` 加进 `dsh.profile.bundles`。base-only 自定义 profile 会让 preset 行 pending。
 - **一个 `DSH_HOME` = 一个 run bundle**：同一个 home 下多个 profile 共享 `bundle.json`、sessions 与默认 workspace，**不是隔离**；第二家公司/第二个 CEO 用第二个 `DSH_HOME`。
+- **浏览器可选**：npm 发布的 `@deepseek-ai/dsh` 不含 browser 两包，preset 默认禁用 browser 组，五角色照常可用；装 `@deepseek-ai/dsh-browser-use` + `@deepseek-ai/dsh-experimental-browser-use-playwright-mcp`（同 DSH 版本）后自动启用；`DSH_COMPANY_BROWSER=on/off` 可强制。
 
 ## What it contributes
 
@@ -22,7 +24,8 @@
 
 ## Configuration
 
-- `DSH_COMPANY_HOME`：公司盘落点（默认 `<DSH_HOME>/company-workspace`）。
+- `DSH_COMPANY_HOME`：公司盘落点（默认 `<DSH_HOME>/company-workspace`）；支持绝对路径与 `~/`，相对路径按启动 cwd 归一（0.3.10 起）。
+- `DSH_COMPANY_BROWSER`：浏览器能力开关；缺省 = profile 能解析 browser 两包就开，否则关；`on`/`off` 强制。
 - `DSH_COMPANY_BOOTSTRAP=off`：只关“复制骨架”，不关 `bundle.json` 身份（自管盘的部署用）。
 - `company-client` 行的 `cultivationRoot`：方法层根；缺席时 `/cultivation adopt|revoke` 明确报错。
 - 兼容窗口：`engines.dsh`（运行时只读这一行；没有它才看 peers）。
@@ -36,21 +39,27 @@
 | 包 `C` | 无用户数据；`workspace/` 是只读 starter | 安装包目录 | 升级整体替换；**绝不在包目录写 data/cache/日志** |
 | 工作区 `W` | 公司盘：手册/章程/台账/交付物/`kb/company.md`；host 生成的 `kb/deliverables-index.json` | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME` | 不动；基部文件按哈希替换、你改过的保留 |
 | home `U/H` | `bundle.json`（身份/基部指纹）、`logs/company-pack-upgrade.log`、`profiles/<p>/company-cultivation/<role>/` | `<DSH_HOME>` | 不动 |
-| session `S` | 会话日志由宿主拥有；本包不自造 event 类型 | `<DSH_HOME>/sessions/` | 不动 |
-| 凭据 `X` | 不写入包；走 `<DSH_HOME>/.credentials.yaml` / 环境变量 | home | 用户管理 |
+| session `S` | 会话日志由宿主拥有；本包不自造 event 类型；目录名/session header 含 cwd 绝对路径 | `<DSH_HOME>/sessions/` | 不动 |
+| 派生索引 `I` | `company-client` 行声明的全文索引（可能含会话正文） | `<DSH_HOME>/profiles/<p>/session-search.db` | 卸载不删；备份按敏感数据处理 |
+| 宿主登记 `R` | DSH 的 workspace 登记（绝对路径） | `<DSH_HOME>/storages/workspace.json` | 宿主所有；搬 home 后不会自动重写 |
+| 浏览器 `B` | 浮窗几何等 UI 记忆（localStorage，按 origin/端口隔离）；不是公司盘数据 | 浏览器 profile | 换端口/浏览器即新 origin；同端口复用会看到上一实例的同 origin 键 |
+| 凭据 `X` | 不写入包；走 `<DSH_HOME>/.credentials.yaml` / 环境变量 | home | 用户管理；文件必须 0600 |
 
 说明：`bootstrap`/catalog 是**部署 provisioning 与 UI 派生索引**，用宿主 `node:fs`（不在模型工具沙箱内）；模型对工作区文件的读写仍走 `ctx.fs`/文件工具。`kb/deliverables-index.json` 是派生视图，删掉可由 host 重建。
 
-公司盘根固定在 `<DSH_HOME>/company-workspace`（或 `DSH_COMPANY_HOME`）。若会话 cwd 不是这个盘，页签/身份显示「非公司盘 / 身份未配置」，host 不静默改读 cwd；需要另一个盘就换 `DSH_COMPANY_HOME` 或另起一个 run bundle。
+公司盘根固定在 `<DSH_HOME>/company-workspace`（或 `DSH_COMPANY_HOME`）。若会话 cwd 不是这个盘，页签/身份显示「非公司盘 / 身份未配置」，host 不静默改读 cwd。
+
+**换盘/搬家不是改一个环境变量**：`bundle.json` 的 workspace 是 bundle 身份的一部分；已有 manifest 时改 `DSH_COMPANY_HOME`，启动会明确警告并拒绝在新路径建第二份盘。换盘/搬家请用新 `DSH_HOME`（先备份），或备份后删除 `bundle.json` 重建。搬 home 后 DSH 自己的 `storages/workspace.json` 与 session 目录名仍是绝对旧路径，需在侧栏重新添加工作区；旧 session 不会自动迁移。
 
 ## Compatibility
 
-- 运行时硬门 = `engines.dsh`（见 `package.json`）；已认证 tag 台账只住维护者仓库、不随包分发，不是 DSH 字段。用户只需看 `engines.dsh`。
+- 运行时硬门 = `engines.dsh`（见 `package.json`）；已认证 tag 台账只住维护者仓库、不随包分发，不是 DSH 字段。窗口宽于已测 tag：**可安装 ≠ 已认证**；已实测见 `docs/release.md`。
+- 已实测通道：vendor 源码构建 `dsh-v0.2.1-rc.2`、npm 发布版 `0.2.1-rc.3`（global `dsh`）；Windows/容器/其他 0.2.x 未执行，不冒充支持。
 - 本包 `private: true`、`license: UNLICENSED`（内部交付）；npm/market 发布未启用。
 
 ## Uninstall
 
-`dsh plugin --profile web remove dsh-company-pack`：只摘插件与 profile 层，公司盘、sessions、`bundle.json`、方法层保留。
+`dsh plugin --profile web remove dsh-company-pack`：只摘插件与 profile 层，公司盘、sessions、`bundle.json`、方法层、`session-search.db` 保留。
 要彻底删除一个部署，确认备份后删除它的整个 `<DSH_HOME>`。详见《安装手册》第六节。
 
 ## Owner（维护者）

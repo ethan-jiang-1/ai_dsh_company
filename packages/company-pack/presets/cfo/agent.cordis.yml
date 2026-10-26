@@ -154,6 +154,9 @@
           - id: browser-use
             name: cordis:group
             group: true
+            # 浏览器是可选面：npm 发布的 DSH meta package 不含这两个包；缺包时整组禁用，五角色照常可用。
+            # 装包后 profile 可解析即自动开；也可用 DSH_COMPANY_BROWSER=on/off 强制（dev 的 run/env.sh 设 on）。
+            disabled: !!js "process.env.DSH_COMPANY_BROWSER === 'off' || (process.env.DSH_COMPANY_BROWSER !== 'on' && (() => { try { const r = process.getBuiltinModule('node:module').createRequire(new URL('package.json', baseUrl)); r.resolve('@deepseek-ai/dsh-browser-use'); r.resolve('@deepseek-ai/dsh-experimental-browser-use-playwright-mcp'); return false } catch { return true } })())"
             isolate:
               browserUse: true
             config:

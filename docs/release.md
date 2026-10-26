@@ -21,14 +21,21 @@
   peers 是**声明语义**（"验证过的宿主 API 面"），不是安装要求。
 - **兼容窗口 = `engines.dsh`**：DSH 在安装/启动时只读这一行（存在即忽略 peers；台账是“已认证 tag”
   台账，不是运行时门）。当前窗口见 `package.json`；`pack-shape` 的 `pack-engines` 强制它覆盖钉住的
-  pin，且 license/repository/private 在场。
+  pin，且 license/repository/private 在场。**窗口是“可安装”，不是“已认证”**：已实测通道 = vendor
+  `dsh-v0.2.1-rc.2` + npm 发布版 `0.2.1-rc.3`；其他 0.2.x 未执行。
+- **npm 发布版不含 browser 两包**：`@deepseek-ai/dsh` meta package 在 rc.2/rc.3 都不依赖
+  `@deepseek-ai/dsh-browser-use` 与 `@deepseek-ai/dsh-experimental-browser-use-playwright-mcp`。
+  五角色 preset 的 browser 组因此**条件启用**（profile 可解析即开，`DSH_COMPANY_BROWSER=on/off` 强制；
+  缺包时整组禁用、角色照常可用）；browser 两包不进 `dependencies`，保住离线/零 runtime 依赖姿态。
 - **许可与发布**：`license: UNLICENSED`（内部交付，未授予再分发权）；`private: true` 保留到 publish。
   真实 npm 发布仍是“第二个消费者出现再定”。
 - **client 面自打包**：`lib/client.js` 由 tsdown 产出，react 与 `dsh-client-*`/`dsh-api-*`
   留作浏览器模块表 require（见 `packages/company-pack/tsdown.config.ts` 外置规则），
   其余内联——所以 tarball 的浏览器半零 runtime 依赖。
 - **exports 不说谎**：`./src/*` 出口已摘（tests 一律相对路径导入源码面；tarball 的 `files`
-  不含 src，留着一个指向不存在文件的出口就是发布形状的谎言）。
+  不含 src，留着一个指向不存在文件的出口就是发布形状的谎言）。`files` 只发 runtime 两半
+  （`lib/index.js` + `lib/client.js`）与 `lib/types/**/*.d.ts`；tsc 的中间 `.js`/`.map`/
+  `.tsbuildinfo` 不进包（`lib/**` 会把 216/272 条打成构建中间物）。
 
 ## 兼容台账（`checks/gates/lib/compat-tags.json`）
 
@@ -92,6 +99,10 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 
 **生命周期冒烟**（`node checks/smoke/lifecycle-smoke.mjs`）：真 tarball v1 → 改基部/加扩张 → v2 → 启动，再卸载、搬 home 重装；补 release-smoke 不覆盖的升级/卸载/迁移面。它不证明 registry 升级、降级、并发或跨 OS。
 
+**通道矩阵冒烟**（`node checks/smoke/channel-matrix-smoke.mjs --channel all`）：vendor built CLI + 真实全局 `dsh`，验证五角色 roster 与 `session/create`；`--with-browser` 另验装 browser 两包后自动启用。它证明“真实启动器通道”，不证明浏览器 UI；需要 PATH 有 global `dsh` 与网络，默认不进 `release --verify`，发布前手动跑。
+
+**隔离矩阵冒烟**（`node checks/smoke/isolation-matrix-smoke.mjs`）：已有 `bundle.json` 后改 `DSH_COMPANY_HOME` 必须告警且不建新盘；相对/`~` 落点归一。它不证明搬家后 DSH 自己的 `storages/workspace.json`/session cwd 会自动迁移。
+
 ## 升 pin 程序（`node tools/sync-dsh.mjs`，认证档）
 
 **触发政策（2026-10-12 用户写死）**：升 pin = **用户策动制**——agent 不主动盯上游 tag、不评估、不建议、不记录候选；只有用户明确指示升 pin 才进本节程序。渠道**只认 RC 与正式版（stable）**；alpha/beta 及其他预发布 tag 通通不管（即使被点名也不作为升 pin 对象——改政策须新 Note，见 D42）。
@@ -119,7 +130,7 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 
 ## 版本纪律
 
-- pack 版本 `0.3.9`（`private: true`——**尚未发布到任何 registry**；真实发布动作（npm publish）等
+- pack 版本 `0.3.10`（`private: true`——**尚未发布到任何 registry**；真实发布动作（npm publish）等
   出现第二个消费者/部署需求时再定；本轮只把本地 tarball 交付内化为 `pnpm release`，未 publish。
   当前 release-smoke 验证的是 `file:` tarball 安装形状）。版本史与每版变化唯一家 =
   [CHANGELOG](../CHANGELOG.md)（此处不写变更史）；改内容必 bump（见下条）。
@@ -128,7 +139,8 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
   **改内容必 bump 版本**；**发布字节 = 冒烟字节**（publish 的产物必须就是 release-smoke
   验过的那份，不另打包）。
 - **OpenSpec 引入**（原 dev-loop §5 时点表随迁）：触发条件 = **第二贡献者进场**或**向 DSH 上游提 seam**（配合 D9 走方案 B）；此前 notes/ 纪律够用（FAQ 13 answer.md 决策 5）。
-- 发布前必跑：`pnpm verify` + `pnpm test`（迭代环）+ `release-smoke`（认证档）；
+- 发布前必跑：`pnpm verify` + `pnpm test`（迭代环）+ `release-smoke`（认证档）+
+  `channel-matrix-smoke --channel all`（真实 npm 通道）；
   preset/内容改动另跑 `preset-smoke`（guides/dev-loop §9.1 分层）。
 
 ## 手动分发（`node tools/export-dist.mjs`，无 key、秒级；2026-09-28 立，精神借 ai_dsh_architect）
@@ -141,7 +153,8 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
   版本 == pack package.json，**且**含 `run bundle` / `bundle.json` / `company-workspace` 关键句与
   当前 pin（升版本忘重导、或内容退回旧安装形状，都会红；反证 2026-09-28 与 2026-10-24 两次红→绿）。
   版本 bump 必须同 diff 重跑导出。
-- **打包步 = release-smoke 同一条 `npm pack`**（npm cache 钉 scratch，§11）；导出后对产物本体
+- **导出先 build**：`tsc -b` + `tsdown`（`lib/` 是 gitignored；直接 `npm pack` 会打旧产物，2026-10-26 实测风险）；
+  **打包步 = release-smoke 同一条 `npm pack`**（npm cache 钉 scratch，§11）；导出后对产物本体
   再断言一次发布边界（cordis.patch.yml / lib 双半 / presets 在场，无 `package/` 外文件）。
 - **产物身份**：`export-dist` 算 tgz 的 sha256，写同目录 `.sha256` 并注入手册；`dist-manual` 在
   本体在场时逐字节核对，未导出/新 clone 时只查形状，不冒充校验过。

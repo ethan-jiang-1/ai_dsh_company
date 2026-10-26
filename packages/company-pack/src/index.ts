@@ -18,6 +18,7 @@ import {
   planBundleManifest,
   planSkeletonUpgrade,
   readBundleManifestState,
+  resolveRecordedWorkspace,
   resolvePackMetadata,
   writeBundleManifest,
   writeUpgradedManifest,
@@ -121,15 +122,27 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   // 盘守卫（卡 6）：会话 cwd 必须落在本 run bundle 的公司盘内；不一致只告警（不拒绝会话），
   // 页签/身份会显示「非公司盘 / 身份未配置」。bundle.json 的 workspace 是权威；没有身份时退回
   // DSH_COMPANY_HOME/companyHome。realpath 规避符号链接假阳性。
-  const guardDshHome = resolveDshHome()
-  const guardState = readBundleManifestState(guardDshHome)
-  const guardCompanyHome = resolveCompanyHome(guardDshHome)
-  const recordedWorkspace = guardState.status === 'ok' && typeof guardState.manifest.workspace === 'string'
-    ? guardState.manifest.workspace
+  const bundleHome = resolveDshHome()
+  const configuredCompanyHome = resolveCompanyHome(bundleHome)
+  const bundleState = readBundleManifestState(bundleHome)
+  const recordedWorkspace = bundleState.status === 'ok'
+    ? resolveRecordedWorkspace(bundleHome, bundleState.manifest.workspace)
     : undefined
-  const expectedWorkspace = canonicalPath(recordedWorkspace === undefined
-    ? guardCompanyHome
-    : isAbsolute(recordedWorkspace) ? recordedWorkspace : resolve(guardDshHome, recordedWorkspace))
+  // bundle 身份以 bundle.json 的 workspace 为准；DSH_COMPANY_HOME 改到别处时不能静默
+  // 在新路径再建一份公司盘（那会让一个 home 分裂成两个盘）。本次跳过自举/升级/目录重建，
+  // 只告警；换盘/搬家 = 新 DSH_HOME，或备份后删除 bundle.json 重建。
+  const rebound = recordedWorkspace !== undefined
+    && canonicalPath(recordedWorkspace) !== canonicalPath(configuredCompanyHome)
+  if (rebound) {
+    const warning = `company-pack：bundle.json 记录的公司盘是 ${recordedWorkspace}，当前 DSH_COMPANY_HOME 解析为 ${configuredCompanyHome}；`
+      + 'bundle 身份以记录为准，本次不写新盘/不升级/不重建目录。换盘或搬家请用新 DSH_HOME（先备份）；'
+      + '确要在本 home 换指针，备份后删除 bundle.json 再启动。'
+    ctx.logger?.warn?.(warning)
+    // 数据分裂风险必须出现在启动输出里，不能只进 logger 文件（2026-10-26 实测 logger 不落 stdout）。
+    process.stderr.write(`dsh: ${warning}\n`)
+  }
+  const companyHome = recordedWorkspace ?? configuredCompanyHome
+  const expectedWorkspace = canonicalPath(companyHome)
   ctx.on('api-session/added', (summary) => {
     if (summary.origin === 'subagent') return
     if (typeof summary.cwd !== 'string' || summary.cwd === '') return
@@ -213,10 +226,10 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   //    默认落到 `<DSH_HOME>/company-workspace`（第三方装完即有盘可连）；已存在的盘一个字节都不动
   //    ——本仓自己的 `company-workspace/` 因此天然免疫（那里的制度件还是符号链接）。
   //    `DSH_COMPANY_HOME` 换落点、`DSH_COMPANY_BOOTSTRAP=off` 关掉（自管盘的部署用，见 run/env.sh）。
-  if (bootstrapEnabled()) {
+  if (!rebound && bootstrapEnabled()) {
     try {
       const skeleton = resolveSkeletonDir(import.meta.url)
-      const { plan, result } = bootstrapCompanyWorkspace(skeleton, resolveCompanyHome(resolveDshHome()))
+      const { plan, result } = bootstrapCompanyWorkspace(skeleton, companyHome)
       if (plan.error !== undefined) {
         ctx.logger?.warn?.(`company-pack 骨架自举跳过：${plan.error}`)
       } else if (result.created.length > 0) {
@@ -233,18 +246,16 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   //    `<DSH_HOME>/bundle.json`。只创建、绝不覆盖；workspace 不存在则不写（没有盘就不冒充 bundle）。
   //    与 bootstrap 开关解耦：自管盘的部署（本仓 dev）仍需要一个身份与骨架指纹。
   try {
-    const dshHome = resolveDshHome()
-    const companyHome = resolveCompanyHome(dshHome)
-    if (existsSync(companyHome)) {
+    if (!rebound && existsSync(companyHome)) {
       const skeleton = resolveSkeletonDir(import.meta.url)
       const pack = resolvePackMetadata(import.meta.url)
-      const state = readBundleManifestState(dshHome)
+      const state = bundleState
       if (state.status === 'corrupt') {
         // 不静默：损坏的 manifest 不是首启。保留原文件（身份不丢给猜测），要求人工修复或备份后删除。
         ctx.logger?.warn?.(`company-pack：bundle.json 损坏，已保留原文件并跳过身份/升级（${state.path}：${state.error}）；`
           + '修好后重启，或备份后删除该文件让下次启动重建')
       } else if (state.status === 'missing') {
-        const plan = planBundleManifest({ dshHome, companyHome, skeletonDir: skeleton, pack })
+        const plan = planBundleManifest({ dshHome: bundleHome, companyHome, skeletonDir: skeleton, pack })
         if (writeBundleManifest(plan).created) {
           ctx.logger?.info?.(`company-pack：run bundle 身份已建立（${plan.path}）`)
         }
@@ -253,12 +264,12 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
         const plan = planSkeletonUpgrade({ manifest: existing, skeletonDir: skeleton, workspace: companyHome, pack })
         if (plan.changed) {
           const result = applySkeletonUpgrade(plan, skeleton, companyHome)
-          writeUpgradedManifest(bundleManifestPath(dshHome), plan.manifest)
+          writeUpgradedManifest(bundleManifestPath(bundleHome), plan.manifest)
           const modified = plan.actions.filter(action => action.reason === 'modified').map(action => action.rel)
           const summary = `基部升级 ${existing.skeleton.version} → ${pack.version}`
             + `（新增 ${String(result.created.length)} / 替换 ${String(result.updated.length)}`
             + ` / 保留用户改过 ${String(modified.length)}${modified.length > 0 ? `：${modified.join(', ')}` : ''}）`
-          appendUpgradeLog(dshHome, summary)
+          appendUpgradeLog(bundleHome, summary)
           ctx.logger?.info?.(`company-pack：${summary}`)
         }
       }
@@ -271,8 +282,7 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   // 首启生成空 catalog（页签显示“还没有成品”，而不是“维护者运行 node tools/...”）；
   // present 事件落盘后重生成。只写 workspace 的 kb/ 索引，不碰交付物本体。
   try {
-    const companyHome = resolveCompanyHome(resolveDshHome())
-    if (existsSync(companyHome)) {
+    if (!rebound && existsSync(companyHome)) {
       const result = regenerateCatalog(companyHome)
       if (result.written) ctx.logger?.info?.(`company-pack：成品目录已生成（${result.path}）`)
     }
@@ -281,8 +291,8 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   }
   ctx.on('session/event', (_session, event) => {
     if ((event as { type?: unknown }).type !== 'deliverables/presented') return
+    if (rebound) return
     try {
-      const companyHome = resolveCompanyHome(resolveDshHome())
       const observed = presentedFromEvent(event, companyHome)
       if (observed.paths.size > 0) regenerateCatalog(companyHome, observed)
     } catch (error) {

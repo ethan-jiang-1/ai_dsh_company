@@ -14,7 +14,8 @@
 import { existsSync, mkdirSync, readdirSync, writeFileSync, lstatSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import type { Dirent } from 'node:fs'
-import { join, sep } from 'node:path'
+import { join, resolve, sep } from 'node:path'
+import { expandHomePath } from '@deepseek-ai/dsh-home-paths'
 
 /**
  * 环境面（两个旋钮）：
@@ -161,13 +162,18 @@ export function resolveSkeletonDir(moduleUrl: string): string {
 
 /**
  * 目标公司盘：显式值 > `DSH_COMPANY_HOME` > `<DSH_HOME>/company-workspace`。
+ *
+ * 归一规则与 `resolveDshHome` 同口径：`~` / `~/` 展开、相对路径按当前工作目录绝对化、
+ * 空白值视为未设置。**不能把 env 原样返回**——相对/带 `~` 的值会让落点随 cwd 漂移，
+ * 并让 `bundle.json.workspace` 记下一个不可复现的字符串（2026-10-26 实测）。
  * @param dshHome - `dshHomePath()` 的根（由 host 入口注入，便于测试）。
  * @param override - 显式覆盖（目前只有 env 面）。
- * @returns 绝对路径。
+ * @returns 绝对路径（默认落点也基于传入的 dshHome）。
  */
 export function resolveCompanyHome(dshHome: string, override?: string): string {
-  const explicit = override ?? env('DSH_COMPANY_HOME')
-  return explicit !== undefined && explicit !== '' ? explicit : join(dshHome, 'company-workspace')
+  const raw = (override ?? env('DSH_COMPANY_HOME'))?.trim()
+  if (raw === undefined || raw === '') return join(dshHome, 'company-workspace')
+  return resolve(expandHomePath(raw))
 }
 
 /** 自举开关：`DSH_COMPANY_BOOTSTRAP=off` 关闭（我们的 dev/排练场不需要它时用）。 */

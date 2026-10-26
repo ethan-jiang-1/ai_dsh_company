@@ -27,7 +27,10 @@ export function run({ root, ok, fail }) {
   const required = ['run bundle', 'bundle.json', 'company-workspace', 'workspace/', 'sha256', 'Node', 'DSH', '卸载', '回退']
   const missing = required.filter(phrase => !manual.includes(phrase))
   if (missing.length > 0) problems.push(`手册缺安装形状/契约关键句：${missing.join(' / ')}（run bundle / bundle.json / workspace 骨架 / sha256 / Node / DSH / 卸载 / 回退）`)
-  if (!/\*\*pnpm 11\*\*/.test(manual)) problems.push('手册缺 pnpm 安装前置（plugin add 需要 pnpm；没有它会报 pnpm was not found）')
+  if (!/pnpm 11/.test(manual) || !/\b12\b/.test(manual)) {
+    problems.push('手册缺 pnpm 11/12 前置（plugin add 在 profile 目录调 pnpm；真实 corepack 默认可能是 12.x）')
+  }
+  if (!/DSH_COMPANY_BROWSER/.test(manual)) problems.push('手册缺 browser 条件开关（缺包时禁用、装包后自动启用）')
   if (!/dsh-web-app/.test(manual)) problems.push('手册缺 profile 合同（公司包要求含 dsh-web-app 的 web profile）')
   if (!/一个 \`DSH_HOME\` 只对应一个 run bundle/.test(manual)) problems.push('手册缺「一个 home 一 bundle」合同')
   if (!manual.includes(expectedTag)) problems.push(`手册缺验证基线 \`${expectedTag}\`（pin 漂了或没重导）`)

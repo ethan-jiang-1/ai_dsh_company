@@ -14,7 +14,7 @@
  */
 import { createHash, randomUUID } from 'node:crypto'
 import { appendFileSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, isAbsolute, join, relative, sep } from 'node:path'
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 /** 当前 manifest 形状版本；字段变化时升。 */
@@ -92,6 +92,17 @@ export function skeletonDigest(skeletonDir: string): Record<string, string> {
     files[rel] = createHash('sha256').update(readFileSync(join(skeletonDir, rel))).digest('hex')
   }
   return files
+}
+
+/**
+ * 把 manifest 里的 workspace 记录还原成绝对路径。bundle.json 的 workspace 是**身份的一部分**：
+ * 创建后不随 DSH_COMPANY_HOME 改写；换盘/搬家应新开 home 或显式重建，不在旧 home 上静默换指针。
+ * @param dshHome - bundle 所在 home（相对记录按它解析）。
+ * @param record - manifest.workspace 的原始值；非字符串/空白返回 undefined。
+ */
+export function resolveRecordedWorkspace(dshHome: string, record: unknown): string | undefined {
+  if (typeof record !== 'string' || record.trim() === '') return undefined
+  return isAbsolute(record) ? record : resolve(dshHome, record)
 }
 
 /** workspace 根的记录形态：在 home 内记相对路径，否则记绝对路径。 */

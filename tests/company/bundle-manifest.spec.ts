@@ -18,6 +18,7 @@ import {
   readBundleManifest,
   readBundleManifestState,
   resolvePackMetadata,
+  resolveRecordedWorkspace,
   skeletonDigest,
   workspaceRecord,
   writeBundleManifest,
@@ -25,6 +26,15 @@ import {
 } from '../../packages/company-pack/src/host/bundle-manifest.ts'
 
 const PACK = { name: 'dsh-company-pack', version: '0.3.0' }
+
+describe('bundle.json 的 workspace 记录', () => {
+  it('相对路径按 home 还原，绝对路径原样，空白/非字符串不冒充', () => {
+    expect(resolveRecordedWorkspace('/h', 'company-workspace')).toBe('/h/company-workspace')
+    expect(resolveRecordedWorkspace('/h', '/abs/company')).toBe('/abs/company')
+    expect(resolveRecordedWorkspace('/h', '  ')).toBeUndefined()
+    expect(resolveRecordedWorkspace('/h', 42)).toBeUndefined()
+  })
+})
 
 function skeleton(): string {
   const dir = mkdtempSync(join(tmpdir(), 'bundle-skeleton-'))

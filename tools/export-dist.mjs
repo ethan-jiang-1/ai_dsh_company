@@ -1,21 +1,22 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：需要交付 tarball 给仓库外的人时（版本号变动后、给无仓库权限者、风险变更前快照）；无 key，秒级。
+// 何时跑：需要交付 tarball 给仓库外的人时（版本号变动后、给无仓库权限者、风险变更前快照）；无 key，构建+打包秒级。
 // 用法：node tools/export-dist.mjs
 //
 // 手动分发导出（精神借 ai_dsh_architect 的 export-dist，2026-09-28）：把 company-pack 打成
 // _dist/ 下的 tarball + 同目录生成《安装手册》。三条规矩照搬：
 //   ① _dist/ 是导出目的地不是源——tgz 全 gitignore，手册是唯一 tracked 例外（版本门禁防漂）；
-//   ② 打包步 = release-smoke 每轮证明的同一个 `npm pack`（npm cache 钉 scratch，不碰 ~/.npm），
+//   ② 打包前先 tsc -b + tsdown（lib/ 是 gitignored；不 build 会打出旧产物）；打包步 = release-smoke 同一条 `npm pack`（npm cache 钉 scratch，不碰 ~/.npm），
 //      导出后对产物本体再跑一遍清单边界断言（必备条目在场、无 package/ 外文件）；
 //   ③ 手册由脚本生成、注入版本与日期，永不手改——手册和旁边的 tarball 不可能漂。
 // 导出 ≠ 发布：不 bump 版本、不跑门禁（除清单）、不发布任何 registry——按工作树现状打包。
 import { repositoryRoot as repoRoot } from './lib/repository-layout.mjs'
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
+import { createRequire } from 'node:module'
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 
 const packDir = join(repoRoot, 'packages', 'company-pack')
 const distDir = join(repoRoot, '_dist')
@@ -35,6 +36,20 @@ try {
   const pinText = readFileSync(join(repoRoot, 'checks', 'gates', 'lib', 'pin.mjs'), 'utf8')
   const expectedTag = /const expectedTag = '([^']+)'/.exec(pinText)?.[1]
   if (!expectedTag) throw new Error('pin.mjs 缺 expectedTag；未替换已有导出')
+
+
+  // 0. 产物必须由当前源码构建：lib/ 整目录 gitignored，直接 npm pack 会静默打旧代码。
+  //    tsc -b 是 solution root 的 build 模式；tsdown 再产出 lib/index.js + lib/client.js。
+  const tsc = spawnSync(process.execPath, [join(repoRoot, 'node_modules/typescript/bin/tsc'), '-b', 'packages/company-pack'], {
+    cwd: repoRoot, encoding: 'utf8', timeout: 180_000,
+  })
+  report('build (tsc -b)', tsc.status === 0, (tsc.status === 0 ? '' : `${tsc.stdout ?? ''}${tsc.stderr ?? ''}`.trim().split('\n').slice(-3).join(' | ')))
+  if (tsc.status !== 0) throw new Error('tsc -b 失败；保留旧的 _dist 不替换')
+  const require = createRequire(join(repoRoot, 'package.json'))
+  const tsdown = join(dirname(require.resolve('tsdown/package.json')), 'dist/run.mjs')
+  const bundled = spawnSync(process.execPath, [tsdown], { cwd: packDir, encoding: 'utf8', timeout: 180_000 })
+  report('bundle (tsdown)', bundled.status === 0, (bundled.status === 0 ? '' : `${bundled.stdout ?? ''}${bundled.stderr ?? ''}`.trim().split('\n').slice(-3).join(' | ')))
+  if (bundled.status !== 0) throw new Error('tsdown 失败；保留旧的 _dist 不替换')
 
   // 只清本脚本自己的旧产物，不动 _dist/ 里别人放的东西
   mkdirSync(distDir, { recursive: true })
@@ -65,8 +80,11 @@ try {
   // run bundle 不进包（2026-10-24）：扩张数据/凭据/会话一律不许出现在 tarball。
   const forbidden = entries.filter((entry) => /^package\/(company-workspace|sessions|deliverables|cultivation|profiles)\//.test(entry)
     || /credentials/.test(entry))
-  report('tarball inventory', listed.status === 0 && missing.length === 0 && outside.length === 0 && presetFiles > 0 && forbidden.length === 0,
-    missing.length ? `missing: ${missing.join(', ')}` : `${entries.length} entries, presets ×${presetFiles}${outside.length ? `, outside package/: ${outside.join(', ')}` : ''}${forbidden.length ? `, forbidden: ${forbidden.slice(0, 3).join(', ')}` : ''}`)
+  // 发布面只留 runtime 两半 + 声明（2026-10-26）：tsc 的中间 .js/.map/.tsbuildinfo 不进包。
+  const buildLeak = entries.filter((entry) => /^package\/lib\/(?:tsconfig\..*\.tsbuildinfo|.*\.map)$/.test(entry)
+    || /^package\/lib\/types\/.*\.js$/.test(entry))
+  report('tarball inventory', listed.status === 0 && missing.length === 0 && outside.length === 0 && presetFiles > 0 && forbidden.length === 0 && buildLeak.length === 0,
+    missing.length ? `missing: ${missing.join(', ')}` : `${entries.length} entries, presets ×${presetFiles}${outside.length ? `, outside package/: ${outside.join(', ')}` : ''}${forbidden.length ? `, forbidden: ${forbidden.slice(0, 3).join(', ')}` : ''}${buildLeak.length ? `, build leak: ${buildLeak.slice(0, 3).join(', ')}` : ''}`)
 
   // 2b. 产物身份（2026-10-25，RFC distribution-lifecycle）：tgz 的 sha256 是收件人唯一的
   // 字节级凭证；手册与旁文件必须同源，不靠“下载后看起来一样”。
@@ -85,7 +103,7 @@ try {
 | 安装包 | \`${tarballName}\`（与本手册同目录） |
 | 校验（sha256） | \`${digest}\` |
 | 打包日期 | ${date} |
-| 验证基线 | DSH \`${expectedTag}\`（Node ≥ 22.19） |
+| 验证基线 | vendor \`${expectedTag}\` + npm 发布版 \`0.2.1-rc.3\`（Node ≥ 22.19；pnpm 11/12） |
 | 许可 | \`UNLICENSED\`（内部交付，未授予再分发权） |
 
 这个安装包是自包含的：bundle 补丁、五个角色 preset、浏览器端、**出厂公司盘骨架 workspace/**
@@ -97,18 +115,20 @@ try {
 
 ## 零、前置
 
-- **Node.js** ≥ 22.19（与 DSH 基线一致）。
-- **pnpm 11**（或 \`corepack enable pnpm\`）：profile 的 \`plugin add\` 需要 \`pnpm\` 在 PATH；
-  没有它时安装会报 \`dsh: pnpm was not found\`。
-- **DSH 运行时**：本手册只在 \`${expectedTag}\` 上验证过；用同版本安装包或源码 checkout
-  （例如 \`npx @deepseek-ai/dsh@${expectedTag.replace(/^dsh-v/, '')} web\`）。版本不匹配时安装会被拒绝。
+- **Node.js** ≥ 22.19（DSH 自身基线；先 \`node -v\`，低于此版本不要装）。
+- **pnpm 11 或 12**：\`dsh plugin\` 在 profile 目录调 pnpm。\`corepack enable pnpm\` 只保证有 pnpm，
+  实际版本由 corepack 从 profile 目录解析（0.3.9 实测无 \`packageManager\` 时会取 12.x）。先 \`pnpm -v\`；
+  要钉 11 用 \`corepack prepare pnpm@11.7.0 --activate\`。没有 pnpm 时安装会报 \`dsh: pnpm was not found\`。
+- **DSH 运行时**：已验证 vendor \`${expectedTag}\` 源码构建与 npm 发布版 \`0.2.1-rc.3\`；
+  运行时硬门是 \`engines.dsh\`，版本不匹配会被拒绝。**真实 npm 包不含 browser 两包**，见下方“可选：浏览器能力”。
 - **一个独立的 \`DSH_HOME\`**：不要复用日用 home，也不要让两个 CEO 共用一个 home。
 - **许可**：本包为内部交付（\`UNLICENSED\`），未授予再分发权；支持窗口 = 当前版本。
 
 ## 一、安装（给这个 CEO 一个独立的 home）
 
 \`\`\`sh
-command -v pnpm >/dev/null 2>&1 || { echo 'pnpm 11 不在 PATH；先 corepack enable pnpm'; exit 1; }
+command -v pnpm >/dev/null 2>&1 || { echo 'pnpm 不在 PATH；先 corepack enable pnpm'; exit 1; }
+node -e "const v=process.versions.node.split('.').map(Number); if(v[0]<22||(v[0]===22&&v[1]<19)){console.error('Node '+process.versions.node+' < 22.19');process.exit(1)}"
 export DSH_HOME="$HOME/dsh-bundles/<你的 CEO 名>"
 dsh plugin --profile web add /path/to/${tarballName}
 \`\`\`
@@ -120,6 +140,23 @@ dsh plugin --profile web add /path/to/${tarballName}
 
 空 home 会自建 \`web\` profile。装进日常环境也可以（不设 \`DSH_HOME\`），但那样第二个 CEO
 必须另开 home——**一个 home 只装一个 CEO**。
+
+### 可选：浏览器能力（0.3.10 起条件启用）
+
+npm 发布的 \`@deepseek-ai/dsh\` 不含 \`@deepseek-ai/dsh-browser-use\` 与
+\`@deepseek-ai/dsh-experimental-browser-use-playwright-mcp\`，所以五个角色默认**不带** browser 工具，
+但角色本身可用。要开浏览器：
+
+\`\`\`sh
+DSH_VER=$(dsh --version)
+dsh plugin --profile web add \
+  "@deepseek-ai/dsh-browser-use@$DSH_VER" \
+  "@deepseek-ai/dsh-experimental-browser-use-playwright-mcp@$DSH_VER"
+\`\`\`
+
+装进 profile 后 preset 自动探测并启用；也可用 \`DSH_COMPANY_BROWSER=on/off\` 强制。**不要**在没装包时
+设 \`on\`——五个角色会报 \`browser-use-def ... never started\`。源码 checkout/vendor 通道两包在安装侧，
+本仓库 \`run/env.sh\` 已设 \`on\`。
 
 日期通道与定时提醒随五个角色 preset 自带（0.2.1 起），不需要另装节律 bundle。
 
@@ -134,6 +171,9 @@ DSH_HOME="$HOME/dsh-bundles/<你的 CEO 名>" dsh web
 - 落 \`<DSH_HOME>/company-workspace\`（出厂骨架；已有盘一个字节不动，只补缺）；
 - 写 \`<DSH_HOME>/bundle.json\`（只创建、不覆盖）；
 - 你在侧栏 \`Workspaces\` 把该目录加成工作区（人手点一次），新建会话选 \`ceo\`。
+- \`DSH_COMPANY_HOME\` 建议用绝对路径或 \`~/...\`；相对路径会按启动 cwd 归一（0.3.10 起）。
+- **已有 bundle.json 时改 \`DSH_COMPANY_HOME\`**：启动会明确警告并拒绝在新路径建第二份盘；
+  换盘/搬家请用新 \`DSH_HOME\`（先备份），或备份后删除 \`bundle.json\` 重建。
 
 **干净判据**：新安装的公司盘只有骨架——没有 journal、没有交付物、没有培养记录、没有会话；
 这些是装完之后你自己长出来的（扩张能力）。
@@ -157,16 +197,27 @@ dsh --profile web --dump-config      # 插件层 + preset-ceo + company-client
 
 ## 四、升级
 
-替换 profile 里的包后重启。基部（手册 / 章程 / 模板 / 起动件）按哈希判定：
+\`\`\`sh
+dsh plugin --profile web add /path/to/<新版本>.tgz
+\`\`\`
+
+装完重启 \`dsh web\`，并硬刷新页面（浏览器模块不会热加载）。基部（手册 / 章程 / 模板 / 起动件）按哈希判定：
 **没改过的**随新包替换，**你改过的**保留并在 \`<DSH_HOME>/logs/company-pack-upgrade.log\` 里点名；扩张面
 （journal / 交付物 / 台账 / 方法层 / 会话）一个字节不动。\`bundle.json\` 的 \`skeleton.version\` 随升级前移。
 
 ## 五、备份 / 迁移
 
 整个 \`DSH_HOME\` 就是 bundle（含公司盘、sessions、方法层、凭据）。归档时排除
-\`.credentials.yaml\` 与含启动 token 的日志；换机器时连 home 一起搬。
-搬完后若 profile 的依赖目录失效，按第二节重新 \`plugin add\` 一次；公司盘、sessions、
-\`bundle.json\` 都不动。
+\`.credentials.yaml\`、\`sessions/\`、\`profiles/<p>/session-search.db\` 与含启动 token 的日志——
+它们可能含会话正文、绝对路径或密钥。\`.credentials.yaml\` 必须保持 \`0600\`（被改宽会拒绝启动）。
+
+换机器时连 home 一起搬；搬完若 profile 的依赖目录失效，按第二节重新 \`plugin add\` 一次。
+\`bundle.json\` 里的相对 workspace 会随新 home 解析；但 DSH 自己的 \`storages/workspace.json\`
+与 session 目录名存的是**绝对旧路径**，不会自动迁移——搬完在侧栏重新添加工作区，
+旧 session 仍在旧路径下，别把“文件还在”当成“UI 已迁移”。
+
+Windows 未验证：不要按本节的 \`shasum\` 路径执行；PowerShell 用
+\`Get-FileHash -Algorithm SHA256 <file>\` 校验。
 
 ## 六、卸载
 
@@ -193,6 +244,10 @@ dsh plugin --profile web remove dsh-company-pack
 | 两个 CEO 看到彼此的历史 | 复用了同一个 \`DSH_HOME\`：新开 home，bundle 之间不共享 |
 | 想确认装了什么版本 | \`dsh plugin --profile web list\`，或看 \`bundle.json\` 的 \`pack.version\` |
 | 成员会话内容被截断 | 宿主注入预算（maxBytes）需 ≥ 常驻注入链（见 pack README 已知限制），dsh 默认 65,536B 够用 |
+| 五角色报 \`browser-use-def ... never started\` | 没装 browser 两包却设了 \`DSH_COMPANY_BROWSER=on\`：装包或 unset/\`off\` |
+| \`bundle.json 记录的公司盘是 ...，当前 DSH_COMPANY_HOME ...\` | 已有 bundle 后改了落点；按提示用新 home，或备份后删 \`bundle.json\` 重建 |
+| \`dsh: pnpm was not found\` | pnpm 不在 PATH；先 \`corepack enable pnpm\` 并 \`pnpm -v\` |
+| 升级后页面还是旧模块 | 重启 \`dsh web\` + 硬刷新；浏览器模块不热加载 |
 `
   writeFileSync(join(distDir, manualName), manual)
   report('manual generated', true, `${manualName}（tracked，版本 ${version}）`)

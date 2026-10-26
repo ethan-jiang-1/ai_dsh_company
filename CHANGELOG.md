@@ -2,6 +2,22 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.3.10 — 2026-10-26
+
+### Fixed
+
+- **真实 npm 发布版 DSH 上五角色可用**：`@deepseek-ai/dsh` meta package 不含 browser 两包，旧 presets 会把五个角色全部标 broken、`session/create` 直接失败。browser 组改为条件启用：profile 可解析两包即自动开；缺包时整组禁用，五角色照常可用；`DSH_COMPANY_BROWSER=on/off` 可强制（dev 的 `run/env.sh` 设 on）。
+- **`DSH_COMPANY_HOME` 归一**：`~` 展开、相对路径按启动 cwd 绝对化、空白视为未设置；不再把不可复现的字符串写进 `bundle.json`。
+- **换盘不再静默分裂**：已有 `bundle.json` 时改 `DSH_COMPANY_HOME`，启动输出明确警告并拒绝在新路径建第二份公司盘。
+- **`export-dist` 先 build**：`lib/` 是 gitignored 的构建目录，直接 `npm pack` 会打出旧代码；导出前跑 `tsc -b` + `tsdown`。
+- **发布面包瘦身**：`files` 只留 `lib/index.js`、`lib/client.js`、`lib/types/**/*.d.ts`；tsc 中间 `.js`/`.map`/`.tsbuildinfo` 不再进包。
+
+### Added
+
+- `channel-matrix-smoke`：vendor built CLI + 真实全局 `dsh` 的五角色 roster/会话；`--with-browser` 验可选 browser 包自动启用。
+- `isolation-matrix-smoke`：改 `DSH_COMPANY_HOME` 的告警/不建新盘 + 相对/`~` 落点归一。
+- 安装手册补 pnpm 11/12、npm 发布版 `0.2.1-rc.3`、可选 browser、换盘/搬家与备份敏感面。
+
 ## 0.3.9 — 2026-10-26
 
 ### Changed
