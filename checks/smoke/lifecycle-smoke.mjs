@@ -159,6 +159,17 @@ try {
   check('v1 首启落公司盘', existsSync(join(companyHome, 'AGENTS.md')) && existsSync(join(companyHome, 'kb/org.md')),
     companyHome)
 
+  // 升级只允许动公司盘基部；home 里的 sessions/storages sentinel 必须逐字节不动。
+  mkdirSync(join(home, 'sessions'), { recursive: true })
+  mkdirSync(join(home, 'storages'), { recursive: true })
+  const homeSentinels = {
+    sessions: join(home, 'sessions/.lifecycle-sentinel'),
+    storages: join(home, 'storages/.lifecycle-sentinel'),
+  }
+  writeFileSync(homeSentinels.sessions, 'sessions sentinel\n')
+  writeFileSync(homeSentinels.storages, 'storages sentinel\n')
+  const homeSentinelHashes = { sessions: hashFile(homeSentinels.sessions), storages: hashFile(homeSentinels.storages) }
+
   console.log('③ 改基部 + 加扩张数据')
   appendFileSync(join(companyHome, 'AGENTS.md'), '\n<!-- lifecycle-keep -->\n')
   appendFileSync(join(companyHome, 'kb/org.md'), '\n<!-- lifecycle-org-keep -->\n')
@@ -212,6 +223,8 @@ try {
   check('改过的 kb/org.md 保留', org.includes('lifecycle-org-keep'))
   check('改过的 CHARTER 历史保留（基部不覆盖部署历史）', charter.includes('lifecycle-charter-keep'))
   check('未改过的模板随 v2 替换', weekly.includes('lifecycle-v2'))
+  check('home sessions/storages sentinel 逐字节不变', hashFile(homeSentinels.sessions) === homeSentinelHashes.sessions
+    && hashFile(homeSentinels.storages) === homeSentinelHashes.storages)
   check('扩张面逐字节不变', hashFile(journal) === expansion.journal
     && hashFile(final) === expansion.final && hashFile(meta) === expansion.meta)
   const manifestPath = join(home, 'bundle.json')
