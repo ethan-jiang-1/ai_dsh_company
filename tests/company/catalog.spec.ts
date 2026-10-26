@@ -5,7 +5,7 @@
  * ②条目未变时二次生成不写（generatedAt/字节稳定，不破 release-smoke 的二启零变更）；
  * ③present 事件按 path/slug 投影，归档后仍保留；④meta/台账解析与仓库口径一致。
  */
-import { mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -118,6 +118,16 @@ describe('host catalog', () => {
       }],
     }, null, 2)}\n`)
     expect(regenerateCatalog(root).catalog?.entries[0]?.presented).toBeNull()
+  })
+
+  it('坏 catalog JSON：readCatalog 返回 null，regenerate 重建且不留 .tmp', () => {
+    const root = workspace()
+    deliverable(root)
+    writeFileSync(catalogPath(root), '{ definitely not json')
+    expect(readCatalog(root)).toBeNull()
+    const result = regenerateCatalog(root)
+    expect(result.catalog?.entries).toHaveLength(1)
+    expect(readdirSync(join(root, 'kb')).some(name => name.endsWith('.tmp'))).toBe(false)
   })
 
   it('台账命中与未命中都写进目录', () => {
