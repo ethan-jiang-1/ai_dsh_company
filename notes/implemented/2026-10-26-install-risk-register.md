@@ -24,6 +24,7 @@
 | **真实 npm 发布版 DSH**（global rc.3）五角色 | `channel-matrix-smoke --channel all`；browser 缺包时条件禁用，装 rc.3 两包后自动启用（`--with-browser`） |
 | pnpm 真实版本（profile 目录 corepack 解析 12.x） | `channel-matrix-smoke` 的 install 实跑；手册已写 11/12 |
 | `DSH_COMPANY_HOME` 相对/`~` 归一；改盘告警且不建第二份盘 | `isolation-matrix-smoke` |
+| 搬 home 后 DSH 旧 workspace 登记被启动点名（只告警，不自动迁移） | `isolation-matrix-smoke` move case、[workspace-registry 单测](../../tests/company/workspace-registry.spec.ts) |
 | 导出产物来自当前源码（build 在 pack 前）；tarball 106 条目 | `release --prepare`、`export-dist` 实跑 |
 
 ## 没数 / 未执行（本轮后）

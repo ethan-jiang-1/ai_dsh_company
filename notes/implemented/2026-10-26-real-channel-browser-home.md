@@ -17,7 +17,9 @@
    `resolveDshHome` 同口径，不再把不可复现字符串写进 `bundle.json`。
 3. **`bundle.json.workspace` 是 bundle 身份的一部分**：已有 manifest 时改 `DSH_COMPANY_HOME`，
    启动在 stderr 明确告警，并跳过自举/升级/目录重建；不在新路径建第二份公司盘。换盘/搬家 = 新
-   `DSH_HOME`，或备份后删除 `bundle.json` 重建。
+   `DSH_HOME`，或备份后删除 `bundle.json` 重建。搬 home 后 DSH 自己的 `storages/workspace.json`
+   仍存绝对旧路径：host 只读体检并在启动输出点名，**不改**上游存储（新模块
+   [`workspace-registry.ts`](../../packages/company-pack/src/host/workspace-registry.ts)）。
 4. **`export-dist` 先 build**：`tsc -b` + `tsdown` 后才 `npm pack`；`lib/` 是 gitignored 的构建目录，
    直接打包会静默打旧代码。发布 `files` 只留 `lib/index.js`、`lib/client.js`、
    `lib/types/**/*.d.ts`；tsc 中间 `.js`/`.map`/`.tsbuildinfo` 不进包。
@@ -58,8 +60,8 @@ vendor browser 包，把全局通道的缺包 bug 遮住。channel/isolation 冒
   显式开启，保持原有全员 browser 覆盖。
 - `DSH_COMPANY_HOME` 相对路径仍按 cwd 归一（与 `DSH_HOME` 一致），但手册建议绝对路径/`~`。
 - 搬 home 后 bundle.json 的相对 workspace 会随新 home 解析；DSH 自己的
-  `storages/workspace.json` 与 session 目录名仍存绝对旧路径，**不会自动迁移**——手册要求重新添加
-  工作区，旧 session 留在旧路径。这是上游存储行为，不在本 pack 修复面。
+  `storages/workspace.json` 与 session 目录名仍存绝对旧路径，**不会自动迁移**——host 启动点名旧登记，
+  手册要求重新添加工作区，旧 session 留在旧路径。这是上游存储行为，不在本 pack 修复面。
 - Linux CI lane 已加在 [fresh-clone](../../.github/workflows/fresh-clone.yml) 的 `install-channel`（Ubuntu + npm 发布版 DSH + channel-matrix），但它在本轮只在 macOS 本机跑过同样的命令，CI 本身未执行；Windows/容器/Node 20/其他 0.2.x 仍未执行。
 - `--with-browser` 需要网络与同 DSH 版本的两个 browser 包；本次实测 rc.3 可用。
 
@@ -70,10 +72,10 @@ vendor browser 包，把全局通道的缺包 bug 遮住。channel/isolation 冒
 | `node checks/smoke/channel-matrix-smoke.mjs --channel global --browser off`（0.3.9 旧包） | **红**：5 角色 broken + 5 session FAIL = 10 FAIL；证明回归线咬得住 |
 | `node checks/smoke/channel-matrix-smoke.mjs --channel all`（0.3.10） | ALL PASS：vendor + 全局 rc.3，五角色/五会话 |
 | `node checks/smoke/channel-matrix-smoke.mjs --channel global --browser auto --with-browser`（0.3.10） | ALL PASS：无包自动禁用；装 rc.3 browser 两包后自动启用 |
-| `node checks/smoke/isolation-matrix-smoke.mjs --pack <0.3.9 修复前>` | **红 6**：rebind 无警告且建了新盘；relative `bundle.workspace` 记 `./company-rel`；tilde 落成字面 `~` 目录 |
-| `node checks/smoke/isolation-matrix-smoke.mjs`（0.3.10） | ALL PASS：rebind 告警/不建新盘、bundle 字节不变、旧盘 sentinel 不动；相对/`~` 归一 |
+| `node checks/smoke/isolation-matrix-smoke.mjs --pack <0.3.9 修复前>` | **红 7**：rebind 无警告且建了新盘；搬 home 后旧 workspace 登记不点名；relative `bundle.workspace` 记 `./company-rel`；tilde 落成字面 `~` 目录 |
+| `node checks/smoke/isolation-matrix-smoke.mjs`（0.3.10） | ALL PASS：rebind 告警/不建新盘、bundle 字节不变、旧盘 sentinel 不动；搬 home 后旧登记点名且数据在；相对/`~` 归一 |
 | `pack-shape` 的 `pack-files` 造红（临时把 `files` 加回 `lib/**`） | **红**：`files 缺 lib/index.js；files 缺 lib/client.js；…；files 用了 lib/**`；还原后 PASS |
-| `pnpm test` | 92 files / 863 tests passed |
+| `pnpm test` | 93 files / 864 tests passed（含 workspace-registry 单测） |
 | `pnpm verify` | ALL PASS（含新 `pack-files`、`dist-manual`） |
 | `pnpm release --prepare --force` | export-dist ALL PASS：106 条目、sha256 `6c83d37e…`、build 在 pack 前 |
 | `pnpm release --verify` | 7 项全绿：verify / test / release-smoke / lifecycle-smoke / standalone-smoke / client-load-smoke / preset-smoke / present-catalog-smoke |

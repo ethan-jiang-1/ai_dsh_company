@@ -11,6 +11,7 @@
 - **换盘不再静默分裂**：已有 `bundle.json` 时改 `DSH_COMPANY_HOME`，启动输出明确警告并拒绝在新路径建第二份公司盘。
 - **`export-dist` 先 build**：`lib/` 是 gitignored 的构建目录，直接 `npm pack` 会打出旧代码；导出前跑 `tsc -b` + `tsdown`。
 - **发布面包瘦身**：`files` 只留 `lib/index.js`、`lib/client.js`、`lib/types/**/*.d.ts`；tsc 中间 `.js`/`.map`/`.tsbuildinfo` 不再进包。
+- **搬家后 workspace 登记体检**：启动点名 `storages/workspace.json` 里已不存在的绝对旧路径（只告警，不自动改 DSH 存储）。
 
 ### Added
 

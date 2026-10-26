@@ -6,8 +6,8 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 // ⚠ 不做值导入——那会把 host 侧核心包的类型图拉进本程序，遮掉 client 面的 sessions 增强（实测）。
 import type {} from '@deepseek-ai/dsh-user-approval'
 import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
-import { existsSync, realpathSync } from 'node:fs'
-import { isAbsolute, relative, resolve } from 'node:path'
+import { existsSync, readFileSync, realpathSync } from 'node:fs'
+import { isAbsolute, join, relative, resolve } from 'node:path'
 import { signoffDecisionNote, signoffReason } from './lib/signoff.ts'
 import { doorsFromSessions } from './lib/doors.ts'
 import { bootstrapCompanyWorkspace, bootstrapEnabled, resolveCompanyHome, resolveSkeletonDir } from './host/bootstrap.ts'
@@ -25,6 +25,7 @@ import {
 } from './host/bundle-manifest.ts'
 import { presentedFromEvent, regenerateCatalog } from './host/catalog.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
+import { staleWorkspacePaths } from './host/workspace-registry.ts'
 
 /**
  * 在场板读模型（R5b）从 host 入口再导出：`checks/smoke/replay-smoke.mjs` 用它把重放会话的
@@ -276,6 +277,23 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
     }
   } catch (error) {
     ctx.logger?.warn?.(`company-pack run bundle 身份写入跳过（不影响运行）：${(error as Error).message}`)
+  }
+
+  // ── 搬家指针体检（2026-10-26，P1）：DSH 的 workspace 登记存绝对路径，搬 home 后不会自动迁移。
+  // 只读点名，不修改 vendor 存储；用户需要在侧栏重新添加工作区。rebound 时已有更强告警，跳过。
+  try {
+    const registry = join(bundleHome, 'storages/workspace.json')
+    if (!rebound && existsSync(registry)) {
+      const stale = staleWorkspacePaths(JSON.parse(readFileSync(registry, 'utf8')), existsSync)
+      if (stale.length > 0) {
+        const warning = `company-pack：DSH workspace 登记里有 ${String(stale.length)} 条路径已不存在（${stale.join('、')}）；`
+          + '搬 home/改名后请在侧栏重新添加工作区，旧 session 仍在旧路径下；本包不自动改 DSH 的登记。'
+        ctx.logger?.warn?.(warning)
+        process.stderr.write(`dsh: ${warning}\n`)
+      }
+    }
+  } catch (error) {
+    ctx.logger?.warn?.(`company-pack workspace 登记体检跳过（不影响运行）：${(error as Error).message}`)
   }
 
   // ── 成品目录（2026-10-25，RFC installed-shape-self-sufficient）──────────────────

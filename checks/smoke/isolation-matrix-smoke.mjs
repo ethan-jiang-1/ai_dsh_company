@@ -9,15 +9,17 @@
 //   bundle.json 字节不变、旧盘 sentinel 不动。防止一个 home 静默分裂成两个公司盘。
 // - relative：DSH_COMPANY_HOME 是相对路径 ⇒ 按 cwd 归一成绝对路径落盘，bundle 记绝对路径。
 // - tilde：DSH_COMPANY_HOME=~/... ⇒ 展开到 HOME，不在 cwd 造一个字面 `~` 目录。
+// - move：搬 home 后 bundle.workspace 随新 home 解析；DSH 的旧 workspace 登记由启动输出点名（不自动迁移）。
 // 不证明：搬家后 DSH 自己的 storages/workspace.json 与 session cwd（vendor 存绝对路径）会自动迁移；
 //   那是上游行为，本 smoke 不冒充。profile reset/方法层、两 home 同 workspace 的并发写入另案。
 
 import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { plainNodeEnv } from '../../tools/drivers/release-process.mjs'
+import { companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 
 const KEEP = process.argv.includes('--keep')
@@ -53,7 +55,7 @@ function install(caseDir, home) {
   })
 }
 
-function boot(caseDir, home, company, { waitPath = null, settleMs = 1200, extra = {} } = {}) {
+function boot(caseDir, home, company, { waitPath = null, settleMs = 1200, hold = false, extra = {} } = {}) {
   const child = spawn('dsh', ['--profile', 'web', '--', '--port', '0', '--no-open'], {
     cwd: caseDir, env: envFor(caseDir, home, company, extra), stdio: ['ignore', 'pipe', 'pipe'],
   })
@@ -61,6 +63,7 @@ function boot(caseDir, home, company, { waitPath = null, settleMs = 1200, extra 
   child.stdout.on('data', chunk => { output += chunk })
   child.stderr.on('data', chunk => { output += chunk })
   return new Promise((resolve) => {
+    const item = { child, base: '', token: '', output: () => output }
     const timer = setTimeout(() => { child.kill('SIGKILL'); resolve(output) }, 60_000)
     let settled = false
     const finish = () => {
@@ -71,11 +74,19 @@ function boot(caseDir, home, company, { waitPath = null, settleMs = 1200, extra 
       setTimeout(() => { child.kill('SIGKILL'); resolve(output) }, 1000)
     }
     const scan = () => {
-      if (!/http:\/\/127\.0\.0\.1:\d+\/\?token=\S+/.test(output)) return
+      const match = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
+      if (match === null) return
+      item.base = `http://127.0.0.1:${match[1]}`
+      item.token = match[2]
       const deadline = Date.now() + 20_000
       const poll = () => {
         if (waitPath === null || existsSync(waitPath) || Date.now() >= deadline) {
           // banner 之后 host apply 还在跑；等目标落盘后再留一个落盘/告警窗口，断言仍以盘上事实为准。
+          if (hold) {
+            clearTimeout(timer)
+            resolve(item)
+            return
+          }
           setTimeout(finish, settleMs)
           return
         }
@@ -86,6 +97,39 @@ function boot(caseDir, home, company, { waitPath = null, settleMs = 1200, extra 
     child.stdout.on('data', scan)
     child.stderr.on('data', scan)
   })
+}
+
+const stopItem = (item) => new Promise((done) => {
+  if (item.child.exitCode !== null) return done()
+  item.child.once('exit', done)
+  item.child.kill('SIGTERM')
+  setTimeout(() => { item.child.kill('SIGKILL'); done() }, 3000)
+})
+
+async function rpcFor(instance) {
+  const cookie = await companyCookie({ fetch: globalThis.fetch, base: instance.base, token: instance.token })
+  return companyRpc({ fetch: globalThis.fetch, base: instance.base, cookie, prefix: 'iso-', dumpBodyOnError: true })
+}
+
+async function moveCase() {
+  const caseDir = join(BASE, 'move')
+  const home = join(caseDir, 'home')
+  const moved = join(caseDir, 'home-moved')
+  const oldWs = join(home, 'company-workspace')
+  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(join(caseDir, 'user'), { recursive: true })
+  const installed = install(caseDir, home)
+  check('move install', installed.status === 0, (installed.stderr ?? '').slice(-240))
+  if (installed.status !== 0) return
+  const first = await boot(caseDir, home, oldWs, { waitPath: join(oldWs, 'kb/company.md'), hold: true })
+  const rpc = await rpcFor(first)
+  await rpc('workspace/create', { request: { path: oldWs } })
+  writeFileSync(join(oldWs, 'kb/company.md'), '公司名: Move Sentinel\n')
+  await stopItem(first)
+  renameSync(home, moved)
+  const second = await boot(caseDir, moved, join(moved, 'company-workspace'), { waitPath: join(moved, 'company-workspace/kb/company.md') })
+  check('move bundle.workspace 仍解析到新 home', JSON.parse(readFileSync(join(moved, 'bundle.json'), 'utf8')).workspace === 'company-workspace')
+  check('move 启动输出点名旧登记路径', second.includes('workspace 登记里有') && second.includes(oldWs), second.slice(-800))
+  check('move 公司盘 sentinel 仍在', readFileSync(join(moved, 'company-workspace/kb/company.md'), 'utf8').includes('Move Sentinel'))
 }
 
 async function rebindCase() {
@@ -144,6 +188,7 @@ try {
   check('global dsh present', version.status === 0)
   if (version.status === 0) {
     await rebindCase()
+    await moveCase()
     await relativeCase()
     await tildeCase()
   }

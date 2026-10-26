@@ -214,7 +214,8 @@ dsh plugin --profile web add /path/to/<新版本>.tgz
 换机器时连 home 一起搬；搬完若 profile 的依赖目录失效，按第二节重新 \`plugin add\` 一次。
 \`bundle.json\` 里的相对 workspace 会随新 home 解析；但 DSH 自己的 \`storages/workspace.json\`
 与 session 目录名存的是**绝对旧路径**，不会自动迁移——搬完在侧栏重新添加工作区，
-旧 session 仍在旧路径下，别把“文件还在”当成“UI 已迁移”。
+旧 session 仍在旧路径下，别把“文件还在”当成“UI 已迁移”。启动输出会点名 \`storages/workspace.json\` 里
+已不存在的旧路径；照提示重新添加即可。
 
 Windows 未验证：不要按本节的 \`shasum\` 路径执行；PowerShell 用
 \`Get-FileHash -Algorithm SHA256 <file>\` 校验。

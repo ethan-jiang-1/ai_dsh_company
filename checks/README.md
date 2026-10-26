@@ -42,7 +42,7 @@
 | [release-smoke.mjs](smoke/release-smoke.mjs) | 构建、打包、干净 profile 安装与 built CLI 启动 |
 | [lifecycle-smoke.mjs](smoke/lifecycle-smoke.mjs) | 真 tarball v1→v2 升级、卸载、搬 home 迁移（keyless；不含 registry/降级/跨 OS） |
 | [channel-matrix-smoke.mjs](smoke/channel-matrix-smoke.mjs) | vendor built CLI 与**真实全局 dsh** 的五角色 roster/session/create；`--with-browser` 验可选 browser 包自动启用（keyless；global 需要网络） |
-| [isolation-matrix-smoke.mjs](smoke/isolation-matrix-smoke.mjs) | 已有 bundle 后改 `DSH_COMPANY_HOME` 的告警/不建新盘；相对/`~` 落点归一（keyless；~1-2min） |
+| [isolation-matrix-smoke.mjs](smoke/isolation-matrix-smoke.mjs) | 改 `DSH_COMPANY_HOME` 的告警/不建新盘；相对/`~` 落点归一；搬 home 后旧 workspace 登记点名（keyless；~2-3min） |
 | [standalone-smoke.mjs](smoke/standalone-smoke.mjs) | 目录独立启动：隔离 home/profile、copy 骨架、boot/RPC、relink、reset（keyless） |
 | [present-catalog-smoke.mjs](smoke/present-catalog-smoke.mjs) | 真 vendor `present` 工具 → session `deliverables/presented` → host catalog（keyless；~1s） |
 | [multi-install-smoke.mjs](smoke/multi-install-smoke.mjs) | 双 home 真装隔离、非空 home 后装、同 home 多 profile 反例、自定义 profile 补 web-app、空 bundle 共存、幂等（keyless；~3-4min，发布前手动） |

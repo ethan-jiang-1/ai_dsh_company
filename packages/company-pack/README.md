@@ -49,7 +49,7 @@
 
 公司盘根固定在 `<DSH_HOME>/company-workspace`（或 `DSH_COMPANY_HOME`）。若会话 cwd 不是这个盘，页签/身份显示「非公司盘 / 身份未配置」，host 不静默改读 cwd。
 
-**换盘/搬家不是改一个环境变量**：`bundle.json` 的 workspace 是 bundle 身份的一部分；已有 manifest 时改 `DSH_COMPANY_HOME`，启动会明确警告并拒绝在新路径建第二份盘。换盘/搬家请用新 `DSH_HOME`（先备份），或备份后删除 `bundle.json` 重建。搬 home 后 DSH 自己的 `storages/workspace.json` 与 session 目录名仍是绝对旧路径，需在侧栏重新添加工作区；旧 session 不会自动迁移。
+**换盘/搬家不是改一个环境变量**：`bundle.json` 的 workspace 是 bundle 身份的一部分；已有 manifest 时改 `DSH_COMPANY_HOME`，启动会明确警告并拒绝在新路径建第二份盘。换盘/搬家请用新 `DSH_HOME`（先备份），或备份后删除 `bundle.json` 重建。搬 home 后 DSH 自己的 `storages/workspace.json` 与 session 目录名仍是绝对旧路径，需在侧栏重新添加工作区；旧 session 不会自动迁移。host 启动时会点名登记里已不存在的旧路径（只告警，不改 DSH 存储）。
 
 ## Compatibility
 
