@@ -119,6 +119,12 @@ try {
 
   console.log('④ built dsh plugin add file:<tarball>')
   await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${tarball}`], { timeoutMs: 180_000 })
+  console.log('④b 同版本重复安装（幂等）')
+  await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${tarball}`], { timeoutMs: 180_000 })
+  const reinstalled = JSON.parse(readFileSync(join(profileDir, 'package.json'), 'utf8'))
+  const reinstalledBundles = (reinstalled?.dsh?.profile?.bundles ?? []).filter(id => id === 'dsh-company-pack')
+  check('重复 plugin add 不产生重复 bundle', reinstalledBundles.length === 1, `company-pack ×${String(reinstalledBundles.length)}`)
+
   const installedProfile = JSON.parse(readFileSync(join(profileDir, 'package.json'), 'utf8'))
   const bundles = installedProfile?.dsh?.profile?.bundles ?? []
   check('plugin add 后 bundles 含 dsh-company-pack', bundles.includes('dsh-company-pack'), `bundles = ${bundles.join(', ')}`)

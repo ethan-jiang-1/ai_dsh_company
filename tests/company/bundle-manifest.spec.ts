@@ -5,7 +5,7 @@
  * ③workspace 在 home 内记相对、在外记绝对；④workspace 不存在不冒充 bundle；⑤骨架指纹跳过 dotfile/符号链接。
  * 反证：把 `writeFileSync(..., { flag: 'wx' })` 的 flag 换成默认 ⇒ 「二次不覆盖」红。
  */
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -182,6 +182,33 @@ describe('基部升级（哈希判定，S3）', () => {
 
 
 describe('两 bundle 身份隔离（S1 自动化）', () => {
+  it('用户删掉的基部文件在下一版被补建；v2 移除的基部文件不删用户盘', () => {
+    const skel = skeleton()
+    const dsh = home()
+    const ws = join(dsh, 'company-workspace')
+    try {
+      writeFileSync(join(skel, 'kb/org.md'), '# org v1\n')
+      mkdirSync(join(skel, 'templates'), { recursive: true })
+      writeFileSync(join(skel, 'templates/meta.md'), '# meta\n')
+      writeFileSync(join(skel, 'templates/legacy.md'), '# legacy\n')
+      cpSync(skel, ws, { recursive: true })
+      const v1 = planBundleManifest({ dshHome: dsh, companyHome: ws, skeletonDir: skel, pack: { ...PACK, version: '0.3.0' }, id: 'b-del' })
+      writeBundleManifest(v1)
+      // 用户误删了一个基部文件；v2 仍带它 ⇒ 应补建。
+      rmSync(join(ws, 'templates/meta.md'), { force: true })
+      // v2 把 legacy 从骨架移除；用户盘里的旧 legacy 不应被删。
+      rmSync(join(skel, 'templates/legacy.md'), { force: true })
+      const plan = planSkeletonUpgrade({ manifest: readBundleManifest(dsh)!, skeletonDir: skel, workspace: ws, pack: { ...PACK, version: '0.3.1' } })
+      const result = applySkeletonUpgrade(plan, skel, ws)
+      expect(result.created).toContain('templates/meta.md')
+      expect(plan.actions.some(a => a.rel === 'templates/legacy.md')).toBe(false)
+      expect(existsSync(join(ws, 'templates/legacy.md'))).toBe(true)
+      expect(readFileSync(join(ws, 'templates/legacy.md'), 'utf8')).toBe('# legacy\n')
+    } finally {
+      rmSync(skel, { recursive: true, force: true }); rmSync(dsh, { recursive: true, force: true })
+    }
+  })
+
   it('两个 home 生成不同 id；各自 workspace 记录独立', () => {
     const skel = skeleton()
     const a = home()
