@@ -52,3 +52,30 @@
 - cdp-probe 是机器腿；**真人视觉/手感判断仍需你本人看一遍**（尤其首屏、侧栏工作区、九页签文案）。
 - 冷 store 没做真实断网（未拔网线/未 firewall）；用空 store + `COREPACK_ENABLE_NETWORK=0` + 无 registry 访问观测。
 - 下一版 0.3.8 是本地临时 build，不是已发布版本；迁移结论对 0.3.7→0.3.8 形状成立。
+
+## 0.3.8 深挖（2026-10-26 下午）
+
+在 0.3.8（pnpm 前置已修）上重跑，并加了几种之前没覆盖的形状：
+
+| 场景 | 结果 |
+|---|---|
+| 0.3.8 冷 store 安装（空 store/cache） | PASS；手册已写 `**pnpm 11**`，安装块有 `command -v pnpm` 预检 |
+| 路径含空格/中文（`用户 二号`、`home 二号`、`公司 盘`） | 安装、首启、RPC、迁移全部 PASS |
+| 0.3.8 → 0.3.9 直接 `plugin add`（不 remove） | PASS；bundle 前移、扩张面仍在 |
+| 0.3.9 → 0.3.8 回退（直接 `plugin add`） | PASS；bundle 回到 0.3.8，AGENTS/CHARTER 仍在 |
+| 单字节篡改 tarball | 拒绝安装（exit≠0） |
+| 只给 Node、无 pnpm | 明确 `dsh: pnpm was not found`；与手册前置一致，不是静默失败 |
+| 浏览器 9 页签 + 真模型一问 | PASS；`askTranscriptGrew=true`，成品页显示 second-machine（present 未核，符合手写文件未 present） |
+
+0.3.8 产物：272 条目，sha256 `c16c67b824e2e3df5fe9194578ac7e074a02df42505f4f27d27a41f90ec5d6b5`；
+`release --check` 9 项 pass。
+
+**cdp-probe 的一个环境坑**：第一次跑 `second-machine-deep` 时 cdp-probe 超时（180s，无输出），现场留下多个
+headless Chrome；杀掉 `cdp-driver-*` 后重跑同一路径、同一 URL，9 页签全过，随后 `--ask` 真模型一问也过。
+结论：这是探针/Chrome 的残留进程问题，不是包或中文路径的产品缺陷；复跑前先清 headless Chrome。
+
+证据追加：
+- `runtime/second-machine-deep/simulate.log`（安装/迁移）
+- `runtime/second-machine-deep/extra.mjs`（回退/直升/篡改/无 pnpm）
+- `runtime/second-machine-deep/cdp-once.mjs`（9 页签 + `--ask`）
+- `runtime/second-machine-deep/cdp-probe.log`
