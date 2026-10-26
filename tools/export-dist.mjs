@@ -113,6 +113,11 @@ export DSH_HOME="$HOME/dsh-bundles/<你的 CEO 名>"
 dsh plugin --profile web add /path/to/${tarballName}
 \`\`\`
 
+> **profile 不是隔离单位**：公司包要求含 \`@deepseek-ai/dsh-web-app\` 的 web profile；自定义 profile 名可以，
+> 但要把 web-app 加进 \`dsh.profile.bundles\`。base-only 自定义 profile 会让 preset 行 pending。
+> 一个 \`DSH_HOME\` 只对应一个 run bundle；同 home 多 profile 共享 \`bundle.json\`/sessions/workspace，
+> 第二家公司/第二个 CEO 请用第二个 \`DSH_HOME\`。
+
 空 home 会自建 \`web\` profile。装进日常环境也可以（不设 \`DSH_HOME\`），但那样第二个 CEO
 必须另开 home——**一个 home 只装一个 CEO**。
 

@@ -10,6 +10,9 @@
 把与 tarball 同目录的《安装手册》按步骤执行：独立 `DSH_HOME` → `dsh plugin --profile web add <tarball>` → 首次启动落公司盘。
 前置 = Node ≥22.19、DSH `0.2.1-rc.2`、**pnpm 11（或 `corepack enable pnpm`）**；sha256 校验见手册；本包不在 npm registry。
 
+- **profile 形状**：必须使用含 `@deepseek-ai/dsh-web-app` 的 web profile；自定义 profile 名可以，但必须把 `dsh-web-app` 加进 `dsh.profile.bundles`。base-only 自定义 profile 会让 preset 行 pending。
+- **一个 `DSH_HOME` = 一个 run bundle**：同一个 home 下多个 profile 共享 `bundle.json`、sessions 与默认 workspace，**不是隔离**；第二家公司/第二个 CEO 用第二个 `DSH_HOME`。
+
 ## What it contributes
 
 - 五个角色 preset（CEO / VP-Eng / VP-Sales / COO / CFO）+ 委派子人格 `researcher`；

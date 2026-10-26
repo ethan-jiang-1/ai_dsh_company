@@ -1,6 +1,6 @@
 {
   "name": "dsh-company-pack",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "private": true,
   "type": "module",
   "description": "Virtual company multi-role plugin pack: 5 role presets (CEO / VP-Eng / VP-Sales / COO / CFO) + host bundle rows + deployment brand skin. Design docs: docs/index.md",

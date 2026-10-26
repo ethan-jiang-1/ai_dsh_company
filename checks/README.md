@@ -43,6 +43,7 @@
 | [lifecycle-smoke.mjs](smoke/lifecycle-smoke.mjs) | 真 tarball v1→v2 升级、卸载、搬 home 迁移（keyless；不含 registry/降级/跨 OS） |
 | [standalone-smoke.mjs](smoke/standalone-smoke.mjs) | 目录独立启动：隔离 home/profile、copy 骨架、boot/RPC、relink、reset（keyless） |
 | [present-catalog-smoke.mjs](smoke/present-catalog-smoke.mjs) | 真 vendor `present` 工具 → session `deliverables/presented` → host catalog（keyless；~1s） |
+| [multi-install-smoke.mjs](smoke/multi-install-smoke.mjs) | 双 home 真装隔离、非空 home 后装、同 home 多 profile 反例、自定义 profile 补 web-app、空 bundle 共存、幂等（keyless；~3-4min，发布前手动） |
 | [refactor-drift-oracle.mjs](smoke/refactor-drift-oracle.mjs) | 纯搬移/拆分的零行为漂移：拆前/拆后 vitest 清单比对（`--hashes` 档含测试体指纹 ⇒ 拦改名/增删/**测试体改动**；两档都放行文件与 describe 归属搬家） |
 
 ## 浏览器与视觉

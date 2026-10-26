@@ -2,6 +2,14 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.3.9 — 2026-10-26
+
+### Changed
+
+- 明确 profile 合同：公司包要求含 `@deepseek-ai/dsh-web-app` 的 web profile；base-only 自定义 profile 的 preset 行会 pending。
+- 明确一个 `DSH_HOME` = 一个 run bundle：同 home 多 profile 共享 bundle/sessions/workspace，不是隔离；第二个公司用第二个 home。
+- 新增 `multi-install-smoke`：双 home 真装隔离、非空 home 后装、同 home 多 profile 反例、自定义 profile 补 web-app、空 bundle 共存、重复安装幂等。
+
 ## 0.3.8 — 2026-10-26
 
 ### Changed
