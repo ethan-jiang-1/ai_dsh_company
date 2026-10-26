@@ -60,7 +60,7 @@ vendor browser 包，把全局通道的缺包 bug 遮住。channel/isolation 冒
 - 搬 home 后 bundle.json 的相对 workspace 会随新 home 解析；DSH 自己的
   `storages/workspace.json` 与 session 目录名仍存绝对旧路径，**不会自动迁移**——手册要求重新添加
   工作区，旧 session 留在旧路径。这是上游存储行为，不在本 pack 修复面。
-- Windows/容器/NODE 20/其他 0.2.x 仍未执行；不因本次绿而声称支持。
+- Linux CI lane 已加在 [fresh-clone](../../.github/workflows/fresh-clone.yml) 的 `install-channel`（Ubuntu + npm 发布版 DSH + channel-matrix），但它在本轮只在 macOS 本机跑过同样的命令，CI 本身未执行；Windows/容器/Node 20/其他 0.2.x 仍未执行。
 - `--with-browser` 需要网络与同 DSH 版本的两个 browser 包；本次实测 rc.3 可用。
 
 ## 验证（都真跑过）

@@ -5,6 +5,7 @@
 # 目前有已知缺口（vendor lock 双锁、全 host OOM、client aggregate 测试类型、musl-gcc），
 # 记录见 notes/implemented/2026-10-25-repo-hygiene-contract.md「已知缺口」节；不在这里假绿。
 # 手动 + 每周一 03:00 UTC；Ubuntu + macOS 双跑（跨环境合同 = docs/repo-hygiene.md）。
+# install-channel：Ubuntu 上用**真实 npm 发布版 DSH** 验五角色（channel-matrix-smoke；不是 vendor 通道）。
 name: fresh-clone
 on:
   workflow_dispatch:
@@ -35,3 +36,21 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm bundle:init
       - run: pnpm verify
+
+  install-channel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - run: corepack enable pnpm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # 固定已实测的 npm 发布版；pack 的 install 锚必须走全局包，而不是 repo vendor。
+      - run: npm install -g @deepseek-ai/dsh@0.2.1-rc.3
+      - run: node tools/export-dist.mjs
+      - run: node checks/smoke/channel-matrix-smoke.mjs --channel global --browser auto
