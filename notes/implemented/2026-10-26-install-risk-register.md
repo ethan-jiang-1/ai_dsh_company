@@ -17,7 +17,7 @@
 | 同 home 两个 web 进程并发 | `concurrent-home-smoke`（bundle/catalog/数据可解析，单实例恢复） |
 | 外部 DSH_COMPANY_HOME + 只搬 home | `external-workspace-smoke`（绝对路径、boot、数据） |
 | 只读 workspace、缺骨架、坏 catalog | `permissions-recovery-smoke`、catalog 单测 |
-| 用户 profile patch 真实改 default；第二 bundle disabled row 共存/卸载 | `profile-row-smoke` |
+| 用户 profile patch 真实改 default；第二 bundle disabled row 共存/卸载 | `profile-row-smoke`；`multi-install-smoke` 双 home 亦验证 default=vp-eng |
 | 自定义 profile 缺 web-app → presets pending；补 web-app 后可启动 | `multi-install-smoke`、合同 Note |
 | 空 bundle 与公司包共存/卸载 | `multi-install-smoke` |
 

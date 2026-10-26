@@ -99,15 +99,17 @@ try {
     // 用户 profile patch 不属于包；重复 add 不应覆盖它。
     const patchFile = join(home, 'dsh/profiles/web/cordis.patch.yml')
     mkdirSync(join(home, 'dsh/profiles/web'), { recursive: true })
-    writeFileSync(patchFile, '# user patch\n[]\n')
+    writeFileSync(patchFile, `- id: agent-preset-registry\n  name: '@deepseek-ai/dsh-agent-preset-registry'\n  config:\n    default: vp-eng\n`)
     const againInstall = install(home, 'web', `file:${TARBALL}`)
-    check(`${name} 重复 add 保留用户 profile patch`, againInstall.status === 0 && readFileSync(patchFile, 'utf8') === '# user patch\n[]\n')
+    check(`${name} 重复 add 保留用户 profile patch`, againInstall.status === 0 && readFileSync(patchFile, 'utf8').includes('default: vp-eng'))
     const ws = join(home, 'ws')
     const booted = await boot(home, ws)
     if (name === 'Acme') aBoot = booted; else bBoot = booted
     const r = await rpc(booted)
     const created = await r('session/create', { request: { cwd: ws, agentPreset: 'ceo' } })
     check(`${name} 可建 ceo 会话`, created?.agentPreset === 'ceo')
+    const defaulted = await r('session/create', { request: { cwd: ws } })
+    check(`${name} profile patch 真实生效（default=vp-eng）`, defaulted?.agentPreset === 'vp-eng', JSON.stringify(defaulted).slice(0, 120))
     writeCompany(ws, name)
     await stop(booted)
   }
