@@ -51,6 +51,8 @@ const verdict = {
   askTranscriptTail: '',
   consoleProblems: [],
   exceptions: [],
+  clientErrors: [],
+  errorRingInstalled: false,
 };
 
 // 页签清单 = 注册源解析（单一事实）；解析为空直接 fail-loud，不静默退化成少一个也绿。
@@ -91,6 +93,7 @@ async function writeEvidence(reason) {
   verdict.evidenceDir = dir;
   writeFileSync(join(dir, 'verdict.json'), JSON.stringify({ reason, ...verdict }, null, 2), 'utf8');
   writeFileSync(join(dir, 'console.log'), [...consoleProblems, ...exceptions].join('\n'), 'utf8');
+  writeFileSync(join(dir, 'client-errors.json'), JSON.stringify(verdict.clientErrors ?? [], null, 2), 'utf8');
   const body = await evaluate('document.body.innerText').catch(() => '');
   writeFileSync(join(dir, 'body.txt'), typeof body === 'string' ? body : JSON.stringify(body), 'utf8');
   if (typeof handle.screenshot === 'function') {
@@ -228,6 +231,17 @@ try {
       verdict.askTranscriptTail = prev.slice(-450);
     }
   }
+  // 浏览器侧错误环（client/error-ring.ts 安装）：页面内的 error/unhandledrejection/console.error。
+  // 这是 agent 能看到的「用户当时到底撞了什么」——此前这类事实只活在用户自己的 DevTools 里。
+  const ring = await evaluate(`JSON.stringify({
+    installed: typeof window.__DSH_COMPANY_ERRORS__ === 'object' && window.__DSH_COMPANY_ERRORS__ !== null,
+    entries: typeof window.__DSH_COMPANY_ERRORS__ === 'object' && window.__DSH_COMPANY_ERRORS__ !== null ? window.__DSH_COMPANY_ERRORS__.list() : [],
+  })`).catch(() => '{"installed":false,"entries":[]}');
+  try {
+    const parsed = JSON.parse(typeof ring === 'string' ? ring : '{"installed":false,"entries":[]}');
+    verdict.errorRingInstalled = parsed.installed === true;
+    verdict.clientErrors = Array.isArray(parsed.entries) ? parsed.entries.slice(0, 20) : [];
+  } catch { verdict.errorRingInstalled = false; verdict.clientErrors = []; }
 } finally {
   verdict.consoleProblems = consoleProblems.slice(0, 10);
   verdict.exceptions = exceptions.slice(0, 10);
@@ -236,6 +250,8 @@ try {
     || verdict.tabFailures.length > 0
     || verdict.consoleProblems.some(p => p.startsWith('console.error'))
     || verdict.exceptions.length > 0
+    || verdict.clientErrors.length > 0
+    || verdict.errorRingInstalled !== true
     || (ask !== undefined && (verdict.askError !== undefined || verdict.askTranscriptGrew !== true));
   if (bad) await writeEvidence('assertion');
   else if (saveEvidence) { verdict.evidenceDir = await writeEvidence('pass'); }
@@ -248,5 +264,7 @@ if (verdict.booted === false || verdict.error !== undefined) exitCode = 1;
 if (verdict.composerReady !== true || verdict.brandPresent !== true) exitCode = 1;
 if (verdict.tabsOpened.length !== tabs.length || verdict.tabFailures.length > 0) exitCode = 1;
 if (verdict.consoleProblems.some(p => p.startsWith('console.error')) || verdict.exceptions.length > 0) exitCode = 1;
+if (verdict.clientErrors.length > 0) exitCode = 1;
+if (verdict.errorRingInstalled !== true) exitCode = 1;
 if (ask !== undefined && (verdict.askError !== undefined || verdict.askTranscriptGrew !== true)) exitCode = 1;
 process.exit(exitCode);

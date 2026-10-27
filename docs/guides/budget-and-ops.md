@@ -33,6 +33,8 @@
 
 | 症状 | 判断 | 动作 |
 |---|---|---|
+| **页面某面板空白 / 页签点不开 / 按钮没反应** | 先看是「环境未就绪」还是「渲染坏」 | 一条命令复现：`node checks/smoke/ui-scene-smoke.mjs`（自起实例 → 全页签 + 浏览器错误环 → exit 2 = 未登录，exit 1 = 真断言失败）；证据落 `runtime/harness-home/diagnosis/` |
+| **用户报「刚才页面报错了」** | 浏览器错误不进会话日志，但进页面内错误环 | `ui-scene-smoke` 或对已起实例跑 `cdp-probe <url> --evidence`，看 verdict 的 `clientErrors`（error / unhandledrejection / console.error） |
 | 改了手册/CHARTER，进行中的成员会话「看不到」 | 指令注入是**触达驱动**（无 watcher）：外部编辑只在下次成功 read/write/edit 或 resume 对齐时可见（2026-09-28 借 FAQ 05） | 让该成员**碰一次工作区文件**（任意 read/edit）或重开会话；不是挂载坏了 |
 | 浏览器里找不到某场会话 | 会话列表按**工作目录**过滤，且必须用带 token 的 URL | 先选/加 `company-workspace`；直接开端口会卡鉴权（启动横幅里的 `/?token=` 一定要带上） |
 | `pnpm dsh web` 报 `EADDRINUSE 3086` | 已经有一个观察窗在跑 | 先 `lsof -nP -iTCP:3086 -sTCP:LISTEN` 复用旧窗（token 在它自己的启动横幅里）；**3080 是本 GUI，永不动** |

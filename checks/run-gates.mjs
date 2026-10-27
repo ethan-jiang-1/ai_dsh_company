@@ -71,8 +71,17 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const failures = []
 const ok = (name) => console.log(`  PASS ${name}`)
 const fail = (name, detail) => { failures.push(`${name}: ${detail}`); console.log(`  FAIL ${name}: ${detail}`) }
+// ── 无对象 ≠ 通过（2026-10-27 R3-06）──────────────────────────────────────────────
+// 为什么：回放场景/UI 金样撤出产品仓后，`replay-fixture-freshness` 报「×0 场景 0 处一致」、
+//   `replay-ui-freshness` 在 0 个金样上 PASS——门禁把「没有对象」印成「检查通过」，读者无法区分。
+// 语义：`skip(name, reason)` = 该门禁**本该有对象**但盘上没有；输出独立一行，最终汇总单列，
+//   不混进 PASS。skip 清单必须与 `EXPECTED_SKIPS` 精确一致（新增一个 = 显式改这里），
+//   防止「静默全跳」变成新的假绿（testing.md §3.6 的零 skip 规矩由此适配）。
+const skips = []
+const skip = (name, reason) => { skips.push({ name, reason }); console.log(`  SKIP ${name}: ${reason}`) }
+const EXPECTED_SKIPS = new Set(['replay-fixture-freshness', 'replay-ui-freshness'])
 
-const ctx = { root, ok, fail }
+const ctx = { root, ok, fail, skip }
 mdUtf8.run(ctx)
 mdLinks.run(ctx)
 docBudget.run(ctx)
@@ -122,5 +131,10 @@ replayFixtureFreshness.run(ctx)
 replayUiFreshness.run(ctx)
 gateWiring.run(ctx)
 
-console.log(failures.length === 0 ? '\nverify: ALL PASS' : `\nverify: ${failures.length} FAILURE(S)`)
+const unexpected = skips.filter(entry => !EXPECTED_SKIPS.has(entry.name))
+for (const entry of unexpected) failures.push(`skip ${entry.name}: ${entry.reason}（不在 EXPECTED_SKIPS——新增跳过必须显式登记）`)
+const skippedNote = skips.length === 0 ? '' : `；${String(skips.length)} 门无对象（${skips.map(entry => entry.name).join(' / ')}）`
+console.log(failures.length === 0
+  ? `\nverify: ALL PASS${skippedNote}`
+  : `\nverify: ${String(failures.length)} FAILURE(S)`)
 process.exit(failures.length === 0 ? 0 : 1)

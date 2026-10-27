@@ -18,7 +18,7 @@ import { freshnessProblems } from '../../tools/lib/replay-fixture-freshness.mjs'
 //   ① r3-delegation 现行手册（187 行）vs 录制（190 行版）→ 红，报
 //     「注入手册第 152 行与现行不一致：录制『- 第一版只把已生效的签字线落进…』vs 现行『### 规矩缺口…』」；
 //   ② 单测负例（replay-fixture-freshness.spec）：无注入面 → 报形状异常；marker 缺席 → undefined 不误判。
-export function run({ root, ok, fail }) {
+export function run({ root, ok, fail, skip }) {
   const replayRoot = join(root, 'snapshots/replay')
   const handbookPath = join(root, 'packages/company-pack/workspace/AGENTS.md')
   if (!existsSync(replayRoot)) { ok('replay-fixture-freshness（无 replay 场景，跳过）'); return }
@@ -69,7 +69,13 @@ export function run({ root, ok, fail }) {
     checkedInjections += fixtureHandbooks.reduce((n, entry) => n + entry.injections.length, 0)
     problems.push(...freshnessProblems(scene, fixtureHandbooks, currentHandbook))
   }
-  problems.length === 0
-    ? ok(`replay-fixture-freshness ×${String(checkedScenes)} 场景 ${String(checkedInjections)} 处注入面与现行手册一致（presence 跳过 ${String(skippedPresence)} / headless 跳过 ${String(skippedHeadless)}）`)
-    : fail('replay-fixture-freshness', `runnable+full 场景的注入面与现行手册漂移——改注入源必须同 diff 重跑/重录受影响场景（改动面映射 = tests/README「注入面」行）：${problems.join('；')}`)
+  if (problems.length > 0) {
+    fail('replay-fixture-freshness', `runnable+full 场景的注入面与现行手册漂移——改注入源必须同 diff 重跑/重录受影响场景（改动面映射 = tests/README「注入面」行）：${problems.join('；')}`)
+  } else if (checkedScenes === 0) {
+    // 无对象 ≠ 通过（R3-06）：本仓唯一 runnable 场景是 headless 合成场景，没有公司手册注入面可查；
+    // 公司行为的注入面随真实证据移出产品仓。门禁照旧存在，等场景回来（或部署仓）自动接上。
+    skip('replay-fixture-freshness', `盘上没有需查注入面的 runnable 场景（headless 跳过 ${String(skippedHeadless)} / presence 跳过 ${String(skippedPresence)}）——公司行为回放已移私有仓`)
+  } else {
+    ok(`replay-fixture-freshness ×${String(checkedScenes)} 场景 ${String(checkedInjections)} 处注入面与现行手册一致（presence 跳过 ${String(skippedPresence)} / headless 跳过 ${String(skippedHeadless)}）`)
+  }
 }

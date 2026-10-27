@@ -42,7 +42,6 @@ import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.m
 import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 import { makeFailingCheck, sleep } from '../../tools/lib/probe-kit.mjs'
 import { diagnosisDir } from '../../tools/lib/diagnosis.mjs'
-import { uiPhase } from './lib/replay-ui.mjs'
 import { spawn, spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
@@ -88,6 +87,13 @@ const HEADLESS = metadata.profile === 'headless'
 // `--patch` 可重复 ⇒ 组合夹具只声明 registry，预设行由这里追加（单一事实 = pack 的文件）。
 const PRESET_PATCHES = COMPANY_ROLE_IDS
   .flatMap(role => ['--patch', join(ROOT, 'packages/company-pack/presets', role, 'agent.cordis.yml')])
+// 2026-10-27（R3-04）：UI 金样场景随真实证据移出产品仓，本仓没有可跑的 `ui.expected.md`。
+// 真页面车道改由 checks/smoke/ui-scene-smoke.mjs 承担（自起实例 + cdp-probe + 证据）。
+if (UI || REFRESH_UI) {
+  console.error('replay-smoke: --ui/--refresh-ui 当前不可用——本仓没有声明 uiEvidence 的场景；')
+  console.error('  真页面断言请用 node checks/smoke/ui-scene-smoke.mjs（自起实例，成功/失败都留证）。')
+  process.exit(2)
+}
 if (HEADLESS && (RECORD || UI || REFRESH_UI)) throw new Error('Headless workspace fixture supports keyless replay, --prepare, and --refresh only')
 if (HEADLESS && !oracle) throw new Error('Headless workspace replay requires workspace.final with before/expected trees')
 if (REFRESH && (!HEADLESS || RECORD || PREPARE)) throw new Error('--refresh supports only keyless headless replay')
@@ -111,7 +117,6 @@ function childRaws() {
 const fixLead = join(replayDir, 'session.v3.jsonl')
 const childFixture = (k) => join(replayDir, `session.${String(k)}.v3.jsonl`)
 const archiveLead = join(scenarioDir, 'sessions', 'lead.jsonl') // 历史归档（首录的任务来源）
-const goldenUi = join(replayDir, 'ui.expected.md')
 /** vendor suite.ts 的 sidecar 命名：lead 无后缀，child 按 fixture 序号（session.1 → .1）。 */
 const sidecarPrompt = (index) => join(replayDir, index === 0 ? 'system-prompt.expected.md' : `system-prompt.${String(index)}.expected.md`)
 const sidecarTools = (index) => join(replayDir, index === 0 ? 'tool-schemas.expected.json' : `tool-schemas.${String(index)}.expected.json`)
@@ -777,16 +782,6 @@ try {
       `录制 ${JSON.stringify(shape(recordedBoard))} / 重放 ${JSON.stringify(shape(replayBoard))}`)
   }
   check('全程无 key（DSH_SNAPSHOT=replay + 真 LLM 已禁用）', true)
-  // 浏览器档（P1.3 / R5b）：r3 = 委派卡端到端；r2 = 驾驶舱端到端（页签 + 行可点）。
-  if (UI) {
-    if (SCENARIO !== 'r3-delegation' && SCENARIO !== 'r2-motion') {
-      check(`ui 档（${SCENARIO}）：暂只支持 r3-delegation / r2-motion`, false, '用 --scenario r3-delegation 或 r2-motion 跑 ui 档')
-    } else {
-      console.log(`  ── ui 档（真浏览器${SCENARIO === 'r2-motion' ? '驾驶舱' : '委派卡'}端到端）──`)
-      // 浏览器档实现在 ./lib/replay-ui.mjs（2026-10-14 拆出）；env 注入判分闭包与旗标事实。
-      await uiPhase({ check, firstDiff, scenario: SCENARIO, refreshUi: REFRESH_UI, goldenUi, root: ROOT }, { url: replayUrl, workspace })
-    }
-  }
 } catch (error) {
   failures.push(`异常: ${error.message}`)
   console.log(`  FAIL 异常: ${error.message.split('\n')[0]}`)

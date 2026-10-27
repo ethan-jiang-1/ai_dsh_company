@@ -15,11 +15,12 @@
 | 确认 client 真的装配 | [client-load-smoke](smoke/client-load-smoke.mjs) |
 | 确认录制行为与工作区判据 | [replay-smoke](smoke/replay-smoke.mjs) |
 | 审计动议输出和角色留痕 | [deliverables-check](audit/deliverables-check.mjs)、[authorship-audit](audit/authorship-audit.mjs)、[journal-audit](audit/journal-audit.mjs) |
-| 查看运行中页面 | [cdp-probe](../probes/browser-visual/cdp-probe.mjs)；操作指南见 [CDP 指南](../docs/guides/cdp-probe.md) |
+| 看真页面 / 复现 UI 症状（**自起实例**） | [ui-scene-smoke](smoke/ui-scene-smoke.mjs)：起观察窗 → cdp-probe 全公司页签 + 浏览器错误环 → 成功/失败都落证据（`--keep` 留实例） |
+| 查看已运行页面 | [cdp-probe](../probes/browser-visual/cdp-probe.mjs)；操作指南见 [CDP 指南](../docs/guides/cdp-probe.md) |
 | 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs)、[channel-matrix-smoke](smoke/channel-matrix-smoke.mjs)、[lifecycle-smoke](smoke/lifecycle-smoke.mjs)、[standalone-smoke](smoke/standalone-smoke.mjs)、[export-dist](../tools/export-dist.mjs) |
 | 从目录隔离启动公司实例 | `pnpm standalone` → [standalone](../tools/standalone.mjs)（隔离 home/profile，不动日用 home） |
 
-模型调用与浏览器是两种独立成本。keyless 表示无需模型密钥：真实进程、浏览器或安装链仍有成本，保留在独立脚本 lane。文件名用来定位层，参数和头注决定实际运行模式；例如 replay 默认回放，`--ui` 加浏览器，`--record` 才重录模型调用。`presence-e2e` 检查 RPC 投影，不启动浏览器。
+模型调用与浏览器是两种独立成本。keyless 表示无需模型密钥：真实进程、浏览器或安装链仍有成本，保留在独立脚本 lane。文件名用来定位层，参数和头注决定实际运行模式；例如 replay 默认回放，`--record` 才重录模型调用；真页面车道 = `ui-scene-smoke`（`replay --ui` 当前无场景，见其头注）。`presence-e2e` 检查 RPC 投影，不启动浏览器。
 
 顶层按用途读（2026-10-07 S2 起）：**验证面 = checks/**（本目录：`smoke/` 真实入口冒烟 + `audit/` 盘面日志判据 + run-gates 门禁）｜**调试面 = [probes/](../probes/)**（窄机制与视觉探查，按机制域四子目录：team / fs-taskboard / browser-visual / session-context）｜**工具面 = [tools/](../tools/)**（维护工具 + `lib/` 共享纯逻辑 + `drivers/` 真实驱动 + `archive/` 已耗仪器）。
 
@@ -60,6 +61,7 @@
 
 | 脚本 | 证明对象 / 用途 |
 |---|---|
+| [ui-scene-smoke.mjs](smoke/ui-scene-smoke.mjs) | **自起实例**的真页面断言：全部公司页签 + 浏览器错误环 + 证据目录；一条命令复现 UI 症状 |
 | [cdp-probe.mjs](../probes/browser-visual/cdp-probe.mjs) | 已运行观察窗的真实渲染、公司页签与控制台；可选问题验证产品回路 |
 | [browser-behavior-probe.mjs](../probes/browser-visual/browser-behavior-probe.mjs) | 自行拉起 MCP，以真实调用验证 browser-use 导航、读取、点击与输入 |
 | [dag-visual-probe.mjs](../probes/browser-visual/dag-visual-probe.mjs) | 合成任务驱动的 DAG 主题、样式与视觉判据 |

@@ -9,15 +9,17 @@ import { createHash } from 'node:crypto'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-export function run({ root, ok, fail }) {
+export function run({ root, ok, fail, skip }) {
   const replayRoot = join(root, 'snapshots/replay')
-  if (!existsSync(replayRoot)) { ok('replay-ui-freshness（无 replay 场景，跳过）'); return }
+  if (!existsSync(replayRoot)) { skip('replay-ui-freshness', '无 replay 场景目录'); return }
   const problems = []
+  let goldenCount = 0
   for (const scene of readdirSync(replayRoot, { withFileTypes: true })) {
     if (!scene.isDirectory() || scene.isSymbolicLink()) continue
     const dir = join(replayRoot, scene.name, 'replay')
     const golden = join(dir, 'ui.expected.md')
     if (!existsSync(golden)) continue
+    goldenCount += 1
     const stamp = join(dir, 'ui.expected.session.sha256')
     const fixture = join(dir, 'session.v3.jsonl')
     if (!existsSync(fixture)) { problems.push(`${scene.name}: 有 ui 金样但无 session.v3.jsonl`); continue }
@@ -28,6 +30,7 @@ export function run({ root, ok, fail }) {
       problems.push(`${scene.name}: 金样所对的 session 已变（${recorded.slice(0, 8)}… vs ${actual.slice(0, 8)}…）——重跑 --ui --refresh-ui，或回滚 session`)
     }
   }
-  if (problems.length === 0) ok('replay-ui-freshness（金样与 session 同代）')
-  else fail('replay-ui-freshness', problems.join('；'))
+  if (problems.length > 0) fail('replay-ui-freshness', problems.join('；'))
+  else if (goldenCount === 0) skip('replay-ui-freshness', '盘上没有任何 ui.expected.md 金样（公司 UI 场景 = ui-scene-smoke 自起实例车道）')
+  else ok(`replay-ui-freshness（${String(goldenCount)} 份金样与 session 同代）`)
 }

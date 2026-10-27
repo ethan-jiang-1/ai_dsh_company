@@ -1,6 +1,7 @@
 // replay-smoke 的浏览器档（--ui / --refresh-ui）实现模块（2026-10-14 重构轮自主文件 589-830 段拆出：
 // 该段只在 UI 旗标下运行，与默认重放档分文件后主文件 ≈590 行、vendored 转写被隔离在专属文件）。
-// 由 checks/smoke/replay-smoke.mjs 独家 import；不单独运行（不是 smoke 入口）。
+// 状态：已耗（2026-10-27，R3-04）——唯一调用方 replay-smoke 已停用 `--ui`（本仓没有声明 uiEvidence 的场景；
+//   真页面车道 = checks/smoke/ui-scene-smoke.mjs）。本模块保留待合成 web 回放场景回归时复用；不单独运行。
 //
 // ── 浏览器档（P1.3）：vendor apps/web/tests/{scaffold,support}.ts 管线的逐行转写 ──
 // 出处：normalizeAria/captureStableAria = scaffold.ts:1385-1480；expandTurnProcesses =

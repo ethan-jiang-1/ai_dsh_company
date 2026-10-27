@@ -27,6 +27,7 @@ import { registerCompanyTabs } from './company-tab-registration.ts'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
 import { installStyles } from './styles.ts'
+import { installErrorCapture, type ErrorCaptureTarget } from './error-ring.ts'
 import { ROLE_SHORT, RoleBadge, readPresetOf, sessionTitleOf } from './RoleBadge.tsx'
 import { TasksAction } from './TasksPanel.tsx'
 import { TEAM_TOOL_KEYS, TeamToolCard } from './TeamToolCard.tsx'
@@ -115,6 +116,10 @@ function makeContextWiring(
 export async function apply(ctx: ClientContext): Promise<void> {
   // CSS 与 fiber 同寿命；重新挂载读取新样式，卸载仅清理本次节点。
   ctx.effect(installStyles)
+
+  // 浏览器侧错误环（R3-03）：error / unhandledrejection / console.error 进 `window.__DSH_COMPANY_ERRORS__`，
+  // 由真页面探针（cdp-probe / ui-scene-smoke）读进 verdict 与证据目录。它**不写会话日志**（边界见模块头注）。
+  ctx.effect(() => installErrorCapture(window as unknown as ErrorCaptureTarget))
 
   // 多实例探活横幅（卡②，2026-10-10 拍板：警告横幅）：同一浏览器多实例并存 = 静默互踩
   // （E2 实证）⇒ localStorage 心跳互见即挂横幅。纯 DOM、无服务依赖，apply 即启。

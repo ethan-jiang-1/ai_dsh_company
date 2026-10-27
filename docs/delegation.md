@@ -105,7 +105,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 | 真页面挂载 | `node checks/smoke/client-load-smoke.mjs`：真浏览器加载真页面，零 loader 错误 + 品牌在场 | client 入口 apply 抛错（slot 名写错会在这里炸，postmortem 0003） | 客户端改动 |
 | 机制 / 边界 | `node checks/smoke/delegation-smoke.mjs`（1 条 prompt ≈30s）：`vp_eng`/`vp_sales`/`subagent_research` 在模型可见目录 + 三个控制名仍是团队版；`--delegate` 真委派一次，断言收到 activation 回执（`started subagent <id>`）、child 日志首帧 `agentPreset = vp-eng`、child 目录无 Team 工具 | activation 语义回归（回执变正文 = 红）；preset 组合没落到 child；Team 工具误入 child 目录 | 该边界改动后 / **升 pin 时** |
 | 挂载（上线前门禁） | `node checks/smoke/preset-smoke.mjs` | 行 config 校验（preset 挂载失败，postmortem 0001） | preset 组合或内容改动后 |
-| 端到端（**已交付，R5a**） | 模型真调 `vp_eng` → 真 UI 对话流里的委派卡 | "模型→工具→卡片"全链路 | `replay-smoke --ui`（无 key 重放 + ariaSnapshot 金样） |
+| 端到端（**历史，R5a**） | 模型真调 `vp_eng` → 真 UI 对话流里的委派卡 | "模型→工具→卡片"全链路 | 原 `replay-smoke --ui` 金样已随真实快照移出产品仓；现行真页面车道 = `ui-scene-smoke`（页签/错误环），委派卡专项断言待合成场景回归 |
 
 **为什么端到端走重放而非每轮真跑（R3 试过并否决）：**先做的是"真浏览器 + 真 composer 驱动模型"
 的 e2e，240s 都等不到卡片——CEO persona 的开工仪式先烧 5–6 步模型往返，且**依赖模型配合**
