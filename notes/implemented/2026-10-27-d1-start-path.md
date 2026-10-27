@@ -4,7 +4,7 @@
 
 # D1 提分：把"开工要读什么"写进入口文件本身
 
-> 上游 = [六维提分卡](../../_backlog/issues/2026-10-27-six-dim-raise.md) 批一。
+> 上游 = [六维提分卡](../../_backlog/_archive/settled_issues/2026-10-27-six-dim-raise.md) 批一。
 
 ## 决定
 

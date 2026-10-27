@@ -4,7 +4,7 @@
 
 # D4 提分：先把"同版本两份字节"杀掉，再让交付面有默认守卫
 
-> 上游 = [六维提分卡](../../_backlog/issues/2026-10-27-six-dim-raise.md) 批二。
+> 上游 = [六维提分卡](../../_backlog/_archive/settled_issues/2026-10-27-six-dim-raise.md) 批二。
 
 ## 决定
 

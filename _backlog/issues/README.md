@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-当前活跃 1 张：[2026-10-27-six-dim-raise](2026-10-27-six-dim-raise.md)（六维提分：D1/D4/D5 → A-；用户批全做，真模型档待授权）。2026-10-27 的第三轮六维度打扫已结归档（A/B/C/D 全批；去向 = 六篇 implemented Note，见[归档卡](../_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)）。
+当前活跃 0 张。2026-10-28 六维提分已结归档（D1/D4/D5 → A-；三批 + 认证档，去向 = 三篇 Note，见[归档卡](../_archive/settled_issues/2026-10-27-six-dim-raise.md)）。2026-10-27 的第三轮六维度打扫已结归档（A/B/C/D 全批；去向 = 六篇 implemented Note，见[归档卡](../_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)）。
 
 2026-10-27 数据模型复盘卡已结并归档（F1–F10 落 [review-followup Note](../../notes/implemented/2026-10-27-data-model-review-followup.md)）。2026-10-27 的数据模型两卡（12 Gap + R1–R6 收尾）已结并归档，去向 = 三份 implemented Note；见 [归档](../_archive/README.md)。2026-10-25 的 6 张收尾卡已结并归档（分发契约 / 生命周期 / 内容自足 / 成品目录 / 独立启动 / 身份守卫），去向 = 三份 implemented Note；见 [归档](../_archive/README.md)。
 
