@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 实验语料打分器（2026-09-26 立；keyless，秒级）——实验 B 的"仪器自检"腿 + "金标准打分"腿。
-// 何时跑：`tools/lib/candidate-scan.mjs` 或 `snapshots/corpora/candidate-scan-corpus/` 改动时（自检腿）；
+// 何时跑：`tools/lib/candidate-scan.mjs` 改动时；语料须先在盘上（本仓已无该资产，缺则 exit 2）；
 //         金标准标注文件改动时（打分腿）：`node checks/audit/candidate-scan-eval.mjs --labels <标注文件>`。
 //
 // ⚠ 自检腿只出**仪器自检**结论（语料期望值自标）——**不能给真实精确率/召回率**。
@@ -202,6 +202,13 @@ function countClosedReports(details, key) {
 
 // ────────────────────────────── 入口 ──────────────────────────────
 const args = process.argv.slice(2)
+// 2026-10-27（R3-05）：判据语料随真实部署证据移出产品仓（2026-10-25 起本仓只留合成 fixtures）。
+// 缺语料时给**可读的 exit 2**，不再 ENOENT 崩栈——崩栈让人误以为是脚本坏了，而不是资产不在。
+if (!existsSync(CORPUS)) {
+  console.error(`candidate-scan-eval: 判据语料缺失（${CORPUS}）——语料随真实证据移出产品仓，本仓不提供该资产；`)
+  console.error('  恢复语料后重跑，或把这条 lane 视为不可用（政策 = docs/testing.md §4）。')
+  process.exit(2)
+}
 const labelsIdx = args.indexOf('--labels')
 let failures
 if (labelsIdx !== -1) {

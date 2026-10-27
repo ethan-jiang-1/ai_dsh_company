@@ -2,15 +2,23 @@ import { describe, expect, it } from 'vitest'
 import { assistantMessageText, collectText } from '../../tools/lib/session-log.mjs'
 import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from '../../tools/lib/entry-probe.mjs'
 
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
+
 // 通配证据路径：单测桩对它返回 quote 自身（自洽），与下方真夹具（AGENTS.md）不撞车
 const evidence = { path: 'docs/index.md', quote: '逐字可核的证据原文至少八字符' }
+// Q4 的标准答案 = 现行 pin，从 AGENTS.md §vendor 簿记现读（2026-10-27 R3-15：原先写死 0.1.7，
+// pin 升到 0.2.1 后这份"入口链新鲜度"答卷仍在教旧值）。测试自己拉事实，不再抄第二份。
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..')
+const bookkeepingTag = /tag `(dsh-v[^`]+)`/.exec(readFileSync(join(ROOT, 'AGENTS.md'), 'utf8'))?.[1]
 // 按**题号**取答案（不是按位置）——加题时不会静默错位；数量断言一律用 ENTRY_QUESTIONS.length
 // 推导，别写死（写死就是"枚举型事实写两处"，2026-09-26 从 8 扩到 12 时正是这里要改）。
 const ANSWERS: Record<string, string> = {
   Q1: '任务源 = 已批 RFC 与磨活；implemented Note 留记录',
   Q2: '完成即离场，历史移入 Note',
   Q3: 'company-workspace/AGENTS.md 公司手册',
-  Q4: 'dsh-v0.1.7-rc.2 只读',
+  Q4: `${bookkeepingTag ?? 'dsh-v?'} 只读`,
   Q5: 'preset-smoke 验证挂载',
   Q6: '任务源与推敲卡规矩 D31 D32',
   Q7: 'dev-loop 真模型不进回归',
@@ -42,6 +50,22 @@ describe('会话回答只取组装消息，不重复遍历 stream', () => {
     }
     expect(assistantMessageText({ data: event })).toBe(text)
     expect(collectText(event).join('\n')).toBe([text, text].join('\n'))
+  })
+})
+
+describe('入口探针的 pin 判据（2026-10-27 R3-15）', () => {
+  it('传入 expectedTag 时，旧 pin 的答案判红（判据不再对任何版本放行）', () => {
+    const stale = good()
+    stale.answers = stale.answers.map(a => a.id === 'Q4' ? { ...a, answer: 'dsh-v0.1.7-rc.2 只读' } : a)
+    const strict = evaluateEntryProbe(JSON.stringify(stale), readSource, { expectedTag: bookkeepingTag })
+    expect(strict.passed).toBe(ENTRY_QUESTIONS.length - 1)
+    expect(strict.failures.join('\n')).toContain('Q4')
+  })
+  it('现行 pin 的答案在严格档通过', () => {
+    expect(evaluateEntryProbe(JSON.stringify(good()), readSource, { expectedTag: bookkeepingTag }).failures).toEqual([])
+  })
+  it('AGENTS.md 簿记可解析出 tag（否则本 spec 的 Q4 答案没有依据）', () => {
+    expect(bookkeepingTag).toMatch(/^dsh-v\d+\.\d+/)
   })
 })
 

@@ -120,9 +120,9 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 2. **货架过账**：对照外部研究树当轮 `_digested/plugin-inventory`（基线对齐新 pin；不对齐时按其
    `_change_log/` 判定影响面），新增/退役能力按判收四档（追平 standard / 未挂载现货 / 评估 / 刻意排除）
    记入收割台账 Note——先查货架再动手是 FAQ 17 四步流程，升 pin 是它的固定触发点。
-3. **语料回放全绿**：vendor 换 tag 后先跑 `checks/smoke/replay-smoke.mjs`（r2/r3 会话判据 + foundation workspace
-   oracle；资格与缺口见[快照合同](../snapshots/README.md)）再谈语义结论——replay = 升 pin 回归网第一道（[testing.md](./testing.md) §4）。
-    已知漂移红（r3 ×2 / foundation ×3 = 录制期组合演进，2026-10-05 裁决维持为漂移金丝雀、不弱化断言不重录掩盖）；升 pin 重校时顺带评估是否以新版本场景重录换更宽绿网（新录不覆盖旧锚，payload 冻结不破）。
+3. **合成回放全绿**：vendor 换 tag 后先跑 `checks/smoke/replay-smoke.mjs` 再谈语义结论。**本仓现行回放网 = 一个 headless 合成
+   场景（`foundation-workspace`，不加载 company-pack）**；公司行为的真实录制已移私有仓（[快照合同](../snapshots/README.md)）。
+   它现在只证明「回放管线本身可跑」，不证明角色/UI 行为——升 pin 的语义回归网落在部署仓，不要把它当第一道。
 
 程序：验证旧簿记及 `verify` → fetch tag 并核对证据 SHA → 在内存暂存新簿记/台账 → checkout 候选 → `pnpm install` → **vendor 面构建 = staging 树构建后拷回**（`git archive` 候选 → 独立 install + `pnpm run build` → 产物逐目录 `git check-ignore` 守门拷回；嵌套工作区跑不了 vendor face 构建，D27 在案且 0.2.0 逐字复现——见 [pin-upgrade Note](../notes/archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md)）→ `test` + built `release-smoke` → 验证通过才写簿记/台账 → 再 `verify`。候选冒烟时台账仍为旧值，安装检查只确认其在场；成功后台账才增加实测 tag。安装限 180 秒、vendor build 与 release-smoke 各 600 秒，其余命令 120 秒；子进程组等待退出。
 

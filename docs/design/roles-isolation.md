@@ -127,7 +127,7 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
 
 内建最像"公司"的协作面：持久邮箱（任意成员↔任意成员，Steer 投递、不丢不重、崩溃恢复）、
 共享任务板（CAS 修订 + `blockedBy` DAG + `writeScopes` 告警）、`fork` teammate 下发会议上下文。
-现成包（0.1.7 现状）：host 侧 = `@deepseek-ai/dsh-experimental-agent-team` +
+现成包（现行；rc.2 已核）：host 侧 = `@deepseek-ai/dsh-experimental-agent-team` +
 `@deepseek-ai/dsh-experimental-tool-agent-team`；Web UI 侧 = `@deepseek-ai/dsh-experimental-client-ui-agent-team`
 （名册/任务板/teammate 导航）。**本仓不装官方 profile bundle，改为在 pack 的 `cordis.patch.yml` 里直插这些行**
 （R1 起，避免 bundle 关掉全局续驶控制——见 [architecture §3 冲突注](./architecture.md)）。

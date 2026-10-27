@@ -71,6 +71,7 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 - **回放舰队撤空，但活跃面仍把它当现行**：`snapshots/replay` 只剩一个 headless 合成场景（`foundation-workspace`，其 `snapshot.yml` 自述"产品仓唯一合成场景"）。而 r2-motion / r3-delegation 在活跃树被引用 **43 处**，其中至少 10 处是**指令性**的：`checks/smoke/replay-smoke.mjs` 头注（"何时跑…r3 ~15s / r2 五会话 ~80–100s"、`--ui` 说明）、`checks/smoke/client-load-smoke.mjs:14`、`docs/guides/dev-loop.md:227`、`docs/testing.md:15`、`docs/guides/cdp-probe.md:59`、`tools/snapshot-motion.mjs`（默认输出 `r2-motion`，:10/:28）、`tests/harness/repository-layout.spec.ts` 的示例名。**最刺眼的是 `docs/design/ui-demo.md:132-133`**：同一张表里 v1 行已写"UI 端到端断言已随真实 snapshots 移出产品仓而退役"，v3/v4 行却仍把 `replay-smoke --ui`（r3 金样 / r2 端到端）列为验收证据。
 - **语义真空绿**：`replay-fixture-freshness` 输出 `×0 场景`（唯一 runnable 是 headless，按设计跳过注入面比对）；`replay-ui-freshness` 在**盘上 0 个 `ui.expected.md`** 的情况下 PASS。门禁把"没有对象"和"检查通过"渲染成同一个词。
 - **声明资产不存在**：`docs/testing.md:62` 与 `checks/audit/candidate-scan-eval.mjs:20` 都指向 `snapshots/corpora/candidate-scan-corpus/`；盘上 `snapshots/` 下只有 `replay/`。实测该脚本 **ENOENT 崩栈、exit 1**（不是优雅报"语料缺失"），因此"行为质量档"只剩真模型 `probe --full` 一条腿。
+- **升 pin 的“第一道回归网”已名存实亡（最重的一条）**：`docs/release.md:123-125` 仍写“语料回放全绿 = vendor 换 tag 后先跑 `checks/smoke/replay-smoke.mjs`（r2/r3 会话判据 + foundation workspace oracle）…replay = 升 pin 回归网第一道”，并列出“已知漂移红（r3 ×2 / foundation ×3）”。现实是：r2/r3 已不在盘上，foundation 是 authored 合成场景且我实跑全绿；`docs/guides/dev-loop.md:133` 与 `docs/testing.md:62` 的同一句也指向已不存在的语料。**升 pin 程序会拿一个不加载本包的合成回放当“全绿”证据。**
 - **计数与事实漂移**：`packages/company-pack/README.md:23` 写"公司视图与**五个页签**"——注册面实际 9 个（`company-tab-registration.ts` 九个 `id:`，cdp-probe 活体也验到 9 个）。`nav-count-claims` 门禁的扫描面是 `docs/** + AGENTS.md + README.md`，**不含包 README**，所以这条活到了收货人文档里。同类：`tests/harness/entry-probe.spec.ts:13` 的 Q4 旧标准答案仍是 `dsh-v0.1.7-rc.2`（现行 pin 是 `dsh-v0.2.1-rc.2`），而判据 `tools/lib/entry-probe.mjs:6` 只匹配 `/dsh-v\d+\.\d+/`——这个"入口链新鲜度"探针抓不到版本腐化；`checks/gates/doc-budget.mjs` 第 13-15 行刚写"注释里不要复述当前行数"，随后三处"内容 N"已过期（64/59/351 写成 60/55/348）。
 - **同文件内重复**：`docs/data-model.md` 把"面板摘要全扫 + open/最近 120 全文"写了三次（:15 表格、:67、:70——后两条几乎逐字重复）。
 - **归档指针失效**：`docs/demo.md` 在 :68/:152/:171/:228 引 `snapshots/archive/...` 四个路径，盘上都不存在；:68 还把合成的 `foundation-workspace` 称作一场真实动议的"归档"。
@@ -141,10 +142,11 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 | R3-23 | D6 | P2 | cdp-probe 把未登录判成渲染失败（盘上 2026-10-26 证据）；成功不落图；`cdp-probe.md:14` 选择器名过期 |
 | R3-24 | D6 | P2 | 症状→动作表无 UI 行；证据 7 天被 prune、web stderr 不落盘、`web-logs` 仅手抄 banner |
 | R3-25 | D1/D2 | P3 | 设计层"0.1.7 现状"标签过期、`architecture.md:284-287` 保留已撤回开放点；`src/client` 30 文件平铺（建议 >40 再拆）；六个面板探针默认会话标题失效 |
+| R3-26 | D4/D5/D6 | P1 | 升 pin 回归网名存实亡：`docs/release.md:123-125` 仍以 r2/r3 + foundation 作“replay = 第一道”，并记“已知漂移红 r3 ×2 / foundation ×3”；r2/r3 已撤、foundation 实跑全绿且不加载本包；`dev-loop.md:133`/`testing.md:62` 同指失效语料 |
 
 ## 4. 建议批次（待 REVIEW 选批）
 
-- **A · 真实性止血（keyless，1 天内）**：R3-05/06/09/15/16 → 清掉不存在的声明与指令性残留；让"零对象"的门禁输出改成可辨识的 `NO-SUBJECTS`（而不是 PASS）；`candidate-scan-eval` 语料缺失时优雅退出 2；修包 README 页签数、entry-probe Q4 从 pin 派生、doc-budget 注释去数字、data-model 去重、demo 归档指针。R3-23/24 的文档面同批。
+- **A · 真实性止血（keyless，1 天内）**：R3-05/06/09/15/16/26 → 清掉不存在的声明与指令性残留；让"零对象"的门禁输出改成可辨识的 `NO-SUBJECTS`（而不是 PASS）；`candidate-scan-eval` 语料缺失时优雅退出 2；修包 README 页签数、entry-probe Q4 从 pin 派生、doc-budget 注释去数字、data-model 去重、demo 归档指针。R3-23/24 的文档面同批。
 - **B · 语义边界与收尾单一化（P1，半天）**：R3-07 授权规则一处家（删指南里的缩写）；R3-08 收尾只留一份有序清单（skill 顾次序、§12 只留指南独有的三件并链接 skill），verify/test 提到回执之前。
 - **C · 回归网补强（P0/P1，2–3 天）**：R3-01 加 `src-layering` 门禁 + `pnpm typecheck`；R3-02 diagnose 中断检测 + `--strict`；R3-04 二选一（合成 web 场景 + `--ui` 放开，或彻底撤掉 `--ui` 并从文档删除）；R3-10 客户端页签/待办渲染 spec；R3-11 host 真组合 spec；R3-12 propose 守卫表驱动 spec；R3-03 客户端错误落一条可选通路（先做"探针成功也落 verdict"这一最小格）。
 - **D · 渐进披露与结构收拢（P2/P3，2 天，可后置）**：R3-17/18/19/20/21/22/25 —— 立政策层并给 dev-loop 减到 ≤150 行、预算双向棘轮 + 链上补预算、checks/README 压到 ≤100 行、三个巨型函数按已存在的注释/导出缝拆、lib 环与重复工具收家。
@@ -182,4 +184,5 @@ git status --porcelain                            # 评审零足迹（审计产�
 - 真模型认证档（entry-probe / delegation-smoke / probe --full）：成本与授权，未跑。
 - vendor/dsh 内部机制与升 pin 面：只读引用，未重校。
 - 公司业务产物质量（deliverables 内容）与 preset persona 文案质量：不在卫生范围。
-- D4 的 notes 全量两两比对：只做主题抽样（决策台账 48 个 D 号抽样 6 个、近 7 天新 Note 4 篇通读）。
+- D4 的 notes 全量两两比对：只做主题抽样（决策台账 48 个 D 号抽样 6 个、近 7 天新 Note 4 篇通读、CHANGELOG 0.3.14 三条声明回代码抽验——均成立）。
+- 第五个子代理（腐化面全量）运行超时被中止；D4 由主 agent 自查 + 文档/测试两个子代理交叉覆盖，未做 notes 全树逐篇比对。

@@ -4,7 +4,7 @@
 // 前置：**先 source run/env.sh 再跑**（或显式给同样的 DSH_PERMISSION_MODE）。姿态事件的**值**已脱敏，
 //   但它们的**在场与位置**随机器姿态变（Seatbelt 可用 = workspace-write，损坏 = danger-full-access，
 //   权限事件序列不同）——裸跑会在那些行上红，那是设计内的「序列漂移照样红」，不是夹具坏。
-// 何时跑：录制行为、组合、委派 UI 或 workspace replay 改动时（第三档，无 key；r3 ~15s / r2 五会话 ~80–100s，--ui 另起浏览器）
+// 何时跑：录制行为、组合或 workspace replay 改动时（第三档，无 key；现行只有一个 headless 合成场景 ~2s；--ui 另起浏览器）
 //   --prepare     原始录制（replay/raw/，lead.jsonl + 任意名 child）→ 归一化 fixture
 //                 （session.v3.jsonl + session.<k>.v3.jsonl，child 按 header createdAt 排序）
 //                 + sidecar（system-prompt.expected.md / tool-schemas.expected.json；child 带 .k. 后缀）
@@ -12,7 +12,7 @@
 //   --record      场景组合（replay/cordis.yml，真模型认证档）下重录 → replay/raw/ → 顺带 prepare
 //   answerer: browser（场景 snapshot.yml 可选项）：本场景的问询由**真 UI 认领并作答**（第一项），
 //     录/放两侧同规则 ⇒ 对称。为什么需要它：ask 是前景等待，没人作答整轮不收口、会话日志不封盘，
-//     阻塞型场景因此既录不成也重放不成（2026-10-11 human-exits-ask 实测）。默认不开，r3/r2 不受影响。
+//     阻塞型场景因此既录不成也重放不成（2026-10-11 human-exits-ask 实测）。默认不开。
 //   --ui          默认重放的全部检查 + 委派卡端到端（P1.3，r3-delegation 场景）：playwright
 //                 加载真页面 → 连接工作区 → 搜索打开 lead 会话 → 展开轮次组 → ariaSnapshot
 //                 金样比对 + 委派卡可访问名断言（断言口径 = 可访问名/文本，不是 data-*——

@@ -56,6 +56,6 @@ console.log），JSON verdict 的 `evidenceDir` 指向它；跨进程可回溯�
 |---|---|---|
 | 结构/契约 | `pnpm verify` / `pnpm test` | 静态 |
 | client 面健康（零挂载失败 + 品牌） | `client-load-smoke` | 真浏览器（自起实例） |
-| 委派卡端到端 + 金样 | `replay-smoke --ui` | 真浏览器（回放） |
+| 回放 UI 金样 | 暂无可用场景（`replay-smoke --ui` 仅对声明 uiEvidence 的场景开放） | — |
 | **运行中实例的真实渲染 + 全环** | **本探针** | 真浏览器（附着运行实例） |
 | owner 亲眼看 | demo.md §前置 | 人 |

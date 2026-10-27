@@ -14,6 +14,7 @@ import { isAbsolute, join, relative, sep } from 'node:path'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { assistantMessageText, collectText, readRecords } from '../../tools/lib/session-log.mjs'
 import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from '../../tools/lib/entry-probe.mjs'
+import { expectedTag } from '../gates/lib/pin.mjs'   // Q4 严格档：判据绑定现行 pin（2026-10-27 R3-15）
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -137,7 +138,7 @@ try {
       assertCodingBaseline(baseline)
       const replies = events.filter(e => e.type === 'assistant/message').map(assistantMessageText).filter(Boolean)
       reply = replies.at(-1) ?? ''
-      result = evaluateEntryProbe(reply, readSource)
+      result = evaluateEntryProbe(reply, readSource, { expectedTag })
       break
     }
     if (Date.now() >= deadline) throw new Error('entry-probe: 轮次超时')

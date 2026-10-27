@@ -130,7 +130,7 @@ CPU 满载 = 死循环；比砍配置二分快得多（R1 三刀二分全白切�
 升级环（AGENTS.md 纪律的展开；执行器 `tools/sync-dsh.mjs`，R5a 建——默认检查簿记一致，`--pin <tag>` 走完整程序）：
 
 ```text
-vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 语料回放全绿（升 pin 回归网第一道，
+vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 合成回放全绿（本仓只有 headless 合成场景，公司行为回放已移私有仓，见 [快照合同](../../snapshots/README.md)；
   政策家 = docs/testing.md §4）→ compatibility 矩阵加列 → 真实安装冒烟
 ```
 

@@ -65,7 +65,7 @@
 - 一场完整会话日志（`$DSH_HOME/sessions/`）——CEO + 四 VP 会话都在
 - `deliverables/` 有本动议的定稿（CEO `present` 声明过）
 - 任务板出现过 **DAG 依赖**与 **≥1 次跨 VP 互审**（消息 + 回执 + 修订号变化）
-- 归档为 `snapshots/replay/foundation-workspace/`（沿用 R1 形状：会话 JSONL + workspace 期望态）
+- 证据归档：真实动议的会话与工作区已移私有仓；本仓只保留**合成** fixture（非本场实测证据）
 
 **R4 加判据（交付物三态，整场通用，机器判）**：
 
@@ -126,7 +126,7 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 | 6 | 回 CEO | 合稿 → `final.md` → `present` | 交付卡片出现；`final.md` 有“保留分歧”节，不抹平 |
 | 7 | 收尾 | 三个 journal 各一篇 | `kb/{ceo,coo,vp-sales}/journal/support-sla-page.md` |
 
-**实测基线**：`snapshots/replay/foundation-workspace/`（合成 keyless fixture；真实动议证据已移私有仓）。这一场真跑 **150 秒**
+**实测基线**：真实动议证据已移私有仓（本仓只留合成 fixture）。当时真跑 **150 秒**
 （预算 6 分钟）。**值得指出的一处**：互审稿路径 `drafts/review-coo.md` 是**模型自己**按三态约定放的
 （prompt 只给了另两份）——三态合同随公司手册注入首帧，所以它会生效，不靠人盯。
 
@@ -149,7 +149,7 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 | 6 | 回 CEO | 合稿：Q4 优先级三条全补件 + 裁定三条 + 版本冻结 → `present` | final.md 出现「判不了」总判 + P1–P3 |
 | 7 | 收尾 | 三 journal 留痕 → **当轮收敛**（压进 CHARTER 历史纪要、journal 清空） | 驾驶舱④培养面板待审归 0 |
 
-**实测基线**：`snapshots/archive/q3-business-review/`（lead 428 行 + cfo + coo）。真跑 **241 秒**（预算 12 分钟），
+**实测基线**：真实证据已移私有仓（原 lead 428 行 + cfo + coo）。当时真跑 **241 秒**（预算 12 分钟），
 3 人组、工具调用在限。**收敛后首场**：角色开工读的是 CHARTER「历史纪要」（46 篇 journal 已于
 2026-09-25 收敛进归档），季度台账逐案引用的就是它——记忆收敛的回环第一次闭合。CFO 稿里的
 「integration-50w 无 final ⇒ 未核实」正是历史纪要 + 引用两分法（候选 C）联合生效的实证。
@@ -168,7 +168,7 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 | 4 | 回 CEO | 合稿：止血 + 根因（区分已证实/待验证）+ 防再发三条带 owner → `present` | final.md 含时间线/根因/防再发 |
 | 5 | 收尾 | **当轮收敛**（journal → CHARTER 历史纪要即清空） | 培养面板待审归 0 |
 
-**实测基线**：`snapshots/archive/emergency-x-incident-review/`（lead 210 行 + vp-eng + coo）。真跑 **100 秒**
+**实测基线**：真实证据已移私有仓（原 lead 210 行 + vp-eng + coo）。当时真跑 **100 秒**
 （预算 8 分钟）。**两处值得指出**：① CEO 客户面止血口径直接用的是**上一场季度经营会刚立的新口径**
 （次工作日首响 + 10% 服务信用只抵扣不下现金）——跨动议组织记忆生效实证；② CFO 的 Q3 新口径
 （补偿三口径）在本案客户面被正确引用且未越权（金额与记账口径留 CFO）。**缺口登记**：VP-Eng/COO
@@ -224,6 +224,6 @@ COO 承接能力内；毛利不得低于 CFO 底线。
 `owners.md` 的授权面就成了摆设（demo 的卖点正是"谁签得动"按人分）。
 
 **实测基线**：两扇门排练 PASS（2026-09-26，排练场）；**真盘三扇门已跑**（2026-10-04，
-firstdeal-v-2026：双签两半各落各门均人应答 allowed-once。快照 =
-`snapshots/archive/memory-convergence-2026-10-04-3/`）。
+firstdeal-v-2026：双签两半各落各门均人应答 allowed-once。原快照 =
+memory-convergence-2026-10-04-3；真实证据已移私有仓）。
 **预算**：3 人、每人单轮出稿、工具 ≤10/人、总墙钟 ≤10 分钟；不新增调研。

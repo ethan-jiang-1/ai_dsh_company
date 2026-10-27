@@ -14,6 +14,9 @@ import { join } from 'node:path'
 // 负例留证 2026-10-12（实跑原话）：docs/orient.md 词表临时插「右栏五个平台页签」→
 //   `FAIL nav-count-claims: docs/orient.md:N → 页签计数声明「五个平台页签」（计数随切片增长必过期；写法 = 全部公司页签 / 清单 = 注册面）`；
 //   还原即绿。豁免方向：cdp-probe.md「开一个页签后…」→ 绿（「一」豁免）。
+// 负例留证 2026-10-27（R3-15，扫描面扩到包 README 后）：packages/company-pack/README.md 临时追加
+//   「公司视图与五个页签。」→ `FAIL nav-count-claims packages/company-pack/README.md:117 → 页签计数声明
+//   「五个页签」`；还原 → 绿 ×47 文件。
 export function run({ root, ok, fail }) {
   const walkNavMd = (dir) => !existsSync(dir) || !lstatSync(dir).isDirectory() ? [] : readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const p = join(dir, entry.name)
@@ -21,7 +24,13 @@ export function run({ root, ok, fail }) {
     return entry.name.endsWith('.md') ? [p.slice(root.length + 1)] : []
   })
   const COUNT_PHRASE = /[两二三四五六七八九十0-9]+ *个? *(?:公司|平台)?页签/
-  const navCountFiles = [...walkNavMd(join(root, 'docs')), 'AGENTS.md', 'README.md'].filter(f => existsSync(join(root, f)))
+  // 2026-10-27（R3-15）：扫描面补**随包分发的文档**——包 README 是收件人第一份文档，workspace/*.md 是
+//   随每个角色会话注入的手册；两者原先不在面内，于是包 README 的「五个页签」（实际 9）活过了两轮审计。
+const navCountFiles = [...new Set([
+  ...walkNavMd(join(root, 'docs')),
+  ...walkNavMd(join(root, 'packages/company-pack/workspace')),
+  'AGENTS.md', 'README.md', 'packages/company-pack/README.md',
+])].filter(f => existsSync(join(root, f)))
   let navCountBad = false
   for (const rel of navCountFiles) {
     const lines = readFileSync(join(root, rel), 'utf8').split('\n')

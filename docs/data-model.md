@@ -67,6 +67,5 @@
 - 面板 records 为“摘要全扫 + open/最近 120 全文”，更早的只显示未展开计数；用 `/cultivation archive` 控制规模。
 - manifest 首建在 hard link 不支持的文件系统上回退 `wx` 单写并告警（仍不覆盖，但非原子发布）；换盘备份只留 5 份。
 - 培养背景 `contexts` 是会话摘录，可能含密钥样式内容；创作面只提示、不自动脱敏。
-- 培养面板摘要全扫 + open/最近 120 全文；更早记录只显示未展开计数，用 archive/purge 控制规模。
 - 不引入第三方 E1 依赖；不新增 `SessionEventMap` 类型；不把插件状态塞进会话 surface。
 - 包目录只读；数据只写公司盘、home、profile 方法层或浏览器本地。

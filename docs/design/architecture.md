@@ -270,7 +270,7 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
    故每个角色 preset 声明自己那套工具行（复制式演化——DSH 无 patch 继承）；pack 的
    `cordis.patch.yml` 只负责**全局行**（registry roster、团队两行、present）。
    代价：五个角色各持一份工具行清单（复制式演化）；换来按角色的最小权限工具面。
-2. **presets 进 roster 的落法**（0.1.7 模型）：registry **一行**（`agent-preset-registry`，用替换
+2. **presets 进 roster 的落法**（现行组合；rc.2 已核）：registry **一行**（`agent-preset-registry`，用替换
    语法覆盖 web-app 的出厂 insert 行，`default: standard → ceo`）+ **每个预设一行**
    `@deepseek-ai/dsh-agent-preset`（住 `presets/<role>/agent.cordis.yml`，经 `dsh.bundle.patch`
    **数组**并入）。（旧模型 = `dsh-agent-presets` 一行 + `roots` 目录扫描 + `!!js`/`baseUrl` 自定位；
@@ -281,10 +281,6 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
    不装官方 bundle，故无续驶控制冲突）。
 4. **双 home**：日用 `~/.dsh` 不动，开发 `DSH_HOME=<repo>/runtime/harness-home`，环境脚本兜底
    （coding agent 不会自己想起这个区别）。
-5. **~~已知开放点（R1 实测）~~ 已随升 pin 失效**：原文记"company profile（无 web-app）里
-   agent-presets 行在源码 CLI 下挂起"——那是 0.1.5 模型 + 已退役 company profile 的组合，
-   0.1.7 换 registry 模型后该行已不存在。观察窗现行做法 = web profile（见 [profile.md](../profile.md)）；
-   原始观察留档在 R1 Note，本条不再作为开放点。
 6. **preset 挂载只在 Web 面**（R1 实测，机制级）：只有 `web-app` bundle 组合 `session-controller`
    （headless / sdk / acp 都是 0），而 `composeAgent`（"session 未指定 preset 时挂 default"）
    住在 session-controller 里。**headless 一次性驱动直接经 core agent registry 建 agent，绕过

@@ -7,8 +7,8 @@
 // replay harness 已交付（checks/smoke/replay-smoke.mjs）；本目录用途 = **基线对照**（行为变了就 diff）。
 //
 // 用法：source run/env.sh && node tools/snapshot-motion.mjs \
-//         --session session-<lead-id> --out snapshots/replay/r2-motion --motion "动议原文" [--cwd company-workspace]
-import { repositoryRoot as ROOT, snapshotOutput, snapshotOutputPath } from './lib/repository-layout.mjs'
+//         --session session-<lead-id> --out snapshots/replay/<场景名> --motion "动议原文" [--cwd company-workspace]
+import { repositoryRoot as ROOT, snapshotOutputPath } from './lib/repository-layout.mjs'
 import { pickSessionLog } from './lib/session-log-generation.mjs'
 import { zstdText } from './drivers/zstd.mjs'
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -24,9 +24,11 @@ const arg = (name, fallback) => {
 }
 const SESSION = arg('session')
 const OUT_ARG = arg('out')
-const OUT = OUT_ARG === undefined
-  ? snapshotOutput(ROOT, 'replay', 'r2-motion')
-  : snapshotOutputPath(ROOT, OUT_ARG)
+if (OUT_ARG === undefined) {
+  console.error('snapshot-motion: 必须给 --out <场景目录>（场景名随动议，不用历史默认值）')
+  process.exit(2)
+}
+const OUT = snapshotOutputPath(ROOT, OUT_ARG)
 const MOTION = arg('motion', '（未注明）')
 const CWD_REL = arg('cwd', 'company-workspace')
 // 场景名（R3 起可配）：探针类场景不是"动议"，别让 snapshot.yml 顶着 r2 的名字。

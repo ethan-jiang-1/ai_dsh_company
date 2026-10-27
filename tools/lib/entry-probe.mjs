@@ -1,4 +1,6 @@
 /** Stable routing questions; current values must come from repository evidence. */
+// 2026-10-27（R3-15）：Q4 原判据 `/dsh-v\d+\.\d+/` 对任何版本都放行，答卷里的旧 pin 永远判绿。
+//   调用方可传 `{ expectedTag }` 把它收紧到现行 pin；档案事实仍住 AGENTS.md 簿记（调用方取）。
 export const ENTRY_QUESTIONS = [
   { id: 'Q1', ask: '现在可开工的任务从哪里取（已批 RFC？磨活？）？没有时怎么办？完成记录住哪里？', expect: [/RFC|磨活|polish|用户指令/, /Note|implemented|台账/] },
   { id: 'Q2', ask: '完成即离场是什么意思？当前任务源与历史记录如何区分？', expect: [/离场|离队|移除|删/, /Note|implemented|历史/] },
@@ -54,7 +56,12 @@ const squash = (text) => text
  * @param {(path: string) => string} readSource - Read only an allowed current repository source.
  * @returns {{passed: number, failures: string[]}} Machine-check results, never human approval.
  */
-export function evaluateEntryProbe(reply, readSource) {
+export function evaluateEntryProbe(reply, readSource, options = {}) {
+  const questions = options.expectedTag === undefined
+    ? ENTRY_QUESTIONS
+    : ENTRY_QUESTIONS.map(q => q.id !== 'Q4'
+      ? q
+      : { ...q, expect: [new RegExp(options.expectedTag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), ...q.expect.slice(1)] })
   let value
   const fenced = /^```(?:json)?\s*\n([\s\S]*?)\n```\s*$/i.exec(reply.trim())
   const body = fenced ? fenced[1] : reply.trim()
@@ -81,8 +88,8 @@ export function evaluateEntryProbe(reply, readSource) {
   const failures = []
   let passed = 0
   if (value.conflicts.length) failures.push(`报告了 ${value.conflicts.length} 个矛盾：${JSON.stringify(value.conflicts)}`)
-  if (value.answers.length !== ENTRY_QUESTIONS.length) failures.push(`必须恰好 ${ENTRY_QUESTIONS.length} 个回答`)
-  for (const q of ENTRY_QUESTIONS) {
+  if (value.answers.length !== questions.length) failures.push(`必须恰好 ${questions.length} 个回答`)
+  for (const q of questions) {
     const matches = value.answers.filter(answer => answer?.id === q.id)
     if (matches.length !== 1) { failures.push(`${q.id}: 缺题或重复`); continue }
     const answer = matches[0]
