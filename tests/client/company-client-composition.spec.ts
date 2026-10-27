@@ -16,6 +16,7 @@ import { createClientTest } from '../../vendor/dsh/packages/test-support/client-
 // 源码面供本包 client 行（tier 的 provide 机制）：动态 import 走 exports 落到 tsdown 的 CJS
 // 构建产物会炸；provide 与根仓「vitest 一律走 src 源码面」纪律一致，模块本体仍是生产实现。
 import * as companyClient from '../../packages/company-pack/src/client/index.ts'
+import { HEARTBEAT_KEY } from '../../packages/company-pack/src/client/instance-guard.ts'
 
 /** The web profile's browser roster with the company pack as an extra bundle layer. */
 const roster = bundleRoster(
@@ -42,7 +43,7 @@ const COMPANY_SLOTS = [
   'sidebar.right.tab.guide.entry',
 ] as const
 
-const HEARTBEATS = 'dsh-instance-heartbeats'
+const HEARTBEATS = HEARTBEAT_KEY
 
 interface TabsRegistry { entries(): ReadonlyArray<{ id: string }> }
 interface SlotsRegistry { entries(key: string): ReadonlyArray<{ options: { key: string } }> }

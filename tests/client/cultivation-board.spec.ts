@@ -63,6 +63,13 @@ describe('CultivationBoard：本人收件与操作指引（V1/V7）', () => {
 })
 
 describe('CultivationBoard：数据诚实与能力呈现（V2/V8/V9）', () => {
+  it('坏记录不静默消失：明确显示文件名与条数', () => {
+    const markup = render({ brokenRecords: ['bad.md', 'worse.md'] })
+    expect(markup).toContain('2 条记录读不动')
+    expect(markup).toContain('bad.md')
+    expect(markup).toContain('worse.md')
+  })
+
   it('journal 不可达行显示「目录不可达」，不当 0 待审呈现', () => {
     const markup = render({ journalRows: [journalRow({ role: 'cfo', label: 'CFO', reach: 'unreachable', count: 0 })] })
     expect(markup).toContain('目录不可达')

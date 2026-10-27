@@ -11,10 +11,11 @@
  *   会连累整个应用（postmortem 0003 的教训），首发自举不该有这种破坏面。
  * - **可重入**：同一目标重复调用 = 第二次全 skip（"建立好了就不用再建立了"的机器判据）。
  */
-import { existsSync, mkdirSync, readdirSync, writeFileSync, lstatSync, readFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, writeFileSync, lstatSync, readFileSync, realpathSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import type { Dirent } from 'node:fs'
-import { join, resolve, sep } from 'node:path'
+import { homedir } from 'node:os'
+import { isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { expandHomePath } from '@deepseek-ai/dsh-home-paths'
 
 /**
@@ -174,6 +175,46 @@ export function resolveCompanyHome(dshHome: string, override?: string): string {
   const raw = (override ?? env('DSH_COMPANY_HOME'))?.trim()
   if (raw === undefined || raw === '') return join(dshHome, 'company-workspace')
   return resolve(expandHomePath(raw))
+}
+
+/**
+ * 校验公司盘落点是否是“安全的独立目录”。
+ *
+ * 为什么不能只 resolve：`DSH_COMPANY_HOME=$DSH_HOME` 会把 `kb/`、`templates/` 写进 home 根；
+ * `DSH_COMPANY_HOME=$HOME` 会污染 OS home。默认落点 `<DSH_HOME>/company-workspace` 是 home 的子目录，
+ * 合法；被拒绝的只有“等于/包含 home 或 OS home”的危险值，以及指向普通文件的落点。
+ * @param dshHome - 当前 DSH home。
+ * @param companyHome - 解析后的公司盘落点。
+ * @returns 合法，或一句可操作原因。
+ */
+export function validateCompanyHome(dshHome: string, companyHome: string): { readonly ok: true } | { readonly ok: false; readonly error: string } {
+  const canonicalOf = (path: string): string => {
+    try { return realpathSync(path) } catch { return resolve(path) }
+  }
+  const home = canonicalOf(dshHome)
+  const osHome = canonicalOf(homedir())
+  const target = resolve(companyHome)
+  let canonical = target
+  try {
+    if (existsSync(target)) {
+      const info = lstatSync(target)
+      if (!info.isSymbolicLink() && !info.isDirectory()) return { ok: false, error: `公司盘落点不是目录：${target}` }
+      canonical = realpathSync(target)
+      if (!lstatSync(canonical).isDirectory()) return { ok: false, error: `公司盘落点不是目录：${canonical}` }
+    }
+  } catch (error) {
+    return { ok: false, error: `公司盘落点读不到：${(error as Error).message}` }
+  }
+  const isAncestor = (parent: string, child: string): boolean => {
+    const rel = relative(parent, child)
+    return rel !== '' && !rel.startsWith('..') && !isAbsolute(rel)
+  }
+  if (canonical === home) return { ok: false, error: `公司盘落点不能等于 DSH_HOME：${canonical}` }
+  if (isAncestor(canonical, home)) return { ok: false, error: `公司盘落点不能包含 DSH_HOME：${canonical}` }
+  if (canonical === osHome || isAncestor(canonical, osHome)) {
+    return { ok: false, error: `公司盘落点不能等于/包含 OS home：${canonical}` }
+  }
+  return { ok: true }
 }
 
 /** 自举开关：`DSH_COMPANY_BOOTSTRAP=off` 关闭（我们的 dev/排练场不需要它时用）。 */

@@ -58,6 +58,8 @@ export interface CultivationBoardProps {
   readonly journalRows: readonly CultivationRow[] | null
   /** 培养记录（null = 目录不可达或首读未完成——不折成 0 条）。 */
   readonly records: readonly CultivationRecord[] | null
+  /** 读不动的记录文件名；空 = 全部可读。 */
+  readonly brokenRecords?: readonly string[] | undefined
   /** 本会话赞/踩（null = 事件流不可达——块内降级）。 */
   readonly feedback: readonly FeedbackItem[] | null
   /** 赞/踩块的事件流是否可达（注入缺席 = false）。 */
@@ -220,6 +222,11 @@ export function CultivationBoard(props: CultivationBoardProps) {
 
       <div className="wk-activity-block" aria-label="需要我处理">
         <strong>需要我处理</strong>
+        {(props.brokenRecords ?? []).length > 0 && (
+          <div className="wk-meta">
+            {String(props.brokenRecords!.length)} 条记录读不动（文件仍在，未被当成 0 条）：{(props.brokenRecords ?? []).join('、')}
+          </div>
+        )}
         {props.records === null
           ? <div className="wk-meta">培养记录尚未读到（目录缺失或读取失败）——不算 0 条。</div>
           : inbox.needsDecision.length === 0
@@ -556,6 +563,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
             <li>建议：/cultivation suggest 角色 期望行为一句话 :: 建议与证据</li>
             <li>采纳：/cultivation adopt 记录编号　拒绝：/cultivation reject 记录编号 :: 理由</li>
             <li>验证：/cultivation verify 记录编号 pass｜fail　撤回：/cultivation revoke 方法名</li>
+            <li>归档：/cultivation archive 天数（只动已处理记录，open 不动）</li>
           </ul>
         </details>
       </div>

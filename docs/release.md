@@ -97,7 +97,7 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 
 全绿证明本次已有 vendor 产物配合真 tarball 安装可用；不证明 vendor 新鲜构建，也不覆盖完整浏览器交互。dev profile 的 `link:` 安装不替代这条验证。
 
-**生命周期冒烟**（`node checks/smoke/lifecycle-smoke.mjs`）：真 tarball v1 → 改基部/加扩张 → v2 → 启动，再卸载、搬 home 重装；补 release-smoke 不覆盖的升级/卸载/迁移面。它不证明 registry 升级、降级、并发或跨 OS。
+**生命周期冒烟**（`node checks/smoke/lifecycle-smoke.mjs`）：真 tarball v1 → 改基部/加扩张 → v2 → 启动，再降级回 v1、business 恢复、卸载、搬 home；补 release-smoke 不覆盖的升级/降级/恢复/卸载/迁移面。它不证明 registry 升级、并发或跨 OS。
 
 **通道矩阵冒烟**（`node checks/smoke/channel-matrix-smoke.mjs --channel all`）：vendor built CLI + 真实全局 `dsh`，验证五角色 roster 与 `session/create`；`--with-browser` 另验装 browser 两包后自动启用。它证明“真实启动器通道”，不证明浏览器 UI；需要 PATH 有 global `dsh` 与网络，默认不进 `release --verify`，发布前手动跑。
 
@@ -130,7 +130,7 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 
 ## 版本纪律
 
-- pack 版本 `0.3.11`（`private: true`——**尚未发布到任何 registry**；真实发布动作（npm publish）等
+- pack 版本 `0.3.12`（`private: true`——**尚未发布到任何 registry**；真实发布动作（npm publish）等
   出现第二个消费者/部署需求时再定；本轮只把本地 tarball 交付内化为 `pnpm release`，未 publish。
   当前 release-smoke 验证的是 `file:` tarball 安装形状）。版本史与每版变化唯一家 =
   [CHANGELOG](../CHANGELOG.md)（此处不写变更史）；改内容必 bump（见下条）。

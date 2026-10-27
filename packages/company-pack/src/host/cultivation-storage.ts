@@ -153,13 +153,14 @@ function loadRecords(recordsDir: string): { readonly records: readonly Cultivati
 }
 
 /** 改写 frontmatter 字段（upsert）；正文原样保留，并以 sibling-temp + rename 避免截断。 */
-function updateRecordFile(recordsDir: string, id: string, updates: Readonly<Record<string, string>>): void {
+function updateRecordFile(recordsDir: string, id: string, updates: Readonly<Record<string, string>>, expectedText?: string): boolean {
   const path = recordPath(recordsDir, id)
   if (path === null) throw new Error(`不安全的记录 id：${id}`)
   if (recordsDirectoryState(recordsDir) !== 'ready') throw new Error(`记录目录不可达：${recordsDir}`)
   const info = lstatOrNull(path)
   if (info === null || info.isSymbolicLink() || !info.isFile()) throw new Error(`拒绝更新非普通记录：${path}`)
   const text = readFileSync(path, 'utf8')
+  if (expectedText !== undefined && text !== expectedText) return false
   const match = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text)
   if (match === null) throw new Error(`记录 ${path} 没有 frontmatter，无法改写`)
   const lines = match[1]!.split('\n')
@@ -169,6 +170,8 @@ function updateRecordFile(recordsDir: string, id: string, updates: Readonly<Reco
     else lines[at] = `${key}: ${value}`
   }
   const next = `---\n${lines.join('\n')}\n---${text.slice(match[0].length).startsWith('\n') ? '' : '\n'}${text.slice(match[0].length)}`
+  // CAS：读后到 rename 前若被外部改过，放弃本次写，调用方提示重试。
+  if (readFileSync(path, 'utf8') !== text) return false
   const temporary = join(recordsDir, `.${id}.${randomUUID()}.tmp`)
   try {
     writeFileSync(temporary, next, { flag: 'wx' })
@@ -177,6 +180,61 @@ function updateRecordFile(recordsDir: string, id: string, updates: Readonly<Reco
     try { unlinkSync(temporary) } catch { /* Not created, already renamed, or cleanup denied. */ }
     throw error
   }
+  return true
+}
+
+/** 恢复一条记录到先前读到的全文（revoke 失败回滚用；只写普通文件，原子替换）。 */
+function restoreRecordFile(recordsDir: string, id: string, text: string): boolean {
+  const path = recordPath(recordsDir, id)
+  if (path === null) return false
+  if (recordsDirectoryState(recordsDir) !== 'ready') return false
+  const info = lstatOrNull(path)
+  if (info === null || info.isSymbolicLink() || !info.isFile()) return false
+  const temporary = join(recordsDir, `.${id}.${randomUUID()}.restore.tmp`)
+  try {
+    writeFileSync(temporary, text, { flag: 'wx' })
+    renameSync(temporary, path)
+    return true
+  } catch {
+    try { unlinkSync(temporary) } catch { /* ignore */ }
+    return false
+  }
+}
+
+/** 把一条记录移动到归档目录（同一公司盘内；只用于已处理/旧记录）。 */
+function archiveRecordFile(recordsDir: string, archiveDir: string, id: string): boolean {
+  const path = recordPath(recordsDir, id)
+  if (path === null) return false
+  if (recordsDirectoryState(recordsDir) !== 'ready') return false
+  const info = lstatOrNull(path)
+  if (info === null || info.isSymbolicLink() || !info.isFile()) return false
+  const archiveInfo = lstatOrNull(archiveDir)
+  if (archiveInfo === null) mkdirSync(archiveDir, { recursive: true })
+  else if (archiveInfo.isSymbolicLink() || !archiveInfo.isDirectory()) throw new UnsafeCultivationPathError(archiveDir)
+  const target = join(archiveDir, `${id}.md`)
+  if (lstatOrNull(target) !== null) return false
+  renameSync(path, target)
+  return true
+}
+
+/** 读一个已部署方法（revoke 先留副本，失败时恢复）。 */
+function readMethodFile(root: string, role: string, slug: string): string | null {
+  if (!ROSTER.has(role) || !SLUG_RE.test(slug)) throw new Error(`不安全的方法路径：${role}/${slug}`)
+  const rootInfo = lstatOrNull(root)
+  if (rootInfo === null) return null
+  if (rootInfo.isSymbolicLink() || !rootInfo.isDirectory()) throw new UnsafeCultivationPathError(root)
+  const roleDir = join(root, role)
+  const roleInfo = lstatOrNull(roleDir)
+  if (roleInfo === null) return null
+  if (roleInfo.isSymbolicLink() || !roleInfo.isDirectory()) throw new UnsafeCultivationPathError(roleDir)
+  const methodDir = join(roleDir, slug)
+  const methodInfo = lstatOrNull(methodDir)
+  if (methodInfo === null) return null
+  if (methodInfo.isSymbolicLink() || !methodInfo.isDirectory()) throw new UnsafeCultivationPathError(methodDir)
+  const file = join(methodDir, 'SKILL.md')
+  const fileInfo = lstatOrNull(file)
+  if (fileInfo === null || fileInfo.isSymbolicLink() || !fileInfo.isFile()) return null
+  return readFileSync(file, 'utf8')
 }
 
 /** Write a record without replacing a colliding filename. */
@@ -200,9 +258,12 @@ function writeRecord(recordsDir: string, draft: Parameters<typeof recordText>[0]
 export interface CultivationStorage {
   writeRecord(recordsDir: string, draft: Parameters<typeof recordText>[0]): string
   readRecord(recordsDir: string, id: string): { readonly text: string } | null
-  updateRecord(recordsDir: string, id: string, updates: Readonly<Record<string, string>>): void
+  updateRecord(recordsDir: string, id: string, updates: Readonly<Record<string, string>>, expectedText?: string): boolean
+  restoreRecord(recordsDir: string, id: string, text: string): boolean
+  archiveRecord(recordsDir: string, archiveDir: string, id: string): boolean
   loadRecords(recordsDir: string): ReturnType<typeof loadRecords>
   installMethod(root: string, role: string, slug: string, text: string): boolean
+  readMethod(root: string, role: string, slug: string): string | null
   removeMethod(root: string, role: string, slug: string): string | null
 }
 
@@ -217,6 +278,8 @@ export const nodeCultivationStorage: CultivationStorage = {
     return { text: readFileSync(path, 'utf8') }
   },
   updateRecord: updateRecordFile,
+  restoreRecord: restoreRecordFile,
+  archiveRecord: archiveRecordFile,
   loadRecords,
   installMethod(root, role, slug, text) {
     if (!ROSTER.has(role) || !SLUG_RE.test(slug)) throw new Error(`不安全的方法路径：${role}/${slug}`)
@@ -238,6 +301,7 @@ export const nodeCultivationStorage: CultivationStorage = {
       throw error
     }
   },
+  readMethod: readMethodFile,
   removeMethod(root, role, slug) {
     if (!ROSTER.has(role) || !SLUG_RE.test(slug)) throw new Error(`不安全的方法路径：${role}/${slug}`)
     const rootInfo = lstatOrNull(root)

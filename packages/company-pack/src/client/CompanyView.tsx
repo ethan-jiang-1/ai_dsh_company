@@ -164,6 +164,7 @@ export function createCompanyView(injected: CompanyViewInjected) {
                 viewerLabel={viewerRole === null ? null : roleLabel(viewerRole)}
                 journalRows={cultivation.journalRows}
                 records={cultivation.records}
+                brokenRecords={cultivation.brokenRecords}
                 feedback={feedback}
                 feedbackReachable={injected.followEvents !== undefined}
                 actions={actions}

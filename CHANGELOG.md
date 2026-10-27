@@ -2,6 +2,17 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.3.12 — 2026-10-27
+
+### Changed
+
+- **培养记录写入加 CAS**：`/cultivation adopt|reject|verify` 与 `revoke` 在读取后若记录被外部改动，拒绝覆盖并提示重试；revoke 先改记录、后删方法，删除失败时回滚记录（同步失败路径；跨 store 崩溃窗口仍不是事务）。
+- **records 归档与坏记录可见**：新增 `/cultivation archive <天数>`，只把已处理（非 open）且早于天数的记录移到 `cultivation/records-archive/`；坏记录在培养面板点名，不再静默消失。
+- **同 home 多 profile 点名**：启动时列出装了本包的 profile，并明确提示方法层按 profile 隔离、一公司请固定一个 web profile。
+- **公司盘落点安全**：`DSH_COMPANY_HOME` 等于/包含 `DSH_HOME` 或 OS home、或指向普通文件时，停写公司数据并告警（默认 `<DSH_HOME>/company-workspace` 不受影响）。
+- **浏览器本地键版本化**：浮窗几何改为 `dsh-company-pack/float/v1/`（旧键只读迁移），实例心跳改为 `dsh-company-pack/instances/v1`。
+- **降级 smoke**：lifecycle-smoke 增加 v2→v1 降级，验证改过的基部保留、未改的回到旧版、扩张面不动。
+
 ## 0.3.11 — 2026-10-27
 
 ### Changed

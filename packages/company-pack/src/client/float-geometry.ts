@@ -22,11 +22,19 @@ export interface FloatRectLike {
 export const MIN_VISIBLE = { width: 220, height: 140 } as const
 
 /** 存档 key 前缀（tabId = 平台页签 key，如 `dsh-company-pack/board`，跨会话稳定）。 */
-export const STORAGE_PREFIX = 'dsh-company-pack/float/'
+export const STORAGE_PREFIX = 'dsh-company-pack/float/v1/'
+
+/** 0.3.11 前的旧前缀：只读迁移，不再写。 */
+export const LEGACY_STORAGE_PREFIX = 'dsh-company-pack/float/'
 
 /** 存档 key：前缀 + tabId。 */
 export function storageKey(tabId: string): string {
   return STORAGE_PREFIX + tabId
+}
+
+/** 旧版 key（迁移读用）。 */
+export function legacyStorageKey(tabId: string): string {
+  return LEGACY_STORAGE_PREFIX + tabId
 }
 
 /**
@@ -68,9 +76,14 @@ export function saveFloatRect(storage: Pick<Storage, 'setItem'>, tabId: string, 
  * 读存档矩形。
  * @returns 无存档 / JSON 损坏 / 字段缺失或非有限数 ⇒ null（调用方回平台默认位）。
  */
-export function loadFloatRect(storage: Pick<Storage, 'getItem'>, tabId: string): FloatRectLike | null {
+export function loadFloatRect(storage: Pick<Storage, 'getItem' | 'setItem'>, tabId: string): FloatRectLike | null {
   try {
-    const raw = storage.getItem(storageKey(tabId))
+    let raw = storage.getItem(storageKey(tabId))
+    let migrated = false
+    if (raw === null) {
+      raw = storage.getItem(legacyStorageKey(tabId))
+      migrated = raw !== null
+    }
     if (raw === null) return null
     const value: unknown = JSON.parse(raw)
     if (typeof value !== 'object' || value === null) return null
@@ -78,7 +91,9 @@ export function loadFloatRect(storage: Pick<Storage, 'getItem'>, tabId: string):
     const { x, y, width, height } = fields
     const finite = (entry: unknown): entry is number => typeof entry === 'number' && Number.isFinite(entry)
     if (!finite(x) || !finite(y) || !finite(width) || !finite(height)) return null
-    return { x, y, width, height }
+    const rect = { x, y, width, height }
+    if (migrated) saveFloatRect(storage, tabId, rect)
+    return rect
   } catch {
     return null
   }

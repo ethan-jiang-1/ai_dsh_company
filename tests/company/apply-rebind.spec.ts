@@ -47,6 +47,41 @@ function ctxStub(): Record<string, unknown> {
 }
 
 describe('host apply 显式换盘', () => {
+  it('同 home 多个 profile 装本包 ⇒ 启动点名方法层不共享', () => {
+    const home = workspaceAt()
+    try {
+      for (const name of ['web', 'web-b']) {
+        const dir = join(home.root, 'profiles', name)
+        mkdirSync(dir, { recursive: true })
+        writeFileSync(join(dir, 'package.json'), JSON.stringify({ dsh: { profile: { bundles: ['dsh-company-pack'] } } }))
+      }
+      const warn = vi.fn()
+      const ctx = { ...ctxStub(), logger: { info: vi.fn(), warn } }
+      process.env.DSH_HOME = home.root
+      process.env.DSH_COMPANY_HOME = home.ws
+      process.env.DSH_COMPANY_BOOTSTRAP = 'off'
+      apply(ctx as never)
+      expect(warn.mock.calls.some(([message]) => String(message).includes('方法层按 profile 隔离'))).toBe(true)
+    } finally {
+      rmSync(home.root, { recursive: true, force: true })
+    }
+  })
+
+  it('DSH_COMPANY_HOME=DSH_HOME ⇒ 不把公司盘写进 home 根', () => {
+    const home = workspaceAt()
+    try {
+      process.env.DSH_HOME = home.root
+      process.env.DSH_COMPANY_HOME = home.root
+      process.env.DSH_COMPANY_BOOTSTRAP = 'if-missing'
+      apply(ctxStub() as never)
+      expect(existsSync(join(home.root, 'AGENTS.md'))).toBe(false)
+      expect(existsSync(join(home.root, 'kb'))).toBe(false)
+      expect(existsSync(join(home.root, 'bundle.json'))).toBe(false)
+    } finally {
+      rmSync(home.root, { recursive: true, force: true })
+    }
+  })
+
   it('损坏 manifest ⇒ 不写默认盘、不覆盖原文件', () => {
     const home = workspaceAt()
     const newCompany = join(home.root, 'new-company')

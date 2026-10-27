@@ -11,11 +11,11 @@ opened: 2026-10-27
 
 **问题与期望结果：** 发布后部署最怕的不是功能少，而是数据作用域、版本、备份、迁移和审计账本没有合同。对照 FAQ 26 审计本包后确认了 12 个 Gap；期望把 P0（部署阻断）收口，P1/P2 显性登记，不再只活在会话里。
 
-**当前情况：** 用户 2026-10-27 批准按推荐方案落地 P0；G1–G5、G9、G10 已落树并通过 0.3.11 真实安装/生命周期/隔离/present 冒烟，证据 = [Note](../../notes/implemented/2026-10-27-data-model-alignment.md)。G6–G8、G11–G12 仍未开工。详细合同 = [docs/data-model.md](../../docs/data-model.md)。
+**当前情况：** P0（G1–G5/G9/G10）已落树并验证，证据 = [P0 Note](../../notes/implemented/2026-10-27-data-model-alignment.md)；P1/P2（G6/G7/G8/G11/G12）已落树，证据 = [P1/P2 Note](../../notes/implemented/2026-10-27-data-model-p1-p2.md)。G8 的面板全量读仍保留为已知边界。详细合同 = [docs/data-model.md](../../docs/data-model.md)。
 
-**未决问题：** P1 的方法层是否从 profile 级迁 home 级、records 保留/归档策略、record↔method 跨存储一致性；P2 的 `companyHome` 危险值校验、localStorage 键名、降级 smoke。P0 的验收以 0.3.11 真实安装/生命周期 smoke 为准。
+**未决问题：** 只剩 G8 的面板全量读（分页）与多 Host 事务边界；方法层是否从 profile 级迁 home 级留作真实多 profile 需求。P0/P1/P2 以 0.3.12 真实安装/生命周期/隔离/升级 smoke 为准。
 
-**下一步：** P0 已收口；本卡保留为 P1/P2 的问题账（`可关闭：否`），G6–G8/G11–G12 逐项开工时更新状态；全部收口后再翻 `已结` 归档。
+**下一步：** P0/P1/P2 均已落树；本卡只留 G8 面板分页与多 Host 事务边界两项已知边界（`可关闭：否`）；出现真实需求时新开卡，不把边界冒充已修。
 
 ## 范围与排除项
 
@@ -31,13 +31,13 @@ opened: 2026-10-27
 | G3 | 备份口径混用，缺 restore 验收 | 高 | P0 已落树并验证：business/full 两档 + 手册 + lifecycle restore |
 | G4 | `presented` 混在派生索引里，false 是审计状态却不可重建 | 高 | P0 已落树并验证：审计账本 + 索引派生 + 事件回扫 |
 | G5 | `bundle.json` v 不校验；catalog schema 不符静默重建；基部升级非原子 | 中高 | P0 已落树并验证：fail loud + 原子写 |
-| G6 | 记录更新无 CAS；revoke 跨 store 半状态；多 Host 无锁 | 中 | P1 未开工 |
-| G7 | 方法层 profile 级，同 home 多 profile 不一致 | 中 | P1 未开工（当前推荐一公司一 profile） |
-| G8 | records 无 GC；坏记录静默隐藏；面板全量读 | 中 | P1 未开工 |
+| G6 | 记录更新无 CAS；revoke 跨 store 半状态；多 Host 无锁 | 中 | 已落树并验证：CAS + revoke 同步回滚；多 Host 仍不支持（文档边界） |
+| G7 | 方法层 profile 级，同 home 多 profile 不一致 | 中 | 已落树并验证：启动点名多 profile；一公司一 web profile 合同 |
+| G8 | records 无 GC；坏记录静默隐藏；面板全量读 | 中 | 部分落地：archive 命令 + 坏记录面板点名；面板仍全量读（归档控规模，分页留后续） |
 | G9 | 读 DSH 私有 `storages/workspace.json` | 中低 | 已落树：优先 `ctx.workspaceRegistry`（inject），旧文件仅保底 |
 | G10 | 数据卡不完整、FAQ 26 未登记 | 中低 | 已落树：`docs/data-model.md` + external-research 行 |
-| G11 | `DSH_COMPANY_HOME` 等于 home/祖先时可能污染 home | 低中 | P2 未开工 |
-| G12 | localStorage 键未命名空间/版本；降级未验 | 低 | P2 未开工 |
+| G11 | `DSH_COMPANY_HOME` 等于 home/祖先时可能污染 home | 低中 | 已落树并验证：不安全落点停写 + 告警 |
+| G12 | localStorage 键未命名空间/版本；降级未验 | 低 | 已落树并验证：float/instances v1 + 旧 float 迁移 + 降级 smoke |
 
 ## 已知与未决
 

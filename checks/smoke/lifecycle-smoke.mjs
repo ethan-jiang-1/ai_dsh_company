@@ -5,7 +5,7 @@
 // 用法：source run/env.sh && node checks/smoke/lifecycle-smoke.mjs [--keep]
 //
 // 证明边界：v1 真装 → 改基部 + 加扩张数据 → v2 真装 → 启动；再卸载、搬 home 后重装。
-// 不证明：registry 升级、降级、并发升级、跨 OS；这些不在本轮范围。
+// 不证明：registry 升级、并发升级、跨 OS；这些不在本轮范围。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
@@ -240,6 +240,18 @@ try {
   await boot()
   check('升级后二启零变更', fingerprint(companyHome) === beforeSecond)
   check('升级后二启 bundle.json 字节不变', readFileSync(manifestPath, 'utf8') === manifestBefore)
+
+  console.log('⑤b 降级：装回 v1，改过的基部保留、未改的回到 v1、扩张面不动')
+  await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'remove', 'dsh-company-pack'], { timeoutMs: 180_000 })
+  await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${v1}`], { timeoutMs: 180_000 })
+  await boot()
+  const downgraded = JSON.parse(readFileSync(join(home, 'bundle.json'), 'utf8'))
+  check('降级后 bundle 版本回到 v1', downgraded.pack?.version === CURRENT_VERSION && downgraded.skeleton?.version === CURRENT_VERSION,
+    JSON.stringify({ pack: downgraded.pack?.version, skeleton: downgraded.skeleton?.version }))
+  check('降级保留改过的 AGENTS.md', readFileSync(join(companyHome, 'AGENTS.md'), 'utf8').includes('lifecycle-keep'))
+  check('降级把未改的模板换回 v1', !readFileSync(join(companyHome, 'templates/weekly-report.md'), 'utf8').includes('lifecycle-v2'))
+  check('降级后扩张面仍逐字节不变', hashFile(journal) === expansion.journal
+    && hashFile(final) === expansion.final && hashFile(meta) === expansion.meta)
 
   console.log('⑥ 卸载：数据不动、profile 摘层')
   await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'remove', 'dsh-company-pack'], { timeoutMs: 180_000 })

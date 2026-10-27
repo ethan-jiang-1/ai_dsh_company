@@ -24,7 +24,7 @@
 
 ## Configuration
 
-- `DSH_COMPANY_HOME`：公司盘落点（默认 `<DSH_HOME>/company-workspace`）；支持绝对路径与 `~/`，相对路径按启动 cwd 归一（0.3.10 起）。生产部署建议绝对路径。
+- `DSH_COMPANY_HOME`：公司盘落点（默认 `<DSH_HOME>/company-workspace`）；支持绝对路径与 `~/`，相对路径按启动 cwd 归一（0.3.10 起）。生产部署建议绝对路径；等于/包含 `DSH_HOME` 或 OS home、或指向普通文件时会停写公司数据并告警。
 - `DSH_COMPANY_REBIND=1`：**一次性显式换盘**。只在旧公司盘已搬走/改名、新盘形状正确时生效；会先备份 `bundle.json` 再改写 workspace，并写升级日志。只迁移 pack 自己的数据，不迁移 DSH session 的绝对 `header.cwd`。
 - `DSH_COMPANY_BROWSER`：浏览器能力开关；缺省 = profile 能解析 browser 两包就开，否则关；`on`/`off` 强制。
 - `DSH_COMPANY_BOOTSTRAP=off`：只关“复制骨架”，不关 `bundle.json` 身份（自管盘的部署用）。
@@ -40,12 +40,12 @@
 |---|---|---|---|
 | 定义 `D` | preset / persona / skills：只读声明；公司事实不在这里 | 包 `presets/**`（`presets/<role>/agent.cordis.yml`，由 `dsh.bundle.patch` 显式引用，不是旧 `.agent-presets/` 扫描） | 随包版本；不同公司不改源码 |
 | 包 `C` | 无用户数据；`workspace/` 是只读 starter | 安装包目录 | 升级整体替换；**绝不在包目录写 data/cache/日志** |
-| 工作区 `W` | 公司盘：手册/章程/台账/交付物/`kb/company.md`/`kb/<role>/journal`/`cultivation/records`；host 生成的派生索引 `kb/deliverables-index.json` + 审计账本 `kb/deliverables-presented.json` | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME`（培养/成品命令只在盘根生效） | 不动；基部文件按哈希替换、你改过的保留 |
+| 工作区 `W` | 公司盘：手册/章程/台账/交付物/`kb/company.md`/`kb/<role>/journal`/`cultivation/records`（归档 `records-archive/`）；host 生成的派生索引 `kb/deliverables-index.json` + 审计账本 `kb/deliverables-presented.json` | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME`（培养/成品命令只在盘根生效） | 不动；基部文件按哈希替换、你改过的保留 |
 | home `U/H` | `bundle.json`（身份/基部指纹）、`bundle.json.bak-*`（显式换盘备份）、`logs/company-pack-upgrade.log`、`profiles/<p>/company-cultivation/<role>/` | `<DSH_HOME>` | 不动；方法层是 profile 级，同 home 多 profile 不共享 |
 | session `S` | 会话日志由宿主拥有；本包不自造 event 类型；目录名/session header 含 cwd 绝对路径 | `<DSH_HOME>/sessions/` | 不动 |
 | 派生索引 `I` | `company-client` 行声明的全文索引（可能含会话正文） | `<DSH_HOME>/profiles/<p>/session-search.db` | 卸载不删；备份按敏感数据处理 |
 | 宿主登记 `R` | DSH 的 workspace 登记（绝对路径） | `<DSH_HOME>/storages/workspace.json` | 宿主所有；搬 home 后不会自动重写 |
-| 浏览器 `B` | 浮窗几何等 UI 记忆（localStorage，按 origin/端口隔离）；不是公司盘数据 | 浏览器 profile | 换端口/浏览器即新 origin；同端口复用会看到上一实例的同 origin 键 |
+| 浏览器 `B` | 浮窗几何/实例心跳（localStorage 键带 `dsh-company-pack/` 命名空间与 v1 版本，按 origin/端口隔离）；不是公司盘数据 | 浏览器 profile | 换端口/浏览器即新 origin；旧 float 键只读迁移 |
 | 凭据 `X` | 不写入包；走 `<DSH_HOME>/.credentials.yaml` / 环境变量 | home | 用户管理；文件必须 0600 |
 
 说明：`bootstrap`/catalog 是**部署 provisioning 与 UI 派生视图**，用宿主 `node:fs`（不在模型工具沙箱内）；模型对工作区文件的读写仍走 `ctx.fs`/文件工具。`kb/deliverables-index.json` 是派生视图，可重建；`kb/deliverables-presented.json` 是 `presented` 的审计账本（true 来自会话事件，false 是操作员结论），**删了会丢审计，备份时一起带上**。
@@ -62,7 +62,7 @@
 
 ## Uninstall
 
-`dsh plugin --profile web remove dsh-company-pack`：只摘插件与 profile 层，公司盘（含 `presented` 审计账本）、sessions、`bundle.json`/`bundle.json.bak-*`、方法层、`session-search.db` 保留。
+`dsh plugin --profile web remove dsh-company-pack`：只摘插件与 profile 层，公司盘（含 `presented` 审计账本与 `cultivation/records-archive/`）、sessions、`bundle.json`/`bundle.json.bak-*`、方法层、`session-search.db` 保留。
 要彻底删除一个部署，确认备份后删除它的整个 `<DSH_HOME>`。详见《安装手册》第六节。
 
 ## Owner（维护者）

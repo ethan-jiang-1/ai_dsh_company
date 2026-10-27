@@ -10,7 +10,7 @@ import { existsSync, readFileSync, realpathSync } from 'node:fs'
 import { isAbsolute, join, relative, resolve } from 'node:path'
 import { signoffDecisionNote, signoffReason } from './lib/signoff.ts'
 import { doorsFromSessions } from './lib/doors.ts'
-import { bootstrapCompanyWorkspace, bootstrapEnabled, resolveCompanyHome, resolveSkeletonDir } from './host/bootstrap.ts'
+import { bootstrapCompanyWorkspace, bootstrapEnabled, resolveCompanyHome, resolveSkeletonDir, validateCompanyHome } from './host/bootstrap.ts'
 import {
   appendUpgradeLog,
   applySkeletonUpgrade,
@@ -36,6 +36,7 @@ import {
   type PresentedSessionQuery,
 } from './host/catalog.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
+import { profilesWithCompanyPack } from './host/profiles.ts'
 import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace-registry.ts'
 
 /**
@@ -128,6 +129,12 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   // 换盘默认硬阻断，只有显式 `DSH_COMPANY_REBIND=1` 且旧盘已不存在时才做一次性 rebind。
   const bundleHome = resolveDshHome()
   const configuredCompanyHome = resolveCompanyHome(bundleHome)
+  const configuredCheck = validateCompanyHome(bundleHome, configuredCompanyHome)
+  if (!configuredCheck.ok) {
+    const warning = `company-pack：DSH_COMPANY_HOME 落点不安全（${configuredCheck.error}）；本次不写自举/升级/成品目录`
+    ctx.logger?.warn?.(warning)
+    process.stderr.write(`dsh: ${warning}\n`)
+  }
   let bundleState = readBundleManifestState(bundleHome)
   let recordedWorkspace = bundleState.status === 'ok'
     ? resolveRecordedWorkspace(bundleHome, bundleState.manifest.workspace)
@@ -146,7 +153,7 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
     ctx.logger?.warn?.(warning)
     process.stderr.write(`dsh: ${warning}\n`)
   }
-  if (rebound && rebindEnabled() && bundleState.status === 'ok') {
+  if (rebound && configuredCheck.ok && rebindEnabled() && bundleState.status === 'ok') {
     const decision = planWorkspaceRebind({
       dshHome: bundleHome,
       manifest: bundleState.manifest,
@@ -186,10 +193,29 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   }
   const identityBlocked = bundleState.status === 'corrupt' || bundleState.status === 'unsupported'
   const companyHome = recordedWorkspace ?? configuredCompanyHome
+  const companyCheck = validateCompanyHome(bundleHome, companyHome)
+  const dataBlocked = identityBlocked || !companyCheck.ok
+  if (!companyCheck.ok) {
+    const warning = `company-pack：公司盘落点不安全（${companyCheck.error}）；公司数据已停写，先修 DSH_COMPANY_HOME`
+    ctx.logger?.warn?.(warning)
+    process.stderr.write(`dsh: ${warning}\n`)
+  }
   const expectedWorkspace = canonicalPath(companyHome)
+  // 方法层是 profile 级：同 home 多 profile 不共享。这里只点名，不改 profile、不冒充隔离。
+  try {
+    const profiles = profilesWithCompanyPack(join(bundleHome, 'profiles'))
+    if (profiles.length > 1) {
+      const warning = `company-pack：同一个 home 里有 ${String(profiles.length)} 个 profile 装了本包（${profiles.join('、')}）；`
+        + '方法层按 profile 隔离，记录/公司盘共享——一个公司请固定用一个 web profile，避免“记录显示已采纳、另一个 profile 不生效”'
+      ctx.logger?.warn?.(warning)
+      process.stderr.write(`dsh: ${warning}\n`)
+    }
+  } catch (error) {
+    ctx.logger?.warn?.(`company-pack profile 体检跳过（不影响运行）：${(error as Error).message}`)
+  }
   // 培养回路（2026-10-13 培养卡）：公司数据只写公司盘根，不跟随 session cwd 的子目录。
-  // 身份损坏/更高版本时拒绝公司数据写入，避免写到猜测的默认盘。
-  registerCultivation(ctx, config, expectedWorkspace, identityBlocked)
+  // 身份损坏/更高版本/落点不安全时拒绝公司数据写入，避免写到猜测的默认盘。
+  registerCultivation(ctx, config, expectedWorkspace, dataBlocked)
   ctx.on('api-session/added', (summary) => {
     if (summary.origin === 'subagent') return
     if (typeof summary.cwd !== 'string' || summary.cwd === '') return
@@ -276,7 +302,7 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   //    默认落到 `<DSH_HOME>/company-workspace`（第三方装完即有盘可连）；已存在的盘一个字节都不动
   //    ——本仓自己的 `company-workspace/` 因此天然免疫（那里的制度件还是符号链接）。
   //    `DSH_COMPANY_HOME` 换落点、`DSH_COMPANY_BOOTSTRAP=off` 关掉（自管盘的部署用，见 run/env.sh）。
-  if (!rebound && !identityBlocked && bootstrapEnabled()) {
+  if (!rebound && !dataBlocked && bootstrapEnabled()) {
     try {
       const skeleton = resolveSkeletonDir(import.meta.url)
       const { plan, result } = bootstrapCompanyWorkspace(skeleton, companyHome)
@@ -296,7 +322,7 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   //    `<DSH_HOME>/bundle.json`。只创建、绝不覆盖；workspace 不存在则不写（没有盘就不冒充 bundle）。
   //    与 bootstrap 开关解耦：自管盘的部署（本仓 dev）仍需要一个身份与骨架指纹。
   try {
-    if (!rebound && !identityBlocked && existsSync(companyHome)) {
+    if (!rebound && !dataBlocked && existsSync(companyHome)) {
       const skeleton = resolveSkeletonDir(import.meta.url)
       const pack = resolvePackMetadata(import.meta.url)
       const state = bundleState
@@ -333,7 +359,7 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   // ── 搬家指针体检（2026-10-26，P1）：DSH 的 workspace 登记存绝对路径，搬 home 后不会自动迁移。
   // 只读点名，不修改 vendor 存储；用户需要在侧栏重新添加工作区。rebound 时已有更强告警，跳过。
   try {
-    if (!rebound && !identityBlocked) {
+    if (!rebound && !dataBlocked) {
       const report = (stale: readonly string[]): void => {
         if (stale.length === 0) return
         const warning = `company-pack：DSH workspace 登记里有 ${String(stale.length)} 条路径已不存在（${stale.join('、')}）；`
@@ -365,7 +391,7 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   // presented 的权威 = kb/deliverables-presented.json（true 来自事件，false 是操作员审计）；
   // 索引只做派生视图。账本缺失时先从旧索引迁移（保住 false），再后台回扫会话事件补 true。
   try {
-    if (!rebound && !identityBlocked && existsSync(companyHome)) {
+    if (!rebound && !dataBlocked && existsSync(companyHome)) {
       const catalogState = readCatalogState(companyHome)
       if (catalogState.status === 'corrupt' || catalogState.status === 'unsupported') {
         const warning = `company-pack：成品目录 ${catalogState.status === 'unsupported' ? `schema ${String(catalogState.schema)} 高于本包支持` : `损坏（${catalogState.error}）`}；`
@@ -418,7 +444,7 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   }
   ctx.on('session/event', (_session, event) => {
     if ((event as { type?: unknown }).type !== 'deliverables/presented') return
-    if (rebound || identityBlocked) return
+    if (rebound || dataBlocked) return
     try {
       const observed = presentedFromEvent(event, companyHome)
       if (observed.paths.size === 0 && observed.slugs.size === 0) return

@@ -40,7 +40,7 @@
 | [replay-smoke.mjs](smoke/replay-smoke.mjs) | 合成 keyless 回放（`foundation-workspace`）：session/sidecar/工作区 oracle；真实动议录制与 UI 端到端已随真实 snapshots 移出产品仓 |
 | [snapshot-motion-smoke.mjs](smoke/snapshot-motion-smoke.mjs) | 真实 CLI 子进程中的快照采集与 workspace capture 接线 |
 | [release-smoke.mjs](smoke/release-smoke.mjs) | 构建、打包、干净 profile 安装与 built CLI 启动 |
-| [lifecycle-smoke.mjs](smoke/lifecycle-smoke.mjs) | 真 tarball v1→v2 升级、卸载、搬 home 迁移（keyless；不含 registry/降级/跨 OS） |
+| [lifecycle-smoke.mjs](smoke/lifecycle-smoke.mjs) | 真 tarball v1→v2 升级、降级回 v1、business 恢复、卸载、搬 home（keyless；不含 registry/并发/跨 OS） |
 | [channel-matrix-smoke.mjs](smoke/channel-matrix-smoke.mjs) | vendor built CLI 与**真实全局 dsh** 的五角色 roster/session/create；`--with-browser` 验可选 browser 包自动启用（keyless；global 需要网络） |
 | [isolation-matrix-smoke.mjs](smoke/isolation-matrix-smoke.mjs) | 改 `DSH_COMPANY_HOME` 的告警/不建新盘；相对/`~` 落点归一；搬 home 后旧 workspace 登记点名（keyless；~2-3min） |
 | [standalone-smoke.mjs](smoke/standalone-smoke.mjs) | 目录独立启动：隔离 home/profile、copy 骨架、boot/RPC、relink、reset（keyless） |

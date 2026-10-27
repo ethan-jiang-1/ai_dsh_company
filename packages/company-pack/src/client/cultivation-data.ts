@@ -107,6 +107,8 @@ export interface CultivationPanelData {
   readonly journalRows: readonly CultivationRow[] | null
   /** 培养记录（null = 目录不可达或首读未完成——不折成 0 条）。 */
   readonly records: readonly CultivationRecord[] | null
+  /** 读不动的记录文件名（坏形状/读取失败；不静默丢掉，由面板明确提示）。 */
+  readonly brokenRecords: readonly string[]
   /** 立即重读（动作/创作成功后台账已变，不等 30s 轮询）。 */
   readonly refresh: () => void
 }
@@ -129,6 +131,7 @@ export function useCultivationPanelData(
   const enabled = options.enabled ?? true
   const [journalRows, setJournalRows] = useState<readonly CultivationRow[] | null>(null)
   const [records, setRecords] = useState<readonly CultivationRecord[] | null>(null)
+  const [brokenRecords, setBrokenRecords] = useState<readonly string[]>([])
   // 动作后立即重读的抓手（2026-10-17 GUI 行动面 S2）：bump 一次 = 重跑下面的读盘 effect。
   const [nonce, setNonce] = useState(0)
   const refresh = useCallback(() => { setNonce(value => value + 1) }, [])
@@ -152,6 +155,7 @@ export function useCultivationPanelData(
       }
       // 记录面：清单不可达 → null；可读则逐条读全文（记录小，2000 字窗足够）。
       let nextRecords: readonly CultivationRecord[] | null = null
+      const broken: string[] = []
       const recordNames = await files.listRecords(sessionId, controller.signal)
       if (recordNames !== null) {
         const parsed: CultivationRecord[] = []
@@ -159,12 +163,14 @@ export function useCultivationPanelData(
           const text = await files.readRecord(sessionId, `cultivation/records/${name}`, controller.signal)
           const record = text === null ? null : parseRecord(name.replace(/\.md$/, ''), text)
           if (record !== null) parsed.push(record)
+          else broken.push(name)
         }
         nextRecords = parsed
       }
       if (controller.signal.aborted) return
       setJournalRows([...inboxRows(listings, heads)])
       setRecords(nextRecords)
+      setBrokenRecords(broken)
     }
     void load()
     const timer = setInterval(() => { void load() }, CULTIVATION_REFRESH_MS)
@@ -184,7 +190,7 @@ export function useCultivationPanelData(
     }
   }, [enabled, sessionId, files, nonce])
 
-  return { journalRows, records, refresh }
+  return { journalRows, records, brokenRecords, refresh }
 }
 
 /** 事件流闭包的形状（`session/follow`：快照给历史、其后实时；侧栏与公司页共用）。 */

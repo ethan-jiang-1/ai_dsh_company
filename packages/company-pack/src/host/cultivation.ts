@@ -41,6 +41,7 @@ import {
   methodSkillText,
   parseRecord,
   recordBody,
+  recordStampOf,
   roleLabel,
   type CultivationRecord,
 } from '../lib/cultivation.ts'
@@ -268,7 +269,7 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       return { kind: 'error' as const, text: '培养命令需要公司角色会话（当前会话不是五角色 preset，或 cwd 缺席）。' }
     }
     if (dataBlocked) {
-      return { kind: 'error' as const, text: 'bundle.json 身份损坏或版本高于本包，公司数据已停写；先修复/恢复 manifest 再培养。' }
+      return { kind: 'error' as const, text: '公司数据已停写（bundle 身份损坏/版本不兼容，或公司盘落点不安全）；先修复 manifest/DSH_COMPANY_HOME 再培养。' }
     }
     const scope = companyScopeOf(face, companyHome)
     if (scope.problem !== undefined) return { kind: 'error' as const, text: scope.problem }
@@ -365,7 +366,10 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       }
       if (!installed) return { kind: 'error' as const, text: `方法 ${slug} 已存在，未覆盖任何文件或记录。` }
       try {
-        storage.updateRecord(recordsDir, id, { status: 'adopted', methodSlug: slug, decidedAt: new Date().toISOString() })
+        if (!storage.updateRecord(recordsDir, id, { status: 'adopted', methodSlug: slug, decidedAt: new Date().toISOString() }, text)) {
+          try { storage.removeMethod(config.cultivationRoot, record.targetRole, slug) } catch { /* Preserve the conflict note. */ }
+          return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，采纳已取消并撤回方法 ${slug}；请重试。` }
+        }
       } catch (error) {
         try { storage.removeMethod(config.cultivationRoot, record.targetRole, slug) } catch { /* Preserve the original record-update failure. */ }
         throw error
@@ -388,7 +392,9 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       if (record.targetRole !== face.role) {
         return { kind: 'error' as const, text: `${record.id} 的培养对象是 ${roleLabel(record.targetRole)}，请在该角色会话里处理。` }
       }
-      storage.updateRecord(recordsDir, id, { status: 'rejected', reason: body.split('\n')[0]!, decidedAt: new Date().toISOString() })
+      if (!storage.updateRecord(recordsDir, id, { status: 'rejected', reason: body.split('\n')[0]!, decidedAt: new Date().toISOString() }, found.text)) {
+        return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，拒绝未写；请重试。` }
+      }
       return { kind: 'success' as const, text: `已拒绝 ${id}（理由已留档，提出者可在培养页查回执）。` }
     }
 
@@ -407,8 +413,40 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       if (record.targetRole !== face.role) {
         return { kind: 'error' as const, text: `${record.id} 归 ${roleLabel(record.targetRole)}，请在该角色会话里回填。` }
       }
-      storage.updateRecord(recordsDir, id, { verification: outcome })
+      if (!storage.updateRecord(recordsDir, id, { verification: outcome }, found.text)) {
+        return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，验证未写；请重试。` }
+      }
       return { kind: 'success' as const, text: `已回填验证：${id} → ${outcome === 'pass' ? '已验证（在同类任务上见过效）' : '验证未通过（建议修订或撤回）'}。` }
+    }
+
+    // archive <days>：只归档已处理记录，open 不动（人工保留策略）
+    if (sub === 'archive') {
+      const days = Number(tokens[1])
+      if (!Number.isSafeInteger(days) || days < 1 || days > 3650) {
+        return { kind: 'error' as const, text: '用法：archive <天数 1..3650>——只归档已处理（非 open）且早于该天数的记录。' }
+      }
+      const archiveDir = join(scope.root, 'cultivation', 'records-archive')
+      const loaded = storage.loadRecords(recordsDir)
+      if (!loaded.reachable) return { kind: 'error' as const, text: `记录目录不可达：${recordsDir}` }
+      const cutoff = Date.now() - days * 86_400_000
+      let archived = 0
+      let failed = 0
+      for (const record of loaded.records) {
+        if (record.status === 'open') continue
+        const stamp = recordStampOf(record.id)
+        if (stamp === null || stamp >= cutoff) continue
+        try {
+          if (storage.archiveRecord(recordsDir, archiveDir, record.id)) archived += 1
+          else failed += 1
+        } catch {
+          failed += 1
+        }
+      }
+      return {
+        kind: 'success' as const,
+        text: `已归档 ${String(archived)} 条记录到 cultivation/records-archive/${failed > 0 ? `；${String(failed)} 条未动（碰撞/读取失败）` : ''}`
+          + `${loaded.broken > 0 ? `；另有 ${String(loaded.broken)} 条坏记录未动` : ''}。open 记录与时间戳不识别的记录保持原样。`,
+      }
     }
 
     // revoke <slug>
@@ -420,28 +458,61 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       }
       if (!SLUG_RE.test(slug)) return { kind: 'error' as const, text: `方法 slug 不安全：${slug}。` }
       let records: readonly CultivationRecord[]
-      let methodDir: string | null
       try {
+        if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) {
+          return { kind: 'error' as const, text: `${roleLabel(face.role)} 方法层里没有方法 ${slug}。` }
+        }
         records = storage.loadRecords(recordsDir).records
-        methodDir = storage.removeMethod(config.cultivationRoot, face.role, slug)
       } catch (error) {
         if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
         throw error
       }
-      if (methodDir === null) return { kind: 'error' as const, text: `${roleLabel(face.role)} 方法层里没有方法 ${slug}。` }
-      let marked = 0
+      const updated: { readonly id: string, readonly text: string }[] = []
+      const rollback = (): number => {
+        let failed = 0
+        for (const item of updated) {
+          try { if (!storage.restoreRecord(recordsDir, item.id, item.text)) failed += 1 } catch { failed += 1 }
+        }
+        return failed
+      }
+      // 先改记录、后删方法：记录冲突时方法仍在，可安全回滚；删除失败时用旧全文回滚记录。
       for (const record of records) {
-        if (record.status === 'adopted' && record.methodSlug === slug && record.targetRole === face.role) {
-          storage.updateRecord(recordsDir, record.id, { revokedAt: new Date().toISOString() })
-          marked++
+        if (record.status !== 'adopted' || record.methodSlug !== slug || record.targetRole !== face.role) continue
+        const current = storage.readRecord(recordsDir, record.id)
+        if (current === null) continue
+        if (!storage.updateRecord(recordsDir, record.id, { revokedAt: new Date().toISOString() }, current.text)) {
+          const failed = rollback()
+          return {
+            kind: 'error' as const,
+            text: `撤回 ${slug} 已取消：记录 ${record.id} 在读取后被改过；${failed > 0 ? `另有 ${String(failed)} 条回滚失败` : '已回滚已改记录'}，请重试。`,
+          }
+        }
+        updated.push({ id: record.id, text: current.text })
+      }
+      let methodDir: string | null
+      try {
+        methodDir = storage.removeMethod(config.cultivationRoot, face.role, slug)
+      } catch (error) {
+        const failed = rollback()
+        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+        return {
+          kind: 'error' as const,
+          text: `撤回 ${slug} 失败（${(error as Error).message}）；${failed > 0 ? `有 ${String(failed)} 条记录回滚失败` : '记录已回滚'}。`,
         }
       }
-      return { kind: 'success' as const, text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(marked)} 条记录）。新开的 ${roleLabel(face.role)} 会话不再加载它。` }
+      if (methodDir === null) {
+        const failed = rollback()
+        return {
+          kind: 'error' as const,
+          text: `撤回 ${slug} 时方法已不在；${failed > 0 ? `有 ${String(failed)} 条记录回滚失败` : '记录已回滚'}。`,
+        }
+      }
+      return { kind: 'success' as const, text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(updated.length)} 条记录）。新开的 ${roleLabel(face.role)} 会话不再加载它。` }
     }
 
     return {
       kind: 'error' as const,
-      text: '子命令只认：correct / suggest / adopt / reject / verify / revoke（培养页有各命令的一句话用法）。',
+      text: '子命令只认：correct / suggest / adopt / reject / verify / revoke / archive（培养页有各命令的一句话用法）。',
     }
   }
 }
@@ -500,7 +571,7 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
         return { id: '', recorded: false, note: '提案需要公司角色会话上下文（agent preset + cwd）。' }
       }
       if (dataBlocked) {
-        return { id: '', recorded: false, note: 'bundle.json 身份损坏或版本高于本包，公司数据已停写；先修复/恢复 manifest。' }
+        return { id: '', recorded: false, note: '公司数据已停写（bundle 身份损坏/版本不兼容，或公司盘落点不安全）；先修复 manifest/DSH_COMPANY_HOME。' }
       }
       const scope = companyScopeOf(face, companyHome)
       if (scope.problem !== undefined) {

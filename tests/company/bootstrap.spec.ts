@@ -6,7 +6,7 @@
  * 反证：把 `applyBootstrap` 里的 `flag: 'wx'` 换成默认 flag（或删 `action === 'skip'` 分支）
  * ⇒ 「已有文件不被覆盖」那条红。
  */
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync, lstatSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync, existsSync, lstatSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -17,6 +17,7 @@ import {
   planBootstrap,
   resolveCompanyHome,
   resolveSkeletonDir,
+  validateCompanyHome,
 } from '../../packages/company-pack/src/host/bootstrap.ts'
 
 /** 造一个最小出厂骨架（形状照 pack 的 workspace/：手册 + kb + templates + 空目录）。 */
@@ -161,6 +162,29 @@ describe('首启自举：落点与开关', () => {
     } finally {
       if (before === undefined) delete process.env.DSH_COMPANY_BOOTSTRAP
       else process.env.DSH_COMPANY_BOOTSTRAP = before
+    }
+  })
+})
+
+
+describe('公司盘落点校验（2026-10-27 G11）', () => {
+  it('默认子目录合法；等于/包含 DSH_HOME 或 OS home、指向普通文件都拒绝', () => {
+    const root = mkdtempSync(join(tmpdir(), 'company-home-check-'))
+    const home = join(root, 'dsh-home')
+    const file = join(root, 'not-a-dir')
+    try {
+      mkdirSync(home, { recursive: true })
+      writeFileSync(file, 'x')
+      expect(validateCompanyHome(home, join(home, 'company-workspace'))).toEqual({ ok: true })
+      expect(validateCompanyHome(home, home).ok).toBe(false)
+      expect(validateCompanyHome(home, root).ok).toBe(false)
+      expect(validateCompanyHome(home, homedir()).ok).toBe(false)
+      expect(validateCompanyHome(home, file).ok).toBe(false)
+      const link = join(root, 'file-link')
+      symlinkSync(file, link)
+      expect(validateCompanyHome(home, link).ok).toBe(false)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
     }
   })
 })

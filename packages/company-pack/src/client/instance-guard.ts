@@ -4,7 +4,8 @@
  * 检测面 = 同浏览器标签页（跨浏览器实例不在此列，已知边界，卡②已登记）。
  */
 
-const KEY = 'dsh-instance-heartbeats'
+export const HEARTBEAT_KEY = 'dsh-company-pack/instances/v1'
+const KEY = HEARTBEAT_KEY
 const STALE_MS = 20_000
 const BANNER_ID = 'dsh-instance-guard-banner'
 

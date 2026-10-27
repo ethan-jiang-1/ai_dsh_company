@@ -1,12 +1,12 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { shouldWarn, startInstanceGuard } from '../../packages/company-pack/src/client/instance-guard.ts'
+import { HEARTBEAT_KEY, shouldWarn, startInstanceGuard } from '../../packages/company-pack/src/client/instance-guard.ts'
 
 // 负例留证 2026-10-10：卡② UX 依据 = 现场实测 3 个 web 实例并存 + E2 实证（多实例同文件
 // ×20 = 20/20 静默互踩）——用户拍板「警告横幅」：第二实例照常启动但被明确告知。
 
 const NOW = 1_000_000
-const KEY = 'dsh-instance-heartbeats'
+const KEY = HEARTBEAT_KEY
 const BANNER_ID = 'dsh-instance-guard-banner'
 
 afterEach(() => {

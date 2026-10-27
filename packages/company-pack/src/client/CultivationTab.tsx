@@ -53,7 +53,7 @@ export function CultivationTab(props: CultivationTabProps) {
   const subscribe = useMemo(() => props.roleSource.subscribe.bind(props.roleSource), [props.roleSource])
   const getPreset = useCallback(() => readPresetOf(props.roleSource, props.sessionId), [props.roleSource, props.sessionId])
   const viewerRole = useSyncExternalStore(subscribe, getPreset, getPreset)
-  const { journalRows, records, refresh } = useCultivationPanelData(props.cultivationFiles, props.sessionId)
+  const { journalRows, records, brokenRecords, refresh } = useCultivationPanelData(props.cultivationFiles, props.sessionId)
   const feedback = useCultivationFeedback(props.followEvents, props.sessionId)
   const teammate = props.useSessions(state => state.byId[props.sessionId]?.origin === 'subagent')
   const contextSources = useMemo(() => props.contextSources?.(props.sessionId), [props.contextSources, props.sessionId])
@@ -75,6 +75,7 @@ export function CultivationTab(props: CultivationTabProps) {
         viewerLabel={viewerRole === null ? null : roleLabel(viewerRole)}
         journalRows={journalRows}
         records={records}
+        brokenRecords={brokenRecords}
         feedback={feedback}
         feedbackReachable={props.followEvents !== undefined}
         actions={actions}

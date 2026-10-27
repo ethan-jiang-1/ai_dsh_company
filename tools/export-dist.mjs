@@ -205,6 +205,11 @@ dsh plugin --profile web add /path/to/<新版本>.tgz
 装完重启 \`dsh web\`，并硬刷新页面（浏览器模块不会热加载）。基部（手册 / 章程 / 模板 / 起动件）按哈希判定：
 **没改过的**随新包替换，**你改过的**保留并在 \`<DSH_HOME>/logs/company-pack-upgrade.log\` 里点名；扩张面
 （journal / 交付物 / 台账 / 方法层 / 会话）一个字节不动。\`bundle.json\` 的 \`skeleton.version\` 随升级前移。
+降级同样走“装回旧 tgz + 重启”：改过的基部保留，未改的回到旧版；扩张面不动。
+
+培养记录可用 \`/cultivation archive <天数>\` 把已处理（非 open）且早于该天数的记录移到
+\`<公司盘>/cultivation/records-archive/\`；open 与读不动的记录不动，面板会点名坏记录。
+一个公司请固定用一个 web profile：同 home 多 profile 会在启动输出里点名，方法层不跨 profile 共享。
 
 ## 五、备份 / 迁移
 

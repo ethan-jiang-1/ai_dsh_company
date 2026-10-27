@@ -5,7 +5,7 @@
  * 真浮出/还原链路由 checks/ 侧的真入口验收覆盖（RFC 验收节），本档只锁纯函数面。
  */
 import { describe, expect, it } from 'vitest'
-import { clampRect, loadFloatRect, MIN_VISIBLE, saveFloatRect, storageKey } from '../../packages/company-pack/src/client/float-geometry.ts'
+import { clampRect, legacyStorageKey, loadFloatRect, MIN_VISIBLE, saveFloatRect, storageKey } from '../../packages/company-pack/src/client/float-geometry.ts'
 
 /** 内存 Storage 假实现（只用到 get/setItem）。 */
 function fakeStorage(): Storage & { map: Map<string, string> } {
@@ -73,6 +73,13 @@ describe('存取层：损坏数据 fail-soft', () => {
   it('roundtrip：save 后 load 还原同矩形', () => {
     const storage = fakeStorage()
     saveFloatRect(storage, 'dsh-company-pack/board', { x: 12, y: 34, width: 560, height: 400 })
+    expect(loadFloatRect(storage, 'dsh-company-pack/board')).toEqual({ x: 12, y: 34, width: 560, height: 400 })
+    expect(storage.map.get(storageKey('dsh-company-pack/board'))).toContain('"width":560')
+  })
+
+  it('旧前缀的存档只读迁移到 v1 前缀（换键不丢布局）', () => {
+    const storage = fakeStorage()
+    storage.map.set(legacyStorageKey('dsh-company-pack/board'), JSON.stringify({ x: 12, y: 34, width: 560, height: 400 }))
     expect(loadFloatRect(storage, 'dsh-company-pack/board')).toEqual({ x: 12, y: 34, width: 560, height: 400 })
     expect(storage.map.get(storageKey('dsh-company-pack/board'))).toContain('"width":560')
   })
