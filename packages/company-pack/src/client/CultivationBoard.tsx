@@ -17,36 +17,25 @@
  * 与 `tests/client/cultivation-board-actions.spec.ts`（交互：点了发什么线、失败怎么显示）。
  */
 import { Tag, Button } from '@deepseek-ai/dsh-client-ui-primitives'
-import { useRef, useState, type ReactNode } from 'react'
 import {
-  CULTIVATION_ROLES,
-  recordInbox,
-  recordStampOf,
   roleLabel,
-  timeLabel,
   type CultivationRecord,
   type CultivationRow,
   type FeedbackItem,
 } from '../lib/cultivation.ts'
 import {
   CULTIVATION_COPY,
-  adoptLine,
-  rejectLine,
-  renderThrown,
   revokeLine,
   verifyLine,
-  type ActionOutcome,
   type CultivationActions,
 } from './cultivation-actions.ts'
 import { CultivationCompose } from './CultivationCompose.tsx'
+import { useCultivationBoard } from './use-cultivation-board.tsx'
+import { CultivationInbox } from './CultivationInbox.tsx'
 import type { CultivationContextSources } from './cultivation-context-data.ts'
 import type { CultivationContext } from '../lib/cultivation-context.ts'
 
-/** 正文折叠阈值：超过这么多行就先只展前几行（长正文不该把别的待办顶走）。 */
-const BODY_PREVIEW_LINES = 4
-
-/** 三个列表的默认可见条数（超过就给「显示全部（共 N 条）」）——300 条一屏滚 = 能用但不好用。 */
-const LIST_CAPS = { inbox: 10, mine: 5, adopted: 5 } as const
+/** 页签体注入面。 */
 
 /** 领域视图 props（三个容器同形喂入；数据加载在各容器）。 */
 export interface CultivationBoardProps {
@@ -81,11 +70,6 @@ export interface CultivationBoardProps {
 }
 
 /** 一条记录的操作行文案（待办给命令、已处理给回执）——**只在没有动作面时**当降级文案用。 */
-function recordKindLabel(record: CultivationRecord): string {
-  if (record.kind === 'suggestion') return `${roleLabel(record.proposerRole)}的建议`
-  return record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)}分身的纠正` : '我的纠正'
-}
-
 /** 验证态 → Tag（V8：未验证 ≠ 已掌握）。 */
 function verificationTag(record: CultivationRecord): { readonly tone: 'success' | 'warning' | 'outline', readonly text: string } {
   if (record.verification === 'pass') return { tone: 'success', text: '已验证' }
@@ -99,105 +83,21 @@ function verificationTag(record: CultivationRecord): { readonly tone: 'success' 
  * @returns 面板内容（容器自己套壳：公司页直接放、侧栏套 PanelFrame）。
  */
 export function CultivationBoard(props: CultivationBoardProps) {
-  // 会话 preset 不在五角色名册（Standard / PTC / 自建 mode）⇒ 与"未选角色"同处理：
-  // 否则面板会把它**当成一个角色**（实测显示"我的分身：ptc"、还开创作入口——提了也会被 host 拒）。
-  const viewer = props.viewerRole !== null && (CULTIVATION_ROLES as readonly string[]).includes(props.viewerRole)
-    ? props.viewerRole
-    : null
-  const actions = props.actions
-  const inbox = recordInbox(props.records ?? [], viewer ?? '')
-  /** 正在执行的记录 id（飞行中禁按钮，防重复点击）。 */
-  const [pendingId, setPendingId] = useState<string | null>(null)
-  /** 每条记录的回执/失败原话（key = 记录 id；不吞失败原因）。 */
-  const [outcomes, setOutcomes] = useState<Readonly<Record<string, ActionOutcome>>>({})
-  /** 正在写理由的记录 id。 */
-  const [rejectingId, setRejectingId] = useState<string | null>(null)
-  /** 每条记录背景卡的展开状态（每个记录独立）。 */
-  const [expandedContexts, setExpandedContexts] = useState<Readonly<Record<string, boolean>>>({})
-  /** 背景原文打开中的记录 id / 失败原话。 */
-  const [openingContextId, setOpeningContextId] = useState<string | null>(null)
-  const [contextOutcomes, setContextOutcomes] = useState<Readonly<Record<string, string>>>({})
-
-  const openContextOf = async (recordId: string, context: CultivationContext): Promise<void> => {
-    if (props.openContext === undefined) return
-    setOpeningContextId(recordId)
-    setContextOutcomes(previous => ({ ...previous, [recordId]: '' }))
-    const result = await props.openContext(context)
-    setOpeningContextId(null)
-    if (!result.ok) setContextOutcomes(previous => ({ ...previous, [recordId]: result.problem }))
-  }
-  const [reason, setReason] = useState('')
-  const [reasonProblem, setReasonProblem] = useState<string | null>(null)
-  /** 正在确认撤回的方法 slug（两步：先讲后果再确认）。 */
-  const [revokingSlug, setRevokingSlug] = useState<string | null>(null)
-  /** 刚创作提交、待高亮的记录 id。 */
-  const [highlightId, setHighlightId] = useState<string | null>(null)
-  /** 哪些列表被展开（默认按 {@link LIST_CAPS} 截断）。 */
-  const [expandedLists, setExpandedLists] = useState<Readonly<Record<string, boolean>>>({})
-  /** 哪些记录的长正文被展开（默认折叠前 {@link BODY_PREVIEW_LINES} 行）。 */
-  const [expandedBodies, setExpandedBodies] = useState<Readonly<Record<string, boolean>>>({})
-  /** 同一行**在飞的**动作 key（双击护栏：`disabled` 要等重渲染，同一 tick 的第二次点击挡不住）。 */
-  const inFlight = useRef<string | null>(null)
-  /** 时间标签的锚点：挂载时取一次（轮询重渲染不跳动；跨小时误差可接受，30s 轮询会带新 now）。 */
-  const now = Date.now()
-  /**
-   * 列表折叠：默认只给最近的 `LIST_CAPS[key]` 条，超出部分用「显示全部（共 N 条）」打开。
-   * 全展开的开关是**每块独立**的（用户可能只想展开已采纳那份）。
-   */
-  const capList = <T,>(key: keyof typeof LIST_CAPS, list: readonly T[]): readonly T[] =>
-    expandedLists[key] === true ? list : list.slice(0, LIST_CAPS[key])
-  /** 折叠控件的渲染（未超阈值就不给）。 */
-  const capControl = (key: keyof typeof LIST_CAPS, total: number): ReactNode =>
-    total <= LIST_CAPS[key]
-      ? null
-      : (
-        <div className="wk-cultivation-actions">
-          <Button size="sm" onClick={() => { setExpandedLists(previous => ({ ...previous, [key]: previous[key] !== true })) }}>
-            {expandedLists[key] === true ? CULTIVATION_COPY.listShowLess : CULTIVATION_COPY.listShowAll(total)}
-          </Button>
-        </div>
-      )
-  /** 记录的时间标签（id 形状不符给 null——不猜）。 */
-  const stampOf = (id: string): string | null => {
-    const at = recordStampOf(id)
-    return at === null ? null : timeLabel(at, now)
-  }
-
-  const run = async (key: string, line: string, after?: () => void): Promise<void> => {
-    if (actions === undefined) return
-    // 双击护栏（探索方向③）：同一行已在飞时忽略后续点击——否则同一 tick 的两次点击会发两条命令。
-    if (inFlight.current === key) return
-    inFlight.current = key
-    setPendingId(key)
-    setReasonProblem(null)
-    let result: ActionOutcome
-    try {
-      result = await actions.run(line)
-    } catch (error) {
-      // 契约上 `run` 永不抛；真抛了**也必须**把 pending 收回来——否则按钮永久停在「处理中…」，
-      // 人连重试入口都没有（BUG-024：间歇复现的正是这条路径）。
-      result = { ok: false, text: CULTIVATION_COPY.unexpected(renderThrown(error)) }
-    } finally {
-      inFlight.current = null
-      setPendingId(null)
-    }
-    setOutcomes(previous => ({ ...previous, [key]: result }))
-    if (result.ok) {
-      after?.()
-      props.onRefresh?.()
-    }
-  }
-
-  const confirmReject = async (id: string): Promise<void> => {
-    const draft = rejectLine(id, reason)
-    if (!draft.ok) {
-      setReasonProblem(draft.problem.message)
-      return
-    }
-    await run(id, draft.line, () => { setRejectingId(null); setReason('') })
-  }
-
-  const outcomeOf = (id: string): ActionOutcome | undefined => outcomes[id]
+  const board = useCultivationBoard(props)
+  const {
+    viewer,
+    actions,
+    inbox,
+    pendingId,
+    revokingSlug,
+    capList,
+    capControl,
+    stampOf,
+    run,
+    outcomeOf,
+    setHighlightId,
+    setRevokingSlug,
+  } = board
 
   return (
     <>
@@ -222,179 +122,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
         />
       )}
 
-      <div className="wk-activity-block" aria-label="需要我处理">
-        <strong>需要我处理</strong>
-        {(props.brokenRecords ?? []).length > 0 && (
-          <div className="wk-meta">
-            {String(props.brokenRecords!.length)} 条记录读不动（文件仍在，未被当成 0 条）：{(props.brokenRecords ?? []).join('、')}
-          </div>
-        )}
-        {(props.unexpandedRecords ?? 0) > 0 && (
-          <div className="wk-meta">
-            还有 {String(props.unexpandedRecords)} 条旧记录只读了摘要（未展开全文）；用 /cultivation archive &lt;天数&gt; 归档后重新加载。
-          </div>
-        )}
-        {props.records === null
-          ? <div className="wk-meta">培养记录尚未读到（目录缺失或读取失败）——不算 0 条。</div>
-          : inbox.needsDecision.length === 0
-            ? <div className="wk-meta">没有给我的建议或纠正。</div>
-            : (
-              <>
-              <div role="list" aria-label="待我处理的培养记录" className="wk-list wk-cultivation-list">
-                {capList('inbox', inbox.needsDecision).map(record => {
-                  const outcome = outcomeOf(record.id)
-                  return (
-                    <div key={record.id} role="listitem" className="wk-row" aria-label={`待处理 ${record.id}`}>
-                      <span className="wk-row-name">
-                        {recordKindLabel(record)}
-                        <Tag tone="info">{record.expectation}</Tag>
-                        {highlightId === record.id && <Tag tone="success">{CULTIVATION_COPY.justSaved}</Tag>}
-                      </span>
-                      {/* 首句只在正文**没显示**时当摘要用；正文在下面就地展开时不再重复（走查抓到的重复行）。 */}
-                      {record.body === '' && (record.contexts?.length ?? 0) === 0 && <span className="wk-row-task">{record.title}</span>}
-                      {record.body === '' && (record.contexts?.length ?? 0) > 0 && (
-                        <span className="wk-meta">{CULTIVATION_COPY.bodyEmptyWithContext}</span>
-                      )}
-                      <span className="wk-meta">
-                        {stampOf(record.id) === null ? '' : `${String(stampOf(record.id))} 提出`}
-                        {(record.contexts?.length ?? 0) === 0 && record.source !== '（会话内提交）'
-                          ? `${stampOf(record.id) === null ? '' : ' · '}出处：${record.source}`
-                          : ''}
-                      </span>
-                      {(record.contexts?.length ?? 0) > 0 && (() => {
-                        const background = record.contexts![0]!
-                        const open = expandedContexts[record.id] === true
-                        const openLabel = background.kind === 'session'
-                          ? CULTIVATION_COPY.contextOpenSession
-                          : CULTIVATION_COPY.contextOpenFile
-                        return (
-                          <div className="wk-cultivation-context-card" aria-label={`背景：${background.title}`}>
-                            <div className="wk-cultivation-context-card-head">
-                              <strong>{background.title}</strong>
-                              <span className="wk-meta">
-                                {[
-                                  background.role === undefined ? '' : background.role,
-                                  background.subtitle === undefined ? '' : background.subtitle,
-                                  background.turn === undefined ? '' : `第 ${String(background.turn)} 轮`,
-                                ].filter(part => part !== '').join(' · ')}
-                              </span>
-                            </div>
-                            <div className="wk-cultivation-context-excerpt" style={{ whiteSpace: 'pre-wrap' }}>
-                              {open ? background.excerpt : background.excerpt.split('\n').slice(0, 2).join('\n')}
-                            </div>
-                            {background.truncated === true && <div className="wk-meta">{CULTIVATION_COPY.contextClipped}</div>}
-                            <div className="wk-cultivation-actions">
-                              <Button size="sm" variant="ghost" aria-expanded={open}
-                                onClick={() => { setExpandedContexts(previous => ({ ...previous, [record.id]: !open })) }}>
-                                {open ? CULTIVATION_COPY.contextCollapse : CULTIVATION_COPY.contextExpand}
-                              </Button>
-                              {props.openContext !== undefined && (
-                                <Button size="sm" variant="ghost" disabled={openingContextId === record.id}
-                                  onClick={() => { void openContextOf(record.id, background) }}>
-                                  {openingContextId === record.id ? CULTIVATION_COPY.contextLoading : openLabel}
-                                </Button>
-                              )}
-                            </div>
-                            {contextOutcomes[record.id] !== undefined && contextOutcomes[record.id] !== '' && (
-                              <div className="wk-meta wk-cultivation-problem">{contextOutcomes[record.id]}</div>
-                            )}
-                          </div>
-                        )
-                      })()}
-                      {record.bodyTruncated === true && (
-                        <div className="wk-meta">正文只加载了摘要，可能不完整；完整原文在 `cultivation/records/{record.id}.md`。</div>
-                      )}
-                      {/* 判断要有材料（S4）：正文就地可见；但**长正文默认只展前几行**（场景轮实测 60 行撑出
-                          1156px 行高，把后面 12 条待办顶到看不见的地方）⇒ 给明确的「展开全文（共 N 行）」。 */}
-                      {record.body !== '' && (() => {
-                        const lines = record.body.split('\n')
-                        const clipped = lines.length > BODY_PREVIEW_LINES
-                        const expanded = expandedBodies[record.id] === true
-                        return (
-                          <div className="wk-cultivation-body">
-                            {expanded || !clipped ? record.body : `${lines.slice(0, BODY_PREVIEW_LINES).join('\n')}\n…`}
-                            {clipped && (
-                              <div className="wk-cultivation-actions">
-                                <Button
-                                  size="sm"
-                                  onClick={() => { setExpandedBodies(previous => ({ ...previous, [record.id]: !expanded })) }}
-                                >
-                                  {expanded ? CULTIVATION_COPY.bodyCollapse : CULTIVATION_COPY.bodyExpand(lines.length)}
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        )
-                      })()}
-                      {actions === undefined
-                        ? (
-                          <span className="wk-row-task">
-                            {`　采纳：/cultivation adopt ${record.id}　拒绝：/cultivation reject ${record.id} :: 理由`}
-                          </span>
-                        )
-                        : (
-                          <div className="wk-cultivation-actions">
-                            <Button
-                              variant="primary"
-                              disabled={pendingId === record.id}
-                              onClick={() => { void run(record.id, adoptLine(record.id)) }}
-                            >
-                              {pendingId === record.id ? CULTIVATION_COPY.running : CULTIVATION_COPY.adopt}
-                            </Button>
-                            <Button
-                              disabled={pendingId === record.id}
-                              onClick={() => { setRejectingId(record.id); setReason(''); setReasonProblem(null) }}
-                            >
-                              {CULTIVATION_COPY.reject}
-                            </Button>
-                          </div>
-                        )}
-                      {rejectingId === record.id && (
-                        <div className="wk-cultivation-reject">
-                          <input
-                            className="wk-cultivation-reason"
-                            value={reason}
-                            placeholder={CULTIVATION_COPY.rejectPlaceholder}
-                            aria-label={CULTIVATION_COPY.rejectPlaceholder}
-                            onChange={event => { setReason(event.target.value) }}
-                            // 键盘可用（2026-10-19 场景轮 S24 抓到：此前 Escape 不取消 = 键盘用户被困在表单里）：
-                            // Escape 取消（不落盘）、Enter 确认（空理由仍走既有校验）。
-                            onKeyDown={event => {
-                              if (event.key === 'Escape') {
-                                event.preventDefault()
-                                setRejectingId(null)
-                                setReasonProblem(null)
-                                return
-                              }
-                              if (event.key === 'Enter') {
-                                event.preventDefault()
-                                void confirmReject(record.id)
-                              }
-                            }}
-                          />
-                          <Button
-                            disabled={pendingId === record.id}
-                            onClick={() => { void confirmReject(record.id) }}
-                          >
-                            {CULTIVATION_COPY.rejectConfirm}
-                          </Button>
-                          <Button onClick={() => { setRejectingId(null); setReasonProblem(null) }}>{CULTIVATION_COPY.cancel}</Button>
-                          {reasonProblem !== null && <div className="wk-meta wk-cultivation-problem">{reasonProblem}</div>}
-                        </div>
-                      )}
-                      {outcome !== undefined && (
-                        <div className={outcome.ok ? 'wk-meta wk-cultivation-outcome' : 'wk-meta wk-cultivation-problem'}>
-                          {outcome.text}
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-              {capControl('inbox', inbox.needsDecision.length)}
-              </>
-            )}
-      </div>
+      <CultivationInbox board={board} />
 
       {(inbox.mine.length > 0 || inbox.processedForViewer.length > 0) && (
         <div className="wk-activity-block" aria-label="我提交的与我已处理">
