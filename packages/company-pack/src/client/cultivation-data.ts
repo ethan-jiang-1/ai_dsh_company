@@ -46,6 +46,8 @@ export interface CultivationFiles {
   readonly readHead: (sessionId: SessionId, path: string, signal: AbortSignal) => Promise<string | null>
   /** 列培养记录目录（cultivation/records）的 .md 文件名；不可达给 null。 */
   readonly listRecords: (sessionId: SessionId, signal: AbortSignal) => Promise<readonly string[] | null>
+  /** 读记录头部（frontmatter + 少量正文）；摘要全扫用，失败给 null。 */
+  readonly readRecordHead: (sessionId: SessionId, path: string, signal: AbortSignal) => Promise<string | null>
   /** 读培养记录全文；失败给 null。 */
   readonly readRecord: (sessionId: SessionId, path: string, signal: AbortSignal) => Promise<string | null>
 }
@@ -97,6 +99,7 @@ export function makeCultivationFiles(remote: RemoteNamespaceFace, leadOf: (sessi
     listJournal: (sessionId, role, signal) => listDir(sessionId, `kb/${role}/journal`, signal),
     readHead: (sessionId, path, signal) => readText(path, 240)(sessionId, signal),
     listRecords: (sessionId, signal) => listDir(sessionId, 'cultivation/records', signal),
+    readRecordHead: (sessionId, path, signal) => readText(path, 60)(sessionId, signal),
     readRecord: (sessionId, path, signal) => readText(path, 2000)(sessionId, signal),
   }
 }
@@ -109,6 +112,8 @@ export interface CultivationPanelData {
   readonly records: readonly CultivationRecord[] | null
   /** 读不动的记录文件名（坏形状/读取失败；不静默丢掉，由面板明确提示）。 */
   readonly brokenRecords: readonly string[]
+  /** 只读了摘要、未读全文的记录数（旧记录；用 archive 控制规模）。 */
+  readonly unexpandedRecords: number
   /** 立即重读（动作/创作成功后台账已变，不等 30s 轮询）。 */
   readonly refresh: () => void
 }
@@ -118,6 +123,9 @@ export const CULTIVATION_REFRESH_MS = 30_000
 
 /** 预览条数（与读模型 PREVIEW_LIMIT 同口径：只读每角色前 3 篇的首段）。 */
 const HEAD_LIMIT = 3
+
+/** 非 open 记录默认只给最近这么多条读全文；更早的只留摘要，避免面板全量读。 */
+export const FULL_RECORD_LIMIT = 120
 
 /**
  * 加载培养面板数据（journal 行 + 记录）。`enabled=false` 时不发任何请求（公司页只在
@@ -132,6 +140,7 @@ export function useCultivationPanelData(
   const [journalRows, setJournalRows] = useState<readonly CultivationRow[] | null>(null)
   const [records, setRecords] = useState<readonly CultivationRecord[] | null>(null)
   const [brokenRecords, setBrokenRecords] = useState<readonly string[]>([])
+  const [unexpandedRecords, setUnexpandedRecords] = useState(0)
   // 动作后立即重读的抓手（2026-10-17 GUI 行动面 S2）：bump 一次 = 重跑下面的读盘 effect。
   const [nonce, setNonce] = useState(0)
   const refresh = useCallback(() => { setNonce(value => value + 1) }, [])
@@ -156,21 +165,39 @@ export function useCultivationPanelData(
       // 记录面：清单不可达 → null；可读则逐条读全文（记录小，2000 字窗足够）。
       let nextRecords: readonly CultivationRecord[] | null = null
       const broken: string[] = []
+      let unexpanded = 0
       const recordNames = await files.listRecords(sessionId, controller.signal)
       if (recordNames !== null) {
-        const parsed: CultivationRecord[] = []
+        const summaries: CultivationRecord[] = []
         for (const name of [...recordNames].sort().reverse()) {
-          const text = await files.readRecord(sessionId, `cultivation/records/${name}`, controller.signal)
-          const record = text === null ? null : parseRecord(name.replace(/\.md$/, ''), text)
-          if (record !== null) parsed.push(record)
-          else broken.push(name)
+          const id = name.replace(/\.md$/, '')
+          const head = await files.readRecordHead(sessionId, `cultivation/records/${name}`, controller.signal)
+          const summary = head === null ? null : parseRecord(id, head)
+          if (summary === null) { broken.push(name); continue }
+          summaries.push(summary)
         }
-        nextRecords = parsed
+        // open 全部读全文（不能藏旧待办）；非 open 只给最近 FULL_RECORD_LIMIT 条。
+        const full = new Set<string>(summaries.filter(record => record.status === 'open').map(record => record.id))
+        let nonOpen = 0
+        for (const record of summaries) {
+          if (record.status === 'open') continue
+          if (nonOpen < FULL_RECORD_LIMIT) { full.add(record.id); nonOpen += 1 }
+        }
+        for (let index = 0; index < summaries.length; index += 1) {
+          const summary = summaries[index]!
+          if (!full.has(summary.id)) continue
+          const text = await files.readRecord(sessionId, `cultivation/records/${summary.id}.md`, controller.signal)
+          const record = text === null ? null : parseRecord(summary.id, text)
+          if (record !== null) summaries[index] = record
+        }
+        nextRecords = summaries
+        unexpanded = summaries.filter(record => !full.has(record.id)).length
       }
       if (controller.signal.aborted) return
       setJournalRows([...inboxRows(listings, heads)])
       setRecords(nextRecords)
       setBrokenRecords(broken)
+      setUnexpandedRecords(unexpanded)
     }
     void load()
     const timer = setInterval(() => { void load() }, CULTIVATION_REFRESH_MS)
@@ -190,7 +217,7 @@ export function useCultivationPanelData(
     }
   }, [enabled, sessionId, files, nonce])
 
-  return { journalRows, records, brokenRecords, refresh }
+  return { journalRows, records, brokenRecords, unexpandedRecords, refresh }
 }
 
 /** 事件流闭包的形状（`session/follow`：快照给历史、其后实时；侧栏与公司页共用）。 */

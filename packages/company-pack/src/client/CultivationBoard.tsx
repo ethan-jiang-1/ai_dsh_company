@@ -60,6 +60,8 @@ export interface CultivationBoardProps {
   readonly records: readonly CultivationRecord[] | null
   /** 读不动的记录文件名；空 = 全部可读。 */
   readonly brokenRecords?: readonly string[] | undefined
+  /** 只读了摘要、未读全文的旧记录数。 */
+  readonly unexpandedRecords?: number | undefined
   /** 本会话赞/踩（null = 事件流不可达——块内降级）。 */
   readonly feedback: readonly FeedbackItem[] | null
   /** 赞/踩块的事件流是否可达（注入缺席 = false）。 */
@@ -225,6 +227,11 @@ export function CultivationBoard(props: CultivationBoardProps) {
         {(props.brokenRecords ?? []).length > 0 && (
           <div className="wk-meta">
             {String(props.brokenRecords!.length)} 条记录读不动（文件仍在，未被当成 0 条）：{(props.brokenRecords ?? []).join('、')}
+          </div>
+        )}
+        {(props.unexpandedRecords ?? 0) > 0 && (
+          <div className="wk-meta">
+            还有 {String(props.unexpandedRecords)} 条旧记录只读了摘要（未展开全文）；用 /cultivation archive &lt;天数&gt; 归档后重新加载。
           </div>
         )}
         {props.records === null
@@ -564,6 +571,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
             <li>采纳：/cultivation adopt 记录编号　拒绝：/cultivation reject 记录编号 :: 理由</li>
             <li>验证：/cultivation verify 记录编号 pass｜fail　撤回：/cultivation revoke 方法名</li>
             <li>归档：/cultivation archive 天数（只动已处理记录，open 不动）</li>
+            <li>体检：/cultivation check（报告记录缺方法/方法无记录，不自动改）</li>
           </ul>
         </details>
       </div>

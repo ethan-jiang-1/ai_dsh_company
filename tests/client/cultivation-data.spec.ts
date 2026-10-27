@@ -9,7 +9,7 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { afterEach, describe, expect, it } from 'vitest'
 import { CULTIVATION_CHANGED_EVENT } from '../../packages/company-pack/src/client/cultivation-actions.ts'
-import { useCultivationPanelData } from '../../packages/company-pack/src/client/cultivation-data.ts'
+import { FULL_RECORD_LIMIT, useCultivationPanelData, type CultivationPanelData } from '../../packages/company-pack/src/client/cultivation-data.ts'
 
 const IS_REACT_ACT_ENVIRONMENT = true
 void IS_REACT_ACT_ENVIRONMENT
@@ -23,6 +23,7 @@ function stubFiles() {
       // 形状照 hook 真实用法：listJournal 给"名字数组"（hook 内部 slice/逐个读），listRecords 给记录数组。
       listJournal: async () => { calls.journal++; return [] },
       listRecords: async () => { calls.records++; return [] },
+      readRecordHead: async (_role: string, name: string) => { calls.read++; void name; return null },
       readRecord: async (_role: string, name: string) => { calls.read++; void name; return null },
     },
   }
@@ -48,5 +49,41 @@ describe('跨实例刷新广播：订阅侧（事件 ⇒ 重读）', () => {
     })
     expect(calls.records, '广播到达必须重读').toBeGreaterThan(afterMount)
     await act(async () => { root.unmount() })
+  })
+})
+
+
+describe('records 摘要全扫 + open/最近 N 全文（2026-10-27 R1）', () => {
+  it('open 全部读全文；非 open 只读最近 FULL_RECORD_LIMIT 条；未展开可见', async () => {
+    const names: string[] = ['20200101-000000-open.md']
+    for (let i = 0; i < FULL_RECORD_LIMIT + 30; i += 1) {
+      names.push(`20261001-${String(i).padStart(6, '0')}-old.md`)
+    }
+    const head = (name: string): string => `---\nkind: correction\ntargetRole: ceo\nproposerRole: ceo\nproposerKind: human\nsource: test\nexpectation: e\nstatus: ${name.includes('open') ? 'open' : 'rejected'}\n---\n\nbody\n`
+    let full = 0
+    let heads = 0
+    const files = {
+      listJournal: async () => [],
+      listRecords: async () => names,
+      readRecordHead: async (_role: string, path: string) => { heads += 1; return head(path) },
+      readRecord: async (_role: string, path: string) => { full += 1; return head(path) },
+    }
+    let data: CultivationPanelData | undefined
+    function Probe(): null {
+      data = useCultivationPanelData(files as never, 'session-1' as never)
+      return null
+    }
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    await act(async () => { root.render(createElement(Probe)) })
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 30)) })
+    expect(heads).toBe(names.length)
+    expect(full).toBe(1 + FULL_RECORD_LIMIT)
+    expect(data?.records).toHaveLength(names.length)
+    expect(data?.brokenRecords).toEqual([])
+    expect(data?.unexpandedRecords).toBe(30)
+    await act(async () => { root.unmount() })
+    container.remove()
   })
 })

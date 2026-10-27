@@ -47,6 +47,26 @@ function ctxStub(): Record<string, unknown> {
 }
 
 describe('host apply 显式换盘', () => {
+  it('另一个 writer 持锁 ⇒ 公司数据停写并点名', () => {
+    const home = workspaceAt()
+    try {
+      writeFileSync(join(home.root, 'company-pack.lock'), JSON.stringify({
+        schema: 1, pid: process.ppid, token: 'other', startedAt: 'x',
+      }))
+      const warn = vi.fn()
+      const ctx = { ...ctxStub(), logger: { info: vi.fn(), warn } }
+      process.env.DSH_HOME = home.root
+      process.env.DSH_COMPANY_HOME = home.ws
+      process.env.DSH_COMPANY_BOOTSTRAP = 'if-missing'
+      apply(ctx as never)
+      expect(warn.mock.calls.some(([message]) => String(message).includes('另一个 writer'))).toBe(true)
+      expect(existsSync(join(home.root, 'bundle.json'))).toBe(false)
+      expect(existsSync(join(home.ws, 'kb/deliverables-index.json'))).toBe(false)
+    } finally {
+      rmSync(home.root, { recursive: true, force: true })
+    }
+  })
+
   it('同 home 多个 profile 装本包 ⇒ 启动点名方法层不共享', () => {
     const home = workspaceAt()
     try {

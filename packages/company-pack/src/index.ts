@@ -36,6 +36,7 @@ import {
   type PresentedSessionQuery,
 } from './host/catalog.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
+import { acquireCompanyLease } from './host/lease.ts'
 import { profilesWithCompanyPack } from './host/profiles.ts'
 import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace-registry.ts'
 
@@ -135,6 +136,16 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
     ctx.logger?.warn?.(warning)
     process.stderr.write(`dsh: ${warning}\n`)
   }
+  const lease = acquireCompanyLease(bundleHome)
+  const leaseBlocked = !lease.acquired
+  if (leaseBlocked) {
+    const warning = `company-pack：${lease.reason}；公司数据已停写（DSH 会话仍可用），先关掉另一个 writer`
+    ctx.logger?.warn?.(warning)
+    process.stderr.write(`dsh: ${warning}\n`)
+  } else {
+    const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
+    if (typeof effect === 'function') effect.call(ctx, () => () => lease.release())
+  }
   let bundleState = readBundleManifestState(bundleHome)
   let recordedWorkspace = bundleState.status === 'ok'
     ? resolveRecordedWorkspace(bundleHome, bundleState.manifest.workspace)
@@ -153,7 +164,7 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
     ctx.logger?.warn?.(warning)
     process.stderr.write(`dsh: ${warning}\n`)
   }
-  if (rebound && configuredCheck.ok && rebindEnabled() && bundleState.status === 'ok') {
+  if (rebound && configuredCheck.ok && !leaseBlocked && rebindEnabled() && bundleState.status === 'ok') {
     const decision = planWorkspaceRebind({
       dshHome: bundleHome,
       manifest: bundleState.manifest,
@@ -194,7 +205,7 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   const identityBlocked = bundleState.status === 'corrupt' || bundleState.status === 'unsupported'
   const companyHome = recordedWorkspace ?? configuredCompanyHome
   const companyCheck = validateCompanyHome(bundleHome, companyHome)
-  const dataBlocked = identityBlocked || !companyCheck.ok
+  const dataBlocked = identityBlocked || leaseBlocked || !companyCheck.ok
   if (!companyCheck.ok) {
     const warning = `company-pack：公司盘落点不安全（${companyCheck.error}）；公司数据已停写，先修 DSH_COMPANY_HOME`
     ctx.logger?.warn?.(warning)
@@ -332,8 +343,14 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
           + '修好后重启，或备份后删除该文件让下次启动重建')
       } else if (state.status === 'missing') {
         const plan = planBundleManifest({ dshHome: bundleHome, companyHome, skeletonDir: skeleton, pack })
-        if (writeBundleManifest(plan).created) {
+        const written = writeBundleManifest(plan)
+        if (written.created) {
           ctx.logger?.info?.(`company-pack：run bundle 身份已建立（${plan.path}）`)
+          if (written.fallback !== undefined) {
+            const warning = `company-pack：manifest 首建不支持 hard link（${written.fallback} 回退，非原子发布）；${plan.path}`
+            ctx.logger?.warn?.(warning)
+            process.stderr.write(`dsh: ${warning}\n`)
+          }
         }
       } else if (state.status === 'unsupported') {
         // 启动时已按 v 高于本包告警；保留原文件，不做升级、不覆盖身份。

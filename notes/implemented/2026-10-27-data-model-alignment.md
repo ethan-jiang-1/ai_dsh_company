@@ -1,7 +1,7 @@
 # 数据模型对齐（FAQ 26）：作用域、版本、换盘、presented 账本
 
-状态：已交付（2026-10-27；P0 收口，P1/P2 显性留在 [Gap 卡](../../_backlog/issues/2026-10-27-data-model-gaps.md)）
-上游 = [DSH 数据模型（FAQ 26）审计出的部署 Gap](../../_backlog/issues/2026-10-27-data-model-gaps.md)
+状态：已交付（2026-10-27；P0 收口，P1/P2 显性留在 [Gap 卡](../../_backlog/_archive/settled_issues/2026-10-27-data-model-gaps.md)）
+上游 = [DSH 数据模型（FAQ 26）审计出的部署 Gap](../../_backlog/_archive/settled_issues/2026-10-27-data-model-gaps.md)
 
 ## 问题
 

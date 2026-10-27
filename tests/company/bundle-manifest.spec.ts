@@ -311,6 +311,23 @@ describe('manifest 版本校验（2026-10-27 FAQ 26 对齐）', () => {
     }
   })
 
+  it('hard link 不支持 ⇒ wx 回退并仍不覆盖', () => {
+    const skel = skeleton()
+    const dsh = home()
+    try {
+      const plan = planBundleManifest({ dshHome: dsh, companyHome: join(dsh, 'company-workspace'), skeletonDir: skel, pack: PACK, id: 'fallback' })
+      const link = (() => { throw Object.assign(new Error('unsupported'), { code: 'ENOTSUP' }) }) as unknown as typeof import('node:fs').linkSync
+      const result = writeBundleManifest(plan, { link })
+      expect(result).toMatchObject({ created: true, fallback: 'wx' })
+      expect(readBundleManifest(dsh)?.id).toBe('fallback')
+      const before = readFileSync(plan.path, 'utf8')
+      expect(writeBundleManifest(plan, { link }).created).toBe(false)
+      expect(readFileSync(plan.path, 'utf8')).toBe(before)
+    } finally {
+      rmSync(skel, { recursive: true, force: true }); rmSync(dsh, { recursive: true, force: true })
+    }
+  })
+
   it('首建用临时文件 + link 发布，不留 .tmp；强制并发计划也不会覆盖', () => {
     const skel = skeleton()
     const dsh = home()

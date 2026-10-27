@@ -760,3 +760,29 @@ describe('/cultivation archive（2026-10-27 G8）', () => {
     })
   })
 })
+
+
+describe('/cultivation check 对账（2026-10-27 R5）', () => {
+  it('报告记录缺方法与方法无记录，不自动改盘', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const { command, proposal } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace)
+      const outcome = await proposal.execute({
+        kind: 'correction', targetRole: 'ceo', expectation: '对账', body: '正文',
+      }, {
+        agent: { session: { header: { agentPreset: 'ceo', cwd: workspace } } },
+        signal: new AbortController().signal,
+      } as never) as { id: string }
+      expect((await invokeCultivation(command, 'ceo', workspace, `adopt ${outcome.id} as check-method`)).kind).toBe('success')
+      nodeCultivationStorage.removeMethod(methods, 'ceo', 'check-method')
+      const missing = await invokeCultivation(command, 'ceo', workspace, 'check')
+      expect(missing.kind).toBe('success')
+      expect(String((missing as { text: string }).text)).toContain('记录缺方法')
+      expect(existsSync(join(methods, 'ceo/check-method/SKILL.md'))).toBe(false)
+
+      nodeCultivationStorage.installMethod(methods, 'ceo', 'orphan-method', 'orphan body')
+      const orphan = await invokeCultivation(command, 'ceo', workspace, 'check')
+      expect(String((orphan as { text: string }).text)).toContain('方法无记录')
+      expect(existsSync(join(methods, 'ceo/orphan-method/SKILL.md'))).toBe(true)
+    })
+  })
+})

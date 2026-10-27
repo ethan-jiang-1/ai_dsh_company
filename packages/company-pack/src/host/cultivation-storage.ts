@@ -217,6 +217,26 @@ function archiveRecordFile(recordsDir: string, archiveDir: string, id: string): 
   return true
 }
 
+/** 列一个角色方法层里的方法 slug（只认含 SKILL.md 的普通目录）。 */
+function listMethodSlugs(root: string, role: string): string[] {
+  if (!ROSTER.has(role)) throw new Error(`不安全的方法路径：${role}`)
+  const rootInfo = lstatOrNull(root)
+  if (rootInfo === null) return []
+  if (rootInfo.isSymbolicLink() || !rootInfo.isDirectory()) throw new UnsafeCultivationPathError(root)
+  const roleDir = join(root, role)
+  const roleInfo = lstatOrNull(roleDir)
+  if (roleInfo === null) return []
+  if (roleInfo.isSymbolicLink() || !roleInfo.isDirectory()) throw new UnsafeCultivationPathError(roleDir)
+  const slugs: string[] = []
+  for (const entry of readdirSync(roleDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue
+    const file = join(roleDir, entry.name, 'SKILL.md')
+    const info = lstatOrNull(file)
+    if (info !== null && !info.isSymbolicLink() && info.isFile()) slugs.push(entry.name)
+  }
+  return slugs.sort()
+}
+
 /** 读一个已部署方法（revoke 先留副本，失败时恢复）。 */
 function readMethodFile(root: string, role: string, slug: string): string | null {
   if (!ROSTER.has(role) || !SLUG_RE.test(slug)) throw new Error(`不安全的方法路径：${role}/${slug}`)
@@ -264,6 +284,7 @@ export interface CultivationStorage {
   loadRecords(recordsDir: string): ReturnType<typeof loadRecords>
   installMethod(root: string, role: string, slug: string, text: string): boolean
   readMethod(root: string, role: string, slug: string): string | null
+  listMethods(root: string, role: string): string[]
   removeMethod(root: string, role: string, slug: string): string | null
 }
 
@@ -302,6 +323,7 @@ export const nodeCultivationStorage: CultivationStorage = {
     }
   },
   readMethod: readMethodFile,
+  listMethods: listMethodSlugs,
   removeMethod(root, role, slug) {
     if (!ROSTER.has(role) || !SLUG_RE.test(slug)) throw new Error(`不安全的方法路径：${role}/${slug}`)
     const rootInfo = lstatOrNull(root)

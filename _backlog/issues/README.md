@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-当前活跃 2 张：[DSH 数据模型（FAQ 26）审计出的部署 Gap](2026-10-27-data-model-gaps.md)（G1–G12 已落树，剩 G8 面板分页/多 Host 边界）；[数据模型收尾 R1–R6](2026-10-27-data-model-closeout.md)（面板加载、writer 护栏、presented 真证据、revoke 崩溃恢复、对账、hardlink 保底）。2026-10-25 的 6 张收尾卡已结并归档（分发契约 / 生命周期 / 内容自足 / 成品目录 / 独立启动 / 身份守卫），去向 = 三份 implemented Note；见 [归档](../_archive/README.md)。
+当前活跃 0 张。2026-10-27 的数据模型两卡（12 Gap + R1–R6 收尾）已结并归档，去向 = 三份 implemented Note；见 [归档](../_archive/README.md)。2026-10-25 的 6 张收尾卡已结并归档（分发契约 / 生命周期 / 内容自足 / 成品目录 / 独立启动 / 身份守卫），去向 = 三份 implemented Note；见 [归档](../_archive/README.md)。
 
 ## 近期归档
 

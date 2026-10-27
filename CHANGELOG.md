@@ -2,6 +2,17 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.3.13 — 2026-10-27
+
+### Changed
+
+- **records 面板不再全量读**：先读全部记录头部摘要，open 全部读全文、非 open 只读最近 120 条；面板显示“还有 N 条旧记录只读了摘要”，不藏旧 open。
+- **同 home writer lease**：`<DSH_HOME>/company-pack.lock` 让第二个进程停写公司数据并点名 holder（DSH 会话仍可用）；崩溃后 stale PID 可接管，不再静默互写。
+- **revoke 崩溃恢复**：revoke 前写 `cultivation/.pending-revoke.json`；启动时按“方法还在 ⇒ 回滚记录；方法已不在 ⇒ 补完 revokedAt”恢复，外部改动报 conflict 不覆盖。
+- **`/cultivation check`**：只报告 adopted 记录缺方法 / 方法无记录，不自动删改。
+- **manifest 首建 hard link 回退**：网络盘/特殊 FS 不支持 hard link 时退回 `wx` 单写并告警，仍不覆盖。
+- **presented 重建真证据**：present-catalog-smoke 增删 index/ledger 后从会话事件恢复 true、false 审计保留；concurrent-home-smoke 增 writer lease/stale 接管断言。
+
 ## 0.3.12 — 2026-10-27
 
 ### Changed

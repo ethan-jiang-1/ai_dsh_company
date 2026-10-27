@@ -168,19 +168,34 @@ export function planBundleManifest(options: {
 }
 
 /** 执行计划：只创建；并发/竞态下 `link` 失败视为已有（skip），绝不覆盖。 */
-export function writeBundleManifest(plan: ManifestPlan): { created: boolean; skipped: boolean } {
+export function writeBundleManifest(
+  plan: ManifestPlan,
+  deps: { readonly link?: typeof linkSync } = {},
+): { created: boolean; skipped: boolean; fallback?: 'wx' } {
   if (plan.error !== undefined || plan.action === 'skip') return { created: false, skipped: true }
   mkdirSync(dirname(plan.path), { recursive: true })
   // 不直接 writeFileSync(path, { flag: 'wx' })：并发第二个 Host 可能读到半截 JSON。
   // 先写临时文件，再用同目录硬链接“发布”——目标已存在时 link 失败，天然保持只创建。
   const temporary = `${plan.path}.${String(process.pid)}.${String(Date.now())}.${randomUUID()}.tmp`
+  const data = `${JSON.stringify(plan.manifest, null, 2)}\n`
   try {
-    writeFileSync(temporary, `${JSON.stringify(plan.manifest, null, 2)}\n`, { flag: 'wx' })
+    writeFileSync(temporary, data, { flag: 'wx' })
     try {
-      linkSync(temporary, plan.path)
+      ;(deps.link ?? linkSync)(temporary, plan.path)
       return { created: true, skipped: false }
     } catch (error) {
-      if ((error as { code?: string }).code === 'EEXIST') return { created: false, skipped: true }
+      const code = (error as { code?: string }).code
+      if (code === 'EEXIST') return { created: false, skipped: true }
+      // 网络盘/特殊 FS 不支持 hard link：退回 wx 单写（仍不覆盖，但换掉原子发布）。
+      if (code === 'EPERM' || code === 'ENOTSUP' || code === 'EOPNOTSUPP' || code === 'EXDEV' || code === 'EMLINK') {
+        try {
+          writeFileSync(plan.path, data, { flag: 'wx' })
+          return { created: true, skipped: false, fallback: 'wx' }
+        } catch (fallbackError) {
+          if ((fallbackError as { code?: string }).code === 'EEXIST') return { created: false, skipped: true }
+          throw fallbackError
+        }
+      }
       throw error
     }
   } finally {

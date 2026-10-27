@@ -1,17 +1,17 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-10-27
 ---
 
 # 推敲：DSH 数据模型（FAQ 26）审计出的部署 Gap
 
-> 立卡：2026-10-27 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-10-27 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；P0 落 `notes/implemented/2026-10-27-data-model-alignment.md`，P1/P2 留在本卡表内继续跟踪。
+> **结论/去向**：做；P0/P1/P2 落 `notes/implemented/2026-10-27-data-model-alignment.md` 与 `2026-10-27-data-model-p1-p2.md`，R1–R6 落 `2026-10-27-data-model-r1-r6.md`；剩余仅边界，不重开。
 
 **问题与期望结果：** 发布后部署最怕的不是功能少，而是数据作用域、版本、备份、迁移和审计账本没有合同。对照 FAQ 26 审计本包后确认了 12 个 Gap；期望把 P0（部署阻断）收口，P1/P2 显性登记，不再只活在会话里。
 
-**当前情况：** P0（G1–G5/G9/G10）已落树并验证，证据 = [P0 Note](../../notes/implemented/2026-10-27-data-model-alignment.md)；P1/P2（G6/G7/G8/G11/G12）已落树，证据 = [P1/P2 Note](../../notes/implemented/2026-10-27-data-model-p1-p2.md)。G8 的面板全量读仍保留为已知边界。详细合同 = [docs/data-model.md](../../docs/data-model.md)。
+**当前情况：** P0（G1–G5/G9/G10）已落树并验证，证据 = [P0 Note](../../../notes/implemented/2026-10-27-data-model-alignment.md)；P1/P2（G6/G7/G8/G11/G12）已落树，证据 = [P1/P2 Note](../../../notes/implemented/2026-10-27-data-model-p1-p2.md)。G8 的面板全量读仍保留为已知边界。详细合同 = [docs/data-model.md](../../../docs/data-model.md)。
 
 **未决问题：** 只剩 G8 的面板全量读（分页）与多 Host 事务边界；方法层是否从 profile 级迁 home 级留作真实多 profile 需求。P0/P1/P2 以 0.3.12 真实安装/生命周期/隔离/升级 smoke 为准。
 
@@ -30,10 +30,10 @@ opened: 2026-10-27
 | G2 | 换盘只能新 home / 删 manifest（丢基部哈希） | 高 | P0 已落树并验证：`DSH_COMPANY_REBIND=1` + 备份/日志 |
 | G3 | 备份口径混用，缺 restore 验收 | 高 | P0 已落树并验证：business/full 两档 + 手册 + lifecycle restore |
 | G4 | `presented` 混在派生索引里，false 是审计状态却不可重建 | 高 | P0 已落树并验证：审计账本 + 索引派生 + 事件回扫 |
-| G5 | `bundle.json` v 不校验；catalog schema 不符静默重建；基部升级非原子 | 中高 | P0 已落树并验证：fail loud + 原子写 |
-| G6 | 记录更新无 CAS；revoke 跨 store 半状态；多 Host 无锁 | 中 | 已落树并验证：CAS + revoke 同步回滚；多 Host 仍不支持（文档边界） |
+| G5 | `bundle.json` v 不校验；catalog schema 不符静默重建；基部升级非原子 | 中高 | 已落树并验证：fail loud + 原子写 + hardlink 回退告警 |
+| G6 | 记录更新无 CAS；revoke 跨 store 半状态；多 Host 无锁 | 中 | 已落树并验证：CAS + revoke journal + writer lease；多 Host 高可用仍不支持（边界） |
 | G7 | 方法层 profile 级，同 home 多 profile 不一致 | 中 | 已落树并验证：启动点名多 profile；一公司一 web profile 合同 |
-| G8 | records 无 GC；坏记录静默隐藏；面板全量读 | 中 | 部分落地：archive 命令 + 坏记录面板点名；面板仍全量读（归档控规模，分页留后续） |
+| G8 | records 无 GC；坏记录静默隐藏；面板全量读 | 中 | 已落树并验证：archive + 坏记录点名 + 摘要全扫/open/最近 120 全文 + 未展开计数 |
 | G9 | 读 DSH 私有 `storages/workspace.json` | 中低 | 已落树：优先 `ctx.workspaceRegistry`（inject），旧文件仅保底 |
 | G10 | 数据卡不完整、FAQ 26 未登记 | 中低 | 已落树：`docs/data-model.md` + external-research 行 |
 | G11 | `DSH_COMPANY_HOME` 等于 home/祖先时可能污染 home | 低中 | 已落树并验证：不安全落点停写 + 告警 |

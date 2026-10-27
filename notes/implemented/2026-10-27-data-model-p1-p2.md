@@ -1,7 +1,7 @@
 # 数据模型 P1/P2：记录一致性、方法层边界、归档/坏记录、落点与本地键
 
 状态：已交付（2026-10-27；G8 的“面板全量读”保留为已知边界，见卡）
-上游 = [DSH 数据模型（FAQ 26）审计出的部署 Gap](../../_backlog/issues/2026-10-27-data-model-gaps.md)
+上游 = [DSH 数据模型（FAQ 26）审计出的部署 Gap](../../_backlog/_archive/settled_issues/2026-10-27-data-model-gaps.md)
 
 ## 问题
 

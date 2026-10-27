@@ -4,7 +4,7 @@
 // 成本：~1 分钟 keyless（同一 home 两个 web 进程 + 一次正常 boot 对照）
 // 前置：已导出 `_dist/dsh-company-pack-<version>.tgz`
 //
-// 证明边界：同 home 两进程不是“支持”的部署形状；本 smoke 只证明不会把 bundle/catalog/数据写成不可恢复。
+// 证明边界：同 home 两进程不是“支持”的部署形状；本 smoke 证明 writer lease 让恰好一个 writer 写公司数据（另一个被点名停写），且不把 bundle/catalog/数据写成不可恢复。
 import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -48,6 +48,9 @@ try {
   const down = starts.filter(x => x.status === 'rejected').map(x => x.reason?.message ?? '')
   check('两个进程至少一个能启动', up.length >= 1, `up=${String(up.length)} down=${String(down.length)}`)
   if (down.length > 0) console.log(`  另一进程失败（可解释即可）：${down[0].split('\n')[0]}`)
+  const blocked = up.filter(item => item.output().includes('另一个 writer')).length
+  check('同 home 恰好一个 writer（另一个被点名停写）', up.length === 2 ? blocked === 1 : blocked === 0,
+    `up=${String(up.length)} blocked=${String(blocked)}`)
   for (const i of up) {
     const r = await rpc(i)
     const created = await r('session/create', { request: { cwd: WS, agentPreset: 'ceo' } })
@@ -66,8 +69,9 @@ try {
   const h = sha(join(WS, 'kb/ceo/journal/after.md'))
   check('数据文件可写/可读', sha(join(WS, 'kb/ceo/journal/after.md')) === h)
 
-  console.log('③ 事后正常 boot 仍可用（单实例）')
+  console.log('③ 事后正常 boot 仍可用（单实例，stale lease 可接管）')
   const one = await boot()
+  check('单实例 boot 不再被旧 lease 阻挡', !one.output().includes('另一个 writer'), one.output().slice(-400))
   const r = await rpc(one)
   check('并发后正常 boot roster 含 ceo', (await r('agentPresets/list', {})).presets?.some(p => p.id === 'ceo') === true)
   await stop(one)

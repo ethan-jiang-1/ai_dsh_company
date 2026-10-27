@@ -165,6 +165,7 @@ export function createCompanyView(injected: CompanyViewInjected) {
                 journalRows={cultivation.journalRows}
                 records={cultivation.records}
                 brokenRecords={cultivation.brokenRecords}
+                unexpandedRecords={cultivation.unexpandedRecords}
                 feedback={feedback}
                 feedbackReachable={injected.followEvents !== undefined}
                 actions={actions}

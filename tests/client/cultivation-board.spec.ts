@@ -63,11 +63,12 @@ describe('CultivationBoard：本人收件与操作指引（V1/V7）', () => {
 })
 
 describe('CultivationBoard：数据诚实与能力呈现（V2/V8/V9）', () => {
-  it('坏记录不静默消失：明确显示文件名与条数', () => {
-    const markup = render({ brokenRecords: ['bad.md', 'worse.md'] })
+  it('坏记录不静默消失；只读摘要的旧记录也有明面计数', () => {
+    const markup = render({ brokenRecords: ['bad.md', 'worse.md'], unexpandedRecords: 30 })
     expect(markup).toContain('2 条记录读不动')
     expect(markup).toContain('bad.md')
     expect(markup).toContain('worse.md')
+    expect(markup).toContain('30 条旧记录只读了摘要')
   })
 
   it('journal 不可达行显示「目录不可达」，不当 0 待审呈现', () => {

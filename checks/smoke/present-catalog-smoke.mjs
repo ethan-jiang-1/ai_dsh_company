@@ -6,7 +6,7 @@
 // 证明链：vendor `@deepseek-ai/dsh-tool-present` 执行 → owner session 追加
 // `deliverables/presented` → 本包 `apply()` 注册的 `session/event` 监听 → catalog `presented=true`。
 // 这不是合成事件：event 由 vendor 工具真实产生；只是不经过模型（模型只决定“调不调”，不决定事件形状）。
-import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Context } from '../../vendor/dsh/vendor/cordis/lib/index.js'
@@ -83,22 +83,58 @@ try {
   check('事件路径是公司盘内的真实路径', event?.data?.files?.[0]?.path === realpathSync(finalPath), String(event?.data?.files?.[0]?.path ?? '无'))
 
   // 2. host 侧：apply 注册的监听消费同一个真实 event
-  const listeners = new Map()
-  const hostCtx = {
-    tools: { register: () => {} }, commands: { register: () => {} },
-    on: (name, listener) => { listeners.set(name, [...(listeners.get(name) ?? []), listener]) },
-    logger: { info: () => {}, warn: (message) => console.error(`  warn ${message}`) },
+  const makeHostCtx = (sessionQuery) => {
+    const listeners = new Map()
+    const ctx = {
+      tools: { register: () => {} }, commands: { register: () => {} },
+      on: (name, listener) => { listeners.set(name, [...(listeners.get(name) ?? []), listener]) },
+      logger: { info: () => {}, warn: (message) => console.error(`  warn ${message}`) },
+      get: () => undefined,
+      inject: (deps, callback) => { if (sessionQuery !== undefined && deps.includes('sessionQuery')) callback({ sessionQuery }) },
+    }
+    return { ctx, listeners }
   }
-  apply(hostCtx)
-  const eventListeners = listeners.get('session/event') ?? []
+  const first = makeHostCtx()
+  apply(first.ctx)
+  const eventListeners = first.listeners.get('session/event') ?? []
   check('host apply 注册了 session/event 监听', eventListeners.length > 0)
   for (const listener of eventListeners) listener(owner.session, event)
   const catalog = JSON.parse(readFileSync(join(workspace, 'kb/deliverables-index.json'), 'utf8'))
   const entry = catalog.entries?.find(item => item.slug === 'alpha')
   check('catalog 出现该条目且 presented=true', entry?.presented === true, JSON.stringify(entry ?? null))
   check('catalog 只有这一条', catalog.entries?.length === 1, String(catalog.entries?.length ?? -1))
-  const ledger = JSON.parse(readFileSync(join(workspace, 'kb/deliverables-presented.json'), 'utf8'))
+  const ledgerPath = join(workspace, 'kb/deliverables-presented.json')
+  const ledger = JSON.parse(readFileSync(ledgerPath, 'utf8'))
   check('present 写入审计账本', ledger.paths?.['deliverables/2026-10-25-alpha/final.md'] === true, JSON.stringify(ledger))
+
+  // 3. 真重建：删 index + ledger，由 sessionQuery 回扫真实事件恢复 true
+  const snapshot = owner.session.snapshotEvents()
+  const sessionQuery = {
+    listSessions: async () => [{ header: { id: 'present-owner-1', cwd: workspace } }],
+    observeSession: async () => ({ events: snapshot, [Symbol.dispose]: () => {} }),
+  }
+  rmSync(join(workspace, 'kb/deliverables-index.json'), { force: true })
+  rmSync(ledgerPath, { force: true })
+  apply(makeHostCtx(sessionQuery).ctx)
+  const deadline = Date.now() + 5_000
+  while (!existsSync(ledgerPath) && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 25))
+  check('删 index/ledger 后由会话事件重建账本', existsSync(ledgerPath))
+  const rebuiltLedger = existsSync(ledgerPath) ? JSON.parse(readFileSync(ledgerPath, 'utf8')) : {}
+  check('重建的 presented=true 来自会话事件', rebuiltLedger.paths?.['deliverables/2026-10-25-alpha/final.md'] === true, JSON.stringify(rebuiltLedger))
+  const rebuiltCatalog = JSON.parse(readFileSync(join(workspace, 'kb/deliverables-index.json'), 'utf8'))
+  check('重建后 catalog presented=true', rebuiltCatalog.entries?.find(item => item.slug === 'alpha')?.presented === true, JSON.stringify(rebuiltCatalog.entries ?? null))
+
+  // 4. false 审计是显式状态：删 index 不丢
+  writeFileSync(ledgerPath, JSON.stringify({
+    schema: 1,
+    updatedAt: '2026-10-27T00:00:00.000Z',
+    paths: { 'deliverables/2026-10-25-alpha/final.md': false },
+    slugs: {},
+  }, null, 2))
+  rmSync(join(workspace, 'kb/deliverables-index.json'), { force: true })
+  apply(makeHostCtx().ctx)
+  const audited = JSON.parse(readFileSync(join(workspace, 'kb/deliverables-index.json'), 'utf8'))
+  check('false 审计在重建索引后仍保留', audited.entries?.find(item => item.slug === 'alpha')?.presented === false, JSON.stringify(audited.entries ?? null))
 } catch (error) {
   failures.push(error.message)
   console.error(`present-catalog-smoke: ${error.stack ?? error.message}`)

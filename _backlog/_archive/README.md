@@ -15,6 +15,8 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-10-27-data-model-gaps.md](settled_issues/2026-10-27-data-model-gaps.md) | 已结；G1–G12 落三份 Note，剩余多 Host 高可用为边界 | 2026-10-27 |
+| [2026-10-27-data-model-closeout.md](settled_issues/2026-10-27-data-model-closeout.md) | 已结；R1–R6 落 [data-model-r1-r6](../../notes/implemented/2026-10-27-data-model-r1-r6.md) | 2026-10-27 |
 | [2026-10-25-distribution-contract.md](settled_issues/2026-10-25-distribution-contract.md) | 已实施；去向 = [distribution-lifecycle](../../notes/implemented/2026-10-25-distribution-lifecycle.md) | 2026-10-25 |
 | [2026-10-25-install-lifecycle-evidence.md](settled_issues/2026-10-25-install-lifecycle-evidence.md) | 已实施；去向 = [distribution-lifecycle](../../notes/implemented/2026-10-25-distribution-lifecycle.md) | 2026-10-25 |
 | [2026-10-25-shipped-content-self-contained.md](settled_issues/2026-10-25-shipped-content-self-contained.md) | 已实施；去向 = [installed-shape-self-sufficient](../../notes/implemented/2026-10-25-installed-shape-self-sufficient.md) | 2026-10-25 |

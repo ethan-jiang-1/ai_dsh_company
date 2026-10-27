@@ -209,7 +209,10 @@ dsh plugin --profile web add /path/to/<新版本>.tgz
 
 培养记录可用 \`/cultivation archive <天数>\` 把已处理（非 open）且早于该天数的记录移到
 \`<公司盘>/cultivation/records-archive/\`；open 与读不动的记录不动，面板会点名坏记录。
+\`/cultivation check\` 只报告“记录缺方法/方法无记录”，不自动删改。
+
 一个公司请固定用一个 web profile：同 home 多 profile 会在启动输出里点名，方法层不跨 profile 共享。
+同一 home 只允许一个 writer：第二实例会停写公司数据（DSH 会话仍可用），崩溃后 stale lease 可接管。
 
 ## 五、备份 / 迁移
 

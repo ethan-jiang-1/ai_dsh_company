@@ -9,6 +9,9 @@
  * defineTool 包装层先做 schema 校验再进 userExecute（vendor core/tools schema.ts），
  * 所以"缺必填参数"分支也走真校验，不抄 schema 形状。
  */
+import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { apply } from '../../packages/company-pack/src/index.ts'
 import { signoffDecisionNote, signoffReason } from '../../packages/company-pack/src/lib/signoff.ts'
@@ -39,7 +42,26 @@ function harness(approve: 'allowed-once' | 'denied') {
     // ctx.on 是 Cordis 标准 API——mock 一个 no-op 让事件监听不炸即可。
     on: () => () => {},
   }
-  apply(ctx as unknown as Parameters<typeof apply>[0], {})
+  const root = mkdtempSync(join(tmpdir(), 'signoff-tool-'))
+  const workspace = join(root, 'company-workspace')
+  mkdirSync(workspace, { recursive: true })
+  const saved = {
+    DSH_HOME: process.env.DSH_HOME,
+    DSH_COMPANY_HOME: process.env.DSH_COMPANY_HOME,
+    DSH_COMPANY_BOOTSTRAP: process.env.DSH_COMPANY_BOOTSTRAP,
+  }
+  process.env.DSH_HOME = root
+  process.env.DSH_COMPANY_HOME = workspace
+  process.env.DSH_COMPANY_BOOTSTRAP = 'off'
+  try {
+    apply(ctx as unknown as Parameters<typeof apply>[0], {})
+  } finally {
+    for (const [key, value] of Object.entries(saved)) {
+      if (value === undefined) delete process.env[key]
+      else process.env[key] = value
+    }
+    rmSync(root, { recursive: true, force: true })
+  }
   const signoff = registered.find(r => r.name === 'request_signoff')
   if (signoff === undefined) throw new Error('apply 没有注册 request_signoff 工具')
   return { captured: signoff, requests, signal: new AbortController().signal }

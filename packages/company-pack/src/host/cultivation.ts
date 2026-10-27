@@ -46,6 +46,11 @@ import {
   type CultivationRecord,
 } from '../lib/cultivation.ts'
 import {
+  clearPendingRevoke,
+  recoverPendingRevoke,
+  writePendingRevoke,
+} from './revoke-journal.ts'
+import {
   ROSTER,
   SLUG_RE,
   UnsafeCultivationPathError,
@@ -449,6 +454,43 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       }
     }
 
+    // check：只报告孤儿（不自动删/改）
+    if (sub === 'check') {
+      if (config.cultivationRoot === undefined) {
+        return { kind: 'error' as const, text: '方法层根未配置（config.cultivationRoot 缺席）。' }
+      }
+      const loaded = storage.loadRecords(recordsDir)
+      if (!loaded.reachable) return { kind: 'error' as const, text: `记录目录不可达：${recordsDir}` }
+      const adopted = loaded.records.filter(record => record.status === 'adopted' && record.targetRole === face.role)
+      const adoptedSlugs = new Set(adopted.map(record => record.methodSlug).filter((slug): slug is string => typeof slug === 'string' && slug !== ''))
+      const missing: string[] = []
+      for (const record of adopted) {
+        const slug = record.methodSlug
+        if (slug === undefined || slug === '') { missing.push(`${record.id}（缺 methodSlug）`); continue }
+        try {
+          if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) missing.push(`${record.id}（缺方法 ${slug}）`)
+        } catch (error) {
+          if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+          throw error
+        }
+      }
+      let orphans: string[] = []
+      try {
+        orphans = storage.listMethods(config.cultivationRoot, face.role).filter(slug => !adoptedSlugs.has(slug))
+      } catch (error) {
+        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+        throw error
+      }
+      if (missing.length === 0 && orphans.length === 0) {
+        return { kind: 'success' as const, text: `${roleLabel(face.role)} 方法层与已采纳记录一致（${String(adopted.length)} 条）。` }
+      }
+      return {
+        kind: 'success' as const,
+        text: `对账结果：${missing.length > 0 ? `记录缺方法 ${missing.join('、')}` : '记录与方法一一对应'}`
+          + `${orphans.length > 0 ? `；方法无记录 ${orphans.join('、')}` : ''}。只报告，不自动删改。`,
+      }
+    }
+
     // revoke <slug>
     if (sub === 'revoke') {
       const slug = tokens[1]
@@ -457,6 +499,10 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
         return { kind: 'error' as const, text: '方法层根未配置（config.cultivationRoot 缺席）。' }
       }
       if (!SLUG_RE.test(slug)) return { kind: 'error' as const, text: `方法 slug 不安全：${slug}。` }
+      const recovered = recoverPendingRevoke(scope.root, config.cultivationRoot, storage)
+      if (recovered.status === 'conflict' || recovered.status === 'error') {
+        return { kind: 'error' as const, text: `有一笔未完成的 revoke 需要先处理（${recovered.problem}）；日志在 cultivation/.pending-revoke.json。` }
+      }
       let records: readonly CultivationRecord[]
       try {
         if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) {
@@ -467,24 +513,46 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
         if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
         throw error
       }
+      const revokedAt = new Date().toISOString()
+      const pendingRecords: { readonly id: string, readonly text: string }[] = []
+      for (const record of records) {
+        if (record.status !== 'adopted' || record.methodSlug !== slug || record.targetRole !== face.role) continue
+        const current = storage.readRecord(recordsDir, record.id)
+        if (current !== null) pendingRecords.push({ id: record.id, text: current.text })
+      }
+      if (pendingRecords.length > 0) {
+        try {
+          writePendingRevoke(scope.root, {
+            schema: 1,
+            role: face.role,
+            slug,
+            revokedAt,
+            createdAt: revokedAt,
+            records: pendingRecords,
+          })
+        } catch (error) {
+          return { kind: 'error' as const, text: `无法写 revoke 恢复日志，撤回未开始：${(error as Error).message}` }
+        }
+      }
       const updated: { readonly id: string, readonly text: string }[] = []
       const rollback = (): number => {
         let failed = 0
         for (const item of updated) {
           try { if (!storage.restoreRecord(recordsDir, item.id, item.text)) failed += 1 } catch { failed += 1 }
         }
+        if (failed === 0) clearPendingRevoke(scope.root)
         return failed
       }
-      // 先改记录、后删方法：记录冲突时方法仍在，可安全回滚；删除失败时用旧全文回滚记录。
+      // 先写 journal、再改记录、最后删方法：崩溃后由 recoverPendingRevoke 判定回滚/补完。
       for (const record of records) {
         if (record.status !== 'adopted' || record.methodSlug !== slug || record.targetRole !== face.role) continue
         const current = storage.readRecord(recordsDir, record.id)
         if (current === null) continue
-        if (!storage.updateRecord(recordsDir, record.id, { revokedAt: new Date().toISOString() }, current.text)) {
+        if (!storage.updateRecord(recordsDir, record.id, { revokedAt }, current.text)) {
           const failed = rollback()
           return {
             kind: 'error' as const,
-            text: `撤回 ${slug} 已取消：记录 ${record.id} 在读取后被改过；${failed > 0 ? `另有 ${String(failed)} 条回滚失败` : '已回滚已改记录'}，请重试。`,
+            text: `撤回 ${slug} 已取消：记录 ${record.id} 在读取后被改过；${failed > 0 ? `另有 ${String(failed)} 条回滚失败（日志保留）` : '已回滚已改记录'}，请重试。`,
           }
         }
         updated.push({ id: record.id, text: current.text })
@@ -497,22 +565,23 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
         if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
         return {
           kind: 'error' as const,
-          text: `撤回 ${slug} 失败（${(error as Error).message}）；${failed > 0 ? `有 ${String(failed)} 条记录回滚失败` : '记录已回滚'}。`,
+          text: `撤回 ${slug} 失败（${(error as Error).message}）；${failed > 0 ? `有 ${String(failed)} 条记录回滚失败（日志保留）` : '记录已回滚'}。`,
         }
       }
       if (methodDir === null) {
         const failed = rollback()
         return {
           kind: 'error' as const,
-          text: `撤回 ${slug} 时方法已不在；${failed > 0 ? `有 ${String(failed)} 条记录回滚失败` : '记录已回滚'}。`,
+          text: `撤回 ${slug} 时方法已不在；${failed > 0 ? `有 ${String(failed)} 条记录回滚失败（日志保留）` : '记录已回滚'}。`,
         }
       }
+      clearPendingRevoke(scope.root)
       return { kind: 'success' as const, text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(updated.length)} 条记录）。新开的 ${roleLabel(face.role)} 会话不再加载它。` }
     }
 
     return {
       kind: 'error' as const,
-      text: '子命令只认：correct / suggest / adopt / reject / verify / revoke / archive（培养页有各命令的一句话用法）。',
+      text: '子命令只认：correct / suggest / adopt / reject / verify / revoke / archive / check（培养页有各命令的一句话用法）。',
     }
   }
 }
@@ -520,6 +589,18 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
 /** 「/cultivation」命令族与提案工具的注册面。 */
 export function registerCultivation(ctx: Context, config: CultivationHostConfig, companyHome?: string, dataBlocked = false): void {
   const storage = nodeCultivationStorage
+  if (!dataBlocked && companyHome !== undefined && config.cultivationRoot !== undefined) {
+    try {
+      const recovered = recoverPendingRevoke(companyHome, config.cultivationRoot, storage)
+      if (recovered.status === 'rolled-back' || recovered.status === 'completed') {
+        ctx.logger?.info?.(`company-pack：已恢复未完成的 revoke（${recovered.status}，${String(recovered.count)} 条记录）`)
+      } else if (recovered.status === 'conflict' || recovered.status === 'error') {
+        ctx.logger?.warn?.(`company-pack：revoke 恢复未完成（${recovered.problem}）；日志保留在 cultivation/.pending-revoke.json`)
+      }
+    } catch (error) {
+      ctx.logger?.warn?.(`company-pack：revoke 恢复跳过（不影响运行）：${(error as Error).message}`)
+    }
+  }
   // ── 分身提案工具（V3）：只开提案，不开采纳 ──────────────────────────────────
   ctx.tools.register(defineTool({
     name: 'cultivation_propose',

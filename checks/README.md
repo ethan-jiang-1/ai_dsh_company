@@ -44,13 +44,13 @@
 | [channel-matrix-smoke.mjs](smoke/channel-matrix-smoke.mjs) | vendor built CLI 与**真实全局 dsh** 的五角色 roster/session/create；`--with-browser` 验可选 browser 包自动启用（keyless；global 需要网络） |
 | [isolation-matrix-smoke.mjs](smoke/isolation-matrix-smoke.mjs) | 改 `DSH_COMPANY_HOME` 的告警/不建新盘；相对/`~` 落点归一；搬 home 后旧 workspace 登记点名（keyless；~2-3min） |
 | [standalone-smoke.mjs](smoke/standalone-smoke.mjs) | 目录独立启动：隔离 home/profile、copy 骨架、boot/RPC、relink、reset（keyless） |
-| [present-catalog-smoke.mjs](smoke/present-catalog-smoke.mjs) | 真 vendor `present` 工具 → session `deliverables/presented` → host catalog（keyless；~1s） |
+| [present-catalog-smoke.mjs](smoke/present-catalog-smoke.mjs) | 真 vendor `present` → catalog + 审计账本；删 index/ledger 后从会话事件重建 true、false 审计保留（keyless；~1s） |
 | [multi-install-smoke.mjs](smoke/multi-install-smoke.mjs) | 双 home 真装隔离、非空 home 后装、同 home 多 profile 反例、自定义 profile 补 web-app、空 bundle 共存、幂等（keyless；~3-4min，发布前手动） |
 | [interrupted-install-smoke.mjs](smoke/interrupted-install-smoke.mjs) | remove 后坏 add、profile package 损坏、re-add 后数据/roster 恢复（keyless；~2min） |
 | [permissions-recovery-smoke.mjs](smoke/permissions-recovery-smoke.mjs) | 只读 workspace、缺骨架补建、坏 catalog 重建（keyless；~1.5min） |
 | [profile-row-smoke.mjs](smoke/profile-row-smoke.mjs) | 用户 profile patch 真实改 default、第二 bundle disabled row 共存/卸载（keyless；~1.5min） |
 | [upgrade-while-running-smoke.mjs](smoke/upgrade-while-running-smoke.mjs) | 旧实例运行中 remove/add 新版本，旧实例仍响应；重启后新版本/session/data（keyless；~2min） |
-| [concurrent-home-smoke.mjs](smoke/concurrent-home-smoke.mjs) | 同 home 两进程首启后 bundle/catalog/数据可解析、单实例恢复（keyless；~1min） |
+| [concurrent-home-smoke.mjs](smoke/concurrent-home-smoke.mjs) | 同 home 两进程恰好一个 writer（另一个点名停写）、stale lease 接管、数据可解析（keyless；~1min） |
 | [external-workspace-smoke.mjs](smoke/external-workspace-smoke.mjs) | DSH_COMPANY_HOME 在 home 外、bundle.workspace 绝对路径、只搬 home 后 boot/数据不丢（keyless；~1min） |
 | [refactor-drift-oracle.mjs](smoke/refactor-drift-oracle.mjs) | 纯搬移/拆分的零行为漂移：拆前/拆后 vitest 清单比对（`--hashes` 档含测试体指纹 ⇒ 拦改名/增删/**测试体改动**；两档都放行文件与 describe 归属搬家） |
 
