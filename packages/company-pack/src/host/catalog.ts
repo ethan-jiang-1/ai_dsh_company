@@ -16,8 +16,8 @@
  * - 幂等：条目未变时不重写索引（`generatedAt` 不变），否则 release-smoke 的“二启零变更”会红。
  */
 import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { dirname, isAbsolute, join, relative } from 'node:path'
 import {
   buildDeliverablesCatalog,
   CATALOG_ROOTS,
@@ -29,6 +29,7 @@ import {
   type DeliverablesCatalog,
   type CatalogScanEntry,
 } from '../lib/deliverables-catalog.ts'
+import { canonicalPath } from './paths.ts'
 
 export const CATALOG_REL = 'kb/deliverables-index.json'
 /** 审计账本（`presented` 的权威；操作员可读可改）。 */
@@ -352,10 +353,6 @@ export async function presentedFromSessions(
     }
   }
   return { paths, slugs, scanned, failed }
-}
-
-function canonicalPath(path: string): string {
-  try { return realpathSync(path) } catch { return resolve(path) }
 }
 
 /**

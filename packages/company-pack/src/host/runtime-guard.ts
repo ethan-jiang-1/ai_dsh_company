@@ -8,8 +8,7 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
-import { realpathSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { join } from 'node:path'
 import { resolveCompanyHome, validateCompanyHome } from './bootstrap.ts'
 import {
   applyWorkspaceRebind,
@@ -21,6 +20,7 @@ import {
 } from './bundle-manifest.ts'
 import { acquireCompanyLease } from './lease.ts'
 import { profilesWithCompanyPack } from './profiles.ts'
+import { canonicalPath } from './paths.ts'
 
 /** 一次 apply 的运行前提（后续注册与自举都从这里取事实）。 */
 export interface CompanyRuntime {
@@ -139,6 +139,3 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
   return { bundleHome, companyHome, expectedWorkspace, dataBlocked, bundleState, rebound }
 }
 
-function canonicalPath(path: string): string {
-  try { return realpathSync(path) } catch { return resolve(path) }
-}

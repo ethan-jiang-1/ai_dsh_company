@@ -49,6 +49,7 @@ import * as claudeSymlink from './gates/claude-symlink.mjs'
 import * as vendorPin from './gates/vendor-pin.mjs'
 import * as packShape from './gates/pack-shape.mjs'
 import * as releaseReady from './gates/release-ready.mjs'
+import * as distFreshness from './gates/dist-freshness.mjs'
 import * as presetRowDeps from './gates/preset-row-deps.mjs'
 import * as clientHalves from './gates/client-halves.mjs'
 import * as srcLayering from './gates/src-layering.mjs'
@@ -79,7 +80,7 @@ const fail = (name, detail) => { failures.push(`${name}: ${detail}`); console.lo
 //   防止「静默全跳」变成新的假绿（testing.md §3.6 的零 skip 规矩由此适配）。
 const skips = []
 const skip = (name, reason) => { skips.push({ name, reason }); console.log(`  SKIP ${name}: ${reason}`) }
-const EXPECTED_SKIPS = new Set(['replay-fixture-freshness', 'replay-ui-freshness'])
+const EXPECTED_SKIPS = new Set(['replay-fixture-freshness', 'replay-ui-freshness', 'dist-freshness'])
 
 const ctx = { root, ok, fail, skip }
 mdUtf8.run(ctx)
@@ -113,6 +114,7 @@ claudeSymlink.run(ctx)
 vendorPin.run(ctx)
 packShape.run(ctx)
 releaseReady.run(ctx)
+distFreshness.run(ctx)
 presetRowDeps.run(ctx)
 clientHalves.run(ctx)
 srcLayering.run(ctx)

@@ -7,6 +7,7 @@
  *
  * 边界：只读（sessionQuery 观测 / `kb/deliverables-index.json`），不写任何文件、不碰方法层。
  */
+import { isRecord } from '../lib/guards.ts'
 import type { Context } from '@deepseek-ai/cordis'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -40,10 +41,6 @@ interface SessionQueryLike {
 }
 
 type ContextRead = { readonly context: CultivationContext } | { readonly problem: string }
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
 
 function errorMessage(error: unknown): string {
   try {

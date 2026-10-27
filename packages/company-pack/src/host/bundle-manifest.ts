@@ -21,7 +21,6 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
-  realpathSync,
   renameSync,
   rmSync,
   unlinkSync,
@@ -29,6 +28,7 @@ import {
 } from 'node:fs'
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { canonicalPath } from './paths.ts'
 
 /** 当前 manifest 形状版本；字段变化时升。 */
 export const BUNDLE_MANIFEST_VERSION = 1
@@ -423,10 +423,6 @@ export const REBIND_ENV = 'DSH_COMPANY_REBIND'
 export function rebindEnabled(env: Record<string, string | undefined> = process.env): boolean {
   const value = env[REBIND_ENV]
   return value === '1' || value === 'on'
-}
-
-function canonicalPath(path: string): string {
-  try { return realpathSync(path) } catch { return resolve(path) }
 }
 
 export interface WorkspaceRebindPlan {

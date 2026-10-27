@@ -8,6 +8,7 @@
  *
  * 边界：只处理本包自己写出的 pending；外部手改过的记录不覆盖（报 conflict，留日志给人看）。
  */
+import { isRecord } from '../lib/guards.ts'
 import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -35,10 +36,6 @@ export type RecoverRevokeResult =
   | { readonly status: 'error'; readonly problem: string }
 
 export const pendingRevokePath = (companyRoot: string): string => join(companyRoot, 'cultivation', '.pending-revoke.json')
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
 
 export function readPendingRevoke(companyRoot: string): PendingRevoke | null {
   const path = pendingRevokePath(companyRoot)

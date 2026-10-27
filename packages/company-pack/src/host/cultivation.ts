@@ -25,8 +25,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 // 纯类型导入：ctx.commands 的 Context 增强（服务本体由 base bundle 挂载，vendor patch 钉行）。
 import type {} from '@deepseek-ai/dsh-commands'
-import { realpathSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { join } from 'node:path'
 import {
   contextSummary,
   decodeContextToken,
@@ -54,6 +53,7 @@ import {
   nodeCultivationStorage,
   type CultivationStorage,
 } from './cultivation-storage.ts'
+import { canonicalPath } from './paths.ts'
 
 /** bundle patch 行注入的 host config（cordis.patch.yml `company-client` 行）。 */
 export interface CultivationHostConfig {
@@ -83,10 +83,6 @@ function sessionFaceOf(agent: AgentLike | undefined): SessionFace | null {
   if (typeof role !== 'string' || role === '' || !ROSTER.has(role)) return null
   if (typeof cwd !== 'string' || cwd === '') return null
   return { role, cwd }
-}
-
-function canonicalPath(path: string): string {
-  try { return realpathSync(path) } catch { return resolve(path) }
 }
 
 /**

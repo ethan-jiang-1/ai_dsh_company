@@ -5,8 +5,8 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 // 纯类型导入：只需要 `ctx.approval` 的 Context 类型增强（服务本体由 web profile 挂载）。
 // ⚠ 不做值导入——那会把 host 侧核心包的类型图拉进本程序，遮掉 client 面的 sessions 增强（实测）。
 import type {} from '@deepseek-ai/dsh-user-approval'
-import { existsSync, readFileSync, realpathSync } from 'node:fs'
-import { isAbsolute, join, relative, resolve } from 'node:path'
+import { existsSync, readFileSync } from 'node:fs'
+import { isAbsolute, join, relative } from 'node:path'
 import { signoffDecisionNote, signoffReason } from './lib/signoff.ts'
 import { doorsFromSessions } from './lib/doors.ts'
 import { bootstrapCompanyWorkspace, bootstrapEnabled, resolveSkeletonDir } from './host/bootstrap.ts'
@@ -33,6 +33,7 @@ import {
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
 import { prepareCompanyRuntime } from './host/runtime-guard.ts'
 import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace-registry.ts'
+import { canonicalPath } from './host/paths.ts'
 
 /**
  * 在场板读模型（R5b）从 host 入口再导出：`checks/smoke/replay-smoke.mjs` 用它把重放会话的
@@ -65,10 +66,6 @@ export type HostConfig = CultivationHostConfig
  * 挂载面 = 既有 `company-client` 行（bundle 级）⇒ 全部会话与 teammate 可见——r2-motion 实证
  * teammate 可见全局工具行（20 工具清单里有 fs / present / ask_user_question）。
  */
-function canonicalPath(path: string): string {
-  try { return realpathSync(path) } catch { return resolve(path) }
-}
-
 export function apply(ctx: Context, config: HostConfig = {}): void {
   ctx.tools.register(defineTool({
     name: 'request_signoff',
