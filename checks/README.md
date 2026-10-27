@@ -10,7 +10,7 @@
 |---|---|
 | 检查结构、引用与簿记 | `pnpm verify` → [run-gates](run-gates.mjs) |
 | 看运行态全景 / 场景 / 会话历史 | `pnpm orient` → [orient](../tools/orient.mjs) |
-| 看最近会话的失败摘要（中断轮也算失败） | `pnpm diagnose [--strict]` → [diagnose](../tools/diagnose.mjs) |
+| 看最近会话的失败摘要（中断轮、非零 bash、待审批也算） | `pnpm diagnose [--strict]` → [diagnose](../tools/diagnose.mjs) |
 | 检查密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs) · [tracked-token](gates/tracked-token.mjs) · [tracked-secrets](gates/tracked-secrets.mjs) |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；分层守卫 = [layering.spec](../tests/harness/layering.spec.ts) |
 | 类型 / 导入签名改动 | `pnpm typecheck`（命令与预算 = [tests/README §验证分层与预算](../tests/README.md)） |

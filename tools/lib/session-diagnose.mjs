@@ -67,19 +67,32 @@ export function summarizeSessionEvents(records, { recent = 1 } = {}) {
     toolCalls: { total: 0, byName: {} },
     nonCompletedTurns: [],
     toolErrors: [],
+    /** bash 非零退出（tool/result 或 job/settled）；不是 isError，但绝不能整份摘要绿掉。 */
+    toolNonZeroExits: [],
     approvals: [],
+    /** asked 后没有 decided 的审批（等待人，不是进程崩溃）。 */
+    pendingApprovals: [],
     pendingQuestions: [],
+    /** team/member.phase=failed（队友 provision/运行失败）。 */
+    teamFailures: [],
+    /** 中断轮的归因（等人回答/等审批/真崩溃）。 */
+    interruptedHints: [],
     presentCalls: [],
     lastAssistant: [],
   }
   const assistantTexts = []
   const askedApprovals = new Map()
+  const pendingApprovalById = new Map()
+  const toolNameByCall = new Map()
+  const lastToolByTurn = new Map()
+  const nonZeroSeen = new Set()
   const startedTurns = new Set()
   for (const record of records) {
     const type = record?.type
     const data = record?.data ?? {}
     if (type === 'turn/start') {
       startedTurns.add(data.turn ?? null)
+      lastToolByTurn.delete(data.turn ?? null)
     } else if (type === 'turn/end') {
       startedTurns.delete(data.turn ?? null)
       summary.turns++
@@ -95,15 +108,35 @@ export function summarizeSessionEvents(records, { recent = 1 } = {}) {
     } else if (type === 'tool/result') {
       const message = data.message ?? {}
       const isError = message.isError === true || data.isError === true
+      const toolCallId = message.toolCallId ?? data.toolCallId ?? ''
+      const text = redactTokenUrls(textOf(message.content) || detailOf(message.error) || detailOf(data.error)).slice(0, 400)
       if (isError) {
-        summary.toolErrors.push({
-          toolCallId: message.toolCallId ?? data.toolCallId ?? '',
-          text: redactTokenUrls(textOf(message.content) || detailOf(message.error) || detailOf(data.error)).slice(0, 400),
-        })
+        summary.toolErrors.push({ toolCallId, text })
+      } else if (toolCallId !== '' && !nonZeroSeen.has(toolCallId) && toolNameByCall.get(toolCallId) === 'bash') {
+        const match = /\[exit code: (\d+)\]/.exec(text)
+        if (match !== null && Number(match[1]) !== 0) {
+          nonZeroSeen.add(toolCallId)
+          summary.toolNonZeroExits.push({ toolCallId, toolName: 'bash', code: Number(match[1]), text: text.slice(0, 300) })
+        }
+      }
+    } else if (type === 'job/settled') {
+      // bash 的 job/settled 也带退出码；和 tool/result 按 callId 去重。
+      const toolCallId = data.toolCall?.callId ?? data.jobId ?? ''
+      const detail = String(data.detail ?? '')
+      const match = /exit code: (\d+)/.exec(detail)
+      if (data.kind === 'bash' && toolCallId !== '' && match !== null && Number(match[1]) !== 0 && !nonZeroSeen.has(toolCallId)) {
+        nonZeroSeen.add(toolCallId)
+        summary.toolNonZeroExits.push({ toolCallId, toolName: 'bash', code: Number(match[1]), text: String(data.label ?? detail).slice(0, 300) })
       }
     } else if (type === 'approval/asked') {
       askedApprovals.set(data.id, data.toolName ?? '')
+      pendingApprovalById.set(data.id, {
+        id: data.id,
+        toolName: data.toolName ?? '',
+        reason: redactTokenUrls(String(data.reason ?? '')).slice(0, 300),
+      })
     } else if (type === 'approval/decided') {
+      pendingApprovalById.delete(data.id)
       const decision = decisionOf(data)
       if (!isAllowedDecision(decision)) {
         summary.approvals.push({
@@ -119,17 +152,35 @@ export function summarizeSessionEvents(records, { recent = 1 } = {}) {
       })
     } else if (type === 'tool/call') {
       const name = data.name ?? data.toolName ?? data.message?.name ?? ''
+      const callId = data.callId ?? data.id ?? ''
+      if (callId !== '' && typeof name === 'string') toolNameByCall.set(callId, name)
+      lastToolByTurn.set(data.turn ?? null, { name, callId })
       summary.toolCalls.total += 1
       if (typeof name === 'string' && name !== '') {
         summary.toolCalls.byName[name] = (summary.toolCalls.byName[name] ?? 0) + 1
       }
       if (name === 'present') summary.presentCalls.push({ callId: data.id ?? data.callId ?? '' })
+    } else if (type === 'team/member' || type === 'agent-team/member') {
+      const phase = data.phase ?? data.status ?? ''
+      if (phase === 'failed') {
+        summary.teamFailures.push({
+          member: data.member ?? data.id ?? data.name ?? '',
+          detail: redactTokenUrls(detailOf(data.error ?? data.detail ?? data.reason)).slice(0, 300),
+        })
+      }
     } else if (type === 'assistant/message') {
       const text = redactTokenUrls(textOf(data.message) || data.text || '').trim()
       if (text !== '') assistantTexts.push(text)
     }
   }
   summary.interruptedTurns = [...startedTurns].sort((left, right) => Number(left ?? 0) - Number(right ?? 0))
+  summary.pendingApprovals = [...pendingApprovalById.values()].slice(0, 10)
+  summary.interruptedHints = summary.interruptedTurns.map(turn => {
+    const last = lastToolByTurn.get(turn)
+    if (last?.name === 'ask_user_question') return { turn, kind: 'waiting-user', detail: last.name }
+    if (pendingApprovalById.size > 0) return { turn, kind: 'waiting-approval', detail: [...pendingApprovalById.values()][0]?.toolName ?? '' }
+    return { turn, kind: 'interrupted', detail: last?.name ?? '' }
+  })
   summary.lastAssistant = assistantTexts.slice(-Math.max(1, recent)).map(text => text.slice(-600))
   return summary
 }

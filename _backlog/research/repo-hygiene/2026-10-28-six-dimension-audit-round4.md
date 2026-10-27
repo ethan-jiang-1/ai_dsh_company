@@ -112,7 +112,7 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 
 ### R4-06（P1，D6）`diagnose` 仍有三类假绿/误诊
 
-1. **bash 非零退出不计失败**：`tools/lib/session-diagnose.mjs:95-103` 只看 `message.isError`；实测 `session-01b060a7` 有 8 条 `detail: "exit code: 1"` / `[exit code: 1]`，`toolErrors=0`、`FAILURES none`、exit 0。
+1. **bash 非零退出不计失败**：`tools/lib/session-diagnose.mjs:95-103` 只看 `message.isError`；实测 `session-01b060a7` 有 8 个非零退出事件（按 callId 去重后 4 条命令），`toolErrors=0`、`FAILURES none`、exit 0。
 2. **等用户回答/等审批被误诊为崩溃**：未闭合 turn 一律输出“进程被杀/崩溃”；`user-questions/request` 并不总在日志里，`approval/asked` 没有 `decided` 时也不计，`pendingQuestions=0`。
 3. **child 会话不可见**：`tools/diagnose.mjs:66` 与第 84-86 行只收 `session-` 前缀，而 child 目录是 `<childId>`；`team/member.phase=failed` 无分支。队友 provision/运行失败在 lead 摘要里零信号。
 

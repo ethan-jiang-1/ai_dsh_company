@@ -96,6 +96,45 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
     expect(summary.toolErrors[0].text).toBe('{"code":"ENOENT"}')
   })
 
+  it('bash 非零退出进 toolNonZeroExits（tool/result 与 job/settled 按 callId 去重）', () => {
+    const summary = summarizeSessionEvents([
+      { type: 'tool/call', data: { name: 'bash', callId: 'b1', turn: 1 } },
+      { type: 'tool/result', data: { turn: 1, message: { isError: false, toolCallId: 'b1', content: [{ type: 'text', text: 'stat: missing\n[exit code: 1]' }] } } },
+      { type: 'job/settled', data: { kind: 'bash', jobId: 'j1', toolCall: { callId: 'b1' }, detail: 'exit code: 1', label: 'stat missing' } },
+    ])
+    expect(summary.toolErrors).toEqual([])
+    expect(summary.toolNonZeroExits).toEqual([
+      { toolCallId: 'b1', toolName: 'bash', code: 1, text: 'stat: missing\n[exit code: 1]' },
+    ])
+  })
+
+  it('中断轮的最后工具是 ask_user_question → 标「等人回答」，不再冒充进程崩溃', () => {
+    const summary = summarizeSessionEvents([
+      { type: 'turn/start', data: { turn: 7 } },
+      { type: 'tool/call', data: { name: 'ask_user_question', callId: 'q1', turn: 7 } },
+    ])
+    expect(summary.interruptedTurns).toEqual([7])
+    expect(summary.interruptedHints).toEqual([{ turn: 7, kind: 'waiting-user', detail: 'ask_user_question' }])
+  })
+
+  it('approval/asked 没有 decided → pendingApprovals（不是已完成审批）', () => {
+    const summary = summarizeSessionEvents([
+      { type: 'approval/asked', data: { id: 'a1', toolName: 'request_signoff', reason: '毛利 <30%' } },
+      { type: 'turn/start', data: { turn: 3 } },
+      { type: 'tool/call', data: { name: 'request_signoff', callId: 's1', turn: 3 } },
+    ])
+    expect(summary.approvals).toEqual([])
+    expect(summary.pendingApprovals).toEqual([{ id: 'a1', toolName: 'request_signoff', reason: '毛利 <30%' }])
+    expect(summary.interruptedHints).toEqual([{ turn: 3, kind: 'waiting-approval', detail: 'request_signoff' }])
+  })
+
+  it('team/member.phase=failed 折进 teamFailures', () => {
+    const summary = summarizeSessionEvents([
+      { type: 'team/member', data: { member: 'vp-eng', phase: 'failed', error: 'provision timeout' } },
+    ])
+    expect(summary.teamFailures).toEqual([{ member: 'vp-eng', detail: 'provision timeout' }])
+  })
+
   it('redactTokenUrls 只脱敏值，不吞 URL 结构', () => {
     expect(redactTokenUrls(`x https://example.invalid/p?token=${token}&a=1 y`))
       .toBe('x https://example.invalid/p?token=<redacted>&a=1 y')
