@@ -109,9 +109,11 @@ describe('测试分层纪律（guides/dev-loop §9.1：真模型/真浏览器不
     expect(replay, 'replay-smoke 头注必须声明"不进 pnpm test"').toContain('不进 pnpm test')
   })
 
-  it('分层预算写在 guides/dev-loop §9.1（纪律有家，不靠记忆）', () => {
+  it('分层预算写在 tests/README 的命令与预算节（纪律有家，不靠记忆；2026-10-27 自 dev-loop §9.1 迁出）', () => {
+    const home = readFileSync(join(ROOT, 'tests/README.md'), 'utf8')
+    expect(home, 'tests/README 缺「验证分层与预算」节').toContain('验证分层与预算')
+    expect(home, '该节必须写明"真模型 / 真浏览器不进迭代环"').toContain('真模型 / 真浏览器不进迭代环')
     const guide = readFileSync(join(ROOT, 'docs/guides/dev-loop.md'), 'utf8')
-    expect(guide, 'guides/dev-loop 缺 §9.1 测试分层').toContain('9.1 测试分层与预算')
-    expect(guide, '§9.1 必须写明"真模型 / 真浏览器不进迭代环"').toContain('真模型 / 真浏览器不进迭代环')
+    expect(guide, 'dev-loop 的 §9.1 编号必须保留为指针（防断链）').toContain('9.1 测试分层与预算')
   })
 })

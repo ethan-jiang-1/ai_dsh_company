@@ -27,7 +27,7 @@
 //   -（--delegate 档）child 目录里 **没有** Team 工具——0.2.1 的 install-timing 修掉了 0.2.0 的
 //     "one-shot child 误当 Lead"污染；Team 工具若回来 ⇒ 重评 docs/delegation.md §4 的记账
 //
-// 预算（guides/dev-loop §10）：墙钟 ≤ `--wall`（默认 300s）；模型 prompt 1 条（--delegate 档 2 条）。
+// 预算（[policy §P3](../..//docs/policy.md)）：墙钟 ≤ `--wall`（默认 300s）；模型 prompt 1 条（--delegate 档 2 条）。
 // 前置：DSH_HOME + 已装 pack + 模型凭据。
 // 用法：source run/env.sh && node checks/smoke/delegation-smoke.mjs [--port 0] [--wall 300]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'

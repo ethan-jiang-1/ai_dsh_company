@@ -27,7 +27,7 @@ const ANSWERS: Record<string, string> = {
   Q10: 'dag-visual 视觉夹具；human-loop-e2e 人机回路；date-rule 日期口径',
   Q11: 'implemented Note 收尾（授权链线索记在状态行）+ 事实 owner 合同同步',
   Q12: '交付型与打磨型；停止 = 预算耗尽 / 输入源枯竭 / 真卡住',
-  Q13: '挂载 = preset-smoke，行为 = 场景/判据，安装 = release-smoke，批准 = 语义审 + 用户验收；语义审按 dev-loop §13 最小清单，结果记进收尾 Note',
+  Q13: '挂载 = preset-smoke，行为 = 场景/判据，安装 = release-smoke，批准 = 语义审 + 用户验收；语义审按 policy §P5 最小清单，结果记进收尾 Note',
 }
 function good() {
   return { answers: ENTRY_QUESTIONS.map((q: { id: string }) => ({ id: q.id, status: 'answered', answer: ANSWERS[q.id], evidence: [evidence] })), conflicts: [] as string[] }

@@ -1,7 +1,7 @@
 # 测试宪法：什么算证据
 
 > 性质：合同层——本仓测试政策的**唯一家**。什么时候读 = 挑验证、写验收、判断「这算不算证据」时。规则的目标不是让测试变多，是**让绿有意义**。
-> 命令与预算档 = [guides/dev-loop §9.1](./guides/dev-loop.md)；每个脚本头注自述「何时跑/成本/状态」（门禁强制）；
+> 命令与预算档 = [tests/README §验证分层与预算](../tests/README.md)；每个脚本头注自述「何时跑/成本/状态」（门禁强制）；
 > 快照树规则 = [snapshots/README.md](../snapshots/README.md)；理由与教训 = `notes/`。思想源头 = DSH `docs/testing.md`（55 行宪法）经 `_digested/test-strategy` 消化的本仓投影（登记见 [index.md](./index.md) §外部研究材料登记）。
 
 ## 1. 分层与证明边界（每层只证明自己能观察的性质）
@@ -64,7 +64,7 @@
 ## 5. 节奏与授权
 
 - 不默认全量：本地按 §2 选最小证据；CI = 结构门禁 + 干净环境差异；pre-push hook = verify + test。
-- **自测轮**（全门禁 sweep + UX 走查 + entry-probe 语义探针）：agent 阶段收口时提案、用户批后跑（2026-10-04 定）；预算按 dev-loop §10 轻任务纪律。
+- **自测轮**（全门禁 sweep + UX 走查 + entry-probe 语义探针）：agent 阶段收口时提案、用户批后跑（2026-10-04 定）；预算按 [policy §P3](./policy.md) 轻任务纪律。
 - **已知未覆盖面（明说不覆盖）**：多人交互/协作 UX 面——2026-10-06 用户立项首轮猎捕已立 4 个判据探针（dual-ceo / task-discovery / claim-race / dual-signoff，真模型档、常驻，触发见头注）+ 4 张 bug 卡（BUG-002..005 **已修闭环**——修复落地+复跑转绿，卡迁 [_fixed_bugs](../_backlog/_archive/fixed_bugs/)；BUG-006 于 2026-10-07 发现即修。台账 = 那些已修卡，不另留猎捕日记）；机制面 E1/E2 与 `fs-guard-probe` 不变。
 
 ## 6. 升级地图（长大后再借的形状；触发条件即准入门，不预建）

@@ -18,7 +18,7 @@
 | D9 | 上游缺口若成刚需→提 seam，不 vendor patch | [roles-isolation](./design/roles-isolation.md) §4.1 |
 | D10 | docs/ 按性质分层，不按时间分层；否决「初始化/」目录方案 | [docs/AGENTS.md](./AGENTS.md) |
 | D11 | 迭代单位 = 垂直轮 **历史**：轮次制已退役 | [roadmap-retirement](../notes/archived/2026-09-28-roadmap-retirement.md) |
-| D12 | patch 语义：`- id:` 只替换已有行，新增行必须 `- insert:` 子列表 | [dev-loop §4](./guides/dev-loop.md) |
+| D12 | patch 语义：`- id:` 只替换已有行，新增行必须 `- insert:` 子列表 | [bootstrap §插拔速查](./guides/bootstrap.md) |
 | D13 | 开发纪律沿用 DSH；偏离须登记。默认适配自由已收紧 | [AGENTS.md](../AGENTS.md) |
 | D14 | 显示名 `<公司名> <角色>` 序列化；preset id 保持 kebab；公司名现行 = 梦之队（D41） | [wochen-naming](../notes/archived/2026-09-22-wochen-naming.md) |
 | D15 | 完成定义 = 该面最小「真检查」通过；发现权在代理一侧不在人 | [agent-workflow-community-practice](../notes/archived/2026-09-22-agent-workflow-community-practice.md) |
@@ -33,7 +33,7 @@
 | D26 | 文档卫生按指导价值取舍；文件/行数仅观察，不是完成门槛 | [dev-loop](./guides/dev-loop.md) |
 | D27 | 升 pin 偏离官方事务（嵌套工作区不能 vendor 自建）⇒ 手工簿记 + 门禁留证 | [pin-upgrade-0.2.0-rc.2](../notes/archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md) |
 | D28 | 枚举型事实的家 = 实现自己（文档只留分层原则 + 指针） | [entry-execution-chain-debt](../notes/archived/2026-09-26-entry-execution-chain-debt.md) |
-| D29 | 自主优先协议：先探索后发明、借鉴成熟插件、REVIEW 分级 | [dev-loop §13](./guides/dev-loop.md) |
+| D29 | 自主优先协议：先探索后发明、借鉴成熟插件、REVIEW 分级 | [policy §P5](./policy.md) |
 | D30 | notes 侧旧 research 层退役（triage 归 notes/README）；现行调研家 = _backlog/research/ | [notes/README](../notes/README.md) |
 | D31 | 推敲空间 `_backlog/`；只承载判断材料、不承载授权；现行制度 2026-10-09 自 ai_dsh_assitant/_backlog 整体重立 | [_backlog/README](../_backlog/README.md) · [backlog-issue-lifecycle](../notes/implemented/2026-10-09-backlog-issue-lifecycle.md) |
 | D32 | 队列层退役（ROADMAP.md 删除）；已批→RFC 状态行「批准：」标记 | [roadmap-retirement](../notes/archived/2026-09-28-roadmap-retirement.md) |

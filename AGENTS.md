@@ -35,7 +35,7 @@ snapshots/              回归证据资产；规则与分类 = snapshots/README.
 ```sh
 git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 corepack enable pnpm && pnpm install   # workspace 解析；全配方（含 vendor 构建）见 guides/bootstrap
-source run/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 接线（⚠ coding 会话 DSH_HOME 带日用值——dev-loop §6）
+source run/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 接线（⚠ coding 会话 DSH_HOME 带日用值——[environments §6](docs/guides/environments.md)）
 pnpm bundle:init                       # fresh clone：建 dev run bundle 的 workspace（制度件符号链接指回 pack；已有盘不动）
 pnpm verify                            # 结构门禁（清单唯一源 = checks/gates/ 目录）
 pnpm test                              # keyless 回归（真模型/浏览器不进；layering 守卫）
@@ -50,7 +50,7 @@ source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的完
 
 ## 密钥
 
-`pnpm dsh` 与真模型冒烟需 `DEEPSEEK_API_KEY`；**密钥住凭据库 `<home>/.credentials.yaml`，不是环境变量**——`env | grep DEEPSEEK` 为空**不代表**没配（2026-10-18 实证：真模型探针曾因此被误判搁置）；自检 = `pnpm orient` 的「凭据」行。凭据按 home 隔离（`runtime/harness-home` 配一次，dev-loop §6）；永不提交密钥。
+`pnpm dsh` 与真模型冒烟需 `DEEPSEEK_API_KEY`；**密钥住凭据库 `<home>/.credentials.yaml`，不是环境变量**——`env | grep DEEPSEEK` 为空**不代表**没配（2026-10-18 实证：真模型探针曾因此被误判搁置）；自检 = `pnpm orient` 的「凭据」行。凭据按 home 隔离（`runtime/harness-home` 配一次，[environments](docs/guides/environments.md)）；永不提交密钥。
 
 ## DSH 源码：三个实体，别混
 
@@ -62,7 +62,7 @@ source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的完
 
 | 纪律 | 权威（vendor 树） | 本仓落点 |
 |---|---|---|
-| 任务反馈面；按变更选检查、只报告实跑过的 | `packages/todo` / `packages/plan` / `AGENTS.md` | dev-loop §0.5/§1/§9.1/§12（收尾含语义审，清单 = §13） |
+| 任务反馈面；按变更选检查、只报告实跑过的 | `packages/todo` / `packages/plan` / `AGENTS.md` | [dev-loop](docs/guides/dev-loop.md) §0.5/§1/§12 + [policy §P5](docs/policy.md)（语义审） |
 | docs = 当前合同（一处事实一个家，只写 now）；文档卫生 | `docs/AGENTS.md` | docs/ 分层；行预算 = doc-budget 门禁 `DOC_LINE_BUDGETS`；细则 = dev-loop §12 |
 | 非平凡变更同 diff 带 Note（决定/输掉的方案/验证什么）；日志税 | `.agents/notes/README.md` / `AGENTS.md` Conventions | notes/proposed/ → notes/implemented/；写什么 = [notes/README.md](notes/README.md) |
 | 完成定义 = 最小真检查；测试分层；真实入口与安装形状 | `docs/testing.md` / `docs/postmortem/0003-web-agent-gui-feedback-loop.md` | 本仓 [测试宪法](docs/testing.md) + layering 守卫；preset = preset-smoke；安装 = release-smoke（[release.md](docs/release.md)） |
@@ -73,7 +73,7 @@ source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的完
 
 **`vendor/` 下受版本控制的内容一个字节都不许改**（submodule HEAD == 簿记 SHA + 工作树零改动）。允许面与三条正路（bundle patch / 提上游升 pin / 先证伪"不可用"再自建）= [release.md §vendor 政策](docs/release.md)；⚠ 禁 `git clean -x`。
 
-**本仓原生纪律**：§11 工具态与越界写入（工具状态先落仓库 gitignored 区）、§13 自主优先协议（先探索后发明、借鉴成熟插件）——规则唯一见 [dev-loop §11/§13](docs/guides/dev-loop.md)。**不发明**：不自造 spec 流程/调度器/记忆/门禁，优先用 DSH 现成载体。
+**本仓原生纪律**：§11 工具态与越界写入（工具状态先落仓库 gitignored 区）、§13 自主优先协议（先探索后发明、借鉴成熟插件）——规则唯一见 [policy §P4/§P5](docs/policy.md)。**不发明**：不自造 spec 流程/调度器/记忆/门禁，优先用 DSH 现成载体。
 
 ## vendor 簿记
 

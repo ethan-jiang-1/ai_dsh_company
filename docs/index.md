@@ -16,6 +16,9 @@
 | [design/roles-isolation.md](./design/roles-isolation.md) | 设计 | 每角色独立六面的机制安排；composition 继承分水岭与 `mount()` 裂缝；M1–M4 编排选型；两个诚实的缺口（§4） |
 | [design/ui-demo.md](./design/ui-demo.md) | 设计 | Web UI 演示层：现成团队 UI（零代码）、公司皮肤（slots/Remote）、demo 分镜 |
 | [design/role-content-plan.md](./design/role-content-plan.md) | 设计 | 角色内容的设计原则与探针设计（persona/skills/KB 分工依据；现时语义唯一家 = [presets.md](./presets.md)） |
+| [policy.md](./policy.md) | 政策 | 常设规则唯一家：授权边界（P1）、门禁升格（P2）、自动化上限（P3）、越界写入（P4）、自主协议（P5） |
+| [guides/debugging.md](./guides/debugging.md) | 指南 | 插件开发的排查阶梯：组合层 → 装载层 → 生效层 → 会话层 → 回归层（自 dev-loop §2 迁出） |
+| [guides/environments.md](./guides/environments.md) | 指南 | 双 home / 双 DSH / 凭据 / 端口 / 排练场 / 沙箱后端的运行环境细节（自 dev-loop §6 迁出） |
 | [guides/budget-and-ops.md](./guides/budget-and-ops.md) | 指南 | 限流旋钮总表、成本结构、demo 运维 runbook（症状→动作）、回放复盘 |
 | [guides/dev-loop.md](./guides/dev-loop.md) | 指南 | 开发操作手册：任务入口与授权（§0.5）、实施和证据交接（§1）；其余按改动面查调试、发布、双 home 等章节 |
 | [guides/bootstrap.md](./guides/bootstrap.md) | 指南 | 冷启动引导（clean checkout → 可跑通）：配方、双面构建与实证坑（2026-09-27 自 dev-loop §7 迁入） |

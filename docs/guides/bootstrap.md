@@ -134,3 +134,23 @@ node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名�
   **只有防线二能抓"preset 挂载失败"**：行 config 校验发生在挂载时，roster 扫描与 `--dump-config`
   都看不到，UI 还会吞掉错误（症状就是"新建会话点了没反应"）。已反证：去掉一个必填 config 即变红
   （精确指向 preset 与缺失字段），恢复后 ALL PASS。
+
+## 插拔速查（装法，2026-10-27 自开发环 §4 迁出）
+
+装法（按离源码远近）：
+
+| 装法 | 命令 | 用途 |
+|---|---|---|
+| workspace 直跑 | `source run/env.sh && pnpm dsh --profile headless "…"` | 日常开发，改配置即刻生效 |
+| patch overlay | `pnpm dsh --profile <p> --patch ./run/try-x.patch.yml` | 一次性实验某插件行，不落盘 |
+| **公司 overlay（headless 动议）** | `pnpm dsh --profile headless --patch ./run/company.overlay.yml "…"` | 无 web-app 行的组合里补公司行（insert 语法）；R1 用它验过全组合 |
+| profile 内持久（dev = link:） | `pnpm dsh plugin --profile <p> add link:./packages/company-pack` | **日常开发**：符号链接指仓库源码，内容改动即刻生效；store/cache 由 profile `.npmrc` 钉在 repo 内 |
+| profile 内持久（真实形状） | `pnpm dsh plugin --profile <p> add file:./packages/company-pack` | 仅验证真实安装形状——归 R5a release-smoke（干净 profile；`plugin` 子命令把参数转发给 profile 目录里的 pnpm） |
+| 正式分发 | `pnpm dsh plugin --profile <p> add <npm-name>` | 用户视角；CI 测兼容矩阵 |
+
+⚠ overlay 语法（R1 实证）：`- id:` **只替换已有行**（not found 会警告丢弃）；**新增行必须
+`- insert:` 子列表**（教义源自 shipped dsh-headless/dsh-web-app 的 cordis.patch.yml）。
+
+拔法（从轻到重）：会话不挂 preset → patch 行 `disabled: true`（行还在，Loader 每次 mount
+求值）→ 卸载（registrations are effects，无残留）。异常时先 `--dump-config` 对照实际组合
+再下结论。

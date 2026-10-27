@@ -141,7 +141,7 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 - **OpenSpec 引入**（原 dev-loop §5 时点表随迁）：触发条件 = **第二贡献者进场**或**向 DSH 上游提 seam**（配合 D9 走方案 B）；此前 notes/ 纪律够用（FAQ 13 answer.md 决策 5）。
 - 发布前必跑：`pnpm verify` + `pnpm test`（迭代环）+ `release-smoke`（认证档）+
   `channel-matrix-smoke --channel all`（真实 npm 通道）；
-  preset/内容改动另跑 `preset-smoke`（guides/dev-loop §9.1 分层）。
+  preset/内容改动另跑 `preset-smoke`（[tests/README §验证分层与预算](../tests/README.md)）。
 
 ## 手动分发（`node tools/export-dist.mjs`，无 key、秒级；2026-09-28 立，精神借 ai_dsh_architect）
 

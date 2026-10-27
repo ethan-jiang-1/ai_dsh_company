@@ -1,7 +1,7 @@
 # web-rpc：驱动 Web 面会话（RPC；R1 实证）
 
 > 性质：指南层 runbook——脚本化建会话、发 prompt、列会话与读会话日志的 HTTP RPC 面。
-> 何时读：验证角色行为（preset 只在 Web 面挂载，dev-loop §2 第 3.6 层）、自动化建会话/发动议、
+> 何时读：验证角色行为（preset 只在 Web 面挂载，[debugging](./debugging.md) 的 Web 面层）、自动化建会话/发动议、
 > 或 UI 静默失败要拿真实错误时。2026-10-12 自 dev-loop §8 整节迁出（常驻层瘦身轮；dev-loop §8
 > 留指针、节号防断链）。
 
