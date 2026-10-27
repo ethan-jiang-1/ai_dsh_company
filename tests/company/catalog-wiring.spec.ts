@@ -9,7 +9,7 @@ import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { apply } from '../../packages/company-pack/src/index.ts'
-import { catalogPath } from '../../packages/company-pack/src/host/catalog.ts'
+import { catalogPath, presentedLedgerPath } from '../../packages/company-pack/src/host/catalog.ts'
 
 let root: string
 let workspace: string
@@ -64,6 +64,8 @@ describe('host catalog wiring', () => {
     const after = JSON.parse(readFileSync(catalogPath(workspace), 'utf8')) as { entries: { presented: boolean | null }[] }
     expect(after.entries).toHaveLength(1)
     expect(after.entries[0]?.presented).toBe(true)
+    const ledger = JSON.parse(readFileSync(presentedLedgerPath(workspace), 'utf8')) as { paths: Record<string, boolean> }
+    expect(ledger.paths['deliverables/2026-10-25-alpha/final.md']).toBe(true)
   })
 
   it('host guard：session cwd 不在公司盘 → 告警', () => {
@@ -82,6 +84,9 @@ describe('host catalog wiring', () => {
     expect(warn.mock.calls.some(([message]) => String(message).includes('不在公司盘'))).toBe(true)
     for (const listener of added) listener({ origin: 'root', sessionId: 'session-inside', cwd: workspace, running: true })
     expect(warn.mock.calls.some(([message]) => String(message).includes('session-inside'))).toBe(false)
+    mkdirSync(join(workspace, 'sub'), { recursive: true })
+    for (const listener of added) listener({ origin: 'root', sessionId: 'session-sub', cwd: join(workspace, 'sub'), running: true })
+    expect(warn.mock.calls.some(([message]) => String(message).includes('不是公司盘根'))).toBe(true)
   })
 
   it('损坏的 bundle.json 告警且不覆盖（不把损坏当首启）', () => {

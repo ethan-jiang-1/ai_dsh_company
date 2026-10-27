@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { bootstrapCompanyWorkspace } from '../../packages/company-pack/src/host/bootstrap.ts'
 import { planBundleManifest } from '../../packages/company-pack/src/host/bundle-manifest.ts'
-import { regenerateCatalog } from '../../packages/company-pack/src/host/catalog.ts'
+import { recordPresented, regenerateCatalog } from '../../packages/company-pack/src/host/catalog.ts'
 
 const PACK = { name: 'dsh-company-pack', version: '0.3.8' }
 const skeleton = join(ROOT, 'packages/company-pack/workspace')
@@ -33,7 +33,8 @@ describe('两个 home 的公司盘隔离', () => {
       expect(pa.manifest.id).not.toBe(pb.manifest.id)
       expect(readFileSync(join(wa, 'kb/company.md'), 'utf8')).toContain('Acme')
       expect(readFileSync(join(wb, 'kb/company.md'), 'utf8')).toContain('Beta')
-      const ca = regenerateCatalog(wa, { paths: ['deliverables/2026-10-26-a/final.md'] }).catalog
+      const recorded = recordPresented(wa, { paths: ['deliverables/2026-10-26-a/final.md'] })
+      const ca = regenerateCatalog(wa, recorded.ledger).catalog
       const cb = regenerateCatalog(wb).catalog
       expect(ca?.entries.map(e => e.slug)).toEqual(['a'])
       expect(ca?.entries[0]?.presented).toBe(true)

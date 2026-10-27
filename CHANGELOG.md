@@ -2,6 +2,17 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.3.11 — 2026-10-27
+
+### Changed
+
+- **公司数据作用域收口**：培养记录/成品目录/方法层命令只认 `bundle.json` 解析出的公司盘根；session `header.cwd` 在盘子目录或盘外时明确拒绝公司数据写入（不再只告警），避免一个公司盘长出多份账本。
+- **显式换盘**：新增 `DSH_COMPANY_REBIND=1` 一次性换盘；旧盘必须已搬走，先备份 `bundle.json` 再改写 workspace，并写升级日志。默认硬阻断不变；只迁 pack 数据，不迁 DSH session 的绝对 `header.cwd`。
+- **`presented` 拆成审计账本 + 派生索引**：新增 `kb/deliverables-presented.json`（`true` 来自会话事件，`false` 是操作员审计）；索引只做派生视图。账本缺失时从旧索引迁移，`true` 可从会话事件回扫；账本损坏/更高 schema 保留原文件并 fail loud。
+- **版本与原子写**：`bundle.json` 校验 `v`/必填字段，更高版本保留原文件并告警；catalog/账本 schema 更高时告警；首建 manifest 与基部升级改临时文件 + rename/link，升级中断不再留下半截基部文件。
+- **备份合同拆分**：安装手册把备份分为 `business`（公司盘 + `bundle.json` + 方法层，不含 sessions/密钥/搜索索引）与 `full`（整 home，加密限权），并补恢复与换盘步骤。
+- **事实级数据卡**：新增 `docs/data-model.md`；README Data 与 FAQ 26 登记同步。
+
 ## 0.3.10 — 2026-10-26
 
 ### Fixed

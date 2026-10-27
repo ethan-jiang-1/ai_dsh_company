@@ -25,8 +25,8 @@ import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 // 纯类型导入：ctx.commands 的 Context 增强（服务本体由 base bundle 挂载，vendor patch 钉行）。
 import type {} from '@deepseek-ai/dsh-commands'
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { readFileSync, realpathSync } from 'node:fs'
+import { join, resolve } from 'node:path'
 import {
   clipExcerpt,
   contextSummary,
@@ -80,6 +80,32 @@ function sessionFaceOf(agent: AgentLike | undefined): SessionFace | null {
   if (typeof role !== 'string' || role === '' || !ROSTER.has(role)) return null
   if (typeof cwd !== 'string' || cwd === '') return null
   return { role, cwd }
+}
+
+function canonicalPath(path: string): string {
+  try { return realpathSync(path) } catch { return resolve(path) }
+}
+
+/**
+ * 公司数据作用域：bundle 的公司盘根，不是 session cwd。
+ *
+ * FAQ 26 的“作用域先于存储”：公司是 home/bundle 级；session cwd 只是会话工作目录，用户完全
+ * 可以把会话开在公司盘子目录。若按 cwd 写培养记录，一个公司会出现多份账本。这里只认盘根；
+ * 盘外/子目录一律给出可操作错误，由调用方决定文案。`companyHome` 缺席 = 兼容 keyless 测试与
+ * 非 bundle 组合，退回 cwd（生产 host 恒传盘根）。
+ * @param face - 会话角色 + cwd。
+ * @param companyHome - bundle 解析出的公司盘根（已 canonical）。
+ * @returns 可写根；或一句给用户看的问题。
+ */
+function companyScopeOf(face: SessionFace, companyHome: string | undefined): { readonly root: string; readonly problem?: string } {
+  const cwd = canonicalPath(face.cwd)
+  if (companyHome === undefined) return { root: cwd }
+  const root = canonicalPath(companyHome)
+  if (cwd === root) return { root }
+  return {
+    root,
+    problem: `公司数据只写 bundle 的公司盘根（${root}）；当前会话 cwd 是 ${cwd}。请在侧栏以公司盘根开新会话，不要在子目录/盘外会话里培养。`,
+  }
 }
 
 /** 背景读取的 host 最小读面（sessionQuery 懒取；缺席 = 明确报错，不静默降级）。 */
@@ -177,10 +203,10 @@ async function readSessionContext(query: SessionQueryLike, ref: CultivationConte
 }
 
 /** 成品背景：只认 `kb/deliverables-index.json` 里的条目（不做任意文件读）。 */
-function readDeliverableContext(cwd: string, ref: CultivationContextRef): ContextRead {
+function readDeliverableContext(companyRoot: string, ref: CultivationContextRef): ContextRead {
   let raw: unknown
   try {
-    raw = JSON.parse(readFileSync(join(cwd, 'kb', 'deliverables-index.json'), 'utf8'))
+    raw = JSON.parse(readFileSync(join(companyRoot, 'kb', 'deliverables-index.json'), 'utf8'))
   } catch {
     return { problem: '读不到成品目录（生成器未跑或索引缺失）——仍可选会话，或直接手写。' }
   }
@@ -207,7 +233,7 @@ function readDeliverableContext(cwd: string, ref: CultivationContextRef): Contex
   return { context }
 }
 
-async function readContext(ctx: Context, cwd: string, ref: CultivationContextRef): Promise<ContextRead> {
+async function readContext(ctx: Context, companyRoot: string, ref: CultivationContextRef): Promise<ContextRead> {
   if (ref.kind === 'session') {
     const query = sessionQueryOf(ctx)
     if (query === undefined) return { problem: '这个界面读不了会话历史（sessionQuery 未挂）。' }
@@ -219,7 +245,7 @@ async function readContext(ctx: Context, cwd: string, ref: CultivationContextRef
   }
   if (ref.kind === 'deliverable') {
     try {
-      return readDeliverableContext(cwd, ref)
+      return readDeliverableContext(companyRoot, ref)
     } catch (error) {
       return { problem: `这段背景读不到：${errorMessage(error)}。` }
     }
@@ -235,16 +261,21 @@ function splitBody(raw: string): { readonly head: string, readonly body: string 
 }
 
 /** 命令行为只依赖会话输入、配置与培养存储；Cordis 注册留在外层适配器。 */
-function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context) {
+function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false) {
   return async ({ agent, rawInput }: { readonly agent?: AgentLike, readonly rawInput: string }) => {
     const face = sessionFaceOf(agent)
     if (face === null) {
       return { kind: 'error' as const, text: '培养命令需要公司角色会话（当前会话不是五角色 preset，或 cwd 缺席）。' }
     }
+    if (dataBlocked) {
+      return { kind: 'error' as const, text: 'bundle.json 身份损坏或版本高于本包，公司数据已停写；先修复/恢复 manifest 再培养。' }
+    }
+    const scope = companyScopeOf(face, companyHome)
+    if (scope.problem !== undefined) return { kind: 'error' as const, text: scope.problem }
     const { head, body } = splitBody(rawInput)
     const tokens = head.split(/\s+/).filter(t => t !== '')
     const sub = tokens[0] ?? ''
-    const recordsDir = join(face.cwd, RECORDS_REL)
+    const recordsDir = join(scope.root, RECORDS_REL)
 
     // correct [--context=<token>] <期望行为一句话> :: <做法与证据正文>
     // suggest <角色> [--context=<token>] <期望行为一句话> :: <建议与证据>
@@ -272,7 +303,7 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
         if (!decoded.ok) return { kind: 'error' as const, text: decoded.problem }
         const item = decoded.command.items[0]
         if (item === undefined) return { kind: 'error' as const, text: '背景只能带一段（v1）。' }
-        const read = await readContext(ctx, face.cwd, item)
+        const read = await readContext(ctx, scope.root, item)
         if ('problem' in read) return { kind: 'error' as const, text: read.problem }
         contexts = [read.context]
       }
@@ -416,7 +447,7 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
 }
 
 /** 「/cultivation」命令族与提案工具的注册面。 */
-export function registerCultivation(ctx: Context, config: CultivationHostConfig): void {
+export function registerCultivation(ctx: Context, config: CultivationHostConfig, companyHome?: string, dataBlocked = false): void {
   const storage = nodeCultivationStorage
   // ── 分身提案工具（V3）：只开提案，不开采纳 ──────────────────────────────────
   ctx.tools.register(defineTool({
@@ -468,6 +499,13 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig)
       if (face === null) {
         return { id: '', recorded: false, note: '提案需要公司角色会话上下文（agent preset + cwd）。' }
       }
+      if (dataBlocked) {
+        return { id: '', recorded: false, note: 'bundle.json 身份损坏或版本高于本包，公司数据已停写；先修复/恢复 manifest。' }
+      }
+      const scope = companyScopeOf(face, companyHome)
+      if (scope.problem !== undefined) {
+        return { id: '', recorded: false, note: scope.problem }
+      }
       if (!ROSTER.has(args.targetRole)) {
         return { id: '', recorded: false, note: `目标角色 ${args.targetRole} 不在名册（${CULTIVATION_ROLES.join('/')}）。` }
       }
@@ -480,7 +518,7 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig)
       if (args.kind !== 'correction' && args.kind !== 'suggestion') {
         return { id: '', recorded: false, note: 'kind 只认 correction / suggestion。' }
       }
-      const id = storage.writeRecord(join(face.cwd, RECORDS_REL), {
+      const id = storage.writeRecord(join(scope.root, RECORDS_REL), {
         kind: args.kind,
         targetRole: args.targetRole,
         proposerRole: face.role,
@@ -502,6 +540,6 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig)
     name: 'cultivation',
     description: '培养回路：给自己的角色提交纠正、给别的角色提建议、采纳/拒绝/验证/撤回方法（采纳仅目标角色本人）',
     input: { hint: 'correct <期望行为> :: <做法与证据> | suggest <角色> <期望行为> :: <建议> | adopt <id> [as <slug>] | reject <id> :: <理由> | verify <id> <pass|fail> | revoke <slug>' },
-    handler: cultivationCommandHandler(config, storage, ctx),
+    handler: cultivationCommandHandler(config, storage, ctx, companyHome, dataBlocked),
   })
 }

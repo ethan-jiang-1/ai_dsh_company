@@ -5,21 +5,24 @@
  * ③workspace 在 home 内记相对、在外记绝对；④workspace 不存在不冒充 bundle；⑤骨架指纹跳过 dotfile/符号链接。
  * 反证：把 `writeFileSync(..., { flag: 'wx' })` 的 flag 换成默认 ⇒ 「二次不覆盖」红。
  */
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
   applySkeletonUpgrade,
+  applyWorkspaceRebind,
   bundleManifestPath,
   planBundleManifest,
   planSkeletonUpgrade,
+  planWorkspaceRebind,
   readBundleManifest,
   readBundleManifestState,
   resolvePackMetadata,
   resolveRecordedWorkspace,
   skeletonDigest,
+  validateBundleManifest,
   workspaceRecord,
   writeBundleManifest,
   writeUpgradedManifest,
@@ -262,6 +265,154 @@ describe('manifest 损坏与原子写（2026-10-25 审查补证）', () => {
     } finally {
       rmSync(skel, { recursive: true, force: true })
       rmSync(dsh, { recursive: true, force: true })
+    }
+  })
+})
+
+
+describe('manifest 版本校验（2026-10-27 FAQ 26 对齐）', () => {
+  it('v 比本包新 ⇒ unsupported（保留原文件，不 cast 成 v1）', () => {
+    const dsh = home()
+    try {
+      const path = join(dsh, 'bundle.json')
+      const raw = JSON.stringify({
+        v: 2,
+        id: 'future',
+        createdAt: '2026-10-27T00:00:00.000Z',
+        pack: PACK,
+        workspace: 'company-workspace',
+        skeleton: { version: '0.3.0', files: {} },
+      })
+      writeFileSync(path, raw)
+      const state = readBundleManifestState(dsh)
+      expect(state.status).toBe('unsupported')
+      if (state.status === 'unsupported') {
+        expect(state.version).toBe(2)
+        expect(state.error).toContain('高于本包支持')
+      }
+      expect(readBundleManifest(dsh)).toBeNull()
+      expect(readFileSync(path, 'utf8')).toBe(raw)
+    } finally {
+      rmSync(dsh, { recursive: true, force: true })
+    }
+  })
+
+  it('v1 但缺 skeleton/files 等必填 ⇒ corrupt；坏文件原样保留', () => {
+    const dsh = home()
+    try {
+      const path = join(dsh, 'bundle.json')
+      writeFileSync(path, JSON.stringify({ v: 1, id: 'x', createdAt: 't', pack: PACK, workspace: 'w' }))
+      const state = readBundleManifestState(dsh)
+      expect(state.status).toBe('corrupt')
+      expect(validateBundleManifest({ v: 1 }).ok).toBe(false)
+      expect(readFileSync(path, 'utf8')).toContain('"v":1')
+    } finally {
+      rmSync(dsh, { recursive: true, force: true })
+    }
+  })
+
+  it('首建用临时文件 + link 发布，不留 .tmp；强制并发计划也不会覆盖', () => {
+    const skel = skeleton()
+    const dsh = home()
+    try {
+      const plan = planBundleManifest({ dshHome: dsh, companyHome: join(dsh, 'company-workspace'), skeletonDir: skel, pack: PACK, id: 'first' })
+      expect(writeBundleManifest(plan).created).toBe(true)
+      expect(readdirSync(dsh).some(name => name.endsWith('.tmp'))).toBe(false)
+      const before = readFileSync(plan.path, 'utf8')
+      expect(writeBundleManifest({ ...plan, action: 'create', manifest: { ...plan.manifest, id: 'second' } }).created).toBe(false)
+      expect(readFileSync(plan.path, 'utf8')).toBe(before)
+    } finally {
+      rmSync(skel, { recursive: true, force: true }); rmSync(dsh, { recursive: true, force: true })
+    }
+  })
+
+  it('基部目标是指向用户文件的符号链接 ⇒ keep，不覆盖', () => {
+    const skel = skeleton()
+    const dsh = home()
+    const ws = join(dsh, 'company-workspace')
+    const outside = join(mkdtempSync(join(tmpdir(), 'bundle-link-')), 'outside.md')
+    try {
+      writeFileSync(join(skel, 'kb/org.md'), '# org\n')
+      cpSync(skel, ws, { recursive: true })
+      const v1 = planBundleManifest({ dshHome: dsh, companyHome: ws, skeletonDir: skel, pack: PACK, id: 'link' })
+      writeBundleManifest(v1)
+      rmSync(join(ws, 'kb/org.md'))
+      writeFileSync(outside, '# user-owned\n')
+      symlinkSync(outside, join(ws, 'kb/org.md'))
+      writeFileSync(join(skel, 'kb/org.md'), '# org v2\n')
+      const plan = planSkeletonUpgrade({ manifest: readBundleManifest(dsh)!, skeletonDir: skel, workspace: ws, pack: { ...PACK, version: '0.3.1' } })
+      expect(plan.actions.find(action => action.rel === 'kb/org.md')).toMatchObject({ action: 'keep', reason: 'occupied' })
+      applySkeletonUpgrade(plan, skel, ws)
+      expect(lstatSync(join(ws, 'kb/org.md')).isSymbolicLink()).toBe(true)
+      expect(readFileSync(join(ws, 'kb/org.md'), 'utf8')).toBe('# user-owned\n')
+    } finally {
+      rmSync(skel, { recursive: true, force: true }); rmSync(dsh, { recursive: true, force: true }); rmSync(join(outside, '..'), { recursive: true, force: true })
+    }
+  })
+})
+
+describe('显式换盘（2026-10-27 FAQ 26 对齐 P0）', () => {
+  const external = (): { root: string; ws: string } => {
+    const root = mkdtempSync(join(tmpdir(), 'rebind-'))
+    const ws = join(root, 'company')
+    mkdirSync(join(ws, 'kb'), { recursive: true })
+    writeFileSync(join(ws, 'AGENTS.md'), '# 手册\n')
+    writeFileSync(join(ws, 'kb/org.md'), '# org\n')
+    return { root, ws }
+  }
+
+  it('旧盘已不在 + 新盘形状对 ⇒ 备份旧 manifest、改写 workspace、记日志、数据不动', () => {
+    const skel = skeleton()
+    const dsh = home()
+    const source = external()
+    const target = external()
+    try {
+      cpSync(skel, source.ws, { recursive: true })
+      writeFileSync(join(source.ws, 'AGENTS.md'), '# 用户手册\n')
+      const plan = planBundleManifest({ dshHome: dsh, companyHome: source.ws, skeletonDir: skel, pack: PACK, id: 'rebind' })
+      writeBundleManifest(plan)
+      const before = readFileSync(plan.path, 'utf8')
+      cpSync(source.ws, target.ws, { recursive: true })
+      rmSync(source.ws, { recursive: true, force: true })
+
+      const decision = planWorkspaceRebind({ dshHome: dsh, manifest: readBundleManifest(dsh)!, companyHome: target.ws, now: new Date('2026-10-27T00:00:00Z') })
+      expect(decision.ok).toBe(true)
+      if (!decision.ok) return
+      expect(decision.plan.backupPath).toContain('bundle.json.bak-')
+      applyWorkspaceRebind(decision.plan)
+      const manifest = readBundleManifest(dsh)!
+      expect(manifest.id).toBe('rebind')
+      expect(manifest.workspace).toBe(target.ws.split('\\').join('/'))
+      expect(readFileSync(decision.plan.backupPath, 'utf8')).toBe(before)
+      expect(readFileSync(join(dsh, 'logs/company-pack-upgrade.log'), 'utf8')).toContain('换盘')
+      expect(readFileSync(join(target.ws, 'AGENTS.md'), 'utf8')).toBe('# 用户手册\n')
+      expect(readFileSync(join(target.ws, 'kb/org.md'), 'utf8')).toBe('# org\n')
+    } finally {
+      rmSync(skel, { recursive: true, force: true }); rmSync(dsh, { recursive: true, force: true })
+      rmSync(source.root, { recursive: true, force: true }); rmSync(target.root, { recursive: true, force: true })
+    }
+  })
+
+  it('拒绝：旧盘仍在 / 新盘不存在 / 新盘形状不对 / 同一路径', () => {
+    const skel = skeleton()
+    const dsh = home()
+    const source = external()
+    const target = external()
+    try {
+      cpSync(skel, source.ws, { recursive: true })
+      const plan = planBundleManifest({ dshHome: dsh, companyHome: source.ws, skeletonDir: skel, pack: PACK, id: 'rebind-deny' })
+      writeBundleManifest(plan)
+      const manifest = readBundleManifest(dsh)!
+      expect(planWorkspaceRebind({ dshHome: dsh, manifest, companyHome: target.ws }).ok).toBe(false)
+      expect(planWorkspaceRebind({ dshHome: dsh, manifest, companyHome: join(target.root, 'missing') }).ok).toBe(false)
+      rmSync(source.ws, { recursive: true, force: true })
+      const empty = join(target.root, 'empty')
+      mkdirSync(empty, { recursive: true })
+      expect(planWorkspaceRebind({ dshHome: dsh, manifest, companyHome: empty }).ok).toBe(false)
+      expect(planWorkspaceRebind({ dshHome: dsh, manifest, companyHome: source.ws }).ok).toBe(false)
+    } finally {
+      rmSync(skel, { recursive: true, force: true }); rmSync(dsh, { recursive: true, force: true })
+      rmSync(source.root, { recursive: true, force: true }); rmSync(target.root, { recursive: true, force: true })
     }
   })
 })

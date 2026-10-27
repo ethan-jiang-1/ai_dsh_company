@@ -11,9 +11,18 @@ import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import {
   catalogPath,
+  emptyPresentedLedger,
+  ensurePresentedLedger,
+  mergePresented,
   presentedFromEvent,
+  presentedFromSessions,
+  presentedLedgerPath,
   readCatalog,
+  readCatalogState,
+  readPresentedLedger,
+  recordPresented,
   regenerateCatalog,
+  writePresentedLedger,
 } from '../../packages/company-pack/src/host/catalog.ts'
 import {
   ledgerSlugsFromText,
@@ -81,18 +90,20 @@ describe('host catalog', () => {
     expect([...observed.paths]).toEqual(['deliverables/2026-10-25-alpha/final.md'])
     expect([...observed.slugs]).toEqual(['alpha'])
 
-    const afterPresent = regenerateCatalog(root, observed)
+    const ledger = mergePresented(emptyPresentedLedger(), observed)
+    writePresentedLedger(root, ledger)
+    const afterPresent = regenerateCatalog(root, ledger)
     expect(afterPresent.catalog?.entries[0]?.presented).toBe(true)
     expect(afterPresent.catalog?.counts.presented).toBe(1)
 
     mkdirSync(join(root, 'deliverables-archive'), { recursive: true })
     renameSync(join(root, 'deliverables/2026-10-25-alpha'), join(root, 'deliverables-archive/2026-10-25-alpha'))
-    const archived = regenerateCatalog(root)
+    const archived = regenerateCatalog(root, ledger)
     expect(archived.catalog?.entries[0]?.root).toBe('deliverables-archive')
     expect(archived.catalog?.entries[0]?.presented).toBe(true)
   })
 
-  it('保留既有 catalog 的 presented=false（审计结论不被冲成未核）', () => {
+  it('旧索引的 presented=false 迁移进账本，索引重建后审计结论不丢', () => {
     const root = workspace()
     deliverable(root)
     regenerateCatalog(root)
@@ -100,24 +111,82 @@ describe('host catalog', () => {
     const raw = JSON.parse(readFileSync(path, 'utf8')) as { entries: { presented: boolean | null }[] }
     raw.entries[0]!.presented = false
     writeFileSync(path, `${JSON.stringify(raw, null, 2)}\n`)
+
+    const bootstrap = ensurePresentedLedger(root)
+    expect(bootstrap.migrated).toBe(true)
+    expect(readPresentedLedger(root).status).toBe('ok')
+    expect(bootstrap.ledger.paths['deliverables/2026-10-25-alpha/final.md']).toBe(false)
+    expect(regenerateCatalog(root, bootstrap.ledger).catalog?.entries[0]?.presented).toBe(false)
+  })
+
+  it('账本里的 presented=false 是权威：索引重生成不会把它冲成未核', () => {
+    const root = workspace()
+    deliverable(root)
+    writePresentedLedger(root, {
+      schema: 1,
+      updatedAt: '2026-10-27T00:00:00.000Z',
+      paths: { 'deliverables/2026-10-25-alpha/final.md': false },
+      slugs: {},
+    })
     expect(regenerateCatalog(root).catalog?.entries[0]?.presented).toBe(false)
   })
 
-  it('旧 false 只按精确 path 保留；同 slug 新件不继承未 present', () => {
+  it('present 事件可以把审计 false 翻成 true；账本损坏时 present 不覆盖', () => {
     const root = workspace()
     deliverable(root)
-    const path = catalogPath(root)
-    writeFileSync(path, `${JSON.stringify({
+    writePresentedLedger(root, {
       schema: 1,
-      generatedAt: '2026-10-24T00:00:00.000Z',
-      counts: {},
-      entries: [{
-        slug: 'alpha',
-        path: 'deliverables/2026-10-24-alpha/final.md',
-        presented: false,
-      }],
-    }, null, 2)}\n`)
+      updatedAt: '2026-10-27T00:00:00.000Z',
+      paths: { 'deliverables/2026-10-25-alpha/final.md': false },
+      slugs: {},
+    })
+    const recorded = recordPresented(root, { paths: ['deliverables/2026-10-25-alpha/final.md'], slugs: ['alpha'] })
+    expect(recorded.ledger?.paths['deliverables/2026-10-25-alpha/final.md']).toBe(true)
+    expect(regenerateCatalog(root, recorded.ledger).catalog?.entries[0]?.presented).toBe(true)
+
+    writeFileSync(presentedLedgerPath(root), '{ bad json')
+    const refused = recordPresented(root, { paths: ['deliverables/2026-10-25-alpha/final.md'] })
+    expect(refused.ledger).toBeUndefined()
+    expect(refused.warning).toContain('损坏')
+    expect(readFileSync(presentedLedgerPath(root), 'utf8')).toBe('{ bad json')
+  })
+
+  it('presented 账本 schema 更高 → unsupported，保留原文件', () => {
+    const root = workspace()
+    writeFileSync(presentedLedgerPath(root), JSON.stringify({ schema: 2, updatedAt: 'x', paths: {}, slugs: {} }))
+    const state = readPresentedLedger(root)
+    expect(state.status).toBe('unsupported')
+    const bootstrap = ensurePresentedLedger(root)
+    expect(bootstrap.warning).toContain('schema 2')
+    expect(readFileSync(presentedLedgerPath(root), 'utf8')).toContain('"schema":2')
+  })
+
+  it('false 只按精确 path 生效；同 slug 新件不继承未 present', () => {
+    const root = workspace()
+    deliverable(root)
+    writePresentedLedger(root, {
+      schema: 1,
+      updatedAt: '2026-10-27T00:00:00.000Z',
+      paths: { 'deliverables/2026-10-24-alpha/final.md': false },
+      slugs: { alpha: false },
+    })
     expect(regenerateCatalog(root).catalog?.entries[0]?.presented).toBeNull()
+
+    writePresentedLedger(root, {
+      schema: 1,
+      updatedAt: '2026-10-27T00:00:01.000Z',
+      paths: { 'deliverables/2026-10-25-alpha/final.md': false },
+      slugs: {},
+    })
+    expect(regenerateCatalog(root).catalog?.entries[0]?.presented).toBe(false)
+  })
+
+  it('catalog schema 2 → unsupported（host 可告警），坏 JSON → corrupt', () => {
+    const root = workspace()
+    writeFileSync(catalogPath(root), JSON.stringify({ schema: 2, entries: [] }))
+    expect(readCatalogState(root)).toMatchObject({ status: 'unsupported', schema: 2 })
+    writeFileSync(catalogPath(root), '{ bad json')
+    expect(readCatalogState(root).status).toBe('corrupt')
   })
 
   it('坏 catalog JSON：readCatalog 返回 null，regenerate 重建且不留 .tmp', () => {
@@ -144,9 +213,44 @@ describe('host catalog', () => {
     const b = workspace()
     deliverable(a)
     deliverable(b)
-    regenerateCatalog(a, { paths: ['deliverables/2026-10-25-alpha/final.md'] })
+    const recorded = recordPresented(a, { paths: ['deliverables/2026-10-25-alpha/final.md'], slugs: ['alpha'] })
+    regenerateCatalog(a, recorded.ledger)
     expect(readCatalog(a)?.entries[0]?.presented).toBe(true)
     expect(regenerateCatalog(b).catalog?.entries[0]?.presented).toBeNull()
+  })
+
+  it('presentedFromSessions：只扫公司盘内会话，收集事件并释放 observation', async () => {
+    const root = workspace()
+    deliverable(root)
+    mkdirSync(join(root, 'sub'), { recursive: true })
+    const disposed: string[] = []
+    const events = new Map<string, unknown[]>([
+      ['s-in', [{
+        type: 'deliverables/presented',
+        data: { files: [{ path: join(root, 'deliverables/2026-10-25-alpha/final.md') }] },
+      }]],
+      ['s-sub', [{
+        type: 'deliverables/presented',
+        data: { files: [{ path: join(root, 'deliverables/2026-10-25-alpha/final.md') }] },
+      }]],
+      ['s-out', [{ type: 'deliverables/presented', data: { files: [{ path: join(root, 'x/final.md') }] } }]],
+    ])
+    const query = {
+      listSessions: async () => [
+        { header: { id: 's-in', cwd: root } },
+        { header: { id: 's-sub', cwd: join(root, 'sub') } },
+        { header: { id: 's-out', cwd: '/tmp/elsewhere' } },
+      ],
+      observeSession: async (id: string) => ({
+        events: (events.get(id) ?? []) as { type?: string, data?: unknown }[],
+        [Symbol.dispose]: () => { disposed.push(id) },
+      }),
+    }
+    const result = await presentedFromSessions(query, root)
+    expect(result.scanned).toBe(2)
+    expect([...result.paths]).toEqual(['deliverables/2026-10-25-alpha/final.md'])
+    expect([...result.slugs]).toEqual(['alpha'])
+    expect(disposed.sort()).toEqual(['s-in', 's-sub'])
   })
 
   it('meta 缺行/枚举外标出 metaProblem，不冒充形状通过', () => {

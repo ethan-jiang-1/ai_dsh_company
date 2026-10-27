@@ -13,7 +13,20 @@
  * - 不抛：调用方按 bootstrap 同样纪律接住错误（apply 期抛错会连累应用）。
  */
 import { createHash, randomUUID } from 'node:crypto'
-import { appendFileSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  appendFileSync,
+  existsSync,
+  linkSync,
+  lstatSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  realpathSync,
+  renameSync,
+  rmSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs'
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -62,6 +75,18 @@ export interface ManifestPlan {
 }
 
 const toPosix = (value: string): string => value.split(sep).join('/')
+
+/** 同目录临时文件 + rename：崩溃时要么旧文件、要么新文件，不留半截。 */
+function atomicWriteFile(path: string, data: string | Uint8Array): void {
+  const temporary = `${path}.${String(process.pid)}.${String(Date.now())}.${randomUUID()}.tmp`
+  try {
+    writeFileSync(temporary, data, { flag: 'wx' })
+    renameSync(temporary, path)
+  } catch (error) {
+    try { unlinkSync(temporary) } catch { /* 临时文件未创建或已 rename */ }
+    throw error
+  }
+}
 
 /** 读 `<pack>/package.json` 的 name/version；读不到时给出可诊断的错误。 */
 export function resolvePackMetadata(moduleUrl: string): PackMetadata {
@@ -142,16 +167,24 @@ export function planBundleManifest(options: {
   return { path, manifest, action: 'create' }
 }
 
-/** 执行计划：只创建；并发/竞态下 `wx` 失败视为已有（skip），绝不覆盖。 */
+/** 执行计划：只创建；并发/竞态下 `link` 失败视为已有（skip），绝不覆盖。 */
 export function writeBundleManifest(plan: ManifestPlan): { created: boolean; skipped: boolean } {
   if (plan.error !== undefined || plan.action === 'skip') return { created: false, skipped: true }
   mkdirSync(dirname(plan.path), { recursive: true })
+  // 不直接 writeFileSync(path, { flag: 'wx' })：并发第二个 Host 可能读到半截 JSON。
+  // 先写临时文件，再用同目录硬链接“发布”——目标已存在时 link 失败，天然保持只创建。
+  const temporary = `${plan.path}.${String(process.pid)}.${String(Date.now())}.${randomUUID()}.tmp`
   try {
-    writeFileSync(plan.path, `${JSON.stringify(plan.manifest, null, 2)}\n`, { flag: 'wx' })
-    return { created: true, skipped: false }
-  } catch (error) {
-    if ((error as { code?: string }).code === 'EEXIST') return { created: false, skipped: true }
-    throw error
+    writeFileSync(temporary, `${JSON.stringify(plan.manifest, null, 2)}\n`, { flag: 'wx' })
+    try {
+      linkSync(temporary, plan.path)
+      return { created: true, skipped: false }
+    } catch (error) {
+      if ((error as { code?: string }).code === 'EEXIST') return { created: false, skipped: true }
+      throw error
+    }
+  } finally {
+    try { unlinkSync(temporary) } catch { /* 已 link 走或未创建 */ }
   }
 }
 
@@ -164,18 +197,71 @@ export function readBundleManifest(dshHome: string): BundleManifest | null {
 export type BundleManifestState =
   | { readonly status: 'missing'; readonly path: string }
   | { readonly status: 'corrupt'; readonly path: string; readonly error: string }
+  | { readonly status: 'unsupported'; readonly path: string; readonly version: number; readonly error: string }
   | { readonly status: 'ok'; readonly path: string; readonly manifest: BundleManifest }
 
+interface ManifestValidation {
+  readonly ok: boolean
+  readonly manifest?: BundleManifest
+  readonly error?: string
+  readonly unsupportedVersion?: number
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
 /**
- * 区分「没装过」与「装过但文件坏了」——两者都返回 null 会让 host 把损坏当首启、静默跳过升级。
- * corrupt 时保留原文件，由调用方告警并要求人工修复（不覆盖身份）。
+ * 校验 manifest 的**最低身份形状**（v / id / pack / workspace / skeleton）。
+ *
+ * 为什么不是 `JSON.parse` 后直接 cast：0.3.10 及以前只要文件能解析就当 ok；一个未来版本或手工
+ * 改坏的 manifest 会被当成 v1 去跑升级，轻则静默跳过、重则覆盖身份。未知版本必须保留原文件并
+ * 让调用方告警；损坏形状走 corrupt，不猜、不覆盖。
+ * @param value - `JSON.parse` 的结果。
+ * @returns 校验结果；`unsupportedVersion` 在场 = 文件是合法 JSON，但版本比本包新。
+ */
+export function validateBundleManifest(value: unknown): ManifestValidation {
+  if (!isRecord(value)) return { ok: false, error: '不是对象' }
+  const version = value.v
+  if (typeof version !== 'number' || !Number.isSafeInteger(version) || version < 1) {
+    return { ok: false, error: `v 不是正整数（${String(version)}）` }
+  }
+  if (version > BUNDLE_MANIFEST_VERSION) {
+    return { ok: false, error: `manifest 版本 ${String(version)} 高于本包支持的 ${String(BUNDLE_MANIFEST_VERSION)}`, unsupportedVersion: version }
+  }
+  if (version !== BUNDLE_MANIFEST_VERSION) {
+    return { ok: false, error: `不支持的 manifest 版本 ${String(version)}` }
+  }
+  if (typeof value.id !== 'string' || value.id.trim() === '') return { ok: false, error: '缺 id' }
+  if (typeof value.createdAt !== 'string' || value.createdAt.trim() === '') return { ok: false, error: '缺 createdAt' }
+  if (!isRecord(value.pack)) return { ok: false, error: '缺 pack' }
+  if (typeof value.pack.name !== 'string' || value.pack.name.trim() === '') return { ok: false, error: 'pack.name 非法' }
+  if (typeof value.pack.version !== 'string' || value.pack.version.trim() === '') return { ok: false, error: 'pack.version 非法' }
+  if (typeof value.workspace !== 'string' || value.workspace.trim() === '') return { ok: false, error: '缺 workspace' }
+  if (!isRecord(value.skeleton)) return { ok: false, error: '缺 skeleton' }
+  if (typeof value.skeleton.version !== 'string' || value.skeleton.version.trim() === '') return { ok: false, error: 'skeleton.version 非法' }
+  if (!isRecord(value.skeleton.files)) return { ok: false, error: 'skeleton.files 非法' }
+  for (const [rel, hash] of Object.entries(value.skeleton.files)) {
+    if (rel === '' || typeof hash !== 'string' || hash === '') return { ok: false, error: `skeleton.files[${rel}] 非法` }
+  }
+  return { ok: true, manifest: value as unknown as BundleManifest }
+}
+
+/**
+ * 区分「没装过」「装过但文件坏了」「文件是更新的版本」——三者都返回 null 会让 host 把损坏当首启、
+ * 静默跳过升级。corrupt/unsupported 时保留原文件，由调用方告警并要求人工处理（不覆盖身份）。
  */
 export function readBundleManifestState(dshHome: string): BundleManifestState {
   const path = join(dshHome, BUNDLE_MANIFEST_FILENAME)
   try {
     if (!existsSync(path)) return { status: 'missing', path }
     if (!lstatSync(path).isFile()) return { status: 'corrupt', path, error: '不是普通文件' }
-    return { status: 'ok', path, manifest: JSON.parse(readFileSync(path, 'utf8')) as BundleManifest }
+    const parsed: unknown = JSON.parse(readFileSync(path, 'utf8'))
+    const validation = validateBundleManifest(parsed)
+    if (validation.ok) return { status: 'ok', path, manifest: validation.manifest! }
+    if (validation.unsupportedVersion !== undefined) {
+      return { status: 'unsupported', path, version: validation.unsupportedVersion, error: validation.error! }
+    }
+    return { status: 'corrupt', path, error: validation.error! }
   } catch (error) {
     return { status: 'corrupt', path, error: (error as Error).message }
   }
@@ -218,6 +304,15 @@ export interface SkeletonUpgradePlan {
 
 const hashFile = (path: string): string => createHash('sha256').update(readFileSync(path)).digest('hex')
 
+function lstatOrNull(path: string): ReturnType<typeof lstatSync> | null {
+  try {
+    return lstatSync(path)
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
+    throw error
+  }
+}
+
 /** 计算升级计划（只读）。 */
 export function planSkeletonUpgrade(options: {
   readonly manifest: BundleManifest
@@ -229,15 +324,27 @@ export function planSkeletonUpgrade(options: {
   const actions: SkeletonUpgradeAction[] = []
   for (const [rel, nextHash] of Object.entries(nextFiles).sort(([a], [b]) => a.localeCompare(b))) {
     const target = join(options.workspace, rel)
-    if (!existsSync(target)) {
+    let info: ReturnType<typeof lstatSync> | null
+    try {
+      info = lstatOrNull(target)
+    } catch {
+      actions.push({ rel, action: 'keep', reason: 'occupied' })
+      continue
+    }
+    if (info === null || info === undefined) {
       actions.push({ rel, action: 'create' })
+      continue
+    }
+    // 符号链接/目录/设备不是我们的基部文件：绝不 rename 覆盖用户的东西。
+    if (info.isSymbolicLink() || !info.isFile()) {
+      actions.push({ rel, action: 'keep', reason: 'occupied' })
       continue
     }
     let current: string
     try {
       current = hashFile(target)
     } catch {
-      actions.push({ rel, action: 'keep' })
+      actions.push({ rel, action: 'keep', reason: 'occupied' })
       continue
     }
     if (current === nextHash) {
@@ -271,7 +378,7 @@ export function applySkeletonUpgrade(plan: SkeletonUpgradePlan, skeletonDir: str
     if (action.action === 'keep') { kept.push(action.rel); continue }
     const target = join(workspace, action.rel)
     mkdirSync(dirname(target), { recursive: true })
-    writeFileSync(target, readFileSync(join(skeletonDir, action.rel)))
+    atomicWriteFile(target, readFileSync(join(skeletonDir, action.rel)))
     if (action.action === 'create') created.push(action.rel)
     else updated.push(action.rel)
   }
@@ -289,4 +396,111 @@ export function writeUpgradedManifest(path: string, manifest: BundleManifest): v
     try { rmSync(temporary, { force: true }) } catch { /* 保留原错误 */ }
     throw error
   }
+}
+
+// ── 显式换盘（2026-10-27，FAQ 26 数据模型对齐 P0）────────────────────────────────
+// 为什么不是“改 env 就自动跟随”：bundle.json 的 workspace 是身份的一部分；静默跟随会让一个
+// home 分裂成两个盘。这里保留默认硬阻断，只在 `DSH_COMPANY_REBIND=1` 且**旧盘已不在**时做
+// 一次性、有备份、有日志的 rebind。DSH 自己的 session header.cwd 仍是绝对旧路径，不在本函数范围。
+export const REBIND_ENV = 'DSH_COMPANY_REBIND'
+
+/** 是否显式请求换盘（`1` / `on`）。 */
+export function rebindEnabled(env: Record<string, string | undefined> = process.env): boolean {
+  const value = env[REBIND_ENV]
+  return value === '1' || value === 'on'
+}
+
+function canonicalPath(path: string): string {
+  try { return realpathSync(path) } catch { return resolve(path) }
+}
+
+export interface WorkspaceRebindPlan {
+  readonly manifestPath: string
+  readonly oldWorkspace: string
+  readonly newWorkspace: string
+  readonly manifest: BundleManifest
+  readonly backupPath: string
+  readonly warnings: readonly string[]
+}
+
+export type WorkspaceRebindDecision =
+  | { readonly ok: true; readonly plan: WorkspaceRebindPlan }
+  | { readonly ok: false; readonly error: string }
+
+/**
+ * 计算换盘计划（只读）。硬条件：旧盘已不存在、新盘存在且像公司盘、manifest 有效。
+ * @param options - home / manifest / 新盘 / 时钟。
+ * @returns 可执行计划，或一句可操作的拒绝原因。
+ */
+export function planWorkspaceRebind(options: {
+  readonly dshHome: string
+  readonly manifest: BundleManifest
+  readonly companyHome: string
+  readonly now?: Date
+}): WorkspaceRebindDecision {
+  const oldWorkspace = resolveRecordedWorkspace(options.dshHome, options.manifest.workspace)
+  if (oldWorkspace === undefined) return { ok: false, error: 'manifest.workspace 为空，无法确定旧公司盘' }
+  const newWorkspace = resolve(options.companyHome)
+  if (canonicalPath(oldWorkspace) === canonicalPath(newWorkspace)) {
+    return { ok: false, error: '新旧公司盘是同一个路径，不需要 rebind' }
+  }
+  if (existsSync(oldWorkspace)) {
+    return { ok: false, error: `旧公司盘仍存在（${oldWorkspace}）；先确认已搬走/改名，避免一个 home 出现两份盘` }
+  }
+  if (!existsSync(newWorkspace)) return { ok: false, error: `新公司盘不存在：${newWorkspace}` }
+  let info: ReturnType<typeof lstatSync>
+  try {
+    info = lstatSync(newWorkspace)
+  } catch (error) {
+    return { ok: false, error: `新公司盘读不到：${(error as Error).message}` }
+  }
+  if (info.isSymbolicLink() || !info.isDirectory()) {
+    return { ok: false, error: `新公司盘不是普通目录：${newWorkspace}` }
+  }
+  if (!existsSync(join(newWorkspace, 'AGENTS.md'))
+    || (!existsSync(join(newWorkspace, 'kb/company.md')) && !existsSync(join(newWorkspace, 'kb/org.md')))) {
+    return { ok: false, error: `新公司盘形状不对（缺 AGENTS.md 或 kb/company.md / kb/org.md）：${newWorkspace}` }
+  }
+  const warnings: string[] = []
+  const baseFiles = Object.keys(options.manifest.skeleton.files)
+  let matched = 0
+  for (const rel of baseFiles) {
+    try {
+      if (existsSync(join(newWorkspace, rel))
+        && hashFile(join(newWorkspace, rel)) === options.manifest.skeleton.files[rel]) matched += 1
+    } catch { /* 读不到就当没匹配，最后只告警 */ }
+  }
+  if (baseFiles.length > 0 && matched === 0) {
+    warnings.push('新盘里没有任何基部文件与 manifest 记录一致；仍按显式 rebind 继续，请确认这是同一份公司盘')
+  }
+  const stamp = (options.now ?? new Date()).toISOString().replace(/[:.]/g, '-')
+  const manifestPath = bundleManifestPath(options.dshHome)
+  let backupPath = `${manifestPath}.bak-${stamp}`
+  let suffix = 1
+  while (existsSync(backupPath)) {
+    backupPath = `${manifestPath}.bak-${stamp}-${String(suffix)}`
+    suffix += 1
+  }
+  return {
+    ok: true,
+    plan: {
+      manifestPath,
+      oldWorkspace,
+      newWorkspace,
+      manifest: { ...options.manifest, workspace: workspaceRecord(options.dshHome, newWorkspace) },
+      backupPath,
+      warnings,
+    },
+  }
+}
+
+/**
+ * 执行换盘：旧 manifest 原字节备份 → 原子改写 workspace → 记升级日志。
+ * 失败时保留备份与原文件；调用方按普通错误处理（不静默）。
+ * @param plan - {@link planWorkspaceRebind} 的产出。
+ */
+export function applyWorkspaceRebind(plan: WorkspaceRebindPlan): void {
+  writeFileSync(plan.backupPath, readFileSync(plan.manifestPath), { flag: 'wx' })
+  atomicWriteFile(plan.manifestPath, `${JSON.stringify(plan.manifest, null, 2)}\n`)
+  appendUpgradeLog(dirname(plan.manifestPath), `换盘 ${plan.oldWorkspace} → ${plan.newWorkspace}（备份 ${plan.backupPath}）`)
 }

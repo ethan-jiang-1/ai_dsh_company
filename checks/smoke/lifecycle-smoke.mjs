@@ -62,13 +62,16 @@ const copyPack = (source, target) => {
 let processes
 let home
 let movedHome
+let restoreHome
 let ownsProfile = false
 try {
   const devHome = requireDevHome('lifecycle-smoke')
   home = join(devHome, 'tmp/lifecycle-smoke-home')
   movedHome = join(devHome, 'tmp/lifecycle-smoke-home-moved')
+  restoreHome = join(devHome, 'tmp/lifecycle-restore-home')
   rmSync(home, { recursive: true, force: true })
   rmSync(movedHome, { recursive: true, force: true })
+  rmSync(restoreHome, { recursive: true, force: true })
   mkdirSync(home, { recursive: true })
 
   const cliDir = join(ROOT, 'vendor/dsh/apps/cli')
@@ -101,7 +104,8 @@ try {
     const child = processes.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
     await child.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
     await waitFor(() => existsSync(join(home, 'bundle.json'))
-      && existsSync(join(companyHome, 'kb/deliverables-index.json')), '首启落盘')
+      && existsSync(join(companyHome, 'kb/deliverables-index.json'))
+      && existsSync(join(companyHome, 'kb/deliverables-presented.json')), '首启落盘')
     const output = child.output
     await child.stop()
     return output
@@ -245,7 +249,47 @@ try {
   check('卸载后公司盘与 bundle.json 仍在', existsSync(join(companyHome, 'AGENTS.md')) && existsSync(manifestPath))
   check('卸载后扩张面仍在', existsSync(journal) && existsSync(final) && existsSync(meta))
 
-  console.log('⑦ 迁移：搬 home 后重装 + 启动')
+  console.log('⑦ business 备份恢复（公司盘 + bundle.json；不含 sessions）')
+  const restoreProfileDir = join(restoreHome, 'profiles', PROFILE)
+  const restoreCompanyHome = join(restoreHome, 'tmp/lifecycle-company-workspace')
+  mkdirSync(restoreProfileDir, { recursive: true })
+  cpSync(companyHome, restoreCompanyHome, { recursive: true })
+  cpSync(manifestPath, join(restoreHome, 'bundle.json'))
+  writeFileSync(join(restoreProfileDir, 'package.json'), `${JSON.stringify({
+    name: `dsh-profile-${PROFILE}`, private: true,
+    dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app'], patchReload: 'startup' } },
+  }, null, 2)}\n`)
+  writeFileSync(join(restoreProfileDir, 'pnpm-workspace.yaml'), 'packages:\n  - .\n\nnodeLinker: hoisted\nautoInstallPeers: false\n')
+  writeFileSync(join(restoreProfileDir, '.npmrc'), `store-dir=${join(ROOT, '.pnpm-store')}\ncache-dir=${join(restoreHome, 'cache/pnpm')}\n`)
+  const restoreEnv = plainNodeEnv({
+    ...process.env,
+    DSH_HOME: restoreHome,
+    DSH_COMPANY_HOME: restoreCompanyHome,
+    DSH_COMPANY_BOOTSTRAP: 'if-missing',
+    npm_config_cache: join(restoreHome, 'npm-cache'),
+    npm_config_store_dir: join(ROOT, '.pnpm-store'),
+    npm_config_verify_deps_before_run: 'false',
+  })
+  const restoreProcesses = releaseProcesses({ cwd: ROOT, env: restoreEnv })
+  try {
+    await restoreProcesses.run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${v2}`], { timeoutMs: 180_000 })
+    const child = restoreProcesses.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
+    await child.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
+    await waitFor(() => existsSync(join(restoreCompanyHome, 'kb/deliverables-presented.json'))
+      && existsSync(join(restoreCompanyHome, 'kb/deliverables-index.json')), '恢复后落盘')
+    await child.stop()
+    const restoredManifest = JSON.parse(readFileSync(join(restoreHome, 'bundle.json'), 'utf8'))
+    check('business 恢复后 boot 成功且 workspace 可解析', restoredManifest.workspace === 'tmp/lifecycle-company-workspace', restoredManifest.workspace)
+    check('business 恢复公司盘与扩张面仍在', readFileSync(join(restoreCompanyHome, 'AGENTS.md'), 'utf8').includes('lifecycle-keep')
+      && existsSync(join(restoreCompanyHome, 'deliverables/2026-10-25-lifecycle/final.md'))
+      && existsSync(join(restoreCompanyHome, 'kb/ceo/journal/2026-10-25-lifecycle.md')))
+    check('business 恢复不带 sessions（按合同）', !existsSync(join(restoreHome, 'sessions'))
+      || readdirSync(join(restoreHome, 'sessions')).length === 0)
+  } finally {
+    await restoreProcesses.close()
+  }
+
+  console.log('⑧ 迁移：搬 home 后重装 + 启动')
   await processes.close()
   const movedV2 = join(movedHome, relative(home, v2))
   renameSync(home, movedHome)
@@ -266,7 +310,8 @@ try {
     const movedChild = movedProcesses.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
     await movedChild.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
     await waitFor(() => existsSync(join(movedHome, 'bundle.json'))
-      && existsSync(join(movedCompanyHome, 'kb/deliverables-index.json')), '迁移后落盘')
+      && existsSync(join(movedCompanyHome, 'kb/deliverables-index.json'))
+      && existsSync(join(movedCompanyHome, 'kb/deliverables-presented.json')), '迁移后落盘')
     await movedChild.stop()
     const movedManifest = JSON.parse(readFileSync(join(movedHome, 'bundle.json'), 'utf8'))
     check('迁移后 boot 成功且 workspace 记录仍可解析', movedManifest.workspace === 'tmp/lifecycle-company-workspace',
@@ -285,10 +330,11 @@ try {
   if (!KEEP) {
     if (home !== undefined) rmSync(home, { recursive: true, force: true })
     if (movedHome !== undefined) rmSync(movedHome, { recursive: true, force: true })
+    if (restoreHome !== undefined) rmSync(restoreHome, { recursive: true, force: true })
   }
   if (ownsProfile) console.log(KEEP ? '  --keep：home 保留' : '  生命周期临时 home 已回收')
 }
 console.log(failures.length === 0
-  ? '\nlifecycle-smoke: ALL PASS（v1 真装 → 改基部 → v2 真装 → 启动 → 卸载 → 迁移）'
+  ? '\nlifecycle-smoke: ALL PASS（v1 真装 → 改基部 → v2 真装 → 启动 → 卸载 → business 恢复 → 迁移）'
   : `\nlifecycle-smoke: ${failures.length} FAILURE(S)`)
 process.exitCode = failures.length === 0 ? 0 : 1

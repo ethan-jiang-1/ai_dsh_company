@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 何时跑：升级/替换 profile、运行中安装边界改动后；发布前手动
-// 成本：~2 分钟 keyless（0.3.9 boot 中 remove/add 0.3.10，再重启验证）
+// 成本：~2 分钟 keyless（当前版 boot 中 remove/add 下一 patch，再重启验证）
 // 前置：已导出当前 `_dist` tarball；当前 pack 可 npm pack
 //
 // 证明形状：运行中的旧实例不因 profile 包被替换而崩/丢数据；重启后升到新版本，旧 session 仍在。
@@ -15,7 +15,12 @@ const BASE = join(ROOT, 'runtime/upgrade-while-running-smoke')
 const CLI = join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js')
 const PACK = JSON.parse(readFileSync(join(ROOT, 'packages/company-pack/package.json'), 'utf8'))
 const V1 = join(ROOT, '_dist', `dsh-company-pack-${PACK.version}.tgz`)
-const V2_VERSION = '0.3.10'
+const V2_VERSION = (() => {
+  const parts = PACK.version.split('.')
+  const patch = Number(parts[2])
+  if (parts.length !== 3 || !Number.isSafeInteger(patch)) throw new Error(`无法从 ${PACK.version} 生成下一版版本`)
+  return `${parts[0]}.${parts[1]}.${String(patch + 1)}`
+})()
 const V2 = join(BASE, `dsh-company-pack-${V2_VERSION}.tgz`)
 const HOME = join(BASE, 'home'); const WS = join(HOME, 'company-workspace')
 const failures = []; const active = new Set()
@@ -40,7 +45,7 @@ try {
   rmSync(BASE, { recursive: true, force: true }); mkdirSync(join(BASE, 'bin'), { recursive: true }); mkdirSync(join(BASE, 'user'), { recursive: true })
   writeFileSync(join(BASE, 'bin/dsh'), `#!/bin/sh\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(CLI)} "$@"\n`, { mode: 0o755 })
   if (!existsSync(V1)) throw new Error(`缺 ${V1}；先导出 _dist`)
-  check('0.3.9 安装成功', dsh(['plugin', '--profile', 'web', 'add', `file:${V1}`]).status === 0)
+  check('当前版安装成功', dsh(['plugin', '--profile', 'web', 'add', `file:${V1}`]).status === 0)
   const old = await boot(); const oldRpc = await rpc(old)
   const created = await oldRpc('session/create', { request: { cwd: WS, agentPreset: 'ceo' } })
   const sessionId = created?.sessionId ?? created?.id
@@ -49,7 +54,7 @@ try {
   mkdirSync(join(WS, 'kb/ceo/journal'), { recursive: true })
   writeFileSync(join(WS, 'kb/ceo/journal/acme.md'), '# Acme\n')
 
-  console.log('① 构造 0.3.10 tarball')
+  console.log(`① 构造 ${V2_VERSION} tarball`)
   const v2Pack = join(BASE, 'pack-v2')
   cpSync(join(ROOT, 'packages/company-pack'), v2Pack, { recursive: true, filter: p => !p.split(sep).includes('node_modules') && !p.split(sep).includes('.git') })
   const manifest = JSON.parse(readFileSync(join(v2Pack, 'package.json'), 'utf8'))
@@ -57,13 +62,13 @@ try {
   writeFileSync(join(v2Pack, 'package.json'), `${JSON.stringify(manifest, null, 2)}\n`)
   writeFileSync(join(v2Pack, 'workspace/templates/weekly-report.md'), `${readFileSync(join(v2Pack, 'workspace/templates/weekly-report.md'), 'utf8')}\n<!-- while-running-v2 -->\n`)
   const packed = spawnSync('npm', ['pack', '--pack-destination', BASE], { cwd: v2Pack, env, encoding: 'utf8', timeout: 120_000 })
-  check('0.3.10 tarball 产出', packed.status === 0 && existsSync(V2), (packed.stderr ?? '').slice(-160))
+  check(`${V2_VERSION} tarball 产出`, packed.status === 0 && existsSync(V2), (packed.stderr ?? '').slice(-160))
 
-  console.log('② 旧实例仍在运行时 remove/add 0.3.10')
+  console.log(`② 旧实例仍在运行时 remove/add ${V2_VERSION}`)
   const removed = dsh(['plugin', '--profile', 'web', 'remove', 'dsh-company-pack'])
   check('运行中 remove 成功', removed.status === 0, `exit=${String(removed.status)}`)
   const added = dsh(['plugin', '--profile', 'web', 'add', `file:${V2}`])
-  check('运行中 add 0.3.10 成功', added.status === 0, `exit=${String(added.status)} ${(added.stderr ?? '').slice(-160)}`)
+  check(`运行中 add ${V2_VERSION} 成功`, added.status === 0, `exit=${String(added.status)} ${(added.stderr ?? '').slice(-160)}`)
   let oldAlive = false
   try {
     const r = await oldRpc('agentPresets/list', {})
@@ -74,10 +79,10 @@ try {
   } catch (error) { check('旧实例仍可响应 RPC', false, String(error.message).split('\n')[0]) }
   await stop(old)
 
-  console.log('③ 重启到 0.3.10：会话/数据还在')
+  console.log(`③ 重启到 ${V2_VERSION}：会话/数据还在`)
   const next = await boot(); const nextRpc = await rpc(next)
   const bundle = JSON.parse(readFileSync(join(HOME, 'bundle.json'), 'utf8'))
-  check('bundle 前移到 0.3.10', bundle?.pack?.version === V2_VERSION, String(bundle?.pack?.version))
+  check(`bundle 前移到 ${V2_VERSION}`, bundle?.pack?.version === V2_VERSION, String(bundle?.pack?.version))
   check('重启后 roster 含 ceo', (await nextRpc('agentPresets/list', {})).presets?.some(p => p.id === 'ceo') === true)
   check('旧 session 仍在 session/list', (await nextRpc('session/list', { _request: {} })).items?.some(item => item.sessionId === sessionId) === true, String(sessionId))
   check('数据仍在', readFileSync(join(WS, 'kb/company.md'), 'utf8').includes('Acme') && readFileSync(join(WS, 'kb/ceo/journal/acme.md'), 'utf8').includes('Acme'))

@@ -49,7 +49,7 @@
 | [interrupted-install-smoke.mjs](smoke/interrupted-install-smoke.mjs) | remove 后坏 add、profile package 损坏、re-add 后数据/roster 恢复（keyless；~2min） |
 | [permissions-recovery-smoke.mjs](smoke/permissions-recovery-smoke.mjs) | 只读 workspace、缺骨架补建、坏 catalog 重建（keyless；~1.5min） |
 | [profile-row-smoke.mjs](smoke/profile-row-smoke.mjs) | 用户 profile patch 真实改 default、第二 bundle disabled row 共存/卸载（keyless；~1.5min） |
-| [upgrade-while-running-smoke.mjs](smoke/upgrade-while-running-smoke.mjs) | 旧实例运行中 remove/add 新版本，旧实例仍响应；重启后 0.3.10/session/data（keyless；~2min） |
+| [upgrade-while-running-smoke.mjs](smoke/upgrade-while-running-smoke.mjs) | 旧实例运行中 remove/add 新版本，旧实例仍响应；重启后新版本/session/data（keyless；~2min） |
 | [concurrent-home-smoke.mjs](smoke/concurrent-home-smoke.mjs) | 同 home 两进程首启后 bundle/catalog/数据可解析、单实例恢复（keyless；~1min） |
 | [external-workspace-smoke.mjs](smoke/external-workspace-smoke.mjs) | DSH_COMPANY_HOME 在 home 外、bundle.workspace 绝对路径、只搬 home 后 boot/数据不丢（keyless；~1min） |
 | [refactor-drift-oracle.mjs](smoke/refactor-drift-oracle.mjs) | 纯搬移/拆分的零行为漂移：拆前/拆后 vitest 清单比对（`--hashes` 档含测试体指纹 ⇒ 拦改名/增删/**测试体改动**；两档都放行文件与 describe 归属搬家） |

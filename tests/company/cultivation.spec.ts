@@ -257,6 +257,7 @@ type RegisteredCultivationTool = Parameters<Context['tools']['register']>[0]
 function cultivationRegistrations(
   config: CultivationHostConfig,
   sessionQuery?: unknown,
+  companyHome?: string,
 ): {
   readonly command: CommandDefinition['handler']
   readonly proposal: RegisteredCultivationTool
@@ -268,7 +269,7 @@ function cultivationRegistrations(
     commands: { register: (definition: CommandDefinition) => { commands.push(definition); return () => {} } },
     get: (name: string) => name === 'sessionQuery' ? sessionQuery : undefined,
   }
-  registerCultivation(ctx as Parameters<typeof registerCultivation>[0], config)
+  registerCultivation(ctx as Parameters<typeof registerCultivation>[0], config, companyHome)
   const command = commands.find(definition => definition.name === 'cultivation')
   const proposal = tools.find(definition => definition.name === 'cultivation_propose')
   if (command === undefined) throw new Error('registerCultivation 没有注册 /cultivation')
@@ -305,6 +306,22 @@ function invokeCultivation(
 }
 
 describe('/cultivation 注册命令的 host 行为', () => {
+  it('公司数据只认盘根：子目录会话被拒绝，盘根会话照常写', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace)
+      const sub = join(workspace, 'deliverables/sub')
+      mkdirSync(sub, { recursive: true })
+      const denied = await invokeCultivation(command, 'ceo', sub, 'correct 收口前列未决 :: 先列清单')
+      expect(denied).toMatchObject({ kind: 'error' })
+      expect(String((denied as { text: string }).text)).toContain('公司盘根')
+      expect(existsSync(join(sub, 'cultivation'))).toBe(false)
+
+      const accepted = await invokeCultivation(command, 'ceo', workspace, 'correct 收口前列未决 :: 先列清单')
+      expect(accepted).toMatchObject({ kind: 'success' })
+      expect(readdirSync(join(workspace, 'cultivation/records')).some(name => name.endsWith('.md'))).toBe(true)
+    })
+  })
+
   const suggestion = {
     kind: 'suggestion',
     targetRole: 'cfo',

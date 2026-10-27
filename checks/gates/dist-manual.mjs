@@ -6,6 +6,7 @@ import { expectedTag } from './lib/pin.mjs'
 
 // ── 2g. 手动分发手册版本 + 安装形状门禁（2026-09-28 立；2026-10-24 扩内容）────
 // 负例留证 2026-09-28：手改手册表头版本 → dist-manual 红，跑 export-dist 还原 → 绿。
+// 负例留证 2026-10-27：从手册删掉「DSH_COMPANY_REBIND」/「deliverables-presented」→ 红（换盘与 presented 账本合同不在手册）；
 // 负例留证 2026-10-24：从手册删掉「run bundle」/「bundle.json」/「company-workspace」关键句 → 红；
 //   重跑 export-dist → 绿。为什么扩：0.2.0 的手册表头版本没漂，但内容还是 2026-10-05 的
 //   “139 条目、无 workspace”——只比版本号抓不到分发件已经教人装错东西。
@@ -24,7 +25,8 @@ export function run({ root, ok, fail }) {
   if (header !== packVersion) {
     problems.push(`表头版本（${header ?? '解析不到'}）≠ pack package.json（${packVersion}）——重跑 \`node tools/export-dist.mjs\` 再提交，别手改手册`)
   }
-  const required = ['run bundle', 'bundle.json', 'company-workspace', 'workspace/', 'sha256', 'Node', 'DSH', '卸载', '回退']
+  const required = ['run bundle', 'bundle.json', 'company-workspace', 'workspace/', 'sha256', 'Node', 'DSH', '卸载', '回退',
+    'DSH_COMPANY_REBIND', 'deliverables-presented', 'business', 'full', 'bundle.json.bak-']
   const missing = required.filter(phrase => !manual.includes(phrase))
   if (missing.length > 0) problems.push(`手册缺安装形状/契约关键句：${missing.join(' / ')}（run bundle / bundle.json / workspace 骨架 / sha256 / Node / DSH / 卸载 / 回退）`)
   if (!/pnpm 11/.test(manual) || !/\b12\b/.test(manual)) {

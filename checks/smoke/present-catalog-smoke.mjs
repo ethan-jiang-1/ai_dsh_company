@@ -97,6 +97,8 @@ try {
   const entry = catalog.entries?.find(item => item.slug === 'alpha')
   check('catalog 出现该条目且 presented=true', entry?.presented === true, JSON.stringify(entry ?? null))
   check('catalog 只有这一条', catalog.entries?.length === 1, String(catalog.entries?.length ?? -1))
+  const ledger = JSON.parse(readFileSync(join(workspace, 'kb/deliverables-presented.json'), 'utf8'))
+  check('present 写入审计账本', ledger.paths?.['deliverables/2026-10-25-alpha/final.md'] === true, JSON.stringify(ledger))
 } catch (error) {
   failures.push(error.message)
   console.error(`present-catalog-smoke: ${error.stack ?? error.message}`)

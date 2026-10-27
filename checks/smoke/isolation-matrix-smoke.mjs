@@ -15,7 +15,7 @@
 
 import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { plainNodeEnv } from '../../tools/drivers/release-process.mjs'
@@ -152,6 +152,33 @@ async function rebindCase() {
   check('rebind 旧盘 sentinel 未动', readFileSync(join(oldWs, 'kb/company.md'), 'utf8').includes('Rebind Sentinel'))
 }
 
+async function explicitRebindCase() {
+  const caseDir = join(BASE, 'rebind-explicit')
+  const home = join(caseDir, 'home')
+  const oldWs = join(home, 'company-workspace')
+  const newWs = join(caseDir, 'company-moved')
+  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(join(caseDir, 'user'), { recursive: true })
+  const installed = install(caseDir, home)
+  check('explicit rebind install', installed.status === 0, (installed.stderr ?? '').slice(-240))
+  if (installed.status !== 0) return
+  await boot(caseDir, home, oldWs, { waitPath: join(oldWs, 'kb/company.md') })
+  writeFileSync(join(oldWs, 'kb/company.md'), '公司名: Explicit Rebind\n')
+  renameSync(oldWs, newWs)
+  const out = await boot(caseDir, home, newWs, {
+    waitPath: join(newWs, 'kb/company.md'),
+    settleMs: 2000,
+    extra: { DSH_COMPANY_REBIND: '1' },
+  })
+  const manifest = JSON.parse(readFileSync(join(home, 'bundle.json'), 'utf8'))
+  check('explicit rebind workspace 前移', manifest.workspace === newWs, manifest.workspace)
+  const backups = readdirSync(home).filter(name => name.startsWith('bundle.json.bak-'))
+  check('explicit rebind 留 manifest 备份', backups.length === 1, backups.join(', '))
+  check('explicit rebind 写升级日志', readFileSync(join(home, 'logs/company-pack-upgrade.log'), 'utf8').includes('换盘'))
+  check('explicit rebind 公司盘 sentinel 仍在', readFileSync(join(newWs, 'kb/company.md'), 'utf8').includes('Explicit Rebind'))
+  check('explicit rebind 不静默重建旧盘', !existsSync(oldWs))
+  check('explicit rebind 启动输出点名换盘', out.includes('已显式换盘'), out.slice(-800))
+}
+
 async function relativeCase() {
   const caseDir = join(BASE, 'relative')
   const home = join(caseDir, 'home')
@@ -188,6 +215,7 @@ try {
   check('global dsh present', version.status === 0)
   if (version.status === 0) {
     await rebindCase()
+    await explicitRebindCase()
     await moveCase()
     await relativeCase()
     await tildeCase()

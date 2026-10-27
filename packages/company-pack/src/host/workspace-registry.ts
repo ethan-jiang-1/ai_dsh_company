@@ -30,3 +30,29 @@ export function staleWorkspacePaths(document: unknown, exists: (path: string) =>
   }
   return [...stale].sort()
 }
+
+/** `ctx.workspaceRegistry.list()` 的最小面（N1；不读持久化层私有 JSON）。 */
+export interface WorkspaceRegistryLike {
+  list(): readonly { readonly path?: unknown }[]
+}
+
+/**
+ * 从 DSH 的 N1 workspace 登记挑出已不存在的绝对路径。
+ * 为什么优先用它：`storages/workspace.json` 是持久化层内部形状，升级/换后端会静默失效；
+ * `workspaceRegistry.list()` 是官方契约。注册表里相对/坏路径不冒充。
+ * @param registry - `ctx.workspaceRegistry`（可选服务；缺席由调用方跳过）。
+ * @param exists - 存在性判定（注入以便单测）。
+ * @returns 去重后的绝对路径，按字典序。
+ */
+export function staleWorkspacePathsFromRegistry(
+  registry: WorkspaceRegistryLike,
+  exists: (path: string) => boolean,
+): string[] {
+  const stale = new Set<string>()
+  for (const workspace of registry.list()) {
+    const path = workspace?.path
+    if (typeof path !== 'string' || path === '' || !isAbsolute(path)) continue
+    if (!exists(path)) stale.add(path)
+  }
+  return [...stale].sort()
+}
