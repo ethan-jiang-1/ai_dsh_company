@@ -5,7 +5,7 @@ intent: "第四轮 fresh-agent 六维打扫（2026-10-28）：复核上一轮 A-
 
 # 第四轮六维度打扫卫生审计（2026-10-28）
 
-> 服务卡：[第四轮六维打扫推敲卡](../../issues/2026-10-28-repo-hygiene-round4.md)｜上一轮：[第三轮审计](../../_archive/research/repo-hygiene/2026-10-27-six-dimension-audit-round3.md)（已归档）
+> 服务卡：[第四轮六维打扫推敲卡](../../settled_issues/2026-10-28-repo-hygiene-round4.md)｜上一轮：[第三轮审计](2026-10-27-six-dimension-audit-round3.md)（已归档）
 >
 > 口径：fresh agent 只读评审；主 agent 亲跑全部 keyless 车道与三次真页面金样；五个独立子代理分别深挖 D1+D3 / D2 / D4 / D5 / D6；D4 另做上一轮 R3-01…26 的逐项复核。
 > vendor/dsh 只读；真模型档未跑（无成本授权）。
@@ -48,7 +48,7 @@ node probes/browser-visual/cdp-probe.mjs <url> --evidence
 
 ### 1.3 上一轮复核口径
 
-上一轮卡（[R3 归档卡](../../_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)）把 R3-21/22/25 的巨函数、重复小工具、平铺目录列为“明确不作”。本轮用户明确要求“代码和测试都要避免平铺、要有层次”，因此这些**被上一轮延后的项，本轮重新列入候选**，不再当作已结。
+上一轮卡（[R3 归档卡](../../settled_issues/2026-10-27-repo-hygiene-round3.md)）把 R3-21/22/25 的巨函数、重复小工具、平铺目录列为“明确不作”。本轮用户明确要求“代码和测试都要避免平铺、要有层次”，因此这些**被上一轮延后的项，本轮重新列入候选**，不再当作已结。
 
 ## 2. 六维复评
 
@@ -214,3 +214,18 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 - vendor/dsh 内部机制与升 pin 面：只核对 pin 簿记，未重校。
 - 交互级 UI 复现、`--attach` 可行性原型：未做。
 - 覆盖率是 keyless 单次运行读数；UI 数据面/真模型行为不在其中。
+
+## 9. 落地后复评（2026-10-28 收口）
+
+> 口径：只认本轮实际落地与实跑读数；残余 P3 明确写“以后做”，不冒充无债。
+
+| 维 | 初评 | 复评 | 关键证据 |
+|---|---|---|---|
+| D1 文档结构与渐进披露 | B | **A-** | 开工最小路径进 AGENTS 首屏 + Plan Mode；ledger/外部研究/计数/预算/架构伪配方去漂；第二跳 src/tests/checks README 加“什么时候读”；预算覆盖 30/30 docs。残余：11/32 文档头寸 <5%（反向棘轮只守 >20%，已如实写）。 |
+| D2 代码/测试层次 | B | **A-** | 0 反向边 / 0 环；host apply 326→214、CultivationBoard 483→226、cultivationCommandHandler 338→206、client apply 201→45；`parseCatalog`/`isRecord`/`clip` 收家；`src-layering` 补 require/注释。残余：Board 余下四块仍 226 行、handler 六支仍内联（已命名可点，列为以后做）。 |
+| D3 文档—执行—验收结构 | B | **A-** | 授权门牌只留章程指针（含“常设指令”）；Plan Mode 进首屏；收尾单家 close-out skill；preset 完成定义单家 preset-change-definition skill；dev-loop §1 已改证据先行。 |
+| D4 上下文腐化 | B | **A-** | 回放口径统一到“合成管线场景，不是升 pin 第一道”；ledger/外部研究/计数/`snapshots/ui`/包 README/CHANGELOG 改到现行；D45/D46 排序、data-model 去重；`release --check` READY 0.3.15。 |
+| D5 测试资产 | B | **A-** | 110 spec / 977 例；新增 CompanyView/workspace-text/apply-lifecycle/probe-steps；observer 生产接线 spec；6 个 tools/lib spec 迁 harness、重名消除；UI 金样 3 连绿 + 红证。残余：共享 mkdtemp/env helper、单个 263 行单 it 巨测未拆（P3，以后做）。 |
+| D6 日志/端到端反馈 | C | **A-** | UI 金样真隔离/稳定/红证；`--steps` 交互复现；启动失败带 tail + web.log + scene.json goldenResult；diagnose 非零 bash/等审批/child/team failed；客户端错误经 `/company-diagnostics` 落 `cultivation/client-errors.log`（agent 可 read）。残余：`--attach` 接用户正在跑的页面未做；错误仍不写 session 事件（文件通道已声明边界）。 |
+
+**总评：D1–D6 均 A-。** 残余项均为 P3：Board 剩余块/六支 command 内联、测试样板 helper、单 it 巨测、`--attach`。它们不阻塞本轮 A-，但已明确留待后续；不写成“无债”。

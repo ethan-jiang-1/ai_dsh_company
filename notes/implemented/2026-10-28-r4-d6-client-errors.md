@@ -4,7 +4,7 @@
 
 # D6：浏览器错误经 host 诊断命令落到公司盘，agent 可以 read
 
-> 上游 = [第四轮六维打扫卡](../../_backlog/issues/2026-10-28-repo-hygiene-round4.md)；审计 = [第四轮报告 D6-01](../../_backlog/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md)。
+> 上游 = [第四轮六维打扫卡](../../_backlog/_archive/settled_issues/2026-10-28-repo-hygiene-round4.md)；审计 = [第四轮报告 D6-01](../../_backlog/_archive/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md)。
 
 ## 决定
 

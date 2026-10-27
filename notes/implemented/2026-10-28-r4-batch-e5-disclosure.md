@@ -4,7 +4,7 @@
 
 # 批 E5：第二跳 owner 加“什么时候读”，preset 完成定义只留一个家
 
-> 上游 = [第四轮六维打扫卡](../../_backlog/issues/2026-10-28-repo-hygiene-round4.md)；审计 = [第四轮报告（R4-11 / R4-13）](../../_backlog/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md)。
+> 上游 = [第四轮六维打扫卡](../../_backlog/_archive/settled_issues/2026-10-28-repo-hygiene-round4.md)；审计 = [第四轮报告（R4-11 / R4-13）](../../_backlog/_archive/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md)。
 
 ## 决定
 

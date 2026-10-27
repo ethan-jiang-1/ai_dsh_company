@@ -4,7 +4,7 @@
 
 # 批 E3：把 host apply 的两个内联工具/门投影拆出入口
 
-> 上游 = [第四轮六维打扫卡](../../_backlog/issues/2026-10-28-repo-hygiene-round4.md)；审计 = [第四轮报告（R4-08）](../../_backlog/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md)。
+> 上游 = [第四轮六维打扫卡](../../_backlog/_archive/settled_issues/2026-10-28-repo-hygiene-round4.md)；审计 = [第四轮报告（R4-08）](../../_backlog/_archive/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md)。
 
 ## 决定
 
