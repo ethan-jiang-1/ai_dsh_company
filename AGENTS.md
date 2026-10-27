@@ -39,6 +39,7 @@ source run/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-
 pnpm bundle:init                       # fresh clone：建 dev run bundle 的 workspace（制度件符号链接指回 pack；已有盘不动）
 pnpm verify                            # 结构门禁（清单唯一源 = checks/gates/ 目录）
 pnpm test                              # keyless 回归（真模型/浏览器不进；layering 守卫）
+pnpm typecheck                         # pack 两面 tsc -b（类型/导入面改动；fresh clone 先按 bootstrap 构建 vendor client 类型）
 pnpm orient                            # 运行态全景（keyless 只读；--scenario = run trace 场景视图）
 pnpm diagnose --session <slug>/<id>     # 会话失败摘要（只读；失败 turn/工具错误/审批/问询/present）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）

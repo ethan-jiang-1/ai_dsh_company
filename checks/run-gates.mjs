@@ -51,6 +51,7 @@ import * as packShape from './gates/pack-shape.mjs'
 import * as releaseReady from './gates/release-ready.mjs'
 import * as presetRowDeps from './gates/preset-row-deps.mjs'
 import * as clientHalves from './gates/client-halves.mjs'
+import * as srcLayering from './gates/src-layering.mjs'
 import * as proposals from './gates/proposals.mjs'
 import * as notesLiveness from './gates/notes-liveness.mjs'
 import * as backlogLiveness from './gates/backlog-liveness.mjs'
@@ -105,6 +106,7 @@ packShape.run(ctx)
 releaseReady.run(ctx)
 presetRowDeps.run(ctx)
 clientHalves.run(ctx)
+srcLayering.run(ctx)
 proposals.run(ctx)
 notesLiveness.run(ctx)
 backlogLiveness.run(ctx)

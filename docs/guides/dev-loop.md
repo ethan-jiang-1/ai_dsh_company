@@ -220,7 +220,8 @@ vendor/dsh 换 tag → 记 SHA 簿记（AGENTS.md）→ typecheck → 合成回�
 
 | 层 | 时间 | 跑什么（代表脚本；**它自己的触发条件在头注**） |
 |---|---|---|
-| 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接、物理行预算、裸路径与 pin 一致性门禁） |
+| 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接、物理行预算、裸路径、分层方向与 pin 一致性门禁） |
+| **类型面 keyless** | 秒级（增量） | `pnpm typecheck`（`tsc -b` 包两面；改导出/导入签名时跑——verify 与 test 都不做类型检查） |
 | **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器） |
 | 装配 keyless | ~25s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） |
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
