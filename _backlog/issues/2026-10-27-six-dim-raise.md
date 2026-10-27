@@ -17,7 +17,7 @@ opened: 2026-10-27
 **进展（2026-10-27/28 深夜）：** 批一 D1 已落（[Note](../../notes/implemented/2026-10-27-d1-start-path.md)：
 AGENTS 顶部三样开工、锚点、三件套分工；走查页签任务文档读入 570→206 行）；批二 D4 已落
 （[Note](../../notes/implemented/2026-10-27-d4-release-and-dist-guard.md)：0.3.15 就位、release 8 项全绿、
-dist-freshness 第 49 门、canonicalPath/isRecord 收家）。批三 D5 UI 金样已落（[Note](../../notes/implemented/2026-10-28-d5-ui-golden.md)：隔离场景 3.8s、9 页签金样、`ui-golden-freshness` 第 50 门、cdp-probe `--texts/--json-out`）。剩余 = 批四认证档（需授权）；fixtures 出处已落（`fixture-provenance` spec）；拆 4 个单 it 巨测**明确不作**（生命周期叙事，收益低于回归风险，理由见 D5 Note）；
+dist-freshness 第 49 门、canonicalPath/isRecord 收家）。批三 D5 UI 金样已落（[Note](../../notes/implemented/2026-10-28-d5-ui-golden.md)：隔离场景 3.8s、9 页签金样、`ui-golden-freshness` 第 50 门、cdp-probe `--texts/--json-out`）。批四认证档已跑（用户授权）：entry-probe **13/13 机器通过**、delegation-smoke **ALL PASS**，答卷归档并在 snapshots/README 登记；fixtures 出处已落；拆 4 个单 it 巨测**明确不作**（理由见 D5 Note）。**三批完成，待复评收口。**
 probe-source 切片 spec 未动（明确留待下一轮）。
 
 ## 当前情况（本轮实测，2026-10-27 深夜）
