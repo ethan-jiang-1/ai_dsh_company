@@ -113,6 +113,18 @@ function splitBody(raw: string): { readonly head: string, readonly body: string 
   return { head: raw.slice(0, at).trim(), body: raw.slice(at + 2).trim() }
 }
 
+/** 一个培养子命令的共享上下文（handler 只做分派，子命令各自成函数）。 */
+interface CultivationCommandContext {
+  readonly face: NonNullable<ReturnType<typeof sessionFaceOf>>
+  readonly root: string
+  readonly recordsDir: string
+  readonly config: CultivationHostConfig
+  readonly storage: CultivationStorage
+  readonly ctx: Context
+}
+
+type CultivationCommandResult = { readonly kind: 'error' | 'success'; readonly text: string }
+
 /** 命令行为只依赖会话输入、配置与培养存储；Cordis 注册留在外层适配器。 */
 function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false) {
   return async ({ agent, rawInput }: { readonly agent?: AgentLike, readonly rawInput: string }) => {
@@ -133,57 +145,7 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
     // correct [--context=<token>] <期望行为一句话> :: <做法与证据正文>
     // suggest <角色> [--context=<token>] <期望行为一句话> :: <建议与证据>
     if (sub === 'correct' || sub === 'suggest') {
-      const isSuggest = sub === 'suggest'
-      const targetRole = isSuggest ? tokens[1] : face.role
-      if (isSuggest && !ROSTER.has(targetRole ?? '')) {
-        return { kind: 'error' as const, text: '用法：suggest <角色> <期望行为一句话> :: <建议与证据>；角色须在名册。' }
-      }
-      let from = isSuggest ? 2 : 1
-      let contextToken: string | undefined
-      const flag = tokens[from]
-      if (flag !== undefined && flag.startsWith('--context=')) {
-        contextToken = flag.slice('--context='.length)
-        from += 1
-      }
-      const expectation = tokens.slice(from).join(' ').trim()
-      if (expectation === '') return { kind: 'error' as const, text: '期望行为不能为空（:: 之前的一句话）。' }
-      if (isSuggest && targetRole === face.role) {
-        return { kind: 'error' as const, text: '给自己的角色用 correct；suggest 指向别的角色。' }
-      }
-      let contexts: readonly CultivationContext[] | undefined
-      if (contextToken !== undefined) {
-        const decoded = decodeContextToken(contextToken)
-        if (!decoded.ok) return { kind: 'error' as const, text: decoded.problem }
-        const item = decoded.command.items[0]
-        if (item === undefined) return { kind: 'error' as const, text: '背景只能带一段（v1）。' }
-        const read = await readContext(ctx, scope.root, item)
-        if ('problem' in read) return { kind: 'error' as const, text: read.problem }
-        contexts = [read.context]
-      }
-      if (body === '' && contexts === undefined) {
-        return { kind: 'error' as const, text: '正文不能为空（:: 之后写做法与证据）。' }
-      }
-      const source = contexts === undefined ? '（会话内提交）' : contextSummary(contexts[0]!)
-      const id = storage.writeRecord(recordsDir, {
-        kind: isSuggest ? 'suggestion' : 'correction',
-        targetRole: targetRole!,
-        proposerRole: face.role,
-        proposerKind: 'human',
-        source,
-        expectation,
-        body,
-        ...(contexts === undefined ? {} : { contexts }),
-      })
-      const action = isSuggest
-        ? `建议 → ${roleLabel(targetRole!)}，待其本人在 ${roleLabel(targetRole!)} 会话里处理`
-        : '纠正，待你采纳'
-      const contextNote = contexts === undefined
-        ? ''
-        : `；背景「${contexts[0]!.title}」，以提交时服务端读到的版本为准`
-      return {
-        kind: 'success' as const,
-        text: `已提交培养记录 ${id}（${action}${contextNote}）。培养页可查收件箱。`,
-      }
+      return commandCorrectOrSuggest({ face, root: scope.root, recordsDir, config, storage, ctx }, sub, tokens, body)
     }
 
     // adopt <id> [as <slug>]
@@ -360,90 +322,7 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
 
     // revoke <slug>
     if (sub === 'revoke') {
-      const slug = tokens[1]
-      if (slug === undefined) return { kind: 'error' as const, text: '用法：revoke <方法slug>。' }
-      if (config.cultivationRoot === undefined) {
-        return { kind: 'error' as const, text: '方法层根未配置（config.cultivationRoot 缺席）。' }
-      }
-      if (!SLUG_RE.test(slug)) return { kind: 'error' as const, text: `方法 slug 不安全：${slug}。` }
-      const recovered = recoverPendingRevoke(scope.root, config.cultivationRoot, storage)
-      if (recovered.status === 'conflict' || recovered.status === 'error') {
-        return { kind: 'error' as const, text: `有一笔未完成的 revoke 需要先处理（${recovered.problem}）；日志在 cultivation/.pending-revoke.json。` }
-      }
-      let records: readonly CultivationRecord[]
-      try {
-        if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) {
-          return { kind: 'error' as const, text: `${roleLabel(face.role)} 方法层里没有方法 ${slug}。` }
-        }
-        records = storage.loadRecords(recordsDir).records
-      } catch (error) {
-        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
-        throw error
-      }
-      const revokedAt = new Date().toISOString()
-      const pendingRecords: { readonly id: string, readonly text: string }[] = []
-      for (const record of records) {
-        if (record.status !== 'adopted' || record.methodSlug !== slug || record.targetRole !== face.role) continue
-        const current = storage.readRecord(recordsDir, record.id)
-        if (current !== null) pendingRecords.push({ id: record.id, text: current.text })
-      }
-      if (pendingRecords.length > 0) {
-        try {
-          writePendingRevoke(scope.root, {
-            schema: 1,
-            role: face.role,
-            slug,
-            revokedAt,
-            createdAt: revokedAt,
-            records: pendingRecords,
-          })
-        } catch (error) {
-          return { kind: 'error' as const, text: `无法写 revoke 恢复日志，撤回未开始：${(error as Error).message}` }
-        }
-      }
-      const updated: { readonly id: string, readonly text: string }[] = []
-      const rollback = (): number => {
-        let failed = 0
-        for (const item of updated) {
-          try { if (!storage.restoreRecord(recordsDir, item.id, item.text)) failed += 1 } catch { failed += 1 }
-        }
-        if (failed === 0) clearPendingRevoke(scope.root)
-        return failed
-      }
-      // 先写 journal、再改记录、最后删方法：崩溃后由 recoverPendingRevoke 判定回滚/补完。
-      for (const record of records) {
-        if (record.status !== 'adopted' || record.methodSlug !== slug || record.targetRole !== face.role) continue
-        const current = storage.readRecord(recordsDir, record.id)
-        if (current === null) continue
-        if (!storage.updateRecord(recordsDir, record.id, { revokedAt }, current.text)) {
-          const failed = rollback()
-          return {
-            kind: 'error' as const,
-            text: `撤回 ${slug} 已取消：记录 ${record.id} 在读取后被改过；${failed > 0 ? `另有 ${String(failed)} 条回滚失败（日志保留）` : '已回滚已改记录'}，请重试。`,
-          }
-        }
-        updated.push({ id: record.id, text: current.text })
-      }
-      let methodDir: string | null
-      try {
-        methodDir = storage.removeMethod(config.cultivationRoot, face.role, slug)
-      } catch (error) {
-        const failed = rollback()
-        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
-        return {
-          kind: 'error' as const,
-          text: `撤回 ${slug} 失败（${(error as Error).message}）；${failed > 0 ? `有 ${String(failed)} 条记录回滚失败（日志保留）` : '记录已回滚'}。`,
-        }
-      }
-      if (methodDir === null) {
-        const failed = rollback()
-        return {
-          kind: 'error' as const,
-          text: `撤回 ${slug} 时方法已不在；${failed > 0 ? `有 ${String(failed)} 条记录回滚失败（日志保留）` : '记录已回滚'}。`,
-        }
-      }
-      clearPendingRevoke(scope.root)
-      return { kind: 'success' as const, text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(updated.length)} 条记录）。新开的 ${roleLabel(face.role)} 会话不再加载它。` }
+      return commandRevoke({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens)
     }
 
     return {
@@ -451,6 +330,156 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       text: '子命令只认：correct / suggest / adopt / reject / verify / revoke / archive / purge / check（培养页有各命令的一句话用法）。',
     }
   }
+}
+
+/** `correct` / `suggest`：写一条培养记录（含可选背景 token）。 */
+async function commandCorrectOrSuggest(
+  command: CultivationCommandContext,
+  sub: 'correct' | 'suggest',
+  tokens: readonly string[],
+  body: string,
+): Promise<CultivationCommandResult> {
+  const { face, root, recordsDir, storage, ctx } = command
+  const isSuggest = sub === 'suggest'
+  const targetRole = isSuggest ? tokens[1] : face.role
+  if (isSuggest && !ROSTER.has(targetRole ?? '')) {
+    return { kind: 'error', text: '用法：suggest <角色> <期望行为一句话> :: <建议与证据>；角色须在名册。' }
+  }
+  let from = isSuggest ? 2 : 1
+  let contextToken: string | undefined
+  const flag = tokens[from]
+  if (flag !== undefined && flag.startsWith('--context=')) {
+    contextToken = flag.slice('--context='.length)
+    from += 1
+  }
+  const expectation = tokens.slice(from).join(' ').trim()
+  if (expectation === '') return { kind: 'error', text: '期望行为不能为空（:: 之前的一句话）。' }
+  if (isSuggest && targetRole === face.role) {
+    return { kind: 'error', text: '给自己的角色用 correct；suggest 指向别的角色。' }
+  }
+  let contexts: readonly CultivationContext[] | undefined
+  if (contextToken !== undefined) {
+    const decoded = decodeContextToken(contextToken)
+    if (!decoded.ok) return { kind: 'error', text: decoded.problem }
+    const item = decoded.command.items[0]
+    if (item === undefined) return { kind: 'error', text: '背景只能带一段（v1）。' }
+    const read = await readContext(ctx, root, item)
+    if ('problem' in read) return { kind: 'error', text: read.problem }
+    contexts = [read.context]
+  }
+  if (body === '' && contexts === undefined) {
+    return { kind: 'error', text: '正文不能为空（:: 之后写做法与证据）。' }
+  }
+  const source = contexts === undefined ? '（会话内提交）' : contextSummary(contexts[0]!)
+  const id = storage.writeRecord(recordsDir, {
+    kind: isSuggest ? 'suggestion' : 'correction',
+    targetRole: targetRole!,
+    proposerRole: face.role,
+    proposerKind: 'human',
+    source,
+    expectation,
+    body,
+    ...(contexts === undefined ? {} : { contexts }),
+  })
+  const action = isSuggest
+    ? `建议 → ${roleLabel(targetRole!)}，待其本人在 ${roleLabel(targetRole!)} 会话里处理`
+    : '纠正，待你采纳'
+  const contextNote = contexts === undefined
+    ? ''
+    : `；背景「${contexts[0]!.title}」，以提交时服务端读到的版本为准`
+  return {
+    kind: 'success',
+    text: `已提交培养记录 ${id}（${action}${contextNote}）。培养页可查收件箱。`,
+  }
+}
+
+/** `revoke <slug>`：先写恢复日志、再改记录、最后删方法；失败可回滚。 */
+async function commandRevoke(command: CultivationCommandContext, tokens: readonly string[]): Promise<CultivationCommandResult> {
+  const { face, root, recordsDir, config, storage } = command
+  const slug = tokens[1]
+  if (slug === undefined) return { kind: 'error', text: '用法：revoke <方法slug>。' }
+  if (config.cultivationRoot === undefined) {
+    return { kind: 'error', text: '方法层根未配置（config.cultivationRoot 缺席）。' }
+  }
+  if (!SLUG_RE.test(slug)) return { kind: 'error', text: `方法 slug 不安全：${slug}。` }
+  const recovered = recoverPendingRevoke(root, config.cultivationRoot, storage)
+  if (recovered.status === 'conflict' || recovered.status === 'error') {
+    return { kind: 'error', text: `有一笔未完成的 revoke 需要先处理（${recovered.problem}）；日志在 cultivation/.pending-revoke.json。` }
+  }
+  let records: readonly CultivationRecord[]
+  try {
+    if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) {
+      return { kind: 'error', text: `${roleLabel(face.role)} 方法层里没有方法 ${slug}。` }
+    }
+    records = storage.loadRecords(recordsDir).records
+  } catch (error) {
+    if (error instanceof UnsafeCultivationPathError) return { kind: 'error', text: error.message }
+    throw error
+  }
+  const revokedAt = new Date().toISOString()
+  const pendingRecords: { readonly id: string, readonly text: string }[] = []
+  for (const record of records) {
+    if (record.status !== 'adopted' || record.methodSlug !== slug || record.targetRole !== face.role) continue
+    const current = storage.readRecord(recordsDir, record.id)
+    if (current !== null) pendingRecords.push({ id: record.id, text: current.text })
+  }
+  if (pendingRecords.length > 0) {
+    try {
+      writePendingRevoke(root, {
+        schema: 1,
+        role: face.role,
+        slug,
+        revokedAt,
+        createdAt: revokedAt,
+        records: pendingRecords,
+      })
+    } catch (error) {
+      return { kind: 'error', text: `无法写 revoke 恢复日志，撤回未开始：${(error as Error).message}` }
+    }
+  }
+  const updated: { readonly id: string, readonly text: string }[] = []
+  const rollback = (): number => {
+    let failed = 0
+    for (const item of updated) {
+      try { if (!storage.restoreRecord(recordsDir, item.id, item.text)) failed += 1 } catch { failed += 1 }
+    }
+    if (failed === 0) clearPendingRevoke(root)
+    return failed
+  }
+  // 先写 journal、再改记录、最后删方法：崩溃后由 recoverPendingRevoke 判定回滚/补完。
+  for (const record of records) {
+    if (record.status !== 'adopted' || record.methodSlug !== slug || record.targetRole !== face.role) continue
+    const current = storage.readRecord(recordsDir, record.id)
+    if (current === null) continue
+    if (!storage.updateRecord(recordsDir, record.id, { revokedAt }, current.text)) {
+      const failed = rollback()
+      return {
+        kind: 'error',
+        text: `撤回 ${slug} 已取消：记录 ${record.id} 在读取后被改过；${failed > 0 ? `另有 ${String(failed)} 条回滚失败（日志保留）` : '已回滚已改记录'}，请重试。`,
+      }
+    }
+    updated.push({ id: record.id, text: current.text })
+  }
+  let methodDir: string | null
+  try {
+    methodDir = storage.removeMethod(config.cultivationRoot, face.role, slug)
+  } catch (error) {
+    const failed = rollback()
+    if (error instanceof UnsafeCultivationPathError) return { kind: 'error', text: error.message }
+    return {
+      kind: 'error',
+      text: `撤回 ${slug} 失败（${(error as Error).message}）；${failed > 0 ? `有 ${String(failed)} 条记录回滚失败（日志保留）` : '记录已回滚'}。`,
+    }
+  }
+  if (methodDir === null) {
+    const failed = rollback()
+    return {
+      kind: 'error',
+      text: `撤回 ${slug} 时方法已不在；${failed > 0 ? `有 ${String(failed)} 条记录回滚失败（日志保留）` : '记录已回滚'}。`,
+    }
+  }
+  clearPendingRevoke(root)
+  return { kind: 'success', text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(updated.length)} 条记录）。新开的 ${roleLabel(face.role)} 会话不再加载它。` }
 }
 
 /** 「/cultivation」命令族与提案工具的注册面。 */
