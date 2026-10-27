@@ -4,8 +4,8 @@
 
 # R3 批次 A：把"已移出产品仓的资产"从活跃面如实下架，并让 pin 判据绑定单一事实家
 
-> 上游 = [第三轮六维度打扫卡](../../_backlog/issues/2026-10-27-repo-hygiene-round3.md)（R3-05/09/15/16/26）；
-> 证据 = [审计报告](../../_backlog/research/repo-hygiene/2026-10-27-six-dimension-audit-round3.md)。
+> 上游 = [第三轮六维度打扫卡](../../_backlog/_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)（R3-05/09/15/16/26）；
+> 证据 = [审计报告](../../_backlog/_archive/research/repo-hygiene/2026-10-27-six-dimension-audit-round3.md)。
 > 前序决定（不移交、只兑现其后果）：产品仓只留合成证据 = [run-bundle-install-unit](./2026-10-24-run-bundle-install-unit.md)（D46）。
 
 ## 决定

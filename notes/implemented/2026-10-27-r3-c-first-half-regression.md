@@ -4,7 +4,7 @@
 
 # R3-C（前半）：把用户实际接触面的回归网补上，并让日志/探针不再假绿
 
-> 上游 = [第三轮六维度打扫卡](../../_backlog/issues/2026-10-27-repo-hygiene-round3.md)
+> 上游 = [第三轮六维度打扫卡](../../_backlog/_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)
 > （R3-02/03 的探针面、R3-10/11/12/23）。后半（合成 web 场景 + `--ui`、客户端错误通道、真空绿门禁）另篇。
 
 ## 决定

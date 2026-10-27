@@ -4,7 +4,7 @@
 
 # R3-C5：给 host/lib/client 的方向加一道默认门禁，并把类型检查变成一条可跑命令
 
-> 上游 = [第三轮六维度打扫卡](../../_backlog/issues/2026-10-27-repo-hygiene-round3.md)（R3-01）；
+> 上游 = [第三轮六维度打扫卡](../../_backlog/_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)（R3-01）；
 > 同轮前序 = [批次 A](./2026-10-27-r3-batch-a-truth.md)。
 
 ## 决定

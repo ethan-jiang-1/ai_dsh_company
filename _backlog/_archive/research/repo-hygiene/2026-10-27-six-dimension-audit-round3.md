@@ -5,7 +5,7 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 
 # 第三轮六维度打扫卫生审计（2026-10-27）
 
-> 服务：[卡](../../issues/2026-10-27-repo-hygiene-round3.md)｜上一轮：[第二轮审计](../../_archive/research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md)（已随母卡归档）
+> 服务：[卡](../../settled_issues/2026-10-27-repo-hygiene-round3.md)｜上一轮：[第二轮审计](../repo-hygiene/2026-10-20-followup-six-dimension-audit.md)（已随母卡归档）
 > 口径：fresh agent 只读评审 + 主 agent 亲跑全部 keyless 车道 + 四个独立子代理深挖（D2 代码结构 / D1+D3 文档层次 / D5 测试资产 / D6 反馈通路）；D4 腐化面由主 agent 自查 + 子代理交叉。
 > vendor/dsh 只读；真模型认证档未跑（无 key 成本授权）；浏览器档跑了 client-load-smoke 与活体 cdp-probe。
 > **数字基线**：`pnpm verify` 47 门 ALL PASS · `pnpm test` 97 spec / 907 用例全绿 · 代码 11,642 行 · 测试 12,869 行 · 门禁+冒烟 9,791 行 · 工具 7,342 行 · 探针 9,340 行 · 文档 3,069 行 · notes 141 件 / 11,058 行 · 773 commits（近 14 天 209 个）。

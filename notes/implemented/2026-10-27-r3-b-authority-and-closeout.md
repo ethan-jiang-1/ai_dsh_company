@@ -4,7 +4,7 @@
 
 # R3-B：把自授权边界收进唯一家，把收尾次序收进唯一 skill
 
-> 上游 = [第三轮六维度打扫卡](../../_backlog/issues/2026-10-27-repo-hygiene-round3.md)（R3-07 / R3-08）。
+> 上游 = [第三轮六维度打扫卡](../../_backlog/_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)（R3-07 / R3-08）。
 
 ## 决定
 

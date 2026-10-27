@@ -4,7 +4,7 @@
 
 # R3-D 前半：索引回到索引、预算变成双向、barrel 修环、探针不再猜历史会话
 
-> 上游 = [第三轮六维度打扫卡](../../_backlog/issues/2026-10-27-repo-hygiene-round3.md)（R3-17/20/22/25）。
+> 上游 = [第三轮六维度打扫卡](../../_backlog/_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)（R3-17/20/22/25）。
 > 后半（政策层 + dev-loop 拆分、三个巨型函数）另篇。
 
 ## 决定

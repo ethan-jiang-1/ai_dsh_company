@@ -4,7 +4,7 @@
 
 # R3-C 后半：一条命令看真页面、浏览器错误进证据、门禁不再把「没有对象」当通过
 
-> 上游 = [第三轮六维度打扫卡](../../_backlog/issues/2026-10-27-repo-hygiene-round3.md)（R3-03/04/06/24）。
+> 上游 = [第三轮六维度打扫卡](../../_backlog/_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)（R3-03/04/06/24）。
 
 ## 决定
 

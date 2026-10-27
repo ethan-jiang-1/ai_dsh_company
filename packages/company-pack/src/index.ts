@@ -5,24 +5,17 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 // 纯类型导入：只需要 `ctx.approval` 的 Context 类型增强（服务本体由 web profile 挂载）。
 // ⚠ 不做值导入——那会把 host 侧核心包的类型图拉进本程序，遮掉 client 面的 sessions 增强（实测）。
 import type {} from '@deepseek-ai/dsh-user-approval'
-import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
 import { existsSync, readFileSync, realpathSync } from 'node:fs'
 import { isAbsolute, join, relative, resolve } from 'node:path'
 import { signoffDecisionNote, signoffReason } from './lib/signoff.ts'
 import { doorsFromSessions } from './lib/doors.ts'
-import { bootstrapCompanyWorkspace, bootstrapEnabled, resolveCompanyHome, resolveSkeletonDir, validateCompanyHome } from './host/bootstrap.ts'
+import { bootstrapCompanyWorkspace, bootstrapEnabled, resolveSkeletonDir } from './host/bootstrap.ts'
 import {
   appendUpgradeLog,
   applySkeletonUpgrade,
-  applyWorkspaceRebind,
   bundleManifestPath,
   planBundleManifest,
   planSkeletonUpgrade,
-  planWorkspaceRebind,
-  readBundleManifestState,
-  rebindEnabled,
-  pruneBundleBackups,
-  resolveRecordedWorkspace,
   resolvePackMetadata,
   writeBundleManifest,
   writeUpgradedManifest,
@@ -38,8 +31,7 @@ import {
   type PresentedSessionQuery,
 } from './host/catalog.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
-import { acquireCompanyLease } from './host/lease.ts'
-import { profilesWithCompanyPack } from './host/profiles.ts'
+import { prepareCompanyRuntime } from './host/runtime-guard.ts'
 import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace-registry.ts'
 
 /**
@@ -126,107 +118,7 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
     },
   }))
 
-  // ── 盘守卫（卡 6 + 2026-10-27 数据模型对齐 P0）──────────────────────────────
-  // 公司数据只认 bundle 的公司盘根：session header.cwd 在子目录/盘外都不能写公司数据。
-  // bundle.json 的 workspace 是权威；没有身份时退回 DSH_COMPANY_HOME/companyHome。
-  // 换盘默认硬阻断，只有显式 `DSH_COMPANY_REBIND=1` 且旧盘已不存在时才做一次性 rebind。
-  const bundleHome = resolveDshHome()
-  const configuredCompanyHome = resolveCompanyHome(bundleHome)
-  const configuredCheck = validateCompanyHome(bundleHome, configuredCompanyHome)
-  if (!configuredCheck.ok) {
-    const warning = `company-pack：DSH_COMPANY_HOME 落点不安全（${configuredCheck.error}）；本次不写自举/升级/成品目录`
-    ctx.logger?.warn?.(warning)
-    process.stderr.write(`dsh: ${warning}\n`)
-  }
-  const lease = acquireCompanyLease(bundleHome)
-  const leaseBlocked = !lease.acquired
-  if (leaseBlocked) {
-    const warning = `company-pack：${lease.reason}；公司数据已停写（DSH 会话仍可用），先关掉另一个 writer`
-    ctx.logger?.warn?.(warning)
-    process.stderr.write(`dsh: ${warning}\n`)
-  } else {
-    const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
-    if (typeof effect === 'function') effect.call(ctx, () => () => lease.release())
-  }
-  let bundleState = readBundleManifestState(bundleHome)
-  let recordedWorkspace = bundleState.status === 'ok'
-    ? resolveRecordedWorkspace(bundleHome, bundleState.manifest.workspace)
-    : undefined
-  let rebound = recordedWorkspace !== undefined
-    && canonicalPath(recordedWorkspace) !== canonicalPath(configuredCompanyHome)
-  if (bundleState.status === 'corrupt') {
-    const warning = `company-pack：bundle.json 损坏，已保留原文件并停写公司数据（${bundleState.path}：${bundleState.error}）；`
-      + '修好后重启，或备份后删除该文件让下次启动重建'
-    ctx.logger?.warn?.(warning)
-    process.stderr.write(`dsh: ${warning}\n`)
-  }
-  if (bundleState.status === 'unsupported') {
-    const warning = `company-pack：bundle.json 是更高版本（v${String(bundleState.version)}，本包支持 v1），已保留原文件并跳过身份/升级（${bundleState.path}）；`
-      + '请安装匹配的新版 pack，或从备份恢复 manifest'
-    ctx.logger?.warn?.(warning)
-    process.stderr.write(`dsh: ${warning}\n`)
-  }
-  if (rebound && configuredCheck.ok && !leaseBlocked && rebindEnabled() && bundleState.status === 'ok') {
-    const decision = planWorkspaceRebind({
-      dshHome: bundleHome,
-      manifest: bundleState.manifest,
-      companyHome: configuredCompanyHome,
-    })
-    if (!decision.ok) {
-      const warning = `company-pack：换盘请求被拒绝（${decision.error}）；本次仍按 bundle.json 记录的公司盘运行，`
-        + '不写新盘/不升级/不重建目录'
-      ctx.logger?.warn?.(warning)
-      process.stderr.write(`dsh: ${warning}\n`)
-    } else {
-      try {
-        applyWorkspaceRebind(decision.plan)
-        bundleState = { status: 'ok', path: decision.plan.manifestPath, manifest: decision.plan.manifest }
-        recordedWorkspace = decision.plan.newWorkspace
-        rebound = false
-        const pruned = pruneBundleBackups(bundleHome)
-        const message = `company-pack：已显式换盘 ${decision.plan.oldWorkspace} → ${decision.plan.newWorkspace}`
-          + `（旧 manifest 备份于 ${decision.plan.backupPath}${pruned.length > 0 ? `；清理旧备份 ${String(pruned.length)} 份` : ''}）`
-        for (const warning of decision.plan.warnings) ctx.logger?.warn?.(`company-pack：${warning}`)
-        ctx.logger?.info?.(message)
-        process.stderr.write(`dsh: ${message}\n`)
-      } catch (error) {
-        const warning = `company-pack：换盘写入失败（${(error as Error).message}）；原 manifest 保持不动，`
-          + '本次跳过自举/升级/目录重建'
-        ctx.logger?.warn?.(warning)
-        process.stderr.write(`dsh: ${warning}\n`)
-      }
-    }
-  }
-  if (rebound) {
-    const warning = `company-pack：bundle.json 记录的公司盘是 ${recordedWorkspace}，当前 DSH_COMPANY_HOME 解析为 ${configuredCompanyHome}；`
-      + 'bundle 身份以记录为准，本次不写新盘/不升级/不重建目录。搬盘后确认旧路径已不存在，'
-      + `再以 DSH_COMPANY_REBIND=1 启动做一次性换盘；或换新 DSH_HOME（先备份）。`
-    ctx.logger?.warn?.(warning)
-    // 数据分裂风险必须出现在启动输出里，不能只进 logger 文件（2026-10-26 实测 logger 不落 stdout）。
-    process.stderr.write(`dsh: ${warning}\n`)
-  }
-  const identityBlocked = bundleState.status === 'corrupt' || bundleState.status === 'unsupported'
-  const companyHome = recordedWorkspace ?? configuredCompanyHome
-  const companyCheck = validateCompanyHome(bundleHome, companyHome)
-  const dataBlocked = identityBlocked || leaseBlocked || !companyCheck.ok
-  if (!companyCheck.ok) {
-    const warning = `company-pack：公司盘落点不安全（${companyCheck.error}）；公司数据已停写，先修 DSH_COMPANY_HOME`
-    ctx.logger?.warn?.(warning)
-    process.stderr.write(`dsh: ${warning}\n`)
-  }
-  const expectedWorkspace = canonicalPath(companyHome)
-  // 方法层是 profile 级：同 home 多 profile 不共享。这里只点名，不改 profile、不冒充隔离。
-  try {
-    const profiles = profilesWithCompanyPack(join(bundleHome, 'profiles'))
-    if (profiles.length > 1) {
-      const warning = `company-pack：同一个 home 里有 ${String(profiles.length)} 个 profile 装了本包（${profiles.join('、')}）；`
-        + '方法层按 profile 隔离，记录/公司盘共享——一个公司请固定用一个 web profile，避免“记录显示已采纳、另一个 profile 不生效”'
-      ctx.logger?.warn?.(warning)
-      process.stderr.write(`dsh: ${warning}\n`)
-    }
-  } catch (error) {
-    ctx.logger?.warn?.(`company-pack profile 体检跳过（不影响运行）：${(error as Error).message}`)
-  }
+  const { bundleHome, companyHome, expectedWorkspace, dataBlocked, bundleState, rebound } = prepareCompanyRuntime(ctx)
   // 培养回路（2026-10-13 培养卡）：公司数据只写公司盘根，不跟随 session cwd 的子目录。
   // 身份损坏/更高版本/落点不安全时拒绝公司数据写入，避免写到猜测的默认盘。
   registerCultivation(ctx, config, expectedWorkspace, dataBlocked)

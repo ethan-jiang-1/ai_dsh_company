@@ -4,7 +4,7 @@
 
 # R3-D 后半：把常设规则搬进政策层，把开发环从 349 行收到 155 行
 
-> 上游 = [第三轮六维度打扫卡](../../_backlog/issues/2026-10-27-repo-hygiene-round3.md)（R3-18/19）；
+> 上游 = [第三轮六维度打扫卡](../../_backlog/_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)（R3-18/19）；
 > 前序 = [D 前半](./2026-10-27-r3-d-first-half-disclosure.md)。
 
 ## 决定
