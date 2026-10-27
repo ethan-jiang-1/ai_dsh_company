@@ -11,7 +11,7 @@ opened: 2026-10-28
 
 **问题与期望结果：** 距第三轮打扫（2026-10-27）只隔一天，但同日收口的“六维提分”把 D1/D4/D5 自评到 A-，并声称 0.3.15 已清理失效引用。用户要求以 fresh agent 视角重新评估六维、把问题挖透、再决定持续改善的批次。期望结果 = 带一手证据的六维复评、分级问题清单、可分批实施的改善方案；本轮推敲完成 = 用户 REVIEW 选批并把批次写进本卡。
 
-**当前情况：** 审计报告 = [research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md](../research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md)。主 agent 亲跑 `pnpm verify`（50 门 ALL PASS + 2 SKIP）、`pnpm test`（106 spec / 954 例）、`pnpm typecheck`、`pnpm test:coverage`（85.73/79.02/85.08/89.65）、`release --check`（READY 0.3.15）、`orient`/`diagnose`，并连续三次跑 `ui-scene-smoke --isolated --golden`（**三次全红、两种差异**）；五个独立子代理分别深挖 D1+D3/D2/D4/D5/D6。**复评：D1 B / D2 B / D3 B / D4 B / D5 B / D6 C；上一轮“六维全部 A-”不成立。**
+**当前情况：** 审计报告 = [research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md](../research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md)。主 agent 亲跑 `pnpm verify`（50 门 ALL PASS + 2 SKIP）、`pnpm test`（106 spec / 954 例）、`pnpm typecheck`、`pnpm test:coverage`（85.73/79.02/85.08/89.65）、`release --check`（READY 0.3.15）、`orient`/`diagnose`，并连续三次跑 `ui-scene-smoke --isolated --golden`（**三次全红、两种差异**）；五个独立子代理分别深挖 D1+D3/D2/D4/D5/D6。**初评（落地前）：D1 B / D2 B / D3 B / D4 B / D5 B / D6 C；上一轮“六维全部 A-”不成立。落地后复评见报告 §9。**
 
 **两个必须先处理的硬问题：**
 
