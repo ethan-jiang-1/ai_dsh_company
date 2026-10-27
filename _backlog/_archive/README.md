@@ -16,6 +16,7 @@
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
 | [2026-10-27-data-model-gaps.md](settled_issues/2026-10-27-data-model-gaps.md) | 已结；G1–G12 落三份 Note，剩余多 Host 高可用为边界 | 2026-10-27 |
+| [2026-10-27-data-model-review-followup.md](settled_issues/2026-10-27-data-model-review-followup.md) | 已结；F1–F10 落 [review-followup](../../notes/implemented/2026-10-27-data-model-review-followup.md) | 2026-10-27 |
 | [2026-10-27-data-model-closeout.md](settled_issues/2026-10-27-data-model-closeout.md) | 已结；R1–R6 落 [data-model-r1-r6](../../notes/implemented/2026-10-27-data-model-r1-r6.md) | 2026-10-27 |
 | [2026-10-25-distribution-contract.md](settled_issues/2026-10-25-distribution-contract.md) | 已实施；去向 = [distribution-lifecycle](../../notes/implemented/2026-10-25-distribution-lifecycle.md) | 2026-10-25 |
 | [2026-10-25-install-lifecycle-evidence.md](settled_issues/2026-10-25-install-lifecycle-evidence.md) | 已实施；去向 = [distribution-lifecycle](../../notes/implemented/2026-10-25-distribution-lifecycle.md) | 2026-10-25 |
@@ -103,6 +104,7 @@
 | [BUG-028-pending-material-anchor-granularity.md](fixed_bugs/BUG-028-pending-material-anchor-granularity.md) | 闸门④锚粒度与纪律不一致——总锚覆盖多任务被判行动幻觉 | 2026-10-19 |
 | [BUG-029-committed-web-token-recurrence.md](fixed_bugs/BUG-029-committed-web-token-recurrence.md) | 观察窗 token 再次随 runtime 日志入库：untrack + `.gitignore` + 类级 tracked-token 窄扫（值不打印）+ 红绿守卫 | 2026-10-20 |
 | [BUG-030-diagnose-approval-outcome.md](fixed_bugs/BUG-030-diagnose-approval-outcome.md) | diagnose 审批判读字段错位（读想象键读不到 outcome）：按真 v4 形状判读 + asked/decided 按 id 配对 + 夹具取真日志样 | 2026-10-20 |
+| [BUG-033-revoke-recovery-body-edit-loss.md](fixed_bugs/BUG-033-revoke-recovery-body-edit-loss.md) | revoke 恢复把“已撤销 + 用户后改正文”回滚成旧全文：journal 目标态 + 第三态 conflict | 2026-10-27 |
 | [BUG-032-r3-rerecord-not-replayable.md](fixed_bugs/BUG-032-r3-rerecord-not-replayable.md) | r3 重录不可重放（委派通知到达竞态）：`--record` 自检 + ≤3 次重录；失败保留现场 | 2026-10-23 |
 | [BUG-031-orient-scenario-children-file-shape.md](fixed_bugs/BUG-031-orient-scenario-children-file-shape.md) | orient --scenario 对 children 文件形状 ENOTDIR 崩：statSync 分流（文件计 1 / 目录数 .jsonl） | 2026-10-20 |
 

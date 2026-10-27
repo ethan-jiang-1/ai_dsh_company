@@ -1,13 +1,13 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-10-27
 ---
 
 # 推敲：数据模型落地复盘后的剩余证据与运维缺口
 
-> 立卡：2026-10-27 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-10-27 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；F1 已立 [BUG-033](../bugs/BUG-033-revoke-recovery-body-edit-loss.md)，F2–F9 按 Phase A/B/C 推进。
+> **结论/去向**：做；F1/BUG-033 已修迁 fixed_bugs，F2–F10 落 [Review follow-up Note](../../../notes/implemented/2026-10-27-data-model-review-followup.md)。
 
 **问题与期望结果：** 0.3.13 的代码面已收口，但复盘发现“实现正确”不等于“证据与运维合同完整”：还有 1 个数据丢失缺陷、2 个 UI/证据真实性缺口、1 个备份证据缺口、1 个保留/删除缺口，以及审计命令、迁移演练、敏感摘录三个小口。期望按 F1–F9 收口，而不是把边界当完成。
 
@@ -26,15 +26,19 @@ opened: 2026-10-27
 
 | # | 发现 | 严重 | 证据 |
 |---|---|---|---|
-| F1 | revoke 恢复会把“已撤销 + 用户后改正文”回滚成旧全文 | 高 | [BUG-033](../bugs/BUG-033-revoke-recovery-body-edit-loss.md) |
-| F2 | 非 open 记录只读 60 行摘要，但面板展开仍把截断 body 当全文；全文读失败也不计入未展开 | 中 | `cultivation-data.ts` 摘要/全文两段；`CultivationBoard` 只显示未展开计数 |
-| F3 | presented 重建 smoke 的 `sessionQuery` 是 fake（真实 vendor 事件 + 假查询） | 中 | `checks/smoke/present-catalog-smoke.mjs` 的 sessionQuery 对象 |
-| F4 | revoke 崩溃恢复只有单元测试，没有真进程 kill/重启注入 | 中 | `tests/company/revoke-journal.spec.ts` 直接调用恢复函数 |
-| F5 | business 恢复 smoke 不含方法层（`company-cultivation/`） | 中 | `lifecycle-smoke` 的 restore 只复制公司盘 + bundle.json |
-| F6 | records-archive、`bundle.json.bak-*`、升级日志无保留/清理策略 | 中 | 只有 archive 命令，没有 purge/轮转 |
-| F7 | `presented=false` 审计没有命令/UI，只能手改 JSON | 中低 | 账本文件是唯一入口 |
-| F8 | 版本迁移只有 fail-loud，没有 v1→v2 演练/夹具 | 中低 | `BUNDLE_MANIFEST_VERSION=1`、catalog/ledger schema=1 |
-| F9 | 培养背景 `contexts` 是会话摘录，可能带秘密；只有 UI 提示 | 低 | `cultivation-context` / 记录写入路径 |
+| F1 | revoke 恢复会把“已撤销 + 用户后改正文”回滚成旧全文 | 高 | 已修：[BUG-033](../fixed_bugs/BUG-033-revoke-recovery-body-edit-loss.md) |
+| F2 | 非 open 记录只读 60 行摘要，但面板展开仍把截断 body 当全文；全文读失败也不计入未展开 | 中 | 已修：`summaryOnly`/`bodyTruncated` + 全文失败计数 + 面板明示 |
+| F3 | presented 重建 smoke 的 `sessionQuery` 是 fake（真实 vendor 事件 + 假查询） | 中 | 已换 vendor `sessionQuery` + `SessionStore` live session；cold/persisted 边界保留 |
+| F4 | revoke 崩溃恢复只有单元测试，没有真进程 kill/重启注入 | 中 | 已加真 host 启动注入 smoke；SIGKILL 时点仍为边界 |
+| F5 | business 恢复 smoke 不含方法层（`company-cultivation/`） | 中 | 已加 fixture + 恢复断言 |
+| F6 | records-archive、`bundle.json.bak-*`、升级日志无保留/清理策略 | 中 | 已加 purge + 备份保留 5 份；日志追加（人工清理） |
+| F7 | `presented=false` 审计没有命令/UI，只能手改 JSON | 中低 | 已加 `/deliverables audit` |
+| F8 | 版本迁移只有 fail-loud，没有 v1→v2 演练/夹具 | 中低 | 已加 v1 fixture + v2 unsupported 边界；真实 v2 未出现 |
+| F9 | 培养背景 `contexts` 是会话摘录，可能带秘密；只有 UI 提示 | 低 | 已加 secret-like 扫描 + 创作面警告 |
+
+## F10（Phase C）
+
+- 已加 `multi-window-banner-smoke`（真浏览器同源两页面横幅）与 `cultivation-gui-probe --summary`（真浏览器 records 未展开/坏记录）。
 
 ## 方案与取舍
 

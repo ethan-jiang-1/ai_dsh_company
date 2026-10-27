@@ -11,7 +11,7 @@
 import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import type { CultivationStorage } from './cultivation-storage.ts'
+import { applyRecordUpdates, type CultivationStorage } from './cultivation-storage.ts'
 
 export interface PendingRevokeRecord {
   readonly id: string
@@ -108,27 +108,27 @@ export function recoverPendingRevoke(
     const methodExists = storage.readMethod(methodRoot, pending.role, pending.slug) !== null
     let changed = 0
     for (const record of pending.records) {
+      const target = applyRecordUpdates(record.text, { revokedAt: pending.revokedAt })
+      if (target === null) return { status: 'conflict', problem: `记录 ${record.id} 的旧全文没有 frontmatter` }
       const current = storage.readRecord(recordsDir, record.id)
       if (current === null) continue
-      if (current.text === record.text) {
-        if (!methodExists) {
-          if (!storage.updateRecord(recordsDir, record.id, { revokedAt: pending.revokedAt }, record.text)) {
-            return { status: 'conflict', problem: `记录 ${record.id} 在恢复时被改动` }
+      const isOld = current.text === record.text
+      const isTarget = current.text === target
+      if (!isOld && !isTarget) {
+        return { status: 'conflict', problem: `记录 ${record.id} 已被外部改动（既不是旧全文也不是目标全文），未动` }
+      }
+      if (methodExists) {
+        if (isTarget) {
+          if (!storage.restoreRecord(recordsDir, record.id, record.text)) {
+            return { status: 'error', problem: `记录 ${record.id} 回滚失败` }
           }
           changed += 1
         }
-        continue
-      }
-      if (methodExists) {
-        if (!current.text.includes('revokedAt:')) {
-          return { status: 'conflict', problem: `记录 ${record.id} 已被外部改动，未回滚` }
-        }
-        if (!storage.restoreRecord(recordsDir, record.id, record.text)) {
-          return { status: 'error', problem: `记录 ${record.id} 回滚失败` }
+      } else if (isOld) {
+        if (!storage.updateRecord(recordsDir, record.id, { revokedAt: pending.revokedAt }, record.text)) {
+          return { status: 'conflict', problem: `记录 ${record.id} 在恢复时被改动` }
         }
         changed += 1
-      } else if (!current.text.includes('revokedAt:')) {
-        return { status: 'conflict', problem: `记录 ${record.id} 已被外部改动，未补写撤销` }
       }
     }
     clearPendingRevoke(companyRoot)

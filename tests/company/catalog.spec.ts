@@ -21,6 +21,7 @@ import {
   readCatalogState,
   readPresentedLedger,
   recordPresented,
+  setPresentedAudit,
   regenerateCatalog,
   writePresentedLedger,
 } from '../../packages/company-pack/src/host/catalog.ts'
@@ -268,5 +269,22 @@ describe('host catalog', () => {
     const parsed = parseCatalog(readFileSync(catalogPath(root), 'utf8'))
     expect(parsed?.entries[0]?.slug).toBe('alpha')
     expect(parsed?.entries[0]?.metaProblem).toBeNull()
+  })
+})
+
+
+describe('presented 人工审计入口（2026-10-27 F7）', () => {
+  it('true/false 写账本并可按账本重建索引；非法路径拒绝', () => {
+    const root = workspace()
+    deliverable(root)
+    const path = 'deliverables/2026-10-25-alpha/final.md'
+    const audited = setPresentedAudit(root, path, false)
+    expect(audited.ledger?.paths[path]).toBe(false)
+    expect(regenerateCatalog(root, audited.ledger).catalog?.entries[0]?.presented).toBe(false)
+    const flipped = setPresentedAudit(root, path, true)
+    expect(flipped.ledger?.paths[path]).toBe(true)
+    expect(flipped.ledger?.slugs.alpha).toBe(true)
+    expect(regenerateCatalog(root, flipped.ledger).catalog?.entries[0]?.presented).toBe(true)
+    expect(setPresentedAudit(root, 'notes/not-final.md', false).warning).toContain('deliverables')
   })
 })

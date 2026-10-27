@@ -104,3 +104,26 @@ describe('host catalog wiring', () => {
     expect(readFileSync(path, 'utf8')).toBe('{"v":1,"id":"cut')
   })
 })
+
+
+describe('deliverables 审计命令（2026-10-27 F7）', () => {
+  it('/deliverables audit 写 false 并重生成索引', async () => {
+    const commands: unknown[] = []
+    const ctx = {
+      tools: { register: () => {} },
+      commands: { register: (definition: unknown) => { commands.push(definition); return () => {} } },
+      on: () => {},
+      logger: { info: () => {}, warn: () => {} },
+      get: () => undefined,
+    }
+    apply(ctx as never)
+    const command = commands.find(entry => (entry as { name?: string }).name === 'deliverables') as { handler: (input: unknown) => Promise<unknown> } | undefined
+    expect(command).toBeDefined()
+    const result = await command!.handler({ rawInput: 'audit deliverables/2026-10-25-alpha/final.md false', agent: undefined, signal: new AbortController().signal })
+    expect(result).toMatchObject({ kind: 'success' })
+    const ledger = JSON.parse(readFileSync(presentedLedgerPath(workspace), 'utf8')) as { paths: Record<string, boolean> }
+    expect(ledger.paths['deliverables/2026-10-25-alpha/final.md']).toBe(false)
+    const catalog = JSON.parse(readFileSync(catalogPath(workspace), 'utf8')) as { entries: { presented: boolean | null }[] }
+    expect(catalog.entries[0]?.presented).toBe(false)
+  })
+})

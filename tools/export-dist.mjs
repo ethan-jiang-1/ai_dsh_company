@@ -208,8 +208,9 @@ dsh plugin --profile web add /path/to/<新版本>.tgz
 降级同样走“装回旧 tgz + 重启”：改过的基部保留，未改的回到旧版；扩张面不动。
 
 培养记录可用 \`/cultivation archive <天数>\` 把已处理（非 open）且早于该天数的记录移到
-\`<公司盘>/cultivation/records-archive/\`；open 与读不动的记录不动，面板会点名坏记录。
-\`/cultivation check\` 只报告“记录缺方法/方法无记录”，不自动删改。
+\`<公司盘>/cultivation/records-archive/\`；\`/cultivation purge <天数>\` 清更早的归档。
+open 与读不动的记录不动，面板会点名坏记录；\`/cultivation check\` 只报告“记录缺方法/方法无记录”，不自动删改。
+交付审计用 \`/deliverables audit <deliverables/<dir>/final.md> true|false\` 写 presented 账本，不用手改 JSON。
 
 一个公司请固定用一个 web profile：同 home 多 profile 会在启动输出里点名，方法层不跨 profile 共享。
 同一 home 只允许一个 writer：第二实例会停写公司数据（DSH 会话仍可用），崩溃后 stale lease 可接管。

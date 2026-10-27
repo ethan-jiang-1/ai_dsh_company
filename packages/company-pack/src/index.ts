@@ -21,6 +21,7 @@ import {
   planWorkspaceRebind,
   readBundleManifestState,
   rebindEnabled,
+  pruneBundleBackups,
   resolveRecordedWorkspace,
   resolvePackMetadata,
   writeBundleManifest,
@@ -33,6 +34,7 @@ import {
   readCatalogState,
   recordPresented,
   regenerateCatalog,
+  setPresentedAudit,
   type PresentedSessionQuery,
 } from './host/catalog.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
@@ -181,8 +183,9 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
         bundleState = { status: 'ok', path: decision.plan.manifestPath, manifest: decision.plan.manifest }
         recordedWorkspace = decision.plan.newWorkspace
         rebound = false
+        const pruned = pruneBundleBackups(bundleHome)
         const message = `company-pack：已显式换盘 ${decision.plan.oldWorkspace} → ${decision.plan.newWorkspace}`
-          + `（旧 manifest 备份于 ${decision.plan.backupPath}）`
+          + `（旧 manifest 备份于 ${decision.plan.backupPath}${pruned.length > 0 ? `；清理旧备份 ${String(pruned.length)} 份` : ''}）`
         for (const warning of decision.plan.warnings) ctx.logger?.warn?.(`company-pack：${warning}`)
         ctx.logger?.info?.(message)
         process.stderr.write(`dsh: ${message}\n`)
@@ -227,6 +230,30 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   // 培养回路（2026-10-13 培养卡）：公司数据只写公司盘根，不跟随 session cwd 的子目录。
   // 身份损坏/更高版本/落点不安全时拒绝公司数据写入，避免写到猜测的默认盘。
   registerCultivation(ctx, config, expectedWorkspace, dataBlocked)
+  // 交付审计命令（2026-10-27 F7）：presented=false 的第一入口，不再要求手改 JSON。
+  ctx.commands.register({
+    name: 'deliverables',
+    description: '交付审计：把一条 final.md 的 presented 结论写入审计账本并重生成索引（人命令）',
+    input: { hint: 'audit <deliverables/<dir>/final.md> true|false' },
+    handler: async ({ rawInput }: { readonly rawInput: string }) => {
+      if (dataBlocked) return { kind: 'error' as const, text: '公司数据已停写（身份/落点/lease 问题）；先修再审计。' }
+      const tokens = rawInput.trim().split(/\s+/).filter(token => token !== '')
+      if (tokens[0] !== 'audit' || tokens.length < 3) {
+        return { kind: 'error' as const, text: '用法：/deliverables audit <deliverables/<dir>/final.md> true|false' }
+      }
+      const value = tokens[tokens.length - 1]
+      if (value !== 'true' && value !== 'false') {
+        return { kind: 'error' as const, text: `审计结论只认 true/false：${value ?? ''}` }
+      }
+      const path = tokens.slice(1, -1).join(' ')
+      const result = setPresentedAudit(expectedWorkspace, path, value === 'true')
+      if (result.ledger === undefined) {
+        return { kind: 'error' as const, text: result.warning ?? '审计写入失败' }
+      }
+      regenerateCatalog(expectedWorkspace, result.ledger)
+      return { kind: 'success' as const, text: `已审计 ${result.path ?? path} = ${value}（写入 presented 账本并重生成索引）。` }
+    },
+  })
   ctx.on('api-session/added', (summary) => {
     if (summary.origin === 'subagent') return
     if (typeof summary.cwd !== 'string' || summary.cwd === '') return

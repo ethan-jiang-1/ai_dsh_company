@@ -12,14 +12,14 @@
 |---|---|---|---|---|---|---|---|
 | 出厂基部（手册/章程/模板/org） | P2 内容 | 用户；`bundle.json` 记基部哈希 | company workspace | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME` | 跟盘；升级未改替换、改过保留；卸载不删 | 可从 pack 重新补缺，但“改过/没改过”的判定依赖 manifest | 否 |
 | 扩张内容（journal/KB/台账/交付物） | P2 内容 | 用户 / 角色 | company workspace | 同上 | 跟盘；用户/操作员保留；无自动 GC | 否（用户内容） | 可能含公司机密 |
-| 培养记录 | P2 内容 | 记录文件 | **company root**（不是 session cwd） | `<company>/cultivation/records/*.md`；归档 `<company>/cultivation/records-archive/`；恢复日志 `cultivation/.pending-revoke.json` | 跟盘；`/cultivation archive <天数>` 只移非 open 旧记录；面板摘要全扫 + open/最近 120 全文；坏记录点名 | 否（人/分身写的决定） | 背景摘录可能含会话内容 |
+| 培养记录 | P2 内容 | 记录文件 | **company root**（不是 session cwd） | `<company>/cultivation/records/*.md`；归档 `<company>/cultivation/records-archive/`；恢复日志 `cultivation/.pending-revoke.json` | 跟盘；`/cultivation archive <天数>` 移非 open 旧记录，`/cultivation purge <天数>` 清旧归档；面板摘要全扫 + open/最近 120 全文；坏记录点名 | 否（人/分身写的决定） | 背景摘录可能含会话内容 |
 | 方法层 | P3 状态 / P4 配置 | 插件 | **profile** | `<DSH_HOME>/profiles/<p>/company-cultivation/<role>/<slug>/SKILL.md` | 跟 profile；卸载保留；同 home 多 profile 启动告警 | 不能自动重建；记录保留正文，方法丢失需人工按记录恢复 | 方法论，可能引用公司事实 |
 | 成品索引 | P1 派生 | 盘上 meta/final + 账本 | company workspace | `<company>/kb/deliverables-index.json` | 可删/可重建；不承载审计权威 | 是 | 路径/结论 |
-| `presented` 审计账本 | P3 状态 | 操作员审计 + 会话事件 | company workspace | `<company>/kb/deliverables-presented.json` | 跟盘；删了丢 `false` 审计与历史 `true` 背书 | 部分：`true` 可从会话事件回扫，`false` 不能 | 审计结论 |
+| `presented` 审计账本 | P3 状态 | 操作员审计 + 会话事件 | company workspace | `<company>/kb/deliverables-presented.json` | 跟盘；`/deliverables audit <path> true|false` 是第一入口；删了丢 `false` 审计与历史 `true` 背书 | 部分：`true` 可从会话事件回扫，`false` 不能 | 审计结论 |
 | writer lease | 边界 / 临时 | 进程 | home | `<DSH_HOME>/company-pack.lock` | 进程持有；崩溃后按 PID 判 stale 接管 | 是 | pid/时间 |
 | `bundle.json` | P4 身份 | 插件 | home / bundle | `<DSH_HOME>/bundle.json` | 只创建；升级改写；删了丢基部哈希与换盘历史 | 否（重建=丢升级判定） | 含绝对路径 |
-| 换盘备份 | P3 审计 | 插件 | home | `<DSH_HOME>/bundle.json.bak-*` | 每次显式 rebind 一份；不自动清 | 否（备份） | 含绝对路径 |
-| 升级日志 | P3 审计 | 插件 | home | `<DSH_HOME>/logs/company-pack-upgrade.log` | 追加；无轮转 | 否 | 含绝对路径/文件名 |
+| 换盘备份 | P3 审计 | 插件 | home | `<DSH_HOME>/bundle.json.bak-*` | 每次显式 rebind 一份；只保留最新 5 份 | 否（备份） | 含绝对路径 |
+| 升级日志 | P3 审计 | 插件 | home | `<DSH_HOME>/logs/company-pack-upgrade.log` | 追加；无自动轮转（人工清理） | 否 | 含绝对路径/文件名 |
 | 会话全文索引 | P1 派生 | 无 | profile | `<DSH_HOME>/profiles/<p>/session-search.db` | 可重建；卸载不删 | 是 | 可能含会话正文 |
 | DSH workspace 登记 | 宿主状态 | DSH | home | `<DSH_HOME>/storages/workspace.json` | 宿主所有；搬 home 后不会自动重写 | 否（重加工作区） | 绝对路径 |
 | 会话日志 + `present` 事件 | 历史 | 会话 | session | `<DSH_HOME>/sessions/` | 核心无删除 API | 导出 ZIP；不删 | 可能含秘密/正文 |
@@ -39,7 +39,7 @@
 
 | 数据 | 版本字段 | 未知/更高版本 | 迁移责任 |
 |---|---|---|---|
-| `bundle.json` | `v: 1` | 保留原文件 + 告警，跳过身份/升级；不覆盖 | 未来 v2 由新 pack 提供迁移；旧 pack 不猜 |
+| `bundle.json` | `v: 1` | 保留原文件 + 告警，跳过身份/升级；不覆盖 | 未来 v2 由新 pack 提供迁移；旧 pack 不猜。v1 fixture = `tests/fixtures/bundle-manifest-v1.json`，迁移入口先以 fixture + unsupported 边界演练 |
 | 成品索引 | `schema: 1` | 保留原文件 + 告警，按盘上内容重建派生视图 | 派生，可重建 |
 | `presented` 账本 | `schema: 1` | 保留原文件 + 告警，presented 暂按未核；不覆盖 | 旧 false 从旧索引迁移；true 可从会话事件回扫 |
 | 培养记录 | 无 | 坏形状跳过并计数；不静默改写 | 格式变更走兼容读 + 新可选字段；破坏性变更新文件名/一次性迁移 |
@@ -65,7 +65,8 @@
 - 不物理删 session 日志、不改 session header；需要会话历史迁移时接受旧 cwd 限制。
 - 记录更新是单进程 CAS（读前全文比对 + rename 前复核）；revoke 有同步失败回滚 + pending journal 启动恢复；多 Host 共享 home 不支持。
 - 面板 records 为“摘要全扫 + open/最近 120 全文”，更早的只显示未展开计数；用 `/cultivation archive` 控制规模。
-- manifest 首建在 hard link 不支持的文件系统上回退 `wx` 单写并告警（仍不覆盖，但非原子发布）。
-- 培养面板仍全量读 records；用 `/cultivation archive <天数>` 控制规模，分页未做。
+- manifest 首建在 hard link 不支持的文件系统上回退 `wx` 单写并告警（仍不覆盖，但非原子发布）；换盘备份只留 5 份。
+- 培养背景 `contexts` 是会话摘录，可能含密钥样式内容；创作面只提示、不自动脱敏。
+- 培养面板摘要全扫 + open/最近 120 全文；更早记录只显示未展开计数，用 archive/purge 控制规模。
 - 不引入第三方 E1 依赖；不新增 `SessionEventMap` 类型；不把插件状态塞进会话 surface。
 - 包目录只读；数据只写公司盘、home、profile 方法层或浏览器本地。

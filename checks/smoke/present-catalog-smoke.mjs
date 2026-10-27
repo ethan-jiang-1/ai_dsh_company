@@ -14,9 +14,10 @@ import AgentRegistry from '../../vendor/dsh/packages/core/agent/lib/index.js'
 import LocalFileSystem from '../../vendor/dsh/packages/fs/fs-local/lib/index.js'
 import { createScope } from '../../vendor/dsh/packages/core/scope/lib/index.js'
 import { ToolCallId } from '../../vendor/dsh/packages/llm/llm/lib/index.js'
-import { SESSION_FORMAT_VERSION, Session, SessionId } from '../../vendor/dsh/packages/core/session/lib/index.js'
+import SessionStore, { SessionId } from '../../vendor/dsh/packages/core/session/lib/index.js'
 import SessionProjectionRegistry from '../../vendor/dsh/packages/session/session-projection/lib/index.js'
 import { turnBoundaryProjectionDefinition } from '../../vendor/dsh/packages/core/agent-loop/lib/index.js'
+import { TestSessionQueryEngine } from '../../vendor/dsh/packages/session-query/session-query/tests/test-service.ts'
 import SystemPrompt from '../../vendor/dsh/packages/core/system-prompt/lib/index.js'
 import ToolRuntime from '../../vendor/dsh/packages/core/tools/lib/index.js'
 import { provideWorkingDirectoryFixture, unsupportedInbox } from '../../vendor/dsh/packages/test-support/agent-loop-testkit/lib/index.js'
@@ -52,15 +53,17 @@ try {
   provideWorkingDirectoryFixture(ctx)
   await ctx.plugin(SystemPrompt)
   await ctx.plugin(ToolRuntime)
+  await ctx.plugin(SessionStore)
   await ctx.plugin(AgentRegistry)
   await ctx.plugin(LocalFileSystem, { cwd: workspace })
   await ctx.plugin(SessionProjectionRegistry)
   ctx.sessionProjections.register(turnBoundaryProjectionDefinition)
+  await ctx.plugin(TestSessionQueryEngine)
   await ctx.plugin(Present, { maxFiles: 2 })
 
   const id = SessionId('present-owner-1')
   let scope
-  const session = Session.create(id, [], { version: SESSION_FORMAT_VERSION, id, createdAt: 0, cwd: workspace, isSeeded: false })
+  const session = ctx.sessions.create(id, { meta: { cwd: workspace } })
   const owner = {
     id, options: {}, session, inbox: unsupportedInbox(), status: 'idle',
     get ctx() { return scope.ctx }, send: () => {}, followup: () => {},
@@ -107,15 +110,10 @@ try {
   const ledger = JSON.parse(readFileSync(ledgerPath, 'utf8'))
   check('present 写入审计账本', ledger.paths?.['deliverables/2026-10-25-alpha/final.md'] === true, JSON.stringify(ledger))
 
-  // 3. 真重建：删 index + ledger，由 sessionQuery 回扫真实事件恢复 true
-  const snapshot = owner.session.snapshotEvents()
-  const sessionQuery = {
-    listSessions: async () => [{ header: { id: 'present-owner-1', cwd: workspace } }],
-    observeSession: async () => ({ events: snapshot, [Symbol.dispose]: () => {} }),
-  }
+  // 3. 真重建：删 index + ledger，由 vendor sessionQuery 服务回扫 live session 的真实事件恢复 true
   rmSync(join(workspace, 'kb/deliverables-index.json'), { force: true })
   rmSync(ledgerPath, { force: true })
-  apply(makeHostCtx(sessionQuery).ctx)
+  apply(makeHostCtx(ctx.sessionQuery).ctx)
   const deadline = Date.now() + 5_000
   while (!existsSync(ledgerPath) && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 25))
   check('删 index/ledger 后由会话事件重建账本', existsSync(ledgerPath))

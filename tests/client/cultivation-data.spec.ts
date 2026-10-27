@@ -83,6 +83,8 @@ describe('records 摘要全扫 + open/最近 N 全文（2026-10-27 R1）', () =>
     expect(data?.records).toHaveLength(names.length)
     expect(data?.brokenRecords).toEqual([])
     expect(data?.unexpandedRecords).toBe(30)
+    expect(data?.records.find(record => record.id.includes('open'))?.bodyTruncated).toBe(false)
+    expect(data?.records.filter(record => record.bodyTruncated === true)).toHaveLength(30)
     await act(async () => { root.unmount() })
     container.remove()
   })

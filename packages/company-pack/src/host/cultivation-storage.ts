@@ -31,6 +31,7 @@ import { dirname, isAbsolute, join, win32 } from 'node:path'
 import {
   CULTIVATION_ROLES,
   parseRecord,
+  recordStampOf,
   recordText,
   type CultivationRecord,
 } from '../lib/cultivation.ts'
@@ -152,6 +153,28 @@ function loadRecords(recordsDir: string): { readonly records: readonly Cultivati
   return { records, broken, reachable: true }
 }
 
+/**
+ * 纯函数：把 frontmatter 字段 upsert 到记录全文（正文原样保留）。
+ * 恢复日志用它从旧全文推导“目标全文”，不靠 `includes('revokedAt:')` 猜。
+ * @param text - 当前记录全文。
+ * @param updates - 要 upsert 的字段。
+ * @returns 新全文；没有 frontmatter 给 null。
+ */
+export function applyRecordUpdates(text: string, updates: Readonly<Record<string, string>>): string | null {
+  const match = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text)
+  if (match === null) return null
+  const lines = match[1]!.split('\n')
+  for (const [key, value] of Object.entries(updates)) {
+    const at = lines.findIndex(line => line.startsWith(`${key}:`))
+    if (at === -1) lines.push(`${key}: ${value}`)
+    else lines[at] = `${key}: ${value}`
+  }
+  // 保留 closing `---` 之后的原始分隔（可能是一个空行），只替换 frontmatter 字段。
+  const closing = match[0].lastIndexOf('---') + 3
+  const suffix = match[0].slice(closing) + text.slice(match[0].length)
+  return `---\n${lines.join('\n')}\n---${suffix}`
+}
+
 /** 改写 frontmatter 字段（upsert）；正文原样保留，并以 sibling-temp + rename 避免截断。 */
 function updateRecordFile(recordsDir: string, id: string, updates: Readonly<Record<string, string>>, expectedText?: string): boolean {
   const path = recordPath(recordsDir, id)
@@ -161,15 +184,8 @@ function updateRecordFile(recordsDir: string, id: string, updates: Readonly<Reco
   if (info === null || info.isSymbolicLink() || !info.isFile()) throw new Error(`拒绝更新非普通记录：${path}`)
   const text = readFileSync(path, 'utf8')
   if (expectedText !== undefined && text !== expectedText) return false
-  const match = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text)
-  if (match === null) throw new Error(`记录 ${path} 没有 frontmatter，无法改写`)
-  const lines = match[1]!.split('\n')
-  for (const [key, value] of Object.entries(updates)) {
-    const at = lines.findIndex(line => line.startsWith(`${key}:`))
-    if (at === -1) lines.push(`${key}: ${value}`)
-    else lines[at] = `${key}: ${value}`
-  }
-  const next = `---\n${lines.join('\n')}\n---${text.slice(match[0].length).startsWith('\n') ? '' : '\n'}${text.slice(match[0].length)}`
+  const next = applyRecordUpdates(text, updates)
+  if (next === null) throw new Error(`记录 ${path} 没有 frontmatter，无法改写`)
   // CAS：读后到 rename 前若被外部改过，放弃本次写，调用方提示重试。
   if (readFileSync(path, 'utf8') !== text) return false
   const temporary = join(recordsDir, `.${id}.${randomUUID()}.tmp`)
@@ -237,6 +253,25 @@ function listMethodSlugs(root: string, role: string): string[] {
   return slugs.sort()
 }
 
+/** 删除归档目录里早于 cutoff 的记录（只动 .md 普通文件；open 不在这里）。 */
+function purgeArchiveFiles(archiveDir: string, cutoff: number): { removed: number, failed: number } {
+  const info = lstatOrNull(archiveDir)
+  if (info === null) return { removed: 0, failed: 0 }
+  if (info.isSymbolicLink() || !info.isDirectory()) throw new UnsafeCultivationPathError(archiveDir)
+  let removed = 0
+  let failed = 0
+  for (const name of readdirSync(archiveDir).filter(entry => entry.endsWith('.md'))) {
+    const id = name.replace(/\.md$/, '')
+    const stamp = recordStampOf(id)
+    if (stamp === null || stamp >= cutoff) continue
+    const path = join(archiveDir, name)
+    const file = lstatOrNull(path)
+    if (file === null || file.isSymbolicLink() || !file.isFile()) { failed += 1; continue }
+    try { unlinkSync(path); removed += 1 } catch { failed += 1 }
+  }
+  return { removed, failed }
+}
+
 /** 读一个已部署方法（revoke 先留副本，失败时恢复）。 */
 function readMethodFile(root: string, role: string, slug: string): string | null {
   if (!ROSTER.has(role) || !SLUG_RE.test(slug)) throw new Error(`不安全的方法路径：${role}/${slug}`)
@@ -281,6 +316,7 @@ export interface CultivationStorage {
   updateRecord(recordsDir: string, id: string, updates: Readonly<Record<string, string>>, expectedText?: string): boolean
   restoreRecord(recordsDir: string, id: string, text: string): boolean
   archiveRecord(recordsDir: string, archiveDir: string, id: string): boolean
+  purgeArchive(archiveDir: string, cutoff: number): { removed: number, failed: number }
   loadRecords(recordsDir: string): ReturnType<typeof loadRecords>
   installMethod(root: string, role: string, slug: string, text: string): boolean
   readMethod(root: string, role: string, slug: string): string | null
@@ -301,6 +337,7 @@ export const nodeCultivationStorage: CultivationStorage = {
   updateRecord: updateRecordFile,
   restoreRecord: restoreRecordFile,
   archiveRecord: archiveRecordFile,
+  purgeArchive: purgeArchiveFiles,
   loadRecords,
   installMethod(root, role, slug, text) {
     if (!ROSTER.has(role) || !SLUG_RE.test(slug)) throw new Error(`不安全的方法路径：${role}/${slug}`)

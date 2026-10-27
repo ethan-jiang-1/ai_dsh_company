@@ -40,15 +40,15 @@
 |---|---|---|---|
 | 定义 `D` | preset / persona / skills：只读声明；公司事实不在这里 | 包 `presets/**`（`presets/<role>/agent.cordis.yml`，由 `dsh.bundle.patch` 显式引用，不是旧 `.agent-presets/` 扫描） | 随包版本；不同公司不改源码 |
 | 包 `C` | 无用户数据；`workspace/` 是只读 starter | 安装包目录 | 升级整体替换；**绝不在包目录写 data/cache/日志** |
-| 工作区 `W` | 公司盘：手册/章程/台账/交付物/`kb/company.md`/`kb/<role>/journal`/`cultivation/records`（归档 `records-archive/`、恢复日志 `.pending-revoke.json`）；host 生成的派生索引 `kb/deliverables-index.json` + 审计账本 `kb/deliverables-presented.json` | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME`（培养/成品命令只在盘根生效） | 不动；基部文件按哈希替换、你改过的保留 |
-| home `U/H` | `bundle.json`（身份/基部指纹）、`bundle.json.bak-*`（显式换盘备份）、`company-pack.lock`（writer lease）、`logs/company-pack-upgrade.log`、`profiles/<p>/company-cultivation/<role>/` | `<DSH_HOME>` | 不动；方法层是 profile 级，同 home 多 profile 不共享 |
+| 工作区 `W` | 公司盘：手册/章程/台账/交付物/`kb/company.md`/`kb/<role>/journal`/`cultivation/records`（归档 `records-archive/`、恢复日志 `.pending-revoke.json`）；host 生成的派生索引 `kb/deliverables-index.json` + 审计账本 `kb/deliverables-presented.json`（`/deliverables audit` 写入） | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME`（培养/成品命令只在盘根生效） | 不动；基部文件按哈希替换、你改过的保留 |
+| home `U/H` | `bundle.json`（身份/基部指纹）、`bundle.json.bak-*`（显式换盘备份，只留最新 5 份）、`company-pack.lock`（writer lease）、`logs/company-pack-upgrade.log`、`profiles/<p>/company-cultivation/<role>/` | `<DSH_HOME>` | 不动；方法层是 profile 级，同 home 多 profile 不共享 |
 | session `S` | 会话日志由宿主拥有；本包不自造 event 类型；目录名/session header 含 cwd 绝对路径 | `<DSH_HOME>/sessions/` | 不动 |
 | 派生索引 `I` | `company-client` 行声明的全文索引（可能含会话正文） | `<DSH_HOME>/profiles/<p>/session-search.db` | 卸载不删；备份按敏感数据处理 |
 | 宿主登记 `R` | DSH 的 workspace 登记（绝对路径） | `<DSH_HOME>/storages/workspace.json` | 宿主所有；搬 home 后不会自动重写 |
 | 浏览器 `B` | 浮窗几何/实例心跳（localStorage 键带 `dsh-company-pack/` 命名空间与 v1 版本，按 origin/端口隔离）；不是公司盘数据 | 浏览器 profile | 换端口/浏览器即新 origin；旧 float 键只读迁移 |
 | 凭据 `X` | 不写入包；走 `<DSH_HOME>/.credentials.yaml` / 环境变量 | home | 用户管理；文件必须 0600 |
 
-说明：`bootstrap`/catalog 是**部署 provisioning 与 UI 派生视图**，用宿主 `node:fs`（不在模型工具沙箱内）；模型对工作区文件的读写仍走 `ctx.fs`/文件工具。`kb/deliverables-index.json` 是派生视图，可重建；`kb/deliverables-presented.json` 是 `presented` 的审计账本（true 来自会话事件，false 是操作员结论），**删了会丢审计，备份时一起带上**。同一 home 只允许一个 writer：第二进程会停写公司数据（DSH 会话仍可用），lease 崩溃后按 PID stale 接管。
+说明：`bootstrap`/catalog 是**部署 provisioning 与 UI 派生视图**，用宿主 `node:fs`（不在模型工具沙箱内）；模型对工作区文件的读写仍走 `ctx.fs`/文件工具。`kb/deliverables-index.json` 是派生视图，可重建；`kb/deliverables-presented.json` 是 `presented` 的审计账本（true 来自会话事件，false 是操作员结论），**删了会丢审计，备份时一起带上**。同一 home 只允许一个 writer：第二进程会停写公司数据（DSH 会话仍可用），lease 崩溃后按 PID stale 接管。`/cultivation archive|purge` 控制记录规模；`/deliverables audit` 是 presented=false 的第一入口。
 
 公司盘根固定在 `<DSH_HOME>/company-workspace`（或 `DSH_COMPANY_HOME`）。若会话 cwd 不是这个盘，页签/身份显示「非公司盘 / 身份未配置」，host 不静默改读 cwd。
 

@@ -250,6 +250,47 @@ export function recordPresented(
 }
 
 /**
+ * 人侧交付审计：把一条 final.md 的 presented 结论写进账本（true/false），再重生成索引。
+ * 这是 `presented=false` 的第一入口；不再要求用户手改 JSON。
+ * @param companyHome - 公司盘根。
+ * @param rawPath - 工作区相对路径（也接受公司盘内绝对路径）。
+ * @param presented - 审计结论。
+ * @param now - 时钟（测试注入）。
+ */
+export function setPresentedAudit(
+  companyHome: string,
+  rawPath: string,
+  presented: boolean,
+  now: Date = new Date(),
+): { readonly ledger?: PresentedLedger; readonly path?: string; readonly warning?: string } {
+  const root = canonicalPath(companyHome)
+  const absolute = isAbsolute(rawPath) ? rawPath : join(root, rawPath)
+  const rel = normalizeRel(relative(root, canonicalPath(absolute)))
+  if (rel === '' || rel.startsWith('..') || isAbsolute(rel) || !rel.endsWith('/final.md')) {
+    return { warning: `审计路径必须是公司盘内的 deliverables/<dir>/final.md 或 deliverables-archive/<dir>/final.md：${rawPath}` }
+  }
+  if (!/^(deliverables|deliverables-archive)\/[^/]+\/final\.md$/.test(rel)) {
+    return { warning: `审计路径只认 deliverables/<dir>/final.md：${rawPath}` }
+  }
+  const state = readPresentedLedger(companyHome)
+  if (state.status === 'corrupt' || state.status === 'unsupported') {
+    return { warning: state.status === 'unsupported'
+      ? `presented 账本 schema ${String(state.schema)} 高于本包支持，未写`
+      : `presented 账本损坏（${state.error}），未写` }
+  }
+  const base = state.status === 'ok' ? state.ledger : ensurePresentedLedger(companyHome, now).ledger
+  const paths: Record<string, boolean> = { ...base.paths, [rel]: presented }
+  let next: PresentedLedger = { schema: 1, updatedAt: now.toISOString(), paths, slugs: base.slugs }
+  // true 同时写 slug 便于归档后延续；false 只认精确 path，不写 slug。
+  if (presented) {
+    const slug = rel.split('/')[1] ?? ''
+    if (slug !== '') next = { ...next, slugs: { ...next.slugs, [slug.replace(/^\d{4}-\d{2}-\d{2}-/, '')]: true } }
+  }
+  writePresentedLedger(companyHome, next)
+  return { ledger: next, path: rel }
+}
+
+/**
  * 从会话事件回扫 `presented=true`。只用于账本缺失的迁移/修复；false 不在这里猜。
  * 只读、可取消；单会话失败计数后继续，不因一条坏日志终止整次修复。
  * @param query - `ctx.sessionQuery` 的最小面。

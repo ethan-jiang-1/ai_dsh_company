@@ -14,7 +14,7 @@
 import { Button, Input, Pill } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useRef, useState } from 'react'
 import { CULTIVATION_ROLES, roleLabel } from '../lib/cultivation.ts'
-import { clipExcerpt, encodeContextToken, type CultivationContextRef } from '../lib/cultivation-context.ts'
+import { clipExcerpt, encodeContextToken, secretLikeFindings, type CultivationContextRef } from '../lib/cultivation-context.ts'
 import {
   CULTIVATION_COPY,
   correctLine,
@@ -272,6 +272,9 @@ export function CultivationCompose(props: CultivationComposeProps) {
                       {expanded ? context.excerpt : context.excerpt.split('\n').slice(0, 3).join('\n')}
                     </div>
                     {context.truncated === true && <div className="wk-meta">{CULTIVATION_COPY.contextClipped}</div>}
+                    {secretLikeFindings(context.excerpt).length > 0 && (
+                      <div className="wk-meta wk-cultivation-problem">{CULTIVATION_COPY.contextSecretWarning}</div>
+                    )}
                     <div className="wk-cultivation-actions">
                       <Button size="sm" variant="ghost" aria-expanded={expanded}
                         onClick={() => { setExpanded(value => !value) }}>

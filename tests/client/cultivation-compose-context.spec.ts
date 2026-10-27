@@ -100,6 +100,15 @@ const type = async (input: HTMLInputElement | HTMLTextAreaElement, text: string)
 }
 
 describe('可选背景：默认值 / 移除 / 手选 / 明说', () => {
+  it('背景含密钥样式 ⇒ 在写入前明示警告', async () => {
+    const { actions } = stubActions()
+    const sources = stubSources({ readPreview: async () => ({ ok: true, turn: { turn: 1, text: 'api_key = sk-abcdefghijklmnop1234' } }) })
+    const container = mount({ actions, sources, currentSessionId: 'session-1' })
+    await click(button(container, CULTIVATION_COPY.composeCorrect))
+    await flush()
+    expect(container.textContent).toContain(CULTIVATION_COPY.contextSecretWarning)
+  })
+
   it('correct 默认带本次最近一轮；正文可空；命令线带 --context=', async () => {
     const { actions, lines } = stubActions()
     const container = mount({ actions, sources: stubSources(), currentSessionId: 'session-1' })

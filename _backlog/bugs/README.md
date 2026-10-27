@@ -10,7 +10,7 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-033](BUG-033-revoke-recovery-body-edit-loss.md) | revoke 恢复把“已撤销 + 用户后改正文”回滚成旧全文 | P1 |
+| —（无活跃缺陷卡） | BUG-033 已修并迁 [fixed_bugs](../_archive/fixed_bugs/BUG-033-revoke-recovery-body-edit-loss.md)：journal 目标态推导 + 第三态 conflict；2026-10-23 BUG-032 同模式 | — |
 
 **2026-10-19 BUG-028 收口**：闸门④认总锚（title 或 prompt 点名即算，依赖链一并传递），lingang-recon 由 3 条误报 → 0 条违规；
 守卫 = `tests/company/deliverables-audit.spec.ts` 两条 keyless 断言（锚粒度 + 依赖链）。教训同 BUG-014：

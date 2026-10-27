@@ -63,6 +63,12 @@ describe('CultivationBoard：本人收件与操作指引（V1/V7）', () => {
 })
 
 describe('CultivationBoard：数据诚实与能力呈现（V2/V8/V9）', () => {
+  it('只读摘要的记录展开时明确“不完整”，不冒充全文', () => {
+    const markup = render({ records: [record({ body: '正文', bodyTruncated: true })] })
+    expect(markup).toContain('正文只加载了摘要')
+    expect(markup).toContain('cultivation/records/20261013-120000-closing.md')
+  })
+
   it('坏记录不静默消失；只读摘要的旧记录也有明面计数', () => {
     const markup = render({ brokenRecords: ['bad.md', 'worse.md'], unexpandedRecords: 30 })
     expect(markup).toContain('2 条记录读不动')

@@ -454,6 +454,26 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       }
     }
 
+    // purge <days>：只清 records-archive 里的旧记录，不动 live records
+    if (sub === 'purge') {
+      const days = Number(tokens[1])
+      if (!Number.isSafeInteger(days) || days < 1 || days > 3650) {
+        return { kind: 'error' as const, text: '用法：purge <天数 1..3650>——只删除 cultivation/records-archive/ 里早于该天数的归档记录。' }
+      }
+      const archiveDir = join(scope.root, 'cultivation', 'records-archive')
+      let result: { removed: number, failed: number }
+      try {
+        result = storage.purgeArchive(archiveDir, Date.now() - days * 86_400_000)
+      } catch (error) {
+        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+        throw error
+      }
+      return {
+        kind: 'success' as const,
+        text: `已清理归档 ${String(result.removed)} 条${result.failed > 0 ? `；${String(result.failed)} 条未动（非普通文件/删除失败）` : ''}。live records 未动。`,
+      }
+    }
+
     // check：只报告孤儿（不自动删/改）
     if (sub === 'check') {
       if (config.cultivationRoot === undefined) {
@@ -581,7 +601,7 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
 
     return {
       kind: 'error' as const,
-      text: '子命令只认：correct / suggest / adopt / reject / verify / revoke / archive / check（培养页有各命令的一句话用法）。',
+      text: '子命令只认：correct / suggest / adopt / reject / verify / revoke / archive / purge / check（培养页有各命令的一句话用法）。',
     }
   }
 }

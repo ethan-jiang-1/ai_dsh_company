@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-当前活跃 1 张：[数据模型落地复盘后的剩余证据与运维缺口](2026-10-27-data-model-review-followup.md)（F1 BUG-033 + F2–F9 证据/保留/审计/迁移）。2026-10-27 的数据模型两卡（12 Gap + R1–R6 收尾）已结并归档，去向 = 三份 implemented Note；见 [归档](../_archive/README.md)。2026-10-25 的 6 张收尾卡已结并归档（分发契约 / 生命周期 / 内容自足 / 成品目录 / 独立启动 / 身份守卫），去向 = 三份 implemented Note；见 [归档](../_archive/README.md)。
+当前活跃 0 张。2026-10-27 数据模型复盘卡已结并归档（F1–F10 落 [review-followup Note](../../notes/implemented/2026-10-27-data-model-review-followup.md)）。2026-10-27 的数据模型两卡（12 Gap + R1–R6 收尾）已结并归档，去向 = 三份 implemented Note；见 [归档](../_archive/README.md)。2026-10-25 的 6 张收尾卡已结并归档（分发契约 / 生命周期 / 内容自足 / 成品目录 / 独立启动 / 身份守卫），去向 = 三份 implemented Note；见 [归档](../_archive/README.md)。
 
 ## 近期归档
 

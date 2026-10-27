@@ -2,6 +2,24 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.3.14 — 2026-10-27
+
+### Fixed
+
+- **BUG-033**：revoke 恢复不再用 `revokedAt:` 猜目标态——从旧全文 + revokedAt 推导目标全文；恢复只认 old/target，第三态 conflict 不覆盖；用户后改正文不再被回滚。
+- **摘要不再冒充全文**：非 open 记录只读摘要时，面板明确“正文只加载了摘要”；全文读失败计入未展开，不再静默。
+
+### Changed
+
+- **presented 重建证据升级**：present-catalog-smoke 改用 vendor `sessionQuery` 服务（live session）回扫真实事件，不再用手写 fake query。
+- **revoke 恢复真启动证据**：新增 revoke-recovery-smoke，在真 home/公司盘/方法层注入两态，启动真 host 验证回滚/补完。
+- **business 恢复覆盖方法层**：lifecycle-smoke 恢复 fixture 增加 `company-cultivation/`，恢复后断方法文件仍在。
+- **保留/清理**：`/cultivation purge <天数>` 清旧 records-archive；`bundle.json.bak-*` 只保留最新 5 份；升级日志保持追加（人工清理）。
+- **交付审计入口**：`/deliverables audit <final.md> true|false` 写 presented 账本并重生成索引，不再要求手改 JSON。
+- **迁移演练夹具**：`tests/fixtures/bundle-manifest-v1.json` + v2 unsupported 边界；真实 v2 schema 出现前不猜。
+- **敏感背景提示**：培养背景命中密钥/令牌样式时创作面明示警告（只提示、不自动脱敏）。
+- **浏览器真场景**：`multi-window-banner-smoke` 同源两页面横幅；`cultivation-gui-probe --summary` 真浏览器 records 未展开/坏记录。
+
 ## 0.3.13 — 2026-10-27
 
 ### Changed

@@ -759,6 +759,24 @@ describe('/cultivation archive（2026-10-27 G8）', () => {
       expect(String((outcome as { text: string }).text)).toContain('1 条坏记录未动')
     })
   })
+
+  it('purge 只删归档里早于天数的记录，live records 不动', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace)
+      const records = join(workspace, 'cultivation/records')
+      const archive = join(workspace, 'cultivation/records-archive')
+      mkdirSync(archive, { recursive: true })
+      const front = '---\nkind: correction\ntargetRole: ceo\nproposerRole: ceo\nproposerKind: human\nsource: test\nexpectation: old\nstatus: rejected\n---\n\nbody\n'
+      writeFileSync(join(archive, '20200101-000000-old.md'), front)
+      writeFileSync(join(archive, '20990101-000000-new.md'), front)
+      writeFileSync(join(records, '20200101-000000-live.md'), front)
+      const outcome = await invokeCultivation(command, 'ceo', workspace, 'purge 30')
+      expect(outcome.kind).toBe('success')
+      expect(existsSync(join(archive, '20200101-000000-old.md'))).toBe(false)
+      expect(existsSync(join(archive, '20990101-000000-new.md'))).toBe(true)
+      expect(existsSync(join(records, '20200101-000000-live.md'))).toBe(true)
+    })
+  })
 })
 
 

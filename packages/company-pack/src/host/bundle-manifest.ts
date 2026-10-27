@@ -510,6 +510,25 @@ export function planWorkspaceRebind(options: {
 }
 
 /**
+ * 只保留最近 N 份换盘备份（默认 5）；返回删掉的文件名。
+ * 备份是审计资产，不是无限日志；默认保留最新 5 份，避免 home 根长期膨胀。
+ * @param dshHome - DSH home。
+ * @param keep - 保留份数（>=1）。
+ */
+export function pruneBundleBackups(dshHome: string, keep = 5): string[] {
+  const safeKeep = Math.max(1, Math.floor(keep))
+  const names = readdirSync(dshHome)
+    .filter(name => name.startsWith(`${BUNDLE_MANIFEST_FILENAME}.bak-`))
+    .sort()
+    .reverse()
+  const removed = names.slice(safeKeep)
+  for (const name of removed) {
+    try { rmSync(join(dshHome, name), { force: true }) } catch { /* 删不掉不影响换盘 */ }
+  }
+  return removed
+}
+
+/**
  * 执行换盘：旧 manifest 原字节备份 → 原子改写 workspace → 记升级日志。
  * 失败时保留备份与原文件；调用方按普通错误处理（不静默）。
  * @param plan - {@link planWorkspaceRebind} 的产出。

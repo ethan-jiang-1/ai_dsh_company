@@ -15,6 +15,7 @@ import {
   CONTEXT_ROLE_MAX_CHARS,
   CONTEXT_TOKEN_MAX_CHARS,
   clipExcerpt,
+  secretLikeFindings,
   contextAddressOf,
   contextPayloadText,
   contextSummary,
@@ -307,5 +308,17 @@ describe('会话轮次投影（host 读与客户端预览共用）', () => {
   it('at 取该轮末条文字事件的时间', () => {
     const picked = pickSessionTurn([ev('user/message', { source: { kind: 'user' }, content: [{ type: 'text', text: 'x' }] }, '2026-10-23T14:00:00.000Z')])
     expect(picked?.at).toBe('2026-10-23T14:00:00.000Z')
+  })
+})
+
+
+describe('背景密钥样式扫描（2026-10-27 F9）', () => {
+  it('只报类别不回显值；干净文本空', () => {
+    expect(secretLikeFindings('普通讨论：先列假设')).toEqual([])
+    const findings = secretLikeFindings('api_key = sk-abcdefghijklmnop1234\nAuthorization: Bearer abcdefghijklmnopqrstuvwxyz')
+    expect(findings).toContain('sk- token')
+    expect(findings).toContain('Bearer token')
+    expect(findings).toContain('password/secret 赋值')
+    expect(findings.join(' ')).not.toContain('abcdefghijklmnop')
   })
 })

@@ -56,6 +56,7 @@ export const CULTIVATION_COPY = {
   contextAdd: '＋ 添加背景',
   contextHint: '选一段会话或一份成品，审批人能看到现场，你不用把来龙去脉写一遍。',
   contextPrivacy: '背景会写进公司盘的培养记录，相关角色可见；只选愿意共享的材料。',
+  contextSecretWarning: '背景里可能有密钥/令牌样式内容；确认这是愿意写进公司盘的材料（不会自动脱敏）。',
   contextUseCurrent: '本次会话',
   contextPickTitle: '选择参考背景',
   contextSearchPlaceholder: '搜会话标题 / 角色 / 成品名…',

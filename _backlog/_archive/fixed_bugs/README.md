@@ -4,6 +4,8 @@
 
 ## 修复流水（倒序）
 
+- **BUG-033**（2026-10-27）：revoke 恢复把“已撤销 + 用户后改正文”回滚成旧全文——journal 只存旧全文、用 `revokedAt:` 猜目标态；用户在后改正文（保留 revokedAt）会被整条回滚。修法 = 从旧全文 + revokedAt 纯函数推导目标全文；恢复只认 old/target，第三态 conflict 不覆盖；守卫 = 同 spec 的“revokedAt + 正文被改 ⇒ conflict 且字节不变”。红绿 = 新用例先红（旧实现 restore 旧全文）→ 修复后 4/4 绿。详见 [卡](BUG-033-revoke-recovery-body-edit-loss.md)。
+
 - **BUG-032**（2026-10-23）：r3 重录产不出可重放 fixture——委派完成通知落在 lead 轮内/轮后两种形状（3 vs 4 次模型调用），重放到达时机相反即 `llm-replay: script exhausted`。修法 = `--record` 录完立即 keyless 自检、红则重录（≤3 次），失败如实保留现场；不在重放侧宽容 script 用尽。红绿 = 前三次重录全红 → 修复后连续两次 `--record` 第一次即自检绿、replay ALL PASS。教训 = **录制类命令要自证可回放，别把运气交给下一次**。详见 [卡](BUG-032-r3-rerecord-not-replayable.md)。
 
 - **BUG-031**（2026-10-20）：`orient --scenario replay/r3-delegation` ENOTDIR 崩——runBundleView 对 children 引用一律 readdirSync，而 r3 声明的是单文件形状（`sessions/vp-eng-child.jsonl`）。修法 = statSync 分流（文件且 .jsonl 计 1 / 目录数 .jsonl）；守卫 = orient.spec 真实 r3 断言 + 文件形状夹具（红 2 failed → 绿 27/27，活体视图完整渲染）。教训 = 消费引用合同要枚举全部合法形状。详见 [卡](BUG-031-orient-scenario-children-file-shape.md)。

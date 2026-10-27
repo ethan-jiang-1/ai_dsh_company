@@ -313,6 +313,31 @@ export function contextPayloadText(items: readonly CultivationContext[]): string
 }
 
 /** 背景的 head+tail 有界截取；截断时 `truncated: true`，不把“已截取”写进 excerpt。 */
+/** 背景里常见的密钥/令牌样式（只报类别，不回显值）。 */
+const SECRET_PATTERNS: readonly { readonly label: string, readonly re: RegExp }[] = [
+  { label: '私钥', re: /-----BEGIN (?:RSA|OPENSSH|EC|DSA|PGP) PRIVATE KEY-----/ },
+  { label: '云访问密钥', re: /\bAKIA[0-9A-Z]{16}\b/ },
+  { label: 'GitHub token', re: /\bgh[pousr]_[A-Za-z0-9]{20,}\b/ },
+  { label: 'Slack token', re: /\bxox[baprs]-[A-Za-z0-9-]{10,}\b/ },
+  { label: 'sk- token', re: /\bsk-[A-Za-z0-9_-]{16,}\b/ },
+  { label: 'Bearer token', re: /\bBearer\s+[A-Za-z0-9._-]{20,}\b/i },
+  { label: 'password/secret 赋值', re: /\b(?:password|passwd|secret|api[_-]?key|access[_-]?token)\s*[:=]\s*[^\s]{8,}/i },
+]
+
+/**
+ * 扫描一段背景文字里常见的密钥/令牌样式。
+ * 只返回类别（不回显值），供 UI 在“写入公司盘”前提示；不阻断、不自动脱敏。
+ * @param text - 背景摘录/正文。
+ * @returns 命中的类别（去重、稳定顺序）。
+ */
+export function secretLikeFindings(text: string): string[] {
+  const found: string[] = []
+  for (const pattern of SECRET_PATTERNS) {
+    if (pattern.re.test(text) && !found.includes(pattern.label)) found.push(pattern.label)
+  }
+  return found
+}
+
 export function clipExcerpt(text: string, max = 1_200): { readonly text: string; readonly truncated: boolean } {
   const chars = [...text]
   if (chars.length <= max) return { text, truncated: false }

@@ -174,7 +174,7 @@ export function useCultivationPanelData(
           const head = await files.readRecordHead(sessionId, `cultivation/records/${name}`, controller.signal)
           const summary = head === null ? null : parseRecord(id, head)
           if (summary === null) { broken.push(name); continue }
-          summaries.push(summary)
+          summaries.push({ ...summary, bodyTruncated: true })
         }
         // open 全部读全文（不能藏旧待办）；非 open 只给最近 FULL_RECORD_LIMIT 条。
         const full = new Set<string>(summaries.filter(record => record.status === 'open').map(record => record.id))
@@ -183,15 +183,19 @@ export function useCultivationPanelData(
           if (record.status === 'open') continue
           if (nonOpen < FULL_RECORD_LIMIT) { full.add(record.id); nonOpen += 1 }
         }
+        const fullyRead = new Set<string>()
         for (let index = 0; index < summaries.length; index += 1) {
           const summary = summaries[index]!
           if (!full.has(summary.id)) continue
           const text = await files.readRecord(sessionId, `cultivation/records/${summary.id}.md`, controller.signal)
           const record = text === null ? null : parseRecord(summary.id, text)
-          if (record !== null) summaries[index] = record
+          if (record !== null) {
+            summaries[index] = { ...record, bodyTruncated: false }
+            fullyRead.add(summary.id)
+          }
         }
         nextRecords = summaries
-        unexpanded = summaries.filter(record => !full.has(record.id)).length
+        unexpanded = summaries.filter(record => !fullyRead.has(record.id)).length
       }
       if (controller.signal.aborted) return
       setJournalRows([...inboxRows(listings, heads)])

@@ -261,12 +261,17 @@ try {
   check('卸载后公司盘与 bundle.json 仍在', existsSync(join(companyHome, 'AGENTS.md')) && existsSync(manifestPath))
   check('卸载后扩张面仍在', existsSync(journal) && existsSync(final) && existsSync(meta))
 
-  console.log('⑦ business 备份恢复（公司盘 + bundle.json；不含 sessions）')
+  console.log('⑦ business 备份恢复（公司盘 + bundle.json + 方法层；不含 sessions）')
   const restoreProfileDir = join(restoreHome, 'profiles', PROFILE)
   const restoreCompanyHome = join(restoreHome, 'tmp/lifecycle-company-workspace')
+  const methodRoot = join(home, 'profiles', PROFILE, 'company-cultivation')
+  const methodFile = join(methodRoot, 'ceo/lifecycle-method/SKILL.md')
+  mkdirSync(join(methodRoot, 'ceo/lifecycle-method'), { recursive: true })
+  writeFileSync(methodFile, '---\nname: lifecycle-method\ndescription: restore test\n---\n\n# lifecycle-method\n')
   mkdirSync(restoreProfileDir, { recursive: true })
   cpSync(companyHome, restoreCompanyHome, { recursive: true })
   cpSync(manifestPath, join(restoreHome, 'bundle.json'))
+  cpSync(methodRoot, join(restoreProfileDir, 'company-cultivation'), { recursive: true })
   writeFileSync(join(restoreProfileDir, 'package.json'), `${JSON.stringify({
     name: `dsh-profile-${PROFILE}`, private: true,
     dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app'], patchReload: 'startup' } },
@@ -295,6 +300,7 @@ try {
     check('business 恢复公司盘与扩张面仍在', readFileSync(join(restoreCompanyHome, 'AGENTS.md'), 'utf8').includes('lifecycle-keep')
       && existsSync(join(restoreCompanyHome, 'deliverables/2026-10-25-lifecycle/final.md'))
       && existsSync(join(restoreCompanyHome, 'kb/ceo/journal/2026-10-25-lifecycle.md')))
+    check('business 恢复方法层文件仍在', readFileSync(join(restoreProfileDir, 'company-cultivation/ceo/lifecycle-method/SKILL.md'), 'utf8').includes('lifecycle-method'))
     check('business 恢复不带 sessions（按合同）', !existsSync(join(restoreHome, 'sessions'))
       || readdirSync(join(restoreHome, 'sessions')).length === 0)
   } finally {

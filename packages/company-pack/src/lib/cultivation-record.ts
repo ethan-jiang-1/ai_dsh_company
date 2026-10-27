@@ -38,6 +38,8 @@ export interface CultivationRecord {
   readonly revokedAt?: string
   /** 正文首句（收件箱预览标题）。 */
   readonly title: string
+  /** 正文是否只加载了摘要（面板分段读；true = 展开也不是全文）。 */
+  readonly bodyTruncated?: boolean
   /**
    * 提案正文（做法与证据全文，trim 后）。
    * 2026-10-17 修订（培养 GUI 卡 S4）：原先**刻意不暴露给客户端**（人只看得到首句 `title`），

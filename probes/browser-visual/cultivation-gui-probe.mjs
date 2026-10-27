@@ -6,7 +6,8 @@
 //   host `/cultivation` 命令族、或升 pin 后必跑（人侧命令通道 = vendor `remote.commands.execute`）；
 //   培养 GUI 卡验收（S2–S6）前必跑。
 // 成本：keyless（boot ~20–60s + chromium；零模型调用）。
-// 用法：source run/env.sh && node probes/browser-visual/cultivation-gui-probe.mjs [--fixture]
+// 用法：source run/env.sh && node probes/browser-visual/cultivation-gui-probe.mjs [--fixture] [--summary]
+//   --summary：额外种 130 条旧记录 + 1 条坏记录，断言面板显示“未展开/坏记录”真浏览器文案。
 //
 // 为什么需要它：keyless 交互档（happy-dom）只能证明「点了发哪条线」；**线真的被 host 执行、
 //   方法真的落进方法层、命令真的进会话日志**只有真浏览器 + 真 host 能证明（client-load-smoke
@@ -41,6 +42,7 @@ import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 
 const FIXTURE = process.argv.includes('--fixture')
+const SUMMARY = process.argv.includes('--summary')
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 let home
@@ -115,6 +117,17 @@ const CROSS_ID = `guiprobe-${STAMP}-cross`
 const SESSIONS_ROOT = join(home, 'sessions', `--${WORKSPACE.replace(/^\//, '').replaceAll('/', '-')}--`)
 const sessionDirsBefore = new Set(existsSync(SESSIONS_ROOT) ? readdirSync(SESSIONS_ROOT) : [])
 const recordsBefore = new Set(existsSync(RECORDS_DIR) ? readdirSync(RECORDS_DIR) : [])
+if (SUMMARY) {
+  mkdirSync(RECORDS_DIR, { recursive: true })
+  for (let index = 0; index < 130; index += 1) {
+    const id = `guiprobe-summary-20200101-${String(index).padStart(6, '0')}`
+    writeFileSync(join(RECORDS_DIR, `${id}.md`), [
+      '---', 'kind: correction', 'targetRole: ceo', 'proposerRole: ceo', 'proposerKind: human',
+      'source: summary probe', 'expectation: summary', 'status: rejected', '---', '', 'old body', '',
+    ].join('\n'))
+  }
+  writeFileSync(join(RECORDS_DIR, 'guiprobe-broken.md'), 'not a record\n')
+}
 /** 读一条记录的当前全文（不存在给 null）。 */
 const recordTextOf = (id) => existsSync(join(RECORDS_DIR, `${id}.md`)) ? readFileSync(join(RECORDS_DIR, `${id}.md`), 'utf8') : null
 
@@ -205,6 +218,16 @@ try {
     const pane = page.locator('.wk-cultivation-compose').first()
     await pane.waitFor({ timeout: 30_000 })
   })
+
+  if (SUMMARY) {
+    const text = await page.locator('body').innerText()
+    const summary = /(\d+) 条旧记录只读了摘要/.exec(text)
+    const broken = /(\d+) 条记录读不动/.exec(text)
+    if (summary === null) failures.push('summary：面板未显示“旧记录只读了摘要”')
+    else console.log(`  PASS summary 面板显示未展开 ${summary[1]} 条`)
+    if (broken === null) failures.push('summary：面板未显示坏记录')
+    else console.log(`  PASS summary 面板显示坏记录 ${broken[1]} 条`)
+  }
 
   // 会话身份 + host 角色：靠**创作面**自己问出来——`correct` 写下的记录，targetRole 就是
   // host 会话的真实角色（handler 取会话 header），这比信客户端投影可靠（2026-10-18 实测：

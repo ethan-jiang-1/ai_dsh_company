@@ -17,6 +17,7 @@ import {
   planBundleManifest,
   planSkeletonUpgrade,
   planWorkspaceRebind,
+  pruneBundleBackups,
   readBundleManifest,
   readBundleManifestState,
   resolvePackMetadata,
@@ -430,6 +431,41 @@ describe('显式换盘（2026-10-27 FAQ 26 对齐 P0）', () => {
     } finally {
       rmSync(skel, { recursive: true, force: true }); rmSync(dsh, { recursive: true, force: true })
       rmSync(source.root, { recursive: true, force: true }); rmSync(target.root, { recursive: true, force: true })
+    }
+  })
+})
+
+
+describe('换盘备份保留（2026-10-27 F6）', () => {
+  it('只保留最近 N 份 bundle.json.bak-*', () => {
+    const dsh = home()
+    try {
+      for (let i = 0; i < 7; i += 1) writeFileSync(join(dsh, `bundle.json.bak-2026-10-2${String(i)}`), String(i))
+      const removed = pruneBundleBackups(dsh, 3)
+      expect(removed).toHaveLength(4)
+      expect(readdirSync(dsh).filter(name => name.startsWith('bundle.json.bak-')).sort())
+        .toEqual(['bundle.json.bak-2026-10-24', 'bundle.json.bak-2026-10-25', 'bundle.json.bak-2026-10-26'])
+    } finally {
+      rmSync(dsh, { recursive: true, force: true })
+    }
+  })
+})
+
+
+describe('v1 fixture 迁移演练入口（2026-10-27 F8）', () => {
+  it('v1 fixture 可读；改 v2 后保留原文件并 unsupported', () => {
+    const dsh = home()
+    try {
+      const fixture = readFileSync(join(process.cwd(), 'tests/fixtures/bundle-manifest-v1.json'), 'utf8')
+      writeFileSync(join(dsh, 'bundle.json'), fixture)
+      expect(readBundleManifestState(dsh).status).toBe('ok')
+      expect(readBundleManifest(dsh)?.id).toBe('bundle-fixture-v1')
+      const future = JSON.stringify({ ...JSON.parse(fixture), v: 2 }, null, 2)
+      writeFileSync(join(dsh, 'bundle.json'), future)
+      expect(readBundleManifestState(dsh)).toMatchObject({ status: 'unsupported', version: 2 })
+      expect(readFileSync(join(dsh, 'bundle.json'), 'utf8')).toBe(future)
+    } finally {
+      rmSync(dsh, { recursive: true, force: true })
     }
   })
 })

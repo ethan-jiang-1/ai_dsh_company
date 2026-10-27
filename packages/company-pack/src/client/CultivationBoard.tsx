@@ -301,6 +301,9 @@ export function CultivationBoard(props: CultivationBoardProps) {
                           </div>
                         )
                       })()}
+                      {record.bodyTruncated === true && (
+                        <div className="wk-meta">正文只加载了摘要，可能不完整；完整原文在 `cultivation/records/{record.id}.md`。</div>
+                      )}
                       {/* 判断要有材料（S4）：正文就地可见；但**长正文默认只展前几行**（场景轮实测 60 行撑出
                           1156px 行高，把后面 12 条待办顶到看不见的地方）⇒ 给明确的「展开全文（共 N 行）」。 */}
                       {record.body !== '' && (() => {
@@ -570,7 +573,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
             <li>建议：/cultivation suggest 角色 期望行为一句话 :: 建议与证据</li>
             <li>采纳：/cultivation adopt 记录编号　拒绝：/cultivation reject 记录编号 :: 理由</li>
             <li>验证：/cultivation verify 记录编号 pass｜fail　撤回：/cultivation revoke 方法名</li>
-            <li>归档：/cultivation archive 天数（只动已处理记录，open 不动）</li>
+            <li>归档：/cultivation archive 天数（只动已处理记录，open 不动）　清理归档：/cultivation purge 天数</li>
             <li>体检：/cultivation check（报告记录缺方法/方法无记录，不自动改）</li>
           </ul>
         </details>
