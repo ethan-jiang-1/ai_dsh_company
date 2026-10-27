@@ -5,8 +5,9 @@ description: Use when finishing any non-trivial change before reporting it done,
 
 # 收尾的完成定义
 
-适用：任何非平凡变更在**宣布完成之前**。规则唯一家 = [dev-loop §12](../../../docs/guides/dev-loop.md)
-（收尾动作清单）与 [§13](../../../docs/guides/dev-loop.md)（语义审四输入）；本 skill 只管**次序**与**判据**。
+适用：任何非平凡变更在**宣布完成之前**。**收尾次序与六行回执形状的唯一家 = 本 skill**；
+去向规则住 [dev-loop §12](../../../docs/guides/dev-loop.md)（整片 revert / `_backlog` 离场 / Note 归属），
+语义审四输入住 [§13](../../../docs/guides/dev-loop.md)——两边都只链接，不复述本 skill 的步骤。
 
 ## 陷阱
 
@@ -31,9 +32,15 @@ description: Use when finishing any non-trivial change before reporting it done,
    （门禁 `bare-path` / `md-links` 查得到的部分交给门禁，查不到的——散文里的描述、表格里的行——自己过一遍）。
 6. **反向检查**：被证伪的已落地切片**整片 revert**（实现+测试+docs+Note 同退），修正另起新条目。
    不做半 revert 的外科修补——半退留「文档说 A、代码是 B」的漂移态，结构门禁查 HEAD 不查语义一致，抓不住。
-7. **发轮次回执**（六行固定形状 = §12）。
-8. `pnpm verify` + `pnpm test`（`set -o pipefail` 链；裸 `cmd | tail` 取的是 tail 的退出码 =
-   假绿）。
+7. **跑门禁**：`pnpm verify` + `pnpm test`（`set -o pipefail` 链；裸 `cmd | tail` 取的是 tail 的
+   退出码 = 假绿）。改动面涉类型/导入签名时加 `pnpm typecheck`。
+8. **发轮次回执**（非平凡收尾必发——交接的标准形状，驾驶座可见面）。固定六行：
+   ① 外部行为与影响面（含改动 owner）；
+   ② 四链证据（挂得上 / 行为对 / 装得上〔适用时〕 / 批准：各点名**实跑**的检查，未跑如实标「未执行」）；
+   ③ 语义审结论（四输入过了一遍、发现 N 条及处置）；
+   ④ 资产增量（场景/夹具/门禁/语料涨了什么，没涨如实写）；
+   ⑤ 未验证面与恢复所需环境线索；
+   ⑥ 下一脚建议（给用户的最小动作，或「无事可做」）。
 
 ## 完成判据
 
@@ -42,12 +49,13 @@ description: Use when finishing any non-trivial change before reporting it done,
 - [ ] 语义审**真跑过**并且**写出了结论**（审了什么、发现 N 条、怎么处置）——不是"已阅"。
 - [ ] 收割三问逐问有答案（「无」也是答案，但必须回答）。
 - [ ] 被证伪的切片整片 revert（或明确说明为何不 revert）。
-- [ ] 六行回执已发。
-- [ ] `pnpm verify` + `pnpm test` 全绿，且命令链用了 `set -o pipefail`。
+- [ ] `pnpm verify` + `pnpm test` 全绿，且命令链用了 `set -o pipefail`（涉类型面时 `pnpm typecheck` 也跑过）。
+- [ ] 六行回执已发，且每行都有内容（「未执行」「无」也是内容）。
 
 ## 指针（别复述）
 
-动作清单 = [dev-loop §12](../../../docs/guides/dev-loop.md)；语义审四输入与拉人四件套 = [§13](../../../docs/guides/dev-loop.md)；
+去向规则（整片 revert / `_backlog` 离场 / Note 归属）= [dev-loop §12](../../../docs/guides/dev-loop.md)；语义审四输入与拉人四件套 = [§13](../../../docs/guides/dev-loop.md)；
+**本 skill 是收尾次序与六行回执形状的唯一家**（§12 与 orient 只链接，不复述）；
 Note 侧的完成定义 = [agent-note-definition](../agent-note-definition/SKILL.md)；
 门禁侧 = [gate-change-definition](../gate-change-definition/SKILL.md)；
 证据分层 = [testing.md](../../../docs/testing.md)。
