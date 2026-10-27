@@ -41,9 +41,11 @@ const COOKIE_TIMEOUT_MS = 15_000
  *   `--patch <path>`（`--patch` 可重复——replay-smoke 的场景 patch + PRESET_PATCHES 组合是数组
  *   用例；不给出则 argv 与其余调用方逐字一致）。
  * @param {number} [options.port] - 传给 `--port` 的值；默认 0（端口是环境状态，交系统分配）。
+ * @param {Function} [options.onOutput] - 每段 stdout/stderr 的回调（调用方自己决定是否落盘；
+ *   本模块保持零 import，不替调用方写文件）。
  * @returns {Promise<{child: object, port: number, token: string, base: string}>}
  */
-export function startWeb({ spawn: spawnProcess, root, home, env = process.env, patch, port = 0 } = {}) {
+export function startWeb({ spawn: spawnProcess, root, home, env = process.env, patch, port = 0, onOutput } = {}) {
   const patches = patch === undefined ? [] : (Array.isArray(patch) ? patch : [patch])
   const child = spawnProcess(process.execPath,
     ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web',
@@ -53,18 +55,21 @@ export function startWeb({ spawn: spawnProcess, root, home, env = process.env, p
   let output = ''
   return new Promise((res, rej) => {
     const settle = fn => value => { clearTimeout(timer); fn(value) }
+    const tail = () => output.trim() === '' ? '' : `；输出尾部：\n${output.slice(-2000)}`
     const on = chunk => {
+      const text = String(chunk)
       // 输出上限 16000 字符（entry-probe-smoke 既有形态）：防失败路径上无界累积，成功路径无影响。
-      output = `${output}${String(chunk)}`.slice(-16_000)
+      output = `${output}${text}`.slice(-16_000)
+      onOutput?.(text)
       const match = BANNER_RE.exec(output)
       if (match) settle(res)({ child, port: Number(match[1]), token: match[2], base: `http://127.0.0.1:${match[1]}` })
     }
     child.stdout.on('data', on)
     child.stderr.on('data', on)
-    child.on('exit', code => settle(rej)(new Error(`web 提前退出 ${String(code)}`)))
+    child.on('exit', code => settle(rej)(new Error(`web 提前退出 ${String(code)}${tail()}`)))
     // spawn 失败（如 ENOENT）发 error 事件；不接会变成未处理异常（entry-probe-smoke 既有防护）。
     child.once('error', error => settle(rej)(error))
-    const timer = setTimeout(() => settle(rej)(new Error('boot 超时：未在输出里读到 banner')), BOOT_TIMEOUT_MS)
+    const timer = setTimeout(() => settle(rej)(new Error(`boot 超时：未在输出里读到 banner${tail()}`)), BOOT_TIMEOUT_MS)
   })
 }
 

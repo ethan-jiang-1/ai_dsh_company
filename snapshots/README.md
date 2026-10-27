@@ -10,7 +10,7 @@
 | 场景 | 现有资产与证明范围 | 消费入口 |
 |---|---|---|
 | [replay/foundation-workspace](replay/foundation-workspace/) | authored 文件工具回放：`workspace.before → expected` 完整树、replay fixtures、sidecars；无公司事实 | [replay-smoke](../checks/smoke/replay-smoke.mjs) |
-| [visual/company-shell](visual/company-shell/) | UI 金样：隔离空壳（无会话）下 9 个公司页签的归一化可见文本；断言外壳与空态，不覆盖会话数据面 | [ui-scene-smoke](../checks/smoke/ui-scene-smoke.mjs)（`--isolated --golden`）+ [ui-golden-freshness](../checks/gates/ui-golden-freshness.mjs) |
+| [visual/company-shell](visual/company-shell/) | UI 金样：隔离空壳（无会话；默认 workspace 指向隔离公司盘）下 9 个公司页签的归一化可见文本；断言外壳与空态，不覆盖会话数据面 | [ui-scene-smoke](../checks/smoke/ui-scene-smoke.mjs)（`--isolated --golden`）+ [ui-golden-freshness](../checks/gates/ui-golden-freshness.mjs) |
 | [probes/entry-probe](probes/entry-probe/) | 认证档答卷归档：真模型对入口链 13 题的逐题答案 + 来源哈希（合成任务；无部署/客户数据） | [entry-probe-smoke](../checks/smoke/entry-probe-smoke.mjs)（真模型，按日期追加） |
 
 ## 规则
@@ -21,4 +21,5 @@
 - `snapshot.yml` 的 `replayEligible` 三态与「资格理由（日期）」由 `replay-scene-liveness` 门禁查。
 - 体积、索引与注入面由 `snapshots-budget` / `snapshot-index` / `replay-fixture-freshness` 守；UI 金样与注册面一致由 `ui-golden-freshness` 守。
 - UI 金样的唯一更新入口 = `node checks/smoke/ui-scene-smoke.mjs --isolated --refresh-golden`（手改金样 = 让回归网失真）。
+- UI 金样的隔离场景预置 `home/storages/workspace.json`（`defaultWorkspaceId` → 公司盘）+ pack 骨架 + 空成品索引/records；**不读用户 OS Documents 下的默认 workspace**。
 - 证据的现行家 = 部署仓/run bundle（`runtime/backups/` 只作本机迁移副本，不进 git）。

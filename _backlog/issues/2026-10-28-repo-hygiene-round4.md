@@ -27,7 +27,7 @@ opened: 2026-10-28
 - 批 D（用户可见面补测）与批 E（拆巨人/收家）的取舍与顺序。
 - UI 症状捕获走哪条：只修金样稳定性 / 加 `cdp-probe --attach <devtools-port>` 接用户正在跑的页面 / 再加 `--steps` 交互脚本。
 
-**下一步：** 用户已于 2026-10-28 批全批（A–E），按批落 commit + Note；每批跑对应真检查。批 A 已落（[Note](../../notes/implemented/2026-10-28-r4-batch-a-truth.md)），继续 B→E。
+**下一步：** 用户已于 2026-10-28 批全批（A–E），按批落 commit + Note；每批跑对应真检查。批 A 已落（[Note](../../notes/implemented/2026-10-28-r4-batch-a-truth.md)），批 B 已落（[Note](../../notes/implemented/2026-10-28-r4-batch-b-ui-lane.md)），继续 C→D→E。
 
 ## 范围与排除项
 

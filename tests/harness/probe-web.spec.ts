@@ -108,6 +108,16 @@ describe('startWeb：进程参数与 banner 解析', () => {
     await expect(started).rejects.toThrow(/web 提前退出 3/)
   })
 
+  it('boot 失败时错误消息带输出尾部；onOutput 能收到同一段（可落 web.log）', async () => {
+    const { spawn, child, emit } = fakeSpawn()
+    const chunks: string[] = []
+    const started = startWeb({ spawn, root: '/repo', home: '/repo/h', port: 0, onOutput: text => { chunks.push(text) } })
+    emit('mount failed: boom\n')
+    child.emit('exit', 3)
+    await expect(started).rejects.toThrow(/mount failed: boom/)
+    expect(chunks.join('')).toContain('mount failed: boom')
+  })
+
   it('child error 事件被接住转为拒绝（不是未处理异常）；banner 解析后 120s 定时器被清掉', async () => {
     const { spawn, child } = fakeSpawn()
     const started = startWeb({ spawn, root: '/repo', home: '/repo/h', port: 0 })

@@ -6,7 +6,8 @@
 //   ③升 pin / 收割后 UI 回归。成本：默认档零模型（真实渲染断言面）；`--ask` 加一次真实模型调用。
 // 前置：GUI URL（demo.md §前置：source run/env.sh → pnpm dsh web -- --port 0 --no-open → 横幅 URL）；
 //   Chrome 二进制：DSH_PROBE_CHROME 环境变量或系统 Chrome（run/env.sh 已指 Chrome for Testing）。
-// 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser] [--evidence] [--texts] [--json-out <path>]
+// 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser] [--evidence] [--texts] [--json-out <path>] [--steps <file>]
+//   --steps：受控动作 JSON（clickText / waitText / expectText / typeText），复现“点按钮/面板”症状；
 //   默认断言面 = composer + 品牌 + 右栏**全部**公司页签逐个开（Start-chip 回切）+ 面板体
 //   `[data-company-tab-title=…]` 可见且非空 + console/异常捕获。页签清单从注册源
 //   `company-tab-registration.ts` 解析（不再手写；2026-10-20 审计：旧清单 8 个漏「成品」）。
@@ -26,6 +27,7 @@ import process from 'node:process';
 import { parseCompanyTabCatalog } from '../../tools/lib/company-tab-catalog.mjs';
 import { diagnosisDir } from '../../tools/lib/diagnosis.mjs';
 import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { parseProbeSteps } from '../../tools/lib/probe-steps.mjs'
 
 const args = process.argv.slice(2);
 const guiUrl = args.find(a => !a.startsWith('--'));
@@ -38,6 +40,17 @@ const saveEvidence = flag('--evidence');   // 成功也落 verdict/截图（R3-2
 const captureTexts = flag('--texts');
 const jsonOutIndex = args.indexOf('--json-out');
 const jsonOut = jsonOutIndex === -1 ? undefined : args[jsonOutIndex + 1];
+const stepsIndex = args.indexOf('--steps');
+const stepsPath = stepsIndex === -1 ? undefined : args[stepsIndex + 1];
+let steps = [];
+if (stepsIndex !== -1 && (stepsPath === undefined || stepsPath.startsWith('--'))) {
+  console.error('cdp-probe: --steps 需要一个 JSON 文件路径');
+  process.exit(2);
+}
+if (stepsPath !== undefined) {
+  try { steps = parseProbeSteps(readFileSync(stepsPath, 'utf8')); }
+  catch (error) { console.error(`cdp-probe: ${error.message}`); process.exit(2); }
+}
 
 if (guiUrl === undefined || !/^https?:\/\//.test(guiUrl) || !guiUrl.includes('token=')) {
   console.error("cdp-probe: PASS a booted GUI URL like 'http://127.0.0.1:<port>/?token=<t>'（demo.md §前置产出）");
@@ -59,6 +72,8 @@ const verdict = {
   clientErrors: [],
   errorRingInstalled: false,
   tabTexts: {},
+  steps: [],
+  stepFailures: [],
 };
 
 // 页签清单 = 注册源解析（单一事实）；解析为空直接 fail-loud，不静默退化成少一个也绿。
@@ -92,6 +107,25 @@ verdict.booted = true;
 const { evaluate, consoleProblems, exceptions } = handle;
 verdict.consoleProblems = consoleProblems;
 verdict.exceptions = exceptions;
+
+/** 金样文本稳定判据：面板 async 读取未完成时不许录成期望。 */
+const LOADING_MARKERS = ['读取中…', '读取团队状态…', '加载中…'];
+const normalizedText = text => String(text ?? '').replace(/\s+/g, ' ').trim();
+const hasLoadingMarker = text => LOADING_MARKERS.some(marker => normalizedText(text).includes(marker));
+
+/** 关掉 “Get started / Add API Key / Sign in” 引导模态（隔离 home 无凭据时会弹；可能晚于首屏）。 */
+const closeGetStarted = () => evaluate(`(() => {
+  const dlg = [...document.querySelectorAll('[role="dialog"]')].find(d => (d.innerText ?? '').includes('Get started'));
+  if (dlg === undefined) return 'absent';
+  const buttons = [...dlg.querySelectorAll('button')];
+  const close = dlg.querySelector('button[aria-label*="Close"],button[aria-label*="关闭"]')
+    ?? buttons.find(b => (b.textContent ?? '').trim() === '×')
+    ?? buttons.find(b => (b.textContent ?? '').trim() === '' && b.querySelector('svg') !== null)
+    ?? buttons.find(b => /close|关闭/i.test(b.getAttribute('aria-label') ?? ''));
+  if (close === undefined) return 'no-close';
+  close.click();
+  return 'dismissed';
+})()`);
 
 /** 失败现场：截图 + body 文本 + verdict + console，落到 runtime 诊断区（不再只打印 JSON）。 */
 async function writeEvidence(reason) {
@@ -155,6 +189,11 @@ try {
     })()`);
     if (dismissed === 'dismissed') verdict.modalsDismissed.push(name);
   }
+  // 隔离 home 没配凭据时会出现 “Get started / Add API Key / Sign in” 引导模态；它不是页面崩溃，
+  // 但会挡截图与点击。关掉它（有 Close 按钮点 Close，否则点右上角 ×），让空壳可见。
+  const getStarted = await closeGetStarted();
+  verdict.getStarted = getStarted;
+  if (getStarted === 'dismissed') verdict.modalsDismissed.push('Get started');
   if (verdict.modalsDismissed.length > 0) await sleep(1000);
 
   // 品牌（AppFrame 主标题，DSH_CLIENT_TITLE 构建期注入）
@@ -193,19 +232,42 @@ try {
       await sleep(500);
       rendered = await probeBody();
     }
-    const ok = clicked && rendered?.present === true && rendered?.visible === true && rendered?.textLength > 0;
+    // --texts 是金样的输入：等面板文本稳定（连续两次归一化相同且不含 loading 占位）再录。
+    // 只对 captureTexts 生效；默认断言面保持原先的快速档。
+    let settled = true;
+    if (clicked && rendered?.present === true && rendered?.visible === true && rendered?.textLength > 0 && captureTexts) {
+      settled = false;
+      let previous = normalizedText(rendered.text);
+      for (let i = 0; i < 8; i++) {
+        await sleep(300);
+        const next = await probeBody();
+        if (next?.present === true && next?.visible === true) rendered = next;
+        const current = normalizedText(next?.text);
+        if (next?.present === true && next?.visible === true && current === previous && !hasLoadingMarker(current)) {
+          settled = true;
+          break;
+        }
+        previous = current;
+      }
+    }
+    const ok = clicked && rendered?.present === true && rendered?.visible === true && rendered?.textLength > 0 && settled;
     if (ok) {
       verdict.tabsOpened.push(tab.title);
       if (captureTexts && typeof rendered.text === 'string') verdict.tabTexts[tab.title] = rendered.text;
     }
     else {
-      const why = !clicked ? 'entry' : rendered?.present !== true ? 'body' : rendered.visible !== true ? 'hidden' : 'empty';
+      const why = !clicked ? 'entry' : rendered?.present !== true ? 'body' : rendered.visible !== true ? 'hidden' : !settled ? 'not-settled' : 'empty';
       verdict.tabFailures.push(`${tab.title}(${why})`);
     }
   }
   if (verdict.tabsOpened.length !== tabs.length) {
     verdict.tabFailures.unshift(`仅 ${verdict.tabsOpened.length}/${tabs.length} 开`);
   }
+  // 隔离 home 的 onboarding 模态可能晚于首屏 1–2s 才出现；页签扫完再关一次，别让它挡截图。
+  const lateGetStarted = await closeGetStarted();
+  verdict.getStartedLate = lateGetStarted;
+  if (lateGetStarted === 'dismissed') verdict.modalsDismissed.push('Get started (late)');
+  if (lateGetStarted === 'dismissed') await sleep(500);
 
   // --ask：真建会话（registry default = ceo）→ 输入 → 发送 → 轮次收口 → 抓 transcript 尾。
   // 收口信号 = 正文增长后连续两次采样不变（主会话无 advisor 那种 "Completed in" 标记；
@@ -241,6 +303,47 @@ try {
       verdict.askTranscriptTail = prev.slice(-450);
     }
   }
+  // --steps：受控交互（按可见文本点击 / 等文本 / 断言文本 / 向选择器输入），复现“点按钮白了”。
+  for (const [index, step] of steps.entries()) {
+    const at = index + 1;
+    let ok = false;
+    let detail = '';
+    const waitMs = step.timeoutMs ?? 5000;
+    if (step.action === 'clickText') {
+      ok = await evaluate(`(() => {
+        const els = [...document.querySelectorAll('button,[role="tab"],[role="button"],a,[data-dockkit-tab],.wk-guide-entry-label')];
+        const el = els.find(e => (e.textContent ?? '').includes(${JSON.stringify(step.value)}));
+        if (el === undefined) return false;
+        el.click();
+        return true;
+      })()`) === true;
+      detail = ok ? `clicked ${step.value}` : `no element containing ${step.value}`;
+      if (ok) await sleep(300);
+    } else if (step.action === 'typeText') {
+      const [selector, text] = step.value;
+      ok = await evaluate(`(() => {
+        const el = document.querySelector(${JSON.stringify(selector)});
+        if (el === null) return false;
+        el.focus();
+        return document.execCommand('insertText', false, ${JSON.stringify(text)}) === true;
+      })()`) === true;
+      detail = ok ? `typed into ${selector}` : `selector missing or insert failed: ${selector}`;
+    } else {
+      const deadline = Date.now() + waitMs;
+      do {
+        const body = await evaluate('document.body.innerText');
+        ok = typeof body === 'string' && body.includes(step.value);
+        if (ok || step.action === 'expectText') break;
+        await sleep(250);
+      } while (Date.now() < deadline);
+      detail = ok ? `found ${step.value}` : `missing ${step.value}${step.action === 'waitText' ? ` within ${String(waitMs)}ms` : ''}`;
+    }
+    verdict.steps.push({ index: at, action: step.action, ok, detail });
+    if (!ok) {
+      verdict.stepFailures.push(`step ${String(at)} ${step.action}: ${detail}`);
+      break;
+    }
+  }
   // 浏览器侧错误环（client/error-ring.ts 安装）：页面内的 error/unhandledrejection/console.error。
   // 这是 agent 能看到的「用户当时到底撞了什么」——此前这类事实只活在用户自己的 DevTools 里。
   const ring = await evaluate(`JSON.stringify({
@@ -262,6 +365,7 @@ try {
     || verdict.exceptions.length > 0
     || verdict.clientErrors.length > 0
     || verdict.errorRingInstalled !== true
+    || verdict.stepFailures.length > 0
     || (ask !== undefined && (verdict.askError !== undefined || verdict.askTranscriptGrew !== true));
   if (bad) await writeEvidence('assertion');
   else if (saveEvidence) { verdict.evidenceDir = await writeEvidence('pass'); }
@@ -284,5 +388,6 @@ if (verdict.tabsOpened.length !== tabs.length || verdict.tabFailures.length > 0)
 if (verdict.consoleProblems.some(p => p.startsWith('console.error')) || verdict.exceptions.length > 0) exitCode = 1;
 if (verdict.clientErrors.length > 0) exitCode = 1;
 if (verdict.errorRingInstalled !== true) exitCode = 1;
+if (verdict.stepFailures.length > 0) exitCode = 1;
 if (ask !== undefined && (verdict.askError !== undefined || verdict.askTranscriptGrew !== true)) exitCode = 1;
 process.exit(exitCode);
