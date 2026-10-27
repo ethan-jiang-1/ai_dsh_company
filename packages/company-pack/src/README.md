@@ -1,5 +1,6 @@
 # src/ —— 本包源码面（host 半 + client 半）
 
+> 什么时候读：改 host/client 源码、找注册入口 / 读模型 / 渲染实现时。
 **布局**（2026-10-05 按盘核对重写；旧文两处失效指针已修：`routing.ts` 从未存在、`delegation-keys` 实际住 client 半）：
 
 - `index.ts` —— **host 注册入口**（bundle 行 `company-client` 指向它）：`inject = ['tools','approval','commands']`

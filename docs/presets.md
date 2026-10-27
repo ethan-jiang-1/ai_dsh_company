@@ -176,9 +176,7 @@ truncated）写进记录 frontmatter；客户端只做预览。有背景时正�
 | skill 条目（增删改名，含方法层） | 下一轮（pre-step digest 重算 → 替换目录注入）；2026-10-13 实测 watcher 连**运行中会话**的 catalog 都会刷新（探针 NOTE 行） | vendor skill digest；培养决定 = [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) |
 | 方法层撤回（`revoke` 删目录） | 删除后新会话不再加载；已加载进历史的正文不回改（append-only） | 2026-10-13 机制探针 |
 
-**培养验收（把"培养"从感觉变成检查）**：改任何 preset 内容后，`pnpm test` + `pnpm verify` +
-`node checks/smoke/preset-smoke.mjs`（真挂载）+ `node checks/smoke/probe-smoke.mjs --full`（入戏探针）全绿，
-才算培养成功（首例 = 2026-09-24，CEO `chairing-staff-meeting` +4 行）。方法层机制改动另跑
+**培养验收**：完整完成定义 = [preset-change-definition skill](../.agents/skills/preset-change-definition/SKILL.md)（次序/最小证据/场景义务的唯一家）；本段只补“培养内容”特有的入戏证据——改任何 preset 内容后，`pnpm test` + `pnpm verify` + `preset-smoke` + `probe-smoke --full` 全绿（首例 = 2026-09-24，CEO `chairing-staff-meeting` +4 行）。方法层机制改动另跑
 [cultivation-method-layer-probe](../probes/session-context/cultivation-method-layer-probe.mjs)（keyless 真 boot；
 判写隔离前先钉 `DSH_PERMISSION_MODE=workspace-write`——本机 Seatbelt 禁用时 env.sh 的
 danger-full-access 处方会让围栏缺席，这是机器条件不是机制缺口）。
