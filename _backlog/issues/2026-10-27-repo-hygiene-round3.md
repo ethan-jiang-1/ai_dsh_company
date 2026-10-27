@@ -18,7 +18,10 @@ opened: 2026-10-27
 （[Note](../../notes/implemented/2026-10-27-r3-c5-layer-guard.md)）→ 批次 B 授权/收尾单一家
 （[Note](../../notes/implemented/2026-10-27-r3-b-authority-and-closeout.md)）→ C 前半回归网与日志真值
 （[Note](../../notes/implemented/2026-10-27-r3-c-first-half-regression.md)；test 910→944，verify 全绿）。
-**剩余：** C1 合成 web 场景让 `--ui` 可用 · C7 客户端错误通道 · A2 真空绿门禁改 skip 语义 · D 渐进披露与结构收拢。
+**进展（2026-10-27 深夜）：** C 后半 + A2 已落——[真页面车道/错误环/SKIP 语义](../../notes/implemented/2026-10-27-r3-c-second-half-ui-lane.md)
+（`ui-scene-smoke` 一条命令自起实例看真页面；浏览器错误环进 verdict；两个 freshness 门禁 0 对象时输出 SKIP）；
+D 前半已落——[索引瘦身/预算双向/lib 修环/探针标题](../../notes/implemented/2026-10-27-r3-d-first-half-disclosure.md)。
+**剩余：** D1 政策层 + dev-loop 拆分（目标 ≤150 行）· D4 三个巨型函数按现成缝拆（482/425/340 行）。
 
 **下一步：** 按剩余四项继续；每项一 commit + Note + 对应真检查，全部落完再收口本卡并写去向。
 
