@@ -16,7 +16,7 @@
 | CLI 集成（`snapshot-motion-smoke`；真实 CLI + 临时 fixture，不进 `pnpm test`） | 真实 CLI 进程路径 | 语义 |
 | 发布形状（`release-smoke`） | 安装形状、built 入口可达 | 语义 |
 | 认证档（真模型） | 真行为 | 跨面正确 |
-| 行为质量档（`probe --full` + candidate-scan 语料） | 角色内容质量 | 机制回归 |
+| 行为质量档（`probe --full`；candidate-scan 语料已移出本仓，eval 报缺失 exit 2） | 角色内容质量 | 机制回归 |
 
 换档先问"这一层能证明我关心的性质吗"，不为安心堆档。
 
@@ -41,7 +41,7 @@
 [该轮 Note](../notes/archived/2026-10-10-minimal-evidence-mapping-home.md)。本节只留政策：
 
 - **同 diff 交付**：最小证据与被证明的改动同一 diff 出现，不欠账到"以后补"；
-- 单测、smoke、rationale **不替代组装转录**——会话级行为的固化证据只有回放场景。
+- 单测、smoke、rationale **不替代组装转录**——会话级行为的固化证据只有回放场景（公司行为回放已移部署仓；本仓只保留合成管线场景）。
 
 ## 3. 证据纪律（DSH 教义的本仓投影）
 

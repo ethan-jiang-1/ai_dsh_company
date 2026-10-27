@@ -5,11 +5,11 @@ import { join } from 'node:path'
 // ── 2c. 行数预算（缩编自 vendor `verify-doc-budgets`；防入口链继续膨胀——R6 D23/清单 B #52） ──
 // 负例留证 2026-09-27：AGENTS.md 临时超上限 → doc-budget 红。
 // 上限 = 立项时值 + 余量；超限先搬（内容挪到该去的家）再压，确需空间才在 Note 里说明后升上限。
-// **2026-09-27 起采 DSH 棘轮语义（FAQ 07 入口链）**：瘦身轮后上限随内容下调（≥5% 头寸）、只降不升；
+// **2026-09-27 起采 DSH 棘轮语义（FAQ 07 入口链）**：瘦身轮后上限随内容下调、只降不升；反向棘轮守 >20% 空置；
 // 上调须在 Note 里论证（三文件曾同时顶格 = 常驻层饱和信号，处置 = 瘦身不是提额）。
-// 负例留证 2026-10-27（R3-17 反向棘轮）：把 docs/project-map.md 的上限临时写成 200（实际 94）→
-//   `FAIL doc-budget: docs/project-map.md 94 行只占上限 200 的 47%（空置 >20%：按现行内容 +5% 下调上限，
-//   或 Note 论证保留）`；还原 99 → ALL PASS。web-rpc 26/47 是同一形态的存量（本轮下调到 30）。
+// 负例留证 2026-10-27（R3-17 反向棘轮）：把 docs/project-map.md 的上限临时写高（远高于内容）→
+//   `FAIL doc-budget: docs/project-map.md … 空置 >20%（按现行内容 +5% 下调上限，
+//   或 Note 论证保留）`；还原 99 → ALL PASS。web-rpc 曾长期空置（本轮下调到 30）。
 // ⚠ 注释里**不要复述当前行数**——那是易腐常量，实测值由每次跑出的 PASS 行给出（2026-09-26 修：
 //   原注释写"后 107 行"/"整治后 131"，实为 108 / 142，属"枚举型事实写两处"那一类腐化）。
 const SLACK_FLOOR = 0.2   // 上限最多比现行内容高 20%；超过即视为棘轮未落实（R3-17）
@@ -25,6 +25,8 @@ const DOC_LINE_BUDGETS = [
   ['docs/terminology.md', 22],   // 2026-10-12 立：术语映射查表自 index 迁出（登记型查表，随 pin 升级演进；行数稳定，头寸宽于 5% 起步）
   ['docs/guides/web-rpc.md', 30], // 2026-10-12 立；2026-10-27 R3-17 棘轮下调：原 47 让 21 行长期空置，按现行内容 + 5% 收紧
   ['docs/guides/release-runbook.md', 75], // 2026-10-26 立：发布五步 runbook（合同仍住 release.md；本文件只留操作与失败定位）
+  ['docs/guides/budget-and-ops.md', 72], // 2026-10-28 R4：补预算（原无上限；按现行内容 +5% 棘轮）
+  ['docs/guides/cdp-probe.md', 68], // 2026-10-28 R4：补预算（原无上限；按现行内容 +5% 棘轮）
   ['docs/policy.md', 100],           // 2026-10-27 R3-19 立：政策层（自 dev-loop §10/§11/§13 + §0.5 规则迁出）
   ['docs/guides/debugging.md', 38],  // 2026-10-27 R3-18：排查阶梯自 dev-loop §2 迁出
   ['docs/guides/environments.md', 48], // 2026-10-27 R3-18：运行环境自 dev-loop §6 迁出
@@ -38,7 +40,7 @@ const DOC_LINE_BUDGETS = [
   ['docs/demo.md', 237],        // 2026-10-21 冻结增长（六维度 Phase D3：无预算合同中最大三份立冻结预算）
   ['docs/multi-human.md', 199], // 2026-10-21 冻结增长
   ['docs/presets.md', 198],     // 2026-10-21 冻结增长（工具面表同轮去历史化）
-  ['packages/company-pack/workspace/AGENTS.md', 190], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面，同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates；2026-10-12 瘦身轮 195→190（内容 180：机制证据段收指针、证据叙事压缩、陈旧日期戳退役——同 diff Note）
+  ['packages/company-pack/workspace/AGENTS.md', 190], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面，同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates；2026-10-12 瘦身轮 195→190（机制证据段收指针、证据叙事压缩、陈旧日期戳退役——同 diff Note）
   // ── 2026-10-27 R3-17：入口链与最大合同补预算（原先 852 行 docs 无棘轮；checks/README 已从 193 压到 78）──
   ['checks/README.md', 85],        // 索引（R3-20 瘦身：逐脚本说明回到头注；只留分类 + 链接）
   ['tests/README.md', 100],         // 改动面 → 最窄检查（入口链第四跳）
@@ -61,7 +63,7 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
   if (lines > cap) {
     fail('doc-budget', `${rel} ${lines} 行超上限 ${cap}（先搬内容到该去的家，再压；不直接加行）`)
   } else if (lines < Math.ceil(cap * (1 - SLACK_FLOOR))) {
-    // 反向棘轮（R3-17）：上限长期悬空 = 「顶格即饱和」信号失效（web-rpc 曾 26/47 空置 21 行）。
+    // 反向棘轮（R3-17）：上限长期悬空 = 「顶格即饱和」信号失效（web-rpc 曾长期空置，已下调）。
     // 处置是**下调上限**（不是写内容凑数）；确需预留空间 → Note 论证后显式下调到 content+5%。
     fail('doc-budget', `${rel} ${lines} 行只占上限 ${cap} 的 ${String(Math.round((lines / cap) * 100))}%（空置 >${String(Math.round(SLACK_FLOOR * 100))}%：按现行内容 +5% 下调上限，或 Note 论证保留）`)
   } else {

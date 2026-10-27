@@ -4,7 +4,7 @@
 // 前置：**先 source run/env.sh 再跑**（或显式给同样的 DSH_PERMISSION_MODE）。姿态事件的**值**已脱敏，
 //   但它们的**在场与位置**随机器姿态变（Seatbelt 可用 = workspace-write，损坏 = danger-full-access，
 //   权限事件序列不同）——裸跑会在那些行上红，那是设计内的「序列漂移照样红」，不是夹具坏。
-// 何时跑：录制行为、组合或 workspace replay 改动时（第三档，无 key；现行只有一个 headless 合成场景 ~2s；--ui 另起浏览器）
+// 何时跑：录制行为、组合或 workspace replay 改动时（第三档，无 key；现行只有一个 headless 合成场景 ~2s；浏览器档已停用，真页面断言用 checks/smoke/ui-scene-smoke.mjs）
 //   --prepare     原始录制（replay/raw/，lead.jsonl + 任意名 child）→ 归一化 fixture
 //                 （session.v3.jsonl + session.<k>.v3.jsonl，child 按 header createdAt 排序）
 //                 + sidecar（system-prompt.expected.md / tool-schemas.expected.json；child 带 .k. 后缀）
@@ -13,13 +13,8 @@
 //   answerer: browser（场景 snapshot.yml 可选项）：本场景的问询由**真 UI 认领并作答**（第一项），
 //     录/放两侧同规则 ⇒ 对称。为什么需要它：ask 是前景等待，没人作答整轮不收口、会话日志不封盘，
 //     阻塞型场景因此既录不成也重放不成（2026-10-11 human-exits-ask 实测）。默认不开。
-//   --ui          默认重放的全部检查 + 委派卡端到端（P1.3，r3-delegation 场景）：playwright
-//                 加载真页面 → 连接工作区 → 搜索打开 lead 会话 → 展开轮次组 → ariaSnapshot
-//                 金样比对 + 委派卡可访问名断言（断言口径 = 可访问名/文本，不是 data-*——
-//                 aria 树里没有 DOM 属性；data-tool locator 只作 DOM 侧补充断言，vendor
-//                 present.e2e 同款双轨）
-//   --refresh-ui  与 --ui 同跑，但把捕获写成 replay/ui.expected.md 金样（首轮/有意变更时用；
-//                 写之前仍断言委派卡在场，杜绝把"卡缺席"录成金样）
+//   --ui / --refresh-ui  已停用：本仓没有声明 uiEvidence 的场景；真页面断言用
+//                 checks/smoke/ui-scene-smoke.mjs（自起实例 + cdp-probe + 证据）。
 //   （默认）       重放组合（replay/cordis.snapshot.yml，llm-replay）复演 → 归一化比对 + sidecar
 //                 比对 + 在场板判据（R5b：重放 lead 的 team/* 事件喂 pack 读模型，非空且与录制
 //                 同形；提案验收 4。场景不带 team 事件时自动跳过）
@@ -31,7 +26,7 @@
 //   （slots 的 tool.call.toolview keyed 注册），行不进组合卡永不渲染（红证即摘行）。
 // sidecar 为什么自算：vendor suite.ts 的 format*Snapshot 有 vitest 依赖，纯 Node 驱动 import
 //   不了；格式（{initial, changes} + <!-- system/message change N --> 分隔）照抄其源码。
-// 浏览器档（--ui）住在 ./lib/replay-ui.mjs（2026-10-14 拆出）：vendor apps/web/tests/scaffold.ts
+// 浏览器档旧实现（--ui，已停用）住在 ./lib/replay-ui.mjs（2026-10-14 拆出）：vendor apps/web/tests/scaffold.ts
 //   import vitest 不能直接 import，normalizeAria/captureStableAria 等为逐行转写（出处注在该文件函数头）。
 // 分层（guides/dev-loop §9.1 + readiness P1.4）：第三档（无 key、但要起进程与浏览器），不进 pnpm test。
 // 预算（§10）：墙钟 ≤ --wall。

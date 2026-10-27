@@ -1,7 +1,7 @@
 # 架构：repo 形态、组合层设计与插件计数
 
 > 什么时候读：想懂公司怎么组装、组合层怎么分层，或改机制前。这份是设计总纲——repo 怎么摆、插件怎么计数，细节按节进。
-> 总入口与决策台账：[index.md](../index.md)。
+> 总入口 = [index.md](../index.md)；决策台账 = [decisions.md](../decisions.md)。
 > 依据：FAQ 13（`_faq_on_digested/13_expert-plugin-repo-organization`）+ DSH 源码工作树逐条核实
 > （`packages/preset/*`、`packages/subagent/*`、`packages/experimental/agent-team/*`、`packages/workflow/*`、
 > `docs/subsystems/{agent-team,subagent,skills,workflow,spill}.md`）。
@@ -40,30 +40,7 @@ sections, and skills while every other session keeps its own"）。
 
 出厂范本 = `packages/bundle/web-app/presets/standard.patch.yml`（0.1.7 起**每预设一行
 `- insert:` 声明**，`name: '@deepseek-ai/dsh-agent-preset'`）；声明语义原文 =
-`packages/preset/agent-preset/README.md`。下面是完整配方：
-
-```yaml
-# ① 身份：persona row，shadow 掉部署默认人格，只对这个 preset 的会话生效
-- id: persona
-  name: '@deepseek-ai/dsh-persona'
-  config:
-    prefix: |-
-      你是 VP of Engineering，……（{{model}}/{{cwd}} 可插值）
-    # complete: true            # 极端收紧：整个 system prompt 只剩 prefix
-    # includeRuntimeContext: false  # 关掉运行时上下文快照
-
-# ② 角色专属 skills：skill-filesystem 行指向 preset 自己的 skills/ 目录，
-#    落在【本 preset 的 scope layer】，别的会话看不见（skills registry 分层机制）
-- id: skill-filesystem
-  name: '@deepseek-ai/dsh-skill-filesystem'
-  config:
-    customSkillDirs:
-      - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('skills/', baseUrl))"
-
-# ③ 该角色可见的工具行（fs/bash/检索/委托/……按需增删）
-- id: tool-fs
-  name: '@deepseek-ai/dsh-tool-fs'
-```
+`packages/preset/agent-preset/README.md`。**最小形状以 [presets/ceo/agent.cordis.yml](../../packages/company-pack/presets/ceo/agent.cordis.yml) 为准**（身份、skills 与工具行都收在 `plugins:` 下；本仓 preset 是自包含声明），这里只留三个机制要点：
 
 三个机制要点（都已在源码核实）：
 
@@ -103,7 +80,7 @@ host 层共享行 + N 个角色 preset + 共享 KB + 模板。插件包（代码
 | ② 第一段真代码（按需） | M2 委托 provider（给委托 child 挂角色 preset，见 [roles-isolation.md](./roles-isolation.md) §2/§3，百行级）；自定义工具行（org_chart、公司检索） | 同一 pack 内新增行 |
 | ③ 拆第二/三个包 | 触发条件（FAQ 13 决策 2 纪律）：某块代码独立演化 / 出现第二个消费方 / 独立发版需求；长出一窝专家才升方案 D | — |
 
-### 2.2 编排主通道（已核定，见 index 决策台账 D4）
+### 2.2 编排主通道（已核定，见 [decisions.md](../decisions.md) D4）
 
 demo 形态"事件从 CEO 进、从 CEO 出"首选 **Agent Teams（M4）**——只有 Lead 能创建/interrupt
 teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱、teammates 保留 `subagent` 工具
@@ -254,7 +231,7 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
 形态一句话：**独立 repo + `vendor/dsh` 钉 SHA submodule + 单 company-pack（唯一发布载体）+
 `company-workspace/` 共享盘 + 双 home**（日用 `~/.dsh` 不动，开发 `DSH_HOME=runtime/harness-home`，
 环境脚本兜底）。装法与取舍的判定依据 = FAQ 13 `option-a-standalone-with-pinned-dsh.md`
-（外部研究材料，登记见 [index §外部研究材料登记](../index.md)）。**本节不复刻目录树**：
+（外部研究材料，登记见 [external-research.md](../external-research.md)）。**本节不复刻目录树**：
 现行目录逐件 owner 与产物落点的唯一家 = [项目地图](../project-map.md)（秒级快览 = 根
 [AGENTS.md 布局块](../../AGENTS.md)，受 layout-block 门禁钉住）——第二张空间地图必漂
 （实测：本树漏 tests/_backlog/_dist 三面，snapshots 与 company-workspace 两行注释过期，

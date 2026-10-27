@@ -9,7 +9,7 @@
 
 | 形状 | 命令 | 状态 |
 |---|---|---|
-| 源码直跑 | `source run/env.sh && pnpm dsh --profile headless "…"` | ✅ R0 已验收 |
+| 源码直跑（通用 CLI；**不是公司面**，preset 只在 Web 挂载） | `source run/env.sh && pnpm dsh --profile headless "…"` | ✅ CLI 已验收 |
 | **开发 web 观察窗**（现行） | `pnpm dsh web -- --port 0 --no-open`（端口是环境状态：系统分配，从启动横幅读端口与 token） → 用 `runtime/harness-home/profiles/web`，pack 走 **`link:`**（改 presets/** 即刻生效，无需重装） | ✅ 现行 |
 | **目录独立启动** | `pnpm standalone [--home <dir>] [--workspace <dir>]` → 隔离 home + 自建 web profile + copy 骨架；`--reset` 只删带标记的 home | ✅ 2026-10-25（证明 = `standalone-smoke`；不碰日用 home） |
 | 组合验证 | `pnpm dsh --profile web --dump-config` | ✅ 通过（**行数与行名以当次 dump 为准，别在此写死**——2026-09-26 实测本行曾写"88 行，四新行"，而清单早已是 6 行） |

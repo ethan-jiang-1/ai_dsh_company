@@ -1,4 +1,4 @@
-# 文档地图、组织原则与决策台账
+# 文档地图与组织原则
 
 本目录是"虚拟公司多角色插件"项目的文档层。什么时候读 = 找某主题的事实家、查决策台账、或不确定该信哪份文档时（驾驭者白话速读 = [orient.md](./orient.md)）。性质：**当前合同 + 设计依据**——只写 now、随代码同 diff；决定、替代方案与验证证据归 `notes/`（`implemented/` 是当前 rationale owner；已落地且合同才是权威的冻结判定在 `archived/`）。
 
@@ -31,7 +31,7 @@
 | [multi-human.md](./multi-human.md) | 合同 | **多人协作现在时**（2026-09-26 出生）：机制边界（卡按会话作用域、成员拉不到人）/ 形态 / 开门 runbook / 协作前提三条 / 迁移清单 / 边界 |
 | [runtime-map.md](./runtime-map.md) | 合同 | **运行态地图**：profile / bundle / preset / session / cwd / 日志 / workspace / snapshot 的时序关系与四条状态轴 |
 | [data-model.md](./data-model.md) | 合同 | 事实级数据卡：权威 / 作用域 / 寿命 / 备份 / 迁移 / 换盘；presented 审计账本与索引的分层 |
-| [project-map.md](./project-map.md) | 合同 | 空间导航：目录逐件 owner、产物落点 |
+| [project-map.md](./project-map.md) | 导航 | 空间导航：目录逐件 owner、产物落点 |
 | [repo-hygiene.md](./repo-hygiene.md) | 合同 | 什么进 git / 什么不进、跨环境规则、例外与执行面 |
 | [guides/cdp-probe.md](./guides/cdp-probe.md) | 指南 | 观察窗「呈现即验证」机器腿：client 面改动后的呈现前走查、页面异常定位 |
 | [guides/web-rpc.md](./guides/web-rpc.md) | 指南 | 驱动 Web 面会话的 HTTP RPC runbook：脚本化建会话/发 prompt/读日志 |
@@ -39,7 +39,7 @@
 | [terminology.md](./terminology.md) | 导航 | 术语映射查表：本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达 |
 | [external-research.md](./external-research.md) | 导航 | repo 外研究材料登记与吸收落点（2026-10-20 自 index 迁出） |
 | [decisions.md](./decisions.md) | 导航 | 决策台账路由（D 号 → 一句话 → 家；2026-10-20 自 index 迁出） |
-| [orient.md](./orient.md) | 导航 | 驾驭者白话七问（只导航，不复述事实） |
+| [orient.md](./orient.md) | 常驻入口 | 驾驭者白话七问（只导航，不复述事实） |
 | [AGENTS.md](./AGENTS.md) | 规范 | 本层分层规矩唯一家（一处事实一个家 / 长度棘轮 / 更新时机 / 负知识） |
 
 ### notes/（决策与教训，不进 docs）
@@ -48,7 +48,7 @@
 |---|---|
 | `_backlog/issues/` → 用户裁决 → `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含实际跑过的验证 + 环境状态）。提案纪律 / 状态轴 / 毕业规则 / 分类规矩唯一家 = [notes/README](../notes/README.md)；未成熟问题由 [_backlog/issues/](../_backlog/issues/README.md) 推敲，制度 = [_backlog/README](../_backlog/README.md) |
 | [notes/archived/](../notes/archived/) · [notes/rejected/](../notes/rejected/) · [notes/postmortem/](../notes/postmortem/README.md) | 离场与复盘目录（D30 起；逐桶判据唯一家 = [notes/README](../notes/README.md)）：archived = 仍能阻止重开的冻结判定，rejected = 负知识，postmortem = **事故复盘** |
-## 决策台账（路由表）
+## 决策台账（已迁）
 
 D 号 → 一句话 → 家的路由表已迁 [decisions.md](./decisions.md)（本页只留路由；决定正文仍住 Note）。
 ## 文档路由

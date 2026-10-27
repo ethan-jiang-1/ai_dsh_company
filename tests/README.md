@@ -24,13 +24,14 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | 改动面 | 最窄检查（先跑这个） | 受影响时升档 | 同 diff 义务（政策原则 = [testing.md §2](../docs/testing.md)） |
 |---|---|---|---|
 | persona / skill 文案（`packages/company-pack/presets/`） | `pnpm test tests/presets` | [preset-smoke](../checks/smoke/preset-smoke.mjs) | **行为判据面**改动（改变"模型被要求做什么/判据怎么落"）→ 场景同 diff 必带；纯措辞润色 → 连通档 + 内容档兜 |
-| 手册 / CHARTER / 模板（`packages/company-pack/workspace/`——**会话注入面**，company-workspace 是其符号链接） | `pnpm verify`（handbook-budget + **replay-fixture-freshness**：runnable+full 场景的注入新鲜度静态比对） | [handbook-smoke](../checks/smoke/handbook-smoke.mjs)（真注入与隔离根）+ 受影响 replay 场景重跑（[replay-smoke](../checks/smoke/replay-smoke.mjs)；2026-10-20 实证：纯 docs 手册提交曾打断 r3 full 档而无人拦） | 注入内容变化 ⇒ 受影响 runnable+full 场景**同 diff 重录**或声明降档（带日期理由）；规矩变化 ⇒ 行为判据面义务同上行 |
+| 手册 / CHARTER / 模板（`packages/company-pack/workspace/`——**会话注入面**，company-workspace 是其符号链接） | `pnpm verify`（handbook-budget + **replay-fixture-freshness**：runnable 场景的注入新鲜度静态比对） | [handbook-smoke](../checks/smoke/handbook-smoke.mjs)（真注入与隔离根）+ 受影响 replay 场景重跑（[replay-smoke](../checks/smoke/replay-smoke.mjs)；本仓仅 foundation 合成场景） | 注入内容变化 ⇒ 受影响 runnable 场景**同 diff 重录**或声明降档（带日期理由；本仓无 full 档）；规矩变化 ⇒ 行为判据面义务同上行 |
 | bundle / preset 行 config（机制面） | `pnpm test tests/presets` | + [delegation-smoke](../checks/smoke/delegation-smoke.mjs)（工具行） | 同 diff 必带 |
 | client 面板（用户可见面：视图模型/组件/文案/CSS，`src/client/`） | `pnpm test tests/client`（按模块点名 spec，含 `client-face` / `style-lifecycle`） | [ui-scene-smoke](../checks/smoke/ui-scene-smoke.mjs) `--isolated --golden`（隔离空壳页签文本金样）+ [client-load-smoke](../checks/smoke/client-load-smoke.mjs) + [cdp-probe](../probes/browser-visual/cdp-probe.mjs)（活体全页签） | 用户可见改动 → 同 diff 刷金样（`--refresh-golden`）/ 对应 visual probe |
 | company 读模型逻辑（`src/lib/` 判据：deliverables / authorship / ledger） | `pnpm test tests/company`（按模块点名 spec） | oracle 反证（真样本钉列）；**新增模块/影响导出面 → 加 `pnpm test tests/harness`（pack-exports 守卫）** | — |
+| host 逻辑（`src/host/`：bootstrap / catalog / cultivation / lease / bundle-manifest / revoke-journal） | `pnpm test tests/company`（按模块点名 spec；真文件集成） | `pnpm test tests/harness`（导出/布局）+ `pnpm typecheck` | — |
 | 类型面（改 `src/**` 的导出/导入签名） | `pnpm typecheck`（`tsc -b` 两面；fresh clone 需先按 [bootstrap](../docs/guides/bootstrap.md) 构建 vendor client 类型） | [release-smoke](../checks/smoke/release-smoke.mjs)（发布前）；`verify` 的 src-layering 只守方向不守类型 | — |
 | pack 导出/注册面（Host / Client 注册改动） | `pnpm test tests/harness`（导出形态）+ `pnpm test tests/company`（Host 注册回调行为）+ `pnpm test tests/client`（Client 槽注册） | [release-smoke](../checks/smoke/release-smoke.mjs)（真实安装形状；含 researcher） | — |
-| 发布 / 升 pin | `pnpm test tests/harness`（release-foundation 等） | [release-smoke](../checks/smoke/release-smoke.mjs) + 升 pin 程序（合同 = [release.md](../docs/release.md)；**语料回放全绿 = 升 pin 回归网第一道**） | — |
+| 发布 / 升 pin | `pnpm test tests/harness`（release-foundation 等） | [release-smoke](../checks/smoke/release-smoke.mjs) + 升 pin 程序（合同 = [release.md](../docs/release.md)；**本仓只有不加载 pack 的合成回放，只证管线可跑，不是升 pin 第一道**） | — |
 | 检查与工具入口（`checks/**`、`probes/**`、`tools/**`） | 消费它的 keyless spec + `pnpm verify`（头注/结构门禁） | 真实入口冒烟按脚本头注「何时跑」 | — |
 | 文档 / 指针 | `pnpm verify`（md-links / bare-path / doc-budget） | [entry-probe-smoke](../checks/smoke/entry-probe-smoke.mjs)（入口链文档改动后） | — |
 
@@ -59,11 +60,11 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器） |
 | 装配 keyless | ~25s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） |
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
-| **重放 lane（第三档，无 key）** | 现行场景 ~2s | `replay-smoke`（会话日志 + sidecar；已声明 workspace oracle 的场景另比完整工作区）——要起进程，不进 `pnpm test`。真页面车道 = `ui-scene-smoke`（自起实例，~40s） |
+| **重放 lane（第三档，无 key）** | 现行场景 ~2s | `replay-smoke`（仅 foundation 合成场景，不加载 company-pack；会话日志 + sidecar）——要起进程，不进 `pnpm test`。真页面车道 = `ui-scene-smoke`（自起实例，~40s） |
 | CLI 集成（keyless，需子进程） | 秒级 | `node checks/smoke/snapshot-motion-smoke.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） |
 | 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../docs/release.md)） |
 | 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件与成本见其头注「何时跑」**；`script-triggers` 门禁强制） |
-| 行为质量档（认证） | 分钟级 | `probe --full`（内容档三探针）+ `candidate-scan-eval`（语料判据家 = [testing.md §4](../docs/testing.md)） |
+| 行为质量档（认证） | 分钟级 | `probe --full`（内容档三探针）；`candidate-scan-eval` 语料已移出本仓，现报缺失 exit 2（判据 = [testing.md §4](../docs/testing.md)） |
 
 **证明边界（每层只证明自己能观察的性质）的唯一家 = [testing.md §1](../docs/testing.md)**
 （2026-10-04 立测试宪法时自开发环迁入——宪法还拥有：改动面→最小证据政策（行级映射表 = 本文件「改动面 → 最窄检查」）、证据纪律（条数以宪法 §3

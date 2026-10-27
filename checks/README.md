@@ -2,7 +2,7 @@
 
 按要证明的对象选下面的入口。本文件是**索引**（政策 = [测试宪法](../docs/testing.md)，改动面映射 = [tests/README](../tests/README.md)）；再读目标脚本的头注——**触发条件、成本、状态与参数的唯一家是脚本头注**；
 本文件只做分类与链接，不复述逐脚本说明（复述必漂）。证据政策 = [测试宪法](../docs/testing.md)；
-开发环境与验证分层 = [开发环](../docs/guides/dev-loop.md)。
+开发环境 = [开发环](../docs/guides/dev-loop.md)；验证分层/命令预算 = [tests/README](../tests/README.md)。
 
 ## 快速选择
 
@@ -13,7 +13,7 @@
 | 看最近会话的失败摘要（中断轮也算失败） | `pnpm diagnose [--strict]` → [diagnose](../tools/diagnose.mjs) |
 | 检查密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs) · [tracked-token](gates/tracked-token.mjs) · [tracked-secrets](gates/tracked-secrets.mjs) |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；分层守卫 = [layering.spec](../tests/harness/layering.spec.ts) |
-| 类型 / 导入签名改动 | `pnpm typecheck`（命令与预算 = [开发环 §9.1](../docs/guides/dev-loop.md)） |
+| 类型 / 导入签名改动 | `pnpm typecheck`（命令与预算 = [tests/README §验证分层与预算](../tests/README.md)） |
 | 确认角色真的挂载 | [preset-smoke](smoke/preset-smoke.mjs) |
 | 确认 client 真的装配 | [client-load-smoke](smoke/client-load-smoke.mjs) |
 | **看真页面 / 复现 UI 症状** | [ui-scene-smoke](smoke/ui-scene-smoke.mjs)：自起实例 → 全部公司页签 + 浏览器错误环 → 证据（`--keep` 留实例；`--isolated --golden` = 隔离空壳金样档） |
@@ -53,7 +53,7 @@
 [ask-latency](../tools/ask-latency.mjs) · [bundle-init](../tools/bundle-init.mjs) · [converge](../tools/converge.mjs) · [deliverables-index](../tools/deliverables-index.mjs) · [diagnose](../tools/diagnose.mjs) · [export-dist](../tools/export-dist.mjs) · [orient](../tools/orient.mjs) · [propose-sampler](../tools/propose-sampler.mjs)
 [prune-runtime](../tools/prune-runtime.mjs) · [rehearsal-init](../tools/rehearsal-init.mjs) · [release](../tools/release.mjs) · [session-log-export](../tools/session-log-export.mjs) · [snapshot-motion](../tools/snapshot-motion.mjs) · [snapshot-path](../tools/snapshot-path.mjs) · [standalone](../tools/standalone.mjs) · [sync-dsh](../tools/sync-dsh.mjs)
 
-**结构门禁**（`checks/gates/`，48 个模块）：清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，
+**结构门禁**（`checks/gates/`，50 个模块）：清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，
 接线一致性由 `gate-wiring` 门禁强制。pin 常量 = [gates/lib/pin.mjs](gates/lib/pin.mjs)。
 
 ## 共享实现与目录选择

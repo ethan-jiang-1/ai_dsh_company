@@ -123,7 +123,7 @@ try {
   await page.goto(`${base}/?token=${token}`)
   // 首启通告模态（遮罩会拦截后续 click）：0.1.7 = Internal Testing Notice；0.2.0 增 Preview
   // Notice（vendor ui-settings-models welcomeTitle，按钮同为 Continue）——都要等出现再关
-  // （goto 返回时常未挂载完，条件检查会扑空；replay-smoke --ui 同款处理）。
+  // （goto 返回时常未挂载完，条件检查会扑空；旧浏览器探针同款处理）。
   for (const name of ['Internal Testing Notice', 'Preview Notice']) {
     const notice = page.getByRole('dialog', { name })
     await notice.waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {})

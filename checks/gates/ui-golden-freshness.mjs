@@ -5,7 +5,7 @@ import { parseCompanyTabCatalog } from '../../tools/lib/company-tab-catalog.mjs'
 import { goldenProblems } from '../../tools/lib/ui-golden.mjs'
 
 // ── 3c. UI 金样与注册面（ui-golden-freshness，2026-10-28 立，六维提分 D5）────────────
-// 为什么：`snapshots/ui/company-shell.golden.json` 是 `ui-scene-smoke --isolated --golden` 的
+// 为什么：`snapshots/visual/company-shell/ui.golden.json` 是 `ui-scene-smoke --isolated --golden` 的
 //   比对基准；页签注册面改了而金样没重刷，下一次真页面跑会红在一个看不懂的文本差异上。
 //   本门禁做静态那一半：金样形状（schema/scene）+ 目录 == 注册源解析结果 + 每页签非空文本。
 // 边界：不跑浏览器（文本比对在 ui-scene-smoke）；金样只覆盖无会话的公司壳。

@@ -17,7 +17,7 @@
 | 修改 host 或 Web | [源码地图](../packages/company-pack/src/README.md) | 找到注册入口、读模型与渲染实现 |
 | 选择验证 | [测试宪法](testing.md)、[tests/README](../tests/README.md)、[脚本索引](../checks/README.md) | 选择证明当前性质的最窄检查 |
 | 查证据与归档 | [快照规则](../snapshots/README.md) | 区分录制、副本、独立 oracle、视觉夹具和归档 |
-| 查设计理由或旧决定 | [主题导航与决策台账](index.md) | 从主题进入合同和关联 Note |
+| 查设计理由或旧决定 | [主题导航](index.md)、[决策台账](decisions.md) | 从主题进入合同和关联 Note |
 
 ## 运行、开发、排练与证据各在哪里
 
@@ -81,13 +81,13 @@ Web 操作按 [动议合同 §前置](demo.md) 执行：启动输出给出当前
 | 改动没进入当前会话或页面 | 生效方式与构建产物 | [开发环 §2](guides/dev-loop.md)、[构建指南](guides/bootstrap.md)、[培养合同](presets.md) |
 | 页面挂载或面板异常 | client 装配与真实渲染 | [client-load-smoke](../checks/smoke/client-load-smoke.mjs)、[cdp-probe](../probes/browser-visual/cdp-probe.mjs) |
 | 交付物、作者或 journal 不对 | 会话日志与实际工作区 | [deliverables-check](../checks/audit/deliverables-check.mjs)、[authorship-audit](../checks/audit/authorship-audit.mjs)、[journal-audit](../checks/audit/journal-audit.mjs) |
-| 会话行为回归 | 录制场景与明确判据 | [replay-smoke](../checks/smoke/replay-smoke.mjs)，按场景声明检查 oracle |
+| 会话行为回归 | 录制场景与明确判据 | [replay-smoke](../checks/smoke/replay-smoke.mjs)（本仓仅 foundation 合成场景；公司行为真实录制在部署仓） |
 
 ## 测试资产怎样串起来
 
 局部逻辑先由 `pnpm test` 给反馈；结构与链接由 `pnpm verify` 检查；装配、机制、CLI 和浏览器检查由脚本进入真实路径。真模型与 E2E 按改动面触发，具体证明范围以 [测试宪法](testing.md) 为准。
 
-资产关系是：**模块 spec → 真实入口脚本 → 场景判据/固化证据**。回放场景保存录制和 sidecar；工作区 oracle 要看场景声明，历史 `workspace.expected` 中有录制副本，名字本身不证明独立编写。`workspace.actual` 是时点副本，live 公司盘则继续演进。视觉夹具使用合成输入，行为质量语料有独立标注；这些资产都由 [快照规则](../snapshots/README.md) 和场景自身说明用途。
+资产关系是：**模块 spec → 真实入口脚本 → 场景判据/固化证据**。回放场景保存录制和 sidecar；工作区 oracle 要看场景声明，历史 `workspace.expected` 中有录制副本，名字本身不证明独立编写。`workspace.actual` 是时点副本，live 公司盘则继续演进。视觉夹具使用合成输入；行为质量语料的判据在部署仓（本仓无该资产）。这些资产都由 [快照规则](../snapshots/README.md) 和场景自身说明用途。
 
 ## 目录整理结论
 

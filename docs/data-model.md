@@ -64,7 +64,7 @@
 - 单 Host、单 `DSH_HOME`；多租户/跨机器同步不在范围。
 - 不物理删 session 日志、不改 session header；需要会话历史迁移时接受旧 cwd 限制。
 - 记录更新是单进程 CAS（读前全文比对 + rename 前复核）；revoke 有同步失败回滚 + pending journal 启动恢复；多 Host 共享 home 不支持。
-- 面板 records 为“摘要全扫 + open/最近 120 全文”，更早的只显示未展开计数；用 `/cultivation archive` 控制规模。
+- 更早的 records 只显示未展开计数；用 `/cultivation archive` 控制规模。
 - manifest 首建在 hard link 不支持的文件系统上回退 `wx` 单写并告警（仍不覆盖，但非原子发布）；换盘备份只留 5 份。
 - 培养背景 `contexts` 是会话摘录，可能含密钥样式内容；创作面只提示、不自动脱敏。
 - 不引入第三方 E1 依赖；不新增 `SessionEventMap` 类型；不把插件状态塞进会话 surface。

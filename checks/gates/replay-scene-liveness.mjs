@@ -3,8 +3,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 // ── 重放场景活性门禁（replay-scene-liveness，2026-10-09 立）─────────────────────
-// 为什么：`snapshots/replay/` 42MB（占资产树 77%），而默认只重放 1 个场景（r3-delegation
-// 420KB = 1% 字节）；replay-smoke **不在 hook、不在 CI**，纯手动。⇒ 场景可以无限累积、
+// 为什么：`snapshots/replay/` 现在只保留 foundation-workspace 合成场景（~100K）；r3/r2 真实
+// 录制已移出产品仓。replay-smoke **不在 hook、不在 CI**，纯手动。⇒ 场景可以无限累积、
 // "这个场景算不算能跑的回归门"全靠 README 散文记着，没有任何机制发现"又收了一个跑不起来的场景"。
 // DSH 立场：Skill = guidance，只有**机械可判**的规则才进门禁。本门禁把散文升成字段。
 // 三态（各场景 snapshot.yml 的 `replayEligible:`）+ 每种态各查什么：

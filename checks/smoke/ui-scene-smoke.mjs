@@ -5,7 +5,7 @@
 //   成本 keyless（boot ~10–30s + cdp-probe ~15s）；前置 = client/前端已构建。
 //   `--keep` 保留实例与他人接着看；`--ask` 透传给 cdp-probe（真模型一次调用，会建测试会话）。
 //   `--isolated`：用 standalone 建隔离 home/公司盘再起（不读 dev 盘，文本确定）。
-//   `--golden` / `--refresh-golden`：与 `snapshots/ui/company-shell.golden.json` 比对/更新
+//   `--golden` / `--refresh-golden`：与 `snapshots/visual/company-shell/ui.golden.json` 比对/更新
 //   （必须配 --isolated；金样只覆盖无会话的公司壳，会话数据面归 keyless 渲染 spec）。
 //
 // 为什么需要它（R3-04 + 六维 D5）：cdp-probe 只能在「你手动起好的实例 + 手抄 token URL」上跑；

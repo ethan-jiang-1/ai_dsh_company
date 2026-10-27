@@ -27,5 +27,6 @@ intent: "为什么需要这份依据。"
 
 | 文件 | 活卡与用途 |
 |---|---|
+| [repo-hygiene/2026-10-28-six-dimension-audit-round4.md](repo-hygiene/2026-10-28-six-dimension-audit-round4.md) | [第四轮六维打扫](../issues/2026-10-28-repo-hygiene-round4.md)：六维复评、分级发现与批次方案 |
 
 随卡归档的材料见 [研究归档](../_archive/research/README.md)。
