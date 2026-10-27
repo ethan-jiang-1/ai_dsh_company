@@ -1,14 +1,13 @@
 /** Host half of the company pack: signoff tool (驾驶舱②) + workspace doors tool (BUG-002) + cultivation loop (2026-10-13 培养卡) + presence read-model re-export.
  * The browser half lives in `./client`. */
 import type { Context } from '@deepseek-ai/cordis'
-import { defineTool } from '@deepseek-ai/dsh-tools'
 // 纯类型导入：只需要 `ctx.approval` 的 Context 类型增强（服务本体由 web profile 挂载）。
 // ⚠ 不做值导入——那会把 host 侧核心包的类型图拉进本程序，遮掉 client 面的 sessions 增强（实测）。
 import type {} from '@deepseek-ai/dsh-user-approval'
 import { existsSync, readFileSync } from 'node:fs'
 import { isAbsolute, join, relative } from 'node:path'
-import { signoffDecisionNote, signoffReason } from './lib/signoff.ts'
-import { doorsFromSessions } from './lib/doors.ts'
+import { registerSignoffTool } from './host/signoff-tool.ts'
+import { registerWorkspaceDoors } from './host/workspace-doors.ts'
 import { bootstrapCompanyWorkspace, bootstrapEnabled, resolveSkeletonDir } from './host/bootstrap.ts'
 import {
   appendUpgradeLog,
@@ -58,62 +57,14 @@ export const inject = ['tools', 'approval', 'commands']
 export type HostConfig = CultivationHostConfig
 
 /**
- * Host plugin body：注册 `request_signoff` 工具——公司签字线（双签 / 会签）的机制停点。
+ * Host plugin body：编排签字工具、工作区门投影、培养命令、首启骨架、bundle 身份与成品目录。
  *
- * 机制（vendor `user-approval`）：`ctx.approval.request()` 一次性审批、轮内有效、无应答者
- * fail-closed；事件对 `approval/asked` + `approval/decided` 进会话日志。浏览器侧由官方
- * `ui-approval` 面板应答（web bundle 已挂），我们的注意力中心观察者（client 半）跨会话显示。
- * 挂载面 = 既有 `company-client` 行（bundle 级）⇒ 全部会话与 teammate 可见——r2-motion 实证
- * teammate 可见全局工具行（20 工具清单里有 fs / present / ask_user_question）。
+ * 具体实现分别住 `host/signoff-tool.ts` / `host/workspace-doors.ts` / `host/cultivation.ts` 等；
+ * 本入口只保留运行前提（`prepareCompanyRuntime`）与装配次序。挂载面 = 既有 `company-client` 行
+ * （bundle 级）⇒ 全部会话与 teammate 可见——r2-motion 实证 teammate 可见全局工具行。
  */
 export function apply(ctx: Context, config: HostConfig = {}): void {
-  ctx.tools.register(defineTool({
-    name: 'request_signoff',
-    description: 'Request human sign-off for a company sign-line (双签 / 会签线). '
-      + 'Call this BEFORE finalizing any conclusion that crosses a sign line — for example a proposal with margin below 30% or a discount below 9折. '
-      + 'The turn pauses until the human decides; proceed with the conclusion only when the decision is allowed-once.',
-    parameters: {
-      line: {
-        type: 'string',
-        required: true,
-        description: 'Which sign line this hits, e.g. "毛利<30% 双签" or "折扣<9折 双签".',
-      },
-      summary: {
-        type: 'string',
-        required: true,
-        description: 'One sentence of what needs the human decision, numbers included.',
-      },
-      detail: {
-        type: 'string',
-        description: 'Optional supporting context: options considered and their numbers.',
-      },
-    },
-    output: {
-      schema: {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          decision: { type: 'string', required: true },
-          note: { type: 'string', required: true },
-        },
-      },
-      render: (_args, value) => [{ type: 'text', text: JSON.stringify(value) }],
-    },
-    async execute(args, exec) {
-      // approval.request() 读取 agent.session（轮内审计配对），无发起会话时不请求。
-      if (exec.agent === undefined) {
-        return { decision: 'unavailable', note: '审批请求需要发起会话（agent）上下文。' }
-      }
-      const decision = await ctx.approval.request({
-        agent: exec.agent,
-        toolName: 'request_signoff',
-        ...(exec.callId !== undefined ? { callId: exec.callId } : {}),
-        reason: signoffReason(args),
-        signal: exec.signal,
-      })
-      return { decision, note: signoffDecisionNote(decision) }
-    },
-  }))
+  registerSignoffTool(ctx)
 
   const { bundleHome, companyHome, expectedWorkspace, dataBlocked, bundleState, rebound } = prepareCompanyRuntime(ctx)
   // 培养回路（2026-10-13 培养卡）：公司数据只写公司盘根，不跟随 session cwd 的子目录。
@@ -157,72 +108,7 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
     }
   })
 
-  const doorFacts = new Map<string, { cwd: string; agentPreset: string | undefined; running: boolean }>()
-  ctx.on('api-session/added', (summary) => {
-    if (summary.origin === 'subagent') return // 只追根会话
-    doorFacts.set(String(summary.sessionId), {
-      cwd: String(summary.cwd ?? ''),
-      agentPreset: typeof summary.projections?.values?.agentPreset === 'string'
-        ? summary.projections.values.agentPreset
-        : undefined,
-      running: summary.running,
-    })
-  })
-  ctx.on('api-session/removed', (sessionId) => { doorFacts.delete(String(sessionId)) })
-  ctx.on('api-session/status', (sessionId, running) => {
-    const fact = doorFacts.get(String(sessionId))
-    if (fact !== undefined) fact.running = running
-  })
-
-  ctx.tools.register(defineTool({
-    name: 'workspace_doors',
-    description: 'Show which role presets currently have root sessions (doors) open on this workspace. '
-      + 'A duplicate warning means two or more sessions share the same preset — for example two CEO doors '
-      + '(the default preset is ceo; forgetting to select your role creates a second CEO). '
-      + 'Use this before closing a motion or presenting final.md to detect silent supersession.',
-    parameters: {},
-    output: {
-      schema: {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          hasDuplicate: { type: 'boolean', required: true },
-          rows: {
-            type: 'array',
-            items: {
-              type: 'object',
-              additionalProperties: false,
-              properties: {
-                preset: { type: 'string', required: true },
-                sessionCount: { type: 'number', required: true },
-                duplicateWarning: { type: 'boolean', required: true },
-              },
-            },
-          },
-        },
-      },
-      render: (_args, value) => [{ type: 'text', text: JSON.stringify(value) }],
-    },
-    async execute(_args, exec) {
-      if (exec.agent === undefined) {
-        return { hasDuplicate: false, rows: [] }
-      }
-      // 用当前 agent 的 cwd 过滤门投影
-      const cwd = exec.agent.session?.header?.cwd ?? ''
-      const facts = [...doorFacts.entries()]
-        .filter(([, fact]) => fact.cwd === cwd)
-        .map(([sessionId, fact]) => ({ sessionId, cwd: fact.cwd, agentPreset: fact.agentPreset, running: fact.running }))
-      const model = doorsFromSessions(facts)
-      return {
-        hasDuplicate: model.hasDuplicate,
-        rows: model.rows.map(row => ({
-          preset: row.preset,
-          sessionCount: row.sessionCount,
-          duplicateWarning: row.duplicateWarning,
-        })),
-      }
-    },
-  }))
+  registerWorkspaceDoors(ctx)
 
   // ── 出厂公司盘骨架的**首启自举**（2026-10-13 立；用户令：「company-workspace 不在就建立一下，
   //    建立好了就不用再建立了」）。规则与纪律 = ./lib/bootstrap.ts 头注（只补缺 / 不抛 / 可重入）：
