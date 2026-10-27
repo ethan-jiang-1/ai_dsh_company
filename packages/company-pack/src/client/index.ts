@@ -16,7 +16,7 @@ import type { FloatRectLike } from './float-geometry.ts'
 import { DreamTeamBrandName } from './Brand.tsx'
 import { startInstanceGuard } from './instance-guard.ts'
 import { createAttentionRegistry } from './attention-registry.ts'
-import { registerAttentionObservers, type AttentionRemote, type AttentionSessions } from './attention-observers.ts'
+import { installAttentionObservers } from './attention-observers.ts'
 import { createCompanyView } from './CompanyView.tsx'
 import { createCompanyDataPlane, WORKSPACE_TEXT_PATHS } from './company-data-plane.ts'
 import { contextRowsFromStore, makeCultivationContextSources, type CultivationContextSources, type FollowLike } from './cultivation-context-data.ts'
@@ -27,7 +27,7 @@ import { registerCompanyTabs } from './company-tab-registration.ts'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
 import { DelegationCard } from './DelegationCard.tsx'
 import { installStyles } from './styles.ts'
-import { installErrorCapture, type ErrorCaptureTarget } from './error-ring.ts'
+import { installErrorCapture, type ClientErrorEntry, type ErrorCaptureTarget } from './error-ring.ts'
 import { ROLE_SHORT, RoleBadge, readPresetOf, sessionTitleOf } from './RoleBadge.tsx'
 import { TasksAction } from './TasksPanel.tsx'
 import { TEAM_TOOL_KEYS, TeamToolCard } from './TeamToolCard.tsx'
@@ -118,8 +118,10 @@ export async function apply(ctx: ClientContext): Promise<void> {
   ctx.effect(installStyles)
 
   // 浏览器侧错误环（R3-03）：error / unhandledrejection / console.error 进 `window.__DSH_COMPANY_ERRORS__`，
-  // 由真页面探针（cdp-probe / ui-scene-smoke）读进 verdict 与证据目录。它**不写会话日志**（边界见模块头注）。
-  ctx.effect(() => installErrorCapture(window as unknown as ErrorCaptureTarget))
+  // 由真页面探针（cdp-probe / ui-scene-smoke）读进 verdict 与证据目录；有当前会话时再经
+  // /company-diagnostics 追加到 cultivation/client-errors.log（agent 可 read；仍不写会话事件）。
+  const errorReporter: { current?: (entry: ClientErrorEntry) => void } = {}
+  ctx.effect(() => installErrorCapture(window as unknown as ErrorCaptureTarget, undefined, entry => { errorReporter.current?.(entry) }))
 
   // 多实例探活横幅（卡②，2026-10-10 拍板：警告横幅）：同一浏览器多实例并存 = 静默互踩
   // （E2 实证）⇒ localStorage 心跳互见即挂横幅。纯 DOM、无服务依赖，apply 即启。
@@ -152,6 +154,21 @@ export async function apply(ctx: ClientContext): Promise<void> {
     })
   })
 
+  // 浏览器错误 → host 诊断文件：按平台原生命令面，无当前会话时跳过；1s 节流防刷屏。
+  ctx.inject(['sessions', 'remote.commands'], (scoped) => {
+    const list = scoped.sessions.list
+    let lastSent = 0
+    errorReporter.current = (entry) => {
+      const now = Date.now()
+      if (now - lastSent < 1000) return
+      const current = Object.values(list.getSnapshot().byId).find(s => (s.retainedBy.mainView ?? 0) > 0)
+      if (current === undefined) return
+      lastSent = now
+      const payload = encodeURIComponent(JSON.stringify(entry))
+      void scoped.remote.commands.execute(current.id, `/company-diagnostics client-error ${payload}`, []).catch(() => {})
+    }
+  })
+
   // 驾驶舱①·「待办」：挂起项登记处（apply 闭包内创建——client 纪律禁模块级单例）。
   // 观察者写入 / 页签读取共享同一实例。
   const attention = createAttentionRegistry()
@@ -160,15 +177,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // approval/request（待批审批；切片二落地前不会触发，管线先行）。⚠ 只登记、**永远委托**
   // （next()）——本监听者是观察者不是应答者，真应答走官方 ui-user-questions / ui-approval
   // 的 waterfall；this = 事件归属 owner ctx，scopeOf → 发起会话（同款 ui-approval 手法）。
-  ctx.inject(['sessions', 'remote'], (scoped) => {
-    // vendor 服务面比本模块用到的两件宽得多（remote 的事件名是封闭联合、sessions.scopeOf 要 Context）：
-    // 这里**故意窄化**成 `$on` + `scopeOf`，让观察者逻辑可在 keyless 档用假 remote 断言。
-    registerAttentionObservers({
-      remote: scoped.remote as unknown as AttentionRemote,
-      sessions: scoped.sessions as unknown as AttentionSessions,
-      attention,
-    })
-  })
+  installAttentionObservers(ctx, attention)
 
   // 委派工具卡（R3）+ 团队工具卡（S2）：把 CEO 的命名委托与团队动作渲染成公司语义的卡。
   // keyed slot 的 key 域是**开放**的（槽合同原话："a typo simply never renders"），

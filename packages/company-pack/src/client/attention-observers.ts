@@ -10,6 +10,7 @@
  * ⚠ 观察者不是应答者：真应答走官方 ui-user-questions / ui-approval 的 waterfall；这里 `this` =
  * 事件归属 owner ctx，`scopeOf` 解出发起会话（同款 ui-approval 手法）。
  */
+import type { Context } from '@deepseek-ai/cordis'
 import type { AttentionRegistry } from './attention-registry.ts'
 
 /** 远端事件面（只用到 $on；handler 的 this = 事件归属 owner）。 */
@@ -57,5 +58,20 @@ export function registerAttentionObservers({ remote, sessions, attention }: Atte
       since: Date.now(),
     })
     return (async () => { try { return await next() } finally { done() } })()
+  })
+}
+
+
+/**
+ * 生产接线：把两个观察者挂到 client context 的 `sessions`/`remote` 注入块。
+ * 单独抽出是为了让 spec 能断言“apply 里真的调了同一注册函数”，而不只测纯函数。
+ */
+export function installAttentionObservers(ctx: Pick<Context, 'inject'>, attention: AttentionRegistry): void {
+  ctx.inject(['sessions', 'remote'], (scoped) => {
+    registerAttentionObservers({
+      remote: scoped.remote as unknown as AttentionRemote,
+      sessions: scoped.sessions as unknown as AttentionSessions,
+      attention,
+    })
   })
 }

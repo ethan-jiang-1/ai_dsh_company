@@ -58,6 +58,26 @@ describe('客户端错误环（R3-03）', () => {
     uninstall()
   })
 
+  it('reporter 收到条目且 token 已脱敏；reporter 抛错不影响环', () => {
+    const seen: Array<{ message: string; href?: string }> = []
+    const ring = createErrorRing(10, entry => { seen.push(entry) })
+    const { target, emit } = fakeTarget()
+    const uninstall = installErrorCapture(target, ring)
+    emit('error', { error: new Error('boom https://example.invalid/?token=SECRET') })
+    expect(seen).toHaveLength(1)
+    expect(seen[0].message).toContain('boom')
+    expect(seen[0].message).not.toContain('SECRET')
+    expect(seen[0].href).not.toContain('SECRET')
+    uninstall()
+
+    const throwing = createErrorRing(10, () => { throw new Error('reporter down') })
+    const second = fakeTarget()
+    const uninstallSecond = installErrorCapture(second.target, throwing)
+    second.emit('error', { error: new Error('still captured') })
+    expect(throwing.list()).toHaveLength(1)
+    uninstallSecond()
+  })
+
   it('同一错误连续刷屏只留一条；环有界（旧条目被挤掉）', () => {
     const ring = createErrorRing(3)
     const { target, emit } = fakeTarget()

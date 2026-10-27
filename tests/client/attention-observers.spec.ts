@@ -7,7 +7,7 @@
  */
 import { describe, expect, it, vi } from 'vitest'
 import { createAttentionRegistry } from '../../packages/company-pack/src/client/attention-registry.ts'
-import { registerAttentionObservers, type AttentionRemote, type AttentionSessions } from '../../packages/company-pack/src/client/attention-observers.ts'
+import { installAttentionObservers, registerAttentionObservers, type AttentionRemote, type AttentionSessions } from '../../packages/company-pack/src/client/attention-observers.ts'
 
 /** 假远端：记下 handler，测试自己派发（this 由调用方给）。 */
 function fakeRemote() {
@@ -24,6 +24,25 @@ const sessions: AttentionSessions = {
 }
 
 describe('待办观察者：登记、委托与销账（R3-10）', () => {
+  it('生产接线 installAttentionObservers 把观察者挂到注入的 remote 上', async () => {
+    const { remote, handlers } = fakeRemote()
+    const registry = createAttentionRegistry()
+    const ctx = {
+      inject: (deps: readonly string[], callback: (scoped: unknown) => void) => {
+        expect(deps).toEqual(['sessions', 'remote'])
+        callback({ remote, sessions })
+      },
+    }
+    installAttentionObservers(ctx as never, registry)
+    const next = vi.fn(async () => {
+      expect(registry.list()[0]).toEqual(expect.objectContaining({ kind: 'approval', sessionId: 'session-vp-eng' }))
+      return 'ok'
+    })
+    await handlers.get('approval/request')?.call('owner-1', { toolName: 'request_signoff', reason: '发布' }, next)
+    expect(next).toHaveBeenCalledTimes(1)
+    expect(registry.list()).toEqual([])
+  })
+
   it('问询事件登记挂起项，并永远把 next() 的返回值原样交回', async () => {
     const { remote, handlers } = fakeRemote()
     const registry = createAttentionRegistry()

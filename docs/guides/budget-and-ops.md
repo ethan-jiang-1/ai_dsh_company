@@ -34,7 +34,7 @@
 | 症状 | 判断 | 动作 |
 |---|---|---|
 | **页面某面板空白 / 页签点不开 / 按钮没反应** | 先看是「环境未就绪」还是「渲染坏」 | 一条命令复现：`node checks/smoke/ui-scene-smoke.mjs`（自起实例 → 全页签 + 浏览器错误环 → exit 2 = 未登录，exit 1 = 真断言失败）；加 `--steps <file>` 可复现点击/输入；证据落 `runtime/harness-home/diagnosis/` |
-| **用户报「刚才页面报错了」** | 浏览器错误不进会话日志，但进页面内错误环 | `ui-scene-smoke` 或对已起实例跑 `cdp-probe <url> --evidence`，看 verdict 的 `clientErrors`（error / unhandledrejection / console.error） |
+| **用户报「刚才页面报错了」** | 浏览器错误不进会话事件，但进页面内错误环，并由 client 追加到公司盘诊断日志 | `ui-scene-smoke` 或对已起实例跑 `cdp-probe <url> --evidence`，看 verdict 的 `clientErrors`；agent 也可直接 read `cultivation/client-errors.log`（当前会话的条目经 `/company-diagnostics` 写入，token 已脱敏） |
 | **会话卡住 / 以为崩了** | 可能是在等用户回答或审批，不是进程死 | `pnpm diagnose --session <slug>/<id>`：`NONZERO` 列 bash 非零退出；中断轮会标「等人回答/等审批/真崩溃」；child 目录也可点名 |
 | 改了手册/CHARTER，进行中的成员会话「看不到」 | 指令注入是**触达驱动**（无 watcher）：外部编辑只在下次成功 read/write/edit 或 resume 对齐时可见（2026-09-28 借 FAQ 05） | 让该成员**碰一次工作区文件**（任意 read/edit）或重开会话；不是挂载坏了 |
 | 服务端启动/挂载报错随终端消失 | 没留下 stdout/stderr | 起窗时 `pnpm dsh web … 2>&1 \| tee runtime/web-logs/web-$(date +%s).log`（目录 gitignored；会含 token，绝不提交）；崩溃现场再从该文件查 |

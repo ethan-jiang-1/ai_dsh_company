@@ -30,6 +30,7 @@ import {
   type PresentedSessionQuery,
 } from './host/catalog.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
+import { registerClientDiagnostics } from './host/client-diagnostics.ts'
 import { prepareCompanyRuntime } from './host/runtime-guard.ts'
 import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace-registry.ts'
 import { canonicalPath } from './host/paths.ts'
@@ -70,6 +71,7 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   // 培养回路（2026-10-13 培养卡）：公司数据只写公司盘根，不跟随 session cwd 的子目录。
   // 身份损坏/更高版本/落点不安全时拒绝公司数据写入，避免写到猜测的默认盘。
   registerCultivation(ctx, config, expectedWorkspace, dataBlocked)
+  registerClientDiagnostics(ctx, expectedWorkspace, dataBlocked)
   // 交付审计命令（2026-10-27 F7）：presented=false 的第一入口，不再要求手改 JSON。
   ctx.commands.register({
     name: 'deliverables',

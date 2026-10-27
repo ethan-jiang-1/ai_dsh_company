@@ -9,7 +9,7 @@
  *
  * 不主张：真 profile 装配、真审批应答、真会话日志（那些归 preset-smoke / 真模型档）。
  */
-import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -69,12 +69,36 @@ function mount(): { ctx: Context; tools: Map<string, unknown>; commands: Map<str
 const wait = (): Promise<void> => new Promise(resolve => { setImmediate(resolve) })
 
 describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）', () => {
-  it('注册面固定：三个工具 + 两个命令（名单漂移即红）', async () => {
+  it('注册面固定：三个工具 + 三个命令（名单漂移即红）', async () => {
     const { ctx, tools, commands } = mount()
     ctx.plugin({ inject: ['tools', 'approval', 'commands'], apply: (scoped: Context) => { apply(scoped, {}) } })
     await wait()
     expect([...tools.keys()].sort()).toEqual(['cultivation_propose', 'request_signoff', 'workspace_doors'])
-    expect([...commands.keys()].sort()).toEqual(['cultivation', 'deliverables'])
+    expect([...commands.keys()].sort()).toEqual(['company-diagnostics', 'cultivation', 'deliverables'])
+    await ctx.fiber.dispose()
+  })
+
+  it('/company-diagnostics client-error 落 cultivation/client-errors.log 并脱敏 token', async () => {
+    const { ctx, commands } = mount()
+    ctx.plugin({ inject: ['tools', 'approval', 'commands'], apply: (scoped: Context) => { apply(scoped, {}) } })
+    await wait()
+    const diagnostic = commands.get('company-diagnostics') as {
+      handler: (input: { readonly rawInput: string }) => Promise<{ readonly kind: string; readonly text: string }>
+    }
+    const payload = encodeURIComponent(JSON.stringify({
+      kind: 'error',
+      message: '页面 boom https://example.invalid/?token=SECRET',
+      stack: 'Error: boom',
+      at: 1,
+      href: 'http://127.0.0.1:1/?token=SECRET',
+    }))
+    const result = await diagnostic.handler({ rawInput: `client-error ${payload}` })
+    expect(result.kind).toBe('success')
+    const logPath = join(dir, 'company', 'cultivation', 'client-errors.log')
+    expect(existsSync(logPath)).toBe(true)
+    const log = readFileSync(logPath, 'utf8')
+    expect(log).toContain('页面 boom')
+    expect(log).not.toContain('SECRET')
     await ctx.fiber.dispose()
   })
 
