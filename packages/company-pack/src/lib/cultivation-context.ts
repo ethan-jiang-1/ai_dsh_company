@@ -9,7 +9,7 @@
  * 因此 base64url 用本文件的字母表实现、UTF-8 用 `TextEncoder`/`TextDecoder`——**不引 `node:`/`Buffer`**。
  * 红证：`tests/client/cultivation-context.spec.ts` 在模块存在前 import 即红；「无 Buffer」用例是回归线。
  */
-import { CULTIVATION_ROLES } from './cultivation.ts'
+import { CULTIVATION_ROLES } from './presence-status.ts'   // 直接依赖词汇层，绕开 barrel 反向边（R3-22）
 
 /** 命令 JSON 的 UTF-8 字节上限（ref 级载荷；远小于正文）。 */
 export const CONTEXT_COMMAND_MAX_BYTES = 2_000

@@ -54,6 +54,10 @@ export function statusLabelFor(status: string): string {
  */
 export const PRESET_KEYS = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'] as const
 
+/** 培养域沿用的名册别名（2026-10-27 R3-22：从 `lib/cultivation.ts` 的 barrel 定义点搬来——
+ *  那里既 `export *` 又定义常量，和 `cultivation-context` 构成三元环。事实仍只有 PRESET_KEYS 一份。） */
+export const CULTIVATION_ROLES = PRESET_KEYS
+
 type PresetRoleId = typeof PRESET_KEYS[number]
 
 function isPresetRole(name: string): name is PresetRoleId {

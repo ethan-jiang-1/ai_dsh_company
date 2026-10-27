@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 何时跑：待办面板（AttentionTab）段落结构 / 空态文案 / 「去处理」入口改文案或结构后；真 web，不进 pnpm test。
-// 前置：dev home 已有会话（默认标题 = 动议观察 · 23684）；用法：
+// 前置：dev home 已有会话（需要 `--title <会话标题>`——不猜历史会话）；用法：
 //   source run/env.sh && node 本脚本 [--title <title>] [--fixture]
 // 断言面（2026-10-21 Phase C4：补齐 attention/presence/budget 三面板专探针；待办是跨会话聚合面——
 //   挂起项有无取决于现场，判据按「结构 + 诚实空态」钉，不为凑数造挂起）：
@@ -19,7 +19,11 @@ import { startWeb } from '../../tools/lib/probe-web.mjs'
 import { dismissNotices, openCompanyTab, openSessionBySearch } from '../../tools/lib/probe-window.mjs'
 
 const args = process.argv.slice(2)
-const titleArg = args.indexOf('--title') === -1 ? '动议观察 · 23684' : args[args.indexOf('--title') + 1]
+const titleArg = args.indexOf('--title') === -1 ? '' : args[args.indexOf('--title') + 1]
+if (titleArg === '') {
+  console.error('本探针需要 --title <会话标题>（在观察窗侧栏看）；不再用写死的历史标题猜会话（2026-10-27 R3）。')
+  process.exit(2)
+}
 const fixture = args.includes('--fixture')
 const OUT = join(ROOT, 'runtime', 'human-exits-evidence', 'attention-panel')
 const FIXTURE_DIR = join(ROOT, 'snapshots', 'visual', 'attention-panel')

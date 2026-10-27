@@ -7,8 +7,13 @@ import { join } from 'node:path'
 // 上限 = 立项时值 + 余量；超限先搬（内容挪到该去的家）再压，确需空间才在 Note 里说明后升上限。
 // **2026-09-27 起采 DSH 棘轮语义（FAQ 07 入口链）**：瘦身轮后上限随内容下调（≥5% 头寸）、只降不升；
 // 上调须在 Note 里论证（三文件曾同时顶格 = 常驻层饱和信号，处置 = 瘦身不是提额）。
+// 负例留证 2026-10-27（R3-17 反向棘轮）：把 docs/project-map.md 的上限临时写成 200（实际 94）→
+//   `FAIL doc-budget: docs/project-map.md 94 行只占上限 200 的 47%（空置 >20%：按现行内容 +5% 下调上限，
+//   或 Note 论证保留）`；还原 99 → ALL PASS。web-rpc 26/47 是同一形态的存量（本轮下调到 30）。
 // ⚠ 注释里**不要复述当前行数**——那是易腐常量，实测值由每次跑出的 PASS 行给出（2026-09-26 修：
 //   原注释写"后 107 行"/"整治后 131"，实为 108 / 142，属"枚举型事实写两处"那一类腐化）。
+const SLACK_FLOOR = 0.2   // 上限最多比现行内容高 20%；超过即视为棘轮未落实（R3-17）
+
 export function run({ root, ok, fail }) {
 const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 84],             // 2026-09-23 二次收口；2026-09-27 瘦身轮 108→100、棘轮 115→105；2026-10-06 条目 D 纯路由化（删复述与括号链，纪律指针化；当时 95→72），棘轮 105→84
@@ -18,7 +23,7 @@ const DOC_LINE_BUDGETS = [
   ['docs/repo-hygiene.md', 80], // 2026-10-25 立：git 边界与跨环境合同（新增门禁 tracked-portability 的解释面）
   ['docs/orient.md', 80],        // 2026-10-06 立（RFC driver-surface-package 条目 C：驾驭者白话五问单页，只导航不复述事实；反证 = 初稿超限红）
   ['docs/terminology.md', 22],   // 2026-10-12 立：术语映射查表自 index 迁出（登记型查表，随 pin 升级演进；行数稳定，头寸宽于 5% 起步）
-  ['docs/guides/web-rpc.md', 47], // 2026-10-12 立：驱动 Web 面会话的 RPC runbook 自 dev-loop §8 迁出（常驻层瘦身轮；操作表行绑定，头寸起步 ≥5%）
+  ['docs/guides/web-rpc.md', 30], // 2026-10-12 立；2026-10-27 R3-17 棘轮下调：原 47 让 21 行长期空置，按现行内容 + 5% 收紧
   ['docs/guides/release-runbook.md', 75], // 2026-10-26 立：发布五步 runbook（合同仍住 release.md；本文件只留操作与失败定位）
   ['docs/guides/dev-loop.md', 367], // 2026-09-26/27 升至 467（§13、inspect 句）后同日瘦身轮：§7 整段迁 guides/bootstrap.md、§7 留指针防断链（当时 467→376），棘轮 467→395；2026-10-12 二轮瘦身：§8 整段迁 guides/web-rpc.md、§5 时点表退役随迁 release.md（程序/人审/矩阵唯一家）、§0 导航表补全 13 节、§2/§12 同文件复述去重（patch 语法=§4、pipefail=§1），棘轮 395→367
   ['docs/testing.md', 75],       // 2026-10-04 立测试宪法（_digested/test-strategy 消化采纳轮；政策唯一家，只写 now——膨胀先迁，不加预算）；同日 61（§3.8 红/场景先行）；同日 75（§1.1 资产命名语法，用户点破 DSH「后缀即层」实践）；2026-10-09 §3.7 prove-it-red 补「标题带 BUG-nnn 的 describe/it = 守卫声明」判据句（guard-red-record 门禁接上；原句只写「三步留证」没给可判形状），**同 diff 压回 75 顶格**（引用链改「见该 Note」，不重复路径）。⚠ 顶格：下一句加进来前先迁——§1 分层表与 tests/README「改动面→最窄检查」有重叠面可搬
@@ -31,6 +36,16 @@ const DOC_LINE_BUDGETS = [
   ['docs/multi-human.md', 199], // 2026-10-21 冻结增长
   ['docs/presets.md', 198],     // 2026-10-21 冻结增长（工具面表同轮去历史化）
   ['packages/company-pack/workspace/AGENTS.md', 190], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面，同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates；2026-10-12 瘦身轮 195→190（内容 180：机制证据段收指针、证据叙事压缩、陈旧日期戳退役——同 diff Note）
+  // ── 2026-10-27 R3-17：入口链与最大合同补预算（原先 852 行 docs 无棘轮；checks/README 已从 193 压到 78）──
+  ['checks/README.md', 85],        // 索引（R3-20 瘦身：逐脚本说明回到头注；只留分类 + 链接）
+  ['tests/README.md', 52],         // 改动面 → 最窄检查（入口链第四跳）
+  ['docs/project-map.md', 99],     // 空间导航（入口链第一跳）
+  ['docs/runtime-map.md', 88],     // 运行态地图（入口链第一跳之二）
+  ['docs/release.md', 172],        // 最大未受管合同：发布形状与升 pin 程序
+  ['docs/guides/bootstrap.md', 143], // 冷启动配方
+  ['docs/delegation.md', 120],     // 汇报线合同
+  ['docs/data-model.md', 76],      // 数据卡合同
+  ['docs/profile.md', 66],         // host 组合合同
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
   // 文件缺失时报「缺失」而不是抛异常：抛异常会**中断整个 run-gates**，
@@ -40,8 +55,14 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
     continue
   }
   const lines = readFileSync(join(root, rel), 'utf8').split('\n').length - 1
-  lines <= cap
-    ? ok(`doc-budget ${rel} (${lines}/${cap})`)
-    : fail('doc-budget', `${rel} ${lines} 行超上限 ${cap}（先搬内容到该去的家，再压；不直接加行）`)
+  if (lines > cap) {
+    fail('doc-budget', `${rel} ${lines} 行超上限 ${cap}（先搬内容到该去的家，再压；不直接加行）`)
+  } else if (lines < Math.ceil(cap * (1 - SLACK_FLOOR))) {
+    // 反向棘轮（R3-17）：上限长期悬空 = 「顶格即饱和」信号失效（web-rpc 曾 26/47 空置 21 行）。
+    // 处置是**下调上限**（不是写内容凑数）；确需预留空间 → Note 论证后显式下调到 content+5%。
+    fail('doc-budget', `${rel} ${lines} 行只占上限 ${cap} 的 ${String(Math.round((lines / cap) * 100))}%（空置 >${String(Math.round(SLACK_FLOOR * 100))}%：按现行内容 +5% 下调上限，或 Note 论证保留）`)
+  } else {
+    ok(`doc-budget ${rel} (${lines}/${cap})`)
+  }
 }
 }

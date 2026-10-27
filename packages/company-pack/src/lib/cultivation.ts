@@ -12,13 +12,6 @@ export * from './cultivation-inbox.ts'
 export * from './cultivation-feedback.ts'
 export * from './cultivation-record.ts'
 
-import { PRESET_KEYS } from './presence-status.ts'
-
-/**
- * 五角色名册 = presence-status 的 pack 内唯一事实家（2026-10-21 收拢：此前同形字面量在
- * presence-status / cultivation / host 工具串三处各一份，加角色要动 ≥4 处——pack/tools 边界的
- * 自包含理由不覆盖 pack 内部）。此处再导出仅为保持既有 import 面。
- */
-export const CULTIVATION_ROLES = PRESET_KEYS
-
-export { roleLabel } from './presence-status.ts'
+// 名册与短标签只做**再导出**（定义住在 presence-status.ts；本文件是纯 barrel——2026-10-27 R3-22
+// 修环：原先这里既 export * 又定义 CULTIVATION_ROLES，与 cultivation-context 构成三元环）。
+export { CULTIVATION_ROLES, roleLabel } from './presence-status.ts'

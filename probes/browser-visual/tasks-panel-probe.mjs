@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 何时跑：任务板入口按钮 / 依赖列 / 右栏页签改文案或结构后；真 web，不进入 pnpm test。
-// 前置：dev home 已有带任务的会话（默认标题 = 动议观察 · 23684）；用法：
+// 前置：dev home 已有带任务的会话（需要 `--title <会话标题>`——不猜历史会话）；用法：
 //   source run/env.sh && node 本脚本 [--title <title>] [--fixture]
 // 断言面：
 //   D1 桌面 1440：入口按钮可见、有 title/aria、可聚焦；
@@ -19,7 +19,11 @@ import { startWeb } from '../../tools/lib/probe-web.mjs'
 import { dismissNotices } from '../../tools/lib/probe-window.mjs'
 
 const args = process.argv.slice(2)
-const titleArg = args.indexOf('--title') === -1 ? '动议观察 · 23684' : args[args.indexOf('--title') + 1]
+const titleArg = args.indexOf('--title') === -1 ? '' : args[args.indexOf('--title') + 1]
+if (titleArg === '') {
+  console.error('本探针需要 --title <会话标题>（在观察窗侧栏看）；不再用写死的历史标题猜会话（2026-10-27 R3）。')
+  process.exit(2)
+}
 const fixture = args.includes('--fixture')
 const OUT = join(ROOT, 'runtime', 'human-exits-evidence', 'tasks-panel')
 const FIXTURE_DIR = join(ROOT, 'snapshots', 'visual', 'tasks-panel')
