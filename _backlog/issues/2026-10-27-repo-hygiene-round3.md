@@ -13,7 +13,14 @@ opened: 2026-10-27
 
 **未决问题：** 四个建议批次的取舍（A 真实性止血 / B 语义边界 / C 回归网补强 / D 渐进披露与结构收拢）——尤其：`replay --ui` 是"补一个合成 web 场景"还是"彻底撤掉并从文档删除"；dev-loop 是否拆出政策层（会动 4–6 份文档的编号与链接）；客户端错误通道要不要做（要碰 client 面与 host 事件面，是本轮唯一"新机制"）。
 
-**下一步：** 用户 2026-10-27 已批全批（A/B/C/D）+ 补合成 web 回放场景（第二问）+ 客户端错误通道（第三问）；按依赖分批实施，每批一个 commit + Note（首批 = [R3 批次 A](../../notes/implemented/2026-10-27-r3-batch-a-truth.md)），收口时本卡归档并写明去向。
+**进展（2026-10-27 夜）：** 用户批全批 + 补 web 场景 + 客户端错误通道。已落三批（每批一 commit + Note）：
+批次 A 真实性止血（[Note](../../notes/implemented/2026-10-27-r3-batch-a-truth.md)）→ C5 分层门禁 + typecheck
+（[Note](../../notes/implemented/2026-10-27-r3-c5-layer-guard.md)）→ 批次 B 授权/收尾单一家
+（[Note](../../notes/implemented/2026-10-27-r3-b-authority-and-closeout.md)）→ C 前半回归网与日志真值
+（[Note](../../notes/implemented/2026-10-27-r3-c-first-half-regression.md)；test 910→944，verify 全绿）。
+**剩余：** C1 合成 web 场景让 `--ui` 可用 · C7 客户端错误通道 · A2 真空绿门禁改 skip 语义 · D 渐进披露与结构收拢。
+
+**下一步：** 按剩余四项继续；每项一 commit + Note + 对应真检查，全部落完再收口本卡并写去向。
 
 ## 范围与排除项
 
