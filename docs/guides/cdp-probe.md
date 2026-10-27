@@ -21,6 +21,7 @@ pnpm dsh web -- --port 0 --no-open        # 起观察窗，横幅拿 URL（demo.
 node probes/browser-visual/cdp-probe.mjs 'http://127.0.0.1:<port>/?token=<t>'          # 默认断言面（零模型）
 node probes/browser-visual/cdp-probe.mjs '<url>' --ask '用一句话自报角色与职责。'      # + 完整产品环（真模型一次调用）
 node probes/browser-visual/cdp-probe.mjs '<url>' --evidence                # 成功也落证据目录（截图 + verdict）
+node probes/browser-visual/cdp-probe.mjs '<url>' --texts --json-out /tmp/v.json   # 逐页签可见文本 + verdict 落文件（UI 金样车道用）
 ```
 
 stdout 打一个 JSON verdict；exit 0 = 全部断言成立，**exit 2 = 环境未就绪**（home 停在登录/凭据引导——

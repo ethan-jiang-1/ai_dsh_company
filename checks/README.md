@@ -16,7 +16,7 @@
 | 类型 / 导入签名改动 | `pnpm typecheck`（命令与预算 = [开发环 §9.1](../docs/guides/dev-loop.md)） |
 | 确认角色真的挂载 | [preset-smoke](smoke/preset-smoke.mjs) |
 | 确认 client 真的装配 | [client-load-smoke](smoke/client-load-smoke.mjs) |
-| **看真页面 / 复现 UI 症状** | [ui-scene-smoke](smoke/ui-scene-smoke.mjs)：自起实例 → 全部公司页签 + 浏览器错误环 → 证据（`--keep` 留实例） |
+| **看真页面 / 复现 UI 症状** | [ui-scene-smoke](smoke/ui-scene-smoke.mjs)：自起实例 → 全部公司页签 + 浏览器错误环 → 证据（`--keep` 留实例；`--isolated --golden` = 隔离空壳金样档） |
 | 查看已运行页面 | [cdp-probe](../probes/browser-visual/cdp-probe.mjs)；指南 = [CDP 指南](../docs/guides/cdp-probe.md) |
 | 确认录制行为与工作区判据 | [replay-smoke](smoke/replay-smoke.mjs)（当前仅 headless 合成场景） |
 | 审计动议输出与角色留痕 | [deliverables-check](audit/deliverables-check.mjs) · [authorship-audit](audit/authorship-audit.mjs) · [journal-audit](audit/journal-audit.mjs) |

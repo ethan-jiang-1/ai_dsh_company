@@ -6,7 +6,7 @@
 //   ③升 pin / 收割后 UI 回归。成本：默认档零模型（真实渲染断言面）；`--ask` 加一次真实模型调用。
 // 前置：GUI URL（demo.md §前置：source run/env.sh → pnpm dsh web -- --port 0 --no-open → 横幅 URL）；
 //   Chrome 二进制：DSH_PROBE_CHROME 环境变量或系统 Chrome（run/env.sh 已指 Chrome for Testing）。
-// 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser] [--evidence]
+// 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser] [--evidence] [--texts] [--json-out <path>]
 //   默认断言面 = composer + 品牌 + 右栏**全部**公司页签逐个开（Start-chip 回切）+ 面板体
 //   `[data-company-tab-title=…]` 可见且非空 + console/异常捕获。页签清单从注册源
 //   `company-tab-registration.ts` 解析（不再手写；2026-10-20 审计：旧清单 8 个漏「成品」）。
@@ -19,7 +19,8 @@
 import { repositoryRoot } from '../../tools/lib/repository-layout.mjs';
 import { launchCdpBrowser } from '../../tools/drivers/cdp-driver.mjs';
 import { loadChromium } from '../../tools/drivers/playwright.mjs';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { join } from 'node:path';
 import process from 'node:process';
 import { parseCompanyTabCatalog } from '../../tools/lib/company-tab-catalog.mjs';
@@ -33,6 +34,10 @@ const askIndex = args.indexOf('--ask');
 const ask = askIndex >= 0 ? (args[askIndex + 1] ?? '用一句话自报角色与职责。') : undefined;
 const keepBrowser = flag('--keep-browser');
 const saveEvidence = flag('--evidence');   // 成功也落 verdict/截图（R3-23；默认只在失败时落）
+// --texts：逐页签捕获归一化可见文本（UI 金样用）；--json-out <path>：verdict 落指定文件（跨进程消费）。
+const captureTexts = flag('--texts');
+const jsonOutIndex = args.indexOf('--json-out');
+const jsonOut = jsonOutIndex === -1 ? undefined : args[jsonOutIndex + 1];
 
 if (guiUrl === undefined || !/^https?:\/\//.test(guiUrl) || !guiUrl.includes('token=')) {
   console.error("cdp-probe: PASS a booted GUI URL like 'http://127.0.0.1:<port>/?token=<t>'（demo.md §前置产出）");
@@ -53,6 +58,7 @@ const verdict = {
   exceptions: [],
   clientErrors: [],
   errorRingInstalled: false,
+  tabTexts: {},
 };
 
 // 页签清单 = 注册源解析（单一事实）；解析为空直接 fail-loud，不静默退化成少一个也绿。
@@ -79,7 +85,7 @@ const chromeBin = process.env.DSH_PROBE_CHROME
 const handle = await launchCdpBrowser({ url: 'about:blank', ...(chromeBin !== undefined ? { chromeBin } : {}) }).catch((error) => ({ failed: String(error?.message ?? error) }));
 if (handle.failed !== undefined) {
   verdict.error = handle.failed;
-  console.log(JSON.stringify(verdict, null, 2));
+console.log(JSON.stringify(verdict, null, 2));
   process.exit(1);
 }
 verdict.booted = true;
@@ -177,9 +183,10 @@ try {
     const selector = `[data-company-tab-title="${tab.title}"]`;
     const probeBody = () => evaluate(`(() => {
       const el = document.querySelector(${JSON.stringify(selector)});
-      if (el === null) return { present: false, visible: false, textLength: 0 };
+      if (el === null) return { present: false, visible: false, textLength: 0, text: '' };
       const rect = el.getBoundingClientRect();
-      return { present: true, visible: rect.width > 0 && rect.height > 0, textLength: (el.innerText ?? '').trim().length };
+      const text = (el.innerText ?? '').trim();
+      return { present: true, visible: rect.width > 0 && rect.height > 0, textLength: text.length, text };
     })()`);
     let rendered = await probeBody();
     for (let i = 0; i < 6 && !(rendered?.present === true && rendered?.visible === true && rendered?.textLength > 0); i++) {
@@ -187,7 +194,10 @@ try {
       rendered = await probeBody();
     }
     const ok = clicked && rendered?.present === true && rendered?.visible === true && rendered?.textLength > 0;
-    if (ok) verdict.tabsOpened.push(tab.title);
+    if (ok) {
+      verdict.tabsOpened.push(tab.title);
+      if (captureTexts && typeof rendered.text === 'string') verdict.tabTexts[tab.title] = rendered.text;
+    }
     else {
       const why = !clicked ? 'entry' : rendered?.present !== true ? 'body' : rendered.visible !== true ? 'hidden' : 'empty';
       verdict.tabFailures.push(`${tab.title}(${why})`);
@@ -258,6 +268,14 @@ try {
   if (!keepBrowser) await handle.settle();
 }
 
+if (jsonOut !== undefined) {
+  try {
+    mkdirSync(dirname(jsonOut), { recursive: true });
+    writeFileSync(jsonOut, `${JSON.stringify(verdict, null, 2)}\n`, 'utf8');
+  } catch (error) {
+    console.error(`cdp-probe: 写 --json-out 失败（${String(error?.message ?? error)}）`);
+  }
+}
 console.log(JSON.stringify(verdict, null, 2));
 let exitCode = 0;
 if (verdict.booted === false || verdict.error !== undefined) exitCode = 1;

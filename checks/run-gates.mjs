@@ -50,6 +50,7 @@ import * as vendorPin from './gates/vendor-pin.mjs'
 import * as packShape from './gates/pack-shape.mjs'
 import * as releaseReady from './gates/release-ready.mjs'
 import * as distFreshness from './gates/dist-freshness.mjs'
+import * as uiGoldenFreshness from './gates/ui-golden-freshness.mjs'
 import * as presetRowDeps from './gates/preset-row-deps.mjs'
 import * as clientHalves from './gates/client-halves.mjs'
 import * as srcLayering from './gates/src-layering.mjs'
@@ -115,6 +116,7 @@ vendorPin.run(ctx)
 packShape.run(ctx)
 releaseReady.run(ctx)
 distFreshness.run(ctx)
+uiGoldenFreshness.run(ctx)
 presetRowDeps.run(ctx)
 clientHalves.run(ctx)
 srcLayering.run(ctx)
