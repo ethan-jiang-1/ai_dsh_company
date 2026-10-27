@@ -32,7 +32,7 @@
 ```text
 source run/env.sh && node probes/fs-taskboard/converge-e2e-probe.mjs
 #   ALL PASS（8/8）；跑后 snapshots/archive 无 convergence-2026-10-23 残留、git status 无新增
-npx vitest run tests/company/converge-rules.spec.ts   # 含自定义 wsRel 的计划用例
+npx vitest run tests/harness/converge-rules.spec.ts   # 含自定义 wsRel 的计划用例
 pnpm test     # 753 passed
 pnpm verify   # ALL PASS（snapshot-index 复绿）
 ```

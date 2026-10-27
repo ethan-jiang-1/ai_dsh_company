@@ -14,7 +14,7 @@
 - `WARNING` **留基座**：它的 7 个码里 check 侧用 5 个（`SLUG_UNLEDGERED` / `PLACEHOLDER_CLAIMS` / `FINAL_WITHOUT_META` / `META_RESULT_PENDING` / `META_LEDGER_MISMATCH`），其中三个是纯盘面观察、与会话对账无关；放对账侧会逼出 `deliverables-check → audit` 的反向依赖。
 - `presentResultRows` **迁对账**：输入是 `auditDeliverables().leadFinalSlugs`（会话侧）、产出 `VIOLATION.PRESENT_RESULT_NOT_FINAL`；留基座会逼出基座 → 对账的反向依赖。
 
-**② 对应 spec 机械拆分**：`tests/company/deliverables.spec.ts` 538 行 → 基座 128 行 + `deliverables-audit.spec.ts` 462 行（恢复 `tests/company` 的 `<模块>.spec.ts` 一一对应，沿 2026-10-14 doors 迁出先例）。
+**② 对应 spec 机械拆分**：`tests/harness/deliverables.spec.ts` 538 行 → 基座 128 行 + `deliverables-audit.spec.ts` 462 行（恢复 `tests/company` 的 `<模块>.spec.ts` 一一对应，沿 2026-10-14 doors 迁出先例）。
 
 **③ 观察项触发线落档**：`checks/smoke/replay-smoke.mjs` 头注立触发线（>800 行或再增第 5 个 mode ⇒ 判据/驱动器分家，沿 replay-ui 拆出先例）。另三条观察项（`src/client/`、`tools/lib/`、大镜像 spec）没有自然宿主文件，只住来源卡上表，不硬塞头注。
 

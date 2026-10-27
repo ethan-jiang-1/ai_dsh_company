@@ -138,7 +138,7 @@ function labelsMode(path) {
   console.log(`candidate-scan-eval --labels: 金标准打分（标注 = ${path}）`)
   console.log(`标注状态：**机器初标（待人复核）** ⇒ 以下数字是"按此草标"的条件值，人改标后须重跑\n`)
 
-  // IO + 三规则实跑；解析与打分逻辑在 lib（纯逻辑，配 tests/company/candidate-scan-labels.spec.ts）
+  // IO + 三规则实跑；解析与打分逻辑在 lib（纯逻辑，配 tests/harness/candidate-scan-labels.spec.ts）
   // --variants（RFC scan-rule-iteration）：并排实跑变体 R2′（关闭检查）/ R3′（双源依赖）——
   // 基线 R1/R2/R3 永远在场作对照；采不采用由人裁决，本档只呈数据。
   const variants = process.argv.includes('--variants')

@@ -80,7 +80,7 @@ source run/env.sh && node checks/audit/deliverables-check.mjs --only lingang-rec
 3. **真现场闭合**：`node checks/audit/deliverables-check.mjs --only lingang-recon` 由 **3 条违规 → 0 条**
    （T5 经「依赖链」一并覆盖，见下），且**不靠改盘面**（`drafts/ceo.md` 与 `schedule.json` 都不动）。
 
-**验证搭载**：`tests/company/deliverables-audit.spec.ts` 两条 keyless 守卫（锚粒度 + 依赖链）——
+**验证搭载**：`tests/harness/deliverables-audit.spec.ts` 两条 keyless 守卫（锚粒度 + 依赖链）——
 它们随 `pnpm test` 跑，是真答案；`replay-smoke --scenario r3-delegation` 因手册改一句而同 diff 重跑（同 diff 刷新夹具 digest）。
 
 ## 修复实况（2026-10-19）
@@ -94,7 +94,7 @@ source run/env.sh && node checks/audit/deliverables-check.mjs --only lingang-rec
 
 **红→绿实测**（实跑命令与输出）：
 - 新守卫先红：`expected [ 'T4', 'T6' ] to deeply equal []`（旧判据只认字面 T 号）。
-- 修后绿：`tests/company/deliverables-audit.spec.ts` 40/40；`pnpm test` 669/669（67 spec）。
+- 修后绿：`tests/harness/deliverables-audit.spec.ts` 40/40；`pnpm test` 669/669（67 spec）。
 - 真入口闭环：`--only lingang-recon` 由 **3 条违规 → `违规 0 条 —— ALL PASS`**（盘面一字未改）。
 - 反证（门没钝）：把锚换成别的 slug ⇒ `["T4","T5"]` 照旧判红；无锚 ⇒ 全判红；`T10` 不被 `T1` 顶替。
 

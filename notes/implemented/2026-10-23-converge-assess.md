@@ -28,7 +28,7 @@
 
 ## 后果
 
-- `tests/company/converge-rules.spec.ts` +12 用例（六闸单失败 / 两个放行面 / 放行不掩盖其他闸 /
+- `tests/harness/converge-rules.spec.ts` +12 用例（六闸单失败 / 两个放行面 / 放行不掩盖其他闸 /
   计划与执行同判据 / 无 final 不要求审计）。`pnpm test` = **739**（原 727）。
 - 活盘计划输出**逐行不变**（`diff` 为空）；`--slug <未闭合 slug>` 退出码仍为 1，文案改为
   `不可收敛——无 final` + 现场行。
@@ -38,11 +38,11 @@
 
 ```text
 # 红（实现前）
-npx vitest run tests/company/converge-rules.spec.ts
+npx vitest run tests/harness/converge-rules.spec.ts
 #   12 failed（TypeError: assess is not a function）+ 35 passed
 
 # 绿
-npx vitest run tests/company/converge-rules.spec.ts     # 47 passed
+npx vitest run tests/harness/converge-rules.spec.ts     # 47 passed
 pnpm test                                                # 739 passed
 pnpm verify                                              # ALL PASS
 

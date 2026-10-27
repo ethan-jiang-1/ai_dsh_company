@@ -29,7 +29,7 @@
 - **红（先跑，TDD）**：新用例「同角色的多实例写入者（`coo-2` / `vp-eng-3`）⇒ match」在实现前实跑
   → `× … expected 'fail' to be 'match'`（`Tests 1 failed | 17 passed`）——**这就是真盘 10 条假阳性的最小化**。
 - **守卫用例同轮已在场且当时即绿**：「规范化只抹实例后缀，不吞跨角色差异：`vp-eng-2` 写 `coo` 稿仍判 fail」——它证明修复方向没有放宽判别力（改前改后都绿，是**不变量**而非新行为）。
-- **绿**：`pnpm exec vitest run tests/company/authorship.spec.ts` → `18 passed (18)`（原 16 条 + 新增 2 条）。
+- **绿**：`pnpm exec vitest run tests/harness/authorship.spec.ts` → `18 passed (18)`（原 16 条 + 新增 2 条）。
 - **真消费面（决定性）**：`source run/env.sh && node checks/audit/authorship-audit.mjs` → 摘要 `一致 160｜已收回 0｜无署名(观察) 27｜写入者不可考(观察) 8｜**署名不实 0**｜版本引用 158（✗过期 0｜？无版号 39）`，`ALL PASS`，exit 0（改前 `署名不实 10` + exit 1）。`一致` 从 150 → 160，正好是那 10 条归位。
 - **显示面**：`✗ …` 十条变 `✓ …｜写入=coo(coo-2)` 等（实例后缀保留在括号里）。
 - **全量**：`pnpm verify` ALL PASS；`pnpm test` 61 文件 / 561 用例全绿（559 + 新增 2）。

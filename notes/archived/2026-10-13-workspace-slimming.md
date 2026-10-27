@@ -60,7 +60,7 @@
   A3 tracked 面 stage 成 `R  …final.md -> …final.md` / A4 ignored 面不进索引）。
 - `pnpm test` —— **53 files / 524 tests 绿**；`node checks/audit/deliverables-check.mjs` —— **违规 0 条 ALL PASS**；
   `node tools/converge.mjs`（计划模式）正常列出可收敛 slug 与 journal 收割预览。
-- **一次真拦截记录**：搬移那条测试初版住 `tests/company/converge-rules.spec.ts` 并真跑 git，
+- **一次真拦截记录**：搬移那条测试初版住 `tests/harness/converge-rules.spec.ts` 并真跑 git，
   被 `tests/harness/layering.spec.ts` 当场判红（回归层不许子进程）⇒ 拆成"spec 只钉计划形状 + probe 真跑"。
 - **未跑**（如实登记）：真盘上的 converge 执行（人驱动的轮末动作；本轮不代跑）。
 
@@ -69,5 +69,5 @@
 - 规则：`.gitignore`（两条点名规则 + 理由/量级注释）。
 - 机制：`tools/lib/converge-rules.mjs`（`archiveMovePlan`）、`tools/converge.mjs`（搬移段）、`tools/orient.mjs`（ignored 计数）。
 - 判据：`checks/run-gates.mjs` 的 `drafts-untracked`、`probes/fs-taskboard/archive-move-probe.mjs`、
-  `tests/company/converge-rules.spec.ts`（纯计划）、`tests/harness/gitignore-guards.spec.ts`（规则在场）。
+  `tests/harness/converge-rules.spec.ts`（纯计划）、`tests/harness/gitignore-guards.spec.ts`（规则在场）。
 - 文档：`docs/guides/dev-loop.md` §7、`snapshots/README.md` §归档动作、`docs/project-map.md` 公司盘行。

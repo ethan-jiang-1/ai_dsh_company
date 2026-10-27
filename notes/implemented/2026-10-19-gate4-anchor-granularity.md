@@ -55,7 +55,7 @@ CEO 真写出来的形状是「**总锚挂 T1 复查，prompt 里逐个点名 T1
 | 检查 | 结果 |
 |---|---|
 | 新守卫先红 | `expected [ 'T4', 'T6' ] to deeply equal []`（旧实现只认字面 T 号） |
-| 修复后 | `tests/company/deliverables-audit.spec.ts` 40/40；`pnpm test` **669/669**（67 spec） |
+| 修复后 | `tests/harness/deliverables-audit.spec.ts` 40/40；`pnpm test` **669/669**（67 spec） |
 | 真入口闭环 | `node checks/audit/deliverables-check.mjs --only lingang-recon`：**3 条违规 → `违规 0 条 —— ALL PASS`**（`drafts/ceo.md` 与 `schedule.json` 一字未改） |
 | 红配方可复现 | 把 lib 退回旧的整句 `includes` ⇒ 两条守卫同时红（`[ 'T4', 'T6' ]` / `[ 'T4', 'T5' ]`）；还原 ⇒ 40/40 绿 |
 | 门没钝（反证） | 锚换成别的 slug ⇒ `["T4","T5"]` 照旧红；`['T9']` 无点名 ⇒ 红；空库 ⇒ 全红 |
@@ -82,6 +82,6 @@ CEO 真写出来的形状是「**总锚挂 T1 复查，prompt 里逐个点名 T1
 ## 落账
 
 改动面：`tools/lib/deliverables-audit.mjs`（判据）、`checks/audit/deliverables-check.mjs`（调用面 + 报告合并）、
-`packages/company-pack/workspace/AGENTS.md`（④行补一句）、`tests/company/deliverables-audit.spec.ts`（两条守卫 + 红配方）、
+`packages/company-pack/workspace/AGENTS.md`（④行补一句）、`tests/harness/deliverables-audit.spec.ts`（两条守卫 + 红配方）、
 `snapshots/replay/r3-delegation/replay/`（夹具同步：注入体 + 手册 digest，**非重录**）、
 `_backlog/`（卡迁归档 + 两处清单 + 索引链接）、`notes/implemented/2026-10-17-motion5-question-avoidance.md`（指向新位置）。

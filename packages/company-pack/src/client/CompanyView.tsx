@@ -146,8 +146,8 @@ export function createCompanyView(injected: CompanyViewInjected) {
           </Button>
         </div>
         <div className="wk-view-body">
-          {data.error !== null && <div className="wk-error">{data.error}</div>}
-          {data.team === null && data.error === null && <StateNote kind="loading" text={LOADING_NOTE} />}
+          {panel !== 'cultivation' && data.error !== null && <div className="wk-error">{data.error}</div>}
+          {panel !== 'cultivation' && data.team === null && data.error === null && <StateNote kind="loading" text={LOADING_NOTE} />}
           {data.team !== null && panel === 'board' && <BoardPanel columns={data.columns} />}
           {data.team !== null && panel === 'dag' && <DagPanel layout={data.dag} />}
           {data.team !== null && panel === 'presence' && (

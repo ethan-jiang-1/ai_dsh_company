@@ -7,7 +7,7 @@
 // `sea-reconcile-2026` 的 CFO 稿与 journal 首版由 **`ceo` preset 会话代笔**（开第二扇门时 preset 没改），
 // `journal-audit` 照样判 ✅。这个盲区正是独立评审点名的：**路径不是作者证明**。
 //
-// 判据（档位定义与实现单一来源 = tools/lib/authorship.mjs，keyless 单测见 tests/company/authorship.spec.ts）：
+// 判据（档位定义与实现单一来源 = tools/lib/authorship.mjs，keyless 单测见 tests/harness/authorship.spec.ts）：
 //   ✓ **一致**   —— 稿首署名行的角色 == 实际写入该文件的会话的 agentPreset；
 //   ◐ **已收回** —— 署名 ≠ 写入者，但稿里有"复核并署名"更正行 ⇒ 观察（sea-reconcile 真实案例）；
 //   ✗ **署名不实** —— 稿里**真的写了** `出稿：<角色>`，且 ≠ 写入者，且无更正行 ⇒ 判红；

@@ -5,7 +5,7 @@
 
 ## 触发：一次真的假绿（实测，不是推测）
 
-`tests/company/deliverables.spec.ts` 的 **BUG-004 守卫**（让位行的机器可查面）声称守住
+`tests/harness/deliverables.spec.ts` 的 **BUG-004 守卫**（让位行的机器可查面）声称守住
 「持认判定 = 占位 ∧ ¬让位」。我把它弱化成子串匹配——**正是它自己声称要防的"措辞走样也认"失效**：
 
 ```js

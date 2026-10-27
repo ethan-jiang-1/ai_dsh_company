@@ -164,7 +164,7 @@ function archived(workspace, role, slug) {
   if (slug === undefined) return null
   const repoRoot = resolve(workspace, '..')
   // 两种归档形状都认（判据纯逻辑 = lib `pickArchivedJournal`，keyless spec 在
-  // tests/company/converge-rules.spec.ts）：
+  // tests/harness/converge-rules.spec.ts）：
   //   ① 老：`<场景>/workspace.actual/kb/<角色>/journal/`（memory-convergence-* 的整盘拷贝形状）；
   //   ② 新：`<场景>/<dirName>/journal/<角色>/`（现行 converge 的证据副本形状）。
   // ⚠ 2026-10-16 实测：只认形状① ⇒ 命名换代后**收敛过的场次全被误报缺席**（16 条缺席里 9 场有证据）。

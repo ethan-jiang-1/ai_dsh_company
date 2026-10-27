@@ -13,7 +13,7 @@
 | —（无活跃缺陷卡） | BUG-033 已修并迁 [fixed_bugs](../_archive/fixed_bugs/BUG-033-revoke-recovery-body-edit-loss.md)：journal 目标态推导 + 第三态 conflict；2026-10-23 BUG-032 同模式 | — |
 
 **2026-10-19 BUG-028 收口**：闸门④认总锚（title 或 prompt 点名即算，依赖链一并传递），lingang-recon 由 3 条误报 → 0 条违规；
-守卫 = `tests/company/deliverables-audit.spec.ts` 两条 keyless 断言（锚粒度 + 依赖链）。教训同 BUG-014：
+守卫 = `tests/harness/deliverables-audit.spec.ts` 两条 keyless 断言（锚粒度 + 依赖链）。教训同 BUG-014：
 **锚的粒度选错**——判据把纪律的意图（有真跟进为证）翻译成了一种形状（每个 T 号各一条锚），
 于是纪律自己鼓励的"一条复查盯全部缺料"反倒撞红。
 

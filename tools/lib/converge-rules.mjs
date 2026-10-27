@@ -1,5 +1,5 @@
 /**
- * converge.mjs 的纯判定规则（判据单一来源；IO 留在驱动脚本，tests/company/converge-rules.spec.ts 消费）。
+ * converge.mjs 的纯判定规则（判据单一来源；IO 留在驱动脚本，tests/harness/converge-rules.spec.ts 消费）。
  * 三条规则各有自己的事故卡：journal 归属 = 2026-10-12 前缀误吞教训（BUG-014 卡引用）；
  * 查重锚 = BUG-014（子串查重假跳过）；证据目录解析 = BUG-015（日期耦合写断链）。
  */

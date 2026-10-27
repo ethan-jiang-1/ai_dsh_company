@@ -31,7 +31,7 @@
 
 真跑过的命令与红/绿形态：
 
-- **生成器红**：把 `buildDeliverablesCatalog` 的 `if (!entry.final) continue` 去掉（非 final 也进目录）⇒ `npx vitest run tests/company/deliverables-catalog.spec.ts` **3 failed / 2 passed**；还原 ⇒ **5 passed**。
+- **生成器红**：把 `buildDeliverablesCatalog` 的 `if (!entry.final) continue` 去掉（非 final 也进目录）⇒ `npx vitest run tests/harness/deliverables-catalog-tools.spec.ts` **3 failed / 2 passed**；还原 ⇒ **5 passed**。
 - `node tools/deliverables-index.mjs` ⇒ `{ total: 44, active: 5, archive: 39, unledgered: 5, presented: 42, notPresented: 2, presentUnknown: 0 }`。
 - `source run/env.sh && node tools/converge.mjs --rebuild-index` ⇒ 收敛末尾同一路径重建成功（index 计数同上）。
 - `source run/env.sh && node checks/audit/deliverables-check.mjs --json` ⇒ 末尾 `JSON:` 行含 `finals:47 / presented:46`；清理前 2 条真违规（final-not-presented / meta-shape-bad），清理后 **0 违规**（private-deploy 已真 present；recon-pack 仅 legacy 观察项），不因目录而绿。

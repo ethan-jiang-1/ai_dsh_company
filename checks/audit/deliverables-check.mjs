@@ -3,7 +3,7 @@
 // 交付物三态判据的**运行场入口**（R4「成品流程」轮）。
 // 何时跑：交付物三态判据或 company-workspace/deliverables 改动后；维护者按需跑（缺 DSH_HOME 自拒），不进 verify
 //
-// 与 `tests/company/deliverables.spec.ts` 的分工（guides/dev-loop §9.1 分层纪律）：
+// 与 `tests/harness/deliverables.spec.ts` 的分工（guides/dev-loop §9.1 分层纪律）：
 //   - 回归层（vitest）守判据本身，只读**明文**归档日志，秒级、无 key；
 //   - 本脚本跑**运行场**——`company-workspace/` + `$DSH_HOME/sessions/`，那里的日志是
 //     多帧 zstd（Node 内置 zstd 只解首帧，实测 329KB 只吐出 1 行），所以这里起 `zstd` 解帧。
@@ -189,7 +189,7 @@ const violations = [...result.violations]
 // ── meta.md 户口面（布局卡 B1，2026-10-03 拍板：meta 是家、台账过渡期人工 + 一致性观察）──
 // 形状红：parse/validate 判据在 lib（validateMeta）；观察三项：final-without-meta（T-9）、
 // 结果留空（存量回填态）、kickoff 与台账日期不一致（两笔账对不上）。
-// 判据纯逻辑 = lib metaLedgerFindings（keyless spec 在 tests/company/deliverables-audit.spec.ts）；
+// 判据纯逻辑 = lib metaLedgerFindings（keyless spec 在 tests/harness/deliverables-audit.spec.ts）；
 // 本脚本只做 IO（读 meta 正文）与分档（violation → violations / warning → warnings）。
 const metaLedger = metaLedgerFindings({
   finalSlugs: [...new Set(result.finals.map(f => f.slug))],
@@ -208,7 +208,7 @@ for (const finding of metaLedger.results) {
 
 // 反向门禁（布局卡评审修正 6，2026-10-04 补落）：present 在而结果≠终态 → 红——
 // present 是收口动作，收了口状态必须落终态词（留空/进行中 = P6 病复发：结果靠自觉回写没人盯）。
-// 判据纯逻辑 = lib presentResultRows（keyless spec 在 tests/company/deliverables-audit.spec.ts）；无 meta 不在射程（T-9 观察项管）。
+// 判据纯逻辑 = lib presentResultRows（keyless spec 在 tests/harness/deliverables-audit.spec.ts）；无 meta 不在射程（T-9 观察项管）。
 const metaResultBySlug = new Map([...metaBySlug].map(([slug, meta]) => [slug, meta.fields.get('结果') ?? '']))
 for (const row of presentResultRows(result.leadFinalSlugs, metaResultBySlug)) {
   violations.push({

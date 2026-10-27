@@ -31,11 +31,11 @@
 
 ```text
 # 红（实现前）
-npx vitest run tests/company/converge-rules.spec.ts
+npx vitest run tests/harness/converge-rules.spec.ts
 #   5 failed（steps is not a function）+ 47 passed
 
 # 绿
-npx vitest run tests/company/converge-rules.spec.ts     # 52 passed
+npx vitest run tests/harness/converge-rules.spec.ts     # 52 passed
 pnpm test                                                # 744 passed
 pnpm verify                                              # ALL PASS
 

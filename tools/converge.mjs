@@ -188,7 +188,7 @@ const appendLedger = (fields) => {
 /**
  * 半态续跑（BUG-020，2026-10-16）。只做**剩余步骤**（清 live journal → 台账行 → 打印 backfill），
  * **不搬移已归档的交付物**；不可续跑时 fail-loud 并给恢复指引。
- * 判定纯逻辑 = `convergenceResume`（keyless spec = tests/company/converge-rules.spec.ts）。
+ * 判定纯逻辑 = `convergenceResume`（keyless spec = tests/harness/converge-rules.spec.ts）。
  */
 const resume = (dirName) => {
   const slug = dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '')

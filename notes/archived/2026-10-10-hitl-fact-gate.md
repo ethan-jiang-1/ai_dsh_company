@@ -50,7 +50,7 @@
 
 ## 验证（实际跑过）
 
-- **红证（TDD）**：先在 `tests/company/candidate-scan-labels.spec.ts` 加 4 用例（待补料浮出 blocked /
+- **红证（TDD）**：先在 `tests/harness/candidate-scan-labels.spec.ts` 加 4 用例（待补料浮出 blocked /
   不算依赖满足且盘上稿不解锁 / R2 不当候选 / R3′ 不假满足）→ **4 failed**（解析器不认识该状态）
   → 扩 `ASSIGN_LINE` + R3/R3′ 分支 → **23/23 绿**。红长什么样：`scanR3` 的 blocked 缺 T1
   （行被正则静默丢弃）。

@@ -25,7 +25,7 @@ export function nominalRoleOf(fileName) {
  * 精确字符串相等把**同一角色的两个实例**判成「署名不实」（真盘实测 10 条假阳性）。
  *
  * ⚠ 规范化**只作用在实例后缀这一维**：比较仍要求角色相等 ⇒ `vp-eng-2` 写 `coo` 稿照旧判红
- * （守卫断言见 tests/company/authorship.spec.ts「规范化只抹实例后缀，不吞跨角色差异」）。
+ * （守卫断言见 tests/harness/authorship.spec.ts「规范化只抹实例后缀，不吞跨角色差异」）。
  * @param preset - 会话的 agentPreset（或任意字符串）。
  * @returns 去掉 `<角色>-<数字>` 后缀的 preset；不含实例后缀时原样返回。
  */

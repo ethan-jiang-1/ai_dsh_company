@@ -31,7 +31,7 @@ opened: 2026-10-19
 - **自动重建**：`tools/converge.mjs` 收敛/续跑后自动调用生成器；`--rebuild-index` 可单独跑；纯命令形状在 `converge-rules` spec 钉住。
 - **页签**：[`DeliverablesTab.tsx`](../../../packages/company-pack/src/client/DeliverablesTab.tsx) + `company-tab-registration` 第 9 项 + `tab-icons` 的产出箱 glyph；`readCatalog` 走 `remote.workspaceFiles.read('kb/deliverables-index.json')`；`openFinal` 走 `sessionFileAddress` + `sidebarRight.openResource`。
 - **UX 顺手修**：页签头标题/按钮 `nowrap` + 新鲜度文案省略号（窄栏不再把「重读/浮出」挤成竖排）；看板标题/guide 的旧「5 秒自动刷新」改「投影更新」。
-- **测试**：`tests/company/deliverables-catalog.spec.ts`（5）+ `tests/client/deliverables-catalog.spec.ts`（8）+ `client-face` 数据面（1）；注册/组合测试同步 9 页签。
+- **测试**：`tests/harness/deliverables-catalog-tools.spec.ts`（5）+ `tests/client/deliverables-catalog.spec.ts`（8）+ `client-face` 数据面（1）；注册/组合测试同步 9 页签。
 - **探针**：[`deliverables-catalog-probe.mjs`](../../../probes/browser-visual/deliverables-catalog-probe.mjs)（真 web；44 行 = 索引；四档筛选；44 个打开；点第一行后 final 正文出现；窄栏可见；`--fixture` 落图）。
 - **Note**：[2026-10-19-deliverables-catalog](../../../notes/implemented/2026-10-19-deliverables-catalog.md)｜批次句号：[2026-10-20-company-panel-batch-close](../../../notes/implemented/2026-10-20-company-panel-batch-close.md)。
 
@@ -43,7 +43,7 @@ opened: 2026-10-19
 | present 判据 | 真 CEO present 后 `presented` 43；audit 违规 **0** | `source run/env.sh && node checks/audit/deliverables-check.mjs --json` |
 | present 真红清除 | 真 CEO 会话 `session-a87b177b…` 调 `present`（绝对路径）；修 `parseSessionLog` 按 cwd 归一后审计可见 | 会话日志 `deliverables/presented`；新增 audit spec |
 | 自动重建 | 收敛/续跑后自动；`--rebuild-index` 单独跑成功 | `node tools/converge.mjs --rebuild-index`；`converge-rules.spec` |
-| 纯逻辑红/绿 | 去掉 final 过滤 ⇒ 3 failed / 2 passed；还原 ⇒ 5 passed | `npx vitest run tests/company/deliverables-catalog.spec.ts` |
+| 纯逻辑红/绿 | 去掉 final 过滤 ⇒ 3 failed / 2 passed；还原 ⇒ 5 passed | `npx vitest run tests/harness/deliverables-catalog-tools.spec.ts` |
 | 全量 keyless | 70 files / 695 tests passed | `pnpm test` |
 | 结构门禁 | ALL PASS | `pnpm verify` |
 | 真挂载 | 零挂载失败 + 品牌在场 | `client-load-smoke`（重建 `lib/` 后） |
