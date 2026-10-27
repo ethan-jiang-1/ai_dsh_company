@@ -128,31 +128,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // 探活的清理函数挂 fiber（effect 惯例）：卸载/重载时移除心跳、横幅与定时器，不泄漏。
   ctx.effect(() => startInstanceGuard(document))
 
-  // 角色身份 UX · C 段：窗口标题带角色 + 整窗角色色条（2026-09-26 立，提案 §五 C）。
-  // vendor 的 DocumentTitle 只在 activePanelId===null 时显示会话标题（用户真实用法下不可靠，
-  // 实测"压根儿找不到变化"）⇒ 本效果无条件接管标题：始终「【角色】会话标题」；
-  // 并把当前角色写到 :root[data-wk-role] 供 CSS 顶部色条使用。
-  // 数据 = 上游 agentPreset 投影（A 段已验）+ 会话列表标题；订阅快照，无轮询。
-  ctx.inject(['sessions'], (scoped) => {
-    scoped.effect(() => {
-      const list = scoped.sessions.list
-      const update = (): void => {
-        const state = list.getSnapshot()
-        const current = Object.values(state.byId).find(s => (s.retainedBy.mainView ?? 0) > 0)
-        const preset = current === undefined ? null : readPresetOf(list, current.id)
-        const short = preset === null ? undefined : ROLE_SHORT[preset]
-        const rawTitle = current === undefined ? undefined : sessionTitleOf(current)
-        if (rawTitle !== undefined && rawTitle !== '') {
-          document.title = short === undefined ? rawTitle : `【${short}】${rawTitle}`
-        }
-        const root = document.documentElement
-        if (short === undefined) delete root.dataset.wkRole
-        else root.dataset.wkRole = preset ?? ''
-      }
-      update()
-      return list.subscribe(update)
-    })
-  })
+  registerTitle(ctx)
 
   // 浏览器错误 → host 诊断文件：按平台原生命令面，无当前会话时跳过；1s 节流防刷屏。
   ctx.inject(['sessions', 'remote.commands'], (scoped) => {
@@ -179,56 +155,17 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // 的 waterfall；this = 事件归属 owner ctx，scopeOf → 发起会话（同款 ui-approval 手法）。
   installAttentionObservers(ctx, attention)
 
-  // 委派工具卡（R3）+ 团队工具卡（S2）：把 CEO 的命名委托与团队动作渲染成公司语义的卡。
-  // keyed slot 的 key 域是**开放**的（槽合同原话："a typo simply never renders"），
-  // 所以 key 必须与 preset 里的 toolName / 官方工具名逐字一致——拼错不报错、只是永远不渲染。
-  ctx.inject(['slots'], (scoped) => {
-    // rc.2 起**一键一 inject**（官方内置 toolview 全是这个形状：`readToolview`/`presentRow`…）。
-    // 旧写法（一个 inject 回调里返回 disposer 数组）在 rc.2 下不再生效 ⇒ 委派卡/团队卡退化成通用行。
-    // priority -1：keyed 槽 lowest renders——rc.2 的 vendor details-toolview 也在 spawn_teammate/
-    // send_message/list_agents 等键上注册（priority 0），同键同优先级会 throw；我们 richer 的卡
-    // 必须压过通用明细行 ⇒ 显式 -1（2026-09-25 UX 实验现场抓到，dag-probe 控制台红证）。
-    for (const key of DELEGATION_TOOL_KEYS) {
-      scoped.slots.inject('tool.call.toolview', () =>
-        scoped.slots.register({ name: 'tool.call.toolview', key, priority: -1 }, DelegationCard))
-    }
-    for (const key of TEAM_TOOL_KEYS) {
-      scoped.slots.inject('tool.call.toolview', () =>
-        scoped.slots.register({ name: 'tool.call.toolview', key, priority: -1 }, TeamToolCard))
-    }
-  })
+  registerToolCards(ctx)
 
-  ctx.inject(['sessions', 'sidebarRight', 'slots'], (scoped) => {
-    scoped.slots.inject('sidebar.brand.name', () =>
-      scoped.slots.register({ name: 'sidebar.brand.name' }, DreamTeamBrandName))
+  registerSidebarIdentity(ctx)
 
-    // 角色身份 UX · B 段：侧栏会话行首的角色徽标（官方 ambient 行装饰位，仅 idle 行渲染）。
-    // root 作用域只给 sessionId（槽合同原话"nothing else"）⇒ 数据经 inject 面注入
-    // 会话列表快照；徽标内部用 useSyncExternalStore 订阅上游 agentPreset 投影。
-    // 无角色/未知 preset 优雅降级为不渲染（RoleBadge 返回 null）。
-    scoped.slots.inject('sidebar.session.row.leading', () =>
-      scoped.slots.register({
-        name: 'sidebar.session.row.leading',
-        id: 'company-role-badge',
-        order: 0,
-        inject: () => ({ roleSource: sessions.list }),
-      }, RoleBadge))
+  registerCompanyTabsWiring(ctx, attention)
 
-    const sessions = scoped.sessions
-    const leadSessionId = createLeadLookup(sessions)
-    // 条目 ② S3：头部按钮从 anchored 弹窗改为打开右栏平台页签（与官方 Agent Team 弹窗不再互盖）。
-    scoped.slots.inject('conversation.session.header.actions', () =>
-      scoped.slots.register({
-        name: 'conversation.session.header.actions',
-        id: 'company-tasks',
-        order: 21,
-        inject: () => ({
-          leadOf: leadSessionId,
-          openTasks: () => { scoped.sidebarRight.openTab('company-tasks') },
-        }),
-      }, TasksAction))
-  })
+  registerCompanyViewWiring(ctx)
 
+}
+
+function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typeof createAttentionRegistry>): void {
   // Company workspace files are read through this injected session Remote; the
   // tab-registration module keeps the four matching contribution surfaces local.
   // ⚠ `remote.commands` = 人侧动作面（2026-10-17 培养 GUI 卡）：面板按钮/创作表单经它发
@@ -274,7 +211,9 @@ export async function apply(ctx: ClientContext): Promise<void> {
       openContext: contextWiring.openContext,
     })
   })
+}
 
+function registerCompanyViewWiring(ctx: ClientContext): void {
   // 公司整页视图（条目 ① S1）：`conversation.view` 的第三个页签（Chat / Trajectory / 公司）。
   // 该槽**没有 inject 面**（catalog registerOptions 只有 id/order/label）且 team 投影是 host-only
   // ⇒ 数据面用注册处闭包注入（见 CompanyView 头注）；跨插件值导入仍被禁。
@@ -321,5 +260,87 @@ export async function apply(ctx: ClientContext): Promise<void> {
       order: 20,
       label: () => '公司',
     }, CompanyView))
+  })
+}
+
+function registerTitle(ctx: ClientContext): void {
+  // 角色身份 UX · C 段：窗口标题带角色 + 整窗角色色条（2026-09-26 立，提案 §五 C）。
+  // vendor 的 DocumentTitle 只在 activePanelId===null 时显示会话标题（用户真实用法下不可靠，
+  // 实测"压根儿找不到变化"）⇒ 本效果无条件接管标题：始终「【角色】会话标题」；
+  // 并把当前角色写到 :root[data-wk-role] 供 CSS 顶部色条使用。
+  // 数据 = 上游 agentPreset 投影（A 段已验）+ 会话列表标题；订阅快照，无轮询。
+  ctx.inject(['sessions'], (scoped) => {
+    scoped.effect(() => {
+      const list = scoped.sessions.list
+      const update = (): void => {
+        const state = list.getSnapshot()
+        const current = Object.values(state.byId).find(s => (s.retainedBy.mainView ?? 0) > 0)
+        const preset = current === undefined ? null : readPresetOf(list, current.id)
+        const short = preset === null ? undefined : ROLE_SHORT[preset]
+        const rawTitle = current === undefined ? undefined : sessionTitleOf(current)
+        if (rawTitle !== undefined && rawTitle !== '') {
+          document.title = short === undefined ? rawTitle : `【${short}】${rawTitle}`
+        }
+        const root = document.documentElement
+        if (short === undefined) delete root.dataset.wkRole
+        else root.dataset.wkRole = preset ?? ''
+      }
+      update()
+      return list.subscribe(update)
+    })
+  })
+}
+
+function registerToolCards(ctx: ClientContext): void {
+  // 委派工具卡（R3）+ 团队工具卡（S2）：把 CEO 的命名委托与团队动作渲染成公司语义的卡。
+  // keyed slot 的 key 域是**开放**的（槽合同原话："a typo simply never renders"），
+  // 所以 key 必须与 preset 里的 toolName / 官方工具名逐字一致——拼错不报错、只是永远不渲染。
+  ctx.inject(['slots'], (scoped) => {
+    // rc.2 起**一键一 inject**（官方内置 toolview 全是这个形状：`readToolview`/`presentRow`…）。
+    // 旧写法（一个 inject 回调里返回 disposer 数组）在 rc.2 下不再生效 ⇒ 委派卡/团队卡退化成通用行。
+    // priority -1：keyed 槽 lowest renders——rc.2 的 vendor details-toolview 也在 spawn_teammate/
+    // send_message/list_agents 等键上注册（priority 0），同键同优先级会 throw；我们 richer 的卡
+    // 必须压过通用明细行 ⇒ 显式 -1（2026-09-25 UX 实验现场抓到，dag-probe 控制台红证）。
+    for (const key of DELEGATION_TOOL_KEYS) {
+      scoped.slots.inject('tool.call.toolview', () =>
+        scoped.slots.register({ name: 'tool.call.toolview', key, priority: -1 }, DelegationCard))
+    }
+    for (const key of TEAM_TOOL_KEYS) {
+      scoped.slots.inject('tool.call.toolview', () =>
+        scoped.slots.register({ name: 'tool.call.toolview', key, priority: -1 }, TeamToolCard))
+    }
+  })
+}
+
+function registerSidebarIdentity(ctx: ClientContext): void {
+  ctx.inject(['sessions', 'sidebarRight', 'slots'], (scoped) => {
+    scoped.slots.inject('sidebar.brand.name', () =>
+      scoped.slots.register({ name: 'sidebar.brand.name' }, DreamTeamBrandName))
+
+    // 角色身份 UX · B 段：侧栏会话行首的角色徽标（官方 ambient 行装饰位，仅 idle 行渲染）。
+    // root 作用域只给 sessionId（槽合同原话"nothing else"）⇒ 数据经 inject 面注入
+    // 会话列表快照；徽标内部用 useSyncExternalStore 订阅上游 agentPreset 投影。
+    // 无角色/未知 preset 优雅降级为不渲染（RoleBadge 返回 null）。
+    scoped.slots.inject('sidebar.session.row.leading', () =>
+      scoped.slots.register({
+        name: 'sidebar.session.row.leading',
+        id: 'company-role-badge',
+        order: 0,
+        inject: () => ({ roleSource: sessions.list }),
+      }, RoleBadge))
+
+    const sessions = scoped.sessions
+    const leadSessionId = createLeadLookup(sessions)
+    // 条目 ② S3：头部按钮从 anchored 弹窗改为打开右栏平台页签（与官方 Agent Team 弹窗不再互盖）。
+    scoped.slots.inject('conversation.session.header.actions', () =>
+      scoped.slots.register({
+        name: 'conversation.session.header.actions',
+        id: 'company-tasks',
+        order: 21,
+        inject: () => ({
+          leadOf: leadSessionId,
+          openTasks: () => { scoped.sidebarRight.openTab('company-tasks') },
+        }),
+      }, TasksAction))
   })
 }
