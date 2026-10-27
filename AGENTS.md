@@ -1,7 +1,9 @@
 # AGENTS.md — 本仓库的入口链
 
 梦之队（Dream Team）虚拟公司 DSH 插件（DSH = DeepSeek Harness，唯一权威 = `vendor/dsh` 钉 SHA 子模块，见下「DSH 源码」节）：一个 company pack 提供五个角色 preset 与 host/client 面。
-**初入仓库**：[项目地图](docs/project-map.md)（空间）+ [运行态地图](docs/runtime-map.md)（时序与四状态轴）——驾驭者白话速读 = [orient 七问](docs/orient.md)；**开始变更**：[开发环 §0.5/§1](docs/guides/dev-loop.md)；**选验证**：[测试宪法](docs/testing.md) + [tests/README](tests/README.md)（改动面→最窄检查）+ [脚本索引](checks/README.md)；**新 Agent 首跑验收** = [tests/README](tests/README.md) 首跑节。
+**开工最小路径**（读完这三样就够开工，其余按需）：① 本文件（纪律 + 命令表）；② 你任务那一份 owner——改角色内容 = [presets.md](docs/presets.md)、改 host/Web 代码 = [src/README](packages/company-pack/src/README.md)、改文档 = [docs/AGENTS.md](docs/AGENTS.md)、改机制/组合 = [profile.md](docs/profile.md)；③ [tests/README.md](tests/README.md) 的「改动面 → 最窄检查」对应行。
+**按需**：[项目地图](docs/project-map.md)（空间）、[运行态地图](docs/runtime-map.md)（时序与四轴）、[开发环 §0.5](docs/guides/dev-loop.md#05-任务入口与交接) / [§1](docs/guides/dev-loop.md#1-执行链从授权到有证据交接)（流程细节）、[policy](docs/policy.md)（授权与常设边界）、[测试宪法](docs/testing.md)（证据边界）、[脚本索引](checks/README.md)（逐脚本）、[orient 七问](docs/orient.md)（白话速读）。
+**三条命令**：`pnpm verify`（结构门禁）/ `pnpm test`（keyless 回归）/ `pnpm typecheck`（类型面）。新 Agent 首跑验收 = [tests/README.md](tests/README.md) 首跑节。
 
 **你（读者）= 维护本 repo 的开发 agent**；五个梦之队角色是你**维护的产物**（跑在 DSH 会话里，由 `pnpm dsh` / web 观察窗驱动）——别把自己混进公司角色，也别替角色执行公司手册。
 
@@ -26,7 +28,7 @@ runtime/                运行残留家（默认整树 gitignored + 极少数 tr
 snapshots/              回归证据资产；规则与分类 = snapshots/README.md
 ```
 
-设计全貌与决策台账：`docs/index.md`。任务入口与执行规则唯一见 [开发环 §0.5/§1](docs/guides/dev-loop.md)；任务源 = 已批 RFC（notes/proposed/ 状态行带「批准：」）与用户点名；唯一例外 = 缺陷卡「修复就绪」自授权（规则唯一家 = [_backlog 章程](_backlog/README.md)「缺陷的通道」——边界与排除项只住那里，别处不复述）。**条目状态不镜像进本文件**（只收常设指令）。
+设计全貌与决策台账：`docs/index.md`。任务源 = 已批 RFC（notes/proposed/ 状态行带「批准：」）与用户点名；唯一例外 = 缺陷卡「修复就绪」自授权（规则唯一家 = [_backlog 章程](_backlog/README.md)「缺陷的通道」——边界与排除项只住那里，别处不复述）。**条目状态不镜像进本文件**（只收常设指令）。
 
 **notes/ 是开发流程核心数据**：开工按主题检索相关 Note；非平凡变更同 diff 更新对应 Note；分类与收尾规则唯一家 = [notes/README.md](notes/README.md)。
 

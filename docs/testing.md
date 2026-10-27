@@ -1,7 +1,7 @@
 # 测试宪法：什么算证据
 
 > 性质：合同层——本仓测试政策的**唯一家**。什么时候读 = 挑验证、写验收、判断「这算不算证据」时。规则的目标不是让测试变多，是**让绿有意义**。
-> 命令与预算档 = [tests/README §验证分层与预算](../tests/README.md)；每个脚本头注自述「何时跑/成本/状态」（门禁强制）；
+> 本文件管**政策与证明边界**；行级映射与命令预算 = [tests/README](../tests/README.md)，脚本索引 = [checks/README](../checks/README.md)。命令与预算档 = [tests/README §验证分层与预算](../tests/README.md)；每个脚本头注自述「何时跑/成本/状态」（门禁强制）；
 > 快照树规则 = [snapshots/README.md](../snapshots/README.md)；理由与教训 = `notes/`。思想源头 = DSH `docs/testing.md`（55 行宪法）经 `_digested/test-strategy` 消化的本仓投影（登记见 [index.md](./index.md) §外部研究材料登记）。
 
 ## 1. 分层与证明边界（每层只证明自己能观察的性质）
