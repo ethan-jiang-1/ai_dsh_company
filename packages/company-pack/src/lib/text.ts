@@ -20,3 +20,17 @@ export function firstText(content: readonly TextBlock[]): string {
   }
   return ''
 }
+
+/** 截断长文本到 `max` 个字符；超出补省略号（动态流/标题共用）。 */
+export function clip(text: string, max: number): string {
+  return text.length <= max ? text : `${text.slice(0, max)}…`
+}
+
+/** 头 70% + 尾 30% 的摘录（保留结论与结尾；由调用方决定是否展示 truncated）。 */
+export function clipExcerpt(text: string, max = 1_200): { readonly text: string; readonly truncated: boolean } {
+  const chars = [...text]
+  if (chars.length <= max) return { text, truncated: false }
+  const head = Math.max(1, Math.floor(max * 0.7))
+  const tail = Math.max(1, max - head)
+  return { text: `${chars.slice(0, head).join('')}\n…\n${chars.slice(-tail).join('')}`, truncated: true }
+}

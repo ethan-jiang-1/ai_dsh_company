@@ -12,6 +12,8 @@
 import { isRecord } from './guards.ts'
 import { CULTIVATION_ROLES } from './presence-status.ts'   // 直接依赖词汇层，绕开 barrel 反向边（R3-22）
 
+export { clipExcerpt } from './text.ts'
+
 /** 命令 JSON 的 UTF-8 字节上限（ref 级载荷；远小于正文）。 */
 export const CONTEXT_COMMAND_MAX_BYTES = 2_000
 /** base64url token 的字符上限。 */
@@ -333,14 +335,6 @@ export function secretLikeFindings(text: string): string[] {
     if (pattern.re.test(text) && !found.includes(pattern.label)) found.push(pattern.label)
   }
   return found
-}
-
-export function clipExcerpt(text: string, max = 1_200): { readonly text: string; readonly truncated: boolean } {
-  const chars = [...text]
-  if (chars.length <= max) return { text, truncated: false }
-  const head = Math.max(1, Math.floor(max * 0.7))
-  const tail = Math.max(1, max - head)
-  return { text: `${chars.slice(0, head).join('')}\n…\n${chars.slice(-tail).join('')}`, truncated: true }
 }
 
 /** `source` 的人话摘要（旧 UI/工具/外部读者仍能读懂）。 */

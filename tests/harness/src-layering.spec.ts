@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ALLOWED_EDGES, edgeProblem, importProblem, importSpecifiers, isNodeBuiltinSpecifier, layerOf } from '../../tools/lib/src-layering.mjs'
+import { ALLOWED_EDGES, edgeProblem, importProblem, importSpecifiers, isNodeBuiltinSpecifier, layerOf, stripComments } from '../../tools/lib/src-layering.mjs'
 
 // 2026-10-27 R3-01：分层判据的纯逻辑（门禁消费它；真树的反向红证见 checks/gates/src-layering.mjs 头注）。
 describe('pack 源码面分层判据', () => {
@@ -33,6 +33,21 @@ describe('pack 源码面分层判据', () => {
     const found = importSpecifiers(text)
     expect(found.map(item => item.specifier)).toEqual(['@deepseek-ai/cordis', './a.ts', './b.ts', './side-effect.css', './c.ts'])
     expect(found.map(item => item.line)).toEqual([1, 2, 3, 4, 5])
+  })
+
+  it('注释里的 import 不算；require 算（注释剥离保持行号）', () => {
+    const text = [
+      "// import { x } from '../host/x.ts'",
+      "/* const y = require('../host/y.ts') */",
+      "const z = require('../host/z.ts')",
+      "import w = require('node:fs')",
+    ].join('\n')
+    const found = importSpecifiers(text)
+    expect(found.map(item => ({ kind: item.kind, specifier: item.specifier, line: item.line }))).toEqual([
+      { kind: 'require', specifier: '../host/z.ts', line: 3 },
+      { kind: 'require', specifier: 'node:fs', line: 4 },
+    ])
+    expect(stripComments('a/*x\n y*/b').split('\n')).toHaveLength(2)
   })
 
   it('node: 内建在 lib/client 判红，在 host/root 放行', () => {

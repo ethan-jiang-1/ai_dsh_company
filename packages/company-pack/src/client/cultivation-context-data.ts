@@ -18,7 +18,8 @@ import {
   type SessionTurnPick,
   type SubagentMode,
 } from '../lib/cultivation-context.ts'
-import { parseCatalog } from './DeliverablesTab.tsx'
+import { parseCatalog } from './deliverables-index.ts'
+import { isRecord } from '../lib/guards.ts'
 
 /** 客户端 sessions store 的行（`SessionListState.byId` 的读子集）。 */
 export interface ContextSessionRowLike {
@@ -85,9 +86,6 @@ export interface CultivationContextSources {
   readonly listDeliverables: (sessionId: string, signal: AbortSignal) => Promise<ContextSourceResult<ContextDeliverableRow>>
   readonly readPreview: (row: ContextSessionRow, signal: AbortSignal) => Promise<SessionPreviewResult>
 }
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value)
 
 const isMode = (value: unknown): value is SubagentMode =>
   value === 'one-shot' || value === 'continuable' || value === 'unknown'

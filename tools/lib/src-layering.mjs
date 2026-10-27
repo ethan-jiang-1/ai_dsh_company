@@ -39,17 +39,57 @@ export function isNodeBuiltinSpecifier(specifier) {
 }
 
 const SPECIFIER = String.raw`(?:\s*type\s*)?\s*`
-/** 从源码文本里取所有模块引用：[{ specifier, line, kind }]（from / 动态 import / 裸 import / export-from）。 */
+/**
+ * 去注释但**保持字符位置/行号不变**：注释字符替换为空格，换行保留。
+ * 只认字符串/模板字面量里的引号（模板里的 `${}` 不展开）；用于避免把注释里的示例 import 判成违规。
+ */
+export function stripComments(text) {
+  const chars = [...String(text)]
+  let quote = null
+  let escaped = false
+  for (let i = 0; i < chars.length; i++) {
+    const ch = chars[i]
+    if (quote !== null) {
+      if (escaped) escaped = false
+      else if (ch === '\\') escaped = true
+      else if (ch === quote) quote = null
+      continue
+    }
+    if (ch === '"' || ch === "'" || ch === '`') { quote = ch; continue }
+    if (ch === '/' && chars[i + 1] === '/') {
+      let j = i
+      while (j < chars.length && chars[j] !== '\n') { chars[j] = ' '; j++ }
+      i = j - 1
+      continue
+    }
+    if (ch === '/' && chars[i + 1] === '*') {
+      let j = i + 2
+      chars[i] = ' '
+      chars[i + 1] = ' '
+      while (j < chars.length && !(chars[j] === '*' && chars[j + 1] === '/')) {
+        if (chars[j] !== '\n') chars[j] = ' '
+        j++
+      }
+      if (j < chars.length) { chars[j] = ' '; chars[j + 1] = ' ' }
+      i = j + 1
+    }
+  }
+  return chars.join('')
+}
+
+/** 从源码文本里取所有模块引用：[{ specifier, line, kind }]（from / 动态 import / 裸 import / require / export-from）。 */
 export function importSpecifiers(text) {
+  const scan = stripComments(text)
   const found = []
   const push = (specifier, index, kind) => {
     const line = text.slice(0, index).split('\n').length
     found.push({ specifier, line, kind })
   }
-  for (const match of text.matchAll(new RegExp(String.raw`\bfrom\s*['"]([^'"]+)['"]`, 'g'))) push(match[1], match.index ?? 0, 'from')
-  for (const match of text.matchAll(/import\s*\(\s*['"]([^'"]+)['"]\s*\)/g)) push(match[1], match.index ?? 0, 'dynamic')
-  for (const match of text.matchAll(new RegExp(String.raw`\bimport\s+['"]([^'"]+)['"]`, 'g'))) push(match[1], match.index ?? 0, 'side-effect')
-  return found.sort((left, right) => left.line - right.line)   // 三类正则各扫一遍，按行号还原文本顺序
+  for (const match of scan.matchAll(new RegExp(String.raw`\bfrom\s*['"]([^'"]+)['"]`, 'g'))) push(match[1], match.index ?? 0, 'from')
+  for (const match of scan.matchAll(/import\s*\(\s*['"]([^'"]+)['"]\s*\)/g)) push(match[1], match.index ?? 0, 'dynamic')
+  for (const match of scan.matchAll(new RegExp(String.raw`\bimport\s+['"]([^'"]+)['"]`, 'g'))) push(match[1], match.index ?? 0, 'side-effect')
+  for (const match of scan.matchAll(/\brequire\s*\(\s*['"]([^'"]+)['"]\s*\)/g)) push(match[1], match.index ?? 0, 'require')
+  return found.sort((left, right) => left.line - right.line)   // 各类正则各扫一遍，按行号还原文本顺序
 }
 
 /**

@@ -5,7 +5,8 @@ import { describe, expect, it } from 'vitest'
 import { buildDeliverablesCatalog, metaProblemsOf as metaProblemsJs } from '../../tools/lib/deliverables-catalog.mjs'
 import { META_RESULTS } from '../../tools/lib/deliverables.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { parseCatalog, resultTone } from '../../packages/company-pack/src/client/DeliverablesTab.tsx'
+import { parseCatalog } from '../../packages/company-pack/src/client/deliverables-index.ts'
+import { resultTone } from '../../packages/company-pack/src/client/DeliverablesTab.tsx'
 import { metaProblemsOf as metaProblemsTs } from '../../packages/company-pack/src/lib/deliverables-catalog.ts'
 
 /**

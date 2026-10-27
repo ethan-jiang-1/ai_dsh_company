@@ -8,6 +8,7 @@
  */
 
 import { PRESET_KEYS, roleLabel } from './presence-status.ts'
+import { clip } from './text.ts'
 
 /** 一条 journal 待审条目。 */
 export interface JournalEntry {
@@ -46,18 +47,14 @@ export function journalTitle(text: string): string {
     const heading = /^#{1,3}\s+(.+)$/.exec(line.trim())
     if (heading !== null) {
       const title = heading[1]!.trim()
-      if (title !== '') return clip(title)
+      if (title !== '') return clip(title, TITLE_CLIP)
     }
   }
   for (const line of lines) {
     const trimmed = line.trim()
-    if (trimmed !== '') return clip(trimmed)
+    if (trimmed !== '') return clip(trimmed, TITLE_CLIP)
   }
   return '（空）'
-}
-
-function clip(text: string): string {
-  return text.length <= TITLE_CLIP ? text : `${text.slice(0, TITLE_CLIP)}…`
 }
 
 /**

@@ -15,7 +15,7 @@ import {
   statusLabelFor,
   type PresenceStatus,
 } from './presence-status.ts'
-import { firstText } from './text.ts'
+import { clip, firstText } from './text.ts'
 
 // 词汇再导出（facade 的对外半边）：消费方继续从 `lib/presence.ts` 取这些名字。
 export {
@@ -142,11 +142,6 @@ type MessageEvent = Extract<TeamEventLike, { type: 'team/message/queued' }>
 const isMemberEvent = (event: TeamEventLike): event is MemberEvent => event.type === 'team/member'
 const isTaskEvent = (event: TeamEventLike): event is TaskEvent => event.type === 'team/task'
 const isMessageEvent = (event: TeamEventLike): event is MessageEvent => event.type === 'team/message/queued'
-
-/** 截断长文本（动态流一行别被任务全文撑爆）。 */
-function clip(text: string, max: number): string {
-  return text.length <= max ? text : `${text.slice(0, max)}…`
-}
 
 /**
  * live 路径：`TeamView` 快照 → 在场板行（D-a/D-c）。当前任务按 **ownerName** 关联——

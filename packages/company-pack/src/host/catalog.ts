@@ -30,6 +30,7 @@ import {
   type CatalogScanEntry,
 } from '../lib/deliverables-catalog.ts'
 import { canonicalPath } from './paths.ts'
+import { isRecord } from '../lib/guards.ts'
 
 export const CATALOG_REL = 'kb/deliverables-index.json'
 /** 审计账本（`presented` 的权威；操作员可读可改）。 */
@@ -39,9 +40,6 @@ export const PRESENTED_LEDGER_REL = 'kb/deliverables-presented.json'
 
 export const catalogPath = (companyHome: string): string => join(companyHome, CATALOG_REL)
 export const presentedLedgerPath = (companyHome: string): string => join(companyHome, PRESENTED_LEDGER_REL)
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value)
 
 export type CatalogReadState =
   | { readonly status: 'ok'; readonly catalog: DeliverablesCatalog }

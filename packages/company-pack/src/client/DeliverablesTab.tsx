@@ -21,30 +21,13 @@ import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { LedgerSummary } from './LedgerTab.tsx'
 import { useWorkspaceText } from './workspace-text.ts'
 import type { FloatRectLike } from './float-geometry.ts'
-
-/** 一条成品目录项（与 `tools/lib/deliverables-catalog.mjs` 同形）。 */
-export interface DeliverablesCatalogEntry {
-  readonly slug: string
-  readonly kickoff: string
-  readonly type: string
-  readonly result: string
-  readonly summary: string
-  readonly root: 'deliverables' | 'deliverables-archive'
-  readonly dir: string
-  readonly path: string
-  readonly ledgered: boolean
-  /** Lead `present` 背书：true/false；null = 审计不可得（未核，不冒充）。 */
-  readonly presented: boolean | null
-  /** meta 形状问题（缺行/枚举外/日期格式）；null = 形状检查通过。 */
-  readonly metaProblem: string | null
-}
-
-/** 解析后的目录形状（counts 不解析：视图从 entries 现算，避免第二份计数）。 */
-export interface DeliverablesCatalog {
-  readonly schema: 1
-  readonly generatedAt: string
-  readonly entries: readonly DeliverablesCatalogEntry[]
-}
+import {
+  filterCatalog,
+  parseCatalog,
+  type CatalogFilter,
+  type DeliverablesCatalog,
+  type DeliverablesCatalogEntry,
+} from './deliverables-index.ts'
 
 /** 页签体注入面。 */
 export interface DeliverablesTabInjected {
@@ -58,7 +41,7 @@ export interface DeliverablesTabInjected {
 
 export type DeliverablesTabProps = PropsRuntime<'sidebar.right.pane.tab'> & DeliverablesTabInjected
 
-type Filter = 'all' | 'active' | 'archive' | 'unledgered' | 'unpresented'
+type Filter = CatalogFilter
 
 const FILTERS: readonly { readonly key: Filter; readonly label: string }[] = [
   { key: 'all', label: '全部' },
@@ -88,56 +71,6 @@ export function resultTone(result: string): 'success' | 'info' | 'warning' | 'da
 export function formatGeneratedAt(value: string): string {
   const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/.exec(value)
   return match === null ? value : `${match[1]} ${match[2]} UTC`
-}
-
-/**
- * 解析生成索引（形状校验 + 字段归一）。坏 JSON / 非 schema 1 返回 null，由调用方显示错误。
- * @param text - 索引文件全文。
- * @returns 目录或 null。
- */
-export function parseCatalog(text: string): DeliverablesCatalog | null {
-  let raw: unknown
-  try { raw = JSON.parse(text) } catch { return null }
-  if (raw === null || typeof raw !== 'object') return null
-  const value = raw as Record<string, unknown>
-  if (value.schema !== 1 || !Array.isArray(value.entries)) return null
-  const entries: DeliverablesCatalogEntry[] = []
-  for (const item of value.entries) {
-    if (item === null || typeof item !== 'object') continue
-    const row = item as Record<string, unknown>
-    const root = row.root === 'deliverables-archive' ? 'deliverables-archive' : 'deliverables'
-    const textOf = (key: string): string => (typeof row[key] === 'string' ? row[key] : '')
-    const slug = textOf('slug')
-    const path = textOf('path')
-    if (slug === '' || path === '') continue
-    entries.push({
-      slug,
-      kickoff: textOf('kickoff'),
-      type: textOf('type'),
-      result: textOf('result'),
-      summary: textOf('summary'),
-      root,
-      dir: textOf('dir'),
-      path,
-      ledgered: row.ledgered !== false,
-      presented: row.presented === true ? true : row.presented === false ? false : null,
-      metaProblem: typeof row.metaProblem === 'string' && row.metaProblem !== '' ? row.metaProblem : null,
-    })
-  }
-  return {
-    schema: 1,
-    generatedAt: typeof value.generatedAt === 'string' ? value.generatedAt : '',
-    entries,
-  }
-}
-
-/** 过滤目录项。 */
-export function filterCatalog(entries: readonly DeliverablesCatalogEntry[], filter: Filter): readonly DeliverablesCatalogEntry[] {
-  if (filter === 'active') return entries.filter(entry => entry.root === 'deliverables')
-  if (filter === 'archive') return entries.filter(entry => entry.root === 'deliverables-archive')
-  if (filter === 'unledgered') return entries.filter(entry => !entry.ledgered)
-  if (filter === 'unpresented') return entries.filter(entry => entry.presented === false)
-  return entries
 }
 
 /** 目录视图（纯展示 + 本地筛选；数据读取在页签体内，便于 keyless 静态渲染）。 */

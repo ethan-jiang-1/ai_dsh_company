@@ -30,7 +30,7 @@ import {
   parseMeta,
   slugFromDirName,
 } from '../../packages/company-pack/src/lib/deliverables-catalog.ts'
-import { parseCatalog } from '../../packages/company-pack/src/client/DeliverablesTab.tsx'
+import { parseCatalog } from '../../packages/company-pack/src/client/deliverables-index.ts'
 
 const roots: string[] = []
 function workspace(): string {

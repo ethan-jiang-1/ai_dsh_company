@@ -28,6 +28,7 @@ import {
 } from 'node:fs'
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { isRecord } from '../lib/guards.ts'
 import { canonicalPath } from './paths.ts'
 
 /** 当前 manifest 形状版本；字段变化时升。 */
@@ -221,9 +222,6 @@ interface ManifestValidation {
   readonly error?: string
   readonly unsupportedVersion?: number
 }
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value)
 
 /**
  * 校验 manifest 的**最低身份形状**（v / id / pack / workspace / skeleton）。

@@ -3,11 +3,13 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import {
   DeliverablesView,
-  filterCatalog,
   formatGeneratedAt,
+} from '../../packages/company-pack/src/client/DeliverablesTab.tsx'
+import {
+  filterCatalog,
   parseCatalog,
   type DeliverablesCatalog,
-} from '../../packages/company-pack/src/client/DeliverablesTab.tsx'
+} from '../../packages/company-pack/src/client/deliverables-index.ts'
 import { sessionFileAddress } from '../../packages/company-pack/src/lib/deliverables-address.ts'
 import { buildDeliverablesCatalog } from '../../tools/lib/deliverables-catalog.mjs'
 
