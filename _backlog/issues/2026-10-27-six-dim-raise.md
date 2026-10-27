@@ -14,6 +14,12 @@ opened: 2026-10-27
 上一轮收口评分：D2/D3/D6 = A-，D1/D4/D5 = B+。本卡把三个 B+ 推到 A-，判据 = 该维无已知结构债，
 或剩余项不再增加 agent 的日常判断成本。**完成 = 三批落地 + 实跑证据 + 评分复评**。
 
+**进展（2026-10-27/28 深夜）：** 批一 D1 已落（[Note](../../notes/implemented/2026-10-27-d1-start-path.md)：
+AGENTS 顶部三样开工、锚点、三件套分工；走查页签任务文档读入 570→206 行）；批二 D4 已落
+（[Note](../../notes/implemented/2026-10-27-d4-release-and-dist-guard.md)：0.3.15 就位、release 8 项全绿、
+dist-freshness 第 49 门、canonicalPath/isRecord 收家）。剩余 = 批三 UI 金样、批四认证档 + fixtures + 拆巨测；
+probe-source 切片 spec 未动（明确留待下一轮）。
+
 ## 当前情况（本轮实测，2026-10-27 深夜）
 
 **D1 入口成本**

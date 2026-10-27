@@ -2,6 +2,27 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.3.15 — 2026-10-28
+
+### Added
+
+- **真实页面自检车道**：`node checks/smoke/ui-scene-smoke.mjs` 一条命令起隔离实例 → 断言全部公司页签 + 浏览器错误环 → 成功/失败都落证据目录（维护者与交付验收用）。
+- **浏览器错误环**：页面内捕获 `error` / `unhandledrejection` / `console.error`，随真页面探针进入 verdict 与证据（不写会话日志——边界见模块头注）。
+- `pnpm typecheck`（pack 两面 `tsc -b`）与 `dist-freshness` 门禁（交付产物与版本记录自洽）。
+
+### Changed
+
+- 收尾次序与六行回执收进 `close-out-definition` skill（唯一家）；缺陷卡自授权边界只住 `_backlog` 章程。
+- 文档入口瘦身：AGENTS 顶部「开工最小路径」（三样就够）；政策层 `docs/policy.md` 独立；dev-loop 349→155 行；checks/README 193→78 行。
+- 门禁「零对象」改为 SKIP（不再把没有回放场景/金样印成 PASS）；`pnpm diagnose` 认中断轮并支持 `--strict`。
+- 分层方向由 `src-layering` 门禁在默认回路守护（client↔host 互不可见、lib/client 禁 `node:` 内建）。
+
+### Fixed
+
+- `cdp-probe` 把未登录/未配凭据判成渲染失败 → 现在 exit 2（环境未就绪）并说明。
+- 声明与资产脱钩：r2/r3 场景、UI 金样、判据语料的失效引用从活文档清理；入口探针 Q4 改绑 AGENTS 簿记 pin。
+- 交付面：0.3.14 期间 `_dist` 三处版本不一致（tarball 0.3.14 / manifest 0.3.10）→ 本版重建并加门禁防复发。
+
 ## 0.3.14 — 2026-10-27
 
 ### Fixed

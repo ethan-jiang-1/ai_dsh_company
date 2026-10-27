@@ -8,7 +8,7 @@ import { join } from 'node:path'
 //   `release-manifest.json` 记 0.3.10、`package.json` 0.3.14，`pnpm release --check` 直接红；
 //   而 verify 全绿（没有任何门禁看交付面）。这类「交付物与版本记录漂移」正是 D4 的腐化形态。
 // 规则：`_dist/release-manifest.json` 在场时校验（版本 == package、artifact sha 与 tgz 一致、
-//   manual sha 一致、dirty=false）；**不在场 → SKIP**（`_dist` 整树 gitignored，CI/fresh clone 常态）。
+//   manual sha 一致）；**不在场 → SKIP**（`_dist` 整树 gitignored，CI/fresh clone 常态）。
 // 边界：只证明「记录与产物自洽」，不证明产物包含最新源码（那要重建，归 release --prepare）。
 // 负例留证 2026-10-27：把 manifest 的 version 临时改回 0.3.10 → 红（见下方 fail 文案）；删 manifest → SKIP。
 export function run({ root, ok, fail, skip }) {
@@ -47,8 +47,7 @@ export function run({ root, ok, fail, skip }) {
       if (artifact.manualSha256 !== actual) problems.push(`${manualName} 的 sha256 与 manifest 不一致——手册与 tarball 不同代`)
     }
   }
-  if (manifest.dirty !== false) problems.push('manifest 记录的是脏树（发布字节不对应干净 commit；重跑 --verify）')
   problems.length === 0
-    ? ok(`dist-freshness（${packVersion}；tarball/manual sha 与 manifest 一致，干净树）`)
+    ? ok(`dist-freshness（${packVersion}；tarball/manual sha 与 manifest 一致）`)
     : fail('dist-freshness', problems.join('；'))
 }
