@@ -36,4 +36,4 @@
 ## 未验 / 边界
 
 - 五块仍在同文件（377 行），不是“每块一个文件”；这是本批的边界。
-- Board 余下四块、command handler 六支内联、测试 helper 仍是 P3 以后做。
+- P3 follow-up 已清零：Board 余四块、command handler 六支、共享测试 helper、`--attach` 均已落（[Note](2026-10-28-r4-p3-followup.md)）。

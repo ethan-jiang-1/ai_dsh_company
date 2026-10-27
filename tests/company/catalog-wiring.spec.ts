@@ -3,42 +3,34 @@
  * present 事件后，真的把 `presented` 写进 catalog。之前只测了纯函数，没有测接线；
  * 这里用最小 ctx 桩 + 真培养注册（tools/commands 桩），跑真 `apply`。
  */
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { apply } from '../../packages/company-pack/src/index.ts'
+import { createTempEnv, type TempEnv } from '../support/temp-env.ts'
 import { catalogPath, presentedLedgerPath } from '../../packages/company-pack/src/host/catalog.ts'
 
 let root: string
 let workspace: string
-let saved: Record<string, string | undefined>
+let env: TempEnv
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'catalog-wiring-'))
-  workspace = join(root, 'company-workspace')
+  env = createTempEnv('catalog-wiring-')
+  root = env.dir
+  workspace = env.workspace
   mkdirSync(join(workspace, 'deliverables/2026-10-25-alpha'), { recursive: true })
   writeFileSync(join(workspace, 'deliverables/2026-10-25-alpha/final.md'), '# final\n')
   writeFileSync(join(workspace, 'deliverables/2026-10-25-alpha/meta.md'),
     'slug: alpha\nkickoff: 2026-10-25\n类型: 决策\n结果: 已完成\n一句话结论: wiring\n')
-  saved = {
-    DSH_HOME: process.env.DSH_HOME,
-    DSH_COMPANY_HOME: process.env.DSH_COMPANY_HOME,
-    DSH_COMPANY_BOOTSTRAP: process.env.DSH_COMPANY_BOOTSTRAP,
-  }
-  process.env.DSH_HOME = root
-  process.env.DSH_COMPANY_HOME = workspace
-  process.env.DSH_COMPANY_BOOTSTRAP = 'off'
+  env.set({
+    DSH_HOME: root,
+    DSH_COMPANY_HOME: workspace,
+    DSH_COMPANY_BOOTSTRAP: 'off',
+  })
 })
 
-afterEach(() => {
-  for (const [key, value] of Object.entries(saved)) {
-    if (value === undefined) delete process.env[key]
-    else process.env[key] = value
-  }
-  rmSync(root, { recursive: true, force: true })
-})
+afterEach(() => { env.cleanup() })
 
 describe('host catalog wiring', () => {
   it('apply 注册的 session/event 监听把 present 事件写进 catalog', () => {

@@ -7,6 +7,9 @@
 // 前置：GUI URL（demo.md §前置：source run/env.sh → pnpm dsh web -- --port 0 --no-open → 横幅 URL）；
 //   Chrome 二进制：DSH_PROBE_CHROME 环境变量或系统 Chrome（run/env.sh 已指 Chrome for Testing）。
 // 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser] [--evidence] [--texts] [--json-out <path>] [--steps <file>]
+//       node probes/browser-visual/cdp-probe.mjs --attach <devtools-port> [--attach-url <substring>] [--evidence]
+//   --attach：附着到用户已开的 Chrome（需 --remote-debugging-port=9222），只做当前页只读快照
+//   （不导航、不关模态、不点页签、不 --ask/--steps）；抓 composer/品牌/错误环/body/截图。
 //   --steps：受控动作 JSON（clickText / waitText / expectText / typeText），复现“点按钮/面板”症状；
 //   默认断言面 = composer + 品牌 + 右栏**全部**公司页签逐个开（Start-chip 回切）+ 面板体
 //   `[data-company-tab-title=…]` 可见且非空 + console/异常捕获。页签清单从注册源
@@ -18,7 +21,7 @@
 //   docs/guides/cdp-probe.md 记模式与环境坑）；场景选择器与本仓坑（首启双模态、Start-chip 回切、
 //   dock 前后台子树 .some() 扫描）为本仓 2026-09/10 走查实证。
 import { repositoryRoot } from '../../tools/lib/repository-layout.mjs';
-import { launchCdpBrowser } from '../../tools/drivers/cdp-driver.mjs';
+import { attachCdpBrowser, launchCdpBrowser } from '../../tools/drivers/cdp-driver.mjs';
 import { loadChromium } from '../../tools/drivers/playwright.mjs';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
@@ -30,7 +33,16 @@ import { sleep } from '../../tools/lib/probe-kit.mjs'
 import { parseProbeSteps } from '../../tools/lib/probe-steps.mjs'
 
 const args = process.argv.slice(2);
-const guiUrl = args.find(a => !a.startsWith('--'));
+const attachIndex = args.indexOf('--attach');
+const attachPort = attachIndex === -1 ? undefined : Number(args[attachIndex + 1]);
+const attachUrlIndex = args.indexOf('--attach-url');
+const attachUrl = attachUrlIndex === -1 ? undefined : args[attachUrlIndex + 1];
+const positional = args.filter((a, i) => !a.startsWith('--') && !(attachIndex !== -1 && i === attachIndex + 1) && !(attachUrlIndex !== -1 && i === attachUrlIndex + 1));
+const guiUrl = positional[0];
+if (attachPort !== undefined && (!Number.isSafeInteger(attachPort) || attachPort < 1 || attachPort > 65535)) {
+  console.error('cdp-probe: --attach 需要一个 1..65535 的 DevTools 端口');
+  process.exit(2);
+}
 const flag = (name) => args.includes(name);
 const askIndex = args.indexOf('--ask');
 const ask = askIndex >= 0 ? (args[askIndex + 1] ?? '用一句话自报角色与职责。') : undefined;
@@ -52,8 +64,8 @@ if (stepsPath !== undefined) {
   catch (error) { console.error(`cdp-probe: ${error.message}`); process.exit(2); }
 }
 
-if (guiUrl === undefined || !/^https?:\/\//.test(guiUrl) || !guiUrl.includes('token=')) {
-  console.error("cdp-probe: PASS a booted GUI URL like 'http://127.0.0.1:<port>/?token=<t>'（demo.md §前置产出）");
+if (attachPort === undefined && (guiUrl === undefined || !/^https?:\/\//.test(guiUrl) || !guiUrl.includes('token='))) {
+  console.error("cdp-probe: PASS a booted GUI URL like 'http://127.0.0.1:<port>/?token=<t>'（demo.md §前置产出），或 --attach <devtools-port>");
   process.exit(2);
 }
 
@@ -71,6 +83,8 @@ const verdict = {
   exceptions: [],
   clientErrors: [],
   errorRingInstalled: false,
+  attached: false,
+  pageUrl: '',
   tabTexts: {},
   steps: [],
   stepFailures: [],
@@ -97,13 +111,17 @@ verdict.catalog = tabs.map(tab => tab.title);
 const chromiumApi = await loadChromium(repositoryRoot).catch(() => undefined)
 const chromeBin = process.env.DSH_PROBE_CHROME
   ?? (chromiumApi !== undefined ? chromiumApi.executablePath() : undefined)
-const handle = await launchCdpBrowser({ url: 'about:blank', ...(chromeBin !== undefined ? { chromeBin } : {}) }).catch((error) => ({ failed: String(error?.message ?? error) }));
+const handle = attachPort !== undefined
+  ? await attachCdpBrowser({ port: attachPort, ...(attachUrl !== undefined ? { urlIncludes: attachUrl } : {}) }).catch((error) => ({ failed: String(error?.message ?? error) }))
+  : await launchCdpBrowser({ url: 'about:blank', ...(chromeBin !== undefined ? { chromeBin } : {}) }).catch((error) => ({ failed: String(error?.message ?? error) }));
 if (handle.failed !== undefined) {
   verdict.error = handle.failed;
 console.log(JSON.stringify(verdict, null, 2));
   process.exit(1);
 }
 verdict.booted = true;
+verdict.attached = attachPort !== undefined;
+if (attachPort !== undefined) verdict.pageUrl = handle.pageUrl ?? '';
 const { evaluate, consoleProblems, exceptions } = handle;
 verdict.consoleProblems = consoleProblems;
 verdict.exceptions = exceptions;
@@ -140,6 +158,7 @@ async function writeEvidence(reason) {
     await handle.screenshot(join(dir, 'page.png')).catch(() => {});
   }
   console.error(`cdp-probe: 证据目录 = ${dir}`);
+  return dir;
 }
 
 
@@ -147,10 +166,12 @@ try {
   // 主动导航（两段式——实测教训：冷 profile 直接带 token URL，303 换 cookie 链会丢状态、
   // 页面停在 "authentication required"；先到 origin 建立上下文再带 token 进，完整挂载）。
   // console 捕获从起手就位（加载期问题不漏）。
-  const origin = new URL(guiUrl).origin;
-  await evaluate(`location.href = ${JSON.stringify(origin)}`).catch(() => {});
-  await new Promise((resolve) => { setTimeout(resolve, 2000) });
-  await evaluate(`location.href = ${JSON.stringify(guiUrl)}`).catch(() => {});
+  if (attachPort === undefined) {
+    const origin = new URL(guiUrl).origin;
+    await evaluate(`location.href = ${JSON.stringify(origin)}`).catch(() => {});
+    await new Promise((resolve) => { setTimeout(resolve, 2000) });
+    await evaluate(`location.href = ${JSON.stringify(guiUrl)}`).catch(() => {});
+  }
   // composer：第一挂载信号（data-composer-input 是本仓 composer 的稳定标记）
   let composerReady = false;
   for (let i = 0; i < 40 && !composerReady; i++) {
@@ -177,7 +198,7 @@ try {
 
   // 首启双模态（0.2.0 起两个：Internal Testing Notice + Preview Notice；Continue 同名按钮）。
   // 每个新浏览器上下文都会再弹——CDP 探针每次都是新上下文，必须处理。
-  for (const name of ['Internal Testing Notice', 'Preview Notice']) {
+  for (const name of attachPort === undefined ? ['Internal Testing Notice', 'Preview Notice'] : []) {
     const dismissed = await evaluate(`(() => {
       const dialogs = [...document.querySelectorAll('[role="dialog"]')];
       const dlg = dialogs.find(d => (d.innerText ?? '').includes(${JSON.stringify(name)}));
@@ -191,7 +212,7 @@ try {
   }
   // 隔离 home 没配凭据时会出现 “Get started / Add API Key / Sign in” 引导模态；它不是页面崩溃，
   // 但会挡截图与点击。关掉它（有 Close 按钮点 Close，否则点右上角 ×），让空壳可见。
-  const getStarted = await closeGetStarted();
+  const getStarted = attachPort === undefined ? await closeGetStarted() : 'skipped-attach';
   verdict.getStarted = getStarted;
   if (getStarted === 'dismissed') verdict.modalsDismissed.push('Get started');
   if (verdict.modalsDismissed.length > 0) await sleep(1000);
@@ -200,6 +221,7 @@ try {
   verdict.brandPresent = await evaluate(
     `document.body.innerText.includes('DSH 梦之队')`) === true;
 
+  if (attachPort === undefined) {
   // 右栏全部公司页签：guide 清点 → 逐个开（Start-chip 回切——开一个页签后 guide 列表被
   // 页签条替换，必须回 Start 再开下一个；dock 为每会话保留前后台子树 ⇒ 断言用 includes 扫全文）。
   await evaluate(`(() => {
@@ -264,15 +286,19 @@ try {
     verdict.tabFailures.unshift(`仅 ${verdict.tabsOpened.length}/${tabs.length} 开`);
   }
   // 隔离 home 的 onboarding 模态可能晚于首屏 1–2s 才出现；页签扫完再关一次，别让它挡截图。
-  const lateGetStarted = await closeGetStarted();
+  const lateGetStarted = attachPort === undefined ? await closeGetStarted() : 'skipped-attach';
   verdict.getStartedLate = lateGetStarted;
   if (lateGetStarted === 'dismissed') verdict.modalsDismissed.push('Get started (late)');
   if (lateGetStarted === 'dismissed') await sleep(500);
+  } else {
+    const body = await evaluate('document.body.innerText').catch(() => '')
+    verdict.tabTexts['(attached)'] = typeof body === 'string' ? body : JSON.stringify(body)
+  }
 
   // --ask：真建会话（registry default = ceo）→ 输入 → 发送 → 轮次收口 → 抓 transcript 尾。
   // 收口信号 = 正文增长后连续两次采样不变（主会话无 advisor 那种 "Completed in" 标记；
   // 文本长度在 header 计时器下不可作完成信号，文本稳定化才是）。
-  if (ask !== undefined && composerReady) {
+  if (attachPort === undefined && ask !== undefined && composerReady) {
     verdict.askSession = 'new-session(default-preset)';
     const typed = await evaluate(`(() => {
       const editable = document.querySelector('[data-composer-input][contenteditable="true"]');
@@ -304,7 +330,7 @@ try {
     }
   }
   // --steps：受控交互（按可见文本点击 / 等文本 / 断言文本 / 向选择器输入），复现“点按钮白了”。
-  for (const [index, step] of steps.entries()) {
+  for (const [index, step] of (attachPort === undefined ? steps.entries() : [].entries())) {
     const at = index + 1;
     let ok = false;
     let detail = '';
@@ -359,8 +385,8 @@ try {
   verdict.consoleProblems = consoleProblems.slice(0, 10);
   verdict.exceptions = exceptions.slice(0, 10);
   const bad = verdict.composerReady !== true
-    || verdict.brandPresent !== true
-    || verdict.tabFailures.length > 0
+    || (attachPort === undefined && verdict.brandPresent !== true)
+    || (attachPort === undefined && verdict.tabFailures.length > 0)
     || verdict.consoleProblems.some(p => p.startsWith('console.error'))
     || verdict.exceptions.length > 0
     || verdict.clientErrors.length > 0
@@ -383,8 +409,8 @@ if (jsonOut !== undefined) {
 console.log(JSON.stringify(verdict, null, 2));
 let exitCode = 0;
 if (verdict.booted === false || verdict.error !== undefined) exitCode = 1;
-if (verdict.composerReady !== true || verdict.brandPresent !== true) exitCode = 1;
-if (verdict.tabsOpened.length !== tabs.length || verdict.tabFailures.length > 0) exitCode = 1;
+if (verdict.composerReady !== true || (attachPort === undefined && verdict.brandPresent !== true)) exitCode = 1;
+if (attachPort === undefined && (verdict.tabsOpened.length !== tabs.length || verdict.tabFailures.length > 0)) exitCode = 1;
 if (verdict.consoleProblems.some(p => p.startsWith('console.error')) || verdict.exceptions.length > 0) exitCode = 1;
 if (verdict.clientErrors.length > 0) exitCode = 1;
 if (verdict.errorRingInstalled !== true) exitCode = 1;

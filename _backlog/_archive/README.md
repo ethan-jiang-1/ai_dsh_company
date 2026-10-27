@@ -17,7 +17,7 @@
 |---|---|---|
 | [2026-10-27-six-dim-raise.md](settled_issues/2026-10-27-six-dim-raise.md) | 已结；六维提分 D1/D4/D5 → A-（开工最小路径 / 0.3.15 交付面 + dist-freshness / UI 金样 + 认证档）；去向 = 三篇 implemented Note | 2026-10-28 |
 | [2026-10-27-repo-hygiene-round3.md](settled_issues/2026-10-27-repo-hygiene-round3.md) | 已结；第三轮六维度打扫 A/B/C/D 全批，R3-01…26 逐项处置（18 修 / 5 部分 / 3 明确不作），去向 = 六篇 implemented Note | 2026-10-27 |
-| [2026-10-28-repo-hygiene-round4.md](settled_issues/2026-10-28-repo-hygiene-round4.md) | 已结；第四轮六维打扫 A–E 全批，D1–D6 = A-，去向 = 11 篇 implemented Note（A/B/C/D/E1–E6/D6） | 2026-10-28 |
+| [2026-10-28-repo-hygiene-round4.md](settled_issues/2026-10-28-repo-hygiene-round4.md) | 已结；第四轮六维打扫 A–E 全批，D1–D6 = A-，去向 = 12 篇 implemented Note（A/B/C/D/E1–E6/D6 + P3 follow-up） | 2026-10-28 |
 | [2026-10-27-data-model-gaps.md](settled_issues/2026-10-27-data-model-gaps.md) | 已结；G1–G12 落三份 Note，剩余多 Host 高可用为边界 | 2026-10-27 |
 | [2026-10-27-data-model-review-followup.md](settled_issues/2026-10-27-data-model-review-followup.md) | 已结；F1–F10 落 [review-followup](../../notes/implemented/2026-10-27-data-model-review-followup.md) | 2026-10-27 |
 | [2026-10-27-data-model-closeout.md](settled_issues/2026-10-27-data-model-closeout.md) | 已结；R1–R6 落 [data-model-r1-r6](../../notes/implemented/2026-10-27-data-model-r1-r6.md) | 2026-10-27 |

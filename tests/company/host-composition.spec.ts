@@ -9,36 +9,30 @@
  *
  * 不主张：真 profile 装配、真审批应答、真会话日志（那些归 preset-smoke / 真模型档）。
  */
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { Context } from '../../vendor/dsh/vendor/cordis/src/index.ts'
 import { apply } from '../../packages/company-pack/src/index.ts'
+import { createTempEnv, type TempEnv } from '../support/temp-env.ts'
 
-const ORIGINAL_ENV = new Map<string, string | undefined>()
-const KEYS = ['DSH_HOME', 'DSH_COMPANY_HOME', 'DSH_COMPANY_BOOTSTRAP', 'DSH_COMPANY_REBIND']
 let dir: string
+let env: TempEnv
 
 beforeEach(() => {
-  for (const key of KEYS) ORIGINAL_ENV.set(key, process.env[key])
-  dir = mkdtempSync(join(tmpdir(), 'host-composition-'))
-  process.env.DSH_HOME = join(dir, 'home')
-  process.env.DSH_COMPANY_HOME = join(dir, 'company')
-  process.env.DSH_COMPANY_BOOTSTRAP = 'off'   // 只验注册面：不铺骨架
-  mkdirSync(join(dir, 'home'), { recursive: true })
-  mkdirSync(join(dir, 'company'), { recursive: true })
-  delete process.env.DSH_COMPANY_REBIND
+  env = createTempEnv('host-composition-')
+  dir = env.dir
+  env.set({
+    DSH_HOME: env.home,
+    DSH_COMPANY_HOME: env.company,
+    DSH_COMPANY_BOOTSTRAP: 'off',   // 只验注册面：不铺骨架
+    DSH_COMPANY_REBIND: undefined,
+  })
+  mkdirSync(env.home, { recursive: true })
+  mkdirSync(env.company, { recursive: true })
 })
 
-afterEach(() => {
-  for (const key of KEYS) {
-    const value = ORIGINAL_ENV.get(key)
-    if (value === undefined) delete process.env[key]
-    else process.env[key] = value
-  }
-  rmSync(dir, { recursive: true, force: true })
-})
+afterEach(() => { env.cleanup() })
 
 /** 真 Context + 只有本测试用到的四件服务。 */
 function mount(): { ctx: Context; tools: Map<string, unknown>; commands: Map<string, unknown>; approval: { calls: number } } {

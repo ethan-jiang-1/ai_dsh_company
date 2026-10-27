@@ -5,8 +5,7 @@
  * ②条目未变时二次生成不写（generatedAt/字节稳定，不破 release-smoke 的二启零变更）；
  * ③present 事件按 path/slug 投影，归档后仍保留；④meta/台账解析与仓库口径一致。
  */
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import {
@@ -31,10 +30,11 @@ import {
   slugFromDirName,
 } from '../../packages/company-pack/src/lib/deliverables-catalog.ts'
 import { parseCatalog } from '../../packages/company-pack/src/client/deliverables-index.ts'
+import { makeTempDir } from '../support/temp-env.ts'
 
 const roots: string[] = []
 function workspace(): string {
-  const dir = mkdtempSync(join(tmpdir(), 'catalog-'))
+  const dir = makeTempDir('catalog-')
   roots.push(dir)
   mkdirSync(join(dir, 'kb'), { recursive: true })
   writeFileSync(join(dir, 'kb/motion-ledger.md'), '| slug | 日期 | 一句话结论 | 参与 |\n|---|---|---|---|\n')

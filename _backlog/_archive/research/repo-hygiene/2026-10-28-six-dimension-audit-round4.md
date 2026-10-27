@@ -217,15 +217,15 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 
 ## 9. 落地后复评（2026-10-28 收口）
 
-> 口径：只认本轮实际落地与实跑读数；残余 P3 明确写“以后做”，不冒充无债。
+> 口径：只认实际落地与实跑读数；P3 四项已由 [follow-up Note](../../../../notes/implemented/2026-10-28-r4-p3-followup.md) 清零。
 
 | 维 | 初评 | 复评 | 关键证据 |
 |---|---|---|---|
 | D1 文档结构与渐进披露 | B | **A-** | 开工最小路径进 AGENTS 首屏 + Plan Mode；ledger/外部研究/计数/预算/架构伪配方去漂；第二跳 src/tests/checks README 加“什么时候读”；预算覆盖 30/30 docs。残余：11/32 文档头寸 <5%（反向棘轮只守 >20%，已如实写）。 |
-| D2 代码/测试层次 | B | **A-** | 0 反向边 / 0 环；host apply 326→214、CultivationBoard 483→226、cultivationCommandHandler 338→206、client apply 201→45；`parseCatalog`/`isRecord`/`clip` 收家；`src-layering` 补 require/注释。残余：Board 余下四块仍 226 行、handler 六支仍内联（已命名可点，列为以后做）。 |
+| D2 代码/测试层次 | B | **A-** | 0 反向边 / 0 环；host apply 326→214、CultivationBoard 483→141、cultivationCommandHandler 338→56、client apply 201→45；`parseCatalog`/`isRecord`/`clip` 收家；`src-layering` 补 require/注释；P3 后 Board 四块出 `CultivationBoardSections.tsx`、六支各成函数。 |
 | D3 文档—执行—验收结构 | B | **A-** | 授权门牌只留章程指针（含“常设指令”）；Plan Mode 进首屏；收尾单家 close-out skill；preset 完成定义单家 preset-change-definition skill；dev-loop §1 已改证据先行。 |
 | D4 上下文腐化 | B | **A-** | 回放口径统一到“合成管线场景，不是升 pin 第一道”；ledger/外部研究/计数/`snapshots/ui`/包 README/CHANGELOG 改到现行；D45/D46 排序、data-model 去重；`release --check` READY 0.3.15。 |
-| D5 测试资产 | B | **A-** | 110 spec / 979 例；新增 CompanyView/workspace-text/apply-lifecycle/probe-steps；observer 生产接线 spec；6 个 tools/lib spec 迁 harness、重名消除；UI 金样 3 连绿 + 红证。残余：共享 mkdtemp/env helper 未收（P3，以后做）。 |
-| D6 日志/端到端反馈 | C | **A-** | UI 金样真隔离/稳定/红证；`--steps` 交互复现；启动失败带 tail + web.log + scene.json goldenResult；diagnose 非零 bash/等审批/child/team failed；客户端错误经 `/company-diagnostics` 落 `cultivation/client-errors.log`（agent 可 read）。残余：`--attach` 接用户正在跑的页面未做；错误仍不写 session 事件（文件通道已声明边界）。 |
+| D5 测试资产 | B | **A-** | 111 spec / 980 例；新增 CompanyView/workspace-text/apply-lifecycle/probe-steps；observer 生产接线 spec；6 个 tools/lib spec 迁 harness、重名消除；UI 金样 3 连绿 + 红证；P3 后 5 处 mkdtemp/env 收 `tests/support/temp-env.ts`。 |
+| D6 日志/端到端反馈 | C | **A-** | UI 金样真隔离/稳定/红证；`--steps` 交互复现；启动失败带 tail + web.log + scene.json goldenResult；diagnose 非零 bash/等审批/child/team failed；客户端错误经 `/company-diagnostics` 落 `cultivation/client-errors.log`（agent 可 read）；P3 后 `cdp-probe --attach` 可只读附着用户正在跑的页面。边界：错误仍不写 session 事件（文件通道已声明）。 |
 
-**总评：D1–D6 均 A-。** 残余项均为 P3：Board 剩余块/六支 command 内联、测试样板 helper、单 it 巨测、`--attach`。它们不阻塞本轮 A-，但已明确留待后续；不写成“无债”。
+**总评：D1–D6 均 A-。** P3 四项（Board 余块、六支 command 内联、测试样板 helper、`--attach`）已由 follow-up 清零；`--attach` 仍需用户显式开 DevTools 端口，这是使用边界不是残余债。

@@ -150,174 +150,32 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
 
     // adopt <id> [as <slug>]
     if (sub === 'adopt') {
-      const id = tokens[1]
-      if (id === undefined) return { kind: 'error' as const, text: '用法：adopt <记录id> [as <方法slug>]。' }
-      const found = storage.readRecord(recordsDir, id)
-      if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在（cultivation/records/ 里没有 ${id}.md）。` }
-      const { text } = found
-      const record = parseRecord(id, text)
-      if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏，无法采纳。` }
-      if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已是 ${record.status === 'adopted' ? '已采纳' : '已拒绝'}，不重复处理。` }
-      if (record.targetRole !== face.role) {
-        return { kind: 'error' as const, text: `仅建议权：${record.id} 的培养对象是 ${roleLabel(record.targetRole)}，请在 ${roleLabel(record.targetRole)} 的会话里采纳。` }
-      }
-      if (config.cultivationRoot === undefined) {
-        return { kind: 'error' as const, text: '方法层根未配置（bundle patch 行 config.cultivationRoot 缺席）——无法部署方法。' }
-      }
-      let slug = tokens[2] === 'as' ? tokens[3] : undefined
-      if (slug === undefined) slug = `method-${id}`
-      if (!SLUG_RE.test(slug)) {
-        return { kind: 'error' as const, text: `方法 slug 只认小写字母/数字/连字符（≤64 位）：${slug}。` }
-      }
-      const proposalBody = recordBody(text)
-      if (proposalBody === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏，无法采纳。` }
-      let installed: boolean
-      try {
-        installed = storage.installMethod(config.cultivationRoot, record.targetRole, slug, methodSkillText({ slug, expectation: record.expectation, body: proposalBody }))
-      } catch (error) {
-        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
-        throw error
-      }
-      if (!installed) return { kind: 'error' as const, text: `方法 ${slug} 已存在，未覆盖任何文件或记录。` }
-      try {
-        if (!storage.updateRecord(recordsDir, id, { status: 'adopted', methodSlug: slug, decidedAt: new Date().toISOString() }, text)) {
-          try { storage.removeMethod(config.cultivationRoot, record.targetRole, slug) } catch { /* Preserve the conflict note. */ }
-          return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，采纳已取消并撤回方法 ${slug}；请重试。` }
-        }
-      } catch (error) {
-        try { storage.removeMethod(config.cultivationRoot, record.targetRole, slug) } catch { /* Preserve the original record-update failure. */ }
-        throw error
-      }
-      return {
-        kind: 'success' as const,
-        text: `已采纳 ${id}：方法 ${slug} 部署到 ${roleLabel(record.targetRole)} 方法层。新开的 ${roleLabel(record.targetRole)} 会话会带着它开工；已经在跑的会话也会随技能目录刷新看到它（下一步就可能用上）。见效后在培养面板点「这条有用」回填，不灵了点「撤回…」（命令行：/cultivation verify ${id} pass|fail、/cultivation revoke ${slug}）。`,
-      }
+      return commandAdopt({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens)
     }
 
     // reject <id> :: <理由>
     if (sub === 'reject') {
-      const id = tokens[1]
-      if (id === undefined || body === '') return { kind: 'error' as const, text: '用法：reject <记录id> :: <一句话理由>。' }
-      const found = storage.readRecord(recordsDir, id)
-      if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在。` }
-      const record = parseRecord(id, found.text)
-      if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏。` }
-      if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已处理过（${record.status}）。` }
-      if (record.targetRole !== face.role) {
-        return { kind: 'error' as const, text: `${record.id} 的培养对象是 ${roleLabel(record.targetRole)}，请在该角色会话里处理。` }
-      }
-      if (!storage.updateRecord(recordsDir, id, { status: 'rejected', reason: body.split('\n')[0]!, decidedAt: new Date().toISOString() }, found.text)) {
-        return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，拒绝未写；请重试。` }
-      }
-      return { kind: 'success' as const, text: `已拒绝 ${id}（理由已留档，提出者可在培养页查回执）。` }
+      return commandReject({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens, body)
     }
 
     // verify <id> <pass|fail>
     if (sub === 'verify') {
-      const id = tokens[1]
-      const outcome = tokens[2]
-      if (id === undefined || (outcome !== 'pass' && outcome !== 'fail')) {
-        return { kind: 'error' as const, text: '用法：verify <记录id> <pass|fail>——在真实同类任务上验证后回填。' }
-      }
-      const found = storage.readRecord(recordsDir, id)
-      if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在。` }
-      const record = parseRecord(id, found.text)
-      if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏。` }
-      if (record.status !== 'adopted') return { kind: 'error' as const, text: `只有已采纳的方法才能回填验证（${id} 现为 ${record.status}）。` }
-      if (record.targetRole !== face.role) {
-        return { kind: 'error' as const, text: `${record.id} 归 ${roleLabel(record.targetRole)}，请在该角色会话里回填。` }
-      }
-      if (!storage.updateRecord(recordsDir, id, { verification: outcome }, found.text)) {
-        return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，验证未写；请重试。` }
-      }
-      return { kind: 'success' as const, text: `已回填验证：${id} → ${outcome === 'pass' ? '已验证（在同类任务上见过效）' : '验证未通过（建议修订或撤回）'}。` }
+      return commandVerify({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens)
     }
 
     // archive <days>：只归档已处理记录，open 不动（人工保留策略）
     if (sub === 'archive') {
-      const days = Number(tokens[1])
-      if (!Number.isSafeInteger(days) || days < 1 || days > 3650) {
-        return { kind: 'error' as const, text: '用法：archive <天数 1..3650>——只归档已处理（非 open）且早于该天数的记录。' }
-      }
-      const archiveDir = join(scope.root, 'cultivation', 'records-archive')
-      const loaded = storage.loadRecords(recordsDir)
-      if (!loaded.reachable) return { kind: 'error' as const, text: `记录目录不可达：${recordsDir}` }
-      const cutoff = Date.now() - days * 86_400_000
-      let archived = 0
-      let failed = 0
-      for (const record of loaded.records) {
-        if (record.status === 'open') continue
-        const stamp = recordStampOf(record.id)
-        if (stamp === null || stamp >= cutoff) continue
-        try {
-          if (storage.archiveRecord(recordsDir, archiveDir, record.id)) archived += 1
-          else failed += 1
-        } catch {
-          failed += 1
-        }
-      }
-      return {
-        kind: 'success' as const,
-        text: `已归档 ${String(archived)} 条记录到 cultivation/records-archive/${failed > 0 ? `；${String(failed)} 条未动（碰撞/读取失败）` : ''}`
-          + `${loaded.broken > 0 ? `；另有 ${String(loaded.broken)} 条坏记录未动` : ''}。open 记录与时间戳不识别的记录保持原样。`,
-      }
+      return commandArchive({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens)
     }
 
     // purge <days>：只清 records-archive 里的旧记录，不动 live records
     if (sub === 'purge') {
-      const days = Number(tokens[1])
-      if (!Number.isSafeInteger(days) || days < 1 || days > 3650) {
-        return { kind: 'error' as const, text: '用法：purge <天数 1..3650>——只删除 cultivation/records-archive/ 里早于该天数的归档记录。' }
-      }
-      const archiveDir = join(scope.root, 'cultivation', 'records-archive')
-      let result: { removed: number, failed: number }
-      try {
-        result = storage.purgeArchive(archiveDir, Date.now() - days * 86_400_000)
-      } catch (error) {
-        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
-        throw error
-      }
-      return {
-        kind: 'success' as const,
-        text: `已清理归档 ${String(result.removed)} 条${result.failed > 0 ? `；${String(result.failed)} 条未动（非普通文件/删除失败）` : ''}。live records 未动。`,
-      }
+      return commandPurge({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens)
     }
 
     // check：只报告孤儿（不自动删/改）
     if (sub === 'check') {
-      if (config.cultivationRoot === undefined) {
-        return { kind: 'error' as const, text: '方法层根未配置（config.cultivationRoot 缺席）。' }
-      }
-      const loaded = storage.loadRecords(recordsDir)
-      if (!loaded.reachable) return { kind: 'error' as const, text: `记录目录不可达：${recordsDir}` }
-      const adopted = loaded.records.filter(record => record.status === 'adopted' && record.targetRole === face.role)
-      const adoptedSlugs = new Set(adopted.map(record => record.methodSlug).filter((slug): slug is string => typeof slug === 'string' && slug !== ''))
-      const missing: string[] = []
-      for (const record of adopted) {
-        const slug = record.methodSlug
-        if (slug === undefined || slug === '') { missing.push(`${record.id}（缺 methodSlug）`); continue }
-        try {
-          if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) missing.push(`${record.id}（缺方法 ${slug}）`)
-        } catch (error) {
-          if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
-          throw error
-        }
-      }
-      let orphans: string[] = []
-      try {
-        orphans = storage.listMethods(config.cultivationRoot, face.role).filter(slug => !adoptedSlugs.has(slug))
-      } catch (error) {
-        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
-        throw error
-      }
-      if (missing.length === 0 && orphans.length === 0) {
-        return { kind: 'success' as const, text: `${roleLabel(face.role)} 方法层与已采纳记录一致（${String(adopted.length)} 条）。` }
-      }
-      return {
-        kind: 'success' as const,
-        text: `对账结果：${missing.length > 0 ? `记录缺方法 ${missing.join('、')}` : '记录与方法一一对应'}`
-          + `${orphans.length > 0 ? `；方法无记录 ${orphans.join('、')}` : ''}。只报告，不自动删改。`,
-      }
+      return commandCheck({ face, root: scope.root, recordsDir, config, storage, ctx })
     }
 
     // revoke <slug>
@@ -480,6 +338,185 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
   }
   clearPendingRevoke(root)
   return { kind: 'success', text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(updated.length)} 条记录）。新开的 ${roleLabel(face.role)} 会话不再加载它。` }
+}
+
+
+function commandAdopt(command: CultivationCommandContext, tokens: readonly string[]): CultivationCommandResult {
+  const { face, recordsDir, config, storage } = command
+        const id = tokens[1]
+      if (id === undefined) return { kind: 'error' as const, text: '用法：adopt <记录id> [as <方法slug>]。' }
+      const found = storage.readRecord(recordsDir, id)
+      if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在（cultivation/records/ 里没有 ${id}.md）。` }
+      const { text } = found
+      const record = parseRecord(id, text)
+      if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏，无法采纳。` }
+      if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已是 ${record.status === 'adopted' ? '已采纳' : '已拒绝'}，不重复处理。` }
+      if (record.targetRole !== face.role) {
+        return { kind: 'error' as const, text: `仅建议权：${record.id} 的培养对象是 ${roleLabel(record.targetRole)}，请在 ${roleLabel(record.targetRole)} 的会话里采纳。` }
+      }
+      if (config.cultivationRoot === undefined) {
+        return { kind: 'error' as const, text: '方法层根未配置（bundle patch 行 config.cultivationRoot 缺席）——无法部署方法。' }
+      }
+      let slug = tokens[2] === 'as' ? tokens[3] : undefined
+      if (slug === undefined) slug = `method-${id}`
+      if (!SLUG_RE.test(slug)) {
+        return { kind: 'error' as const, text: `方法 slug 只认小写字母/数字/连字符（≤64 位）：${slug}。` }
+      }
+      const proposalBody = recordBody(text)
+      if (proposalBody === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏，无法采纳。` }
+      let installed: boolean
+      try {
+        installed = storage.installMethod(config.cultivationRoot, record.targetRole, slug, methodSkillText({ slug, expectation: record.expectation, body: proposalBody }))
+      } catch (error) {
+        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+        throw error
+      }
+      if (!installed) return { kind: 'error' as const, text: `方法 ${slug} 已存在，未覆盖任何文件或记录。` }
+      try {
+        if (!storage.updateRecord(recordsDir, id, { status: 'adopted', methodSlug: slug, decidedAt: new Date().toISOString() }, text)) {
+          try { storage.removeMethod(config.cultivationRoot, record.targetRole, slug) } catch { /* Preserve the conflict note. */ }
+          return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，采纳已取消并撤回方法 ${slug}；请重试。` }
+        }
+      } catch (error) {
+        try { storage.removeMethod(config.cultivationRoot, record.targetRole, slug) } catch { /* Preserve the original record-update failure. */ }
+        throw error
+      }
+      return {
+        kind: 'success' as const,
+        text: `已采纳 ${id}：方法 ${slug} 部署到 ${roleLabel(record.targetRole)} 方法层。新开的 ${roleLabel(record.targetRole)} 会话会带着它开工；已经在跑的会话也会随技能目录刷新看到它（下一步就可能用上）。见效后在培养面板点「这条有用」回填，不灵了点「撤回…」（命令行：/cultivation verify ${id} pass|fail、/cultivation revoke ${slug}）。`,
+      }
+    
+}
+
+function commandReject(command: CultivationCommandContext, tokens: readonly string[], body: string): CultivationCommandResult {
+  const { face, recordsDir, storage } = command
+        const id = tokens[1]
+      if (id === undefined || body === '') return { kind: 'error' as const, text: '用法：reject <记录id> :: <一句话理由>。' }
+      const found = storage.readRecord(recordsDir, id)
+      if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在。` }
+      const record = parseRecord(id, found.text)
+      if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏。` }
+      if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已处理过（${record.status}）。` }
+      if (record.targetRole !== face.role) {
+        return { kind: 'error' as const, text: `${record.id} 的培养对象是 ${roleLabel(record.targetRole)}，请在该角色会话里处理。` }
+      }
+      if (!storage.updateRecord(recordsDir, id, { status: 'rejected', reason: body.split('\n')[0]!, decidedAt: new Date().toISOString() }, found.text)) {
+        return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，拒绝未写；请重试。` }
+      }
+      return { kind: 'success' as const, text: `已拒绝 ${id}（理由已留档，提出者可在培养页查回执）。` }
+    
+}
+
+function commandVerify(command: CultivationCommandContext, tokens: readonly string[]): CultivationCommandResult {
+  const { face, recordsDir, storage } = command
+        const id = tokens[1]
+      const outcome = tokens[2]
+      if (id === undefined || (outcome !== 'pass' && outcome !== 'fail')) {
+        return { kind: 'error' as const, text: '用法：verify <记录id> <pass|fail>——在真实同类任务上验证后回填。' }
+      }
+      const found = storage.readRecord(recordsDir, id)
+      if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在。` }
+      const record = parseRecord(id, found.text)
+      if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏。` }
+      if (record.status !== 'adopted') return { kind: 'error' as const, text: `只有已采纳的方法才能回填验证（${id} 现为 ${record.status}）。` }
+      if (record.targetRole !== face.role) {
+        return { kind: 'error' as const, text: `${record.id} 归 ${roleLabel(record.targetRole)}，请在该角色会话里回填。` }
+      }
+      if (!storage.updateRecord(recordsDir, id, { verification: outcome }, found.text)) {
+        return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，验证未写；请重试。` }
+      }
+      return { kind: 'success' as const, text: `已回填验证：${id} → ${outcome === 'pass' ? '已验证（在同类任务上见过效）' : '验证未通过（建议修订或撤回）'}。` }
+    
+}
+
+function commandArchive(command: CultivationCommandContext, tokens: readonly string[]): CultivationCommandResult {
+  const { root, recordsDir, storage } = command
+        const days = Number(tokens[1])
+      if (!Number.isSafeInteger(days) || days < 1 || days > 3650) {
+        return { kind: 'error' as const, text: '用法：archive <天数 1..3650>——只归档已处理（非 open）且早于该天数的记录。' }
+      }
+      const archiveDir = join(root, 'cultivation', 'records-archive')
+      const loaded = storage.loadRecords(recordsDir)
+      if (!loaded.reachable) return { kind: 'error' as const, text: `记录目录不可达：${recordsDir}` }
+      const cutoff = Date.now() - days * 86_400_000
+      let archived = 0
+      let failed = 0
+      for (const record of loaded.records) {
+        if (record.status === 'open') continue
+        const stamp = recordStampOf(record.id)
+        if (stamp === null || stamp >= cutoff) continue
+        try {
+          if (storage.archiveRecord(recordsDir, archiveDir, record.id)) archived += 1
+          else failed += 1
+        } catch {
+          failed += 1
+        }
+      }
+      return {
+        kind: 'success' as const,
+        text: `已归档 ${String(archived)} 条记录到 cultivation/records-archive/${failed > 0 ? `；${String(failed)} 条未动（碰撞/读取失败）` : ''}`
+          + `${loaded.broken > 0 ? `；另有 ${String(loaded.broken)} 条坏记录未动` : ''}。open 记录与时间戳不识别的记录保持原样。`,
+      }
+    
+}
+
+function commandPurge(command: CultivationCommandContext, tokens: readonly string[]): CultivationCommandResult {
+  const { root, storage } = command
+        const days = Number(tokens[1])
+      if (!Number.isSafeInteger(days) || days < 1 || days > 3650) {
+        return { kind: 'error' as const, text: '用法：purge <天数 1..3650>——只删除 cultivation/records-archive/ 里早于该天数的归档记录。' }
+      }
+      const archiveDir = join(root, 'cultivation', 'records-archive')
+      let result: { removed: number, failed: number }
+      try {
+        result = storage.purgeArchive(archiveDir, Date.now() - days * 86_400_000)
+      } catch (error) {
+        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+        throw error
+      }
+      return {
+        kind: 'success' as const,
+        text: `已清理归档 ${String(result.removed)} 条${result.failed > 0 ? `；${String(result.failed)} 条未动（非普通文件/删除失败）` : ''}。live records 未动。`,
+      }
+    
+}
+
+function commandCheck(command: CultivationCommandContext): CultivationCommandResult {
+  const { face, recordsDir, config, storage } = command
+        if (config.cultivationRoot === undefined) {
+        return { kind: 'error' as const, text: '方法层根未配置（config.cultivationRoot 缺席）。' }
+      }
+      const loaded = storage.loadRecords(recordsDir)
+      if (!loaded.reachable) return { kind: 'error' as const, text: `记录目录不可达：${recordsDir}` }
+      const adopted = loaded.records.filter(record => record.status === 'adopted' && record.targetRole === face.role)
+      const adoptedSlugs = new Set(adopted.map(record => record.methodSlug).filter((slug): slug is string => typeof slug === 'string' && slug !== ''))
+      const missing: string[] = []
+      for (const record of adopted) {
+        const slug = record.methodSlug
+        if (slug === undefined || slug === '') { missing.push(`${record.id}（缺 methodSlug）`); continue }
+        try {
+          if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) missing.push(`${record.id}（缺方法 ${slug}）`)
+        } catch (error) {
+          if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+          throw error
+        }
+      }
+      let orphans: string[] = []
+      try {
+        orphans = storage.listMethods(config.cultivationRoot, face.role).filter(slug => !adoptedSlugs.has(slug))
+      } catch (error) {
+        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+        throw error
+      }
+      if (missing.length === 0 && orphans.length === 0) {
+        return { kind: 'success' as const, text: `${roleLabel(face.role)} 方法层与已采纳记录一致（${String(adopted.length)} 条）。` }
+      }
+      return {
+        kind: 'success' as const,
+        text: `对账结果：${missing.length > 0 ? `记录缺方法 ${missing.join('、')}` : '记录与方法一一对应'}`
+          + `${orphans.length > 0 ? `；方法无记录 ${orphans.join('、')}` : ''}。只报告，不自动删改。`,
+      }
+    
 }
 
 /** 「/cultivation」命令族与提案工具的注册面。 */

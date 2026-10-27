@@ -29,6 +29,7 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { assertAttachPort } from '../lib/cdp-attach.mjs';
 
 const CHROME_CANDIDATES = [
   process.env.DSH_PROBE_CHROME,
@@ -172,4 +173,105 @@ export async function launchCdpBrowser({ url, chromeBin, windowSize = '1600,1000
   };
   void bootTimeoutMs;
   return handle;
+}
+
+/**
+ * Attach to an already-running Chrome DevTools endpoint (no launch, no navigation).
+ *
+ * Use this when the user has a live Web GUI open and the question is "why did *that*
+ * page break" — a second throwaway browser proves nothing about the tab the user saw.
+ * The page target is selected by `urlIncludes` when given, else the first `page`
+ * target; the returned handle's `settle` only closes the WebSocket and never kills
+ * the user's browser.
+ *
+ * @param {object} options
+ * @param {number} options.port - DevTools HTTP port, e.g. 9222.
+ * @param {string} [options.urlIncludes] - pick the page whose URL contains this.
+ * @param {number} [options.bootTimeoutMs] - max wait for a page target.
+ * @returns {Promise<object>} same evaluate/click/screenshot/console/exceptions shape.
+ */
+export async function attachCdpBrowser({ port, urlIncludes, bootTimeoutMs = 20000 } = {}) {
+  assertAttachPort(port);
+  const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms) });
+  const problems = [];
+  const exceptions = [];
+  let target;
+  const deadline = Date.now() + bootTimeoutMs;
+  while (target === undefined && Date.now() < deadline) {
+    try {
+      const list = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
+      const pages = list.filter(entry => entry.type === 'page' && entry.webSocketDebuggerUrl !== undefined);
+      target = urlIncludes === undefined ? pages[0] : pages.find(entry => String(entry.url ?? '').includes(urlIncludes));
+      if (target === undefined && urlIncludes === undefined) target = pages.find(entry => /^https?:/.test(String(entry.url ?? '')));
+    } catch {}
+    if (target === undefined) await sleep(250);
+  }
+  if (target === undefined) throw new Error(`no attachable page target on port ${port}${urlIncludes === undefined ? '' : ` matching ${urlIncludes}`}`);
+
+  const ws = new WebSocket(target.webSocketDebuggerUrl);
+  await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('CDP websocket failed')) });
+  let seq = 0;
+  const pending = new Map();
+  ws.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+    if (message.id !== undefined && pending.has(message.id)) {
+      pending.get(message.id)(message);
+      pending.delete(message.id);
+      return;
+    }
+    if (message.method === 'Runtime.consoleAPICalled' && ['error', 'warning'].includes(message.params.type)) {
+      const text = message.params.args.map(arg => arg.value ?? arg.description ?? '').join(' ');
+      problems.push(`console.${message.params.type}: ${text.slice(0, 300)}`);
+    }
+    if (message.method === 'Runtime.exceptionThrown') {
+      const details = message.params.exceptionDetails;
+      exceptions.push(`exception: ${(details.exception?.description ?? details.text).slice(0, 300)}`);
+    }
+  };
+  const send = (method, params = {}) => new Promise((resolve) => {
+    const id = ++seq;
+    pending.set(id, resolve);
+    ws.send(JSON.stringify({ id, method, params }));
+    setTimeout(() => {
+      if (pending.has(id)) {
+        pending.delete(id);
+        resolve({ result: { exceptionDetails: { text: `CDP evaluate timed out: ${method}` } } });
+      }
+    }, 20000);
+  });
+
+  await send('Runtime.enable');
+  await send('Page.enable');
+
+  const screenshot = async (file) => {
+    const reply = await send('Page.captureScreenshot', { format: 'png' });
+    const data = reply.result?.data;
+    if (typeof data !== 'string') return false;
+    fs.writeFileSync(file, Buffer.from(data, 'base64'));
+    return true;
+  };
+  const evaluate = async (expression) => {
+    const reply = await send('Runtime.evaluate', { expression, returnByValue: true });
+    if (reply.result?.exceptionDetails !== undefined) {
+      return { error: reply.result.exceptionDetails.exception?.description ?? reply.result.exceptionDetails.text };
+    }
+    return reply.result?.result?.value;
+  };
+  const click = async (selector) => evaluate(`(() => {
+    const el = document.querySelector(${JSON.stringify(selector)});
+    if (el === null) return 'no-element';
+    el.click();
+    return 'clicked';
+  })()`);
+  return {
+    evaluate,
+    click,
+    screenshot,
+    consoleProblems: problems,
+    exceptions,
+    pageUrl: target.url,
+    attached: true,
+    close: () => ws.close(),
+    settle: async () => { ws.close() },
+  };
 }

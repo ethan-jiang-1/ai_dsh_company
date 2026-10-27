@@ -2,22 +2,22 @@
  * 两个 CEO 两个 home（需求 2）：身份、公司盘、catalog 三样都不串。
  * 这里只做 keyless 盘面/纯逻辑；真装第二 home 的证据在第二机模拟与 release/lifecycle smoke。
  */
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { bootstrapCompanyWorkspace } from '../../packages/company-pack/src/host/bootstrap.ts'
 import { planBundleManifest } from '../../packages/company-pack/src/host/bundle-manifest.ts'
 import { recordPresented, regenerateCatalog } from '../../packages/company-pack/src/host/catalog.ts'
+import { makeTempDir } from '../support/temp-env.ts'
 
 const PACK = { name: 'dsh-company-pack', version: '0.3.8' }
 const skeleton = join(ROOT, 'packages/company-pack/workspace')
 
 describe('两个 home 的公司盘隔离', () => {
   it('bundle id / 公司名 / catalog 不串', () => {
-    const a = mkdtempSync(join(tmpdir(), 'two-home-a-'))
-    const b = mkdtempSync(join(tmpdir(), 'two-home-b-'))
+    const a = makeTempDir('two-home-a-')
+    const b = makeTempDir('two-home-b-')
     const wa = join(a, 'company-workspace')
     const wb = join(b, 'company-workspace')
     try {

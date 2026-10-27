@@ -4,13 +4,13 @@
 
 **为什么存在**：插件 client 半（侧栏面板、卡片、对话区）在 stub/静态冒烟里是绿的，在真实渲染器里仍可能崩——钩子绑定、会话作用域、主题、布局都是真实环境才有的变量。这个工具起一个**一次性无头 Chrome**，把 booted 的观察窗当真实用户一样驱动，然后报告**实际渲染出了什么**。它是「执行冒烟」和「owner 亲眼看」之间的那一环——呈现即验证（dev-loop §1）的机器实现。
 
-**出处**：2026-10-01 从 `ai_dsh_loop_advisor` 项目借鉴（owner 指令「想办法借鉴过来」）。驱动层按其文档契约**逐字拷贝零修改**；场景层换成本仓观察窗的面（五角色驾驶舱）。借鉴当夜即抓到驱动层两个新坑并回灌本文（见下）。
+**出处**：2026-10-01 从 `ai_dsh_loop_advisor` 项目借鉴（owner 指令「想办法借鉴过来」）。驱动层 launch 路径按其文档契约**逐字保留**（2026-10-28 追加 attach 路径，不改 launch）；场景层换成本仓观察窗的面（五角色驾驶舱）。借鉴当夜即抓到驱动层两个新坑并回灌本文（见下）。
 
 ## 架构（两层，借用只拷第一层）
 
 | 文件 | 职责 | 可移植性 |
 |---|---|---|
-| `tools/drivers/cdp-driver.mjs` | **通用驱动**：起无头 Chrome（port 0 + DevToolsActivePort）、CDP 连接、evaluate/click（20s 超时竞速）、console 错误与未捕获异常捕获、清理。Node 22 内建（原生 WebSocket/fetch），零 npm 依赖 | 任何有 web UI 的项目直接拷走（本项目已验证逐字可用） |
+| `tools/drivers/cdp-driver.mjs` | **通用驱动**：起无头 Chrome（port 0 + DevToolsActivePort）或附着已运行 Chrome（`attachCdpBrowser`）、CDP 连接、evaluate/click（20s 超时竞速）、console 错误与未捕获异常捕获、清理。Node 22 内建（原生 WebSocket/fetch），零 npm 依赖 | 任何有 web UI 的项目直接拷走（本项目已验证逐字可用） |
 | `probes/browser-visual/cdp-probe.mjs` | **本仓场景**：composer + 品牌 + 右栏全部公司页签逐个开（Start-chip 回切；页签清单从 `packages/company-pack/src/client/company-tab-registration.ts` 解析，面板体 `data-company-tab-title` 可见且非空）+ `--ask` 全环（真建会话输入发送等收口） | 换成你自己页面的选择器和断言 |
 
 ## 本仓用法
@@ -23,6 +23,7 @@ node probes/browser-visual/cdp-probe.mjs '<url>' --ask '用一句话自报角色
 node probes/browser-visual/cdp-probe.mjs '<url>' --steps /tmp/ui-steps.json   # 受控交互（clickText/waitText/expectText/typeText）
 node probes/browser-visual/cdp-probe.mjs '<url>' --evidence                # 成功也落证据目录（截图 + verdict）
 node probes/browser-visual/cdp-probe.mjs '<url>' --texts --json-out /tmp/v.json   # 逐页签可见文本 + verdict 落文件（UI 金样车道用）
+node probes/browser-visual/cdp-probe.mjs --attach 9222 --attach-url 127.0.0.1 --evidence   # 附着用户已开页面（只读快照）
 ```
 
 stdout 打一个 JSON verdict；exit 0 = 全部断言成立，**exit 2 = 环境未就绪**（home 停在登录/凭据引导——
@@ -31,6 +32,7 @@ runtime/harness-home/diagnosis 下的 cdp-probe-<timestamp>/（page.png / body.t
 console.log），JSON verdict 的 `evidenceDir` 指向它；`--evidence` 让成功也写同一形状。
 `--ask` 会在 GUI 里真建会话（registry default = ceo）留下测试会话，需要时在 GUI 里归档清理。
 `--steps` 是受控动作集（按可见文本点击、等/断言文本、向选择器输入），用于复现“点某个按钮/面板”的症状；动作文件形状 = `tools/lib/probe-steps.mjs` 头注。
+`--attach <devtools-port>` 附着用户已开的 Chrome（需以 `--remote-debugging-port=9222` 启动）做只读快照：不导航、不关模态、不点页签、不跑 `--ask/--steps`；品牌断言在 attach 档不强制（用户页可能不在公司首屏）。
 
 ## 已踩平的环境坑（驱动 + 场景里已编码成规则）
 
