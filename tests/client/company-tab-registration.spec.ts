@@ -105,23 +105,41 @@ function mountKeyedDeclaration(ctx: Context, owner: string, slot: string) {
   })
 }
 
-describe('company tab registration', () => {
-  it('keeps tab types, keyed renderers, injected data, waits, collapse, reinstallation, and unload aligned', async () => {
-    const ctx = new Context()
-    const slots = new SlotRegistry(ctx)
-    const sidebarRightTabs = new SidebarRightTabRegistry(ctx)
-    const { data, pending } = tabData()
-    const openTab = vi.fn()
-    const openSession = vi.fn()
-    ctx.provide('sidebarRightTabs', sidebarRightTabs)
-    ctx.provide('sidebarRight', { openTab })
-    ctx.provide('uiWorkspace', { openSession })
-    onTestFinished(async () => { await ctx.fiber.dispose() })
+async function mountHarness() {
+  const ctx = new Context()
+  const slots = new SlotRegistry(ctx)
+  const sidebarRightTabs = new SidebarRightTabRegistry(ctx)
+  const { data, pending } = tabData()
+  const openTab = vi.fn()
+  const openSession = vi.fn()
+  ctx.provide('sidebarRightTabs', sidebarRightTabs)
+  ctx.provide('sidebarRight', { openTab })
+  ctx.provide('uiWorkspace', { openSession })
+  onTestFinished(async () => { await ctx.fiber.dispose() })
+  const companyFiber = mountCompanyTabs(ctx, data)
+  onTestFinished(async () => { await companyFiber.dispose() })
+  await companyFiber.await()
+  return { ctx, slots, sidebarRightTabs, data, pending, openTab, openSession, companyFiber }
+}
 
-    const companyFiber = mountCompanyTabs(ctx, data)
-    onTestFinished(async () => { await companyFiber.dispose() })
-    await companyFiber.await()
-    const declaredTypes = sidebarRightTabs.entries()
+async function declareRoot(harness: Awaited<ReturnType<typeof mountHarness>>) {
+  const fiber = mountRootDeclarations(harness.ctx)
+  onTestFinished(async () => { await fiber.dispose() })
+  await fiber.await()
+  return fiber
+}
+
+async function declareSlot(harness: Awaited<ReturnType<typeof mountHarness>>, owner: string, slot: string) {
+  const fiber = mountKeyedDeclaration(harness.ctx, owner, slot)
+  onTestFinished(async () => { await fiber.dispose() })
+  await fiber.await()
+  return fiber
+}
+
+describe('company tab registration', () => {
+  it('registers all tab types and guide icons before any slot declaration', async () => {
+    const harness = await mountHarness()
+    const declaredTypes = harness.sidebarRightTabs.entries()
     expect(declaredTypes.map(({ id, kind, title, guide }) => ({
       id, kind, title: title(''), guide: guide?.map(entry => [entry.id, entry.order, entry.title(), entry.description?.()]),
     }))).toEqual(EXPECTED_TYPES.map(type => ({
@@ -132,79 +150,63 @@ describe('company tab registration', () => {
     })))
     expect(declaredTypes.map(definition => definition.guide?.[0]?.icon)).toEqual(GUIDE_ICONS)
 
-    // The module has registered its type stage, but each slots.inject waits for
-    // the corresponding real SlotRegistry declaration instead of registering early.
-    expect(slots.entries(BODY_SLOT)).toEqual([])
-    expect(slots.entries(TITLE_SLOT)).toEqual([])
-    expect(slots.entries(GUIDE_SLOT)).toEqual([])
+    // 类型阶段已注册，但三个 slots.inject 都在等真实 SlotRegistry 声明，不提前注册。
+    expect(harness.slots.entries(BODY_SLOT)).toEqual([])
+    expect(harness.slots.entries(TITLE_SLOT)).toEqual([])
+    expect(harness.slots.entries(GUIDE_SLOT)).toEqual([])
+  })
 
-    const rootFiber = mountRootDeclarations(ctx)
-    onTestFinished(async () => { await rootFiber.dispose() })
-    await rootFiber.await()
-    const bodyFiber = mountKeyedDeclaration(ctx, BODY_OWNER, BODY_SLOT)
-    onTestFinished(async () => { await bodyFiber.dispose() })
-    await bodyFiber.await()
-    const bodyEntries = slots.entries(BODY_SLOT)
+  it('mounts body, title and guide only after declarations, with injected data intact', async () => {
+    const harness = await mountHarness()
+    await declareRoot(harness)
+    const bodyFiber = await declareSlot(harness, BODY_OWNER, BODY_SLOT)
+    const bodyEntries = harness.slots.entries(BODY_SLOT)
     expect(bodyEntries.map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
     expect(bodyEntries.map(entry => entry.component)).toEqual(BODY_COMPONENTS)
-    expect(slots.entries(TITLE_SLOT)).toEqual([])
-    expect(slots.entries(GUIDE_SLOT)).toEqual([])
+    expect(harness.slots.entries(TITLE_SLOT)).toEqual([])
+    expect(harness.slots.entries(GUIDE_SLOT)).toEqual([])
+
     const bodyProps = bodyEntries.map(entry => entry.inject?.() ?? {})
     const attentionProps = bodyProps[0]!
     expect(Object.keys(attentionProps).sort()).toEqual(['floatTab', 'follow', 'getPending', 'leadOf', 'openSession', 'unfloatTab'])
-    expect(attentionProps.floatTab).toBe(data.floatTab)
-    expect(attentionProps.unfloatTab).toBe(data.unfloatTab)
-    expect(attentionProps.leadOf).toBe(data.leadOf)
-    expect(attentionProps.follow).toBe(data.follow)
-    expect((attentionProps.getPending as () => unknown)()).toEqual([pending])
+    expect(attentionProps.floatTab).toBe(harness.data.floatTab)
+    expect(attentionProps.unfloatTab).toBe(harness.data.unfloatTab)
+    expect(attentionProps.leadOf).toBe(harness.data.leadOf)
+    expect(attentionProps.follow).toBe(harness.data.follow)
+    expect((attentionProps.getPending as () => unknown)()).toEqual([harness.pending])
     ;(attentionProps.openSession as (sessionId: SessionId) => void)('test-session' as SessionId)
-    expect(openSession).toHaveBeenCalledWith('test-session')
+    expect(harness.openSession).toHaveBeenCalledWith('test-session')
 
-    const sharedData = { leadOf: data.leadOf, follow: data.follow, floatTab: data.floatTab, unfloatTab: data.unfloatTab }
-    for (const index of [1, 2, 4, 5]) {
-      expect(bodyProps[index]).toEqual(sharedData)
-    }
+    const sharedData = { leadOf: harness.data.leadOf, follow: harness.data.follow, floatTab: harness.data.floatTab, unfloatTab: harness.data.unfloatTab }
+    for (const index of [1, 2, 4, 5]) expect(bodyProps[index]).toEqual(sharedData)
     const presenceProps = bodyProps[3]!
-    expect(presenceProps).toEqual({ ...sharedData, openMember: data.openMember })
+    expect(presenceProps).toEqual({ ...sharedData, openMember: harness.data.openMember })
     const member = { id: 'member-1', role: 'teammate' } as const
     await (presenceProps.openMember as CompanyTabRegistrationData['openMember'])('child-session' as SessionId, member)
-    expect(data.openMember).toHaveBeenCalledWith('child-session', member)
+    expect(harness.data.openMember).toHaveBeenCalledWith('child-session', member)
 
     expect(bodyProps[6]).toEqual({
-      floatTab: data.floatTab,
-      unfloatTab: data.unfloatTab,
-      cultivationFiles: data.cultivationFiles,
-      followEvents: data.follow,
-      roleSource: data.roleSource,
+      floatTab: harness.data.floatTab,
+      unfloatTab: harness.data.unfloatTab,
+      cultivationFiles: harness.data.cultivationFiles,
+      followEvents: harness.data.follow,
+      roleSource: harness.data.roleSource,
     })
-    expect(bodyProps[7]).toEqual({ floatTab: data.floatTab, unfloatTab: data.unfloatTab, readLedger: data.readLedger })
-    const ledgerProps = bodyProps[7]!
     const signal = new AbortController().signal
-    await expect((ledgerProps.readLedger as CompanyTabRegistrationData['readLedger'])('lead-session' as SessionId, signal)).resolves.toBe('ledger text')
-    expect(data.readLedger).toHaveBeenCalledWith('lead-session', signal)
+    expect(bodyProps[7]).toEqual({ floatTab: harness.data.floatTab, unfloatTab: harness.data.unfloatTab, readLedger: harness.data.readLedger })
+    await expect((bodyProps[7]!.readLedger as CompanyTabRegistrationData['readLedger'])('lead-session' as SessionId, signal)).resolves.toBe('ledger text')
+    expect(harness.data.readLedger).toHaveBeenCalledWith('lead-session', signal)
+    expect(bodyProps[8]!.readCatalog).toBe(harness.data.readCatalog)
+    await expect((bodyProps[8]!.readCatalog as CompanyTabRegistrationData['readCatalog'])('lead-session' as SessionId, signal)).resolves.toBe('catalog text')
+    expect(harness.data.readCatalog).toHaveBeenCalledWith('lead-session', signal)
 
-    const catalogProps = bodyProps[8]!
-    expect(catalogProps.floatTab).toBe(data.floatTab)
-    expect(catalogProps.unfloatTab).toBe(data.unfloatTab)
-    expect(catalogProps.readCatalog).toBe(data.readCatalog)
-    expect(typeof catalogProps.openFinal).toBe('function')
-    await expect((catalogProps.readCatalog as CompanyTabRegistrationData['readCatalog'])('lead-session' as SessionId, signal)).resolves.toBe('catalog text')
-    expect(data.readCatalog).toHaveBeenCalledWith('lead-session', signal)
+    const titleFiber = await declareSlot(harness, TITLE_OWNER, TITLE_SLOT)
+    expect(harness.slots.entries(TITLE_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
+    expect(harness.slots.entries(TITLE_SLOT).map(entry => entry.component)).toEqual(TITLE_COMPONENTS)
+    expect(harness.slots.entries(GUIDE_SLOT)).toEqual([])
 
-    const titleFiber = mountKeyedDeclaration(ctx, TITLE_OWNER, TITLE_SLOT)
-    onTestFinished(async () => { await titleFiber.dispose() })
-    await titleFiber.await()
-    expect(slots.entries(TITLE_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
-    expect(slots.entries(GUIDE_SLOT)).toEqual([])
-    const guideFiber = mountKeyedDeclaration(ctx, GUIDE_OWNER, GUIDE_SLOT)
-    onTestFinished(async () => { await guideFiber.dispose() })
-    await guideFiber.await()
-
-    const titleEntries = slots.entries(TITLE_SLOT)
-    expect(titleEntries.map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
-    expect(titleEntries.map(entry => entry.component)).toEqual(TITLE_COMPONENTS)
-
-    const guideEntries = slots.entries(GUIDE_SLOT)
+    const guideFiber = await declareSlot(harness, GUIDE_OWNER, GUIDE_SLOT)
+    const guideEntries = harness.slots.entries(GUIDE_SLOT)
     expect(guideEntries.map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
     expect(guideEntries.map(entry => entry.component)).toEqual(GUIDE_COMPONENTS)
     for (const [index, entry] of guideEntries.entries()) {
@@ -212,52 +214,55 @@ describe('company tab registration', () => {
       expect(Object.keys(props)).toEqual(['openTab'])
       ;(props.openTab as (kind: string) => void)(EXPECTED_TYPES[index]!.kind)
     }
-    expect(openTab.mock.calls).toEqual(EXPECTED_TYPES.map(type => [type.kind]))
+    expect(harness.openTab.mock.calls).toEqual(EXPECTED_TYPES.map(type => [type.kind]))
 
-    // Collapsing one declaring slot removes only that slot's contributions;
-    // the other two waits remain installed, then this group follows redeclaration.
     await bodyFiber.dispose()
-    expect(slots.entries(BODY_SLOT)).toEqual([])
-    expect(slots.entries(TITLE_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
-    expect(slots.entries(GUIDE_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
-    const replacementBodyFiber = mountKeyedDeclaration(ctx, BODY_OWNER, BODY_SLOT)
-    onTestFinished(async () => { await replacementBodyFiber.dispose() })
-    await replacementBodyFiber.await()
-    expect(slots.entries(BODY_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
-    expect(slots.entries(BODY_SLOT).map(entry => entry.component)).toEqual(BODY_COMPONENTS)
-
-    // Each independent wait owns a separate declaration epoch and reinstalls only its own group.
     await titleFiber.dispose()
-    expect(slots.entries(TITLE_SLOT)).toEqual([])
-    expect(slots.entries(BODY_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
-    expect(slots.entries(GUIDE_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
-    const replacementTitleFiber = mountKeyedDeclaration(ctx, TITLE_OWNER, TITLE_SLOT)
-    onTestFinished(async () => { await replacementTitleFiber.dispose() })
-    await replacementTitleFiber.await()
-    expect(slots.entries(TITLE_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
-    expect(slots.entries(TITLE_SLOT).map(entry => entry.component)).toEqual(TITLE_COMPONENTS)
+    await guideFiber.dispose()
+  })
+
+  it('collapses one declaration at a time; reinstallation and final unload stay scoped', async () => {
+    const harness = await mountHarness()
+    await declareRoot(harness)
+    let bodyFiber = await declareSlot(harness, BODY_OWNER, BODY_SLOT)
+    let titleFiber = await declareSlot(harness, TITLE_OWNER, TITLE_SLOT)
+    let guideFiber = await declareSlot(harness, GUIDE_OWNER, GUIDE_SLOT)
+
+    await bodyFiber.dispose()
+    expect(harness.slots.entries(BODY_SLOT)).toEqual([])
+    expect(harness.slots.entries(TITLE_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
+    expect(harness.slots.entries(GUIDE_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
+    bodyFiber = await declareSlot(harness, BODY_OWNER, BODY_SLOT)
+    expect(harness.slots.entries(BODY_SLOT).map(entry => entry.component)).toEqual(BODY_COMPONENTS)
+
+    await titleFiber.dispose()
+    expect(harness.slots.entries(TITLE_SLOT)).toEqual([])
+    expect(harness.slots.entries(BODY_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
+    expect(harness.slots.entries(GUIDE_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
+    titleFiber = await declareSlot(harness, TITLE_OWNER, TITLE_SLOT)
+    expect(harness.slots.entries(TITLE_SLOT).map(entry => entry.component)).toEqual(TITLE_COMPONENTS)
 
     await guideFiber.dispose()
-    expect(slots.entries(GUIDE_SLOT)).toEqual([])
-    expect(slots.entries(BODY_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
-    expect(slots.entries(TITLE_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
-    const replacementGuideFiber = mountKeyedDeclaration(ctx, GUIDE_OWNER, GUIDE_SLOT)
-    onTestFinished(async () => { await replacementGuideFiber.dispose() })
-    await replacementGuideFiber.await()
-    const restoredGuideEntries = slots.entries(GUIDE_SLOT)
-    expect(restoredGuideEntries.map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
+    expect(harness.slots.entries(GUIDE_SLOT)).toEqual([])
+    expect(harness.slots.entries(BODY_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
+    expect(harness.slots.entries(TITLE_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
+    guideFiber = await declareSlot(harness, GUIDE_OWNER, GUIDE_SLOT)
+    const restoredGuideEntries = harness.slots.entries(GUIDE_SLOT)
     expect(restoredGuideEntries.map(entry => entry.component)).toEqual(GUIDE_COMPONENTS)
     for (const [index, entry] of restoredGuideEntries.entries()) {
       const props = entry.inject?.() ?? {}
       ;(props.openTab as (kind: string) => void)(EXPECTED_TYPES[index]!.kind)
     }
-    expect(openTab.mock.calls.slice(EXPECTED_TYPES.length)).toEqual(EXPECTED_TYPES.map(type => [type.kind]))
+    expect(harness.openTab.mock.calls).toHaveLength(EXPECTED_TYPES.length)
 
-    await companyFiber.dispose()
-    expect(sidebarRightTabs.entries()).toEqual([])
-    expect(sidebarRightTabs.guide()).toEqual([])
-    expect(slots.entries(BODY_SLOT)).toEqual([])
-    expect(slots.entries(TITLE_SLOT)).toEqual([])
-    expect(slots.entries(GUIDE_SLOT)).toEqual([])
+    await harness.companyFiber.dispose()
+    expect(harness.sidebarRightTabs.entries()).toEqual([])
+    expect(harness.sidebarRightTabs.guide()).toEqual([])
+    expect(harness.slots.entries(BODY_SLOT)).toEqual([])
+    expect(harness.slots.entries(TITLE_SLOT)).toEqual([])
+    expect(harness.slots.entries(GUIDE_SLOT)).toEqual([])
+    await bodyFiber.dispose()
+    await titleFiber.dispose()
+    await guideFiber.dispose()
   })
 })

@@ -36,4 +36,4 @@
 ## 未验 / 边界
 
 - 五块仍在同文件（377 行），不是“每块一个文件”；这是本批的边界。
-- Board 余下四块、command handler 六支内联、测试 helper/单 it 巨测仍是 P3 以后做。
+- Board 余下四块、command handler 六支内联、测试 helper 仍是 P3 以后做。
