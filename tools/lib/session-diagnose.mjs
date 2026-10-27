@@ -61,6 +61,10 @@ export function summarizeSessionEvents(records, { recent = 1 } = {}) {
     },
     total: records.length,
     turns: 0,
+    /** 有 turn/start 但没有配对 turn/end 的轮次（被杀/中断/崩溃——不是「无失败」）。 */
+    interruptedTurns: [],
+    /** tool/call 总数与按名字的计数（成功的调用此前完全不可见）。 */
+    toolCalls: { total: 0, byName: {} },
     nonCompletedTurns: [],
     toolErrors: [],
     approvals: [],
@@ -70,10 +74,14 @@ export function summarizeSessionEvents(records, { recent = 1 } = {}) {
   }
   const assistantTexts = []
   const askedApprovals = new Map()
+  const startedTurns = new Set()
   for (const record of records) {
     const type = record?.type
     const data = record?.data ?? {}
-    if (type === 'turn/end') {
+    if (type === 'turn/start') {
+      startedTurns.add(data.turn ?? null)
+    } else if (type === 'turn/end') {
+      startedTurns.delete(data.turn ?? null)
       summary.turns++
       const reason = data.reason ?? {}
       const kind = reason.kind ?? (reason.error !== undefined ? 'error' : 'unknown')
@@ -111,12 +119,17 @@ export function summarizeSessionEvents(records, { recent = 1 } = {}) {
       })
     } else if (type === 'tool/call') {
       const name = data.name ?? data.toolName ?? data.message?.name ?? ''
+      summary.toolCalls.total += 1
+      if (typeof name === 'string' && name !== '') {
+        summary.toolCalls.byName[name] = (summary.toolCalls.byName[name] ?? 0) + 1
+      }
       if (name === 'present') summary.presentCalls.push({ callId: data.id ?? data.callId ?? '' })
     } else if (type === 'assistant/message') {
       const text = redactTokenUrls(textOf(data.message) || data.text || '').trim()
       if (text !== '') assistantTexts.push(text)
     }
   }
+  summary.interruptedTurns = [...startedTurns].sort((left, right) => Number(left ?? 0) - Number(right ?? 0))
   summary.lastAssistant = assistantTexts.slice(-Math.max(1, recent)).map(text => text.slice(-600))
   return summary
 }

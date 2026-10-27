@@ -33,6 +33,26 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
     expect(summary.lastAssistant.join('\n')).not.toContain(token)
   })
 
+  it('中断轮（有 turn/start 无 turn/end）单独点名——不能渲染成「无失败」（R3-02）', () => {
+    const summary = summarizeSessionEvents([
+      { type: 'turn/start', data: { turn: 1 } },
+      { type: 'turn/end', data: { turn: 1, reason: { kind: 'completed' } } },
+      { type: 'turn/start', data: { turn: 2 } },
+      { type: 'tool/call', data: { name: 'bash' } },
+    ])
+    expect(summary.turns).toBe(1)
+    expect(summary.interruptedTurns).toEqual([2])
+  })
+
+  it('工具调用计数按名字聚合（成功调用此前完全不可见）', () => {
+    const summary = summarizeSessionEvents([
+      { type: 'tool/call', data: { name: 'read' } },
+      { type: 'tool/call', data: { name: 'read' } },
+      { type: 'tool/call', data: { name: 'present', callId: 'p1' } },
+    ])
+    expect(summary.toolCalls).toEqual({ total: 3, byName: { read: 2, present: 1 } })
+  })
+
   it('审批按真 v4 形状判读：asked/decided 按 id 配对拿工具名，outcome 进失败行', () => {
     const summary = summarizeSessionEvents([
       { type: 'approval/asked', data: { id: 'a1', toolName: 'request_signoff', callId: 'c9', reason: '双签线' } },

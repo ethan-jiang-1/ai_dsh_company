@@ -16,6 +16,7 @@ import type { FloatRectLike } from './float-geometry.ts'
 import { DreamTeamBrandName } from './Brand.tsx'
 import { startInstanceGuard } from './instance-guard.ts'
 import { createAttentionRegistry } from './attention-registry.ts'
+import { registerAttentionObservers, type AttentionRemote, type AttentionSessions } from './attention-observers.ts'
 import { createCompanyView } from './CompanyView.tsx'
 import { createCompanyDataPlane, WORKSPACE_TEXT_PATHS } from './company-data-plane.ts'
 import { contextRowsFromStore, makeCultivationContextSources, type CultivationContextSources, type FollowLike } from './cultivation-context-data.ts'
@@ -155,32 +156,12 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // （next()）——本监听者是观察者不是应答者，真应答走官方 ui-user-questions / ui-approval
   // 的 waterfall；this = 事件归属 owner ctx，scopeOf → 发起会话（同款 ui-approval 手法）。
   ctx.inject(['sessions', 'remote'], (scoped) => {
-    scoped.remote.$on('user-questions/request', function (request, next) {
-      const sessionId = scoped.sessions.scopeOf(this)
-      if (sessionId === undefined) return next()
-      const first = request.questions[0]
-      const done = attention.begin({
-        kind: 'question',
-        sessionId,
-        what: typeof first?.question === 'string' && first.question.trim() !== ''
-          ? first.question.trim()
-          : '（问询内容缺失）',
-        since: Date.now(),
-      })
-      return (async () => { try { return await next() } finally { done() } })()
-    })
-    scoped.remote.$on('approval/request', function (request, next) {
-      const sessionId = scoped.sessions.scopeOf(this)
-      if (sessionId === undefined) return next()
-      const done = attention.begin({
-        kind: 'approval',
-        sessionId,
-        what: typeof request.reason === 'string' && request.reason.trim() !== ''
-          ? `${request.toolName}：${request.reason.trim()}`
-          : request.toolName,
-        since: Date.now(),
-      })
-      return (async () => { try { return await next() } finally { done() } })()
+    // vendor 服务面比本模块用到的两件宽得多（remote 的事件名是封闭联合、sessions.scopeOf 要 Context）：
+    // 这里**故意窄化**成 `$on` + `scopeOf`，让观察者逻辑可在 keyless 档用假 remote 断言。
+    registerAttentionObservers({
+      remote: scoped.remote as unknown as AttentionRemote,
+      sessions: scoped.sessions as unknown as AttentionSessions,
+      attention,
     })
   })
 

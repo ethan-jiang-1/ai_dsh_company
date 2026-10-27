@@ -20,11 +20,13 @@ source run/env.sh   # 提供 DSH_PROBE_CHROME 备选；二进制默认复用 loa
 pnpm dsh web -- --port 0 --no-open        # 起观察窗，横幅拿 URL（demo.md §前置）
 node probes/browser-visual/cdp-probe.mjs 'http://127.0.0.1:<port>/?token=<t>'          # 默认断言面（零模型）
 node probes/browser-visual/cdp-probe.mjs '<url>' --ask '用一句话自报角色与职责。'      # + 完整产品环（真模型一次调用）
+node probes/browser-visual/cdp-probe.mjs '<url>' --evidence                # 成功也落证据目录（截图 + verdict）
 ```
 
-stdout 打一个 JSON verdict；exit 0 = 全部断言成立。失败时另写
+stdout 打一个 JSON verdict；exit 0 = 全部断言成立，**exit 2 = 环境未就绪**（home 停在登录/凭据引导——
+不是渲染失败；先配凭据或换已 onboarding 的 home）。失败时另写
 runtime/harness-home/diagnosis 下的 cdp-probe-<timestamp>/（page.png / body.txt / verdict.json /
-console.log），JSON verdict 的 `evidenceDir` 指向它；跨进程可回溯，不再只打印 JSON。
+console.log），JSON verdict 的 `evidenceDir` 指向它；`--evidence` 让成功也写同一形状。
 `--ask` 会在 GUI 里真建会话（registry default = ceo）留下测试会话，需要时在 GUI 里归档清理。
 
 ## 已踩平的环境坑（驱动 + 场景里已编码成规则）

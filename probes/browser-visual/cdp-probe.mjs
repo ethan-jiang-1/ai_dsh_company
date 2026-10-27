@@ -6,9 +6,9 @@
 //   ③升 pin / 收割后 UI 回归。成本：默认档零模型（真实渲染断言面）；`--ask` 加一次真实模型调用。
 // 前置：GUI URL（demo.md §前置：source run/env.sh → pnpm dsh web -- --port 0 --no-open → 横幅 URL）；
 //   Chrome 二进制：DSH_PROBE_CHROME 环境变量或系统 Chrome（run/env.sh 已指 Chrome for Testing）。
-// 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser]
+// 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser] [--evidence]
 //   默认断言面 = composer + 品牌 + 右栏**全部**公司页签逐个开（Start-chip 回切）+ 面板体
-//   `data-company-tab` 可见且非空 + console/异常捕获。页签清单从注册源
+//   `[data-company-tab-title=…]` 可见且非空 + console/异常捕获。页签清单从注册源
 //   `company-tab-registration.ts` 解析（不再手写；2026-10-20 审计：旧清单 8 个漏「成品」）。
 //   --ask 会真建会话（registry default = ceo）输入问题发送并等待轮次收口——完整产品环，留测试会话。
 // 退出码：0 = 全部断言成立；1 = 有断言失败（JSON verdict 已打印，含 consoleProblems/exceptions；
@@ -32,6 +32,7 @@ const flag = (name) => args.includes(name);
 const askIndex = args.indexOf('--ask');
 const ask = askIndex >= 0 ? (args[askIndex + 1] ?? '用一句话自报角色与职责。') : undefined;
 const keepBrowser = flag('--keep-browser');
+const saveEvidence = flag('--evidence');   // 成功也落 verdict/截图（R3-23；默认只在失败时落）
 
 if (guiUrl === undefined || !/^https?:\/\//.test(guiUrl) || !guiUrl.includes('token=')) {
   console.error("cdp-probe: PASS a booted GUI URL like 'http://127.0.0.1:<port>/?token=<t>'（demo.md §前置产出）");
@@ -95,7 +96,7 @@ async function writeEvidence(reason) {
   if (typeof handle.screenshot === 'function') {
     await handle.screenshot(join(dir, 'page.png')).catch(() => {});
   }
-  console.error(`cdp-probe: 失败现场 = ${dir}`);
+  console.error(`cdp-probe: 证据目录 = ${dir}`);
 }
 
 
@@ -114,6 +115,22 @@ try {
     if (!composerReady) await sleep(500);
   }
   verdict.composerReady = composerReady;
+
+  // 未登录/未配凭据的 home 会停在 onboarding（add API key / sign in）——那是**环境未就绪**，
+  // 不是页面渲染坏（R3-23：盘上 2026-10-26 的现场就是 0/9 页签 + blank console）。判成 exit 2，
+  // 免得 agent 把「没配 key」误诊成 client 崩了。
+  if (!composerReady) {
+    const bodyText = await evaluate('document.body.innerText').catch(() => '');
+    const pendingOnboarding = typeof bodyText === 'string' && /Add API Key|Sign in to your DeepSeek account/i.test(bodyText);
+    if (pendingOnboarding) {
+      verdict.reason = 'not-onboarded';
+      verdict.evidenceDir = await writeEvidence('not-onboarded');
+      if (!keepBrowser) await handle.settle();
+      console.log(JSON.stringify(verdict, null, 2));
+      console.error('cdp-probe: 页面停在登录/凭据引导——该 home 未就绪（exit 2），不是渲染失败；先配凭据或换已 onboarding 的 home。');
+      process.exit(2);
+    }
+  }
 
   // 首启双模态（0.2.0 起两个：Internal Testing Notice + Preview Notice；Continue 同名按钮）。
   // 每个新浏览器上下文都会再弹——CDP 探针每次都是新上下文，必须处理。
@@ -221,6 +238,7 @@ try {
     || verdict.exceptions.length > 0
     || (ask !== undefined && (verdict.askError !== undefined || verdict.askTranscriptGrew !== true));
   if (bad) await writeEvidence('assertion');
+  else if (saveEvidence) { verdict.evidenceDir = await writeEvidence('pass'); }
   if (!keepBrowser) await handle.settle();
 }
 

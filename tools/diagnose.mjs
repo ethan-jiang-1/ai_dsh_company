@@ -2,8 +2,9 @@
 // 状态：常驻
 // 何时跑：一场会话/动议跑完后要回答「刚才哪里不对」时；或用户报症状、你要先读日志再猜原因时。
 // 作用：从 dev home 的会话日志里折出失败摘要——非 completed 的 turn、tool/result 错误、
-//   被拒/非 allow 的审批、待答问询、present 调用、最后 assistant 正文；只读、无模型、无浏览器。
-// 用法：source run/env.sh && node tools/diagnose.mjs [--session <slug>[/<id前缀>]] [--json] [--home <路径>]
+//   被拒/非 allow 的审批、待答问询、present 调用、最后 assistant 正文；中断轮（有 start 无 end）与工具调用统计；
+//   只读、无模型、无浏览器。`--strict` = 有失败即 exit 1（默认 0）。
+// 用法：source run/env.sh && node tools/diagnose.mjs [--session <slug>[/<id前缀>]] [--json] [--home <路径>] [--strict]
 //   不给 --session = 选最近更新的会话；日志优先走 pickSessionLog（zstd 多帧用 CLI 解）。
 // 前置：dev home 有 sessions/；离开 dev home 时 fail-closed（requireDevHome）。
 // `--home <路径>`（2026-10-23）：显式读一个**非 dev home**（如日用 `~/.dsh`——Web GUI 会话就住那儿）的会话日志。
@@ -21,6 +22,8 @@ const arg = (name) => {
   return index === -1 ? undefined : args[index + 1]
 }
 const JSON_OUT = args.includes('--json')
+// --strict：把「摘要里有失败」变成非零退出（默认 0 保持只读摘要的兼容语义）。
+const STRICT = args.includes('--strict')
 
 const HOME_ARG = arg('home')
 let home
@@ -124,8 +127,14 @@ const s = summary.session
 console.log(`SESSION ${target.slug}/${target.id}`)
 console.log(`PRESET ${s.preset === '' ? '?' : s.preset}  CWD ${s.cwd === '' ? '?' : s.cwd}`)
 console.log(`LOG ${logPath}${badLines > 0 ? `（${String(badLines)} 行坏 JSON 已跳过）` : ''}`)
-console.log(`EVENTS total=${String(summary.total)} turns=${String(summary.turns)} nonCompleted=${String(summary.nonCompletedTurns.length)} toolErrors=${String(summary.toolErrors.length)} approvals=${String(summary.approvals.length)} pendingQuestions=${String(summary.pendingQuestions.length)} presentCalls=${String(summary.presentCalls.length)}`)
+console.log(`EVENTS total=${String(summary.total)} turns=${String(summary.turns)} interrupted=${String(summary.interruptedTurns.length)} nonCompleted=${String(summary.nonCompletedTurns.length)} toolCalls=${String(summary.toolCalls.total)} toolErrors=${String(summary.toolErrors.length)} approvals=${String(summary.approvals.length)} pendingQuestions=${String(summary.pendingQuestions.length)} presentCalls=${String(summary.presentCalls.length)}`)
+if (summary.toolCalls.total > 0) {
+  const top = Object.entries(summary.toolCalls.byName).sort((left, right) => right[1] - left[1]).slice(0, 6)
+  console.log(`TOOLS ${top.map(([name, count]) => `${name}×${String(count)}`).join(' ')}`)
+}
 const failures = []
+// 中断轮：有 start 无 end = 没跑完（此前会被当成「无失败」，R3-02）。
+for (const turn of summary.interruptedTurns) failures.push(`turn ${String(turn ?? '?')} interrupted（有 turn/start 无 turn/end：进程被杀/崩溃，不是 completed）`)
 for (const turn of summary.nonCompletedTurns) failures.push(`turn ${String(turn.turn)} ${turn.kind}${turn.detail === '' ? '' : `：${turn.detail}`}`)
 for (const error of summary.toolErrors) failures.push(`tool error ${error.toolCallId}${error.text === '' ? '' : `：${error.text}`}`)
 for (const approval of summary.approvals) failures.push(`approval ${approval.toolName === '' ? '?' : approval.toolName} → ${approval.decision}`)
@@ -140,3 +149,4 @@ if (summary.lastAssistant.length > 0) {
   console.log('LAST ASSISTANT')
   for (const line of summary.lastAssistant[0].split('\n')) console.log(`  ${redactTokenUrls(line)}`)
 }
+if (STRICT && failures.length > 0) process.exitCode = 1
