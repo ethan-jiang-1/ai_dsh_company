@@ -61,7 +61,7 @@ session-search 索引仍在 profile；升级日志无轮转；client inject 包�
 | `pnpm typecheck` | exit 0 |
 | `preset-smoke` | ALL PASS（含 `session/search` → K cache + 旧 profile 路径缺席） |
 | `release --prepare` / `--verify` | 0.4.1 tarball（125 条目）/ verify 全绿 |
-| 专项 spec | `fs-record-write`（真 fs-local）、`fs-record-sandbox`（真 fs-sandbox policy）、`cultivation`（ctx.fs 通道）、`bundle-manifest`（日志轮转）、`deliverables-catalog`（派生显示） |
+| 专项 spec | `fs-record-write`（真 fs-local）、`fs-record-sandbox`（真 fs-sandbox policy）、`cultivation`（ctx.fs 通道）、`bundle-manifest`（日志轮转）、`deliverables-catalog`（派生显示）；`present-catalog-smoke` 第 5 段 = 真 vendor event → fake domain |
 
 **未验 / 边界**：`fs-sandbox` 的 per-call policy 已有真 `fs-sandbox + sandboxPolicy` 测试
 （根内可写、根外 `FS_SANDBOX_DENIED`；平台 temp 是 writableRoots 允许面，不拿它当反例）；

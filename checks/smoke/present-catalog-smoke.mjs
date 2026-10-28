@@ -6,9 +6,9 @@
 // 证明链：vendor `@deepseek-ai/dsh-tool-present` 执行 → owner session 追加
 // `deliverables/presented` → 本包 `apply()` 注册的 `session/event` 监听 → catalog `presented=true`。
 // 这不是合成事件：event 由 vendor 工具真实产生；只是不经过模型（模型只决定“调不调”，不决定事件形状）。
-// ⚠ 本 smoke 的 host ctx 不 mount `storageDomain` ⇒ 走 legacy 同步路径（旧 W 账本）；
-//   domain 路径（company_deliverables）由 tests/company/presented-domain*.spec +
-//   catalog-wiring 的 fake-facility 集成覆盖；真 profile 的 base 提供 storage-domain。
+// 两段：前半 host ctx 不 mount `storageDomain` ⇒ legacy W 同步路径；第 5 段用 fake
+// `storageDomain` facility + 同一个真 vendor event 走 domain 账本（W false 不再改权威）。
+// 真 profile 的 base 提供 storage-domain；真文件 domain 由 presented-domain-real.spec 覆盖。
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -136,6 +136,48 @@ try {
   apply(makeHostCtx().ctx)
   const audited = JSON.parse(readFileSync(join(workspace, 'kb/deliverables-index.json'), 'utf8'))
   check('false 审计在重建索引后仍保留', audited.entries?.find(item => item.slug === 'alpha')?.presented === false, JSON.stringify(audited.entries ?? null))
+
+  // 5. 真 vendor event → ctx.storageDomain（2026-10-28 二轮）：同一 present 事件走 domain 账本，
+  //    W false 不再改权威；证明 vendor 事件与 domain 两条已测路径能拼在一起。
+  const domainState = new Map()
+  const domainFacility = {
+    async open() {
+      return {
+        table: () => ({
+          get: key => domainState.get(key),
+          put: async (key, value) => { domainState.set(key, structuredClone(value)) },
+        }),
+        close: async () => {},
+      }
+    },
+  }
+  const makeDomainHostCtx = () => {
+    const listeners = new Map()
+    const ctx = {
+      tools: { register: () => {} }, commands: { register: () => {} },
+      on: (name, listener) => { listeners.set(name, [...(listeners.get(name) ?? []), listener]) },
+      logger: { info: () => {}, warn: message => console.error(`  warn ${message}`) },
+      get: name => name === 'storageDomain' ? domainFacility : name === 'sessionQuery' ? ctx.sessionQuery : undefined,
+      effect: callback => { const dispose = callback(); return dispose },
+      inject: (deps, callback) => { if (deps.includes('sessionQuery') && ctx.sessionQuery !== undefined) callback({ sessionQuery: ctx.sessionQuery }) },
+    }
+    return { ctx, listeners }
+  }
+  const domainHost = makeDomainHostCtx()
+  apply(domainHost.ctx)
+  const waitFor = async predicate => {
+    const deadline = Date.now() + 5_000
+    while (!predicate() && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 25))
+  }
+  await waitFor(() => domainState.get('state') !== undefined)
+  const domainListeners = domainHost.listeners.get('session/event') ?? []
+  check('domain host 注册了 session/event 监听', domainListeners.length > 0)
+  for (const listener of domainListeners) listener(owner.session, event)
+  await waitFor(() => domainState.get('state')?.paths?.['deliverables/2026-10-25-alpha/final.md'] === true)
+  check('vendor event 写入 domain 账本', domainState.get('state')?.paths?.['deliverables/2026-10-25-alpha/final.md'] === true, JSON.stringify(domainState.get('state') ?? null))
+  check('domain 权威不受 W false 影响', domainState.get('state')?.paths?.['deliverables/2026-10-25-alpha/final.md'] === true)
+  const domainIndex = JSON.parse(readFileSync(join(workspace, 'kb/deliverables-index.json'), 'utf8'))
+  check('domain 路径重建的 catalog presented=true', domainIndex.entries?.find(item => item.slug === 'alpha')?.presented === true, JSON.stringify(domainIndex.entries ?? null))
 } catch (error) {
   failures.push(error.message)
   console.error(`present-catalog-smoke: ${error.stack ?? error.message}`)

@@ -32,7 +32,7 @@ M4 已落地（peer + 受控 lock、0.4.0、安装手册/CHANGELOG、`release --
 | 类型 | `pnpm typecheck` → exit 0 |
 | 真实安装 | `release-smoke` → **ALL PASS**（0.4.0 tarball → 干净 profile → 首启/二启零变更） |
 | 生命周期 | `lifecycle-smoke` → **ALL PASS**（卸载 / business 恢复 / 搬 home；domain 账本 + `company/methods`） |
-| 账本 | `present-catalog-smoke` ALL PASS（legacy fallback）；`presented-domain*.spec` 真设施迁移/写入/篡改隔离 |
+| 账本 | `present-catalog-smoke` ALL PASS（legacy W + fake domain 两段，真 vendor event）；`presented-domain*.spec` 真设施迁移/写入/篡改隔离 |
 | 方法层 | `preset-smoke` ALL PASS；`cultivation-method-layer-probe` ALL PASS（adopt/撤回/跨会话/角色闸） |
 | 撤回恢复 | `revoke-recovery-smoke` → **ALL PASS**（0.4.0 真 host 启动） |
 | 发布 | `pnpm release --prepare` 产出 0.4.0 tarball/manual；`release --check` 见收尾回执 |
