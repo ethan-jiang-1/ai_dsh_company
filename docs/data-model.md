@@ -70,5 +70,6 @@ workspace 沙箱、session event 校验、storage domain schema 与 approval。�
 - Host 插件在进程内、沙箱之外执行；包目录只读；沙箱只管“改”，读不受限。
 - H 是**写边界**，不是保密边界：模型可读 home 文件，但不应能经工具写 H；`danger-full-access` 下无文件围栏，H/方法层的隔离承诺都降级为约定。
 - 角色边界、owners、签字线是 prompt/approval 级，不是数据 ACL；**不做 per-role 数据隔离**。
+- `AGENTS.md` / `owners.md` / CHARTER 是指令/治理面（W，可写）：模型改它会影响后续会话的指令链，并被基部哈希视为“用户改过”；这是约定，不是 ACL。
 - 公司内容会作为工具结果/指令进入模型请求；本包不向第三方上传；client-errors/日志可能含 URL，按普通文件处理。
 - 单 Host、单 `DSH_HOME`；多租户/跨机器同步、session 删除 API、多 Host 事务不在范围；不引入 E1 依赖，不新增 event 类型。

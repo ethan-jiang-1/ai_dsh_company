@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-当前活跃 0 张。2026-10-28 数据设计硬化卡已结归档（M1–M4 落地，0.4.0；去向 = implemented Note），见 [归档](../_archive/settled_issues/2026-10-28-data-design-hardening.md)。2026-10-28 第四轮六维打扫已结归档（A–E 全批；六维复评 D1–D6 = A-；去向 = 12 篇 implemented Note，见[归档卡](../_archive/settled_issues/2026-10-28-repo-hygiene-round4.md)）。2026-10-28 六维提分已结归档（D1/D4/D5 → A-；三批 + 认证档，去向 = 三篇 Note，见[归档卡](../_archive/settled_issues/2026-10-27-six-dim-raise.md)）。2026-10-27 的第三轮六维度打扫已结归档（A/B/C/D 全批；去向 = 六篇 implemented Note，见[归档卡](../_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)）。
+当前活跃 1 张：[2026-10-28-data-design-round2](2026-10-28-data-design-round2.md)（FAQ 24 二轮审计残余：ctx.fs 写通道 / catalog 读信任 / K 落点 / 指令面 / 日志 / namespace / T4-T7 / client peers；等人拍板）。2026-10-28 数据设计硬化卡已结归档（M1–M4 落地，0.4.0；去向 = implemented Note），见 [归档](../_archive/settled_issues/2026-10-28-data-design-hardening.md)。2026-10-28 第四轮六维打扫已结归档（A–E 全批；六维复评 D1–D6 = A-；去向 = 12 篇 implemented Note，见[归档卡](../_archive/settled_issues/2026-10-28-repo-hygiene-round4.md)）。2026-10-28 六维提分已结归档（D1/D4/D5 → A-；三批 + 认证档，去向 = 三篇 Note，见[归档卡](../_archive/settled_issues/2026-10-27-six-dim-raise.md)）。2026-10-27 的第三轮六维度打扫已结归档（A/B/C/D 全批；去向 = 六篇 implemented Note，见[归档卡](../_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)）。
 
 2026-10-27 数据模型复盘卡已结并归档（F1–F10 落 [review-followup Note](../../notes/implemented/2026-10-27-data-model-review-followup.md)）。2026-10-27 的数据模型两卡（12 Gap + R1–R6 收尾）已结并归档，去向 = 三份 implemented Note；见 [归档](../_archive/README.md)。2026-10-25 的 6 张收尾卡已结并归档（分发契约 / 生命周期 / 内容自足 / 成品目录 / 独立启动 / 身份守卫），去向 = 三份 implemented Note；见 [归档](../_archive/README.md)。
 

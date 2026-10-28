@@ -28,7 +28,7 @@ M4 已落地（peer + 受控 lock、0.4.0、安装手册/CHANGELOG、`release --
 | 面 | 实跑结果（2026-10-28） |
 |---|---|
 | 单元/回归 | `pnpm test` → **114 files / 995 tests** 全绿 |
-| 结构门禁 | `pnpm verify` → **ALL PASS**（doc-budget data-model 74/76、dist-manual 0.4.0、dist-freshness、release-ready） |
+| 结构门禁 | `pnpm verify` → **ALL PASS**（doc-budget data-model 75/76、dist-manual 0.4.0、dist-freshness、release-ready） |
 | 类型 | `pnpm typecheck` → exit 0 |
 | 真实安装 | `release-smoke` → **ALL PASS**（0.4.0 tarball → 干净 profile → 首启/二启零变更） |
 | 生命周期 | `lifecycle-smoke` → **ALL PASS**（卸载 / business 恢复 / 搬 home；domain 账本 + `company/methods`） |
@@ -36,6 +36,18 @@ M4 已落地（peer + 受控 lock、0.4.0、安装手册/CHANGELOG、`release --
 | 方法层 | `preset-smoke` ALL PASS；`cultivation-method-layer-probe` ALL PASS（adopt/撤回/跨会话/角色闸） |
 | 撤回恢复 | `revoke-recovery-smoke` → **ALL PASS**（0.4.0 真 host 启动） |
 | 发布 | `pnpm release --prepare` 产出 0.4.0 tarball/manual；`release --check` 见收尾回执 |
+
+## 二轮审计（2026-10-28，FAQ 24 01–10）
+
+0.4.0 后按 01–10 重走：发布物（bundle/patch/exports/files/engines/peers）、定义（preset/row id/Config/
+skill/domain API）、数据 6+2、数据卡、T0–T8、六版本/标识符均已对齐或有意排除。
+
+**残余（显式，不阻塞 0.4.0）**：`ctx.fs` 写通道、catalog 读信任、session-search K 落点、指令/治理面可写、
+upgrade log 轮转、全量 `company/` namespace、T4/T7 视觉/回放证据、client inject peers；逐项与选项 =
+[二轮审计卡](../../_backlog/issues/2026-10-28-data-design-round2.md)。
+
+**本轮补充**：`AGENTS.md`/owners/CHARTER 的“W 可写、非 ACL、改后影响基部哈希”进 data-model §六；
+运行态清理 714M → 643M（保留 `harness-home/b`、公司 sessions、业务盘与旧 W 审计备份）。
 
 ## 问题
 
