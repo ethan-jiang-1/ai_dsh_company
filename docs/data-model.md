@@ -17,7 +17,7 @@ workspace 沙箱、session event 校验、storage domain schema 与 approval。�
 | 出厂基部（手册/章程/模板/org） | 用户 / 这个公司 | 用户；manifest 记哈希 | host 自举/升级；人可改 | `<DSH_HOME>/company-workspace/**` 或 `DSH_COMPANY_HOME`；相对路径 | 模型 fs / 用户 | 跟盘；未改替换、改过保留；卸载不删 | manifest v1；bootstrap/lifecycle |
 | 扩张内容（journal/KB/台账/交付物） | 用户 / 这个公司 | 用户 / 角色 | 模型 fs + 人 | 同上；`kb/`、`deliverables/` | 模型 fs / 用户 / 客户端 | 跟盘；无自动 GC | 无（内容）；文件测试 |
 | 培养记录 | 公司 / 角色 | 记录文件 | 模型 `cultivation_propose`（只建）；人命令改 | `<company>/cultivation/records/*.md`；文件名 id | 模型 fs / 客户端 / 用户 | 跟盘；archive/purge 人工 | `schema: 1`；cultivation spec |
-| 方法层 | 部署者 / 角色 | 记录（方法文件是部署产物） | **仅人** `/cultivation adopt` | `<DSH_HOME>/profiles/<p>/company-cultivation/<role>/`（M3 目标见 RFC） | 模型经 skill / 用户 | 跟 profile；卸载保留 | skill loader；probe |
+| 方法层 | 部署者 / 角色 | 记录（方法文件是部署产物） | **仅人** `/cultivation adopt` | `<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`（旧 profile 路径只读留一版） | 模型经 skill / 用户 | 跟 home；卸载保留 | skill loader；method-migration spec |
 | 成品索引 | 公司 / 盘上 meta/final | 派生 | host catalog | `<company>/kb/deliverables-index.json` | 模型 fs / 客户端 | 可删可重建；显示缓存 | schema 1；catalog spec |
 | `presented` 账本 | 操作员 / 这次交付 | domain `company_deliverables`（true 来自事件，false 人审） | host 事件 + 人命令；模型不能写 domain | `<DSH_HOME>/storages/company_deliverables.json`；旧 W `kb/deliverables-presented.json` 只读留一版 | 用户 / 索引派生 | 跟 home；删了丢 false/true 背书 | domain v1 + schema 1；tamper/backfill |
 | writer lease | 进程 / 这个 home | 进程 | host apply | `<DSH_HOME>/company-pack.lock` | 宿主 | 进程持有；stale 接管 | schema 1；lease spec |
@@ -42,7 +42,7 @@ workspace 沙箱、session event 校验、storage domain schema 与 approval。�
 | 公司盘写入 | fs-sandbox / bash 沙箱 | `workspace-write` 硬；`danger-full-access` 无 | 文案限定模式 |
 | 审计账本 | domain（宿主 KV） | 硬（模型无工具写）；`danger-full-access` 下文件可改但 domain 版本仍校验 | 已迁；旧 W 只读留一版 |
 | 成品索引 | W 文件 | 软且派生 | 只当显示缓存 |
-| 方法层 | workspace 外 profile 目录 | `workspace-write` 硬；`danger-full-access` 软 | RFC M3 迁 home |
+| 方法层 | 公司级 home 目录（workspace 外） | 硬（`workspace-write`；`danger-full-access` 下降级为约定） | 已迁（M3） |
 | 角色私有 | `kb/<role>` 约定 / writeScopes advisory | 软 | 写清不是隔离 |
 | 签字线 | prompt + `request_signoff` | 只有工具被调用时硬 | 改文案，不改机制 |
 
@@ -50,7 +50,7 @@ workspace 沙箱、session event 校验、storage domain schema 与 approval。�
 
 - **公司盘根是唯一业务写作用域**：records/catalog/method 命令只认 `bundle.json` 解析出的 company root；会话 cwd 在盘子目录/盘外时拒绝公司数据写入。
 - **落点安全与换盘**：`DSH_COMPANY_HOME` 等于/包含 `DSH_HOME` 或 OS home、或指向普通文件时停写并告警；换盘默认硬阻断，`DSH_COMPANY_REBIND=1` + 旧盘已不存在 + 新盘形状正确时才备份 manifest → 改写 workspace → 记日志；不迁 session `header.cwd`。
-- **方法层当前是 profile 级**：同 home 多 profile 共享盘/记录但方法各一份；启动点名多个装本包的 profile。**这是已知错配，M3 迁公司级**（见 RFC）。
+- **方法层是公司级**：`<DSH_HOME>/company/methods/<role>/`；同 home 多 profile 共享；旧 `<profile>/company-cultivation/` 只读留一版，host 启动一次性迁移（冲突落 `.legacy/`）。
 - **键**：`bundle.json.workspace` 在 home 内记相对路径、在外记绝对路径；不用 `workspaceId` 当长期键；DSH 的 workspace 登记是另一本账，搬 home 后需人重加。
 
 ## 五、版本与标识符
@@ -68,7 +68,7 @@ workspace 沙箱、session event 校验、storage domain schema 与 approval。�
 ## 六、边界与威胁模型
 
 - Host 插件在进程内、沙箱之外执行；包目录只读；沙箱只管“改”，读不受限。
-- H 是**写边界**，不是保密边界：模型可读 home 文件，但不应能经工具写 H；`danger-full-access` 下无文件围栏，H/M3 的隔离承诺都降级为约定。
+- H 是**写边界**，不是保密边界：模型可读 home 文件，但不应能经工具写 H；`danger-full-access` 下无文件围栏，H/方法层的隔离承诺都降级为约定。
 - 角色边界、owners、签字线是 prompt/approval 级，不是数据 ACL；**不做 per-role 数据隔离**。
 - 公司内容会作为工具结果/指令进入模型请求；本包不向第三方上传；client-errors/日志可能含 URL，按普通文件处理。
 - 单 Host、单 `DSH_HOME`；多租户/跨机器同步、session 删除 API、多 Host 事务不在范围；不引入 E1 依赖，不新增 event 类型。

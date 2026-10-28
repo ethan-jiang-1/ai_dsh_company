@@ -149,7 +149,7 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 | 面 | 动作 | 谁 |
 |---|---|---|
 | **通用方法**（pack skills） | 改 `packages/company-pack/presets/<role>/skills/`——跨公司可复用的方法论 | 维护者（repo 写权限 = 培养权不变） |
-| **角色方法层**（2026-10-13 新增；2026-10-17 加 GUI 行动面） | 本人采纳培养记录 ⇒ host 写 `<profile>/company-cultivation/<role>/<slug>/SKILL.md`——部署本地、按角色隔离、pack 升级不擦 | 角色驾驭者（人）在培养面板点「采纳」或敲 `/cultivation adopt`——**同一条人侧命令通道**（面板经 `remote.commands.execute` 发同一行命令，host 照旧记 `source: user`，角色闸不变）；分身只能用 `cultivation_propose` 工具提案 |
+| **角色方法层**（2026-10-13 新增；2026-10-17 加 GUI 行动面；2026-10-28 M3 公司级） | 本人采纳培养记录 ⇒ host 写 `<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`——公司级、按角色隔离、pack 升级不擦；旧 `<profile>/company-cultivation/` 只读留一版 | 角色驾驭者（人）在培养面板点「采纳」或敲 `/cultivation adopt`——**同一条人侧命令通道**（面板经 `remote.commands.execute` 发同一行命令，host 照旧记 `source: user`，角色闸不变）；分身只能用 `cultivation_propose` 工具提案 |
 | **素材**（journal） | 角色会话收工纪要，人审后按「轮末收敛」压进 CHARTER | 分身写、人收敛 |
 
 **培养记录 = 公司盘 `cultivation/records/*.md`**（纠正/建议/采纳回执/验证引用；UI 经

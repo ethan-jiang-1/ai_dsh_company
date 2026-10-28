@@ -5,6 +5,10 @@
 **部分取代**：「培养动作 = 改 pack preset」扩为三面（通用方法/角色方法层/素材），其生效边界表与
 自改否决维持有效——双方互链，D25 条目已指回本 Note。）
 
+> **2026-10-28 M3 部分取代作用域**：方法层已从 `<profile>/company-cultivation/<role>/` 迁
+> `<DSH_HOME>/company/methods/<role>/`（旧 profile 路径只读留一版，host 启动一次性迁移）；
+> 提案/采纳/角色闸/沙箱边界等其余决定保留。见 [RFC](../proposed/2026-10-28-data-design-hardening.md)。
+
 ## ① Motivation（外部可观察行为）
 
 用户在公司页看到「用量」子页后提出改为「培养」：每个人培养自己的角色分身，CEO 可给非 CEO
@@ -22,7 +26,8 @@ UI 半边，不是独立过渡）；③ CEO 跨角色 = **仅建议权，目标�
 - **权限分工**：分身提案 = `cultivation_propose` 工具（host 注册，署 preset/会话，只开提案）；
   人侧采纳/拒绝/撤回/验证 = `ctx.commands.register` 的 `/cultivation` 命令族（不经模型、run 进
   会话日志；**采纳角色闸** = 命令所在会话 preset === 记录目标角色——仅建议权拍板③的机制面）。
-- **方法层**：每角色 preset 第二 `customSkillDirs` 锚 `baseUrl`（实测 = `<DSH_HOME>/profiles/<name>/company-cultivation/<role>/`）；
+- **方法层**：每角色 preset 第二 `customSkillDirs` 锚 `baseUrl`（现 = `<DSH_HOME>/company/methods/<role>/`；
+  M3 前 = `<DSH_HOME>/profiles/<name>/company-cultivation/<role>/`，旧路径只读留一版）；
   host `config.cultivationRoot` 同 `baseUrl` 同前缀（`cordis.patch.yml` `company-client` 行 `!!js`）——
   构造上对齐。pack 升级不擦；CEO 委派 child 继承 ceo 组合 ⇒ 不误挂职能角色方法（delegation-smoke 维持）。
 

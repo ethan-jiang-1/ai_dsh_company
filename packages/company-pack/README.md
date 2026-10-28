@@ -42,7 +42,7 @@
 | 包 `C` | 无用户数据；`workspace/` 是只读 starter | 安装包目录 | 升级整体替换；**绝不在包目录写 data/cache/日志** |
 | 工作区 `W` | 公司盘：手册/章程/台账/交付物/`kb/company.md`/`kb/<role>/journal`/`cultivation/records`（归档 `records-archive/`、恢复日志 `.pending-revoke.json`）；host 生成的派生索引 `kb/deliverables-index.json`（审计账本已迁 H domain，旧 W 文件只读留一版） | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME`（培养/成品命令只在盘根生效） | 不动；基部文件按哈希替换、你改过的保留 |
 | 用户 `U` | 用户全局 AGENTS/skills（本包不写） | `$DSH_HOME/AGENTS.md`、`$DSH_HOME/skills`、`~/.agents` | 用户维护；本包只读/不碰 |
-| 宿主状态 `H` | `bundle.json`（身份/基部指纹）、`bundle.json.bak-*`（显式换盘备份，只留最新 5 份）、`company-pack.lock`（writer lease）、`logs/company-pack-upgrade.log`、`logs/company-client-errors.log`（256 KiB 轮转）、`storages/company_deliverables.json`（`presented` 审计 domain）、`profiles/<p>/company-cultivation/<role>/`（方法层，当前 profile 级） | `<DSH_HOME>` | 不动；方法层 M3 迁公司级，同 home 多 profile 不再各一份 |
+| 宿主状态 `H` | `bundle.json`（身份/基部指纹）、`bundle.json.bak-*`（显式换盘备份，只留最新 5 份）、`company-pack.lock`（writer lease）、`logs/company-pack-upgrade.log`、`logs/company-client-errors.log`（256 KiB 轮转）、`storages/company_deliverables.json`（`presented` 审计 domain）、`company/methods/<role>/`（方法层，公司级；旧 profile 路径只读留一版） | `<DSH_HOME>` | 不动；方法层同 home 多 profile 共享 |
 | 会话 `S` | 会话日志由宿主拥有；本包不自造 event 类型；目录名/session header 含 cwd 绝对路径 | `<DSH_HOME>/sessions/` | 不动 |
 | 缓存 `K` | `company-client` 行声明的全文索引（派生；可能含会话正文） | `<DSH_HOME>/profiles/<p>/session-search.db` | 可删可重建；卸载不删；备份按敏感数据处理 |
 | 凭据 `X` | 不写入包；走 `<DSH_HOME>/.credentials.yaml` / 环境变量 | home | 用户管理；文件必须 0600 |
@@ -63,13 +63,13 @@
 
 ## Backup
 
-- `business` = 公司盘（journal/交付物/records/KB）+ `bundle.json` + `storages/company_deliverables.json`（presented domain）+ 方法层；不含 sessions、凭据、索引、宿主日志。
+- `business` = 公司盘（journal/交付物/records/KB）+ `bundle.json` + `storages/company_deliverables.json`（presented domain）+ `company/methods/`（方法层）；不含 sessions、凭据、索引、宿主日志。
 - `full` = 整个 `DSH_HOME`；含会话正文/密钥/绝对路径，加密、限权、不共享。
 - 恢复 `business`：新 home 解包 → `plugin add` 同版本 → 启动；旧会话不回来。`full` 搬 home 后 DSH workspace 登记与 session cwd 仍是旧绝对路径，需人重加。
 
 ## Uninstall
 
-`dsh plugin --profile web remove dsh-company-pack`：只摘插件与 profile 层，公司盘（含 `cultivation/records-archive/`）、旧 W `kb/deliverables-presented.json`、`storages/company_deliverables.json`、sessions、`bundle.json`/`bundle.json.bak-*`、方法层、`session-search.db` 保留。
+`dsh plugin --profile web remove dsh-company-pack`：只摘插件与 profile 层，公司盘（含 `cultivation/records-archive/`）、旧 W `kb/deliverables-presented.json`、`storages/company_deliverables.json`、sessions、`bundle.json`/`bundle.json.bak-*`、`company/methods/`、`session-search.db` 保留。
 要彻底删除一个部署，确认备份后删除它的整个 `<DSH_HOME>`。详见《安装手册》第六节。
 
 ## Owner（维护者）

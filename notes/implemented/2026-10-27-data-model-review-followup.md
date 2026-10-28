@@ -13,7 +13,7 @@
 2. **F2**：`CultivationRecord.bodyTruncated`；hook 只为 open + 最近 120 条非 open 读全文，其余标摘要；全文读失败计入未展开；面板展开明示“正文只加载了摘要”。
 3. **F3**：present-catalog-smoke 改用 vendor `TestSessionQueryEngine` + `SessionStore`（live session）回扫事件；不再用手写 fake query。
 4. **F4**：新增 `revoke-recovery-smoke`，在真 tarball home/公司盘/方法层注入两种崩溃态，启动真 host 验证回滚/补完。
-5. **F5**：lifecycle business 恢复 fixture 加 `company-cultivation/`，恢复后断方法文件仍在。
+5. **F5**：lifecycle business 恢复 fixture 加 `company/methods/`，恢复后断方法文件仍在。
 6. **F6**：`/cultivation purge <天数>` 清旧 records-archive；`pruneBundleBackups` 只保留最新 5 份换盘备份；升级日志保持追加（人工清理）。
 7. **F7**：`/deliverables audit <final.md> true|false` 写 presented 账本并重生成索引；不再要求手改 JSON。
 8. **F8**：`tests/fixtures/bundle-manifest-v1.json` + v2 unsupported 边界演练；真实 v2 schema 未出现，不造猜测。

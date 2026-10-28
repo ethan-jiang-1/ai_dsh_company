@@ -253,7 +253,7 @@ try {
     if (role === null) throw new Error('未拿到角色')
     seedRecord(conflictId, { targetRole: role, expectation: 'UX场景：撞名失败', body: '做法：测失败态。' })
     seeded.push(conflictId)
-    const dir = join(home, 'profiles', 'web', 'company-cultivation', role, `method-${conflictId}`)
+    const dir = join(home, 'company', 'methods', role, `method-${conflictId}`)
     mkdirSync(dir, { recursive: true })
     writeFileSync(join(dir, 'SKILL.md'), '---\nname: occupied\ndescription: 占位\n---\n\n占位\n')
     await wake()
@@ -1072,14 +1072,14 @@ try {
 // ── 清理：只删本档自己的记录与方法 ─────────────────────────────────────────────
 for (const id of seeded) rmSync(join(RECORDS, `${id}.md`), { force: true })
 if (role !== null) {
-  for (const id of seeded) rmSync(join(home, 'profiles', 'web', 'company-cultivation', role, `method-${id}`), { recursive: true, force: true })
-  try { require('node:fs').rmdirSync(join(home, 'profiles', 'web', 'company-cultivation', role)) } catch { /* 非空则留 */ }
+  for (const id of seeded) rmSync(join(home, 'company', 'methods', role, `method-${id}`), { recursive: true, force: true })
+  try { require('node:fs').rmdirSync(join(home, 'company', 'methods', role)) } catch { /* 非空则留 */ }
 }
 if (existsSync(RECORDS)) for (const name of readdirSync(RECORDS)) if (name.startsWith(`uxsc-${STAMP}-`)) rmSync(join(RECORDS, name), { force: true })
 // 方法层里本轮的残留也清（唯一 id 下不会有别人的东西）
 for (const roleDir of [role, 'ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']) {
   if (roleDir === null) continue
-  const base = join(home, 'profiles', 'web', 'company-cultivation', roleDir)
+  const base = join(home, 'company', 'methods', roleDir)
   if (!existsSync(base)) continue
   for (const name of readdirSync(base)) if (name.includes(`uxsc-${STAMP}`)) rmSync(join(base, name), { recursive: true, force: true })
 }

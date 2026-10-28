@@ -9,11 +9,12 @@
  *
  * 两个落点：
  * - **培养记录** = 会话 cwd 的 `cultivation/records/*.md`（公司盘共享，UI 与分身均可读，写留日志）；
- * - **方法层** = `<profile>/company-cultivation/<role>/<slug>/SKILL.md`——根由 bundle patch 行
- *   config.cultivationRoot 注入（!!js 锚 baseUrl = loader 树根），与各角色 preset 的第二
- *   customSkillDirs 同前缀构造对齐；在分身 workspace 沙箱之外（D25 自改否决维持——分身写不了），
- *   pack 升级不擦。生效边界：**新开的该角色会话**加载（运行中会话不吃热更新——presets.md
- *   生效边界表）。
+ * - **方法层** = `<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`（2026-10-28 M3 起公司级；
+ *   旧 `<profile>/company-cultivation/<role>/` 只读留一版，host 启动一次性迁移）——根由 bundle patch
+ *   行 config.cultivationRoot 注入（!!js 锚 baseUrl = loader 树根），与各角色 preset 的第二
+ *   customSkillDirs 同前缀构造对齐；在分身 workspace 沙箱之外（D25 自改否决维持——workspace-write
+ *   下分身写不了；danger-full-access 无围栏），pack 升级不擦。生效边界：**新开的该角色会话**加载
+ *   （运行中会话不吃热更新——presets.md 生效边界表）。
  *
  * 文件操作与路径安全判据住 `./cultivation-storage.ts`（2026-10-16 拆出——存储层独立成模块，
  * 本文件只留命令语义与注册面）；安全不变量与威胁模型见该模块头注。
@@ -57,7 +58,7 @@ import { canonicalPath } from './paths.ts'
 
 /** bundle patch 行注入的 host config（cordis.patch.yml `company-client` 行）。 */
 export interface CultivationHostConfig {
-  /** 方法层根（绝对路径）；缺席时 adopt/revoke 明确报错，提案/拒绝照常（记录面不依赖它）。 */
+  /** 方法层根（绝对路径，公司级 `$DSH_HOME/company/methods/`）；缺席时 adopt/revoke 明确报错。 */
   readonly cultivationRoot?: string
 }
 

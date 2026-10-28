@@ -74,7 +74,7 @@ const seeds = ROLES.map(role => ({
 }))
 const CROSS_EXPECTATION = 'GUI探针：跨角色建议（可见但不该给采纳把手）'
 const PROFILE_WEB = join(home, 'profiles', 'web')
-const METHOD_ROOT_OF = (role) => join(PROFILE_WEB, 'company-cultivation', role)
+const METHOD_ROOT_OF = (role) => join(home, 'company', 'methods', role)
 const RECORDS_DIR = join(WORKSPACE, 'cultivation', 'records')
 const OUT_DIR = join(ROOT, 'runtime', 'human-exits-evidence')
 const FIXTURE_DIR = join(ROOT, 'snapshots', 'visual', 'cultivation-gui')

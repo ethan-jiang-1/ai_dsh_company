@@ -5,7 +5,9 @@ M2/M3 动数据路径前单独呈迁移/回滚一页纸）
 进度：M1 已落地（2026-10-28；records schema、client-errors 迁 home logs+轮转、T4/preset-smoke
 数据感知、data-model v2、README Data 6+2、home 白名单；111 files / 983 tests、verify、typecheck 全绿）。
 M2 已落地（2026-10-28；presented 账本迁 domain `company_deliverables`、旧 W 迁移/fallback、
-release/lifecycle smoke 全绿）。M3–M4 待做。
+release/lifecycle smoke 全绿）。
+M3 已落地（2026-10-28；方法层迁 `<DSH_HOME>/company/methods/<role>/`、旧 profile 迁移/冲突备份、
+五份 preset + host config 同改；preset-smoke/method-layer-probe/lifecycle/release 全绿）。M4 待做。
 已知：`@deepseek-ai/dsh-storage-domain` / `zod` 由 base 提供；pack `package.json` 的 peer 声明 +
 可控 lock 更新留 M4（本轮不引入 lock 漂移；release-smoke 真装通过）。
 

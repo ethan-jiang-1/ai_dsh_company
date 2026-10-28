@@ -81,7 +81,7 @@ describe('host apply 显式换盘', () => {
       process.env.DSH_COMPANY_HOME = home.ws
       process.env.DSH_COMPANY_BOOTSTRAP = 'off'
       apply(ctx as never)
-      expect(warn.mock.calls.some(([message]) => String(message).includes('方法层按 profile 隔离'))).toBe(true)
+      expect(warn.mock.calls.some(([message]) => String(message).includes('方法层/记录/公司盘都是公司级共享'))).toBe(true)
     } finally {
       rmSync(home.root, { recursive: true, force: true })
     }

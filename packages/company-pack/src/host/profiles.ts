@@ -1,9 +1,9 @@
 /**
- * profile 边界体检（2026-10-27 G7）：方法层是 profile 级，同 home 多 profile 不共享。
+ * profile 体检（2026-10-27 G7；2026-10-28 M3 起方法层公司级共享）：列出同 home 装了本包的 profile。
  *
- * 一个公司 = 一个 web profile 是当前合同；但用户完全可以在同 home 再装一个 profile。
- * 这里只读 `profiles/<profile>/package.json` 的 `dsh.profile.bundles`，点名哪些 profile 装了本包，
- * 供 host 在启动输出里告警——不改变任何 profile，也不冒充隔离。
+ * 一个公司 = 一个 web profile 仍是建议；用户可以在同 home 再装。方法层/记录/公司盘都是公司级共享，
+ * 多 profile 不再造成方法分叉，只会分叉会话与偏好。这里只读 `profiles/<profile>/package.json` 的
+ * `dsh.profile.bundles`，供 host 启动点名——不改变任何 profile。
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'

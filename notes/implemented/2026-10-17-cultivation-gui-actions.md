@@ -44,7 +44,7 @@
 | 读模型（S4）：`pnpm exec vitest run tests/company/cultivation.spec.ts` | 25/25 PASS（新增「正文进客户端读模型：多行原样带出」） |
 | 全量 keyless：`pnpm test` | **64 files / 616 tests PASS** |
 | 真挂载：`source run/env.sh && node checks/smoke/client-load-smoke.mjs` | ALL PASS（真浏览器零挂载失败；新注入面 `remote.commands` 不炸） |
-| 真行为：`source run/env.sh && node probes/browser-visual/cultivation-gui-probe.mjs [--fixture]` | **ALL PASS**：① 面板走人在界面上的真路径打开、把手只给本角色；② 点「采纳」→ 公司盘记录翻 `adopted` + `methodSlug` + 方法 `SKILL.md` 落 `<profile>/company-cultivation/<role>/`；③ 该会话日志 `command/run` 与 `command/done` **按 commandId 配对**、`source.kind=user`、args 含本次采纳线；④ 跨角色采纳被 host 拒（文案含「仅建议权」）；⑤ 创作表单提交 → 公司盘新增 `status: open` 记录（`proposerKind: human`）；⑥ 零挂载失败；⑦ 出视觉夹具 |
+| 真行为：`source run/env.sh && node probes/browser-visual/cultivation-gui-probe.mjs [--fixture]` | **ALL PASS**：① 面板走人在界面上的真路径打开、把手只给本角色；② 点「采纳」→ 公司盘记录翻 `adopted` + `methodSlug` + 方法 `SKILL.md` 落 `<DSH_HOME>/company/methods/<role>/`；③ 该会话日志 `command/run` 与 `command/done` **按 commandId 配对**、`source.kind=user`、args 含本次采纳线；④ 跨角色采纳被 host 拒（文案含「仅建议权」）；⑤ 创作表单提交 → 公司盘新增 `status: open` 记录（`proposerKind: human`）；⑥ 零挂载失败；⑦ 出视觉夹具 |
 | 结构：`pnpm verify` | ALL PASS |
 
 夹具（`snapshots/visual/cultivation-gui/panel.png`，1440×1000）当场抓到一个真实 UX 缺陷并已修：培养行沿用窄列布局，

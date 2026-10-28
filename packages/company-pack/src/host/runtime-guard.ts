@@ -124,12 +124,12 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
     process.stderr.write(`dsh: ${warning}\n`)
   }
   const expectedWorkspace = canonicalPath(companyHome)
-  // 方法层是 profile 级：同 home 多 profile 不共享。这里只点名，不改 profile、不冒充隔离。
+  // 2026-10-28 M3 起方法层是公司级（同 home 共享）；仍点名多 profile，避免会话/偏好分叉。
   try {
     const profiles = profilesWithCompanyPack(join(bundleHome, 'profiles'))
     if (profiles.length > 1) {
       const warning = `company-pack：同一个 home 里有 ${String(profiles.length)} 个 profile 装了本包（${profiles.join('、')}）；`
-        + '方法层按 profile 隔离，记录/公司盘共享——一个公司请固定用一个 web profile，避免“记录显示已采纳、另一个 profile 不生效”'
+        + '方法层/记录/公司盘都是公司级共享（M3 起）；一个公司建议固定一个 web profile，避免会话与偏好分叉'
       ctx.logger?.warn?.(warning)
       process.stderr.write(`dsh: ${warning}\n`)
     }

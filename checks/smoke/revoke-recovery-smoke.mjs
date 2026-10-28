@@ -35,13 +35,14 @@ let processes
 const recordText = (revoked) => `---\nkind: correction\ntargetRole: ceo\nproposerRole: ceo\nproposerKind: human\nsource: smoke\nexpectation: recovery\nstatus: adopted\nmethodSlug: recovery-method\n${revoked ? `revokedAt: ${REVOKED_AT}\n` : ''}---\n\nthe body\n`
 const recordPath = join(company, 'cultivation/records/20261027-000000-recovery.md')
 const journalPath = join(company, 'cultivation/.pending-revoke.json')
-const methodPath = join(profileDir, 'company-cultivation/ceo/recovery-method/SKILL.md')
+const methodRoot = join(home, 'company', 'methods')
+const methodPath = join(methodRoot, 'ceo/recovery-method/SKILL.md')
 
 const boot = async () => {
   const child = processes.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
   await child.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, 120_000)
   const deadline = Date.now() + 20_000
-  while (!(existsSync(join(company, 'kb/deliverables-index.json')) && existsSync(join(company, 'kb/deliverables-presented.json'))) && Date.now() < deadline) {
+  while (!(existsSync(join(company, 'kb/deliverables-index.json')) && existsSync(join(home, 'storages/company_deliverables.json'))) && Date.now() < deadline) {
     await new Promise(resolve => setTimeout(resolve, 50))
   }
   await child.stop()
@@ -85,7 +86,7 @@ try {
   check('方法还在 ⇒ 方法文件保留', existsSync(methodPath))
   check('方法还在 ⇒ journal 清理', !existsSync(journalPath))
 
-  rmSync(join(profileDir, 'company-cultivation/ceo/recovery-method'), { recursive: true, force: true })
+  rmSync(join(methodRoot, 'ceo/recovery-method'), { recursive: true, force: true })
   writeFileSync(recordPath, oldText)
   writeFileSync(journalPath, JSON.stringify({
     schema: 1, role: 'ceo', slug: 'recovery-method', revokedAt: REVOKED_AT, createdAt: REVOKED_AT,

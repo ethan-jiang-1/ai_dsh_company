@@ -93,13 +93,12 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       for (const skill of skills) {
         expect(readFileSync(join(PRESETS_DIR, role, 'skills', skill.name, 'SKILL.md'), 'utf8')).toContain(`name: ${skill.name}`)
       }
-      // 2026-10-13 培养卡（C 路径）：第二 skill 根 = 部署本地角色方法层（profile 根下
-      // company-cultivation/<role>/，本人采纳的方法落这里、新会话加载；分身在 workspace
-      // 沙箱外不可写）。锚点与 host config 同一 baseUrl 前缀，构造上对齐。
+      // 2026-10-28 M3：第二 skill 根 = 公司级方法层（<DSH_HOME>/company/methods/<role>/）；
+      // 旧 profile 路径只读留一版，host 启动迁移。分身在 workspace 沙箱外不可写（workspace-write）。
       const compose = roleYml(role)
       expect(
-        compose.includes(`company-cultivation/${role}/`),
-        `${role} preset 声明角色方法层根（company-cultivation/${role}/）`,
+        compose.includes(`../../company/methods/${role}/`),
+        `${role} preset 声明公司级方法层根（../../company/methods/${role}/）`,
       ).toBe(true)
     }
   })

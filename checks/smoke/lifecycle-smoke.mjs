@@ -265,7 +265,7 @@ try {
   console.log('⑦ business 备份恢复（公司盘 + bundle.json + 方法层 + domain 账本；不含 sessions）')
   const restoreProfileDir = join(restoreHome, 'profiles', PROFILE)
   const restoreCompanyHome = join(restoreHome, 'tmp/lifecycle-company-workspace')
-  const methodRoot = join(home, 'profiles', PROFILE, 'company-cultivation')
+  const methodRoot = join(home, 'company', 'methods')
   const methodFile = join(methodRoot, 'ceo/lifecycle-method/SKILL.md')
   mkdirSync(join(methodRoot, 'ceo/lifecycle-method'), { recursive: true })
   writeFileSync(methodFile, '---\nname: lifecycle-method\ndescription: restore test\n---\n\n# lifecycle-method\n')
@@ -274,7 +274,8 @@ try {
   cpSync(manifestPath, join(restoreHome, 'bundle.json'))
   mkdirSync(join(restoreHome, 'storages'), { recursive: true })
   cpSync(join(home, 'storages/company_deliverables.json'), join(restoreHome, 'storages/company_deliverables.json'))
-  cpSync(methodRoot, join(restoreProfileDir, 'company-cultivation'), { recursive: true })
+  mkdirSync(join(restoreHome, 'company'), { recursive: true })
+  cpSync(methodRoot, join(restoreHome, 'company', 'methods'), { recursive: true })
   writeFileSync(join(restoreProfileDir, 'package.json'), `${JSON.stringify({
     name: `dsh-profile-${PROFILE}`, private: true,
     dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app'], patchReload: 'startup' } },
@@ -303,7 +304,7 @@ try {
     check('business 恢复公司盘与扩张面仍在', readFileSync(join(restoreCompanyHome, 'AGENTS.md'), 'utf8').includes('lifecycle-keep')
       && existsSync(join(restoreCompanyHome, 'deliverables/2026-10-25-lifecycle/final.md'))
       && existsSync(join(restoreCompanyHome, 'kb/ceo/journal/2026-10-25-lifecycle.md')))
-    check('business 恢复方法层文件仍在', readFileSync(join(restoreProfileDir, 'company-cultivation/ceo/lifecycle-method/SKILL.md'), 'utf8').includes('lifecycle-method'))
+    check('business 恢复方法层文件仍在', readFileSync(join(restoreHome, 'company/methods/ceo/lifecycle-method/SKILL.md'), 'utf8').includes('lifecycle-method'))
     check('business 恢复账本 domain 仍在', existsSync(join(restoreHome, 'storages/company_deliverables.json')))
     check('business 恢复不带 sessions（按合同）', !existsSync(join(restoreHome, 'sessions'))
       || readdirSync(join(restoreHome, 'sessions')).length === 0)

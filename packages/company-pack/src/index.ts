@@ -30,6 +30,7 @@ import {
   type PresentedSessionQuery,
 } from './host/catalog.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
+import { migrateLegacyMethodLayers } from './host/cultivation-storage.ts'
 import {
   auditLedger,
   createPresentedLedgerStore,
@@ -59,8 +60,8 @@ export const inject = ['tools', 'approval', 'commands']
 
 /**
  * bundle patch 行可注入的 host config（`cordis.patch.yml` 的 `company-client` 行）。
- * 2026-10-13 培养卡：`cultivationRoot` = 方法层根（!!js 锚 baseUrl = profile 根下的
- * `company-cultivation/`），与各角色 preset 的第二 customSkillDirs 同前缀构造对齐。
+ * 2026-10-28 M3：`cultivationRoot` = 公司级方法层根（!!js 从 profile 根上两级到
+ * `<DSH_HOME>/company/methods/`），与各角色 preset 的第二 customSkillDirs 同前缀构造对齐。
  */
 export type HostConfig = CultivationHostConfig
 
@@ -82,6 +83,21 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
     : createPresentedLedgerStore(ctx, bundleHome, companyHome)
   // 培养回路（2026-10-13 培养卡）：公司数据只写公司盘根，不跟随 session cwd 的子目录。
   // 身份损坏/更高版本/落点不安全时拒绝公司数据写入，避免写到猜测的默认盘。
+  // 2026-10-28 M3：方法层从 profile 级迁公司级；旧 profile 方法只读留一版，copy 到新根。
+  if (!dataBlocked && config.cultivationRoot !== undefined) {
+    try {
+      const migrated = migrateLegacyMethodLayers(bundleHome, config.cultivationRoot)
+      if (migrated.copied.length > 0) {
+        ctx.logger?.info?.(`company-pack：方法层已迁公司级（${String(migrated.copied.length)} 个；旧 profile 路径只读留一版）`)
+      }
+      if (migrated.conflicts.length > 0) {
+        ctx.logger?.warn?.(`company-pack：方法层迁移冲突 ${String(migrated.conflicts.length)} 个（${migrated.conflicts.join('、')}）；旧版本落 .legacy/，不覆盖新根`)
+      }
+      for (const warning of migrated.warnings) ctx.logger?.warn?.(`company-pack：方法层迁移：${warning}`)
+    } catch (error) {
+      ctx.logger?.warn?.(`company-pack 方法层迁移跳过（不影响运行）：${(error as Error).message}`)
+    }
+  }
   registerCultivation(ctx, config, expectedWorkspace, dataBlocked)
   registerClientDiagnostics(ctx, bundleHome, dataBlocked)
   // 交付审计命令（2026-10-27 F7）：presented=false 的第一入口，不再要求手改 JSON。

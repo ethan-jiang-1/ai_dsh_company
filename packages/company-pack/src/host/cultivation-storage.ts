@@ -15,6 +15,8 @@
  * keyless 判据 = `tests/company/cultivation.spec.ts`（命令行为经 `CultivationStorage` 观察同一面）。
  */
 import {
+  copyFileSync,
+  existsSync,
   linkSync,
   lstatSync,
   mkdirSync,
@@ -26,6 +28,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from 'node:fs'
+import type { Dirent } from 'node:fs'
 import { randomUUID } from 'node:crypto'
 import { dirname, isAbsolute, join, win32 } from 'node:path'
 import {
@@ -87,10 +90,94 @@ function ensureDirectory(path: string): void {
 function ensureMethodRoot(root: string): void {
   let info = lstatOrNull(root)
   if (info === null) {
-    mkdirSync(root)
+    mkdirSync(root, { recursive: true })
     info = lstatOrNull(root)
   }
   if (info === null || info.isSymbolicLink() || !info.isDirectory()) throw new UnsafeCultivationPathError(root)
+}
+
+/** 旧 profile 方法层 → 公司级根的一次性迁移标记（skill loader 忽略非 .md 文件）。 */
+export const METHOD_MIGRATION_MARKER = '.migrated'
+
+/** 一次方法层迁移的结果（host 日志与测试共用）。 */
+export interface MethodMigrationResult {
+  readonly copied: readonly string[]
+  readonly conflicts: readonly string[]
+  readonly warnings: readonly string[]
+  readonly skipped: boolean
+}
+
+/**
+ * 把 `<DSH_HOME>/profiles/<p>/company-cultivation/<role>/<slug>/SKILL.md` 迁到公司级根
+ * （2026-10-28 M3）。只读旧文件、不删；新根已有且内容不同时，旧版本落 `.legacy/<profile>/`
+ * （不是 SKILL.md，不会被 skill loader 当技能）并记 conflict。marker 保证幂等。
+ * @param dshHome - DSH home。
+ * @param methodRoot - 新的公司级方法根。
+ * @param now - 时钟（marker 用）。
+ */
+export function migrateLegacyMethodLayers(
+  dshHome: string,
+  methodRoot: string,
+  now: Date = new Date(),
+): MethodMigrationResult {
+  const result = { copied: [] as string[], conflicts: [] as string[], warnings: [] as string[], skipped: false }
+  if (existsSync(join(methodRoot, METHOD_MIGRATION_MARKER))) return { ...result, skipped: true }
+  ensureMethodRoot(methodRoot)
+  const profilesDir = join(dshHome, 'profiles')
+  let profiles: Dirent[] = []
+  try {
+    profiles = readdirSync(profilesDir, { withFileTypes: true })
+  } catch { /* 没有 profiles：没有旧方法 */ }
+  for (const profile of profiles.filter(entry => entry.isDirectory()).sort((a, b) => a.name.localeCompare(b.name))) {
+    const legacyRoot = join(profilesDir, profile.name, 'company-cultivation')
+    let roles: Dirent[] = []
+    try {
+      roles = readdirSync(legacyRoot, { withFileTypes: true })
+    } catch { continue }
+    for (const role of roles.filter(entry => entry.isDirectory() && ROSTER.has(entry.name))) {
+      const roleRoot = join(legacyRoot, role.name)
+      let slugs: Dirent[] = []
+      try {
+        slugs = readdirSync(roleRoot, { withFileTypes: true })
+      } catch { continue }
+      for (const slug of slugs.filter(entry => entry.isDirectory())) {
+        const source = join(roleRoot, slug.name, 'SKILL.md')
+        const sourceInfo = lstatOrNull(source)
+        if (sourceInfo === null || sourceInfo.isSymbolicLink() || !sourceInfo.isFile()) continue
+        const text = readFileSync(source, 'utf8')
+        const destDir = join(methodRoot, role.name, slug.name)
+        const dest = join(destDir, 'SKILL.md')
+        try {
+          if (!existsSync(dest)) {
+            mkdirSync(destDir, { recursive: true })
+            copyFileSync(source, dest)
+            result.copied.push(`${role.name}/${slug.name}`)
+            continue
+          }
+          if (readFileSync(dest, 'utf8') === text) continue
+          const conflict = join(methodRoot, role.name, '.legacy', profile.name, `${slug.name}.md`)
+          if (!existsSync(conflict)) {
+            mkdirSync(dirname(conflict), { recursive: true })
+            copyFileSync(source, conflict)
+          }
+          result.conflicts.push(`${role.name}/${slug.name} (${profile.name})`)
+        } catch (error) {
+          result.warnings.push(`${role.name}/${slug.name}：${(error as Error).message}`)
+        }
+      }
+    }
+  }
+  try {
+    writeFileSync(join(methodRoot, METHOD_MIGRATION_MARKER), `${JSON.stringify({
+      version: 1,
+      migratedAt: now.toISOString(),
+      copied: result.copied.length,
+      conflicts: result.conflicts.length,
+    })}\n`, { flag: 'wx' })
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') result.warnings.push(`写迁移 marker 失败：${(error as Error).message}`)
+  }
+  return result
 }
 
 /** Publish a new file without replacing an existing destination. Both paths share one directory/filesystem. */

@@ -3,7 +3,7 @@
 // 培养方法层机制探针（2026-10-13 培养卡 S0/V3/V4/V5）：真 boot web，**零模型**——
 // 目录发现 / 跨角色隔离 / 缺目录容忍 / 命令族 wiring / 采纳落盘 / 跨会话生效。
 //
-// 何时跑：改 preset 第二 customSkillDirs（company-cultivation/<role>/）、host /cultivation
+// 何时跑：改 preset 第二 customSkillDirs（../../company/methods/<role>/）、host /cultivation
 //   命令族或 cultivation_propose 工具、cordis.patch.yml 的 cultivationRoot 锚、或升 pin 后必跑；
 //   培养回路验收（培养卡 V3–V5）前必跑。
 // 成本：keyless（boot ~20–40s，零模型调用；skills/list 与 commands/* 是免模型冷读 Remote）。
@@ -20,7 +20,7 @@
 //   ② ceo / vp-eng / coo 会话不含它（方法层按角色隔离，不串 CEO、不串其他职能）
 //   ③ 五角色 session/create 全部成功（缺目录容忍：只有 cfo 方法层存在，其余四角色目录缺席）
 //   ④ commands/list 含 cultivation；/cultivation correct 落记录到 <cwd>/cultivation/records/
-//   ⑤ /cultivation adopt → 方法 SKILL.md 落 <profile>/company-cultivation/cfo/ + 记录翻 adopted
+//   ⑤ /cultivation adopt → 方法 SKILL.md 落 <DSH_HOME>/company/methods/cfo/ + 记录翻 adopted
 //   ⑥ 采纳后**新开**的 cfo 会话 catalog 含该方法（跨会话持续生效）；运行中会话复查 = 观察项
 //      （watcher 刷新时点不是 V5 的主张面，打印实测行为供卡参考）
 // `--full` 档加第七条（V6 写隔离，真模型一轮 ≈$0.05）：
@@ -36,7 +36,6 @@ import { readRecords } from '../../tools/lib/session-log.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { sleep } from '../../tools/lib/probe-kit.mjs'
 
@@ -50,11 +49,9 @@ try {
   console.error(error.message)
   process.exit(2)
 }
-const REHEARSAL = join(ROOT, REHEARSAL_REL)
-ensureRehearsalWorkspace(ROOT)
-const PROFILE_WEB = join(home, 'profiles', 'web')
-const METHOD_ROOT = join(PROFILE_WEB, 'company-cultivation')
-const RECORDS_DIR = join(REHEARSAL, 'cultivation', 'records')
+const COMPANY = join(ROOT, 'company-workspace')
+const METHOD_ROOT = join(home, 'company', 'methods')
+const RECORDS_DIR = join(COMPANY, 'cultivation', 'records')
 const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
 
 // ── 预置（探针前清掉自己的历史残留，再种 seed 方法到 cfo 方法层）────────────────
@@ -83,7 +80,13 @@ const check = (label, fn) => fn().then(
 // 本次探针落下的记录 id（④⑤ 写入、清理段收走——外层声明，finally 后仍可见）。
 let recordId = null
 
-const { child, base, token } = await startWeb({ spawn, root: ROOT, home, port: 0 })
+const { child, base, token } = await startWeb({
+  spawn,
+  root: ROOT,
+  home,
+  port: 0,
+  env: { ...process.env, DSH_COMPANY_HOME: COMPANY },
+})
 try {
   const cookie = await companyCookie({ fetch, base, token, onEmptyCookie: 'throw' })
   const rpc = companyRpc({ fetch, base, cookie, prefix: 'cm-', dumpBodyOnError: true })
@@ -92,7 +95,7 @@ try {
   const sessionIds = new Map()
   for (const role of ROLES) {
     await check(`session/create 挂上 ${role}（方法层缺目录不炸）`, async () => {
-      const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: role } })
+      const created = await rpc('session/create', { request: { cwd: COMPANY, agentPreset: role } })
       if (created?.agentPreset !== role) throw new Error(`返回 preset 不是 ${role}：${JSON.stringify(created).slice(0, 160)}`)
       sessionIds.set(role, created.id ?? created.sessionId)
     })
@@ -155,7 +158,7 @@ try {
 
   // ⑥ 跨会话持续生效：新开的 cfo 会话 catalog 含采纳方法；旧会话复查 = 观察项
   await check('⑥ 采纳后新开的 cfo 会话加载该方法（跨会话生效）', async () => {
-    const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'cfo' } })
+    const created = await rpc('session/create', { request: { cwd: COMPANY, agentPreset: 'cfo' } })
     const value = await rpc('skills/list', { request: { sessionId: created.id ?? created.sessionId } })
     const names = (value.skills ?? []).map(skill => skill.name)
     if (!names.includes(`method-${recordId}`)) {
@@ -185,7 +188,7 @@ try {
     if (existsSync(dir)) throw new Error(`方法目录没删：${dir}`)
     const text = readFileSync(join(RECORDS_DIR, `${recordId}.md`), 'utf8')
     if (!text.includes('revokedAt')) throw new Error('记录没标 revokedAt')
-    const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'cfo' } })
+    const created = await rpc('session/create', { request: { cwd: COMPANY, agentPreset: 'cfo' } })
     const value = await rpc('skills/list', { request: { sessionId: created.id ?? created.sessionId } })
     const names = (value.skills ?? []).map(skill => skill.name)
     if (names.includes(slug)) throw new Error(`新开的 cfo 会话仍加载已撤回方法：${names.join(', ').slice(0, 200)}`)
@@ -222,7 +225,7 @@ try {
   if (FULL) {
     await check('⑦ 分身 fs 写方法层路径被沙箱拒（D25 自改否决的活体面）', async () => {
       const target = join(METHOD_ROOT, 'cfo', 'probe-write-test', 'SKILL.md')
-      const created = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'cfo' } })
+      const created = await rpc('session/create', { request: { cwd: COMPANY, agentPreset: 'cfo' } })
       const sessionId = created.id ?? created.sessionId
       await rpc('session/prompt', { request: {
         requestId: `cmp-${String(Date.now())}-${Math.random().toString(36).slice(2, 6)}`,

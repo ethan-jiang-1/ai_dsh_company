@@ -17,7 +17,7 @@
    整树规则；迁移前已做全量导出（workspace 45M gz + sessions 160M gz + tracked 清单，
    住 `runtime/backups/`，gitignored）。
 4. **基部 / 扩张分层（五角色同等）**：pack 的 `presets/<role>/` + `workspace/` 是基部；
-   方法层（`<home>/profiles/<p>/company-cultivation/<role>/`）、journal、培养记录、交付物、台账、
+   方法层（`<home>/company/methods/<role>/`）、journal、培养记录、交付物、台账、
    sessions 是扩张，只住 bundle、不进产品仓。提升到基部 = 显式改 pack + Note，不自动回流。
 5. **manifest + 哈希升级**：首启写 `<DSH_HOME>/bundle.json`（v1：id / createdAt / pack 版本 /
    workspace 根 / 基部逐文件 sha256）。升级逐文件判定：缺失 ⇒ 补建；用户改过（当前哈希 ≠ 上次基部
@@ -152,7 +152,7 @@ grep -rE 'agentic-coworker|renewal-x-2026|token-factory|ai-transformation-2026|s
 
 **E2 · 两 bundle 隔离（注入 sentinel）**
 两 home 各装 0.3.1，A 注入 `kb/ceo/journal/SENTINEL-A.md`、台账行、owners 行、凭据标记、方法层
-`profiles/web/company-cultivation/ceo/SENTINEL-A/SKILL.md`；B 同路径检查全无 A 的 sentinel；
+`company/methods/ceo/SENTINEL-A/SKILL.md`；B 同路径检查全无 A 的 sentinel；
 id 不同（`bundle-9fb…` vs `bundle-22be…`），sessions 各自 0。B 自己的 `.credentials.yaml` 是
 DSH 首次 boot 生成的 browser-session grant，**不含 A 的标记**（不是泄漏）。
 

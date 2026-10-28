@@ -42,20 +42,15 @@ const roleSkills = (role) => readdirSync(join(ROOT, 'packages/company-pack/prese
   .map(entry => entry.name)
   .sort()
 
-/** 该角色方法层里实际存在的 skill（deployer 根；旧 profile 路径与 M3 后的 home 路径都收）。 */
-const methodSkills = (role, homeDir, profileName) => {
-  const roots = [
-    join(homeDir, 'profiles', profileName, 'company-cultivation', role),
-    join(homeDir, 'company', 'methods', role),
-  ]
+/** 该角色公司级方法层里实际存在的 skill（M3 起；旧 profile 路径由 host 启动迁移，不再直接加载）。 */
+const methodSkills = (role, homeDir) => {
+  const root = join(homeDir, 'company', 'methods', role)
   const names = []
-  for (const root of roots) {
-    try {
-      for (const entry of readdirSync(root, { withFileTypes: true })) {
-        if (entry.isDirectory()) names.push(entry.name)
-      }
-    } catch { /* 目录缺席 = 没有方法 */ }
-  }
+  try {
+    for (const entry of readdirSync(root, { withFileTypes: true })) {
+      if (entry.isDirectory()) names.push(entry.name)
+    }
+  } catch { /* 目录缺席 = 没有方法 */ }
   return names
 }
 
@@ -172,7 +167,7 @@ try {
       if (sessionId === undefined) throw new Error('没有会话 id（上一步未通过）')
       const value = await rpc(base, cookie, 'skills/list', { request: { sessionId } })
       const actual = (value.skills ?? []).map(skill => skill.name).sort()
-      const expected = [...new Set([...roleSkills(role), ...methodSkills(role, home, PROFILE)])].sort()
+      const expected = [...new Set([...roleSkills(role), ...methodSkills(role, home)])].sort()
       const extra = actual.filter(name => !expected.includes(name))
       const missing = expected.filter(name => !actual.includes(name))
       if (extra.length > 0) throw new Error(`看见了非本角色的 skill：${extra.join(', ')}`)

@@ -189,7 +189,7 @@ try {
   seedRecord(IDS.verify, { status: 'adopted', targetRole: role, expectation: 'UX走查：验证某条已采纳方法', body: '做法：测试回填验证。', methodSlug: SLUG.verify })
   seedRecord(IDS.revoke, { status: 'adopted', targetRole: role, expectation: 'UX走查：撤掉一条方法', body: '做法：测试撤回。', methodSlug: SLUG.revoke })
   for (const slug of [SLUG.verify, SLUG.revoke]) {
-    const dir = join(home, 'profiles', 'web', 'company-cultivation', role, slug)
+    const dir = join(home, 'company', 'methods', role, slug)
     mkdirSync(dir, { recursive: true })
     writeFileSync(join(dir, 'SKILL.md'), `---\nname: ${slug}\ndescription: UX 走查占位方法\n---\n\n占位。\n`)
   }
@@ -278,7 +278,7 @@ try {
     await shot(page, '05-t6-revoke-consequence')
     await button(row, COPY.revokeConfirm).click()
     step()
-    const methodDir = join(home, 'profiles', 'web', 'company-cultivation', role, SLUG.revoke)
+    const methodDir = join(home, 'company', 'methods', role, SLUG.revoke)
     const deadline = Date.now() + 20_000
     while (Date.now() < deadline && existsSync(methodDir)) await sleep(500)
     if (existsSync(methodDir)) throw new Error('方法目录没被删（撤回没生效）')
@@ -307,9 +307,9 @@ try {
 // 清理：只删本档自己的记录与方法
 for (const id of Object.values(IDS)) rmSync(join(RECORDS, `${id}.md`), { force: true })
 if (role !== null) {
-  rmSync(join(home, 'profiles', 'web', 'company-cultivation', role, `method-${IDS.adopt}`), { recursive: true, force: true })
-  for (const slug of Object.values(SLUG)) rmSync(join(home, 'profiles', 'web', 'company-cultivation', role, slug), { recursive: true, force: true })
-  try { require('node:fs').rmdirSync(join(home, 'profiles', 'web', 'company-cultivation', role)) } catch { /* 非空则留 */ }
+  rmSync(join(home, 'company', 'methods', role, `method-${IDS.adopt}`), { recursive: true, force: true })
+  for (const slug of Object.values(SLUG)) rmSync(join(home, 'company', 'methods', role, slug), { recursive: true, force: true })
+  try { require('node:fs').rmdirSync(join(home, 'company', 'methods', role)) } catch { /* 非空则留 */ }
 }
 if (existsSync(RECORDS)) for (const name of readdirSync(RECORDS)) if (name.startsWith(`uxwalk-${STAMP}-`)) rmSync(join(RECORDS, name), { force: true })
 

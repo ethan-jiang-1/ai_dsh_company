@@ -59,5 +59,5 @@
 
 ## 范围 / 排除
 
-- 范围：本包自造状态（`bundle.json`、`company-cultivation/`、`kb/deliverables-*`、`cultivation/records`）与 DSH 边界的部署合同。
+- 范围：本包自造状态（`bundle.json`、`company/methods/`、`kb/deliverables-*`、`cultivation/records`）与 DSH 边界的部署合同。
 - 排除：多租户、跨机器同步、session 删除 API、改 vendor、E1 依赖；P1/P2 见 Gap 卡。
