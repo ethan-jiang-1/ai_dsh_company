@@ -17,7 +17,7 @@ import { DreamTeamBrandName } from './Brand.tsx'
 import { startInstanceGuard } from './instance-guard.ts'
 import { createAttentionRegistry } from './attention-registry.ts'
 import { installAttentionObservers } from './attention-observers.ts'
-import { createCompanyView } from './CompanyView.tsx'
+import { createCultivationView } from './CultivationView.tsx'
 import { createCompanyDataPlane, WORKSPACE_TEXT_PATHS } from './company-data-plane.ts'
 import { contextRowsFromStore, makeCultivationContextSources, type CultivationContextSources, type FollowLike } from './cultivation-context-data.ts'
 import type { CultivationContext } from '../lib/cultivation-context.ts'
@@ -35,8 +35,8 @@ import { TEAM_TOOL_KEYS, TeamToolCard } from './TeamToolCard.tsx'
 /** Required services: the slot registry plus the remote namespace we read. */
 export const inject = ['slots', 'remote', 'sessions']
 
-/** 公司整页视图的 cell id（`conversation.view` list 槽的 id；与官方 chat / trajectory 并列）。 */
-const COMPANY_VIEW_ID = 'dsh-company-pack/company'
+/** 培养主视图的 cell id（`conversation.view` list 槽的 id；与官方 chat / trajectory 并列）。 */
+const CULTIVATION_VIEW_ID = 'dsh-company-pack/cultivation'
 
 /**
  * 本包 client 面登记四处：委派工具卡（R3）、部署品牌、会话头部任务板、公司驾驶舱页签（R5b）。
@@ -161,7 +161,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
 
   registerCompanyTabsWiring(ctx, attention)
 
-  registerCompanyViewWiring(ctx)
+  registerCultivationViewWiring(ctx)
 
 }
 
@@ -213,53 +213,31 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
   })
 }
 
-function registerCompanyViewWiring(ctx: ClientContext): void {
-  // 公司整页视图（条目 ① S1）：`conversation.view` 的第三个页签（Chat / Trajectory / 公司）。
-  // 该槽**没有 inject 面**（catalog registerOptions 只有 id/order/label）且 team 投影是 host-only
-  // ⇒ 数据面用注册处闭包注入（见 CompanyView 头注）；跨插件值导入仍被禁。
-  // ⚠ remote 按命名空间 inject：`remote.session`（follow 流）+ `remote.workspaceFiles`
-  //   （2026-10-13 培养卡：第四子页培养的 journal/记录读取——与侧栏页签同一工厂语义）。
+function registerCultivationViewWiring(ctx: ClientContext): void {
+  // 培养主视图（2026-10-28）：`conversation.view` 第三个页签（Chat / Trajectory / 培养）。
+  // 公司总览不再占第三个 tab：它的看板/依赖/在场/交付已经住在右栏页签，按钮直接打开。
+  // 该槽没有 inject 面 ⇒ 数据面用注册处闭包注入；右侧培养面板自有 composer（命令面）。
   ctx.inject(['sessions', 'uiWorkspace', 'remote.session', 'remote.workspaceFiles', 'remote.commands', 'sidebarRight', 'slots'], (scoped) => {
     const sessions = scoped.sessions
     const { leadOf, follow, cultivationFiles, cultivationActions, rawFollow, readWorkspaceText } = createCompanyDataPlane(scoped)
     const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, 2000)
     const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog)
-    // 条目 ② S4：从公司视图直接浮出某个面板 = 打开对应平台页签 + `float`。
-    // ⚠ openTab 的落位对 `active()` 的可见性有延迟（实测：同步读拿不到刚开的页签，float 静默
-    // no-op）⇒ 推迟到宏任务并重试；带 kind 守卫防浮错别人的页签。重试耗尽 = 优雅降级
-    //（页签已打开，用户可在页签头的「浮出」一键拽出）。
-    const floatPanel = (kind: string): void => {
-      scoped.sidebarRight.openTab(kind)
-      const tryFloat = (attempt: number): void => {
-        const active = scoped.sidebarRight.active()
-        if (active !== undefined && active.kind === kind) {
-          scoped.sidebarRight.float(active.id)
-          return
-        }
-        if (attempt < 10) setTimeout(() => { tryFloat(attempt + 1) }, 50)
-      }
-      setTimeout(() => { tryFloat(0) }, 0)
-    }
-    const CompanyView = createCompanyView({
-      leadOf,
-      follow,
-      readCompany: readWorkspaceText('kb/company.md', 40),
-      floatPanel,
-      // 培养数据面（2026-10-13 培养卡）：同一 follow 流喂赞/踩块；文件闭包与 viewer 角色源
-      // 与侧栏页签同一语义（领域视图两个壳一处事实）。
+    const openCompanyOverview = (): void => { scoped.sidebarRight.openTab('company-board') }
+    const CultivationView = createCultivationView({
       cultivationFiles,
       cultivationActions,
       followEvents: follow,
       roleSource: sessions.list,
       contextSources: contextWiring.contextSources,
       openContext: contextWiring.openContext,
+      openCompanyOverview,
     })
     scoped.slots.inject('conversation.view', () => scoped.slots.register({
       name: 'conversation.view',
-      id: COMPANY_VIEW_ID,
+      id: CULTIVATION_VIEW_ID,
       order: 20,
-      label: () => '公司',
-    }, CompanyView))
+      label: () => '培养',
+    }, CultivationView))
   })
 }
 

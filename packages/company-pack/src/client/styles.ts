@@ -579,7 +579,120 @@ const CSS = `
    div:has(> section[...]) 的特异性 (0,1,2) 盖过 .floatingCell (0,1,0)，与加载顺序无关。 */
 div:has(> section[data-dockkit-float]) { z-index: calc(var(--dsh-dockkit-float-layer, 60) + 1); }
 div:has(> section[data-dockkit-float-active]) { z-index: calc(var(--dsh-dockkit-float-layer, 60) + 2); }
+
+/* ── 培养主视图（2026-10-28）：第三 tab；左侧培养板 + 右侧自有 composer ─────────
+   培养视图激活时隐藏 shell 的全局 composer；右栏 composer 是唯一入口。
+   数据属性只在本窗口/本视图挂载期间存在，切到 Chat/Trajectory 即恢复。 */
+html[data-dsh-cultivation-view] [data-composer-seat] { display: none !important; }
+.wk-cult-view {
+  display: flex;
+  flex-direction: column;
+  /* 会话 scrollBody 在 active phase 是 flex:1 0 auto（内容驱动高度）；培养页要
+     左右各自滚动、composer 钉在右栏底，所以按窗口给一个稳定高度。 */
+  height: calc(100dvh - 76px);
+  max-height: calc(100dvh - 76px);
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  color: var(--dsw-alias-label-primary);
+}
+.wk-cult-view-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--dsw-alias-border-l1);
+}
+.wk-cult-view-eyebrow { color: var(--dsw-alias-label-tertiary); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+.wk-cult-view-title { font-size: 18px; font-weight: 650; margin-top: 3px; }
+.wk-cult-view-sub { color: var(--dsw-alias-label-secondary); font-size: 12px; margin-top: 3px; }
+.wk-cult-overview {
+  border: 1px solid var(--dsw-alias-border-l1);
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-secondary);
+  border-radius: 7px;
+  padding: 6px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.wk-cult-overview:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.wk-cult-view-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 390px);
+  flex: 1;
+  min-height: 0;
+}
+.wk-cult-view-board { min-height: 0; overflow: auto; padding: 14px 18px 24px; }
+.wk-cult-chat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border-left: 1px solid var(--dsw-alias-border-l1);
+  background: var(--dsw-alias-bg-layer-1);
+}
+.wk-cult-chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 12px 9px;
+  border-bottom: 1px solid var(--dsw-alias-border-l1);
+}
+.wk-cult-chat-title { font-size: 12.5px; font-weight: 650; }
+.wk-cult-chat-sub { color: var(--dsw-alias-label-tertiary); font-size: 10.5px; margin-top: 2px; }
+.wk-cult-chat-badge { color: var(--dsw-alias-label-tertiary); border: 1px solid var(--dsw-alias-border-l1); border-radius: 99px; padding: 2px 6px; font-size: 9px; white-space: nowrap; }
+.wk-cult-chat-hint { color: var(--dsw-alias-label-tertiary); font-size: 10.5px; line-height: 1.5; padding: 8px 12px; border-bottom: 1px solid var(--dsw-alias-border-l1); }
+.wk-cult-chat-hint code { color: var(--dsw-alias-label-secondary); font-size: 10px; }
+.wk-cult-chat-lines { flex: 1; min-height: 0; overflow: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 10px; }
+.wk-cult-chat-empty { color: var(--dsw-alias-label-tertiary); font-size: 11px; line-height: 1.6; border: 1px dashed var(--dsw-alias-border-l1); border-radius: 8px; padding: 10px; }
+.wk-cult-chat-empty b { display: block; color: var(--dsw-alias-label-secondary); font-size: 11.5px; }
+.wk-cult-chat-empty span { display: block; margin: 3px 0 7px; }
+.wk-cult-chat-empty code { display: block; color: var(--dsw-alias-label-secondary); font-size: 10px; overflow-wrap: anywhere; }
+.wk-cult-chat-line { display: flex; flex-direction: column; gap: 3px; }
+.wk-cult-chat-line.you { align-items: flex-end; }
+.wk-cult-chat-who { color: var(--dsw-alias-label-tertiary); font-size: 9.5px; }
+.wk-cult-chat-bubble {
+  max-width: 92%;
+  border: 1px solid var(--dsw-alias-border-l1);
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-secondary);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font-size: 11px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.wk-cult-chat-line.you .wk-cult-chat-bubble { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.wk-cult-chat-bubble.bad { border-color: var(--dsw-alias-state-error-primary); color: var(--dsw-alias-state-error-primary); }
+.wk-cult-chat-composer { border-top: 1px solid var(--dsw-alias-border-l1); padding: 9px 10px 10px; }
+.wk-cult-chat-composer textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 54px;
+  max-height: 130px;
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 7px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+  padding: 7px 8px;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.wk-cult-chat-composer textarea:focus { outline: 1px solid var(--dsw-alias-border-l1); }
+.wk-cult-chat-actions { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.wk-cult-chat-session { color: var(--dsw-alias-label-tertiary); font-size: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wk-cult-chat-send { margin-left: auto; border: 0; border-radius: 6px; background: var(--dsw-alias-brand-primary); color: #16111f; font-size: 10.5px; padding: 5px 10px; cursor: pointer; }
+.wk-cult-chat-send:disabled { opacity: .45; cursor: default; }
+@media (max-width: 1180px) {
+  .wk-cult-view-split { grid-template-columns: minmax(0, 1fr) 320px; }
+}
 `
+
 
 /**
  * 注入本次挂载拥有的样式表；非浏览器环境返回空清理函数。
