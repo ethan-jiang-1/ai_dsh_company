@@ -130,7 +130,7 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 
 ## 版本纪律
 
-- pack 版本 `0.3.15`（`private: true`——**尚未发布到任何 registry**；真实发布动作（npm publish）等
+- pack 版本 `0.4.0`（`private: true`——**尚未发布到任何 registry**；真实发布动作（npm publish）等
   出现第二个消费者/部署需求时再定；本轮只把本地 tarball 交付内化为 `pnpm release`，未 publish。
   当前 release-smoke 验证的是 `file:` tarball 安装形状）。版本史与每版变化唯一家 =
   [CHANGELOG](../CHANGELOG.md)（此处不写变更史）；改内容必 bump（见下条）。

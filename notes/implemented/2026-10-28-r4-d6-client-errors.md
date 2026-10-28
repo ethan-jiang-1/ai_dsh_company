@@ -8,7 +8,7 @@
 >
 > **2026-10-28 数据设计硬化 M1 部分取代落点**：日志迁 `$DSH_HOME/logs/company-client-errors.log`
 > （旧 `cultivation/client-errors.log` 只读留一版）；命令/脱敏/不写会话事件的决定保留。见
-> [RFC](../proposed/2026-10-28-data-design-hardening.md)。
+> [数据设计硬化 Note](./2026-10-28-data-design-hardening.md)。
 
 ## 决定
 

@@ -1,15 +1,13 @@
 # 2026-10-28 · 数据设计硬化：写通道、权威归位与迁移
 
-状态：待实施（批准：用户 2026-10-28 会话授权——「你发现的问题我都想修复」；按 M1→M4 逐条实施，
-M2/M3 动数据路径前单独呈迁移/回滚一页纸）
-进度：M1 已落地（2026-10-28；records schema、client-errors 迁 home logs+轮转、T4/preset-smoke
-数据感知、data-model v2、README Data 6+2、home 白名单；111 files / 983 tests、verify、typecheck 全绿）。
-M2 已落地（2026-10-28；presented 账本迁 domain `company_deliverables`、旧 W 迁移/fallback、
-release/lifecycle smoke 全绿）。
-M3 已落地（2026-10-28；方法层迁 `<DSH_HOME>/company/methods/<role>/`、旧 profile 迁移/冲突备份、
-五份 preset + host config 同改；preset-smoke/method-layer-probe/lifecycle/release 全绿）。M4 待做。
-已知：`@deepseek-ai/dsh-storage-domain` / `zod` 由 base 提供；pack `package.json` 的 peer 声明 +
-可控 lock 更新留 M4（本轮不引入 lock 漂移；release-smoke 真装通过）。
+状态：已交付（2026-10-28；M1–M4 全部落地；批准：用户 2026-10-28 会话授权——「你发现的问题我都想修复」）
+进度：M1 已落地（records schema、client-errors 迁 home logs+轮转、T4/preset-smoke 数据感知、
+data-model v2、README Data 6+2、home 白名单）；M2 已落地（presented 账本迁 domain
+`company_deliverables`、旧 W 迁移/fallback）；M3 已落地（方法层迁
+`<DSH_HOME>/company/methods/<role>/`、旧 profile 迁移/冲突备份、五份角色 preset + host config）；
+M4 已落地（peer + 受控 lock、0.4.0、安装手册/CHANGELOG、`release --check` 见交付证据）。
+已知：`@deepseek-ai/dsh-storage-domain` / `zod` 已是 peer + dev；lock 只加 importer 两行，
+未引入 rc.4 漂移；`release-smoke` 真装通过。
 
 > 依据：外部研究 FAQ 24（发布与 agent 数据平面；rc.3 基线，但本仓 pin rc.2 已核
 > `ctx.storageDomain`、storage-json `single`、`fs-sandbox`、`sessionQuery`、`workspaceRegistry`、
@@ -24,6 +22,20 @@ M3 已落地（2026-10-28；方法层迁 `<DSH_HOME>/company/methods/<role>/`、
 > [data-model-p1-p2](../implemented/2026-10-27-data-model-p1-p2.md)、
 > [data-model-r1-r6](../implemented/2026-10-27-data-model-r1-r6.md)、
 > [run-bundle-install-unit](../implemented/2026-10-24-run-bundle-install-unit.md) 中被改路径的引用。
+
+## 交付与证据
+
+| 面 | 实跑结果（2026-10-28） |
+|---|---|
+| 单元/回归 | `pnpm test` → **114 files / 995 tests** 全绿 |
+| 结构门禁 | `pnpm verify` → **ALL PASS**（doc-budget data-model 74/76、dist-manual 0.4.0、dist-freshness、release-ready） |
+| 类型 | `pnpm typecheck` → exit 0 |
+| 真实安装 | `release-smoke` → **ALL PASS**（0.4.0 tarball → 干净 profile → 首启/二启零变更） |
+| 生命周期 | `lifecycle-smoke` → **ALL PASS**（卸载 / business 恢复 / 搬 home；domain 账本 + `company/methods`） |
+| 账本 | `present-catalog-smoke` ALL PASS（legacy fallback）；`presented-domain*.spec` 真设施迁移/写入/篡改隔离 |
+| 方法层 | `preset-smoke` ALL PASS；`cultivation-method-layer-probe` ALL PASS（adopt/撤回/跨会话/角色闸） |
+| 撤回恢复 | `revoke-recovery-smoke` → **ALL PASS**（0.4.0 真 host 启动） |
+| 发布 | `pnpm release --prepare` 产出 0.4.0 tarball/manual；`release --check` 见收尾回执 |
 
 ## 问题
 
@@ -175,6 +187,8 @@ M3 已落地（2026-10-28；方法层迁 `<DSH_HOME>/company/methods/<role>/`、
 - 不新增 session event 类型；不改 vendor；不引入 E1 依赖。
 - `danger-full-access` 下没有文件级保护；文档如实写，不宣称绝对隔离。
 - 角色边界、owners、签字线是 prompt/approval 级，不升级为数据 ACL。
+- `ctx.fs` 用于 `cultivation_propose` 的写通道本轮**未做**：当前 host 写用同目录 temp + `link` 独占发布（不会盲覆盖），但绕过了 fs 观测策略；保留为后续一致性改进，不阻塞数据归属/权威。
+- `$DSH_HOME/company/` 本轮只收方法层；`bundle.json`/lease/logs 保持 DSH home 既有位置（避免身份/恢复路径迁移），不宣称“所有自造状态已收口”。
 
 ## 风险
 

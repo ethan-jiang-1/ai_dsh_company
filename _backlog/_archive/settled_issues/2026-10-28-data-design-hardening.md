@@ -7,7 +7,7 @@ opened: 2026-10-28
 
 > 立卡：2026-10-28 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；RFC = [data-design-hardening](../../../notes/proposed/2026-10-28-data-design-hardening.md)（批准：用户 2026-10-28「你发现的问题我都想修复」）；M1（合同/低风险）与 M2（账本 domain）已落地，M3（方法层）/M4（收口/发布）按 RFC 继续；卡按章程关闭，不阻塞下游实施/验收。
+> **结论/去向**：做；实施 = [data-design-hardening](../../../notes/implemented/2026-10-28-data-design-hardening.md)（批准：用户 2026-10-28「你发现的问题我都想修复」）；M1–M4 已落地（0.4.0）；卡按章程关闭，不阻塞下游验收。
 
 **问题与期望结果：** 对照 FAQ 24（发布/定义/数据 6+2/原生能力/T0–T8）与 FAQ 26（数据家/承诺），我们的
 数据平面大体选对，但**写权限边界**没有落地：审计账本在模型可写的工作区、派生索引被 UI 当权威、方法层
@@ -26,13 +26,15 @@ data-model 数据卡 v2/硬软表/六版本/标识符、README Data 6+2 与 Back
 **M2 进度（2026-10-28）：** `presented` 账本迁 `ctx.storageDomain`（domain `company_deliverables`，
 `single`/v1，`<DSH_HOME>/storages/company_deliverables.json`）；旧 W 账本一次性迁移、旧文件只读留一版；
 模型写旧 W 不再改权威；`release-smoke`/`lifecycle-smoke`/`present-catalog-smoke` + 真设施 spec 全绿；
-`pnpm test` 113 files / 992 tests。M3 方法层、M4 收口/peer 声明待做。
+`pnpm test` 113 files / 992 tests。M3 见下。
 
-**未决问题：** 无阻断项。M3（方法层 home 级 + 双 profile 迁移）、M4（`$DSH_HOME/company/` 命名空间、
-日志轮转、`ctx.fs`、0.4.0 发布、storage-domain/zod peer 声明 + 受控 lock）仍按 RFC 推进；账本 domain 的
-“用户不再手改 JSON”已由 `/deliverables audit` 覆盖。
+**M3 进度（2026-10-28）：** 方法层迁 `<DSH_HOME>/company/methods/<role>/`；旧 profile 路径启动迁移、只读留一版，冲突落 `.legacy/`；五份角色 preset + host config 同改；preset-smoke/method-layer-probe/lifecycle/release 全绿；`pnpm test` 114 files / 995 tests。
 
-**下一步：** 按 RFC M3（方法层归 home）→ M4（收口/发布）继续；每条一个 commit，完成发六行回执。
+**M4 进度（2026-10-28）：** `storage-domain`/`zod` peer + dev + 受控 lock（6 行）；0.4.0 tarball/手册/CHANGELOG；release-smoke/lifecycle-smoke/revoke-recovery-smoke/present-catalog-smoke 全绿；`pnpm release --prepare` 产出 0.4.0。
+
+**未决问题：** 无阻断项。M1–M4 已落地；`ctx.fs` 用于模型发起的写通道、`$DSH_HOME/company/` 全量命名空间（bundle/lease/logs）是显式边界，见 Note「边界与不做什么」。账本 domain 的“用户不再手改 JSON”已由 `/deliverables audit` 覆盖。
+
+**下一步：** 无；实施 Note 已毕业，后续问题另开卡引用本卡。
 
 ## 事实与判据（显性化清单）
 
@@ -47,7 +49,7 @@ data-model 数据卡 v2/硬软表/六版本/标识符、README Data 6+2 与 Back
 | 7 | **P2 测试** | `preset-smoke` 断言 `skills/list` 恰好等于包内技能；T4 说“catalog 没有模型可见路径” | dev home 有 adopt 方法就假红；索引在 workspace 内、fs 可读 | [preset-smoke.mjs](../../../checks/smoke/preset-smoke.mjs#L147-L165)、[presets.spec.ts](../../../tests/presets/presets.spec.ts#L69) |
 | 8 | **P2 发布** | `files`/`exports`/技能发现/`dsh.client.inject` peers 与数据路径耦合 | 改数据路径/资源时缺一条 T0 断言 | [release-smoke.mjs](../../../checks/smoke/release-smoke.mjs#L205-L255) |
 
-状态（2026-10-28）：#1/#4/#5/#7 已由 M1/M2 修；#6 由 M1 部分修；#3/#8 由 M3/M4 继续；#2 仍是派生显示（文档已标，客户端直读保留）。
+状态（2026-10-28）：#1/#4/#5/#7 已由 M1/M2 修；#6 由 M1 部分修（data-model 威胁模型；preset 注释已随 M3 改路径）；#3/#8 由 M3/M4 处理；#2 仍是派生显示（文档已标，客户端直读保留）。
 
 ## 硬软边界（本卡的核心结论）
 

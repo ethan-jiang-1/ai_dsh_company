@@ -2,7 +2,7 @@
 
 > 性质：合同（只写 now）。什么时候读 = 部署/备份/迁移、改数据形状，或回答“谁写、谁看得见、升级留什么”。
 > 用户侧摘要 = [pack README Data](../packages/company-pack/README.md#data)；外部依据 = FAQ 24/26（[登记](./external-research.md)）；Gap 账 = [Gap 卡](../_backlog/_archive/settled_issues/2026-10-27-data-model-gaps.md)。
-> 迁移计划 = [数据设计硬化 RFC](../notes/proposed/2026-10-28-data-design-hardening.md)。
+> 已交付 = [数据设计硬化 Note](../notes/implemented/2026-10-28-data-design-hardening.md)。
 
 ## 一、一句话
 

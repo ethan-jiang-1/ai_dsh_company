@@ -7,7 +7,7 @@
 
 > **2026-10-28 M3 部分取代作用域**：方法层已从 `<profile>/company-cultivation/<role>/` 迁
 > `<DSH_HOME>/company/methods/<role>/`（旧 profile 路径只读留一版，host 启动一次性迁移）；
-> 提案/采纳/角色闸/沙箱边界等其余决定保留。见 [RFC](../proposed/2026-10-28-data-design-hardening.md)。
+> 提案/采纳/角色闸/沙箱边界等其余决定保留。见 [数据设计硬化 Note](./2026-10-28-data-design-hardening.md)。
 
 ## ① Motivation（外部可观察行为）
 

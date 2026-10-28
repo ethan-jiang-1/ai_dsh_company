@@ -2,6 +2,23 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.4.0 — 2026-10-28
+
+### Changed
+
+- **审计账本迁宿主状态**：`presented` 从公司盘 W 迁 `ctx.storageDomain`（domain `company_deliverables`，`<DSH_HOME>/storages/company_deliverables.json`）；旧 W 账本一次性迁移、只读留一版；`/deliverables audit` 写 domain，模型不再能改审计权威；索引仍是派生显示。
+- **方法层归公司级**：`<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`；旧 `<profile>/company-cultivation/` 启动迁移、只读留一版，冲突落 `.legacy/`；同 home 多 profile 共享方法。
+- **数据卡 v2**：写者/通道、可见性、硬软边界、六版本、标识符 API、威胁模型进 `docs/data-model.md`；README Data 改 6+2，`Backup` 独立成节。
+- **client-errors 迁宿主日志**：`<DSH_HOME>/logs/company-client-errors.log`；256 KiB 轮转 `.1`；旧 `cultivation/client-errors.log` 只读留一版。
+- **records schema 1**：新记录写 `schema: 1`，旧记录缺字段按 1 读。
+- **依赖声明**：`@deepseek-ai/dsh-storage-domain` 与 `zod` 进 peer + dev；受控 lock 只加 importer 两行（未引入 rc.4 漂移）。
+
+### Fixed
+
+- `preset-smoke` 在 adopt 过方法的 home 上假红（期望集 = 包内 + 本角色方法层；用临时方法 fixture 真红→绿）。
+- T4 措辞：catalog 是“未注入指令面”，不是“模型不可见”（workspace 文件仍可被 fs 读）。
+- 方法层探针 cwd 对齐公司盘根（原 rehearsal cwd 会被公司根守卫拒绝）。
+
 ## 0.3.15 — 2026-10-28
 
 ### Added

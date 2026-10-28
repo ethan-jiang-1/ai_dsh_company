@@ -5,7 +5,7 @@
 
 > **2026-10-28 数据设计硬化 M2 部分取代账本落点**：`presented` 账本已迁 `ctx.storageDomain`
 > （domain `company_deliverables`，`<DSH_HOME>/storages/company_deliverables.json`）；旧 W
-> `kb/deliverables-presented.json` 只读留一版。见 [RFC](../proposed/2026-10-28-data-design-hardening.md)。
+> `kb/deliverables-presented.json` 只读留一版。见 [数据设计硬化 Note](./2026-10-28-data-design-hardening.md)。
 
 ## 问题
 

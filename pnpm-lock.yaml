@@ -301,6 +301,9 @@ importers:
       '@deepseek-ai/dsh-session-stats':
         specifier: workspace:*
         version: link:../../vendor/dsh/packages/session/session-stats
+      '@deepseek-ai/dsh-storage-domain':
+        specifier: workspace:*
+        version: link:../../vendor/dsh/packages/storage/storage-domain
       '@deepseek-ai/dsh-token-meter':
         specifier: workspace:*
         version: link:../../vendor/dsh/packages/llm/token-meter
@@ -316,6 +319,9 @@ importers:
       react:
         specifier: ^18.2.0
         version: 18.3.1
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
 
   vendor/dsh/apps/cli:
     dependencies:

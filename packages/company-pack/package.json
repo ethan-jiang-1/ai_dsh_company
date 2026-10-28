@@ -1,6 +1,6 @@
 {
   "name": "dsh-company-pack",
-  "version": "0.3.15",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "description": "Virtual company multi-role plugin pack: 5 role presets (CEO / VP-Eng / VP-Sales / COO / CFO) + host bundle rows + deployment brand skin. Design docs: docs/index.md",
@@ -59,6 +59,7 @@
     "@deepseek-ai/dsh-plan-mode": "^0.2.1-rc.2",
     "@deepseek-ai/dsh-session-persistence-jsonl": "^0.2.1-rc.2",
     "@deepseek-ai/dsh-session-query-sqlite": "^0.2.1-rc.2",
+    "@deepseek-ai/dsh-storage-domain": "^0.2.1-rc.2",
     "@deepseek-ai/dsh-skill-filesystem": "^0.2.1-rc.2",
     "@deepseek-ai/dsh-time-context": "^0.2.1-rc.2",
     "@deepseek-ai/dsh-tool-ask-user": "^0.2.1-rc.2",
@@ -79,7 +80,8 @@
     "@deepseek-ai/dsh-tool-workflow": "^0.2.1-rc.2",
     "@deepseek-ai/dsh-tools": "^0.2.1-rc.2",
     "@deepseek-ai/dsh-user-approval": "^0.2.1-rc.2",
-    "@deepseek-ai/dsh-workflow-ptc": "^0.2.1-rc.2"
+    "@deepseek-ai/dsh-workflow-ptc": "^0.2.1-rc.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "workspace:*",
@@ -98,11 +100,13 @@
     "@deepseek-ai/dsh-experimental-agent-team": "workspace:*",
     "@deepseek-ai/dsh-session": "workspace:*",
     "@deepseek-ai/dsh-session-stats": "workspace:*",
+    "@deepseek-ai/dsh-storage-domain": "workspace:*",
     "@deepseek-ai/dsh-token-meter": "workspace:*",
     "@deepseek-ai/dsh-tools": "workspace:*",
     "@deepseek-ai/dsh-user-approval": "workspace:*",
     "@types/react": "~18.3.1",
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "zod": "4.4.3"
   },
   "dsh": {
     "bundle": {

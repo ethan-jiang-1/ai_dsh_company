@@ -210,9 +210,9 @@ dsh plugin --profile web add /path/to/<新版本>.tgz
 培养记录可用 \`/cultivation archive <天数>\` 把已处理（非 open）且早于该天数的记录移到
 \`<公司盘>/cultivation/records-archive/\`；\`/cultivation purge <天数>\` 清更早的归档。
 open 与读不动的记录不动，面板会点名坏记录；\`/cultivation check\` 只报告“记录缺方法/方法无记录”，不自动删改。
-交付审计用 \`/deliverables audit <deliverables/<dir>/final.md> true|false\` 写 presented 账本，不用手改 JSON。
+交付审计用 \`/deliverables audit <deliverables/<dir>/final.md> true|false\` 写 presented 审计账本（宿主 domain），不用手改 JSON。
 
-一个公司请固定用一个 web profile：同 home 多 profile 会在启动输出里点名，方法层不跨 profile 共享。
+一个公司建议固定用一个 web profile：同 home 多 profile 会在启动输出里点名；方法层/记录/公司盘都是公司级共享（2026-10-28 起），多 profile 只会分叉会话与偏好。
 同一 home 只允许一个 writer：第二实例会停写公司数据（DSH 会话仍可用），崩溃后 stale lease 可接管。
 
 ## 五、备份 / 迁移
@@ -221,7 +221,7 @@ open 与读不动的记录不动，面板会点名坏记录；\`/cultivation che
 
 | 姿势 | 打包什么 | 不包含 / 会丢什么 | 用途 |
 |---|---|---|---|
-| **business** | 公司盘（含 \`kb/deliverables-presented.json\` 审计账本）、\`<DSH_HOME>/bundle.json\`、\`<DSH_HOME>/profiles/<p>/company-cultivation/\` | sessions、\`.credentials.yaml\`、\`profiles/<p>/session-search.db\`、DSH workspace 登记 | 交接 / 换机器 / 公司数据归档 |
+| **business** | 公司盘（含旧 W \`kb/deliverables-presented.json\` 只读留一版）、\`<DSH_HOME>/bundle.json\`、\`<DSH_HOME>/storages/company_deliverables.json\`（presented domain）、\`<DSH_HOME>/company/methods/\`（方法层） | sessions、\`.credentials.yaml\`、\`profiles/<p>/session-search.db\`、DSH workspace 登记 | 交接 / 换机器 / 公司数据归档 |
 | **full** | 整个 \`DSH_HOME\` | 不丢；但含会话正文、密钥、绝对路径 | 整机迁移 / 灾难恢复；加密、限权、不共享 |
 
 business 示例（公司盘在 home 内时；在外则把第一条换成
@@ -229,14 +229,13 @@ business 示例（公司盘在 home 内时；在外则把第一条换成
 
 \`\`\`sh
 tar -czf company-business.tgz -C "$DSH_HOME" bundle.json company-workspace
-# 方法层只有在采纳过方法时存在；没有就跳过，不要用缺路径让 tar 报错
-if [ -d "$DSH_HOME/profiles/web/company-cultivation" ]; then
-  tar -czf company-business-methods.tgz -C "$DSH_HOME" profiles/web/company-cultivation
-fi
+# 审计账本（domain）与方法层：缺就跳过，别让 tar 报错
+[ -f "$DSH_HOME/storages/company_deliverables.json" ] && tar -czf company-business-ledger.tgz -C "$DSH_HOME" storages/company_deliverables.json
+[ -d "$DSH_HOME/company/methods" ] && tar -czf company-business-methods.tgz -C "$DSH_HOME" company/methods
 \`\`\`
 
-恢复 business：新 home 解包（有方法层就一起解）→ 按第二节 \`plugin add\` 同版本/新版本 → 启动。
-**没有 sessions，旧会话不会回来**；公司盘、方法层（若打包）、presented 审计账本会回来。
+恢复 business：新 home 解包（有账本/方法层就一起解）→ 按第二节 \`plugin add\` 同版本/新版本 → 启动。
+**没有 sessions，旧会话不会回来**；公司盘、方法层（若打包）、presented 审计 domain 会回来。
 
 恢复 full：整 home 搬移；搬完若 profile 的依赖目录失效，按第二节重新 \`plugin add\` 一次。
 \`bundle.json\` 里的相对 workspace 会随新 home 解析；但 DSH 自己的 \`storages/workspace.json\`
