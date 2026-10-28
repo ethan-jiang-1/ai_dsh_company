@@ -67,6 +67,18 @@ session-search 索引仍在 profile；升级日志无轮转；client inject 包�
 （根内可写、根外 `FS_SANDBOX_DENIED`；平台 temp 是 writableRoots 允许面，不拿它当反例）；
 catalog 仍是 W 派生显示；全量 namespace/指令 ACL 不做；T4/T7 无新 replay/视觉场景。
 
+## 三轮复核（2026-10-28）
+
+0.4.2 + 真 fs-sandbox + vendor→domain smoke 后复核：
+
+- `_dist` 只有 0.4.2；release manifest READY @ `55a164e`；旧 0.4.1 tarball 已清。
+- 运行态：旧 profile `session-search.db*` 已清；新 `cache/company/session-search-web.db` 由真 `preset-smoke` 搜索创建；
+  `ui-scene-smoke` 真页面全绿；旧 startup/diagnosis 等残留已清（保留 `harness-home/b` 与公司 sessions）。
+- 文档/代码一致：K cache、日志轮转、client peers、domain 权威、方法层路径；`pnpm verify` 全绿。
+- **本轮无 P1/P2 实质发现**；剩余只归边界：catalog 仍是 W 派生显示（UI 已明示，host RPC 未做）、
+  `company/` 只收方法层、指令/治理面无 ACL、T4/T7 无新 replay/视觉场景。连续两轮（本轮 + 上轮真
+  fs-sandbox/domain 证据）无 P1/P2，按目标停止条件收口。
+
 ## 范围 / 排除
 
 - 范围：二轮 8 项的代码/文档/发布收口（0.4.1）。
