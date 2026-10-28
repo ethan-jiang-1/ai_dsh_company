@@ -66,7 +66,9 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
-  it('catalog 不进模型指令面（T4：没有模型可见路径，故无新 replay 场景）', () => {
+  it('catalog 未注入模型指令面（T4：workspace 文件仍可被 fs 读取，故不声称不可见）', () => {
+    // 2026-10-28 数据设计硬化 M1：catalog 在 workspace 内，模型可经 fs 读到；这里只能断言
+    // “没有把它写进指令面”，不能断言“模型不可见”（可见性见 docs/data-model.md 数据卡）。
     const agents = readFileSync(join(PACK, 'workspace/AGENTS.md'), 'utf8')
     expect(agents).not.toContain('deliverables-index')
     for (const role of [...ROLES, 'researcher']) expect(roleYml(role)).not.toContain('deliverables-index')

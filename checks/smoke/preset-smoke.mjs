@@ -42,6 +42,23 @@ const roleSkills = (role) => readdirSync(join(ROOT, 'packages/company-pack/prese
   .map(entry => entry.name)
   .sort()
 
+/** 该角色方法层里实际存在的 skill（deployer 根；旧 profile 路径与 M3 后的 home 路径都收）。 */
+const methodSkills = (role, homeDir, profileName) => {
+  const roots = [
+    join(homeDir, 'profiles', profileName, 'company-cultivation', role),
+    join(homeDir, 'company', 'methods', role),
+  ]
+  const names = []
+  for (const root of roots) {
+    try {
+      for (const entry of readdirSync(root, { withFileTypes: true })) {
+        if (entry.isDirectory()) names.push(entry.name)
+      }
+    } catch { /* 目录缺席 = 没有方法 */ }
+  }
+  return names
+}
+
 let home
 try {
   home = requireDevHome('preset-smoke')
@@ -145,16 +162,17 @@ try {
   })
 
   // ③ 角色 skills 硬隔离（真入口断言）：`skills/list` 是 session 寻址的冷读 Remote，
-  //    按会话的 preset scope 解析注册表。断言"恰好等于该角色目录里的 skill"——
-  //    `includeDefaultRoots` 默认 true 时，角色会话会额外看见项目根/用户级技能集
-  //    （`~/.agents/skills` 等），本条即抓这个泄漏。
+  //    按会话的 preset scope 解析注册表。期望集 = 包内 skills + **本角色方法层**
+  //    （deployer 根；旧 profile 路径与 M3 后的 home 路径都收）——方法层是数据，不是组合泄漏；
+  //    不把它算进 expected 会在 adopt 过的 home 里假红。`includeDefaultRoots` 默认 true 时，
+  //    角色会话会额外看见项目根/用户级技能集（`~/.agents/skills` 等），本条仍抓这个泄漏。
   for (const role of ROLES) {
     await check(`${role} 只看见自己的 skills`, async () => {
       const sessionId = sessionIds.get(role)
       if (sessionId === undefined) throw new Error('没有会话 id（上一步未通过）')
       const value = await rpc(base, cookie, 'skills/list', { request: { sessionId } })
       const actual = (value.skills ?? []).map(skill => skill.name).sort()
-      const expected = roleSkills(role)
+      const expected = [...new Set([...roleSkills(role), ...methodSkills(role, home, PROFILE)])].sort()
       const extra = actual.filter(name => !expected.includes(name))
       const missing = expected.filter(name => !actual.includes(name))
       if (extra.length > 0) throw new Error(`看见了非本角色的 skill：${extra.join(', ')}`)
