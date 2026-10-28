@@ -268,6 +268,7 @@ function cultivationRegistrations(
   sessionQuery?: unknown,
   companyHome?: string,
   fs?: unknown,
+  sandboxPolicy?: unknown,
 ): {
   readonly command: CommandDefinition['handler']
   readonly proposal: RegisteredCultivationTool
@@ -277,7 +278,7 @@ function cultivationRegistrations(
   const ctx = {
     tools: { register: (definition: RegisteredCultivationTool) => { tools.push(definition); return () => {} } },
     commands: { register: (definition: CommandDefinition) => { commands.push(definition); return () => {} } },
-    get: (name: string) => name === 'sessionQuery' ? sessionQuery : name === 'fs' ? fs : undefined,
+    get: (name: string) => name === 'sessionQuery' ? sessionQuery : name === 'fs' ? fs : name === 'sandboxPolicy' ? sandboxPolicy : undefined,
   }
   registerCultivation(ctx as Parameters<typeof registerCultivation>[0], config, companyHome)
   const command = commands.find(definition => definition.name === 'cultivation')
@@ -318,15 +319,18 @@ function invokeCultivation(
 describe('cultivation_propose 的 ctx.fs 通道（2026-10-28 二轮）', () => {
   it('有 ctx.fs 时走 createIfAbsent；不写 node:fs 文件', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
-      const calls: { path: string; expected: unknown }[] = []
+      const calls: { path: string; expected: unknown; policy: unknown }[] = []
+      const policy = { mode: 'workspace-write', workspaceRoot: workspace }
+      let resolvedWith: unknown
+      const sandboxPolicy = { resolve: (request: unknown) => { resolvedWith = request; return policy } }
       const fs = {
         resolve: async (path: string) => ({ path }),
-        writeText: async (target: unknown, _content: string, expected: unknown) => {
-          calls.push({ path: (target as { path: string }).path, expected })
+        writeText: async (target: unknown, _content: string, expected: unknown, _signal: unknown, passed: unknown) => {
+          calls.push({ path: (target as { path: string }).path, expected, policy: passed })
           return { operation: 'create', version: 'v1' }
         },
       }
-      const { proposal } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace, fs)
+      const { proposal } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace, fs, sandboxPolicy)
       const result = await proposal.execute({
         kind: 'correction',
         targetRole: 'ceo',
@@ -339,6 +343,8 @@ describe('cultivation_propose 的 ctx.fs 通道（2026-10-28 二轮）', () => {
       expect(result.recorded).toBe(true)
       expect(calls).toHaveLength(1)
       expect(calls[0]?.expected).toEqual({ kind: 'createIfAbsent' })
+      expect(calls[0]?.policy).toEqual(policy)
+      expect((resolvedWith as { session?: { header?: { cwd?: string } } })?.session?.header?.cwd).toBe(workspace)
       expect(calls[0]?.path.endsWith('.md')).toBe(true)
       expect(readdirSync(join(workspace, 'cultivation', 'records'))).toHaveLength(0)
     })
