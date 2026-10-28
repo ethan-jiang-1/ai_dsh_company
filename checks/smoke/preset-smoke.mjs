@@ -16,7 +16,7 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
 import { spawn } from 'node:child_process'
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
@@ -154,6 +154,17 @@ try {
     const aid = a?.id ?? a?.sessionId
     const bid = b?.id ?? b?.sessionId
     if (typeof aid !== 'string' || typeof bid !== 'string' || aid === bid) throw new Error(`会话 id 异常：${String(aid)} / ${String(bid)}`)
+  })
+
+  // ②c K cache 落点（2026-10-28 二轮）：session/search 真触发 session-query-sqlite，
+  //    索引应落在 home cache/company/session-search-<profile>.db，不回 profile 目录。
+  await check('session-search 索引落 K cache（per profile）', async () => {
+    const value = await rpc(base, cookie, 'session/search', { request: { query: 'CEO' } })
+    if (!Array.isArray(value.items)) throw new Error(`session/search 返回形状异常：${JSON.stringify(value).slice(0, 120)}`)
+    const db = join(home, 'cache', 'company', `session-search-${PROFILE}.db`)
+    if (!existsSync(db)) throw new Error(`缺索引文件 ${db}`)
+    const old = join(home, 'profiles', PROFILE, 'session-search.db')
+    if (existsSync(old)) throw new Error(`旧 profile 索引仍在：${old}`)
   })
 
   // ③ 角色 skills 硬隔离（真入口断言）：`skills/list` 是 session 寻址的冷读 Remote，

@@ -52,7 +52,9 @@ import {
   SLUG_RE,
   UnsafeCultivationPathError,
   nodeCultivationStorage,
+  writeRecordViaFs,
   type CultivationStorage,
+  type FsWriteLike,
 } from './cultivation-storage.ts'
 import { canonicalPath } from './paths.ts'
 
@@ -74,6 +76,31 @@ interface SessionFace {
 /** 命令/工具执行上下文里 Agent 的最小结构面（本地声明，不引 dsh-agent 类型图）。 */
 interface AgentLike {
   readonly session?: { readonly header?: { readonly cwd?: string, readonly agentPreset?: string } } | undefined
+}
+
+/** 取可选 `ctx.fs`（模型发起的写优先走它；缺席回退 node:fs）。 */
+function fsOf(ctx: Context): FsWriteLike | undefined {
+  try {
+    const get = (ctx as unknown as { get?: (name: string) => unknown }).get
+    return typeof get === 'function' ? get.call(ctx, 'fs') as FsWriteLike | undefined : undefined
+  } catch {
+    return undefined
+  }
+}
+
+/** 取会话 sandbox policy（fs-sandbox 需要；缺席时由 backend 用部署 fallback）。 */
+function sandboxPolicyOf(ctx: Context, agent: unknown): unknown {
+  try {
+    const get = (ctx as unknown as { get?: (name: string) => unknown }).get
+    const service = typeof get === 'function'
+      ? get.call(ctx, 'sandboxPolicy') as { resolve?: (request: { session?: unknown }) => unknown } | undefined
+      : undefined
+    if (service?.resolve === undefined) return undefined
+    const session = (agent as AgentLike | undefined)?.session
+    return service.resolve(session === undefined ? {} : { session })
+  } catch {
+    return undefined
+  }
 }
 
 /** 从执行上下文取「所在会话的角色 + cwd」；任一缺席给 null（调用方报可操作错误）。 */
@@ -604,15 +631,20 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
       if (args.kind !== 'correction' && args.kind !== 'suggestion') {
         return { id: '', recorded: false, note: 'kind 只认 correction / suggestion。' }
       }
-      const id = storage.writeRecord(join(scope.root, RECORDS_REL), {
-        kind: args.kind,
+      const draft = {
+        kind: args.kind === 'suggestion' ? 'suggestion' as const : 'correction' as const,
         targetRole: args.targetRole,
         proposerRole: face.role,
-        proposerKind: 'agent',
+        proposerKind: 'agent' as const,
         source: args.source?.trim() !== '' && args.source !== undefined ? args.source : '（会话内提交）',
         expectation: args.expectation,
         body: args.body,
-      })
+      }
+      const recordsDir = join(scope.root, RECORDS_REL)
+      const fs = fsOf(ctx)
+      const id = fs === undefined
+        ? storage.writeRecord(recordsDir, draft)
+        : await writeRecordViaFs(fs, recordsDir, draft, exec.signal, sandboxPolicyOf(ctx, exec.agent))
       return {
         id,
         recorded: true,

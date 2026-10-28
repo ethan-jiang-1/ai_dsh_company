@@ -44,7 +44,7 @@
 | 用户 `U` | 用户全局 AGENTS/skills（本包不写） | `$DSH_HOME/AGENTS.md`、`$DSH_HOME/skills`、`~/.agents` | 用户维护；本包只读/不碰 |
 | 宿主状态 `H` | `bundle.json`（身份/基部指纹）、`bundle.json.bak-*`（显式换盘备份，只留最新 5 份）、`company-pack.lock`（writer lease）、`logs/company-pack-upgrade.log`、`logs/company-client-errors.log`（256 KiB 轮转）、`storages/company_deliverables.json`（`presented` 审计 domain）、`company/methods/<role>/`（方法层，公司级；旧 profile 路径只读留一版） | `<DSH_HOME>` | 不动；方法层同 home 多 profile 共享 |
 | 会话 `S` | 会话日志由宿主拥有；本包不自造 event 类型；目录名/session header 含 cwd 绝对路径 | `<DSH_HOME>/sessions/` | 不动 |
-| 缓存 `K` | `company-client` 行声明的全文索引（派生；可能含会话正文） | `<DSH_HOME>/profiles/<p>/session-search.db` | 可删可重建；卸载不删；备份按敏感数据处理 |
+| 缓存 `K` | `company-client` 行声明的全文索引（派生；可能含会话正文） | `<DSH_HOME>/cache/company/session-search-<p>.db`（per-profile 文件） | 可删可重建；卸载不删；备份按敏感数据处理 |
 | 凭据 `X` | 不写入包；走 `<DSH_HOME>/.credentials.yaml` / 环境变量 | home | 用户管理；文件必须 0600 |
 
 说明：6+2 = D/C/W/U/S/H + K/X。`R` DSH workspace 登记与 `B` 浏览器 localStorage 是**边界**，不是本包平面：R 归宿主，搬 home 后需重新添加；B 按 origin/设备，Host/模型看不到。没有单独的 `I` 平面——派生索引落 W（catalog）或 K（session-search）。
@@ -69,7 +69,7 @@
 
 ## Uninstall
 
-`dsh plugin --profile web remove dsh-company-pack`：只摘插件与 profile 层，公司盘（含 `cultivation/records-archive/`）、旧 W `kb/deliverables-presented.json`、`storages/company_deliverables.json`、sessions、`bundle.json`/`bundle.json.bak-*`、`company/methods/`、`session-search.db` 保留。
+`dsh plugin --profile web remove dsh-company-pack`：只摘插件与 profile 层，公司盘（含 `cultivation/records-archive/`）、旧 W `kb/deliverables-presented.json`、`storages/company_deliverables.json`、sessions、`bundle.json`/`bundle.json.bak-*`、`company/methods/`、`cache/company/session-search-*.db` 保留。
 要彻底删除一个部署，确认备份后删除它的整个 `<DSH_HOME>`。详见《安装手册》第六节。
 
 ## Owner（维护者）

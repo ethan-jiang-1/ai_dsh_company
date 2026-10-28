@@ -14,7 +14,6 @@
  */
 import { createHash, randomUUID } from 'node:crypto'
 import {
-  appendFileSync,
   existsSync,
   linkSync,
   lstatSync,
@@ -30,6 +29,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { isRecord } from '../lib/guards.ts'
 import { canonicalPath } from './paths.ts'
+import { appendRotatingLine } from './rotating-log.ts'
 
 /** 当前 manifest 形状版本；字段变化时升。 */
 export const BUNDLE_MANIFEST_VERSION = 1
@@ -40,9 +40,7 @@ export const BUNDLE_MANIFEST_FILENAME = 'bundle.json'
 export const BUNDLE_UPGRADE_LOG = 'logs/company-pack-upgrade.log'
 
 export function appendUpgradeLog(dshHome: string, message: string): void {
-  const path = join(dshHome, BUNDLE_UPGRADE_LOG)
-  mkdirSync(dirname(path), { recursive: true })
-  appendFileSync(path, `${new Date().toISOString()} ${message}\n`, 'utf8')
+  appendRotatingLine(join(dshHome, BUNDLE_UPGRADE_LOG), `${new Date().toISOString()} ${message}\n`)
 }
 
 /** manifest 的绝对路径（`<DSH_HOME>/bundle.json`）。 */

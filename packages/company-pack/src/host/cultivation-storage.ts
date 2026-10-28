@@ -53,7 +53,7 @@ function isSafeRecordId(id: string): boolean {
 }
 
 /** 记录 id：时间戳 + 短随机（文件名倒序 ≈ 最新在前）。 */
-function newRecordId(now = new Date()): string {
+export function newRecordId(now = new Date()): string {
   const pad = (n: number): string => String(n).padStart(2, '0')
   const rand = Math.random().toString(36).slice(2, 6)
   return `${String(now.getFullYear())}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}-${rand}`
@@ -391,6 +391,46 @@ function writeRecord(recordsDir: string, draft: Parameters<typeof recordText>[0]
       return id
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+    }
+  }
+  throw new Error('Unable to allocate a unique cultivation record id after 8 attempts')
+}
+
+/** Minimum `ctx.fs` face used for model-initiated record writes (no vendor type leak). */
+export interface FsWriteLike {
+  resolve(path: string, opts?: { cwd?: string, signal?: AbortSignal }): Promise<unknown>
+  writeText(
+    target: unknown,
+    content: string,
+    expected?: { kind: 'createIfAbsent' },
+    signal?: AbortSignal,
+    sandboxPolicy?: unknown,
+  ): Promise<unknown>
+}
+
+/**
+ * 模型发起的记录写入走 `ctx.fs`（2026-10-28 二轮）：目录仍由 host provisioning 建；
+ * 文件内容用 `createIfAbsent` 发布，既有文件零覆盖；`FS_NOT_OBSERVED` 视为 id 碰撞重试。
+ * fs 缺席时调用方回退 `writeRecord`（node:fs + link wx）；两者都不做盲覆盖。
+ */
+export async function writeRecordViaFs(
+  fs: FsWriteLike,
+  recordsDir: string,
+  draft: Parameters<typeof recordText>[0],
+  signal?: AbortSignal,
+  sandboxPolicy?: unknown,
+): Promise<string> {
+  ensureRecordsDirectory(recordsDir)
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const id = newRecordId()
+    const path = recordPath(recordsDir, id)
+    if (path === null) throw new Error(`Generated an unsafe cultivation record id: ${id}`)
+    try {
+      const target = await fs.resolve(path)
+      await fs.writeText(target, recordText(draft), { kind: 'createIfAbsent' }, signal, sandboxPolicy)
+      return id
+    } catch (error) {
+      if ((error as { code?: unknown }).code !== 'FS_NOT_OBSERVED') throw error
     }
   }
   throw new Error('Unable to allocate a unique cultivation record id after 8 attempts')

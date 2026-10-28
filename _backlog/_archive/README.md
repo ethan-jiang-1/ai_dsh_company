@@ -15,6 +15,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-10-28-data-design-round2.md](settled_issues/2026-10-28-data-design-round2.md) | 已结；二轮削洋葱 8 项（ctx.fs / 派生显示 / K cache / 日志 / peers 修；指令面/namespace/T4-T7 边界）；0.4.1；去向 = [implemented Note](../../notes/implemented/2026-10-28-data-design-round2.md) | 2026-10-28 |
 | [2026-10-28-data-design-hardening.md](settled_issues/2026-10-28-data-design-hardening.md) | 已结；数据设计硬化（账本→domain、方法层→公司级、数据卡 v2）；M1–M4 落地（0.4.0）；去向 = [implemented Note](../../notes/implemented/2026-10-28-data-design-hardening.md) | 2026-10-28 |
 | [2026-10-27-six-dim-raise.md](settled_issues/2026-10-27-six-dim-raise.md) | 已结；六维提分 D1/D4/D5 → A-（开工最小路径 / 0.3.15 交付面 + dist-freshness / UI 金样 + 认证档）；去向 = 三篇 implemented Note | 2026-10-28 |
 | [2026-10-27-repo-hygiene-round3.md](settled_issues/2026-10-27-repo-hygiene-round3.md) | 已结；第三轮六维度打扫 A/B/C/D 全批，R3-01…26 逐项处置（18 修 / 5 部分 / 3 明确不作），去向 = 六篇 implemented Note | 2026-10-27 |

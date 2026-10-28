@@ -22,8 +22,8 @@ workspace 沙箱、session event 校验、storage domain schema 与 approval。�
 | `presented` 账本 | 操作员 / 这次交付 | domain `company_deliverables`（true 来自事件，false 人审） | host 事件 + 人命令；模型不能写 domain | `<DSH_HOME>/storages/company_deliverables.json`；旧 W `kb/deliverables-presented.json` 只读留一版 | 用户 / 索引派生 | 跟 home；删了丢 false/true 背书 | domain v1 + schema 1；tamper/backfill |
 | writer lease | 进程 / 这个 home | 进程 | host apply | `<DSH_HOME>/company-pack.lock` | 宿主 | 进程持有；stale 接管 | schema 1；lease spec |
 | `bundle.json` + 备份 | 插件 / 这个安装 | manifest | host apply；人只读 | `<DSH_HOME>/bundle.json(.bak-*)` | 用户 / 工具 | 只创建；升级改写；备份 5 份 | v1；manifest spec |
-| 宿主日志（upgrade/client-errors） | 插件 / 这个 home | 插件 | host append/命令 | `<DSH_HOME>/logs/...` | 用户 / 模型 fs | 追加；client-errors 256 KiB 轮转；卸载不删 | 无版本；host-composition |
-| 会话全文索引 | 无 / 会话语料 | 无（派生） | `session-query-sqlite` | `<DSH_HOME>/profiles/<p>/session-search.db` | 代码，非模型 | 可重建；卸载不删 | DSH schema；rebuild |
+| 宿主日志（upgrade/client-errors） | 插件 / 这个 home | 插件 | host append/命令 | `<DSH_HOME>/logs/...` | 用户 / 模型 fs | 追加；均 256 KiB 轮转 `.1`；卸载不删 | 无版本；host-composition |
+| 会话全文索引 | 无 / 会话语料 | 无（派生） | `session-query-sqlite` | `<DSH_HOME>/cache/company/session-search-<p>.db`（K；per-profile 文件） | 代码，非模型 | 可重建；清缓存丢索引 | DSH schema；rebuild |
 | DSH workspace 登记 | DSH / 这台机器 | DSH | 宿主/服务 | `<DSH_HOME>/storages/workspace.json` | 宿主 | 宿主所有；搬 home 需重加 | DSH 管；stale 告警 |
 | 会话日志 + `present` 事件 | 会话 / 这次对话 | 日志 | agent loop / `present` | `<DSH_HOME>/sessions/` | 模型 / 客户端 | 无删除 API；不删 | DSH 格式；replay |
 | 浏览器状态 | 设备 / origin | 客户端 | client apply | `localStorage`：`dsh-company-pack/.../v1` | 浏览器 | 换 origin 即丢；不参与模型 | v1；float/instance spec |

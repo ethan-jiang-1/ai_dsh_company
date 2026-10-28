@@ -2,6 +2,16 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.4.1 — 2026-10-28
+
+### Changed
+
+- **模型发起的写走 `ctx.fs`**：`cultivation_propose` 在 `ctx.fs` 可用时用 `resolve + writeText({createIfAbsent})`（并传会话 sandbox policy），既有文件零覆盖；服务缺席才回退 `node:fs` link wx。真 fs-local 测试覆盖 createIfAbsent/`FS_NOT_OBSERVED`。
+- **索引读信任明示**：成品页签脚注明确「本索引是 host 生成的派生显示，presented 以 domain 审计账本为准」；静态渲染测试钉住。
+- **会话全文索引落 K cache**：`<DSH_HOME>/cache/company/session-search-<profile>.db`（仍 per-profile 单进程 owner）；`preset-smoke` 用真 `session/search` 断言新路径、旧 profile 路径不出现。
+- **升级日志有界**：`logs/company-pack-upgrade.log` 与 client-errors 共用 256 KiB 轮转 `.1`。
+- **client inject peers 补齐**：`dsh.client.inject` 的 8 个包全部进 `peerDependencies`（受控 lock 不变）。
+
 ## 0.4.0 — 2026-10-28
 
 ### Changed

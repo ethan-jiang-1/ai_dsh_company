@@ -18,12 +18,12 @@
     default: ceo
 
 # ── 会话全文检索（0.2.0 harvest 批2）：base 出厂挂着 seam 但 openAt: never + :memory:
-#   （派生索引重启即丢）。替换行翻开懒开 + durable 路径（锚 profile 目录，baseUrl = profile dir，
-#   customSkillDirs 同款 !!js 先例）；索引库独立于会话库（上游教义：别指 session-persistence db）。
+#   （派生索引重启即丢）。替换行翻开懒开 + durable 路径（2026-10-28 二轮：K cache，
+#   按 profile 文件名隔离；仍保持单进程 owner，不跨 profile 共享）；索引库独立于会话库。
 - id: session-query-sqlite
   name: '@deepseek-ai/dsh-session-query-sqlite'
   config:
-    path: !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('session-search.db', baseUrl))"
+    path: !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('../../cache/company/session-search-' + process.getBuiltinModule('node:path').basename(process.getBuiltinModule('node:url').fileURLToPath(baseUrl)) + '.db', baseUrl))"
     openAt: first-search
 
 - insert:

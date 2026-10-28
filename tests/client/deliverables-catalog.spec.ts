@@ -104,6 +104,11 @@ describe('DeliverablesView（静态渲染）', () => {
     expect(html).toContain('present 未核 1')
   })
 
+  it('明确派生显示而非审计权威（presented 以 domain 审计账本为准）', () => {
+    expect(html).toContain('派生显示')
+    expect(html).toContain('审计权威')
+  })
+
   it('按月分组，行里同时有 slug、日期/类型、结论、结果 tag 与「打开」', () => {
     expect(html).toContain('2026-10 · 3 份')
     expect(html).toContain('ledgered-one')

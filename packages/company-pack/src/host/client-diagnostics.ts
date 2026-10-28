@@ -10,8 +10,8 @@
  * 长度有界、token URL 脱敏。日志是用户/操作员可读的普通文件，不冒充审计账本。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { appendFileSync, existsSync, mkdirSync, renameSync, statSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
+import { appendRotatingLine } from './rotating-log.ts'
 
 /** 诊断日志落点（相对 DSH_HOME；宿主日志，不是公司数据）。 */
 export const CLIENT_ERRORS_REL = 'logs/company-client-errors.log'
@@ -19,7 +19,7 @@ export const CLIENT_ERRORS_REL = 'logs/company-client-errors.log'
 export const LEGACY_CLIENT_ERRORS_REL = 'cultivation/client-errors.log'
 
 /** 单文件上限；超过则把当前文件轮转为 `.1`（只留一份备份）。 */
-const MAX_LOG_BYTES = 256 * 1024
+export const CLIENT_ERRORS_MAX_BYTES = 256 * 1024
 
 const MAX_INPUT_CHARS = 8_000
 
@@ -69,15 +69,7 @@ export function registerClientDiagnostics(ctx: Context, dshHome: string, dataBlo
       }
       const path = join(dshHome, CLIENT_ERRORS_REL)
       try {
-        mkdirSync(dirname(path), { recursive: true })
-        if (existsSync(path) && statSync(path).size >= MAX_LOG_BYTES) {
-          try {
-            renameSync(path, `${path}.1`)
-          } catch {
-            // 轮转失败不挡本次写入；下一轮再试。
-          }
-        }
-        appendFileSync(path, `${JSON.stringify({ at: new Date().toISOString(), entry })}\n`, 'utf8')
+        appendRotatingLine(path, `${JSON.stringify({ at: new Date().toISOString(), entry })}\n`, CLIENT_ERRORS_MAX_BYTES)
       } catch (error) {
         return { kind: 'error' as const, text: `诊断写入失败：${(error as Error).message}` }
       }

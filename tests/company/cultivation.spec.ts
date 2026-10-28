@@ -267,6 +267,7 @@ function cultivationRegistrations(
   config: CultivationHostConfig,
   sessionQuery?: unknown,
   companyHome?: string,
+  fs?: unknown,
 ): {
   readonly command: CommandDefinition['handler']
   readonly proposal: RegisteredCultivationTool
@@ -276,7 +277,7 @@ function cultivationRegistrations(
   const ctx = {
     tools: { register: (definition: RegisteredCultivationTool) => { tools.push(definition); return () => {} } },
     commands: { register: (definition: CommandDefinition) => { commands.push(definition); return () => {} } },
-    get: (name: string) => name === 'sessionQuery' ? sessionQuery : undefined,
+    get: (name: string) => name === 'sessionQuery' ? sessionQuery : name === 'fs' ? fs : undefined,
   }
   registerCultivation(ctx as Parameters<typeof registerCultivation>[0], config, companyHome)
   const command = commands.find(definition => definition.name === 'cultivation')
@@ -313,6 +314,36 @@ function invokeCultivation(
     signal: new AbortController().signal,
   })
 }
+
+describe('cultivation_propose 的 ctx.fs 通道（2026-10-28 二轮）', () => {
+  it('有 ctx.fs 时走 createIfAbsent；不写 node:fs 文件', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const calls: { path: string; expected: unknown }[] = []
+      const fs = {
+        resolve: async (path: string) => ({ path }),
+        writeText: async (target: unknown, _content: string, expected: unknown) => {
+          calls.push({ path: (target as { path: string }).path, expected })
+          return { operation: 'create', version: 'v1' }
+        },
+      }
+      const { proposal } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace, fs)
+      const result = await proposal.execute({
+        kind: 'correction',
+        targetRole: 'ceo',
+        expectation: '走 ctx.fs',
+        body: '记录正文',
+      } as never, {
+        agent: { session: { header: { agentPreset: 'ceo', cwd: workspace } } },
+        signal: new AbortController().signal,
+      } as never) as { recorded: boolean; id: string }
+      expect(result.recorded).toBe(true)
+      expect(calls).toHaveLength(1)
+      expect(calls[0]?.expected).toEqual({ kind: 'createIfAbsent' })
+      expect(calls[0]?.path.endsWith('.md')).toBe(true)
+      expect(readdirSync(join(workspace, 'cultivation', 'records'))).toHaveLength(0)
+    })
+  })
+})
 
 describe('/cultivation 注册命令的 host 行为', () => {
   it('公司数据只认盘根：子目录会话被拒绝，盘根会话照常写', async () => {

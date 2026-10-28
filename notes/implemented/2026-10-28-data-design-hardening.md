@@ -44,7 +44,8 @@ skill/domain API）、数据 6+2、数据卡、T0–T8、六版本/标识符均�
 
 **残余（显式，不阻塞 0.4.0）**：`ctx.fs` 写通道、catalog 读信任、session-search K 落点、指令/治理面可写、
 upgrade log 轮转、全量 `company/` namespace、T4/T7 视觉/回放证据、client inject peers；逐项与选项 =
-[二轮审计卡](../../_backlog/issues/2026-10-28-data-design-round2.md)。
+[二轮审计卡](../../_backlog/_archive/settled_issues/2026-10-28-data-design-round2.md)；已由
+[0.4.1 二轮削洋葱 Note](./2026-10-28-data-design-round2.md) 收口。
 
 **本轮补充**：`AGENTS.md`/owners/CHARTER 的“W 可写、非 ACL、改后影响基部哈希”进 data-model §六；
 运行态清理 714M → 643M（保留 `harness-home/b`、公司 sessions、业务盘与旧 W 审计备份）。

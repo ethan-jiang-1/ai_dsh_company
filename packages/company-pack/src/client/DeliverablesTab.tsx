@@ -174,8 +174,9 @@ export function DeliverablesView({ catalog, sessionId, openFinal }: {
             </div>
           )}
       <div className="wk-meta wk-catalog-foot">
-        成品 = 目录里有 <code>final.md</code>；<code>present</code> 背书来自本部署 host 记录的 present 事件，
-        未记录的条目显示「未核」。索引由 host 生成，面板只读。
+        成品 = 目录里有 <code>final.md</code>；<code>present</code> 背书来自本部署 host 的审计账本（domain；
+        由 present 事件 + 操作员审计写入）。本索引是 host 生成的**派生显示**，不作为审计权威；
+        未记录的条目显示「未核」，面板只读。
       </div>
     </>
   )

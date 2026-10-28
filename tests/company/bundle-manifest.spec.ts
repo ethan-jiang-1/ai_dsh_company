@@ -11,6 +11,7 @@ import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
+  appendUpgradeLog,
   applySkeletonUpgrade,
   applyWorkspaceRebind,
   bundleManifestPath,
@@ -466,6 +467,24 @@ describe('v1 fixture 迁移演练入口（2026-10-27 F8）', () => {
       expect(readFileSync(join(dsh, 'bundle.json'), 'utf8')).toBe(future)
     } finally {
       rmSync(dsh, { recursive: true, force: true })
+    }
+  })
+})
+
+
+describe('升级日志有界（2026-10-28 二轮）', () => {
+  it('appendUpgradeLog 超过 256 KiB 轮转为 .1', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'upgrade-log-'))
+    try {
+      const logs = join(dir, 'logs')
+      mkdirSync(logs, { recursive: true })
+      const path = join(logs, 'company-pack-upgrade.log')
+      writeFileSync(path, 'x'.repeat(256 * 1024))
+      appendUpgradeLog(dir, 'rotation')
+      expect(existsSync(`${path}.1`)).toBe(true)
+      expect(readFileSync(path, 'utf8')).toContain('rotation')
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
     }
   })
 })
