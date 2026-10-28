@@ -2,7 +2,16 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.4.5 — 2026-10-28
+
+### Added
+
+- **培养对话 attach**：右栏可选择左侧培养记录作为上下文；prompt 带 `【附加记录】` 引用，界面只显示用户原话。
+- **流式/工具行**：assistant transient text-delta 显示「生成中」；tool/call、tool/result 以紧凑行显示，失败带原因。
+- 范围前缀 + `【用户问题】` 标记，渲染时剥离；审批仍走平台审批面（面板只显示工具状态，不伪造审批卡）。
+
 ## 0.4.4 — 2026-10-28
+
 
 ### Added
 

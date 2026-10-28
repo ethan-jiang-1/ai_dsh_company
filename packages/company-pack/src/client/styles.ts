@@ -671,6 +671,21 @@ html[data-dsh-cultivation-view] [data-composer-seat] { display: none !important;
   overflow-wrap: anywhere;
 }
 .wk-cult-chat-line.you .wk-cult-chat-bubble { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.wk-cult-chat-line.tool .wk-cult-chat-bubble { border-style: dashed; color: var(--dsw-alias-label-tertiary); font-size: 10px; padding: 4px 7px; }
+.wk-cult-chat-line.tool .wk-cult-chat-who { color: var(--dsw-alias-label-tertiary); }
+.wk-cult-chat-bubble.streaming { border-color: var(--dsw-alias-border-l1); color: var(--dsw-alias-label-secondary); }
+.wk-cult-chat-attach { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; color: var(--dsw-alias-label-tertiary); font-size: 9.5px; }
+.wk-cult-chat-attach select {
+  min-width: 0;
+  flex: 1;
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 5px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-secondary);
+  font: inherit;
+  font-size: 9.5px;
+  padding: 3px 4px;
+}
 .wk-cult-chat-bubble.bad { border-color: var(--dsw-alias-state-error-primary); color: var(--dsw-alias-state-error-primary); }
 .wk-cult-chat-composer { border-top: 1px solid var(--dsw-alias-border-l1); padding: 9px 10px 10px; }
 .wk-cult-chat-composer textarea {

@@ -106,6 +106,7 @@ export function createCultivationView(injected: CultivationViewInjected) {
             mainSessionId={sessionId}
             cwd={sessionCwd}
             agentPreset={viewerRole}
+            attachments={records ?? []}
           />
         </div>
       </div>

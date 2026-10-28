@@ -11,15 +11,31 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'reac
 import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionBinding, SessionReference } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { CultivationRecord } from '../lib/cultivation.ts'
 
 type EventWindow = ReturnType<SessionBinding['eventSource']['getSnapshot']>
 
 /** 独立培养会话的范围前缀：同一个 agent 只在这个线程里谈培养。 */
 const CULTIVATION_SCOPE = '【培养对话】你只在这个线程里讨论培养：纠正、方法、journal、赞踩。不要处理其他项目或公司事务。回答要能落到方法/记录上。\n\n'
 
-/** 渲染时剥掉范围前缀，用户看到的是自己写的那句。 */
+/** 渲染时剥掉范围/附加前缀，用户看到的是自己写的那句。 */
 function stripScope(text: string): string {
+  const marker = '【用户问题】'
+  const at = text.indexOf(marker)
+  if (at >= 0) return text.slice(at + marker.length)
   return text.startsWith(CULTIVATION_SCOPE) ? text.slice(CULTIVATION_SCOPE.length) : text
+}
+
+/** 把附加记录压成有界上下文（引用 id/期望/来源，正文截断）。 */
+function attachedContext(record: CultivationRecord | undefined): string {
+  if (record === undefined) return ''
+  const body = record.body.length > 1200 ? `${record.body.slice(0, 1200)}…` : record.body
+  return `【附加记录】${record.id} · ${record.targetRole} · ${record.status}
+期望：${record.expectation}
+来源：${record.source ?? '（未记）'}
+正文：${body}
+
+`
 }
 type EventEntries = EventWindow['entries']
 type SessionSnapshot = ReturnType<SessionBinding['session']['getSnapshot']>
@@ -34,11 +50,13 @@ export interface CultivationChatPanelProps {
   readonly cwd?: string | undefined
   /** 当前角色 preset；缺席 = 等角色投影。 */
   readonly agentPreset?: string | null | undefined
+  /** 左侧可附加的记录/方法（只带引用与摘要，不复制全文）。 */
+  readonly attachments?: readonly CultivationRecord[] | undefined
 }
 
 interface ThreadRow {
   readonly id: string
-  readonly who: 'you' | 'host'
+  readonly who: 'you' | 'host' | 'tool'
   readonly text: string
 }
 
@@ -75,6 +93,16 @@ function rowsOf(entries: EventEntries): readonly ThreadRow[] {
     if (event.type === 'assistant/message') {
       const text = textOfBlocks(event.data.message.content as readonly unknown[])
       if (text !== '') rows.push({ id: `a-${event.seq}`, who: 'host', text })
+      continue
+    }
+    if (event.type === 'tool/call') {
+      rows.push({ id: `tc-${event.seq}`, who: 'tool', text: `工具 · ${event.data.name}` })
+      continue
+    }
+    if (event.type === 'tool/result') {
+      const failed = event.data.message.isError === true || event.data.error !== undefined
+      const reason = event.data.error?.reason ?? ''
+      rows.push({ id: `tr-${event.seq}`, who: 'tool', text: failed ? `工具失败${reason === '' ? '' : ` · ${reason}`}` : '工具完成' })
     }
   }
   return rows
@@ -85,7 +113,7 @@ function rowsOf(entries: EventEntries): readonly ThreadRow[] {
  * @param props - sessions + 主会话 cwd/role。
  * @returns 培养对话面板。
  */
-export function CultivationChatPanel({ sessions, mainSessionId, cwd, agentPreset }: CultivationChatPanelProps) {
+export function CultivationChatPanel({ sessions, mainSessionId, cwd, agentPreset, attachments = [] }: CultivationChatPanelProps) {
   const [state, setState] = useState<PanelState>({ status: cwd === undefined || agentPreset == null ? 'waiting' : 'creating' })
 
   useEffect(() => {
@@ -147,19 +175,19 @@ export function CultivationChatPanel({ sessions, mainSessionId, cwd, agentPreset
       </header>
 
       <div className="wk-cult-chat-hint">
-        只谈培养：纠正、方法、journal、赞踩；回复不会混进主 Chat。
+        只谈培养：纠正、方法、journal、赞踩；回复不会混进主 Chat。工具审批走平台审批面。
       </div>
 
       {state.status === 'waiting' && <div className="wk-cult-chat-state">等待主会话的工作区与角色…</div>}
       {state.status === 'creating' && <div className="wk-cult-chat-state">正在建立培养会话…</div>}
       {state.status === 'error' && <div className="wk-cult-chat-state bad">培养会话打不开：{state.error}</div>}
-      {state.status === 'ready' && <CultivationThread binding={state.binding} />}
+      {state.status === 'ready' && <CultivationThread binding={state.binding} attachments={attachments} />}
     </section>
   )
 }
 
 /** 一个已就绪绑定的 transcript + composer（hooks 只在 ready 后挂载）。 */
-function CultivationThread({ binding }: { readonly binding: SessionBinding }) {
+function CultivationThread({ binding, attachments }: { readonly binding: SessionBinding, readonly attachments: readonly CultivationRecord[] }) {
   const window = useSyncExternalStore(
     binding.eventSource.subscribe.bind(binding.eventSource),
     binding.eventSource.getSnapshot.bind(binding.eventSource),
@@ -175,6 +203,8 @@ function CultivationThread({ binding }: { readonly binding: SessionBinding }) {
   const [pending, setPending] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
+  const [attachedId, setAttachedId] = useState('')
+  const attached = attachments.find(record => record.id === attachedId)
   const listRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -182,6 +212,15 @@ function CultivationThread({ binding }: { readonly binding: SessionBinding }) {
     if (list !== null) list.scrollTop = list.scrollHeight
   }, [rows, pending])
 
+  const liveText = useMemo(() => {
+    let text = ''
+    for (const entry of window.entries) {
+      if (entry.type !== 'transient') continue
+      const chunk = entry.event.data.chunk
+      if (chunk.type === 'text-delta') text += chunk.text
+    }
+    return text
+  }, [window.entries])
   const pendingVisible = pending !== null && !rows.some(row => row.who === 'you' && row.text === pending)
 
   const submit = async (): Promise<void> => {
@@ -192,7 +231,7 @@ function CultivationThread({ binding }: { readonly binding: SessionBinding }) {
     setPending(text)
     setSending(true)
     try {
-      const result = await binding.session.prompt([{ type: 'text', text: `${CULTIVATION_SCOPE}${text}` }], 'queue')
+      const result = await binding.session.prompt([{ type: 'text', text: `${CULTIVATION_SCOPE}${attachedContext(attached)}【用户问题】${text}` }], 'queue')
       if (!result.ok) {
         setError(`${result.error.code}: ${result.error.message}`)
         setPending(null)
@@ -217,10 +256,16 @@ function CultivationThread({ binding }: { readonly binding: SessionBinding }) {
         )}
         {rows.map(row => (
           <div key={row.id} className={`wk-cult-chat-line ${row.who}`}>
-            <div className="wk-cult-chat-who">{row.who === 'you' ? '你' : '培养 host'}</div>
+            <div className="wk-cult-chat-who">{row.who === 'you' ? '你' : row.who === 'tool' ? '工具' : '培养 host'}</div>
             <div className="wk-cult-chat-bubble">{row.text}</div>
           </div>
         ))}
+        {liveText !== '' && snapshot.running && (
+          <div className="wk-cult-chat-line host">
+            <div className="wk-cult-chat-who">培养 host · 生成中</div>
+            <div className="wk-cult-chat-bubble streaming">{liveText}</div>
+          </div>
+        )}
         {pendingVisible && (
           <div className="wk-cult-chat-line you">
             <div className="wk-cult-chat-who">你 · 发送中</div>
@@ -234,6 +279,17 @@ function CultivationThread({ binding }: { readonly binding: SessionBinding }) {
       </div>
 
       <div className="wk-cult-chat-composer">
+        <label className="wk-cult-chat-attach">
+          <span>附加记录</span>
+          <select value={attachedId} onChange={event => setAttachedId(event.target.value)}>
+            <option value="">不附加</option>
+            {attachments.map(record => (
+              <option key={record.id} value={record.id}>
+                {record.id.slice(0, 18)} · {record.expectation.slice(0, 42)}
+              </option>
+            ))}
+          </select>
+        </label>
         <textarea
           value={draft}
           rows={3}

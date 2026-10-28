@@ -78,6 +78,42 @@ describe('CultivationChatPanel（独立培养会话）', () => {
     expect(host.textContent).toContain('建议整理成反例方法。')
   })
 
+  it('附加左侧记录后，prompt 带记录引用；界面显示用户原话', async () => {
+    const fake = fakeSessions()
+    const record = {
+      id: '20261028-abc123', targetRole: 'ceo', status: 'open', expectation: '收口前列未决',
+      source: 'deliverables/demo/final.md', body: '做法与证据', kind: 'correction',
+    }
+    const host = document.createElement('div')
+    document.body.append(host)
+    mounted = createRoot(host)
+    await act(async () => {
+      mounted?.render(createElement(CultivationChatPanel, {
+        sessions: fake.sessions, mainSessionId: 'session-main' as never, cwd: '/tmp/company', agentPreset: 'ceo',
+        attachments: [record] as never,
+      }))
+    })
+    const select = host.querySelector('select') as HTMLSelectElement
+    const setSelect = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value')?.set
+    await act(async () => {
+      setSelect?.call(select, record.id)
+      select.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+    const area = host.querySelector('textarea') as HTMLTextAreaElement
+    const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set
+    await act(async () => {
+      setter?.call(area, '这条怎么落成方法？')
+      area.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+    const send = [...host.querySelectorAll('button')].find(node => node.textContent?.includes('发送'))
+    await act(async () => { send?.dispatchEvent(new MouseEvent('click', { bubbles: true })) })
+    const prompt = (fake.binding as unknown as { session: { prompt: ReturnType<typeof vi.fn> } }).session.prompt
+    const text = prompt.mock.calls[0]?.[0]?.[0]?.text as string
+    expect(text).toContain('【附加记录】20261028-abc123')
+    expect(text).toContain('收口前列未决')
+    expect(text).toContain('【用户问题】这条怎么落成方法？')
+  })
+
   it('缺 cwd/角色时等待，不创建会话', async () => {
     const fake = fakeSessions()
     const host = document.createElement('div')
