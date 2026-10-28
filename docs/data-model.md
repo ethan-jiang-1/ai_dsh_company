@@ -42,7 +42,7 @@
 | `bundle.json` | `v: 1` | 保留原文件 + 告警，跳过身份/升级；不覆盖 | 未来 v2 由新 pack 提供迁移；旧 pack 不猜。v1 fixture = `tests/fixtures/bundle-manifest-v1.json`，迁移入口先以 fixture + unsupported 边界演练 |
 | 成品索引 | `schema: 1` | 保留原文件 + 告警，按盘上内容重建派生视图 | 派生，可重建 |
 | `presented` 账本 | `schema: 1` | 保留原文件 + 告警，presented 暂按未核；不覆盖 | 旧 false 从旧索引迁移；true 可从会话事件回扫 |
-| 培养记录 | 无 | 坏形状跳过并计数；不静默改写 | 格式变更走兼容读 + 新可选字段；破坏性变更新文件名/一次性迁移 |
+| 培养记录 | `schema: 1`（缺字段按 1 读） | 坏形状跳过并计数；不静默改写 | 兼容读 + 新可选字段；破坏性变更新文件名/一次性迁移 |
 | 方法层 `SKILL.md` | skill loader 认 `name`/`description` | 额外字段忽略；不认识的形状不加载 | 新字段附加；不覆盖用户方法 |
 
 **fail loud 优先于静默重建**：权威数据（`bundle.json`/账本）损坏时保留原文件；只有派生索引可以重建。

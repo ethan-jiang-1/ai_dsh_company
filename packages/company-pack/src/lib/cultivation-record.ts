@@ -15,6 +15,8 @@ import { journalTitle } from './cultivation-inbox.ts'
 export interface CultivationRecord {
   /** 文件名去 `.md`（时间戳前缀 ⇒ 文件名倒序 ≈ 最新在前）。 */
   readonly id: string
+  /** 记录格式版本；旧记录缺字段按 1 读（2026-10-28 数据卡 v2：记录也要可迁移）。 */
+  readonly schema?: number
   readonly kind: 'correction' | 'suggestion'
   /** 培养对象角色（建议由谁采纳）。 */
   readonly targetRole: string
@@ -55,6 +57,9 @@ export interface CultivationRecord {
 /** 记录 frontmatter 的可选透传字段（解析 → 领域形状）。 */
 const OPTIONAL_FIELDS = ['methodSlug', 'reason', 'decidedAt', 'revokedAt'] as const
 
+/** 当前培养记录格式版本；旧记录缺 `schema` 按本版读。 */
+export const RECORD_SCHEMA = 1
+
 /** 一条新记录的写入面（status 恒为 open；采纳/拒绝由 host 侧改写）。 */
 export interface RecordDraft {
   readonly kind: 'correction' | 'suggestion'
@@ -78,6 +83,7 @@ const oneLine = (text: string): string => text.replaceAll('\n', ' ').trim()
 export function recordText(draft: RecordDraft): string {
   return [
     '---',
+    `schema: ${String(RECORD_SCHEMA)}`,
     `kind: ${draft.kind}`,
     `targetRole: ${oneLine(draft.targetRole)}`,
     `proposerRole: ${oneLine(draft.proposerRole)}`,
@@ -133,6 +139,9 @@ export function parseRecord(id: string, text: string): CultivationRecord | null 
   if (expectation === undefined || expectation === '') return null
   const status = fields.get('status') ?? 'open'
   if (status !== 'open' && status !== 'adopted' && status !== 'rejected') return null
+  const schemaRaw = fields.get('schema')
+  const schema = schemaRaw === undefined ? RECORD_SCHEMA : Number(schemaRaw)
+  if (!Number.isSafeInteger(schema) || schema < 1) return null
   const verification = fields.get('verification')
   if (verification !== undefined && verification !== 'pending' && verification !== 'pass' && verification !== 'fail') return null
   const body = parsed.body
@@ -140,6 +149,7 @@ export function parseRecord(id: string, text: string): CultivationRecord | null 
   // 可选字段先聚成普通对象再收窄成领域形状（避免对 readonly 接口的索引签名强转）。
   const loose: Record<string, unknown> = {
     id,
+    schema,
     kind,
     targetRole,
     proposerRole,

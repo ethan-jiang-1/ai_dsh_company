@@ -143,6 +143,14 @@ describe('培养记录：写读往返与坏形状', () => {
     expect(record!.title).toBe('做法：收口盘点先列未决清单，再下结论。')
   })
 
+  it('记录格式带 schema: 1；旧记录缺字段按 1 读（迁移最小面）', () => {
+    const text = recordText(draft)
+    expect(text).toContain('schema: 1')
+    expect(parseRecord('r-schema', text)!.schema).toBe(1)
+    const legacy = text.replace('schema: 1\n', '')
+    expect(parseRecord('r-legacy', legacy)!.schema).toBe(1)
+  })
+
   it('正文进客户端读模型（S4）：多行原样带出——判断必须先有材料', () => {
     const text = recordText({
       ...draft,
