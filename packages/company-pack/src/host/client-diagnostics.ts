@@ -1,19 +1,25 @@
 /**
- * `/company-diagnostics`：把浏览器错误环的一条诊断写入公司盘（2026-10-28 R4-D6）。
+ * `/company-diagnostics`：把浏览器错误环的一条诊断写入宿主日志（2026-10-28 R4-D6；
+ * 同日数据设计硬化 M1 迁出公司盘）。
  *
  * 为什么：client 没有往 session 追加事件的合法通道；但 client 可以经 `remote.commands.execute`
- * 调一个**人可见的 host 命令**。命令只追加一行到 `cultivation/client-errors.log`，agent 用 read
+ * 调一个**人可见的 host 命令**。命令只追加一行到 `logs/company-client-errors.log`，agent 用 read
  * 就能看到“用户那一页”的错误。它不写会话事件、不改公司数据，只做诊断落盘。
  *
  * 安全：只收 `client-error <uri-encoded JSON>`；按字段白名单归一（kind/message/stack/at/href），
  * 长度有界、token URL 脱敏。日志是用户/操作员可读的普通文件，不冒充审计账本。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { appendFileSync, mkdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { appendFileSync, existsSync, mkdirSync, renameSync, statSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 
-/** 诊断日志落点（公司盘内；agent 可直接 read）。 */
-export const CLIENT_ERRORS_REL = 'cultivation/client-errors.log'
+/** 诊断日志落点（相对 DSH_HOME；宿主日志，不是公司数据）。 */
+export const CLIENT_ERRORS_REL = 'logs/company-client-errors.log'
+/** 旧落点（公司盘内；只读保留一版，不再写入）。 */
+export const LEGACY_CLIENT_ERRORS_REL = 'cultivation/client-errors.log'
+
+/** 单文件上限；超过则把当前文件轮转为 `.1`（只留一份备份）。 */
+const MAX_LOG_BYTES = 256 * 1024
 
 const MAX_INPUT_CHARS = 8_000
 
@@ -22,10 +28,10 @@ function redact(text: string): string {
 }
 
 /** 注册 `/company-diagnostics client-error <encoded>`。 */
-export function registerClientDiagnostics(ctx: Context, companyHome: string, dataBlocked = false): void {
+export function registerClientDiagnostics(ctx: Context, dshHome: string, dataBlocked = false): void {
   ctx.commands.register({
     name: 'company-diagnostics',
-    description: '把一条浏览器侧诊断写入 cultivation/client-errors.log（Web 错误环内部用；人可读）',
+    description: '把一条浏览器侧诊断写入 logs/company-client-errors.log（Web 错误环内部用；人可读）',
     input: { hint: 'client-error <URI-encoded JSON>' },
     handler: async ({ rawInput }: { readonly rawInput: string }) => {
       if (dataBlocked) {
@@ -61,9 +67,16 @@ export function registerClientDiagnostics(ctx: Context, companyHome: string, dat
         at: typeof source.at === 'number' ? source.at : Date.now(),
         ...(typeof source.href === 'string' ? { href: redact(source.href).slice(0, 500) } : {}),
       }
-      const path = join(companyHome, CLIENT_ERRORS_REL)
+      const path = join(dshHome, CLIENT_ERRORS_REL)
       try {
-        mkdirSync(join(companyHome, 'cultivation'), { recursive: true })
+        mkdirSync(dirname(path), { recursive: true })
+        if (existsSync(path) && statSync(path).size >= MAX_LOG_BYTES) {
+          try {
+            renameSync(path, `${path}.1`)
+          } catch {
+            // 轮转失败不挡本次写入；下一轮再试。
+          }
+        }
         appendFileSync(path, `${JSON.stringify({ at: new Date().toISOString(), entry })}\n`, 'utf8')
       } catch (error) {
         return { kind: 'error' as const, text: `诊断写入失败：${(error as Error).message}` }

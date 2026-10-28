@@ -20,6 +20,7 @@
 | `bundle.json` | P4 身份 | 插件 | home / bundle | `<DSH_HOME>/bundle.json` | 只创建；升级改写；删了丢基部哈希与换盘历史 | 否（重建=丢升级判定） | 含绝对路径 |
 | 换盘备份 | P3 审计 | 插件 | home | `<DSH_HOME>/bundle.json.bak-*` | 每次显式 rebind 一份；只保留最新 5 份 | 否（备份） | 含绝对路径 |
 | 升级日志 | P3 审计 | 插件 | home | `<DSH_HOME>/logs/company-pack-upgrade.log` | 追加；无自动轮转（人工清理） | 否 | 含绝对路径/文件名 |
+| 客户端错误日志 | P3 运维 | 插件 | home | `<DSH_HOME>/logs/company-client-errors.log`（旧 `cultivation/client-errors.log` 只读留一版） | 追加；256 KiB 轮转 `.1`；卸载不删 | 否 | 可能含页面 URL/堆栈 |
 | 会话全文索引 | P1 派生 | 无 | profile | `<DSH_HOME>/profiles/<p>/session-search.db` | 可重建；卸载不删 | 是 | 可能含会话正文 |
 | DSH workspace 登记 | 宿主状态 | DSH | home | `<DSH_HOME>/storages/workspace.json` | 宿主所有；搬 home 后不会自动重写 | 否（重加工作区） | 绝对路径 |
 | 会话日志 + `present` 事件 | 历史 | 会话 | session | `<DSH_HOME>/sessions/` | 核心无删除 API | 导出 ZIP；不删 | 可能含秘密/正文 |

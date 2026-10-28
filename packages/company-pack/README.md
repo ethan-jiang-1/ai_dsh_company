@@ -41,7 +41,7 @@
 | 定义 `D` | preset / persona / skills：只读声明；公司事实不在这里 | 包 `presets/**`（`presets/<role>/agent.cordis.yml`，由 `dsh.bundle.patch` 显式引用，不是旧 `.agent-presets/` 扫描） | 随包版本；不同公司不改源码 |
 | 包 `C` | 无用户数据；`workspace/` 是只读 starter | 安装包目录 | 升级整体替换；**绝不在包目录写 data/cache/日志** |
 | 工作区 `W` | 公司盘：手册/章程/台账/交付物/`kb/company.md`/`kb/<role>/journal`/`cultivation/records`（归档 `records-archive/`、恢复日志 `.pending-revoke.json`）；host 生成的派生索引 `kb/deliverables-index.json` + 审计账本 `kb/deliverables-presented.json`（`/deliverables audit` 写入） | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME`（培养/成品命令只在盘根生效） | 不动；基部文件按哈希替换、你改过的保留 |
-| home `U/H` | `bundle.json`（身份/基部指纹）、`bundle.json.bak-*`（显式换盘备份，只留最新 5 份）、`company-pack.lock`（writer lease）、`logs/company-pack-upgrade.log`、`profiles/<p>/company-cultivation/<role>/` | `<DSH_HOME>` | 不动；方法层是 profile 级，同 home 多 profile 不共享 |
+| home `U/H` | `bundle.json`（身份/基部指纹）、`bundle.json.bak-*`（显式换盘备份，只留最新 5 份）、`company-pack.lock`（writer lease）、`logs/company-pack-upgrade.log`、`logs/company-client-errors.log`（浏览器诊断，256 KiB 轮转）、`profiles/<p>/company-cultivation/<role>/` | `<DSH_HOME>` | 不动；方法层是 profile 级，同 home 多 profile 不共享 |
 | session `S` | 会话日志由宿主拥有；本包不自造 event 类型；目录名/session header 含 cwd 绝对路径 | `<DSH_HOME>/sessions/` | 不动 |
 | 派生索引 `I` | `company-client` 行声明的全文索引（可能含会话正文） | `<DSH_HOME>/profiles/<p>/session-search.db` | 卸载不删；备份按敏感数据处理 |
 | 宿主登记 `R` | DSH 的 workspace 登记（绝对路径） | `<DSH_HOME>/storages/workspace.json` | 宿主所有；搬 home 后不会自动重写 |

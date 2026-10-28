@@ -9,7 +9,7 @@
  *
  * 不主张：真 profile 装配、真审批应答、真会话日志（那些归 preset-smoke / 真模型档）。
  */
-import { existsSync, mkdirSync, readFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { Context } from '../../vendor/dsh/vendor/cordis/src/index.ts'
@@ -72,7 +72,7 @@ describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）'
     await ctx.fiber.dispose()
   })
 
-  it('/company-diagnostics client-error 落 cultivation/client-errors.log 并脱敏 token', async () => {
+  it('/company-diagnostics client-error 落 home logs 并脱敏 token', async () => {
     const { ctx, commands } = mount()
     ctx.plugin({ inject: ['tools', 'approval', 'commands'], apply: (scoped: Context) => { apply(scoped, {}) } })
     await wait()
@@ -88,11 +88,29 @@ describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）'
     }))
     const result = await diagnostic.handler({ rawInput: `client-error ${payload}` })
     expect(result.kind).toBe('success')
-    const logPath = join(dir, 'company', 'cultivation', 'client-errors.log')
+    const logPath = join(env.home, 'logs', 'company-client-errors.log')
     expect(existsSync(logPath)).toBe(true)
     const log = readFileSync(logPath, 'utf8')
     expect(log).toContain('页面 boom')
     expect(log).not.toContain('SECRET')
+    await ctx.fiber.dispose()
+  })
+
+  it('/company-diagnostics 超过 256 KiB 轮转为 .1（日志有界）', async () => {
+    const { ctx, commands } = mount()
+    ctx.plugin({ inject: ['tools', 'approval', 'commands'], apply: (scoped: Context) => { apply(scoped, {}) } })
+    await wait()
+    const diagnostic = commands.get('company-diagnostics') as {
+      handler: (input: { readonly rawInput: string }) => Promise<{ readonly kind: string; readonly text: string }>
+    }
+    const logPath = join(env.home, 'logs', 'company-client-errors.log')
+    mkdirSync(join(env.home, 'logs'), { recursive: true })
+    writeFileSync(logPath, 'x'.repeat(256 * 1024))
+    const payload = encodeURIComponent(JSON.stringify({ kind: 'error', message: 'rotation', at: 1 }))
+    const result = await diagnostic.handler({ rawInput: `client-error ${payload}` })
+    expect(result.kind).toBe('success')
+    expect(existsSync(`${logPath}.1`)).toBe(true)
+    expect(readFileSync(logPath, 'utf8')).toContain('rotation')
     await ctx.fiber.dispose()
   })
 

@@ -6,7 +6,7 @@
  * 本模块在**页面内**保留一个有界环，并挂到 `window.__DSH_COMPANY_ERRORS__`：
  * - 真页面探针（cdp-probe / ui-scene-smoke）读取它并计入 verdict/证据 → agent 能看见；
  * - 用户可以在 DevTools 里 `__DSH_COMPANY_ERRORS__` 直接看；
- * - client apply 可注入 reporter，把条目经 `/company-diagnostics` 写 `cultivation/client-errors.log`
+ * - client apply 可注入 reporter，把条目经 `/company-diagnostics` 写 `$DSH_HOME/logs/company-client-errors.log`
  *   ——agent 用 read 就能看到“用户那一页”的错误（仍不写会话事件；边界见 Note）。
  */
 

@@ -119,7 +119,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
 
   // 浏览器侧错误环（R3-03）：error / unhandledrejection / console.error 进 `window.__DSH_COMPANY_ERRORS__`，
   // 由真页面探针（cdp-probe / ui-scene-smoke）读进 verdict 与证据目录；有当前会话时再经
-  // /company-diagnostics 追加到 cultivation/client-errors.log（agent 可 read；仍不写会话事件）。
+  // /company-diagnostics 追加到 $DSH_HOME/logs/company-client-errors.log（agent 可 read；仍不写会话事件）。
   const errorReporter: { current?: (entry: ClientErrorEntry) => void } = {}
   ctx.effect(() => installErrorCapture(window as unknown as ErrorCaptureTarget, undefined, entry => { errorReporter.current?.(entry) }))
 
