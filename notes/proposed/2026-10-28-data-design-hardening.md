@@ -58,14 +58,15 @@ M2/M3 动数据路径前单独呈迁移/回滚一页纸）
 
 ### M2 · 账本迁宿主状态（H）
 
-- 新增 host 模块（计划 `presented-domain.ts`）：`defineDomain({ name: 'company-deliverables',
-  version: 1, layout: 'single', tables: { ... } })`；`ctx.inject(['storageDomain'], …)`，缺席时
+- 新增 host 模块（计划 `presented-domain.ts`）：`defineDomain({ name: 'company_deliverables',
+  version: 1, layout: 'single', tables: { ... } })`（vendor `UNIT_NAME_RE` 只认
+  `/^[a-z][a-z0-9_]*$/` ⇒ 下划线，不是连字符）；`ctx.inject(['storageDomain'], …)`，缺席时
   回退 W 文件并显式告警（降级不是静默）。
 - `setPresentedAudit` / `recordPresented` 写 domain；`readPresentedLedger` 读 domain；
   `regenerateCatalog` 与 `/deliverables audit` 只通过 domain 读写；`present` 事件仍由 host 记 `true`。
 - 迁移：启动时若 domain 为空且旧 W 账本在场，读旧账本 → 写 domain → 保留旧文件一版并标记
   migrated；domain 打不开（invalid-record/version-mismatch）→ fail loud，保留原文件、停写公司数据。
-- 备份/卸载：`business` 加入 domain 文件（`storages/company-deliverables.json` 或后端实际文件），
+- 备份/卸载：`business` 加入 domain 文件（`storages/company_deliverables.json` 或后端实际文件），
   手册的备份/卸载/恢复三节同 diff；`full` 保持整 home。
 - 客户端仍读派生索引；文档明确「索引 = 显示缓存，审计以 domain 为准」。
 

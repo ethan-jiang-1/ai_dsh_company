@@ -72,7 +72,7 @@ JSON”与版本 0.4.0 的备份/手册成本已登记在 RFC「风险」节。
 | 段 | 判据（先红后绿） |
 |---|---|
 | M1 | `pnpm verify`、`pnpm test tests/presets tests/company tests/client`、`preset-smoke`、home 白名单 diff；records schema 与 client-errors 迁移各有红样 |
-| M2 | domain schema/迁移；删 index/domain 后 `true` 可回扫、`false` 保留；模型 fs 写旧 W 账本不改变权威；business 备份/restore |
+| M2 | domain `company_deliverables`（`UNIT_NAME_RE` 只认下划线）schema/迁移；删 index/domain 后 `true` 可回扫、`false` 保留；模型 fs 写旧 W 账本不改变权威；business 备份/restore |
 | M3 | 六份 preset + host config 新路径；旧 profile 方法迁移；双 profile 看到同一方法；探针（含 `workspace-write` 写隔离红/绿） |
 | M4 | `verify`/`test`/`typecheck`/`release-smoke`/`lifecycle-smoke`；0.4.0 手册/CHANGELOG/`release --check`；回滚演练 |
 
