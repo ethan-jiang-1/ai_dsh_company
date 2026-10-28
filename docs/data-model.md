@@ -19,7 +19,7 @@ workspace 沙箱、session event 校验、storage domain schema 与 approval。�
 | 培养记录 | 公司 / 角色 | 记录文件 | 模型 `cultivation_propose`（只建）；人命令改 | `<company>/cultivation/records/*.md`；文件名 id | 模型 fs / 客户端 / 用户 | 跟盘；archive/purge 人工 | `schema: 1`；cultivation spec |
 | 方法层 | 部署者 / 角色 | 记录（方法文件是部署产物） | **仅人** `/cultivation adopt` | `<DSH_HOME>/profiles/<p>/company-cultivation/<role>/`（M3 目标见 RFC） | 模型经 skill / 用户 | 跟 profile；卸载保留 | skill loader；probe |
 | 成品索引 | 公司 / 盘上 meta/final | 派生 | host catalog | `<company>/kb/deliverables-index.json` | 模型 fs / 客户端 | 可删可重建；显示缓存 | schema 1；catalog spec |
-| `presented` 账本 | 操作员 / 这次交付 | 账本（true 来自事件，false 人审） | host 事件 + 人命令；**模型不该写** | `<company>/kb/deliverables-presented.json`（M2 目标 H） | 用户 / 索引派生 | 跟盘；删了丢 false/true 背书 | schema 1；catalog/tamper（M2） |
+| `presented` 账本 | 操作员 / 这次交付 | domain `company_deliverables`（true 来自事件，false 人审） | host 事件 + 人命令；模型不能写 domain | `<DSH_HOME>/storages/company_deliverables.json`；旧 W `kb/deliverables-presented.json` 只读留一版 | 用户 / 索引派生 | 跟 home；删了丢 false/true 背书 | domain v1 + schema 1；tamper/backfill |
 | writer lease | 进程 / 这个 home | 进程 | host apply | `<DSH_HOME>/company-pack.lock` | 宿主 | 进程持有；stale 接管 | schema 1；lease spec |
 | `bundle.json` + 备份 | 插件 / 这个安装 | manifest | host apply；人只读 | `<DSH_HOME>/bundle.json(.bak-*)` | 用户 / 工具 | 只创建；升级改写；备份 5 份 | v1；manifest spec |
 | 宿主日志（upgrade/client-errors） | 插件 / 这个 home | 插件 | host append/命令 | `<DSH_HOME>/logs/...` | 用户 / 模型 fs | 追加；client-errors 256 KiB 轮转；卸载不删 | 无版本；host-composition |
@@ -40,7 +40,7 @@ workspace 沙箱、session event 校验、storage domain schema 与 approval。�
 | 边界 | 现在靠什么 | 硬吗 | 处置 |
 |---|---|---|---|
 | 公司盘写入 | fs-sandbox / bash 沙箱 | `workspace-write` 硬；`danger-full-access` 无 | 文案限定模式 |
-| 审计账本 | W 文件 | 软（模型 fs/bash 可写） | RFC M2 迁 H |
+| 审计账本 | domain（宿主 KV） | 硬（模型无工具写）；`danger-full-access` 下文件可改但 domain 版本仍校验 | 已迁；旧 W 只读留一版 |
 | 成品索引 | W 文件 | 软且派生 | 只当显示缓存 |
 | 方法层 | workspace 外 profile 目录 | `workspace-write` 硬；`danger-full-access` 软 | RFC M3 迁 home |
 | 角色私有 | `kb/<role>` 约定 / writeScopes advisory | 软 | 写清不是隔离 |
@@ -59,7 +59,7 @@ workspace 沙箱、session event 校验、storage domain schema 与 approval。�
 |---|---|---|
 | 包/组合 | npm + bundle patch | 改内容必 bump；发布字节 = 冒烟字节；行 id / Config 键 / 默认值破坏性变更写迁移 |
 | 定义/资源 | preset + skill/locale/icon | 已有 Agent 保留旧 revision；资源随包替换，用户可编辑的不放包内 |
-| 数据 schema | 本包 | `bundle.json` v1 / catalog 1 / ledger 1 / records 1 / lease 1；版本不符 fail loud |
+| 数据 schema | 本包 | `bundle.json` v1 / catalog 1 / ledger 1 / records 1 / lease 1 / domain `company_deliverables` v1；版本不符 fail loud |
 | 会话格式 | DSH | 作者不改；按 `SESSION_FORMAT_VERSION` 规则演进 |
 
 **标识符是 API**：行 id、preset id、Config 字段、skill 名、domain 名 + schema、文件路径、localStorage 键；改名/改 schema 必须先想迁移。

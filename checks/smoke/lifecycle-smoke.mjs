@@ -105,7 +105,7 @@ try {
     await child.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
     await waitFor(() => existsSync(join(home, 'bundle.json'))
       && existsSync(join(companyHome, 'kb/deliverables-index.json'))
-      && existsSync(join(companyHome, 'kb/deliverables-presented.json')), '首启落盘')
+      && existsSync(join(home, 'storages/company_deliverables.json')), '首启落盘')
     const output = child.output
     await child.stop()
     return output
@@ -258,10 +258,11 @@ try {
   const afterRemove = JSON.parse(readFileSync(join(profileDir, 'package.json'), 'utf8'))
   const bundles = afterRemove?.dsh?.profile?.bundles ?? []
   check('卸载后 profile 无该 bundle', !bundles.includes('dsh-company-pack'), `bundles = ${bundles.join(', ')}`)
-  check('卸载后公司盘与 bundle.json 仍在', existsSync(join(companyHome, 'AGENTS.md')) && existsSync(manifestPath))
+  check('卸载后公司盘、bundle.json 与账本 domain 仍在', existsSync(join(companyHome, 'AGENTS.md')) && existsSync(manifestPath)
+    && existsSync(join(home, 'storages/company_deliverables.json')))
   check('卸载后扩张面仍在', existsSync(journal) && existsSync(final) && existsSync(meta))
 
-  console.log('⑦ business 备份恢复（公司盘 + bundle.json + 方法层；不含 sessions）')
+  console.log('⑦ business 备份恢复（公司盘 + bundle.json + 方法层 + domain 账本；不含 sessions）')
   const restoreProfileDir = join(restoreHome, 'profiles', PROFILE)
   const restoreCompanyHome = join(restoreHome, 'tmp/lifecycle-company-workspace')
   const methodRoot = join(home, 'profiles', PROFILE, 'company-cultivation')
@@ -271,6 +272,8 @@ try {
   mkdirSync(restoreProfileDir, { recursive: true })
   cpSync(companyHome, restoreCompanyHome, { recursive: true })
   cpSync(manifestPath, join(restoreHome, 'bundle.json'))
+  mkdirSync(join(restoreHome, 'storages'), { recursive: true })
+  cpSync(join(home, 'storages/company_deliverables.json'), join(restoreHome, 'storages/company_deliverables.json'))
   cpSync(methodRoot, join(restoreProfileDir, 'company-cultivation'), { recursive: true })
   writeFileSync(join(restoreProfileDir, 'package.json'), `${JSON.stringify({
     name: `dsh-profile-${PROFILE}`, private: true,
@@ -292,7 +295,7 @@ try {
     await restoreProcesses.run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${v2}`], { timeoutMs: 180_000 })
     const child = restoreProcesses.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
     await child.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
-    await waitFor(() => existsSync(join(restoreCompanyHome, 'kb/deliverables-presented.json'))
+    await waitFor(() => existsSync(join(restoreHome, 'storages/company_deliverables.json'))
       && existsSync(join(restoreCompanyHome, 'kb/deliverables-index.json')), '恢复后落盘')
     await child.stop()
     const restoredManifest = JSON.parse(readFileSync(join(restoreHome, 'bundle.json'), 'utf8'))
@@ -301,6 +304,7 @@ try {
       && existsSync(join(restoreCompanyHome, 'deliverables/2026-10-25-lifecycle/final.md'))
       && existsSync(join(restoreCompanyHome, 'kb/ceo/journal/2026-10-25-lifecycle.md')))
     check('business 恢复方法层文件仍在', readFileSync(join(restoreProfileDir, 'company-cultivation/ceo/lifecycle-method/SKILL.md'), 'utf8').includes('lifecycle-method'))
+    check('business 恢复账本 domain 仍在', existsSync(join(restoreHome, 'storages/company_deliverables.json')))
     check('business 恢复不带 sessions（按合同）', !existsSync(join(restoreHome, 'sessions'))
       || readdirSync(join(restoreHome, 'sessions')).length === 0)
   } finally {
@@ -329,7 +333,7 @@ try {
     await movedChild.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
     await waitFor(() => existsSync(join(movedHome, 'bundle.json'))
       && existsSync(join(movedCompanyHome, 'kb/deliverables-index.json'))
-      && existsSync(join(movedCompanyHome, 'kb/deliverables-presented.json')), '迁移后落盘')
+      && existsSync(join(movedHome, 'storages/company_deliverables.json')), '迁移后落盘')
     await movedChild.stop()
     const movedManifest = JSON.parse(readFileSync(join(movedHome, 'bundle.json'), 'utf8'))
     check('迁移后 boot 成功且 workspace 记录仍可解析', movedManifest.workspace === 'tmp/lifecycle-company-workspace',

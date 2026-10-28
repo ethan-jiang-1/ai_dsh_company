@@ -40,16 +40,16 @@
 |---|---|---|---|
 | 定义 `D` | preset / persona / skills：只读声明；公司事实不在这里 | 包 `presets/**`（`presets/<role>/agent.cordis.yml`，由 `dsh.bundle.patch` 显式引用，不是旧 `.agent-presets/` 扫描） | 随包版本；不同公司不改源码 |
 | 包 `C` | 无用户数据；`workspace/` 是只读 starter | 安装包目录 | 升级整体替换；**绝不在包目录写 data/cache/日志** |
-| 工作区 `W` | 公司盘：手册/章程/台账/交付物/`kb/company.md`/`kb/<role>/journal`/`cultivation/records`（归档 `records-archive/`、恢复日志 `.pending-revoke.json`）；host 生成的派生索引 `kb/deliverables-index.json` + 审计账本 `kb/deliverables-presented.json`（`/deliverables audit` 写入） | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME`（培养/成品命令只在盘根生效） | 不动；基部文件按哈希替换、你改过的保留 |
+| 工作区 `W` | 公司盘：手册/章程/台账/交付物/`kb/company.md`/`kb/<role>/journal`/`cultivation/records`（归档 `records-archive/`、恢复日志 `.pending-revoke.json`）；host 生成的派生索引 `kb/deliverables-index.json`（审计账本已迁 H domain，旧 W 文件只读留一版） | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME`（培养/成品命令只在盘根生效） | 不动；基部文件按哈希替换、你改过的保留 |
 | 用户 `U` | 用户全局 AGENTS/skills（本包不写） | `$DSH_HOME/AGENTS.md`、`$DSH_HOME/skills`、`~/.agents` | 用户维护；本包只读/不碰 |
-| 宿主状态 `H` | `bundle.json`（身份/基部指纹）、`bundle.json.bak-*`（显式换盘备份，只留最新 5 份）、`company-pack.lock`（writer lease）、`logs/company-pack-upgrade.log`、`logs/company-client-errors.log`（256 KiB 轮转）、`profiles/<p>/company-cultivation/<role>/`（方法层，当前 profile 级） | `<DSH_HOME>` | 不动；方法层 M3 迁公司级，同 home 多 profile 不再各一份 |
+| 宿主状态 `H` | `bundle.json`（身份/基部指纹）、`bundle.json.bak-*`（显式换盘备份，只留最新 5 份）、`company-pack.lock`（writer lease）、`logs/company-pack-upgrade.log`、`logs/company-client-errors.log`（256 KiB 轮转）、`storages/company_deliverables.json`（`presented` 审计 domain）、`profiles/<p>/company-cultivation/<role>/`（方法层，当前 profile 级） | `<DSH_HOME>` | 不动；方法层 M3 迁公司级，同 home 多 profile 不再各一份 |
 | 会话 `S` | 会话日志由宿主拥有；本包不自造 event 类型；目录名/session header 含 cwd 绝对路径 | `<DSH_HOME>/sessions/` | 不动 |
 | 缓存 `K` | `company-client` 行声明的全文索引（派生；可能含会话正文） | `<DSH_HOME>/profiles/<p>/session-search.db` | 可删可重建；卸载不删；备份按敏感数据处理 |
 | 凭据 `X` | 不写入包；走 `<DSH_HOME>/.credentials.yaml` / 环境变量 | home | 用户管理；文件必须 0600 |
 
 说明：6+2 = D/C/W/U/S/H + K/X。`R` DSH workspace 登记与 `B` 浏览器 localStorage 是**边界**，不是本包平面：R 归宿主，搬 home 后需重新添加；B 按 origin/设备，Host/模型看不到。没有单独的 `I` 平面——派生索引落 W（catalog）或 K（session-search）。
 
-说明：`bootstrap`/catalog 是**部署 provisioning 与 UI 派生视图**，用宿主 `node:fs`（不在模型工具沙箱内）；模型对工作区文件的读写仍走 `ctx.fs`/文件工具。`kb/deliverables-index.json` 是派生视图，可重建；`kb/deliverables-presented.json` 是 `presented` 的审计账本（true 来自会话事件，false 是操作员结论），**删了会丢审计，备份时一起带上**。同一 home 只允许一个 writer：第二进程会停写公司数据（DSH 会话仍可用），lease 崩溃后按 PID stale 接管。`/cultivation archive|purge` 控制记录规模；`/deliverables audit` 是 presented=false 的第一入口。
+说明：`bootstrap`/catalog 是**部署 provisioning 与 UI 派生视图**，用宿主 `node:fs`（不在模型工具沙箱内）；模型对工作区文件的读写仍走 `ctx.fs`/文件工具。`kb/deliverables-index.json` 是派生视图，可重建；`presented` 的权威 = `storages/company_deliverables.json`（domain `company_deliverables`；true 来自会话事件，false 是操作员结论），旧 W `kb/deliverables-presented.json` 只读留一版；**删账本会丢 `false` 审计，备份时一起带上**。同一 home 只允许一个 writer：第二进程会停写公司数据（DSH 会话仍可用），lease 崩溃后按 PID stale 接管。`/cultivation archive|purge` 控制记录规模；`/deliverables audit` 是 presented=false 的第一入口。
 
 公司盘根固定在 `<DSH_HOME>/company-workspace`（或 `DSH_COMPANY_HOME`）。若会话 cwd 不是这个盘，页签/身份显示「非公司盘 / 身份未配置」，host 不静默改读 cwd。
 
@@ -63,13 +63,13 @@
 
 ## Backup
 
-- `business` = 公司盘（journal/交付物/records/KB）+ `bundle.json` + 方法层；不含 sessions、凭据、索引、宿主日志。M2 账本迁 domain 后把 domain 文件一起带上。
+- `business` = 公司盘（journal/交付物/records/KB）+ `bundle.json` + `storages/company_deliverables.json`（presented domain）+ 方法层；不含 sessions、凭据、索引、宿主日志。
 - `full` = 整个 `DSH_HOME`；含会话正文/密钥/绝对路径，加密、限权、不共享。
 - 恢复 `business`：新 home 解包 → `plugin add` 同版本 → 启动；旧会话不回来。`full` 搬 home 后 DSH workspace 登记与 session cwd 仍是旧绝对路径，需人重加。
 
 ## Uninstall
 
-`dsh plugin --profile web remove dsh-company-pack`：只摘插件与 profile 层，公司盘（含 `presented` 审计账本与 `cultivation/records-archive/`）、sessions、`bundle.json`/`bundle.json.bak-*`、方法层、`session-search.db` 保留。
+`dsh plugin --profile web remove dsh-company-pack`：只摘插件与 profile 层，公司盘（含 `cultivation/records-archive/`）、旧 W `kb/deliverables-presented.json`、`storages/company_deliverables.json`、sessions、`bundle.json`/`bundle.json.bak-*`、方法层、`session-search.db` 保留。
 要彻底删除一个部署，确认备份后删除它的整个 `<DSH_HOME>`。详见《安装手册》第六节。
 
 ## Owner（维护者）

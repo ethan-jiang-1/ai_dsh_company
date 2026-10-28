@@ -3,6 +3,10 @@
 状态：已交付（2026-10-27；P0 收口，P1/P2 显性留在 [Gap 卡](../../_backlog/_archive/settled_issues/2026-10-27-data-model-gaps.md)）
 上游 = [DSH 数据模型（FAQ 26）审计出的部署 Gap](../../_backlog/_archive/settled_issues/2026-10-27-data-model-gaps.md)
 
+> **2026-10-28 数据设计硬化 M2 部分取代账本落点**：`presented` 账本已迁 `ctx.storageDomain`
+> （domain `company_deliverables`，`<DSH_HOME>/storages/company_deliverables.json`）；旧 W
+> `kb/deliverables-presented.json` 只读留一版。见 [RFC](../proposed/2026-10-28-data-design-hardening.md)。
+
 ## 问题
 
 对照外部研究 FAQ 26（`_faq_on_digested/26_plugin-data-model`）审计本包，发现 12 个数据模型 Gap；其中 5 个是发布后部署的 P0：培养记录按 session cwd 写、换盘只能删 manifest、备份口径混用、`presented` 混在派生索引里、`bundle.json`/catalog 没有版本与原子写。旧实现把这些事实散在 README 平面表和会话里，没有一个可追踪的问题账，也没有逐项数据卡。

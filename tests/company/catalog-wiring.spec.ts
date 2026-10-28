@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { apply } from '../../packages/company-pack/src/index.ts'
 import { createTempEnv, type TempEnv } from '../support/temp-env.ts'
-import { catalogPath, presentedLedgerPath } from '../../packages/company-pack/src/host/catalog.ts'
+import { catalogPath, presentedLedgerPath, writePresentedLedger } from '../../packages/company-pack/src/host/catalog.ts'
 
 let root: string
 let workspace: string
@@ -58,6 +58,55 @@ describe('host catalog wiring', () => {
     expect(after.entries[0]?.presented).toBe(true)
     const ledger = JSON.parse(readFileSync(presentedLedgerPath(workspace), 'utf8')) as { paths: Record<string, boolean> }
     expect(ledger.paths['deliverables/2026-10-25-alpha/final.md']).toBe(true)
+  })
+
+  it('storageDomain 可用时账本走 domain；模型写旧 W 文件不改权威', async () => {
+    writePresentedLedger(workspace, {
+      schema: 1,
+      updatedAt: '2026-10-25T00:00:00.000Z',
+      paths: { 'deliverables/2026-10-25-alpha/final.md': false },
+      slugs: {},
+    })
+    const records = new Map<string, unknown>()
+    const table = {
+      get: (key: string) => records.get(key),
+      put: async (key: string, value: unknown) => { records.set(key, value) },
+    }
+    const handle = { name: 'company_deliverables', table: () => table, close: async () => {} }
+    const listeners = new Map<string, ((...args: unknown[]) => void)[]>()
+    const ctx = {
+      tools: { register: () => {} },
+      commands: { register: () => {} },
+      on: (event: string, listener: (...args: unknown[]) => void) => { listeners.set(event, [...(listeners.get(event) ?? []), listener]) },
+      logger: { info: () => {}, warn: () => {} },
+      get: (name: string) => name === 'storageDomain' ? { open: async () => handle } : undefined,
+      effect: (callback: () => () => void) => callback,
+    }
+    apply(ctx as never)
+    await new Promise(resolve => setTimeout(resolve, 50))
+    expect(records.get('state')).toMatchObject({ paths: { 'deliverables/2026-10-25-alpha/final.md': false } })
+    const before = JSON.parse(readFileSync(catalogPath(workspace), 'utf8')) as { entries: { presented: boolean | null }[] }
+    expect(before.entries[0]?.presented).toBe(false)
+
+    for (const listener of listeners.get('session/event') ?? []) {
+      listener({}, {
+        type: 'deliverables/presented',
+        data: { files: [{ path: join(workspace, 'deliverables/2026-10-25-alpha/final.md') }] },
+      })
+    }
+    await new Promise(resolve => setTimeout(resolve, 50))
+    expect(records.get('state')).toMatchObject({ paths: { 'deliverables/2026-10-25-alpha/final.md': true } })
+    const after = JSON.parse(readFileSync(catalogPath(workspace), 'utf8')) as { entries: { presented: boolean | null }[] }
+    expect(after.entries[0]?.presented).toBe(true)
+
+    // 模型改旧 W 账本不该影响 domain 权威。
+    writePresentedLedger(workspace, {
+      schema: 1,
+      updatedAt: '2026-10-25T00:00:00.000Z',
+      paths: { 'deliverables/2026-10-25-alpha/final.md': false },
+      slugs: {},
+    })
+    expect(records.get('state')).toMatchObject({ paths: { 'deliverables/2026-10-25-alpha/final.md': true } })
   })
 
   it('host guard：session cwd 不在公司盘 → 告警', () => {

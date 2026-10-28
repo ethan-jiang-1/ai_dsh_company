@@ -6,6 +6,9 @@
 // 证明链：vendor `@deepseek-ai/dsh-tool-present` 执行 → owner session 追加
 // `deliverables/presented` → 本包 `apply()` 注册的 `session/event` 监听 → catalog `presented=true`。
 // 这不是合成事件：event 由 vendor 工具真实产生；只是不经过模型（模型只决定“调不调”，不决定事件形状）。
+// ⚠ 本 smoke 的 host ctx 不 mount `storageDomain` ⇒ 走 legacy 同步路径（旧 W 账本）；
+//   domain 路径（company_deliverables）由 tests/company/presented-domain*.spec +
+//   catalog-wiring 的 fake-facility 集成覆盖；真 profile 的 base 提供 storage-domain。
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'

@@ -249,6 +249,28 @@ export function recordPresented(
 }
 
 /**
+ * 审计路径归一与校验（旧文件实现与 domain 实现共用）。
+ * @param companyHome - 公司盘根。
+ * @param rawPath - 工作区相对路径（也接受公司盘内绝对路径）。
+ * @returns 合法时 rel；否则 warning。
+ */
+export function auditRelPath(
+  companyHome: string,
+  rawPath: string,
+): { readonly rel?: string; readonly warning?: string } {
+  const root = canonicalPath(companyHome)
+  const absolute = isAbsolute(rawPath) ? rawPath : join(root, rawPath)
+  const rel = normalizeRel(relative(root, canonicalPath(absolute)))
+  if (rel === '' || rel.startsWith('..') || isAbsolute(rel) || !rel.endsWith('/final.md')) {
+    return { warning: `审计路径必须是公司盘内的 deliverables/<dir>/final.md 或 deliverables-archive/<dir>/final.md：${rawPath}` }
+  }
+  if (!/^(deliverables|deliverables-archive)\/[^/]+\/final\.md$/.test(rel)) {
+    return { warning: `审计路径只认 deliverables/<dir>/final.md：${rawPath}` }
+  }
+  return { rel }
+}
+
+/**
  * 人侧交付审计：把一条 final.md 的 presented 结论写进账本（true/false），再重生成索引。
  * 这是 `presented=false` 的第一入口；不再要求用户手改 JSON。
  * @param companyHome - 公司盘根。
@@ -262,15 +284,9 @@ export function setPresentedAudit(
   presented: boolean,
   now: Date = new Date(),
 ): { readonly ledger?: PresentedLedger; readonly path?: string; readonly warning?: string } {
-  const root = canonicalPath(companyHome)
-  const absolute = isAbsolute(rawPath) ? rawPath : join(root, rawPath)
-  const rel = normalizeRel(relative(root, canonicalPath(absolute)))
-  if (rel === '' || rel.startsWith('..') || isAbsolute(rel) || !rel.endsWith('/final.md')) {
-    return { warning: `审计路径必须是公司盘内的 deliverables/<dir>/final.md 或 deliverables-archive/<dir>/final.md：${rawPath}` }
-  }
-  if (!/^(deliverables|deliverables-archive)\/[^/]+\/final\.md$/.test(rel)) {
-    return { warning: `审计路径只认 deliverables/<dir>/final.md：${rawPath}` }
-  }
+  const resolved = auditRelPath(companyHome, rawPath)
+  if (resolved.rel === undefined) return { warning: resolved.warning ?? '审计路径不合法' }
+  const rel = resolved.rel
   const state = readPresentedLedger(companyHome)
   if (state.status === 'corrupt' || state.status === 'unsupported') {
     return { warning: state.status === 'unsupported'

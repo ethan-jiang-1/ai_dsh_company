@@ -199,8 +199,9 @@ try {
     walk('')
     return rows
   }
+  const domainLedger = join(home, 'storages/company_deliverables.json')
   await waitFor(() => existsSync(join(home, 'bundle.json')) && existsSync(join(companyHome, 'kb/deliverables-index.json'))
-      && existsSync(join(companyHome, 'kb/deliverables-presented.json')), '首启落盘')
+      && existsSync(domainLedger), '首启落盘')
   const first = fingerprint(companyHome)
   // T5（FAQ 24 §8.1）：包目录只读——运行/升级不应在安装副本里新增 data/cache/日志。
   const packBefore = fingerprint(installedPack)

@@ -30,6 +30,13 @@ import {
   type PresentedSessionQuery,
 } from './host/catalog.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
+import {
+  auditLedger,
+  createPresentedLedgerStore,
+  ensureLedger,
+  recordLedger,
+  storageDomainOf,
+} from './host/presented-domain.ts'
 import { registerClientDiagnostics } from './host/client-diagnostics.ts'
 import { prepareCompanyRuntime } from './host/runtime-guard.ts'
 import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace-registry.ts'
@@ -68,6 +75,11 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   registerSignoffTool(ctx)
 
   const { bundleHome, companyHome, expectedWorkspace, dataBlocked, bundleState, rebound } = prepareCompanyRuntime(ctx)
+  // presented 账本 store（2026-10-28 数据设计硬化 M2）：storageDomain 可用时走 domain；
+  // 缺席/打不开时 store 自己回退旧 W 文件并告警（降级不是静默）。没有 domain 的旧组合保留同步路径。
+  const ledgerStorePromise = storageDomainOf(ctx) === undefined
+    ? undefined
+    : createPresentedLedgerStore(ctx, bundleHome, companyHome)
   // 培养回路（2026-10-13 培养卡）：公司数据只写公司盘根，不跟随 session cwd 的子目录。
   // 身份损坏/更高版本/落点不安全时拒绝公司数据写入，避免写到猜测的默认盘。
   registerCultivation(ctx, config, expectedWorkspace, dataBlocked)
@@ -88,12 +100,24 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
         return { kind: 'error' as const, text: `审计结论只认 true/false：${value ?? ''}` }
       }
       const path = tokens.slice(1, -1).join(' ')
-      const result = setPresentedAudit(expectedWorkspace, path, value === 'true')
+      if (ledgerStorePromise === undefined) {
+        const result = setPresentedAudit(expectedWorkspace, path, value === 'true')
+        if (result.ledger === undefined) {
+          return { kind: 'error' as const, text: result.warning ?? '审计写入失败' }
+        }
+        regenerateCatalog(expectedWorkspace, result.ledger)
+        return { kind: 'success' as const, text: `已审计 ${result.path ?? path} = ${value}（写入 presented 账本并重生成索引）。` }
+      }
+      const store = await ledgerStorePromise
+      const result = await auditLedger(expectedWorkspace, store, path, value === 'true')
       if (result.ledger === undefined) {
         return { kind: 'error' as const, text: result.warning ?? '审计写入失败' }
       }
       regenerateCatalog(expectedWorkspace, result.ledger)
-      return { kind: 'success' as const, text: `已审计 ${result.path ?? path} = ${value}（写入 presented 账本并重生成索引）。` }
+      return {
+        kind: 'success' as const,
+        text: `已审计 ${result.path ?? path} = ${value}（presented 账本 = ${store.kind === 'domain' ? 'domain' : '文件降级'}；索引已重生成）。`,
+      }
     },
   })
   ctx.on('api-session/added', (summary) => {
@@ -207,10 +231,9 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
     ctx.logger?.warn?.(`company-pack workspace 登记体检跳过（不影响运行）：${(error as Error).message}`)
   }
 
-  // ── 成品目录 + presented 审计账本（2026-10-25 目录；2026-10-27 账本拆分）──
-  // 首启生成空 catalog（页签显示“还没有成品”，而不是“维护者运行 node tools/...”）。
-  // presented 的权威 = kb/deliverables-presented.json（true 来自事件，false 是操作员审计）；
-  // 索引只做派生视图。账本缺失时先从旧索引迁移（保住 false），再后台回扫会话事件补 true。
+  // ── 成品目录 + presented 审计账本（2026-10-25 目录；2026-10-27 账本拆分；2026-10-28 M2 domain）──
+  // 有 storageDomain：走下面的异步 domain 启动；没有：保留旧同步文件路径（fallback/测试）。
+  if (ledgerStorePromise === undefined) {
   try {
     if (!rebound && !dataBlocked && existsSync(companyHome)) {
       const catalogState = readCatalogState(companyHome)
@@ -263,18 +286,76 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
   } catch (error) {
     ctx.logger?.warn?.(`company-pack 成品目录生成跳过（不影响运行）：${(error as Error).message}`)
   }
+  } else {
+    void (async () => {
+      const store = await ledgerStorePromise
+      if (rebound || dataBlocked || !existsSync(companyHome)) return
+      const catalogState = readCatalogState(companyHome)
+      if (catalogState.status === 'corrupt' || catalogState.status === 'unsupported') {
+        const warning = `company-pack：成品目录 ${catalogState.status === 'unsupported' ? `schema ${String(catalogState.schema)} 高于本包支持` : `损坏（${catalogState.error}）`}；`
+          + '已按盘上 meta/final 重建派生索引（presented 以审计账本为准）'
+        ctx.logger?.warn?.(warning)
+      }
+      const bootstrap = await ensureLedger(companyHome, store)
+      if (bootstrap.warning !== undefined) ctx.logger?.warn?.(`company-pack：${bootstrap.warning}`)
+      if (bootstrap.migrated) ctx.logger?.info?.(`company-pack：presented 审计账本已迁移（${store.kind}）`)
+      const result = regenerateCatalog(companyHome, bootstrap.ledger)
+      if (result.written) ctx.logger?.info?.(`company-pack：成品目录已生成（${result.path}）`)
+      if (!bootstrap.needsScan) return
+      const scan = async (query: PresentedSessionQuery): Promise<void> => {
+        try {
+          const observed = await presentedFromSessions(query, companyHome, AbortSignal.timeout(30_000))
+          const recorded = await recordLedger(companyHome, store, observed)
+          if (recorded.ledger === undefined) {
+            ctx.logger?.warn?.(`company-pack：presented 回扫结果未写账本（${recorded.warning ?? '未知原因'}）`)
+            return
+          }
+          const regenerated = regenerateCatalog(companyHome, recorded.ledger)
+          if (regenerated.written) {
+            ctx.logger?.info?.(`company-pack：presented 回扫完成（扫 ${String(observed.scanned)} 会话 / 失败 ${String(observed.failed)}）`)
+          }
+        } catch (error) {
+          ctx.logger?.warn?.(`company-pack：presented 回扫跳过（不影响运行）：${(error as Error).message}`)
+        }
+      }
+      const inject = (ctx as unknown as {
+        inject?: (deps: readonly string[], callback: (scoped: unknown) => void) => unknown
+      }).inject
+      if (typeof inject === 'function') {
+        inject.call(ctx, ['sessionQuery'], (scoped) => {
+          const query = (scoped as { readonly sessionQuery?: PresentedSessionQuery }).sessionQuery
+          if (query !== undefined) void scan(query)
+        })
+      } else {
+        const getter = (ctx as unknown as { get?: (name: string) => unknown }).get
+        const query = typeof getter === 'function' ? getter.call(ctx, 'sessionQuery') as PresentedSessionQuery | undefined : undefined
+        if (query !== undefined) void scan(query)
+      }
+    })().catch(error => ctx.logger?.warn?.(`company-pack 成品目录 domain 初始化跳过（不影响运行）：${(error as Error).message}`))
+  }
   ctx.on('session/event', (_session, event) => {
     if ((event as { type?: unknown }).type !== 'deliverables/presented') return
     if (rebound || dataBlocked) return
     try {
       const observed = presentedFromEvent(event, companyHome)
       if (observed.paths.size === 0 && observed.slugs.size === 0) return
-      const recorded = recordPresented(companyHome, observed)
-      if (recorded.ledger === undefined) {
-        ctx.logger?.warn?.(`company-pack 成品目录 present 投影未写账本（${recorded.warning ?? '未知原因'}）`)
+      if (ledgerStorePromise === undefined) {
+        const recorded = recordPresented(companyHome, observed)
+        if (recorded.ledger === undefined) {
+          ctx.logger?.warn?.(`company-pack 成品目录 present 投影未写账本（${recorded.warning ?? '未知原因'}）`)
+          return
+        }
+        regenerateCatalog(companyHome, recorded.ledger)
         return
       }
-      regenerateCatalog(companyHome, recorded.ledger)
+      void ledgerStorePromise.then(async store => {
+        const recorded = await recordLedger(companyHome, store, observed)
+        if (recorded.ledger === undefined) {
+          ctx.logger?.warn?.(`company-pack 成品目录 present 投影未写账本（${recorded.warning ?? '未知原因'}）`)
+          return
+        }
+        regenerateCatalog(companyHome, recorded.ledger)
+      }).catch(error => ctx.logger?.warn?.(`company-pack 成品目录 present domain 投影跳过（不影响运行）：${(error as Error).message}`))
     } catch (error) {
       ctx.logger?.warn?.(`company-pack 成品目录 present 投影跳过（不影响运行）：${(error as Error).message}`)
     }

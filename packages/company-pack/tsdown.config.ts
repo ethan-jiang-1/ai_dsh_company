@@ -28,7 +28,9 @@ export default defineConfig([
     entry: { index: 'lib/types/index.js' },
     format: 'esm',
     platform: 'node',
-    external: [/^@deepseek-ai\//],
+    // zod is a peer shared with @deepseek-ai/dsh-storage-domain; bundling it would create a
+    // second schema instance. Keep it require-able from the profile.
+    external: [/^@deepseek-ai\//, /^zod(\/|$)/],
   },
   {
     ...shared,
