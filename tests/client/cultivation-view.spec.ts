@@ -5,11 +5,13 @@
  */
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createCultivationView } from '../../packages/company-pack/src/client/CultivationView.tsx'
 import type { CultivationFiles } from '../../packages/company-pack/src/client/cultivation-data.ts'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+
+beforeEach(() => { localStorage.clear() })
 
 let mounted: Root | null = null
 afterEach(() => {
@@ -69,6 +71,23 @@ describe('CultivationView', () => {
     expect(document.documentElement.dataset.dshCultivationView).toBe('1')
     const overview = [...host.querySelectorAll('button')].find(node => node.textContent?.includes('公司总览'))
     await act(async () => { overview?.dispatchEvent(new MouseEvent('click', { bubbles: true })) })
+  })
+
+  it('分界可拖/键盘调宽，宽度持久化', async () => {
+    const host = await mount()
+    const split = host.querySelector('.wk-cult-view-split') as HTMLElement
+    const handle = host.querySelector('[role="separator"]') as HTMLElement
+    expect(handle.getAttribute('aria-orientation')).toBe('vertical')
+    expect(split.style.getPropertyValue('--wk-cult-chat-width')).toBe('390px')
+    await act(async () => {
+      handle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+    })
+    expect(split.style.getPropertyValue('--wk-cult-chat-width')).toBe('406px')
+    expect(localStorage.getItem('dsh-company-cultivation-chat-width')).toBe('406')
+    await act(async () => {
+      handle.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }))
+    })
+    expect(split.style.getPropertyValue('--wk-cult-chat-width')).toBe('390px')
   })
 
   it('卸载清掉 composer 隐藏属性', async () => {

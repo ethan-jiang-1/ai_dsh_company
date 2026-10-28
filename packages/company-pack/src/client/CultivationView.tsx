@@ -7,7 +7,8 @@
  *
  * 为什么不是公司子页：只有培养需要“记录 → 判断 → 方法”的专属对话；其他面板不需要。
  */
-import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
@@ -41,6 +42,27 @@ export interface CultivationViewInjected {
 
 export type CultivationViewProps = PropsRuntime<'conversation.view'>
 
+/** 右栏宽度状态（拖动分界/键盘 Home 复位；按浏览器持久化）。 */
+const CHAT_WIDTH_KEY = 'dsh-company-cultivation-chat-width'
+const CHAT_MIN = 280
+const CHAT_MAX = 720
+const BOARD_MIN = 380
+const CHAT_DEFAULT = 390
+
+function clampChatWidth(value: number): number {
+  return Math.max(CHAT_MIN, Math.min(CHAT_MAX, Math.round(value)))
+}
+
+function initialChatWidth(): number {
+  try {
+    const raw = typeof localStorage === 'undefined' ? null : localStorage.getItem(CHAT_WIDTH_KEY)
+    const parsed = raw === null ? Number.NaN : Number(raw)
+    return Number.isFinite(parsed) ? clampChatWidth(parsed) : CHAT_DEFAULT
+  } catch {
+    return CHAT_DEFAULT
+  }
+}
+
 /**
  * 造培养主视图。
  * @param injected - 培养数据/动作/背景源 + 公司总览入口。
@@ -61,6 +83,52 @@ export function createCultivationView(injected: CultivationViewInjected) {
       ? undefined
       : (context: CultivationContext) => injected.openContext!(sessionId, context)
     const actions = useMemo(() => injected.cultivationActions(sessionId), [injected.cultivationActions, sessionId])
+    const splitRef = useRef<HTMLDivElement | null>(null)
+    const [chatWidth, setChatWidth] = useState(initialChatWidth)
+    const [dragging, setDragging] = useState(false)
+
+    useEffect(() => {
+      try {
+        if (typeof localStorage !== 'undefined') localStorage.setItem(CHAT_WIDTH_KEY, String(chatWidth))
+      } catch {
+        // 私有模式/配额失败：本次会话仍可拖，不阻断。
+      }
+    }, [chatWidth])
+
+    const beginResize = (event: ReactPointerEvent<HTMLDivElement>): void => {
+      if (event.button !== 0) return
+      event.preventDefault()
+      const split = splitRef.current
+      if (split === null) return
+      const max = Math.max(CHAT_MIN, Math.min(CHAT_MAX, split.clientWidth - BOARD_MIN))
+      const startX = event.clientX
+      const startWidth = chatWidth
+      const onMove = (move: PointerEvent): void => {
+        const next = clampChatWidth(startWidth + startX - move.clientX)
+        setChatWidth(Math.min(next, max))
+      }
+      const onUp = (): void => {
+        document.removeEventListener('pointermove', onMove)
+        document.removeEventListener('pointerup', onUp)
+        setDragging(false)
+      }
+      document.addEventListener('pointermove', onMove)
+      document.addEventListener('pointerup', onUp)
+      setDragging(true)
+    }
+
+    const onResizeKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>): void => {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault()
+        setChatWidth(value => clampChatWidth(value + 16))
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        setChatWidth(value => clampChatWidth(value - 16))
+      } else if (event.key === 'Home') {
+        event.preventDefault()
+        setChatWidth(CHAT_DEFAULT)
+      }
+    }
 
     // 培养视图自有右栏 composer；隐藏 shell 的全局 composer（per-document，切走即恢复）。
     useEffect(() => {
@@ -82,7 +150,11 @@ export function createCultivationView(injected: CultivationViewInjected) {
           </button>
         </header>
 
-        <div className="wk-cult-view-split">
+        <div
+          ref={splitRef}
+          className={`wk-cult-view-split${dragging ? ' dragging' : ''}`}
+          style={{ '--wk-cult-chat-width': `${chatWidth}px` } as CSSProperties}
+        >
           <div className="wk-cult-view-board">
             <CultivationBoard
               viewerRole={viewerRole}
@@ -101,6 +173,20 @@ export function createCultivationView(injected: CultivationViewInjected) {
               openContext={openContext}
             />
           </div>
+          <div
+            className="wk-cult-resize"
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="调整培养对话宽度"
+            aria-valuemin={CHAT_MIN}
+            aria-valuemax={CHAT_MAX}
+            aria-valuenow={Math.round(chatWidth)}
+            tabIndex={0}
+            title="拖动调整左右宽度；键盘 ←/→，Home 复位"
+            onPointerDown={beginResize}
+            onKeyDown={onResizeKeyDown}
+            onDoubleClick={() => setChatWidth(CHAT_DEFAULT)}
+          />
           <CultivationChatPanel
             sessions={injected.sessions}
             mainSessionId={sessionId}
