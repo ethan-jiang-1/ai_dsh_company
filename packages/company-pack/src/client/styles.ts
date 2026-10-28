@@ -646,6 +646,10 @@ html[data-dsh-cultivation-view] [data-composer-seat] { display: none !important;
 .wk-cult-chat-badge { color: var(--dsw-alias-label-tertiary); border: 1px solid var(--dsw-alias-border-l1); border-radius: 99px; padding: 2px 6px; font-size: 9px; white-space: nowrap; }
 .wk-cult-chat-hint { color: var(--dsw-alias-label-tertiary); font-size: 10.5px; line-height: 1.5; padding: 8px 12px; border-bottom: 1px solid var(--dsw-alias-border-l1); }
 .wk-cult-chat-hint code { color: var(--dsw-alias-label-secondary); font-size: 10px; }
+.wk-cult-chat-state { padding: 12px; color: var(--dsw-alias-label-tertiary); font-size: 10.5px; line-height: 1.5; }
+.wk-cult-chat-state.bad { color: var(--dsw-alias-state-error-primary); }
+.wk-cult-chat-status { color: var(--dsw-alias-label-tertiary); font-size: 9.5px; padding: 2px 2px 0; }
+.wk-cult-chat-error { color: var(--dsw-alias-state-error-primary); font-size: 10px; line-height: 1.5; }
 .wk-cult-chat-lines { flex: 1; min-height: 0; overflow: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 10px; }
 .wk-cult-chat-empty { color: var(--dsw-alias-label-tertiary); font-size: 11px; line-height: 1.6; border: 1px dashed var(--dsw-alias-border-l1); border-radius: 8px; padding: 10px; }
 .wk-cult-chat-empty b { display: block; color: var(--dsw-alias-label-secondary); font-size: 11.5px; }

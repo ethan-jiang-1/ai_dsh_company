@@ -9,6 +9,7 @@
  */
 import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { roleLabel } from '../lib/cultivation.ts'
@@ -30,6 +31,7 @@ export interface CultivationViewInjected {
   readonly cultivationFiles: CultivationFiles
   readonly cultivationActions: CultivationActionsFactory
   readonly followEvents?: CultivationFollowEvents | undefined
+  readonly sessions: ISessions
   readonly roleSource: RoleBadgeInjected['roleSource']
   readonly contextSources?: ((sessionId: SessionId) => CultivationContextSources) | undefined
   readonly openContext?: ((sessionId: SessionId, context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false, readonly problem: string }>) | undefined
@@ -53,6 +55,7 @@ export function createCultivationView(injected: CultivationViewInjected) {
     const { journalRows, records, brokenRecords, unexpandedRecords, refresh } = useCultivationPanelData(injected.cultivationFiles, sessionId)
     const feedback = useCultivationFeedback(injected.followEvents, sessionId)
     const teammate = props.useSessions(state => state.byId[sessionId]?.origin === 'subagent')
+    const sessionCwd = props.useSessions(state => state.byId[sessionId]?.cwd)
     const contextSources = useMemo(() => injected.contextSources?.(sessionId), [injected.contextSources, sessionId])
     const openContext = injected.openContext === undefined
       ? undefined
@@ -98,7 +101,12 @@ export function createCultivationView(injected: CultivationViewInjected) {
               openContext={openContext}
             />
           </div>
-          <CultivationChatPanel sessionId={sessionId} actions={actions} />
+          <CultivationChatPanel
+            sessions={injected.sessions}
+            mainSessionId={sessionId}
+            cwd={sessionCwd}
+            agentPreset={viewerRole}
+          />
         </div>
       </div>
     )

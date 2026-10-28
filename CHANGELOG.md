@@ -2,7 +2,20 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.4.4 — 2026-10-28
+
+### Added
+
+- **培养对话绑定独立培养会话**：右侧面板用 `sessions.create` / `retain` 建独立 session，从 `binding.eventSource` 读历史、用 `binding.session.prompt` 发送；主 Chat / 轨迹不受影响。
+- 每次 prompt 带「只谈培养」范围前缀，渲染时剥掉；真页面已跑通一问一答（CEO 只答培养范围）。
+- 同一主会话按 localStorage 复用培养会话；缺 cwd/角色时显示等待，不静默建错。
+
+### Known
+
+- 工具/审批的完整渲染、attach 记录/方法与写回仍待后续切片；当前只展示 user/assistant 文本与 running 状态。
+
 ## 0.4.3 — 2026-10-28
+
 
 ### Added
 

@@ -224,6 +224,7 @@ function registerCultivationViewWiring(ctx: ClientContext): void {
     const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog)
     const openCompanyOverview = (): void => { scoped.sidebarRight.openTab('company-board') }
     const CultivationView = createCultivationView({
+      sessions,
       cultivationFiles,
       cultivationActions,
       followEvents: follow,

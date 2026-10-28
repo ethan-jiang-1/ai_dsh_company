@@ -35,7 +35,7 @@ function roleSource() {
 }
 
 function props() {
-  const state = { byId: { 'session-lead': { origin: 'human' } }, projectionsBySession: {} }
+  const state = { byId: { 'session-lead': { origin: 'human', cwd: '/tmp/company' } }, projectionsBySession: {} }
   return {
     sessionId: 'session-lead',
     useProjection: () => undefined,
@@ -46,6 +46,7 @@ function props() {
 async function mount(over: Record<string, unknown> = {}): Promise<HTMLElement> {
   const openCompanyOverview = vi.fn()
   const View = createCultivationView({
+    sessions: { create: async () => 'session-cultivation', retain: () => ({ ready: new Promise(() => {}), release: () => {} }) } as never,
     cultivationFiles: files,
     cultivationActions: () => ({ run: async () => ({ ok: true, text: 'ok' }) }),
     roleSource: roleSource(),
