@@ -1,8 +1,8 @@
 # 2026-10-28 · 培养主视图：第三 tab，左板右对话
 
-状态：批准（用户 2026-10-28 会话「对的，你开始做吧，Set up 一个 goal，把这个落地了」）；实施中
+状态：已交付（2026-10-28；0.4.5；用户批准「对的，你开始做吧，Set up 一个 goal，把这个落地了」）
 批准：用户 2026-10-28 会话「对的，你开始做吧，Set up 一个 goal，把这个落地了」。
-进度：第一切片（IA / 左板 / 右栏命令面 / shell composer 隐藏）已落地；第二切片（独立培养会话 create/retain/prompt + 范围前缀 + 真页面一问一答 + 流式文本/工具行）已落地；attach（选记录附上下文）已落地；审批卡与写回为下一阶段。
+进度：三 tab / 左板 / 右栏独立培养会话 / 自有 composer / 流式文本 / 工具行 / attach（选记录附上下文）已落地；真页面已跑通一问一答。审批卡仍走平台审批面；写回走左侧 `/cultivation adopt`（AI 只提案/不提权）。
 
 > 依据：用户走查判断「只有培养需要这个对话，其他面板不需要」，要求把培养从公司子页拎出来；
 > 结构 = 主区三 tab（对话 / 轨迹 / 培养），培养 tab 内部左右分；公司总览保留无对话入口。
@@ -34,6 +34,20 @@
 - **公司总览做第四个 tab**：三 tab 结构更清楚；总览用右栏无对话入口。
 - **右栏内嵌第二份主 Chat 历史**：复制 Chat、状态/滚动分叉；不做。
 - **用 ComposerBlock 把 shell composer 置灰**：会话级，跨窗口误伤；改为视图挂载期的 per-document 隐藏。
+
+## 交付证据（2026-10-28）
+
+- `pnpm test` → 118 files / 1006 tests 全绿；`pnpm verify` ALL PASS；`pnpm typecheck` exit 0。
+- 真页面（dev home，Playwright）：三 tab 可见；点「培养」→ 左板 + 右栏独立会话；attach 下拉；发一句 → 工具行（glob/read）+ CEO 培养范围回复；主 Chat composer 仍隐藏；切走恢复。
+- `release --check` → READY 0.4.5 @ fbf39042；`_dist` 只留 0.4.5。
+- 证据图（运行态，不入 git）：`runtime/ux-mockups/cultivation-live-chat.png`。
+
+## 边界
+
+- 工具审批不在这里伪造卡：走平台审批面（`ui-approval`/待办）；面板只显示工具行与 running。
+- attach 当前是右栏下拉选记录；左侧点选 attach 是后续 UX。
+- 写回仍由人走左侧 `/cultivation adopt`；面板不让模型自批/自采纳。
+- 培养会话是独立 session（可在侧栏看到）；标题/清理策略后续定。
 
 ## 验收
 
