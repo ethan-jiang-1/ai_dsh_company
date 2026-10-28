@@ -1,72 +1,74 @@
-# 数据模型：事实、权威、作用域与生命周期
+# 数据模型：事实、权威、写通道与生命周期
 
-> 性质：合同（只写 now）。什么时候读 = 发布后部署、备份/迁移、改 `bundle.json`/成品索引/培养记录的形状，或回答“这份数据谁删、备份什么、升级留什么”。用户侧摘要 = [pack README Data](../packages/company-pack/README.md#data)；外部依据 = FAQ 26（[登记](./external-research.md)）；Gap 账 = [数据模型 Gap 卡](../_backlog/_archive/settled_issues/2026-10-27-data-model-gaps.md)；R1–R6 收尾 = [收尾卡](../_backlog/_archive/settled_issues/2026-10-27-data-model-closeout.md)。
+> 性质：合同（只写 now）。什么时候读 = 部署/备份/迁移、改数据形状，或回答“谁写、谁看得见、升级留什么”。
+> 用户侧摘要 = [pack README Data](../packages/company-pack/README.md#data)；外部依据 = FAQ 24/26（[登记](./external-research.md)）；Gap 账 = [Gap 卡](../_backlog/_archive/settled_issues/2026-10-27-data-model-gaps.md)。
+> 迁移计划 = [数据设计硬化 RFC](../notes/proposed/2026-10-28-data-design-hardening.md)。
 
 ## 一、一句话
 
-**用户拥有的字节留在公司盘；插件只拥有身份、索引、游标、方法和审计账本；一个事实只有一个权威。** 自造目录/文件可以，但版本、迁移、备份、删除由本包承担——DSH 不提供“插件数据根”。
+**用户拥有的字节留在公司盘；插件只拥有身份、索引、游标、方法和审计账本；一个事实只有一个权威。**
+自造目录/文件可以，但版本、迁移、备份、删除由本包承担——DSH 不提供“插件数据根”；硬边界只有包目录只读、
+workspace 沙箱、session event 校验、storage domain schema 与 approval。备份/恢复/卸载 = [README Backup](../packages/company-pack/README.md#backup)。
 
 ## 二、事实级数据卡
 
-| 事实 | 承诺 | 权威 | 作用域 / 键 | 位置 | 寿命 / 删除 | 可重建 | 敏感 |
+| 事实 | 拥有·关于 | 权威 | 写者·通道 | 位置·键 | 可见性 | 寿命·删除 | 版本·测试 |
 |---|---|---|---|---|---|---|---|
-| 出厂基部（手册/章程/模板/org） | P2 内容 | 用户；`bundle.json` 记基部哈希 | company workspace | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME` | 跟盘；升级未改替换、改过保留；卸载不删 | 可从 pack 重新补缺，但“改过/没改过”的判定依赖 manifest | 否 |
-| 扩张内容（journal/KB/台账/交付物） | P2 内容 | 用户 / 角色 | company workspace | 同上 | 跟盘；用户/操作员保留；无自动 GC | 否（用户内容） | 可能含公司机密 |
-| 培养记录 | P2 内容 | 记录文件 | **company root**（不是 session cwd） | `<company>/cultivation/records/*.md`；归档 `<company>/cultivation/records-archive/`；恢复日志 `cultivation/.pending-revoke.json` | 跟盘；`/cultivation archive <天数>` 移非 open 旧记录，`/cultivation purge <天数>` 清旧归档；面板摘要全扫 + open/最近 120 全文；坏记录点名 | 否（人/分身写的决定） | 背景摘录可能含会话内容 |
-| 方法层 | P3 状态 / P4 配置 | 插件 | **profile** | `<DSH_HOME>/profiles/<p>/company-cultivation/<role>/<slug>/SKILL.md` | 跟 profile；卸载保留；同 home 多 profile 启动告警 | 不能自动重建；记录保留正文，方法丢失需人工按记录恢复 | 方法论，可能引用公司事实 |
-| 成品索引 | P1 派生 | 盘上 meta/final + 账本 | company workspace | `<company>/kb/deliverables-index.json` | 可删/可重建；不承载审计权威 | 是 | 路径/结论 |
-| `presented` 审计账本 | P3 状态 | 操作员审计 + 会话事件 | company workspace | `<company>/kb/deliverables-presented.json` | 跟盘；`/deliverables audit <path> true|false` 是第一入口；删了丢 `false` 审计与历史 `true` 背书 | 部分：`true` 可从会话事件回扫，`false` 不能 | 审计结论 |
-| writer lease | 边界 / 临时 | 进程 | home | `<DSH_HOME>/company-pack.lock` | 进程持有；崩溃后按 PID 判 stale 接管 | 是 | pid/时间 |
-| `bundle.json` | P4 身份 | 插件 | home / bundle | `<DSH_HOME>/bundle.json` | 只创建；升级改写；删了丢基部哈希与换盘历史 | 否（重建=丢升级判定） | 含绝对路径 |
-| 换盘备份 | P3 审计 | 插件 | home | `<DSH_HOME>/bundle.json.bak-*` | 每次显式 rebind 一份；只保留最新 5 份 | 否（备份） | 含绝对路径 |
-| 升级日志 | P3 审计 | 插件 | home | `<DSH_HOME>/logs/company-pack-upgrade.log` | 追加；无自动轮转（人工清理） | 否 | 含绝对路径/文件名 |
-| 客户端错误日志 | P3 运维 | 插件 | home | `<DSH_HOME>/logs/company-client-errors.log`（旧 `cultivation/client-errors.log` 只读留一版） | 追加；256 KiB 轮转 `.1`；卸载不删 | 否 | 可能含页面 URL/堆栈 |
-| 会话全文索引 | P1 派生 | 无 | profile | `<DSH_HOME>/profiles/<p>/session-search.db` | 可重建；卸载不删 | 是 | 可能含会话正文 |
-| DSH workspace 登记 | 宿主状态 | DSH | home | `<DSH_HOME>/storages/workspace.json` | 宿主所有；搬 home 后不会自动重写 | 否（重加工作区） | 绝对路径 |
-| 会话日志 + `present` 事件 | 历史 | 会话 | session | `<DSH_HOME>/sessions/` | 核心无删除 API | 导出 ZIP；不删 | 可能含秘密/正文 |
-| 浏览器状态 | 客户端 | 设备 | origin | `localStorage`：`dsh-company-pack/float/v1/`、`dsh-company-pack/instances/v1` | 换端口/浏览器即丢；旧 float 键只读迁移；不参与模型请求 | 否（UI 偏好） | 否 |
-| 凭据 | 凭据 | provider | home | `<DSH_HOME>/.credentials.yaml` / 环境变量 | 用户管理；`0600` | 否 | 是 |
+| 出厂基部（手册/章程/模板/org） | 用户 / 这个公司 | 用户；manifest 记哈希 | host 自举/升级；人可改 | `<DSH_HOME>/company-workspace/**` 或 `DSH_COMPANY_HOME`；相对路径 | 模型 fs / 用户 | 跟盘；未改替换、改过保留；卸载不删 | manifest v1；bootstrap/lifecycle |
+| 扩张内容（journal/KB/台账/交付物） | 用户 / 这个公司 | 用户 / 角色 | 模型 fs + 人 | 同上；`kb/`、`deliverables/` | 模型 fs / 用户 / 客户端 | 跟盘；无自动 GC | 无（内容）；文件测试 |
+| 培养记录 | 公司 / 角色 | 记录文件 | 模型 `cultivation_propose`（只建）；人命令改 | `<company>/cultivation/records/*.md`；文件名 id | 模型 fs / 客户端 / 用户 | 跟盘；archive/purge 人工 | `schema: 1`；cultivation spec |
+| 方法层 | 部署者 / 角色 | 记录（方法文件是部署产物） | **仅人** `/cultivation adopt` | `<DSH_HOME>/profiles/<p>/company-cultivation/<role>/`（M3 目标见 RFC） | 模型经 skill / 用户 | 跟 profile；卸载保留 | skill loader；probe |
+| 成品索引 | 公司 / 盘上 meta/final | 派生 | host catalog | `<company>/kb/deliverables-index.json` | 模型 fs / 客户端 | 可删可重建；显示缓存 | schema 1；catalog spec |
+| `presented` 账本 | 操作员 / 这次交付 | 账本（true 来自事件，false 人审） | host 事件 + 人命令；**模型不该写** | `<company>/kb/deliverables-presented.json`（M2 目标 H） | 用户 / 索引派生 | 跟盘；删了丢 false/true 背书 | schema 1；catalog/tamper（M2） |
+| writer lease | 进程 / 这个 home | 进程 | host apply | `<DSH_HOME>/company-pack.lock` | 宿主 | 进程持有；stale 接管 | schema 1；lease spec |
+| `bundle.json` + 备份 | 插件 / 这个安装 | manifest | host apply；人只读 | `<DSH_HOME>/bundle.json(.bak-*)` | 用户 / 工具 | 只创建；升级改写；备份 5 份 | v1；manifest spec |
+| 宿主日志（upgrade/client-errors） | 插件 / 这个 home | 插件 | host append/命令 | `<DSH_HOME>/logs/...` | 用户 / 模型 fs | 追加；client-errors 256 KiB 轮转；卸载不删 | 无版本；host-composition |
+| 会话全文索引 | 无 / 会话语料 | 无（派生） | `session-query-sqlite` | `<DSH_HOME>/profiles/<p>/session-search.db` | 代码，非模型 | 可重建；卸载不删 | DSH schema；rebuild |
+| DSH workspace 登记 | DSH / 这台机器 | DSH | 宿主/服务 | `<DSH_HOME>/storages/workspace.json` | 宿主 | 宿主所有；搬 home 需重加 | DSH 管；stale 告警 |
+| 会话日志 + `present` 事件 | 会话 / 这次对话 | 日志 | agent loop / `present` | `<DSH_HOME>/sessions/` | 模型 / 客户端 | 无删除 API；不删 | DSH 格式；replay |
+| 浏览器状态 | 设备 / origin | 客户端 | client apply | `localStorage`：`dsh-company-pack/.../v1` | 浏览器 | 换 origin 即丢；不参与模型 | v1；float/instance spec |
+| 凭据 | 用户 / home | provider | 用户 | `<DSH_HOME>/.credentials.yaml` / env | 不进日志/导出 | 用户撤销；`0600` | DSH 管；secret scan |
 
-## 三、作用域与键
+## 三、写矩阵与硬软边界
 
-- **公司盘根是唯一写作用域**：培养记录、成品目录、方法层命令都只认 `bundle.json` 解析出的 company root。session `header.cwd` 在盘子目录或盘外时，host 明确拒绝公司数据写入（不是只告警）；页签/身份显示「非公司盘」。
-- **落点安全**：`DSH_COMPANY_HOME` 等于/包含 `DSH_HOME` 或 OS home、或指向普通文件时，host 停写公司数据并告警；默认 `<DSH_HOME>/company-workspace` 合法。
-- **不用 `workspaceId` 当长期键**：`bundle.json.workspace` 在 home 内记相对路径、在外记绝对路径；这是 pack 的稳定身份。DSH 自己的 workspace 登记是另一本账，搬 home 后需要人重新添加。
-- **换盘**：默认硬阻断；`DSH_COMPANY_REBIND=1` + 旧盘已不存在 + 新盘形状正确时，备份 `bundle.json` → 改写 workspace → 记日志。**不迁 DSH session 的 `header.cwd`**——旧会话仍锚在旧绝对路径；要连历史一起搬，只能保持原绝对路径或接受旧会话不可续。
-- **方法层是 profile 级**：一个公司 = 一个 web profile。同 home 多 profile 共享 `bundle.json`/公司盘/sessions，但方法层各一份；host 启动会点名多个装了本包的 profile；这是刻意边界，不是隔离承诺。`/cultivation check` 只报告记录缺方法/方法无记录。
-- **同 home 一个 writer**：`company-pack.lock` 保证第二个进程停写公司数据（DSH 会话仍可用）；stale PID 可接管。它是防静默互写，不是多 Host 高可用/事务。
+| 通道 | 可以写 | 不该写 |
+|---|---|---|
+| 模型工具 | 内容：records/journal/drafts/final、`present` 声明 | 审计账本、方法层、`bundle.json`、lease |
+| 人命令 | adopt/revoke/audit/archive/diagnostics | 内容正文（可走 fs，但应是人改） |
+| host apply | 骨架 seed/upgrade、catalog、从事件记 ledger | 用户正文（除 seed/upgrade） |
 
-## 四、版本与迁移
-
-| 数据 | 版本字段 | 未知/更高版本 | 迁移责任 |
+| 边界 | 现在靠什么 | 硬吗 | 处置 |
 |---|---|---|---|
-| `bundle.json` | `v: 1` | 保留原文件 + 告警，跳过身份/升级；不覆盖 | 未来 v2 由新 pack 提供迁移；旧 pack 不猜。v1 fixture = `tests/fixtures/bundle-manifest-v1.json`，迁移入口先以 fixture + unsupported 边界演练 |
-| 成品索引 | `schema: 1` | 保留原文件 + 告警，按盘上内容重建派生视图 | 派生，可重建 |
-| `presented` 账本 | `schema: 1` | 保留原文件 + 告警，presented 暂按未核；不覆盖 | 旧 false 从旧索引迁移；true 可从会话事件回扫 |
-| 培养记录 | `schema: 1`（缺字段按 1 读） | 坏形状跳过并计数；不静默改写 | 兼容读 + 新可选字段；破坏性变更新文件名/一次性迁移 |
-| 方法层 `SKILL.md` | skill loader 认 `name`/`description` | 额外字段忽略；不认识的形状不加载 | 新字段附加；不覆盖用户方法 |
+| 公司盘写入 | fs-sandbox / bash 沙箱 | `workspace-write` 硬；`danger-full-access` 无 | 文案限定模式 |
+| 审计账本 | W 文件 | 软（模型 fs/bash 可写） | RFC M2 迁 H |
+| 成品索引 | W 文件 | 软且派生 | 只当显示缓存 |
+| 方法层 | workspace 外 profile 目录 | `workspace-write` 硬；`danger-full-access` 软 | RFC M3 迁 home |
+| 角色私有 | `kb/<role>` 约定 / writeScopes advisory | 软 | 写清不是隔离 |
+| 签字线 | prompt + `request_signoff` | 只有工具被调用时硬 | 改文案，不改机制 |
 
-**fail loud 优先于静默重建**：权威数据（`bundle.json`/账本）损坏时保留原文件；只有派生索引可以重建。
+## 四、作用域与键
 
-## 五、备份、恢复与删除
+- **公司盘根是唯一业务写作用域**：records/catalog/method 命令只认 `bundle.json` 解析出的 company root；会话 cwd 在盘子目录/盘外时拒绝公司数据写入。
+- **落点安全与换盘**：`DSH_COMPANY_HOME` 等于/包含 `DSH_HOME` 或 OS home、或指向普通文件时停写并告警；换盘默认硬阻断，`DSH_COMPANY_REBIND=1` + 旧盘已不存在 + 新盘形状正确时才备份 manifest → 改写 workspace → 记日志；不迁 session `header.cwd`。
+- **方法层当前是 profile 级**：同 home 多 profile 共享盘/记录但方法各一份；启动点名多个装本包的 profile。**这是已知错配，M3 迁公司级**（见 RFC）。
+- **键**：`bundle.json.workspace` 在 home 内记相对路径、在外记绝对路径；不用 `workspaceId` 当长期键；DSH 的 workspace 登记是另一本账，搬 home 后需人重加。
 
-| 备份 | 内容 | 丢什么 | 用途 |
-|---|---|---|---|
-| `business` | 公司盘（含 journal/交付物/records/两个 `kb/` 索引）+ `bundle.json` + `profiles/<p>/company-cultivation/` | sessions、`.credentials.yaml`、`session-search.db`、DSH workspace 登记 | 交接/换机器/公司数据归档 |
-| `full` | 整个 `DSH_HOME` | 不丢（但含会话正文/密钥/绝对路径） | 整机迁移/灾难恢复；加密、限权、不共享 |
+## 五、版本与标识符
 
-- 恢复 `business`：新 home 解包 → `plugin add` 同版本/新版本 → 启动；旧会话不会回来（没有 sessions）。
-- 恢复 `full`：整 home 搬移；DSH 的 `storages/workspace.json`/session 目录名仍是绝对旧路径，需在侧栏重加工作区；旧会话仍锚旧 cwd。
-- 卸载：`plugin remove` 只摘插件/profile 层；公司盘、`bundle.json`/`.bak-*`、方法层、sessions、`session-search.db` 保留。彻底删除 = 确认备份后删整个 `DSH_HOME`。
-- 删除/保留：pack 不自动删用户内容、records、journal、交付物；journal 的“轮末收敛”是操作员在会话外做；records 用 `/cultivation archive <天数>` 归档非 open 旧记录（open 与坏记录不动），坏记录在面板点名。
+| 版本 | 归属 | 变更规则 |
+|---|---|---|
+| 包/组合 | npm + bundle patch | 改内容必 bump；发布字节 = 冒烟字节；行 id / Config 键 / 默认值破坏性变更写迁移 |
+| 定义/资源 | preset + skill/locale/icon | 已有 Agent 保留旧 revision；资源随包替换，用户可编辑的不放包内 |
+| 数据 schema | 本包 | `bundle.json` v1 / catalog 1 / ledger 1 / records 1 / lease 1；版本不符 fail loud |
+| 会话格式 | DSH | 作者不改；按 `SESSION_FORMAT_VERSION` 规则演进 |
 
-## 六、边界
+**标识符是 API**：行 id、preset id、Config 字段、skill 名、domain 名 + schema、文件路径、localStorage 键；改名/改 schema 必须先想迁移。
+**不自造 session 扩展**：不新增 `SessionEventMap` 类型、不依赖 `plugin:` 记录；用已有事件、投影、`agent.inject()` 或 storage。
 
-- 单 Host、单 `DSH_HOME`；多租户/跨机器同步不在范围。
-- 不物理删 session 日志、不改 session header；需要会话历史迁移时接受旧 cwd 限制。
-- 记录更新是单进程 CAS（读前全文比对 + rename 前复核）；revoke 有同步失败回滚 + pending journal 启动恢复；多 Host 共享 home 不支持。
-- 更早的 records 只显示未展开计数；用 `/cultivation archive` 控制规模。
-- manifest 首建在 hard link 不支持的文件系统上回退 `wx` 单写并告警（仍不覆盖，但非原子发布）；换盘备份只留 5 份。
-- 培养背景 `contexts` 是会话摘录，可能含密钥样式内容；创作面只提示、不自动脱敏。
-- 不引入第三方 E1 依赖；不新增 `SessionEventMap` 类型；不把插件状态塞进会话 surface。
-- 包目录只读；数据只写公司盘、home、profile 方法层或浏览器本地。
+## 六、边界与威胁模型
+
+- Host 插件在进程内、沙箱之外执行；包目录只读；沙箱只管“改”，读不受限。
+- H 是**写边界**，不是保密边界：模型可读 home 文件，但不应能经工具写 H；`danger-full-access` 下无文件围栏，H/M3 的隔离承诺都降级为约定。
+- 角色边界、owners、签字线是 prompt/approval 级，不是数据 ACL；**不做 per-role 数据隔离**。
+- 公司内容会作为工具结果/指令进入模型请求；本包不向第三方上传；client-errors/日志可能含 URL，按普通文件处理。
+- 单 Host、单 `DSH_HOME`；多租户/跨机器同步、session 删除 API、多 Host 事务不在范围；不引入 E1 依赖，不新增 event 类型。

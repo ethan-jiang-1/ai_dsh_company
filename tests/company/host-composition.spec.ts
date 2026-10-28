@@ -9,8 +9,8 @@
  *
  * 不主张：真 profile 装配、真审批应答、真会话日志（那些归 preset-smoke / 真模型档）。
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { join, relative, sep } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { Context } from '../../vendor/dsh/vendor/cordis/src/index.ts'
 import { apply } from '../../packages/company-pack/src/index.ts'
@@ -138,6 +138,25 @@ describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）'
     await ctx.fiber.dispose()
   })
 
+  it('home 数据面白名单：client-errors 落 logs；公司盘不多写', async () => {
+    env.set({ DSH_COMPANY_BOOTSTRAP: 'on' })
+    const { ctx, commands } = mount()
+    ctx.plugin({ inject: ['tools', 'approval', 'commands'], apply: (scoped: Context) => { apply(scoped, {}) } })
+    await wait()
+    const diagnostic = commands.get('company-diagnostics') as {
+      handler: (input: { readonly rawInput: string }) => Promise<{ readonly kind: string; readonly text: string }>
+    }
+    const payload = encodeURIComponent(JSON.stringify({ kind: 'error', message: 'home-plane', at: 1 }))
+    const result = await diagnostic.handler({ rawInput: `client-error ${payload}` })
+    expect(result.kind).toBe('success')
+    await ctx.fiber.dispose()
+    expect(existsSync(join(env.home, 'logs', 'company-client-errors.log'))).toBe(true)
+    expect(existsSync(join(env.company, 'cultivation', 'client-errors.log'))).toBe(false)
+    const allowed = ['bundle.json', 'logs/', 'company-pack.lock', 'storages/', 'profiles/', 'sessions/', 'company-workspace/']
+    const unexpected = walkFiles(env.home).filter(rel => !allowed.some(prefix => rel === prefix || rel.startsWith(prefix)))
+    expect(unexpected).toEqual([])
+  })
+
   it('工具与命令的 schema 形状可判（模型可见面的最小锚）', async () => {
     const { ctx, tools, commands } = mount()
     ctx.plugin({ inject: ['tools', 'approval', 'commands'], apply: (scoped: Context) => { apply(scoped, {}) } })
@@ -153,3 +172,12 @@ describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）'
     await ctx.fiber.dispose()
   })
 })
+
+/** home 内全部文件（相对路径，POSIX 分隔）；用于数据面白名单。 */
+function walkFiles(root: string, dir: string = root): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+    const path = join(dir, entry.name)
+    const rel = relative(root, path).split(sep).join('/')
+    return entry.isDirectory() ? walkFiles(root, path) : [rel]
+  })
+}

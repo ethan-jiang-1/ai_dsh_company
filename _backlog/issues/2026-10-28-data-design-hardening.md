@@ -18,6 +18,11 @@ opened: 2026-10-28
 用户侧摘要 = [pack README Data](../../packages/company-pack/README.md#data)。基线实跑：`pnpm verify`
 ALL PASS；`pnpm test` 111 files / 980 tests 全绿（RFC 写入前的基线）。
 
+**M1 进度（2026-10-28）：** records `schema: 1`、client-errors 迁 `$DSH_HOME/logs/company-client-errors.log`
+（256 KiB 轮转，旧路径只读留一版）、T4 措辞、`preset-smoke` 数据感知（临时方法 fixture 真红→绿）、
+data-model 数据卡 v2/硬软表/六版本/标识符、README Data 6+2 与 Backup、home 白名单测试已落地。
+`pnpm test` 111 files / 983 tests、`pnpm verify`、`pnpm typecheck` 全绿。M2 账本、M3 方法层、M4 收口待做。
+
 **未决问题：** 无阻断项。M2/M3 动数据路径前按 RFC 再呈一页迁移/回滚；账本 H 的“用户不再直接手改
 JSON”与版本 0.4.0 的备份/手册成本已登记在 RFC「风险」节。
 

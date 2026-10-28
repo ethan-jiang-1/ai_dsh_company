@@ -2,6 +2,9 @@
 
 状态：待实施（批准：用户 2026-10-28 会话授权——「你发现的问题我都想修复」；按 M1→M4 逐条实施，
 M2/M3 动数据路径前单独呈迁移/回滚一页纸）
+进度：M1 已落地（2026-10-28；records schema、client-errors 迁 home logs+轮转、T4/preset-smoke
+数据感知、data-model v2、README Data 6+2、home 白名单；111 files / 983 tests、verify、typecheck 全绿）。
+M2–M4 待做。
 
 > 依据：外部研究 FAQ 24（发布与 agent 数据平面；rc.3 基线，但本仓 pin rc.2 已核
 > `ctx.storageDomain`、storage-json `single`、`fs-sandbox`、`sessionQuery`、`workspaceRegistry`、
