@@ -1,6 +1,6 @@
 # 2026-10-28 · 数据设计二轮削洋葱：写通道、读信任与 K 落点（0.4.1）
 
-状态：已交付（2026-10-28；0.4.1；上游 = [二轮审计卡](../../_backlog/_archive/settled_issues/2026-10-28-data-design-round2.md)）
+状态：已交付（2026-10-28；0.4.1 + 0.4.2 迁移竞态修复；上游 = [二轮审计卡](../../_backlog/_archive/settled_issues/2026-10-28-data-design-round2.md)）
 
 ## 问题
 
@@ -43,6 +43,14 @@ session-search 索引仍在 profile；升级日志无轮转；client inject 包�
 - UI 不再暗示索引是审计权威；presented 的权威仍是 domain。
 - 搜索索引可随 cache 清理重建；删 cache 不影响审计/会话。
 - client inject peers 完整；非 web 组合仍不承诺（`platform: web`）。
+
+## 追加（同日，0.4.2）：迁移 copy 的 check-then-copy 竞态
+
+- 旧实现 `existsSync(dest)` + `copyFileSync(source, dest)` 在双进程/外部并发下可能覆盖新方法；改为
+  `copyFileSync(..., COPYFILE_EXCL)` 发布，`EEXIST` 后再比较内容/落冲突备份；冲突备份也 EXCL。
+  marker `wx` 与旧文件只读保留不变。
+- 测试：`method-migration.spec.ts` 新增“已有 `.legacy` 冲突备份不被覆盖”；4 tests 全绿。
+- 版本：0.4.2（0.4.1 之后的补丁）。
 
 ## 验证（实跑，2026-10-28）
 

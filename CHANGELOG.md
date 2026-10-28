@@ -2,7 +2,14 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.4.2 — 2026-10-28
+
+### Fixed
+
+- **方法层迁移的 check-then-copy 竞态**：旧 `<profile>/company-cultivation/` → 公司级迁移改用 `COPYFILE_EXCL` 发布；目标已存在则比较内容，冲突备份同样 EXCL，不再可能覆盖并发写入的新方法/既有备份。marker `wx` 不变。
+
 ## 0.4.1 — 2026-10-28
+
 
 ### Changed
 

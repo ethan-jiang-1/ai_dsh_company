@@ -15,6 +15,7 @@
  * keyless 判据 = `tests/company/cultivation.spec.ts`（命令行为经 `CultivationStorage` 观察同一面）。
  */
 import {
+  constants,
   copyFileSync,
   existsSync,
   linkSync,
@@ -148,17 +149,21 @@ export function migrateLegacyMethodLayers(
         const destDir = join(methodRoot, role.name, slug.name)
         const dest = join(destDir, 'SKILL.md')
         try {
-          if (!existsSync(dest)) {
-            mkdirSync(destDir, { recursive: true })
-            copyFileSync(source, dest)
+          mkdirSync(destDir, { recursive: true })
+          try {
+            copyFileSync(source, dest, constants.COPYFILE_EXCL)
             result.copied.push(`${role.name}/${slug.name}`)
             continue
+          } catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
           }
           if (readFileSync(dest, 'utf8') === text) continue
           const conflict = join(methodRoot, role.name, '.legacy', profile.name, `${slug.name}.md`)
-          if (!existsSync(conflict)) {
-            mkdirSync(dirname(conflict), { recursive: true })
-            copyFileSync(source, conflict)
+          mkdirSync(dirname(conflict), { recursive: true })
+          try {
+            copyFileSync(source, conflict, constants.COPYFILE_EXCL)
+          } catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
           }
           result.conflicts.push(`${role.name}/${slug.name} (${profile.name})`)
         } catch (error) {

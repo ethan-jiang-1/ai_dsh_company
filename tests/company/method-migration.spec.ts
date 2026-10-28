@@ -51,6 +51,17 @@ describe('方法层旧 profile → 公司级迁移', () => {
     expect(readFileSync(join(methodRoot, 'ceo/.legacy/web-b/foo.md'), 'utf8')).toContain('from web-b')
   })
 
+  it('已有 .legacy 冲突备份不被覆盖（EXCL 发布）', () => {
+    seed('web', 'ceo', 'foo', 'from web')
+    seed('web-b', 'ceo', 'foo', 'from web-b')
+    const backup = join(methodRoot, 'ceo', '.legacy', 'web-b', 'foo.md')
+    mkdirSync(join(methodRoot, 'ceo', '.legacy', 'web-b'), { recursive: true })
+    writeFileSync(backup, 'sentinel')
+    const result = migrateLegacyMethodLayers(env.home, methodRoot)
+    expect(result.conflicts).toContain('ceo/foo (web-b)')
+    expect(readFileSync(backup, 'utf8')).toBe('sentinel')
+  })
+
   it('非名册角色不迁；根目录按需创建（含 company 父目录）', () => {
     seed('web', 'researcher', 'research-method', 'not a company role')
     const result = migrateLegacyMethodLayers(env.home, methodRoot)
