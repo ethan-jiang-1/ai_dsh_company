@@ -1,7 +1,7 @@
 # 2026-10-30 · 培养主线与后续工作证据
 
 状态：已交付（用户于 2026-10-29 授权「看上去还可以，这样吧，你就落地实现了, setup goal, 静默自主执行如何?」，后续明确「静默，自主执行，克服一切障碍」并批准实施计划）
-上游 = [_backlog/issues/2026-10-29-cultivation-experience.md](../../_backlog/issues/2026-10-29-cultivation-experience.md)
+上游 = [_backlog/_archive/settled_issues/2026-10-29-cultivation-experience.md](../../_backlog/_archive/settled_issues/2026-10-29-cultivation-experience.md)
 前决定：[培养主视图](./2026-10-28-cultivation-main-view.md)、[GUI 行动面](./2026-10-17-cultivation-gui-actions.md)、[培养回路](./2026-10-13-agent-cultivation-loop.md)；这些关于页面位置、命令通道和人侧角色闸的决定继续有效。
 
 ## 决定
@@ -29,6 +29,7 @@
 - 绿：`pnpm exec vitest run tests/company/cultivation.spec.ts tests/client/cultivation-board.spec.ts tests/client/cultivation-board-actions.spec.ts tests/client/cultivation-compose-context.spec.ts`：4 files / 98 tests PASS。
 - `pnpm test`：118 files / 1011 tests PASS。
 - `pnpm typecheck`：exit 0。
-- `pnpm verify`：初跑在 bare-path 因卡上 `_backlog/research/cultivation` 只存在于原型分支而红；移除不存在的活跃路径指针后复跑 ALL PASS。Replay fixture freshness 和 replay UI freshness 因当前盘无对应对象而 SKIP。
+- `pnpm verify`：初跑在 bare-path 因卡上的研究路径指针只存在于原型分支而红；移除不存在的活跃路径指针后复跑 ALL PASS。Replay fixture freshness 和 replay UI freshness 因当前盘无对应对象而 SKIP。
 - `node probes/browser-visual/cultivation-gui-probe.mjs --isolated`（前置 `source run/env.sh`）：真 Web + Chromium 通过零挂载、单一主入口提交、可选成品背景、采纳、命令日志配对、角色闸拒绝、打开原文；隔离 home 无既有会话时诚实呈现空状态；脚本清理自身 marker 所有隔离运行数据。另跑 `node checks/smoke/ui-scene-smoke.mjs --isolated`，全部公司页签加载且零浏览器错误。
 - 真人新手可用性测试未执行；自动化只证明交互路径、角色合同和渲染可运行，不证明文案对新人无困惑。
+- 归档：用户 2026-10-30 指出该卡不应继续悬挂；卡按章程移入 settled_issues。真人新手可用性测试仍未执行，保留为本 Note 的后续体验观察，不作为卡关闭条件。

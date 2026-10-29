@@ -25,8 +25,6 @@ intent: "为什么需要这份依据。"
 
 ## 索引
 
-| 文件 | 活卡与用途 |
-|---|---|
-| [培养 UX 卡](../issues/2026-10-29-cultivation-experience.md) | 用户确认的培养主线与追溯价值；原型与 UX 研究材料在 `prototype/cultivation-ia-2026-10-29` 分支；生产实现与边界见 [implemented Note](../../notes/implemented/2026-10-30-cultivation-work-improvement-traceability.md) |
+当前无活跃研究材料。培养 UX 原型与研究稿未入库，保存在分支 `prototype/cultivation-ia-2026-10-29`；消费者 = [已结卡](../_archive/settled_issues/2026-10-29-cultivation-experience.md) 与 [implemented Note](../../notes/implemented/2026-10-30-cultivation-work-improvement-traceability.md)。
 
 随卡归档的材料见 [研究归档](../_archive/research/README.md)。
