@@ -4,7 +4,7 @@
  */
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useState } from 'react'
-import { roleLabel, VERIFICATION_EVIDENCE_LIMIT, type CultivationRecord, type CultivationRow, type CultivationVerification, type FeedbackItem } from '../lib/cultivation.ts'
+import { roleLabel, timeLabel, VERIFICATION_EVIDENCE_LIMIT, type CultivationRecord, type CultivationRow, type CultivationVerification, type FeedbackItem } from '../lib/cultivation.ts'
 import { CULTIVATION_COPY, revokeLine, verifyLine } from './cultivation-actions.ts'
 import type { CultivationBoardState } from './use-cultivation-board.tsx'
 
@@ -17,8 +17,20 @@ function verificationTag(record: CultivationRecord): { readonly tone: 'success' 
 
 const MAX_VISIBLE_VERIFICATIONS = 3
 
-function verificationText(entry: CultivationVerification): string {
-  return `${entry.outcome === 'pass' ? '有用' : '没起作用'} · ${entry.evidence} · ${entry.at}`
+/** 自纠正 = 提出者与目标同一角色；它的决定人就是当前角色语境下的人，不是“对方”。 */
+function isSelfRecord(record: CultivationRecord): boolean {
+  return record.kind === 'correction' && record.proposerRole === record.targetRole
+}
+
+/** 记录类型的人话名词（拒绝回执按 kind 说，不把纠正叫成建议）。 */
+function kindNoun(record: CultivationRecord): string {
+  return record.kind === 'suggestion' ? '建议' : '纠正'
+}
+
+/** 观察时间用人话；原始 ISO 只放在 title 里供核对。 */
+function verificationTime(entry: CultivationVerification, now: number): string {
+  const at = Date.parse(entry.at)
+  return Number.isNaN(at) ? entry.at : timeLabel(at, now)
 }
 
 export function CultivationMine({ inbox }: { readonly inbox: CultivationBoardState['inbox'] }) {
@@ -27,13 +39,13 @@ export function CultivationMine({ inbox }: { readonly inbox: CultivationBoardSta
       {(inbox.mine.length > 0 || inbox.processedForViewer.length > 0) && (
         <div className="wk-activity-block" aria-label="我提交的与我已处理">
           <strong>我提交的 · 我已处理</strong>
-          <div className="wk-meta">等对方处理；你无需操作。</div>
+          <div className="wk-meta">自己的纠正在上面「需要我处理」里待你决定；给别的角色的建议等对方处理。</div>
           <div role="list" aria-label="提案与处理回执" className="wk-list wk-cultivation-list">
             {inbox.processedForViewer.map(record => (
               <div key={record.id} role="listitem" className="wk-row" aria-label={`已拒绝 ${record.id}`}>
                 <span className="wk-row-name">
-                  已拒绝 {roleLabel(record.proposerRole)} 的建议<Tag tone="outline">{record.expectation}</Tag>
-                  <Tag tone="warning">目标角色的人已拒绝</Tag>
+                  已拒绝 {roleLabel(record.proposerRole)} 的{kindNoun(record)}<Tag tone="outline">{record.expectation}</Tag>
+                  <Tag tone="warning">目标角色语境下的人已拒绝</Tag>
                 </span>
                 <span className="wk-row-task">理由：{record.reason ?? '（未留）'}</span>
                 {record.decidedAt !== undefined && <span className="wk-meta">目标角色语境下的人拒绝 · 拒绝时间：{record.decidedAt}</span>}
@@ -44,9 +56,9 @@ export function CultivationMine({ inbox }: { readonly inbox: CultivationBoardSta
               <div key={record.id} role="listitem" className="wk-row" aria-label={`我提交的 ${record.id}`}>
                 <span className="wk-row-name">
                   {record.kind === 'suggestion' ? `给 ${roleLabel(record.targetRole)} 的建议` : '我的纠正'}
-                  {record.status === 'open' && <Tag tone="info">待对方处理</Tag>}
-                  {record.status === 'adopted' && <Tag tone="success">目标角色的人已采纳{record.methodSlug !== undefined ? ` → ${record.methodSlug}` : ''}</Tag>}
-                  {record.status === 'rejected' && <Tag tone="warning">目标角色的人已拒绝</Tag>}
+                  {record.status === 'open' && <Tag tone="info">{isSelfRecord(record) ? '待我决定' : '待对方处理'}</Tag>}
+                  {record.status === 'adopted' && <Tag tone="success">目标角色语境下的人已采纳{record.methodSlug !== undefined ? ` → ${record.methodSlug}` : ''}</Tag>}
+                  {record.status === 'rejected' && <Tag tone="warning">目标角色语境下的人已拒绝</Tag>}
                 </span>
                 <span className="wk-row-task">
                   {record.status === 'rejected'
@@ -66,7 +78,7 @@ export function CultivationMine({ inbox }: { readonly inbox: CultivationBoardSta
 }
 
 export function CultivationAdopted({ board, records }: { readonly board: CultivationBoardState; readonly records: readonly CultivationRecord[] | null }) {
-  const { inbox, actions, pendingId, revokingSlug, capList, capControl, stampOf, run, outcomeOf, setRevokingSlug } = board
+  const { inbox, actions, pendingId, revokingSlug, capList, capControl, stampOf, now, run, outcomeOf, setRevokingSlug } = board
   const [verifyingId, setVerifyingId] = useState<string | null>(null)
   const [verificationOutcome, setVerificationOutcome] = useState<'pass' | 'fail'>('pass')
   const [verificationEvidence, setVerificationEvidence] = useState('')
@@ -116,7 +128,7 @@ export function CultivationAdopted({ board, records }: { readonly board: Cultiva
                       {revoked ? '——方法已删除，本角色会话不再加载。' : '——新开的本角色会话带着它开工；已经在跑的会话也会随技能目录刷新看到它。'}
                     </span>
                     <span className="wk-meta">
-                      提出者：{record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)} 分身（Agent）` : `${roleLabel(record.proposerRole)} 角色语境下的人`}；目标角色：{roleLabel(record.targetRole)}；人已采纳
+                      提出者：{record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)} 分身（Agent）` : `${roleLabel(record.proposerRole)} 角色语境下的人`}；目标角色：{roleLabel(record.targetRole)}；目标角色语境下的人已采纳
                     </span>
                     {(record.contexts?.length ?? 0) > 0
                       ? <span className="wk-meta">原始工作依据：背景「{record.contexts![0]!.title}」</span>
@@ -146,8 +158,25 @@ export function CultivationAdopted({ board, records }: { readonly board: Cultiva
                       return (
                         <div className="wk-cultivation-verification-history" aria-label="后续工作观察历史">
                           <span className="wk-meta">后续相似工作观察：{String(history.length)} 条</span>
-                          {visible.map((entry, index) => <span key={`${entry.at}:${index}`} className="wk-meta">{verificationText(entry)}</span>)}
-                          {!expanded && history.length > MAX_VISIBLE_VERIFICATIONS && <Button size="sm" onClick={() => { setExpandedEvidence(previous => ({ ...previous, [`history:${record.id}`]: true })) }}>查看全部 {String(history.length)} 条观察</Button>}
+                          {visible.map((entry, index) => (
+                            <div key={`${entry.at}:${index}`} className="wk-cultivation-observation">
+                              <div className="wk-cultivation-observation-head">
+                                <Tag tone={entry.outcome === 'pass' ? 'success' : 'warning'}>{entry.outcome === 'pass' ? '有用' : '没起作用'}</Tag>
+                                <span className="wk-meta" title={entry.at}>{verificationTime(entry, now)}</span>
+                              </div>
+                              <div className="wk-cultivation-observation-evidence">{entry.evidence}</div>
+                            </div>
+                          ))}
+                          {!expanded && history.length > MAX_VISIBLE_VERIFICATIONS && (
+                            <div className="wk-cultivation-actions">
+                              <Button size="sm" onClick={() => { setExpandedEvidence(previous => ({ ...previous, [`history:${record.id}`]: true })) }}>查看全部 {String(history.length)} 条观察</Button>
+                            </div>
+                          )}
+                          {expanded && history.length > MAX_VISIBLE_VERIFICATIONS && (
+                            <div className="wk-cultivation-actions">
+                              <Button size="sm" onClick={() => { setExpandedEvidence(previous => ({ ...previous, [`history:${record.id}`]: false })) }}>只看最近 {String(MAX_VISIBLE_VERIFICATIONS)} 条</Button>
+                            </div>
+                          )}
                         </div>
                       )
                     })()}

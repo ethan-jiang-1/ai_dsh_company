@@ -255,17 +255,44 @@ describe('创作面：不看说明也能提交一条（S5，判据 ①/G1）', (
     expect(container.textContent).toContain(CULTIVATION_COPY.problemExpectationSeparator)
   })
 
-  it('「给别的角色提建议」要先选角色，且不给自己', async () => {
+  it('「给别的角色提建议」要先选角色，且不给自己；未选时不可提交', async () => {
     const { actions, lines } = stubActions()
     const { container } = mount({ actions, viewerRole: 'ceo', viewerLabel: 'CEO' })
     await startComposition(container, 'suggest')
     expect(button(container, 'CFO'), '应能选目标角色').not.toBeNull()
     expect(button(container, 'CEO'), '不把自己列成建议对象').toBeNull()
+    expect(button(container, CULTIVATION_COPY.submit)!.disabled, '未选目标时提交应禁用').toBe(true)
+    expect(container.textContent).toContain('先选一个目标角色；未选不会提交。')
     await click(button(container, 'CFO')!)
+    expect(button(container, CULTIVATION_COPY.submit)!.disabled).toBe(false)
+    expect(container.textContent).not.toContain('先选一个目标角色；未选不会提交。')
     await type(container.querySelector('input') as HTMLInputElement, '测算先列假设口径')
     await type(container.querySelector('textarea') as HTMLTextAreaElement, '做法：单列固定成本与边际成本。')
     await click(button(container, CULTIVATION_COPY.submit)!)
     expect(lines).toEqual(['/cultivation suggest cfo 测算先列假设口径 :: 做法：单列固定成本与边际成本。'])
+  })
+
+  it('验证历史逐条可读；>3 条可展开/收起；原始 ISO 只在 title 里', async () => {
+    const history = Array.from({ length: 4 }, (_, index) => ({
+      outcome: index % 2 === 0 ? 'pass' as const : 'fail' as const,
+      evidence: `观察证据 ${String(index + 1)}`,
+      at: new Date(Date.now() - (index + 1) * 60_000).toISOString(),
+    }))
+    const { actions } = stubActions()
+    const { container } = mount({
+      records: [record({ id: 'r-history', status: 'adopted', methodSlug: 'method-r-history', verification: 'pass', verificationHistory: history })],
+      actions,
+    })
+    expect(container.querySelectorAll('.wk-cultivation-observation')).toHaveLength(3)
+    expect(container.textContent).toContain('后续相似工作观察：4 条')
+    expect(container.textContent).toContain('观察证据 4')
+    expect(container.textContent, '原始 ISO 不该出现在可见文本').not.toContain(history[0]!.at)
+    expect(container.querySelector(`[title="${history[3]!.at}"]`), '原始时间保留在 title 供核对').not.toBeNull()
+
+    await click(button(container, '查看全部 4 条观察')!)
+    expect(container.querySelectorAll('.wk-cultivation-observation')).toHaveLength(4)
+    await click(button(container, '只看最近 3 条')!)
+    expect(container.querySelectorAll('.wk-cultivation-observation')).toHaveLength(3)
   })
 })
 

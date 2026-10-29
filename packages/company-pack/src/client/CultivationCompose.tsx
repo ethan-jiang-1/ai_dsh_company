@@ -147,7 +147,9 @@ export function CultivationCompose(props: CultivationComposeProps) {
     setOutcome(null)
     setExpectation('')
     setBody('')
-    setTargetRole(next === 'suggest' ? (others[0] ?? '') : props.viewerRole)
+    // 跨角色建议不预选目标：默认选中第一个别的角色会把建议静默发错人（2026-10-30 复核）。
+    // 未选时提交按钮禁用并给出提示；选定后才可提交。
+    setTargetRole(next === 'suggest' ? '' : props.viewerRole)
     if (next === 'correct' && canContext) {
       const result = sources.listSessions(currentSessionId, props.viewerRole)
       if (result.ok) {
@@ -247,6 +249,9 @@ export function CultivationCompose(props: CultivationComposeProps) {
                 ))}
               </div>
             )}
+            {mode === 'suggest' && targetRole === '' && (
+              <span className="wk-meta wk-cultivation-role-hint">先选一个目标角色；未选不会提交。</span>
+            )}
             {canContext && (
               <div className="wk-cultivation-context">
                 <div className="wk-cultivation-context-head">
@@ -331,7 +336,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
               </span>
             </label>
             <div className="wk-cultivation-actions">
-              <Button variant="primary" disabled={pending || contextStatus === 'loading'} onClick={() => { void submit() }}>
+              <Button variant="primary" disabled={pending || contextStatus === 'loading' || (mode === 'suggest' && targetRole === '')} onClick={() => { void submit() }}>
                 {pending ? CULTIVATION_COPY.running : CULTIVATION_COPY.submit}
               </Button>
               <Button disabled={pending} onClick={() => { resetContext(); setMode(null); setProblem(null) }}>{CULTIVATION_COPY.cancel}</Button>

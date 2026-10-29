@@ -400,6 +400,13 @@ try {
 
   await check('⑤b 可选背景：suggest + 成品背景 → 记录 contexts + 人话 source；正文可空', async () => {
     await chooseCultivationIntent('给别的角色提建议')
+    const form = page.locator('.wk-cultivation-compose').first()
+    const submit = form.getByRole('button', { name: '记下来', exact: true })
+    if (!(await submit.isDisabled())) throw new Error('未选目标角色时提交应禁用（不允许默认发给别人）')
+    if (await form.getByText('先选一个目标角色；未选不会提交。').count() === 0) throw new Error('未选目标角色时应给提示')
+    await form.getByRole('button', { name: 'CFO', exact: true }).click()
+    if (await submit.isDisabled()) throw new Error('选了目标角色后提交应可用')
+    if (await form.getByText('先选一个目标角色；未选不会提交。').count() > 0) throw new Error('选目标角色后提示应消失')
     await page.getByRole('button', { name: '＋ 添加背景', exact: true }).click()
     const catalog = JSON.parse(readFileSync(join(WORKSPACE, 'kb', 'deliverables-index.json'), 'utf8'))
     const slug = Array.isArray(catalog?.entries) ? catalog.entries[0]?.slug : undefined
@@ -426,6 +433,7 @@ try {
     contextRecordId = found.name.replace(/\.md$/, '')
     if (!found.body.includes('contexts: ')) throw new Error('记录缺 contexts')
     if (!found.body.includes('"kind":"deliverable"')) throw new Error('记录 contexts 不是 deliverable')
+    if (!/targetRole:\s*cfo\b/.test(found.body)) throw new Error('建议目标角色未按显式选择写成 cfo')
     if (!/source: 成品「/.test(found.body)) throw new Error('记录 source 不是成品人话摘要')
     const bodyAfter = found.body.split('---').at(-1)?.trim() ?? ''
     if (bodyAfter !== '') throw new Error(`正文应为空，实际：${bodyAfter.slice(0, 80)}`)

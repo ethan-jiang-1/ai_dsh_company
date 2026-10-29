@@ -223,22 +223,32 @@ function CultivationThread({ binding, attachments }: { readonly binding: Session
   }, [window.entries])
   const pendingVisible = pending !== null && !rows.some(row => row.who === 'you' && row.text === pending)
 
+  // 流式文本增长时也跟随到底；只依赖 rows/pending 会让长回复停在折叠线以下。
+  useEffect(() => {
+    const list = listRef.current
+    if (list !== null) list.scrollTop = list.scrollHeight
+  }, [liveText])
+
   const submit = async (): Promise<void> => {
     const text = draft.trim()
     if (text === '' || sending) return
-    setDraft('')
     setError(null)
     setPending(text)
     setSending(true)
     try {
       const result = await binding.session.prompt([{ type: 'text', text: `${CULTIVATION_SCOPE}${attachedContext(attached)}【用户问题】${text}` }], 'queue')
       if (!result.ok) {
+        // 失败不丢输入：恢复草稿，用户改一下就能重发。
         setError(`${result.error.code}: ${result.error.message}`)
         setPending(null)
+        setDraft(text)
+        return
       }
+      setDraft('')
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : String(reason))
       setPending(null)
+      setDraft(text)
     } finally {
       setSending(false)
     }

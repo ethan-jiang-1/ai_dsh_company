@@ -99,7 +99,7 @@ describe('CultivationBoard：数据诚实与能力呈现（V2/V8/V9）', () => {
     expect(markup).toContain('原始工作依据')
     expect(markup).toContain('VP-Eng 分身')
     expect(markup).toContain('目标角色：CFO')
-    expect(markup).toContain('人已采纳')
+    expect(markup).toContain('目标角色语境下的人已采纳')
   })
 
   it('拒绝回执展示目标角色的人侧决定及决定时间', () => {
@@ -107,8 +107,33 @@ describe('CultivationBoard：数据诚实与能力呈现（V2/V8/V9）', () => {
       kind: 'suggestion', proposerRole: 'ceo', targetRole: 'cfo', status: 'rejected',
       reason: '缺少后续案例', decidedAt: '2026-10-29T11:20:00.000Z',
     })] })
-    expect(markup).toContain('目标角色的人已拒绝')
+    expect(markup).toContain('目标角色语境下的人已拒绝')
     expect(markup).toContain('拒绝时间：2026-10-29T11:20:00.000Z')
+  })
+
+  it('自纠正的 open 状态说「待我决定」，不再说「待对方处理」', () => {
+    const markup = render({ records: [record({ targetRole: 'ceo', proposerRole: 'ceo', status: 'open' })] })
+    expect(markup).toContain('待我决定')
+    expect(markup).toContain('自己的纠正在上面「需要我处理」里待你决定')
+    expect(markup, '自纠正不该显示等对方处理').not.toContain('待对方处理')
+  })
+
+  it('跨角色建议的 open 状态仍说「待对方处理」', () => {
+    const markup = render({ records: [record({ kind: 'suggestion', targetRole: 'cfo', proposerRole: 'ceo', status: 'open' })] })
+    expect(markup).toContain('待对方处理')
+    expect(markup).not.toContain('待我决定')
+  })
+
+  it('拒绝回执按记录类型说纠正/建议，不把纠正叫成建议', () => {
+    const markup = render({ records: [record({ kind: 'correction', proposerRole: 'cfo', targetRole: 'ceo', status: 'rejected', reason: '口径不符' })] })
+    expect(markup).toContain('已拒绝 CFO 的纠正')
+    expect(markup).not.toContain('已拒绝 CFO 的建议')
+  })
+
+  it('「怎么养」指向可见的「开始记录一项工作」入口，而不是把隐藏按钮说成直接可见', () => {
+    const markup = render()
+    expect(markup).toContain('点上面「开始记录一项工作」→「给你的角色留一条方法」')
+    expect(markup).toContain('点「开始记录一项工作」→「给别的角色提建议」')
   })
 
   it('旧 pass/fail 状态不伪造证据，并提示历史依据未记录', () => {

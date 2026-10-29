@@ -142,8 +142,8 @@ export function createCultivationView(injected: CultivationViewInjected) {
         <header className="wk-cult-view-head">
           <div>
             <div className="wk-cult-view-eyebrow">CULTIVATION · 培养</div>
-            <div className="wk-cult-view-title">培养 · 方法工作台</div>
-            <div className="wk-cult-view-sub">只有培养需要专属对话；左边是纠正/方法/journal，右边只谈培养。</div>
+            <div className="wk-cult-view-title">让角色今后的工作更好</div>
+            <div className="wk-cult-view-sub">从一项真实工作或改进目标开始；左边看记录，右边只谈培养。</div>
           </div>
           <button type="button" className="wk-cult-overview" onClick={injected.openCompanyOverview}>
             公司总览 ↗

@@ -382,6 +382,21 @@ const CSS = `
   border-left: 2px solid var(--dsw-alias-border-l2);
   padding-left: 8px;
 }
+.wk-cultivation-role-hint { color: var(--dsw-alias-label-secondary); }
+.wk-cultivation-verification-history { display: grid; gap: 6px; }
+.wk-cultivation-observation {
+  display: grid;
+  gap: 2px;
+  border-left: 2px solid var(--dsw-alias-border-l2);
+  padding-left: 8px;
+}
+.wk-cultivation-observation-head { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.wk-cultivation-observation-evidence {
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
 .wk-cultivation-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .wk-cultivation-teammate { border-left: 2px solid var(--dsw-alias-state-warn-primary); padding-left: 8px; }
 .wk-cultivation-context { display: grid; gap: 6px; }

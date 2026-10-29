@@ -65,7 +65,7 @@ async function mount(over: Record<string, unknown> = {}): Promise<HTMLElement> {
 describe('CultivationView', () => {
   it('左培养板 + 右培养对话；公司总览打开右栏；shell composer 隐藏只在挂载期', async () => {
     const host = await mount()
-    expect(host.textContent).toContain('培养 · 方法工作台')
+    expect(host.textContent).toContain('让角色今后的工作更好')
     expect(host.querySelector('.wk-cult-view-split')).not.toBeNull()
     expect(host.querySelector('.wk-cult-chat')).not.toBeNull()
     expect(document.documentElement.dataset.dshCultivationView).toBe('1')

@@ -6,6 +6,8 @@
 
 当前活跃 0 张。
 
+2026-10-30 培养入口与证据可读性收口卡已结归档（目标角色/文案/自纠正状态/验证历史/对话失败与流式；去向 = implemented Note），见 [归档](../_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)。
+
 2026-10-29 培养 UX 卡已结归档（生产主线与追溯切片落地；去向 = implemented Note；真人走查留 Note 后续观察），见 [归档](../_archive/settled_issues/2026-10-29-cultivation-experience.md)。
 
 2026-10-28 二轮削洋葱卡已结归档（8 项残余 5 修 / 3 边界；0.4.1；去向 = implemented Note），见 [归档](../_archive/settled_issues/2026-10-28-data-design-round2.md)。2026-10-28 数据设计硬化卡已结归档（M1–M4 落地，0.4.0；去向 = implemented Note），见 [归档](../_archive/settled_issues/2026-10-28-data-design-hardening.md)。2026-10-28 第四轮六维打扫已结归档（A–E 全批；六维复评 D1–D6 = A-；去向 = 12 篇 implemented Note，见[归档卡](../_archive/settled_issues/2026-10-28-repo-hygiene-round4.md)）。2026-10-28 六维提分已结归档（D1/D4/D5 → A-；三批 + 认证档，去向 = 三篇 Note，见[归档卡](../_archive/settled_issues/2026-10-27-six-dim-raise.md)）。2026-10-27 的第三轮六维度打扫已结归档（A/B/C/D 全批；去向 = 六篇 implemented Note，见[归档卡](../_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)）。
@@ -14,6 +16,7 @@
 
 ## 近期归档
 
+- 培养入口收口卡 2026-10-30 已结：目标角色显式选择、入口文案、自纠正状态、验证历史逐条、对话失败保留草稿；实施 = [entry-followup Note](../../notes/implemented/2026-10-30-cultivation-entry-followup.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)。
 - 培养 UX 卡 2026-10-29 已结：结论 = 做；案例工坊 A 主线、来源/决定/验证历史落地；实施 = [traceability Note](../../notes/implemented/2026-10-30-cultivation-work-improvement-traceability.md)；卡在 [归档](../_archive/settled_issues/2026-10-29-cultivation-experience.md)。
 - 二轮削洋葱卡 2026-10-28 已结：8 项残余 5 修 / 3 边界；0.4.1；实施 = [round2 Note](../../notes/implemented/2026-10-28-data-design-round2.md)；卡在 [归档](../_archive/settled_issues/2026-10-28-data-design-round2.md)。
 - 数据设计硬化卡 2026-10-28 已结：结论=做；实施 = [data-design-hardening](../../notes/implemented/2026-10-28-data-design-hardening.md)；M1–M4 落地（0.4.0）；卡在 [归档](../_archive/settled_issues/2026-10-28-data-design-hardening.md)。

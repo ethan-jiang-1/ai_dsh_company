@@ -28,7 +28,7 @@ function fakeSessions() {
     getSnapshot: () => eventSnapshot,
     subscribe: (listener: () => void) => { eventListeners.add(listener); return () => eventListeners.delete(listener) },
   }
-  const sessionSnapshot = { running: false, blank: false }
+  let sessionSnapshot = { running: false, blank: false }
   const session = {
     sessionId: 'session-cultivation',
     getSnapshot: () => sessionSnapshot,
@@ -39,12 +39,22 @@ function fakeSessions() {
   const create = vi.fn(async () => 'session-cultivation')
   const release = vi.fn()
   const retain = vi.fn(() => ({ sessionId: 'session-cultivation', binding, ready: Promise.resolve(binding), release }))
-  const pushEntry = (event: unknown) => {
-    entries = [...entries, { type: 'event', event }]
+  const publish = (next: unknown[]) => {
+    entries = next
     eventSnapshot = { entries, hasMore: false, revision: entries.length, change: { kind: 'replace', entries } }
     for (const listener of eventListeners) listener()
   }
-  return { sessions: { create, retain } as never, binding, create, retain, release, pushEntry }
+  const pushEntry = (event: unknown) => {
+    publish([...entries, { type: 'event', event }])
+  }
+  const pushTransient = (text: string) => {
+    publish([...entries, { type: 'transient', event: { type: 'assistant/message-delta', data: { chunk: { type: 'text-delta', text } } } }])
+  }
+  const setRunning = (running: boolean) => {
+    sessionSnapshot = { ...sessionSnapshot, running }
+    for (const listener of sessionListeners) listener()
+  }
+  return { sessions: { create, retain } as never, binding, create, retain, release, pushEntry, pushTransient, setRunning }
 }
 
 describe('CultivationChatPanel（独立培养会话）', () => {
@@ -112,6 +122,49 @@ describe('CultivationChatPanel（独立培养会话）', () => {
     expect(text).toContain('【附加记录】20261028-abc123')
     expect(text).toContain('收口前列未决')
     expect(text).toContain('【用户问题】这条怎么落成方法？')
+  })
+
+  it('prompt 失败保留草稿并显示原因（不丢用户输入）', async () => {
+    const fake = fakeSessions()
+    const host = document.createElement('div')
+    document.body.append(host)
+    mounted = createRoot(host)
+    await act(async () => {
+      mounted?.render(createElement(CultivationChatPanel, {
+        sessions: fake.sessions, mainSessionId: 'session-main' as never, cwd: '/tmp/company', agentPreset: 'ceo',
+      }))
+    })
+    const prompt = (fake.binding as unknown as { session: { prompt: ReturnType<typeof vi.fn> } }).session.prompt
+    prompt.mockResolvedValueOnce({ ok: false, error: { code: 'E_FAIL', message: '连接断了' } })
+    const area = host.querySelector('textarea') as HTMLTextAreaElement
+    const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set
+    await act(async () => {
+      setter?.call(area, '别丢这句话')
+      area.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+    const send = [...host.querySelectorAll('button')].find(node => node.textContent?.includes('发送'))
+    await act(async () => { send?.dispatchEvent(new MouseEvent('click', { bubbles: true })) })
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)) })
+    expect(host.textContent).toContain('E_FAIL: 连接断了')
+    expect((host.querySelector('textarea') as HTMLTextAreaElement).value, '失败后草稿应保留').toBe('别丢这句话')
+  })
+
+  it('流式 text-delta 在 running 时出现在面板', async () => {
+    const fake = fakeSessions()
+    const host = document.createElement('div')
+    document.body.append(host)
+    mounted = createRoot(host)
+    await act(async () => {
+      mounted?.render(createElement(CultivationChatPanel, {
+        sessions: fake.sessions, mainSessionId: 'session-main' as never, cwd: '/tmp/company', agentPreset: 'ceo',
+      }))
+    })
+    await act(async () => {
+      fake.setRunning(true)
+      fake.pushTransient('生成中的回答')
+    })
+    expect(host.textContent).toContain('生成中的回答')
+    expect(host.textContent).toContain('生成中')
   })
 
   it('缺 cwd/角色时等待，不创建会话', async () => {
