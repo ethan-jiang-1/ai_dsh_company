@@ -22,7 +22,8 @@
 //   ④ 跨角色采纳被 host 拒（`commands/execute` 直发 cfo 会话采纳 ceo 的记录 → 文案含「仅建议权」）；
 //   ⑤ 主任务「让角色今后的工作更好」→ 人选择纠正/建议 → 提交 → 公司盘新增 `status: open` 记录；
 //   ⑥ 零挂载失败（无 banner / 无 loader 错误）；
-//   ⑦ `--fixture` 时截图入 snapshots/visual/cultivation-gui/（用户可见改动的视觉夹具）。
+//   ⑦ `--fixture` 时截图入 snapshots/visual/cultivation-gui/（用户可见改动的视觉夹具）；
+//   ⑧ 已采纳方法验证：无依据不发；有用/失败都写 `verificationHistory`；失败观察不撤回方法。
 //
 // ⚠ 会话落在**公司盘** `company-workspace/`（注册工作区里唯一路径有效的那个：侧栏的
 //   `rehearsal-workspace` 仍指着旧路径 dev/rehearsal-workspace，面板读不到那边的记录——
@@ -46,6 +47,42 @@ const FIXTURE = process.argv.includes('--fixture')
 const SUMMARY = process.argv.includes('--summary') && !process.argv.includes('--isolated')
 const ISOLATED = process.argv.includes('--isolated')
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+/** 取目录下最新 .ts/.tsx 的 mtime；用于拒绝陈旧 lib 冒充当前源码的证据。 */
+function newestSourceMtime(dir) {
+  let newest = 0
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name)
+    if (entry.isDirectory()) {
+      if (entry.name !== 'node_modules') newest = Math.max(newest, newestSourceMtime(path))
+    } else if (entry.isFile() && /\.(ts|tsx)$/.test(entry.name)) {
+      newest = Math.max(newest, statSync(path).mtimeMs)
+    }
+  }
+  return newest
+}
+
+/**
+ * 真浏览器证据必须来自当前源码：lib 产物比 src 旧时直接拒绝。
+ * 2026-10-30 实测：旧 lib 与 src 的一句用户可见文案不一致，探针仍全绿——所以不能只信“探针过了”。
+ */
+function assertPackBuiltFromSource() {
+  const libRoot = join(ROOT, 'packages/company-pack/lib')
+  const srcRoot = join(ROOT, 'packages/company-pack/src')
+  const newest = newestSourceMtime(srcRoot)
+  for (const name of ['client.js', 'index.js']) {
+    const artifact = join(libRoot, name)
+    if (!existsSync(artifact)) {
+      console.error(`cultivation-gui-probe: 缺 ${artifact}；先构建 pack（pnpm typecheck + tsdown）`)
+      process.exit(2)
+    }
+    if (statSync(artifact).mtimeMs < newest) {
+      console.error(`cultivation-gui-probe: ${name} 早于 src；先构建 pack（pnpm typecheck + tsdown）再跑——拒绝用陈旧 lib 当证据`)
+      process.exit(2)
+    }
+  }
+}
+assertPackBuiltFromSource()
 
 let home
 let isolatedRoot
@@ -293,6 +330,7 @@ try {
 
     const pane = page.locator('.wk-cultivation-compose').first()
     await pane.waitFor({ timeout: 30_000 })
+    await page.screenshot({ path: join(OUT_DIR, 'cultivation-panel.png'), fullPage: false })
   })
 
   const startCultivationEntry = async () => {
@@ -472,6 +510,58 @@ try {
     await adoptedRow.waitFor({ timeout: 15_000 })
   })
 
+  await check('⑤e 验证必须带后续工作依据：有用/失败都写历史，失败不撤回', async () => {
+    if (own === null) throw new Error('② 未采纳记录')
+    const adoptedRow = page.getByRole('listitem', { name: `方法 method-${own.id}` })
+    const verifyFormOf = () => adoptedRow.locator('.wk-cultivation-verification-form')
+    const historyOf = (id) => {
+      const text = recordTextOf(id) ?? ''
+      const raw = /verificationHistory:\s*(\S+)/.exec(text)?.[1]
+      if (raw === undefined) return { text, history: null }
+      try { return { text, history: JSON.parse(decodeURIComponent(raw)) } } catch { return { text, history: null } }
+    }
+
+    await adoptedRow.getByRole('button', { name: '这条有用', exact: true }).click()
+    await verifyFormOf().waitFor({ timeout: 10_000 })
+    await verifyFormOf().getByRole('button', { name: '记录有用观察', exact: true }).click()
+    await adoptedRow.getByText('请写明一项采纳后的相似工作').first().waitFor({ timeout: 5_000 })
+    const evidence1 = '后续同类收口再次按清单盘点，未决项没有遗漏。'
+    await verifyFormOf().locator('textarea').fill(evidence1)
+    await verifyFormOf().getByRole('button', { name: '记录有用观察', exact: true }).click()
+
+    const deadline = Date.now() + 25_000
+    let first = historyOf(own.id)
+    while (Date.now() < deadline && !(first.text.includes('verification: pass') && first.history?.length === 1)) {
+      await sleep(500)
+      first = historyOf(own.id)
+    }
+    if (!first.text.includes('verification: pass')) throw new Error('有用观察未写入 verification: pass')
+    if (first.history === null || first.history.length !== 1) throw new Error('有用观察未写入 verificationHistory')
+    if (first.history[0]?.evidence !== evidence1) throw new Error(`有用观察依据不一致：${JSON.stringify(first.history)}`)
+    await adoptedRow.getByText('后续相似工作观察：1 条').first().waitFor({ timeout: 15_000 })
+    await adoptedRow.getByText(evidence1).first().waitFor({ timeout: 15_000 })
+
+    await adoptedRow.getByRole('button', { name: '没起作用', exact: true }).click()
+    await verifyFormOf().waitFor({ timeout: 10_000 })
+    const evidence2 = '下一次收口又漏了一项未决。'
+    await verifyFormOf().locator('textarea').fill(evidence2)
+    await verifyFormOf().getByRole('button', { name: '记录失败观察', exact: true }).click()
+
+    const deadline2 = Date.now() + 25_000
+    let second = historyOf(own.id)
+    while (Date.now() < deadline2 && !(second.text.includes('verification: fail') && second.history?.length === 2)) {
+      await sleep(500)
+      second = historyOf(own.id)
+    }
+    if (!second.text.includes('verification: fail')) throw new Error('失败观察未写入 verification: fail')
+    if (second.history === null || second.history.length !== 2) throw new Error('失败观察未追加到 verificationHistory')
+    if (second.history[1]?.evidence !== evidence2) throw new Error(`失败观察依据不一致：${JSON.stringify(second.history)}`)
+    if (!second.text.includes('status: adopted')) throw new Error('失败观察不应撤回方法（status 仍应为 adopted）')
+    if (!existsSync(join(METHOD_ROOT_OF(own.role), `method-${own.id}`, 'SKILL.md'))) throw new Error('失败观察不应删除方法文件')
+    await adoptedRow.getByText('后续相似工作观察：2 条').first().waitFor({ timeout: 15_000 })
+    await page.screenshot({ path: join(OUT_DIR, 'cultivation-verify.png'), fullPage: false })
+  })
+
   await check('③ 命令进会话日志（command/run + command/done，source=user）', async () => {
     if (sessionId === null || own === null) throw new Error('前序判据未就绪')
     // command/run 与 command/done 是直写日志的事件（不吃轮次 checkpoint），落盘有延迟 ⇒ 轮询等齐。
@@ -596,6 +686,6 @@ if (ISOLATED && isolatedRoot !== undefined) {
 }
 
 console.log(failures.length === 0
-  ? '\ncultivation-gui-probe: ALL PASS（真浏览器点按：把手/采纳落盘/日志留痕/角色闸/创作提交/零挂载失败）'
+  ? '\ncultivation-gui-probe: ALL PASS（真浏览器点按：把手/采纳落盘/日志留痕/角色闸/创作提交/验证依据/零挂载失败）'
   : `\ncultivation-gui-probe: ${failures.length} FAILURE(S)\n${failures.join('\n')}`)
 process.exit(failures.length === 0 ? 0 : 1)

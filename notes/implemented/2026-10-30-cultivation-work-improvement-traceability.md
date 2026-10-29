@@ -30,6 +30,7 @@
 - `pnpm test`：118 files / 1011 tests PASS。
 - `pnpm typecheck`：exit 0。
 - `pnpm verify`：初跑在 bare-path 因卡上的研究路径指针只存在于原型分支而红；移除不存在的活跃路径指针后复跑 ALL PASS。Replay fixture freshness 和 replay UI freshness 因当前盘无对应对象而 SKIP。
-- `node probes/browser-visual/cultivation-gui-probe.mjs --isolated`（前置 `source run/env.sh`）：真 Web + Chromium 通过零挂载、单一主入口提交、可选成品背景、采纳、命令日志配对、角色闸拒绝、打开原文；隔离 home 无既有会话时诚实呈现空状态；脚本清理自身 marker 所有隔离运行数据。另跑 `node checks/smoke/ui-scene-smoke.mjs --isolated`，全部公司页签加载且零浏览器错误。
+- `node probes/browser-visual/cultivation-gui-probe.mjs --isolated`（前置 `source run/env.sh` + 重建 pack）：真 Web + Chromium 通过零挂载、单一主入口提交、可选成品背景、采纳、命令日志配对、角色闸拒绝、打开原文、验证依据/历史（有用 + 失败两条观察，失败不撤回方法）；隔离 home 无既有会话时诚实呈现空状态；脚本清理自身 marker 所有隔离运行数据。另跑 `node checks/smoke/ui-scene-smoke.mjs --isolated`，全部公司页签加载且零浏览器错误。
+- 2026-10-30 复核：盘上旧 `lib/client.js` 与 `src` 的用户可见文案不一致（旧 bundle 写「原始工作依据：在培养面板中提交」，`src` 写「来源：会话内提交；具体工作出处未单独记录」），探针仍全绿 ⇒ 真浏览器证据可能来自陈旧构建。已给探针加 mtime 守卫：旧 lib 早于 `src` 时 exit 2；重建后复跑 ALL PASS。探针新增 ⑤e 覆盖新验证表单（无依据不发、历史落盘、失败不撤回）。
 - 真人新手可用性测试未执行；自动化只证明交互路径、角色合同和渲染可运行，不证明文案对新人无困惑。
 - 归档：用户 2026-10-30 指出该卡不应继续悬挂；卡按章程移入 settled_issues。真人新手可用性测试仍未执行，保留为本 Note 的后续体验观察，不作为卡关闭条件。
