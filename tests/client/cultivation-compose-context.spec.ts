@@ -86,6 +86,11 @@ const click = async (target: HTMLElement): Promise<void> => {
   await act(async () => { target.dispatchEvent(new MouseEvent('click', { bubbles: true })) })
 }
 
+const openCorrection = async (container: HTMLElement): Promise<void> => {
+  await click(button(container, '开始记录一项工作'))
+  await click(button(container, CULTIVATION_COPY.composeCorrect))
+}
+
 const flush = async (): Promise<void> => {
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)) })
 }
@@ -104,7 +109,7 @@ describe('可选背景：默认值 / 移除 / 手选 / 明说', () => {
     const { actions } = stubActions()
     const sources = stubSources({ readPreview: async () => ({ ok: true, turn: { turn: 1, text: 'api_key = sk-abcdefghijklmnop1234' } }) })
     const container = mount({ actions, sources, currentSessionId: 'session-1' })
-    await click(button(container, CULTIVATION_COPY.composeCorrect))
+    await openCorrection(container)
     await flush()
     expect(container.textContent).toContain(CULTIVATION_COPY.contextSecretWarning)
   })
@@ -112,7 +117,7 @@ describe('可选背景：默认值 / 移除 / 手选 / 明说', () => {
   it('correct 默认带本次最近一轮；正文可空；命令线带 --context=', async () => {
     const { actions, lines } = stubActions()
     const container = mount({ actions, sources: stubSources(), currentSessionId: 'session-1' })
-    await click(button(container, CULTIVATION_COPY.composeCorrect))
+    await openCorrection(container)
     await flush()
     expect(container.textContent).toContain('收口检查')
     expect(container.textContent).toContain('用户：收口前把未决项列一下')
@@ -130,7 +135,7 @@ describe('可选背景：默认值 / 移除 / 手选 / 明说', () => {
   it('移除背景 → 正文必填；提交被拦且不发命令', async () => {
     const { actions, lines } = stubActions()
     const container = mount({ actions, sources: stubSources(), currentSessionId: 'session-1' })
-    await click(button(container, CULTIVATION_COPY.composeCorrect))
+    await openCorrection(container)
     await flush()
     await click(button(container, CULTIVATION_COPY.contextRemove))
     await type(container.querySelector('input') as HTMLInputElement, '收口前逐项列出未决项')
@@ -143,7 +148,7 @@ describe('可选背景：默认值 / 移除 / 手选 / 明说', () => {
   it('手选成品 → 卡片显示结果，命令 token 带 deliverable ref', async () => {
     const { actions, lines } = stubActions()
     const container = mount({ actions, sources: stubSources(), currentSessionId: 'session-1' })
-    await click(button(container, CULTIVATION_COPY.composeCorrect))
+    await openCorrection(container)
     await flush()
     await click(button(container, CULTIVATION_COPY.contextChange))
     await flush()
@@ -168,7 +173,7 @@ describe('可选背景：默认值 / 移除 / 手选 / 明说', () => {
       sources: stubSources({ readPreview: async () => ({ ok: false, problem: '读不到' }) }),
       currentSessionId: 'session-1',
     })
-    await click(button(container, CULTIVATION_COPY.composeCorrect))
+    await openCorrection(container)
     await flush()
     expect(container.textContent).not.toContain('读不到')
     await type(container.querySelector('input') as HTMLInputElement, '收口前逐项列出未决项')

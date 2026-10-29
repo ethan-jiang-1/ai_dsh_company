@@ -40,6 +40,10 @@ import {
   recordStampOf,
   roleLabel,
   type CultivationRecord,
+  type CultivationVerification,
+  encodeVerificationHistory,
+  VERIFICATION_EVIDENCE_LIMIT,
+  VERIFICATION_HISTORY_LIMIT,
 } from '../lib/cultivation.ts'
 import {
   clearPendingRevoke,
@@ -186,9 +190,9 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
       return commandReject({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens, body)
     }
 
-    // verify <id> <pass|fail>
+    // verify <id> <pass|fail> :: <后续相似工作的具体依据>
     if (sub === 'verify') {
-      return commandVerify({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens)
+      return commandVerify({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens, body)
     }
 
     // archive <days>：只归档已处理记录，open 不动（人工保留策略）
@@ -435,26 +439,41 @@ function commandReject(command: CultivationCommandContext, tokens: readonly stri
     
 }
 
-function commandVerify(command: CultivationCommandContext, tokens: readonly string[]): CultivationCommandResult {
+function commandVerify(command: CultivationCommandContext, tokens: readonly string[], evidence: string): CultivationCommandResult {
   const { face, recordsDir, storage } = command
-        const id = tokens[1]
-      const outcome = tokens[2]
-      if (id === undefined || (outcome !== 'pass' && outcome !== 'fail')) {
-        return { kind: 'error' as const, text: '用法：verify <记录id> <pass|fail>——在真实同类任务上验证后回填。' }
-      }
-      const found = storage.readRecord(recordsDir, id)
-      if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在。` }
-      const record = parseRecord(id, found.text)
-      if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏。` }
-      if (record.status !== 'adopted') return { kind: 'error' as const, text: `只有已采纳的方法才能回填验证（${id} 现为 ${record.status}）。` }
-      if (record.targetRole !== face.role) {
-        return { kind: 'error' as const, text: `${record.id} 归 ${roleLabel(record.targetRole)}，请在该角色会话里回填。` }
-      }
-      if (!storage.updateRecord(recordsDir, id, { verification: outcome }, found.text)) {
-        return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，验证未写；请重试。` }
-      }
-      return { kind: 'success' as const, text: `已回填验证：${id} → ${outcome === 'pass' ? '已验证（在同类任务上见过效）' : '验证未通过（建议修订或撤回）'}。` }
-    
+  const id = tokens[1]
+  const outcome = tokens[2]
+  if (id === undefined || (outcome !== 'pass' && outcome !== 'fail')) {
+    return { kind: 'error', text: '用法：verify <记录id> <pass|fail> :: <后续相似工作的具体依据>。' }
+  }
+  const normalizedEvidence = evidence.trim()
+  if (normalizedEvidence === '') {
+    return { kind: 'error', text: '验证需要后续相似工作的具体依据；请在 :: 之后写明发生了什么。' }
+  }
+  if (normalizedEvidence.length > VERIFICATION_EVIDENCE_LIMIT) {
+    return { kind: 'error', text: `验证依据最多 ${String(VERIFICATION_EVIDENCE_LIMIT)} 个字符，请保留最相关的工作事实。` }
+  }
+  const found = storage.readRecord(recordsDir, id)
+  if (found === null) return { kind: 'error', text: `记录 ${id} 不存在。` }
+  const record = parseRecord(id, found.text)
+  if (record === null) return { kind: 'error', text: `记录 ${id} 形状坏。` }
+  if (record.status !== 'adopted') return { kind: 'error', text: `只有已采纳的方法才能回填验证（${id} 现为 ${record.status}）。` }
+  if (record.targetRole !== face.role) {
+    return { kind: 'error', text: `${record.id} 归 ${roleLabel(record.targetRole)}，请在该角色会话里回填。` }
+  }
+  const entry: CultivationVerification = { outcome, evidence: normalizedEvidence, at: new Date().toISOString() }
+  const verificationHistory = [...(record.verificationHistory ?? []), entry].slice(-VERIFICATION_HISTORY_LIMIT)
+  const updates = {
+    verification: outcome,
+    verificationHistory: encodeVerificationHistory(verificationHistory),
+  }
+  if (!storage.updateRecord(recordsDir, id, updates, found.text)) {
+    return { kind: 'error', text: `记录 ${id} 在读取后被改过，验证未写；请重试。` }
+  }
+  return {
+    kind: 'success',
+    text: `已记录后续工作依据并回填验证：${id} → ${outcome === 'pass' ? '有用' : '没起作用'}。失败观察不会自动撤回方法。`,
+  }
 }
 
 function commandArchive(command: CultivationCommandContext, tokens: readonly string[]): CultivationCommandResult {
@@ -657,7 +676,7 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
   ctx.commands.register({
     name: 'cultivation',
     description: '培养回路：给自己的角色提交纠正、给别的角色提建议、采纳/拒绝/验证/撤回方法（采纳仅目标角色本人）',
-    input: { hint: 'correct <期望行为> :: <做法与证据> | suggest <角色> <期望行为> :: <建议> | adopt <id> [as <slug>] | reject <id> :: <理由> | verify <id> <pass|fail> | revoke <slug>' },
+    input: { hint: 'correct <期望行为> :: <做法与证据> | suggest <角色> <期望行为> :: <建议> | adopt <id> [as <slug>] | reject <id> :: <理由> | verify <id> <pass|fail> :: <后续相似工作的具体依据> | revoke <slug>' },
     handler: cultivationCommandHandler(config, storage, ctx, companyHome, dataBlocked),
   })
 }

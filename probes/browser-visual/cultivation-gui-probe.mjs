@@ -20,7 +20,7 @@
 //   ③ 该会话日志出现 `command/run` + `command/done`（name=cultivation、source.kind=user）——
 //      证明"按钮 = 人侧命令"，不是旁路；
 //   ④ 跨角色采纳被 host 拒（`commands/execute` 直发 cfo 会话采纳 ceo 的记录 → 文案含「仅建议权」）；
-//   ⑤ 创作表单提交 → 公司盘新增一条 `status: open` 记录（人给分身的输入进得去）；
+//   ⑤ 主任务「让角色今后的工作更好」→ 人选择纠正/建议 → 提交 → 公司盘新增 `status: open` 记录；
 //   ⑥ 零挂载失败（无 banner / 无 loader 错误）；
 //   ⑦ `--fixture` 时截图入 snapshots/visual/cultivation-gui/（用户可见改动的视觉夹具）。
 //
@@ -30,8 +30,9 @@
 //   `method-guiprobe-*` 方法目录，动别人的一个不碰。
 //
 // 清理：只删本次探针自己种下/产生的记录与方法目录（动别人的一个不碰）。
-import { spawn } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { spawn, spawnSync } from 'node:child_process'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { randomUUID } from 'node:crypto'
 import { basename, join } from 'node:path'
 import { loadChromium, launchChromium } from '../../tools/drivers/playwright.mjs'
 import { companyCookie, companyRpc, startWeb } from '../../tools/lib/probe-web.mjs'
@@ -42,20 +43,58 @@ import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { readRecords } from '../../tools/lib/session-log.mjs'
 
 const FIXTURE = process.argv.includes('--fixture')
-const SUMMARY = process.argv.includes('--summary')
+const SUMMARY = process.argv.includes('--summary') && !process.argv.includes('--isolated')
+const ISOLATED = process.argv.includes('--isolated')
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 let home
-try {
-  home = requireDevHome('cultivation-gui-probe')
-} catch (error) {
-  console.error(error.message)
-  process.exit(2)
+let isolatedRoot
+let isolatedMarker
+if (ISOLATED) {
+  const scratchRoot = join(ROOT, 'runtime/tmp')
+  mkdirSync(scratchRoot, { recursive: true })
+  isolatedRoot = mkdtempSync(join(scratchRoot, 'cultivation-gui-'))
+  home = join(isolatedRoot, 'home')
+  const provision = spawnSync(process.execPath, [join(ROOT, 'tools/standalone.mjs'), '--home', home, '--provision-only', '--no-build'], { cwd: ROOT, encoding: 'utf8' })
+  if (provision.status !== 0) {
+    console.error(`cultivation-gui-probe: 隔离 profile 预置失败：${(provision.stderr ?? '').trim().slice(-800)}`)
+    process.exit(2)
+  }
+  isolatedMarker = join(home, '.standalone-home')
+  if (!existsSync(isolatedMarker)) throw new Error(`隔离 home 缺少 ownership marker：${isolatedMarker}`)
+  const isolatedWorkspace = join(home, 'company-workspace')
+  mkdirSync(isolatedWorkspace, { recursive: true })
+  cpSync(join(ROOT, 'packages/company-pack/workspace'), isolatedWorkspace, { recursive: true, force: false })
+  mkdirSync(join(isolatedWorkspace, 'cultivation/records'), { recursive: true })
+  const syntheticPath = 'deliverables/2026-10-29-cultivation-probe/final.md'
+  const syntheticDir = join(isolatedWorkspace, 'deliverables/2026-10-29-cultivation-probe')
+  mkdirSync(syntheticDir, { recursive: true })
+  writeFileSync(join(syntheticDir, 'meta.md'), 'slug: cultivation-probe\nkickoff: 2026-10-29\n类型: 诊断\n结果: 已完成\n一句话结论: 用于验证培养页背景引用链。\n')
+  writeFileSync(join(syntheticDir, 'final.md'), '此文件由隔离培养 GUI 探针生成；不含用户数据。\n')
+  const catalogPath = join(isolatedWorkspace, 'kb/deliverables-index.json')
+  const catalog = { schema: 1, generatedAt: new Date().toISOString(), counts: { total: 1, active: 1, archive: 0, unledgered: 1, presented: 0, notPresented: 0, presentUnknown: 1 }, entries: [{ slug: 'cultivation-probe', kickoff: '2026-10-29', type: '诊断', result: '已完成', summary: '用于验证培养页背景引用链。', root: 'deliverables', dir: '2026-10-29-cultivation-probe', path: syntheticPath, ledgered: false, presented: null, metaProblem: null }] }
+  writeFileSync(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`, 'utf8')
+  const workspaceId = randomUUID()
+  const now = new Date().toISOString()
+  mkdirSync(join(home, 'storages'), { recursive: true })
+  writeFileSync(join(home, 'storages/workspace.json'), `${JSON.stringify({
+    unit: { name: 'workspace', version: 2 },
+    global: { initialized: true, workspaceIds: [workspaceId], archivedSessionIds: [], pinnedSessionIds: [], defaultWorkspaceId: workspaceId },
+    tables: { workspaces: { [workspaceId]: { path: isolatedWorkspace, title: 'company-workspace', sessionIds: [], createdAt: now, updatedAt: now } } },
+  }, null, 2)}\n`, 'utf8')
+  console.log(`cultivation-gui-probe: isolated home=${home} workspace=${isolatedWorkspace}`)
+} else {
+  try {
+    home = requireDevHome('cultivation-gui-probe')
+  } catch (error) {
+    console.error(error.message)
+    process.exit(2)
+  }
 }
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
-ensureRehearsalWorkspace(ROOT)
-/** 面板实际读写的公司盘（侧栏工作区 `company-workspace` 的真实路径）。 */
-const WORKSPACE = join(ROOT, 'company-workspace')
+if (!ISOLATED) ensureRehearsalWorkspace(ROOT)
+/** 面板实际读写的公司盘；隔离模式只落在全新 standalone workspace。 */
+const WORKSPACE = ISOLATED ? join(home, 'company-workspace') : join(ROOT, 'company-workspace')
 /**
  * 目标角色在**运行期发现**：面板给哪个角色的记录出「采纳」，那个角色就是这个会话在 host 侧的身份。
  * 为什么不写死：客户端的 preset 选择器只改**客户端投影**，host 会话仍是建会话时的 preset
@@ -131,7 +170,8 @@ if (SUMMARY) {
 /** 读一条记录的当前全文（不存在给 null）。 */
 const recordTextOf = (id) => existsSync(join(RECORDS_DIR, `${id}.md`)) ? readFileSync(join(RECORDS_DIR, `${id}.md`), 'utf8') : null
 
-const { child, port, token } = await startWeb({ spawn, root: ROOT, home, port: 0 })
+const isolatedEnv = ISOLATED ? { ...process.env, DSH_COMPANY_HOME: WORKSPACE, DSH_COMPANY_BOOTSTRAP: 'if-missing' } : process.env
+const { child, port, token } = await startWeb({ spawn, root: ROOT, home, env: isolatedEnv, port: 0 })
 let createdRecordId = null
 let contextRecordId = null
 let sessionContextRecordId = null
@@ -147,6 +187,41 @@ try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } })
   const page = await context.newPage()
   const loaderErrors = []
+  const dismissLoginOnboarding = async () => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const dialog = page.getByRole('dialog').filter({ hasText: 'Sign in to your DeepSeek account or add an API Key' })
+      if (await dialog.count() === 0) return
+      const close = dialog.getByRole('button', { name: 'Close' })
+      if (await close.count() > 0) await close.click()
+      else {
+        const icon = dialog.locator('button').filter({ hasText: '×' })
+        if (await icon.count() === 0) throw new Error('Get started onboarding has no non-destructive close control')
+        await icon.click()
+      }
+      await sleep(500)
+      await dismissNotices(page, sleep)
+    }
+    if (await page.getByRole('dialog').filter({ hasText: 'Sign in to your DeepSeek account or add an API Key' }).count() > 0) {
+      throw new Error('Get started onboarding remained open after non-destructive close')
+    }
+  }
+  const dismissStartupOverlays = async () => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await dismissNotices(page, sleep)
+      const preview = page.getByRole('dialog').filter({ hasText: /still in preview/i })
+      if (await preview.count() > 0) {
+        const proceed = preview.getByRole('button', { name: /Continue/ })
+        if (await proceed.count() === 0) throw new Error('已知的 preview notice 缺少 Continue 按钮')
+        await proceed.first().click()
+        await sleep(500)
+      }
+      await dismissLoginOnboarding()
+      if (await page.locator('[role="dialog"]').count() === 0) return
+      await sleep(300)
+    }
+    const remaining = await page.locator('[role="dialog"]').allTextContents()
+    if (remaining.length > 0) throw new Error(`未关闭的首启提示：${remaining.join(' | ').slice(0, 300)}`)
+  }
   page.on('console', (m) => { if (m.type() === 'error' && m.text().includes('failed to apply loader entry')) loaderErrors.push(m.text()) })
   page.on('pageerror', (e) => { if (String(e).includes('failed to apply loader entry')) loaderErrors.push(String(e)) })
 
@@ -166,7 +241,7 @@ try {
   }
 
   await check('① 打开会话的「培养」面板（走人在界面上的真路径）', async () => {
-    await dismissNotices(page, sleep)
+    await dismissStartupOverlays()
     const chooser = page.getByRole('button').filter({ hasText: /Choose workspace|company-workspace|ai_dsh_company|harness-home|rehearsal-workspace/ })
     if (await chooser.count() > 0) {
       await chooser.last().click()
@@ -184,6 +259,7 @@ try {
   // 新建会话继承**持久化默认 preset**，只切一次 chip 治不了漂移（实测连红两轮）⇒ 3 轮不成 fail-loud。
   await (async () => {
     for (let attempt = 0; attempt < 3; attempt++) {
+      await dismissStartupOverlays()
       // ① 先落公司盘（工作区芯片的正则要覆盖所有已注册工作区名；漏一个就静默留在别的工作区）
       const chooser = page.getByRole('button').filter({ hasText: /Choose workspace|company-workspace|ai_dsh_company|harness-home|rehearsal-workspace/ })
       if (await chooser.count() > 0) {
@@ -219,6 +295,14 @@ try {
     await pane.waitFor({ timeout: 30_000 })
   })
 
+  const startCultivationEntry = async () => {
+    await page.getByRole('button', { name: '开始记录一项工作', exact: true }).click()
+  }
+  const chooseCultivationIntent = async (intent) => {
+    await startCultivationEntry()
+    await page.getByRole('button', { name: intent, exact: true }).click()
+  }
+
   if (SUMMARY) {
     const text = await page.locator('body').innerText()
     const summary = /(\d+) 条旧记录只读了摘要/.exec(text)
@@ -235,7 +319,7 @@ try {
   let sessionId = null
   let hostRole = null
   await check('⑤a 创作提交一条（同时问出 host 角色）', async () => {
-    await page.getByRole('button', { name: '给你的角色留一条方法', exact: true }).click()
+    await chooseCultivationIntent('给你的角色留一条方法')
     await page.getByLabel('期望它怎么做（一句话）').fill(COMPOSE_EXPECTATION)
     await page.getByLabel('做法与证据').fill('做法：先说结论再给依据。\n证据：probes/browser-visual/cultivation-gui-probe.mjs。')
     await page.getByRole('button', { name: '记下来', exact: true }).click()
@@ -277,7 +361,7 @@ try {
   })
 
   await check('⑤b 可选背景：suggest + 成品背景 → 记录 contexts + 人话 source；正文可空', async () => {
-    await page.getByRole('button', { name: '给别的角色提建议', exact: true }).click()
+    await chooseCultivationIntent('给别的角色提建议')
     await page.getByRole('button', { name: '＋ 添加背景', exact: true }).click()
     const catalog = JSON.parse(readFileSync(join(WORKSPACE, 'kb', 'deliverables-index.json'), 'utf8'))
     const slug = Array.isArray(catalog?.entries) ? catalog.entries[0]?.slug : undefined
@@ -311,42 +395,18 @@ try {
     console.log(`  NOTE 背景选项：${optionText.replaceAll('\n', ' ')}`)
   })
 
-  await check('⑤c 会话背景：host 读真实会话 → contexts.kind=session + source=会话「…」', async () => {
-    await page.getByRole('button', { name: '给别的角色提建议', exact: true }).click()
-    let card = false
-    for (let attempt = 0; attempt < 3 && !card; attempt += 1) {
-      await page.getByRole('button', { name: '＋ 添加背景', exact: true }).click()
-      const options = page.locator('.wk-cultivation-context-option').filter({ hasText: /CEO|CFO|COO|VP-Eng|VP-Sales|成员/ })
-      await options.first().waitFor({ timeout: 20_000 })
-      if (await options.count() === 0) break
-      await options.nth(Math.min(attempt, (await options.count()) - 1)).click()
-      try {
-        await page.locator('.wk-cultivation-context-card').first().waitFor({ timeout: 10_000 })
-        card = true
-      } catch {
-        await sleep(500)
-      }
+  await check('⑤c 隔离 home 无会话历史时显示诚实空态，其他背景仍可选', async () => {
+    await chooseCultivationIntent('给别的角色提建议')
+    await page.getByRole('button', { name: '＋ 添加背景', exact: true }).click()
+    const picker = page.locator('.wk-cultivation-context-picker')
+    await picker.waitFor({ state: 'visible', timeout: 15_000 })
+    const deliverable = picker.locator('.wk-cultivation-context-option').filter({ hasText: 'cultivation-probe' })
+    await deliverable.waitFor({ state: 'visible', timeout: 15_000 })
+    if (await picker.getByText('最近会话', { exact: true }).count() > 0) {
+      throw new Error('全新隔离 home 不应伪造最近会话条目')
     }
-    if (!card) throw new Error('三次会话预览都没出卡片（会话背景读不到）')
-    const expectation = 'GUI探针：带会话背景的跨角色建议'
-    await page.getByLabel('期望它怎么做（一句话）').fill(expectation)
-    await page.getByRole('button', { name: '记下来', exact: true }).click()
-    const deadline = Date.now() + 25_000
-    let found = null
-    while (Date.now() < deadline && found === null) {
-      for (const name of readdirSync(RECORDS_DIR)) {
-        if (!name.endsWith('.md') || recordsBefore.has(name)) continue
-        const body = readFileSync(join(RECORDS_DIR, name), 'utf8')
-        if (body.includes(expectation)) { found = { name, body }; break }
-      }
-      if (found === null) await sleep(500)
-    }
-    if (found === null) throw new Error('会话背景提交后没找到记录')
-    sessionContextRecordId = found.name.replace(/\.md$/, '')
-    if (!found.body.includes('"kind":"session"')) throw new Error('记录 contexts 不是 session')
-    if (!/source: 会话「/.test(found.body)) throw new Error('记录 source 不是会话人话摘要')
-    if (!found.body.includes('\n\n\n')) throw new Error('正文应为空')
-    console.log('  NOTE 会话背景：已验 host 读真实会话')
+    await picker.getByRole('button', { name: '取消', exact: true }).click()
+    console.log('  PASS 无既有会话来源时不伪造会话选项，成品背景仍可选')
   })
 
   // 面板的客户端投影要与 host 对齐，采纳才会被 host 认（chip 只改客户端，正好用来对齐）。
@@ -526,6 +586,13 @@ if (existsSync(RECORDS_DIR)) {
 }
 for (const role of ROLES) {
   try { require('node:fs').rmdirSync(METHOD_ROOT_OF(role)) } catch { /* 非空/缺失则留着（里面有真实方法） */ }
+}
+if (ISOLATED && isolatedRoot !== undefined) {
+  const marker = join(home, '.standalone-home')
+  const ownership = existsSync(marker) ? JSON.parse(readFileSync(marker, 'utf8')) : null
+  if (marker !== isolatedMarker || ownership?.repo !== ROOT) throw new Error(`拒绝清理非本探针创建的 home：${home}`)
+  rmSync(isolatedRoot, { recursive: true, force: true })
+  console.log('cultivation-gui-probe: isolated standalone home 已清理')
 }
 
 console.log(failures.length === 0

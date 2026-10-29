@@ -67,6 +67,11 @@ function stubActions(answer: ActionOutcome = { ok: true, text: '已采纳 r-1：
 
 const mounted: Array<{ root: Root, container: HTMLElement }> = []
 
+async function startComposition(container: HTMLElement, intent: 'correct' | 'suggest'): Promise<void> {
+  await click(button(container, '开始记录一项工作')!)
+  await click(button(container, intent === 'correct' ? CULTIVATION_COPY.composeCorrect : CULTIVATION_COPY.composeSuggest)!)
+}
+
 /** 挂一棵面板（props 覆盖式）。 */
 function mount(props: Record<string, unknown>): { readonly container: HTMLElement, readonly rerender: (next: Record<string, unknown>) => void } {
   const container = document.createElement('div')
@@ -163,7 +168,7 @@ describe('治理动作：点一下就发出对那条记录的命令（S2）', ()
     expect(container.textContent).toContain('仅建议权')
   })
 
-  it('已采纳行：验证两个动作各发 pass/fail；撤回要先讲后果再确认', async () => {
+  it('pass/fail 先要求具体后续工作依据；确认后才发送，并可另行撤回', async () => {
     const { actions, lines } = stubActions({ ok: true, text: '已回填验证：r-9 → pass。' })
     const { container } = mount({
       records: [record({ id: 'r-9', status: 'adopted', methodSlug: 'method-r-9' })],
@@ -171,14 +176,22 @@ describe('治理动作：点一下就发出对那条记录的命令（S2）', ()
     })
 
     await click(button(container, CULTIVATION_COPY.verifyPass)!)
-    expect(lines).toEqual(['/cultivation verify r-9 pass'])
+    expect(lines).toEqual([])
+    expect(container.textContent).toContain(CULTIVATION_COPY.verificationEvidenceLabel)
+    await type(container.querySelector('textarea') as HTMLTextAreaElement, '新预算复盘列出了关键假设。')
+    await click(button(container, CULTIVATION_COPY.verifyPassConfirm)!)
+    expect(lines).toEqual(['/cultivation verify r-9 pass :: 新预算复盘列出了关键假设。'])
+
     await click(button(container, CULTIVATION_COPY.verifyFail)!)
-    expect(lines[1]).toBe('/cultivation verify r-9 fail')
+    expect(lines).toHaveLength(1)
+    await type(container.querySelector('textarea') as HTMLTextAreaElement, '新的复盘仍漏掉敏感性假设。')
+    await click(button(container, CULTIVATION_COPY.verifyFailConfirm)!)
+    expect(lines[1]).toBe('/cultivation verify r-9 fail :: 新的复盘仍漏掉敏感性假设。')
 
     const revoke = button(container, CULTIVATION_COPY.revoke)
-    expect(revoke, '已采纳行应有撤回入口').not.toBeNull()
+    expect(revoke, '已采纳行应有独立撤回入口').not.toBeNull()
     await click(revoke!)
-    expect(lines, '第一下不执行，先讲后果').toHaveLength(2)
+    expect(lines, '验证失败不是撤回，首次点击不执行撤回').toHaveLength(2)
     expect(container.textContent).toContain('不能再被采纳')
     await click(button(container, CULTIVATION_COPY.revokeConfirm)!)
     expect(lines[2]).toBe('/cultivation revoke method-r-9')
@@ -211,9 +224,9 @@ describe('创作面：不看说明也能提交一条（S5，判据 ①/G1）', (
     const { actions, lines } = stubActions({ ok: true, text: '已提交培养记录 20261017-120000-abcd（纠正，待你采纳）。' })
     const { container } = mount({ actions, viewerRole: 'ceo', viewerLabel: 'CEO' })
 
-    const open = button(container, CULTIVATION_COPY.composeCorrect)
-    expect(open, '面板顶部应有创作入口').not.toBeNull()
-    await click(open!)
+    expect(button(container, '开始记录一项工作'), '主任务应是单一开始动作').not.toBeNull()
+    expect(button(container, CULTIVATION_COPY.composeCorrect), '分支选择应在主动作之后').toBeNull()
+    await startComposition(container, 'correct')
 
     const inputs = container.querySelectorAll('input')
     const textarea = container.querySelector('textarea')
@@ -227,12 +240,14 @@ describe('创作面：不看说明也能提交一条（S5，判据 ①/G1）', (
       '/cultivation correct 收口前逐项列出未决项 :: 做法：先列未决清单。\n证据：deliverables/x/final.md',
     ])
     expect(container.textContent).toContain('已提交培养记录')
+    expect(button(container, '开始记录一项工作'), '提交成功后回到单一主入口').not.toBeNull()
+    expect(button(container, CULTIVATION_COPY.composeCorrect), '下一步分支选择不应继续常驻').toBeNull()
   })
 
   it('期望句含 `::` 时不发命令，行内说明为什么', async () => {
     const { actions, lines } = stubActions()
     const { container } = mount({ actions })
-    await click(button(container, CULTIVATION_COPY.composeCorrect)!)
+    await startComposition(container, 'correct')
     await type(container.querySelector('input') as HTMLInputElement, '含 :: 的期望')
     await type(container.querySelector('textarea') as HTMLTextAreaElement, '正文')
     await click(button(container, CULTIVATION_COPY.submit)!)
@@ -243,7 +258,7 @@ describe('创作面：不看说明也能提交一条（S5，判据 ①/G1）', (
   it('「给别的角色提建议」要先选角色，且不给自己', async () => {
     const { actions, lines } = stubActions()
     const { container } = mount({ actions, viewerRole: 'ceo', viewerLabel: 'CEO' })
-    await click(button(container, CULTIVATION_COPY.composeSuggest)!)
+    await startComposition(container, 'suggest')
     expect(button(container, 'CFO'), '应能选目标角色').not.toBeNull()
     expect(button(container, 'CEO'), '不把自己列成建议对象').toBeNull()
     await click(button(container, 'CFO')!)
@@ -317,7 +332,7 @@ describe('走查抓到的四处 UX 缺陷（2026-10-18，图为证）', () => {
   it('创作面：标签常驻（不是只在 placeholder 里），正文栏带做法提示', async () => {
     const { actions } = stubActions()
     const { container } = mount({ actions })
-    await click(button(container, CULTIVATION_COPY.composeCorrect)!)
+    await startComposition(container, 'correct')
     await type(container.querySelector('input') as HTMLInputElement, '写了字标签也在')
     const text = container.textContent ?? ''
     expect(text, '期望行为标签常驻').toContain(CULTIVATION_COPY.expectationLabel)
@@ -388,14 +403,15 @@ describe('大规模折叠（2026-10-19：300 条一屏滚 = 能用但不好用�
 })
 
 describe('时间感（场景轮 S9：此前行内没有任何时间信息）', () => {
-  it('真实时间戳 id 的记录显示"提出时间"（人话标签）', () => {
+  it('真实时间戳 id 的记录显示提出时间（人话标签）', () => {
     const { container } = mount({ records: [record({ id: '20261018-141107-ux9a' })] })
-    expect(container.textContent, '待办行要说得清什么时候提的').toMatch(/提出/)
+    expect(container.textContent, '应显示真实而非猜测的提案日期').toContain('提出时间')
   })
 
-  it('非时间戳 id（测试/手写）不猜时间、也不崩', () => {
+  it('非时间戳 id（测试/手写）不猜日期，提出者仍正常显示', () => {
     const { container } = mount({ records: [record({ id: 'r-1' })] })
-    expect(container.textContent).not.toContain('提出')
+    expect(container.textContent).not.toContain('提出时间：')
+    expect(container.textContent).toContain('提出者：CEO 分身（Agent）')
   })
 })
 

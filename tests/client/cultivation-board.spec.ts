@@ -83,6 +83,40 @@ describe('CultivationBoard：数据诚实与能力呈现（V2/V8/V9）', () => {
     expect(markup).not.toContain('0 待审')
   })
 
+  it('主路径说清今后要做得更好，方法行呈现提案来源、提出者、目标与决定状态', () => {
+    const markup = render({ viewerRole: 'cfo', viewerLabel: 'CFO', records: [record({
+      id: '20261029-100000-evid',
+      source: 'deliverables/q4-review.md',
+      body: '报告结论用了预测数字，但没有列关键假设。',
+      proposerKind: 'agent',
+      proposerRole: 'vp-eng',
+      targetRole: 'cfo',
+      status: 'adopted',
+      methodSlug: 'assumption-check',
+      decidedAt: '2026-10-29T10:00:00.000Z',
+    })] })
+    expect(markup).toContain('让角色今后的工作更好')
+    expect(markup).toContain('原始工作依据')
+    expect(markup).toContain('VP-Eng 分身')
+    expect(markup).toContain('目标角色：CFO')
+    expect(markup).toContain('人已采纳')
+  })
+
+  it('拒绝回执展示目标角色的人侧决定及决定时间', () => {
+    const markup = render({ viewerRole: 'cfo', viewerLabel: 'CFO', records: [record({
+      kind: 'suggestion', proposerRole: 'ceo', targetRole: 'cfo', status: 'rejected',
+      reason: '缺少后续案例', decidedAt: '2026-10-29T11:20:00.000Z',
+    })] })
+    expect(markup).toContain('目标角色的人已拒绝')
+    expect(markup).toContain('拒绝时间：2026-10-29T11:20:00.000Z')
+  })
+
+  it('旧 pass/fail 状态不伪造证据，并提示历史依据未记录', () => {
+    const markup = render({ records: [record({ status: 'adopted', verification: 'fail', verificationHistory: [], methodSlug: 'review-evidence' })] })
+    expect(markup).toContain('验证未通过')
+    expect(markup).toContain('历史验证结果已保存，但后续工作依据未记录；方法仍已采纳。')
+  })
+
   it('已采纳·未验证 与 已验证分开呈现（V8 能力而非记账）', () => {
     const withUnverified = render({
       records: [record({ status: 'adopted', methodSlug: 'closing-checklist' })],

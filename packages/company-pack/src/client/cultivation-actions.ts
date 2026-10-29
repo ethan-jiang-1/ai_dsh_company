@@ -31,6 +31,12 @@ export const CULTIVATION_COPY = {
   rejectConfirm: '确认拒绝',
   verifyPass: '这条有用',
   verifyFail: '没起作用',
+  verifyPassConfirm: '记录有用观察',
+  verifyFailConfirm: '记录失败观察',
+  verificationEvidenceLabel: '后续相似工作的具体情况',
+  verificationEvidencePlaceholder: '例如：新的预算复盘仍未列出关键假设及其影响。',
+  verificationEvidenceHint: '依据会和本次有用/没起作用的判断一起留在培养记录里。失败观察不会自动撤回方法。',
+  verificationEvidenceRequired: '请写明一项采纳后的相似工作；没有新案例时可以先取消，不必造测试。',
   revoke: '撤回…',
   revokeConfirm: '确认撤回',
   /** 撤回是四个动作里唯一的破坏性动作：后果说全再让人点确认（比"再点一次"更有安全价值）。 */
@@ -191,8 +197,11 @@ export function rejectLine(id: string, reason: string): DraftResult {
 }
 
 /** `verify <记录id> pass|fail`。 */
-export function verifyLine(id: string, outcome: 'pass' | 'fail'): string {
-  return `/cultivation verify ${id} ${outcome}`
+export function verifyLine(id: string, outcome: 'pass' | 'fail', evidence?: string): string {
+  const normalizedEvidence = evidence?.trim()
+  return normalizedEvidence === undefined || normalizedEvidence === ''
+    ? `/cultivation verify ${id} ${outcome}`
+    : `/cultivation verify ${id} ${outcome} :: ${normalizedEvidence}`
 }
 
 /** `revoke <方法slug>`：slug 由采纳回执发下，可信。 */

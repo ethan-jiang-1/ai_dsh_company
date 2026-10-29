@@ -12,6 +12,12 @@ import { parseContextPayload, contextPayloadText, type CultivationContext } from
 import { journalTitle } from './cultivation-inbox.ts'
 
 /** 一条培养记录（frontmatter 的领域投影）。 */
+export interface CultivationVerification {
+  readonly outcome: 'pass' | 'fail'
+  readonly evidence: string
+  readonly at: string
+}
+
 export interface CultivationRecord {
   /** 文件名去 `.md`（时间戳前缀 ⇒ 文件名倒序 ≈ 最新在前）。 */
   readonly id: string
@@ -35,6 +41,10 @@ export interface CultivationRecord {
   readonly reason?: string
   /** 验证态（人判定后回填；缺席 = 未验证）。 */
   readonly verification?: 'pending' | 'pass' | 'fail'
+  /** 每次验证对应的一条后续工作证据；旧记录缺席时按空历史读取。 */
+  readonly verificationHistory?: readonly CultivationVerification[]
+  /** 坏历史单独告警，主培养记录仍保留。 */
+  readonly verificationHistoryProblem?: string | null
   readonly decidedAt?: string
   /** 方法撤回时间（在场 = 方法已从方法层删除，新会话不再加载）。 */
   readonly revokedAt?: string
@@ -56,6 +66,34 @@ export interface CultivationRecord {
 
 /** 记录 frontmatter 的可选透传字段（解析 → 领域形状）。 */
 const OPTIONAL_FIELDS = ['methodSlug', 'reason', 'decidedAt', 'revokedAt'] as const
+
+export const VERIFICATION_HISTORY_LIMIT = 20
+export const VERIFICATION_EVIDENCE_LIMIT = 1_000
+
+export function encodeVerificationHistory(history: readonly CultivationVerification[]): string {
+  return encodeURIComponent(JSON.stringify(history))
+}
+
+function parseVerificationHistory(raw: string | undefined): readonly CultivationVerification[] | null {
+  if (raw === undefined || raw === '') return []
+  try {
+    const decoded: unknown = JSON.parse(decodeURIComponent(raw))
+    if (!Array.isArray(decoded) || decoded.length > VERIFICATION_HISTORY_LIMIT) return null
+    const history: CultivationVerification[] = []
+    for (const item of decoded) {
+      if (item === null || typeof item !== 'object') return null
+      const entry = item as Record<string, unknown>
+      if ((entry.outcome !== 'pass' && entry.outcome !== 'fail')
+        || typeof entry.evidence !== 'string' || entry.evidence.trim() === ''
+        || entry.evidence.length > VERIFICATION_EVIDENCE_LIMIT
+        || typeof entry.at !== 'string' || Number.isNaN(Date.parse(entry.at))) return null
+      history.push({ outcome: entry.outcome, evidence: entry.evidence, at: entry.at })
+    }
+    return history
+  } catch {
+    return null
+  }
+}
 
 /** 当前培养记录格式版本；旧记录缺 `schema` 按本版读。 */
 export const RECORD_SCHEMA = 1
@@ -144,6 +182,8 @@ export function parseRecord(id: string, text: string): CultivationRecord | null 
   if (!Number.isSafeInteger(schema) || schema < 1) return null
   const verification = fields.get('verification')
   if (verification !== undefined && verification !== 'pending' && verification !== 'pass' && verification !== 'fail') return null
+  const verificationHistory = parseVerificationHistory(fields.get('verificationHistory'))
+  const verificationHistoryProblem = verificationHistory === null ? '验证历史格式损坏；当前状态与原始提案仍可查看。' : null
   const body = parsed.body
   const contextRead = parseContextPayload(fields.get('contexts'))
   // 可选字段先聚成普通对象再收窄成领域形状（避免对 readonly 接口的索引签名强转）。
@@ -154,13 +194,15 @@ export function parseRecord(id: string, text: string): CultivationRecord | null 
     targetRole,
     proposerRole,
     proposerKind,
-    source: fields.get('source') ?? '（会话内提交）',
+    source: fields.get('source') ?? '',
     expectation,
     status,
     title: journalTitle(body),
     body: body.trim(),
     contexts: contextRead.contexts,
     contextProblem: contextRead.problem,
+    verificationHistory: verificationHistory ?? [],
+    verificationHistoryProblem,
   }
   for (const key of OPTIONAL_FIELDS) {
     const value = fields.get(key)

@@ -155,7 +155,7 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 **培养记录 = 公司盘 `cultivation/records/*.md`**（纠正/建议/采纳回执/验证引用；UI 经
 `workspaceFiles` 读、分身经 fs 读——写留日志）。闭环：纠正或跨角色建议（CEO 仅建议权，
 目标角色本人采纳）→ 本人采纳 → 方法落方法层 → 新会话生效 → 同类任务验证回填（`verify`）
-→ 不灵可撤回（`revoke`）。数据诚实 = 不可达 ≠ 0、未验证 ≠ 已掌握。机制与判据 =
+→ 不灵可撤回（`revoke`）。每次验证都附一项采纳后的相似工作事实，pass/fail、证据和时间追加到记录历史；失败只记为观察、不自动撤回。缺少原始出处显示为未记录，不推断来源或自然人身份。数据诚实 = 不可达 ≠ 0、未验证 ≠ 已掌握。机制与判据 =
 [cultivation-method-layer-probe](../probes/session-context/cultivation-method-layer-probe.mjs)。
 
 **可选参考背景（2026-10-23）**：`/cultivation correct|suggest` 接受可选的

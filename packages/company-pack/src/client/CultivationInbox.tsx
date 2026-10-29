@@ -12,6 +12,11 @@ function recordKindLabel(record: CultivationRecord): string {
   return record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)}分身的纠正` : '我的纠正'
 }
 
+function recordProvenance(record: CultivationRecord): string {
+  const proposer = record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)} 分身（Agent）` : `${roleLabel(record.proposerRole)} 角色语境下的人`
+  return `提出者：${proposer}；目标角色：${roleLabel(record.targetRole)}`
+}
+
 export function CultivationInbox({ board }: { readonly board: CultivationBoardState }) {
   const {
     inbox,
@@ -76,11 +81,14 @@ export function CultivationInbox({ board }: { readonly board: CultivationBoardSt
                       {record.body === '' && (record.contexts?.length ?? 0) > 0 && (
                         <span className="wk-meta">{CULTIVATION_COPY.bodyEmptyWithContext}</span>
                       )}
+                      <span className="wk-meta">{recordProvenance(record)}</span>
                       <span className="wk-meta">
-                        {stampOf(record.id) === null ? '' : `${String(stampOf(record.id))} 提出`}
-                        {(record.contexts?.length ?? 0) === 0 && record.source !== '（会话内提交）'
-                          ? `${stampOf(record.id) === null ? '' : ' · '}出处：${record.source}`
-                          : ''}
+                        {stampOf(record.id) === null ? '' : `${String(stampOf(record.id))} 提出时间`}
+                        {(record.contexts?.length ?? 0) > 0
+                          ? ''
+                          : record.source === '（会话内提交）'
+                            ? '；来源：会话内提交，具体工作出处未记录'
+                            : record.source !== '' ? `${stampOf(record.id) === null ? '' : ' · '}出处：${record.source}` : '；来源未记录'}
                       </span>
                       {(record.contexts?.length ?? 0) > 0 && (() => {
                         const background = record.contexts![0]!

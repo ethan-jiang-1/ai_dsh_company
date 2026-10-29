@@ -3,7 +3,8 @@
  * 我提交的 · 已采纳 · journal · 赞踩。状态仍由 `useCultivationBoard` 持有，本文件只渲染。
  */
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
-import { roleLabel, type CultivationRecord, type CultivationRow, type FeedbackItem } from '../lib/cultivation.ts'
+import { useState } from 'react'
+import { roleLabel, VERIFICATION_EVIDENCE_LIMIT, type CultivationRecord, type CultivationRow, type CultivationVerification, type FeedbackItem } from '../lib/cultivation.ts'
 import { CULTIVATION_COPY, revokeLine, verifyLine } from './cultivation-actions.ts'
 import type { CultivationBoardState } from './use-cultivation-board.tsx'
 
@@ -12,6 +13,12 @@ function verificationTag(record: CultivationRecord): { readonly tone: 'success' 
   if (record.verification === 'pass') return { tone: 'success', text: '已验证' }
   if (record.verification === 'fail') return { tone: 'warning', text: '验证未通过' }
   return { tone: 'outline', text: '未验证' }
+}
+
+const MAX_VISIBLE_VERIFICATIONS = 3
+
+function verificationText(entry: CultivationVerification): string {
+  return `${entry.outcome === 'pass' ? '有用' : '没起作用'} · ${entry.evidence} · ${entry.at}`
 }
 
 export function CultivationMine({ inbox }: { readonly inbox: CultivationBoardState['inbox'] }) {
@@ -26,8 +33,11 @@ export function CultivationMine({ inbox }: { readonly inbox: CultivationBoardSta
               <div key={record.id} role="listitem" className="wk-row" aria-label={`已拒绝 ${record.id}`}>
                 <span className="wk-row-name">
                   已拒绝 {roleLabel(record.proposerRole)} 的建议<Tag tone="outline">{record.expectation}</Tag>
+                  <Tag tone="warning">目标角色的人已拒绝</Tag>
                 </span>
                 <span className="wk-row-task">理由：{record.reason ?? '（未留）'}</span>
+                {record.decidedAt !== undefined && <span className="wk-meta">目标角色语境下的人拒绝 · 拒绝时间：{record.decidedAt}</span>}
+
               </div>
             ))}
             {inbox.mine.map(record => (
@@ -35,8 +45,8 @@ export function CultivationMine({ inbox }: { readonly inbox: CultivationBoardSta
                 <span className="wk-row-name">
                   {record.kind === 'suggestion' ? `给 ${roleLabel(record.targetRole)} 的建议` : '我的纠正'}
                   {record.status === 'open' && <Tag tone="info">待对方处理</Tag>}
-                  {record.status === 'adopted' && <Tag tone="success">已采纳{record.methodSlug !== undefined ? ` → ${record.methodSlug}` : ''}</Tag>}
-                  {record.status === 'rejected' && <Tag tone="warning">被拒绝</Tag>}
+                  {record.status === 'adopted' && <Tag tone="success">目标角色的人已采纳{record.methodSlug !== undefined ? ` → ${record.methodSlug}` : ''}</Tag>}
+                  {record.status === 'rejected' && <Tag tone="warning">目标角色的人已拒绝</Tag>}
                 </span>
                 <span className="wk-row-task">
                   {record.status === 'rejected'
@@ -57,6 +67,29 @@ export function CultivationMine({ inbox }: { readonly inbox: CultivationBoardSta
 
 export function CultivationAdopted({ board, records }: { readonly board: CultivationBoardState; readonly records: readonly CultivationRecord[] | null }) {
   const { inbox, actions, pendingId, revokingSlug, capList, capControl, stampOf, run, outcomeOf, setRevokingSlug } = board
+  const [verifyingId, setVerifyingId] = useState<string | null>(null)
+  const [verificationOutcome, setVerificationOutcome] = useState<'pass' | 'fail'>('pass')
+  const [verificationEvidence, setVerificationEvidence] = useState('')
+  const [verificationProblem, setVerificationProblem] = useState<string | null>(null)
+  const [expandedEvidence, setExpandedEvidence] = useState<Readonly<Record<string, boolean>>>({})
+  const startVerification = (recordId: string, outcome: 'pass' | 'fail'): void => {
+    setVerifyingId(recordId)
+    setVerificationOutcome(outcome)
+    setVerificationEvidence('')
+    setVerificationProblem(null)
+  }
+  const confirmVerification = (recordId: string): void => {
+    const evidence = verificationEvidence.trim()
+    if (evidence === '') {
+      setVerificationProblem(CULTIVATION_COPY.verificationEvidenceRequired)
+      return
+    }
+    void run(recordId, verifyLine(recordId, verificationOutcome, evidence), () => {
+      setVerifyingId(null)
+      setVerificationEvidence('')
+      setVerificationProblem(null)
+    })
+  }
   return (
       <div className="wk-activity-block" aria-label="已采纳的方法">
         <strong>已采纳的方法</strong>
@@ -82,22 +115,74 @@ export function CultivationAdopted({ board, records }: { readonly board: Cultiva
                       {record.expectation}
                       {revoked ? '——方法已删除，本角色会话不再加载。' : '——新开的本角色会话带着它开工；已经在跑的会话也会随技能目录刷新看到它。'}
                     </span>
-                    {stampOf(record.id) !== null && <span className="wk-meta">{`${String(stampOf(record.id))} 提出`}</span>}
+                    <span className="wk-meta">
+                      提出者：{record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)} 分身（Agent）` : `${roleLabel(record.proposerRole)} 角色语境下的人`}；目标角色：{roleLabel(record.targetRole)}；人已采纳
+                    </span>
+                    {(record.contexts?.length ?? 0) > 0
+                      ? <span className="wk-meta">原始工作依据：背景「{record.contexts![0]!.title}」</span>
+                      : record.source === '（会话内提交）'
+                        ? <span className="wk-meta">来源：会话内提交；具体工作出处未单独记录</span>
+                        : record.source !== ''
+                          ? <span className="wk-meta">原始工作依据：{record.source}</span>
+                          : <span className="wk-meta">原始工作依据：来源未记录</span>}
+                    {stampOf(record.id) !== null && <span className="wk-meta">提出时间：{String(stampOf(record.id))}</span>}
+                    {record.decidedAt !== undefined && <span className="wk-meta">采纳时间：{record.decidedAt}</span>}
+                    {record.body !== '' && (() => {
+                      const expanded = expandedEvidence[record.id] === true
+                      return (
+                        <div className="wk-cultivation-body">
+                          {expanded || record.body.length <= 360 ? record.body : `${record.body.slice(0, 360)}…`}
+                          {record.body.length > 360 && <Button size="sm" onClick={() => { setExpandedEvidence(previous => ({ ...previous, [record.id]: !expanded })) }}>{expanded ? '收起原始依据' : '展开原始依据'}</Button>}
+                        </div>
+                      )
+                    })()}
+                    {record.bodyTruncated === true && <span className="wk-meta">原始依据只加载了摘要，可能不完整；完整原文在培养记录文件中。</span>}
+                    {record.verificationHistoryProblem !== null && record.verificationHistoryProblem !== undefined && <span className="wk-meta wk-cultivation-problem">{record.verificationHistoryProblem}</span>}
+                    {record.verification !== undefined && (record.verificationHistory?.length ?? 0) === 0 && record.verificationHistoryProblem == null && <span className="wk-meta">历史验证结果已保存，但后续工作依据未记录；方法仍已采纳。</span>}
+                    {(record.verificationHistory?.length ?? 0) > 0 && (() => {
+                      const history = record.verificationHistory ?? []
+                      const expanded = expandedEvidence[`history:${record.id}`] === true
+                      const visible = expanded ? history : history.slice(-MAX_VISIBLE_VERIFICATIONS)
+                      return (
+                        <div className="wk-cultivation-verification-history" aria-label="后续工作观察历史">
+                          <span className="wk-meta">后续相似工作观察：{String(history.length)} 条</span>
+                          {visible.map((entry, index) => <span key={`${entry.at}:${index}`} className="wk-meta">{verificationText(entry)}</span>)}
+                          {!expanded && history.length > MAX_VISIBLE_VERIFICATIONS && <Button size="sm" onClick={() => { setExpandedEvidence(previous => ({ ...previous, [`history:${record.id}`]: true })) }}>查看全部 {String(history.length)} 条观察</Button>}
+                        </div>
+                      )
+                    })()}
                     {!revoked && actions !== undefined && (
                       <div className="wk-cultivation-actions">
-                        <Button
-                          variant="primary"
-                          disabled={pendingId === record.id}
-                          onClick={() => { void run(record.id, verifyLine(record.id, 'pass')) }}
-                        >
-                          {CULTIVATION_COPY.verifyPass}
-                        </Button>
-                        <Button
-                          disabled={pendingId === record.id}
-                          onClick={() => { void run(record.id, verifyLine(record.id, 'fail')) }}
-                        >
-                          {CULTIVATION_COPY.verifyFail}
-                        </Button>
+                        {verifyingId === record.id
+                          ? (
+                            <div className="wk-cultivation-verification-form">
+                              <label className="wk-cultivation-field">
+                                <span className="wk-meta">{CULTIVATION_COPY.verificationEvidenceLabel}</span>
+                                <textarea
+                                  className="wk-cultivation-body-input"
+                                  rows={3}
+                                  maxLength={VERIFICATION_EVIDENCE_LIMIT}
+                                  value={verificationEvidence}
+                                  placeholder={CULTIVATION_COPY.verificationEvidencePlaceholder}
+                                  onChange={event => { setVerificationEvidence(event.target.value); setVerificationProblem(null) }}
+                                />
+                              </label>
+                              <span className="wk-meta">{CULTIVATION_COPY.verificationEvidenceHint}</span>
+                              {verificationProblem !== null && <span className="wk-meta wk-cultivation-problem">{verificationProblem}</span>}
+                              <div className="wk-cultivation-actions">
+                                <Button variant="primary" disabled={pendingId === record.id} onClick={() => { confirmVerification(record.id) }}>
+                                  {verificationOutcome === 'pass' ? CULTIVATION_COPY.verifyPassConfirm : CULTIVATION_COPY.verifyFailConfirm}
+                                </Button>
+                                <Button disabled={pendingId === record.id} onClick={() => { setVerifyingId(null); setVerificationEvidence(''); setVerificationProblem(null) }}>{CULTIVATION_COPY.cancel}</Button>
+                              </div>
+                            </div>
+                          )
+                          : (
+                            <>
+                              <Button variant="primary" disabled={pendingId === record.id} onClick={() => { startVerification(record.id, 'pass') }}>{CULTIVATION_COPY.verifyPass}</Button>
+                              <Button disabled={pendingId === record.id} onClick={() => { startVerification(record.id, 'fail') }}>{CULTIVATION_COPY.verifyFail}</Button>
+                            </>
+                          )}
                         {revokingSlug === slug
                           ? (
                             <div className="wk-cultivation-confirm">

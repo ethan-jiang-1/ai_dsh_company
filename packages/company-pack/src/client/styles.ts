@@ -357,6 +357,8 @@ const CSS = `
 .wk-cultivation-list .wk-row { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; row-gap: 4px; }
 .wk-cultivation-list .wk-row-name { flex: none; flex-wrap: wrap; min-width: 0; overflow-wrap: anywhere; }
 .wk-cultivation-list .wk-row-task { width: 100%; overflow-wrap: anywhere; }
+.wk-cultivation-main-entry { display: grid; justify-items: start; gap: 8px; }
+.wk-cultivation-main-entry > strong { font-size: 15px; }
 .wk-cultivation-compose-entry { display: flex; flex-wrap: wrap; gap: 8px; }
 .wk-cultivation-compose-form { display: grid; gap: 8px; }
 .wk-cultivation-roles { display: flex; flex-wrap: wrap; gap: 6px; }

@@ -22,6 +22,8 @@ import {
   recordText,
   timeLabel,
   type CultivationRecord,
+  VERIFICATION_EVIDENCE_LIMIT,
+  VERIFICATION_HISTORY_LIMIT,
 } from '../../packages/company-pack/src/lib/cultivation.ts'
 
 /**
@@ -173,6 +175,43 @@ describe('培养记录：写读往返与坏形状', () => {
     expect(rejected.status).toBe('rejected')
     expect(rejected.reason).toBe('数字口径已有 KB 单一来源')
     expect(rejected.kind).toBe('suggestion')
+  })
+
+  it('验证历史保存每次后续工作的结论、依据和时间；旧记录仍可读取', () => {
+    const history = [
+      { outcome: 'fail' as const, evidence: '新预算复盘仍未列出敏感性假设。', at: '2026-10-29T10:00:00.000Z' },
+      { outcome: 'pass' as const, evidence: '后续复盘列出了假设及影响区间。', at: '2026-10-29T11:00:00.000Z' },
+    ]
+    const text = recordText(draft).replace('status: open', [
+      'status: adopted',
+      'verification: pass',
+      `verificationHistory: ${encodeURIComponent(JSON.stringify(history))}`,
+    ].join('\n'))
+    const record = parseRecord('r-history', text)!
+    expect(record).toMatchObject({ status: 'adopted', verification: 'pass', verificationHistory: history })
+    const legacyText = recordText(draft)
+      .replace('source: deliverables/x/final.md\n', '')
+      .replace('status: open', 'status: adopted\nverification: fail')
+    const legacy = parseRecord('r-legacy-verification', legacyText)!
+    expect(legacy.verification).toBe('fail')
+    expect(legacy.source).toBe('')
+    expect(legacy.verificationHistory).toEqual([])
+    const tooManyEntries = Array.from({ length: VERIFICATION_HISTORY_LIMIT + 1 }, (_, index) => ({
+      outcome: 'pass', evidence: `工作 ${String(index)}`, at: '2026-10-29T10:00:00.000Z',
+    }))
+    const malformedHistoryText = recordText(draft).replace('status: open', [
+      'status: adopted',
+      `verificationHistory: ${encodeURIComponent(JSON.stringify(tooManyEntries))}`,
+    ].join('\n'))
+    expect(parseRecord('r-too-many', malformedHistoryText)).toMatchObject({
+      status: 'adopted', verificationHistory: [], verificationHistoryProblem: expect.any(String),
+    })
+    const tooLongEvidence = [{ outcome: 'pass', evidence: 'x'.repeat(VERIFICATION_EVIDENCE_LIMIT + 1), at: '2026-10-29T10:00:00.000Z' }]
+    const tooLongHistoryText = recordText(draft).replace('status: open', [
+      'status: adopted',
+      `verificationHistory: ${encodeURIComponent(JSON.stringify(tooLongEvidence))}`,
+    ].join('\n'))
+    expect(parseRecord('r-too-long', tooLongHistoryText)?.verificationHistoryProblem).toBeDefined()
   })
 
   it('坏形状给 null（面板不撒谎也不崩）：无 frontmatter / 枚举外值 / 缺必填', () => {
@@ -451,7 +490,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
     })
   })
 
-  it('reject 与 verify 更新 frontmatter，同时保留原记录正文', async () => {
+  it('reject 与 verify 更新记录，同时保留原记录正文并记录后续工作依据', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
       const recordsDir = join(workspace, 'cultivation', 'records')
       const openPath = join(recordsDir, 'r-reject.md')
@@ -466,9 +505,24 @@ describe('/cultivation 注册命令的 host 行为', () => {
       const adoptedDraft = recordText(suggestion).replace('status: open', 'status: adopted\nmethodSlug: review-numbers')
       const adoptedPath = join(recordsDir, 'r-verify.md')
       writeFileSync(adoptedPath, adoptedDraft)
-      expect(await invokeCultivation(handler, 'cfo', workspace, 'verify r-verify pass')).toMatchObject({ kind: 'success' })
+      expect(await invokeCultivation(handler, 'cfo', workspace, 'verify r-verify pass')).toMatchObject({ kind: 'error' })
+      expect(parseRecord('r-verify', readFileSync(adoptedPath, 'utf8'))?.verification).toBeUndefined()
+      expect(await invokeCultivation(handler, 'ceo', workspace,
+        'verify r-verify fail :: 新预算回顾仍未说明关键假设。')).toMatchObject({ kind: 'error' })
+      expect(await invokeCultivation(handler, 'cfo', workspace,
+        'verify r-verify fail :: 新预算回顾仍未说明关键假设。')).toMatchObject({ kind: 'success' })
+      expect(await invokeCultivation(handler, 'cfo', workspace,
+        'verify r-verify pass :: 后续复盘列出了假设及其影响区间。')).toMatchObject({ kind: 'success' })
       const verifiedText = readFileSync(adoptedPath, 'utf8')
-      expect(parseRecord('r-verify', verifiedText)).toMatchObject({ status: 'adopted', verification: 'pass' })
+      expect(parseRecord('r-verify', verifiedText)).toMatchObject({
+        status: 'adopted',
+        verification: 'pass',
+        verificationHistory: [
+          { outcome: 'fail', evidence: '新预算回顾仍未说明关键假设。' },
+          { outcome: 'pass', evidence: '后续复盘列出了假设及其影响区间。' },
+        ],
+      })
+      expect(parseRecord('r-verify', verifiedText)?.revokedAt).toBeUndefined()
       expect(verifiedText).toContain(suggestion.body)
     })
   })
@@ -715,7 +769,7 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
       expect(await invokeCultivation(command, 'cfo', workspace, 'adopt 20261023-140200-aaaa')).toMatchObject({ kind: 'success' })
       expect(await invokeCultivation(command, 'cfo', workspace, 'reject 20261023-140201-bbbb :: 证据不足')).toMatchObject({ kind: 'success' })
       expect(await invokeCultivation(command, 'cfo', workspace, 'adopt 20261023-140202-cccc')).toMatchObject({ kind: 'success' })
-      expect(await invokeCultivation(command, 'cfo', workspace, 'verify 20261023-140202-cccc pass')).toMatchObject({ kind: 'success' })
+      expect(await invokeCultivation(command, 'cfo', workspace, 'verify 20261023-140202-cccc pass :: 下一次同类检查按期列出了未决事项。')).toMatchObject({ kind: 'success' })
       for (const id of ['20261023-140200-aaaa', '20261023-140201-bbbb', '20261023-140202-cccc']) {
         const record = parseRecord(id, readFileSync(join(workspace, 'cultivation', 'records', `${id}.md`), 'utf8'))
         expect(record?.contexts).toEqual([context])

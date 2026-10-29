@@ -87,6 +87,7 @@ const cardFromDeliverable = (row: ContextDeliverableRow): ComposeContextCard => 
  */
 export function CultivationCompose(props: CultivationComposeProps) {
   const [mode, setMode] = useState<Mode | null>(null)
+  const [chooserOpen, setChooserOpen] = useState(false)
   const [targetRole, setTargetRole] = useState('')
   const [expectation, setExpectation] = useState('')
   const [body, setBody] = useState('')
@@ -203,6 +204,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
     setPending(false)
     setOutcome(result)
     if (!result.ok) return
+    setChooserOpen(false)
     const savedId = SAVED_ID_RE.exec(result.text)?.[1]
     setMode(null)
     setExpectation('')
@@ -213,13 +215,20 @@ export function CultivationCompose(props: CultivationComposeProps) {
   }
 
   return (
-    <div className="wk-activity-block wk-cultivation-compose" aria-label="给分身留一条方法">
+    <div className="wk-activity-block wk-cultivation-compose" aria-label="工作改善提案">
       {props.teammate === true && <div className="wk-meta wk-cultivation-teammate">{CULTIVATION_COPY.teammateBanner}</div>}
       {mode === null
         ? (
-          <div className="wk-cultivation-compose-entry">
-            <Button variant="primary" onClick={() => { openForm('correct') }}>{CULTIVATION_COPY.composeCorrect}</Button>
-            <Button onClick={() => { openForm('suggest') }}>{CULTIVATION_COPY.composeSuggest}</Button>
+          <div className="wk-cultivation-main-entry">
+            {!chooserOpen
+              ? <Button variant="primary" onClick={() => { setChooserOpen(true) }}>开始记录一项工作</Button>
+              : (
+                <div className="wk-cultivation-compose-entry" aria-label="选择提案方式">
+                  <Button variant="primary" onClick={() => { openForm('correct') }}>{CULTIVATION_COPY.composeCorrect}</Button>
+                  <Button onClick={() => { openForm('suggest') }}>{CULTIVATION_COPY.composeSuggest}</Button>
+                  <Button onClick={() => { setChooserOpen(false) }}>{CULTIVATION_COPY.cancel}</Button>
+                </div>
+              )}
           </div>
         )
         : (

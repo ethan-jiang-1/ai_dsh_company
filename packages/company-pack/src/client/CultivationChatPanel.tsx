@@ -32,7 +32,7 @@ function attachedContext(record: CultivationRecord | undefined): string {
   const body = record.body.length > 1200 ? `${record.body.slice(0, 1200)}…` : record.body
   return `【附加记录】${record.id} · ${record.targetRole} · ${record.status}
 期望：${record.expectation}
-来源：${record.source ?? '（未记）'}
+来源：${record.source || '来源未记录'}
 正文：${body}
 
 `

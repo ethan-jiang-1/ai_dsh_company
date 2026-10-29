@@ -92,6 +92,11 @@ export function CultivationBoard(props: CultivationBoardProps) {
         </div>
       </div>
 
+      <div className="wk-activity-block wk-cultivation-main" aria-label="让角色今后的工作更好">
+        <strong>让角色今后的工作更好</strong>
+        <div className="wk-meta">从一项真实工作或改进目标开始，写下下次想看到的做法。提交后仍需目标角色语境下的人决定。</div>
+      </div>
+
       {viewer !== null && actions !== undefined && (
         <CultivationCompose
           viewerRole={viewer}
