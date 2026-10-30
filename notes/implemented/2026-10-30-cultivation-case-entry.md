@@ -31,4 +31,5 @@
 - 绿：`pnpm test`：118 files / 1021 tests PASS（含新增：`--work=` 落字段/空值/坏编码/超限拒、单表单提交带 `--work=`、只写工作+期望可提交、预览随输入与目标角色更新、目标角色默认当前角色/点 CFO 变建议）。
 - `pnpm typecheck`：exit 0。`pnpm verify`：ALL PASS（2 门无对象 SKIP）。
 - 真浏览器 `node probes/browser-visual/cultivation-gui-probe.mjs --isolated`（先 `tsc -b` + `tsdown`，mtime 守卫拒旧 lib）：ALL PASS——⑤a 单表单填工作+期望+做法提交，记录带 `work: 收口时漏了未决项…` 且 `status: open`；⑤b 默认显纠正说明、点 CFO 变建议说明、成品背景照常落 `contexts` + `targetRole: cfo`；⑤c 隔离 home 不伪造会话来源；其余采纳落方法层、验证依据/历史、命令日志配对、角色闸拒绝、打开原文、零挂载失败全绿。另跑 `node checks/smoke/ui-scene-smoke.mjs --isolated`：全部公司页签加载、浏览器错误环零命中。
+- E2E（2026-10-30 用户「先 E2E 再真人测试」指示后新增资产）：`probes/browser-visual/cultivation-main-e2e.mjs`——主视图全程含**真模型**：dev home 既有公司盘会话进第三 tab，主视图挂载/独立培养会话建立/composer 隐藏、单表单 work 全链路、纠正→建议切换、治理回路（待我决定/采纳落方法层/验证两条/失败不撤回）、右栏真模型回复渲染、分隔条拖宽持久化——7/7 ALL PASS。探针侧调出的三个坑都不是产品缺陷：空白新会话不渲染 conversation tabs（改走既有会话）、自动带背景会把正文标签翻成「做法（可选）」（改按 textarea 序号定位）、「待我决定」合同位置在我提交的区（修断言位置）。跑法：`source run/env.sh && node probes/browser-visual/cultivation-main-e2e.mjs`（真模型 2 次短调用；自写记录带 `mainE2E：` 前缀并自清理）。
 - 诚实边界：主任务仍是「一个表单」，不是对话式案例工坊；工作事实靠人手填，没有从会话自动提炼；真人新手走查未执行。
