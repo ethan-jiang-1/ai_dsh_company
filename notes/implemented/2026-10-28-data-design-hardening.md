@@ -116,8 +116,9 @@ upgrade log 轮转、全量 `company/` namespace、T4/T7 视觉/回放证据、c
   不同 → 保留新、旧文件加 `.conflict` 备份并告警，不静默覆盖。迁移幂等，记录 marker。
 - 双 profile 一致性：同 home 两个 profile 的新会话看到同一套方法；旧「一公司一 web profile」
   告警可以退役或降为提示。
-- `$DSH_HOME/company/` 作为增量命名空间：methods、client-errors、lease/logs 中至少 methods 与
-  client-errors 先入住；`bundle.json` 保持原位一版，后续再议。
+- `$DSH_HOME/company/` 作为增量命名空间：M3 曾设想 methods、client-errors、lease/logs 中至少 methods 与
+  client-errors 先入住；**M4 定案只收方法层**——client-errors 住 `<DSH_HOME>/logs/`（见 §M4 与
+  [data-model](../../docs/data-model.md)）；`bundle.json` 保持原位一版，后续再议。
 
 ### M4 · 收口
 
@@ -204,7 +205,7 @@ upgrade log 轮转、全量 `company/` namespace、T4/T7 视觉/回放证据、c
 - 不新增 session event 类型；不改 vendor；不引入 E1 依赖。
 - `danger-full-access` 下没有文件级保护；文档如实写，不宣称绝对隔离。
 - 角色边界、owners、签字线是 prompt/approval 级，不升级为数据 ACL。
-- `ctx.fs` 用于 `cultivation_propose` 的写通道本轮**未做**：当前 host 写用同目录 temp + `link` 独占发布（不会盲覆盖），但绕过了 fs 观测策略；保留为后续一致性改进，不阻塞数据归属/权威。
+- `ctx.fs` 用于 `cultivation_propose` 的写通道本轮**未做**——2026-10-28 round2 已补：`writeRecordViaFs` 走 `ctx.fs`（见 [round2](./2026-10-28-data-design-round2.md)）；当时的备选是继续用同目录 temp + `link` 独占发布（不会盲覆盖，但绕过 fs 观测策略），保留为历史取舍。
 - `$DSH_HOME/company/` 本轮只收方法层；`bundle.json`/lease/logs 保持 DSH home 既有位置（避免身份/恢复路径迁移），不宣称“所有自造状态已收口”。
 
 ## 风险

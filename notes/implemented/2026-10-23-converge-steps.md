@@ -10,7 +10,7 @@
    证据副本 → 引用重指（静默）→ 归档搬移 → 清 journal（每篇一步）→ 台账 → 索引 → backfill 指引。
 2. **dry-run 的清单由 steps 渲染，执行器按同一份 steps 逐条执行。**
    `executeStep(step, ctx)` 是副作用唯一入口，`default: throw` 兜未知步骤；
-   搬移步带 `from/to/gitArgs`（与 `archiveMovePlan` 同源），执行时仍按 `git ls-files` 判断 tracked。
+   搬移步带 `from/to`（与 `archiveMovePlan` 同源），执行 = 纯 fs rename（2026-10-30 起不再 `git add`）。
 3. **输出逐字不变**：活盘计划输出与改动前 `diff` 为空；`--slug <未闭合>` 仍是同一条拒绝文案 + 退出码 1。
 
 ## 输掉的方案
@@ -25,7 +25,7 @@
 
 - 「计划打印一套、执行另一套」在结构上不可能再发生——新增动作 = 改 lib 一处 + `executeStep` 一个 case。
 - 副作用顺序被测试锁死（`converge-rules.spec.ts` 的 kind 序列与 label 全列表）。
-- 副作用本身一行未改（copyEvidence / rewriteRefs / rename+git add / clearLiveJournal / appendLedger / rebuildCatalogIndex 原样）。
+- 副作用顺序与实现沿用当时版本（copyEvidence / rewriteRefs / rename / clearLiveJournal / appendLedger / rebuildCatalogIndex）；归档搬移 2026-10-30 起改为纯 fs rename，不再 `git add`。
 
 ## 验证（真跑）
 

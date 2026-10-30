@@ -13,7 +13,7 @@
 
 **修法 = 路径规则 + 类级窄扫 + 两层测试，不做历史重写。**
 
-1. runtime/web-logs/ 进 `.gitignore`；已 tracked 的两件 `git rm --cached` 后删除本地文件。
+1. runtime/ 进 `.gitignore`（2026-10-25 起改为「默认拒绝 + 白名单」，见 [repo-hygiene-contract](./2026-10-25-repo-hygiene-contract.md)）；已 tracked 的两件 `git rm --cached` 后删除本地文件。
    根 `AGENTS.md` 与 `runtime/README.md` 的 tracked/ignored 说明同步。
 2. 纯逻辑 = `tools/lib/tracked-token.mjs`：只认 `https?://...?token=<20+ 字符>` 的 URL 查询串，
    返回行号与 token 长度，**不回传 token 值**。

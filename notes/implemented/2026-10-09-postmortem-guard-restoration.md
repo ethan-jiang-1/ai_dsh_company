@@ -41,7 +41,7 @@ preset-smoke: 3 FAILURE(S)
 
 ## 决定
 
-新增门禁 `preset-required-config`（`checks/run-gates.mjs` §3-bis），把 0001 承诺的那层**快检查**装回去：
+新增门禁 `preset-required-config`（`checks/gates/preset-required-config.mjs`），把 0001 承诺的那层**快检查**装回去：
 
 - **判据源** = vendor **committed 生成物** `docs/config-catalog.md`（145 个 catalog 块，56 个包有必填字段）。
   **结构即事实**：`  name: type` = 必填，`  name?: type` = 有默认值。

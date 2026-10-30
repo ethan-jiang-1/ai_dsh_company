@@ -79,7 +79,7 @@ switch the consumer to `danger-full-access`*（`vendor/dsh/packages/sandbox/sand
     （2026-10-10 的 entry-probe 答卷；真实证据已随 2026-10-25 清理移出产品仓）得 12/13，唯一失败项是 Q1
     引文不匹配（内容问题）；那次会话 1 条 bash 撞 fail-closed，agent 改用 read/grep/glob 完成，
     `approval/asked` = 0。历史分数本就在 0/12–12/12 间波动 ⇒ 是这个探针的固有噪声，不是 sandbox 回归。
-  - `checks/smoke/replay-smoke.mjs:238` 的 `DSH_PERMISSION_MODE: 'workspace-write'` 是**死代码**：
+  - `checks/smoke/replay-smoke.mjs:279` 的 `DSH_PERMISSION_MODE: 'workspace-write'` 是**死代码**（行号随重构移位）：
     `snapshots/replay/*/replay/cordis.snapshot.yml` 在更外层把 `sandbox-policy.mode` 钉成
     `workspace-write`，覆盖 base bundle 对环境变量的读取。A/B 实跑（同一个真实 headless 命令，只差
     环境变量）产出**逐字节相同**的 `sandbox/mode`、`approval/policy` 与内嵌的

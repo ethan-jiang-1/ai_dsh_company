@@ -4,7 +4,7 @@
 
 ## 决定
 
-`packages/company-pack/src/lib/presence.ts` 396 行 → **360 行（折算面）＋新建 `presence-status.ts` 76 行（词汇面）**；`presence.ts` 再导出词汇 = facade ⇒ **对外取用面零变化**。
+`packages/company-pack/src/lib/presence.ts` 396 行 → **360 行（折算面）＋新建 `presence-status.ts` 76 行（词汇面）**（2026-10-16 当时读数；现行行数以代码为准）；`presence.ts` 再导出词汇 = facade ⇒ **对外取用面零变化**。
 
 - **迁出（闭表 + 纯映射）**：`PresenceStatus`、`STATUS_LABEL`、`presenceStatusFromPhase`、`statusLabelFor`、`PRESET_DISPLAY_NAMES`、`displayNameFor`（含私有 `PRESET_KEYS` / `PresetRoleId` / `isPresetRole`）。
 - **留守（折算）**：板与事件的形状类型（`PresenceRow` / `ActivityEntry` / `PresenceBoardModel` / `TeamViewLike` / `TeamEventLike` / `TeamStreamFrame`）与函数（`rowsFromTeamView` / `diffActivity` / `presenceFromEvents` / `activityFromEvents` / `memberNames`）。

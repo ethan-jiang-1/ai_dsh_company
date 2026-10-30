@@ -24,7 +24,7 @@
 
 ## 后果
 
-- 四个入口级函数现状：host `apply` 214、`CultivationBoard` 226、`cultivationCommandHandler` 206、client `apply` 45。
+- 四个入口级函数读数（2026-10-28 当时；现行行数以代码为准）：host `apply` 214、`CultivationBoard` 226、`cultivationCommandHandler` 206、client `apply` 45。
 - 公司页签/整页两块从 apply 体内移出，改注册面时按函数名定位；`apply` 读起来是装配清单。
 
 ## 验证
@@ -35,5 +35,5 @@
 
 ## 未验 / 边界
 
-- 五块仍在同文件（377 行），不是“每块一个文件”；这是本批的边界。
+- 五块仍在同文件（当时 377 行），不是“每块一个文件”；这是本批的边界。
 - P3 follow-up 已清零：Board 余四块、command handler 六支、共享测试 helper、`--attach` 均已落（[Note](../archived/receipts/2026-10-28-r4-p3-followup.md)）。

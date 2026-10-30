@@ -55,4 +55,4 @@
 ## 范围 / 排除
 
 - 范围：R1–R6 的现在时行为、测试、文档。
-- 排除：多 Host 高可用/事务、records 面板真分页（当前是摘要+最近 120）、方法层迁 home 级。
+- 排除：多 Host 高可用/事务、records 面板真分页（当前是摘要+最近 120）。方法层公司级不在本篇范围——2026-10-28 M3 已落地（见 [hardening](./2026-10-28-data-design-hardening.md) §M3 与 [data-model](../../docs/data-model.md)）。

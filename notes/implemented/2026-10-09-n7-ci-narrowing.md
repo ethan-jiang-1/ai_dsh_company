@@ -11,10 +11,10 @@ CI 1 job vs DSH 10、**且无 coverage 门禁**（而 `docs/testing.md` 点名 `
 ### ① 无 PR / stack 纪律 —— **成立**，但不是"缺流程"
 
 - 事实：分支 `master`，历史**零 merge commit**，全部直推。
-- 更新：`docs/testing.md:75` 里那段确实提到 "coverage 死代码扫描"，但它在一节**「升级地图」**
-  （未来可能加的检查）里，用「→」串成一条升级路径。它**没有**说 `test:coverage` 是当前 CI 门禁——
-  是我把「升级设想」读成了「现行承诺」。`package.json` 里根本没有 `test:coverage` 脚本，
-  所以不存在"点名了却没实现"的欠账。
+- 更新：`docs/testing.md` 的「升级地图」节（[§6](../../docs/testing.md)）里那段确实提到 "coverage 死代码扫描"，
+  但那是**未来可能加的检查**，用「→」串成一条升级路径。它**没有**说 `test:coverage` 是当前 CI 门禁——
+  是我把「升级设想」读成了「现行承诺」。`package.json` 当时没有 `test:coverage` 脚本（2026-10 后期
+  加了 `pnpm test:coverage` 观察档，不进 CI、不是门禁），所以不存在"点名了却没实现"的欠账。
 - `.github/workflows/ci.yml` 的注释写得很清楚，而且是**带红证的决定**：test lane 不在 CI
   （2026-09-28 首跑红，run 36373885805），因为 vitest 解析 vendor 内部 `@deepseek-ai/*` 走包入口
   （未构建 lib），干净环境必红；补齐要付全量 vendor 构建链，负担不成比例 ⇒ test 挪进 pre-push hook，

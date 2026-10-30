@@ -44,5 +44,5 @@ pnpm verify   # ALL PASS（snapshot-index 复绿）
 
 ## 未验
 
-- `resume` 路径仍未端到端覆盖（它不搬移、步骤不同；要补需另造半态夹具）。
-- `--charter-backfill` 只打印指引、不执行，探针未覆盖（本就是人工收尾步）。
+- `resume` 仍未**全量**端到端覆盖：探针只跑 `--dry-run`（退出 0、不动盘）；真搬移/清 journal 仍缺半态夹具。
+- `--charter-backfill` 已真执行并有探针覆盖（退出 0 / 全员 5 角色 / 两次幂等），见 [converge-evidence-home](./2026-10-30-converge-evidence-home.md) §验证；本段其余是 2026-10-23 当时的未验状态。

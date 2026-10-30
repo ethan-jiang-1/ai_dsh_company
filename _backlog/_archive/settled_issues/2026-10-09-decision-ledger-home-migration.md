@@ -74,7 +74,7 @@ opened: 2026-10-09
 | D1 | 自写包一个；角色为 preset | architecture §2 | 初始 `docs/00-index.md` 台账（commit `25f7c13`）与 `10-architecture.md` 同批创建，明写 `10 §2` / FAQ 13 决策 2 为出处；设计文档自称“动工前的设计决策记录”。同期无独立出生 Note 的证据。 | 保留 design §2；这是原始设计决定依据 |
 | D2 | 角色 preset 只放差异 | architecture §1/§6 | 初始台账指向 `10 §1/§6` 及 cordis preset 两平面教义；architecture 初始提交即解释角色 preset 的机制形状。`repo-scaffolding` 记录部署承载与 profile 初始形态，不是该决定的独立 Note。 | 保留 design §1/§6；原始设计依据在位 |
 | D3 | 独立 repo、pinned submodule、双 home | architecture §6 | 初始台账明确写 `10 §6；FAQ 13`，归属是原始设计依据；初始 `repo-scaffolding` 只记录 submodule pin 的落地事实，`dual-dsh-entities` 是后续三实体/裸命令隔离决定，不替代 repo 形态 rationale。 | 保留 design §6；原始设计依据在位 |
-| D4 | Agent Teams 主通道、Lead-only 权威 | architecture §2.2 | 初始台账直接指向 `10 §2.2 + plans/roadmap；用户 demo 需求`；初始 architecture §2.2 已明确 M4、Lead-only 权威和选择理由。`dynamic-team-assembly` 是 CEO 按问题组队的后续内容决定，不是 M4 出生记录。 | 保留 design §2.2；原始依据与用户需求指针在位 |
+| D4 | Agent Teams 主通道、Lead-only 权威 | architecture §2.2 | 初始台账直接指向 `10 §2.2 + plans/roadmap；用户 demo 需求`；初始 architecture §2.2 已明确 M4、Lead-only 权威和选择理由。`dynamic-team-assembly`（2026-10-30 已删，历史在 git）是 CEO 按问题组队的后续内容决定，不是 M4 出生记录。 | 保留 design §2.2；原始依据与用户需求指针在位 |
 | D5 | 第 0 天零自定义 JS | architecture §2.1 | 初始台账引 `10 §2.1/§3；30 §1`，初始 architecture §2.1 已写纯配置层 0 行 JS、代码按需增长；初始 ui-demo §1 说明现成团队 UI 使第 0 天无需自写 UI。 | 保留 design §2.1；原始设计依据在位 |
 | D6 | UI 分层、同 pack client 面 | ui-demo §0/§2 | 初始台账明指 `30 §0/§2`，但初始 2026-09-21 版本当时将 client 面列为第 1 层“自定义公司皮肤”；`2026-09-22-client-face-brand` 才记录同 pack `dsh.client` 落地。它是同期实现决定，不是初始 D6 全部内容的出生轮 Note。 | 保留 ui-demo §0/§2；若未来路由实现决定，须先拆清初始设计与后续同 pack 落地的命题边界 |
 | D7 | KB 三载体 | architecture §5 | 初始台账指向 `10 §5`；初始 architecture §5 已区分角色知识/skills、公司手册和活数据载体。`twin-cultivation-and-self-learning` 讨论跨会话学习与接线边界，不是三载体分类的出生记录。 | 保留 design §5；原始分类依据在位 |

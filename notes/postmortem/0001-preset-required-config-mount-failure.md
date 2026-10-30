@@ -83,11 +83,11 @@ mount.
 
 ## Guardrails added
 
-- `scripts/preset-smoke.mjs` — boots the real web profile, asserts the roster, then calls
+- `checks/smoke/preset-smoke.mjs` — boots the real web profile, asserts the roster, then calls
   `session/create` for **every** preset. This is the only check that exercises row config
   validation. Proven by regression injection: removing `sampleOverCapGlobResults` turns it red with
   the exact host error, while the other three presets stay green.
-- `preset-required-config` 门禁（`checks/run-gates.mjs`，**2026-10-09 N4 复原**）— rows that declare a
+- `preset-required-config` 门禁（`checks/gates/preset-required-config.mjs`，**2026-10-09 N4 复原**）— rows that declare a
   `config:` must carry that plugin's schema-required fields. Fast, keyless, in `pnpm verify`.
   判据源 = vendor committed `docs/config-catalog.md`（`  name: type` = 必填）。
   ⚠ **本条的原始承诺曾静默失效**：此处原写 `` `scripts/verify.mjs` check 8 — rows with known
