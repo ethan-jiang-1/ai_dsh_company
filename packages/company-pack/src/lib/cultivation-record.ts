@@ -32,6 +32,8 @@ export interface CultivationRecord {
   readonly proposerKind: 'human' | 'agent'
   /** 原始材料坐标（文件/会话引用；可缺席——正文里可再展开）。 */
   readonly source: string
+  /** 这次什么工作 / 想改善什么（2026-10-30 工作优先切片；旧记录缺席）。 */
+  readonly work?: string
   /** 期望行为一句话。 */
   readonly expectation: string
   readonly status: 'open' | 'adopted' | 'rejected'
@@ -65,8 +67,9 @@ export interface CultivationRecord {
 }
 
 /** 记录 frontmatter 的可选透传字段（解析 → 领域形状）。 */
-const OPTIONAL_FIELDS = ['methodSlug', 'reason', 'decidedAt', 'revokedAt'] as const
+const OPTIONAL_FIELDS = ['work', 'methodSlug', 'reason', 'decidedAt', 'revokedAt'] as const
 
+export const WORK_TEXT_LIMIT = 2_000
 export const VERIFICATION_HISTORY_LIMIT = 20
 export const VERIFICATION_EVIDENCE_LIMIT = 1_000
 
@@ -105,6 +108,8 @@ export interface RecordDraft {
   readonly proposerRole: string
   readonly proposerKind: 'human' | 'agent'
   readonly source: string
+  /** 这次什么工作 / 想改善什么；缺席 = 旧表单/旧记录。 */
+  readonly work?: string
   readonly expectation: string
   readonly body: string
   /** 背景（host 读后填；缺席 = 不写 `contexts` 字段）。 */
@@ -127,6 +132,7 @@ export function recordText(draft: RecordDraft): string {
     `proposerRole: ${oneLine(draft.proposerRole)}`,
     `proposerKind: ${oneLine(draft.proposerKind)}`,
     `source: ${oneLine(draft.source)}`,
+    ...(draft.work === undefined || draft.work.trim() === '' ? [] : [`work: ${oneLine(draft.work)}`]),
     `expectation: ${oneLine(draft.expectation)}`,
     'status: open',
     ...(draft.contexts === undefined || draft.contexts.length === 0

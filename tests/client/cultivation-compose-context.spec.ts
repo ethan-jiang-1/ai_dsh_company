@@ -87,8 +87,8 @@ const click = async (target: HTMLElement): Promise<void> => {
 }
 
 const openCorrection = async (container: HTMLElement): Promise<void> => {
-  await click(button(container, '开始记录一项工作'))
-  await click(button(container, CULTIVATION_COPY.composeCorrect))
+  // 2026-10-30 工作优先切片：单表单，没有纠正/建议二选一了。
+  await click(button(container, CULTIVATION_COPY.composeOpen))
 }
 
 const flush = async (): Promise<void> => {

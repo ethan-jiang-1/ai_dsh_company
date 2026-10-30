@@ -22,6 +22,7 @@ import {
   recordText,
   timeLabel,
   type CultivationRecord,
+  WORK_TEXT_LIMIT,
   VERIFICATION_EVIDENCE_LIMIT,
   VERIFICATION_HISTORY_LIMIT,
 } from '../../packages/company-pack/src/lib/cultivation.ts'
@@ -683,8 +684,31 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
       const { command } = cultivationRegistrations({}, query())
       const result = await invokeCultivation(command, 'ceo', workspace, 'correct 收口前逐项列出未决项 ::')
       expect(result).toMatchObject({ kind: 'error' })
-      expect(result.text).toBe('正文不能为空（:: 之后写做法与证据）。')
+      expect(result.text).toBe('正文不能为空（:: 之后写做法与证据；或至少写清这次工作）。')
       expect(recordsOf(workspace)).toHaveLength(0)
+    })
+  })
+
+  it('--work= 落记录 work 字段；有 work 时空正文放行；空值/坏编码/超限拒', async () => {
+    await withCultivationWorkspace(async workspace => {
+      const { command } = cultivationRegistrations({}, query())
+      const empty = await invokeCultivation(command, 'ceo', workspace, 'correct --work= 期望 ::')
+      expect(empty).toMatchObject({ kind: 'error' })
+
+      const bad = await invokeCultivation(command, 'ceo', workspace, 'correct --work=%zz 期望 ::')
+      expect(bad).toMatchObject({ kind: 'error' })
+      expect(bad.text).toContain('URI')
+
+      const tooLong = await invokeCultivation(command, 'ceo', workspace,
+        `correct --work=${encodeURIComponent('很'.repeat(WORK_TEXT_LIMIT + 1))} 期望 :: `)
+      expect(tooLong).toMatchObject({ kind: 'error' })
+      expect(tooLong.text).toContain('工作事实最多')
+
+      const ok = await invokeCultivation(command, 'ceo', workspace,
+        `correct --work=${encodeURIComponent('预算评审的结论没列关键假设')} 期望行为 :: `)
+      expect(ok).toMatchObject({ kind: 'success' })
+      const [record] = recordsOf(workspace)
+      expect(record).toMatchObject({ work: '预算评审的结论没列关键假设', status: 'open' })
     })
   })
 

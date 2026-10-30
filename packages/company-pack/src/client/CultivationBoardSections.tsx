@@ -65,6 +65,7 @@ export function CultivationMine({ inbox }: { readonly inbox: CultivationBoardSta
                     ? `理由：${record.reason ?? '（未留）'}`
                     : record.body === '' && record.contexts?.[0] !== undefined ? record.contexts[0].title : record.title}
                 </span>
+                {record.work !== undefined && record.work !== '' && <span className="wk-meta">这次工作：{record.work}</span>}
                 {record.contexts?.[0] !== undefined && (
                   <span className="wk-meta">背景：{record.contexts[0].kind === 'session' ? '会话' : '成品'}「{record.contexts[0].title}」</span>
                 )}
@@ -130,6 +131,7 @@ export function CultivationAdopted({ board, records }: { readonly board: Cultiva
                     <span className="wk-meta">
                       提出者：{record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)} 分身（Agent）` : `${roleLabel(record.proposerRole)} 角色语境下的人`}；目标角色：{roleLabel(record.targetRole)}；目标角色语境下的人已采纳
                     </span>
+                    {record.work !== undefined && record.work !== '' && <span className="wk-row-task">这次工作：{record.work}</span>}
                     {(record.contexts?.length ?? 0) > 0
                       ? <span className="wk-meta">原始工作依据：背景「{record.contexts![0]!.title}」</span>
                       : record.source === '（会话内提交）'

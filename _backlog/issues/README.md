@@ -6,6 +6,8 @@
 
 当前活跃 0 张。
 
+2026-10-30 培养主任务工作/目标优先单入口卡已结归档（第一切片：work 字段 + 单表单 + 预览；去向 = implemented Note），见 [归档](../_archive/settled_issues/2026-10-30-cultivation-case-entry.md)。
+
 2026-10-30 培养入口与证据可读性收口卡已结归档（目标角色/文案/自纠正状态/验证历史/对话失败与流式；去向 = implemented Note），见 [归档](../_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)。
 
 2026-10-29 培养 UX 卡已结归档（生产主线与追溯切片落地；去向 = implemented Note；真人走查留 Note 后续观察），见 [归档](../_archive/settled_issues/2026-10-29-cultivation-experience.md)。
@@ -16,6 +18,7 @@
 
 ## 近期归档
 
+- 培养工作优先单入口卡 2026-10-30 已结：work 字段 + 单表单 + 实时预览落地；实施 = [case-entry Note](../../notes/implemented/2026-10-30-cultivation-case-entry.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-case-entry.md)。
 - 培养入口收口卡 2026-10-30 已结：目标角色显式选择、入口文案、自纠正状态、验证历史逐条、对话失败保留草稿；实施 = [entry-followup Note](../../notes/implemented/2026-10-30-cultivation-entry-followup.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)。
 - 培养 UX 卡 2026-10-29 已结：结论 = 做；案例工坊 A 主线、来源/决定/验证历史落地；实施 = [traceability Note](../../notes/implemented/2026-10-30-cultivation-work-improvement-traceability.md)；卡在 [归档](../_archive/settled_issues/2026-10-29-cultivation-experience.md)。
 - 二轮削洋葱卡 2026-10-28 已结：8 项残余 5 修 / 3 边界；0.4.1；实施 = [round2 Note](../../notes/implemented/2026-10-28-data-design-round2.md)；卡在 [归档](../_archive/settled_issues/2026-10-28-data-design-round2.md)。

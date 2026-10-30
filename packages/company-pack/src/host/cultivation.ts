@@ -42,6 +42,7 @@ import {
   type CultivationRecord,
   type CultivationVerification,
   encodeVerificationHistory,
+  WORK_TEXT_LIMIT,
   VERIFICATION_EVIDENCE_LIMIT,
   VERIFICATION_HISTORY_LIMIT,
 } from '../lib/cultivation.ts'
@@ -222,7 +223,7 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
   }
 }
 
-/** `correct` / `suggest`：写一条培养记录（含可选背景 token）。 */
+/** `correct` / `suggest`：写一条培养记录（含可选背景与工作事实 token）。 */
 async function commandCorrectOrSuggest(
   command: CultivationCommandContext,
   sub: 'correct' | 'suggest',
@@ -233,14 +234,24 @@ async function commandCorrectOrSuggest(
   const isSuggest = sub === 'suggest'
   const targetRole = isSuggest ? tokens[1] : face.role
   if (isSuggest && !ROSTER.has(targetRole ?? '')) {
-    return { kind: 'error', text: '用法：suggest <角色> <期望行为一句话> :: <建议与证据>；角色须在名册。' }
+    return { kind: 'error', text: '用法：suggest <角色> [--context=…] [--work=…] <期望行为一句话> :: <建议与证据>；角色须在名册。' }
   }
   let from = isSuggest ? 2 : 1
   let contextToken: string | undefined
-  const flag = tokens[from]
-  if (flag !== undefined && flag.startsWith('--context=')) {
-    contextToken = flag.slice('--context='.length)
-    from += 1
+  let workToken: string | undefined
+  while (tokens[from] !== undefined && tokens[from]!.startsWith('--')) {
+    const flag = tokens[from]!
+    if (flag.startsWith('--context=')) {
+      contextToken = flag.slice('--context='.length)
+      from += 1
+      continue
+    }
+    if (flag.startsWith('--work=')) {
+      workToken = flag.slice('--work='.length)
+      from += 1
+      continue
+    }
+    break
   }
   const expectation = tokens.slice(from).join(' ').trim()
   if (expectation === '') return { kind: 'error', text: '期望行为不能为空（:: 之前的一句话）。' }
@@ -257,8 +268,23 @@ async function commandCorrectOrSuggest(
     if ('problem' in read) return { kind: 'error', text: read.problem }
     contexts = [read.context]
   }
-  if (body === '' && contexts === undefined) {
-    return { kind: 'error', text: '正文不能为空（:: 之后写做法与证据）。' }
+  let work: string | undefined
+  if (workToken !== undefined) {
+    if (workToken === '') return { kind: 'error', text: '工作事实不能为空（--work= 后面写这次什么工作）。' }
+    let decoded: string
+    try {
+      decoded = decodeURIComponent(workToken)
+    } catch {
+      return { kind: 'error', text: '工作事实编码坏：不是合法的 URI 编码。' }
+    }
+    work = decoded.trim()
+    if (work === '') return { kind: 'error', text: '工作事实不能为空（--work= 后面写这次什么工作）。' }
+    if (work.length > WORK_TEXT_LIMIT) {
+      return { kind: 'error', text: `工作事实最多 ${String(WORK_TEXT_LIMIT)} 个字符，请保留最相关的一段。` }
+    }
+  }
+  if (body === '' && contexts === undefined && work === undefined) {
+    return { kind: 'error', text: '正文不能为空（:: 之后写做法与证据；或至少写清这次工作）。' }
   }
   const source = contexts === undefined ? '（会话内提交）' : contextSummary(contexts[0]!)
   const id = storage.writeRecord(recordsDir, {
@@ -267,6 +293,7 @@ async function commandCorrectOrSuggest(
     proposerRole: face.role,
     proposerKind: 'human',
     source,
+    ...(work === undefined ? {} : { work }),
     expectation,
     body,
     ...(contexts === undefined ? {} : { contexts }),

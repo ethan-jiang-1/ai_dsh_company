@@ -17,7 +17,7 @@
  * keyless 判据 = `tests/client/cultivation-actions.spec.ts`；真机制（真命令、真落盘）= browser-visual 探针。
  */
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
-import { CULTIVATION_ROLES } from '../lib/cultivation.ts'
+import { CULTIVATION_ROLES, WORK_TEXT_LIMIT } from '../lib/cultivation.ts'
 
 /**
  * 面向人的文案（面板按钮、表单、校验提示、通道降级）。**迭代里改得最多的就是这里**——
@@ -49,8 +49,21 @@ export const CULTIVATION_COPY = {
   cancel: '取消',
   running: '处理中…',
   // ── 创作入口与表单 ───────────────────────────────────────────────────────
+  composeOpen: '开始记录一项工作',
+  composeClose: '收起',
   composeCorrect: '给你的角色留一条方法',
   composeSuggest: '给别的角色提建议',
+  workLabel: '这次什么工作 / 想改善什么',
+  workPlaceholder: '例如：Q4 预算评审的结论用了预测数字，但没有列关键假设。',
+  previewLabel: '提交前预览',
+  previewTarget: '目标角色',
+  previewWork: '这次工作',
+  previewExpectation: '下次希望',
+  previewBody: '补充做法与证据',
+  previewBackground: '背景',
+  previewEmptyWork: '未记录',
+  selfNote: (role: string): string => `记录自己的纠正；提交后在「需要我处理」里由你（${role} 角色语境）决定。`,
+  suggestNote: (role: string): string => `这是给 ${role} 的建议，由对方角色语境下的人决定；你这边只留回执。`,
   submit: '记下来',
   expectationLabel: '期望它怎么做（一句话）',
   expectationPlaceholder: '例如：收口前逐项列出未决项',
@@ -97,7 +110,9 @@ export const CULTIVATION_COPY = {
   // ── 校验提示 ─────────────────────────────────────────────────────────────
   problemExpectationEmpty: '先写一句「期望它怎么做」。',
   problemExpectationSeparator: '期望行为里不能出现 `::`（它是与正文的分隔符）。',
-  problemBodyEmpty: '正文不能为空：写清做法与证据，或带一段背景。',
+  problemBodyEmpty: '正文不能为空：写清做法与证据，或写清这次工作/带一段背景。',
+  problemWorkEmpty: '先写这次什么工作或想改善什么。',
+  problemWorkTooLong: `工作事实最多 ${String(WORK_TEXT_LIMIT)} 个字符，请保留最相关的一段。`,
   problemReason: '拒绝要留一句理由（会留档给提出者）。',
   problemRoleUnknown: `目标角色须在名册（${CULTIVATION_ROLES.join(' / ')}）。`,
   problemRoleSelf: '给自己的角色用「留一条方法」；建议指向别的角色。',
@@ -209,32 +224,43 @@ export function revokeLine(slug: string): string {
   return `/cultivation revoke ${slug}`
 }
 
-/** `correct <期望行为> :: <正文>`（正文保真多行；期望句不得含 `::`）。 */
-export function correctLine(expectation: string, body: string, contextToken?: string): DraftResult {
+/** `correct [--context=…] [--work=…] <期望行为> :: <正文>`（正文保真多行；期望句不得含 `::`）。 */
+export function correctLine(expectation: string, body: string, contextToken?: string, work?: string): DraftResult {
   const problem = expectationProblem(expectation)
   if (problem !== null) return { ok: false, problem }
-  if (body.trim() === '' && contextToken === undefined) {
+  const workText = work?.trim() ?? ''
+  if (work !== undefined && workText === '') {
+    return { ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemWorkEmpty } }
+  }
+  if (workText.length > WORK_TEXT_LIMIT) {
+    return { ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemWorkTooLong } }
+  }
+  if (body.trim() === '' && contextToken === undefined && workText === '') {
     return { ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemBodyEmpty } }
   }
-  const flag = contextToken === undefined ? '' : ` --context=${contextToken}`
-  return { ok: true, line: `/cultivation correct${flag} ${expectation.trim()} :: ${body.trim()}` }
+  const flags = [
+    contextToken === undefined ? '' : `--context=${contextToken}`,
+    workText === '' ? '' : `--work=${encodeURIComponent(workText)}`,
+  ].filter(flag => flag !== '').join(' ')
+  const prefix = flags === '' ? '' : ` ${flags}`
+  return { ok: true, line: `/cultivation correct${prefix} ${expectation.trim()} :: ${body.trim()}` }
 }
 
 /**
- * `suggest <角色> <期望行为> :: <正文>`。
+ * `suggest <角色> [--context=…] [--work=…] <期望行为> :: <正文>`。
  * @param targetRole - 建议指向的角色（须在名册）。
  * @param expectation - 期望行为一句话。
  * @param body - 建议与证据正文。
  * @param ownRole - 当前会话角色；给了就挡住"建议指向自己"（host 也会拒，这里先给人话）。
  */
-export function suggestLine(targetRole: string, expectation: string, body: string, ownRole?: string, contextToken?: string): DraftResult {
+export function suggestLine(targetRole: string, expectation: string, body: string, ownRole?: string, contextToken?: string, work?: string): DraftResult {
   if (!(CULTIVATION_ROLES as readonly string[]).includes(targetRole)) {
     return { ok: false, problem: { field: 'role', message: CULTIVATION_COPY.problemRoleUnknown } }
   }
   if (ownRole !== undefined && ownRole === targetRole) {
     return { ok: false, problem: { field: 'role', message: CULTIVATION_COPY.problemRoleSelf } }
   }
-  const draft = correctLine(expectation, body, contextToken)
+  const draft = correctLine(expectation, body, contextToken, work)
   if (!draft.ok) return draft
   return { ok: true, line: `/cultivation suggest ${targetRole}${draft.line.slice('/cultivation correct'.length)}` }
 }

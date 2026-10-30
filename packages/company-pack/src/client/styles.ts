@@ -383,6 +383,24 @@ const CSS = `
   padding-left: 8px;
 }
 .wk-cultivation-role-hint { color: var(--dsw-alias-label-secondary); }
+.wk-cultivation-preview {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--dsw-alias-bg-layer-1);
+  min-width: 0;
+}
+.wk-cultivation-preview-row {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 8px;
+  align-items: baseline;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
 .wk-cultivation-verification-history { display: grid; gap: 6px; }
 .wk-cultivation-observation {
   display: grid;

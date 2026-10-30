@@ -20,7 +20,7 @@
 //   ③ 该会话日志出现 `command/run` + `command/done`（name=cultivation、source.kind=user）——
 //      证明"按钮 = 人侧命令"，不是旁路；
 //   ④ 跨角色采纳被 host 拒（`commands/execute` 直发 cfo 会话采纳 ceo 的记录 → 文案含「仅建议权」）；
-//   ⑤ 主任务「让角色今后的工作更好」→ 人选择纠正/建议 → 提交 → 公司盘新增 `status: open` 记录；
+//   ⑤ 工作优先单表单：默认纠正/点角色切建议 → 提交 → 公司盘新增 `status: open` 记录（含 work 工作事实）；
 //   ⑥ 零挂载失败（无 banner / 无 loader 错误）；
 //   ⑦ `--fixture` 时截图入 snapshots/visual/cultivation-gui/（用户可见改动的视觉夹具）；
 //   ⑧ 已采纳方法验证：无依据不发；有用/失败都写 `verificationHistory`；失败观察不撤回方法。
@@ -334,11 +334,9 @@ try {
   })
 
   const startCultivationEntry = async () => {
+    // 2026-10-30 工作优先切片：单表单；没有纠正/建议二选一了。
     await page.getByRole('button', { name: '开始记录一项工作', exact: true }).click()
-  }
-  const chooseCultivationIntent = async (intent) => {
-    await startCultivationEntry()
-    await page.getByRole('button', { name: intent, exact: true }).click()
+    await page.getByLabel('这次什么工作 / 想改善什么').waitFor({ timeout: 10_000 })
   }
 
   if (SUMMARY) {
@@ -357,7 +355,8 @@ try {
   let sessionId = null
   let hostRole = null
   await check('⑤a 创作提交一条（同时问出 host 角色）', async () => {
-    await chooseCultivationIntent('给你的角色留一条方法')
+    await startCultivationEntry()
+    await page.getByLabel('这次什么工作 / 想改善什么').fill('收口时漏了未决项，收口质量不稳。')
     await page.getByLabel('期望它怎么做（一句话）').fill(COMPOSE_EXPECTATION)
     await page.getByLabel('做法与证据').fill('做法：先说结论再给依据。\n证据：probes/browser-visual/cultivation-gui-probe.mjs。')
     await page.getByRole('button', { name: '记下来', exact: true }).click()
@@ -374,6 +373,7 @@ try {
     if (found === null) throw new Error('创作提交后没找到新记录（open）')
     createdRecordId = found.name.replace(/\.md$/, '')
     if (!found.body.includes('proposerKind: human')) throw new Error('新记录没署成人侧提交（proposerKind）')
+    if (!/work: 收口时漏了未决项/.test(found.body)) throw Error('新记录缺工作事实（work 字段）')
     const role = /targetRole:\s*(\S+)/.exec(found.body)?.[1]
     if (role === undefined) throw new Error('新记录缺 targetRole')
     hostRole = role
@@ -399,14 +399,16 @@ try {
   })
 
   await check('⑤b 可选背景：suggest + 成品背景 → 记录 contexts + 人话 source；正文可空', async () => {
-    await chooseCultivationIntent('给别的角色提建议')
+    await startCultivationEntry()
     const form = page.locator('.wk-cultivation-compose').first()
-    const submit = form.getByRole('button', { name: '记下来', exact: true })
-    if (!(await submit.isDisabled())) throw new Error('未选目标角色时提交应禁用（不允许默认发给别人）')
-    if (await form.getByText('先选一个目标角色；未选不会提交。').count() === 0) throw new Error('未选目标角色时应给提示')
+    // 工作优先切片：目标默认当前角色（纠正）；点 CFO 才是建议。显式选择，无默认发人。
+    if (await form.getByText('记录自己的纠正；提交后在「需要我处理」里由你（CEO 角色语境）决定。').count() !== 1) {
+      throw new Error('默认目标 = 当前角色时应有纠正说明')
+    }
     await form.getByRole('button', { name: 'CFO', exact: true }).click()
-    if (await submit.isDisabled()) throw new Error('选了目标角色后提交应可用')
-    if (await form.getByText('先选一个目标角色；未选不会提交。').count() > 0) throw new Error('选目标角色后提示应消失')
+    if (await form.getByText('这是给 CFO 的建议，由对方角色语境下的人决定；你这边只留回执。').count() !== 1) {
+      throw new Error('改选 CFO 后应显示建议说明')
+    }
     await page.getByRole('button', { name: '＋ 添加背景', exact: true }).click()
     const catalog = JSON.parse(readFileSync(join(WORKSPACE, 'kb', 'deliverables-index.json'), 'utf8'))
     const slug = Array.isArray(catalog?.entries) ? catalog.entries[0]?.slug : undefined
@@ -442,7 +444,7 @@ try {
   })
 
   await check('⑤c 隔离 home 无会话历史时显示诚实空态，其他背景仍可选', async () => {
-    await chooseCultivationIntent('给别的角色提建议')
+    await startCultivationEntry()
     await page.getByRole('button', { name: '＋ 添加背景', exact: true }).click()
     const picker = page.locator('.wk-cultivation-context-picker')
     await picker.waitFor({ state: 'visible', timeout: 15_000 })

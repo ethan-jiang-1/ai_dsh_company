@@ -81,6 +81,7 @@ export function CultivationInbox({ board }: { readonly board: CultivationBoardSt
                       {record.body === '' && (record.contexts?.length ?? 0) > 0 && (
                         <span className="wk-meta">{CULTIVATION_COPY.bodyEmptyWithContext}</span>
                       )}
+                      {record.work !== undefined && record.work !== '' && <span className="wk-row-task">这次工作：{record.work}</span>}
                       <span className="wk-meta">{recordProvenance(record)}</span>
                       <span className="wk-meta">
                         {stampOf(record.id) === null ? '' : `${String(stampOf(record.id))} 提出时间`}

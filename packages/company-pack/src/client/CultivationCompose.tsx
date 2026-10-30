@@ -1,8 +1,11 @@
 /**
- * 创作面（培养 GUI 卡 S5，判据 ①/G1；2026-10-23 背景卡 D1=A / D2=A 扩可选背景）。
+ * 创作面（培养 GUI 卡 S5，判据 ①/G1；2026-10-23 背景卡 D1=A / D2=A 扩可选背景；
+ * 2026-10-30 工作优先切片：去掉纠正/建议二选一，单表单以「这次什么工作」为第一字段，
+ * 目标角色显式可改，提交前有实时预览——原型 A「案例工坊」的第一步落在现有命令面上）。
  *
  * 为什么不挤进记录行：创作属于**另一个时刻**（复盘后沉淀），混进待办行会让人分不清"我在下判"还是"我在提一条"；
- * 入口固定在面板顶部，点开即表单。
+ * 入口固定在面板顶部，点开即表单。纠正/建议不再是两个入口：由目标角色是否等于当前角色推导
+ * `correct`/`suggest`——人先说工作，类型是推导结果不是选择题。
  *
  * 分工：命令线构造与校验在 `cultivation-actions.ts`；背景 token 编码在 `lib/cultivation-context.ts`；
  * 候选/预览在 `cultivation-context-data.ts`；本组件只显示状态与提交。
@@ -54,8 +57,6 @@ export interface CultivationComposeProps {
   readonly teammate?: boolean | undefined
 }
 
-/** 两种创作意图。 */
-type Mode = 'correct' | 'suggest'
 type ContextStatus = 'idle' | 'loading'
 
 /** host 提交回执里取记录 id（`已提交培养记录 <id>（…）`）；取不到就只刷新、不高亮。 */
@@ -81,14 +82,14 @@ const cardFromDeliverable = (row: ContextDeliverableRow): ComposeContextCard => 
 })
 
 /**
- * 创作入手处（两个入口 → 表单 → 回执）。
+ * 创作入手处（单表单：工作 → 下次做法 → 目标角色 → 可选补充/背景 → 预览 → 提交）。
  * @param props - 见 {@link CultivationComposeProps}。
- * @returns 入口按钮或展开的表单（含回执与校验提示）。
+ * @returns 入口按钮或展开的表单（含预览、回执与校验提示）。
  */
 export function CultivationCompose(props: CultivationComposeProps) {
-  const [mode, setMode] = useState<Mode | null>(null)
-  const [chooserOpen, setChooserOpen] = useState(false)
-  const [targetRole, setTargetRole] = useState('')
+  const [open, setOpen] = useState(false)
+  const [targetRole, setTargetRole] = useState(props.viewerRole)
+  const [work, setWork] = useState('')
   const [expectation, setExpectation] = useState('')
   const [body, setBody] = useState('')
   const [problem, setProblem] = useState<string | null>(null)
@@ -101,8 +102,8 @@ export function CultivationCompose(props: CultivationComposeProps) {
   const [expanded, setExpanded] = useState(false)
   const seq = useRef(0)
   const inflight = useRef<AbortController | null>(null)
-  // 建议对象 = 名册里除我以外的角色（给自己的用「留一条方法」）。
-  const others = CULTIVATION_ROLES.filter(role => role !== props.viewerRole)
+  // 纠正/建议由目标角色推导：人先说工作，类型不是选择题。
+  const isSuggest = targetRole !== props.viewerRole
   const sources = props.sources
   const currentSessionId = props.currentSessionId
   const canContext = sources !== undefined && currentSessionId !== undefined && currentSessionId !== ''
@@ -140,23 +141,31 @@ export function CultivationCompose(props: CultivationComposeProps) {
     setExpanded(false)
   }
 
-  const openForm = (next: Mode): void => {
+  const openForm = (): void => {
     resetContext()
-    setMode(next)
+    setOpen(true)
     setProblem(null)
     setOutcome(null)
+    setWork('')
     setExpectation('')
     setBody('')
-    // 跨角色建议不预选目标：默认选中第一个别的角色会把建议静默发错人（2026-10-30 复核）。
-    // 未选时提交按钮禁用并给出提示；选定后才可提交。
-    setTargetRole(next === 'suggest' ? '' : props.viewerRole)
-    if (next === 'correct' && canContext) {
+    setTargetRole(props.viewerRole)
+    if (canContext) {
       const result = sources.listSessions(currentSessionId, props.viewerRole)
       if (result.ok) {
         const current = result.value.find(row => row.current)
         if (current !== undefined) void pickSession(current, true)
       }
     }
+  }
+
+  const closeForm = (): void => {
+    resetContext()
+    setOpen(false)
+    setProblem(null)
+    setWork('')
+    setExpectation('')
+    setBody('')
   }
 
   const onPick = (pick: ContextPickerPick): void => {
@@ -183,8 +192,8 @@ export function CultivationCompose(props: CultivationComposeProps) {
     if (context !== null) {
       const encoded = encodeContextToken({
         v: 1,
-        mode: mode === 'suggest' ? 'suggest' : 'correct',
-        ...(mode === 'suggest' ? { targetRole } : {}),
+        mode: isSuggest ? 'suggest' : 'correct',
+        ...(isSuggest ? { targetRole } : {}),
         items: [context.ref],
       })
       if (!encoded.ok) {
@@ -193,9 +202,11 @@ export function CultivationCompose(props: CultivationComposeProps) {
       }
       token = encoded.token
     }
-    const draft = mode === 'suggest'
-      ? suggestLine(targetRole, expectation, body, props.viewerRole, token)
-      : correctLine(expectation, body, token)
+    // work 是可选字段：空串 = 没填（不是"填了但为空"），不触发必填校验。
+    const workText = work.trim() === '' ? undefined : work
+    const draft = isSuggest
+      ? suggestLine(targetRole, expectation, body, props.viewerRole, token, workText)
+      : correctLine(expectation, body, token, workText)
     if (!draft.ok) {
       setProblem(draft.problem.message)
       return
@@ -206,39 +217,53 @@ export function CultivationCompose(props: CultivationComposeProps) {
     setPending(false)
     setOutcome(result)
     if (!result.ok) return
-    setChooserOpen(false)
     const savedId = SAVED_ID_RE.exec(result.text)?.[1]
-    setMode(null)
-    setExpectation('')
-    setBody('')
-    resetContext()
+    closeForm()
     props.onRefresh?.()
     if (savedId !== undefined) props.onSubmitted?.(savedId)
   }
 
+  const previewRows: readonly { readonly label: string, readonly value: string }[] = [
+    { label: CULTIVATION_COPY.previewWork, value: work.trim() === '' ? CULTIVATION_COPY.previewEmptyWork : work.trim() },
+    { label: CULTIVATION_COPY.previewExpectation, value: expectation.trim() },
+    ...(body.trim() === '' ? [] : [{ label: CULTIVATION_COPY.previewBody, value: body.trim() }]),
+    ...(context === null ? [] : [{ label: CULTIVATION_COPY.previewBackground, value: context.title }]),
+  ]
+  const hasDraft = work.trim() !== '' || expectation.trim() !== '' || body.trim() !== ''
+
   return (
     <div className="wk-activity-block wk-cultivation-compose" aria-label="工作改善提案">
       {props.teammate === true && <div className="wk-meta wk-cultivation-teammate">{CULTIVATION_COPY.teammateBanner}</div>}
-      {mode === null
+      {!open
         ? (
           <div className="wk-cultivation-main-entry">
-            {!chooserOpen
-              ? <Button variant="primary" onClick={() => { setChooserOpen(true) }}>开始记录一项工作</Button>
-              : (
-                <div className="wk-cultivation-compose-entry" aria-label="选择提案方式">
-                  <Button variant="primary" onClick={() => { openForm('correct') }}>{CULTIVATION_COPY.composeCorrect}</Button>
-                  <Button onClick={() => { openForm('suggest') }}>{CULTIVATION_COPY.composeSuggest}</Button>
-                  <Button onClick={() => { setChooserOpen(false) }}>{CULTIVATION_COPY.cancel}</Button>
-                </div>
-              )}
+            <Button variant="primary" onClick={openForm}>{CULTIVATION_COPY.composeOpen}</Button>
           </div>
         )
         : (
           <div className="wk-cultivation-compose-form">
-            <strong>{mode === 'correct' ? CULTIVATION_COPY.composeCorrect : CULTIVATION_COPY.composeSuggest}</strong>
-            {mode === 'suggest' && (
+            <label className="wk-cultivation-field">
+              <span className="wk-meta">{CULTIVATION_COPY.workLabel}</span>
+              <textarea
+                className="wk-cultivation-body-input"
+                value={work}
+                rows={2}
+                placeholder={CULTIVATION_COPY.workPlaceholder}
+                onChange={event => { setWork(event.target.value) }}
+              />
+            </label>
+            <label className="wk-cultivation-field">
+              <span className="wk-meta">{CULTIVATION_COPY.expectationLabel}</span>
+              <Input
+                value={expectation}
+                placeholder={CULTIVATION_COPY.expectationPlaceholder}
+                onChange={event => { setExpectation(event.target.value) }}
+              />
+            </label>
+            <div className="wk-cultivation-field">
+              <span className="wk-meta">{CULTIVATION_COPY.targetRoleLabel}</span>
               <div className="wk-cultivation-roles" role="group" aria-label={CULTIVATION_COPY.targetRoleLabel}>
-                {others.map(role => (
+                {[props.viewerRole, ...CULTIVATION_ROLES.filter(role => role !== props.viewerRole)].map(role => (
                   <Pill
                     key={role}
                     active={role === targetRole}
@@ -248,10 +273,22 @@ export function CultivationCompose(props: CultivationComposeProps) {
                   </Pill>
                 ))}
               </div>
-            )}
-            {mode === 'suggest' && targetRole === '' && (
-              <span className="wk-meta wk-cultivation-role-hint">先选一个目标角色；未选不会提交。</span>
-            )}
+              <span className="wk-meta wk-cultivation-role-hint">
+                {isSuggest ? CULTIVATION_COPY.suggestNote(roleLabel(targetRole)) : CULTIVATION_COPY.selfNote(roleLabel(props.viewerRole))}
+              </span>
+            </div>
+            <label className="wk-cultivation-field">
+              <span className="wk-meta">{context === null ? CULTIVATION_COPY.bodyLabel : CULTIVATION_COPY.bodyOptionalLabel}</span>
+              <textarea
+                className="wk-cultivation-body-input"
+                value={body}
+                rows={4}
+                onChange={event => { setBody(event.target.value) }}
+              />
+              <span className="wk-meta wk-cultivation-hint">
+                {context === null ? CULTIVATION_COPY.bodyHint : CULTIVATION_COPY.bodyOptionalHint}
+              </span>
+            </label>
             {canContext && (
               <div className="wk-cultivation-context">
                 <div className="wk-cultivation-context-head">
@@ -306,7 +343,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
                     <CultivationContextPicker
                       sources={sources}
                       currentSessionId={currentSessionId}
-                      targetRole={mode === 'suggest' ? targetRole : undefined}
+                      targetRole={isSuggest ? targetRole : undefined}
                       onPick={onPick}
                       onCancel={() => { setPickerOpen(false) }}
                     />
@@ -314,32 +351,26 @@ export function CultivationCompose(props: CultivationComposeProps) {
                 )}
               </div>
             )}
-            {/* 标签常驻（placeholder 一打字就消失，走查里"打完就不记得这栏是什么"）。 */}
-            <label className="wk-cultivation-field">
-              <span className="wk-meta">{CULTIVATION_COPY.expectationLabel}</span>
-              <Input
-                value={expectation}
-                placeholder={CULTIVATION_COPY.expectationPlaceholder}
-                onChange={event => { setExpectation(event.target.value) }}
-              />
-            </label>
-            <label className="wk-cultivation-field">
-              <span className="wk-meta">{context === null ? CULTIVATION_COPY.bodyLabel : CULTIVATION_COPY.bodyOptionalLabel}</span>
-              <textarea
-                className="wk-cultivation-body-input"
-                value={body}
-                rows={4}
-                onChange={event => { setBody(event.target.value) }}
-              />
-              <span className="wk-meta wk-cultivation-hint">
-                {context === null ? CULTIVATION_COPY.bodyHint : CULTIVATION_COPY.bodyOptionalHint}
-              </span>
-            </label>
+            {hasDraft && (
+              <div className="wk-cultivation-preview" aria-label={CULTIVATION_COPY.previewLabel}>
+                <span className="wk-meta">{CULTIVATION_COPY.previewLabel}</span>
+                <div className="wk-cultivation-preview-row">
+                  <span className="wk-meta">{CULTIVATION_COPY.previewTarget}</span>
+                  <strong>{roleLabel(targetRole)}{isSuggest ? '（建议）' : ''}</strong>
+                </div>
+                {previewRows.map(row => (
+                  <div key={row.label} className="wk-cultivation-preview-row">
+                    <span className="wk-meta">{row.label}</span>
+                    <span>{row.value}</span>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="wk-cultivation-actions">
-              <Button variant="primary" disabled={pending || contextStatus === 'loading' || (mode === 'suggest' && targetRole === '')} onClick={() => { void submit() }}>
+              <Button variant="primary" disabled={pending || contextStatus === 'loading'} onClick={() => { void submit() }}>
                 {pending ? CULTIVATION_COPY.running : CULTIVATION_COPY.submit}
               </Button>
-              <Button disabled={pending} onClick={() => { resetContext(); setMode(null); setProblem(null) }}>{CULTIVATION_COPY.cancel}</Button>
+              <Button disabled={pending} onClick={closeForm}>{CULTIVATION_COPY.cancel}</Button>
             </div>
           </div>
         )}

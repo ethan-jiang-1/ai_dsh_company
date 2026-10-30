@@ -198,12 +198,17 @@ describe('可选背景的命令线（D1=A：只带 ref token）', () => {
     })
   })
 
-  it('无 context 且正文空 → 提示可带背景；有 context 则允许空正文', () => {
+  it('无 context 且正文空 → 提示可带背景或写工作；有 context / work 则允许空正文', () => {
     expect(correctLine('期望句', '  \n ')).toEqual({
       ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemBodyEmpty },
     })
-    expect(CULTIVATION_COPY.problemBodyEmpty).toContain('或带一段背景')
+    expect(CULTIVATION_COPY.problemBodyEmpty).toContain('或写清这次工作')
     expect(correctLine('期望句', '', 'tok').ok).toBe(true)
+    expect(correctLine('期望句', '', undefined, '这次工作').ok).toBe(true)
+    // work 显式给了但空 = 校验问题（不是没填）。
+    expect(correctLine('期望句', '', undefined, '  ')).toEqual({
+      ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemWorkEmpty },
+    })
   })
 
   it('期望句以 --context（无 =）开头仍按旧语法构造，不误判为 flag', () => {

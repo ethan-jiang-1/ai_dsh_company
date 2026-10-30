@@ -67,9 +67,14 @@ function stubActions(answer: ActionOutcome = { ok: true, text: '已采纳 r-1：
 
 const mounted: Array<{ root: Root, container: HTMLElement }> = []
 
-async function startComposition(container: HTMLElement, intent: 'correct' | 'suggest'): Promise<void> {
-  await click(button(container, '开始记录一项工作')!)
-  await click(button(container, intent === 'correct' ? CULTIVATION_COPY.composeCorrect : CULTIVATION_COPY.composeSuggest)!)
+async function startComposition(container: HTMLElement): Promise<void> {
+  // 2026-10-30 工作优先切片：单表单，没有纠正/建议二选一了。
+  await click(button(container, CULTIVATION_COPY.composeOpen)!)
+}
+
+/** 表单里的多行输入：第 1 个 = 工作事实，第 2 个 = 补充做法与证据。 */
+function textareas(container: HTMLElement): HTMLTextAreaElement[] {
+  return [...container.querySelectorAll('textarea')]
 }
 
 /** 挂一棵面板（props 覆盖式）。 */
@@ -219,55 +224,79 @@ describe('治理动作：点一下就发出对那条记录的命令（S2）', ()
   })
 })
 
-describe('创作面：不看说明也能提交一条（S5，判据 ①/G1）', () => {
-  it('顶部有「给你的角色留一条方法」，展开后提交发出 correct 线', async () => {
+describe('创作面：不看说明也能提交一条（S5，判据 ①/G1；2026-10-30 工作优先单表单）', () => {
+  it('单表单先问这次什么工作；提交发出带 --work= 的 correct 线；成功后回到单一主入口', async () => {
     const { actions, lines } = stubActions({ ok: true, text: '已提交培养记录 20261017-120000-abcd（纠正，待你采纳）。' })
     const { container } = mount({ actions, viewerRole: 'ceo', viewerLabel: 'CEO' })
 
-    expect(button(container, '开始记录一项工作'), '主任务应是单一开始动作').not.toBeNull()
-    expect(button(container, CULTIVATION_COPY.composeCorrect), '分支选择应在主动作之后').toBeNull()
-    await startComposition(container, 'correct')
+    expect(button(container, CULTIVATION_COPY.composeOpen), '主任务应是单一开始动作').not.toBeNull()
+    expect(button(container, CULTIVATION_COPY.composeCorrect), '不应再有纠正/建议二选一').toBeNull()
+    await startComposition(container)
 
     const inputs = container.querySelectorAll('input')
-    const textarea = container.querySelector('textarea')
-    expect(inputs.length, '期望行为是单行输入').toBeGreaterThan(0)
-    expect(textarea, '正文要能写多段（本包自写 textarea）').not.toBeNull()
+    const areas = textareas(container)
+    expect(areas.length, '工作事实 + 补充做法两个多行输入').toBe(2)
+    await type(areas[0]!, '收口盘点时漏了未决项，收口质量不稳。')
     await type(inputs[0] as HTMLInputElement, '收口前逐项列出未决项')
-    await type(textarea as HTMLTextAreaElement, '做法：先列未决清单。\n证据：deliverables/x/final.md')
+    await type(areas[1]!, '做法：先列未决清单。\n证据：deliverables/x/final.md')
     await click(button(container, CULTIVATION_COPY.submit)!)
 
     expect(lines).toEqual([
-      '/cultivation correct 收口前逐项列出未决项 :: 做法：先列未决清单。\n证据：deliverables/x/final.md',
+      '/cultivation correct --work=%E6%94%B6%E5%8F%A3%E7%9B%98%E7%82%B9%E6%97%B6%E6%BC%8F%E4%BA%86%E6%9C%AA%E5%86%B3%E9%A1%B9%EF%BC%8C%E6%94%B6%E5%8F%A3%E8%B4%A8%E9%87%8F%E4%B8%8D%E7%A8%B3%E3%80%82 收口前逐项列出未决项 :: 做法：先列未决清单。\n证据：deliverables/x/final.md',
     ])
     expect(container.textContent).toContain('已提交培养记录')
-    expect(button(container, '开始记录一项工作'), '提交成功后回到单一主入口').not.toBeNull()
-    expect(button(container, CULTIVATION_COPY.composeCorrect), '下一步分支选择不应继续常驻').toBeNull()
+    expect(button(container, CULTIVATION_COPY.composeOpen), '提交成功后回到单一主入口').not.toBeNull()
+  })
+
+  it('只写工作 + 期望、不写正文也能提交（work 充当依据）', async () => {
+    const { actions, lines } = stubActions({ ok: true, text: '已提交培养记录 20261030-000000-work1（纠正，待你采纳）。' })
+    const { container } = mount({ actions })
+    await startComposition(container)
+    await type(textareas(container)[0]!, '发布前没有回滚说明。')
+    await type(container.querySelector('input') as HTMLInputElement, '发布时附回滚步骤')
+    await click(button(container, CULTIVATION_COPY.submit)!)
+    expect(lines).toHaveLength(1)
+    expect(decodeURIComponent(/--work=([^ ]+)/.exec(lines[0]!)?.[1] ?? '')).toBe('发布前没有回滚说明。')
+    expect(lines[0]).not.toContain('做法与证据')
+  })
+
+  it('提交前预览显示目标角色/工作/下次希望，随输入更新', async () => {
+    const { actions } = stubActions()
+    const { container } = mount({ actions, viewerRole: 'ceo', viewerLabel: 'CEO' })
+    await startComposition(container)
+    expect(container.querySelector('[aria-label="提交前预览"]'), '没写东西时不显示预览').toBeNull()
+    await type(textareas(container)[0]!, 'Q4 预算评审没列关键假设。')
+    await type(container.querySelector('input') as HTMLInputElement, '结论前列出关键假设')
+    const preview = container.querySelector('[aria-label="提交前预览"]')
+    expect(preview, '写了东西就该有预览').not.toBeNull()
+    expect(preview!.textContent).toContain('CEO')
+    expect(preview!.textContent).toContain('Q4 预算评审没列关键假设。')
+    expect(preview!.textContent).toContain('结论前列出关键假设')
+    await click(button(container, 'CFO')!)
+    expect(container.querySelector('[aria-label="提交前预览"]')!.textContent).toContain('CFO（建议）')
   })
 
   it('期望句含 `::` 时不发命令，行内说明为什么', async () => {
     const { actions, lines } = stubActions()
     const { container } = mount({ actions })
-    await startComposition(container, 'correct')
+    await startComposition(container)
     await type(container.querySelector('input') as HTMLInputElement, '含 :: 的期望')
-    await type(container.querySelector('textarea') as HTMLTextAreaElement, '正文')
+    await type(textareas(container)[1]!, '正文')
     await click(button(container, CULTIVATION_COPY.submit)!)
     expect(lines).toEqual([])
     expect(container.textContent).toContain(CULTIVATION_COPY.problemExpectationSeparator)
   })
 
-  it('「给别的角色提建议」要先选角色，且不给自己；未选时不可提交', async () => {
+  it('目标角色默认当前角色；点别的角色即变建议，由对方语境决定', async () => {
     const { actions, lines } = stubActions()
     const { container } = mount({ actions, viewerRole: 'ceo', viewerLabel: 'CEO' })
-    await startComposition(container, 'suggest')
-    expect(button(container, 'CFO'), '应能选目标角色').not.toBeNull()
-    expect(button(container, 'CEO'), '不把自己列成建议对象').toBeNull()
-    expect(button(container, CULTIVATION_COPY.submit)!.disabled, '未选目标时提交应禁用').toBe(true)
-    expect(container.textContent).toContain('先选一个目标角色；未选不会提交。')
-    await click(button(container, 'CFO')!)
-    expect(button(container, CULTIVATION_COPY.submit)!.disabled).toBe(false)
-    expect(container.textContent).not.toContain('先选一个目标角色；未选不会提交。')
+    await startComposition(container)
+    expect(container.textContent).toContain('记录自己的纠正；提交后在「需要我处理」里由你（CEO 角色语境）决定。')
+    expect(button(container, 'CEO'), '自己也在目标角色里（默认选中）').not.toBeNull()
     await type(container.querySelector('input') as HTMLInputElement, '测算先列假设口径')
-    await type(container.querySelector('textarea') as HTMLTextAreaElement, '做法：单列固定成本与边际成本。')
+    await type(textareas(container)[1]!, '做法：单列固定成本与边际成本。')
+    await click(button(container, 'CFO')!)
+    expect(container.textContent).toContain('这是给 CFO 的建议，由对方角色语境下的人决定；你这边只留回执。')
     await click(button(container, CULTIVATION_COPY.submit)!)
     expect(lines).toEqual(['/cultivation suggest cfo 测算先列假设口径 :: 做法：单列固定成本与边际成本。'])
   })
@@ -356,12 +385,13 @@ describe('走查抓到的四处 UX 缺陷（2026-10-18，图为证）', () => {
     expect(warning!.textContent).toContain('不能再被采纳')
   })
 
-  it('创作面：标签常驻（不是只在 placeholder 里），正文栏带做法提示', async () => {
+  it('创作面：标签常驻（不是只在 placeholder 里），工作/正文栏带提示', async () => {
     const { actions } = stubActions()
     const { container } = mount({ actions })
-    await startComposition(container, 'correct')
+    await startComposition(container)
     await type(container.querySelector('input') as HTMLInputElement, '写了字标签也在')
     const text = container.textContent ?? ''
+    expect(text, '工作事实标签常驻').toContain(CULTIVATION_COPY.workLabel)
     expect(text, '期望行为标签常驻').toContain(CULTIVATION_COPY.expectationLabel)
     expect(text, '正文标签常驻').toContain(CULTIVATION_COPY.bodyLabel)
     expect(text, '正文栏带做法/出处提示').toContain(CULTIVATION_COPY.bodyHint)
