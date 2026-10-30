@@ -91,13 +91,63 @@ export function backlogLivenessProblems(backlogRoot) {
     const fullDir = join(backlogRoot, pool)
     if (!isDir(fullDir)) continue
     const files = markdownFiles(fullDir)
-    const indexPath = pool.startsWith('_archive/') ? '_archive/README.md' : `${pool}/README.md`
+    // ── 研究题模型（2026-10-30）：索引 → 题名页 → 材料两级所有权 ─────────────────────
+    // 规则正本 = _backlog/research/README.md「一个研究题长什么样」与 _archive/research/README.md「归档规则」。
+    // 为什么：研究按"研究题目录 + 题名页 README.md"组织；shelf 索引一题一行（链题名页），材料由题名页
+    //   逐份点名。旧判据是"每份 .md 直接进 shelf 索引"，加题名页后会把索引变成逐文件清单（与
+    //   "一处事实一个家"冲突，_archive/README.md 曾因此把研究列两遍）。
+    // 判据（只证形状，不证证据质量）：题名页在场；`> 问题` / `> 消费者` / `> 产出的卡` 三行在场；归档
+    //   题名页另有 `> 归档：YYYY-MM-DD`；题名页被 shelf 索引按解析后路径链接；材料被自己题名页按解析后
+    //   路径链接（散文点名不算，与其它桶反 prose 口径一致）；shelf 根不落平铺材料。
+    // 负例留证 2026-10-30（真树植入，`pnpm verify` 原话；逐条还原即绿）：
+    //   ① 删 `_archive/research/collaboration/README.md` → `… 缺题名页——研究题必须有题名页（问题 / 消费者 / 产出的卡 / 材料）`；
+    //   ② 删 agent-cultivation 题名页的「> 产出的卡：」行 → `…:1 缺「> 产出的卡：」行——题名页要回答研究什么、服务谁、产出了什么`；
+    //   ③ notes-consistency 材料链接改成散文 → `… 未在题名页 notes-consistency/README.md 中被点名——材料清单必须与盘上一致`；
+    //   ④ 归档索引删掉 repo-hygiene 行 → `… 未被 _archive/research/README.md 索引链接点名——索引按题名页一行登记，不按文件`；
+    //   ⑤ 删 run-bundle 题名页的「> 归档：」行 → `…:1 缺「> 归档：YYYY-MM-DD」行——归档题名页要记下归档日`；
+    //   ⑥ 材料移回 shelf 根 → `… 平铺在 shelf 根——研究材料必须住进题名目录（_backlog/_archive/research/<slug>/）`。
+    //   spec 夹具 = tests/harness/backlog-liveness.spec.ts 的研究题三例（缺题名页/三行/归档日、散件与索引、两级反散文）。
+    const researchPool = pool.endsWith('research')
+    const indexPath = researchPool ? `${pool}/README.md`
+      : pool.startsWith('_archive/') ? '_archive/README.md' : `${pool}/README.md`
     const indexFile = join(backlogRoot, indexPath)
     const indexed = isFile(indexFile) ? markdownLinkTargets(indexFile) : new Set()
+    if (researchPool && isFile(indexFile)) {
+      // 题名页三行 = 名头的形状；缺一行就是没交代清楚（问题 / 服务谁 / 长出了什么）。
+      const topics = new Set(files.filter(name => name.includes('/')).map(name => name.split('/')[0]))
+      for (const topic of topics) {
+        const bannerFull = join(fullDir, topic, 'README.md')
+        const bannerWhere = `_backlog/${pool}/${topic}/README.md`
+        if (!isFile(bannerFull)) {
+          problems.push(`${bannerWhere} 缺题名页——研究题必须有题名页（问题 / 消费者 / 产出的卡 / 材料）`)
+          continue
+        }
+        const banner = readFileSync(bannerFull, 'utf8')
+        for (const field of ['问题', '消费者', '产出的卡']) {
+          if (!new RegExp(`^>\\s*${field}[：:]`, 'm').test(banner))
+            problems.push(`${bannerWhere}:1 缺「> ${field}：」行——题名页要回答研究什么、服务谁、产出了什么`)
+        }
+        if (pool.startsWith('_archive/') && !/^>\s*归档[：:]\s*\d{4}-\d{2}-\d{2}/m.test(banner))
+          problems.push(`${bannerWhere}:1 缺「> 归档：YYYY-MM-DD」行——归档题名页要记下归档日`)
+        if (!indexed.has(resolve(bannerFull)))
+          problems.push(`${bannerWhere} 未被 ${indexPath} 索引链接点名——索引按题名页一行登记，不按文件`)
+        const materialLinks = markdownLinkTargets(bannerFull, banner)
+        for (const name of files) {
+          if (name.split('/')[0] !== topic || basename(name) === 'README.md') continue
+          if (!materialLinks.has(resolve(fullDir, name)))
+            problems.push(`_backlog/${pool}/${name} 未在题名页 ${topic}/README.md 中被点名——材料清单必须与盘上一致`)
+        }
+      }
+      // shelf 根只放索引；材料一律住题名目录（散件会让"题"这个概念失效）。
+      for (const name of files) {
+        if (name.includes('/') || basename(name) === 'README.md') continue
+        problems.push(`_backlog/${pool}/${name} 平铺在 shelf 根——研究材料必须住进题名目录（_backlog/${pool}/<slug>/）`)
+      }
+    }
     for (const name of files.filter(name => basename(name) !== 'README.md')) {
       const full = join(fullDir, name)
       const where = `_backlog/${pool}/${name}`
-      if (!indexed.has(resolve(full))) problems.push(`${where} 未被 ${indexPath} 索引链接点名`)
+      if (!researchPool && !indexed.has(resolve(full))) problems.push(`${where} 未被 ${indexPath} 索引链接点名`)
       const text = readFileSync(full, 'utf8')
       if (pool === 'issues' || pool === 'bugs') {
         const head = text.split('\n').slice(0, 12).join('\n').replaceAll('**', '')

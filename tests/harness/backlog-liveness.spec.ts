@@ -18,12 +18,23 @@ const put = (path: string, text: string) => {
   mkdirSync(dirname(join(root, path)), { recursive: true })
   writeFileSync(join(root, path), text)
 }
+// 研究题自 2026-10-30 起由自己的 shelf 索引（一题一行）持有；其余归档池共用 _archive/README.md。
 const index = (pool: string, path: string) => {
+  if (pool.endsWith('research')) return put(`${pool}/README.md`, `# Index\n\n[topic](<${path}>)\n`)
   if (pool.startsWith('_archive/')) {
     const owner = '_archive/README.md'
     put(owner, readFileSync(join(root, owner), 'utf8') + `\n[material](<${pool.slice('_archive/'.length)}/${path}>)\n`)
   } else put(`${pool}/README.md`, `# Index\n\n[material](<${path}>)\n`)
 }
+// 题名页正例：三行名头 + 材料表；归档题名页另带 `> 归档：` 行。
+const banner = ({ archive, lines = [] }: { archive?: string; lines?: string[] } = {}) => [
+  '# Topic', '',
+  '> 问题：这轮研究回答什么',
+  '> 消费者：—',
+  '> 产出的卡：—',
+  ...(archive ? [`> 归档：${archive}`] : []),
+  '', '## 材料', '', ...lines, '',
+].join('\n')
 // 2026-10-12（借鉴卡落地）：夹具带上 > 状态行（立卡/状态/类型/毕业/可关闭）——镜像互查与
 // 「毕业：」封闭头是活状态门禁的一部分，正例夹具必须长成现行模板的样子。
 const issue = (extra = '', status = '推敲中', graduation = '未定') =>
@@ -45,10 +56,11 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     put('bugs/BUG-007-demo.md', '---\nstatus: 调查中\nseverity: P1\nopened: 2026-10-09\n---\n\n# Bug\n\n> 严重级别：P1（重要）｜发现：2026-10-09｜状态：调查中\n')
     index('bugs', 'BUG-007-demo.md')
     put('research/tech-exploration/2026-10-09-demo.md', '---\ntopic: 技术\nintent: Test the actual route.\n---\n# Research\n')
-    index('research', 'tech-exploration/2026-10-09-demo.md')
+    put('research/tech-exploration/README.md', banner({ lines: ['- [demo](2026-10-09-demo.md)'] }))
+    index('research', 'tech-exploration/README.md')
     put('methods/demo.md', '---\nname: demo\ndescription: A method.\nwhenToUse: Deliberation.\n---\n# Method\n')
     index('methods', 'demo.md')
-    for (const pool of pools.filter(pool => pool.startsWith('_archive/'))) {
+    for (const pool of pools.filter(pool => pool.startsWith('_archive/') && !pool.endsWith('research'))) {
       put(`${pool}/BUG-001-old.md`, '# Original historical discussion\n')
       index(pool, 'BUG-001-old.md')
     }
@@ -89,23 +101,54 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     for (const message of ['severity', 'name 须匹配文件名', 'description', 'whenToUse']) expect(problems).toContain(message)
   })
 
-  it('does not satisfy two nested materials by basename prose or another bucket link', () => {
+  // 2026-10-30（研究题模型）：材料由题名页按解析后路径逐份点名；散文提及不算，跨桶链接也不算。
+  it('does not satisfy nested materials by basename prose or another bucket link', () => {
     for (const path of ['research/tech-exploration/2026-10-08-same.md', '_archive/research/tech-exploration/2026-10-08-same.md']) put(path, '# Old research\n')
-    index('research', '../_archive/research/tech-exploration/2026-10-08-same.md')
+    put('research/tech-exploration/README.md', banner({ lines: ['- 2026-10-08-same.md（散文点名，不算链接）'] }))
+    put('_archive/research/tech-exploration/README.md', banner({ archive: '2026-10-09', lines: ['- 2026-10-08-same.md'] }))
+    put('research/README.md', '# Index\n\n[topic](<tech-exploration/README.md>)\n')
+    put('_archive/research/README.md', '# Index\n\n')
     put('_archive/README.md', '# Index\n\n2026-10-08-same.md\n')
-    put('_archive/research/README.md', '# Navigation\n\n[material](tech-exploration/2026-10-08-same.md)\n')
-    expect(check(root).filter(problem => problem.includes('未被'))).toHaveLength(2)
-    index('research', './tech-exploration/2026-10-08-same.md#old-research')
-    index('_archive/research', 'tech-exploration/2026-10-08-same.md')
+    const problems = check(root)
+    expect(problems.filter(problem => problem.includes('未被'))).toHaveLength(1)
+    expect(problems.filter(problem => problem.includes('未在题名页'))).toHaveLength(2)
+    // 修好两级链接（题名页点名材料 + 归档 shelf 索引点名题名页）后才绿。
+    put('research/tech-exploration/README.md', banner({ lines: ['- [same](2026-10-08-same.md)'] }))
+    put('_archive/research/tech-exploration/README.md', banner({ archive: '2026-10-09', lines: ['- [same](2026-10-08-same.md)'] }))
+    put('_archive/research/README.md', '# Index\n\n[topic](<tech-exploration/README.md>)\n')
     expect(check(root)).toEqual([])
+  })
+
+  // 2026-10-30（研究题模型）：题名页是形状锚——三行名头必须在；归档题名页另须归档日。
+  it('requires a research banner with its three header lines and the archive date', () => {
+    put('research/no-banner/2026-10-09-a.md', '---\ntopic: 技术\nintent: A.\n---\n')
+    put('research/missing-line/2026-10-09-b.md', '---\ntopic: 技术\nintent: B.\n---\n')
+    put('research/missing-line/README.md', '# Topic\n\n> 问题：q\n> 消费者：—\n\n## 材料\n\n- [b](2026-10-09-b.md)\n')
+    put('_archive/research/no-archive-date/2026-10-09-c.md', '---\ntopic: 技术\nintent: C.\n---\n')
+    put('_archive/research/no-archive-date/README.md', banner({ lines: ['- [c](2026-10-09-c.md)'] }))
+    put('_archive/research/README.md', '# Index\n\n[no-archive-date](<no-archive-date/README.md>)\n')
+    const problems = check(root).join('\n')
+    expect(problems).toContain('_backlog/research/no-banner/README.md 缺题名页')
+    expect(problems).toContain('_backlog/research/missing-line/README.md:1 缺「> 产出的卡：」行')
+    expect(problems).toContain('_backlog/_archive/research/no-archive-date/README.md:1 缺「> 归档：YYYY-MM-DD」行')
+  })
+
+  // 2026-10-30：shelf 根只放索引；散件会让"研究题"这个概念失效。
+  it('keeps the research shelf root free of flat material and links the banner', () => {
+    put('research/2026-10-09-loose.md', '---\ntopic: 技术\nintent: Loose.\n---\n')
+    put('research/topic/2026-10-09-inside.md', '---\ntopic: 技术\nintent: Inside.\n---\n')
+    put('research/topic/README.md', banner({ lines: ['- [inside](2026-10-09-inside.md)'] }))
+    index('research', 'topic/2026-10-09-inside.md')
+    const problems = check(root).join('\n')
+    expect(problems).toContain('平铺在 shelf 根')
+    expect(problems).toContain('_backlog/research/topic/README.md 未被 research/README.md 索引链接点名')
   })
 
   it('requires the owner index and enforces research metadata from the effective date', () => {
     put('research/upstream/2026-10-09-demo.md', '# Missing new head\n')
-    put('research/upstream/README.md', '# Index\n\n[demo](2026-10-09-demo.md)\n')
+    put('research/upstream/README.md', banner({ lines: ['- [demo](2026-10-09-demo.md)'] }))
+    index('research', 'upstream/README.md')
     expect(check(root).join('\n')).toContain('缺 frontmatter')
-    expect(check(root).join('\n')).toContain('未被 research/README.md')
-    index('research', 'upstream/2026-10-09-demo.md')
     put('research/upstream/2026-10-09-demo.md', '---\ntopic: 技术\nintent: |\n  Line one\n  Line two\n---\n')
     expect(check(root).join('\n')).toContain('topic 应与子目录匹配')
     expect(check(root).join('\n')).toContain('单行非空 intent')

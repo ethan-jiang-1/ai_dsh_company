@@ -54,6 +54,7 @@
 | D47 | backlog→notes 交接契约：用户是队列；notes 不是收件箱；卡顶结论/去向为记录家；关闭以结论确认为准 | [handoff-contract](../notes/implemented/2026-10-25-backlog-notes-handoff-contract.md) |
 | D48 | 目录独立启动 = 隔离 home + 自建 web profile + copy 骨架；入口 `pnpm standalone`；不承诺预构建/跨 OS | [standalone-deployment](../notes/archived/2026-10-25-standalone-deployment.md) |
 | D49 | notes 长期治理：取代门禁 + 收据层 + 机械审计；收敛证据随归档件 | [governance](../notes/implemented/2026-10-30-notes-consistency-governance.md) · [converge-evidence](../notes/implemented/2026-10-30-converge-evidence-home.md) |
+| D50 | 研究按研究题组织：题目录 + 题名页（问题/消费者/产出的卡/材料）；双索引一题一行；`backlog-liveness` 两级校验 | [_backlog/research](../_backlog/research/README.md) · [research-topics Note](../notes/implemented/2026-10-30-backlog-research-topics.md) |
 
 ### 待定与活动提案
 

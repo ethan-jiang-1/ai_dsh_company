@@ -107,7 +107,7 @@ node /Users/bowhead/ai_dsh_company/node_modules/vitest/vitest.mjs run packages/e
 
 | 历史材料 | 可保留 | 不能继承的判断 |
 |---|---|---|
-| [旧走查](../2026-10-04-multi-user-ux-walk.md) | 一次交错里盲写被拒、重读追加，两行俱全 | “多次采样=全排列证明”；没 barrier、没完整独立 oracle 的采样只能增加观察 |
+| [旧走查](../multi-user-ux/2026-10-04-multi-user-ux-walk.md) | 一次交错里盲写被拒、重读追加，两行俱全 | “多次采样=全排列证明”；没 barrier、没完整独立 oracle 的采样只能增加观察 |
 | [C系毕业卡](../../settled_issues/2026-10-04-multi-user-concurrency-bdd.md) | C1–C7 是有用的待验行为类别 | “C1–C7 内建够”；C2 retry-success 对 owner 占用不成立；C4 从同时读改成终态六行丢失原验收性质 |
 | [跨进程毕业方案](../../settled_issues/2026-10-04-cross-process-shared-disk.md) | 一个写服务、task scope 提示、审计分层可减风险 | “丢更新机制上无法静默发生”过强：重读后完整覆盖仍合法，task owner 也不拦写；多人 root 无共同 Team |
 | [R0落地 Note](../../../../notes/archived/2026-10-03-redis-r0-native-collab.md) | 手册声明 freshness≠独占、引用版号审计、出厂变更卡边界 | E1全绿不是所有安全性质成立；占位是可观察声明，不是逻辑任务原子抢占 |

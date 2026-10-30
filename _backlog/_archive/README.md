@@ -8,7 +8,7 @@
 | [suspended_issues/](suspended_issues/README.md) | 推敲被用户叫停，尚无结论 |
 | [fixed_bugs/](fixed_bugs/README.md) | 已修复缺陷；编号权威在其 README |
 | [suspended_bugs/](suspended_bugs/README.md) | 查明但尚未修复的缺陷 |
-| [research/](research/README.md) | 材料随最后一张活卡离开 |
+| [research/](research/README.md) | 归档研究题：题名页 + 一题一行索引；随最后一张活卡整目录迁入 |
 | [legacy/](legacy/README.md) | 退役历史池，只按历史引用读取，不再收新件 |
 
 ## 已关闭问题
@@ -75,14 +75,9 @@
 | [2026-10-19-ledger-ux-deep-dive.md](settled_issues/2026-10-19-ledger-ux-deep-dive.md) | 已结（40 行 = parseMotionLedger 真文件；全文入口 16/27；刷新 30s；人读 60s/5 步/复述难/总体还行 → 接受） | 2026-10-19 |
 | [2026-10-24-run-bundle-clean-base.md](settled_issues/2026-10-24-run-bundle-clean-base.md) | 已实施并交付（run bundle = 安装单元：bundle.json + 整盘去 tracked + 哈希升级 + 0.3.0 分发；证据 = implemented Note） | 2026-10-24 |
 | [2026-10-19-deliverables-ledger.md](settled_issues/2026-10-19-deliverables-ledger.md) | 已结（成品目录 = 生成索引 kb/deliverables-index.json + 只读第 9 页签；44 份/活跃 5/归档 39/台账外 5；present 审计仍归 deliverables-check） | 2026-10-19 |
-
-## 研究
-
-- [repo-hygiene/2026-10-27-six-dimension-audit-round3.md](research/repo-hygiene/2026-10-27-six-dimension-audit-round3.md) — 第三轮六维度审计（六维判定 + R3-01…26 + 实跑读数）；服务卡 = 上面的 2026-10-27 已结卡。
-- [repo-hygiene/2026-10-28-six-dimension-audit-round4.md](research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md) — 第四轮六维审计（初评 B/B/B/B/B/C + R4-01…22 + 收口复评 A-）；服务卡 = 上面的 2026-10-28 已结卡。
-- [run-bundle/2026-10-24-run-bundle-boundary.md](research/run-bundle/2026-10-24-run-bundle-boundary.md) — run bundle 现状排摸（安装实测 / 历史负担 / base-gown 分层 / 迁移面）；服务卡 = 上面的 2026-10-24 已结卡。
-- [notes-consistency/2026-10-30-triage.md](research/notes-consistency/2026-10-30-triage.md) — notes/ 2026-10-30 全树分诊（16 篇 archive + 21 篇收据、硬矛盾清单）；服务卡 = 无（治理轮报告）。
-- [notes-consistency/2026-10-30-receipts-digest.md](research/notes-consistency/2026-10-30-receipts-digest.md) — 21 篇收据的证据索引（演练 11 + R3/R4 批次 10；排除 2 篇误报）；原文已移入 notes/archived/receipts/。
+| [BUG-026-owner-missing-from-team-projection.md](settled_issues/BUG-026-owner-missing-from-team-projection.md) | 查明为**误报**（wire 视图 ownerName 273/273 齐全；卡读的是 projcache 的 state 行，而 state = `TeamTaskSnapshot`，本就不含 ownerName/ready）；失败类 = 读盘上存了什么 ≠ 读消费者那一层 | 2026-10-19 |
+| [BUG-023-cultivation-float-actions-dead.md](settled_issues/BUG-023-cultivation-float-actions-dead.md) | 查明为**误报**（浮窗正常；真凶是探针跨轮复用 id 撞上遗留方法目录 + 诊断漏读行内原话）⇒ 修的是探针卫生 | 2026-10-18 |
+| [2026-10-17-cultivation-gui-actions.md](settled_issues/2026-10-17-cultivation-gui-actions.md) | 已实施；培养 GUI 行动面的 UX 推敲（时刻地图 / 输入清单把手审计 / 迭代框架 / 体验协议），去向 = 同名毕业 Note | 2026-10-17 |
 
 ## 已修缺陷
 
@@ -119,30 +114,6 @@
 | [BUG-033-revoke-recovery-body-edit-loss.md](fixed_bugs/BUG-033-revoke-recovery-body-edit-loss.md) | revoke 恢复把“已撤销 + 用户后改正文”回滚成旧全文：journal 目标态 + 第三态 conflict | 2026-10-27 |
 | [BUG-032-r3-rerecord-not-replayable.md](fixed_bugs/BUG-032-r3-rerecord-not-replayable.md) | r3 重录不可重放（委派通知到达竞态）：`--record` 自检 + ≤3 次重录；失败保留现场 | 2026-10-23 |
 | [BUG-031-orient-scenario-children-file-shape.md](fixed_bugs/BUG-031-orient-scenario-children-file-shape.md) | orient --scenario 对 children 文件形状 ENOTDIR 崩：statSync 分流（文件计 1 / 目录数 .jsonl） | 2026-10-20 |
-
-## 随卡归档的研究
-
-| 文件 | 曾服务于 | 日期 |
-|---|---|---|
-| [2026-10-04-multi-user-ux-walk.md](research/2026-10-04-multi-user-ux-walk.md) | 多用户 BDD 两张卡的走查与能力盘点 | 2026-10-04 |
-| [2026-10-09-teamagent-locks-and-acceptance-audit.md](research/collaboration/2026-10-09-teamagent-locks-and-acceptance-audit.md) | 协作安全卡＋BUG-007 的机制边界、旧落地断点与验收复核 | 2026-10-10 |
-| [2026-10-09-deterministic-write-conflict-seam.md](research/collaboration/2026-10-09-deterministic-write-conflict-seam.md) | 协作安全卡＋BUG-007 的确定性同版本竞写与合并 | 2026-10-10 |
-| [2026-10-09-member-stale-write-acceptance.md](research/collaboration/2026-10-09-member-stale-write-acceptance.md) | BUG-007＋协作安全卡的成员 stale 拒写闭环 | 2026-10-10 |
-| [2026-10-09-team-read-barrier-seam.md](research/collaboration/2026-10-09-team-read-barrier-seam.md) | BUG-007＋协作安全卡的 post-execute 屏障接入点与限制 | 2026-10-10 |
-| [2026-10-09-team-read-barrier-acceptance.md](research/collaboration/2026-10-09-team-read-barrier-acceptance.md) | BUG-007＋协作安全卡的双成员同轮放行与冲突恢复验收 | 2026-10-10 |
-| [backlog-ux/2026-10-19-issue-card-audit.md](research/backlog-ux/2026-10-19-issue-card-audit.md) | 已结质量卡＋四张公司面卡：卡面当前态/陈旧引用审计（2026-10-21 自活跃 research 随卡归档） | 2026-10-19 |
-| [company-panels-ux/2026-10-19-panel-inventory-and-priority.md](research/company-panels-ux/2026-10-19-panel-inventory-and-priority.md) | 已结公司面优先级卡：面板数据量/痛点与 Top 3 依据（⚠ §二/§四/§五已被真相复核订正） | 2026-10-19 |
-| [company-panels-ux/2026-10-19-panel-truth-audit.md](research/company-panels-ux/2026-10-19-panel-truth-audit.md) | 同一父卡＋三张深挖卡＋BUG-025/026/027：面板真实数据面复核（⚠ §三 取法已证伪——读的是 projcache state 而非 wire 视图） | 2026-10-19 |
-| [repo-hygiene/2026-10-20-fresh-agent-audit.md](research/repo-hygiene/2026-10-20-fresh-agent-audit.md) | 已结卫生审计卡：第一轮六轴证据、腐化账本与 A–D 分批修复建议 | 2026-10-20 |
-| [repo-hygiene/2026-10-20-followup-six-dimension-audit.md](research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md) | 同一卡第二轮：上轮修复复核全守住 + 新发现（replay 实际 1/10、BUG A/C）+ P0–P4 改善清单 | 2026-10-20 |
-| [2026-10-10-claim-loser-yield-acceptance.md](research/collaboration/2026-10-10-claim-loser-yield-acceptance.md) | 协作安全卡裁4 的认领让位行为对照 | 2026-10-10 |
-| [2026-10-12-assembly-evidence.md](research/ceo-minimal-assembly/2026-10-12-assembly-evidence.md) | 组队健壮性卡的证据基线（触点盘点/17 场全景/失败链/andon 与 RACI） | 2026-10-12 |
-| [2026-10-13-cultivation-design.md](research/agent-cultivation/2026-10-13-cultivation-design.md) | 培养卡的产品研究：对象、关系、用户路径和 A/B/C/D 候选取舍 | 2026-10-13 |
-| [2026-10-13-dsh-capabilities.md](research/agent-cultivation/2026-10-13-dsh-capabilities.md) | 培养卡的钉版 DSH 能力边界与待探针事项 | 2026-10-13 |
-| [2026-10-13-external-patterns.md](research/agent-cultivation/2026-10-13-external-patterns.md) | 培养卡的外部一手实践（记忆/教学/评估与反证） | 2026-10-13 |
-| [2026-10-17-cultivation-gui-actions.md](settled_issues/2026-10-17-cultivation-gui-actions.md) | 培养 GUI 行动面的 UX 推敲（时刻地图/输入清单把手审计/迭代框架/体验协议）——已实施，去向 = 同名毕业 Note | 2026-10-17 |
-| [BUG-023-cultivation-float-actions-dead.md](settled_issues/BUG-023-cultivation-float-actions-dead.md) | 培养面板浮窗"点了没反应"= **误报**（浮窗正常；真凶是探针跨轮复用 id 撞上遗留方法目录 + 诊断漏读行内原话）⇒ 修的是探针卫生 | 2026-10-18 |
-| [BUG-026-owner-missing-from-team-projection.md](settled_issues/BUG-026-owner-missing-from-team-projection.md) | owner「全线缺失」= **误报**（wire 视图 ownerName 273/273 齐全；卡读的是 projcache 的 **state** 行，而 state = `TeamTaskSnapshot`，本就不含 ownerName/ready）⇒ 失败类 = 读盘上存了什么 ≠ 读消费者那一层 | 2026-10-19 |
 
 ## 暂停卡
 

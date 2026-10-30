@@ -76,7 +76,7 @@ opened: 2026-10-09
 - 同一 fs-local 实例能拒旧版本写；不能阻止“重读后合法覆盖别人工作”的语义冲突。
 - 旧多进程替换探针观察到20/20双成功覆盖；其GO按各worker到场放行、没有核对双方version，不能称严格同版本认证。新文件createIfAbsent观察到20/20一胜一拒，钉住实现用hard-link no-replace，两条路径不可混说；仪器局限见确定性交错研究。
 - writeScopes 是提示，不是锁或写权限；占位在不同角色文件中，没有共同原子认领点。
-- [历史研究](../research/2026-10-04-multi-user-ux-walk.md)的单次追加收敛有参考价值，但“多次采样=全排列证明”不成立；[旧毕业卡](2026-10-04-cross-process-shared-disk.md)“丢更新机制上无法静默发生”超出 freshness guard 的保证。
+- [历史研究](../research/multi-user-ux/2026-10-04-multi-user-ux-walk.md)的单次追加收敛有参考价值，但“多次采样=全排列证明”不成立；[旧毕业卡](2026-10-04-cross-process-shared-disk.md)“丢更新机制上无法静默发生”超出 freshness guard 的保证。
 
 ## 方案与取舍
 

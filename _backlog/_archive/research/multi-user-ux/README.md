@@ -1,0 +1,12 @@
+# multi-user-ux：多用户全交互走查与并发能力盘点
+
+> 问题：多人同时使用公司面时，问询、审批、成员投递与并发写这些真实交互在人机两侧各是什么样；一次走查能证明什么、不能证明什么？
+> 消费者：[2026-10-04 多用户并发 BDD](../../settled_issues/2026-10-04-multi-user-concurrency-bdd.md)、[2026-10-04 人机合一 UX BDD](../../settled_issues/2026-10-04-human-agent-unity-ux-bdd.md)；另被 [2026-10-09 协作安全验收](../../settled_issues/2026-10-09-collaboration-safety-acceptance.md) 引为历史研究
+> 产出的卡：—
+> 归档：2026-10-09（原平铺于 `_archive/research/` 根；2026-10-30 归入题目录）
+
+## 材料
+
+| 文件 | 作用 | 日期 |
+|---|---|---|
+| [2026-10-04-multi-user-ux-walk.md](2026-10-04-multi-user-ux-walk.md) | 人机合一全旅程实录 + 并发观察；截图与走查仪器在仓外 | 2026-10-04 |

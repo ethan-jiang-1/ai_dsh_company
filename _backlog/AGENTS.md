@@ -8,7 +8,7 @@
 |---|---|
 | [issues/](issues/README.md) | 还没结束的问题卡（推敲层，不是任务源） |
 | [bugs/](bugs/README.md) | 这次不修的缺陷卡（修复工作项） |
-| [research/](research/README.md) | 服务于活卡的长证据（随末张活卡归档） |
+| [research/](research/README.md) | 研究题（目录 + 题名页）；随末张活卡整目录归档 |
 | [methods/](methods/README.md) | 走卡方法（常驻 SOP，不归档） |
 | [_archive/](_archive/README.md) | 离开活跃区的卡（默认不读，点名才开） |
 

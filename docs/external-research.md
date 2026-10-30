@@ -3,9 +3,9 @@
 > 性质：导航/参考——repo 外研究材料的登记与吸收落点。当前文档地图 = [index.md](./index.md)；
 > 本页不承载合同事实，只回答「哪个外部想法落到了哪里」。研究树 HEAD 持续演进，引用以注册行为准、不追新提交。
 
-本 repo 的形态与机制结论借鉴七处 repo 外材料（前三处在维护者本机的 vendor 研究树内、
+本 repo 的形态与机制结论借鉴八处 repo 外材料（前三处在维护者本机的 vendor 研究树内、
 已被其 git 跟踪；其余为独立外部仓；均不在本 repo 版本控制范围，引用时注明是外部研究材料）：
-`_faq_on_digested/`、`_digested/`、`_dsh_plugin_agent_ready_development/`、外部仓 ai_deerflow_deep_research_v2（`_backlog` 借鉴源，D31）、外部仓 ai_dsh_loop_advisor/_backlog（D31 制度演进宿主，D33 回借源）、外部仓 ai_dsh_assitant/notes（notes/ 分类 owner 精神借源，D35）、外部仓 ai_dsh_assitant/_backlog（`_backlog` 现行制度整体借源，2026-10-09 重立——路由见 D31 行）。各材料的版本核对与其"想法落在哪儿"见下表；研究树 HEAD 持续演进，引用以注册行为准、不追新提交。**思想吸收进本 repo 文档后，日常不再依赖原文**；下表是"哪个想法落在了哪儿"的地图：
+`_faq_on_digested/`、`_digested/`、`_dsh_plugin_agent_ready_development/`、外部仓 ai_deerflow_deep_research_v2（`_backlog` 借鉴源，D31）、外部仓 ai_dsh_loop_advisor/_backlog（D31 制度演进宿主，D33 回借源）、外部仓 ai_dsh_assitant/notes（notes/ 分类 owner 精神借源，D35）、外部仓 ai_dsh_assitant/_backlog（`_backlog` 现行制度整体借源，2026-10-09 重立——路由见 D31 行）、外部仓 ai_dsh_deep_research/_backlog（研究题/题名页模型借源，2026-10-30 当日态——D50）。各材料的版本核对与其"想法落在哪儿"见下表；研究树 HEAD 持续演进，引用以注册行为准、不追新提交。**思想吸收进本 repo 文档后，日常不再依赖原文**；下表是"哪个想法落在了哪儿"的地图：
 
 | 材料 | 内容 | 吸收落点 |
 |---|---|---|
@@ -25,3 +25,4 @@
 | `_faq_on_digested/04/05/11/15`（4 目录） | 根入口文档静态/运行时设计 + 原生开发环 + loop 工程 vs SDD | 判定 = [archived/faq-04-05-11-15-judgment](../notes/archived/2026-09-28-faq-04-05-11-15-judgment.md)：立即借的九条已在现行合同（dev-loop 等），有压力再借的六条带触发条件；「防重复评估」节防重读全文 |
 | 外部仓 ai_dsh_loop_advisor 的 `_backlog`（独立外部仓，维护者本机；2026-10-03 当日态） | D31 制度的直系后代（本仓 → ai_dsh_architect → advisor，其间又借 ai_deerflow_dr_v3 主干框架）：四门/主干框架/三条硬规则/章程账本二分/搁置池新纪律（搁置 = 队列决定，agent 不得自行判搁置）/索引交叉核对门禁/随卡归档的 reference/ | 章制回借（D33）：主干框架与硬规则、章程账本二分、backlog-liveness 升格、两桶解禁、全日期卡名；判定与不借边界 = [archived/2026-10-03-backlog-charter-refit](../notes/archived/2026-10-03-backlog-charter-refit.md) |
 | 外部仓 ai_dsh_assitant 的 `_backlog`（独立外部仓，维护者本机；2026-10-09 当日态） | 问题卡/缺陷卡/研究/按需方法/结论交接/触发索引的完整章制（第七处借源，D31/D33 前朝制度的后继） | `_backlog/` 现行制度整体重立：判定、适配与验证 = [archived/2026-10-09-backlog-issue-lifecycle](../notes/archived/2026-10-09-backlog-issue-lifecycle.md) |
+| 外部仓 ai_dsh_deep_research 的 `_backlog`（独立外部仓，维护者本机；2026-10-30 当日态） | 研究层形状：研究题 = 题目录 + 题名页（问题/消费者/产出的卡/材料）、双索引一题一行、归档补归档行、门禁只证形状（第八处借源） | [_backlog/research](../_backlog/research/README.md) 与 [_archive/research](../_backlog/_archive/research/README.md) 的题名页模型 + `backlog-liveness` 两级校验（D50）；判定与验证 = [2026-10-30-backlog-research-topics](../notes/implemented/2026-10-30-backlog-research-topics.md) |

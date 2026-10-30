@@ -19,6 +19,6 @@ import { backlogLivenessProblems } from '../../tools/lib/backlog-liveness.mjs'
 export function run({ root, ok, fail }) {
   const problems = backlogLivenessProblems(join(root, '_backlog'))
   problems.length === 0
-    ? ok('backlog-liveness（制度目录/README、卡头、关闭判断、method 形状、递归索引、归档做卡去向）')
+    ? ok('backlog-liveness（制度目录/README、卡头、关闭判断、method 形状、递归索引、研究题两级索引、归档做卡去向）')
     : fail('backlog-liveness', problems.join('；'))
 }

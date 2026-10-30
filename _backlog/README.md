@@ -41,7 +41,7 @@
 
 旧卡若已经承担实现后的终验，保留其原有未完成要求到验收完成，分别写清技术缺口与用户待确认项。这不是新卡等待下游实施才关闭的理由；“已实现”也不等于“已验收”。
 
-缺陷按 [缺陷规则](bugs/README.md) 处理：修好进 [已修缺陷](_archive/fixed_bugs/README.md)，查明未修进 [待修缺陷](_archive/suspended_bugs/README.md)。研究在最后一张使用它的活卡离开时随迁 [研究归档](_archive/research/README.md)。
+缺陷按 [缺陷规则](bugs/README.md) 处理：修好进 [已修缺陷](_archive/fixed_bugs/README.md)，查明未修进 [待修缺陷](_archive/suspended_bugs/README.md)。研究题在最后一张使用它的活卡离开时整目录随迁 [研究归档](_archive/research/README.md)。
 
 ## 双轨状态生命周期（2026-10-12 立）
 
@@ -87,7 +87,7 @@
 
 ## 文件与维护
 
-问题与研究文件用 `YYYY-MM-DD-<slug>.md`，缺陷用 `BUG-<NNN>-<slug>.md`。新问题/缺陷第一项 frontmatter 为 `status`，新研究第一项为 `topic`，具体模板见各目录 README；历史归档不批量回填字段。
+研究按研究题组织（细则见[调研](research/README.md)）；问题与研究材料文件用 `YYYY-MM-DD-<slug>.md`，缺陷用 `BUG-<NNN>-<slug>.md`。新问题/缺陷第一项 frontmatter 为 `status`，新研究材料第一项为 `topic`，具体模板见各目录 README；历史归档不批量回填字段。
 
 清单与目录保持一致，机械形状由 `pnpm verify` 检查（含状态行↔frontmatter 镜像互查与 `毕业：` 封闭头）；检查通过不证明问题结论正确或方法有效。章程只写制度，现值和条目进各目录清单。状态行带 🔒 的卡仅用户可判定触发，agent 只报告与建议。本区门牌 = [AGENTS.md](AGENTS.md)（薄：定位、走法、门票与枚举，随第一方文件操作自动注入；规则唯一家仍是本章程与各 README，门牌不复述事实）。
 
