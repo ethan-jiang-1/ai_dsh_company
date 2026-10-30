@@ -1,5 +1,5 @@
 /**
- * 培养背景纯形状的 keyless 判据（RFC notes/proposed/2026-10-23-cultivation-context.md，D1=A）。
+ * 培养背景纯形状的 keyless 判据（RFC 存档 notes/archived/2026-10-23-cultivation-context.md，D1=A）。
  *
  * 为什么单独立一条：命令 token 的编解码与 `contexts` 读模型是 client/host 共用面——
  * 编码错了 = 命令解析失败；解码太松 = 客户端能把摘录从侧门塞进记录（D1 的信任边界）。

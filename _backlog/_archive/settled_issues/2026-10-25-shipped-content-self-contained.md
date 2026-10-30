@@ -7,7 +7,7 @@ opened: 2026-10-25
 
 > 立卡：2026-10-25 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；去向 = `notes/implemented/2026-10-25-installed-shape-self-sufficient.md`（与卡 4 合并）
+> **结论/去向**：做；去向 = `notes/archived/2026-10-25-installed-shape-self-sufficient.md`（与卡 4 合并）
 
 **问题与期望结果：** 公司手册和角色 skill 是每个成员会话的注入内容，但里面大量引用维护者仓库的 `../docs/*`、`checks/`、`tools/`、`runtime/`、`snapshots/`。装到别人的 home 后这些路径不存在，角色会按不存在的指令行动。期望：新装公司在没有本仓库的机器上，注入内容里的每条指令都能执行，或明确标成“非注入的维护者附录”。
 
@@ -53,4 +53,4 @@ opened: 2026-10-25
 ## 裁决（2026-10-25）
 
 - Q2 = 不同公司各自部署。operator 动作优先产品化（卡 4 的 catalog/present）；其余维护者脚本引用改写成“操作员 runbook”，不再出现在注入内容里。
-- 去向：`notes/implemented/2026-10-25-installed-shape-self-sufficient.md`（与卡 4 合并）。
+- 去向：`notes/archived/2026-10-25-installed-shape-self-sufficient.md`（与卡 4 合并）。

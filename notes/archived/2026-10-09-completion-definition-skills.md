@@ -56,7 +56,7 @@ DSH 给的载体就是 skill：procedural memory，按上下文触发加载。
 - 每个 skill 的 Markdown 链接**全部可解析**（md-links 门禁扫描面已含 `.agents/skills`，见 2026-10-08 试点轮）。
 - **真入口证据**：起一次真会话，从会话 durable 日志的 `skill-catalog` 事件读 catalog——
   三个新名在场，catalog 从 14 条涨到 17 条。收据归档
-  [snapshots/probes/skill-catalog-definitions](../../snapshots/probes/skill-catalog-definitions/2026-10-09/README.md)。
+  该快照已随 2026-10-25 真实证据移出产品仓。
 - `pnpm verify` + `pnpm test` 全绿。
 
 ## 验证记录（2026-10-09 实施）

@@ -118,7 +118,7 @@ function scanInputOf(row) {
   const briefPath = join(dir, 'drafts/ceo.md')
   let briefDir = dir
   if (!existsSync(briefPath)) {
-    // 归档回退（2026-10-06 修）：轮末收敛把动议 git mv 进 deliverables-archive/<日期>-<slug>/——
+    // 归档回退（2026-10-06 修）：轮末收敛把动议移进 deliverables-archive/<日期>-<slug>/——
     // live 路径消失后打分腿即崩（红收据 = 修前全表跑「真盘动议无任务书」exit 1）。
     // 按尾缀 -<slug> 匹配归档目录；歧义（多日期同名）fail-loud 不猜。
     const archiveRoot = join(DELIVERABLES, '..', 'deliverables-archive')

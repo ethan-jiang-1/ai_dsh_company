@@ -1,5 +1,5 @@
 /**
- * 培养背景的纯形状与编解码（2026-10-23 背景卡 D1=A / D2=A；RFC = notes/proposed/2026-10-23-cultivation-context.md）。
+ * 培养背景的纯形状与编解码（2026-10-23 背景卡 D1=A / D2=A；RFC 存档 = notes/archived/2026-10-23-cultivation-context.md）。
  *
  * 两件事：
  * ① **命令**只带最小引用（`CultivationContextRef`）——摘录/标题/时间由 host 读后填，客户端不塞证据；

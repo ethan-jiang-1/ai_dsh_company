@@ -161,7 +161,8 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 **可选参考背景（2026-10-23）**：`/cultivation correct|suggest` 接受可选的
 `--context=<base64url(ref JSON)>`（GUI 培养面板发出；不带 flag 的旧语法逐字不变）。命令只带引用
 （session/成品 path + turn/address），**host 读后**把自包含 `contexts`（kind/ref/title/at/turn/excerpt/
-truncated）写进记录 frontmatter；客户端只做预览。有背景时正文可空（方法正文回落为期望句），无背景仍必填。
+truncated）写进记录 frontmatter；客户端只做预览。有背景或 `--work=` 时正文可空（方法正文回落为期望句）；
+两者都无仍必填。
 成品只认 `kb/deliverables-index.json` 条目；host 读不到就不落记录。背景随记录共享、相关角色可见；
 只取用户/助手文字（排除 tool/reasoning/checkpoint）。teammate 会话只做背景源：记录按 Lead（CEO）身份
 记账，成员继承 CEO 的方法层——指向成员名的 suggest 改不到该成员。机制判据 =

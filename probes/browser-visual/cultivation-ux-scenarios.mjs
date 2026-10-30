@@ -54,7 +54,7 @@ const SHOT_DIR = join(OUT_DIR, 'ux-scenarios')
 //   看起来就像"按钮点了没反应"——2026-10-18 BUG-023 假阳性就是这么来的）。唯一 id + 收尾清理双保险。
 const TOKEN = Math.random().toString(36).slice(2, 6)
 const P = `uxsc-${STAMP}-${TOKEN}`
-const COPY = { adopt: '采纳', reject: '拒绝', rejectConfirm: '确认拒绝', verifyPass: '这条有用', composeSuggest: '给别的角色提建议', submit: '记下来' }
+const COPY = { adopt: '采纳', reject: '拒绝', rejectConfirm: '确认拒绝', verifyPass: '这条有用', composeOpen: '开始记录一项工作', submit: '记下来' }
 
 let home
 try {
@@ -386,11 +386,11 @@ try {
   await check('S5 跨角色流向：建议只进「我提交的」、不进「需要我处理」', async () => {
     if (role !== 'ceo') { notes.push('S5 跳过：当前会话角色不是 ceo（跨角色建议的提出者需为 ceo 才有代表性）'); return }
     const expectation = `UX场景：给 CFO 的建议 ${STAMP}`
-    await page.getByRole('button', { name: COPY.composeSuggest, exact: true }).click()
+    await page.getByRole('button', { name: COPY.composeOpen, exact: true }).click()
     await sleep(600)
     await page.getByRole('button', { name: 'CFO', exact: true }).click()
     await page.getByLabel('期望它怎么做（一句话）').fill(expectation)
-    await page.locator('textarea').fill('做法：测算先列假设口径。')
+    await page.getByRole('textbox', { name: /做法与证据/ }).fill('做法：测算先列假设口径。')
     await page.getByRole('button', { name: COPY.submit, exact: true }).click()
     const deadline = Date.now() + 20_000
     let found = null
@@ -911,6 +911,8 @@ try {
     const row = page.getByRole('listitem', { name: `方法 ${slug}` })
     await row.waitFor({ timeout: 25_000 }).catch(() => { throw new Error('已采纳记录没出现在方法列表') })
     await row.getByRole('button', { name: '没起作用', exact: true }).click()
+    await row.getByLabel('后续相似工作的具体情况').fill('UX场景：新的相似工作仍未列出关键假设。')
+    await row.getByRole('button', { name: '记录失败观察', exact: true }).click()
     const deadline = Date.now() + 25_000
     let text = ''
     while (Date.now() < deadline) {
@@ -1030,7 +1032,7 @@ try {
     }
     if (/我的分身：(ptc|standard)/.test(text)) throw new Error('把非名册 preset 当成角色显示了（我的分身：ptc）')
     if (await page.getByRole('button', { name: COPY.adopt, exact: true }).count() > 0) throw new Error('无角色会话里仍给了「采纳」按钮（死按钮）')
-    if (await page.getByRole('button', { name: COPY.composeSuggest, exact: true }).count() > 0) throw new Error('无角色会话里仍给了创作入口（点了也发不出）')
+    if (await page.getByRole('button', { name: COPY.composeOpen, exact: true }).count() > 0) throw new Error('无角色会话里仍给了创作入口（点了也发不出）')
   })
 
   // S7 把会话切成了非公司 preset ⇒ **收尾必须还原**（会话 preset 是持久的，否则下一个探针/下一轮全崩——

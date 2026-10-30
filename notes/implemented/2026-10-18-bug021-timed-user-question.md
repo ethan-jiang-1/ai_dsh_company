@@ -49,7 +49,7 @@ args:   { "agentId": "<SessionId>", "callId": "<toolCallId>",
 **归因纪律（本次两条红分开归因，不混为"漂移"）**：① 我这次的有意变更 = tool schema；② **既有漂移**（非本轮引入）=
 公司手册 2026-10-16 新增两节早于夹具，两处注入体的**正文 + `source.digest`** 同步到当前值——硬证 = 现场解压日志里的
 注入体与当前 `company-workspace/AGENTS.md` **逐字节一致**（digest 取现场同值）。台账记于
-`snapshots/replay/r3-delegation/snapshot.yml`（2026-10-18 条）。
+r3 回放场景的 snapshot.yml（2026-10-18 条；该场景已随真实证据移出产品仓，2026-10-25）。
 
 ## 真模型验收（2026-10-18 补跑；探针 = `probes/session-context/ask-user-timed-probe.mjs`）
 
@@ -76,4 +76,4 @@ args:   { "agentId": "<SessionId>", "callId": "<toolCallId>",
 
 - 卡（现场/两轮深挖/修法候选与输掉的方案）=[BUG-021（已归档）](../../_backlog/_archive/fixed_bugs/BUG-021-ask-user-question-no-scripted-answer-path.md)
 - 文档面：[web-rpc.md](../../docs/guides/web-rpc.md)（口径改正 + 本 Note 指针）
-- 组合面：[preset 合同](../../docs/presets.md)；回放金样台账 [snapshot.yml](../../snapshots/replay/r3-delegation/snapshot.yml)
+- 组合面：[preset 合同](../../docs/presets.md)；回放金样台账 r3 回放场景的 snapshot.yml（已移出产品仓）

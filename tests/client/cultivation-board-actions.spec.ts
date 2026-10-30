@@ -214,7 +214,7 @@ describe('治理动作：点一下就发出对那条记录的命令（S2）', ()
     expect(container.textContent).toContain('请选择负责的角色')
     expect(container.textContent, '不该把非名册 preset 当成角色显示').not.toContain('我的分身：ptc')
     expect(button(container, CULTIVATION_COPY.adopt)).toBeNull()
-    expect(button(container, CULTIVATION_COPY.composeCorrect)).toBeNull()
+    expect(button(container, '给你的角色留一条方法')).toBeNull()
   })
 
   it('没注入动作面（命令面缺席）⇒ 退回只读：给命令原文，不给死按钮', () => {
@@ -230,7 +230,7 @@ describe('创作面：不看说明也能提交一条（S5，判据 ①/G1；2026
     const { container } = mount({ actions, viewerRole: 'ceo', viewerLabel: 'CEO' })
 
     expect(button(container, CULTIVATION_COPY.composeOpen), '主任务应是单一开始动作').not.toBeNull()
-    expect(button(container, CULTIVATION_COPY.composeCorrect), '不应再有纠正/建议二选一').toBeNull()
+    expect(button(container, '给你的角色留一条方法'), '不应再有纠正/建议二选一').toBeNull()
     await startComposition(container)
 
     const inputs = container.querySelectorAll('input')

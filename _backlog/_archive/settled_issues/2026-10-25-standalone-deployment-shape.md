@@ -7,7 +7,7 @@ opened: 2026-10-25
 
 > 立卡：2026-10-25 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；去向 = `notes/implemented/2026-10-25-standalone-deployment.md`（与卡 6 合并）
+> **结论/去向**：做；去向 = `notes/archived/2026-10-25-standalone-deployment.md`（与卡 6 合并）
 
 **问题与期望结果：** 现在只有维护者的 dev 形状：`source run/env.sh` 强制仓库内 home/workspace、link profile；换目录、换机器、换 home 都要手工修。期望：从干净目录 + 干净 home 一条受支持的入口起 web，五角色出现、可建会话；可迁移、可清理、前置可检，不依赖 `~/.dsh` 和维护者状态。
 
@@ -57,4 +57,4 @@ opened: 2026-10-25
 
 - Q1 = A+C（源码直跑 + 隔离 home）；B 作可迁移性验收；D 不做。
 - Q4 = 本机 clean-room 必做；CI 至少一个 OS（预算允许）；容器级只对具体目标环境做一次。
-- 去向：`notes/implemented/2026-10-25-standalone-deployment.md`（与卡 6 合并）。
+- 去向：`notes/archived/2026-10-25-standalone-deployment.md`（与卡 6 合并）。

@@ -23,3 +23,5 @@
 - UI 金样的唯一更新入口 = `node checks/smoke/ui-scene-smoke.mjs --isolated --refresh-golden`（手改金样 = 让回归网失真）。
 - UI 金样的隔离场景预置 `home/storages/workspace.json`（`defaultWorkspaceId` → 公司盘）+ pack 骨架 + 空成品索引/records；**不读用户 OS Documents 下的默认 workspace**。
 - 证据的现行家 = 部署仓/run bundle（`runtime/backups/` 只作本机迁移副本，不进 git）。
+- **收敛证据不落这里**（2026-10-30 起）：journal 副本随交付物进 `deliverables-archive/<目录>/journal/`；
+  `converge` 不再写 `snapshots/archive`。本目录只收合成场景。

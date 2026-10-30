@@ -2,6 +2,10 @@
 
 状态：已交付（2026-10-24；用户令「那就 setup goal 来都弄好吧」，按 [问题卡](../../_backlog/_archive/settled_issues/2026-10-24-run-bundle-clean-base.md) 的建议推进；RFC 正文已并入本篇）。
 
+> **2026-10-27 部分取代（备份口径）**：备份分两档——业务盘（盘 + `bundle.json` + domain 账本 + 方法层）与
+> 完整 home（含凭据）；“整个 home = bundle、排除凭据”是当时口径，已由
+> [data-model-alignment](./2026-10-27-data-model-alignment.md) §5 与 [data-model](../../docs/data-model.md) 取代。
+
 > 来源：问题卡（已归档）+ [研究稿](../../_backlog/_archive/research/run-bundle/2026-10-24-run-bundle-boundary.md)。
 > 一句话：把“产品源码”和“一个正在运行的部署”拆开——产品仓只留基部；每次安装产生一个独立、
 > 可识别、默认干净的 run bundle；用户在自己的 bundle 里培养扩张能力。
@@ -51,7 +55,7 @@
   `handbook-budget` / `doc-budget` / `bare-path` 改读 pack 骨架；`ledger-participation` 在无 dev bundle 时
   如实跳过；`security-scan` 扫描面改 pack 出厂骨架；`dist-manual` 扩内容断言。
 - **dev 入口**：[`tools/bundle-init.mjs`](../../tools/bundle-init.mjs)（`pnpm bundle:init`；已有盘一个字节不动；
-  制度件 8 处符号链接指回 pack）；[`run/env.sh`](../../run/env.sh) 导出 `DSH_COMPANY_HOME` 并在缺盘时提示。
+  制度件 3 处符号链接指回 pack（`AGENTS.md` / `templates` / `kb/org.md`），5 份 CHARTER 是基部实文件）；[`run/env.sh`](../../run/env.sh) 导出 `DSH_COMPANY_HOME` 并在缺盘时提示。
 - **分发**：[`tools/export-dist.mjs`](../../tools/export-dist.mjs) 手册重写 + 清单加
   `workspace/AGENTS.md`/`kb/org.md`/`kb/owners.md` 与禁项（不允许 `company-workspace|sessions|deliverables|cultivation|profiles|credentials`）。
 - **安装冒烟**：[`checks/smoke/release-smoke.mjs`](../../checks/smoke/release-smoke.mjs) ⑥ 新增

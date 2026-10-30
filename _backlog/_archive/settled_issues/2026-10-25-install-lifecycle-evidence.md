@@ -7,7 +7,7 @@ opened: 2026-10-25
 
 > 立卡：2026-10-25 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；去向 = `notes/implemented/2026-10-25-distribution-lifecycle.md`（与卡 1 合并）
+> **结论/去向**：做；去向 = `notes/archived/2026-10-25-distribution-lifecycle.md`（与卡 1 合并）
 
 **问题与期望结果：** 手册承诺“升级只动没改过的基部、改过的保留并点名；卸载不动数据；备份/迁移连 home 一起搬”。现在只有首启/二启的真安装证据，升级只有单测、卸载与迁移没有证据。期望：用真 tarball 把这三条承诺跑成可复现的 keyless 检查。
 
@@ -53,4 +53,4 @@ opened: 2026-10-25
 ## 裁决（2026-10-25）
 
 - 按卡 1 的版本/回滚语义实施；v1/v2 夹具只落 `runtime/` 临时区，不进 git；升级日志断言保留清单。
-- 去向：`notes/implemented/2026-10-25-distribution-lifecycle.md`。
+- 去向：`notes/archived/2026-10-25-distribution-lifecycle.md`。

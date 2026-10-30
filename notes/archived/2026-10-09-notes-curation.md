@@ -14,7 +14,7 @@
 吸收进留下的家，不另开第二本：D11 的否决进
 [roadmap-retirement](../archived/2026-09-28-roadmap-retirement.md)；在场板「不自建 Remote / 不用 paceMs」进
 [org-presence-board](../archived/2026-09-22-org-presence-board.md)；培养的三条否决进
-[twin-cultivation](./2026-09-24-twin-cultivation.md)（「新会话才生效」已被该 Note 证伪，不带走）；
+[twin-cultivation](../implemented/2026-09-24-twin-cultivation.md)（「新会话才生效」已被该 Note 证伪，不带走）；
 D15 压成短决定，文献不留；语料加强轮的「零增量」并进
 [plugin-corpus-realignment](./2026-10-07-plugin-corpus-realignment.md)。
 台账路由改到现行家（D10 → `docs/AGENTS.md`，D11/D23 → 退役 Note，D12 → dev-loop §4，D13 → 根 AGENTS.md）。

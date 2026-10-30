@@ -7,7 +7,7 @@ opened: 2026-10-25
 
 > 立卡：2026-10-25 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；去向 = `notes/implemented/2026-10-25-installed-shape-self-sufficient.md`（与卡 3 合并）
+> **结论/去向**：做；去向 = `notes/archived/2026-10-25-installed-shape-self-sufficient.md`（与卡 3 合并）
 
 **问题与期望结果：** 成品页签读 `kb/deliverables-index.json`，但生成器是仓库工具 `tools/deliverables-index.mjs`，不在 tarball 里；新装公司的页签永久报“维护者运行 node tools/...”。期望：安装后的成品闭环可用——空态清楚、新增/`present` 后能刷新、审计状态有明确来源（或明确“未审计”降级）。
 
@@ -54,4 +54,4 @@ opened: 2026-10-25
 ## 裁决（2026-10-25）
 
 - 产品化：host 侧生成 catalog + present 投影；完整 `deliverables-check` 平移不做（第二阶段）；未核条目标 `presented: null`，不冒充已 present。
-- 去向：`notes/implemented/2026-10-25-installed-shape-self-sufficient.md`。
+- 去向：`notes/archived/2026-10-25-installed-shape-self-sufficient.md`。

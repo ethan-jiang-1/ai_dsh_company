@@ -7,7 +7,7 @@ opened: 2026-10-28
 
 > 立卡：2026-10-28 ｜ 状态：已结 ｜ 类型：任务 ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：A–E 全批落地 + 六维复评 D1–D6 = A-；去向 = 12 篇 implemented Note（A/B/C/D/E1–E6/D6 + P3 follow-up）与第四节复评。P3 四项已于 follow-up 清零（[Note](../../../notes/implemented/2026-10-28-r4-p3-followup.md)）。
+> **结论/去向**：A–E 全批落地 + 六维复评 D1–D6 = A-；去向 = 12 篇 implemented Note（A/B/C/D/E1–E6/D6 + P3 follow-up）与第四节复评。P3 四项已于 follow-up 清零（[Note](../../../notes/archived/receipts/2026-10-28-r4-p3-followup.md)）。
 
 **问题与期望结果：** 距第三轮打扫（2026-10-27）只隔一天，但同日收口的“六维提分”把 D1/D4/D5 自评到 A-，并声称 0.3.15 已清理失效引用。用户要求以 fresh agent 视角重新评估六维、把问题挖透、再决定持续改善的批次。期望结果 = 带一手证据的六维复评、分级问题清单、可分批实施的改善方案；本轮推敲完成 = 用户 REVIEW 选批并把批次写进本卡。
 
@@ -27,7 +27,7 @@ opened: 2026-10-28
 - 批 D（用户可见面补测）与批 E（拆巨人/收家）的取舍与顺序。
 - UI 症状捕获走哪条：只修金样稳定性 / 加 `cdp-probe --attach <devtools-port>` 接用户正在跑的页面 / 再加 `--steps` 交互脚本。
 
-**下一步：** 用户已于 2026-10-28 批全批（A–E），按批落 commit + Note；每批跑对应真检查。批 A 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-a-truth.md)），批 B 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-b-ui-lane.md)），批 C 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-c-diagnose.md)），批 D 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-d-tests.md)），批 E1 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-e1-helpers.md)），批 E2 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-e2-handler.md)），批 E3 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-e3-host-apply.md)），批 E4 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-e4-board.md)），批 E5 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-e5-disclosure.md)），批 E6 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-e6-client-apply.md)），D6 客户端错误通道 + observer 接线已落（[Note](../../../notes/implemented/2026-10-28-r4-d6-client-errors.md)）；P3 四项已清零（[Note](../../../notes/implemented/2026-10-28-r4-p3-followup.md)）；六维复评见报告 §9。
+**下一步：** 用户已于 2026-10-28 批全批（A–E），按批落 commit + Note；每批跑对应真检查。批 A 已落（[Note](../../../notes/archived/receipts/2026-10-28-r4-batch-a-truth.md)），批 B 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-b-ui-lane.md)），批 C 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-c-diagnose.md)），批 D 已落（[Note](../../../notes/archived/receipts/2026-10-28-r4-batch-d-tests.md)），批 E1 已落（[Note](../../../notes/archived/receipts/2026-10-28-r4-batch-e1-helpers.md)），批 E2 已落（[Note](../../../notes/archived/receipts/2026-10-28-r4-batch-e2-handler.md)），批 E3 已落（[Note](../../../notes/archived/receipts/2026-10-28-r4-batch-e3-host-apply.md)），批 E4 已落（[Note](../../../notes/archived/receipts/2026-10-28-r4-batch-e4-board.md)），批 E5 已落（[Note](../../../notes/archived/receipts/2026-10-28-r4-batch-e5-disclosure.md)），批 E6 已落（[Note](../../../notes/implemented/2026-10-28-r4-batch-e6-client-apply.md)），D6 客户端错误通道 + observer 接线已落（[Note](../../../notes/implemented/2026-10-28-r4-d6-client-errors.md)）；P3 四项已清零（[Note](../../../notes/archived/receipts/2026-10-28-r4-p3-followup.md)）；六维复评见报告 §9。
 
 ## 范围与排除项
 

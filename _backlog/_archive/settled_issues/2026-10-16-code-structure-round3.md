@@ -12,7 +12,7 @@ opened: 2026-10-16
 **当前情况：**
 - 基线（2026-10-16 实跑）：`pnpm verify` ALL PASS；`pnpm test` 60 文件 / 559 用例全绿——本轮是绿基线上的纯结构提案，无行为变更目标。
 - 快评一项误判已修正：doors 寄居块 2026-10-14 已迁出，[tests/company](../../../tests/company/doors.spec.ts) 的 `<模块>.spec.ts` 一一对应已恢复（[deliverables.spec 尾注](../../../tests/harness/deliverables.spec.ts) 是迁出墓碑，非活债务）。
-- 本卡是第三轮：前两轮 owner = [2026-10-14 六项重构](../../../notes/implemented/2026-10-14-code-restructure.md) 与 [client-host-replay 局部化](../../../notes/implemented/2026-10-14-client-host-replay-locality.md)；本卡只接它们未接的面，不翻它们的案。
+- 本卡是第三轮：前两轮 owner = [2026-10-14 六项重构](../../../notes/archived/2026-10-14-code-restructure.md) 与 [client-host-replay 局部化](../../../notes/archived/2026-10-14-client-host-replay-locality.md)；本卡只接它们未接的面，不翻它们的案。
 - 用户 2026-10-16 已言「按你的推荐就行」——推荐 A 记为首选范围；开工仍待明示（卡不授予实施权）。
 
 **未决问题：** 无（① 范围 2026-10-16 拍 A；② 开工令已下，授权 = 用户「计划这么详细了, 就setup goal 推动落地」）。
@@ -20,7 +20,7 @@ opened: 2026-10-16
 **下一步：** 已全部完成，本卡结档。
 
 > **结论与去向（2026-10-16 结）：** 范围 A **做并已落地**——Item 1（`tools/lib/deliverables.mjs` 506 行拆「形状与身份」210 行 /「声明对账」`deliverables-audit.mjs` 322 行，依赖严格单向；对应 spec 538 行拆基座 128 + 对账 462，恢复 `<模块>.spec.ts` 一一对应）＋ Item 3（`replay-smoke` 头注触发线）。范围外留档：Item 2（`presence.ts` 内部接缝）未做、留独立第二轮；另三条观察项只住本卡上表。
-> 实施与验证收据 = [notes/implemented/2026-10-16-deliverables-audit-seam.md](../../../notes/implemented/2026-10-16-deliverables-audit-seam.md)（commit `fa9801f` 触发线＋毕业 / `2e73269` spec 拆分 / `3f0af0b` lib 拆分，加本 Note 归档 commit）；两处实施口径修正（`WARNING` 留基座、`presentResultRows` + `META_FINAL_RESULTS` 迁对账）见 §拍板记录，且已被实测消费面证实。上轮 owner 互链：[2026-10-14 六项重构](../../../notes/implemented/2026-10-14-code-restructure.md)、[client-host-replay 局部化](../../../notes/implemented/2026-10-14-client-host-replay-locality.md)（本卡未翻它们的案）。
+> 实施与验证收据 = [notes/archived/2026-10-16-deliverables-audit-seam.md](../../../notes/archived/2026-10-16-deliverables-audit-seam.md)（commit `fa9801f` 触发线＋毕业 / `2e73269` spec 拆分 / `3f0af0b` lib 拆分，加本 Note 归档 commit）；两处实施口径修正（`WARNING` 留基座、`presentResultRows` + `META_FINAL_RESULTS` 迁对账）见 §拍板记录，且已被实测消费面证实。上轮 owner 互链：[2026-10-14 六项重构](../../../notes/archived/2026-10-14-code-restructure.md)、[client-host-replay 局部化](../../../notes/archived/2026-10-14-client-host-replay-locality.md)（本卡未翻它们的案）。
 > 关闭条件核对：范围已圈定（A）且去向已记录（实施通道 = 用户点名 + 基线法）⇒ 毕业头改「做」、按章程迁 settled_issues、实施与验收证据归收尾 Note（均已完成）。
 
 ## 拍板记录（2026-10-16）

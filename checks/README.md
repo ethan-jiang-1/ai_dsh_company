@@ -40,7 +40,7 @@
 [cultivation-gui](../probes/browser-visual/cultivation-gui-probe.mjs) · [cultivation-main-e2e](../probes/browser-visual/cultivation-main-e2e.mjs) · [cultivation-ux-scenarios](../probes/browser-visual/cultivation-ux-scenarios.mjs) · [cultivation-ux-walkthrough](../probes/browser-visual/cultivation-ux-walkthrough.mjs) · [dag-midflight](../probes/browser-visual/dag-midflight-probe.mjs) · [dag-visual](../probes/browser-visual/dag-visual-probe.mjs) · [deliverables-catalog](../probes/browser-visual/deliverables-catalog-probe.mjs)
 [ledger-summary](../probes/browser-visual/ledger-summary-probe.mjs) · [open-in-app](../probes/browser-visual/open-in-app-probe.mjs) · [presence-panel](../probes/browser-visual/presence-panel-probe.mjs) · [sidebar-role-mark](../probes/browser-visual/sidebar-role-mark-probe.mjs) · [tasks-panel](../probes/browser-visual/tasks-panel-probe.mjs)
 
-文件与任务板（11）：[archive-move](../probes/fs-taskboard/archive-move-probe.mjs) · [collaboration-oracle](../probes/fs-taskboard/collaboration-oracle-probe.mjs) · [converge-e2e](../probes/fs-taskboard/converge-e2e-probe.mjs) · [cross-process-fs](../probes/fs-taskboard/cross-process-fs-probe.mjs) · [fs-guard](../probes/fs-taskboard/fs-guard-probe.mjs)
+文件与任务板（10）：[collaboration-oracle](../probes/fs-taskboard/collaboration-oracle-probe.mjs) · [converge-e2e](../probes/fs-taskboard/converge-e2e-probe.mjs) · [cross-process-fs](../probes/fs-taskboard/cross-process-fs-probe.mjs) · [fs-guard](../probes/fs-taskboard/fs-guard-probe.mjs)
 [motion-taskboard](../probes/fs-taskboard/motion-taskboard-probe.mjs) · [observed-write-conflict](../probes/fs-taskboard/observed-write-conflict-probe.mjs) · [review-staleness](../probes/fs-taskboard/review-staleness-probe.mjs) · [task-discovery](../probes/fs-taskboard/task-discovery-probe.mjs) · [taskboard-presence](../probes/fs-taskboard/taskboard-presence-probe.mjs) · [taskboard-scope](../probes/fs-taskboard/taskboard-scope-probe.mjs)
 
 会话上下文（17）：[ask-user-timed](../probes/session-context/ask-user-timed-probe.mjs) · [budget-signoff](../probes/session-context/budget-signoff-probe.mjs) · [ceo-assembly](../probes/session-context/ceo-assembly-probe.mjs) · [cultivation-context](../probes/session-context/cultivation-context-probe.mjs) · [cultivation-method-layer](../probes/session-context/cultivation-method-layer-probe.mjs) · [cultivation-propose](../probes/session-context/cultivation-propose-probe.mjs)
@@ -50,11 +50,11 @@
 团队协作（13）：[claim-race](../probes/team/claim-race-probe.mjs) · [dissent-preservation](../probes/team/dissent-preservation-probe.mjs) · [member-inquiry](../probes/team/member-inquiry-probe.mjs) · [member-interrupt](../probes/team/member-interrupt-probe.mjs) · [member-reject-in-team](../probes/team/member-reject-in-team-probe.mjs) · [member-rescue](../probes/team/member-rescue-probe.mjs)
 [member-stale-write](../probes/team/member-stale-write-probe.mjs) · [multi-user-e2e](../probes/team/multi-user-e2e-probe.mjs) · [team-atomicity](../probes/team/team-atomicity-probe.mjs) · [team-claim-loser](../probes/team/team-claim-loser-probe.mjs) · [team-concurrency](../probes/team/team-concurrency-probe.mjs) · [team-recovery](../probes/team/team-recovery-probe.mjs) · [read-barrier](../probes/team/read-barrier/index.mjs)
 
-**维护工具**（`tools/`，16 个）
-[ask-latency](../tools/ask-latency.mjs) · [bundle-init](../tools/bundle-init.mjs) · [converge](../tools/converge.mjs) · [deliverables-index](../tools/deliverables-index.mjs) · [diagnose](../tools/diagnose.mjs) · [export-dist](../tools/export-dist.mjs) · [orient](../tools/orient.mjs) · [propose-sampler](../tools/propose-sampler.mjs)
+**维护工具**（`tools/`，17 个）
+[ask-latency](../tools/ask-latency.mjs) · [bundle-init](../tools/bundle-init.mjs) · [converge](../tools/converge.mjs) · [deliverables-index](../tools/deliverables-index.mjs) · [diagnose](../tools/diagnose.mjs) · [export-dist](../tools/export-dist.mjs) · [notes-audit](../tools/notes-audit.mjs) · [orient](../tools/orient.mjs) · [propose-sampler](../tools/propose-sampler.mjs)
 [prune-runtime](../tools/prune-runtime.mjs) · [rehearsal-init](../tools/rehearsal-init.mjs) · [release](../tools/release.mjs) · [session-log-export](../tools/session-log-export.mjs) · [snapshot-motion](../tools/snapshot-motion.mjs) · [snapshot-path](../tools/snapshot-path.mjs) · [standalone](../tools/standalone.mjs) · [sync-dsh](../tools/sync-dsh.mjs)
 
-**结构门禁**（`checks/gates/`，50 个模块）：清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，
+**结构门禁**（`checks/gates/`，52 个模块）：清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，
 接线一致性由 `gate-wiring` 门禁强制。pin 常量 = [gates/lib/pin.mjs](gates/lib/pin.mjs)。
 
 ## 共享实现与目录选择

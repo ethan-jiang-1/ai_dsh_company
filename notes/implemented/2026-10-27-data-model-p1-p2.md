@@ -3,6 +3,12 @@
 状态：已交付（2026-10-27；G8 的“面板全量读”保留为已知边界，见卡）
 上游 = [DSH 数据模型（FAQ 26）审计出的部署 Gap](../../_backlog/_archive/settled_issues/2026-10-27-data-model-gaps.md)
 
+> **2026-10-28 M3 部分取代（G7 方法层边界）**：方法层已迁公司级 `<DSH_HOME>/company/methods/<role>/`，
+> 同 home 多 profile 共享；本文 §决定 4 与 §后果 的“按 profile 隔离/各一份”作废。
+> 见 [data-model](../../docs/data-model.md) §四、[profiles.ts](../../packages/company-pack/src/host/profiles.ts) 与
+> [数据设计硬化 Note](./2026-10-28-data-design-hardening.md)；
+> 其余 G6/G8/G11/G12 仍有效。
+
 ## 问题
 
 P0 收口后，Gap 卡还剩 G6（record CAS/revoke 半状态）、G7（方法层 profile 边界）、G8（records 无 GC/坏记录静默/面板全量读）、G11（companyHome 危险值）、G12（localStorage 键名/降级未验）。这些不是发布阻断，但会在长期运行和搬迁/多 profile 场景里变成数据不一致。

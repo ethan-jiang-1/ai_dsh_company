@@ -17,10 +17,10 @@ opened: 2026-10-27
 **未决问题：** 四个建议批次的取舍（A 真实性止血 / B 语义边界 / C 回归网补强 / D 渐进披露与结构收拢）——尤其：`replay --ui` 是"补一个合成 web 场景"还是"彻底撤掉并从文档删除"；dev-loop 是否拆出政策层（会动 4–6 份文档的编号与链接）；客户端错误通道要不要做（要碰 client 面与 host 事件面，是本轮唯一"新机制"）。
 
 **进展（2026-10-27 夜）：** 用户批全批 + 补 web 场景 + 客户端错误通道。已落三批（每批一 commit + Note）：
-批次 A 真实性止血（[Note](../../../notes/implemented/2026-10-27-r3-batch-a-truth.md)）→ C5 分层门禁 + typecheck
+批次 A 真实性止血（[Note](../../../notes/archived/receipts/2026-10-27-r3-batch-a-truth.md)）→ C5 分层门禁 + typecheck
 （[Note](../../../notes/implemented/2026-10-27-r3-c5-layer-guard.md)）→ 批次 B 授权/收尾单一家
 （[Note](../../../notes/implemented/2026-10-27-r3-b-authority-and-closeout.md)）→ C 前半回归网与日志真值
-（[Note](../../../notes/implemented/2026-10-27-r3-c-first-half-regression.md)；test 910→944，verify 全绿）。
+（[Note](../../../notes/archived/receipts/2026-10-27-r3-c-first-half-regression.md)；test 910→944，verify 全绿）。
 **进展（2026-10-27 深夜）：** C 后半 + A2 已落——[真页面车道/错误环/SKIP 语义](../../../notes/implemented/2026-10-27-r3-c-second-half-ui-lane.md)
 （`ui-scene-smoke` 一条命令自起实例看真页面；浏览器错误环进 verdict；两个 freshness 门禁 0 对象时输出 SKIP）；
 D 前半已落——[索引瘦身/预算双向/lib 修环/探针标题](../../../notes/implemented/2026-10-27-r3-d-first-half-disclosure.md)。
@@ -33,31 +33,31 @@ D 前半已落——[索引瘦身/预算双向/lib 修环/探针标题](../../..
 | # | 处置 | 去向 |
 |---|---|---|
 | R3-01 | 修：`src-layering` 门禁（第 48 门）+ `pnpm typecheck` | [C5 Note](../../../notes/implemented/2026-10-27-r3-c5-layer-guard.md) |
-| R3-02 | 修：`diagnose` 中断轮 + 工具计数 + `--strict` | [C 前半](../../../notes/implemented/2026-10-27-r3-c-first-half-regression.md) |
+| R3-02 | 修：`diagnose` 中断轮 + 工具计数 + `--strict` | [C 前半](../../../notes/archived/receipts/2026-10-27-r3-c-first-half-regression.md) |
 | R3-03 | 修（改道）：页面内错误环 + 探针读入 verdict；**不写会话日志**（无合法通道，边界已声明） | [C 后半](../../../notes/implemented/2026-10-27-r3-c-second-half-ui-lane.md) |
 | R3-04 | 改道：`ui-scene-smoke` 自起实例真页面车道；`replay --ui` 显式停用（本仓无场景/金样） | 同上（用户可推翻改回完整回放场景） |
-| R3-05 | 修：缺语料 exit 2 + 文档如实下架 | [A](../../../notes/implemented/2026-10-27-r3-batch-a-truth.md) |
+| R3-05 | 修：缺语料 exit 2 + 文档如实下架 | [A](../../../notes/archived/receipts/2026-10-27-r3-batch-a-truth.md) |
 | R3-06 | 修：`skip()` + `EXPECTED_SKIPS`，两个 freshness 门禁 0 对象时输出 SKIP | [C 后半](../../../notes/implemented/2026-10-27-r3-c-second-half-ui-lane.md) |
 | R3-07 | 修：自授权边界只住 `_backlog` 章程（删指南缩写） | [B](../../../notes/implemented/2026-10-27-r3-b-authority-and-closeout.md) |
 | R3-08 | 修：收尾次序/六行回执只住 close-out skill；§12 只留去向规则 | 同上 |
-| R3-09 | 修：r2/r3 指令性残留清理（release/dev-loop/testing/cdp-probe/client-load/replay/UI-demo/demo） | [A](../../../notes/implemented/2026-10-27-r3-batch-a-truth.md) |
-| R3-10 | 修：待办页签/观察者/两面板渲染与生命周期 spec | [C 前半](../../../notes/implemented/2026-10-27-r3-c-first-half-regression.md) |
+| R3-09 | 修：r2/r3 指令性残留清理（release/dev-loop/testing/cdp-probe/client-load/replay/UI-demo/demo） | [A](../../../notes/archived/receipts/2026-10-27-r3-batch-a-truth.md) |
+| R3-10 | 修：待办页签/观察者/两面板渲染与生命周期 spec | [C 前半](../../../notes/archived/receipts/2026-10-27-r3-c-first-half-regression.md) |
 | R3-11 | 修：host 真 Cordis 组合 spec | 同上 |
 | R3-12 | 修：propose 五守卫表驱动 spec | 同上 |
 | R3-13 | 部分：产品面新增 ~45 例（比例改善）；`collaboration-probe-verdict` 的源码切片守卫**不改**（改它要动探针导出面，收益低） | 本卡 |
 | R3-14 | 修：政策句与现状对齐（显式 dev-only 条件跳过 + 新增须带预期 N 守卫） | [D4](../../../notes/implemented/2026-10-27-r3-d4-giant-functions.md) 同轮 |
-| R3-15 | 修：包 README 页签数、Q4 绑簿记、doc-budget 注释去数字、计数门禁扩面 | [A](../../../notes/implemented/2026-10-27-r3-batch-a-truth.md) |
-| R3-16 | 修：data-model 去重 + demo 假归档指针清理 | [A](../../../notes/implemented/2026-10-27-r3-batch-a-truth.md) |
+| R3-15 | 修：包 README 页签数、Q4 绑簿记、doc-budget 注释去数字、计数门禁扩面 | [A](../../../notes/archived/receipts/2026-10-27-r3-batch-a-truth.md) |
+| R3-16 | 修：data-model 去重 + demo 假归档指针清理 | [A](../../../notes/archived/receipts/2026-10-27-r3-batch-a-truth.md) |
 | R3-17 | 修：预算双向棘轮 + 入口链/大合同补预算 | [D 前半](../../../notes/implemented/2026-10-27-r3-d-first-half-disclosure.md) |
 | R3-18 | 修：dev-loop 349→155 行；入口链 102KB→66KB | [D 后半](../../../notes/implemented/2026-10-27-r3-d-second-half-policy-layer.md) |
 | R3-19 | 修：政策层 `docs/policy.md` + tier 表「政策」行 | 同上 |
 | R3-20 | 修：`checks/README.md` 193→78 行（说明回头注） | [D 前半](../../../notes/implemented/2026-10-27-r3-d-first-half-disclosure.md) |
 | R3-21 | 部分：`apply` 425→326（守卫拆出）、`cultivation.ts` 717→568（背景读取拆出）；**handler 子命令与 Board 明确不拆**（行为密度/风险 > 行数收益，D26） | [D4](../../../notes/implemented/2026-10-27-r3-d4-giant-functions.md) |
 | R3-22 | 部分：lib 三元环已拆；重复小工具（canonicalPath 4 份 / isRecord 3 份）与单 it 巨测**明确不作**（纯卫生，改签面 9 文件，收益低于回归风险） | 本卡 |
-| R3-23 | 修：cdp-probe 未登录 exit 2 + `--evidence` 成功留证 + 选择器头注 | [C 前半](../../../notes/implemented/2026-10-27-r3-c-first-half-regression.md) |
+| R3-23 | 修：cdp-probe 未登录 exit 2 + `--evidence` 成功留证 + 选择器头注 | [C 前半](../../../notes/archived/receipts/2026-10-27-r3-c-first-half-regression.md) |
 | R3-24 | 部分：runbook 补两条 UI 行 + 起窗 tee 落盘指引；诊断索引 `index.jsonl` 与 30 天保留**明确不作**（证据已按目录可发现，7 天清扫是运行卫生） | [C 后半](../../../notes/implemented/2026-10-27-r3-c-second-half-ui-lane.md) |
-| R3-25 | 修：设计层 0.1.7 标签改「现行 rc.2 已核」、探针标题必填；`src/client` 平铺**明确不作**（>40 文件再拆） | [A](../../../notes/implemented/2026-10-27-r3-batch-a-truth.md) / [D 前半](../../../notes/implemented/2026-10-27-r3-d-first-half-disclosure.md) |
-| R3-26 | 修：release/dev-loop 的“升 pin 第一道”改为如实（合成场景只证管线可跑） | [A](../../../notes/implemented/2026-10-27-r3-batch-a-truth.md) |
+| R3-25 | 修：设计层 0.1.7 标签改「现行 rc.2 已核」、探针标题必填；`src/client` 平铺**明确不作**（>40 文件再拆） | [A](../../../notes/archived/receipts/2026-10-27-r3-batch-a-truth.md) / [D 前半](../../../notes/implemented/2026-10-27-r3-d-first-half-disclosure.md) |
+| R3-26 | 修：release/dev-loop 的“升 pin 第一道”改为如实（合成场景只证管线可跑） | [A](../../../notes/archived/receipts/2026-10-27-r3-batch-a-truth.md) |
 
 **明确不作的三项**（R3-13 的源码切片守卫 / R3-22 的重复工具与巨测 / R3-24 的诊断索引与保留期）都在上表写了理由；
 若后续出现实证痛点，按「口头担忧第二次提起 → 立卡或明确否决」重新开卡。

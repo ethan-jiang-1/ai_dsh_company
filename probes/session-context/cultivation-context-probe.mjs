@@ -3,7 +3,7 @@
 // 培养「可选参考背景」机制探针（2026-10-23 背景卡 D1=A / D2=A 的实施前门）。
 //
 // 何时跑：改 host 读会话/成品、客户端预览读、`contexts` 记录读取，或升 pin 后必跑；
-//   本探针**不写产品代码**，只验平台机制是否支撑 RFC（notes/proposed/2026-10-23-cultivation-context.md）。
+//   本探针**不写产品代码**，只验平台机制是否支撑 RFC（notes/archived/2026-10-23-cultivation-context.md）。
 // 成本：keyless（boot web ~20–40s；零模型调用；只读会话/命令/文件面）。
 // 用法：source run/env.sh && node probes/session-context/cultivation-context-probe.mjs
 //

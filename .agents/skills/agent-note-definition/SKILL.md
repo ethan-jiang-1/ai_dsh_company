@@ -10,13 +10,19 @@ description: Use when writing or updating a file under notes/ and before claimin
 
 ## 步骤
 
-1. **先搜，再写。** 按主题在活跃树（`notes/`、`docs/`、`_backlog/`）搜同决定或同机制的既有 owner。
+1. **先判类，再搜。** 写之前问三句：这是**决定**还是**收据**？它**取代了谁**？**谁还会读**它？
+   收据（轮次/会话收尾、探针或 E2E 首跑、批次流水、状态快照、“只记测量结果”）**不住 `implemented/`**——
+   直接进 `notes/archived/receipts/`（或 `snapshots/`/`_backlog/research/`、部署仓；历史归 git）。
+   写进来只会把 rationale owner 淹没（负例 = notes/README §二）。是决定，再按主题在活跃树
+   （`notes/`、`docs/`、`_backlog/`）搜同决定或同机制的既有 owner。
    - 完整取代 → 吸收它独有的理由/备选/后果/验证后**同 diff 删除旧的**（历史归 git）。
-   - 部分取代 → 双方保留互链，更新仍有效的事实。
+   - 部分取代 → 双方保留互链；implemented 旧文加「被…取代」指针，旧文已无现行内容则 `git mv` 到
+     archived。archived 是冻结层，**不回写**——由新 Note 单侧承载指针。
    - 都没搜就写 = 大概率造出第二本账（D34/D36 两次实地案例）。
 2. **定生命周期与位置。** 决定**已随本次变更落地** → 直接 `implemented/`（不必从 `proposed/` 起）；
    提案**尚未实施** → `proposed/`，且状态行必须带「批准：」标记 + 有「## 验收」节（两道门禁查）；
-   被否 → `rejected/`。未成熟的思考不进 `notes/`，住 `_backlog/issues/` 推敲卡。
+   被否的**方案** → 赢家 Note 的「输掉的方案」；被推翻的**研究稿** → `rejected/`。
+   未成熟的思考不进 `notes/`，住 `_backlog/issues/` 推敲卡。
 3. **写四件**：决定 / **输掉的方案**（必载——没写击败了什么的决定会重新开讼）/ 后果 / **验证**。
    备选只记录真实考虑过的，不编造。
 4. **验证必须来自真跑过的命令**，写明命令、断言什么、**红长什么样**——让实施者不看对话就能复现。
@@ -29,6 +35,8 @@ description: Use when writing or updating a file under notes/ and before claimin
 ## 完成判据
 
 - [ ] 第 1 步搜过，且结论（取代 / 部分取代 / 无冲突）在 Note 里说得出。
+- [ ] 先判类过：收据/日记/批次流水没有写进 `implemented/`（收据应进 `archived/receipts/`）；决定才进来。
+- [ ] 若取代了旧 Note：旧文有回链（或已 `git mv` 到 archived）；archived 目标未被回写。
 - [ ] 位置与状态行符合生命周期；`proposed/` 侧带「批准：」+ 「## 验收」。
 - [ ] 「输掉的方案」非空，且每条是真考虑过的（不是凑数的稻草人）。
 - [ ] 验证节里的每条命令**真跑过**，且写了红/绿形态；未验项显式列为未验。

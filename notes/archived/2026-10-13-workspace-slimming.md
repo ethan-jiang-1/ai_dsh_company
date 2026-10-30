@@ -8,7 +8,7 @@
 
 | 层 | 内容 | 入库 | 家 |
 |---|---|---|---|
-| ① 制度件 | 手册 / `templates/` / `kb/org.md` / 五份 `CHARTER.md` + 起动件 | ✅ | `packages/company-pack/workspace/**`（唯一真源，[骨架 Note](2026-10-13-company-workspace-skeleton-shipped.md)） |
+| ① 制度件 | 手册 / `templates/` / `kb/org.md` / 五份 `CHARTER.md` + 起动件 | ✅ | `packages/company-pack/workspace/**`（唯一真源，[骨架 Note](../implemented/2026-10-13-company-workspace-skeleton-shipped.md)） |
 | ② 业务成品 | `deliverables*/<日期>-<slug>/final.md` + `meta.md`（+ 台账行） | ✅ | 运行盘 `company-workspace/` |
 | ③ 过程物料 | `deliverables*/<日期>-<slug>/drafts/**`（含 `sources/` 的 PDF/HTML/raw） | ❌（`.gitignore` 点名） | 运行盘本地（工作树保留） |
 

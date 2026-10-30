@@ -4,6 +4,9 @@
 上游 = [_backlog/_archive/settled_issues/2026-10-30-cultivation-case-entry.md](../../_backlog/_archive/settled_issues/2026-10-30-cultivation-case-entry.md)
 前决定：[培养主线与证据](./2026-10-30-cultivation-work-improvement-traceability.md)、[培养入口收口](./2026-10-30-cultivation-entry-followup.md)、[培养主视图](./2026-10-28-cultivation-main-view.md)。这些决定继续有效；本 Note 只把主任务第一步从「选记录类型」换成「先说工作」。
 
+> **同日部分取代**：本文取代 [entry-followup](./2026-10-30-cultivation-entry-followup.md) §决定 1–2
+> （目标角色不预选/入口文案）；其 #3–#6 继续有效。
+
 ## 决定
 
 1. **去掉纠正/建议二选一。** 创作面是一个单表单：`这次什么工作 / 想改善什么`（多行）→ `期望它怎么做（一句话）` → 目标角色 pills（默认当前角色，改点别的角色即变建议，界面明说纠正/建议两种归属）→ 可选做法与证据 → 可选参考背景 → 提交前预览。`correct`/`suggest` 由目标角色是否等于当前角色推导——人先说工作，类型是推导结果不是选择题。

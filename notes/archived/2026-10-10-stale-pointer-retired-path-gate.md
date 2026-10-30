@@ -5,7 +5,7 @@ backlog 收卡一单按其自家规则归档、retired-path 门禁 + bare-path T
 
 ## 问题
 
-2026-10-09 backlog 大改名（plans→issues、_done→_archive，[backlog-issue-lifecycle](../implemented/2026-10-09-backlog-issue-lifecycle.md)）
+2026-10-09 backlog 大改名（plans→issues、_done→_archive，[backlog-issue-lifecycle](../archived/2026-10-09-backlog-issue-lifecycle.md)）
 后，旧路径前缀在 bare-path 的三个盲区里全绿存活：① TOP_DIRS 不含 `_backlog/`——NOW_FILES 明明含
 _backlog 活跃卡，扫描面里这一半路径从未被存在性检查；② glob/占位内容被 `[*<>…{}]` 过滤跳过
 （`BUG-nnn-*.md` 形状的判据句）；③ `.agents/skills/`、checks/README.md、run/README.md 不在扫描面。

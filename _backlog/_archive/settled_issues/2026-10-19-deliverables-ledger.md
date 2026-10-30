@@ -33,7 +33,7 @@ opened: 2026-10-19
 - **UX 顺手修**：页签头标题/按钮 `nowrap` + 新鲜度文案省略号（窄栏不再把「重读/浮出」挤成竖排）；看板标题/guide 的旧「5 秒自动刷新」改「投影更新」。
 - **测试**：`tests/harness/deliverables-catalog-tools.spec.ts`（5）+ `tests/client/deliverables-catalog.spec.ts`（8）+ `client-face` 数据面（1）；注册/组合测试同步 9 页签。
 - **探针**：[`deliverables-catalog-probe.mjs`](../../../probes/browser-visual/deliverables-catalog-probe.mjs)（真 web；44 行 = 索引；四档筛选；44 个打开；点第一行后 final 正文出现；窄栏可见；`--fixture` 落图）。
-- **Note**：[2026-10-19-deliverables-catalog](../../../notes/implemented/2026-10-19-deliverables-catalog.md)｜批次句号：[2026-10-20-company-panel-batch-close](../../../notes/implemented/2026-10-20-company-panel-batch-close.md)。
+- **Note**：[2026-10-19-deliverables-catalog](../../../notes/implemented/2026-10-19-deliverables-catalog.md)｜批次句号：[2026-10-20-company-panel-batch-close](../../../notes/archived/receipts/2026-10-20-company-panel-batch-close.md)。
 
 ## 事实与证据（本轮实跑）
 

@@ -3,14 +3,14 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { assess, archiveGitArgs, archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, pickArchivedJournal, resolveEvidenceDir, steps } from '../../tools/lib/converge-rules.mjs'
+import { assess, archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, pickArchivedJournal, steps } from '../../tools/lib/converge-rules.mjs'
 const TMP: string[] = []
 afterAll(() => { for (const d of TMP) rmSync(d, { recursive: true, force: true }) })
 
 // converge.mjs 的纯判定规则（判据单一来源 = tools/lib/converge-rules.mjs；IO 在驱动脚本
 // ——沙箱对照实验与真仓复现收据见 _backlog 卡 BUG-014 / BUG-015）。
 // ⚠ 2026-10-13：归档搬移那条初版在此**真跑 git**，被 layering 守卫当场拦下（回归层不许起子进程）——
-// 真跑那半已搬去 probes/fs-taskboard/archive-move-probe.mjs；本文件只留纯计划断言。
+// 真跑那半已搬去 probes/fs-taskboard/converge-e2e-probe.mjs（archive-move-probe 已删）；本文件只留纯计划断言。
 // 负例留证 2026-10-12：BUG-014 —— 修复前判据（整文件 includes）对下方 COO 反例恒真阳性
 //   （「旧判据 includes 误报」用例钉住它）；真仓零写入 re-run 五角色全报「已有——跳过」而 COO 条目为 0
 //   （收据 = 卡复现节）；本文件实现前实跑 = 模块不存在红。
@@ -156,6 +156,10 @@ describe('converge-rules · CHARTER 历史纪要查重锚（BUG-014 假跳过）
     const withEntry = cooLike + '\n- 2026-10-10 · ai-sprint-2026（评审）—— 结论一句\n'
     expect(charterHasEntry(withEntry, 'ai-sprint-2026')).toBe(true)
   })
+  it('kickoff 带时间也能命中（避免重复登记）', () => {
+    expect(charterHasEntry('- 2026-10-24 09:30 · ai-sprint-2026（评审）—— 结论\n', 'ai-sprint-2026')).toBe(true)
+  })
+
   it('条目行锚不吞别家 slug 的条目（ai-sprint-2026-v4 ≠ ai-sprint-2026）', () => {
     const other = '- 2026-10-10 · ai-sprint-2026-v4（评审）—— 别家\n'
     expect(charterHasEntry(other, 'ai-sprint-2026')).toBe(false)
@@ -187,51 +191,32 @@ describe('converge-rules · 旗标解析（BUG-016 幽灵旗标）', () => {
       slug: undefined, dryRun: false, charterBackfill: '2026-10-10-ai-sprint-2026', allowNoJournal: false, allowOpenFindings: false,
     })
   })
+  it('动作互斥：--slug/--resume/--charter-backfill/--rebuild-index 只能一个', () => {
+    expect(() => parseFlags(['--slug', 'a', '--resume', 'b'])).toThrow(/一次只能一个动作/)
+    expect(() => parseFlags(['--slug', 'a', '--rebuild-index'])).toThrow(/不能与其他动作同用/)
+    expect(() => parseFlags(['--rebuild-index', '--dry-run'])).toThrow(/不能与 --dry-run 同用/)
+  })
+  it('动作缺值 fail-loud（不再静默落计划模式）', () => {
+    expect(() => parseFlags(['--slug'])).toThrow(/目录名/)
+    expect(() => parseFlags(['--resume', '--dry-run'])).toThrow(/目录名/)
+    expect(() => parseFlags(['--charter-backfill'])).toThrow(/目录名/)
+  })
+
   it('无参 = 计划模式（dryRun false、无 slug）', () => {
     expect(parseFlags([])).toEqual({ slug: undefined, dryRun: false, charterBackfill: undefined, allowNoJournal: false, allowOpenFindings: false })
   })
 })
 
-describe('converge-rules · 收敛证据目录解析（BUG-015 日期耦合）', () => {
-  const makeArchive = () => {
-    const root = join(tmpdir(), 'converge-rules-spec-' + Math.random().toString(36).slice(2, 10))
-    mkdirSync(join(root, 'convergence-2026-10-01', '2026-10-01-ai-demo'), { recursive: true })
-    return root
-  }
-  it('按 slug 解析真实收敛日期目录（≠ 运行日）', () => {
-    const root = makeArchive()
-    try {
-      expect(resolveEvidenceDir(root, '2026-10-01-ai-demo')).toBe('convergence-2026-10-01')
-    } finally { rmSync(root, { recursive: true, force: true }) }
-  })
-  it('无证据目录 → throw（fail-loud，不再静默写断链）', () => {
-    const root = makeArchive()
-    try {
-      expect(() => resolveEvidenceDir(root, '2026-10-02-no-such-slug')).toThrow(/无收敛证据目录/)
-    } finally { rmSync(root, { recursive: true, force: true }) }
-  })
-  it('多日并存时取最新（ISO 日期字典序 = 时间序）', () => {
-    const root = makeArchive()
-    try {
-      mkdirSync(join(root, 'convergence-2026-10-11', '2026-10-01-ai-demo'), { recursive: true })
-      expect(resolveEvidenceDir(root, '2026-10-01-ai-demo')).toBe('convergence-2026-10-11')
-    } finally { rmSync(root, { recursive: true, force: true }) }
-  })
-})
-
-describe('converge-rules · 归档搬移计划（2026-10-13：drafts 不进 git 后 git mv 不再可用）', () => {
+describe('converge-rules · 归档搬移计划（2026-10-30：run bundle 时代 = 纯 fs rename）', () => {
   /**
-   * 现场：`git mv <交付物目录>` 遇到未跟踪文件会 fatal（`not under version control`）——
-   * 而 drafts/sources 自瘦身轮起正是未跟踪的 ⇒ 计划改成"fs rename + `git add -A`"。
-   * 本 spec 只钉**计划形状**（纯逻辑，无子进程——回归层不许起进程，layering 守卫）；
-   * "真 git 里跑得通"那半住探针：probes/fs-taskboard/archive-move-probe.mjs（真 .gitignore / 真未跟踪件 / 真 add）。
-   * 反证：把计划换成 `['mv', from, to]` ⇒ 探针 A2/A3 红。
+   * 现场：`company-workspace/` 整树 gitignored（D45/D46），显式 `git add` 会被拒绝——
+   * 收敛的归档步骤只做文件系统搬移；交付物不再有 tracked 面。
+   * 反证 = converge-e2e 探针（真工作区、真未跟踪件）。
    */
-  it('计划 = deliverables → deliverables-archive，git 参数 = add -A -- <旧> <新>', () => {
+  it('计划 = deliverables → deliverables-archive（无 git 参数）', () => {
     const plan = archiveMovePlan('2026-10-13-demo-slug')
     expect(plan.from).toBe('company-workspace/deliverables/2026-10-13-demo-slug')
     expect(plan.to).toBe('company-workspace/deliverables-archive/2026-10-13-demo-slug')
-    expect(plan.gitArgs).toEqual(['add', '-A', '--', plan.from, plan.to])
   })
 })
 
@@ -254,14 +239,6 @@ describe('converge-rules · 一句话结论占位判定（2026-10-20；真结论
   })
 })
 
-
-describe('converge-rules · 归档后 git add 参数（2026-10-20 新交付物未 tracked 的 fatal）', () => {
-  it('旧路径有 tracked 项 ⇒ 原计划；纯未 tracked ⇒ 只 stage 归档家', () => {
-    const plan = archiveMovePlan('2026-10-20-demo')
-    expect(archiveGitArgs(plan, true)).toEqual(plan.gitArgs)
-    expect(archiveGitArgs(plan, false)).toEqual(['add', '-A', '--', plan.to])
-  })
-})
 
 // 2026-10-23（架构评审候选 1）：「可收敛」判据此前在 converge.mjs 写了三份（计划 / 单 slug / 续跑），
 // 且计划模式不认两个放行旗标——计划说「未备」而带旗标执行却能收。判据收进 assess 后由两处共用。
@@ -333,7 +310,6 @@ describe('converge-rules · 可收敛判据 assess（判据单源；2026-10-23�
 describe('converge-rules · 收敛动作序列 steps（计划与执行同源；2026-10-23）', () => {
   const state = () => ({
     dirName: '2026-10-20-demo',
-    evName: 'convergence-2026-10-23',
     conclusion: '做完了这件事',
     journal: [{ role: 'ceo', file: '2026-10-20-demo.md' }],
   })
@@ -355,23 +331,23 @@ describe('converge-rules · 收敛动作序列 steps（计划与执行同源；2
 
   it('dry-run 标签就是执行序列：只有 rewrite-refs 无 label（它不在计划清单里）', () => {
     const plan = steps(state())
-    expect(plan.find(step => step.kind === 'rewrite-refs')?.label).toBeUndefined()
+    expect(plan.find(step => step.kind === 'rewrite-refs')?.label).toBe('重指 CHARTER/notes 路径指针')
     expect(plan.filter(step => step.label).map(step => step.label)).toEqual([
-      '证据副本 → snapshots/archive/convergence-2026-10-23/2026-10-20-demo/（journal ×1 留底；交付物本体 git mv 进归档家，不双份拷贝）',
-      'git mv deliverables/2026-10-20-demo → deliverables-archive/2026-10-20-demo',
-      'git rm kb/ceo/journal/2026-10-20-demo.md（副本已入证据目录）',
+      '证据副本 → company-workspace/deliverables-archive/2026-10-20-demo/journal/（journal ×1 随交付物搬移；不再写 snapshots/）',
+      '重指 CHARTER/notes 路径指针',
+      'fs rename company-workspace/deliverables/2026-10-20-demo → company-workspace/deliverables-archive/2026-10-20-demo',
+      '清 live journal kb/ceo/journal/2026-10-20-demo.md（副本已入归档件 journal/）',
       '台账追加一行（逐字取 meta：做完了这件事…）',
       '成品索引重建（node tools/deliverables-index.mjs）',
       'CHARTER 历史纪要补登：node tools/converge.mjs --charter-backfill 2026-10-20-demo（结论逐字取 meta）',
     ])
   })
 
-  it('搬移步带执行器要用的 from/to/gitArgs（与 archiveMovePlan 同源）', () => {
+  it('搬移步带执行器要用的 from/to（与 archiveMovePlan 同源）', () => {
     const move = steps(state()).find(step => step.kind === 'archive-move')!
     const plan = archiveMovePlan('2026-10-20-demo')
     expect(move.from).toBe(plan.from)
     expect(move.to).toBe(plan.to)
-    expect(move.gitArgs).toEqual(plan.gitArgs)
   })
 
   it('自定义工作区根（CONVERGE_WS_REL 测试缝）：搬移计划跟着走', () => {

@@ -2,14 +2,18 @@
 
 状态：implemented（2026-10-19；成品台账卡；`present` 状态已接入 deliverables-check 审计；converge 自动重建）
 
+> **2026-10-25/28 部分取代（所有权）**：host 侧 catalog + domain `presented` 账本成为权威；
+> 本文只保留“派生索引 + 只读页签 + 不建第二份手写事实”的决定与当时证据。writer/presented 权威、
+> tracked 状态与筛选档数按现行合同（[data-model](../../docs/data-model.md) §二/§三）为准。
+
 ## 决定
 
 公司级「成品台账」按**派生视图**落地，不新建第二份手写事实、不新增 Remote/store：
 
-1. **数据面 = 盘上 `deliverables/` + `deliverables-archive/` 的 `final.md` + `meta.md`**。`tools/lib/deliverables-catalog.mjs` 是纯形状（只收 final、按 kickoff 倒序、计数活跃/归档/台账外），`tools/deliverables-index.mjs` 扫描并生成 `company-workspace/kb/deliverables-index.json`。当前 47 份（**活跃 0 / 归档 47 / 台账外 1** / present 46 / 未 present 1 / present 未核 0）；2026-10-20 已收敛 v2 / v3 / lingang / role-kit / private-deploy / token-account-pool / hefeng / kid-ai 八件；private-deploy 先由真 CEO 会话补 present 再收敛；hefeng 判不了、kid-ai 已采纳；light 已废弃/无 final（不入目录）。`present` 状态**不另写判据**：生成器跑 `checks/audit/deliverables-check.mjs --json`，取最后一行 `JSON.presented`；审计不可得时 `presented=null`（面板显示「present 未核」，不冒充）。
-2. **页签 = 右栏「成品」**（第 9 个公司页签，guide entry 同步）。只读：统计（共 47 / 活跃 0 / 归档 47 / 台账外 1 / present 46 / 未 present 1）→ 全部/活跃/归档/台账外四档筛选 → 按月分组 → 每行 `结果 tag + slug + 归档/台账外 + 日期·类型`，一句话结论复用 `LedgerSummary`（2 行 + 全文入口），右上「打开」用 `dsh-resource://file/session/...` 在右栏预览 `final.md`。
+1. **数据面 = 盘上 `deliverables/` + `deliverables-archive/` 的 `final.md` + `meta.md`**。`tools/lib/deliverables-catalog.mjs` 是纯形状（只收 final、按 kickoff 倒序、计数活跃/归档/台账外），`tools/deliverables-index.mjs` 扫描并生成 `company-workspace/kb/deliverables-index.json`。当时 47 份（**活跃 0 / 归档 47 / 台账外 1** / present 46 / 未 present 1 / present 未核 0；现行数字以生成器输出为准）；2026-10-20 已收敛 v2 / v3 / lingang / role-kit / private-deploy / token-account-pool / hefeng / kid-ai 八件；private-deploy 先由真 CEO 会话补 present 再收敛；hefeng 判不了、kid-ai 已采纳；light 已废弃/无 final（不入目录）。`present` 状态**不另写判据**：生成器跑 `checks/audit/deliverables-check.mjs --json`，取最后一行 `JSON.presented`；审计不可得时 `presented=null`（面板显示「present 未核」，不冒充）。
+2. **页签 = 右栏「成品」**（第 9 个公司页签，guide entry 同步）。只读：统计（当时 共 47 / 活跃 0 / 归档 47 / 台账外 1 / present 46 / 未 present 1）→ 全部/活跃/归档/台账外/未 present 五档筛选 → 按月分组 → 每行 `结果 tag + slug + 归档/台账外 + 日期·类型`，一句话结论复用 `LedgerSummary`（2 行 + 全文入口），右上「打开」用 `dsh-resource://file/session/...` 在右栏预览 `final.md`。
 3. **静态索引说真话**：页签头显示「静态索引 · 生成于 …」；「重读」只重读文件，不轮询。缺索引/坏 schema 明确提示跑生成器，不静默空表。
-4. **并列不替代**：动议台账答「决定了什么」，成品目录答「交出了哪些 final」；`present` 状态由 `deliverables-check` 提供，目录只显示，不另写审计。
+4. **并列不替代**：动议台账答「决定了什么」，成品目录答「交出了哪些 final」；`present` 状态由 domain 账本提供、经审计档透出（2026-10-28 M2 起；当时 = `deliverables-check`），目录只显示，不另写审计。
 
 ## 输掉的方案
 
@@ -22,7 +26,7 @@
 
 ## 后果
 
-- `company-workspace/kb/deliverables-index.json` 是 tracked 生成物（44 条）；重新生成即可重建，不手改。产生/归档成品后跑 `node tools/deliverables-index.mjs`；已接进 `converge`：正常收敛/`--resume` 后自动重建；也可 `node tools/converge.mjs --rebuild-index` 单独跑。
+- `company-workspace/kb/deliverables-index.json` 是 **gitignored 生成物**（workspace 整树 gitignored；当时 44 条）；重新生成即可重建，不手改。产生/归档成品后跑 `node tools/deliverables-index.mjs`；已接进 `converge`：正常收敛/`--resume` 后自动重建；也可 `node tools/converge.mjs --rebuild-index` 单独跑。
 - 第 9 个公司页签「成品」；`company-tab-registration`/`tab-icons`/组合测试同步到 9。
 - 顺手修：`BoardTabTitle`/`BoardGuideEntry` 的旧「5 秒自动刷新」→「投影更新」；`wk-pane-head` 标题/按钮 `nowrap` + 新鲜度文案省略号（窄栏不再把「重读/浮出」挤成竖排）。
 - 页签名/工具地址：`sessionFileAddress` 段级编码（空格/# 不丢）。
@@ -52,4 +56,4 @@
 - **实时性**：页签是静态快照 + 重读，不订阅盘变化；需求变强时再考虑 host read model/Remote。`converge` 自动重建覆盖盘变更的主路径。
 - **已跑**：`replay-smoke --ui` r3-delegation **ALL PASS**（33s；委派卡/aria/金样；workspace 未认证）；成品目录打开链路仍由真 app 探针覆盖。
 
-批次句号与清理清单见 [2026-10-20-company-panel-batch-close](2026-10-20-company-panel-batch-close.md)。
+批次句号与清理清单见 [2026-10-20-company-panel-batch-close](../archived/receipts/2026-10-20-company-panel-batch-close.md)。

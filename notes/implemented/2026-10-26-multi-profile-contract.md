@@ -2,7 +2,7 @@
 
 状态：已交付（2026-10-26）。范围 = 分发/安装/升级的 profile 形状，不是新功能。
 
-## 发现
+## 决定（安装合同：五条发现即判据）
 
 1. **自定义 profile 不是一个可用的公司 profile**。`dsh plugin --profile web-a add <tgz>` 在空 home 自动建出的
    `web-a/package.json` 只有：

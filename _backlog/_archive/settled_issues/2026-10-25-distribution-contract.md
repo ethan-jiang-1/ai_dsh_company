@@ -7,7 +7,7 @@ opened: 2026-10-25
 
 > 立卡：2026-10-25 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；去向 = `notes/implemented/2026-10-25-distribution-lifecycle.md`（与卡 2 合并）
+> **结论/去向**：做；去向 = `notes/archived/2026-10-25-distribution-lifecycle.md`（与卡 2 合并）
 
 **问题与期望结果：** 现在的 tgz + 生成手册能证明“装得上、首启能起”，但不能让一个陌生人回答：这包要哪个 DSH / Node / OS、怎么核对字节、装错了怎么退、谁会支持哪个版本。期望：只拿 tgz + 手册 + 一个兼容 DSH，就能走完“识别 → 校验 → 安装 → 首验 → 失败退出”，并且 `pnpm verify` 有机械门禁。
 
@@ -53,4 +53,4 @@ opened: 2026-10-25
 ## 裁决（2026-10-25）
 
 - Q3 = 手递 tgz + registry-ready，本轮不 publish。license 先 `UNLICENSED`（内部交付），发布时再定；`engines.dsh` 取与 peers 同宽的 0.2.x 范围，矩阵保留“已认证 tag”台账。
-- 去向：`notes/implemented/2026-10-25-distribution-lifecycle.md`（与卡 2 合并）。
+- 去向：`notes/archived/2026-10-25-distribution-lifecycle.md`（与卡 2 合并）。

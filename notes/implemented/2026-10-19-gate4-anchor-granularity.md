@@ -18,7 +18,7 @@ prompt 里逐项写到点后派 `T4` 复算接入方案、派 `T6` 定稿账务�
 
 先搜后写：同类先例 = [BUG-014](../../_backlog/_archive/fixed_bugs/BUG-014-charter-backfill-dedupe-false-skip.md)
 （查重锚从整文件 `includes` 收成条目行锚，方向相反但同属「锚的粒度选错」）。无同主题的第二本账；
-升 pin 那轮（[2026-10-19 升 pin](./2026-10-19-pin-upgrade-0.2.1-rc.2.md)）不涉及这条判据。
+升 pin 那轮（[2026-10-19 升 pin](../archived/2026-10-19-pin-upgrade-0.2.1-rc.2.md)）不涉及这条判据。
 
 ## 方案
 
@@ -68,8 +68,9 @@ CEO 真写出来的形状是「**总锚挂 T1 复查，prompt 里逐个点名 T1
 - **D1**：认总锚，且**prompt 与 title 同权**（纪律要"为证"，命令式文本里 title 与 prompt 是一份证据的两段）。
 - **D2**：补**依赖链传递**——这是原卡未预见的一半；只做总锚点名在真现场仍留 1 条误报。
 - **D3**：违规按 slug 合并一条（报告面，不改判据）。
-- **D4**（超出自授权，按用户本轮指示落）：**手册补一句**写明总锚必须点名下游 T 号。这句落在
-  `packages/company-pack/workspace/AGENTS.md`，属 docs 合同面——按 `_backlog` 章程，缺陷卡 `修复就绪` 的自授权
+- **D4**（超出自授权，按用户本轮指示落）：**手册补一句**写明总锚必须点名下游 T 号。这句现住
+  `packages/company-pack/presets/ceo/skills/chairing-staff-meeting/SKILL.md`（2026-10-21 Phase E 从
+  `workspace/AGENTS.md` 迁入 CEO skill），属 docs 合同面——按 `_backlog` 章程，缺陷卡 `修复就绪` 的自授权
   不覆盖它，本轮由用户"这个 BUG 给修了"明确指示关上；**已向用户补报**。
 
 ## 失败类与横切
@@ -82,6 +83,6 @@ CEO 真写出来的形状是「**总锚挂 T1 复查，prompt 里逐个点名 T1
 ## 落账
 
 改动面：`tools/lib/deliverables-audit.mjs`（判据）、`checks/audit/deliverables-check.mjs`（调用面 + 报告合并）、
-`packages/company-pack/workspace/AGENTS.md`（④行补一句）、`tests/harness/deliverables-audit.spec.ts`（两条守卫 + 红配方）、
-`snapshots/replay/r3-delegation/replay/`（夹具同步：注入体 + 手册 digest，**非重录**）、
-`_backlog/`（卡迁归档 + 两处清单 + 索引链接）、`notes/implemented/2026-10-17-motion5-question-avoidance.md`（指向新位置）。
+`packages/company-pack/presets/ceo/skills/chairing-staff-meeting/SKILL.md`（④行补一句；2026-10-21 自 workspace/AGENTS.md 迁入）、`tests/harness/deliverables-audit.spec.ts`（两条守卫 + 红配方）、
+`snapshots/replay/r3-delegation/replay/`（当时夹具同步；r3 已随真实证据移出产品仓，2026-10-25）、
+`_backlog/`（卡迁归档 + 两处清单 + 索引链接）、`notes/archived/receipts/2026-10-17-motion5-question-avoidance.md`（指向新位置）。

@@ -17,7 +17,7 @@ export const FINAL_BASENAME = 'final.md'
 export const DRAFTS_DIRNAME = 'drafts'
 export const SOURCES_DIRNAME = 'sources'
 
-/** 活跃根与归档根（C1，2026-10-03 拍板：收敛件整目录 git mv 进归档家，判据跟随扩根——T-11 处置 = 跟随扩根）。 */
+/** 活跃根与归档根（C1，2026-10-03 拍板：收敛件整目录移进归档家；判据跟随扩根——T-11 处置 = 跟随扩根）。 */
 export const ACTIVE_ROOT = 'deliverables/'
 export const ARCHIVE_ROOT = 'deliverables-archive/'
 

@@ -13,7 +13,7 @@ import { NOW_FILES } from './bare-path.mjs'
 // 规则：**活跃面**（= NOW_FILES ∪ `.agents/skills/**` ∪ checks/README.md ∪ run/README.md）的反引号内容
 // 命中退役前缀 → 红，失败信息点名文件:行与现行家。**退役前缀清单唯一家 = 下面的数组**（D28：枚举的家 =
 // 实现自己；Note 与文档描述本门禁时不逐字复述清单）。归档树（postmortem / _backlog/_archive /
-// notes/archived）不扫——记录当时事实的档案，判红即逼篡改记录（与 bare-path 观察档同边界）。
+// notes/archived）不扫——记录当时事实的档案，判红即逼篡改记录（与 bare-path 一样不扫 archived）。
 // 负例留证 2026-10-10（实跑原话）：docs/orient.md 临时插负例A（反引号内旧 plans 池前缀路径）→
 //   `FAIL retired-path: docs/orient.md:61 → \`_backlog/plans/zz-demo.md\` 用了退役路径——改指现行家 \`_backlog/issues/\``；
 //   还原即绿。豁免方向：同一行放进 notes/archived/ 临时文件 → retired-path 不红（不在扫描面；探针文件已删）。

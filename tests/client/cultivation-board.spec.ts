@@ -130,10 +130,12 @@ describe('CultivationBoard：数据诚实与能力呈现（V2/V8/V9）', () => {
     expect(markup).not.toContain('已拒绝 CFO 的建议')
   })
 
-  it('「怎么养」指向可见的「开始记录一项工作」入口，而不是把隐藏按钮说成直接可见', () => {
+  it('「怎么养」指向单表单入口，不再把已删除的纠正/建议按钮说成直接可见', () => {
     const markup = render()
-    expect(markup).toContain('点上面「开始记录一项工作」→「给你的角色留一条方法」')
-    expect(markup).toContain('点「开始记录一项工作」→「给别的角色提建议」')
+    expect(markup).toContain('点上面「开始记录一项工作」')
+    expect(markup).toContain('把目标角色改成对方')
+    expect(markup).not.toContain('→「给你的角色留一条方法」')
+    expect(markup).not.toContain('→「给别的角色提建议」')
   })
 
   it('旧 pass/fail 状态不伪造证据，并提示历史依据未记录', () => {

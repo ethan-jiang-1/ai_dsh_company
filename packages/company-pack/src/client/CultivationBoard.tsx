@@ -122,8 +122,8 @@ export function CultivationBoard(props: CultivationBoardProps) {
       <div className="wk-activity-block">
         <strong>怎么养</strong>
         <ul className="wk-activity">
-          <li>要它改做法：点上面「开始记录一项工作」→「{CULTIVATION_COPY.composeCorrect}」，写清期望与证据；它进「需要我处理」，你确认后点「{CULTIVATION_COPY.adopt}」。</li>
-          <li>要别的角色改：点「开始记录一项工作」→「{CULTIVATION_COPY.composeSuggest}」，先选目标角色——由对方本人在它的会话里采纳，你这边只留回执。</li>
+          <li>要它改做法：点上面「开始记录一项工作」，在表单里写清这次工作、想改善什么与证据；它进「需要我处理」，你确认后点「{CULTIVATION_COPY.adopt}」。</li>
+          <li>要别的角色改：同一个入口，把目标角色改成对方即可变成建议——由对方本人在它的会话里采纳，你这边只留回执。</li>
           <li>采纳 = 把做法写进那个角色的方法层：新开的该角色会话带着它开工；已经在跑的会话也会随技能目录刷新看到它。当前这段对话不受影响。</li>
           <li>同类任务上见效后回填「{CULTIVATION_COPY.verifyPass}」；不灵了「{CULTIVATION_COPY.revoke}」撤回（会删掉方法，记录也不能再被采纳）。</li>
           <li>分身自己也能提案（工具里叫 cultivation_propose）；采纳、拒绝、撤回、验证只能由人在这里点。</li>

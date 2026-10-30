@@ -1,5 +1,5 @@
 /**
- * 背景选择面板（RFC notes/proposed/2026-10-23-cultivation-context.md）。
+ * 背景选择面板（RFC 存档 notes/archived/2026-10-23-cultivation-context.md）。
  *
  * 形态 = 内联面板（不是 modal）：本次会话 / 最近会话 / 最近成品三组 + 客户端搜索；
  * 键盘 ↑/↓/Enter/Escape；焦点回到触发点。数据源经 `CultivationContextSources` 注入

@@ -1,7 +1,7 @@
 /**
  * converge.mjs 的纯判定规则（判据单一来源；IO 留在驱动脚本，tests/harness/converge-rules.spec.ts 消费）。
- * 三条规则各有自己的事故卡：journal 归属 = 2026-10-12 前缀误吞教训（BUG-014 卡引用）；
- * 查重锚 = BUG-014（子串查重假跳过）；证据目录解析 = BUG-015（日期耦合写断链）。
+ * 两条规则各有自己的事故卡：journal 归属 = 2026-10-12 前缀误吞教训（BUG-014 卡引用）；
+ * 查重锚 = BUG-014（子串查重假跳过）。证据目录解析（BUG-015）已随 2026-10-30 证据家迁移删除。
  */
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, sep } from 'node:path'
@@ -39,7 +39,8 @@ export function journalPresence(input) {
  * 收敛切片的识别与计量（2026-10-16 立；事故 = 预算门禁的过滤器只认旧命名）。
  *
  * 为什么住这里：**收敛切片的命名有两代**——旧 `memory-convergence-<日期>[-N]`（至 2026-10-07）、
- * 新 `convergence-<日期>`（本文件同目录的 `tools/converge.mjs` 现行 `evName`）。命名知识属收敛面，
+ * 新 `convergence-<日期>`（2026-10-30 起不再新写：证据随归档件走 `deliverables-archive/<dir>/journal/`；
+ * 本判据只为存量与预算口径保留）。命名知识属收敛面，
  * 所以过滤器住这里、由预算门禁（`checks/gates/snapshots-budget.mjs`）消费；判据单一来源，
  * 且可被 keyless 单测直接钉（`checks/**` 不许被 tests 导入 ⇒ 住在门禁里就测不到）。
  * @param input - `{ scenes, bytesOf }`：`scenes` = `canonicalSnapshotScenes(root)`；`bytesOf` = 目录 → 字节数。
@@ -136,7 +137,7 @@ export function canonicalParticipation(raw) {
  *  引用路径里的 slug 字样误触（BUG-014：COO 的证据路径含 slug → 假跳过、条目漏登）。 */
 export function charterHasEntry(charterText, slug) {
   const esc = slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  return new RegExp(`^\\s*-\\s*\\d{4}-\\d{2}-\\d{2}\\s*·\\s*${esc}（`, 'm').test(charterText)
+  return new RegExp(`^\\s*-\\s*\\d{4}-\\d{2}-\\d{2}(?:\\s+\\d{2}:\\d{2}(?::\\d{2})?)?\\s*·\\s*${esc}（`, 'm').test(charterText)
 }
 
 /** CLI 旗标解析（纯函数）——参数唯一源在 converge.mjs 头注（BUG-016：未知旗标曾静默收下）。 */
@@ -147,41 +148,36 @@ export function parseFlags(args) {
       throw new Error(`未知旗标 ${a}——认识：--slug <目录名> / --dry-run / --charter-backfill <目录名> / --allow-no-journal / --allow-open-findings / --resume <目录名> / --rebuild-index；无参 = 计划模式`)
     }
   }
-  const argOf = name => { const i = args.indexOf(`--${name}`); return i === -1 ? undefined : args[i + 1] }
-  return { slug: argOf('slug'), dryRun: args.includes('--dry-run'), charterBackfill: argOf('charter-backfill'), allowNoJournal: args.includes('--allow-no-journal'), allowOpenFindings: args.includes('--allow-open-findings'), resume: argOf('resume') }
-}
-
-/** 解析某已收敛 slug 的证据目录名（convergence-<日期>）。
- *  扫 snapshots/archive/ 下各 convergence-* 目录，认「<目录>/<dirName> 在场」为证据；
- *  多日并存取最新（ISO 日期字典序 = 时间序）；无证据目录 = throw（fail-loud——
- *  BUG-015：写死运行日曾静默写出断链指针）。 */
-export function resolveEvidenceDir(archiveRoot, dirName) {
-  const matches = []
-  if (existsSync(archiveRoot)) {
-    for (const d of readdirSync(archiveRoot)) {
-      if (!/^convergence-\d{4}-\d{2}-\d{2}$/.test(d)) continue
-      if (existsSync(join(archiveRoot, d, dirName))) matches.push(d)
-    }
+  const argOf = name => {
+    const i = args.indexOf(`--${name}`)
+    if (i === -1) return undefined
+    const value = args[i + 1]
+    if (value === undefined || value.startsWith('--')) throw new Error(`--${name} 需要一个目录名`)
+    return value
   }
-  if (matches.length === 0) {
-    throw new Error(`无收敛证据目录：snapshots/archive/convergence-*/ 下没有 ${dirName}（backfill 只补已收敛 slug）`)
-  }
-  matches.sort()
-  return matches[matches.length - 1]
+  const slug = argOf('slug')
+  const charterBackfill = argOf('charter-backfill')
+  const resume = argOf('resume')
+  const actions = [slug, charterBackfill, resume].filter(Boolean)
+  if (actions.length > 1) throw new Error('一次只能一个动作：--slug / --charter-backfill / --resume 三选一')
+  if (args.includes('--rebuild-index') && actions.length > 0) throw new Error('--rebuild-index 不能与其他动作同用')
+  if (args.includes('--rebuild-index') && args.includes('--dry-run')) throw new Error('--rebuild-index 不能与 --dry-run 同用')
+  return { slug, dryRun: args.includes('--dry-run'), charterBackfill, allowNoJournal: args.includes('--allow-no-journal'), allowOpenFindings: args.includes('--allow-open-findings'), resume }
 }
 
 /**
  * 归档搬移的**步骤计划**（2026-10-13）。为什么不再用 `git mv`：自本日起交付物的 `drafts/**`
  * （含 `sources/`）**不进 git**（仓库瘦身，见 archived Note 2026-10-13-workspace-slimming），
  * 而 `git mv <目录>` 遇到未跟踪文件会 fatal（`not under version control`）——目录必须用
- * **文件系统搬**，tracked 面（final/meta 等）再用 `git add -A` 收进索引（删除+新增一起 stage）。
+ * **文件系统搬**。2026-10-30 起 run bundle 的 `company-workspace/` 整树 gitignored，归档不再做
+ * `git add`（显式 add 忽略路径会 fatal）；计划只给 from/to，执行 = 纯 fs rename。
  * @param dirName - deliverables/ 下的目录名（`<日期>-<slug>`）。
- * @returns 相对仓库根的 from/to + git 参数（执行留在驱动脚本；spec 在临时 git 仓里真跑同一份计划）。
+ * @returns 相对仓库根的 from/to（纯文件系统搬移；不再有 git 参数）。
  */
 export function archiveMovePlan(dirName, wsRel = 'company-workspace') {
   const from = join(wsRel, 'deliverables', dirName).split(sep).join('/')
   const to = join(wsRel, 'deliverables-archive', dirName).split(sep).join('/')
-  return { from, to, gitArgs: ['add', '-A', '--', from, to] }
+  return { from, to }
 }
 
 /**
@@ -255,31 +251,21 @@ export function assess(state, flags = {}) {
  *
  * 每步 `{ kind, label?, ... }`：`label` 存在 = 会打印进 dry-run 清单；`rewrite-refs` 静默
  * （历史行为：CHARTER/notes 的路径重指不进取景清单），但执行器仍按序消费它。
- * @param {{ dirName: string, evName: string, conclusion: string, journal: Array<{role: string, file: string}> }} state
+ * @param {{ dirName: string, conclusion: string, journal: Array<{role: string, file: string}> }} state
  * @returns {Array<{kind: string, label?: string, [k: string]: unknown}>}
  */
 export function steps(state) {
   const journal = state.journal ?? []
-  const move = archiveMovePlan(state.dirName, state.wsRel)
+  const wsRel = state.wsRel ?? 'company-workspace'
+  const move = archiveMovePlan(state.dirName, wsRel)
+  const journalRel = `${wsRel}/deliverables-archive/${state.dirName}/journal`
   return [
-    { kind: 'evidence-copy', label: `证据副本 → snapshots/archive/${state.evName}/${state.dirName}/（journal ×${journal.length} 留底；交付物本体 git mv 进归档家，不双份拷贝）` },
-    { kind: 'rewrite-refs', dirName: state.dirName, evName: state.evName, journal },
-    { kind: 'archive-move', label: `git mv deliverables/${state.dirName} → deliverables-archive/${state.dirName}`, ...move },
-    ...journal.map(entry => ({ kind: 'clear-journal', label: `git rm kb/${entry.role}/journal/${entry.file}（副本已入证据目录）`, entry })),
+    { kind: 'evidence-copy', label: `证据副本 → ${journalRel}/（journal ×${journal.length} 随交付物搬移；不再写 snapshots/）` },
+    { kind: 'rewrite-refs', label: '重指 CHARTER/notes 路径指针', dirName: state.dirName, journal },
+    { kind: 'archive-move', label: `fs rename ${wsRel}/deliverables/${state.dirName} → ${wsRel}/deliverables-archive/${state.dirName}`, ...move },
+    ...journal.map(entry => ({ kind: 'clear-journal', label: `清 live journal kb/${entry.role}/journal/${entry.file}（副本已入归档件 journal/）`, entry })),
     { kind: 'ledger-append', label: `台账追加一行（逐字取 meta：${state.conclusion.slice(0, 40)}…）` },
     { kind: 'rebuild-index', label: '成品索引重建（node tools/deliverables-index.mjs）' },
     { kind: 'backfill-hint', label: `CHARTER 历史纪要补登：node tools/converge.mjs --charter-backfill ${state.dirName}（结论逐字取 meta）` },
   ]
-}
-
-/**
- * 归档搬移后的 `git add` 参数（2026-10-20 现场：新建交付物的 final/meta 尚未 tracked，
- * 搬走后 `git add -A -- <旧路径> <新路径>` 因旧路径无任何 tracked 项而 fatal，收敛半途崩）。
- * 旧路径有 tracked 文件 ⇒ 用原计划（同时 stage 删除+新增）；没有 ⇒ 只 stage 归档家。
- * @param {{ from: string, to: string, gitArgs: string[] }} plan - `archiveMovePlan` 结果。
- * @param {boolean} fromTracked - 搬移前 `git ls-files -- <from>` 是否非空。
- * @returns {string[]} git add 参数。
- */
-export function archiveGitArgs(plan, fromTracked) {
-  return fromTracked ? plan.gitArgs : ['add', '-A', '--', plan.to]
 }

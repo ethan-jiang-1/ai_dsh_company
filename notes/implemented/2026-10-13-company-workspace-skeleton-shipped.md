@@ -13,7 +13,8 @@
 | ② 本部署数据 | 填写后的 owners、台账行、`kb/<角色>/journal/`、`deliverables/` | `company-workspace/`（运行盘） | 现状不变（本轮只动 ①） | ❌ |
 | ③ 过程物料 | `deliverables*/**/drafts/**`（含 `sources/` 原始取证） | 运行盘 | 待切片 2（≈70MB / 694 件） | ❌ |
 
-运行盘对 ① 用**符号链接**指回 pack（`company-workspace/AGENTS.md` → `../packages/company-pack/workspace/AGENTS.md` 等 8 处），
+运行盘对 ① 用**符号链接**指回 pack（`company-workspace/AGENTS.md` → `../packages/company-pack/workspace/AGENTS.md`、
+`templates`、`kb/org.md` 共 3 处；5 份 `CHARTER.md` 是实文件），
 不复制：一处事实一个家（先例 = 根 `CLAUDE.md`、排练场手册）。角色会话读 `company-workspace/AGENTS.md` 照读（链接透明），
 而第三方装到的与我们在改的**是同一份**。
 
@@ -46,12 +47,13 @@
 release-smoke ④⑥（骨架随包 + 首启落盘 + 二次启动零变更，ALL PASS）。
 **同轮再接着做完**：④仓库瘦身 = [公司盘瘦身](../archived/2026-10-13-workspace-slimming.md)（drafts/sources 出 git +
 converge/orient/排练判据适配 + `drafts-untracked` 门禁）。
-**仍未做**：⑤落点自动登记成工作区、⑥制度件升级策略。
+**仍未做**：⑤落点自动登记成工作区；⑥制度件升级策略已由 2026-10-24 的 manifest 哈希升级补上
+（未改替换、改过保留，见 [run-bundle](./2026-10-24-run-bundle-install-unit.md) §5）。
 
 ## 验证（都真跑过）
 
 - `node checks/run-gates.mjs`（`pnpm verify`）——**ALL PASS**，含新门禁 `company-skeleton`
-  （`PASS company-skeleton 单源 ×8 + 起动件 ×9`、`PASS company-skeleton 随包分发（files 含 workspace/**）`）。
+  （`PASS company-skeleton 单源 ×3 + 章程 ×5 + 起动件 ×9`、`PASS company-skeleton 随包分发（files 含 workspace/**）`）。
 - 门禁反证三处（红→还原→绿，原话）：
   ① 运行盘手册换成真副本 ⇒ `FAIL company-skeleton: company-workspace/AGENTS.md 不是符号链接（副本 = 第二本账；运行盘该指回 packages/company-pack/workspace/AGENTS.md）`；
   ② `files` 删掉 `workspace/**` ⇒ `FAIL … 的 files 缺 workspace/**——第三方装了插件却没有公司盘骨架`；
@@ -67,7 +69,7 @@ converge/orient/排练判据适配 + `drafts-untracked` 门禁）。
 ## 落点
 
 - 骨架：`packages/company-pack/workspace/`（含 `README.md` 说明"是什么 / 装完怎么落盘"）；pack `files` 加 `workspace/**`。
-- 运行盘链接：`company-workspace/AGENTS.md`、`templates`、`kb/org.md`、`kb/<角色>/CHARTER.md`×5。
+- 运行盘链接：`company-workspace/AGENTS.md`、`templates`、`kb/org.md`（3 处）；`kb/<角色>/CHARTER.md`×5 是实文件（随包分发，不链接）。
 - 门禁：`checks/run-gates.mjs` 的 `company-skeleton`；走查修复：`tools/lib/markdown-links.mjs`（路径排除）、
   `tools/lib/rehearsal.mjs`（`copyRef` 解引用）+ `tests/harness/foundation-safety.spec.ts`（新守）。
 - 文档：`packages/company-pack/README.md`（owner 表 + 装完第一步）、`docs/project-map.md` 公司盘行。

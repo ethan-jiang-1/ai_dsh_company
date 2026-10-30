@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 收敛执行器：把 snapshots/README §归档动作 的五步手工流程机械化——
-//   证据副本 → git mv 交付物进归档家 → 清 live journal（留 .gitkeep）→ 台账行自动追加（逐字取 meta，查重跳过）→ 成品索引重建 → 打印 CHARTER 补登指引（--charter-backfill）。
+// 收敛执行器：把归档动作的五步手工流程机械化——
+//   journal 副本入交付物 `journal/`（随交付物进归档家）→ 清 live journal（留 .gitkeep）→ 台账行自动追加（逐字取 meta，查重跳过）→ 成品索引重建 → 打印 CHARTER 补登指引（--charter-backfill）。
+// 证据家 = 归档件的 `journal/`（2026-10-30 起）；**不再写 `snapshots/archive`**——产品仓只留合成场景，
+// 真实部署证据归部署盘/归档件。政策 = notes/implemented/2026-10-30-converge-evidence-home.md。
 // 何时跑：用户说「收敛/清理工作区」时；或轮末维护者收敛已闭合动议时（维护者专用——分身不自行删改，见手册「轮末收敛」）。
 // 用法（参数唯一源 = 本头注；未知旗标 = 退出 1——`--plan` 不是旗标，无参即计划模式）：
 //   node tools/converge.mjs                     # 计划模式：列出可收敛/未闭合 slug + journal 收割预览（放行旗标此档也生效）
@@ -12,16 +14,16 @@
 //   node tools/converge.mjs --charter-backfill <目录名>  # 为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步）
 //   node tools/converge.mjs --resume <目录名>   # **半态续跑**：交付物已在归档家但 journal/台账未做完时接手（BUG-020；不搬移交付物）
 //   node tools/converge.mjs --rebuild-index    # 只重建成品索引（等价于收敛末尾那一步；生成器跑完后重读）
-// 成本：秒级~十秒级、无模型；交付物走 git mv（tracked）；journal 已跟踪的走 git rm、**未跟踪的走 rmSync**
+// 成本：秒级~十秒级、无模型；交付物走 fs rename（不再 git add）；journal 已跟踪的走 git rm、**未跟踪的走 rmSync**
 //   （角色刚写、尚未入库的 journal 是常态；2026-10-16 实测 git rm 会以 pathspec 不匹配中断收敛）。
 // ⚠ 环境：需 **`source run/env.sh`**（DSH_HOME 指向开发 home）——「无未结审计发现」这道前置要调
 //   `checks/audit/deliverables-check.mjs --only <slug>`（判据单一来源 = 那个审计档，收敛器不重写）。
 //   环境不可用时 fail-closed（报一条不可评估的发现），不放行。
 // 退出码：0 = 成功（计划或执行）；1 = 前置不满足/用法错误。
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, renameSync, rmSync } from 'node:fs'
-import { join, basename } from 'node:path'
+import { join, basename, relative, resolve, sep } from 'node:path'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { assess, archiveGitArgs, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalSlug, parseFlags, resolveEvidenceDir, steps } from './lib/converge-rules.mjs'
+import { assess, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalSlug, parseFlags, steps } from './lib/converge-rules.mjs'
 import { parseAuditVerdict } from './lib/audit-verdict.mjs'
 import { COMPANY_ROLE_IDS } from './lib/company-roles.mjs'
 import { spawnSync } from 'node:child_process'
@@ -36,8 +38,13 @@ try {
 } catch (e) { console.error(`✗ ${e.message}`); process.exit(1) }
 // 测试缝（2026-10-23）：探针在 runtime/ 下的临时工作区真跑同一套步骤，不碰 live 公司盘。
 // 默认值不变，CLI 行为不变；只有显式设了 CONVERGE_WS_REL 才重定向。
-const WS_REL = process.env.CONVERGE_WS_REL ?? 'company-workspace'
-const WS = join(ROOT, WS_REL)
+const ROOT_REAL = resolve(ROOT)
+const WS = resolve(ROOT, process.env.CONVERGE_WS_REL ?? 'company-workspace')
+if (WS === ROOT_REAL || !WS.startsWith(ROOT_REAL + sep)) {
+  console.error(`✗ CONVERGE_WS_REL 必须指向仓库内的子目录（当前解析为 ${WS}）`)
+  process.exit(1)
+}
+const WS_REL = relative(ROOT, WS).split(sep).join('/')
 const ACTIVE = join(WS, 'deliverables')
 const ARCHIVE = join(WS, 'deliverables-archive')
 const LEDGER = join(WS, 'kb', 'motion-ledger.md')
@@ -82,7 +89,7 @@ const checkSlugFindings = slug => {
  */
 const rebuildCatalogIndex = () => {
   const invocation = catalogIndexInvocation({ root: ROOT })
-  const r = spawnSync(invocation.command, invocation.args, { cwd: invocation.cwd, encoding: 'utf8' })
+  const r = spawnSync(invocation.command, invocation.args, { cwd: invocation.cwd, encoding: 'utf8', env: { ...process.env, DELIVERABLES_WS_REL: WS_REL } })
   if (r.status !== 0) {
     console.error(`✗ 成品索引重建失败（exit ${String(r.status)}）：${(r.stderr ?? '').trim().slice(0, 300)}`)
     console.error('  盘上收敛可能已完成；索引可单独重跑：node tools/deliverables-index.mjs')
@@ -154,9 +161,10 @@ const clearLiveJournal = journal => {
 }
 
 const copyEvidence = (evDir, journal) => {
-  // ⚠ 证据副本只收 **journal**（它们被从 live 删除，需要留底）；交付物本体 = git mv 进
-  //   deliverables-archive（持久拷贝）——再拷一份进 snapshots 是双份存储（2026-10-12 实测把
-  //   snapshots 顶爆 64M 预算，84.1M）。evDir 由调用方构造（converge() 内 evName 单一出处）。
+  if (journal.length === 0) return evDir
+  // ⚠ 证据副本只收 **journal**（它们被从 live 删除，需要留底）；交付物本体随后 fs rename 进
+  //   deliverables-archive，journal 作为其子目录随行——单一持久拷贝，不再进 snapshots。
+  //   evDir = 交付物目录（收敛时活跃件，续跑时归档件）。
   mkdirSync(join(evDir, 'journal'), { recursive: true })
   for (const j of journal) {
     const src = join(WS, j.path)
@@ -205,15 +213,20 @@ const resume = (dirName) => {
       : '活跃区与归档家都没有它：核对目录名，或从未收敛过'))
     process.exit(1)
   }
+  if (DRY) {
+    console.log(`续跑计划 · ${dirName}（剩余：${state.remaining.join(' / ')}；dry-run，不动盘）`)
+    return
+  }
   const metaBody = readFileSync(join(ARCHIVE, dirName, 'meta.md'), 'utf8')
   const field = k => (metaBody.match(new RegExp(`^${k}:\\s*(.*)$`, 'm'))?.[1] ?? '').trim()
   const fields = { slug: field('slug') || slug, kickoff: field('kickoff') || dirName.slice(0, 10),
     类型: field('类型'), 参与: field('参与'), 墙钟: field('墙钟'), 结论: field('一句话结论') }
   console.log(`续跑收敛 · ${dirName}（剩余：${state.remaining.join(' / ')}）`)
   if (journal.length > 0) {
-    const evDir = join(ROOT, 'snapshots', 'archive', `convergence-${today}`, dirName)
+    const evDir = join(ARCHIVE, dirName)
     copyEvidence(evDir, journal)
-    console.log(`  · 证据副本 → snapshots/archive/convergence-${today}/${dirName}/（journal ×${journal.length}）`)
+    rewriteRefs({ dirName, journal })
+    console.log(`  · journal 副本 → deliverables-archive/${dirName}/journal/（×${journal.length}）`)
     const removed = clearLiveJournal(journal)
     console.log(`  · 清 live journal ×${removed.length}`)
   } else console.log('  · 零 live journal 可清（journal 步已完成——续跑幂等）')
@@ -229,7 +242,7 @@ const resume = (dirName) => {
  *   （foundation-safety 钉「CHARTER 的 kb/ 路径必须存在」）。指向一律改写为证据副本路径，
  *   并逐条打印供人复核（决定内容应已 inline 在 CHARTER 句里，此处只动指针）。
  */
-const rewriteRefs = ({ dirName, evName, journal }) => {
+const rewriteRefs = ({ dirName, journal }) => {
   const refRewrites = []
   for (const role of ROLES) {
     const charter = join(WS, 'kb', role, 'CHARTER.md')
@@ -239,7 +252,7 @@ const rewriteRefs = ({ dirName, evName, journal }) => {
     for (const j of journal) {
       const ref = `kb/${j.role}/journal/${j.file}`
       if (ct.includes('`' + ref + '`') || ct.includes(ref)) {
-        const to = `snapshots/archive/${evName}/${dirName}/journal/${j.role}/${j.file}`
+        const to = `deliverables-archive/${dirName}/journal/${j.role}/${j.file}`
         ct = ct.split('`' + ref + '`').join(`'${to}'（原稿）`).split(ref).join(to)
         touched = true
         refRewrites.push(`kb/${role}/CHARTER.md：${ref} → ${to}`)
@@ -257,9 +270,10 @@ const rewriteRefs = ({ dirName, evName, journal }) => {
     for (const j of journal) {
       const ref = `${WS_REL}/kb/${j.role}/journal/${j.file}`
       if (nt.includes(ref)) {
-        nt = nt.split(ref).join(`snapshots/archive/${evName}/${dirName}/journal/${j.role}/${j.file}`)
+        const noteTo = `${WS_REL}/deliverables-archive/${dirName}/journal/${j.role}/${j.file}`
+        nt = nt.split(ref).join(noteTo)
         touched = true
-        refRewrites.push(`notes/implemented/${n}：journal 路径 → 证据副本`)
+        refRewrites.push(`notes/implemented/${n}：journal 路径 → ${noteTo}`)
       }
     }
     for (const dref of [`${WS_REL}/deliverables/${dirName}/`]) {
@@ -280,16 +294,13 @@ const rewriteRefs = ({ dirName, evName, journal }) => {
  */
 const executeStep = (step, ctx) => {
   switch (step.kind) {
-    case 'evidence-copy': copyEvidence(ctx.evDir, ctx.journal); break
+    case 'evidence-copy': copyEvidence(join(ACTIVE, ctx.dirName), ctx.journal); break
     case 'rewrite-refs': rewriteRefs(ctx); break
     case 'archive-move': {
-      // 归档搬移（2026-10-13 起）：`git mv` → **fs rename + git add -A**。原因见 archiveMovePlan 注释
-      // （drafts 不再 tracked，`git mv` 遇未跟踪文件 fatal）。
-      // 新建交付物的 final/meta 可能尚未 tracked：旧路径无 tracked 项时 `git add -A -- from to`
-      // 会 fatal（2026-10-20 token-account-pool 真现场，收敛半途崩）。按 tracked 与否选参数。
-      const fromTracked = (spawnSync('git', ['ls-files', '--', step.from], { cwd: ROOT, encoding: 'utf8' }).stdout ?? '').trim() !== ''
+      // 归档搬移 = **纯 fs rename**（2026-10-30 起不再 `git add`）：run bundle 时代
+      // `company-workspace/` 整树 gitignored，显式 add 会被 git 拒绝（真现场 = converge-e2e 探针）。
+      // 交付物的 tracked 面早已不存在；归档是业务盘动作，不是 git 动作。
       renameSync(join(ROOT, step.from), join(ROOT, step.to))
-      git(archiveGitArgs(step, fromTracked))
       break
     }
     case 'clear-journal': clearLiveJournal([step.entry]); break
@@ -323,23 +334,21 @@ const converge = (dirName) => {
   }
   if (readiness.accepted.includes('no-journal')) console.error(`⚠ ${dirName}: 零 journal，--allow-no-journal 显式放行（缺口照记：收敛后 live 不再有留痕）`)
   if (readiness.accepted.includes('open-findings')) console.error(`⚠ ${dirName}: 有未结审计发现，--allow-open-findings 显式放行——${findings.detail}`)
-  // ⚠ 字段必须在任何搬移前捕获——git mv 之后 meta.md 就不在原位了（2026-10-12 实测 crash 教训）
+  // ⚠ 字段必须在任何搬移前捕获——rename 之后 meta.md 就不在原位了（2026-10-12 实测 crash 教训）
   const fields = {
     slug: slugOf,
     kickoff: metaField(slugDir, 'kickoff') || dirName.slice(0, 10),
     类型: metaField(slugDir, '类型'), 参与: metaField(slugDir, '参与'), 墙钟: metaField(slugDir, '墙钟'), 结论: concl,
   }
   // 零 journal / 未结审计发现两道前置已并入 assess（本函数 prologue），此处不再重复判。
-  const evName = `convergence-${today}` // 证据目录 = 创建日（本函数创建；backfill 补登走 resolveEvidenceDir——BUG-015）
-  const evDir = join(ROOT, 'snapshots', 'archive', evName, dirName)
   // 计划清单与执行动作同源（converge-rules.steps）：dry-run 打印的就是执行器要逐条消费的序列。
-  const plan = steps({ dirName, evName, conclusion: fields.结论, journal, wsRel: WS_REL })
+  const plan = steps({ dirName, conclusion: fields.结论, journal, wsRel: WS_REL })
   console.log(`收敛计划 · ${dirName}${DRY ? '（dry-run）' : ''}`)
   for (const step of plan) if (step.label) console.log('  · ' + step.label)
   if (DRY) { console.log('dry-run 结束，未动盘'); return }
-  const ctx = { dirName, evName, journal, fields, evDir }
+  const ctx = { dirName, journal, fields }
   for (const step of plan) executeStep(step, ctx)
-  console.log(`✓ 收敛完成：交付物已入归档家、${journal.length} 篇 journal 清入证据副本、台账行已追加`)
+  console.log(`✓ 收敛完成：交付物已入归档家（含 ${journal.length} 篇 journal 副本）、live journal 已清、台账行已追加`)
   console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/converge.mjs --charter-backfill ${dirName}（教训性文字仍由人把守——纪要素材逐字取 meta）`)
 }
 
@@ -355,17 +364,24 @@ const charterBackfill = (dirName) => {
   const kickoff = metaField(slugDir, 'kickoff') || dirName.slice(0, 10)
   const kind = metaField(slugDir, '类型') || '—'
   const concl = metaField(slugDir, '一句话结论')
-  const roles = [...new Set((metaField(slugDir, '参与').match(/CEO|VP-Eng|VP-Sales|COO|CFO/g) ?? []).map(r => ROLE_KEY[r]).filter(Boolean))]
+  const participation = metaField(slugDir, '参与')
+  let roles = [...new Set((participation.match(/CEO|VP-Eng|VP-Sales|COO|CFO/g) ?? []).map(r => ROLE_KEY[r]).filter(Boolean))]
+  if (roles.length === 0 && /全员/.test(participation)) roles = [...new Set(Object.values(ROLE_KEY))]
   if (roles.length === 0) { console.error(`✗ ${dirName}: meta.参与 无可解析角色`); process.exit(1) }
-  let evName
-  try { evName = resolveEvidenceDir(join(ROOT, 'snapshots', 'archive'), dirName) }
-  catch (e) { console.error(`✗ ${dirName}: ${e.message}`); process.exit(1) }
-  if (DRY) { console.log(`backfill 计划：${slug} → ${roles.join(', ')} 的 CHARTER 历史纪要（journal 全文：snapshots/archive/${evName}/${dirName}/journal/<role>/）`); return }
+  const journalExists = existsSync(join(ARCHIVE, dirName, 'journal'))
+  const journalNote = role => existsSync(join(ARCHIVE, dirName, 'journal', role))
+    ? `journal 全文：\`deliverables-archive/${dirName}/journal/${role}/\``
+    : '该角色无 journal 副本'
+  const journalHint = journalExists
+    ? `journal 全文：deliverables-archive/${dirName}/journal/<role>/（有副本的角色）`
+    : '历史收敛未留 journal 副本'
+  if (DRY) { console.log(`backfill 计划：${slug} → ${roles.join(', ')} 的 CHARTER 历史纪要（${journalHint}）`); return }
   for (const role of roles) {
     const charter = join(WS, 'kb', role, 'CHARTER.md')
+    mkdirSync(join(WS, 'kb', role), { recursive: true })
     let ct = existsSync(charter) ? readFileSync(charter, 'utf8') : ''
     if (charterHasEntry(ct, slug)) { console.log(`  · ${role}: CHARTER 历史纪要已有 ${slug} 条目——跳过`); continue }
-    const entry = `- ${kickoff} · ${slug}（${kind}）—— ${concl}\n  （journal 全文：\`snapshots/archive/${evName}/${dirName}/journal/${role}/\`；交付物：\`deliverables-archive/${dirName}/\`）`
+    const entry = `- ${kickoff} · ${slug}（${kind}）—— ${concl}\n  （${journalNote(role)}；交付物：\`deliverables-archive/${dirName}/\`）`
     const hdr = ct.match(/^## 历史纪要.*$/m)
     if (hdr) {
       const after = ct.indexOf('\n## ', hdr.index + 1)

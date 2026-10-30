@@ -13,7 +13,7 @@
    - `dev-loop §0.5` 只留一句指针，**删掉"限 P1/P2 修复型"这句缩写**——原文把章程里
      "P0，或触碰章程/常设指令/docs 合同/company-pack 公开行为/已记录决定 ⇒ 不自授权"的排除项漏掉了，
      一个按 AGENTS 路由过去的 agent 会以为改 docs 合同也能自助。
-2. **收尾次序与六行回执形状的唯一家 = `close-out-definition` skill**（八步；`verify`/`test` 提到回执**之前**）。
+2. **收尾次序与六行回执形状的唯一家 = `close-out-definition` skill**（九步；`verify`/`test` 提到回执**之前**）。
    `dev-loop §12` 只留指南独有的去向规则（对照授权原文、整片 revert、`_backlog` 离场条件、Note 归属），
    并链接 skill；`orient.md` 的六行回执指针从 §12 改指 skill。
 3. 两份清单不再"互指对方为 owner"：skill 自称次序与回执形状的 owner，§12 自称去向规则的 owner。

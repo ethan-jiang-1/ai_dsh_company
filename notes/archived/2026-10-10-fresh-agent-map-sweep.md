@@ -26,7 +26,7 @@
 - **C1/C4 在判据层排除，不追改档案**：entry-probe 提示词的 conflicts 契约收窄到「**活跃树现行文本之间**的来源冲突」，点名历史面（snapshots 档案 / notes/archived / _backlog/_archive / deliverables-archive / runtime）的时效差异不立矛盾。
 - **C2 的盲区用门禁堵死**（不动人工清扫）：retired-path 扫描面扩「checks|probes|tools|tests 的脚本**注释行**」——只扫注释（`//`、块注释行），不扫代码体（模板字符串/映射表是逻辑不是指针；本门禁自己的退役前缀映射表在单引号字符串里，自豁免）。
 - `C5` 的单点映射落判据家 `demo.md`（「判据按会话形状核 = Lead 根门 present，与手册「只有 CEO」同指」），手册该行加指针——**手册是字节预算面，不复述判据**。
-- **幽灵指针改指自足家**：纪律表该格改 `[release.md §vendor 政策](docs/release.md)`——该文件自称顶层合同（vendor 政策 + 升 pin 程序）且 §升 pin 程序自足；**不补建那个 README**（子模块内建文件会碰 vendor 只读面，且第二名只会再漂）。
+- **幽灵指针改指自足家**：纪律表该格改 `[release.md §vendor 政策](../../docs/release.md)`——该文件自称顶层合同（vendor 政策 + 升 pin 程序）且 §升 pin 程序自足；**不补建那个 README**（子模块内建文件会碰 vendor 只读面，且第二名只会再漂）。
 - **同源盲区一并堵死**（bare-path 重挂例外）：raw 已带 `vendor/` 前缀时不再往 `vendor/dsh/` 下重挂——双树查本身保留（纪律表「权威（vendor 树）」列合法写 vendor 相对写法如 `packages/todo`）。
 - `.pi/` 走 .gitignore 声明（带缘由注释）；写入者在本仓之外，不删目录。
 - **布局块进射程**（新门禁 `layout-block`）：取 fenced 块的**首列路径 token** 做存在性检查（symlink 行、说明续行、`zz` 夹具负例跳过）。**只查存在性，不查散文语义**——"这句话说得对不对"不做机械判定（本仓既有边界：计数/措辞靠纪律与审读）。

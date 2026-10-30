@@ -2,6 +2,10 @@
 
 状态：implemented（2026-10-23；P8；上游事故 = 同日 r3 金样比第六次重录早 9 小时）
 
+> **2026-10-27 部分取代（运行模式）**：`--ui` / `--refresh-ui` 已停用（本仓没有声明 `uiEvidence` 的场景），
+> r3 金样随真实证据移出产品仓；本文的“当前模式”作废。机制判据（sha256 sidecar + 静态复算）保留在
+> [replay-ui-freshness 门禁](../../checks/gates/replay-ui-freshness.mjs)；现行 UI 回归 = [ui-scene-smoke](../../checks/smoke/ui-scene-smoke.mjs)。
+
 ## 决定
 
 1. **指纹旁记**：`--ui --refresh-ui` 在写 `ui.expected.md` 的同时写旁文件

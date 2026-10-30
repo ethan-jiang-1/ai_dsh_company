@@ -47,7 +47,7 @@
 | 位置 | 回答什么 |
 |---|---|
 | `_backlog/issues/` → 用户裁决 → `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含实际跑过的验证 + 环境状态）。提案纪律 / 状态轴 / 毕业规则 / 分类规矩唯一家 = [notes/README](../notes/README.md)；未成熟问题由 [_backlog/issues/](../_backlog/issues/README.md) 推敲，制度 = [_backlog/README](../_backlog/README.md) |
-| [notes/archived/](../notes/archived/) · [notes/rejected/](../notes/rejected/) · [notes/postmortem/](../notes/postmortem/README.md) | 离场与复盘目录（D30 起；逐桶判据唯一家 = [notes/README](../notes/README.md)）：archived = 仍能阻止重开的冻结判定，rejected = 负知识，postmortem = **事故复盘** |
+| [notes/archived/](../notes/archived/) · [notes/rejected/](../notes/rejected/) · [notes/postmortem/](../notes/postmortem/README.md) | 离场与复盘目录（D30 起；逐桶判据唯一家 = [notes/README](../notes/README.md)）：archived = 顶层仍能阻止重开的冻结判定（`receipts/` = 只帮复核的历史证据，非否决），rejected = 负知识，postmortem = **事故复盘** |
 ## 决策台账（已迁）
 
 D 号 → 一句话 → 家的路由表已迁 [decisions.md](./decisions.md)（本页只留路由；决定正文仍住 Note）。

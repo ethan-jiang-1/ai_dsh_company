@@ -30,11 +30,14 @@ description: Use when finishing any non-trivial change before reporting it done,
    ③撞到运行态事实没（→ 调试阶梯 / Note / 升级 probe）。**三问全「无」也是合法答案，如实记。**
 5. **指针收口。** 改过的路径/符号/默认值，在所有**活文档**里的引用是否都指到现行家
    （门禁 `bare-path` / `md-links` 查得到的部分交给门禁，查不到的——散文里的描述、表格里的行——自己过一遍）。
-6. **反向检查**：被证伪的已落地切片**整片 revert**（实现+测试+docs+Note 同退），修正另起新条目。
+6. **改口检查。** 本轮若推翻/收窄了既有决定：旧 Note 是否已加「被…取代」指针（或 `git mv` 到
+   archived）、新 Note 的「输掉的方案」是否载明旧决定？只有新文、没有旧文回链 = 未收口
+   （规则 = notes/README §五）。机械面 = `pnpm notes:audit`（只读；硬项 = 取代缺回链 / 状态行）。
+7. **反向检查**：被证伪的已落地切片**整片 revert**（实现+测试+docs+Note 同退），修正另起新条目。
    不做半 revert 的外科修补——半退留「文档说 A、代码是 B」的漂移态，结构门禁查 HEAD 不查语义一致，抓不住。
-7. **跑门禁**：`pnpm verify` + `pnpm test`（`set -o pipefail` 链；裸 `cmd | tail` 取的是 tail 的
+8. **跑门禁**：`pnpm verify` + `pnpm test`（`set -o pipefail` 链；裸 `cmd | tail` 取的是 tail 的
    退出码 = 假绿）。改动面涉类型/导入签名时加 `pnpm typecheck`。
-8. **发轮次回执**（非平凡收尾必发——交接的标准形状，驾驶座可见面）。固定六行：
+9. **发轮次回执**（非平凡收尾必发——交接的标准形状，驾驶座可见面）。固定六行：
    ① 外部行为与影响面（含改动 owner）；
    ② 四链证据（挂得上 / 行为对 / 装得上〔适用时〕 / 批准：各点名**实跑**的检查，未跑如实标「未执行」）；
    ③ 语义审结论（四输入过了一遍、发现 N 条及处置）；
@@ -48,6 +51,7 @@ description: Use when finishing any non-trivial change before reporting it done,
 - [ ] 四链证据每条点名实跑检查；未跑的显式标「未执行」（不写成绿）。
 - [ ] 语义审**真跑过**并且**写出了结论**（审了什么、发现 N 条、怎么处置）——不是"已阅"。
 - [ ] 收割三问逐问有答案（「无」也是答案，但必须回答）。
+- [ ] 改口检查过：若推翻/收窄旧决定，旧文有回链或已归档；`pnpm notes:audit` 无「取代缺回链」。
 - [ ] 被证伪的切片整片 revert（或明确说明为何不 revert）。
 - [ ] `pnpm verify` + `pnpm test` 全绿，且命令链用了 `set -o pipefail`（涉类型面时 `pnpm typecheck` 也跑过）。
 - [ ] 六行回执已发，且每行都有内容（「未执行」「无」也是内容）。

@@ -217,7 +217,7 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 
 ## 9. 落地后复评（2026-10-28 收口）
 
-> 口径：只认实际落地与实跑读数；P3 四项已由 [follow-up Note](../../../../notes/implemented/2026-10-28-r4-p3-followup.md) 清零。
+> 口径：只认实际落地与实跑读数；P3 四项已由 [follow-up Note](../../../../notes/archived/receipts/2026-10-28-r4-p3-followup.md) 清零。
 
 | 维 | 初评 | 复评 | 关键证据 |
 |---|---|---|---|

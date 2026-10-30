@@ -76,7 +76,7 @@ switch the consumer to `danger-full-access`*（`vendor/dsh/packages/sandbox/sand
   - `checks/smoke/entry-probe-smoke.mjs`：它的 `read-only` 不在脚本里，而在
     `run/entry-probe.patch.yml` 的 profile 层（`sandbox-policy.mode: read-only` + `approval.policy: never`），
     是**有意**的 fail-closed 档。实测该探针**容忍** fail-closed：最近一次归档
-    （`snapshots/probes/entry-probe/2026-10-10/answer-10-00-01-310Z.md`）得 12/13，唯一失败项是 Q1
+    （2026-10-10 的 entry-probe 答卷；真实证据已随 2026-10-25 清理移出产品仓）得 12/13，唯一失败项是 Q1
     引文不匹配（内容问题）；那次会话 1 条 bash 撞 fail-closed，agent 改用 read/grep/glob 完成，
     `approval/asked` = 0。历史分数本就在 0/12–12/12 间波动 ⇒ 是这个探针的固有噪声，不是 sandbox 回归。
   - `checks/smoke/replay-smoke.mjs:238` 的 `DSH_PERMISSION_MODE: 'workspace-write'` 是**死代码**：

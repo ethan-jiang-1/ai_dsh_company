@@ -26,12 +26,12 @@
 | [2026-10-27-data-model-gaps.md](settled_issues/2026-10-27-data-model-gaps.md) | 已结；G1–G12 落三份 Note，剩余多 Host 高可用为边界 | 2026-10-27 |
 | [2026-10-27-data-model-review-followup.md](settled_issues/2026-10-27-data-model-review-followup.md) | 已结；F1–F10 落 [review-followup](../../notes/implemented/2026-10-27-data-model-review-followup.md) | 2026-10-27 |
 | [2026-10-27-data-model-closeout.md](settled_issues/2026-10-27-data-model-closeout.md) | 已结；R1–R6 落 [data-model-r1-r6](../../notes/implemented/2026-10-27-data-model-r1-r6.md) | 2026-10-27 |
-| [2026-10-25-distribution-contract.md](settled_issues/2026-10-25-distribution-contract.md) | 已实施；去向 = [distribution-lifecycle](../../notes/implemented/2026-10-25-distribution-lifecycle.md) | 2026-10-25 |
-| [2026-10-25-install-lifecycle-evidence.md](settled_issues/2026-10-25-install-lifecycle-evidence.md) | 已实施；去向 = [distribution-lifecycle](../../notes/implemented/2026-10-25-distribution-lifecycle.md) | 2026-10-25 |
-| [2026-10-25-shipped-content-self-contained.md](settled_issues/2026-10-25-shipped-content-self-contained.md) | 已实施；去向 = [installed-shape-self-sufficient](../../notes/implemented/2026-10-25-installed-shape-self-sufficient.md) | 2026-10-25 |
-| [2026-10-25-deliverables-catalog-and-audit.md](settled_issues/2026-10-25-deliverables-catalog-and-audit.md) | 已实施；去向 = [installed-shape-self-sufficient](../../notes/implemented/2026-10-25-installed-shape-self-sufficient.md) | 2026-10-25 |
-| [2026-10-25-standalone-deployment-shape.md](settled_issues/2026-10-25-standalone-deployment-shape.md) | 已实施；去向 = [standalone-deployment](../../notes/implemented/2026-10-25-standalone-deployment.md) | 2026-10-25 |
-| [2026-10-25-deployment-identity-and-workspace-guard.md](settled_issues/2026-10-25-deployment-identity-and-workspace-guard.md) | 已实施；去向 = [standalone-deployment](../../notes/implemented/2026-10-25-standalone-deployment.md) | 2026-10-25 |
+| [2026-10-25-distribution-contract.md](settled_issues/2026-10-25-distribution-contract.md) | 已实施；去向 = [distribution-lifecycle](../../notes/archived/2026-10-25-distribution-lifecycle.md) | 2026-10-25 |
+| [2026-10-25-install-lifecycle-evidence.md](settled_issues/2026-10-25-install-lifecycle-evidence.md) | 已实施；去向 = [distribution-lifecycle](../../notes/archived/2026-10-25-distribution-lifecycle.md) | 2026-10-25 |
+| [2026-10-25-shipped-content-self-contained.md](settled_issues/2026-10-25-shipped-content-self-contained.md) | 已实施；去向 = [installed-shape-self-sufficient](../../notes/archived/2026-10-25-installed-shape-self-sufficient.md) | 2026-10-25 |
+| [2026-10-25-deliverables-catalog-and-audit.md](settled_issues/2026-10-25-deliverables-catalog-and-audit.md) | 已实施；去向 = [installed-shape-self-sufficient](../../notes/archived/2026-10-25-installed-shape-self-sufficient.md) | 2026-10-25 |
+| [2026-10-25-standalone-deployment-shape.md](settled_issues/2026-10-25-standalone-deployment-shape.md) | 已实施；去向 = [standalone-deployment](../../notes/archived/2026-10-25-standalone-deployment.md) | 2026-10-25 |
+| [2026-10-25-deployment-identity-and-workspace-guard.md](settled_issues/2026-10-25-deployment-identity-and-workspace-guard.md) | 已实施；去向 = [standalone-deployment](../../notes/archived/2026-10-25-standalone-deployment.md) | 2026-10-25 |
 | [2026-09-28-dag-edge-routing.md](settled_issues/2026-09-28-dag-edge-routing.md) | 已实施；决定稿已删，历史在 git | 2026-09-28 |
 | [2026-09-28-float-geometry-memory.md](settled_issues/2026-09-28-float-geometry-memory.md) | 已实施；决定稿已删，历史在 git | 2026-09-28 |
 | [2026-09-28-sidebar-split-budget.md](settled_issues/2026-09-28-sidebar-split-budget.md) | 不做 | 2026-09-28 |
@@ -81,6 +81,8 @@
 - [repo-hygiene/2026-10-27-six-dimension-audit-round3.md](research/repo-hygiene/2026-10-27-six-dimension-audit-round3.md) — 第三轮六维度审计（六维判定 + R3-01…26 + 实跑读数）；服务卡 = 上面的 2026-10-27 已结卡。
 - [repo-hygiene/2026-10-28-six-dimension-audit-round4.md](research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md) — 第四轮六维审计（初评 B/B/B/B/B/C + R4-01…22 + 收口复评 A-）；服务卡 = 上面的 2026-10-28 已结卡。
 - [run-bundle/2026-10-24-run-bundle-boundary.md](research/run-bundle/2026-10-24-run-bundle-boundary.md) — run bundle 现状排摸（安装实测 / 历史负担 / base-gown 分层 / 迁移面）；服务卡 = 上面的 2026-10-24 已结卡。
+- [notes-consistency/2026-10-30-triage.md](research/notes-consistency/2026-10-30-triage.md) — notes/ 2026-10-30 全树分诊（16 篇 archive + 21 篇收据、硬矛盾清单）；服务卡 = 无（治理轮报告）。
+- [notes-consistency/2026-10-30-receipts-digest.md](research/notes-consistency/2026-10-30-receipts-digest.md) — 21 篇收据的证据索引（演练 11 + R3/R4 批次 10；排除 2 篇误报）；原文已移入 notes/archived/receipts/。
 
 ## 已修缺陷
 

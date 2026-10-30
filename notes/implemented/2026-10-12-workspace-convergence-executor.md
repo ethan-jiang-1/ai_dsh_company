@@ -2,16 +2,21 @@
 
 状态：implemented（2026-10-12 用户点名落地；推敲 owner = `_backlog/_archive/settled_issues/2026-10-12-workspace-convergence.md`——本 Note 只承载落地决定与后续缺陷修复取舍，不复述推敲）
 
+> **2026-10-30 部分取代（证据家 + 归档搬移）**：journal 副本改随交付物进
+> `deliverables-archive/<目录>/journal/`，不再写 `snapshots/archive`；归档搬移不再做 `git add`
+> （run bundle 后 `company-workspace/` 整树 gitignored）。本文 §决定 的旧落点与 §后果 的
+> “snapshots 体积随收敛增长”作废；新 owner = [converge-evidence-home](./2026-10-30-converge-evidence-home.md)。
+
 ## 问题
 
-live 公司盘随动议持续堆积（journal 曾达 39 篇跨 5 角色、live deliverables 曾达 7 slug）：角色开工读最近 journal 的上下文被历史噪声稀释、扫盘变吵。收敛政策已有家（`snapshots/README.md` §归档动作五步）但全靠手工，摩擦高到不常做——堆积没有常态化出口。
+live 公司盘随动议持续堆积（journal 曾达 39 篇跨 5 角色、live deliverables 曾达 7 slug）：角色开工读最近 journal 的上下文被历史噪声稀释、扫盘变吵。收敛政策当时住 `snapshots/README.md` §归档动作五步（2026-10-30 起证据家迁到归档件 `journal/`，见顶部）但全靠手工，摩擦高到不常做——堆积没有常态化出口。
 
 ## 决定
 
-- **CLI = 机械执行器，政策家不变**：`tools/converge.mjs` 实现 §归档动作的可机械化子集——无参计划模式（列可收敛/未闭合 slug + journal 收割预览）、`--slug` 收敛单个（证据副本 → `snapshots/archive/convergence-<收敛日>/<slug>/` → 归档家 git mv → journal 清出留 .gitkeep → 台账行逐字自动追加）、`--dry-run`、`--charter-backfill` 补登 CHARTER 历史纪要。语义判断与政策仍归 snapshots/README §归档动作与人。
+- **CLI = 机械执行器**：`tools/converge.mjs` 实现归档动作的可机械化子集——无参计划模式（列可收敛/未闭合 slug + journal 收割预览）、`--slug` 收敛单个（journal 副本 → 归档件 `journal/`（2026-10-30 起；当时为 `snapshots/archive/`）→ 归档家 fs rename → journal 清出留 .gitkeep → 台账行逐字自动追加）、`--dry-run`、`--charter-backfill` 补登 CHARTER 历史纪要。语义判断仍归人；证据家 owner = 顶部新 Note。
 - **常态化入轮末**：`docs/guides/dev-loop.md` §12 收尾清单含收敛步（无参计划 → 逐个 --slug → --charter-backfill）；工具入口登记 = `checks/README.md`。
-- **判定规则单源**：`tools/lib/converge-rules.mjs`（journal 归属 / CHARTER 条目查重锚 / 证据目录解析 / CLI 旗标解析），回归锚 = `tests/harness/converge-rules.spec.ts`（负例留证 ×3）+ `tests/harness/gitignore-guards.spec.ts`（BUG-013 的 ignore 规则守卫）。
-- **证据副本只收 journal**（被从 live 删除的才需留底）；交付物本体 git mv 进 `company-workspace/deliverables-archive/`，不双份拷贝。
+- **判定规则单源**：`tools/lib/converge-rules.mjs`（journal 归属 / CHARTER 条目查重锚 / CLI 旗标解析），回归锚 = `tests/harness/converge-rules.spec.ts`（负例留证 ×3）+ `tests/harness/gitignore-guards.spec.ts`（BUG-013 的 ignore 规则守卫）。
+- **journal 副本只收 journal**（被从 live 删除的才需留底）；交付物本体 fs rename 进 `company-workspace/deliverables-archive/`，不双份拷贝、不再 git add（2026-10-30 起）。
 
 ## 输掉的方案
 

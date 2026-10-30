@@ -8,6 +8,10 @@
 > **2026-10-28 M3 部分取代作用域**：方法层已从 `<profile>/company-cultivation/<role>/` 迁
 > `<DSH_HOME>/company/methods/<role>/`（旧 profile 路径只读留一版，host 启动一次性迁移）；
 > 提案/采纳/角色闸/沙箱边界等其余决定保留。见 [数据设计硬化 Note](./2026-10-28-data-design-hardening.md)。
+>
+> **2026-10-28 主视图取代入口**：培养从“公司页第四子页”升为第三个主视图 tab（`CultivationView`），
+> 公司总览退回右栏、无对话入口；本文 §② 的入口句作废。见
+> [培养主视图](./2026-10-28-cultivation-main-view.md)。
 
 ## ① Motivation（外部可观察行为）
 
@@ -18,9 +22,9 @@ UI 半边，不是独立过渡）；③ CEO 跨角色 = **仅建议权，目标�
 
 ## ② 决定（机制栈）
 
-- **入口**：公司主面第四子页 用量→培养（`CompanyView` 的 `COMPANY_PANELS`）；培养面板**不依赖
+- **入口**：公司主面第四子页 用量→培养（`CompanyView` 的 `COMPANY_PANELS`；2026-10-28 起改为第三主视图 tab，见顶部）；培养面板**不依赖
   team 数据**（独立角色根会话可看）；用量保留平台页签 `company-budget`（换入口 ≠ 删统计）。
-  同一领域视图（`CultivationBoard`）住公司页/侧栏/浮窗三个壳——一处事实。
+  同一领域视图（`CultivationBoard`）住主视图/侧栏/浮窗三个壳——一处事实（2026-10-28 起主视图壳替代公司页壳）。
 - **数据**：培养记录 = 公司盘 `cultivation/records/*.md`（lib `cultivation.ts` 读模型
   `recordText`/`parseRecord`/`recordInbox`；**不可达 ≠ 0、未验证 ≠ 已掌握**的诚实呈现）。
 - **权限分工**：分身提案 = `cultivation_propose` 工具（host 注册，署 preset/会话，只开提案）；

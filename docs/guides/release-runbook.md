@@ -5,8 +5,8 @@
 
 ## 0. 先决
 
-- 工作树干净；`CHANGELOG.md` 顶部条目 = `package.json` 的版本，且已有实际变化（不是 TODO）。
-- `vendor/dsh` 干净、pin 簿记一致；`pnpm verify` 通过。
+- 工作树干净；`CHANGELOG.md` 顶部条目 = `package.json` 版本且有实际变化；`vendor/dsh` 干净、pin 簿记一致；`pnpm verify` 通过。
+- `pnpm notes:audit --strict` 通过（硬项 0）；收据/死路径成片增长时按 [notes/README §五](../../notes/README.md) 做语义分诊。
 - 真模型冒烟需要凭据时才用 `--with-key`；发布预检与安装冒烟本身 keyless。
 
 ## 1. 五步

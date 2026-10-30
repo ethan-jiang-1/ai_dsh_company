@@ -9,7 +9,7 @@
 //
 // 依赖：本文件**零 import**（叶子模块）；presence.ts → 本文件单向。
 // 为什么 `PRESET_KEYS` 留在这里而不引 `tools/lib/company-roles.mjs`：pack 发布面自包含
-// （`files` 不含 tools/），不许反向依赖维护工具层——同名决定见 notes/implemented/2026-10-14-code-restructure.md
+// （`files` 不含 tools/），不许反向依赖维护工具层——同名决定见 notes/archived/2026-10-14-code-restructure.md
 // 「输掉的方案」（`CULTIVATION_ROLES`/`PRESET_KEYS` 同理）。
 
 /**

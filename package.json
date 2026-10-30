@@ -11,6 +11,7 @@
     "bundle:init": "node tools/bundle-init.mjs",
     "standalone": "node tools/standalone.mjs",
     "orient": "node tools/orient.mjs",
+    "notes:audit": "node tools/notes-audit.mjs",
     "diagnose": "node tools/diagnose.mjs",
     "verify": "node checks/run-gates.mjs",
     "test": "vitest run",

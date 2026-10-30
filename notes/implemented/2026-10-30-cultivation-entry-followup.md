@@ -4,6 +4,9 @@
 上游 = [_backlog/_archive/settled_issues/2026-10-30-cultivation-entry-followup.md](../../_backlog/_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)
 前决定：[培养主线与证据](./2026-10-30-cultivation-work-improvement-traceability.md)、[培养主视图](./2026-10-28-cultivation-main-view.md)、[GUI 行动面](./2026-10-17-cultivation-gui-actions.md)。这些决定继续有效；本 Note 只收口入口后的误发/误导/可读性。
 
+> **2026-10-30 同日部分取代（#1–#2）**：[case-entry](./2026-10-30-cultivation-case-entry.md) 把入口改成
+> 单表单、目标角色默认当前角色、纠正/建议由目标角色推导；本文 §决定 1–2 作废，**#3–#6 仍有效**。
+
 ## 决定
 
 1. **跨角色建议不预选目标角色。** 打开“给别的角色提建议”时 `targetRole` 为空，角色 pills 无 active；未选时“记下来”禁用并提示“先选一个目标角色；未选不会提交”。选定后才发 `/cultivation suggest <role> …`。不把第一个非本角色当默认值。
@@ -33,3 +36,14 @@
 ## 边界
 
 数据模型、`/cultivation` 命令语法、角色闸、AI 起草边界均未改。验证历史仍是有界 `verificationHistory`；`method` 卡的历史呈现变了，记录格式不变。培养对话的失败/流式是客户端行为；真浏览器主视图/对话仍没有专门探针，只有 keyless + 运行态截图。
+
+## 追加（2026-10-30 晚）：单表单文案与不同行并发
+
+- **文案对齐单表单**：`CultivationBoard` 的「怎么养」不再说“→ 给你的角色留一条方法 / → 给别的角色提建议”两个已删除的按钮；
+  改为“点上面「开始记录一项工作」，在表单里写清这次工作、想改善什么与证据”与“同一个入口，把目标角色改成对方即可变成建议”。
+  删除死常量 `composeCorrect` / `composeSuggest`。
+- **不同行并发不再互相误伤**：`pendingId` 单值改为 per-record `pendingIds` 集合 + `inFlight` 按 key 判。
+  同一行双击仍只发一条（护栏保留），不同行并发各发一条。
+- **探针同步**：S19 验证负路补“后续相似工作的具体情况”再确认（2026-10-30 起验证必须有依据）；
+  UX 场景探针在隔离 home 复跑 **ALL PASS**（S13/S23 未验成，原因仍是空白会话没有会话视图入口）。
+- 验证：`cultivation-board` 两 spec 56 PASS；`pnpm test` 全量绿；真浏览器 `cultivation-ux-scenarios` ALL PASS。

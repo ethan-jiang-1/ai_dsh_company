@@ -2,6 +2,8 @@
 
 状态：已交付（2026-10-17 用户令「setup goal，按我们的研发流程推进直到完全结束」；六条待裁点采推荐项）
 
+> **2026-10-28 主视图改造**：面板壳现由 `CultivationView` 承载（`CultivationTab` 仍在右栏）；本文的行动面判据不变。
+
 > 本 Note = 决定 + 实跑证据 + 未验残留。UX 推敲（时刻地图 / 人的输入清单把手审计 / 迭代框架 / 体验协议）的家 =
 > [推敲卡](../../_backlog/_archive/settled_issues/2026-10-17-cultivation-gui-actions.md)（已归档，含裁定表）；
 > 机制核证（UI→host 通道、槽 scope、命令多行能力）同卡，不在此复述。

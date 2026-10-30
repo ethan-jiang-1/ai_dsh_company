@@ -51,8 +51,6 @@ export const CULTIVATION_COPY = {
   // ── 创作入口与表单 ───────────────────────────────────────────────────────
   composeOpen: '开始记录一项工作',
   composeClose: '收起',
-  composeCorrect: '给你的角色留一条方法',
-  composeSuggest: '给别的角色提建议',
   workLabel: '这次什么工作 / 想改善什么',
   workPlaceholder: '例如：Q4 预算评审的结论用了预测数字，但没有列关键假设。',
   previewLabel: '提交前预览',

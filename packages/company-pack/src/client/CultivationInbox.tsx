@@ -24,7 +24,7 @@ export function CultivationInbox({ board }: { readonly board: CultivationBoardSt
     records,
     brokenRecords,
     unexpandedRecords,
-    pendingId,
+    pendingIds,
     rejectingId,
     expandedContexts,
     openingContextId,
@@ -166,13 +166,13 @@ export function CultivationInbox({ board }: { readonly board: CultivationBoardSt
                           <div className="wk-cultivation-actions">
                             <Button
                               variant="primary"
-                              disabled={pendingId === record.id}
+                              disabled={pendingIds.has(record.id)}
                               onClick={() => { void run(record.id, adoptLine(record.id)) }}
                             >
-                              {pendingId === record.id ? CULTIVATION_COPY.running : CULTIVATION_COPY.adopt}
+                              {pendingIds.has(record.id) ? CULTIVATION_COPY.running : CULTIVATION_COPY.adopt}
                             </Button>
                             <Button
-                              disabled={pendingId === record.id}
+                              disabled={pendingIds.has(record.id)}
                               onClick={() => { setRejectingId(record.id); setReason(''); setReasonProblem(null) }}
                             >
                               {CULTIVATION_COPY.reject}
@@ -203,7 +203,7 @@ export function CultivationInbox({ board }: { readonly board: CultivationBoardSt
                             }}
                           />
                           <Button
-                            disabled={pendingId === record.id}
+                            disabled={pendingIds.has(record.id)}
                             onClick={() => { void confirmReject(record.id) }}
                           >
                             {CULTIVATION_COPY.rejectConfirm}

@@ -91,4 +91,4 @@
 
 清单与目录保持一致，机械形状由 `pnpm verify` 检查（含状态行↔frontmatter 镜像互查与 `毕业：` 封闭头）；检查通过不证明问题结论正确或方法有效。章程只写制度，现值和条目进各目录清单。状态行带 🔒 的卡仅用户可判定触发，agent 只报告与建议。本区门牌 = [AGENTS.md](AGENTS.md)（薄：定位、走法、门票与枚举，随第一方文件操作自动注入；规则唯一家仍是本章程与各 README，门牌不复述事实）。
 
-本制度整体借自 `ai_dsh_assitant/_backlog` 工作树；取舍、适配与验证见 [落地 Note](../notes/implemented/2026-10-09-backlog-issue-lifecycle.md)。2026-10-12 制度显性化（缺陷通道、双轨状态生命周期、agent 门牌）借自 `ai_dsh_loop_advisor/_backlog` 同日同名评审卡（机器本地路径，刻意不链接），落地记录见 [显性化 Note](../notes/implemented/2026-10-12-backlog-process-made-explicit.md)。[退役历史池](_archive/legacy/README.md) 保持历史性质，不收新件，也不是任务源。
+本制度整体借自 `ai_dsh_assitant/_backlog` 工作树；取舍、适配与验证见 [落地 Note](../notes/archived/2026-10-09-backlog-issue-lifecycle.md)。2026-10-12 制度显性化（缺陷通道、双轨状态生命周期、agent 门牌）借自 `ai_dsh_loop_advisor/_backlog` 同日同名评审卡（机器本地路径，刻意不链接），落地记录见 [显性化 Note](../notes/archived/2026-10-12-backlog-process-made-explicit.md)。[退役历史池](_archive/legacy/README.md) 保持历史性质，不收新件，也不是任务源。

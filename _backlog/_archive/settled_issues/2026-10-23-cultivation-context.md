@@ -8,7 +8,7 @@ opened: 2026-10-23
 > 立卡：2026-10-23 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
 > **结论（2026-10-23）：** 做；D1=A（命令只带引用、host 读后写 `contexts`）、D2=A（teammate 只做背景源、按 Lead 身份记账）。
-> 申请已提交并实施 → [实施 Note](../../../notes/implemented/2026-10-23-cultivation-context.md)；本卡归档，终验归 Note。
+> 申请已提交并实施 → [实施 Note](../../../notes/archived/2026-10-23-cultivation-context.md)；本卡归档，终验归 Note。
 
 > **给 review 的人：** 这份卡是自包含的研究 + 方案，不需要读对话上下文。建议按 §1 原话 → §2 现状 → §3 目标 → §4 UX → §5 技术 → §7 验收 → §9 未决 读；只有 10 分钟就先读 §1、§4.2、§4.5、§5.2、§5.3、§9。§10 是可直接照着问的 review 清单。所有文件链接都指向仓库现行代码/合同；证据等级单独标在 §2.4，代码读到的和真跑过的分开写。
 >
@@ -22,7 +22,7 @@ opened: 2026-10-23
 >
 > **二轮复核（2026-10-23 20:15，agent）：** 见 §13——**落地 = 0**（零产品代码；卡与索引均未入库）。§12 的 P0-1/P0-4 修正仍不完整（teammate 是 ceo-preset、方法层按 preset 装载；Q10 与 §5.2 两套方案并存），并新增一个实现级缺口（共享 codec 引 `Buffer` 会炸浏览器半）。另有 5 处 DSH 支持面可用未用、2 处口径修正。
 >
-> **拍板（2026-10-23 21:15，用户）：** D1 = **A（命令只带引用，host 读后写 `contexts`）**；D2 = **A（teammate 只做背景源，按 Lead/CEO 身份记账，界面明说）**。规范正文见 [RFC](../../../notes/implemented/2026-10-23-cultivation-context.md)；本卡 §5.1/§5.2/§5.5/§7 的客户端快照写法按 §14 作废。
+> **拍板（2026-10-23 21:15，用户）：** D1 = **A（命令只带引用，host 读后写 `contexts`）**；D2 = **A（teammate 只做背景源，按 Lead/CEO 身份记账，界面明说）**。规范正文见 [RFC](../../../notes/archived/2026-10-23-cultivation-context.md)；本卡 §5.1/§5.2/§5.5/§7 的客户端快照写法按 §14 作废。
 
 ## 1. 用户原话与截图现场
 
@@ -1081,7 +1081,7 @@ contexts: {"v":1,"items":[{"kind":"deliverable","ref":"<workspace-relative-path>
 | D4 | v1 源 | 会话（本次 + 最近）+ 成品 | 沿用 §9 Q1；journal 放 v1.1。 |
 | D5 | AI 起草 | v2 | 沿用 §9 Q3。 |
 
-**规范正文**：[RFC](../../../notes/implemented/2026-10-23-cultivation-context.md) 是 D1=A/D2=A 后的实施合同；本卡 §5.1/§5.2/§5.5/§7 中与它冲突的客户端快照段作废（保留为讨论记录，不再作为验收依据）。
+**规范正文**：[RFC](../../../notes/archived/2026-10-23-cultivation-context.md) 是 D1=A/D2=A 后的实施合同；本卡 §5.1/§5.2/§5.5/§7 中与它冲突的客户端快照段作废（保留为讨论记录，不再作为验收依据）。
 
 **探针门（实施前）**：冷会话 host 读耗时（`observeSession`）、`follow` 首帧 + break 不 promote、ref-only 命令往返与日志大小、8KB `contexts` 记录经 2000 行读取、冷 `agentTeam` 投影可用性。结果回填 RFC 的验证节与本卡 §5.14。
 

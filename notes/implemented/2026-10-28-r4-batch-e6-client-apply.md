@@ -14,7 +14,7 @@
    - `registerToolCards(ctx)`：委派卡 + 团队卡 keyed slots；
    - `registerSidebarIdentity(ctx)`：品牌、角色徽标、会话头任务板；
    - `registerCompanyTabsWiring(ctx, attention)`：公司页签数据面 + `registerCompanyTabs`；
-   - `registerCompanyViewWiring(ctx)`：公司整页视图 + `conversation.view` 注册。
+   - `registerCultivationViewWiring(ctx)`：培养主视图 + `conversation.view` 注册（2026-10-28 主视图改造后改名/改语义）。
 3. `apply` 从 201 行降到 **45 行**；行为、inject 依赖、注册顺序不变。
 
 ## 输掉的方案
@@ -36,4 +36,4 @@
 ## 未验 / 边界
 
 - 五块仍在同文件（377 行），不是“每块一个文件”；这是本批的边界。
-- P3 follow-up 已清零：Board 余四块、command handler 六支、共享测试 helper、`--attach` 均已落（[Note](2026-10-28-r4-p3-followup.md)）。
+- P3 follow-up 已清零：Board 余四块、command handler 六支、共享测试 helper、`--attach` 均已落（[Note](../archived/receipts/2026-10-28-r4-p3-followup.md)）。

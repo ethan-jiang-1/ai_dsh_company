@@ -1,7 +1,7 @@
 # retro 候选 1+2 落地：判据写法进宪法、catalog 语义进入口
 
 状态：implemented（2026-10-23；用户令「拟计划 → setup goal 推进」；
-上游证据 = [residual verification Note](./2026-10-23-residual-verification.md) 里两处判据读错面的实测）
+上游证据 = [residual verification Note](../archived/receipts/2026-10-23-residual-verification.md) 里两处判据读错面的实测）
 
 ## 决定
 

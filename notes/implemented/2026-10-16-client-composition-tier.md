@@ -1,6 +1,6 @@
 # Client whole-client 组合档进入 keyless 树
 
-状态：implemented（2026-10-16；授权 = 用户四选一后续轮的 D 项：「引入 client-test-runtime，真组合测 client apply 的挂载/卸载/重载」。此前该证据缺口在 [2026-10-15-cultivation-host-safety](./2026-10-15-cultivation-host-safety.md) 如实挂起。）
+状态：implemented（2026-10-16；授权 = 用户四选一后续轮的 D 项：「引入 client-test-runtime，真组合测 client apply 的挂载/卸载/重载」。此前该证据缺口在 [2026-10-15-cultivation-host-safety](../archived/2026-10-15-cultivation-host-safety.md) 如实挂起。）
 
 ## 决定
 
@@ -43,6 +43,6 @@
 
 ## 指针
 
-- 挂起项的原文与守卫修复：[2026-10-15-cultivation-host-safety](./2026-10-15-cultivation-host-safety.md)
+- 挂起项的原文与守卫修复：[2026-10-15-cultivation-host-safety](../archived/2026-10-15-cultivation-host-safety.md)
 - 测试分区与分层：[tests README](../../tests/README.md)
 - tier 本体（vendor，只读）：`vendor/dsh/packages/test-support/client-runtime/src/assembly/`

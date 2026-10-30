@@ -9,7 +9,7 @@
 - **迁出（闭表 + 纯映射）**：`PresenceStatus`、`STATUS_LABEL`、`presenceStatusFromPhase`、`statusLabelFor`、`PRESET_DISPLAY_NAMES`、`displayNameFor`（含私有 `PRESET_KEYS` / `PresetRoleId` / `isPresetRole`）。
 - **留守（折算）**：板与事件的形状类型（`PresenceRow` / `ActivityEntry` / `PresenceBoardModel` / `TeamViewLike` / `TeamEventLike` / `TeamStreamFrame`）与函数（`rowsFromTeamView` / `diffActivity` / `presenceFromEvents` / `activityFromEvents` / `memberNames`）。
 - **依赖方向**：`presence-status.ts` 零 import（叶子）；`presence.ts` → 它单向。原链 `dag → board → presence` 扩为 `dag → board → presence → presence-status`，**仍无环**。
-- **为什么 `PRESET_KEYS` 留在 pack 内**：pack 发布面自包含（`files` = `lib/**` / `presets/**` / `workspace/**` / `cordis.patch.yml`），不许反向依赖维护工具层——同名决定见 [2026-10-14 六项重构](./2026-10-14-code-restructure.md)「输掉的方案」。
+- **为什么 `PRESET_KEYS` 留在 pack 内**：pack 发布面自包含（`files` = `lib/**` / `presets/**` / `workspace/**` / `cordis.patch.yml`），不许反向依赖维护工具层——同名决定见 [2026-10-14 六项重构](../archived/2026-10-14-code-restructure.md)「输掉的方案」。
 
 **实读复核修正了来源卡 Item 2 的三处不实之处**（卡已结档，记录在此）：
 

@@ -65,4 +65,4 @@ cordis_inspect_list→bash ×2）。
 
 - 场景声明：[snapshots/replay/r3-delegation/snapshot.yml](../../snapshots/replay/r3-delegation/snapshot.yml)
 - 脱敏实现：[tools/lib/replay-logic.mjs](../../tools/lib/replay-logic.mjs) 的 `normalizeReplayTimeContext`（runner 调用：[checks/smoke/replay-smoke.mjs](../../checks/smoke/replay-smoke.mjs)）
-- 后续结构整理：[2026-10-14-code-restructure](../implemented/2026-10-14-code-restructure.md)；本轮 replay helper 迁移见 [2026-10-14-client-host-replay-locality](../implemented/2026-10-14-client-host-replay-locality.md)。
+- 后续结构整理：[2026-10-14-code-restructure](../archived/2026-10-14-code-restructure.md)；本轮 replay helper 迁移见 [2026-10-14-client-host-replay-locality](../archived/2026-10-14-client-host-replay-locality.md)。

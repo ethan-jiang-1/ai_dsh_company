@@ -51,8 +51,8 @@ export function useCultivationBoard(props: CultivationBoardStateProps) {
     : null
   const actions = props.actions
   const inbox = recordInbox(props.records ?? [], viewer ?? '')
-  /** 正在执行的记录 id（飞行中禁按钮，防重复点击）。 */
-  const [pendingId, setPendingId] = useState<string | null>(null)
+  /** 正在执行的记录 id 集合（飞行中禁按钮，按记录判，不误伤并发）。 */
+  const [pendingIds, setPendingIds] = useState<ReadonlySet<string>>(() => new Set())
   /** 每条记录的回执/失败原话（key = 记录 id；不吞失败原因）。 */
   const [outcomes, setOutcomes] = useState<Readonly<Record<string, ActionOutcome>>>({})
   /** 正在写理由的记录 id。 */
@@ -82,7 +82,7 @@ export function useCultivationBoard(props: CultivationBoardStateProps) {
   /** 哪些记录的长正文被展开（默认折叠前 {@link BODY_PREVIEW_LINES} 行）。 */
   const [expandedBodies, setExpandedBodies] = useState<Readonly<Record<string, boolean>>>({})
   /** 同一行**在飞的**动作 key（双击护栏：`disabled` 要等重渲染，同一 tick 的第二次点击挡不住）。 */
-  const inFlight = useRef<string | null>(null)
+  const inFlight = useRef<Set<string>>(new Set())
   /** 时间标签的锚点：挂载时取一次（轮询重渲染不跳动；跨小时误差可接受，30s 轮询会带新 now）。 */
   const now = Date.now()
   /** 列表折叠：默认只给最近的 `LIST_CAPS[key]` 条，超出部分用「显示全部（共 N 条）」打开。 */
@@ -108,9 +108,9 @@ export function useCultivationBoard(props: CultivationBoardStateProps) {
   const run = async (key: string, line: string, after?: () => void): Promise<void> => {
     if (actions === undefined) return
     // 双击护栏：同一 tick 的两次点击会发两条命令。
-    if (inFlight.current === key) return
-    inFlight.current = key
-    setPendingId(key)
+    if (inFlight.current.has(key)) return
+    inFlight.current.add(key)
+    setPendingIds(previous => new Set(previous).add(key))
     setReasonProblem(null)
     let result: ActionOutcome
     try {
@@ -119,8 +119,12 @@ export function useCultivationBoard(props: CultivationBoardStateProps) {
       // 契约上 `run` 永不抛；真抛了也必须把 pending 收回来，否则按钮永久停在「处理中…」。
       result = { ok: false, text: CULTIVATION_COPY.unexpected(renderThrown(error)) }
     } finally {
-      inFlight.current = null
-      setPendingId(null)
+      inFlight.current.delete(key)
+      setPendingIds(previous => {
+        const next = new Set(previous)
+        next.delete(key)
+        return next
+      })
     }
     setOutcomes(previous => ({ ...previous, [key]: result }))
     if (result.ok) {
@@ -144,7 +148,7 @@ export function useCultivationBoard(props: CultivationBoardStateProps) {
     viewer,
     actions,
     inbox,
-    pendingId,
+    pendingIds,
     outcomes,
     rejectingId,
     expandedContexts,
@@ -163,7 +167,6 @@ export function useCultivationBoard(props: CultivationBoardStateProps) {
     brokenRecords: props.brokenRecords,
     unexpandedRecords: props.unexpandedRecords,
     records: props.records,
-    setPendingId,
     setRejectingId,
     setExpandedContexts,
     setReason,

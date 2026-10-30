@@ -79,7 +79,7 @@ export function CultivationMine({ inbox }: { readonly inbox: CultivationBoardSta
 }
 
 export function CultivationAdopted({ board, records }: { readonly board: CultivationBoardState; readonly records: readonly CultivationRecord[] | null }) {
-  const { inbox, actions, pendingId, revokingSlug, capList, capControl, stampOf, now, run, outcomeOf, setRevokingSlug } = board
+  const { inbox, actions, pendingIds, revokingSlug, capList, capControl, stampOf, now, run, outcomeOf, setRevokingSlug } = board
   const [verifyingId, setVerifyingId] = useState<string | null>(null)
   const [verificationOutcome, setVerificationOutcome] = useState<'pass' | 'fail'>('pass')
   const [verificationEvidence, setVerificationEvidence] = useState('')
@@ -201,17 +201,17 @@ export function CultivationAdopted({ board, records }: { readonly board: Cultiva
                               <span className="wk-meta">{CULTIVATION_COPY.verificationEvidenceHint}</span>
                               {verificationProblem !== null && <span className="wk-meta wk-cultivation-problem">{verificationProblem}</span>}
                               <div className="wk-cultivation-actions">
-                                <Button variant="primary" disabled={pendingId === record.id} onClick={() => { confirmVerification(record.id) }}>
+                                <Button variant="primary" disabled={pendingIds.has(record.id)} onClick={() => { confirmVerification(record.id) }}>
                                   {verificationOutcome === 'pass' ? CULTIVATION_COPY.verifyPassConfirm : CULTIVATION_COPY.verifyFailConfirm}
                                 </Button>
-                                <Button disabled={pendingId === record.id} onClick={() => { setVerifyingId(null); setVerificationEvidence(''); setVerificationProblem(null) }}>{CULTIVATION_COPY.cancel}</Button>
+                                <Button disabled={pendingIds.has(record.id)} onClick={() => { setVerifyingId(null); setVerificationEvidence(''); setVerificationProblem(null) }}>{CULTIVATION_COPY.cancel}</Button>
                               </div>
                             </div>
                           )
                           : (
                             <>
-                              <Button variant="primary" disabled={pendingId === record.id} onClick={() => { startVerification(record.id, 'pass') }}>{CULTIVATION_COPY.verifyPass}</Button>
-                              <Button disabled={pendingId === record.id} onClick={() => { startVerification(record.id, 'fail') }}>{CULTIVATION_COPY.verifyFail}</Button>
+                              <Button variant="primary" disabled={pendingIds.has(record.id)} onClick={() => { startVerification(record.id, 'pass') }}>{CULTIVATION_COPY.verifyPass}</Button>
+                              <Button disabled={pendingIds.has(record.id)} onClick={() => { startVerification(record.id, 'fail') }}>{CULTIVATION_COPY.verifyFail}</Button>
                             </>
                           )}
                         {revokingSlug === slug
@@ -221,7 +221,7 @@ export function CultivationAdopted({ board, records }: { readonly board: Cultiva
                               <div className="wk-meta wk-cultivation-consequence">{CULTIVATION_COPY.revokeConsequence}</div>
                               <div className="wk-cultivation-actions">
                                 <Button
-                                  disabled={pendingId === record.id}
+                                  disabled={pendingIds.has(record.id)}
                                   onClick={() => { void run(record.id, revokeLine(slug), () => { setRevokingSlug(null) }) }}
                                 >
                                   {CULTIVATION_COPY.revokeConfirm}

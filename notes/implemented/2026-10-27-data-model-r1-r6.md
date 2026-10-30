@@ -11,6 +11,9 @@
 
 1. **R1 面板两段读**：先读每条记录的头部（frontmatter + 少量正文）做摘要全扫；open 全部读全文（不能藏旧待办），非 open 只读最近 `FULL_RECORD_LIMIT = 120` 条；未展开条数在面板明示。坏记录继续点名。
 2. **R2 writer lease**：`<DSH_HOME>/company-pack.lock` 原子创建；同 home 第二个进程被点名并停写公司数据（DSH 会话仍可用）；stale PID 可接管；正常 dispose 释放。它不是多 Host 高可用锁，只防静默互写。
+
+> **2026-10-30 触发兑现**：本文 R2 兑现了 [Redis R0](../archived/2026-10-03-redis-r0-native-collab.md) 挂起的
+> R1(a)/R2 跨进程互斥触发条件（同 home 已有实现；多 Host 仍不在范围）；Redis 线随该 Note 归档，不再另立卡。
 3. **R3 presented 重建真证据**：`present-catalog-smoke` 在真实 present 后删 index + ledger，用 `ctx.sessionQuery` 回扫真实事件恢复 true；false 审计在删索引后仍保留。
 4. **R4 revoke pending journal**：revoke 前写 `cultivation/.pending-revoke.json`（旧记录全文 + role/slug/revokedAt）。恢复规则：方法还在 ⇒ 回滚记录；方法已不在 ⇒ 补完 `revokedAt`；记录被外部改成第三种形状 ⇒ conflict，日志保留不覆盖。
 5. **R5 `/cultivation check`**：只报告 adopted 记录缺方法、方法无记录两类孤儿；不自动删改。

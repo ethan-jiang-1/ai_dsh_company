@@ -31,7 +31,8 @@
 - **盲区可表达了**：真遇到「那段时间的日志确实没有」时，审计可以如实报「证据不可考」而不是断言「没有声明」；`deliverables-check --evidence-from` 是它的入口。
 - **严格档没被削弱**：不声明时的行为与改前逐字相同（原 3 条正向用例全绿即为证）；两条守卫钉住「present 在场的件不受影响」「声明期之后的件照旧判红」。
 - **射程如实记在测试里**：认不出日期的 slug（如 `pilot`）吃不到这条声明——这是已知边界，写进了 spec 的注释（宁可判红，不静默放过）。
-- 未做：让判据自动从 `snapshots/archive/<slug>/sessions/` 读归档日志（那是「扩大证据源」的另一条线，与「声明可得性」正交，本轮不动）。
+- 未做：让判据自动从会话归档读日志（当时设想路径 = `snapshots/archive/<slug>/sessions/`；该证据家已于 2026-10-30 退役）。
+  这是「扩大证据源」的另一条线，与「声明可得性」正交，本轮不动。
 
 ## 验证
 
@@ -39,6 +40,6 @@
 - **真入口两方向（造件 + 空日志源，隔离单一违规）**：
   - 未声明 ⇒ `违规 1 条：final-not-presented | deliverables/2026-09-22-probe/final.md`，**exit 1**；
   - `--evidence-from 2026-10-01` ⇒ `观察项 1 条：present-evidence-missing … ⇒ **证据不可考，不判红**`，**违规 0 条 ALL PASS，exit 0**。
-- **严格档未被扰动**：真盘全盘 `deliverables-check`（不带旗标）依旧 0 违规；`all-in-ai-2026` 那条红早已由真实收口消掉（见 [closeout-quality-check](./2026-10-16-closeout-quality-check.md)）。
+- **严格档未被扰动**：真盘全盘 `deliverables-check`（不带旗标）依旧 0 违规；`all-in-ai-2026` 那条红早已由真实收口消掉（见 [closeout-quality-check](../archived/receipts/2026-10-16-closeout-quality-check.md)）。
 - **流程处置**：BUG-019 迁 `_archive/fixed_bugs`（status 已修 + 修复说明 + 首版诊断被推翻的留痕）；`guard-red-record` 先点红（卡未迁）→ 迁移后复绿；bugs/README、fixed_bugs/README 流水、_archive/README 索引、两处失效内链（`closeout-requires-present` 与 settled 卡的 3 处）同步。
 - **全量**：`pnpm test` → `62 passed (62)` / **`581 passed (581)`**；`pnpm verify` ALL PASS。

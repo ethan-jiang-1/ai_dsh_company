@@ -7,7 +7,7 @@ opened: 2026-10-25
 
 > 立卡：2026-10-25 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；去向 = `notes/implemented/2026-10-25-standalone-deployment.md`（与卡 5 合并）
+> **结论/去向**：做；去向 = `notes/archived/2026-10-25-standalone-deployment.md`（与卡 5 合并）
 >
 > 条件已满足：Q2 = 不同公司（2026-10-25 goal 裁决），本卡启用；同公司多人只保留 owners/multi-human 文档。
 
@@ -58,4 +58,4 @@ opened: 2026-10-25
 
 - Q2 = 不同公司各自部署，本卡启用。
 - 产品名固定（梦之队），公司名走部署配置；guard 先做“提示/降级”，不误伤维护者会话；dev 符号链接标维护者专用。
-- 去向：`notes/implemented/2026-10-25-standalone-deployment.md`。
+- 去向：`notes/archived/2026-10-25-standalone-deployment.md`。

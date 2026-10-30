@@ -23,6 +23,10 @@ M4 已落地（peer + 受控 lock、0.4.0、安装手册/CHANGELOG、`release --
 > [data-model-r1-r6](../implemented/2026-10-27-data-model-r1-r6.md)、
 > [run-bundle-install-unit](../implemented/2026-10-24-run-bundle-install-unit.md) 中被改路径的引用。
 
+> **2026-10-30 复核更正**：上面的“已就地更新 p1-p2”当时**没有真正做到**——p1-p2 的方法层句
+> （profile 级隔离）未同步，留成了与 data-model 相反的说法。已在
+> [p1-p2](./2026-10-27-data-model-p1-p2.md) 顶部补 M3 部分取代 banner；此处如实记为当时的漏项。
+
 ## 交付与证据
 
 | 面 | 实跑结果（2026-10-28） |
@@ -70,7 +74,7 @@ upgrade log 轮转、全量 `company/` namespace、T4/T7 视觉/回放证据、c
    workspace 内、fs 可读。发布面的 `files`/`exports`/技能发现/`dsh.client.inject` peers 也要
    在改数据路径时同步核。
 
-## 方案
+## 决定（M1–M4 的落地取舍）
 
 ### M1 · 合同 + 低风险（不改数据路径）
 
