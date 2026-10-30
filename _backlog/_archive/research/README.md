@@ -1,6 +1,6 @@
 # research/ · 归档研究题（冻结证据）
 
-研究题的最后一张活消费者离开后，整目录从 [`_backlog/research/`](../../research/README.md) 迁入此处；
+研究题的最后一张使用它的活卡离开后，整目录从 [`_backlog/research/`](../../research/README.md) 迁入此处；
 slug 与题名页原样保留。本页是**题名索引**：一题一行；材料明细、消费者与产出的卡住在各题的题名页
 （`<slug>/README.md`）。
 
@@ -27,7 +27,7 @@ slug 与题名页原样保留。本页是**题名索引**：一题一行；材�
 | [company-panels-ux/](company-panels-ux/README.md) · 公司面面板数据量与真实数据面复核 | 2 份 | [优先级卡](../settled_issues/2026-10-19-company-panels-ux-priority.md) 等 4 张 + [BUG-025](../fixed_bugs/BUG-025-ledger-reads-wrong-data-face.md) 等 3 个 | — | 2026-10-21 |
 | [repo-hygiene/](repo-hygiene/README.md) · fresh-agent 六维打扫（四轮） | 4 份 | [卫生审计卡](../settled_issues/2026-10-20-fresh-agent-repo-hygiene.md)、[第三轮](../settled_issues/2026-10-27-repo-hygiene-round3.md)、[第四轮](../settled_issues/2026-10-28-repo-hygiene-round4.md) | — | 2026-10-21 |
 | [run-bundle/](run-bundle/README.md) · run bundle 的现状、边界与迁移面 | 1 份 | [干净底座卡](../settled_issues/2026-10-24-run-bundle-clean-base.md) | — | 2026-10-24 |
-| [notes-consistency/](notes-consistency/README.md) · notes/ 全树分诊与收据治理 | 3 份 | —（无卡；治理轮直接产出） | — | 2026-10-30 |
+| [notes-consistency/](notes-consistency/README.md) · notes/ 全树分诊与收据治理 | 3 份 | —（无卡；治理轮直接记录） | — | 2026-10-30 |
 
 ## 归档规则
 
