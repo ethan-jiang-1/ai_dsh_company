@@ -13,7 +13,7 @@
 //   ① 缺陷轨「活跃」改名「调查中」并扩到四活跃值（修复就绪/修复已落地/等人拍板）；② 新增状态行↔
 //   frontmatter 镜像互查；③ 问题卡状态行「毕业：」封闭头。制度唯一家 = _backlog/README.md
 //   「双轨状态生命周期」「缺陷的通道」；负例留证见新增块注释。
-import { existsSync, lstatSync, readFileSync, readdirSync } from 'node:fs'
+import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 import { createRequire } from 'node:module'
 import { markdownLinkTargets } from './markdown-links.mjs'
@@ -45,8 +45,11 @@ export function backlogLivenessProblems(backlogRoot) {
     if (!isFile(join(full, 'README.md'))) problems.push(`${where}/README.md 必需索引缺失或不是文件`)
   }
   const markdownFiles = (dir, prefix = '') => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
-    if (entry.isDirectory()) return markdownFiles(join(dir, entry.name), join(prefix, entry.name))
-    return entry.isFile() && entry.name.endsWith('.md') ? [join(prefix, entry.name)] : []
+    const full = join(dir, entry.name)
+    if (entry.isDirectory()) return markdownFiles(full, join(prefix, entry.name))
+    // 符号链接文件与 markdown-links 的源文件 walker 同口径纳入（目录 symlink 两边都不跟随）。
+    const file = entry.isFile() || entry.isSymbolicLink() && existsSync(full) && statSync(full).isFile()
+    return file && entry.name.endsWith('.md') ? [join(prefix, entry.name)] : []
   })
   const statuses = {
     issues: ['推敲中', '等人拍板'],
@@ -99,7 +102,7 @@ export function backlogLivenessProblems(backlogRoot) {
     // 判据（只证形状，不证证据质量）：题名页在场；`> 问题` / `> 消费者` / `> 产出的卡` 三行在场；归档
     //   题名页另有 `> 归档：YYYY-MM-DD`；题名页被 shelf 索引按解析后路径链接；材料被自己题名页按解析后
     //   路径链接（散文点名不算，与其它桶反 prose 口径一致）；shelf 根不落平铺材料。
-    // 题从盘上 `.md` 材料反推（git 不跟踪空目录）：只有资产、没有任何 `.md` 的题目录不产生检查对象。
+    // 题目录 = shelf 根的目录（空目录/纯资产目录同样要求题名页）；目录 symlink 不跟随即不视为题。
     // 负例留证 2026-10-30（真树植入，`pnpm verify` 原话；逐条还原即绿）：
     //   ① 删 `_archive/research/collaboration/README.md` → `… 缺题名页——研究题必须有题名页（问题 / 消费者 / 产出的卡 / 材料）`；
     //   ② 删 agent-cultivation 题名页的「> 产出的卡：」行 → `…:1 缺「> 产出的卡：」行——题名页要回答研究什么、服务谁、产出了什么`；
@@ -107,7 +110,10 @@ export function backlogLivenessProblems(backlogRoot) {
     //   ④ 归档索引删掉 repo-hygiene 行 → `… 未被 _archive/research/README.md 索引链接点名——索引按题名页一行登记，不按文件`；
     //   ⑤ 删 run-bundle 题名页的「> 归档：」行 → `…:1 缺「> 归档：YYYY-MM-DD」行——归档题名页要记下归档日`；
     //   ⑥ 材料移回 shelf 根 → `… 平铺在 shelf 根——研究材料必须住进题名目录（_backlog/_archive/research/<slug>/）`。
-    //   spec 夹具 = tests/harness/backlog-liveness.spec.ts 的研究题三例（缺题名页/三行/归档日、散件与索引、两级反散文）。
+    //   ⑦ 建只有 png 的 `_archive/research/zz-probe/`（无题名页）→ `_backlog/_archive/research/zz-probe/README.md 缺题名页——…`；
+    //   ⑧ `zz-probe/2026-10-30-zz-symlink.md` 符号链接到无头文件（题名页已点名）→ `…:1 缺 frontmatter`（旧 walker 会静默跳过）。
+    //   spec 夹具 = tests/harness/backlog-liveness.spec.ts 的研究题五例（题名页/三行/归档日、散件与索引、两级反散文、
+    //   目录枚举、symlink 文件）。
     const researchPool = pool.endsWith('research')
     const indexPath = researchPool ? `${pool}/README.md`
       : pool.startsWith('_archive/') ? '_archive/README.md' : `${pool}/README.md`
@@ -115,7 +121,9 @@ export function backlogLivenessProblems(backlogRoot) {
     const indexed = isFile(indexFile) ? markdownLinkTargets(indexFile) : new Set()
     if (researchPool && isFile(indexFile)) {
       // 题名页三行 = 名头的形状；缺一行就是没交代清楚（问题 / 服务谁 / 长出了什么）。
-      const topics = new Set(files.filter(name => name.includes('/')).map(name => name.split('/')[0]))
+      const topics = new Set(readdirSync(fullDir, { withFileTypes: true })
+        .filter(entry => entry.isDirectory() && !entry.name.startsWith('.'))
+        .map(entry => entry.name))
       for (const topic of topics) {
         const bannerFull = join(fullDir, topic, 'README.md')
         const bannerWhere = `_backlog/${pool}/${topic}/README.md`

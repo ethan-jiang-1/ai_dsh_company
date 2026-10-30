@@ -1,4 +1,4 @@
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { backlogLivenessProblems } from '../../tools/lib/backlog-liveness.mjs'
@@ -108,7 +108,7 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     put('_archive/research/tech-exploration/README.md', banner({ archive: '2026-10-09', lines: ['- 2026-10-08-same.md'] }))
     put('research/README.md', '# Index\n\n[topic](<tech-exploration/README.md>)\n')
     put('_archive/research/README.md', '# Index\n\n')
-    put('_archive/README.md', '# Index\n\n2026-10-08-same.md\n')
+    put('_archive/README.md', '# Index\n\n[same](research/tech-exploration/2026-10-08-same.md)\n')
     const problems = check(root)
     expect(problems.filter(problem => problem.includes('未被'))).toHaveLength(1)
     expect(problems.filter(problem => problem.includes('未在题名页'))).toHaveLength(2)
@@ -142,6 +142,25 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     const problems = check(root).join('\n')
     expect(problems).toContain('平铺在 shelf 根')
     expect(problems).toContain('_backlog/research/topic/README.md 未被 research/README.md 索引链接点名')
+  })
+
+  // 2026-10-30（复核补强）：题目录按目录枚举——只有资产、没有任何 .md 的目录同样要求题名页。
+  it('requires a banner for every topic directory, including asset-only ones', () => {
+    put('research/asset-only/pic.png', 'png')
+    put('_archive/research/asset-only-2/pic.png', 'png')
+    const problems = check(root).join('\n')
+    expect(problems).toContain('_backlog/research/asset-only/README.md 缺题名页')
+    expect(problems).toContain('_backlog/_archive/research/asset-only-2/README.md 缺题名页')
+  })
+
+  // 2026-10-30（复核补强）：符号链接 .md 与 markdown-links 的源文件 walker 同口径纳入校验。
+  it('follows symlinked material files instead of silently skipping them', () => {
+    put('outside/2026-10-09-target.md', '# no head\n')
+    mkdirSync(join(root, 'research/linked'), { recursive: true })
+    symlinkSync(join(root, 'outside/2026-10-09-target.md'), join(root, 'research/linked/2026-10-09-link.md'))
+    put('research/linked/README.md', banner({ lines: ['- [link](2026-10-09-link.md)'] }))
+    index('research', 'linked/README.md')
+    expect(check(root).join('\n')).toContain('_backlog/research/linked/2026-10-09-link.md:1 缺 frontmatter')
   })
 
   it('requires the owner index and enforces research metadata from the effective date', () => {

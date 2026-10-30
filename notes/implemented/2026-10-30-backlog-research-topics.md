@@ -21,21 +21,24 @@
 - **生命周期**：最后一张活消费者离开 → 整个题目录 `git mv` 到 `_archive/research/<slug>/`，题名页补
   归档行，材料正文不重写、只修必要相对链接；归档是冻结证据，**不是实施授权**，引用不复活。
 - **门禁只证形状**（`backlog-liveness`）：题名页在场；三行在场；归档题名页另有归档行；题名页被 shelf
-  索引按**解析后路径**链接；材料被自己题名页按解析后路径逐份点名（散文提及不算）；shelf 根不落平铺材料。
+  索引按**解析后路径**链接；材料被自己题名页按解析后路径逐份点名（散文提及不算）；shelf 根不落平铺材料；
+  题目录按 shelf 根目录枚举（只有资产、空目录同样要求题名页）；符号链接 `.md` 与 `md-links` 同口径纳入。
 - **存量迁移**：8 个归档题目录各补题名页；平铺的 `2026-10-04-multi-user-ux-walk.md` 归入新题
   `multi-user-ux/`（修 6 处相对链接：3 张卡 + 1 份协作题材料的交叉引用 + 移入文件自身 2 处）；`_archive/README.md`
   的「## 研究」清单与「## 随卡归档的研究」表退役，误列在该表里的 3 张卡
   （`2026-10-17-cultivation-gui-actions`、`BUG-023`、`BUG-026`）归位「已关闭问题」表。
 - **数据出处**：题名页的消费者取自旧 `_archive/README.md` 的「曾服务于 / 服务卡」列与卡内链接；
-  「产出的卡」无证据一律 `—`，不编造。
+  「产出的卡」只填有证据的——`company-panels-ux` 复核同轮立的 BUG-025/026/027 记产出侧——其余无证据写
+  `—`，不编造。
 
 ## 输掉的方案
 
 - **只立规则、不动存量**：新旧两套形状并存，门禁要写 grandfather 豁免，下一轮还得补迁移——用户否。
 - **只加题名页、不改门禁**：旧判据要求每份 `.md` 直接进 shelf 索引，题名页一加就红；"材料必须住题名
   目录、题名页必须点名"也无法机械保证，等于只靠自觉。
-- **保留 `_archive/README.md` 的逐文件研究清单**：实测同一批材料在该文件列了两遍（bullet 6 行 + 表格
-  16 行），正是章程反对的"一处事实两个家"；也挡住"索引一题一行"的可扫读性。
+- **保留 `_archive/README.md` 的逐文件研究清单**：实测同一批研究材料在该文件列了两遍（「## 研究」清单与
+  「## 随卡归档的研究」表；表里还误列了 3 张卡），正是章程反对的"一处事实两个家"；也挡住"索引一题一行"
+  的可扫读性。
 - **归档索引只留 名头｜材料｜归档**：更贴合"一处事实一个家"，但查归档要逐页点开；用户选保留
   消费者/产出的卡两列作导航摘要，明细仍在题名页（重复面 = 摘要，不承载细则）。
 
@@ -48,14 +51,16 @@
 - 台账登记 D50：`docs/decisions.md` 行数 60→61，`doc-budget` 上限同日 60→61（路由表按决定增长；
   本轮不顺手压缩尾部历史段——那属另一轮，避免把两件事塞进同一变更）。
 - 无待办：门禁与 spec 同 diff 已接；后续写研究按
-  [_backlog/research/README.md](../../_backlog/research/README.md) 的模板走。
+  [_backlog/research/README.md](../../_backlog/research/README.md) 的模板走。唯一不回填项 = 历史消费者卡
+  指向题名页的回链（新写卡适用；归档卡不为适配新模板重写）。
 
 ## 验证
 
 | 面 | 实跑命令与结果（2026-10-30） |
 |---|---|
-| 窄回归 | `npx vitest run tests/harness/backlog-liveness.spec.ts` → **1 file / 27 tests passed**（新增研究题三例：缺题名页/三行/归档行、散件与索引、两级反散文） |
+| 窄回归 | `npx vitest run tests/harness/backlog-liveness.spec.ts` → **1 file / 29 tests passed**（研究题五例：题名页/三行/归档日、散件与索引、两级反散文、目录枚举、symlink 文件） |
 | 结构门禁 | `pnpm verify` → **ALL PASS**（`backlog-liveness` 描述已含「研究题两级索引」） |
-| 真树造红（逐条植入→还原） | ① 删 `_archive/research/collaboration/README.md` → `FAIL backlog-liveness: _backlog/_archive/research/collaboration/README.md 缺题名页——研究题必须有题名页（问题 / 消费者 / 产出的卡 / 材料）`；还原后绿。② 删 `agent-cultivation` 题名页「> 产出的卡：」行 → `…:1 缺「> 产出的卡：」行——题名页要回答研究什么、服务谁、产出了什么`。③ `notes-consistency` 材料链接改散文 → `… 未在题名页 notes-consistency/README.md 中被点名——材料清单必须与盘上一致`。④ 归档索引删 `repo-hygiene` 行 → `… 未被 _archive/research/README.md 索引链接点名——索引按题名页一行登记，不按文件`。⑤ 删 `run-bundle` 题名页「> 归档：」行 → `…:1 缺「> 归档：YYYY-MM-DD」行——归档题名页要记下归档日`。⑥ 材料移回 shelf 根 → `… 平铺在 shelf 根——研究材料必须住进题名目录（_backlog/_archive/research/<slug>/）`。六条原话同时写进 `backlog-liveness` 块注释 |
+| 真树造红（逐条植入→还原） | ① 删 `_archive/research/collaboration/README.md` → `FAIL backlog-liveness: _backlog/_archive/research/collaboration/README.md 缺题名页——研究题必须有题名页（问题 / 消费者 / 产出的卡 / 材料）`；还原后绿。② 删 `agent-cultivation` 题名页「> 产出的卡：」行 → `…:1 缺「> 产出的卡：」行——题名页要回答研究什么、服务谁、产出了什么`。③ `notes-consistency` 材料链接改散文 → `… 未在题名页 notes-consistency/README.md 中被点名——材料清单必须与盘上一致`。④ 归档索引删 `repo-hygiene` 行 → `… 未被 _archive/research/README.md 索引链接点名——索引按题名页一行登记，不按文件`。⑤ 删 `run-bundle` 题名页「> 归档：」行 → `…:1 缺「> 归档：YYYY-MM-DD」行——归档题名页要记下归档日`。⑥ 材料移回 shelf 根 → `… 平铺在 shelf 根——研究材料必须住进题名目录（_backlog/_archive/research/<slug>/）`。⑦ 只有 png 的 `zz-probe/`（无题名页）→ `… 缺题名页——…`。⑧ `zz-probe` 题名页点名到无头文件的符号链接 → `…:1 缺 frontmatter`（旧 walker 静默跳过）。八条原话同时写进 `backlog-liveness` 块注释 |
+| 复核修补（2026-10-30） | 独立复核后修：`company-panels-ux` 的 BUG-025/026/027 从「消费者」改记「产出的卡」（证据 = 同提交 `9036567` 立审计 + 三卡）；归档程序去重（程序只住归档页）；`multi-user-ux` 的「被引用」移出消费者行、与索引一致；Note 计数/数据出处订正；门禁补目录枚举与 symlink 文件纳入 |
 | 链接面 | 首跑曾因题名页相对链接少一级（`../settled_issues/` 应为 `../../settled_issues/`）红 25 条 md-links；修正后同一条 `pnpm verify` 全绿——这是形状之外唯一一次真实返工 |
 | 全量回归 | `pnpm test` → **119 files / 1044 tests 全绿**（含 harness 区；观察窗/公司盘告警行是夹具预期噪声） |
