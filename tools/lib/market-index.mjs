@@ -21,6 +21,20 @@ const MARKET_METADATA = {
   },
 }
 
+/**
+ * 已列版本的发布时间保持稳定：重复 `--prepare` 不因"生成时刻"改变已跟踪文件的字节。
+ * 同 name+version 已有条目 → 沿用它的 publishTimestamp；版本变了或显式 refresh → 用 now。
+ */
+export function stablePublishTimestamp({ existingIndex, name, version, now, refresh = false }) {
+  if (!refresh && existingIndex !== undefined) {
+    const plugin = (existingIndex.plugins ?? []).find(item => item?.name === name)
+    const listed = (plugin?.versions ?? []).find(item => item?.version === version)
+    const stamp = listed?.publishTimestamp
+    if (Number.isInteger(stamp) && stamp > 0) return stamp
+  }
+  return now
+}
+
 /** 从 GitHub 仓库 URL 取市场要的网页 URL（去 `.git`；不保留 git+ 前缀）。 */
 export function repositoryWebUrl(url) {
   return String(url).replace(/^git\+/, '').replace(/\.git$/, '').replace(/\/+$/, '')

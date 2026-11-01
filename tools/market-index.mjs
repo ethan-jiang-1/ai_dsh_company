@@ -14,7 +14,7 @@
 // publishTimestamp 生成时刻；真实 publish 后可用 vendor generator 读 registry 的发布时间再生成。
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
-import { buildMarketIndex } from './lib/market-index.mjs'
+import { buildMarketIndex, stablePublishTimestamp } from './lib/market-index.mjs'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
 
 const args = process.argv.slice(2)
@@ -25,10 +25,11 @@ const valueOf = flag => {
 }
 if (has('--help') || has('-h') || (!has('--prepare') && !has('--check'))) {
   console.log(`用法：
-  node tools/market-index.mjs --prepare [--out market-index.json]
+  node tools/market-index.mjs --prepare [--refresh] [--out market-index.json]
   node tools/market-index.mjs --check   [--out market-index.json]
 
 --prepare：从 packages/company-pack 的 manifest/locale/icon 生成单文件 index（图标内联），并用 DSH 校验器验。
+           同版本重复执行字节稳定；发布后加 --refresh 用真实时间。
 --check  ：校验已有 index（名称/版本/图标与包 manifest 一致）。`)
   process.exit(has('--help') || has('-h') ? 0 : 2)
 }
@@ -62,7 +63,16 @@ const fail = (message) => {
 if (has('--prepare')) {
   const svg = readFileSync(join(packDir, 'icon.svg'))
   const icon = `data:image/svg+xml;base64,${svg.toString('base64')}`
-  const index = buildMarketIndex({ manifest, locales, publishTimestamp: Math.floor(Date.now() / 1000), icon })
+  // 同版本重复 prepare 必须字节稳定（否则每次发布准备都把 tracked index 弄脏）。
+  const existing = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : undefined
+  const publishTimestamp = stablePublishTimestamp({
+    existingIndex: existing,
+    name: manifest.name,
+    version: manifest.version,
+    now: Math.floor(Date.now() / 1000),
+    refresh: has('--refresh'),
+  })
+  const index = buildMarketIndex({ manifest, locales, publishTimestamp, icon })
   try {
     await parseWithDshValidator(index, 'https://example.invalid/index.json')
   } catch (error) {

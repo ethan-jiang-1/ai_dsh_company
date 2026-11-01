@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { buildMarketIndex, repositoryWebUrl } from '../../tools/lib/market-index.mjs'
+import { buildMarketIndex, repositoryWebUrl, stablePublishTimestamp } from '../../tools/lib/market-index.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 
 const PACK = join(ROOT, 'packages/company-pack')
@@ -38,6 +38,13 @@ describe('插件市场 index（format 1）', () => {
     expect(plugin?.versions.some(version => version.version === manifest.version), 'tracked index 版本落后于 package.json（先跑 node tools/market-index.mjs --prepare）').toBe(true)
     expect(plugin?.icon?.startsWith('data:image/svg+xml;base64,'), 'tracked index 图标应内联，单文件可托管').toBe(true)
     expect(plugin?.metadata.category).toBe('company')
+  })
+
+  it('同版本重复生成保持发布时间不变（tracked index 不被"生成时刻"弄脏）', () => {
+    const existing = buildMarketIndex({ manifest, locales, publishTimestamp: 1_700_000_000, icon: 'data:image/svg+xml;base64,AA==' })
+    expect(stablePublishTimestamp({ existingIndex: existing, name: manifest.name, version: manifest.version, now: 1_800_000_000 })).toBe(1_700_000_000)
+    expect(stablePublishTimestamp({ existingIndex: existing, name: manifest.name, version: '9.9.9', now: 1_800_000_000 })).toBe(1_800_000_000)
+    expect(stablePublishTimestamp({ existingIndex: existing, name: manifest.name, version: manifest.version, now: 1_800_000_000, refresh: true })).toBe(1_800_000_000)
   })
 
   it('仓库网页 URL 去 git+ / .git，不把 clone URL 原样塞给市场', () => {
