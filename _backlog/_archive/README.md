@@ -15,6 +15,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-01-plugin-lifecycle-publish.md](settled_issues/2026-11-01-plugin-lifecycle-publish.md) | 已结；0.7.0 发布就绪（install/身份/index/升卸/本地 registry 演练）；公有 publish/托管 = handoff | 2026-11-02 |
 | [2026-11-01-plugin-as-product-v3.md](settled_issues/2026-11-01-plugin-as-product-v3.md) | 已结；bundle 产品/无 launcher/workspace 解析/内容在包/run bundle 全嵌套/账本分区；0.7.0 复核；去向 = [v3 Note](../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md) | 2026-11-02 |
 | [2026-11-01-plugin-as-product.md](settled_issues/2026-11-01-plugin-as-product.md) | 已结；0.5.0 产品形状：company profile/启动器/workspace v2/登记/seed/手册碰撞/方法账本留 host；v1 边界 = Web onboarding/Windows/registry/威胁注入 | 2026-11-01 |
 | [2026-11-01-landing-plan.md](settled_issues/2026-11-01-landing-plan.md) | 已结；P0–P6 执行回执；v1 边界不阻塞关闭 | 2026-11-01 |

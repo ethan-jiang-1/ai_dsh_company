@@ -7,7 +7,7 @@ opened: 2026-11-01
 
 > 立卡：2026-11-01 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：2026-11-02 用户验收「两卡不冲突，推动落地」；结论 = v3 产品形状落地并经 0.7.0 复核；去向 = [v3 Note](../../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md) + [生命周期卡](../../issues/2026-11-01-plugin-lifecycle-publish.md)。两处按 v3 Note 收窄：首屏 = DSH 原生 Workspace picker（不自建 onboarding）、0.5 根目录不自动迁移。
+> **结论/去向**：2026-11-02 用户验收「两卡不冲突，推动落地」；结论 = v3 产品形状落地并经 0.7.0 复核；去向 = [v3 Note](../../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md) + [生命周期卡](2026-11-01-plugin-lifecycle-publish.md)。两处按 v3 Note 收窄：首屏 = DSH 原生 Workspace picker（不自建 onboarding）、0.5 根目录不自动迁移。
 >
 > **2026-11-01 用户授权原文**：
 > 「需要我review的, 授权给你 记得 做对最重要, 不需要兼容考虑, 安装需要尊重dsh」
@@ -361,7 +361,7 @@ run： <workspace>/.dsh-company/{kb,deliverables,deliverables-archive,cultivatio
 ## 下一步
 
 1. v3 复核完成：产品形状/边界已落地；两处口径按 v3 Note 收窄（原生 picker、不自动迁移）。
-2. 等用户验收后按关闭法归档；真实 npm publish 不在本卡，归[生命周期与发布卡](../../issues/2026-11-01-plugin-lifecycle-publish.md)
+2. 等用户验收后按关闭法归档；真实 npm publish 不在本卡，归[生命周期与发布卡](2026-11-01-plugin-lifecycle-publish.md)
    的 [publish handoff](../../../docs/guides/publish-handoff.md)。
 
 ## 关联

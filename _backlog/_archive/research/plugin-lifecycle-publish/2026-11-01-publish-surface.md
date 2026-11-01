@@ -5,7 +5,7 @@ intent: "发布面事实核对：npm 包身份、市场 index format 1、官方�
 
 # 发布面：npm、市场、目录与文档的真事实
 
-> 服务卡：[生命周期与发布卡](../../issues/2026-11-01-plugin-lifecycle-publish.md)。
+> 服务卡：[生命周期与发布卡](../../settled_issues/2026-11-01-plugin-lifecycle-publish.md)。
 > 性质：静态事实 + 可复现的本地校验，不是方案。
 > 证据：T = 本轮真跑；C = vendor/FAQ/本仓源码与文档。
 
@@ -39,14 +39,14 @@ private**——因为 dry-run 在 `libnpmpublish` 之前返回；真实 publish 
 ## 2. 市场：一份静态 JSON，DSH 只校验格式
 
 FAQ 24 §6 与 vendor 的
-[plugin-market-index](../../../vendor/dsh/packages/util/plugin-market-index/README.md)、
-[plugin-market-generator](../../../vendor/dsh/apps/plugin-market-generator/README.md)（C）给出的事实：
+[plugin-market-index](../../../../vendor/dsh/packages/util/plugin-market-index/README.md)、
+[plugin-market-generator](../../../../vendor/dsh/apps/plugin-market-generator/README.md)（C）给出的事实：
 
 - 市场**源**是第三方托管的静态 JSON（`format: 1`），DSH 不托管；`dsh-plugin-market` 是实验服务；
   官方不带任何 index 源。
 - Discover 是**实验开关**：shipped profile 默认关闭，需要用户在 Plugins → Experimental plugins →
   **Custom plugin markets** 打开；打开后才有 Discover 页与 `plugin_market` 工具（C：
-  [plugin-market-bundle](../../../vendor/dsh/packages/experimental/plugin-market-bundle/README.md)）。
+  [plugin-market-bundle](../../../../vendor/dsh/packages/experimental/plugin-market-bundle/README.md)）。
 - **官方目录只收第一方 `@deepseek-ai/dsh-*` bundle**，外部作者不可发布（C：FAQ 24 §7）。所以
   「借助 DSH 的社区市场」唯一可行的形态 = npm/Git + 自托管 index。
 - index 的版本字段：`version`、`publishTimestamp`（Unix 秒）、`source`（npm 或 git+commit）、可选
@@ -129,7 +129,7 @@ icon resolved: https://example.invalid/icons/dsh-company-pack.svg
 
 ## 4. 更新与卸载：外部插件没有 Update
 
-vendor UI README 原文（C，[ui-plugin-manager](../../../vendor/dsh/packages/client/ui-plugin-manager/README.md)）：
+vendor UI README 原文（C，[ui-plugin-manager](../../../../vendor/dsh/packages/client/ui-plugin-manager/README.md)）：
 
 > on-demand Official entries offer explicit Update, while other plugins are upgraded by
 > uninstalling and reinstalling.
@@ -142,7 +142,7 @@ vendor UI README 原文（C，[ui-plugin-manager](../../../vendor/dsh/packages/c
 | 外部 bundle（我们） | **没有 Update**；要卸载再装（CLI：`remove` + `add`；GUI：Remove + Install） |
 | 全部 | bundle membership 变化要重启 profile；没有命令级回滚 |
 
-当前 [_dist/安装手册.md](../../../_dist/安装手册.md) 写「GUI（默认）：在 Plugins 页更新/重装新版本」，
+当前 [_dist/安装手册.md](../../../../_dist/安装手册.md) 写「GUI（默认）：在 Plugins 页更新/重装新版本」，
 把外部插件说成了有 Update——这是**会让人找不到按钮**的文档错误。正确写法是「卸载当前版本 →
 装新版本 → 重启」，并给出 CLI 等价命令。
 

@@ -1,12 +1,14 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-01
 ---
 
 # 推敲：插件生命周期与发布——把 0.6.0 做成能经社区市场交付的插件
 
-> 立卡：2026-11-01 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 毕业：未定 ｜ 可关闭：否
+> 立卡：2026-11-01 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
+> **结论/去向**：2026-11-02 用户要求收口。交付物 = 0.7.0 发布就绪（`release --check` READY）+ 应用内/CLI 安装、升级/卸载、市场 index 真校验、按名安装本地 registry 演练 + [publish-handoff](../../../docs/guides/publish-handoff.md)；**公有 npm publish 与 index https 托管按 D6 由发布人执行**，该回执不在卡内。
+
 > **原始意图（用户原话）**：
 > 「读读这里 …50-lifecycle …我看了 _dist/ 下的内容后，感觉到还是有不少距离 …需要你再次系统性地思考一下这件事儿怎么做对，退后一步，想清楚 …弄明白或者试探，或者是今后的方案，记着要显性化放到 _backlog/ …确保我们正儿八经很好地遵循了DSH插件的生命周期，尽量不要乱发明，我们要借助D.SH的社区(市场)发布内容，不要发布个稀奇古怪的东西 …最后给我一个计划」
 > 「你一定要挖掘透做实验等等等等好吗？别轻而易举的就定调往前冲 _backlog/ 哎，你可以做实验，在research里头，方案还是在issues里头」
@@ -123,7 +125,7 @@ opened: 2026-11-01
 ### P3 · npm 发布 + 市场 index（G3）
 
 - **交付**：发布 D5 版本到 npm（人工，D6）；跑 vendor 的
-  [`plugin-market-generator`](../../vendor/dsh/apps/plugin-market-generator/README.md) 生成 index + icons
+  [`plugin-market-generator`](../../../vendor/dsh/apps/plugin-market-generator/README.md) 生成 index + icons
   （或手写条目 + 真校验器）；托管到 https 静态位置；文档写「Plugins → Experimental plugins →
   Custom plugin markets → 加 index URL → Discover」。
 - **出场门**：`parseMarketIndex` 通过；`marketInstallTarget` 指向 `name@version`；干净 profile 能按
@@ -134,7 +136,7 @@ opened: 2026-11-01
 
 - **交付**：手册升级段改「卸载 → 装新版 → 重启」；卸载段列精确删除面；`bundle.json.pack.version`
   语义写清（若选跟随，则加更新逻辑与测试）；新增卸载残留快照 smoke（复用
-  [`interrupted-install-smoke.mjs`](../../checks/smoke/interrupted-install-smoke.mjs) 的形状）。
+  [`interrupted-install-smoke.mjs`](../../../checks/smoke/interrupted-install-smoke.mjs) 的形状）。
 - **出场门**：升级实验（0.6.x → 0.7.x）依赖/包副本/run bundle 断言通过；卸载后残留面与文档逐项一致；
   不再出现「删整个 `DSH_HOME`」。
 - **失败就停**：残留面与文档不一致 → 改文档或改实现，不带错发布。
@@ -250,15 +252,15 @@ v3 卡 0.7.0 复核见其「0.7.0 复核」节；两卡边界一致，没有互�
 ## 剩余 handoff（代码面已收口，不是 gap）
 
 1. **真实 npm publish**：本机无 npm 凭据；按名安装已在本地 registry 演练通过，公有 registry 账号/占用仍未验；发布字节已 READY（`_dist/dsh-company-pack-0.7.0.tgz`，
-   sha `a37ba24b…a8a44`），按 [publish-handoff](../../docs/guides/publish-handoff.md) 由有权限的人执行。
+   sha `a37ba24b…a8a44`），按 [publish-handoff](../../../docs/guides/publish-handoff.md) 由有权限的人执行。
 2. **market index https 托管**：index 已在 `_dist/market/` 用 DSH 校验器验过；发布后用 vendor generator
    重生成并托管，Discover 加源验证。
 3. **用户验收**：0.7.0 的发布字节与两卡复核；关闭由用户判定。
 
 ## 下一步
 
-1. 用户验收 0.7.0 的发布字节与 [实现 Note](../../notes/implemented/2026-11-01-plugin-lifecycle-publish.md)。
-2. 要真发时按 [publish-handoff](../../docs/guides/publish-handoff.md)：`npm publish` → vendor generator
+1. 用户验收 0.7.0 的发布字节与 [实现 Note](../../../notes/implemented/2026-11-01-plugin-lifecycle-publish.md)。
+2. 要真发时按 [publish-handoff](../../../docs/guides/publish-handoff.md)：`npm publish` → vendor generator
    生成 index → https 托管 → Discover 验证；回来后补版本页/index URL 回执。
 3. 本卡保持 `推敲中`；真实 publish 与用户验收是关闭前置，不由 agent 代判。
 
@@ -267,10 +269,10 @@ v3 卡 0.7.0 复核见其「0.7.0 复核」节；两卡边界一致，没有互�
 - 研究题：[插件生命周期与发布](../research/plugin-lifecycle-publish/README.md)
   - [安装/升级/卸载实验](../research/plugin-lifecycle-publish/2026-11-01-install-apply-and-data.md)
   - [发布面事实](../research/plugin-lifecycle-publish/2026-11-01-publish-surface.md)
-- 前序：[v3 卡](../_archive/settled_issues/2026-11-01-plugin-as-product-v3.md)、[v3 研究题](../_archive/research/plugin-as-product-v3/README.md)、
-  [v3 实现 Note](../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)
-- 现行合同：[README](../../README.md)、[release](../../docs/release.md)、
-  [安装手册](../../_dist/安装手册.md)、[包 README](../../packages/company-pack/README.md)、
-  [release-smoke](../../checks/smoke/release-smoke.mjs)
+- 前序：[v3 卡](2026-11-01-plugin-as-product-v3.md)、[v3 研究题](../research/plugin-as-product-v3/README.md)、
+  [v3 实现 Note](../../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)
+- 现行合同：[README](../../../README.md)、[release](../../../docs/release.md)、
+  [安装手册](../../../_dist/安装手册.md)、[包 README](../../../packages/company-pack/README.md)、
+  [release-smoke](../../../checks/smoke/release-smoke.mjs)
 - 外部规范（只读）：`_faq_on_digested/26_plugin-as-product/50-lifecycle/`、
   `_faq_on_digested/24_plugin-publish-and-agent-data-planes/`

@@ -2,8 +2,8 @@
 
 状态：已交付（2026-11-02；P0–P5 落地，0.7.0 发布字节与验收证据在下方）
 
-> 上游：[插件生命周期与发布卡](../../_backlog/issues/2026-11-01-plugin-lifecycle-publish.md)（推敲中，实施回执在读）、
-> 研究题 [plugin-lifecycle-publish](../../_backlog/research/plugin-lifecycle-publish/README.md)
+> 上游：[插件生命周期与发布卡](../../_backlog/_archive/settled_issues/2026-11-01-plugin-lifecycle-publish.md)（已结，发布就绪 + handoff）、
+> 研究题 [plugin-lifecycle-publish](../../_backlog/_archive/research/plugin-lifecycle-publish/README.md)
 > （装/起/升/卸实验 + 发布面事实）。
 > 用户授权（2026-11-01）：「静默自主执行，遇到障碍自行克服，直到所有issues 可以落地后验证，需要证据支持我们的落地」；
 > 前一轮同类授权：「需要我review的, 授权给你 记得 做对最重要, 不需要兼容考虑, 安装需要尊重dsh」。

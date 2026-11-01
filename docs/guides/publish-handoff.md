@@ -76,5 +76,5 @@ manifest 的 `engines.dsh`）。
 
 ## 7 回执
 
-发布完成后把以下事实写进[生命周期与发布卡](../../_backlog/issues/2026-11-01-plugin-lifecycle-publish.md)
+发布完成后把以下事实写进[生命周期与发布卡](../../_backlog/_archive/settled_issues/2026-11-01-plugin-lifecycle-publish.md)
 与实施 Note：版本、tgz sha256、manifest gitSha、npm 版本页、index URL、一次干净 profile 的安装验证结果。

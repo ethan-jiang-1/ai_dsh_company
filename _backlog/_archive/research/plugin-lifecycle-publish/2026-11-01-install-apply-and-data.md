@@ -5,7 +5,7 @@ intent: "真运行时上复现安装、in-app 安装、升级、卸载、版本�
 
 # 装、起、升、卸的真运行时证据（rc.2 与 rc.5）
 
-> 服务卡：[生命周期与发布卡](../../issues/2026-11-01-plugin-lifecycle-publish.md)。
+> 服务卡：[生命周期与发布卡](../../settled_issues/2026-11-01-plugin-lifecycle-publish.md)。
 > 性质：实验记录 + 事实归纳，不是方案。方案与取舍在卡里。
 > 证据：T = 本轮真跑；C = vendor 源码/README、FAQ 文本、本仓脚本。
 

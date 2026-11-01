@@ -4,16 +4,13 @@
 
 ## 活跃清单
 
-当前活跃 1 张；v3 卡已结归档，生命周期发布卡待真实 publish handoff。
+当前活跃 0 张；v3 与生命周期卡均已结归档，待真实公有 publish 时按 handoff 执行。已结卡见[归档索引](../_archive/README.md)。
 
-- [插件生命周期与发布卡](2026-11-01-plugin-lifecycle-publish.md) — 0.7.0 READY：默认安装/发布身份/市场 index/升级卸载已落地；真实 npm publish 与 index 托管待人工 handoff。
-- [插件即产品卡](../_archive/settled_issues/2026-11-01-plugin-as-product.md) — 0.5.0 产品形状；去向 = v2 manifest Note。
-- [落地顺序卡](../_archive/settled_issues/2026-11-01-landing-plan.md) — P0–P6 执行回执；v1 边界写清。
 - [产品生命周期卡](../_archive/settled_issues/2026-11-01-product-lifecycle.md) — 升级/降级/中断/恢复/搬移/doctor。
-- [workspace 与数据安全卡](../_archive/settled_issues/2026-11-01-workspace-and-data-safety.md) — v2 身份/登记/导出/不可信边界。
 
 ## 近期归档
 
+- 生命周期发布卡 2026-11-02 已结：0.7.0 发布就绪 + 本地 registry 按名安装演练 + market index 校验；公有 publish/托管 = [handoff](../../docs/guides/publish-handoff.md)；卡在 [归档](../_archive/settled_issues/2026-11-01-plugin-lifecycle-publish.md)。
 - v3 产品化卡 2026-11-02 已结：0.7.0 复核通过（入口/workspace/内容/账本；原生 picker、不自动迁移写实）；去向 = [v3 Note](../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)；卡在 [归档](../_archive/settled_issues/2026-11-01-plugin-as-product-v3.md)。
 - 发布与文档卡 2026-11-01 已结：`_dist` 手册/README/docs/CI 验收落地；去向 = [v2 manifest Note](../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)；卡在 [归档](../_archive/settled_issues/2026-11-01-release-and-docs.md)。
 - 培养工作优先单入口卡 2026-10-30 已结：work 字段 + 单表单 + 实时预览落地；实施 = [case-entry Note](../../notes/implemented/2026-10-30-cultivation-case-entry.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-case-entry.md)。

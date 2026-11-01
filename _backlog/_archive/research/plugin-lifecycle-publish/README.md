@@ -1,8 +1,9 @@
 # 插件生命周期与发布：把 `_dist` 从仓库内 tarball 变成能经 DSH 社区市场交付的插件
 
 > 问题：0.6.0 的 bundle 形状已经对了，为什么 `_dist` 仍不像一个能发布、能装、能升、能卸的产品？FAQ 50 的十段生命周期里，哪些是 DSH 的硬门禁、哪些只是质量线，我们分别差在哪、怎么补？
-> 消费者：[生命周期与发布卡](../../issues/2026-11-01-plugin-lifecycle-publish.md)（本轮的方案、取舍与验收都在那张卡里）。
-> 产出的卡：[生命周期与发布卡](../../issues/2026-11-01-plugin-lifecycle-publish.md)。
+> 消费者：[生命周期与发布卡](../../settled_issues/2026-11-01-plugin-lifecycle-publish.md)（本轮的方案、取舍与验收都在那张卡里）。
+> 产出的卡：[生命周期与发布卡](../../settled_issues/2026-11-01-plugin-lifecycle-publish.md)。
+> 归档：2026-11-02
 
 ## 这轮研究回答什么
 
@@ -35,6 +36,6 @@
 
 ## 与 v3 研究题的关系
 
-[v3 研究题](../../_archive/research/plugin-as-product-v3/README.md)回答的是「产品单位是什么、入口在哪、内容与 run bundle
+[v3 研究题](../plugin-as-product-v3/README.md)回答的是「产品单位是什么、入口在哪、内容与 run bundle
 怎么分家」；本轮不重开那些结论，只接着问「这个 bundle 怎么被交付、装上、升级、卸载，以及怎么
 出现在 DSH 的市场里」。0.6.0 的 bundle 形状是本轮的前提，不是本轮要重新论证的对象。
