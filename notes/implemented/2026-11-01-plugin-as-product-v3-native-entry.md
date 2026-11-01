@@ -72,6 +72,24 @@
 - `dist-manual` 在旧手册含 `--workspace`/`--profile desktop` 时红；模板去掉旧字面量并重导 → 绿。
 - `company-skeleton`/`base-clean`/`security-scan` 在旧 `workspace/` 源上红；迁 `content/` 并重写门禁 → 绿。
 
+## 0.7.0 复核（2026-11-02）
+
+v3 的边界没有被 0.7.0 生命周期轮改动；本轮补了真模型与认证档证据，并把两处验收口径写实：
+
+- **真模型 handbook 注入（T）**：dev home 的 `web` profile（0.7.0 源码 link）建 ceo 会话，问「引用系统
+  指令里 `公司手册` 标题后的第一句」；模型原话 `本文件是公司级共识，由 host 在每个成员 agent 创建时注入
+  system prompt。` + `HANDBOOK-OK`（`session-686d4c44-a6dc-4312-901f-6f52791611ba`）。证明 section 真到达模型，
+  不是只注册在 host。
+- **认证档（T）**：`company-entry-smoke`、`external-workspace-smoke`、`isolation-matrix-smoke` 均 ALL PASS
+  （v3 布局/身份断言已从 v2 更新为 v3）；`release --verify` 六项全绿；`release --check` READY 0.7.0。
+- **首屏口径**：首屏 = DSH 原生 Workspace picker；本包不自建 onboarding（见下「已知边界」）。README/手册/
+  profile/runtime-map 原写「产品 onboarding / 本包 client 回答」，已改为「DSH Workspace picker（本包不自建
+  onboarding）」。
+- **迁移口径**：0.5 根目录不自动迁移（0.5/0.6 未发布，无外部用户；旧文件保留/手册手工搬）。v3 卡 D4 的
+  「移未改副本」收窄为不自动迁移。
+- **与生命周期卡不冲突**：D53（会话检索改 isolated 组）只换实现；D54（MIT/npm 身份）只换发布姿态；
+  v3 的 bundle 入口、workspace 解析、内容/run bundle 分家、账本分区均未改。
+
 ## 已知边界 / 未做
 
 - **0.5.0 → 0.6.0 不迁移**：旧根目录骨架/旧 manifest/旧账本原样保留；新 workspace 重新开始，或按手册手工搬。

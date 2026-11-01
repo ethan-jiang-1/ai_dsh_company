@@ -44,11 +44,11 @@ dsh --profile company
 ```
 
 优先级：`DSH_COMPANY_HOME` → 启动 cwd（合理的项目目录）→ `<DSH_HOME>/company/settings.json` 的最近
-选择（便利提示）→ DSH Workspace picker / 产品 onboarding。没有 workspace 时 Host 不写盘；Host boot
+选择（便利提示）→ DSH Workspace picker。没有 workspace 时 Host 不写盘；Host boot
 不等用户。**没有 `--workspace` flag，也没有终端 TTY 询问。**
 
 首启是 DSH 的 token 门（无 token 401；带 token 303 + HttpOnly cookie → SPA），原生没有欢迎页；
-第一次看到什么由 DSH Web picker / 本包 client 回答。Desktop 不依赖 `welcome-notice`。
+第一次看到什么由 DSH Web 的 Workspace picker 回答（本包不自建 onboarding）。Desktop 不依赖 `welcome-notice`。
 
 ## 数据布局
 

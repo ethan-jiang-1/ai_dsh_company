@@ -40,7 +40,7 @@ dsh plugin --profile company add <tarball-or-package-name>
   `<workspace>/.dsh-company/`；home 只留 DSH 运行时与 host 治理。一个安装 = 一个公司，可顺序服务
   多个 workspace；不同公司 = 不同 `DSH_HOME`；并发多 workspace 后置。
 - **启动**：`cd <workspace> && dsh --profile company`；`DSH_COMPANY_HOME` 可显式指定；无 workspace
-  时 DSH Workspace picker/产品 onboarding 询问，Host boot 不等待。没有 `--workspace` flag。
+  时 DSH Workspace picker 询问（本包不自建 onboarding），Host boot 不等待。没有 `--workspace` flag。
 - **浏览器可选**：npm 发布的 `@deepseek-ai/dsh` 不含 browser 两包，preset 默认禁用 browser 组；
   装两包后自动启用；`DSH_COMPANY_BROWSER=on/off` 可强制。
 

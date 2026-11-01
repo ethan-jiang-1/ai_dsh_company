@@ -4,7 +4,7 @@
 // 成本：~1-2 分钟 keyless（临时 home + 真 tarball 安装 + 两次 boot；不调模型）
 // 用法：node checks/smoke/company-entry-smoke.mjs [--keep]
 //
-// 证明形状（0.6.0 v3）：
+// 证明形状（v3 起；版本随 package.json）：
 // - 干净 home：CLI 建 company profile → `dsh plugin --profile company add <tarball>` → roster 含 pack；
 // - 从 workspace cwd 直接 `dsh --profile company`（无 launcher/profile patch）→ banner；
 // - `<workspace>/.dsh-company/bundle.json` v3；kb/ 状态在场；根目录无 AGENTS.md/templates/kb；
@@ -20,7 +20,8 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 
 const KEEP = process.argv.includes('--keep')
 const CLI = join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js')
-const TARBALL = join(ROOT, '_dist', 'dsh-company-pack-0.6.0.tgz')
+const PACK_VERSION = JSON.parse(readFileSync(join(ROOT, 'packages/company-pack/package.json'), 'utf8')).version
+const TARBALL = join(ROOT, '_dist', `dsh-company-pack-${PACK_VERSION}.tgz`)
 const failures = []
 const check = (label, ok, detail = '') => {
   console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`)
@@ -33,7 +34,7 @@ if (!existsSync(CLI)) {
   process.exit(2)
 }
 if (!existsSync(TARBALL)) {
-  console.error(`company-entry-smoke: 缺 ${TARBALL}；先跑 node tools/export-dist.mjs（0.6.0）`)
+  console.error(`company-entry-smoke: 缺 ${TARBALL}；先跑 node tools/export-dist.mjs（${PACK_VERSION}）`)
   process.exit(2)
 }
 

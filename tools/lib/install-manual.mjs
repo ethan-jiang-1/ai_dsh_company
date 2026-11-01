@@ -106,7 +106,7 @@ DSH_COMPANY_HOME=/path/to/your-project dsh --profile company
 ${b}${b}${b}
 
 workspace 优先级：${q('DSH_COMPANY_HOME')} → 启动 cwd（合理项目目录）→ ${q('DSH_HOME/company/settings.json')}
-的最近选择（便利提示）→ DSH Workspace picker / 产品 onboarding。**没有 workspace 专用命令行参数，
+的最近选择（便利提示）→ DSH Workspace picker（本包不自建 onboarding）。**没有 workspace 专用命令行参数，
 也没有终端 TTY 询问。** 没有 workspace 时 Host 不写盘；Host boot 不等用户。
 
 首启会：
@@ -115,7 +115,7 @@ workspace 优先级：${q('DSH_COMPANY_HOME')} → 启动 cwd（合理项目目�
   ${q('logs/')}、${q('exports/')}、${q('overrides/')}；
 - 只补缺地写状态实例（company/org/owners/台账/章程）；不覆盖已有文件；
 - 写 ${q('.dsh-company/bundle.json')}（v3：id / createdAt / pack；${q('pack')} 是创建时的包版本）；
-- 登记 workspace（如果启动时已知道）；首屏由 DSH picker / 本包 client 回答；
+- 登记 workspace（如果启动时已知道）；首屏由 DSH Workspace picker 回答（本包不自建 onboarding）；
 - **不**在 workspace 根写手册/模板/kb/deliverables；**不**在 home 根写 bundle。
 
 首启是 DSH 的 token 门：${q('dsh web')} 打印 ${q('?token=…')} URL；无 token 401，带 token 303 +

@@ -21,7 +21,7 @@
 - **一个安装 = 一个公司**；同一 home 可顺序服务多个 workspace；不同公司 = 不同 `DSH_HOME`；
   并发多 workspace 后置。换项目不新建 home/重装。
 - **workspace 解析**：`DSH_COMPANY_HOME` → 启动 cwd（合理项目目录）→ `<DSH_HOME>/company/settings.json`
-  最近选择 → DSH Workspace picker/产品 onboarding。Host boot 不等用户；无 workspace 时零写。
+  最近选择 → DSH Workspace picker（本包不自建 onboarding）。Host boot 不等用户；无 workspace 时零写。
 - **插件内容只读**：presets/persona/skills/host/client/`content/`（手册/模板/默认章程/状态默认值）；
   **不 seed** 手册/模板到 workspace。
 - **run bundle**：`<workspace>/.dsh-company/`（`kb/`、`deliverables/`、`cultivation/`、`logs/`、

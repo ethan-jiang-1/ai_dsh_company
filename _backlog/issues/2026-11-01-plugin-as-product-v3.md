@@ -246,16 +246,16 @@ run： <workspace>/{kb,deliverables,deliverables-archive,cultivation}/ + .dsh-co
 ## 验收标准
 
 1. **安装**：干净 home；`dsh plugin --profile company add <tarball>` → `dsh.profile.bundles` 含 `dsh-company-pack`；真启动无 `did not activate`/`skipping profile bundle`；tarball 不含 `bin/**`；`dsh-company` 命令不存在。Plugins 页安装句在 README/手册，CLI 句标「仅 `dsh web`」。
-2. **启动/workspace**：`cd <temp-project> && dsh --profile company` → 无需 `--workspace`/TTY；workspace 登记；`DSH_COMPANY_HOME` 同样可用；无 workspace 启动 → Host 零写、Client onboarding 出现；Host boot 不阻塞。
-3. **内容边界**：新 workspace 无 `AGENTS.md`/`COMPANY.md`/`templates/` 副本；已有用户 `AGENTS.md` 不动；真模型会话注入 pack `content/AGENTS.md`；模板从 pack 读；`.dsh-company/overrides/` 可选覆盖。
-4. **run bundle**：`<workspace>/kb/`、`deliverables/`、`cultivation/`、`.dsh-company/bundle.json`（v3）在场；home 根无 `bundle.json`；方法层/presented 账本权威仍在 home；workspace `.dsh-company/exports/` 只是派生。
+2. **启动/workspace**：`cd <temp-project> && dsh --profile company` → 无需 `--workspace`/TTY；workspace 登记；`DSH_COMPANY_HOME` 同样可用；无 workspace 启动 → Host 零写、**DSH 原生 Workspace picker** 回答首屏（本包不自建 onboarding；0.7.0 口径见复核节）；Host boot 不阻塞。
+3. **内容边界**：新 workspace 无 `AGENTS.md`/`COMPANY.md`/`templates/` 副本；已有用户 `AGENTS.md` 不动；真模型会话注入 pack `content/AGENTS.md`（0.7.0 复核有真模型原话）；模板从 pack 读；`.dsh-company/overrides/` 可选覆盖。
+4. **run bundle**：`<workspace>/.dsh-company/kb/`、`deliverables/`、`cultivation/`、`bundle.json`（v3）在场；home 根无 `bundle.json`；方法层/presented 账本权威仍在 home；workspace `.dsh-company/exports/` 只是派生。
 5. **多 workspace**：同一 home 顺序 workspace A/B 都能启动；两套 run bundle；账本按 workspace 分区不串；无「第二盘」拒绝；换项目不新建 home/重装。
-6. **身份/迁移**：0.5.0 的 v2 manifest → v3（id/createdAt 保留）；账本 v1 → v2（true/false 保留）；旧 `AGENTS.md`/`templates/` 只移未改 pack 副本；改过的保留；旧 profile patch 行只告警/兼容；二启字节稳定。
+6. **身份/迁移**：0.5.0 的 v2 manifest → v3（id/createdAt 保留）；账本 v1 → v2（true/false 保留）；旧 `AGENTS.md`/`templates/` **不自动迁移**（0.7.0 口径见复核节：0.5/0.6 未发布，旧文件保留 + 手册手工搬）；旧 profile patch 行只告警/兼容；二启字节稳定。
 7. **文档**：根 README、`_dist/安装手册.md`、pack/workspace README、`docs/{profile,runtime-map,data-model,release,project-map,demo,index,decisions,orient}.md`、guides、`AGENTS.md`、`tests/README.md`、`checks/README.md`、CHANGELOG、web-window-ops 同 diff；无旧主路径。
 8. **门禁**：`dist-manual` 新关键句 + sha256 + pin；`pack-shape`/`pack-files` 无 bin + content；`company-skeleton` 无手册/模板 seed；`handbook-budget` 量 content/注入；`run-bundle-clean`/`layout-block`/`bare-path`/`md-links`/`doc-budget` 绿；每道新判据有红→还原→绿原话。
-9. **认证档**：`release-smoke`、`company-entry-smoke`、`release-smoke`/`company-entry-smoke`、`external-workspace-smoke`、`isolation-matrix-smoke`、`client-load-smoke`、`handbook.spec`、`preset-smoke` 全绿（真模型按改动面）。
-10. **分发**：`_dist` 0.6.0 重导；tarball = 冒烟字节；sha256 手册一致；`release --verify` 绿。
-11. **生命周期四段**：①装 = Plugins 页默认句 + CLI 仅 web + 三成功进 roster；②起 = 真启动无 `did not activate`/`skipping profile bundle`；③配 = 默认值在 bundle、home 不供货、产品不静默写 home patch；④首启 = 本包 client 回答首屏、不依赖 `welcome-notice`、Host 不阻塞、Desktop 有替代路径。文档全文无 `--profile desktop`。
+9. **认证档**：`release-smoke`、`company-entry-smoke`、`external-workspace-smoke`、`isolation-matrix-smoke`、`client-load-smoke`、`handbook.spec`、`preset-smoke` 全绿（0.7.0 复核表见下；真模型按改动面）。
+10. **分发**：`_dist` 0.7.0 重导；tarball = 冒烟字节；sha256 手册一致；`release --verify` 绿。
+11. **生命周期四段**：①装 = Plugins 页默认句 + CLI 仅 web + 三成功进 roster；②起 = 真启动无 `did not activate`/`skipping profile bundle`；③配 = 默认值在 bundle、home 不供货、产品不静默写 home patch；④首启 = DSH Workspace picker 回答首屏（本包不自建 onboarding）、不依赖 `welcome-notice`、Host 不阻塞、Desktop 有替代路径。文档全文无 `--profile desktop`。
 
 ## 范围与排除项
 
@@ -315,10 +315,54 @@ run： <workspace>/{kb,deliverables,deliverables-archive,cultivation}/ + .dsh-co
 `client-load-smoke`、`preset-smoke`、`present-catalog-smoke`、`release --verify` 全绿。细节 = 
 [v3 Note](../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)。
 
+## 0.7.0 复核（2026-11-02）
+
+**结论**：v3 的产品形状与边界**已落地且未被 0.7.0 破坏**；0.7.0 生命周期轮改的是会话检索实现（D53）与
+发布姿态（D54），不改入口/workspace/内容边界。两卡不冲突。复核同时收口了两处“验收文字超前于实现”的口径。
+
+### 逐条证据（真跑）
+
+| # | 验收 | 证据 |
+|---|---|---|
+| 1 | 安装 | `company-entry-smoke` ALL PASS（tarball 安装、roster、无 bin、无 registrar）；`release-smoke` CLI + 应用内安装 `applied` |
+| 2 | 启动/workspace | `company-entry-smoke`（cwd 启动、登记、A/B 两盘）；`isolation-matrix-smoke` no-workspace 零写 + 可操作告警；首屏 = DSH 原生 Workspace picker（C：ui-workspace first-use）+ 本包零 onboarding UI（v3 Note） |
+| 3 | 内容边界 | `company-entry-smoke` 根目录无 AGENTS/templates/kb；真模型会话原话：`本文件是公司级共识，由 host 在每个成员 agent 创建时注入 system prompt。` + `HANDBOOK-OK`（session-686d4c44，2026-11-02）；`handbook.spec` 绿 |
+| 4 | run bundle | 上述 smoke 的 `.dsh-company/{kb,bundle.json}`；`release-smoke` home 根无 bundle；方法层/账本 home；`exports/` 派生 |
+| 5 | 多 workspace | `company-entry-smoke` 同 home A/B 两次 boot、各自 v3 身份、无「第二盘」拒绝；`presented-domain.spec` 按 workspace 分区 |
+| 6 | 身份/迁移 | `bundle-manifest.spec` v2→v3（id/createdAt）；`presented-domain.spec` 账本分区；0.5 根目录**不自动迁移**（口径见下） |
+| 7 | 文档 | `pnpm verify` 的 `doc-taxonomy` / `md-links` / `bare-path` / `doc-budget` 全绿；README/手册/合同同步 |
+| 8 | 门禁 | `pnpm verify` ALL PASS；`company-skeleton` / `handbook-budget` / `run-bundle-clean` / `dist-manual` 绿 |
+| 9 | 认证档 | `release --verify` 六项全绿；`company-entry` / `external-workspace` / `isolation-matrix` ALL PASS；`client-load` / `handbook.spec` / `preset-smoke` 绿 |
+| 10 | 分发 | `pnpm release --check` READY 0.7.0（manifest `gitSha=HEAD`、`dirty=false`）；tarball sha `a37ba24b…a8a44`；手册同版本 |
+| 11 | 生命周期四段 | 装/起/配/首启证据同上；文档无 `--profile desktop`；首启依赖 DSH picker（不依赖 `welcome-notice`） |
+
+### 两处口径收口（不是实现回退，是把已决定的范围写实）
+
+1. **首启 onboarding**：v3 Note 已明确「无 workspace 首屏依赖 DSH Workspace picker；没有本包自建
+   onboarding UI」。本轮把 README/手册/profile/runtime-map 里「产品 onboarding / 本包 client 回答」
+   的表述改成「DSH Workspace picker（本包不自建 onboarding）」——不造第二个 picker。
+2. **0.5 根目录迁移**：v3 Note 已明确「0.5.0 → 0.6.0 不迁移，旧文件原样保留/手册手工搬」。理由 =
+   0.5/0.6 从未发布、无外部用户；生命周期卡也把 0.5 迁移列为排除项。D4 的「移未改副本」在本轮
+   **收窄为不自动迁移**，避免为不存在的外部数据写迁移代码。
+
+### 与生命周期卡的冲突检查
+
+| v3 边界 | 0.7.0 是否改动 | 结论 |
+|---|---|---|
+| 产品单位 = bundle，无 launcher/bin | 未改 | 一致 |
+| 入口 = named profile；无 `--workspace` | 未改 | 一致 |
+| 内容在 pack；run bundle 在 `.dsh-company/` | 未改 | 一致 |
+| startup/登记行在 bundle patch；不写 profile patch | `company-session-search` 也是 bundle insert | 一致 |
+| 方法层/账本权威在 home | 未改 | 一致 |
+| 一安装一公司、顺序多 workspace | 未改 | 一致 |
+| 会话检索实现 | 0.7.0 从替换 host 行改为 insert+isolate 组（D53） | **不冲突**：只换实现，不改 v3 边界 |
+| 发布姿态/许可 | 0.7.0 改为 MIT + npm 身份（D54） | **不冲突**：v3 未规定许可；发布 handoff 在生命周期卡 |
+
 ## 下一步
 
-1. 已实施，等用户验收/复核；卡保持 `推敲中`、`可关闭：否`。
-2. 验收通过后写卡顶结论/去向并归档；若要补自建 onboarding/Desktop 真机，另开新卡。
+1. v3 复核完成：产品形状/边界已落地；两处口径按 v3 Note 收窄（原生 picker、不自动迁移）。
+2. 等用户验收后按关闭法归档；真实 npm publish 不在本卡，归[生命周期与发布卡](2026-11-01-plugin-lifecycle-publish.md)
+   的 [publish handoff](../../docs/guides/publish-handoff.md)。
 
 ## 关联
 

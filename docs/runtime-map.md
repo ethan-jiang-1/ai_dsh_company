@@ -16,7 +16,7 @@
   → run bundle 状态（.dsh-company/ 只补缺；不 seed 手册/模板）
   → host：workspace 登记（早于 readiness；失败只告警）
   → Web host（team / present / company-client）
-  → 浏览器 client（品牌 / 卡片 / 公司视图页签 / 无 workspace 时 picker/onboarding）
+  → 浏览器 client（品牌 / 卡片 / 公司视图页签；无 workspace 时由 DSH picker 回答，本包不自建 onboarding）
   → session cwd = workspace（首屏选中目标；默认 ceo 会话）
   → preset persona / 工具 / skills / handbook systemPrompt section 进会话
   → vendor agent loop → 会话日志（$DSH_HOME/sessions/）

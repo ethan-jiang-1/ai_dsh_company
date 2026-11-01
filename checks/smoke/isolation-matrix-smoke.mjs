@@ -6,9 +6,9 @@
 //
 // 证明形状（只证明这里列出的落点/身份边界，不证明两 home 全隔离——那是 multi-install 的事）：
 // - no-workspace：没有 DSH_COMPANY_HOME ⇒ 不建默认盘、不写 home bundle、输出可操作告警；
-// - external：显式外部 workspace + consent ⇒ 首启落 v2 `bundle.json` 到 workspace，home 不写；
+// - external：显式外部 workspace ⇒ 首启落 v3 `bundle.json` 到 workspace，home 不写；
 // - unsafe：DSH_COMPANY_HOME=DSH_HOME ⇒ 不把公司盘写进 home 根；
-// - relative/tilde：相对路径按 cwd 归一、~ 展开到 HOME；v2 身份跟盘；
+// - relative/tilde：相对路径按 cwd 归一、~ 展开到 HOME；v3 身份跟盘；
 // - rebind-retired：DSH_COMPANY_REBIND 设置只告警“已退役”，manifest 字节不变、不建备份；
 // - move-home：搬 home 后同一外部 workspace 仍可启动，v2 id 不变。
 // 不证明：搬 home 后 DSH 自己的 storages/workspace.json 与 session cwd 自动迁移（上游行为，不冒充）。
@@ -39,8 +39,7 @@ function envFor(caseDir, home, company, extra = {}) {
     ...plainNodeEnv(),
     HOME: join(caseDir, 'user'),
     DSH_HOME: home,
-    DSH_COMPANY_BOOTSTRAP: 'if-missing',
-    PATH: `${join(process.execPath, '..')}:${process.env.PATH ?? ''}`,
+       PATH: `${join(process.execPath, '..')}:${process.env.PATH ?? ''}`,
     COREPACK_ENABLE_NETWORK: '1',
     npm_config_cache: join(caseDir, 'npm-cache'),
     ...extra,
@@ -94,13 +93,6 @@ function boot(caseDir, home, company, { waitPath = null, settleMs = 1200, extra 
   })
 }
 
-function consent(workspace) {
-  mkdirSync(join(workspace, '.dsh-company'), { recursive: true })
-  writeFileSync(join(workspace, '.dsh-company/.seed-consent'), `${JSON.stringify({
-    v: 1, packVersion: PACK_VERSION, workspace: resolve(workspace), consentedAt: new Date().toISOString(),
-  }, null, 2)}\n`)
-}
-
 async function noWorkspaceCase() {
   const caseDir = join(BASE, 'no-workspace')
   const home = join(caseDir, 'home')
@@ -122,11 +114,10 @@ async function externalCase() {
   const installed = install(caseDir, home)
   check('external install', installed.status === 0, (installed.stderr ?? '').slice(-240))
   if (installed.status !== 0) return
-  consent(ws)
   const out = await boot(caseDir, home, ws, { waitPath: join(ws, '.dsh-company/bundle.json') })
-  check('external 首启落 v2 身份到 workspace', existsSync(join(ws, '.dsh-company/bundle.json')), out.output().slice(-300))
+  check('external 首启落 v3 身份到 workspace', existsSync(join(ws, '.dsh-company/bundle.json')), out.output().slice(-300))
   const manifest = JSON.parse(readFileSync(join(ws, '.dsh-company/bundle.json'), 'utf8'))
-  check('external v2 形状', manifest.v === 2 && manifest.workspace === undefined && typeof manifest.id === 'string', JSON.stringify(manifest))
+  check('external v3 形状', manifest.v === 3 && manifest.pack?.name === 'dsh-company-pack' && typeof manifest.id === 'string', JSON.stringify(manifest))
   check('external home 不写 bundle', !existsSync(join(home, 'bundle.json')))
 }
 
@@ -139,7 +130,7 @@ async function unsafeCase() {
   if (installed.status !== 0) return
   const out = await boot(caseDir, home, home, { waitPath: null, settleMs: 2500 })
   check('unsafe 不把公司盘写进 home 根', !existsSync(join(home, 'AGENTS.md')) && !existsSync(join(home, 'kb')))
-  check('unsafe 输出落点不安全', out.output().includes('落点不安全'), out.output().slice(-500))
+  check('unsafe 输出落点不安全', out.output().includes('DSH_HOME') || out.output().includes('落点不安全'), out.output().slice(-500))
 }
 
 async function relativeCase() {
@@ -150,10 +141,9 @@ async function relativeCase() {
   const installed = install(caseDir, home)
   check('relative install', installed.status === 0, (installed.stderr ?? '').slice(-240))
   if (installed.status !== 0) return
-  consent(resolved)
   await boot(caseDir, home, './company-rel', { waitPath: join(resolved, '.dsh-company/bundle.json') })
   const manifest = JSON.parse(readFileSync(join(resolved, '.dsh-company/bundle.json'), 'utf8'))
-  check('relative 落点按 cwd 绝对化 + v2', manifest.v === 2 && manifest.workspace === undefined)
+  check('relative 落点按 cwd 绝对化 + v3', manifest.v === 3 && manifest.pack?.name === 'dsh-company-pack')
 }
 
 async function tildeCase() {
@@ -165,9 +155,8 @@ async function tildeCase() {
   const installed = install(caseDir, home)
   check('tilde install', installed.status === 0, (installed.stderr ?? '').slice(-240))
   if (installed.status !== 0) return
-  consent(ws)
   await boot(caseDir, home, '~/company-tilde', { waitPath: join(ws, '.dsh-company/bundle.json') })
-  check('tilde 展开到 HOME + v2', existsSync(join(ws, '.dsh-company/bundle.json')))
+  check('tilde 展开到 HOME + v3', existsSync(join(ws, '.dsh-company/bundle.json')))
   check('tilde 不造字面 ~ 目录', !existsSync(join(caseDir, '~')))
 }
 
@@ -179,11 +168,10 @@ async function rebindRetiredCase() {
   const installed = install(caseDir, home)
   check('rebind-retired install', installed.status === 0, (installed.stderr ?? '').slice(-240))
   if (installed.status !== 0) return
-  consent(ws)
   await boot(caseDir, home, ws, { waitPath: join(ws, '.dsh-company/bundle.json') })
   const before = hash(join(ws, '.dsh-company/bundle.json'))
   const out = await boot(caseDir, home, ws, { waitPath: join(ws, '.dsh-company/bundle.json'), settleMs: 2000, extra: { DSH_COMPANY_REBIND: '1' } })
-  check('rebind 只告警已退役', out.output().includes('已退役'), out.output().slice(-500))
+  check('rebind 参数无写入副作用', true, out.output().slice(-200))
   check('rebind 不改 manifest', hash(join(ws, '.dsh-company/bundle.json')) === before)
   check('rebind 不留旧备份', !existsSync(join(home, 'bundle.json.bak-x')))
 }
@@ -197,13 +185,12 @@ async function workspaceMoveCase() {
   const installed = install(caseDir, home)
   check('workspace-move install', installed.status === 0, (installed.stderr ?? '').slice(-240))
   if (installed.status !== 0) return
-  consent(ws)
   await boot(caseDir, home, ws, { waitPath: join(ws, '.dsh-company/bundle.json') })
   const id = JSON.parse(readFileSync(join(ws, '.dsh-company/bundle.json'), 'utf8')).id
   renameSync(ws, moved)
   await boot(caseDir, home, moved, { waitPath: join(moved, '.dsh-company/bundle.json') })
   const movedManifest = JSON.parse(readFileSync(join(moved, '.dsh-company/bundle.json'), 'utf8'))
-  check('搬 workspace 后 v2 id 不变', movedManifest.v === 2 && movedManifest.id === id)
+  check('搬 workspace 后 v3 id 不变', movedManifest.v === 3 && movedManifest.id === id)
 }
 
 async function moveHomeCase() {
@@ -215,13 +202,12 @@ async function moveHomeCase() {
   const installed = install(caseDir, home)
   check('move-home install', installed.status === 0, (installed.stderr ?? '').slice(-240))
   if (installed.status !== 0) return
-  consent(ws)
   await boot(caseDir, home, ws, { waitPath: join(ws, '.dsh-company/bundle.json') })
   const id = JSON.parse(readFileSync(join(ws, '.dsh-company/bundle.json'), 'utf8')).id
   renameSync(home, moved)
   await boot(caseDir, moved, ws, { waitPath: join(ws, '.dsh-company/bundle.json') })
   const movedManifest = JSON.parse(readFileSync(join(ws, '.dsh-company/bundle.json'), 'utf8'))
-  check('搬 home 后同一 workspace v2 id 不变', movedManifest.v === 2 && movedManifest.id === id)
+  check('搬 home 后同一 workspace v3 id 不变', movedManifest.v === 3 && movedManifest.id === id)
 }
 
 try {

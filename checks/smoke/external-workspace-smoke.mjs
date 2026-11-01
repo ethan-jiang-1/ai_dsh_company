@@ -4,7 +4,7 @@
 // 成本：~1 分钟 keyless（安装 + 外部盘 boot + 搬 home 后 boot）
 // 前置：已导出 `_dist/dsh-company-pack-<version>.tgz`
 //
-// 证明形状：DSH_COMPANY_HOME 在 home 外时 bundle.workspace 记绝对路径；只搬 home 后仍能 boot，数据不丢。
+// 证明形状（v3）：DSH_COMPANY_HOME 在 home 外时身份落在该 workspace 的 `.dsh-company/`；只搬 home 后仍能 boot，id/数据不丢。
 import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
@@ -20,7 +20,7 @@ const HOME = join(BASE, 'home'); const MOVED = join(BASE, 'home-moved'); const E
 const failures = []; const active = new Set()
 const check = (label, ok, detail = '') => { console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail ? `（${detail}）` : ''}`); if (!ok) failures.push(label) }
 const sha = p => createHash('sha256').update(readFileSync(p)).digest('hex')
-const envFor = (home) => ({ HOME: join(BASE, 'user'), DSH_HOME: home, DSH_COMPANY_HOME: EXT, DSH_COMPANY_BOOTSTRAP: 'if-missing', PATH: `${join(BASE, 'bin')}:${process.env.PATH}`, npm_config_store_dir: join(BASE, 'store'), npm_config_cache: join(BASE, 'cache') })
+const envFor = (home) => ({ HOME: join(BASE, 'user'), DSH_HOME: home, DSH_COMPANY_HOME: EXT, PATH: `${join(BASE, 'bin')}:${process.env.PATH}`, npm_config_store_dir: join(BASE, 'store'), npm_config_cache: join(BASE, 'cache') })
 const dsh = (home, args) => spawnSync(join(BASE, 'bin/dsh'), args, { cwd: BASE, env: envFor(home), encoding: 'utf8', timeout: 180_000 })
 const boot = (home) => {
   const child = spawn(join(BASE, 'bin/dsh'), ['--profile', 'web', '--', '--port', '0', '--no-open'], { cwd: BASE, env: envFor(home), stdio: ['ignore', 'pipe', 'pipe'] })
@@ -41,19 +41,15 @@ try {
   writeFileSync(join(BASE, 'bin/dsh'), `#!/bin/sh\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(CLI)} "$@"\n`, { mode: 0o755 })
   if (!existsSync(TARBALL)) throw new Error(`缺 ${TARBALL}`)
   check('安装成功', dsh(HOME, ['plugin', '--profile', 'web', 'add', `file:${TARBALL}`]).status === 0)
-  mkdirSync(join(EXT, '.dsh-company'), { recursive: true })
-  writeFileSync(join(EXT, '.dsh-company/.seed-consent'), `${JSON.stringify({
-    v: 1, packVersion: PACK.version, workspace: EXT, consentedAt: new Date().toISOString(),
-  }, null, 2)}\n`)
   console.log('① 外部 workspace 首启')
   const first = await boot(HOME)
   const r = await rpc(first)
   await r('session/create', { request: { cwd: EXT, agentPreset: 'ceo' } })
-  mkdirSync(join(EXT, 'kb/ceo/journal'), { recursive: true })
-  writeFileSync(join(EXT, 'kb/company.md'), '公司名: Acme\n')
-  writeFileSync(join(EXT, 'kb/ceo/journal/acme.md'), '# Acme\n')
+  mkdirSync(join(EXT, '.dsh-company/kb/ceo/journal'), { recursive: true })
+  writeFileSync(join(EXT, '.dsh-company/kb/company.md'), '公司名: Acme\n')
+  writeFileSync(join(EXT, '.dsh-company/kb/ceo/journal/acme.md'), '# Acme\n')
   const bundle1 = JSON.parse(readFileSync(join(EXT, '.dsh-company/bundle.json'), 'utf8'))
-  check('workspace v2 身份在外部盘', bundle1.v === 2 && bundle1.workspace === undefined && typeof bundle1.id === 'string',
+  check('workspace v3 身份在外部盘', bundle1.v === 3 && bundle1.pack?.name === 'dsh-company-pack' && typeof bundle1.id === 'string',
     JSON.stringify({ v: bundle1.v, id: bundle1.id }))
   await stop(first)
 
@@ -62,9 +58,9 @@ try {
   const second = await boot(MOVED)
   const r2 = await rpc(second)
   check('搬 home 后 roster 仍含 ceo', (await r2('agentPresets/list', {})).presets?.some(p => p.id === 'ceo') === true)
-  check('搬 home 后公司盘/数据仍在', existsSync(join(EXT, 'kb/company.md')) && readFileSync(join(EXT, 'kb/company.md'), 'utf8').includes('Acme'))
+  check('搬 home 后公司盘/数据仍在', existsSync(join(EXT, '.dsh-company/kb/company.md')) && readFileSync(join(EXT, '.dsh-company/kb/company.md'), 'utf8').includes('Acme'))
   const bundle2 = JSON.parse(readFileSync(join(EXT, '.dsh-company/bundle.json'), 'utf8'))
-  check('搬 home 后 workspace v2 身份仍在外部盘', bundle2.v === 2 && bundle2.id === bundle1.id && bundle2.workspace === undefined,
+  check('搬 home 后 workspace v3 身份仍在外部盘', bundle2.v === 3 && bundle2.id === bundle1.id,
     JSON.stringify({ v: bundle2.v, id: bundle2.id }))
   await stop(second)
 } catch (error) { failures.push(error.message); console.error(`external-workspace-smoke: ${error.stack ?? error.message}`) }

@@ -209,14 +209,14 @@ opened: 2026-11-01
 **P0 完成**：`cordis.patch.yml` 去掉 `session-query-sqlite` 改值替换，改为 `company-session-search`
 （insert + isolate：provider + tool）；六个 preset 的 `tool-session-query` 行收敛；`preset-smoke`
 改用 `pluginInventory/list` 断言组行 active；`release-smoke` 新增 ④c 应用内安装断言。
-rc.2 与 rc.5 的 in-app 安装均为 `application: applied`。
+rc.2 与 rc.5 的 in-app 安装均为 `application: applied`；真模型 `session_search` 命中前一会话（证据见 Note）。
 
 **P1 完成**：`license: MIT` + `LICENSE`、`author`/`homepage`/`bugs`/`keywords`/`publishConfig`；
 `private` 移除；`pack-engines`/`pack-files` 改为发布姿态；README/手册模板/`docs/release.md` 同步。
 `npm publish --dry-run`：127 files、LICENSE 在场、无 `bin/`、public access。
 
 **P2 完成**：`pnpm release --prepare`（0.7.0）→ `--verify` 六项认证档全绿；tarball
-`sha256=10966e7d…e57e5`；manifest 记录版本/HEAD/检查项（`--stamp` 后 `dirty=false`）。
+`sha256=a37ba24b…a8a44`；manifest 记录版本/HEAD/检查项（`--stamp` 后 `dirty=false`）。
 
 **P3 完成（到 handoff）**：`tools/market-index.mjs`（manifest→format 1 + DSH 校验器真验）、
 `tests/company/market-index.spec.ts`、`docs/guides/publish-handoff.md`；`_dist/market/index.json`
@@ -233,6 +233,27 @@ docs 预算内；`pnpm verify` / `pnpm test`（1027 passed / 3 skipped）/ `pnpm
 
 验收对照：①装/②起/⑤产物/⑥升级/⑦卸载/⑧文档/⑨门禁 = 本轮已验证；③ npm 身份 dry-run 通过，
 真实 publish 留 handoff；④ index 通过校验、托管留 handoff；⑩ 发布后回执待人工 publish 后补。
+
+## 与 v3 卡的关系（无冲突，2026-11-02 复核）
+
+| 面 | v3 卡 | 本卡 | 是否冲突 |
+|---|---|---|---|
+| 产品单位/入口 | bundle + named profile；无 launcher | 不改 | 否 |
+| workspace/内容/run bundle | env/cwd/saved/picker；内容在 pack；`.dsh-company/` | 不改 | 否 |
+| startup 行/账本 | bundle patch；账本按 workspace 留 home | `company-session-search` 也是 bundle insert；账本未动 | 否 |
+| 会话检索 | v3 未规定实现（文档只说角色工具） | D53：改 insert+isolate 组 | 否（只换实现） |
+| 许可/发布 | v3 未规定 | D54：MIT + npm 身份 + market handoff | 否（新面） |
+| 0.5 迁移 | v3 明确不自动迁移 | 本卡排除项同样不做 | 否（同一口径） |
+
+v3 卡 0.7.0 复核见其「0.7.0 复核」节；两卡边界一致，没有互相否定。
+
+## 剩余 handoff（代码面已收口，不是 gap）
+
+1. **真实 npm publish**：本机无 npm 凭据；发布字节已 READY（`_dist/dsh-company-pack-0.7.0.tgz`，
+   sha `a37ba24b…a8a44`），按 [publish-handoff](../../docs/guides/publish-handoff.md) 由有权限的人执行。
+2. **market index https 托管**：index 已在 `_dist/market/` 用 DSH 校验器验过；发布后用 vendor generator
+   重生成并托管，Discover 加源验证。
+3. **用户验收**：0.7.0 的发布字节与两卡复核；关闭由用户判定。
 
 ## 下一步
 

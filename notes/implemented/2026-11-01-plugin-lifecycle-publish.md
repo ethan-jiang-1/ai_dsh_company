@@ -59,7 +59,7 @@
 | 项 | 值 |
 |---|---|
 | 版本 | `0.7.0`（tarball `_dist/dsh-company-pack-0.7.0.tgz`） |
-| sha256 | `10966e7d028914263eb421ebefceda2256b9484674f3ecfc3d071ed564be57e5` |
+| sha256 | `a37ba24be4b18e5c9362ccb5cb7d528d99b8dafcf4221d7f8ed0cb6d4c8a8a44` |
 | 手册 | `_dist/安装手册.md`（生成；MIT/精确卸载面/市场开关） |
 | manifest | `_dist/release-manifest.json`（`pnpm release --verify` 全绿后写） |
 | market index | `node tools/market-index.mjs --check` → `dsh-company-pack@0.7.0`，DSH 校验器通过；`_dist/market/` 可托管 |
@@ -69,6 +69,18 @@ client-load-smoke / preset-smoke / present-catalog-smoke）；`interrupted-insta
 （remove 后 run bundle / home 身份 / presented ledger 残留）；`upgrade-while-running-smoke` ALL PASS
 （运行中 remove+add 0.7.1；重启后身份保留创建版本 0.7.0、依赖到 0.7.1、旧 session 仍在）；
 rc.5 干净 profile 应用内安装 `application: applied` + 六 preset + `session/create`。
+
+## 真模型会话检索（2026-11-02，T）
+
+隔离组不只「行 active」——真模型下也工作：
+
+- 会话 A（`session-5e83a253-a099-4371-9191-ad76c034d9d6`）：让模型记住 `ZEBRA-987`；
+- 会话 B（`session-be04d9b7-e0cb-4f4a-97df-b2d00781dcc7`）：让模型用 `session_search` 查该码；
+- 结果：模型返回会话 A 的 id 与原文片段；会话日志有 5 次 `session_search` 工具调用；
+  `<DSH_HOME>/cache/company/session-search-web.db` 首次搜索后落盘（约 220MB）。
+- 说明：host 侧栏 `session/search` 仍保持出厂 `openAt: never`，不在此承诺内。
+
+v3 卡 0.7.0 复核结论：两卡不冲突（D53 只换检索实现、D54 只换发布姿态；v3 边界未改）。
 
 ## 未做
 
