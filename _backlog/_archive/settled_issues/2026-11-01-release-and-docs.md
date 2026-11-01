@@ -37,8 +37,8 @@ RFC/实施。**本卡不是实施授权。**
 
 ## 当前情况
 
-- 研究依据：[发布/文档/验证](../../research/plugin-as-product/2026-11-01-release-and-verification.md)；
-  主稿 [§7.4 文档面/§10.7 技术设计](../../research/plugin-as-product/2026-11-01-plugin-as-product.md)。
+- 研究依据：[发布/文档/验证](../research/plugin-as-product/2026-11-01-release-and-verification.md)；
+  主稿 [§7.4 文档面/§10.7 技术设计](../research/plugin-as-product/2026-11-01-plugin-as-product.md)。
 - `_dist/安装手册.md` 是 tracked 生成物；`tools/export-dist.mjs` 内嵌旧手册模板；
   `checks/gates/dist-manual.mjs` required 含 `company-workspace`/`DSH_COMPANY_REBIND`/
   “一个 DSH_HOME 只对应一个 run bundle”（C）。
@@ -122,8 +122,8 @@ RFC/实施。**本卡不是实施授权。**
 
 ## 关联
 
-- 伞卡：[插件即产品](../../issues/2026-11-01-plugin-as-product.md)（S4/S5）
-- 研究：[发布/验证](../../research/plugin-as-product/2026-11-01-release-and-verification.md)、
-  [主稿 §7.4/§10.7](../../research/plugin-as-product/2026-11-01-plugin-as-product.md)
-- 相邻卡：[产品生命周期](../../issues/2026-11-01-product-lifecycle.md)、
-  [workspace 与数据安全](../../issues/2026-11-01-workspace-and-data-safety.md)
+- 伞卡：[插件即产品](./2026-11-01-plugin-as-product.md)（S4/S5）
+- 研究：[发布/验证](../research/plugin-as-product/2026-11-01-release-and-verification.md)、
+  [主稿 §7.4/§10.7](../research/plugin-as-product/2026-11-01-plugin-as-product.md)
+- 相邻卡：[产品生命周期](./2026-11-01-product-lifecycle.md)、
+  [workspace 与数据安全](./2026-11-01-workspace-and-data-safety.md)

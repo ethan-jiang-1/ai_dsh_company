@@ -15,6 +15,10 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-01-plugin-as-product.md](settled_issues/2026-11-01-plugin-as-product.md) | 已结；0.5.0 产品形状：company profile/启动器/workspace v2/登记/seed/手册碰撞/方法账本留 host；v1 边界 = Web onboarding/Windows/registry/威胁注入 | 2026-11-01 |
+| [2026-11-01-landing-plan.md](settled_issues/2026-11-01-landing-plan.md) | 已结；P0–P6 执行回执；v1 边界不阻塞关闭 | 2026-11-01 |
+| [2026-11-01-product-lifecycle.md](settled_issues/2026-11-01-product-lifecycle.md) | 已结；安装/首启/升级/降级/备份/恢复/搬移/卸载/doctor + 运行中升级/坏安装注入 | 2026-11-01 |
+| [2026-11-01-workspace-and-data-safety.md](settled_issues/2026-11-01-workspace-and-data-safety.md) | 已结；选/切/搬/备/删、lease、v2 身份、方法/账本留 host + 导出；不可信项目边界测试 | 2026-11-01 |
 | [2026-11-01-release-and-docs.md](settled_issues/2026-11-01-release-and-docs.md) | 已结；0.5.0 发布面/文档面落地（手册/README/docs/CHANGELOG/门禁）；registry 不启用、Windows/容器不承诺；验收 = release --verify 全绿 | 2026-11-01 |
 | [2026-10-30-cultivation-case-entry.md](settled_issues/2026-10-30-cultivation-case-entry.md) | 已结；培养主任务工作/目标优先单入口第一切片（work 字段 + 单表单 + 预览）；去向 = [case-entry Note](../../notes/implemented/2026-10-30-cultivation-case-entry.md)；对话式梳理/AI 起草另决 | 2026-10-30 |
 | [2026-10-30-cultivation-entry-followup.md](settled_issues/2026-10-30-cultivation-entry-followup.md) | 已结；目标角色显式选择、入口文案、自纠正状态、验证历史逐条、对话失败保留草稿；去向 = [entry-followup Note](../../notes/implemented/2026-10-30-cultivation-entry-followup.md)；主任务 IA 另决 | 2026-10-30 |

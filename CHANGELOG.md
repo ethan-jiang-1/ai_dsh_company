@@ -34,9 +34,9 @@
 
 ### Known
 
-- v1→v2 迁移有 keyless spec 与 lifecycle smoke 的升级/降级段；没有在**真实旧 home** 上另做一次人工演练。
 - Web 内 onboarding 选 workspace 未做（v1 用终端启动器询问/`--workspace`）。
 - Windows / 容器 / npm registry 发布未验证/未启用；不冒充支持。
+- 不可信项目不承诺消除 prompt injection；只做边界/形状测试。
 
 ## 0.4.6 — 2026-10-29
 

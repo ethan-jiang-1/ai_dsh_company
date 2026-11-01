@@ -1,13 +1,16 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-01
 ---
 
 # 推敲：workspace 生命周期与数据安全——选、切、搬、备、删、信任边界
 
-> 立卡：2026-11-01 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-01 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：（未结；关闭时写结论 + 下游 RFC/Note 或用户去向）
+> **结论/去向**：已结（2026-11-01）。workspace 选/切/搬/备/删、lease、登记、v2 身份、seed consent、
+> 方法/账本留 host + 导出均有实现与证据；不可信项目边界（恶意 AGENTS、symlink、伪造 consent、危险落点）
+> 有 `untrusted-project.spec`。v1 边界：不承诺消除 prompt injection/恶意脚本；`danger-full-access` 下降级约定。
+> 去向 = [v2 manifest Note](../../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md) + [data-model](../../../docs/data-model.md)。
 
 ## 问题与期望结果
 
@@ -64,7 +67,7 @@ RFC/实施。**本卡不是实施授权。**
 - 信任边界表、模型可写面、host 治理面、`bundle.json`/导出/手册/方法/账本/秘密的数据卡；
 - 搬 workspace、stale 登记、旧 session cwd、符号链接/不可信项目的失败提示；
 - 安全测试（manifest 篡改、consent 伪造、symlink、秘密扫描、日志脱敏）；
-- 手册/README 的“workspace/数据/安全”章节（与 [发布与文档卡](../_archive/settled_issues/2026-11-01-release-and-docs.md) 共写）。
+- 手册/README 的“workspace/数据/安全”章节（与 [发布与文档卡](./2026-11-01-release-and-docs.md) 共写）。
 
 **排除**
 - 多租户/跨机器同步/HA；
@@ -110,14 +113,15 @@ RFC/实施。**本卡不是实施授权。**
 - ✅ `bundle.json` v2 + home 身份备份（创建/升级/迁移）；损坏 fail loud、保留原文件。
 - ✅ 方法/账本留 home + `.dsh-company/exports/` 只读导出；治理导出幂等。
 - ✅ 搬 home/workspace、stale 登记、rebind 退役、seed consent、symlink 基部 keep 有测试。
-- ⏳ 不可信项目完整威胁注入（恶意 AGENTS/skills/symlink/脚本）未穷尽；v1 只做边界测试与文档声明。
+- ✅ 不可信项目边界：`untrusted-project.spec`（恶意 AGENTS 不覆盖、symlink 不写穿、伪造 consent/危险落点拒绝）。
+- v1 边界：不承诺消除 prompt injection/恶意脚本；`danger-full-access` 下降级约定。
 
 ## 关闭条件
 
 - 伞卡 Q1/Q3 已拍板；本卡「未决问题」已答；`## 验收标准` 定稿。
 - 下游 RFC/实施申请已提交并记录去向（`rfc` / `implementation` / `用户（日期）`）。
 - 满足后写 `可关闭：是`、卡顶补 `> **结论/去向**`，`git mv` 到
-  [_archive/settled_issues](../_archive/settled_issues/README.md)，更新两边清单。
+  [_archive/settled_issues](./README.md)，更新两边清单。
 
 ## 关联
 
@@ -126,4 +130,4 @@ RFC/实施。**本卡不是实施授权。**
   [生命周期](../research/plugin-as-product/2026-11-01-product-lifecycle.md)、
   [主稿 §5/§10.5–10.6](../research/plugin-as-product/2026-11-01-plugin-as-product.md)
 - 相邻卡：[产品生命周期](2026-11-01-product-lifecycle.md)、
-  [发布与文档](../_archive/settled_issues/2026-11-01-release-and-docs.md)
+  [发布与文档](./2026-11-01-release-and-docs.md)

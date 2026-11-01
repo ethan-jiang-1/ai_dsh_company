@@ -1,13 +1,16 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-01
 ---
 
 # 推敲：产品生命周期——安装、首启、升级、回滚、迁移、卸载、修复
 
-> 立卡：2026-11-01 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-01 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：（未结；关闭时写结论 + 下游 RFC/Note 或用户去向）
+> **结论/去向**：已结（2026-11-01）。install/first-run/upgrade/downgrade/rollback/backup/restore/move/uninstall/
+> repair 均有实现与证据；运行中升级/坏安装/坏 profile 由 `upgrade-while-running-smoke`/`interrupted-install-smoke`
+> 覆盖；`doctor` 只读检查。v1 边界：Web onboarding 另案。去向 = [v2 manifest Note](../../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)
+> + `lifecycle-smoke`/`isolation-matrix-smoke`。
 
 ## 问题与期望结果
 
@@ -60,7 +63,7 @@ RFC/实施。**本卡不是实施授权。**
 - 生命周期合同（状态机/失败面/证据）与 `doctor` 检查项；
 - 升级/降级/回滚/移动/备份/恢复/卸载/修复的脚本与 smoke 扩展；
 - 与 `bundle.json` v2、seed consent、`COMPANY.md` 碰撞、治理导出的交叉断言；
-- 手册/README 的生命周期章节（与 [发布与文档卡](../_archive/settled_issues/2026-11-01-release-and-docs.md) 共写）。
+- 手册/README 的生命周期章节（与 [发布与文档卡](./2026-11-01-release-and-docs.md) 共写）。
 
 **排除**
 - 自动更新/自动下载（v1 不做；用户手动 `plugin add`）；
@@ -106,14 +109,16 @@ RFC/实施。**本卡不是实施授权。**
 - ✅ 搬 workspace：`isolation-matrix-smoke` 新 case（v2 id 不变）。
 - ✅ 真实旧 home v1 迁移演练 T（id/createdAt 保留、旧文件 `.migrated-*`）。
 - ✅ `doctor` 只读检查（home/profile/pack/workspace/consent/manifest/身份备份/settings/lease）。
-- ⏳ 运行中中断升级/安装的故障注入未穷尽；Web onboarding 仍后置。
+- ✅ 运行中升级：`upgrade-while-running-smoke`（旧实例不崩、重启 0.5.1、旧 session/数据在）。
+- ✅ 坏安装/坏 profile：`interrupted-install-smoke`（坏 tarball/缺文件/坏 package 后数据不丢、re-add 恢复）。
+- v1 边界：Web onboarding 另案（终端启动器已覆盖）。
 
 ## 关闭条件
 
 - 伞卡 Q1–Q7 已拍板；本卡「未决问题」已答；`## 验收标准` 定稿。
 - 下游 RFC/实施申请已提交并记录去向（`rfc` / `implementation` / `用户（日期）`）。
 - 满足后写 `可关闭：是`、卡顶补 `> **结论/去向**`，`git mv` 到
-  [_archive/settled_issues](../_archive/settled_issues/README.md)，更新两边清单。
+  [_archive/settled_issues](./README.md)，更新两边清单。
 
 ## 关联
 
@@ -122,4 +127,4 @@ RFC/实施。**本卡不是实施授权。**
   [信任/数据](../research/plugin-as-product/2026-11-01-trust-and-data.md)、
   [发布/验证](../research/plugin-as-product/2026-11-01-release-and-verification.md)
 - 相邻卡：[workspace 与数据安全](2026-11-01-workspace-and-data-safety.md)、
-  [发布与文档](../_archive/settled_issues/2026-11-01-release-and-docs.md)
+  [发布与文档](./2026-11-01-release-and-docs.md)

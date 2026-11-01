@@ -4,26 +4,12 @@
 
 ## 活跃清单
 
-当前活跃 4 张。
+当前活跃 0 张；2026-11-01 产品化四卡已全部结清并归档。
 
-- [2026-11-01 插件即产品：独立 company profile 与 workspace 自有的 run bundle](2026-11-01-plugin-as-product.md)
-  — 产品形状决策卡（Q1–Q7）；研究依据 = [plugin-as-product](../research/plugin-as-product/README.md)。
-- [2026-11-01 落地顺序：把 research 与 issues 串成一条可执行路线](2026-11-01-landing-plan.md)
-  — P0–P6 顺序、依赖、出场门与回退点。
-- [2026-11-01 产品生命周期：安装/首启/升级/回滚/迁移/卸载/修复](2026-11-01-product-lifecycle.md)
-  — 生命周期状态机与失败注入。
-- [2026-11-01 workspace 与数据安全：选/切/搬/备/删与信任边界](2026-11-01-workspace-and-data-safety.md)
-  — workspace 生命周期、模型可写面、方法/账本/身份保护。
-
-2026-10-30 培养主任务工作/目标优先单入口卡已结归档（第一切片：work 字段 + 单表单 + 预览；去向 = implemented Note），见 [归档](../_archive/settled_issues/2026-10-30-cultivation-case-entry.md)。
-
-2026-10-30 培养入口与证据可读性收口卡已结归档（目标角色/文案/自纠正状态/验证历史/对话失败与流式；去向 = implemented Note），见 [归档](../_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)。
-
-2026-10-29 培养 UX 卡已结归档（生产主线与追溯切片落地；去向 = implemented Note；真人走查留 Note 后续观察），见 [归档](../_archive/settled_issues/2026-10-29-cultivation-experience.md)。
-
-2026-10-28 二轮削洋葱卡已结归档（8 项残余 5 修 / 3 边界；0.4.1；去向 = implemented Note），见 [归档](../_archive/settled_issues/2026-10-28-data-design-round2.md)。2026-10-28 数据设计硬化卡已结归档（M1–M4 落地，0.4.0；去向 = implemented Note），见 [归档](../_archive/settled_issues/2026-10-28-data-design-hardening.md)。2026-10-28 第四轮六维打扫已结归档（A–E 全批；六维复评 D1–D6 = A-；去向 = 12 篇 implemented Note，见[归档卡](../_archive/settled_issues/2026-10-28-repo-hygiene-round4.md)）。2026-10-28 六维提分已结归档（D1/D4/D5 → A-；三批 + 认证档，去向 = 三篇 Note，见[归档卡](../_archive/settled_issues/2026-10-27-six-dim-raise.md)）。2026-10-27 的第三轮六维度打扫已结归档（A/B/C/D 全批；去向 = 六篇 implemented Note，见[归档卡](../_archive/settled_issues/2026-10-27-repo-hygiene-round3.md)）。
-
-2026-10-27 数据模型复盘卡已结并归档（F1–F10 落 [review-followup Note](../../notes/implemented/2026-10-27-data-model-review-followup.md)）。2026-10-27 的数据模型两卡（12 Gap + R1–R6 收尾）已结并归档，去向 = 三份 implemented Note；见 [归档](../_archive/README.md)。2026-10-25 的 6 张收尾卡已结并归档（分发契约 / 生命周期 / 内容自足 / 成品目录 / 独立启动 / 身份守卫），去向 = 三份 archived Note；见 [归档](../_archive/README.md)。
+- [插件即产品卡](../_archive/settled_issues/2026-11-01-plugin-as-product.md) — 0.5.0 产品形状；去向 = v2 manifest Note。
+- [落地顺序卡](../_archive/settled_issues/2026-11-01-landing-plan.md) — P0–P6 执行回执；v1 边界写清。
+- [产品生命周期卡](../_archive/settled_issues/2026-11-01-product-lifecycle.md) — 升级/降级/中断/恢复/搬移/doctor。
+- [workspace 与数据安全卡](../_archive/settled_issues/2026-11-01-workspace-and-data-safety.md) — v2 身份/登记/导出/不可信边界。
 
 ## 近期归档
 

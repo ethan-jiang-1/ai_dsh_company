@@ -5,7 +5,7 @@ intent: "为「插件即产品：独立 company profile、启动即进入用户 
 
 # 插件即产品：profile、workspace 与 run bundle 的边界
 
-> 服务卡：[插件即产品：独立 company profile 与 workspace 自有的 run bundle](../../issues/2026-11-01-plugin-as-product.md)。
+> 服务卡：[插件即产品：独立 company profile 与 workspace 自有的 run bundle](../../settled_issues/2026-11-01-plugin-as-product.md)。
 > 读法：先读卡「原始意图」，再读本稿；§1–§5 是事实与机制，§6–§8 是方案比较、迁移与验证，不是决定。
 > 性质：研究证据，不是决定；拍板项住卡。
 > 证据分级：**T** = 本轮实跑；**C** = 当前源码/合同阅读；**P** = 提议，未实现；**U** = 未验证。
@@ -802,12 +802,12 @@ TTY 询问；无 TTY 且无值 → 非零退出 + 两条命令。**Host 只认 `
 
 **本仓当前合同**
 
-- [运行态地图](../../../docs/runtime-map.md)、[数据模型](../../../docs/data-model.md)、
-  [profile 合同](../../../docs/profile.md)、[发布合同](../../../docs/release.md)
-- [公司包 README](../../../packages/company-pack/README.md)、
-  [公司盘 README](../../../packages/company-pack/workspace/README.md)
-- [run/README](../../../run/README.md)、[runtime/README](../../../runtime/README.md)
-- [安装手册（生成物）](../../../_dist/安装手册.md)
+- [运行态地图](../../../../docs/runtime-map.md)、[数据模型](../../../../docs/data-model.md)、
+  [profile 合同](../../../../docs/profile.md)、[发布合同](../../../../docs/release.md)
+- [公司包 README](../../../../packages/company-pack/README.md)、
+  [公司盘 README](../../../../packages/company-pack/workspace/README.md)
+- [run/README](../../../../run/README.md)、[runtime/README](../../../../runtime/README.md)
+- [安装手册（生成物）](../../../../_dist/安装手册.md)
 
 **源码直达（vendor 内，只读）**
 
@@ -821,7 +821,7 @@ TTY 询问；无 TTY 且无值 → 非零退出 + 两条命令。**Host 只认 `
 
 **历史决定**
 
-- [run-bundle-install-unit](../../../notes/implemented/2026-10-24-run-bundle-install-unit.md)、
-  [data-model-alignment](../../../notes/implemented/2026-10-27-data-model-alignment.md)、
-  [data-design-hardening](../../../notes/implemented/2026-10-28-data-design-hardening.md)、
-  [standalone-deployment](../../../notes/archived/2026-10-25-standalone-deployment.md)
+- [run-bundle-install-unit](../../../../notes/implemented/2026-10-24-run-bundle-install-unit.md)、
+  [data-model-alignment](../../../../notes/implemented/2026-10-27-data-model-alignment.md)、
+  [data-design-hardening](../../../../notes/implemented/2026-10-28-data-design-hardening.md)、
+  [standalone-deployment](../../../../notes/archived/2026-10-25-standalone-deployment.md)

@@ -1,13 +1,15 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-01
 ---
 
 # 推敲：落地顺序——把 research 与 issues 串成一条可执行的产品化路线
 
-> 立卡：2026-11-01 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-01 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：（未结；关闭时写结论 + 下游 RFC/Note 或用户去向）
+> **结论/去向**：已结（2026-11-01）。P0–P6 按序执行；P3/P4/P5 的 v1 边界（Web onboarding、Windows/registry、
+> 完整威胁注入、旧 design 文档逐篇改写）明确不阻塞关闭。证据 = [v2 manifest Note](../../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)
+> + `release --verify` 全绿 + 本卡「实施回执」。
 >
 > **2026-11-01 用户授权**：按伞卡 Q1–Q7 推荐推进；setup goal；静默自主执行；不询问；补测试计划。
 > 执行顺序 = 本卡 P0–P6；测试计划 = 本卡「## 测试计划（落地尾巴）」。本卡不是实施授权之外的
@@ -39,7 +41,7 @@ RFC/实施申请。**本卡不是实施授权，也不是任务队列。**
 | 形状/机制/数据归属 | [主稿](../research/plugin-as-product/2026-11-01-plugin-as-product.md) | [伞卡](2026-11-01-plugin-as-product.md) Q1–Q7 | 一安装一 workspace？生产状态含方法/账本？专用盘还是已有项目？ |
 | 生命周期/失败模式 | [生命周期](../research/plugin-as-product/2026-11-01-product-lifecycle.md) | [产品生命周期](2026-11-01-product-lifecycle.md) | doctor/repair 范围、备份点、降级深度 |
 | 信任/数据安全 | [信任/数据](../research/plugin-as-product/2026-11-01-trust-and-data.md) | [workspace 与数据安全](2026-11-01-workspace-and-data-safety.md) | `bundle.json` 可写边界、methods/ledger 是否全搬、不可信项目声明 |
-| 发布/文档/验证 | [发布/验证](../research/plugin-as-product/2026-11-01-release-and-verification.md) | [发布与文档](../_archive/settled_issues/2026-11-01-release-and-docs.md) | doc-budget 处置、registry/Windows 声明、CI 范围 |
+| 发布/文档/验证 | [发布/验证](../research/plugin-as-product/2026-11-01-release-and-verification.md) | [发布与文档](./2026-11-01-release-and-docs.md) | doc-budget 处置、registry/Windows 声明、CI 范围 |
 
 ## 未知怎么关（先分事实/决策，别混）
 
@@ -310,31 +312,30 @@ P0 决策
 | P0 决策 | ✅ | 用户 2026-11-01 授权按推荐；伞卡 Q1–Q7 已落 |
 | P1 产品入口 | ✅ | 启动器 `bin/dsh-company.mjs` + `pnpm company`；`company-entry-smoke` / `release-smoke` / 浏览器自动 CEO 会话（T） |
 | P2 v2/手册/一 workspace | ✅ | `bundle-manifest.spec` v2/迁移/升级/符号链接；`seed-handbook.spec`；`release-smoke` 无 home bundle、v2、二启稳定；启动器拒同 home 第二盘 |
-| P3 生命周期 | ✅/部分 | `lifecycle-smoke`（升级/降级/卸载/business 恢复/搬 home）、`external`/`isolation`/`multi`、`doctor`、**真实旧 home v1 迁移演练 T**、**workspace 搬迁 T**；未做运行中中断升级、Web onboarding |
-| P4 信任/数据 | ✅/部分 | 方法/账本留 home + `governance-export` 只读导出；`bundle.json` 身份备份（创建/升级/迁移）；`register-workspace` 不建目录/不授权；symlink/consent/篡改测试覆盖形状，未做全部威胁注入 |
-| P5 发布/文档 | ✅（核心卡已归档） | 根 README、pack/workspace README、profile/runtime-map/data-model/release/project-map/decisions/external-research/demo/bootstrap/environments/orient、CHANGELOG、`_dist` 手册；[发布与文档卡已结归档](../_archive/settled_issues/2026-11-01-release-and-docs.md)；旧 design 文档只做关键指针清扫 |
+| P3 生命周期 | ✅ | `lifecycle-smoke`、`upgrade-while-running-smoke`、`interrupted-install-smoke`、`external`/`isolation`/`multi`、`doctor`、真实旧 home v1 迁移、workspace 搬迁；Web onboarding 明确 v1 外 |
+| P4 信任/数据 | ✅ | 方法/账本留 home + `governance-export`；`bundle.json` 身份备份；`register-workspace` 不建目录/不授权；`untrusted-project.spec` 覆盖恶意 AGENTS/symlink/伪造 consent/危险落点；完整 prompt injection 明确 v1 边界 |
+| P5 发布/文档 | ✅（核心卡已归档） | 根 README、pack/workspace README、profile/runtime-map/data-model/release/project-map/decisions/external-research/demo/bootstrap/environments/orient、CHANGELOG、`_dist` 手册；[发布与文档卡已结归档](./2026-11-01-release-and-docs.md)；旧 design 文档只做关键指针清扫（v1 边界） |
 | P6 验证/发布 | ✅ | `pnpm verify` / `pnpm test` / `release --verify` 全绿；`_dist` 0.5.0 已重导；`release` manifest 已更新 |
 
-**已知剩余（不冒充“全落地”）**
-- 运行中中断升级/安装的故障注入未穷尽（升级/降级/卸载/恢复/搬移已覆盖）。
-- Web 内 onboarding 选 workspace 未做（v1 终端启动器询问/`--workspace`）。
-- Windows / 容器 / npm registry 未验证/未启用。
-- 不可信项目的完整威胁注入（恶意 AGENTS/skills/symlink/脚本）未穷尽；只做了形状/边界测试。
-- 旧 design 文档（role-content-plan/ui-demo 等）仍有历史语境，未逐篇改成产品叙事。
+**v1 明确边界（不阻塞关闭）**
+- Web 内 onboarding 选 workspace 不做（v1 终端启动器询问/`--workspace`）。
+- Windows / 容器 / npm registry 不验证/不启用。
+- 不可信项目不承诺消除 prompt injection/恶意脚本；边界/形状测试已加。
+- 旧 design 文档（role-content-plan/ui-demo 等）保留历史语境，未逐篇改成产品叙事。
 
 ## 关闭条件
 
 - 用户确认 P0–P6 顺序与决策门槛；各卡前置/验收一致。
 - 下游 RFC/实施申请已提交并记录去向（`rfc` / `implementation` / `用户（日期）`）。
 - 满足后写 `可关闭：是`、卡顶补 `> **结论/去向**`，`git mv` 到
-  [_archive/settled_issues](../_archive/settled_issues/README.md)，更新两边清单。
+  [_archive/settled_issues](./README.md)，更新两边清单。
 
 ## 关联
 
 - 伞卡：[插件即产品](2026-11-01-plugin-as-product.md)
 - 落地卡：[产品生命周期](2026-11-01-product-lifecycle.md)、
   [workspace 与数据安全](2026-11-01-workspace-and-data-safety.md)、
-  [发布与文档](../_archive/settled_issues/2026-11-01-release-and-docs.md)
+  [发布与文档](./2026-11-01-release-and-docs.md)
 - 研究：[主稿](../research/plugin-as-product/2026-11-01-plugin-as-product.md)、
   [生命周期](../research/plugin-as-product/2026-11-01-product-lifecycle.md)、
   [信任/数据](../research/plugin-as-product/2026-11-01-trust-and-data.md)、

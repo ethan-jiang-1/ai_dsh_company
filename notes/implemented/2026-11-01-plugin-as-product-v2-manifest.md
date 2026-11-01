@@ -3,10 +3,10 @@
 状态：已交付（2026-11-01；用户当轮授权——「我们这个项目其实是要 Develop plug in as a product …… 先给出 plan …
 利用 backlog 结构把事情打磨好」，先出研究与卡、再落第一批切片）
 
-> 上游 = [_backlog/issues/2026-11-01-plugin-as-product.md](../../_backlog/issues/2026-11-01-plugin-as-product.md)
-> （推敲中；本 Note 只记录**已落地的那部分**，未决的 Q1–Q5 仍在卡上）、
-> [落地顺序卡](../../_backlog/issues/2026-11-01-landing-plan.md)（P0–P6）、
-> 研究题 [plugin-as-product](../../_backlog/research/plugin-as-product/README.md)（4 份材料）。
+> 上游 = [_backlog/issues/2026-11-01-plugin-as-product.md](../../_backlog/_archive/settled_issues/2026-11-01-plugin-as-product.md)
+> （已结；Q1–Q7 已按用户授权落地）、
+> [落地顺序卡](../../_backlog/_archive/settled_issues/2026-11-01-landing-plan.md)（P0–P6）、
+> 研究题 [plugin-as-product](../../_backlog/_archive/research/plugin-as-product/README.md)（4 份材料）。
 > 取代 = [run-bundle-install-unit](./2026-10-24-run-bundle-install-unit.md) 的 §决定 1/2/5（身份落点与
 > manifest 形状）与 [multi-profile-contract](./2026-10-26-multi-profile-contract.md) 的「产品入口 = 通用 `web`」
 > 一条；manifests v1 的 home 形状仍作为迁移来源保留。
@@ -67,12 +67,17 @@
 | 检查 | 结果 |
 |---|---|
 | `pnpm verify` | 结构面全绿（含 dist-manual/dist-freshness/script-index） |
-| `pnpm test` | 122 files / 1046 tests 全绿（含 bootstrap/bundle-manifest/seed-handbook/register-workspace/governance-export/apply-rebind） |
+| `pnpm test` | 123 files / 1051 tests 全绿（含 bootstrap/bundle-manifest/seed-handbook/register-workspace/governance-export/apply-rebind） |
 | `release-smoke` | ALL PASS（真 tarball + company profile + 外部 workspace + 登记 + v2 + 二启稳定） |
 | `lifecycle-smoke` | ALL PASS（v1 真装 → 改基部 → v2 → 启动 → 降级 → 卸载 → business 恢复 → 搬 home） |
 | `external-workspace-smoke` / `isolation-matrix-smoke` / `multi-install-smoke` / `company-entry-smoke` | ALL PASS |
 | `client-load-smoke` | ALL PASS（真浏览器零挂载失败/品牌） |
 | `release --verify` | ALL PASS（构建 → tarball → 真装 → roster/RPC → preset/present/standalone） |
+| `interrupted-install-smoke` | ALL PASS（坏 tarball/缺文件/坏 profile 后数据不丢、re-add 恢复） |
+| `upgrade-while-running-smoke` | ALL PASS（旧实例运行中 remove/add 0.5.1，旧 session/数据在，重启前移） |
+| `handbook-smoke --cwd <temp with COMPANY.md>` | ALL PASS（`COMPANY.md` 注入，不混开发仓库 AGENTS） |
+| 真实旧 home v1 迁移演练 | PASS（v2 id/createdAt 保留；旧文件 `.migrated-*`） |
+| `tests/company/untrusted-project.spec.ts` | 5/5 PASS（恶意 AGENTS 不覆盖、symlink 不写穿、伪造 consent/危险落点拒绝） |
 
 **红证（本 Note 覆盖的机械面）**
 - `script-index`：`tools/company.mjs` 未进 `checks/README.md` ⇒
@@ -83,13 +88,20 @@
 - `release-ready`：pack 版本 0.5.0 而 CHANGELOG 顶部仍 0.4.6 ⇒ `FAIL release-ready: CHANGELOG.md:5 顶部条目是 0.4.6`；
   补 0.5.0 条目后 `PASS release-ready（0.5.0；条目 2026-11-01）`。
 
-## 未做 / 未验（诚实清单）
+## 新门禁红→还原→绿（原话）
+
+- `dist-manual`：把手册唯一合同句 `一次安装 = 一个 DSH home` 改成 `多个` → `FAIL dist-manual: 手册缺「一次安装 = 一个 home + 一个用户 workspace」合同`；还原 → `verify: ALL PASS`。
+- `doc-budget`：`docs/data-model.md` 临时加 2 行 → `FAIL doc-budget: docs/data-model.md 78 行超上限 76`；还原 → `verify: ALL PASS`。
+- `script-index`：从 `checks/README.md` 删掉 `company-entry-smoke` 行 → `FAIL script-index: 未入索引的公开入口：checks/smoke/company-entry-smoke.mjs`；还原 → `verify: ALL PASS`。
+- `tracked-portability`（push 前实际红）：研究稿 `$T/home` 命中 `/home/<name>/` 绝对路径规则 → `FAIL tracked-portability`；改 `$T/h` → 全绿。
+- `dist-freshness`（重导前实际红）：手册/tarball sha 与 manifest 不同代 → `FAIL dist-freshness`；`release --prepare --force` → 全绿。
+
+## v1 明确边界（已与卡上结论对齐）
 
 - **`_dist` 已重导**（0.5.0；sha/手册/manifest 同步）；`dist-manual`/`dist-freshness` 绿。
 - **README / docs 合同已换形状**（根 README、pack/workspace README、profile/runtime-map/data-model/release/
   project-map/decisions/external-research/demo/bootstrap/environments 等）；`doc-budget` 在预算内。
-- **v1 → v2 迁移有 keyless spec（migrateLegacyManifest）与 lifecycle smoke 的升级/降级段**；没有在真实
-  旧 home 上另外做一次人工演练（spec 覆盖形状/匹配/不匹配/备份）。
-- **Web onboarding 询问 workspace** 未做（当前只终端启动器询问；卡上 Q6 的 Web 面仍后置）。
-- 卡上 Q1–Q5 已按用户 2026-11-01 授权按推荐落地（专用盘主/一装一 workspace/方法账本留 host/手册碰撞/
-  0.5.0 迁移）；若用户改口，需再来一刀。
+- **v1 → v2 迁移**：keyless spec + **真实旧 home 演练 T**（id/createdAt 保留、旧文件 `.migrated-*`）。
+- **Web onboarding** 不做（终端启动器询问/`--workspace` 为 v1 主路径）。
+- **Windows / 容器 / registry** 不验证/不启用；**不可信项目**不承诺消除 prompt injection，只做边界测试。
+- 四张产品化卡 + 发布/文档卡已结归档；研究题随迁 `_backlog/_archive/research/plugin-as-product/`。

@@ -5,8 +5,8 @@ intent: "补齐插件即产品的生命周期状态机、失败模式与验收�
 
 # 插件即产品的生命周期与失败模式
 
-> 服务卡：[插件即产品（伞卡）](../../issues/2026-11-01-plugin-as-product.md)、
-> [产品生命周期落地卡](../../issues/2026-11-01-product-lifecycle.md)。
+> 服务卡：[插件即产品（伞卡）](../../settled_issues/2026-11-01-plugin-as-product.md)、
+> [产品生命周期落地卡](../../settled_issues/2026-11-01-product-lifecycle.md)。
 > 性质：研究证据与失败模式清单，不是决定；拍板项住卡。基线 = `vendor/dsh` `dsh-v0.2.1-rc.2`；
 > 证据标签 **T** 实跑、**C** 源码/合同读、**P** 设计、**U** 未验证。
 > 与主研究稿的分工：主稿（`2026-11-01-plugin-as-product.md`）回答“形状与数据归属”；
@@ -200,6 +200,6 @@ intent: "补齐插件即产品的生命周期状态机、失败模式与验收�
 
 ## 13. 服务卡与下一步
 
-- 伞卡：[插件即产品](../../issues/2026-11-01-plugin-as-product.md) 的 S1/S2/S5。
-- 落地卡：[产品生命周期](../../issues/2026-11-01-product-lifecycle.md)。
+- 伞卡：[插件即产品](../../settled_issues/2026-11-01-plugin-as-product.md) 的 S1/S2/S5。
+- 落地卡：[产品生命周期](../../settled_issues/2026-11-01-product-lifecycle.md)。
 - 需要用户拍板：doctor/repair 的 v1 范围；升级前自动备份点；运行中升级是否明确不支持。

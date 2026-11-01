@@ -5,8 +5,8 @@ intent: "把插件即产品的信任边界、模型可写面、方法/账本/身
 
 # 插件即产品的信任边界与数据安全
 
-> 服务卡：[插件即产品（伞卡）](../../issues/2026-11-01-plugin-as-product.md)、
-> [workspace 与数据安全落地卡](../../issues/2026-11-01-workspace-and-data-safety.md)。
+> 服务卡：[插件即产品（伞卡）](../../settled_issues/2026-11-01-plugin-as-product.md)、
+> [workspace 与数据安全落地卡](../../settled_issues/2026-11-01-workspace-and-data-safety.md)。
 > 性质：研究证据与威胁模型，不是决定；拍板项住卡。基线 = `vendor/dsh` `dsh-v0.2.1-rc.2`。
 > 证据标签 **T** 实跑、**C** 源码/合同读、**P** 设计、**U** 未验证。
 > 与主稿分工：主稿回答“数据放哪”；本稿回答“放进去之后谁还能改、坏了怎么办、哪些承诺不能做”。
@@ -147,6 +147,6 @@ home，产品只能 fail loud/备份，不能阻止。
 
 ## 10. 服务卡与下一步
 
-- 伞卡：[插件即产品](../../issues/2026-11-01-plugin-as-product.md) Q1/Q3。
-- 落地卡：[workspace 与数据安全](../../issues/2026-11-01-workspace-and-data-safety.md)。
+- 伞卡：[插件即产品](../../settled_issues/2026-11-01-plugin-as-product.md) Q1/Q3。
+- 落地卡：[workspace 与数据安全](../../settled_issues/2026-11-01-workspace-and-data-safety.md)。
 - 需要用户拍板：`bundle.json` 可写边界；methods/ledger 是否全搬；不可信项目的支持声明。

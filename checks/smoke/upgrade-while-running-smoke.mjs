@@ -43,6 +43,8 @@ const rpc = async i => { const cookie = await companyCookie({ fetch: globalThis.
 
 try {
   rmSync(BASE, { recursive: true, force: true }); mkdirSync(join(BASE, 'bin'), { recursive: true }); mkdirSync(join(BASE, 'user'), { recursive: true })
+  mkdirSync(join(WS, '.dsh-company'), { recursive: true })
+  writeFileSync(join(WS, '.dsh-company/.seed-consent'), `${JSON.stringify({ v: 1, packVersion: PACK.version, workspace: WS, consentedAt: new Date().toISOString() }, null, 2)}\n`)
   writeFileSync(join(BASE, 'bin/dsh'), `#!/bin/sh\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(CLI)} "$@"\n`, { mode: 0o755 })
   if (!existsSync(V1)) throw new Error(`缺 ${V1}；先导出 _dist`)
   check('当前版安装成功', dsh(['plugin', '--profile', 'web', 'add', `file:${V1}`]).status === 0)
@@ -50,8 +52,8 @@ try {
   const created = await oldRpc('session/create', { request: { cwd: WS, agentPreset: 'ceo' } })
   const sessionId = created?.sessionId ?? created?.id
   check('旧实例可建 session', created?.agentPreset === 'ceo')
-  writeFileSync(join(WS, 'kb/company.md'), '公司名: Acme\n')
   mkdirSync(join(WS, 'kb/ceo/journal'), { recursive: true })
+  writeFileSync(join(WS, 'kb/company.md'), '公司名: Acme\n')
   writeFileSync(join(WS, 'kb/ceo/journal/acme.md'), '# Acme\n')
 
   console.log(`① 构造 ${V2_VERSION} tarball`)
@@ -81,7 +83,7 @@ try {
 
   console.log(`③ 重启到 ${V2_VERSION}：会话/数据还在`)
   const next = await boot(); const nextRpc = await rpc(next)
-  const bundle = JSON.parse(readFileSync(join(HOME, 'bundle.json'), 'utf8'))
+  const bundle = JSON.parse(readFileSync(join(WS, '.dsh-company/bundle.json'), 'utf8'))
   check(`bundle 前移到 ${V2_VERSION}`, bundle?.pack?.version === V2_VERSION, String(bundle?.pack?.version))
   check('重启后 roster 含 ceo', (await nextRpc('agentPresets/list', {})).presets?.some(p => p.id === 'ceo') === true)
   check('旧 session 仍在 session/list', (await nextRpc('session/list', { _request: {} })).items?.some(item => item.sessionId === sessionId) === true, String(sessionId))

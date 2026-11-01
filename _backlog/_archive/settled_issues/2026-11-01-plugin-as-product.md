@@ -1,13 +1,17 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-01
 ---
 
 # 推敲：插件即产品——独立 company profile 与 workspace 自有的 run bundle
 
-> 立卡：2026-11-01 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-01 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：（未结；关闭时写结论 + 下游 RFC/Note 或用户去向）
+> **结论/去向**：已结（2026-11-01）。0.5.0 产品形状落地：`company` profile/启动器、workspace v2 身份/迁移、
+> boot 登记、seed consent、手册碰撞、方法/账本留 host + 导出；验收 = `company-entry`/`release`/`lifecycle`/
+> `client-load`/`external`/`isolation`/`multi`/`standalone` + `handbook-smoke` + 真实旧 home 迁移 + `pnpm verify`/
+> `pnpm test`/`release --verify`。v1 明确边界：Web onboarding、Windows/容器、registry 不做；不可信项目
+> 只做边界/形状测试，不承诺消除 prompt injection。去向 = [v2 manifest Note](../../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)。
 
 ## 原始意图（用户原话，按时间顺序）
 
@@ -123,7 +127,7 @@ profile，启动时指向我的项目；我的项目拥有公司身份与产物�
 - **身份错位**：首启把 `<home>/bundle.json`（v1，含 `workspace` 绝对路径）写成 home 身份；
   公司盘默认在 home；方法层 `<home>/company/methods`；presented 账本
   `<home>/storages/company_deliverables.json`；升级/错误日志 `<home>/logs`。
-  （合同现状 = [数据模型](../../docs/data-model.md)、[运行态地图](../../docs/runtime-map.md) §二·五）
+  （合同现状 = [数据模型](../../../docs/data-model.md)、[运行态地图](../../../docs/runtime-map.md) §二·五）
 - **入口错位**：`docs/profile.md` 的现行产品形状是 `web`；`tools/standalone.mjs` 也是
   `web` profile + copy 骨架；`README.md` 的安装句是 `plugin --profile <名> add link:…`，
   首启“写 bundle.json 与 company-workspace”。
@@ -137,7 +141,7 @@ profile，启动时指向我的项目；我的项目拥有公司身份与产物�
   仍未覆盖。（源码 = `vendor/dsh/packages/client/ui-workspace/src/client/navigation.ts`）
 - **历史决定需要被取代**：D45（run bundle = `bundle.json` + home + workspace）与 D48
   （目录独立启动 = 隔离 home + `web` profile + copy 骨架）是旧形状；新形状要在
-  [决策台账](../../docs/decisions.md) 记新 D 号，并给旧 Note 加取代 banner（历史不回填）。
+  [决策台账](../../../docs/decisions.md) 记新 D 号，并给旧 Note 加取代 banner（历史不回填）。
 - **研究依据**：[研究稿](../research/plugin-as-product/2026-11-01-plugin-as-product.md) 已把
   FAQ 26、vendor 源码、当前合同、实测与影响面收在一处；本卡只留判断与验收，不复述机制细节。
 
@@ -398,7 +402,7 @@ profile，启动时指向我的项目；我的项目拥有公司身份与产物�
 - Windows 支持（继续 POSIX；不承诺跨 OS）；容器镜像/离线预构建。
 - 浏览器内自建 onboarding UI（本轮用启动器询问；client 选择器作为后续增量）。
 - 重写/删除旧 `DSH_HOME`、旧 sessions、旧 workspace 数据；只迁移、不清理。
-- 改 vendor；升级 pin；npm registry 发布（仍按 [release.md](../../docs/release.md) 的第二个消费者再定）。
+- 改 vendor；升级 pin；npm registry 发布（仍按 [release.md](../../../docs/release.md) 的第二个消费者再定）。
 - 替角色写公司内容、改五角色 persona 语义（除 `COMPANY.md` 路径/候选与必要文案）。
 
 ## 已知与未决
@@ -434,8 +438,8 @@ profile，启动时指向我的项目；我的项目拥有公司身份与产物�
   / `用户（日期）` 之一）。**下游受理不是关闭条件**。
 - 若结论 = 不做/以后做：写清理由、触发条件与适用范围；需要下游保留的提交申请。
 - 满足后写 `可关闭：是`，卡顶补 `> **结论/去向**`，同次 `git mv` 到
-  [_archive/settled_issues](../_archive/settled_issues/README.md)，更新两边清单；研究题在最后
-  一张使用它的活卡离开时随迁 [_archive/research](../_archive/research/README.md)。
+  [_archive/settled_issues](./README.md)，更新两边清单；研究题在最后
+  一张使用它的活卡离开时随迁 [_archive/research](../research/README.md)。
 
 ## 给第二个 review agent 的导读
 
@@ -469,7 +473,7 @@ profile，启动时指向我的项目；我的项目拥有公司身份与产物�
 - 落地顺序：[2026-11-01 落地顺序](2026-11-01-landing-plan.md)（P0–P6；本卡 Q1–Q7 是 P0）
 - 落地卡：[产品生命周期](2026-11-01-product-lifecycle.md)、
   [workspace 与数据安全](2026-11-01-workspace-and-data-safety.md)、
-  [发布与文档](../_archive/settled_issues/2026-11-01-release-and-docs.md)
+  [发布与文档](./2026-11-01-release-and-docs.md)
 - 研究：[主稿](../research/plugin-as-product/2026-11-01-plugin-as-product.md)、
   [生命周期](../research/plugin-as-product/2026-11-01-product-lifecycle.md)、
   [信任/数据](../research/plugin-as-product/2026-11-01-trust-and-data.md)、
@@ -483,4 +487,4 @@ profile，启动时指向我的项目；我的项目拥有公司身份与产物�
 workspace）；**`COMPANY.md` 注入 T**（`handbook-smoke --cwd` 全过，不混开发仓库 AGENTS）；
 **workspace 搬迁 T**（isolation-matrix 新 case，v2 id 不变）。剩余（Web onboarding、Windows/registry、
 威胁注入、逐门禁红证）= [落地顺序 §实施回执](2026-11-01-landing-plan.md#实施回执2026-11-01静默自主执行)
-与 [v2 manifest Note](../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)。
+与 [v2 manifest Note](../../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)。

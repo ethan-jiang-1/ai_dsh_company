@@ -1,9 +1,9 @@
 # plugin-as-product：插件即产品的 profile、workspace、生命周期与数据归属
 
 > 问题：本仓如何从“开发一个 DSH 插件”走成“一个可安装的产品”——独立启动的 `company` profile、启动时解析用户 workspace、插件内容留在插件内、生产状态与产物（run bundle）落在用户 workspace，并且安装/首启/升级/回滚/迁移/卸载/修复都能落地？
-> 消费者：[插件即产品（伞卡）](../../issues/2026-11-01-plugin-as-product.md)
-> 产出的卡：[落地顺序](../../issues/2026-11-01-landing-plan.md)、[产品生命周期](../../issues/2026-11-01-product-lifecycle.md)、[workspace 与数据安全](../../issues/2026-11-01-workspace-and-data-safety.md)、[发布与文档](../../_archive/settled_issues/2026-11-01-release-and-docs.md)
-> 归档：—
+> 消费者：[插件即产品（伞卡）](../../settled_issues/2026-11-01-plugin-as-product.md)
+> 产出的卡：[落地顺序](../../settled_issues/2026-11-01-landing-plan.md)、[产品生命周期](../../settled_issues/2026-11-01-product-lifecycle.md)、[workspace 与数据安全](../../settled_issues/2026-11-01-workspace-and-data-safety.md)、[发布与文档](../../settled_issues/2026-11-01-release-and-docs.md)
+> 归档：2026-11-01
 
 ## 材料
 

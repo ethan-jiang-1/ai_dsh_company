@@ -18,6 +18,7 @@
 
 | 名头 | 材料 | 历史消费者 | 产出的卡 | 归档 |
 |---|---|---|---|---|
+| [plugin-as-product/](plugin-as-product/README.md) · 插件即产品：独立 company profile / workspace run bundle / 生命周期 / 信任 / 发布 | 4 份 | [插件即产品](../settled_issues/2026-11-01-plugin-as-product.md) 等 5 张 | 产品化四卡 + 发布/文档卡 | 2026-11-01 |
 | [multi-user-ux/](multi-user-ux/README.md) · 多用户全交互走查与并发能力盘点 | 1 份 | [多用户 BDD](../settled_issues/2026-10-04-multi-user-concurrency-bdd.md)、[人机合一 BDD](../settled_issues/2026-10-04-human-agent-unity-ux-bdd.md) | — | 2026-10-09 |
 | [collaboration/](collaboration/README.md) · 多人协作的锁、读屏障与认领让位 | 6 份 | [协作安全验收](../settled_issues/2026-10-09-collaboration-safety-acceptance.md)、[BUG-007](../fixed_bugs/BUG-007-collaboration-probe-false-positives.md) | — | 2026-10-10 |
 | [ceo-minimal-assembly/](ceo-minimal-assembly/README.md) · 组队健壮性三层防御的证据基线 | 1 份 | [组队健壮性卡](../settled_issues/2026-10-12-ceo-minimal-assembly.md) | — | 2026-10-12 |

@@ -5,8 +5,8 @@ intent: "把插件即产品的分发、版本兼容、构建产物、手册/READ
 
 # 插件即产品的发布、文档与验证工程
 
-> 服务卡：[插件即产品（伞卡）](../../issues/2026-11-01-plugin-as-product.md)、
-> [发布与文档落地卡](../../_archive/settled_issues/2026-11-01-release-and-docs.md)。
+> 服务卡：[插件即产品（伞卡）](../../settled_issues/2026-11-01-plugin-as-product.md)、
+> [发布与文档落地卡](../../settled_issues/2026-11-01-release-and-docs.md)。
 > 性质：研究证据与发布面清单，不是决定；拍板项住卡。基线 = `vendor/dsh` `dsh-v0.2.1-rc.2`。
 > 证据标签 **T** 实跑、**C** 源码/合同读、**P** 设计、**U** 未验证。
 > 与主稿分工：主稿回答“产品形状/数据归属”；本稿回答“怎么发出去、怎么证明发的是对的、
@@ -152,6 +152,6 @@ intent: "把插件即产品的分发、版本兼容、构建产物、手册/READ
 
 ## 9. 服务卡与下一步
 
-- 伞卡：[插件即产品](../../issues/2026-11-01-plugin-as-product.md) S4/S5。
-- 落地卡：[发布与文档](../../_archive/settled_issues/2026-11-01-release-and-docs.md)。
+- 伞卡：[插件即产品](../../settled_issues/2026-11-01-plugin-as-product.md) S4/S5。
+- 落地卡：[发布与文档](../../settled_issues/2026-11-01-release-and-docs.md)。
 - 需要用户拍板：registry 是否开、Windows 声明、手册形态、doc-budget 处置。
