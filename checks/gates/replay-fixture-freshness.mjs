@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { freshnessProblems } from '../../tools/lib/replay-fixture-freshness.mjs'
 
 // ── 重放注入面新鲜度门禁（replay-fixture-freshness，2026-10-20 立）────────────────
-// 为什么：手册（packages/company-pack/workspace/AGENTS.md，唯一家；company-workspace 是符号链接）
+// 为什么：手册（packages/company-pack/content/AGENTS.md，唯一家；company-workspace 是符号链接）
 // 是**会话注入内容**——纯 docs 提交改它 = 改回放输入。2026-10-20 实锤（本门禁的出生事故）：
 // 589d785（手册去重 190→187 行，纯 docs）当晚把 r3-delegation 的 full 档「归一化零 diff」
 // 打红，而 pre-push 只跑 verify+test、replay-scene-liveness 按设计不跑进程 ⇒ 整条链没有
@@ -20,7 +20,7 @@ import { freshnessProblems } from '../../tools/lib/replay-fixture-freshness.mjs'
 //   ② 单测负例（replay-fixture-freshness.spec）：无注入面 → 报形状异常；marker 缺席 → undefined 不误判。
 export function run({ root, ok, fail, skip }) {
   const replayRoot = join(root, 'snapshots/replay')
-  const handbookPath = join(root, 'packages/company-pack/workspace/AGENTS.md')
+  const handbookPath = join(root, 'packages/company-pack/content/AGENTS.md')
   if (!existsSync(replayRoot)) { ok('replay-fixture-freshness（无 replay 场景，跳过）'); return }
   if (!existsSync(handbookPath)) { fail('replay-fixture-freshness', `现行手册缺失：${handbookPath}（注入源唯一家，缺了所有 full 档场景都失判）`); return }
   const currentHandbook = readFileSync(handbookPath, 'utf8')

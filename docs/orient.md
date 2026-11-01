@@ -17,7 +17,7 @@ COO、CFO 各自是独立 preset，跑在 DSH 会话里，你通过 web 观察�
 
 ## 二问：怎么跑起来？
 
-白话三步：进开发环境（`source run/env.sh`）→ 起产品（`pnpm company --workspace …`）→ 浏览器开门
+白话三步：进开发环境（`source run/env.sh`）→ 起产品（`pnpm company …`）→ 浏览器开门
 （token URL 在启动横幅里读）。**headless 只证明 CLI 能跑，不是公司运行。**
 
 → 唯一步步骤：[demo.md §前置](demo.md)
@@ -53,7 +53,7 @@ audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.m
 - **skills**：`packages/company-pack/presets/<角色>/skills/`——盘上可见，一角色一目录。
 - **运行态**：[runtime/](../runtime/README.md)（gitignored，跑过留下的状态全在这）；
   一条命令看全景：`pnpm orient`。
-- **run bundle（workspace 单元）**：用户 workspace + `<workspace>/.dsh-company/bundle.json`（v2）+ 公司盘；home 只留 DSH 运行时与 host 治理；
+- **run bundle（workspace 单元）**：用户 workspace + `<workspace>/.dsh-company/bundle.json`（v3）+ 公司盘；home 只留 DSH 运行时与 host 治理；
   一次安装一个，**不进 git**，第二个 CEO 新开 home。定义与 base/grown 分层 = [运行态地图 §二·五](runtime-map.md)。
   **run trace（四件套）** = 代码与组合 / DSH 运行状态 / 会话 cwd / 证据——`pnpm orient` 默认全景直接显示这四件；
   某次运行的证据链按需算视图：

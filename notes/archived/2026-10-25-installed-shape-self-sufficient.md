@@ -12,8 +12,8 @@
 
 ## 当前事实
 
-- 手册 [AGENTS.md](../../packages/company-pack/workspace/AGENTS.md) 多处引用 `../docs/*`、`checks/audit/*`、`snapshots/README.md`、`runtime/rehearsal-workspace/`；13/14 份 skill 结尾写“归仓库的门禁/审计脚本”；CEO chairing skill 写 `node tools/converge.mjs`。
-- 模板 [meta.md](../../packages/company-pack/workspace/templates/meta.md) 把词表指向 `tools/lib/deliverables.mjs`。
+- 手册 [AGENTS.md](../../packages/company-pack/content/AGENTS.md) 多处引用 `../docs/*`、`checks/audit/*`、`snapshots/README.md`、`runtime/rehearsal-workspace/`；13/14 份 skill 结尾写“归仓库的门禁/审计脚本”；CEO chairing skill 写 `node tools/converge.mjs`。
+- 模板 [meta.md](../../packages/company-pack/content/templates/meta.md) 把词表指向 `tools/lib/deliverables.mjs`。
 - 客户端读 `kb/deliverables-index.json`（[company-data-plane.ts](../../packages/company-pack/src/client/company-data-plane.ts)）；错误文案在 [DeliverablesTab.tsx](../../packages/company-pack/src/client/DeliverablesTab.tsx)。
 - 仓库生成器 [tools/deliverables-index.mjs](../../tools/deliverables-index.mjs) 依赖 [checks/audit/deliverables-check.mjs](../../checks/audit/deliverables-check.mjs)，不在 pack `files`。
 - 现有 [markdown-links.mjs](../../tools/lib/markdown-links.mjs) 把 pack 骨架排除、只校验 dev 盘，安装形状的死链在结构上不可见。

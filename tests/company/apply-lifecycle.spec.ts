@@ -74,7 +74,7 @@ describe('Host apply 生命周期：迟到 inject 与卸载后事件（R4-05）'
     expect(toolRegistrations()).toBe(3)
     scoped.emit('api-session/added', { sessionId: 'session-x', cwd: '/outside-r4', origin: 'human', running: true, projections: { values: {} } })
     await wait()
-    expect(warns.some(message => message.includes('不在公司盘'))).toBe(true)
+    expect(warns.some(message => message.includes('不在 workspace'))).toBe(true)
     const before = warns.length
     await ctx.fiber.dispose()
     scoped.emit('api-session/added', { sessionId: 'session-y', cwd: '/outside-r4-2', origin: 'human', running: true, projections: { values: {} } })

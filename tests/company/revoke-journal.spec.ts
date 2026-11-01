@@ -13,7 +13,7 @@ import {
 
 function fixture(): { root: string; records: string; methods: string; id: string; text: string } {
   const root = mkdtempSync(join(tmpdir(), 'revoke-journal-'))
-  const records = join(root, 'cultivation/records')
+  const records = join(root, '.dsh-company/cultivation/records')
   const methods = join(root, 'methods')
   const id = nodeCultivationStorage.writeRecord(records, {
     kind: 'correction', targetRole: 'ceo', proposerRole: 'ceo', proposerKind: 'human',

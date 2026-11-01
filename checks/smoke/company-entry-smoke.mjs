@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：启动器/profile 建/装/workspace 解析/seed consent/一 home 一 workspace 改动后；发布前
-// 成本：~1-2 分钟 keyless（临时 home + 真 profile 建/装 + 一次 boot；不调模型）
+// 何时跑：安装/启动/workspace 解析/run bundle 布局改动后；发布前
+// 成本：~1-2 分钟 keyless（临时 home + 真 tarball 安装 + 两次 boot；不调模型）
 // 用法：node checks/smoke/company-entry-smoke.mjs [--keep]
 //
-// 证明形状：`pnpm company` 等价入口（bin 启动器）在干净 HOME 下：
-// - 建 company profile（base + web-app + pack）、装 pack、写 seed consent/settings；
-// - workspace 落 v2 `bundle.json`，home 根不写 bundle；
-// - boot 出 banner，workspace 登记进 DSH Workspace；
-// - 同一 home 再传第二个 workspace ⇒ 拒绝（v1 一安装一 workspace）。
-// 不证明：浏览器首屏/CEO 会话（client-load 另测）、真模型、跨 OS。
+// 证明形状（0.6.0 v3）：
+// - 干净 home：CLI 建 company profile → `dsh plugin --profile company add <tarball>` → roster 含 pack；
+// - 从 workspace cwd 直接 `dsh --profile company`（无 launcher/profile patch）→ banner；
+// - `<workspace>/.dsh-company/bundle.json` v3；kb/ 状态在场；根目录无 AGENTS.md/templates/kb；
+// - 无 `.seed-consent`；stderr 无 `did not activate`/`skipping profile bundle`；
+// - 同一 home 顺序第二个 workspace 可启动（不再拒绝第二盘），各写自己的 `.dsh-company/`。
+// 不证明：浏览器首屏/CEO 会话（client-load 另测）、真模型、Desktop 壳、跨 OS。
 
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync } from 'node:fs'
@@ -18,7 +19,8 @@ import { join } from 'node:path'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 
 const KEEP = process.argv.includes('--keep')
-const BIN = join(ROOT, 'packages/company-pack/bin/dsh-company.mjs')
+const CLI = join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js')
+const TARBALL = join(ROOT, '_dist', 'dsh-company-pack-0.6.0.tgz')
 const failures = []
 const check = (label, ok, detail = '') => {
   console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail === '' ? '' : `（${detail}）`}`)
@@ -26,83 +28,117 @@ const check = (label, ok, detail = '') => {
 }
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
+if (!existsSync(CLI)) {
+  console.error(`company-entry-smoke: vendor CLI 未构建：${CLI}（先按 docs/guides/bootstrap 构建）`)
+  process.exit(2)
+}
+if (!existsSync(TARBALL)) {
+  console.error(`company-entry-smoke: 缺 ${TARBALL}；先跑 node tools/export-dist.mjs（0.6.0）`)
+  process.exit(2)
+}
+
 const root = realpathSync(mkdtempSync(join(tmpdir(), 'company-entry-smoke-')))
 const home = join(root, 'home')
-const workspace = join(root, 'company-workspace')
-const secondWorkspace = join(root, 'second-workspace')
+const workspace = join(root, 'workspace-a')
+const second = join(root, 'workspace-b')
 const userHome = join(root, 'user')
+const baseEnv = { ...process.env, HOME: userHome, DSH_HOME: home, DSH_COMPANY_BROWSER: 'off', DSH_COMPANY_HOME: '' }
 let child
 
-try {
-  mkdirSync(userHome, { recursive: true })
-  console.log('① 启动器：干净 home + workspace')
-  child = spawn(process.execPath, [BIN, '--home', home, '--workspace', workspace, '--yes', '--no-open', '--port', '0'], {
-    env: { ...process.env, HOME: userHome, DSH_COMPANY_BROWSER: 'off' },
+function runDsh(args, cwd = ROOT) {
+  return spawnSync(process.execPath, [CLI, ...args], {
+    cwd, env: baseEnv, encoding: 'utf8', timeout: 180_000,
+  })
+}
+
+async function boot(workspaceDir) {
+  const processChild = spawn(process.execPath, [CLI, '--profile', 'company', '--', '--port', '0', '--no-open'], {
+    cwd: workspaceDir,
+    env: { ...baseEnv, DSH_COMPANY_HOME: workspaceDir },
     detached: true,
     stdio: ['ignore', 'pipe', 'pipe'],
   })
   let output = ''
-  child.stdout.on('data', chunk => { output += chunk })
-  child.stderr.on('data', chunk => { output += chunk })
+  processChild.stdout.on('data', chunk => { output += chunk })
+  processChild.stderr.on('data', chunk => { output += chunk })
   const deadline = Date.now() + 180_000
-  while (Date.now() < deadline && !/dsh web:/.test(output)) await sleep(200)
-  check('启动器打出 dsh web banner', /dsh web:/.test(output), output.slice(-600))
-  const bundleDeadline = Date.now() + 15_000
-  while (Date.now() < bundleDeadline && !existsSync(join(workspace, '.dsh-company/bundle.json'))) await sleep(100)
-  check('profile bundles 含 base/web-app/pack',
-    (() => {
-      try {
-        const pkg = JSON.parse(readFileSync(join(home, 'profiles/company/package.json'), 'utf8'))
-        const bundles = pkg?.dsh?.profile?.bundles ?? []
-        return ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', 'dsh-company-pack'].every(id => bundles.includes(id))
-      } catch { return false }
-    })())
-  check('workspace 落 v2 bundle.json',
-    (() => {
-      try {
-        const manifest = JSON.parse(readFileSync(join(workspace, '.dsh-company/bundle.json'), 'utf8'))
-        return manifest.v === 2 && manifest.workspace === undefined && typeof manifest.id === 'string'
-      } catch { return false }
-    })(), workspace)
-  check('home 根不写 bundle', !existsSync(join(home, 'bundle.json')))
-  check('seed consent 在场', existsSync(join(workspace, '.dsh-company/.seed-consent')))
-  check('settings 记录 workspace', (() => {
-    try { return JSON.parse(readFileSync(join(home, 'company/settings.json'), 'utf8')).workspace === workspace } catch { return false }
+  while (Date.now() < deadline && !/dsh web:/.test(output) && processChild.exitCode === null) await sleep(200)
+  return { child: processChild, output: () => output }
+}
+
+async function stop(handle) {
+  if (handle === undefined) return
+  try { process.kill(-handle.child.pid, 'SIGTERM') } catch { /* gone */ }
+  await sleep(1200)
+  try { process.kill(-handle.child.pid, 'SIGKILL') } catch { /* gone */ }
+  await sleep(300)
+}
+
+try {
+  mkdirSync(userHome, { recursive: true })
+  mkdirSync(workspace, { recursive: true })
+  mkdirSync(second, { recursive: true })
+
+  console.log('① profile + 真 tarball 安装')
+  const created = runDsh(['--profile', 'company', '--from-default-profile', 'web', '--dump-default-config'])
+  check('company profile 从 web template 建立', created.status === 0, (created.stderr ?? '').slice(-300))
+  const added = runDsh(['plugin', '--profile', 'company', 'add', `file:${TARBALL}`])
+  check('plugin add exit 0', added.status === 0, (added.stderr ?? '').slice(-300))
+  check('roster 含 dsh-company-pack', (() => {
+    try {
+      const pkg = JSON.parse(readFileSync(join(home, 'profiles/company/package.json'), 'utf8'))
+      return (pkg?.dsh?.profile?.bundles ?? []).includes('dsh-company-pack')
+    } catch { return false }
   })())
+  check('安装副本含 content/ 无 bin/', existsSync(join(home, 'profiles/company/node_modules/dsh-company-pack/content/AGENTS.md'))
+    && !existsSync(join(home, 'profiles/company/node_modules/dsh-company-pack/bin')))
+  check('profile patch 不写 registrar', !readFileSync(join(home, 'profiles/company/cordis.patch.yml'), 'utf8').includes('company-workspace-register'))
+
+  console.log('② 第一个 workspace：直接 dsh --profile company')
+  let handle = await boot(workspace)
+  let output = handle.output()
+  check('banner 出现', /dsh web:/.test(output), output.slice(-600))
+  check('stderr 无 did not activate / skipping bundle', !/did not activate|skipping profile bundle/.test(output), output.slice(-300))
+  check('workspace 落 v3 bundle.json', (() => {
+    try {
+      const manifest = JSON.parse(readFileSync(join(workspace, '.dsh-company/bundle.json'), 'utf8'))
+      return manifest.v === 3 && typeof manifest.id === 'string' && manifest.pack?.name === 'dsh-company-pack'
+    } catch { return false }
+  })())
+  check('.dsh-company/kb 状态在场', existsSync(join(workspace, '.dsh-company/kb/company.md'))
+    && existsSync(join(workspace, '.dsh-company/kb/org.md'))
+    && existsSync(join(workspace, '.dsh-company/kb/owners.md')))
+  check('根目录无 AGENTS.md/templates/kb', !existsSync(join(workspace, 'AGENTS.md'))
+    && !existsSync(join(workspace, 'COMPANY.md'))
+    && !existsSync(join(workspace, 'templates'))
+    && !existsSync(join(workspace, 'kb')))
+  check('无 seed-consent', !existsSync(join(workspace, '.dsh-company/.seed-consent')))
+  check('home 根无 bundle', !existsSync(join(home, 'bundle.json')))
   check('workspace 已登记进 DSH Workspace', (() => {
     try {
       const storage = JSON.parse(readFileSync(join(home, 'storages/workspace.json'), 'utf8'))
-      return Object.values(storage?.tables?.workspaces ?? {}).some(row => String(row.path).includes('company-workspace'))
+      return Object.values(storage?.tables?.workspaces ?? {}).some(row => String(row.path) === workspace)
     } catch { return false }
   })())
-  check('registrar profile patch 在场', readFileSync(join(home, 'profiles/company/cordis.patch.yml'), 'utf8').includes('company-workspace-register'))
+  await stop(handle)
 
-  try { process.kill(-child.pid, 'SIGTERM') } catch { /* gone */ }
-  await sleep(1200)
-  try { process.kill(-child.pid, 'SIGKILL') } catch { /* gone */ }
-  await sleep(500)
-
-  const doctor = spawnSync(process.execPath, [BIN, '--doctor', '--home', home, '--workspace', workspace], {
-    env: { ...process.env, HOME: userHome, DSH_COMPANY_BROWSER: 'off' }, encoding: 'utf8', timeout: 60_000,
-  })
-  check('doctor 只读检查全绿', doctor.status === 0, `${doctor.stdout ?? ''}${doctor.stderr ?? ''}`.slice(-500))
-
-  console.log('② 同一 home 第二 workspace ⇒ 拒绝')
-  const second = spawnSync(process.execPath, [BIN, '--home', home, '--workspace', secondWorkspace, '--yes', '--no-open'], {
-    env: { ...process.env, HOME: userHome, DSH_COMPANY_BROWSER: 'off' }, encoding: 'utf8', timeout: 60_000,
-  })
-  check('第二 workspace 退出码 2', second.status === 2, `exit=${String(second.status)}`)
-  check('第二 workspace 拒绝理由可读', /同一 home 已绑定/.test(second.stderr ?? ''), (second.stderr ?? '').slice(-300))
-  check('第二 workspace 未被创建', !existsSync(secondWorkspace))
+  console.log('③ 同一 home 顺序第二个 workspace（不拒绝第二盘）')
+  handle = await boot(second)
+  output = handle.output()
+  check('第二个 workspace banner 出现', /dsh web:/.test(output), output.slice(-600))
+  check('第二个 workspace 落自己的 v3 身份', (() => {
+    try {
+      const manifest = JSON.parse(readFileSync(join(second, '.dsh-company/bundle.json'), 'utf8'))
+      return manifest.v === 3 && typeof manifest.id === 'string'
+    } catch { return false }
+  })())
+  check('第二个 workspace 无拒绝文案', !/同一 home 已绑定|换项目请用新的/.test(output), output.slice(-300))
+  await stop(handle)
 } catch (error) {
   failures.push(String(error))
   console.error(`company-entry-smoke: ${String(error)}`)
 } finally {
-  if (child !== undefined) {
-    try { process.kill(-child.pid, 'SIGTERM') } catch { try { child.kill('SIGTERM') } catch { /* gone */ } }
-    await sleep(500)
-    try { process.kill(-child.pid, 'SIGKILL') } catch { /* gone */ }
-  }
+  if (child !== undefined) await stop({ child })
   if (!KEEP) rmSync(root, { recursive: true, force: true })
   else console.log(`company-entry-smoke: --keep 保留 ${root}`)
 }

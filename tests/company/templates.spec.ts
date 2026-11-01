@@ -17,7 +17,7 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 // 补栏位后 3 passed；今天再删任一栏位仍会红（判据落在产出侧，不靠人记得写）。
 // 2026-10-24：模板是基部（随包分发），读 pack 的单源；dev bundle 的 company-workspace/templates
 // 是指回它的符号链接，不再作为测试基准。
-const TEMPLATES = join(ROOT, 'packages/company-pack/workspace/templates')
+const TEMPLATES = join(ROOT, 'packages/company-pack/content/templates')
 const templateFiles = readdirSync(TEMPLATES).filter(name => name.endsWith('.md'))
 const textOf = name => readFileSync(join(TEMPLATES, name), 'utf8')
 /** 复核声明的落点 = 带「AI 使用声明」的产出模板（meta.md 是户口件，不带）。 */

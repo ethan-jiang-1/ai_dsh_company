@@ -126,7 +126,7 @@ describe('培养记录：写读往返与坏形状', () => {
     targetRole: 'ceo',
     proposerRole: 'ceo',
     proposerKind: 'human',
-    source: 'deliverables/x/final.md',
+    source: '.dsh-company/deliverables/x/final.md',
     expectation: '收口前逐项列出未决项',
     body: '做法：收口盘点先列未决清单，再下结论。',
   } as const
@@ -140,7 +140,7 @@ describe('培养记录：写读往返与坏形状', () => {
     expect(record!.targetRole).toBe('ceo')
     expect(record!.proposerRole).toBe('ceo')
     expect(record!.proposerKind).toBe('human')
-    expect(record!.source).toBe('deliverables/x/final.md')
+    expect(record!.source).toBe('.dsh-company/deliverables/x/final.md')
     expect(record!.expectation).toBe('收口前逐项列出未决项')
     expect(record!.status).toBe('open')
     expect(record!.title).toBe('做法：收口盘点先列未决清单，再下结论。')
@@ -157,10 +157,10 @@ describe('培养记录：写读往返与坏形状', () => {
   it('正文进客户端读模型（S4）：多行原样带出——判断必须先有材料', () => {
     const text = recordText({
       ...draft,
-      body: '做法：先列未决清单，按 owner 分行。\n证据：deliverables/x/final.md 第 3 节；口径 A :: 口径 B。',
+      body: '做法：先列未决清单，按 owner 分行。\n证据：.dsh-company/deliverables/x/final.md 第 3 节；口径 A :: 口径 B。',
     })
     const record = parseRecord('r-body', text)!
-    expect(record.body).toBe('做法：先列未决清单，按 owner 分行。\n证据：deliverables/x/final.md 第 3 节；口径 A :: 口径 B。')
+    expect(record.body).toBe('做法：先列未决清单，按 owner 分行。\n证据：.dsh-company/deliverables/x/final.md 第 3 节；口径 A :: 口径 B。')
     expect(record.title).toBe('做法：先列未决清单，按 owner 分行。')
   })
 
@@ -191,7 +191,7 @@ describe('培养记录：写读往返与坏形状', () => {
     const record = parseRecord('r-history', text)!
     expect(record).toMatchObject({ status: 'adopted', verification: 'pass', verificationHistory: history })
     const legacyText = recordText(draft)
-      .replace('source: deliverables/x/final.md\n', '')
+      .replace('source: .dsh-company/deliverables/x/final.md\n', '')
       .replace('status: open', 'status: adopted\nverification: fail')
     const legacy = parseRecord('r-legacy-verification', legacyText)!
     expect(legacy.verification).toBe('fail')
@@ -334,7 +334,7 @@ async function withCultivationWorkspace<T>(run: (workspace: string, methods: str
   const workspace = join(root, 'workspace')
   const methods = join(root, 'methods')
   try {
-    mkdirSync(join(workspace, 'cultivation', 'records'), { recursive: true })
+    mkdirSync(join(workspace, '.dsh-company', 'cultivation', 'records'), { recursive: true })
     return await run(workspace, methods)
   } finally {
     rmSync(root, { recursive: true, force: true })
@@ -386,7 +386,7 @@ describe('cultivation_propose 的 ctx.fs 通道（2026-10-28 二轮）', () => {
       expect(calls[0]?.policy).toEqual(policy)
       expect((resolvedWith as { session?: { header?: { cwd?: string } } })?.session?.header?.cwd).toBe(workspace)
       expect(calls[0]?.path.endsWith('.md')).toBe(true)
-      expect(readdirSync(join(workspace, 'cultivation', 'records'))).toHaveLength(0)
+      expect(readdirSync(join(workspace, '.dsh-company', 'cultivation', 'records'))).toHaveLength(0)
     })
   })
 })
@@ -395,7 +395,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
   it('公司数据只认盘根：子目录会话被拒绝，盘根会话照常写', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
       const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace)
-      const sub = join(workspace, 'deliverables/sub')
+      const sub = join(workspace, '.dsh-company/deliverables/sub')
       mkdirSync(sub, { recursive: true })
       const denied = await invokeCultivation(command, 'ceo', sub, 'correct 收口前列未决 :: 先列清单')
       expect(denied).toMatchObject({ kind: 'error' })
@@ -404,7 +404,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
 
       const accepted = await invokeCultivation(command, 'ceo', workspace, 'correct 收口前列未决 :: 先列清单')
       expect(accepted).toMatchObject({ kind: 'success' })
-      expect(readdirSync(join(workspace, 'cultivation/records')).some(name => name.endsWith('.md'))).toBe(true)
+      expect(readdirSync(join(workspace, '.dsh-company/cultivation/records')).some(name => name.endsWith('.md'))).toBe(true)
     })
   })
 
@@ -428,7 +428,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
         targetRole: 'ceo',
         expectation: '收口前列出未决项',
         body: '先列清单，再下结论。',
-        source: 'deliverables/brief.md',
+        source: '.dsh-company/deliverables/brief.md',
       }, {
         agent: { session: { header: { agentPreset: 'ceo', cwd: workspace } } },
         signal: new AbortController().signal,
@@ -442,7 +442,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
 
       expect(outcome.recorded).toBe(true)
       expect(outcome.note).toContain('纠正')
-      const recordPath = join(workspace, 'cultivation', 'records', `${outcome.id}.md`)
+      const recordPath = join(workspace, '.dsh-company', 'cultivation', 'records', `${outcome.id}.md`)
       const text = readFileSync(recordPath, 'utf8')
       const saved = parseRecord(outcome.id, text)
       expect(saved).toMatchObject({
@@ -450,7 +450,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
         targetRole: 'ceo',
         proposerRole: 'ceo',
         proposerKind: 'agent',
-        source: 'deliverables/brief.md',
+        source: '.dsh-company/deliverables/brief.md',
         expectation: '收口前列出未决项',
         status: 'open',
       })
@@ -461,7 +461,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
 
   it('跨角色采纳被拒绝，记录保持 open 且不部署方法', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
-      const recordPath = join(workspace, 'cultivation', 'records', 'r1.md')
+      const recordPath = join(workspace, '.dsh-company', 'cultivation', 'records', 'r1.md')
       writeFileSync(recordPath, recordText(suggestion))
       const handler = cultivationRegistrations({ cultivationRoot: methods }).command
 
@@ -493,7 +493,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
 
   it('reject 与 verify 更新记录，同时保留原记录正文并记录后续工作依据', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
-      const recordsDir = join(workspace, 'cultivation', 'records')
+      const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
       const openPath = join(recordsDir, 'r-reject.md')
       writeFileSync(openPath, recordText(suggestion))
       const handler = cultivationRegistrations({ cultivationRoot: methods }).command
@@ -530,7 +530,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
 
   it('revoke validates the slug, removes only the target method and annotates a matching record', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
-      const recordsDir = join(workspace, 'cultivation', 'records')
+      const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
       const recordPath = join(recordsDir, 'r-revoke.md')
       const adopted = recordText(suggestion).replace('status: open', 'status: adopted\nmethodSlug: review-numbers')
       writeFileSync(recordPath, adopted)
@@ -550,7 +550,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
 
   it('record and method collisions preserve existing files and leave the proposal open', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
-      const recordsDir = join(workspace, 'cultivation', 'records')
+      const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
       const recordPath = join(recordsDir, 'r-collision.md')
       writeFileSync(recordPath, recordText(suggestion))
       const methodDir = join(methods, 'cfo', 'review-numbers')
@@ -566,7 +566,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
 
   it('record and method symlinks are not followed when reading, listing, or revoking', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
-      const recordsDir = join(workspace, 'cultivation', 'records')
+      const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
       const externalRecord = join(workspace, '..', 'outside-record.md')
       const externalText = recordText(suggestion).replace('status: open', 'status: adopted\nmethodSlug: follow-test')
       writeFileSync(externalRecord, externalText)
@@ -592,7 +592,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
 
   it('目标角色采纳从记录部署已存正文，并将记录持久化为 adopted', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
-      const recordPath = join(workspace, 'cultivation', 'records', 'r1.md')
+      const recordPath = join(workspace, '.dsh-company', 'cultivation', 'records', 'r1.md')
       writeFileSync(recordPath, recordText(suggestion))
       const handler = cultivationRegistrations({ cultivationRoot: methods }).command
 
@@ -635,7 +635,7 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
     return encoded.token
   }
   const recordsOf = (workspace: string) => {
-    const dir = join(workspace, 'cultivation', 'records')
+    const dir = join(workspace, '.dsh-company', 'cultivation', 'records')
     if (!existsSync(dir)) return []
     return readdirSync(dir).filter(name => name.endsWith('.md')).map(name => {
       const record = parseRecord(name.replace(/\.md$/, ''), readFileSync(join(dir, name), 'utf8'))
@@ -740,24 +740,24 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
 
   it('成品 ref 只在成品目录里认；缺失给可读错误', async () => {
     await withCultivationWorkspace(async workspace => {
-      mkdirSync(join(workspace, 'kb'), { recursive: true })
-      writeFileSync(join(workspace, 'kb', 'deliverables-index.json'), JSON.stringify({
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb', 'deliverables-index.json'), JSON.stringify({
         schema: 1,
         entries: [{
           slug: 'budget-review', result: '已采纳', kickoff: '2026-10-22',
-          summary: '结论：先列假设，再给数字。', path: 'deliverables/budget-review/final.md',
+          summary: '结论：先列假设，再给数字。', path: '.dsh-company/deliverables/budget-review/final.md',
         }],
       }))
       const { command } = cultivationRegistrations({}, query())
       const ok = await invokeCultivation(command, 'ceo', workspace,
-        `suggest cfo --context=${tokenOf({ kind: 'deliverable', ref: 'deliverables/budget-review/final.md' }, 'suggest')} 结论先列假设 ::`)
+        `suggest cfo --context=${tokenOf({ kind: 'deliverable', ref: '.dsh-company/deliverables/budget-review/final.md' }, 'suggest')} 结论先列假设 ::`)
       expect(ok).toMatchObject({ kind: 'success' })
       const record = recordsOf(workspace)[0]
       expect(record.contexts?.[0]).toMatchObject({ kind: 'deliverable', title: 'budget-review', subtitle: '已采纳' })
       expect(record.source).toBe('成品「budget-review」（已采纳）')
 
       const missing = await invokeCultivation(command, 'ceo', workspace,
-        `suggest cfo --context=${tokenOf({ kind: 'deliverable', ref: 'deliverables/nope/final.md' }, 'suggest')} 期望 ::`)
+        `suggest cfo --context=${tokenOf({ kind: 'deliverable', ref: '.dsh-company/deliverables/nope/final.md' }, 'suggest')} 期望 ::`)
       expect(missing).toMatchObject({ kind: 'error' })
       expect(missing.text).toContain('没有这个成品')
       expect(recordsOf(workspace)).toHaveLength(1)
@@ -781,7 +781,7 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
         kind: 'session' as const, ref: 'session-1', title: '收口检查', excerpt: '用户：……', turn: 1,
       }
       const write = (id: string): void => {
-        writeFileSync(join(workspace, 'cultivation', 'records', `${id}.md`), recordText({
+        writeFileSync(join(workspace, '.dsh-company', 'cultivation', 'records', `${id}.md`), recordText({
           kind: 'correction', targetRole: 'cfo', proposerRole: 'cfo', proposerKind: 'human',
           source: '会话「收口检查」', expectation: '收口前逐项列出未决项', body: '', contexts: [context],
         }))
@@ -795,7 +795,7 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
       expect(await invokeCultivation(command, 'cfo', workspace, 'adopt 20261023-140202-cccc')).toMatchObject({ kind: 'success' })
       expect(await invokeCultivation(command, 'cfo', workspace, 'verify 20261023-140202-cccc pass :: 下一次同类检查按期列出了未决事项。')).toMatchObject({ kind: 'success' })
       for (const id of ['20261023-140200-aaaa', '20261023-140201-bbbb', '20261023-140202-cccc']) {
-        const record = parseRecord(id, readFileSync(join(workspace, 'cultivation', 'records', `${id}.md`), 'utf8'))
+        const record = parseRecord(id, readFileSync(join(workspace, '.dsh-company', 'cultivation', 'records', `${id}.md`), 'utf8'))
         expect(record?.contexts).toEqual([context])
       }
     })
@@ -844,7 +844,7 @@ describe('revoke 跨 store 失败回滚（2026-10-27 G6）', () => {
         signal: new AbortController().signal,
       } as never) as { id: string }
       expect((await invokeCultivation(command, 'ceo', workspace, `adopt ${outcome.id} as rollback-method`)).kind).toBe('success')
-      const recordPath = join(workspace, 'cultivation/records', `${outcome.id}.md`)
+      const recordPath = join(workspace, '.dsh-company/cultivation/records', `${outcome.id}.md`)
       expect(readFileSync(recordPath, 'utf8')).toContain('status: adopted')
       expect(existsSync(join(methods, 'ceo/rollback-method/SKILL.md'))).toBe(true)
 
@@ -868,7 +868,7 @@ describe('/cultivation archive（2026-10-27 G8）', () => {
   it('只归档已处理且早于天数的记录；open 与坏记录不动', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
       const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace)
-      const records = join(workspace, 'cultivation/records')
+      const records = join(workspace, '.dsh-company/cultivation/records')
       const front = (status: string): string => `---\nkind: correction\ntargetRole: ceo\nproposerRole: ceo\nproposerKind: human\nsource: test\nexpectation: old\nstatus: ${status}\n---\n\nbody\n`
       writeFileSync(join(records, '20200101-000000-old1.md'), front('rejected'))
       writeFileSync(join(records, '20200101-000000-old2.md'), front('open'))
@@ -876,7 +876,7 @@ describe('/cultivation archive（2026-10-27 G8）', () => {
       const outcome = await invokeCultivation(command, 'ceo', workspace, 'archive 30')
       expect(outcome.kind).toBe('success')
       expect(existsSync(join(records, '20200101-000000-old1.md'))).toBe(false)
-      expect(existsSync(join(workspace, 'cultivation/records-archive/20200101-000000-old1.md'))).toBe(true)
+      expect(existsSync(join(workspace, '.dsh-company/cultivation/records-archive/20200101-000000-old1.md'))).toBe(true)
       expect(existsSync(join(records, '20200101-000000-old2.md'))).toBe(true)
       expect(existsSync(join(records, 'broken.md'))).toBe(true)
       expect(String((outcome as { text: string }).text)).toContain('1 条坏记录未动')
@@ -886,8 +886,8 @@ describe('/cultivation archive（2026-10-27 G8）', () => {
   it('purge 只删归档里早于天数的记录，live records 不动', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
       const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace)
-      const records = join(workspace, 'cultivation/records')
-      const archive = join(workspace, 'cultivation/records-archive')
+      const records = join(workspace, '.dsh-company/cultivation/records')
+      const archive = join(workspace, '.dsh-company/cultivation/records-archive')
       mkdirSync(archive, { recursive: true })
       const front = '---\nkind: correction\ntargetRole: ceo\nproposerRole: ceo\nproposerKind: human\nsource: test\nexpectation: old\nstatus: rejected\n---\n\nbody\n'
       writeFileSync(join(archive, '20200101-000000-old.md'), front)

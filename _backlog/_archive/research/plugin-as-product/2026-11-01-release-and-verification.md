@@ -50,7 +50,7 @@ intent: "把插件即产品的分发、版本兼容、构建产物、手册/READ
 - `_dist` 是导出目的地，不是源；tgz 全 gitignore，手册是唯一 tracked 例外（C：`docs/release.md`）。
 - `export-dist` 先 build（tsc -b + tsdown），再 `npm pack`（cache 钉 scratch），再对产物本体断言
   清单边界，再算 sha256、注入手册；导出 ≠ 发布（不 bump、不跑认证档、不进 registry）。
-- 新增产品面后，tarball 必须含：`bin/dsh-company.mjs`（计划）、`lib/register-workspace.js`
+- 新增产品面后，tarball 必须含：bin/dsh-company.mjs（历史，已删除）（计划）、`lib/register-workspace.js`
   （计划）、`workspace/AGENTS.md`、`cordis.patch.yml`、`lib/index.js`、`lib/client.js`、
   presets/locale/icon；不得含 workspace 数据/会话/凭据/构建中间物。
 

@@ -4,14 +4,11 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { expectedTag } from './lib/pin.mjs'
 
-// ── 2g. 手动分发手册版本 + 安装形状门禁（2026-09-28 立；2026-10-24 扩内容）────
-// 负例留证 2026-09-28：手改手册表头版本 → dist-manual 红，跑 export-dist 还原 → 绿。
-// 负例留证 2026-10-27：从手册删掉「DSH_COMPANY_REBIND」/「deliverables-presented」→ 红（换盘与 presented 账本合同不在手册）；
-// 负例留证 2026-10-24：从手册删掉「run bundle」/「bundle.json」/「company-workspace」关键句 → 红；
-//   重跑 export-dist → 绿。为什么扩：0.2.0 的手册表头版本没漂，但内容还是 2026-10-05 的
-//   “139 条目、无 workspace”——只比版本号抓不到分发件已经教人装错东西。
-// 解法：版本 bump 必须同 diff 重跑 `node tools/export-dist.mjs`（手册由脚本生成、永不手改）；
-//   手册必须写清 run bundle 的安装/身份/干净判据。
+// ── 2g. 手动分发手册版本 + 安装形状门禁（2026-09-28 立；2026-11-01 v3 重写）────────
+// 为什么：手册是收件人的唯一安装路径；版本对但内容教旧形状（launcher/--workspace/一 home
+// 一 workspace/seed）就是装错。0.6.0 起形状 = Plugins 页默认、`dsh --profile company`、
+// run bundle 在 `<workspace>/.dsh-company/`、插件内容在包 `content/`。
+// 负例留证：删「Plugins」或写入 `--workspace` → 本门禁红；重跑 export-dist → 绿。
 export function run({ root, ok, fail }) {
   const packVersion = JSON.parse(readFileSync(join(root, 'packages/company-pack/package.json'), 'utf8')).version
   const manualPath = join(root, '_dist', '安装手册.md')
@@ -25,22 +22,19 @@ export function run({ root, ok, fail }) {
   if (header !== packVersion) {
     problems.push(`表头版本（${header ?? '解析不到'}）≠ pack package.json（${packVersion}）——重跑 \`node tools/export-dist.mjs\` 再提交，别手改手册`)
   }
-  const required = ['company', '--workspace', '.dsh-company/bundle.json', 'AGENTS.md', 'COMPANY.md',
-    'exports', 'sha256', 'Node', 'DSH', '卸载', '回退', 'pnpm 11', '12', 'DSH_COMPANY_BROWSER', 'dsh-web-app',
-    'business', 'full', 'seed-consent']
+  const required = ['Plugins', 'dsh --profile company', '.dsh-company/bundle.json', 'content/', 'kb/',
+    'deliverables/', 'exports', 'company/ledger', 'sha256', 'DSH', 'dsh --version', '卸载', '回退',
+    'DSH_COMPANY_BROWSER', 'dsh-web-app', '仅 `dsh web`', '三个成功']
   const missing = required.filter(phrase => !manual.includes(phrase))
-  if (missing.length > 0) problems.push(`手册缺安装形状/契约关键句：${missing.join(' / ')}（run bundle / bundle.json / workspace 骨架 / sha256 / Node / DSH / 卸载 / 回退）`)
-  if (!/pnpm 11/.test(manual) || !/\b12\b/.test(manual)) {
-    problems.push('手册缺 pnpm 11/12 前置（plugin add 在 profile 目录调 pnpm；真实 corepack 默认可能是 12.x）')
-  }
-  if (!/DSH_COMPANY_BROWSER/.test(manual)) problems.push('手册缺 browser 条件开关（缺包时禁用、装包后自动启用）')
-  if (!/dsh-web-app/.test(manual)) problems.push('手册缺 profile 合同（公司包要求含 dsh-web-app 的 web profile）')
-  if (!/一次安装 = 一个 DSH home/.test(manual) || !/一个用户 workspace/.test(manual)) {
-    problems.push('手册缺「一次安装 = 一个 home + 一个用户 workspace」合同')
-  }
+  if (missing.length > 0) problems.push(`手册缺安装形状/契约关键句：${missing.join(' / ')}`)
+  const forbidden = ['--workspace', '--profile desktop', 'bin/dsh-company', 'seed-consent',
+    'handbookTarget', '一次安装 = 一个 DSH home', '换项目 = 新建一个 home']
+  const found = forbidden.filter(phrase => manual.includes(phrase))
+  if (found.length > 0) problems.push(`手册仍教旧形状：${found.join(' / ')}（0.6.0 以 .dsh-company/ 与 named profile 为准）`)
+  if (!/Plugins/.test(manual)) problems.push('手册缺应用内 Plugins 页默认安装路径')
+  if (!/不需要.*Node|不要求.*Node/.test(manual)) problems.push('手册应说明不要求用户单独安装 Node/pnpm（DSH 已装好）')
+  if (!/仅 `dsh web`/.test(manual)) problems.push('手册的 CLI 段缺「仅 `dsh web`」边界')
   if (!manual.includes(expectedTag)) problems.push(`手册缺验证基线 \`${expectedTag}\`（pin 漂了或没重导）`)
-  // 产物身份（2026-10-25，RFC distribution-lifecycle）：手册必须给出 tgz 的 sha256；
-  // 本体在场时逐字节核对，本体不在场（fresh clone / 未导出）只查形状，不冒充校验过。
   const manualHash = /[0-9a-f]{64}/.exec(manual)?.[0]
   if (manualHash === undefined) problems.push('手册缺 tgz 的 sha256（64 位十六进制）——重跑 `node tools/export-dist.mjs`')
   const tarball = join(root, '_dist', `dsh-company-pack-${packVersion}.tgz`)
@@ -52,6 +46,6 @@ export function run({ root, ok, fail }) {
     else if (!readFileSync(sidecar, 'utf8').trim().startsWith(digest)) problems.push('_dist 的 .sha256 旁文件与 tgz 本体不一致——重跑 `node tools/export-dist.mjs`')
   }
   problems.length === 0
-    ? ok(`dist-manual（版本 ${packVersion} + run bundle 安装形状 + sha256 + pin ${expectedTag}）`)
+    ? ok(`dist-manual（版本 ${packVersion} + DSH 安装形状 + sha256 + pin ${expectedTag}）`)
     : fail('dist-manual', problems.join('；'))
 }

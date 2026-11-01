@@ -6,7 +6,9 @@
  * - 数据面 = 盘上 meta/final；`presented` 由部署 host 的 present 事件投影，未观测 = null（未核）。
  * - `ledgered` = slug 能在 kb/motion-ledger.md 找到。
  */
-export const CATALOG_ROOTS = ['deliverables', 'deliverables-archive'] as const
+import { RUN_BUNDLE_PATHS } from './run-bundle-paths.ts'
+
+export const CATALOG_ROOTS = [RUN_BUNDLE_PATHS.deliverables, RUN_BUNDLE_PATHS.archive] as const
 export type CatalogRoot = (typeof CATALOG_ROOTS)[number]
 
 /** 动议分型（唯一词表；模板与校验共用）。 */
@@ -135,8 +137,8 @@ export function buildDeliverablesCatalog(input: {
     generatedAt: input.generatedAt,
     counts: {
       total: rows.length,
-      active: rows.filter(row => row.root === 'deliverables').length,
-      archive: rows.filter(row => row.root === 'deliverables-archive').length,
+      active: rows.filter(row => row.root === RUN_BUNDLE_PATHS.deliverables).length,
+      archive: rows.filter(row => row.root === RUN_BUNDLE_PATHS.archive).length,
       unledgered: rows.filter(row => !row.ledgered).length,
       presented: rows.filter(row => row.presented === true).length,
       notPresented: rows.filter(row => row.presented === false).length,

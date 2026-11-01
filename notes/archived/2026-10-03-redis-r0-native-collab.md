@@ -9,7 +9,7 @@ E1/E2（调研卡，已实测）钉死了地基：**会话内守卫真实生效�
 
 ## 四条落地（对应 Redis 卡 R0 清单）
 
-1. **守卫边界进手册**（R0-1）：[公司手册](../../company-workspace/AGENTS.md)「协作规矩」新增**写盘守卫**
+1. **守卫边界进手册**（R0-1）：[公司手册](../../packages/company-pack/content/AGENTS.md)「协作规矩」新增**写盘守卫**
    条（先读再写/盲写拒/stale 拒/会话记账进程重启清零/**管新鲜度不管独占**）；
    [multi-human.md §3](../../docs/multi-human.md)「机制实况」刷新为 E1/E2 实测版（原"read-before-write
    是可选插件的按会话观察"改判：base bundle 常驻 + 行为实测 4/4 绿）。

@@ -2,8 +2,8 @@
 
 > 什么时候读：多个物理人要进同一家公司盘协作、或协作行为不符预期时。路线 = 形态表 → 开门 runbook。
 > 顶层合同：**多个物理人**在同一家公司共享盘上协作的**形态、开门配方、边界与迁移清单**。
-> 人侧归属与授权面的事实家 = [`kb/owners.md`（dev bundle workspace；pack 单源）](../packages/company-pack/workspace/kb/owners.md)；
-> 成员侧的协作规矩 = [`AGENTS.md`（pack 单源）](../packages/company-pack/workspace/AGENTS.md)。
+> 人侧归属与授权面的事实家 = [`kb/owners.md`（dev bundle workspace；pack 单源）](../packages/company-pack/content/state/owners.md)；
+> 成员侧的协作规矩 = [`AGENTS.md`（pack 单源）](../packages/company-pack/content/AGENTS.md)。
 > 来源与取舍（含输掉的方案）= [multi-human-role-routing（已归档）](../notes/archived/2026-09-26-multi-human-role-routing.md)。
 > **不许复杂化**（用户定的）：不搞 client/server、不搞账号体系、**不在 DSH 里造"人"这一层**。
 
@@ -51,7 +51,7 @@
 
 ```sh
 cd <仓库根> && source run/env.sh
-CI=true pnpm company --workspace "$PWD/company-workspace" --no-open   # 端口是环境状态；见下方"端口不是仓库事实"
+CI=true pnpm company --no-open   # 端口是环境状态；见下方"端口不是仓库事实"
 # 启动横幅里会打印带 token 的 URL：http://127.0.0.1:<port>/?token=<token>
 ```
 

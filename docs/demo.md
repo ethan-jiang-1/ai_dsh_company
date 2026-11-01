@@ -23,8 +23,8 @@
 1. `source run/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒）**：
    `pnpm dsh --profile company --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 说明你起的是
    日用 `~/.dsh`（那里另有同名 `web` profile）或 pack 没装。dev profile 已 `link:` 装好，不必再 `plugin add`。
-2. `pnpm company --workspace "$PWD/company-workspace" --no-open`（**端口是环境状态**：`--port 0` 交系统分配，
-   端口/token 从启动横幅读；要固定端口先确认空闲）。启动器会建/验 `company` profile、装/修 pack、
+2. `pnpm company --no-open`（**端口是环境状态**：`--port 0` 交系统分配，
+   端口/token 从启动横幅读；要固定端口先确认空闲）。dev wrapper 只 exec `dsh --profile company`；产品安装/首启按 README/手册，
    把 workspace 登记进 DSH，并在浏览器首屏自动选中目标盘。
 3. 浏览器打开横幅 URL（**必须带 token**）。**不再手点 Choose workspace**：目标 workspace 已在 boot 时登记；
    若侧栏没有，先看启动输出是否报“未指定/未登记/落点不安全”。
@@ -83,7 +83,7 @@
   硬隔离在独立 preset 会话里成立（[design/roles-isolation](./design/roles-isolation.md) §4 分水岭）。
   要让团队内成员拿到完整 preset 面，走 R3 命名委托或上游 seam（D9）。
 - 五人同时在线时模型调用量上升；预算口径见 `kb/org.md`（AI 试点每案 $200/月硬顶）。
-- **交付物三态是硬约定，不是习惯**：`company-workspace/AGENTS.md` 的「交付物三态」一节随每个成员
+- **交付物三态是硬约定，不是习惯**：`packages/company-pack/content/AGENTS.md` 的「交付物三态」一节随每个成员
   会话首帧注入，`node checks/audit/deliverables-check.mjs` 机器核对。写错位置（比如职能自己写 `final.md`、
   或把排练产物平铺在 `deliverables/` 根下）会被判据报出来。
 

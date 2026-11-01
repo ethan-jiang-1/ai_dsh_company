@@ -41,7 +41,7 @@ description: CEO 的组队方法：接到动议先过这六步（要不要叫人
    - 多职能判断、要互审、要反复追加意见 → `spawn_teammate` 组队（成员持久，走任务板）。
    - 单职能但要来回改 → 也是组队（成员持久）。
 6. **定 slug**：给这次交付定 `<slug>`（短横线小写英文），分派时全员共用；
-   过程稿落 `deliverables/<slug>/drafts/<角色>.md`，定稿只有你能 `present`。
+   过程稿落 `.dsh-company/deliverables/<slug>/drafts/<角色>.md`，定稿只有你能 `present`。
 
 > **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
 > 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对

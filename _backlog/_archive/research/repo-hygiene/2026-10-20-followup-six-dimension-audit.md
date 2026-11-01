@@ -20,7 +20,7 @@ intent: "第二轮 fresh-agent 打扫（同日晚，母卡持续跟进）：六�
 证据链（全部本轮实测）：
 
 1. `node checks/smoke/replay-smoke.mjs --scenario r3-delegation` **红**：full 档「归一化日志零 diff」session#1 第 13 行失败（差异在注入手册内容）。
-2. 根因 = 提交 `589d785`（2026-10-20 21:58，手册去重 190→187 行）——手册（`packages/company-pack/workspace/AGENTS.md`，唯一家；company-workspace 是符号链接）是会话注入内容，改它=改回放输入；r3 录制（2026-10-10 重录）含旧手册。
+2. 根因 = 提交 `589d785`（2026-10-20 21:58，手册去重 190→187 行）——手册（`packages/company-pack/content/AGENTS.md`，唯一家；company-workspace 是符号链接）是会话注入内容，改它=改回放输入；r3 录制（2026-10-10 重录）含旧手册。
 3. 上轮审计当天早些时候 r3 曾全绿（14.7s）→ 589d785 是唯一中间变量。
 4. 通路缺口：pre-push hook 只跑 verify+test（不含 replay）；tests/README「改动面→最窄检查」**没有**「pack workspace 制度件/注入面 → replay」行；`replay-scene-liveness` 门禁按设计不跑进程（只证声明↔磁盘一致），r3 的 runnable 声明已失真。
 5. r2 虽绿，但其内容级判据（归一化全量/sidecar）是 presence 档显式 SKIP——**可跑回归网实际 = 1 个场景（r2 presence 档，只守在场板形状）**。

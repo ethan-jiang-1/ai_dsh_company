@@ -69,7 +69,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   it('catalog 未注入模型指令面（T4：workspace 文件仍可被 fs 读取，故不声称不可见）', () => {
     // 2026-10-28 数据设计硬化 M1：catalog 在 workspace 内，模型可经 fs 读到；这里只能断言
     // “没有把它写进指令面”，不能断言“模型不可见”（可见性见 docs/data-model.md 数据卡）。
-    const agents = readFileSync(join(PACK, 'workspace/AGENTS.md'), 'utf8')
+    const agents = readFileSync(join(PACK, 'content/AGENTS.md'), 'utf8')
     expect(agents).not.toContain('deliverables-index')
     for (const role of [...ROLES, 'researcher']) expect(roleYml(role)).not.toContain('deliverables-index')
   })
@@ -254,7 +254,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   })
 
   it('公司手册（模型可见）覆盖五角色职责边界、路由与升级规则——不随内容改动悄悄失效', () => {
-    const handbook = readFileSync(join(ROOT, 'packages/company-pack/workspace/AGENTS.md'), 'utf8')
+    const handbook = readFileSync(join(ROOT, 'packages/company-pack/content/AGENTS.md'), 'utf8')
     for (const role of ['CEO', 'CFO', 'VP-Sales', 'VP-Eng', 'COO']) {
       expect(handbook, `手册缺 ${role} 的职责边界`).toContain(role)
     }
@@ -267,7 +267,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   })
 
   it('交付物三态（R4）：手册写清成品归 CEO、职能写 drafts；模板不再是占位', () => {
-    const handbook = readFileSync(join(ROOT, 'packages/company-pack/workspace/AGENTS.md'), 'utf8')
+    const handbook = readFileSync(join(ROOT, 'packages/company-pack/content/AGENTS.md'), 'utf8')
     // 三态的字面形状必须与产品内词表一致（src/lib/deliverables-catalog.ts 的 META_TYPES/META_RESULTS）
     expect(handbook, '三态必须点明成品路径').toContain('deliverables/<日期>-<slug>/final.md')
     expect(handbook, '三态必须点明过程稿路径').toContain('deliverables/<日期>-<slug>/drafts/<角色>.md')
@@ -279,7 +279,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     const presetGuide = readFileSync(join(ROOT, 'docs/presets.md'), 'utf8')
     expect(presetGuide, 'COO 运营核查必须路由到 COO 专用模板').toContain('产出=运营方案 + 预算核查（`templates/ops-review-note.md`）')
     for (const template of ['prd.md', 'weekly-report.md', 'review-note.md', 'decision-memo.md', 'ops-review-note.md']) {
-      const body = readFileSync(join(ROOT, 'packages/company-pack/workspace/templates', template), 'utf8')
+      const body = readFileSync(join(ROOT, 'packages/company-pack/content/templates', template), 'utf8')
       expect(body, `${template} 仍是占位（模板即流程：写作类工作流的第一版就是它）`).not.toContain('占位')
       expect(body.length, `${template} 太短，像没写完`).toBeGreaterThan(300)
     }
@@ -320,7 +320,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(chairing, '必须说明板面 id 形状 task-N').toContain('task-N')
     expect(chairing, '必须点破"同批建的还没有 id、不许猜"').toMatch(/不许猜|还没有 id/)
     expect(chairing, '必须区分纸面号与板面 id').toContain('纸面号')
-    const handbook = readFileSync(join(ROOT, 'packages/company-pack/workspace/AGENTS.md'), 'utf8')
+    const handbook = readFileSync(join(ROOT, 'packages/company-pack/content/AGENTS.md'), 'utf8')
     expect(handbook, '派活行格式 owner（手册）必须点明 T 号是纸面号').toMatch(/`T<N>` 是纸面号/)
   })
 
@@ -353,7 +353,7 @@ describe('组队健壮性三层防御（2026-10-12 用户裁定；issue 2026-10-
   })
 
   it('B3 · 成员侧打回规范在场（手册：域内核对义务 + 打回三件套 + 不追责）', () => {
-    const handbook = readFileSync(join(ROOT, 'packages/company-pack/workspace', 'AGENTS.md'), 'utf8')
+    const handbook = readFileSync(join(ROOT, 'packages/company-pack/content', 'AGENTS.md'), 'utf8')
     expect(handbook, '缺成员「域内核对」义务（收到分派先答：我的域？判据给我了吗？）')
       .toMatch(/域内核对/)
     expect(handbook, '打回缺三件套形状（为什么不是我 / 缺什么 / 建议谁接）')

@@ -68,7 +68,7 @@
 - **文档**：[运行态地图 §二·五](../../docs/runtime-map.md)（定义 + base/grown 表）、[项目地图](../../docs/project-map.md)、
   [release](../../docs/release.md)、[demo](../../docs/demo.md)、[bootstrap](../../docs/guides/bootstrap.md)、
   [orient](../../docs/orient.md)、[run/README](../../run/README.md)、[runtime/README](../../runtime/README.md)、
-  [pack README](../../packages/company-pack/README.md)、[workspace README](../../packages/company-pack/workspace/README.md)；
+  [pack README](../../packages/company-pack/README.md)、[workspace README](../../packages/company-pack/content/README.md)；
   决策台账 D45。
 
 ## 二修（2026-10-24，验证发现第一版只做对一半）
@@ -109,8 +109,8 @@ workspace 数据层干净了，但 **pack 的基部内容本身漏历史**。这
 | 旧分发件对照 | `_dist` 0.2.0 = **139 条目 / 0 个 workspace**；当前 0.3.1 = **260 / 23** |
 
 **红证（造红 → 还原 → 绿；都实跑）**
-- `run-bundle-clean`：`git add -f company-workspace/AGENTS.md` ⇒
-  `FAIL run-bundle-clean: index 里有 1 件 bundle 数据…：company-workspace/AGENTS.md`；`git rm --cached` ⇒ PASS。
+- `run-bundle-clean`：`git add -f packages/company-pack/content/AGENTS.md` ⇒
+  `FAIL run-bundle-clean: index 里有 1 件 bundle 数据…：packages/company-pack/content/AGENTS.md`；`git rm --cached` ⇒ PASS。
 - `dist-manual`：把手册里的 `bundle.json` 改成 `bundle.removed` ⇒
   `FAIL dist-manual: 手册缺安装形状关键句：bundle.json…`；还原 ⇒ PASS。
 - manifest 不覆盖：去掉 `writeFileSync(..., { flag: 'wx' })` ⇒ 6 条中 1 条红
@@ -171,8 +171,8 @@ DSH 首次 boot 生成的 browser-session grant，**不含 A 的标记**（不�
 `new-032.md` 新建；journal/台账/owners/凭据标记/方法层全在；manifest id/createdAt 不变、pack/skeleton=0.3.2。
 
 **E4 · 门禁变异（造红 → 还原 → 绿）**
-- `company-skeleton`：把 `company-workspace/AGENTS.md` 换成实文件 ⇒ FAIL「不是符号链接」。
-- `run-bundle-clean`：`git add -f company-workspace/AGENTS.md` ⇒ FAIL「index 里有 1 件 bundle 数据」。
+- `company-skeleton`：把 `packages/company-pack/content/AGENTS.md` 换成实文件 ⇒ FAIL「不是符号链接」。
+- `run-bundle-clean`：`git add -f packages/company-pack/content/AGENTS.md` ⇒ FAIL「index 里有 1 件 bundle 数据」。
 - `dist-manual`：手册删 `bundle.json` ⇒ FAIL「缺安装形状关键句」。
 - `base-clean`：pack CEO CHARTER 追加 `- 2026-09-22 · leak-test` ⇒ FAIL「含历史条目」。
 - `handbook-budget`：pack AGENTS 追加 15KB ⇒ FAIL「32937B + 1024B > maxBytes 32768」。

@@ -9,7 +9,7 @@
 |---|---|---|
 | a | 解阻与落盘 | 队列行的"待你裁"是**假阻塞**（形态早在 §形态 自裁）；已转 ▶ 并开工 |
 | b | **成员能不能拉人**（头号机制问题） | 答「**被拒**」——静态三跳 + 活体一次（探针 `scripts/member-inquiry-probe.mjs`，可复跑）；**结论重塑了 demo 形态**，见 §机制结论 |
-| c | `owners.md` v1 单操作者 → **v2 多物理人** | `company-workspace/kb/owners.md`（甲 CEO 线 / 乙 财务线 / 丙 业务与交付线）+ **三条操作口径**；`routing.ts` 的代码副本同步（那份重复事实家已进磨清单） |
+| c | `owners.md` v1 单操作者 → **v2 多物理人** | `company-workspace/.dsh-company/kb/owners.md`（甲 CEO 线 / 乙 财务线 / 丙 业务与交付线）+ **三条操作口径**；`routing.ts` 的代码副本同步（那份重复事实家已进磨清单） |
 | d | 多门 runbook | 合同 [docs/multi-human.md](../../docs/multi-human.md) §2（含最容易漏的"先连工作区 + **必须点 `Edit path`**"） |
 | e | 迁移清单 | 同一合同 §4（要搬 4 类 / **不能搬会话库** / 迁移后第一件事 = 把 owners 的甲乙丙换真名） |
 | f | **一场真动议验收** | slug `sea-reconcile-2026`，见 §后果与验证 |
@@ -235,7 +235,7 @@ CEO 的收口没跑完（`turn/end` 有、`present` 无）。⇒ 手册里那条
 ## 依据
 
 - 机制落点见上（vendor 只读核对，2026-09-26）。
-- 人侧归属：[company-workspace/kb/owners.md](../../company-workspace/kb/owners.md)；
+- 人侧归属：[company-workspace/.dsh-company/kb/owners.md](../../company-workspace/.dsh-company/kb/owners.md)；
   三档与不在场分档 = 公司手册「人机接口」节。
 - 既有裁决：批准即立法（[human-agent-integration](./2026-09-25-human-agent-integration.md)）、
   依赖门槛（借设计不装）、D13 不自造。

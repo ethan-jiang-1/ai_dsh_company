@@ -40,7 +40,7 @@ const DOC_LINE_BUDGETS = [
   ['docs/demo.md', 237],        // 2026-10-21 冻结增长（六维度 Phase D3：无预算合同中最大三份立冻结预算）
   ['docs/multi-human.md', 199], // 2026-10-21 冻结增长
   ['docs/presets.md', 198],     // 2026-10-21 冻结增长（工具面表同轮去历史化）
-  ['packages/company-pack/workspace/AGENTS.md', 190], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面，同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates；2026-10-12 瘦身轮 195→190（机制证据段收指针、证据叙事压缩、陈旧日期戳退役——同 diff Note）
+  ['packages/company-pack/content/AGENTS.md', 190], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面，同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates；2026-10-12 瘦身轮 195→190（机制证据段收指针、证据叙事压缩、陈旧日期戳退役——同 diff Note）
   // ── 2026-10-27 R3-17：入口链与最大合同补预算（原先 852 行 docs 无棘轮；checks/README 已从 193 压到 78）──
   ['checks/README.md', 85],        // 索引（R3-20 瘦身：逐脚本说明回到头注；只留分类 + 链接）
   ['tests/README.md', 100],         // 改动面 → 最窄检查（入口链第四跳）
@@ -49,7 +49,7 @@ const DOC_LINE_BUDGETS = [
   ['docs/release.md', 172],        // 最大未受管合同：发布形状与升 pin 程序
   ['docs/guides/bootstrap.md', 165], // 冷启动配方
   ['docs/delegation.md', 120],     // 汇报线合同
-  ['docs/data-model.md', 76],      // 数据卡合同
+  ['docs/data-model.md', 40],      // 数据卡合同
   ['docs/profile.md', 66],         // host 组合合同
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {

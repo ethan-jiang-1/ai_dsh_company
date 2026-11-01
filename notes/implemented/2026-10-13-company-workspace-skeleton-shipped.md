@@ -8,14 +8,14 @@
 
 | 层 | 内容 | 家 | 进 git | 随包分发 |
 |---|---|---|---|---|
-| ① 出厂骨架 | 手册 `AGENTS.md`、`templates/`、`kb/org.md`、`kb/<角色>/CHARTER.md`×5 | **`packages/company-pack/workspace/`**（唯一真源） | ✅（就是 pack 源码） | ✅（`files` 带 `workspace/**`） |
+| ① 出厂骨架 | 手册 `AGENTS.md`、`templates/`、`kb/org.md`、`kb/<角色>/CHARTER.md`×5 | **`packages/company-pack/content/`**（唯一真源） | ✅（就是 pack 源码） | ✅（`files` 带 `workspace/**`） |
 | ① 起动件 | `kb/owners.md`、`kb/motion-ledger.md`（待填/待写）、空目录 `.gitkeep` | 同上 | ✅ | ✅ |
 | ② 本部署数据 | 填写后的 owners、台账行、`kb/<角色>/journal/`、`deliverables/` | `company-workspace/`（运行盘） | 现状不变（本轮只动 ①） | ❌ |
 | ③ 过程物料 | `deliverables*/**/drafts/**`（含 `sources/` 原始取证） | 运行盘 | 待切片 2（≈70MB / 694 件） | ❌ |
 
-运行盘对 ① 用**符号链接**指回 pack（`company-workspace/AGENTS.md` → `../packages/company-pack/workspace/AGENTS.md`、
+运行盘对 ① 用**符号链接**指回 pack（`packages/company-pack/content/AGENTS.md` → `../packages/company-pack/content/AGENTS.md`、
 `templates`、`kb/org.md` 共 3 处；5 份 `CHARTER.md` 是实文件），
-不复制：一处事实一个家（先例 = 根 `CLAUDE.md`、排练场手册）。角色会话读 `company-workspace/AGENTS.md` 照读（链接透明），
+不复制：一处事实一个家（先例 = 根 `CLAUDE.md`、排练场手册）。角色会话读 `packages/company-pack/content/AGENTS.md` 照读（链接透明），
 而第三方装到的与我们在改的**是同一份**。
 
 **为什么这是"给不同人安装"的硬缺口**：手册是 vendor `agent-instructions` 从**会话 cwd 往上找 `AGENTS.md`**
@@ -34,8 +34,8 @@
 
 1. **md-links 的（路径）排除**：骨架是要**发布到任意磁盘**的运行语料，手册里的相对指针（`../docs/*`）
    是**部署相对**的——在运行盘读到才成立，在 pack 家读到深度没有意义。所以 `tools/lib/markdown-links.mjs`
-   按**路径**排除 `packages/company-pack/workspace`（不按目录名，避免误伤任何叫 workspace 的目录），
-   校验落在运行盘那份（显式加入 `company-workspace/AGENTS.md`，符号链接读到同一内容）。
+   按**路径**排除 `packages/company-pack/content`（不按目录名，避免误伤任何叫 workspace 的目录），
+   校验落在运行盘那份（显式加入 `packages/company-pack/content/AGENTS.md`，符号链接读到同一内容）。
    模板与 CHARTER 实测 **0 条 markdown 链接** ⇒ 无覆盖损失。
 2. **排练场镜像要解引用**：`tools/lib/rehearsal.mjs` 此前 `cpSync` 直接拷制度件；源变成符号链接后
    二次刷新 EEXIST 崩（preset-smoke 首跑现场）。修法 = `copyRef` 先 `realpathSync` 再拷
@@ -55,21 +55,21 @@ converge/orient/排练判据适配 + `drafts-untracked` 门禁）。
 - `node checks/run-gates.mjs`（`pnpm verify`）——**ALL PASS**，含新门禁 `company-skeleton`
   （`PASS company-skeleton 单源 ×3 + 章程 ×5 + 起动件 ×9`、`PASS company-skeleton 随包分发（files 含 workspace/**）`）。
 - 门禁反证三处（红→还原→绿，原话）：
-  ① 运行盘手册换成真副本 ⇒ `FAIL company-skeleton: company-workspace/AGENTS.md 不是符号链接（副本 = 第二本账；运行盘该指回 packages/company-pack/workspace/AGENTS.md）`；
+  ① 运行盘手册换成真副本 ⇒ `FAIL company-skeleton: packages/company-pack/content/AGENTS.md 不是符号链接（副本 = 第二本账；运行盘该指回 packages/company-pack/content/AGENTS.md）`；
   ② `files` 删掉 `workspace/**` ⇒ `FAIL … 的 files 缺 workspace/**——第三方装了插件却没有公司盘骨架`；
-  ③ 删起动件 `owners.md` ⇒ `FAIL … packages/company-pack/workspace/kb/owners.md 缺失（出厂起动件/空目录骨架）`。
+  ③ 删起动件 `owners.md` ⇒ `FAIL … packages/company-pack/content/kb/owners.md 缺失（出厂起动件/空目录骨架）`。
 - 镜像守反证：把 `copyRef` 退回 `cpSync(…, {dereference:true})` ⇒ 新测
   「真盘制度件是符号链接时，镜像落的是实文件」红（`Error: Recursive option not enabled, cannot copy a directory: …/kb/org.md/`）→ 还原绿。
 - `pnpm test` —— **52 files / 514 tests 绿**（含新镜像守）；`preset-smoke`、`client-load-smoke` —— **ALL PASS**。
 - **未跑**（如实登记）：`handbook-smoke`（真模型注入验收；**无 `DEEPSEEK_API_KEY`，阻断**——它才是"注入的确实是手册"那一道，
-  本轮的注入面证据 = 角色会话能读 `company-workspace/AGENTS.md`（链接透明）+ preset-smoke 挂载）；`release-smoke`（切片 3 跑）。
+  本轮的注入面证据 = 角色会话能读 `packages/company-pack/content/AGENTS.md`（链接透明）+ preset-smoke 挂载）；`release-smoke`（切片 3 跑）。
 - 顺带核过（不是本轮引入的）：`deliverables/**/fixtures/**/.ssh/id_ed25519` 是**合成夹具**
   （内容 = `SYNTHETIC-ED25519-FIXTURE-DO-NOT-USE`），是凭据可达性门禁的必需诱饵——"永不提交密钥"要留这条写明条件的例外。
 
 ## 落点
 
-- 骨架：`packages/company-pack/workspace/`（含 `README.md` 说明"是什么 / 装完怎么落盘"）；pack `files` 加 `workspace/**`。
-- 运行盘链接：`company-workspace/AGENTS.md`、`templates`、`kb/org.md`（3 处）；`kb/<角色>/CHARTER.md`×5 是实文件（随包分发，不链接）。
+- 骨架：`packages/company-pack/content/`（含 `README.md` 说明"是什么 / 装完怎么落盘"）；pack `files` 加 `workspace/**`。
+- 运行盘链接：`packages/company-pack/content/AGENTS.md`、`templates`、`kb/org.md`（3 处）；`kb/<角色>/CHARTER.md`×5 是实文件（随包分发，不链接）。
 - 门禁：`checks/run-gates.mjs` 的 `company-skeleton`；走查修复：`tools/lib/markdown-links.mjs`（路径排除）、
   `tools/lib/rehearsal.mjs`（`copyRef` 解引用）+ `tests/harness/foundation-safety.spec.ts`（新守）。
 - 文档：`packages/company-pack/README.md`（owner 表 + 装完第一步）、`docs/project-map.md` 公司盘行。

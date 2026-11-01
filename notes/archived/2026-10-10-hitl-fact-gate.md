@@ -9,7 +9,7 @@
 
 ## 决定
 
-1. **外部正文取不到 = 本部署常态，写进手册**（`company-workspace/AGENTS.md` §工作纪律·取证能力边界）：
+1. **外部正文取不到 = 本部署常态，写进手册**（`packages/company-pack/content/AGENTS.md` §工作纪律·取证能力边界）：
    `web_search` 只回标题+URL；`web_fetch` 对一切域名被沙箱 DNS 策略拦截（25/25 主机名实证，
    含 example.com；报错 = `WEB_BLOCKED_URL`/`resolves to a non-public IP address`）；pack 无 shell 工具；
    浏览器位同过不了 DNS ⇒ **外部事实的唯一获取通道 = HITL 人补料**。依据 = 

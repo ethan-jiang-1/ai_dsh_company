@@ -9,6 +9,7 @@ import {
   type CultivationActionsFactory,
 } from './cultivation-actions.ts'
 import type { FollowLike } from './cultivation-context-data.ts'
+import { RUN_BUNDLE_PATHS } from '../lib/run-bundle-paths.ts'
 import { makeCultivationFiles, makeWorkspaceTextReader, type CultivationFiles } from './cultivation-data.ts'
 
 type CompanyRemote = Parameters<typeof makeCultivationFiles>[0]
@@ -26,8 +27,8 @@ export interface CompanyDataPlaneContext {
 
 /** 两个静态页签的数据面路径（唯一家；面板只读这两份，不自己扫盘——BUG-025 的连线判据）。 */
 export const WORKSPACE_TEXT_PATHS = {
-  ledger: 'kb/motion-ledger.md',
-  catalog: 'kb/deliverables-index.json',
+  ledger: RUN_BUNDLE_PATHS.ledger,
+  catalog: RUN_BUNDLE_PATHS.catalog,
 } as const
 
 /** 数据面输出（页签与公司视图共用同一实现）。 */

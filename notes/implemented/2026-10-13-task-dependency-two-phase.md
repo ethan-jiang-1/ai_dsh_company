@@ -11,7 +11,7 @@ CEO 技能 `chairing-staff-meeting` 第 2 步（拆解分派）改为**两拍落
 3. `task-N` = **板面 id（板子 create 落地时才发号）**；任务书派活行里的 `T1/T2` = **纸面号**——落板前用
    create 的返回或 `team_task_list` 换一次；**同批建的任务彼此还没有 id，不许猜**。
 
-同 diff 在**派活行格式的 owner**（`company-workspace/AGENTS.md`「机器可读派活行」）补一句
+同 diff 在**派活行格式的 owner**（`packages/company-pack/content/AGENTS.md`「机器可读派活行」）补一句
 "`T<N>` 是纸面号——板面 id 是板子发号的 `task-N`，依赖落板前先换号"，让两处说法不再各说各话。
 
 ## 现场（真会话证据，不是推演）
@@ -58,7 +58,7 @@ blocked_by=[task-1,task-2,task-3])` ✅。**但 task-3 的依赖从未落板**�
 ## 落点
 
 - 指令：`packages/company-pack/presets/ceo/skills/chairing-staff-meeting/SKILL.md` 第 2 步。
-- 格式 owner：`company-workspace/AGENTS.md`「机器可读派活行」。
+- 格式 owner：`packages/company-pack/content/AGENTS.md`「机器可读派活行」。
 - keyless 守卫：`tests/presets/presets.spec.ts`「任务依赖必须教"两拍落"」。
 - 机制权威（只读）：`vendor/dsh/packages/experimental/agent-team/src/task-board.ts`（`dependencies()` / id 生成）、
   `vendor/dsh/packages/experimental/tool-agent-team/src/index.ts`（`team_task_create` / `team_task_update` 参数）。

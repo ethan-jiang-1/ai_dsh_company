@@ -20,6 +20,7 @@ import {
   type CultivationRow,
   type FeedbackItem,
 } from '../lib/cultivation.ts'
+import { RUN_BUNDLE_PATHS } from '../lib/run-bundle-paths.ts'
 
 /** `workspaceFiles` remote 的最小结构面（本地声明——照 RoleBadge 惯例不为此引包）。 */
 export interface WorkspaceFilesFace {
@@ -96,9 +97,9 @@ export function makeCultivationFiles(remote: RemoteNamespaceFace, leadOf: (sessi
   }
   const readText = makeWorkspaceTextReader(remote, leadOf)
   return {
-    listJournal: (sessionId, role, signal) => listDir(sessionId, `kb/${role}/journal`, signal),
+    listJournal: (sessionId, role, signal) => listDir(sessionId, `${RUN_BUNDLE_PATHS.kb}/${role}/journal`, signal),
     readHead: (sessionId, path, signal) => readText(path, 240)(sessionId, signal),
-    listRecords: (sessionId, signal) => listDir(sessionId, 'cultivation/records', signal),
+    listRecords: (sessionId, signal) => listDir(sessionId, RUN_BUNDLE_PATHS.records, signal),
     readRecordHead: (sessionId, path, signal) => readText(path, 60)(sessionId, signal),
     readRecord: (sessionId, path, signal) => readText(path, 2000)(sessionId, signal),
   }
@@ -157,7 +158,7 @@ export function useCultivationPanelData(
         listings[role] = names
         if (names !== null) {
           for (const name of names.slice(0, HEAD_LIMIT)) {
-            const text = await files.readHead(sessionId, `kb/${role}/journal/${name}`, controller.signal)
+            const text = await files.readHead(sessionId, `${RUN_BUNDLE_PATHS.kb}/${role}/journal/${name}`, controller.signal)
             if (text !== null) heads[`${role}/${name}`] = text
           }
         }
@@ -171,7 +172,7 @@ export function useCultivationPanelData(
         const summaries: CultivationRecord[] = []
         for (const name of [...recordNames].sort().reverse()) {
           const id = name.replace(/\.md$/, '')
-          const head = await files.readRecordHead(sessionId, `cultivation/records/${name}`, controller.signal)
+          const head = await files.readRecordHead(sessionId, `${RUN_BUNDLE_PATHS.records}/${name}`, controller.signal)
           const summary = head === null ? null : parseRecord(id, head)
           if (summary === null) { broken.push(name); continue }
           summaries.push({ ...summary, bodyTruncated: true })
@@ -187,7 +188,7 @@ export function useCultivationPanelData(
         for (let index = 0; index < summaries.length; index += 1) {
           const summary = summaries[index]!
           if (!full.has(summary.id)) continue
-          const text = await files.readRecord(sessionId, `cultivation/records/${summary.id}.md`, controller.signal)
+          const text = await files.readRecord(sessionId, `${RUN_BUNDLE_PATHS.records}/${summary.id}.md`, controller.signal)
           const record = text === null ? null : parseRecord(summary.id, text)
           if (record !== null) {
             summaries[index] = { ...record, bodyTruncated: false }

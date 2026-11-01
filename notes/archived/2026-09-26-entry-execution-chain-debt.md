@@ -62,7 +62,7 @@ vendor）与**执行链**（取任务 → 判授权 → 实施 → 选验证 →
 | B9 | `ROADMAP.md:11`、`:13-17` | 唯一队列项无 ▶/⏸；§0.5 分支②无法判定；三处文本给出三种动作 | 加状态标记；待裁点写进条目 |
 | B10 | `ROADMAP.md:3` vs `:11/:34` | 文件头把"搁置项"写成可取任务源 | 改为"只从当前条目（及池内项复活条件）读" |
 | B11 | `docs/index.md` 台账 | 缺 **D27**（5 处引用它）——"登记偏离"这个收尾动作的落点坏了 | 补台账行 |
-| B12 | `company-workspace/AGENTS.md:34` vs `:123` | 「固定支出 ≥$500/月 CFO 会签」一处算"签字线"、一处只算"两条必批" ⇒ **公司角色无法判断要不要走 `request_signoff`**（行为级） | 手册内对齐，口径唯一见 `kb/org.md` |
+| B12 | `packages/company-pack/content/AGENTS.md:34` vs `:123` | 「固定支出 ≥$500/月 CFO 会签」一处算"签字线"、一处只算"两条必批" ⇒ **公司角色无法判断要不要走 `request_signoff`**（行为级） | 手册内对齐，口径唯一见 `kb/org.md` |
 | B13 | `snapshots/dag-midflight/`、`notes/implemented/2026-09-26-long-chain-motion-dag-midflight.md:96` | **归档证据与 Note 不符**：`run.json` = `session-41515cf5`（标题「动议观察 · 23684」，卡死场 4/5）；两份 `-nodes.json` 的 7 个节点标题全是「续约 Y」（`renewal-y-2026`）；Note 却称图来自 `ca50e97f`（「DAG 中途形态 · 长链动议 81160」= `sea-entry-2026`）。dev home 无第二套图 | 用 `--session ca50e97f` 重采，或改正 Note；并在快照 README 记明来源 |
 
 ### R · rot（按主题归并）
@@ -74,7 +74,7 @@ vendor）与**执行链**（取任务 → 判授权 → 实施 → 选验证 →
 | R3 死指针与门禁盲区 | 8 | `dev/harness-home/README:4`（`docs/design/10-architecture.md`）；`.gitignore:5`（`guides/60 §7`）；`proposed/README:10`（vendor note MISSING）；`demo.md:12`（`finance-agent-workflow-vp-eng.md` MISSING）；`index:99,121`（`20、30`/`–40` 编号残影）；`snapshots/README:42`（`../../notes/` 应为 `../notes/`）；`architecture:39,208` 两条 vendor 路径 |
 | R4 僵尸待办/时态 | 8 | `architecture:166-170`（"R3 待验证点"，结论早在 `delegation.md §2`）；`delegation:79`（"随升 pin 处理"，已交付）；`delegation:101,102`（"轮末"）；`snapshots/README:43` + `snapshot-motion.mjs:4`（"归 R5"）；`demo.md:1,5`（自述 R4 定稿，实际已有场景 D/E）；`budget-and-ops:38`（驾驶舱旧名）；`README:9`（"全程沿用"） |
 | R5 枚举清单双写 | 6 | `dev-loop:152-153`（六→16）；`dev-loop:159-160`+`rehearsal-init:3`（四→≥8）；`dev-loop:347`（认证档漏 4）；`AGENTS:43-50`（漏 entry-probe/harvest-probe；`node scripts/<名>.mjs` 模板 16 个里 10 个不成立）；`snapshots/README:16-42`（6/16 目录）；`role-content-plan:37-59,64,74`（skills 清单与盘上不符、journal 命名旧式） |
-| R6 矛盾对 | 3 | `profile:21-23` vs `dev-loop:204`（`file:` 硬链接 vs 真拷贝）；`company-workspace/AGENTS.md:34` vs `:123`（=B12）；`tests/presets.spec.ts:43,56,85`（标题"四角色"、用例遍历五项） |
+| R6 矛盾对 | 3 | `profile:21-23` vs `dev-loop:204`（`file:` 硬链接 vs 真拷贝）；`packages/company-pack/content/AGENTS.md:34` vs `:123`（=B12）；`tests/presets.spec.ts:43,56,85`（标题"四角色"、用例遍历五项） |
 | R7 其余 | 7 | `AGENTS:35,52,78,79,81` 五个断指针（§6.5 / §1 第⑥步 / 收尾模板 / 行预算 / 环境状态）；`ROADMAP:6,20/23,41,73,298,313`；`dev-loop:357`（禁物 4 vs 实 5）；`verify.mjs:2,47,48,231`（头注不全 / 预算注释漂 / 状态行只读首物理行）；`index:26,34,58`；`kb/org.md:59` 表结构；`chairing-staff-meeting/SKILL.md:26`；`markdown-links.mjs:14` |
 
 ### N · noise

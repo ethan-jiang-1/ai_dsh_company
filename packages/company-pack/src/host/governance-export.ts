@@ -25,7 +25,7 @@ const EXPORT_README = `# 治理导出（derived）
 
 /** 导出可接受的最小账本读取面（domain store / 测试桩）。 */
 export interface ExportLedgerSource {
-  readonly kind: 'domain' | 'legacy'
+  readonly kind: 'domain' | 'file' | 'legacy'
   read(): PresentedLedgerState
 }
 

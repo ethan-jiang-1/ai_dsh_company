@@ -12,6 +12,7 @@ import {
 } from '../../packages/company-pack/src/client/deliverables-index.ts'
 import { sessionFileAddress } from '../../packages/company-pack/src/lib/deliverables-address.ts'
 import { buildDeliverablesCatalog } from '../../tools/lib/deliverables-catalog.mjs'
+import { RUN_BUNDLE_PATHS } from '../../packages/company-pack/src/lib/run-bundle-paths.ts'
 
 /**
  * 成品目录的 keyless 层（2026-10-19 成品台账卡）：
@@ -25,18 +26,18 @@ const CATALOG = parseCatalog(JSON.stringify({
   entries: [
     {
       slug: 'ledgered-one', kickoff: '2026-10-19', type: '诊断', result: '已完成',
-      summary: '一句结论一：这是看板上的成品摘要。', root: 'deliverables',
-      dir: '2026-10-19-ledgered-one', path: 'deliverables/2026-10-19-ledgered-one/final.md', ledgered: true, presented: true,
+      summary: '一句结论一：这是看板上的成品摘要。', root: RUN_BUNDLE_PATHS.deliverables,
+      dir: '2026-10-19-ledgered-one', path: `${RUN_BUNDLE_PATHS.deliverables}/2026-10-19-ledgered-one/final.md`, ledgered: true, presented: true,
     },
     {
       slug: 'archive-two', kickoff: '2026-10-12', type: '生产', result: '已采纳',
-      summary: '一句结论二：归档件。', root: 'deliverables-archive',
-      dir: '2026-10-12-archive-two', path: 'deliverables-archive/2026-10-12-archive-two/final.md', ledgered: false, presented: false,
+      summary: '一句结论二：归档件。', root: RUN_BUNDLE_PATHS.archive,
+      dir: '2026-10-12-archive-two', path: `${RUN_BUNDLE_PATHS.archive}/2026-10-12-archive-two/final.md`, ledgered: false, presented: false,
     },
     {
       slug: 'active-three', kickoff: '2026-10-19', type: '口径问答', result: '判不了',
-      summary: '一句结论三：台账外。', root: 'deliverables',
-      dir: '2026-10-19-active-three', path: 'deliverables/2026-10-19-active-three/final.md', ledgered: false, presented: null,
+      summary: '一句结论三：台账外。', root: RUN_BUNDLE_PATHS.deliverables,
+      dir: '2026-10-19-active-three', path: `${RUN_BUNDLE_PATHS.deliverables}/2026-10-19-active-three/final.md`, ledgered: false, presented: null,
       metaProblem: '结果不在词表：「完成」',
     },
   ],
@@ -52,7 +53,7 @@ describe('parseCatalog', () => {
 
   it('缺字段的条目跳过；ledgered 缺省按 true（不让缺字段的旧索引全变成台账外）', () => {
     const parsed = parseCatalog(JSON.stringify({
-      schema: 1, generatedAt: 'x', entries: [{ slug: 's', path: 'deliverables/s/final.md' }, { slug: '', path: 'x' }],
+      schema: 1, generatedAt: 'x', entries: [{ slug: 's', path: `${RUN_BUNDLE_PATHS.deliverables}/s/final.md` }, { slug: '', path: 'x' }],
     }))
     expect(parsed?.entries).toHaveLength(1)
     expect(parsed?.entries[0]?.ledgered).toBe(true)
@@ -133,7 +134,7 @@ describe('generator → parser 契约', () => {
   it('工具生成的真实形状可被页签 parser 解析（条目字段；counts 由视图现算、不解析）', () => {
     const built = buildDeliverablesCatalog({
       entries: [{
-        root: 'deliverables',
+        root: RUN_BUNDLE_PATHS.deliverables,
         dir: '2026-10-20-contract',
         fields: new Map([['slug', 'contract'], ['kickoff', '2026-10-20'], ['类型', '决策'], ['结果', '已采纳'], ['一句话结论', '一句结论']]),
         final: true,
@@ -145,7 +146,7 @@ describe('generator → parser 契约', () => {
     const parsed = parseCatalog(JSON.stringify(built))
     expect(parsed?.entries).toEqual([{
       slug: 'contract', kickoff: '2026-10-20', type: '决策', result: '已采纳', summary: '一句结论',
-      root: 'deliverables', dir: '2026-10-20-contract', path: 'deliverables/2026-10-20-contract/final.md',
+      root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-20-contract', path: `${RUN_BUNDLE_PATHS.deliverables}/2026-10-20-contract/final.md`,
       ledgered: true, presented: true, metaProblem: null,
     }])
   })

@@ -57,8 +57,8 @@ describe('client 面（R3：委派工具卡）', () => {
     expect(await read(WORKSPACE_TEXT_PATHS.ledger, 240)('s' as never, signal)).toBe('x')
     expect(await read(WORKSPACE_TEXT_PATHS.catalog, 2000)('s' as never, signal)).toBe('x')
     expect(seen).toEqual([
-      { path: 'kb/motion-ledger.md', limit: 240 },
-      { path: 'kb/deliverables-index.json', limit: 2000 },
+      { path: '.dsh-company/kb/motion-ledger.md', limit: 240 },
+      { path: '.dsh-company/kb/deliverables-index.json', limit: 2000 },
     ])
     const tab = readFileSync(join(PACK, 'src/client/LedgerTab.tsx'), 'utf8')
     expect(tab, 'LedgerTab 必须经 parseMotionLedger 解析（否则读的可能是别的表）').toContain('parseMotionLedger')

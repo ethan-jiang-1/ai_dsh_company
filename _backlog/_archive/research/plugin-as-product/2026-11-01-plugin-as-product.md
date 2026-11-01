@@ -445,7 +445,7 @@ Host 侧只认 `DSH_COMPANY_HOME`（启动器负责 1/3/4），缺省时**不写
 - `packages/company-pack/cordis.patch.yml`：注册 row、`cultivationRoot` 保持现状（不搬）。
 - `packages/company-pack/presets/*/agent.cordis.yml`：`instructionFileCandidates` 加
   `COMPANY.md`（碰撞感知）；`customSkillDirs` 保持 home。
-- `packages/company-pack/workspace/AGENTS.md`：**不改名**；文档补充“已有项目里的 seed 目标可能
+- `packages/company-pack/content/AGENTS.md`：**不改名**；文档补充“已有项目里的 seed 目标可能
   是 `COMPANY.md`”。
 
 ### 7.2 启动器 / 工具
@@ -486,7 +486,7 @@ Host 侧只认 `DSH_COMPANY_HOME`（启动器负责 1/3/4），缺省时**不写
 | `AGENTS.md` | 布局块（`bin/`、`company-workspace` 说明）、命令表（`pnpm company`、`--profile company`）、vendor/安装指针 |
 | `_dist/安装手册.md` | 由 `export-dist` 重写：product home、company profile、workspace 参数/询问、v2 bundle、无 rebind、workspace 业务备份 + home 治理导出、卸载保留 workspace |
 | `packages/company-pack/README.md` | Install/Config/Data/Backup/Uninstall 全部换新形状；`DSH_COMPANY_HOME` 必填；方法层/账本留 home + 导出 |
-| `packages/company-pack/workspace/README.md` | 用户 workspace 说明：run bundle 在此、手册目标（`AGENTS.md`/`COMPANY.md` 碰撞）、`.dsh-company/`、备份/迁移 |
+| `packages/company-pack/content/README.md` | 用户 workspace 说明：run bundle 在此、手册目标（`AGENTS.md`/`COMPANY.md` 碰撞）、`.dsh-company/`、备份/迁移 |
 | 手册目标（`AGENTS.md` 优先；已有则 `COMPANY.md`） | 不改 pack 源文件名；文档写清碰撞 seed 与两份并存时的加载顺序 |
 | `docs/profile.md` | 部署形状：产品安装（company profile + 独立 home/一 workspace）、dev 形状、standalone 退役/别名；`web` 不再是产品入口 |
 | `docs/runtime-map.md` | run bundle 重定义（workspace + `.dsh-company/bundle.json` + 公司盘）；home = DSH 运行时 + host 治理；首启/登记/选择时序 |
@@ -607,7 +607,7 @@ DSH_HOME=$T/h node vendor/dsh/apps/cli/lib/bin.js \
    spawn `dsh --profile company`，设 `DSH_HOME`、`DSH_COMPANY_HOME`、cwd=workspace。
 5. `--reset` 只删带标记（`.company-home`）的 home；不删 workspace；无标记非空 home 拒绝接管。
 
-启动器交付：repo 形态 tools/company.mjs（计划新增）；安装形态包 `bin/dsh-company.mjs`
+启动器交付：repo 形态 tools/company.mjs（计划新增）；安装形态包 bin/dsh-company.mjs（历史，已删除）
 （计划新增）。包 `bin` 会被 `dsh plugin add` 链到 `profiles/company/node_modules/.bin/`
 （**T**，2026-11-01 小包实测），所以安装形态的入口路径可行；本包尚未集成，集成后加
 `company-entry-smoke`（`--help` / 建 profile / 装 pack / 无参报错 / 不写日用 home）。
@@ -805,7 +805,7 @@ TTY 询问；无 TTY 且无值 → 非零退出 + 两条命令。**Host 只认 `
 - [运行态地图](../../../../docs/runtime-map.md)、[数据模型](../../../../docs/data-model.md)、
   [profile 合同](../../../../docs/profile.md)、[发布合同](../../../../docs/release.md)
 - [公司包 README](../../../../packages/company-pack/README.md)、
-  [公司盘 README](../../../../packages/company-pack/workspace/README.md)
+  [公司盘 README](../../../../packages/company-pack/content/README.md)
 - [run/README](../../../../run/README.md)、[runtime/README](../../../../runtime/README.md)
 - [安装手册（生成物）](../../../../_dist/安装手册.md)
 

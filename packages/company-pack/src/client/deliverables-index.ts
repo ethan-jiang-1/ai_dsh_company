@@ -5,6 +5,7 @@
  * 这里是 client 侧读模型：只做 JSON → 目录 → 筛选，不 import React、不做 I/O。
  * host 侧生成器仍是 `lib/deliverables-catalog.ts`（build from disk），两者没有互相依赖。
  */
+import { RUN_BUNDLE_PATHS } from '../lib/run-bundle-paths.ts'
 
 /** 一条成品目录项（与 `tools/lib/deliverables-catalog.mjs` 同形）。 */
 export interface DeliverablesCatalogEntry {
@@ -13,7 +14,7 @@ export interface DeliverablesCatalogEntry {
   readonly type: string
   readonly result: string
   readonly summary: string
-  readonly root: 'deliverables' | 'deliverables-archive'
+  readonly root: typeof RUN_BUNDLE_PATHS.deliverables | typeof RUN_BUNDLE_PATHS.archive
   readonly dir: string
   readonly path: string
   readonly ledgered: boolean
@@ -48,7 +49,7 @@ export function parseCatalog(text: string): DeliverablesCatalog | null {
   for (const item of value.entries) {
     if (item === null || typeof item !== 'object') continue
     const row = item as Record<string, unknown>
-    const root = row.root === 'deliverables-archive' ? 'deliverables-archive' : 'deliverables'
+    const root = row.root === RUN_BUNDLE_PATHS.archive ? RUN_BUNDLE_PATHS.archive : RUN_BUNDLE_PATHS.deliverables
     const textOf = (key: string): string => (typeof row[key] === 'string' ? row[key] : '')
     const slug = textOf('slug')
     const path = textOf('path')
@@ -76,8 +77,8 @@ export function parseCatalog(text: string): DeliverablesCatalog | null {
 
 /** 过滤目录项。 */
 export function filterCatalog(entries: readonly DeliverablesCatalogEntry[], filter: CatalogFilter): readonly DeliverablesCatalogEntry[] {
-  if (filter === 'active') return entries.filter(entry => entry.root === 'deliverables')
-  if (filter === 'archive') return entries.filter(entry => entry.root === 'deliverables-archive')
+  if (filter === 'active') return entries.filter(entry => entry.root === RUN_BUNDLE_PATHS.deliverables)
+  if (filter === 'archive') return entries.filter(entry => entry.root === RUN_BUNDLE_PATHS.archive)
   if (filter === 'unledgered') return entries.filter(entry => !entry.ledgered)
   if (filter === 'unpresented') return entries.filter(entry => entry.presented === false)
   return entries

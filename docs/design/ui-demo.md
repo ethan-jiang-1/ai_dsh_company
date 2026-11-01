@@ -94,7 +94,7 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 
 ## 3. 演示分镜（一场 demo 怎么走）
 
-1. 开 `pnpm company --workspace "$PWD/company-workspace" --no-open`（company profile；**端口是环境状态**，系统分配后从启动横幅读——见 guides/bootstrap），首屏开 CEO 会话（ceo preset）。
+1. 开 `pnpm company --no-open`（company profile；**端口是环境状态**，系统分配后从启动横幅读——见 guides/bootstrap），首屏开 CEO 会话（ceo preset）。
 2. 输入一个公司级动议（"评估把 X 产品线扩展到欧洲"）。
 3. 观众看到 CEO：拆解（todo/plan）→ `spawn_teammate` 建出四位职能 VP（名册五行 = CEO + 四职能）→
    任务板落任务（blockedBy 依赖可视化）→ 给各 VP 发初始 brief。

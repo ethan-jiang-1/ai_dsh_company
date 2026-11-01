@@ -21,18 +21,17 @@
 | 查看已运行页面 | [cdp-probe](../probes/browser-visual/cdp-probe.mjs)；指南 = [CDP 指南](../docs/guides/cdp-probe.md) |
 | 确认录制行为与工作区判据 | [replay-smoke](smoke/replay-smoke.mjs)（当前仅 headless 合成场景） |
 | 审计动议输出与角色留痕 | [deliverables-check](audit/deliverables-check.mjs) · [authorship-audit](audit/authorship-audit.mjs) · [journal-audit](audit/journal-audit.mjs) |
-| 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs) · [lifecycle-smoke](smoke/lifecycle-smoke.mjs) · [standalone-smoke](smoke/standalone-smoke.mjs) · [export-dist](../tools/export-dist.mjs) |
-| 从目录隔离启动公司实例 | `pnpm standalone` → [standalone](../tools/standalone.mjs) |
-| **按产品形状启动（独立 company profile + 自有 workspace）** | `pnpm company` → [company](../tools/company.mjs)：解析/询问 workspace → 建/验 profile → 装 pack → 设 home env → 起 web |
-| 产品入口端到端（启动器建 profile/装 pack/workspace/seed/一 home 一 workspace） | [company-entry-smoke](smoke/company-entry-smoke.mjs)（keyless，~1-2 分钟） |
+| 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs) · [export-dist](../tools/export-dist.mjs) |
+| **dev 启动** | `pnpm company --no-open` → [company](../tools/company.mjs)：只 exec `dsh --profile company`；不建 profile/不装包/不问 workspace |
+| 产品入口端到端（真 tarball 装 profile → `dsh --profile company` → workspace/run bundle） | [company-entry-smoke](smoke/company-entry-smoke.mjs)（keyless，~1-2 分钟） |
 
 ## 清单（分区 = 目录本身；逐脚本说明 = 各自头注）
 
 **冒烟 / 真实入口**（`checks/smoke/`，28 个）
 [attention-e2e](smoke/attention-e2e-smoke.mjs) · [channel-matrix](smoke/channel-matrix-smoke.mjs) · [client-load](smoke/client-load-smoke.mjs) · [concurrent-home](smoke/concurrent-home-smoke.mjs) · [delegation](smoke/delegation-smoke.mjs) · [entry-probe](smoke/entry-probe-smoke.mjs) · [external-workspace](smoke/external-workspace-smoke.mjs)
-[handbook](smoke/handbook-smoke.mjs) · [human-loop-e2e](smoke/human-loop-e2e-smoke.mjs) · [interrupted-install](smoke/interrupted-install-smoke.mjs) · [isolation-matrix](smoke/isolation-matrix-smoke.mjs) · [lifecycle](smoke/lifecycle-smoke.mjs) · [multi-install](smoke/multi-install-smoke.mjs) · [multi-window-banner](smoke/multi-window-banner-smoke.mjs)
+[human-loop-e2e](smoke/human-loop-e2e-smoke.mjs) · [interrupted-install](smoke/interrupted-install-smoke.mjs) · [isolation-matrix](smoke/isolation-matrix-smoke.mjs) · [multi-install](smoke/multi-install-smoke.mjs) · [multi-window-banner](smoke/multi-window-banner-smoke.mjs)
 [permissions-recovery](smoke/permissions-recovery-smoke.mjs) · [presence-e2e](smoke/presence-e2e-smoke.mjs) · [present-catalog](smoke/present-catalog-smoke.mjs) · [preset](smoke/preset-smoke.mjs) · [probe](smoke/probe-smoke.mjs) · [profile-row](smoke/profile-row-smoke.mjs) · [refactor-drift-oracle](smoke/refactor-drift-oracle.mjs)
-[release](smoke/release-smoke.mjs) · [replay](smoke/replay-smoke.mjs) · [revoke-recovery](smoke/revoke-recovery-smoke.mjs) · [snapshot-motion](smoke/snapshot-motion-smoke.mjs) · [standalone](smoke/standalone-smoke.mjs) · [ui-scene](smoke/ui-scene-smoke.mjs) · [upgrade-while-running](smoke/upgrade-while-running-smoke.mjs)
+[release](smoke/release-smoke.mjs) · [replay](smoke/replay-smoke.mjs) · [revoke-recovery](smoke/revoke-recovery-smoke.mjs) · [snapshot-motion](smoke/snapshot-motion-smoke.mjs) · [ui-scene](smoke/ui-scene-smoke.mjs) · [upgrade-while-running](smoke/upgrade-while-running-smoke.mjs)
 
 **盘面审计**（`checks/audit/`，4 个）
 [authorship-audit](audit/authorship-audit.mjs) · [candidate-scan-eval](audit/candidate-scan-eval.mjs) · [deliverables-check](audit/deliverables-check.mjs) · [journal-audit](audit/journal-audit.mjs)
@@ -54,7 +53,7 @@
 
 **维护工具**（`tools/`，17 个）
 [ask-latency](../tools/ask-latency.mjs) · [bundle-init](../tools/bundle-init.mjs) · [converge](../tools/converge.mjs) · [deliverables-index](../tools/deliverables-index.mjs) · [diagnose](../tools/diagnose.mjs) · [export-dist](../tools/export-dist.mjs) · [notes-audit](../tools/notes-audit.mjs) · [orient](../tools/orient.mjs) · [propose-sampler](../tools/propose-sampler.mjs)
-[prune-runtime](../tools/prune-runtime.mjs) · [rehearsal-init](../tools/rehearsal-init.mjs) · [release](../tools/release.mjs) · [session-log-export](../tools/session-log-export.mjs) · [snapshot-motion](../tools/snapshot-motion.mjs) · [snapshot-path](../tools/snapshot-path.mjs) · [standalone](../tools/standalone.mjs) · [sync-dsh](../tools/sync-dsh.mjs)
+[prune-runtime](../tools/prune-runtime.mjs) · [rehearsal-init](../tools/rehearsal-init.mjs) · [release](../tools/release.mjs) · [session-log-export](../tools/session-log-export.mjs) · [snapshot-motion](../tools/snapshot-motion.mjs) · [snapshot-path](../tools/snapshot-path.mjs) · [sync-dsh](../tools/sync-dsh.mjs)
 
 **结构门禁**（`checks/gates/`，52 个模块）：清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，
 接线一致性由 `gate-wiring` 门禁强制。pin 常量 = [gates/lib/pin.mjs](gates/lib/pin.mjs)。
@@ -74,7 +73,7 @@
 
 | 触发条件 | 该做什么 |
 |---|---|
-| 真实盘**待处理 > 30 条**（或已采纳 > 5 个） | 折叠开始挡东西 ⇒ 先决定上**筛选**（优先于分页）。量法 `ls company-workspace/cultivation/records \| wc -l`；依据 = [场景轮 Note](../notes/implemented/2026-10-18-cultivation-scenario-audit.md) 追加十四 |
+| 真实盘**待处理 > 30 条**（或已采纳 > 5 个） | 折叠开始挡东西 ⇒ 先决定上**筛选**（优先于分页）。量法 `ls company-workspace/.dsh-company/cultivation/records \| wc -l`；依据 = [场景轮 Note](../notes/implemented/2026-10-18-cultivation-scenario-audit.md) 追加十四 |
 | 再攒 **~20 场真实收口仍 0 次自发提案** | 考虑在 persona/技能加一句引导（先查是不是被别的机制压住）。先跑 [propose-sampler](../tools/propose-sampler.mjs) 看分箱；依据 = 同上 追加十六 |
 | **升 pin** 或动培养面（面板 / host / preset 工具行） | 复跑四档真入口：[cultivation-gui](../probes/browser-visual/cultivation-gui-probe.mjs)、[cultivation-ux-walkthrough](../probes/browser-visual/cultivation-ux-walkthrough.mjs)、[cultivation-ux-scenarios](../probes/browser-visual/cultivation-ux-scenarios.mjs)、[cultivation-method-layer](../probes/session-context/cultivation-method-layer-probe.mjs)；动 preset 另跑 [preset-smoke](smoke/preset-smoke.mjs) |
 | 想复核**问询窗口 120s** 还要不要改 | `node tools/ask-latency.mjs`（只读报数，不改配置）；依据 = [BUG-021 Note](../notes/implemented/2026-10-18-bug021-timed-user-question.md) |

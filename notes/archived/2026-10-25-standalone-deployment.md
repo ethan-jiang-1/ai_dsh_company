@@ -92,7 +92,7 @@ node checks/smoke/standalone-smoke.mjs
 
 - [tools/standalone.mjs](../../tools/standalone.mjs) + `pnpm standalone`：`--home`/`--workspace`/`--port`/`--no-open`/`--provision-only`/`--no-build`/`--reset`/`--help`；doctor 查 Node/vendor CLI/web dist/vendor client bundles/pack 产物；隔离 `DSH_HOME`，自建 `web` profile，`link:` 指回当前 pack，`DSH_COMPANY_BOOTSTRAP=if-missing` 让 host copy 骨架；`--reset` 只删带 `.standalone-home` 标记的 home，拒绝接管已有 DSH 数据的 home。
 - [standalone-smoke.mjs](../../checks/smoke/standalone-smoke.mjs)：临时 `HOME` + 隔离 home；provision → 改坏 link → relink → boot/RPC（五角色 + researcher、`session/create`）→ reset；断言不写日用 `~/.dsh`。
-- 身份：新增 [kb/company.md](../../packages/company-pack/workspace/kb/company.md)（公司名/产品名/样例标记）；手册标题改为「公司手册」并指向它；[CompanyView](../../packages/company-pack/src/client/CompanyView.tsx) 读该文件显示公司名，读不到显示「非公司盘 / 身份未配置」；[DeliverablesTab](../../packages/company-pack/src/client/DeliverablesTab.tsx) 的缺索引错误提示确认 workspace。
+- 身份：新增 [kb/company.md](../../packages/company-pack/content/state/company.md)（公司名/产品名/样例标记）；手册标题改为「公司手册」并指向它；[CompanyView](../../packages/company-pack/src/client/CompanyView.tsx) 读该文件显示公司名，读不到显示「非公司盘 / 身份未配置」；[DeliverablesTab](../../packages/company-pack/src/client/DeliverablesTab.tsx) 的缺索引错误提示确认 workspace。
 - 形状矩阵：[bootstrap.md](../../docs/guides/bootstrap.md) 顶部「先选形状」表；[profile.md](../../docs/profile.md) 部署形状表加「目录独立启动」行；`bundle-init` 头注标维护者专用。
 - 索引：[checks/README.md](../../checks/README.md) 登记 `standalone` 与 `standalone-smoke`。
 

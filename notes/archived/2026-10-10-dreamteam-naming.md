@@ -16,7 +16,7 @@
    client-load-smoke 与 cdp-probe 的断言字面同 diff）。标签页标题 = 前端 dist 构建（vite）烤入；
    应用内主标题 = ui-layout client 包（vendor client 构建）烤入。
 4. **指令基线守卫换锚**：`tools/lib/entry-probe.mjs` 的公司手册标题字面 → `# 梦之队 · 公司手册`
-   （spec 与 `company-workspace/AGENTS.md` 标题三方同 diff）。
+   （spec 与 `packages/company-pack/content/AGENTS.md` 标题三方同 diff）。
 5. **历史证据不改**：snapshots/、deliverables-archive/、journal、authorship 兼容 fixture 里的
    `wochen` 是冻结样本（署名正则本就不匹配公司名字面），保持原样。D14 Note 名字部分由此
    **部分取代**（互链 = 该 Note 顶部指针行）；显示名序列化机制仍以 D14 为 owner。

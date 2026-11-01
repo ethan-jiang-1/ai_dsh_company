@@ -23,7 +23,7 @@ description: CEO 的外部取证打法清单：动议要外部事实时的换通
 7. **DoH + IP 直连（TLS SNI 墙时的招）**：`curl -sS 'https://223.5.5.5/resolve?name=<域>&type=A'`
    拿真 IP，再 `curl --resolve <域>:443:<IP>` 钉 SNI（上轮取证已验证网络层可用）。
 8. **HITL（最后手段）+ 主动唤醒**：以上穷尽仍拿不到 ⇒ 走「事实阻塞闸门」：任务标**「待补料」**、
-   发一张补料卡（料落 `deliverables/<slug>/drafts/sources/`），**并用 schedule 工具立一条真跟进**
+   发一张补料卡（料落 `.dsh-company/deliverables/<slug>/drafts/sources/`），**并用 schedule 工具立一条真跟进**
    ——schedule 任务的 **title 必须含 `待补料·<slug>·<T号>`**（审计锚，schedule.json 可查），
    prompt 按「执行类照跑，决策类排队」分写：
    - **执行类**（报告/查料/读档）——prompt 直写行动："到点检查 `sources/<料名>` 是否存在；存在 ⇒
@@ -35,6 +35,6 @@ description: CEO 的外部取证打法清单：动议要外部事实时的换通
 
 ## 落盘形状
 
-- 原文/文件 → `deliverables/<slug>/drafts/sources/<来源名>.<ext>`（文件名带来源）；
+- 原文/文件 → `.dsh-company/deliverables/<slug>/drafts/sources/<来源名>.<ext>`（文件名带来源）；
 - 命令与结果 → 同目录 `FETCH-LOG.md`（命令原文 + 状态码 + 字节数——下一轮照抄即可复现）；
 - 事实分级表 → 各角色稿件的 §事实节（等级 + URL 逐条对应）。

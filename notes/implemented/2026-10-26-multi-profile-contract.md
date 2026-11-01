@@ -36,7 +36,7 @@
 
 ## 未执行 / 边界
 
-- **Windows**：未执行；本机 Darwin。静态事实：`tools/standalone.mjs` 显式拒绝 win32；release/standalone smoke
+- **Windows**：未执行；本机 Darwin。静态事实：tools/standalone.mjs（0.6.0 已删除） 显式拒绝 win32；release/standalone smoke
   依赖 POSIX 进程组。不能声称 Windows 可用。
 - **容器**：Docker CLI 在，但 daemon 不可用（`docker info` 连接失败）；未跑 Linux 容器。
 - **预构建离线**：边界 = `_dist` tarball + 已安装 DSH/base；不把 DSH 本体打进公司包。空 store/无网的安装

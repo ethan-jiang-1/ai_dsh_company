@@ -1,47 +1,38 @@
 /**
- * 公司盘守卫与 run bundle 身份（2026-10-27 拆出；2026-11-01 产品化改版）。
+ * 运行前提守卫（2026-11-01 v3）。
  *
- * 产品化后的运行前提：
- * - workspace 必须由启动器/环境显式给出（`DSH_COMPANY_HOME`）；没有默认 `<home>/company-workspace`；
- * - manifest 在 `<workspace>/.dsh-company/bundle.json`（v2）；home 里的 v1 可在 workspace 匹配时迁移；
- * - `DSH_COMPANY_REBIND` 退役：设置时只告警，不执行旧逻辑；
- * - 方法层/账本留 home（D25/M2）；workspace 只放业务产物 + 派生导出；
+ * - workspace 由 `DSH_COMPANY_HOME` / 启动 cwd / saved 解析；不再由 launcher/TTY 提供；
+ * - 没有 workspace 时不写盘：应用照常起，等 Client picker 选目录后由可见的 session/onboarding
+ *   路径再初始化（本模块只表达“当前没有”的停写态）；
+ * - manifest 在 `<workspace>/.dsh-company/bundle.json`（v3）；v2 只警告待升级，不阻塞；
+ * - 方法层/账本留 home（D25/M2）；workspace 只放 run bundle；
  * - 没有 workspace / manifest 坏 / lease 败时 dataBlocked = 停写公司数据（DSH 会话仍可用）。
  *
- * 边界：只做**启动前提与一次性副作用**（告警、迁移、lease effect），不注册工具/命令、不写业务数据。
+ * 边界：只做启动前提与 lease effect；不注册工具/命令、不写业务数据。
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
-import {
-  chooseHandbookTarget,
-  resolveCompanyHome,
-  validateCompanyHome,
-  type HandbookTarget,
-} from './bootstrap.ts'
-import {
-  identityBackupPath,
-  migrateLegacyManifest,
-  readBundleManifestState,
-  type BundleManifestState,
-} from './bundle-manifest.ts'
+import { validateCompanyHome } from './bootstrap.ts'
+import { identityBackupPath, readBundleManifestState, type BundleManifestState } from './bundle-manifest.ts'
 import { acquireCompanyLease } from './lease.ts'
 import { profilesWithCompanyPack } from './profiles.ts'
 import { canonicalPath } from './paths.ts'
-
-const env = (name: string): string | undefined => (process.env as Record<string, string | undefined>)[name]
+import { resolveWorkspace, type WorkspaceSource } from './workspace-resolution.ts'
 
 /** 一次 apply 的运行前提（后续注册与自举都从这里取事实）。 */
 export interface CompanyRuntime {
   readonly dshHome: string
-  /** 显式 workspace；未设置/不存在时为空串（调用方必须看 dataBlocked）。 */
-  readonly companyHome: string
+  /** 解析到的 workspace（绝对 canonical）；没有时为空串。 */
+  readonly workspace: string
+  /** 兼容旧调用点的别名；新代码用 `workspace`。 */
   readonly expectedWorkspace: string
+  readonly source: WorkspaceSource
   readonly dataBlocked: boolean
   readonly bundleState: BundleManifestState | undefined
-  readonly handbookTarget: HandbookTarget
   readonly hasWorkspace: boolean
+  readonly resolutionError?: string
 }
 
 /** 告警落 logger + stderr（启动输出里必须能看到数据分裂/停写风险）。 */
@@ -53,7 +44,6 @@ function warn(ctx: Context, message: string): void {
 /** 解析并校验运行前提；告警直接落 logger/stderr，不抛错（停写由 dataBlocked 表达）。 */
 export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
   const dshHome = resolveDshHome()
-  const configured = resolveCompanyHome(dshHome)
   const lease = acquireCompanyLease(dshHome)
   let dataBlocked = false
   if (!lease.acquired) {
@@ -64,95 +54,78 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
     if (typeof effect === 'function') effect.call(ctx, () => () => lease.release())
   }
 
-  if (env('DSH_COMPANY_REBIND') !== undefined) {
-    warn(ctx, 'company-pack：DSH_COMPANY_REBIND 已退役（manifest 现在跟 workspace 走）；本次忽略该变量，'
-      + '不会改写任何盘。搬 workspace 请用启动器重新指定路径并重新登记。')
-  }
-
-  if (configured === undefined) {
-    warn(ctx, 'company-pack：未指定公司 workspace（DSH_COMPANY_HOME 为空）；本次不写自举/身份/目录。'
-      + '用 `pnpm company --workspace <dir>` 或显式 `DSH_HOME=… DSH_COMPANY_HOME=… dsh --profile company` 启动。')
+  const resolution = resolveWorkspace({ dshHome })
+  if (resolution.workspace === undefined) {
+    const why = resolution.source === 'env'
+      ? (resolution.error ?? 'DSH_COMPANY_HOME 无效')
+      : '未指定 workspace（DSH_COMPANY_HOME 为空，cwd 不是可用项目目录，也没有已保存选择）'
+    warn(ctx, `company-pack：${why}；本次不写 run bundle/身份/登记。`
+      + '在项目目录执行 `dsh --profile company`、设 DSH_COMPANY_HOME，或从侧栏选择 workspace。')
     return {
       dshHome,
-      companyHome: '',
+      workspace: '',
       expectedWorkspace: '',
+      source: resolution.source,
       dataBlocked: true,
       bundleState: undefined,
-      handbookTarget: 'AGENTS.md',
       hasWorkspace: false,
+      ...(resolution.error === undefined ? {} : { resolutionError: resolution.error }),
     }
   }
 
+  const configured = resolution.workspace
   const check = validateCompanyHome(dshHome, configured)
   if (!check.ok) {
-    warn(ctx, `company-pack：公司 workspace 落点不安全（${check.error}）；公司数据已停写`)
+    warn(ctx, `company-pack：workspace 落点不安全（${check.error}）；公司数据已停写`)
     dataBlocked = true
   }
   if (!existsSync(configured)) {
-    warn(ctx, `company-pack：公司 workspace 不存在：${configured}；本次不写盘。`
-      + '先由启动器创建/选择目录，或手工 `mkdir -p` 后重试。')
+    warn(ctx, `company-pack：workspace 不存在：${configured}；本次不写盘。`)
     return {
       dshHome,
-      companyHome: configured,
+      workspace: configured,
       expectedWorkspace: configured,
+      source: resolution.source,
       dataBlocked: true,
       bundleState: undefined,
-      handbookTarget: 'AGENTS.md',
       hasWorkspace: false,
     }
   }
 
-  const companyHome = canonicalPath(configured)
-  let bundleState = readBundleManifestState(companyHome)
-  // 已有 v2 manifest 时，手册目标以 manifest 为准（否则第二次 boot 会把 AGENTS 当“已有项目”
-  // 再补一份 COMPANY.md，造成双手册）。没有 manifest 时才按碰撞选择；v1 迁移沿用 AGENTS。
-  let handbookTarget = bundleState.status === 'ok'
-    ? bundleState.manifest.handbookTarget
-    : chooseHandbookTarget(companyHome)
-  if (bundleState.status === 'missing') {
-    const migration = migrateLegacyManifest({ dshHome, companyHome, handbookTarget: 'AGENTS.md' })
-    if (migration.migrated) {
-      ctx.logger?.info?.(`company-pack：v1 bundle manifest 已迁移到 ${companyHome}/.dsh-company/bundle.json`
-        + `（旧文件 ${migration.legacyPath ?? '保留'}；id/createdAt 保留）`)
-      bundleState = readBundleManifestState(companyHome)
-      if (bundleState.status === 'ok') handbookTarget = bundleState.manifest.handbookTarget
-    } else if (migration.skippedReason !== undefined) {
-      ctx.logger?.info?.(`company-pack：未迁移 v1 manifest（${migration.skippedReason}）`)
-    }
-  }
+  const workspace = canonicalPath(configured)
+  const bundleState = readBundleManifestState(workspace)
   if (bundleState.status === 'corrupt') {
-    const backup = bundleState.path.endsWith('.json')
-      ? join(dshHome, 'company/identity') : join(dshHome, 'company/identity')
     warn(ctx, `company-pack：bundle.json 损坏，已保留原文件并停写公司数据（${bundleState.path}：${bundleState.error}）；`
-      + `修好后重启，或从 home 身份备份恢复（${backup}/<bundle-id>.json，仅作恢复参考）`)
+      + `修好后重启，或从 home 身份备份恢复（${join(dshHome, 'company/identity')}/<bundle-id>.json，仅作恢复参考）`)
     dataBlocked = true
   }
   if (bundleState.status === 'unsupported') {
-    warn(ctx, `company-pack：bundle.json 是更高版本（v${String(bundleState.version)}，本包支持 v${String(2)}），`
+    warn(ctx, `company-pack：bundle.json 是更高版本（v${String(bundleState.version)}，本包支持 v3），`
       + '已保留原文件并跳过身份/升级；请安装匹配的新版 pack，或从备份恢复 manifest')
     dataBlocked = true
   }
+  if (bundleState.status === 'legacy') {
+    ctx.logger?.info?.('company-pack：检测到 v2 run bundle 身份；本次原地升级为 v3（旧文件备份 bundle.v2.json）')
+  }
 
   if (!check.ok) dataBlocked = true
-  // 2026-10-28 M3 起方法层是公司级（同 home 共享）；仍点名多 profile，避免会话/偏好分叉。
   try {
     const profiles = profilesWithCompanyPack(join(dshHome, 'profiles'))
     if (profiles.length > 1) {
       warn(ctx, `company-pack：同一个 home 里有 ${String(profiles.length)} 个 profile 装了本包`
-        + `（${profiles.join('、')}）；方法层/记录/公司盘都是公司级共享；建议固定一个 company profile`)
+        + `（${profiles.join('、')}）；方法层/记录/账本都是公司级共享；建议固定一个 company profile`)
     }
   } catch (error) {
     ctx.logger?.warn?.(`company-pack profile 体检跳过（不影响运行）：${(error as Error).message}`)
   }
 
-  const expectedWorkspace = companyHome
   return {
     dshHome,
-    companyHome,
-    expectedWorkspace,
+    workspace,
+    expectedWorkspace: workspace,
+    source: resolution.source,
     dataBlocked,
     bundleState,
-    handbookTarget,
     hasWorkspace: true,
   }
 }

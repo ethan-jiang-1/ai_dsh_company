@@ -209,13 +209,10 @@ function verify() {
     ['verify', ['pnpm', ['verify'], false]],
     ['test', ['pnpm', ['test'], false]],
     ['release-smoke', [process.execPath, ['checks/smoke/release-smoke.mjs'], true]],
-    ['lifecycle-smoke', [process.execPath, ['checks/smoke/lifecycle-smoke.mjs'], true]],
-    ['standalone-smoke', [process.execPath, ['checks/smoke/standalone-smoke.mjs'], true]],
     ['client-load-smoke', [process.execPath, ['checks/smoke/client-load-smoke.mjs'], true]],
     ['preset-smoke', [process.execPath, ['checks/smoke/preset-smoke.mjs'], true]],
     ['present-catalog-smoke', [process.execPath, ['checks/smoke/present-catalog-smoke.mjs'], false]],
   ]
-  if (withKey) commands.push(['handbook-smoke', [process.execPath, ['checks/smoke/handbook-smoke.mjs'], true]])
   const checks = {}
   for (const [name, [command, argv, needsEnv]] of commands) {
     console.log(`\n── ${name} ──`)

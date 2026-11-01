@@ -1,40 +1,32 @@
 /**
- * presented 账本 domain 通道（2026-10-28 数据设计硬化 M2）：
- * - 声明合法（name/version/layout）；
- * - 旧 W 账本一次性迁入 domain，旧文件保留（回滚/只读）；
- * - 迁移后 domain 是权威：模型写旧 W 文件不改变账本；
- * - storageDomain 缺席/打开失败 → 旧文件降级并告警。
+ * presented 账本 v3（per-workspace，host-only）：
+ * - domain `company_run_bundle_ledger` v1，按 workspace key 分区；
+ * - storageDomain 缺席/打开失败 → `<DSH_HOME>/company/ledger/<hash>.json`（仍不在 workspace）；
+ * - `record`/`audit` 只写 store；模型写 workspace 文件不会改账本；
+ * - 两个 workspace 的账本不串。
  */
-import { existsSync } from 'node:fs'
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
   auditLedger,
   createPresentedLedgerStore,
   ensureLedger,
+  ledgerFilePath,
+  ledgerKey,
   presentedDomain,
   recordLedger,
   type PresentedLedgerStore,
 } from '../../packages/company-pack/src/host/presented-domain.ts'
-import {
-  readPresentedLedger,
-  writePresentedLedger,
-  type PresentedLedger,
-} from '../../packages/company-pack/src/host/catalog.ts'
+import { RUN_BUNDLE_PATHS } from '../../packages/company-pack/src/lib/run-bundle-paths.ts'
 import { createTempEnv, type TempEnv } from '../support/temp-env.ts'
 
 let env: TempEnv
-
 beforeEach(() => { env = createTempEnv('presented-domain-') })
 afterEach(() => { env.cleanup() })
 
-const legacyLedger: PresentedLedger = {
-  schema: 1,
-  updatedAt: '2026-10-28T00:00:00.000Z',
-  paths: { 'deliverables/2026-10-28-alpha/final.md': false },
-  slugs: {},
-}
+const rel = `${RUN_BUNDLE_PATHS.deliverables}/2026-10-28-alpha/final.md`
 
-/** 最小假 domain：只实现 store 用到的 get/put/close。 */
 function fakeDomain(): { records: Map<string, unknown>; handle: unknown } {
   const records = new Map<string, unknown>()
   const table = {
@@ -44,7 +36,7 @@ function fakeDomain(): { records: Map<string, unknown>; handle: unknown } {
   return {
     records,
     handle: {
-      name: 'company_deliverables',
+      name: presentedDomain.name,
       table: () => table,
       close: async () => {},
     },
@@ -63,77 +55,79 @@ function ctxWith(facility: unknown): { ctx: unknown; warns: string[] } {
   }
 }
 
-async function domainStoreWith(facility: unknown): Promise<PresentedLedgerStore> {
+async function domainStoreWith(facility: unknown, workspace = env.workspace): Promise<PresentedLedgerStore> {
   const { ctx } = ctxWith(facility)
-  return await createPresentedLedgerStore(ctx as never, env.home, env.workspace)
+  return await createPresentedLedgerStore(ctx as never, env.home, workspace)
 }
 
-describe('presented domain 声明与 store', () => {
-  it('domain 名/版本/布局是稳定契约', () => {
-    expect(presentedDomain.name).toBe('company_deliverables')
+describe('presented domain v3', () => {
+  it('domain 名/版本/按 workspace 的表是稳定契约', () => {
+    expect(presentedDomain.name).toBe('company_run_bundle_ledger')
     expect(presentedDomain.version).toBe(1)
-    expect(presentedDomain.layout).toBe('single')
+    expect(Object.keys(presentedDomain.tables)).toEqual(['ledgers'])
   })
 
-  it('旧 W 账本迁入 domain：false 保留、旧文件仍在', async () => {
-    writePresentedLedger(env.workspace, legacyLedger)
+  it('missing → 空账本 + needsScan；domain 记录按 workspace key 写入', async () => {
     const domain = fakeDomain()
     const store = await domainStoreWith({ open: async () => domain.handle })
     expect(store.kind).toBe('domain')
-    const bootstrap = await ensureLedger(env.workspace, store)
-    expect(bootstrap.migrated).toBe(true)
-    expect(bootstrap.ledger.paths['deliverables/2026-10-28-alpha/final.md']).toBe(false)
-    expect(domain.records.get('state')).toMatchObject({ paths: { 'deliverables/2026-10-28-alpha/final.md': false } })
-    expect(existsSync(`${env.workspace}/kb/deliverables-presented.json`)).toBe(true)
+    const bootstrap = await ensureLedger(store)
+    expect(bootstrap.needsScan).toBe(true)
+    expect(domain.records.get(ledgerKey(env.workspace))).toMatchObject({ workspace: env.workspace, paths: {} })
   })
 
-  it('迁移后 domain 是权威：模型改旧 W 文件不影响 store', async () => {
-    writePresentedLedger(env.workspace, legacyLedger)
+  it('record 后 domain 是权威；模型写 workspace 旧文件不影响 store', async () => {
     const domain = fakeDomain()
     const store = await domainStoreWith({ open: async () => domain.handle })
-    await ensureLedger(env.workspace, store)
-    await recordLedger(env.workspace, store, { paths: ['deliverables/2026-10-28-alpha/final.md'] })
-    expect(store.read()).toMatchObject({ status: 'ok' })
-    expect((store.read() as { ledger: PresentedLedger }).ledger.paths['deliverables/2026-10-28-alpha/final.md']).toBe(true)
-
-    // 模拟模型 fs 写旧 W 账本（false）——domain 不应被改。
-    writePresentedLedger(env.workspace, { ...legacyLedger, paths: { 'deliverables/2026-10-28-alpha/final.md': false } })
-    expect((store.read() as { ledger: PresentedLedger }).ledger.paths['deliverables/2026-10-28-alpha/final.md']).toBe(true)
+    await ensureLedger(store)
+    await recordLedger(store, { paths: [rel] })
+    expect((store.read() as { ledger: { paths: Record<string, boolean> } }).ledger.paths[rel]).toBe(true)
+    mkdirSync(join(env.workspace, RUN_BUNDLE_PATHS.kb), { recursive: true })
+    writeFileSync(join(env.workspace, RUN_BUNDLE_PATHS.presented), JSON.stringify({ schema: 1, updatedAt: 'x', paths: { [rel]: false }, slugs: {} }))
+    expect((store.read() as { ledger: { paths: Record<string, boolean> } }).ledger.paths[rel]).toBe(true)
   })
 
-  it('人侧 audit 写 domain；true 带 slug、false 只认 path', async () => {
+  it('人侧 audit 写 store；true 带 slug、false 只认 path；非法路径拒绝', async () => {
     const domain = fakeDomain()
     const store = await domainStoreWith({ open: async () => domain.handle })
-    await ensureLedger(env.workspace, store)
-    const audited = await auditLedger(env.workspace, store, 'deliverables/2026-10-28-alpha/final.md', false)
-    expect(audited.path).toBe('deliverables/2026-10-28-alpha/final.md')
-    const record = domain.records.get('state') as PresentedLedger
-    expect(record.paths['deliverables/2026-10-28-alpha/final.md']).toBe(false)
-    expect(record.slugs).toEqual({})
+    await ensureLedger(store)
+    const audited = await auditLedger(env.workspace, store, rel, false)
+    expect(audited.path).toBe(rel)
+    const state = store.read() as { ledger: { paths: Record<string, boolean>; slugs: Record<string, boolean> } }
+    expect(state.ledger.paths[rel]).toBe(false)
+    expect(state.ledger.slugs).toEqual({})
+    const flipped = await auditLedger(env.workspace, store, rel, true)
+    expect(flipped.ledger?.slugs.alpha).toBe(true)
+    expect((await auditLedger(env.workspace, store, 'notes/not-final.md', false)).warning).toContain('deliverables')
   })
 
-  it('storageDomain 缺席 → legacy store + 告警', async () => {
+  it('storageDomain 缺席 → host-only 文件 store + 告警', async () => {
     const { ctx, warns } = ctxWith(undefined)
     const store = await createPresentedLedgerStore(ctx as never, env.home, env.workspace)
-    expect(store.kind).toBe('legacy')
+    expect(store.kind).toBe('file')
+    expect(store.workspace).toBe(env.workspace)
     expect(warns.some(message => message.includes('storageDomain'))).toBe(true)
+    expect(ledgerFilePath(env.home, env.workspace)).toContain(join(env.home, 'company/ledger'))
+    expect(existsSync(ledgerFilePath(env.home, env.workspace))).toBe(false)
   })
 
-  it('domain 打开失败 → legacy store + 告警（降级不静默）', async () => {
+  it('domain 打开失败 → host-only 文件 store + 告警（降级不静默）', async () => {
     const { ctx, warns } = ctxWith({ open: async () => { throw new Error('backend down') } })
     const store = await createPresentedLedgerStore(ctx as never, env.home, env.workspace)
-    expect(store.kind).toBe('legacy')
+    expect(store.kind).toBe('file')
     expect(warns.some(message => message.includes('domain 打开失败'))).toBe(true)
   })
 
-  it('legacy fallback 仍可读写旧 W 账本（回退路径）', async () => {
-    writePresentedLedger(env.workspace, legacyLedger)
+  it('文件 fallback 可读写，且两个 workspace 的账本不串', async () => {
+    const other = join(env.dir, 'other-workspace')
+    mkdirSync(other, { recursive: true })
     const { ctx } = ctxWith(undefined)
-    const store = await createPresentedLedgerStore(ctx as never, env.home, env.workspace)
-    const bootstrap = await ensureLedger(env.workspace, store)
-    expect(bootstrap.ledger.paths['deliverables/2026-10-28-alpha/final.md']).toBe(false)
-    await recordLedger(env.workspace, store, { paths: ['deliverables/2026-10-28-alpha/final.md'] })
-    expect(readPresentedLedger(env.workspace)).toMatchObject({ status: 'ok' })
-    expect((readPresentedLedger(env.workspace) as { ledger: PresentedLedger }).ledger.paths['deliverables/2026-10-28-alpha/final.md']).toBe(true)
+    const a = await createPresentedLedgerStore(ctx as never, env.home, env.workspace)
+    const b = await createPresentedLedgerStore(ctx as never, env.home, other)
+    await ensureLedger(a)
+    await ensureLedger(b)
+    await recordLedger(a, { paths: [rel] })
+    expect((a.read() as { ledger: { paths: Record<string, boolean> } }).ledger.paths[rel]).toBe(true)
+    expect((b.read() as { ledger: { paths: Record<string, boolean> } }).ledger.paths[rel]).toBeUndefined()
   })
 })

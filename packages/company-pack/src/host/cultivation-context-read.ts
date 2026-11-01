@@ -5,7 +5,7 @@
  * 命令闭包里，读背景的判据与命令分发混在一起；拆出后命令处理器只留「命令语义 + 分发」，
  * 背景读取的错误文案与证据口径在这里一处维护。
  *
- * 边界：只读（sessionQuery 观测 / `kb/deliverables-index.json`），不写任何文件、不碰方法层。
+ * 边界：只读（sessionQuery 观测 / `RUN_BUNDLE_PATHS.catalog`），不写任何文件、不碰方法层。
  */
 import { isRecord } from '../lib/guards.ts'
 import type { Context } from '@deepseek-ai/cordis'
@@ -20,6 +20,7 @@ import {
 } from '../lib/cultivation-context.ts'
 import { roleLabel } from '../lib/cultivation.ts'
 import { ROSTER } from './cultivation-storage.ts'
+import { RUN_BUNDLE_PATHS } from '../lib/run-bundle-paths.ts'
 
 /** 背景读取的 host 最小读面（sessionQuery 懒取；缺席 = 明确报错，不静默降级）。 */
 interface SessionObservationLike {
@@ -111,11 +112,11 @@ async function readSessionContext(query: SessionQueryLike, ref: CultivationConte
   return { context }
 }
 
-/** 成品背景：只认 `kb/deliverables-index.json` 里的条目（不做任意文件读）。 */
+/** 成品背景：只认 `RUN_BUNDLE_PATHS.catalog` 里的条目（不做任意文件读）。 */
 function readDeliverableContext(companyRoot: string, ref: CultivationContextRef): ContextRead {
   let raw: unknown
   try {
-    raw = JSON.parse(readFileSync(join(companyRoot, 'kb', 'deliverables-index.json'), 'utf8'))
+    raw = JSON.parse(readFileSync(join(companyRoot, RUN_BUNDLE_PATHS.catalog), 'utf8'))
   } catch {
     return { problem: '读不到成品目录（生成器未跑或索引缺失）——仍可选会话，或直接手写。' }
   }

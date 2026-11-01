@@ -38,7 +38,7 @@ A（pack 侧 runtime context 注入）/ B（上游 seam）**未批**，留案见
 
 三处落点（**手册持规则正文**；另两处只持各自的动作与列口径）：
 
-1. **公司手册「日期口径」**（`company-workspace/AGENTS.md` §协作规矩）：全角色规则——没有取真日期
+1. **公司手册「日期口径」**（`packages/company-pack/content/AGENTS.md` §协作规矩）：全角色规则——没有取真日期
    的通道 ⇒ 不许推算 / 不许"取次日" / 不许凭记忆猜；取不到真日期时文件名与正文首行一律用占位
    `日期待核`，真日期由轮末收敛或人回填；**宁缺勿错**。
 2. **CEO skill `chairing-staff-meeting` 记账步**：只留 CEO 侧动作（文件名 `日期待核-<slug>.md` +

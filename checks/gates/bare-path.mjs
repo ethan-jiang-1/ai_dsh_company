@@ -23,7 +23,7 @@ const NOTES_CURRENCY_EFFECTIVE_DATE = '2026-10-09'
 // budget-and-ops 引的 workflow-worker-thread 同样成空壳）——门禁边界与叙述边界不重合 = 盲区。
 // 同时收窄匹配器，避免扩面后自带假阳性：跳过 `{a,b}` 花括号展开，剥掉 `path:12-34` 的引文行号后缀。
 export const NOW_FILES = (() => {
-  const out = ['AGENTS.md', 'README.md', 'ROADMAP.md', 'packages/company-pack/workspace/AGENTS.md',
+  const out = ['AGENTS.md', 'README.md', 'ROADMAP.md', 'packages/company-pack/content/AGENTS.md',
     'snapshots/README.md', 'runtime/README.md', 'runtime/harness-home/README.md', 'packages/company-pack/README.md',
     'packages/company-pack/src/README.md'].filter(f => existsSync(join(root, f)))
   const walkMd = (dir) => !existsSync(dir) || !lstatSync(dir).isDirectory() ? [] : readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
@@ -74,7 +74,7 @@ export const NOW_FILES = (() => {
       return m !== null && m[1] >= NOTES_CURRENCY_EFFECTIVE_DATE
     }),
     walkMd(join(root, '_backlog')).filter(p => !p.startsWith('_backlog/_archive/')),
-    walkMd(join(root, 'packages/company-pack/workspace')),
+    walkMd(join(root, 'packages/company-pack/content')),
   )
 })()
 /** Historical bare receipts are observed; rendered Markdown navigation still uses the hard link gate. */

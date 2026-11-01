@@ -69,7 +69,7 @@
 
 | 漂移源 | 证据（期望 vs 实际） |
 |---|---|
-| `company-workspace/AGENTS.md` 涨过注入预算 | 现 **19879 字节** > 16384 ⇒ 截断行文案变了（录制里是 `16757→15991`，现在是另一组数） |
+| `packages/company-pack/content/AGENTS.md` 涨过注入预算 | 现 **19879 字节** > 16384 ⇒ 截断行文案变了（录制里是 `16757→15991`，现在是另一组数） |
 | `workspace_doors` 工具入表（BUG-002 修复，10-06） | `tool-schemas` 第 1403 行：期望 `"write"` / 实际 `"workspace_doors"` |
 | persona 文本演进 | `system-prompt#1` 第 7 行：期望一句行事口径 / 实际「目录里若见 team 工具…」 |
 | **vendor DSH 工具描述演进** | `foundation-workspace`：`bash` description 期望「no state (cwd, variables, functions)」/ 实际「pass `workdir` instead of using `cd`」 |

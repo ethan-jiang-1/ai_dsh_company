@@ -10,7 +10,7 @@
 import { META_RESULTS, META_TYPES, slugFromDirName } from './deliverables.mjs'
 
 /** 目录条目的根（活跃 / 归档）。 */
-export const CATALOG_ROOTS = ['deliverables', 'deliverables-archive']
+export const CATALOG_ROOTS = ['.dsh-company/deliverables', '.dsh-company/deliverables-archive']
 
 /** 一条成品目录项。 */
 /**
@@ -20,7 +20,7 @@ export const CATALOG_ROOTS = ['deliverables', 'deliverables-archive']
  * @property {string} type meta「类型」
  * @property {string} result meta「结果」
  * @property {string} summary meta「一句话结论」
- * @property {'deliverables'|'deliverables-archive'} root
+ * @property {'.dsh-company/deliverables'|'.dsh-company/deliverables-archive'} root
  * @property {string} dir 目录名（含日期前缀）
  * @property {string} path final.md 的 workspace 相对路径
  * @property {boolean} ledgered 是否在动议台账里
@@ -46,7 +46,7 @@ export function metaProblemsOf(fields) {
 /**
  * 把交付物扫描结果折成稳定目录（按 kickoff 倒序、同日起 slug 升序）。
  * @param {object} input
- * @param {ReadonlyArray<{ root: 'deliverables'|'deliverables-archive', dir: string, fields: Map<string,string>, final: boolean, presented?: boolean|null }>} input.entries 扫描结果（fields 来自 parseMeta）
+ * @param {ReadonlyArray<{ root: '.dsh-company/deliverables'|'.dsh-company/deliverables-archive', dir: string, fields: Map<string,string>, final: boolean, presented?: boolean|null }>} input.entries 扫描结果（fields 来自 parseMeta）
  * @param {ReadonlySet<string>} input.ledgerSlugs 动议台账里的 slug 集合
  * @param {string} input.generatedAt ISO 时间
  * @returns {{ schema: 1, generatedAt: string, counts: { total: number, active: number, archive: number, unledgered: number, presented: number, notPresented: number, presentUnknown: number }, entries: CatalogEntry[] }}
@@ -77,8 +77,8 @@ export function buildDeliverablesCatalog({ entries, ledgerSlugs, generatedAt }) 
     generatedAt,
     counts: {
       total: rows.length,
-      active: rows.filter(row => row.root === 'deliverables').length,
-      archive: rows.filter(row => row.root === 'deliverables-archive').length,
+      active: rows.filter(row => row.root === '.dsh-company/deliverables').length,
+      archive: rows.filter(row => row.root === '.dsh-company/deliverables-archive').length,
       unledgered: rows.filter(row => !row.ledgered).length,
       presented: rows.filter(row => row.presented === true).length,
       notPresented: rows.filter(row => row.presented === false).length,

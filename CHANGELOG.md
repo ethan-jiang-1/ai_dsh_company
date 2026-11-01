@@ -2,6 +2,22 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.6.0 — 2026-11-01
+
+### Changed
+
+- **DSH-native 产品入口**：删除 package bin / 产品启动器。安装默认 DSH **Plugins** 页（web/Desktop
+  同一句）；CLI `dsh plugin --profile company add <tgz>` 仅 `dsh web` 自动化。启动 = `dsh --profile company`。
+- **workspace 是启动输入**：`DSH_COMPANY_HOME` → 启动 cwd → 保存的最近选择 → DSH Workspace picker；
+  Host boot 不等用户；无 `--workspace` flag、无 TTY 询问。一个安装 = 一个公司，可顺序服务多个 workspace。
+- **插件内容与 run bundle 分家**：手册/模板/默认章程/状态默认值住 pack `content/`，不复制到 workspace；
+  run bundle 全部收进 `<workspace>/.dsh-company/`（`kb/`、`deliverables/`、`cultivation/`、`logs/`、
+  `exports/`、`overrides/`、`bundle.json` v3）；workspace 根不再出现产品文件。
+- **presented 账本按 workspace 分区**：新 domain `company_run_bundle_ledger` v1（或
+  `<DSH_HOME>/company/ledger/<hash>.json`）；方法层/账本仍留 home（D25/M2）。
+- **0.5.0 布局不自动迁移**：旧根目录骨架/旧 manifest/旧账本原样保留；新 workspace 重新开始，或按
+  安装手册手工搬 `.dsh-company/`。版本 0.6.0 是破坏性改版。
+
 ## 0.5.0 — 2026-11-01
 
 ### Changed

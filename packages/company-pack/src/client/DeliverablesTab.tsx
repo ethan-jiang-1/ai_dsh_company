@@ -28,6 +28,7 @@ import {
   type DeliverablesCatalog,
   type DeliverablesCatalogEntry,
 } from './deliverables-index.ts'
+import { RUN_BUNDLE_PATHS } from '../lib/run-bundle-paths.ts'
 
 /** 页签体注入面。 */
 export interface DeliverablesTabInjected {
@@ -83,8 +84,8 @@ export function DeliverablesView({ catalog, sessionId, openFinal }: {
   const entries = catalog.entries
   const counts = useMemo(() => ({
     total: entries.length,
-    active: entries.filter(entry => entry.root === 'deliverables').length,
-    archive: entries.filter(entry => entry.root === 'deliverables-archive').length,
+    active: entries.filter(entry => entry.root === RUN_BUNDLE_PATHS.deliverables).length,
+    archive: entries.filter(entry => entry.root === RUN_BUNDLE_PATHS.archive).length,
     unledgered: entries.filter(entry => !entry.ledgered).length,
     presented: entries.filter(entry => entry.presented === true).length,
     notPresented: entries.filter(entry => entry.presented === false).length,
@@ -144,12 +145,12 @@ export function DeliverablesView({ catalog, sessionId, openFinal }: {
                       key={entry.path}
                       role="listitem"
                       className="wk-row wk-deliverable-row"
-                      aria-label={`${entry.kickoff} ${entry.slug}，${entry.type || '未分型'}，${entry.result || '未填结果'}${entry.root === 'deliverables-archive' ? '，归档' : ''}${entry.ledgered ? '' : '，台账外'}${entry.presented === true ? '，已 present' : entry.presented === false ? '，未 present' : '，present 未核'}`}
+                      aria-label={`${entry.kickoff} ${entry.slug}，${entry.type || '未分型'}，${entry.result || '未填结果'}${entry.root === RUN_BUNDLE_PATHS.archive ? '，归档' : ''}${entry.ledgered ? '' : '，台账外'}${entry.presented === true ? '，已 present' : entry.presented === false ? '，未 present' : '，present 未核'}`}
                     >
                       <span className="wk-row-name">
                         <Tag tone={resultTone(entry.result)}>{entry.result || '未填'}</Tag>
                         <span className="wk-deliverable-slug" title={entry.slug}>{entry.slug}</span>
-                        {entry.root === 'deliverables-archive' && <Tag tone="outline">归档</Tag>}
+                        {entry.root === RUN_BUNDLE_PATHS.archive && <Tag tone="outline">归档</Tag>}
                         {!entry.ledgered && <Tag tone="warning">台账外</Tag>}
                         {entry.presented === false && <Tag tone="warning">未 present</Tag>}
                         {entry.presented === null && <Tag tone="outline">present 未核</Tag>}

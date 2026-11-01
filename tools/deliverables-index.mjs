@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 何时跑：新增/归档成品、改 meta.md 后，或一轮收敛末尾；维护者跑（生成物，不手改）。
-// 作用：扫描 `company-workspace/deliverables/` 与 `deliverables-archive/` 的 final.md + meta.md，
-//   生成 `company-workspace/kb/deliverables-index.json`；公司页签「成品」只读这份索引。
+// 作用：扫描 `company-workspace/.dsh-company/deliverables/` 与 `deliverables-archive/` 的 final.md + meta.md，
+//   生成 `company-workspace/.dsh-company/kb/deliverables-index.json`；公司页签「成品」只读这份索引。
 // 口径：成品 = 有 final.md；present 状态**复用** checks/audit/deliverables-check.mjs --json 的判据（不另写一套）；
 //   审计不可得（未 source run/env.sh 等）时 presented=null，面板显示「未核」，不冒充已 present。
 // 用法：node tools/deliverables-index.mjs
@@ -17,7 +17,7 @@ import { buildDeliverablesCatalog, CATALOG_ROOTS } from './lib/deliverables-cata
 // 测试缝（2026-10-23）：converge 的端到端探针把工作区重定向到 runtime/ 下的临时目录。
 // 默认值不变；只有显式设了 DELIVERABLES_WS_REL 才重定向（converge 会把它传给本生成器）。
 const WORKSPACE = join(ROOT, process.env.DELIVERABLES_WS_REL ?? 'company-workspace')
-const OUT = join(WORKSPACE, 'kb', 'deliverables-index.json')
+const OUT = join(WORKSPACE, '.dsh-company', 'kb', 'deliverables-index.json')
 
 /**
  * 跑审计档拿 present 背书集合（单一判据 = checks/audit/deliverables-check.mjs）。
@@ -77,13 +77,13 @@ for (const root of CATALOG_ROOTS) {
   }
 }
 
-const ledgerPath = join(WORKSPACE, 'kb', 'motion-ledger.md')
+const ledgerPath = join(WORKSPACE, '.dsh-company', 'kb', 'motion-ledger.md')
 const catalog = buildDeliverablesCatalog({
   entries,
   ledgerSlugs: existsSync(ledgerPath) ? ledgerSlugs(readFileSync(ledgerPath, 'utf8')) : new Set(),
   generatedAt: new Date().toISOString(),
 })
 
-mkdirSync(join(WORKSPACE, 'kb'), { recursive: true })
+mkdirSync(join(WORKSPACE, '.dsh-company', 'kb'), { recursive: true })
 writeFileSync(OUT, `${JSON.stringify(catalog, null, 2)}\n`, 'utf8')
 console.log(JSON.stringify({ path: relative(ROOT, OUT), ...catalog.counts }, null, 2))

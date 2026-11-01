@@ -48,7 +48,7 @@ args:   { "agentId": "<SessionId>", "callId": "<toolCallId>",
 
 **归因纪律（本次两条红分开归因，不混为"漂移"）**：① 我这次的有意变更 = tool schema；② **既有漂移**（非本轮引入）=
 公司手册 2026-10-16 新增两节早于夹具，两处注入体的**正文 + `source.digest`** 同步到当前值——硬证 = 现场解压日志里的
-注入体与当前 `company-workspace/AGENTS.md` **逐字节一致**（digest 取现场同值）。台账记于
+注入体与当前 `packages/company-pack/content/AGENTS.md` **逐字节一致**（digest 取现场同值）。台账记于
 r3 回放场景的 snapshot.yml（2026-10-18 条；该场景已随真实证据移出产品仓，2026-10-25）。
 
 ## 真模型验收（2026-10-18 补跑；探针 = `probes/session-context/ask-user-timed-probe.mjs`）

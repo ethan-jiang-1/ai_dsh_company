@@ -67,7 +67,7 @@ RFC/实施。**本卡不是实施授权。**
 
 **范围**
 - `_dist/安装手册.md` + `tools/export-dist.mjs` 模板 + `dist-manual` 关键句 + sha/清单；
-- 根 `README.md`、`packages/company-pack/README.md`、`packages/company-pack/workspace/README.md`；
+- 根 `README.md`、`packages/company-pack/README.md`、`packages/company-pack/content/README.md`；
 - `docs/profile.md`、`runtime-map.md`、`data-model.md`、`release.md`、`project-map.md`、`index.md`、
   `decisions.md`、`external-research.md`、`orient.md`、`demo.md`、`guides/{bootstrap,environments,
   release-runbook}.md`；active docs 的 stale 引用清扫；

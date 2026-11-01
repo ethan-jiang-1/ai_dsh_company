@@ -81,7 +81,7 @@ function lstatOrNull(path: string): NonNullable<ReturnType<typeof lstatSync>> | 
 function ensureDirectory(path: string): void {
   let info = lstatOrNull(path)
   if (info === null) {
-    mkdirSync(path)
+    mkdirSync(path, { recursive: true })
     info = lstatOrNull(path)
   }
   if (info === null || info.isSymbolicLink() || !info.isDirectory()) throw new UnsafeCultivationPathError(path)
@@ -216,7 +216,7 @@ function recordsDirectoryState(recordsDir: string): 'missing' | 'ready' {
 
 function ensureRecordsDirectory(recordsDir: string): void {
   const cultivationDir = dirname(recordsDir)
-  if (lstatOrNull(cultivationDir) === null) mkdirSync(cultivationDir)
+  if (lstatOrNull(cultivationDir) === null) mkdirSync(cultivationDir, { recursive: true })
   ensureDirectory(cultivationDir)
   ensureDirectory(recordsDir)
 }

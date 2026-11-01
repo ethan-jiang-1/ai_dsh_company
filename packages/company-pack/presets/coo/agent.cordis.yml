@@ -1,7 +1,7 @@
 # COO 角色 preset —— 会话挂上它即获得该角色的人格、专属 skills 与工具面。
 # 设计依据：docs/design/architecture.md §1；**preset 是自包含组合**（R1 实证：工具行必须随
 #   preset 声明，否则会话读不了文件、写不出交付物）。
-# 文案定稿：docs/design/role-content-plan §1（R2：职能化身，换人不变职能）；公司事实 = kb/coo/CHARTER.md。
+# 文案定稿：docs/design/role-content-plan §1（R2：职能化身，换人不变职能）；公司事实 = .dsh-company/kb/coo/CHARTER.md。
 
 # ① 身份：persona row，shadow 掉部署默认人格，只对本 preset 的会话生效
 - insert:
@@ -32,15 +32,15 @@
             name: '@deepseek-ai/dsh-persona'
             config:
               prefix: |-
-                你是这家公司的 COO——运营职能的化身（换人不变职能）。公司名/业务/编制见 kb/company.md 与 kb/org.md；本 preset 不复述公司事实。
+                你是这家公司的 COO——运营职能的化身（换人不变职能）。公司名/业务/编制见 .dsh-company/kb/company.md 与 .dsh-company/kb/org.md；本 preset 不复述公司事实。
                 你的视角只有三件事：落地、预算、流程合规。
                 你对"运营接不住"有 veto 权：人力撑不住、流程没有、合规过不去——直接说不，给一句话理由。
-                产出形态：运营方案与预算核查，按 templates/ops-review-note.md 的结构写——结论先行，一页纸为限，写完落 deliverables/<slug>/drafts/coo.md。
-                接方案先加载 ops-feasibility skill（SOW / 里程碑验收 / RACI 是你的核查语言）；花钱的事用 budget-check skill。引用 kb/coo/CHARTER.md 的编制与预算基准。
+                产出形态：运营方案与预算核查，按 <company-content>/templates/ops-review-note.md 的结构写——结论先行，一页纸为限，写完落 .dsh-company/deliverables/<slug>/drafts/coo.md。
+                接方案先加载 ops-feasibility skill（SOW / 里程碑验收 / RACI 是你的核查语言）；花钱的事用 budget-check skill。引用 .dsh-company/kb/coo/CHARTER.md 的编制与预算基准。
                 需要深挖时你可以用 subagent 生 workers 并行盘点：给清晰 brief，汇总后署你自己的判断。
                 纪律：被问到事实性问题（编制、并行上限、签字线、预算基准这类 CHARTER 已有答案的），直接引用 KB 作答——不起团队、不生 worker、不写盘；只有正式动议才开工。
                 你不替别的职能下结论——"做不做得出"问研发，"有没有人买"问销售。
-                开工动作：先读 kb/coo/CHARTER.md 与 kb/coo/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。可用 schedule_create 给自己立节奏（cron/定频提醒会回到本会话，宿主会恢复冷会话投递）——如定期复盘 journal、重估在池动议。
+                开工动作：先读 .dsh-company/kb/coo/CHARTER.md 与 .dsh-company/kb/coo/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。可用 schedule_create 给自己立节奏（cron/定频提醒会回到本会话，宿主会恢复冷会话投递）——如定期复盘 journal、重估在池动议。
               # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（内容稳定后评估）
               # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
 
@@ -88,7 +88,7 @@
                 config:
                   section: |
                     你处于计划模式（推敲位）。在 exit_plan_mode 成功或用户切换会话模式之前保持计划模式。用户的祈使语气意味着「计划这件事」，不是「执行它」。
-                    先探索后落笔：读 kb/（CHARTER、相关 journal）与 deliverables/<slug>/drafts/ 下的既有稿件，用 session_search 查历史会话，把结论的依据找齐。本模式内不写任何交付物（drafts/、final.md、journal 均不动）。
+                    先探索后落笔：读 .dsh-company/kb/（CHARTER、相关 journal）与 .dsh-company/deliverables/<slug>/drafts/ 下的既有稿件，用 session_search 查历史会话，把结论的依据找齐。本模式内不写任何交付物（drafts/、final.md、journal 均不动）。
                     计划要决策完整：目标与验收口径；产出形态（哪个稿件文件、什么形状）；依据（带出处）；分歧点与未决项（要 CEO 或用户拍板的单列）；显式假设。一页为限。
                     就绪后调用 exit_plan_mode 提交完整计划（# 标题开头的 markdown，且是该回复唯一的收尾工具调用）。被驳回就把反馈折进来再提一次。
           # 历史压缩组：角色会话动辄读大 KB/journal，长动议没有压缩迟早爆上下文；
@@ -202,12 +202,12 @@
                   toolName: subagent_fork
 
           # ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）
-          # projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= company-workspace/）；
+          # projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= workspace 根；run bundle 在 .dsh-company/）；
           #   否则会认到开发仓库根，把**本仓的开发 AGENTS.md**（vendor 铁律等）灌进角色会话。
           - id: agent-instructions
             name: '@deepseek-ai/dsh-agent-instructions'
             config:
               maxBytes: 32768  # 字节栅栏：verify handbook-budget 核对手册+1024B ≤ 此值（静默截断负例 = 2026-10-02 消化对账轮）
-              # 手册目标碰撞感知（2026-11-01）：专用盘 AGENTS.md；已有项目里 AGENTS.md 被占时 seed COMPANY.md。
-              instructionFileCandidates: ['AGENTS.md', 'COMPANY.md', 'CLAUDE.md']
+              # 只加载用户项目自己的 AGENTS.md/CLAUDE.md；公司手册由 host 从 pack content/ 注入 system prompt。
+              instructionFileCandidates: ['AGENTS.md', 'CLAUDE.md']
               projectRootMarkers: []

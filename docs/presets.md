@@ -5,7 +5,7 @@
 > 内容来源 [design/role-content-plan.md](./design/role-content-plan.md)；命名约定见台账 D14
 > （显示名 `梦之队 <角色>`，preset id 保持 kebab）。R1 定稿 CEO / VP-Eng；R2 定稿 VP-Sales / COO，
 > 并增设 CFO（用户 2026-09-22 定案：50 人高科技公司，软件开发 / 服务 / 系统集成）。
-> **编制唯一事实家 = `company-workspace/kb/org.md`**（细到岗位）；各角色 CHARTER 只留本条线事实
+> **编制唯一事实家 = `company-workspace/.dsh-company/kb/org.md`**（细到岗位）；各角色 CHARTER 只留本条线事实
 > 并引用它（Q3：公司事实活数据留 workspace，pack 不含公司事实——D17）。
 > **工作流惯例**：每个角色至少 1 个自己的端到端工作流 skill（`<role>-workflow`，1 号）；
 > 后续按 `<role>-workflow-<主题>` 追加第 2、3 个——CEO 的工作流即 `chairing-staff-meeting`。
@@ -52,7 +52,7 @@ UI 按 trust 分组，故六张卡（5 公司角色 + researcher）出现在 **B
   "这家公司不做了"。
 - **工作流（1 号）**：`chairing-staff-meeting`——五步节奏：澄清 → 拆解分派（单一 owner + 可验收）→
   追进度（不抢活）→ 收口（保留分歧、`present` 交付）→ 记账。R2 起在第 3、4 步之间插入互审。
-- **KB**：`company-workspace/kb/ceo/CHARTER.md`（决策原则：一页纸 / 分歧保留 / 不代笔；公司业务
+- **KB**：`company-workspace/.dsh-company/kb/ceo/CHARTER.md`（决策原则：一页纸 / 分歧保留 / 不代笔；公司业务
   与编制指引）+ `journal/`。
 - **验证**：Web 会话选 `ceo` → 身份探针（答出 CEO 视角与 veto 边界）；动议跑通见 [demo.md](./demo.md)。
 

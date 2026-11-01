@@ -15,7 +15,7 @@ opened: 2026-10-25
 
 **当前情况：**
 - 品牌硬编码在 [Brand.tsx](../../../packages/company-pack/src/client/Brand.tsx)（`DSH 梦之队`）；手册标题也是“梦之队”。
-- 出厂 org（[org.md](../../../packages/company-pack/workspace/kb/org.md)）是具体样例（50 人 / 9 客户 / $ 数字）；[owners.md](../../../packages/company-pack/workspace/kb/owners.md) 是待填起动件。
+- 出厂 org（[org.md](../../../packages/company-pack/content/state/org.md)）是具体样例（50 人 / 9 客户 / $ 数字）；[owners.md](../../../packages/company-pack/content/state/owners.md) 是待填起动件。
 - 一个 home 可注册多个 workspace；插件不校验会话 cwd 是否为 bundle 的 workspace；错盘时页签会半空。
 - dev 形状用符号链接把手册/模板/org 指回 pack（[bundle-init.mjs](../../../tools/bundle-init.mjs)）；非维护者跑 dev 形状会写产品源。
 - `bundle.json` 的 workspace 在盘内记相对、盘外记绝对（[bundle-manifest.ts](../../../packages/company-pack/src/host/bundle-manifest.ts)）。

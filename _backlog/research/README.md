@@ -49,7 +49,9 @@ research/
 
 ## 索引
 
-当前无活跃研究题（2026-11-01 产品化研究题已随最后一张消费者卡迁入[研究归档](../_archive/research/README.md)）。
+- [插件即产品 v3](plugin-as-product-v3/README.md) — FAQ 26 最新更新后的入口/workspace/内容边界复核；服务 [v3 卡](../issues/2026-11-01-plugin-as-product-v3.md)。
+
+2026-11-01 上一轮产品化研究题已随最后一张消费者卡迁入[研究归档](../_archive/research/README.md)。
 
 归档题名见[研究归档](../_archive/research/README.md)；本页只列活跃题名，不重复逐文件清单。
 

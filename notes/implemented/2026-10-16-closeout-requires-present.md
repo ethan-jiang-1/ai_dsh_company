@@ -15,7 +15,7 @@
 
 ## 决定（A + B，按职责分家）
 
-**A（公司侧，1 行）**：`company-workspace/AGENTS.md` 的「工作纪律」节加一条——**成品收口必须先 `present`**：写进 `final.md` 不等于收口；**先 present、后**把 meta「结果」改终态词；没 present 就没有「已完成」，顺序颠倒会被收敛前置点名。真身落 `packages/company-pack/workspace/AGENTS.md`（运行盘是符号链接；出厂骨架随包分发）。
+**A（公司侧，1 行）**：`packages/company-pack/content/AGENTS.md` 的「工作纪律」节加一条——**成品收口必须先 `present`**：写进 `final.md` 不等于收口；**先 present、后**把 meta「结果」改终态词；没 present 就没有「已完成」，顺序颠倒会被收敛前置点名。真身落 `packages/company-pack/content/AGENTS.md`（运行盘是符号链接；出厂骨架随包分发）。
 
 **B（工具侧，同一道闸）**：`tools/converge.mjs` 新增前置「**无未结审计发现**」，判据**复用** `checks/audit/deliverables-check.mjs --only <slug>` 的裁决——收敛器**不重写** present 背书 / meta 形状 / 占位抢注这些判据（单一来源是审计档；复述必然漂移），它只要一个「通过/未通过 + 为什么」。计划模式与执行档都接；放行 = 显式 `--allow-open-findings`（照记警告，不静默）。
 

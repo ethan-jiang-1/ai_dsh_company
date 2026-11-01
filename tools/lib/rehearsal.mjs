@@ -1,78 +1,48 @@
-// 排练场（runtime/rehearsal-workspace/）的成型与守卫 —— 轮间待办②「练习场 ≠ 运行场」。
-// 出处：notes/implemented/2026-09-22-workspace-hygiene.md 条目去向 #3；roadmap 轮间待办（R4 → R5a）②。
+// 排练场（runtime/rehearsal-workspace/）的成型与守卫 —— 练习场 ≠ 运行场。
 //
-// 为什么：排练/探针跑在真盘时，过程稿不受三态判据约束（drafts/ 本就不需要 present），
-// 产物会安静积进 company-workspace/ —— R4 W2 删掉的 15 份污染文件正是探针跑在真盘的产物。
-// 机制：workspace 归属按 SessionHeader.cwd（vendor docs/subsystems/workspace.md），
-// 会话 cwd 换到独立目录即完成隔离，不需要新功能。
-//
-// 镜像语义（ensure 幂等，可反复跑）：
-//   - 参考输入每次都刷新：kb/<role>/CHARTER.md、kb/org.md、**kb/owners.md**、
-//     **kb/motion-ledger.md**、templates/（后两件 2026-09-26 补：排练场里的角色此前**看不到
-//     授权面与经营台账**——排练动议若要按 owners.md 路由、或要看台账，就会缺料）
-//   - 排练产物永不触碰：kb/<role>/journal/（**不镜像**真实 journal——排练记忆不混真记忆）、
-//     deliverables/、排练会话写出的任何文件
-//   - AGENTS.md 是指向真盘手册的**符号链接**（相对目标）：手册即注入基线，单一事实家不搬家；
-//     preset 的 projectRootMarkers: [] ⇒ 指令链只认 cwd，不会向上混入开发仓库 AGENTS.md
-import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readlinkSync, realpathSync, rmSync, symlinkSync } from 'node:fs'
-import { join, relative } from 'node:path'
+// 形状（2026-11-01 v3）：只读内容在 pack `content/`；排练场只建 `.dsh-company/` 状态/产物。
+// 不再复制手册/模板到根，也不建根 AGENTS.md（host 注入 pack handbook）。
+// 排练产物永不触碰真实 workspace 的 journal/deliverables；这里只做参考状态镜像。
+import { cpSync, existsSync, mkdirSync, readdirSync, realpathSync, rmSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 
 export const REHEARSAL_REL = join('runtime', 'rehearsal-workspace')
+const ROLES = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']
 
 /**
- * 公司参考镜像（幂等纯 fs）：AGENTS.md + kb 事实三件（org/owners/motion-ledger）+ 各角色
- * CHARTER + journal 目录骨架 + templates/。journal 真文件不镜像（记忆不混）、既有产物不触碰。
- * - BUG-006（2026-10-07）：录制临时工作区此前只拷 AGENTS.md ⇒ 角色看不到 templates/meta.md
- *   词表模板，meta 类型/结果字段自由发挥越审计词表。修法 = 录制工作区吃与排练场同源的镜像。
- * - agents 语义二分：'symlink' = 相对符号链接（排练场惯例——手册单一事实家、live 演进即见）；
- *   'copy' = 实拷贝（录制工作区必须用——workspace-oracle 拒符号链接，录后快照采集才走得通）。
+ * 公司参考镜像（幂等纯 fs）：`.dsh-company/kb` 状态 + 角色章程 + 空产物目录。
+ * @param {string} workspace - 目标排练/录制 workspace。
+ * @param {string} companyRoot - dev workspace 根（用于推导 repo 根）。
+ * @param {{ agents?: 'copy'|'symlink', contentRoot?: string }} [options] - agents 保留兼容但不再使用。
+ * @returns {string} workspace
  */
-export function mirrorCompanyReference(workspace, companyRoot, { agents = 'copy' } = {}) {
-  if (!existsSync(join(companyRoot, 'AGENTS.md'))) {
-    throw new Error(`mirror: 找不到真盘手册 ${join(companyRoot, 'AGENTS.md')}——companyRoot 传对了吗？`)
+export function mirrorCompanyReference(workspace, companyRoot, { contentRoot } = {}) {
+  const repoRoot = dirname(companyRoot)
+  const content = contentRoot ?? join(repoRoot, 'packages/company-pack/content')
+  if (!existsSync(join(content, 'AGENTS.md'))) {
+    throw new Error(`mirror: 找不到 pack content 手册 ${join(content, 'AGENTS.md')}——repo 布局变了吗？`)
   }
-  mkdirSync(workspace, { recursive: true })
-  // ⚠ 2026-10-13 起真盘的制度件**本身是符号链接**（住 packages/company-pack/workspace，出厂骨架单源）。
-  // 镜像要的是"每次刷新的一份**实文件**"（指向 pack 的链接会让排练场跟着仓库走，且二次刷新崩）。
-  // ⚠ Node 的 cpSync 对「符号链接源 + 已存在目标」会抛误导错（`Cannot overwrite non-directory … with
-  // directory …`，dereference 与否都实测复现）⇒ 先 `realpathSync` 解引用再拷，是唯一稳的路。
-  const copyRef = (source, dest, recursive = false) => { cpSync(realpathSync(source), dest, { recursive, force: true }) }
-  if (agents === 'symlink') refreshSymlink(join(workspace, 'AGENTS.md'), relative(workspace, join(companyRoot, 'AGENTS.md')))
-  else copyRef(join(companyRoot, 'AGENTS.md'), join(workspace, 'AGENTS.md'))
-
-  mkdirSync(join(workspace, 'deliverables'), { recursive: true })
-  mkdirSync(join(workspace, 'kb'), { recursive: true })
-  const realKb = join(companyRoot, 'kb')
-  // kb 根的**事实家三件**：编制 / 人侧授权面 / 经营台账。少镜像一件，场里就有一处事实缺料。
-  for (const name of ['org.md', 'owners.md', 'motion-ledger.md']) {
-    if (existsSync(join(realKb, name))) copyRef(join(realKb, name), join(workspace, 'kb', name))
+  const run = join(workspace, '.dsh-company')
+  for (const dir of [run, join(run, 'kb'), join(run, 'deliverables'), join(run, 'deliverables-archive'),
+    join(run, 'cultivation'), join(run, 'cultivation/records'), join(run, 'logs'), join(run, 'exports')]) {
+    mkdirSync(dir, { recursive: true })
   }
-  for (const entry of existsSync(realKb) ? readdirSync(realKb, { withFileTypes: true }) : []) {
-    if (!entry.isDirectory()) continue
-    mkdirSync(join(workspace, 'kb', entry.name, 'journal'), { recursive: true })
-    const charter = join(realKb, entry.name, 'CHARTER.md')
-    if (existsSync(charter)) copyRef(charter, join(workspace, 'kb', entry.name, 'CHARTER.md'))
+  const copy = (source, target) => { if (existsSync(source)) cpSync(realpathSync(source), target, { force: true }) }
+  for (const file of ['company.md', 'org.md', 'owners.md', 'motion-ledger.md']) {
+    copy(join(content, 'state', file), join(run, 'kb', file))
   }
-  if (existsSync(join(companyRoot, 'templates'))) {
-    copyRef(join(companyRoot, 'templates'), join(workspace, 'templates'), true)
+  for (const role of ROLES) {
+    mkdirSync(join(run, 'kb', role, 'journal'), { recursive: true })
+    copy(join(content, 'charters', `${role}.md`), join(run, 'kb', role, 'CHARTER.md'))
   }
   return workspace
 }
 
 /** 幂等成型排练场，返回其绝对路径。repoRoot = 仓库根（checks/ 的上一级）。 */
 export function ensureRehearsalWorkspace(repoRoot) {
-  const real = join(repoRoot, 'company-workspace')
-  const rehearsal = mirrorCompanyReference(join(repoRoot, REHEARSAL_REL), real, { agents: 'symlink' })
-  return rehearsal
-}
-
-/** 指向 target 的相对符号链接；已存在但指错、或是普通文件/目录则重建。 */
-function refreshSymlink(linkPath, target) {
-  try {
-    if (lstatSync(linkPath).isSymbolicLink() && readlinkSync(linkPath) === target) return
-  } catch {
-    // 不存在：落到下面创建
-  }
-  rmSync(linkPath, { force: true, recursive: true })
-  symlinkSync(target, linkPath, 'file')
+  const rehearsal = join(repoRoot, REHEARSAL_REL)
+  rmSync(join(rehearsal, 'AGENTS.md'), { force: true })
+  return mirrorCompanyReference(rehearsal, join(repoRoot, 'company-workspace'), {
+    contentRoot: join(repoRoot, 'packages/company-pack/content'),
+  })
 }

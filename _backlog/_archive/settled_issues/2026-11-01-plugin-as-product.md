@@ -234,7 +234,7 @@ profile，启动时指向我的项目；我的项目拥有公司身份与产物�
 
 ### Q6 · 启动器交付形状
 
-- **建议**：repo 形态 `pnpm company`；安装形态 pack `bin/dsh-company`（`dsh plugin add` 后落在
+- **建议**：repo 形态 `pnpm company`；安装形态 pack bin/dsh-company（历史，已删除）（`dsh plugin add` 后落在
   `profiles/company/node_modules/.bin/`）；两者共用一份 bootstrap 逻辑；直接
   `DSH_HOME=… DSH_COMPANY_HOME=… dsh --profile company` 作为无启动器 fallback。
 - 备选：只写文档、不做启动器（做不到“询问 workspace/seed 确认/最近 workspace”，不推荐）。
@@ -289,7 +289,7 @@ profile，启动时指向我的项目；我的项目拥有公司身份与产物�
 
 ### S1 · 产品入口与 workspace 解析
 
-- **交付**：`company` profile 创建/修复、`pnpm company` / `bin/dsh-company` 启动器、workspace
+- **交付**：`company` profile 创建/修复、`pnpm company` / bin/dsh-company（历史，已删除） 启动器、workspace
   优先级与 TTY 询问、最近 workspace 设置、boot 时 Workspace 登记、seed 计划/consent、无
   workspace 停写告警。
 - **技术支撑**：[研究稿 §10.1–10.3](../research/plugin-as-product/2026-11-01-plugin-as-product.md#101-profile-与启动器)
@@ -319,7 +319,7 @@ profile，启动时指向我的项目；我的项目拥有公司身份与产物�
 ### S4 · 产品文档与分发面（用户点名）
 
 - **交付**：`README.md`、`_dist/安装手册.md`（由 `export-dist` 生成）、`packages/company-pack/README.md`、
-  `packages/company-pack/workspace/README.md`、`AGENTS.md` 布局/命令、`docs/{profile,runtime-map,
+  `packages/company-pack/content/README.md`、`AGENTS.md` 布局/命令、`docs/{profile,runtime-map,
   data-model,release,project-map,index,decisions,external-research,orient,demo}.md`、
   `docs/guides/{bootstrap,environments,release-runbook}.md`、`run/README.md`、`runtime/README.md`、
   `tests/README.md`、`checks/README.md`、`CHANGELOG.md`、`.agents/skills/web-window-ops`。

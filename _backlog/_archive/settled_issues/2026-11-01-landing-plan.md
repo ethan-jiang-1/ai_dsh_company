@@ -310,7 +310,7 @@ P0 决策
 | 阶段 | 状态 | 证据 / 剩余 |
 |---|---|---|
 | P0 决策 | ✅ | 用户 2026-11-01 授权按推荐；伞卡 Q1–Q7 已落 |
-| P1 产品入口 | ✅ | 启动器 `bin/dsh-company.mjs` + `pnpm company`；`company-entry-smoke` / `release-smoke` / 浏览器自动 CEO 会话（T） |
+| P1 产品入口 | ✅ | 启动器 bin/dsh-company.mjs（历史，已删除） + `pnpm company`；`company-entry-smoke` / `release-smoke` / 浏览器自动 CEO 会话（T） |
 | P2 v2/手册/一 workspace | ✅ | `bundle-manifest.spec` v2/迁移/升级/符号链接；`seed-handbook.spec`；`release-smoke` 无 home bundle、v2、二启稳定；启动器拒同 home 第二盘 |
 | P3 生命周期 | ✅ | `lifecycle-smoke`、`upgrade-while-running-smoke`、`interrupted-install-smoke`、`external`/`isolation`/`multi`、`doctor`、真实旧 home v1 迁移、workspace 搬迁；Web onboarding 明确 v1 外 |
 | P4 信任/数据 | ✅ | 方法/账本留 home + `governance-export`；`bundle.json` 身份备份；`register-workspace` 不建目录/不授权；`untrusted-project.spec` 覆盖恶意 AGENTS/symlink/伪造 consent/危险落点；完整 prompt injection 明确 v1 边界 |

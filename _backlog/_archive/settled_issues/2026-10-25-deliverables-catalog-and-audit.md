@@ -14,7 +14,7 @@ opened: 2026-10-25
 **当前情况：**
 - 客户端读 `kb/deliverables-index.json`（[company-data-plane.ts](../../../packages/company-pack/src/client/company-data-plane.ts)）；错误文案在 [DeliverablesTab.tsx](../../../packages/company-pack/src/client/DeliverablesTab.tsx)。
 - 生成器 [tools/deliverables-index.mjs](../../../tools/deliverables-index.mjs) 依赖仓库的审计/会话日志逻辑；不在 pack `files`。
-- 模板 [meta.md](../../../packages/company-pack/workspace/templates/meta.md) 把词表指向 `tools/lib/deliverables.mjs`。
+- 模板 [meta.md](../../../packages/company-pack/content/templates/meta.md) 把词表指向 `tools/lib/deliverables.mjs`。
 - chairing skill 写 `node tools/converge.mjs`；手册说“这条是机器检查的”，但安装后没有该检查。
 - `present` 是宿主工具；host 能读会话事件，但目前没有产品侧的 catalog/present 投影。
 

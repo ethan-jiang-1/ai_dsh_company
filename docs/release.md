@@ -1,8 +1,9 @@
 # release · 发布形状的现在时（company-pack）
 
 > 什么时候读：发布、打包、装进真实 profile、升 vendor pin 时。路线 = §vendor 政策 → release-smoke。
-> 产品形状（2026-11-01）：`company` profile + 用户 workspace；身份在 `<workspace>/.dsh-company/bundle.json`（v2），
-> home 只留运行时与治理；安装/升级/备份/卸载以 [_dist 手册](../_dist/安装手册.md) 为准。
+> 产品形状（2026-11-01 v3）：一个 bundle 装进 named profile；无 launcher；run bundle 在
+> `<workspace>/.dsh-company/`（`bundle.json` v3）；home 只留运行时与治理；安装/升级/备份/卸载以
+> [_dist 手册](../_dist/安装手册.md) 为准。
 > 顶层合同：vendor 政策、pack 的依赖姿态、兼容台账、真实安装冒烟程序、升 pin 程序。
 > 每次发布的操作步骤 = [guides/release-runbook.md](./guides/release-runbook.md)；一条命令入口 = `pnpm release`。
 > 依据：FAQ 13（外部研究：dsh-market / dsh-im 生态姿态）；原 dev-loop §5 发布时点表已全部落地随迁本文件（2026-10-12）。
@@ -90,24 +91,23 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 3. **干净 profile**：dev harness home 下 `release-check`，**先删后建**；预置
    `package.json`（bundles = web 模板形状 `[dsh-base, dsh-web-app]` + `patchReload: startup`——
    自定义 profile 名走 DEFAULT 只有 dsh-base，起不了 web）+ `pnpm-workspace.yaml`
-   （hoisted + autoInstallPeers: false，vendor 模板镜像）+ `.npmrc`（store/cache 钉 repo 内，§11）+
-   产品 profile patch（`company-workspace-register` 行；否则 boot 不登记 workspace）。
-   外部 workspace 在 boot 前建好并写 `.dsh-company/.seed-consent`（workspace + pack 版本）。
-4. **真安装**：`node <bin.dsh> plugin --profile release-check add file:<tarball>` → 断言 bundles reconcile、安装副本的 presets/client/**出厂骨架 `workspace/`**、peers 与 engines 窗口。`--profile` 挂在 plugin 子命令上。
+   （hoisted + autoInstallPeers: false，vendor 模板镜像）+ `.npmrc`（store/cache 钉 repo 内，§11）。
+   外部 workspace 在 boot 前建好；不写 profile patch、不写 seed consent。
+4. **真安装**：`node <bin.dsh> plugin --profile release-check add file:<tarball>` → 断言 bundles reconcile、安装副本的 presets/client/**`content/`**、无 `bin/`/`workspace/`、peers 与 engines 窗口。`--profile` 挂在 plugin 子命令上。
 5. **boot + RPC**：`node <bin.dsh> --profile release-check -- --port 0 --no-open` → roster 五公司角色 + researcher 零 broken、`session/create` 挂上 ceo 与 researcher、浏览器模块表含本包 client。随机端口的临时实例不替换开发 GUI。
-6. **首启自举 + run bundle**：干净 `DSH_COMPANY_HOME` 下第一次 boot 必须把骨架落到位（手册/章程/模板/起动件），并在 `<workspace>/.dsh-company/bundle.json` 写 v2 身份（id / handbookTarget / 基部逐文件 sha256）；**home 根不写 bundle**；workspace 登记进 DSH Workspace；**新安装不许带扩张数据**（journal / 交付物 / 培养记录）；**第二次 boot 零变更且 bundle.json 字节不变**。
+6. **首启 + run bundle**：干净 `DSH_COMPANY_HOME` 下第一次 boot 只建 `<workspace>/.dsh-company/` 状态（不写根手册/模板），写 `bundle.json` v3（id / createdAt / pack）；**home 根不写 bundle**；workspace 登记进 DSH Workspace；**新安装不许带扩张数据**（journal / 交付物 / 培养记录）；**第二次 boot 零变更且 bundle.json 字节不变**；真启动 stderr 无 `did not activate`。
 
 两个 DSH 调用均为 plain Node，清除继承的 `NODE_OPTIONS`、`NODE_PATH`、`TSX_*`，不走 `pnpm dsh`/tsx。构建和打包各限 120 秒，安装 180 秒，boot 120 秒、实例总寿命 180 秒、每个 HTTP 请求 15 秒；POSIX 子进程组 TERM 后等待，1 秒后 KILL。确认退出才回收 profile（`--keep` 保留）；同 home 的锁目录拒绝并发运行。强杀脚本留下的锁须确认无进程后人工移除。
 
 全绿证明本次已有 vendor 产物配合真 tarball 安装可用；不证明 vendor 新鲜构建，也不覆盖完整浏览器交互。dev profile 的 `link:` 安装不替代这条验证。
 
-**生命周期冒烟**（`node checks/smoke/lifecycle-smoke.mjs`）：真 tarball v1 → 改基部/加扩张 → v2 → 启动，再降级回 v1、business 恢复、卸载、搬 home；workspace v2 身份/方法层/账本按新形状断言。它不证明 registry 升级、并发或跨 OS。
+**生命周期**：0.6.0 是破坏性布局，不做 0.5.0 迁移；旧文件原样保留。升级/卸载/备份由安装手册与 `release-smoke` 的二次 boot 覆盖；不再有独立 `lifecycle-smoke`（旧形状已删除）。
 
-**产品入口冒烟**（计划/常驻 `node checks/smoke/company-entry-smoke.mjs`）：真启动器建 profile/装 pack/解析 workspace/seed consent/一 home 一 workspace；它不证明浏览器首屏（client-load 另测）。
+**产品入口冒烟**（`node checks/smoke/company-entry-smoke.mjs`）：真 tarball 装进干净 profile → `dsh --profile company`（cwd=临时 workspace）→ 无 launcher/profile patch/根 seed；它不证明浏览器首屏（client-load 另测）。
 
 **通道矩阵冒烟**（`node checks/smoke/channel-matrix-smoke.mjs --channel all`）：vendor built CLI + 真实全局 `dsh`，验证五角色 roster 与 `session/create`；`--with-browser` 另验装 browser 两包后自动启用。它证明“真实启动器通道”，不证明浏览器 UI；需要 PATH 有 global `dsh` 与网络，默认不进 `release --verify`，发布前手动跑。
 
-**隔离矩阵冒烟**（`node checks/smoke/isolation-matrix-smoke.mjs`）：无 workspace 停写、外部 workspace + consent、落点不安全、相对/`~` 归一、`DSH_COMPANY_REBIND` 只告警、搬 home 后 v2 id 不变。它不证明搬家后 DSH 自己的 `storages/workspace.json`/session cwd 会自动迁移。
+**隔离矩阵冒烟**（`node checks/smoke/isolation-matrix-smoke.mjs`）：无 workspace 零写、外部 workspace、同 home 顺序 A/B、落点不安全、相对/`~` 归一、旧 0.5.0 布局告警不迁移。它不证明搬家后 DSH 自己的 `storages/workspace.json`/session cwd 会自动迁移。
 
 ## 升 pin 程序（`node tools/sync-dsh.mjs`，认证档）
 
@@ -136,7 +136,7 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 
 ## 版本纪律
 
-- pack 版本 `0.5.0`（`private: true`——**尚未发布到任何 registry**；真实发布动作（npm publish）等
+- pack 版本 `0.6.0`（`private: true`——**尚未发布到任何 registry**；真实发布动作（npm publish）等
   出现第二个消费者/部署需求时再定；本轮只把本地 tarball 交付内化为 `pnpm release`，未 publish。
   当前 release-smoke 验证的是 `file:` tarball 安装形状）。版本史与每版变化唯一家 =
   [CHANGELOG](../CHANGELOG.md)（此处不写变更史）；改内容必 bump（见下条）。
@@ -156,8 +156,9 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 
 - **`_dist/` 是导出目的地不是源**：tgz 全 gitignore；《安装手册》是唯一 tracked 例外——
   由脚本生成（版本/日期/条目数注入），**永不手改**；verify 的 `dist-manual` 门禁核对手册表头
-  版本 == pack package.json，**且**含 `company` / `--workspace` / `.dsh-company/bundle.json` /
-  `AGENTS.md`/`COMPANY.md` / `exports` / seed-consent / 备份/卸载关键句与当前 pin（升版本忘重导、或内容退回旧安装形状，都会红；反证 2026-09-28 与 2026-10-24 两次红→绿）。
+  版本 == pack package.json，**且**含 `Plugins` / `dsh --profile company` / `.dsh-company/bundle.json` /
+  `content/` / `exports` / 备份/卸载关键句与当前 pin；且不含 `--workspace`/`--profile desktop`/`bin/dsh-company`/
+  `seed-consent`（升版本忘重导、或内容退回旧安装形状，都会红）。
   版本 bump 必须同 diff 重跑导出。
 - **导出先 build**：`tsc -b` + `tsdown`（`lib/` 是 gitignored；直接 `npm pack` 会打旧产物，2026-10-26 实测风险）；
   **打包步 = release-smoke 同一条 `npm pack`**（npm cache 钉 scratch，§11）；导出后对产物本体

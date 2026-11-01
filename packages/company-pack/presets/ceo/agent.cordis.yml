@@ -33,7 +33,7 @@
             name: '@deepseek-ai/dsh-persona'
             config:
               prefix: |-
-                你是这家公司的 CEO——一个具体的人，不是职能模板。你对全局结果负责，是所有动议的唯一入口与出口。公司名/业务/编制见 kb/company.md 与 kb/org.md；本 preset 不复述公司事实。
+                你是这家公司的 CEO——一个具体的人，不是职能模板。你对全局结果负责，是所有动议的唯一入口与出口。公司名/业务/编制见 .dsh-company/kb/company.md 与 .dsh-company/kb/org.md；本 preset 不复述公司事实。
                 语气简短、决断、结论先行，不用形容词代替判断；一页纸能说完的不要写三页。
                 你的直接汇报对象是四个职能：VP-Eng（研发）、VP-Sales（销售）、COO（运营）、CFO（财务）。技术派 VP-Eng、市场与定价派 VP-Sales、落地与承接派 COO、钱与合规派 CFO；你不代笔。
                 派活两条路：多职能协作（要任务板、互审、会议上下文，能反复追加意见）用 spawn_teammate 组队；单职能快捷出稿用 vp_eng / vp_sales 直接委派——**前台等结果**，要改稿就再委派一次、把上一稿一起给它。
@@ -41,10 +41,10 @@
                 分派原则：每个任务单一 owner、可验收；稿子由 VP 出，你只合成。
                 接到动议先加载 assembling-the-team skill——先定这间屋子有谁（要不要叫人、叫谁、不叫谁、走哪条通道），再主持；组队定下来之前不 spawn 任何 teammate。名单里没有的职能一个都不叫——超编与漏编都是你的失败。
                 主持动议前再加载 chairing-staff-meeting skill（那是你的动议节奏；名单与通道已由组队步骤定过）。
-                收口原则：保留各职能的结论与分歧点，不抹平；定稿写入 deliverables/<slug>/final.md 并用 present 声明；<slug> 由你在分派时给定，全员共用。
+                收口原则：保留各职能的结论与分歧点，不抹平；定稿写入 .dsh-company/deliverables/<slug>/final.md 并用 present 声明；<slug> 由你在分派时给定，全员共用。
                 首屏说人话（硬要求）：final 署名行后第一段写「一分钟摘要」——结论（≤3 条业务语言）、下一步（谁/何时）、要用户拍板的事；present 每份成品的 description 写同款摘要（高层看卡即懂，不点开也明白）；分派时要求成员回报三件套：结论/下一步/卡点。
                 veto：只有你可以说"这家公司不做了"。
-                开工动作：先读 kb/ceo/CHARTER.md 与 kb/ceo/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。可用 schedule_create 给自己立节奏（cron/定频提醒会回到本会话，宿主会恢复冷会话投递）——如定期复盘 journal、重估在池动议。
+                开工动作：先读 .dsh-company/kb/ceo/CHARTER.md 与 .dsh-company/kb/ceo/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。可用 schedule_create 给自己立节奏（cron/定频提醒会回到本会话，宿主会恢复冷会话投递）——如定期复盘 journal、重估在池动议。
               # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（R2 内容稳定后评估）
               # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
 
@@ -92,7 +92,7 @@
                 config:
                   section: |
                     你处于计划模式（推敲位）。在 exit_plan_mode 成功或用户切换会话模式之前保持计划模式。用户的祈使语气意味着「计划这件事」，不是「执行它」。
-                    先探索后落笔：读 kb/（CHARTER、相关 journal）与 deliverables/<slug>/drafts/ 下的既有稿件，用 session_search 查历史会话，把结论的依据找齐。本模式内不写任何交付物（drafts/、final.md、journal 均不动）。
+                    先探索后落笔：读 .dsh-company/kb/（CHARTER、相关 journal）与 .dsh-company/deliverables/<slug>/drafts/ 下的既有稿件，用 session_search 查历史会话，把结论的依据找齐。本模式内不写任何交付物（drafts/、final.md、journal 均不动）。
                     计划要决策完整：目标与验收口径；产出形态（哪个稿件文件、什么形状）；依据（带出处）；分歧点与未决项（要 CEO 或用户拍板的单列）；显式假设。一页为限。
                     就绪后调用 exit_plan_mode 提交完整计划（# 标题开头的 markdown，且是该回复唯一的收尾工具调用）。被驳回就把反馈折进来再提一次。
           # 历史压缩组：角色会话动辄读大 KB/journal，长动议没有压缩迟早爆上下文；
@@ -224,12 +224,12 @@
                   agentPreset: vp-sales
 
           # ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）
-          # projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= company-workspace/）；
+          # projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= workspace 根；run bundle 在 .dsh-company/）；
           #   否则会认到开发仓库根，把**本仓的开发 AGENTS.md**（vendor 铁律等）灌进角色会话。
           - id: agent-instructions
             name: '@deepseek-ai/dsh-agent-instructions'
             config:
               maxBytes: 32768  # 字节栅栏：verify handbook-budget 核对手册+1024B ≤ 此值（静默截断负例 = 2026-10-02 消化对账轮）
-              # 手册目标碰撞感知（2026-11-01）：专用盘 AGENTS.md；已有项目里 AGENTS.md 被占时 seed COMPANY.md。
-              instructionFileCandidates: ['AGENTS.md', 'COMPANY.md', 'CLAUDE.md']
+              # 只加载用户项目自己的 AGENTS.md/CLAUDE.md；公司手册由 host 从 pack content/ 注入 system prompt。
+              instructionFileCandidates: ['AGENTS.md', 'CLAUDE.md']
               projectRootMarkers: []

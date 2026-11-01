@@ -16,7 +16,7 @@ UX 实验场一（`renewal-x-2026`，日志 `session-306dafdf` seq 97/98/103/104
 
 ## 采用方案（规则，落手册）
 
-三原则 + 依据，落 `company-workspace/AGENTS.md` §人机接口「问询节流」：
+三原则 + 依据，落 `packages/company-pack/content/AGENTS.md` §人机接口「问询节流」：
 
 1. **同批内容不许追问**（首要）：人已表态（如选「现在给」）而内容没到 ⇒ 按缺料出稿、把「未落实」
    写进未决项，**不许紧接着再问一遍**；

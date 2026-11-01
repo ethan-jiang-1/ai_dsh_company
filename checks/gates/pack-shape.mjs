@@ -77,11 +77,14 @@ if (pack.exports?.['./icon'] === undefined) metaProblems.push('exports 缺 ./ico
 // 两半 + 声明。静态检查 files/exports，不依赖 lib 是否已构建（fresh clone 也能跑）。
 const files = Array.isArray(pack.files) ? pack.files : []
 const fileProblems = []
-for (const required of ['lib/index.js', 'lib/client.js', 'lib/types/**/*.d.ts']) {
+for (const required of ['lib/index.js', 'lib/client.js', 'lib/types/**/*.d.ts', 'content/**']) {
   if (!files.includes(required)) fileProblems.push(`files 缺 ${required}`)
 }
 if (files.includes('lib/**')) fileProblems.push('files 用了 lib/**（会把 tsc 中间产物/tsbuildinfo 打进包）')
 if (files.includes('lib/types/**/*.js') || files.includes('lib/types/**')) fileProblems.push('files 把 lib/types 的 .js 打进包')
+if (files.includes('workspace/**')) fileProblems.push('files 仍带 workspace/**（只读内容已迁 content/）')
+if (files.some(file => file.startsWith('bin/'))) fileProblems.push('files 仍带 bin/**（产品包不得有启动器）')
+if (pack.bin !== undefined) fileProblems.push('bin 字段仍在（产品入口是 dsh --profile company）')
 if (pack.dependencies !== undefined && Object.keys(pack.dependencies).length > 0) {
   fileProblems.push('dependencies 非空（运行时依赖应走 peerDependencies；browser 两包也不进 dependencies）')
 }

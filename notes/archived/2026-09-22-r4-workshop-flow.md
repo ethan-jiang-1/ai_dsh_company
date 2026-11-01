@@ -5,7 +5,7 @@
 - **交付物三态有机器判据**：`scripts/lib/deliverables.mjs`（纯逻辑）+ `scripts/deliverables-check.mjs`
   （运行场入口）。规则：成品 `deliverables/<slug>/final.md` 必须能回溯到一次 **Lead（CEO）会话**的
   `deliverables/presented`；过程稿 `deliverables/<slug>/drafts/<角色>.md`；排练/探针产物不进
-  `deliverables/`。合同家 = `company-workspace/AGENTS.md`「交付物三态」（随每个成员会话首帧注入）。
+  `deliverables/`。合同家 = `packages/company-pack/content/AGENTS.md`「交付物三态」（随每个成员会话首帧注入）。
 - **运行场已是三态形状**：25 份平铺 → **6 成品 / 12 过程稿 / 0 违规**。
 - **模板即流程**：`templates/prd.md`、`templates/weekly-report.md` 从两行占位补齐；四个职能的
   preset 与全部 skill 的产出路径从 `deliverables/` 直落改到 `drafts/`（18 处）。
@@ -15,7 +15,7 @@
 
 ## 判据的三个设计决定（都不是随手定的）
 
-1. **成品归 Lead**（agentPreset=`ceo` 且 `delegationDepth=0`）。依据 `company-workspace/AGENTS.md`
+1. **成品归 Lead**（agentPreset=`ceo` 且 `delegationDepth=0`）。依据 `packages/company-pack/content/AGENTS.md`
    承诺权"只有 CEO 能对外发布结论……CEO `present` 之前都只是草稿"。实测 R2 归档里 CFO `present`
    过 3 次、VP-Sales 1 次——不限归属则过程稿与定稿平级，"哪些是成品"仍答不上来。
 2. **按交付物身份（`slug` + 角色）比对，不按字面路径**。这是给"三态迁移"留的桥：CEO 在 R1 声明的
@@ -126,7 +126,7 @@ pnpm test    # 38 条；其中 tests/deliverables.spec.ts 13 条守判据本身�
 
 ## 未做 / 移出本轮
 
-- **W3 journal 回溯压缩**：**规则已立**（`company-workspace/AGENTS.md`「轮末收敛」——已闭轮的
+- **W3 journal 回溯压缩**：**规则已立**（`packages/company-pack/content/AGENTS.md`「轮末收敛」——已闭轮的
   journal 压成 CHARTER 一条附录，原文件随快照归档，只由人做），但**没有回溯压缩 R1/R2 的 38 篇**。
   理由：① 提案的「依据（实际查过）」对这条没给证据（只证了交付物↔present 与 workspace registry）；
   ② 实测结构异质（164 个 `## 动议` 节，只有 22/38 有 `## 结论`），机械压缩必然编造摘要，手工压

@@ -100,7 +100,7 @@ source run/env.sh && node checks/audit/deliverables-check.mjs --only lingang-rec
 
 **同 diff 附带的两处**：
 - **报告粒度**：同一 slug 的未锚 T 号合并成**一条**违规（"T4、T5 无锚"），不再一个 T 号一条——否则"判据偏严"会被"报告刷屏"复刻一次。
-- **手册补一句**（`packages/company-pack/workspace/AGENTS.md` ④行）：写明"一条总锚可覆盖多个缺料任务，但必须在 title 或 prompt 里点名它解锁的下游 `T<N>`"。**这是 docs 合同面，超出自授权范围**——按用户本轮明确指示"这个 BUG 给修了"落，修复后补报。手册一改，`replay-smoke` 的两份注入体 + 手册 digest 随之重算（`--prepare` 重生成，夹具 = 录制数据，非重录）。
+- **手册补一句**（`packages/company-pack/content/AGENTS.md` ④行）：写明"一条总锚可覆盖多个缺料任务，但必须在 title 或 prompt 里点名它解锁的下游 `T<N>`"。**这是 docs 合同面，超出自授权范围**——按用户本轮明确指示"这个 BUG 给修了"落，修复后补报。手册一改，`replay-smoke` 的两份注入体 + 手册 digest 随之重算（`--prepare` 重生成，夹具 = 录制数据，非重录）。
 
 **端到端复验（真模型，2026-10-19）**：排练场跑一场「只派活不出稿 + 立一条总锚」的微动议，
 CEO 真写 4 条 `待补料`（T1–T4，T2/T3/T4 依赖 T1）+ 真立 1 条总锚（prompt 点名 T1/T2/T3）⇒

@@ -65,7 +65,7 @@ opened: 2026-10-16
 |---|---|
 | FINAL_BASENAME / DRAFTS_DIRNAME / SOURCES_DIRNAME / ACTIVE_ROOT / ARCHIVE_ROOT；slugFromDirName、normalizeRel、deliverableId、classifyDeliverable；META_TYPES / META_RESULTS / META_FINAL_RESULTS、parseMeta、validateMeta、presentResultRows | WARNING、VIOLATION；PLACEHOLDER_CLAIM/YIELD_LINE + isPlaceholderClaim / isPlaceholderYield；isLeadSession、uncoveredPendingMaterial、partitionArchiveViolations、parseSessionLog、auditDeliverables |
 
-拆分逻辑：「一份交付物是什么、住在盘上哪、形状合不合法」 vs 「会话声明与盘上对账、违了哪条」。基座名不变 ⇒ 现有文档指针（[meta.md 模板头注](../../../packages/company-pack/workspace/templates/meta.md)、[snapshots/README](../../../snapshots/README.md)）零改动。
+拆分逻辑：「一份交付物是什么、住在盘上哪、形状合不合法」 vs 「会话声明与盘上对账、违了哪条」。基座名不变 ⇒ 现有文档指针（[meta.md 模板头注](../../../packages/company-pack/content/templates/meta.md)、[snapshots/README](../../../snapshots/README.md)）零改动。
 
 动刀清单：
 1. deliverables-check.mjs：import 拆两行（validateMeta / presentResultRows 留基座，其余指 audit）+ 头注「判据逻辑一份」改指两家；

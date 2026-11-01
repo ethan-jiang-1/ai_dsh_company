@@ -1,6 +1,6 @@
 {
   "name": "dsh-company-pack",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "description": "Virtual company multi-role plugin pack: 5 role presets (CEO / VP-Eng / VP-Sales / COO / CFO) + host bundle rows + deployment brand skin. Design docs: docs/index.md",
@@ -26,24 +26,18 @@
     },
     "./locale/*.json": "./locale/*.json",
     "./icon": "./icon.svg",
-    "./package.json": "./package.json",
-    "./register-workspace": {
-      "types": "./lib/types/host/register-workspace.d.ts",
-      "default": "./lib/register-workspace.js"
-    }
+    "./package.json": "./package.json"
   },
   "files": [
     "lib/index.js",
     "lib/client.js",
-    "lib/register-workspace.js",
     "lib/*.js",
-    "bin/**",
     "lib/types/**/*.d.ts",
     "presets/**",
-    "workspace/**",
     "locale/*.json",
     "icon.svg",
-    "cordis.patch.yml"
+    "cordis.patch.yml",
+    "content/**"
   ],
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.4",
@@ -147,8 +141,5 @@
       ],
       "platform": "web"
     }
-  },
-  "bin": {
-    "dsh-company": "./bin/dsh-company.mjs"
   }
 }

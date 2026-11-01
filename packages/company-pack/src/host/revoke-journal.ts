@@ -13,6 +13,7 @@ import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { applyRecordUpdates, type CultivationStorage } from './cultivation-storage.ts'
+import { RUN_BUNDLE_PATHS } from '../lib/run-bundle-paths.ts'
 
 export interface PendingRevokeRecord {
   readonly id: string
@@ -35,7 +36,7 @@ export type RecoverRevokeResult =
   | { readonly status: 'conflict'; readonly problem: string }
   | { readonly status: 'error'; readonly problem: string }
 
-export const pendingRevokePath = (companyRoot: string): string => join(companyRoot, 'cultivation', '.pending-revoke.json')
+export const pendingRevokePath = (companyRoot: string): string => join(companyRoot, RUN_BUNDLE_PATHS.cultivation, '.pending-revoke.json')
 
 export function readPendingRevoke(companyRoot: string): PendingRevoke | null {
   const path = pendingRevokePath(companyRoot)
@@ -100,7 +101,7 @@ export function recoverPendingRevoke(
       : { status: 'none' }
   }
   if (!existsSync(methodRoot)) return { status: 'conflict', problem: `方法层根不存在：${methodRoot}` }
-  const recordsDir = join(companyRoot, 'cultivation', 'records')
+  const recordsDir = join(companyRoot, RUN_BUNDLE_PATHS.records)
   try {
     const methodExists = storage.readMethod(methodRoot, pending.role, pending.slug) !== null
     let changed = 0

@@ -26,7 +26,7 @@ import { join, relative } from 'node:path'
 //
 // 判据是**逐道**的、写死在下方 DECISIONS；**不读聚合总码**——v2 实证：默认参数下总码 2 来自
 // 自家样本假红，真正暴露的那道是 3 被吃掉（两个完全不同的世界给出同一个总码）。
-// 范围声明：本门禁只真扫 `packages/company-pack/workspace/` 的五道闸（live 公司盘只住 bundle，
+// 范围声明：本门禁只真扫 `packages/company-pack/content/` 的五道闸（live 公司盘只住 bundle，
 // 不进产品门禁）。跨仓 tracked 文本的 token URL 窄扫归 `checks/gates/tracked-token.mjs`
 // （BUG-029 立；值不打印，vendor/ 只读除外），硬编码凭据赋值窄扫归 `checks/gates/tracked-secrets.mjs`
 // （2026-10-25 立）——三者合起来才覆盖「出厂骨架 + 仓库面」，不要把本门禁的 all-pass 读成
@@ -36,7 +36,7 @@ const POLICIES = ['--sources-policy=report', '--fixture-policy=report']
 const THRESHOLDS = ['--entropy=3.5', '--minlen=16']
 // 2026-10-24：扫描面从 live 公司盘改为 **pack 出厂骨架**（唯一随包分发的面；live 盘只住 bundle，
 // 不进 git、也不该被产品门禁依赖）。live 盘的凭据面由维护者的每日/本机通道负责，不在这里冒充。
-const SCAN_REL = 'packages/company-pack/workspace'
+const SCAN_REL = 'packages/company-pack/content'
 
 /** accept = 本通道下可接受的码（不属于 accept 也不属于 block ⇒ BROKEN，红）；block = 应拦提交的码。
  *  a1 的 accept 含 3：CI runner 的 HOME 无 `~/.ssh`、检出内也无凭据面

@@ -60,19 +60,12 @@ try {
     }
   }
   console.log(`built CLI：${cli}（plain Node；vendor 产物新鲜度未证明，本脚本只重建 company-pack）`)
-  // 首启自举的验收落点（2026-10-13）：**隔离目录** + 显式打开开关（本仓 run/env.sh 为自管盘设
-  // DSH_COMPANY_BOOTSTRAP=off，那条会随环境继承进来——模拟安装必须自己把它翻回来）。
+  // run bundle 的验收落点：隔离 workspace；只由 host 写 `.dsh-company/`。
   const companyHome = join(home, 'tmp/release-company-workspace')
   rmSync(companyHome, { recursive: true, force: true })
   mkdirSync(companyHome, { recursive: true })
-  const packVersion = JSON.parse(readFileSync(join(PACK_DIR, 'package.json'), 'utf8')).version
-  mkdirSync(join(companyHome, '.dsh-company'), { recursive: true })
-  writeFileSync(join(companyHome, '.dsh-company/.seed-consent'), `${JSON.stringify({
-    v: 1, packVersion, workspace: companyHome, consentedAt: new Date().toISOString(),
-  }, null, 2)}\n`)
   const env = plainNodeEnv({ ...process.env, DSH_HOME: home,
     DSH_COMPANY_HOME: companyHome,
-    DSH_COMPANY_BOOTSTRAP: 'if-missing',
     // vendor 通道安装侧有 browser 两包；显式开，避免 auto 探测从 profile 看而误关。
     DSH_COMPANY_BROWSER: 'on',
     npm_config_cache: join(home, 'tmp/npm-cache'), npm_config_store_dir: join(ROOT, '.pnpm-store'),
@@ -123,7 +116,7 @@ try {
   }, null, 2)}\n`)
   writeFileSync(join(profileDir, 'pnpm-workspace.yaml'), 'packages:\n  - .\n\nnodeLinker: hoisted\nautoInstallPeers: false\n')
   writeFileSync(join(profileDir, '.npmrc'), `store-dir=${join(ROOT, '.pnpm-store')}\ncache-dir=${join(home, 'cache/pnpm')}\n`)
-  writeFileSync(join(profileDir, 'cordis.patch.yml'), "# release-smoke product profile patch\n- insert:\n    - id: company-workspace-register\n      name: 'dsh-company-pack/register-workspace'\n")
+  writeFileSync(join(profileDir, 'cordis.patch.yml'), '# release-smoke: no product profile patch\n[]\n')
 
   console.log('④ built dsh plugin add file:<tarball>')
   await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${tarball}`], { timeoutMs: 180_000 })
@@ -140,13 +133,12 @@ try {
   check('真实安装副本在场（node_modules/dsh-company-pack）', existsSync(join(installedPack, 'package.json')))
   check('安装副本带 presets/', existsSync(join(installedPack, 'presets/ceo')))
   check('安装副本带 client 产物', existsSync(join(installedPack, 'lib/client.js')))
-  check('安装副本带 bin 启动器', existsSync(join(installedPack, 'bin/dsh-company.mjs')))
-  check('安装副本带 register-workspace 入口', existsSync(join(installedPack, 'lib/register-workspace.js')))
+  check('安装副本无 bin/启动器', !existsSync(join(installedPack, 'bin')))
   check('安装副本带 locale/icon（可发现性元数据）', ['locale/en.json', 'locale/zh.json', 'icon.svg'].every(rel => existsSync(join(installedPack, rel))))
-  // 出厂骨架（2026-10-13）：少了它，第三方装完插件就是"没有手册与章程"的裸奔（见该 Note）
-  check('安装副本带出厂骨架 workspace/（手册 + 章程 + 模板 + 起动件）',
-    ['workspace/AGENTS.md', 'workspace/templates/meta.md', 'workspace/kb/org.md', 'workspace/kb/owners.md',
-      'workspace/kb/motion-ledger.md', 'workspace/kb/ceo/CHARTER.md', 'workspace/deliverables'].every(rel =>
+  // 只读内容（2026-11-01 v3）：少了它，第三方装完插件就是"没有手册/模板/默认章程"的裸奔。
+  check('安装副本带 content/（手册 + 模板 + 默认章程 + 状态默认值）',
+    ['content/AGENTS.md', 'content/templates/meta.md', 'content/charters/ceo.md',
+      'content/state/org.md', 'content/state/owners.md', 'content/state/motion-ledger.md'].every(rel =>
       existsSync(join(installedPack, rel))),
     `根目录 = ${readdirSync(installedPack).sort().join(', ')}`)
   const installedManifest = JSON.parse(readFileSync(join(installedPack, 'package.json'), 'utf8'))
@@ -207,36 +199,33 @@ try {
     walk('')
     return rows
   }
-  const domainLedger = join(home, 'storages/company_deliverables.json')
-  await waitFor(() => existsSync(join(companyHome, '.dsh-company/bundle.json')) && existsSync(join(companyHome, 'kb/deliverables-index.json'))
+  const domainLedger = join(home, 'storages/company_run_bundle_ledger.json')
+  await waitFor(() => existsSync(join(companyHome, '.dsh-company/bundle.json')) && existsSync(join(companyHome, '.dsh-company/kb/deliverables-index.json'))
       && existsSync(domainLedger), '首启落盘')
   const first = fingerprint(companyHome)
   // T5（FAQ 24 §8.1）：包目录只读——运行/升级不应在安装副本里新增 data/cache/日志。
   const packBefore = fingerprint(installedPack)
   const has = (rows, rel) => rows !== null && rows.some(row => row.startsWith(`${rel}:`))
-  check('首启把出厂公司盘落到 DSH_COMPANY_HOME（含手册/章程/起动件）',
-    ['AGENTS.md', 'kb/org.md', 'kb/owners.md', 'kb/motion-ledger.md', 'kb/ceo/CHARTER.md', 'templates/meta.md']
+  check('首启把 run bundle 落到 .dsh-company/（含状态/章程；不含根手册/模板）',
+    ['.dsh-company/kb/company.md', '.dsh-company/kb/org.md', '.dsh-company/kb/owners.md', '.dsh-company/kb/motion-ledger.md', '.dsh-company/kb/ceo/CHARTER.md']
       .every(rel => has(first, rel)),
     first === null ? `落点不存在：${companyHome}` : `共 ${String(first.length)} 件`)
 
   // 成品目录（2026-10-25，RFC installed-shape-self-sufficient）：新装也要有可读空目录，
   // 页签显示“还没有成品”，而不是“维护者运行 node tools/...”。
-  const catalogFile = join(companyHome, 'kb/deliverables-index.json')
+  const catalogFile = join(companyHome, '.dsh-company/kb/deliverables-index.json')
   const catalog = existsSync(catalogFile) ? JSON.parse(readFileSync(catalogFile, 'utf8')) : null
   check('首启生成成品目录（空目录，不依赖仓库工具）',
     catalog?.schema === 1 && catalog?.counts?.total === 0 && typeof catalog?.generatedAt === 'string',
     catalog === null ? `catalog 不存在：${catalogFile}` : JSON.stringify(catalog.counts))
 
-  // run bundle 身份（2026-11-01）：首启写 `<workspace>/.dsh-company/bundle.json`（v2）；home 根不写。
+  // run bundle 身份（2026-11-01 v3）：首启写 `<workspace>/.dsh-company/bundle.json`（v3）；home 根不写。
   const manifestPath = join(companyHome, '.dsh-company/bundle.json')
   const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : null
-  check('首启写 workspace bundle.json（v2 身份）',
-    manifest?.v === 2 && typeof manifest.id === 'string' && typeof manifest.createdAt === 'string'
-      && manifest.workspace === undefined
-      && typeof manifest.handbookTarget === 'string'
-      && typeof manifest.skeleton?.version === 'string'
-      && Object.keys(manifest.skeleton?.files ?? {}).length >= 10,
-    manifest === null ? 'bundle.json 不存在' : JSON.stringify({ id: manifest.id, handbookTarget: manifest.handbookTarget, files: Object.keys(manifest.skeleton?.files ?? {}).length }))
+  check('首启写 workspace bundle.json（v3 身份）',
+    manifest?.v === 3 && typeof manifest.id === 'string' && typeof manifest.createdAt === 'string'
+      && manifest.pack?.name === 'dsh-company-pack' && manifest.runBundle?.schema === 1,
+    manifest === null ? 'bundle.json 不存在' : JSON.stringify({ id: manifest.id, pack: manifest.pack }))
   check('home 根不再写 bundle.json', !existsSync(join(home, 'bundle.json')))
   const workspaceStoragePath = join(home, 'storages/workspace.json')
   const workspaceStorage = existsSync(workspaceStoragePath) ? JSON.parse(readFileSync(workspaceStoragePath, 'utf8')) : null
@@ -244,13 +233,13 @@ try {
   check('boot 时把 workspace 登记进 DSH Workspace', registeredPaths.some(path => String(path).includes('release-company-workspace')),
     workspaceStorage === null ? 'storages/workspace.json 不存在' : registeredPaths.join(', '))
   // 干净底座：新安装不许带任何扩张数据（journal / 交付物 / 培养记录）。
-  const historyRows = (first ?? []).filter(row => /^kb\/[^/]+\/journal\/.+/.test(row)
-    || /^deliverables\/.+\/(final|meta)\.md/.test(row) || /^cultivation\/records\/.+/.test(row))
+  const historyRows = (first ?? []).filter(row => /^\.dsh-company\/kb\/[^/]+\/journal\/.+/.test(row)
+    || /^\.dsh-company\/deliverables\/.+\/(final|meta)\.md/.test(row) || /^\.dsh-company\/cultivation\/records\/.+/.test(row))
   check('干净底座（无 journal / 交付物 / 培养记录）', historyRows.length === 0, `扩张数据 ${String(historyRows.length)} 件：${historyRows.slice(0, 3).join(', ')}`)
   // 2026-10-25：CHARTER 历史条目也必须为零——第一版漏的正是这一层（305 行）。
   const charterHistory = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales'].flatMap(role => {
-    const path = join(companyHome, 'kb', role, 'CHARTER.md')
-    if (!existsSync(path)) return [`缺少 kb/${role}/CHARTER.md`]
+    const path = join(companyHome, '.dsh-company/kb', role, 'CHARTER.md')
+    if (!existsSync(path)) return [`缺少 .dsh-company/kb/${role}/CHARTER.md`]
     return readFileSync(path, 'utf8').split('\n').filter(line => /^- 20\d\d-\d\d-\d\d · /.test(line))
       .map(line => `kb/${role}/CHARTER.md: ${line.slice(0, 40)}`)
   })

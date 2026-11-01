@@ -20,7 +20,7 @@
      `runtime/ops`、`runtime/e2e`、`runtime/web-logs`、`harness-home` 凭据面与 5 件白名单。
    - `tracked-secrets`：跨仓 tracked 文本的**带引号凭据赋值**扫描（`const TOKEN = '...'`），
      补 `tracked-token` 只认 URL 查询串的形状缺口；值不打印。
-3. **secret 扫描的范围声明同步**：`security-scan` 仍只真扫 `packages/company-pack/workspace/`；
+3. **secret 扫描的范围声明同步**：`security-scan` 仍只真扫 `packages/company-pack/content/`；
    跨仓 tracked 面 = `tracked-token`（URL）+ `tracked-secrets`（赋值）。合成夹具面
    （`checks/lib/ci-security-gates/` 下的 fixtures 与 evidence 子目录）由 a2 自测与 MANIFEST 指纹负责，
    不在新门禁重复扫。

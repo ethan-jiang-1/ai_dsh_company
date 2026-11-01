@@ -20,7 +20,7 @@
    `{ expectedTag }`，`entry-probe-smoke` 用门禁常量 `checks/gates/lib/pin.mjs` 注入严格判据。旧 pin 的答卷
    从此判红（新增 3 个 spec）。
 4. **页签计数门禁扩面**：`nav-count-claims` 扫描面增加 `packages/company-pack/README.md` 与
-   `packages/company-pack/workspace/*.md`（随包分发的收件人文档与会话注入手册），并修掉包 README 的
+   `packages/company-pack/content/*.md`（随包分发的收件人文档与会话注入手册），并修掉包 README 的
    "五个页签"（注册面实际 9 个）。
 5. **`snapshot-motion` 不再默认往 `r2-motion` 写**：`--out` 变必填（场景名随动议）；`snapshot-path` 的用法示例
    改成现行合成场景。

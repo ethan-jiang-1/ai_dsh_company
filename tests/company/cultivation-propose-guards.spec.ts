@@ -66,7 +66,7 @@ const agent = (role: string, cwd = join(dir, 'company')): Record<string, unknown
   session: { header: { agentPreset: role, cwd } },
 })
 const baseArgs = { kind: 'correction', targetRole: 'ceo', expectation: '收口前列未决', body: '做法与证据' }
-const recordsDir = (): string => join(dir, 'company', 'cultivation', 'records')
+const recordsDir = (): string => join(dir, 'company', '.dsh-company', 'cultivation', 'records')
 const recordCount = (): number => (existsSync(recordsDir()) ? readdirSync(recordsDir()).length : 0)
 
 describe('cultivation_propose 守卫（R3-12）', () => {

@@ -30,9 +30,9 @@ persona 要点 / 工作流与打法 skills / KB 骨架 / 逐角色验证的**现
 |---|---|---|
 | persona | `presets/<role>/agent.cordis.yml` 的 persona row | 每请求计 token，控制在 ~300 字内 |
 | 角色方法 skills | `presets/<role>/skills/<name>/SKILL.md` | per-preset layer，硬隔离（别的角色看不见） |
-| 公司手册 | `company-workspace/AGENTS.md`（随会话经 `agent-instructions` 注入） | 全员可见（D7/D17 三载体；手册本体即合同，见 [index](../index.md) 文档路由） |
-| 事实/客户/历史 | `company-workspace/kb/<role>/` | 活数据，fs 工具读取 |
-| journal（角色记忆） | `company-workspace/kb/<role>/journal/<日期>-<slug>.md`（取不到真日期用 `日期待核-<slug>.md`，见公司手册「日期口径」） | D8：文件即记忆 |
+| 公司手册 | `packages/company-pack/content/AGENTS.md`（随会话经 `agent-instructions` 注入） | 全员可见（D7/D17 三载体；手册本体即合同，见 [index](../index.md) 文档路由） |
+| 事实/客户/历史 | `company-workspace/.dsh-company/kb/<role>/` | 活数据，fs 工具读取 |
+| journal（角色记忆） | `company-workspace/.dsh-company/kb/<role>/journal/<日期>-<slug>.md`（取不到真日期用 `日期待核-<slug>.md`，见公司手册「日期口径」） | D8：文件即记忆 |
 
 ## 3. 入戏探针（R1 验 CEO/VP-Eng；R2 新增 vp-sales / coo / cfo 三角色）
 

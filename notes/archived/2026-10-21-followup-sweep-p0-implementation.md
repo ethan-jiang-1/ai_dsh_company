@@ -11,7 +11,7 @@
    文件形状 statSync 分流。**夹具全部改从真日志取样**（session-1d120f37 原行为样）——想象形状夹具是「套件全绿
    保释错实现」的通道。附带：diagnose `--session` 前缀两态统一（`session-<uuid>` 与裸 uuid 同义，与 orient 对齐）。
 2. **replay 注入面闭环四件套**（对「replay 回归网实际 1/10」的结构性回答）：
-   ① tests/README 改动面表新增「手册/CHARTER/制度件（`packages/company-pack/workspace/`——会话注入面）」行；
+   ① tests/README 改动面表新增「手册/CHARTER/制度件（`packages/company-pack/content/`——会话注入面）」行；
    ② 新门禁 [replay-fixture-freshness](../../checks/gates/replay-fixture-freshness.mjs)（keyless 静态比对
    runnable+full 场景录制注入手册 vs 现行手册；presence 档跳过——其判据本就豁免内容比对）；
    ③ r3 第五次真重录（15s，lead 55 行 + 1 child，随 589d785 后的现行手册刷新）；

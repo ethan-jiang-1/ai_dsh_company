@@ -1,4 +1,6 @@
 # 2026-11-01 · 插件即产品：独立 company profile、workspace 自持身份（manifest v2）与 boot 登记
+> **0.6.0 取代**：入口/workspace/内容边界已由 [v3 Note](./2026-11-01-plugin-as-product-v3-native-entry.md) 重写（无 launcher；run bundle 全在 `.dsh-company/`；manifest v3）。本 Note 保留 v2 历史与迁移证据。
+
 
 状态：已交付（2026-11-01；用户当轮授权——「我们这个项目其实是要 Develop plug in as a product …… 先给出 plan …
 利用 backlog 结构把事情打磨好」，先出研究与卡、再落第一批切片）
@@ -13,7 +15,7 @@
 
 ## 决定
 
-1. **产品入口 = 独立 `company` profile**：`dsh-company` 启动器（`packages/company-pack/bin/dsh-company.mjs`，
+1. **产品入口 = 独立 `company` profile**：`dsh-company` 启动器（packages/company-pack/bin/dsh-company.mjs（0.6.0 已删除），
    pack `bin` 字段 → 安装后落在 profile 的 `node_modules/.bin`）与 repo 形态转发器
    （`tools/company.mjs` → `pnpm company`）。形状 = 解析/询问 workspace → 建/验 profile → 装/修 pack →
    写 seed consent → 设 `DSH_HOME`/`DSH_COMPANY_HOME` → spawn `dsh --profile company`。
@@ -49,7 +51,7 @@
 
 ## 实现与落点
 
-- `packages/company-pack/bin/dsh-company.mjs`（唯一启动器实现）+ `tools/company.mjs`（repo 形态转发，`pnpm company`）。
+- packages/company-pack/bin/dsh-company.mjs（0.6.0 已删除）（唯一启动器实现）+ `tools/company.mjs`（repo 形态转发，`pnpm company`）。
 - `packages/company-pack/src/host/bootstrap.ts`：`planBootstrap` / `applyBootstrap` / `seedAllowed` /
   `validateCompanyHome` / `chooseHandbookTarget` / consent 读写。
 - `packages/company-pack/src/host/bundle-manifest.ts`：`BUNDLE_MANIFEST_VERSION = 2`、`bundleManifestPath(workspace)`、
@@ -57,7 +59,7 @@
 - `packages/company-pack/src/host/runtime-guard.ts`：`prepareCompanyRuntime` 返回 `CompanyRuntime`
   （`dshHome` / `companyHome` / `dataBlocked` / `bundleState` / `handbookTarget` / `hasWorkspace`），
   lease 失败与坏 manifest 走 `dataBlocked` 停写。
-- `packages/company-pack/src/host/register-workspace.ts`（新）：boot 登记 row；**不放进 pack bundle**（会被
+- packages/company-pack/src/host/register-workspace.ts（0.6.0 已删除）（新）：boot 登记 row；**不放进 pack bundle**（会被
   Client 组合加载），由启动器写进 profile 的 `cordis.patch.yml`（`company-workspace-register`）。
 - `presets/*/agent.cordis.yml`：`instructionFileCandidates` 五角色同加。
 - 门禁/索引：`checks/README.md` 增 `pnpm company` 入口行；`tools/company.mjs` 补「状态：常驻」头注。

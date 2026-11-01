@@ -1,6 +1,6 @@
 ---
 name: tech-feasibility-review
-description: 技术评估方法论：选项枚举（自建/现成/混合）→ 可行性·成本·风险 → veto 或建议 → 一页纸（templates/review-note.md）。
+description: 技术评估方法论：选项枚举（自建/现成/混合）→ 可行性·成本·风险 → veto 或建议 → 一页纸（<company-content>/templates/review-note.md）。
 ---
 # 技术可行性评估（一页纸）
 
@@ -8,16 +8,16 @@ description: 技术评估方法论：选项枚举（自建/现成/混合）→ �
 
 1. **选项枚举**：至少三个——自建 / 用现成（采购或开源托管）/ 混合。禁止二元思维。
 2. **逐项评估**（每选项三行以内）：
-   - 可行性：按 kb/vp-eng/CHARTER.md 的技术栈事实判断——我们 8 人团队、无专职运维，
+   - 可行性：按 .dsh-company/kb/vp-eng/CHARTER.md 的技术栈事实判断——我们 8 人团队、无专职运维，
      撑不撑得起；
    - 成本：搭建 + 维护的人力估算（人·周），直言不讳；
    - 风险：最可能翻车的一件事 + 兜底手段。
 3. **结论**：先行。三选一 + 一句话理由；若建议"不做"，直接行使 veto 并说明。
-4. **格式与交付**：按 `templates/review-note.md` 结构写，结论先行，一页纸为限；
-   交付到 `deliverables/<slug>/drafts/vp-eng.md`。
+4. **格式与交付**：按 `<company-content>/templates/review-note.md` 结构写，结论先行，一页纸为限；
+   交付到 `.dsh-company/deliverables/<slug>/drafts/vp-eng.md`。
 
 红线：只谈技术与成本；"有没有人买"归销售、"接不接得住"归运营，不代答。
-需要事实支撑时优先读自己的 KB（`kb/vp-eng/`），不够再用 `subagent` 派 worker 调研。
+需要事实支撑时优先读自己的 KB（`.dsh-company/kb/vp-eng/`），不够再用 `subagent` 派 worker 调研。
 
 > **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
 > 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对

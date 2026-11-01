@@ -62,6 +62,7 @@ import {
   type FsWriteLike,
 } from './cultivation-storage.ts'
 import { canonicalPath } from './paths.ts'
+import { RUN_BUNDLE_PATHS } from '../lib/run-bundle-paths.ts'
 
 /** bundle patch 行注入的 host config（cordis.patch.yml `company-client` 行）。 */
 export interface CultivationHostConfig {
@@ -70,7 +71,7 @@ export interface CultivationHostConfig {
 }
 
 /** 记录目录（相对会话 cwd；公司盘共享）。 */
-const RECORDS_REL = join('cultivation', 'records')
+const RECORDS_REL = RUN_BUNDLE_PATHS.records
 
 /** 会话角色 + cwd 的最小读面（工具与命令共用）。 */
 interface SessionFace {
@@ -509,7 +510,7 @@ function commandArchive(command: CultivationCommandContext, tokens: readonly str
       if (!Number.isSafeInteger(days) || days < 1 || days > 3650) {
         return { kind: 'error' as const, text: '用法：archive <天数 1..3650>——只归档已处理（非 open）且早于该天数的记录。' }
       }
-      const archiveDir = join(root, 'cultivation', 'records-archive')
+      const archiveDir = join(root, RUN_BUNDLE_PATHS.cultivation, 'records-archive')
       const loaded = storage.loadRecords(recordsDir)
       if (!loaded.reachable) return { kind: 'error' as const, text: `记录目录不可达：${recordsDir}` }
       const cutoff = Date.now() - days * 86_400_000
@@ -540,7 +541,7 @@ function commandPurge(command: CultivationCommandContext, tokens: readonly strin
       if (!Number.isSafeInteger(days) || days < 1 || days > 3650) {
         return { kind: 'error' as const, text: '用法：purge <天数 1..3650>——只删除 cultivation/records-archive/ 里早于该天数的归档记录。' }
       }
-      const archiveDir = join(root, 'cultivation', 'records-archive')
+      const archiveDir = join(root, RUN_BUNDLE_PATHS.cultivation, 'records-archive')
       let result: { removed: number, failed: number }
       try {
         result = storage.purgeArchive(archiveDir, Date.now() - days * 86_400_000)

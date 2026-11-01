@@ -156,7 +156,7 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
    （`ChildComposition` 加一个 `preset` 字段，`materializeTracked` 的 setup 里按它 mount）。
    这个提案的自然落点已经存在——`applyChildComposition` 就是唯一收口处，上游改动面很小。
 2. **跨会话长期记忆没有内建 seam**（`packages/` 无 memory 包；FAQ 08 也把长期记忆列为缺口）。
-   角色的"经历"跨会话沉淀 = workspace 文件（`company-workspace/kb/<role>/journal/`）+ 角色
+   角色的"经历"跨会话沉淀 = workspace 文件（`company-workspace/.dsh-company/kb/<role>/journal/`）+ 角色
    skill 指引"开工先读自己的 journal"。这反而贴合公司隐喻：离职换人（换 preset/换模型），
    公司资产（KB/journal/deliverables）留在盘上。
 

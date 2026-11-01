@@ -30,11 +30,12 @@ import {
   type CatalogScanEntry,
 } from '../lib/deliverables-catalog.ts'
 import { canonicalPath } from './paths.ts'
+import { RUN_BUNDLE_PATHS } from '../lib/run-bundle-paths.ts'
 import { isRecord } from '../lib/guards.ts'
 
-export const CATALOG_REL = 'kb/deliverables-index.json'
+export const CATALOG_REL = RUN_BUNDLE_PATHS.catalog
 /** 审计账本（`presented` 的权威；操作员可读可改）。 */
-export const PRESENTED_LEDGER_REL = 'kb/deliverables-presented.json'
+export const PRESENTED_LEDGER_REL = RUN_BUNDLE_PATHS.presented
 
 /** 目录里的相对路径（POSIX）。 */
 
@@ -262,10 +263,10 @@ export function auditRelPath(
   const absolute = isAbsolute(rawPath) ? rawPath : join(root, rawPath)
   const rel = normalizeRel(relative(root, canonicalPath(absolute)))
   if (rel === '' || rel.startsWith('..') || isAbsolute(rel) || !rel.endsWith('/final.md')) {
-    return { warning: `审计路径必须是公司盘内的 deliverables/<dir>/final.md 或 deliverables-archive/<dir>/final.md：${rawPath}` }
+    return { warning: `审计路径必须是 .dsh-company/deliverables/<dir>/final.md 或 .dsh-company/deliverables-archive/<dir>/final.md：${rawPath}` }
   }
-  if (!/^(deliverables|deliverables-archive)\/[^/]+\/final\.md$/.test(rel)) {
-    return { warning: `审计路径只认 deliverables/<dir>/final.md：${rawPath}` }
+  if (!/^(\.dsh-company\/deliverables|\.dsh-company\/deliverables-archive)\/[^/]+\/final\.md$/.test(rel)) {
+    return { warning: `审计路径只认 .dsh-company/deliverables/<dir>/final.md：${rawPath}` }
   }
   return { rel }
 }
@@ -388,7 +389,7 @@ export function presentedFromEvent(event: unknown, companyHome: string): { paths
     const absolute = isAbsolute(raw) ? raw : join(root, raw)
     const rel = normalizeRel(relative(root, canonicalPath(absolute)))
     if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) continue
-    const match = /^(deliverables|deliverables-archive)\/([^/]+)\/final\.md$/.exec(rel)
+    const match = /^(\.dsh-company\/deliverables|\.dsh-company\/deliverables-archive)\/([^/]+)\/final\.md$/.exec(rel)
     if (match === null) continue
     const dirName = match[2] ?? ''
     if (dirName === '') continue
@@ -448,7 +449,7 @@ export function regenerateCatalog(companyHome: string, presented?: PresentedLedg
   const previousState = readCatalogState(companyHome)
   const previous = previousState.status === 'ok' ? previousState.catalog : null
   const entries = scanEntries(companyHome, ledger)
-  const ledgerPath = join(companyHome, 'kb/motion-ledger.md')
+  const ledgerPath = join(companyHome, RUN_BUNDLE_PATHS.ledger)
   const catalog = buildDeliverablesCatalog({
     entries,
     ledgerSlugs: existsSync(ledgerPath) ? ledgerSlugsFromText(readFileSync(ledgerPath, 'utf8')) : new Set(),
@@ -457,7 +458,7 @@ export function regenerateCatalog(companyHome: string, presented?: PresentedLedg
   if (previous !== null && JSON.stringify(previous.entries) === JSON.stringify(catalog.entries)) {
     return { written: false, catalog: previous, path }
   }
-  mkdirSync(join(companyHome, 'kb'), { recursive: true })
+  mkdirSync(join(companyHome, RUN_BUNDLE_PATHS.kb), { recursive: true })
   const temporary = `${path}.${String(process.pid)}.${String(Date.now())}.${randomUUID()}.tmp`
   try {
     writeFileSync(temporary, `${JSON.stringify(catalog, null, 2)}\n`, 'utf8')

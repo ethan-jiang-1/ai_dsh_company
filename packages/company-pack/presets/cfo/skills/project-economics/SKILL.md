@@ -1,13 +1,13 @@
 ---
 name: project-economics
-description: 项目经济性测算：报价毛利底线（30% 签字线）、人力成本按"人·周"分摊、里程碑收款曲线与垫资；一页纸（templates/decision-memo.md）。
+description: 项目经济性测算：报价毛利底线（30% 签字线）、人力成本按"人·周"分摊、里程碑收款曲线与垫资；一页纸（<company-content>/templates/decision-memo.md）。
 ---
 # 项目经济性测算（一页纸）
 
 对任何报价 / 预算 / 立项的标准打法：
 
 1. **收入侧**：合同额按里程碑拆收款曲线（公司惯例 3-4-3）；维护年费单列（≈ 项目额 15–20%）。
-2. **成本侧**：人力按"人·周"× 条线分摊（编制与费率基准见 `kb/org.md` 与 `kb/cfo/CHARTER.md`）；
+2. **成本侧**：人力按"人·周"× 条线分摊（编制与费率基准见 `.dsh-company/kb/org.md` 与 `.dsh-company/kb/cfo/CHARTER.md`）；
    云与外包按预算基准；漏项按最坏档补——"先低报后追加"不算口径。**跨职能数字（研发人天、
    交付人天等）取 owner 口径重算，不自行占位**——自己的估算只作对照并标【我的估算】，
    两家口径不收敛时并列报出交 CEO 裁。
@@ -16,7 +16,7 @@ description: 项目经济性测算：报价毛利底线（30% 签字线）、人
    先调用 `request_signoff` 工具（line 写触的哪条线、summary 带数字），拿到人的批准再落结论；
    被拒绝就按拒绝意见改写或行使 veto；无人应答（fail-closed）则把该事项写进未决项，不落对外结论。
 4. **现金风险**：垫资月数 = 成本先于收款的时间；垫资超一个月的合同先过 CFO；收款滞后一档公司现金能不能撑——撑不住即 veto。
-5. **格式与交付**：按 `templates/decision-memo.md` 结构，一页纸为限，交付到 `deliverables/<slug>/drafts/cfo.md`。
+5. **格式与交付**：按 `<company-content>/templates/decision-memo.md` 结构，一页纸为限，交付到 `.dsh-company/deliverables/<slug>/drafts/cfo.md`。
 
 红线：数字要可复现（算式 + 乘数逐项列出）；**门槛类算式过边界值自查**——每个乘数加在哪一项
 逐项点名、临界值代回原式验方向（乘数加错项的偏差是系统性的，可达 2 倍量级）；

@@ -1,174 +1,132 @@
 /**
- * 首启自举的 keyless 完成定义（2026-10-13 立）。
+ * run bundle 初始化 v3 的 keyless 完成定义（2026-11-01）。
  *
- * 判据三条（对应 lib/bootstrap.ts 头注的纪律）：①缺什么建什么（含嵌套目录）；
- * ②已有的一律不动（内容与字节都不改——本仓的运行盘尤其不能被覆盖）；③可重入（第二次全 skip）。
- * 反证：把 `applyBootstrap` 里的 `flag: 'wx'` 换成默认 flag（或删 `action === 'skip'` 分支）
- * ⇒ 「已有文件不被覆盖」那条红。
+ * 判据：
+ * ① 只建 `<workspace>/.dsh-company/`，不写根目录 `AGENTS.md`/`COMPANY.md`/`kb/`/`templates/`；
+ * ② 状态实例（company/org/owners/ledger/charter）只补缺；
+ * ③ 手册/模板不进 run bundle（只读内容住 pack `content/`）；
+ * ④ 可重入：第二次全 skip，已有文件字节不变；
+ * ⑤ content 缺失/落点不安全时不抛，返回可诊断错误。
  */
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync, existsSync, lstatSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
-import { join, resolve } from 'node:path'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   applyBootstrap,
   bootstrapCompanyWorkspace,
-  bootstrapEnabled,
+  listRunBundleFiles,
   planBootstrap,
-  resolveCompanyHome,
-  resolveSkeletonDir,
+  resolveContentDir,
   validateCompanyHome,
 } from '../../packages/company-pack/src/host/bootstrap.ts'
 
-/** 造一个最小出厂骨架（形状照 pack 的 workspace/：手册 + kb + templates + 空目录）。 */
-function skeleton(): string {
-  const dir = mkdtempSync(join(tmpdir(), 'company-skeleton-'))
-  mkdirSync(join(dir, 'kb/ceo/journal'), { recursive: true })
+/** 最小 pack content：手册 + 模板 + 默认章程 + 状态默认值。 */
+function content(): string {
+  const dir = mkdtempSync(join(tmpdir(), 'company-content-'))
   mkdirSync(join(dir, 'templates'), { recursive: true })
-  mkdirSync(join(dir, 'deliverables'), { recursive: true })
-  writeFileSync(join(dir, 'AGENTS.md'), '# 手册\n')
-  writeFileSync(join(dir, 'kb/org.md'), '# org\n')
-  writeFileSync(join(dir, 'kb/ceo/CHARTER.md'), '# ceo 章程\n')
+  mkdirSync(join(dir, 'charters'), { recursive: true })
+  mkdirSync(join(dir, 'state'), { recursive: true })
+  writeFileSync(join(dir, 'AGENTS.md'), '# 公司手册\n')
   writeFileSync(join(dir, 'templates/meta.md'), '# meta 模板\n')
-  writeFileSync(join(dir, '.gitkeep'), '') // dotfile 不进目标盘
+  writeFileSync(join(dir, 'charters/ceo.md'), '# ceo 默认章程\n')
+  writeFileSync(join(dir, 'state/company.md'), '# 公司身份\n')
+  writeFileSync(join(dir, 'state/org.md'), '# 组织\n')
+  writeFileSync(join(dir, 'state/owners.md'), '# owners\n')
+  writeFileSync(join(dir, 'state/motion-ledger.md'), '# 台账\n')
   return dir
 }
 
-describe('首启自举：planBootstrap', () => {
-  it('目标盘不存在 ⇒ 全部 create（含嵌套目录）；dotfile 不进计划', () => {
-    const skel = skeleton()
-    const home = join(mkdtempSync(join(tmpdir(), 'company-home-')), 'company-workspace')
+describe('run bundle v3：planBootstrap', () => {
+  it('只计划 .dsh-company/ 内的目录与状态；不计划根 AGENTS.md/kb/templates', () => {
+    const pack = content()
+    const workspace = mkdtempSync(join(tmpdir(), 'company-ws-'))
     try {
-      const plan = planBootstrap(skel, home)
+      const plan = planBootstrap(pack, workspace)
       expect(plan.error).toBeUndefined()
-      expect(plan.creates).toBe(plan.entries.length)
-      expect(plan.entries.map(entry => entry.rel)).toContain('kb/ceo/journal')
-      expect(plan.entries.map(entry => entry.rel)).not.toContain('.gitkeep')
+      const rels = plan.entries.map(entry => entry.rel)
+      expect(rels).toContain('.dsh-company')
+      expect(rels).toContain('.dsh-company/kb/company.md')
+      expect(rels).toContain('.dsh-company/kb/ceo/CHARTER.md')
+      expect(rels).toContain('.dsh-company/deliverables')
+      expect(rels).toContain('.dsh-company/cultivation/records')
+      expect(rels).toContain('.dsh-company/README.md')
+      expect(rels).not.toContain('AGENTS.md')
+      expect(rels).not.toContain('kb/company.md')
+      expect(rels).not.toContain('templates/meta.md')
+      expect(rels.some(rel => rel.startsWith('templates/'))).toBe(false)
     } finally {
-      rmSync(skel, { recursive: true, force: true }); rmSync(home, { recursive: true, force: true })
+      rmSync(pack, { recursive: true, force: true }); rmSync(workspace, { recursive: true, force: true })
     }
   })
 
-  it('骨架缺失 ⇒ 带 error 的空计划（不抛——apply 期抛错会连累应用）', () => {
-    const plan = planBootstrap('/nonexistent/skeleton', '/tmp/whatever-company-home')
+  it('content 缺失 ⇒ 带 error 的空计划（不抛）', () => {
+    const plan = planBootstrap('/nonexistent/content', '/tmp/whatever-workspace')
     expect(plan.entries).toEqual([])
-    expect(plan.error).toContain('骨架目录不存在')
+    expect(plan.error).toContain('content 目录不存在')
   })
 })
 
-describe('首启自举：applyBootstrap（只补缺 / 绝不覆盖 / 可重入）', () => {
-  it('第一次落盘、第二次全 skip；已有文件内容一个字节不改', () => {
-    const skel = skeleton()
-    const home = join(mkdtempSync(join(tmpdir(), 'company-home-')), 'company-workspace')
+describe('run bundle v3：applyBootstrap（只补缺 / 绝不覆盖 / 可重入）', () => {
+  it('第一次落盘、第二次全 skip；已有状态内容一个字节不改；手册/模板不落盘', () => {
+    const pack = content()
+    const workspace = mkdtempSync(join(tmpdir(), 'company-ws-'))
     try {
-      const first = bootstrapCompanyWorkspace(skel, home)
+      const first = bootstrapCompanyWorkspace(pack, workspace)
       expect(first.plan.error).toBeUndefined()
-      expect(first.result.created).toContain('AGENTS.md')
-      expect(readFileSync(join(home, 'kb/org.md'), 'utf8')).toBe('# org\n')
-      expect(existsSync(join(home, 'deliverables'))).toBe(true)
+      expect(first.result.created).toContain('.dsh-company/kb/company.md')
+      expect(readFileSync(join(workspace, '.dsh-company/kb/org.md'), 'utf8')).toBe('# 组织\n')
+      expect(existsSync(join(workspace, '.dsh-company/deliverables'))).toBe(true)
+      expect(existsSync(join(workspace, 'AGENTS.md'))).toBe(false)
+      expect(existsSync(join(workspace, 'templates'))).toBe(false)
 
-      // 用户填了自己的东西（owners）与改了手册——第二次自举不许碰
-      writeFileSync(join(home, 'kb/owners.md'), '# 我们的人\n')
-      writeFileSync(join(home, 'AGENTS.md'), '# 我们改过的手册\n')
-      const second = bootstrapCompanyWorkspace(skel, home, 'AGENTS.md')
+      writeFileSync(join(workspace, '.dsh-company/kb/owners.md'), '# 我们的人\n')
+      const second = bootstrapCompanyWorkspace(pack, workspace)
       expect(second.result.created).toEqual([])
-      expect(second.result.skipped.length).toBe(first.result.created.length)
-      expect(readFileSync(join(home, 'kb/owners.md'), 'utf8')).toBe('# 我们的人\n')
-      expect(readFileSync(join(home, 'AGENTS.md'), 'utf8')).toBe('# 我们改过的手册\n')
+      expect(readFileSync(join(workspace, '.dsh-company/kb/owners.md'), 'utf8')).toBe('# 我们的人\n')
     } finally {
-      rmSync(skel, { recursive: true, force: true }); rmSync(home, { recursive: true, force: true })
+      rmSync(pack, { recursive: true, force: true }); rmSync(workspace, { recursive: true, force: true })
     }
   })
 
-  it('部分缺件 ⇒ 只补缺的（additive migration 语义）', () => {
-    const skel = skeleton()
-    const home = join(mkdtempSync(join(tmpdir(), 'company-home-')), 'company-workspace')
+  it('部分缺件 ⇒ 只补缺的', () => {
+    const pack = content()
+    const workspace = mkdtempSync(join(tmpdir(), 'company-ws-'))
     try {
-      mkdirSync(join(home, 'kb'), { recursive: true })
-      writeFileSync(join(home, 'kb/org.md'), '# 我们的 org\n')
-      const { result } = bootstrapCompanyWorkspace(skel, home)
-      expect(result.created).toContain('kb/ceo/CHARTER.md')
-      expect(result.skipped).toContain('kb/org.md')
-      expect(readFileSync(join(home, 'kb/org.md'), 'utf8')).toBe('# 我们的 org\n')
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/org.md'), '# 我们的 org\n')
+      const { result } = bootstrapCompanyWorkspace(pack, workspace)
+      expect(result.created).toContain('.dsh-company/kb/company.md')
+      expect(result.skipped).toContain('.dsh-company/kb/org.md')
+      expect(readFileSync(join(workspace, '.dsh-company/kb/org.md'), 'utf8')).toBe('# 我们的 org\n')
     } finally {
-      rmSync(skel, { recursive: true, force: true }); rmSync(home, { recursive: true, force: true })
+      rmSync(pack, { recursive: true, force: true }); rmSync(workspace, { recursive: true, force: true })
     }
   })
 
-  it('计划带 error 时 apply 是纯 no-op（不建目录）', () => {
-    const home = join(mkdtempSync(join(tmpdir(), 'company-home-')), 'company-workspace')
+  it('计划带 error 时 apply 是纯 no-op（不建 workspace）', () => {
+    const workspace = join(mkdtempSync(join(tmpdir(), 'company-ws-')), 'nested')
     try {
-      const plan = planBootstrap('/nonexistent/skeleton', home)
+      const plan = planBootstrap('/nonexistent/content', workspace)
       const result = applyBootstrap(plan)
       expect(result.created).toEqual([])
-      expect(existsSync(home)).toBe(false)
-      expect(lstatSync(join(home, '..')).isDirectory()).toBe(true)
+      expect(existsSync(workspace)).toBe(false)
     } finally {
-      rmSync(join(home, '..'), { recursive: true, force: true })
+      rmSync(workspace, { recursive: true, force: true })
     }
   })
 })
 
-describe('首启自举：骨架目录的路径算术（防"多套一层 workspace"）', () => {
-  // 现场（2026-10-13）：接线把已解出的 `<pack>/workspace` 又喂给会再拼 `workspace` 的助手
-  // ⇒ `<pack>/workspace/workspace`，真实例里只留一行 warn、静默不落盘；release-smoke ⑥ 抓出。
-  // 反证：把 resolveSkeletonDir 改成 `join(fileURLToPath(new URL('../', moduleUrl)), 'workspace', 'workspace')` ⇒ 本条红。
-  it('`<pack>/lib/index.js` ⇒ `<pack>/workspace`（不是 `<pack>/workspace/workspace`）', () => {
-    // ⚠ fileURLToPath **保留 URL 的尾斜杠**，而 Node 的 path.normalize 也保留（实测；POSIX 语义）
-    // ⇒ 断言自己剥尾斜杠（关键是"只一层 workspace"）
+describe('content 目录路径算术', () => {
+  it('`<pack>/lib/index.js` ⇒ `<pack>/content`（只一层）', () => {
     const strip = (value: string): string => value.replace(/\/+$/, '')
-    expect(strip(resolveSkeletonDir('file:///pack/lib/index.js'))).toBe('/pack/workspace')
-    expect(resolveSkeletonDir('file:///pack/lib/index.js')).not.toContain('/workspace/workspace')
+    expect(strip(resolveContentDir('file:///pack/lib/index.js'))).toBe('/pack/content')
+    expect(resolveContentDir('file:///pack/lib/index.js')).not.toContain('/content/content')
   })
 })
 
-describe('首启自举：落点与开关', () => {
-  it('落点优先级：显式 > DSH_COMPANY_HOME；没有默认 <DSH_HOME>/company-workspace', () => {
-    const before = process.env.DSH_COMPANY_HOME
-    try {
-      delete process.env.DSH_COMPANY_HOME
-      expect(resolveCompanyHome('/h')).toBeUndefined()
-      expect(resolveCompanyHome('/h', '/x/y')).toBe('/x/y')
-      process.env.DSH_COMPANY_HOME = '/env/company'
-      expect(resolveCompanyHome('/h')).toBe('/env/company')
-    } finally {
-      if (before === undefined) delete process.env.DSH_COMPANY_HOME
-      else process.env.DSH_COMPANY_HOME = before
-    }
-  })
-
-  it('落点归一：~ 展开、相对路径绝对化、空白回落（2026-10-26 P1）', () => {
-    const before = process.env.DSH_COMPANY_HOME
-    try {
-      delete process.env.DSH_COMPANY_HOME
-      expect(resolveCompanyHome('/h', '~/company')).toBe(join(homedir(), 'company'))
-      expect(resolveCompanyHome('/h', 'relative/company')).toBe(resolve('relative/company'))
-      expect(resolveCompanyHome('/h', '   ')).toBeUndefined()
-      process.env.DSH_COMPANY_HOME = ' ~/env-company '
-      expect(resolveCompanyHome('/h')).toBe(join(homedir(), 'env-company'))
-    } finally {
-      if (before === undefined) delete process.env.DSH_COMPANY_HOME
-      else process.env.DSH_COMPANY_HOME = before
-    }
-  })
-
-  it('开关：DSH_COMPANY_BOOTSTRAP=off 关闭（自管盘的部署用）', () => {
-    const before = process.env.DSH_COMPANY_BOOTSTRAP
-    try {
-      delete process.env.DSH_COMPANY_BOOTSTRAP
-      expect(bootstrapEnabled()).toBe(true)
-      process.env.DSH_COMPANY_BOOTSTRAP = 'off'
-      expect(bootstrapEnabled()).toBe(false)
-    } finally {
-      if (before === undefined) delete process.env.DSH_COMPANY_BOOTSTRAP
-      else process.env.DSH_COMPANY_BOOTSTRAP = before
-    }
-  })
-})
-
-
-describe('公司盘落点校验（2026-10-27 G11）', () => {
-  it('默认子目录合法；等于/包含 DSH_HOME 或 OS home、指向普通文件都拒绝', () => {
+describe('workspace 落点校验', () => {
+  it('普通子目录合法；等于/包含 DSH_HOME 或 OS home、普通文件、symlink 到文件都拒绝', () => {
     const root = mkdtempSync(join(tmpdir(), 'company-home-check-'))
     const home = join(root, 'dsh-home')
     const file = join(root, 'not-a-dir')
@@ -185,6 +143,21 @@ describe('公司盘落点校验（2026-10-27 G11）', () => {
       expect(validateCompanyHome(home, link).ok).toBe(false)
     } finally {
       rmSync(root, { recursive: true, force: true })
+    }
+  })
+})
+
+describe('listRunBundleFiles', () => {
+  it('只列 run bundle 内文件', () => {
+    const pack = content()
+    const workspace = mkdtempSync(join(tmpdir(), 'company-ws-'))
+    try {
+      bootstrapCompanyWorkspace(pack, workspace)
+      const files = listRunBundleFiles(workspace)
+      expect(files).toContain('.dsh-company/kb/company.md')
+      expect(files.every(file => file.startsWith('.dsh-company/'))).toBe(true)
+    } finally {
+      rmSync(pack, { recursive: true, force: true }); rmSync(workspace, { recursive: true, force: true })
     }
   })
 })

@@ -1,44 +1,38 @@
-/** Host half of the company pack: signoff tool (驾驶舱②) + workspace doors tool (BUG-002) + cultivation loop (2026-10-13 培养卡) + presence read-model re-export.
- * The browser half lives in `./client`. */
+/** Host half of the company pack: signoff, workspace doors, cultivation, run bundle, catalog/ledger. */
 import type { Context } from '@deepseek-ai/cordis'
-// 纯类型导入：只需要 `ctx.approval` 的 Context 类型增强（服务本体由 web profile 挂载）。
-// ⚠ 不做值导入——那会把 host 侧核心包的类型图拉进本程序，遮掉 client 面的 sessions 增强（实测）。
 import type {} from '@deepseek-ai/dsh-user-approval'
 import { existsSync, readFileSync } from 'node:fs'
 import { isAbsolute, join, relative } from 'node:path'
 import { registerSignoffTool } from './host/signoff-tool.ts'
 import { registerWorkspaceDoors } from './host/workspace-doors.ts'
-import { applyBootstrap, planBootstrap, resolveSkeletonDir, seedAllowed } from './host/bootstrap.ts'
+import {
+  applyBootstrap,
+  planBootstrap,
+  resolveContentDir,
+} from './host/bootstrap.ts'
 import {
   appendUpgradeLog,
-  applySkeletonUpgrade,
-  identityBackupPath,
   bundleManifestPath,
   planBundleManifest,
-  planSkeletonUpgrade,
   resolvePackMetadata,
   writeBundleManifest,
-  writeIdentityBackup,
-  writeUpgradedManifest,
 } from './host/bundle-manifest.ts'
 import {
-  ensurePresentedLedger,
   presentedFromEvent,
   presentedFromSessions,
   readCatalogState,
-  recordPresented,
   regenerateCatalog,
-  setPresentedAudit,
   type PresentedSessionQuery,
 } from './host/catalog.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
+import { registerHandbook } from './host/handbook.ts'
 import { migrateLegacyMethodLayers } from './host/cultivation-storage.ts'
 import {
   auditLedger,
   createPresentedLedgerStore,
   ensureLedger,
+  type PresentedLedgerStore,
   recordLedger,
-  storageDomainOf,
 } from './host/presented-domain.ts'
 import { registerClientDiagnostics } from './host/client-diagnostics.ts'
 import { exportGovernance, type ExportLedgerSource } from './host/governance-export.ts'
@@ -46,60 +40,49 @@ import { prepareCompanyRuntime } from './host/runtime-guard.ts'
 import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace-registry.ts'
 import { canonicalPath } from './host/paths.ts'
 
-/**
- * 在场板读模型（R5b）从 host 入口再导出：`checks/smoke/replay-smoke.mjs` 用它把重放会话的
- * team 事件折成在场板做判据 4 断言；纯函数、零依赖，不影响 host 挂载面。
- */
 export * from './lib/presence.ts'
-
-/**
- * 工作区门投影（BUG-002，2026-10-06）：同 cwd 的根会话 × preset 聚合——同 preset ≥2 = duplicateWarning。
- * 再导出纯函数供 keyless spec 与 client 视图消费。
- */
 export * from './lib/doors.ts'
 
-/** Host half now registers tools and the cultivation command family: tool registry + approval + commands services. */
-export const inject = ['tools', 'approval', 'commands']
+/** Host half registers tools, approval and the cultivation command family. */
+export const inject = ['tools', 'approval', 'commands', 'workspaceRegistry']
 
-/**
- * bundle patch 行可注入的 host config（`cordis.patch.yml` 的 `company-client` 行）。
- * 2026-10-28 M3：`cultivationRoot` = 公司级方法层根（!!js 从 profile 根上两级到
- * `<DSH_HOME>/company/methods/`），与各角色 preset 的第二 customSkillDirs 同前缀构造对齐。
- */
 export type HostConfig = CultivationHostConfig
 
 /**
- * Host plugin body：编排签字工具、工作区门投影、培养命令、首启骨架、bundle 身份与成品目录。
- *
- * 具体实现分别住 `host/signoff-tool.ts` / `host/workspace-doors.ts` / `host/cultivation.ts` 等；
- * 本入口只保留运行前提（`prepareCompanyRuntime`）与装配次序。挂载面 = 既有 `company-client` 行
- * （bundle 级）⇒ 全部会话与 teammate 可见——r2-motion 实证 teammate 可见全局工具行。
+ * Host plugin body. Workspace is resolved at boot from env/cwd/saved; no launcher/TTY.
+ * If no workspace is known, the app stays usable but company data is blocked until the user
+ * opens a session in a workspace (the native DSH picker path) and the host is restarted/activated.
  */
-export function apply(ctx: Context, config: HostConfig = {}): void {
+export async function apply(ctx: Context, config: HostConfig = {}): Promise<void> {
   registerSignoffTool(ctx)
 
-  const { dshHome: bundleHome, companyHome, expectedWorkspace, dataBlocked, bundleState, handbookTarget } = prepareCompanyRuntime(ctx)
-  const hasWorkspace = companyHome !== ''
-  // presented 账本 store（2026-10-28 数据设计硬化 M2）：storageDomain 可用时走 domain；
-  // 缺席/打不开时 store 自己回退旧 W 文件并告警（降级不是静默）。没有 domain 的旧组合保留同步路径。
-  const ledgerStorePromise = !hasWorkspace || storageDomainOf(ctx) === undefined
-    ? undefined
-    : createPresentedLedgerStore(ctx, bundleHome, companyHome)
+  const runtime = prepareCompanyRuntime(ctx)
+  const workspace = runtime.workspace
+  const hasWorkspace = workspace !== ''
+  const dataBlocked = runtime.dataBlocked || !hasWorkspace
+
+  const ledgerStorePromise: Promise<PresentedLedgerStore> | undefined =
+    hasWorkspace && !runtime.dataBlocked
+      ? createPresentedLedgerStore(ctx, runtime.dshHome, workspace)
+      : undefined
+
   const exportNow = (ledger?: ExportLedgerSource): void => {
     if (dataBlocked || !hasWorkspace) return
     try {
-      const result = exportGovernance({ dshHome: bundleHome, workspace: companyHome, ...(ledger === undefined ? {} : { ledger }) })
+      const result = exportGovernance({
+        dshHome: runtime.dshHome,
+        workspace,
+        ...(ledger === undefined ? {} : { ledger }),
+      })
       for (const warning of result.warnings) ctx.logger?.warn?.(`company-pack：治理导出：${warning}`)
     } catch (error) {
       ctx.logger?.warn?.(`company-pack 治理导出跳过（不影响运行）：${(error as Error).message}`)
     }
   }
-  // 培养回路（2026-10-13 培养卡）：公司数据只写公司盘根，不跟随 session cwd 的子目录。
-  // 身份损坏/更高版本/落点不安全时拒绝公司数据写入，避免写到猜测的默认盘。
-  // 2026-10-28 M3：方法层从 profile 级迁公司级；旧 profile 方法只读留一版，copy 到新根。
+
   if (!dataBlocked && config.cultivationRoot !== undefined) {
     try {
-      const migrated = migrateLegacyMethodLayers(bundleHome, config.cultivationRoot)
+      const migrated = migrateLegacyMethodLayers(runtime.dshHome, config.cultivationRoot)
       if (migrated.copied.length > 0) {
         ctx.logger?.info?.(`company-pack：方法层已迁公司级（${String(migrated.copied.length)} 个；旧 profile 路径只读留一版）`)
       }
@@ -111,136 +94,93 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
       ctx.logger?.warn?.(`company-pack 方法层迁移跳过（不影响运行）：${(error as Error).message}`)
     }
   }
-  registerCultivation(ctx, config, expectedWorkspace, dataBlocked)
-  registerClientDiagnostics(ctx, bundleHome, dataBlocked)
-  // 交付审计命令（2026-10-27 F7）：presented=false 的第一入口，不再要求手改 JSON。
+
+  registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked)
+  registerHandbook(ctx, resolveContentDir(import.meta.url), hasWorkspace ? workspace : undefined)
+  registerClientDiagnostics(ctx, runtime.dshHome, dataBlocked)
+
   ctx.commands.register({
     name: 'deliverables',
     description: '交付审计：把一条 final.md 的 presented 结论写入审计账本并重生成索引（人命令）',
-    input: { hint: 'audit <deliverables/<dir>/final.md> true|false' },
+    input: { hint: 'audit .dsh-company/deliverables/<dir>/final.md true|false' },
     handler: async ({ rawInput }: { readonly rawInput: string }) => {
-      if (dataBlocked) return { kind: 'error' as const, text: '公司数据已停写（身份/落点/lease 问题）；先修再审计。' }
+      if (dataBlocked) return { kind: 'error' as const, text: '公司数据已停写（无 workspace/身份/lease 问题）；先选 workspace 再审计。' }
       const tokens = rawInput.trim().split(/\s+/).filter(token => token !== '')
       if (tokens[0] !== 'audit' || tokens.length < 3) {
-        return { kind: 'error' as const, text: '用法：/deliverables audit <deliverables/<dir>/final.md> true|false' }
+        return { kind: 'error' as const, text: '用法：/deliverables audit .dsh-company/deliverables/<dir>/final.md true|false' }
       }
       const value = tokens[tokens.length - 1]
       if (value !== 'true' && value !== 'false') {
         return { kind: 'error' as const, text: `审计结论只认 true/false：${value ?? ''}` }
       }
-      const path = tokens.slice(1, -1).join(' ')
       if (ledgerStorePromise === undefined) {
-        const result = setPresentedAudit(expectedWorkspace, path, value === 'true')
-        if (result.ledger === undefined) {
-          return { kind: 'error' as const, text: result.warning ?? '审计写入失败' }
-        }
-        regenerateCatalog(expectedWorkspace, result.ledger)
-        exportNow()
-        return { kind: 'success' as const, text: `已审计 ${result.path ?? path} = ${value}（写入 presented 账本并重生成索引）。` }
+        return { kind: 'error' as const, text: 'presented 账本未初始化（无 workspace）。' }
       }
+      const path = tokens.slice(1, -1).join(' ')
       const store = await ledgerStorePromise
-      const result = await auditLedger(expectedWorkspace, store, path, value === 'true')
+      const result = await auditLedger(workspace, store, path, value === 'true')
       if (result.ledger === undefined) {
         return { kind: 'error' as const, text: result.warning ?? '审计写入失败' }
       }
-      regenerateCatalog(expectedWorkspace, result.ledger)
+      regenerateCatalog(workspace, result.ledger)
+      exportNow(store)
       return {
         kind: 'success' as const,
-        text: `已审计 ${result.path ?? path} = ${value}（presented 账本 = ${store.kind === 'domain' ? 'domain' : '文件降级'}；索引已重生成）。`,
+        text: `已审计 ${result.path ?? path} = ${value}（presented 账本 = ${store.kind}；索引已重生成）。`,
       }
     },
   })
+
   ctx.on('api-session/added', (summary) => {
     if (summary.origin === 'subagent') return
+    if (!hasWorkspace) return
     if (typeof summary.cwd !== 'string' || summary.cwd === '') return
     const cwd = canonicalPath(summary.cwd)
-    const rel = relative(expectedWorkspace, cwd)
+    const rel = relative(workspace, cwd)
     if (rel !== '' && (rel.startsWith('..') || isAbsolute(rel))) {
-      ctx.logger?.warn?.(`company-pack：会话 ${String(summary.sessionId)} 的 cwd ${cwd} 不在公司盘 ${expectedWorkspace}；`
+      ctx.logger?.warn?.(`company-pack：会话 ${String(summary.sessionId)} 的 cwd ${cwd} 不在 workspace ${workspace}；`
         + '页签/身份会显示「非公司盘 / 身份未配置」，公司数据命令会拒绝写入')
     } else if (rel !== '') {
-      ctx.logger?.warn?.(`company-pack：会话 ${String(summary.sessionId)} 的 cwd ${cwd} 在公司盘子目录，不是公司盘根 ${expectedWorkspace}；`
-        + '公司数据（培养记录/方法层/成品目录）只在盘根生效，请以盘根开新会话')
+      ctx.logger?.warn?.(`company-pack：会话 ${String(summary.sessionId)} 的 cwd ${cwd} 在 workspace 子目录，不是根 ${workspace}；`
+        + '公司数据（培养记录/方法层/成品目录）只在 workspace 根生效，请以 workspace 根开新会话')
     }
   })
 
   registerWorkspaceDoors(ctx)
 
-  // ── 出厂骨架 + run bundle 身份（2026-11-01 产品化）──────────────────────────────
-  // 规则：workspace 必须显式；seed 需 consent 或已有公司标记；身份写 <workspace>/.dsh-company/
-  // bundle.json（v2）；没有 workspace/未同意 seed 时零写。骨架/身份/升级互不连累应用。
-  const skeleton = resolveSkeletonDir(import.meta.url)
-  try {
-    const pack = resolvePackMetadata(import.meta.url)
-    const canSeed = !dataBlocked && hasWorkspace && seedAllowed(companyHome, pack.version)
-    if (canSeed) {
-      const plan = planBootstrap(skeleton, companyHome, handbookTarget)
-      if (plan.error !== undefined) {
-        ctx.logger?.warn?.(`company-pack 骨架自举跳过：${plan.error}`)
-      } else {
-        const result = applyBootstrap(plan)
-        if (result.created.length > 0) {
-          ctx.logger?.info?.(`company-pack：出厂骨架已落到 ${plan.companyHome}`
-            + `（新建 ${String(result.created.length)} 件；手册目标 ${plan.handbookTarget}）——填 kb/owners.md 后即可开工`)
-        }
-      }
-    } else if (!dataBlocked && hasWorkspace) {
-      ctx.logger?.info?.('company-pack：workspace 未确认 seed（缺 .dsh-company/.seed-consent 或公司标记）；'
-        + '本次不写骨架/身份。用 `pnpm company` 首启确认，或显式设置 DSH_COMPANY_BOOTSTRAP=if-missing。')
-    }
-
-    try {
-      if (!dataBlocked && hasWorkspace && existsSync(companyHome)) {
-        const state = bundleState
-        if (state === undefined) {
-          // runtime-guard 已按无 workspace/坏身份处理；这里只兜底。
-        } else if (state.status === 'corrupt' || state.status === 'unsupported') {
-          // runtime-guard 已告警并 dataBlocked；保留原文件，不覆盖身份。
-        } else if (state.status === 'missing') {
-          if (seedAllowed(companyHome, pack.version)) {
-            const plan = planBundleManifest({
-              dshHome: bundleHome,
-              companyHome,
-              skeletonDir: skeleton,
-              pack,
-              handbookTarget,
-            })
-            const written = writeBundleManifest(plan)
-            if (written.created) {
-              ctx.logger?.info?.(`company-pack：run bundle 身份已建立（${plan.path}；v2）`)
-              if (written.fallback !== undefined) {
-                const warning = `company-pack：manifest 首建不支持 hard link（${written.fallback} 回退，非原子发布）；${plan.path}`
-                ctx.logger?.warn?.(warning)
-                process.stderr.write(`dsh: ${warning}\n`)
-              }
-            }
-          }
-        } else if (state.status === 'ok') {
-          const existing = state.manifest
-          const plan = planSkeletonUpgrade({ manifest: existing, skeletonDir: skeleton, workspace: companyHome, pack })
-          if (plan.changed) {
-            const result = applySkeletonUpgrade(plan, skeleton, companyHome)
-            writeUpgradedManifest(bundleManifestPath(companyHome), plan.manifest)
-            writeIdentityBackup(identityBackupPath(bundleHome, plan.manifest.id), plan.manifest)
-            const modified = plan.actions.filter(action => action.reason === 'modified').map(action => action.rel)
-            const summary = `基部升级 ${existing.skeleton.version} → ${pack.version}`
-              + `（新增 ${String(result.created.length)} / 替换 ${String(result.updated.length)}`
-              + ` / 保留用户改过 ${String(modified.length)}${modified.length > 0 ? `：${modified.join(', ')}` : ''}）`
-            appendUpgradeLog(companyHome, summary)
-            ctx.logger?.info?.(`company-pack：${summary}`)
-          }
-        }
-      }
-    } catch (error) {
-      ctx.logger?.warn?.(`company-pack run bundle 身份写入跳过（不影响运行）：${(error as Error).message}`)
-    }
-  } catch (error) {
-    ctx.logger?.warn?.(`company-pack 首启/身份跳过（不影响运行）：${(error as Error).message}`)
+  if (hasWorkspace && !runtime.dataBlocked) {
+    ensureRunBundle(ctx, workspace, runtime.dshHome, runtime.bundleState)
+    const registration = registerWorkspace(ctx, workspace)
+    if (registration !== undefined) await registration
   }
-  // ── 搬家指针体检（2026-10-26，P1）：DSH 的 workspace 登记存绝对路径，搬 home 后不会自动迁移。
-  // 只读点名，不修改 vendor 存储；用户需要在侧栏重新添加工作区。
+
+  if (ledgerStorePromise !== undefined) {
+    void initializeCatalog(ctx, workspace, ledgerStorePromise, exportNow)
+  }
+
+  ctx.on('session/event', (_session, event) => {
+    if ((event as { type?: unknown }).type !== 'deliverables/presented') return
+    if (dataBlocked || ledgerStorePromise === undefined) return
+    try {
+      const observed = presentedFromEvent(event, workspace)
+      if (observed.paths.size === 0 && observed.slugs.size === 0) return
+      void ledgerStorePromise.then(async store => {
+        const recorded = await recordLedger(store, observed)
+        if (recorded.ledger === undefined) {
+          ctx.logger?.warn?.(`company-pack 成品目录 present 投影未写账本（${recorded.warning ?? '未知原因'}）`)
+          return
+        }
+        regenerateCatalog(workspace, recorded.ledger)
+        exportNow(store)
+      }).catch(error => ctx.logger?.warn?.(`company-pack 成品目录 present 投影跳过（不影响运行）：${(error as Error).message}`))
+    } catch (error) {
+      ctx.logger?.warn?.(`company-pack 成品目录 present 投影跳过（不影响运行）：${(error as Error).message}`)
+    }
+  })
+
+  // 搬家指针体检：DSH 的 workspace 登记存绝对路径，搬 home 后不会自动迁移。
   try {
-    if (!dataBlocked && hasWorkspace) {
+    if (!dataBlocked) {
       const report = (stale: readonly string[]): void => {
         if (stale.length === 0) return
         const warning = `company-pack：DSH workspace 登记里有 ${String(stale.length)} 条路径已不存在（${stale.join('、')}）；`
@@ -252,154 +192,131 @@ export function apply(ctx: Context, config: HostConfig = {}): void {
         inject?: (deps: readonly string[], callback: (scoped: unknown) => void) => unknown
       }).inject
       if (typeof inject === 'function') {
-        // N1 合同：等 workspaceRegistry 就绪再列；不读持久化层私有 JSON。
         inject.call(ctx, ['workspaceRegistry'], (scoped) => {
           const registry = (scoped as { readonly workspaceRegistry?: WorkspaceRegistryLike }).workspaceRegistry
           if (registry !== undefined) report(staleWorkspacePathsFromRegistry(registry, existsSync))
         })
       } else {
-        // 旧组合/无 registry 的保底：只读 DSH 的登记文件做诊断，不再作为主路径。
-        const registryPath = join(bundleHome, 'storages/workspace.json')
+        const registryPath = join(runtime.dshHome, 'storages/workspace.json')
         if (existsSync(registryPath)) report(staleWorkspacePaths(JSON.parse(readFileSync(registryPath, 'utf8')), existsSync))
       }
     }
   } catch (error) {
     ctx.logger?.warn?.(`company-pack workspace 登记体检跳过（不影响运行）：${(error as Error).message}`)
   }
+}
 
-  // ── 成品目录 + presented 审计账本（2026-10-25 目录；2026-10-27 账本拆分；2026-10-28 M2 domain）──
-  // 有 storageDomain：走下面的异步 domain 启动；没有：保留旧同步文件路径（fallback/测试）。
-  if (ledgerStorePromise === undefined) {
+/** 初始化 run bundle 目录/状态 + v3 身份。没有 workspace 时调用方已跳过。 */
+function ensureRunBundle(
+  ctx: Context,
+  workspace: string,
+  dshHome: string,
+  bundleState: ReturnType<typeof prepareCompanyRuntime>['bundleState'],
+): void {
   try {
-    if (!dataBlocked && hasWorkspace && existsSync(companyHome)) {
-      const catalogState = readCatalogState(companyHome)
-      if (catalogState.status === 'corrupt' || catalogState.status === 'unsupported') {
-        const warning = `company-pack：成品目录 ${catalogState.status === 'unsupported' ? `schema ${String(catalogState.schema)} 高于本包支持` : `损坏（${catalogState.error}）`}；`
-          + '已按盘上 meta/final 重建派生索引（presented 以审计账本为准）'
+    const contentDir = resolveContentDir(import.meta.url)
+    const plan = planBootstrap(contentDir, workspace)
+    if (plan.error !== undefined) {
+      ctx.logger?.warn?.(`company-pack run bundle 初始化跳过：${plan.error}`)
+    } else {
+      const result = applyBootstrap(plan)
+      if (result.created.length > 0) {
+        ctx.logger?.info?.(`company-pack：run bundle 已初始化 ${workspace}/.dsh-company（新建 ${String(result.created.length)} 件）`)
+      }
+    }
+    const pack = resolvePackMetadata(import.meta.url)
+    const manifestPlan = planBundleManifest({ dshHome, workspace, pack })
+    if (manifestPlan.error !== undefined) {
+      ctx.logger?.warn?.(`company-pack run bundle 身份未更新：${manifestPlan.error}`)
+      return
+    }
+    const written = writeBundleManifest(manifestPlan)
+    if (written.created || written.upgraded) {
+      const action = written.upgraded ? 'v2→v3' : 'v3'
+      ctx.logger?.info?.(`company-pack：run bundle 身份已写入（${bundleManifestPath(workspace)}；${action}）`)
+      if (written.fallback !== undefined) {
+        const warning = `company-pack：manifest 首建不支持 hard link（${written.fallback} 回退，非原子发布）；${bundleManifestPath(workspace)}`
         ctx.logger?.warn?.(warning)
+        process.stderr.write(`dsh: ${warning}\n`)
       }
-      const bootstrap = ensurePresentedLedger(companyHome)
-      if (bootstrap.warning !== undefined) ctx.logger?.warn?.(`company-pack：${bootstrap.warning}`)
-      if (bootstrap.migrated) {
-        ctx.logger?.info?.('company-pack：presented 审计账本已从旧成品索引迁移')
-      }
-      const result = regenerateCatalog(companyHome, bootstrap.ledger)
-      if (result.written) ctx.logger?.info?.(`company-pack：成品目录已生成（${result.path}）`)
-      exportNow()
-      if (bootstrap.needsScan) {
-        // 后台回扫，不阻塞首屏：账本缺失/从旧索引迁移时，旧 present 事件可能只在会话日志里。
-        // 用 ctx.inject 等 sessionQuery 服务就绪，而不是在 apply 时 ctx.get（后者在真实 boot 里可能还是 undefined）。
-        const scan = async (query: PresentedSessionQuery): Promise<void> => {
-          try {
-            const observed = await presentedFromSessions(query, companyHome, AbortSignal.timeout(30_000))
-            const recorded = recordPresented(companyHome, observed)
-            if (recorded.ledger === undefined) {
-              ctx.logger?.warn?.(`company-pack：presented 回扫结果未写账本（${recorded.warning ?? '未知原因'}）`)
-              return
-            }
-            const regenerated = regenerateCatalog(companyHome, recorded.ledger)
-            exportNow()
-            if (regenerated.written) {
-              ctx.logger?.info?.(`company-pack：presented 回扫完成（扫 ${String(observed.scanned)} 会话 / 失败 ${String(observed.failed)}）`)
-            }
-          } catch (error) {
-            ctx.logger?.warn?.(`company-pack：presented 回扫跳过（不影响运行）：${(error as Error).message}`)
-          }
-        }
-        const inject = (ctx as unknown as {
-          inject?: (deps: readonly string[], callback: (scoped: unknown) => void) => unknown
-        }).inject
-        if (typeof inject === 'function') {
-          inject.call(ctx, ['sessionQuery'], (scoped) => {
-            const query = (scoped as { readonly sessionQuery?: PresentedSessionQuery }).sessionQuery
-            if (query !== undefined) void scan(query)
-          })
-        } else {
-          const getter = (ctx as unknown as { get?: (name: string) => unknown }).get
-          const query = typeof getter === 'function' ? getter.call(ctx, 'sessionQuery') as PresentedSessionQuery | undefined : undefined
-          if (query !== undefined) void scan(query)
-        }
-      }
+      try {
+        appendUpgradeLog(workspace, `run bundle identity ${action}; pack ${pack.version}; previous ${bundleState?.status ?? 'missing'}`)
+      } catch { /* 日志失败不影响运行 */ }
     }
   } catch (error) {
-    ctx.logger?.warn?.(`company-pack 成品目录生成跳过（不影响运行）：${(error as Error).message}`)
+    ctx.logger?.warn?.(`company-pack run bundle 初始化跳过（不影响运行）：${(error as Error).message}`)
   }
-  } else {
-    void (async () => {
-      const store = await ledgerStorePromise
-      if (dataBlocked || !hasWorkspace || !existsSync(companyHome)) return
-      const catalogState = readCatalogState(companyHome)
-      if (catalogState.status === 'corrupt' || catalogState.status === 'unsupported') {
-        const warning = `company-pack：成品目录 ${catalogState.status === 'unsupported' ? `schema ${String(catalogState.schema)} 高于本包支持` : `损坏（${catalogState.error}）`}；`
-          + '已按盘上 meta/final 重建派生索引（presented 以审计账本为准）'
-        ctx.logger?.warn?.(warning)
-      }
-      const bootstrap = await ensureLedger(companyHome, store)
-      if (bootstrap.warning !== undefined) ctx.logger?.warn?.(`company-pack：${bootstrap.warning}`)
-      if (bootstrap.migrated) ctx.logger?.info?.(`company-pack：presented 审计账本已迁移（${store.kind}）`)
-      const result = regenerateCatalog(companyHome, bootstrap.ledger)
-      if (result.written) ctx.logger?.info?.(`company-pack：成品目录已生成（${result.path}）`)
-      exportNow(store)
-      if (!bootstrap.needsScan) return
-      const scan = async (query: PresentedSessionQuery): Promise<void> => {
-        try {
-          const observed = await presentedFromSessions(query, companyHome, AbortSignal.timeout(30_000))
-          const recorded = await recordLedger(companyHome, store, observed)
-          if (recorded.ledger === undefined) {
-            ctx.logger?.warn?.(`company-pack：presented 回扫结果未写账本（${recorded.warning ?? '未知原因'}）`)
-            return
-          }
-          const regenerated = regenerateCatalog(companyHome, recorded.ledger)
-          exportNow(store)
-          if (regenerated.written) {
-            ctx.logger?.info?.(`company-pack：presented 回扫完成（扫 ${String(observed.scanned)} 会话 / 失败 ${String(observed.failed)}）`)
-          }
-        } catch (error) {
-          ctx.logger?.warn?.(`company-pack：presented 回扫跳过（不影响运行）：${(error as Error).message}`)
-        }
-      }
-      const inject = (ctx as unknown as {
-        inject?: (deps: readonly string[], callback: (scoped: unknown) => void) => unknown
-      }).inject
-      if (typeof inject === 'function') {
-        inject.call(ctx, ['sessionQuery'], (scoped) => {
-          const query = (scoped as { readonly sessionQuery?: PresentedSessionQuery }).sessionQuery
-          if (query !== undefined) void scan(query)
-        })
-      } else {
-        const getter = (ctx as unknown as { get?: (name: string) => unknown }).get
-        const query = typeof getter === 'function' ? getter.call(ctx, 'sessionQuery') as PresentedSessionQuery | undefined : undefined
-        if (query !== undefined) void scan(query)
-      }
-    })().catch(error => ctx.logger?.warn?.(`company-pack 成品目录 domain 初始化跳过（不影响运行）：${(error as Error).message}`))
+}
+
+/**
+ * 登记 workspace；失败只告警，不连累 boot。
+ * 生产：导出的 `inject` 已声明 workspaceRegistry，loader 等它就绪后才运行 apply；
+ * 返回 Promise 让 Web readiness 等到登记完成（前轮探针同形）。
+ * 测试/无 registry 组合：属性访问不到就跳过，返回 undefined。
+ */
+function registerWorkspace(ctx: Context, workspace: string): Promise<void> | undefined {
+  let registry: { create(path: string): Promise<{ id: string; path: string }> } | undefined
+  try {
+    registry = (ctx as unknown as {
+      readonly workspaceRegistry?: { create(path: string): Promise<{ id: string; path: string }> }
+    }).workspaceRegistry
+  } catch {
+    registry = undefined
   }
-  ctx.on('session/event', (_session, event) => {
-    if ((event as { type?: unknown }).type !== 'deliverables/presented') return
-    if (dataBlocked || !hasWorkspace) return
+  if (registry === undefined) return undefined
+  return registry.create(workspace)
+    .then(registered => { ctx.logger?.info?.(`company-pack：workspace 已登记 ${registered.id} @ ${registered.path}`) })
+    .catch((error: unknown) => { ctx.logger?.warn?.(`company-pack：workspace 登记失败（不影响启动）：${(error as Error).message}`) })
+}
+
+/** 初始化成品目录 + presented 账本；缺失时后台回扫会话。 */
+async function initializeCatalog(
+  ctx: Context,
+  workspace: string,
+  storePromise: Promise<PresentedLedgerStore>,
+  exportNow: (ledger?: ExportLedgerSource) => void,
+): Promise<void> {
+  const store = await storePromise
+  if (!existsSync(workspace)) return
+  const catalogState = readCatalogState(workspace)
+  if (catalogState.status === 'corrupt' || catalogState.status === 'unsupported') {
+    ctx.logger?.warn?.(`company-pack：成品目录 ${catalogState.status === 'unsupported' ? `schema ${String(catalogState.schema)} 高于本包支持` : `损坏（${catalogState.error}）`}；`
+      + '已按盘上 meta/final 重建派生索引（presented 以审计账本为准）')
+  }
+  const bootstrap = await ensureLedger(store)
+  if (bootstrap.warning !== undefined) ctx.logger?.warn?.(`company-pack：${bootstrap.warning}`)
+  const result = regenerateCatalog(workspace, bootstrap.ledger)
+  if (result.written) ctx.logger?.info?.(`company-pack：成品目录已生成（${result.path}）`)
+  exportNow(store)
+  if (!bootstrap.needsScan) return
+  const scan = async (query: PresentedSessionQuery): Promise<void> => {
     try {
-      const observed = presentedFromEvent(event, companyHome)
-      if (observed.paths.size === 0 && observed.slugs.size === 0) return
-      if (ledgerStorePromise === undefined) {
-        const recorded = recordPresented(companyHome, observed)
-        if (recorded.ledger === undefined) {
-          ctx.logger?.warn?.(`company-pack 成品目录 present 投影未写账本（${recorded.warning ?? '未知原因'}）`)
-          return
-        }
-        regenerateCatalog(companyHome, recorded.ledger)
-        exportNow()
+      const observed = await presentedFromSessions(query, workspace, AbortSignal.timeout(30_000))
+      const recorded = await recordLedger(store, observed)
+      if (recorded.ledger === undefined) {
+        ctx.logger?.warn?.(`company-pack：presented 回扫结果未写账本（${recorded.warning ?? '未知原因'}）`)
         return
       }
-      void ledgerStorePromise.then(async store => {
-        const recorded = await recordLedger(companyHome, store, observed)
-        if (recorded.ledger === undefined) {
-          ctx.logger?.warn?.(`company-pack 成品目录 present 投影未写账本（${recorded.warning ?? '未知原因'}）`)
-          return
-        }
-        regenerateCatalog(companyHome, recorded.ledger)
-        exportNow(store)
-      }).catch(error => ctx.logger?.warn?.(`company-pack 成品目录 present domain 投影跳过（不影响运行）：${(error as Error).message}`))
+      const regenerated = regenerateCatalog(workspace, recorded.ledger)
+      exportNow(store)
+      if (regenerated.written) {
+        ctx.logger?.info?.(`company-pack：presented 回扫完成（扫 ${String(observed.scanned)} 会话 / 失败 ${String(observed.failed)}）`)
+      }
     } catch (error) {
-      ctx.logger?.warn?.(`company-pack 成品目录 present 投影跳过（不影响运行）：${(error as Error).message}`)
+      ctx.logger?.warn?.(`company-pack：presented 回扫跳过（不影响运行）：${(error as Error).message}`)
     }
-  })
+  }
+  const inject = (ctx as unknown as {
+    inject?: (deps: readonly string[], callback: (scoped: unknown) => void) => unknown
+  }).inject
+  if (typeof inject === 'function') {
+    inject.call(ctx, ['sessionQuery'], (scoped) => {
+      const query = (scoped as { readonly sessionQuery?: PresentedSessionQuery }).sessionQuery
+      if (query !== undefined) void scan(query)
+    })
+  } else {
+    const getter = (ctx as unknown as { get?: (name: string) => unknown }).get
+    const query = typeof getter === 'function' ? getter.call(ctx, 'sessionQuery') as PresentedSessionQuery | undefined : undefined
+    if (query !== undefined) void scan(query)
+  }
 }

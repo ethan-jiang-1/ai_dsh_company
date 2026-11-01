@@ -12,11 +12,12 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { join } from 'node:path'
 import { appendRotatingLine } from './rotating-log.ts'
+import { RUN_BUNDLE_PATHS } from '../lib/run-bundle-paths.ts'
 
 /** 诊断日志落点（相对 DSH_HOME；宿主日志，不是公司数据）。 */
 export const CLIENT_ERRORS_REL = 'logs/company-client-errors.log'
 /** 旧落点（公司盘内；只读保留一版，不再写入）。 */
-export const LEGACY_CLIENT_ERRORS_REL = 'cultivation/client-errors.log'
+export const LEGACY_CLIENT_ERRORS_REL = `${RUN_BUNDLE_PATHS.cultivation}/client-errors.log`
 
 /** 单文件上限；超过则把当前文件轮转为 `.1`（只留一份备份）。 */
 export const CLIENT_ERRORS_MAX_BYTES = 256 * 1024

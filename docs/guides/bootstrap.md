@@ -5,20 +5,20 @@
 > 出生：2026-09-27 自 dev-loop §7 整段迁入（常驻层瘦身轮；dev-loop §7 留指针、编号不动防既有引用断链）。
 > 配方与坑均在钉住 vendor 基线实证（R0/R1，2026-09-22）；机制结论以 vendor/dsh 工作树为权威。
 
-## 先选形状（真插件安装 vs 目录独立启动）
+## 先选形状（真插件安装 vs 维护者 dev）
 
-| | **真插件安装** | **目录独立启动** |
+| | **真插件安装** | **维护者 dev** |
 |---|---|---|
 | 适用 | 给别人用、跨机器/跨部署 | 在本机隔离环境里跑本仓库的当前代码 |
 | 前置 | 有 `dsh` 运行时 + tarball；不需要本仓库 | 本仓库 + pinned vendor + Node/pnpm；按本节构建 |
-| 数据落点 | 新 `DSH_HOME` + 用户 `--workspace`（身份/产物在 workspace；home 只运行时+治理） | `--home`/`--workspace`（默认 `runtime/harness-home` + 仓内 dev 盘） |
-| 首启 | `dsh plugin add` → 启动器 `--workspace` → seed 确认 | `pnpm company --workspace …` 自建 profile/登记/seed |
-| 升级 | 换 profile 包后重启（哈希判定；workspace v2 身份） | 拉代码 + 重跑 `pnpm company`（构建/重指 link） |
-| 删除 | `plugin remove` + 删 home | `pnpm standalone --reset`（只删带标记的 home） |
-| 验收 | `release-smoke` + `lifecycle-smoke` | `standalone-smoke`（隔离 home/RPC/relink/reset） |
+| 数据落点 | 新 `DSH_HOME` + 用户 workspace 的 `.dsh-company/`（身份/产物；home 只运行时+治理） | dev 用 `runtime/harness-home` + 仓内 `company-workspace/.dsh-company/` |
+| 首启 | Plugins/CLI 装 bundle → `dsh --profile company` → workspace 解析/登记/状态只补缺 | dev 用 `pnpm company --no-open`（只 exec） |
+| 升级 | 换 profile 包后重启（workspace v3 身份；状态只补缺） | 拉代码 + 重跑 `pnpm company`（构建/重指 link） |
+| 删除 | `plugin remove` + 删 home | 手工删 dev home/workspace（本仓无独立启动器） |
+| 验收 | `release-smoke` + `company-entry-smoke` | `pnpm verify` + `pnpm test` + `company-entry-smoke` |
 | 不承诺 | 浏览器全交互、离线 | 跨 OS 构建、离线预构建、容器 |
 
-目录独立启动**不是**“复制构建产物分发包”：构建仍按 checkout 产生；换机器按本节重建。
+维护者 dev **不是**“复制构建产物分发包”：构建仍按 checkout 产生；换机器按本节重建。产品入口始终是 named profile，不是本仓脚本。
 
 ```sh
 git submodule update --init             # vendor/dsh 钉 tag
@@ -43,8 +43,8 @@ node ./node_modules/typescript/bin/tsc -b \
 node ./node_modules/typescript/bin/tsc -b vendor/dsh/tsconfig.client.json   # client 面（测试面报错可忽略）
 (cd vendor/dsh && DSH_CLIENT_TITLE="DSH 梦之队" ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE client)
 DSH_CLIENT_TITLE="DSH 梦之队" pnpm --filter @deepseek-ai/dsh-web-frontend run build   # 前端 dist
-source run/env.sh && pnpm company --workspace "$PWD/company-workspace" --no-open   # dev 产品入口（profile company；seed/登记/自动选中）
-# 真实安装形状归 release-smoke：plugin --profile company add file:<tgz> → 启动器 --workspace
+source run/env.sh && pnpm company --no-open   # dev-only：exec dsh --profile company（workspace=company-workspace）
+# 真实安装形状归 release-smoke：plugin --profile company add file:<tgz> → dsh --profile company（cwd=workspace）
 
 # pack 代码面构建（改 src/** 任一面都需要——host〔src/index.ts+lib〕与 client〔src/client〕双编译面，
 # 2026-09-25 起 solution root；⚠ 旧命令 `tsc -p tsconfig.json` 在 solution root 上静默不构建，即此坑的由来）：
@@ -67,7 +67,7 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack
 #   历史：file: 拷贝时代，presets/*.yml 用编辑工具改会换 inode、安装副本是真拷贝（link count 1），
 #   不重装则改动不可见——该坑随 link: 消失。
 node checks/smoke/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）
-node checks/smoke/handbook-smoke.mjs        # agent-instructions 注入完成定义：指令基线 = 公司手册（默认只跑 ceo 一次小调用）
+pnpm test tests/company/handbook.spec.ts    # 手册注入完成定义（keyless：content/override/systemPrompt section）
 node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
 ```
 
