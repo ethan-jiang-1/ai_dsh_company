@@ -99,12 +99,12 @@ opened: 2026-11-01
 **期望结果**：给出并落地 0.6.0 的产品形状：
 
 1. 产品单位 = `dsh-company-pack` bundle；无 package bin；默认 Plugins 页安装，CLI 仅 web 自动化。
-2. 启动 = `dsh --profile company`（或用户自己的 profile）；workspace 优先级 = `DSH_COMPANY_HOME` → 启动 cwd（合理项目目录）→ 产品保存的最近选择 → Client 询问；无 `--workspace`、无 TTY 询问、Host 不阻塞。
+2. 启动 = `dsh --profile company`（或用户自己的 profile）；workspace 优先级 = `DSH_COMPANY_HOME` → 启动 cwd（合理项目目录）→ 产品保存的最近选择 → DSH Workspace picker（本包不自建 onboarding）；无 `--workspace`、无 TTY 询问、Host 不阻塞。
 3. 一个安装 = 一个公司；同一 home 可顺序服务多个 workspace；换项目不新建 home/重装；不同公司 = 不同 home。
-4. 插件内容全部在 pack（`presets/`、`src/`、`content/` 手册/模板）；run bundle 在 workspace（`kb/`、`deliverables/`、`cultivation/`、`.dsh-company/`）；不再 seed 手册/模板。
+4. 插件内容全部在 pack（`presets/`、`src/`、`content/` 手册/模板）；run bundle 全在 `<workspace>/.dsh-company/`（`kb/`、`deliverables/`、`cultivation/`、`bundle.json`）；不再 seed 手册/模板。
 5. 公司手册从 pack 注入（`systemPrompt.section`）；模板从 pack 读、可选 `.dsh-company/overrides/`；章程/org/company 是状态，只补缺。
 6. startup/registrar 行在 bundle patch；host-only 行/包解决 client tier；删掉 profile patch registrar 依赖。
-7. 身份 `bundle.json` v3；presented 账本按 workspace 分区（v2）；0.5.0 数据可迁移、旧文件保留、不静默覆盖。
+7. 身份 `bundle.json` v3；presented 账本按 workspace 分区（新 domain `company_run_bundle_ledger` v1）；0.5.0 旧账本不读不迁、旧文件保留、不静默覆盖。
 8. README、`_dist` 手册、pack/workspace README、docs 合同/指南、AGENTS 布局/命令、CHANGELOG、测试/门禁全部同 diff 改。
 9. 验证按真实入口：真 tarball → 真安装 → 真启动 → workspace/run bundle/无 seed/无 launcher；红→绿证据齐全。
 
@@ -118,16 +118,16 @@ opened: 2026-11-01
 - **验证**：`company-entry-smoke` 测 launcher；`release-smoke` 预置 profile patch + seed-consent；`tests/README.md` 产品入口行写 bin/dsh-company.mjs（历史，已删除）。这些只证启动器路径，不证默认安装路径。
 - **证据**：前轮研究 [主稿](../_archive/research/plugin-as-product/2026-11-01-plugin-as-product.md)、[伞卡](../_archive/settled_issues/2026-11-01-plugin-as-product.md)、[落地卡](../_archive/settled_issues/2026-11-01-landing-plan.md)；本轮同步 = [研究稿](../research/plugin-as-product-v3/2026-11-01-entry-and-run-bundle-boundary.md)。
 
-## 目标形状（推荐 A）
+## 目标形状（0.6.0 落地版；原推荐 A 的 workspace 根布局已废弃）
 
 ```text
 安装：Plugins 页装 dsh-company-pack（web/Desktop 同一句）
       CLI 仅 web 自动化：dsh plugin --profile company add <tgz>
 启动：cd /path/to/workspace && dsh --profile company
       或 DSH_COMPANY_HOME=/path/to/workspace dsh --profile company
-      或无 workspace：Client onboarding 选择目录
+      或无 workspace：DSH Workspace picker 选择目录（本包不自建 onboarding）
 内容：packages/company-pack/{presets,src,content}/**  ← 只读产品内容
-run： <workspace>/{kb,deliverables,deliverables-archive,cultivation}/ + .dsh-company/{bundle.json,logs,exports,overrides}/
+run： <workspace>/.dsh-company/{kb,deliverables,deliverables-archive,cultivation,logs,exports,overrides,bundle.json}
 治理：<DSH_HOME>/{sessions,credentials,storages,company/methods,company/ledger}/ ← home 公司治理
 ```
 
@@ -136,16 +136,16 @@ run： <workspace>/{kb,deliverables,deliverables-archive,cultivation}/ + .dsh-co
 | 问题 | 选择 | 为什么 |
 |---|---|---|
 | 入口 | named `company` profile；无 bin | FAQ 37/40 + DSH architecture；Plugins 页默认安装 |
-| workspace 解析 | env → cwd → saved → Client ask | 启动时知道/询问；Host 不阻塞；不加 web flag |
+| workspace 解析 | env → cwd → saved → DSH Workspace picker | 启动时知道/询问；Host 不阻塞；不加 web flag；不自建 onboarding |
 | 一安装多 workspace | 一个公司/安装，顺序多 workspace | 用户要装一次；账本按 workspace 分区；并发后置 |
 | 手册 | pack `content/AGENTS.md` → `systemPrompt.section` | 不 copy 只读内容；不依赖 workspace 文件名 |
 | 模板 | pack `content/templates/`；可选 `.dsh-company/overrides/` | 默认内容在包；用户改才落 workspace |
-| 章程/org/company | `kb/` 状态，首启只补缺 | 这是公司实例数据，不是只读产品内容 |
+| 章程/org/company | `.dsh-company/kb/` 状态，首启只补缺 | 这是公司实例数据，不是只读产品内容 |
 | startup 行 | bundle patch 的 host-only 行/包 | home 不能供货；默认安装要自带行为 |
 | 身份 | `bundle.json` v3（seed 只记状态） | 去掉 handbookTarget/内容哈希；迁移清楚 |
-| 账本 | domain v2 per workspace（或 per-workspace file） | 多 workspace 不串；host-only 权威不降级 |
+| 账本 | 新 domain `company_run_bundle_ledger` v1，按 workspace key（或 per-workspace file） | 多 workspace 不串；host-only 权威不降级；旧 `company_deliverables` 不读不迁 |
 | 方法层 | home 公司级 | 一安装一公司；不同公司不同 home |
-| run bundle 布局 | workspace 根 + `.dsh-company/`（本轮） | 与现行角色路径一致、迁移小；全嵌套后置 |
+| run bundle 布局 | **全收进 `.dsh-company/`**（本轮已落地） | 任意项目根零产品文件；路径/迁移统一；原「根 + `.dsh-company`」方案未采用 |
 
 ## 落地阶段（P0–P6）
 
@@ -250,7 +250,7 @@ run： <workspace>/{kb,deliverables,deliverables-archive,cultivation}/ + .dsh-co
 3. **内容边界**：新 workspace 无 `AGENTS.md`/`COMPANY.md`/`templates/` 副本；已有用户 `AGENTS.md` 不动；真模型会话注入 pack `content/AGENTS.md`（0.7.0 复核有真模型原话）；模板从 pack 读；`.dsh-company/overrides/` 可选覆盖。
 4. **run bundle**：`<workspace>/.dsh-company/kb/`、`deliverables/`、`cultivation/`、`bundle.json`（v3）在场；home 根无 `bundle.json`；方法层/presented 账本权威仍在 home；workspace `.dsh-company/exports/` 只是派生。
 5. **多 workspace**：同一 home 顺序 workspace A/B 都能启动；两套 run bundle；账本按 workspace 分区不串；无「第二盘」拒绝；换项目不新建 home/重装。
-6. **身份/迁移**：0.5.0 的 v2 manifest → v3（id/createdAt 保留）；账本 v1 → v2（true/false 保留）；旧 `AGENTS.md`/`templates/` **不自动迁移**（0.7.0 口径见复核节：0.5/0.6 未发布，旧文件保留 + 手册手工搬）；旧 profile patch 行只告警/兼容；二启字节稳定。
+6. **身份/迁移**：0.5.0 的 v2 manifest → v3（id/createdAt 保留）；旧 `company_deliverables` 账本不读不迁，新 domain 按 workspace 分区；旧 `AGENTS.md`/`templates/` **不自动迁移**（0.7.0 口径见复核节：0.5/0.6 未发布，旧文件保留 + 手册手工搬）；旧 profile patch 行只告警/兼容；二启字节稳定。
 7. **文档**：根 README、`_dist/安装手册.md`、pack/workspace README、`docs/{profile,runtime-map,data-model,release,project-map,demo,index,decisions,orient}.md`、guides、`AGENTS.md`、`tests/README.md`、`checks/README.md`、CHANGELOG、web-window-ops 同 diff；无旧主路径。
 8. **门禁**：`dist-manual` 新关键句 + sha256 + pin；`pack-shape`/`pack-files` 无 bin + content；`company-skeleton` 无手册/模板 seed；`handbook-budget` 量 content/注入；`run-bundle-clean`/`layout-block`/`bare-path`/`md-links`/`doc-budget` 绿；每道新判据有红→还原→绿原话。
 9. **认证档**：`release-smoke`、`company-entry-smoke`、`external-workspace-smoke`、`isolation-matrix-smoke`、`client-load-smoke`、`handbook.spec`、`preset-smoke` 全绿（0.7.0 复核表见下；真模型按改动面）。
@@ -282,7 +282,7 @@ run： <workspace>/{kb,deliverables,deliverables-archive,cultivation}/ + .dsh-co
 
 | # | 决策 | 推荐 | 若选另一条的影响 |
 |---|---|---|---|
-| D1 | run bundle 布局：workspace 根 vs 全收进 `.dsh-company/` | **根**（本轮；路径/迁移小） | 全嵌套对任意项目更干净，但 160+ 路径/客户端/迁移大，P2/P4 变重 |
+| D1 | run bundle 布局：workspace 根 vs 全收进 `.dsh-company/` | **全收进 `.dsh-company/`**（已落地；0.6.0 起） | 根布局会让任意项目根出现产品文件，且路径/迁移分裂；全嵌套路径统一 |
 | D2 | 安装范围：一个公司/安装、顺序多 workspace vs 一 workspace/安装 | **一个公司/安装 + 顺序多 workspace** | 继续一 workspace/安装 = 用户已否的安装器 UX |
 | D3 | 公司手册：pack 注入 vs workspace 副本 | **pack 注入**（可选 overrides） | 继续 copy = 用户已否的内容边界 |
 | D4 | 旧 0.5.0 手册/模板副本迁移 | 只移未改 pack 副本到 `.dsh-company/legacy/`，改过保留告警 | 全删有风险；全留会重复注入 |
@@ -295,7 +295,7 @@ run： <workspace>/{kb,deliverables,deliverables-archive,cultivation}/ + .dsh-co
 3. **启动**：接受「`cd <workspace> && dsh --profile company`；workspace 从 cwd/env/saved/Client 询问来；没有 `--workspace` flag」吗？
 4. **一安装多 workspace**：接受「一个安装 = 一个公司，顺序服务多个 workspace；不同公司 = 不同 home；并发多 workspace 后置」吗？
 5. **内容边界**：接受「手册/模板只读住 pack；手册注入；模板 pack/override；workspace 不 seed 手册/模板」吗？
-6. **run bundle 布局**：本轮继续放 workspace 根（`kb/`/`deliverables/`/`cultivation/` + `.dsh-company/`），还是全收进 `.dsh-company/`？
+6. **run bundle 布局**：已落地为全收进 `.dsh-company/`（`kb/`/`deliverables/`/`cultivation/`/`bundle.json` 同根）；不再保留 workspace 根布局。
 7. **账本**：接受「presented 账本按 workspace 分区，权威留 home；方法层公司级留 home」吗？
 8. **首启**：接受「本包 client 负责首屏；无 workspace 选目录；有 workspace 选中会话；不依赖 welcome-notice；Host 不阻塞」吗？
 9. **迁移**：接受「0.6.0 破坏性；v2→v3 manifest、v1→v2 账本；旧手册/模板只移未改副本，改过的保留告警」吗？
