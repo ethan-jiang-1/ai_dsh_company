@@ -28,6 +28,18 @@ describe('插件市场 index（format 1）', () => {
     expect(plugin.versions[0]?.engines.dsh).toBe(manifest.engines.dsh)
   })
 
+  it('仓库根 market-index.json 与包版本一致，且被 DSH 校验器接受', async () => {
+    const tracked = JSON.parse(readFileSync(join(ROOT, 'market-index.json'), 'utf8'))
+    // @ts-expect-error vendor built ESM has no root .d.ts; runtime shape is the authority here.
+    const { parseMarketIndex } = await import('../../vendor/dsh/packages/util/plugin-market-index/lib/index.js')
+    const parsed = parseMarketIndex(tracked, 'https://example.invalid/market-index.json')
+    const plugin = parsed.plugins.find(item => item.name === manifest.name)
+    expect(plugin, 'tracked index 缺本包条目').toBeDefined()
+    expect(plugin?.versions.some(version => version.version === manifest.version), 'tracked index 版本落后于 package.json（先跑 node tools/market-index.mjs --prepare）').toBe(true)
+    expect(plugin?.icon?.startsWith('data:image/svg+xml;base64,'), 'tracked index 图标应内联，单文件可托管').toBe(true)
+    expect(plugin?.metadata.category).toBe('company')
+  })
+
   it('仓库网页 URL 去 git+ / .git，不把 clone URL 原样塞给市场', () => {
     expect(repositoryWebUrl('git+https://github.com/acme/pack.git')).toBe('https://github.com/acme/pack')
     expect(repositoryWebUrl('https://github.com/acme/pack/')).toBe('https://github.com/acme/pack')

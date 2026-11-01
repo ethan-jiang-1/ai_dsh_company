@@ -1,0 +1,94 @@
+{
+  "format": 1,
+  "title": {
+    "en": "Dream Team plugins",
+    "zh": "梦之队插件"
+  },
+  "description": {
+    "en": "Plugins for the Dream Team company in DSH.",
+    "zh": "梦之队公司在 DSH 里的插件索引。"
+  },
+  "metadata": {
+    "categories": {
+      "company": {
+        "title": {
+          "en": "Company & teams",
+          "zh": "公司与团队"
+        }
+      }
+    },
+    "labels": {
+      "dsh-plugin": {
+        "title": {
+          "en": "DSH plugin",
+          "zh": "DSH 插件"
+        }
+      },
+      "multi-agent": {
+        "title": {
+          "en": "Multi-agent",
+          "zh": "多智能体"
+        }
+      }
+    },
+    "sortKeys": {
+      "published": {
+        "title": {
+          "en": "Published",
+          "zh": "发布时间"
+        },
+        "order": "desc"
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-company-pack",
+      "title": {
+        "en": "Dream Team Company Pack",
+        "zh": "梦之队公司包"
+      },
+      "description": {
+        "en": "Five role presets, the company handbook, and the company Web tabs.",
+        "zh": "五个角色 preset、公司手册与公司 Web 页签。"
+      },
+      "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzFmNmZlYiIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMjAiIHI9IjUiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB4PSIxNSIgeT0iMzEiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxOSIgcng9IjQiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB4PSIyNyIgeT0iMjkiIHdpZHRoPSIxMCIgaGVpZ2h0PSIyMSIgcng9IjQiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB4PSIzOSIgeT0iMzMiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxNyIgcng9IjQiIGZpbGw9IiNmZmYiLz4KPC9zdmc+Cg==",
+      "author": "ethan-jiang-1",
+      "homepage": "https://github.com/ethan-jiang-1/ai_dsh_company#readme",
+      "repository": {
+        "url": "https://github.com/ethan-jiang-1/ai_dsh_company",
+        "directory": "packages/company-pack"
+      },
+      "metadata": {
+        "category": "company",
+        "keywords": [
+          "dsh",
+          "dsh-plugin",
+          "dsh-bundle",
+          "agent-preset",
+          "company",
+          "team"
+        ],
+        "labels": [
+          "dsh-plugin",
+          "multi-agent"
+        ],
+        "sortKeys": {
+          "published": 1793573588
+        }
+      },
+      "versions": [
+        {
+          "version": "0.7.0",
+          "publishTimestamp": 1793573588,
+          "source": {
+            "type": "npm"
+          },
+          "engines": {
+            "dsh": ">=0.2.1-rc.2 <0.3.0"
+          }
+        }
+      ]
+    }
+  ]
+}

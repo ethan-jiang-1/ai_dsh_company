@@ -17,7 +17,7 @@
 ```sh
 shasum -a 256 _dist/dsh-company-pack-<version>.tgz
 cat _dist/release-manifest.json            # artifact.sha256 / gitSha / dirty
-node tools/market-index.mjs --prepare      # staged index（预演用；真实发布时间以第 3 步为准）
+node tools/market-index.mjs --prepare      # 生成/刷新仓库根 market-index.json（tracked；图标内联）
 node tools/market-index.mjs --check
 ```
 
@@ -35,28 +35,36 @@ npm view dsh-company-pack@<version> version
 - 发布失败/中断时先 `npm view` 查是否已落地；已落地就不要重发同版本。
 - provenance/CI 是后续增强，不在本页 v1。
 
-## 3 生成真实 market index（推荐用 vendor generator）
+## 3 刷新 market index（仓库根 tracked 文件）
+
+`release --prepare` 已经按 package 版本重生成仓库根 `market-index.json`（format 1、图标内联、
+分类/标签/排序键齐全），它就是要托管的单文件。发布后用实际发布时间刷新一次并提交：
 
 ```sh
-mkdir -p _dist/market/site
+node tools/market-index.mjs --prepare
+node tools/market-index.mjs --check
+git add market-index.json && git commit -m "chore(market): <version>"
+```
+
+可选：用 vendor generator 从 registry 读真实 `publishTimestamp`/registry：
+
+```sh
 printf 'dsh-company-pack\n' > _dist/market/plugins.txt
 pnpm --filter @deepseek-ai/dsh-plugin-market-generator start -- \
   --input _dist/market/plugins.txt \
-  --output _dist/market/site/index.json \
-  --title "Dream Team Plugins"
+  --output _dist/market/site/index.json --title "Dream Team plugins"
+# 对比后把确认的字段并回仓库根 market-index.json；不要同时托管两份
 ```
-
-generator 从 registry 读版本/发布时间/展示字段，写 `index.json` 与 `icons/`，并用同一份
-`@deepseek-ai/dsh-plugin-market-index` 校验。**这一步会覆盖第 1 步的 staged index**——真实
-`publishTimestamp` 以 registry 为准。
 
 ## 4 托管与校验
 
-- 把 `_dist/market/site/index.json` 与 `_dist/market/site/icons/` 放到 **https** 静态主机（GitHub Pages / 对象存储 / 任意
-  不跟随重定向的静态服务）；index 上限 128 MiB，图标可内联 `data:`（≤32 KiB）或相对路径。
-- 校验：`node tools/market-index.mjs --check --out _dist/market/site`（名称/版本/图标与包 manifest 一致，且 DSH
-  校验器通过）。
-- 跨源图标必须是 https；`http:` 只允许同源。
+- 把仓库根 `market-index.json` 放到 **https** 静态主机（GitHub raw / jsDelivr / Pages / 对象存储）；
+  它是单文件、图标内联，不需要额外 `icons/` 目录。
+- 例：`https://cdn.jsdelivr.net/gh/ethan-jiang-1/ai_dsh_company@<ref>/market-index.json`
+  （`<ref>` 用发布 commit/tag；raw.githubusercontent 同理）。
+- 校验：`node tools/market-index.mjs --check`（默认读仓库根；名称/版本/图标与包 manifest 一致，且 DSH
+  校验器通过）。自定义位置用 `--out <file-or-dir>`。
+- 跨源图标必须是 https；本索引用内联 `data:`，不受此限。
 
 ## 5 用户侧发现（实验开关）
 
@@ -72,7 +80,7 @@ manifest 的 `engines.dsh`）。
 - npm 同版本不可覆盖；72 小时内可 `npm unpublish`（会破坏已装用户的解析，慎用），更常用的是
   `npm deprecate` + 发修复版。
 - 已安装用户没有命令级回滚：卸载当前版本 → 装旧 tarball/旧版本 → 重启 profile。
-- market index 回退 = 换回上一版 `index.json` 与 icons；旧版本条目可保留。
+- market index 回退 = revert 仓库根 `market-index.json` 到上一版；旧版本条目可保留。
 
 ## 7 回执
 

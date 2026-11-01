@@ -160,6 +160,8 @@ function bump(kind) {
     const doc = readFileSync(releaseDoc, 'utf8')
     writeFileSync(releaseDoc, doc.replace(/pack 版本 `\d+\.\d+\.\d+`/, `pack 版本 \`${next}\``))
   }
+  // 仓库根 market-index.json 是发布/托管物，版本必须与 package 同一步更新。
+  run(process.execPath, ['tools/market-index.mjs', '--prepare'])
   console.log(`release: ${manifest.version} 就位；填 CHANGELOG.md 的 ${next} 条目后跑 --prepare`)
 }
 
@@ -194,6 +196,7 @@ function prepare() {
     fail(`已存在 ${version} 的 tgz；同版本重打会让字节漂移（npm pack 带 mtime）。改内容先 bump；确要重打加 --force`)
   }
   build()
+  run(process.execPath, ['tools/market-index.mjs', '--prepare'])
   artifactCheck()
   writeManifest({ verify: 'not-run', test: 'not-run' })
   console.log('release: prepare 完成；下一步 --verify')

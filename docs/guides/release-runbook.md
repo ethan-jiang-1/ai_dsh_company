@@ -12,7 +12,7 @@
 ## 1. 五步
 
 ```sh
-# ① 选版本；只改 package.json + CHANGELOG + docs/release.md 的版本行
+# ① 选版本；改 package.json + CHANGELOG + release.md 版本行；market-index.json 自动重生成
 pnpm release --bump patch        # 或 minor / major
 
 # ② 填 CHANGELOG 的“本版变化”（用户可见；删掉 TODO）

@@ -333,7 +333,7 @@ run： <workspace>/.dsh-company/{kb,deliverables,deliverables-archive,cultivatio
 | 7 | 文档 | `pnpm verify` 的 `doc-taxonomy` / `md-links` / `bare-path` / `doc-budget` 全绿；README/手册/合同同步 |
 | 8 | 门禁 | `pnpm verify` ALL PASS；`company-skeleton` / `handbook-budget` / `run-bundle-clean` / `dist-manual` 绿 |
 | 9 | 认证档 | `release --verify` 六项全绿；`company-entry` / `external-workspace` / `isolation-matrix` ALL PASS；`client-load` / `handbook.spec` / `preset-smoke` 绿 |
-| 10 | 分发 | `pnpm release --check` READY 0.7.0（manifest `gitSha=HEAD`、`dirty=false`）；tarball sha `a37ba24b…a8a44`；手册同版本 |
+| 10 | 分发 | `pnpm release --check` READY 0.7.0（manifest `gitSha=HEAD`、`dirty=false`）；tarball sha `13d01509…f679f6`；手册同版本 |
 | 11 | 生命周期四段 | 装/起/配/首启证据同上；文档无 `--profile desktop`；首启依赖 DSH picker（不依赖 `welcome-notice`） |
 
 ### 两处口径收口（不是实现回退，是把已决定的范围写实）

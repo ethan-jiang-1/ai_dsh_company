@@ -54,9 +54,15 @@ dsh plugin --profile company add <tarball-or-package-name>
 - `content/`：公司手册、模板、默认章程、状态默认值（只读产品内容，不 seed 到手写路径）；
 - 公司视图与一套公司页签（成品、台账、待办、培养等；清单 = 客户端注册面，不在文档枚举）。
 
+## Market / discovery
+
+仓库根 `market-index.json` 是 format 1 索引（单文件，图标内联）。Plugins → Experimental plugins →
+Custom plugin markets 开启后，在 Discover 添加它的 https URL（GitHub raw / jsDelivr），即可按版本发现与安装。
+索引里的 `engines.dsh` 只用于展示；安装时仍读包自身 manifest。
+
 ## Configuration
 
-- `DSH_COMPANY_HOME`：显式 workspace（自动化/部署）。不设时按 cwd → saved → Client ask 解析。
+- `DSH_COMPANY_HOME`：显式 workspace（自动化/部署）。不设时按 cwd → saved → DSH Workspace picker 解析（本包不自建 onboarding）。
 - `DSH_COMPANY_BROWSER`：浏览器能力开关；缺省 = profile 能解析 browser 两包就开，否则关；`on`/`off` 强制。
 - `company-client` 行的 `cultivationRoot`：方法层根；缺席时 `/cultivation adopt|revoke` 明确报错。
 - 兼容窗口：`engines.dsh`（运行时只读这一行；没有它才看 peers）。
