@@ -2,8 +2,8 @@
 
 状态：已交付（2026-11-01；用户授权「需要我review的, 授权给你 记得 做对最重要, 不需要兼容考虑, 安装需要尊重dsh」）
 
-> 上游 = [插件即产品 v3 卡](../../_backlog/issues/2026-11-01-plugin-as-product-v3.md)（推敲中，实施回执已补）、
-> 研究题 [plugin-as-product-v3](../../_backlog/research/plugin-as-product-v3/README.md)（边界稿 + 失败复盘）。
+> 上游 = [插件即产品 v3 卡](../../_backlog/_archive/settled_issues/2026-11-01-plugin-as-product-v3.md)（已结，0.7.0 复核）、
+> 研究题 [plugin-as-product-v3](../../_backlog/_archive/research/plugin-as-product-v3/README.md)（边界稿 + 失败复盘）。
 > 取代 = [v2 manifest Note](./2026-11-01-plugin-as-product-v2-manifest.md) 的入口/workspace/内容边界三条、
 > [run-bundle-install-unit](./2026-10-24-run-bundle-install-unit.md) 的 run bundle 物理单元位置（v3 收进 `.dsh-company/`）、
 > [standalone-deployment](../archived/2026-10-25-standalone-deployment.md) 的独立启动器形状。
@@ -101,8 +101,8 @@ v3 的边界没有被 0.7.0 生命周期轮改动；本轮补了真模型与认�
 
 ## 指针
 
-- 研究/复盘：[plugin-as-product-v3](../../_backlog/research/plugin-as-product-v3/README.md)。
-- 卡：[插件即产品 v3](../../_backlog/issues/2026-11-01-plugin-as-product-v3.md)。
+- 研究/复盘：[plugin-as-product-v3](../../_backlog/_archive/research/plugin-as-product-v3/README.md)。
+- 卡：[插件即产品 v3](../../_backlog/_archive/settled_issues/2026-11-01-plugin-as-product-v3.md)（已结）。
 - 合同：[profile](../../docs/profile.md)、[runtime-map](../../docs/runtime-map.md)、[data-model](../../docs/data-model.md)、
   [release](../../docs/release.md)、[`_dist` 手册](../../_dist/安装手册.md)。
 - 代码：`src/host/bootstrap.ts`、`workspace-resolution.ts`、`handbook.ts`、`run-bundle.ts`、

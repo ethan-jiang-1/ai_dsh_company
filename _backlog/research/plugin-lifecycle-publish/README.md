@@ -35,6 +35,6 @@
 
 ## 与 v3 研究题的关系
 
-[v3 研究题](../plugin-as-product-v3/README.md)回答的是「产品单位是什么、入口在哪、内容与 run bundle
+[v3 研究题](../../_archive/research/plugin-as-product-v3/README.md)回答的是「产品单位是什么、入口在哪、内容与 run bundle
 怎么分家」；本轮不重开那些结论，只接着问「这个 bundle 怎么被交付、装上、升级、卸载，以及怎么
 出现在 DSH 的市场里」。0.6.0 的 bundle 形状是本轮的前提，不是本轮要重新论证的对象。

@@ -49,10 +49,9 @@ research/
 
 ## 索引
 
-- [插件即产品 v3](plugin-as-product-v3/README.md) — FAQ 26 最新更新后的入口/workspace/内容边界复核；服务 [v3 卡](../issues/2026-11-01-plugin-as-product-v3.md)。
 - [插件生命周期与发布](plugin-lifecycle-publish/README.md) — 装/起/升/卸的真运行时证据与 npm/市场发布面；服务 [生命周期与发布卡](../issues/2026-11-01-plugin-lifecycle-publish.md)。
 
-2026-11-01 上一轮产品化研究题已随最后一张消费者卡迁入[研究归档](../_archive/research/README.md)。
+2026-11-01/02 的产品化研究题已随各自消费者卡迁入[研究归档](../_archive/research/README.md)。
 
 归档题名见[研究归档](../_archive/research/README.md)；本页只列活跃题名，不重复逐文件清单。
 

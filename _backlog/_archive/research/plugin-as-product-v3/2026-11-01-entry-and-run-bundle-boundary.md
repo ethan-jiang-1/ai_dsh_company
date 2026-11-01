@@ -5,7 +5,7 @@ intent: "消化 FAQ 26 最新更新并复核 0.5.0 产品化：入口、workspac
 
 # 插件即产品 v3：入口、workspace 与 run bundle 的再划线
 
-> 服务卡：[插件即产品 v3](../../issues/2026-11-01-plugin-as-product-v3.md)。
+> 服务卡：[插件即产品 v3](../../settled_issues/2026-11-01-plugin-as-product-v3.md)。
 > 读法：先读卡「修正结论」，再读本稿 §1–§3；§4 以后是技术底稿与验证计划，不是实施授权。
 > 证据分级：**T** = 前轮真跑过的探针/冒烟（引用既往记录）；**C** = 当前源码、docs、FAQ 26 最新文本；**P** = 提议，未实现；**U** = 未验证。
 > 基线：`vendor/dsh` 仍钉 `dsh-v0.2.1-rc.2`；FAQ 26 最新文本的历史外部基线是 `dsh-v0.2.1-rc.3`（历史外部语料，不覆盖本仓现在时）。两者差异按 `engines.dsh` 窗口处理，本轮不升 pin。
@@ -336,6 +336,6 @@ packages/company-pack/                 <workspace>/
 ## 8. 参考
 
 - 外部 FAQ 26（本轮同步）：`10-foundations/16-startup-resolution.md`、`17-config-layers.md`、`18-install-upgrade.md`、`30-external/37-lifecycle-stages.md`、`50-launch/40-profile-integration.md`、`50-launch/90-evidence.md`。
-- 本仓前轮：[插件即产品卡](../../_archive/settled_issues/2026-11-01-plugin-as-product.md)、[落地顺序卡](../../_archive/settled_issues/2026-11-01-landing-plan.md)、[主研究稿](../../_archive/research/plugin-as-product/2026-11-01-plugin-as-product.md)。
-- 当前代码：0.5.0 launcher（已删除）、[bootstrap](../../../packages/company-pack/src/host/bootstrap.ts)、[manifest](../../../packages/company-pack/src/host/bundle-manifest.ts)、[runtime guard](../../../packages/company-pack/src/host/runtime-guard.ts)、[presented domain](../../../packages/company-pack/src/host/presented-domain.ts)、[client composition spec](../../../tests/client/company-client-composition.spec.ts)。
-- 当前合同：[README](../../../README.md)、[profile](../../../docs/profile.md)、[runtime map](../../../docs/runtime-map.md)、[data model](../../../docs/data-model.md)、[release](../../../docs/release.md)、[`_dist` 手册](../../../_dist/安装手册.md)。
+- 本仓前轮：[插件即产品卡](../../settled_issues/2026-11-01-plugin-as-product.md)、[落地顺序卡](../../settled_issues/2026-11-01-landing-plan.md)、[主研究稿](../plugin-as-product/2026-11-01-plugin-as-product.md)。
+- 当前代码：0.5.0 launcher（已删除）、[bootstrap](../../../../packages/company-pack/src/host/bootstrap.ts)、[manifest](../../../../packages/company-pack/src/host/bundle-manifest.ts)、[runtime guard](../../../../packages/company-pack/src/host/runtime-guard.ts)、[presented domain](../../../../packages/company-pack/src/host/presented-domain.ts)、[client composition spec](../../../../tests/client/company-client-composition.spec.ts)。
+- 当前合同：[README](../../../../README.md)、[profile](../../../../docs/profile.md)、[runtime map](../../../../docs/runtime-map.md)、[data model](../../../../docs/data-model.md)、[release](../../../../docs/release.md)、[`_dist` 手册](../../../../_dist/安装手册.md)。

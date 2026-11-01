@@ -82,6 +82,19 @@ rc.5 干净 profile 应用内安装 `application: applied` + 六 preset + `sessi
 
 v3 卡 0.7.0 复核结论：两卡不冲突（D53 只换检索实现、D54 只换发布姿态；v3 边界未改）。
 
+## 按包名安装的本地演练（2026-11-02，T）
+
+本机没有 npm 凭据，公有 publish 不可代做；为了把「npm 身份 → 按名安装」链路也验掉，用 repo 内极简
+只读 registry（`_dist` tarball + manifest）做了一次发布演练：
+
+- `node runtime/lifecycle-lab/mini-registry.mjs` 服务 `dsh-company-pack@0.7.0`；
+- 干净 web profile：`dsh plugin --profile local add dsh-company-pack --registry http://127.0.0.1:4874`
+  → dependency `^0.7.0`、roster 含包；
+- boot + RPC：六角色零 broken、`session/create` ceo、stderr 空。
+
+证明：包名/版本/依赖解析/按名安装是通的；**不证明**公有 registry 的账号、命名占用与签名。
+公有 publish + index https 托管仍按 handoff 由发布人执行。
+
 ## 未做
 
 - 真实 `npm publish`（需 npm 凭据；D6 人工 handoff）与 market index 的 https 托管（步骤 = [publish-handoff](../../docs/guides/publish-handoff.md)）。

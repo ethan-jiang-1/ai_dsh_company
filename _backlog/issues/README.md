@@ -4,9 +4,8 @@
 
 ## 活跃清单
 
-当前活跃 2 张；两卡均已完成 0.7.0 复核，待在用户侧验收/真实 publish handoff。
+当前活跃 1 张；v3 卡已结归档，生命周期发布卡待真实 publish handoff。
 
-- [插件即产品 v3 卡](2026-11-01-plugin-as-product-v3.md) — 0.7.0 复核完成：入口/workspace/内容/账本判定落地；原生 picker 与不自动迁移已写实；待用户验收。
 - [插件生命周期与发布卡](2026-11-01-plugin-lifecycle-publish.md) — 0.7.0 READY：默认安装/发布身份/市场 index/升级卸载已落地；真实 npm publish 与 index 托管待人工 handoff。
 - [插件即产品卡](../_archive/settled_issues/2026-11-01-plugin-as-product.md) — 0.5.0 产品形状；去向 = v2 manifest Note。
 - [落地顺序卡](../_archive/settled_issues/2026-11-01-landing-plan.md) — P0–P6 执行回执；v1 边界写清。
@@ -15,6 +14,7 @@
 
 ## 近期归档
 
+- v3 产品化卡 2026-11-02 已结：0.7.0 复核通过（入口/workspace/内容/账本；原生 picker、不自动迁移写实）；去向 = [v3 Note](../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)；卡在 [归档](../_archive/settled_issues/2026-11-01-plugin-as-product-v3.md)。
 - 发布与文档卡 2026-11-01 已结：`_dist` 手册/README/docs/CI 验收落地；去向 = [v2 manifest Note](../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)；卡在 [归档](../_archive/settled_issues/2026-11-01-release-and-docs.md)。
 - 培养工作优先单入口卡 2026-10-30 已结：work 字段 + 单表单 + 实时预览落地；实施 = [case-entry Note](../../notes/implemented/2026-10-30-cultivation-case-entry.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-case-entry.md)。
 - 培养入口收口卡 2026-10-30 已结：目标角色显式选择、入口文案、自纠正状态、验证历史逐条、对话失败保留草稿；实施 = [entry-followup Note](../../notes/implemented/2026-10-30-cultivation-entry-followup.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)。

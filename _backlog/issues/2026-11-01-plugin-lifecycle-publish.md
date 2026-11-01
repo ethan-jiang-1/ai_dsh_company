@@ -218,7 +218,7 @@ rc.2 与 rc.5 的 in-app 安装均为 `application: applied`；真模型 `sessio
 **P2 完成**：`pnpm release --prepare`（0.7.0）→ `--verify` 六项认证档全绿；tarball
 `sha256=a37ba24b…a8a44`；manifest 记录版本/HEAD/检查项（`--stamp` 后 `dirty=false`）。
 
-**P3 完成（到 handoff）**：`tools/market-index.mjs`（manifest→format 1 + DSH 校验器真验）、
+**P3 完成（到 handoff）**：本地 registry 按名安装演练通过（`dsh plugin add dsh-company-pack --registry ...` → `^0.7.0` + 六角色 boot）；`tools/market-index.mjs`（manifest→format 1 + DSH 校验器真验）、
 `tests/company/market-index.spec.ts`、`docs/guides/publish-handoff.md`；`_dist/market/index.json`
 以 `dsh-company-pack@0.7.0` 通过校验。**真实 npm publish 与 https 托管 = 人工 handoff（D6）**，
 本机无 npm 凭据，未执行。
@@ -249,7 +249,7 @@ v3 卡 0.7.0 复核见其「0.7.0 复核」节；两卡边界一致，没有互�
 
 ## 剩余 handoff（代码面已收口，不是 gap）
 
-1. **真实 npm publish**：本机无 npm 凭据；发布字节已 READY（`_dist/dsh-company-pack-0.7.0.tgz`，
+1. **真实 npm publish**：本机无 npm 凭据；按名安装已在本地 registry 演练通过，公有 registry 账号/占用仍未验；发布字节已 READY（`_dist/dsh-company-pack-0.7.0.tgz`，
    sha `a37ba24b…a8a44`），按 [publish-handoff](../../docs/guides/publish-handoff.md) 由有权限的人执行。
 2. **market index https 托管**：index 已在 `_dist/market/` 用 DSH 校验器验过；发布后用 vendor generator
    重生成并托管，Discover 加源验证。
@@ -267,7 +267,7 @@ v3 卡 0.7.0 复核见其「0.7.0 复核」节；两卡边界一致，没有互�
 - 研究题：[插件生命周期与发布](../research/plugin-lifecycle-publish/README.md)
   - [安装/升级/卸载实验](../research/plugin-lifecycle-publish/2026-11-01-install-apply-and-data.md)
   - [发布面事实](../research/plugin-lifecycle-publish/2026-11-01-publish-surface.md)
-- 前序：[v3 卡](2026-11-01-plugin-as-product-v3.md)、[v3 研究题](../research/plugin-as-product-v3/README.md)、
+- 前序：[v3 卡](../_archive/settled_issues/2026-11-01-plugin-as-product-v3.md)、[v3 研究题](../_archive/research/plugin-as-product-v3/README.md)、
   [v3 实现 Note](../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)
 - 现行合同：[README](../../README.md)、[release](../../docs/release.md)、
   [安装手册](../../_dist/安装手册.md)、[包 README](../../packages/company-pack/README.md)、

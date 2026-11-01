@@ -1,8 +1,9 @@
 # 插件即产品 v3：入口、workspace 与 run bundle 的再划线
 
 > 问题：FAQ 26 在 2026-11-01 连续更新（37 生命周期、40 启动/安装、18 安装三成功、17 home 不能供货、16 首启令牌门）后，0.5.0 的「启动器 + 一 home 一 workspace + 骨架 copy」产品形状是否仍成立？正确的入口、workspace 解析、插件内容/run bundle 边界与迁移面是什么？
-> 消费者：[插件即产品 v3 卡](../../issues/2026-11-01-plugin-as-product-v3.md)
-> 产出的卡：[插件即产品 v3 卡](../../issues/2026-11-01-plugin-as-product-v3.md)
+> 消费者：[插件即产品 v3 卡](../../settled_issues/2026-11-01-plugin-as-product-v3.md)
+> 产出的卡：[插件即产品 v3 卡](../../settled_issues/2026-11-01-plugin-as-product-v3.md)
+> 归档：2026-11-02
 
 ## 材料
 

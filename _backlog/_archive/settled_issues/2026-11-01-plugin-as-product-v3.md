@@ -1,13 +1,13 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-01
 ---
 
 # 推敲：插件即产品 v3——拆掉 launcher，把 workspace 与 run bundle 放回产品位置
 
-> 立卡：2026-11-01 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-01 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：用户 2026-11-01 授权 review 项由 agent 决定；`做`。下游落点 = 0.6.0 实现 + 新 RFC/Note。
+> **结论/去向**：2026-11-02 用户验收「两卡不冲突，推动落地」；结论 = v3 产品形状落地并经 0.7.0 复核；去向 = [v3 Note](../../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md) + [生命周期卡](../../issues/2026-11-01-plugin-lifecycle-publish.md)。两处按 v3 Note 收窄：首屏 = DSH 原生 Workspace picker（不自建 onboarding）、0.5 根目录不自动迁移。
 >
 > **2026-11-01 用户授权原文**：
 > 「需要我review的, 授权给你 记得 做对最重要, 不需要兼容考虑, 安装需要尊重dsh」
@@ -116,7 +116,7 @@ opened: 2026-11-01
 - **内容 copy**：`bootstrap.ts` 的 `planBootstrap`/`applyBootstrap` 复制 pack `workspace/` 到用户 workspace；`bundle-manifest.ts` 把 `AGENTS.md`/`templates` 哈希写进 v2；`workspace/README.md` 说「启动器指定/seed 骨架」。
 - **账本**：`presented-domain.ts` 是单一 `company_deliverables` domain，`paths`/`slugs` 单表；多 workspace 同相对路径会撞。
 - **验证**：`company-entry-smoke` 测 launcher；`release-smoke` 预置 profile patch + seed-consent；`tests/README.md` 产品入口行写 bin/dsh-company.mjs（历史，已删除）。这些只证启动器路径，不证默认安装路径。
-- **证据**：前轮研究 [主稿](../_archive/research/plugin-as-product/2026-11-01-plugin-as-product.md)、[伞卡](../_archive/settled_issues/2026-11-01-plugin-as-product.md)、[落地卡](../_archive/settled_issues/2026-11-01-landing-plan.md)；本轮同步 = [研究稿](../research/plugin-as-product-v3/2026-11-01-entry-and-run-bundle-boundary.md)。
+- **证据**：前轮研究 [主稿](../../_archive/research/plugin-as-product/2026-11-01-plugin-as-product.md)、[伞卡](../../_archive/settled_issues/2026-11-01-plugin-as-product.md)、[落地卡](../../_archive/settled_issues/2026-11-01-landing-plan.md)；本轮同步 = [研究稿](../research/plugin-as-product-v3/2026-11-01-entry-and-run-bundle-boundary.md)。
 
 ## 目标形状（0.6.0 落地版；原推荐 A 的 workspace 根布局已废弃）
 
@@ -313,7 +313,7 @@ run： <workspace>/.dsh-company/{kb,deliverables,deliverables-archive,cultivatio
 
 验证：`pnpm verify` ALL PASS；`pnpm test` 1022 pass/3 skipped；`company-entry-smoke`、`release-smoke`、
 `client-load-smoke`、`preset-smoke`、`present-catalog-smoke`、`release --verify` 全绿。细节 = 
-[v3 Note](../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)。
+[v3 Note](../../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)。
 
 ## 0.7.0 复核（2026-11-02）
 
@@ -361,12 +361,12 @@ run： <workspace>/.dsh-company/{kb,deliverables,deliverables-archive,cultivatio
 ## 下一步
 
 1. v3 复核完成：产品形状/边界已落地；两处口径按 v3 Note 收窄（原生 picker、不自动迁移）。
-2. 等用户验收后按关闭法归档；真实 npm publish 不在本卡，归[生命周期与发布卡](2026-11-01-plugin-lifecycle-publish.md)
-   的 [publish handoff](../../docs/guides/publish-handoff.md)。
+2. 等用户验收后按关闭法归档；真实 npm publish 不在本卡，归[生命周期与发布卡](../../issues/2026-11-01-plugin-lifecycle-publish.md)
+   的 [publish handoff](../../../docs/guides/publish-handoff.md)。
 
 ## 关联
 
 - 本轮研究：[插件即产品 v3 研究稿](../research/plugin-as-product-v3/2026-11-01-entry-and-run-bundle-boundary.md)。
-- 上一轮：[伞卡](../_archive/settled_issues/2026-11-01-plugin-as-product.md)、[落地卡](../_archive/settled_issues/2026-11-01-landing-plan.md)、[主研究稿](../_archive/research/plugin-as-product/2026-11-01-plugin-as-product.md)、[v2 manifest Note](../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)。
-- 当前合同：[README](../../README.md)、[profile](../../docs/profile.md)、[runtime map](../../docs/runtime-map.md)、[data model](../../docs/data-model.md)、[release](../../docs/release.md)、[`_dist` 手册](../../_dist/安装手册.md)。
+- 上一轮：[伞卡](../../_archive/settled_issues/2026-11-01-plugin-as-product.md)、[落地卡](../../_archive/settled_issues/2026-11-01-landing-plan.md)、[主研究稿](../../_archive/research/plugin-as-product/2026-11-01-plugin-as-product.md)、[v2 manifest Note](../../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)。
+- 当前合同：[README](../../../README.md)、[profile](../../../docs/profile.md)、[runtime map](../../../docs/runtime-map.md)、[data model](../../../docs/data-model.md)、[release](../../../docs/release.md)、[`_dist` 手册](../../../_dist/安装手册.md)。
 - 外部 FAQ 26（只读）：`_faq_on_digested/26_plugin-as-product`（2026-11-01 更新：37 生命周期、40 启动/安装、18 安装三成功、17 home 不能供货、16 首启令牌门）。
