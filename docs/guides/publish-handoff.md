@@ -38,10 +38,11 @@ npm view dsh-company-pack@<version> version
 ## 3 生成真实 market index（推荐用 vendor generator）
 
 ```sh
-printf 'dsh-company-pack\n' > /tmp/dsh-plugins.txt
+mkdir -p _dist/market/site
+printf 'dsh-company-pack\n' > _dist/market/plugins.txt
 pnpm --filter @deepseek-ai/dsh-plugin-market-generator start -- \
-  --input /tmp/dsh-plugins.txt \
-  --output <site>/index.json \
+  --input _dist/market/plugins.txt \
+  --output _dist/market/site/index.json \
   --title "Dream Team Plugins"
 ```
 
@@ -51,9 +52,9 @@ generator 从 registry 读版本/发布时间/展示字段，写 `index.json` �
 
 ## 4 托管与校验
 
-- 把 `<site>/index.json` 与 `<site>/icons/` 放到 **https** 静态主机（GitHub Pages / 对象存储 / 任意
+- 把 `_dist/market/site/index.json` 与 `_dist/market/site/icons/` 放到 **https** 静态主机（GitHub Pages / 对象存储 / 任意
   不跟随重定向的静态服务）；index 上限 128 MiB，图标可内联 `data:`（≤32 KiB）或相对路径。
-- 校验：`node tools/market-index.mjs --check --out <site>`（名称/版本/图标与包 manifest 一致，且 DSH
+- 校验：`node tools/market-index.mjs --check --out _dist/market/site`（名称/版本/图标与包 manifest 一致，且 DSH
   校验器通过）。
 - 跨源图标必须是 https；`http:` 只允许同源。
 

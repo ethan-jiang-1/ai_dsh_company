@@ -83,7 +83,9 @@ if (has('--prepare')) {
   const entry = index.plugins?.find(plugin => plugin.name === manifest.name)
   if (entry === undefined) fail(`index 里没有 ${manifest.name}`)
   const versions = Array.isArray(entry.versions) ? entry.versions : []
-  if (versions[0]?.version !== manifest.version) fail(`index 版本 ${versions[0]?.version} ≠ package ${manifest.version}`)
+  if (!versions.some(version => version?.version === manifest.version)) {
+    fail(`index 里没有 ${manifest.name}@${manifest.version}（现有 ${versions.map(version => version?.version).join(', ')}）`)
+  }
   const icon = typeof entry.icon === 'string' ? entry.icon : ''
   if (!icon.startsWith('data:') && !existsSync(join(dirname(file), icon.replace(/^\.\//, '')))) fail(`图标不在 index 同目录：${icon}`)
   console.log(`market-index: OK ${manifest.name}@${manifest.version}（${versions.length} 个版本；icon ${icon}）`)
