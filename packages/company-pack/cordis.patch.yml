@@ -17,14 +17,31 @@
   config:
     default: ceo
 
-# ── 会话全文检索（0.2.0 harvest 批2）：base 出厂挂着 seam 但 openAt: never + :memory:
-#   （派生索引重启即丢）。替换行翻开懒开 + durable 路径（2026-10-28 二轮：K cache，
-#   按 profile 文件名隔离；仍保持单进程 owner，不跨 profile 共享）；索引库独立于会话库。
-- id: session-query-sqlite
-  name: '@deepseek-ai/dsh-session-query-sqlite'
-  config:
-    path: !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('../../cache/company/session-search-' + process.getBuiltinModule('node:path').basename(process.getBuiltinModule('node:url').fileURLToPath(baseUrl)) + '.db', baseUrl))"
-    openAt: first-search
+# ── 会话全文检索（0.7.0）：insert + isolate 的独立 provider 组（官方 `session-search` 同款）──
+# 为什么**不再**替换 base 的 `session-query-sqlite`：改值替换会在应用内安装（Plugins 页 /
+#   `plugin_manager`）的 live recomposition 里重载被 `session-controller` 依赖的服务行；
+#   rc.2 与 rc.5 实测都触发 `session-controller … file-upload: Agent resolver is already registered`，
+#   `installBundle` 报 `application: failed`（CLI 安装 + 重启是绿的，但那不是默认路径）。
+#   只新增行、不触碰既有行，两条安装路径都绿——官方 @deepseek-ai/dsh-experimental-session-search
+#   就是这个形状（`isolate: { sessionQuery: true }` + 组内 provider + 组内工具）。
+# 代价（显式，别当没发生）：隔离组只服务组内消费者，所以 DSH 侧栏的 `session/search` 保持出厂行为
+#   （base 行仍是 `openAt: never`，有会话时搜索会报禁用），durable 索引只给五个角色的 `session_search` 工具用；
+#   索引仍按 profile 落 `<DSH_HOME>/cache/company/`，仍单进程 owner、不跨 profile 共享。
+# 工具行必须在组内：组外消费者看的是 root 的 host provider（未打开）。
+- insert:
+    - id: company-session-search
+      name: cordis:group
+      group: true
+      isolate:
+        sessionQuery: true
+      config:
+        - id: company-session-query-sqlite
+          name: '@deepseek-ai/dsh-session-query-sqlite'
+          config:
+            path: !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('../../cache/company/session-search-' + process.getBuiltinModule('node:path').basename(process.getBuiltinModule('node:url').fileURLToPath(baseUrl)) + '.db', baseUrl))"
+            openAt: first-search
+        - id: company-tool-session-query
+          name: '@deepseek-ai/dsh-tool-session-query'
 
 - insert:
     # ── 日期通道 + 自主节律（0.2.0 harvest 批3；**0.2.1 改址**）──

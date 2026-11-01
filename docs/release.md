@@ -30,8 +30,9 @@
   `@deepseek-ai/dsh-browser-use` 与 `@deepseek-ai/dsh-experimental-browser-use-playwright-mcp`。
   五角色 preset 的 browser 组因此**条件启用**（profile 可解析即开，`DSH_COMPANY_BROWSER=on/off` 强制；
   缺包时整组禁用、角色照常可用）；browser 两包不进 `dependencies`，保住离线/零 runtime 依赖姿态。
-- **许可与发布**：`license: UNLICENSED`（内部交付，未授予再分发权）；`private: true` 保留到 publish。
-  真实 npm 发布仍是“第二个消费者出现再定”。
+- **许可与发布（2026-11-01 起）**：`license: MIT` + `LICENSE`、`author`/`homepage`/`keywords`/
+  `publishConfig.access: public`；`private` 已移除。发布面 = npm + 自托管 market index；
+  **真实 `npm publish` 是人工 handoff**（D6：有 npm 权限的人执行，字节 = `pnpm release --check` 过的 tarball）。
 - **client 面自打包**：`lib/client.js` 由 tsdown 产出，react 与 `dsh-client-*`/`dsh-api-*`
   留作浏览器模块表 require（见 `packages/company-pack/tsdown.config.ts` 外置规则），
   其余内联——所以 tarball 的浏览器半零 runtime 依赖。
@@ -136,9 +137,9 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 
 ## 版本纪律
 
-- pack 版本 `0.6.0`（`private: true`——**尚未发布到任何 registry**；真实发布动作（npm publish）等
-  出现第二个消费者/部署需求时再定；本轮只把本地 tarball 交付内化为 `pnpm release`，未 publish。
-  当前 release-smoke 验证的是 `file:` tarball 安装形状）。版本史与每版变化唯一家 =
+- pack 版本 `0.6.0`（发布姿态 = 可 npm 发布：MIT/身份齐全/`private` 已移除；真实 publish 是
+  人工 handoff，见上条）。当前 release-smoke 既验 `file:` tarball 安装，也验应用内
+  `pluginManager/installBundle` 的默认路径；版本史与每版变化唯一家 =
   [CHANGELOG](../CHANGELOG.md)（此处不写变更史）；改内容必 bump（见下条）。
 - 真实发布落定时的已判要件（2026-10-07 借语料 sdlc-11 登记；未到触发不预建脚本）：
   **registry 三态幂等**（无 → publish / sha512 同 → skip / 异 → fail「改内容没升版」）；

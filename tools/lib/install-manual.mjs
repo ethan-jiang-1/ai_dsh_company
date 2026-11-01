@@ -23,19 +23,16 @@ export function renderInstallManual(input) {
 | 安装包 | ${q(input.tarballName)}（与本手册同目录） |
 | 校验（sha256） | ${q(input.digest)} |
 | 打包日期 | ${input.date} |
-| 适用 DSH | ${q('engines.dsh')} 窗口内（本包验证基线：vendor ${q(input.expectedTag)}；npm 发布版 ${q('0.2.1-rc.3')}） |
-| 许可 | ${q('UNLICENSED')}（内部交付，未授予再分发权） |
+| 适用 DSH | ${q('engines.dsh')} 窗口内（${q('>=0.2.1-rc.2 <0.3.0')}；已验证 ${q('0.2.1-rc.2')} 与 ${q('0.2.1-rc.5')}） |
+| 许可 | MIT（${q('LICENSE')} 随包） |
 
 这个安装包是自包含的：bundle 补丁、五个角色 preset、浏览器端、host 行，以及 ${q('content/')}
 （公司手册/模板/默认章程/状态默认值）。**没有产品启动器、没有 package bin、没有可写的 profile 目录。**
 
-**产品形状（0.6.0 起）**：一个 bundle 装进一个 named profile。插件内容全部在包内；生产状态与最终
-artifacts（run bundle）全部在用户 workspace 的 ${q('.dsh-company/')}；home 只留 DSH 运行时与 host
-治理（sessions / 凭据 / workspace 登记 / lease / 方法层 / presented 账本 / 身份备份）。一个安装 =
+**产品形状**：一个 bundle 装进一个 named profile。插件内容全部在包内；生产状态与最终 artifacts
+（run bundle）全部在用户 workspace 的 ${q('.dsh-company/')}；home 只留 DSH 运行时与 host 治理
+（sessions / 凭据 / workspace 登记 / lease / 方法层 / presented 账本 / 身份备份）。一个安装 =
 一个公司，可顺序服务多个 workspace；不同公司才用不同 ${q('DSH_HOME')}。
-
-> **0.6.0 是破坏性布局**：0.5.0 的根目录骨架（手册/模板/kb/deliverables 在 workspace 根）不会自动迁移。
-> 旧文件原样保留；请在新 workspace 重新开始，或按本手册手工把需要的数据搬进 ${q('.dsh-company/')}。
 
 ## 零、前置：只需要一个已安装的 DSH
 
@@ -44,16 +41,18 @@ artifacts（run bundle）全部在用户 workspace 的 ${q('.dsh-company/')}；h
 - **一个 workspace 目录**：已存在、可写。不需要专用空盘；产品只在其中写 ${q('.dsh-company/')}。
 - **不需要**为这个包单独安装 Node、pnpm、构建工具或修改 profile 文件——它们属于 DSH 自己的运行时；
   用户只面对 DSH 的 Plugins 页/CLI。
-- **许可**：内部交付（${q('UNLICENSED')}），未授予再分发权。
+- **许可**：MIT（${q('LICENSE')} 随包）。
 
 ## 一、安装：默认在 DSH 应用内 Plugins 页
 
 ### GUI（默认，web 与 Desktop 同一句）
 
 1. 打开 DSH。
-2. 进入 **Plugins** 页。
-3. 安装 ${q('dsh-company-pack')}。
-4. 若界面提示重启/刷新，按提示重启 profile（浏览器模块不会热加载）。
+2. 进入 **Plugins** 页 → **Add plugin**。
+3. 已发布版本输入包名 ${q('dsh-company-pack')}（可带 ${q('@version')}）；本仓 ${q('_dist')} 交付
+   （尚未 publish 时）粘贴 tarball 的**绝对路径**——该入口接受包名、Git、tarball、本地目录。
+4. 安装完成后确认结果是 ${q('application: applied')}；若有“重启/刷新”提示，按提示重启 profile
+   （浏览器模块不会热加载）。
 
 Desktop 用户也用这一句。**不要**用 CLI 的 profile 参数去装 Desktop——CLI 只覆盖它能碰到的那一个
 profile，装错不会出现在 App 里。
@@ -68,7 +67,7 @@ GUI 用户不需要这一节。CLI 的 ${q('--profile')} 只作 ${q('dsh web')} 
 ${b}${b}${b}sh
 dsh --version                                  # 必须在 engines.dsh 窗口内
 dsh --profile company --from-default-profile web --dump-default-config   # 仅首次；仅 CLI web 自动化
-dsh plugin --profile company add /path/to/${input.tarballName}
+dsh plugin --profile company add /path/to/${input.tarballName}           # 或 dsh-company-pack@${input.version}
 ${b}${b}${b}
 
 > **仅 ${q('dsh web')}**。CLI 不能管理 Desktop profile（双门禁闭）。
@@ -77,6 +76,12 @@ ${b}${b}${b}
 
 装完**重启该 profile**；CLI 是另一个进程，宿主不知道。真启动一次，stderr 不应有
 ${q('did not activate')} 或 ${q('skipping profile bundle')}；${q('--dump-config')} 有 row 不等于挂载。
+
+### 从 DSH 市场发现（可选）
+
+市场是实验能力：Plugins → Experimental plugins → **Custom plugin markets** 打开后，把发布方给出的
+${q('index.json')} URL 加进 Discover，即可按版本安装。市场 index 只做发现与展示；安装时 DSH 仍会读包
+自身 manifest 的 ${q('engines.dsh')}，不兼容会被拒。
 
 ### 可选：浏览器能力（条件启用）
 
@@ -109,7 +114,7 @@ workspace 优先级：${q('DSH_COMPANY_HOME')} → 启动 cwd（合理项目目�
 - 在 workspace 建 ${q('.dsh-company/')}：${q('kb/')}、${q('deliverables/')}、${q('cultivation/')}、
   ${q('logs/')}、${q('exports/')}、${q('overrides/')}；
 - 只补缺地写状态实例（company/org/owners/台账/章程）；不覆盖已有文件；
-- 写 ${q('.dsh-company/bundle.json')}（v3：id / createdAt / pack）；
+- 写 ${q('.dsh-company/bundle.json')}（v3：id / createdAt / pack；${q('pack')} 是创建时的包版本）；
 - 登记 workspace（如果启动时已知道）；首屏由 DSH picker / 本包 client 回答；
 - **不**在 workspace 根写手册/模板/kb/deliverables；**不**在 home 根写 bundle。
 
@@ -151,17 +156,21 @@ ${b}${b}${b}
 | 包内内容 | ${q('presets/**')}、${q('src/**')}、${q('content/**')}（手册/模板/默认章程/状态默认值） | 维护者；只读 |
 | 用户 workspace | ${q('.dsh-company/')}：kb / deliverables / cultivation / logs / exports / overrides / ${q('bundle.json')}（v3） | 用户；可携带的 run bundle |
 | 产品 home | ${q('profiles/company')}、sessions、凭据、workspace 登记、lease、${q('company/methods/')}、${q('company/ledger/')}、${q('company/identity/')} | DSH + host 治理 |
+| 派生索引 | ${q('cache/company/session-search-<profile>.db')}（SQLite FTS5；单进程 owner） | 可删可重建；不进备份 |
 
 用户项目自己的项目指令文件不会被复制或覆盖；公司手册从包 ${q('content/AGENTS.md')} 注入 system prompt，
 不写入 workspace。模板默认读包；要改就放 ${q('.dsh-company/overrides/')}。
 
 ## 五、升级
 
-- **GUI（默认）**：在 Plugins 页更新/重装新版本，按提示重启 profile；浏览器硬刷新。
-- **CLI（仅 web 自动化）**：${q('dsh plugin --profile company add')} 新 tgz，重启 profile。
-- 0.6.0 起没有“基部哈希替换”：包内容随包版本只读；${q('.dsh-company/')} 状态只补缺，不覆盖你改过的文件。
-- 旧 0.5.0 根目录布局不做自动迁移；需要保留的数据请手工搬进 ${q('.dsh-company/')}。
+- **外部插件没有 Update 按钮**：升级 = 先移除当前版本，再安装新版本，然后重启 profile；浏览器硬刷新。
+  GUI 用 Plugins 页的 Remove / Add plugin；CLI（仅 web 自动化）用
+  ${q('dsh plugin --profile company remove dsh-company-pack')} → ${q('dsh plugin --profile company add')}。
+- 包内容随包版本只读；${q('.dsh-company/')} 状态只补缺，不覆盖你改过的文件。
+- ${q('.dsh-company/bundle.json')} 的 ${q('pack')} 字段记录**创建这个 run bundle 的包版本**，不是当前
+  安装版本；排障时以 Plugins 页/依赖里的版本为准。
 - **降级**：先备份 → 装回旧包 → 重启；更高 schema 的 ${q('bundle.json')}/账本/记录不会被旧版静默改写。
+- DSH 没有命令级回滚；回退就是装回旧版本。
 
 ## 六、备份 / 迁移
 
@@ -184,8 +193,25 @@ ${b}${b}${b}
 ## 七、卸载
 
 在 DSH 应用内 Plugin Manager 移除 ${q('dsh-company-pack')}（CLI 自动化才用
-${q('dsh plugin --profile company remove dsh-company-pack')}）。只卸插件、不动 workspace/home 数据；
-要彻底删除一个公司，确认备份后删除整个 ${q('DSH_HOME')} 和 workspace。产品不代删用户项目。
+${q('dsh plugin --profile company remove dsh-company-pack')}）。只卸插件与 profile 层；数据默认留下：
+
+| 留下什么 | 位置 |
+|---|---|
+| run bundle（kb / deliverables / cultivation / logs / exports / bundle.json） | ${q('<workspace>/.dsh-company/')} |
+| 身份备份、方法层、presented 账本、lease 残留 | ${q('<DSH_HOME>/company/')} |
+| presented 账本 storage | ${q('<DSH_HOME>/storages/company_run_bundle_ledger.json')} |
+| 会话与凭据（DSH 所有） | ${q('<DSH_HOME>/sessions/')}、${q('<DSH_HOME>/.credentials.yaml')} |
+
+要彻底删除一个公司，确认备份后按面删除：
+
+${b}${b}${b}sh
+rm -rf <workspace>/.dsh-company
+rm -rf <DSH_HOME>/company
+rm -f  <DSH_HOME>/storages/company_run_bundle_ledger.json
+rm -f  <DSH_HOME>/cache/company/session-search-*.db      # 派生索引，可删可重建
+${b}${b}${b}
+
+**不要**为了清插件删除整个 ${q('DSH_HOME')}——会话、凭据、其他 profile 的依赖都在那里。产品不代删用户项目。
 
 ## 八、安装失败与回退
 
@@ -199,7 +225,7 @@ ${q('dsh plugin --profile company remove dsh-company-pack')}）。只卸插件�
   时 Host 故意不写，等你在 DSH Workspace picker 里选。
 - **${q('bundle.json')} 损坏**：host 会停写并保留原文件；从 ${q('$DSH_HOME/company/identity/<id>.json')}
   恢复或备份后让 host 重建。
-- **回退**：备份整个 home + workspace；用同一个安装入口装回上一个版本；0.6.0 不自动降级状态文件。
+- **回退**：备份整个 home + workspace；用同一个安装入口装回上一个版本；旧版不会静默改写更高 schema 的状态文件。
 
 ## 常见问题
 

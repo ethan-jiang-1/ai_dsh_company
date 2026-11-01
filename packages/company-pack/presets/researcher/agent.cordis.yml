@@ -44,8 +44,6 @@
                   # 光在 persona 里写"只读"不够——工具在场就会被调，能力面必须与文案一致。
                   write: false
                   edit: false
-              - id: tool-session-query
-                name: '@deepseek-ai/dsh-tool-session-query'
               - id: tool-web
                 name: '@deepseek-ai/dsh-tool-web'
                 config:

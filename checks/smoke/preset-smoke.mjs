@@ -156,13 +156,23 @@ try {
     if (typeof aid !== 'string' || typeof bid !== 'string' || aid === bid) throw new Error(`会话 id 异常：${String(aid)} / ${String(bid)}`)
   })
 
-  // ②c K cache 落点（2026-10-28 二轮）：session/search 真触发 session-query-sqlite，
-  //    索引应落在 home cache/company/session-search-<profile>.db，不回 profile 目录。
-  await check('session-search 索引落 K cache（per profile）', async () => {
-    const value = await rpc(base, cookie, 'session/search', { request: { query: 'CEO' } })
-    if (!Array.isArray(value.items)) throw new Error(`session/search 返回形状异常：${JSON.stringify(value).slice(0, 120)}`)
-    const db = join(home, 'cache', 'company', `session-search-${PROFILE}.db`)
-    if (!existsSync(db)) throw new Error(`缺索引文件 ${db}`)
+  // ②c 会话检索隔离组（0.7.0）：bundle 用 insert + isolate 的独立 provider 组提供角色
+  //    `session_search`，**不再替换** base 的 `session-query-sqlite`——改值替换会让默认的
+  //    应用内安装（Plugins 页/plugin_manager）在 live recomposition 时报
+  //    `session-controller … file-upload: Agent resolver is already registered`（rc.2/rc.5 实测）。
+  //    这里证两件事：组内 provider/tool 真挂载（active），且全组合只有一条 tool 行。
+  //    host 的 `session/search` 保持出厂行为（`openAt: never`，可能空/禁用），不是产品承诺，
+  //    所以本检查不调用它——产品承诺只有角色 `session_search` 工具（其索引在首次搜索时懒开）。
+  await check('session-search 隔离组挂载（provider + tool active，且无重复行）', async () => {
+    const inventory = await rpc(base, cookie, 'pluginInventory/list', {})
+    const entries = inventory.entries ?? []
+    for (const idPart of ['company-session-query-sqlite', 'company-tool-session-query']) {
+      const rows = entries.filter(entry => String(entry.entryId).includes(idPart))
+      if (rows.length !== 1) throw new Error(`${idPart} 行数 ${String(rows.length)}（期望 1）`)
+      if (rows[0].fiberPhase !== 'active') throw new Error(`${idPart} 未 active：${String(rows[0].fiberPhase)}`)
+    }
+    const toolRows = entries.filter(entry => entry.moduleName === '@deepseek-ai/dsh-tool-session-query')
+    if (toolRows.length !== 1) throw new Error(`tool-session-query 行数 ${String(toolRows.length)}（期望 1；preset 行应已收敛到组内）`)
     const old = join(home, 'profiles', PROFILE, 'session-search.db')
     if (existsSync(old)) throw new Error(`旧 profile 索引仍在：${old}`)
   })

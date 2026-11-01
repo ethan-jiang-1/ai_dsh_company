@@ -108,11 +108,6 @@
                   thresholdChars: 8192
                   headChars: 4096
                   tailChars: 1024
-          # ── 0.2.0 harvest 批2：会话全文检索（FTS5；索引库随 profile 目录，
-          #    openAt=first-search 懒开——不搜索零开销）。「上次动议定了什么」先 session_search
-          #    再问人：journal 是摘要，会话库是全文；授权域 = 本工作区（五角色共用共享盘 ⇒ 跨角色可查）。
-          - id: tool-session-query
-            name: '@deepseek-ai/dsh-tool-session-query'
           - id: tool-skill
             name: '@deepseek-ai/dsh-tool-skill'
           - id: tool-cordis

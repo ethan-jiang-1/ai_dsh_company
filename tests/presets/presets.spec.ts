@@ -384,3 +384,36 @@ describe('BUG-021：问询必须能自行收口（timed 形态）', () => {
     }
   })
 })
+
+// 2026-11-01 生命周期卡 P0：会话检索必须走 insert + isolate 的独立 provider 组，
+// 不能用 bundle patch 改值替换 base 的 `session-query-sqlite`——后者会让默认的
+// 应用内安装（Plugins 页/plugin_manager）在 live recomposition 时报
+// `session-controller … file-upload: Agent resolver is already registered`（rc.2/rc.5 实测）。
+// 形态判据：组 + isolate + 组内 provider + 组内工具；六个 preset 不再各持一份 tool 行。
+describe('会话检索：isolated provider 组（P0 安装路径守卫）', () => {
+  const patch = readFileSync(join(PACK, 'cordis.patch.yml'), 'utf8')
+
+  it('bundle patch 声明 isolated sessionQuery 组，provider 与 tool 都在组内', () => {
+    expect(patch, '缺 company-session-search 组').toMatch(/^\s+- id: company-session-search$/m)
+    expect(patch, '组必须 isolate sessionQuery').toMatch(/^\s+isolate:\n\s+sessionQuery: true$/m)
+    expect(patch, '组内缺 sqlite provider').toMatch(/^\s+- id: company-session-query-sqlite$/m)
+    expect(patch, '组内缺 tool-session-query').toMatch(/^\s+- id: company-tool-session-query$/m)
+    // 组内顺序：provider 在 tool 之前（tool 依赖 sessionQuery）
+    const provider = patch.indexOf('- id: company-session-query-sqlite')
+    const tool = patch.indexOf('- id: company-tool-session-query')
+    expect(provider, 'provider 行缺席').toBeGreaterThan(-1)
+    expect(tool, 'tool 行缺席').toBeGreaterThan(provider)
+  })
+
+  it('不再用 bundle patch 替换 base 的 session-query-sqlite（默认安装路径会红）', () => {
+    expect(patch, 'bundle patch 仍在替换 session-query-sqlite：in-app 安装会触发 file-upload 重复 resolver')
+      .not.toMatch(/^- id: session-query-sqlite$/m)
+  })
+
+  it('六个 preset 不再各持 tool-session-query 行（工具面收敛到 bundle 组）', () => {
+    for (const role of [...ROLES, 'researcher']) {
+      expect(roleYml(role), `${role} 仍有 tool-session-query 行；组内工具会与它重复注册`)
+        .not.toMatch(/tool-session-query/)
+    }
+  })
+})

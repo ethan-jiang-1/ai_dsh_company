@@ -19,15 +19,15 @@ workspace** 里做事；插件内容全部在包内，生产状态与最终 arti
 
 ## 安装
 
-**GUI（默认）**：在 DSH **Plugins** 页安装 `dsh-company-pack`（web 与 Desktop 通用），按提示重启
-profile。
+**GUI（默认）**：在 DSH **Plugins** 页的 **Add plugin** 安装（web 与 Desktop 通用）：已发布版本
+输入包名 `dsh-company-pack`；本仓 `_dist` 交付在未 publish 时粘贴 tarball 绝对路径。按提示重启 profile。
 
 **CLI（仅 `dsh web` 自动化）**：
 
 ```sh
 export DSH_HOME="$HOME/.dsh-company/<你的公司名>"
 dsh --profile company --from-default-profile web --dump-default-config   # 仅首次
-dsh plugin --profile company add /path/to/dsh-company-pack-<version>.tgz
+dsh plugin --profile company add /path/to/dsh-company-pack-<version>.tgz   # 或包名@<version>
 ```
 
 装完重启 `dsh --profile company`。三个成功分开核：安装命令成功 → dependency 写入 → 进

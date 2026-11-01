@@ -1,10 +1,22 @@
 {
   "name": "dsh-company-pack",
   "version": "0.6.0",
-  "private": true,
   "type": "module",
-  "description": "Virtual company multi-role plugin pack: 5 role presets (CEO / VP-Eng / VP-Sales / COO / CFO) + host bundle rows + deployment brand skin. Design docs: docs/index.md",
-  "license": "UNLICENSED",
+  "description": "Five-role virtual company for DSH: CEO / VP-Eng / VP-Sales / COO / CFO presets, company handbook and Web tabs.",
+  "license": "MIT",
+  "author": "ethan-jiang-1",
+  "homepage": "https://github.com/ethan-jiang-1/ai_dsh_company#readme",
+  "bugs": {
+    "url": "https://github.com/ethan-jiang-1/ai_dsh_company/issues"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "dsh-bundle",
+    "agent-preset",
+    "company",
+    "team"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/ethan-jiang-1/ai_dsh_company.git",
@@ -37,8 +49,12 @@
     "locale/*.json",
     "icon.svg",
     "cordis.patch.yml",
-    "content/**"
+    "content/**",
+    "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.4",
     "@deepseek-ai/dsh-api-remotes": "^0.2.1-rc.2",

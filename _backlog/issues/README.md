@@ -4,9 +4,10 @@
 
 ## 活跃清单
 
-当前活跃 1 张；2026-11-01 产品化四卡已全部结清并归档，v3 修正卡在推敲。
+当前活跃 2 张；2026-11-01 产品化四卡已全部结清并归档，v3 修正卡与生命周期发布卡在推敲。
 
 - [插件即产品 v3 卡](2026-11-01-plugin-as-product-v3.md) — 拆 launcher、workspace 解析、插件内容/run bundle 分家；待用户确认 D1–D3。
+- [插件生命周期与发布卡](2026-11-01-plugin-lifecycle-publish.md) — 默认 in-app 安装红、npm/市场发布身份与渠道、升级/卸载文档；待用户拍板 D1–D6。
 - [插件即产品卡](../_archive/settled_issues/2026-11-01-plugin-as-product.md) — 0.5.0 产品形状；去向 = v2 manifest Note。
 - [落地顺序卡](../_archive/settled_issues/2026-11-01-landing-plan.md) — P0–P6 执行回执；v1 边界写清。
 - [产品生命周期卡](../_archive/settled_issues/2026-11-01-product-lifecycle.md) — 升级/降级/中断/恢复/搬移/doctor。

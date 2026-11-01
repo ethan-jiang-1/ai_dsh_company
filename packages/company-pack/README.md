@@ -2,22 +2,39 @@
 
 > **给收件人（先读这个）**：本包是 `dsh-company-pack`（版本见 `package.json` / 手册表头）；DSH 窗口 =
 > `engines.dsh`（`>=0.2.1-rc.2 <0.3.0`）。只需要 DSH 已安装且版本在窗口内；**不要求用户单独装
-> Node/pnpm**（DSH 运行时自己负责）。安装、sha256 校验、升级、备份、卸载、回退见与
-> tarball 同目录的《安装手册》（`_dist/安装手册.md`，由 `node tools/export-dist.mjs` 生成，不在 tarball 内）。
-> 许可 = `UNLICENSED`（内部交付，未授予再分发权）。
+> Node/pnpm**（DSH 运行时自己负责）。安装、sha256 校验、升级、备份、卸载、回退见同版本生成的
+> 《安装手册》（仓库 `_dist/安装手册.md`）。许可 = MIT（`LICENSE` 随包）。
 
 ## Install
 
-**默认在 DSH Plugins 页安装**（web 与 Desktop 同一句）。CLI 只是 `dsh web` 自动化：
+**默认在 DSH Plugins 页安装**（web 与 Desktop 同一句）：已发布版本输入包名 `dsh-company-pack`；
+本仓 `_dist` 交付（尚未 publish 时）在 Add plugin 里粘贴 tarball 的**绝对路径**（该入口接受
+tarball/本地目录）。CLI 只是 `dsh web` 自动化：
 
 ```sh
+dsh --version                                                            # 必须在 engines.dsh 窗口内
 dsh --profile company --from-default-profile web --dump-default-config   # 仅首次
-dsh plugin --profile company add <tarball>
+dsh plugin --profile company add <tarball-or-package-name>
 ```
 
 装完重启 `dsh --profile company`。三个成功分开核：安装命令成功 → dependency 写入 →
 `dsh.profile.bundles`；不要用 `--profile desktop`（CLI 不能管理 Desktop）。前置 = DSH 已安装且版本在
-窗口内；不需要用户单独装 Node/pnpm；本包不在 npm registry。
+窗口内；不需要用户单独装 Node/pnpm。
+
+## Verify
+
+- `dsh --profile company --dump-config`：能看到 `company-client` 与 `company-session-search` 行；
+- 真启动一次：stderr 没有 `did not activate` / `skipping profile bundle`；
+- Plugins 页：bundle 卡片可见，六条 preset 行（ceo / vp-eng / vp-sales / coo / cfo / researcher）不 broken；
+- 应用内安装的结果是 `application: applied`（不是 restart-required / failed）。
+
+## Compatibility
+
+- `engines.dsh`（`>=0.2.1-rc.2 <0.3.0`）是唯一硬版本门；有它时 peer 范围不参与判定。
+- 已验证运行时：`dsh-v0.2.1-rc.2`（`release-smoke`）与 `0.2.1-rc.5`（生命周期实验的 host 面：
+  六 preset / `session/create` / client 模块表）。窗口内其他 0.2.x 未执行，不等于承诺。
+- market index 里的 `engines.dsh` 只用于展示/推荐；安装时以包自身 manifest 为准。
+- 不兼容时安装会被拒绝并回滚；`allow-version` 是用户的逃生门，不是作者兼容策略。
 
 - **产品形状**：一个 bundle 装进一个 named profile；插件内容全部在包内，run bundle 在用户
   `<workspace>/.dsh-company/`；home 只留 DSH 运行时与 host 治理。一个安装 = 一个公司，可顺序服务
@@ -32,6 +49,8 @@ dsh plugin --profile company add <tarball>
 - 五个角色 preset（CEO / VP-Eng / VP-Sales / COO / CFO）+ 委派子人格 `researcher`；
 - host 行：签字、工作区门、团队、present、日期/节律、公司 client 面、run bundle 初始化、
   workspace 登记、handbook `systemPrompt.section`、成品目录/账本；
+- `company-session-search`（insert + isolate 组）：角色 `session_search` 工具 + 独立
+  `sessionQuery` provider；不替换 host 行，所以默认应用内安装能 live 应用；
 - `content/`：公司手册、模板、默认章程、状态默认值（只读产品内容，不 seed 到手写路径）；
 - 公司视图与一套公司页签（成品、台账、待办、培养等；清单 = 客户端注册面，不在文档枚举）。
 
@@ -53,6 +72,7 @@ dsh plugin --profile company add <tarball>
 | 包 `C` | 无用户数据 | 安装包目录 | 升级整体替换；**绝不在包目录写 data/cache/日志** |
 | run bundle `W` | `.dsh-company/`：kb（公司/org/owners/台账/章程/journal）、deliverables、cultivation、logs、exports、overrides、`bundle.json`（v3） | 用户 workspace | 用户备份；状态只补缺，不覆盖 |
 | 宿主状态 `H` | `company/identity/<id>.json`（身份备份）、`company-pack.lock`、`logs/company-client-errors.log`、`company/ledger/<hash>.json`（presented 账本）、`company/methods/<role>/` | `<DSH_HOME>` | 不动；方法层/账本同 home |
+| 派生 `K` | 会话检索索引（SQLite FTS5）；单进程 owner、per profile | `<DSH_HOME>/cache/company/session-search-<profile>.db` | 可删可重建；不进备份；不跨 profile 共享 |
 | 会话 `S` | 会话日志由宿主拥有；header.cwd 含 workspace 绝对路径 | `<DSH_HOME>/sessions/` | 不动 |
 | 凭据 `X` | 不写入包；走 `<DSH_HOME>/.credentials.yaml` / 环境变量 | home | 用户管理；0600 |
 
@@ -70,11 +90,21 @@ dsh plugin --profile company add <tarball>
 ## Uninstall
 
 `dsh plugin --profile company remove dsh-company-pack`（或应用内 Plugin Manager）：只摘插件与 profile
-层；workspace、home（含 sessions、方法层、账本、身份备份）保留。要彻底删除一个部署，确认备份后删除
-整个 `<DSH_HOME>` + workspace。详见《安装手册》第六节。
+层；**数据默认全部留下**。要彻底删除一个公司，确认备份后按面删除：
+
+```sh
+rm -rf <workspace>/.dsh-company                       # run bundle（kb/deliverables/cultivation/bundle.json）
+rm -rf <DSH_HOME>/company                             # identity / methods / ledger
+rm -f  <DSH_HOME>/storages/company_run_bundle_ledger.json
+# 会话、凭据、其他 profile 依赖 HOME 里的共享状态，不要整删 DSH_HOME
+```
+
+`<DSH_HOME>/cache/company/session-search-*.db` 是派生索引，可删可重建；不要为了清插件删整个
+`DSH_HOME`（会话/凭据/workspace 登记都在那里）。详见《安装手册》卸载节。
 
 ## 已知限制（随行为变更同 diff 更新）
 
+- **侧栏内容搜索保持 DSH 出厂行为**（0.7.0）：本包不再替换 host 的 `session-query-sqlite`——改值替换会让默认的应用内安装（Plugins 页/`plugin_manager`）在 live recomposition 时报 `file-upload: Agent resolver is already registered`。`company-session-search` 隔离组只给角色 `session_search` 工具用；DSH 侧栏 `session/search` 保持出厂 `openAt: never`（有会话时搜索会报禁用），不是产品承诺。
 - **侧栏角色色调只借平台令牌**（2026-10-13）：CEO 用 adaptive 的 `--dsw-alias-*` 品牌对（浅/深主题自动反转），其余四色用 **static 色相**（blue/green/amber/red，固定值、两主题同观感）+ 按底色选的黑/白字（对比度实测见探针 G6）——**不是**上游策展的分类色板（那份仍缺，见角色身份 UX 提案开放问题 2），换主题观感不一致处即此债。
 - **侧栏角色标记受 16px 座位约束**（2026-10-13）：行首座位是**可共存的 list 格**（同格还有计划任务时钟，16px 跨度），故标记按 12px 设计、单字母（C/F/O/E/S）。与时钟同格时两者合计 28px > 座位 16px，靠"座位居中溢出 + 标题前 4px 间隙"恰好不撞标题盒（几何判据 = [sidebar-role-mark-probe](../../probes/browser-visual/sidebar-role-mark-probe.mjs)）；**再加第三个同格占用者、或把标记改宽，这条就破**。
 - 机制与出厂行替换已对钉版 `dsh-v0.2.1-rc.2` 验证（2026-09-30 升 pin + 插件收割：pack-compat / release-smoke / 全套门禁；本仓嵌套工作区 vendor 自建偏离 = D27）。

@@ -146,6 +146,52 @@ try {
   check('安装副本带 engines.dsh 运行时窗口', typeof installedManifest?.engines?.dsh === 'string')
   check('安装副本不再携带 dsh.compatibility（FAQ 24 §9.2）', installedManifest?.dsh?.compatibility === undefined)
 
+  // ④c 应用内安装路径（2026-11-01 生命周期卡 P0）：Plugins 页 / plugin_manager 走的是
+  // pluginManager.installBundle，而不是 CLI 的 dsh plugin。它会在**运行中的组合**上 live 应用
+  // patch；改值替换被 session-controller 依赖的服务行会报
+  // `file-upload: Agent resolver is already registered`，application=failed。
+  // 这条断言就是默认路径的看门狗：CLI 绿不能替代它。
+  console.log('④c 应用内安装（pluginManager/installBundle，Plugins 页同款）')
+  const inAppProfile = 'release-in-app'
+  const inAppDir = join(home, 'profiles', inAppProfile)
+  rmSync(inAppDir, { recursive: true, force: true })
+  mkdirSync(inAppDir, { recursive: true })
+  writeFileSync(join(inAppDir, 'package.json'), `${JSON.stringify({
+    name: `dsh-profile-${inAppProfile}`, private: true,
+    dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app'], patchReload: 'startup' } },
+  }, null, 2)}\n`)
+  writeFileSync(join(inAppDir, 'pnpm-workspace.yaml'), 'packages:\n  - .\n\nnodeLinker: hoisted\nautoInstallPeers: false\n')
+  writeFileSync(join(inAppDir, '.npmrc'), `store-dir=${join(ROOT, '.pnpm-store')}\ncache-dir=${join(home, 'cache/pnpm')}\n`)
+  writeFileSync(join(inAppDir, 'cordis.patch.yml'), '# release-smoke in-app: no product profile patch\n[]\n')
+  const inApp = processes.start(process.execPath, [cli, '--profile', inAppProfile, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
+  try {
+    const inAppBanner = await inApp.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
+    const inAppBase = `http://127.0.0.1:${inAppBanner[1]}`
+    const inAppCookie = (await fetch(`${inAppBase}/?token=${inAppBanner[2]}`, { redirect: 'manual', signal: AbortSignal.timeout(15_000) }))
+      .headers.getSetCookie().map(cookie => cookie.split(';')[0]).join('; ')
+    let inAppRpcId = 0
+    const inAppRpc = async (method, args) => {
+      const response = await fetch(`${inAppBase}/api/${method}`, {
+        method: 'POST', headers: { 'content-type': 'application/json', cookie: inAppCookie },
+        body: JSON.stringify({ type: 'client-request', rpcId: `release-in-app-${++inAppRpcId}`, method, payload: { args } }),
+        signal: AbortSignal.timeout(15_000),
+      })
+      const body = await response.json()
+      if (body?.result?.ok !== true) throw new Error(`${method}: ${JSON.stringify(body?.result?.error ?? body).slice(0, 400)}`)
+      return body.result.value
+    }
+    const inspected = await inAppRpc('pluginManager/inspect', { spec: `file:${tarball}`, options: {} })
+    check('应用内 inspect 接受 tarball', inspected?.status === 'accepted', JSON.stringify(inspected).slice(0, 120))
+    const installed = await inAppRpc('pluginManager/installBundle', { spec: `file:${tarball}`, options: { requestId: 'release-in-app' } })
+    check('应用内安装 application=applied（默认路径）', installed?.application === 'applied',
+      JSON.stringify(installed?.error ?? installed?.application).slice(0, 240))
+    const inAppManifest = JSON.parse(readFileSync(join(inAppDir, 'package.json'), 'utf8'))
+    check('应用内安装进 dsh.profile.bundles',
+      (inAppManifest?.dsh?.profile?.bundles ?? []).includes('dsh-company-pack'))
+  } finally {
+    await inApp.stop()
+  }
+
   console.log('⑤ boot web（built CLI，临时随机端口；不替换现有 GUI）')
   const child = processes.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
   const banner = await child.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)

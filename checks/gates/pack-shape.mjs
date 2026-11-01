@@ -34,7 +34,9 @@ if (compat !== undefined && (!Array.isArray(compatReleases) || !compatReleases.i
 }
 
 // 分发契约（2026-10-25，RFC distribution-lifecycle）：DSH 只读 engines.dsh（存在即忽略 peers），
-// 所以兼容窗口必须有这一行；license/repository/private 是给收件人的身份，不是装饰。
+// 所以兼容窗口必须有这一行；license/repository/author/homepage/keywords/publishConfig 是给收件人与
+// 市场卡片的身份，不是装饰。2026-11-01 生命周期卡：发布姿态从“private 内部交付”切到“可 npm 发布”——
+// private 仍为 true 即红（真实 publish 会被 libnpmpublish 以 EPRIVATE 拒），LICENSE 文件必须在盘。
 // 矩阵仍是“已认证 tag 台账”，engines 是“当前可安装窗口”——两者语义不同，别混。
 const semver = (() => {
   for (const base of ['../../vendor/dsh/packages/boot/app-boot/package.json', '../../vendor/dsh/package.json']) {
@@ -57,10 +59,21 @@ else if (!semver.satisfies(pinVersion, dshRange, { includePrerelease: true })) {
   enginesProblems.push(`engines.dsh ${JSON.stringify(dshRange)} 不覆盖当前 pin ${pinVersion}`)
 }
 if (typeof pack?.license !== 'string' || pack.license.trim() === '') enginesProblems.push('license 缺失')
+else if (!existsSync(join(root, 'packages/company-pack/LICENSE'))) enginesProblems.push('LICENSE 文件缺失（license 字段不足以让收件人看到条款）')
 if (pack?.repository === undefined) enginesProblems.push('repository 缺失')
-if (pack?.private !== true) enginesProblems.push('private 不是 true（未到 publish 时不应放开）')
+if (typeof pack?.author !== 'string' && (typeof pack?.author !== 'object' || pack?.author?.name === undefined)) {
+  enginesProblems.push('author 缺失（市场卡片没有作者）')
+}
+if (typeof pack?.homepage !== 'string' || !/^https?:\/\//.test(pack.homepage)) {
+  enginesProblems.push('homepage 缺失或不是绝对 http(s) URL（市场 generator 只认这个字段）')
+}
+if (!Array.isArray(pack?.keywords) || pack.keywords.length === 0) enginesProblems.push('keywords 缺失或为空（Discover 检索为空）')
+if (['public', 'restricted'].includes(pack?.publishConfig?.access) === false) {
+  enginesProblems.push('publishConfig.access 缺失或不是 public/restricted')
+}
+if (pack?.private === true) enginesProblems.push('private 仍为 true（真实 npm publish 会被 EPRIVATE 拒；发布姿态应移除）')
 enginesProblems.length === 0
-  ? ok(`pack-engines（node ${nodeRange} / dsh ${dshRange} / ${pack.license} / private）`)
+  ? ok(`pack-engines（node ${nodeRange} / dsh ${dshRange} / ${pack.license} / 发布身份齐全）`)
   : fail('pack-engines', enginesProblems.join('；'))
 
 // 本仓发布形状硬门（不是 DSH 硬门；FAQ 24 §6 把它列为质量线）：locale/icon 既然随包发布，
@@ -77,7 +90,7 @@ if (pack.exports?.['./icon'] === undefined) metaProblems.push('exports 缺 ./ico
 // 两半 + 声明。静态检查 files/exports，不依赖 lib 是否已构建（fresh clone 也能跑）。
 const files = Array.isArray(pack.files) ? pack.files : []
 const fileProblems = []
-for (const required of ['lib/index.js', 'lib/client.js', 'lib/types/**/*.d.ts', 'content/**']) {
+for (const required of ['lib/index.js', 'lib/client.js', 'lib/types/**/*.d.ts', 'content/**', 'LICENSE']) {
   if (!files.includes(required)) fileProblems.push(`files 缺 ${required}`)
 }
 if (files.includes('lib/**')) fileProblems.push('files 用了 lib/**（会把 tsc 中间产物/tsbuildinfo 打进包）')
