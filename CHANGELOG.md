@@ -2,6 +2,21 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.7.0 — 2026-11-02
+
+### Changed
+
+- **默认应用内安装修复**：会话全文检索改由 `company-session-search`（insert + isolate 组）提供，
+  不再替换 host 的 `session-query-sqlite`。Plugins 页 / `plugin_manager` 安装不再报
+  `file-upload: Agent resolver is already registered`；六个 preset 的 `tool-session-query` 行收敛到组内。
+  角色 `session_search` 工具不变；DSH 侧栏内容搜索保持出厂行为（`openAt: never`）。
+- **发布身份**：`license: MIT` + `LICENSE`、`author`/`homepage`/`bugs`/`keywords`/`publishConfig.access`；
+  移除 `private`。npm 发布与 market index 走发布 handoff（发布字节 = `pnpm release --check` 的 tarball）。
+- **升级/卸载说明修正**：外部插件没有 Update 按钮，升级 = 卸载再装 + 重启；卸载不再建议删整个
+  `DSH_HOME`，改为 run bundle / `company/` / ledger storage 的精确删除面。
+- **验收面**：`release-smoke` 增加应用内安装 `application: applied` 断言；README 补 Verify /
+  Compatibility，手册补市场开关与精确卸载面。
+
 ## 0.6.0 — 2026-11-01
 
 ### Changed

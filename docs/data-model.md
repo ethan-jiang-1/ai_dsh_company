@@ -16,6 +16,7 @@
 | 交付物 | 用户/CEO | workspace 文件 | 角色 fs；CEO `present` | `<workspace>/.dsh-company/deliverables/**`、`deliverables-archive/**` | 跟 workspace；用户备份 |
 | 培养记录 | 公司/角色 | 记录文件 | 模型 `cultivation_propose`（只建）；人命令改 | `<workspace>/.dsh-company/cultivation/records/**` | 跟 workspace；archive/purge 人工 |
 | 成品索引 | 公司/盘上 meta/final | 派生 | host catalog | `<workspace>/.dsh-company/kb/deliverables-index.json` | 可删可重建 |
+| 会话检索索引 | 会话历史全文 | 派生 K | `session-query-sqlite`（`company-session-search` 隔离组） | `<DSH_HOME>/cache/company/session-search-<profile>.db` | 可删可重建；单进程 owner、不跨 profile |
 | run bundle 身份 | 插件/这次安装 | manifest（host-owned 约定） | host apply；人只读 | `<workspace>/.dsh-company/bundle.json`（v3） | 只创建/原地升 v3；home 备份 |
 | 方法层 | 部署者/角色 | **home 记录**（D25） | 人 `/cultivation adopt`；preset skill loader | `<DSH_HOME>/company/methods/<role>/**` | 跟 home；workspace `exports/methods/` 是派生 |
 | presented 账本 | 操作员/本次交付 | **home domain/文件**（M2） | host 事件 + 人命令；模型不可写 | `<DSH_HOME>/storages/company_run_bundle_ledger.json` 或 `company/ledger/<hash>.json`（按 workspace key） | 跟 home；workspace `exports/ledger.json` 是派生 |

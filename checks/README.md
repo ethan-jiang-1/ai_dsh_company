@@ -21,7 +21,7 @@
 | 查看已运行页面 | [cdp-probe](../probes/browser-visual/cdp-probe.mjs)；指南 = [CDP 指南](../docs/guides/cdp-probe.md) |
 | 确认录制行为与工作区判据 | [replay-smoke](smoke/replay-smoke.mjs)（当前仅 headless 合成场景） |
 | 审计动议输出与角色留痕 | [deliverables-check](audit/deliverables-check.mjs) · [authorship-audit](audit/authorship-audit.mjs) · [journal-audit](audit/journal-audit.mjs) |
-| 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs) · [export-dist](../tools/export-dist.mjs) |
+| 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs) · [export-dist](../tools/export-dist.mjs) · [market-index](../tools/market-index.mjs) |
 | **dev 启动** | `pnpm company --no-open` → [company](../tools/company.mjs)：只 exec `dsh --profile company`；不建 profile/不装包/不问 workspace |
 | 产品入口端到端（真 tarball 装 profile → `dsh --profile company` → workspace/run bundle） | [company-entry-smoke](smoke/company-entry-smoke.mjs)（keyless，~1-2 分钟） |
 
@@ -51,8 +51,8 @@
 团队协作（13）：[claim-race](../probes/team/claim-race-probe.mjs) · [dissent-preservation](../probes/team/dissent-preservation-probe.mjs) · [member-inquiry](../probes/team/member-inquiry-probe.mjs) · [member-interrupt](../probes/team/member-interrupt-probe.mjs) · [member-reject-in-team](../probes/team/member-reject-in-team-probe.mjs) · [member-rescue](../probes/team/member-rescue-probe.mjs)
 [member-stale-write](../probes/team/member-stale-write-probe.mjs) · [multi-user-e2e](../probes/team/multi-user-e2e-probe.mjs) · [team-atomicity](../probes/team/team-atomicity-probe.mjs) · [team-claim-loser](../probes/team/team-claim-loser-probe.mjs) · [team-concurrency](../probes/team/team-concurrency-probe.mjs) · [team-recovery](../probes/team/team-recovery-probe.mjs) · [read-barrier](../probes/team/read-barrier/index.mjs)
 
-**维护工具**（`tools/`，17 个）
-[ask-latency](../tools/ask-latency.mjs) · [bundle-init](../tools/bundle-init.mjs) · [converge](../tools/converge.mjs) · [deliverables-index](../tools/deliverables-index.mjs) · [diagnose](../tools/diagnose.mjs) · [export-dist](../tools/export-dist.mjs) · [notes-audit](../tools/notes-audit.mjs) · [orient](../tools/orient.mjs) · [propose-sampler](../tools/propose-sampler.mjs)
+**维护工具**（`tools/`，18 个）
+[ask-latency](../tools/ask-latency.mjs) · [bundle-init](../tools/bundle-init.mjs) · [converge](../tools/converge.mjs) · [deliverables-index](../tools/deliverables-index.mjs) · [diagnose](../tools/diagnose.mjs) · [export-dist](../tools/export-dist.mjs) · [market-index](../tools/market-index.mjs) · [notes-audit](../tools/notes-audit.mjs) · [orient](../tools/orient.mjs) · [propose-sampler](../tools/propose-sampler.mjs)
 [prune-runtime](../tools/prune-runtime.mjs) · [rehearsal-init](../tools/rehearsal-init.mjs) · [release](../tools/release.mjs) · [session-log-export](../tools/session-log-export.mjs) · [snapshot-motion](../tools/snapshot-motion.mjs) · [snapshot-path](../tools/snapshot-path.mjs) · [sync-dsh](../tools/sync-dsh.mjs)
 
 **结构门禁**（`checks/gates/`，52 个模块）：清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，

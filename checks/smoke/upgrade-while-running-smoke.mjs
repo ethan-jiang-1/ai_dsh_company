@@ -25,7 +25,7 @@ const V2 = join(BASE, `dsh-company-pack-${V2_VERSION}.tgz`)
 const HOME = join(BASE, 'home'); const WS = join(HOME, 'company-workspace')
 const failures = []; const active = new Set()
 const check = (label, ok, detail = '') => { console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail ? `（${detail}）` : ''}`); if (!ok) failures.push(label) }
-const env = { HOME: join(BASE, 'user'), DSH_HOME: HOME, DSH_COMPANY_HOME: WS, DSH_COMPANY_BOOTSTRAP: 'if-missing', PATH: `${join(BASE, 'bin')}:${process.env.PATH}`, npm_config_store_dir: join(BASE, 'store'), npm_config_cache: join(BASE, 'cache') }
+const env = { HOME: join(BASE, 'user'), DSH_HOME: HOME, DSH_COMPANY_HOME: WS, PATH: `${join(BASE, 'bin')}:${process.env.PATH}`, npm_config_store_dir: join(BASE, 'store'), npm_config_cache: join(BASE, 'cache') }
 const dsh = args => spawnSync(join(BASE, 'bin/dsh'), args, { cwd: BASE, env, encoding: 'utf8', timeout: 300_000 })
 const boot = () => {
   const child = spawn(join(BASE, 'bin/dsh'), ['--profile', 'web', '--', '--port', '0', '--no-open'], { cwd: BASE, env, stdio: ['ignore', 'pipe', 'pipe'] })
@@ -43,8 +43,6 @@ const rpc = async i => { const cookie = await companyCookie({ fetch: globalThis.
 
 try {
   rmSync(BASE, { recursive: true, force: true }); mkdirSync(join(BASE, 'bin'), { recursive: true }); mkdirSync(join(BASE, 'user'), { recursive: true })
-  mkdirSync(join(WS, '.dsh-company'), { recursive: true })
-  writeFileSync(join(WS, '.dsh-company/.seed-consent'), `${JSON.stringify({ v: 1, packVersion: PACK.version, workspace: WS, consentedAt: new Date().toISOString() }, null, 2)}\n`)
   writeFileSync(join(BASE, 'bin/dsh'), `#!/bin/sh\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(CLI)} "$@"\n`, { mode: 0o755 })
   if (!existsSync(V1)) throw new Error(`缺 ${V1}；先导出 _dist`)
   check('当前版安装成功', dsh(['plugin', '--profile', 'web', 'add', `file:${V1}`]).status === 0)
@@ -52,9 +50,9 @@ try {
   const created = await oldRpc('session/create', { request: { cwd: WS, agentPreset: 'ceo' } })
   const sessionId = created?.sessionId ?? created?.id
   check('旧实例可建 session', created?.agentPreset === 'ceo')
-  mkdirSync(join(WS, 'kb/ceo/journal'), { recursive: true })
-  writeFileSync(join(WS, 'kb/company.md'), '公司名: Acme\n')
-  writeFileSync(join(WS, 'kb/ceo/journal/acme.md'), '# Acme\n')
+  mkdirSync(join(WS, '.dsh-company/kb/ceo/journal'), { recursive: true })
+  writeFileSync(join(WS, '.dsh-company/kb/company.md'), '公司名: Acme\n')
+  writeFileSync(join(WS, '.dsh-company/kb/ceo/journal/acme.md'), '# Acme\n')
 
   console.log(`① 构造 ${V2_VERSION} tarball`)
   const v2Pack = join(BASE, 'pack-v2')
@@ -62,7 +60,7 @@ try {
   const manifest = JSON.parse(readFileSync(join(v2Pack, 'package.json'), 'utf8'))
   manifest.version = V2_VERSION
   writeFileSync(join(v2Pack, 'package.json'), `${JSON.stringify(manifest, null, 2)}\n`)
-  writeFileSync(join(v2Pack, 'workspace/templates/weekly-report.md'), `${readFileSync(join(v2Pack, 'workspace/templates/weekly-report.md'), 'utf8')}\n<!-- while-running-v2 -->\n`)
+  writeFileSync(join(v2Pack, 'content/templates/weekly-report.md'), `${readFileSync(join(v2Pack, 'content/templates/weekly-report.md'), 'utf8')}\n<!-- while-running-v2 -->\n`)
   const packed = spawnSync('npm', ['pack', '--pack-destination', BASE], { cwd: v2Pack, env, encoding: 'utf8', timeout: 120_000 })
   check(`${V2_VERSION} tarball 产出`, packed.status === 0 && existsSync(V2), (packed.stderr ?? '').slice(-160))
 
@@ -84,10 +82,14 @@ try {
   console.log(`③ 重启到 ${V2_VERSION}：会话/数据还在`)
   const next = await boot(); const nextRpc = await rpc(next)
   const bundle = JSON.parse(readFileSync(join(WS, '.dsh-company/bundle.json'), 'utf8'))
-  check(`bundle 前移到 ${V2_VERSION}`, bundle?.pack?.version === V2_VERSION, String(bundle?.pack?.version))
+  // 0.7.0 语义：bundle.json 的 pack 是**创建**这个 run bundle 的包版本，不跟随升级；
+  // 当前安装版本看 profile dependency。升级保留身份是刻意行为（见安装手册「升级」）。
+  check(`bundle 身份保留创建版本 ${PACK.version}`, bundle?.pack?.version === PACK.version, String(bundle?.pack?.version))
+  check(`profile 依赖已到 ${V2_VERSION}`,
+    readFileSync(join(profile(), 'package.json'), 'utf8').includes(V2_VERSION))
   check('重启后 roster 含 ceo', (await nextRpc('agentPresets/list', {})).presets?.some(p => p.id === 'ceo') === true)
   check('旧 session 仍在 session/list', (await nextRpc('session/list', { _request: {} })).items?.some(item => item.sessionId === sessionId) === true, String(sessionId))
-  check('数据仍在', readFileSync(join(WS, 'kb/company.md'), 'utf8').includes('Acme') && readFileSync(join(WS, 'kb/ceo/journal/acme.md'), 'utf8').includes('Acme'))
+  check('数据仍在', readFileSync(join(WS, '.dsh-company/kb/company.md'), 'utf8').includes('Acme') && readFileSync(join(WS, '.dsh-company/kb/ceo/journal/acme.md'), 'utf8').includes('Acme'))
   await stop(next)
 } catch (error) { failures.push(error.message); console.error(`upgrade-while-running-smoke: ${error.stack ?? error.message}`) }
 finally {

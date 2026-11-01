@@ -24,8 +24,8 @@
   peers 是**声明语义**（"验证过的宿主 API 面"），不是安装要求。
 - **兼容窗口 = `engines.dsh`**：DSH 在安装/启动时只读这一行（存在即忽略 peers；台账是“已认证 tag”
   台账，不是运行时门）。当前窗口见 `package.json`；`pack-shape` 的 `pack-engines` 强制它覆盖钉住的
-  pin，且 license/repository/private 在场。**窗口是“可安装”，不是“已认证”**：已实测通道 = vendor
-  `dsh-v0.2.1-rc.2` + npm 发布版 `0.2.1-rc.3`；其他 0.2.x 未执行。
+  pin，且 license/repository/author/homepage/keywords/publishConfig 在场。**窗口是“可安装”，不是“已认证”**：
+  已实测 = vendor `dsh-v0.2.1-rc.2`（全量冒烟）+ npm `0.2.1-rc.3`；`0.2.1-rc.5` 验 host 面（六 preset / `session/create` / client），其他 0.2.x 未执行。
 - **npm 发布版不含 browser 两包**：`@deepseek-ai/dsh` meta package 在 rc.2/rc.3 都不依赖
   `@deepseek-ai/dsh-browser-use` 与 `@deepseek-ai/dsh-experimental-browser-use-playwright-mcp`。
   五角色 preset 的 browser 组因此**条件启用**（profile 可解析即开，`DSH_COMPANY_BROWSER=on/off` 强制；
@@ -137,7 +137,7 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 
 ## 版本纪律
 
-- pack 版本 `0.6.0`（发布姿态 = 可 npm 发布：MIT/身份齐全/`private` 已移除；真实 publish 是
+- pack 版本 `0.7.0`（发布姿态 = 可 npm 发布：MIT/身份齐全/`private` 已移除；真实 publish 是
   人工 handoff，见上条）。当前 release-smoke 既验 `file:` tarball 安装，也验应用内
   `pluginManager/installBundle` 的默认路径；版本史与每版变化唯一家 =
   [CHANGELOG](../CHANGELOG.md)（此处不写变更史）；改内容必 bump（见下条）。

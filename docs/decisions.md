@@ -57,5 +57,5 @@
 | D51 | 插件即产品：`company` profile + workspace 自持 run bundle（v2 形状被 D52 取代；方法层/账本留 host 沿用） | [v2 manifest Note](../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md) · [_backlog 伞卡](../_backlog/_archive/settled_issues/2026-11-01-plugin-as-product.md) |
 | D50 | 研究按研究题组织：题目录 + 题名页（问题/消费者/产出的卡/材料）；双索引一题一行；`backlog-liveness` 两级校验 | [_backlog/research](../_backlog/research/README.md) · [research-topics Note](../notes/implemented/2026-10-30-backlog-research-topics.md) |
 | D52 | 插件即产品 v3：DSH-native 入口；无 launcher；内容在包；run bundle 与账本按 workspace 分区 | [v3 Note](../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md) · [v3 卡](../_backlog/issues/2026-11-01-plugin-as-product-v3.md) |
-### 待定与活动提案
-旧问题 Q1–Q8 均已闭合（Q1→D18、Q2→D16、Q3→D17、Q4 于 2026-09-22 定案、Q5–Q8→D22）。这只结算该组问题；当前任务源 = [notes/proposed/](../notes/proposed/README.md) 已批 RFC 与用户点名（D32，无中心队列）；未成熟的问题在 [_backlog/issues/](../_backlog/issues/README.md) 澄清，不是实施任务。旧磨清单与搁置池按历史记录归 [_backlog/_archive/legacy/](../_backlog/_archive/legacy/README.md)，不是任务源；当前问题关闭、暂停和触发规则见 [_backlog/README](../_backlog/README.md)。
+| D53 | 会话检索 = bundle 内 insert + isolate 独立 provider 组；不替换 host 行（默认 in-app 安装约束） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |
+| D54 | 发布姿态 = MIT + npm 身份齐全 + 市场 index handoff；npm publish 仍人工（D6） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |

@@ -23,7 +23,7 @@ const active = new Set()
 const check = (label, ok, detail = '') => { console.log(`  ${ok ? 'PASS' : 'FAIL'} ${label}${detail ? `（${detail}）` : ''}`); if (!ok) failures.push(label) }
 const sha = p => createHash('sha256').update(readFileSync(p)).digest('hex')
 const env = {
-  HOME: join(BASE, 'user'), DSH_HOME: HOME, DSH_COMPANY_HOME: WS, DSH_COMPANY_BOOTSTRAP: 'if-missing',
+  HOME: join(BASE, 'user'), DSH_HOME: HOME, DSH_COMPANY_HOME: WS,
   PATH: `${join(BASE, 'bin')}:${process.env.PATH}`, npm_config_store_dir: join(BASE, 'store'), npm_config_cache: join(BASE, 'cache'),
 }
 const dsh = (args, options = {}) => spawnSync(join(BASE, 'bin/dsh'), args, { cwd: BASE, env, encoding: 'utf8', timeout: 180_000, ...options })
@@ -57,12 +57,12 @@ try {
   const first = await boot()
   const r = await rpc(first)
   await r('session/create', { request: { cwd: WS, agentPreset: 'ceo' } })
-  mkdirSync(join(WS, 'kb/ceo/journal'), { recursive: true })
-  writeFileSync(join(WS, 'kb/company.md'), '公司名: Acme\n')
-  writeFileSync(join(WS, 'kb/ceo/journal/acme.md'), '# Acme\n')
-  mkdirSync(join(WS, 'deliverables/2026-10-26-a'), { recursive: true })
-  writeFileSync(join(WS, 'deliverables/2026-10-26-a/final.md'), '# final\n')
-  const before = { company: sha(join(WS, 'kb/company.md')), journal: sha(join(WS, 'kb/ceo/journal/acme.md')), final: sha(join(WS, 'deliverables/2026-10-26-a/final.md')) }
+  mkdirSync(join(WS, '.dsh-company/kb/ceo/journal'), { recursive: true })
+  writeFileSync(join(WS, '.dsh-company/kb/company.md'), '公司名: Acme\n')
+  writeFileSync(join(WS, '.dsh-company/kb/ceo/journal/acme.md'), '# Acme\n')
+  mkdirSync(join(WS, '.dsh-company/deliverables/2026-10-26-a'), { recursive: true })
+  writeFileSync(join(WS, '.dsh-company/deliverables/2026-10-26-a/final.md'), '# final\n')
+  const before = { company: sha(join(WS, '.dsh-company/kb/company.md')), journal: sha(join(WS, '.dsh-company/kb/ceo/journal/acme.md')), final: sha(join(WS, '.dsh-company/deliverables/2026-10-26-a/final.md')) }
   const sessionsBefore = readdirSync(join(HOME, 'sessions')).length
   await stop(first)
   check('profile 含 company-pack', bundles().includes('dsh-company-pack'))
@@ -71,6 +71,9 @@ try {
   const removed = dsh(['plugin', '--profile', 'web', 'remove', 'dsh-company-pack'])
   check('remove 成功', removed.status === 0)
   check('remove 后 bundles 不含 pack', !bundles().includes('dsh-company-pack'))
+  check('remove 后 workspace run bundle 仍在', existsSync(join(WS, '.dsh-company/bundle.json')))
+  check('remove 后 home 身份备份仍在', existsSync(join(HOME, 'company/identity')) && readdirSync(join(HOME, 'company/identity')).length > 0)
+  check('remove 后 presented 账本 storage 仍在', existsSync(join(HOME, 'storages/company_run_bundle_ledger.json')))
   const corrupt = join(BASE, 'corrupt.tgz')
   const bytes = readFileSync(TARBALL); bytes[bytes.length - 1] ^= 0xff; writeFileSync(corrupt, bytes)
   const bad = install(corrupt)
@@ -78,9 +81,9 @@ try {
   check('坏 add 后 bundles 仍不含 pack', !bundles().includes('dsh-company-pack'))
   const missing = install(join(BASE, 'does-not-exist.tgz'))
   check('不存在 tarball add 失败', missing.status !== 0, `exit=${String(missing.status)}`)
-  check('坏 add 后数据仍在', sha(join(WS, 'kb/company.md')) === before.company
-    && sha(join(WS, 'kb/ceo/journal/acme.md')) === before.journal
-    && sha(join(WS, 'deliverables/2026-10-26-a/final.md')) === before.final)
+  check('坏 add 后数据仍在', sha(join(WS, '.dsh-company/kb/company.md')) === before.company
+    && sha(join(WS, '.dsh-company/kb/ceo/journal/acme.md')) === before.journal
+    && sha(join(WS, '.dsh-company/deliverables/2026-10-26-a/final.md')) === before.final)
   check('坏 add 后 session 文件仍在', readdirSync(join(HOME, 'sessions')).length === sessionsBefore)
 
   console.log('③ re-add 好包：roster 恢复，数据不变')
@@ -90,9 +93,9 @@ try {
   const r2 = await rpc(second)
   const roster = await r2('agentPresets/list', {})
   check('re-add 后 roster 含 ceo', (roster.presets ?? []).some(p => p.id === 'ceo'))
-  check('re-add 后数据仍不变', sha(join(WS, 'kb/company.md')) === before.company
-    && sha(join(WS, 'kb/ceo/journal/acme.md')) === before.journal
-    && sha(join(WS, 'deliverables/2026-10-26-a/final.md')) === before.final)
+  check('re-add 后数据仍不变', sha(join(WS, '.dsh-company/kb/company.md')) === before.company
+    && sha(join(WS, '.dsh-company/kb/ceo/journal/acme.md')) === before.journal
+    && sha(join(WS, '.dsh-company/deliverables/2026-10-26-a/final.md')) === before.final)
   await stop(second)
 
   console.log('④ profile package.json 损坏：boot 必须可诊断，修复后恢复')
