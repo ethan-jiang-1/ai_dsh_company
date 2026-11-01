@@ -181,7 +181,8 @@ workspace、安装副本就是仓库源码——所以"dev 里看着对"与"用�
 | AC3 迁移提示 | 已 link 的 home 再跑默认：先打印「当前是 link: … 需要保留请加 --link」，随后切到 `file:` |
 | AC4 幂等 | 同内容二启：`安装副本已是最新（file:…abef80f4.tgz）`，不重复 add |
 | AC5 门禁 | `PASS dev-product-parity`；注入「默认改回 link」→ 点名红；bootstrap 写回 web profile → 红；包 README 写 market-index.json → 红；各自还原 → 绿 |
-| AC6 全量 | `pnpm verify` ALL PASS；`pnpm test` 123 files / 1035 passed / 3 skipped；`pnpm typecheck` 绿 |
+| AC6 全量 | `pnpm verify` ALL PASS；`pnpm test` 123 files / 1036 passed / 3 skipped；`pnpm typecheck` 绿；`release --check` READY 0.7.0 @ `ad439b6` |
+| AC7 index 字节稳定 | 同版本重复 `--prepare`：`market-index.json` 无 diff（`stablePublishTimestamp`；版本变化/`--refresh` 才换时间） |
 
 ## 关联
 
