@@ -100,7 +100,7 @@ FAQ 24 §9.2：`dsh.compatibility` 不是 DSH 字段，安装器/启动器不读
 
 两个 DSH 调用均为 plain Node，清除继承的 `NODE_OPTIONS`、`NODE_PATH`、`TSX_*`，不走 `pnpm dsh`/tsx。构建和打包各限 120 秒，安装 180 秒，boot 120 秒、实例总寿命 180 秒、每个 HTTP 请求 15 秒；POSIX 子进程组 TERM 后等待，1 秒后 KILL。确认退出才回收 profile（`--keep` 保留）；同 home 的锁目录拒绝并发运行。强杀脚本留下的锁须确认无进程后人工移除。
 
-全绿证明本次已有 vendor 产物配合真 tarball 安装可用；不证明 vendor 新鲜构建，也不覆盖完整浏览器交互。dev profile 的 `link:` 安装不替代这条验证。
+全绿证明本次已有 vendor 产物配合真 tarball 安装可用；不证明 vendor 新鲜构建，也不覆盖完整浏览器交互。dev 默认已走 tarball；`--link` 快速通道不替代这条验证。
 
 **生命周期**：0.6.0 是破坏性布局，不做 0.5.0 迁移；旧文件原样保留。升级/卸载/备份由安装手册与 `release-smoke` 的二次 boot 覆盖；不再有独立 `lifecycle-smoke`（旧形状已删除）。
 

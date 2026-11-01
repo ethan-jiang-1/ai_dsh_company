@@ -37,6 +37,7 @@
 | [guides/web-rpc.md](./guides/web-rpc.md) | 指南 | 驱动 Web 面会话的 HTTP RPC runbook：脚本化建会话/发 prompt/读日志 |
 | [guides/release-runbook.md](./guides/release-runbook.md) | 指南 | 发布五步 runbook：bump/CHANGELOG/prepare/verify/check；产物、manifest 与失败定位 |
 | [guides/publish-handoff.md](./guides/publish-handoff.md) | 指南 | 字节离开仓库：npm publish、vendor generator 生成 market index、https 托管与 Discover 发现、回滚与回执 |
+| [guides/dev-product-parity.md](./guides/dev-product-parity.md) | 指南 | dev 启动器与产品安装路径的同形点/允许差异表；`pnpm company` 默认 tarball、`--link` 快速通道 |
 | [terminology.md](./terminology.md) | 导航 | 术语映射查表：本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达 |
 | [external-research.md](./external-research.md) | 导航 | repo 外研究材料登记与吸收落点（2026-10-20 自 index 迁出） |
 | [decisions.md](./decisions.md) | 导航 | 决策台账路由（D 号 → 一句话 → 家；2026-10-20 自 index 迁出） |

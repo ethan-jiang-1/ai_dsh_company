@@ -25,6 +25,7 @@ const DOC_LINE_BUDGETS = [
   ['docs/terminology.md', 22],   // 2026-10-12 立：术语映射查表自 index 迁出（登记型查表，随 pin 升级演进；行数稳定，头寸宽于 5% 起步）
   ['docs/guides/web-rpc.md', 30], // 2026-10-12 立；2026-10-27 R3-17 棘轮下调：原 47 让 21 行长期空置，按现行内容 + 5% 收紧
   ['docs/guides/release-runbook.md', 75], // 2026-10-26 立：发布五步 runbook（合同仍住 release.md；本文件只留操作与失败定位）
+  ['docs/guides/dev-product-parity.md', 60], // 2026-11-02 立：dev/产品差异表（合同 = release.md/profile.md；本文件只留同形点与允许差异）
   ['docs/guides/budget-and-ops.md', 72], // 2026-10-28 R4：补预算（原无上限；按现行内容 +5% 棘轮）
   ['docs/guides/cdp-probe.md', 68], // 2026-10-28 R4：补预算（原无上限；按现行内容 +5% 棘轮）
   ['docs/policy.md', 100],           // 2026-10-27 R3-19 立：政策层（自 dev-loop §10/§11/§13 + §0.5 规则迁出）

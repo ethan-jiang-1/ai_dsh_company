@@ -5,7 +5,9 @@ opened: 2026-11-02
 
 # 推敲：dev 通道与产品安装路径对齐——`link:` 安装 vs tarball/registry，差异有界且显性
 
-> 立卡：2026-11-02 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：未定 ｜ 可关闭：否
+> 立卡：2026-11-02 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+>
+> **去向**：实现 = [dev/product parity Note](../../notes/implemented/2026-11-02-dev-product-path-parity.md)；待用户验收后按关闭法归档。
 >
 > **原始意图（用户原话）**：
 > 「外部仓 deep-research 的 `_backlog/issues/2026-11-02-dev-product-path-parity.md`（路径见用户消息；不写本机绝对路径）
@@ -65,6 +67,16 @@ workspace、安装副本就是仓库源码——所以"dev 里看着对"与"用�
 - **已有补偿面**（C/T）：`release-smoke`（tarball + 干净 profile + 应用内安装）、`company-entry-smoke`
   （tarball + `company` profile + 两 workspace）、`export-dist`（`npm pack` 清单断言）。它们证明产品形
   可走，但不在日常回路里，且依赖手动/发布时执行。
+
+## 决策（2026-11-02，用户点名「推进落地」后 agent 代行）
+
+| # | 选择 | 理由 |
+|---|---|---|
+| D1 | **默认 tarball；`--link` 显式快速通道** | 日常回路必须走产品同形安装；link 保留给"改即刻生效"的调试场景 |
+| D2 | **profile 名保持 `company`** | 与产品同形；改 `company-dev` 会偏离产品名并牵动所有 smoke |
+| D3 | **观察窗用 dev home 的 `company`；3080 只作日用** | 不动用户日常 home；验收走 dev home |
+| D4 | **`market-index.staged.json` 标记未发布期**；发布后删除 | 索引可入库/可校验，但不引导用户加一个 registry 里不存在的版本 |
+| D5 | **parity 指南住 `docs/guides/dev-product-parity.md`** | 常驻参考（表），不塞进已接近预算的 dev-loop |
 
 ## 未决问题
 
@@ -142,6 +154,34 @@ workspace、安装副本就是仓库源码——所以"dev 里看着对"与"用�
 - 把 3080 日用 GUI 换成 dev home（用户日常环境不动）。
 - 真实 npm publish（仍按 [publish-handoff](../../docs/guides/publish-handoff.md) 人工执行）。
 - 把 link 通道删掉（它是调试必需，只是降为显式）。
+
+## 实施回执（2026-11-02）
+
+**P0 完成**：`tools/company.mjs` 默认 `tsc + tsdown → npm pack → dsh plugin --profile company add file:<tgz>
+→ exec`；`--link` 显式快速通道；link→tarball 迁移有显式提示（不静默）；tarball 内容寻址命名
+（`<name>-<ver>-<sha8>.tgz`，内容一变 spec 就变）；同 spec 跳过 add（二启 `安装副本已是最新`）。
+安装规划抽成纯函数 `tools/lib/dev-install.mjs`（`resolveDevMode`/`devTarballName`/`planDevStart`）。
+
+**P1 完成**：新增 [parity 指南](../../docs/guides/dev-product-parity.md)（同形机制 + 允许差异 + 怎么验）；
+修 `docs/guides/bootstrap.md` 的「装进 **web profile**」→ company；`policy`/`demo`/`profile`/`release`/`AGENTS`
+同步到"默认 tarball、`--link` 快速通道"。
+
+**P2 完成**：`market-index.staged.json`（`requiresPublish: true`，版本随 bump）；未发布期面向用户文档
+（根 README/包 README/手册）不出现 `market-index.json`；发布后删标记即可解除。
+
+**P3 完成**：新门禁 [dev-product-parity](../../checks/gates/dev-product-parity.mjs) 接线进 `pnpm verify`；
+判据 4 组（启动器默认、parity 指南机制点、bootstrap 漂移、市场 staged 规则）。
+
+### 验证（真跑）
+
+| 验收 | 证据 |
+|---|---|
+| AC1 干净 dev home 默认 tarball | 干净 home 首启：`dep=file:…/tmp/dev-pack/dsh-company-pack-0.7.0-abef80f4.tgz`；banner 出；六角色零 broken；`session/create` ceo；无 `did not activate` |
+| AC2 `--link` 快速通道 | 干净 home `--link`：`dep=link:/…/packages/company-pack`；banner 出 |
+| AC3 迁移提示 | 已 link 的 home 再跑默认：先打印「当前是 link: … 需要保留请加 --link」，随后切到 `file:` |
+| AC4 幂等 | 同内容二启：`安装副本已是最新（file:…abef80f4.tgz）`，不重复 add |
+| AC5 门禁 | `PASS dev-product-parity`；注入「默认改回 link」→ 点名红；bootstrap 写回 web profile → 红；包 README 写 market-index.json → 红；各自还原 → 绿 |
+| AC6 全量 | `pnpm verify` ALL PASS；`pnpm test` 123 files / 1035 passed / 3 skipped；`pnpm typecheck` 绿 |
 
 ## 关联
 

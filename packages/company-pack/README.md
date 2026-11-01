@@ -56,9 +56,9 @@ dsh plugin --profile company add <tarball-or-package-name>
 
 ## Market / discovery
 
-仓库根 `market-index.json` 是 format 1 索引（单文件，图标内联）。Plugins → Experimental plugins →
-Custom plugin markets 开启后，在 Discover 添加它的 https URL（GitHub raw / jsDelivr），即可按版本发现与安装。
-索引里的 `engines.dsh` 只用于展示；安装时仍读包自身 manifest。
+市场是 DSH 的实验能力（Plugins → Experimental plugins → Custom plugin markets）。**安装不依赖它**：
+拿到包名/版本直接 `dsh plugin add`，或应用内 Plugins 页的 Add plugin 输入包名。
+本版本尚未发布到 registry，索引源由发布方在发布后提供；未发布前不提供加源指引。
 
 ## Configuration
 

@@ -59,7 +59,7 @@
 | 项 | 值 |
 |---|---|
 | 版本 | `0.7.0`（tarball `_dist/dsh-company-pack-0.7.0.tgz`） |
-| sha256 | `13d01509ff02e79286a85aa50e808285558290cf015488c1576bd4426fa679f6` |
+| sha256 | `abef80f4f55c78de8118ab9d0704777952b38b982ffdab83439d64ab73dc55ff` |
 | 手册 | `_dist/安装手册.md`（生成；MIT/精确卸载面/市场开关） |
 | manifest | `_dist/release-manifest.json`（`pnpm release --verify` 全绿后写） |
 | market index | `market-index.json`（仓库根，tracked；图标内联）；`node tools/market-index.mjs --check` → `dsh-company-pack@0.7.0`，DSH 校验器通过 |

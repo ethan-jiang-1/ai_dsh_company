@@ -53,7 +53,7 @@
    **先配置重定向进仓库 gitignored 区，再首次使用**。已有落点：
    - DSH 数据层：`DSH_HOME=runtime/harness-home`（env.sh，双 home）
    - pnpm store：仓库根 `.pnpm-store/`；dev profile 的 `.npmrc` 把 `store-dir` / `cache-dir` 钉在 repo 内
-   - dev profile 的 pack：`link:` 符号链接（内容改动即刻生效，重装仅在改依赖/bundle 行）
+   - dev profile 的 pack：默认 `npm pack` + `plugin add file:<tgz>`（产品同形）；`pnpm company --link` 是显式快速通道
    - 排练/探针 cwd：`runtime/rehearsal-workspace/`
    **新工具进工具链时，重定向配置必须在首次使用前完成**——这是引导配方（[bootstrap](./guides/bootstrap.md)）的一部分。
 3. **确需越界（重定向覆盖不了的场景）**：先问人，一次说清"写哪个路径、为什么没有替代"；

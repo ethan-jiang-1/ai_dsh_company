@@ -22,9 +22,9 @@
 
 1. `source run/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒）**：
    `pnpm dsh --profile company --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 说明你起的是
-   日用 `~/.dsh`（那里另有同名 `web` profile）或 pack 没装。dev profile 已 `link:` 装好，不必再 `plugin add`。
+   日用 `~/.dsh`（那里另有同名 `web` profile）或 pack 没装。`pnpm company` 首次会按需 pack + `plugin add`。
 2. `pnpm company --no-open`（**端口是环境状态**：`--port 0` 交系统分配，
-   端口/token 从启动横幅读；要固定端口先确认空闲）。dev wrapper 只 exec `dsh --profile company`；产品安装/首启按 README/手册，
+   端口/token 从启动横幅读；要固定端口先确认空闲）。dev wrapper 默认 pack + `plugin add file:` 后 exec；`--link` 走快速通道；产品安装/首启按 README/手册，
    把 workspace 登记进 DSH，并在浏览器首屏自动选中目标盘。
 3. 浏览器打开横幅 URL（**必须带 token**）。**不再手点 Choose workspace**：目标 workspace 已在 boot 时登记；
    若侧栏没有，先看启动输出是否报“未指定/未登记/落点不安全”。

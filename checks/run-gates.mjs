@@ -67,6 +67,7 @@ import * as trackedToken from './gates/tracked-token.mjs'
 import * as trackedSecrets from './gates/tracked-secrets.mjs'
 import * as trackedPortability from './gates/tracked-portability.mjs'
 import * as scriptIndex from './gates/script-index.mjs'
+import * as devProductParity from './gates/dev-product-parity.mjs'
 import * as replayFixtureFreshness from './gates/replay-fixture-freshness.mjs'
 import * as replayUiFreshness from './gates/replay-ui-freshness.mjs'
 import * as gateWiring from './gates/gate-wiring.mjs'
@@ -135,6 +136,7 @@ trackedToken.run(ctx)
 trackedSecrets.run(ctx)
 trackedPortability.run(ctx)
 scriptIndex.run(ctx)
+devProductParity.run(ctx)
 replayFixtureFreshness.run(ctx)
 replayUiFreshness.run(ctx)
 gateWiring.run(ctx)

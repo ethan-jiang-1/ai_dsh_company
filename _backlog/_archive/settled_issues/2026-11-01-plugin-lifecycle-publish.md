@@ -218,7 +218,7 @@ rc.2 与 rc.5 的 in-app 安装均为 `application: applied`；真模型 `sessio
 `npm publish --dry-run`：127 files、LICENSE 在场、无 `bin/`、public access。
 
 **P2 完成**：`pnpm release --prepare`（0.7.0）→ `--verify` 六项认证档全绿；tarball
-`sha256=13d01509…f679f6`；manifest 记录版本/HEAD/检查项（`--stamp` 后 `dirty=false`）。
+`sha256=abef80f4…dc55ff`；manifest 记录版本/HEAD/检查项（`--stamp` 后 `dirty=false`）。
 
 **P3 完成（到 handoff）**：本地 registry 按名安装演练通过（`dsh plugin add dsh-company-pack --registry ...` → `^0.7.0` + 六角色 boot）；`tools/market-index.mjs`（manifest→format 1 + DSH 校验器真验）、
 `tests/company/market-index.spec.ts`、`docs/guides/publish-handoff.md`；仓库根 `market-index.json`
@@ -252,7 +252,7 @@ v3 卡 0.7.0 复核见其「0.7.0 复核」节；两卡边界一致，没有互�
 ## 剩余 handoff（代码面已收口，不是 gap）
 
 1. **真实 npm publish**：本机无 npm 凭据；按名安装已在本地 registry 演练通过，公有 registry 账号/占用仍未验；发布字节已 READY（`_dist/dsh-company-pack-0.7.0.tgz`，
-   sha `13d01509…f679f6`），按 [publish-handoff](../../../docs/guides/publish-handoff.md) 由有权限的人执行。
+   sha `abef80f4…dc55ff`），按 [publish-handoff](../../../docs/guides/publish-handoff.md) 由有权限的人执行。
 2. **market index https 托管**：仓库根 `market-index.json` 已用 DSH 校验器验过；托管到 https，
    Discover 加源验证（发布后可用 vendor generator 校准真实发布时间）。
 3. **用户验收**：0.7.0 的发布字节与两卡复核；关闭由用户判定。

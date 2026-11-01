@@ -13,7 +13,7 @@
 | **产品安装（默认）** | DSH **Plugins** 页安装 `dsh-company-pack`（web/Desktop 同一句） | ✅ 跨面；装完重启 profile |
 | **CLI web 自动化** | `dsh --profile company --from-default-profile web --dump-default-config` → `dsh plugin --profile company add <tgz>` | ✅ **仅 `dsh web`**；不能 `desktop` |
 | **启动** | `cd <workspace> && dsh --profile company`（或 `DSH_COMPANY_HOME`） | ✅ 无 launcher/bin；无 `--workspace` |
-| **维护者 dev** | `source run/env.sh` → `pnpm company --no-open`（dev-only exec） | ✅ dev home = `runtime/harness-home`，pack 走 `link:` |
+| **维护者 dev** | `source run/env.sh` → `pnpm company --no-open`（默认 pack + `plugin add file:`；`--link` 快速通道） | ✅ dev home = `runtime/harness-home`，差异表 = [dev-product-parity](./guides/dev-product-parity.md) |
 | **通用/旧部署** | 任意 web profile 装本包 | ✅ 兼容形状；不承诺 Desktop shell |
 
 产品形状细节：

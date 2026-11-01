@@ -57,10 +57,10 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack
 # ⚠ preset 内容与代码面不同步：link: 安装下改 presets/**（persona/skills）**即刻生效无需重建**，
 #   但 host/client 代码（src/**）走 lib/ 构建产物——**不重建 = 改动永远不生效**（2026-09-25 实证：
 #   verify 的 client-halves 门禁只查形状不构建，preset-smoke/client-load 全绿也可能验的是旧包）。
-# ⚠ 重装纪律（2026-09-22 更新；2026-09-30 补节律 bundle）：dev profile 的 pack 已改 **`link:` 符号链接**
-#   ——改 presets/** persona / skills 即刻生效，**无需重装**；只有改 pack 依赖或 bundle 行才需要
-#   `plugin --profile company remove` + `add`。profile 的 `.npmrc` 把 store/cache 钉在 repo 内
-#   （`~/Library` 不被碰）。**真实安装形状的验证归 R5a release-smoke**（干净 profile + file:/registry）。
+# ⚠ 安装形状（2026-11-02 起）：`pnpm company` **默认** = pack → `plugin add file:<tgz>` → exec，
+#   与产品同形（差异表 = guides/dev-product-parity.md）。改 presets/** 后**要重启**（tarball 是副本）；
+#   需要"改即刻生效"时用 `pnpm company --link`（显式快速通道，改 presets 免重建）。
+#   profile 的 `.npmrc` 把 store/cache 钉在 repo 内（`~/Library` 不被碰）。
 #   **日期通道与定时提醒不再需要额外 bundle（0.2.1）**：`time-context` + `tool-schedule` 由五个
 #   角色 preset 各自声明（`preset-clock` 组），宿主 schedule 服务随 web-app 组合而来 ⇒ profile 的
 #   bundles 列表里若还留着已退役的 schedule bundle，删掉那一项即可。
@@ -96,8 +96,8 @@ node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名�
 - **web 观察窗三件事**（R1 实证）：① client bundles（`tsdown --env.DSH_BUILD_FACE client`）——
   缺了报 `client bundles not found; run pnpm run build before launch`；② 前端 dist
   （`pnpm --filter @deepseek-ai/dsh-web-frontend run build`）——缺了首页 404 空页；
-  ③ pack 装进 **web profile**（`plugin add link:./packages/company-pack`，dev 用符号链接——
-  内容改动即刻生效；profile `.npmrc` 把 store/cache 钉在 repo 内，`~/Library` 不被碰。
+  ③ pack 装进 **company profile**（`pnpm company` 默认 pack + `plugin add file:`；`--link` 走符号
+  链接快速通道。profile `.npmrc` 把 store/cache 钉在 repo 内，`~/Library` 不被碰。
   历史：file: 拷贝时代首次装会拦 koffi 构建审批 → profile 的 `pnpm-workspace.yaml` 改
   `koffi: true` 再装；link: 下 profile 不再装 koffi，koffi 由源码域解析）。观察窗默认端口 3080，**与本 GUI 冲突**，用
   `-- --port 0`（端口是环境状态，系统分配后从启动横幅读）。preset roster 出现在 UI 的 Built-in 组（5 公司角色 + researcher；trust 分组见上文 R1 坑注）。
