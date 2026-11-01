@@ -49,13 +49,13 @@
 | D42 | vendor 升 pin＝用户策动制（agent 不盯不评不建议）＋渠道只认 RC/正式版，alpha/beta 通通不管 | [pin-upgrade-policy](../notes/archived/2026-10-12-pin-upgrade-policy.md) |
 | D43 | 培养三面：第三主视图＝培养（立时第四子页）；方法层公司级（M3 起）；CEO 仅建议权（D25 部分取代） | [agent-cultivation-loop](../notes/implemented/2026-10-13-agent-cultivation-loop.md) |
 | D44 | 成品目录 = 盘上 meta/final 的生成索引 + 只读右栏页签；host 生成（present 事件投影，未核=null）；完整审计仍归操作员 | [deliverables-catalog](../notes/implemented/2026-10-19-deliverables-catalog.md)（补充 = [installed-shape-self-sufficient](../notes/archived/2026-10-25-installed-shape-self-sufficient.md)） |
-| D45 | run bundle = 一次安装的物理单元（bundle.json + home + workspace）；不进 git；基部随 pack、扩张住 bundle | [RFC run-bundle-install-unit](../notes/implemented/2026-10-24-run-bundle-install-unit.md) |
+| D45 | run bundle = 一次安装的物理单元（bundle.json + home + workspace）；身份落点部分被 D51 取代 | [RFC run-bundle-install-unit](../notes/implemented/2026-10-24-run-bundle-install-unit.md) |
 | D46 | 产品仓历史只留产品与合成 fixtures；真实部署证据移私有仓；remote 重建为 private | [run-bundle-install-unit](../notes/implemented/2026-10-24-run-bundle-install-unit.md) |
 | D47 | backlog→notes 交接契约：用户是队列；notes 不是收件箱；卡顶结论/去向为记录家；关闭以结论确认为准 | [handoff-contract](../notes/implemented/2026-10-25-backlog-notes-handoff-contract.md) |
-| D48 | 目录独立启动 = 隔离 home + 自建 web profile + copy 骨架；入口 `pnpm standalone`；不承诺预构建/跨 OS | [standalone-deployment](../notes/archived/2026-10-25-standalone-deployment.md) |
+| D48 | 目录独立启动 = 隔离 home + web profile + copy 骨架；产品入口被 D51 取代 | [standalone-deployment](../notes/archived/2026-10-25-standalone-deployment.md) |
 | D49 | notes 长期治理：取代门禁 + 收据层 + 机械审计；收敛证据随归档件 | [governance](../notes/implemented/2026-10-30-notes-consistency-governance.md) · [converge-evidence](../notes/implemented/2026-10-30-converge-evidence-home.md) |
+| D51 | 插件即产品：`company` profile + workspace 自持 run bundle（v2/登记/seed）；方法层/账本留 host | [v2 manifest Note](../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md) · [_backlog 伞卡](../_backlog/issues/2026-11-01-plugin-as-product.md) |
 | D50 | 研究按研究题组织：题目录 + 题名页（问题/消费者/产出的卡/材料）；双索引一题一行；`backlog-liveness` 两级校验 | [_backlog/research](../_backlog/research/README.md) · [research-topics Note](../notes/implemented/2026-10-30-backlog-research-topics.md) |
-
 ### 待定与活动提案
 
 旧问题 Q1–Q8 均已闭合（Q1→D18、Q2→D16、Q3→D17、Q4 于 2026-09-22 定案、Q5–Q8→D22）。这只结算该组问题；当前任务源 = [notes/proposed/](../notes/proposed/README.md) 已批 RFC 与用户点名（D32，无中心队列）；未成熟的问题在 [_backlog/issues/](../_backlog/issues/README.md) 澄清，不是实施任务。旧磨清单与搁置池按历史记录归 [_backlog/_archive/legacy/](../_backlog/_archive/legacy/README.md)，不是任务源；当前问题关闭、暂停和触发规则见 [_backlog/README](../_backlog/README.md)。

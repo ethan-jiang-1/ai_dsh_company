@@ -76,6 +76,12 @@ const rpc = async (i) => {
   const cookie = await companyCookie({ fetch: globalThis.fetch, base: i.base, token: i.token })
   return companyRpc({ fetch: globalThis.fetch, base: i.base, cookie, prefix: 'multi-' })
 }
+const consent = (workspace) => {
+  mkdirSync(join(workspace, '.dsh-company'), { recursive: true })
+  writeFileSync(join(workspace, '.dsh-company/.seed-consent'), `${JSON.stringify({
+    v: 1, packVersion: PACK.version, workspace, consentedAt: new Date().toISOString(),
+  }, null, 2)}\n`)
+}
 const writeCompany = (workspace, name) => {
   mkdirSync(join(workspace, 'kb/ceo/journal'), { recursive: true })
   writeFileSync(join(workspace, 'kb/company.md'), `公司名: ${name}\n`)
@@ -103,6 +109,8 @@ try {
     const againInstall = install(home, 'web', `file:${TARBALL}`)
     check(`${name} 重复 add 保留用户 profile patch`, againInstall.status === 0 && readFileSync(patchFile, 'utf8').includes('default: vp-eng'))
     const ws = join(home, 'ws')
+    mkdirSync(ws, { recursive: true })
+    consent(ws)
     const booted = await boot(home, ws)
     if (name === 'Acme') aBoot = booted; else bBoot = booted
     const r = await rpc(booted)
@@ -113,8 +121,8 @@ try {
     writeCompany(ws, name)
     await stop(booted)
   }
-  const idA = JSON.parse(readFileSync(join(homes[0], 'dsh/bundle.json'), 'utf8')).id
-  const idB = JSON.parse(readFileSync(join(homes[1], 'dsh/bundle.json'), 'utf8')).id
+  const idA = JSON.parse(readFileSync(join(homes[0], 'ws/.dsh-company/bundle.json'), 'utf8')).id
+  const idB = JSON.parse(readFileSync(join(homes[1], 'ws/.dsh-company/bundle.json'), 'utf8')).id
   check('两个 home 的 bundle id 不同', idA !== idB)
   check('两个 home 的 company.md/journal 不串',
     readFileSync(join(homes[0], 'ws/kb/company.md'), 'utf8').includes('Acme')
@@ -134,6 +142,7 @@ try {
   const stockSession = await stockRpc('session/create', { request: { cwd: join(stock, 'ws'), agentPreset: 'standard' } })
   await stop(stockBoot)
   const stockInstall = install(stock, 'web', `file:${TARBALL}`)
+  consent(join(stock, 'ws'))
   check('非空 home 后装 pack 成功', stockInstall.status === 0, `exit=${String(stockInstall.status)} ${(stockInstall.stderr ?? '').slice(-160)}`)
   const afterStock = await boot(stock, join(stock, 'ws'))
   const afterRpc = await rpc(afterStock)
@@ -166,6 +175,8 @@ try {
   const customManifest = JSON.parse(readFileSync(customProfile, 'utf8'))
   customManifest.dsh.profile.bundles = [...new Set([...customManifest.dsh.profile.bundles, '@deepseek-ai/dsh-web-app'])]
   writeFileSync(customProfile, `${JSON.stringify(customManifest, null, 2)}\n`)
+  mkdirSync(join(shared, 'ws-a'), { recursive: true })
+  consent(join(shared, 'ws-a'))
   const customBoot = await boot(shared, join(shared, 'ws-a'), 'web-a')
   cBoot = customBoot
   const customRpc = await rpc(customBoot)

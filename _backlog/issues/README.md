@@ -4,7 +4,16 @@
 
 ## 活跃清单
 
-当前活跃 0 张。
+当前活跃 4 张。
+
+- [2026-11-01 插件即产品：独立 company profile 与 workspace 自有的 run bundle](2026-11-01-plugin-as-product.md)
+  — 产品形状决策卡（Q1–Q7）；研究依据 = [plugin-as-product](../research/plugin-as-product/README.md)。
+- [2026-11-01 落地顺序：把 research 与 issues 串成一条可执行路线](2026-11-01-landing-plan.md)
+  — P0–P6 顺序、依赖、出场门与回退点。
+- [2026-11-01 产品生命周期：安装/首启/升级/回滚/迁移/卸载/修复](2026-11-01-product-lifecycle.md)
+  — 生命周期状态机与失败注入。
+- [2026-11-01 workspace 与数据安全：选/切/搬/备/删与信任边界](2026-11-01-workspace-and-data-safety.md)
+  — workspace 生命周期、模型可写面、方法/账本/身份保护。
 
 2026-10-30 培养主任务工作/目标优先单入口卡已结归档（第一切片：work 字段 + 单表单 + 预览；去向 = implemented Note），见 [归档](../_archive/settled_issues/2026-10-30-cultivation-case-entry.md)。
 
@@ -18,6 +27,7 @@
 
 ## 近期归档
 
+- 发布与文档卡 2026-11-01 已结：`_dist` 手册/README/docs/CI 验收落地；去向 = [v2 manifest Note](../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)；卡在 [归档](../_archive/settled_issues/2026-11-01-release-and-docs.md)。
 - 培养工作优先单入口卡 2026-10-30 已结：work 字段 + 单表单 + 实时预览落地；实施 = [case-entry Note](../../notes/implemented/2026-10-30-cultivation-case-entry.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-case-entry.md)。
 - 培养入口收口卡 2026-10-30 已结：目标角色显式选择、入口文案、自纠正状态、验证历史逐条、对话失败保留草稿；实施 = [entry-followup Note](../../notes/implemented/2026-10-30-cultivation-entry-followup.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)。
 - 培养 UX 卡 2026-10-29 已结：结论 = 做；案例工坊 A 主线、来源/决定/验证历史落地；实施 = [traceability Note](../../notes/implemented/2026-10-30-cultivation-work-improvement-traceability.md)；卡在 [归档](../_archive/settled_issues/2026-10-29-cultivation-experience.md)。

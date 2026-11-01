@@ -70,7 +70,7 @@ describe('首启自举：applyBootstrap（只补缺 / 绝不覆盖 / 可重入�
       // 用户填了自己的东西（owners）与改了手册——第二次自举不许碰
       writeFileSync(join(home, 'kb/owners.md'), '# 我们的人\n')
       writeFileSync(join(home, 'AGENTS.md'), '# 我们改过的手册\n')
-      const second = bootstrapCompanyWorkspace(skel, home)
+      const second = bootstrapCompanyWorkspace(skel, home, 'AGENTS.md')
       expect(second.result.created).toEqual([])
       expect(second.result.skipped.length).toBe(first.result.created.length)
       expect(readFileSync(join(home, 'kb/owners.md'), 'utf8')).toBe('# 我们的人\n')
@@ -123,11 +123,11 @@ describe('首启自举：骨架目录的路径算术（防"多套一层 workspac
 })
 
 describe('首启自举：落点与开关', () => {
-  it('落点优先级：显式 > DSH_COMPANY_HOME > <DSH_HOME>/company-workspace', () => {
+  it('落点优先级：显式 > DSH_COMPANY_HOME；没有默认 <DSH_HOME>/company-workspace', () => {
     const before = process.env.DSH_COMPANY_HOME
     try {
       delete process.env.DSH_COMPANY_HOME
-      expect(resolveCompanyHome('/h')).toBe('/h/company-workspace')
+      expect(resolveCompanyHome('/h')).toBeUndefined()
       expect(resolveCompanyHome('/h', '/x/y')).toBe('/x/y')
       process.env.DSH_COMPANY_HOME = '/env/company'
       expect(resolveCompanyHome('/h')).toBe('/env/company')
@@ -143,7 +143,7 @@ describe('首启自举：落点与开关', () => {
       delete process.env.DSH_COMPANY_HOME
       expect(resolveCompanyHome('/h', '~/company')).toBe(join(homedir(), 'company'))
       expect(resolveCompanyHome('/h', 'relative/company')).toBe(resolve('relative/company'))
-      expect(resolveCompanyHome('/h', '   ')).toBe('/h/company-workspace')
+      expect(resolveCompanyHome('/h', '   ')).toBeUndefined()
       process.env.DSH_COMPANY_HOME = ' ~/env-company '
       expect(resolveCompanyHome('/h')).toBe(join(homedir(), 'env-company'))
     } finally {

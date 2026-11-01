@@ -25,7 +25,7 @@ export default defineConfig([
   {
     ...shared,
     name: PACKAGE_ID,
-    entry: { index: 'lib/types/index.js' },
+    entry: { index: 'lib/types/index.js', 'register-workspace': 'lib/types/host/register-workspace.js' },
     format: 'esm',
     platform: 'node',
     // zod is a peer shared with @deepseek-ai/dsh-storage-domain; bundling it would create a

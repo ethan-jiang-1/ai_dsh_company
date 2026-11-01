@@ -20,19 +20,16 @@
 **呈现即验证**（2026-09-30 立，用户裁定；规则唯一见 [dev-loop §1](./guides/dev-loop.md)）：替人起观察窗 = 先自己跑通本节（boot 横幅 + roster + client 零挂载失败），红了当场修，全绿才交 URL——用户不当第一次验收员。
 **机器腿 = [cdp-probe](./guides/cdp-probe.md)**：`node probes/browser-visual/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/全部公司页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
 
-1. `source run/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒，自检代替警告）**：
-   `pnpm dsh --profile web --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 就说明你起的是日用 `~/.dsh`
-   ——那里**也有个同名 `web` profile**（装的是日用插件集、没有公司五角色），或 pack 没装。不 source 的失败是**静默**的：
-   起得来、不报错、五角色一个不出现。**计数 ≥1 同时证明「不必再 `plugin add`」**（dev web profile 已 `link:` 装好）。
-2. `pnpm dsh web -- --port 0 --no-open`（**端口是环境状态不是仓库事实**：`--port 0` 交系统分配，端口与 token 从启动横幅读；
-   要固定端口就先 `lsof -nP -iTCP:<port> -sTCP:LISTEN` 确认空闲——固定端口的回报是浏览器 origin 不变，工作区连接与面板布局能留下）
-3. 浏览器打开该 URL（**必须带 token**：直接开端口会卡鉴权）。**先连工作区**——会话列表按【工作目录】
-   过滤，不连就看不到本场会话。两条入口：空态页点主区的 **Choose workspace**；已有工作区时走侧栏
-   `Workspaces` 旁的 **Add workspace** 图标。对话框里**必须先点 `Edit path`** 才会出现路径输入框 →
-   粘贴 `company-workspace` 的绝对路径（= **dev run bundle 的 workspace**；fresh clone 先跑 `pnpm bundle:init`）→ 回车 → `Open`。
-   ⚠ **这一步最容易漏**：对话框默认是目录浏览器，不点 `Edit path` 看不到粘贴框（2026-09-23 实测，
-   用户与代理都卡过）。平台 UI（vendor 只读）改不了，写进 runbook 代偿。
-4. 新建会话：preset 选 **梦之队 CEO**（`ceo` 是 profile 默认）；工作目录 `company-workspace`
+1. `source run/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒）**：
+   `pnpm dsh --profile company --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 说明你起的是
+   日用 `~/.dsh`（那里另有同名 `web` profile）或 pack 没装。dev profile 已 `link:` 装好，不必再 `plugin add`。
+2. `pnpm company --workspace "$PWD/company-workspace" --no-open`（**端口是环境状态**：`--port 0` 交系统分配，
+   端口/token 从启动横幅读；要固定端口先确认空闲）。启动器会建/验 `company` profile、装/修 pack、
+   把 workspace 登记进 DSH，并在浏览器首屏自动选中目标盘。
+3. 浏览器打开横幅 URL（**必须带 token**）。**不再手点 Choose workspace**：目标 workspace 已在 boot 时登记；
+   若侧栏没有，先看启动输出是否报“未指定/未登记/落点不安全”。
+4. 首屏应出现 `梦之队 CEO` 会话（`ceo` 是 registry 默认）；没有就新建会话选 **梦之队 CEO**，工作目录
+   `company-workspace`。
 5. 需要收窄过程详情时，在 Settings 的「工作步骤展示」选择 `compact`（还有标准/详细/完全展开）；实测：简洁/标准/详细都把过程行折起来，选**完全展开**才逐条展开（同一会话 2.5k vs 19.9k 字符）。它只减少工具调用细节，**不折叠助手最终长回复**——`/compact` 是另一条历史压缩命令，不用它代替显示模式验收。
 6. 在会话中打开交付物文件后，使用右栏文档预览的 **Open in app / 在应用中打开** 控件调用本机应用；「在侧边栏打开」只负责把目标文件带入右栏预览，两者不是同一动作。入口不可用时记录现场环境和失败位置，不以源码存在或静态配置代替验收。
 7. 进“另一位成员的空间”：**teammate 的会话不在顶层列表**——在会话头部点 **Team 名册**，点成员名打开其会话（`uiWorkspace.openSession`，子会话；rc.2 现行 API，旧 `sessions.openSubagent` 已移除）。显式入口 = 右栏「在场」页签的在场板**行可点**（条目 ② 起为平台页签，可拖出成浮窗并看）。

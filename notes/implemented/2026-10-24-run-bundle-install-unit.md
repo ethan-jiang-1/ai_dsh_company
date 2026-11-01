@@ -2,6 +2,10 @@
 
 状态：已交付（2026-10-24；用户令「那就 setup goal 来都弄好吧」，按 [问题卡](../../_backlog/_archive/settled_issues/2026-10-24-run-bundle-clean-base.md) 的建议推进；RFC 正文已并入本篇）。
 
+> **2026-11-01 部分取代（身份落点）**：`bundle.json` 已从 `<DSH_HOME>/bundle.json`（v1）搬到 workspace 的
+> `<workspace>/.dsh-company/bundle.json`（v2），§决定 1/2/5 里的 home 落点由
+> [plugin-as-product-v2-manifest](./2026-11-01-plugin-as-product-v2-manifest.md) 取代；本文的家目录形状只作迁移来源。
+
 > **2026-10-27 部分取代（备份口径）**：备份分两档——业务盘（盘 + `bundle.json` + domain 账本 + 方法层）与
 > 完整 home（含凭据）；“整个 home = bundle、排除凭据”是当时口径，已由
 > [data-model-alignment](./2026-10-27-data-model-alignment.md) §5 与 [data-model](../../docs/data-model.md) 取代。

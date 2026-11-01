@@ -40,8 +40,7 @@ let lockDir
 let ownsProfile = false
 let ownsLock = false
 try {
-  // 干净 home 必须在**自己的子目录**：bundle.json 写在 DSH_HOME 根，直接拿 dev home 会把
-  // release-check 的临时 workspace 记成 dev bundle 的身份（2026-10-24 实测踩到）。
+  // 干净 home 必须在**自己的子目录**；产品形状下身份跟 workspace 走，不再写 home 根。
   const devHome = requireDevHome('release-smoke')
   const home = join(devHome, 'tmp/release-smoke-home')
   rmSync(home, { recursive: true, force: true })
@@ -65,6 +64,12 @@ try {
   // DSH_COMPANY_BOOTSTRAP=off，那条会随环境继承进来——模拟安装必须自己把它翻回来）。
   const companyHome = join(home, 'tmp/release-company-workspace')
   rmSync(companyHome, { recursive: true, force: true })
+  mkdirSync(companyHome, { recursive: true })
+  const packVersion = JSON.parse(readFileSync(join(PACK_DIR, 'package.json'), 'utf8')).version
+  mkdirSync(join(companyHome, '.dsh-company'), { recursive: true })
+  writeFileSync(join(companyHome, '.dsh-company/.seed-consent'), `${JSON.stringify({
+    v: 1, packVersion, workspace: companyHome, consentedAt: new Date().toISOString(),
+  }, null, 2)}\n`)
   const env = plainNodeEnv({ ...process.env, DSH_HOME: home,
     DSH_COMPANY_HOME: companyHome,
     DSH_COMPANY_BOOTSTRAP: 'if-missing',
@@ -118,6 +123,7 @@ try {
   }, null, 2)}\n`)
   writeFileSync(join(profileDir, 'pnpm-workspace.yaml'), 'packages:\n  - .\n\nnodeLinker: hoisted\nautoInstallPeers: false\n')
   writeFileSync(join(profileDir, '.npmrc'), `store-dir=${join(ROOT, '.pnpm-store')}\ncache-dir=${join(home, 'cache/pnpm')}\n`)
+  writeFileSync(join(profileDir, 'cordis.patch.yml'), "# release-smoke product profile patch\n- insert:\n    - id: company-workspace-register\n      name: 'dsh-company-pack/register-workspace'\n")
 
   console.log('④ built dsh plugin add file:<tarball>')
   await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${tarball}`], { timeoutMs: 180_000 })
@@ -134,6 +140,8 @@ try {
   check('真实安装副本在场（node_modules/dsh-company-pack）', existsSync(join(installedPack, 'package.json')))
   check('安装副本带 presets/', existsSync(join(installedPack, 'presets/ceo')))
   check('安装副本带 client 产物', existsSync(join(installedPack, 'lib/client.js')))
+  check('安装副本带 bin 启动器', existsSync(join(installedPack, 'bin/dsh-company.mjs')))
+  check('安装副本带 register-workspace 入口', existsSync(join(installedPack, 'lib/register-workspace.js')))
   check('安装副本带 locale/icon（可发现性元数据）', ['locale/en.json', 'locale/zh.json', 'icon.svg'].every(rel => existsSync(join(installedPack, rel))))
   // 出厂骨架（2026-10-13）：少了它，第三方装完插件就是"没有手册与章程"的裸奔（见该 Note）
   check('安装副本带出厂骨架 workspace/（手册 + 章程 + 模板 + 起动件）',
@@ -200,7 +208,7 @@ try {
     return rows
   }
   const domainLedger = join(home, 'storages/company_deliverables.json')
-  await waitFor(() => existsSync(join(home, 'bundle.json')) && existsSync(join(companyHome, 'kb/deliverables-index.json'))
+  await waitFor(() => existsSync(join(companyHome, '.dsh-company/bundle.json')) && existsSync(join(companyHome, 'kb/deliverables-index.json'))
       && existsSync(domainLedger), '首启落盘')
   const first = fingerprint(companyHome)
   // T5（FAQ 24 §8.1）：包目录只读——运行/升级不应在安装副本里新增 data/cache/日志。
@@ -219,15 +227,22 @@ try {
     catalog?.schema === 1 && catalog?.counts?.total === 0 && typeof catalog?.generatedAt === 'string',
     catalog === null ? `catalog 不存在：${catalogFile}` : JSON.stringify(catalog.counts))
 
-  // run bundle 身份（2026-10-24）：首启写 `<DSH_HOME>/bundle.json`；workspace 记相对根、骨架指纹在场。
-  const manifestPath = join(home, 'bundle.json')
+  // run bundle 身份（2026-11-01）：首启写 `<workspace>/.dsh-company/bundle.json`（v2）；home 根不写。
+  const manifestPath = join(companyHome, '.dsh-company/bundle.json')
   const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : null
-  check('首启写 bundle.json（run bundle 身份）',
-    manifest?.v === 1 && typeof manifest.id === 'string' && typeof manifest.createdAt === 'string'
-      && manifest.workspace === 'tmp/release-company-workspace'
+  check('首启写 workspace bundle.json（v2 身份）',
+    manifest?.v === 2 && typeof manifest.id === 'string' && typeof manifest.createdAt === 'string'
+      && manifest.workspace === undefined
+      && typeof manifest.handbookTarget === 'string'
       && typeof manifest.skeleton?.version === 'string'
       && Object.keys(manifest.skeleton?.files ?? {}).length >= 10,
-    manifest === null ? 'bundle.json 不存在' : JSON.stringify({ id: manifest.id, workspace: manifest.workspace, files: Object.keys(manifest.skeleton?.files ?? {}).length }))
+    manifest === null ? 'bundle.json 不存在' : JSON.stringify({ id: manifest.id, handbookTarget: manifest.handbookTarget, files: Object.keys(manifest.skeleton?.files ?? {}).length }))
+  check('home 根不再写 bundle.json', !existsSync(join(home, 'bundle.json')))
+  const workspaceStoragePath = join(home, 'storages/workspace.json')
+  const workspaceStorage = existsSync(workspaceStoragePath) ? JSON.parse(readFileSync(workspaceStoragePath, 'utf8')) : null
+  const registeredPaths = Object.values(workspaceStorage?.tables?.workspaces ?? {}).map(row => row.path)
+  check('boot 时把 workspace 登记进 DSH Workspace', registeredPaths.some(path => String(path).includes('release-company-workspace')),
+    workspaceStorage === null ? 'storages/workspace.json 不存在' : registeredPaths.join(', '))
   // 干净底座：新安装不许带任何扩张数据（journal / 交付物 / 培养记录）。
   const historyRows = (first ?? []).filter(row => /^kb\/[^/]+\/journal\/.+/.test(row)
     || /^deliverables\/.+\/(final|meta)\.md/.test(row) || /^cultivation\/records\/.+/.test(row))

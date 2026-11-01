@@ -29,7 +29,11 @@
    进程，stdout 出结果，日志落 `$DSH_HOME/sessions/`。web 形态（观察窗）起**本地**
    HTTP 端口（值见启动横幅）；因 `DSH_HOME` 指 dev home，它与日用 DSH 的 web 实例
    （若同时开）是两个完全独立进程：profile、会话、凭据、端口互不可见。
-7. **排练场 ≠ 运行场**：排练/探针会话的默认 cwd 是 `runtime/rehearsal-workspace/`（`node tools/rehearsal-init.mjs`
+7. **产品形状（2026-11-01）**：`company` profile + 独立 `DSH_HOME` + 用户 `--workspace`；workspace
+   拥有 `bundle.json`（v2）与业务产物，home 只留 sessions/凭据/登记/方法层/账本/lease。启动器
+   `pnpm company --workspace <dir>` 会 seed/登记；换项目 = 新 home。
+
+8. **排练场 ≠ 运行场**：排练/探针会话的默认 cwd 是 `runtime/rehearsal-workspace/`（`node tools/rehearsal-init.mjs`
    幂等成型；preset/probe/handbook/delegation 探针已默认指这里并会自建，`--cwd` 可显式覆盖）。
    **真盘 `company-workspace/` 只收真实动议的产物**——排练产物不受三态判据约束（`drafts/` 本就不需要
    `present`），跑在真盘会安静积污（实测删过 15 份）；验收判据 = 新默认跑一次探针后

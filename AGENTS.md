@@ -3,7 +3,7 @@
 梦之队（Dream Team）虚拟公司 DSH 插件（DSH = DeepSeek Harness，唯一权威 = `vendor/dsh` 钉 SHA 子模块，见下「DSH 源码」节）：一个 company pack 提供五个角色 preset 与 host/client 面。
 **开工最小路径**（读完这三样就够开工，其余按需；feature 任务先 Plan Mode，规则 = [policy P1](docs/policy.md)）：① 本文件（纪律 + 命令表）；② 你任务那一份 owner——改角色内容 = [presets.md](docs/presets.md)、改 host/Web 代码 = [src/README](packages/company-pack/src/README.md)、改文档 = [docs/AGENTS.md](docs/AGENTS.md)、改机制/组合 = [profile.md](docs/profile.md)；③ [tests/README.md](tests/README.md) 的「改动面 → 最窄检查」对应行。
 **按需**：[项目地图](docs/project-map.md)（空间）、[运行态地图](docs/runtime-map.md)（时序与四轴）、[开发环 §0.5](docs/guides/dev-loop.md#05-任务入口与交接) / [§1](docs/guides/dev-loop.md#1-执行链从授权到有证据交接)（流程细节）、[policy](docs/policy.md)（授权与常设边界）、[测试宪法](docs/testing.md)（证据边界）、[脚本索引](checks/README.md)（逐脚本）、[orient 七问](docs/orient.md)（白话速读）。
-**三条命令**：`pnpm verify`（结构门禁）/ `pnpm test`（keyless 回归）/ `pnpm typecheck`（类型面）。新 Agent 首跑验收 = [tests/README.md](tests/README.md) 首跑节。
+**四条命令**：`pnpm company --workspace <dir>`（产品入口）/ `pnpm verify`（结构门禁）/ `pnpm test`（keyless 回归）/ `pnpm typecheck`（类型面）。新 Agent 首跑验收 = [tests/README.md](tests/README.md) 首跑节。
 
 **你（读者）= 维护本 repo 的开发 agent**；五个梦之队角色是你**维护的产物**（跑在 DSH 会话里，由 `pnpm dsh` / web 观察窗驱动）——别把自己混进公司角色，也别替角色执行公司手册。
 
@@ -12,8 +12,8 @@
 ```
 CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 校验）
 .agents/skills/          完成定义 skill 与 web-window-ops 的宿主（清单 = 目录本身，DSH 会话 catalog 自动发现；catalog 只收模型可加载项，`disable-model-invocation` 的用户命令〔/retro 等〕需用户点名）；DSH 会话技能从这里装载（D39）
-packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml、src/（host R3+）+ src/client/（client 面）
-company-workspace/      **dev run bundle 的 workspace**（会话 cwd；整树 gitignored，不进 git）：AGENTS.md 等制度件是指回 pack 的符号链接（`pnpm bundle:init` 建）、kb/、templates/、cultivation/、deliverables/ + deliverables-archive/——扩张数据只住这里；bundle 身份 = runtime/harness-home/bundle.json
+packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml、src/（host R3+）+ src/client/（client 面）+ bin/dsh-company.mjs（产品启动器）
+company-workspace/      **dev run bundle 的 workspace**（会话 cwd；整树 gitignored，不进 git）：AGENTS.md 等制度件是指回 pack 的符号链接（`pnpm bundle:init` 建）、kb/、templates/、cultivation/、deliverables/ + deliverables-archive/——扩张数据只住这里；bundle 身份 = company-workspace/.dsh-company/bundle.json（v2）
 vendor/dsh/             DSH 源码 submodule（钉 SHA，只读铁律见下节）
 docs/                   当前合同与导航：index（地图）+ decisions（台账）→ design/ guides/ + 顶层合同（git 边界 = repo-hygiene.md）
 notes/                  开发记忆：proposed/（RFC）→ implemented/（活跃决策记忆）；离场目录不复述于此——分类规则唯一家 = notes/README.md
@@ -39,6 +39,7 @@ git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 corepack enable pnpm && pnpm install   # workspace 解析；全配方（含 vendor 构建）见 guides/bootstrap
 source run/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 接线（⚠ coding 会话 DSH_HOME 带日用值——[environments](docs/guides/environments.md)）
 pnpm bundle:init                       # fresh clone：建 dev run bundle 的 workspace（制度件符号链接指回 pack；已有盘不动）
+pnpm company --workspace "$PWD/company-workspace"   # dev 产品入口（company profile/seed/登记/自动选中）
 pnpm verify                            # 结构门禁（清单唯一源 = checks/gates/ 目录）
 pnpm test                              # keyless 回归（真模型/浏览器不进；layering 守卫）
 pnpm typecheck                         # pack 两面 tsc -b（类型/导入面改动；fresh clone 先按 bootstrap 构建 vendor client 类型）

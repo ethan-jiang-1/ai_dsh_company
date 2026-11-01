@@ -207,4 +207,6 @@
             name: '@deepseek-ai/dsh-agent-instructions'
             config:
               maxBytes: 32768  # 字节栅栏：verify handbook-budget 核对手册+1024B ≤ 此值（静默截断负例 = 2026-10-02 消化对账轮）
+              # 手册目标碰撞感知（2026-11-01）：专用盘 AGENTS.md；已有项目里 AGENTS.md 被占时 seed COMPANY.md。
+              instructionFileCandidates: ['AGENTS.md', 'COMPANY.md', 'CLAUDE.md']
               projectRootMarkers: []

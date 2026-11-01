@@ -1,22 +1,19 @@
 /**
- * host apply 的显式换盘接线（2026-10-27 FAQ 26 数据模型对齐 P0）。
+ * host apply 的 workspace/迁移/停写接线（2026-11-01 产品化改版；原“显式换盘”已退役）。
  *
- * 判据：`DSH_COMPANY_REBIND=1` + 旧盘已搬走 + 新盘形状对 ⇒ apply 改写 bundle.json、留备份、
- * 记升级日志，并继续用新盘；旧盘仍在 ⇒ 拒绝且 manifest 字节不变。
+ * 判据：
+ * - 没有 DSH_COMPANY_HOME ⇒ 不 seed、不写 home bundle；
+ * - DSH_COMPANY_HOME == DSH_HOME / 损坏 workspace manifest ⇒ 停写、不覆盖；
+ * - v1 home manifest + 匹配 workspace ⇒ 迁移到 workspace v2，id 保留，旧文件改名；
+ * - DSH_COMPANY_REBIND 设置时只告警“已退役”，不改任何盘。
  */
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { apply } from '../../packages/company-pack/src/index.ts'
-import {
-  bundleManifestPath,
-  planBundleManifest,
-  readBundleManifest,
-  writeBundleManifest,
-} from '../../packages/company-pack/src/host/bundle-manifest.ts'
+import { bundleManifestPath, readBundleManifestState } from '../../packages/company-pack/src/host/bundle-manifest.ts'
 
-const PACK = { name: 'dsh-company-pack', version: '0.3.10' }
 const roots: string[] = []
 const saved = { ...process.env }
 
@@ -29,7 +26,7 @@ afterEach(() => {
 })
 
 function workspaceAt(): { root: string; ws: string } {
-  const root = mkdtempSync(join(tmpdir(), 'apply-rebind-'))
+  const root = mkdtempSync(join(tmpdir(), 'apply-product-'))
   roots.push(root)
   const ws = join(root, 'company')
   cpSync(join(process.cwd(), 'packages/company-pack/workspace'), ws, { recursive: true })
@@ -46,130 +43,90 @@ function ctxStub(): Record<string, unknown> {
   }
 }
 
-describe('host apply 显式换盘', () => {
-  it('另一个 writer 持锁 ⇒ 公司数据停写并点名', () => {
-    const home = workspaceAt()
+function runWithEnv(root: string, ws: string | undefined, extra: Record<string, string> = {}): { warn: ReturnType<typeof vi.fn>; info: ReturnType<typeof vi.fn>; ctx: Record<string, unknown> } {
+  process.env.DSH_HOME = root
+  if (ws === undefined) delete process.env.DSH_COMPANY_HOME
+  else process.env.DSH_COMPANY_HOME = ws
+  process.env.DSH_COMPANY_BOOTSTRAP = 'if-missing'
+  for (const [key, value] of Object.entries(extra)) process.env[key] = value
+  const warn = vi.fn()
+  const info = vi.fn()
+  const ctx = { ...ctxStub(), logger: { info, warn } }
+  apply(ctx as never)
+  return { warn, info, ctx }
+}
+
+describe('host apply 的 workspace 接线', () => {
+  it('没有 workspace ⇒ 不 seed、不写 home bundle、告警可操作', () => {
+    const { root } = workspaceAt()
     try {
-      writeFileSync(join(home.root, 'company-pack.lock'), JSON.stringify({
-        schema: 1, pid: process.ppid, token: 'other', startedAt: 'x',
+      const { warn } = runWithEnv(root, undefined)
+      expect(warn.mock.calls.some(([message]) => String(message).includes('未指定公司 workspace'))).toBe(true)
+      expect(existsSync(join(root, 'bundle.json'))).toBe(false)
+      expect(existsSync(join(root, 'AGENTS.md'))).toBe(false)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  it('workspace == DSH_HOME ⇒ 停写、不把公司盘写进 home 根', () => {
+    const { root } = workspaceAt()
+    try {
+      const { warn } = runWithEnv(root, root)
+      expect(warn.mock.calls.some(([message]) => String(message).includes('落点不安全'))).toBe(true)
+      expect(existsSync(join(root, 'bundle.json'))).toBe(false)
+      expect(existsSync(join(root, 'AGENTS.md'))).toBe(false)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  it('损坏 workspace manifest ⇒ 停写、保留原文件', () => {
+    const { root, ws } = workspaceAt()
+    try {
+      mkdirSync(join(ws, '.dsh-company'), { recursive: true })
+      const path = bundleManifestPath(ws)
+      writeFileSync(path, '{"v":2,"id":"cut')
+      const { warn } = runWithEnv(root, ws)
+      expect(warn.mock.calls.some(([message]) => String(message).includes('bundle.json 损坏'))).toBe(true)
+      expect(readFileSync(path, 'utf8')).toBe('{"v":2,"id":"cut')
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  it('v1 home manifest + 匹配 workspace ⇒ 迁移到 workspace v2，id 保留，旧文件改名', () => {
+    const { root, ws } = workspaceAt()
+    try {
+      writeFileSync(join(root, 'bundle.json'), JSON.stringify({
+        v: 1,
+        id: 'bundle-legacy',
+        createdAt: '2026-10-24T00:00:00.000Z',
+        pack: { name: 'dsh-company-pack', version: '0.4.6' },
+        workspace: ws,
+        skeleton: { version: '0.4.6', files: { 'AGENTS.md': 'oldhash' } },
       }))
-      const warn = vi.fn()
-      const ctx = { ...ctxStub(), logger: { info: vi.fn(), warn } }
-      process.env.DSH_HOME = home.root
-      process.env.DSH_COMPANY_HOME = home.ws
-      process.env.DSH_COMPANY_BOOTSTRAP = 'if-missing'
-      apply(ctx as never)
-      expect(warn.mock.calls.some(([message]) => String(message).includes('另一个 writer'))).toBe(true)
-      expect(existsSync(join(home.root, 'bundle.json'))).toBe(false)
-      expect(existsSync(join(home.ws, 'kb/deliverables-index.json'))).toBe(false)
+      runWithEnv(root, ws)
+      const state = readBundleManifestState(ws)
+      expect(state.status).toBe('ok')
+      if (state.status !== 'ok') return
+      expect(state.manifest.id).toBe('bundle-legacy')
+      expect(existsSync(join(root, 'bundle.json'))).toBe(false)
+      expect(existsSync(bundleManifestPath(ws))).toBe(true)
     } finally {
-      rmSync(home.root, { recursive: true, force: true })
+      rmSync(root, { recursive: true, force: true })
     }
   })
 
-  it('同 home 多个 profile 装本包 ⇒ 启动点名方法层不共享', () => {
-    const home = workspaceAt()
+  it('DSH_COMPANY_REBIND 设置 ⇒ 只告警“已退役”，不改盘', () => {
+    const { root, ws } = workspaceAt()
     try {
-      for (const name of ['web', 'web-b']) {
-        const dir = join(home.root, 'profiles', name)
-        mkdirSync(dir, { recursive: true })
-        writeFileSync(join(dir, 'package.json'), JSON.stringify({ dsh: { profile: { bundles: ['dsh-company-pack'] } } }))
-      }
-      const warn = vi.fn()
-      const ctx = { ...ctxStub(), logger: { info: vi.fn(), warn } }
-      process.env.DSH_HOME = home.root
-      process.env.DSH_COMPANY_HOME = home.ws
-      process.env.DSH_COMPANY_BOOTSTRAP = 'off'
-      apply(ctx as never)
-      expect(warn.mock.calls.some(([message]) => String(message).includes('方法层/记录/公司盘都是公司级共享'))).toBe(true)
+      const { warn } = runWithEnv(root, ws, { DSH_COMPANY_REBIND: '1' })
+      expect(warn.mock.calls.some(([message]) => String(message).includes('已退役'))).toBe(true)
+      expect(existsSync(join(root, 'bundle.json'))).toBe(false)
+      expect(existsSync(join(root, 'bundle.json.bak-x'))).toBe(false)
     } finally {
-      rmSync(home.root, { recursive: true, force: true })
-    }
-  })
-
-  it('DSH_COMPANY_HOME=DSH_HOME ⇒ 不把公司盘写进 home 根', () => {
-    const home = workspaceAt()
-    try {
-      process.env.DSH_HOME = home.root
-      process.env.DSH_COMPANY_HOME = home.root
-      process.env.DSH_COMPANY_BOOTSTRAP = 'if-missing'
-      apply(ctxStub() as never)
-      expect(existsSync(join(home.root, 'AGENTS.md'))).toBe(false)
-      expect(existsSync(join(home.root, 'kb'))).toBe(false)
-      expect(existsSync(join(home.root, 'bundle.json'))).toBe(false)
-    } finally {
-      rmSync(home.root, { recursive: true, force: true })
-    }
-  })
-
-  it('损坏 manifest ⇒ 不写默认盘、不覆盖原文件', () => {
-    const home = workspaceAt()
-    const newCompany = join(home.root, 'new-company')
-    try {
-      const corrupt = '{"v":1,"id":"cut'
-      writeFileSync(join(home.root, 'bundle.json'), corrupt)
-      process.env.DSH_HOME = home.root
-      process.env.DSH_COMPANY_HOME = newCompany
-      process.env.DSH_COMPANY_BOOTSTRAP = 'if-missing'
-      apply(ctxStub() as never)
-      expect(existsSync(newCompany)).toBe(false)
-      expect(readFileSync(join(home.root, 'bundle.json'), 'utf8')).toBe(corrupt)
-    } finally {
-      rmSync(home.root, { recursive: true, force: true })
-    }
-  })
-
-  it('旧盘搬走 + 新盘形状对 ⇒ 改写 workspace、备份原 manifest、继续用新盘', () => {
-    const home = workspaceAt()
-    const target = workspaceAt()
-    const skel = join(process.cwd(), 'packages/company-pack/workspace')
-    try {
-      const plan = planBundleManifest({ dshHome: home.root, companyHome: home.ws, skeletonDir: skel, pack: PACK, id: 'apply-rebind' })
-      writeBundleManifest(plan)
-      const before = readFileSync(bundleManifestPath(home.root), 'utf8')
-      rmSync(target.ws, { recursive: true, force: true })
-      renameSync(home.ws, target.ws)
-
-      process.env.DSH_HOME = home.root
-      process.env.DSH_COMPANY_HOME = target.ws
-      process.env.DSH_COMPANY_BOOTSTRAP = 'off'
-      process.env.DSH_COMPANY_REBIND = '1'
-      apply(ctxStub() as never)
-
-      const manifest = readBundleManifest(home.root)
-      expect(manifest?.id).toBe('apply-rebind')
-      expect(manifest?.workspace).toBe(target.ws.split('\\').join('/'))
-      const backups = readdirSync(home.root).filter(name => name.startsWith('bundle.json.bak-'))
-      expect(backups).toHaveLength(1)
-      expect(readFileSync(join(home.root, backups[0]!), 'utf8')).toBe(before)
-      expect(readFileSync(join(home.root, 'logs/company-pack-upgrade.log'), 'utf8')).toContain('换盘')
-      expect(existsSync(join(target.ws, 'kb/deliverables-index.json'))).toBe(true)
-    } finally {
-      rmSync(home.root, { recursive: true, force: true })
-      rmSync(target.root, { recursive: true, force: true })
-    }
-  })
-
-  it('旧盘仍在 ⇒ 拒绝换盘，manifest 字节不变', () => {
-    const home = workspaceAt()
-    const target = workspaceAt()
-    const skel = join(process.cwd(), 'packages/company-pack/workspace')
-    try {
-      const plan = planBundleManifest({ dshHome: home.root, companyHome: home.ws, skeletonDir: skel, pack: PACK, id: 'apply-refuse' })
-      writeBundleManifest(plan)
-      const before = readFileSync(bundleManifestPath(home.root), 'utf8')
-
-      process.env.DSH_HOME = home.root
-      process.env.DSH_COMPANY_HOME = target.ws
-      process.env.DSH_COMPANY_BOOTSTRAP = 'off'
-      process.env.DSH_COMPANY_REBIND = '1'
-      apply(ctxStub() as never)
-
-      expect(readFileSync(bundleManifestPath(home.root), 'utf8')).toBe(before)
-      expect(readdirSync(home.root).some(name => name.startsWith('bundle.json.bak-'))).toBe(false)
-    } finally {
-      rmSync(home.root, { recursive: true, force: true })
-      rmSync(target.root, { recursive: true, force: true })
+      rmSync(root, { recursive: true, force: true })
     }
   })
 })

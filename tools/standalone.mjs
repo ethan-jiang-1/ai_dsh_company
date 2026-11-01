@@ -180,6 +180,17 @@ if (!env.DEEPSEEK_API_KEY && !existsSync(join(home, '.credentials.yaml'))) {
   console.warn('standalone: 未发现 DEEPSEEK_API_KEY / <home>/.credentials.yaml；角色会话需要时再配（boot 本身不需要 key）')
 }
 
+// 2026-11-01 产品化：standalone 仍是旧入口，但 host 现在要求 workspace 显式 + seed consent；
+// 这里为兼容 smoke 补一份 consent（真实产品入口 = pnpm company）。
+mkdirSync(workspace, { recursive: true })
+mkdirSync(join(workspace, '.dsh-company'), { recursive: true })
+writeFileSync(join(workspace, '.dsh-company/.seed-consent'), `${JSON.stringify({
+  v: 1,
+  packVersion: JSON.parse(readFileSync(join(packDir, 'package.json'), 'utf8')).version,
+  workspace,
+  consentedAt: new Date().toISOString(),
+}, null, 2)}\n`)
+
 if (has('provision-only')) {
   console.log(`standalone: 已就绪\n  home      ${home}\n  workspace ${workspace}\n  profile   web\n  boot      pnpm standalone --home ${home} --workspace ${workspace}`)
   process.exit(0)

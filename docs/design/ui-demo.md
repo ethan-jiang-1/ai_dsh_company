@@ -15,7 +15,7 @@
 1. **UI 不改变"一个包"**。pack 长出一个 **client 面**：`package.json` 加 `dsh.client`
    （`platform: 'web'` + `inject` 依赖边）+ `exports["./client"]` 指向打包产物，Host 行和
    client 模块住在同一个 npm 包里。先例：dsh-market（tsdown 打包）、dsh-im（esbuild 打包）。
-   装法不变：`dsh plugin --profile web add file:./packages/company-pack` 一条命令，
+   装法：`dsh plugin --profile company add file:./packages/company-pack` 一条命令，
    host 插件行和 Web UI 一起进组合。
 2. **demo 第 0 天不需要写任何 UI 代码**。官方 experimental 的 `client-ui-agent-team`
    已经把"组织协作"最贵的几块画好了（§1）；我们自定义的只是"公司皮肤"层（§2）。
@@ -94,7 +94,7 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 
 ## 3. 演示分镜（一场 demo 怎么走）
 
-1. 开 `pnpm dsh web -- --port 0 --no-open`（web profile；**端口是环境状态**，系统分配后从启动横幅读——见 guides/bootstrap），侧栏开 CEO 会话（ceo preset）。
+1. 开 `pnpm company --workspace "$PWD/company-workspace" --no-open`（company profile；**端口是环境状态**，系统分配后从启动横幅读——见 guides/bootstrap），首屏开 CEO 会话（ceo preset）。
 2. 输入一个公司级动议（"评估把 X 产品线扩展到欧洲"）。
 3. 观众看到 CEO：拆解（todo/plan）→ `spawn_teammate` 建出四位职能 VP（名册五行 = CEO + 四职能）→
    任务板落任务（blockedBy 依赖可视化）→ 给各 VP 发初始 brief。

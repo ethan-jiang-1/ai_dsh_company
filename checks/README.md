@@ -23,6 +23,8 @@
 | 审计动议输出与角色留痕 | [deliverables-check](audit/deliverables-check.mjs) · [authorship-audit](audit/authorship-audit.mjs) · [journal-audit](audit/journal-audit.mjs) |
 | 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs) · [lifecycle-smoke](smoke/lifecycle-smoke.mjs) · [standalone-smoke](smoke/standalone-smoke.mjs) · [export-dist](../tools/export-dist.mjs) |
 | 从目录隔离启动公司实例 | `pnpm standalone` → [standalone](../tools/standalone.mjs) |
+| **按产品形状启动（独立 company profile + 自有 workspace）** | `pnpm company` → [company](../tools/company.mjs)：解析/询问 workspace → 建/验 profile → 装 pack → 设 home env → 起 web |
+| 产品入口端到端（启动器建 profile/装 pack/workspace/seed/一 home 一 workspace） | [company-entry-smoke](smoke/company-entry-smoke.mjs)（keyless，~1-2 分钟） |
 
 ## 清单（分区 = 目录本身；逐脚本说明 = 各自头注）
 

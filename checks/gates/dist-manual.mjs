@@ -25,8 +25,9 @@ export function run({ root, ok, fail }) {
   if (header !== packVersion) {
     problems.push(`表头版本（${header ?? '解析不到'}）≠ pack package.json（${packVersion}）——重跑 \`node tools/export-dist.mjs\` 再提交，别手改手册`)
   }
-  const required = ['run bundle', 'bundle.json', 'company-workspace', 'workspace/', 'sha256', 'Node', 'DSH', '卸载', '回退',
-    'DSH_COMPANY_REBIND', 'deliverables-presented', 'business', 'full', 'bundle.json.bak-']
+  const required = ['company', '--workspace', '.dsh-company/bundle.json', 'AGENTS.md', 'COMPANY.md',
+    'exports', 'sha256', 'Node', 'DSH', '卸载', '回退', 'pnpm 11', '12', 'DSH_COMPANY_BROWSER', 'dsh-web-app',
+    'business', 'full', 'seed-consent']
   const missing = required.filter(phrase => !manual.includes(phrase))
   if (missing.length > 0) problems.push(`手册缺安装形状/契约关键句：${missing.join(' / ')}（run bundle / bundle.json / workspace 骨架 / sha256 / Node / DSH / 卸载 / 回退）`)
   if (!/pnpm 11/.test(manual) || !/\b12\b/.test(manual)) {
@@ -34,7 +35,9 @@ export function run({ root, ok, fail }) {
   }
   if (!/DSH_COMPANY_BROWSER/.test(manual)) problems.push('手册缺 browser 条件开关（缺包时禁用、装包后自动启用）')
   if (!/dsh-web-app/.test(manual)) problems.push('手册缺 profile 合同（公司包要求含 dsh-web-app 的 web profile）')
-  if (!/一个 \`DSH_HOME\` 只对应一个 run bundle/.test(manual)) problems.push('手册缺「一个 home 一 bundle」合同')
+  if (!/一次安装 = 一个 DSH home/.test(manual) || !/一个用户 workspace/.test(manual)) {
+    problems.push('手册缺「一次安装 = 一个 home + 一个用户 workspace」合同')
+  }
   if (!manual.includes(expectedTag)) problems.push(`手册缺验证基线 \`${expectedTag}\`（pin 漂了或没重导）`)
   // 产物身份（2026-10-25，RFC distribution-lifecycle）：手册必须给出 tgz 的 sha256；
   // 本体在场时逐字节核对，本体不在场（fresh clone / 未导出）只查形状，不冒充校验过。

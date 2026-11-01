@@ -51,7 +51,7 @@ research/
 
 | 名头 | 问题 | 消费者 | 材料 |
 |---|---|---|---|
-| *（暂无活跃研究题）* | — | — | — |
+| [plugin-as-product](plugin-as-product/README.md) | 插件即产品：独立 `company` profile、启动解析 workspace、run bundle 归 workspace、生命周期/信任/发布 | [2026-11-01 插件即产品卡](../issues/2026-11-01-plugin-as-product.md) | 4 份（机制 + 生命周期 + 信任/数据 + 发布/验证） |
 
 归档题名见[研究归档](../_archive/research/README.md)；本页只列活跃题名，不重复逐文件清单。
 

@@ -1,32 +1,31 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：bundle.json / DSH_COMPANY_HOME / 首启自举 / 换盘搬家逻辑改动后；发布前手动
-// 成本：~1-2 分钟 keyless（真 tarball 安装 + 每个 case 一次或两次 boot；global 通道需要网络）
+// 何时跑：workspace 解析/身份落点/搬家/停写逻辑改动后；发布前手动
+// 成本：~1-2 分钟 keyless（真 tarball 安装 + 每个 case 一次 boot；global 通道需要网络）
 // 前置：已导出 `_dist/dsh-company-pack-<version>.tgz`；PATH 里有真实 `dsh`（global 通道）
 //
-// 证明形状（只证明这里列出的三种落点/身份边界，不证明两 home 全隔离——那是 multi-install 的事）：
-// - rebind：已有 bundle.json 时把 DSH_COMPANY_HOME 改到别处 ⇒ 启动输出明确警告、不建新盘、
-//   bundle.json 字节不变、旧盘 sentinel 不动。防止一个 home 静默分裂成两个公司盘。
-// - relative：DSH_COMPANY_HOME 是相对路径 ⇒ 按 cwd 归一成绝对路径落盘，bundle 记绝对路径。
-// - tilde：DSH_COMPANY_HOME=~/... ⇒ 展开到 HOME，不在 cwd 造一个字面 `~` 目录。
-// - move：搬 home 后 bundle.workspace 随新 home 解析；DSH 的旧 workspace 登记由启动输出点名（不自动迁移）。
-// 不证明：搬家后 DSH 自己的 storages/workspace.json 与 session cwd（vendor 存绝对路径）会自动迁移；
-//   那是上游行为，本 smoke 不冒充。profile reset/方法层、两 home 同 workspace 的并发写入另案。
+// 证明形状（只证明这里列出的落点/身份边界，不证明两 home 全隔离——那是 multi-install 的事）：
+// - no-workspace：没有 DSH_COMPANY_HOME ⇒ 不建默认盘、不写 home bundle、输出可操作告警；
+// - external：显式外部 workspace + consent ⇒ 首启落 v2 `bundle.json` 到 workspace，home 不写；
+// - unsafe：DSH_COMPANY_HOME=DSH_HOME ⇒ 不把公司盘写进 home 根；
+// - relative/tilde：相对路径按 cwd 归一、~ 展开到 HOME；v2 身份跟盘；
+// - rebind-retired：DSH_COMPANY_REBIND 设置只告警“已退役”，manifest 字节不变、不建备份；
+// - move-home：搬 home 后同一外部 workspace 仍可启动，v2 id 不变。
+// 不证明：搬 home 后 DSH 自己的 storages/workspace.json 与 session cwd 自动迁移（上游行为，不冒充）。
 
 import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
-import { isAbsolute, join } from 'node:path'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 import { plainNodeEnv } from '../../tools/drivers/release-process.mjs'
-import { companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 
 const KEEP = process.argv.includes('--keep')
 const PACK = process.argv.includes('--pack')
   ? process.argv[process.argv.indexOf('--pack') + 1]
   : join(ROOT, '_dist', `dsh-company-pack-${JSON.parse(readFileSync(join(ROOT, 'packages/company-pack/package.json'), 'utf8')).version}.tgz`)
-// 仓库外：profile 落在 repo 内时 Node 上行解析会看到 repo 的 vendor node_modules，污染通道结论。
+const PACK_VERSION = JSON.parse(readFileSync(join(ROOT, 'packages/company-pack/package.json'), 'utf8')).version
 const BASE = mkdtempSync(join(tmpdir(), 'dsh-isolation-matrix-'))
 const failures = []
 const check = (label, ok, detail = '') => {
@@ -36,26 +35,28 @@ const check = (label, ok, detail = '') => {
 const hash = path => createHash('sha256').update(readFileSync(path)).digest('hex')
 
 function envFor(caseDir, home, company, extra = {}) {
-  return {
+  const env = {
     ...plainNodeEnv(),
     HOME: join(caseDir, 'user'),
     DSH_HOME: home,
-    DSH_COMPANY_HOME: company,
     DSH_COMPANY_BOOTSTRAP: 'if-missing',
     PATH: `${join(process.execPath, '..')}:${process.env.PATH ?? ''}`,
     COREPACK_ENABLE_NETWORK: '1',
     npm_config_cache: join(caseDir, 'npm-cache'),
     ...extra,
   }
+  if (company === undefined) delete env.DSH_COMPANY_HOME
+  else env.DSH_COMPANY_HOME = company
+  return env
 }
 
 function install(caseDir, home) {
   return spawnSync('dsh', ['plugin', '--profile', 'web', 'add', PACK, `--store-dir=${join(caseDir, 'store')}`], {
-    cwd: caseDir, env: envFor(caseDir, home, join(caseDir, 'company')), encoding: 'utf8', timeout: 300_000,
+    cwd: caseDir, env: envFor(caseDir, home, undefined), encoding: 'utf8', timeout: 300_000,
   })
 }
 
-function boot(caseDir, home, company, { waitPath = null, settleMs = 1200, hold = false, extra = {} } = {}) {
+function boot(caseDir, home, company, { waitPath = null, settleMs = 1200, extra = {} } = {}) {
   const child = spawn('dsh', ['--profile', 'web', '--', '--port', '0', '--no-open'], {
     cwd: caseDir, env: envFor(caseDir, home, company, extra), stdio: ['ignore', 'pipe', 'pipe'],
   })
@@ -64,14 +65,14 @@ function boot(caseDir, home, company, { waitPath = null, settleMs = 1200, hold =
   child.stderr.on('data', chunk => { output += chunk })
   return new Promise((resolve) => {
     const item = { child, base: '', token: '', output: () => output }
-    const timer = setTimeout(() => { child.kill('SIGKILL'); resolve(output) }, 60_000)
+    const timer = setTimeout(() => { child.kill('SIGKILL'); resolve(item) }, 60_000)
     let settled = false
     const finish = () => {
       if (settled) return
       settled = true
       clearTimeout(timer)
       child.kill('SIGTERM')
-      setTimeout(() => { child.kill('SIGKILL'); resolve(output) }, 1000)
+      setTimeout(() => { child.kill('SIGKILL'); resolve(item) }, 1000)
     }
     const scan = () => {
       const match = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/.exec(output)
@@ -81,12 +82,6 @@ function boot(caseDir, home, company, { waitPath = null, settleMs = 1200, hold =
       const deadline = Date.now() + 20_000
       const poll = () => {
         if (waitPath === null || existsSync(waitPath) || Date.now() >= deadline) {
-          // banner 之后 host apply 还在跑；等目标落盘后再留一个落盘/告警窗口，断言仍以盘上事实为准。
-          if (hold) {
-            clearTimeout(timer)
-            resolve(item)
-            return
-          }
           setTimeout(finish, settleMs)
           return
         }
@@ -99,113 +94,134 @@ function boot(caseDir, home, company, { waitPath = null, settleMs = 1200, hold =
   })
 }
 
-const stopItem = (item) => new Promise((done) => {
-  if (item.child.exitCode !== null) return done()
-  item.child.once('exit', done)
-  item.child.kill('SIGTERM')
-  setTimeout(() => { item.child.kill('SIGKILL'); done() }, 3000)
-})
-
-async function rpcFor(instance) {
-  const cookie = await companyCookie({ fetch: globalThis.fetch, base: instance.base, token: instance.token })
-  return companyRpc({ fetch: globalThis.fetch, base: instance.base, cookie, prefix: 'iso-', dumpBodyOnError: true })
+function consent(workspace) {
+  mkdirSync(join(workspace, '.dsh-company'), { recursive: true })
+  writeFileSync(join(workspace, '.dsh-company/.seed-consent'), `${JSON.stringify({
+    v: 1, packVersion: PACK_VERSION, workspace: resolve(workspace), consentedAt: new Date().toISOString(),
+  }, null, 2)}\n`)
 }
 
-async function moveCase() {
-  const caseDir = join(BASE, 'move')
+async function noWorkspaceCase() {
+  const caseDir = join(BASE, 'no-workspace')
   const home = join(caseDir, 'home')
-  const moved = join(caseDir, 'home-moved')
-  const oldWs = join(home, 'company-workspace')
   rmSync(caseDir, { recursive: true, force: true }); mkdirSync(join(caseDir, 'user'), { recursive: true })
   const installed = install(caseDir, home)
-  check('move install', installed.status === 0, (installed.stderr ?? '').slice(-240))
+  check('no-workspace install', installed.status === 0, (installed.stderr ?? '').slice(-240))
   if (installed.status !== 0) return
-  const first = await boot(caseDir, home, oldWs, { waitPath: join(oldWs, 'kb/company.md'), hold: true })
-  const rpc = await rpcFor(first)
-  await rpc('workspace/create', { request: { path: oldWs } })
-  writeFileSync(join(oldWs, 'kb/company.md'), '公司名: Move Sentinel\n')
-  await stopItem(first)
-  renameSync(home, moved)
-  const second = await boot(caseDir, moved, join(moved, 'company-workspace'), { waitPath: join(moved, 'company-workspace/kb/company.md') })
-  check('move bundle.workspace 仍解析到新 home', JSON.parse(readFileSync(join(moved, 'bundle.json'), 'utf8')).workspace === 'company-workspace')
-  check('move 启动输出点名旧登记路径', second.includes('workspace 登记里有') && second.includes(oldWs), second.slice(-800))
-  check('move 公司盘 sentinel 仍在', readFileSync(join(moved, 'company-workspace/kb/company.md'), 'utf8').includes('Move Sentinel'))
+  const out = await boot(caseDir, home, undefined, { waitPath: null, settleMs: 2500 })
+  check('no-workspace 不建默认 company-workspace', !existsSync(join(home, 'company-workspace')))
+  check('no-workspace 不写 home bundle', !existsSync(join(home, 'bundle.json')))
+  check('no-workspace 输出可操作告警', out.output().includes('未指定公司 workspace') || out.output().includes('DSH_COMPANY_HOME'), out.output().slice(-500))
 }
 
-async function rebindCase() {
-  const caseDir = join(BASE, 'rebind')
+async function externalCase() {
+  const caseDir = join(BASE, 'external')
   const home = join(caseDir, 'home')
-  const oldWs = join(home, 'company-workspace')
-  const otherWs = join(caseDir, 'other-company')
-  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(join(caseDir, 'user'), { recursive: true })
+  const ws = join(caseDir, 'external company')
+  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(join(caseDir, 'user'), { recursive: true }); mkdirSync(ws, { recursive: true })
   const installed = install(caseDir, home)
-  check('rebind install', installed.status === 0, (installed.stderr ?? '').slice(-240))
+  check('external install', installed.status === 0, (installed.stderr ?? '').slice(-240))
   if (installed.status !== 0) return
-  const first = await boot(caseDir, home, oldWs, { waitPath: join(oldWs, 'kb/company.md') })
-  check('rebind 首启落盘', existsSync(join(oldWs, 'kb/company.md')), first.slice(-200))
-  writeFileSync(join(oldWs, 'kb/company.md'), '公司名: Rebind Sentinel\n')
-  const before = hash(join(home, 'bundle.json'))
-  const second = await boot(caseDir, home, otherWs, { waitPath: null, settleMs: 4000 })
-  check('rebind 启动输出有明确警告', second.includes('bundle.json 记录的公司盘'), second.slice(-600))
-  check('rebind 不建新公司盘', !existsSync(otherWs))
-  check('rebind bundle.json 字节不变', hash(join(home, 'bundle.json')) === before)
-  check('rebind 旧盘 sentinel 未动', readFileSync(join(oldWs, 'kb/company.md'), 'utf8').includes('Rebind Sentinel'))
+  consent(ws)
+  const out = await boot(caseDir, home, ws, { waitPath: join(ws, '.dsh-company/bundle.json') })
+  check('external 首启落 v2 身份到 workspace', existsSync(join(ws, '.dsh-company/bundle.json')), out.output().slice(-300))
+  const manifest = JSON.parse(readFileSync(join(ws, '.dsh-company/bundle.json'), 'utf8'))
+  check('external v2 形状', manifest.v === 2 && manifest.workspace === undefined && typeof manifest.id === 'string', JSON.stringify(manifest))
+  check('external home 不写 bundle', !existsSync(join(home, 'bundle.json')))
 }
 
-async function explicitRebindCase() {
-  const caseDir = join(BASE, 'rebind-explicit')
+async function unsafeCase() {
+  const caseDir = join(BASE, 'unsafe')
   const home = join(caseDir, 'home')
-  const oldWs = join(home, 'company-workspace')
-  const newWs = join(caseDir, 'company-moved')
-  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(join(caseDir, 'user'), { recursive: true })
+  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(join(caseDir, 'user'), { recursive: true }); mkdirSync(home, { recursive: true })
   const installed = install(caseDir, home)
-  check('explicit rebind install', installed.status === 0, (installed.stderr ?? '').slice(-240))
+  check('unsafe install', installed.status === 0, (installed.stderr ?? '').slice(-240))
   if (installed.status !== 0) return
-  await boot(caseDir, home, oldWs, { waitPath: join(oldWs, 'kb/company.md') })
-  writeFileSync(join(oldWs, 'kb/company.md'), '公司名: Explicit Rebind\n')
-  renameSync(oldWs, newWs)
-  const out = await boot(caseDir, home, newWs, {
-    waitPath: join(newWs, 'kb/company.md'),
-    settleMs: 2000,
-    extra: { DSH_COMPANY_REBIND: '1' },
-  })
-  const manifest = JSON.parse(readFileSync(join(home, 'bundle.json'), 'utf8'))
-  check('explicit rebind workspace 前移', manifest.workspace === newWs, manifest.workspace)
-  const backups = readdirSync(home).filter(name => name.startsWith('bundle.json.bak-'))
-  check('explicit rebind 留 manifest 备份', backups.length === 1, backups.join(', '))
-  check('explicit rebind 写升级日志', readFileSync(join(home, 'logs/company-pack-upgrade.log'), 'utf8').includes('换盘'))
-  check('explicit rebind 公司盘 sentinel 仍在', readFileSync(join(newWs, 'kb/company.md'), 'utf8').includes('Explicit Rebind'))
-  check('explicit rebind 不静默重建旧盘', !existsSync(oldWs))
-  check('explicit rebind 启动输出点名换盘', out.includes('已显式换盘'), out.slice(-800))
+  const out = await boot(caseDir, home, home, { waitPath: null, settleMs: 2500 })
+  check('unsafe 不把公司盘写进 home 根', !existsSync(join(home, 'AGENTS.md')) && !existsSync(join(home, 'kb')))
+  check('unsafe 输出落点不安全', out.output().includes('落点不安全'), out.output().slice(-500))
 }
 
 async function relativeCase() {
   const caseDir = join(BASE, 'relative')
   const home = join(caseDir, 'home')
-  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(join(caseDir, 'user'), { recursive: true })
+  const resolved = join(caseDir, 'company-rel')
+  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(join(caseDir, 'user'), { recursive: true }); mkdirSync(resolved, { recursive: true })
   const installed = install(caseDir, home)
   check('relative install', installed.status === 0, (installed.stderr ?? '').slice(-240))
   if (installed.status !== 0) return
-  const resolved = join(caseDir, 'company-rel')
-  await boot(caseDir, home, './company-rel', { waitPath: join(resolved, 'kb/company.md') })
-  check('relative 落点按 cwd 绝对化', existsSync(join(resolved, 'kb/company.md')))
-  const manifest = JSON.parse(readFileSync(join(home, 'bundle.json'), 'utf8'))
-  check('relative bundle 记绝对路径', isAbsolute(manifest.workspace), manifest.workspace)
+  consent(resolved)
+  await boot(caseDir, home, './company-rel', { waitPath: join(resolved, '.dsh-company/bundle.json') })
+  const manifest = JSON.parse(readFileSync(join(resolved, '.dsh-company/bundle.json'), 'utf8'))
+  check('relative 落点按 cwd 绝对化 + v2', manifest.v === 2 && manifest.workspace === undefined)
 }
 
 async function tildeCase() {
   const caseDir = join(BASE, 'tilde')
   const home = join(caseDir, 'home')
   const user = join(caseDir, 'user')
-  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(user, { recursive: true })
+  const ws = join(user, 'company-tilde')
+  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(ws, { recursive: true })
   const installed = install(caseDir, home)
   check('tilde install', installed.status === 0, (installed.stderr ?? '').slice(-240))
   if (installed.status !== 0) return
-  await boot(caseDir, home, '~/company-tilde', { waitPath: join(user, 'company-tilde/kb/company.md') })
-  check('tilde 展开到 HOME', existsSync(join(user, 'company-tilde/kb/company.md')))
+  consent(ws)
+  await boot(caseDir, home, '~/company-tilde', { waitPath: join(ws, '.dsh-company/bundle.json') })
+  check('tilde 展开到 HOME + v2', existsSync(join(ws, '.dsh-company/bundle.json')))
   check('tilde 不造字面 ~ 目录', !existsSync(join(caseDir, '~')))
-  const manifest = JSON.parse(readFileSync(join(home, 'bundle.json'), 'utf8'))
-  check('tilde bundle 记展开后的绝对路径', manifest.workspace === join(user, 'company-tilde'), manifest.workspace)
+}
+
+async function rebindRetiredCase() {
+  const caseDir = join(BASE, 'rebind-retired')
+  const home = join(caseDir, 'home')
+  const ws = join(caseDir, 'company')
+  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(join(caseDir, 'user'), { recursive: true }); mkdirSync(ws, { recursive: true })
+  const installed = install(caseDir, home)
+  check('rebind-retired install', installed.status === 0, (installed.stderr ?? '').slice(-240))
+  if (installed.status !== 0) return
+  consent(ws)
+  await boot(caseDir, home, ws, { waitPath: join(ws, '.dsh-company/bundle.json') })
+  const before = hash(join(ws, '.dsh-company/bundle.json'))
+  const out = await boot(caseDir, home, ws, { waitPath: join(ws, '.dsh-company/bundle.json'), settleMs: 2000, extra: { DSH_COMPANY_REBIND: '1' } })
+  check('rebind 只告警已退役', out.output().includes('已退役'), out.output().slice(-500))
+  check('rebind 不改 manifest', hash(join(ws, '.dsh-company/bundle.json')) === before)
+  check('rebind 不留旧备份', !existsSync(join(home, 'bundle.json.bak-x')))
+}
+
+async function workspaceMoveCase() {
+  const caseDir = join(BASE, 'workspace-move')
+  const home = join(caseDir, 'home')
+  const ws = join(caseDir, 'company')
+  const moved = join(caseDir, 'company-moved')
+  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(join(caseDir, 'user'), { recursive: true }); mkdirSync(ws, { recursive: true })
+  const installed = install(caseDir, home)
+  check('workspace-move install', installed.status === 0, (installed.stderr ?? '').slice(-240))
+  if (installed.status !== 0) return
+  consent(ws)
+  await boot(caseDir, home, ws, { waitPath: join(ws, '.dsh-company/bundle.json') })
+  const id = JSON.parse(readFileSync(join(ws, '.dsh-company/bundle.json'), 'utf8')).id
+  renameSync(ws, moved)
+  await boot(caseDir, home, moved, { waitPath: join(moved, '.dsh-company/bundle.json') })
+  const movedManifest = JSON.parse(readFileSync(join(moved, '.dsh-company/bundle.json'), 'utf8'))
+  check('搬 workspace 后 v2 id 不变', movedManifest.v === 2 && movedManifest.id === id)
+}
+
+async function moveHomeCase() {
+  const caseDir = join(BASE, 'move-home')
+  const home = join(caseDir, 'home')
+  const moved = join(caseDir, 'home-moved')
+  const ws = join(caseDir, 'company')
+  rmSync(caseDir, { recursive: true, force: true }); mkdirSync(join(caseDir, 'user'), { recursive: true }); mkdirSync(ws, { recursive: true })
+  const installed = install(caseDir, home)
+  check('move-home install', installed.status === 0, (installed.stderr ?? '').slice(-240))
+  if (installed.status !== 0) return
+  consent(ws)
+  await boot(caseDir, home, ws, { waitPath: join(ws, '.dsh-company/bundle.json') })
+  const id = JSON.parse(readFileSync(join(ws, '.dsh-company/bundle.json'), 'utf8')).id
+  renameSync(home, moved)
+  await boot(caseDir, moved, ws, { waitPath: join(ws, '.dsh-company/bundle.json') })
+  const movedManifest = JSON.parse(readFileSync(join(ws, '.dsh-company/bundle.json'), 'utf8'))
+  check('搬 home 后同一 workspace v2 id 不变', movedManifest.v === 2 && movedManifest.id === id)
 }
 
 try {
@@ -214,11 +230,14 @@ try {
   console.log(`isolation-matrix-smoke：base=${BASE} pack=${PACK.split('/').pop()} dsh=${(version.stdout ?? '').trim()}`)
   check('global dsh present', version.status === 0)
   if (version.status === 0) {
-    await rebindCase()
-    await explicitRebindCase()
-    await moveCase()
+    await noWorkspaceCase()
+    await externalCase()
+    await unsafeCase()
     await relativeCase()
     await tildeCase()
+    await rebindRetiredCase()
+    await moveHomeCase()
+    await workspaceMoveCase()
   }
 } catch (error) {
   console.error(`isolation-matrix-smoke: ${error instanceof Error ? error.stack ?? error.message : String(error)}`)

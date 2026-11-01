@@ -131,8 +131,9 @@ describe('host catalog wiring', () => {
   })
 
   it('损坏的 bundle.json 告警且不覆盖（不把损坏当首启）', () => {
-    const path = join(root, 'bundle.json')
-    writeFileSync(path, '{"v":1,"id":"cut')
+    mkdirSync(join(workspace, '.dsh-company'), { recursive: true })
+    const path = join(workspace, '.dsh-company/bundle.json')
+    writeFileSync(path, '{"v":2,"id":"cut')
     const warn = vi.fn()
     const ctx = {
       tools: { register: () => {} },
@@ -142,7 +143,7 @@ describe('host catalog wiring', () => {
     }
     apply(ctx as never)
     expect(warn.mock.calls.some(([message]) => String(message).includes('bundle.json 损坏'))).toBe(true)
-    expect(readFileSync(path, 'utf8')).toBe('{"v":1,"id":"cut')
+    expect(readFileSync(path, 'utf8')).toBe('{"v":2,"id":"cut')
   })
 })
 

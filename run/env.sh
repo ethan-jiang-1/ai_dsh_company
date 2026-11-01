@@ -6,7 +6,7 @@ mkdir -p "$DSH_HOME"
 
 # dev run bundle 的 workspace（2026-10-24 RFC run-bundle-install-unit）：
 # company-workspace 整树 gitignored，是会话 cwd；制度件符号链接指回 pack。首启时 pack 会写
-# runtime/harness-home/bundle.json（bundle 身份 + 骨架指纹）。fresh clone 先 `pnpm bundle:init`。
+# company-workspace/.dsh-company/bundle.json（v2 身份 + 骨架指纹）。fresh clone 先 `pnpm bundle:init`。
 export DSH_COMPANY_HOME="$_repo_root_dev/company-workspace"
 if [ ! -d "$DSH_COMPANY_HOME" ]; then
   echo "⚠ 未发现 dev run bundle workspace：$DSH_COMPANY_HOME" >&2

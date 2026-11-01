@@ -1,109 +1,89 @@
 # dsh-company-pack
 
-> **给收件人（先读这个）**：本包是 `dsh-company-pack`（版本见 `package.json` / 手册表头）；DSH 窗口 = `engines.dsh`
-> （`>=0.2.1-rc.2 <0.3.0`），Node ≥22.19。已验证通道 = vendor 源码构建 `dsh-v0.2.1-rc.2` 与 npm 发布版
-> `0.2.1-rc.3`；安装、sha256 校验、升级、卸载、回退见与 tarball 同目录的《安装手册》
-> （`_dist/安装手册.md`，由 `node tools/export-dist.mjs` 生成，不在 tarball 内）。
-> 许可 = `UNLICENSED`（内部交付，未授予再分发权）。
+> **给收件人（先读这个）**：本包是 `dsh-company-pack`（版本见 `package.json` / 手册表头）；DSH 窗口 =
+> `engines.dsh`（`>=0.2.1-rc.2 <0.3.0`），Node ≥22.19。已验证通道 = vendor 源码构建
+> `dsh-v0.2.1-rc.2` 与 npm 发布版 `0.2.1-rc.3`；安装、sha256 校验、升级、备份、卸载、回退见与
+> tarball 同目录的《安装手册》（`_dist/安装手册.md`，由 `node tools/export-dist.mjs` 生成，不在
+> tarball 内）。许可 = `UNLICENSED`（内部交付，未授予再分发权）。
 
 ## Install
 
-把与 tarball 同目录的《安装手册》按步骤执行：独立 `DSH_HOME` → `dsh plugin --profile web add <tarball>` → 首次启动落公司盘。
-前置 = Node ≥22.19、DSH 窗口内版本、**pnpm 11 或 12**（`corepack enable pnpm` 只保证有 pnpm；实际版本由 profile 目录的 corepack 解析）；sha256 校验见手册；本包不在 npm registry。
+把与 tarball 同目录的《安装手册》按步骤执行：独立 `DSH_HOME` → 建 `company` profile
+（`dsh --profile company --from-default-profile web`）→ `dsh plugin --profile company add <tarball>`
+→ 启动器 `--workspace <dir>`。前置 = Node ≥22.19、DSH 窗口内版本、**pnpm 11 或 12**；sha256 校验见
+手册；本包不在 npm registry。
 
-- **profile 形状**：必须使用含 `@deepseek-ai/dsh-web-app` 的 web profile；自定义 profile 名可以，但必须把 `dsh-web-app` 加进 `dsh.profile.bundles`。base-only 自定义 profile 会让 preset 行 pending。
-- **一个 `DSH_HOME` = 一个 run bundle**：同一个 home 下多个 profile 共享 `bundle.json`、sessions 与默认 workspace，**不是隔离**；第二家公司/第二个 CEO 用第二个 `DSH_HOME`。
-- **浏览器可选**：npm 发布的 `@deepseek-ai/dsh` 不含 browser 两包，preset 默认禁用 browser 组，五角色照常可用；装 `@deepseek-ai/dsh-browser-use` + `@deepseek-ai/dsh-experimental-browser-use-playwright-mcp`（同 DSH 版本）后自动启用；`DSH_COMPANY_BROWSER=on/off` 可强制。
+- **产品形状**：一次安装 = 一个 home + 一个 `company` profile + 一个用户 workspace。workspace
+  拥有公司身份与业务产物；home 留 DSH 运行时与 host 治理。换项目 = 新 home，不要复用旧 home 的
+  第二份盘。
+- **workspace 必须显式**：`DSH_COMPANY_HOME` 或启动器 `--workspace`；没有默认
+  `<DSH_HOME>/company-workspace`。首启需要 seed 确认（或盘上已有公司标记）。
+- **浏览器可选**：npm 发布的 `@deepseek-ai/dsh` 不含 browser 两包，preset 默认禁用 browser 组；
+  装两包后自动启用；`DSH_COMPANY_BROWSER=on/off` 可强制。
 
 ## What it contributes
 
 - 五个角色 preset（CEO / VP-Eng / VP-Sales / COO / CFO）+ 委派子人格 `researcher`；
-- host 行：签字、工作区门、团队、present、日期/节律、本包 client 面；
+- host 行：签字、工作区门、团队、present、日期/节律、本包 client 面、boot workspace 登记
+  （`register-workspace` 子路径；由产品 profile patch 挂载）；
 - `workspace/` 出厂公司盘骨架（手册 / 章程 / 编制 / 模板 / 起动件）；
+- `bin/dsh-company.mjs` 产品启动器（安装后 `profiles/company/node_modules/.bin/dsh-company`）；
 - 公司视图与一套公司页签（成品、台账、待办、培养等；清单 = 客户端注册面，不在文档枚举）。
 
 ## Configuration
 
-- `DSH_COMPANY_HOME`：公司盘落点（默认 `<DSH_HOME>/company-workspace`）；支持绝对路径与 `~/`，相对路径按启动 cwd 归一（0.3.10 起）。生产部署建议绝对路径；等于/包含 `DSH_HOME` 或 OS home、或指向普通文件时会停写公司数据并告警。
-- `DSH_COMPANY_REBIND=1`：**一次性显式换盘**。只在旧公司盘已搬走/改名、新盘形状正确时生效；会先备份 `bundle.json` 再改写 workspace，并写升级日志。只迁移 pack 自己的数据，不迁移 DSH session 的绝对 `header.cwd`。
+- `DSH_COMPANY_HOME`：公司 workspace 根（**必填**；启动器设置）。支持绝对路径与 `~/`；相对路径按
+  启动 cwd 归一。等于/包含 `DSH_HOME` 或 OS home、或指向普通文件时会停写公司数据并告警。
+- `DSH_COMPANY_BOOTSTRAP=off`：只关“复制骨架/写身份”，不关产品启动；`if-missing` 由启动器设置，
+  配合 `.dsh-company/.seed-consent`。
 - `DSH_COMPANY_BROWSER`：浏览器能力开关；缺省 = profile 能解析 browser 两包就开，否则关；`on`/`off` 强制。
-- `DSH_COMPANY_BOOTSTRAP=off`：只关“复制骨架”，不关 `bundle.json` 身份（自管盘的部署用）。
 - `company-client` 行的 `cultivationRoot`：方法层根；缺席时 `/cultivation adopt|revoke` 明确报错。
+  方法层/审计账本留 home（D25/M2），workspace 只放派生导出。
 - 兼容窗口：`engines.dsh`（运行时只读这一行；没有它才看 peers）。
-- 本包不导出 Config schema（唯一可调项 `cultivationRoot` 是可选行 config，没有 schema 校验）——FAQ 24 的显式例外，见 RFC faq24-alignment。
+- 本包不导出 Config schema（唯一可调项 `cultivationRoot` 是可选行 config，没有 schema 校验）。
 
 ## Data
 
-逐项数据卡（权威/作用域/寿命/删除/迁移）= [docs/data-model.md](../../docs/data-model.md)。下面只留平面摘要。
+逐项数据卡（权威/作用域/寿命/删除/迁移）= [docs/data-model.md](../../docs/data-model.md)。平面摘要：
 
 | 平面 | 我们写什么 | 位置 | 升级/卸载 |
 |---|---|---|---|
-| 定义 `D` | preset / persona / skills：只读声明；公司事实不在这里 | 包 `presets/**`（`presets/<role>/agent.cordis.yml`，由 `dsh.bundle.patch` 显式引用，不是旧 `.agent-presets/` 扫描） | 随包版本；不同公司不改源码 |
+| 定义 `D` | preset / persona / skills：只读声明 | 包 `presets/**`（`dsh.bundle.patch` 显式引用） | 随包版本 |
 | 包 `C` | 无用户数据；`workspace/` 是只读 starter | 安装包目录 | 升级整体替换；**绝不在包目录写 data/cache/日志** |
-| 工作区 `W` | 公司盘：手册/章程/台账/交付物/`kb/company.md`/`kb/<role>/journal`/`cultivation/records`（归档 `records-archive/`、恢复日志 `.pending-revoke.json`）；host 生成的派生索引 `kb/deliverables-index.json`（审计账本已迁 H domain，旧 W 文件只读留一版） | `<DSH_HOME>/company-workspace` 或 `DSH_COMPANY_HOME`（培养/成品命令只在盘根生效） | 不动；基部文件按哈希替换、你改过的保留 |
-| 用户 `U` | 用户全局 AGENTS/skills（本包不写） | `$DSH_HOME/AGENTS.md`、`$DSH_HOME/skills`、`~/.agents` | 用户维护；本包只读/不碰 |
-| 宿主状态 `H` | `bundle.json`（身份/基部指纹）、`bundle.json.bak-*`（显式换盘备份，只留最新 5 份）、`company-pack.lock`（writer lease）、`logs/company-pack-upgrade.log`、`logs/company-client-errors.log`（256 KiB 轮转）、`storages/company_deliverables.json`（`presented` 审计 domain）、`company/methods/<role>/`（方法层，公司级；旧 profile 路径只读留一版） | `<DSH_HOME>` | 不动；方法层同 home 多 profile 共享 |
-| 会话 `S` | 会话日志由宿主拥有；本包不自造 event 类型；目录名/session header 含 cwd 绝对路径 | `<DSH_HOME>/sessions/` | 不动 |
-| 缓存 `K` | `company-client` 行声明的全文索引（派生；可能含会话正文） | `<DSH_HOME>/cache/company/session-search-<p>.db`（per-profile 文件） | 可删可重建；卸载不删；备份按敏感数据处理 |
-| 凭据 `X` | 不写入包；走 `<DSH_HOME>/.credentials.yaml` / 环境变量 | home | 用户管理；文件必须 0600 |
+| 工作区 `W` | 公司盘：手册（`AGENTS.md`；碰名时 `COMPANY.md`）/ 章程 / 台账 / 交付物 / `kb/**` / `cultivation/records`；`.dsh-company/` 身份/日志/治理导出 | 用户 workspace 根 | 不动；基部按哈希替换、改过保留 |
+| 用户 `U` | 用户全局 AGENTS/skills（本包不写） | `$DSH_HOME/AGENTS.md`、`$DSH_HOME/skills`、`~/.agents` | 用户维护 |
+| 宿主状态 `H` | `bundle.json` **身份备份**（`company/identity/<id>.json`）、`company-pack.lock`、`logs/company-client-errors.log`、`storages/company_deliverables.json`（presented domain）、`company/methods/<role>/` | `<DSH_HOME>` | 不动；方法层/账本同 home 共享 |
+| 会话 `S` | 会话日志由宿主拥有；目录名/session header 含 cwd 绝对路径 | `<DSH_HOME>/sessions/` | 不动 |
+| 缓存 `K` | `company-client` 行声明的全文索引（派生） | `<DSH_HOME>/cache/company/session-search-<p>.db` | 可删可重建 |
+| 凭据 `X` | 不写入包；走 `<DSH_HOME>/.credentials.yaml` / 环境变量 | home | 用户管理；0600 |
 
-说明：6+2 = D/C/W/U/S/H + K/X。`R` DSH workspace 登记与 `B` 浏览器 localStorage 是**边界**，不是本包平面：R 归宿主，搬 home 后需重新添加；B 按 origin/设备，Host/模型看不到。没有单独的 `I` 平面——派生索引落 W（catalog）或 K（session-search）。
+`R` DSH workspace 登记与 `B` 浏览器 localStorage 是**边界**，不是本包平面。`bundle.json` 在
+workspace 里，模型在 `workspace-write` 下可写；host 只校验 + 留 home 身份备份，**不是防篡改边界**。
 
-说明：`bootstrap`/catalog 是**部署 provisioning 与 UI 派生视图**，用宿主 `node:fs`（不在模型工具沙箱内）；模型对工作区文件的读写仍走 `ctx.fs`/文件工具。`kb/deliverables-index.json` 是派生视图，可重建；`presented` 的权威 = `storages/company_deliverables.json`（domain `company_deliverables`；true 来自会话事件，false 是操作员结论），旧 W `kb/deliverables-presented.json` 只读留一版；**删账本会丢 `false` 审计，备份时一起带上**。同一 home 只允许一个 writer：第二进程会停写公司数据（DSH 会话仍可用），lease 崩溃后按 PID stale 接管。`/cultivation archive|purge` 控制记录规模；`/deliverables audit` 是 presented=false 的第一入口。
-
-公司盘根固定在 `<DSH_HOME>/company-workspace`（或 `DSH_COMPANY_HOME`）。若会话 cwd 不是这个盘，页签/身份显示「非公司盘 / 身份未配置」，host 不静默改读 cwd。
-
-**换盘/搬家不是改一个环境变量**：`bundle.json` 的 workspace 是 bundle 身份的一部分；已有 manifest 时直接改 `DSH_COMPANY_HOME`，启动会明确警告并拒绝在新路径建第二份盘。确认旧盘已搬走/改名后，用 `DSH_COMPANY_REBIND=1 DSH_COMPANY_HOME=<新盘> dsh web` 做一次性换盘（自动备份 `bundle.json`，并在 `logs/company-pack-upgrade.log` 留痕）；不想显式换盘就用新 `DSH_HOME`（先备份）。搬 home 后 DSH 自己的 `storages/workspace.json` 与 session 目录名仍是绝对旧路径，需在侧栏重新添加工作区；旧 session 不会自动迁移。host 启动时会点名登记里已不存在的旧路径（只告警，不改 DSH 存储）。
+公司盘根 = `DSH_COMPANY_HOME`。若会话 cwd 不是这个盘，页签/身份显示「非公司盘 / 身份未配置」，
+host 不静默改读 cwd。方法层/账本留 home 是刻意的安全边界（D25/M2）；workspace
+`.dsh-company/exports/` 只是可携带快照，不是第二权威。
 
 ## Compatibility
 
-- 运行时硬门 = `engines.dsh`（见 `package.json`）；已认证 tag 台账只住维护者仓库、不随包分发，不是 DSH 字段。窗口宽于已测 tag：**可安装 ≠ 已认证**；已实测见 `docs/release.md`。
-- 已实测通道：vendor 源码构建 `dsh-v0.2.1-rc.2`、npm 发布版 `0.2.1-rc.3`（global `dsh`）；Windows/容器/其他 0.2.x 未执行，不冒充支持。
-- 本包 `private: true`、`license: UNLICENSED`（内部交付）；npm/market 发布未启用。
+- 运行时硬门 = `engines.dsh`（见 `package.json`）；已认证 tag 台账只住维护者仓库、不随包分发。
+- 已实测通道：vendor 源码构建 `dsh-v0.2.1-rc.2`、npm 发布版 `0.2.1-rc.3`；Windows/容器/其他
+  0.2.x 未执行，不冒充支持。
+- 本包 `private: true`、`license: UNLICENSED`；npm/market 发布未启用。
 
 ## Backup
 
-- `business` = 公司盘（journal/交付物/records/KB）+ `bundle.json` + `storages/company_deliverables.json`（presented domain）+ `company/methods/`（方法层）；不含 sessions、凭据、索引、宿主日志。
-- `full` = 整个 `DSH_HOME`；含会话正文/密钥/绝对路径，加密、限权、不共享。
-- 恢复 `business`：新 home 解包 → `plugin add` 同版本 → 启动；旧会话不回来。`full` 搬 home 后 DSH workspace 登记与 session cwd 仍是旧绝对路径，需人重加。
+- `business` = 公司 workspace（含 `.dsh-company/` 身份/导出/日志）+ home 的
+  `company/methods/` 与 `storages/company_deliverables.json`（或已导出快照）；不含 sessions/凭据/索引。
+- `full` = 整个 `DSH_HOME` + workspace；含会话正文/密钥/绝对路径，加密、限权、不共享。
+- 恢复 `business`：新 home 解 workspace → `plugin add` 同版本/新版本 → 以该 workspace 启动；
+  旧会话不回来。方法层/账本按 home 恢复或由 host 重新导出。
 
 ## Uninstall
 
-`dsh plugin --profile web remove dsh-company-pack`：只摘插件与 profile 层，公司盘（含 `cultivation/records-archive/`）、旧 W `kb/deliverables-presented.json`、`storages/company_deliverables.json`、sessions、`bundle.json`/`bundle.json.bak-*`、`company/methods/`、`cache/company/session-search-*.db` 保留。
-要彻底删除一个部署，确认备份后删除它的整个 `<DSH_HOME>`。详见《安装手册》第六节。
-
-## Owner（维护者）
-
-唯一自写包（决策 D1：一个包；行多包少）。**owner 表**（每件东西是什么、谁消费——RFC pack-boundaries 2026-10-05 立）：
-
-| 件 | 是什么 | 消费方向 | 出生 |
-|---|---|---|---|
-| `workspace/` | **出厂公司盘骨架**（手册 `AGENTS.md`、`templates/`、`kb/org.md`、五份 `CHARTER.md` + 起动件 `kb/owners.md`/`kb/motion-ledger.md` + 空目录）：角色跑起来读的全在这里——**随包分发**，否则第三方装完没手册没章程（2026-10-13 立；单源判据 = verify 的 `company-skeleton`） | 安装后落到使用者的公司盘（会话 cwd）；**基部起步**（CHARTER 历史纪要是扩张数据，出厂为空；升级只动没改过的文件） | D43 + RFC run-bundle-install-unit（2026-10-24） |
-| `presets/<role>/` | persona + skills **声明**（改它 = 改角色；生效边界见 [docs/presets.md](../../docs/presets.md)） | loader 组合 → 角色会话 | R0–R2 |
-| `src/` | **自写实现**两半：Host = `src/index.ts` 注册入口 + `src/host/`（Node-only 自举与培养注册/文件操作）+ `src/lib/`（共享读模型纯逻辑）；Client = `src/client/` 注册入口与浏览器面——具体布局唯一家 = [src/README](./src/README.md) | vendor runtime + `tests/company`（Host 源码直测）/ `tests/client`（Client 注册与视图） | R3+ |
-| `lib/` | **generated 发布产物（read-only）**：`tsc -b packages/company-pack` → tsdown 两面产出；**改 `src/` ≠ 浏览器已重建**——dsh web 常驻面必须重跑构建（事实家 = [bootstrap](../../docs/guides/bootstrap.md)） | `npm pack` → profile 安装（`exports`：`.` → `lib/index.js`、`./client` → `lib/client.js`） | R5 |
-| `cordis.patch.yml` | **bundle 装配行**：`agent-preset-registry` 替换出厂行；`dsh.bundle.patch` 为**数组** = registry 1 + 五角色预设行 + 委派子人格 `researcher` 一行（0.2.1） | profile 组合层 | R0–R2 |
-| `package.json` | **发布/注入声明**：peerDependencies（**版本以此为准，此处不复述**——复述必漂）、`engines.dsh` 安装窗口（DSH 运行时只读这一行）、`files` 白名单、`dsh.client` 字段、license/repository | 包管理器 + loader | R0–R2 |
-
-⚠ `lib/` 是生成产物：`git diff` 里它先变 = 你改了构建或忘了它由 `src/` 生成——永远改 `src/`，构建产 `lib/`（物理拆分 host/domain 的重启条件 = implemented/pack-boundaries（已删，历史在 git） 重启条件节）。
-
-发布前清单已全部落地（2026-09-25 随升 pin ①）：cordis 在 peerDependencies、`engines.dsh` +
-已认证 tag 台账只住维护者仓库、不随包分发（历史版本 + 当前钉住；`pack-engines` / `pack-compat`
-门禁强制窗口覆盖当前 pin）、`npm pack` → 干净 profile → `dsh plugin add` 真实安装冒烟 =
-release-smoke ALL PASS（[docs/release.md](../../docs/release.md)）。pack 保持 `private: true`、
-`license: UNLICENSED`——真实 npm 发布等第二个消费者出现再定。
-
-**装完第一步（自动，2026-10-24 起 = 一个 run bundle）**：插件第一次跑起来会把包内 `workspace/` 骨架落到
-`<DSH_HOME>/company-workspace`（**只补缺、绝不覆盖**；见 host 半 `src/host/bootstrap.ts`），并在
-`<DSH_HOME>/bundle.json` 写 bundle 身份（id / createdAt / pack 版本 / 基部逐文件 sha256）。**一次安装 = 一个
-DSH home = 一个 bundle**；装完即有盘可连，填 `kb/owners.md` 就能开工。第二个 CEO **新开一个 `DSH_HOME`**，
-不要复用（sessions / 凭据 / 方法层 / workspace 登记都在 home 里，复用即共享历史）。
-
-- 基部升级（同一次 apply）：目标缺失 ⇒ 补建；用户改过（哈希 ≠ 上次基部哈希）⇒ 保留并记日志；没改过 ⇒ 替换。
-  扩张面（journal / 交付物 / 台账 / 方法层 / 会话）一个字节不动。manifest 只创建、绝不覆盖。
-- 落点用 `DSH_COMPANY_HOME` 换、`DSH_COMPANY_BOOTSTRAP=off` 只关“复制骨架”（**自管盘的部署**这么用；
-  本仓 `run/env.sh` 就是关的——dev 盘在 `company-workspace/`，制度件是指回本目录的符号链接，
-  由 `pnpm bundle:init` 建；bundle.json 仍会写）。
+`dsh plugin --profile company remove dsh-company-pack`：只摘插件与 profile 层；workspace、home
+（含 sessions、方法层、账本、身份备份）保留。要彻底删除一个部署，确认备份后删除整个
+`<DSH_HOME>` + workspace。详见《安装手册》第六节。
 
 ## 已知限制（随行为变更同 diff 更新；2026-09-28 立，借 FAQ 04 package README tier）
 

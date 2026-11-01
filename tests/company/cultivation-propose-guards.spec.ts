@@ -41,7 +41,10 @@ afterEach(() => {
 type Propose = (args: Record<string, unknown>, exec: Record<string, unknown>) => Promise<{ id: string; recorded: boolean; note: string }>
 
 async function mount(opts: { readonly corruptBundle?: boolean } = {}): Promise<{ ctx: Context; propose: Propose }> {
-  if (opts.corruptBundle === true) writeFileSync(join(dir, 'home', 'bundle.json'), '{ this is not json', 'utf8')
+  if (opts.corruptBundle === true) {
+    mkdirSync(join(dir, 'company', '.dsh-company'), { recursive: true })
+    writeFileSync(join(dir, 'company', '.dsh-company/bundle.json'), '{ this is not json', 'utf8')
+  }
   const ctx = new Context()
   const tools = new Map<string, { execute: Propose }>()
   ctx.provide('tools', {

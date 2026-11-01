@@ -24,8 +24,8 @@
 | 面 | 位置 | 所有权与用途 |
 |---|---|---|
 | 自写运行包 | [company-pack](../packages/company-pack/) | 五个角色 preset、bundle 行、host 注册与 client 面；发布形状由 [包声明](../packages/company-pack/package.json) 决定 |
-| dev run bundle 的 workspace | `company-workspace/`（**gitignored**；fresh clone 用 `pnpm bundle:init`） | 公司角色会话 cwd；本部署的扩张数据（owners、台账、journal、交付物、培养记录）只住这里，不进 git。制度件的家 = [pack workspace](../packages/company-pack/workspace/)（出厂骨架、随包分发）；dev 盘里用符号链接指回。bundle 身份 = `<DSH_HOME>/bundle.json`（见 [运行态地图 §二·五](runtime-map.md)） |
-| 启动配置 | [run](../run/)、[env.sh](../run/env.sh) | tracked 启动配置；源码验证使用开发 DSH_HOME |
+| dev run bundle 的 workspace | `company-workspace/`（**gitignored**；fresh clone 用 `pnpm bundle:init`） | 公司角色会话 cwd；本部署的扩张数据（owners、台账、journal、交付物、培养记录）只住这里，不进 git。制度件的家 = [pack workspace](../packages/company-pack/workspace/)（出厂骨架、随包分发）；dev 盘里用符号链接指回。bundle 身份 = `<workspace>/.dsh-company/bundle.json`（v2；见 [运行态地图 §二·五](runtime-map.md)） |
+| 启动配置 | [run](../run/)、[env.sh](../run/env.sh) | tracked 启动配置；`pnpm company` 产品入口；源码验证使用开发 DSH_HOME |
 | 运行残留 | [runtime](../runtime/)、[runtime/README](../runtime/README.md) | 开发 DSH_HOME、第二 home、浏览器工具态与排练盘（默认整树忽略 + 显式白名单，逐件见 runtime/README；排练盘成型见 [rehearsal 实现](../tools/lib/rehearsal.mjs)） |
 | 上游机制 | [vendor/dsh](../vendor/dsh/) | 钉住的只读 submodule；开发 `pnpm dsh` 的源码基线 |
 | keyless 回归 | [tests](../tests/)、[Vitest 配置](../vitest.config.ts) | 模块逻辑、静态渲染、隔离文件夹具；分层守卫见 [layering.spec.ts](../tests/harness/layering.spec.ts) |
@@ -35,7 +35,7 @@
 | 决策记忆 | [notes](../notes/) | 按主题检索决定、被否决方案与复验依据 |
 | 推敲空间 | [_backlog](../_backlog/README.md) | 未成熟判断材料；任务执行按开发环与用户指令进入 |
 
-**四个位置影响运行**：**代码来源**决定 DSH 版本、**DSH_HOME** 决定 profile / 会话日志 / bundle 身份（`<DSH_HOME>/bundle.json`）、**会话 cwd** 决定公司事实和输出、**验证证据**冻结时点事实——四条状态轴的权威位置与「不能从这里推断什么」唯一家 = [运行态地图 §二](runtime-map.md)。一次安装 = 一个 `DSH_HOME` = 一个 run bundle；第二个 CEO 新开 home，不复用。开发环境用 `source run/env.sh` 与 `pnpm dsh` 配对；裸 `dsh` 是另一份全局安装。[开发环 §6](guides/dev-loop.md) 解释双 home 与双 DSH。
+**四个位置影响运行**：**代码来源**决定 DSH 版本、**DSH_HOME** 决定 profile / 会话日志 / workspace 登记 / 方法层 / 账本、**会话 cwd（workspace）** 决定公司事实与产物（含 `.dsh-company/bundle.json` v2）、**验证证据**冻结时点事实——四条状态轴的权威与「不能从这里推断什么」唯一家 = [运行态地图 §二](runtime-map.md)。一次安装 = 一个 home + 一个 workspace；第二个公司新开 home。开发环境用 `source run/env.sh` 与 `pnpm company`/`pnpm dsh` 配对；裸 `dsh` 是另一份全局安装。[开发环 §6](guides/dev-loop.md) 解释双 home 与双 DSH。
 
 ## 真实运行链
 
@@ -75,7 +75,7 @@ Web 操作按 [动议合同 §前置](demo.md) 执行：启动输出给出当前
 
 | 现象 | 从哪一层查 | 下一步证据 |
 |---|---|---|
-| 公司角色没有出现 | profile 与最终组合 | `pnpm dsh --profile web --dump-config`，核对 bundle/preset 行 |
+| 公司角色没有出现 | profile 与最终组合 | `pnpm dsh --profile company --dump-config`，核对 bundle/preset 行 |
 | 名册有角色但创建失败 | 实际 preset 挂载 | [preset-smoke](../checks/smoke/preset-smoke.mjs)，dump/名册扫描不能证明 schema 挂载成功 |
 | 工具缺失或委派续驶不可达 | 会话组合、工具目录、团队名册 | [delegation-smoke](../checks/smoke/delegation-smoke.mjs) 与对应机制探针 |
 | 改动没进入当前会话或页面 | 生效方式与构建产物 | [开发环 §2](guides/dev-loop.md)、[构建指南](guides/bootstrap.md)、[培养合同](presets.md) |

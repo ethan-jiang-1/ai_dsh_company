@@ -89,6 +89,11 @@ try {
   if (!existsSync(join(PACK_DIR, 'lib/index.js'))) throw new Error('pack lib/index.js 缺失；先按 bootstrap 构建 pack')
 
   const companyHome = join(home, 'tmp/lifecycle-company-workspace')
+  mkdirSync(companyHome, { recursive: true })
+  mkdirSync(join(companyHome, '.dsh-company'), { recursive: true })
+  writeFileSync(join(companyHome, '.dsh-company/.seed-consent'), `${JSON.stringify({
+    v: 1, packVersion: CURRENT_VERSION, workspace: companyHome, consentedAt: new Date().toISOString(),
+  }, null, 2)}\n`)
   const env = plainNodeEnv({
     ...process.env,
     DSH_HOME: home,
@@ -103,7 +108,7 @@ try {
   const boot = async () => {
     const child = processes.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
     await child.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
-    await waitFor(() => existsSync(join(home, 'bundle.json'))
+    await waitFor(() => existsSync(join(companyHome, '.dsh-company/bundle.json'))
       && existsSync(join(companyHome, 'kb/deliverables-index.json'))
       && existsSync(join(home, 'storages/company_deliverables.json')), '首启落盘')
     const output = child.output
@@ -214,7 +219,7 @@ try {
   try { await run(process.execPath, [cli, 'plugin', '--profile', 'tamper-check', 'add', `file:${tampered}`], { timeoutMs: 180_000 }) } catch { tamperRefused = true }
   check('单字节篡改 tarball 拒绝安装', tamperRefused)
   await boot()
-  const upgradeLogPath = join(home, 'logs/company-pack-upgrade.log')
+  const upgradeLogPath = join(companyHome, '.dsh-company/logs/company-pack-upgrade.log')
   const upgradeLog = existsSync(upgradeLogPath) ? readFileSync(upgradeLogPath, 'utf8') : ''
   check('升级日志点名保留清单', /基部升级/.test(upgradeLog) && /保留用户改过/.test(upgradeLog)
     && upgradeLog.includes('AGENTS.md') && upgradeLog.includes('kb/ceo/CHARTER.md'),
@@ -231,7 +236,7 @@ try {
     && hashFile(homeSentinels.storages) === homeSentinelHashes.storages)
   check('扩张面逐字节不变', hashFile(journal) === expansion.journal
     && hashFile(final) === expansion.final && hashFile(meta) === expansion.meta)
-  const manifestPath = join(home, 'bundle.json')
+  const manifestPath = join(companyHome, '.dsh-company/bundle.json')
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
   check('bundle.json 版本前移', manifest.pack?.version === V2_VERSION && manifest.skeleton?.version === V2_VERSION,
     JSON.stringify({ pack: manifest.pack?.version, skeleton: manifest.skeleton?.version }))
@@ -245,7 +250,7 @@ try {
   await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'remove', 'dsh-company-pack'], { timeoutMs: 180_000 })
   await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${v1}`], { timeoutMs: 180_000 })
   await boot()
-  const downgraded = JSON.parse(readFileSync(join(home, 'bundle.json'), 'utf8'))
+  const downgraded = JSON.parse(readFileSync(join(companyHome, '.dsh-company/bundle.json'), 'utf8'))
   check('降级后 bundle 版本回到 v1', downgraded.pack?.version === CURRENT_VERSION && downgraded.skeleton?.version === CURRENT_VERSION,
     JSON.stringify({ pack: downgraded.pack?.version, skeleton: downgraded.skeleton?.version }))
   check('降级保留改过的 AGENTS.md', readFileSync(join(companyHome, 'AGENTS.md'), 'utf8').includes('lifecycle-keep'))
@@ -271,7 +276,6 @@ try {
   writeFileSync(methodFile, '---\nname: lifecycle-method\ndescription: restore test\n---\n\n# lifecycle-method\n')
   mkdirSync(restoreProfileDir, { recursive: true })
   cpSync(companyHome, restoreCompanyHome, { recursive: true })
-  cpSync(manifestPath, join(restoreHome, 'bundle.json'))
   mkdirSync(join(restoreHome, 'storages'), { recursive: true })
   cpSync(join(home, 'storages/company_deliverables.json'), join(restoreHome, 'storages/company_deliverables.json'))
   mkdirSync(join(restoreHome, 'company'), { recursive: true })
@@ -299,8 +303,8 @@ try {
     await waitFor(() => existsSync(join(restoreHome, 'storages/company_deliverables.json'))
       && existsSync(join(restoreCompanyHome, 'kb/deliverables-index.json')), '恢复后落盘')
     await child.stop()
-    const restoredManifest = JSON.parse(readFileSync(join(restoreHome, 'bundle.json'), 'utf8'))
-    check('business 恢复后 boot 成功且 workspace 可解析', restoredManifest.workspace === 'tmp/lifecycle-company-workspace', restoredManifest.workspace)
+    const restoredManifest = JSON.parse(readFileSync(join(restoreCompanyHome, '.dsh-company/bundle.json'), 'utf8'))
+    check('business 恢复后 boot 成功且 workspace v2 身份在场', restoredManifest.v === 2 && restoredManifest.workspace === undefined && typeof restoredManifest.id === 'string', JSON.stringify({ v: restoredManifest.v, id: restoredManifest.id }))
     check('business 恢复公司盘与扩张面仍在', readFileSync(join(restoreCompanyHome, 'AGENTS.md'), 'utf8').includes('lifecycle-keep')
       && existsSync(join(restoreCompanyHome, 'deliverables/2026-10-25-lifecycle/final.md'))
       && existsSync(join(restoreCompanyHome, 'kb/ceo/journal/2026-10-25-lifecycle.md')))
@@ -332,13 +336,13 @@ try {
     await movedRun(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${movedV2}`], { timeoutMs: 180_000 })
     const movedChild = movedProcesses.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
     await movedChild.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
-    await waitFor(() => existsSync(join(movedHome, 'bundle.json'))
+    await waitFor(() => existsSync(join(movedCompanyHome, '.dsh-company/bundle.json'))
       && existsSync(join(movedCompanyHome, 'kb/deliverables-index.json'))
       && existsSync(join(movedHome, 'storages/company_deliverables.json')), '迁移后落盘')
     await movedChild.stop()
-    const movedManifest = JSON.parse(readFileSync(join(movedHome, 'bundle.json'), 'utf8'))
-    check('迁移后 boot 成功且 workspace 记录仍可解析', movedManifest.workspace === 'tmp/lifecycle-company-workspace',
-      movedManifest.workspace)
+    const movedManifest = JSON.parse(readFileSync(join(movedCompanyHome, '.dsh-company/bundle.json'), 'utf8'))
+    check('迁移后 boot 成功且 workspace v2 身份仍在', movedManifest.v === 2 && movedManifest.workspace === undefined && typeof movedManifest.id === 'string',
+      JSON.stringify({ v: movedManifest.v, id: movedManifest.id }))
     check('迁移后公司盘与扩张面仍在', existsSync(join(movedCompanyHome, 'AGENTS.md'))
       && readFileSync(join(movedCompanyHome, 'AGENTS.md'), 'utf8').includes('lifecycle-keep')
       && existsSync(join(movedCompanyHome, 'deliverables/2026-10-25-lifecycle/final.md')))

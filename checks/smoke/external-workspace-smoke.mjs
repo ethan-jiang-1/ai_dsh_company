@@ -41,6 +41,10 @@ try {
   writeFileSync(join(BASE, 'bin/dsh'), `#!/bin/sh\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(CLI)} "$@"\n`, { mode: 0o755 })
   if (!existsSync(TARBALL)) throw new Error(`缺 ${TARBALL}`)
   check('安装成功', dsh(HOME, ['plugin', '--profile', 'web', 'add', `file:${TARBALL}`]).status === 0)
+  mkdirSync(join(EXT, '.dsh-company'), { recursive: true })
+  writeFileSync(join(EXT, '.dsh-company/.seed-consent'), `${JSON.stringify({
+    v: 1, packVersion: PACK.version, workspace: EXT, consentedAt: new Date().toISOString(),
+  }, null, 2)}\n`)
   console.log('① 外部 workspace 首启')
   const first = await boot(HOME)
   const r = await rpc(first)
@@ -48,8 +52,9 @@ try {
   mkdirSync(join(EXT, 'kb/ceo/journal'), { recursive: true })
   writeFileSync(join(EXT, 'kb/company.md'), '公司名: Acme\n')
   writeFileSync(join(EXT, 'kb/ceo/journal/acme.md'), '# Acme\n')
-  const bundle1 = JSON.parse(readFileSync(join(HOME, 'bundle.json'), 'utf8'))
-  check('bundle.workspace 是外部绝对路径', bundle1.workspace === EXT, bundle1.workspace)
+  const bundle1 = JSON.parse(readFileSync(join(EXT, '.dsh-company/bundle.json'), 'utf8'))
+  check('workspace v2 身份在外部盘', bundle1.v === 2 && bundle1.workspace === undefined && typeof bundle1.id === 'string',
+    JSON.stringify({ v: bundle1.v, id: bundle1.id }))
   await stop(first)
 
   console.log('② 只搬 home（外部盘不动）')
@@ -58,8 +63,9 @@ try {
   const r2 = await rpc(second)
   check('搬 home 后 roster 仍含 ceo', (await r2('agentPresets/list', {})).presets?.some(p => p.id === 'ceo') === true)
   check('搬 home 后公司盘/数据仍在', existsSync(join(EXT, 'kb/company.md')) && readFileSync(join(EXT, 'kb/company.md'), 'utf8').includes('Acme'))
-  const bundle2 = JSON.parse(readFileSync(join(MOVED, 'bundle.json'), 'utf8'))
-  check('搬 home 后 bundle.workspace 仍指向外部盘', bundle2.workspace === EXT, bundle2.workspace)
+  const bundle2 = JSON.parse(readFileSync(join(EXT, '.dsh-company/bundle.json'), 'utf8'))
+  check('搬 home 后 workspace v2 身份仍在外部盘', bundle2.v === 2 && bundle2.id === bundle1.id && bundle2.workspace === undefined,
+    JSON.stringify({ v: bundle2.v, id: bundle2.id }))
   await stop(second)
 } catch (error) { failures.push(error.message); console.error(`external-workspace-smoke: ${error.stack ?? error.message}`) }
 finally {

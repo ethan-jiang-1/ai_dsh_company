@@ -2,6 +2,42 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.5.0 — 2026-11-01
+
+### Changed
+
+- **插件即产品：workspace 自持公司身份与产物**。`bundle.json` 从 `<DSH_HOME>/` 搬到
+  `<workspace>/.dsh-company/bundle.json`（v2：身份跟盘走，去掉 `workspace` 字段，新增 `handbookTarget`）；
+  骨架、业务产物与升级日志跟 workspace，`home` 只留 DSH 运行时与 host 治理（sessions / 凭据 /
+  workspace 登记 / lease / 方法层 / 审计账本）以及一份身份备份。
+- **workspace 必须显式**：`DSH_COMPANY_HOME` 由启动器给出；取消默认 `<DSH_HOME>/company-workspace`。
+  没有 workspace、manifest 损坏或 lease 冲突时停写公司数据并点名原因（DSH 会话仍可用）。
+- **`DSH_COMPANY_REBIND` 退役**：设了只告警，不再执行旧改盘逻辑。
+- **新 workspace 需 seed 同意**：只有 `.dsh-company/.seed-consent` 匹配（workspace + pack 版本）或盘上
+  已有公司标记时才补骨架；直接启动无同意只告警、不写身份。`DSH_COMPANY_BOOTSTRAP=if-missing` 可显式放行。
+- **手册种子碰撞感知**：`AGENTS.md` 优先；已有项目里 `AGENTS.md` 被占用时写 `COMPANY.md`，角色
+  `agent-instructions` 候选同步为 `AGENTS.md` / `COMPANY.md` / `CLAUDE.md`。
+
+### Added
+
+- **`dsh-company` 启动器 + `pnpm company`**：解析/询问 workspace → 建/验 `company` profile（只在缺失时
+  `--from-default-profile web`，已存在只验证不 reset）→ 装/修 pack → 写 seed consent → 设
+  `DSH_HOME`/`DSH_COMPANY_HOME` → 起 web。`--print` 只打印解析结果，`--reset` 只删带 `.company-home`
+  标记的 home（不删 workspace）。repo 形态入口 = `pnpm company`。
+- **boot 自动登记 workspace**：独立 host row（`inject: workspaceRegistry` + async apply）在 Web readiness
+  前把 `DSH_COMPANY_HOME` 登记进 DSH Workspace，浏览器打开即选中目标 workspace（压掉首用 Documents 默认盘）。
+  只登记，不建目录、不 seed、不授权；失败只告警。
+- **`dsh-company --doctor`**：只读检查 home/profile/pack/workspace/seed consent/manifest/身份备份/
+  settings/lease；全绿 0，否则 1。
+- **治理导出**：workspace `.dsh-company/exports/` 只读快照（methods / presented ledger），权威仍在 home；
+  `bundle.json` 升级时同步 home 身份备份。
+
+### Known
+
+- v1→v2 迁移有 keyless spec 与 lifecycle smoke 的升级/降级段；没有在**真实旧 home** 上另做一次人工演练。
+- Web 内 onboarding 选 workspace 未做（v1 用终端启动器询问/`--workspace`）。
+- Windows / 容器 / npm registry 发布未验证/未启用；不冒充支持。
+
 ## 0.4.6 — 2026-10-29
 
 ### Added

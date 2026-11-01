@@ -91,7 +91,7 @@ try {
   const workspace = join(home, 'company-workspace')
   check('首启 copy 公司盘骨架', existsSync(join(workspace, 'AGENTS.md')) && existsSync(join(workspace, 'kb/org.md')))
   check('首启 copy 公司身份', existsSync(join(workspace, 'kb/company.md')))
-  check('首启写 bundle.json', existsSync(join(home, 'bundle.json')))
+  check('首启写 workspace v2 bundle.json', existsSync(join(workspace, '.dsh-company/bundle.json')))
   const created = await rpc('session/create', { request: { cwd: workspace, agentPreset: 'ceo' } })
   check('session/create 挂上 ceo', created?.agentPreset === 'ceo' || created?.preset === 'ceo', JSON.stringify(created).slice(0, 120))
   check('全程不写日用 ~/.dsh', !existsSync(join(fakeHome, '.dsh')))

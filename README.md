@@ -1,23 +1,40 @@
-# ai_dsh_company
+# ai_dsh_company · 梦之队
 
-[![ci](https://github.com/ethan-jiang-1/ai_dsh_company/actions/workflows/ci.yml/badge.svg)](https://github.com/ethan-jiang-1/ai_dsh_company/actions/workflows/ci.yml)
+**插件即产品**：一个 DSH 产品包（`packages/company-pack`）提供五个角色 preset（CEO / VP-Eng /
+VP-Sales / COO / CFO）+ 委派子人格 `researcher`，以独立 `company` profile 启动；启动时指定/询问
+用户 workspace，插件的全部能力施加到那个 workspace 上。
 
-虚拟公司多角色 DSH 插件项目（DSH = DeepSeek Harness，以钉 SHA 的 `vendor/dsh` submodule 为基座）：一个 pack（`packages/company-pack`）扮演一家公司——**梦之队**（Dream Team），
-CEO、VP-Eng、VP-Sales、COO、CFO 各自是独立 preset，事件从 CEO 进出，中间用 Agent Teams 协作。
+- **插件内容在包内**：persona / skills / client / host / 出厂骨架随 `dsh-company-pack` 发布；
+- **run bundle 在用户 workspace**：公司盘、`bundle.json`（v2）、升级日志、治理导出都住
+  `<workspace>/.dsh-company/` 与盘根；
+- **home 只留 DSH 运行时 + host 治理**：sessions / 凭据 / workspace 登记 / lease / 方法层 /
+  审计账本，另留一份身份备份；方法层/账本不搬进模型可写区（D25/M2）。
 
-**首屏快读**（展开 = [运行态地图](./docs/runtime-map.md)）：
+**最小启动（维护者 dev）**
 
-- **四条状态轴**：代码与构建（vendor 只读、src → lib generated）｜DSH 运行态（runtime/，dev bundle 的 home）｜
-  会话事实（company-workspace/，dev bundle 的 workspace；**整树 gitignored**）｜验证证据（snapshots/，冻结）——一轴不推断另一轴。
-- **run bundle = 安装单元**：一次安装 = 一个 DSH home + 一个 company workspace + `bundle.json`；不在 git，
-  第二个 CEO 新开 home。定义与基部/扩张分层 = [运行态地图 §二·五](./docs/runtime-map.md)。
-- **最小启动**：完整公司面 = Web 观察窗（`source run/env.sh` → `pnpm dsh web` → token URL 开门，步骤 =
-  [demo.md](./docs/demo.md)）；`pnpm dsh --profile headless` 只证明通用 CLI，**不是**公司运行。
-- **新 Agent 首跑验收**（推荐、非强制）= [tests/README](./tests/README.md) 首跑节（有 key / 无 key 两条路径）；改东西选检查 = 同文件「改动面 → 最窄检查」表。
+```sh
+git submodule update --init && corepack enable pnpm && pnpm install
+pnpm bundle:init                 # fresh clone：建 dev workspace（已有盘一个字节不动）
+source run/env.sh                # dev home + 裸 dsh 拦截
+pnpm company --workspace "$PWD/company-workspace" --no-open
+# 需要 Web 观察窗时按 docs/demo.md §前置；端口/token 从启动横幅读
+```
 
-- 入口：[驾驭者七问](./docs/orient.md)（白话速读）· [项目地图](./docs/project-map.md)（空间导航）· [运行态地图](./docs/runtime-map.md)（时序与状态轴）·
-  [脚本索引](./checks/README.md)（按用途选入口）· [AGENTS.md](./AGENTS.md)（coding agent）· [设计与决策](./docs/index.md)
-- 安装：`pnpm dsh plugin --profile <名> add link:./packages/company-pack`（开发联调；fresh clone 先 `pnpm bundle:init`）；发布形状 =
-  `npm pack` → 干净 profile `add file:<tarball>`（验收 = release-smoke，[docs/release.md](./docs/release.md)）——装后 profile 的 roster 可见五个公司角色 + researcher 委派子人格；首次启动写 `bundle.json` 与 `company-workspace/`
-- 纪律：**默认严格照做钉住的 DSH 研发纪律，偏离必须登记**（权威对照表见 [AGENTS.md](./AGENTS.md) §纪律；操作手册 [guides/dev-loop](./docs/guides/dev-loop.md)）
-- 任务与推敲：实施任务源 = 已批 RFC（`notes/proposed/`）与用户点名；尚未明确的问题住 [_backlog/issues/](./_backlog/issues/README.md)，按需使用 methods/ 与 research/；历史材料见 [_backlog/_archive/](./_backlog/_archive/README.md)，均不是任务队列
+**安装 / 交付**：`_dist/安装手册.md`（生成物）与 tarball 是唯一收件人路径：
+独立 `DSH_HOME` → `dsh --profile company --from-default-profile web` → `dsh plugin --profile company
+add <tgz>` → 启动器 `--workspace`。安装形状、升级、备份、卸载、回退见
+[docs/release.md](./docs/release.md) 与 `_dist/安装手册.md`。
+
+| 层 | 放什么 | 谁拥有 |
+|---|---|---|
+| 插件包 `packages/company-pack/**` | 角色定义、client/host 代码、出厂骨架（只读） | 维护者；随包版本 |
+| 产品 home `<DSH_HOME>` | `profiles/company`、sessions、凭据、workspace 登记、lease、方法层、审计账本、身份备份 | DSH + host 治理 |
+| 公司 workspace | 公司盘（`AGENTS.md`/`COMPANY.md`、`kb/`、`templates/`、`deliverables/`、`cultivation/`）+ `.dsh-company/`（`bundle.json`、日志、导出） | 用户；可携带的 run bundle |
+
+**入口**：[项目地图](./docs/project-map.md) · [运行态地图](./docs/runtime-map.md) ·
+[profile 合同](./docs/profile.md) · [数据模型](./docs/data-model.md) · [发布合同](./docs/release.md) ·
+[驾驭者七问](./docs/orient.md) · [AGENTS.md](./AGENTS.md)（coding agent）。
+
+**纪律**：默认严格照做钉住的 DSH 研发纪律，偏离必须登记（对照 = [AGENTS.md](./AGENTS.md) §纪律）；
+`vendor/dsh` 是唯一只读权威，`pnpm verify` / `pnpm test` / `pnpm typecheck` 是三条常驻命令。历史
+决策与证据在 [notes](./notes/README.md)；未成熟问题在 [_backlog](./_backlog/README.md)。

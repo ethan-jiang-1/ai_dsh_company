@@ -15,6 +15,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-01-release-and-docs.md](settled_issues/2026-11-01-release-and-docs.md) | 已结；0.5.0 发布面/文档面落地（手册/README/docs/CHANGELOG/门禁）；registry 不启用、Windows/容器不承诺；验收 = release --verify 全绿 | 2026-11-01 |
 | [2026-10-30-cultivation-case-entry.md](settled_issues/2026-10-30-cultivation-case-entry.md) | 已结；培养主任务工作/目标优先单入口第一切片（work 字段 + 单表单 + 预览）；去向 = [case-entry Note](../../notes/implemented/2026-10-30-cultivation-case-entry.md)；对话式梳理/AI 起草另决 | 2026-10-30 |
 | [2026-10-30-cultivation-entry-followup.md](settled_issues/2026-10-30-cultivation-entry-followup.md) | 已结；目标角色显式选择、入口文案、自纠正状态、验证历史逐条、对话失败保留草稿；去向 = [entry-followup Note](../../notes/implemented/2026-10-30-cultivation-entry-followup.md)；主任务 IA 另决 | 2026-10-30 |
 | [2026-10-29-cultivation-experience.md](settled_issues/2026-10-29-cultivation-experience.md) | 已结；培养主线（案例工坊 A）+ 来源/决定/验证历史落地；去向 = [implemented Note](../../notes/implemented/2026-10-30-cultivation-work-improvement-traceability.md)；真人走查留 Note 后续观察 | 2026-10-30 |

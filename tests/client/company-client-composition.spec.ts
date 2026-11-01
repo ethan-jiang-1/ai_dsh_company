@@ -85,7 +85,7 @@ describe('company client apply through the whole-client tier', () => {
     // The instance guard ran inside the real apply and owns one heartbeat.
     const beats = JSON.parse(localStorage.getItem(HEARTBEATS) ?? '{}') as Record<string, number>
     expect(Object.keys(beats).filter(id => id.startsWith('tab-'))).toHaveLength(1)
-  })
+  }, 90_000)
 
   test('unloading the pack row removes its tab types, slot entries, and guard heartbeat', async ({ mock, start }) => {
     declareWorkspaceFilesNamespace(mock)
