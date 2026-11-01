@@ -47,7 +47,7 @@ const rpc = async i => { const cookie = await companyCookie({ fetch: globalThis.
 
 try {
   rmSync(BASE, { recursive: true, force: true })
-  mkdirSync(join(BASE, 'bin'), { recursive: true }); mkdirSync(env.HOME, { recursive: true })
+  mkdirSync(join(BASE, 'bin'), { recursive: true }); mkdirSync(env.HOME, { recursive: true }); mkdirSync(WS, { recursive: true })
   writeFileSync(join(BASE, 'bin/dsh'), `#!/bin/sh\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(CLI)} "$@"\n`, { mode: 0o755 })
   if (!existsSync(TARBALL)) throw new Error(`缺 ${TARBALL}；先导出 _dist`)
   console.log(`interrupted-install-smoke: ${TARBALL.split('/').pop()}`)

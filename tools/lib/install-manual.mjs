@@ -23,7 +23,7 @@ export function renderInstallManual(input) {
 | 安装包 | ${q(input.tarballName)}（与本手册同目录） |
 | 校验（sha256） | ${q(input.digest)} |
 | 打包日期 | ${input.date} |
-| 适用 DSH | ${q('engines.dsh')} 窗口内（${q('>=0.2.1-rc.2 <0.3.0')}；已验证 ${q('0.2.1-rc.2')} 与 ${q('0.2.1-rc.5')}） |
+| 适用 DSH | ${q('engines.dsh')} 窗口内（${q('>=0.2.1-rc.2 <0.3.0')}；已验证基线 ${q('dsh-v0.2.1-rc.2')} 与 ${q('0.2.1-rc.5')}） |
 | 许可 | MIT（${q('LICENSE')} 随包） |
 
 这个安装包是自包含的：bundle 补丁、五个角色 preset、浏览器端、host 行，以及 ${q('content/')}

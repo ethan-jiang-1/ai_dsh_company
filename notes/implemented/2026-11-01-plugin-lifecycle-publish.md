@@ -1,6 +1,6 @@
 # 2026-11-01 · 插件生命周期与发布：默认安装路径修复、npm 身份与市场 handoff
 
-状态：已交付（P0/P1 已落地；P2–P5 在本发布轮续作，最终回执见卡）
+状态：已交付（2026-11-02；P0–P5 落地，0.7.0 发布字节与验收证据在下方）
 
 > 上游：[插件生命周期与发布卡](../../_backlog/issues/2026-11-01-plugin-lifecycle-publish.md)（推敲中，实施回执在读）、
 > 研究题 [plugin-lifecycle-publish](../../_backlog/research/plugin-lifecycle-publish/README.md)
@@ -54,9 +54,25 @@
 | 结构门禁 | `pnpm verify` | ALL PASS |
 | npm 身份 | `npm publish --dry-run` + `npm pack --json` | 127 files；LICENSE/README 在场；无 `bin/`；public access；无 EPRIVATE（dry-run） |
 
+## 发布字节与验收（0.7.0）
+
+| 项 | 值 |
+|---|---|
+| 版本 | `0.7.0`（tarball `_dist/dsh-company-pack-0.7.0.tgz`） |
+| sha256 | `10966e7d028914263eb421ebefceda2256b9484674f3ecfc3d071ed564be57e5` |
+| 手册 | `_dist/安装手册.md`（生成；MIT/精确卸载面/市场开关） |
+| manifest | `_dist/release-manifest.json`（`pnpm release --verify` 全绿后写） |
+| market index | `node tools/market-index.mjs --check` → `dsh-company-pack@0.7.0`，DSH 校验器通过；`_dist/market/` 可托管 |
+
+认证档（实跑）：`pnpm release --verify` 全绿（verify / test 1027 passed / release-smoke /
+client-load-smoke / preset-smoke / present-catalog-smoke）；`interrupted-install-smoke` ALL PASS
+（remove 后 run bundle / home 身份 / presented ledger 残留）；`upgrade-while-running-smoke` ALL PASS
+（运行中 remove+add 0.7.1；重启后身份保留创建版本 0.7.0、依赖到 0.7.1、旧 session 仍在）；
+rc.5 干净 profile 应用内安装 `application: applied` + 六 preset + `session/create`。
+
 ## 未做
 
-- 真实 `npm publish`（需 npm 凭据；D6 人工 handoff）与 market index 托管（P3/P4）。
+- 真实 `npm publish`（需 npm 凭据；D6 人工 handoff）与 market index 的 https 托管（步骤 = [publish-handoff](../../docs/guides/publish-handoff.md)）。
 - 真模型会话里的 `session_search` 调用（keyless 冒烟只证 provider/tool active + 索引路径配置；
   首次 agent 搜索才懒开索引）。
 - Windows/Linux、Desktop 真机、容器。

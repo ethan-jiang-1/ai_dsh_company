@@ -42,7 +42,7 @@ const stop = i => new Promise(done => { active.delete(i.child); if (i.child.exit
 const rpc = async i => { const cookie = await companyCookie({ fetch: globalThis.fetch, base: i.base, token: i.token }); return companyRpc({ fetch: globalThis.fetch, base: i.base, cookie, prefix: 'upw-' }) }
 
 try {
-  rmSync(BASE, { recursive: true, force: true }); mkdirSync(join(BASE, 'bin'), { recursive: true }); mkdirSync(join(BASE, 'user'), { recursive: true })
+  rmSync(BASE, { recursive: true, force: true }); mkdirSync(join(BASE, 'bin'), { recursive: true }); mkdirSync(join(BASE, 'user'), { recursive: true }); mkdirSync(WS, { recursive: true })
   writeFileSync(join(BASE, 'bin/dsh'), `#!/bin/sh\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(CLI)} "$@"\n`, { mode: 0o755 })
   if (!existsSync(V1)) throw new Error(`缺 ${V1}；先导出 _dist`)
   check('当前版安装成功', dsh(['plugin', '--profile', 'web', 'add', `file:${V1}`]).status === 0)
@@ -50,6 +50,9 @@ try {
   const created = await oldRpc('session/create', { request: { cwd: WS, agentPreset: 'ceo' } })
   const sessionId = created?.sessionId ?? created?.id
   check('旧实例可建 session', created?.agentPreset === 'ceo')
+  const v1Manifest = join(WS, '.dsh-company/bundle.json')
+  const v1Bundle = existsSync(v1Manifest) ? JSON.parse(readFileSync(v1Manifest, 'utf8')) : null
+  check(`V1 首启写身份 ${PACK.version}`, v1Bundle?.pack?.version === PACK.version, String(v1Bundle?.pack?.version ?? 'missing'))
   mkdirSync(join(WS, '.dsh-company/kb/ceo/journal'), { recursive: true })
   writeFileSync(join(WS, '.dsh-company/kb/company.md'), '公司名: Acme\n')
   writeFileSync(join(WS, '.dsh-company/kb/ceo/journal/acme.md'), '# Acme\n')
@@ -86,7 +89,7 @@ try {
   // 当前安装版本看 profile dependency。升级保留身份是刻意行为（见安装手册「升级」）。
   check(`bundle 身份保留创建版本 ${PACK.version}`, bundle?.pack?.version === PACK.version, String(bundle?.pack?.version))
   check(`profile 依赖已到 ${V2_VERSION}`,
-    readFileSync(join(profile(), 'package.json'), 'utf8').includes(V2_VERSION))
+    readFileSync(join(HOME, 'profiles/web/package.json'), 'utf8').includes(V2_VERSION))
   check('重启后 roster 含 ceo', (await nextRpc('agentPresets/list', {})).presets?.some(p => p.id === 'ceo') === true)
   check('旧 session 仍在 session/list', (await nextRpc('session/list', { _request: {} })).items?.some(item => item.sessionId === sessionId) === true, String(sessionId))
   check('数据仍在', readFileSync(join(WS, '.dsh-company/kb/company.md'), 'utf8').includes('Acme') && readFileSync(join(WS, '.dsh-company/kb/ceo/journal/acme.md'), 'utf8').includes('Acme'))

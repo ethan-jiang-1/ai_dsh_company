@@ -204,27 +204,42 @@ opened: 2026-11-01
 | D5 | 首版版本/引擎窗口 | 0.7.0 + 保持窗口 | 版本语义与修复不对应 |
 | D6 | 发布动作 | v1 人工 + 清单 | 没人拥有 publish，P3 无法执行 |
 
-## 实施回执（2026-11-01，进行中）
+## 实施回执（2026-11-02，0.7.0）
 
 **P0 完成**：`cordis.patch.yml` 去掉 `session-query-sqlite` 改值替换，改为 `company-session-search`
 （insert + isolate：provider + tool）；六个 preset 的 `tool-session-query` 行收敛；`preset-smoke`
-改用 `pluginInventory/list` 断言组行 active；`release-smoke` 新增 ④c 应用内安装断言。证据 =
-[实施 Note](../../notes/implemented/2026-11-01-plugin-lifecycle-publish.md)。
+改用 `pluginInventory/list` 断言组行 active；`release-smoke` 新增 ④c 应用内安装断言。
+rc.2 与 rc.5 的 in-app 安装均为 `application: applied`。
 
 **P1 完成**：`license: MIT` + `LICENSE`、`author`/`homepage`/`bugs`/`keywords`/`publishConfig`；
 `private` 移除；`pack-engines`/`pack-files` 改为发布姿态；README/手册模板/`docs/release.md` 同步。
+`npm publish --dry-run`：127 files、LICENSE 在场、无 `bin/`、public access。
 
-验证（真跑）：`pnpm verify` ALL PASS；`pnpm test` 1025 passed / 3 skipped；
-`preset-smoke` ALL PASS；`release-smoke` ALL PASS（含应用内安装 `applied`）；
-rc.5 干净 profile in-app 安装 `applied`；`npm publish --dry-run` 127 files / LICENSE 在场 / 无 bin。
-P2–P5（provenance、market index、升级/卸载文档与残留测试、最终收口）继续。
+**P2 完成**：`pnpm release --prepare`（0.7.0）→ `--verify` 六项认证档全绿；tarball
+`sha256=10966e7d…e57e5`；manifest 记录版本/HEAD/检查项（`--stamp` 后 `dirty=false`）。
+
+**P3 完成（到 handoff）**：`tools/market-index.mjs`（manifest→format 1 + DSH 校验器真验）、
+`tests/company/market-index.spec.ts`、`docs/guides/publish-handoff.md`；`_dist/market/index.json`
+以 `dsh-company-pack@0.7.0` 通过校验。**真实 npm publish 与 https 托管 = 人工 handoff（D6）**，
+本机无 npm 凭据，未执行。
+
+**P4 完成**：手册/README 改「外部插件无 Update / 卸载再装」与精确卸载面；
+`interrupted-install-smoke` ALL PASS（remove 后 run bundle / home 身份 / presented ledger 残留）；
+`upgrade-while-running-smoke` ALL PASS（运行中 remove+add 0.7.1；重启后身份保留 0.7.0、依赖到 0.7.1、
+旧 session 仍在）；`bundle.json.pack` 语义写清。
+
+**P5 完成**：README 补 Verify/Compatibility；locale/description 改公共口吻；decisions D53/D54；
+docs 预算内；`pnpm verify` / `pnpm test`（1027 passed / 3 skipped）/ `pnpm typecheck` 全绿。
+
+验收对照：①装/②起/⑤产物/⑥升级/⑦卸载/⑧文档/⑨门禁 = 本轮已验证；③ npm 身份 dry-run 通过，
+真实 publish 留 handoff；④ index 通过校验、托管留 handoff；⑩ 发布后回执待人工 publish 后补。
 
 ## 下一步
 
-1. 用户对 D1–D6 给 yes/no/改；至少 D1–D4 有答案后 P0 才能开工。
-2. P0 先修默认安装路径（它不依赖 npm/市场决策），拿到 rc.2 + rc.5 两条路径的绿证据。
-3. P1–P3 依赖 D2/D3/D4/D6；P4/P5 可在 P0 后并行准备文档与测试。
-4. 本卡保持 `推敲中`；不因研究完成而自动进入实施。
+1. 用户验收 0.7.0 的发布字节与 [实现 Note](../../notes/implemented/2026-11-01-plugin-lifecycle-publish.md)。
+2. 要真发时按 [publish-handoff](../../docs/guides/publish-handoff.md)：`npm publish` → vendor generator
+   生成 index → https 托管 → Discover 验证；回来后补版本页/index URL 回执。
+3. 本卡保持 `推敲中`；真实 publish 与用户验收是关闭前置，不由 agent 代判。
 
 ## 关联
 
