@@ -230,7 +230,7 @@ git -C vendor/dsh rev-parse 'dsh-v0.2.1-rc.2^{commit}'
 - `docs/decisions.md` 62/62 零头寸（R5-17 剩余面）、`checks/README.md` 手工库存（R5-18）、dev-loop 空壳节（R5-19）、归档链接只查 `.md`（R5-20）；
 - 剩余约 13 处源码文本断言（`client-face` 的 toolview 优先级是刻意保留的装配面）。
 
-## 9. A- 收口（2026-11-03，0.8.1 @ deb1f38）
+## 9. A- 收口（2026-11-03，0.8.1；发布字节 commit deb1f38）
 
 | 维 | 分 | 一句话 |
 |---|---|---|

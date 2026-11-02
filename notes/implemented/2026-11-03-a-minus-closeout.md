@@ -5,7 +5,7 @@
 > 上游 = [第五轮七维打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round5.md)
 > 尺子：A- = **主反馈路径无已知假绿、每维有可复跑判据、残余只余文档化边界**；A = 无残余。
 
-## 复评（当前树，0.8.1 @ deb1f38）
+## 复评（当前树，0.8.1；发布字节 commit deb1f38）
 
 | 维 | 分 | 判据 |
 |---|---|---|
@@ -31,7 +31,7 @@ pnpm verify     # ALL PASS（53 门 + 2 无对象）
 pnpm test       # 134 files / 1076 tests（0 skipped）
 pnpm typecheck  # exit 0
 release --verify# 全绿（release-smoke 含卸载/重装；0.8.1）
-release --check # READY 0.8.1 @ deb1f38（tgz 127 entries；7 项检查 pass）
+release --check # READY 0.8.1（发布字节 commit deb1f38；manifest 随收盘提交重新 stamp；tgz 127 entries）
 ```
 
 ## 仍未做（不阻塞 A-，需外部决策）

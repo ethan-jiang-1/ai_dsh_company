@@ -189,9 +189,6 @@ importers:
       '@deepseek-ai/dsh-plan-mode':
         specifier: ^0.2.1-rc.2
         version: link:../../vendor/dsh/packages/plan/plan-mode
-      '@deepseek-ai/dsh-session-persistence-jsonl':
-        specifier: ^0.2.1-rc.2
-        version: link:../../vendor/dsh/packages/session/session-persistence-jsonl
       '@deepseek-ai/dsh-session-query-sqlite':
         specifier: ^0.2.1-rc.2
         version: link:../../vendor/dsh/packages/session-query/session-query-sqlite
@@ -246,12 +243,6 @@ importers:
       '@deepseek-ai/dsh-tool-web':
         specifier: ^0.2.1-rc.2
         version: link:../../vendor/dsh/packages/web/tool-web
-      '@deepseek-ai/dsh-tool-workflow':
-        specifier: ^0.2.1-rc.2
-        version: link:../../vendor/dsh/packages/workflow/tool-workflow
-      '@deepseek-ai/dsh-workflow-ptc':
-        specifier: ^0.2.1-rc.2
-        version: link:../../vendor/dsh/packages/workflow/workflow-ptc
     devDependencies:
       '@deepseek-ai/cordis':
         specifier: workspace:*
