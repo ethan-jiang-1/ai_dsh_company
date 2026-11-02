@@ -3,13 +3,13 @@
 状态：implemented（2026-11-03；A- D1 第一批）
 
 > 上游 = [第五轮七维打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round5.md)
-> 评分 GAP：D1 手工库存（`checks/README` 80 行逐脚本枚举，`script-index` 反向强制）；9/32 文档无“什么时候读”。
+> 评分 GAP：D1 手工库存（`checks/README.md` 80 行逐脚本枚举，`script-index` 反向强制）；9/32 文档无“什么时候读”。
 
 ## 决定
 
 1. **公开入口库存改为生成物**：`tools/lib/checks-index.mjs` 扫描 smoke/audit/probes/tools 顶层并渲染
    `checks/INDEX.generated.md`；`tools/checks-index.mjs --write` 更新；`script-index` 门禁校验生成物与目录
-   逐字一致，并检查 README 已链接它。`checks/README` 只留快速选择 + 清单指针（80→56 行）。
+   逐字一致，并检查 README 已链接它。`checks/README.md` 只留快速选择 + 清单指针（80→56 行）。
 2. **补齐 32/32 文档“什么时候读”**：9 份缺失文档各加一行（零头寸的 3 份合并进现有 `>` 首行，不增长行数）。
 3. **README 行预算随内容下调** 85→59（+5% 棘轮）。
 
@@ -30,7 +30,7 @@ pnpm verify                                # ALL PASS
 pnpm test                                  # 131 spec / 1071 例（1068 pass / 3 skip）
 ```
 
-红证（doc-budget）：`checks/README` 上限临时 59→50 → `FAIL 56 行超上限 50`；还原 → PASS。
+红证（doc-budget）：`checks/README.md` 上限临时 59→50 → `FAIL 56 行超上限 50`；还原 → PASS。
 
 ## 后果与边界
 

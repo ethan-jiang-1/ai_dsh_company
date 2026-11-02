@@ -5,6 +5,7 @@
  * （不需要 DOM、不需要模型）。状态只从持久的 call/result 推导，不读活状态（可回放）。
  */
 import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
+import { isRecord } from './guards.ts'
 
 /** 卡片生命周期。 */
 export type CardState = 'running' | 'ok' | 'error' | 'stopped'
@@ -43,9 +44,7 @@ export function resultTextOf(block: ToolCallViewProps['block']): string | null {
 export function parseArgsObject(argsRaw: string): Record<string, unknown> | null {
   try {
     const parsed = JSON.parse(argsRaw) as unknown
-    if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-      return parsed as Record<string, unknown>
-    }
+    if (isRecord(parsed)) return parsed
   } catch {
     // 截断的 JSON：交给调用方回退。
   }

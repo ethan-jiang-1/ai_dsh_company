@@ -29,6 +29,8 @@ describe('pack 导出形态守卫（Loader unwrapExports round-trip）', () => {
     //（服务本体由 base bundle 挂载；preset-spec 的 deps ∪ peers 已覆盖 dsh-commands）。
     expect(unwrapped.inject).toEqual(['tools', 'approval', 'commands', 'workspaceRegistry'])
     expect(typeof unwrapped.apply).toBe('function')
+    // 2026-11-03 A- D2：公开面收窄为 loader 需要的 inject/apply；presence/doors 不再从根 barrel 漏出。
+    expect(Object.keys(hostEntry).sort()).toEqual(['apply', 'inject'])
   })
 
   it('client 半：无 default export，inject/apply 穿过 unwrapExports 仍在', () => {

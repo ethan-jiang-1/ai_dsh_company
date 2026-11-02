@@ -9,13 +9,13 @@ import { join } from 'node:path'
  * 纯函数测试 + **live bundle 真台账**断言（2026-10-24 起台账只住 dev run bundle，不进 git）。
  *
  * - 纯解析/统计：始终跑（无盘依赖）。
- * - 真台账：只在 dev bundle 在场时跑（`company-workspace/kb/motion-ledger.md`）；fresh clone / CI
+ * - 真台账：只在 dev bundle 在场时跑（`company-workspace/.dsh-company/kb/motion-ledger.md`）；fresh clone / CI
  *   没有它，跳过而不是造一个假台账——live 数据口径由 `ledger-participation` 门禁在盘上时守。
  *   真页面渲染是认证档：浏览器开真页面走查。
  */
 
-const LIVE_LEDGER = join(ROOT, 'company-workspace/kb/motion-ledger.md')
-const LIVE_META = join(ROOT, 'company-workspace/deliverables-archive/2026-10-10-ai-transformation-2026-v4/meta.md')
+const LIVE_LEDGER = join(ROOT, 'company-workspace/.dsh-company/kb/motion-ledger.md')
+const LIVE_META = join(ROOT, 'company-workspace/.dsh-company/deliverables-archive/2026-10-10-ai-transformation-2026-v4/meta.md')
 const hasLive = existsSync(LIVE_LEDGER) && existsSync(LIVE_META)
 const REAL_LEDGER = hasLive ? readFileSync(LIVE_LEDGER, 'utf8') : ''
 

@@ -40,9 +40,6 @@ import { prepareCompanyRuntime } from './host/runtime-guard.ts'
 import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace-registry.ts'
 import { canonicalPath } from './host/paths.ts'
 
-export * from './lib/presence.ts'
-export * from './lib/doors.ts'
-
 /** Host half registers tools, approval and the cultivation command family. */
 export const inject = ['tools', 'approval', 'commands', 'workspaceRegistry']
 
