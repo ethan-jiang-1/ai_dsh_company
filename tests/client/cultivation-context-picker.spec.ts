@@ -103,6 +103,17 @@ describe('背景选择面板（R5-27）', () => {
     expect(host.textContent).toContain('还没有可引用的会话或成品')
   })
 
+  it('成品目录不可达时显示 problem，不静默空面板', async () => {
+    const host = await mount(createElement(CultivationContextPicker, props({
+      sources: {
+        listSessions: () => ({ ok: true as const, value: [current, recent] }),
+        listDeliverables: async () => ({ ok: false as const, problem: '成品索引不可读' }),
+        readPreview: async () => ({ ok: true as const }),
+      },
+    })))
+    expect(host.textContent).toContain('成品索引不可读')
+  })
+
   it('Escape 取消（不选中任何项）', async () => {
     const onCancel = vi.fn()
     const host = await mount(createElement(CultivationContextPicker, props({ onCancel })))

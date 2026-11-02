@@ -46,7 +46,7 @@
 ## 3. 证据纪律（DSH 教义的本仓投影）
 
 1. **验证世界，不信自报**：断言从会话日志、在盘文件、RPC/外部观察取；agent 自述与模型正文不算证据。
-2. **mock 白名单**：只许替非确定边界（模型/网络/时钟），下游保持真实现；每个替身写明"证明不了什么"。本仓 keyless 层零**未列入白名单**的 mock；当前白名单内两处：`company-client-composition` 的 RemoteMock（网络边界）、`foundation-safety` 的 `vi.mock('node:os')`（环境边界）。
+2. **mock 白名单**：只许替非确定边界（模型/网络/时钟），下游保持真实现；每个替身写明"证明不了什么"。本仓 keyless 层零**未列入白名单**的模块 mock；当前模块替身两处：`company-client-composition` 的 RemoteMock（网络边界）、`foundation-safety` 的 `vi.mock('node:os')`（环境边界）。**参数注入式假件**（如 `probe-web.spec` 把 spawn/fetch 作为参数传入）不是模块 mock；每个 spec 头注自述“证明不了什么”，不占白名单。
 3. **真实入口**："能跑"的证据取自真实形态（`pnpm dsh`、真挂载、发布产物）；手搭组装不算数。
 4. **单向归因**：单跑才绿 = spec 自身缺陷，不赖环境；测试获取的资源自己负责到 teardown。
 5. **掩盖黑名单**：加 sleep、加超时不指认等待状态、加重试、整文件串行化、弱化断言、改归一化凑绿——都不是修法。retry 只许出现在真模型档。

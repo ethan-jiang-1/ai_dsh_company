@@ -299,8 +299,11 @@ export function setPresentedAudit(
   let next: PresentedLedger = { schema: 1, updatedAt: now.toISOString(), paths, slugs: base.slugs }
   // true 同时写 slug 便于归档后延续；false 只认精确 path，不写 slug。
   if (presented) {
-    const slug = rel.split('/')[1] ?? ''
-    if (slug !== '') next = { ...next, slugs: { ...next.slugs, [slug.replace(/^\d{4}-\d{2}-\d{2}-/, '')]: true } }
+    // v3 路径是 `.dsh-company/deliverables/<dir>/final.md`：slug 取 final.md 的父目录，
+    // 不能按旧 v2 `deliverables/<dir>/final.md` 的 split[1]（那会取到字面 `deliverables`）。
+    const dirName = rel.split('/').slice(-2)[0] ?? ''
+    const slug = dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '')
+    if (slug !== '') next = { ...next, slugs: { ...next.slugs, [slug]: true } }
   }
   writePresentedLedger(companyHome, next)
   return { ledger: next, path: rel }

@@ -9,6 +9,7 @@ import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import {
+  auditRelPath,
   catalogPath,
   emptyPresentedLedger,
   mergePresented,
@@ -16,7 +17,9 @@ import {
   presentedFromSessions,
   readCatalog,
   readCatalogState,
+  readPresentedLedger,
   regenerateCatalog,
+  setPresentedAudit,
 } from '../../packages/company-pack/src/host/catalog.ts'
 import {
   ledgerSlugsFromText,
@@ -194,6 +197,35 @@ describe('host catalog', () => {
     expect([...result.paths]).toEqual([expected])
     expect([...result.slugs]).toEqual(['alpha'])
     expect(disposed.sort()).toEqual(['s-in', 's-sub'])
+  })
+
+  it('auditRelPath 只认交付物根下的 final.md（拒绝 meta / 穿越 / 外部绝对路径）', () => {
+    const root = workspace()
+    deliverable(root)
+    const rel = `${RUN_BUNDLE_PATHS.deliverables}/2026-10-25-alpha/final.md`
+    expect(auditRelPath(root, rel)).toEqual({ rel })
+    expect(auditRelPath(root, join(root, rel))).toEqual({ rel })
+    expect(auditRelPath(root, `${RUN_BUNDLE_PATHS.deliverables}/2026-10-25-alpha/meta.md`).warning).toContain('final.md')
+    expect(auditRelPath(root, '../escape/final.md').warning).toBeDefined()
+    expect(auditRelPath(root, '/tmp/elsewhere/final.md').warning).toBeDefined()
+  })
+
+  it('setPresentedAudit：true 同时写 path+slug；false 只认精确 path；账本可回读', () => {
+    const root = workspace()
+    deliverable(root)
+    const rel = `${RUN_BUNDLE_PATHS.deliverables}/2026-10-25-alpha/final.md`
+    const yes = setPresentedAudit(root, rel, true, new Date('2026-11-03T00:00:00Z'))
+    expect(yes.path).toBe(rel)
+    expect(yes.ledger?.paths[rel]).toBe(true)
+    expect(yes.ledger?.slugs.alpha).toBe(true)
+    const read = readPresentedLedger(root)
+    expect(read.status).toBe('ok')
+    const no = setPresentedAudit(root, rel, false)
+    expect(no.ledger?.paths[rel]).toBe(false)
+    // 坏账本不被覆盖，返回可读 warning
+    writeFileSync(join(root, RUN_BUNDLE_PATHS.presented), '{not-json')
+    const bad = setPresentedAudit(root, rel, true)
+    expect(bad.warning).toContain('损坏')
   })
 
   it('meta 缺行/枚举外标出 metaProblem，不冒充形状通过', () => {
