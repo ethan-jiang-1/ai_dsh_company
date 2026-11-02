@@ -4,7 +4,9 @@
 
 ## 活跃清单
 
-当前活跃 0 张；v3、生命周期与 dev/产品路径 parity 卡已结归档。已结卡见[归档索引](../_archive/README.md)。
+当前活跃 1 张；v3、生命周期与 dev/产品路径 parity 卡已结归档。已结卡见[归档索引](../_archive/README.md)。
+
+- [去掉 Trajectory 页签与 New terminal 入口](2026-11-02-remove-trajectory-terminal-ui.md) — 主区只留 Chat + 培养；方案 = pack patch 禁 `ui-trajectory` / `ui-sidebar-terminal` 两行；待落地。
 
 ## 近期归档
 
