@@ -229,3 +229,17 @@ git -C vendor/dsh rev-parse 'dsh-v0.2.1-rc.2^{commit}'
 - npm publish / HTTPS 市场托管仍人工；`market-index.staged.json` 标记 0.7.2 未发布（发布后删）；
 - `docs/decisions.md` 62/62 零头寸（R5-17 剩余面）、`checks/README.md` 手工库存（R5-18）、dev-loop 空壳节（R5-19）、归档链接只查 `.md`（R5-20）；
 - 剩余约 13 处源码文本断言（`client-face` 的 toolview 优先级是刻意保留的装配面）。
+
+## 9. A- 收口（2026-11-03，0.8.1 @ deb1f38）
+
+| 维 | 分 | 一句话 |
+|---|---|---|
+| D1 | A- | 库存生成化 + 32/32 when-to-read；残余为旧锚点重定向与零头寸棘轮 |
+| D2 | A- | 0 环/0 反向边；640 行 spec 拆三份；公开面 apply/inject；残余 6 个源码断言 spec/P3 长函数 |
+| D3 | A- | 授权单一真相源；语义审/完成定义/收尾各单家 |
+| D4 | A- | content/退役路径/READY/兼容表述；残余冻结归档断链与 decisions 零头寸 |
+| D5 | A- | 覆盖 86.72/78.65；company-tabs 75.92、catalog 76.29、skip 0；presets 真挂载在 preset-smoke |
+| D6 | A- | isolated golden/诊断/错误留痕/tee/--steps；残余为全链路与证据寿命边界 |
+| D7 | A- | 0.8.1 发布；peers 47；web-only/品牌偏离文档化；workspaceRegistry 是 web 产品面 |
+
+详见 [A- 收口 Note](../../../notes/implemented/2026-11-03-a-minus-closeout.md)。

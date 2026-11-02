@@ -11,11 +11,11 @@ opened: 2026-11-03
 
 **问题与期望结果：** 用户要求以 fresh agent 视角重评七个维度（文档/代码渐进披露、代码与测试层次、文档—执行—验收结构、上下文腐化、测试资产、反馈通路、DSH 插件约定），并先评估、REVIEW 后再持续改善。期望结果 = 一份带 file:line 与实跑读数的分级发现 + 一个经用户选批的改善序列。
 
-**当前情况：** 第五轮审计已完成，报告 = [七维审计](../research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)。**批次 A + E 部分 + B（授权门牌）+ C（0.7.2 重打）已落地**（R5-01/02/08/10/11/21/22/30/31/33，R5-06 培养壳；Note 见「已落地」节）。当前读数：`pnpm verify` 53 门 ALL PASS + 2 SKIP；`pnpm test` **134 spec / 1076 例（0 skipped on dev home）**；版本 **0.8.1**（catalog 修复，`release --verify` 全绿）；`pnpm typecheck` exit 0；`release-smoke` **44 PASS**（含卸载/重装）；`release --check` **READY 0.7.2 @ 419839e**；`client-load-smoke` ALL PASS；`ui-scene-smoke`（dev + isolated golden）9/9 页签 ALL PASS。审计基线（before）见报告。七维评分：D1 B / D2 B / D3 B- / D4 C+ / D5 B / D6 C / D7 B-。
+**当前情况：** 七维已全部 A-（D1/D2/D5/D7 已从 B+ 提升；D3/D4/D6 维持）；0.8.1 READY @ deb1f38。第五轮审计已完成，报告 = [七维审计](../research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)。**批次 A + E 部分 + B（授权门牌）+ C（0.7.2 重打）已落地**（R5-01/02/08/10/11/21/22/30/31/33，R5-06 培养壳；Note 见「已落地」节）。当前读数：`pnpm verify` 53 门 ALL PASS + 2 SKIP；`pnpm test` **134 spec / 1076 例（0 skipped on dev home）**；版本 **0.8.1**（catalog 修复，`release --verify` 全绿）；`pnpm typecheck` exit 0；`release-smoke` **44 PASS**（含卸载/重装）；`release --check` **READY 0.7.2 @ 419839e**；`client-load-smoke` ALL PASS；`ui-scene-smoke`（dev + isolated golden）9/9 页签 ALL PASS。审计基线（before）见报告。七维评分：D1 B / D2 B / D3 B- / D4 C+ / D5 B / D6 C / D7 B-。
 
-**未决问题：** ① D1/D2/D5/D7 到 A- 的剩余 GAP（新 goal 跟踪）；② D7 的 web-only `inject`、`$DSH_HOME/company/` 自造树、品牌槽半边按「文档化偏离」保留还是改成 DSH 原生载体；③ 真模型/Desktop/npm publish 的验收授权。B/C 已落地。
+**未决问题：** 七维已全部复评 ≥ A-（0.8.1 @ deb1f38）。剩余 = 文档化边界：D7 web-only/品牌最小侵入/`$DSH_HOME/company/` 合同；D5 presets 真挂载在 preset-smoke；D6 全链路与证据寿命。外部决策 = npm publish/市场托管、真模型/Desktop 验收。
 
-**下一步：** 按新 goal 把 D1/D2/D5/D7 从 B+ 打磨到 A-（D3/D4/D6 维持 A-），每批复评；细节见报告 §5/§8。
+**下一步：** 无自动推进项；等用户 review A- 收口与 0.8.1（breaking 0.8.0 的公开面收窄需重点看）。
 
 ## 已落地（批次 A，2026-11-03）
 
