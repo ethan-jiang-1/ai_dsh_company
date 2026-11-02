@@ -47,8 +47,9 @@ npm CLI / `dsh web` 的 Plugins 页需要 pnpm 在 PATH（或 `corepack enable p
 ## Compatibility
 
 - `engines.dsh`（`>=0.2.1-rc.2 <0.3.0`）是唯一硬版本门；有它时 peer 范围不参与判定。
-- 已验证运行时：`dsh-v0.2.1-rc.2`（`release-smoke`）与 `0.2.1-rc.5`（生命周期实验的 host 面：
-  六 preset / `session/create` / client 模块表）。窗口内其他 0.2.x 未执行，不等于承诺。
+- 已验证运行时：`dsh-v0.2.1-rc.2`（`release-smoke` 全链）与 `0.2.1-rc.5`（仅生命周期实验的 host 面：
+  六 preset / `session/create` / in-app 安装 / client 模块表；**不在兼容台账**，不等于全链认证）。
+  窗口内其他 0.2.x 未执行，不等于承诺。
 - market index 里的 `engines.dsh` 只用于展示/推荐；安装时以包自身 manifest 为准。
 - 不兼容时安装会被拒绝并回滚；`allow-version` 是用户的逃生门，不是作者兼容策略。
 

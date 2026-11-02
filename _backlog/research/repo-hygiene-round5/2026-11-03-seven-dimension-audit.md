@@ -6,7 +6,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 # 第五轮七维打扫审计（2026-11-03）
 
 > 服务：[第五轮七维打扫卡](../../issues/2026-11-03-repo-hygiene-round5.md)
-> **批次 A 已落地（2026-11-03）**：R5-01 / R5-02 / R5-08 / R5-10 / R5-11 / R5-21 / R5-22 + R5-30 已修，R5-06 的培养壳已补测（浮窗几何未收），R5-31 的落盘门与刷新留存已修，R5-33 的启动 tee 已加，R5-07 的写盘决策已补直接判据；R5-05 的活引用已改指 policy P5；R5-06 的培养壳与 PanelFrame 浮窗接线已补测；R5-12 的 preset 完成定义已收成 skill 单一门槛，R5-27 的背景选择面板已补 keyless 判据，R5-17 的主要预算盲区已补，R5-23 的 929 行 spec 已切出纯 lib 面，R5-11 的退役路径已入 retired-path 前缀表，R5-09 的 freshness / 台账摘要源码断言已改行为断言，index 墓碑节与 AGENTS 旧节引用已清，Brand 词标已补测、debugging/dev-loop 空壳引用已改指；R5-03 的“指路”部分已做（release --check 进命令表/发布清单，readiness 输出划界；_dist 未重打）（仍需当前会话的边界仍在）（R5-01 的 cultivation-gui-probe 已标已耗并移出复跑清单；R5-10 = release-smoke 第 ⑦ 步；R5-06 = cultivation-tab.spec；R5-04 门牌/摘要已改纯指针）；实施记录 = [批次 A Note](../../../notes/implemented/2026-11-03-round5-batch-a.md)。下文保留审计时点（before）的发现；B–F 批与未列项仍有效。
+> **批次 A 已落地（2026-11-03）**：R5-01 / R5-02 / R5-08 / R5-10 / R5-11 / R5-21 / R5-22 + R5-30 已修，R5-06 的培养壳已补测（浮窗几何未收），R5-31 的落盘门与刷新留存已修，R5-33 的启动 tee 已加，R5-07 的写盘决策已补直接判据；R5-05 的活引用已改指 policy P5；R5-06 的培养壳与 PanelFrame 浮窗接线已补测；R5-12 的 preset 完成定义已收成 skill 单一门槛，R5-27 的背景选择面板已补 keyless 判据，R5-17 的主要预算盲区已补，R5-23 的 929 行 spec 已切出纯 lib 面，R5-11 的退役路径已入 retired-path 前缀表，R5-09 的 freshness / 台账摘要源码断言已改行为断言，index 墓碑节与 AGENTS 旧节引用已清，Brand 词标已补测、debugging/dev-loop 空壳引用已改指；R5-03 的“指路”部分已做（release --check 进命令表/发布清单，readiness 输出划界；_dist 未重打）（仍需当前会话的边界仍在）（R5-01 的 cultivation-gui-probe 已标已耗并移出复跑清单；R5-10 = release-smoke 第 ⑦ 步；R5-06 = cultivation-tab.spec；R5-04 门牌/摘要已改纯指针；R5-03 已按 0.7.2 bump 重打并 release --verify 全绿，npm publish 仍人工）；实施记录 = [批次 A Note](../../../notes/implemented/2026-11-03-round5-batch-a.md)。下文保留审计时点（before）的发现；B–F 批与未列项仍有效。
 > 上一轮：[第四轮审计（2026-10-28）](../../_archive/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md)
 > 口径：fresh agent 只读评审 + 主 agent 亲跑全部 keyless 车道 + 六个独立子代理分维深挖；主 agent 对 P0/P1 逐条回查原文件/原命令。
 > vendor/dsh 只读；真模型认证档未跑（成本授权未给）。真页面档跑了 dev 模式 `ui-scene-smoke` 与 `client-load-smoke`；isolated 金样档实测启动失败（见 D6）。
@@ -225,8 +225,7 @@ git -C vendor/dsh rev-parse 'dsh-v0.2.1-rc.2^{commit}'
 | 行预算 | 35 行、5 份最大 owner 文档在外 | **40 行**（补 README/backlog/notes/pack README/publish-handoff） |
 | `retired-path` 前缀 | 2 条（仅 `_backlog`） | **4 条**（+ `workspace/`、独立启动器） |
 
-**仍未收的**（需用户决策，不是 agent 可自授权）：
-- `_dist` 仍过期（`release --check` exit 1）、`market-index` 仍声明未发布的 0.7.1——发布/版本决策；
-- `_backlog` 授权门牌与章程摘要仍截断排除项（R5-04），改制度面需点头；
+**仍未收的**：
+- npm publish / HTTPS 市场托管仍人工；`market-index.staged.json` 标记 0.7.2 未发布（发布后删）；
 - `docs/decisions.md` 62/62 零头寸（R5-17 剩余面）、`checks/README.md` 手工库存（R5-18）、dev-loop 空壳节（R5-19）、归档链接只查 `.md`（R5-20）；
 - 剩余约 13 处源码文本断言（`client-face` 的 toolview 优先级是刻意保留的装配面）。

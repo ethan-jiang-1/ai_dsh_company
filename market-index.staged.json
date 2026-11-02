@@ -1,6 +1,6 @@
 {
-  "version": "0.7.1",
+  "version": "0.7.2",
   "requiresPublish": true,
-  "since": "2026-11-02",
-  "reason": "索引声明的 0.7.1 尚未发布到 npm registry；发布后删除本文件并按 publish-handoff 校准 publishTimestamp。"
+  "since": "2026-11-03",
+  "reason": "索引声明的 0.7.2 尚未发布到 npm registry；发布后删除本文件并按 publish-handoff 校准 publishTimestamp。"
 }

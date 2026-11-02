@@ -1,6 +1,6 @@
 {
   "name": "dsh-company-pack",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "type": "module",
   "description": "Five-role virtual company for DSH: CEO / VP-Eng / VP-Sales / COO / CFO presets, company handbook and Web tabs.",
   "license": "MIT",
@@ -108,8 +108,12 @@
     "zod": "^4.4.3"
   },
   "peerDependenciesMeta": {
-    "@deepseek-ai/dsh-browser-use": { "optional": true },
-    "@deepseek-ai/dsh-experimental-browser-use-playwright-mcp": { "optional": true }
+    "@deepseek-ai/dsh-browser-use": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-experimental-browser-use-playwright-mcp": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "workspace:*",

@@ -2,6 +2,21 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.7.2 — 2026-11-03
+
+### Changed
+
+- **客户端错误留痕**：`/company-diagnostics` 不再因公司盘停写（`dataBlocked`）而拒绝写入；错误环
+  镜像 `sessionStorage`，页面刷新后仍能读到；落盘失败在页面提示一次。日志仍写
+  `$DSH_HOME/logs/company-client-errors.log`（256 KiB 轮转，token 脱敏）。
+- **发布 readiness 指路**：入口命令表与发布清单补 `pnpm release --check`；`verify` 的
+  `dist-freshness` / `release-ready` 输出标明可发布性由 `release --check` 判定（`verify` 绿 ≠ 可发布）。
+- **兼容性表述**：`0.2.1-rc.5` 的验证范围写清为“生命周期实验的 host 面”，与
+  `checks/gates/lib/compat-tags.json` 的认证 tag 台账区分（台账仍只列 rc.2）。
+- **维护者开发面**：`pnpm company` 启动输出自动 tee 到 `runtime/web-logs/`（token 脱敏）；培养/台账/
+  背景选择面板补 keyless 行为判据；929 行培养 spec 拆出纯 lib 面；退役路径门禁覆盖 v3 的
+  `workspace/` 与独立启动器。这些不改变模型可见行为，但让回归证据更可信。
+
 ## 0.7.1 — 2026-11-02
 
 ### Changed
