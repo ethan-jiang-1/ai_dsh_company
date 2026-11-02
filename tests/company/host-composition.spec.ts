@@ -96,6 +96,23 @@ describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）'
     await ctx.fiber.dispose()
   })
 
+  it('/company-diagnostics 在公司数据停写时仍落 home logs（诊断不是公司数据；R5-31）', async () => {
+    // bundle.json 坏 → runtime-guard 置 dataBlocked；诊断日志住 DSH_HOME，不应被公司盘停写挡住。
+    mkdirSync(join(env.company, '.dsh-company'), { recursive: true })
+    writeFileSync(join(env.company, '.dsh-company/bundle.json'), '{not-json')
+    const { ctx, commands } = mount()
+    ctx.plugin({ inject: ['tools', 'approval', 'commands'], apply: (scoped: Context) => { apply(scoped, {}) } })
+    await wait()
+    const diagnostic = commands.get('company-diagnostics') as {
+      handler: (input: { readonly rawInput: string }) => Promise<{ readonly kind: string; readonly text: string }>
+    }
+    const payload = encodeURIComponent(JSON.stringify({ kind: 'error', message: 'blocked-but-logged', at: 1 }))
+    const result = await diagnostic.handler({ rawInput: `client-error ${payload}` })
+    expect(result.kind).toBe('success')
+    expect(readFileSync(join(env.home, 'logs', 'company-client-errors.log'), 'utf8')).toContain('blocked-but-logged')
+    await ctx.fiber.dispose()
+  })
+
   it('/company-diagnostics 超过 256 KiB 轮转为 .1（日志有界）', async () => {
     const { ctx, commands } = mount()
     ctx.plugin({ inject: ['tools', 'approval', 'commands'], apply: (scoped: Context) => { apply(scoped, {}) } })

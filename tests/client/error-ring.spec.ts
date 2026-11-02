@@ -6,8 +6,10 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createErrorRing,
   ERROR_RING_KEY,
+  ERROR_RING_PERSIST_KEY,
   installErrorCapture,
   type ErrorCaptureTarget,
+  type ErrorRing,
 } from '../../packages/company-pack/src/client/error-ring.ts'
 
 /** 假 window：只有 error-ring 用到的四个面。 */
@@ -90,6 +92,32 @@ describe('客户端错误环（R3-03）', () => {
     expect(ring.list()).toHaveLength(3)
     expect(ring.list().map(entry => entry.message)).toEqual(['Error: a', 'Error: b', 'Error: c'])
     uninstall()
+  })
+
+  it('sessionStorage 恢复：刷新后最近一页错误仍在，且不回放 reporter（R5-31）', () => {
+    const store = new Map<string, string>()
+    const storage = {
+      getItem: (key: string): string | null => store.get(key) ?? null,
+      setItem: (key: string, value: string): void => { store.set(key, value) },
+    }
+    const first = fakeTarget()
+    ;(first.target as unknown as { sessionStorage: typeof storage }).sessionStorage = storage
+    const uninstallFirst = installErrorCapture(first.target)
+    first.emit('error', { error: new Error('persist me') })
+    const firstRing = (first.target as unknown as Record<string, unknown>)[ERROR_RING_KEY] as ErrorRing
+    expect(firstRing.list().map(entry => entry.message)).toEqual(['Error: persist me'])
+    expect(store.get(ERROR_RING_PERSIST_KEY)).toContain('persist me')
+    uninstallFirst()
+
+    // 新页面：同一 sessionStorage，新的环；历史条目恢复但不重新上报。
+    const second = fakeTarget()
+    ;(second.target as unknown as { sessionStorage: typeof storage }).sessionStorage = storage
+    const seen: string[] = []
+    const uninstallSecond = installErrorCapture(second.target, undefined, entry => { seen.push(entry.message) })
+    const secondRing = (second.target as unknown as Record<string, unknown>)[ERROR_RING_KEY] as ErrorRing
+    expect(secondRing.list().map(entry => entry.message)).toEqual(['Error: persist me'])
+    expect(seen).toEqual([])
+    uninstallSecond()
   })
 
   it('卸载后不再捕获、console.error 还原；全局引用回到安装前', () => {

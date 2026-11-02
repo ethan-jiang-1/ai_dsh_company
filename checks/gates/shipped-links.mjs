@@ -1,5 +1,5 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
-// 何时跑：改 pack 的 `workspace/**` 或 `presets/**/skills/**` Markdown 后；发布/导出前。
+// 何时跑：改 pack 的 `content/**` 或 `presets/**/skills/**` Markdown 后；发布/导出前。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, extname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 
@@ -7,9 +7,12 @@ import { dirname, extname, isAbsolute, join, relative, resolve, sep } from 'node
 // 为什么：workspace/ + skills 的 Markdown 会随包落到别人的 home；`../docs`、`checks/`、`tools/`、
 // `runtime/` 这些只在维护者仓库里成立。旧 `md-links` 把 pack 骨架排除、只校验 dev 盘那份，
 // 安装形状的死链在结构上不可见（2026-10-25 实测）。
-// 判据：以“安装读者”视角解析——workspace 文件的相对链接不得穿出 workspace；skills 的链接按
-// workspace 相对（角色 cwd）解析；两类都不许出现仓库顶目录；裸路径（反引号）同样按段扫描。
-const WORKSPACE = 'packages/company-pack/workspace'
+// 判据：以“安装读者”视角解析——content 文件的相对链接不得穿出 content；skills 的链接按
+// 相对/运行盘（`.dsh-company/`）分别解析；两类都不许出现仓库顶目录；裸路径（反引号）同样按段扫描。
+// 负例留证 2026-11-03（R5-02）：在 `content/AGENTS.md` 末尾加 `[broken](zz-missing-shipped.md)` →
+//   `FAIL shipped-links: packages/company-pack/content/AGENTS.md:158 链接目标不在随包 content：zz-missing-shipped.md`；
+//   还原 → `OK shipped-links（content 17 份 + skill 14 份 + persona 6 份）`；root 缺失 → 报「不在盘上」不崩。
+const CONTENT = 'packages/company-pack/content'
 const PRESETS = 'packages/company-pack/presets'
 const REPO_PATH = /(^|[\s"'`(])(?:\.\.\/)?(docs|notes|_backlog|checks|tests|probes|tools|run|runtime|snapshots|vendor|packages|company-workspace)\//
 const REPO_TOP = new Set(['docs', 'notes', '_backlog', 'checks', 'tests', 'probes', 'tools',
@@ -62,10 +65,14 @@ const isExternal = target => target === '' || target.startsWith('#')
 const topOf = (target) => target.replace(/^\.\//, '').split('/')[0]
 
 export function run({ root, ok, fail }) {
-  const workspaceRoot = resolve(root, WORKSPACE)
+  const contentRoot = resolve(root, CONTENT)
   const presetsRoot = resolve(root, PRESETS)
+  if (!existsSync(contentRoot)) {
+    fail('shipped-links', `${CONTENT} 不在盘上——随包分发的只读内容（手册/模板/默认章程/状态默认值）不许消失；发布面会少一整层`)
+    return
+  }
   const files = [
-    ...mdFiles(workspaceRoot).map(rel => ({ rel: `${WORKSPACE}/${rel}`, file: join(workspaceRoot, rel), kind: 'workspace' })),
+    ...mdFiles(contentRoot).map(rel => ({ rel: `${CONTENT}/${rel}`, file: join(contentRoot, rel), kind: 'content' })),
     ...mdFiles(presetsRoot).filter(rel => rel.split('/').includes('skills')).map(rel => ({ rel: `${PRESETS}/${rel}`, file: join(presetsRoot, rel), kind: 'skill' })),
   ]
   const problems = []
@@ -97,25 +104,21 @@ export function run({ root, ok, fail }) {
           problems.push(`${at} 链接指向仓库/穿出 workspace：${raw}`)
           continue
         }
-        if (kind === 'workspace') {
+        if (kind === 'content') {
           const resolved = resolve(dirname(file), target)
-          const within = relative(workspaceRoot, resolved)
+          const within = relative(contentRoot, resolved)
           if (within.startsWith(`..${sep}`) || within === '..' || isAbsolute(within)) {
-            problems.push(`${at} 链接穿出 workspace：${raw}`)
+            problems.push(`${at} 链接穿出 content：${raw}`)
             continue
           }
-          if (!existsSync(resolved)) problems.push(`${at} 链接目标不在出厂骨架：${raw}`)
-        } else {
-          const resolved = target.startsWith('./') || target.startsWith('../')
-            ? resolve(dirname(file), target)
-            : resolve(workspaceRoot, target)
-          if (target.startsWith('./') || target.startsWith('../')) {
-            const within = relative(presetsRoot, resolved)
-            if (within.startsWith(`..${sep}`) || within === '..') problems.push(`${at} 链接穿出 pack：${raw}`)
-            else if (!existsSync(resolved)) problems.push(`${at} 链接目标不在 pack：${raw}`)
-          } else if (!existsSync(resolved)) {
-            problems.push(`${at} 链接目标不在出厂骨架：${raw}`)
-          }
+          if (!existsSync(resolved)) problems.push(`${at} 链接目标不在随包 content：${raw}`)
+        } else if (target.startsWith('./') || target.startsWith('../')) {
+          // skill 的相对链接按 pack 内解析；非相对目标是角色 cwd 的运行时路径
+          // （`.dsh-company/...`，由 host 首启自举创建），不在包里要求存在——否则必假红。
+          const resolved = resolve(dirname(file), target)
+          const within = relative(presetsRoot, resolved)
+          if (within.startsWith(`..${sep}`) || within === '..') problems.push(`${at} 链接穿出 pack：${raw}`)
+          else if (!existsSync(resolved)) problems.push(`${at} 链接目标不在 pack：${raw}`)
         }
       }
       for (const span of codeSpans(line)) {
@@ -137,6 +140,6 @@ export function run({ root, ok, fail }) {
     })
   }
   problems.length === 0
-    ? ok(`shipped-links（${String(files.length)} 份 Markdown + ${String(personas.length)} 份 persona；零仓库路径/穿出 workspace）`)
+    ? ok(`shipped-links（content ${String(files.filter(f => f.kind === 'content').length)} 份 + skill ${String(files.filter(f => f.kind === 'skill').length)} 份 + persona ${String(personas.length)} 份；零仓库路径/穿出 content）`)
     : fail('shipped-links', problems.join('；'))
 }

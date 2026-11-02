@@ -1,7 +1,7 @@
 // 纯逻辑：replay fixture 的注入面新鲜度判据（keyless，无 I/O）。
 //
 // 为什么（2026-10-20 BUG-r3 事故）：手册是会话注入内容——纯 docs 提交改了
-// packages/company-pack/workspace/AGENTS.md，就等于改了回放输入；r3-delegation 的 full 档
+// packages/company-pack/content/AGENTS.md，就等于改了回放输入；r3-delegation 的 full 档
 // 「归一化零 diff」判据当晚被打红，而 pre-push 只跑 verify+test（不含 replay）、
 // replay-scene-liveness 又按设计不跑进程——整条链没有任何东西能拦住或发现「注入面变了」。
 // 本模块把「录制时的注入内容 vs 现行注入源」收成静态可比判据（不跑进程、秒级）。

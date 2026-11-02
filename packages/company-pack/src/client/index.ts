@@ -134,6 +134,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
   ctx.inject(['sessions', 'remote.commands'], (scoped) => {
     const list = scoped.sessions.list
     let lastSent = 0
+    let reporterWarned = false
     errorReporter.current = (entry) => {
       const now = Date.now()
       if (now - lastSent < 1000) return
@@ -141,7 +142,13 @@ export async function apply(ctx: ClientContext): Promise<void> {
       if (current === undefined) return
       lastSent = now
       const payload = encodeURIComponent(JSON.stringify(entry))
-      void scoped.remote.commands.execute(current.id, `/company-diagnostics client-error ${payload}`, []).catch(() => {})
+      // 落盘失败不再静默：只喊一次（console.warn 不进错误环，避免自激），开发者能在页面上看到。
+      void scoped.remote.commands.execute(current.id, `/company-diagnostics client-error ${payload}`, []).catch((error) => {
+        if (!reporterWarned) {
+          reporterWarned = true
+          console.warn(`company diagnostics 写入失败（错误仍在 __DSH_COMPANY_ERRORS__）：${String((error as Error)?.message ?? error)}`)
+        }
+      })
     }
   })
 

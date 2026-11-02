@@ -33,6 +33,18 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
     expect(summary.lastAssistant.join('\n')).not.toContain(token)
   })
 
+  it('非零退出码在 >400 字符输出末尾仍被识别（R5-30：先截断再正则 = 假绿）', () => {
+    const long = 'x'.repeat(600)
+    const summary = summarizeSessionEvents([
+      { type: 'tool/call', data: { name: 'bash', callId: 'c-long' } },
+      { type: 'tool/result', data: { message: { toolCallId: 'c-long', content: [{ type: 'text', text: `${long}
+[exit code: 7]` }] } } },
+    ])
+    expect(summary.toolNonZeroExits).toHaveLength(1)
+    expect(summary.toolNonZeroExits[0]).toMatchObject({ toolCallId: 'c-long', toolName: 'bash', code: 7 })
+    expect(summary.toolNonZeroExits[0].text).toContain('[exit code: 7]')
+  })
+
   it('中断轮（有 turn/start 无 turn/end）单独点名——不能渲染成「无失败」（R3-02）', () => {
     const summary = summarizeSessionEvents([
       { type: 'turn/start', data: { turn: 1 } },

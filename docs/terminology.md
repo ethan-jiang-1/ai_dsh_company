@@ -9,7 +9,7 @@
 | `bundle` / `profile` / `pack` | DSH 的可安装发布单位 / Harness home 的具名组装 / 本仓对 `dsh-company-pack` 的简称；三者不互替 | `vendor/dsh/docs/architecture.md`（profiles and bundles 节）；[profile.md](./profile.md) |
 | 公司状态（company state，代码历史名 `run bundle`）/ `run trace` / 发布物 / 发行版 | `.dsh-company/` 状态根 / 四件套追溯视图 / 单个可下载产物 / bundle+profile+home+surface+生命周期 | [runtime-map.md](./runtime-map.md)；[release.md](./release.md) |
 | 角色（CEO/VP…） | agent preset（`presets/<id>/agent.cordis.yml` + persona + skills） | `packages/preset/agent-preset`（每预设一行声明，rc.2 形）+ `packages/preset/persona`；出厂范本 = `packages/bundle/web-app/presets/` |
-| 组织/公司 | 一个 host profile + preset roster（rc.2：`agent-preset-registry` 装配，roots 目录扫描已废） | `packages/preset/agent-preset-registry`（default 装配）+ `docs/architecture.md`（组合链）；升 pin 迁移实证 = [pin-upgrade-0.2.0](../notes/archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md) |
+| 组织/公司 | 一个 host profile + preset roster（rc.2：`agent-preset-registry` 装配，roots 目录扫描已废） | `packages/preset/agent-preset-registry`（default 装配）+ `docs/design/architecture.md`（组合链）；升 pin 迁移实证 = [pin-upgrade-0.2.0](../notes/archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md) |
 | worker（角色底下干活的一次性代理） | one-shot subagent（`dsh-tool-subagent`，spawn provider） | `packages/subagent/tool-subagent/README.md` |
 | 派活/汇报线 | 命名委托工具（通道 A / M2） | 同上（per-instance persona 教义在其 README） |
 | 会议/任务板/邮箱 | Agent Teams（`ctx.agentTeams`，experimental） | `packages/experimental/agent-team` + `packages/experimental/tool-agent-team` + `docs/subsystems/agent-team.md` |

@@ -30,13 +30,12 @@ const EXCLUDED = new Set(['node_modules', 'vendor', 'lib', 'dist', 'build', 'gen
   'snapshots', 'journal', 'deliverables', 'deliverables-archive', 'archived', 'archive', 'historical'])
 
 /**
- * 出厂公司盘骨架（2026-10-13 立）：它是**要发布到任意磁盘的运行语料**，不是本仓的源文档——
- * 手册里的相对指针（`../docs/*`）是**部署相对**的：在运行盘 `company-workspace/AGENTS.md`
- * 读到才成立，在 pack 家（`packages/company-pack/workspace/`）读到的深度没有意义。
- * 所以这里按**路径**排除（不按名字，避免误伤任何叫 workspace 的目录），链接校验落在运行盘那份
- * ——它已在下面显式加入（符号链接读到同一份内容，校验基准 = 读者看到的位置）。
+ * 随包分发的只读内容（2026-11-03 自 workspace 迁入 `content/`）：它是**要发布到任意磁盘的运行语料**，
+ * 不是本仓的源文档——手册里的相对指针是**部署相对**的：在运行盘读到才成立，在 pack 家读到的深度
+ * 没有意义。所以这里按**路径**排除；安装形状的链接校验由 `shipped-links` 门禁按 content 基准负责
+ * （2026-11-03 同 diff 迁移）。不按名字排除，避免误伤任何叫 content 的目录。
  */
-const EXCLUDED_PATHS = new Set(['packages/company-pack/workspace'])
+const EXCLUDED_PATHS = new Set(['packages/company-pack/content'])
 
 /** Discover current Markdown from disk, including untracked/new Notes; never follow directory symlinks. */
 export function sourceMarkdownFiles(root) {

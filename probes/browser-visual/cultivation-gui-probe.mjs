@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-// 状态：常驻
+// 状态：已耗（2026-11-03 v3 删除独立启动器后未迁移：仍引用已删除的独立启动器与旧 workspace/ 布局；
+//   复跑条件 = 按 ui-scene-smoke 的产品同形预置改成 content/.dsh-company 路径。培养面交互先用
+//   `ui-scene-smoke --steps` 复现，见 checks/README「看真页面」行。）
 // 培养 GUI 行动面探针（2026-10-17 培养 GUI 卡 S6）：**真浏览器点真按钮** → 真命令 → 真落盘。
 //
 // 何时跑：改 client 面培养动作（CultivationBoard / CultivationCompose / cultivation-actions）、
@@ -41,6 +43,13 @@ import { dismissNotices, openCompanyTab, openSession } from '../../tools/lib/pro
 import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+
+// v3 起独立启动器已删除；本探针未迁移到 content/.dsh-company 布局，先实事求是地拒绝运行，
+// 不再把 MODULE_NOT_FOUND 栈丢给下一个 agent。复跑条件 = 按 ui-scene-smoke 的产品同形预置重写。
+if (!existsSync(join(ROOT, 'tools/standalone.mjs'))) {
+  console.error('cultivation-gui-probe: 已耗（2026-11-03）——v3 删除了独立启动器且本探针未迁移；培养面点击交互请用 `node checks/smoke/ui-scene-smoke.mjs --steps <file>`。')
+  process.exit(2)
+}
 import { readRecords } from '../../tools/lib/session-log.mjs'
 
 const FIXTURE = process.argv.includes('--fixture')

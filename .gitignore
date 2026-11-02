@@ -20,8 +20,8 @@ runtime/harness-home/*
 
 # ── dev run bundle 的 workspace ───────────────────────────────
 # 2026-10-24 RFC run-bundle-install-unit：company-workspace/ 是 dev bundle 的 workspace——整树不进 git
-# （成品/台账/journal/交付物/过程物料都只住 bundle）；制度件仍由 packages/company-pack/workspace/ 单源提供
-# （`pnpm bundle:init` 建符号链接）。反例防线 = checks/gates/run-bundle-clean.mjs（`git add -f` 也能抓）。
+# （成品/台账/journal/交付物/过程物料都只住 bundle）；只读制度件由 packages/company-pack/content/ 单源提供
+# （host 首启按需读，不复制到 workspace；`pnpm bundle:init` 只建 .dsh-company/ 状态）。反例防线 = checks/gates/run-bundle-clean.mjs（`git add -f` 也能抓）。
 company-workspace/
 
 # ── 导出目的地 ────────────────────────────────────────────────

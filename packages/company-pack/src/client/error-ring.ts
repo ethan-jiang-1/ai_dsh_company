@@ -28,18 +28,25 @@ export interface ErrorRing {
   readonly push: (entry: ClientErrorEntry) => void
   readonly list: () => readonly ClientErrorEntry[]
   readonly clear: () => void
+  /** 恢复持久化条目（不回放 reporter、不触发 onChange——它们是上一页已上报过的历史）。 */
+  readonly restore: (entries: readonly ClientErrorEntry[]) => void
 }
 
 export const ERROR_RING_LIMIT = 50
 export const ERROR_RING_KEY = '__DSH_COMPANY_ERRORS__'
+/** sessionStorage 键：刷新后恢复最近一页的错误（只留当前标签页，不进 localStorage）。 */
+export const ERROR_RING_PERSIST_KEY = '__DSH_COMPANY_ERRORS_V1__'
 
 /** 错误正文/堆栈里的 token URL 不入日志（用户可读，但绝不把凭据抄进去）。 */
 export function redactTokenUrls(text: string): string {
   return text.replace(/([?&]token=)[^\s&"'<>]+/g, '$1<redacted>')
 }
 
-export function createErrorRing(limit = ERROR_RING_LIMIT, onEntry?: ClientErrorReporter): ErrorRing {
+export function createErrorRing(limit = ERROR_RING_LIMIT, onEntry?: ClientErrorReporter, onChange?: (entries: readonly ClientErrorEntry[]) => void): ErrorRing {
   const entries: ClientErrorEntry[] = []
+  const changed = (): void => {
+    try { onChange?.(entries) } catch { /* 持久化失败不改变环 */ }
+  }
   return {
     push(entry) {
       const last = entries[entries.length - 1]
@@ -50,9 +57,14 @@ export function createErrorRing(limit = ERROR_RING_LIMIT, onEntry?: ClientErrorR
       while (entries.length > limit) entries.shift()
       // reporter 是旁路：它抛错不能让页面错误捕获本身炸掉。
       try { onEntry?.(entry) } catch { /* reporter 自己的失败不改变环 */ }
+      changed()
     },
     list: () => [...entries],
-    clear: () => { entries.length = 0 },
+    clear: () => { entries.length = 0; changed() },
+    restore(restored) {
+      entries.length = 0
+      for (const entry of restored.slice(-limit)) entries.push(entry)
+    },
   }
 }
 
@@ -76,6 +88,11 @@ export interface ErrorCaptureTarget {
   readonly removeEventListener: (type: string, listener: (event: never) => void) => void
   readonly console?: { error: (...args: unknown[]) => void }
   readonly location?: { href?: string }
+  /** 可选：刷新后仍留痕；缺席（旧测试/非浏览器）时自动跳过。 */
+  readonly sessionStorage?: {
+    getItem(key: string): string | null
+    setItem(key: string, value: string): void
+  }
 }
 
 /**
@@ -84,7 +101,24 @@ export interface ErrorCaptureTarget {
  * @param ring - 环（由调用方持有，探针从 `target[ERROR_RING_KEY]` 读同一份）。
  */
 export function installErrorCapture(target: ErrorCaptureTarget, ring?: ErrorRing, onEntry?: ClientErrorReporter): () => void {
-  const capture = ring ?? createErrorRing(ERROR_RING_LIMIT, onEntry)
+  const storage = target.sessionStorage
+  const persist = (entries: readonly ClientErrorEntry[]): void => {
+    if (storage === undefined) return
+    try { storage.setItem(ERROR_RING_PERSIST_KEY, JSON.stringify(entries)) } catch { /* 配额/隐私模式：跳过 */ }
+  }
+  const capture = ring ?? createErrorRing(ERROR_RING_LIMIT, onEntry, persist)
+  if (storage !== undefined) {
+    try {
+      const raw = storage.getItem(ERROR_RING_PERSIST_KEY)
+      const parsed: unknown = raw === null ? [] : JSON.parse(raw)
+      if (Array.isArray(parsed)) {
+        capture.restore(parsed.filter((entry): entry is ClientErrorEntry =>
+          entry !== null && typeof entry === 'object'
+          && typeof (entry as ClientErrorEntry).kind === 'string'
+          && typeof (entry as ClientErrorEntry).message === 'string'))
+      }
+    } catch { /* 坏存档：按空处理 */ }
+  }
   const global = target as unknown as Record<string, unknown>
   const previous = global[ERROR_RING_KEY] as ErrorRing | undefined
   global[ERROR_RING_KEY] = capture

@@ -76,7 +76,7 @@ source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的真
 
 **`vendor/` 下受版本控制的内容一个字节都不许改**（submodule HEAD == 簿记 SHA + 工作树零改动）。允许面与三条正路（bundle patch / 提上游升 pin / 先证伪"不可用"再自建）= [release.md §vendor 政策](docs/release.md)；⚠ 禁 `git clean -x`。
 
-**本仓原生纪律**：§11 工具态与越界写入（工具状态先落仓库 gitignored 区）、§13 自主优先协议（先探索后发明、借鉴成熟插件）——规则唯一见 [policy §P4/§P5](docs/policy.md)。**不发明**：不自造 spec 流程/调度器/记忆/门禁，优先用 DSH 现成载体。
+**本仓原生纪律**：工具态与越界写入（工具状态先落仓库 gitignored 区）、自主优先协议（先探索后发明、借鉴成熟插件）——规则唯一见 [policy §P4/§P5](docs/policy.md)。**不发明**：不自造 spec 流程/调度器/记忆/门禁，优先用 DSH 现成载体。
 
 ## vendor 簿记
 

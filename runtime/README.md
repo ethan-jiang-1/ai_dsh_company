@@ -15,7 +15,7 @@
 |---|---|---|
 | `harness-home/` | **开发主 DSH_HOME（dev bundle 的 home）**：`sessions/`（会话日志 = 数据层证据源，世代选择唯一口径 = [session-log-generation](../tools/lib/session-log-generation.mjs)）、`profiles/`（`headless` / `web` = current）、`storages/`、`cache/`、`oracle-tests/`、`replay-runs/` + `replay-diagnosis/`（replay 现场与失败诊断）、`diagnosis/`（浏览器探针失败截图/aria/console，2026-10-20 起）、`repository-migration-hashes.json`（迁移校验基线）；内部细则见其 [README](./harness-home/README.md) | runtime·current |
 | `harness-home/bundle.json` | **legacy v1 身份**（2026-10-24 起）：id / createdAt / pack / workspace / 基部 sha256；2026-11-01 起由 workspace `.dsh-company/bundle.json`（v2）取代，仅作迁移来源 | runtime·legacy |
-| `standalone/` | **目录独立启动的隔离 home**（2026-10-25 起，默认 `runtime/standalone/home`）：自建 web profile + copy 骨架，不碰 `harness-home/`；`pnpm standalone --reset` 只删带 `.standalone-home` 标记的 home | runtime·隔离实例 |
+| `standalone/` | **旧独立启动器的残留**（启动器已于 2026-11-01 v3 删除，产品入口 = `dsh --profile company`）：目录可能含旧隔离 home，确认无人在用后手工删 | runtime·legacy |
 | ~~`harness-home/profiles/company/`~~ | **已删除**（2026-10-05 裁决轮：零功能消费面终核 + 48M 死重；理论重建 = git/vendor 历史 + `file:` 安装程序有文档）——若再现同名目录 = 异常，查来历 | deleted·2026-10-05 |
 | `harness-home/b/`、`harness-home-b/` | 第二/嵌套 home——多 home 实验与跨 home 审计视角（authorship 口径：每家导出各审一次再拼结果） | runtime·实验面 |
 | `pw-browsers/` | 浏览器二进制与 profile（`PLAYWRIGHT_BROWSERS_PATH` 重定向落点）；**UI 布局记忆按 origin 隔离**存在浏览器 profile——换端口重启即新 origin、记忆清零 | runtime |

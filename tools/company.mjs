@@ -8,12 +8,13 @@
 // → exec dsh。`--link` = 旧的符号链接快速通道（改 presets/** 即刻生效，不验打包面）。
 // 差异表与允许差异 = docs/guides/dev-product-parity.md；本文件只做：定位、pack/add、exec。
 // 不建 profile 之外的写操作（缺 profile 时才用 web 模板初始化）、不写 profile patch、不问 workspace。
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync } from 'node:fs'
+import { createWriteStream, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { devTarballName, migrationNotice, planDevStart, resolveDevMode } from './lib/dev-install.mjs'
+import { redactTokenUrls } from './lib/session-diagnose.mjs'
 
 const here = fileURLToPath(import.meta.url)
 const root = resolve(dirname(here), '..')
@@ -113,7 +114,31 @@ if (mode === 'tarball') {
   }
 }
 
-const result = spawnSync(process.execPath, [cli, '--profile', 'company', '--', ...passthrough], {
-  cwd: workspace, env, stdio: 'inherit',
+// 启动输出同时落盘：起窗崩溃时不再只剩终端（2026-11-03 R5-33）。
+// 日志写 redact 后的文本（token URL 会被替换）；终端仍显示原文。
+const logDir = join(root, 'runtime/web-logs')
+mkdirSync(logDir, { recursive: true })
+const stamp = new Date().toISOString().replace(/[:.]/g, '-')
+const logPath = join(logDir, `company-${stamp}.log`)
+const logStream = createWriteStream(logPath, { flags: 'a' })
+console.log(`company(dev): 启动日志 → ${logPath}（含运行输出，token 已脱敏；勿提交）`)
+const child = spawn(process.execPath, [cli, '--profile', 'company', '--', ...passthrough], {
+  cwd: workspace, env, stdio: ['inherit', 'pipe', 'pipe'],
 })
-process.exit(result.status ?? 1)
+const tee = (stream, target, sink) => {
+  stream.on('data', chunk => {
+    target.write(chunk)
+    sink.write(redactTokenUrls(chunk.toString()))
+  })
+}
+tee(child.stdout, process.stdout, logStream)
+tee(child.stderr, process.stderr, logStream)
+child.on('error', error => {
+  console.error(`company(dev): 子进程启动失败：${error.message}`)
+  logStream.end()
+  process.exit(1)
+})
+child.on('close', code => {
+  logStream.end()
+  process.exit(code ?? 1)
+})

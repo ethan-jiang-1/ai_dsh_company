@@ -7,7 +7,7 @@ description: Use when finishing any non-trivial change before reporting it done,
 
 适用：任何非平凡变更在**宣布完成之前**。**收尾次序与六行回执形状的唯一家 = 本 skill**；
 去向规则住 [dev-loop §12](../../../docs/guides/dev-loop.md)（整片 revert / `_backlog` 离场 / Note 归属），
-语义审四输入住 [§13](../../../docs/guides/dev-loop.md)——两边都只链接，不复述本 skill 的步骤。
+语义审四输入住 [policy.md §P5](../../../docs/policy.md)——两边都只链接，不复述本 skill 的步骤。
 
 ## 陷阱
 
@@ -22,7 +22,7 @@ description: Use when finishing any non-trivial change before reporting it done,
    机器绿灯不覆盖这一问。范围外多做的东西也要点出来（不是功劳，是没被要求的东西）。
 2. **证据四链点名**（挂得上 / 行为对 / 装得上〔适用时〕/ 批准）：每条点名**实跑的检查**；
    没跑的**如实标「未执行」**——不混入"应该跑了"的暗示。
-3. **语义审**（四输入 = §13）：带①授权/验收原文 ②该面合同文档（docs 只写 now，同 diff 更新了吗）
+3. **语义审**（四输入 = [policy.md §P5](../../../docs/policy.md)）：带①授权/验收原文 ②该面合同文档（docs 只写 now，同 diff 更新了吗）
    ③证据选层（选的检查能证明承诺的性质吗）④Note（决定/备选/真证据齐吗），**重读当前 diff**，
    不沿用旧结论。输出 finding 带「缺陷/位置/影响/证据」，blocker 与建议分开；机器已可靠拒绝的不复报。
 4. **收割三问**（资产从运行里长出来，不从想象里写）：这次运行——①抓到异常没（→BUG 卡 + 红绿修复）
@@ -58,7 +58,7 @@ description: Use when finishing any non-trivial change before reporting it done,
 
 ## 指针（别复述）
 
-去向规则（整片 revert / `_backlog` 离场 / Note 归属）= [dev-loop §12](../../../docs/guides/dev-loop.md)；语义审四输入与拉人四件套 = [§13](../../../docs/guides/dev-loop.md)；
+去向规则（整片 revert / `_backlog` 离场 / Note 归属）= [dev-loop §12](../../../docs/guides/dev-loop.md)；语义审四输入与拉人四件套 = [policy.md §P5](../../../docs/policy.md)；
 **本 skill 是收尾次序与六行回执形状的唯一家**（§12 与 orient 只链接，不复述）；
 Note 侧的完成定义 = [agent-note-definition](../agent-note-definition/SKILL.md)；
 门禁侧 = [gate-change-definition](../gate-change-definition/SKILL.md)；

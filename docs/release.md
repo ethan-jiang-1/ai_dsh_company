@@ -75,9 +75,10 @@ tag（升 pin 走 sync-dsh，冒烟过了才加列）；`sync-dsh` 检查模式�
 
 认证档装的是 `_dist` 的**同一份发布 tarball**（`--tarball <path> --expect-sha <manifest.artifact.sha256>`），
 不另 `npm pack`；干净 profile 用官方 `--from-default-profile web` 初始化，再做 CLI/应用内安装、boot/RPC、
-首启与二次 boot。程序、成本、超时和锁 = 脚本头注；判据 = 安装副本的 presets/client/`content/`、roster
+首启、二次 boot、卸载与重装。程序、成本、超时和锁 = 脚本头注；判据 = 安装副本的 presets/client/`content/`、roster
 零 broken、`session/create`、`application: applied`（或 `restart-required` 后重启）、stderr 无
-`did not activate`/`skipping profile bundle`、`_dist` sha 与 manifest 一致。`release --verify` 同时跑
+`did not activate`/`skipping profile bundle`、`_dist` sha 与 manifest 一致、`plugin remove` 后
+bundles 摘净且 `.dsh-company/` 字节不变（重装可恢复）。`release --verify` 同时跑
 `company-entry-smoke`（真 tarball + 第二 workspace）与 `sourceFingerprint` 核对；`release --check`
 拒绝“源已变但 `_dist` 未重打”。
 

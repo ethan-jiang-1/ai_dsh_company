@@ -4,7 +4,11 @@
 
 ## 活跃清单
 
-当前活跃 0 张；v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajectory/New terminal 收回卡均已结归档。已结卡见[归档索引](../_archive/README.md)。新问题按 [backlog 入口](../README.md) 立卡，不从归档里自行开工。
+当前活跃 1 张：
+
+- [第五轮七维打扫卡](./2026-11-03-repo-hygiene-round5.md)（2026-11-03）：v3 迁移与发行版收口后的七维复评 + 分批改善；材料 = [审计](../research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)。
+
+v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajectory/New terminal 收回卡均已结归档。已结卡见[归档索引](../_archive/README.md)。新问题按 [backlog 入口](../README.md) 立卡，不从归档里自行开工。
 
 ## 近期归档
 

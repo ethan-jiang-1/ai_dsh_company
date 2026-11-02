@@ -97,7 +97,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
 
   registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked)
   registerHandbook(ctx, resolveContentDir(import.meta.url), hasWorkspace ? workspace : undefined)
-  registerClientDiagnostics(ctx, runtime.dshHome, dataBlocked)
+  registerClientDiagnostics(ctx, runtime.dshHome)
 
   ctx.commands.register({
     name: 'deliverables',

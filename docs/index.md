@@ -50,9 +50,6 @@
 |---|---|
 | `_backlog/issues/` → 用户裁决 → `notes/proposed/` → `notes/implemented/` | 一次决策的来龙去脉（含实际跑过的验证 + 环境状态）。提案纪律 / 状态轴 / 毕业规则 / 分类规矩唯一家 = [notes/README](../notes/README.md)；未成熟问题由 [_backlog/issues/](../_backlog/issues/README.md) 推敲，制度 = [_backlog/README](../_backlog/README.md) |
 | [notes/archived/](../notes/archived/) · [notes/rejected/](../notes/rejected/) · [notes/postmortem/](../notes/postmortem/README.md) | 离场与复盘目录（D30 起；逐桶判据唯一家 = [notes/README](../notes/README.md)）：archived = 顶层仍能阻止重开的冻结判定（`receipts/` = 只帮复核的历史证据，非否决），rejected = 负知识，postmortem = **事故复盘** |
-## 决策台账（已迁）
-
-D 号 → 一句话 → 家的路由表已迁 [decisions.md](./decisions.md)（本页只留路由；决定正文仍住 Note）。
 ## 文档路由
 
 主题事实的 owner；不代表该面在当前提交经过完整覆盖（验证状态见各合同与 Note）。
@@ -63,7 +60,3 @@ D 号 → 一句话 → 家的路由表已迁 [decisions.md](./decisions.md)（�
 | 内容——角色说什么话、带什么技能、KB 放哪 | design/role-content-plan + presets.md + `company-workspace/.dsh-company/kb/` + `packages/company-pack/content/AGENTS.md`（host 注入，不落盘） |
 | 运营——token 怎么省、现场出状况怎么办 | guides/budget-and-ops |
 | 流程——任务怎么进、证据怎么交、门禁怎么守 | guides/dev-loop + `notes/` + `checks/run-gates.mjs` |
-
-## 外部研究材料登记（repo 外，只读引用）
-
-登记表已迁 [external-research.md](./external-research.md)（本页只留路由；索引不再承载外部材料表）。

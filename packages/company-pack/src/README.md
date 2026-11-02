@@ -28,6 +28,6 @@
   构建走 tsdown client 半（产物 `lib/client.js`）。
 
 **构建**：`tsc -b packages/company-pack` + tsdown 两面（事实家 = [bootstrap](../../../docs/guides/bootstrap.md)）。
-⚠ 本目录**不进 tarball**（`files` = `lib/**`、`presets/**`、`workspace/**`、`cordis.patch.yml`；
-  `workspace/**` = 出厂公司盘骨架，2026-10-13 起随包）——发布面是
-`lib/`（generated，owner 表 = [pack README](../README.md)）。
+⚠ 本目录**不进 tarball**（`files` 的现行清单 = [package.json](../package.json)：只发 runtime 两半、
+`presets/**`、`content/**`、`locale/`、`icon.svg`、`cordis.patch.yml`、`LICENSE`，不发 `src/**` 与 `workspace/**`）
+——发布面是 `lib/`（generated，owner 表 = [pack README](../README.md)）。

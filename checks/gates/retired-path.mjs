@@ -28,7 +28,14 @@ export function run({ root, ok, fail }) {
   const RETIRED_PATH_PREFIXES = [
     ['_backlog/_done', '_backlog/_archive'],
     ['_backlog/plans/', '_backlog/issues/'],
+    // 2026-11-03（R5-11/R5-01）：v3 把出厂内容从 workspace/ 搬到 content/、删除了独立启动器；
+    // 两类残留曾靠人工扫出来。前缀入表后，活跃文档/脚本注释再写旧家即红。
+    ['packages/company-pack/workspace', 'packages/company-pack/content'],
+    ['tools/standalone.mjs', 'checks/smoke/ui-scene-smoke.mjs（产品入口 = dsh --profile company）'],
   ]
+  // 负例留证 2026-11-03（R5-11/R5-01）：docs/orient.md 临时插 `packages/company-pack/workspace` →
+  //   `FAIL retired-path: docs/orient.md:79 → … 用了退役路径——改指现行家 packages/company-pack/content`；
+  //   还原 → `OK ×177 文件 + 352 脚本注释面`。
   const retiredScanFiles = [...new Set([
     ...NOW_FILES, ...walkMd3(join(root, '.agents/skills')), 'checks/README.md', 'run/README.md',
   ])].filter(f => existsSync(join(root, f)))

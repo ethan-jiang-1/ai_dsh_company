@@ -86,6 +86,7 @@ describe('公司整页视图：子页签、加载/错误与浮出（R4-05）', (
     for (const label of ['看板', '依赖图', '在场', '培养']) expect(host.textContent).toContain(label)
     expect(host.textContent).toContain('公司：测试公司')
     expect(host.textContent).toContain('读取团队状态…')
+    expect(host.textContent).toContain('投影更新')
     expect(host.querySelector('button[role="tab"][aria-selected="true"]')?.textContent).toContain('看板')
   })
 

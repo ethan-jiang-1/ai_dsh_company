@@ -53,8 +53,8 @@
 | D47 | backlog→notes 交接契约：用户是队列；notes 不是收件箱；卡顶结论/去向为记录家；关闭以结论确认为准 | [handoff-contract](../notes/implemented/2026-10-25-backlog-notes-handoff-contract.md) |
 | D48 | 目录独立启动 = 隔离 home + web profile + copy 骨架；产品入口被 D51/D52 取代 | [standalone-deployment](../notes/archived/2026-10-25-standalone-deployment.md) |
 | D49 | notes 长期治理：取代门禁 + 收据层 + 机械审计；收敛证据随归档件 | [governance](../notes/implemented/2026-10-30-notes-consistency-governance.md) · [converge-evidence](../notes/implemented/2026-10-30-converge-evidence-home.md) |
-| D51 | 插件即产品：`company` profile + workspace 自持 run bundle（v2 形状被 D52 取代；方法层/账本留 host 沿用） | [v2 manifest Note](../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md) · [_backlog 伞卡](../_backlog/_archive/settled_issues/2026-11-01-plugin-as-product.md) |
 | D50 | 研究按研究题组织：题目录 + 题名页（问题/消费者/产出的卡/材料）；双索引一题一行；`backlog-liveness` 两级校验 | [_backlog/research](../_backlog/research/README.md) · [research-topics Note](../notes/implemented/2026-10-30-backlog-research-topics.md) |
+| D51 | 插件即产品：`company` profile + workspace 自持 run bundle（v2 形状被 D52 取代；方法层/账本留 host 沿用） | [v2 manifest Note](../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md) · [_backlog 伞卡](../_backlog/_archive/settled_issues/2026-11-01-plugin-as-product.md) |
 | D52 | 插件即产品 v3：DSH-native 入口；无 launcher；内容在包；run bundle 与账本按 workspace 分区 | [v3 Note](../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md) · [v3 卡](../_backlog/_archive/settled_issues/2026-11-01-plugin-as-product-v3.md) |
 | D53 | 会话检索 = bundle 内 insert + isolate 独立 provider 组；不替换 host 行（默认 in-app 安装约束） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |
 | D54 | 发布姿态 = MIT + npm 身份齐全 + 市场 index handoff；npm publish 仍人工（D6） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |

@@ -7,7 +7,7 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
  * 复核独立性分层声明（BUG-012 的机械兜底，2026-10-11）。
  *
  * 病根：一个模型戴五顶帽子、同模异线程的复核被当成「异人复核」报出去；V4 的 final 全篇
- * grep 不到「独立性」或「边际」字样。手册已立规则（`packages/company-pack/workspace/AGENTS.md`），
+ * grep 不到「独立性」或「边际」字样。手册已立规则（`packages/company-pack/content/AGENTS.md`），
  * 本 spec 把**产出侧**钉住：带「AI 使用声明」的模板必须齐两条声明栏位，否则下一份 final
  * 照旧不会写——这正是 V4 的实况。
  *

@@ -18,17 +18,25 @@ import { join } from 'node:path'
 //   「公司视图与五个页签。」→ `FAIL nav-count-claims packages/company-pack/README.md:117 → 页签计数声明
 //   「五个页签」`；还原 → 绿 ×47 文件。
 export function run({ root, ok, fail }) {
+  const contentRoot = join(root, 'packages/company-pack/content')
+  if (!existsSync(contentRoot)) {
+    fail('nav-count-claims', 'packages/company-pack/content 不在盘上——随包分发的只读内容（手册/模板/默认章程）是页签计数声明的主要注入面，不许消失')
+    return
+  }
   const walkNavMd = (dir) => !existsSync(dir) || !lstatSync(dir).isDirectory() ? [] : readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const p = join(dir, entry.name)
     if (entry.isDirectory()) return ['node_modules', '.git', 'lib'].includes(entry.name) ? [] : walkNavMd(p)
     return entry.name.endsWith('.md') ? [p.slice(root.length + 1)] : []
   })
   const COUNT_PHRASE = /[两二三四五六七八九十0-9]+ *个? *(?:公司|平台)?页签/
-  // 2026-10-27（R3-15）：扫描面补**随包分发的文档**——包 README 是收件人第一份文档，workspace/*.md 是
+  // 2026-10-27（R3-15）：扫描面补**随包分发的文档**——包 README 是收件人第一份文档，content/*.md 是
 //   随每个角色会话注入的手册；两者原先不在面内，于是包 README 的「五个页签」（实际 9）活过了两轮审计。
+// 2026-11-03（R5-02）：v3 把出厂内容从 workspace/ 搬到 content/，本门随迁。负例留证同轮：
+//   在 `content/AGENTS.md` 末尾加「右栏五个页签」→ `FAIL nav-count-claims: …:158 → 页签计数声明「五个页签」`；
+//   还原 → `OK ×52`；root 缺失 → 报「不在盘上」不崩。
 const navCountFiles = [...new Set([
   ...walkNavMd(join(root, 'docs')),
-  ...walkNavMd(join(root, 'packages/company-pack/workspace')),
+  ...walkNavMd(join(root, 'packages/company-pack/content')),
   'AGENTS.md', 'README.md', 'packages/company-pack/README.md',
 ])].filter(f => existsSync(join(root, f)))
   let navCountBad = false

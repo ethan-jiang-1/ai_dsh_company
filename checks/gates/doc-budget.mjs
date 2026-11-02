@@ -52,6 +52,15 @@ const DOC_LINE_BUDGETS = [
   ['docs/delegation.md', 120],     // 汇报线合同
   ['docs/data-model.md', 40],      // 数据卡合同
   ['docs/profile.md', 66],         // host 组合合同
+  // ── 2026-11-03 R5-17：三份最大 owner 文档 + 根 README + 发布 handoff 补预算 ──
+  // 审计实测：它们是活文档里最大的几份，却完全在棘轮外；预算 = 现行内容 +5–7%（只降不升）。
+  ['README.md', 90],
+  ['_backlog/README.md', 140],
+  ['notes/README.md', 132],
+  ['packages/company-pack/README.md', 160],
+  ['docs/guides/publish-handoff.md', 95],
+  // 负例留证 2026-11-03（R5-17）：publish-handoff 上限临时 95→80 →
+  //   `FAIL doc-budget: docs/guides/publish-handoff.md 90 行超上限 80`；还原 95 → PASS。
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {
   // 文件缺失时报「缺失」而不是抛异常：抛异常会**中断整个 run-gates**，

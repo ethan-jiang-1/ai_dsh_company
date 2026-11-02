@@ -31,7 +31,7 @@ stdout 打一个 JSON verdict；exit 0 = 全部断言成立，**exit 2 = 环境�
 runtime/harness-home/diagnosis 下的 cdp-probe-<timestamp>/（page.png / body.txt / verdict.json /
 console.log），JSON verdict 的 `evidenceDir` 指向它；`--evidence` 让成功也写同一形状。
 `--ask` 会在 GUI 里真建会话（registry default = ceo）留下测试会话，需要时在 GUI 里归档清理。
-`--steps` 是受控动作集（按可见文本点击、等/断言文本、向选择器输入），用于复现“点某个按钮/面板”的症状；动作文件形状 = `tools/lib/probe-steps.mjs` 头注。
+`--steps` 是受控动作集（按可见文本点击、等/断言文本、向选择器输入），用于复现“点某个按钮/面板”的症状；动作文件形状 = `tools/lib/probe-steps.mjs` 头注。`typeText` 的第一个元素是 CSS 选择器：composer 用 `[data-composer-input][contenteditable="true"]`（例：`[{"typeText":["[data-composer-input][contenteditable=\"true\"]","hi"]}]`）。
 `--attach <devtools-port>` 附着用户已开的 Chrome（需以 `--remote-debugging-port=9222` 启动）做只读快照：不导航、不关模态、不点页签、不跑 `--ask/--steps`；品牌断言在 attach 档不强制（用户页可能不在公司首屏）。
 
 ## 已踩平的环境坑（驱动 + 场景里已编码成规则）

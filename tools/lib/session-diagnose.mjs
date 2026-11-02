@@ -109,14 +109,19 @@ export function summarizeSessionEvents(records, { recent = 1 } = {}) {
       const message = data.message ?? {}
       const isError = message.isError === true || data.isError === true
       const toolCallId = message.toolCallId ?? data.toolCallId ?? ''
-      const text = redactTokenUrls(textOf(message.content) || detailOf(message.error) || detailOf(data.error)).slice(0, 400)
+      const fullText = redactTokenUrls(textOf(message.content) || detailOf(message.error) || detailOf(data.error))
+      const text = fullText.slice(0, 400)
       if (isError) {
         summary.toolErrors.push({ toolCallId, text })
       } else if (toolCallId !== '' && !nonZeroSeen.has(toolCallId) && toolNameByCall.get(toolCallId) === 'bash') {
-        const match = /\[exit code: (\d+)\]/.exec(text)
+        // 匹配**未截断**全文：bash 把 `[exit code: N]` 追加在输出末尾，先 slice(0,400) 会把
+        // 绝大多数非零退出读成 0（R5-30 实测 597 会话 132 条真非零只报 87 条）。
+        const match = /\[exit code: (\d+)\]/.exec(fullText)
         if (match !== null && Number(match[1]) !== 0) {
           nonZeroSeen.add(toolCallId)
-          summary.toolNonZeroExits.push({ toolCallId, toolName: 'bash', code: Number(match[1]), text: text.slice(0, 300) })
+          // 证据取尾部：退出码 marker 在末尾，截头部会把「为什么失败」唯一线索切掉。
+          const excerpt = fullText.length > 300 ? `…${fullText.slice(-280)}` : fullText
+          summary.toolNonZeroExits.push({ toolCallId, toolName: 'bash', code: Number(match[1]), text: excerpt })
         }
       }
     } else if (type === 'job/settled') {

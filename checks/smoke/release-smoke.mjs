@@ -319,6 +319,25 @@ try {
   check('第二次启动 bundle.json 字节不变（只创建、不覆盖）',
     manifestBefore !== null && readFileSync(manifestPath, 'utf8') === manifestBefore,
     manifestBefore === null ? 'bundle.json 不存在' : '字节一致')
+
+  console.log('⑦ 卸载与重装（remove 只摘插件、数据全部留下）')
+  const beforeRemoveManifest = readFileSync(manifestPath, 'utf8')
+  await processes.close()
+  await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'remove', 'dsh-company-pack'], { timeoutMs: 180_000 })
+  const bundlesAfterRemove = (() => {
+    try {
+      return JSON.parse(readFileSync(join(profileDir, 'package.json'), 'utf8'))?.dsh?.profile?.bundles ?? []
+    } catch { return [] }
+  })()
+  check('plugin remove 后 bundles 不再含 dsh-company-pack', !bundlesAfterRemove.includes('dsh-company-pack'), `bundles = ${bundlesAfterRemove.join(', ')}`)
+  check('安装副本已移除（node_modules/dsh-company-pack 不在）', !existsSync(join(installedPack, 'package.json')))
+  check('公司状态保留（bundle.json 字节不变 + kb/company.md 在场）',
+    existsSync(manifestPath) && readFileSync(manifestPath, 'utf8') === beforeRemoveManifest
+      && existsSync(join(companyHome, '.dsh-company/kb/company.md')))
+  await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${tarball}`], { timeoutMs: 180_000 })
+  const bundlesAfterReadd = JSON.parse(readFileSync(join(profileDir, 'package.json'), 'utf8'))?.dsh?.profile?.bundles ?? []
+  check('重装后 bundles 含 dsh-company-pack', bundlesAfterReadd.includes('dsh-company-pack'), `bundles = ${bundlesAfterReadd.join(', ')}`)
+  check('重装后公司状态未变（不覆盖用户数据）', readFileSync(manifestPath, 'utf8') === beforeRemoveManifest)
 } catch (error) {
   failures.push(error.message)
   console.error(`release-smoke: ${error.message}`)

@@ -29,15 +29,14 @@ function redact(text: string): string {
 }
 
 /** 注册 `/company-diagnostics client-error <encoded>`。 */
-export function registerClientDiagnostics(ctx: Context, dshHome: string, dataBlocked = false): void {
+export function registerClientDiagnostics(ctx: Context, dshHome: string): void {
   ctx.commands.register({
     name: 'company-diagnostics',
     description: '把一条浏览器侧诊断写入 logs/company-client-errors.log（Web 错误环内部用；人可读）',
     input: { hint: 'client-error <URI-encoded JSON>' },
     handler: async ({ rawInput }: { readonly rawInput: string }) => {
-      if (dataBlocked) {
-        return { kind: 'error' as const, text: '公司数据已停写（身份/落点/lease 问题）；先修复再记录诊断。' }
-      }
+      // 诊断日志住 DSH_HOME（不是公司数据）：公司盘 dataBlocked 时，“用户那一页”的错误仍必须留痕。
+      // 2026-11-03（R5-31）：此前 dataBlocked 直接拒绝，dev home 有 lease 问题时用户报的页面错误永远不进盘。
       const prefix = 'client-error '
       if (!rawInput.startsWith(prefix)) {
         return { kind: 'error' as const, text: '用法：/company-diagnostics client-error <URI-encoded JSON>' }

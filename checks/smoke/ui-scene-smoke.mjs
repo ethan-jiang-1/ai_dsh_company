@@ -2,10 +2,12 @@
 // 状态：常驻
 // ui-scene 冒烟：**自起观察窗** → 真浏览器跑完整公司页签扫（含浏览器错误环）→ 成功/失败都留证。
 // 何时跑：client 面改动后、呈现给用户前、或用户报「页面某个面板不对」要复现时。
-//   成本 keyless（boot ~10–30s + cdp-probe ~15s）；前置 = client/前端已构建。
+//   成本 keyless（boot ~10–30s + cdp-probe ~15s）；前置 = client/前端已构建 + dev 模式有 company profile
+//   （`pnpm company` 首跑建；`--isolated` 自建临时 profile，不依赖 dev home）。
 //   `--keep` 保留实例与他人接着看；`--ask` 透传给 cdp-probe（真模型一次调用，会建测试会话）。
 //   `--steps <file>` 透传给 cdp-probe（受控动作：clickText / waitText / expectText / typeText）。
-//   `--isolated`：用 standalone 建隔离 home/公司盘再起（不读 dev 盘，也不读用户 OS 默认 workspace；落 pack 骨架 + 空成品索引，文本确定）。
+//   `--isolated`：官方 web 模板建临时 `company` profile + `plugin add <pack 目录>`（link）再起
+//   （不读 dev 盘，也不读用户 OS 默认 workspace；`.dsh-company/` 由 host 首启自举，文本确定）。
 //   `--golden` / `--refresh-golden`：与 `snapshots/visual/company-shell/ui.golden.json` 比对/更新
 //   （必须配 --isolated；金样只覆盖无会话的公司壳，会话数据面归 keyless 渲染 spec）。
 //
@@ -18,7 +20,7 @@
 //   web stdout/stderr + 场景回执 → runtime/harness-home/diagnosis/ui-scene-smoke-<ts>/{web.log,scene.json}。
 import { spawn, spawnSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
@@ -56,28 +58,49 @@ const redact = text => String(text ?? '').replace(/([?&]token=)[^\s&"'<>]+/g, '$
 /** 隔离场景的临时根（runtime/tmp 下，gitignored；--keep 保留）。 */
 let isolatedRoot
 let isolatedEnv
+/** 预置失败时先回收临时根再退出：否则失败的隔离盘会留在 runtime/tmp 里被其他门禁扫到。 */
+const failSetup = (message) => {
+  console.error(message)
+  if (isolatedRoot !== undefined) rmSync(isolatedRoot, { recursive: true, force: true })
+  process.exit(2)
+}
 if (ISOLATED) {
   mkdirSync(join(ROOT, 'runtime/tmp'), { recursive: true })
   isolatedRoot = mkdtempSync(join(ROOT, 'runtime/tmp/ui-scene-'))
   const home = join(isolatedRoot, 'home')
+  const userHome = join(isolatedRoot, 'user')
   const company = join(home, 'company-workspace')
-  const provision = spawnSync(process.execPath, [
-    join(ROOT, 'tools/standalone.mjs'), '--home', home, '--provision-only', '--no-build',
-  ], { cwd: ROOT, env: process.env, encoding: 'utf8' })
-  if (provision.status !== 0) {
-    console.error(`ui-scene-smoke: 隔离场景预置失败（exit ${String(provision.status)}）：${(provision.stderr ?? '').trim().slice(-400)}`)
-    process.exit(2)
+  const cli = join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js')
+  if (!existsSync(cli)) {
+    failSetup(`ui-scene-smoke: vendor CLI 未构建：${cli}（先按 docs/guides/bootstrap.md 构建）`)
   }
-  // standalone --provision-only 故意不落骨架（给真实部署留空盘）；UI 金样要的是“已就绪的空公司壳”，
-  // 所以这里显式落 pack 骨架 + 空成品索引，避免面板在“读取中/不可读”之间随机漂。
+  if (!existsSync(join(ROOT, 'packages/company-pack/lib/client.js'))) {
+    failSetup('ui-scene-smoke: pack client 未构建（packages/company-pack/lib/client.js 缺失）——先按 bootstrap 跑 tsc -b + tsdown')
+  }
+  mkdirSync(userHome, { recursive: true })
   mkdirSync(company, { recursive: true })
-  cpSync(join(ROOT, 'packages/company-pack/workspace'), company, { recursive: true, force: false })
-  // 空公司盘也要有可读的 records 目录；否则培养面板把“目录缺失”渲染成“尚未读到”，不是空态。
-  mkdirSync(join(company, 'cultivation', 'records'), { recursive: true })
-  const catalogPath = join(company, 'kb/deliverables-index.json')
-  if (!existsSync(catalogPath)) {
-    writeFileSync(catalogPath, `${JSON.stringify({ schema: 1, generatedAt: new Date().toISOString(), entries: [] }, null, 2)}\n`, 'utf8')
+  const provisionEnv = { ...process.env, HOME: userHome, DSH_HOME: home, DSH_COMPANY_BROWSER: 'off' }
+  const errorHint = (text) => {
+    const lines = String(text ?? '').trim().split('\n')
+    return lines.find(line => /Cannot find module|ENOENT|Error:/.test(line)) ?? lines[0] ?? ''
   }
+  // 隔离 home 走产品同形路径：官方 web 模板建 profile → `plugin add <pack 目录>`（link）→ boot。
+  // 不再依赖已删除的独立启动器；v3 起 content/ 由 host 首启自举，不复制骨架。
+  const init = spawnSync(process.execPath, [
+    cli, '--profile', 'company', '--from-default-profile', 'web', '--dump-default-config',
+  ], { cwd: ROOT, env: provisionEnv, encoding: 'utf8', timeout: 180_000 })
+  if (init.status !== 0) {
+    failSetup(`ui-scene-smoke: 隔离 profile 初始化失败（exit ${String(init.status)}）：${errorHint(init.stderr)}`)
+  }
+  const added = spawnSync(process.execPath, [
+    cli, 'plugin', '--profile', 'company', 'add', join(ROOT, 'packages/company-pack'),
+  ], { cwd: ROOT, env: provisionEnv, encoding: 'utf8', timeout: 180_000 })
+  if (added.status !== 0) {
+    failSetup(`ui-scene-smoke: 隔离 profile 安装 pack 失败（exit ${String(added.status)}）：${errorHint(added.stderr)}`)
+  }
+  // 空公司盘也要有可读的 records 目录；否则培养面板把“目录缺失”渲染成“尚未读到”，不是空态。
+  // 状态根 = `.dsh-company/`（v3）；host 首启按 if-missing 落其余骨架。
+  mkdirSync(join(company, '.dsh-company/cultivation/records'), { recursive: true })
   // 真隔离：不读用户 OS Documents 下的默认 workspace（那是真人的盘，既会泄数据也会让金样漂）。
   // 预置 workspace registry，把 defaultWorkspaceId 指到隔离公司盘；app 首启就不会去建 OS 默认盘。
   const workspaceId = randomUUID()
@@ -104,13 +127,15 @@ if (ISOLATED) {
       },
     },
   }, null, 2)}\n`, 'utf8')
+  // 不覆盖 HOME：真浏览器探针要按 homedir() 找 playwright 缓存；隔离只针对 DSH/公司状态。
   isolatedEnv = {
     ...process.env,
     DSH_HOME: home,
     DSH_COMPANY_HOME: company,
     DSH_COMPANY_BOOTSTRAP: 'if-missing',
+    DSH_COMPANY_BROWSER: 'off',
   }
-  console.log(`ui-scene-smoke: 隔离场景 ${isolatedRoot}（home + 骨架公司盘 + 默认 workspace 指向公司盘）`)
+  console.log(`ui-scene-smoke: 隔离场景 ${isolatedRoot}（官方模板 profile + pack link + 空公司盘；不读 dev home）`)
 }
 
 let home
@@ -131,6 +156,8 @@ const web = await startWeb({
   root: ROOT,
   home,
   env: isolatedEnv ?? process.env,
+  // 产品入口 = `dsh --profile company`；不传 profile 会 boot `web`，页面就没有公司页签。
+  profile: 'company',
   port: 0,
   onOutput: text => { webOutput += text },
 }).catch(error => {

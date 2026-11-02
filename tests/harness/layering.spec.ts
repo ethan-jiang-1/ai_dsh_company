@@ -25,8 +25,9 @@ const FORBIDDEN: readonly { readonly pattern: RegExp; readonly why: string }[] =
   { pattern: /from ['"]node:child_process['"]/, why: '起进程 = 起真服务/真浏览器 → 属于认证档' },
   { pattern: /\bplaywright\b/i, why: '真浏览器 → 认证档（client-load-smoke）' },
   { pattern: /DEEPSEEK_API_KEY|credentials\.yaml/, why: '回归必须 keyless' },
-  // fetch/spawn/exec are checked from parsed call expressions below; regex would
-  // mistake a fixture string for an executed call.
+  // fetch/spawn/exec call sites are NOT mechanically scanned here: a raw-text scan would
+  // false-positive on fixture strings. The import ban above catches node:child_process;
+  // any other driver/network use belongs in checks/ or probes/, not tests/.
 
 ]
 
