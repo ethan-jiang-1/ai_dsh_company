@@ -1,5 +1,6 @@
 # 项目地图：从入口到证据
 
+> 什么时候读：第一次找入口、或不确定某个目录/运行态事实归谁时。
 这份地图供项目驾驭者与维护 Coding Agent 使用。根 [AGENTS.md](../AGENTS.md) 路由开发任务；[公司手册](../packages/company-pack/content/AGENTS.md) 是角色会话的运行时输入（dev 盘里是指回它的符号链接）。先用下表选入口，政策和操作细节由链接目标维护。
 
 **快读（happy path）**：启动公司 → [demo.md §前置](demo.md)；改东西 → 下表按任务进入；验证 → [tests/README](../tests/README.md) 最窄检查表；卡住 → 本页「交互与调试入口」现象表；时序与状态轴 → [运行态地图](runtime-map.md)。

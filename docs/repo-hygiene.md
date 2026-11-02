@@ -1,5 +1,6 @@
 # repo hygiene：什么进 git，什么不进，以及跨环境规则
 
+> 什么时候读：决定什么东西进 git、跨环境搬运或清理运行残留时。
 > 性质：合同（当前边界）。**可执行边界 = [.gitignore](../.gitignore) + [.gitattributes](../.gitattributes)**；
 > 本文件解释规则与例外，不替代实现。变更记录归 `notes/`，这里只写 now。
 > 一句话：**tracked = 可复现的配方；ignored = 机器本地的状态**。
