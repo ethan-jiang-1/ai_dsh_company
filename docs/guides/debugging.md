@@ -5,7 +5,7 @@
 
 | 层 | 手段 | 核对什么 |
 |---|---|---|
-| 1 组合层 | `pnpm dsh --profile <p> --dump-config` | 打印最终组合树，确认"我以为挂上的行"真的在、config 是我以为的；层级顺序 bundle → profile patch → home patch → `--patch` overlay（`vendor/dsh/apps/cli/src/dump-config.ts`）。⚠ patch 语法两条（`- id:` 替换 / `- insert:` 新增）唯一家 = [开发环 §4](./dev-loop.md) |
+| 1 组合层 | `pnpm dsh --profile <p> --dump-config` | 打印最终组合树，确认"我以为挂上的行"真的在、config 是我以为的；层级顺序 bundle → profile patch → home patch → `--patch` overlay（`vendor/dsh/apps/cli/src/dump-config.ts`）。⚠ patch 语法两条（`- id:` 替换 / `- insert:` 新增）唯一家 = [bootstrap §插拔速查](./bootstrap.md) |
 | 2 装载层 | preset 装不上时看 roster 报错 | roster **连原因一起列出**（fail-loud），报错即诊断，不静默跳过 |
 | 3 生效层 | 改 patch 行后要不要重启 | 长驻 Web 默认启用 HMR；headless/sdk/acp 由组合里的 `hmr` row 关闭；不要用当前 vendor 已删除的旧 profile 热重载字段（判据 = `vendor/dsh/packages/bundle/base/cordis.patch.yml`） |
 | 3.5 **退出层（R1 实证）** | **症状"任务似已跑完但进程不退 + stdout 零输出"→ 查组合里的 `hmr` row** | **HMR 由 YAML 组合决定**：base 默认启用；headless/sdk/acp 用 `- id: hmr` + `disabled: true` 关闭。一次性自定义 profile 需退出时，在 profile patch 写同样的 `disabled: true`，或直接用 shipped `headless`；旧的 profile 热重载字段已从 vendor 删除，写它不会生效 |

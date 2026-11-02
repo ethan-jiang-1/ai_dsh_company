@@ -6,6 +6,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { CompanyIdentity, companyNameFrom } from '../../packages/company-pack/src/client/CompanyView.tsx'
+import { DreamTeamBrandName } from '../../packages/company-pack/src/client/Brand.tsx'
 
 describe('CompanyIdentity', () => {
   it('从 kb/company.md 抽公司名；空文件给“未填”', () => {
@@ -16,6 +17,10 @@ describe('CompanyIdentity', () => {
       .toContain('公司：Acme')
     expect(renderToStaticMarkup(createElement(CompanyIdentity, { state: { status: 'ready', text: '产品名: DSH\n' } })))
       .toContain('公司：（未填）')
+  })
+
+  it('侧栏品牌名 = 部署词标（首屏第一笔；Brand.tsx 此前 0% 覆盖）', () => {
+    expect(renderToStaticMarkup(createElement(DreamTeamBrandName))).toContain('DSH 梦之队')
   })
 
   it('loading 不冒充未填；读不到身份时明确“非公司盘”', () => {

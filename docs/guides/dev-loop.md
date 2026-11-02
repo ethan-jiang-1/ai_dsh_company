@@ -87,8 +87,8 @@
 
 冷启动引导（clean checkout → 可跑通：submodule / install / 双面构建 / 装包）与全部实证坑的
 **唯一家 = [bootstrap.md](./bootstrap.md)**（2026-09-27 自本节整段迁出——常驻层瘦身轮，编号保留防断链）。
-何时读 = 新 clone、重建 dev home、vendor 换 tag、任何「跑不起来」的第一站；§11 的工具态重定向
-纪律是引导的一部分，配合读。
+何时读 = 新 clone、重建 dev home、vendor 换 tag、任何「跑不起来」的第一站；工具态重定向
+纪律（[policy §P4](../policy.md)）是引导的一部分，配合读。
 
 ## 8. 驱动 Web 面会话（RPC）
 
