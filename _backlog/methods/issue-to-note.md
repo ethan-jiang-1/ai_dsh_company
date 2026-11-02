@@ -6,7 +6,7 @@ whenToUse: A confirmed issue conclusion needs a downstream decision. The user de
 
 # Request downstream handling (RFC / Note)
 
-**Input:** scoped issue, confirmed conclusion and supporting evidence. For work to be done, include scope, alternatives and acceptance criteria. Resolve uncertain choices through [requirements confirmation](requirements-elicitation.md) before treating them as decisions.
+**Input:** scoped issue at `待落地` (conclusion `做`, non-empty `## 验收标准`, `去向` chosen), confirmed by the user. For work to be done, include scope, alternatives and acceptance criteria. Resolve uncertain choices through [requirements confirmation](requirements-elicitation.md) before treating them as decisions.
 
 **Output:** a submitted request with a typed destination, or an explicit gap preventing submission.
 
@@ -23,15 +23,16 @@ Use the [backlog closure criteria](../README.md). State the applicable conclusio
 
 Separate confirmed facts from recommendations. A pending human choice keeps the dependent conclusion open; record the exact question and next step.
 
-**Request type** (choose one; do not leave it implicit):
+**Request type** (choose one; do not leave it implicit — write it as the typed value of `去向`, `> **结论/去向**：<value> — <destination>`):
 
 - `rfc` — approved, not yet implemented; lands in `notes/proposed/`;
 - `note` — the decision is delivered with the current change; lands in `notes/implemented/`;
 - `implementation` — a small authorized change with no RFC/Note; record the commit or contract;
 - `pending` — conclusion confirmed, downstream request left with the user; record `destination = user (YYYY-MM-DD)`;
 - `none` — no downstream artifact is needed; the card closes with the existing conclusion and `destination = none`.
+- `rejected` — the conclusion is "do not do it" and the negative knowledge still prevents a credible repeat; lands in `notes/rejected/`.
 
-**Destination** must be durable: a repository path (`notes/proposed/<file>` or `notes/implemented/<file>`), or `user (YYYY-MM-DD)` when the request is left with the user. "This reply" alone is not a destination unless the user decided in the same turn.
+**Destination** must be durable: a repository path (`notes/proposed/<file>` or `notes/implemented/<file>`), or `user (YYYY-MM-DD)` when the request is left with the user. "This reply" alone is not a destination unless the user decided in the same turn. At `待落地` the artifact does not exist yet: write the planned path as **inline code**, never a Markdown link (a link to a missing file turns `md-links` red). At close, switch it to a live relative link.
 
 ## 2. Submit the request
 
@@ -42,7 +43,7 @@ Record the submission date, recipient or destination, and requested handling on 
 **Three decisions, three owners:**
 
 - **Authorization** — the user decides whether to do the work and its scope.
-- **Downstream need** — the agent proposes the request type (`rfc`/`note`/`implementation`/`pending`/`none`), using the closure criteria and the request-type table; the user confirms when the choice is not obvious. The test is the request-type table: no downstream artifact → `none`; approved plan → `rfc`; same-turn delivery → `note`; small authorized change → `implementation`; user-held request → `pending`. Never leave a `do` conclusion with an **untyped** destination; `none` is a valid explicit value when no downstream artifact is needed.
+- **Downstream need** — the agent proposes the request type (`rfc`/`note`/`implementation`/`pending`/`none`/`rejected`), using the closure criteria and the request-type table; the user confirms when the choice is not obvious. The test is the request-type table: no downstream artifact → `none`; approved plan → `rfc`; same-turn delivery → `note`; small authorized change → `implementation`; user-held request → `pending`; negative knowledge worth keeping → `rejected`. Never leave a `do` conclusion with an **untyped** destination; `none` is a valid explicit value when no downstream artifact is needed.
 - **Note necessity and form** — when the request type is `note`, the notes owner applies [notes/README §二](../../notes/README.md) ("real alternatives + lasting tradeoff") to decide whether a Note is warranted and its form; if no Note is warranted, the type falls back to `implementation` (the change is recorded by its commit/contract) or `none` (no artifact); when the type is `rfc`, the [proposed contract](../../notes/proposed/README.md) owns the form.
 
 Do not describe the Note decision as "the receiver decides"; it is rule-bound, not discretionary.
@@ -59,7 +60,7 @@ Do not describe the Note decision as "the receiver decides"; it is rule-bound, n
 
 ## 3. Close the issue when its conditions are met
 
-Apply the [backlog closure rules](../README.md): preserve the discussion, add the conclusion and request destination (or the existing conclusion that answers the issue), move the card into the appropriate archive, repair relative links, and update the active and archive lists. Research follows its [consumer-linked lifecycle](../research/README.md). A submitted request need not have produced a Note before the card closes.
+Apply the [backlog closure rules](../README.md): preserve the discussion, add the conclusion and request destination (or the existing conclusion that answers the issue), record the review on the status line (`审查：agent`, `审查：用户`, or `审查：跳过 — reason`), move the card into the appropriate archive, repair relative links, and update the active and archive lists. Research follows its [consumer-linked lifecycle](../research/README.md). A submitted request need not have produced a Note before the card closes.
 
 **Close condition:** the conclusion is confirmed by the user, and the downstream request is recorded. The downstream acceptance is not a close condition. If the user's confirmation of the conclusion is still pending, keep the card active in `等人拍板`.
 

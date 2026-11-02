@@ -1,13 +1,13 @@
 ---
-status: 推敲中
+status: 等人拍板
 opened: 2026-11-02
 ---
 
 # 推敲：主界面去掉 Trajectory 页签与右侧栏 New Terminal 入口
 
-> 立卡：2026-11-02 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-02 ｜ 状态：等人拍板 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否 ｜ 审查：用户 — 待验收
 >
-> **去向**：实现 = 本卡落地后新建 implemented Note（分类规则 = [notes/README](../../notes/README.md)）；验收后按关闭法归档。
+> **结论/去向**：做 → `note` — `notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md`（已落树，待用户验收；验收后写 Note 并归档）。
 >
 > **用户原话（2026-11-02 走查反馈）**：「主Tab 这里 Trajectory 不需要, 去掉。右边 sidebar New Terminal
 > 也去掉, 没有必要。这个诉求显性化到 issues 我们要跟踪这个决定的落地。」

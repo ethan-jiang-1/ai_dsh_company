@@ -52,7 +52,9 @@ export function backlogLivenessProblems(backlogRoot) {
     return file && entry.name.endsWith('.md') ? [join(prefix, entry.name)] : []
   })
   const statuses = {
-    issues: ['推敲中', '等人拍板'],
+    // 2026-11-02（五道门落地）：问题轨加 `待落地`——结论已定、门票与去向已写、尚未交付。
+    //   它是「已过定性门」，不是任务追踪器：执行可见性归会话 plan/todo（D001 输掉的方案：issue 设 `落地中`）。
+    issues: ['推敲中', '待落地', '等人拍板'],
     // 2026-10-12（借鉴卡落地）：缺陷轨四活跃值——「活跃」改名「调查中」（与目录「活跃清单」撞词），
     //   修复就绪 = 门票且授权的翻转点，修复已落地 = 修复落树、验收未满，等人拍板 = 通道/用户选择。
     bugs: ['调查中', '修复就绪', '修复已落地', '等人拍板'],
@@ -81,6 +83,27 @@ export function backlogLivenessProblems(backlogRoot) {
       return
     }
     return data
+  }
+  // ── 五道门（2026-11-02 立）：状态 ↔ 出口物的机械耦合 ─────────────────────────────
+  // 规则正本 = _backlog/README.md「五道门」；本块只证形状，不证结论对不对。
+  // 去向 = 封闭集值（形如 `> **结论/去向**：note — notes/implemented/…`），不是散文：
+  //   散文里的「用户已拍板…」不可枚举；窄到 6 个词，机器才知道这张卡该去哪儿。
+  const DESTINATIONS = ['rfc', 'note', 'implementation', 'pending', 'none', 'rejected']
+  const GRADUATED = ['rfc', 'note', 'implementation']
+  const headText = text => text.split('\n').slice(0, 12).join('\n').replaceAll('**', '')
+  const destination = head => /去向\s*[:：=＝]\s*`?([a-z][a-z-]*)/.exec(head)?.[1] ?? ''
+  const lineOf = (text, needle) => {
+    const index = text.split('\n').findIndex(line => line.includes(needle))
+    return index < 0 ? 1 : index + 1
+  }
+  // 「非空 ## 节」= 门票的形状锚：标题在场且标题到下一个 `##` 之间有非空正文。
+  const sectionBody = (text, heading) => {
+    const lines = text.split('\n')
+    const start = lines.findIndex(line => new RegExp(`^##\\s+${heading}\\s*$`).test(line))
+    if (start < 0) return ''
+    const rest = lines.slice(start + 1)
+    const end = rest.findIndex(line => /^##\s+/.test(line))
+    return (end < 0 ? rest : rest.slice(0, end)).join('\n').trim()
   }
   // Source graduation checks inspect only the first 12 lines: historical discussion is not a verdict.
   const closureSignals = [
@@ -138,6 +161,21 @@ export function backlogLivenessProblems(backlogRoot) {
         }
         if (pool.startsWith('_archive/') && !/^>\s*归档[：:]\s*\d{4}-\d{2}-\d{2}/m.test(banner))
           problems.push(`${bannerWhere}:1 缺「> 归档：YYYY-MM-DD」行——归档题名页要记下归档日`)
+        // 2026-11-02（五道门落地）：题名页是工作项，有自己的位置（调研中 → 已定性）；
+        //   归档题名页是冻结层，不回填。材料无 status（上面研究分支另查反向）。
+        if (!pool.startsWith('_archive/')) {
+          const head = banner.startsWith('---\n') ? frontmatter(banner, bannerWhere) : null
+          if (!head) {
+            if (!banner.startsWith('---\n')) problems.push(`${bannerWhere}:1 缺 frontmatter（status: 调研中|已定性 + opened: YYYY-MM-DD）——题名页是工作项，材料才是证据`)
+          } else {
+            const keys = Object.keys(head)
+            if (keys[0] !== 'status') problems.push(`${bannerWhere}:2 frontmatter 首字段须为 status`)
+            else if (!['调研中', '已定性'].includes(String(head.status))) problems.push(`${bannerWhere}:2 status ${JSON.stringify(head.status)} 不属于题名页（调研中|已定性）`)
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(String(head.opened ?? ''))) problems.push(`${bannerWhere}:1 缺 opened: YYYY-MM-DD`)
+            if (head.status === '已定性' && !/^>\s*结论[：:]\s*\S/m.test(banner))
+              problems.push(`${bannerWhere}:1 「已定性」缺「> 结论：」行——定性门要求能一句话说出结论`)
+          }
+        }
         if (!indexed.has(resolve(bannerFull)))
           problems.push(`${bannerWhere} 未被 ${indexPath} 索引链接点名——索引按题名页一行登记，不按文件`)
         const materialLinks = markdownLinkTargets(bannerFull, banner)
@@ -177,15 +215,34 @@ export function backlogLivenessProblems(backlogRoot) {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(String(data.opened ?? ''))) problems.push(`${where}:1 缺 opened: YYYY-MM-DD`)
         if (pool.endsWith('bugs') && !['P0', 'P1', 'P2'].includes(data.severity)) problems.push(`${where}:1 缺 severity: P0/P1/P2`)
       }
-      // 2026-10-25（交接契约）：归档「毕业：做」卡（opened ≥ 2026-10-25）首 12 行须有 durable 去向
-      //   （`> **结论/去向**` 块；RFC/Note 路径或 `用户（YYYY-MM-DD）`）。老卡祖父豁免——归档区默认不读，
-      //   没有去向的「做」卡会把「用户是队列」的请求变成死信。反证 = spec 的 no-destination fixture 红；
-      //   with-destination fixture 绿；2026-10-24 老卡不红。
-      if (pool === '_archive/settled_issues' && String(data.opened) >= '2026-10-25') {
+      // 2026-11-02（五道门落地）：门票与去向的守卫——状态声称到了门口，出口物就必须在场。
+      //   负例留证见本文件头「五道门」块的 ①–③；规则正本 = _backlog/README.md「五道门」表。
+      if (pool === 'issues' && data.status === '待落地') {
+        const graduation = (/毕业：\s*([^｜|\n]+)/.exec(headText(text))?.[1] ?? '').trim()
+        if (graduation && !graduation.startsWith('做'))
+          problems.push(`${where}:1 「待落地」只用于「毕业：做」——${graduation} 类结论直接归档，不占落地门`)
+        if (!sectionBody(text, '验收标准'))
+          problems.push(`${where}:${lineOf(text, '## 验收标准')} 「待落地」卡缺非空 ## 验收标准——门票由格式承载，写不出就不许进落地`)
+        const dest = destination(headText(text))
+        if (!dest) problems.push(`${where}:1 「待落地」卡缺去向值（> **结论/去向**：rfc|note|implementation — <落点>）`)
+        else if (!GRADUATED.includes(dest))
+          problems.push(`${where}:1 去向「${dest}」不能停在「待落地」——只有 rfc|note|implementation 进落地，其余毕业即归档`)
+      }
+      if (pool === 'bugs' && (data.status === '修复就绪' || data.status === '修复已落地')) {
+        if (!sectionBody(text, '已修判定'))
+          problems.push(`${where}:${lineOf(text, '## 已修判定')} 「${data.status}」卡缺非空 ## 已修判定——该翻转即门票，先写判据再翻`)
+      }
+      // 2026-11-02（五道门落地）：归档「毕业：做」卡的去向升级为封闭集值 + 审查记录在场。
+      //   生效日 = 2026-11-03：规则落地当天及以前的卡按原契约（去向在场即可），不追改已归档正文。
+      if (pool === '_archive/settled_issues' && String(data.opened) >= '2026-11-03') {
         const statusLine = text.split('\n').slice(0, 12).find(line => line.trimStart().startsWith('>') && line.includes('状态：')) ?? ''
-        const head = text.split('\n').slice(0, 12).join('\n').replaceAll('**', '')
-        if (/毕业：\s*做/.test(statusLine.replaceAll('**', '')) && !/去向\s*[:：=＝]\s*\S/.test(head)) {
-          problems.push(`${where}:1 归档「毕业：做」卡缺去向（卡顶写 \`> **结论/去向**：...\`；RFC/Note 路径或 \`用户（YYYY-MM-DD）\`）`)
+        const head = headText(text)
+        if (/毕业：\s*做/.test(statusLine.replaceAll('**', ''))) {
+          const dest = destination(head)
+          if (!dest) problems.push(`${where}:1 归档「毕业：做」卡缺去向值（> **结论/去向**：rfc|note|implementation|pending|none|rejected — <落点>）`)
+          else if (!DESTINATIONS.includes(dest)) problems.push(`${where}:1 去向「${dest}」不在封闭集（rfc|note|implementation|pending|none|rejected）`)
+          if (!/审查\s*[:：]\s*(agent|用户|跳过)/.test(head))
+            problems.push(`${where}:1 归档「毕业：做」卡缺审查记录（状态行写 审查：agent|用户|跳过 — …；跳过要写理由）`)
         }
       }
       // 2026-10-12 立（借鉴卡落地）：状态行↔frontmatter 镜像互查 + 问题卡「毕业：」封闭头。
@@ -218,6 +275,8 @@ export function backlogLivenessProblems(backlogRoot) {
         const topic = topicByDir[name.split('/')[0]]
         if (topic !== undefined && data.topic !== topic) problems.push(`${where}:2 topic 应与子目录匹配（${topic}）`)
         if (typeof data.intent !== 'string' || !data.intent.trim() || /[\r\n]/.test(data.intent)) problems.push(`${where}:1 缺单行非空 intent`)
+        // 2026-11-02（五道门落地）：材料是证据不是工作项——状态只住题名页，第二状态源必漂。
+        if (!pool.startsWith('_archive/') && 'status' in data) problems.push(`${where}:1 研究材料不设 status——材料是证据，状态只住题名页`)
       } else if (pool === 'methods') {
         if (data.name !== basename(name, '.md')) problems.push(`${where}:2 name 须匹配文件名 ${basename(name, '.md')}`)
         for (const key of ['description', 'whenToUse']) {

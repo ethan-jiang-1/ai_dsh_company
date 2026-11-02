@@ -14,11 +14,17 @@ import { backlogLivenessProblems } from '../../tools/lib/backlog-liveness.mjs'
 //   issues/README.md 暂移 → 报必需索引缺失；新 research 文件缺 frontmatter → 报缺 frontmatter。四项各自还原后 ALL PASS。
 // 2026-10-10：函数体已原样挪进 tools/lib/backlog-liveness.mjs（本卡「两处重复收成模块」）。
 // 2026-10-25：归档「毕业：做」卡的 durable 去向（opened ≥ 2026-10-25；老卡豁免）——理由与反证见 lib 的检查块。
+// 2026-11-02（五道门）：状态 ↔ 出口物耦合——`待落地` 门票/去向/毕业头、`修复就绪`/`修复已落地` 的 `## 已修判定`、
+//   归档去向封闭集 + `审查：` 记录（生效日 2026-11-03）、题名页 `调研中|已定性`、材料禁 status。
+//   负例留证 2026-11-02（真树植入四张 `zz-probe` 卡，实跑原话；逐条删除即绿）：
+//     「待落地」卡缺非空 ## 验收标准 / 缺去向值；「修复就绪」卡缺非空 ## 已修判定；
+//     题名页缺 frontmatter；归档「毕业：做」卡缺去向值 / 缺审查记录。
+//   豁免方向同轮验过：opened = 2026-11-02 的已归档卡（散文去向、无审查）不红。
 // 留在本文件的是调用与上面这段「为什么」——判据正文只有一份实现，spec 改为直接 import 该模块
 // （原先 spec 靠切本文件源码 + vm 求值，改这里的注释就会假红，已实测证伪后拆除）。
 export function run({ root, ok, fail }) {
   const problems = backlogLivenessProblems(join(root, '_backlog'))
   problems.length === 0
-    ? ok('backlog-liveness（制度目录/README、卡头、关闭判断、method 形状、递归索引、研究题两级索引、归档做卡去向）')
+    ? ok('backlog-liveness（制度目录/README、卡头、关闭判断、method 形状、递归索引、研究题两级索引、归档做卡去向、五道门门票/去向/审查）')
     : fail('backlog-liveness', problems.join('；'))
 }

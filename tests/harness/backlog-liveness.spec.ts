@@ -27,11 +27,16 @@ const index = (pool: string, path: string) => {
   } else put(`${pool}/README.md`, `# Index\n\n[material](<${path}>)\n`)
 }
 // 题名页正例：三行名头 + 材料表；归档题名页另带 `> 归档：` 行。
-const banner = ({ archive, lines = [] }: { archive?: string; lines?: string[] } = {}) => [
+// 2026-11-02（五道门）：活跃题名页带 frontmatter（status 调研中|已定性 + opened）；归档题名页冻结、不回填。
+const banner = ({ archive, lines = [], status = '调研中', opened = '2026-10-09', head = !archive, conclusion }: {
+  archive?: string; lines?: string[]; status?: string; opened?: string; head?: boolean; conclusion?: string
+} = {}) => [
+  ...(head ? ['---', `status: ${status}`, `opened: ${opened}`, '---', ''] : []),
   '# Topic', '',
   '> 问题：这轮研究回答什么',
   '> 消费者：—',
   '> 产出的卡：—',
+  ...(conclusion ? [`> 结论：${conclusion}`] : []),
   ...(archive ? [`> 归档：${archive}`] : []),
   '', '## 材料', '', ...lines, '',
 ].join('\n')
@@ -207,31 +212,84 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     expect(problems).toContain('「毕业：马上做」头不在封闭集')
   })
 
-  // 2026-10-12：缺陷轨「活跃」→「调查中」改名 + 三新值；修复就绪缺 ## 已修判定如实不查（验收在场族按用户裁定延后）。
+  // 2026-10-12：缺陷轨「活跃」→「调查中」改名 + 三新值。
+  // 2026-11-02（五道门）：修复就绪/修复已落地从「如实不查」升级为门票检查——夹具补 ## 已修判定。
   // 注：index() 对活跃池是覆写不是追加——多卡时一次写全索引。
-  it('renames the bug active value, accepts the new bug enums with mirrored lines, defers acceptance presence', () => {
+  it('renames the bug active value and accepts the new bug enums with mirrored lines and tickets', () => {
     put('bugs/BUG-013-old.md', '---\nstatus: 活跃\nseverity: P2\nopened: 2026-10-09\n---\n\n# Bug\n\n> 严重级别：P2（次要）｜发现：2026-10-09｜状态：活跃\n')
     index('bugs', 'BUG-013-old.md')
     expect(check(root).join('\n')).toContain('status "活跃" 不属于此桶')
     for (const [id, value] of [['014', '调查中'], ['015', '修复就绪'], ['016', '修复已落地'], ['017', '等人拍板']]) {
-      put(`bugs/BUG-${id}-demo.md`, `---\nstatus: ${value}\nseverity: P2\nopened: 2026-10-09\n---\n\n# Bug\n\n> 严重级别：P2（次要）｜发现：2026-10-09｜状态：${value}\n`)
+      put(`bugs/BUG-${id}-demo.md`, `---\nstatus: ${value}\nseverity: P2\nopened: 2026-10-09\n---\n\n# Bug\n\n> 严重级别：P2（次要）｜发现：2026-10-09｜状态：${value}\n\n## 已修判定\n\n- [ ] 判据\n`)
     }
     put('bugs/README.md', '# Index\n\n' + ['BUG-013-old.md', 'BUG-014-demo.md', 'BUG-015-demo.md', 'BUG-016-demo.md', 'BUG-017-demo.md'].map(name => `[material](<${name}>)`).join('\n') + '\n')
     expect(check(root).filter(problem => problem.includes('BUG-0'))).toEqual(['_backlog/bugs/BUG-013-old.md:2 status "活跃" 不属于此桶'])
   })
 
   // 2026-10-25（交接契约）：归档「毕业：做」卡必须留下 durable 去向；老卡祖父豁免。
-  // 反证：no-destination → 红；with-destination → 绿；2026-10-24 old → 不红。
-  it('requires a destination on freshly archived do-cards and grandfathers older cards', () => {
-    const archived = (date, graduation, extra = '') =>
-      `---\nstatus: 已结\nopened: ${date}\n---\n\n# Issue\n\n> 立卡：${date} ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：${graduation} ｜ 可关闭：是\n${extra}\n`
-    put('_archive/settled_issues/2026-10-25-no-destination.md', archived('2026-10-25', '做'))
-    put('_archive/settled_issues/2026-10-25-with-destination.md', archived('2026-10-25', '做', '\n> **结论/去向**：Note -> notes/implemented/2026-10-25-demo.md'))
-    put('_archive/settled_issues/2026-10-24-old.md', archived('2026-10-24', '做'))
-    for (const name of ['2026-10-25-no-destination.md', '2026-10-25-with-destination.md', '2026-10-24-old.md']) index('_archive/settled_issues', name)
+  // 2026-11-02（五道门）：去向升级为封闭集值 + 审查记录在场；生效日 2026-11-03，落地当天的卡不追改。
+  // 反证：no-destination → 红；prose → 红；with-typed → 绿；老卡 → 不红。
+  it('requires a typed destination and a review record on freshly archived do-cards and grandfathers older cards', () => {
+    const archived = (date, extra = '') =>
+      `---\nstatus: 已结\nopened: ${date}\n---\n\n# Issue\n\n> 立卡：${date} ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是\n${extra}\n`
+    put('_archive/settled_issues/2026-11-03-no-destination.md', archived('2026-11-03'))
+    put('_archive/settled_issues/2026-11-03-prose.md', archived('2026-11-03', '\n> **结论/去向**：用户已拍板「就这么办」'))
+    put('_archive/settled_issues/2026-11-03-with-destination.md', archived('2026-11-03', '\n> **结论/去向**：note — `notes/implemented/2026-11-03-demo.md`\n> 审查：agent — 语义审过'))
+    put('_archive/settled_issues/2026-11-03-no-review.md', archived('2026-11-03', '\n> **结论/去向**：note — `notes/implemented/2026-11-03-demo.md`'))
+    put('_archive/settled_issues/2026-11-02-old.md', archived('2026-11-02'))
+    for (const name of ['2026-11-03-no-destination.md', '2026-11-03-prose.md', '2026-11-03-with-destination.md', '2026-11-03-no-review.md', '2026-11-02-old.md']) index('_archive/settled_issues', name)
     const problems = check(root).join('\n')
-    expect(problems).toContain('_backlog/_archive/settled_issues/2026-10-25-no-destination.md:1 归档「毕业：做」卡缺去向')
-    expect(problems).not.toContain('2026-10-25-with-destination')
-    expect(problems).not.toContain('2026-10-24-old')
+    expect(problems).toContain('_backlog/_archive/settled_issues/2026-11-03-no-destination.md:1 归档「毕业：做」卡缺去向值')
+    expect(problems).toContain('_backlog/_archive/settled_issues/2026-11-03-prose.md:1 归档「毕业：做」卡缺去向值')
+    expect(problems).toContain('_backlog/_archive/settled_issues/2026-11-03-no-review.md:1 归档「毕业：做」卡缺审查记录')
+    expect(problems).not.toContain('2026-11-03-with-destination')
+    expect(problems).not.toContain('2026-11-02-old')
+  })
+
+  // 2026-11-02（五道门）：待落地 = 已过定性门（结论=做 + 门票 + 去向）；其余结论不占落地门。
+  it('gates the issue ready status on the ticket, the graduation head and the destination', () => {
+    const ready = (id, graduation, dest, body = '\n- [ ] 可执行判据\n') =>
+      `---\nstatus: 待落地\nopened: 2026-11-02\n---\n\n# Issue ${id}\n\n> 立卡：2026-11-02 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：${graduation} ｜ 可关闭：否\n>\n> **结论/去向**：${dest}\n\n## 验收标准\n${body}`
+    put('issues/ready.md', ready('ok', '做', 'note — `notes/implemented/2026-11-02-demo.md`'))
+    put('issues/no-ticket.md', ready('ticket', '做', 'note — x', '\n'))
+    put('issues/not-do.md', ready('head', '以后做', 'note — x'))
+    put('issues/bad-dest.md', ready('dest', '做', 'pending — 用户（2026-11-02）'))
+    put('issues/README.md', '# Index\n\n' + ['ready.md', 'no-ticket.md', 'not-do.md', 'bad-dest.md'].map(name => `[material](<${name}>)`).join('\n') + '\n')
+    const problems = check(root).join('\n')
+    expect(problems).toContain('_backlog/issues/no-ticket.md:12 「待落地」卡缺非空 ## 验收标准')
+    expect(problems).toContain('_backlog/issues/not-do.md:1 「待落地」只用于「毕业：做」')
+    expect(problems).toContain('_backlog/issues/bad-dest.md:1 去向「pending」不能停在「待落地」')
+    expect(problems).not.toContain('issues/ready.md')
+  })
+
+  // 2026-11-02（五道门）：缺陷轨两张门票——修复就绪/修复已落地缺判据 = 门没造好。
+  it('requires 已修判定 on a bug at the fix gates', () => {
+    const bug = (id, status, body = '') =>
+      `---\nstatus: ${status}\nseverity: P1\nopened: 2026-11-02\n---\n\n# Bug ${id}\n\n> 严重级别：P1（重要）｜发现：2026-11-02｜状态：${status}\n\n${body}`
+    put('bugs/BUG-040-ready.md', bug('040', '修复就绪'))
+    put('bugs/BUG-041-landed.md', bug('041', '修复已落地', '## 已修判定\n\n- [ ] 判据\n'))
+    put('bugs/BUG-042-investigating.md', bug('042', '调查中'))
+    put('bugs/README.md', '# Index\n\n' + ['BUG-040-ready.md', 'BUG-041-landed.md', 'BUG-042-investigating.md'].map(name => `[material](<${name}>)`).join('\n') + '\n')
+    const problems = check(root).join('\n')
+    expect(problems).toContain('_backlog/bugs/BUG-040-ready.md:1 「修复就绪」卡缺非空 ## 已修判定')
+    expect(problems).not.toContain('BUG-041-landed')
+    expect(problems).not.toContain('BUG-042-investigating')
+  })
+
+  // 2026-11-02（五道门）：题名页是工作项（调研中 → 已定性），材料是证据（不设 status）。
+  it('requires a status on active topic pages, a conclusion once qualified, and no status on material', () => {
+    put('research/no-head/2026-11-02-a.md', '---\ntopic: 技术\nintent: A.\n---\n')
+    put('research/no-head/README.md', banner({ head: false, lines: ['- [a](2026-11-02-a.md)'] }))
+    put('research/qualified/2026-11-02-b.md', '---\ntopic: 技术\nintent: B.\n---\n')
+    put('research/qualified/README.md', banner({ status: '已定性', lines: ['- [b](2026-11-02-b.md)'] }))
+    put('research/with-status/2026-11-02-c.md', '---\nstatus: 调研中\ntopic: 技术\nintent: C.\n---\n')
+    put('research/with-status/README.md', banner({ lines: ['- [c](2026-11-02-c.md)'] }))
+    put('research/README.md', '# Index\n\n' + ['no-head/README.md', 'qualified/README.md', 'with-status/README.md'].map(path => `[topic](<${path}>)`).join('\n') + '\n')
+    const problems = check(root).join('\n')
+    expect(problems).toContain('_backlog/research/no-head/README.md:1 缺 frontmatter（status: 调研中|已定性 + opened: YYYY-MM-DD）')
+    expect(problems).toContain('_backlog/research/qualified/README.md:1 「已定性」缺「> 结论：」行')
+    expect(problems).toContain('_backlog/research/with-status/2026-11-02-c.md:1 研究材料不设 status')
+    put('research/qualified/README.md', banner({ status: '已定性', conclusion: '结论一句话', lines: ['- [b](2026-11-02-b.md)'] }))
+    expect(check(root).join('\n')).not.toContain('qualified/README.md')
   })
 })

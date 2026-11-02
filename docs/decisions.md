@@ -59,3 +59,4 @@
 | D53 | 会话检索 = bundle 内 insert + isolate 独立 provider 组；不替换 host 行（默认 in-app 安装约束） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |
 | D54 | 发布姿态 = MIT + npm 身份齐全 + 市场 index handoff；npm publish 仍人工（D6） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |
 | D55 | 发行版六轴与术语对齐：公司状态/run trace；发布字节装 `_dist`、sourceFingerprint；docs-first legacy 名 | [distribution-alignment Note](../notes/implemented/2026-11-02-distribution-alignment.md) |
+| D56 | backlog 五道门：issue `待落地`、研究题名页 `调研中/已定性`、去向封闭集与审查记录、门票由门禁钉住；不加 `落地中/待审` | [five-gates Note](../notes/implemented/2026-11-02-backlog-five-gates.md) |
