@@ -11,11 +11,11 @@ opened: 2026-11-03
 
 **问题与期望结果：** 用户要求以 fresh agent 视角重评七个维度（文档/代码渐进披露、代码与测试层次、文档—执行—验收结构、上下文腐化、测试资产、反馈通路、DSH 插件约定），并先评估、REVIEW 后再持续改善。期望结果 = 一份带 file:line 与实跑读数的分级发现 + 一个经用户选批的改善序列。
 
-**当前情况：** 第五轮审计已完成，报告 = [七维审计](../research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)。**批次 A + E 部分 + B（授权门牌）+ C（0.7.2 重打）已落地**（R5-01/02/08/10/11/21/22/30/31/33，R5-06 培养壳；Note 见「已落地」节）。当前读数：`pnpm verify` 53 门 ALL PASS + 2 SKIP；`pnpm test` **131 spec / 1069 例（1066 pass / 3 skip）**；`pnpm typecheck` exit 0；`release-smoke` **44 PASS**（含卸载/重装）；`client-load-smoke` ALL PASS；`ui-scene-smoke`（dev + isolated golden）9/9 页签 ALL PASS。审计基线（before）见报告。七维评分：D1 B / D2 B / D3 B- / D4 C+ / D5 B / D6 C / D7 B-。
+**当前情况：** 第五轮审计已完成，报告 = [七维审计](../research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)。**批次 A + E 部分 + B（授权门牌）+ C（0.7.2 重打）已落地**（R5-01/02/08/10/11/21/22/30/31/33，R5-06 培养壳；Note 见「已落地」节）。当前读数：`pnpm verify` 53 门 ALL PASS + 2 SKIP；`pnpm test` **131 spec / 1069 例（1066 pass / 3 skip）**；`pnpm typecheck` exit 0；`release-smoke` **44 PASS**（含卸载/重装）；`release --check` **READY 0.7.2 @ 419839e**；`client-load-smoke` ALL PASS；`ui-scene-smoke`（dev + isolated golden）9/9 页签 ALL PASS。审计基线（before）见报告。七维评分：D1 B / D2 B / D3 B- / D4 C+ / D5 B / D6 C / D7 B-。
 
-**未决问题：** ① 用户选批（A–F，见报告 §5）；② 涉及 `_backlog` 制度面的 B 批（授权门牌/语义审 owner）是否授权；③ D7 的 web-only `inject`、`$DSH_HOME/company/` 自造树、品牌槽半边是否按「文档化偏离」保留，还是改成 DSH 原生载体；④ `_dist` 是否现在重打（`release --check` 已红）。
+**未决问题：** ① D1/D2/D5/D7 到 A- 的剩余 GAP（新 goal 跟踪）；② D7 的 web-only `inject`、`$DSH_HOME/company/` 自造树、品牌槽半边按「文档化偏离」保留还是改成 DSH 原生载体；③ 真模型/Desktop/npm publish 的验收授权。B/C 已落地。
 
-**下一步：** 用户 REVIEW 报告后点名剩余批次（B–F）；B 批（授权门牌/语义审 owner）需用户点头。做完一批按 [开发环 §12](../../docs/guides/dev-loop.md) 收尾并回本卡更新。
+**下一步：** 按新 goal 把 D1/D2/D5/D7 从 B+ 打磨到 A-（D3/D4/D6 维持 A-），每批复评；细节见报告 §5/§8。
 
 ## 已落地（批次 A，2026-11-03）
 
@@ -51,7 +51,7 @@ opened: 2026-11-03
 
 ## 已知与未决
 
-- 最重：R5-01 isolated 金样档不可启动；R5-02 两门禁根在已删除 `workspace/`（真空 PASS）；R5-03 `release --check` 红而 verify 绿；R5-04 授权门牌截断；R5-05 语义审 owner 空壳；R5-06 培养页签壳 0%；R5-30 `diagnose` 漏报 34% 非零退出。
+- 已修：R5-01/02/03/04/05/06/07/08/09(重点)/10/11/12/17/23(首刀)/27/30/31/33；剩余 GAP 见报告 §5/§8 与新 goal。
 - 已守住（不重做）：Plan Mode 首屏、台账路由、证据先行、close-out 单家、AttentionTab/守卫/host-composition 补测、真页面 9/9 与错误环捕获。
 - 未验证：真模型档、Desktop 壳、`notes/` 全量两两比对、待审批/child/team failed 的 diagnose 归因。
 
