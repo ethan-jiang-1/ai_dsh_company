@@ -1,4 +1,4 @@
-# 发布 runbook（0.3.x 起）
+# 发布 runbook
 
 > 性质：操作步骤（how）。合同（发布形态 / 兼容 / 版本政策）唯一家 = [release.md](../release.md)；
 > 本文只把“每次发布到底做什么”固定成一条可执行路径。命令入口 = `tools/release.mjs`。
@@ -12,7 +12,7 @@
 ## 1. 五步
 
 ```sh
-# ① 选版本；改 package.json + CHANGELOG + release.md 版本行；market-index.json 自动重生成
+# ① 选版本；改 package.json + CHANGELOG；market-index.json 自动重生成
 pnpm release --bump patch        # 或 minor / major
 
 # ② 填 CHANGELOG 的“本版变化”（用户可见；删掉 TODO）
@@ -27,13 +27,13 @@ pnpm release --verify
 pnpm release --verify --with-key
 
 # ⑤ 提交发布字节，再在干净树上做最终核对
-git add -A && git commit -m "chore(release): 0.3.4"
+git add -A && git commit -m "chore(release): <version>"
 pnpm release --stamp              # 把 manifest 的 gitSha 钉到发布 commit，不改产物
 pnpm release --check
 ```
 
 `--prepare` / `--verify` 会改 tracked 的 `_dist/安装手册.md`，所以它们允许发布产物造成的脏树；`--check`
-默认要求干净树。`--all` = prepare + verify，不会替你 commit/push/publish。
+默认要求干净树。`--verify` 装 `_dist` 同一份 tarball，并用 `sourceFingerprint` 拒绝“源变但产物没重打”；`--all` = prepare + verify，不 commit/push/publish。
 
 ## 2. 产物与证据
 

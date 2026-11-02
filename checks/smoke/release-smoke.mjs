@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 认证档（不进 pnpm test）：company-pack 构建 → npm pack → 干净 profile 真安装 → built CLI boot/RPC。
-// 认证档自 2026-10-13 起同时认「出厂骨架随包 + 首启自举（落盘 / 二次启动零变更）」。
+// 认证档（不进 pnpm test）：发布 tarball → 官方 profile 初始化 → 真安装 → built CLI boot/RPC。
+// `--tarball`/`--expect-sha`：装 `_dist` 的同一份发布字节（release --verify 走这条）；省略才现场 build+pack。
+// 同时认「出厂骨架随包 + 首启自举（落盘 / 二次启动零变更）」。
 // 何时跑：pack 依赖、安装形状、built 启动器改动时；或它属于关键验收时（无 key，分钟级）
 // vendor 产物是前置条件，不由此脚本重建；存在/运行通过不代表新鲜。构建配方见 guides/bootstrap。
-// 用法：source run/env.sh && node checks/smoke/release-smoke.mjs [--keep]
+// 用法：source run/env.sh && node checks/smoke/release-smoke.mjs [--keep] [--tarball <path>] [--expect-sha <sha256>]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
@@ -16,6 +17,12 @@ import { plainNodeEnv, releaseProcesses } from '../../tools/drivers/release-proc
 import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
 
 const KEEP = process.argv.includes('--keep')
+const valueOf = flag => {
+  const index = process.argv.indexOf(flag)
+  return index < 0 ? undefined : process.argv[index + 1]
+}
+const PROVIDED_TARBALL = valueOf('--tarball') === undefined ? undefined : resolve(ROOT, valueOf('--tarball'))
+const EXPECTED_SHA = valueOf('--expect-sha')
 const PACK_DIR = join(ROOT, 'packages/company-pack')
 const PROFILE = 'release-check'
 const ROLES = [...COMPANY_ROLE_IDS, ...COMPANY_SUPPORT_PRESET_IDS]
@@ -40,7 +47,7 @@ let lockDir
 let ownsProfile = false
 let ownsLock = false
 try {
-  // 干净 home 必须在**自己的子目录**；产品形状下身份跟 workspace 走，不再写 home 根。
+  // 干净 home 必须在**自己的子目录**；交付形态下身份跟 workspace 走，不再写 home 根。
   const devHome = requireDevHome('release-smoke')
   const home = join(devHome, 'tmp/release-smoke-home')
   rmSync(home, { recursive: true, force: true })
@@ -59,8 +66,8 @@ try {
       throw new Error(`缺少 built artifact：${artifact}；按 docs/guides/bootstrap.md 构建；不会回退 tsx/src`)
     }
   }
-  console.log(`built CLI：${cli}（plain Node；vendor 产物新鲜度未证明，本脚本只重建 company-pack）`)
-  // run bundle 的验收落点：隔离 workspace；只由 host 写 `.dsh-company/`。
+  console.log(`built CLI：${cli}（plain Node；vendor 产物新鲜度未证明；本轮${PROVIDED_TARBALL === undefined ? '现场重建 company-pack' : '安装 _dist 发布字节'}）`)
+  // 公司状态的验收落点：隔离 workspace；只由 host 写 `.dsh-company/`。
   const companyHome = join(home, 'tmp/release-company-workspace')
   rmSync(companyHome, { recursive: true, force: true })
   mkdirSync(companyHome, { recursive: true })
@@ -80,43 +87,51 @@ try {
   ownsLock = true
   profileDir = join(home, 'profiles', PROFILE)
 
-  console.log('① 构建 company-pack 发布面（tsc + tsdown）')
-  // 为什么必须 clean + `-b`（2026-09-26 实证，反证在案）：
-  // `tsc -p packages/company-pack/tsconfig.json` 在 **solution root** 上是**静默 no-op**——
-  // 该 tsconfig 是 `files: []` + 两条 references，非 build 模式不展开 references ⇒ 零输入；
-  // 而 TS 的 TS18002（"没有输入文件"）报错条件要求 references 为空，非空即**抑制报错** ⇒ 退出 0、零 emit。
-  // 两条分支实测：① 干净态 ⇒ lib/ 根本没被创建、tsdown 的 entry（lib/types/index.js）无来源；
-  // ② 陈旧态 ⇒ 上一次 `tsc -b` 的产物原样留着被 tsdown 打包 ⇒ **发布冒烟验的是旧包（假绿）**。
-  // 所以这里既改 `-b`（真构建），又先删 lib/（杜绝陈旧产物——release 面要的是"来自当前源码的新鲜构建"，
-  // 同文件对 vendor 的既有警告是同一个道理）。
-  rmSync(join(PACK_DIR, 'lib'), { recursive: true, force: true })
-  await run(process.execPath, ['./node_modules/typescript/bin/tsc', '-b', 'packages/company-pack'])
-  const tsdownRun = join(dirname(createRequire(join(ROOT, 'package.json')).resolve('tsdown/package.json')), 'dist/run.mjs')
-  await run(process.execPath, [tsdownRun], { cwd: PACK_DIR })
+  let tarball
+  if (PROVIDED_TARBALL !== undefined) {
+    tarball = PROVIDED_TARBALL
+    if (!existsSync(tarball) || !statSync(tarball).isFile()) throw new Error(`--tarball 不存在或不是文件：${tarball}`)
+    const actual = createHash('sha256').update(readFileSync(tarball)).digest('hex')
+    if (EXPECTED_SHA !== undefined && actual !== EXPECTED_SHA) {
+      throw new Error(`--tarball sha256 ${actual} ≠ --expect-sha ${EXPECTED_SHA}；拒绝安装与 manifest 不一致的字节`)
+    }
+    check('--tarball 与 manifest sha256 一致', EXPECTED_SHA === undefined || actual === EXPECTED_SHA, actual)
+    console.log(`① 使用发布字节（不重打）：${tarball.split('/').pop()}（${Math.round(statSync(tarball).size / 1024)} KB）`)
+  } else {
+    console.log('① 构建 company-pack 发布面（tsc + tsdown）')
+    // 为什么必须 clean + `-b`（2026-09-26 实证，反证在案）：
+    // `tsc -p packages/company-pack/tsconfig.json` 在 **solution root** 上是**静默 no-op**——
+    // 该 tsconfig 是 `files: []` + 两条 references，非 build 模式不展开 references ⇒ 零输入；
+    // 而 TS 的 TS18002（"没有输入文件"）报错条件要求 references 为空，非空即**抑制报错** ⇒ 退出 0、零 emit。
+    // 两条分支实测：① 干净态 ⇒ lib/ 根本没被创建、tsdown 的 entry（lib/types/index.js）无来源；
+    // ② 陈旧态 ⇒ 上一次 `tsc -b` 的产物原样留着被 tsdown 打包 ⇒ **发布冒烟验的是旧包（假绿）**。
+    // 所以这里既改 `-b`（真构建），又先删 lib/（杜绝陈旧产物——release 面要的是"来自当前源码的新鲜构建"，
+    // 同文件对 vendor 的既有警告是同一个道理）。
+    rmSync(join(PACK_DIR, 'lib'), { recursive: true, force: true })
+    await run(process.execPath, ['./node_modules/typescript/bin/tsc', '-b', 'packages/company-pack'])
+    const tsdownRun = join(dirname(createRequire(join(ROOT, 'package.json')).resolve('tsdown/package.json')), 'dist/run.mjs')
+    await run(process.execPath, [tsdownRun], { cwd: PACK_DIR })
 
-  console.log('② npm pack')
-  const packTmp = join(home, 'tmp/release-pack')
-  rmSync(packTmp, { recursive: true, force: true })
-  mkdirSync(packTmp, { recursive: true })
-  const packed = await run('npm', ['pack', '--pack-destination', packTmp], { cwd: PACK_DIR })
-  const tarball = join(packTmp, packed.trim().split('\n').filter(Boolean).at(-1) ?? '')
-  if (!statSync(tarball).isFile()) throw new Error(`npm pack 没产出 tarball（${tarball}）`)
-  console.log(`  tarball：${tarball.split('/').pop()}（${Math.round(statSync(tarball).size / 1024)} KB）`)
+    console.log('② npm pack')
+    const packTmp = join(home, 'tmp/release-pack')
+    rmSync(packTmp, { recursive: true, force: true })
+    mkdirSync(packTmp, { recursive: true })
+    const packed = await run('npm', ['pack', '--pack-destination', packTmp], { cwd: PACK_DIR })
+    tarball = join(packTmp, packed.trim().split('\n').filter(Boolean).at(-1) ?? '')
+    if (!statSync(tarball).isFile()) throw new Error(`npm pack 没产出 tarball（${tarball}）`)
+    console.log(`  tarball：${tarball.split('/').pop()}（${Math.round(statSync(tarball).size / 1024)} KB）`)
+  }
 
-  console.log(`③ 预置干净 profile（${PROFILE}）`)
+  console.log(`③ 官方初始化干净 profile（${PROFILE}）`)
   rmSync(profileDir, { recursive: true, force: true })
-  mkdirSync(profileDir, { recursive: true })
   ownsProfile = true
-  // Custom names default to dsh-base only. Match the vendor web template explicitly.
-  // 0.2.1：实验性 schedule bundle 退役（宿主 schedule/ui-schedule 由 web-app 挂，
-  // time-context/tool-schedule 归 preset 行所有权）⇒ 安装形状回到 base + web-app 两件。
-  writeFileSync(join(profileDir, 'package.json'), `${JSON.stringify({
-    name: `dsh-profile-${PROFILE}`, private: true,
-    dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app'], patchReload: 'startup' } },
-  }, null, 2)}\n`)
-  writeFileSync(join(profileDir, 'pnpm-workspace.yaml'), 'packages:\n  - .\n\nnodeLinker: hoisted\nautoInstallPeers: false\n')
+  // FAQ 20：自定义 profile 首次用 shipped web template；不手写 package.json / bundle list。
+  await run(process.execPath, [cli, '--profile', PROFILE, '--from-default-profile', 'web', '--dump-default-config'],
+    { cwd: home, timeoutMs: 120_000 })
   writeFileSync(join(profileDir, '.npmrc'), `store-dir=${join(ROOT, '.pnpm-store')}\ncache-dir=${join(home, 'cache/pnpm')}\n`)
-  writeFileSync(join(profileDir, 'cordis.patch.yml'), '# release-smoke: no product profile patch\n[]\n')
+  const initialized = JSON.parse(readFileSync(join(profileDir, 'package.json'), 'utf8'))
+  check('官方 init 的 dependencies 是对象', typeof initialized.dependencies === 'object' && initialized.dependencies !== null)
+  check('官方 init 不写 patchReload', !Object.hasOwn(initialized.dsh?.profile ?? {}, 'patchReload'))
 
   console.log('④ built dsh plugin add file:<tarball>')
   await run(process.execPath, [cli, 'plugin', '--profile', PROFILE, 'add', `file:${tarball}`], { timeoutMs: 180_000 })
@@ -151,21 +166,18 @@ try {
   // patch；改值替换被 session-controller 依赖的服务行会报
   // `file-upload: Agent resolver is already registered`，application=failed。
   // 这条断言就是默认路径的看门狗：CLI 绿不能替代它。
-  console.log('④c 应用内安装（pluginManager/installBundle，Plugins 页同款）')
-  const inAppProfile = 'release-in-app'
+  console.log('④c 应用内安装（shipped web profile，pluginManager/installBundle；Plugins 页同款）')
+  const inAppProfile = 'web'
   const inAppDir = join(home, 'profiles', inAppProfile)
   rmSync(inAppDir, { recursive: true, force: true })
-  mkdirSync(inAppDir, { recursive: true })
-  writeFileSync(join(inAppDir, 'package.json'), `${JSON.stringify({
-    name: `dsh-profile-${inAppProfile}`, private: true,
-    dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app'], patchReload: 'startup' } },
-  }, null, 2)}\n`)
-  writeFileSync(join(inAppDir, 'pnpm-workspace.yaml'), 'packages:\n  - .\n\nnodeLinker: hoisted\nautoInstallPeers: false\n')
-  writeFileSync(join(inAppDir, '.npmrc'), `store-dir=${join(ROOT, '.pnpm-store')}\ncache-dir=${join(home, 'cache/pnpm')}\n`)
-  writeFileSync(join(inAppDir, 'cordis.patch.yml'), '# release-smoke in-app: no product profile patch\n[]\n')
   const inApp = processes.start(process.execPath, [cli, '--profile', inAppProfile, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
   try {
     const inAppBanner = await inApp.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
+    writeFileSync(join(inAppDir, '.npmrc'), `store-dir=${join(ROOT, '.pnpm-store')}\ncache-dir=${join(home, 'cache/pnpm')}\n`)
+    const inAppInit = JSON.parse(readFileSync(join(inAppDir, 'package.json'), 'utf8'))
+    check('shipped web profile 自动初始化（base+web-app）', ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app']
+      .every(bundle => (inAppInit?.dsh?.profile?.bundles ?? []).includes(bundle)))
+    check('shipped web profile 不写 patchReload', !Object.hasOwn(inAppInit?.dsh?.profile ?? {}, 'patchReload'))
     const inAppBase = `http://127.0.0.1:${inAppBanner[1]}`
     const inAppCookie = (await fetch(`${inAppBase}/?token=${inAppBanner[2]}`, { redirect: 'manual', signal: AbortSignal.timeout(15_000) }))
       .headers.getSetCookie().map(cookie => cookie.split(';')[0]).join('; ')
@@ -252,7 +264,7 @@ try {
   // T5（FAQ 24 §8.1）：包目录只读——运行/升级不应在安装副本里新增 data/cache/日志。
   const packBefore = fingerprint(installedPack)
   const has = (rows, rel) => rows !== null && rows.some(row => row.startsWith(`${rel}:`))
-  check('首启把 run bundle 落到 .dsh-company/（含状态/章程；不含根手册/模板）',
+  check('首启把公司状态落到 .dsh-company/（含状态/章程；不含根手册/模板）',
     ['.dsh-company/kb/company.md', '.dsh-company/kb/org.md', '.dsh-company/kb/owners.md', '.dsh-company/kb/motion-ledger.md', '.dsh-company/kb/ceo/CHARTER.md']
       .every(rel => has(first, rel)),
     first === null ? `落点不存在：${companyHome}` : `共 ${String(first.length)} 件`)
@@ -265,7 +277,7 @@ try {
     catalog?.schema === 1 && catalog?.counts?.total === 0 && typeof catalog?.generatedAt === 'string',
     catalog === null ? `catalog 不存在：${catalogFile}` : JSON.stringify(catalog.counts))
 
-  // run bundle 身份（2026-11-01 v3）：首启写 `<workspace>/.dsh-company/bundle.json`（v3）；home 根不写。
+  // 公司状态 身份（2026-11-01 v3）：首启写 `<workspace>/.dsh-company/bundle.json`（v3）；home 根不写。
   const manifestPath = join(companyHome, '.dsh-company/bundle.json')
   const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : null
   check('首启写 workspace bundle.json（v3 身份）',

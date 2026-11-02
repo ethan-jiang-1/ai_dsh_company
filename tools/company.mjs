@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // 状态：常驻（repo dev-only）
-// 何时跑：维护者要在 dev workspace 起一个 `company` profile 看产品形状时。
+// 何时跑：维护者要在 dev workspace 起一个 `company` profile 看交付形态时。
 // 用法：pnpm company [--link] [--port <n>] [--no-open] [--home <DSH_HOME>] [--workspace <dir>]
 //
-// 这**不是**产品入口，也不进 tarball：产品入口是 `dsh --profile company`。
-// **默认走产品同形安装**：tsc + tsdown → npm pack → `dsh plugin --profile company add file:<tgz>`
+// 这**不是**启动入口，也不进 tarball：启动入口是 `dsh --profile company`。
+// **默认走用户侧同形安装**：tsc + tsdown → npm pack → `dsh plugin --profile company add file:<tgz>`
 // → exec dsh。`--link` = 旧的符号链接快速通道（改 presets/** 即刻生效，不验打包面）。
 // 差异表与允许差异 = docs/guides/dev-product-parity.md；本文件只做：定位、pack/add、exec。
 // 不建 profile 之外的写操作（缺 profile 时才用 web 模板初始化）、不写 profile patch、不问 workspace。
@@ -27,7 +27,7 @@ if (args.includes('--help') || args.includes('-h')) {
 
 dev-only：默认 tsc + tsdown + npm pack → \`dsh plugin --profile company add file:<tgz>\` → exec dsh。
 --link = 符号链接快速通道（改 presets/** 即刻生效；不验打包面）。
-产品安装/启动见 README 与 _dist 手册；本脚本不写 profile patch、不问 workspace。`)
+应用内安装/启动见 README 与 _dist 手册；本脚本不写 profile patch、不问 workspace。`)
   process.exit(0)
 }
 const mode = resolveDevMode(args)
@@ -75,7 +75,7 @@ if (!profileExists) {
 
 let tarballPath
 if (mode === 'tarball') {
-  console.log('company(dev): 构建 + 打包（产品同形安装）')
+  console.log('company(dev): 构建 + 打包（用户侧同形安装）')
   run([process.execPath, './node_modules/typescript/bin/tsc', '-b', 'packages/company-pack'])
   run([join(root, 'node_modules/.bin/tsdown')], { cwd: packDir })
   mkdirSync(stateDir, { recursive: true })

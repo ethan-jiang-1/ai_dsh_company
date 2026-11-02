@@ -23,11 +23,11 @@
 | 审计动议输出与角色留痕 | [deliverables-check](audit/deliverables-check.mjs) · [authorship-audit](audit/authorship-audit.mjs) · [journal-audit](audit/journal-audit.mjs) |
 | 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs) · [export-dist](../tools/export-dist.mjs) · [market-index](../tools/market-index.mjs) |
 | **dev 启动** | `pnpm company --no-open` → [company](../tools/company.mjs)：缺 profile 时初始化；默认构建 + `npm pack` + `plugin add file:<tgz>` → exec `dsh --profile company`；`--link` 快速通道 |
-| 产品入口端到端（真 tarball 装 profile → `dsh --profile company` → workspace/run bundle） | [company-entry-smoke](smoke/company-entry-smoke.mjs)（keyless，~1-2 分钟） |
+| 启动入口端到端（真 tarball 装 profile → `dsh --profile company` → workspace/公司状态） | [company-entry-smoke](smoke/company-entry-smoke.mjs)（keyless，~1-2 分钟） |
 
 ## 清单（分区 = 目录本身；逐脚本说明 = 各自头注）
 
-**冒烟 / 真实入口**（`checks/smoke/`，28 个）
+**冒烟 / 真实入口**（`checks/smoke/`，26 个）
 [attention-e2e](smoke/attention-e2e-smoke.mjs) · [channel-matrix](smoke/channel-matrix-smoke.mjs) · [client-load](smoke/client-load-smoke.mjs) · [concurrent-home](smoke/concurrent-home-smoke.mjs) · [delegation](smoke/delegation-smoke.mjs) · [entry-probe](smoke/entry-probe-smoke.mjs) · [external-workspace](smoke/external-workspace-smoke.mjs)
 [human-loop-e2e](smoke/human-loop-e2e-smoke.mjs) · [interrupted-install](smoke/interrupted-install-smoke.mjs) · [isolation-matrix](smoke/isolation-matrix-smoke.mjs) · [multi-install](smoke/multi-install-smoke.mjs) · [multi-window-banner](smoke/multi-window-banner-smoke.mjs)
 [permissions-recovery](smoke/permissions-recovery-smoke.mjs) · [presence-e2e](smoke/presence-e2e-smoke.mjs) · [present-catalog](smoke/present-catalog-smoke.mjs) · [preset](smoke/preset-smoke.mjs) · [probe](smoke/probe-smoke.mjs) · [profile-row](smoke/profile-row-smoke.mjs) · [refactor-drift-oracle](smoke/refactor-drift-oracle.mjs)
@@ -55,7 +55,7 @@
 [ask-latency](../tools/ask-latency.mjs) · [bundle-init](../tools/bundle-init.mjs) · [converge](../tools/converge.mjs) · [deliverables-index](../tools/deliverables-index.mjs) · [diagnose](../tools/diagnose.mjs) · [export-dist](../tools/export-dist.mjs) · [market-index](../tools/market-index.mjs) · [notes-audit](../tools/notes-audit.mjs) · [orient](../tools/orient.mjs) · [propose-sampler](../tools/propose-sampler.mjs)
 [prune-runtime](../tools/prune-runtime.mjs) · [rehearsal-init](../tools/rehearsal-init.mjs) · [release](../tools/release.mjs) · [session-log-export](../tools/session-log-export.mjs) · [snapshot-motion](../tools/snapshot-motion.mjs) · [snapshot-path](../tools/snapshot-path.mjs) · [sync-dsh](../tools/sync-dsh.mjs)
 
-**结构门禁**（`checks/gates/`，52 个模块）：清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，
+**结构门禁**（`checks/gates/`，53 个模块）：清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，
 接线一致性由 `gate-wiring` 门禁强制。pin 常量 = [gates/lib/pin.mjs](gates/lib/pin.mjs)。
 
 ## 共享实现与目录选择

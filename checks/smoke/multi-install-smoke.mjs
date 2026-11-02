@@ -8,7 +8,7 @@
 // A 两个 home 各一个 web profile：bundle id / company.md / catalog / journal 不串。
 // B 非空 home 先有 stock workspace+session，再装 pack：旧数据在，pack 能挂。
 // C 同 home 两个自定义 profile：自动 profile 只有 base（缺 web-app）⇒ presets pending；
-//   这是**反例/预期失败**，证明“profile 名不是隔离单位、一个 home 一个 run bundle”。
+//   这是**反例/预期失败**，证明“profile 名不是隔离单位；base-only 起不了 Web”。
 // D 给自定义 profile 补 @deepseek-ai/dsh-web-app 后可启动（合同：公司包要求 web profile）。
 // E 同 home 再装一个空 bundle 层：不抢行、不覆盖，remove 后公司包仍可用。
 // F 同版本重复 add：bundle 不重复。
@@ -31,7 +31,7 @@ const check = (label, ok, detail = '') => {
 }
 const envFor = (home, workspace) => ({
   HOME: join(home, 'user'), DSH_HOME: join(home, 'dsh'), DSH_COMPANY_HOME: workspace,
-  DSH_COMPANY_BOOTSTRAP: 'if-missing', PATH: `${join(BASE, 'bin')}:${process.env.PATH}`,
+  PATH: `${join(BASE, 'bin')}:${process.env.PATH}`,
   npm_config_store_dir: join(home, 'store'), npm_config_cache: join(home, 'cache'),
 })
 const shim = () => {
@@ -76,16 +76,13 @@ const rpc = async (i) => {
   const cookie = await companyCookie({ fetch: globalThis.fetch, base: i.base, token: i.token })
   return companyRpc({ fetch: globalThis.fetch, base: i.base, cookie, prefix: 'multi-' })
 }
-const consent = (workspace) => {
-  mkdirSync(join(workspace, '.dsh-company'), { recursive: true })
-  writeFileSync(join(workspace, '.dsh-company/.seed-consent'), `${JSON.stringify({
-    v: 1, packVersion: PACK.version, workspace, consentedAt: new Date().toISOString(),
-  }, null, 2)}\n`)
-}
+const initProfile = (home, profile) => spawnSync(join(BASE, 'bin/dsh'),
+  ['--profile', profile, '--from-default-profile', 'web', '--dump-default-config'],
+  { cwd: BASE, env: envFor(home, join(home, 'ws')), encoding: 'utf8', timeoutMs: 120_000 })
 const writeCompany = (workspace, name) => {
-  mkdirSync(join(workspace, 'kb/ceo/journal'), { recursive: true })
-  writeFileSync(join(workspace, 'kb/company.md'), `公司名: ${name}\n`)
-  writeFileSync(join(workspace, 'kb/ceo/journal/acme.md'), `# ${name}\n`)
+  mkdirSync(join(workspace, '.dsh-company/kb/ceo/journal'), { recursive: true })
+  writeFileSync(join(workspace, '.dsh-company/kb/company.md'), `公司名: ${name}\n`)
+  writeFileSync(join(workspace, '.dsh-company/kb/ceo/journal/acme.md'), `# ${name}\n`)
 }
 const profileBundles = (home, profile) => JSON.parse(readFileSync(join(home, 'dsh/profiles', profile, 'package.json'), 'utf8'))?.dsh?.profile?.bundles ?? []
 
@@ -110,7 +107,6 @@ try {
     check(`${name} 重复 add 保留用户 profile patch`, againInstall.status === 0 && readFileSync(patchFile, 'utf8').includes('default: vp-eng'))
     const ws = join(home, 'ws')
     mkdirSync(ws, { recursive: true })
-    consent(ws)
     const booted = await boot(home, ws)
     if (name === 'Acme') aBoot = booted; else bBoot = booted
     const r = await rpc(booted)
@@ -125,24 +121,19 @@ try {
   const idB = JSON.parse(readFileSync(join(homes[1], 'ws/.dsh-company/bundle.json'), 'utf8')).id
   check('两个 home 的 bundle id 不同', idA !== idB)
   check('两个 home 的 company.md/journal 不串',
-    readFileSync(join(homes[0], 'ws/kb/company.md'), 'utf8').includes('Acme')
-    && readFileSync(join(homes[1], 'ws/kb/company.md'), 'utf8').includes('Beta'))
+    readFileSync(join(homes[0], 'ws/.dsh-company/kb/company.md'), 'utf8').includes('Acme')
+    && readFileSync(join(homes[1], 'ws/.dsh-company/kb/company.md'), 'utf8').includes('Beta'))
   check('两个 home 的 session 目录都非空', [homes[0], homes[1]].every(home => existsSync(join(home, 'dsh/sessions')) && readdirSync(join(home, 'dsh/sessions')).length > 0))
 
   console.log('② 非空 home：先有 stock workspace+session，再装 pack')
   const stock = makeHome('home-stock')
   mkdirSync(join(stock, 'ws'), { recursive: true })
-  const stockProfile = join(stock, 'dsh/profiles/web')
-  mkdirSync(stockProfile, { recursive: true })
-  writeFileSync(join(stockProfile, 'package.json'), `${JSON.stringify({ name: 'dsh-profile-web', private: true, dsh: { profile: { bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app'], patchReload: 'startup' } } }, null, 2)}\n`)
-  writeFileSync(join(stockProfile, 'pnpm-workspace.yaml'), 'packages:\n  - .\n\nnodeLinker: hoisted\nautoInstallPeers: false\n')
   const stockBoot = await boot(stock, join(stock, 'ws'))
   const stockRpc = await rpc(stockBoot)
   await stockRpc('workspace/create', { request: { path: join(stock, 'ws') } })
   const stockSession = await stockRpc('session/create', { request: { cwd: join(stock, 'ws'), agentPreset: 'standard' } })
   await stop(stockBoot)
   const stockInstall = install(stock, 'web', `file:${TARBALL}`)
-  consent(join(stock, 'ws'))
   check('非空 home 后装 pack 成功', stockInstall.status === 0, `exit=${String(stockInstall.status)} ${(stockInstall.stderr ?? '').slice(-160)}`)
   const afterStock = await boot(stock, join(stock, 'ws'))
   const afterRpc = await rpc(afterStock)
@@ -170,13 +161,12 @@ try {
   }
   if (!customFailed) check('base-only 自定义 profile 未失败（合同可能变了）', false)
 
-  console.log('④ 给自定义 profile 补 web-app 后可启动')
-  const customProfile = join(shared, 'dsh/profiles/web-a/package.json')
-  const customManifest = JSON.parse(readFileSync(customProfile, 'utf8'))
-  customManifest.dsh.profile.bundles = [...new Set([...customManifest.dsh.profile.bundles, '@deepseek-ai/dsh-web-app'])]
-  writeFileSync(customProfile, `${JSON.stringify(customManifest, null, 2)}\n`)
+  console.log('④ 用官方 web 模板重建自定义 profile 后可启动')
+  const reinit = initProfile(shared, 'web-a')
+  check('官方 --from-default-profile web 重置成功', reinit.status === 0, (reinit.stderr ?? '').slice(-200))
+  const reinstall = install(shared, 'web-a', `file:${TARBALL}`)
+  check('重建后重装 pack 成功', reinstall.status === 0, (reinstall.stderr ?? '').slice(-160))
   mkdirSync(join(shared, 'ws-a'), { recursive: true })
-  consent(join(shared, 'ws-a'))
   const customBoot = await boot(shared, join(shared, 'ws-a'), 'web-a')
   cBoot = customBoot
   const customRpc = await rpc(customBoot)

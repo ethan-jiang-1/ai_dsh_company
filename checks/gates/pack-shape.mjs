@@ -76,7 +76,7 @@ enginesProblems.length === 0
   ? ok(`pack-engines（node ${nodeRange} / dsh ${dshRange} / ${pack.license} / 发布身份齐全）`)
   : fail('pack-engines', enginesProblems.join('；'))
 
-// 本仓发布形状硬门（不是 DSH 硬门；FAQ 24 §6 把它列为质量线）：locale/icon 既然随包发布，
+// 本仓发布与分发硬门（不是 DSH 硬门；FAQ 24 §6 把它列为质量线）：locale/icon 既然随包发布，
 // files/exports 少一项就会在安装后被静默降级，本仓选择升格为 fail。负例留证 2026-10-26：
 // 从 files 删 'icon.svg' → pack-meta 红；还原 → 绿。
 const metaProblems = []
@@ -96,10 +96,15 @@ for (const required of ['lib/index.js', 'lib/client.js', 'lib/types/**/*.d.ts', 
 if (files.includes('lib/**')) fileProblems.push('files 用了 lib/**（会把 tsc 中间产物/tsbuildinfo 打进包）')
 if (files.includes('lib/types/**/*.js') || files.includes('lib/types/**')) fileProblems.push('files 把 lib/types 的 .js 打进包')
 if (files.includes('workspace/**')) fileProblems.push('files 仍带 workspace/**（只读内容已迁 content/）')
-if (files.some(file => file.startsWith('bin/'))) fileProblems.push('files 仍带 bin/**（产品包不得有启动器）')
-if (pack.bin !== undefined) fileProblems.push('bin 字段仍在（产品入口是 dsh --profile company）')
+if (files.some(file => file.startsWith('bin/'))) fileProblems.push('files 仍带 bin/**（发布包不得有启动器）')
+if (pack.bin !== undefined) fileProblems.push('bin 字段仍在（启动入口是 dsh --profile company）')
 if (pack.dependencies !== undefined && Object.keys(pack.dependencies).length > 0) {
   fileProblems.push('dependencies 非空（运行时依赖应走 peerDependencies；browser 两包也不进 dependencies）')
+}
+for (const name of ['@deepseek-ai/dsh-browser-use', '@deepseek-ai/dsh-experimental-browser-use-playwright-mcp']) {
+  if (pack.peerDependencies?.[name] !== undefined && pack.peerDependenciesMeta?.[name]?.optional !== true) {
+    fileProblems.push(`${name} 是条件能力的 peer，必须标 peerDependenciesMeta.optional`)
+  }
 }
 for (const [label, rel] of [
   ['exports["."].default', pack.exports?.['.']?.default],

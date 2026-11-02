@@ -4,12 +4,13 @@
 
 ## 活跃清单
 
-当前活跃 1 张；v3、生命周期与 dev/产品路径 parity 卡已结归档。已结卡见[归档索引](../_archive/README.md)。
+当前活跃 1 张；v3、生命周期、dev/产品路径 parity 与 FAQ 26 发行版对齐卡已结归档。已结卡见[归档索引](../_archive/README.md)。
 
 - [去掉 Trajectory 页签与 New terminal 入口](2026-11-02-remove-trajectory-terminal-ui.md) — 已落地（主区 Chat + 培养；右栏 guide 无 New terminal；pack 两条禁用）；待验收后归档。
 
 ## 近期归档
 
+- FAQ 26 发行版对齐卡 2026-11-02 已结：术语/发布证据链/current docs 清理；0.7.1；去向 = [distribution-alignment Note](../../notes/implemented/2026-11-02-distribution-alignment.md)；卡在 [归档](../_archive/settled_issues/2026-11-02-harness-release-alignment.md)。
 - dev/产品路径 parity 卡 2026-11-02 已结：默认 tarball + `--link` 快速通道 + parity 指南/门禁 + 市场 staged；去向 = [parity Note](../../notes/implemented/2026-11-02-dev-product-path-parity.md)；卡在 [归档](../_archive/settled_issues/2026-11-02-dev-product-path-parity.md)。
 
 - 生命周期发布卡 2026-11-02 已结：0.7.0 发布就绪 + 本地 registry 按名安装演练 + market index 校验；公有 publish/托管 = [handoff](../../docs/guides/publish-handoff.md)；卡在 [归档](../_archive/settled_issues/2026-11-01-plugin-lifecycle-publish.md)。

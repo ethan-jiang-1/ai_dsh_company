@@ -15,7 +15,7 @@
 //   pnpm release --check [--allow-dirty]
 //   pnpm release --all [--allow-dirty] [--with-key]
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
@@ -68,6 +68,42 @@ function pack() {
 
 function sha256(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex')
+}
+
+// 发布物的源指纹：tarball 里的包内容（构建产物 lib/ 除外，由 --prepare 的 build 负责）。
+// 目的：让 --check/--stamp 在“源已变但 _dist 没重打”时拒绝，不再只对 manifest 自洽。
+const PACKAGE_SOURCE_DIRS = ['presets', 'content', 'locale', 'src']
+const PACKAGE_SOURCE_FILES = ['package.json', 'cordis.patch.yml', 'README.md', 'LICENSE', 'icon.svg',
+  'tsconfig.json', 'tsconfig.host.json', 'tsconfig.client.json', 'tsdown.config.ts']
+function packageSourceFiles(dir = PACK) {
+  const files = []
+  for (const rel of PACKAGE_SOURCE_FILES) if (existsSync(join(dir, rel))) files.push(rel)
+  for (const relDir of PACKAGE_SOURCE_DIRS) {
+    const root = join(dir, relDir)
+    if (!existsSync(root)) continue
+    const walk = (abs, relBase) => {
+      for (const entry of readdirSync(abs, { withFileTypes: true })) {
+        if (entry.name === 'node_modules' || entry.name === '.DS_Store') continue
+        const absChild = join(abs, entry.name)
+        const relChild = join(relBase, entry.name)
+        if (entry.isDirectory()) walk(absChild, relChild)
+        else if (entry.isFile()) files.push(relChild)
+      }
+    }
+    walk(root, relDir)
+  }
+  return [...new Set(files)].sort()
+}
+
+function sourceFingerprint() {
+  const hash = createHash('sha256')
+  for (const rel of packageSourceFiles()) {
+    hash.update(rel)
+    hash.update('\0')
+    hash.update(readFileSync(join(PACK, rel)))
+    hash.update('\0')
+  }
+  return hash.digest('hex')
 }
 
 function readManifest() {
@@ -155,11 +191,7 @@ function bump(kind) {
     const index = changelog.search(/^##\s/m)
     writeFileSync(changelogPath, index === -1 ? `${changelog.trimEnd()}\n\n${entry}` : `${changelog.slice(0, index)}${entry}${changelog.slice(index)}`)
   }
-  const releaseDoc = join(ROOT, 'docs/release.md')
-  if (existsSync(releaseDoc)) {
-    const doc = readFileSync(releaseDoc, 'utf8')
-    writeFileSync(releaseDoc, doc.replace(/pack 版本 `\d+\.\d+\.\d+`/, `pack 版本 \`${next}\``))
-  }
+  // 版本唯一家 = package.json + CHANGELOG；release.md 不再复制版本号。
   // 仓库根 market-index.json 是发布/托管物，版本必须与 package 同一步更新。
   run(process.execPath, ['tools/market-index.mjs', '--prepare'])
   console.log(`release: ${manifest.version} 就位；填 CHANGELOG.md 的 ${next} 条目后跑 --prepare`)
@@ -180,6 +212,7 @@ function writeManifest(checks) {
     gitSha: capture('git', ['rev-parse', 'HEAD']).trim(),
     generatedAt: new Date().toISOString(),
     dirty: capture('git', ['status', '--porcelain']).trim() !== '',
+    sourceFingerprint: sourceFingerprint(),
     artifact,
     checks,
   }
@@ -193,7 +226,7 @@ function prepare() {
   const version = pack().version
   const existing = join(DIST, `dsh-company-pack-${version}.tgz`)
   if (existsSync(existing) && !has('--force')) {
-    fail(`已存在 ${version} 的 tgz；同版本重打会让字节漂移（npm pack 带 mtime）。改内容先 bump；确要重打加 --force`)
+    fail(`已存在 ${version} 的 tgz；发布物已落盘。改内容先 bump；确要重打加 --force`)
   }
   build()
   run(process.execPath, ['tools/market-index.mjs', '--prepare'])
@@ -204,14 +237,17 @@ function prepare() {
 
 function verify() {
   sourceCheck(true)
-  artifactCheck()
+  const artifact = artifactCheck()
   const prepared = readManifest()
   if (prepared.version !== pack().version) fail(`manifest 版本 ${prepared.version} ≠ package ${pack().version}；先 --prepare`)
+  if (prepared.sourceFingerprint !== sourceFingerprint()) fail('pack 源码面已变但 _dist 没重打；先重跑 --prepare')
   if (!allowStaleManifest && prepared.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest 不是当前 HEAD 的 --prepare 产物；先重跑 --prepare（仅 test/docs 改动可显式 --allow-stale-manifest）')
   const commands = [
     ['verify', ['pnpm', ['verify'], false]],
     ['test', ['pnpm', ['test'], false]],
-    ['release-smoke', [process.execPath, ['checks/smoke/release-smoke.mjs'], true]],
+    ['release-smoke', [process.execPath, ['checks/smoke/release-smoke.mjs', '--tarball',
+      join(DIST, artifact.file), '--expect-sha', artifact.sha256], true]],
+    ['company-entry-smoke', [process.execPath, ['checks/smoke/company-entry-smoke.mjs'], true]],
     ['client-load-smoke', [process.execPath, ['checks/smoke/client-load-smoke.mjs'], true]],
     ['preset-smoke', [process.execPath, ['checks/smoke/preset-smoke.mjs'], true]],
     ['present-catalog-smoke', [process.execPath, ['checks/smoke/present-catalog-smoke.mjs'], false]],
@@ -238,6 +274,7 @@ function stamp() {
   const artifact = artifactCheck()
   const manifest = readManifest()
   if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
+  if (manifest.sourceFingerprint !== sourceFingerprint()) fail('pack 源码面已变但 _dist 没重打；先重跑 --prepare')
   if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
   const checks = manifest.checks ?? {}
   const notPass = Object.entries(checks).filter(([, status]) => status !== 'pass')
@@ -254,6 +291,7 @@ function check(allowDirtyTree = allowDirty) {
   const artifact = artifactCheck()
   const manifest = readManifest()
   if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
+  if (manifest.sourceFingerprint !== sourceFingerprint()) fail('pack 源码面已变但 _dist 没重打；先重跑 --prepare')
   if (manifest.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest gitSha 不是当前 HEAD（发布后被改过？重跑 --prepare/--verify）')
   if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
   if (manifest.dirty !== false) fail('manifest 记录的是脏树（发布字节不对应一个干净 commit；重跑 --verify）')

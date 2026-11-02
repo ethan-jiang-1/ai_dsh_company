@@ -30,7 +30,7 @@ export function run({ root, ok, fail }) {
   } else {
     const launcher = readFileSync(launcherPath, 'utf8')
     if (!/resolveDevMode\(args\)/.test(launcher)) problems.push('dev 启动器没有从 resolveDevMode 取安装模式')
-    if (!/npm'\s*,\s*\['pack'/.test(launcher)) problems.push('dev 启动器缺 npm pack（产品同形安装的第一步）')
+    if (!/npm'\s*,\s*\['pack'/.test(launcher)) problems.push('dev 启动器缺 npm pack（用户侧同形安装的第一步）')
     if (!/'plugin', '--profile', 'company', 'add'/.test(launcher)) problems.push('dev 启动器缺 plugin add（roster 由 DSH 写，不手改 profile）')
     const planner = join(root, 'tools/lib/dev-install.mjs')
     if (!existsSync(planner)) problems.push('缺 tools/lib/dev-install.mjs（安装规划纯函数）')
@@ -79,14 +79,33 @@ export function run({ root, ok, fail }) {
       if (staged.requiresPublish !== true) problems.push('staged 标记缺 requiresPublish: true（语义：索引声明的版本尚未发布）')
       for (const rel of ['README.md', 'packages/company-pack/README.md', '_dist/安装手册.md']) {
         const file = join(root, rel)
-        if (existsSync(file) && readFileSync(file, 'utf8').includes('market-index.json')) {
-          problems.push(`未发布期不得在面向用户文档里出现 market-index.json（${rel}）`)
+        if (!existsSync(file)) continue
+        const text = readFileSync(file, 'utf8')
+        if (/market-index\.json|(^|[^-\w])index\.json|Add index source/.test(text)) {
+          problems.push(`未发布期不得在面向用户文档里出现可加的市场源（${rel}）`)
         }
       }
     }
   }
 
+  // ⑤ 分发/安装/初始化 current docs 退役词：防旧说法回潮（2026-11-02）。
+  // 负例留证：在 run/README.md 写回「一 home 一 workspace」→ 本门禁红；还原即绿。
+  const retired = [
+    ['README.md', /插件即产品|产品形状|产品安装|产品入口|产品 home|产品文件|产品承诺/],
+    ['packages/company-pack/README.md', /产品形状|产品安装|产品入口|产品 home|产品文件|产品承诺|run bundle/],
+    ['_dist/安装手册.md', /产品形状|产品安装|产品入口|产品 home|产品文件|产品承诺|run bundle/],
+    ['run/README.md', /一 home 一 workspace|启动器强制|第二个 CEO 新开 home|v2/],
+    ['docs/orient.md', /一次安装一个|第二个 CEO 新开 home|run bundle 四件套/],
+    ['docs/external-research.md', /26_plugin-data-model|26_plugin-as-product/],
+  ]
+  for (const [rel, pattern] of retired) {
+    const file = join(root, rel)
+    if (existsSync(file) && pattern.test(readFileSync(file, 'utf8'))) {
+      problems.push(`current docs 仍有退役说法（${rel} / ${pattern.source}）`)
+    }
+  }
+
   problems.length === 0
-    ? ok('dev-product-parity（启动器默认 tarball + parity 指南 + bootstrap/profile 一致 + 市场 staged 规则）')
+    ? ok('dev-product-parity（启动器默认 tarball + parity 指南 + bootstrap/profile 一致 + 市场 staged 规则 + 退役词）')
     : fail('dev-product-parity', problems.join('；'))
 }

@@ -29,8 +29,8 @@
    进程，stdout 出结果，日志落 `$DSH_HOME/sessions/`。web 形态（观察窗）起**本地**
    HTTP 端口（值见启动横幅）；因 `DSH_HOME` 指 dev home，它与日用 DSH 的 web 实例
    （若同时开）是两个完全独立进程：profile、会话、凭据、端口互不可见。
-7. **产品形状（2026-11-01 v3）**：一个 bundle 装进 named profile；workspace 由 cwd/`DSH_COMPANY_HOME`/picker
-   解析，run bundle 在 `<workspace>/.dsh-company/`（bundle.json v3）；home 只留 sessions/凭据/登记/方法层/
+7. **交付形态**：一个 bundle 装进 named profile；workspace 由 cwd/`DSH_COMPANY_HOME`/picker
+   解析，公司状态在 `<workspace>/.dsh-company/`（`bundle.json` v3，legacy 文件名）；home 只留 sessions/凭据/登记/方法层/
    账本/lease。一个安装 = 一个公司，可顺序服务多个 workspace；不同公司新开 home。dev 用 `pnpm company --no-open`。
 
 8. **排练场 ≠ 运行场**：排练/探针会话的默认 cwd 是 `runtime/rehearsal-workspace/`（`node tools/rehearsal-init.mjs`
@@ -42,7 +42,7 @@
    排练场里手册是指向真盘的**符号链接**（注入基线不变），
    CHARTER/org/templates 每次刷新，**journal 不镜像**（排练记忆不混真记忆）；`snapshot-motion` /
    `deliverables-check` 默认仍指真盘——归档与审计本来就属于运行场。
-8. **沙箱后端探测**：`env.sh` 实跑一次 `sandbox-exec` 探测，**不可用则自动导出 `DSH_PERMISSION_MODE=danger-full-access`**
+9. **沙箱后端探测**：`env.sh` 实跑一次 `sandbox-exec` 探测，**不可用则自动导出 `DSH_PERMISSION_MODE=danger-full-access`**
    （macOS 26 本机禁了 Seatbelt；不落则每条 bash 都退化成「请求升级」，连 `ls` 也一样）。探测结果**明示**（stderr 一行取舍）；
    逃生阀 = `DSH_SKIP_SANDBOX_PROBE=1` 或自行设 `DSH_PERMISSION_MODE`；后端恢复自动回到 `workspace-write`。
    理由、输掉的方案与红绿证据见 [sandbox-backend-probe](../../notes/implemented/2026-10-10-sandbox-backend-probe.md)。

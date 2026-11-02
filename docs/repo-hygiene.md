@@ -8,7 +8,7 @@
 
 | 树 | 住哪 | 进 git？ |
 |---|---|---|
-| 产品树 | `packages/`、`docs/`、`notes/`、`_backlog/`、`checks/`、`tests/`、`probes/`、`tools/`、`run/`、`snapshots/`、根 manifest/lock、`vendor/dsh` submodule pin | **是**（仅该进的子集） |
+| 主仓树 | `packages/`、`docs/`、`notes/`、`_backlog/`、`checks/`、`tests/`、`probes/`、`tools/`、`run/`、`snapshots/`、根 manifest/lock、`vendor/dsh` submodule pin | **是**（仅该进的子集） |
 | 运行树 | `runtime/*`、`company-workspace/`、`.pi/`、`node_modules/`、`.pnpm-store/`、构建产物、导出 tgz | **否**（默认拒绝） |
 
 ## 二、必须进 git（fresh clone 的配方）
@@ -58,8 +58,8 @@ CI 证明 install + `bundle:init` + `verify`；vendor 全量构建/测试的干�
 
 ## 六、新增文件/目录 checklist
 
-1. 问：fresh clone 缺它还能开发吗？能 ⇒ ignored；不能 ⇒ 进产品树。
-2. 进产品树 ⇒ 检查 LF、相对路径、无用户名/主机名、无凭据、大小写唯一。
+1. 问：fresh clone 缺它还能开发吗？能 ⇒ ignored；不能 ⇒ 进主仓树。
+2. 进主仓树 ⇒ 检查 LF、相对路径、无用户名/主机名、无凭据、大小写唯一。
 3. 运行残留 ⇒ 默认 ignore（`runtime/*`）即可；要 tracked ⇒ 改 `.gitignore` 白名单 + `runtime/README.md` + 门禁期望。
 4. 大件（>2MB）⇒ 先问该不该在产品仓；多数应去私有归档/生成物。
 5. 跑 `pnpm verify`；涉及行为再跑 `pnpm test`；跨环境改动加跑 `fresh-clone`（Ubuntu/macOS）。

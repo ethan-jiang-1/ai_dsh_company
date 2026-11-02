@@ -5,9 +5,9 @@ import { join } from 'node:path'
 import { expectedTag } from './lib/pin.mjs'
 
 // ── 2g. 手动分发手册版本 + 安装形状门禁（2026-09-28 立；2026-11-01 v3 重写）────────
-// 为什么：手册是收件人的唯一安装路径；版本对但内容教旧形状（launcher/--workspace/一 home
-// 一 workspace/seed）就是装错。0.6.0 起形状 = Plugins 页默认、`dsh --profile company`、
-// run bundle 在 `<workspace>/.dsh-company/`、插件内容在包 `content/`。
+// 为什么：手册是收件人的安装路径；版本对但内容教旧形状（launcher/--workspace/一 home
+// 一 workspace/seed）就是装错。现行形状 = Plugins 页默认、`dsh --profile company`、
+// 公司状态在 `<workspace>/.dsh-company/`、插件内容在包 `content/`。
 // 负例留证：删「Plugins」或写入 `--workspace` → 本门禁红；重跑 export-dist → 绿。
 export function run({ root, ok, fail }) {
   const packVersion = JSON.parse(readFileSync(join(root, 'packages/company-pack/package.json'), 'utf8')).version
@@ -24,15 +24,16 @@ export function run({ root, ok, fail }) {
   }
   const required = ['Plugins', 'dsh --profile company', '.dsh-company/bundle.json', 'content/', 'kb/',
     'deliverables/', 'exports', 'company/ledger', 'sha256', 'DSH', 'dsh --version', '卸载', '回退',
-    'DSH_COMPANY_BROWSER', 'dsh-web-app', '仅 `dsh web`', '三个成功']
+    'DSH_COMPANY_BROWSER', 'dsh-web-app', '仅 `dsh web`', '三个成功', 'pnpm', 'Desktop', 'npm CLI']
   const missing = required.filter(phrase => !manual.includes(phrase))
   if (missing.length > 0) problems.push(`手册缺安装形状/契约关键句：${missing.join(' / ')}`)
   const forbidden = ['--workspace', '--profile desktop', 'bin/dsh-company', 'seed-consent',
     'handbookTarget', '一次安装 = 一个 DSH home', '换项目 = 新建一个 home']
   const found = forbidden.filter(phrase => manual.includes(phrase))
-  if (found.length > 0) problems.push(`手册仍教旧形状：${found.join(' / ')}（0.6.0 以 .dsh-company/ 与 named profile 为准）`)
+  if (found.length > 0) problems.push(`手册仍教旧形状：${found.join(' / ')}（以 .dsh-company/ 与 named profile 为准）`)
   if (!/Plugins/.test(manual)) problems.push('手册缺应用内 Plugins 页默认安装路径')
-  if (!/不需要.*Node|不要求.*Node/.test(manual)) problems.push('手册应说明不要求用户单独安装 Node/pnpm（DSH 已装好）')
+  if (!/Desktop.*自带|自带.*pnpm/.test(manual)) problems.push('手册应写 Desktop 自带 Node/pnpm')
+  if (!/npm CLI|`dsh web`/.test(manual) || !/PATH/.test(manual)) problems.push('手册应写 npm CLI / dsh web 需要 pnpm 在 PATH')
   if (!/仅 `dsh web`/.test(manual)) problems.push('手册的 CLI 段缺「仅 `dsh web`」边界')
   if (!manual.includes(expectedTag)) problems.push(`手册缺验证基线 \`${expectedTag}\`（pin 漂了或没重导）`)
   const manualHash = /[0-9a-f]{64}/.exec(manual)?.[0]

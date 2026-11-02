@@ -30,7 +30,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | client 面板（用户可见面：视图模型/组件/文案/CSS，`src/client/`） | `pnpm test tests/client`（按模块点名 spec，含 `client-face` / `style-lifecycle`） | [ui-scene-smoke](../checks/smoke/ui-scene-smoke.mjs) `--isolated --golden`（隔离空壳页签文本金样；`--steps` 复现交互）+ [client-load-smoke](../checks/smoke/client-load-smoke.mjs) + [cdp-probe](../probes/browser-visual/cdp-probe.mjs)（活体全页签） | 用户可见改动 → 同 diff 刷金样（`--refresh-golden`）/ 对应 visual probe |
 | company 读模型逻辑（`src/lib/` 判据：deliverables / authorship / ledger） | `pnpm test tests/company`（按模块点名 spec） | oracle 反证（真样本钉列）；**新增模块/影响导出面 → 加 `pnpm test tests/harness`（pack-exports 守卫）** | — |
 | host 逻辑（`src/host/`：bootstrap / workspace-resolution / handbook / catalog / cultivation / lease / bundle-manifest / governance-export / revoke-journal） | `pnpm test tests/company`（按模块点名 spec；真文件集成） | `pnpm test tests/harness`（导出/布局）+ `pnpm typecheck` | — |
-| 产品入口 / workspace 解析 / run bundle（`src/host/startup*`、`tools/company.mjs` dev-only） | `pnpm test tests/company`（bootstrap/manifest/presented-domain） | [company-entry-smoke](../checks/smoke/company-entry-smoke.mjs) + [release-smoke](../checks/smoke/release-smoke.mjs) + [client-load-smoke](../checks/smoke/client-load-smoke.mjs) | 新入口同 diff 进 checks/README；`pnpm verify` script-index/status |
+| 启动入口 / workspace 解析 / 公司状态（`src/host/startup*`、`tools/company.mjs` dev-only） | `pnpm test tests/company`（bootstrap/manifest/presented-domain） | [company-entry-smoke](../checks/smoke/company-entry-smoke.mjs) + [release-smoke](../checks/smoke/release-smoke.mjs) + [client-load-smoke](../checks/smoke/client-load-smoke.mjs) | 新入口同 diff 进 checks/README；`pnpm verify` script-index/status |
 | 类型面（改 `src/**` 的导出/导入签名） | `pnpm typecheck`（`tsc -b` 两面；fresh clone 需先按 [bootstrap](../docs/guides/bootstrap.md) 构建 vendor client 类型） | [release-smoke](../checks/smoke/release-smoke.mjs)（发布前）；`verify` 的 src-layering 只守方向不守类型 | — |
 | pack 导出/注册面（Host / Client 注册改动） | `pnpm test tests/harness`（导出形态）+ `pnpm test tests/company`（Host 注册回调行为）+ `pnpm test tests/client`（Client 槽注册） | [release-smoke](../checks/smoke/release-smoke.mjs)（真实安装形状；含 researcher） | — |
 | 发布 / 升 pin | `pnpm test tests/harness`（release-foundation 等） | [release-smoke](../checks/smoke/release-smoke.mjs) + 升 pin 程序（合同 = [release.md](../docs/release.md)；**本仓只有不加载 pack 的合成回放，只证管线可跑，不是升 pin 第一道**） | — |
@@ -64,7 +64,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
 | **重放 lane（第三档，无 key）** | 现行场景 ~2s | `replay-smoke`（仅 foundation 合成场景，不加载 company-pack；会话日志 + sidecar）——要起进程，不进 `pnpm test`。真页面车道 = `ui-scene-smoke`（自起实例，~40s） |
 | CLI 集成（keyless，需子进程） | 秒级 | `node checks/smoke/snapshot-motion-smoke.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） |
-| 发布形状（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../docs/release.md)） |
+| 发布与分发（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../docs/release.md)） |
 | 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件与成本见其头注「何时跑」**；`script-triggers` 门禁强制） |
 | 行为质量档（认证） | 分钟级 | `probe --full`（内容档三探针）；`candidate-scan-eval` 语料已移出本仓，现报缺失 exit 2（判据 = [testing.md §4](../docs/testing.md)） |
 

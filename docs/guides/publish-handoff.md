@@ -16,21 +16,20 @@
 
 ```sh
 shasum -a 256 _dist/dsh-company-pack-<version>.tgz
-cat _dist/release-manifest.json            # artifact.sha256 / gitSha / dirty
-node tools/market-index.mjs --prepare      # 生成/刷新仓库根 market-index.json（tracked；图标内联）
+cat _dist/release-manifest.json            # artifact.sha256 / sourceFingerprint / gitSha / dirty
 node tools/market-index.mjs --check
 ```
 
-发布字节 = `release --check` 验过的 tarball；**不要**为了发布另打一次包。
+发布字节 = `release --check` 验过的 **_dist tarball**；**不要**为了发布另打一次包，也不要 `cd` 进包目录发布。
 
 ## 2 npm publish（不可逆）
 
 ```sh
-cd packages/company-pack
-npm publish --access public
+npm publish _dist/dsh-company-pack-<version>.tgz --access public
 npm view dsh-company-pack@<version> version
 ```
 
+- 发布前先 `npm publish --dry-run _dist/dsh-company-pack-<version>.tgz`，确认 contents 与 `tar -tzf` 一致。
 - 同版本不能重发；内容变了先 `pnpm release --bump` 再走五步。
 - 发布失败/中断时先 `npm view` 查是否已落地；已落地就不要重发同版本。
 - provenance/CI 是后续增强，不在本页 v1。
@@ -38,12 +37,14 @@ npm view dsh-company-pack@<version> version
 ## 3 刷新 market index（仓库根 tracked 文件）
 
 `release --prepare` 已经按 package 版本重生成仓库根 `market-index.json`（format 1、图标内联、
-分类/标签/排序键齐全），它就是要托管的单文件。发布后用实际发布时间刷新一次并提交：
+分类/标签/排序键齐全），它就是要托管的单文件。未发布期由 `market-index.staged.json` 标记
+（`requiresPublish: true`）；发布成功后：刷新一次 → 删除 staged → 提交。
 
 ```sh
 node tools/market-index.mjs --prepare
 node tools/market-index.mjs --check
-git add market-index.json && git commit -m "chore(market): <version>"
+rm market-index.staged.json
+git add market-index.json market-index.staged.json && git commit -m "chore(market): <version>"
 ```
 
 可选：用 vendor generator 从 registry 读真实 `publishTimestamp`/registry：
@@ -70,7 +71,7 @@ pnpm --filter @deepseek-ai/dsh-plugin-market-generator start -- \
 
 1. Plugins → Experimental plugins → **Custom plugin markets** 打开。
 2. Plugins → **Discover** → Manage index sources → 加 `<index-url>`。
-3. 选版本安装；安装完成后确认 `application: applied`、六条 preset 不 broken、`session/create` 能挂上。
+3. 选版本安装；安装完成后确认 `application: applied` 或 `restart-required`（按提示重启后再验）、六条 preset 不 broken、`session/create` 能挂上。
 
 默认安装路径仍是应用内 Plugins 页；市场只是**发现层**，不改变安装/版本门的判定（DSH 安装时读包自身
 manifest 的 `engines.dsh`）。
@@ -84,5 +85,6 @@ manifest 的 `engines.dsh`）。
 
 ## 7 回执
 
-发布完成后把以下事实写进[生命周期与发布卡](../../_backlog/_archive/settled_issues/2026-11-01-plugin-lifecycle-publish.md)
-与实施 Note：版本、tgz sha256、manifest gitSha、npm 版本页、index URL、一次干净 profile 的安装验证结果。
+发布完成后把以下事实写进当轮发布 Note（`notes/implemented/<date>-release-<version>.md`）
+与 `_dist/release-manifest.json`：版本、tgz sha256、manifest gitSha、npm 版本页、index URL、
+一次干净 profile 的安装验证结果。归档卡只读，不再当收件箱。

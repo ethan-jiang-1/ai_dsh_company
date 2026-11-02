@@ -22,22 +22,22 @@
 | [guides/budget-and-ops.md](./guides/budget-and-ops.md) | 指南 | 限流旋钮总表、成本结构、demo 运维 runbook（症状→动作）、回放复盘 |
 | [guides/dev-loop.md](./guides/dev-loop.md) | 指南 | 开发操作手册：任务入口与授权（§0.5）、实施和证据交接（§1）；其余按改动面查调试、发布、双 home 等章节 |
 | [guides/bootstrap.md](./guides/bootstrap.md) | 指南 | 冷启动引导（clean checkout → 可跑通）：配方、双面构建与实证坑（2026-09-27 自 dev-loop §7 迁入） |
-| [profile.md](./profile.md) | 合同 | host 组合现在时：产品安装（company profile + workspace）vs dev、行清单语义、开放点 |
+| [profile.md](./profile.md) | 合同 | host 组合现在时：应用内安装（company profile + workspace）vs dev、行清单语义、开放点 |
 | [delegation.md](./delegation.md) | 合同 | 汇报线现在时（R3 出生，0.2.1 复校）：命名委托 = activation（终稿走完成通知、人格由 `agentPreset` 给）与 team 的分工、team shadow 边界与证据、委派工具卡、分层验证 |
 | [presets.md](./presets.md) | 合同 | 角色 preset 语义（R2：五角色定稿——CEO / VP-Eng / VP-Sales / COO / CFO；0.2.1 增设委派用的 researcher）；名册运行时实测；验证分层；培养回路与学习载体（D25/D43） |
 | [demo.md](./demo.md) | 合同 | demo 操作合同（R4 立场景 C，2026-09-25 补场景 D 季度经营会 / E 事件复盘）：动议、前置、分镜与观测点、验收判据（含**交付物三态**的机器判据）、已知边界 |
-| [release.md](./release.md) | 合同 | 发布形状现在时：company profile 安装/冒烟、兼容台账、产品入口 smoke、升 pin 程序 |
+| [release.md](./release.md) | 合同 | 发行版六轴、发布物与发布字节、兼容台账、启动入口 smoke、升 pin 程序 |
 | [testing.md](./testing.md) | 合同 | **测试宪法**（2026-10-04 立）：什么算证据——分层与证明边界、改动面→最小证据**政策**（行级映射 = tests/README，2026-10-10 迁家）、证据纪律、资产三分法、自测轮授权、已知未覆盖面与升级地图 |
 | [multi-human.md](./multi-human.md) | 合同 | **多人协作现在时**（2026-09-26 出生）：机制边界（卡按会话作用域、成员拉不到人）/ 形态 / 开门 runbook / 协作前提三条 / 迁移清单 / 边界 |
-| [runtime-map.md](./runtime-map.md) | 合同 | **运行态地图**：安装 → company profile boot → workspace 解析/登记 → session cwd 的时序、run bundle（workspace v3）与四条状态轴 |
-| [data-model.md](./data-model.md) | 合同 | 事实级数据卡：workspace run bundle vs home 治理、bundle v3、方法层/账本、备份/迁移/导出 |
+| [runtime-map.md](./runtime-map.md) | 合同 | **运行态地图**：安装 → company profile boot → workspace 解析/登记 → session cwd 的时序、公司状态（workspace v3）与四条状态轴 |
+| [data-model.md](./data-model.md) | 合同 | 事实级数据卡：workspace 公司状态 vs home 治理、公司状态清单 v3、方法层/账本、备份/迁移/导出 |
 | [project-map.md](./project-map.md) | 导航 | 空间导航：目录逐件 owner、产物落点 |
 | [repo-hygiene.md](./repo-hygiene.md) | 合同 | 什么进 git / 什么不进、跨环境规则、例外与执行面 |
 | [guides/cdp-probe.md](./guides/cdp-probe.md) | 指南 | 观察窗「呈现即验证」机器腿：client 面改动后的呈现前走查、页面异常定位 |
 | [guides/web-rpc.md](./guides/web-rpc.md) | 指南 | 驱动 Web 面会话的 HTTP RPC runbook：脚本化建会话/发 prompt/读日志 |
 | [guides/release-runbook.md](./guides/release-runbook.md) | 指南 | 发布五步 runbook：bump/CHANGELOG/prepare/verify/check；产物、manifest 与失败定位 |
 | [guides/publish-handoff.md](./guides/publish-handoff.md) | 指南 | 字节离开仓库：npm publish、vendor generator 生成 market index、https 托管与 Discover 发现、回滚与回执 |
-| [guides/dev-product-parity.md](./guides/dev-product-parity.md) | 指南 | dev 启动器与产品安装路径的同形点/允许差异表；`pnpm company` 默认 tarball、`--link` 快速通道 |
+| [guides/dev-product-parity.md](./guides/dev-product-parity.md) | 指南 | dev 启动器与应用内安装路径的同形点/允许差异表；`pnpm company` 默认 tarball、`--link` 快速通道 |
 | [terminology.md](./terminology.md) | 导航 | 术语映射查表：本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达 |
 | [external-research.md](./external-research.md) | 导航 | repo 外研究材料登记与吸收落点（2026-10-20 自 index 迁出） |
 | [decisions.md](./decisions.md) | 导航 | 决策台账路由（D 号 → 一句话 → 家；2026-10-20 自 index 迁出） |

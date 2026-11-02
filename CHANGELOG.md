@@ -2,6 +2,20 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.7.1 — 2026-11-02
+
+### Changed
+
+- **FAQ 26 Harness 发行版对齐**：读者面统一为 Harness 发行版 / 交付形态 / 公司状态（company state）/
+  run trace；清掉 current docs 的「插件即产品 / 产品形状 / 产品入口」旧说法与 v2 残留；代码/持久名保留
+  legacy，不再把 `run bundle` 当 DSH bundle。
+- **发布证据链**：`release-smoke` 装 `_dist` 同一份 tarball（`--tarball/--expect-sha`）；`release --check/--stamp`
+  加 `sourceFingerprint`，源变而产物未重打即拒绝；`publish-handoff` 改为 `npm publish <tgz>`。
+- **安装前置与 README**：Desktop 自带 Node/pnpm、npm CLI / `dsh web` 需 pnpm 在 PATH，分开写；
+  包 README 补 `description`/`kind`、升级/排障；browser 两包标 optional；应用内安装接受 `restart-required`。
+- **文档事实**：`run/README` 重写 v3；外部研究 26 目录改 `26_harness-release`；profile 初始化统一官方
+  `--from-default-profile web`，删除已不存在的 `patchReload`；手写 roster/seed-consent 的旧引导删除。
+
 ## 0.7.0 — 2026-11-02
 
 ### Changed

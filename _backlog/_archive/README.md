@@ -15,6 +15,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-02-harness-release-alignment.md](settled_issues/2026-11-02-harness-release-alignment.md) | 已结；FAQ 26 术语/current docs/发布字节证据链对齐；0.7.1；去向 = [distribution-alignment Note](../../notes/implemented/2026-11-02-distribution-alignment.md) | 2026-11-02 |
 | [2026-11-02-dev-product-path-parity.md](settled_issues/2026-11-02-dev-product-path-parity.md) | 已结；dev 默认 tarball + `--link` 显式快速通道、parity 指南/门禁、市场 staged；去向 = [parity Note](../../notes/implemented/2026-11-02-dev-product-path-parity.md) | 2026-11-02 |
 | [2026-11-01-plugin-lifecycle-publish.md](settled_issues/2026-11-01-plugin-lifecycle-publish.md) | 已结；0.7.0 发布就绪（install/身份/index/升卸/本地 registry 演练）；公有 publish/托管 = handoff | 2026-11-02 |
 | [2026-11-01-plugin-as-product-v3.md](settled_issues/2026-11-01-plugin-as-product-v3.md) | 已结；bundle 产品/无 launcher/workspace 解析/内容在包/run bundle 全嵌套/账本分区；0.7.0 复核；去向 = [v3 Note](../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md) | 2026-11-02 |

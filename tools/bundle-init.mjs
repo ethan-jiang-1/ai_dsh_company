@@ -1,9 +1,9 @@
 // 状态：常驻
-// 何时跑：fresh clone、或 dev 的 company-workspace 被清掉之后——重建 dev run bundle 的 workspace。
-// 形状（2026-11-01 v3）：只在 `company-workspace/.dsh-company/` 建状态/产物目录与状态实例；
+// 何时跑：fresh clone、或 dev 的 company-workspace 被清掉之后——重建 dev 公司状态的 workspace。
+// 形状：只在 `company-workspace/.dsh-company/` 建状态/产物目录与状态实例；
 // 插件内容（手册/模板/默认章程）住 pack `content/`，不复制、不建符号链接。已有 workspace 时跳过。
 //
-// 产品安装不需要本脚本——`dsh --profile company` 首启会自己初始化 `.dsh-company/`；这里只补 dev 盘。
+// 应用内安装不需要本脚本——`dsh --profile company` 首启会自己初始化 `.dsh-company/`；这里只补 dev 盘。
 import { copyFileSync, existsSync, mkdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { repositoryRoot as repoRoot } from './lib/repository-layout.mjs'
@@ -14,7 +14,7 @@ const RUN = join(WORKSPACE, '.dsh-company')
 const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
 
 if (existsSync(WORKSPACE)) {
-  console.log(`bundle:init 跳过——dev run bundle workspace 已在场：${relative(repoRoot, WORKSPACE)}（一个字节都不动）`)
+  console.log(`bundle:init 跳过——dev 公司状态 workspace 已在场：${relative(repoRoot, WORKSPACE)}（一个字节都不动）`)
   process.exit(0)
 }
 if (!existsSync(CONTENT)) {

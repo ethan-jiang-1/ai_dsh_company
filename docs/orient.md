@@ -17,7 +17,7 @@ COO、CFO 各自是独立 preset，跑在 DSH 会话里，你通过 web 观察�
 
 ## 二问：怎么跑起来？
 
-白话三步：进开发环境（`source run/env.sh`）→ 起产品（`pnpm company …`）→ 浏览器开门
+白话三步：进开发环境（`source run/env.sh`）→ 起公司（`pnpm company …`）→ 浏览器开门
 （token URL 在启动横幅里读）。**headless 只证明 CLI 能跑，不是公司运行。**
 
 → 唯一步步骤：[demo.md §前置](demo.md)
@@ -45,7 +45,7 @@ audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.m
 测试资产**双向反查**：改动面 → 最窄检查（[tests/README](../tests/README.md)）；场景 → 固定住
 什么行为（[snapshots 索引](../snapshots/README.md)）。
 
-## 六问：agent loop、skills、运行态、run bundle 在哪？
+## 六问：agent loop、skills、运行态、公司状态 在哪？
 
 - **loop 本体不在本仓库**——它在 [vendor/dsh](../vendor/dsh/)（钉版本、只读）；本仓只拥有
   喂给 loop 的输入（preset、skills、patch）和接住 loop 的输出（会话日志、workspace、证据）。
@@ -53,8 +53,8 @@ audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.m
 - **skills**：`packages/company-pack/presets/<角色>/skills/`——盘上可见，一角色一目录。
 - **运行态**：[runtime/](../runtime/README.md)（gitignored，跑过留下的状态全在这）；
   一条命令看全景：`pnpm orient`。
-- **run bundle（workspace 单元）**：用户 workspace + `<workspace>/.dsh-company/bundle.json`（v3）+ 公司盘；home 只留 DSH 运行时与 host 治理；
-  一次安装一个，**不进 git**，第二个 CEO 新开 home。定义与 base/grown 分层 = [运行态地图 §二·五](runtime-map.md)。
+- **公司状态（workspace 单元）**：用户 workspace + `<workspace>/.dsh-company/`（v3；`bundle.json` 为 legacy 文件名）+ 公司盘；home 只留 DSH 运行时与 host 治理；
+  一个安装 = 一个公司；同一 home 可顺序服务多个 workspace，不同公司才新开 home。**不进 git**。定义与 base/grown 分层 = [运行态地图 §二·五](runtime-map.md)。
   **run trace（四件套）** = 代码与组合 / DSH 运行状态 / 会话 cwd / 证据——`pnpm orient` 默认全景直接显示这四件；
   某次运行的证据链按需算视图：
   `pnpm orient --scenario replay/foundation-workspace`（引用不复制，防第二权威）。
@@ -66,12 +66,12 @@ audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.m
 四个介入点，其余默认不打扰你：**立项脚**——批 RFC = 定验收（验收原文写清「怎么测」，质量杠杆最重的一脚）；
 **实施脚**——红绿环自跑，不拉你；**收口脚**——收**轮次回执**（六行固定形状：外部行为 / 四链证据 / 语义审结论 /
 资产增量 / 未验证面 / 下一脚建议；唯一家 = [close-out skill](../.agents/skills/close-out-definition/SKILL.md)），对照授权原文验收，不重读对话；
-**体验脚**——实例 + 走查单等人侧四件套（[§13](guides/dev-loop.md)；与六问 run bundle 四件套是两回事）。前一脚没踩稳（验收含糊），后面全靠运气。
+**体验脚**——实例 + 走查单等人侧四件套（[§13](guides/dev-loop.md)；与六问 run trace 四件套是两回事）。前一脚没踩稳（验收含糊），后面全靠运气。
 
 → 本页只导航不复述——四脚的规则家都在开发环。
 
 ## 现在就想看点什么？
 
 `pnpm orient`——keyless、秒级、只读：当前 home（含「没 source env.sh = 用了日用 home」警告）、
-在场 profiles、最近会话、公司盘概览、run bundle 四件套、待核工作候选（R3′ 口径扫描——零容忍未达门槛，
+在场 profiles、最近会话、公司盘概览、run trace 四件套、待核工作候选（R3′ 口径扫描——零容忍未达门槛，
 只显示不进待办）、便宜检查清单。不用为了「看看现在什么状态」拉起整个公司。

@@ -1,7 +1,6 @@
 # 决策台账（路由表）
 
-> 性质：导航/路由——D 号 → 一句话 → 家；决定正文（理由/输掉的方案/验证证据）住 Note，本页不复述。
-> 2026-10-20 自 [index.md](./index.md) 迁出（fresh-agent 审计：index 只留文档地图；台账单独一页）。
+> 性质：导航/路由——D 号 → 一句话 → 家；决定正文住 Note，本页不复述（自 index 迁出；登记见 index）。
 
 本表只是路由：**D 号 → 一句话 → 决定的家**。决定正文（理由 / 输掉的方案 / 验证证据）住 Note，本表不复述；冲突时以 Note 为准。历史适用范围见各行「历史」标注；编号不重用、不删行；新 D 号须带可解析的家（`ledger-routing` 门禁）。台账只有正向门禁（新 D 号有家）；反向（制度级重立必有台账行/登记行）无门禁——2026-10-09 `_backlog` 整体重立曾漏网（已由 D31 行与外部材料表第七处补路由），复发再按升格判据（dev-loop §9）议门禁。
 
@@ -59,3 +58,4 @@
 | D52 | 插件即产品 v3：DSH-native 入口；无 launcher；内容在包；run bundle 与账本按 workspace 分区 | [v3 Note](../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md) · [v3 卡](../_backlog/_archive/settled_issues/2026-11-01-plugin-as-product-v3.md) |
 | D53 | 会话检索 = bundle 内 insert + isolate 独立 provider 组；不替换 host 行（默认 in-app 安装约束） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |
 | D54 | 发布姿态 = MIT + npm 身份齐全 + 市场 index handoff；npm publish 仍人工（D6） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |
+| D55 | 发行版六轴与术语对齐：公司状态/run trace；发布字节装 `_dist`、sourceFingerprint；docs-first legacy 名 | [distribution-alignment Note](../notes/implemented/2026-11-02-distribution-alignment.md) |

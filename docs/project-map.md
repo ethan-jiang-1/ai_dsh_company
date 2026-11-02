@@ -23,9 +23,9 @@
 
 | 面 | 位置 | 所有权与用途 |
 |---|---|---|
-| 自写运行包 | [company-pack](../packages/company-pack/) | 五个角色 preset、bundle 行、host 注册与 client 面；发布形状由 [包声明](../packages/company-pack/package.json) 决定 |
-| dev run bundle 的 workspace | `company-workspace/`（**gitignored**；fresh clone 用 `pnpm bundle:init`） | 公司角色会话 cwd；本部署的扩张数据（owners、台账、journal、交付物、培养记录）只住 `.dsh-company/`，不进 git。插件只读内容的家 = [pack content](../packages/company-pack/content/)（随包分发，不复制）。bundle 身份 = `<workspace>/.dsh-company/bundle.json`（v3；见 [运行态地图 §二·五](runtime-map.md)） |
-| 启动配置 | [run](../run/)、[env.sh](../run/env.sh) | tracked 启动配置；`pnpm company` 产品入口；源码验证使用开发 DSH_HOME |
+| 自写运行包 | [company-pack](../packages/company-pack/) | 五个角色 preset、bundle 行、host 注册与 client 面；发布与分发由 [包声明](../packages/company-pack/package.json) 决定 |
+| dev 公司状态的 workspace | `company-workspace/`（**gitignored**；fresh clone 用 `pnpm bundle:init`） | 公司角色会话 cwd；本部署的扩张数据（owners、台账、journal、交付物、培养记录）只住 `.dsh-company/`，不进 git。插件只读内容的家 = [pack content](../packages/company-pack/content/)（随包分发，不复制）。公司状态清单 = `<workspace>/.dsh-company/bundle.json`（v3，legacy 文件名；见 [运行态地图 §二·五](runtime-map.md)） |
+| 启动配置 | [run](../run/)、[env.sh](../run/env.sh) | tracked 启动配置；`pnpm company` 启动入口；源码验证使用开发 DSH_HOME |
 | 运行残留 | [runtime](../runtime/)、[runtime/README](../runtime/README.md) | 开发 DSH_HOME、第二 home、浏览器工具态与排练盘（默认整树忽略 + 显式白名单，逐件见 runtime/README；排练盘成型见 [rehearsal 实现](../tools/lib/rehearsal.mjs)） |
 | 上游机制 | [vendor/dsh](../vendor/dsh/) | 钉住的只读 submodule；开发 `pnpm dsh` 的源码基线 |
 | keyless 回归 | [tests](../tests/)、[Vitest 配置](../vitest.config.ts) | 模块逻辑、静态渲染、隔离文件夹具；分层守卫见 [layering.spec.ts](../tests/harness/layering.spec.ts) |
@@ -89,6 +89,4 @@ Web 操作按 [动议合同 §前置](demo.md) 执行：启动输出给出当前
 
 资产关系是：**模块 spec → 真实入口脚本 → 场景判据/固化证据**。回放场景保存录制和 sidecar；工作区 oracle 要看场景声明，历史 `workspace.expected` 中有录制副本，名字本身不证明独立编写。`workspace.actual` 是时点副本，live 公司盘则继续演进。视觉夹具使用合成输入；行为质量语料的判据在部署仓（本仓无该资产）。这些资产都由 [快照规则](../snapshots/README.md) 和场景自身说明用途。
 
-## 目录整理结论
-
-顶层按**用途**读（2026-10-07 S1–S3，RFC [driver-purpose-top-level](../notes/archived/2026-10-07-driver-purpose-top-level.md)）：**运行 = run/**（env.sh + overlay）、**验证 = checks/**（smoke + audit + run-gates）、**调试 = probes/**（按机制域四子目录）、**工具 = tools/**（含 lib/drivers/archive）；keyless spec 按 company/client/presets/harness 领域归位；`scripts/`、`dev/` 两个形态名目录已退役。长期收益是目录本身回答“该改哪类资产、从哪个用途进”，索引回答“该选哪个入口”；不把搬迁成本当作保持平铺的理由。根 [run-gates](../checks/run-gates.mjs) 保持完整稳定入口；门禁自 2026-10-14 拆成 checks/gates/ 模块（清单唯一源 = gates/ 目录，pin 常量 = gates/lib/pin.mjs）。取舍 = [driver-purpose-top-level](../notes/archived/2026-10-07-driver-purpose-top-level.md)。
+顶层按**用途**分区：运行 = `run/`、验证 = `checks/`、调试 = `probes/`、工具 = `tools/`；清单 = 目录本身。设计理由与取舍 = [driver-purpose-top-level](../notes/archived/2026-10-07-driver-purpose-top-level.md)。

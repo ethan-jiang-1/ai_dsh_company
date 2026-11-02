@@ -14,7 +14,7 @@
 | 机制冒烟（`delegation-smoke`） | 模型可见边界 | 设计取舍、跨面正确 |
 | 重放 lane（`replay-smoke`；会话日志 + sidecar 回放，无 key；`--ui` 无可用场景） | 会话级行为复现与回归锚 | 录制之外的行为、设计取舍 |
 | CLI 集成（`snapshot-motion-smoke`；真实 CLI + 临时 fixture，不进 `pnpm test`） | 真实 CLI 进程路径 | 语义 |
-| 发布形状（`release-smoke`） | 安装形状、built 入口可达 | 语义 |
+| 发布与分发（`release-smoke`） | 安装形状、built 入口可达 | 语义 |
 | 认证档（真模型） | 真行为 | 跨面正确 |
 | 行为质量档（`probe --full`；candidate-scan 语料已移出本仓，eval 报缺失 exit 2） | 角色内容质量 | 机制回归 |
 

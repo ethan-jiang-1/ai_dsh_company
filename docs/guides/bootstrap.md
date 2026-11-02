@@ -18,14 +18,14 @@
 | 验收 | `release-smoke` + `company-entry-smoke` | `pnpm verify` + `pnpm test` + `company-entry-smoke` |
 | 不承诺 | 浏览器全交互、离线 | 跨 OS 构建、离线预构建、容器 |
 
-维护者 dev **不是**“复制构建产物分发包”：构建仍按 checkout 产生；换机器按本节重建。产品入口始终是 named profile，不是本仓脚本。
+维护者 dev **不是**“复制构建产物分发包”：构建仍按 checkout 产生；换机器按本节重建。启动入口始终是 named profile，不是本仓脚本。
 
 ```sh
 git submodule update --init             # vendor/dsh 钉 tag
 corepack enable pnpm                    # 一次性：pnpm 读根 packageManager（钉 11.7.0）
 pnpm install                            # 根 workspace（vendor/dsh 全树含 vendored cordis 与 native/system）
 (cd vendor/dsh && pnpm install --frozen-lockfile --ignore-scripts)  # vendor 自己的 lock：pi-ai 1.1.0 / vite 8.2.2 等；根 lock 会解析到更新版 → 类型漂移
-pnpm bundle:init                        # dev run bundle 的 workspace（company-workspace/ 整树 gitignored；制度件符号链接指回 pack）
+pnpm bundle:init                        # dev 公司状态 的 workspace（company-workspace/ 整树 gitignored；制度件符号链接指回 pack）
 # host 面最小 dev type graph（fresh-clone CI 跑这档；源码直跑需要的 typert 产物）：
 node ./node_modules/typescript/bin/tsc -b \
   vendor/dsh/packages/typert/generator \
@@ -58,7 +58,7 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack
 #   但 host/client 代码（src/**）走 lib/ 构建产物——**不重建 = 改动永远不生效**（2026-09-25 实证：
 #   verify 的 client-halves 门禁只查形状不构建，preset-smoke/client-load 全绿也可能验的是旧包）。
 # ⚠ 安装形状（2026-11-02 起）：`pnpm company` **默认** = pack → `plugin add file:<tgz>` → exec，
-#   与产品同形（差异表 = guides/dev-product-parity.md）。改 presets/** 后**要重启**（tarball 是副本）；
+#   与用户侧同形（差异表 = guides/dev-product-parity.md）。改 presets/** 后**要重启**（tarball 是副本）；
 #   需要"改即刻生效"时用 `pnpm company --link`（显式快速通道，改 presets 免重建）。
 #   profile 的 `.npmrc` 把 store/cache 钉在 repo 内（`~/Library` 不被碰）。
 #   **日期通道与定时提醒不再需要额外 bundle（0.2.1）**：`time-context` + `tool-schedule` 由五个
@@ -72,7 +72,7 @@ node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名�
 ```
 
 > **fresh clone 的可执行证明（范围诚实）**：CI `fresh-clone` workflow 在干净 Ubuntu + macOS runner 上跑
-> `pnpm install` → `pnpm bundle:init` → `pnpm verify`（手动 + 每周一 03:00 UTC）——证明产品树
+> `pnpm install` → `pnpm bundle:init` → `pnpm verify`（手动 + 每周一 03:00 UTC）——证明主仓树
 > 能装、能建 dev workspace、能过全部门禁。**它不跑**下面这条 host/native/pack/test 构建链：
 > 该链在 7GB runner 上仍有已知缺口（vendor 双 lock、全 host 构建 OOM、client aggregate 测试类型、
 > musl-gcc），登记在 [repo-hygiene Note](../../notes/implemented/2026-10-25-repo-hygiene-contract.md)；
@@ -120,8 +120,8 @@ node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名�
   devDeps workspace 链接（源码域）里，行就解析不到 → **preset 被标记 broken → UI 给不出可用角色**
   （扫描得到、名字也对，就是不能用；`discoverPresets` 的 `broken` 字段是唯一线索）。
   对应 DSH 的 `verify-cordis-config` 门禁；我们同构到 `checks/gates/preset-row-deps.mjs`（原 run-gates 检查 7）。
-- **patchReload**：headless 用途的自定义 profile 必须 `"startup"`（见 [开发环 §2](./dev-loop.md) 第 3.5 层）；web 形态
-  才用 `"live"`。
+- **一次性 profile 退出**：headless 用途优先用 shipped `headless`；自定义 profile 在 profile patch 把
+  `hmr` row 设为 `disabled: true`（见 [调试指南 §3.5](./debugging.md)）。旧的 profile 热重载字段已从当前 vendor 删除，不要再写。
 - **品牌（皮肤第一笔，零代码）**：`DSH_CLIENT_TITLE` 是构建期环境变量，同时决定**浏览器标签页标题**
   （`apps/web/vite.config.ts`）与**应用内主标题**（`ui-layout/src/client/AppFrame.tsx:192`）——所以
   **上面两条构建命令都要带它**（web dist 与 client 面各注入一次）。侧栏品牌名是插槽
@@ -144,7 +144,7 @@ node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名�
 | workspace 直跑 | `source run/env.sh && pnpm dsh --profile headless "…"` | 源码组合调试，改配置即刻生效（不验打包面） |
 | patch overlay | `pnpm dsh --profile <p> --patch ./run/try-x.patch.yml` | 一次性实验某插件行，不落盘 |
 | **公司 overlay（headless 动议）** | `pnpm dsh --profile headless --patch ./run/company.overlay.yml "…"` | 无 web-app 行的组合里补公司行（insert 语法）；R1 用它验过全组合 |
-| profile 内持久（dev 默认，tarball） | `pnpm company`（包装器：构建 + `npm pack` + `plugin add file:<tgz>`） | **日常开发**：与产品同形；store/cache 由 profile `.npmrc` 钉在 repo 内 |
+| profile 内持久（dev 默认，tarball） | `pnpm company`（包装器：构建 + `npm pack` + `plugin add file:<tgz>`） | **日常开发**：与用户侧同形；store/cache 由 profile `.npmrc` 钉在 repo 内 |
 | profile 内持久（link 快速通道） | `pnpm company --link`（或 `pnpm dsh plugin --profile company add link:./packages/company-pack`） | 改 `presets/**` 即刻生效；**不验打包面**，只做快速迭代 |
 | profile 内持久（真实形状） | `pnpm dsh plugin --profile <p> add file:./packages/company-pack` | 仅验证真实安装形状——归 R5a release-smoke（干净 profile；`plugin` 子命令把参数转发给 profile 目录里的 pnpm） |
 | 正式分发 | `pnpm dsh plugin --profile <p> add <npm-name>` | 用户视角；CI 测兼容矩阵 |

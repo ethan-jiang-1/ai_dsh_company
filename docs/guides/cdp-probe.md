@@ -17,9 +17,9 @@
 
 ```sh
 source run/env.sh   # 提供 DSH_PROBE_CHROME 备选；二进制默认复用 loadChromium 解析（ms-playwright 缓存）
-pnpm company --no-open   # 起产品，横幅拿 URL（demo.md §前置）
+pnpm company --no-open   # 起公司，横幅拿 URL（demo.md §前置）
 node probes/browser-visual/cdp-probe.mjs 'http://127.0.0.1:<port>/?token=<t>'          # 默认断言面（零模型）
-node probes/browser-visual/cdp-probe.mjs '<url>' --ask '用一句话自报角色与职责。'      # + 完整产品环（真模型一次调用）
+node probes/browser-visual/cdp-probe.mjs '<url>' --ask '用一句话自报角色与职责。'      # + 完整公司环（真模型一次调用）
 node probes/browser-visual/cdp-probe.mjs '<url>' --steps /tmp/ui-steps.json   # 受控交互（clickText/waitText/expectText/typeText）
 node probes/browser-visual/cdp-probe.mjs '<url>' --evidence                # 成功也落证据目录（截图 + verdict）
 node probes/browser-visual/cdp-probe.mjs '<url>' --texts --json-out /tmp/v.json   # 逐页签可见文本 + verdict 落文件（UI 金样车道用）
@@ -39,7 +39,7 @@ console.log），JSON verdict 的 `evidenceDir` 指向它；`--evidence` 让成�
 驱动层（源自 loop-advisor，逐字保留）：
 - **`--remote-debugging-port=0`** + 从 profile 目录 `DevToolsActivePort` 读真实端口——固定端口会静默连上孤儿 Chrome 的旧页面，判决全错。
 - **`--no-sandbox` + GPU/crashpad 禁用**：受限环境起不来 Chrome 内部沙箱，GPU 进程直接 FATAL。
-- **桌面 `--window-size`**：无头默认 800×600，响应式 UI 在窄视口是另一套产品形态。
+- **桌面 `--window-size`**：无头默认 800×600，响应式 UI 在窄视口是另一套界面形态。
 - **别用 `--virtual-time-budget`**：页面有活 WebSocket 时虚拟时间永不推进。用真实时间预算 + 轮询。
 - **每个 evaluate 带超时竞速**：socket 断了要 fail，不能挂死探针。
 - **dock 前后台子树并存**：同名节点 DOM 里多份，断言用 `.some()`/全文 `includes` 扫，不取第一个。

@@ -161,8 +161,8 @@ try {
   //    应用内安装（Plugins 页/plugin_manager）在 live recomposition 时报
   //    `session-controller … file-upload: Agent resolver is already registered`（rc.2/rc.5 实测）。
   //    这里证两件事：组内 provider/tool 真挂载（active），且全组合只有一条 tool 行。
-  //    host 的 `session/search` 保持出厂行为（`openAt: never`，可能空/禁用），不是产品承诺，
-  //    所以本检查不调用它——产品承诺只有角色 `session_search` 工具（其索引在首次搜索时懒开）。
+  //    host 的 `session/search` 保持出厂行为（`openAt: never`，可能空/禁用），不是本包承诺，
+  //    所以本检查不调用它——本包承诺只有角色 `session_search` 工具（其索引在首次搜索时懒开）。
   await check('session-search 隔离组挂载（provider + tool active，且无重复行）', async () => {
     const inventory = await rpc(base, cookie, 'pluginInventory/list', {})
     const entries = inventory.entries ?? []

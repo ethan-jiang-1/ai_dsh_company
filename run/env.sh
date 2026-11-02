@@ -4,12 +4,12 @@ _repo_root_dev="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export DSH_HOME="$_repo_root_dev/runtime/harness-home"
 mkdir -p "$DSH_HOME"
 
-# dev run bundle 的 workspace（2026-10-24 RFC run-bundle-install-unit）：
-# company-workspace 整树 gitignored，是会话 cwd；run bundle 只住 .dsh-company/。
+# dev 公司状态的 workspace：
+# company-workspace 整树 gitignored，是会话 cwd；公司状态只住 .dsh-company/。
 # 首启时 pack 会初始化 .dsh-company/ 并写 bundle.json（v3 身份）。fresh clone 先 `pnpm bundle:init`。
 export DSH_COMPANY_HOME="$_repo_root_dev/company-workspace"
 if [ ! -d "$DSH_COMPANY_HOME" ]; then
-  echo "⚠ 未发现 dev run bundle workspace：$DSH_COMPANY_HOME" >&2
+  echo "⚠ 未发现 dev 公司状态 workspace：$DSH_COMPANY_HOME" >&2
   echo "  先跑 'pnpm bundle:init'（建 .dsh-company 状态；已有盘一个字节都不动）。" >&2
 fi
 unset _repo_root_dev

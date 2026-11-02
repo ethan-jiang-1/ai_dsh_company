@@ -56,7 +56,7 @@ sections, and skills while every other session keeps its own"）。
 
 ### 1.3 所以"组织插件 + N 个角色插件"应该倒过来
 
-不是写 N 个插件包，而是：**一个 pack 提供"公司"这个产品的全部**——
+不是写 N 个插件包，而是：**一个 pack 提供“公司”这个组合的全部能力**——
 host 层共享行 + N 个角色 preset + 共享 KB + 模板。插件包（代码）只在两种情况出现：
 ① 有真正要写的自定义工具/服务（如 org_chart 工具、公司知识检索工具）；② 某角色的代码独立演化
 到值得拆包（FAQ 13 决策 2：拆分只在角色独立演化时发生；生态 90%+ 单包起步）。
@@ -215,7 +215,7 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
 
 | KB 性质 | 载体 | 机制 |
 |---|---|---|
-| 产品化角色知识（随 pack 发布、随版本走） | 各 preset 目录内 `skills/` | per-preset scope layer，硬隔离（§1.2） |
+| 随包发布的角色知识（随版本走） | 各 preset 目录内 `skills/` | per-preset scope layer，硬隔离（§1.2） |
 | 公司共享手册（全员可见） | 全局 skills root（`<dshHome>/skills`）或项目 `.dsh/skills` | skills registry 全局层；project root rank 更高 |
 | 活数据（公司 wiki、产出物、会议纪要） | 共享 workspace 文件 + fs 工具 | 团队共享一个 checkout；最终产物用 `present` 工具标记 deliverable |
 
