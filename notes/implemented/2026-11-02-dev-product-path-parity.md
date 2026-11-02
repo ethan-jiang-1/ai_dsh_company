@@ -2,7 +2,7 @@
 
 状态：已交付（2026-11-02；用户点名「严格遵循流程推进落地」）
 
-> 上游 = [dev/产品路径 parity 卡](../../_backlog/issues/2026-11-02-dev-product-path-parity.md)。
+> 上游 = [dev/产品路径 parity 卡](../../_backlog/_archive/settled_issues/2026-11-02-dev-product-path-parity.md)（已结归档）。
 > 借鉴 = deep-research 仓 2026-11-02 的 dev/product parity 卡（外部、只读；同形问题：dev 绿推不出用户绿）。
 > 不改 = 产品入口（`dsh --profile company`）、v3 的 workspace/内容边界、五角色 persona、vendor pin。
 

@@ -4,13 +4,11 @@
 
 ## 活跃清单
 
-当前活跃 1 张；v3 与生命周期卡已结归档；dev/产品路径 parity 卡已落地待验收。已结卡见[归档索引](../_archive/README.md)。
-
-- [dev/产品路径 parity 卡](2026-11-02-dev-product-path-parity.md) — 已落地（默认 tarball、`--link` 显式快速通道、parity 门禁；D1–D5 已决），待用户验收后归档。
-
-- [产品生命周期卡](../_archive/settled_issues/2026-11-01-product-lifecycle.md) — 升级/降级/中断/恢复/搬移/doctor。
+当前活跃 0 张；v3、生命周期与 dev/产品路径 parity 卡已结归档。已结卡见[归档索引](../_archive/README.md)。
 
 ## 近期归档
+
+- dev/产品路径 parity 卡 2026-11-02 已结：默认 tarball + `--link` 快速通道 + parity 指南/门禁 + 市场 staged；去向 = [parity Note](../../notes/implemented/2026-11-02-dev-product-path-parity.md)；卡在 [归档](../_archive/settled_issues/2026-11-02-dev-product-path-parity.md)。
 
 - 生命周期发布卡 2026-11-02 已结：0.7.0 发布就绪 + 本地 registry 按名安装演练 + market index 校验；公有 publish/托管 = [handoff](../../docs/guides/publish-handoff.md)；卡在 [归档](../_archive/settled_issues/2026-11-01-plugin-lifecycle-publish.md)。
 - v3 产品化卡 2026-11-02 已结：0.7.0 复核通过（入口/workspace/内容/账本；原生 picker、不自动迁移写实）；去向 = [v3 Note](../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)；卡在 [归档](../_archive/settled_issues/2026-11-01-plugin-as-product-v3.md)。

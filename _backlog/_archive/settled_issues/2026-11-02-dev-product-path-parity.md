@@ -1,13 +1,15 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-02
 ---
 
 # 推敲：dev 通道与产品安装路径对齐——`link:` 安装 vs tarball/registry，差异有界且显性
 
-> 立卡：2026-11-02 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-02 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **去向**：实现 = [dev/product parity Note](../../notes/implemented/2026-11-02-dev-product-path-parity.md)；待用户验收后按关闭法归档。
+> **结论/去向**：做——日常 dev 通道默认产品同形安装（tarball + `--link` 显式快速通道），
+> parity 指南/门禁与市场 staged 标记落地；实施 = [parity Note](../../../notes/implemented/2026-11-02-dev-product-path-parity.md)；
+> 用户 2026-11-02 验收，已按关闭法归档。
 >
 > **原始意图（用户原话）**：
 > 「外部仓 deep-research 的 `_backlog/issues/2026-11-02-dev-product-path-parity.md`（路径见用户消息；不写本机绝对路径）
@@ -152,7 +154,7 @@ workspace、安装副本就是仓库源码——所以"dev 里看着对"与"用�
 - 新 launcher / 第二层启动器 / 发布 profile 目录。
 - 改 DSH 上游、升 pin、改五角色 persona 语义。
 - 把 3080 日用 GUI 换成 dev home（用户日常环境不动）。
-- 真实 npm publish（仍按 [publish-handoff](../../docs/guides/publish-handoff.md) 人工执行）。
+- 真实 npm publish（仍按 [publish-handoff](../../../docs/guides/publish-handoff.md) 人工执行）。
 - 把 link 通道删掉（它是调试必需，只是降为显式）。
 
 ## 实施回执（2026-11-02）
@@ -162,14 +164,14 @@ workspace、安装副本就是仓库源码——所以"dev 里看着对"与"用�
 （`<name>-<ver>-<sha8>.tgz`，内容一变 spec 就变）；同 spec 跳过 add（二启 `安装副本已是最新`）。
 安装规划抽成纯函数 `tools/lib/dev-install.mjs`（`resolveDevMode`/`devTarballName`/`planDevStart`）。
 
-**P1 完成**：新增 [parity 指南](../../docs/guides/dev-product-parity.md)（同形机制 + 允许差异 + 怎么验）；
+**P1 完成**：新增 [parity 指南](../../../docs/guides/dev-product-parity.md)（同形机制 + 允许差异 + 怎么验）；
 修 `docs/guides/bootstrap.md` 的「装进 **web profile**」→ company；`policy`/`demo`/`profile`/`release`/`AGENTS`
 同步到"默认 tarball、`--link` 快速通道"。
 
 **P2 完成**：`market-index.staged.json`（`requiresPublish: true`，版本随 bump）；未发布期面向用户文档
 （根 README/包 README/手册）不出现 `market-index.json`；发布后删标记即可解除。
 
-**P3 完成**：新门禁 [dev-product-parity](../../checks/gates/dev-product-parity.mjs) 接线进 `pnpm verify`；
+**P3 完成**：新门禁 [dev-product-parity](../../../checks/gates/dev-product-parity.mjs) 接线进 `pnpm verify`；
 判据 4 组（启动器默认、parity 指南机制点、bootstrap 漂移、市场 staged 规则）。
 
 **收口补（2026-11-02）**：AC3 复扫补到活文档漂移——bootstrap 插拔速查仍把 `link:` 写成日常开发
@@ -198,10 +200,10 @@ README/checks 索引仍写「只 exec / 不装包」；run/README 把 `pnpm comp
 ## 关联
 
 - 借鉴（外部、只读）：deep-research 仓的 dev/product parity 卡（用户 2026-11-02 点名；路径不落本机绝对路径）。
-- 前序卡（已结归档）：[生命周期与发布卡](../_archive/settled_issues/2026-11-01-plugin-lifecycle-publish.md)
+- 前序卡（已结归档）：[生命周期与发布卡](2026-11-01-plugin-lifecycle-publish.md)
   （发布/安装形已收口；本卡补的是**日常 dev 回路**与产品回路的同形）。
-- 证据：[生命周期 Note](../../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) 的
-  「发布字节与验收」；[v3 Note](../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)。
-- 现行合同：[profile](../../docs/profile.md)、[policy](../../docs/policy.md)、[demo](../../docs/demo.md)、
-  [bootstrap](../../docs/guides/bootstrap.md)、[release](../../docs/release.md)。
+- 证据：[生命周期 Note](../../../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) 的
+  「发布字节与验收」；[v3 Note](../../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)。
+- 现行合同：[profile](../../../docs/profile.md)、[policy](../../../docs/policy.md)、[demo](../../../docs/demo.md)、
+  [bootstrap](../../../docs/guides/bootstrap.md)、[release](../../../docs/release.md)。
 - 补偿面：`release-smoke` / `company-entry-smoke` / `export-dist`。
