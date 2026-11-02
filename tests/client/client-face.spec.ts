@@ -46,10 +46,6 @@ describe('client 面（R3：委派工具卡）', () => {
       { path: '.dsh-company/kb/motion-ledger.md', limit: 240 },
       { path: '.dsh-company/kb/deliverables-index.json', limit: 2000 },
     ])
-    const tab = readFileSync(join(PACK, 'src/client/LedgerTab.tsx'), 'utf8')
-    expect(tab, 'LedgerTab 必须经 parseMotionLedger 解析（否则读的可能是别的表）').toContain('parseMotionLedger')
-    const catalogTab = readFileSync(join(PACK, 'src/client/DeliverablesTab.tsx'), 'utf8')
-    expect(catalogTab, 'DeliverablesTab 必须经 parseCatalog 解析').toContain('parseCatalog')
   })
 
   it('client 入口确实注册了 tool.call.toolview，且 key 走共享常量（不写死）', () => {

@@ -11,7 +11,7 @@ opened: 2026-11-03
 
 **问题与期望结果：** 用户要求以 fresh agent 视角重评七个维度（文档/代码渐进披露、代码与测试层次、文档—执行—验收结构、上下文腐化、测试资产、反馈通路、DSH 插件约定），并先评估、REVIEW 后再持续改善。期望结果 = 一份带 file:line 与实跑读数的分级发现 + 一个经用户选批的改善序列。
 
-**当前情况：** 第五轮审计已完成，报告 = [七维审计](../research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)。**批次 A + E 部分已落地**（R5-01/02/08/10/11/21/22/30/31/33，R5-06 培养壳；Note 见「已落地」节）。当前读数：`pnpm verify` 53 门 ALL PASS + 2 SKIP；`pnpm test` **130 spec / 1067 例（1064 pass / 3 skip）**；`pnpm typecheck` exit 0；`release-smoke` **44 PASS**（含卸载/重装）；`client-load-smoke` ALL PASS；`ui-scene-smoke`（dev + isolated golden）9/9 页签 ALL PASS。审计基线（before）见报告。七维评分：D1 B / D2 B / D3 B- / D4 C+ / D5 B / D6 C / D7 B-。
+**当前情况：** 第五轮审计已完成，报告 = [七维审计](../research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)。**批次 A + E 部分已落地**（R5-01/02/08/10/11/21/22/30/31/33，R5-06 培养壳；Note 见「已落地」节）。当前读数：`pnpm verify` 53 门 ALL PASS + 2 SKIP；`pnpm test` **131 spec / 1069 例（1066 pass / 3 skip）**；`pnpm typecheck` exit 0；`release-smoke` **44 PASS**（含卸载/重装）；`client-load-smoke` ALL PASS；`ui-scene-smoke`（dev + isolated golden）9/9 页签 ALL PASS。审计基线（before）见报告。七维评分：D1 B / D2 B / D3 B- / D4 C+ / D5 B / D6 C / D7 B-。
 
 **未决问题：** ① 用户选批（A–F，见报告 §5）；② 涉及 `_backlog` 制度面的 B 批（授权门牌/语义审 owner）是否授权；③ D7 的 web-only `inject`、`$DSH_HOME/company/` 自造树、品牌槽半边是否按「文档化偏离」保留，还是改成 DSH 原生载体；④ `_dist` 是否现在重打（`release --check` 已红）。
 
@@ -38,7 +38,8 @@ opened: 2026-11-03
 - `panel-freshness` 的 freshness 源码断言改为真实渲染断言（AttentionTab/CompanyView/LedgerTab 各自渲染面已覆盖）。
 - 台账长摘要的 7 条源码断言改为 `LedgerSummary` 真点按钮（全文/收起/aria/class；新增 `ledger-summary-interaction.spec.ts`，保留原 5 例静态渲染）
 - `Brand.tsx` 补静态渲染（侧栏词标，首屏第一笔）；`debugging.md`/`dev-loop.md` 的两处空壳节引用改指 bootstrap/policy 现行家。
-- 发布 readiness 指路：`AGENTS.md` 命令表加 `pnpm release --check`；`docs/release.md` 发布前清单补它；两个 readiness PASS 行划界。Note = [release-readiness-pointer](../../notes/implemented/2026-11-03-release-readiness-pointer.md)。；Note = [ledger-summary-behavior](../../notes/implemented/2026-11-03-ledger-summary-behavior.md)。
+- 发布 readiness 指路：`AGENTS.md` 命令表加 `pnpm release --check`；`docs/release.md` 发布前清单补它；两个 readiness PASS 行划界。Note = [release-readiness-pointer](../../notes/implemented/2026-11-03-release-readiness-pointer.md)。
+- 台账页签 ready 路径补渲染（统计/行/成品/不可读）；删 `parseMotionLedger`/`parseCatalog` 两条源码断言。Note = [ledger-tab-ready](../../notes/implemented/2026-11-03-ledger-tab-ready.md)。；Note = [ledger-summary-behavior](../../notes/implemented/2026-11-03-ledger-summary-behavior.md)。
 - `docs/index.md` 去掉「决策台账（已迁）」「外部研究材料登记（已迁）」两个墓碑节；`docs/testing.md` 直接链 `external-research.md`；`AGENTS.md` 的 §11/§13 旧节引用改指 `policy §P4/§P5`。
 
 ## 范围与排除项

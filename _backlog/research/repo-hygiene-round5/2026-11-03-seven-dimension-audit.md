@@ -203,7 +203,7 @@ git -C vendor/dsh rev-parse 'dsh-v0.2.1-rc.2^{commit}'
 - 公司业务产物质量与 persona 文案质量：不在卫生范围。
 - D6 子代理已回；它没验证到的：待审批/待问询的归因、中断轮的归因、child 会话、team failed（代码路径在 `session-diagnose.mjs:131-175`，dev home 里没有这类会话可证）。
 
-## 8. 打扫后读数（2026-11-03，5 个提交 / 13 篇 Note）
+## 8. 打扫后读数（2026-11-03，5 个提交 / 13 篇 Note；checkpoint = 提交 `4512ddf`，之后新增见第五轮卡）
 
 > 口径：同一 dev home、同一 vendor pin；覆盖率 = `npx vitest run --coverage`（v8，仅 keyless 面）。
 > 提交链 = `6bd9ef6`（批次 A/E 主体）→ `c78241d`（台账行为断言）→ `eef37a1`（品牌/引用）→ `a0f8668`（发布指路）。
