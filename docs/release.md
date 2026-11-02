@@ -127,8 +127,9 @@ reset/clean，不覆盖并发修改。安装限 180 秒、vendor build 与 relea
 - 版本与每版变化唯一家 = `packages/company-pack/package.json` + [CHANGELOG](../CHANGELOG.md)；此处不写变更史。
 - 发布字节 = `_dist` 的 tarball；`npm publish` 用它，不从包目录重打。改内容必 bump。
 - tarball/git 安装的版本门在安装后判定，失败会回滚；已允许的 build-script 副作用可能保留（FAQ 18）。
-- 发布前必跑：`pnpm verify` + `pnpm test`（迭代环）+ `release-smoke`（认证档）+
-  `channel-matrix-smoke --channel all`（真实 npm 通道）；preset/内容改动另跑 `preset-smoke`。
+- 发布前必跑：`pnpm verify` + `pnpm test`（迭代环）+ `pnpm release --check`（dist 与源码指纹；
+  **`verify` 绿 ≠ 可发布**）+ `release-smoke`（认证档）+ `channel-matrix-smoke --channel all`
+  （真实 npm 通道）；preset/内容改动另跑 `preset-smoke`。
 
 ## 手动分发（`node tools/export-dist.mjs`）
 

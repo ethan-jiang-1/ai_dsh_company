@@ -37,7 +37,8 @@ opened: 2026-11-03
 - `retired-path` 补 v3 两类退役（workspace/、独立启动器）+ 三处旧引用改指；Note = [retired-path-v3](../../notes/implemented/2026-11-03-retired-path-v3.md)。
 - `panel-freshness` 的 freshness 源码断言改为真实渲染断言（AttentionTab/CompanyView/LedgerTab 各自渲染面已覆盖）。
 - 台账长摘要的 7 条源码断言改为 `LedgerSummary` 真点按钮（全文/收起/aria/class；新增 `ledger-summary-interaction.spec.ts`，保留原 5 例静态渲染）
-- `Brand.tsx` 补静态渲染（侧栏词标，首屏第一笔）；`debugging.md`/`dev-loop.md` 的两处空壳节引用改指 bootstrap/policy 现行家。；Note = [ledger-summary-behavior](../../notes/implemented/2026-11-03-ledger-summary-behavior.md)。
+- `Brand.tsx` 补静态渲染（侧栏词标，首屏第一笔）；`debugging.md`/`dev-loop.md` 的两处空壳节引用改指 bootstrap/policy 现行家。
+- 发布 readiness 指路：`AGENTS.md` 命令表加 `pnpm release --check`；`docs/release.md` 发布前清单补它；两个 readiness PASS 行划界。Note = [release-readiness-pointer](../../notes/implemented/2026-11-03-release-readiness-pointer.md)。；Note = [ledger-summary-behavior](../../notes/implemented/2026-11-03-ledger-summary-behavior.md)。
 - `docs/index.md` 去掉「决策台账（已迁）」「外部研究材料登记（已迁）」两个墓碑节；`docs/testing.md` 直接链 `external-research.md`；`AGENTS.md` 的 §11/§13 旧节引用改指 `policy §P4/§P5`。
 
 ## 范围与排除项

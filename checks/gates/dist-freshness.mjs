@@ -48,6 +48,6 @@ export function run({ root, ok, fail, skip }) {
     }
   }
   problems.length === 0
-    ? ok(`dist-freshness（${packVersion}；tarball/manual sha 与 manifest 一致）`)
+    ? ok(`dist-freshness（${packVersion}；tarball/manual sha 与 manifest 一致；可发布性看 release --check）`)
     : fail('dist-freshness', problems.join('；'))
 }
