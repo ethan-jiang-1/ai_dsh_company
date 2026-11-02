@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 状态：常驻
-// preset 冒烟（上线前门禁）：boot 真 web profile，逐个 preset 建一次会话，断言挂载成功。
+// preset 冒烟（上线前门禁）：boot 真 company profile，逐个 preset 建一次会话，断言挂载成功。
 // 何时跑：**preset 改动的完成定义**：改 presets/**（persona/skills）或组合行后必跑（keyless 真挂载 ~30s）
 //
 // 为什么必须有它（R1 实证）：preset 的失败发生在"**会话创建时挂载**"——Loader 用每行的 config
@@ -9,9 +9,9 @@
 // 两者都看不到 config 校验；**UI 还会把错误吞掉**（"新建会话点了没反应"）。
 // 所以唯一能上线前抓住它的手段是：走真入口路径（web RPC session/create）挂一次。
 //
-// 前置：DSH_HOME 指向已装本 pack 的 profile（`source run/env.sh` 后用 dev home），
+// 前置：DSH_HOME 指向已装本 pack 的 company profile（`source run/env.sh` 后 `pnpm company` 默认装这里），
 //       client 面与前端 dist 已构建（guides/bootstrap）。
-// 用法：source run/env.sh && node checks/smoke/preset-smoke.mjs [--port 0] [--profile web]
+// 用法：source run/env.sh && node checks/smoke/preset-smoke.mjs [--port 0] [--profile company]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
@@ -26,7 +26,7 @@ const arg = (name, fallback) => {
   return i === -1 ? fallback : process.argv[i + 1]
 }
 const PORT = Number(arg('port', '0'))
-const PROFILE = arg('profile', 'web')
+const PROFILE = arg('profile', 'company')
 // 练习场 ≠ 运行场（轮间待办②）：默认 cwd 在排练场，排练/探针产物不再积进真盘；
 // `--cwd` 可显式覆盖（确需指回真盘时）。
 const CWD = resolve(arg('cwd', join(ROOT, REHEARSAL_REL)))
@@ -113,7 +113,7 @@ const check = (label, fn) => fn().then(
 // 既有差异当参数保留：--port 走 PORT（默认 0）、空 cookie 即抛（onEmptyCookie: 'throw'）、rpcId 前缀
 // `smoke-` + 失败回退转储响应体（dumpBodyOnError）；rpc/boot 失败文案统一为模块款（卡内接受的
 // 文本统一：只进 FAIL 行的诊断后缀，判据标签与退出码不变）。
-const { child, base, token } = await startWeb({ spawn, root: ROOT, home, port: PORT })
+const { child, base, token } = await startWeb({ spawn, root: ROOT, home, port: PORT, profile: PROFILE })
 try {
   const cookie = await companyCookie({ fetch, base, token, onEmptyCookie: 'throw' })
   // 四参旧签名保留给下方既有调用点（base/cookie 已由工厂闭包持有），调用点一字不动。

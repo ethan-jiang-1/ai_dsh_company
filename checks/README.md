@@ -22,7 +22,7 @@
 | 确认录制行为与工作区判据 | [replay-smoke](smoke/replay-smoke.mjs)（当前仅 headless 合成场景） |
 | 审计动议输出与角色留痕 | [deliverables-check](audit/deliverables-check.mjs) · [authorship-audit](audit/authorship-audit.mjs) · [journal-audit](audit/journal-audit.mjs) |
 | 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs) · [export-dist](../tools/export-dist.mjs) · [market-index](../tools/market-index.mjs) |
-| **dev 启动** | `pnpm company --no-open` → [company](../tools/company.mjs)：只 exec `dsh --profile company`；不建 profile/不装包/不问 workspace |
+| **dev 启动** | `pnpm company --no-open` → [company](../tools/company.mjs)：缺 profile 时初始化；默认构建 + `npm pack` + `plugin add file:<tgz>` → exec `dsh --profile company`；`--link` 快速通道 |
 | 产品入口端到端（真 tarball 装 profile → `dsh --profile company` → workspace/run bundle） | [company-entry-smoke](smoke/company-entry-smoke.mjs)（keyless，~1-2 分钟） |
 
 ## 清单（分区 = 目录本身；逐脚本说明 = 各自头注）

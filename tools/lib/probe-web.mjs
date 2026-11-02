@@ -37,18 +37,22 @@ const COOKIE_TIMEOUT_MS = 15_000
  *   （不动权限档——那归 run/env.sh 的探测）。
  * @param {object} [options.env] - 基础环境（默认 `process.env`）。要加额外键（如 team-concurrency 的
  *   `DSH_PROBE_BARRIER_*`）就传展开后的基础环境，`home` 会再叠加 `DSH_HOME`。
- * @param {string|string[]} [options.patch] - Cordis patch overlay；给出时在 `web` 后逐个插
+ * @param {string|string[]} [options.patch] - Cordis patch overlay；给出时在启动目标后逐个插
  *   `--patch <path>`（`--patch` 可重复——replay-smoke 的场景 patch + PRESET_PATCHES 组合是数组
  *   用例；不给出则 argv 与其余调用方逐字一致）。
+ * @param {string} [options.profile] - 要启动的 profile 名；不给出时保持 `dsh web`（= `--profile web`）。
+ *   给出时改走 `dsh --profile <name>`（preset-smoke 用 `company`——dev 默认安装目标，见
+ *   docs/guides/dev-product-parity.md）。
  * @param {number} [options.port] - 传给 `--port` 的值；默认 0（端口是环境状态，交系统分配）。
  * @param {Function} [options.onOutput] - 每段 stdout/stderr 的回调（调用方自己决定是否落盘；
  *   本模块保持零 import，不替调用方写文件）。
  * @returns {Promise<{child: object, port: number, token: string, base: string}>}
  */
-export function startWeb({ spawn: spawnProcess, root, home, env = process.env, patch, port = 0, onOutput } = {}) {
+export function startWeb({ spawn: spawnProcess, root, home, env = process.env, patch, profile, port = 0, onOutput } = {}) {
   const patches = patch === undefined ? [] : (Array.isArray(patch) ? patch : [patch])
+  const boot = profile === undefined ? ['web'] : ['--profile', profile]
   const child = spawnProcess(process.execPath,
-    ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', 'web',
+    ['--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', ...boot,
       ...patches.flatMap(entry => ['--patch', entry]),
       '--', '--port', String(port), '--no-open'],
     { cwd: root, env: home === undefined ? { ...env } : { ...env, DSH_HOME: home }, stdio: ['ignore', 'pipe', 'pipe'] })

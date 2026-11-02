@@ -4,9 +4,9 @@
 
 ## 活跃清单
 
-当前活跃 1 张；v3 与生命周期卡已结归档；新立 dev/产品路径 parity 卡。已结卡见[归档索引](../_archive/README.md)。
+当前活跃 1 张；v3 与生命周期卡已结归档；dev/产品路径 parity 卡已落地待验收。已结卡见[归档索引](../_archive/README.md)。
 
-- [dev/产品路径 parity 卡](2026-11-02-dev-product-path-parity.md) — dev 日常通道走 `link:`、产品走 tarball/registry；差异需有界且显性（D1–D5 待拍板）。
+- [dev/产品路径 parity 卡](2026-11-02-dev-product-path-parity.md) — 已落地（默认 tarball、`--link` 显式快速通道、parity 门禁；D1–D5 已决），待用户验收后归档。
 
 - [产品生命周期卡](../_archive/settled_issues/2026-11-01-product-lifecycle.md) — 升级/降级/中断/恢复/搬移/doctor。
 

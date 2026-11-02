@@ -52,6 +52,17 @@ describe('startWeb：进程参数与 banner 解析', () => {
     expect(base).toBe('http://127.0.0.1:43219')
   })
 
+  it('给出 profile 时用 --profile <name> 替代 web 子命令（preset-smoke 走 dev 默认的 company）', async () => {
+    const { spawn, calls, emit } = fakeSpawn()
+    const started = startWeb({ spawn, root: '/repo', profile: 'company' })
+    emit(BANNER)
+    await started
+    expect(calls[0][1]).toEqual([
+      '--import', 'tsx/esm', 'vendor/dsh/apps/cli/src/bin.ts', '--profile', 'company',
+      '--', '--port', '0', '--no-open',
+    ])
+  })
+
   it('给出 patch 时在 web 后插 --patch <path>，并在基础环境上叠加额外键与 DSH_HOME（team-concurrency 读屏障用例）', async () => {
     const { spawn, calls, emit } = fakeSpawn()
     const started = startWeb({

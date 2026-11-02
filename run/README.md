@@ -29,8 +29,8 @@ bundle **不在 git**；本仓的 dev bundle = home `runtime/harness-home/` + wo
 
 一条命令看当前实况：`pnpm orient`（keyless 只读；场景视图 `--scenario <kind>/<场景>`）。
 bundle 身份/基部指纹看 `<workspace>/.dsh-company/bundle.json`；首次 apply 写、只创建不覆盖。
-产品入口 = `pnpm company --workspace <dir>`；`pnpm dsh --profile company` 直启需显式
-`DSH_COMPANY_HOME`。
+dev 形态入口 = `pnpm company --workspace <dir>`（repo wrapper；默认 pack + `plugin add file:`）；
+产品入口 = `dsh --profile company`；源码直启（`pnpm dsh`）需显式 `DSH_COMPANY_HOME`。
 
 ## 件
 

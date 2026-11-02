@@ -14,10 +14,11 @@
 // 会被 ①② 抓到；**页签在场 + 行可点**的功能断言在 `probes/browser-visual/cdp-probe.mjs`
 // （活体页签扫）与 `tests/client`（渲染/交互断言）。
 //
-// 前置：与 preset-smoke 相同（DSH_HOME + 已装 pack + 前端与 client 面已构建）；另需
+// 前置：与 preset-smoke 相同（DSH_HOME + 已装 pack 的 company profile——`pnpm company` 默认装这里；
+//       前端与 client 面已构建）；另需
 //       playwright（vendor 全树 `pnpm install` 后在 .pnpm store，本脚本自动定位）与一份
 //       chromium（缺 playwright 期望的版本时自动回退缓存里最新一份）。
-// 用法：source run/env.sh && node checks/smoke/client-load-smoke.mjs [--port 0]
+// 用法：source run/env.sh && node checks/smoke/client-load-smoke.mjs [--port 0] [--profile company]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb } from '../../tools/lib/probe-web.mjs'
 import { spawn } from 'node:child_process'
@@ -32,6 +33,7 @@ const arg = (name, fallback) => {
   return i === -1 ? fallback : process.argv[i + 1]
 }
 const PORT = Number(arg('port', '0'))
+const PROFILE = arg('profile', 'company')
 const BRAND = 'DSH 梦之队'
 
 let home
@@ -47,7 +49,7 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 const chromiumApi = await loadChromium(ROOT)
 // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：本 smoke 只 boot——token 直接进浏览器 URL，
 // 不取 cookie、不发 RPC ⇒ 只走 startWeb 这一层；spawn 注入（tools/lib 是 keyless 纯逻辑缝）。
-const { child, port, token } = await startWeb({ spawn, root: ROOT, home, port: PORT })
+const { child, port, token } = await startWeb({ spawn, root: ROOT, home, port: PORT, profile: PROFILE })
 let failures = 0
 const fail = (label, detail) => { failures++; console.log(`  FAIL ${label}: ${detail}`) }
 let page

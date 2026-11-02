@@ -68,10 +68,11 @@ dsh --profile company
 git submodule update --init && corepack enable pnpm && pnpm install
 pnpm bundle:init                 # 建 dev workspace（已有盘一个字节不动）
 source run/env.sh                # dev home + 裸 dsh 拦截
-pnpm company --no-open           # dev-only：exec `dsh --profile company`（不建 profile/不装包/不问 workspace）
+pnpm company --no-open           # dev-only：构建 + pack + `plugin add file:<tgz>` + exec `dsh --profile company`（`--link` 快速通道）
 ```
 
-`pnpm company` 只是 repo dev wrapper，不进 tarball；产品入口永远是 `dsh --profile company`。
+`pnpm company` 只是 repo dev wrapper，不进 tarball：默认按产品同形安装（pack 出 tarball 再 `plugin add file:`），
+`--link` 是显式快速通道；产品入口永远是 `dsh --profile company`。
 `pnpm verify` / `pnpm test` / `pnpm typecheck` 是常驻三条命令。
 
 **分发**：`_dist/安装手册.md`（生成物）与 tarball 是唯一收件人路径；安装形状、升级、备份、卸载、

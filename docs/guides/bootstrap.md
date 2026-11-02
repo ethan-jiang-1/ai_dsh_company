@@ -12,8 +12,8 @@
 | 适用 | 给别人用、跨机器/跨部署 | 在本机隔离环境里跑本仓库的当前代码 |
 | 前置 | 有 `dsh` 运行时 + tarball；不需要本仓库 | 本仓库 + pinned vendor + Node/pnpm；按本节构建 |
 | 数据落点 | 新 `DSH_HOME` + 用户 workspace 的 `.dsh-company/`（身份/产物；home 只运行时+治理） | dev 用 `runtime/harness-home` + 仓内 `company-workspace/.dsh-company/` |
-| 首启 | Plugins/CLI 装 bundle → `dsh --profile company` → workspace 解析/登记/状态只补缺 | dev 用 `pnpm company --no-open`（只 exec） |
-| 升级 | 换 profile 包后重启（workspace v3 身份；状态只补缺） | 拉代码 + 重跑 `pnpm company`（构建/重指 link） |
+| 首启 | Plugins/CLI 装 bundle → `dsh --profile company` → workspace 解析/登记/状态只补缺 | dev 用 `pnpm company --no-open`（构建 + pack + 安装 + exec） |
+| 升级 | 换 profile 包后重启（workspace v3 身份；状态只补缺） | 拉代码 + 重跑 `pnpm company`（构建 + 重装 tarball） |
 | 删除 | `plugin remove` + 删 home | 手工删 dev home/workspace（本仓无独立启动器） |
 | 验收 | `release-smoke` + `company-entry-smoke` | `pnpm verify` + `pnpm test` + `company-entry-smoke` |
 | 不承诺 | 浏览器全交互、离线 | 跨 OS 构建、离线预构建、容器 |
@@ -43,7 +43,7 @@ node ./node_modules/typescript/bin/tsc -b \
 node ./node_modules/typescript/bin/tsc -b vendor/dsh/tsconfig.client.json   # client 面（测试面报错可忽略）
 (cd vendor/dsh && DSH_CLIENT_TITLE="DSH 梦之队" ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE client)
 DSH_CLIENT_TITLE="DSH 梦之队" pnpm --filter @deepseek-ai/dsh-web-frontend run build   # 前端 dist
-source run/env.sh && pnpm company --no-open   # dev-only：exec dsh --profile company（workspace=company-workspace）
+source run/env.sh && pnpm company --no-open   # dev-only：pack + plugin add file: + exec dsh --profile company（workspace=company-workspace）
 # 真实安装形状归 release-smoke：plugin --profile company add file:<tgz> → dsh --profile company（cwd=workspace）
 
 # pack 代码面构建（改 src/** 任一面都需要——host〔src/index.ts+lib〕与 client〔src/client〕双编译面，
@@ -54,7 +54,7 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack
 (cd packages/company-pack && ../../node_modules/.bin/tsdown)
 # ⚠ 两步必须连跑：tsdown 的入口是 lib/types/**（tsc 的产物）——改 src 后只跑 tsdown = 打包上一次的旧产物（2026-09-27 实测：改 styles.ts 只跑 tsdown，页面仍旧色）；也别删 lib/ 再只跑 tsdown（入口没了直接红）
 # ③ client 面生效第三跳 = **用户浏览器刷新**（无 HMR：模块表 rev 会变，不刷新看的是旧 bundle）
-# ⚠ preset 内容与代码面不同步：link: 安装下改 presets/**（persona/skills）**即刻生效无需重建**，
+# ⚠ preset 内容与代码面不同步：presets/**（persona/skills）是数据面，按安装形态生效（见下条安装形状）；
 #   但 host/client 代码（src/**）走 lib/ 构建产物——**不重建 = 改动永远不生效**（2026-09-25 实证：
 #   verify 的 client-halves 门禁只查形状不构建，preset-smoke/client-load 全绿也可能验的是旧包）。
 # ⚠ 安装形状（2026-11-02 起）：`pnpm company` **默认** = pack → `plugin add file:<tgz>` → exec，
@@ -65,7 +65,7 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack
 #   角色 preset 各自声明（`preset-clock` 组），宿主 schedule 服务随 web-app 组合而来 ⇒ profile 的
 #   bundles 列表里若还留着已退役的 schedule bundle，删掉那一项即可。
 #   历史：file: 拷贝时代，presets/*.yml 用编辑工具改会换 inode、安装副本是真拷贝（link count 1），
-#   不重装则改动不可见——该坑随 link: 消失。
+#   不重装则改动不可见——默认 tarball 按内容寻址（内容变 → spec 变 → 重装），启动器吸收该坑。
 node checks/smoke/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）
 pnpm test tests/company/handbook.spec.ts    # 手册注入完成定义（keyless：content/override/systemPrompt section）
 node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
@@ -129,7 +129,7 @@ node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名�
 - **上线前必跑 preset 冒烟**（R1 起，两道防线）：
   1. **防线一（快，`pnpm test`）**：已知必填 config 字段必须随工具行给出（如
      `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`）。
-  2. **防线二（真，`node checks/smoke/preset-smoke.mjs`）**：boot 真 web profile → `agentPresets/list`
+  2. **防线二（真，`node checks/smoke/preset-smoke.mjs`）**：boot 真 company profile（`pnpm company` 默认安装目标）→ `agentPresets/list`
      断言 5 公司角色 + researcher 零 broken → **逐个 `session/create` 真挂一次**。
   **只有防线二能抓"preset 挂载失败"**：行 config 校验发生在挂载时，roster 扫描与 `--dump-config`
   都看不到，UI 还会吞掉错误（症状就是"新建会话点了没反应"）。已反证：去掉一个必填 config 即变红
@@ -141,10 +141,11 @@ node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名�
 
 | 装法 | 命令 | 用途 |
 |---|---|---|
-| workspace 直跑 | `source run/env.sh && pnpm dsh --profile headless "…"` | 日常开发，改配置即刻生效 |
+| workspace 直跑 | `source run/env.sh && pnpm dsh --profile headless "…"` | 源码组合调试，改配置即刻生效（不验打包面） |
 | patch overlay | `pnpm dsh --profile <p> --patch ./run/try-x.patch.yml` | 一次性实验某插件行，不落盘 |
 | **公司 overlay（headless 动议）** | `pnpm dsh --profile headless --patch ./run/company.overlay.yml "…"` | 无 web-app 行的组合里补公司行（insert 语法）；R1 用它验过全组合 |
-| profile 内持久（dev = link:） | `pnpm dsh plugin --profile company add link:./packages/company-pack` | **日常开发**：符号链接指仓库源码，内容改动即刻生效；store/cache 由 profile `.npmrc` 钉在 repo 内 |
+| profile 内持久（dev 默认，tarball） | `pnpm company`（包装器：构建 + `npm pack` + `plugin add file:<tgz>`） | **日常开发**：与产品同形；store/cache 由 profile `.npmrc` 钉在 repo 内 |
+| profile 内持久（link 快速通道） | `pnpm company --link`（或 `pnpm dsh plugin --profile company add link:./packages/company-pack`） | 改 `presets/**` 即刻生效；**不验打包面**，只做快速迭代 |
 | profile 内持久（真实形状） | `pnpm dsh plugin --profile <p> add file:./packages/company-pack` | 仅验证真实安装形状——归 R5a release-smoke（干净 profile；`plugin` 子命令把参数转发给 profile 目录里的 pnpm） |
 | 正式分发 | `pnpm dsh plugin --profile <p> add <npm-name>` | 用户视角；CI 测兼容矩阵 |
 

@@ -30,7 +30,7 @@
 | workspace | `company-workspace/` | 用户自己的项目目录 | 演练盘与真盘分离（`runtime/README.md`） |
 | 凭据 | dev home 的 `.credentials.yaml` | 用户 home / 环境变量 | 按 home 隔离；不共享 |
 | 浏览器两包 | dev 显式 `DSH_COMPANY_BROWSER=on` | 装了才开；`on/off` 强制 | 源码树可解析、npm 发行版不含两包 |
-| probe / 日志 | cdp-probe、client-load、diagnostics | 用户无 | 调试必需，不影响安装机制 |
+| probe / 日志 | 调试工具可自选 profile（多数 `probes/` 仍 boot `web`）；`preset-smoke` / `client-load-smoke` 固定 `company` | 用户无 | 调试必需，不承担产品形验收；产品形验收走 `company` 档 |
 | 账户观察窗 | 3080 是日用 `~/.dsh` 的 `web` profile | 用户的 `company` profile | 日用 GUI 不承担验收；验收走 dev home 的 `company` |
 
 ## 怎么验
@@ -39,6 +39,7 @@
 source run/env.sh
 pnpm company --no-open            # 默认：pack + file: 安装 + 启动
 pnpm company --link --no-open     # 快速通道（改 presets 即刻生效）
+node checks/smoke/preset-smoke.mjs    # 真挂载（boot dev 默认 company profile）
 node checks/smoke/release-smoke.mjs   # 产品形认证档（tarball + 应用内安装）
 pnpm verify                       # 含 dev-product-parity 门禁
 ```

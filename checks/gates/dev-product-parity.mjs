@@ -9,13 +9,16 @@ import { join } from 'node:path'
 // 判据（每条都有可指回的文件）：
 //   ① dev 启动器默认路径含 npm pack + `plugin add file:`，模式从 resolveDevMode 取；
 //   ② parity 指南在场，且差异表覆盖必须登记的机制点（安装源/版本门/runtime/workspace/凭据/probe）；
-//   ③ bootstrap 观察窗一节不再写「装进 web profile」（活文档漂移，实测与 profile.md 矛盾）；
+//   ③ bootstrap 不再把 link 写成 dev 默认（三处实测漂移：观察窗「装进 web profile」、插拔速查
+//      「dev = link:」、升级行「重指 link」）；
 //   ④ market index 未发布期：`market-index.staged.json` 在场时，面向用户的 README/手册不得出现
 //      `market-index.json`（不得引导用户加一个 registry 里还不存在的版本源）。
 // 负例留证 2026-11-02（真树植入，`pnpm verify` 原话，逐条还原即绿）：
 //   ① launcher 默认改回 link → `dev 启动器默认模式不是 tarball`;
 //   ② 删 parity 指南的「允许差异」行 → `parity 指南缺机制点「允许差异」`;
-//   ③ bootstrap 临时写回「装进 **web profile**」→ `bootstrap 仍写「装进 web profile」`;
+//   ③ bootstrap 三处各一条：写回「装进 **web profile**」→ `bootstrap 仍写「装进 web profile」`;
+//      插拔速查写回「dev = link:」→ `bootstrap 仍把 link 写成 dev 默认`；
+//      升级行写回「重指 link」→ `bootstrap 升级配方仍写「重指 link」`;
 //   ④ staged 标记在场时在包 README 临时加 `market-index.json` → `未发布期不得在面向用户文档里出现 market-index.json`。
 export function run({ root, ok, fail }) {
   const problems = []
@@ -48,10 +51,17 @@ export function run({ root, ok, fail }) {
     if (!/^\|.+\|$/m.test(parity)) problems.push('parity 指南没有差异表')
   }
 
-  // ③ bootstrap 不再把观察窗装进 shipped web profile
+  // ③ bootstrap 不再把 link 写成 dev 默认（观察窗 profile / 插拔速查 / 升级配方三处漂移）
   const bootstrapPath = join(root, 'docs/guides/bootstrap.md')
-  if (existsSync(bootstrapPath) && /装进 \*\*web profile\*\*/.test(readFileSync(bootstrapPath, 'utf8'))) {
-    problems.push('bootstrap 仍写「装进 web profile」（观察窗 profile 是 company；与 docs/profile.md 矛盾）')
+  if (existsSync(bootstrapPath)) {
+    const bootstrap = readFileSync(bootstrapPath, 'utf8')
+    for (const [pattern, message] of [
+      [/装进 \*\*web profile\*\*/, 'bootstrap 仍写「装进 web profile」（观察窗 profile 是 company；与 docs/profile.md 矛盾）'],
+      [/dev = link:/, 'bootstrap 仍把 link 写成 dev 默认（dev = link:；日常通道应是 tarball，link 只作 --link 快速通道）'],
+      [/重指 link/, 'bootstrap 升级配方仍写「重指 link」（默认安装是 tarball，重跑即构建 + 重装）'],
+    ]) {
+      if (pattern.test(bootstrap)) problems.push(message)
+    }
   }
 
   // ④ 未发布期不得引导加市场源

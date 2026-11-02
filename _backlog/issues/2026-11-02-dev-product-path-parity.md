@@ -172,16 +172,27 @@ workspace、安装副本就是仓库源码——所以"dev 里看着对"与"用�
 **P3 完成**：新门禁 [dev-product-parity](../../checks/gates/dev-product-parity.mjs) 接线进 `pnpm verify`；
 判据 4 组（启动器默认、parity 指南机制点、bootstrap 漂移、市场 staged 规则）。
 
+**收口补（2026-11-02）**：AC3 复扫补到活文档漂移——bootstrap 插拔速查仍把 `link:` 写成日常开发
+（`dev = link:`）、升级行仍「重指 link」、历史句「该坑随 link: 消失」；ui-demo 仍写 web profile；
+README/checks 索引仍写「只 exec / 不装包」；run/README 把 `pnpm company` 称产品入口；v3 Note 仍写
+「repo-only exec wrapper」。以上均改到现行家；门禁 ③ 扩到 `dev = link:` 与 `重指 link` 两条。
+
+**冒烟档补（2026-11-02）**：干净 dev home 复跑发现 `preset-smoke` / `client-load-smoke` 仍 boot
+`web`（那里没有 pack）——preset 19 FAIL、client 品牌槽 FAIL；`startWeb` 新增可选 `profile`，
+两档固定 `company` 后全绿（6 角色 + researcher 真挂载；真页面零挂载失败）。其余 dev 冒烟/探针
+仍 boot `web`，已在 parity 指南登记为调试面差异（见 Note「未做」）。
+
 ### 验证（真跑）
 
 | 验收 | 证据 |
 |---|---|
 | AC1 干净 dev home 默认 tarball | 干净 home 首启：`dep=file:…/tmp/dev-pack/dsh-company-pack-0.7.0-abef80f4.tgz`；banner 出；六角色零 broken；`session/create` ceo；无 `did not activate` |
+| AC1b 真挂载/真页面（干净 home） | `preset-smoke` → ALL PASS（6 角色 + researcher）；`client-load-smoke` → ALL PASS（零挂载失败 / 零 loader 错误）；改前 boot web 分别 19 FAIL / 品牌槽 FAIL |
 | AC2 `--link` 快速通道 | 干净 home `--link`：`dep=link:/…/packages/company-pack`；banner 出 |
 | AC3 迁移提示 | 已 link 的 home 再跑默认：先打印「当前是 link: … 需要保留请加 --link」，随后切到 `file:` |
 | AC4 幂等 | 同内容二启：`安装副本已是最新（file:…abef80f4.tgz）`，不重复 add |
-| AC5 门禁 | `PASS dev-product-parity`；注入「默认改回 link」→ 点名红；bootstrap 写回 web profile → 红；包 README 写 market-index.json → 红；各自还原 → 绿 |
-| AC6 全量 | `pnpm verify` ALL PASS；`pnpm test` 123 files / 1036 passed / 3 skipped；`pnpm typecheck` 绿；`release --check` READY 0.7.0 @ `ad439b6` |
+| AC5 门禁 | `PASS dev-product-parity`；六组真树植入各自点名红（默认改回 link / bootstrap 装进 web profile / `dev = link:` / 重指 link / 删「允许差异」/ 包 README 写 market-index.json）；逐条还原 → 绿 |
+| AC6 全量 | `pnpm verify` ALL PASS；`pnpm test` 123 files / 1037 passed / 3 skipped；`pnpm typecheck` 绿；`release --check` READY 0.7.0 @ `ad439b6` |
 | AC7 index 字节稳定 | 同版本重复 `--prepare`：`market-index.json` 无 diff（`stablePublishTimestamp`；版本变化/`--refresh` 才换时间） |
 
 ## 关联

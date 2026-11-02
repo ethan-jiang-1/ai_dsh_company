@@ -35,7 +35,8 @@
    workspace hash key），storageDomain 缺席/失败回退 `<DSH_HOME>/company/ledger/<hash>.json`；仍不在
    workspace。旧 `company_deliverables` domain / workspace `kb/deliverables-presented.json` 不读不迁。
 8. **dev 形状收口。** `pnpm bundle:init` 只建 `company-workspace/.dsh-company/` 状态（不复制内容）；
-   `pnpm company` 是 repo-only exec wrapper（不建 profile/不装包/不问 workspace）；删除 `pnpm standalone`。
+   `pnpm company` 是 repo-only wrapper（不写 profile patch/不问 workspace；2026-11-02 起默认
+   pack + `plugin add file:`，见 [parity Note](./2026-11-02-dev-product-path-parity.md)）；删除 `pnpm standalone`。
 
 ## 输掉的方案
 
