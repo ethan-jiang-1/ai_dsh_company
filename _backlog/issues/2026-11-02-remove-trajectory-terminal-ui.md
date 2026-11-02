@@ -110,6 +110,23 @@ opened: 2026-11-02
 - 改 3080 日用 `~/.dsh` home、改五角色 persona、改公司页签/培养视图。
 - 真实 npm publish（仍走 publish-handoff）。
 
+## 实施回执（2026-11-02）
+
+**P0 完成**：`packages/company-pack/cordis.patch.yml` 加 `ui-trajectory` / `ui-sidebar-terminal` 两条
+顶层替换行（`disabled: true`）；`terminal-controller` 保持 active。落地 Note =
+[remove-trajectory-terminal-ui](../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md)。
+
+**P1 完成**：`tests/company/ui-surface.spec.ts` 5 条 keyless；干净 home 产品形安装 + `preset-smoke`
+ALL PASS；真页面主区 = Chat + 培养、右栏 guide = 9 公司页签、无 New terminal；`pluginInventory`
+两条 `enabled:false`；`pnpm verify` / `pnpm test`（124 files / 1042 passed）/ `pnpm typecheck` 绿。
+
+**附带修复**：`tools/company.mjs` 的旧 tarball 清理从 `plugin add` 前移到 add 之后——换内容时先删旧文件
+会让 pnpm 读旧 spec 时 ENOENT（实测 `abef80f4` → `5fe5f189` 红）；修后安装成功、旧 tarball 清掉、
+新 tarball 保留。
+
+**未决**：`ui-attachment` 的 type-only `inject` 仍列 `ui-trajectory`，`preset-smoke` 闭包 lint 报
+非致命 WARN；上游 tidy-up 不在本卡。
+
 ## 关联
 
 - 用户反馈来源：2026-11-02 观察窗走查（dev home `runtime/harness-home`，`company` profile，端口 57849）。

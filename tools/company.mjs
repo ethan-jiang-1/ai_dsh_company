@@ -91,9 +91,6 @@ if (mode === 'tarball') {
   const sha256 = createHash('sha256').update(readFileSync(packedPath)).digest('hex')
   tarballPath = join(stateDir, devTarballName({ name: manifest.name, version: manifest.version, sha256 }))
   if (packedPath !== tarballPath) renameSync(packedPath, tarballPath)
-  for (const name of readdirSync(stateDir)) {
-    if (name.endsWith('.tgz') && join(stateDir, name) !== tarballPath) rmSync(join(stateDir, name), { force: true })
-  }
 }
 
 const plan = planDevStart({
@@ -107,6 +104,13 @@ if (installStep !== undefined) {
   run([process.execPath, cli, 'plugin', '--profile', 'company', 'add', installStep.spec])
 } else {
   console.log(`company(dev): 安装副本已是最新（${plan.spec}）`)
+}
+// 清理必须在 add 之后：pnpm 换依赖时要读旧 tarball（profile package.json 的旧 spec），
+// 先删旧文件会让 `plugin add` 以 ENOENT 失败（2026-11-02 实测：旧 abef80f4、新 5fe5f189）。
+if (mode === 'tarball') {
+  for (const name of readdirSync(stateDir)) {
+    if (name.endsWith('.tgz') && join(stateDir, name) !== tarballPath) rmSync(join(stateDir, name), { force: true })
+  }
 }
 
 const result = spawnSync(process.execPath, [cli, '--profile', 'company', '--', ...passthrough], {

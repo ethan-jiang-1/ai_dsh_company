@@ -7,6 +7,18 @@
 # 依赖纪律（R5a 起）：runtime 依赖声明为 peerDependencies（不精确钉死；pre-stable API），
 # 已认证 tag 台账在 checks/gates/lib/compat-tags.json（不随包分发）—— 合同见 docs/release.md。
 
+# ── 产品 UI 收口（2026-11-02：去掉 Trajectory 页签与 New Terminal 入口）──
+# 两行都是 web-app 出厂 UI 行；整行 disabled 是唯一不碰 vendor 的窄口径。
+# 不用 developerTools 开关：它连带代码差异/交互预览与 built-in ptc/minimal，且是每用户设置。
+# 用户决定与验收 = _backlog/issues/2026-11-02-remove-trajectory-terminal-ui.md；
+# 落地 Note = notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md。
+- id: ui-trajectory
+  name: '@deepseek-ai/dsh-client-ui-trajectory'
+  disabled: true
+- id: ui-sidebar-terminal
+  name: '@deepseek-ai/dsh-client-ui-sidebar-terminal'
+  disabled: true
+
 # ── preset roster（替换 web-app 出厂行：default 改 ceo）──
 # 0.1.7 起预设声明模型变了：registry 一行（本处，按 id 替换 web-app 的 insert）+ **每个预设一行**
 #   `@deepseek-ai/dsh-agent-preset`（预设的子插件行内联进 `config.plugins`）。五行分别住
