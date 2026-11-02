@@ -35,9 +35,10 @@ opened: 2026-11-02
   行 → `@deepseek-ai/dsh-client-ui-trajectory`；client 在 `conversation.view` 注册 id `trajectory`、
   order 10（`packages/client/ui-trajectory/src/client/index.ts`）。
 - **现成开关不够窄**（C）：`ui-conversation` 在 `developerTools` 关时隐藏 Trajectory
-  （`src/client/apply.ts:212`），但同一个开关也过滤「需要 coding tools」的 preset
-  （`ui-agent-preset/src/client/AgentPresetSection.tsx:107`：`developerTools || !requiresCodingTools(row)`）
-  并影响代码差异/交互预览——关掉会隐藏公司五角色，不可用。
+  （`src/client/apply.ts:212`）；`ui-agent-preset` 同开关只过滤 built-in `ptc`/`minimal`
+  （`settings-store.ts:53` 的 `requiresCodingTools` 只认这两个，**不隐藏公司五角色**），但它同时影响
+  代码差异/交互预览，且是每用户设置而非产品默认——用它去 Trajectory = 连带关掉别的东西、还依赖
+  用户手动拨开关，不作为产品方案。
 - **New terminal 归属**（T/C）：`web-app/cordis.patch.yml:300` 的 `ui-sidebar-terminal` 行 →
   `@deepseek-ai/dsh-client-ui-sidebar-terminal`；client 注册快捷键 `terminal.new`（`src/client/index.ts:55`）、
   右栏 tab 类型 `terminal` 与开始页 guide `new`「新建终端」（同文件 71–73）；宿主服务 =
@@ -55,7 +56,7 @@ opened: 2026-11-02
 | # | 待定 | 推荐 | 若选另一条 |
 |---|---|---|---|
 | D1 | New terminal 的范围 | **禁用 `ui-sidebar-terminal` 整行**：入口 + tab 类型 + 快捷键一起消失；`terminal-controller` 保留为无 UI 的宿主服务 | 只隐藏开始页入口：上游没有「只去 guide」的配置/开关，需改 vendor client 或 CSS 覆盖，违反 vendor 铁律/易碎，不做 |
-| D2 | Trajectory 的去除方式 | **禁用 `ui-trajectory` 行**：只去掉 view 注册；轨迹数据/会话日志仍在，Chat 兜底 | 关 `developerTools` 开关：会连带隐藏 coding-tool presets 与代码差异，不做 |
+| D2 | Trajectory 的去除方式 | **禁用 `ui-trajectory` 行**：只去掉 view 注册；轨迹数据/会话日志仍在，Chat 兜底 | 关 `developerTools` 开关：会连带隐藏代码差异/交互预览与 built-in `ptc`/`minimal`，且是每用户设置而非产品默认，不做 |
 | D3 | 生效范围 | **pack 层**：dev + 产品 company profile 同形；产品用户装 tarball 即得到 | 只改 dev profile：产品不同形，且 dev 绿推不出用户绿，违背 [parity 卡](../_archive/settled_issues/2026-11-02-dev-product-path-parity.md)，不做 |
 | D4 | `terminal-controller` 是否一并禁用 | **保留**：无 UI 入口时不分配进程；少动一条宿主服务，回滚面小 | 一并禁用：更彻底，但可能影响隐藏消费者，需另证 |
 
