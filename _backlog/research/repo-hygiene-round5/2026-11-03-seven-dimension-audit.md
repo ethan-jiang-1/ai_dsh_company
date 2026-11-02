@@ -6,7 +6,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 # 第五轮七维打扫审计（2026-11-03）
 
 > 服务：[第五轮七维打扫卡](../../issues/2026-11-03-repo-hygiene-round5.md)
-> **批次 A–C 已落地（2026-11-03）**：R5-01/02/04/05/06/07/08/10/11/12/17/21/22/23(首刀)/27/30/31/33 已修；R5-03 已按 0.7.2 bump 重打并 `release --verify` 全绿（`release --check` READY；npm publish 仍人工）。详见 [第五轮卡](../../issues/2026-11-03-repo-hygiene-round5.md) 与各 Note。下文保留审计时点（before）的发现。
+> **批次 A–C 已落地（2026-11-03）**：R5-01/02/04/05/06/07/08/10/11/12/17/21/22/23(首刀)/27/30/31/33 已修；R5-03 已按 0.7.2/0.8.0 bump 重打并 `release --verify` 全绿（npm publish 仍人工）；D7 公开面/peers 已收。详见 [第五轮卡](../../issues/2026-11-03-repo-hygiene-round5.md) 与各 Note。下文保留审计时点（before）的发现。
 > 上一轮：[第四轮审计（2026-10-28）](../../_archive/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md)
 > 口径：fresh agent 只读评审 + 主 agent 亲跑全部 keyless 车道 + 六个独立子代理分维深挖；主 agent 对 P0/P1 逐条回查原文件/原命令。
 > vendor/dsh 只读；真模型认证档未跑（成本授权未给）。真页面档跑了 dev 模式 `ui-scene-smoke` 与 `client-load-smoke`；isolated 金样档实测启动失败（见 D6）。

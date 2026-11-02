@@ -2,6 +2,22 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.8.0 — 2026-11-03
+
+### Breaking
+
+- 根入口不再 re-export `lib/presence` / `lib/doors`：公开面收窄为 loader 需要的 `apply` / `inject`。
+  若曾从 `dsh-company-pack` 包根 import 这两个读模型，请改从内部模块取，或自行复制。
+
+### Changed
+
+- `peerDependencies` 删除 3 个无引用项（`session-persistence-jsonl` / `tool-workflow` / `workflow-ptc`），
+  50 → 47；preset 行/import/patch 三源核对，`preset-row-deps` 与 `release-smoke` 复验。
+- README 写清：只支持 web 组合（`workspaceRegistry` 由 web-app 提供，base-only/headless 不加载本包）；
+  品牌只占 `sidebar.brand.name`，保留官方 mark/hero（与 `ui-brand-official` 共存的最小侵入）。
+- 文档/测试：D1 checks 库存生成化 + 32/32 when-to-read；D2 640 行 host spec 拆三族、`isRecord` 收家；
+  D5 五页签体补渲染、台账 live 路径修正（dev home skip 归零）。过程证据见 `notes/implemented/2026-11-03-*`。
+
 ## 0.7.2 — 2026-11-03
 
 ### Changed
