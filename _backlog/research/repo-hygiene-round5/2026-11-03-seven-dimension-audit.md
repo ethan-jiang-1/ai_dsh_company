@@ -202,3 +202,31 @@ git -C vendor/dsh rev-parse 'dsh-v0.2.1-rc.2^{commit}'
 - `notes/` 181 篇全量两两比对：只抽样 + `notes-audit`（死路径 2 / 零入链 44 / 取代缺回链 0）。
 - 公司业务产物质量与 persona 文案质量：不在卫生范围。
 - D6 子代理已回；它没验证到的：待审批/待问询的归因、中断轮的归因、child 会话、team failed（代码路径在 `session-diagnose.mjs:131-175`，dev home 里没有这类会话可证）。
+
+## 8. 打扫后读数（2026-11-03，5 个提交 / 13 篇 Note）
+
+> 口径：同一 dev home、同一 vendor pin；覆盖率 = `npx vitest run --coverage`（v8，仅 keyless 面）。
+> 提交链 = `6bd9ef6`（批次 A/E 主体）→ `c78241d`（台账行为断言）→ `eef37a1`（品牌/引用）→ `a0f8668`（发布指路）。
+
+| 面 | 审计时（before） | 现在（after） |
+|---|---|---|
+| `pnpm test` | 124 spec / 1048 例（1045 pass / 3 skip） | **130 spec / 1067 例（1064 pass / 3 skip）** |
+| 总覆盖率 | 85.14 stmt / 77.33 branch | **85.93 stmt / 77.92 branch** |
+| `CultivationTab.tsx` | 0.00% stmt（只被注册数组点名） | **93.75% stmt / 50% branch** |
+| `CultivationContextPicker.tsx` | 56.45% / 40.81% | **70.96% / 61.22%** |
+| `company-tabs.tsx` | 24.07% / 14.54% | **53.70% / 36.36%** |
+| `LedgerTab.tsx` | 64.10% / 52.50% | **94.87% / 72.50%** |
+| `Brand.tsx` | 0.00% | **100%** |
+| `release-smoke` | 39 PASS（无卸载） | **44 PASS**（含 remove → 数据保留 → 重装） |
+| `ui-scene-smoke --isolated --golden` | exit 2（独立启动器已删） | **连续两次 ALL PASS（9 页签）** |
+| `diagnose` 非零退出 | 597 会话 132 条真非零只报 87 条 | 全文匹配；真会话 `nonzero=2` 与日志一致 |
+| `shipped-links` 扫描 | 14 份 skill md（content 17 份零检查） | **content 17 + skill 14 + persona 6** |
+| `nav-count-claims` 扫描 | 35 份 | **52 份** |
+| 行预算 | 35 行、5 份最大 owner 文档在外 | **40 行**（补 README/backlog/notes/pack README/publish-handoff） |
+| `retired-path` 前缀 | 2 条（仅 `_backlog`） | **4 条**（+ `workspace/`、独立启动器） |
+
+**仍未收的**（需用户决策，不是 agent 可自授权）：
+- `_dist` 仍过期（`release --check` exit 1）、`market-index` 仍声明未发布的 0.7.1——发布/版本决策；
+- `_backlog` 授权门牌与章程摘要仍截断排除项（R5-04），改制度面需点头；
+- `docs/decisions.md` 62/62 零头寸（R5-17 剩余面）、`checks/README.md` 手工库存（R5-18）、dev-loop 空壳节（R5-19）、归档链接只查 `.md`（R5-20）；
+- 剩余约 13 处源码文本断言（`client-face` 的 toolview 优先级是刻意保留的装配面）。
