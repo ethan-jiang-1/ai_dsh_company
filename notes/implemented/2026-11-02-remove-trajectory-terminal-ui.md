@@ -1,8 +1,8 @@
 # 2026-11-02 · 去掉 Trajectory 页签与右侧栏 New terminal：pack 层禁两行
 
-状态：已交付（2026-11-02；用户「那就推进落地吧」）
+状态：已交付（2026-11-02；2026-11-03 用户真页面走查通过、卡已归档到 settled_issues）
 
-> 上游 = [去掉 Trajectory 页签与 New Terminal 入口卡](../../_backlog/issues/2026-11-02-remove-trajectory-terminal-ui.md)。
+> 上游 = [去掉 Trajectory 页签与 New Terminal 入口卡](../../_backlog/_archive/settled_issues/2026-11-02-remove-trajectory-terminal-ui.md)。
 > 部分取代 = [培养主视图 Note](./2026-10-28-cultivation-main-view.md) 的「主区三 tab」；该 Note 已加回链。
 > 不改 = vendor `dsh`、pin、五角色 persona、公司九页签、`terminal-controller` 宿主服务、3080 日用 home。
 
@@ -45,6 +45,10 @@
 | 启动日志 | `pnpm company` 实跑 | 无 `did not activate` / `failed to apply loader entry` |
 | 启动器 bug 红→绿 | 旧 `abef80f4` → 新 `5fe5f189` 内容变化 | 修前 `dsh plugin add` ENOENT exit 254；修后安装成功、旧 tarball 清掉、新 tarball 保留 |
 | 全量 | `pnpm verify` / `pnpm test` / `pnpm typecheck` | ALL PASS；124 files / 1042 passed / 3 skipped；typecheck exit 0 |
+| 验收 · 主区 tab（真页面 DOM） | 端口 57999 实例开会话读 `[data-conversation-tabs] [role=tab]` | `Chat` + `培养`；点「培养」渲染主体、点回 `Chat` 正常 |
+| 验收 · 右栏 guide（真页面 DOM） | 开右栏清点 registry 胶囊 + 全页文本 | 胶囊仅 `files`；公司 9 页签全在；页面无 `terminal`/`终端` |
+| 验收 · 组合面（比文本硬） | `window.__DSH_BOOT__.entries`（69 条） | `ui-trajectory` / `ui-sidebar-terminal` 两条 client 行 **ABSENT**；`api-terminal-controller`/`ui-chat`/`ui-attachment` PRESENT |
+| 验收 · 快捷键 | 会话页派发 `Ctrl+`` keydown | 无新 tab/面板、无 console 报错（合成按键，补充证据） |
 
 ## 边界与未做
 
@@ -52,5 +56,7 @@
 - 已保存的右栏 terminal tab 不再渲染（终端是临时进程，无持久数据损失）；`terminal-controller` 仍 active。
 - `ui-attachment` 的 client `inject` 仍列 `ui-trajectory`（type-only 依赖）；`preset-smoke` 的闭包 lint 报
   非致命 WARN，app 与 attachment 均 active。上游 tidy-up 不在本卡范围。
+- 真页面断言是**一次性探针**（读数见上表），没进 `ui-scene-smoke` 金样：金样只盖公司九页签 catalog，
+  不含主区 view tab 与 guide 胶囊清单。要变常驻，得给 `ui-scene-smoke` 加断言面——后续票，不在本卡。
 - 3080 日用 `~/.dsh` home 未动；若那里装过本包，升级/reinstall 后自然同形。
 - 真实 npm publish 仍按 [publish-handoff](../../docs/guides/publish-handoff.md)，不在本卡。

@@ -1,5 +1,5 @@
 /**
- * 培养对话面板（2026-10-28 培养主视图）：绑定**独立培养会话**，与主 Chat / Trajectory 分开。
+ * 培养对话面板（2026-10-28 培养主视图）：绑定**独立培养会话**，与主 Chat 分开。
  *
  * 数据：一次 `sessions.create`（按主会话缓存 id）→ `retain` → `binding.eventSource` 读历史/实时；
  * 输入：`binding.session.prompt([{type:'text'}], 'queue')`。

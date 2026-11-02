@@ -15,6 +15,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-02-remove-trajectory-terminal-ui.md](settled_issues/2026-11-02-remove-trajectory-terminal-ui.md) | 已结；pack 禁 `ui-trajectory` / `ui-sidebar-terminal` 两行，主区 = Chat + 培养、右栏无 New terminal；组合面 + 真页面验收通过；去向 = [Note](../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md) | 2026-11-03 |
 | [2026-11-02-harness-release-alignment.md](settled_issues/2026-11-02-harness-release-alignment.md) | 已结；FAQ 26 术语/current docs/发布字节证据链对齐；0.7.1；去向 = [distribution-alignment Note](../../notes/implemented/2026-11-02-distribution-alignment.md) | 2026-11-02 |
 | [2026-11-02-dev-product-path-parity.md](settled_issues/2026-11-02-dev-product-path-parity.md) | 已结；dev 默认 tarball + `--link` 显式快速通道、parity 指南/门禁、市场 staged；去向 = [parity Note](../../notes/implemented/2026-11-02-dev-product-path-parity.md) | 2026-11-02 |
 | [2026-11-01-plugin-lifecycle-publish.md](settled_issues/2026-11-01-plugin-lifecycle-publish.md) | 已结；0.7.0 发布就绪（install/身份/index/升卸/本地 registry 演练）；公有 publish/托管 = handoff | 2026-11-02 |

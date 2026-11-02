@@ -1,5 +1,5 @@
 /**
- * 培养主视图（2026-10-28 培养第三 tab）：第三个 `conversation.view`，与 Chat / Trajectory 平级。
+ * 培养主视图（2026-10-28 培养 tab；2026-11-02 起主区 = Chat + 培养）：与 Chat 并列的 `conversation.view`。
  *
  * 左：培养领域板（纠正 / 方法 / journal / 赞踩 / 怎么养），复用 `CultivationBoard`；
  * 右：培养专属面板（自有 composer；当前阶段命令面，独立培养会话下一阶段接入）。

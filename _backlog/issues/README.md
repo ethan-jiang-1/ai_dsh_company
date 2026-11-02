@@ -4,11 +4,11 @@
 
 ## 活跃清单
 
-当前活跃 1 张；v3、生命周期、dev/产品路径 parity 与 FAQ 26 发行版对齐卡已结归档。已结卡见[归档索引](../_archive/README.md)。
-
-- [去掉 Trajectory 页签与 New terminal 入口](2026-11-02-remove-trajectory-terminal-ui.md) — 已落地（主区 Chat + 培养；右栏 guide 无 New terminal；pack 两条禁用）；`等人拍板` = 待用户验收，验收后写 Note 并归档。
+当前活跃 0 张；v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajectory/New terminal 收回卡均已结归档。已结卡见[归档索引](../_archive/README.md)。新问题按 [backlog 入口](../README.md) 立卡，不从归档里自行开工。
 
 ## 近期归档
+
+- Trajectory/New terminal 收回卡 2026-11-03 已结：pack 禁 `ui-trajectory` / `ui-sidebar-terminal` 两行，主区 = Chat + 培养、右栏无 New terminal，真页面 + 组合面双证据；去向 = [remove-trajectory-terminal-ui Note](../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md)；卡在 [归档](../_archive/settled_issues/2026-11-02-remove-trajectory-terminal-ui.md)。
 
 - FAQ 26 发行版对齐卡 2026-11-02 已结：术语/发布证据链/current docs 清理；0.7.1；去向 = [distribution-alignment Note](../../notes/implemented/2026-11-02-distribution-alignment.md)；卡在 [归档](../_archive/settled_issues/2026-11-02-harness-release-alignment.md)。
 - dev/产品路径 parity 卡 2026-11-02 已结：默认 tarball + `--link` 快速通道 + parity 指南/门禁 + 市场 staged；去向 = [parity Note](../../notes/implemented/2026-11-02-dev-product-path-parity.md)；卡在 [归档](../_archive/settled_issues/2026-11-02-dev-product-path-parity.md)。

@@ -10,7 +10,7 @@
 # ── 产品 UI 收口（2026-11-02：去掉 Trajectory 页签与 New Terminal 入口）──
 # 两行都是 web-app 出厂 UI 行；整行 disabled 是唯一不碰 vendor 的窄口径。
 # 不用 developerTools 开关：它连带代码差异/交互预览与 built-in ptc/minimal，且是每用户设置。
-# 用户决定与验收 = _backlog/issues/2026-11-02-remove-trajectory-terminal-ui.md；
+# 用户决定与验收 = _backlog/_archive/settled_issues/2026-11-02-remove-trajectory-terminal-ui.md；
 # 落地 Note = notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md。
 - id: ui-trajectory
   name: '@deepseek-ai/dsh-client-ui-trajectory'

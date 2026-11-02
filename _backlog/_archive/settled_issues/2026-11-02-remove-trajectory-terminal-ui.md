@@ -1,13 +1,14 @@
 ---
-status: 等人拍板
+status: 已结
 opened: 2026-11-02
 ---
 
 # 推敲：主界面去掉 Trajectory 页签与右侧栏 New Terminal 入口
 
-> 立卡：2026-11-02 ｜ 状态：等人拍板 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否 ｜ 审查：用户 — 待验收
+> 立卡：2026-11-02 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：用户 — 通过（2026-11-03 真页面走查）
 >
-> **结论/去向**：做 → `note` — `notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md`（已落树，待用户验收；验收后写 Note 并归档）。
+> **结论/去向**：note — [remove-trajectory-terminal-ui](../../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md)
+> （2026-11-02 交付、2026-11-03 验收通过；决定正文在 Note，本卡保留推敲与证据）。
 >
 > **用户原话（2026-11-02 走查反馈）**：「主Tab 这里 Trajectory 不需要, 去掉。右边 sidebar New Terminal
 > 也去掉, 没有必要。这个诉求显性化到 issues 我们要跟踪这个决定的落地。」
@@ -45,11 +46,11 @@ opened: 2026-11-02
   `terminal-controller`（web-app:130）。
 - **合法改动点**（C/T）：本包 bundle 层 = `packages/company-pack/cordis.patch.yml`；`- id:` 可替换
   web-app 已存在的行。两行都在 web-app bundle 顶层，pack 在其后叠加，不需要 vendor patch。
-- **前序决定**（C）：[培养主视图 Note](../../notes/implemented/2026-10-28-cultivation-main-view.md) 决定 1
-  与验收「主区严格三 tab：Chat / Trajectory / 培养」；[ui-demo](../../docs/design/ui-demo.md) 命名表同句。
+- **前序决定**（C）：[培养主视图 Note](../../../notes/implemented/2026-10-28-cultivation-main-view.md) 决定 1
+  与验收「主区严格三 tab：Chat / Trajectory / 培养」；[ui-demo](../../../docs/design/ui-demo.md) 命名表同句。
   本卡落地是**部分取代**，新 Note 必须写清并给旧 Note/文档加指针。
 - **发布面**（C）：0.7.0 未发布；本改动只改 pack 的 profile patch，不改 tarball 结构/版本；产品发布
-  仍按 [publish-handoff](../../docs/guides/publish-handoff.md)。
+  仍按 [publish-handoff](../../../docs/guides/publish-handoff.md)。
 
 ## 未决问题
 
@@ -57,7 +58,7 @@ opened: 2026-11-02
 |---|---|---|---|
 | D1 | New terminal 的范围 | **禁用 `ui-sidebar-terminal` 整行**：入口 + tab 类型 + 快捷键一起消失；`terminal-controller` 保留为无 UI 的宿主服务 | 只隐藏开始页入口：上游没有「只去 guide」的配置/开关，需改 vendor client 或 CSS 覆盖，违反 vendor 铁律/易碎，不做 |
 | D2 | Trajectory 的去除方式 | **禁用 `ui-trajectory` 行**：只去掉 view 注册；轨迹数据/会话日志仍在，Chat 兜底 | 关 `developerTools` 开关：会连带隐藏代码差异/交互预览与 built-in `ptc`/`minimal`，且是每用户设置而非产品默认，不做 |
-| D3 | 生效范围 | **pack 层**：dev + 产品 company profile 同形；产品用户装 tarball 即得到 | 只改 dev profile：产品不同形，且 dev 绿推不出用户绿，违背 [parity 卡](../_archive/settled_issues/2026-11-02-dev-product-path-parity.md)，不做 |
+| D3 | 生效范围 | **pack 层**：dev + 产品 company profile 同形；产品用户装 tarball 即得到 | 只改 dev profile：产品不同形，且 dev 绿推不出用户绿，违背 [parity 卡](./2026-11-02-dev-product-path-parity.md)，不做 |
 | D4 | `terminal-controller` 是否一并禁用 | **保留**：无 UI 入口时不分配进程；少动一条宿主服务，回滚面小 | 一并禁用：更彻底，但可能影响隐藏消费者，需另证 |
 
 ## 方案与取舍
@@ -75,8 +76,8 @@ opened: 2026-11-02
 
 - keyless：新增/扩展断言（patch 里两行 `disabled: true`；或 client 组合 spec 断言 view 列表无 trajectory）。
 - 真页面：`client-load-smoke` + `ui-scene-smoke`（主区 tab 清单、右栏 guide 清单、公司九页签仍在）。
-- 文档/Note 指针：[ui-demo](../../docs/design/ui-demo.md) 的「三 tab」句、
-  [培养主视图 Note](../../notes/implemented/2026-10-28-cultivation-main-view.md) 的部分取代回链；
+- 文档/Note 指针：[ui-demo](../../../docs/design/ui-demo.md) 的「三 tab」句、
+  [培养主视图 Note](../../../notes/implemented/2026-10-28-cultivation-main-view.md) 的部分取代回链；
   产品行为合同若提到主视图，同 diff 更新。
 - 全量：`pnpm verify` / `pnpm test` / `pnpm typecheck` / `release --check`；preset/client 冒烟。
 
@@ -114,7 +115,7 @@ opened: 2026-11-02
 
 **P0 完成**：`packages/company-pack/cordis.patch.yml` 加 `ui-trajectory` / `ui-sidebar-terminal` 两条
 顶层替换行（`disabled: true`）；`terminal-controller` 保持 active。落地 Note =
-[remove-trajectory-terminal-ui](../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md)。
+[remove-trajectory-terminal-ui](../../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md)。
 
 **P1 完成**：`tests/company/ui-surface.spec.ts` 5 条 keyless；干净 home 产品形安装 + `preset-smoke`
 ALL PASS；真页面主区 = Chat + 培养、右栏 guide = 9 公司页签、无 New terminal；`pluginInventory`
@@ -127,12 +128,29 @@ ALL PASS；真页面主区 = Chat + 培养、右栏 guide = 9 公司页签、无
 **未决**：`ui-attachment` 的 type-only `inject` 仍列 `ui-trajectory`，`preset-smoke` 闭包 lint 报
 非致命 WARN；上游 tidy-up 不在本卡。
 
+## 验收回执（2026-11-03，用户批准「测完没问题就收尾」）
+
+同一实例（dev home、`company` profile、端口 57999、tarball 产品同形安装）上逐条实测，机器腿先跑、
+用户点验为最后一道真检查：
+
+| 验收项 | 怎么测的 | 读数 |
+|---|---|---|
+| AC1 主区 tab | 真页面开会话 → 读 `[data-conversation-tabs] [role=tab]` | `Chat` + `培养` 两条；点「培养」→ 培养主体渲染，点回 `Chat` 正常 |
+| AC2 右栏无 New terminal | 开右栏开始页 → 清点 registry 胶囊 + 全页文本 | 胶囊只有 `files`（Workspace files）；公司页签 9 个（待办/看板/依赖图/在场/用量/任务板/培养/台账/成品）；页面全文无 `terminal`/`终端` |
+| AC2′ 快捷键 | 会话页派发 `Ctrl+`` keydown | 无新 tab、无终端面板、右栏不变、无 console 报错 |
+| AC4 组合面（比文本更硬） | 取 `/` 的 `window.__DSH_BOOT__.entries`（69 条） | `@deepseek-ai/dsh-client-ui-trajectory` **ABSENT**、`@deepseek-ai/dsh-client-ui-sidebar-terminal` **ABSENT**；`api-terminal-controller` / `ui-chat` / `ui-attachment` PRESENT |
+| AC3 不误伤 | `cdp-probe` 默认档（9 公司页签逐个开 + 不收错误） | `tabFailures: []`、`consoleProblems: []`、`exceptions: []`、`clientErrors: []`、errorRing 安装 |
+| 机械 | `pnpm verify` / `pnpm test` | ALL PASS；124 files / 1045 passed / 3 skipped |
+
+口径：`__DSH_BOOT__.entries` 缺席比「页面上看不见」更强——插件没下发就**不可能**注册 view 或快捷键；
+`Ctrl+`` 那一行是合成按键，作为补充而非主证。
+
 ## 关联
 
 - 用户反馈来源：2026-11-02 观察窗走查（dev home `runtime/harness-home`，`company` profile，端口 57849）。
-- 前序决定：[培养主视图 Note](../../notes/implemented/2026-10-28-cultivation-main-view.md)（三 tab；本卡部分取代）。
-- 同形约束：[dev/产品 parity 卡](../_archive/settled_issues/2026-11-02-dev-product-path-parity.md)、
-  [parity 指南](../../docs/guides/dev-product-parity.md)。
-- 现行合同/设计：[profile](../../docs/profile.md)、[ui-demo](../../docs/design/ui-demo.md)。
+- 前序决定：[培养主视图 Note](../../../notes/implemented/2026-10-28-cultivation-main-view.md)（三 tab；本卡部分取代）。
+- 同形约束：[dev/产品 parity 卡](./2026-11-02-dev-product-path-parity.md)、
+  [parity 指南](../../../docs/guides/dev-product-parity.md)。
+- 现行合同/设计：[profile](../../../docs/profile.md)、[ui-demo](../../../docs/design/ui-demo.md)。
 - 上游载体：`vendor/dsh/packages/bundle/web-app/cordis.patch.yml`（行 300/457）、
   `vendor/dsh/packages/client/ui-sidebar-terminal/`、`vendor/dsh/packages/client/ui-trajectory/`。

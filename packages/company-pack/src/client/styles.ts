@@ -615,9 +615,9 @@ const CSS = `
 div:has(> section[data-dockkit-float]) { z-index: calc(var(--dsh-dockkit-float-layer, 60) + 1); }
 div:has(> section[data-dockkit-float-active]) { z-index: calc(var(--dsh-dockkit-float-layer, 60) + 2); }
 
-/* ── 培养主视图（2026-10-28）：第三 tab；左侧培养板 + 右侧自有 composer ─────────
+/* ── 培养主视图（2026-10-28）：左培养板 + 右自有 composer ─────────
    培养视图激活时隐藏 shell 的全局 composer；右栏 composer 是唯一入口。
-   数据属性只在本窗口/本视图挂载期间存在，切到 Chat/Trajectory 即恢复。 */
+   数据属性只在本窗口/本视图挂载期间存在，切回 Chat 即恢复。 */
 html[data-dsh-cultivation-view] [data-composer-seat] { display: none !important; }
 .wk-cult-view {
   display: flex;

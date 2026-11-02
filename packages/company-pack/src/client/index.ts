@@ -35,7 +35,7 @@ import { TEAM_TOOL_KEYS, TeamToolCard } from './TeamToolCard.tsx'
 /** Required services: the slot registry plus the remote namespace we read. */
 export const inject = ['slots', 'remote', 'sessions']
 
-/** 培养主视图的 cell id（`conversation.view` list 槽的 id；与官方 chat / trajectory 并列）。 */
+/** 培养主视图的 cell id（`conversation.view` list 槽的 id；与官方 chat 并列）。 */
 const CULTIVATION_VIEW_ID = 'dsh-company-pack/cultivation'
 
 /**
@@ -214,7 +214,7 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
 }
 
 function registerCultivationViewWiring(ctx: ClientContext): void {
-  // 培养主视图（2026-10-28）：`conversation.view` 第三个页签（Chat / Trajectory / 培养）。
+  // 培养主视图（2026-10-28；2026-11-02 起主区就剩 Chat + 培养——Trajectory 已从 company profile 禁用）。
   // 公司总览不再占第三个 tab：它的看板/依赖/在场/交付已经住在右栏页签，按钮直接打开。
   // 该槽没有 inject 面 ⇒ 数据面用注册处闭包注入；右侧培养面板自有 composer（命令面）。
   ctx.inject(['sessions', 'uiWorkspace', 'remote.session', 'remote.workspaceFiles', 'remote.commands', 'sidebarRight', 'slots'], (scoped) => {
