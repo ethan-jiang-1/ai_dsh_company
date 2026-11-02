@@ -317,6 +317,7 @@ async function driveScenario({ patchSource, env, tasks }) {
   // rc.2：client 模块表（`window.__DSH_BOOT__` 的 dsh.client 行）按 **profile 的 node_modules** 解析
   // 每个 browser 模块 ⇒ 裸 `--patch` lane（无 profile 安装）下本包的 client 半解析不到，
   // 于是品牌槽与委派卡一起缺席。这里给临时 profile 补最小安装形状：node_modules 符号链接 + bundles 声明。
+  // 这是合成 replay fixture，不是产品安装路径；官方 init/安装断言由 release-smoke 与 company-entry-smoke 覆盖。
   mkdirSync(join(profileDir, 'node_modules'), { recursive: true })
   symlinkSync(join(ROOT, 'packages', 'company-pack'), join(profileDir, 'node_modules', 'dsh-company-pack'), 'dir')
   // 0.2.1：实验性 schedule bundle 退役——宿主 schedule / ui-schedule 行由 web-app 组合挂，

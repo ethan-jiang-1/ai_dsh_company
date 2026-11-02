@@ -7,6 +7,7 @@
 **用户拥有的业务字节留在 workspace；host 治理留 home；插件只拥有身份/方法/账本/索引。**
 一个事实只有一个权威。workspace 是模型可写区（`workspace-write`）；方法层（D25）与 presented 账本
 （M2）刻意留 home，不搬进模型可写区；workspace 的 `exports/` 只是派生快照。
+字段全集（owner/authority/source/mechanism-path/scope-key/readers/writers/rebuildability/retention）= FAQ 26 91 数据卡；本表只列本仓有差异的列。
 
 | 事实 | Owner | Authority | 写者 | 位置 | 保留/迁移 |
 |---|---|---|---|---|---|
