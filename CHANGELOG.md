@@ -2,6 +2,19 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.8.1 — 2026-11-03
+
+### Fixed
+
+- **交付审计的 slug 写入**：v3 路径下 `setPresentedAudit` 用 `split('/')[1]` 取到字面 `deliverables`，
+  presented=true 的 slug 永远写错，归档后按 slug 延续的 catalog 命中会失效。改为取 `final.md` 父目录
+  并剥日期前缀；新增 5 个审计路径用例（含穿越/外部/meta 拒绝）。
+
+### Changed
+
+- D5 测试与文档：`host/catalog.ts` 覆盖 55.8→76.29%；Picker 补成品目录不可达 problem 态；
+  `docs/testing.md` 区分“模块 mock”与“参数注入式假件”（`probe-web.spec` 属后者）。
+
 ## 0.8.0 — 2026-11-03
 
 ### Breaking
