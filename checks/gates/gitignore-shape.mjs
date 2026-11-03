@@ -6,6 +6,8 @@
 // 负例留证 2026-10-25：删掉 `.gitignore` 的 `runtime/*` 行
 //   → `FAIL gitignore-shape: runtime/ops/shots/window-boot.png 应 ignored 实为 not-ignored；…`；
 //   还原 → 绿。删 `!runtime/probe-*.mjs` → probe-drill.mjs 应 not-ignored 实为 ignored，同样红。
+// 2026-11-03：加 `coverage/`——vitest.config.ts 教 `npx vitest run --coverage`，此前生成物未忽略，
+//   跑一次覆盖率就让工作树变脏并让 `release --check` 报“工作树不干净”。负例 = 删该行 → 本门红。
 import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -17,6 +19,7 @@ const REQUIRED_RULES = [
   /^!runtime\/harness-home\/$/m,
   /^runtime\/harness-home\/\*$/m,
   /^!runtime\/harness-home\/README\.md$/m,
+  /^coverage\/$/m,
 ]
 
 const EXPECTED = [
@@ -30,6 +33,7 @@ const EXPECTED = [
   ['runtime/harness-home/README.md', false],
   ['_dist/dsh-company-pack-0.3.1.tgz', true],
   ['_dist/安装手册.md', false],
+  ['coverage/coverage-summary.json', true],
 ]
 
 function statusFor(root, path) {

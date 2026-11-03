@@ -32,8 +32,8 @@ pnpm release --stamp              # 把 manifest 的 gitSha 钉到发布 commit�
 pnpm release --check
 ```
 
-`--prepare` / `--verify` 会改 tracked 的 `_dist/安装手册.md`，所以它们允许发布产物造成的脏树；`--check`
-默认要求干净树。`--verify` 装 `_dist` 同一份 tarball，并用 `sourceFingerprint` 拒绝“源变但产物没重打”；`--all` = prepare + verify，不 commit/push/publish。
+`--prepare` / `--verify` 会改 tracked 的 `_dist/安装手册.md`，所以它们允许发布产物造成的脏树；`--check` 默认要求干净树。`--verify` 装 `_dist` 同一份 tarball，并用 `sourceFingerprint` 拒绝“源变但产物没重打”；`--all` = prepare + verify，不 commit/push/publish。
+READY 是点态（只对 `--stamp` 的 commit 成立，之后提交再红是设计）；语义与证据要求 = [release.md §版本纪律](../release.md)。
 
 ## 2. 产物与证据
 

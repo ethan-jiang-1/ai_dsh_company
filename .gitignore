@@ -6,6 +6,8 @@ node_modules/
 dist/
 # 自写包的构建产物（源码面/产物面不混，同 DSH 的 lib/ 约定；构建见 docs/guides/bootstrap.md）
 packages/company-pack/lib/
+# 覆盖率观察档（vitest.config.ts 教 `npx vitest run --coverage`；生成物不是交付物，不许弄脏发布检查）
+coverage/
 
 # ── 运行残留家：默认整树拒绝，tracked 白名单显式列出 ─────────────
 # 2026-10-25 起从「逐条点名」改为「默认拒绝 + 白名单」（runtime/ops 漏口 + BUG-013/029 的类级教训）。

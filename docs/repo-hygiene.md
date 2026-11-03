@@ -24,7 +24,7 @@
 ## 三、不进 git（机器状态）
 
 - 会话、凭据、storage、profiles、浏览器二进制/profile、日志、截图、审计落盘。
-- 构建产物（`lib/`、`dist/`、`*.tsbuildinfo`）、依赖树、pnpm store、缓存。
+- 构建产物（`lib/`、`dist/`、`*.tsbuildinfo`）、覆盖率观察档（`coverage/`）、依赖树、pnpm store、缓存。
 - 导出 tarball、备份、排练盘、外部工具任务态。
 - OS/编辑器残渣（`.DS_Store`、`Thumbs.db`、`._*`、`*.swp`、`*.bak`、`*.orig`、`*.rej`、`.claude/settings.local.json`）。
 - **判定**：可由命令重建、只对这台机器有意义、或可能含真实数据/凭据 ⇒ 不 tracked。

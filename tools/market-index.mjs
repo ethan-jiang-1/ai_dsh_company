@@ -14,7 +14,7 @@
 // publishTimestamp 生成时刻；真实 publish 后可用 vendor generator 读 registry 的发布时间再生成。
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
-import { buildMarketIndex, stablePublishTimestamp } from './lib/market-index.mjs'
+import { buildMarketIndex, stablePublishTimestamp, unpublishedVersionInIndex } from './lib/market-index.mjs'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
 
 const args = process.argv.slice(2)
@@ -26,11 +26,12 @@ const valueOf = flag => {
 if (has('--help') || has('-h') || (!has('--prepare') && !has('--check'))) {
   console.log(`用法：
   node tools/market-index.mjs --prepare [--refresh] [--out market-index.json]
-  node tools/market-index.mjs --check   [--out market-index.json]
+  node tools/market-index.mjs --check   [--out market-index.json] [--hosted]
 
 --prepare：从 packages/company-pack 的 manifest/locale/icon 生成单文件 index（图标内联），并用 DSH 校验器验。
            同版本重复执行字节稳定；发布后加 --refresh 用真实时间。
---check  ：校验已有 index（名称/版本/图标与包 manifest 一致）。`)
+--check  ：校验已有 index（名称/版本/图标与包 manifest 一致）。
+--check --hosted：托管前额外检查——served index 仍列 staged 未发布版本时拒绝（DSH 市场只认 npm，404 装不上）。`)
   process.exit(has('--help') || has('-h') ? 0 : 2)
 }
 // DSH 的校验器（vendor built ESM）；路径与 docs 里的 VALIDATOR_REL 同源。
@@ -98,5 +99,13 @@ if (has('--prepare')) {
   }
   const icon = typeof entry.icon === 'string' ? entry.icon : ''
   if (!icon.startsWith('data:') && !existsSync(join(dirname(file), icon.replace(/^\.\//, '')))) fail(`图标不在 index 同目录：${icon}`)
-  console.log(`market-index: OK ${manifest.name}@${manifest.version}（${versions.length} 个版本；icon ${icon}）`)
+  if (has('--hosted')) {
+    const stagedPath = join(ROOT, 'market-index.staged.json')
+    const staged = existsSync(stagedPath) ? JSON.parse(readFileSync(stagedPath, 'utf8')) : undefined
+    const unpublished = unpublishedVersionInIndex({ index, staged })
+    if (unpublished !== undefined) {
+      fail(`served index 仍列着未发布版本 ${unpublished}（staged requiresPublish=true）；先 npm publish 并删除 staged，再托管`)
+    }
+  }
+  console.log(`market-index: OK ${manifest.name}@${manifest.version}（${versions.length} 个版本；icon ${icon}${has('--hosted') ? '；托管检查通过' : ''}）`)
 }

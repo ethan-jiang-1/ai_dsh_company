@@ -46,6 +46,24 @@ function localized(en, zh) {
 }
 
 /**
+ * served index 里是否仍列着 staged（未发布）版本。
+ * `--hosted` 用它挡“跳过 publish 直接托管”的路径：DSH 市场只认 npm，404 的版本装不上。
+ * @param {{ index: object, staged?: { version?: string, requiresPublish?: boolean } }} input
+ * @returns {string | undefined} 命中的版本；undefined = 可托管
+ */
+export function unpublishedVersionInIndex({ index, staged }) {
+  if (staged === undefined || staged.requiresPublish !== true) return undefined
+  const version = staged.version
+  if (typeof version !== 'string' || version === '') return undefined
+  const plugins = Array.isArray(index?.plugins) ? index.plugins : []
+  for (const plugin of plugins) {
+    const versions = Array.isArray(plugin?.versions) ? plugin.versions : []
+    if (versions.some(entry => entry?.version === version)) return version
+  }
+  return undefined
+}
+
+/**
  * 构造本包的 market index（一个插件、一个版本）。
  * @param {object} input
  * @param {object} input.manifest packages/company-pack/package.json

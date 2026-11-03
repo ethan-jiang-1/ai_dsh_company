@@ -130,6 +130,8 @@ reset/clean，不覆盖并发修改。安装限 180 秒、vendor build 与 relea
 - 发布前必跑：`pnpm verify` + `pnpm test`（迭代环）+ `pnpm release --check`（dist 与源码指纹；
   **`verify` 绿 ≠ 可发布**）+ `release-smoke`（认证档）+ `channel-matrix-smoke --channel all`
   （真实 npm 通道）；preset/内容改动另跑 `preset-smoke`。
+- `release --check` 的 READY 是**点态**：只对 `--stamp` 钉住的 commit 成立；之后再有提交，`gitSha` 落后、
+  `--check` 变红是设计。把 READY 行（带 commit SHA）贴进当版 Note；没有输出的“已发布/READY”不算证据。
 
 ## 手动分发（`node tools/export-dist.mjs`）
 

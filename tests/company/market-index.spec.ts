@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { buildMarketIndex, repositoryWebUrl, stablePublishTimestamp } from '../../tools/lib/market-index.mjs'
+import { buildMarketIndex, repositoryWebUrl, stablePublishTimestamp, unpublishedVersionInIndex } from '../../tools/lib/market-index.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 
 const PACK = join(ROOT, 'packages/company-pack')
@@ -50,5 +50,13 @@ describe('插件市场 index（format 1）', () => {
   it('仓库网页 URL 去 git+ / .git，不把 clone URL 原样塞给市场', () => {
     expect(repositoryWebUrl('git+https://github.com/acme/pack.git')).toBe('https://github.com/acme/pack')
     expect(repositoryWebUrl('https://github.com/acme/pack/')).toBe('https://github.com/acme/pack')
+  })
+
+  it('托管前检查：served index 仍列 staged 未发布版本时命中该版本', () => {
+    const index = buildMarketIndex({ manifest, locales, publishTimestamp: 1_790_000_000 })
+    expect(unpublishedVersionInIndex({ index, staged: { version: manifest.version, requiresPublish: true } })).toBe(manifest.version)
+    expect(unpublishedVersionInIndex({ index, staged: { version: manifest.version, requiresPublish: false } })).toBeUndefined()
+    expect(unpublishedVersionInIndex({ index, staged: undefined })).toBeUndefined()
+    expect(unpublishedVersionInIndex({ index, staged: { version: '9.9.9', requiresPublish: true } })).toBeUndefined()
   })
 })
