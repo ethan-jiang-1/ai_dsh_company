@@ -95,3 +95,5 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 keyless 单测唯一后缀 `*.spec.ts`（[testing.md §1.1](../docs/testing.md)）；按四区归位；需要真进程 / 浏览器 / 模型的检查写
 `checks/smoke/` 或 `probes/` 下的 `.mjs` 并在头注自述「何时跑 / 成本 / 状态」——不塞进 tests/（layering 守卫拦截）。
 本文件骨架由 [harness/navigation-assets.spec](./harness/navigation-assets.spec.ts) 钉进回归（2026-10-05 红→绿落地）。
+
+> ⚠ `tests/` 目前不在任何 tsc 程序（[testing.md §5](../docs/testing.md) 已知未覆盖面）；新 spec 的导入/形状错误只能运行期暴露。
