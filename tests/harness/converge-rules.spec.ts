@@ -354,7 +354,7 @@ describe('converge-rules · 收敛动作序列 steps（计划与执行同源；2
     const plan = archiveMovePlan('2026-10-20-demo', 'runtime/probe-ws')
     expect(plan.from).toBe('runtime/probe-ws/deliverables/2026-10-20-demo')
     expect(plan.to).toBe('runtime/probe-ws/deliverables-archive/2026-10-20-demo')
-    const move = steps({ ...state(), wsRel: 'runtime/probe-ws' }).find(step => step.kind === 'archive-move')!
+    const move = steps({ ...state(), wsRel: 'runtime/probe-ws' } as never).find(step => step.kind === 'archive-move')!
     expect(move.from).toBe(plan.from)
     expect(move.to).toBe(plan.to)
   })

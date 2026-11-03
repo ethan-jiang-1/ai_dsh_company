@@ -32,6 +32,8 @@
     "tests/harness/backlog-liveness.spec.ts",
     "tests/harness/recovery-scope-evidence.spec.ts",
     "tests/harness/workspace-oracle.spec.ts",
+    "tests/harness/deliverables-audit.spec.ts",
+    "tests/harness/converge-rules.spec.ts",
     "tests/support/temp-env.ts"
   ]
 }

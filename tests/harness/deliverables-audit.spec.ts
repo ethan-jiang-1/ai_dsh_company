@@ -160,7 +160,7 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
     expect(one.warnings).toEqual([])                                  // 单来源：不报
     const two = auditDeliverables({ workspaceFiles, sessions: [lead('s1'), lead('s2')] })
     expect(two.warnings.map(w => w.code)).toEqual([WARNING.SLUG_COLLISION])
-    expect(two.warnings[0].slug).toBe('pilot')
+    expect((two.warnings[0] as unknown as { slug: string }).slug).toBe('pilot')
     expect(two.violations).toEqual([])                                // 警告**不**影响违规面
   })
 
@@ -297,9 +297,9 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
     const { violations, warnings } = partitionArchiveViolations([archived, active])
     expect(violations).toEqual([active])
     expect(warnings).toHaveLength(1)
-    expect(warnings[0].code).toBe('legacy-archive:final-not-presented')
-    expect(warnings[0].detail).toContain('deliverables-archive/2026-10-07-recon-pack/final.md')
-    expect(warnings[0].detail).toContain('存量豁免')
+    expect(warnings[0]!.code).toBe('legacy-archive:final-not-presented')
+    expect(warnings[0]!.detail).toContain('deliverables-archive/2026-10-07-recon-pack/final.md')
+    expect(warnings[0]!.detail).toContain('存量豁免')
   })
 
   it('反向检查只追 Lead 声明：非 Lead 的过程稿声明丢了不报（否则历史噪音永久污染审计）', () => {
