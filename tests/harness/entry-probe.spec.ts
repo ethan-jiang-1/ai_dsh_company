@@ -78,30 +78,30 @@ describe('入口探针不使用全文兜底', () => {
   })
   it('缺题不能靠其他题或全文关键词蒙混通过', () => {
     const value = good()
-    value.answers[0].answer = value.answers.map(a => a.answer).join(' ')
+    value.answers[0]!.answer = value.answers.map(a => a.answer).join(' ')
     value.answers = value.answers.slice(0, 1)
     expect(evaluate(value).passed).toBe(1)
     expect(evaluate(value).failures).toContain('Q2: 缺题或重复')
   })
   it('重复题号、未知题号及非 JSON 均失败', () => {
     const value = good()
-    value.answers[1].id = 'Q1'
+    value.answers[1]!.id = 'Q1'
     expect(evaluate(value).failures).toContain('Q1: 缺题或重复')
-    value.answers[1].id = 'Q99'
+    value.answers[1]!.id = 'Q99'
     expect(evaluate(value).failures).toContain('Q2: 缺题或重复')
     expect(evaluateEntryProbe('队列 implemented D23 只读 8/8 PASS', readSource).passed).toBe(0)
   })
   it('无答案、有冲突或证据伪造都会失败', () => {
     const value = good()
-    value.answers[0].status = 'unresolved'
-    value.answers[1].evidence = [{ ...evidence, quote: '这段原文实际上不存在于文件中' }]
-    value.answers[2].evidence = [{ ...evidence, path: '../../secret.md' }]
+    value.answers[0]!.status = 'unresolved'
+    value.answers[1]!.evidence = [{ ...evidence, quote: '这段原文实际上不存在于文件中' }]
+    value.answers[2]!.evidence = [{ ...evidence, path: '../../secret.md' }]
     value.conflicts = ['队列和当前合同不一致']
     expect(evaluate(value).failures).toHaveLength(4)
   })
   it('证据中的关键词不能代替本题答案', () => {
     const value = good()
-    value.answers[0].answer = '不知道'
+    value.answers[0]!.answer = '不知道'
     expect(evaluate(value).passed).toBe(ENTRY_QUESTIONS.length - 1)
   })
   it.each([null, {}, { answers: [] }, { answers: {}, conflicts: [] }])('缺明确结构即失败：%j', value => {
@@ -137,13 +137,13 @@ describe('入口探针不使用全文兜底', () => {
     const src = '（submodule HEAD == 簿记 SHA + 工作树零改动，\n`pnpm verify` 双门禁强制，均带反证）'
     const reader = (path: string) => (path === 'AGENTS.md' ? src : evidence.quote)
     const a = good()
-    a.answers[0].evidence = [{ path: 'AGENTS.md', quote: '（submodule HEAD == 簿记 SHA + 工作树零改动，pnpm verify 双门禁强制，均带反证）' }]
+    a.answers[0]!.evidence = [{ path: 'AGENTS.md', quote: '（submodule HEAD == 簿记 SHA + 工作树零改动，pnpm verify 双门禁强制，均带反证）' }]
     expect(evaluateEntryProbe(JSON.stringify(a), reader).failures).toEqual([])
 
     const src2 = '// `--dump-config` 只打印 profile 树，\n// 两者都看不到 config 校验；'
     const reader2 = (path: string) => (path === 'AGENTS.md' ? src2 : evidence.quote)
     const b = good()
-    b.answers[0].evidence = [{ path: 'AGENTS.md', quote: '`--dump-config` 只打印 profile 树，两者都看不到 config 校验；' }]
+    b.answers[0]!.evidence = [{ path: 'AGENTS.md', quote: '`--dump-config` 只打印 profile 树，两者都看不到 config 校验；' }]
     expect(evaluateEntryProbe(JSON.stringify(b), reader2).failures).toEqual([])
   })
 
@@ -152,10 +152,10 @@ describe('入口探针不使用全文兜底', () => {
     const aligned = 'node checks/smoke/preset-smoke.mjs          # preset 改动的完成定义'
     const reader = (path: string) => (path === 'AGENTS.md' ? aligned : evidence.quote)
     const spaced = good()
-    spaced.answers[4].evidence = [{ path: 'AGENTS.md', quote: 'node checks/smoke/preset-smoke.mjs # preset 改动的完成定义' }]
+    spaced.answers[4]!.evidence = [{ path: 'AGENTS.md', quote: 'node checks/smoke/preset-smoke.mjs # preset 改动的完成定义' }]
     expect(evaluateEntryProbe(JSON.stringify(spaced), reader).failures).toEqual([])
     const wrong = good()
-    wrong.answers[4].evidence = [{ path: 'AGENTS.md', quote: '这段原文其实并不存在于任何文件里' }]
+    wrong.answers[4]!.evidence = [{ path: 'AGENTS.md', quote: '这段原文其实并不存在于任何文件里' }]
     const failures = evaluateEntryProbe(JSON.stringify(wrong), reader).failures
     expect(failures.join()).toContain('原文不匹配')
     expect(failures.join()).toContain('引的是')   // 报错要带上引了什么，便于一眼改
@@ -171,11 +171,11 @@ describe('入口探针不使用全文兜底', () => {
     ]
     for (const quote of cases) {
       const value = good()
-      value.answers[0].evidence = [{ path: 'AGENTS.md', quote }]
+      value.answers[0]!.evidence = [{ path: 'AGENTS.md', quote }]
       expect(evaluateEntryProbe(JSON.stringify(value), reader).failures, quote).toEqual([])
     }
     const wrong = good()
-    wrong.answers[0].evidence = [{ path: 'AGENTS.md', quote: '这段文字真的不在源文件里出现过' }]
+    wrong.answers[0]!.evidence = [{ path: 'AGENTS.md', quote: '这段文字真的不在源文件里出现过' }]
     expect(evaluateEntryProbe(JSON.stringify(wrong), reader).failures.join()).toContain('原文不匹配')
   })
 })

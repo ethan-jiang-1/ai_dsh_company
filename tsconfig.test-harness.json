@@ -36,6 +36,7 @@
     "tests/harness/converge-rules.spec.ts",
     "tests/harness/claim-loser-evidence.spec.ts",
     "tests/harness/question-stop.spec.ts",
+    "tests/harness/entry-probe.spec.ts",
     "tests/support/temp-env.ts"
   ]
 }
