@@ -11,7 +11,7 @@
 import { cpSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { randomUUID } from 'node:crypto'
-import type { PresentedLedger, PresentedLedgerState } from './catalog.ts'
+import type { PresentedLedger, PresentedLedgerState } from './presented-ledger.ts'
 
 const EXPORT_README = `# 治理导出（derived）
 
