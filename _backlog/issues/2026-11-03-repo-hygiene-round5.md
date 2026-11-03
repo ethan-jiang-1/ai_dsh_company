@@ -11,9 +11,9 @@ opened: 2026-11-03
 
 **问题与期望结果：** 用户要求以 fresh agent 视角重评七个维度（文档/代码渐进披露、代码与测试层次、文档—执行—验收结构、上下文腐化、测试资产、反馈通路、DSH 插件约定），并先评估、REVIEW 后再持续改善。期望结果 = 一份带 file:line 与实跑读数的分级发现 + 一个经用户选批的改善序列。
 
-**当前情况（第五轮 A- 结论是历史；最新复评 = [fresh-recheck](../research/repo-hygiene-round5/2026-11-03-fresh-recheck.md)）：** 当前 = **D1 A- / D2 A- / D3 B+ / D4 B+ / D5 A- / D6 A- / D7 B+**。发布链：0.8.2 @258637d → 0.8.3 @f36bf9c（死代码删除）→ **0.8.4 @5c5caf1**（客户端错误留痕修复）；三 tag 已推。master = `d934a31`，0.8.4 后 pack 源码重构未发布（下一版 0.8.5）。当前读数：`pnpm verify` 53 门 + 2 SKIP；`pnpm test` **138 spec / 1102 例**；`typecheck` 0；`test:coverage` 6 个关键模块阈值；`release --check` 在发布 commit READY、之后提交再红是设计；D6 isolated 全链 smoke ALL PASS。
+**当前情况（第五轮 A- 结论是历史；最新复评 = [fresh-recheck](../research/repo-hygiene-round5/2026-11-03-fresh-recheck.md)）：** 当前 = **D1 A- / D2 A- / D3 B+ / D4 B+ / D5 A- / D6 A- / D7 B+**。发布链：0.8.2 @258637d → 0.8.3 @f36bf9c（死代码删除）→ 0.8.4 @5c5caf1（客户端错误留痕）→ **0.8.5 @d210502**（内部结构重构）；四 tag 已推。当前读数：`pnpm verify` 53 门 + 2 SKIP；`pnpm test` **138 spec / 1102 例**；`typecheck` 0；`test:coverage` 6 个关键模块阈值；`release --check` 在发布 commit READY、之后提交再红是设计；D6 isolated 全链 smoke ALL PASS。
 
-**未决问题：** tests 进 tsc（host/client 两面 test project；client 54 / harness 132 errors 未接）、0.8.5 发布字节（0.8.4 后源码已变）、70 篇零入链 Note 的全量分诊、npm publish（本机无认证）、D3 的 Note 证据仍靠人贴。外部决策 = npm publish / Desktop 验收。
+**未决问题：** tests 进 tsc（host/client 两面 test project；试过 client 54 / harness 132 / company 97 / 合并子集 177 errors，均未接）、70 篇零入链 Note 的全量分诊、npm publish（本机无认证）、D3 的 Note 证据仍靠人贴。外部决策 = npm publish / Desktop 验收。
 
 **下一步：** Phase 0（发布真伪/coverage/托管 guard）、Phase 1（合同与实现对齐）、Phase 2（CompanyView/workspace-resolution/导出面/测试归区）、Phase 3a（dev-loop 瘦身/手册纠错/Note banner）与 0.8.3/0.8.4 发布字节已落地并 push；master 当前 = `5c5caf1`。剩余 = Phase 3b（D6 isolated 单 writer 真页面端到端——dev home 的 `session/writer-held` 挡住；D7 npm publish 仍无认证）、Phase 4（关键模块覆盖阈值、tests 进 tsc 的两面工程、pre-push 加 typecheck、notes 语义审计），以及 D1 `docs/index.md` 何时读列 / 67 篇 Note 零入链。
 
