@@ -11,7 +11,6 @@ const locales = Object.fromEntries(['en', 'zh'].map(lang => [lang, JSON.parse(re
 describe('插件市场 index（format 1）', () => {
   it('manifest → 条目：DSH 真校验器接受，展示字段与 manifest/locale 对齐', async () => {
     const index = buildMarketIndex({ manifest, locales, publishTimestamp: 1_790_000_000 })
-    // @ts-expect-error vendor built ESM has no root .d.ts; runtime shape is the authority here.
     const { parseMarketIndex } = await import('../../vendor/dsh/packages/util/plugin-market-index/lib/index.js')
     const parsed = parseMarketIndex(index, 'https://example.invalid/index.json')
     const plugin = parsed.plugins[0]
@@ -30,7 +29,6 @@ describe('插件市场 index（format 1）', () => {
 
   it('仓库根 market-index.json 与包版本一致，且被 DSH 校验器接受', async () => {
     const tracked = JSON.parse(readFileSync(join(ROOT, 'market-index.json'), 'utf8'))
-    // @ts-expect-error vendor built ESM has no root .d.ts; runtime shape is the authority here.
     const { parseMarketIndex } = await import('../../vendor/dsh/packages/util/plugin-market-index/lib/index.js')
     const parsed = parseMarketIndex(tracked, 'https://example.invalid/market-index.json')
     const plugin = parsed.plugins.find(item => item.name === manifest.name)
