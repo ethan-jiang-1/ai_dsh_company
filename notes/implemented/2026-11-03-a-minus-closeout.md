@@ -2,6 +2,10 @@
 
 状态：implemented（2026-11-03；A- goal 收口）
 
+> **已被 fresh 复评推翻（2026-11-03）**：七维不是全 A-——现行 = D1 B+ / D2 B+ / D3 B+ / D4 B- /
+> D5 B+ / D6 A- / D7 B。本表只作历史收口记录，不当现行读数；GAP 与修复见
+> [round5 卡](../../_backlog/issues/2026-11-03-repo-hygiene-round5.md) 与 2026-11-03 的 Phase Notes。
+
 > 上游 = [第五轮七维打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round5.md)
 > 尺子：A- = **主反馈路径无已知假绿、每维有可复跑判据、残余只余文档化边界**；A = 无残余。
 

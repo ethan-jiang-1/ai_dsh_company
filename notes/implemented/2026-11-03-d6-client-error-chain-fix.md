@@ -18,7 +18,7 @@
 - 既有单测 `host-composition.spec` 直接调 `handler({ rawInput: 'client-error …' })`（无前导空格），所以
   一直绿——**测试形状与真实 dispatch 形状不一致**，这正是假绿。
 
-## 修复
+## 决定
 
 - `src/host/client-diagnostics.ts`：`const input = rawInput.trimStart()`，后续判断/切片都用 `input`；
   注释写明 vendor 形状与 2026-11-03 真页面断链。

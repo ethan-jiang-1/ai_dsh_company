@@ -22,7 +22,7 @@ UI 半边，不是独立过渡）；③ CEO 跨角色 = **仅建议权，目标�
 
 ## ② 决定（机制栈）
 
-- **入口**：公司主面第四子页 用量→培养（`CompanyView` 的 `COMPANY_PANELS`；2026-10-28 起改为第三主视图 tab，见顶部）；培养面板**不依赖
+- **入口**：公司主面第四子页 用量→培养（`CompanyView` 的 `COMPANY_PANELS`；2026-10-28 起改为第三主视图 tab；`CompanyView` 本身 2026-11-03 已删，现行 = 培养页/右栏）；培养面板**不依赖
   team 数据**（独立角色根会话可看）；用量保留平台页签 `company-budget`（换入口 ≠ 删统计）。
   同一领域视图（`CultivationBoard`）住主视图/侧栏/浮窗三个壳——一处事实（2026-10-28 起主视图壳替代公司页壳）。
 - **数据**：培养记录 = 公司盘 `cultivation/records/*.md`（lib `cultivation.ts` 读模型

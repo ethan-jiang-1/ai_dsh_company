@@ -5,6 +5,11 @@
 > 范围 = `51e87dd..HEAD`（D1/D2/D5/D7 A- 批次 + 0.8.0/0.8.1）
 > 方法 = code-review 两轴：Standards（AGENTS/docs/testing/release/notes + 气味基线）与 Spec（第五轮卡 + A- 收口 Note）
 
+## 决定
+
+- 按两轴 review 的硬发现逐条修补；清单见下。用户可见变化归 CHANGELOG，过程证据归本条。
+- 未关闭项（D7 文档化边界、D2 长函数、tests 类型面等）另列「仍未做」，不冒充已修。
+
 ## 硬发现与修补
 
 1. **CHANGELOG 混入维护者过程证据**（CHANGELOG 自述“只记用户/收件人可见变化”）：0.8.0 的

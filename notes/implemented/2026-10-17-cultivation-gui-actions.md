@@ -28,7 +28,7 @@
 | 片 | 落点 |
 |---|---|
 | S1 动作面纯模块 | `packages/company-pack/src/client/cultivation-actions.ts`（六条命令线构造 + host 结果折算 + 文案表 + 通道封装，缺席即降级） |
-| S2 治理动作 | `CultivationBoard.tsx`（采纳 / 拒绝含内联理由 / 这条有用·没起作用 / 撤回…含后果说明与两段确认；飞行中禁用；成功后刷新；失败出 host 原话；未注入即只读降级）、`cultivation-data.ts`（`refresh()`）、`CultivationTab.tsx` / `CompanyView.tsx` / `index.ts` / `company-tab-registration.ts`（注入 `remote.commands` 与动作面工厂）、`styles.ts` |
+| S2 治理动作 | `CultivationBoard.tsx`（采纳 / 拒绝含内联理由 / 这条有用·没起作用 / 撤回…含后果说明与两段确认；飞行中禁用；成功后刷新；失败出 host 原话；未注入即只读降级）、`cultivation-data.ts`（`refresh()`）、`CultivationTab.tsx` / `CompanyView.tsx`（2026-11-03 已删） / `index.ts` / `company-tab-registration.ts`（注入 `remote.commands` 与动作面工厂）、`styles.ts` |
 | S3 无困惑重排 | 同上（待办置顶；journal 改「素材（不用你操作）」；「我提交的」加「等对方处理；你无需操作」；「怎么养」改写为"点哪里"，命令语法收进折叠的「熟手命令行」） |
 | S4 判断材料 | `src/lib/cultivation.ts`（`CultivationRecord.body` 进客户端读模型——修订原先"正文不暴露给客户端"的注记，理由 = 人不下无证据的判断）+ 面板就地展开 |
 | S5 创作面 | `CultivationCompose.tsx`（顶部两个入口 + 期望单行 / 正文多行 / 建议选角色 + 校验：非空、期望句不得含 `::`）+ 提交后刷新并高亮新行 |

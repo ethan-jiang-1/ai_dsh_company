@@ -2,6 +2,10 @@
 
 状态：implemented（2026-11-03；用户授权「打扫卫生 + 持续改善」；D6 R5-31）
 
+> **2026-11-03 补充**：本 Note 只证落点/持久化；页面→host 的 reporter 链当时因 vendor
+> `parseCommand` 的 rawInput 前导空白而断过，修复见 [D6 客户端错误断链](./2026-11-03-d6-client-error-chain-fix.md)
+> （isolated smoke 已绿）。
+
 > 上游 = [第五轮七维打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round5.md)
 > 审计 = [第五轮七维审计](../../_backlog/research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md) R5-31
 
