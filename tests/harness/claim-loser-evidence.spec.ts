@@ -20,7 +20,7 @@ const claimOk = (id: string, taskId: string, name: string) => ok(id, JSON.string
 
 // One clean race per task; the same member wins both and the loser yields on the
 // owner-bound file while still publishing its row on the explicitly shared file.
-function fixture(winner: 'w1' | 'w2' = 'w1') {
+function fixture(winner: 'w1' | 'w2' = 'w1'): any {
   const loser = winner === 'w1' ? 'w2' : 'w1'
   const winnerEvents = [
     claim('c1', 'task-1', 1), claimOk('c1', 'task-1', winner),
@@ -70,7 +70,7 @@ describe('claim-loser yield evidence', () => {
   })
   it('rejects a winner that never publishes its owner line and a file with extra rows', () => {
     const missing = fixture()
-    missing.memberEvents.w1 = missing.memberEvents.w1.filter(event => event.data?.callId !== 'wo')
+    missing.memberEvents.w1 = missing.memberEvents.w1.filter((event: any) => event.data?.callId !== 'wo')
     expect(claimLoserEvidence(missing).winnerPublishes).toBe(false)
     const extra = fixture()
     extra.ownerContent = 'w1 owns this task\nw2 was here\n'
@@ -78,7 +78,7 @@ describe('claim-loser yield evidence', () => {
   })
   it('rejects missing delivered reports and lead writes on either target', () => {
     const quiet = fixture()
-    quiet.leadEvents = quiet.leadEvents.filter(event => event.type !== 'team/message/delivered')
+    quiet.leadEvents = quiet.leadEvents.filter((event: any) => event.type !== 'team/message/delivered')
     expect(claimLoserEvidence(quiet).reports).toBe(false)
     const leadWrite = fixture()
     leadWrite.leadEvents.splice(0, 0, call('lead-w', 'write', { file_path: OWNER, content: 'lead was here\n' }))
@@ -86,7 +86,7 @@ describe('claim-loser yield evidence', () => {
   })
   it('rejects a shared control where the claim loser never writes or a row is missing', () => {
     const silent = fixture()
-    silent.memberEvents.w2 = silent.memberEvents.w2.filter(event => event.data?.callId !== 'ls' && event.data?.message?.toolCallId !== 'ls')
+    silent.memberEvents.w2 = silent.memberEvents.w2.filter((event: any) => event.data?.callId !== 'ls' && event.data?.message?.toolCallId !== 'ls')
     expect(claimLoserEvidence(silent).sharedControl).toBe(false)
     const shortFile = fixture()
     shortFile.sharedContent = 'w1 was here\n'
@@ -94,7 +94,7 @@ describe('claim-loser yield evidence', () => {
   })
   it('rejects a missing shared-task claim and an unfinished member turn', () => {
     const noClaim = fixture()
-    noClaim.memberEvents.w2 = noClaim.memberEvents.w2.filter(event => event.data?.callId !== 'c4' && event.data?.message?.toolCallId !== 'c4')
+    noClaim.memberEvents.w2 = noClaim.memberEvents.w2.filter((event: any) => event.data?.callId !== 'c4' && event.data?.message?.toolCallId !== 'c4')
     expect(claimLoserEvidence(noClaim).claimRaceShared).toBe(false)
     const active = fixture()
     active.memberEvents.w2 = [...active.memberEvents.w2.slice(0, -1), { type: 'turn/start', data: {} }]

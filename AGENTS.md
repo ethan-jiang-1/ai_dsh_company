@@ -42,7 +42,7 @@ pnpm bundle:init                       # fresh clone：建 dev 的 .dsh-company/
 pnpm company --no-open                 # repo dev-only：pack + plugin add file: + exec `dsh --profile company`（--link = 快速通道）
 pnpm verify                            # 结构门禁（清单唯一源 = checks/gates/ 目录）
 pnpm test                              # keyless 回归（真模型/浏览器不进；layering 守卫）
-pnpm typecheck                         # pack 两面 + tests/client + tests/company + tests/harness（15 个不变量 spec）（类型/导入面改动；fresh clone 先按 bootstrap 构建 vendor client 类型）
+pnpm typecheck                         # pack 两面 + tests/client + tests/company + tests/harness（17 个不变量 spec）（类型/导入面改动；fresh clone 先按 bootstrap 构建 vendor client 类型）
 pnpm release --check                   # 发布就绪（dist 与源码指纹；verify 绿 ≠ 可发布）
 pnpm orient                            # 运行态全景（keyless 只读；--scenario = run trace 场景视图）
 pnpm diagnose --session <slug>/<id>     # 会话失败摘要（只读；失败 turn/工具错误/非零 bash/待审批/问询/present；child 也可点名）

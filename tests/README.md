@@ -33,7 +33,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | company 读模型逻辑（`src/lib/` 判据：deliverables / authorship / ledger） | `pnpm test tests/company`（按模块点名 spec） | oracle 反证（真样本钉列）；**新增模块/影响导出面 → 加 `pnpm test tests/harness`（pack-exports 守卫）** | — |
 | host 逻辑（`src/host/`：bootstrap / workspace-resolution / handbook / catalog / catalog-state / presented-ledger / cultivation / lease / bundle-manifest / governance-export / revoke-journal） | `pnpm test tests/company`（按模块点名 spec；真文件集成） | `pnpm test tests/harness`（导出/布局）+ `pnpm typecheck` | — |
 | 启动入口 / workspace 解析 / 公司状态（`src/host/startup*`、`tools/company.mjs` dev-only） | `pnpm test tests/company`（bootstrap/manifest/presented-domain） | [company-entry-smoke](../checks/smoke/company-entry-smoke.mjs) + [release-smoke](../checks/smoke/release-smoke.mjs) + [client-load-smoke](../checks/smoke/client-load-smoke.mjs) | 新入口同 diff 进 checks/README；`pnpm verify` script-index/status |
-| 类型面（改 `src/**` 的导出/导入签名） | `pnpm typecheck`（pack 两面 + `tests/client` + `tests/company` + `tests/harness` 的 15 个不变量 spec；fresh clone 需先按 [bootstrap](../docs/guides/bootstrap.md) 构建 vendor client 类型） | [release-smoke](../checks/smoke/release-smoke.mjs)（发布前）；`verify` 的 src-layering 只守方向不守类型 | — |
+| 类型面（改 `src/**` 的导出/导入签名） | `pnpm typecheck`（pack 两面 + `tests/client` + `tests/company` + `tests/harness` 的 17 个不变量 spec；fresh clone 需先按 [bootstrap](../docs/guides/bootstrap.md) 构建 vendor client 类型） | [release-smoke](../checks/smoke/release-smoke.mjs)（发布前）；`verify` 的 src-layering 只守方向不守类型 | — |
 | pack 导出/注册面（Host / Client 注册改动） | `pnpm test tests/harness`（导出形态）+ `pnpm test tests/company`（Host 注册回调行为）+ `pnpm test tests/client`（Client 槽注册） | [release-smoke](../checks/smoke/release-smoke.mjs)（真实安装形状；含 researcher） | — |
 | 发布 / 升 pin | `pnpm test tests/harness`（release-foundation 等） | [release-smoke](../checks/smoke/release-smoke.mjs) + 升 pin 程序（合同 = [release.md](../docs/release.md)；**本仓只有不加载 pack 的合成回放，只证管线可跑，不是升 pin 第一道**） | — |
 | 检查与工具入口（`checks/**`、`probes/**`、`tools/**`） | 消费它的 keyless spec + `pnpm verify`（头注/结构门禁） | 真实入口冒烟按脚本头注「何时跑」 | — |
@@ -60,7 +60,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | 层 | 时间 | 跑什么（代表脚本；**它自己的触发条件在头注**） |
 |---|---|---|
 | 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接、物理行预算、裸路径、分层方向与 pin 一致性门禁） |
-| **类型面 keyless** | 秒级（增量） | `pnpm typecheck`（pack 两面 + `tests/client` + `tests/company` + `tests/harness` 的 15 个不变量 spec；改导出/导入签名或测试类型时跑——verify 与 test 都不做类型检查） |
+| **类型面 keyless** | 秒级（增量） | `pnpm typecheck`（pack 两面 + `tests/client` + `tests/company` + `tests/harness` 的 17 个不变量 spec；改导出/导入签名或测试类型时跑——verify 与 test 都不做类型检查） |
 | **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器） |
 | 装配 keyless | ~25s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） |
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
@@ -96,4 +96,4 @@ keyless 单测唯一后缀 `*.spec.ts`（[testing.md §1.1](../docs/testing.md)�
 `checks/smoke/` 或 `probes/` 下的 `.mjs` 并在头注自述「何时跑 / 成本 / 状态」——不塞进 tests/（layering 守卫拦截）。
 本文件骨架由 [harness/navigation-assets.spec](./harness/navigation-assets.spec.ts) 钉进回归（2026-10-05 红→绿落地）。
 
-> ⚠ `tests/client` / `tests/company` 已由 `tsconfig.test-client.json` / `tsconfig.test-company.json` 覆盖；`tests/harness` 只收 15 个不变量 spec（`tsconfig.test-harness.json`）；其余 harness 宽松测试仍未进 tsc（[testing.md §5](../docs/testing.md) 已知未覆盖面）。
+> ⚠ `tests/client` / `tests/company` 已由 `tsconfig.test-client.json` / `tsconfig.test-company.json` 覆盖；`tests/harness` 只收 17 个不变量 spec（`tsconfig.test-harness.json`）；其余 harness 宽松测试仍未进 tsc（[testing.md §5](../docs/testing.md) 已知未覆盖面）。

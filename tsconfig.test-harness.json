@@ -34,6 +34,8 @@
     "tests/harness/workspace-oracle.spec.ts",
     "tests/harness/deliverables-audit.spec.ts",
     "tests/harness/converge-rules.spec.ts",
+    "tests/harness/claim-loser-evidence.spec.ts",
+    "tests/harness/question-stop.spec.ts",
     "tests/support/temp-env.ts"
   ]
 }

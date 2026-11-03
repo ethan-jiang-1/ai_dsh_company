@@ -12,7 +12,7 @@ import { questionStopOf } from '../../tools/lib/question-stop.mjs'
 
 const T0 = 1_700_000_000_000
 /** 一条 tool/call（`arguments` 是 JSON 字符串——实测形状）。 */
-const call = (callId, { timeout, ids = ['q1'], at = T0 } = {}) => ({
+const call = (callId: string, { timeout, ids = ['q1'], at = T0 }: { timeout?: number, ids?: string[], at?: number } = {}) => ({
   type: 'tool/call',
   seq: 1,
   time: at,
@@ -28,7 +28,7 @@ const call = (callId, { timeout, ids = ['q1'], at = T0 } = {}) => ({
   },
 })
 /** 一条 tool/result（配对用 `data.message.toolCallId`——实测形状）。 */
-const result = (callId, { at = T0 + 1000, text = '{"pending":true}' } = {}) => ({
+const result = (callId: string, { at = T0 + 1000, text = '{"pending":true}' } = {}) => ({
   type: 'tool/result',
   seq: 2,
   time: at,
@@ -57,19 +57,19 @@ describe('questionStopOf：停在问询上吗？这个停点驱动能不能自�
   it('模型明示 timeout: -1 ⇒ 窗口无界，立刻建议 stop（BUG-022 的反例路径）', () => {
     const verdict = questionStopOf([call('c1', { timeout: -1 })], { now: T0 + 5_000 })
     expect(verdict).toMatchObject({ callId: 'c1', window: 'unbounded', action: 'stop', remainingMs: null })
-    expect(verdict.reason).toContain('-1')
+    expect(verdict!.reason).toContain('-1')
   })
 
   it('超长窗口（超阈值）视同无界：驱动不该陪着等一小时', () => {
     const verdict = questionStopOf([call('c1', { timeout: 3600 })], { now: T0 + 5_000, maxBoundedWindowMs: 900_000 })
     expect(verdict).toMatchObject({ window: 'unbounded', action: 'stop' })
-    expect(verdict.reason).toContain('3600')
+    expect(verdict!.reason).toContain('3600')
   })
 
   it('有界但已超出窗口 + 宽限仍无结果 ⇒ 也建议 stop（并把"逾期"说清楚）', () => {
     const verdict = questionStopOf([call('c1')], { now: T0 + 300_000, slackMs: 60_000 })
     expect(verdict).toMatchObject({ window: 'bounded', action: 'stop', remainingMs: 0 })
-    expect(verdict.reason).toContain('逾期')
+    expect(verdict!.reason).toContain('逾期')
   })
 
   it('多条问询：取最老那条未配对的（后面的不该顶掉前面的）', () => {
@@ -79,7 +79,7 @@ describe('questionStopOf：停在问询上吗？这个停点驱动能不能自�
 
   it('question.id 一并带出（报给人时要能点名问的是哪几问）', () => {
     const verdict = questionStopOf([call('c1', { ids: ['a', 'b'] })], { now: T0 + 1_000 })
-    expect(verdict.questionIds).toEqual(['a', 'b'])
+    expect(verdict!.questionIds).toEqual(['a', 'b'])
   })
 
   it('缺时间戳不炸（按 now 计，等 0ms）', () => {
@@ -93,21 +93,21 @@ describe('questionStopOf：停在问询上吗？这个停点驱动能不能自�
     const broken = { type: 'tool/call', seq: 1, time: T0, data: { name: 'ask_user_question', arguments: '{"questions":[]}' } }
     const verdict = questionStopOf([broken], { now: T0 + 1_000 })
     expect(verdict).toMatchObject({ window: 'unknown', action: 'stop', callId: null })
-    expect(verdict.reason).toContain('callId')
+    expect(verdict!.reason).toContain('callId')
   })
 
   it('name 命中但 arguments 不是 JSON ⇒ 停并点名（窗口无从判定，不许按默认窗口陪等）', () => {
     const broken = { type: 'tool/call', seq: 1, time: T0, data: { callId: 'c1', name: 'ask_user_question', arguments: '不是 JSON' } }
     const verdict = questionStopOf([broken], { now: T0 + 1_000 })
     expect(verdict).toMatchObject({ window: 'unknown', action: 'stop' })
-    expect(verdict.reason).toContain('arguments')
+    expect(verdict!.reason).toContain('arguments')
   })
 
   it('name 丢了但参数里就是 questions ⇒ 停并点名（工具改名/字段搬家也要被抓到）', () => {
     const drifted = { type: 'tool/call', seq: 1, time: T0, data: { callId: 'c9', arguments: JSON.stringify({ questions: [{ id: 'q' }] }) } }
     const verdict = questionStopOf([drifted], { now: T0 + 1_000 })
     expect(verdict).toMatchObject({ window: 'unknown', action: 'stop', callId: 'c9' })
-    expect(verdict.reason).toContain('形状')
+    expect(verdict!.reason).toContain('形状')
   })
 
   it('非问询工具的未配对调用不算停点（别的工具挂住是别的问题）', () => {
