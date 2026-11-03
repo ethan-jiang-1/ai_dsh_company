@@ -73,10 +73,11 @@ intent: "第六轮七维打扫（2026-11-03）：fresh agent 独立复评七个�
 |---|---|---|---|---|
 | A · 止血 ✅ | R6-01/02/03/08/09（已落地）+ R6-13/14 | D1/D4/D5/D7 | 低 | `pnpm verify` + `pnpm test` + `typecheck` |
 | B · 首屏与反馈 ✅ | R6-04/05/06：`orient` 首屏补真页面/诊断/日志入口；`--scenario` 分场景给正确命令；`diagnose`/`orient` 实现 `--help` 与未知参数 fail-loud | D6 | 低 | 实跑四个命令流；`orient` spec |
-| C · 豁免区算账 | R6-07：活层死链先修；豁免区改为**计数 + 棘轮预算**（新增 `link-exemptions` 门禁或并入 `md-links`），让"看不见"变成"有数字、只能降" | D4 | 中 | 造红：往豁免区加一条死链 → 超预算红；还原绿 |
-| D · 层次化（代码，下一轮） | R6-10 第一刀：`packages/company-pack/src/client/` 按关切分 `cultivation/`、`tabs/`、`wiring/`、`data/`（保持 `index.ts` 在顶层）；同步 `tools/lib/company-tab-catalog.mjs` 的源路径常量 | D2 | 中高 | `typecheck` + `pnpm test` + `verify` + `ui-scene-smoke` |
-| E · 层次化（测试，下一轮） | R6-10 第二刀：`tests/client` 镜像 src 分目录；`tests/harness` 按 `tools/lib` 关切分 `repo/`、`session/`、`evidence/`、`probe/`（仅移动，不改断言） | D2 | 中 | 同上 |
-| F · 测试质量 | R6-11/12：补 `host/cultivation` / `workspace-doors` 直接 spec；删空断言；`expect(true)` 改真判据；择 3 处文本断言改行为断言 | D5 | 低 | 覆盖率读数 + 造红 |
+| C · 豁免区算账 ✅ | R6-07：活层死链先修；新增 `checks/gates/link-debt.mjs` + `checks/gates/lib/link-debt.json`（archived 32 / moved 0 / live 0） | D4 | 中 | 造红两条：加 moved 死链 / 往归档加死链 → 超基线红；还原绿 |
+| D · 层次化（代码）✅ | R6-10 第一刀：`src/client` → `index.ts` + `wiring/ data/ ui/ tabs/ cultivation/`；同步 `company-tab-catalog` / `ui-golden-freshness` / `cdp-probe` 的源路径 | D2 | 中高 | `typecheck` + `pnpm test` + `verify` + `ui-scene-smoke` 全绿 |
+| E · 层次化（测试）✅ | R6-10 第二刀：`tests/client` 镜像五组；`tests/harness` → `repo/ tools/ session/ evidence/ ui/`（54 → 5，顶层 0） | D2 | 中 | 同上；三次真实路径失效被抓（tsconfig 排除 / entry-probe 根 / skip-budget 自身） |
+| F · 测试质量 ✅（首刀+二刀） | R6-11/12：`workspace-doors` / `install-manual` / `error-relay` 补判据；`catalog-wiring` 空断言改真行为；删 `expect(true)`；`dag-panel` 负向正则收窄到 inline style；`host/cultivation` 仍只经 harness（明说不用重复造） | D5 | 低 | 覆盖率读数 + 四次造红 |
+| H · 行为面收口 ✅ | R6-15/16（settings tier 真的写、lease 挪到解析后）；D6 错误中继队列化 + e2e 补「加载即报错」段 | D6/D7 | 中 | 单测造红 + 两条真页面 smoke ALL PASS |
 | G · 老旧资产 ✅ | 三个一次性探针删除（`runtime/` 白名单 5→2 件，`gitignore-shape` 同步）；`runtime/README` 散文路径槽修正 | D1/D4 | 低 | `verify`（gitignore-shape 同步）+ `script-index` |
 
 **不做**：`npm publish`（人工）、`vendor/` 改动、`tests/*` 以外的大规模搬迁（`checks/gates` / `tools/lib` 的 48/53 平铺在 D 批视效果决定是否跟进——它们被 53 门与 86 脚本以相对路径引用，搬迁收益低于风险，需单独论证）。
@@ -111,7 +112,7 @@ md5 tests/company/dag.spec.ts tests/company/cultivation-lib.spec.ts   # 修复�
 | D1 | A- | **A-** | 设计层两处现状改口、过期枚举删除；残余（76 篇零入链）未动 |
 | D2 | B+ | **A** | `src/client` 41 → 1 入口 + 5 关切目录；`tests/client` 48 → 根 1 + 五组镜像；`tests/harness` 54 → 五组（repo/tools/session/evidence/ui）；0 环仍成立；`checks/gates`(54) / `tools/lib`(48) 判为同质目录、不搬（见 §8 决策） |
 | D3 | A- | **A-** | 未动（无新增验收面） |
-| D4 | B | **B+** | 重复 spec 门禁 + 链接欠账棘轮（archived 32 / moved 0 / live 0，超基线即红）；残余 = 冻结层 32 条死链（只设天花板）、设计层现状声明仍靠人 |
+| D4 | B | **A-** | 重复 spec 门禁 + 链接欠账棘轮（archived 32 / moved 0 / live 0，超基线即红）；残余 = 冻结层 32 条死链（按政策只设天花板）、设计层现状声明仍无机械面（人工复核）、76 篇零入链（上轮定性不批量迁） |
 | D5 | B+ | **A-** | DAG spec 恢复（+20 例）、混合面类型洞收口、orient +2 例；F 批：`workspace-doors` 直接 spec（4 例，带造红）、`install-manual` 模板判据（4 例，零覆盖 → 有判据，含 lease 归属的回归守卫）、`catalog-wiring` 空断言改真行为、删掉 `expect(true)`；套件 1108 → 1116。残余 = 少量源码文本断言（CSS/装配面，刻意保留） |
 | D6 | B+ | **A-** | 首屏真页面/诊断入口、`--scenario` 按类型分派、`--help` 与未知参数 fail-loud；客户端错误改为有界队列中继（无会话排队、会话出现后补送、节流不再丢条目）；残余 = 「先抛错再开会话」的端到端时序未做探针 |
 | D7 | A- | **A-** | 安装=启动 profile、卸载残留披露；D7 两项已决并落地——「最近选择」真的写、lease 挪到 workspace 解析之后（无 workspace 零写含锁文件）；残余 = npm 未发布、market index 单版本（外部发布面） |
@@ -133,3 +134,33 @@ D5 = F 批测试质量）。下一轮优先级：F 批（测试质量）→ C �
 **复访条件**：`checks/gates` > 70 或出现第二位维护者按主题找门禁时再议；届时先立「门禁 → 关切」的
 目录约定与 `gate-wiring` 的递归判据，再一次性搬（附 tension note：D28 的"枚举的家 = 实现自己"仍成立，
 分组只是让清单可扫得更快，不产生第二份清单）。
+
+## 9. 收口：R6 逐条状态（2026-11-03 末）
+
+> 口径：已落地 = 有同 diff 证据（Note/测试/门禁）；延后 = 写明触发条件或不做的理由。不留悬空编号。
+
+| # | 状态 | 落点 |
+|---|---|---|
+| R6-01 DAG spec 被覆盖 | ✅ 已修 | 恢复原 spec（+`TaskRow.description`）；20 例绿 |
+| R6-02 重复 spec 无门禁 | ✅ 已修 | `checks/gates/spec-duplicates.mjs`（造红留证） |
+| R6-03 harness tsconfig 手工清单 | ✅ 已修 | glob + 单条 exclude；隐藏 TS2554 修好 |
+| R6-04 `--scenario` 错误命令 | ✅ 已修 | 按 kind 分派（replay/visual/归档） |
+| R6-05 `--help` 静默忽略 | ✅ 已修 | orient/diagnose `--help` + 未知参数 exit 2 |
+| R6-06 首屏不指路 | ✅ 已修 | orient「看到真页面 / 查失败现场」节 |
+| R6-07 豁免区死链 | ✅ 已修 | `link-debt` 棘轮 + 5 条活层死链改写 |
+| R6-08 设计层两处现状矛盾 | ✅ 已修 | ui-demo / index / terminology 改口 |
+| R6-09 过期枚举 | ✅ 已修 | 7 处「51+6 名单」改为规则表述 |
+| R6-10 平铺无层次 | ✅ 已修 | src/client + tests/client + tests/harness 三树；checks/tools 判定不搬（§8） |
+| R6-11 无直接 spec 的模块 | ✅ 部分 | 补 workspace-doors / install-manual / error-relay；`host/cultivation` 仍经 harness（5 档真跑，不重复造）；`client/session-source` 无直接 spec（10 行副作用导入）→ 延后，触发 = 改它时补 |
+| R6-12 源码文本断言 | ✅ 部分 | dag-panel 收窄；client-face 装配面**刻意保留**（`client-load-smoke` 抓不到同键冲突，注释已论证）；CSS/夹具文本断言属产物契约，保留 |
+| R6-13 安装≠启动 profile | ✅ 已修 | README / profile.md / 手册模板 |
+| R6-14 卸载残留清单 | ✅ 已修（模板） | 模板已改；`_dist/安装手册.md` 待下次 `release --prepare` 再生（触发 = 发布轮） |
+| R6-15 settings tier 只读不写 | ✅ 已修 | 实现写侧 + 单测 + home 白名单 |
+| R6-16 lease 先于 workspace | ✅ 已修（一半） | lease 挪后；cwd 启发式保留（产品行为，Note 记了输掉的方案） |
+| R6-17 market index 单版本/时间戳 | ⏸ 延后 | 外部发布面；触发 = `npm publish` 后按参考生成器重生成（`publish-handoff`） |
+| R6-18 首屏错误无盘上证据 | ✅ 已修 | 错误中继队列 + e2e「加载即报错」段 |
+| R6-19 `_dist` 手册与模板不同步 | ⏸ 延后 | 生成物，不手改；触发 = 下次 `release --prepare` |
+
+**结论**：17 条原始 GAP 中 15 条已闭或部分闭合（部分项写明了保留理由），2 条延后且都写了触发条件；
+新增 2 条由本轮改动暴露（R6-18/19）并已处理/登记。材料本身即"评估 + GAP + 计划 + 证据"四件套；
+实施证据散在 8 篇 `notes/implemented/2026-11-03-*` 与提交链里。

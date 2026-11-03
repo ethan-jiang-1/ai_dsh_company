@@ -59,9 +59,12 @@ describe('DagPanel 画布自适应栏宽（2026-09-28 两轮试用反馈：右�
       layout: layoutDag([task('a'), task('b'), task('c'), task('d')]),
     })) // 4 根并行一层 = 832px（现场 731px 栏里会裁切的形状）
     expect(html).toContain('wk-dag-fit') // 外层量容器宽的 wrapper（ResizeObserver 挂点）
-    expect(html).toMatch(/transform:scale\(/) // 绘制级缩放（SSR 首帧 scale=1，测得后再缩）
-    expect(html).not.toMatch(/max-width/) // CSS 宽度缩放已被 Safari 事故证伪
-    expect(html).not.toMatch(/min-width/) // 旧下限机制由 fitScale 接管
+    // 只断言 **style 属性**：整页正则会被无关 class 名（含 max-width 字样）误伤；
+    // 也不行只断 <svg> 标签——宽度缩放若加在 wrapper 上同样是事故形态（Safari 文字堆角）。
+    const inlineStyles = [...html.matchAll(/style="([^"]*)"/g)].map(match => match[1] ?? '').join(';')
+    expect(inlineStyles).toMatch(/transform:scale\(/) // 绘制级缩放（SSR 首帧 scale=1，测得后再缩）
+    expect(inlineStyles, 'CSS 宽度缩放已被 Safari 事故证伪').not.toMatch(/max-width/)
+    expect(inlineStyles, '旧下限机制由 fitScale 接管').not.toMatch(/min-width/)
   })
 
   it('PanelFrame 的 action 槽渲染页签自备动作（依赖图「重画」的机制面，2026-09-28 用户令）', () => {
