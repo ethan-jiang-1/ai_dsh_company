@@ -38,14 +38,14 @@ const LABELS_TEXT = `# 实验 B 金标准
 
 describe('标注文件解析（parseLabelsText）', () => {
   it('两张表分开解析，kind 正确；表头/分隔行/正文说明行不进结果', () => {
-    const rows = parseLabelsText(LABELS_TEXT)
-    expect(rows.map(r => r.id)).toEqual(['case-a', 'case-b', 'case-c', 'real-x'])
+    const rows: any = parseLabelsText(LABELS_TEXT)
+    expect(rows.map((r: any) => r.id)).toEqual(['case-a', 'case-b', 'case-c', 'real-x'])
     expect(rows[0].kind).toBe('synthetic')
     expect(rows[3].kind).toBe('real')
   })
 
   it('描述里的 `；` 不拆条目（碎片并回上一条）', () => {
-    const rows = parseLabelsText(LABELS_TEXT)
+    const rows: any = parseLabelsText(LABELS_TEXT)
     expect(rows[0].tasks).toEqual([
       { role: 'cfo', task: 'T1', status: '待办' },
       { role: 'coo', task: 'T2', status: '阻塞' },
@@ -53,7 +53,7 @@ describe('标注文件解析（parseLabelsText）', () => {
   })
 
   it('关闭条目 ⇒ 整场关闭标记；审批×N 解析为计数', () => {
-    const rows = parseLabelsText(LABELS_TEXT)
+    const rows: any = parseLabelsText(LABELS_TEXT)
     expect(rows[1].closed).toBe(true)
     expect(rows[1].tasks[0].role).toBe('——')
     expect(rows[2].approvals).toBe(2)
@@ -90,7 +90,7 @@ describe('打分（scoreLabels）：指标与零容忍计数', () => {
       ['x1', { r1: R1(['cfo', 'coo']), r2: [], r3: R3([], []), drafts: [] }],
       ['x2', { r1: R1(['vp-eng']), r2: [], r3: R3([], [], true), drafts: [] }],
     ])
-    const { M, zeroTol } = scoreLabels(rows, scans)
+    const { M, zeroTol }: any = scoreLabels(rows, scans)
     expect(M.R1.tp).toBe(1)               // cfo
     expect(M.R1.blockedAsCandidate).toBe(1) // coo 只有阻塞活
     expect(M.R1.falseImmediate).toBe(1)   // x2 的 vp-eng（关闭动议）
@@ -101,7 +101,7 @@ describe('打分（scoreLabels）：指标与零容忍计数', () => {
     const rows = [{ id: 'x', kind: 'synthetic', closed: false, approvals: 0, remind: '', zeroNote: '',
       tasks: [{ role: 'coo', task: 'T6', status: '待办' }] }]
     const scans = new Map([['x', { r1: [], r2: [], r3: R3([], []), drafts: ['coo.md'] }]])
-    const { M } = scoreLabels(rows, scans)
+    const { M }: any = scoreLabels(rows, scans)
     expect(M.R1.miss).toBe(1)
     expect(M.R1.missWithDraft).toBe(1)
   })
@@ -117,7 +117,7 @@ describe('打分（scoreLabels）：指标与零容忍计数', () => {
     // R2 报 T1（待核实当候选）+ T2（取消被报）但没报 T3 ⇒ R2 阻塞漏显示 +1；
     // R3 把 T1 报成候选、T2 未报（状态行=取消）、T3 两处都无 ⇒ R3 阻塞漏显示 +1
     const scans = new Map([['x', { r1: R1(['vp-sales']), r2: R2([['T1', 'vp-sales'], ['T2', 'vp-eng']]), r3: R3([['T1', 'vp-sales']], []), drafts: [] }]])
-    const { M, zeroTol } = scoreLabels(rows, scans)
+    const { M, zeroTol }: any = scoreLabels(rows, scans)
     expect(M.R2.reported).toBe(2)
     expect(M.R2.staleAsCandidate).toBe(1)     // T1 待核实当候选
     expect(M.R2.falseImmediate).toBe(1)       // T2 取消被报
@@ -142,12 +142,12 @@ describe('打分（scoreLabels）：指标与零容忍计数', () => {
 describe('双源核对（2026-09-26 采纳结论的一部分）', () => {
   const BRIEF = '派活｜T1｜vp-sales｜市场门｜依赖：无｜状态：待办\n'
   it('状态行待办 + 稿不在盘 ⇒ stale=false（正常候选）', () => {
-    expect(scanR2(BRIEF, [])[0].stale).toBe(false)
-    expect(scanR3(BRIEF, [], false).candidates[0].stale).toBe(false)
+    expect(scanR2(BRIEF, [])[0]!.stale).toBe(false)
+    expect(scanR3(BRIEF, [], false).candidates[0]!.stale).toBe(false)
   })
   it('状态行待办 + 稿已在盘 ⇒ stale=true（待核实，不是干净候选）——R2/R3 同标', () => {
-    expect(scanR2(BRIEF, ['vp-sales.md'])[0].stale).toBe(true)
-    expect(scanR3(BRIEF, ['vp-sales.md'], false).candidates[0].stale).toBe(true)
+    expect(scanR2(BRIEF, ['vp-sales.md'])[0]!.stale).toBe(true)
+    expect(scanR3(BRIEF, ['vp-sales.md'], false).candidates[0]!.stale).toBe(true)
   })
   it('互审稿（<角色>-review.md）也算该角色有稿', () => {
     expect(roleHasDraft('cfo', ['cfo-review.md'])).toBe(true)
@@ -176,7 +176,7 @@ describe('真实状态漂移形状（case 14 = r6-baseline 录制收割，2026-1
   })
 
   it('金标准=六待核实 ⇒ R2 全 surfaced 但类别错（待核实当候选×6）；R3 漏 4（沉入不可见 blocked）', () => {
-    const { M } = scoreLabels([goldRow(['待核实', '待核实', '待核实', '待核实', '待核实', '待核实'])], scans())
+    const { M }: any = scoreLabels([goldRow(['待核实', '待核实', '待核实', '待核实', '待核实', '待核实'])], scans())
     expect(M.R2.reported).toBe(6)
     expect(M.R2.tp).toBe(6)
     expect(M.R2.staleAsCandidate).toBe(6)
@@ -187,7 +187,7 @@ describe('真实状态漂移形状（case 14 = r6-baseline 录制收割，2026-1
   })
 
   it('反证：同一扫描形状下翻一条金标准为「取消」⇒ zeroTol.cancelReported 见红计数（仪器能分辨对错标注）', () => {
-    const { M, zeroTol } = scoreLabels([goldRow(['取消', '待核实', '待核实', '待核实', '待核实', '待核实'])], scans())
+    const { M, zeroTol }: any = scoreLabels([goldRow(['取消', '待核实', '待核实', '待核实', '待核实', '待核实'])], scans())
     expect(zeroTol.cancelReported).toBe(2)      // T1 被 R2 与 R3 各报一次 ⇒ 零容忍按规则双计
     expect(M.R2.tp).toBe(5)                       // 其余五条不受影响
   })
@@ -203,7 +203,7 @@ describe('规则变体（RFC scan-rule-iteration，2026-10-06：R2′ 关闭检�
     expect(scanR2Closed('派活｜T1｜cfo｜毛利｜依赖：无｜状态：待办', [], true)).toEqual([])
     const open = scanR2Closed('派活｜T1｜cfo｜毛利｜依赖：无｜状态：待办', [], false)
     expect(open).toHaveLength(1)
-    expect(open[0].rule).toBe('R2')
+    expect(open[0]!.rule).toBe('R2')
   })
 
   it('scanR3Dual（case 14 漂移形状）：四个沉没任务浮出且带 depByDisk 标记', () => {
@@ -228,12 +228,12 @@ describe('规则变体（RFC scan-rule-iteration，2026-10-06：R2′ 关闭检�
     const r2 = scanR2(brief, [])
     const r3 = scanR3(brief, [], false)
     // 变体在场
-    const withVariants = scoreLabels([row], new Map([['x', { r1: [], r2, r3, drafts: [], r2c: scanR2Closed(brief, [], false), r3d: scanR3Dual(brief, [], false) }]]))
+    const withVariants: any = scoreLabels([row], new Map([['x', { r1: [], r2, r3, drafts: [], r2c: scanR2Closed(brief, [], false), r3d: scanR3Dual(brief, [], false) }]]))
     expect(withVariants.M.R2C.reported).toBe(1)
     expect(withVariants.M.R3D.reported).toBe(1)
     expect(withVariants.M.R2.reported).toBe(1)
     // 变体缺省：键在场为零，R2/R3 不受影响
-    const without = scoreLabels([row], new Map([['x', { r1: [], r2, r3, drafts: [] }]]))
+    const without: any = scoreLabels([row], new Map([['x', { r1: [], r2, r3, drafts: [] }]]))
     expect(without.M.R2C.reported).toBe(0)
     expect(without.M.R3D.reported).toBe(0)
     expect(without.M.R2.reported).toBe(1)
@@ -285,13 +285,13 @@ describe('派活行的「假设」段（BUG-011 的机械兜底，2026-10-11）'
     const parsed = parseAssignments(WITH)
     expect(parsed).toHaveLength(1)
     expect(parsed[0]).toMatchObject({ id: 'T1', role: 'vp-sales', title: '市场门', deps: [], status: '待办' })
-    expect(parsed[0].assumption, '「假设」段必须被解析出来（否则统计无从下手）').toBe('待证（客户预算未核）')
+    expect(parsed[0]!.assumption, '「假设」段必须被解析出来（否则统计无从下手）').toBe('待证（客户预算未核）')
   })
 
   it('不带「假设」段的旧派活行仍然解析（向后兼容，旧任务书不返工）', () => {
     const parsed = parseAssignments(WITHOUT)
     expect(parsed).toHaveLength(1)
-    expect(parsed[0].assumption).toBeUndefined()
+    expect(parsed[0]!.assumption).toBeUndefined()
   })
 
   it('手动验证红配方：删掉解析里的假设捕获 ⇒ 第一条断言转红', () => {
