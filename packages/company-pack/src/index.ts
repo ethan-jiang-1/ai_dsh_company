@@ -20,10 +20,10 @@ import {
 import {
   presentedFromEvent,
   presentedFromSessions,
-  readCatalogState,
-  regenerateCatalog,
   type PresentedSessionQuery,
-} from './host/catalog.ts'
+} from './host/presented-ledger.ts'
+import { readCatalogState } from './host/catalog-state.ts'
+import { regenerateCatalog } from './host/catalog.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
 import { registerHandbook } from './host/handbook.ts'
 import { migrateLegacyMethodLayers } from './host/cultivation-storage.ts'
