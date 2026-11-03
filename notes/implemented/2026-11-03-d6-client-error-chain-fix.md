@@ -41,14 +41,17 @@ commands/execute 同一行
 # 真页面（dev home）
 错误环捕获 1 条；reporter injected → call → current=session-…；
 commands/execute 返回 session/writer-held（dev home 另有 writer 持有该会话）——**不是本修复回归**，
-是 dev 多实例的现场；单 writer 的 isolated 端到端仍待补。
+是 dev 多实例的现场。
+
+# 真页面（isolated 单 writer；2026-11-03 补）
+node checks/smoke/client-error-chain-smoke.mjs
+# ALL PASS：会话打开（单 writer）→ 错误环捕获 → host 日志落盘
 npx vitest run tests/company/host-composition.spec.ts   # 8 passed
 pnpm test                                                # 135 files / 1084 tests
 pnpm verify                                              # ALL PASS
 ```
 
-## 未做
+## 余项
 
-- isolated（单 writer）真页面端到端：起临时 home + profile + pack → 建会话 → 注入 `console.error`
-  → 断言日志。dev home 的 `session/writer-held` 挡住了当前这条；已把形状记在这里，下一步补 smoke。
 - reporter 在 `session/writer-held` 时只有一次性 `console.warn`；是否要在 UI 上更显眼，另行评估。
+- isolated smoke 已覆盖整链；dev home 的 writer-held 是环境现场，不是链路缺陷。
