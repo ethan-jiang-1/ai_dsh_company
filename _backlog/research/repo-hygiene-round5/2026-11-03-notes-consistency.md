@@ -25,7 +25,7 @@ intent: "D4 高腐化面的 notes 分诊（2026-11-03）：A- 收口/客户端�
 
 | Note | 类 | 证据 | 处方 | 目标 owner |
 |---|---|---|---|---|
-| `2026-11-03-a-minus-closeout` | **CONFLICT** | 标题“七维全部 A-” vs fresh 复评 D4 B- / D7 B | 已加 banner（推翻 + 现行分） | round5 卡 |
+| `2026-11-03-a-minus-closeout`（receipts） | **CONFLICT** | 标题“七维全部 A-” vs fresh 复评 D4 B- / D7 B | 已移 `archived/receipts/` + banner（digest 增补） | round5 卡 |
 | `2026-11-03-client-error-durability` | **CONFLICT（部分）** | 只讲落点/持久化；reporter 链当时断 | 已加 banner 指向 D6 修复 | D6 Note |
 | `2026-11-03-d6-client-error-chain-fix` | **KEEP** | 有决定/根因/验证/余项 | 补 `## 决定`（audit 的 noDecision 清零） | 自身 |
 | `2026-11-03-review-integrity-fixes` | **KEEP** | 两轴 review 修补清单 | 补 `## 决定` | 自身 |
@@ -35,7 +35,7 @@ intent: "D4 高腐化面的 notes 分诊（2026-11-03）：A- 收口/客户端�
 
 ## 硬矛盾（已消解）
 
-- 旧：`notes/implemented/2026-11-03-a-minus-closeout.md:1` “七维全部达到 A-”。
+- 旧：`notes/archived/receipts/2026-11-03-a-minus-closeout.md:1` “七维全部达到 A-”。
   新：`_backlog/issues/2026-11-03-repo-hygiene-round5.md:14` fresh 复评 D1 B+ / D2 B+ / D3 B+ / D4 B- / D5 B+ / D6 A- / D7 B。
   判：**fresh 复评赢**；A- 文只作历史收口，已 banner。
 

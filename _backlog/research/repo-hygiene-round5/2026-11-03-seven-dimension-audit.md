@@ -242,4 +242,4 @@ git -C vendor/dsh rev-parse 'dsh-v0.2.1-rc.2^{commit}'
 | D6 | A- | isolated golden/诊断/错误留痕/tee/--steps；残余为全链路与证据寿命边界 |
 | D7 | A- | 0.8.2 发布字节 READY（未 npm publish）；peers 47；web-only/品牌/inject 偏离文档化；workspaceRegistry 是 web 产品面 |
 
-详见 [A- 收口 Note](../../../notes/implemented/2026-11-03-a-minus-closeout.md)；两轴 review 的修补与字面残余 = [review-integrity-fixes](../../../notes/implemented/2026-11-03-review-integrity-fixes.md)。
+详见 [A- 收口 Note](../../../notes/archived/receipts/2026-11-03-a-minus-closeout.md)；两轴 review 的修补与字面残余 = [review-integrity-fixes](../../../notes/implemented/2026-11-03-review-integrity-fixes.md)。

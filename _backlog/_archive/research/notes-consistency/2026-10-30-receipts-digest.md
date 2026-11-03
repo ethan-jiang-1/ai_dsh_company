@@ -56,3 +56,9 @@ intent: "notes/ 分诊的收据索引：21 篇无持久决定的演练/批次/�
 - 真跑证据：看 `checks/` 的 smoke/audit 与 `snapshots/` 的合成资产；历史原文 = `git log --all -- <path>`。
 - 下次分诊：`pnpm notes:audit` + [notes-consistency-audit](../../../../.agents/skills/notes-consistency-audit/SKILL.md)。
 - 失效/重复时再删（git 留历史）；不因“曾经被引用”而续命。
+
+## 五、2026-11-03 增补
+
+| 原文（现 `notes/archived/receipts/`） | 证明了什么 | 现行 owner / 可复核处 |
+|---|---|---|
+| `2026-11-03-a-minus-closeout` | 0.8.2 上曾自评七维全 A-；盘点行数/门禁/预算 | 已被 `_backlog/research/repo-hygiene-round5/2026-11-03-fresh-recheck.md` 推翻（当前 D1 A- / D2 A- / D3 B+ / D4 B+ / D5 A- / D6 A- / D7 B+） |
