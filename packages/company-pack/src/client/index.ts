@@ -26,7 +26,7 @@ import { registerCompanyTabs } from './tabs/company-tab-registration.ts'
 import { DELEGATION_TOOL_KEYS } from './wiring/delegation-keys.ts'
 import { DelegationCard } from './ui/DelegationCard.tsx'
 import { installStyles } from './ui/styles.ts'
-import { installErrorCapture, type ClientErrorEntry, type ErrorCaptureTarget } from './wiring/error-ring.ts'
+import { createErrorRelay, installErrorCapture, type ClientErrorEntry, type ErrorCaptureTarget } from './wiring/error-ring.ts'
 import { ROLE_SHORT, RoleBadge, readPresetOf, sessionTitleOf } from './ui/RoleBadge.tsx'
 import { TasksAction } from './tabs/TasksPanel.tsx'
 import { TEAM_TOOL_KEYS, TeamToolCard } from './ui/TeamToolCard.tsx'
@@ -72,26 +72,25 @@ export async function apply(ctx: ClientContext): Promise<void> {
 
   registerTitle(ctx)
 
-  // 浏览器错误 → host 诊断文件：按平台原生命令面，无当前会话时跳过；1s 节流防刷屏。
+  // 浏览器错误 → host 诊断文件：条目进有界队列，有当前会话就按 1s 节流送、没有就等会话出现再送
+  // （2026-11-03 第六轮 D6：旧实现「无会话 / 节流窗口内」直接丢条目，首屏错误永远没有盘上证据）。
   ctx.inject(['sessions', 'remote.commands'], (scoped) => {
     const list = scoped.sessions.list
-    let lastSent = 0
     let reporterWarned = false
-    errorReporter.current = (entry) => {
-      const now = Date.now()
-      if (now - lastSent < 1000) return
-      const current = Object.values(list.getSnapshot().byId).find(s => (s.retainedBy.mainView ?? 0) > 0)
-      if (current === undefined) return
-      lastSent = now
-      const payload = encodeURIComponent(JSON.stringify(entry))
+    const relay = createErrorRelay({
+      currentSessionId: () => Object.values(list.getSnapshot().byId).find(s => (s.retainedBy.mainView ?? 0) > 0)?.id,
+      send: (sessionId, entry) => scoped.remote.commands.execute(sessionId, `/company-diagnostics client-error ${encodeURIComponent(JSON.stringify(entry))}`, []),
       // 落盘失败不再静默：只喊一次（console.warn 不进错误环，避免自激），开发者能在页面上看到。
-      void scoped.remote.commands.execute(current.id, `/company-diagnostics client-error ${payload}`, []).catch((error) => {
-        if (!reporterWarned) {
-          reporterWarned = true
-          console.warn(`company diagnostics 写入失败（错误仍在 __DSH_COMPANY_ERRORS__）：${String((error as Error)?.message ?? error)}`)
-        }
-      })
-    }
+      onSendError: (error) => {
+        if (reporterWarned) return
+        reporterWarned = true
+        console.warn(`company diagnostics 写入失败（错误仍在 __DSH_COMPANY_ERRORS__）：${String((error as Error)?.message ?? error)}`)
+      },
+    })
+    // 会话出现/切换时补送队列里排着的条目（首屏报错 → 开会话后仍能落盘）。
+    const unsubscribe = list.subscribe(() => relay.flush())
+    ctx.effect(() => () => { unsubscribe(); relay.dispose() })
+    errorReporter.current = (entry) => relay.push(entry)
   })
 
   // 驾驶舱①·「待办」：挂起项登记处（apply 闭包内创建——client 纪律禁模块级单例）。

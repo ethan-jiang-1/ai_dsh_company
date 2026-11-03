@@ -113,7 +113,7 @@ md5 tests/company/dag.spec.ts tests/company/cultivation-lib.spec.ts   # 修复�
 | D3 | A- | **A-** | 未动（无新增验收面） |
 | D4 | B | **B+** | 重复 spec 门禁 + 链接欠账棘轮（archived 32 / moved 0 / live 0，超基线即红）；残余 = 冻结层 32 条死链（只设天花板）、设计层现状声明仍靠人 |
 | D5 | B+ | **A-** | DAG spec 恢复（+20 例）、混合面类型洞收口、orient +2 例；F 批：`workspace-doors` 直接 spec（4 例，带造红）、`install-manual` 模板判据（4 例，零覆盖 → 有判据，含 lease 归属的回归守卫）、`catalog-wiring` 空断言改真行为、删掉 `expect(true)`；套件 1108 → 1116。残余 = 少量源码文本断言（CSS/装配面，刻意保留） |
-| D6 | B+ | **A-** | 首屏真页面/诊断入口、`--scenario` 按类型分派、`--help` 与未知参数 fail-loud；残余 = 客户端错误捕获条件性 |
+| D6 | B+ | **A-** | 首屏真页面/诊断入口、`--scenario` 按类型分派、`--help` 与未知参数 fail-loud；客户端错误改为有界队列中继（无会话排队、会话出现后补送、节流不再丢条目）；残余 = 「先抛错再开会话」的端到端时序未做探针 |
 | D7 | A- | **A-** | 安装=启动 profile、卸载残留披露；D7 两项已决并落地——「最近选择」真的写、lease 挪到 workspace 解析之后（无 workspace 零写含锁文件）；残余 = npm 未发布、market index 单版本（外部发布面） |
 
 **总评：A- / A- / A- / B+ / B+ / A- / A-。** 剩余两档 B+ 各自有明确批次（D4 = 冻结层天花板不动 + 设计层现状人工；

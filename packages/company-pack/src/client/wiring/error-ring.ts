@@ -163,3 +163,94 @@ export function installErrorCapture(target: ErrorCaptureTarget, ring?: ErrorRing
     global[ERROR_RING_KEY] = previous
   }
 }
+
+/**
+ * 错误上报中继（2026-11-03 第六轮 D6）：把「有当前会话才发、1s 节流」从一个**丢弃式闭包**改成
+ * 可测的队列——无当前会话时条目留在队列里，等会话出现（`sessions.list.subscribe` 触发 flush）再发；
+ * 节流窗口内到达的条目排队而不是被丢掉；队列有界（与错误环同上限）。
+ *
+ * 为什么：旧实现 `if (now - lastSent < 1000) return` + `if (current === undefined) return` 直接丢条目，
+ * 首屏（还没有任何会话）报的错永远到不了 `company-client-errors.log`——用户症状因此没有盘上证据。
+ * 证明边界：本模块不碰 DOM/远端；发送与定时器都靠注入，keyless 可判。
+ */
+export interface ErrorRelayOptions<Id = string> {
+  /** 当前应接收错误的会话 id（无会话返回 undefined）。 */
+  readonly currentSessionId: () => Id | undefined
+  /** 真实发送（client 侧 = remote.commands.execute）。返回 thenable 时失败进 onSendError。 */
+  readonly send: (sessionId: Id, entry: ClientErrorEntry) => unknown
+  /** 两条发送之间的最小间隔（默认 1000ms，防刷屏）。 */
+  readonly intervalMs?: number
+  /** 队列上限（默认 = 错误环上限 50；超出丢最旧）。 */
+  readonly maxPending?: number
+  readonly now?: () => number
+  readonly schedule?: (fn: () => void, ms: number) => unknown
+  readonly cancel?: (handle: unknown) => void
+  readonly onSendError?: (error: unknown) => void
+}
+
+/** 错误上报中继。 */
+export interface ErrorRelay {
+  readonly push: (entry: ClientErrorEntry) => void
+  readonly flush: () => void
+  readonly pending: () => number
+  readonly dispose: () => void
+}
+
+/** 建一个中继；无会话时排队，会话出现后按节流逐个送出。 */
+export function createErrorRelay<Id = string>(options: ErrorRelayOptions<Id>): ErrorRelay {
+  const interval = options.intervalMs ?? 1000
+  const maxPending = options.maxPending ?? ERROR_RING_LIMIT
+  const now = options.now ?? (() => Date.now())
+  const schedule = options.schedule ?? ((fn, ms) => setTimeout(fn, ms))
+  const cancel = options.cancel ?? (handle => clearTimeout(handle as ReturnType<typeof setTimeout>))
+  const queue: ClientErrorEntry[] = []
+  let lastSent = 0
+  let timer: unknown
+  let disposed = false
+
+  const clearTimer = () => {
+    if (timer === undefined) return
+    cancel(timer)
+    timer = undefined
+  }
+
+  const flush = () => {
+    if (disposed) return
+    clearTimer()
+    if (queue.length === 0) return
+    const sessionId = options.currentSessionId()
+    if (sessionId === undefined) return // 没有会话：留在队列里，等 subscribe 再 flush
+    const wait = interval - (now() - lastSent)
+    if (wait > 0) {
+      timer = schedule(() => { timer = undefined; flush() }, wait)
+      return
+    }
+    const entry = queue.shift()
+    if (entry === undefined) return
+    lastSent = now()
+    try {
+      const result = options.send(sessionId, entry)
+      if (result !== undefined && typeof (result as Promise<unknown>).catch === 'function') {
+        void (result as Promise<unknown>).catch(error => options.onSendError?.(error))
+      }
+    } catch (error) {
+      options.onSendError?.(error)
+    }
+    if (queue.length > 0) timer = schedule(() => { timer = undefined; flush() }, interval)
+  }
+
+  return {
+    push(entry) {
+      if (disposed) return
+      queue.push(entry)
+      while (queue.length > maxPending) queue.shift()
+      flush()
+    },
+    flush,
+    pending: () => queue.length,
+    dispose() {
+      disposed = true
+      clearTimer()
+    },
+  }
+}
