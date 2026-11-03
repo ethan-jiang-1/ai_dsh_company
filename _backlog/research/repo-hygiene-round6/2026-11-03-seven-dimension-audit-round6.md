@@ -49,8 +49,8 @@ intent: "第六轮七维打扫（2026-11-03）：fresh agent 独立复评七个�
 
 | R6-13 | D7 | **P1** | 安装 profile ≠ 启动 profile：Plugins 页装的是**当前 profile**（release-smoke ④c 实测装进 `web`），而 `README.md` / `packages/company-pack/README.md` / `docs/release.md` 把 `dsh --profile company` 写成唯一入口；`company` 不是出厂 profile，缺失时 DSH 直接报错。 | **已修**（README / profile.md / 安装手册模板按「装进哪个就启动哪个」改写） |
 | R6-14 | D7 | **P1** | 卸载残留清单不准：`<DSH_HOME>/company-pack.lock` 实际在 home 根（手册写在 `company/` 下）；`storages/workspace.json` 的登记行、`logs/company-client-errors.log`、浏览器 localStorage 键未列。DSH 无卸载清理钩子 ⇒ 唯一合规动作 = 精确披露。 | **已修**（模板表格 + 清理命令；`_dist` 手册待下次 `release --prepare` 再生） |
-| R6-15 | D7 | **P2** | `<DSH_HOME>/company/settings.json` 被 4 处文档写成 workspace 解析的一层，但生产端只读不写（写函数只有测试调用）——文档承诺了一个不会发生的便利。 | 待决（实现写侧 vs 删该层，见 §4） |
-| R6-16 | D7 | **P2** | `runtime-guard` 在 workspace 解析**之前**取 lease（写 `<DSH_HOME>/company-pack.lock`），与「无 workspace 时零写」表述相反；另 cwd 启发式会把任意「可用目录」当 workspace 自动写 `.dsh-company/`。 | 待决（属产品行为，需单独授权） |
+| R6-15 | D7 | **P2** | `<DSH_HOME>/company/settings.json` 被 4 处文档写成 workspace 解析的一层，但生产端只读不写——文档承诺了一个不会发生的便利。 | **已修**：实现写侧（内容未变不重写、写失败只告警）；Note = [workspace-choice-and-lease-order](../../../notes/implemented/2026-11-03-workspace-choice-and-lease-order.md) |
+| R6-16 | D7 | **P2** | `runtime-guard` 在 workspace 解析**之前**取 lease（写 `<DSH_HOME>/company-pack.lock`），与「无 workspace 时零写」表述相反；另 cwd 启发式会把任意「可用目录」当 workspace 自动写 `.dsh-company/`。 | **已修一半**：lease 挪到解析之后（无 workspace 不取锁）；cwd 启发式保留（产品行为，见 Note 的输掉的方案） |
 | R6-17 | D7 | **P3** | market index 只列 0.8.7 单版本、`publishTimestamp` = 生成时刻；参考生成器列全部已发布版本 + 真实发布时间。`_dist/market/index.json` 仍是 0.7.0（gitignored）。 | 外部发布面（未 publish，本轮不动） |
 
 ### P3 / 观察
@@ -114,7 +114,7 @@ md5 tests/company/dag.spec.ts tests/company/cultivation-lib.spec.ts   # 修复�
 | D4 | B | **B+** | 重复 spec 门禁 + 链接欠账棘轮（archived 32 / moved 0 / live 0，超基线即红）；残余 = 冻结层 32 条死链（只设天花板）、设计层现状声明仍靠人 |
 | D5 | B+ | **B+**（F 批首刀后更接近 A-） | DAG spec 恢复（+20 例）、混合面类型洞收口、orient +2 例；F 批首刀：`workspace-doors` 补直接 spec（4 例，含造红留证）、`catalog-wiring` 两条空断言改成真断言、删掉一条 `expect(true)` 同义反复；套件 1109 → 1112。残余 = 文本断言 / 其余无直接 spec 模块 |
 | D6 | B+ | **A-** | 首屏真页面/诊断入口、`--scenario` 按类型分派、`--help` 与未知参数 fail-loud；残余 = 客户端错误捕获条件性 |
-| D7 | A- | **A-** | 安装=启动 profile、卸载残留披露；残余 = npm 未发布、settings.json/lease 两项待决 |
+| D7 | A- | **A-** | 安装=启动 profile、卸载残留披露；D7 两项已决并落地——「最近选择」真的写、lease 挪到 workspace 解析之后（无 workspace 零写含锁文件）；残余 = npm 未发布、market index 单版本（外部发布面） |
 
 **总评：A- / A- / A- / B+ / B+ / A- / A-。** 剩余两档 B+ 各自有明确批次（D4 = 冻结层天花板不动 + 设计层现状人工；
 D5 = F 批测试质量）。下一轮优先级：F 批（测试质量）→ C 批余项（豁免区从"有天花板"到"定向清账"）→ `checks/` 与 `tools/` 的层次论证。

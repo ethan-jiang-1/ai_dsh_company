@@ -19,7 +19,7 @@ import { identityBackupPath, readBundleManifestState, type BundleManifestState }
 import { acquireCompanyLease } from './lease.ts'
 import { profilesWithCompanyPack } from './profiles.ts'
 import { canonicalPath } from './paths.ts'
-import { resolveWorkspace, type WorkspaceSource } from './workspace-resolution.ts'
+import { readSavedWorkspace, resolveWorkspace, writeSavedWorkspace, type WorkspaceSource } from './workspace-resolution.ts'
 
 /** 一次 apply 的运行前提（后续注册与自举都从这里取事实）。 */
 export interface CompanyRuntime {
@@ -44,22 +44,14 @@ function warn(ctx: Context, message: string): void {
 /** 解析并校验运行前提；告警直接落 logger/stderr，不抛错（停写由 dataBlocked 表达）。 */
 export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
   const dshHome = resolveDshHome()
-  const lease = acquireCompanyLease(dshHome)
   let dataBlocked = false
-  if (!lease.acquired) {
-    warn(ctx, `company-pack：${lease.reason}；公司数据已停写（DSH 会话仍可用），先关掉另一个 writer`)
-    dataBlocked = true
-  } else {
-    const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
-    if (typeof effect === 'function') effect.call(ctx, () => () => lease.release())
-  }
 
   const resolution = resolveWorkspace({ dshHome })
   if (resolution.workspace === undefined) {
     const why = resolution.source === 'env'
       ? (resolution.error ?? 'DSH_COMPANY_HOME 无效')
       : '未指定 workspace（DSH_COMPANY_HOME 为空，cwd 不是可用项目目录，也没有已保存选择）'
-    warn(ctx, `company-pack：${why}；本次不写 run bundle/身份/登记。`
+    warn(ctx, `company-pack：${why}；本次不写 run bundle/身份/登记，也不取 lease。`
       + '在项目目录执行 `dsh --profile company`、设 DSH_COMPANY_HOME，或从侧栏选择 workspace。')
     return {
       dshHome,
@@ -70,6 +62,29 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
       bundleState: undefined,
       hasWorkspace: false,
       ...(resolution.error === undefined ? {} : { resolutionError: resolution.error }),
+    }
+  }
+
+  // 有 workspace 才需要 writer 锁：没有 workspace 时本模块不写任何公司数据（「零写」含 lease 文件）。
+  // 2026-11-03 第六轮：此前 lease 在 workspace 解析之前取，无 workspace 也会在 home 根落锁文件，
+  // 与 README/profile 的「无 workspace 时零写」相反。
+  const lease = acquireCompanyLease(dshHome)
+  if (!lease.acquired) {
+    warn(ctx, `company-pack：${lease.reason}；公司数据已停写（DSH 会话仍可用），先关掉另一个 writer`)
+    dataBlocked = true
+  } else {
+    const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
+    if (typeof effect === 'function') effect.call(ctx, () => () => lease.release())
+  }
+
+  // 文档承诺的「最近选择」tier（README / profile / data-model）：解析到就记住，下次从别的 cwd 启动也能回到它。
+  // 只在 lease 到手（未被停写）且来源不是 saved 时写；内容未变不重写（避免每次启动 mtime 抖动）。
+  // 写失败只告警，不影响本次启动——便利设置不是启动前提。
+  if (lease.acquired && resolution.source !== 'saved') {
+    try {
+      if (readSavedWorkspace(dshHome).workspace !== resolution.workspace) writeSavedWorkspace(dshHome, resolution.workspace)
+    } catch (error) {
+      warn(ctx, `company-pack：记住最近 workspace 失败（不影响本次启动）：${String((error as { message?: string })?.message ?? error)}`)
     }
   }
 

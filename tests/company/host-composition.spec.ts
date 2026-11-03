@@ -171,7 +171,8 @@ describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）'
     await ctx.fiber.dispose()
     expect(existsSync(join(env.home, 'logs', 'company-client-errors.log'))).toBe(true)
     expect(existsSync(join(env.company, '.dsh-company/cultivation', 'client-errors.log'))).toBe(false)
-    const allowed = ['bundle.json', 'logs/', 'company-pack.lock', 'storages/', 'profiles/', 'sessions/', 'company-workspace/', 'company/identity/', 'company/ledger/']
+    // company/settings.json = 「最近选择」便利设置（2026-11-03 起真的会写；此前文档承诺但生产只读）。
+    const allowed = ['bundle.json', 'logs/', 'company-pack.lock', 'storages/', 'profiles/', 'sessions/', 'company-workspace/', 'company/identity/', 'company/ledger/', 'company/settings.json']
     const unexpected = walkFiles(env.home).filter(rel => !allowed.some(prefix => rel === prefix || rel.startsWith(prefix)))
     expect(unexpected).toEqual([])
   })

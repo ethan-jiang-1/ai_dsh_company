@@ -6,7 +6,7 @@
  * 本档用临时 home/workspace 跑真实 `prepareCompanyRuntime`：正常、坏 manifest、被占 lease、落点不存在。
  * **不主张**真 profile 装配与 DSH 会话（归 release-smoke / preset-smoke）。
  */
-import { mkdirSync, realpathSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { prepareCompanyRuntime } from '../../packages/company-pack/src/host/runtime-guard.ts'
@@ -63,6 +63,9 @@ describe('运行前提守卫：写盘决策（R5-07）', () => {
     expect(runtime.dataBlocked).toBe(false)
     expect(runtime.bundleState?.status).toBe('missing')
     expect(runtime.workspace).toBe(realpathSync(env.company))
+    // 2026-11-03 第六轮：文档承诺的「最近选择」tier 必须真的发生（此前生产只读不写）。
+    const saved = JSON.parse(readFileSync(join(env.home, 'company/settings.json'), 'utf8')) as { workspace: string }
+    expect(saved.workspace).toBe(realpathSync(env.company))
   })
 
   it('bundle.json 损坏：停写公司数据，但 workspace 仍解析出来（会话可用）', () => {
@@ -93,5 +96,8 @@ describe('运行前提守卫：写盘决策（R5-07）', () => {
     expect(runtime.hasWorkspace).toBe(false)
     expect(runtime.dataBlocked).toBe(true)
     expect(runtime.workspace).toBe('')
+    // 没有 workspace 就不写「最近选择」（零写在无 workspace 时仍成立）。
+    expect(existsSync(join(env.home, 'company/settings.json'))).toBe(false)
+    expect(existsSync(join(env.home, 'company-pack.lock')), '无 workspace 不取 lease（零写）').toBe(false)
   })
 })
