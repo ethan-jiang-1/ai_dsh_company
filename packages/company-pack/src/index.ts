@@ -24,11 +24,11 @@ import {
 } from './host/presented-ledger.ts'
 import { readCatalogState } from './host/catalog-state.ts'
 import { regenerateCatalog } from './host/catalog.ts'
+import { registerDeliverablesCommand } from './host/deliverables-command.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
 import { registerHandbook } from './host/handbook.ts'
 import { migrateLegacyMethodLayers } from './host/cultivation-storage.ts'
 import {
-  auditLedger,
   createPresentedLedgerStore,
   ensureLedger,
   type PresentedLedgerStore,
@@ -96,37 +96,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   registerHandbook(ctx, resolveContentDir(import.meta.url), hasWorkspace ? workspace : undefined)
   registerClientDiagnostics(ctx, runtime.dshHome)
 
-  ctx.commands.register({
-    name: 'deliverables',
-    description: '交付审计：把一条 final.md 的 presented 结论写入审计账本并重生成索引（人命令）',
-    input: { hint: 'audit .dsh-company/deliverables/<dir>/final.md true|false' },
-    handler: async ({ rawInput }: { readonly rawInput: string }) => {
-      if (dataBlocked) return { kind: 'error' as const, text: '公司数据已停写（无 workspace/身份/lease 问题）；先选 workspace 再审计。' }
-      const tokens = rawInput.trim().split(/\s+/).filter(token => token !== '')
-      if (tokens[0] !== 'audit' || tokens.length < 3) {
-        return { kind: 'error' as const, text: '用法：/deliverables audit .dsh-company/deliverables/<dir>/final.md true|false' }
-      }
-      const value = tokens[tokens.length - 1]
-      if (value !== 'true' && value !== 'false') {
-        return { kind: 'error' as const, text: `审计结论只认 true/false：${value ?? ''}` }
-      }
-      if (ledgerStorePromise === undefined) {
-        return { kind: 'error' as const, text: 'presented 账本未初始化（无 workspace）。' }
-      }
-      const path = tokens.slice(1, -1).join(' ')
-      const store = await ledgerStorePromise
-      const result = await auditLedger(workspace, store, path, value === 'true')
-      if (result.ledger === undefined) {
-        return { kind: 'error' as const, text: result.warning ?? '审计写入失败' }
-      }
-      regenerateCatalog(workspace, result.ledger)
-      exportNow(store)
-      return {
-        kind: 'success' as const,
-        text: `已审计 ${result.path ?? path} = ${value}（presented 账本 = ${store.kind}；索引已重生成）。`,
-      }
-    },
-  })
+  registerDeliverablesCommand(ctx, { dataBlocked, workspace, ledgerStorePromise, exportNow })
 
   ctx.on('api-session/added', (summary) => {
     if (summary.origin === 'subagent') return
