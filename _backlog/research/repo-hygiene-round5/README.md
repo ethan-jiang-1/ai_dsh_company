@@ -18,3 +18,4 @@ opened: 2026-11-03
 | [2026-11-03-seven-dimension-audit.md](2026-11-03-seven-dimension-audit.md) | 七维评分、分级发现、与第四轮的关系、建议批次、实跑读数（含 2026-11-03 复评追记） | 2026-11-03 |
 | [2026-11-03-notes-consistency.md](2026-11-03-notes-consistency.md) | D4 高腐化面的 notes 分诊（分类、已执行处方、残余） | 2026-11-03 |
 | [2026-11-03-fresh-recheck.md](2026-11-03-fresh-recheck.md) | Phase 0–4 后的七维复评：当前分、证据、剩余边界 | 2026-11-03 |
+| [2026-11-03-orphan-triage.md](2026-11-03-orphan-triage.md) | 零入链 76 篇全量分诊：59 决策 / 17 收据候选，结论不批量迁 | 2026-11-03 |
