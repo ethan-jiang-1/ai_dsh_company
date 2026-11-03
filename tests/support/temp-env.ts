@@ -30,6 +30,9 @@ export function createTempEnv(prefix: string): TempEnv {
   const dir = makeTempDir(prefix)
   const saved = new Map<string, string | undefined>()
   let cleaned = false
+  // 测试进程的 env 是完整 NodeJS.ProcessEnv；client 构建面把 process.env 收窄成 DSH_CLIENT_*，
+  // 这里显式回宽，避免 test project 用 client 类型时任意 key 索引报 TS7053（2026-11-03）。
+  const env = process.env as Record<string, string | undefined>
   return {
     dir,
     home: join(dir, 'home'),
@@ -37,17 +40,17 @@ export function createTempEnv(prefix: string): TempEnv {
     workspace: join(dir, 'workspace'),
     set(vars) {
       for (const [key, value] of Object.entries(vars)) {
-        if (!saved.has(key)) saved.set(key, process.env[key])
-        if (value === undefined) delete process.env[key]
-        else process.env[key] = value
+        if (!saved.has(key)) saved.set(key, env[key])
+        if (value === undefined) delete env[key]
+        else env[key] = value
       }
     },
     cleanup() {
       if (cleaned) return
       cleaned = true
       for (const [key, value] of saved) {
-        if (value === undefined) delete process.env[key]
-        else process.env[key] = value
+        if (value === undefined) delete env[key]
+        else env[key] = value
       }
       rmSync(dir, { recursive: true, force: true })
     },
