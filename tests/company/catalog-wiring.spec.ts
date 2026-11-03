@@ -80,17 +80,27 @@ describe('host catalog wiring', () => {
   })
 
   it('domain 可用时走 domain，按 workspace key 分区；模型写 workspace 文件不改权威', async () => {
-    const { ctx, records } = fakeCtx({ domain: true })
+    const { ctx, records, listeners } = fakeCtx({ domain: true })
     apply(ctx as never)
     await waitFor(() => records.has(ledgerKey(canonicalPath(workspace))))
     expect(records.get(ledgerKey(canonicalPath(workspace)))).toMatchObject({ workspace: canonicalPath(workspace), paths: {} })
     const before = JSON.parse(readFileSync(catalogPath(workspace), 'utf8')) as { entries: { presented: boolean | null }[] }
     expect(before.entries[0]?.presented).toBeNull()
 
-    for (const listener of (ctx as unknown as { on: unknown }).on ? [] : []) void listener
-    // present via a direct session/event listener captured by apply
-    const listeners = (ctx as unknown as { listeners?: unknown }).listeners
-    void listeners
+    // 模型/外部直接往盘上写一份成品目录（不经 present）：盘上出现 ≠ 成品。
+    // 权威只来自 present 事件 + domain 账本；索引重生成后，多出来的目录只能是「未核」（null）。
+    mkdirSync(join(workspace, RUN_BUNDLE_PATHS.deliverables, '2026-10-26-model'), { recursive: true })
+    writeFileSync(join(workspace, RUN_BUNDLE_PATHS.deliverables, '2026-10-26-model/final.md'), '# model wrote this\n')
+    for (const listener of listeners.get('session/event') ?? []) {
+      listener({}, { type: 'deliverables/presented', data: { files: [{ path: join(workspace, rel) }] } })
+    }
+    await waitFor(() => {
+      const current = JSON.parse(readFileSync(catalogPath(workspace), 'utf8')) as { entries: { presented: boolean | null }[] }
+      return current.entries.some(entry => entry.presented === true)
+    })
+    const after = JSON.parse(readFileSync(catalogPath(workspace), 'utf8')) as { entries: { dir: string; presented: boolean | null }[] }
+    expect(after.entries.find(entry => entry.dir === '2026-10-25-alpha')?.presented).toBe(true)
+    expect(after.entries.find(entry => entry.dir === '2026-10-26-model')?.presented).toBeNull()
   })
 
   it('host guard：session cwd 不在 workspace → 告警；子目录 → 提示用根', () => {

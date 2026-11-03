@@ -294,9 +294,7 @@ describe('派活行的「假设」段（BUG-011 的机械兜底，2026-10-11）'
     expect(parsed[0]!.assumption).toBeUndefined()
   })
 
-  it('手动验证红配方：删掉解析里的假设捕获 ⇒ 第一条断言转红', () => {
-    // 红配方写在这里，改解析时照着跑：注释掉 ASSIGN_LINE 的 `(?:｜假设：([^｜]*))?` 与
-    // parseAssignments 的 assumption 字段 ⇒ 上面第一条 `assumption` 断言失败。
-    expect(true).toBe(true)
-  })
+  // 红配方（不设 `expect(true)` 空断言占位——空断言不是证据，配方本身写在判据旁边即可）：
+  // 注释掉 ASSIGN_LINE 的 `(?:｜假设：([^｜]*))?` 与 parseAssignments 的 assumption 字段
+  // ⇒ 上面第一条 `assumption` 断言转红。
 })

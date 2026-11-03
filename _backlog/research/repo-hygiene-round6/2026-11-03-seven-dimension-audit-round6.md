@@ -112,7 +112,7 @@ md5 tests/company/dag.spec.ts tests/company/cultivation-lib.spec.ts   # 修复�
 | D2 | B+ | **A-** | `src/client` 41 → 1 入口 + 5 关切目录；`tests/client` 48 → 根 1 + 五组镜像；0 环仍成立；残余 = `checks/gates` 53 / `tools/lib` 48 / `tests/harness` 53 仍平铺（单独论证，未动） |
 | D3 | A- | **A-** | 未动（无新增验收面） |
 | D4 | B | **B+** | 重复 spec 门禁 + 链接欠账棘轮（archived 32 / moved 0 / live 0，超基线即红）；残余 = 冻结层 32 条死链（只设天花板）、设计层现状声明仍靠人 |
-| D5 | B+ | **B+** | DAG spec 恢复（+20 例）、混合面类型洞收口、orient +2 例；残余 = 文本断言 / 同义反复 / 18 模块无直接 spec（F 批） |
+| D5 | B+ | **B+**（F 批首刀后更接近 A-） | DAG spec 恢复（+20 例）、混合面类型洞收口、orient +2 例；F 批首刀：`workspace-doors` 补直接 spec（4 例，含造红留证）、`catalog-wiring` 两条空断言改成真断言、删掉一条 `expect(true)` 同义反复；套件 1109 → 1112。残余 = 文本断言 / 其余无直接 spec 模块 |
 | D6 | B+ | **A-** | 首屏真页面/诊断入口、`--scenario` 按类型分派、`--help` 与未知参数 fail-loud；残余 = 客户端错误捕获条件性 |
 | D7 | A- | **A-** | 安装=启动 profile、卸载残留披露；残余 = npm 未发布、settings.json/lease 两项待决 |
 
