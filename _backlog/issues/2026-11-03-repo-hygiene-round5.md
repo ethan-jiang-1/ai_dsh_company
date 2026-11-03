@@ -15,7 +15,7 @@ opened: 2026-11-03
 
 **未决问题：** 本轮（fresh 复评）未收：D4 语义腐化（workflow 幽灵能力、dev 符号链接四篇、安装手册 src/**、CHANGELOG 过程证据、台账 D 号）与 Note 67 篇零入链；D2/D5 的 CompanyView 死代码、workspace-resolution 直测、tests 类型检查；D1 的 dev-loop 重定向壳与 preset 验证表重复；D6 的 plain dsh tee / 页面错误→host log 端到端；D7 的 npm publish（本机无认证）与 master 0.4.6 落后 54 提交。外部决策 = npm publish / master 合并 / Desktop 验收。
 
-**下一步：** 无自动推进项；等用户 review A- 收口与 0.8.2（breaking 0.8.0 的公开面收窄需重点看）。
+**下一步：** Phase 0（发布真伪/coverage/托管 guard）、Phase 1（合同与实现对齐）、Phase 2（CompanyView/workspace-resolution/导出面/测试归区）已落地并 push；master 已 ff 到 `4ef518e`、`0.8.2` tag 已推。剩余 = Phase 3（D6 plain dsh tee / 页面错误→host log 端到端；D7 npm publish 仍无认证）、Phase 4（关键模块覆盖阈值、tests 进 tsc 的两面工程、pre-push 加 typecheck、notes 语义审计），以及 D1 dev-loop 重定向壳 / `_dist` 手册 `src/**` 行 / 4 篇 Note 静默腐化。
 
 ## 已落地（批次 A，2026-11-03）
 
