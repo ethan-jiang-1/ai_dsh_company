@@ -2,6 +2,14 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.8.4 — 2026-11-03
+
+### Fixed
+
+- 客户端错误留痕：`/company-diagnostics client-error` 现在能正确处理命令名后的前导空白
+  （vendor `parseCommand` 的真实形状）。此前页面错误进错误环但写不进
+  `$DSH_HOME/logs/company-client-errors.log`；现在无需手动命令即可留痕（token 仍脱敏）。
+
 ## 0.8.3 — 2026-11-03
 
 ### Changed
