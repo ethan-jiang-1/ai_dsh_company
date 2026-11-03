@@ -17,6 +17,9 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { UseProjection } from '@deepseek-ai/dsh-api-session-controller/client'
 import type {} from '@deepseek-ai/dsh-session-stats/client'
 import type {} from '@deepseek-ai/dsh-token-meter/client'
+// `agentTeam` 是 agent-team 通过 module augmentation 加进 SessionProjectionMap 的；不引这个 type
+// 时 `useSessions` 的 store 快照与本地 SessionsStoreLike 结构不兼容（2026-11-03 client test project 现场）。
+import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
 import { boardColumns, tasksFromTeamView, type BoardColumn, type TaskRow } from '../lib/board.ts'
 import { budgetSummary, type BudgetSummary } from '../lib/budget.ts'
 import { layoutDag, type DagLayout } from '../lib/dag.ts'
