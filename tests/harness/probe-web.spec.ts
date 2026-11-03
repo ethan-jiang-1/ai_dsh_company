@@ -15,7 +15,7 @@ import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.m
 
 /** 假 child：可写 stdout/stderr 的 EventEmitter，带 kill。 */
 function fakeChild() {
-  const child = new EventEmitter()
+  const child: any = new EventEmitter()
   child.stdout = new EventEmitter()
   child.stderr = new EventEmitter()
   child.exitCode = null
@@ -26,10 +26,10 @@ function fakeChild() {
 
 /** 假 spawn：记录调用，返回一个可被手动喂 banner 的 child。 */
 function fakeSpawn() {
-  const calls = []
+  const calls: any[] = []
   const child = fakeChild()
-  const spawn = vi.fn((...args) => { calls.push(args); return child })
-  return { spawn, calls, child, emit: text => child.stdout.emit('data', text) }
+  const spawn = vi.fn((...args: any[]) => { calls.push(args); return child })
+  return { spawn, calls, child, emit: (text: string) => child.stdout.emit('data', text) }
 }
 
 const BANNER = 'dsh web: http://127.0.0.1:43219/?token=TOKEN-abc_123\n'
@@ -122,7 +122,7 @@ describe('startWeb：进程参数与 banner 解析', () => {
   it('boot 失败时错误消息带输出尾部；onOutput 能收到同一段（可落 web.log）', async () => {
     const { spawn, child, emit } = fakeSpawn()
     const chunks: string[] = []
-    const started = startWeb({ spawn, root: '/repo', home: '/repo/h', port: 0, onOutput: text => { chunks.push(text) } })
+    const started = startWeb({ spawn, root: '/repo', home: '/repo/h', port: 0, onOutput: (text: string) => { chunks.push(text) } })
     emit('mount failed: boom\n')
     child.emit('exit', 3)
     await expect(started).rejects.toThrow(/mount failed: boom/)
@@ -168,7 +168,7 @@ describe('companyCookie：token 交换', () => {
 
 describe('companyRpc：请求形状', () => {
   it('请求体是 client-request，rpcId 前缀由调用方传入并自增', async () => {
-    const bodies = []
+    const bodies: any[] = []
     const fetchImpl = vi.fn(async (url, init) => {
       bodies.push({ url, body: JSON.parse(init.body) })
       return { json: async () => ({ result: { ok: true, value: { v: 1 } } }) }
@@ -185,7 +185,7 @@ describe('companyRpc：请求形状', () => {
   })
 
   it('默认不给请求加超时信号（调用方要就自己传）', async () => {
-    const seen = []
+    const seen: any[] = []
     const fetchImpl = vi.fn(async (url, init) => {
       seen.push(init.signal)
       return { json: async () => ({ result: { ok: true, value: null } }) }
@@ -209,7 +209,7 @@ describe('companyRpc：请求形状', () => {
   })
 
   it('共享 counter：两次造出的 rpc 沿用同一条编号序列（team-recovery 重启后不重置）', async () => {
-    const ids = []
+    const ids: any[] = []
     const fetchImpl = vi.fn(async (url, init) => {
       ids.push(JSON.parse(init.body).rpcId)
       return { json: async () => ({ result: { ok: true, value: null } }) }

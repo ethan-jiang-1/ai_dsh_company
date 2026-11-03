@@ -4,7 +4,7 @@
 
 > 上游 = [tests/client 进 tsc](./2026-11-03-client-test-typecheck.md) /
 > [tests/company 进 tsc](./2026-11-03-company-test-typecheck.md)。
-> harness 全量严格 192 / 非严格 118 errors；本轮只收 18 个判据型 spec（17→0），其余宽松测试仍未。
+> harness 全量严格 192 / 非严格 118 errors；本轮只收 19 个判据型 spec（17→0），其余宽松测试仍未。
 
 ## 决定
 
@@ -27,9 +27,10 @@
   - `claim-loser-evidence`（认领竞争判据）
   - `question-stop`（问询阻塞判据）
   - `entry-probe`（入口语义探针判据）
+  - `probe-web`（web 启动/RPC 探针假件）
   - `tests/support/temp-env.ts`
 - `pnpm typecheck` 四段：pack + client + company + harness 子集；`.githooks/pre-push` 四行同步。
-- 六批共修正 84 处类型面：`market-index` 回调参数、`navigation-assets` 的 `m[1]!`、`notes-audit` 的 `note(file: string, body: string)`、`release-foundation` 的 `observedPaths as never[]`、`snapshots-budget` 的 `bytesOf`/`hit.map` 标注。
+- 七批共修正 104 处类型面：`market-index` 回调参数、`navigation-assets` 的 `m[1]!`、`notes-audit` 的 `note(file: string, body: string)`、`release-foundation` 的 `observedPaths as never[]`、`snapshots-budget` 的 `bytesOf`/`hit.map` 标注。
 
 ## 输掉的方案
 
@@ -40,7 +41,7 @@
 ## 验证（实跑，2026-11-03 13:3x +08）
 
 ```text
-tsc -p tsconfig.test-harness.json   # 0 errors（起始 17 + 10 + 18 + 6 + 20 + 13）
+tsc -p tsconfig.test-harness.json   # 0 errors（起始 17 + 10 + 18 + 6 + 20 + 13 + 20）
 pnpm typecheck                      # exit 0（pack + client + company + harness 子集）
 pnpm test                           # 139 files / 1108 tests
 pnpm verify                         # ALL PASS
