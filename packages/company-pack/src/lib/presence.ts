@@ -3,9 +3,9 @@
 // 本文件管**折算**：事件 / 快照 → 板（行与动态）；读取的 wire 结构与板形状类型也在这里。
 // 状态与显示名词汇（`PresenceStatus` / `STATUS_LABEL` / `presenceStatusFromPhase` /
 // `statusLabelFor` / `PRESET_DISPLAY_NAMES` / `displayNameFor`）住 ./presence-status.ts，
-// 由本文件**再导出**——所以 `export * from './lib/presence.ts'`（src/index.ts）与各 client
-// importer 的取用面一个字节都不变（2026-10-16 第三轮结构收敛：facade 拆法，见
-// notes/implemented/2026-10-16-presence-status-seam.md）。
+// 由本文件**再导出**——各 client importer 的取用面一个字节都不变（2026-10-16 第三轮结构收敛：
+// facade 拆法，见 notes/implemented/2026-10-16-presence-status-seam.md）。根入口 0.8.0 起不再
+// `export *`（公开面收窄为 apply/inject），这里的再导出只服务包内相对 import。
 // 依赖方向单向：本文件 → presence-status.ts（后者零 import，是叶子）。
 import {
   PRESET_DISPLAY_NAMES,

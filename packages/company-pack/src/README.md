@@ -6,7 +6,7 @@
 - `index.ts` —— **host 注册入口**（bundle 行 `company-client` 指向它）：`inject = ['tools','approval','commands']`
   声明依赖、`apply(ctx)` 编排签字工具（`request_signoff`）、工作区门投影工具（`workspace_doors`）、培养工具/命令
   （接线在 `host/cultivation.ts`）、公司盘首启自举（接线在 `host/bootstrap.ts`）与成品目录生成/present 投影
-  （接线在 `host/catalog.ts`），并再导出共享读模型。消费方向 = vendor runtime → 本入口。
+  （接线在 `host/catalog.ts`）；公开面只导出 loader 需要的 `apply`/`inject`（0.8.0 收窄，读模型走内部 import）。消费方向 = vendor runtime → 本入口。
 - `host/` —— **host-only 逻辑**（用 node 内建，浏览器面不许进）：`bootstrap.ts` 负责公司盘骨架首启自举
   （只补缺 / 不抛 / 可重入）；`catalog.ts` 扫描成品 meta/final、按 present 事件投影并幂等写
   `kb/deliverables-index.json`；`cultivation.ts` 负责培养提案工具与人侧 `/cultivation` 命令语义；
@@ -29,5 +29,5 @@
 
 **构建**：`tsc -b packages/company-pack` + tsdown 两面（事实家 = [bootstrap](../../../docs/guides/bootstrap.md)）。
 ⚠ 本目录**不进 tarball**（`files` 的现行清单 = [package.json](../package.json)：只发 runtime 两半、
-`presets/**`、`content/**`、`locale/`、`icon.svg`、`cordis.patch.yml`、`LICENSE`，不发 `src/**` 与 `workspace/**`）
+`presets/**`、`content/**`、`locale/`、`icon.svg`、`cordis.patch.yml`、`LICENSE`，不发 `src/**`（v3 起也没有 `workspace/**`））
 ——发布面是 `lib/`（generated，owner 表 = [pack README](../README.md)）。

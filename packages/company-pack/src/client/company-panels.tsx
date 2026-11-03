@@ -1,5 +1,5 @@
 /**
- * 公司视图的四个面板（条目 ① S1）：**纯展示**——数据在 `CompanyView` 折好，这里只画。
+ * 公司视图的四个面板（条目 ① S1）：**纯展示**——数据由各页签容器（`company-tabs` / `TasksPanel` / `DeliverablesTab`）折好，这里只画。
  *
  * 视觉纪律：颜色一律 `--dsw-*` 令牌；状态用官方 `StateDot`/`Tag`（platform module，零体积）；
  * DAG 是自绘 SVG（平台无 mermaid / 图表渲染器，研究 §1.5）。

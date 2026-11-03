@@ -6,7 +6,7 @@
  * 流水线；接上它要复刻 vendor 的 CSS 插件链（`packages/client/tsdown.client.ts:502-557`），
  * 收益不抵风险。样式量增长到确需作用域隔离时再回头接。
  *
- * 纪律：颜色一律走平台令牌 `--dsw-*`（`docs/web-styling.md:11,17-18` 禁 feature 包写字面颜色）；
+ * 纪律：颜色一律走平台令牌 `--dsw-*`（`vendor/dsh/docs/web-styling.md:11,17-18` 禁 feature 包写字面颜色）；
  * 动效复用 `--ds-ease-in-out` / `--ds-transition-duration[-fast|-slow]`，并给
  * `prefers-reduced-motion: reduce` 回退（官方惯例，vendor 内 28 个样式表已这么做）。
  */

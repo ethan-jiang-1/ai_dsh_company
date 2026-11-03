@@ -4,7 +4,7 @@
 > 承接 [architecture.md](./architecture.md) 与
 > [roles-isolation.md](./roles-isolation.md)；总入口 [index.md](../index.md)。
 > 本篇回答：demo 要"看见他们协调"，DSH Web UI 给到哪一层、我们自己要写哪一层。
-> 依据：`docs/subsystems/{client-modules,slots,sidebar-right,web-client}.md`、
+> 依据：`vendor/dsh/docs/subsystems/{client-modules,slots,sidebar-right,web-client}.md`、
 > `packages/experimental/client-ui-agent-team/`（官方范本，逐行读过）、
 > `packages/client/ui-deliverables/`、FAQ 13 决策 4、FAQ 12（Web 缓存坑）。
 
@@ -46,7 +46,7 @@ demo 叙事与这套 UI 的对应：**事情从 CEO 出来** = 在 CEO 会话里
 
 ## 2. 第 1 层 · 自定义"公司皮肤"（同一个 pack 的 client 面）
 
-Web Client 的扩展系统是**类型化 React 槽位**（`docs/subsystems/slots.md`）：
+Web Client 的扩展系统是**类型化 React 槽位**（`vendor/dsh/docs/subsystems/slots.md`）：
 feature 插件经 `ctx.slots.register()` 贡献 UI，绝不 import 别的 feature 包的运行时。
 公司视图不装社区任务板或图库：那些包不读官方 team 数据，git 安装还会在沙箱外跑 prepare。零依赖 SVG/CSS 够用；图真变大再按采用度另议。
 shipped 槽位树里我们值得占的位置：
@@ -67,7 +67,7 @@ shipped 槽位树里我们值得占的位置：
   （依据 = `ui-sidebar-right/src/client/tab-registry.ts:48-58` + `ui-slots/src/index.ts:526-527,834-837`）。
 - **数据面走 Remote API，不走文件**：官方团队 UI 的 `mount.ts` 就是范本——
   `ctx.remote.$mount(contribution)` 挂载生成的 Remote stub，组件里经它拉权威状态。我们的 host 插件
-  同样可以用 `@Remote(...)` 暴露自己的读模型（范本 = 本包的 `companyDash`，见 `src/client/use-company-data.ts`），
+  同样可以把读模型做成声明式拉取（本包范本 = `useCompanyData`，见 `src/client/use-company-data.ts`），
   浏览器端零轮询逻辑、纯声明式拉取。UI 域之间只传 JSON + 回调（slots 纪律）。
   ⚠ **团队态在 0.1.7 不再走 RPC**：`remote.agentTeams` 随 agent-team 的 `./remote` 导出整体移除，
   改读 Lead 会话的 `agentTeam` **投影**（`session/projections`）。
@@ -108,7 +108,7 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 
 - **client 构建链**：tsdown 把 `src/client/` 打成 **`lib/client.js`**（不是 `dist/`），
   `exports["./client"]` 指向它。dev 时 `dsh-client-hmr` stat-poll bundle → SSE 推送，
-  改了重建即可热更，不用重启（机制见 `docs/subsystems/client-modules.md` §The service）。
+  改了重建即可热更，不用重启（机制见 `vendor/dsh/docs/subsystems/client-modules.md` §The service）。
 - **双 home 纪律不变**：Web 开发也跑在 `DSH_HOME=<repo>/runtime/harness-home` 的
   `company` profile 上，别碰日用 home。
 - **FAQ 12 的坑要背**：dsh web 多开窗口第 4 个卡住 = rev 轮换 + 陈旧缓存 index（动态模块

@@ -22,10 +22,10 @@
 | D14 | 显示名 `<公司名> <角色>` 序列化；preset id 保持 kebab；公司名现行 = 梦之队（D41） | [wochen-naming](../notes/archived/2026-09-22-wochen-naming.md) |
 | D15 | 完成定义 = 该面最小「真检查」通过；发现权在代理一侧不在人 | [agent-workflow-community-practice](../notes/archived/2026-09-22-agent-workflow-community-practice.md) |
 | D16 | 角色模型路由 = 全员同模型（不写 `agentOptions`） | [presets](./presets.md)；[tests/presets](../tests/presets/presets.spec.ts) |
-| D17 | 公司事实全部留 workspace 活数据；pack 不含公司事实 | [presets](./presets.md)；[pack workspace](../packages/company-pack/content/)（dev 盘 = `company-workspace/`，gitignored） |
+| D17 | 公司事实全部留 workspace 活数据；pack 不含公司事实（**出厂样例除外**——`content/state` 与 `charters` 是首启只补缺的默认值，不是活数据） | [presets](./presets.md)；[pack content](../packages/company-pack/content/)（dev 盘 = `company-workspace/`，gitignored） |
 | D18 | CEO 命名委托不承担续驶（0.2.1 起每次调用 = activation，终稿走完成通知）；续驶归 team；CEO preset 不放全局控制行 | [delegation](./delegation.md) |
-| D19+D21 | R5 拆轮 + 搁置池准入 **历史**：轮次制已由 D23/D24 退役，整池已随 D32 退役 | [_misc/suspended.md](../_backlog/_archive/legacy/suspended.md) |
 | D20 | 交付物三态判据：成品 = Lead 的 `present`；比对按 slug+角色身份不按路径 | [r4-workshop-flow](../notes/archived/2026-09-22-r4-workshop-flow.md) |
+| D19+D21 | R5 拆轮 + 搁置池准入 **历史**：轮次制已由 D23/D24 退役，整池已随 D32 退役 | [_misc/suspended.md](../_backlog/_archive/legacy/suspended.md) |
 | D22 | 在场板主键 = team roster；冷启动 = 读 `agentTeam` 投影推送（历史：拉式 RPC + 5s 轮询，0.1.7 起退役） | [org-presence-board](../notes/archived/2026-09-22-org-presence-board.md) |
 | D23+D24 | 开发流条目制 **历史**：队列 owner ROADMAP.md 已由 D32 退役 | [roadmap-retirement](../notes/archived/2026-09-28-roadmap-retirement.md) |
 | D25 | 培养 = 改 `presets/<role>/`（生效边界按面）；学习 = journal 唯一载体（2026-10-13 扩三面 → D43） | [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) |
@@ -57,6 +57,6 @@
 | D51 | 插件即产品：`company` profile + workspace 自持 run bundle（v2 形状被 D52 取代；方法层/账本留 host 沿用） | [v2 manifest Note](../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md) · [_backlog 伞卡](../_backlog/_archive/settled_issues/2026-11-01-plugin-as-product.md) |
 | D52 | 插件即产品 v3：DSH-native 入口；无 launcher；内容在包；run bundle 与账本按 workspace 分区 | [v3 Note](../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md) · [v3 卡](../_backlog/_archive/settled_issues/2026-11-01-plugin-as-product-v3.md) |
 | D53 | 会话检索 = bundle 内 insert + isolate 独立 provider 组；不替换 host 行（默认 in-app 安装约束） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |
-| D54 | 发布姿态 = MIT + npm 身份齐全 + 市场 index handoff；npm publish 仍人工（D6） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |
+| D54 | 发布姿态 = MIT + npm 身份 + 市场 index 交接；npm publish 仍人工（[publish-handoff](./guides/publish-handoff.md)） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |
 | D55 | 发行版六轴与术语对齐：公司状态/run trace；发布字节装 `_dist`、sourceFingerprint；docs-first legacy 名 | [distribution-alignment Note](../notes/implemented/2026-11-02-distribution-alignment.md) |
 | D56 | backlog 五道门：issue `待落地`、研究题名页 `调研中/已定性`、去向封闭集与审查记录、门票由门禁钉住；不加 `落地中/待审` | [five-gates Note](../notes/implemented/2026-11-02-backlog-five-gates.md) |

@@ -39,7 +39,7 @@
    `present`），跑在真盘会安静积污（实测删过 15 份）；验收判据 = 新默认跑一次探针后
    `git status --porcelain` **无新增**（bundle 整树 gitignored，不进 git）且
    `find company-workspace -type f | wc -l` 与跑前一致（ignored 的本地过程稿也要看，否则这层会漏成“零改动”）。
-   排练场里手册是指向真盘的**符号链接**（注入基线不变），
+   排练场不建手册副本或符号链接；手册由 host 从 pack `content/` 注入（与真盘同一份基线），
    CHARTER/org/templates 每次刷新，**journal 不镜像**（排练记忆不混真记忆）；`snapshot-motion` /
    `deliverables-check` 默认仍指真盘——归档与审计本来就属于运行场。
 9. **沙箱后端探测**：`env.sh` 实跑一次 `sandbox-exec` 探测，**不可用则自动导出 `DSH_PERMISSION_MODE=danger-full-access`**

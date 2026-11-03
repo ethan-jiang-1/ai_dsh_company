@@ -5,7 +5,7 @@
 > 或 UI 静默失败要拿真实错误时。2026-10-12 自 dev-loop §8 整节迁出（常驻层瘦身轮；dev-loop §8
 > 留指针、节号防断链）。
 
-preset 只在 Web 面挂载（§2 第 3.6 层），所以**验证角色行为必须驱动 Web 面**：
+preset 只在 Web 面挂载（[debugging §3.6](./debugging.md) 的层），所以**验证角色行为必须驱动 Web 面**：
 
 ```sh
 # ① token → cookie（cookie 按 origin 隔离：换端口/换实例都要重新换一次；3081 = 示例值，端口是环境状态、从启动横幅读）

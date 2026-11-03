@@ -4,7 +4,7 @@
 > 总入口 = [index.md](../index.md)；决策台账 = [decisions.md](../decisions.md)。
 > 依据：FAQ 13（`_faq_on_digested/13_expert-plugin-repo-organization`）+ DSH 源码工作树逐条核实
 > （`packages/preset/*`、`packages/subagent/*`、`packages/experimental/agent-team/*`、`packages/workflow/*`、
-> `docs/subsystems/{agent-team,subagent,skills,workflow,spill}.md`）。
+> `vendor/dsh/docs/subsystems/{agent-team,subagent,skills,workflow,spill}.md`）。
 > 性质：设计层——只保留仍指导未来选择的机制依据（为什么选 A 不选 B）；已落地的现在时语义归
 > docs 顶层合同，单次决策归 `notes/`（分层规矩唯一家 = [docs/AGENTS.md](../AGENTS.md)）。
 
@@ -32,7 +32,7 @@
 | profile / patch | `$DSH_HOME/profiles/<p>` | 部署级组合选择 | 开发用 `web` profile（共享行 + team 行 + registry 行）；`company` profile 已退役 |
 | **agent preset** | 一个目录一个 `agent.cordis.yml` | **一个会话**挂什么（工具/prompt sections/skills/persona） | **每个角色一个 preset** |
 
-依据：`docs/architecture.md` 的组合链（package → bundle → profile/patch → app 启动 Loader）；
+依据：`vendor/dsh/docs/architecture.md` 的组合链（package → bundle → profile/patch → app 启动 Loader）；
 `packages/preset/README.md`（"a session composed from a preset runs that preset's tools, prompt
 sections, and skills while every other session keeps its own"）。
 
@@ -47,7 +47,7 @@ sections, and skills while every other session keeps its own"）。
 - **persona**（`packages/preset/persona`）：`prefix`/`suffix` 是模板；`complete: true` 让整个
   system prompt 只剩 persona；`includeRuntimeContext: false` 连运行时上下文快照都关掉。
   只能挂在 preset 组合内（全局挂会与 prompt registry 的部署 persona 冲突、fail loud）。
-- **skills 硬隔离**（`docs/subsystems/skills.md`）：registry 是 host + per-scope 分层，
+- **skills 硬隔离**（`vendor/dsh/docs/subsystems/skills.md`）：registry 是 host + per-scope 分层，
   "a plugin mounted by an agent preset's standing composition lands in that preset's layer"，
   读时合并 scope 链、最近层同名直接赢。→ CEO preset 挂 CEO skills 目录，VP preset 挂 VP
   skills 目录，**互不可见**，这正是"每个角色有自己的 skill、单独隔离"的官方载体。
@@ -97,7 +97,7 @@ teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱�
 - @deepseek-ai/dsh-session-persistence-jsonl  # team 激活前提
 - @deepseek-ai/dsh-experimental-agent-team       # M4 域服务（或直接装 agent-team-profile）
 - @deepseek-ai/dsh-experimental-tool-agent-team  # M4 九个工具
-- @deepseek-ai/dsh-workflow-worker-thread + dsh-tool-workflow  # CEO 的流水线（可选）
+# workflow 行已于 0.8.0 退役（pack 三源零引用；见 delegation.md §4.4）
 # 各角色 preset 内的行（按角色选配）
 - @deepseek-ai/dsh-persona               # 每角色一行（人格）
 - @deepseek-ai/dsh-skill-filesystem + dsh-tool-skill  # 角色 skills 目录进自己的 layer
@@ -107,12 +107,12 @@ teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱�
 
 ---
 
-## 3. 协作通道盘点：DSH 已经给了四条，选着用
+## 3. 协作通道盘点：DSH 已经给了四条，选着用（通道 D 已退役）
 
 > 术语约定：本节按**机制**分四条通道（A–D）；[roles-isolation.md](./roles-isolation.md) §3
 > 按**用法**分四种编排（M1–M4）。映射：M1 人中继＝多会话直用机制；M2 隔离委托＝通道 A 的
-> 自定义 provider 强化版；M3 SDK 编排＝通道 C；M4 团队＝通道 B。通道 D（workflow）是任意
-> 编排里 CEO 手里的"流水线"工具，不单独构成编排。
+> 自定义 provider 强化版；M3 SDK 编排＝通道 C；M4 团队＝通道 B。通道 D（workflow）已于 0.8.0
+> 退役，编号保留作历史，不再作为本仓通道。
 
 ### 通道 A · 命名委托工具（stable，最贴近"汇报线"）
 
@@ -175,11 +175,11 @@ profile（`profile` + `patches` 配置）、自己的 composition/skills/model r
   child 自己的 session root）；不支持 persona/toolFilter（由 child profile 自己决定）。
 - 适合"出一份稿子"式的任务式协作，不适合持续对话。
 
-### 通道 D · Workflow 脚本（脚本化流水线）
+### 通道 D · Workflow 脚本（已退役，0.8.0）
 
-`dsh-tool-workflow` + worker-thread 引擎：模型写一段 JS 编排脚本，`agent()` fan-out 子代理，
-带 phase/pipeline/parallel。适合"一次写作流水线"：CEO 出 brief → 各 VP 并行出稿 → 汇总审阅。
-children 仍 join 父 composition；脚本是一次 run，不是常驻组织。
+`dsh-tool-workflow` + worker-thread 引擎在 0.8.0 从本包移除：imports / preset 行 / patch 三源零引用，
+peer 同版删除。现行编排面 = team + 命名委托；这里只留否决记忆——脚本化流水线是一次 run，
+不常驻组织，也不该再按旧表加行。
 
 ---
 

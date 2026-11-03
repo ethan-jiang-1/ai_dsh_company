@@ -6,8 +6,7 @@
 
 ### Changed
 
-- 内部维护：交付审计的 slug 提取复用 `slugFromDirName`；pack README 补 `dsh.client.inject`
-  的 8 条边说明。无用户可见行为变化。
+- 无用户可见变化（维护者过程见 `notes/implemented/2026-11-03-release-0.8.2.md`）。
 
 ## 0.8.1 — 2026-11-03
 
@@ -46,9 +45,6 @@
   `dist-freshness` / `release-ready` 输出标明可发布性由 `release --check` 判定（`verify` 绿 ≠ 可发布）。
 - **兼容性表述**：`0.2.1-rc.5` 的验证范围写清为“生命周期实验的 host 面”，与
   `checks/gates/lib/compat-tags.json` 的认证 tag 台账区分（台账仍只列 rc.2）。
-- **维护者开发面**：`pnpm company` 启动输出自动 tee 到 `runtime/web-logs/`（token 脱敏）；培养/台账/
-  背景选择面板补 keyless 行为判据；929 行培养 spec 拆出纯 lib 面；退役路径门禁覆盖 v3 的
-  `workspace/` 与独立启动器。这些不改变模型可见行为，但让回归证据更可信。
 
 ## 0.7.1 — 2026-11-02
 

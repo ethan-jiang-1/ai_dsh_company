@@ -12,9 +12,9 @@
 workspace 登记 / lease / 方法层 / presented 账本 / 身份备份）。一个安装 = 一个公司；同一 home 可顺序
 服务多个 workspace，换项目不新建 home、不重装；不同公司才用不同 `DSH_HOME`。
 
-公司状态**不进 git**；本仓的 dev 公司状态 = workspace `company-workspace/`（整树 gitignored；制度件
-符号链接指回 pack，`pnpm bundle:init` 建），身份 = `company-workspace/.dsh-company/bundle.json`（v3，
-legacy 文件名）。定义与 base/grown 分层唯一家 = [运行态地图 §二·五](../docs/runtime-map.md)。
+公司状态**不进 git**；本仓的 dev 公司状态 = workspace `company-workspace/`（整树 gitignored；`pnpm bundle:init`
+只建 `.dsh-company/` 状态；手册/模板住 pack `content/`——host 注入/只读，默认章程与状态首启只补缺），
+身份 = `company-workspace/.dsh-company/bundle.json`（v3，legacy 文件名）。定义与 base/grown 分层唯一家 = [运行态地图 §二·五](../docs/runtime-map.md)。
 
 **run trace = 一次运行的追溯视图**（引用不复制）：
 
