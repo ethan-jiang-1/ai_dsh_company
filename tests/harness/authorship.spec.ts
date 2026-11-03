@@ -127,8 +127,8 @@ describe('版本一致交叉核对（R0-3）', () => {
 
   it('稿面无版号行（历史稿）⇒ 观察不判红（证据不可考不判红精神）', () => {
     const rows = crossCheckVersions('依据：`drafts/old.md`（**v1**）', new Map([['drafts/old.md', undefined]]))
-    expect(rows[0].stale).toBe(false)
-    expect(rows[0].current).toBeUndefined()
+    expect(rows[0]!.stale).toBe(false)
+    expect(rows[0]!.current).toBeUndefined()
   })
 
   it('currentVersionOf：认署名行 `版本 vN`', () => {

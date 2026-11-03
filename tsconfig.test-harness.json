@@ -41,6 +41,20 @@
     "tests/harness/orient.spec.ts",
     "tests/harness/candidate-scan-labels.spec.ts",
     "tests/harness/session-diagnose.spec.ts",
+    "tests/harness/audit-verdict.spec.ts",
+    "tests/harness/authorship.spec.ts",
+    "tests/harness/checks-index.spec.ts",
+    "tests/harness/foundation-links.spec.ts",
+    "tests/harness/foundation-safety.spec.ts",
+    "tests/harness/gitignore-guards.spec.ts",
+    "tests/harness/layering.spec.ts",
+    "tests/harness/pack-engines.spec.ts",
+    "tests/harness/pack-metadata.spec.ts",
+    "tests/harness/repository-layout.spec.ts",
+    "tests/harness/runtime-layout.spec.ts",
+    "tests/harness/src-layering.spec.ts",
+    "tests/harness/tracked-secrets.spec.ts",
+    "tests/harness/tracked-token.spec.ts",
     "tests/support/temp-env.ts"
   ]
 }

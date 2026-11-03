@@ -4,7 +4,7 @@
 
 > 上游 = [tests/client 进 tsc](./2026-11-03-client-test-typecheck.md) /
 > [tests/company 进 tsc](./2026-11-03-company-test-typecheck.md)。
-> harness 全量严格 192 / 非严格 118 errors；本轮只收 22 个判据型 spec（17→0），其余宽松测试仍未。
+> harness 全量严格 192 / 非严格 118 errors；本轮只收 36 个判据型 spec（17→0），其余宽松测试仍未。
 
 ## 决定
 
@@ -31,9 +31,12 @@
   - `orient`（运行态全景）
   - `candidate-scan-labels`（候选扫描标注与评分）
   - `session-diagnose`（会话诊断纯逻辑）
+  - 结构门禁 14 个：audit-verdict / authorship / checks-index / foundation-links / foundation-safety /
+    gitignore-guards / layering / pack-engines / pack-metadata / repository-layout / runtime-layout /
+    src-layering / tracked-secrets / tracked-token
   - `tests/support/temp-env.ts`
 - `pnpm typecheck` 四段：pack + client + company + harness 子集；`.githooks/pre-push` 四行同步。
-- 十批共修正 184 处类型面：`market-index` 回调参数、`navigation-assets` 的 `m[1]!`、`notes-audit` 的 `note(file: string, body: string)`、`release-foundation` 的 `observedPaths as never[]`、`snapshots-budget` 的 `bytesOf`/`hit.map` 标注。
+- 十一批共修正 187 处类型面：`market-index` 回调参数、`navigation-assets` 的 `m[1]!`、`notes-audit` 的 `note(file: string, body: string)`、`release-foundation` 的 `observedPaths as never[]`、`snapshots-budget` 的 `bytesOf`/`hit.map` 标注。
 
 ## 输掉的方案
 
@@ -44,7 +47,7 @@
 ## 验证（实跑，2026-11-03 13:3x +08）
 
 ```text
-tsc -p tsconfig.test-harness.json   # 0 errors（起始 17 + 10 + 18 + 6 + 20 + 13 + 20 + 22 + 29 + 29）
+tsc -p tsconfig.test-harness.json   # 0 errors（起始 17 + 10 + 18 + 6 + 20 + 13 + 20 + 22 + 29 + 29 + 3）
 pnpm typecheck                      # exit 0（pack + client + company + harness 子集）
 pnpm test                           # 139 files / 1108 tests
 pnpm verify                         # ALL PASS

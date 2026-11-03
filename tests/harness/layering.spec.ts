@@ -86,7 +86,7 @@ describe('测试分层纪律（真模型/真浏览器不进回归）', () => {
       .map(entry => join(libRoot, entry.name))
     const report = inspectKeylessGraph(entries, { libRoot })
     const libOffenders = report.violations.map(({ file, reason, chain }) =>
-      `${relative(ROOT, file)} → ${reason} [${chain.map(path => relative(ROOT, path)).join(' → ')}]`)
+      `${relative(ROOT, file)} → ${reason} [${chain.map((path: string) => relative(ROOT, path)).join(' → ')}]`)
     const allowedUnresolved = new Set([
       "pathToFileURL(resolveParser('mdast-util-from-markdown')).href",
       "pathToFileURL(resolveParser('mdast-util-gfm')).href",
