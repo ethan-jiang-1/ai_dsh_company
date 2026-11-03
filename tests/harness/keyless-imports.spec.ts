@@ -17,7 +17,7 @@ const fixture = (files: Record<string, string>) => {
   }
   return root
 }
-afterEach(() => { while (fixtures.length) rmSync(fixtures.pop(), { recursive: true, force: true }) })
+afterEach(() => { while (fixtures.length) rmSync(fixtures.pop()!, { recursive: true, force: true }) })
 
 describe('keyless local import analysis', () => {
   it('parses static, re-export and literal dynamic imports without evaluating source', () => {

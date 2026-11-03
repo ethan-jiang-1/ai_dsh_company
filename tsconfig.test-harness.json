@@ -55,6 +55,21 @@
     "tests/harness/src-layering.spec.ts",
     "tests/harness/tracked-secrets.spec.ts",
     "tests/harness/tracked-token.spec.ts",
+    "tests/harness/cdp-attach.spec.ts",
+    "tests/harness/collaboration-probe-verdict.spec.ts",
+    "tests/harness/deliverables-catalog-tools.spec.ts",
+    "tests/harness/deliverables.spec.ts",
+    "tests/harness/dev-install.spec.ts",
+    "tests/harness/fixture-provenance.spec.ts",
+    "tests/harness/keyless-imports.spec.ts",
+    "tests/harness/probe-kit.spec.ts",
+    "tests/harness/probe-steps.spec.ts",
+    "tests/harness/replay-fixture-freshness.spec.ts",
+    "tests/harness/replay-logic.spec.ts",
+    "tests/harness/session-log-generation.spec.ts",
+    "tests/harness/snapshot-index.spec.ts",
+    "tests/harness/ui-golden.spec.ts",
+    "tests/harness/ui-surface.spec.ts",
     "tests/support/temp-env.ts"
   ]
 }

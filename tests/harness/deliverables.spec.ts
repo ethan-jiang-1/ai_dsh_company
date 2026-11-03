@@ -51,7 +51,7 @@ describe('交付物形状与身份（R4 判据的基座半边）', () => {
 })
 
 describe('meta.md 形状校验（validateMeta / parseMeta）', () => {
-  const parseAndValidate = body => ({ ...validateMeta(body), events: parseMeta(body).events })
+  const parseAndValidate = (body: string) => ({ ...validateMeta(body), events: parseMeta(body).events })
   const GOOD = [
     'slug: agentic-coworker',
     'kickoff: 2026-09-22',
