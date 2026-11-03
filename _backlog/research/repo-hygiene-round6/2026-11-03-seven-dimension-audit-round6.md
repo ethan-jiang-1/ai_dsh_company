@@ -109,7 +109,7 @@ md5 tests/company/dag.spec.ts tests/company/cultivation-lib.spec.ts   # 修复�
 | 维 | 审计时 | 现在 | 变的证据 |
 |---|---|---|---|
 | D1 | A- | **A-** | 设计层两处现状改口、过期枚举删除；残余（76 篇零入链）未动 |
-| D2 | B+ | **A-** | `src/client` 41 → 1 入口 + 5 关切目录；`tests/client` 48 → 根 1 + 五组镜像；0 环仍成立；残余 = `checks/gates` 53 / `tools/lib` 48 / `tests/harness` 53 仍平铺（单独论证，未动） |
+| D2 | B+ | **A** | `src/client` 41 → 1 入口 + 5 关切目录；`tests/client` 48 → 根 1 + 五组镜像；`tests/harness` 54 → 五组（repo/tools/session/evidence/ui）；0 环仍成立；`checks/gates`(54) / `tools/lib`(48) 判为同质目录、不搬（见 §8 决策） |
 | D3 | A- | **A-** | 未动（无新增验收面） |
 | D4 | B | **B+** | 重复 spec 门禁 + 链接欠账棘轮（archived 32 / moved 0 / live 0，超基线即红）；残余 = 冻结层 32 条死链（只设天花板）、设计层现状声明仍靠人 |
 | D5 | B+ | **A-** | DAG spec 恢复（+20 例）、混合面类型洞收口、orient +2 例；F 批：`workspace-doors` 直接 spec（4 例，带造红）、`install-manual` 模板判据（4 例，零覆盖 → 有判据，含 lease 归属的回归守卫）、`catalog-wiring` 空断言改真行为、删掉 `expect(true)`；套件 1108 → 1116。残余 = 少量源码文本断言（CSS/装配面，刻意保留） |
@@ -118,3 +118,18 @@ md5 tests/company/dag.spec.ts tests/company/cultivation-lib.spec.ts   # 修复�
 
 **总评：A- / A- / A- / B+ / B+ / A- / A-。** 剩余两档 B+ 各自有明确批次（D4 = 冻结层天花板不动 + 设计层现状人工；
 D5 = F 批测试质量）。下一轮优先级：F 批（测试质量）→ C 批余项（豁免区从"有天花板"到"定向清账"）→ `checks/` 与 `tools/` 的层次论证。
+
+## 8. 层次化边界：哪些搬了、哪些明确不搬
+
+| 目录 | 判断 | 依据 |
+|---|---|---|
+| `src/client`（41） | **搬**：1 入口 + `wiring/ data/ ui/ tabs/ cultivation/` | 41 个名字混着五种关切，`ls` 不传达架构；产品代码，读者最多 |
+| `tests/client`（48） | **搬**：镜像 `src/client` 五组，根只留整客户端组合 spec | 测试树要能按被测面导航；与源码同构最省猜 |
+| `tests/harness`（54） | **搬**：`repo/ tools/ session/ evidence/ ui/` | 54 个名字混着五类判据（仓库不变量/工具纯逻辑/会话/协作证据/金样） |
+| `checks/gates`（54） | **不搬** | 同质目录：**一门禁一文件**，名字即不变量；读者是加门禁的维护者，`gate-wiring` 依赖「目录 = 清单」；搬迁要动 54 门 + runner + 97 处文档引用，收益是"分组"，风险在验证链本身 |
+| `tools/lib`（48） | **不搬** | 同质目录：**一模块一文件**，被 54 门 + 86 脚本以相对路径引用；分组维度与门禁/脚本的消费关系不同构，搬了要先发明第二套目录约定 |
+| `probes/*`（59，四域） | 不搬 | 已按机制域四子目录；单目录内是"一次探针一文件" |
+
+**复访条件**：`checks/gates` > 70 或出现第二位维护者按主题找门禁时再议；届时先立「门禁 → 关切」的
+目录约定与 `gate-wiring` 的递归判据，再一次性搬（附 tension note：D28 的"枚举的家 = 实现自己"仍成立，
+分组只是让清单可扫得更快，不产生第二份清单）。

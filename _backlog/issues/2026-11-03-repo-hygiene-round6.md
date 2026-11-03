@@ -29,4 +29,9 @@ opened: 2026-11-03
 - 已落地（批 C/D/E，2026-11-03）：R6-07（`link-debt` 棘轮：archived 32 / moved 0 / live 0，超基线即红）、
   R6-10（`src/client` 五分目录 + `tests/client` 镜像；Note =
   [client-layering-restructure](../../notes/implemented/2026-11-03-client-layering-restructure.md)）。
-- 待做：R6-11/12 测试质量（F 批）、R6-15/16 D7 待决项、`checks/gates`/`tools/lib` 层次论证（单独轮）。
+- 已落地（2026-11-03 后半）：R6-15/16（settings tier 真的写、lease 挪到解析后）、R6-11（workspace-doors /
+  install-manual / 错误中继判据、空断言与同义反复清理）、R6-10 收尾（`tests/harness` 五分目录）、
+  D6 端到端补「加载即报错」段。Note = [workspace-choice-and-lease-order](../../notes/implemented/2026-11-03-workspace-choice-and-lease-order.md)
+  · [test-tree-layering](../../notes/implemented/2026-11-03-test-tree-layering.md) ·
+  [client-error-relay](../../notes/implemented/2026-11-03-client-error-relay.md)。
+- 待做：R6-12 剩余源码文本断言（刻意保留的装配面）、`checks/gates`/`tools/lib` 已判不搬（复访条件见材料 §8）。
