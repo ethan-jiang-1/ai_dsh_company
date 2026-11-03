@@ -60,9 +60,10 @@ no-index 教义下没有主题索引：**目录树 + 全文检索就是清单**�
 ## 三、机械门禁
 
 - `proposal-scheduled` / `proposal-graduated`（proposed 侧：批准标记 + 「## 验收」节 + 该毕业的毕业）。
-- `notes-liveness`（D35 立）：`implemented/` 文件名日期 ≥ 2026-10-05 的 Note，前 6 行必须有 `状态：` 行
-  且以生命周期词（implemented/已交付/已消化）开头——存量按生效日祖父豁免；反证 =
-  [notes-taxonomy-owner](./archived/2026-10-05-notes-taxonomy-owner.md)。
+- `notes-liveness`（D35 立；2026-11-03 扩）：`implemented/` 文件名日期 ≥ 2026-10-05 的 Note，前 6 行必须有 `状态：` 行
+  且以生命周期词（implemented/已交付/已消化）开头——存量按生效日祖父豁免；日期 ≥ 2026-11-04 的还须有
+  `## 决定` 节（收据/流水请进 `archived/receipts/`）。反证 = [notes-taxonomy-owner](./archived/2026-10-05-notes-taxonomy-owner.md)
+  + 2026-11-03 临时 fixture（2026-11-04-zz-no-decision）缺决定节 → 红。
 - `notes-supersession`（2026-10-30 立）：`implemented/` 旧文被说「取代/部分取代」却没出现新文件名即红；
   archived 目标豁免（冻结层不回写）。判据 = §五。
 - `notes-archived-links`（2026-10-30 立）：`archived/**/*.md` 的 markdown `.md` 链接必须存在——
