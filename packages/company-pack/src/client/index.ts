@@ -19,9 +19,7 @@ import { createAttentionRegistry } from './attention-registry.ts'
 import { installAttentionObservers } from './attention-observers.ts'
 import { createCultivationView } from './CultivationView.tsx'
 import { createCompanyDataPlane, WORKSPACE_TEXT_PATHS } from './company-data-plane.ts'
-import { contextRowsFromStore, makeCultivationContextSources, type CultivationContextSources, type FollowLike } from './cultivation-context-data.ts'
-import type { CultivationContext } from '../lib/cultivation-context.ts'
-import { sessionFileAddress } from '../lib/deliverables-address.ts'
+import { makeContextWiring, type ContextWiringScoped } from './context-wiring.ts'
 import { createLeadLookup } from './company-session-adapters.ts'
 import { registerCompanyTabs } from './company-tab-registration.ts'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
@@ -55,63 +53,6 @@ const CULTIVATION_VIEW_ID = 'dsh-company-pack/cultivation'
  * 行数据与任务板同走 slot props 的 `useSessions` 座位读 `agentTeam` 投影（升 0.1.7 时由 `remote.agentTeams.view` 改判）。
  * @param ctx - Client root context.
  */
-/** 背景读/开的最小结构面（两个注入块共用；预检与导航都在容器，领域视图不碰 RPC）。 */
-interface ContextWiringScoped {
-  readonly sessions: ClientContext['sessions']
-  readonly uiWorkspace: { openSession(target: unknown): void }
-  readonly sidebarRight: { openResource(address: string): void }
-  readonly remote: {
-    readonly workspaceFiles: {
-      stat(agentId: SessionId, path: string, signal: AbortSignal): Promise<{ readonly ok: boolean }>
-    }
-  }
-}
-
-/** 造背景源与「打开原文」（会话查 list/subagentAddress；文件先 stat 再开 file resource）。 */
-function makeContextWiring(
-  scoped: ContextWiringScoped,
-  leadOf: (sessionId: SessionId) => SessionId,
-  rawFollow: FollowLike,
-  readCatalog: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>,
-): {
-  readonly contextSources: (sessionId: SessionId) => CultivationContextSources
-  readonly openContext: (sessionId: SessionId, context: CultivationContext) => Promise<
-    { readonly ok: true } | { readonly ok: false, readonly problem: string }
-  >
-} {
-  const rows = (): ReturnType<typeof contextRowsFromStore> =>
-    contextRowsFromStore(scoped.sessions.list.getSnapshot().byId as never)
-  return {
-    contextSources: () => makeCultivationContextSources({
-      getSessions: rows,
-      follow: rawFollow,
-      readCatalog: (sessionId, signal) => readCatalog(sessionId as SessionId, signal),
-    }),
-    openContext: async (sessionId, context) => {
-      try {
-        if (context.kind === 'session') {
-          const state = scoped.sessions.list.getSnapshot()
-          const exists = state.byId[context.ref as SessionId] !== undefined
-            || (context.parentSessionId !== undefined
-              && scoped.sessions.subagentAddress(context.ref as SessionId) !== undefined)
-          if (!exists) return { ok: false, problem: '这个会话现在打不开了（可能已删除）。' }
-          const target = context.parentSessionId === undefined
-            ? context.ref
-            : { parentSessionId: context.parentSessionId, childSessionId: context.ref, mode: context.mode ?? 'unknown' }
-          scoped.uiWorkspace.openSession(target)
-          return { ok: true }
-        }
-        const lead = leadOf(sessionId)
-        const stat = await scoped.remote.workspaceFiles.stat(lead, context.ref, new AbortController().signal)
-        if (!stat.ok) return { ok: false, problem: '原文不在了（文件可能已归档/移动）。' }
-        scoped.sidebarRight.openResource(sessionFileAddress(lead, context.ref))
-        return { ok: true }
-      } catch (error) {
-        return { ok: false, problem: `打不开原文：${error instanceof Error ? error.message : String(error)}` }
-      }
-    },
-  }
-}
 
 export async function apply(ctx: ClientContext): Promise<void> {
   // CSS 与 fiber 同寿命；重新挂载读取新样式，卸载仅清理本次节点。
