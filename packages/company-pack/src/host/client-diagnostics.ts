@@ -37,11 +37,15 @@ export function registerClientDiagnostics(ctx: Context, dshHome: string): void {
     handler: async ({ rawInput }: { readonly rawInput: string }) => {
       // 诊断日志住 DSH_HOME（不是公司数据）：公司盘 dataBlocked 时，“用户那一页”的错误仍必须留痕。
       // 2026-11-03（R5-31）：此前 dataBlocked 直接拒绝，dev home 有 lease 问题时用户报的页面错误永远不进盘。
+      // vendor `parseCommand` 的 rawInput 保留命令名后的分隔空白（commands/src/index.ts:125）：
+      // 客户端发 `/company-diagnostics client-error …` 时这里拿到的是 " client-error …"。
+      // 不 trimStart 的话 startsWith 永远 false——2026-11-03 真页面探针实测到的断链。
+      const input = rawInput.trimStart()
       const prefix = 'client-error '
-      if (!rawInput.startsWith(prefix)) {
+      if (!input.startsWith(prefix)) {
         return { kind: 'error' as const, text: '用法：/company-diagnostics client-error <URI-encoded JSON>' }
       }
-      const encoded = rawInput.slice(prefix.length).trim()
+      const encoded = input.slice(prefix.length).trim()
       if (encoded === '' || encoded.length > MAX_INPUT_CHARS) {
         return { kind: 'error' as const, text: `诊断载荷为空或超过 ${String(MAX_INPUT_CHARS)} 字符。` }
       }

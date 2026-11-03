@@ -86,7 +86,9 @@ describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）'
       at: 1,
       href: 'http://127.0.0.1:1/?token=SECRET',
     }))
-    const result = await diagnostic.handler({ rawInput: `client-error ${payload}` })
+    // 真实 dispatch（vendor parseCommand）给 rawInput 留命令名后的前导空白；handler 必须 trimStart。
+    // 2026-11-03 真页面探针：不带空白的直接调用一直绿，页面链路却因 " client-error …" 静默失败。
+    const result = await diagnostic.handler({ rawInput: ` client-error ${payload}` })
     expect(result.kind).toBe('success')
     const logPath = join(env.home, 'logs', 'company-client-errors.log')
     expect(existsSync(logPath)).toBe(true)
@@ -107,7 +109,7 @@ describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）'
       handler: (input: { readonly rawInput: string }) => Promise<{ readonly kind: string; readonly text: string }>
     }
     const payload = encodeURIComponent(JSON.stringify({ kind: 'error', message: 'blocked-but-logged', at: 1 }))
-    const result = await diagnostic.handler({ rawInput: `client-error ${payload}` })
+    const result = await diagnostic.handler({ rawInput: ` client-error ${payload}` })
     expect(result.kind).toBe('success')
     expect(readFileSync(join(env.home, 'logs', 'company-client-errors.log'), 'utf8')).toContain('blocked-but-logged')
     await ctx.fiber.dispose()
@@ -124,7 +126,7 @@ describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）'
     mkdirSync(join(env.home, 'logs'), { recursive: true })
     writeFileSync(logPath, 'x'.repeat(256 * 1024))
     const payload = encodeURIComponent(JSON.stringify({ kind: 'error', message: 'rotation', at: 1 }))
-    const result = await diagnostic.handler({ rawInput: `client-error ${payload}` })
+    const result = await diagnostic.handler({ rawInput: ` client-error ${payload}` })
     expect(result.kind).toBe('success')
     expect(existsSync(`${logPath}.1`)).toBe(true)
     expect(readFileSync(logPath, 'utf8')).toContain('rotation')
@@ -164,7 +166,7 @@ describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）'
       handler: (input: { readonly rawInput: string }) => Promise<{ readonly kind: string; readonly text: string }>
     }
     const payload = encodeURIComponent(JSON.stringify({ kind: 'error', message: 'home-plane', at: 1 }))
-    const result = await diagnostic.handler({ rawInput: `client-error ${payload}` })
+    const result = await diagnostic.handler({ rawInput: ` client-error ${payload}` })
     expect(result.kind).toBe('success')
     await ctx.fiber.dispose()
     expect(existsSync(join(env.home, 'logs', 'company-client-errors.log'))).toBe(true)
