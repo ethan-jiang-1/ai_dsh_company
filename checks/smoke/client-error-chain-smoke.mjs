@@ -5,6 +5,11 @@
 //
 // 断言**整条链**：真页面错误 → `window.__DSH_COMPANY_ERRORS__` → client reporter →
 // `/company-diagnostics client-error` → `$DSH_HOME/logs/company-client-errors.log`。
+// 2026-11-03 第六轮起跑**两段**：① 页面一加载就报错（早于用户发第一条消息）→ 环捕获 → 落盘；
+// ② 会话内报错 → 立即落盘。两段各自有 marker，互不借用。
+// ⚠ 观察边界：DSH Web 加载时会保留一个草稿会话，页面里拿不到「retainedBy.mainView = 0」的窗口，
+//   所以「无会话先排队」的语义由 `tests/client/wiring/error-relay.spec.ts` 的注入时钟判据证明，
+//   本档只证真页面两段都能到盘。
 // 为什么必须隔离：dev home 的会话可能被另一个 writer 持有（`session/writer-held`），
 //   页面 reporter 会发命令但被拒；隔离 home + 自己创建的会话才能证明单 writer 下的真实链路。
 // 退出码：0 = 全链 PASS；1 = 断言失败；2 = 环境未就绪（构建/隔离 profile 初始化失败）。
@@ -77,6 +82,16 @@ try {
     fail('composer 在场', '隔离页面没有 composer（未完成 onboarding 或 client 未 apply）')
     throw new Error('composer missing')
   }
+
+  // ① 页面一加载就报错（早于用户发第一条消息）：环里有、最终也能落盘（队列化后不再丢）。
+  const logPath = join(home, 'logs/company-client-errors.log')
+  const earlyMarker = `client-error-early-${String(Date.now())}`
+  await page.evaluate(m => console.error(m), earlyMarker)
+  await sleep(1_500)
+  const earlyRing = await page.evaluate(() => globalThis.__DSH_COMPANY_ERRORS__?.list?.() ?? [])
+  if (earlyRing.some(entry => String(entry.message).includes(earlyMarker))) pass('加载即报错入环')
+  else fail('加载即报错入环', `__DSH_COMPANY_ERRORS__ 未出现 ${earlyMarker}`)
+
   await composer.focus()
   await page.keyboard.type('hi', { delay: 10 })
   await page.keyboard.press('Enter')
@@ -89,6 +104,15 @@ try {
   if (!ready) fail('会话打开', `title 未出现角色前缀（当前 ${await page.title()}）`)
   else pass('会话打开（单 writer）')
 
+  // ①b 会话就绪后：早于第一条消息的错误也应在盘上（队列 + subscribe 补送，或加载时已有会话）。
+  let earlyLogged = false
+  for (let i = 0; i < 20; i++) {
+    await sleep(500)
+    if (existsSync(logPath) && readFileSync(logPath, 'utf8').includes(earlyMarker)) { earlyLogged = true; break }
+  }
+  if (earlyLogged) pass('加载即报错最终落盘')
+  else fail('加载即报错最终落盘', `未在 ${logPath} 找到 ${earlyMarker}`)
+
   const marker = `client-error-chain-${String(Date.now())}`
   await page.evaluate(m => console.error(m), marker)
   await sleep(1_500)
@@ -96,7 +120,6 @@ try {
   if (ring.some(entry => String(entry.message).includes(marker))) pass('错误环捕获')
   else fail('错误环捕获', `__DSH_COMPANY_ERRORS__ 未出现 marker（${JSON.stringify(ring).slice(0, 200)}）`)
 
-  const logPath = join(home, 'logs/company-client-errors.log')
   let logged = false
   for (let i = 0; i < 20; i++) {
     await sleep(500)

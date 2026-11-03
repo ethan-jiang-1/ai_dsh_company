@@ -54,5 +54,7 @@ pnpm verify      # ALL PASS（56 门 + 2 无对象）
 tsdown build     # client 354.02 kB（+1.8 kB：中继逻辑）
 ```
 
-未验：真实「首屏报错 → 5 秒后用户开会话 → 日志出现」的端到端时序（`client-error-chain-smoke` 只覆盖
-有会话路径；补这条需要探针驱动「先抛错、再建会话」，属下一轮）。
+补记（同轮）：`client-error-chain-smoke` 现在跑两段——「页面加载即报错」与「会话内报错」都到盘。
+⚠ 观察边界：DSH Web 加载时会保留一个草稿会话，真页面里拿不到「retainedBy.mainView = 0」的窗口，
+所以「无会话先排队、会话出现再补送」的语义由 `tests/client/wiring/error-relay.spec.ts` 的注入时钟
+判据证明；端到端只证两段都到盘。
