@@ -3,24 +3,26 @@
  * 解析分支 + dataBlocked/无账本/成功路径；账本实现本身归 presented-domain-real.spec。
  */
 import { describe, expect, it, vi } from 'vitest'
+import type { Context } from '@deepseek-ai/cordis'
 import { parseDeliverablesAudit, registerDeliverablesCommand } from '../../packages/company-pack/src/host/deliverables-command.ts'
 
 function mount(options = {}) {
-  let definition
-  const ctx = { commands: { register: (def) => { definition = def } } }
+  type Def = { handler: (input: { readonly rawInput: string }) => Promise<{ readonly kind: string, readonly text: string }> }
+  let definition: Def | undefined
+  const ctx = { commands: { register: (def: Def) => { definition = def } } }
   const audit = vi.fn(async () => ({ ledger: { schema: 1, updatedAt: '', paths: {}, slugs: {} }, path: 'p' }))
   const regenerate = vi.fn()
   const exportNow = vi.fn()
-  registerDeliverablesCommand(ctx, {
+  registerDeliverablesCommand(ctx as unknown as Context, {
     dataBlocked: false,
     workspace: '/w',
-    ledgerStorePromise: Promise.resolve({ kind: 'domain' }),
+    ledgerStorePromise: Promise.resolve({ kind: 'domain' }) as never,
     exportNow,
-    audit,
+    audit: audit as never,
     regenerate,
     ...options,
   })
-  return { definition, audit, regenerate, exportNow }
+  return { definition: definition as Def, audit, regenerate, exportNow }
 }
 
 describe('parseDeliverablesAudit', () => {

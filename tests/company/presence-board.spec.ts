@@ -132,15 +132,15 @@ describe('presenceFromEvents（回放 / 离线路径，验收判据 4：非空�
 
 describe('rowsFromTeamView（live 路径：Lead 的 agentTeam 投影 → 行）', () => {
   // 0.1.7 起成员只有持久生命周期 `phase`（provisioning/active/failed）；live 忙闲不在投影里。
-  const view = {
+  const view: TeamViewLike = {
     members: [
       { id: LEAD, name: 'lead', role: 'lead', phase: 'active' },
       { id: VP_ENG, name: 'vp-eng', role: 'teammate', phase: 'active' },
       { id: COO, name: 'coo', role: 'teammate', phase: 'provisioning' },
     ],
     tasks: [
-      { id: 'task-2', revision: 2, subject: 'VP-Eng：技术可行性结论', status: 'in_progress', blockedBy: [], ownerName: 'vp-eng', ready: true, writeScopeWarnings: [] },
-      { id: 'task-3', revision: 3, subject: 'COO：交付承接结论', status: 'completed', blockedBy: [], ownerName: 'coo', ready: true, writeScopeWarnings: [] },
+      { id: 'task-2', revision: 2, subject: 'VP-Eng：技术可行性结论', status: 'in_progress', blockedBy: [], ownerName: 'vp-eng', ready: true },
+      { id: 'task-3', revision: 3, subject: 'COO：交付承接结论', status: 'completed', blockedBy: [], ownerName: 'coo', ready: true },
     ],
   }
 

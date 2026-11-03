@@ -31,7 +31,7 @@ describe('方法层旧 profile → 公司级迁移', () => {
     seed('web', 'cfo', 'bar', 'from web')
     const first = migrateLegacyMethodLayers(env.home, methodRoot)
     expect(first.skipped).toBe(false)
-    expect(first.copied.sort()).toEqual(['ceo/foo', 'cfo/bar'])
+    expect([...first.copied].sort()).toEqual(['ceo/foo', 'cfo/bar'])
     expect(readFileSync(join(methodRoot, 'ceo/foo/SKILL.md'), 'utf8')).toContain('from web')
     expect(existsSync(foo)).toBe(true)
     expect(existsSync(join(methodRoot, METHOD_MIGRATION_MARKER))).toBe(true)

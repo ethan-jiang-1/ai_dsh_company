@@ -22,7 +22,7 @@ import type { TeamViewLike } from '../../packages/company-pack/src/lib/presence.
 /** 造一个最小 TeamView（成员表对看板无关，但类型要求在场）。 */
 function view(tasks: TeamViewLike['tasks']): TeamViewLike {
   return {
-    members: [{ id: 'session-lead', name: 'lead', role: 'lead', status: 'running' }],
+    members: [{ id: 'session-lead', name: 'lead', role: 'lead', phase: 'active' }],
     tasks,
   }
 }

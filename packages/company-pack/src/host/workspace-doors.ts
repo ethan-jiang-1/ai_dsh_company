@@ -5,6 +5,7 @@
  * 进程内事实表，工具按当前 agent 的 cwd 过滤后读纯函数 `doorsFromSessions`。
  */
 import type { Context } from '@deepseek-ai/cordis'
+import type {} from '@deepseek-ai/dsh-api-session-controller/types'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { doorsFromSessions } from '../lib/doors.ts'
 

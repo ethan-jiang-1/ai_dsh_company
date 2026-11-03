@@ -43,7 +43,7 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
       const result = await invokeCultivation(command, 'ceo', workspace,
         `correct --context=${tokenOf({ kind: 'session', ref: 'session-1', label: '收口检查', role: 'ceo' })} 收口前逐项列出未决项 ::`)
       expect(result).toMatchObject({ kind: 'success' })
-      const record = recordsOf(workspace)[0]
+      const record = recordsOf(workspace)[0]!
       expect(record.body).toBe('')
       expect(record.source).toBe('会话「收口检查」')
       expect(record.contexts?.[0]).toMatchObject({
@@ -65,7 +65,7 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
       const result = await invokeCultivation(command, 'ceo', workspace,
         `suggest cfo --context=${tokenOf({ kind: 'session', ref: 'session-1' }, 'suggest')} 结论先列假设 ::`)
       expect(result).toMatchObject({ kind: 'success' })
-      const record = recordsOf(workspace)[0]
+      const record = recordsOf(workspace)[0]!
       expect(record.targetRole).toBe('cfo')
       expect(record.proposerRole).toBe('ceo')
       expect(record.contexts?.[0]?.kind).toBe('session')
@@ -145,7 +145,7 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
       const ok = await invokeCultivation(command, 'ceo', workspace,
         `suggest cfo --context=${tokenOf({ kind: 'deliverable', ref: '.dsh-company/deliverables/budget-review/final.md' }, 'suggest')} 结论先列假设 ::`)
       expect(ok).toMatchObject({ kind: 'success' })
-      const record = recordsOf(workspace)[0]
+      const record = recordsOf(workspace)[0]!
       expect(record.contexts?.[0]).toMatchObject({ kind: 'deliverable', title: 'budget-review', subtitle: '已采纳' })
       expect(record.source).toBe('成品「budget-review」（已采纳）')
 
@@ -162,7 +162,7 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
       const { command } = cultivationRegistrations({}, query())
       const result = await invokeCultivation(command, 'ceo', workspace, 'correct --context is confusing :: 做法与证据。')
       expect(result).toMatchObject({ kind: 'success' })
-      const record = recordsOf(workspace)[0]
+      const record = recordsOf(workspace)[0]!
       expect(record.expectation).toBe('--context is confusing')
       expect(record.contexts).toEqual([])
     })

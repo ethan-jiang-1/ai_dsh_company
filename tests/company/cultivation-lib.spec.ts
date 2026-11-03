@@ -69,7 +69,7 @@ describe('inboxRows', () => {
     )
     expect(rows).toHaveLength(CULTIVATION_ROLES.length)
     const ceo = rows.find(row => row.role === 'ceo')!
-    expect(ceo.count).toBe(4)
+    expect(ceo!.count).toBe(4)
     expect(ceo.entries.map(entry => entry.name)).toEqual(['d.md', 'c.md', 'b.md'])
     expect(ceo.entries[0]!.title).toBe('最新复盘')
     expect(ceo.entries[1]!.title).toBe('结论：预算内。')
@@ -91,8 +91,8 @@ describe('inboxRows', () => {
   it('预览上限 = PREVIEW_LIMIT', () => {
     const names = Array.from({ length: 10 }, (_, i) => `j${String(i)}.md`)
     const [ceo] = inboxRows({ ceo: names }, {})
-    expect(ceo.entries).toHaveLength(PREVIEW_LIMIT)
-    expect(ceo.count).toBe(10)
+    expect(ceo!.entries).toHaveLength(PREVIEW_LIMIT)
+    expect(ceo!.count).toBe(10)
   })
 
   // 2026-10-13 培养卡 V2（数据诚实）：清单不可达 ≠ 0——目录缺失/断流必须以「不可达」态
@@ -102,7 +102,7 @@ describe('inboxRows', () => {
     const ceo = rows.find(row => row.role === 'ceo')!
     const cfo = rows.find(row => row.role === 'cfo')!
     expect(ceo.reach).toBe('ok')
-    expect(ceo.count).toBe(1)
+    expect(ceo!.count).toBe(1)
     expect(cfo.reach).toBe('unreachable')
     expect(cfo.count).toBe(0)
     expect(cfo.entries).toHaveLength(0)
@@ -225,7 +225,7 @@ describe('recordInbox：按 viewer 角色分箱（V7 归属过滤 + 回执）', 
     status: 'open',
     title: 't',
     ...over,
-  })
+  }) as unknown as CultivationRecord
 
   it('需要我处理 = open 且 target=viewer；我的提案含回执；已采纳 = adopted 且 target=viewer', () => {
     const records = [

@@ -96,4 +96,4 @@ keyless 单测唯一后缀 `*.spec.ts`（[testing.md §1.1](../docs/testing.md)�
 `checks/smoke/` 或 `probes/` 下的 `.mjs` 并在头注自述「何时跑 / 成本 / 状态」——不塞进 tests/（layering 守卫拦截）。
 本文件骨架由 [harness/navigation-assets.spec](./harness/navigation-assets.spec.ts) 钉进回归（2026-10-05 红→绿落地）。
 
-> ⚠ `tests/client` 已由 `tsconfig.test-client.json` 覆盖（`pnpm typecheck`）；`tests/company` / `tests/harness` 仍未进 tsc（[testing.md §5](../docs/testing.md) 已知未覆盖面）。
+> ⚠ `tests/client` / `tests/company` 已由 `tsconfig.test-client.json` / `tsconfig.test-company.json` 覆盖（`pnpm typecheck`；各自排除直引 vendor 源码的 spec）；`tests/harness` 仍未进 tsc（[testing.md §5](../docs/testing.md) 已知未覆盖面）。

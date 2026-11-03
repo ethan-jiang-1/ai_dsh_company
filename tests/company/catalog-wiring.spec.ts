@@ -99,13 +99,13 @@ describe('host catalog wiring', () => {
     apply(ctx as never)
     const added = listeners.get('api-session/added') ?? []
     expect(added.length).toBeGreaterThan(0)
-    for (const listener of added) listener({ origin: 'root', sessionId: 'session-outside', cwd: join(root, 'elsewhere'), running: true })
-    expect(warn.mock.calls.some(([message]) => String(message).includes('不在 workspace'))).toBe(true)
-    for (const listener of added) listener({ origin: 'root', sessionId: 'session-inside', cwd: workspace, running: true })
-    expect(warn.mock.calls.some(([message]) => String(message).includes('session-inside'))).toBe(false)
+    for (const listener of added) (listener as (arg: unknown) => void)({ origin: 'root', sessionId: 'session-outside', cwd: join(root, 'elsewhere'), running: true })
+    expect((warn.mock.calls as unknown as Array<[unknown]>).some(([message]) => String(message).includes('不在 workspace'))).toBe(true)
+    for (const listener of added) (listener as (arg: unknown) => void)({ origin: 'root', sessionId: 'session-inside', cwd: workspace, running: true })
+    expect((warn.mock.calls as unknown as Array<[unknown]>).some(([message]) => String(message).includes('session-inside'))).toBe(false)
     mkdirSync(join(workspace, 'sub'), { recursive: true })
-    for (const listener of added) listener({ origin: 'root', sessionId: 'session-sub', cwd: join(workspace, 'sub'), running: true })
-    expect(warn.mock.calls.some(([message]) => String(message).includes('不是根'))).toBe(true)
+    for (const listener of added) (listener as (arg: unknown) => void)({ origin: 'root', sessionId: 'session-sub', cwd: join(workspace, 'sub'), running: true })
+    expect((warn.mock.calls as unknown as Array<[unknown]>).some(([message]) => String(message).includes('不是根'))).toBe(true)
   })
 
   it('损坏的 bundle.json 告警且不覆盖', () => {
@@ -115,7 +115,7 @@ describe('host catalog wiring', () => {
     const { ctx } = fakeCtx()
     const warn = vi.spyOn(ctx.logger, 'warn')
     apply(ctx as never)
-    expect(warn.mock.calls.some(([message]) => String(message).includes('bundle.json 损坏'))).toBe(true)
+    expect((warn.mock.calls as unknown as Array<[unknown]>).some(([message]) => String(message).includes('bundle.json 损坏'))).toBe(true)
     expect(readFileSync(path, 'utf8')).toBe('{"v":3,"id":"cut')
   })
 })

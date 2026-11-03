@@ -1,6 +1,7 @@
 /** Host half of the company pack: signoff, workspace doors, cultivation, run bundle, catalog/ledger. */
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-user-approval'
+import type {} from '@deepseek-ai/dsh-api-session-controller/types'
 import { existsSync, readFileSync } from 'node:fs'
 import { isAbsolute, join, relative } from 'node:path'
 import { registerSignoffTool } from './host/signoff-tool.ts'

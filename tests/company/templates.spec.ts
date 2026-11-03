@@ -19,7 +19,7 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 // 是指回它的符号链接，不再作为测试基准。
 const TEMPLATES = join(ROOT, 'packages/company-pack/content/templates')
 const templateFiles = readdirSync(TEMPLATES).filter(name => name.endsWith('.md'))
-const textOf = name => readFileSync(join(TEMPLATES, name), 'utf8')
+const textOf = (name: string) => readFileSync(join(TEMPLATES, name), 'utf8')
 /** 复核声明的落点 = 带「AI 使用声明」的产出模板（meta.md 是户口件，不带）。 */
 const reviewed = templateFiles.filter(name => textOf(name).includes('AI 使用声明'))
 
