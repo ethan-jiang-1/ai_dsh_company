@@ -22,6 +22,8 @@ description: Use when finishing any non-trivial change before reporting it done,
    机器绿灯不覆盖这一问。范围外多做的东西也要点出来（不是功劳，是没被要求的东西）。
 2. **证据四链点名**（挂得上 / 行为对 / 装得上〔适用时〕/ 批准）：每条点名**实跑的检查**；
    没跑的**如实标「未执行」**——不混入"应该跑了"的暗示。
+   **发布类声明另加**：声称 READY/已发布，必须贴 `node tools/release.mjs --check` 的原始 READY 行 + commit SHA；
+   没有输出行的 READY 不算证据（2026-11-03 0.8.2 A- 收口的实况：Note 写了 READY，`--check` 实际红）。
 3. **语义审**（四输入 = [policy.md §P5](../../../docs/policy.md)）：带①授权/验收原文 ②该面合同文档（docs 只写 now，同 diff 更新了吗）
    ③证据选层（选的检查能证明承诺的性质吗）④Note（决定/备选/真证据齐吗），**重读当前 diff**，
    不沿用旧结论。输出 finding 带「缺陷/位置/影响/证据」，blocker 与建议分开；机器已可靠拒绝的不复报。
@@ -54,6 +56,7 @@ description: Use when finishing any non-trivial change before reporting it done,
 - [ ] 改口检查过：若推翻/收窄旧决定，旧文有回链或已归档；`pnpm notes:audit` 无「取代缺回链」。
 - [ ] 被证伪的切片整片 revert（或明确说明为何不 revert）。
 - [ ] `pnpm verify` + `pnpm test` 全绿，且命令链用了 `set -o pipefail`（涉类型面时 `pnpm typecheck` 也跑过）。
+- [ ] 发布类声明贴了 `release --check` 原始 READY 行 + commit SHA；没有就标「未发布/未执行」。
 - [ ] 六行回执已发，且每行都有内容（「未执行」「无」也是内容）。
 
 ## 指针（别复述）
