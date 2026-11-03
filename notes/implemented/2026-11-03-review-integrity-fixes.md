@@ -23,7 +23,8 @@
 7. **skip 无预算守卫**：新增 `tests/harness/skip-budget.spec.ts`；只允许 `ledger.spec` 的
    dev-only live 档，且登记“预期 3 例（dev home）/0 例（fresh clone）”。新 skip 未登记即红。
 8. **when-to-read 的 blockquote 后缺空行**：6 份插入式文档补空行，避免 lazy continuation 把正文吞进引用块。
-9. **D7 inject 偏离未进 README**：已知限制补“8 条边 = client 模块 factory 依赖，删除需上游合同/证据”。
+9. **release-smoke ④c 假红**：in-app install 的 fetch 15s 在负载下 abort；改为 60s（inspect 仍 15s）。
+10. **D7 inject 偏离未进 README**：已知限制补“8 条边 = client 模块 factory 依赖，删除需上游合同/证据”。
 
 ## 输掉的方案
 
@@ -40,7 +41,7 @@ npx vitest run tests/presets/presets.spec.ts      # 27 passed（含 YAML schema�
 npx vitest run tests/harness/skip-budget.spec.ts  # 1 passed（登记守卫）
 pnpm verify                                       # ALL PASS
 pnpm test                                         # 135 files / 1077 tests（0 skipped on dev home）
-release --check                                   # READY 0.8.1（收盘提交重新 stamp）
+release --check                                   # READY 0.8.2（收盘提交重新 stamp）
 ```
 
 ## 仍未做（review 明确点名的字面项）
@@ -52,4 +53,4 @@ release --check                                   # READY 0.8.1（收盘提交�
   不等于“逐项清单全部关闭”。
 - D1：5 份预算零头寸仍在（棘轮信号）；dev-loop 旧锚点保留，§0 表已加一句显式指向。
 - D5：catalog 76.29% 仍有未覆盖分支；presets 真挂载仍在 `preset-smoke`（认证档）。
-- D7 “0.8.1 发布”指**发布字节 READY**，不是 npm publish；市场索引仍 staged。
+- D7 “0.8.2 发布”指**发布字节 READY**，不是 npm publish；市场索引仍 staged。

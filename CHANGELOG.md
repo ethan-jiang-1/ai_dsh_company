@@ -2,6 +2,13 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.8.2 — 2026-11-03
+
+### Changed
+
+- 内部维护：交付审计的 slug 提取复用 `slugFromDirName`；pack README 补 `dsh.client.inject`
+  的 8 条边说明。无用户可见行为变化。
+
 ## 0.8.1 — 2026-11-03
 
 ### Fixed

@@ -182,11 +182,12 @@ try {
     const inAppCookie = (await fetch(`${inAppBase}/?token=${inAppBanner[2]}`, { redirect: 'manual', signal: AbortSignal.timeout(15_000) }))
       .headers.getSetCookie().map(cookie => cookie.split(';')[0]).join('; ')
     let inAppRpcId = 0
-    const inAppRpc = async (method, args) => {
+    const inAppRpc = async (method, args, timeoutMs = 15_000) => {
       const response = await fetch(`${inAppBase}/api/${method}`, {
         method: 'POST', headers: { 'content-type': 'application/json', cookie: inAppCookie },
         body: JSON.stringify({ type: 'client-request', rpcId: `release-in-app-${++inAppRpcId}`, method, payload: { args } }),
-        signal: AbortSignal.timeout(15_000),
+        // live install 会真装包/重写 profile；15s 在负载下会假红（2026-11-03 实测 abort）。inspect 仍 15s。
+        signal: AbortSignal.timeout(timeoutMs),
       })
       const body = await response.json()
       if (body?.result?.ok !== true) throw new Error(`${method}: ${JSON.stringify(body?.result?.error ?? body).slice(0, 400)}`)
@@ -194,7 +195,7 @@ try {
     }
     const inspected = await inAppRpc('pluginManager/inspect', { spec: `file:${tarball}`, options: {} })
     check('应用内 inspect 接受 tarball', inspected?.status === 'accepted', JSON.stringify(inspected).slice(0, 120))
-    const installed = await inAppRpc('pluginManager/installBundle', { spec: `file:${tarball}`, options: { requestId: 'release-in-app' } })
+    const installed = await inAppRpc('pluginManager/installBundle', { spec: `file:${tarball}`, options: { requestId: 'release-in-app' } }, 60_000)
     check('应用内安装 application=applied（默认路径）', installed?.application === 'applied',
       JSON.stringify(installed?.error ?? installed?.application).slice(0, 240))
     const inAppManifest = JSON.parse(readFileSync(join(inAppDir, 'package.json'), 'utf8'))

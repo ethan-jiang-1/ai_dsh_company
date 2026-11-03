@@ -6,7 +6,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 # 第五轮七维打扫审计（2026-11-03）
 
 > 服务：[第五轮七维打扫卡](../../issues/2026-11-03-repo-hygiene-round5.md)
-> **批次 A–C 已落地（2026-11-03）**：R5-01/02/04/05/06/07/08/10/11/12/17/21/22/23(首刀)/27/30/31/33 已修；R5-03 已按 0.7.2/0.8.0 bump 重打并 `release --verify` 全绿（npm publish 仍人工）；D7 公开面/peers 已收；D5 catalog 审计路径补测（v3 slug 修复）；0.8.1 发布。详见 [第五轮卡](../../issues/2026-11-03-repo-hygiene-round5.md) 与各 Note。下文保留审计时点（before）的发现。
+> **批次 A–C 已落地（2026-11-03）**：R5-01/02/04/05/06/07/08/10/11/12/17/21/22/23(首刀)/27/30/31/33 已修；R5-03 已按 0.7.2/0.8.0 bump 重打并 `release --verify` 全绿（npm publish 仍人工）；D7 公开面/peers 已收；D5 catalog 审计路径补测（v3 slug 修复）；0.8.2 发布。详见 [第五轮卡](../../issues/2026-11-03-repo-hygiene-round5.md) 与各 Note。下文保留审计时点（before）的发现。
 > 上一轮：[第四轮审计（2026-10-28）](../../_archive/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md)
 > 口径：fresh agent 只读评审 + 主 agent 亲跑全部 keyless 车道 + 六个独立子代理分维深挖；主 agent 对 P0/P1 逐条回查原文件/原命令。
 > vendor/dsh 只读；真模型认证档未跑（成本授权未给）。真页面档跑了 dev 模式 `ui-scene-smoke` 与 `client-load-smoke`；isolated 金样档实测启动失败（见 D6）。
@@ -230,7 +230,7 @@ git -C vendor/dsh rev-parse 'dsh-v0.2.1-rc.2^{commit}'
 - `docs/decisions.md` 62/62 零头寸（R5-17 剩余面）、`checks/README.md` 手工库存（R5-18）、dev-loop 空壳节（R5-19）、归档链接只查 `.md`（R5-20）；
 - 剩余约 13 处源码文本断言（`client-face` 的 toolview 优先级是刻意保留的装配面）。
 
-## 9. A- 收口（2026-11-03，0.8.1；发布字节 commit deb1f38）
+## 9. A- 收口（2026-11-03，0.8.2；review 后内部维护）
 
 | 维 | 分 | 一句话 |
 |---|---|---|
@@ -240,6 +240,6 @@ git -C vendor/dsh rev-parse 'dsh-v0.2.1-rc.2^{commit}'
 | D4 | A- | content/退役路径/READY/兼容表述；残余冻结归档断链与 decisions 零头寸 |
 | D5 | A- | 覆盖 86.72/78.65；company-tabs 75.92、catalog 76.29、skip 0；preset keyless YAML schema；真挂载在 preset-smoke |
 | D6 | A- | isolated golden/诊断/错误留痕/tee/--steps；残余为全链路与证据寿命边界 |
-| D7 | A- | 0.8.1 发布字节 READY（未 npm publish）；peers 47；web-only/品牌/inject 偏离文档化；workspaceRegistry 是 web 产品面 |
+| D7 | A- | 0.8.2 发布字节 READY（未 npm publish）；peers 47；web-only/品牌/inject 偏离文档化；workspaceRegistry 是 web 产品面 |
 
 详见 [A- 收口 Note](../../../notes/implemented/2026-11-03-a-minus-closeout.md)；两轴 review 的修补与字面残余 = [review-integrity-fixes](../../../notes/implemented/2026-11-03-review-integrity-fixes.md)。
