@@ -55,7 +55,7 @@ workspace 只从 `DSH_COMPANY_HOME` → 启动 cwd（合理的项目目录）→
 
 | 平面 | 放什么 | 谁拥有 |
 |---|---|---|
-| 插件包 `packages/company-pack/**` | presets、`src/host`、`src/client`、`content/`（手册/模板/默认章程/状态默认值） | 维护者；随包版本，只读 |
+| 插件包（发布面） | `lib/`（host/client 两半）、`presets/`、`content/`（手册/模板/默认章程/状态默认值）、`locale/`、`icon.svg`、`cordis.patch.yml`；源码面 `src/` 只在 repo、不随包 | 维护者；随包版本，只读 |
 | Harness home `<DSH_HOME>` | `profiles/company`、sessions、凭据、workspace 登记、lease、`company/methods/`、`company/ledger/`、`company/identity/` | DSH + host 治理 |
 | 用户 workspace | `<workspace>/.dsh-company/`：`kb/`（公司/org/owners/台账/章程/journal）、`deliverables/`、`cultivation/`、`logs/`、`exports/`、`overrides/`、`bundle.json`（v3，legacy 文件名） | 用户；可携带的公司状态 |
 
