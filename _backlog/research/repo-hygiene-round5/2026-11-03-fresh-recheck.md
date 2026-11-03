@@ -19,13 +19,13 @@ intent: "2026-11-03 Phase 0–4 后的七维复评：当前分、主要证据、
 | D4 上下文腐化 | **B+** | ↑ | workflow 幽灵能力/符号链接/CompanyView 旧叙述已改；A- 收口加推翻 banner；旧路径/台账序号修；notes:audit 硬项 0。残余：70 篇零入链的语义分诊、npm/market 未发布、release check 在非发布 HEAD 红（点态）。 |
 | D5 测试资产 | **A-** | ↑ | 138 文件 / 1102 例；workspace-resolution 12 例、context-wiring 8、member/title 9；6 个高风险模块覆盖阈值（红证）；skip 预期 N 守卫。残余：tests 类型面、presets 真挂载仍在认证档、client/index branch 16.66。 |
 | D6 反馈通路 | **A-** | → | isolated 真页面全链 smoke（错误环→reporter→host 日志）ALL PASS；`--steps`/截图/诊断/tee 已有；证据 7 天保留已写 runbook。残余：dev 多 writer 的 `session/writer-held` 现场、plain `dsh` 仅文档化 tee。 |
-| D7 DSH 插件约定 | **B+** | ↑ | bundle/patch/preset/client/安装/初始化/卸载仍是原生；master 快进去 private、0.8.2/0.8.3/0.8.4 tag；0.8.4 READY @5c5caf1。残余：npm publish 无认证、market index staged、0.8.4 后源码未发布（下一版 0.8.5）。 |
+| D7 DSH 插件约定 | **B+** | ↑ | bundle/patch/preset/client/安装/初始化/卸载仍是原生；master 快进去 private、0.8.2–0.8.6 tag；0.8.6 READY @3d69649。残余：npm publish 无认证、market index staged。 |
 
 ## 结论
 
 - **结构/证据面已从“B 档 + 假绿”走到“A-/B+ 且假绿有门”**；最大的剩余不是结构，而是**未发布/未类型检查**两个外部或独立轮项。
 - 仍不能称 A：D3/D7 的“发布字节真出去”和 tests 类型面没有闭合；D4 的 70 篇 Note 语义分诊只做了高腐化面。
-- 下一轮优先级：tests 两面 test project（先修新测试松类型 + `@types/react-dom`）→ 0.8.5 发布字节 → 70 篇 Note 全量分诊。
+- 下一轮优先级：tests 两面 test project（先修新测试松类型 + `@types/react-dom`）→ 70 篇 Note 全量分诊；发布已到 0.8.6。
 
 ## 机械读数
 
@@ -34,6 +34,6 @@ pnpm verify        ALL PASS（53 门 + 2 无对象）
 pnpm test          138 files / 1102 tests
 pnpm typecheck     exit 0
 pnpm test:coverage exit 0（6 个关键模块阈值）
-release --check    非发布 HEAD 红（gitSha/sourceFingerprint），0.8.4 READY @5c5caf1
+release --check    非发布 HEAD 红（gitSha/sourceFingerprint），0.8.6 READY @3d69649
 notes:audit        noDecision 0 / deadPaths 0 / missingBacklinks 0 / orphans 70
 ```
