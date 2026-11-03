@@ -48,7 +48,7 @@
 
 ```text
 # 红相（修前实跑）
-npx vitest run tests/harness/session-diagnose.spec.ts tests/harness/orient.spec.ts
+npx vitest run tests/harness/session/session-diagnose.spec.ts tests/harness/session/orient.spec.ts
   # → session-diagnose 4 failed（配对/枚举/孤儿/序列化）；orient 2 failed（真实 r3 ENOTDIR + 夹具文件形状）
 node checks/run-gates.mjs        # → FAIL replay-fixture-freshness：r3 注入手册第 153 行与现行不一致（出生事故即负例）
 pnpm diagnose --session <公司盘slug>/session-1d120f37   # 修前：FAILURES「approval ? →」「turn 1 error：[object Object]」

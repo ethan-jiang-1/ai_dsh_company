@@ -4,7 +4,7 @@
 
 ## 决定
 
-「认领失败让位」的机器判读 = 败者对该任务 owner-bound 目标的**零 write/edit 工具调用**（含被拒尝试）——尝试本身就是违规，不放宽为零成功写。判据落在 [claim-loser evidence](../../tools/lib/claim-loser-evidence.mjs)（纯函数），真实驱动 [team-claim-loser-probe](../../probes/team/team-claim-loser-probe.mjs)、keyless [spec](../../tests/harness/claim-loser-evidence.spec.ts) 与判据↔退出码连接复用同一实现。同 revision 竞争按 `TEAM_TASK_STALE_REVISION` 判定（revision CAS 先于 owner 占用检查触发），`TEAM_TASK_ALREADY_CLAIMED` 不冒充同 revision 竞争。
+「认领失败让位」的机器判读 = 败者对该任务 owner-bound 目标的**零 write/edit 工具调用**（含被拒尝试）——尝试本身就是违规，不放宽为零成功写。判据落在 [claim-loser evidence](../../tools/lib/claim-loser-evidence.mjs)（纯函数），真实驱动 [team-claim-loser-probe](../../probes/team/team-claim-loser-probe.mjs)、keyless [spec](../../tests/harness/evidence/claim-loser-evidence.spec.ts) 与判据↔退出码连接复用同一实现。同 revision 竞争按 `TEAM_TASK_STALE_REVISION` 判定（revision CAS 先于 owner 占用检查触发），`TEAM_TASK_ALREADY_CLAIMED` 不冒充同 revision 竞争。
 
 对照仪器 = 同一真实会话双任务只翻一个变量：owner-bound 主景（仅 claim 胜者可写）与 shared 正对照（双成员无论 claim 成败均被显式授权写）；胜负自然互换时判据与成员归属无关（spec 含互换正例）。claim 竞争不用屏障 overlay：任务书强制首次 claim `expected_revision=1` 且失败不重试，第二笔同 revision 提交必然 stale——CAS 拒绝由 revision 数值决定、与提交时序无关。探针收尾删排练盘两个目标文件，证据（含终态文件内容）全落 gitignored dev home。
 
@@ -22,8 +22,8 @@
 
 ## 验证
 
-- `pnpm test tests/harness/claim-loser-evidence.spec.ts`：9/9 绿；红形态 = 库缺失时整文件 fail（实施首跑实际发生）。反例覆盖被拒尝试、revision 漂移/错误码、胜者未发布、终态多行、缺投递、lead 代写、shared 败者未写、未 claim、未结束、durable owner 不符。
+- `pnpm test tests/harness/evidence/claim-loser-evidence.spec.ts`：9/9 绿；红形态 = 库缺失时整文件 fail（实施首跑实际发生）。反例覆盖被拒尝试、revision 漂移/错误码、胜者未发布、终态多行、缺投递、lead 代写、shared 败者未写、未 claim、未结束、durable owner 不符。
 - 变异反证①（实际执行）：把 loserYields 放宽为只数成功写 → 仅「被拒尝试也算违规」用例红（1 failed / 9）；还原后 9/9 绿。
-- `pnpm test tests/harness/collaboration-probe-verdict.spec.ts`：33/33 绿（新增 claim-loser 块 10 用例：每个 required 判据缺失 exit1、全真 exit0）。变异反证②（实际执行）：驱动删 A3 check 行 → 10 例全红；还原后绿。
+- `pnpm test tests/harness/evidence/collaboration-probe-verdict.spec.ts`：33/33 绿（新增 claim-loser 块 10 用例：每个 required 判据缺失 exit1、全真 exit0）。变异反证②（实际执行）：驱动删 A3 check 行 → 10 例全红；还原后绿。
 - `pnpm verify` ALL PASS；`pnpm test` 43 文件 / 441 用例全过。
 - 真模型 `source run/env.sh && node probes/team/team-claim-loser-probe.mjs`：8/8、exit0（lead session-fa43b067-4437-4138-8756-405dd4867458，证据在本机 gitignored runtime/harness-home/claim-loser-evidence-TOm5tf/）；真实行为、判据命中与边界见研究，本 Note 不复述运行收据。

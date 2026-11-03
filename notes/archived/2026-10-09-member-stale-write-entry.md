@@ -6,7 +6,7 @@
 
 本Note形成时BUG-007唯一剩余入口缺口是concurrency C1b；当前已由另一个双成员同轮屏障实验覆盖，归档和证据指针见后果节。本 Note 记录补这个入口的仪器取舍：一个 lead + 一个成员的同轮受控场景，用「外部改盘」制造真实版本漂移，而不是靠两个成员并发竞写撞运气。
 
-判据落在 [成员 stale evidence](../../tools/lib/member-stale-evidence.mjs)（纯函数，不变量自身），真实驱动 [member-stale-write-probe](../../probes/team/member-stale-write-probe.mjs) 与 keyless 回归 [spec](../../tests/harness/member-stale-evidence.spec.ts) 复用同一实现。七个条件全为真才算通过：
+判据落在 [成员 stale evidence](../../tools/lib/member-stale-evidence.mjs)（纯函数，不变量自身），真实驱动 [member-stale-write-probe](../../probes/team/member-stale-write-probe.mjs) 与 keyless 回归 [spec](../../tests/harness/evidence/member-stale-evidence.spec.ts) 复用同一实现。七个条件全为真才算通过：
 
 - `phase1Read`：成员**完整**读了基线（全文一次读到底，`offset=1`、`totalLines == lines.length`、行号连续、正文精确等于基线），且此刻盘上未被写、外部改盘已应用、水位 `externalAfterEventCount` 为正整数。
 - `firstWriteStale`：败者第一次写确实报 `FS_STALE_VERSION`（不是 `FS_NOT_OBSERVED`），是本次第一笔写，且发生在外部改盘之后，载荷精确为旧观察 `BASE\nMEMBER\n`。

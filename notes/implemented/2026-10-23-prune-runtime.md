@@ -29,7 +29,7 @@
 ## 验证（真跑）
 
 ```text
-npx vitest run tests/harness/prune-policy.spec.ts   # 3 passed（删/留原因/README 保护）
+npx vitest run tests/harness/repo/prune-policy.spec.ts   # 3 passed（删/留原因/README 保护）
 node tools/prune-runtime.mjs --days 7               # dry-run：候选 161 · 可删 105 / 22.0M · 留 56
 node tools/prune-runtime.mjs --days 7 --apply       # 删 105 项，回收 22.9M
 pnpm test     # 756 passed

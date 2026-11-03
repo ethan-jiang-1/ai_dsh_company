@@ -67,7 +67,7 @@ notes/ 已经历多轮产品演进，三类东西混在同一层：
 ## 验证（真跑）
 
 ```text
-npx vitest run tests/harness/notes-audit.spec.ts
+npx vitest run tests/harness/tools/notes-audit.spec.ts
 #   16 passed（解析/收据/死路径/取代回链/活引用/状态行 + 否定句豁免）
 pnpm notes:audit
 #   implemented 74 / archived 69 / receipts 21（均不含 README）；收据候选 0 / 无决定节 0 / 死路径 0 / 取代缺回链 0 / 零入链 41

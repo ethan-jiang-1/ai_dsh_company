@@ -1,7 +1,7 @@
 // 背压活状态检查（2026-10-10 从 checks/run-gates.mjs 原样挪入；卡「两处重复收成模块」）。
 // 状态：常驻
 // 何时跑：改 `_backlog/` 制度目录、卡头、索引，或改本文件后 → `node checks/run-gates.mjs`
-//   （门禁行 `backlog-liveness（…）`）+ `npx vitest run tests/harness/backlog-liveness.spec.ts`。
+//   （门禁行 `backlog-liveness（…）`）+ `npx vitest run tests/harness/tools/backlog-liveness.spec.ts`。
 //
 // 为什么从门禁文件里挪出来：这道检查只有两个调用方——门禁**运行**它、spec **断言**它；原先 spec 靠
 //   切 `checks/run-gates.mjs` 的源码字符串 + `vm` 求值来拿到函数，改一处注释就会让 spec 假红（实测
@@ -135,7 +135,7 @@ export function backlogLivenessProblems(backlogRoot) {
     //   ⑥ 材料移回 shelf 根 → `… 平铺在 shelf 根——研究材料必须住进题名目录（_backlog/_archive/research/<slug>/）`。
     //   ⑦ 建只有 png 的 `_archive/research/zz-probe/`（无题名页）→ `_backlog/_archive/research/zz-probe/README.md 缺题名页——…`；
     //   ⑧ `zz-probe/2026-10-30-zz-symlink.md` 符号链接到无头文件（题名页已点名）→ `…:1 缺 frontmatter`（旧 walker 会静默跳过）。
-    //   spec 夹具 = tests/harness/backlog-liveness.spec.ts 的研究题五例（题名页/三行/归档日、散件与索引、两级反散文、
+    //   spec 夹具 = tests/harness/tools/backlog-liveness.spec.ts 的研究题五例（题名页/三行/归档日、散件与索引、两级反散文、
     //   目录枚举、symlink 文件）。
     const researchPool = pool.endsWith('research')
     const indexPath = researchPool ? `${pool}/README.md`

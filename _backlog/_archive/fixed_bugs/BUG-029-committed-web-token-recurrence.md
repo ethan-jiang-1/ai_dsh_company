@@ -26,7 +26,7 @@ runtime/web-logs/web-20261019-105001.log 被 git 跟踪，首行为一条带
   `HIGH-ENTROPY-ASSIGNMENT ... key=token len=43 entropy=4.90`，退出码 2。
   ⇒ **工具能咬，通道没接**。
 - 这是 [BUG-013](BUG-013-e2e-driver-token-committed.md) 的同类复发：
-  上次修的是 `runtime/e2e/` 路径 + `.gitignore` 规则，`tests/harness/gitignore-guards.spec.ts`
+  上次修的是 `runtime/e2e/` 路径 + `.gitignore` 规则，`tests/harness/repo/gitignore-guards.spec.ts`
   也只钉这一条路径；没有类级「任何 tracked 文件不得含 token URL」守卫。
 
 缓解事实：该 token 是本地观察窗**按进程生成**的会话 token，重启即轮换，不是 API key；
@@ -50,7 +50,7 @@ runtime/web-logs/web-20261019-105001.log 被 git 跟踪，首行为一条带
 - **横切排查**：`git grep -nE 'token=[A-Za-z0-9_-]{20,}'` 全 tracked 面；本次只命中
   runtime/web-logs 这一件。用 a2 全 tracked 扫描会命中三件，其中两件是**测试替身**：
   `probes/session-context/human-exits-nonblocking-probe.mjs` 的
-  `token: url.searchParams.get('token')`（动态值）与 `tests/harness/orient.spec.ts`
+  `token: url.searchParams.get('token')`（动态值）与 `tests/harness/session/orient.spec.ts`
   的 `secret = 'never-render-this-placeholder'`（占位串）。类级守卫若直接复用 a2，
   需要把 `tests/**` / 探针源码标成 fixture 面，或用窄的 token-URL 正则，避免假红。
 - **为什么值得横切**：这是同一失败类 7 天内第二次；不升类级就会第三次。
@@ -74,8 +74,8 @@ token 值不复制到卡、报告或测试输出里。
 2. 类级守卫落在两处：
    - 纯逻辑 = `tools/lib/tracked-token.mjs`（只认 URL 查询串里的 token，值不回传）；
    - 门禁 = `checks/gates/tracked-token.mjs`（扫 `git ls-files`，跳过只读 `vendor/`），
-     已装配进 `checks/run-gates.mjs`；keyless 判据 = `tests/harness/tracked-token.spec.ts`，
-     `.gitignore` 红绿守卫 = `tests/harness/gitignore-guards.spec.ts`。
+     已装配进 `checks/run-gates.mjs`；keyless 判据 = `tests/harness/repo/tracked-token.spec.ts`，
+     `.gitignore` 红绿守卫 = `tests/harness/repo/gitignore-guards.spec.ts`。
 3. 安全闸的**范围声明**同步：`checks/README.md` 与 `security-scan.mjs` 头注写清
    「company-workspace 真扫 + tracked token-URL 窄扫」；不再说无边界的「真扫」。
 4. 不做历史重写：token 已随进程失效，和 BUG-013 同一裁定；重启观察窗即轮换。

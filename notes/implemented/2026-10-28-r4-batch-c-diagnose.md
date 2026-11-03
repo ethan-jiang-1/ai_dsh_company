@@ -30,7 +30,7 @@
 
 ## 验证
 
-- `pnpm test tests/harness/session-diagnose.spec.ts` → 12 tests passed（新增非零 bash 去重、等人回答、待审批、team failed 四例）。
+- `pnpm test tests/harness/session/session-diagnose.spec.ts` → 12 tests passed（新增非零 bash 去重、等人回答、待审批、team failed 四例）。
 - `source run/env.sh && pnpm diagnose --session '--Users-bowhead-ai_dsh_company-company-workspace--/session-01b060a7'` → `nonzero=4`、`NONZERO 4`、4 条命令尾部；`FAILURES none`（无 isError）。
 - 同一命令 `--strict` → exit 1；`--json --strict` → exit 1，JSON 含 `toolNonZeroExits`。
 - `pnpm diagnose --session '…/daadc7d2-b1ce-47c1-8193-a49f1bf59ac1'` → 正常输出（child 无 `session-` 前缀）。

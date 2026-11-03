@@ -31,7 +31,7 @@
 
 ```text
 rg -n "CompanyView|createCompanyView" packages/company-pack/src tests   # 0 命中
-npx vitest run tests/company/workspace-resolution.spec.ts tests/client/ui/brand.spec.ts tests/harness/pack-exports.spec.ts
+npx vitest run tests/company/workspace-resolution.spec.ts tests/client/ui/brand.spec.ts tests/harness/repo/pack-exports.spec.ts
 # 15 passed（12 + 1 + 2）
 pnpm test                                                               # 见本轮提交后的读数
 pnpm verify                                                             # 删文件后 archived 链接 4 处红 → 改指本条 → 绿

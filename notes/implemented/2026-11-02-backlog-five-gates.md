@@ -57,6 +57,6 @@ _backlog/_archive/settled_issues/2026-11-03-zz-probe.md:1 归档「毕业：做�
 
 删除后：`verify: ALL PASS；2 门无对象（replay-fixture-freshness / replay-ui-freshness）`。豁免方向同时验过：`opened = 2026-11-02` 的已归档发行对齐卡（散文去向、无审查）在场不红。
 
-- `pnpm exec vitest run tests/harness/backlog-liveness.spec.ts`：32 passed（新增 4 例：待落地门、缺陷门票、题名页状态、归档去向 + 审查；原「修复就绪如实不查」例改为「门票在场」）。
+- `pnpm exec vitest run tests/harness/tools/backlog-liveness.spec.ts`：32 passed（新增 4 例：待落地门、缺陷门票、题名页状态、归档去向 + 审查；原「修复就绪如实不查」例改为「门票在场」）。
 - `pnpm test`：124 文件 / 1045 passed / 3 skipped。
 - `pnpm verify`：ALL PASS。

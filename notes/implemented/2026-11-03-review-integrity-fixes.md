@@ -25,7 +25,7 @@
 6. **presets 缺 keyless YAML schema**：新增 `presets.spec` 用例，用 vendor `js-yaml` + 自定义
    `!!js` 标量 schema（不求值），断言顶层数组 → insert → dsh-agent-preset → config.plugins、
    id 唯一、行有 id/name。
-7. **skip 无预算守卫**：新增 `tests/harness/skip-budget.spec.ts`；只允许 `ledger.spec` 的
+7. **skip 无预算守卫**：新增 `tests/harness/repo/skip-budget.spec.ts`；只允许 `ledger.spec` 的
    dev-only live 档，且登记“预期 3 例（dev home）/0 例（fresh clone）”。新 skip 未登记即红。
 8. **when-to-read 的 blockquote 后缺空行**：6 份插入式文档补空行，避免 lazy continuation 把正文吞进引用块。
 9. **release-smoke ④c 假红**：in-app install 的 fetch 15s 在负载下 abort；改为 60s（inspect 仍 15s）。
@@ -43,7 +43,7 @@
 ```text
 pnpm install --frozen-lockfile --ignore-scripts   # exit 0（lock 与 package 一致）
 npx vitest run tests/presets/presets.spec.ts      # 27 passed（含 YAML schema）
-npx vitest run tests/harness/skip-budget.spec.ts  # 1 passed（登记守卫）
+npx vitest run tests/harness/repo/skip-budget.spec.ts  # 1 passed（登记守卫）
 pnpm verify                                       # ALL PASS
 pnpm test                                         # 135 files / 1077 tests（0 skipped on dev home）
 release --check                                   # READY 0.8.2（收盘提交重新 stamp）

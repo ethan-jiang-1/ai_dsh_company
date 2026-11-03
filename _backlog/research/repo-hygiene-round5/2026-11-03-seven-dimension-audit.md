@@ -39,7 +39,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 | R5-05 | D3 | **P1** | 语义审四输入的 owner 是空壳：`close-out-definition/SKILL.md:10,25,61`、`dev-loop.md:132` 说「住 §13」，而 `dev-loop.md:153-155` 只有一行指向 `policy.md §P5`；实际正文在 `policy.md:79-84`。7 处活引用指到中转节。 |
 | R5-06 | D5 | **P1** | 用户最常点的「培养」页签壳 `CultivationTab.tsx` **0.0% statements**（只在 `company-tab-registration.spec.ts:37` 的数组里被点名）；整页空白、`roleSource` 抛错，1048 例全绿。同族：`company-tabs.tsx` 24.1%（浮窗/localStorage 85-158 未覆盖）、`Brand.tsx` 0%。 |
 | R5-07 | D2 | **P1** | 决定「公司数据可不可写」的 `host/runtime-guard.ts`（137 行）无直接 spec；`workspace-resolution.ts` 25.5%、`workspace-doors.ts` 31.8%，只有间接组合覆盖。 |
-| R5-08 | D2 | **P1** | 分层守卫自称检查 fetch/spawn/exec「from parsed call expressions below」，实际文件里没有这段（`tests/harness/layering.spec.ts:28-29` vs 全体），守卫在说谎；动态 import 的 `spawn` 可穿。 |
+| R5-08 | D2 | **P1** | 分层守卫自称检查 fetch/spawn/exec「from parsed call expressions below」，实际文件里没有这段（`tests/harness/repo/layering.spec.ts:28-29` vs 全体），守卫在说谎；动态 import 的 `spawn` 可穿。 |
 | R5-09 | D2/D5 | **P1** | 源码文本当行为断言至少 15 处（`client-face.spec.ts:21-39,63-88` 断 `useState(false)`/`ResizeObserver`；`panel-freshness.spec.ts:51-65` 断字面量）。行为保持的重构变红，行为回归只要拼写不变仍绿。 |
 | R5-10 | D7 | **P1** | 卸载承诺从未冒烟：`release-smoke` 有 install / 幂等重装 / 应用内安装 / 首启 / 二启，**没有 remove**；而 README/手册承诺「remove 只摘插件、数据全部留下」。这是用户点名的生命周期轴里唯一没证据的一格。 |
 | R5-30 | D6 | **P1** | `diagnose` 少报非零退出：`tools/lib/session-diagnose.mjs:110` 先把工具输出截到 400 字符再匹配 `[exit code: N]`，而 marker 在输出末尾。全 dev home 597 会话实测 **132 条真非零 / 只报 87 条（漏 34%）**；会话 `003d6306…` 有 2 条 exit 1，`diagnose` 打 `nonzero=0`。 |
@@ -67,7 +67,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 - **测试粒度反了**（R5-23）：原 cultivation spec（929 行，2026-11-03 已拆） / 44 个 it，覆盖 `host/cultivation` + `host/cultivation-storage` + `lib/cultivation` + `lib/cultivation-context` 四模块；源码是一模块一文件。`tests/client/cultivation/cultivation-board-actions.spec.ts` 574 行。
 - **测试分区无主**（R5-24）：`src/lib`（20 模块）没有自己的区；9 个纯 lib spec 住 `tests/company/`，1 个住 `tests/client/`；`tools/lib` 的 2 个 spec 也住 `tests/company/`（`dev-install`/`market-index`），而 `tests/README.md:16-19` 把 tools/lib 判据划给 harness。
 - **共享面漏测**（R5-25）：`lib/tool-card.ts`（75 行，两个卡片共用）无直接 spec，且 `:44` 内联复制了 `lib/guards.ts:5` 的 `isRecord`；`lib/guards.ts` 本身也无 spec。
-- **入口导出面**（R5-26）：`src/index.ts:43-44` `export *` 出 17 个符号，仓内无消费者（只有 `apply` 被 7 处 import）；`tests/harness/pack-exports.spec.ts` 钉了 inject/apply，没钉导出集合，公开面可静默变宽。
+- **入口导出面**（R5-26）：`src/index.ts:43-44` `export *` 出 17 个符号，仓内无消费者（只有 `apply` 被 7 处 import）；`tests/harness/repo/pack-exports.spec.ts` 钉了 inject/apply，没钉导出集合，公开面可静默变宽。
 - **静默盲区**：`checks/gates/src-layering.mjs` 只认字面量 specifier，`await import(v)` / 模板串可穿（未复发，注释已明说）。
 
 ### D3 文档—执行—验收（B-）
@@ -104,7 +104,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 - **preset 只有文本**（R5-15）：`tests/presets/presets.spec.ts` 26 个 YAML 正则断言；真挂载只在 `checks/smoke/preset-smoke.mjs`（不在 `pnpm test`）。schema 非法的 preset 在 keyless 档仍绿。
 - **静默 skip**（R5-16）：`tests/company/ledger.spec.ts:43` 的 `describe.skipIf(!hasLive)` 正是本轮 3 个 skip；它是 live 台账的唯一结构断言，fresh clone 上消失，且没有「预期 N 个真跑」守卫（宪法 §3.6 要求）。
 - **测试重心**：harness 48 文件 / 504 例 = 48%，一半断言守仓库自身；产品面是少数。
-- **mock 白名单漂移**（R5-28）：`docs/testing.md:49` 说只有两处；`tests/harness/probe-web.spec.ts:151-207` 有 11 处 fetch/spawn stub（网络边界），未登记。
+- **mock 白名单漂移**（R5-28）：`docs/testing.md:49` 说只有两处；`tests/harness/session/probe-web.spec.ts:151-207` 有 11 处 fetch/spawn stub（网络边界），未登记。
 - **fixture emitter 混入 tests**（R5-29）：`role-mark-fixture.spec.ts`、`board-drift-fixture.spec.ts`、`dag-visual-fixture.spec.ts` 是产物生成器，不是行为测试，但计入 124。
 - **3 个 0 覆盖的壳**：`Brand.tsx` 0%、`CultivationTab` 0%，`client/index.ts` 58.5%。
 

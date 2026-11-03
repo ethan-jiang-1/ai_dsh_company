@@ -23,6 +23,6 @@
     "tests/support/temp-env.ts"
   ],
   "exclude": [
-    "tests/harness/pack-exports.spec.ts"
+    "tests/harness/repo/pack-exports.spec.ts"
   ]
 }

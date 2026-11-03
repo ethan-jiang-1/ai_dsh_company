@@ -44,7 +44,7 @@
 ## 验证
 
 - `set -o pipefail; pnpm verify`：ALL PASS（2026-10-25）；`backlog-liveness` 输出含“归档做卡去向”；`bare-path ×956`、`notes-liveness ×64`、`ledger-routing ×45`。
-- `pnpm exec vitest run tests/harness/backlog-liveness.spec.ts`：25/25（新增 1 例）。
+- `pnpm exec vitest run tests/harness/tools/backlog-liveness.spec.ts`：25/25（新增 1 例）。
 - `pnpm test`：85 文件 / 829 用例通过（2026-10-25 02:10，全量 keyless）。
 - 真树红证：在 `_backlog/_archive/settled_issues/` 植入一张文件名带 `zz-` 的 2026-10-25 卡（`opened: 2026-10-25`、`毕业：做`、无 `去向`）+ 归档索引链接 → `node checks/run-gates.mjs` exit 1，原话：
   ```

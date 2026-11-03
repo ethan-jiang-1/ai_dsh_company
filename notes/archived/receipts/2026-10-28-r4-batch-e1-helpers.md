@@ -32,7 +32,7 @@
 
 ## 验证
 
-- `pnpm test tests/harness/src-layering.spec.ts` → 6 passed（新增注释/require/行号用例）。
+- `pnpm test tests/harness/repo/src-layering.spec.ts` → 6 passed（新增注释/require/行号用例）。
 - 真树红证：`packages/company-pack/src/client/zz-layering-red.ts` 内容 `require('../host/catalog.ts')` →
   `FAIL src-layering: … zz-layering-red.ts:1 → client → host 不在允许方向`；删文件 → `PASS src-layering ×65 文件 / 166 条相对引用`。
 - `pnpm test` → **110 files / 974 tests passed**；`pnpm verify` → ALL PASS；`pnpm typecheck` → exit 0。

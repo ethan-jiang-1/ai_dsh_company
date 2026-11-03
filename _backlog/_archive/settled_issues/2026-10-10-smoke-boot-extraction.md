@@ -58,7 +58,7 @@ preset、probe、replay。
 
 | 行为 | 通过/失败 | 证据 |
 |---|---|---|
-| 模块扩展形状（patch 数组 / onEmptyCookie） | 新 spec 用例先红（模块还没有这两个能力）后绿，断言 argv 与 cookie 行为 | `tests/harness/probe-web.spec.ts` |
+| 模块扩展形状（patch 数组 / onEmptyCookie） | 新 spec 用例先红（模块还没有这两个能力）后绿，断言 argv 与 cookie 行为 | `tests/harness/session/probe-web.spec.ts` |
 | 25 个已迁探针零扰动 | `git diff probes/` 为空；`pnpm test` 全绿 | diff + suite |
 | smoke 判据不变 | 每个 smoke 的 diff 只含启动块删除与模块调用 | `git diff checks/smoke/` 逐文件审计 |
 | 真 banner 仍解析 | 一次真启动 PASS | 验收脚本 |

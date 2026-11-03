@@ -30,7 +30,7 @@ intent: "补BUG-007真实成员freshness拒写与恢复子路径，区分同轮s
 
 [纯判据](../../../../tools/lib/member-stale-evidence.mjs)由真实驱动复用：成功read必须offset=1、totalLines与lines一致、行号连续及载荷精确；外部修改水位后第一次write实际stale；期间不重读；stale后read真实最新外部载荷，再write/edit精确合并；独立文件精确；Lead无目标write；最新turn completed且总预算未过。
 
-`pnpm test tests/harness/member-stale-evidence.spec.ts`实际4/4通过；覆盖FS_NOT_OBSERVED不能替stale、缺水位、read-only、部分read、错误合并payload、无配对write result、间隔重读、活动轮、预算过期、Lead代写与多空行。使用收紧后的helper重放上述成功成员/Lead实际JSON，7项全true；这不是另一次真模型运行。
+`pnpm test tests/harness/evidence/member-stale-evidence.spec.ts`实际4/4通过；覆盖FS_NOT_OBSERVED不能替stale、缺水位、read-only、部分read、错误合并payload、无配对write result、间隔重读、活动轮、预算过期、Lead代写与多空行。使用收紧后的helper重放上述成功成员/Lead实际JSON，7项全true；这不是另一次真模型运行。
 
 ## 语义审、收割与下一步
 

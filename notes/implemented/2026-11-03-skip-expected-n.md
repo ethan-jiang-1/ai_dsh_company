@@ -7,7 +7,7 @@
 
 ## 决定
 
-- `tests/harness/skip-budget.spec.ts` 增加第二条断言：对每个登记文件，解析 `describe.skipIf(...)` 回调体，
+- `tests/harness/repo/skip-budget.spec.ts` 增加第二条断言：对每个登记文件，解析 `describe.skipIf(...)` 回调体，
   数其中 `it(` 的数量；必须等于注释里 `skip 预期：… N 例` 的 N。
 - 注释格式收紧为 `skip 预期：[^\n]*?\d+\s*例`；ledger 的“真跑 3 例”即可匹配。
 - 这是**结构守卫**，不是运行证据：它证明“skip 块里的用例数没悄悄变”，不证明 dev home 真跑了那 3 例
@@ -22,7 +22,7 @@
 ## 验证（实跑，2026-11-03 11:4x +08）
 
 ```text
-npx vitest run tests/harness/skip-budget.spec.ts   # 2 passed
+npx vitest run tests/harness/repo/skip-budget.spec.ts   # 2 passed
 # 红证：在 ledger 的 skipIf 块里临时加 it('__skip_guard_red', () => {})
 #   → 1 failed：skip 块有 4 个 it，注释预期 3 例
 # 还原 → 2 passed

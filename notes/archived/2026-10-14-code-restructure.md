@@ -4,7 +4,7 @@
 
 ## 决定（六项，每项一 commit）
 
-1. **doors 守卫迁出**：`tests/harness/deliverables.spec.ts` 尾部寄居的 BUG-002 块迁独立 `tests/company/doors.spec.ts`，恢复 tests/company `<模块>.spec.ts` 一一对应（负例留证行随守卫同迁——guard-red-record 门禁按声明文件找留证）。
+1. **doors 守卫迁出**：`tests/harness/tools/deliverables.spec.ts` 尾部寄居的 BUG-002 块迁独立 `tests/company/doors.spec.ts`，恢复 tests/company `<模块>.spec.ts` 一一对应（负例留证行随守卫同迁——guard-red-record 门禁按声明文件找留证）。
 2. **测试夹具去重**：deliverables 九处同形 Lead 内联 → 顶层 `leadSession(slug, {覆写})`（异形 cwd/多 presented/legacy/BUG-003 drafts 保留内联）；candidate-scan-labels 的 case-14 六行漂移形状两处逐字重复 → 文件级 `CASE14_BRIEF/CASE14_DRAFTS`；presets.spec 六处角色数组 → 文件级 `ROLES`、十一处读盘 → `roleYml()`。
 3. **五角色数组单源**：`tools/lib/company-roles.mjs` 的 `COMPANY_ROLE_IDS` 为 mjs 侧唯一事实家（10 处消费：authorship/candidate-scan[死导出删]/deliverables/converge/run-gates presets 门禁/四 smoke/journal-audit）；journal-audit 原字母序以 `[...COMPANY_ROLE_IDS].sort()` 保持零漂移。
 4. **zstd 解压收 drivers**：`tools/drivers/zstd.mjs` 的 `zstdText(file,{maxBuffer})` 收拢 4 处近似拷贝（orient/snapshot-motion/session-log-export/journal-audit）；各调用点 maxBuffer 沿用现值。
@@ -25,7 +25,7 @@
 ## 后果
 
 - 加第 6 角色：mjs 侧改 1 处（company-roles.mjs）+ 建 preset 目录（presets 门禁强制），原 10 处 → 1 处；加门禁 = `checks/gates/` 加一个文件 + runner 两行（import + 调用），分区编号腐化（两个 2c-bis/2c-ter/2d-quater）随之消解——文件名即门禁短名，FAIL 行可直达文件。
-- 探针改输出格式：先红 `tests/harness/probe-kit.spec.ts`（3 条钉格式），不再要点几十处。
+- 探针改输出格式：先红 `tests/harness/session/probe-kit.spec.ts`（3 条钉格式），不再要点几十处。
 - 判分类探针要 keyless 回归：照 team-concurrency-verdict.mjs 先例抽 lib + spec 普通 import（不再源码切片 + vm 求值——探针一改锚就假红，2026-10-10 probe-web 抽取同款病灶同款修法，互链 [2026-10-10-probe-web-and-backlog-liveness-extraction](2026-10-10-probe-web-and-backlog-liveness-extraction.md)）。
 - 重放 lane 的 3 个预存 FAIL（cultivation_propose 进 sidecar 对比、金样「最小往返探针/Ping VP-Eng」第 35 行漂移）**属培养回路轮（fe3c0c9）遗留、非本轮造成**——本轮以「与基线逐行一致」为不变量如实保留，刷新金样归该面 owner。
 

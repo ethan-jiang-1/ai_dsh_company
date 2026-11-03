@@ -15,7 +15,7 @@
  * - `tool/call.data = { turn, step, callId, name, arguments }`，**`arguments` 是 JSON 字符串**；
  * - `tool/result.data.message.toolCallId` 与调用配对（老形状兜底 `data.callId`）。
  *
- * keyless 判据 = `tests/harness/question-stop.spec.ts`；驱动侧用法 = `probes/session-context/ask-user-timed-probe.mjs`。
+ * keyless 判据 = `tests/harness/tools/question-stop.spec.ts`；驱动侧用法 = `probes/session-context/ask-user-timed-probe.mjs`。
  */
 
 /** 默认前台窗口（秒）——与五角色 preset 钉的 `timeout: 120` 同值。 */

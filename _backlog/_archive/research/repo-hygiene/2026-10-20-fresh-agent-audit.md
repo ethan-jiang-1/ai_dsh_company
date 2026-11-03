@@ -55,7 +55,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
   每份文档开头有「什么时候读」，路由表按任务而不是按文件组织。
 - `docs/testing.md`（政策）与 `tests/README.md`（行级映射）有意识分工；`checks/README.md` 只索引、
   触发/成本/状态回脚本头注；`notes/` 与 `_backlog/` 的 owner 文件写得比多数仓库清楚。
-- 测试分层守卫（`tests/harness/layering.spec.ts`）是真的机械门禁，不是口号。
+- 测试分层守卫（`tests/harness/repo/layering.spec.ts`）是真的机械门禁，不是口号。
 
 **问题**
 
@@ -140,7 +140,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 | 10 | `packages/company-pack/src/README.md:16`「十一模块」 | 12 个 lib 模块 | `ls src/lib/*.ts` 12 个 |
 | 11 | `docs/project-map.md:29`「runtime 全部 gitignored」 | 审计时 11 件 tracked；修复后 9 件（两件日志已 untrack） | `git ls-files runtime` |
 | 12 | `runtime/README.md` 第 5–8 行 + 根 `AGENTS.md:25` 的 tracked 白名单 | 审计时两处都漏 runtime/web-logs/*.log；修复后 runtime README 已补 ignored 说明 | 同上；且其中一件含 token → BUG-029 |
-| 13 | `docs/testing.md` 第 12/49 行「keyless 不证明装配」「现状零 mock」 | whole-client spec 真 boot + RemoteMock；另有 `vi.mock('node:os')` | `tests/client/company-client-composition.spec.ts` 第 4–15/57 行；`tests/harness/foundation-safety.spec.ts:8` |
+| 13 | `docs/testing.md` 第 12/49 行「keyless 不证明装配」「现状零 mock」 | whole-client spec 真 boot + RemoteMock；另有 `vi.mock('node:os')` | `tests/client/company-client-composition.spec.ts` 第 4–15/57 行；`tests/harness/repo/foundation-safety.spec.ts:8` |
 | 14 | `checks/smoke/replay-smoke.mjs:7`「~11s」 | r3 14.7s；r2 98.9s；r2 `--ui` 80.8s | 本轮实跑 |
 | 15 | `checks/smoke/client-load-smoke.mjs:4`「~10s」 | 26.4s | 本轮实跑 |
 | 16 | `docs/guides/dev-loop.md:252` 引「Tests 5.16s/3.40s，全程 13.6s/4.8s」 | Tests 7.7–13.5s，全程热 9.4–23.6s / 冷 55.4s | 本轮实跑；单点值不是稳定值 |

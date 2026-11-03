@@ -27,11 +27,11 @@
 
 | 命令 / 试验 | 断言 | 红 / 绿形态 |
 |---|---|---|
-| `pnpm exec vitest run tests/client/tabs/company-tab-registration.spec.ts tests/client/wiring/company-session-adapters.spec.ts tests/company/cultivation.spec.ts tests/harness/replay-logic.spec.ts` | 四个 seam 的 targeted specs | 4 files / 25 tests PASS（初次聚焦运行） |
+| `pnpm exec vitest run tests/client/tabs/company-tab-registration.spec.ts tests/client/wiring/company-session-adapters.spec.ts tests/company/cultivation.spec.ts tests/harness/session/replay-logic.spec.ts` | 四个 seam 的 targeted specs | 4 files / 25 tests PASS（初次聚焦运行） |
 | 临时把 `company-tab-registration.ts` 的 attention id 改为 `attention-mutated`；跑 `pnpm exec vitest run tests/client/tabs/company-tab-registration.spec.ts`；还原后重跑 | 注册 key 漂移能否被独立期望抓住 | 红：1 test failed，expected `dsh-company-pack/attention`、收到 `attention-mutated`；还原绿：1/1 PASS |
 | 临时让 `createLeadLookup` 返回当前 session 而非 parent；跑 `pnpm exec vitest run tests/client/wiring/company-session-adapters.spec.ts`；还原后重跑 | child 路由是否归到 Lead | 红：1 test failed，expected `lead-session`、收到 `child-session`；还原绿：1/1 PASS |
 | 临时反转 adoption 的 target-role guard；跑 `pnpm exec vitest run tests/company/cultivation.spec.ts`；还原后重跑 | 跨角色不得采纳、目标本人可以采纳 | 红：2 failed / 17 passed，跨角色请求错误成功、目标本人反被拒；还原绿：19/19 PASS |
-| 临时停用 `TIME_CONTEXT_SAMPLE` 正则；跑 `pnpm exec vitest run tests/harness/replay-logic.spec.ts`；还原后重跑 | 时间样本归一化合同 | 红：1 failed / 3 passed，时间戳未替换；还原绿：4/4 PASS |
+| 临时停用 `TIME_CONTEXT_SAMPLE` 正则；跑 `pnpm exec vitest run tests/harness/session/replay-logic.spec.ts`；还原后重跑 | 时间样本归一化合同 | 红：1 failed / 3 passed，时间戳未替换；还原绿：4/4 PASS |
 | `set -o pipefail && pnpm verify && pnpm test` | 门禁、Note/link/path/doc-budget 与全量 keyless 回归 | ALL PASS：verify ALL PASS；59 files / 550 tests PASS |
 | `pnpm exec tsc -b packages/company-pack --pretty false && (cd packages/company-pack && ../../node_modules/.bin/tsdown)` | 两半类型检查与构建 | 通过；Host/Client build complete；仅 `external` deprecation warnings |
 | `source run/env.sh && node checks/smoke/client-load-smoke.mjs` | 真实浏览器插件挂载与 loader 健康 | ALL PASS：无 mount failure、无 loader error、品牌槽在场 |

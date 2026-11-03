@@ -56,7 +56,7 @@ r2 presence + `--ui` 全绿。问题集中在**总账与反馈面**：新增角�
   不断言面板体内容；`docs/demo.md` 与 `docs/guides/cdp-probe.md` 仍称「全部公司页签」。
 - `docs/testing.md` 说 keyless「不证明装配」「现状零 mock」，但
   `tests/client/company-client-composition.spec.ts` 真 boot 生产 client + RemoteMock，
-  `tests/harness/foundation-safety.spec.ts` 用 `vi.mock('node:os')`；层表与成本预算都过期。
+  `tests/harness/repo/foundation-safety.spec.ts` 用 `vi.mock('node:os')`；层表与成本预算都过期。
 - `replay-ui` 失败现场写 `/tmp/replay-ui-fail.png|.aria` 与固定名 console log，下一次运行覆盖；
   `client-load-smoke` / `cdp-probe` 失败无截图。仓库已有 `runtime/harness-home/replay-diagnosis`
   却没接上。

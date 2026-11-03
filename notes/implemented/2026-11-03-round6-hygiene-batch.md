@@ -14,7 +14,7 @@
 2. **`tsconfig.test-harness.json` 从 51 行 include 清单改成 glob + 单条 exclude。** 同目录的
    `tests/client` / `tests/company` 早已是 glob+exclude；手工清单会静默漏新 spec，且它藏着一个真
    type error（`company-tab-catalog.spec.ts` 少传第二个参数——被排除所以从没进 tsc）。
-   唯一排除项 `tests/harness/pack-exports.spec.ts` 是**混合面**：host 与 client 两半同文件，host 项目
+   唯一排除项 `tests/harness/repo/pack-exports.spec.ts` 是**混合面**：host 与 client 两半同文件，host 项目
    缺 jsx、client 项目缺 node `process` 全局，实测两向皆红，只能留在 tsc 外并在测试宪法里写清。
 3. **首屏必须自己指到「真页面 / 失败现场」**，不靠三份文档接力。`pnpm orient` 新增
    「看到真页面 / 查失败现场」节（`ui-scene-smoke` 三种跑法、`diagnosis/` 证据目录、
@@ -76,7 +76,7 @@ node checks/run-gates.mjs
 node ./node_modules/typescript/bin/tsc -p tsconfig.test-harness.json        # 修复前 TS2554（Expected 2 arguments），修复后 exit 0
 
 # 4) orient 首屏/分派：造红 → 还原 → 绿
-#   删掉 LIVE_SURFACES 渲染节 → tests/harness/orient.spec.ts 的「首屏带真页面与失败现场入口」红：
+#   删掉 LIVE_SURFACES 渲染节 → tests/harness/session/orient.spec.ts 的「首屏带真页面与失败现场入口」红：
 #   × 首屏带真页面与失败现场入口（页面 / 诊断 / 证据目录 / 客户端错误日志）
 #   还原 → 21 passed
 node tools/orient.mjs --scenario visual/company-shell

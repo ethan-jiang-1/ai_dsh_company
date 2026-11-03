@@ -30,7 +30,7 @@
 ## 验证（真跑）
 
 ```text
-npx vitest run tests/client/tabs/company-tab-registration.spec.ts tests/harness/company-tab-catalog.spec.ts
+npx vitest run tests/client/tabs/company-tab-registration.spec.ts tests/harness/ui/company-tab-catalog.spec.ts
 #   3 passed（注册面恒等 + 源解析 9 条 + 面部缺失 fail-loud）
 pnpm test     # 750 passed
 pnpm verify   # ALL PASS

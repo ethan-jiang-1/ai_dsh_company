@@ -71,7 +71,7 @@ node probes/fs-taskboard/converge-e2e-probe.mjs
 #   归档件 journal 副本 / 台账行 / 索引含 slug / backfill 退出 0 /
 #   CHARTER 纪要写的是 journal/ceo/（不是 <role> 占位）/
 #   resume --dry-run 不动盘 / backfill 全员 5 角色 / 按角色 journal / 带时间 kickoff 幂等
-npx vitest run tests/harness/converge-rules.spec.ts
+npx vitest run tests/harness/tools/converge-rules.spec.ts
 #   49 passed（纯 fs 搬移计划；resolveEvidenceDir 用例随功能删除）
 pnpm test
 #   119 files / 1042 tests passed

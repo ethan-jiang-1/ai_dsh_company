@@ -36,7 +36,7 @@
 
 - 起始 `git status --short`（2026-10-09）为空；8 次 `git mv` 后保留原文件名，归档讨论正文不重写。链接修复只针对 Markdown 目标。
 - `pnpm verify`（最终）：ALL PASS，包含 md-links ×1246/255 files、doc budgets 与 `backlog-liveness`。过程首轮发现并修复旧卡/研究互链与本仓不存在的外仓方法路径；裸路径门禁另报告 5 条历史观察，不是失败。
-- `pnpm exec vitest run tests/harness/backlog-liveness.spec.ts tests/harness/foundation-links.spec.ts`：39/39 通过。
+- `pnpm exec vitest run tests/harness/tools/backlog-liveness.spec.ts tests/harness/repo/foundation-links.spec.ts`：39/39 通过。
 - 真实文件反例，逐项 `pnpm verify` 红后恢复并重跑绿：问题卡删 `opened` → 报缺字段；归档索引改一个真实目标 → 报卡未被 owner README 索引；暂移 `issues/README.md` → 报必需索引缺失；当天新 research 文件缺 frontmatter → 报缺头。四项恢复后均 ALL PASS。首次错误造红（重复 YAML key、缺失父目录）不计有效证据，修正后重跑。
 - `set -o pipefail; pnpm test`：37 个测试文件、379 个用例通过。出现一条 React SSR `useLayoutEffect` 警告，测试退出码为 0；真模型与浏览器验收不适用于本次纯流程/文档变更。
 

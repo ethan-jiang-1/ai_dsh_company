@@ -14,7 +14,7 @@
 - **就地修复排查落点**：当场修掉不建卡的，其同类横切排查一句话记该轮轮次回执①行（有 Note 随 Note）——解「模板问横切排查、当场修的没有卡可写」的自相矛盾。
 - **bugs 模板**：加 `## 已修判定`（含搭载依赖字段）；状态节列新枚举并指回章程。
 - **开发环 §0.5 对账**：任务源清单加唯一例外指针句（修复就绪自授权），规则唯一家 = 章程，不双写。
-- **门禁修订**（`tools/lib/backlog-liveness.mjs`，既有类修订不新增族）：缺陷轨枚举表扩容改名、状态行↔frontmatter 镜像互查、问题卡 `毕业：` 封闭头；反证在 `tests/harness/backlog-liveness.spec.ts`（24 例）。
+- **门禁修订**（`tools/lib/backlog-liveness.mjs`，既有类修订不新增族）：缺陷轨枚举表扩容改名、状态行↔frontmatter 镜像互查、问题卡 `毕业：` 封闭头；反证在 `tests/harness/tools/backlog-liveness.spec.ts`（24 例）。
 
 ## 输掉的方案
 
@@ -42,7 +42,7 @@
   ③ `_backlog/issues/2026-10-12-zz-rednoline.md:1 缺状态行（> … ｜ 状态：<frontmatter 值> ｜ …）`；
   ④ `_backlog/bugs/BUG-013-zz-redactive.md:2 status "活跃" 不属于此桶`；
   ⑤ BUG-014（`修复就绪`＋镜像行）无任何活状态问题（新值接受）；BUG-015（`修复就绪` 缺 `## 已修判定`）不报警——验收在场族延后，如实不查。删除植入卡后复跑 → `verify: ALL PASS`（还原即绿）。
-- **spec**：`npx vitest run tests/harness/backlog-liveness.spec.ts` 24/24（含镜像互查、毕业封闭头、旧值拒绝、新值接受、延后族五个新控制；首次跑 1 failed——spec 的 `index()` 助手对活跃池是覆写不是追加，多卡夹具改为一次写全索引后绿，判据未动）。`pnpm exec vitest run tests/harness/backlog-liveness.spec.ts tests/harness/foundation-links.spec.ts` 41/41。
+- **spec**：`npx vitest run tests/harness/tools/backlog-liveness.spec.ts` 24/24（含镜像互查、毕业封闭头、旧值拒绝、新值接受、延后族五个新控制；首次跑 1 failed——spec 的 `index()` 助手对活跃池是覆写不是追加，多卡夹具改为一次写全索引后绿，判据未动）。`pnpm exec vitest run tests/harness/tools/backlog-liveness.spec.ts tests/harness/repo/foundation-links.spec.ts` 41/41。
 - **全量**：`pnpm verify` ALL PASS；`pnpm test` 47 文件 / 482 用例全过。真模型/浏览器验收不适用（纯流程/文档/门禁变更）。
 - **门禁抓到两处真错（如实记）**：收口轮中途 `link` 抓归档卡 issues 自引链接少一层目录（`../issues/` → `../../issues/`），`bare-path` 抓本 Note 状态行引用卡片旧路径（git mv 后）——修正后绿。两处都是本次新增检查面之外的既有门禁正常工作。
 

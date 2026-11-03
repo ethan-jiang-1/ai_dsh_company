@@ -169,7 +169,7 @@ node /Users/bowhead/ai_dsh_company/node_modules/vitest/vitest.mjs run packages/e
 授权原文：「先按 BUG-007 修复判据与驱动退出条件，再用可信证据决定协作协议或机制要补到哪一层」。本节是后续实施收据，前文的调查失败是修前证据，不继承为当前判据状态。实现取舍见 [判据 Note](../../../../notes/archived/2026-10-09-collaboration-probe-evidence.md)；未改生产代码、preset、vendor、协作协议或锁服务。
 
 - 当前 [纯事件判据](../../../../tools/lib/collaboration-evidence.mjs)与[恢复/跨根判据](../../../../tools/lib/recovery-scope-evidence.mjs)位于既有keyless seam；真实驱动与回归共用。旧五类坏样本被拒，现oracle完整11项均拒绝（exit0）；缺反例清单会报错，不允许0/0假绿。
-- [事实回归](../../../../tests/harness/collaboration-evidence.spec.ts)、[恢复跨根回归](../../../../tests/harness/recovery-scope-evidence.spec.ts)、[实际退出连接](../../../../tests/harness/collaboration-probe-verdict.spec.ts)验证正例、路径/任务/成员错归因、无结果/仅read、重复/额外行、旧恢复事件、单轮结束及required行失败退出。
+- [事实回归](../../../../tests/harness/evidence/collaboration-evidence.spec.ts)、[恢复跨根回归](../../../../tests/harness/evidence/recovery-scope-evidence.spec.ts)、[实际退出连接](../../../../tests/harness/evidence/collaboration-probe-verdict.spec.ts)验证正例、路径/任务/成员错归因、无结果/仅read、重复/额外行、旧恢复事件、单轮结束及required行失败退出。
 - 原子读承诺明确收窄：验证每轮三次独立成功追加后的完整read采样与精确末态，不证明任意reader全过程永不见半截。一次写入全三行/一次read不能冒充三轮，审阅反例实际先红（expected false收到true），修后绿。
 - warning合同校正：钉住的task-view只要求被指的另一任务in_progress，发warning的当前任务可以completed；不是两个任务必须同时active，也不是completed任务保留了过期warning。模型正文不参与此判定。
 

@@ -27,7 +27,7 @@ orient 自己宣传的「深看某次运行」在 2 个 runnable 场景之一上
 ## 修复（红→还原→绿）
 
 - children 引用先用 `statSync` 分流：文件且 `.jsonl` 计 1；目录数 `.jsonl` 件数；缺失如实 0。
-- 守卫 = `tests/harness/orient.spec.ts`：真实 tracked 场景 r3 断言（不崩且计 1）+ 夹具文件形状用例。
+- 守卫 = `tests/harness/session/orient.spec.ts`：真实 tracked 场景 r3 断言（不崩且计 1）+ 夹具文件形状用例。
 - 红相（修前实测）：orient.spec 2 failed（真实 r3 ENOTDIR + 夹具文件形状）；
   绿相：27/27；活体：`orient --scenario replay/r3-delegation` 完整渲染 run bundle 视图。
 
