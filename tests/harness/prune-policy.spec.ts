@@ -5,7 +5,7 @@ import { selectPrunable } from '../../tools/lib/prune-runtime.mjs'
 // 用户口径：7 天前的数据一律清（插件内容除外）；最近但别扭的由人判断。
 describe('runtime prune policy', () => {
   const now = Date.parse('2026-10-23T00:00:00Z')
-  const entry = (path, daysAgo, extra = {}) => ({ path, mtimeMs: now - daysAgo * 86_400_000, ...extra })
+  const entry = (path: string, daysAgo: number, extra: Record<string, unknown> = {}) => ({ path, mtimeMs: now - daysAgo * 86_400_000, ...extra })
 
   it('超过天数、无引用、未跟踪 ⇒ 删', () => {
     const { drop, keep } = selectPrunable([entry('runtime/e2e/old', 10)], { now, days: 7 })

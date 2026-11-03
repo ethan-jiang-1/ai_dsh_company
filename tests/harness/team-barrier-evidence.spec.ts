@@ -49,7 +49,7 @@ describe('two-member read-barrier publication evidence', () => {
     expect(teamBarrierEvidence(noWrite).recovery).toBe(false)
     const wrong = good(); wrong.memberEvents.w2[7] = call('w3', 'write', { file_path: target, content: 'w2 was here\n' })
     expect(teamBarrierEvidence(wrong).recovery).toBe(false)
-    const partial = good(); partial.memberEvents.w2[6].data.meta!.totalLines = 2
+    const partial = good(); (partial.memberEvents.w2[6] as any).data.meta!.totalLines = 2
     expect(teamBarrierEvidence(partial).recovery).toBe(false)
     expect(teamBarrierEvidence({ ...good(), leadEvents: [call('lead', 'write', { file_path: target })] }).noLeadWrites).toBe(false)
   })

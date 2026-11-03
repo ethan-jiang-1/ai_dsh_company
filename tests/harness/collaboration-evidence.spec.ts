@@ -46,21 +46,21 @@ describe('collaboration evidence verdicts', () => {
   })
 
   it('requires three successful appends and full well-formed reads between each append', () => {
-    const memberEvents = Object.fromEntries(['w1', 'w2'].map(name => [name, [1, 2, 3].flatMap(round => {
+    const memberEvents: Record<string, Array<{ type: string; data: any }>> = Object.fromEntries(['w1', 'w2'].map(name => [name, [1, 2, 3].flatMap(round => {
       const rows = Array.from({ length: round }, (_, i) => `${name} round ${i + 1}`)
       return [call(`${name}-w${round}`, 'edit', { file_path: target, new_string: rows.join('\n') }), result(`${name}-w${round}`, 'Updated file'),
         call(`${name}-r${round}`, 'read', { file_path: target }), result(`${name}-r${round}`, rows.join('\n'), undefined, { offset: 1, totalLines: round, lines: rows.map((text, i) => ({ number: i + 1, text })) })]
     })]))
     const evidence = atomicityEvidence({ leadEvents: [], memberEvents, file: expected.join('\n') })
     expect(evidence).toMatchObject({ fileExact: true, readbacks: { w1: true, w2: true } })
-    const readsOnly = { w1: memberEvents.w1.filter((event: { type: string; data: { name?: string; message?: { toolCallId: string } } }) => event.type === 'tool/call' ? event.data.name === 'read' : event.data.message?.toolCallId.includes('-r')) }
-    expect(atomicityEvidence({ leadEvents: [], memberEvents: readsOnly, file: '' }).readbacks.w1).toBe(false)
+    const readsOnly = { w1: memberEvents.w1!.filter((event: { type: string; data: { name?: string; message?: { toolCallId: string } } }) => event.type === 'tool/call' ? event.data.name === 'read' : event.data.message?.toolCallId.includes('-r')) }
+    expect((atomicityEvidence({ leadEvents: [], memberEvents: readsOnly, file: '' }) as unknown as { readbacks: { w1: boolean } }).readbacks.w1).toBe(false)
     expect(atomicityEvidence({ leadEvents: [], memberEvents: {}, file: expected.concat('w1 round 1').join('\n') }).fileExact).toBe(false)
     const rows = ['w1 round 1', 'w1 round 2', 'w1 round 3']
     const collapsed = [call('one-write', 'write', { file_path: target, content: rows.join('\n') }), result('one-write', 'Created'),
       call('one-read', 'read', { file_path: target }), result('one-read', rows.join('\n'), undefined,
         { offset: 1, totalLines: 3, lines: rows.map((text, i) => ({ number: i + 1, text })) })]
-    expect(atomicityEvidence({ leadEvents: [], memberEvents: { w1: collapsed }, file: '' }).readbacks.w1).toBe(false)
+    expect((atomicityEvidence({ leadEvents: [], memberEvents: { w1: collapsed }, file: '' }) as unknown as { readbacks: { w1: boolean } }).readbacks.w1).toBe(false)
   })
 
   it('uses parsed task-list warnings for two in-progress tasks, not assistant prose', () => {

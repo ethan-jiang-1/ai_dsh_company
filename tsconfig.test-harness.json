@@ -25,6 +25,10 @@
     "tests/harness/snapshots-budget.spec.ts",
     "tests/harness/release-foundation.spec.ts",
     "tests/harness/market-index.spec.ts",
+    "tests/harness/collaboration-evidence.spec.ts",
+    "tests/harness/member-stale-evidence.spec.ts",
+    "tests/harness/team-barrier-evidence.spec.ts",
+    "tests/harness/prune-policy.spec.ts",
     "tests/support/temp-env.ts"
   ]
 }
