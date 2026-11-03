@@ -30,6 +30,25 @@ function specFiles(): string[] {
   return out
 }
 
+/** `describe.skipIf(...)` 回调体（从 `=> {` 到匹配的 `}`）；找不到返回空串。 */
+function skippedBlock(text: string): string {
+  const at = text.search(/describe\.skipIf\(/)
+  if (at < 0) return ''
+  const arrow = text.indexOf('=>', at)
+  if (arrow < 0) return ''
+  const open = text.indexOf('{', arrow)
+  if (open < 0) return ''
+  let depth = 0
+  for (let i = open; i < text.length; i++) {
+    if (text[i] === '{') depth++
+    else if (text[i] === '}') {
+      depth--
+      if (depth === 0) return text.slice(open + 1, i)
+    }
+  }
+  return ''
+}
+
 describe('skip 预算（新增 skip 必须登记预期 N）', () => {
   it('只有登记过的 spec 允许 skip，且登记文件写明预期', () => {
     const offenders = specFiles().filter(rel => {
@@ -40,8 +59,18 @@ describe('skip 预算（新增 skip 必须登记预期 N）', () => {
     for (const [rel, expectation] of ALLOWED) {
       const text = readFileSync(join(ROOT, rel), 'utf8')
       expect(text, `${rel} 缺“skip 预期”注释`).toContain('skip 预期')
-      expect(text).toContain('预期')
+      expect(text, `${rel} 的 skip 预期注释缺“预期 N 例”`).toMatch(/skip 预期：[^\n]*?\d+\s*例/)
       expect(expectation.length).toBeGreaterThan(0)
+    }
+  })
+
+  it('登记的 skip 块里 it 数必须等于注释的预期 N（防静默加例）', () => {
+    for (const rel of ALLOWED.keys()) {
+      const text = readFileSync(join(ROOT, rel), 'utf8')
+      const count = (skippedBlock(text).match(/\bit\(/g) ?? []).length
+      const expected = /skip 预期：[^\n]*?(\d+)\s*例/.exec(text)?.[1]
+      expect(expected, `${rel} 缺“预期 N 例”`).toBeDefined()
+      expect(count, `${rel} 的 skip 块有 ${String(count)} 个 it，注释预期 ${String(expected)} 例`).toBe(Number(expected))
     }
   })
 })
