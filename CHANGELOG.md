@@ -2,6 +2,14 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.8.7 — 2026-11-03
+
+### Changed
+
+- 无用户可见行为变化：host `api-session/*` 事件类型与 client `agentTeam` 投影类型改为显式 type import；
+  `tests/client` / `tests/company` 进 `pnpm typecheck`（测试面不随包）。证据见
+  `notes/implemented/2026-11-03-client-test-typecheck.md` / `...-company-test-typecheck.md`。
+
 ## 0.8.6 — 2026-11-03
 
 ### Changed
