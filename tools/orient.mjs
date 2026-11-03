@@ -59,6 +59,26 @@ function sessionPresetFor(homePath, slug) {
 }
 
 const args = process.argv.slice(2)
+const USAGE = `用法：node tools/orient.mjs [--scenario <kind>/<场景> | --session <slug>[/<id前缀>]] [--workspace <dir>]
+
+  （无参数）                 运行态全景（home / profiles / 会话 / 公司盘 / run trace / 真页面与诊断入口）
+  --scenario <kind>/<场景>   run trace 视图（清单 = snapshots/README）
+  --session <slug>[/<id>]    列/查某 slug 的历史会话（preset · cwd · createdAt）
+  --workspace <dir>          把公司盘与待核候选扫描指向别的工作区
+  --help, -h                 本帮助（不读盘、不打印摘要）
+
+成本：纯 fs 只读 + zstd 解会话头部，秒级；无模型无浏览器。`
+if (args.includes('--help') || args.includes('-h')) {
+  console.log(USAGE)
+  process.exit(0)
+}
+// 未知参数 fail-loud：旧行为是静默忽略（`--help` 会打印一份真实摘要并 exit 0，问用法的人拿到错误答案）。
+const KNOWN_FLAGS = new Set(['--scenario', '--session', '--workspace'])
+const unknown = args.filter(arg => arg.startsWith('-') && !KNOWN_FLAGS.has(arg))
+if (unknown.length > 0) {
+  console.error(`orient: 未知参数 ${unknown.join(' ')}（--help 看用法）`)
+  process.exit(2)
+}
 const argValue = (name) => {
   const i = args.indexOf(name)
   return i === -1 ? undefined : args[i + 1]

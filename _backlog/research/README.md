@@ -60,6 +60,7 @@ opened: YYYY-MM-DD
 
 
 - [repo-hygiene-round5](./repo-hygiene-round5/README.md) — 第五轮七维打扫（v3 内容迁移与发行版收口之后）；消费者 = [第五轮七维打扫卡](../issues/2026-11-03-repo-hygiene-round5.md)。
+- [repo-hygiene-round6](./repo-hygiene-round6/README.md) — 第六轮七维打扫（fresh agent 复评与层次化）；消费者 = [第六轮七维打扫卡](../issues/2026-11-03-repo-hygiene-round6.md)。
 
 2026-11-01/02 的产品化与生命周期研究题已随各自消费者卡迁入[研究归档](../_archive/research/README.md)。
 

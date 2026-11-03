@@ -17,7 +17,7 @@ describe('company-tab-catalog', () => {
   })
 
   it('格式漂移时返回空（探针 fail-loud，而不是少一个也绿）', () => {
-    expect(parseCompanyTabCatalog('id: x, title: y')).toEqual([])
+    expect(parseCompanyTabCatalog('id: x, title: y', 'const FACES = {}')).toEqual([])
     expect(parseCompanyTabCatalog("id: 'dsh-company-pack/x', kind: 'k', face: 'missing'", 'const FACES = {}')).toEqual([])
   })
 })

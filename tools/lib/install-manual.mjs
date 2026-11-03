@@ -199,8 +199,12 @@ ${q('dsh plugin --profile company remove dsh-company-pack')}）。只卸插件�
 | 留下什么 | 位置 |
 |---|---|
 | 公司状态（kb / deliverables / cultivation / logs / exports / bundle.json） | ${q('<workspace>/.dsh-company/')} |
-| 身份备份、方法层、presented 账本、lease 残留 | ${q('<DSH_HOME>/company/')} |
+| 身份备份、方法层、presented 账本 | ${q('<DSH_HOME>/company/')} |
+| 并发写者锁（lease） | ${q('<DSH_HOME>/company-pack.lock')}（在 home 根，不在 ${q('company/')} 里） |
+| workspace 登记行（host 经 DSH registry 加的） | ${q('<DSH_HOME>/storages/workspace.json')} |
 | presented 账本 storage | ${q('<DSH_HOME>/storages/company_run_bundle_ledger.json')} |
+| 客户端错误日志（已脱敏） | ${q('<DSH_HOME>/logs/company-client-errors.log')} |
+| 浮窗几何 / 实例心跳（浏览器本地） | 浏览器 localStorage（按 origin 隔离；换端口即新 origin） |
 | 会话与凭据（DSH 所有） | ${q('<DSH_HOME>/sessions/')}、${q('<DSH_HOME>/.credentials.yaml')} |
 
 要彻底删除一个公司，确认备份后按面删除：
@@ -208,6 +212,8 @@ ${q('dsh plugin --profile company remove dsh-company-pack')}）。只卸插件�
 ${b}${b}${b}sh
 rm -rf <workspace>/.dsh-company
 rm -rf <DSH_HOME>/company
+rm -f  <DSH_HOME>/company-pack.lock
+rm -f  <DSH_HOME>/logs/company-client-errors.log
 rm -f  <DSH_HOME>/storages/company_run_bundle_ledger.json
 rm -f  <DSH_HOME>/cache/company/session-search-*.db      # 派生索引，可删可重建
 ${b}${b}${b}

@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { CREDENTIALS_FILE, DEEPSEEK_CREDENTIAL, credentialsState, homeStatus, listProfiles, listSessions, listSlugSessions, orientState, parseCredentialKeys, parseSessionHead, parseSessionPreset, renderOrient, renderSessionView, runBundleView, scanDeliverables, workspaceOverview } from '../../tools/lib/orient.mjs'
+import { CHECKS, CREDENTIALS_FILE, DEEPSEEK_CREDENTIAL, LIVE_SURFACES, credentialsState, homeStatus, listProfiles, listSessions, listSlugSessions, orientState, parseCredentialKeys, parseSessionHead, parseSessionPreset, renderOrient, renderSessionView, runBundleView, scanDeliverables, scenarioVerification, workspaceOverview } from '../../tools/lib/orient.mjs'
 
 // 条目 B 判据（RFC driver-surface-package）：pnpm orient 的 keyless 只读核心——
 // home 判定（requireDevHome 同款但只警告不抛）/ profiles / 会话清单 / 公司盘概览 /
@@ -110,6 +110,31 @@ describe('orientState + renderOrient', () => {
     expect(text).toContain('pnpm verify')
     expect(text).toContain('pnpm test')
     expect(text).not.toContain('source run/env.sh')
+  })
+
+  // 2026-11-03 第六轮 R6-06：真页面车道存在，但首屏只有 verify/test/orient——agent 看不到
+  // 「页面怎么打开/失败现场在哪」，只能去翻三份文档。首屏必须自带入口（这条断言就是那道门）。
+  it('首屏带真页面与失败现场入口（页面 / 诊断 / 证据目录 / 客户端错误日志）', () => {
+    const text = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace }))
+    expect(text).toContain('看到真页面 / 查失败现场')
+    expect(text).toContain('ui-scene-smoke.mjs')
+    expect(text).toContain('--isolated --golden')
+    expect(text).toContain('--steps')
+    expect(text).toContain('diagnosis/')
+    expect(text).toContain('company-client-errors.log')
+    expect(text).toContain('pnpm diagnose --session')
+    expect(CHECKS.some(check => check.cmd.includes('diagnose'))).toBe(true)
+    expect(LIVE_SURFACES.length).toBeGreaterThanOrEqual(4)
+  })
+
+  // 2026-11-03 第六轮 R6-04：`--scenario` 曾对所有场景给同一条 replay-smoke 命令；visual 场景没有
+  // snapshot.yml，照抄即 ENOENT（实测 exit 1）。复跑入口按场景类型分派。
+  it('--scenario 的验证命令按场景类型分派（replay / visual / 归档证据）', () => {
+    expect(scenarioVerification('replay', 'replay/x')).toBe('node checks/smoke/replay-smoke.mjs --scenario replay/x')
+    expect(scenarioVerification('visual', 'visual/x')).toContain('ui-scene-smoke.mjs --isolated --golden')
+    expect(scenarioVerification('probes', 'probes/x')).toContain('无通用复跑入口')
+    expect(runBundleView(ROOT, 'visual/company-shell').verification).toContain('ui-scene-smoke')
+    expect(runBundleView(ROOT, 'replay/foundation-workspace').verification).toContain('replay-smoke')
   })
 
   it('凭据行只说键名不说值（密钥住凭据库、不是环境变量——env 里没有不代表没配）', () => {

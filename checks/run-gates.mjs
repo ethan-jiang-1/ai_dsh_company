@@ -62,6 +62,7 @@ import * as backlogLiveness from './gates/backlog-liveness.mjs'
 import * as replaySceneLiveness from './gates/replay-scene-liveness.mjs'
 import * as snapshotIndex from './gates/snapshot-index.mjs'
 import * as guardRedRecord from './gates/guard-red-record.mjs'
+import * as specDuplicates from './gates/spec-duplicates.mjs'
 import * as securityScan from './gates/security-scan.mjs'
 import * as trackedToken from './gates/tracked-token.mjs'
 import * as trackedSecrets from './gates/tracked-secrets.mjs'
@@ -131,6 +132,7 @@ backlogLiveness.run(ctx)
 replaySceneLiveness.run(ctx)
 snapshotIndex.run(ctx)
 guardRedRecord.run(ctx)
+specDuplicates.run(ctx)
 securityScan.run(ctx)
 trackedToken.run(ctx)
 trackedSecrets.run(ctx)

@@ -81,7 +81,17 @@ export function scanDeliverables(workspaceRoot) {
 export const CHECKS = [
   { cmd: 'pnpm verify', what: '结构门禁（清单唯一源 = checks/gates/ 目录）' },
   { cmd: 'pnpm test', what: 'keyless 回归（vitest，秒级）' },
+  { cmd: 'pnpm diagnose --session <slug>/<id>', what: '一场会话的失败摘要（失败 turn / 工具错误 / 非零 bash / 待审批 / 待问询；只读）' },
   { cmd: 'pnpm orient --scenario <kind>/<场景>', what: 'run trace 视图（引用合同 = snapshots/README）' },
+]
+
+/** 真页面与现场证据（首屏就要指路——真页面车道存在但 `orient` 不提，agent 只能猜）。 */
+export const LIVE_SURFACES = [
+  { cmd: 'node checks/smoke/ui-scene-smoke.mjs', what: '真页面自起实例：全部公司页签渲染 + 浏览器错误环（~40s，需已构建 pack client）' },
+  { cmd: 'node checks/smoke/ui-scene-smoke.mjs --isolated --golden', what: '隔离金样档：空壳页签文本与 tracked 金样逐字比对（确定性回归网）' },
+  { cmd: 'node checks/smoke/ui-scene-smoke.mjs --steps <json>', what: '复现点击/输入（clickText / typeText / waitText / expectText）' },
+  { cmd: '<DSH_HOME>/diagnosis/', what: '现场证据：page.png / body.txt / verdict.json / console.log（回执里给具体目录）' },
+  { cmd: '<DSH_HOME>/logs/company-client-errors.log', what: '客户端错误落盘（页面错误环的持久面；token 已脱敏）' },
 ]
 
 /** 列某 slug 下全部会话（id/mtime 近序）；slug 不存在 fail-loud（调用方决定显示条数与解码成本）。 */
@@ -254,6 +264,8 @@ export function renderOrient(state) {
   lines.push('深看某次运行 pnpm orient --scenario <kind>/<场景>')
   lines.push('', '== 便宜检查（keyless，现在就能跑）==')
   for (const check of state.checks) lines.push(`  ${check.cmd} — ${check.what}`)
+  lines.push('', '== 看到真页面 / 查失败现场 ==')
+  for (const surface of LIVE_SURFACES) lines.push(`  ${surface.cmd} — ${surface.what}`)
   return lines.join('\n')
 }
 
@@ -287,6 +299,13 @@ function resolveScene(root, selection) {
   return matches[0]
 }
 
+/** 场景类型的复跑入口：replay 走回放、visual 走隔离金样、其余是归档证据（无通用复跑入口）。 */
+export function scenarioVerification(kind, canonical) {
+  if (kind === 'replay') return `node checks/smoke/replay-smoke.mjs --scenario ${canonical}`
+  if (kind === 'visual') return 'node checks/smoke/ui-scene-smoke.mjs --isolated --golden（刷新金样 = 加 --refresh-golden）'
+  return '—（归档证据，无通用复跑入口；重跑走产生它的探针，触发条件见其头注）'
+}
+
 /**
  * Run bundle 视图（引用合同 = snapshots/README）：按合同字段反查场景声明与引用存在性。
  * 引用不复制——不落盘 manifest、不改场景；live 权威永远是 DSH session + workspace。
@@ -313,7 +332,7 @@ export function runBundleView(root, selection) {
       sessionChildrenCount: childrenCount,
       workspaceExpectedExists: ref(fields['workspace.expected']) !== null && existsSync(ref(fields['workspace.expected'])),
     },
-    verification: `node checks/smoke/replay-smoke.mjs --scenario ${canonical}`,
+    verification: scenarioVerification(scene.kind, canonical),
   }
 }
 

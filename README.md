@@ -5,11 +5,12 @@ preset（CEO / VP-Eng / VP-Sales / COO / CFO）+ 委派子人格 `researcher`。
 启动后在**用户指定的 workspace** 里做事；插件内容全部在包内，运行状态与最终产物（公司状态）全部在
 workspace。
 
-- **安装尊重 DSH**：默认在 DSH **Plugins** 页安装（`dsh web` 与 Desktop 同一句）；CLI
-  `dsh plugin --profile company add <tgz>` 只是 web 自动化，不能管 `desktop`。
-- **启动入口是 named profile**：`cd /path/to/your-project && dsh --profile company`。没有 package bin，
-  没有第二层 launcher；workspace 从启动 cwd / `DSH_COMPANY_HOME` / 已保存选择来，没有就由 DSH
-  Workspace picker 问。
+- **安装尊重 DSH**：Plugins 页装的是**当前 profile**（`dsh web` 与 Desktop 各一份；CLI
+  `dsh plugin --profile company add <tgz>` 只是 web 自动化，不能管 `desktop`）。**装到哪个 profile，
+  就用哪个 profile 启动**——装进 `web` 就继续 `dsh web`/Desktop，别跳到 `--profile company`（那里没装）。
+- **启动入口是 named profile**：固定公司 profile 时 `cd /path/to/your-project && dsh --profile company`
+  （先按「安装」一节的 CLI 步骤建它）。没有 package bin，没有第二层 launcher；workspace 从启动 cwd /
+  `DSH_COMPANY_HOME` / 已保存选择来，没有就由 DSH Workspace picker 问。
 - **插件内容在包内**：persona / skills / host / client / 公司手册 / 模板 / 默认章程随包发布，只读。
 - **公司状态在 workspace**：`<workspace>/.dsh-company/` 一个目录装下 `kb/`、`deliverables/`、
   `cultivation/`、日志、治理导出与 `bundle.json`（v3，legacy 文件名）；workspace 根不再出现本包写出的文件。
@@ -21,7 +22,9 @@ workspace。
 ## 安装
 
 **GUI（默认）**：在 DSH **Plugins** 页的 **Add plugin** 安装（web 与 Desktop 通用）：已发布版本
-输入包名 `dsh-company-pack`；本仓 `_dist` 交付在未 publish 时粘贴 tarball 绝对路径。按提示重启 profile。
+输入包名 `dsh-company-pack`；本仓 `_dist` 交付在未 publish 时粘贴 tarball 绝对路径。按提示重启 profile
+——装进的是**你正运行的那个 profile**，之后用同一个入口启动（`dsh web` 或 Desktop）。想固定成独立的
+`company` profile，才走下面的 CLI 三步。
 
 **CLI（仅 `dsh web` 自动化）**：
 

@@ -13,13 +13,17 @@ import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
 const gitignore = readFileSync(join(repositoryRoot, '.gitignore'), 'utf8')
 
 describe('gitignore-guards（runtime 默认拒绝 + 白名单形状）', () => {
-  it('.gitignore 整树拒绝 runtime/*，并显式放行 5 件 tracked 白名单', () => {
+  it('.gitignore 整树拒绝 runtime/*，并显式放行 2 件 tracked 白名单', () => {
     expect(gitignore).toMatch(/^runtime\/\*$/m)
     expect(gitignore).toMatch(/^!runtime\/README\.md$/m)
-    expect(gitignore).toMatch(/^!runtime\/probe-\*\.mjs$/m)
     expect(gitignore).toMatch(/^!runtime\/harness-home\/$/m)
     expect(gitignore).toMatch(/^runtime\/harness-home\/\*$/m)
     expect(gitignore).toMatch(/^!runtime\/harness-home\/README\.md$/m)
+    // 2026-11-03 第六轮：三个一次性探针（probe-drill / probe-schedule / probe-two-instances）
+    // 对应卡早已归档、头注自认「用完可删」，却靠 `!runtime/probe-*.mjs` 白名单留在源码面——
+    // 源码住「运行残留家」是分类错误。删除后不再放行任何 runtime 根级脚本（负例：加回该行 → 本断言无守卫，
+    // 但 `gitignore-shape` 的 probe-drill 期望值会红）。
+    expect(gitignore, 'runtime 根级不再放行脚本').not.toMatch(/^!runtime\/.*\.mjs$/m)
   })
 
   // 2026-10-24 RFC run-bundle-install-unit：公司盘整树是 **dev run bundle 的 workspace**，不进 git

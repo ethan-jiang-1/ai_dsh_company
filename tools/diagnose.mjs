@@ -18,6 +18,32 @@ import { zstdText } from './drivers/zstd.mjs'
 import { redactTokenUrls, summarizeSessionEvents } from './lib/session-diagnose.mjs'
 
 const args = process.argv.slice(2)
+const USAGE = `用法：source run/env.sh && node tools/diagnose.mjs [--session <slug>[/<id前缀>]] [--json] [--home <路径>] [--strict]
+
+  （无参数）        最近更新的会话
+  --session <s>    指定会话（slug 路径；child 目录也可，无 session- 前缀）
+  --json           机器可读摘要
+  --home <dir>     显式读另一个 home（如日用 ~/.dsh）；默认 fail-closed 只认 dev home
+  --strict         有失败或非零 bash 即 exit 1（默认 0，只读摘要）
+  --help, -h       本帮助（不读会话、不打印摘要）`
+if (args.includes('--help') || args.includes('-h')) {
+  console.log(USAGE)
+  process.exit(0)
+}
+// 未知参数 fail-loud：旧行为是静默忽略（`--help` 会打印一份真实会话摘要并 exit 0，问用法的人拿到错误答案）。
+const VALUE_FLAGS = new Set(['--session', '--home'])
+const BOOL_FLAGS = new Set(['--json', '--strict'])
+const unknownArgs = []
+for (let i = 0; i < args.length; i++) {
+  const token = args[i]
+  if (VALUE_FLAGS.has(token)) { i += 1; continue }
+  if (BOOL_FLAGS.has(token)) continue
+  if (token.startsWith('-')) unknownArgs.push(token)
+}
+if (unknownArgs.length > 0) {
+  console.error(`diagnose: 未知参数 ${unknownArgs.join(' ')}（--help 看用法）`)
+  process.exit(2)
+}
 const arg = (name) => {
   const index = args.indexOf(`--${name}`)
   return index === -1 ? undefined : args[index + 1]

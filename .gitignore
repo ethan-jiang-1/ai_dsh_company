@@ -15,7 +15,6 @@ coverage/
 # 目录级 negation 必须先把目录本身放出来，再放行文件（见 harness-home 两行）。
 runtime/*
 !runtime/README.md
-!runtime/probe-*.mjs
 !runtime/harness-home/
 runtime/harness-home/*
 !runtime/harness-home/README.md
