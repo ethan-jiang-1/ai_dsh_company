@@ -26,4 +26,7 @@ opened: 2026-11-03
   R6-04/05/06（`orient` 首屏与 `--scenario` 分派、`--help`/未知参数）、R6-08/09（设计层两处现状 + 过期枚举）、
   R6-13/14（安装=启动 profile、卸载残留披露）、一次性探针删除。Note =
   [round6-hygiene-batch](../../notes/implemented/2026-11-03-round6-hygiene-batch.md)。
-- 待做：R6-10 层次化（D/E 批）、R6-07 豁免区死链算账（C 批）、R6-11/12 测试质量（F 批）、R6-15/16 D7 待决项。
+- 已落地（批 C/D/E，2026-11-03）：R6-07（`link-debt` 棘轮：archived 32 / moved 0 / live 0，超基线即红）、
+  R6-10（`src/client` 五分目录 + `tests/client` 镜像；Note =
+  [client-layering-restructure](../../notes/implemented/2026-11-03-client-layering-restructure.md)）。
+- 待做：R6-11/12 测试质量（F 批）、R6-15/16 D7 待决项、`checks/gates`/`tools/lib` 层次论证（单独轮）。

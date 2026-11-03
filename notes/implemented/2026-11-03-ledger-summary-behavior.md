@@ -7,7 +7,7 @@
 
 ## 决定
 
-新增 `tests/client/ledger-summary-interaction.spec.ts`（happy-dom 真挂 `LedgerSummary`；**不改**已有的 `ledger-summary.spec.ts` 5 例静态渲染规格）：长摘要出现「全文」入口、
+新增 `tests/client/tabs/ledger-summary-interaction.spec.ts`（happy-dom 真挂 `LedgerSummary`；**不改**已有的 `ledger-summary.spec.ts` 5 例静态渲染规格）：长摘要出现「全文」入口、
 点开后变「收起」、`aria-expanded` 与 `is-expanded` 类同步；短摘要未裁切时不给入口。
 同时把 `client-face.spec.ts` 里“长摘要必须有全文入口”的 **7 条源码正则**收成 **2 条样式断言**
 （`-webkit-line-clamp` 存在；不给 `.wk-row-summary:not(` 开免裁口子）。
@@ -22,7 +22,7 @@
 ## 验证（实跑）
 
 ```text
-npx vitest run tests/client/ledger-summary.spec.ts tests/client/ledger-summary-interaction.spec.ts tests/client/client-face.spec.ts
+npx vitest run tests/client/tabs/ledger-summary.spec.ts tests/client/tabs/ledger-summary-interaction.spec.ts tests/client/wiring/client-face.spec.ts
 # 3 files / 12 tests passed（静态 5 + 交互 2 + client-face 5）
 ```
 

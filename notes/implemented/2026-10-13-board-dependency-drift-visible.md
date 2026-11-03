@@ -46,7 +46,7 @@
 ## 验证（都真跑过）
 
 - `pnpm test tests/company/board.spec.ts` —— **15 tests 绿**：真事故形态报 `missing`、T4 自我修复后无分叉、无映射报 `unmapped`、`不依赖 T1`/`可先做不依赖它们的部分` 不误报、`boardColumns` 把分叉挂上卡。
-- `pnpm test tests/client/board-panel.spec.ts` —— **2 tests 绿**：分叉 tag 在场且点名 T1、T2；整块板**有且只有一条**（假阳性守卫，按卡切段而不是按全文字符串）。
+- `pnpm test tests/client/tabs/board-panel.spec.ts` —— **2 tests 绿**：分叉 tag 在场且点名 T1、T2；整块板**有且只有一条**（假阳性守卫，按卡切段而不是按全文字符串）。
 - 反证（红→还原→绿）三处：
   ① 删掉 `company-panels.tsx` 里的分叉 tag 分支 ⇒ `board-panel.spec.ts` **2 条红**，且视觉档夹具发射器先红（探针 exit 2，拿不到夹具）；
   ② `boardColumns` 里把 `drift` 写死 `null`（判据不接进卡）⇒ `board.spec.ts` + `board-panel.spec.ts` **3 条红**；
@@ -58,7 +58,7 @@
 ## 落点
 
 - 判据：`packages/company-pack/src/lib/board.ts`（`declaredDependencyLabels` / `paperToTaskId` / `dependencyDrift` / `driftLabel`；`TaskRow.description`、`BoardCard.drift`）。
-- 渲染：`packages/company-pack/src/client/company-panels.tsx`（BoardPanel 卡脚）。
-- keyless：`tests/company/board.spec.ts`、`tests/client/board-panel.spec.ts`；夹具发射器 `tests/client/board-drift-fixture.spec.ts`。
+- 渲染：`packages/company-pack/src/client/tabs/company-panels.tsx`（BoardPanel 卡脚）。
+- keyless：`tests/company/board.spec.ts`、`tests/client/tabs/board-panel.spec.ts`；夹具发射器 `tests/client/tabs/board-drift-fixture.spec.ts`。
 - 真渲染判据 + 图像：`probes/browser-visual/board-drift-probe.mjs`、`snapshots/visual/board-drift/`。
 - 姊妹决定（协议侧）：[任务依赖"两拍落"](2026-10-13-task-dependency-two-phase.md)。

@@ -93,8 +93,8 @@ const verdict = {
 // 页签清单 = 注册源解析（单一事实）；解析为空直接 fail-loud，不静默退化成少一个也绿。
 let tabs = [];
 try {
-  const source = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/company-tab-registration.ts'), 'utf8');
-  const identity = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/tab-icons.tsx'), 'utf8');
+  const source = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/tabs/company-tab-registration.ts'), 'utf8');
+  const identity = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/ui/tab-icons.tsx'), 'utf8');
   tabs = parseCompanyTabCatalog(source, identity);
 } catch (error) {
   console.error(`cdp-probe: 读页签注册源失败：${String(error?.message ?? error)}`);

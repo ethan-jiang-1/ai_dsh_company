@@ -35,12 +35,12 @@ try {
 
 // ── 夹具：由 vitest 发射器现算（组件 import vendor *.module.css，只有本仓转换链能解）──
 const FIXTURE = join(tmpdir(), `dag-visual-fixture-${String(process.pid)}.json`)
-const emitted = spawnSync('npx', ['vitest', 'run', 'tests/client/dag-visual-fixture.spec.ts'],
+const emitted = spawnSync('npx', ['vitest', 'run', 'tests/client/tabs/dag-visual-fixture.spec.ts'],
   { cwd: ROOT, env: { ...process.env, DAG_VISUAL_EMIT: FIXTURE }, encoding: 'utf8' })
 if (emitted.status !== 0) {
   console.error(emitted.stdout?.slice(-2000) ?? '')
   console.error(emitted.stderr?.slice(-2000) ?? '')
-  console.error('夹具发射失败（tests/client/dag-visual-fixture.spec.ts）')
+  console.error('夹具发射失败（tests/client/tabs/dag-visual-fixture.spec.ts）')
   process.exit(2)
 }
 const { svg, css, chainSvg, chainHeight } = JSON.parse(readFileSync(FIXTURE, 'utf8'))

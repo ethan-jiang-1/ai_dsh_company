@@ -30,7 +30,7 @@ npx vitest run tests/company/cultivation-command.spec.ts \
 # 3 files / 23 tests passed（原 host 23 例）
 npx vitest run tests/harness/pack-exports.spec.ts
 # 2 passed（host 导出集合 = apply/inject）
-npx vitest run tests/client/team-tool-card.spec.ts tests/client/delegation-card.spec.ts
+npx vitest run tests/client/ui/team-tool-card.spec.ts tests/client/ui/delegation-card.spec.ts
 # 16 passed（isRecord 迁移未改行为）
 pnpm test
 # 134 files / 1073 tests（0 skipped）

@@ -66,7 +66,7 @@
 pnpm verify                                       # 39 门 ALL PASS（含 freshness/gate-wiring/纯文本档）
 pnpm test                                         # 78 spec / 727 tests 全绿
 pnpm test:coverage                                # 观察档基线（tools/lib 95.4% lines）
-npx vitest run tests/client/company-data-lifecycle.spec.ts   # 6/6（C3 新增）
+npx vitest run tests/client/data/company-data-lifecycle.spec.ts   # 6/6（C3 新增）
 node probes/browser-visual/{presence,budget,attention}-panel-probe.mjs --fixture  # 三探针 ALL PASS
 # Phase E 全电池：
 node checks/smoke/preset-smoke.mjs                # ALL PASS 6 preset

@@ -8,7 +8,7 @@
 
 - 把 `makeContextWiring` / `ContextWiringScoped` 从 `client/index.ts` 抽到
   `client/context-wiring.ts`；入口只 import，不再在 apply 闭包里藏 60 行接线。
-- 新增 `tests/client/company-context-wiring.spec.ts` 8 例，覆盖：
+- 新增 `tests/client/wiring/company-context-wiring.spec.ts` 8 例，覆盖：
   会话在/不在、subagent child（mode 有/缺）、文件 stat ok/!ok/抛错、`contextSources.listSessions`。
   三种“点了没反应”的现场（会话已删 / 原文不在 / stat 抛错）现在有 keyless 证据。
 - 入口只保留 `openMember` / `registerTitle` / 两个 inject 块；这两处仍靠 whole-client 间接覆盖，
@@ -25,7 +25,7 @@
 ## 验证（实跑，2026-11-03 11:1x +08）
 
 ```text
-npx vitest run tests/client/company-context-wiring.spec.ts   # 8 passed
+npx vitest run tests/client/wiring/company-context-wiring.spec.ts   # 8 passed
 pnpm test                                                     # 136 files / 1092 tests
 pnpm verify                                                   # ALL PASS
 npx vitest run --coverage --coverage.reporter=json-summary
@@ -36,5 +36,5 @@ npx vitest run --coverage --coverage.reporter=json-summary
 
 ## 事实落点
 
-- 新家 = `packages/company-pack/src/client/context-wiring.ts`；`client/index.ts` 的 import 是唯一入口。
+- 新家 = `packages/company-pack/src/client/wiring/context-wiring.ts`；`client/index.ts` 的 import 是唯一入口。
 - 证明边界：不证 slot 注册、remote 真装配与 UI 呈现（→ company-client-composition / ui-scene）。

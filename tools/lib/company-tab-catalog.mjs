@@ -11,8 +11,8 @@ const FACE_ROW = /^\s{2}(\w+): \{ tone: '[^']+', glyph: \w+, label: '([^']+)',/g
 
 /**
  * 解析页签注册目录（注册源 + 身份源两份输入）。
- * @param {string} source `packages/company-pack/src/client/company-tab-registration.ts` 全文。
- * @param {string} identitySource `packages/company-pack/src/client/tab-icons.tsx` 全文。
+ * @param {string} source `packages/company-pack/src/client/tabs/company-tab-registration.ts` 全文。
+ * @param {string} identitySource `packages/company-pack/src/client/ui/tab-icons.tsx` 全文。
  * @returns {ReadonlyArray<{ id: string, title: string }>} 按注册源顺序；任一 face 在身份源里找不到 label ⇒ []。
  */
 export function parseCompanyTabCatalog(source, identitySource) {

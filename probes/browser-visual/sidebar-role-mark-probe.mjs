@@ -5,7 +5,7 @@
 // 何时跑：动 `.wk-role-badge`（styles.ts）或 RoleBadge.tsx 时；vendor 升 pin 涉及 ui-workspace
 // 行布局（座位宽度 / 标题间距 / list 座位共存）时。零模型成本，自带 chromium（~30–60s）。
 //
-// 为什么需要它：keyless 只能证明「CSS 文本写了 12px」（tests/client/client-css.spec.ts 的座位上限
+// 为什么需要它：keyless 只能证明「CSS 文本写了 12px」（tests/client/ui/client-css.spec.ts 的座位上限
 // 守卫），证明不了真渲染盒落在哪儿。2026-10-13 的真实缺陷正是这样漏过去的——B 段首版用 3 字药丸
 // （32.45px）住 16px 座位，座位 `justify-content:center` 且不裁剪 ⇒ 两侧各溢出一半：真 DOM 实测
 // **左溢 8.22px**（标记被推出行框；在无侧栏内边距的窄窗布局里被容器边界切掉字母——用户截图现场）、
@@ -173,12 +173,12 @@ writeFileSync(join(SHOTS, 'computed.json'), JSON.stringify({ seatCeiling: SEAT_C
 // ── 末段：五角色对照图（G6；真组件 + 真 CSS，经 vitest 发射器现算）──
 console.log('── 五角色对照夹具（G6）──')
 const FIXTURE = join(tmpdir(), `sidebar-role-mark-fixture-${String(process.pid)}.json`)
-const emitted = spawnSync('npx', ['vitest', 'run', 'tests/client/role-mark-fixture.spec.ts'],
+const emitted = spawnSync('npx', ['vitest', 'run', 'tests/client/ui/role-mark-fixture.spec.ts'],
   { cwd: ROOT, env: { ...process.env, SIDEBAR_ROLE_MARK_EMIT: FIXTURE }, encoding: 'utf8' })
 if (emitted.status !== 0) {
   console.error(emitted.stdout?.slice(-1500) ?? '')
   console.error(emitted.stderr?.slice(-1500) ?? '')
-  failures.push('夹具发射失败（tests/client/role-mark-fixture.spec.ts）')
+  failures.push('夹具发射失败（tests/client/ui/role-mark-fixture.spec.ts）')
 } else {
   const fixture = JSON.parse(readFileSync(FIXTURE, 'utf8'))
   // 1×/6× 两条叠起来比 800px 视口高：元素截图会被裁掉后几格（实测只拍到 3 格），先给足高度。

@@ -8,8 +8,8 @@ import { parseCompanyTabCatalog } from '../../tools/lib/company-tab-catalog.mjs'
 // live 面由 cdp-probe 从同一份 catalog 驱动；解析失败 = 探针不该静默跑 8/8。
 describe('company-tab-catalog', () => {
   it('从真实注册源解析出 9 个页签，含成品', () => {
-    const source = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/company-tab-registration.ts'), 'utf8')
-    const identity = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/tab-icons.tsx'), 'utf8')
+    const source = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/tabs/company-tab-registration.ts'), 'utf8')
+    const identity = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/ui/tab-icons.tsx'), 'utf8')
     const tabs = parseCompanyTabCatalog(source, identity)
     expect(tabs).toHaveLength(9)
     expect(tabs.map(tab => tab.title)).toContain('成品')

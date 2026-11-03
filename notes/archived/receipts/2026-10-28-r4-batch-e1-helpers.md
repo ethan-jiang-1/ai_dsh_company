@@ -8,7 +8,7 @@
 
 ## 决定
 
-1. **`parseCatalog` 从页签组件搬出**：新建 `packages/company-pack/src/client/deliverables-index.ts`，收 `DeliverablesCatalogEntry` / `DeliverablesCatalog` / `CatalogFilter` / `parseCatalog` / `filterCatalog`。`DeliverablesTab` 与 `cultivation-context-data` 都从这里取；数据模块不再 import `.tsx` 组件。
+1. **`parseCatalog` 从页签组件搬出**：新建 `packages/company-pack/src/client/data/deliverables-index.ts`，收 `DeliverablesCatalogEntry` / `DeliverablesCatalog` / `CatalogFilter` / `parseCatalog` / `filterCatalog`。`DeliverablesTab` 与 `cultivation-context-data` 都从这里取；数据模块不再 import `.tsx` 组件。
 2. **`isRecord` 收家**：`host/bundle-manifest.ts`、`host/catalog.ts`、`client/cultivation-context-data.ts` 三份逐字定义删除，统一 import `lib/guards.ts`（host/lib/client 双编译面都可用的纯叶）。
 3. **`clip` / `clipExcerpt` 收家**：`presence.ts` 的 `clip(text,max)`、`cultivation-inbox.ts` 的固定长度 `clip`、`cultivation-context.ts` 的头尾 `clipExcerpt` 全搬 `lib/text.ts`；`cultivation-context.ts` 保留 re-export，外部取用面不变。
 4. **`src-layering` 补盲**：

@@ -29,9 +29,9 @@ opened: 2026-10-19
 - **纯逻辑**：`tools/lib/deliverables-catalog.mjs`（只收 final；按 kickoff 倒序；活跃/归档/台账外计数；slug 从 meta 或目录回落）。
 - **生成器**：`tools/deliverables-index.mjs`（扫两棵树 + 解析 meta/台账 slug + 跑 `deliverables-check --json` 取 present，写 JSON；无参）。
 - **自动重建**：`tools/converge.mjs` 收敛/续跑后自动调用生成器；`--rebuild-index` 可单独跑；纯命令形状在 `converge-rules` spec 钉住。
-- **页签**：[`DeliverablesTab.tsx`](../../../packages/company-pack/src/client/DeliverablesTab.tsx) + `company-tab-registration` 第 9 项 + `tab-icons` 的产出箱 glyph；`readCatalog` 走 `remote.workspaceFiles.read('kb/deliverables-index.json')`；`openFinal` 走 `sessionFileAddress` + `sidebarRight.openResource`。
+- **页签**：[`DeliverablesTab.tsx`](../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx) + `company-tab-registration` 第 9 项 + `tab-icons` 的产出箱 glyph；`readCatalog` 走 `remote.workspaceFiles.read('kb/deliverables-index.json')`；`openFinal` 走 `sessionFileAddress` + `sidebarRight.openResource`。
 - **UX 顺手修**：页签头标题/按钮 `nowrap` + 新鲜度文案省略号（窄栏不再把「重读/浮出」挤成竖排）；看板标题/guide 的旧「5 秒自动刷新」改「投影更新」。
-- **测试**：`tests/harness/deliverables-catalog-tools.spec.ts`（5）+ `tests/client/deliverables-catalog.spec.ts`（8）+ `client-face` 数据面（1）；注册/组合测试同步 9 页签。
+- **测试**：`tests/harness/deliverables-catalog-tools.spec.ts`（5）+ `tests/client/tabs/deliverables-catalog.spec.ts`（8）+ `client-face` 数据面（1）；注册/组合测试同步 9 页签。
 - **探针**：[`deliverables-catalog-probe.mjs`](../../../probes/browser-visual/deliverables-catalog-probe.mjs)（真 web；44 行 = 索引；四档筛选；44 个打开；点第一行后 final 正文出现；窄栏可见；`--fixture` 落图）。
 - **Note**：[2026-10-19-deliverables-catalog](../../../notes/implemented/2026-10-19-deliverables-catalog.md)｜批次句号：[2026-10-20-company-panel-batch-close](../../../notes/archived/receipts/2026-10-20-company-panel-batch-close.md)。
 

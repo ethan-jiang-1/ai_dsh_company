@@ -22,15 +22,15 @@
 ## 后果
 
 - 表格列从 5 列减到 4 列；依赖列在桌面 650px 右栏首屏可见，多依赖自动换行、subject 2 行钳制（全量文本在 DOM）。
-- `tests/client/tasks-table.spec.ts` 从 3 条扩到 6 条：依赖 owner/subject/title、悬空 `id（未找到）`、deleted 不进表 + 死映射移除。
-- 新 `tasks-panel-probe` 把入口可见性/键盘/落点变成可复跑证据；视觉夹具在 [tasks-panel/desktop.png](../../snapshots/visual/tasks-panel/desktop.png) 与 [narrow.png](../../snapshots/visual/tasks-panel/narrow.png)。
+- `tests/client/tabs/tasks-table.spec.ts` 从 3 条扩到 6 条：依赖 owner/subject/title、悬空 `id（未找到）`、deleted 不进表 + 死映射移除。
+- 新 `tasks-panel-probe` 把入口可见性/键盘/落点变成可复跑证据；视觉夹具（桌面 / 窄栏两张）已随真实证据移出产品仓（部署方私有证据仓），本仓不再保留。
 - **未解**：窄栏 390 下表格仍需横向滚动（依赖列在第二列，先看到）；不做任务编辑/筛选；不替换官方 team 面板。
 
 ## 验证
 
 真跑过的命令与红/绿形态：
 
-- **依赖列红**：把 `DependencyLabel` 临时改成 `return <span className="wk-dep">{id}</span>` ⇒ `npx vitest run tests/client/tasks-table.spec.ts` **1 failed / 5 passed**；还原 ⇒ **6 passed**。
+- **依赖列红**：把 `DependencyLabel` 临时改成 `return <span className="wk-dep">{id}</span>` ⇒ `npx vitest run tests/client/tabs/tasks-table.spec.ts` **1 failed / 5 passed**；还原 ⇒ **6 passed**。
 - **`已删` 红**：把 `deleted: '已删'` 加回 `STATUS_LABEL` ⇒ 同 spec **1 failed / 5 passed**；还原 ⇒ **6 passed**。
 - `pnpm test` ⇒ **68 files / 677 tests passed**。
 - `pnpm verify` ⇒ **ALL PASS**。

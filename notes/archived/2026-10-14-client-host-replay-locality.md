@@ -6,8 +6,8 @@
 
 这是新一轮后续决定，覆盖 Client 页签装配、Host cultivation 命令/存储、Replay 判据三个切面；对 [2026-10-14-code-restructure](./2026-10-14-code-restructure.md) **部分后续**，旧 Note 的六项决定、理由和旧验证收据保持原文不动。旧 Note 增加本轮指针；本 Note 记录新增 seam 与当前事实。Replay normalization 的历史决定仍在 [2026-10-10-replay-posture-redaction](2026-10-10-replay-posture-redaction.md)，该 Note 的实现路径已更新到当前落点。
 
-1. **Client Lead/follow 适配器**：[company-session-adapters.ts](../../packages/company-pack/src/client/company-session-adapters.ts) 集中 child→parent Lead 寻址及 follow 快照/live-event 帧投影；消费面仍按既有作用域组装。
-2. **Client 页签注册目录**：[company-tab-registration.ts](../../packages/company-pack/src/client/company-tab-registration.ts) 的固定 `TAB_REGISTRATIONS` 并置八个页签的身份/元数据与 body/title/guide keyed 回调；`index.ts` 仍是 composition root。三个 slot group 仍分别 `slots.inject`，由 Cordis 各自管理声明等待、销毁与重装。
+1. **Client Lead/follow 适配器**：[company-session-adapters.ts](../../packages/company-pack/src/client/wiring/company-session-adapters.ts) 集中 child→parent Lead 寻址及 follow 快照/live-event 帧投影；消费面仍按既有作用域组装。
+2. **Client 页签注册目录**：[company-tab-registration.ts](../../packages/company-pack/src/client/tabs/company-tab-registration.ts) 的固定 `TAB_REGISTRATIONS` 并置八个页签的身份/元数据与 body/title/guide keyed 回调；`index.ts` 仍是 composition root。三个 slot group 仍分别 `slots.inject`，由 Cordis 各自管理声明等待、销毁与重装。
 3. **Host cultivation seam**：[cultivation.ts](../../packages/company-pack/src/host/cultivation.ts) 把命令 handler 从注册体移出并保留命令语义；文件操作住 [cultivation-storage.ts](../../packages/company-pack/src/host/cultivation-storage.ts)（2026-10-16 自 cultivation.ts 拆出，安全不变量见该模块头注）的固定 Node `CultivationStorage` 适配器。`registerCultivation` 仍注册工具与命令。存储接口不是调用方可注入的公开替代面；没有把 correct/suggest 等规则抽为共享纯模块。
 4. **Replay 纯逻辑**：[replay-logic.mjs](../../tools/lib/replay-logic.mjs) 仅承载 `normalizeReplayTimeContext` 与 full/presence `judgeReplaySessions`；[replay-smoke.mjs](../../checks/smoke/replay-smoke.mjs) 仍负责会话构造/归一外壳、sidecar、UI 判据、CLI 与输出，`replay-ui.mjs` 不变。缺少 expected session 时的空夹具语义、full 首差异、presence 排序后的 member/task 集合判据保持原样。
 
@@ -27,9 +27,9 @@
 
 | 命令 / 试验 | 断言 | 红 / 绿形态 |
 |---|---|---|
-| `pnpm exec vitest run tests/client/company-tab-registration.spec.ts tests/client/company-session-adapters.spec.ts tests/company/cultivation.spec.ts tests/harness/replay-logic.spec.ts` | 四个 seam 的 targeted specs | 4 files / 25 tests PASS（初次聚焦运行） |
-| 临时把 `company-tab-registration.ts` 的 attention id 改为 `attention-mutated`；跑 `pnpm exec vitest run tests/client/company-tab-registration.spec.ts`；还原后重跑 | 注册 key 漂移能否被独立期望抓住 | 红：1 test failed，expected `dsh-company-pack/attention`、收到 `attention-mutated`；还原绿：1/1 PASS |
-| 临时让 `createLeadLookup` 返回当前 session 而非 parent；跑 `pnpm exec vitest run tests/client/company-session-adapters.spec.ts`；还原后重跑 | child 路由是否归到 Lead | 红：1 test failed，expected `lead-session`、收到 `child-session`；还原绿：1/1 PASS |
+| `pnpm exec vitest run tests/client/tabs/company-tab-registration.spec.ts tests/client/wiring/company-session-adapters.spec.ts tests/company/cultivation.spec.ts tests/harness/replay-logic.spec.ts` | 四个 seam 的 targeted specs | 4 files / 25 tests PASS（初次聚焦运行） |
+| 临时把 `company-tab-registration.ts` 的 attention id 改为 `attention-mutated`；跑 `pnpm exec vitest run tests/client/tabs/company-tab-registration.spec.ts`；还原后重跑 | 注册 key 漂移能否被独立期望抓住 | 红：1 test failed，expected `dsh-company-pack/attention`、收到 `attention-mutated`；还原绿：1/1 PASS |
+| 临时让 `createLeadLookup` 返回当前 session 而非 parent；跑 `pnpm exec vitest run tests/client/wiring/company-session-adapters.spec.ts`；还原后重跑 | child 路由是否归到 Lead | 红：1 test failed，expected `lead-session`、收到 `child-session`；还原绿：1/1 PASS |
 | 临时反转 adoption 的 target-role guard；跑 `pnpm exec vitest run tests/company/cultivation.spec.ts`；还原后重跑 | 跨角色不得采纳、目标本人可以采纳 | 红：2 failed / 17 passed，跨角色请求错误成功、目标本人反被拒；还原绿：19/19 PASS |
 | 临时停用 `TIME_CONTEXT_SAMPLE` 正则；跑 `pnpm exec vitest run tests/harness/replay-logic.spec.ts`；还原后重跑 | 时间样本归一化合同 | 红：1 failed / 3 passed，时间戳未替换；还原绿：4/4 PASS |
 | `set -o pipefail && pnpm verify && pnpm test` | 门禁、Note/link/path/doc-budget 与全量 keyless 回归 | ALL PASS：verify ALL PASS；59 files / 550 tests PASS |

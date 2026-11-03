@@ -57,7 +57,7 @@ dev 组合里命令面确实是挂着的：培养机制探针判据④（`comman
 
 ### ② 面板里的命令是**纯文本**，板没有动作面
 
-三壳（公司页第四子页 / 侧栏页签 / 浮窗）共用 [CultivationBoard.tsx](../../../packages/company-pack/src/client/CultivationBoard.tsx)，
+三壳（公司页第四子页 / 侧栏页签 / 浮窗）共用 [CultivationBoard.tsx](../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx)，
 其头注自称「纯展示」板；待处理行只渲染 `采纳：/cultivation adopt <id>　拒绝：/cultivation reject <id> :: 理由` 这类文案
 （:83），既无按钮也无回调面。所以「点不动」是当前事实、不是缺陷。
 

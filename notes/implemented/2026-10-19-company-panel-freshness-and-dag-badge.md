@@ -20,8 +20,8 @@
 
 ## 后果
 
-- 9 个 `PanelFrame` 调用方的显示文案现在与数据源一致；`tests/client/panel-freshness.spec.ts` 钉默认值与轮询面板的显式间隔，`tests/client/dag-panel.spec.ts` 钉徽章独立类与默认文案。
-- `dag-visual-probe` 新增「进行中徽章 ≠ 可开工」判据与 21 节点窄栏度量；`dag-midflight-probe` 新增 `--narrow`（真 app 390×900，落 `narrow-metrics.json` + 截图）；资产在 [dag-visual/narrow-21.png](../../snapshots/visual/dag-visual/narrow-21.png) 与 [dag-midflight/narrow.png](../../snapshots/visual/dag-midflight/narrow.png)。
+- 9 个 `PanelFrame` 调用方的显示文案现在与数据源一致；`tests/client/tabs/panel-freshness.spec.ts` 钉默认值与轮询面板的显式间隔，`tests/client/tabs/dag-panel.spec.ts` 钉徽章独立类与默认文案。
+- `dag-visual-probe` 新增「进行中徽章 ≠ 可开工」判据与 21 节点窄栏度量；`dag-midflight-probe` 新增 `--narrow`（真 app 390×900，落 `narrow-metrics.json` + 截图）；两张窄栏资产（21 节点 / 进行中徽章）已随真实证据移出产品仓（部署方私有证据仓），本仓不再保留。
 - **真 21 节点已执行（2026-10-20）**：`dag-midflight-probe` 原取第一条 `session/title`，UI 用最后一条；改为取最后一条后按标题打开成功。实测宽图 1716×321，390 窄栏 `overflowX=true / overflowY=false`，整页 `scrollHeight=900` ⇒ 真实 21 节点样本只横向滚动；纵向 2366px 只在合成 21 串行链成立。
 - 本轮不动 DAG 布局、不动任务板表格、不做成品台账；窄栏接受度由看板卡上的 🔒 问题承载。
 
@@ -29,8 +29,8 @@
 
 真跑过的命令与红/绿形态：
 
-- **徽章红**：把 `company-panels.tsx` 的 in_progress 类改回 `wk-dag-ready` ⇒ `npx vitest run tests/client/dag-panel.spec.ts` **1 failed / 12 passed**；还原 ⇒ **13 passed**。
-- **新鲜度红**：把 `company-tabs.tsx` 的默认值改回 `每 5 秒自动刷新` ⇒ `npx vitest run tests/client/panel-freshness.spec.ts tests/client/dag-panel.spec.ts` **3 failed / 13 passed**；还原 ⇒ **16 passed**。
+- **徽章红**：把 `company-panels.tsx` 的 in_progress 类改回 `wk-dag-ready` ⇒ `npx vitest run tests/client/tabs/dag-panel.spec.ts` **1 failed / 12 passed**；还原 ⇒ **13 passed**。
+- **新鲜度红**：把 `company-tabs.tsx` 的默认值改回 `每 5 秒自动刷新` ⇒ `npx vitest run tests/client/tabs/panel-freshness.spec.ts tests/client/tabs/dag-panel.spec.ts` **3 failed / 13 passed**；还原 ⇒ **16 passed**。
 - `pnpm test` ⇒ **68 files / 674 tests passed**。
 - `pnpm verify` ⇒ **ALL PASS**。
 - pack 双面构建：`node ./node_modules/typescript/bin/tsc -b packages/company-pack && (cd packages/company-pack && ../../node_modules/.bin/tsdown)` ⇒ 成功；之后复跑 `client-load-smoke` **ALL PASS**（不重建 = web 读旧 `lib/`，label/徽章改动不生效）。

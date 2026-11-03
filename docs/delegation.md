@@ -88,7 +88,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 - 槽 `tool.call.toolview`（keyed），key = `vp_eng` / `vp_sales`；渲染"委派 · VP-Eng｜brief｜
   VP 交回的稿子"，状态 running/ok/error/stopped 只从 call/result 切片推导（可回放）。
 - ⚠ **key 必须与 preset 的 `toolName` 逐字一致**：keyed key 域是开放的，拼错**不报错**、只是永不
-  渲染。两边由共享常量 `packages/company-pack/src/client/delegation-keys.ts` 钉住，
+  渲染。两边由共享常量 `packages/company-pack/src/client/wiring/delegation-keys.ts` 钉住，
   `pnpm test` 的 client-face 守卫比对 preset 的 `toolName`。
 - 卡片只依赖 `slots` 服务（不读团队状态），单独 `ctx.inject(['slots'], …)` 注册——不被 team
   remote 的缺席拖住。
@@ -100,8 +100,8 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 
 | 层 | 手段 | 守什么 | 何时跑 |
 |---|---|---|---|
-| keyless 行为 | `pnpm test` → `tests/client/delegation-card.spec.ts`：纯函数视图模型（running/ok/error/stopped、brief 解析、截断 JSON 回退、未知工具名回退）+ `react-dom/server` 静态渲染 | 卡片**渲染语义**（不需要 DOM、不需要模型，毫秒级） | 每次改动 |
-| keyless 装配 | `pnpm test` → `tests/client/client-face.spec.ts`：卡片 key ↔ preset `toolName` **逐字一致** + 注册走共享常量 + 单独 `inject(['slots'])` | keyed slot 的**静默失效**（key 拼错 = 永不渲染） | 每次改动 |
+| keyless 行为 | `pnpm test` → `tests/client/ui/delegation-card.spec.ts`：纯函数视图模型（running/ok/error/stopped、brief 解析、截断 JSON 回退、未知工具名回退）+ `react-dom/server` 静态渲染 | 卡片**渲染语义**（不需要 DOM、不需要模型，毫秒级） | 每次改动 |
+| keyless 装配 | `pnpm test` → `tests/client/wiring/client-face.spec.ts`：卡片 key ↔ preset `toolName` **逐字一致** + 注册走共享常量 + 单独 `inject(['slots'])` | keyed slot 的**静默失效**（key 拼错 = 永不渲染） | 每次改动 |
 | 真页面挂载 | `node checks/smoke/client-load-smoke.mjs`：真浏览器加载真页面，零 loader 错误 + 品牌在场 | client 入口 apply 抛错（slot 名写错会在这里炸，postmortem 0003） | 客户端改动 |
 | 机制 / 边界 | `node checks/smoke/delegation-smoke.mjs`（1 条 prompt ≈30s）：`vp_eng`/`vp_sales`/`subagent_research` 在模型可见目录 + 三个控制名仍是团队版；`--delegate` 真委派一次，断言收到 activation 回执（`started subagent <id>`）、child 日志首帧 `agentPreset = vp-eng`、child 目录无 Team 工具 | activation 语义回归（回执变正文 = 红）；preset 组合没落到 child；Team 工具误入 child 目录 | 该边界改动后 / **升 pin 时** |
 | 挂载（上线前门禁） | `node checks/smoke/preset-smoke.mjs` | 行 config 校验（preset 挂载失败，postmortem 0001） | preset 组合或内容改动后 |

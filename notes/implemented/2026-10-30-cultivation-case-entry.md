@@ -30,7 +30,7 @@
 
 ## 验证（实跑）
 
-- 红：① 单表单实现前，`tests/client/cultivation-board-actions.spec.ts` 的创作面用例点「给别的角色提建议」按钮失败（按钮已不存在）；② host 旧错误文案断言红（`正文不能为空（:: 之后写做法与证据）。` → 新文案含「或至少写清这次工作」）；③ 组件曾把空 work 传成「填了但为空」触发必填误拦——compose-context 四例红，改为 `空串 = 未填` 后绿。
+- 红：① 单表单实现前，`tests/client/cultivation/cultivation-board-actions.spec.ts` 的创作面用例点「给别的角色提建议」按钮失败（按钮已不存在）；② host 旧错误文案断言红（`正文不能为空（:: 之后写做法与证据）。` → 新文案含「或至少写清这次工作」）；③ 组件曾把空 work 传成「填了但为空」触发必填误拦——compose-context 四例红，改为 `空串 = 未填` 后绿。
 - 绿：`pnpm test`：118 files / 1021 tests PASS（含新增：`--work=` 落字段/空值/坏编码/超限拒、单表单提交带 `--work=`、只写工作+期望可提交、预览随输入与目标角色更新、目标角色默认当前角色/点 CFO 变建议）。
 - `pnpm typecheck`：exit 0。`pnpm verify`：ALL PASS（2 门无对象 SKIP）。
 - 真浏览器 `node probes/browser-visual/cultivation-gui-probe.mjs --isolated`（先 `tsc -b` + `tsdown`，mtime 守卫拒旧 lib）：ALL PASS——⑤a 单表单填工作+期望+做法提交，记录带 `work: 收口时漏了未决项…` 且 `status: open`；⑤b 默认显纠正说明、点 CFO 变建议说明、成品背景照常落 `contexts` + `targetRole: cfo`；⑤c 隔离 home 不伪造会话来源；其余采纳落方法层、验证依据/历史、命令日志配对、角色闸拒绝、打开原文、零挂载失败全绿。另跑 `node checks/smoke/ui-scene-smoke.mjs --isolated`：全部公司页签加载、浏览器错误环零命中。

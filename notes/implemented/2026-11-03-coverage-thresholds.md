@@ -44,7 +44,7 @@ pnpm test:coverage
 # 红证：把 context-wiring statements 阈值临时改成 99
 npx vitest run --coverage
 # exit 1：ERROR: Coverage for statements (95%) does not meet
-#   "packages/company-pack/src/client/context-wiring.ts" threshold (99%)
+#   "packages/company-pack/src/client/wiring/context-wiring.ts" threshold (99%)
 # 还原 90 → exit 0
 ```
 

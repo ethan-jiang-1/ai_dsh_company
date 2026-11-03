@@ -146,7 +146,7 @@ console.log({cardsShowing_dependencyReadyTag_on_nonPending:falseReady, legit_pen
 - `tests/company/board.spec.ts`：**真 wire 形状**夹具（带 ownerName/ready/writeScopes）断言非 pending
   一律不报 `ready`；另一条断言 `ready` 缺失时回落也不许放宽。
   **反证**：把回落改回 `readyOf(...)` ⇒ 2 failed；还原 ⇒ 17 passed。
-- `tests/client/board-panel.spec.ts`：渲染面断言已完成的卡与进行中的卡**都不出现**依赖徽章，
+- `tests/client/tabs/board-panel.spec.ts`：渲染面断言已完成的卡与进行中的卡**都不出现**依赖徽章，
   且待办卡的两种真信号都还在（防门槛把合法标签一起吞掉）。
   **反证**：门槛改回无条件 `blockedBy.length > 0` ⇒ 2 failed；还原 ⇒ 5 passed。
 
@@ -155,7 +155,7 @@ console.log({cardsShowing_dependencyReadyTag_on_nonPending:falseReady, legit_pen
 `TasksPanel.tsx` 直接吃 wire 的 `ready`，判据是 `task.ready === false ? '（阻塞）' : ''`——
 与看板徽章**同一个 bug**（不看 status）。真 wire 实测：298 行里 **280 行**挂「（阻塞）」，
 其中 **273 行是非 pending**（活都干完了还标阻塞）。已修（条件加 `task.status === 'pending'`），
-判据 = `tests/client/tasks-table.spec.ts`（红/绿实证：门槛退回 ⇒ 2 failed，还原 ⇒ 3 passed）。
+判据 = `tests/client/tabs/tasks-table.spec.ts`（红/绿实证：门槛退回 ⇒ 2 failed，还原 ⇒ 3 passed）。
 
 ### 六、未搭车（如实留缺口）
 

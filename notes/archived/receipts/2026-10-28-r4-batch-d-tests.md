@@ -9,7 +9,7 @@
 ## 决定
 
 1. **公司整页真挂载测试**：`tests/client/company-view.spec.ts` 用 happy-dom + createRoot 真挂 `createCompanyView`，断四子页签、身份条、加载/错误行、浮出回调。测试先抓到一处真 bug：培养页与“读取团队状态…”同时出现；修 `CompanyView.tsx`，培养页不再显示 team loading/error。
-2. **workspace 状态机测试**：`tests/client/workspace-text.spec.ts` 覆盖 loading→ready、null→unreadable、卸载 abort、reload 重读；台账/成品/身份条共用的状态机不再零用例。
+2. **workspace 状态机测试**：`tests/client/data/workspace-text.spec.ts` 覆盖 loading→ready、null→unreadable、卸载 abort、reload 重读；台账/成品/身份条共用的状态机不再零用例。
 3. **Host 生命周期**：`tests/company/apply-lifecycle.spec.ts` 覆盖 apply 后迟到 `workspaceRegistry` 触发 inject 回调、dispose 后 `api-session/added` 不再告警；补上 host-composition 没跑的两格。
 4. **测试分区归位**：6 个被测对象是 `tools/lib/*.mjs` 的 spec 从 `tests/company/` 迁 `tests/harness/`（authorship / converge-rules / deliverables-audit / deliverables / candidate-scan-labels / deliverables-catalog）；company 区只剩真公司读模型与 host 行为。
 5. **重名消除**：company 区 `deliverables-catalog.spec.ts` 迁 harness 并改名 `deliverables-catalog-tools.spec.ts`；client 区同名 spec 保留，命令不再歧义。
@@ -31,7 +31,7 @@
 ## 验证
 
 - `tests/client/company-view.spec.ts` → 4 passed；其中「培养页不应再出现读取团队状态」在修 `CompanyView.tsx` 前红、修后绿（红证即该断言）。
-- `tests/client/workspace-text.spec.ts` → 4 passed。
+- `tests/client/data/workspace-text.spec.ts` → 4 passed。
 - `tests/company/apply-lifecycle.spec.ts` → 2 passed（迟到 inject 的警告落 stderr；dispose 后事件不再告警）。
 - `pnpm test` → **110 files / 973 tests passed**；`pnpm verify` → ALL PASS；`pnpm typecheck` → exit 0。
 - 迁区后 `git grep` 旧 `tests/company/{deliverables,converge-rules,authorship,candidate-scan-labels}*.spec.ts` 零命中；`bare-path` 全绿。

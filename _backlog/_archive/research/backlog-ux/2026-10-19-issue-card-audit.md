@@ -29,7 +29,7 @@ intent: "为 issue 卡质量审与 DSH-native 收口提供逐条证据：四张�
 |---|---|---|---|---|
 | A1 | P1 | [看板卡](../../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §「已确立的事实 / 本轮范围」 | 「两个致命结论」仍说“正确性缺陷已确认两条”；“本轮范围”第 1 条仍写“先修数据 BUG-026/027” | 与同卡「核心不再是修正确性缺陷」直接冲突；026 是误报、027 已修。当前段应只留呈现层 + golden 判据 |
 | A2 | P1 | [看板卡](../../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §「验收标准」 | 仍把 BUG-026/027 的「已修判定」当验收条目 | 两个 BUG 已归档；026 的“已修判定”是在误报结论之前写的。条目要么已满足，要么不可执行 |
-| A3 | P1 | [任务板卡](../../../_archive/settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md) §「已确立的事实 / 本轮范围」 | 「修 owner 后要重测（BUG-026 不修…）」；「BUG-027 修好后需同步复核」 | 同卡 §「已确立的事实 / 验收标准」说 026 是误报、无需修复；`（阻塞）` 已在 [TasksPanel.tsx](../../../../packages/company-pack/src/client/TasksPanel.tsx) 的 `TasksTableView` 修掉并有 [spec](../../../../tests/client/tasks-table.spec.ts) 的 describe 块 |
+| A3 | P1 | [任务板卡](../../../_archive/settled_issues/2026-10-19-taskboard-table-ux-deep-dive.md) §「已确立的事实 / 本轮范围」 | 「修 owner 后要重测（BUG-026 不修…）」；「BUG-027 修好后需同步复核」 | 同卡 §「已确立的事实 / 验收标准」说 026 是误报、无需修复；`（阻塞）` 已在 [TasksPanel.tsx](../../../../packages/company-pack/src/client/tabs/TasksPanel.tsx) 的 `TasksTableView` 修掉并有 [spec](../../../../tests/client/tabs/tasks-table.spec.ts) 的 describe 块 |
 | A4 | P1 | [优先级卡](../../../_archive/settled_issues/2026-10-19-company-panels-ux-priority.md) §「建议 Top 3 / 依据」 | “owner 列空”“先依赖 ① 修 owner”；还说在场连带 BUG-026 | owner 在 wire 上齐全；① 没有 owner 修复任务；026 已结。“三条已确认缺陷…不需要浏览器就能修”也已过期 |
 | A5 | P1 | [issues/README](../../../issues/README.md) §活跃清单 | 旧版还写“BUG-026 走哪条路”“owner 空”“已确认两条真缺陷 BUG-026/027” | 三条都已撤回/关闭；本轮已先改这三行，但正文/状态仍未收口 |
 | A6 | P1 | [真相复核 §五/§六](../company-panels-ux/2026-10-19-panel-truth-audit.md) | §五仍以被证伪的 §三为依据说“真值缺 owner、ready 放宽、必须换底”；§六仍说 owner 全缺可能是开发 home 特有 | 与文首补正相反；正文仍在判断路径上。本轮已加失效指针，未重写 |
@@ -199,9 +199,9 @@ DSH 的 `plan-mode` 不是“写计划”的装饰：`exit_plan_mode` 把完整�
 cd /Users/bowhead/ai_dsh_company
 node checks/run-gates.mjs                     # 形状门禁；本轮 ALL PASS
 npx vitest run tests/harness/backlog-liveness.spec.ts
-wc -l packages/company-pack/src/client/TasksPanel.tsx \
-      packages/company-pack/src/client/company-panels.tsx \
-      packages/company-pack/src/client/LedgerTab.tsx
+wc -l packages/company-pack/src/client/tabs/TasksPanel.tsx \
+      packages/company-pack/src/client/tabs/company-panels.tsx \
+      packages/company-pack/src/client/tabs/LedgerTab.tsx
 grep -R "BUG-026\|BUG-027\|等你点\|owner 列空" -n _backlog/issues _backlog/research
 ```
 

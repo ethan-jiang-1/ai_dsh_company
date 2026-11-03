@@ -32,7 +32,7 @@
 | 命令 / 试验 | 断言 | 红 / 绿形态 |
 |---|---|---|
 | `pnpm exec vitest run tests/company/cultivation.spec.ts` | 命令族 + 文件安全 24 用例 | 修复前穿越用例红：`expected 'success' to be 'error'`（tests/company/cultivation.spec.ts:343）；修复后 24/24 PASS |
-| `pnpm exec vitest run tests/client/instance-guard.spec.ts` | 判据纯函数 3 例 + disposer 契约（横幅随他人心跳出现；dispose 清心跳/横幅/定时器；停表后 20s 不续写） | 4/4 PASS |
+| `pnpm exec vitest run tests/client/wiring/instance-guard.spec.ts` | 判据纯函数 3 例 + disposer 契约（横幅随他人心跳出现；dispose 清心跳/横幅/定时器；停表后 20s 不续写） | 4/4 PASS |
 | 临时去掉 instance-guard 清理里的两枚 `clearInterval` 后重跑上一条 | disposer 测试有牙齿 | 红：dispose 后泄漏的 beat 定时器续写自身心跳，`expected {...tab-other, tab-self…} to deeply equal {tab-other}`；还原后绿 4/4 |
 | `pnpm exec tsc -b packages/company-pack --pretty false` | host/client 两面类型 | 通过（无输出） |
 | `cd packages/company-pack && ../../node_modules/.bin/tsdown` | 两面产物构建 | Host/Client build complete（仅既有 `external` deprecation warning） |

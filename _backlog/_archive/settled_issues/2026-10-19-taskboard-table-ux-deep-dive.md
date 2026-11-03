@@ -9,7 +9,7 @@ opened: 2026-10-19
 
 ## 当前结论（只写 now）
 
-「任务板」两副面孔都在 [`TasksPanel.tsx`](../../../packages/company-pack/src/client/TasksPanel.tsx)：① 会话头部入口按钮；② 右栏页签体表格 `TasksTableView`。本轮已实施、验证、收口：
+「任务板」两副面孔都在 [`TasksPanel.tsx`](../../../packages/company-pack/src/client/tabs/TasksPanel.tsx)：① 会话头部入口按钮；② 右栏页签体表格 `TasksTableView`。本轮已实施、验证、收口：
 
 1. **依赖列人读优先**：每项 = `owner · subject`，`task-N` 只做 `title` / `data-dep-id` 次要信息；多依赖用 `wk-deps` 换行；悬空依赖显式 `id（未找到）`。
 2. **行 id 并入任务列**：`task-1@3` 灰字在 subject 前，去掉独立 id 列，给依赖列让出宽度；列序 = 任务 / 依赖 / 状态 / owner，依赖在窄栏也能先看到。
@@ -23,7 +23,7 @@ opened: 2026-10-19
 
 - **表格**：`TasksTableView` 用 `tasksFromTeamView(view)` 归一化行；`DependencyLabel` 输出 owner + subject + `data-dep-id`；行 id 并入任务列；删 `STATUS_LABEL.deleted`。
 - **样式**：依赖列 `white-space: normal`、`min-width: 10rem`；`.wk-deps` 可换行；`.wk-dep-subject` 2 行钳制（全量文本在 DOM）；id 只进 `title`/`data`。
-- **测试**：`tests/client/tasks-table.spec.ts` 从 3 条扩到 6 条（依赖 owner/subject/title、悬空 id、deleted 不进表 + 死映射移除）。
+- **测试**：`tests/client/tabs/tasks-table.spec.ts` 从 3 条扩到 6 条（依赖 owner/subject/title、悬空 id、deleted 不进表 + 死映射移除）。
 - **探针**：新 [tasks-panel-probe](../../../probes/browser-visual/tasks-panel-probe.mjs)（真 web，1440/390；入口可见/焦点/Tab 序/Enter 落点；`--fixture` 落图）；[checks/README](../../../checks/README.md) 索引；[snapshots/README](../../../snapshots/README.md) 场景行。
 - **Note**：[2026-10-19-taskboard-dependency-labels](../../../notes/implemented/2026-10-19-taskboard-dependency-labels.md)。
 
@@ -35,7 +35,7 @@ opened: 2026-10-19
 
 | 项 | 结果 | 命令/产物 |
 |---|---|---|
-| 依赖列 keyless | 6 tests passed（owner/subject/title、悬空、deleted） | `npx vitest run tests/client/tasks-table.spec.ts` |
+| 依赖列 keyless | 6 tests passed（owner/subject/title、悬空、deleted） | `npx vitest run tests/client/tabs/tasks-table.spec.ts` |
 | 全量 keyless | 68 files / 677 tests passed | `pnpm test` |
 | 结构门禁 | ALL PASS | `pnpm verify` |
 | 真挂载 | 零挂载失败 + 品牌在场 | `client-load-smoke`（重建 `lib/` 后） |

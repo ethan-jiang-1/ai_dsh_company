@@ -64,7 +64,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 
 **问题**：
 
-- **测试粒度反了**（R5-23）：原 cultivation spec（929 行，2026-11-03 已拆） / 44 个 it，覆盖 `host/cultivation` + `host/cultivation-storage` + `lib/cultivation` + `lib/cultivation-context` 四模块；源码是一模块一文件。`tests/client/cultivation-board-actions.spec.ts` 574 行。
+- **测试粒度反了**（R5-23）：原 cultivation spec（929 行，2026-11-03 已拆） / 44 个 it，覆盖 `host/cultivation` + `host/cultivation-storage` + `lib/cultivation` + `lib/cultivation-context` 四模块；源码是一模块一文件。`tests/client/cultivation/cultivation-board-actions.spec.ts` 574 行。
 - **测试分区无主**（R5-24）：`src/lib`（20 模块）没有自己的区；9 个纯 lib spec 住 `tests/company/`，1 个住 `tests/client/`；`tools/lib` 的 2 个 spec 也住 `tests/company/`（`dev-install`/`market-index`），而 `tests/README.md:16-19` 把 tools/lib 判据划给 harness。
 - **共享面漏测**（R5-25）：`lib/tool-card.ts`（75 行，两个卡片共用）无直接 spec，且 `:44` 内联复制了 `lib/guards.ts:5` 的 `isRecord`；`lib/guards.ts` 本身也无 spec。
 - **入口导出面**（R5-26）：`src/index.ts:43-44` `export *` 出 17 个符号，仓内无消费者（只有 `apply` 被 7 处 import）；`tests/harness/pack-exports.spec.ts` 钉了 inject/apply，没钉导出集合，公开面可静默变宽。

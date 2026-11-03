@@ -21,11 +21,20 @@
   host/client 各消费哪些**以各文件 import 为准**（host 面偏 signoff/doors，client 面占大多数）。
   （client 面另有 `cultivation-actions`＝人侧动作面纯模块：命令线构造 + host 结果折算 + 文案表；
   `CultivationCompose.tsx`＝创作面表单——2026-10-17 培养 GUI 卡）
-- `client/` —— **client 注册入口与浏览器面**：`index.ts`（`dsh.client` 注入面及组合）调用
-  `company-session-adapters.ts` 统一 Lead 归并与 follow 帧投影，调用 `company-tab-registration.ts` 以一个固定页签目录
-  派生类型、body、title、guide 四处贡献；Cordis 各槽仍各自等待声明并负责卸载/重装。其余是页签组件与视图模型
-  （范本 `delegationCardModel`）、`Brand.tsx` 品牌皮肤、`float-geometry.ts` 浮窗几何；**`delegation-keys`（委派键归一）住这里**，不在 lib/。
-  构建走 tsdown client 半（产物 `lib/client.js`）。
+- `client/` —— **client 注册入口与浏览器面**，顶层只留 `index.ts`（`dsh.client` 注入面及组合），其余按关切分五组
+  （2026-11-03 第六轮；每组 = 一个目录，读目录名即知职责）：
+  - `wiring/` —— 组合与接线：`context-wiring`（槽上下文）、`company-session-adapters`（Lead 归并 + follow 帧投影）、
+    `attention-registry` / `attention-observers`、`member-navigation`、`title-state`、`instance-guard`、`error-ring`、
+    **`delegation-keys`（委派键归一，不在 lib/）**。
+  - `data/` —— 数据面：`company-data-plane`（路径/读模型常量）、`use-company-data`（订阅生命周期）、`deliverables-index`、
+    `workspace-text`、`session-source`。
+  - `ui/` —— 共用视觉件：`styles`（CSS 唯一源）、`Brand`、`RoleBadge`、`tab-icons`、`float-geometry`（浮窗几何）、
+    `DelegationCard` / `TeamToolCard`（工具卡）。
+  - `tabs/` —— 页签面：`company-tabs`（框架/浮出）、`company-panels`（看板/依赖图/在场/用量）、`company-tab-registration`
+    （固定页签目录 → 类型/body/title/guide 四处贡献）、四个页签体 + `TasksPanel`。
+  - `cultivation/` —— 培养域：`CultivationView` / `CultivationTab` 壳、看板/收件箱/创作/背景选择器、`cultivation-actions|data|context-data`、
+    `use-cultivation-board`。
+  Cordis 各槽仍各自等待声明并负责卸载/重装；构建走 tsdown client 半（产物 `lib/client.js`）。
 
 **构建**：`tsc -b packages/company-pack` + tsdown 两面（事实家 = [bootstrap](../../../docs/guides/bootstrap.md)）。
 ⚠ 本目录**不进 tarball**（`files` 的现行清单 = [package.json](../package.json)：只发 runtime 两半、

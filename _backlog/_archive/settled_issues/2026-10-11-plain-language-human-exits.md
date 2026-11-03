@@ -24,7 +24,7 @@ opened: 2026-10-11
   仅尾部漏「机制事实」黑话（workspace_doors=2、闸门 grep 误伤）。
 - **重灾区 = meta「一句话结论」→ 台账行 → 台账页签链**：V4 meta 一句话结论实测 **835 字**单链句
   （多数历史行约 72–184 字，非强制规范；吸收 handoff 2026-10-11 §3 待落卡项①），直灌管理层常驻面板
-  （[LedgerTab](../../../packages/company-pack/src/client/LedgerTab.tsx) 整行渲染 `row.summary`，无 clamp）。
+  （[LedgerTab](../../../packages/company-pack/src/client/tabs/LedgerTab.tsx) 整行渲染 `row.summary`，无 clamp）。
   台账行随动议复杂度退化：最长 sea-entry 184 字、realtime-recon 165、renewal-u 157，
   夹 κ>0.70 / allowed-once / fail-closed 等内部术语。
 - 模板在推密度：[templates/meta.md](../../../company-workspace/templates/meta.md) 要求「一句话结论」

@@ -27,7 +27,7 @@
 
 | 片 | 落点 |
 |---|---|
-| S1 动作面纯模块 | `packages/company-pack/src/client/cultivation-actions.ts`（六条命令线构造 + host 结果折算 + 文案表 + 通道封装，缺席即降级） |
+| S1 动作面纯模块 | `packages/company-pack/src/client/cultivation/cultivation-actions.ts`（六条命令线构造 + host 结果折算 + 文案表 + 通道封装，缺席即降级） |
 | S2 治理动作 | `CultivationBoard.tsx`（采纳 / 拒绝含内联理由 / 这条有用·没起作用 / 撤回…含后果说明与两段确认；飞行中禁用；成功后刷新；失败出 host 原话；未注入即只读降级）、`cultivation-data.ts`（`refresh()`）、`CultivationTab.tsx` / `CompanyView.tsx`（2026-11-03 已删） / `index.ts` / `company-tab-registration.ts`（注入 `remote.commands` 与动作面工厂）、`styles.ts` |
 | S3 无困惑重排 | 同上（待办置顶；journal 改「素材（不用你操作）」；「我提交的」加「等对方处理；你无需操作」；「怎么养」改写为"点哪里"，命令语法收进折叠的「熟手命令行」） |
 | S4 判断材料 | `src/lib/cultivation.ts`（`CultivationRecord.body` 进客户端读模型——修订原先"正文不暴露给客户端"的注记，理由 = 人不下无证据的判断）+ 面板就地展开 |
@@ -38,9 +38,9 @@
 
 | 检查 | 结果 |
 |---|---|
-| **S1 红**：`pnpm exec vitest run tests/client/cultivation-actions.spec.ts` | `Cannot find module '../../packages/company-pack/src/client/cultivation-actions.ts'`（模块不存在，判据先行） |
+| **S1 红**：`pnpm exec vitest run tests/client/cultivation/cultivation-actions.spec.ts` | `Cannot find module '../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'`（模块不存在，判据先行） |
 | S1 绿：同上 | 11/11 PASS（线构造边界：期望句含 `::` 必拒、正文多行与 `::` 保真、理由压平；结果折算：host 原话上行 / 未匹配 / 远程错误 / 抛错 / 动作面缺席） |
-| **S2–S5 红**：`pnpm exec vitest run tests/client/cultivation-board-actions.spec.ts` | 11 failed / 3 passed（无按钮、无动作面 prop、无创作入口、无折叠命令行、正文不可见） |
+| **S2–S5 红**：`pnpm exec vitest run tests/client/cultivation/cultivation-board-actions.spec.ts` | 11 failed / 3 passed（无按钮、无动作面 prop、无创作入口、无折叠命令行、正文不可见） |
 | S2–S5 绿：同上（happy-dom + createRoot 真派发事件） | 14/14 PASS：点采纳发出的线、拒绝理由两步、撤回两步与后果文案、失败原话行内可见、角色不符不出按钮、未注入即只读降级、创作表单校验与提交线、正文可见、素材块「不用你操作」、命令行折叠 |
 | 静态渲染档未回归：`cultivation-board.spec.ts` | 7/7 PASS |
 | 读模型（S4）：`pnpm exec vitest run tests/company/cultivation.spec.ts` | 25/25 PASS（新增「正文进客户端读模型：多行原样带出」） |

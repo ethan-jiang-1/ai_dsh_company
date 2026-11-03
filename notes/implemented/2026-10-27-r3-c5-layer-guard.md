@@ -37,8 +37,8 @@
 
 ```text
 # 红（破坏真文件，不是构造夹具）
-packages/company-pack/src/client/Brand.tsx 顶部插入 `import '../host/catalog.ts'`
-  → FAIL src-layering packages/company-pack/src/client/Brand.tsx:1 → client → host 不在允许方向（client 允许：client / lib）
+packages/company-pack/src/client/ui/Brand.tsx 顶部插入 `import '../host/catalog.ts'`
+  → FAIL src-layering packages/company-pack/src/client/ui/Brand.tsx:1 → client → host 不在允许方向（client 允许：client / lib）
 还原 → PASS src-layering ×58 文件 / 144 条相对引用（反向零）
 
 npx vitest run tests/harness/src-layering.spec.ts   → 5 passed

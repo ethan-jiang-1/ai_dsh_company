@@ -7,7 +7,7 @@
 
 ## 决定
 
-新增 `tests/client/panel-frame.spec.ts`（happy-dom 真挂 `PanelFrame`）：
+新增 `tests/client/tabs/panel-frame.spec.ts`（happy-dom 真挂 `PanelFrame`）：
 ① dock 态点「浮出」→ `floatTab('tab-1', 存档几何)`；② 浮窗态（祖先 `[data-dockkit-float]`）点「收回」→
 `unfloatTab('pane-9')` 且按 **contentId** 把 `getBoundingClientRect()` 存进 localStorage；
 ③ 浮窗态显示「收回」而不是「浮出」，标题与刷新文案保持。
@@ -23,9 +23,9 @@
 ## 验证（实跑）
 
 ```text
-npx vitest run tests/client/panel-frame.spec.ts
+npx vitest run tests/client/tabs/panel-frame.spec.ts
 # 3 passed
-npx vitest run tests/client/panel-frame.spec.ts --coverage
+npx vitest run tests/client/tabs/panel-frame.spec.ts --coverage
 # company-tabs.tsx | 53.7 stmt / 34.54 branch（此前 24.1%）
 ```
 

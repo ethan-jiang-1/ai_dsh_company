@@ -4,7 +4,7 @@
 
 ## 决定
 
-1. **身份表住 [tab-icons.tsx](../../packages/company-pack/src/client/tab-icons.tsx) 的 `FACES`**：
+1. **身份表住 [tab-icons.tsx](../../packages/company-pack/src/client/ui/tab-icons.tsx) 的 `FACES`**：
    一行 = `{ tone, glyph, label, tooltip }`。此前同样的四个值在三种渲染（标题 / guide icon / guide 胶囊）
    里各写一遍，改一个字的提示要动三处。
 2. **三种渲染从这一行派生一次**（`titleOf` / `entryOf` / `iconOf`），导出 `TAB_IDENTITY`；
@@ -30,7 +30,7 @@
 ## 验证（真跑）
 
 ```text
-npx vitest run tests/client/company-tab-registration.spec.ts tests/harness/company-tab-catalog.spec.ts
+npx vitest run tests/client/tabs/company-tab-registration.spec.ts tests/harness/company-tab-catalog.spec.ts
 #   3 passed（注册面恒等 + 源解析 9 条 + 面部缺失 fail-loud）
 pnpm test     # 750 passed
 pnpm verify   # ALL PASS

@@ -25,8 +25,8 @@ export function run({ root, ok, fail }) {
   }
   let catalog
   try {
-    const source = readFileSync(join(root, 'packages/company-pack/src/client/company-tab-registration.ts'), 'utf8')
-    const identity = readFileSync(join(root, 'packages/company-pack/src/client/tab-icons.tsx'), 'utf8')
+    const source = readFileSync(join(root, 'packages/company-pack/src/client/tabs/company-tab-registration.ts'), 'utf8')
+    const identity = readFileSync(join(root, 'packages/company-pack/src/client/ui/tab-icons.tsx'), 'utf8')
     catalog = parseCompanyTabCatalog(source, identity).map(tab => tab.title)
   } catch (error) {
     fail('ui-golden-freshness', `读页签注册源失败：${String(error?.message ?? error)}`)

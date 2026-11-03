@@ -7,7 +7,7 @@
 
 ## 决定
 
-新增 `tests/client/cultivation-tab.spec.ts`（happy-dom + `createRoot` 真挂 `CultivationTab`）：
+新增 `tests/client/tabs/cultivation-tab.spec.ts`（happy-dom + `createRoot` 真挂 `CultivationTab`）：
 断言面板外壳与 `data-company-tab-title="培养"`、viewer 角色（`梦之队 CEO`）、“需要我处理”与空态；
 再用一条**真实 record 形状**（frontmatter + 正文）断言期望文案出现在面板；最后断言记录目录
 `null`（不可达）时给「不可达」而不是折成 0 条空态。
@@ -24,9 +24,9 @@
 ## 验证（实跑）
 
 ```text
-npx vitest run tests/client/cultivation-tab.spec.ts
+npx vitest run tests/client/tabs/cultivation-tab.spec.ts
 # 3 passed
-npx vitest run tests/client/cultivation-tab.spec.ts --coverage
+npx vitest run tests/client/tabs/cultivation-tab.spec.ts --coverage
 # ...vationTab.tsx | 93.75 stmt / 50 branch / 85.71 func / 90.9 line（此前 0.0%）
 ```
 

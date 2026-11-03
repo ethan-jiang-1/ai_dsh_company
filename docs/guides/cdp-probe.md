@@ -11,7 +11,7 @@
 | 文件 | 职责 | 可移植性 |
 |---|---|---|
 | `tools/drivers/cdp-driver.mjs` | **通用驱动**：起无头 Chrome（port 0 + DevToolsActivePort）或附着已运行 Chrome（`attachCdpBrowser`）、CDP 连接、evaluate/click（20s 超时竞速）、console 错误与未捕获异常捕获、清理。Node 22 内建（原生 WebSocket/fetch），零 npm 依赖 | 任何有 web UI 的项目直接拷走（本项目已验证逐字可用） |
-| `probes/browser-visual/cdp-probe.mjs` | **本仓场景**：composer + 品牌 + 右栏全部公司页签逐个开（Start-chip 回切；页签清单从 `packages/company-pack/src/client/company-tab-registration.ts` 解析，面板体 `data-company-tab-title` 可见且非空）+ `--ask` 全环（真建会话输入发送等收口） | 换成你自己页面的选择器和断言 |
+| `probes/browser-visual/cdp-probe.mjs` | **本仓场景**：composer + 品牌 + 右栏全部公司页签逐个开（Start-chip 回切；页签清单从 `packages/company-pack/src/client/tabs/company-tab-registration.ts` 解析，面板体 `data-company-tab-title` 可见且非空）+ `--ask` 全环（真建会话输入发送等收口） | 换成你自己页面的选择器和断言 |
 
 ## 本仓用法
 

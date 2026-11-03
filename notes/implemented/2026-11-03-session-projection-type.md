@@ -7,7 +7,7 @@
 
 ## 决定
 
-- `src/client/use-company-data.ts` 增加 `import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'`。
+- `src/client/data/use-company-data.ts` 增加 `import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'`。
 - 原因：`agentTeam` 是 agent-team 通过 `declare module '@deepseek-ai/dsh-session/types'` 的
   `SessionProjectionMap` augmentation 加进来的；不引这个 type 时，vendor `SessionListState.projectionsBySession`
   的 `values` 与本地 `SessionsStoreLike` 不兼容（TS 报“no properties in common”）。
@@ -30,6 +30,6 @@ pnpm typecheck                                   # exit 0
 
 ## 事实落点
 
-- 类型缝的 owner = `src/client/use-company-data.ts` 头注；
+- 类型缝的 owner = `src/client/data/use-company-data.ts` 头注；
 - tests 类型面仍未接（124 errors 全在 tests），见 [testing.md](../../docs/testing.md) §5 已知未覆盖面。
 - 0.8.6 之后 pack 源码又变了；下次发布 0.8.7。

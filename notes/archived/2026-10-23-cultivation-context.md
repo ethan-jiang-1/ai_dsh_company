@@ -190,9 +190,9 @@ export interface CultivationContext {
   键盘 ↑/↓/Enter/Escape，`aria-expanded`/`aria-controls`/`role="option"`；焦点回到触发点。
   材质优先用 `MenuSurface`（`@deepseek-ai/dsh-client-ui-primitives`，本包已依赖）；若其锚定/floating
   形态不适配内联面板，用现有 token 自绘并在代码注释说明理由。
-- 成品源：复用 `readCatalog` + `parseCatalog`（[DeliverablesTab.tsx](../../packages/company-pack/src/client/DeliverablesTab.tsx)）
+- 成品源：复用 `readCatalog` + `parseCatalog`（[DeliverablesTab.tsx](../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx)）
   与 `sessionFileAddress`（[deliverables-address.ts](../../packages/company-pack/src/lib/deliverables-address.ts)），不写第二份解析器。
-- 读取文本复用 `makeWorkspaceTextReader`（[cultivation-data.ts](../../packages/company-pack/src/client/cultivation-data.ts)）。
+- 读取文本复用 `makeWorkspaceTextReader`（[cultivation-data.ts](../../packages/company-pack/src/client/cultivation/cultivation-data.ts)）。
 
 **teammate 明说**
 
@@ -257,7 +257,7 @@ node probes/session-context/cultivation-context-probe.mjs
 **怎么测**：
 
 ```sh
-npx vitest run tests/client/cultivation-context.spec.ts tests/client/cultivation-context-data.spec.ts tests/client/cultivation-compose-context.spec.ts
+npx vitest run tests/client/cultivation/cultivation-context.spec.ts tests/client/cultivation/cultivation-context-data.spec.ts tests/client/cultivation/cultivation-compose-context.spec.ts
 ```
 
 - `CultivationContextRef`/`CultivationContextCommand` 编码 → 解码往返；token 无 `+`/`/`/`=`。
@@ -314,7 +314,7 @@ npx vitest run tests/client/cultivation-*context*.spec.ts
 **怎么测**：
 
 ```sh
-npx vitest run tests/client/cultivation-board.spec.ts
+npx vitest run tests/client/cultivation/cultivation-board.spec.ts
 ```
 
 - 带 `contexts` 的记录显示背景卡；展开/收起；`打开会话`/`打开原文` 调回调；无回调不出按钮。
@@ -360,7 +360,7 @@ npx vitest run tests/client/cultivation-board.spec.ts
 
 **红/绿收据（关键）**：
 
-- 纯模型 spec 在模块存在前 import 即红；实现后 42/42 绿（`tests/client/cultivation-context.spec.ts`）。
+- 纯模型 spec 在模块存在前 import 即红；实现后 42/42 绿（`tests/client/cultivation/cultivation-context.spec.ts`）。
 - 客户端数据 7/7、创作面交互 5/5、动作面 16/16、审批行 10/10。
 - 机制探针首跑 ④ 红是**探针自己的期望句长度算错**（951 字符 < 2,000 断言）；修正为 2,518 字符后绿——不是平台截断。
 - 真浏览器首跑 ⑤b 红：`session/follow` 带 `assistantStream: false` 被 wire boundary 拒（schema 只认 true/缺席）；改为不传后绿。

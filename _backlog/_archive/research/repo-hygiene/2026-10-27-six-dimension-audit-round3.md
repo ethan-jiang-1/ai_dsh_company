@@ -54,7 +54,7 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 - **三个巨型函数**（不是巨型文件）：`CultivationBoard` 482 行且**零段注释**；`index.ts` 的 `apply` 425 行（五段注释，但盘守卫一段就 209 行）；`cultivationCommandHandler` 340 行零段注释。其余 >300 行文件都已按导出/纯数据分解，不是问题。
 - **一个三元环**：`lib/cultivation.ts` 既是 barrel（`export *` ×3）又定义 `CULTIVATION_ROLES`；`lib/cultivation-context.ts` 反向 import 它。今天只靠函数体内延迟解引用不炸（潜伏，不是活故障）。
 - **重复小工具无家**：`canonicalPath` 逐字 4 份、`isRecord` 3 份、`lstatOrNull` 2 份、`clip` 3 份且签名各异（改一个以为全改了 = 真陷阱）。纯逻辑可进 `lib/`，带 `node:fs` 的只能进 `host/`（否则 client 叶 TS2591——已实证过的坑）。
-- 测试侧的层次问题不在目录，在**四个单 `it` 巨测**（263/120/108/84 行，失败只报一个不透明名字）、**同名 spec**（`deliverables-catalog.spec.ts` 在两区各一）与**一个放错区的纯 lib 测**（`tests/client/cultivation-context.spec.ts`）。
+- 测试侧的层次问题不在目录，在**四个单 `it` 巨测**（263/120/108/84 行，失败只报一个不透明名字）、**同名 spec**（`deliverables-catalog.spec.ts` 在两区各一）与**一个放错区的纯 lib 测**（`tests/client/cultivation/cultivation-context.spec.ts`）。
 
 ### D3 文档／执行／验收的整体结构 —— 判定：过度结构，不是不足
 

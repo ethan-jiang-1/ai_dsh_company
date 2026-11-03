@@ -6,7 +6,7 @@
 
 1. **提交一份契约夹具** `tests/fixtures/catalog.contract.json`：由生成器对固定输入产出，含两根、台账内外、
    `presented` 三态、7 个结果词 + 1 个未知词、缺字段行、无 final 行（被排除）。
-2. **两侧共钉**（`tests/client/catalog-contract.spec.ts`）：
+2. **两侧共钉**（`tests/client/data/catalog-contract.spec.ts`）：
    - 生成器侧：同一输入必须产出与夹具逐字段相等的结果；
    - 页签侧：`parseCatalog` 必须把夹具解析回同一批 entries。
    加字段会同时打破两个断言——不会像此前那样只在浏览器探针里才被发现。
@@ -31,7 +31,7 @@
 ## 验证（真跑）
 
 ```text
-npx vitest run tests/client/catalog-contract.spec.ts tests/client/deliverables-catalog.spec.ts
+npx vitest run tests/client/data/catalog-contract.spec.ts tests/client/tabs/deliverables-catalog.spec.ts
 #   13 passed（契约 4 + 既有目录 9）
 pnpm test     # 750 passed
 pnpm verify   # ALL PASS

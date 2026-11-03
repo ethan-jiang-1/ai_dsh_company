@@ -5,13 +5,13 @@
 ## 决定
 
 1. **读取闭包唯一**：`makeWorkspaceTextReader(remote, leadOf)` 住
-   [cultivation-data.ts](../../packages/company-pack/src/client/cultivation-data.ts)，形状 =
+   [cultivation-data.ts](../../packages/company-pack/src/client/cultivation/cultivation-data.ts)，形状 =
    `(path, limit) => (sessionId, signal) => Promise<string | null>`；失败（不可读/异常）一律 null。
    此前同一段 try/ok/catch 在三处各写一遍（cultivation readText、index 的 readLedger / readCatalog）。
-2. **数据面只暴露一个入口**：[company-data-plane.ts](../../packages/company-pack/src/client/company-data-plane.ts)
+2. **数据面只暴露一个入口**：[company-data-plane.ts](../../packages/company-pack/src/client/data/company-data-plane.ts)
    加 `readWorkspaceText`；两个静态页签的路径收进 `WORKSPACE_TEXT_PATHS` 常量表（台账 / 成品索引），
    index.ts 不再自己写路径。
-3. **加载机唯一**：[workspace-text.ts](../../packages/company-pack/src/client/workspace-text.ts) 的
+3. **加载机唯一**：[workspace-text.ts](../../packages/company-pack/src/client/data/workspace-text.ts) 的
    `useWorkspaceText(load, sessionId, { refreshMs? })` → `{ state, reload }`；状态三态
    （loading / unreadable / ready）。LedgerTab 与 DeliverablesTab 删掉各自的 AbortController、
    null 文案、catch 文案、轮询/手动 tick 状态机。

@@ -59,5 +59,5 @@ source run/env.sh && node probes/browser-visual/cultivation-ux-walkthrough.mjs -
 ## 指针
 
 - 走查探针：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough.mjs)（`--protocol` / `--shots`）
-- 面板合同与实现：[CultivationBoard.tsx](../../packages/company-pack/src/client/CultivationBoard.tsx)｜[CultivationCompose.tsx](../../packages/company-pack/src/client/CultivationCompose.tsx)｜宿主回执：[cultivation.ts](../../packages/company-pack/src/host/cultivation.ts)
+- 面板合同与实现：[CultivationBoard.tsx](../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx)｜[CultivationCompose.tsx](../../packages/company-pack/src/client/cultivation/CultivationCompose.tsx)｜宿主回执：[cultivation.ts](../../packages/company-pack/src/host/cultivation.ts)
 - 前决定：[培养 GUI 行动面](./2026-10-17-cultivation-gui-actions.md)（其「体验协议」节即本轮的入口）

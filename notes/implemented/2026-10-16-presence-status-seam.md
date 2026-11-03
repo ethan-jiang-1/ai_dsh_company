@@ -40,7 +40,7 @@
 全部实跑；基线与红证存 `runtime/e2e/round3b-baseline/`、`runtime/e2e/round3b-receipts/`（gitignored）。
 
 - **导出面守恒（零漂移的机械判据）**：拆前 `presence.ts` 17 个导出；拆后 `presence.ts` + `presence-status.ts` 并集**恰好 17**，`丢失: 无 | 新增: 无`；**11 个留守符号实现体逐字未改**、**6 个迁移符号定义逐字未改**（脚本按 brace 配平切片比对，非肉眼）。
-- **对外取用面**：`src/index.ts` 的 `export *` 不动；**6 个 client 文件 + `board.ts` + 4 个测试文件**（`tests/company/presence-board.spec.ts`、`tests/company/board.spec.ts`、`tests/client/board-panel.spec.ts`、`tests/client/board-drift-fixture.spec.ts`）的 import 路径与符号**全未改**（`git status` 只列 `presence.ts` / `presence-status.ts` / `src/README.md` 三个文件）。
+- **对外取用面**：`src/index.ts` 的 `export *` 不动；**6 个 client 文件 + `board.ts` + 4 个测试文件**（`tests/company/presence-board.spec.ts`、`tests/company/board.spec.ts`、`tests/client/tabs/board-panel.spec.ts`、`tests/client/tabs/board-drift-fixture.spec.ts`）的 import 路径与符号**全未改**（`git status` 只列 `presence.ts` / `presence-status.ts` / `src/README.md` 三个文件）。
 - **回归**：`pnpm test` → `61 passed (61)` / `559 passed (559)`；`pnpm verify` → `verify: ALL PASS`。
 - **两面构建（卡验收）**：`pnpm exec tsc -b packages/company-pack` exit 0；`(cd packages/company-pack && pnpm exec tsdown)` → host `Build complete`（`lib/index.js` 54.06 kB）、client `Build complete`（`lib/client.js` 196.98 kB）。产物体积较拆前各小 0.09 kB（再导出摊平了重复引用），sourcemap 略大（多一个模块），属结构变化的预期形状。
 - **built 入口契约**：`await import('packages/company-pack/lib/index.js')` 断言词汇面 5 个**运行值**全在（`PresenceStatus` 是 type-only，按 `.d.ts` 验）；抽查 `statusLabelFor('bogus') === '未知'`、`displayNameFor('lead','lead') === '梦之队 CEO'`。类型面：`lib/types/lib/presence-status.d.ts` 定义 6 个符号，`presence.d.ts` 以 `export {…}` / `export type {…}` 再导出它们。

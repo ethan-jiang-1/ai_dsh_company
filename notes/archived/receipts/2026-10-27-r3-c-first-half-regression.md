@@ -46,9 +46,9 @@
 ## 验证（真跑）
 
 ```text
-npx vitest run tests/client/attention-tab.spec.ts            → 5 passed
-npx vitest run tests/client/attention-observers.spec.ts      → 5 passed
-npx vitest run tests/client/company-panels.spec.ts           → 5 passed
+npx vitest run tests/client/tabs/attention-tab.spec.ts            → 5 passed
+npx vitest run tests/client/wiring/attention-observers.spec.ts      → 5 passed
+npx vitest run tests/client/tabs/company-panels.spec.ts           → 5 passed
 npx vitest run tests/company/host-composition.spec.ts        → 4 passed
 npx vitest run tests/company/cultivation-propose-guards.spec.ts → 8 passed
 npx vitest run tests/harness/session-diagnose.spec.ts        → 8 passed（新增中断轮/工具计数 2 例）

@@ -83,13 +83,13 @@ sequenceDiagram
 
 | 面 | 今天的实际行为 | 代码锚点 |
 |---|---|---|
-| 创作表单 | 两个入口（给自己 / 给别人）；表单只有「期望它怎么做（一句话）」与「做法与证据」两栏；正文必填；提交前只校验期望非空、不含 `::`、正文非空 | [CultivationCompose.tsx](../../../packages/company-pack/src/client/CultivationCompose.tsx) |
-| 命令线构造 | `correctLine(expectation, body)` / `suggestLine(targetRole, expectation, body, ownRole)`；没有背景参数 | [cultivation-actions.ts](../../../packages/company-pack/src/client/cultivation-actions.ts) |
+| 创作表单 | 两个入口（给自己 / 给别人）；表单只有「期望它怎么做（一句话）」与「做法与证据」两栏；正文必填；提交前只校验期望非空、不含 `::`、正文非空 | [CultivationCompose.tsx](../../../packages/company-pack/src/client/cultivation/CultivationCompose.tsx) |
+| 命令线构造 | `correctLine(expectation, body)` / `suggestLine(targetRole, expectation, body, ownRole)`；没有背景参数 | [cultivation-actions.ts](../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts) |
 | 人侧命令 | `/cultivation correct <期望> :: <正文>` / `suggest <角色> <期望> :: <正文>`；`source` 写死为「（会话内提交）」；正文为空直接拒 | [host/cultivation.ts](../../../packages/company-pack/src/host/cultivation.ts) |
 | 记录 | frontmatter 扁平字段：`kind / targetRole / proposerRole / proposerKind / source / expectation / status`；正文在 `---` 之后；`source` 是单行字符串；无结构化背景字段 | [cultivation-record.ts](../../../packages/company-pack/src/lib/cultivation-record.ts) |
-| 审批行 | 显示「期望句」Tag、时间、`source`（非默认值才显示「出处：…」）、正文（默认折 4 行）；采纳/拒绝按钮 | [CultivationBoard.tsx](../../../packages/company-pack/src/client/CultivationBoard.tsx) |
-| 数据面 | 面板读 `cultivation/records/*.md` 与 `kb/<role>/journal/*.md`；经 `remote.workspaceFiles`，只读；动作经 `remote.commands` | [cultivation-data.ts](../../../packages/company-pack/src/client/cultivation-data.ts) |
-| 注入面 | 侧栏页签与公司整页各自注入 `cultivationFiles` / `cultivationActions` / `roleSource`；公司页与页签共用 `CultivationBoard` | [company-tab-registration.ts](../../../packages/company-pack/src/client/company-tab-registration.ts)、[已删：CompanyView.tsx](../../../notes/implemented/2026-11-03-d2-companyview-removal.md)、[client/index.ts](../../../packages/company-pack/src/client/index.ts) |
+| 审批行 | 显示「期望句」Tag、时间、`source`（非默认值才显示「出处：…」）、正文（默认折 4 行）；采纳/拒绝按钮 | [CultivationBoard.tsx](../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx) |
+| 数据面 | 面板读 `cultivation/records/*.md` 与 `kb/<role>/journal/*.md`；经 `remote.workspaceFiles`，只读；动作经 `remote.commands` | [cultivation-data.ts](../../../packages/company-pack/src/client/cultivation/cultivation-data.ts) |
+| 注入面 | 侧栏页签与公司整页各自注入 `cultivationFiles` / `cultivationActions` / `roleSource`；公司页与页签共用 `CultivationBoard` | [company-tab-registration.ts](../../../packages/company-pack/src/client/tabs/company-tab-registration.ts)、[已删：CompanyView.tsx](../../../notes/implemented/2026-11-03-d2-companyview-removal.md)、[client/index.ts](../../../packages/company-pack/src/client/index.ts) |
 | 分身提案 | `cultivation_propose` 工具接受 `source` 字符串（文件/会话坐标），但人侧表单没有这个入口 | [host/cultivation.ts](../../../packages/company-pack/src/host/cultivation.ts) |
 
 ### 2.3 平台已经提供的能力（本轮读码/读合同确认）
@@ -899,16 +899,16 @@ contexts: {"v":1,"items":[{"kind":"deliverable","ref":"<workspace-relative-path>
 
 | 文件 | 先看什么 |
 |---|---|
-| [CultivationCompose.tsx](../../../packages/company-pack/src/client/CultivationCompose.tsx) | `CultivationCompose`、`openForm`、`submit`；两栏与提交线 |
-| [cultivation-actions.ts](../../../packages/company-pack/src/client/cultivation-actions.ts) | `CULTIVATION_COPY`、`correctLine`、`suggestLine`、`makeCultivationActions` |
+| [CultivationCompose.tsx](../../../packages/company-pack/src/client/cultivation/CultivationCompose.tsx) | `CultivationCompose`、`openForm`、`submit`；两栏与提交线 |
+| [cultivation-actions.ts](../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts) | `CULTIVATION_COPY`、`correctLine`、`suggestLine`、`makeCultivationActions` |
 | [host/cultivation.ts](../../../packages/company-pack/src/host/cultivation.ts) | `cultivationCommandHandler`、`splitBody`、`sessionFaceOf`、`writeRecord`、`registerCultivation` |
 | [cultivation-record.ts](../../../packages/company-pack/src/lib/cultivation-record.ts) | `CultivationRecord`、`RecordDraft`、`recordText`、`parseRecord`、`methodSkillText` |
-| [CultivationBoard.tsx](../../../packages/company-pack/src/client/CultivationBoard.tsx) | `recordKindLabel`、`verificationTag`、`run`、待办行/正文折叠/按钮 |
-| [cultivation-data.ts](../../../packages/company-pack/src/client/cultivation-data.ts) | `CultivationFiles`、`makeCultivationFiles`、`useCultivationPanelData`、刷新/广播 |
-| [company-tab-registration.ts](../../../packages/company-pack/src/client/company-tab-registration.ts) | cultivation 页签的注入面；侧栏/公司页两个注册块 |
+| [CultivationBoard.tsx](../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx) | `recordKindLabel`、`verificationTag`、`run`、待办行/正文折叠/按钮 |
+| [cultivation-data.ts](../../../packages/company-pack/src/client/cultivation/cultivation-data.ts) | `CultivationFiles`、`makeCultivationFiles`、`useCultivationPanelData`、刷新/广播 |
+| [company-tab-registration.ts](../../../packages/company-pack/src/client/tabs/company-tab-registration.ts) | cultivation 页签的注入面；侧栏/公司页两个注册块 |
 | [已删：CompanyView.tsx](../../../notes/implemented/2026-11-03-d2-companyview-removal.md) | 原公司整页培养子页（2026-11-03 删除；培养页与右栏共用 Board） |
 | [client/index.ts](../../../packages/company-pack/src/client/index.ts) | `createCompanyDataPlane` 与两个 inject 块 |
-| [company-session-adapters.ts](../../../packages/company-pack/src/client/company-session-adapters.ts) | `follow` 目前把子会话归到 Lead；背景预览需要另走 raw follow |
+| [company-session-adapters.ts](../../../packages/company-pack/src/client/wiring/company-session-adapters.ts) | `follow` 目前把子会话归到 Lead；背景预览需要另走 raw follow |
 | [session-controller README](../../../vendor/dsh/packages/api/session-controller/README.md) | `session/list` / `search` / `follow` / `page` 的合同 |
 | [session-query README](../../../vendor/dsh/packages/session-query/session-query/README.md) | `readSurface` / `observeSession` / `listSessions`；host 备选读法 |
 | [session-reference README](../../../vendor/dsh/packages/context/session-reference/README.md) | 有界、不可信、只取文字的跨会话快照先例 |

@@ -14,7 +14,7 @@
 
 - 手册 [AGENTS.md](../../packages/company-pack/content/AGENTS.md) 多处引用 `../docs/*`、`checks/audit/*`、`snapshots/README.md`、`runtime/rehearsal-workspace/`；13/14 份 skill 结尾写“归仓库的门禁/审计脚本”；CEO chairing skill 写 `node tools/converge.mjs`。
 - 模板 [meta.md](../../packages/company-pack/content/templates/meta.md) 把词表指向 `tools/lib/deliverables.mjs`。
-- 客户端读 `kb/deliverables-index.json`（[company-data-plane.ts](../../packages/company-pack/src/client/company-data-plane.ts)）；错误文案在 [DeliverablesTab.tsx](../../packages/company-pack/src/client/DeliverablesTab.tsx)。
+- 客户端读 `kb/deliverables-index.json`（[company-data-plane.ts](../../packages/company-pack/src/client/data/company-data-plane.ts)）；错误文案在 [DeliverablesTab.tsx](../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx)。
 - 仓库生成器 [tools/deliverables-index.mjs](../../tools/deliverables-index.mjs) 依赖 [checks/audit/deliverables-check.mjs](../../checks/audit/deliverables-check.mjs)，不在 pack `files`。
 - 现有 [markdown-links.mjs](../../tools/lib/markdown-links.mjs) 把 pack 骨架排除、只校验 dev 盘，安装形状的死链在结构上不可见。
 - `present` 工具会向会话追加 `deliverables/presented` 事件（files 为绝对路径），host 可听 `session/event`。
@@ -89,7 +89,7 @@ node checks/smoke/preset-smoke.mjs
 - 新增门禁 [shipped-links](../../checks/gates/shipped-links.mjs)：以安装读者视角扫描 31 份出厂 Markdown（17 workspace + 14 skills）+ 6 份 persona（`agent.cordis.yml` 非注释行）；链接/引用式定义/绝对路径穿出 workspace、指向仓库顶目录、fenced 代码块或裸路径出现 `checks/`/`tools/`/`runtime/`/`snapshots/` 即红。已接入 [run-gates](../../checks/run-gates.mjs)。
 - 内容：手册去掉 `../docs`、`checks/`、`snapshots/`、`runtime/rehearsal-workspace/` 指针，改成操作员/会话内动作；13 份 skill 的“归仓库的门禁/审计脚本”改成“操作员收口核对”；chairing skill 的 `node tools/converge.mjs` 改成人工收口；`templates/meta.md` 内联 `类型`/`结果` 词表，不再指向 `tools/lib/deliverables.mjs`。
 - 成品目录产品化：新增 [src/lib/deliverables-catalog.ts](../../packages/company-pack/src/lib/deliverables-catalog.ts)（纯逻辑）与 [src/host/catalog.ts](../../packages/company-pack/src/host/catalog.ts)（扫描/生成/幂等）；host 首启生成空 catalog，`session/event` 的 `deliverables/presented` 投影为 `presented=true`，未观测 = `null`；条目未变不重写（`generatedAt` 稳定，保二启零变更）。
-- 客户端 [DeliverablesTab.tsx](../../packages/company-pack/src/client/DeliverablesTab.tsx)：空态/错误/页脚不再提维护者工具；present 未核与已 present 分开展示；新增 `metaProblem`（缺行/枚举外/日期格式）并在行上标「meta 形状错」。`src/lib` 与 `tools/lib` 的生成器同 schema，contract fixture 两侧共钉。
+- 客户端 [DeliverablesTab.tsx](../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx)：空态/错误/页脚不再提维护者工具；present 未核与已 present 分开展示；新增 `metaProblem`（缺行/枚举外/日期格式）并在行上标「meta 形状错」。`src/lib` 与 `tools/lib` 的生成器同 schema，contract fixture 两侧共钉。
 - 证据：`release-smoke` 首启断言 `counts.total=0` 的 catalog 在场且二启零变更；[tests/company/catalog.spec.ts](../../tests/company/catalog.spec.ts) 覆盖空目录、幂等、present path/slug、归档后保留、false 保留、metaProblem、host→client parser 契约；[tests/company/catalog-wiring.spec.ts](../../tests/company/catalog-wiring.spec.ts) 用最小 ctx 桩跑真 `apply()`，证明 `session/event` 监听把 present 写进 catalog。
 
 红/绿收据（实跑）：

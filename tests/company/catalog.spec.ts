@@ -26,7 +26,7 @@ import {
   parseMeta,
   slugFromDirName,
 } from '../../packages/company-pack/src/lib/deliverables-catalog.ts'
-import { parseCatalog } from '../../packages/company-pack/src/client/deliverables-index.ts'
+import { parseCatalog } from '../../packages/company-pack/src/client/data/deliverables-index.ts'
 import { RUN_BUNDLE_PATHS } from '../../packages/company-pack/src/lib/run-bundle-paths.ts'
 import { makeTempDir } from '../support/temp-env.ts'
 

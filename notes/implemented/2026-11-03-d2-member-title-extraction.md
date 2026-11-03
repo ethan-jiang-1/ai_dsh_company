@@ -24,7 +24,7 @@
 ## 验证（实跑，2026-11-03 11:2x +08）
 
 ```text
-npx vitest run tests/client/member-navigation.spec.ts tests/client/title-state.spec.ts  # 9 passed
+npx vitest run tests/client/wiring/member-navigation.spec.ts tests/client/wiring/title-state.spec.ts  # 9 passed
 pnpm test                                                                                # 138 files / 1101 tests
 pnpm verify                                                                              # ALL PASS
 npx vitest run --coverage --coverage.reporter=json-summary

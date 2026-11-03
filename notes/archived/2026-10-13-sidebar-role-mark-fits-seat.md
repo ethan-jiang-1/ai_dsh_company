@@ -11,15 +11,15 @@
   `vendor/dsh/packages/client/ui-workspace/src/client/contract/slots.ts`），且是 **list 座位**
   ——同格还住着计划任务时钟（`[data-session-schedule-mark]`，12px 图元 / 16px 跨度）。
 - 标记 = **12px 方形**（= 同格既有 occupant 的尺寸）+ **单字母** `C/F/O/E/S`
-  （`ROLE_MARK`，`packages/company-pack/src/client/RoleBadge.tsx`）；
+  （`ROLE_MARK`，`packages/company-pack/src/client/ui/RoleBadge.tsx`）；
   `ROLE_SHORT`（CEO/CFO/COO/VPE/VPS）保留给窗口标题前缀、会话头 preset 标签与标记自身的 `title`。
 - **两个通道**（2026-10-13 用户追加要求「他们 5 个必须有区别」）：字母管"是谁"，**底色**管
   "一眼扫过是谁"——12px 的字母在侧栏快速扫读时面积太小。CEO 走 adaptive 的 `--dsw-alias-*`
   品牌对（浅主题近黑底/白字、深主题自动反转），CFO/COO/VPE/VPS 走 **static 色相**
   blue-600 / green-500 / amber-500 / red-600，字色取该底色上对比度更高的一侧（白/白/黑/黑）。
-  色值全部是平台令牌（`packages/company-pack/src/client/styles.ts` 的「角色色调」块），
+  色值全部是平台令牌（`packages/company-pack/src/client/ui/styles.ts` 的「角色色调」块），
   我方零字面色。
-- CSS 在 `packages/company-pack/src/client/styles.ts` 的 `.wk-role-badge`：`box-sizing: border-box`
+- CSS 在 `packages/company-pack/src/client/ui/styles.ts` 的 `.wk-role-badge`：`box-sizing: border-box`
   + `width/height: 12px` + `padding: 0`（座位占用者的宽度自此是**声明**的事实，不再由字号/内边距悄悄决定）。
 
 ## 为什么（真 DOM 实测，不是推算）
@@ -57,7 +57,7 @@
 
 - `pnpm test tests/client` —— **13 files / 79 tests 绿**（含新增守卫 `client-css.spec.ts`「行首座位的尺寸上限」与 `role-badge.spec.ts` 的 `ROLE_MARK` 两张表同键/单字母/互异断言）。
 - 守卫反证（红→还原→绿）：把 `.wk-role-badge` 的 `width: 12px` 改成 `32px`
-  ⇒ `pnpm test tests/client/client-css.spec.ts` 红（`AssertionError: expected 32 to be less than or equal to 16`）→ 还原 ⇒ 绿。
+  ⇒ `pnpm test tests/client/ui/client-css.spec.ts` 红（`AssertionError: expected 32 to be less than or equal to 16`）→ 还原 ⇒ 绿。
 - `node probes/browser-visual/sidebar-role-mark-probe.mjs`（前置 `source run/env.sh`）——**三腿 ALL PASS / 64 PASS**
   （腿① desktop 1280、腿② narrow 356 点开侧栏、腿③ 注入 0 侧栏内边距复现用户截图的布局条件；腿③实测 `row.l=0`、
   `badge.l=2`、`clockIcon.r = title.l = 28`）。
@@ -73,8 +73,8 @@
 
 ## 落点
 
-- 实现：`packages/company-pack/src/client/RoleBadge.tsx`（`ROLE_MARK`）、`packages/company-pack/src/client/styles.ts`（`.wk-role-badge`）。
-- keyless 守卫：`tests/client/client-css.spec.ts`、`tests/client/role-badge.spec.ts`。
-- 真几何判据 + 图像判据：`probes/browser-visual/sidebar-role-mark-probe.mjs`（发射器 = `tests/client/role-mark-fixture.spec.ts`，真组件 + 真 CSS）、`snapshots/visual/sidebar-role-mark/`。
+- 实现：`packages/company-pack/src/client/ui/RoleBadge.tsx`（`ROLE_MARK`）、`packages/company-pack/src/client/ui/styles.ts`（`.wk-role-badge`）。
+- keyless 守卫：`tests/client/ui/client-css.spec.ts`、`tests/client/ui/role-badge.spec.ts`。
+- 真几何判据 + 图像判据：`probes/browser-visual/sidebar-role-mark-probe.mjs`（发射器 = `tests/client/ui/role-mark-fixture.spec.ts`，真组件 + 真 CSS）、`snapshots/visual/sidebar-role-mark/`。
 - 合同/runbook：`docs/multi-human.md` §2 第 4 条、`packages/company-pack/README.md` 已知限制。
 - 前身：`notes/archived/2026-09-26-role-identity-ux.md` B 段（标记形态由本 Note 部分取代；A/C 段与其数据来源结论仍现行）。

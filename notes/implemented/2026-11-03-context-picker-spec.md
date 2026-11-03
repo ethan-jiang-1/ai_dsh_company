@@ -7,7 +7,7 @@
 
 ## 决定
 
-新增 `tests/client/cultivation-context-picker.spec.ts`（happy-dom 真挂 `CultivationContextPicker`）：
+新增 `tests/client/cultivation/cultivation-context-picker.spec.ts`（happy-dom 真挂 `CultivationContextPicker`）：
 ① 渲染三组候选（本次会话 / 最近会话 / 最近成品）与隐私说明；② 点候选项回传 `{kind:'session',row}`；
 ③ 搜索过滤会话与成品（`alpha` 命中、`zzz-no-match` 空态）；④ Escape 调 `onCancel`。
 
@@ -20,9 +20,9 @@
 ## 验证（实跑）
 
 ```text
-npx vitest run tests/client/cultivation-context-picker.spec.ts
+npx vitest run tests/client/cultivation/cultivation-context-picker.spec.ts
 # 4 passed
-npx vitest run tests/client/cultivation-context-picker.spec.ts --coverage
+npx vitest run tests/client/cultivation/cultivation-context-picker.spec.ts --coverage
 # ...extPicker.tsx | 69.35 stmt / 61.22 branch（此前 56.5% / 0 分支）
 ```
 

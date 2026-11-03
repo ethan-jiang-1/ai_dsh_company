@@ -5,7 +5,7 @@
 // 何时跑：动 `company-panels.tsx` 的看板卡 / `lib/board.ts` 的分叉判据（dependencyDrift /
 // driftLabel）/ `styles.ts` 的 `.wk-card*` 时。零模型成本，自带 chromium（~30–60s）。
 //
-// 为什么需要它：keyless 静态渲染只能证明"HTML 里出现了那句话"（tests/client/board-panel.spec.ts），
+// 为什么需要它：keyless 静态渲染只能证明"HTML 里出现了那句话"（tests/client/tabs/board-panel.spec.ts），
 // 证明不了它在真令牌/真布局下**看得见、不挤爆卡脚**——2026-10-13 的事故正是"信号根本没出现"这类：
 // 板面报"依赖已就绪"、任务文本写着"依赖 T1,T2"，中间没有任何可见提示（静默缺边）。
 //
@@ -37,12 +37,12 @@ try {
 
 // ── 夹具：真组件 + 真 CSS，经 vitest 发射器现算（与 role-mark 夹具同款）──
 const FIXTURE = join(tmpdir(), `board-drift-fixture-${String(process.pid)}.json`)
-const emitted = spawnSync('npx', ['vitest', 'run', 'tests/client/board-drift-fixture.spec.ts'],
+const emitted = spawnSync('npx', ['vitest', 'run', 'tests/client/tabs/board-drift-fixture.spec.ts'],
   { cwd: ROOT, env: { ...process.env, BOARD_DRIFT_EMIT: FIXTURE }, encoding: 'utf8' })
 if (emitted.status !== 0) {
   console.error(emitted.stdout?.slice(-1500) ?? '')
   console.error(emitted.stderr?.slice(-1500) ?? '')
-  console.error('夹具发射失败（tests/client/board-drift-fixture.spec.ts）')
+  console.error('夹具发射失败（tests/client/tabs/board-drift-fixture.spec.ts）')
   process.exit(2)
 }
 const fixture = JSON.parse(readFileSync(FIXTURE, 'utf8'))

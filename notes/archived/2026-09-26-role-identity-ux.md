@@ -90,7 +90,7 @@ keyless 单测 6 项 + 真浏览器自主验收 ALL PASS）。残余项「每角
   `data-wk-role=cfo`、顶条 3px——**与 vendor DocumentTitle 并存无闪烁**（开放问题 3 定案）。
 
 **顺序与状态**：A ✅（零代码）→ B ✅ → C ✅（验收 `ee7b8b5` + 一次性自主验收脚本——真浏览器
-连 UI 断言，未入库；单测在 `tests/client/role-badge.spec.ts`）→ ③ 收尾 ✅（2026-09-26 提案毕业；
+连 UI 断言，未入库；单测在 `tests/client/ui/role-badge.spec.ts`）→ ③ 收尾 ✅（2026-09-26 提案毕业；
 「角色可见」已并入 [multi-human.md](../../docs/multi-human.md) 开门 runbook 第 4 条）。
 
 ## 六、明确不做

@@ -27,7 +27,7 @@
 ```text
 npx vitest run tests/company/catalog.spec.ts
 # 15 passed（新增 2 例；修复 slug 后绿）
-npx vitest run tests/client/cultivation-context-picker.spec.ts
+npx vitest run tests/client/cultivation/cultivation-context-picker.spec.ts
 # 5 passed（新增 problem 态）
 npx vitest run tests/company/catalog.spec.ts --coverage
 # catalog.ts | 76.29 stmt / 62.98 branch（此前 55.84/41.98）

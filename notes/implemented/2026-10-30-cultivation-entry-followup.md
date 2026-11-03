@@ -26,7 +26,7 @@
 ## 验证（实跑）
 
 - 红：① 修复前诊断——`suggest` 不选角色直接提交，实际命令为 `/cultivation suggest vp-eng …`（临时诊断 spec 精确断言，删除后不留树）；② 临时回退 `CultivationCompose` 的默认目标 → “给别的角色提建议”测试在“未选时提交应禁用”断言红；③ 临时回退验证历史旧渲染 → `.wk-cultivation-observation` 断言红。两次回退后均恢复，定向 62 绿。
-- 绿：`pnpm exec vitest run tests/client/cultivation-board-actions.spec.ts tests/client/cultivation-board.spec.ts tests/client/cultivation-chat-panel.spec.ts tests/client/cultivation-view.spec.ts`：4 files / 62 tests PASS。
+- 绿：`pnpm exec vitest run tests/client/cultivation/cultivation-board-actions.spec.ts tests/client/cultivation/cultivation-board.spec.ts tests/client/cultivation/cultivation-chat-panel.spec.ts tests/client/cultivation/cultivation-view.spec.ts`：4 files / 62 tests PASS。
 - `pnpm test`：118 files / 1018 tests PASS。
 - `pnpm typecheck`：exit 0。
 - `pnpm verify`：ALL PASS；2 门无对象 SKIP。

@@ -1,0 +1,7 @@
+{
+  "recordedAt": "2026-11-03",
+  "note": "豁免区死链天花板：archived = 冻结层历史记录（不回写），moved = 证据已移出产品仓的引用，live = 活层死链（必须 0）。只许降；口径 = checks/gates/link-debt.mjs。",
+  "archived": 32,
+  "moved": 0,
+  "live": 0
+}

@@ -11,7 +11,7 @@
    的 `config.name` = `梦之队 <角色>`；preset id 仍是不动的 kebab（vendor id 正则只限 id 不限显示名）。
    统一前缀的用途 = preset 面板五卡聚族、可搜（用户点名的硬要求）。
 3. **品牌字面同步换代**：侧栏 wordmark `DSH Wochen Team` → `DSH 梦之队`
-   （`packages/company-pack/src/client/Brand.tsx`，函数名 WocheBrandName → DreamTeamBrandName）；
+   （`packages/company-pack/src/client/ui/Brand.tsx`，函数名 WocheBrandName → DreamTeamBrandName）；
    `DSH_CLIENT_TITLE` 构建期 env 值同换（[bootstrap](../../docs/guides/bootstrap.md) 两条构建命令、
    client-load-smoke 与 cdp-probe 的断言字面同 diff）。标签页标题 = 前端 dist 构建（vite）烤入；
    应用内主标题 = ui-layout client 包（vendor client 构建）烤入。

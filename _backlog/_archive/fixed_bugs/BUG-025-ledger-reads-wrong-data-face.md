@@ -23,7 +23,7 @@ opened: 2026-10-19
 
 数据面读的是 `kb/motion-ledger.md`，**不是** deliverables 目录：
 
-- `packages/company-pack/src/client/LedgerTab.tsx:22` — 注入面 `readLedger`，注释写明「读 `kb/motion-ledger.md` 全文」
+- `packages/company-pack/src/client/tabs/LedgerTab.tsx:22` — 注入面 `readLedger`，注释写明「读 `kb/motion-ledger.md` 全文」
 - `packages/company-pack/src/client/index.ts:205` — `workspaceFiles.read(leadOf(sessionId), 'kb/motion-ledger.md', { limit: 240 }, signal)`
 - `packages/company-pack/src/lib/ledger.ts:30` — `parseMotionLedger(text)`：解析 markdown 表的**行**
 - `tests/company/ledger.spec.ts:14` — 真台账断言也是读 `company-workspace/kb/motion-ledger.md`
@@ -98,7 +98,7 @@ grep -c "lingang-recon" company-workspace/kb/motion-ledger.md     # → 0（不�
 | ① 993 / 40 归属不再混用 | ✅ | 调研 §一 顶部已加订正块；四张卡各写清「动议台账 = 40 行」与「成品目录 = 993 文件」 |
 | ② 台账卡验收任务能在面板里做到 | ✅ | 旧任务（临港预审成品）已换出；新任务 `role-boundary-diagnosis-2026` 在动议表里**真有这一行**（`grep -c` = 2，摘要 525 字） |
 | ③ "排第一"理由换真理由或降级 | ✅ | 父卡「新的证据排序」把台账从第一降到第三，并写明真理由（卡写错 > 面板坏） |
-| ④ 机器判据钉住数据面 | ✅ **本轮补上** | 卡原写"加在 `tests/company/ledger.spec.ts`"，但该 spec 只读真文件、**没有断言面板的数据面接线**——缺口实测存在。判据改落在 `tests/client/client-face.spec.ts`（那里才读得到 `index.ts`）：断言 `readLedger` 读 `kb/motion-ledger.md`、不读 `deliverables`、经 `parseMotionLedger`。**红/绿实证**：把 `index.ts` 的路径改成 `kb/deliverables-index.md` ⇒ 1 failed；还原 ⇒ 5 passed |
+| ④ 机器判据钉住数据面 | ✅ **本轮补上** | 卡原写"加在 `tests/company/ledger.spec.ts`"，但该 spec 只读真文件、**没有断言面板的数据面接线**——缺口实测存在。判据改落在 `tests/client/wiring/client-face.spec.ts`（那里才读得到 `index.ts`）：断言 `readLedger` 读 `kb/motion-ledger.md`、不读 `deliverables`、经 `parseMotionLedger`。**红/绿实证**：把 `index.ts` 的路径改成 `kb/deliverables-index.md` ⇒ 1 failed；还原 ⇒ 5 passed |
 
 **这轮真正的收获不是这条缺陷，是它暴露的失败类**：数据量事实来自 `find`（盘上有什么），面板数据面来自
 `remote.workspaceFiles.read(path)`（面板读什么）——**两者之间的连线没人查**。判据④钉的就是这条连线。

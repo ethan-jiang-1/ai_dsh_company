@@ -107,7 +107,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
    `makeCultivationFiles`、`makeCultivationActions` 在页签注入块（约 184–202 行）和公司视图注入块
    （约 240–242 行）各构造一次。两处注释都说「同一语义」，但没有任何机械约束保证它们一起改。
    一个 `createCompanyDataPlane(scoped)` 工厂（深模块）可以消灭这层重复。
-3. **成品目录的 schema 有两份**：`src/client/DeliverablesTab.tsx:24–45` 的 TS 类型 + `parseCatalog`
+3. **成品目录的 schema 有两份**：`src/client/tabs/DeliverablesTab.tsx:24–45` 的 TS 类型 + `parseCatalog`
    手工校验，与 `tools/lib/deliverables-catalog.mjs` 第 16–28 行 的 JSDoc 形状 + generator 各一份。
    两边各有 keyless 测试，但**没有测试用 generator 的真实输出喂 parser**；生成器加字段、parser 不认，
    单测仍可全绿，只有跑 `deliverables-catalog-probe` 才暴露。一个共享 schema（或生成类型）是更深的模块。

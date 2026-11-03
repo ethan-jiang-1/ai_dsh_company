@@ -27,7 +27,7 @@
 
 ## 验证
 
-- `pnpm test tests/client/cultivation-board.spec.ts tests/client/cultivation-board-actions.spec.ts` → **46 tests passed**。
+- `pnpm test tests/client/cultivation/cultivation-board.spec.ts tests/client/cultivation/cultivation-board-actions.spec.ts` → **46 tests passed**。
 - `pnpm test` → **110 files / 974 tests**；`pnpm verify` → ALL PASS；`pnpm typecheck` → exit 0。
 - 拆前后文案/按钮/键盘路径未改；`cultivation-board-actions` 的点击→命令行断言是行为级兜底。
 

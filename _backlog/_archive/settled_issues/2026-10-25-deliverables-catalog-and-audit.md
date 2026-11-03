@@ -12,7 +12,7 @@ opened: 2026-10-25
 **问题与期望结果：** 成品页签读 `kb/deliverables-index.json`，但生成器是仓库工具 `tools/deliverables-index.mjs`，不在 tarball 里；新装公司的页签永久报“维护者运行 node tools/...”。期望：安装后的成品闭环可用——空态清楚、新增/`present` 后能刷新、审计状态有明确来源（或明确“未审计”降级）。
 
 **当前情况：**
-- 客户端读 `kb/deliverables-index.json`（[company-data-plane.ts](../../../packages/company-pack/src/client/company-data-plane.ts)）；错误文案在 [DeliverablesTab.tsx](../../../packages/company-pack/src/client/DeliverablesTab.tsx)。
+- 客户端读 `kb/deliverables-index.json`（[company-data-plane.ts](../../../packages/company-pack/src/client/data/company-data-plane.ts)）；错误文案在 [DeliverablesTab.tsx](../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx)。
 - 生成器 [tools/deliverables-index.mjs](../../../tools/deliverables-index.mjs) 依赖仓库的审计/会话日志逻辑；不在 pack `files`。
 - 模板 [meta.md](../../../packages/company-pack/content/templates/meta.md) 把词表指向 `tools/lib/deliverables.mjs`。
 - chairing skill 写 `node tools/converge.mjs`；手册说“这条是机器检查的”，但安装后没有该检查。
