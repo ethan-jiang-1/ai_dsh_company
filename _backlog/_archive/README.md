@@ -15,6 +15,8 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-03-repo-hygiene-round6.md](settled_issues/2026-11-03-repo-hygiene-round6.md) | 已结；fresh agent 七维复评（落地后 A-/A/A-/A-/A-/A-/A-）+ 三棵测试树层次化 + 腐化通道四条机械面（retired-claims / command-refs / dist-manual 同源 / ledger 顺序）+ 错误中继与 D7 两项；去向 = [context-rot-guards Note](../../notes/implemented/2026-11-03-context-rot-guards.md) 等 9 篇 | 2026-11-03 |
+| [2026-11-03-repo-hygiene-round5.md](settled_issues/2026-11-03-repo-hygiene-round5.md) | 已结（消化）；A–F 各批已落地或被第六轮承接；残余 = npm publish（外部）与零入链分诊（已定性不批量迁） | 2026-11-03 |
 | [2026-11-02-remove-trajectory-terminal-ui.md](settled_issues/2026-11-02-remove-trajectory-terminal-ui.md) | 已结；pack 禁 `ui-trajectory` / `ui-sidebar-terminal` 两行，主区 = Chat + 培养、右栏无 New terminal；组合面 + 真页面验收通过；去向 = [Note](../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md) | 2026-11-03 |
 | [2026-11-02-harness-release-alignment.md](settled_issues/2026-11-02-harness-release-alignment.md) | 已结；FAQ 26 术语/current docs/发布字节证据链对齐；0.7.1；去向 = [distribution-alignment Note](../../notes/implemented/2026-11-02-distribution-alignment.md) | 2026-11-02 |
 | [2026-11-02-dev-product-path-parity.md](settled_issues/2026-11-02-dev-product-path-parity.md) | 已结；dev 默认 tarball + `--link` 显式快速通道、parity 指南/门禁、市场 staged；去向 = [parity Note](../../notes/implemented/2026-11-02-dev-product-path-parity.md) | 2026-11-02 |

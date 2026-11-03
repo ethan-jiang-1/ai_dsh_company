@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-03；A- D2 批次）
 
-> 上游 = [第五轮七维打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round5.md)
+> 上游 = [第五轮七维打扫卡](../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round5.md)
 > 评分 GAP：D2 host spec 640 行；根入口 `export *` 17 符号无消费者；`tool-card` 第 4 份 `isRecord`。
 
 ## 决定

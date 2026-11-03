@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-03；A- D1 第一批）
 
-> 上游 = [第五轮七维打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round5.md)
+> 上游 = [第五轮七维打扫卡](../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round5.md)
 > 评分 GAP：D1 手工库存（`checks/README.md` 80 行逐脚本枚举，`script-index` 反向强制）；9/32 文档无“什么时候读”。
 
 ## 决定

@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-03；七维复评 Phase 1）
 
-> 上游 = [第五轮打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round5.md) 的 fresh 复评（D4 B-）。
+> 上游 = [第五轮打扫卡](../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round5.md) 的 fresh 复评（D4 B-）。
 > 关联 = [Phase 0 发布真伪](./2026-11-03-release-truth-phase0.md)。
 
 ## 决定

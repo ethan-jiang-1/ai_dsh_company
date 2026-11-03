@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-03；A- D5 收尾）
 
-> 上游 = [第五轮七维打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round5.md)
+> 上游 = [第五轮七维打扫卡](../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round5.md)
 > 评分 GAP：`host/catalog.ts` 55.8–58.9%；Picker 70.96%；`docs/testing.md` 的 mock 白名单与实际不符。
 
 ## 决定

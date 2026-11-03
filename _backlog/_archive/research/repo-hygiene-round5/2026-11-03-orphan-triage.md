@@ -56,4 +56,4 @@ notes:audit --json
 ## 边界
 
 - 本文只做分类与建议，不动文件；`notes:audit` 的硬项（noDecision / deadPaths / missingBacklinks）仍为 0。
-- 收据层规则 = [notes/README §一/§五](../../../notes/README.md)；digest = [收据 digest](../../_archive/research/notes-consistency/2026-10-30-receipts-digest.md)。
+- 收据层规则 = [notes/README §一/§五](../../../../notes/README.md)；digest = [收据 digest](../notes-consistency/2026-10-30-receipts-digest.md)。

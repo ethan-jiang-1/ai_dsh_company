@@ -1,8 +1,8 @@
 # 客户端错误上报：无会话排队、会话出现后补送
 
 状态：implemented（2026-11-03 第六轮 D6 批）
-上游 = [第六轮七维打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round6.md) ·
-材料 = [第七维审计](../../_backlog/research/repo-hygiene-round6/2026-11-03-seven-dimension-audit-round6.md)
+上游 = [第六轮七维打扫卡](../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round6.md) ·
+材料 = [第七维审计](../../_backlog/_archive/research/repo-hygiene-round6/2026-11-03-seven-dimension-audit-round6.md)
 
 ## 决定
 

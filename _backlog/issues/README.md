@@ -4,14 +4,17 @@
 
 ## 活跃清单
 
-当前活跃 2 张：
+当前活跃 0 张。
 
-- [第五轮七维打扫卡](./2026-11-03-repo-hygiene-round5.md)（2026-11-03）：v3 迁移与发行版收口后的七维复评 + 分批改善；材料 = [审计](../research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)。
-- [第六轮七维打扫卡](./2026-11-03-repo-hygiene-round6.md)（2026-11-03）：fresh agent 复评 + 层次化与腐化通道清理；材料 = [审计](../research/repo-hygiene-round6/2026-11-03-seven-dimension-audit-round6.md)。
+2026-11-03 两张打扫卡（第五轮 / 第六轮）均已结归档：改善按五道门落地，证据在各 Note；
+残余项（npm publish 等外部依赖）在卡的「结论/去向」与归档材料里写清。
 
 v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajectory/New terminal 收回卡均已结归档。已结卡见[归档索引](../_archive/README.md)。新问题按 [backlog 入口](../README.md) 立卡，不从归档里自行开工。
 
 ## 近期归档
+
+- 第六轮七维打扫卡 2026-11-03 已结：fresh agent 复评 A-…A- + 层次化（client/tests/harness）+ 腐化通道四条机械面；去向 = [context-rot-guards Note](../../notes/implemented/2026-11-03-context-rot-guards.md) 与各批 Note；卡在[归档](../_archive/settled_issues/2026-11-03-repo-hygiene-round6.md)。
+- 第五轮七维打扫卡 2026-11-03 已结（消化）：A–F 各批已落地或被第六轮承接；残余 = npm publish（外部）与零入链分诊（已定性不批量迁）；卡在[归档](../_archive/settled_issues/2026-11-03-repo-hygiene-round5.md)。
 
 - Trajectory/New terminal 收回卡 2026-11-03 已结：pack 禁 `ui-trajectory` / `ui-sidebar-terminal` 两行，主区 = Chat + 培养、右栏无 New terminal，真页面 + 组合面双证据；去向 = [remove-trajectory-terminal-ui Note](../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md)；卡在 [归档](../_archive/settled_issues/2026-11-02-remove-trajectory-terminal-ui.md)。
 

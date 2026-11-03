@@ -5,9 +5,9 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 
 # 第五轮七维打扫审计（2026-11-03）
 
-> 服务：[第五轮七维打扫卡](../../issues/2026-11-03-repo-hygiene-round5.md)
-> **批次 A–C 已落地（2026-11-03）**：R5-01/02/04/05/06/07/08/10/11/12/17/21/22/23(首刀)/27/30/31/33 已修；R5-03 已按 0.7.2/0.8.0 bump 重打并 `release --verify` 全绿（npm publish 仍人工）；D7 公开面/peers 已收；D5 catalog 审计路径补测（v3 slug 修复）；0.8.2 发布。详见 [第五轮卡](../../issues/2026-11-03-repo-hygiene-round5.md) 与各 Note。下文保留审计时点（before）的发现。
-> 上一轮：[第四轮审计（2026-10-28）](../../_archive/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md)
+> 服务：[第五轮七维打扫卡](../../settled_issues/2026-11-03-repo-hygiene-round5.md)
+> **批次 A–C 已落地（2026-11-03）**：R5-01/02/04/05/06/07/08/10/11/12/17/21/22/23(首刀)/27/30/31/33 已修；R5-03 已按 0.7.2/0.8.0 bump 重打并 `release --verify` 全绿（npm publish 仍人工）；D7 公开面/peers 已收；D5 catalog 审计路径补测（v3 slug 修复）；0.8.2 发布。详见 [第五轮卡](../../settled_issues/2026-11-03-repo-hygiene-round5.md) 与各 Note。下文保留审计时点（before）的发现。
+> 上一轮：[第四轮审计（2026-10-28）](../repo-hygiene/2026-10-28-six-dimension-audit-round4.md)
 > 口径：fresh agent 只读评审 + 主 agent 亲跑全部 keyless 车道 + 六个独立子代理分维深挖；主 agent 对 P0/P1 逐条回查原文件/原命令。
 > vendor/dsh 只读；真模型认证档未跑（成本授权未给）。真页面档跑了 dev 模式 `ui-scene-smoke` 与 `client-load-smoke`；isolated 金样档实测启动失败（见 D6）。
 > **数字基线**：HEAD `ad07da3` · `pnpm verify` **53 门 ALL PASS + 2 SKIP** · `pnpm test` **124 spec / 1048 例（1045 pass / 3 skip）** · `pnpm typecheck` exit 0 · 覆盖率 **85.14 stmt / 77.33 branch / 86.10 func / 88.87 line** · 代码 81 文件 / 13,996 行 · 测试 15,174 行 · `release-smoke` **39 PASS** · `client-load-smoke` **ALL PASS** · `ui-scene-smoke`（dev）**ALL PASS 9/9 页签** · `release --check` **exit 1**。
@@ -242,4 +242,4 @@ git -C vendor/dsh rev-parse 'dsh-v0.2.1-rc.2^{commit}'
 | D6 | A- | isolated golden/诊断/错误留痕/tee/--steps；残余为全链路与证据寿命边界 |
 | D7 | A- | 0.8.2 发布字节 READY（未 npm publish）；peers 47；web-only/品牌/inject 偏离文档化；workspaceRegistry 是 web 产品面 |
 
-详见 [A- 收口 Note](../../../notes/archived/receipts/2026-11-03-a-minus-closeout.md)；两轴 review 的修补与字面残余 = [review-integrity-fixes](../../../notes/implemented/2026-11-03-review-integrity-fixes.md)。
+详见 [A- 收口 Note](../../../../notes/archived/receipts/2026-11-03-a-minus-closeout.md)；两轴 review 的修补与字面残余 = [review-integrity-fixes](../../../../notes/implemented/2026-11-03-review-integrity-fixes.md)。

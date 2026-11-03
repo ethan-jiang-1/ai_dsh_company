@@ -1,8 +1,8 @@
 # 腐化通道的机械面：禁写断言、命令引用、生成物同源、台账顺序
 
 状态：implemented（2026-11-03 第六轮 D4 深挖）
-上游 = [第六轮七维打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round6.md) ·
-材料 = [D4 深挖](../../_backlog/research/repo-hygiene-round6/2026-11-03-context-rot-deep-dive.md)
+上游 = [第六轮七维打扫卡](../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round6.md) ·
+材料 = [D4 深挖](../../_backlog/_archive/research/repo-hygiene-round6/2026-11-03-context-rot-deep-dive.md)
 
 ## 决定
 

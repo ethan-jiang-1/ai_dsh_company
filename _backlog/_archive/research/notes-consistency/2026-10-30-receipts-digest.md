@@ -61,4 +61,4 @@ intent: "notes/ 分诊的收据索引：21 篇无持久决定的演练/批次/�
 
 | 原文（现 `notes/archived/receipts/`） | 证明了什么 | 现行 owner / 可复核处 |
 |---|---|---|
-| `2026-11-03-a-minus-closeout` | 0.8.2 上曾自评七维全 A-；盘点行数/门禁/预算 | 已被 `_backlog/research/repo-hygiene-round5/2026-11-03-fresh-recheck.md` 推翻（当前 D1 A- / D2 A- / D3 B+ / D4 B+ / D5 A- / D6 A- / D7 B+） |
+| `2026-11-03-a-minus-closeout` | 0.8.2 上曾自评七维全 A-；盘点行数/门禁/预算 | 已被 `_backlog/_archive/research/repo-hygiene-round5/2026-11-03-fresh-recheck.md` 推翻（当前 D1 A- / D2 A- / D3 B+ / D4 B+ / D5 A- / D6 A- / D7 B+） |

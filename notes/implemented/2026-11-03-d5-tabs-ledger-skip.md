@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-03；A- D5 批次）
 
-> 上游 = [第五轮七维打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round5.md)
+> 上游 = [第五轮七维打扫卡](../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round5.md)
 > 评分 GAP：`company-tabs` 53.7%；`ledger.spec` 的 live 档因路径停在 v2 布局而永久 skip（3 例）。
 
 ## 决定

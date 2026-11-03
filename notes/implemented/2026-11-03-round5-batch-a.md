@@ -2,8 +2,8 @@
 
 状态：implemented（2026-11-03；用户授权「打扫卫生 + 持续改善」，批次 A 为真实性止血，不动 `_backlog` 章程）
 
-> 上游 = [第五轮七维打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round5.md)
-> 审计 = [第五轮七维审计](../../_backlog/research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)
+> 上游 = [第五轮七维打扫卡](../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round5.md)
+> 审计 = [第五轮七维审计](../../_backlog/_archive/research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)
 > 批次 A 范围 = R5-01 / R5-02 / R5-08 / R5-11 / R5-21 / R5-22 + E1（R5-30）。R5-03/04/05/06/07/10/31 等留给后续批次。
 
 ## 决定

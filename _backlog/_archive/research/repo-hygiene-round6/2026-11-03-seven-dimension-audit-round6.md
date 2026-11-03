@@ -5,7 +5,7 @@ intent: "第六轮七维打扫（2026-11-03）：fresh agent 独立复评七个�
 
 # 第六轮七维审计（2026-11-03，fresh agent）
 
-> 服务：[第六轮七维打扫卡](../../issues/2026-11-03-repo-hygiene-round6.md)
+> 服务：[第六轮七维打扫卡](../../settled_issues/2026-11-03-repo-hygiene-round6.md)
 > 上一轮：[第五轮审计](../repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)（结论 A-/A-/A-/A-/A-/A-/A-）与 [复评](../repo-hygiene-round5/2026-11-03-fresh-recheck.md)
 > 口径：fresh agent 只读评审 + 主 agent 亲跑 keyless 全链（`verify` / `test` / `typecheck` / `coverage` / `ui-scene-smoke`）+ 四个独立子代理分维深挖；P0/P1 逐条回查原文件与 git 历史。
 > 基线 = `1f61723`；`pnpm verify` 53 门 ALL PASS + 2 无对象；`pnpm test` **139 spec / 1108 例**（修复前）；`pnpm typecheck` exit 0。
@@ -49,7 +49,7 @@ intent: "第六轮七维打扫（2026-11-03）：fresh agent 独立复评七个�
 
 | R6-13 | D7 | **P1** | 安装 profile ≠ 启动 profile：Plugins 页装的是**当前 profile**（release-smoke ④c 实测装进 `web`），而 `README.md` / `packages/company-pack/README.md` / `docs/release.md` 把 `dsh --profile company` 写成唯一入口；`company` 不是出厂 profile，缺失时 DSH 直接报错。 | **已修**（README / profile.md / 安装手册模板按「装进哪个就启动哪个」改写） |
 | R6-14 | D7 | **P1** | 卸载残留清单不准：`<DSH_HOME>/company-pack.lock` 实际在 home 根（手册写在 `company/` 下）；`storages/workspace.json` 的登记行、`logs/company-client-errors.log`、浏览器 localStorage 键未列。DSH 无卸载清理钩子 ⇒ 唯一合规动作 = 精确披露。 | **已修**（模板表格 + 清理命令；`_dist` 手册待下次 `release --prepare` 再生） |
-| R6-15 | D7 | **P2** | `<DSH_HOME>/company/settings.json` 被 4 处文档写成 workspace 解析的一层，但生产端只读不写——文档承诺了一个不会发生的便利。 | **已修**：实现写侧（内容未变不重写、写失败只告警）；Note = [workspace-choice-and-lease-order](../../../notes/implemented/2026-11-03-workspace-choice-and-lease-order.md) |
+| R6-15 | D7 | **P2** | `<DSH_HOME>/company/settings.json` 被 4 处文档写成 workspace 解析的一层，但生产端只读不写——文档承诺了一个不会发生的便利。 | **已修**：实现写侧（内容未变不重写、写失败只告警）；Note = [workspace-choice-and-lease-order](../../../../notes/implemented/2026-11-03-workspace-choice-and-lease-order.md) |
 | R6-16 | D7 | **P2** | `runtime-guard` 在 workspace 解析**之前**取 lease（写 `<DSH_HOME>/company-pack.lock`），与「无 workspace 时零写」表述相反；另 cwd 启发式会把任意「可用目录」当 workspace 自动写 `.dsh-company/`。 | **已修一半**：lease 挪到解析之后（无 workspace 不取锁）；cwd 启发式保留（产品行为，见 Note 的输掉的方案） |
 | R6-17 | D7 | **P3** | market index 只列 0.8.7 单版本、`publishTimestamp` = 生成时刻；参考生成器列全部已发布版本 + 真实发布时间。`_dist/market/index.json` 仍是 0.7.0（gitignored）。 | 外部发布面（未 publish，本轮不动） |
 

@@ -1,8 +1,8 @@
 # workspace 便利设置真的会写；lease 挪到 workspace 解析之后
 
 状态：implemented（2026-11-03 第六轮 D7 批）
-上游 = [第六轮七维打扫卡](../../_backlog/issues/2026-11-03-repo-hygiene-round6.md) ·
-材料 = [第七维审计](../../_backlog/research/repo-hygiene-round6/2026-11-03-seven-dimension-audit-round6.md)（R6-15/R6-16）
+上游 = [第六轮七维打扫卡](../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round6.md) ·
+材料 = [第七维审计](../../_backlog/_archive/research/repo-hygiene-round6/2026-11-03-seven-dimension-audit-round6.md)（R6-15/R6-16）
 
 ## 决定
 

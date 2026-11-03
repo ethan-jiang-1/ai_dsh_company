@@ -5,8 +5,8 @@ intent: "D4 高腐化面的 notes 分诊（2026-11-03）：A- 收口/客户端�
 
 # notes 分诊 · 2026-11-03 · D4 高腐化面（A- 收口 / 客户端错误 / v3 / CompanyView）
 
-> 性质：分诊报告（不是 Note）。规则唯一家 = [notes/README](../../../notes/README.md)；
-> 次序与判据 = [notes-consistency-audit skill](../../../.agents/skills/notes-consistency-audit/SKILL.md)。
+> 性质：分诊报告（不是 Note）。规则唯一家 = [notes/README](../../../../notes/README.md)；
+> 次序与判据 = [notes-consistency-audit skill](../../../../.agents/skills/notes-consistency-audit/SKILL.md)。
 > 范围 = 本轮 fresh 复评 D4 命中与 2026-11-03 发布/重构批次；**不是全量 115 篇**。
 
 命令：`node tools/notes-audit.mjs --json`、`pnpm verify`（2026-11-03 10:5x +08）。
@@ -15,11 +15,11 @@ intent: "D4 高腐化面的 notes 分诊（2026-11-03）：A- 收口/客户端�
 
 | 机制 | 现行 owner |
 |---|---|
-| 七维评分 | [round5 卡](../../issues/2026-11-03-repo-hygiene-round5.md) 的 fresh 复评（D4 B-，不是全 A-） |
-| 页面错误→host 日志 | [D6 断链修复](../../../notes/implemented/2026-11-03-d6-client-error-chain-fix.md) + `checks/smoke/client-error-chain-smoke.mjs` |
-| v3 公司盘 / 内容 | [v3 native entry](../../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)、`packages/company-pack/content/README.md` |
-| CompanyView | 已删；[D2 removal Note](../../../notes/implemented/2026-11-03-d2-companyview-removal.md) |
-| 发布 READY | [release.md](../../../docs/release.md) §版本纪律（点态） |
+| 七维评分 | [round5 卡](../../settled_issues/2026-11-03-repo-hygiene-round5.md) 的 fresh 复评（D4 B-，不是全 A-） |
+| 页面错误→host 日志 | [D6 断链修复](../../../../notes/implemented/2026-11-03-d6-client-error-chain-fix.md) + `checks/smoke/client-error-chain-smoke.mjs` |
+| v3 公司盘 / 内容 | [v3 native entry](../../../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)、`packages/company-pack/content/README.md` |
+| CompanyView | 已删；[D2 removal Note](../../../../notes/implemented/2026-11-03-d2-companyview-removal.md) |
+| 发布 READY | [release.md](../../../../docs/release.md) §版本纪律（点态） |
 
 ## 分类与执行
 
@@ -36,7 +36,7 @@ intent: "D4 高腐化面的 notes 分诊（2026-11-03）：A- 收口/客户端�
 ## 硬矛盾（已消解）
 
 - 旧：`notes/archived/receipts/2026-11-03-a-minus-closeout.md:1` “七维全部达到 A-”。
-  新：`_backlog/issues/2026-11-03-repo-hygiene-round5.md:14` fresh 复评 D1 B+ / D2 B+ / D3 B+ / D4 B- / D5 B+ / D6 A- / D7 B。
+  新：`_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round5.md:14` fresh 复评 D1 B+ / D2 B+ / D3 B+ / D4 B- / D5 B+ / D6 A- / D7 B。
   判：**fresh 复评赢**；A- 文只作历史收口，已 banner。
 
 ## 机械基线（修后）
