@@ -20,7 +20,7 @@ afterAll(() => { for (const dir of TMP) rmSync(dir, { recursive: true, force: tr
  * notes/ 机械审计的判据层（2026-10-30）。只测**可机械判**的部分：
  * 路径存在性、取代回链、收据特征、状态行。语义分诊不在本 spec 的范围。
  */
-const note = (file, body) => ({ file, text: body })
+const note = (file: string, body: string) => ({ file, text: body })
 
 describe('notes-audit · 解析', () => {
   const text = '# 2026-10-30 · 一个决定\n\n状态：implemented（2026-10-30；授权）\n\n## 决定\n\n做 A。\n'

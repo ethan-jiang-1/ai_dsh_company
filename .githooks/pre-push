@@ -16,4 +16,5 @@ node checks/run-gates.mjs || exit 1
 node ./node_modules/typescript/bin/tsc -b packages/company-pack || exit 1
 node ./node_modules/typescript/bin/tsc -p tsconfig.test-client.json || exit 1
 node ./node_modules/typescript/bin/tsc -p tsconfig.test-company.json || exit 1
+node ./node_modules/typescript/bin/tsc -p tsconfig.test-harness.json || exit 1
 exec pnpm test

@@ -15,7 +15,7 @@
     "diagnose": "node tools/diagnose.mjs",
     "verify": "node checks/run-gates.mjs",
     "test": "vitest run",
-    "typecheck": "node ./node_modules/typescript/bin/tsc -b packages/company-pack && node ./node_modules/typescript/bin/tsc -p tsconfig.test-client.json && node ./node_modules/typescript/bin/tsc -p tsconfig.test-company.json",
+    "typecheck": "node ./node_modules/typescript/bin/tsc -b packages/company-pack && node ./node_modules/typescript/bin/tsc -p tsconfig.test-client.json && node ./node_modules/typescript/bin/tsc -p tsconfig.test-company.json && node ./node_modules/typescript/bin/tsc -p tsconfig.test-harness.json",
     "release": "node tools/release.mjs",
     "release:check": "node tools/release.mjs --check",
     "release:prepare": "node tools/release.mjs --prepare",

@@ -49,7 +49,7 @@ describe('tests/README 导航骨架', () => {
   it('tests/README 相对链接全部可解析', () => {
     const text = read('tests/README.md')
     const links = [...text.matchAll(/\]\(([^)#\s]+?)(?:#[^)]*)?\)/g)]
-      .map((m) => m[1])
+      .map((m) => m[1]!)
       .filter((target) => !/^https?:/.test(target))
     expect(links.length).toBeGreaterThan(4)
     for (const link of links) {

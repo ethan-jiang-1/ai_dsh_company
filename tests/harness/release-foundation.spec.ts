@@ -21,7 +21,7 @@ afterEach(() => { for (const dir of dirs.splice(0)) rmSync(dir, { recursive: tru
 function transactionOptions(paths: ReturnType<typeof fixture>) {
   return {
     updates: [{ path: paths.metadata, content: 'candidate metadata\n' }],
-    observedPaths: [paths.lock],
+    observedPaths: [paths.lock] as never[],
     validate: async (_context: { observe: (path: string) => void }) => {},
     verify: async () => {},
     rollback: async () => {},

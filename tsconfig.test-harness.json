@@ -1,0 +1,30 @@
+{
+  "extends": "./packages/company-pack/tsconfig.host.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "composite": false,
+    "incremental": false,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "checkJs": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "types": ["node"],
+    "paths": {
+      "@deepseek-ai/*": ["./packages/company-pack/node_modules/@deepseek-ai/*"],
+      "@deepseek-ai/dsh-api-session-controller/client": ["./packages/company-pack/node_modules/@deepseek-ai/dsh-api-session-controller/lib/types/client/index.d.ts"],
+      "@deepseek-ai/dsh-api-session-controller/types": ["./packages/company-pack/node_modules/@deepseek-ai/dsh-api-session-controller/lib/types/types.d.ts"],
+      "@deepseek-ai/dsh-session/types": ["./packages/company-pack/node_modules/@deepseek-ai/dsh-session/lib/types/types.d.ts"]
+    }
+  },
+  "include": [
+    "tests/harness/navigation-assets.spec.ts",
+    "tests/harness/skip-budget.spec.ts",
+    "tests/harness/notes-audit.spec.ts",
+    "tests/harness/snapshots-budget.spec.ts",
+    "tests/harness/release-foundation.spec.ts",
+    "tests/harness/market-index.spec.ts",
+    "tests/support/temp-env.ts"
+  ]
+}

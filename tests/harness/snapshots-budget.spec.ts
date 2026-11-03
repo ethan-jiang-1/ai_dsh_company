@@ -18,12 +18,12 @@ const scenes = [
   { name: 'convergence-2026-10-16', path: 'current' },
   { name: 'replay/r3-delegation', path: 'other' },
 ]
-const bytesOf = p => ({ legacy: 65536, current: 65536, other: 999 })[p] ?? 0
+const bytesOf = (p: string) => ({ legacy: 65536, current: 65536, other: 999 } as Record<string, number>)[p] ?? 0
 
 describe('收敛切片识别与计量（两代命名都要覆盖）', () => {
   it('旧命名 memory-convergence-* 与新命名 convergence-* 都计入，非收敛场景不计', () => {
     const { scenes: hit, bytes } = convergenceSlices({ scenes, bytesOf })
-    expect(hit.map(s => s.name)).toEqual(['memory-convergence-2026-10-04-5', 'convergence-2026-10-16'])
+    expect(hit.map((s: { name: string }) => s.name)).toEqual(['memory-convergence-2026-10-04-5', 'convergence-2026-10-16'])
     // ⚠ 断言**精确字节**：64KiB 与 128KiB 在一位小数的 mb() 文案里都是 0.1M，
     // 拿文案断言会「因错的原因通过」（2026-10-16 实测踩过）。漏任一代 ⇒ 65536。
     expect(bytes).toBe(131072)
