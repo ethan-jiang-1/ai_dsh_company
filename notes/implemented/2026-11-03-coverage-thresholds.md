@@ -9,7 +9,7 @@
 ## 决定
 
 - `vitest.config.ts` 的 coverage 从**纯观察档**升级为**关键模块阈值档**；全局不设阈值（vendor/tools 噪声会淹），
-  只给 6 个高风险模块下限：
+  只给 10 个高风险模块下限：
 
 | 模块 | statements | branches | 当前 |
 |---|---|---|---|
@@ -19,6 +19,10 @@
 | `host/workspace-resolution.ts` | 85 | 75 | 92.15 / 82.69 |
 | `host/runtime-guard.ts` | 70 | 60 | 75.00 / 65.38 |
 | `client/index.ts` | 65 | 10 | 73.11 / 16.66 |
+| `client/use-company-data.ts` | 95 | 85 | 97.91 / 86.95 |
+| `host/deliverables-command.ts` | 90 | 70 | 92.30 / 76.92 |
+| `host/catalog-state.ts` | 80 | 70 | 80.76 / 76.00 |
+| `host/presented-ledger.ts` | 70 | 55 | 72.89 / 59.70 |
 
 - **不进 pre-push**：coverage 全量 ~15s（含 transform 更高），且 `pnpm test` 是秒级层；阈值是
   `pnpm test:coverage` 的手动棘轮（发布前/改这些模块时），不替代 keyless 回归。
@@ -35,7 +39,7 @@
 
 ```text
 pnpm test:coverage
-# exit 0；6 个阈值全过（读数见上表）
+# exit 0；10 个阈值全过（读数见上表）
 
 # 红证：把 context-wiring statements 阈值临时改成 99
 npx vitest run --coverage
