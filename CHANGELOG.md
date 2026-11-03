@@ -2,6 +2,14 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.8.3 — 2026-11-03
+
+### Changed
+
+- 无用户可见行为变化：删除不可达的 CompanyView 与两个测试；安装手册的“包内内容”表纠正为
+  `lib/**` / `presets/**` / `content/**` 等实际 `files`。维护者过程证据见
+  `notes/implemented/2026-11-03-d2-companyview-removal.md` 与 `2026-11-03-d1-dev-loop-and-manual.md`。
+
 ## 0.8.2 — 2026-11-03
 
 ### Changed
