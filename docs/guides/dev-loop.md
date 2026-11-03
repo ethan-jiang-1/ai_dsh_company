@@ -1,6 +1,6 @@
 # 开发环：一个变更从意图到调整的操作手册
 
-> 什么时候读：开工前定任务与授权（§0.5）、实施中选检查（§1/§9.1）、收尾交证据（§12）——其余章节按改动面查。
+> 什么时候读：开工前定任务与授权（§0.5）、实施中选检查（§1）、收尾交证据（§12）——其余章节按改动面查。
 > 性质：指南层——"怎么操作"的展开与查表处；纪律压缩版在根 AGENTS.md。来源 = FAQ 13 `dev-loop.md` +
 > `dual-home-isolation.md`（外部材料，登记见 [external-research.md](../external-research.md)）；机制结论以
 > `vendor/dsh/` 工作树为权威，旗标与行为已在**钉住的 vendor 基线**核对——基线版本与 SHA 的唯一事实家 =
@@ -13,21 +13,21 @@
 | 需要做什么 | 唯一详细位置 |
 |---|---|
 | 选择任务、判断授权与 Plan Mode | §0.5 |
-| 实施、验证、交接 | §1；验证触发条件见 §9.1 |
-| 排查运行问题 | §2 → [debugging.md](./debugging.md)（组合层→会话层阶梯） |
+| 实施、验证、交接 | §1；验证触发条件 = [tests/README §验证分层与预算](../../tests/README.md) |
+| 排查运行问题 | [debugging.md](./debugging.md)（组合层→会话层阶梯） |
 | 写新代码前的四问 | §3 |
-| 插拔与装法速查 | §4 → [bootstrap §插拔速查](./bootstrap.md) |
-| 升级环与发布 | §5 → [release.md](../release.md)（程序唯一家） |
-| 双 home 与双 DSH | §6 → [environments.md](./environments.md) |
-| 环境引导 | §7（= bootstrap.md 指针） |
-| 驱动 Web 面会话（RPC） | §8 = [web-rpc 指南](./web-rpc.md) |
-| 门禁分层与测试预算 | §9 / §9.1 → [tests/README §验证分层与预算](../../tests/README.md) |
-| 自动化轻任务纪律 | §10 → [policy.md](../policy.md)（P3） |
-| 工具态与越界写入 | §11 → [policy.md](../policy.md)（P4） |
+| 插拔与装法速查 | [bootstrap §插拔速查](./bootstrap.md) |
+| 升级环与发布 | [release.md](../release.md)（程序唯一家） |
+| 双 home 与双 DSH | [environments.md](./environments.md) |
+| 环境引导 | [bootstrap.md](./bootstrap.md) |
+| 驱动 Web 面会话（RPC） | [web-rpc 指南](./web-rpc.md) |
+| 门禁分层与测试预算 | §9 + [tests/README §验证分层与预算](../../tests/README.md) |
+| 自动化轻任务纪律 | [policy.md](../policy.md)（P3） |
+| 工具态与越界写入 | [policy.md](../policy.md)（P4） |
 | 更新 Notes 与收尾队列项 | §12 |
-| 自主优先协议与语义审 | §13 → [policy.md](../policy.md)（P5） |
+| 自主优先协议与语义审 | [policy.md](../policy.md)（P5） |
 
-> 旧节号（§2 / §4–§8 / §9.1 / §10–§11 / §13）只保留锚点；现行家一律见上表，不复述。
+> 旧 §2/§4–§8/§9.1/§10–§11/§13 的空壳节已删；上表直接给现行家（全仓无锚点入站；正文旧引用已改指目标）。
 
 ## 0.5 任务入口与交接
 
@@ -45,24 +45,20 @@
 
 1. **定切片**：点明本次改动、非目标与验收。多步任务用 `todo_write` 跟踪并随用户反馈调整；机械单步可省。
 2. **最窄实施（证据先行）**：机制面先写会红的测试、行为面先立场景（Given/When/Then + 判据点名），再改拥有该事实的合同/实现；不顺手扩范围。`vendor/dsh/` 只读（见根 `AGENTS.md`）。
-3. **选证据**：运行能因本次回归失败的最窄检查，再按受影响面补真实入口；触发条件见 §9.1。静态结构检查不证明运行行为。
+3. **选证据**：运行能因本次回归失败的最窄检查，再按受影响面补真实入口；触发条件见 [tests/README](../../tests/README.md)。静态结构检查不证明运行行为。
 4. **同步事实**：docs 只写当前合同；仅在出现新决定、约束或关键验证时新增/更新 Note。既有事实变化时更新其 owner，不复制全文到多处。
 5. **交接**：逐项报告已完成、未验证、未完成及其证据/下一步。任务只有完成验收后才算收口；`_backlog` 卡的关闭与离场按其**自身条件**（结论 + 交接去向已记录即可，不等实施验收），规则唯一家 = [_backlog/README](../../_backlog/README.md)。只报告实际执行过的命令。
 
-完成定义是该面的最小真实检查通过（D15）；未跑的关键验收明确标缺口。按改动面选择检查与入口验证，细则唯一见 §9.1；结构检查不能替代运行验收。
+完成定义是该面的最小真实检查通过（D15）；未跑的关键验收明确标缺口。按改动面选择检查与入口验证，细则唯一见 [tests/README](../../tests/README.md)；结构检查不能替代运行验收。
 **证据不许假绿**：命令链一律 `set -o pipefail` + `&&`——`pnpm verify | tail` 的退出码是 `tail` 的，不带 pipefail 必假绿。
 **呈现即验证（2026-09-30 立，用户裁定）**：凡「启动给我看 / 呈现给我」类请求——起观察窗、交付 URL、演示一个面——**先自己跑通，红了当场修，全绿才呈现**；用户不当第一次验收员。观察窗的最小真检查与操作程序 = [web-window-ops skill](../../.agents/skills/web-window-ops/SKILL.md)（规则源 = [demo.md §前置](../demo.md)）；真模型面另加一轮真实会话。修不动时如实报告卡点与已排除项，不硬呈现半红的东西。
 
 **交付记录**：feature 或非平凡变更同 diff 更新实现、当前合同、必要验证与 Note；机械单步只改事实 owner 并运行相关检查，不新建意图或 RFC。
 
 **完成判断链（四不等式；2026-10-07 立以收口"门禁全绿即完成"错觉）**：**挂得上 ≠ 行为对 ≠ 装得上 ≠ 已获批**——
-四条各需独立观察，前一条绿不豁免后一条：挂载 = `preset-smoke`；行为 = 该面场景/判据（§9.1 选层）；
+四条各需独立观察，前一条绿不豁免后一条：挂载 = `preset-smoke`；行为 = 该面场景/判据（[tests/README](../../tests/README.md) 选层）；
 安装 = `release-smoke`（发布/导出面变更时）；批准 = 语义审（[policy.md §P5](../policy.md) 最小清单）+ 用户验收（§12 对照授权原文）。
 机器全绿只证断言通过，不证「做的是不是这件事」——每层的证明边界唯一家 = [testing.md §1](../testing.md)。
-
-## 2. 调试阶梯（组合层 → 会话层，不跳层）
-
-**手册 = [debugging.md](./debugging.md)**（2026-10-27 从本节迁出；编号保留防断链）。
 
 ## 3. 设计四问（R3+ 写第一行 JS 前必答）
 
@@ -72,30 +68,6 @@
 | ② 模型会看见什么新状态 | **日志税**：每个新的模型可见输入配 `SessionEventMap` 成员（并定 `ignorable`），否则 JSONL 回放不出来 | [architecture.md](../design/architecture.md) §8 已预警；漏了在第 5 阶段以"日志读不全"还债 |
 | ③ UI 走哪层 | presenter 纯函数 → `tool.call.toolview` 槽 → `dsh.client.inject`，不一步到顶 | [ui-demo.md](../design/ui-demo.md) 分层（D6） |
 | ④ 证据是什么 | **红/场景先行**（2026-10-04 升格）：机制面 = 实现前那个测试已写且红；行为/UX 面 = 场景先立（Given/When/Then + 判据点名）；口头担忧第二次提起 → 立卡或明确否决，不留复发性话题 | 该变更的 Note"需验证什么"；场景规格写在该变更自己的 Note 或探针头注 |
-
-## 4. 插拔速查
-
-**速查表 = [bootstrap §插拔速查](./bootstrap.md)**（2026-10-27 从本节迁出；编号保留防断链）。
-
-## 5. 升级环与发布纪律
-
-**程序、人审、兼容矩阵与版本触发唯一家 = [release.md](../release.md)**（2026-10-27 压缩为指针；编号保留防断链）。
-
-## 6. 双 home 与双 DSH 操作细节
-
-**手册 = [environments.md](./environments.md)**（2026-10-27 从本节迁出；编号保留防断链）。
-
-## 7. 环境引导（配方已迁 [guides/bootstrap.md](./bootstrap.md)）
-
-冷启动引导（clean checkout → 可跑通：submodule / install / 双面构建 / 装包）与全部实证坑的
-**唯一家 = [bootstrap.md](./bootstrap.md)**（2026-09-27 自本节整段迁出——常驻层瘦身轮，编号保留防断链）。
-何时读 = 新 clone、重建 dev home、vendor 换 tag、任何「跑不起来」的第一站；工具态重定向
-纪律（[policy §P4](../policy.md)）是引导的一部分，配合读。
-
-## 8. 驱动 Web 面会话（RPC）
-
-唯一家 = [web-rpc 指南](./web-rpc.md)（2026-10-12 自本节整段迁出——常驻层瘦身轮，节号保留防断链；
-调试阶梯 3.6/3.8 层的验证入口随它（[debugging](./debugging.md)））。
 
 ## 9. 门禁分层：连通档（默认，秒级）vs 内容档（按需，分钟级）
 
@@ -111,19 +83,7 @@
 
 **要点（可迁移到别的面）**：五条设计要点（"通"不考内容／从权威日志读事实／问句要短／完成信号用持久事件／慢是常态）写在范例脚本头注 = [`checks/smoke/probe-smoke.mjs`](../../checks/smoke/probe-smoke.mjs)（2026-09-26 从本节搬出，一处事实一个家）。
 
-**门禁升格判据 = [policy.md §P2](../policy.md)**（2026-10-27 迁出；编号保留防断链）。
-
-### 9.1 测试分层与预算
-
-**命令与预算速查 = [tests/README §验证分层与预算](../../tests/README.md)**（2026-10-27 迁出；编号保留防断链）。
-
-## 10. 自动化只许是轻任务
-
-**规则 = [policy.md §P3](../policy.md)**（2026-10-27 迁出；编号保留防断链）。
-
-## 11. 工具态与越界写入
-
-**规则 = [policy.md §P4](../policy.md)**（2026-10-27 迁出；编号保留防断链）。
+**门禁升格判据 = [policy.md §P2](../policy.md)**。
 
 ## 12. 记录与收尾
 
@@ -142,7 +102,7 @@
 
 - 任务入口见 §0.5；Plan Mode 适用条件见 [policy §P1](../policy.md)；多步任务的 todo 规则见 §1。
 - 默认遵循钉住的 DSH 纪律；vendor 原文是权威，本仓适配按 D 号记录约束与证据。根 `AGENTS.md` 只提供纪律落点索引，不是逐源清单。升 pin 时按 [release.md](../release.md) 重校流程合同。
-- 按改动面选择验证（§9.1）；结构门禁不替代运行验收。入口探针机器通过不等于语义审阅通过。
+- 按改动面选择验证（[tests/README](../../tests/README.md)）；结构门禁不替代运行验收。入口探针机器通过不等于语义审阅通过。
 - 新门禁反证的操作口径 = **只回滚实现、保留新测试**——连测试一起回滚会得全绿假象；红→还原→绿三步留证。
 - 收到人审/用户反馈：成立就修复并补证据；不成立用技术事实反驳，**不作表演式同意**。
 - 条目收尾后可派**中立体清扫**（独立子代理；输入 = diff + 收尾 Note + 关联卡；扫与修分家），清单不另写 Note。
@@ -151,7 +111,3 @@
 - **push 落点**：`origin` 已指向 `ssh://git@ssh.github.com:443/ethan-jiang-1/ai_dsh_company.git`（22 端口被拦），`git push origin master` 直接用；命令链纪律 = §1（证据不许假绿）。push 由 **pre-push hook 强制跑全量 `pnpm verify` + `pnpm test`**（verify 2026-09-27 立；test 09-28 加，不进 CI 的定界见 [n7-ci-narrowing](../../notes/implemented/2026-10-09-n7-ci-narrowing.md)；接线 = `source run/env.sh` 幂等设 `core.hooksPath`；bypass = `--no-verify`，用后须在收尾 Note 说明原因）。
 - **工作区收敛（2026-10-12 入轮末；2026-10-30 证据家改到归档件）**：收尾跑 `node tools/converge.mjs`（无参 = 计划模式）——有 ✓ 可收敛 slug 就逐个 `--slug` 收敛（journal 副本随交付物进归档家、台账自动），再 `--charter-backfill` 补历史纪要；证据家 = `deliverables-archive/<目录>/journal/`，不再写 `snapshots/archive`（依据 = [converge-evidence-home](../../notes/implemented/2026-10-30-converge-evidence-home.md)）。
 - **复盘一问：本轮有没有 agent 遵守的"未成文规则"**（从代码模式推断出的伪规则，跨会话会扩散）？三选一收口：升格 verify 门禁 / 写进 owner Note / 显式作废——规则不留空气（2026-09-28 借 FAQ 11）。
-
-## 13. 自主优先协议（D29）
-
-**规则 = [policy.md §P5](../policy.md)**（2026-10-27 迁出；编号保留防断链）。

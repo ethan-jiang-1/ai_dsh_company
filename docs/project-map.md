@@ -14,7 +14,7 @@
 | 开始代码或文档变更 | [开发环](guides/dev-loop.md) §0.5/§1 | 判断任务、范围、授权与完成证据 |
 | 启动并操作公司 | [动议合同](demo.md) §前置 | 打开带 token 的观察窗、连接公司盘、创建 CEO 会话 |
 | 查运行态与时序 | [运行态地图](runtime-map.md) | 分清代码/运行态/会话事实/证据四轴与首跑错误入口 |
-| 查组合和工具装载 | [profile 合同](profile.md)、[开发环](guides/dev-loop.md) §2 | dump 组合、检查名册与实际会话挂载 |
+| 查组合和工具装载 | [profile 合同](profile.md)、[debugging](guides/debugging.md) | dump 组合、检查名册与实际会话挂载 |
 | 修改角色内容 | [preset 合同](presets.md) | 找到 persona、skill 与 workspace 事实的各自 owner |
 | 修改 host 或 Web | [源码地图](../packages/company-pack/src/README.md) | 找到注册入口、读模型与渲染实现 |
 | 选择验证 | [测试宪法](testing.md)、[tests/README](../tests/README.md)、[脚本索引](../checks/README.md) | 选择证明当前性质的最窄检查 |
@@ -37,7 +37,7 @@
 | 决策记忆 | [notes](../notes/) | 按主题检索决定、被否决方案与复验依据 |
 | 推敲空间 | [_backlog](../_backlog/README.md) | 未成熟判断材料；任务执行按开发环与用户指令进入 |
 
-**四个位置影响运行**：**代码来源**决定 DSH 版本、**DSH_HOME** 决定 profile / 会话日志 / workspace 登记 / 方法层 / 账本、**会话 cwd（workspace）** 决定公司事实与产物（含 `.dsh-company/bundle.json` v3）、**验证证据**冻结时点事实——四条状态轴的权威与「不能从这里推断什么」唯一家 = [运行态地图 §二](runtime-map.md)。一个安装 = 一个公司，可顺序服务多个 workspace；不同公司新开 home。开发环境用 `source run/env.sh` 与 `pnpm company`/`pnpm dsh` 配对；裸 `dsh` 是另一份全局安装。[开发环 §6](guides/dev-loop.md) 解释双 home 与双 DSH。
+**四个位置影响运行**：**代码来源**决定 DSH 版本、**DSH_HOME** 决定 profile / 会话日志 / workspace 登记 / 方法层 / 账本、**会话 cwd（workspace）** 决定公司事实与产物（含 `.dsh-company/bundle.json` v3）、**验证证据**冻结时点事实——四条状态轴的权威与「不能从这里推断什么」唯一家 = [运行态地图 §二](runtime-map.md)。一个安装 = 一个公司，可顺序服务多个 workspace；不同公司新开 home。开发环境用 `source run/env.sh` 与 `pnpm company`/`pnpm dsh` 配对；裸 `dsh` 是另一份全局安装。[environments](guides/environments.md) 解释双 home 与双 DSH。
 
 ## 真实运行链
 
@@ -80,7 +80,7 @@ Web 操作按 [动议合同 §前置](demo.md) 执行：启动输出给出当前
 | 公司角色没有出现 | profile 与最终组合 | `pnpm dsh --profile company --dump-config`，核对 bundle/preset 行 |
 | 名册有角色但创建失败 | 实际 preset 挂载 | [preset-smoke](../checks/smoke/preset-smoke.mjs)，dump/名册扫描不能证明 schema 挂载成功 |
 | 工具缺失或委派续驶不可达 | 会话组合、工具目录、团队名册 | [delegation-smoke](../checks/smoke/delegation-smoke.mjs) 与对应机制探针 |
-| 改动没进入当前会话或页面 | 生效方式与构建产物 | [开发环 §2](guides/dev-loop.md)、[构建指南](guides/bootstrap.md)、[培养合同](presets.md) |
+| 改动没进入当前会话或页面 | 生效方式与构建产物 | [debugging](guides/debugging.md)、[构建指南](guides/bootstrap.md)、[培养合同](presets.md) |
 | 页面挂载或面板异常 | client 装配与真实渲染 | [client-load-smoke](../checks/smoke/client-load-smoke.mjs)、[cdp-probe](../probes/browser-visual/cdp-probe.mjs) |
 | 交付物、作者或 journal 不对 | 会话日志与实际工作区 | [deliverables-check](../checks/audit/deliverables-check.mjs)、[authorship-audit](../checks/audit/authorship-audit.mjs)、[journal-audit](../checks/audit/journal-audit.mjs) |
 | 会话行为回归 | 录制场景与明确判据 | [replay-smoke](../checks/smoke/replay-smoke.mjs)（本仓仅 foundation 合成场景；公司行为真实录制在部署仓） |

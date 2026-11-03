@@ -2,6 +2,10 @@
 
 状态：已消化（2026-10-26）
 
+> **已被 v3 部分取代（2026-11-01）**：第 2 条“公司盘根 = `<DSH_HOME>/company-workspace`”不再成立；
+> v3 用用户 workspace 的 `.dsh-company/`。现行 = [v3 native entry](./2026-11-01-plugin-as-product-v3-native-entry.md) +
+> [data-model](../../docs/data-model.md)。其余条目（`dsh.compatibility` 退役等）仍有效。
+
 ## 问题
 
 对照外部研究 `_faq_on_digested/24_plugin-publish-and-agent-data-planes`（DSH rc.3 基线），我们的发布形态与数据平面总体对齐，但有四处要修正：

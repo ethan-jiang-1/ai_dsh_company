@@ -20,7 +20,7 @@
 | [guides/debugging.md](./guides/debugging.md) | 指南 | 插件开发的排查阶梯：组合层 → 装载层 → 生效层 → 会话层 → 回归层（自 dev-loop §2 迁出） |
 | [guides/environments.md](./guides/environments.md) | 指南 | 双 home / 双 DSH / 凭据 / 端口 / 排练场 / 沙箱后端的运行环境细节（自 dev-loop §6 迁出） |
 | [guides/budget-and-ops.md](./guides/budget-and-ops.md) | 指南 | 限流旋钮总表、成本结构、demo 运维 runbook（症状→动作）、回放复盘 |
-| [guides/dev-loop.md](./guides/dev-loop.md) | 指南 | 开发操作手册：任务入口与授权（§0.5）、实施和证据交接（§1）；其余按改动面查调试、发布、双 home 等章节 |
+| [guides/dev-loop.md](./guides/dev-loop.md) | 指南 | 开发操作手册：任务入口与授权（§0.5）、实施和证据交接（§1）、设计四问（§3）、门禁分层（§9）、收尾（§12）；其余按改动面查 debugging / bootstrap / release / environments / web-rpc |
 | [guides/bootstrap.md](./guides/bootstrap.md) | 指南 | 冷启动引导（clean checkout → 可跑通）：配方、双面构建与实证坑（2026-09-27 自 dev-loop §7 迁入） |
 | [profile.md](./profile.md) | 合同 | host 组合现在时：应用内安装（company profile + workspace）vs dev、行清单语义、开放点 |
 | [delegation.md](./delegation.md) | 合同 | 汇报线现在时（R3 出生，0.2.1 复校）：命名委托 = activation（终稿走完成通知、人格由 `agentPreset` 给）与 team 的分工、team shadow 边界与证据、委派工具卡、分层验证 |

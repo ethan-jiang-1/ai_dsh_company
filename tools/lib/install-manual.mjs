@@ -154,7 +154,7 @@ ${b}${b}${b}
 
 | 平面 | 放什么 | 谁拥有 |
 |---|---|---|
-| 包内内容 | ${q('presets/**')}、${q('src/**')}、${q('content/**')}（手册/模板/默认章程/状态默认值） | 维护者；只读 |
+| 包内内容 | ${q('lib/**')}（runtime 两半 + 类型）、${q('presets/**')}、${q('content/**')}（手册/模板/默认章程/状态默认值）、${q('locale/')}、${q('icon.svg')}、${q('cordis.patch.yml')} | 维护者；只读 |
 | 用户 workspace | ${q('.dsh-company/')}：kb / deliverables / cultivation / logs / exports / overrides / ${q('bundle.json')}（v3，legacy 文件名） | 用户；可携带的公司状态 |
 | Harness home | ${q('profiles/company')}、sessions、凭据、workspace 登记、lease、${q('company/methods/')}、${q('company/ledger/')}、${q('company/identity/')} | DSH + host 治理 |
 | 派生索引 | ${q('cache/company/session-search-<profile>.db')}（SQLite FTS5；单进程 owner） | 可删可重建；不进备份 |

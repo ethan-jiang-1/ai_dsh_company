@@ -76,5 +76,5 @@ workspace；换项目不新建 home。bundle 不在 git；本仓 dev 的 `compan
 | 怎么启动公司运行 | [demo.md §前置](demo.md) / 根 README；`cd company-workspace && pnpm dsh --profile company` 或 `pnpm company` |
 | 改哪里 | [项目地图](project-map.md) + [pack owner 表](../packages/company-pack/README.md) + [四形态](presets.md) |
 | 用什么局部验证 | [tests/README](../tests/README.md) + [testing.md §2](testing.md) |
-| 运行卡点先查什么 | [项目地图](project-map.md) 现象表 + [开发环 §2](guides/dev-loop.md) |
+| 运行卡点先查什么 | [项目地图](project-map.md) 现象表 + [debugging](guides/debugging.md) |
 | 产物与证据从哪来 | 本图 §一/§二·五 + [快照规则](../snapshots/README.md) |

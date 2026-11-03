@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 /**
- * 测试分层纪律的**机械门禁**（guides/dev-loop §9.1，R3 立）。
+ * 测试分层纪律的**机械门禁**（tests/README §验证分层与预算，R3 立）。
  *
  * 起因（用户当轮反馈）："这种测试如果是 regression 的话，跑得这样慢是完全受不了的。"
  * 结论：`pnpm test` 是秒级 keyless 单元/纯逻辑层；需要子进程的 CLI 集成检查放独立 smoke，
@@ -42,7 +42,7 @@ function specFiles(dir: string): string[] {
   return found
 }
 
-describe('测试分层纪律（guides/dev-loop §9.1：真模型/真浏览器不进回归）', () => {
+describe('测试分层纪律（真模型/真浏览器不进回归）', () => {
   it('回归层不许出现子进程 / 浏览器 / 网络 / 密钥', () => {
     const offenders: string[] = []
     for (const file of specFiles(TESTS)) {
@@ -110,11 +110,12 @@ describe('测试分层纪律（guides/dev-loop §9.1：真模型/真浏览器不
     expect(replay, 'replay-smoke 头注必须声明"不进 pnpm test"').toContain('不进 pnpm test')
   })
 
-  it('分层预算写在 tests/README 的命令与预算节（纪律有家，不靠记忆；2026-10-27 自 dev-loop §9.1 迁出）', () => {
+  it('分层预算写在 tests/README 的命令与预算节（dev-loop 不再保留 §9.1 空壳）', () => {
     const home = readFileSync(join(ROOT, 'tests/README.md'), 'utf8')
     expect(home, 'tests/README 缺「验证分层与预算」节').toContain('验证分层与预算')
     expect(home, '该节必须写明"真模型 / 真浏览器不进迭代环"').toContain('真模型 / 真浏览器不进迭代环')
     const guide = readFileSync(join(ROOT, 'docs/guides/dev-loop.md'), 'utf8')
-    expect(guide, 'dev-loop 的 §9.1 编号必须保留为指针（防断链）').toContain('9.1 测试分层与预算')
+    expect(guide, 'dev-loop 应指到 tests/README 的预算节').toContain('tests/README §验证分层与预算')
+    expect(guide, 'dev-loop 不再保留 §9.1 空壳节').not.toContain('9.1 测试分层与预算')
   })
 })

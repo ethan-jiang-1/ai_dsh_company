@@ -2,6 +2,9 @@
 
 状态：implemented（2026-10-13；起因 = 用户「company-workspace 里只有部分内容值得进 git」+「这插件要给不同人安装」）
 
+> **已被 v3 取代（2026-11-01）**：`workspace/**` 随包与符号链接骨架已退役；现行 = [v3 native entry](./2026-11-01-plugin-as-product-v3-native-entry.md)
+> （`content/` 只读、host 注入、`bundle:init` 只建 `.dsh-company/`）。下游读到 `workspace/**` 一律按历史理解。
+
 ## 决定
 
 把公司盘的内容分三层，各归其家（**家**决定进不进 git、随不随包分发）：

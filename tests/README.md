@@ -17,6 +17,8 @@
 | [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫；Lead/follow 适配器与 tab 注册目录（真实 Cordis `Context`/`SlotRegistry`）；多实例探活 disposer 契约；whole-client 档（真 `bootClient` × web profile bundle roster）覆盖 `apply` 组合与 fiber 卸载/重载（company-client-composition） | 真浏览器渲染交互（→ client-load-smoke；真页面页签/错误环 → ui-scene-smoke） |
 | [tests/presets](./presets/) | persona / skills 声明内容 | 组合装配与工具行实际生效（→ preset-smoke + 会话日志证据） |
 | [tests/harness](./harness/) | 仓库结构与测试分层合同 + `tools/lib/` 纯逻辑判据（如 replay normalization/judges） | 运行时或 CLI 端到端行为 |
+| [tests/support](./support/) | 跨区共享夹具（临时目录/环境），不是 spec | 产品行为；不单独证明任何面 |
+| [tests/fixtures](./fixtures/) | 合成输入与 provenance（`fixture-provenance` 门禁） | 运行时行为 |
 
 spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随仓库增长，写进文档必过期）；导航到区，不到件。
 
