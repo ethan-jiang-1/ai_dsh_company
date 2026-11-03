@@ -1,7 +1,6 @@
 /** 浏览器半：部署品牌（侧栏）+ 团队任务板（会话头部）+ 公司驾驶舱页签（右栏，R5b）。 */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type { PaneId, TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
-import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-api-session-controller/client'
@@ -20,6 +19,8 @@ import { installAttentionObservers } from './attention-observers.ts'
 import { createCultivationView } from './CultivationView.tsx'
 import { createCompanyDataPlane, WORKSPACE_TEXT_PATHS } from './company-data-plane.ts'
 import { makeContextWiring, type ContextWiringScoped } from './context-wiring.ts'
+import { makeOpenMember } from './member-navigation.ts'
+import { titleUpdateFor } from './title-state.ts'
 import { createLeadLookup } from './company-session-adapters.ts'
 import { registerCompanyTabs } from './company-tab-registration.ts'
 import { DELEGATION_TOOL_KEYS } from './delegation-keys.ts'
@@ -124,19 +125,7 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
     const { leadOf, follow, cultivationFiles, cultivationActions, rawFollow, readWorkspaceText } = createCompanyDataPlane(scoped)
     const floatTab = (tabId: TabId, rect?: FloatRectLike): void => { scoped.sidebarRight.float(tabId, rect) }
     const unfloatTab = (paneId: string): void => { scoped.sidebarRight.dock(paneId as PaneId) }
-    const openMember = async (
-      sessionId: SessionId,
-      member: { readonly id: string; readonly role: 'lead' | 'teammate' },
-    ): Promise<void> => {
-      const lead = leadOf(sessionId)
-      if (member.role === 'lead') {
-        scoped.uiWorkspace.openSession(lead)
-        return
-      }
-      if ((sessions.retainInfo(sessionId).getSnapshot().retainedBy.mainView ?? 0) === 0) return
-      await sessions.refresh()
-      scoped.uiWorkspace.openSession({ parentSessionId: lead, childSessionId: member.id as SessionId, mode: 'continuable' })
-    }
+    const openMember = makeOpenMember({ sessions, uiWorkspace: scoped.uiWorkspace, leadOf })
     // 动作面按会话取（命令作用在面板所在会话；跨角色会被 host 角色闸拒，错误原话回到面板行内）。
     // 读取闭包唯一实现 = data plane 的 readWorkspaceText（Lead 寻址 + 失败 null 都在工厂里）。
     const readLedger = readWorkspaceText(WORKSPACE_TEXT_PATHS.ledger, 240)
@@ -203,14 +192,11 @@ function registerTitle(ctx: ClientContext): void {
         const state = list.getSnapshot()
         const current = Object.values(state.byId).find(s => (s.retainedBy.mainView ?? 0) > 0)
         const preset = current === undefined ? null : readPresetOf(list, current.id)
-        const short = preset === null ? undefined : ROLE_SHORT[preset]
-        const rawTitle = current === undefined ? undefined : sessionTitleOf(current)
-        if (rawTitle !== undefined && rawTitle !== '') {
-          document.title = short === undefined ? rawTitle : `【${short}】${rawTitle}`
-        }
+        const result = titleUpdateFor({ current, preset, roleShort: ROLE_SHORT, titleOf: sessionTitleOf })
+        if (result.title !== undefined) document.title = result.title
         const root = document.documentElement
-        if (short === undefined) delete root.dataset.wkRole
-        else root.dataset.wkRole = preset ?? ''
+        if (result.role === undefined) delete root.dataset.wkRole
+        else root.dataset.wkRole = result.role
       }
       update()
       return list.subscribe(update)
