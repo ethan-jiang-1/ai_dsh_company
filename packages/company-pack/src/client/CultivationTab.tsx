@@ -1,7 +1,7 @@
 /**
  * 培养页签体（驾驶舱④切片四 → 2026-10-13 培养卡升级）：领域视图（`CultivationBoard`）的
  * 侧栏/浮窗壳。数据加载与折叠在 `cultivation-data.ts`；展示纪律在 Board 头注。
- * 公司主面第四子页用**同一领域视图**（`CompanyView`）——一处事实，两个壳。
+ * 公司主面不再挂整页视图；培养页与右栏共用 CultivationBoard 这一领域视图（一处事实，两个壳）。
  */
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'

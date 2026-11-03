@@ -39,5 +39,7 @@ describe('pack 导出形态守卫（Loader unwrapExports round-trip）', () => {
     expect(unwrapped).toBe(clientEntry)
     expect(unwrapped.inject).toEqual(['slots', 'remote', 'sessions'])
     expect(typeof unwrapped.apply).toBe('function')
+    // 2026-11-03 D2：client 入口也只许 loader 需要的 apply/inject；新增运行时导出必须走用户签字（vendor client AGENTS）。
+    expect(Object.keys(clientEntry).sort()).toEqual(['apply', 'inject'])
   })
 })
