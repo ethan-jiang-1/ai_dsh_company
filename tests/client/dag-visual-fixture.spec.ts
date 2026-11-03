@@ -19,7 +19,7 @@ import { layoutDag } from '../../packages/company-pack/src/lib/dag.ts'
 import type { TaskRow } from '../../packages/company-pack/src/lib/board.ts'
 
 const task = (id: string, blockedBy: readonly string[] = [], status: TaskRow['status'] = 'pending', ownerName = 'vp-eng'): TaskRow =>
-  ({ id, subject: `T${id} 任务标题示例`, status, blockedBy, ownerName, ready: false, revision: 1 })
+  ({ id, subject: `T${id} 任务标题示例`, status, blockedBy, ownerName, description: '', ready: false, revision: 1 })
 
 /** 三态同屏夹具（视觉判据的输入；改这里 = 改视觉档的取材）。 */
 export const FIXTURE_TASKS: readonly TaskRow[] = [
@@ -55,7 +55,7 @@ describe('DAG 视觉夹具', () => {
     const css = stylesSource.slice(start, stylesSource.indexOf('`', start))
     expect(css.length).toBeGreaterThan(1000)
 
-    const emit = process.env.DAG_VISUAL_EMIT
+    const emit = (process.env as Record<string, string | undefined>).DAG_VISUAL_EMIT
     if (emit !== undefined && emit !== '') {
       writeFileSync(emit, JSON.stringify({
         svg,

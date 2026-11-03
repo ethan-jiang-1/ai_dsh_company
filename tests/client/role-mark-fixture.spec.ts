@@ -100,7 +100,7 @@ describe('角色标记对照夹具', () => {
     expect(css).toContain('.wk-role-badge')
     expect(css).toContain('width: 12px')
 
-    const emit = process.env.SIDEBAR_ROLE_MARK_EMIT
+    const emit = (process.env as Record<string, string | undefined>).SIDEBAR_ROLE_MARK_EMIT
     if (emit !== undefined && emit !== '') {
       writeFileSync(emit, JSON.stringify({ css, diagramCss: DIAGRAM_CSS, html, roles: FIXTURE_ROLES }, null, 2), 'utf8')
     }

@@ -63,7 +63,7 @@ describe('看板分叉视觉夹具', () => {
     const css = shippedCss()
     expect(css).toContain('.wk-card-subject')
 
-    const emit = process.env.BOARD_DRIFT_EMIT
+    const emit = (process.env as Record<string, string | undefined>).BOARD_DRIFT_EMIT
     if (emit !== undefined && emit !== '') {
       writeFileSync(emit, JSON.stringify({ css, html, note: '事故板面：task-3 声明依赖未落板 / task-4 健康对照' }), 'utf8')
     }

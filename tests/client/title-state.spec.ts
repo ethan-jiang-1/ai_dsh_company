@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 import { titleUpdateFor } from '../../packages/company-pack/src/client/title-state.ts'
 
 const roleShort = { ceo: 'CEO', 'vp-eng': 'E' }
-const titleOf = row => row.title
+const titleOf = (row: { title?: string }) => row.title
 
 const row = (over = {}) => ({ id: 's1', retainedBy: { mainView: 1 }, title: '问候', ...over })
 

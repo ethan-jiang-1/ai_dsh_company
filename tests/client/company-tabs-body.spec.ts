@@ -33,18 +33,18 @@ const render = (component: Parameters<typeof createElement>[0], over: Record<str
 
 describe('公司页签体静态渲染（R5-06/D5）', () => {
   it('看板 / 依赖图 / 用量 / 任务板各自渲染标题与空态', () => {
-    expect(render(BoardTab)).toContain('看板')
-    expect(render(BoardTab)).toContain('这一列暂时是空的')
-    expect(render(DagTab)).toContain('依赖图')
-    expect(render(DagTab)).toContain('这场动议还没有任务依赖图')
-    expect(render(BudgetTab)).toContain('用量')
-    expect(render(BudgetTab)).toContain('tokens')
-    expect(render(TasksTab)).toContain('任务板')
-    expect(render(TasksTab)).toContain('读取团队状态…')
+    expect(render(BoardTab as never)).toContain('看板')
+    expect(render(BoardTab as never)).toContain('这一列暂时是空的')
+    expect(render(DagTab as never)).toContain('依赖图')
+    expect(render(DagTab as never)).toContain('这场动议还没有任务依赖图')
+    expect(render(BudgetTab as never)).toContain('用量')
+    expect(render(BudgetTab as never)).toContain('tokens')
+    expect(render(TasksTab as never)).toContain('任务板')
+    expect(render(TasksTab as never)).toContain('读取团队状态…')
   })
 
   it('在场页签：没有团队动议时给空态，不是空白面板', () => {
-    const html = render(PresenceTab)
+    const html = render(PresenceTab as never)
     expect(html).toContain('在场')
     expect(html).toContain('当前没有团队动议')
     expect(html).toContain('协作动态')

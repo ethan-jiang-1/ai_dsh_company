@@ -52,10 +52,10 @@ describe('客户端错误环（R3-03）', () => {
     ;(target.console as { error: (...args: unknown[]) => void }).error('render failed', 42)
 
     expect(ring.list().map(entry => entry.kind)).toEqual(['error', 'rejection', 'console'])
-    expect(ring.list()[0].message).toContain('boom')
-    expect(ring.list()[0].stack).toContain('Error: boom')
-    expect(ring.list()[1].message).toContain('promise said no')
-    expect(ring.list()[2].message).toContain('render failed 42')
+    expect(ring.list()[0]!.message).toContain('boom')
+    expect(ring.list()[0]!.stack).toContain('Error: boom')
+    expect(ring.list()[1]!.message).toContain('promise said no')
+    expect(ring.list()[2]!.message).toContain('render failed 42')
     expect(consoleError).toHaveBeenCalledWith('render failed', 42)   // 不吞原输出
     uninstall()
   })
@@ -67,9 +67,9 @@ describe('客户端错误环（R3-03）', () => {
     const uninstall = installErrorCapture(target, ring)
     emit('error', { error: new Error('boom https://example.invalid/?token=SECRET') })
     expect(seen).toHaveLength(1)
-    expect(seen[0].message).toContain('boom')
-    expect(seen[0].message).not.toContain('SECRET')
-    expect(seen[0].href).not.toContain('SECRET')
+    expect(seen[0]!.message).toContain('boom')
+    expect(seen[0]!.message).not.toContain('SECRET')
+    expect(seen[0]!.href).not.toContain('SECRET')
     uninstall()
 
     const throwing = createErrorRing(10, () => { throw new Error('reporter down') })

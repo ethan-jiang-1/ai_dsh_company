@@ -14,7 +14,7 @@ import { layoutDag } from '../../packages/company-pack/src/lib/dag.ts'
 import type { TaskRow } from '../../packages/company-pack/src/lib/board.ts'
 
 const task = (id: string, blockedBy: readonly string[] = [], status: TaskRow['status'] = 'pending'): TaskRow =>
-  ({ id, subject: `任务 ${id}`, status, blockedBy, ownerName: 'vp-eng', ready: blockedBy.length === 0, revision: 1 })
+  ({ id, subject: `任务 ${id}`, status, blockedBy, ownerName: 'vp-eng', description: '', ready: blockedBy.length === 0, revision: 1 })
 
 describe('DagPanel 渲染结构（定位/动画分层）', () => {
   const tasks = [task('a'), task('b'), task('c', ['a']), task('d', ['b'])]

@@ -26,20 +26,26 @@ const leadOf = () => 'lead-session'
 const rawFollow = async function* () {}
 const readCatalog = async () => null
 
+const wiringFor = (scoped: ReturnType<typeof makeScoped>) =>
+  makeContextWiring(scoped as never, leadOf as never, rawFollow as never, readCatalog as never) as unknown as {
+    readonly openContext: (sessionId: string, context: unknown) => Promise<{ readonly ok: boolean, readonly problem?: string }>
+    readonly contextSources: (sessionId: string) => { readonly listSessions: (id: string, role?: string) => { readonly ok: boolean, readonly value: readonly unknown[] } }
+  }
+
 const sessionContext = (over = {}) => ({ kind: 'session', ref: 'session-1', title: 't', excerpt: '', ...over })
 const fileContext = (over = {}) => ({ kind: 'deliverable', ref: 'kb/x.md', title: 't', excerpt: '', ...over })
 
 describe('makeContextWiring / openContext', () => {
   it('会话在列表里 → openSession(ref)', async () => {
     const scoped = makeScoped()
-    const wiring = makeContextWiring(scoped, leadOf, rawFollow, readCatalog)
+    const wiring = wiringFor(scoped)
     await expect(wiring.openContext('session-1', sessionContext())).resolves.toEqual({ ok: true })
     expect(scoped.uiWorkspace.openSession).toHaveBeenCalledWith('session-1')
   })
 
   it('会话不在 → 可操作 problem，不导航', async () => {
     const scoped = makeScoped()
-    const wiring = makeContextWiring(scoped, leadOf, rawFollow, readCatalog)
+    const wiring = wiringFor(scoped)
     const result = await wiring.openContext('session-1', sessionContext({ ref: 'gone' }))
     expect(result).toEqual({ ok: false, problem: '这个会话现在打不开了（可能已删除）。' })
     expect(scoped.uiWorkspace.openSession).not.toHaveBeenCalled()
@@ -52,7 +58,7 @@ describe('makeContextWiring / openContext', () => {
         subagentAddress: vi.fn(() => ({ parentSessionId: 'parent' })),
       },
     })
-    const wiring = makeContextWiring(scoped, leadOf, rawFollow, readCatalog)
+    const wiring = wiringFor(scoped)
     await expect(wiring.openContext('session-1', sessionContext({
       ref: 'child', parentSessionId: 'parent', mode: 'continuable',
     }))).resolves.toEqual({ ok: true })
@@ -68,7 +74,7 @@ describe('makeContextWiring / openContext', () => {
         subagentAddress: vi.fn(() => ({ parentSessionId: 'parent' })),
       },
     })
-    const wiring = makeContextWiring(scoped, leadOf, rawFollow, readCatalog)
+    const wiring = wiringFor(scoped)
     await wiring.openContext('session-1', sessionContext({ ref: 'child', parentSessionId: 'parent' }))
     expect(scoped.uiWorkspace.openSession).toHaveBeenCalledWith({
       parentSessionId: 'parent', childSessionId: 'child', mode: 'unknown',
@@ -77,7 +83,7 @@ describe('makeContextWiring / openContext', () => {
 
   it('成品/文件 stat ok → openResource(sessionFileAddress(lead, ref))', async () => {
     const scoped = makeScoped()
-    const wiring = makeContextWiring(scoped, leadOf, rawFollow, readCatalog)
+    const wiring = wiringFor(scoped)
     await expect(wiring.openContext('session-1', fileContext())).resolves.toEqual({ ok: true })
     expect(scoped.sidebarRight.openResource).toHaveBeenCalledWith(sessionFileAddress('lead-session', 'kb/x.md'))
   })
@@ -86,7 +92,7 @@ describe('makeContextWiring / openContext', () => {
     const scoped = makeScoped({
       remote: { workspaceFiles: { stat: vi.fn(async () => ({ ok: false })) } },
     })
-    const wiring = makeContextWiring(scoped, leadOf, rawFollow, readCatalog)
+    const wiring = wiringFor(scoped)
     await expect(wiring.openContext('session-1', fileContext()))
       .resolves.toEqual({ ok: false, problem: '原文不在了（文件可能已归档/移动）。' })
     expect(scoped.sidebarRight.openResource).not.toHaveBeenCalled()
@@ -96,7 +102,7 @@ describe('makeContextWiring / openContext', () => {
     const scoped = makeScoped({
       remote: { workspaceFiles: { stat: vi.fn(async () => { throw new Error('boom') }) } },
     })
-    const wiring = makeContextWiring(scoped, leadOf, rawFollow, readCatalog)
+    const wiring = wiringFor(scoped)
     await expect(wiring.openContext('session-1', fileContext()))
       .resolves.toEqual({ ok: false, problem: '打不开原文：boom' })
   })
@@ -105,7 +111,7 @@ describe('makeContextWiring / openContext', () => {
 describe('makeContextWiring / contextSources', () => {
   it('listSessions 从当前会话列表投影（空列表也是 ok）', () => {
     const scoped = makeScoped({ sessions: { list: { getSnapshot: () => ({ byId: {} }) }, subagentAddress: vi.fn() } })
-    const wiring = makeContextWiring(scoped, leadOf, rawFollow, readCatalog)
+    const wiring = wiringFor(scoped)
     expect(wiring.contextSources('session-1').listSessions('session-1')).toEqual({ ok: true, value: [] })
   })
 })

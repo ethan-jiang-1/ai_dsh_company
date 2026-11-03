@@ -104,7 +104,7 @@ describe('useCompanyData 订阅生命周期', () => {
     let followCalls = 0
     const follow = async function* (): AsyncGenerator<TeamStreamFrame> { followCalls++; yield* [] }
     const store: SessionsStoreLike = { projectionsBySession: { 's-1': { values: { agentTeam: teamView } } } }
-    const h = mountHarness({ sessionId: 's-1', store, injected: injectedOf(follow as CompanyDataInjected['follow']), stream: false })
+    const h = mountHarness({ sessionId: 's-1' as never, store, injected: injectedOf(follow as CompanyDataInjected['follow']), stream: false })
     await h.rerender({})
     expect(followCalls, '不订阅面板不得拉流').toBe(0)
     expect(h.last().streamError).toBeNull()
@@ -121,7 +121,7 @@ describe('useCompanyData 订阅生命周期', () => {
       { kind: 'history', events: [memberActive('m-1', 1), messageTo('m-1', '第一稿', 2)] },
     ])
     const store: SessionsStoreLike = { projectionsBySession: {} }
-    const h = mountHarness({ sessionId: 's-1', store, injected: injectedOf(ch.follow), stream: true })
+    const h = mountHarness({ sessionId: 's-1' as never, store, injected: injectedOf(ch.follow), stream: true })
     await h.rerender({})
     expect(h.last().activity).toHaveLength(2)
     expect(h.last().activity[0]?.text, '最新在前（reverse）').toContain('第一稿')
@@ -135,7 +135,7 @@ describe('useCompanyData 订阅生命周期', () => {
     const events = Array.from({ length: 55 }, (_, i) => memberActive(`m-${String(i)}`, i + 1))
     const ch = channel([{ kind: 'history', events }])
     const store: SessionsStoreLike = { projectionsBySession: {} }
-    const h = mountHarness({ sessionId: 's-1', store, injected: injectedOf(ch.follow), stream: true })
+    const h = mountHarness({ sessionId: 's-1' as never, store, injected: injectedOf(ch.follow), stream: true })
     await h.rerender({})
     expect(h.last().activity).toHaveLength(50)
     expect(h.last().activity[0]?.text, '最新一条还在').toContain('m-54')
@@ -144,7 +144,7 @@ describe('useCompanyData 订阅生命周期', () => {
 
   it('流错误 fail-loud 落 streamError，team 读模型不受牵连', async () => {
     const store: SessionsStoreLike = { projectionsBySession: { 's-1': { values: { agentTeam: teamView } } } }
-    const h = mountHarness({ sessionId: 's-1', store, injected: injectedOf(failingFollow as CompanyDataInjected['follow']), stream: true })
+    const h = mountHarness({ sessionId: 's-1' as never, store, injected: injectedOf(failingFollow as CompanyDataInjected['follow']), stream: true })
     await h.rerender({})
     expect(h.last().streamError).toBe('boom')
     expect(h.last().tasks[0]?.subject, '任务板仍由投影维持').toBe('出评审意见')
@@ -157,10 +157,10 @@ describe('useCompanyData 订阅生命周期', () => {
     // 包装器必须**调用**底层 follow 返回生成器（返回函数本身会让 for-await 立刻 TypeError 被吞进 streamError）。
     const followOf = (id: SessionId, signal: AbortSignal) => (id === 's-2' ? chB.follow : chA.follow)(id, signal)
     const store: SessionsStoreLike = { projectionsBySession: {} }
-    const h = mountHarness({ sessionId: 's-1', store, injected: injectedOf(followOf as CompanyDataInjected['follow']), stream: true })
+    const h = mountHarness({ sessionId: 's-1' as never, store, injected: injectedOf(followOf as CompanyDataInjected['follow']), stream: true })
     await h.rerender({})
     expect(h.last().activity[0]?.text).toContain('上线')
-    await h.rerender({ sessionId: 's-2' })
+    await h.rerender({ sessionId: 's-2' as never })
     expect(chA.api.signal?.aborted, '旧流必须被中止').toBe(true)
     expect(chB.api.signal).toBeDefined()
     expect(h.last().activity[0]?.text, '活动随新会话重置为新历史').toContain('新会话历史')
@@ -171,7 +171,7 @@ describe('useCompanyData 订阅生命周期', () => {
   it('名册迟到：投影到达后动态里裸 id 换成成员名（不重拉流）', async () => {
     const ch = channel([{ kind: 'history', events: [messageTo('m-9', '给谁的话', 1)] }])
     let store: SessionsStoreLike = { projectionsBySession: {} }
-    const h = mountHarness({ sessionId: 's-1', store, injected: injectedOf(ch.follow), stream: true })
+    const h = mountHarness({ sessionId: 's-1' as never, store, injected: injectedOf(ch.follow), stream: true })
     await h.rerender({})
     expect(h.last().activity[0]?.text, '名册缺席时裸 id 原样').toContain('m-9')
     store = { projectionsBySession: { 's-1': { values: { agentTeam: { ...teamView, members: [...teamView.members, { id: 'm-9', name: 'vp-sales', role: 'teammate', phase: 'active' }] } } } } }

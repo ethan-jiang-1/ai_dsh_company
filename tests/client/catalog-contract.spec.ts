@@ -45,7 +45,7 @@ const INPUT = {
 
 describe('成品目录契约（生成器 ↔ 页签 parser 共钉一份夹具）', () => {
   it('生成器对固定输入产出的就是夹具本身（形状变更先破这里）', () => {
-    expect(buildDeliverablesCatalog(INPUT)).toEqual(FIXTURE)
+    expect(buildDeliverablesCatalog(INPUT as never)).toEqual(FIXTURE)
   })
 
   it('parser 把夹具解析回同一批 entries（不解析 counts——视图从 entries 现算）', () => {

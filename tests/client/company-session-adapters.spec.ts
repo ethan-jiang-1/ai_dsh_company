@@ -46,11 +46,11 @@ describe('company session adapters', () => {
       sessionFrame({ type: 'event', event: { ...event, seq: 8, time: event.time + 1 } }),
       sessionFrame({
         type: 'assistant-stream',
-        frame: { type: 'start', attemptId: 'attempt-1', revision: 1, startedAfterSeq: 8, turn: 1, step: 1 },
+        frame: { type: 'start', attemptId: 'attempt-1', revision: 1, startedAfterSeq: 8, turn: 1, step: 1 } as never,
       }),
     ]
-    const remote: Pick<SessionRemote, 'follow'> = {
-      follow(request, signal) {
+    const remote = {
+      follow(request: any, signal: AbortSignal) {
         requests.push({ address: request.address, signal: signal! })
         return (async function* () { yield* frames })()
       },
@@ -63,7 +63,7 @@ describe('company session adapters', () => {
           : undefined
       },
     }
-    const adapters = createCompanySessionAdapters(sessions, remote)
+    const adapters = createCompanySessionAdapters(sessions, remote as never)
     const signal = new AbortController().signal
 
     expect(adapters.leadOf(child)).toBe(lead)

@@ -243,7 +243,7 @@ describe('记录往返：contexts / 空正文 / 方法回落', () => {
   })
 
   it('旧记录（无 contexts）→ []，其余字段不变', () => {
-    const text = recordText({ ...draft, contexts: undefined })
+    const text = recordText({ ...draft, contexts: undefined as never })
     expect(text).not.toContain('contexts:')
     const parsed = parseRecord('20261023-140200-abcd', text)
     expect(parsed?.contexts).toEqual([])
@@ -252,7 +252,7 @@ describe('记录往返：contexts / 空正文 / 方法回落', () => {
   })
 
   it('坏 contexts JSON → 记录仍在，contextProblem 非空，source 照常', () => {
-    const text = recordText({ ...draft, contexts: undefined }).replace('status: open', 'status: open\ncontexts: {bad json')
+    const text = recordText({ ...draft, contexts: undefined as never }).replace('status: open', 'status: open\ncontexts: {bad json')
     const parsed = parseRecord('20261023-140200-abcd', text)
     expect(parsed).not.toBeNull()
     expect(parsed?.contexts).toEqual([])

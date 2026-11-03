@@ -19,10 +19,13 @@ function deps(mainView = 1) {
   }
 }
 
+const open = (d: ReturnType<typeof deps>, sessionId: string, member: { readonly id: string, readonly role: 'lead' | 'teammate' }) =>
+  makeOpenMember(d as never)(sessionId as never, member)
+
 describe('makeOpenMember', () => {
   it('lead → 直接打开 lead，不查 retain/不 refresh', async () => {
     const d = deps()
-    await makeOpenMember(d)('session-1', { id: 'lead-session', role: 'lead' })
+    await open(d, 'session-1', { id: 'lead-session', role: 'lead' })
     expect(d.leadOf).toHaveBeenCalledWith('session-1')
     expect(d.uiWorkspace.openSession).toHaveBeenCalledWith('lead-session')
     expect(d.sessions.retainInfo).not.toHaveBeenCalled()
@@ -31,14 +34,14 @@ describe('makeOpenMember', () => {
 
   it('teammate 未被 mainView retain → 静默返回，不 refresh/不导航', async () => {
     const d = deps(0)
-    await makeOpenMember(d)('session-1', { id: 'member-1', role: 'teammate' })
+    await open(d, 'session-1', { id: 'member-1', role: 'teammate' })
     expect(d.sessions.refresh).not.toHaveBeenCalled()
     expect(d.uiWorkspace.openSession).not.toHaveBeenCalled()
   })
 
   it('teammate 仍被 retain → refresh 后按 continuable child 打开', async () => {
     const d = deps(1)
-    await makeOpenMember(d)('session-1', { id: 'member-1', role: 'teammate' })
+    await open(d, 'session-1', { id: 'member-1', role: 'teammate' })
     expect(d.sessions.refresh).toHaveBeenCalledTimes(1)
     expect(d.uiWorkspace.openSession).toHaveBeenCalledWith({
       parentSessionId: 'lead-session', childSessionId: 'member-1', mode: 'continuable',
@@ -48,7 +51,7 @@ describe('makeOpenMember', () => {
   it('refresh 失败 → 拒绝原错误，不导航', async () => {
     const d = deps(1)
     d.sessions.refresh.mockRejectedValueOnce(new Error('refresh boom'))
-    await expect(makeOpenMember(d)('session-1', { id: 'member-1', role: 'teammate' })).rejects.toThrow('refresh boom')
+    await expect(open(d, 'session-1', { id: 'member-1', role: 'teammate' })).rejects.toThrow('refresh boom')
     expect(d.uiWorkspace.openSession).not.toHaveBeenCalled()
   })
 })
