@@ -64,6 +64,7 @@
 ## 5. 节奏与授权
 
 - 不默认全量：本地按 §2 选最小证据；CI = 结构门禁 + 干净环境差异；pre-push hook = verify + typecheck + test（typecheck 只覆盖 pack 两面；tests 进 tsc 仍是独立轮，见 2026-11-03 D5 Note）。
+- **关键模块覆盖下限** = [`vitest.config.ts`](../vitest.config.ts) 的 `coverage.thresholds`（context-wiring / member-navigation / title-state / workspace-resolution / runtime-guard / client/index）；跑 `pnpm test:coverage` 验，低于即红；`pnpm test` 不跑覆盖（秒级）。
 - **自测轮**（全门禁 sweep + UX 走查 + entry-probe 语义探针）：agent 阶段收口时提案、用户批后跑（2026-10-04 定）；预算按 [policy §P3](./policy.md) 轻任务纪律。
 - **已知未覆盖面（明说不覆盖）**：多人交互/协作 UX 面——2026-10-06 用户立项首轮猎捕已立 4 个判据探针（dual-ceo / task-discovery / claim-race / dual-signoff，真模型档、常驻，触发见头注）+ 4 张 bug 卡（BUG-002..005 **已修闭环**——修复落地+复跑转绿，卡迁 [_fixed_bugs](../_backlog/_archive/fixed_bugs/)；BUG-006 于 2026-10-07 发现即修。台账 = 那些已修卡，不另留猎捕日记）；机制面 E1/E2 与 `fs-guard-probe` 不变。
 

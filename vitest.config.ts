@@ -14,13 +14,22 @@ export default defineConfig({
   test: {
     include: ['tests/**/*.spec.ts'],
     testTimeout: 30_000,
-    // coverage = **非门禁观察档**（2026-10-21 Phase C5 立：升级地图「coverage 死代码扫描」的可用化；
+    // coverage = **关键模块阈值档**（2026-11-03 Phase 4；原 2026-10-21 观察档升级）。
     // 只统计自写树——tsconfig paths 按设计把 @deepseek-ai/* 指向 vendor src，不收窄会把 vendor
-    // 全树算进来淹没读数。跑法 = `npx vitest run --coverage`；不设阈值、不进门禁（先观察）。
+    // 全树算进来淹没读数。全局不设阈值；下列高风险模块有下限，`pnpm test:coverage` 低于即红。
+    // `pnpm test` 仍不跑 coverage（秒级）；阈值是发布前/独立轮的手动棘轮，不塞进 pre-push。
     coverage: {
       provider: 'v8',
       include: ['packages/company-pack/src/**/*.{ts,tsx}', 'tools/lib/**/*.mjs'],
       reporter: ['text'],
+      thresholds: {
+        'packages/company-pack/src/client/context-wiring.ts': { statements: 90, branches: 85 },
+        'packages/company-pack/src/client/member-navigation.ts': { statements: 95, branches: 80 },
+        'packages/company-pack/src/client/title-state.ts': { statements: 95, branches: 90 },
+        'packages/company-pack/src/host/workspace-resolution.ts': { statements: 85, branches: 75 },
+        'packages/company-pack/src/host/runtime-guard.ts': { statements: 70, branches: 60 },
+        'packages/company-pack/src/client/index.ts': { statements: 65, branches: 10 },
+      },
     },
   },
 })
