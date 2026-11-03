@@ -13,9 +13,9 @@
 | D2 代码/测试层次 | **A-** | 源码 0 环/0 反向边；两条独立守卫；host spec 640→266/198/133 三份；测试文件最大 266 行；公开面 = apply/inject；`isRecord` 收家。残余：6 个源码断言 spec（CSS/装配/parser 面，各自有理由）、15 个 >100 行函数（P3） |
 | D3 文档—执行—验收 | **A-** | 授权门牌/摘要纯指针；语义审 owner policy P5；preset 完成定义 skill 单家；close-out 单家；Plan Mode/五道门 |
 | D4 上下文腐化 | **A-** | content 门禁、退役路径 4 前缀、index 墓碑清除、0.8.1 READY、compat 表述对齐。残余：31 条冻结归档断链（只查 `.md` 目标的门禁边界）、decisions 零头寸 |
-| D5 测试资产 | **A-** | 全量覆盖 **86.72 stmt / 78.65 branch**；CultivationTab 93.75、company-tabs 75.92、catalog 76.29、LedgerTab 97.43、Brand 100、Picker 72.58；dev home **0 skip**；mock 白名单与“参数注入假件”表述对齐。残余：presets 真挂载在 `preset-smoke` 门外（设计分层）；catalog 未覆盖分支（76.29 是主+审计路径） |
+| D5 测试资产 | **A-** | 全量覆盖 **86.72 stmt / 78.65 branch**；CultivationTab 93.75、company-tabs 75.92、catalog 76.29、LedgerTab 97.43、Brand 100、Picker 72.58；dev home **0 skip**；preset 有 keyless YAML schema；mock 白名单与“参数注入假件”表述对齐。残余：presets 真挂载仍在 `preset-smoke`（设计分层）；catalog 未覆盖分支（76.29 是主+审计路径） |
 | D6 反馈通路 | **A-** | isolated golden 两次绿；dev 9/9；diagnose 真会话 `nonzero=2`；客户端错误落盘/刷新留存；启动 tee；`--steps` 点击复现。残余：页面→host log 全链路未用真会话端到端、`pnpm dsh web` 不 tee、证据 7 天保留 |
-| D7 DSH 插件约定 | **A-** | 0.8.1：bundle/patch/preset/client 原生；安装/初始化/卸载/发布真实冒烟；公开面 apply/inject；peers 47；web-only/品牌偏离已写进 README。残余：`workspaceRegistry` 硬 inject（产品面 = web）、品牌只占 name 槽（与官方 brand 共存的最小侵入）、`$DSH_HOME/company/` 自造树（D25/M2 合同） |
+| D7 DSH 插件约定 | **A-** | 0.8.1 发布字节 READY（未 npm publish）：bundle/patch/preset/client 原生；安装/初始化/卸载/发布真实冒烟；公开面 apply/inject；peers 47；web-only/品牌/`dsh.client.inject` 偏离已写进 README。残余：`workspaceRegistry` 硬 inject（产品面 = web）、品牌只占 name 槽（与官方 brand 共存的最小侵入）、`$DSH_HOME/company/` 自造树（D25/M2 合同） |
 
 ## 本轮 A- 批次证据
 
@@ -28,7 +28,7 @@
 
 ```text
 pnpm verify     # ALL PASS（53 门 + 2 无对象）
-pnpm test       # 134 files / 1076 tests（0 skipped）
+pnpm test       # 135 files / 1077 tests（0 skipped）
 pnpm typecheck  # exit 0
 release --verify# 全绿（release-smoke 含卸载/重装；0.8.1）
 release --check # READY 0.8.1（发布字节 commit deb1f38；manifest 随收盘提交重新 stamp；tgz 127 entries）

@@ -301,8 +301,7 @@ export function setPresentedAudit(
   if (presented) {
     // v3 路径是 `.dsh-company/deliverables/<dir>/final.md`：slug 取 final.md 的父目录，
     // 不能按旧 v2 `deliverables/<dir>/final.md` 的 split[1]（那会取到字面 `deliverables`）。
-    const dirName = rel.split('/').slice(-2)[0] ?? ''
-    const slug = dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '')
+    const slug = slugFromDirName(rel.split('/').slice(-2)[0] ?? '')
     if (slug !== '') next = { ...next, slugs: { ...next.slugs, [slug]: true } }
   }
   writePresentedLedger(companyHome, next)

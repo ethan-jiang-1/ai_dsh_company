@@ -49,11 +49,6 @@ export function indexTargetFor(rel) {
   return `../${rel}`
 }
 
-/** 找未出现在 README 的公开脚本（兼容旧判据；新门禁改用 renderScriptInventory）。 */
-export function missingIndexedScripts(scripts, readme) {
-  return scripts.filter(rel => !readme.includes(`](${indexTargetFor(rel)})`))
-}
-
 const labelOf = (rel) => extname(rel) === '.mjs' ? rel.slice(rel.lastIndexOf('/') + 1, -'.mjs'.length) : rel
 
 /** 按行宽折行（只在 ` · ` 分隔处折，保留 Markdown 链接完整）。 */

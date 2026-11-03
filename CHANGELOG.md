@@ -8,19 +8,18 @@
 
 - **交付审计的 slug 写入**：v3 路径下 `setPresentedAudit` 用 `split('/')[1]` 取到字面 `deliverables`，
   presented=true 的 slug 永远写错，归档后按 slug 延续的 catalog 命中会失效。改为取 `final.md` 父目录
-  并剥日期前缀；新增 5 个审计路径用例（含穿越/外部/meta 拒绝）。
+  并剥日期前缀。
 
 ### Changed
 
-- D5 测试与文档：`host/catalog.ts` 覆盖 55.8→76.29%；Picker 补成品目录不可达 problem 态；
-  `docs/testing.md` 区分“模块 mock”与“参数注入式假件”（`probe-web.spec` 属后者）。
+- 背景选择面板在成品目录不可读时显示错误，不再静默空态。
 
 ## 0.8.0 — 2026-11-03
 
 ### Breaking
 
 - 根入口不再 re-export `lib/presence` / `lib/doors`：公开面收窄为 loader 需要的 `apply` / `inject`。
-  若曾从 `dsh-company-pack` 包根 import 这两个读模型，请改从内部模块取，或自行复制。
+  包未提供 `./lib/*` 子路径导出；若曾从包根 import 这两个读模型，需自行复制或从源码取。
 
 ### Changed
 
@@ -28,8 +27,6 @@
   50 → 47；preset 行/import/patch 三源核对，`preset-row-deps` 与 `release-smoke` 复验。
 - README 写清：只支持 web 组合（`workspaceRegistry` 由 web-app 提供，base-only/headless 不加载本包）；
   品牌只占 `sidebar.brand.name`，保留官方 mark/hero（与 `ui-brand-official` 共存的最小侵入）。
-- 文档/测试：D1 checks 库存生成化 + 32/32 when-to-read；D2 640 行 host spec 拆三族、`isRecord` 收家；
-  D5 五页签体补渲染、台账 live 路径修正（dev home skip 归零）。过程证据见 `notes/implemented/2026-11-03-*`。
 
 ## 0.7.2 — 2026-11-03
 

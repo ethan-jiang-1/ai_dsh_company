@@ -11,7 +11,7 @@ opened: 2026-11-03
 
 **问题与期望结果：** 用户要求以 fresh agent 视角重评七个维度（文档/代码渐进披露、代码与测试层次、文档—执行—验收结构、上下文腐化、测试资产、反馈通路、DSH 插件约定），并先评估、REVIEW 后再持续改善。期望结果 = 一份带 file:line 与实跑读数的分级发现 + 一个经用户选批的改善序列。
 
-**当前情况：** 七维已全部 A-（D1/D2/D5/D7 已从 B+ 提升；D3/D4/D6 维持）；0.8.1 READY（发布字节 commit deb1f38；manifest 随收盘提交重新 stamp）。第五轮审计已完成，报告 = [七维审计](../research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)。**批次 A + E 部分 + B（授权门牌）+ C（0.7.2 重打）已落地**（R5-01/02/08/10/11/21/22/30/31/33，R5-06 培养壳；Note 见「已落地」节）。当前读数：`pnpm verify` 53 门 ALL PASS + 2 SKIP；`pnpm test` **134 spec / 1076 例（0 skipped on dev home）**；版本 **0.8.1**（catalog 修复，`release --verify` 全绿）；`pnpm typecheck` exit 0；`release-smoke` **44 PASS**（含卸载/重装）；`release --check` **READY 0.8.1**（发布字节 commit deb1f38；manifest 随收盘提交重新 stamp）；`client-load-smoke` ALL PASS；`ui-scene-smoke`（dev + isolated golden）9/9 页签 ALL PASS。审计基线（before）见报告。七维评分：D1 B / D2 B / D3 B- / D4 C+ / D5 B / D6 C / D7 B-。
+**当前情况：** 七维已全部 A-（D1/D2/D5/D7 已从 B+ 提升；D3/D4/D6 维持）；0.8.1 READY（发布字节 commit deb1f38；manifest 随收盘提交重新 stamp）。第五轮审计已完成，报告 = [七维审计](../research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)。**批次 A + E 部分 + B（授权门牌）+ C（0.7.2 重打）已落地**（R5-01/02/08/10/11/21/22/30/31/33，R5-06 培养壳；Note 见「已落地」节）。当前读数：`pnpm verify` 53 门 ALL PASS + 2 SKIP；`pnpm test` **135 spec / 1077 例（0 skipped on dev home）**；版本 **0.8.1**（catalog 修复，`release --verify` 全绿）；`pnpm typecheck` exit 0；`release-smoke` **44 PASS**（含卸载/重装）；`release --check` **READY 0.8.1**（发布字节 commit deb1f38；manifest 随收盘提交重新 stamp）；`client-load-smoke` ALL PASS；`ui-scene-smoke`（dev + isolated golden）9/9 页签 ALL PASS。审计基线（before）见报告。七维评分：D1 B / D2 B / D3 B- / D4 C+ / D5 B / D6 C / D7 B-。
 
 **未决问题：** 七维已全部复评 ≥ A-（0.8.1）。剩余 = 文档化边界：D7 web-only/品牌最小侵入/`$DSH_HOME/company/` 合同；D5 presets 真挂载在 preset-smoke；D6 全链路与证据寿命。外部决策 = npm publish/市场托管、真模型/Desktop 验收。
 
@@ -46,6 +46,7 @@ opened: 2026-11-03
 - D5 批次：五页签体补静态渲染（company-tabs 53.7→75.92%）；台账 live 路径修正，3 例永久 skip 归零。Note = [d5-tabs-ledger-skip](../../notes/implemented/2026-11-03-d5-tabs-ledger-skip.md)。
 - D7 批次：0.8.0（公开面收窄 breaking）；peers 50→47；web-only/品牌偏离文档化。Note = [release-0.8.0](../../notes/implemented/2026-11-03-release-0.8.0.md)。
 - D5 收尾：catalog 审计路径补测（抓到 v3 slug bug 并修复）；Picker problem 态；mock 白名单表述对齐。Note = [d5-catalog-audit](../../notes/implemented/2026-11-03-d5-catalog-audit.md)；发布 = [release-0.8.1](../../notes/implemented/2026-11-03-release-0.8.1.md)。
+- Review 修补：CHANGELOG 去过程证据、迁移提示修正、lock importer 清已删 peer、slug 去重、preset YAML schema、skip 预算守卫。Note = [review-integrity-fixes](../../notes/implemented/2026-11-03-review-integrity-fixes.md)。
 - 台账页签 ready 路径补渲染（统计/行/成品/不可读）；删 `parseMotionLedger`/`parseCatalog` 两条源码断言。Note = [ledger-tab-ready](../../notes/implemented/2026-11-03-ledger-tab-ready.md)。；Note = [ledger-summary-behavior](../../notes/implemented/2026-11-03-ledger-summary-behavior.md)。
 - `docs/index.md` 去掉「决策台账（已迁）」「外部研究材料登记（已迁）」两个墓碑节；`docs/testing.md` 直接链 `external-research.md`；`AGENTS.md` 的 §11/§13 旧节引用改指 `policy §P4/§P5`。
 

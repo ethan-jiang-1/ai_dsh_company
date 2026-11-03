@@ -137,6 +137,7 @@ rm -f  <DSH_HOME>/storages/company_run_bundle_ledger.json
 ## 已知限制（随行为变更同 diff 更新）
 
 - **只支持 web 组合**：`company-client` 的 `inject` 声明 `workspaceRegistry`（由 web-app 组合提供）；base-only / headless profile 不加载本包。这不是缺陷，是本包的 app surface = Web（[release.md](../../docs/release.md) 六轴）。
+- **`dsh.client.inject` 的 8 条边** = 本包 client 模块 factory 的真实依赖（不是 bundle require）；删除需上游合同/证据，故保留。
 - **品牌只替换 name 槽**：client 面只占 `sidebar.brand.name`，保留官方 mark 与 `conversation.hero.brand.mark`；这是与 `ui-brand-official` 的 `single` 槽共存的最小侵入，不是“完整皮肤”。
 - **侧栏内容搜索保持 DSH 出厂行为**：本包不再替换 host 的 `session-query-sqlite`——改值替换会让默认的应用内安装（Plugins 页/`plugin_manager`）在 live recomposition 时报 `file-upload: Agent resolver is already registered`。`company-session-search` 隔离组只给角色 `session_search` 工具用；DSH 侧栏 `session/search` 保持出厂 `openAt: never`（有会话时搜索会报禁用），不是本包承诺。
 - **侧栏角色色调只借平台令牌**：CEO 用 adaptive 的 `--dsw-alias-*` 品牌对（浅/深主题自动反转），其余四色用 **static 色相**（blue/green/amber/red，固定值、两主题同观感）+ 按底色选的黑/白字（对比度实测见探针 G6）——**不是**上游策展的分类色板（那份仍缺，见角色身份 UX 提案开放问题 2），换主题观感不一致处即此债。

@@ -238,8 +238,8 @@ git -C vendor/dsh rev-parse 'dsh-v0.2.1-rc.2^{commit}'
 | D2 | A- | 0 环/0 反向边；640 行 spec 拆三份；公开面 apply/inject；残余 6 个源码断言 spec/P3 长函数 |
 | D3 | A- | 授权单一真相源；语义审/完成定义/收尾各单家 |
 | D4 | A- | content/退役路径/READY/兼容表述；残余冻结归档断链与 decisions 零头寸 |
-| D5 | A- | 覆盖 86.72/78.65；company-tabs 75.92、catalog 76.29、skip 0；presets 真挂载在 preset-smoke |
+| D5 | A- | 覆盖 86.72/78.65；company-tabs 75.92、catalog 76.29、skip 0；preset keyless YAML schema；真挂载在 preset-smoke |
 | D6 | A- | isolated golden/诊断/错误留痕/tee/--steps；残余为全链路与证据寿命边界 |
-| D7 | A- | 0.8.1 发布；peers 47；web-only/品牌偏离文档化；workspaceRegistry 是 web 产品面 |
+| D7 | A- | 0.8.1 发布字节 READY（未 npm publish）；peers 47；web-only/品牌/inject 偏离文档化；workspaceRegistry 是 web 产品面 |
 
-详见 [A- 收口 Note](../../../notes/implemented/2026-11-03-a-minus-closeout.md)。
+详见 [A- 收口 Note](../../../notes/implemented/2026-11-03-a-minus-closeout.md)；两轴 review 的修补与字面残余 = [review-integrity-fixes](../../../notes/implemented/2026-11-03-review-integrity-fixes.md)。

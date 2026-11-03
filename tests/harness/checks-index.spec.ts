@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { indexTargetFor, missingIndexedScripts, renderScriptInventory, scanPublicScripts } from '../../tools/lib/checks-index.mjs'
+import { indexTargetFor, renderScriptInventory, scanPublicScripts } from '../../tools/lib/checks-index.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 
 describe('checks-index 纯逻辑', () => {
@@ -35,12 +35,4 @@ describe('checks-index 纯逻辑', () => {
     expect(scripts.some(rel => rel.startsWith('checks/gates/'))).toBe(false)
   })
 
-  it('只报告未链接的公开脚本', () => {
-    const readme = '[a](smoke/a.mjs) [b](../probes/team/b.mjs)'
-    expect(missingIndexedScripts([
-      'checks/smoke/a.mjs',
-      'probes/team/b.mjs',
-      'tools/c.mjs',
-    ], readme)).toEqual(['tools/c.mjs'])
-  })
 })

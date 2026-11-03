@@ -1,10 +1,20 @@
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { createRequire } from 'node:module'
 import { describe, expect, it } from 'vitest'
 
 const PACK = join(ROOT, 'packages/company-pack')
 const PRESETS_DIR = join(PACK, 'presets')
+const yaml = createRequire(join(ROOT, 'vendor/dsh/package.json'))('js-yaml') as {
+  load(text: string, options?: unknown): unknown
+  Type: new (tag: string, options: { kind: string, construct: (data: string) => string }) => unknown
+  DEFAULT_SCHEMA: { extend(types: unknown[]): unknown }
+}
+// DSH 的 preset 用 `!!js` 表达式；schema 校验只把它当字符串，不求值。
+const YAML_SCHEMA = yaml.DEFAULT_SCHEMA.extend([
+  new yaml.Type('tag:yaml.org,2002:js', { kind: 'scalar', construct: data => data }),
+])
 
 /** 公司五角色（本文件持独立字面量 = 独立事实源：与 presets/ 目录内容互相印证——若改为 import
  * 共享常量，常量被误删一角时本文件会静默跳过该角色的全部断言，守卫即失效）。 */
@@ -52,6 +62,26 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       expect(text, `${role} 的 config.id 必须等于角色 id`).toMatch(new RegExp(`^\\s+id: ${role}$`, 'm'))
       expect(text, `${role} 缺 config.plugins`).toMatch(/^\s+plugins:$/m)
       // 真正"挂得上"的完成定义在 preset-smoke（真 web 逐角色建会话）——这里只守声明形状。
+    }
+  })
+
+  it('YAML 结构可解析：顶层数组 → insert → dsh-agent-preset → config.plugins（R5-15 keyless schema）', () => {
+    for (const role of [...ROLES, 'researcher']) {
+      const docs = yaml.load(roleYml(role), { schema: YAML_SCHEMA }) as Array<{ insert?: Array<{ name?: string, config?: { id?: string, plugins?: Array<{ id?: string, name?: string }> } }> }>
+      expect(Array.isArray(docs), `${role} 顶层必须是数组`).toBe(true)
+      const insert = docs[0]?.insert
+      expect(Array.isArray(insert), `${role} 缺 insert 数组`).toBe(true)
+      const row = insert?.find(item => item?.name === '@deepseek-ai/dsh-agent-preset')
+      expect(row, `${role} 缺 dsh-agent-preset 行`).toBeDefined()
+      expect(row?.config?.id, `${role} config.id 必须等于角色 id`).toBe(role)
+      const plugins = row?.config?.plugins
+      expect(Array.isArray(plugins), `${role} 缺 config.plugins`).toBe(true)
+      const ids = (plugins ?? []).map(plugin => plugin?.id)
+      expect(new Set(ids).size, `${role} config.plugins 有重复 id`).toBe(ids.length)
+      for (const plugin of plugins ?? []) {
+        expect(typeof plugin.id, `${role} 插件行缺 id`).toBe('string')
+        expect(typeof plugin.name, `${role} 插件行缺 name`).toBe('string')
+      }
     }
   })
 

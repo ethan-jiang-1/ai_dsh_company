@@ -262,5 +262,3 @@ describe('/cultivation 注册命令的 host 行为', () => {
     })
   })
 })
-
-
