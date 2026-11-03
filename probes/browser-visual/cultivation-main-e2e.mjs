@@ -9,7 +9,8 @@
 // 成本：**真模型 2 次短调用**（新会话首启 1 次 + 培养对话 1 次）+ chromium；dev home（有密钥）。
 // 用法：source run/env.sh && node probes/browser-visual/cultivation-main-e2e.mjs [--shots]
 //
-// ⚠ 与其他培养档的分工：cultivation-gui-probe 从侧栏页签进（面板复用，隔离 home、keyless）；
+// ⚠ 与其他培养档的分工：页签点击交互归 `checks/smoke/ui-scene-smoke.mjs --steps`（原 cultivation-gui-probe
+// 已于 2026-11-03 第六轮删除：v3 的宿主形状变了、未迁移；证据在 git 历史）；
 //   本档从会话头第三个 tab 进——主视图与独立培养会话**只在主视图存在**，且独立会话要真模型才有回复。
 //   本档会在 dev 公司盘写自己前缀的记录并清理；创建的独立培养会话留在侧栏（真实使用痕迹，不删）。
 //

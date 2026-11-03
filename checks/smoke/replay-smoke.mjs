@@ -26,7 +26,8 @@
 //   （slots 的 tool.call.toolview keyed 注册），行不进组合卡永不渲染（红证即摘行）。
 // sidecar 为什么自算：vendor suite.ts 的 format*Snapshot 有 vitest 依赖，纯 Node 驱动 import
 //   不了；格式（{initial, changes} + <!-- system/message change N --> 分隔）照抄其源码。
-// 浏览器档旧实现（--ui，已停用）住在 ./lib/replay-ui.mjs（2026-10-14 拆出）：vendor apps/web/tests/scaffold.ts
+// 浏览器档旧实现（--ui，已停用）曾住 ./lib/replay-ui.mjs（2026-10-14 拆出；2026-11-03 第六轮删除，
+// 需要时从 git 历史取）：vendor apps/web/tests/scaffold.ts
 //   import vitest 不能直接 import，normalizeAria/captureStableAria 等为逐行转写（出处注在该文件函数头）。
 // 分层（guides/dev-loop §9.1 + readiness P1.4）：第三档（无 key、但要起进程与浏览器），不进 pnpm test。
 // 预算（§10）：墙钟 ≤ --wall。

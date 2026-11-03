@@ -16,3 +16,4 @@ opened: 2026-11-03
 | 文件 | 作用 | 日期 |
 |---|---|---|
 | [2026-11-03-seven-dimension-audit-round6.md](2026-11-03-seven-dimension-audit-round6.md) | 七维评分、分级发现（R6-01…12）、与第五轮关系、A–G 分批计划、实跑读数 | 2026-11-03 |
+| [2026-11-03-context-rot-deep-dive.md](2026-11-03-context-rot-deep-dive.md) | D4 深挖：八条腐化通道、实跑验证、处置与次序 | 2026-11-03 |

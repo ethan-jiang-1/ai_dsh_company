@@ -18,7 +18,7 @@
    **边界（明说不做）**：它不写会话日志——client 没有往 session 追加事件的合法通道，自造 vendor 机制违反 D13；
    所以它是「用户/agent 通过真页面车道可见」，不是「模型下一轮上下文可见」。这条边界写进模块头注与 CDP 指南。
 3. **`replay-smoke --ui` 显式停用**：本仓没有声明 uiEvidence 的场景/金样；`--ui`/`--refresh-ui` 直接 exit 2
-   并指向 `ui-scene-smoke`；`checks/smoke/lib/replay-ui.mjs` 标「已耗（2026-10-27）」，等功能场景回归时复用。
+   并指向 `ui-scene-smoke`；`replay-ui` 标「已耗（2026-10-27）」（2026-11-03 第六轮删除；需要时从 git 历史取）。
 4. **门禁的「无对象」独立成 SKIP**：`run-gates` 新增 `skip(name, reason)` 与 `EXPECTED_SKIPS` 白名单；
    `replay-fixture-freshness`（0 个需查注入面的 runnable 场景）与 `replay-ui-freshness`（0 份金样）
    从 `PASS ×0` 改为 `SKIP`，最终摘要写明「N 门无对象」。新增跳过必须显式登记，否则红（防静默全跳）。

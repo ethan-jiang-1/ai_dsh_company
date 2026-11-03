@@ -30,7 +30,7 @@
 - `pnpm test`：118 files / 1018 tests PASS。
 - `pnpm typecheck`：exit 0。
 - `pnpm verify`：ALL PASS；2 门无对象 SKIP。
-- 真浏览器 `node probes/browser-visual/cultivation-gui-probe.mjs --isolated`（先 `tsc -b` + `tsdown`，mtime 守卫拒旧 lib）：ALL PASS。⑤b 显式选 CFO 前提交禁用 + 提示在场，选后记录 `targetRole: cfo`；⑤e 验证无依据不发、有用/失败两条历史、失败不撤回；其余采纳/日志/角色闸/背景/零挂载全绿。
+- 真浏览器 `node cultivation-gui-probe --isolated`（先 `tsc -b` + `tsdown`，mtime 守卫拒旧 lib）：ALL PASS。⑤b 显式选 CFO 前提交禁用 + 提示在场，选后记录 `targetRole: cfo`；⑤e 验证无依据不发、有用/失败两条历史、失败不撤回；其余采纳/日志/角色闸/背景/零挂载全绿。
 - 诚实边界：主任务仍是“一个入口 → 选纠正/建议 → 旧表单”，不是原型的自然语言案例工坊；自纠正仍同时出现在两个列表，只是状态语言不再矛盾；真人新手走查仍未执行。
 
 ## 边界

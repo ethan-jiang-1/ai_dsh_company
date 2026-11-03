@@ -30,9 +30,9 @@
 [authorship-audit](audit/authorship-audit.mjs) · [candidate-scan-eval](audit/candidate-scan-eval.mjs)
 [deliverables-check](audit/deliverables-check.mjs) · [journal-audit](audit/journal-audit.mjs)
 
-## 窄机制与视觉探针（probes/，58）
+## 窄机制与视觉探针（probes/，57）
 
-### browser-visual（18）
+### browser-visual（17）
 
 [attention-panel-probe](../probes/browser-visual/attention-panel-probe.mjs)
 [board-drift-probe](../probes/browser-visual/board-drift-probe.mjs)
@@ -40,7 +40,6 @@
 [budget-panel-probe](../probes/browser-visual/budget-panel-probe.mjs)
 [cdp-probe](../probes/browser-visual/cdp-probe.mjs)
 [compact-view-probe](../probes/browser-visual/compact-view-probe.mjs)
-[cultivation-gui-probe](../probes/browser-visual/cultivation-gui-probe.mjs)
 [cultivation-main-e2e](../probes/browser-visual/cultivation-main-e2e.mjs)
 [cultivation-ux-scenarios](../probes/browser-visual/cultivation-ux-scenarios.mjs)
 [cultivation-ux-walkthrough](../probes/browser-visual/cultivation-ux-walkthrough.mjs)
@@ -115,6 +114,6 @@
 [snapshot-motion](../tools/snapshot-motion.mjs) · [snapshot-path](../tools/snapshot-path.mjs)
 [sync-dsh](../tools/sync-dsh.mjs)
 
-## 结构门禁（checks/gates/，55 个模块）
+## 结构门禁（checks/gates/，57 个模块）
 
 清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，接线一致性由 `gate-wiring` 门禁强制。

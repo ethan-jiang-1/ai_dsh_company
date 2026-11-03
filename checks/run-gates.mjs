@@ -64,6 +64,8 @@ import * as snapshotIndex from './gates/snapshot-index.mjs'
 import * as guardRedRecord from './gates/guard-red-record.mjs'
 import * as specDuplicates from './gates/spec-duplicates.mjs'
 import * as linkDebt from './gates/link-debt.mjs'
+import * as retiredClaims from './gates/retired-claims.mjs'
+import * as commandRefs from './gates/command-refs.mjs'
 import * as securityScan from './gates/security-scan.mjs'
 import * as trackedToken from './gates/tracked-token.mjs'
 import * as trackedSecrets from './gates/tracked-secrets.mjs'
@@ -135,6 +137,8 @@ snapshotIndex.run(ctx)
 guardRedRecord.run(ctx)
 specDuplicates.run(ctx)
 linkDebt.run(ctx)
+retiredClaims.run(ctx)
+commandRefs.run(ctx)
 securityScan.run(ctx)
 trackedToken.run(ctx)
 trackedSecrets.run(ctx)

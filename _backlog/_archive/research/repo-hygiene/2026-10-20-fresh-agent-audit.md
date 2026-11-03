@@ -226,7 +226,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
      `aria-label`、行数、空态/错误态），也没有断言可见性/尺寸/遮挡。空面板、零高度、被模态盖住
      都可能过。
    - 失败时只打印 JSON verdict，没有截图/aria/console 落盘；`--keep-browser` 也救不了事后复盘。
-2. **失败现场是 ephemeral + overwritten**：`checks/smoke/lib/replay-ui.mjs` 第 101–105 行 把
+2. **失败现场是 ephemeral + overwritten**：`replay-ui` 第 101–105 行 把
    `replay-ui-fail.png`、`replay-ui-fail.aria`、`replay-ui-console.log` 写到 `/tmp` 固定路径；
    `:250–251` 又写 `/tmp/replay-ui-after-click.aria`。下一次运行覆盖同名文件；跨会话无法回溯。
    `client-load-smoke` / `cdp-probe` 失败没有截图。`runtime/README.md` 的 tmp 出口表也没登记这些路径。
@@ -312,7 +312,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
   成本预算改成「场景 + 热/冷」而不是单点秒数。
 - `tests/README.md` 的「改动面→最窄检查」：client 面板行补 `cdp-probe`（全页签 + 内容标记）与
   对应 visual probe；成品目录行补 `deliverables-catalog-probe`；安装行补 researcher。
-- `checks/smoke/lib/replay-ui.mjs`：失败现场改写到 `runtime/harness-home/replay-diagnosis/<scenario>-<timestamp>/`
+- `replay-ui`：失败现场改写到 `runtime/harness-home/replay-diagnosis/<scenario>-<timestamp>/`
   （截图/aria/console/URL），不再用 `/tmp` 固定名；成功运行也保留一份可选的 console 摘要。
 - `client-load-smoke` / `cdp-probe` 失败时复用同一个 `captureFailure` helper（截图 + aria + console + URL）。
 - `replay-smoke` 的 `check` 增加 `skip()` 原语；presence 档只打印 summary（PASS/SKIP/FAIL 计数），

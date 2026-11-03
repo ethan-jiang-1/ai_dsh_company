@@ -3,7 +3,8 @@
  *
  * 为什么单独立一条：面板按钮与创作表单**只经由这一个模块发命令**——线构造错了，真机上就是
  * 「点了没反应 / 命令没解析」；host 的错误文本丢掉了，人就得回会话里翻原因（UX 卡第一号风险）。
- * 真机制（命令执行、方法层落盘）在真机档：`probes/browser-visual/cultivation-gui-probe.mjs`。
+ * 真机制（命令执行、方法层落盘）在真机档：`checks/smoke/ui-scene-smoke.mjs --steps` 与
+ * `probes/session-context/cultivation-method-layer-probe.mjs`（原 cultivation-gui-probe 已删除）。
  * 红证（先红后绿）：本 spec 在模块存在前 import 即红（见毕业 Note 的验证节）。
  */
 import type { SessionId } from '@deepseek-ai/dsh-session/types'

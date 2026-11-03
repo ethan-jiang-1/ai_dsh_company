@@ -32,7 +32,7 @@
 | S3 无困惑重排 | 同上（待办置顶；journal 改「素材（不用你操作）」；「我提交的」加「等对方处理；你无需操作」；「怎么养」改写为"点哪里"，命令语法收进折叠的「熟手命令行」） |
 | S4 判断材料 | `src/lib/cultivation.ts`（`CultivationRecord.body` 进客户端读模型——修订原先"正文不暴露给客户端"的注记，理由 = 人不下无证据的判断）+ 面板就地展开 |
 | S5 创作面 | `CultivationCompose.tsx`（顶部两个入口 + 期望单行 / 正文多行 / 建议选角色 + 校验：非空、期望句不得含 `::`）+ 提交后刷新并高亮新行 |
-| S6 真机验收 | `probes/browser-visual/cultivation-gui-probe.mjs` + 视觉夹具 `snapshots/visual/cultivation-gui/panel.png` |
+| S6 真机验收 | `cultivation-gui-probe` + 视觉夹具 `snapshots/visual/cultivation-gui/panel.png` |
 
 ## 实跑证据（红 → 绿）
 
@@ -46,7 +46,7 @@
 | 读模型（S4）：`pnpm exec vitest run tests/company/cultivation.spec.ts` | 25/25 PASS（新增「正文进客户端读模型：多行原样带出」） |
 | 全量 keyless：`pnpm test` | **64 files / 616 tests PASS** |
 | 真挂载：`source run/env.sh && node checks/smoke/client-load-smoke.mjs` | ALL PASS（真浏览器零挂载失败；新注入面 `remote.commands` 不炸） |
-| 真行为：`source run/env.sh && node probes/browser-visual/cultivation-gui-probe.mjs [--fixture]` | **ALL PASS**：① 面板走人在界面上的真路径打开、把手只给本角色；② 点「采纳」→ 公司盘记录翻 `adopted` + `methodSlug` + 方法 `SKILL.md` 落 `<DSH_HOME>/company/methods/<role>/`；③ 该会话日志 `command/run` 与 `command/done` **按 commandId 配对**、`source.kind=user`、args 含本次采纳线；④ 跨角色采纳被 host 拒（文案含「仅建议权」）；⑤ 创作表单提交 → 公司盘新增 `status: open` 记录（`proposerKind: human`）；⑥ 零挂载失败；⑦ 出视觉夹具 |
+| 真行为：`source run/env.sh && node cultivation-gui-probe [--fixture]` | **ALL PASS**：① 面板走人在界面上的真路径打开、把手只给本角色；② 点「采纳」→ 公司盘记录翻 `adopted` + `methodSlug` + 方法 `SKILL.md` 落 `<DSH_HOME>/company/methods/<role>/`；③ 该会话日志 `command/run` 与 `command/done` **按 commandId 配对**、`source.kind=user`、args 含本次采纳线；④ 跨角色采纳被 host 拒（文案含「仅建议权」）；⑤ 创作表单提交 → 公司盘新增 `status: open` 记录（`proposerKind: human`）；⑥ 零挂载失败；⑦ 出视觉夹具 |
 | 结构：`pnpm verify` | ALL PASS |
 
 夹具（`snapshots/visual/cultivation-gui/panel.png`，1440×1000）当场抓到一个真实 UX 缺陷并已修：培养行沿用窄列布局，

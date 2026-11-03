@@ -29,7 +29,7 @@
 |---|---|---|---|
 | 代码包（plugin package） | npm 包，导出 Cordis 插件 | 有没有**新代码**（自定义工具/服务/流） | 只在角色需要专属工具时才出现 |
 | bundle（`dsh.bundle.patch`） | pack 的 `cordis.patch.yml` | 装进来时默认加哪些**行** | company pack 的 host 层共享行 |
-| profile / patch | `$DSH_HOME/profiles/<p>` | 部署级组合选择 | 开发用 `web` profile（共享行 + team 行 + registry 行）；`company` profile 已退役 |
+| profile / patch | `$DSH_HOME/profiles/<p>` | 部署级组合选择 | 产品入口 = `company` profile（CLI 从 web 模板建；v3 起不再是「已退役」）；GUI 安装落当前 profile（装进 `web` 就用 `web`） |
 | **agent preset** | 一个目录一个 `agent.cordis.yml` | **一个会话**挂什么（工具/prompt sections/skills/persona） | **每个角色一个 preset** |
 
 依据：`vendor/dsh/docs/architecture.md` 的组合链（package → bundle → profile/patch → app 启动 Loader）；

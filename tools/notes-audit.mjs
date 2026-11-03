@@ -56,7 +56,29 @@ try {
   console.error(`notes-audit: ${error.message}`)
   process.exit(2)
 }
-const result = auditNotes(notes, { root })
+/** 当前文档（docs + 根 README/AGENTS + _backlog 活区；归档不算阅读路径）——第二个 orphan 口径的输入。 */
+function currentDocs() {
+  const out = ['AGENTS.md', 'README.md', 'tests/README.md', 'checks/README.md', 'packages/company-pack/README.md']
+    .filter(file => existsSync(join(root, file)))
+    .map(file => ({ file, text: readFileSync(join(root, file), 'utf8') }))
+  for (const dir of ['docs', '_backlog']) {
+    const full = join(root, dir)
+    if (!existsSync(full)) continue
+    const walk = (abs, rel) => {
+      for (const entry of readdirSync(abs, { withFileTypes: true })) {
+        if (entry.name === 'node_modules') continue
+        if (dir === '_backlog' && entry.name === '_archive' && entry.isDirectory()) continue
+        const child = `${rel}/${entry.name}`
+        if (entry.isDirectory()) walk(join(abs, entry.name), child)
+        else if (entry.name.endsWith('.md')) out.push({ file: child, text: readFileSync(join(abs, entry.name), 'utf8') })
+      }
+    }
+    walk(full, dir)
+  }
+  return out
+}
+
+const result = auditNotes(notes, { root, externalDocs: currentDocs() })
 result.summary.receiptsArchived = receipts.length
 
 if (asJson) {
@@ -80,7 +102,8 @@ if (asJson) {
   list('无决定节', summary.noDecision)
   list('死路径', summary.deadPaths, true)
   list('取代缺回链', summary.missingBacklinks, true)
-  list('零 Note 入链（docs 路由不计）', summary.orphans)
+  list('零 Note 入链（仅 note→note）', summary.orphans)
+  list('零任何当前文档入链（notes + docs + _backlog 活区）', summary.orphansAnyDoc)
   list('状态行不符', summary.statusMismatch)
   process.stdout.write('提示：机械面只出候选；语义分诊 = .agents/skills/notes-consistency-audit/SKILL.md\n')
 }

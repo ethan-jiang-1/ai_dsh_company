@@ -177,7 +177,7 @@ export function supersessionBacklinks(notes) {
 /**
  * 审计一组 Note。
  * @param {ReadonlyArray<{file: string, text: string}>} notes 相对仓库根的路径 + 全文
- * @param {{root?: string, exists?: (p: string) => boolean}} [options]
+ * @param {{root?: string, exists?: (p: string) => boolean, externalDocs?: ReadonlyArray<{file: string, text: string}>}} [options]
  */
 export function auditNotes(notes, options = {}) {
   const root = options.root ?? process.cwd()
@@ -190,6 +190,14 @@ export function auditNotes(notes, options = {}) {
     for (const target of noteLinks(note.file, note.text)) {
       if (target === normalize(note.file)) continue
       if (byFile.has(target)) inbound.set(target, inbound.get(target) + 1)
+    }
+  }
+  // 2026-11-03（第六轮 D4-6）：`orphans` 只数 note→note 链接，会被读成"N 篇孤立"。同一批 Note 从
+  // docs/_backlog/README 被点到时其实有人读。第二个口径 = 任何**当前**文档（不含归档）的入链。
+  const inboundAny = new Map(notes.map(n => [normalize(n.file), inbound.get(normalize(n.file)) ?? 0]))
+  for (const doc of options.externalDocs ?? []) {
+    for (const target of noteLinks(normalize(doc.file), doc.text)) {
+      if (byFile.has(target)) inboundAny.set(target, (inboundAny.get(target) ?? 0) + 1)
     }
   }
 
@@ -210,6 +218,7 @@ export function auditNotes(notes, options = {}) {
       lifecycle,
       lines: note.text.split('\n').length,
       inbound: inbound.get(file) ?? 0,
+      inboundAny: inboundAny.get(file) ?? 0,
       outbound: links.length,
       receipt,
       hasDecision: hasDecisionSection(note.text),
@@ -233,6 +242,7 @@ export function auditNotes(notes, options = {}) {
         .filter(row => row.missingBacklinks.length > 0)
         .map(row => ({ file: row.file, links: row.missingBacklinks })),
       orphans: pick(row => row.lifecycle === 'implemented' && row.inbound === 0),
+      orphansAnyDoc: pick(row => row.lifecycle === 'implemented' && row.inboundAny === 0),
       statusMismatch: pick(row => row.statusMismatch),
     },
   }

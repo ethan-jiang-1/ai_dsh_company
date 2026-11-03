@@ -51,7 +51,7 @@
 | `node checks/smoke/revoke-recovery-smoke.mjs` | ALL PASS（真 host 启动回滚/补完两态） |
 | `node checks/smoke/client-load-smoke.mjs` | ALL PASS |
 | `node checks/smoke/multi-window-banner-smoke.mjs` | ALL PASS（同源两页面横幅） |
-| `node probes/browser-visual/cultivation-gui-probe.mjs --summary` | ALL PASS（未展开 11 / 坏记录 1） |
+| `node cultivation-gui-probe --summary` | ALL PASS（未展开 11 / 坏记录 1） |
 
 红证：临时把 `recoverPendingRevoke` 的 `isTarget` 改成 `includes('revokedAt:')` → BUG-033 用例红（`expected "conflict", received "rolled-back"`）；还原绿。
 

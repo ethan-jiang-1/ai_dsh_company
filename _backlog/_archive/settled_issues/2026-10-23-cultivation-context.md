@@ -721,7 +721,7 @@ contexts: {"v":1,"items":[{"kind":"deliverable","ref":"<workspace-relative-path>
 3. **客户端数据**：`cultivation-context-data.ts` 的列会话/读轮次/读成品；用 fake sessions/files/catalog 测。
 4. **选择面板 + 表单**：`CultivationContextPicker`、`CultivationCompose` 背景 state、默认当前轮、动态文案；交互 spec。
 5. **审批行**：`CultivationBoard` 背景卡、展开、打开回调、空正文、坏 contexts；静态 + 交互 spec。
-6. **真浏览器**：扩 `probes/browser-visual/cultivation-gui-probe.mjs` 或新 probe；出视觉夹具；窄栏/浮窗。
+6. **真浏览器**：扩 `cultivation-gui-probe` 或新 probe；出视觉夹具；窄栏/浮窗。
 7. **结构门禁**：`pnpm verify`；`pnpm test`；`client-load-smoke`。
 8. **文档与 Note**：同 diff 更新 [docs/presets.md](../../../docs/presets.md) 的 `/cultivation` 合同（可选背景 / 空正文 / 记录 `contexts`）；按 [notes/README](../../../notes/README.md) 写实施 Note（决定、输掉的方案、红/绿证据）。本卡只做决策与交接，§6.1 不是实施授权。
 
@@ -786,7 +786,7 @@ contexts: {"v":1,"items":[{"kind":"deliverable","ref":"<workspace-relative-path>
 
 ### 7.4 真浏览器（probe）
 
-扩展现有 [cultivation-gui-probe.mjs](../../../probes/browser-visual/cultivation-gui-probe.mjs) 或新 probe，至少：
+扩展现有 cultivation-gui-probe（2026-11-03 删除） 或新 probe，至少：
 
 1. 从真实会话打开培养页 → 打开 correct → 确认默认背景卡是当前会话最近一轮 → 只写期望、正文空 → 提交 → 公司盘记录含 `contexts` + 人话 `source` → 审批行显示背景卡。
 2. 打开 suggest → 选 CFO → 选一份真实成品（或探针夹具）→ 只写期望 → 提交 → 记录 `targetRole: cfo`、`contexts.kind = deliverable`；CFO 侧收件箱可见；打开原文可用。

@@ -2,6 +2,7 @@
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { renderInstallManual } from '../../tools/lib/install-manual.mjs'
 import { expectedTag } from './lib/pin.mjs'
 
 // ── 2g. 手动分发手册版本 + 安装形状门禁（2026-09-28 立；2026-11-01 v3 重写）────────
@@ -46,7 +47,38 @@ export function run({ root, ok, fail }) {
     if (!existsSync(sidecar)) problems.push('_dist 缺 tgz 的 .sha256 旁文件——重跑 `node tools/export-dist.mjs`')
     else if (!readFileSync(sidecar, 'utf8').trim().startsWith(digest)) problems.push('_dist 的 .sha256 旁文件与 tgz 本体不一致——重跑 `node tools/export-dist.mjs`')
   }
+  // 2026-11-03（第六轮 D4-3）：tracked 手册必须**就是当前模板的产物**。此前只查版本/sha/关键句，
+  // 模板改了（例如卸载清单）而手册没重生成，verify 仍绿——本轮实测存在过一次。
+  // 渲染输入从手册自身读回（版本/包名/sha/日期）+ pin，可脱离本地 manifest 复核（fresh clone 也成立）。
+  const headerCell = (label) => {
+    const line = manual.split('\n').find(candidate => candidate.startsWith(`| ${label} |`))
+    if (line === undefined) return undefined
+    const raw = line.split('|').slice(2, -1).join('|').trim()
+    return /`([^`]+)`/.exec(raw)?.[1]?.trim() ?? raw
+  }
+  const tarballName = headerCell('安装包')
+  const manualDigest = headerCell('校验（sha256）')
+  const manualDate = headerCell('打包日期')
+  if (tarballName !== undefined && manualDigest !== undefined && manualDate !== undefined) {
+    const rendered = renderInstallManual({
+      version: packVersion,
+      tarballName,
+      digest: manualDigest,
+      date: manualDate,
+      expectedTag,
+      entries: 0,
+    })
+    if (rendered !== manual) {
+      let at = 0
+      while (at < rendered.length && at < manual.length && rendered[at] === manual[at]) at += 1
+      const around = (text) => JSON.stringify(text.slice(Math.max(0, at - 40), at + 60))
+      problems.push(`手册不是当前模板的产物（${'tools/lib/install-manual.mjs'} 改了而手册没重生成）：`
+        + `首处差异 @${String(at)} 模板=${around(rendered)} 手册=${around(manual)}——重跑 \`node tools/export-dist.mjs\`（或 release --prepare）`)
+    }
+  } else {
+    problems.push('手册头部缺「安装包 / 校验（sha256）/ 打包日期」行——无法复核是否为当前模板产物（重跑 export-dist 再提交）')
+  }
   problems.length === 0
-    ? ok(`dist-manual（版本 ${packVersion} + DSH 安装形状 + sha256 + pin ${expectedTag}）`)
+    ? ok(`dist-manual（版本 ${packVersion} + DSH 安装形状 + sha256 + 模板同源 + pin ${expectedTag}）`)
     : fail('dist-manual', problems.join('；'))
 }

@@ -51,6 +51,17 @@ export function run({ root, ok, fail }) {
   if (headerAt !== -1 && rows.length < LEDGER_MIN_ROWS) {
     problems.push(`表头之下只解析到 ${rows.length} 行（< ${LEDGER_MIN_ROWS}）——台账被削或行形状被改坏`)
   }
+  // 2026-11-03（第六轮 D4-4）：编号顺序也是形状——`D19+D21` 曾排在 `D20` 之后，门禁全绿。
+  // 取每行首个编号做非降序检查（合并行按首号排；不拆行，编号本身不重用）。
+  const orderProblems = []
+  let previous = 0
+  for (const { line, no } of rows) {
+    const number = Number(/D(\d+)/.exec(line)?.[1] ?? 0)
+    if (number === 0) continue // 合并/异常行交给列检查
+    if (number < previous) orderProblems.push(`第 ${no} 行（D${number} 排在 D${previous} 之后）`)
+    else previous = number
+  }
+  if (orderProblems.length) problems.push(`台账编号必须非降序（插行要放对位置）：${orderProblems.join('、')}`)
   problems.push(
     ...(malformed.length ? [`行必须是三列（# / 一句话 / 决定的家）：${malformed.join('、')}`] : []),
     ...(tooLong.length ? [`「一句话」超 ${LEDGER_CELL_MAX} 字符（决定正文归 Note，本表只路由）：${tooLong.join('、')}`] : []),

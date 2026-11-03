@@ -24,8 +24,8 @@
 | D16 | 角色模型路由 = 全员同模型（不写 `agentOptions`） | [presets](./presets.md)；[tests/presets](../tests/presets/presets.spec.ts) |
 | D17 | 公司事实全部留 workspace 活数据；pack 不含公司事实（**出厂样例除外**——`content/state` 与 `charters` 是首启只补缺的默认值，不是活数据） | [presets](./presets.md)；[pack content](../packages/company-pack/content/)（dev 盘 = `company-workspace/`，gitignored） |
 | D18 | CEO 命名委托不承担续驶（0.2.1 起每次调用 = activation，终稿走完成通知）；续驶归 team；CEO preset 不放全局控制行 | [delegation](./delegation.md) |
-| D20 | 交付物三态判据：成品 = Lead 的 `present`；比对按 slug+角色身份不按路径 | [r4-workshop-flow](../notes/archived/2026-09-22-r4-workshop-flow.md) |
 | D19+D21 | R5 拆轮 + 搁置池准入 **历史**：轮次制已由 D23/D24 退役，整池已随 D32 退役 | [_misc/suspended.md](../_backlog/_archive/legacy/suspended.md) |
+| D20 | 交付物三态判据：成品 = Lead 的 `present`；比对按 slug+角色身份不按路径 | [r4-workshop-flow](../notes/archived/2026-09-22-r4-workshop-flow.md) |
 | D22 | 在场板主键 = team roster；冷启动 = 读 `agentTeam` 投影推送（历史：拉式 RPC + 5s 轮询，0.1.7 起退役） | [org-presence-board](../notes/archived/2026-09-22-org-presence-board.md) |
 | D23+D24 | 开发流条目制 **历史**：队列 owner ROADMAP.md 已由 D32 退役 | [roadmap-retirement](../notes/archived/2026-09-28-roadmap-retirement.md) |
 | D25 | 培养 = 改 `presets/<role>/`（生效边界按面）；学习 = journal 唯一载体（2026-10-13 扩三面 → D43） | [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) |

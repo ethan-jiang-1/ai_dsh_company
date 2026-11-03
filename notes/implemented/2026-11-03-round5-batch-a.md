@@ -58,7 +58,7 @@ node checks/smoke/ui-scene-smoke.mjs                        # dev 模式
 
 - `shipped-links` 现在真的覆盖 17 份随包 Markdown；`nav-count-claims` 从 35 份扩到 52 份。
 - 隔离金样档重新可用，且它立刻抓到了停更的 UI 文本（证明这层回归网有价值）。
-- 收口：`probes/browser-visual/cultivation-gui-probe.mjs` 仍引用已删除的独立启动器与旧 `workspace/`
+- 收口：`cultivation-gui-probe` 仍引用已删除的独立启动器与旧 `workspace/`（该探针 2026-11-03 第六轮已删除）
   骨架，已标「已耗（2026-11-03，复跑条件写在头注）」并移出「升 pin / 动培养面」复跑清单；
   培养页点击交互先由 `ui-scene-smoke --steps` 顶班。
 - 未收：`diagnose` 的客户端错误落盘门（R5-31）、发布 readiness（R5-03）、授权门牌（R5-04）等仍在审计报告里待批。
