@@ -1,6 +1,6 @@
 {
-  "version": "0.8.5",
+  "version": "0.8.6",
   "requiresPublish": true,
   "since": "2026-11-03",
-  "reason": "索引声明的 0.8.5 尚未发布到 npm registry；发布后删除本文件并按 publish-handoff 校准 publishTimestamp。"
+  "reason": "索引声明的 0.8.6 尚未发布到 npm registry；发布后删除本文件并按 publish-handoff 校准 publishTimestamp。"
 }

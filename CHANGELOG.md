@@ -2,6 +2,13 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.8.6 — 2026-11-03
+
+### Changed
+
+- 无用户可见行为变化：`/deliverables audit` 命令抽为 `host/deliverables-command.ts`（解析/注册可直测），
+  行为与 0.8.5 相同。维护者证据见 `notes/implemented/2026-11-03-d2-deliverables-command.md`。
+
 ## 0.8.5 — 2026-11-03
 
 ### Changed
