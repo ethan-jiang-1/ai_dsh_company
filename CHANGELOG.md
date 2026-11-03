@@ -2,6 +2,14 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.8.5 — 2026-11-03
+
+### Changed
+
+- 无用户可见行为变化：host 成品目录拆分（`catalog-state` / `presented-ledger` / `catalog`），
+  client 入口接线抽为 `context-wiring` / `member-navigation` / `title-state`；均为内部结构，
+  行为与 0.8.4 相同。维护者过程证据见 `notes/implemented/2026-11-03-d2-*` 与 `...-coverage-thresholds.md`。
+
 ## 0.8.4 — 2026-11-03
 
 ### Fixed

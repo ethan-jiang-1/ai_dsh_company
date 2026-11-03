@@ -1,6 +1,6 @@
 {
   "name": "dsh-company-pack",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "type": "module",
   "description": "Five-role virtual company for DSH: CEO / VP-Eng / VP-Sales / COO / CFO presets, company handbook and Web tabs.",
   "license": "MIT",
