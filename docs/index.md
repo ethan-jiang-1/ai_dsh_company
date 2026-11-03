@@ -8,6 +8,8 @@
 [docs/AGENTS.md](./AGENTS.md)——下面是本目录的**现状登记**，不是规矩。项目运行与目录导航 =
 [project-map.md](./project-map.md)；脚本索引 = [checks/README.md](../checks/README.md)（触发与成本以脚本头注为准）。
 
+> 选文档先看文件头部的「什么时候读」；本表只回答“它是什么、属于哪层”，不替代 when-to-read。
+
 ### 现有文档
 
 | 文档 | 层 | 回答什么 |
