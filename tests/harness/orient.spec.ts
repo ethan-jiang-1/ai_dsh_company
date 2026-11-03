@@ -77,10 +77,10 @@ describe('profiles 与会话清单', () => {
   it('会话按 slug 汇总：计数、最新时间、近序排列', () => {
     const sessions = listSessions(home, 5)
     expect(sessions.total).toBe(2)
-    expect(sessions.recent[0].slug).toBe('slug-company')
-    expect(sessions.recent[0].sessions).toBe(2)
-    expect(new Date(sessions.recent[0].latest).getTime()).toBe(new Date('2026-10-06T12:00:00Z').getTime())
-    expect(sessions.recent[1].slug).toBe('slug-rehearsal')
+    expect(sessions.recent[0]!.slug).toBe('slug-company')
+    expect(sessions.recent[0]!.sessions).toBe(2)
+    expect(new Date(sessions.recent[0]!.latest).getTime()).toBe(new Date('2026-10-06T12:00:00Z').getTime())
+    expect(sessions.recent[1]!.slug).toBe('slug-rehearsal')
   })
 })
 
@@ -166,7 +166,7 @@ describe('session 视图（observation-closeout 条目 A）', () => {
   it('listSlugSessions 近序列出全部会话；slug 不存在 fail-loud', () => {
     const rows = listSlugSessions(home, 'slug-company')
     expect(rows.map(r => r.id)).toEqual(['session-2222', 'session-1111'])
-    expect(rows[0].mtime).toBe('2026-10-06T12:00:00.000Z')
+    expect(rows[0]!.mtime).toBe('2026-10-06T12:00:00.000Z')
     expect(() => listSlugSessions(home, 'no-such-slug')).toThrow('session slug 不存在')
   })
 
@@ -209,16 +209,16 @@ describe('待核工作候选扫描（RFC orient-scan-view，R3′ 口径）', ()
     motion(ws, 'motion-closed', { final: true, ceo: brief([assign('T1', 'vp-sales', '无')]) })
     motion(ws, 'motion-open', { ceo: brief([assign('T1', 'vp-sales', '无'), assign('T2', 'cfo', 'T9')]) })
     motion(ws, 'motion-drift', { ceo: brief([assign('T1', 'vp-eng', '无'), assign('T2', 'coo', 'T1'), assign('T3', 'vp-sales', 'T5')]), drafts: ['vp-eng.md'] })
-    const scan = scanDeliverables(ws)
+    const scan: any = scanDeliverables(ws)
     expect(scan['motion-closed']).toEqual({ closed: true, candidates: [], blocked: [] })
     const open = scan['motion-open']
     expect(open.closed).toBe(false)
-    expect(open.candidates.map(c => c.task)).toEqual(['T1'])
-    expect(open.blocked.map(b => b.task)).toEqual(['T2'])
+    expect(open.candidates.map((c: any) => c.task)).toEqual(['T1'])
+    expect(open.blocked.map((b: any) => b.task)).toEqual(['T2'])
     const drift = scan['motion-drift']
-    expect(drift.candidates.map(c => `${c.task}${c.depByDisk ? 'ᵈ' : ''}`)).toEqual(['T1', 'T2ᵈ'])
-    expect(drift.candidates.find(c => c.task === 'T1')!.stale).toBe(true)
-    expect(drift.blocked.map(b => b.task)).toEqual(['T3'])
+    expect(drift.candidates.map((c: any) => `${c.task}${c.depByDisk ? 'ᵈ' : ''}`)).toEqual(['T1', 'T2ᵈ'])
+    expect(drift.candidates.find((c: any) => c.task === 'T1')!.stale).toBe(true)
+    expect(drift.blocked.map((b: any) => b.task)).toEqual(['T3'])
   })
 
   it('渲染：公司盘后带「待核工作候选」节（R3′ 口径 + 零容忍门槛声明）；空盘如实「无动议在盘」', () => {
@@ -252,7 +252,7 @@ describe('run trace 视图（引用合同字段，引用不复制）', () => {
       'workspace:',
       '  expected: workspace.expected/',
     ].join('\n'))
-    const view = runBundleView(root, 'mini')
+    const view: any = runBundleView(root, 'mini')
     expect(view.fields.scenario).toBe('mini')
     expect(view.refs.sessionLeadExists).toBe(false)
     expect(view.refs.sessionChildrenCount).toBe(0)

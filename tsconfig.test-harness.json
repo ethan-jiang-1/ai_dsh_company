@@ -38,6 +38,7 @@
     "tests/harness/question-stop.spec.ts",
     "tests/harness/entry-probe.spec.ts",
     "tests/harness/probe-web.spec.ts",
+    "tests/harness/orient.spec.ts",
     "tests/support/temp-env.ts"
   ]
 }

@@ -175,6 +175,11 @@ export function credentialsState(home) {
   return { present: true, keys: parseCredentialKeys(readFileSync(path, 'utf8')) }
 }
 
+/**
+ * @param {{ env?: NodeJS.ProcessEnv, dailyHome?: string, workspaceRoot?: string, gitStatus?: number|null,
+ *   gitIgnored?: number|null, sessionPresets?: Record<string, string|null|undefined>|null,
+ *   sessionLimit?: number, root?: string }} [options]
+ */
 export function orientState({ env = process.env, dailyHome, workspaceRoot, gitStatus = null, gitIgnored = null, sessionPresets = null, sessionLimit = 5, root } = {}) {
   const home = homeStatus(env, { dailyHome })
   const effective = home.kind === 'ok' ? home.home : null
