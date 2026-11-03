@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { redactTokenUrls, summarizeSessionEvents } from '../../tools/lib/session-diagnose.mjs'
+// 事件形状是动态日志；纯函数返回的 summary 字段很多，局部用 wide 类型收口。
+const summarize: any = summarizeSessionEvents
 
 const token = '0123456789abcdefghij'
 
@@ -13,7 +15,7 @@ const token = '0123456789abcdefghij'
 // + asked/decided 按 id 配对（实跑与卡 = _backlog/_archive/fixed_bugs/BUG-030-diagnose-approval-outcome.md）。
 describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
   it('综合折叠：失败 turn / 工具错误 / 待答问询 / present / 最后正文（token 脱敏）', () => {
-    const summary = summarizeSessionEvents([
+    const summary = summarize([
       { type: 'session', id: 's1', cwd: '/company', agentPreset: 'ceo' },
       { type: 'turn/end', data: { turn: 1, reason: { kind: 'completed' } } },
       { type: 'turn/end', data: { turn: 2, reason: { kind: 'error', error: 'boom' } } },
@@ -35,7 +37,7 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
 
   it('非零退出码在 >400 字符输出末尾仍被识别（R5-30：先截断再正则 = 假绿）', () => {
     const long = 'x'.repeat(600)
-    const summary = summarizeSessionEvents([
+    const summary = summarize([
       { type: 'tool/call', data: { name: 'bash', callId: 'c-long' } },
       { type: 'tool/result', data: { message: { toolCallId: 'c-long', content: [{ type: 'text', text: `${long}
 [exit code: 7]` }] } } },
@@ -46,7 +48,7 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
   })
 
   it('中断轮（有 turn/start 无 turn/end）单独点名——不能渲染成「无失败」（R3-02）', () => {
-    const summary = summarizeSessionEvents([
+    const summary = summarize([
       { type: 'turn/start', data: { turn: 1 } },
       { type: 'turn/end', data: { turn: 1, reason: { kind: 'completed' } } },
       { type: 'turn/start', data: { turn: 2 } },
@@ -57,7 +59,7 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
   })
 
   it('工具调用计数按名字聚合（成功调用此前完全不可见）', () => {
-    const summary = summarizeSessionEvents([
+    const summary = summarize([
       { type: 'tool/call', data: { name: 'read' } },
       { type: 'tool/call', data: { name: 'read' } },
       { type: 'tool/call', data: { name: 'present', callId: 'p1' } },
@@ -66,7 +68,7 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
   })
 
   it('审批按真 v4 形状判读：asked/decided 按 id 配对拿工具名，outcome 进失败行', () => {
-    const summary = summarizeSessionEvents([
+    const summary = summarize([
       { type: 'approval/asked', data: { id: 'a1', toolName: 'request_signoff', callId: 'c9', reason: '双签线' } },
       { type: 'approval/decided', data: { id: 'a1', outcome: 'rejected' } },
     ])
@@ -75,7 +77,7 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
 
   it('allowed-once 不入失败；rejected/cancelled/unavailable 入失败（vendor 枚举，fail-closed）', () => {
     const decided = (id: string, outcome: string) => ({ type: 'approval/decided', data: { id, outcome } })
-    const summary = summarizeSessionEvents([
+    const summary = summarize([
       { type: 'approval/asked', data: { id: 'ok', toolName: 'bash' } },
       decided('ok', 'allowed-once'),
       { type: 'approval/asked', data: { id: 'r', toolName: 'request_signoff' } },
@@ -93,14 +95,14 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
   })
 
   it('asked 缺席（日志裁剪/导入）时工具名如实为空，不猜', () => {
-    const summary = summarizeSessionEvents([
+    const summary = summarize([
       { type: 'approval/decided', data: { id: 'orphan', outcome: 'rejected' } },
     ])
     expect(summary.approvals).toEqual([{ toolName: '', decision: 'rejected' }])
   })
 
   it('turn/end 与 tool/result 的 error 为对象时序列化，不渲染 [object Object]', () => {
-    const summary = summarizeSessionEvents([
+    const summary = summarize([
       { type: 'turn/end', data: { turn: 2, reason: { kind: 'error', error: { code: 'EACCES', path: '/x' } } } },
       { type: 'tool/result', data: { message: { isError: true, toolCallId: 'c2', error: { code: 'ENOENT' } } } },
     ])
@@ -109,7 +111,7 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
   })
 
   it('bash 非零退出进 toolNonZeroExits（tool/result 与 job/settled 按 callId 去重）', () => {
-    const summary = summarizeSessionEvents([
+    const summary = summarize([
       { type: 'tool/call', data: { name: 'bash', callId: 'b1', turn: 1 } },
       { type: 'tool/result', data: { turn: 1, message: { isError: false, toolCallId: 'b1', content: [{ type: 'text', text: 'stat: missing\n[exit code: 1]' }] } } },
       { type: 'job/settled', data: { kind: 'bash', jobId: 'j1', toolCall: { callId: 'b1' }, detail: 'exit code: 1', label: 'stat missing' } },
@@ -121,7 +123,7 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
   })
 
   it('中断轮的最后工具是 ask_user_question → 标「等人回答」，不再冒充进程崩溃', () => {
-    const summary = summarizeSessionEvents([
+    const summary = summarize([
       { type: 'turn/start', data: { turn: 7 } },
       { type: 'tool/call', data: { name: 'ask_user_question', callId: 'q1', turn: 7 } },
     ])
@@ -130,7 +132,7 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
   })
 
   it('approval/asked 没有 decided → pendingApprovals（不是已完成审批）', () => {
-    const summary = summarizeSessionEvents([
+    const summary = summarize([
       { type: 'approval/asked', data: { id: 'a1', toolName: 'request_signoff', reason: '毛利 <30%' } },
       { type: 'turn/start', data: { turn: 3 } },
       { type: 'tool/call', data: { name: 'request_signoff', callId: 's1', turn: 3 } },
@@ -141,7 +143,7 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
   })
 
   it('team/member.phase=failed 折进 teamFailures', () => {
-    const summary = summarizeSessionEvents([
+    const summary = summarize([
       { type: 'team/member', data: { member: 'vp-eng', phase: 'failed', error: 'provision timeout' } },
     ])
     expect(summary.teamFailures).toEqual([{ member: 'vp-eng', detail: 'provision timeout' }])
