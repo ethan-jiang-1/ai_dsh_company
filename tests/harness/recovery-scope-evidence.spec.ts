@@ -65,7 +65,7 @@ describe('recovery and scope evidence', () => {
       reply: true,
       completedTurn: true,
     })
-    expect(recoveryEvidence(recoveryInput(events.filter(event => event.type !== 'tool/call' || event.data?.name !== 'send_message'))).reply).toBe(true)
+    expect(recoveryEvidence(recoveryInput(events.filter(event => event.type !== 'tool/call' || (event.data as any)?.name !== 'send_message'))).reply).toBe(true)
   })
 
   it('rejects historical prose, absent tool results, wrong marker delivery IDs, and pre-prompt turns', () => {
@@ -95,13 +95,13 @@ describe('recovery and scope evidence', () => {
       reply: false,
       completedTurn: false,
     })
-    const stalePrompt = goodRecoveryEvents().map(event => event.type === 'user/message' && event.data?.content?.[0]?.text === recoveryPrompt
+    const stalePrompt = goodRecoveryEvents().map(event => event.type === 'user/message' && (event.data as any)?.content?.[0]?.text === recoveryPrompt
       ? { ...event, seq: 8 } : event)
     expect(recoveryEvidence(recoveryInput(stalePrompt)).restartPromptFound).toBe(false)
   })
 
   it('rejects missing or unsuccessful roster calls and duplicate marker delivery', () => {
-    const missingRoster = goodRecoveryEvents().filter(event => event.type !== 'tool/result' || event.data?.message?.toolCallId !== 'roster')
+    const missingRoster = goodRecoveryEvents().filter(event => event.type !== 'tool/result' || (event.data as any)?.message?.toolCallId !== 'roster')
     expect(recoveryEvidence(recoveryInput(missingRoster)).roster).toBe(false)
 
     const duplicate = [...goodRecoveryEvents(), { type: 'team/message/delivered', seq: 19, data: { messageId: 'marker-1' } }]
@@ -113,7 +113,7 @@ describe('recovery and scope evidence', () => {
 
     const { cfoEvents, cooEvents } = goodScopeEvents()
     expect(taskboardScopeEvidence({
-      cfoEvents: cfoEvents.filter(event => event.type !== 'tool/result' || event.data?.message?.toolCallId !== 'cfo-list'),
+      cfoEvents: cfoEvents.filter(event => event.type !== 'tool/result' || (event.data as any)?.message?.toolCallId !== 'cfo-list'),
       cooEvents,
     }).b1).toBe(false)
     expect(taskboardScopeEvidence({ cfoEvents, cooEvents: [] }).b2).toBe(false)

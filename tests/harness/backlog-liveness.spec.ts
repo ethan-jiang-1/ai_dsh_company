@@ -230,7 +230,7 @@ describe('backlog institution, migrated headers and recursive membership', () =>
   // 2026-11-02（五道门）：去向升级为封闭集值 + 审查记录在场；生效日 2026-11-03，落地当天的卡不追改。
   // 反证：no-destination → 红；prose → 红；with-typed → 绿；老卡 → 不红。
   it('requires a typed destination and a review record on freshly archived do-cards and grandfathers older cards', () => {
-    const archived = (date, extra = '') =>
+    const archived = (date: string, extra = '') =>
       `---\nstatus: 已结\nopened: ${date}\n---\n\n# Issue\n\n> 立卡：${date} ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是\n${extra}\n`
     put('_archive/settled_issues/2026-11-03-no-destination.md', archived('2026-11-03'))
     put('_archive/settled_issues/2026-11-03-prose.md', archived('2026-11-03', '\n> **结论/去向**：用户已拍板「就这么办」'))
@@ -248,7 +248,7 @@ describe('backlog institution, migrated headers and recursive membership', () =>
 
   // 2026-11-02（五道门）：待落地 = 已过定性门（结论=做 + 门票 + 去向）；其余结论不占落地门。
   it('gates the issue ready status on the ticket, the graduation head and the destination', () => {
-    const ready = (id, graduation, dest, body = '\n- [ ] 可执行判据\n') =>
+    const ready = (id: string, graduation: string, dest: string, body = '\n- [ ] 可执行判据\n') =>
       `---\nstatus: 待落地\nopened: 2026-11-02\n---\n\n# Issue ${id}\n\n> 立卡：2026-11-02 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：${graduation} ｜ 可关闭：否\n>\n> **结论/去向**：${dest}\n\n## 验收标准\n${body}`
     put('issues/ready.md', ready('ok', '做', 'note — `notes/implemented/2026-11-02-demo.md`'))
     put('issues/no-ticket.md', ready('ticket', '做', 'note — x', '\n'))
@@ -264,7 +264,7 @@ describe('backlog institution, migrated headers and recursive membership', () =>
 
   // 2026-11-02（五道门）：缺陷轨两张门票——修复就绪/修复已落地缺判据 = 门没造好。
   it('requires 已修判定 on a bug at the fix gates', () => {
-    const bug = (id, status, body = '') =>
+    const bug = (id: string, status: string, body = '') =>
       `---\nstatus: ${status}\nseverity: P1\nopened: 2026-11-02\n---\n\n# Bug ${id}\n\n> 严重级别：P1（重要）｜发现：2026-11-02｜状态：${status}\n\n${body}`
     put('bugs/BUG-040-ready.md', bug('040', '修复就绪'))
     put('bugs/BUG-041-landed.md', bug('041', '修复已落地', '## 已修判定\n\n- [ ] 判据\n'))

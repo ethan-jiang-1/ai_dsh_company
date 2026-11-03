@@ -29,6 +29,9 @@
     "tests/harness/member-stale-evidence.spec.ts",
     "tests/harness/team-barrier-evidence.spec.ts",
     "tests/harness/prune-policy.spec.ts",
+    "tests/harness/backlog-liveness.spec.ts",
+    "tests/harness/recovery-scope-evidence.spec.ts",
+    "tests/harness/workspace-oracle.spec.ts",
     "tests/support/temp-env.ts"
   ]
 }

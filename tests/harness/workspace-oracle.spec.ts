@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { captureWorkspace, compareWorkspace, seedWorkspace, workspaceOracle } from '../../tools/lib/workspace-oracle.mjs'
 
 let root: string
+const capture = (options: Record<string, unknown>) => captureWorkspace(options as never)
 beforeEach(() => {
   const parent = join(ROOT, 'runtime/harness-home/oracle-tests')
   mkdirSync(parent, { recursive: true })
@@ -27,7 +28,7 @@ describe('independent capture oracle', () => {
     const out = join(root, 'scenario')
     tree('scenario/workspace.expected', 'authored\n')
     file(join(cwd, '.hidden'), 'hidden')
-    const metadata = captureWorkspace({ cwd, out })
+    const metadata = capture({ cwd, out })
     expect(metadata).toEqual({ final: false, actual: 'workspace.actual/' })
     expect(compareWorkspace(cwd, join(out, 'workspace.actual'))).toEqual([])
     expect(readFileSync(join(out, 'workspace.expected/nested/file.txt'), 'utf8')).toBe('authored\n')
@@ -36,7 +37,7 @@ describe('independent capture oracle', () => {
   it('does not delete expected on --no-workspace', () => {
     const out = join(root, 'scenario')
     tree('scenario/workspace.expected')
-    expect(captureWorkspace({ cwd: join(root, 'absent'), out, noWorkspace: true })).toEqual({ final: false })
+    expect(capture({ cwd: join(root, 'absent'), out, noWorkspace: true })).toEqual({ final: false })
     expect(existsSync(join(out, 'workspace.expected/nested/file.txt'))).toBe(true)
   })
 
@@ -45,32 +46,32 @@ describe('independent capture oracle', () => {
     const expectedSource = tree('authored', 'expected')
     const beforeSource = tree('before', 'before')
     const out = join(root, 'scenario')
-    expect(captureWorkspace({ cwd, out, expectedSource, beforeSource }).final).toBe(true)
+    expect(capture({ cwd, out, expectedSource, beforeSource }).final).toBe(true)
     expect(compareWorkspace(expectedSource, join(out, 'workspace.expected'))).toEqual([])
     file(join(expectedSource, 'nested/file.txt'), 'changed')
-    expect(() => captureWorkspace({ cwd, out, expectedSource, beforeSource })).toThrow('Refusing to overwrite')
+    expect(() => capture({ cwd, out, expectedSource, beforeSource })).toThrow('Refusing to overwrite')
     expect(readFileSync(join(out, 'workspace.expected/nested/file.txt'), 'utf8')).toBe('expected')
   })
 
   it.each(['live', 'live/nested', '.'])('rejects expected sources overlapping live: %s', name => {
     const cwd = tree('live')
-    expect(() => captureWorkspace({ cwd, out: join(root, 'scenario'), expectedSource: join(root, name) })).toThrow('overlap')
+    expect(() => capture({ cwd, out: join(root, 'scenario'), expectedSource: join(root, name) })).toThrow('overlap')
     expect(existsSync(join(root, 'scenario'))).toBe(false)
   })
 
   it('rejects output overlap and symlinks in source, target, or ancestors before writes', () => {
     const cwd = tree('live')
-    expect(() => captureWorkspace({ cwd, out: join(cwd, 'snapshot') })).toThrow('overlap')
+    expect(() => capture({ cwd, out: join(cwd, 'snapshot') })).toThrow('overlap')
     const source = tree('authored')
     symlinkSync(source, join(root, 'alias'), 'dir')
-    expect(() => captureWorkspace({ cwd, out: join(root, 'scenario'), expectedSource: join(root, 'alias') })).toThrow('Symlink')
+    expect(() => capture({ cwd, out: join(root, 'scenario'), expectedSource: join(root, 'alias') })).toThrow('Symlink')
     symlinkSync(join(source, 'nested/file.txt'), join(source, 'linked'))
-    expect(() => captureWorkspace({ cwd, out: join(root, 'scenario'), expectedSource: source })).toThrow('Symlink')
-    expect(() => captureWorkspace({ cwd, out: join(root, 'alias/new') })).toThrow('Symlink')
+    expect(() => capture({ cwd, out: join(root, 'scenario'), expectedSource: source })).toThrow('Symlink')
+    expect(() => capture({ cwd, out: join(root, 'alias/new') })).toThrow('Symlink')
     rmSync(join(source, 'linked'))
     mkdirSync(join(root, 'scenario'))
     symlinkSync(source, join(root, 'scenario/workspace.expected'), 'dir')
-    expect(() => captureWorkspace({ cwd, out: join(root, 'scenario') })).toThrow('Symlink')
+    expect(() => capture({ cwd, out: join(root, 'scenario') })).toThrow('Symlink')
   })
 })
 
