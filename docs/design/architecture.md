@@ -89,21 +89,11 @@ teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱�
 故本仓直插这些行自配；直插取舍见 §3 冲突注）。
 因此 demo 第 0 天不需要任何自定义 provider——层② 是组合隔离的增强，不是 demo 门槛。
 
-### 2.3 装但不写的行（cordis.patch.yml / profile 的行清单，全是现成包）
+### 2.3 装但不写的行（全是现成包）
 
-```yaml
-# bundle 层（pack 的 cordis.patch.yml；profile 只选 bundle）
-- @deepseek-ai/dsh-agent-preset-registry  # roster（替换出厂行，default: ceo）；5 公司角色 + researcher 各一行声明另住 presets/<role>/agent.cordis.yml
-- @deepseek-ai/dsh-session-persistence-jsonl  # team 激活前提
-- @deepseek-ai/dsh-experimental-agent-team       # M4 域服务（或直接装 agent-team-profile）
-- @deepseek-ai/dsh-experimental-tool-agent-team  # M4 九个工具
-# workflow 行已于 0.8.0 退役（pack 三源零引用；见 delegation.md §4.4）
-# 各角色 preset 内的行（按角色选配）
-- @deepseek-ai/dsh-persona               # 每角色一行（人格）
-- @deepseek-ai/dsh-skill-filesystem + dsh-tool-skill  # 角色 skills 目录进自己的 layer
-- @deepseek-ai/dsh-tool-fs / dsh-tool-bash / dsh-tool-fs-search / dsh-tool-web / dsh-tool-todo / dsh-tool-present …
-- @deepseek-ai/dsh-tool-subagent          # CEO 的 vp_eng/vp_sales 委托行（per-instance persona）
-```
+行清单的唯一家 = [cordis.patch.yml](../../packages/company-pack/cordis.patch.yml)（bundle 层）与
+[presets/](../../packages/company-pack/presets/) 各角色的 `agent.cordis.yml`（per-preset 层）；这里不复刻枚举（D28）。
+workflow 行已于 0.8.0 退役（见 [delegation.md §4](../delegation.md)）。
 
 ---
 
