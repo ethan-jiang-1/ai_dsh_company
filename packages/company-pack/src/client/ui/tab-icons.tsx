@@ -31,7 +31,7 @@ function Glyph({ size = 16, className, children }: GlyphProps & { readonly child
 }
 
 /** 待办（原「需要你」）：铃铛（注意方向·主档）。 */
-export function BellGlyph({ size, className }: GlyphProps): ReactNode {
+function BellGlyph({ size, className }: GlyphProps): ReactNode {
   return (
     <Glyph size={size} className={className}>
       <path d="M8 2.75C6.06 2.75 4.4 4.4 4.4 6.35c0 2.75-.9 3.7-1.5 4.4h10.2c-.6-.7-1.5-1.65-1.5-4.4C11.6 4.4 9.94 2.75 8 2.75Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
@@ -41,7 +41,7 @@ export function BellGlyph({ size, className }: GlyphProps): ReactNode {
 }
 
 /** 用量：半圆仪表 + 指针（注意方向·次档）。 */
-export function GaugeGlyph({ size, className }: GlyphProps): ReactNode {
+function GaugeGlyph({ size, className }: GlyphProps): ReactNode {
   return (
     <Glyph size={size} className={className}>
       <path d="M3 11.5a5 5 0 0 1 10 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -52,7 +52,7 @@ export function GaugeGlyph({ size, className }: GlyphProps): ReactNode {
 }
 
 /** 看板：2×2 圆角四格（执行方向·总览主档）。 */
-export function GridGlyph({ size, className }: GlyphProps): ReactNode {
+function GridGlyph({ size, className }: GlyphProps): ReactNode {
   return (
     <Glyph size={size} className={className}>
       <rect x="2.75" y="2.75" width="4.5" height="4.5" rx="1" stroke="currentColor" strokeWidth="1.5" />
@@ -64,7 +64,7 @@ export function GridGlyph({ size, className }: GlyphProps): ReactNode {
 }
 
 /** 任务板：三列不等高看板条（执行方向·工作台次档）。 */
-export function KanbanGlyph({ size, className }: GlyphProps): ReactNode {
+function KanbanGlyph({ size, className }: GlyphProps): ReactNode {
   return (
     <Glyph size={size} className={className}>
       <rect x="2.75" y="2.75" width="3.2" height="10.5" rx="1" stroke="currentColor" strokeWidth="1.5" />
@@ -75,7 +75,7 @@ export function KanbanGlyph({ size, className }: GlyphProps): ReactNode {
 }
 
 /** 依赖图：一源两汇节点连线（机制方向·结构主档）。 */
-export function DagGlyph({ size, className }: GlyphProps): ReactNode {
+function DagGlyph({ size, className }: GlyphProps): ReactNode {
   return (
     <Glyph size={size} className={className}>
       <circle cx="4.2" cy="8" r="1.7" stroke="currentColor" strokeWidth="1.5" />
@@ -87,7 +87,7 @@ export function DagGlyph({ size, className }: GlyphProps): ReactNode {
 }
 
 /** 台账：开页账本（中缝 + 行线；机制方向·账本次档）。 */
-export function LedgerGlyph({ size, className }: GlyphProps): ReactNode {
+function LedgerGlyph({ size, className }: GlyphProps): ReactNode {
   return (
     <Glyph size={size} className={className}>
       <path d="M8 4.1C6.9 3.15 5.2 2.7 2.9 2.85v8.9c2.3-.15 4 .3 5.1 1.25 1.1-.95 2.8-1.4 5.1-1.25v-8.9C10.8 2.7 9.1 3.15 8 4.1Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
@@ -98,7 +98,7 @@ export function LedgerGlyph({ size, className }: GlyphProps): ReactNode {
 }
 
 /** 成品：带盖的产出箱（机制方向·账本次档；与台账的账本一眼区分）。 */
-export function CatalogGlyph({ size, className }: GlyphProps): ReactNode {
+function CatalogGlyph({ size, className }: GlyphProps): ReactNode {
   return (
     <Glyph size={size} className={className}>
       <path d="M2.9 5.3 8 3l5.1 2.3v5.4L8 13 2.9 10.7Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
@@ -109,7 +109,7 @@ export function CatalogGlyph({ size, className }: GlyphProps): ReactNode {
 }
 
 /** 在场：双人（前全后半；人方向·在线主档）。 */
-export function PeopleGlyph({ size, className }: GlyphProps): ReactNode {
+function PeopleGlyph({ size, className }: GlyphProps): ReactNode {
   return (
     <Glyph size={size} className={className}>
       <circle cx="6.2" cy="5.4" r="1.9" stroke="currentColor" strokeWidth="1.5" />
@@ -121,7 +121,7 @@ export function PeopleGlyph({ size, className }: GlyphProps): ReactNode {
 }
 
 /** 培养：幼苗（茎 + 两叶；人方向·成长次档）。 */
-export function SproutGlyph({ size, className }: GlyphProps): ReactNode {
+function SproutGlyph({ size, className }: GlyphProps): ReactNode {
   return (
     <Glyph size={size} className={className}>
       <path d="M8 13.4V7.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -166,7 +166,7 @@ function guideIcon(tone: string, GlyphComponent: (props: GlyphProps) => ReactNod
    Tooltip；点击 = openTab（与 vendor EntryBox 同语义，kind 由槽 owner props 给）。 */
 
 /** guide 条目胶囊 props：槽 owner 面（entryId/kind/title/description）+ 注册处注入的 openTab。 */
-export interface GuideEntryProps {
+interface GuideEntryProps {
   readonly entryId?: string | undefined
   readonly kind: string
   readonly title?: string | undefined
