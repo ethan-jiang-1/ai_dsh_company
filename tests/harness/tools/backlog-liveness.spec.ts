@@ -1,8 +1,7 @@
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
-import { basename, dirname, join, resolve } from 'node:path'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { backlogLivenessProblems } from '../../../tools/lib/backlog-liveness.mjs'
-import { markdownLinkTargets } from '../../../tools/lib/markdown-links.mjs'
 import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
 
 // Exercise the owning gate's read-only function without running the repository-wide gate runner.

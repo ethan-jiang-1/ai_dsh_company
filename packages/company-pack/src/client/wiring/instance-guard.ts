@@ -54,7 +54,11 @@ export function startInstanceGuard(doc: Document = document): () => void {
   const beatTimer = window.setInterval(() => writeBeat(selfId), 5_000)
   const check = () => {
     const message = shouldWarn(doc.defaultView?.localStorage?.getItem(KEY) ?? null, Date.now(), selfId)
-    message === null ? removeBanner(doc) : upsertBanner(doc, message)
+    if (message === null) {
+      removeBanner(doc)
+    } else {
+      upsertBanner(doc, message)
+    }
   }
   check()
   const checkTimer = window.setInterval(check, 10_000)

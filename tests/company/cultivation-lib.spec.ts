@@ -17,7 +17,6 @@ import {
   recordStampOf,
   recordText,
   timeLabel,
-  WORK_TEXT_LIMIT,
   VERIFICATION_EVIDENCE_LIMIT,
   VERIFICATION_HISTORY_LIMIT,
   type CultivationRecord,

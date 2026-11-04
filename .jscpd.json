@@ -1,0 +1,25 @@
+{
+  "path": [
+    "packages/company-pack/src",
+    "tools/lib"
+  ],
+  "minTokens": 100,
+  "minLines": 10,
+  "mode": "mild",
+  "format": [
+    "typescript",
+    "javascript"
+  ],
+  "pattern": "**/*.{ts,tsx,mjs}",
+  "ignore": [
+    "**/node_modules/**",
+    "packages/company-pack/lib/**",
+    "**/tests/**"
+  ],
+  "reporters": [
+    "console"
+  ],
+  "exitCode": 1,
+  "noColors": true,
+  "noTips": true
+}

@@ -96,6 +96,7 @@ const COMMAND_KEYS = ['v', 'mode', 'targetRole', 'items'] as const
 const REF_KEYS = ['kind', 'ref', 'turn', 'parentSessionId', 'mode', 'label', 'role'] as const
 const CONTEXT_KEYS = ['kind', 'ref', 'parentSessionId', 'mode', 'role', 'title', 'subtitle', 'at', 'turn', 'excerpt', 'truncated'] as const
 const SESSION_REF_RE = /^[A-Za-z0-9._:-]+$/u
+// oxlint-disable-next-line eslint/no-control-regex -- 控制字符是清洗对象：这条正则的用途就是拒绝它们
 const CONTROL_RE = /[\u0000-\u001f\u007f]/u
 const BASE64URL_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
 const BASE64URL_LOOKUP = new Map([...BASE64URL_ALPHABET].map((char, index) => [char, index]))

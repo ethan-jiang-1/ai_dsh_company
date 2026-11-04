@@ -8,18 +8,15 @@
  * 不主张：真 profile 装配、真 workspace registry / sessionQuery（那归 preset-smoke / release-smoke）。
  */
 import { mkdirSync } from 'node:fs'
-import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { Context } from '../../vendor/dsh/vendor/cordis/src/index.ts'
 import { apply } from '../../packages/company-pack/src/index.ts'
 import { createTempEnv, type TempEnv } from '../support/temp-env.ts'
 
-let dir: string
 let env: TempEnv
 
 beforeEach(() => {
   env = createTempEnv('apply-lifecycle-')
-  dir = env.dir
   env.set({
     DSH_HOME: env.home,
     DSH_COMPANY_HOME: env.company,

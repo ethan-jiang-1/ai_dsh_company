@@ -81,6 +81,7 @@ describe('待办页签：挂起项、空态与断流（R3-10）', () => {
   })
 
   it('动态流断掉时显式落错误行（fail-loud，不静默）', async () => {
+    // oxlint-disable-next-line eslint/require-yield -- 模拟传输断流：这条生成器的用途就是只抛不 yield
     const follow = async function* (): AsyncGenerator<never> {
       throw new Error('transport closed')
     }

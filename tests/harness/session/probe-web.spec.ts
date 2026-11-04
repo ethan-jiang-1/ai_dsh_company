@@ -135,7 +135,7 @@ describe('startWeb：进程参数与 banner 解析', () => {
     child.emit('error', new Error('spawn ENOENT'))
     await expect(started).rejects.toThrow(/ENOENT/)
     // 定时器清理：解析成功后 pending 的 boot 定时器不应再挂着
-    const { spawn: s2, child: c2, emit } = fakeSpawn()
+    const { spawn: s2, emit } = fakeSpawn()
     vi.useFakeTimers()
     const done = startWeb({ spawn: s2, root: '/repo', home: '/h', port: 0 })
     emit(BANNER)

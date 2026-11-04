@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { classifyDeliverable, deliverableId, isPlaceholderClaim, parseMeta, slugFromDirName, validateMeta } from '../../../tools/lib/deliverables.mjs'
+import { classifyDeliverable, deliverableId, parseMeta, slugFromDirName, validateMeta } from '../../../tools/lib/deliverables.mjs'
 
 /**
  * 交付物判据**形状与身份**面的回归层（R4「成品流程」轮；2026-10-16 第三轮结构收敛按

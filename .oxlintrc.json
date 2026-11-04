@@ -1,0 +1,28 @@
+{
+  // 本仓自写面的 correctness 档（2026-11-04 接入；理由与输掉的方案 = notes/implemented/2026-11-04-lint-and-dup-upstream.md）。
+  // 只收 correctness：stylistic 不进门禁（vendor .oxlintrc.json 的 @stylistic 段是上游自己的样式合同，不搬）。
+  // type-aware 档（no-floating-promises 一类）需要 oxlint-tsgolint + program 接线，触发条件在 Note。
+  // reportUnusedDisableDirectives 暂不开：现有 `eslint-disable` 指向本仓未启用的插件（react-hooks），
+  // 开了会把「未来才生效的注释」判成噪声；重开条件与 react 插件启用一起评估（Note 记触发）。
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "env": { "builtin": true },
+  "ignorePatterns": [
+    "vendor/**",
+    "packages/company-pack/lib/**",
+    "**/node_modules/**",
+    "runtime/**"
+  ],
+  "overrides": [
+    {
+      // 未使用绑定：测试里的死 import 也是债（tsc 不查未使用导入）。`_` 前缀保留为「有意不用」的记号（vendor 同款）。
+      "files": ["packages/company-pack/src/**/*.{ts,tsx}", "tests/**/*.ts"],
+      "rules": {
+        "no-unused-vars": ["error", {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_"
+        }]
+      }
+    }
+  ]
+}

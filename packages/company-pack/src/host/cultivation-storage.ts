@@ -12,7 +12,7 @@
  * - 新建文件用同目录 temp + `link` 独占发布——既有文件零覆盖；记录改写用 sibling-temp + `rename` 原子替换；
  * - 方法目录独占 `mkdir` 占位；碰撞返回未安装且不改动既有文件。
  *
- * keyless 判据 = `tests/company/cultivation.spec.ts`（命令行为经 `CultivationStorage` 观察同一面）。
+ * keyless 判据 = `tests/company/cultivation-maintenance.spec.ts` 与 `revoke-journal.spec.ts`（命令行为经 `CultivationStorage` 观察同一面）。
  */
 import {
   constants,
@@ -364,8 +364,11 @@ function purgeArchiveFiles(archiveDir: string, cutoff: number): { removed: numbe
   return { removed, failed }
 }
 
-/** 读一个已部署方法（revoke 先留副本，失败时恢复）。 */
-function readMethodFile(root: string, role: string, slug: string): string | null {
+/**
+ * 方法目录的路径安全阶梯（读与删共用同一份判据）：名册/ slug 先校验，再逐级 lstat——
+ * 任一级缺失返回 null，symlink 或非目录一律抛错。
+ */
+function resolveMethodDir(root: string, role: string, slug: string): string | null {
   if (!ROSTER.has(role) || !SLUG_RE.test(slug)) throw new Error(`不安全的方法路径：${role}/${slug}`)
   const rootInfo = lstatOrNull(root)
   if (rootInfo === null) return null
@@ -378,6 +381,13 @@ function readMethodFile(root: string, role: string, slug: string): string | null
   const methodInfo = lstatOrNull(methodDir)
   if (methodInfo === null) return null
   if (methodInfo.isSymbolicLink() || !methodInfo.isDirectory()) throw new UnsafeCultivationPathError(methodDir)
+  return methodDir
+}
+
+/** 读一个已部署方法（revoke 先留副本，失败时恢复）。 */
+function readMethodFile(root: string, role: string, slug: string): string | null {
+  const methodDir = resolveMethodDir(root, role, slug)
+  if (methodDir === null) return null
   const file = join(methodDir, 'SKILL.md')
   const fileInfo = lstatOrNull(file)
   if (fileInfo === null || fileInfo.isSymbolicLink() || !fileInfo.isFile()) return null
@@ -494,18 +504,8 @@ export const nodeCultivationStorage: CultivationStorage = {
   readMethod: readMethodFile,
   listMethods: listMethodSlugs,
   removeMethod(root, role, slug) {
-    if (!ROSTER.has(role) || !SLUG_RE.test(slug)) throw new Error(`不安全的方法路径：${role}/${slug}`)
-    const rootInfo = lstatOrNull(root)
-    if (rootInfo === null) return null
-    if (rootInfo.isSymbolicLink() || !rootInfo.isDirectory()) throw new UnsafeCultivationPathError(root)
-    const roleDir = join(root, role)
-    const roleInfo = lstatOrNull(roleDir)
-    if (roleInfo === null) return null
-    if (roleInfo.isSymbolicLink() || !roleInfo.isDirectory()) throw new UnsafeCultivationPathError(roleDir)
-    const methodDir = join(roleDir, slug)
-    const methodInfo = lstatOrNull(methodDir)
-    if (methodInfo === null) return null
-    if (methodInfo.isSymbolicLink() || !methodInfo.isDirectory()) throw new UnsafeCultivationPathError(methodDir)
+    const methodDir = resolveMethodDir(root, role, slug)
+    if (methodDir === null) return null
     rmSync(methodDir, { recursive: true })
     return methodDir
   },

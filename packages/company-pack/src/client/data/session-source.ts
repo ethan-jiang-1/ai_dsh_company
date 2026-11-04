@@ -6,5 +6,3 @@ declare module '@deepseek-ai/dsh-api-session-controller/client' {
     companyCultivation: unknown
   }
 }
-
-export {}

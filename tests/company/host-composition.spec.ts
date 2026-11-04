@@ -16,12 +16,10 @@ import { Context } from '../../vendor/dsh/vendor/cordis/src/index.ts'
 import { apply } from '../../packages/company-pack/src/index.ts'
 import { createTempEnv, type TempEnv } from '../support/temp-env.ts'
 
-let dir: string
 let env: TempEnv
 
 beforeEach(() => {
   env = createTempEnv('host-composition-')
-  dir = env.dir
   env.set({
     DSH_HOME: env.home,
     DSH_COMPANY_HOME: env.company,

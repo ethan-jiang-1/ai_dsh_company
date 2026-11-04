@@ -1,4 +1,3 @@
-import type { SessionRemote } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionFollowFrame } from '@deepseek-ai/dsh-api-session-controller/types'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import { describe, expect, it } from 'vitest'

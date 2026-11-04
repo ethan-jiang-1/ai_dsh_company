@@ -10,7 +10,6 @@
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import { describe, expect, it } from 'vitest'
 import {
-  CULTIVATION_CHANGED_EVENT,
   CULTIVATION_COPY,
   adoptLine,
   correctLine,
