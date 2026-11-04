@@ -32,6 +32,11 @@
 - **收据层清理（同轮追加）**：22 篇 archived receipts 全在 digest 内；预检发现 15 篇仍有入站
   markdown 链接（删了会红 `md-links`），**只删 7 篇零链接原文（438 行）**，15 篇保留；
   digest 改口为「15 在盘 / 7 已删（git 历史保留）」。不重构 archived 链接。
+- **研究题收口尝试（同轮追加，已 revert）**：4 个候选（backlog-ux / company-panels-ux /
+  ceo-minimal-assembly / multi-user-ux，736 行）实测有 **9 条 archived 入站链接**（8 在
+  `_backlog/_archive`、1 在冻结层 `notes/archived`）——删除使 `link-debt` 32→39、
+  `notes-archived-links` 红；按计划整批 revert，4 题保留。预检只查活层、漏了归档层
+  （本会话第四个口径教训）；不再重试。
 
 ## 输掉的方案
 
