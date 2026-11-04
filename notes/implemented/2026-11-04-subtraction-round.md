@@ -29,6 +29,9 @@
 - **仪器使用审计（同轮追加）**：15 个"只在索引出现"的 smoke/audit 逐个核过——全部有活触发面
   （release / install-lifecycle / scenario-e2e / tool）且至少一处引用，**0 个可退役**；早先的
   "0 引用"是测量口径错（按完整文件名搜且排除 `checks/`）。`checks/smoke` 重复率 0.42%，无抽公共层的必要。
+- **收据层清理（同轮追加）**：22 篇 archived receipts 全在 digest 内；预检发现 15 篇仍有入站
+  markdown 链接（删了会红 `md-links`），**只删 7 篇零链接原文（438 行）**，15 篇保留；
+  digest 改口为「15 在盘 / 7 已删（git 历史保留）」。不重构 archived 链接。
 
 ## 输掉的方案
 
