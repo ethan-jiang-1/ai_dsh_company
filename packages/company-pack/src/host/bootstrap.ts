@@ -11,21 +11,15 @@ import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSy
 import { homedir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 import { isAbsolute, join, relative, resolve, sep } from 'node:path'
-import { expandHomePath } from '@deepseek-ai/dsh-home-paths'
 import { RUN_BUNDLE_DIR, RUN_BUNDLE_REL } from './run-bundle.ts'
-
-const env = (name: string): string | undefined => (process.env as Record<string, string | undefined>)[name]
 
 /** 五角色（researcher 没有 CHARTER）。 */
 export const COMPANY_ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'] as const
-export type CompanyRole = typeof COMPANY_ROLES[number]
 
-/** 公司手册源（pack 内唯一真源；只读，不复制）。 */
-export const HANDBOOK_SOURCE = 'AGENTS.md'
 /** 默认章程源目录（pack 内）。 */
-export const CHARTERS_SOURCE = 'charters'
+const CHARTERS_SOURCE = 'charters'
 /** 状态实例默认值源目录（pack 内）。 */
-export const STATE_SOURCE = 'state'
+const STATE_SOURCE = 'state'
 
 export interface BootstrapEntry {
   /** 相对 workspace 的 POSIX 路径（目标）。 */
@@ -192,13 +186,6 @@ export function bootstrapCompanyWorkspace(
   return { plan, result: applyBootstrap(plan) }
 }
 
-/** 目标 workspace：显式值 / `DSH_COMPANY_HOME`；没有默认落点。 */
-export function resolveCompanyHome(_dshHome: string, override?: string): string | undefined {
-  const raw = (override ?? env('DSH_COMPANY_HOME'))?.trim()
-  if (raw === undefined || raw === '') return undefined
-  return resolve(expandHomePath(raw))
-}
-
 /** 校验 workspace 落点：不能等于/包含 DSH_HOME 或 OS home，必须是目录。 */
 export function validateCompanyHome(
   dshHome: string,
@@ -232,12 +219,6 @@ export function validateCompanyHome(
     return { ok: false, error: `workspace 不能等于/包含 OS home：${canonical}` }
   }
   return { ok: true }
-}
-
-/** run bundle 是否已存在（只认 `.dsh-company/` 状态，不认根目录旧布局）。 */
-export function hasRunBundle(workspace: string): boolean {
-  return existsSync(join(workspace, RUN_BUNDLE_REL.kb, 'company.md'))
-    || existsSync(join(workspace, RUN_BUNDLE_REL.manifest))
 }
 
 /** 列出 run bundle 里的相对文件（诊断/测试用）。 */
