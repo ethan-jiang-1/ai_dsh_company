@@ -15,7 +15,7 @@ import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { validateCompanyHome } from './bootstrap.ts'
-import { identityBackupPath, readBundleManifestState, type BundleManifestState } from './bundle-manifest.ts'
+import { readBundleManifestState, type BundleManifestState } from './bundle-manifest.ts'
 import { acquireCompanyLease } from './lease.ts'
 import { profilesWithCompanyPack } from './profiles.ts'
 import { canonicalPath } from './paths.ts'
@@ -144,9 +144,3 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
     hasWorkspace: true,
   }
 }
-
-/** 诊断用：给出 home 身份备份目录（不保证存在）。 */
-export const identityBackupDir = (dshHome: string): string => join(dshHome, 'company/identity')
-
-/** 诊断用：某个 bundle id 的身份备份路径。 */
-export const identityBackupFor = (dshHome: string, id: string): string => identityBackupPath(dshHome, id)

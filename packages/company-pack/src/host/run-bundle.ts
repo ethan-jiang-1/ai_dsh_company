@@ -10,7 +10,6 @@
  * 路径一律**相对 workspace 的 POSIX 字符串**给模型/remote 用；host 落盘再用 `join`。
  * 字符串常量唯一家 = `src/lib/run-bundle-paths.ts`（client 也读同一份）。
  */
-import { join } from 'node:path'
 import { RUN_BUNDLE_DIR, RUN_BUNDLE_PATHS, runBundleRel } from '../lib/run-bundle-paths.ts'
 
 export { RUN_BUNDLE_DIR, runBundleRel }
@@ -34,7 +33,3 @@ export const RUN_BUNDLE_REL = {
   overrides: RUN_BUNDLE_PATHS.overrides,
   legacy: RUN_BUNDLE_PATHS.legacy,
 } as const
-
-/** 绝对路径：`<workspace>/.dsh-company/<rel>`。 */
-export const runBundlePath = (workspace: string, rel = ''): string =>
-  join(workspace, RUN_BUNDLE_DIR, rel)

@@ -8,11 +8,6 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-export interface ProfileDescriptor {
-  readonly name: string
-  readonly bundles: readonly string[]
-}
-
 /** 列出装了本包的 profile（按名字排序；坏 package.json 跳过）。 */
 export function profilesWithCompanyPack(profilesDir: string, packName = 'dsh-company-pack'): string[] {
   if (!existsSync(profilesDir)) return []
