@@ -29,10 +29,9 @@ import { appendRotatingLine } from './rotating-log.ts'
 
 /** 当前 manifest 形状版本。 */
 export const BUNDLE_MANIFEST_VERSION = 3
-export const BUNDLE_MANIFEST_FILENAME = 'bundle.json'
-export const BUNDLE_MANIFEST_REL = RUN_BUNDLE_REL.manifest
-export const BUNDLE_UPGRADE_LOG = `${RUN_BUNDLE_REL.logs}/company-pack-upgrade.log`
-export const BUNDLE_IDENTITY_DIR = 'company/identity'
+const BUNDLE_MANIFEST_REL = RUN_BUNDLE_REL.manifest
+const BUNDLE_UPGRADE_LOG = `${RUN_BUNDLE_REL.logs}/company-pack-upgrade.log`
+const BUNDLE_IDENTITY_DIR = 'company/identity'
 
 /** manifest 的绝对路径（`<workspace>/.dsh-company/bundle.json`）。 */
 export const bundleManifestPath = (workspace: string): string => join(workspace, BUNDLE_MANIFEST_REL)
@@ -91,7 +90,7 @@ export function resolvePackMetadata(moduleUrl: string): PackMetadata {
 }
 
 /** 写 home 身份备份（workspace manifest 的恢复副本；不是第二权威）。 */
-export function writeIdentityBackup(backupPath: string, manifest: BundleManifest): void {
+function writeIdentityBackup(backupPath: string, manifest: BundleManifest): void {
   mkdirSync(dirname(backupPath), { recursive: true })
   atomicWriteFile(backupPath, `${JSON.stringify(manifest, null, 2)}\n`)
 }
@@ -112,7 +111,7 @@ interface ManifestValidation {
 }
 
 /** 校验 v3 身份形状；v2 单独标 legacy 供原地升级。 */
-export function validateBundleManifest(value: unknown): ManifestValidation {
+function validateBundleManifest(value: unknown): ManifestValidation {
   if (!isRecord(value)) return { ok: false, error: '不是对象' }
   const version = value.v
   if (typeof version !== 'number' || !Number.isSafeInteger(version) || version < 1) {
@@ -175,12 +174,6 @@ export function readBundleManifestState(workspace: string): BundleManifestState 
   } catch (error) {
     return { status: 'corrupt', path, error: (error as Error).message }
   }
-}
-
-/** 读 manifest；不存在/坏/legacy 返回 null。 */
-export function readBundleManifest(workspace: string): BundleManifest | null {
-  const state = readBundleManifestState(workspace)
-  return state.status === 'ok' ? state.manifest : null
 }
 
 /**
