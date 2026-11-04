@@ -9,8 +9,11 @@
 
 - **lint = oxlint 1.81.0，correctness 档 + `--deny-warnings`**，范围 `packages/company-pack/src` + `tests`。
   规则表住 `.oxlintrc.json`；`no-unused-vars` 对 `_` 前缀放行（vendor 同款）。
-- **dup = jscpd 5.1.2，minLines 10 / minTokens 100 / mode mild / exit 1**，范围 `packages/company-pack/src` + `tools/lib`
-  （drivers 在抽完 CDP 会话后同轮纳入）。范围与阈值住 `.jscpd.json` 的 `path`（单家）。
+- **dup = jscpd 5.1.2，minLines 10 / minTokens 100 / mode mild / exit 1**，范围 `packages/company-pack/src` +
+  `tools/lib` + `tools/drivers`。范围与阈值住 `.jscpd.json` 的 `path`（单家）。
+- **`cdp-driver` 抽 `connectSession(target)`**：WS 打开 / `onmessage` 分派 / 20s send 超时 / Runtime+Page enable /
+  evaluate·click·screenshot 只有一份；launch 与 attach 各自只留「拿 target + 组装 handle」。
+  63 行 / 519 tokens 的 intra-file 克隆归零（`-118/+79` 行）。
 - 两者是 `package.json` 的 `lint` / `dup` 命令；**不进 `checks/gates/`**（P2：没有复发事故，gates 是要维护的代码）。
 - 首轮读数：lint 19 条（15 error + 4 warn）→ **0/0**；dup 1 处 → **0**。
 
@@ -38,10 +41,17 @@ pnpm -s lint   → 0 warnings / 0 errors（230 files，exit 0）
 造红：把 instance-guard 的 if/else 改回三元 → Found 1 warning / exit 1；还原 → 0/0
 pnpm -s dup    → 0 clones（101 files / 14,692 lines，exit 0）
 造红：tools/lib/__dup-probe.mjs 复制 repository-layout 的 14 行块 → 1 clone（14 lines / 159 tokens）/ exit 1；删除 → 0
+pnpm -s dup（含 drivers）→ 0 clones（104 files / 15,123 lines，exit 0）
+node --check tools/drivers/cdp-driver.mjs → OK
+合成页真 Chrome（launch + attach 两条路径）→ 10 项 PASS：evaluate / click 及效果 / console.warn 捕获 /
+  screenshot 落盘 / close+settle 删 profile / attach 的 evaluate·click·attached 标志
 pnpm typecheck → exit 0（pack 两面 + tests 三面）
 pnpm test      → 142 files / 1122 tests
 pnpm verify    → ALL PASS（57 门，2 门无对象）
 ```
+
+整机 `cdp-probe` 未跑：3080 被本 GUI 占用（另起实例会撞端口 + 同一 `company-workspace` 的 writer），
+驱动两条路径改用合成页真 Chrome 验证；probe 自身的断言逻辑本次未改。
 
 存储重构的局部判据：`tests/company/cultivation-maintenance.spec.ts` + `revoke-journal.spec.ts` 9 例绿
 （`resolveMethodDir` 抽出前后同一份断言；读/删共用一条路径阶梯）。
@@ -53,6 +63,9 @@ pnpm verify    → ALL PASS（57 门，2 门无对象）
   （现有 `eslint-disable` 指向未启用的 react-hooks，重开与 react 插件一起评估）。
 - 复杂度读数 / 变异测试：触发写进 [testing.md §6](../../docs/testing.md)。
 - pre-push 接线在 Commit C（接线后 `--no-verify` 仍是逃生门，理由纪律不变）。
+- 观察项（未复现）：本轮起 `pnpm company` 观察窗（3080 占用失败）后，`packages/company-pack/node_modules` 被摘，
+  `pnpm test` 一度报 `Cannot find package`；`pnpm install` 恢复后全绿。未定位到 profile 安装还是失败退出那一步；
+  第二次出现再立卡。
 
 ## 取代
 

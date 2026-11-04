@@ -42,57 +42,18 @@ export function findChromeBinary() {
 }
 
 /**
- * Launch a throwaway headless Chrome and attach to its page target.
- * @param {object} options
- * @param {string} options.url - the page to load (include any auth token).
- * @param {string} [options.chromeBin] - browser binary; auto-detected when absent.
- * @param {string} [options.windowSize] - `--window-size` value; default `1600,1000`.
- * @param {number} [options.bootTimeoutMs] - how long to wait for CDP + the page.
- * @returns {Promise<object>} handle: { evaluate, click, consoleProblems, exceptions, close }.
+ * Open the CDP session over a resolved page target and return the probe-facing face.
+ *
+ * Launch and attach share this one implementation: the socket setup, console/exception
+ * capture, the 20s send timeout and the Runtime/Page enable handshake must not drift
+ * between them. The caller owns the browser process; `close` closes only this socket.
+ *
+ * @param {{ webSocketDebuggerUrl: string }} target - a `/json/list` page entry.
+ * @returns {Promise<object>} { ws, problems, exceptions, evaluate, click, screenshot, close }
  */
-export async function launchCdpBrowser({ url, chromeBin, windowSize = '1600,1000', bootTimeoutMs = 20000 } = {}) {
-  const bin = chromeBin ?? findChromeBinary();
-  if (bin === undefined) throw new Error('no Chrome/Edge binary found (set DSH_PROBE_CHROME)');
-  const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cdp-driver-'));
-  const chrome = spawn(bin, [
-    '--headless=new',
-    '--no-sandbox',
-    '--disable-gpu',
-    '--disable-software-rasterizer',
-    '--disable-dev-shm-usage',
-    '--disable-crash-reporter',
-    `--crash-dumps-dir=${profileDir}`,
-    `--user-data-dir=${profileDir}`,
-    '--no-first-run',
-    '--remote-debugging-port=0',
-    `--window-size=${windowSize}`,
-    url,
-  ], { stdio: 'ignore' });
-
-  const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms) });
+async function connectSession(target) {
   const problems = [];
   const exceptions = [];
-
-  // Port 0: the OS picks the debugging port and Chrome writes it here.
-  let cdpPort = null;
-  for (let i = 0; i < 40 && cdpPort === null; i++) {
-    try {
-      cdpPort = Number(fs.readFileSync(path.join(profileDir, 'DevToolsActivePort'), 'utf8').split('\n')[0]);
-    } catch {}
-    if (cdpPort === null) await sleep(250);
-  }
-  if (cdpPort === null) throw new Error('DevToolsActivePort never appeared');
-
-  let target = undefined;
-  for (let i = 0; i < 20 && target === undefined; i++) {
-    try {
-      const list = await (await fetch(`http://127.0.0.1:${cdpPort}/json/list`)).json();
-      target = list.find(entry => entry.type === 'page' && entry.webSocketDebuggerUrl !== undefined);
-    } catch {}
-    if (target === undefined) await sleep(500);
-  }
-  if (target === undefined) throw new Error('no CDP page target appeared');
-
   const ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('CDP websocket failed')) });
 
@@ -155,12 +116,67 @@ export async function launchCdpBrowser({ url, chromeBin, windowSize = '1600,1000
     return 'clicked';
   })()`);
 
+  return { ws, problems, exceptions, evaluate, click, screenshot, close: () => ws.close() };
+}
+
+/**
+ * Launch a throwaway headless Chrome and attach to its page target.
+ * @param {object} options
+ * @param {string} options.url - the page to load (include any auth token).
+ * @param {string} [options.chromeBin] - browser binary; auto-detected when absent.
+ * @param {string} [options.windowSize] - `--window-size` value; default `1600,1000`.
+ * @param {number} [options.bootTimeoutMs] - how long to wait for CDP + the page.
+ * @returns {Promise<object>} handle: { evaluate, click, consoleProblems, exceptions, close }.
+ */
+export async function launchCdpBrowser({ url, chromeBin, windowSize = '1600,1000', bootTimeoutMs = 20000 } = {}) {
+  const bin = chromeBin ?? findChromeBinary();
+  if (bin === undefined) throw new Error('no Chrome/Edge binary found (set DSH_PROBE_CHROME)');
+  const profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cdp-driver-'));
+  const chrome = spawn(bin, [
+    '--headless=new',
+    '--no-sandbox',
+    '--disable-gpu',
+    '--disable-software-rasterizer',
+    '--disable-dev-shm-usage',
+    '--disable-crash-reporter',
+    `--crash-dumps-dir=${profileDir}`,
+    `--user-data-dir=${profileDir}`,
+    '--no-first-run',
+    '--remote-debugging-port=0',
+    `--window-size=${windowSize}`,
+    url,
+  ], { stdio: 'ignore' });
+
+  const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms) });
+
+  // Port 0: the OS picks the debugging port and Chrome writes it here.
+  let cdpPort = null;
+  for (let i = 0; i < 40 && cdpPort === null; i++) {
+    try {
+      cdpPort = Number(fs.readFileSync(path.join(profileDir, 'DevToolsActivePort'), 'utf8').split('\n')[0]);
+    } catch {}
+    if (cdpPort === null) await sleep(250);
+  }
+  if (cdpPort === null) throw new Error('DevToolsActivePort never appeared');
+
+  let target = undefined;
+  for (let i = 0; i < 20 && target === undefined; i++) {
+    try {
+      const list = await (await fetch(`http://127.0.0.1:${cdpPort}/json/list`)).json();
+      target = list.find(entry => entry.type === 'page' && entry.webSocketDebuggerUrl !== undefined);
+    } catch {}
+    if (target === undefined) await sleep(500);
+  }
+  if (target === undefined) throw new Error('no CDP page target appeared');
+
+  const session = await connectSession(target);
+
   const handle = {
-    evaluate,
-    click,
-    screenshot,
-    consoleProblems: problems,
-    exceptions,
+    evaluate: session.evaluate,
+    click: session.click,
+    screenshot: session.screenshot,
+    consoleProblems: session.problems,
+    exceptions: session.exceptions,
     profileDir,
     close: () => { chrome.kill() },
   };
@@ -193,8 +209,6 @@ export async function launchCdpBrowser({ url, chromeBin, windowSize = '1600,1000
 export async function attachCdpBrowser({ port, urlIncludes, bootTimeoutMs = 20000 } = {}) {
   assertAttachPort(port);
   const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms) });
-  const problems = [];
-  const exceptions = [];
   let target;
   const deadline = Date.now() + bootTimeoutMs;
   while (target === undefined && Date.now() < deadline) {
@@ -208,70 +222,16 @@ export async function attachCdpBrowser({ port, urlIncludes, bootTimeoutMs = 2000
   }
   if (target === undefined) throw new Error(`no attachable page target on port ${port}${urlIncludes === undefined ? '' : ` matching ${urlIncludes}`}`);
 
-  const ws = new WebSocket(target.webSocketDebuggerUrl);
-  await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('CDP websocket failed')) });
-  let seq = 0;
-  const pending = new Map();
-  ws.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    if (message.id !== undefined && pending.has(message.id)) {
-      pending.get(message.id)(message);
-      pending.delete(message.id);
-      return;
-    }
-    if (message.method === 'Runtime.consoleAPICalled' && ['error', 'warning'].includes(message.params.type)) {
-      const text = message.params.args.map(arg => arg.value ?? arg.description ?? '').join(' ');
-      problems.push(`console.${message.params.type}: ${text.slice(0, 300)}`);
-    }
-    if (message.method === 'Runtime.exceptionThrown') {
-      const details = message.params.exceptionDetails;
-      exceptions.push(`exception: ${(details.exception?.description ?? details.text).slice(0, 300)}`);
-    }
-  };
-  const send = (method, params = {}) => new Promise((resolve) => {
-    const id = ++seq;
-    pending.set(id, resolve);
-    ws.send(JSON.stringify({ id, method, params }));
-    setTimeout(() => {
-      if (pending.has(id)) {
-        pending.delete(id);
-        resolve({ result: { exceptionDetails: { text: `CDP evaluate timed out: ${method}` } } });
-      }
-    }, 20000);
-  });
-
-  await send('Runtime.enable');
-  await send('Page.enable');
-
-  const screenshot = async (file) => {
-    const reply = await send('Page.captureScreenshot', { format: 'png' });
-    const data = reply.result?.data;
-    if (typeof data !== 'string') return false;
-    fs.writeFileSync(file, Buffer.from(data, 'base64'));
-    return true;
-  };
-  const evaluate = async (expression) => {
-    const reply = await send('Runtime.evaluate', { expression, returnByValue: true });
-    if (reply.result?.exceptionDetails !== undefined) {
-      return { error: reply.result.exceptionDetails.exception?.description ?? reply.result.exceptionDetails.text };
-    }
-    return reply.result?.result?.value;
-  };
-  const click = async (selector) => evaluate(`(() => {
-    const el = document.querySelector(${JSON.stringify(selector)});
-    if (el === null) return 'no-element';
-    el.click();
-    return 'clicked';
-  })()`);
+  const session = await connectSession(target);
   return {
-    evaluate,
-    click,
-    screenshot,
-    consoleProblems: problems,
-    exceptions,
+    evaluate: session.evaluate,
+    click: session.click,
+    screenshot: session.screenshot,
+    consoleProblems: session.problems,
+    exceptions: session.exceptions,
     pageUrl: target.url,
     attached: true,
-    close: () => ws.close(),
-    settle: async () => { ws.close() },
+    close: session.close,
+    settle: async () => { session.close() },
   };
 }

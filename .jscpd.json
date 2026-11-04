@@ -1,7 +1,8 @@
 {
   "path": [
     "packages/company-pack/src",
-    "tools/lib"
+    "tools/lib",
+    "tools/drivers"
   ],
   "minTokens": 100,
   "minLines": 10,
