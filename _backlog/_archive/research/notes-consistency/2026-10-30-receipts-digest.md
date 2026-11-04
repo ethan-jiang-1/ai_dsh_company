@@ -1,12 +1,13 @@
 ---
 topic: 仓库卫生
-intent: "notes/ 分诊的收据索引：21 篇无持久决定的演练/批次/状态记录，各自证明了什么、现行 owner 在哪、删除后靠什么复核。用于获授权后替换原文（原文归 git 历史）。"
+intent: "notes/ 分诊的收据索引：22 篇无持久决定的演练/批次/状态记录，各自证明了什么、现行 owner 在哪、删除后靠什么复核。用于获授权后替换原文（原文归 git 历史）。"
 ---
 
 # notes 收据 digest · 2026-10-30
 
 > 性质：**证据索引**，不是决定。按 [notes/README §五](../../../../notes/README.md) 的 `receipt` 处置：
-> 21 篇原文已 `git mv` 到 `notes/archived/receipts/`（保留正文，不进 `archived/` 否决层）；本文件是唯一索引。
+> 22 篇原文在 `notes/archived/receipts/`（保留正文，不进 `archived/` 否决层）；本文件是唯一索引
+> （覆盖核验 22/22，2026-11-04）。原文删除按 notes/README §五 需用户点头（git 留历史）。
 > 机械面基线：`pnpm notes:audit` 报 9 篇收据候选；语义面另判 R3/R4 批次 10 篇、证据簇 2 篇，
 > 并排除 2 篇误报（见末节）。
 
