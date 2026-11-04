@@ -40,3 +40,5 @@
 ⚠ 本目录**不进 tarball**（`files` 的现行清单 = [package.json](../package.json)：只发 runtime 两半、
 `presets/**`、`content/**`、`locale/`、`icon.svg`、`cordis.patch.yml`、`LICENSE`，不发 `src/**`（v3 起也没有 `workspace/**`））
 ——发布面是 `lib/`（generated，owner 表 = [pack README](../README.md)）。
+
+**质量命令**：`pnpm lint`（oxlint，本包 `src` + `tests`，correctness 档零告警）/ `pnpm dup`（jscpd，`src` + `tools/lib` + `tools/drivers`，minLines 10 / minTokens 100）——取舍与覆盖边界 = [Note](../../../notes/implemented/2026-11-04-lint-and-dup-upstream.md)。

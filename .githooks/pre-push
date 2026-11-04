@@ -1,14 +1,16 @@
 #!/bin/sh
 # pre-push：push 前跑全量结构门禁 + keyless 行为测试（enforcement 通道，2026-09-27 立；接线 = run/env.sh 幂等设 core.hooksPath）。
 # 为什么：DSH 立场——"Agents follow enforced gates far more reliably than prose conventions"。
-#        verify ~2s + typecheck ~1s + test ~1.3s，合计秒级，不越「hook 只装便宜高置信缺陷」的预算（DSH lefthook 同款边界）。
+#        verify ~2s + typecheck ~1s + lint/dup <0.2s + test ~1.3s，合计秒级，不越「hook 只装便宜高置信缺陷」的预算（DSH lefthook 同款边界）。
 #        test 进 hook 而非 CI（2026-09-28 实证定界）：vitest 的 vendor 内部 @deepseek-ai/* 解析依赖
 #        已构建 lib——本地 dev 树按 bootstrap 必然已构建所以跑得动；CI 干净环境没有，而补齐 =
 #        全量 vendor 构建链（DSH 自己的 test 脚本也是 build && vitest），负担不成比例。
-#        ⇒ 分工 = hook 管「忘跑」（verify+typecheck+test 都强制），CI 管「环境差异/绕过」（verify 穷举档）。
+#        ⇒ 分工 = hook 管「忘跑」（verify+typecheck+lint+dup+test 都强制），CI 管「环境差异/绕过」（verify 穷举档）。
 # 负例留证（2026-09-27）：AGENTS.md 临时加死链 → push 被 verify 拦下（未触网络层）；还原 → 放行到网络层。
 #        （2026-09-28）：临时失败 spec → hook 红；删除 → 绿。
 #        （2026-11-03）：临时写 `const x: number = 's'` → typecheck 拦下；还原 → 绿。
+#        （2026-11-04）：临时把 instance-guard 的 if/else 改回三元 → lint 拦下；还原 → 绿。
+#                      临时在 tools/lib 放 10 行复制块 → dup 拦下；删除 → 绿。
 # bypass：git push --no-verify（紧急逃生门；用了要在收尾 Note 说明原因）。
 [ -t 0 ] || cat >/dev/null   # 消费 stdin 的 ref 清单（git push 管道喂入；手动直跑时不阻塞）
 cd "$(git rev-parse --show-toplevel)" || exit 1
@@ -17,4 +19,6 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack || exit 1
 node ./node_modules/typescript/bin/tsc -p tsconfig.test-client.json || exit 1
 node ./node_modules/typescript/bin/tsc -p tsconfig.test-company.json || exit 1
 node ./node_modules/typescript/bin/tsc -p tsconfig.test-harness.json || exit 1
+pnpm -s lint || exit 1
+pnpm -s dup || exit 1
 exec pnpm test

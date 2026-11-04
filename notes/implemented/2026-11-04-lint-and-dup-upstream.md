@@ -14,6 +14,11 @@
 - **`cdp-driver` 抽 `connectSession(target)`**：WS 打开 / `onmessage` 分派 / 20s send 超时 / Runtime+Page enable /
   evaluate·click·screenshot 只有一份；launch 与 attach 各自只留「拿 target + 组装 handle」。
   63 行 / 519 tokens 的 intra-file 克隆归零（`-118/+79` 行）。
+- **收尾判据同轮补齐**（G2/G4）：断言反证（把被测函数改成返回 `null`，断言仍绿 = 没钉住）进
+  [close-out skill](../../.agents/skills/close-out-definition/SKILL.md) 收割三问②；commit body 的
+  why / what / 验证行写进第 8 步与完成判据。
+- **升级触发**（G3）：函数复杂度读数与变异测试进 [testing.md §6](../../docs/testing.md)；`.mjs` lint 与
+  type-aware 档的触发留在本节「边界与触发」。
 - 两者是 `package.json` 的 `lint` / `dup` 命令；**不进 `checks/gates/`**（P2：没有复发事故，gates 是要维护的代码）。
 - 首轮读数：lint 19 条（15 error + 4 warn）→ **0/0**；dup 1 处 → **0**。
 
@@ -48,6 +53,8 @@ node --check tools/drivers/cdp-driver.mjs → OK
 pnpm typecheck → exit 0（pack 两面 + tests 三面）
 pnpm test      → 142 files / 1122 tests
 pnpm verify    → ALL PASS（57 门，2 门无对象）
+sh .githooks/pre-push </dev/null → 全链绿（verify + typecheck + lint + dup + test）
+造红：lint 红时 hook 在 `pnpm -s lint` 步退出 1；还原 → 全链绿
 ```
 
 整机 `cdp-probe` 未跑：3080 被本 GUI 占用（另起实例会撞端口 + 同一 `company-workspace` 的 writer），
@@ -62,7 +69,7 @@ pnpm verify    → ALL PASS（57 门，2 门无对象）
   type-aware 档（触发 = 一次 floating-promise 类缺陷）；`reportUnusedDisableDirectives` 暂关
   （现有 `eslint-disable` 指向未启用的 react-hooks，重开与 react 插件一起评估）。
 - 复杂度读数 / 变异测试：触发写进 [testing.md §6](../../docs/testing.md)。
-- pre-push 接线在 Commit C（接线后 `--no-verify` 仍是逃生门，理由纪律不变）。
+- pre-push 已接线（Commit C）：verify + typecheck + lint + dup + test；`--no-verify` 仍是逃生门，理由纪律不变。
 - 观察项（未复现）：本轮起 `pnpm company` 观察窗（3080 占用失败）后，`packages/company-pack/node_modules` 被摘，
   `pnpm test` 一度报 `Cannot find package`；`pnpm install` 恢复后全绿。未定位到 profile 安装还是失败退出那一步；
   第二次出现再立卡。

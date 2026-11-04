@@ -63,7 +63,7 @@
 
 ## 5. 节奏与授权
 
-- 不默认全量：本地按 §2 选最小证据；CI = 结构门禁 + 干净环境差异；pre-push hook = verify + typecheck + test（typecheck = pack 两面 + `tests/client` + `tests/company` + `tests/harness`（三者各排除直引 vendor 源码的 spec；harness 收全部 spec，唯一例外 = `pack-exports` 混合面），见 2026-11-03 D5 Note）。
+- 不默认全量：本地按 §2 选最小证据；CI = 结构门禁 + 干净环境差异；pre-push hook = verify + typecheck + lint + dup + test（typecheck = pack 两面 + `tests/client` + `tests/company` + `tests/harness`（三者各排除直引 vendor 源码的 spec；harness 收全部 spec，唯一例外 = `pack-exports` 混合面），见 2026-11-03 D5 Note）。
 - **关键模块覆盖下限** = [`vitest.config.ts`](../vitest.config.ts) 的 `coverage.thresholds`（context-wiring / member-navigation / title-state / workspace-resolution / runtime-guard / client/index）；跑 `pnpm test:coverage` 验，低于即红；`pnpm test` 不跑覆盖（秒级）。
 - **tests 部分不在 tsc（已知未覆盖面）**：`tests/client` 已接（`tsconfig.test-client.json`；排除 3 个直引 vendor 源码的 spec）；`tests/company` 已接（`tsconfig.test-company.json`；排除 7 个直引 vendor 源码 / host-composition 的 spec）；`tests/harness` 已接（`tsconfig.test-harness.json`；glob 全收，唯一例外 = `tests/harness/repo/pack-exports.spec.ts`——它同时 import host 与 client 两半，任一面的全局环境（`process`/`client-build-environment`）都会让另一半报错，实测两向皆红，只能留在 tsc 外）。
 - **自测轮**（全门禁 sweep + UX 走查 + entry-probe 语义探针）：agent 阶段收口时提案、用户批后跑（2026-10-04 定）；预算按 [policy §P3](./policy.md) 轻任务纪律。
@@ -71,4 +71,4 @@
 
 ## 6. 升级地图（长大后再借的形状；触发条件即准入门，不预建）
 
-脚本化模型 adapter 进程内 harness（回放覆盖不到的会话级行为；vendor `core/agent-loop/tests/mock-adapter.ts` 源码平面可复用）→ Config 两脸断言（首个带 Config 的 host 插件）→ 自跳过计数守卫（出现 skipIf）→ coverage 死代码扫描（lib 判据逻辑可疑）→ 交互性能预算常数化（性能回归指控）→ 快照世代模型（vendor 会话格式再 bump 且存有跨格式场景）。
+脚本化模型 adapter 进程内 harness（回放覆盖不到的会话级行为；vendor `core/agent-loop/tests/mock-adapter.ts` 源码平面可复用）→ Config 两脸断言（首个带 Config 的 host 插件）→ 自跳过计数守卫（出现 skipIf）→ coverage 死代码扫描（lib 判据逻辑可疑）→ 交互性能预算常数化（性能回归指控）→ 快照世代模型（vendor 会话格式再 bump 且存有跨格式场景）→ 函数复杂度读数（同一函数两次事故）→ 变异测试（关键判据模块覆盖达标仍反复出错）。

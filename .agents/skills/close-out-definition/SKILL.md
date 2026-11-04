@@ -28,7 +28,7 @@ description: Use when finishing any non-trivial change before reporting it done,
    ③证据选层（选的检查能证明承诺的性质吗）④Note（决定/备选/真证据齐吗），**重读当前 diff**，
    不沿用旧结论。输出 finding 带「缺陷/位置/影响/证据」，blocker 与建议分开；机器已可靠拒绝的不复报。
 4. **收割三问**（资产从运行里长出来，不从想象里写）：这次运行——①抓到异常没（→BUG 卡 + 红绿修复）
-   ②行为值得钉吗（判据「变了我们要不要知道」→ replay 场景 / keyless 断言 / 视觉夹具）
+   ②行为值得钉吗（判据「变了我们要不要知道」→ replay 场景 / keyless 断言 / 视觉夹具；钉之前反证一次：把被测函数改成返回 null，断言仍绿 = 这条没钉住）
    ③撞到运行态事实没（→ 调试阶梯 / Note / 升级 probe）。**三问全「无」也是合法答案，如实记。**
 5. **指针收口。** 改过的路径/符号/默认值，在所有**活文档**里的引用是否都指到现行家
    （门禁 `bare-path` / `md-links` 查得到的部分交给门禁，查不到的——散文里的描述、表格里的行——自己过一遍）。
@@ -38,7 +38,8 @@ description: Use when finishing any non-trivial change before reporting it done,
 7. **反向检查**：被证伪的已落地切片**整片 revert**（实现+测试+docs+Note 同退），修正另起新条目。
    不做半 revert 的外科修补——半退留「文档说 A、代码是 B」的漂移态，结构门禁查 HEAD 不查语义一致，抓不住。
 8. **跑门禁**：`pnpm verify` + `pnpm test`（`set -o pipefail` 链；裸 `cmd | tail` 取的是 tail 的
-   退出码 = 假绿）。改动面涉类型/导入签名时加 `pnpm typecheck`。
+   退出码 = 假绿）。改动面涉类型/导入签名时加 `pnpm typecheck`；涉 `src` / `tools/lib` / `drivers` 时加
+   `pnpm lint` + `pnpm dup`（pre-push 也强制）。提交体写 why / what / 验证行——本仓代码 commit 的现行形状，别只写标题。
 9. **发轮次回执**（非平凡收尾必发——交接的标准形状，驾驶座可见面）。固定六行：
    ① 外部行为与影响面（含改动 owner）；
    ② 四链证据（挂得上 / 行为对 / 装得上〔适用时〕 / 批准：各点名**实跑**的检查，未跑如实标「未执行」）；
@@ -55,7 +56,7 @@ description: Use when finishing any non-trivial change before reporting it done,
 - [ ] 收割三问逐问有答案（「无」也是答案，但必须回答）。
 - [ ] 改口检查过：若推翻/收窄旧决定，旧文有回链或已归档；`pnpm notes:audit` 无「取代缺回链」。
 - [ ] 被证伪的切片整片 revert（或明确说明为何不 revert）。
-- [ ] `pnpm verify` + `pnpm test` 全绿，且命令链用了 `set -o pipefail`（涉类型面时 `pnpm typecheck` 也跑过）。
+- [ ] `pnpm verify` + `pnpm test` 全绿，且命令链用了 `set -o pipefail`（涉类型面时 `typecheck`、涉源码面时 `lint` + `dup` 也跑过）。
 - [ ] 发布类声明贴了 `release --check` 原始 READY 行 + commit SHA；没有就标「未发布/未执行」。
 - [ ] 六行回执已发，且每行都有内容（「未执行」「无」也是内容）。
 
