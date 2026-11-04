@@ -36,8 +36,8 @@ const DOC_LINE_BUDGETS = [
   ['docs/AGENTS.md', 62],        // 2026-10-09 N1 立（docs/ 分层规矩唯一家：一处事实一个家表 + 长度棘轮 + 更新时机 + 负知识；行数上限唯一源在 run-gates 不复述数字）；反证 = doc-taxonomy 门禁（表头/不属于这层 列缺失即红）
   ['docs/design/architecture.md', 360], // 2026-10-20 审计：设计层原先无预算；先冻结增长（5% 头寸），下一轮把 §7/§10 的现在时/操作表迁合同
   ['docs/design/roles-isolation.md', 187], // 2026-10-20：冻结增长；§3 选型表可降为合同指针
-  ['docs/design/ui-demo.md', 155], // 2026-10-20：冻结增长；§1–§2 实现指引可降为合同指针
-  ['docs/design/role-content-plan.md', 54], // 2026-10-20：冻结增长；现时语义归 presets.md
+  ['docs/design/ui-demo.md', 129], // 2026-10-20：冻结增长；§1–§2 实现指引可降为合同指针；2026-11-04 减法轮 147→123（§5 分层归轮/命名表退役，历史归 Notes），上限随内容下调
+  ['docs/design/role-content-plan.md', 37], // 2026-10-20：冻结增长；现时语义归 presets.md；2026-11-04 减法轮 51→35（探针/闭合接口改指针），上限随内容下调
   ['docs/demo.md', 237],        // 2026-10-21 冻结增长（六维度 Phase D3：无预算合同中最大三份立冻结预算）
   ['docs/multi-human.md', 199], // 2026-10-21 冻结增长
   ['docs/presets.md', 198],     // 2026-10-21 冻结增长（工具面表同轮去历史化）

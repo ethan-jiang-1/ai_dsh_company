@@ -13,6 +13,9 @@
 - **本轮实际删**：`bootstrap` 6 个、`tab-icons` 10 个、`bundle-manifest` 7 个、4 文件里 5 个
   **全仓零引用死导出**（`LEGACY_CLIENT_ERRORS_REL` / `ProfileDescriptor` / `runBundlePath` /
   `identityBackupDir` / `identityBackupFor`）。src 净 **+18 / −63 = −45 行**，28 个导出面收窄。
+- **设计层同轮追加**：`role-content-plan` **51→35**（探针/闭合接口改指针）、`ui-demo` **147→123**
+  （§5 分层归轮 + 命名表退役，历史归 Notes 与 terminology）；两份预算随内容下调。
+  加上代码 −45，本轮合计 **−85 行**（不含本 Note）。
 - **明确不删（都逐条看过）**：
   - `2026-10-23` 的 12 篇与 `2026-10-16` 的 7 篇：**19/19 都有「决定 + 输掉的方案」**，0 篇纯收据 → 搬去
     `archived/receipts/` 会丢 rationale，不做。
@@ -44,8 +47,8 @@
 
 ## 边界与触发
 
-- **Phase 5 设计层未做**（677 行、24 处「历史/已落地」标记）：一份文档一节地搬，风险高于前四批；
-  触发 = 用户点名或下一轮减法。
+- **Phase 5 设计层已做（同轮追加）**：`role-content-plan` 51→35、`ui-demo` 147→123；仍保留
+  `architecture` 的通道 D 退役叙述（负知识）与 `roles-isolation` §5（未实施计划）——两者不是历史叙述。
 - **门禁红证**：4–5 门可便宜造红（改一个字节 / 加一行），但那是**加**不是减；留给需要时。
 - **过程观察**：本轮 push 期间 SSH agent 的可用 key 时有时无（`id_rsa` 被 GitHub 拒；`gh` HTTPS 可用）；
   不是仓库事实，记在这里防下次误判为“没有权限”。
