@@ -211,7 +211,7 @@ try {
   }
   const wake = async () => { await page.evaluate(() => { window.dispatchEvent(new Event('focus')) }); await sleep(700) }
   const roleShort = async () => /我的分身：([^\n|]+)/.exec(await page.locator('body').innerText())?.[1]?.trim() ?? null
-  role = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo' }[await roleShort()] ?? null
+  role = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo', CMO: 'cmo' }[await roleShort()] ?? null
 
   // 行查询一律限定在**侧栏那个面板**内：公司页实例并存时，page-wide 会命中两份（strict violation）。
   const rowOf = (id) => page.locator('.wk-pane').getByRole('listitem', { name: `待处理 ${id}` }).first()

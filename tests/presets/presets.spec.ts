@@ -474,3 +474,14 @@ describe('第六角色 CMO 的用户可见清单与职责边界', () => {
     expect(readFileSync(join(PACK, 'content/charters/cmo.md'), 'utf8')).toContain('VP-Sales')
   })
 })
+
+describe('包元数据与用户可见角色清单', () => {
+  it('package description 与 README 六角色（含 CMO），不再 Five-role', () => {
+    const manifest = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8'))
+    expect(manifest.description).toContain('CMO')
+    expect(manifest.description).not.toContain('Five-role')
+    const readme = readFileSync(join(PACK, 'README.md'), 'utf8')
+    expect(readme).toContain('cmo / researcher')
+    expect(readme).not.toContain('Five-role')
+  })
+})

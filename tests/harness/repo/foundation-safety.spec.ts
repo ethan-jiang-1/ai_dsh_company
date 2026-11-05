@@ -134,3 +134,11 @@ describe('录制工作区参考镜像（v3）', () => {
     }
   })
 })
+
+describe('converge 的标签→角色映射', () => {
+  it('含 CMO（宪章补登 --charter-backfill 用）', () => {
+    const src = readFileSync(join(ROOT, 'tools/converge.mjs'), 'utf8')
+    expect(src).toContain("CMO: 'cmo'")
+    expect(src).toMatch(/CEO\|VP-Eng\|VP-Sales\|COO\|CFO\|CMO/)
+  })
+})

@@ -352,7 +352,7 @@ const converge = (dirName) => {
   console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/converge.mjs --charter-backfill ${dirName}（教训性文字仍由人把守——纪要素材逐字取 meta）`)
 }
 
-const ROLE_KEY = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo' }
+const ROLE_KEY = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo', CMO: 'cmo' }
 // --charter-backfill <目录名>：为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步机械化）。
 //   纪要素材逐字取 meta（结论不转写）；条目 = 日期 + slug（类型）+ 结论 + 两个归档位。
 //   已登记（charterHasEntry 条目行锚——BUG-014）则跳过；「历史纪要」节缺失则新建；
@@ -365,7 +365,7 @@ const charterBackfill = (dirName) => {
   const kind = metaField(slugDir, '类型') || '—'
   const concl = metaField(slugDir, '一句话结论')
   const participation = metaField(slugDir, '参与')
-  let roles = [...new Set((participation.match(/CEO|VP-Eng|VP-Sales|COO|CFO/g) ?? []).map(r => ROLE_KEY[r]).filter(Boolean))]
+  let roles = [...new Set((participation.match(/CEO|VP-Eng|VP-Sales|COO|CFO|CMO/g) ?? []).map(r => ROLE_KEY[r]).filter(Boolean))]
   if (roles.length === 0 && /全员/.test(participation)) roles = [...new Set(Object.values(ROLE_KEY))]
   if (roles.length === 0) { console.error(`✗ ${dirName}: meta.参与 无可解析角色`); process.exit(1) }
   const journalExists = existsSync(join(ARCHIVE, dirName, 'journal'))

@@ -1,5 +1,5 @@
 ---
-description: "Five-role virtual company for DSH: CEO / VP-Eng / VP-Sales / COO / CFO presets, company handbook and Web tabs."
+description: "Six-role virtual company for DSH: CEO / VP-Eng / VP-Sales / COO / CFO / CMO presets (MRD/PRD product definition), company handbook and Web tabs."
 kind: "package-reference"
 ---
 
@@ -31,7 +31,7 @@ npm CLI / `dsh web` 的 Plugins 页需要 pnpm 在 PATH（或 `corepack enable p
 
 - `dsh --profile company --dump-config`：能看到 `company-client` 与 `company-session-search` 行；
 - 真启动一次：stderr 没有 `did not activate` / `skipping profile bundle`；
-- Plugins 页：bundle 卡片可见，六条 preset 行（ceo / vp-eng / vp-sales / coo / cfo / researcher）不 broken；
+- Plugins 页：bundle 卡片可见，七条 preset 行（ceo / vp-eng / vp-sales / coo / cfo / cmo / researcher）不 broken；
 - 应用内安装的结果是 `application: applied`，或 `restart-required`（按提示重启后再验）；`failed` 才是失败。
 
 ## 交付形态
@@ -71,6 +71,8 @@ npm CLI / `dsh web` 的 Plugins 页需要 pnpm 在 PATH（或 `corepack enable p
 ## What it contributes
 
 - 六个角色 preset（CEO / VP-Eng / VP-Sales / COO / CFO / CMO）+ 委派子人格 `researcher`；
+- 产品定义：CMO 出 MRD（`MR-###`）、VP-Eng 出 PRD（`REQ-###` / `AC-###-#` / slice 需求账本），
+  共享 `product-definition`（项目制/系统集成、硬软一体）；`/prd check <目录名>` 机械校验；
 - host 行：签字、工作区门、团队、present、日期/节律、公司 client 面、公司状态初始化、
   workspace 登记、handbook `systemPrompt.section`、成品目录/账本；
 - `company-session-search`（insert + isolate 组）：角色 `session_search` 工具 + 独立

@@ -180,7 +180,7 @@ try {
 
   await shot(page, '00-first-view', { full: true })
   const short = /我的分身：([^\n|]+)/.exec(await page.locator('body').innerText())?.[1]?.trim() ?? null
-  role = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo' }[short] ?? null
+  role = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo', CMO: 'cmo' }[short] ?? null
   if (role === null) throw new Error(`面板没报出会话角色（我的分身 = ${String(short)}）`)
 
   // 预置四条：T2 采纳 / T4 拒绝 / T5 验证 / T6 撤回（后者带方法目录，撤回才有的删）

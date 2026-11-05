@@ -108,6 +108,22 @@
 验证：`pnpm test` **145 files / 1150 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS；
 `release --prepare/--verify` 全绿。
 
+## 2026-11-05 矩阵扫描 第 1 轮（goal）
+
+- **package.json description 与 README frontmatter 仍是 `Five-role …`**（npm 元数据 / 市场索引来源）
+  → 六角色 + CMO（MRD/PRD product definition）。
+- **pack README「六条 preset 行（ceo / … / researcher）」漏 cmo** → **七条**（六角色 + researcher）。
+- **根 README 角色列表仍是五个**（正文已写六角色但清单漏 CMO）→ 补 CMO。
+- pack README「What it contributes」缺产品定义能力 → 加 CMO MRD / VP-Eng PRD / 共享 product-definition / /prd check 一条。
+- **`tools/converge.mjs` 的 ROLE_KEY 与 `--charter-backfill` 参与正则仍五角色**（CMO 的宪章补登会漏）
+  → 加 CMO；新增 source-shape 测试。
+- **两个 cultivation UX 探针的角色短标签映射仍五角色** → 加 CMO。
+- 测试资产：package description / README 清单不再出现 Five-role 且含 CMO；converge 映射含 CMO。
+- live 台账「参与列口径」扩到六角色（历史行保留 全员五人）。
+
+验证：`pnpm test` **145 files / 1152 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS；
+`release --prepare/--verify` 全绿（0.9.0 同版本未发布重打）。
+
 ## 事实落点
 
 `presets/cmo/`、`presets/_shared/skills/product-definition/`、`presets/vp-eng/skills/prd-playbook/`、
