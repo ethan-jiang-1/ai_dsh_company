@@ -48,9 +48,13 @@
   tabFailures 0、console/exceptions 零。
 - `/prd check`：单测覆盖合法一对、REQ 重号、来源不存在、AC 缺 then、状态无 changeLog、依赖环、
   slice 断链、dataBlocked、缺文件、成功回执。
-- `pnpm release --verify`：见发布回执（本 Note 落账后由 release 记录）。
-- **未跑**：真实 CEO+CMO+VP-Eng 产品动议（需真模型多轮 spawn，成本/时间超本轮；结构面由
-  `/prd check` + preset-smoke 覆盖；行为场景已写进 [product-definition 指南](../../docs/guides/product-definition.md)）。
+- `pnpm release --verify` **全绿**（verify / test / release-smoke 0.9.0 / company-entry / client-load /
+  preset-smoke / present-catalog）；`release --stamp/--check` → **READY 0.9.0 @ ffdf0ef**。
+- **真实产品动议实跑**（2026-11-05 20:23–20:45，约 22 分钟，真模型）：CEO 只叫 **CMO + VP-Eng**
+  （VP-Sales / COO / CFO 不在屋）→ CMO 出 MRD（4 机会：go 1 / defer 1 / no-go 2）→ VP-Eng 出 PRD
+  （4 slice / **13 REQ / 37 AC**）→ CMO 互审**打回 2 条** → VP-Eng 升 v2 复核通过 → `/prd check` 绿
+  （4/13/37/0 错）→ CEO `present` final + mrd + prd。产物在
+  `company-workspace/.dsh-company/deliverables/2026-11-05-reconciliation-product/`（workspace 数据，不进 git）。
 
 ## 事实落点
 
