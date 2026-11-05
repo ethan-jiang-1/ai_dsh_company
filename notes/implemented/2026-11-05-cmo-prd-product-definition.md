@@ -49,7 +49,7 @@
 - `/prd check`：单测覆盖合法一对、REQ 重号、来源不存在、AC 缺 then、状态无 changeLog、依赖环、
   slice 断链、dataBlocked、缺文件、成功回执。
 - `pnpm release --verify` **全绿**（verify / test / release-smoke 0.9.0 / company-entry / client-load /
-  preset-smoke / present-catalog）；`release --stamp/--check` → **READY 0.9.0 @ ffdf0ef**。
+  preset-smoke / present-catalog）；`release --stamp/--check` → **READY 0.9.0**（点态；gitSha 见 `_dist/release-manifest.json`）。
 - **真实产品动议实跑**（2026-11-05 20:23–20:45，约 22 分钟，真模型）：CEO 只叫 **CMO + VP-Eng**
   （VP-Sales / COO / CFO 不在屋）→ CMO 出 MRD（4 机会：go 1 / defer 1 / no-go 2）→ VP-Eng 出 PRD
   （4 slice / **13 REQ / 37 AC**）→ CMO 互审**打回 2 条** → VP-Eng 升 v2 复核通过 → `/prd check` 绿
@@ -90,8 +90,23 @@
 5. **文档残留**：README / architecture / roles-isolation / ui-demo / multi-human / cdp-probe / presets 的
    "五角色 / 五色 / C·F·O·E·S" → 六角色（设计层只改现在时陈述；R2 历史场景不改）。
 
-验证：`pnpm test` **145 files / 1149 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS；
+验证：`pnpm test` **145 files / 1150 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS；
 `release --prepare/--verify` 见发布记录（0.9.0 同版本未发布重打）。
+
+## 2026-11-05 第三遍审查（用户可见面 / 工作流 / 边界）
+
+- **pack README 的角色清单仍是五角色**（随包用户可见）→ 六角色（CEO / VP-Eng / VP-Sales / COO / CFO / CMO）。
+- **默认 CEO 章程仍写"五条线"** → 六条线（pack 默认 + dev 盘）。
+- **VP-Sales 章程仍把"市场"整包揽**（与 CMO 重叠）→ 现有客户 / 销售 / 定价，新市场与新产品机会归 CMO
+  （pack 默认 + dev 盘；手册与 presets 合同同 diff）。
+- **VP-Eng 的 1 号工作流 `eng-workflow` 只写评审/评估、没提 PRD** → 加 PRD 分支：读 MRD → `prd-playbook`
+  + 共享 `product-definition` → `drafts/prd.md` → `/prd check`；评审稿仍走 review-note。
+- 测试资产：presets 新增「pack README 含 CMO + VP-Sales/CMO 章程互相指认边界」；CMO 委派工具面核实
+  （tool-subagent / fork / control 都在，persona 的 subagent 声明不虚）。
+- 未改：历史 notes / CHANGELOG / R2 场景的"五角色"是当时记录；dev 盘历史 journal 的五角色条目不回写。
+
+验证：`pnpm test` **145 files / 1150 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS；
+`release --prepare/--verify` 全绿。
 
 ## 事实落点
 

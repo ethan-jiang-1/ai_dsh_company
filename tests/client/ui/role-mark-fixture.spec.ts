@@ -2,7 +2,7 @@
  * 角色标记**六角色对照夹具的发射器**（2026-10-13 立）：
  *
  * 视觉认证档 `probes/browser-visual/sidebar-role-mark-probe.mjs` 的末段要一张"一次看全
- * C/F/O/E/S + 16px 座位关系"的对照图。标记必须来自**真组件**（`RoleBadge`，逐 preset 渲染成
+ * C/F/O/E/S/M + 16px 座位关系"的对照图。标记必须来自**真组件**（`RoleBadge`，逐 preset 渲染成
  * 静态标记）与**真 CSS**（`styles.ts` 的 CSS 常量原文）——所以走本仓转换链发射，不在探针里手抄。
  *
  * 本测试**默认只断言夹具能渲染**（`pnpm test` 里零副作用）；设了 `SIDEBAR_ROLE_MARK_EMIT=<路径>`

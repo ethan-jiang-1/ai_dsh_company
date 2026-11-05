@@ -70,7 +70,7 @@ npm CLI / `dsh web` 的 Plugins 页需要 pnpm 在 PATH（或 `corepack enable p
 
 ## What it contributes
 
-- 五个角色 preset（CEO / VP-Eng / VP-Sales / COO / CFO）+ 委派子人格 `researcher`；
+- 六个角色 preset（CEO / VP-Eng / VP-Sales / COO / CFO / CMO）+ 委派子人格 `researcher`；
 - host 行：签字、工作区门、团队、present、日期/节律、公司 client 面、公司状态初始化、
   workspace 登记、handbook `systemPrompt.section`、成品目录/账本；
 - `company-session-search`（insert + isolate 组）：角色 `session_search` 工具 + 独立

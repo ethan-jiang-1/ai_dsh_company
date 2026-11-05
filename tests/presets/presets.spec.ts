@@ -51,7 +51,7 @@ function rowBlock(role: string, rowId: string): string {
 }
 
 describe('company roster（R1 回归：preset 必须可挂载）', () => {
-  it('五个角色各声明一个 dsh-agent-preset 行，且都列进 dsh.bundle.patch 数组（0.1.7 声明模型）', () => {
+  it('六个角色各声明一个 dsh-agent-preset 行，且都列进 dsh.bundle.patch 数组（0.1.7 声明模型）', () => {
     const patch = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')).dsh.bundle.patch as string[]
     expect(Array.isArray(patch), '0.1.7 起 dsh.bundle.patch 为数组（registry 一行 + 每预设一行）').toBe(true)
     for (const role of ROLES) {
@@ -113,7 +113,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(missing).toEqual([])
   })
 
-  it('五角色文案定稿（R1 两角色守卫扩展），skill 目录名与 frontmatter 一致', () => {
+  it('六角色文案定稿（R1 两角色守卫扩展），skill 目录名与 frontmatter 一致', () => {
     for (const role of ROLES) {
       const decl = roleYml(role)
       expect(decl, `${role} persona 仍是占位`).not.toContain('占位')
@@ -133,7 +133,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
-  it('五角色必须声明基础工具行（preset 自包含；R1 首跑：无工具行 → 读不了文件、写不出交付物）', () => {
+  it('六角色必须声明基础工具行（preset 自包含；R1 首跑：无工具行 → 读不了文件、写不出交付物）', () => {
     const required = ['tool-fs', 'tool-fs-search', 'tool-skill', 'tool-todo', 'tool-present']
     for (const role of ROLES) {
       const composition = roleYml(role)
@@ -283,7 +283,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       .not.toMatch(/dsh-experimental-schedule-bundle/)
   })
 
-  it('公司手册（模型可见）覆盖五角色职责边界、路由与升级规则——不随内容改动悄悄失效', () => {
+  it('公司手册（模型可见）覆盖六角色职责边界、路由与升级规则——不随内容改动悄悄失效', () => {
     const handbook = readFileSync(join(ROOT, 'packages/company-pack/content/AGENTS.md'), 'utf8')
     for (const role of ['CEO', 'CFO', 'VP-Sales', 'VP-Eng', 'COO', 'CMO']) {
       expect(handbook, `手册缺 ${role} 的职责边界`).toContain(role)
@@ -400,7 +400,7 @@ describe('BUG-021：问询必须能自行收口（timed 形态）', () => {
   // 'open' 态只能前台答、`userQuestions/answer` 只吃 'continued' ⇒ 无 UI 认领的环境里问询永停 open
   // （现场：一场跑到 26 步的动议挂 40 分钟后掉线）。timed 形态让窗口有界：超时后工具返回 pending、
   // 问询转 continued（RPC 可答），前台 UI 的卡片也仍在（"已继续工作，仍可回答"）。
-  it('五角色的 ask_user_question 都钉 timed 形态 + 显式 timeout', () => {
+  it('六角色的 ask_user_question 都钉 timed 形态 + 显式 timeout', () => {
     for (const role of ROLES) {
       const block = rowBlock(role, 'tool-ask-user')
       expect(block, `${role} preset 缺 tool-ask-user 行`).not.toBe('')
@@ -464,5 +464,13 @@ describe('共享 product-definition 能力（CMO + VP-Eng）', () => {
   it('CMO mrd-playbook 与 VP-Eng prd-playbook 引用共享能力', () => {
     expect(readFileSync(join(PRESETS_DIR, 'cmo/skills/mrd-playbook/SKILL.md'), 'utf8')).toContain('product-definition')
     expect(readFileSync(join(PRESETS_DIR, 'vp-eng/skills/prd-playbook/SKILL.md'), 'utf8')).toContain('product-definition')
+  })
+})
+
+describe('第六角色 CMO 的用户可见清单与职责边界', () => {
+  it('pack README 角色清单含 CMO；VP-Sales 与 CMO 章程互相指认边界', () => {
+    expect(readFileSync(join(PACK, 'README.md'), 'utf8')).toContain('COO / CFO / CMO')
+    expect(readFileSync(join(PACK, 'content/charters/vp-sales.md'), 'utf8')).toContain('CMO')
+    expect(readFileSync(join(PACK, 'content/charters/cmo.md'), 'utf8')).toContain('VP-Sales')
   })
 })

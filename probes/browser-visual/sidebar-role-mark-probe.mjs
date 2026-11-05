@@ -18,7 +18,7 @@
 //   G4 同格时钟图标（12px 图元，在场时）不越标题盒（icon.right ≤ title.left + 0.5）
 //   G5 零挂载失败（无 "Failed to load plugins" 错误屏）
 //   G0 非空守卫：真侧栏里至少 1 个标记（零标记 = 判据空转，按红处理）
-//   G6 六角色对照夹具（末段）：真组件渲出的 C/F/O/E/S 六个标记齐、渲染宽 12px、**六个底色互异**、
+//   G6 六角色对照夹具（末段）：真组件渲出的 C/F/O/E/S/M 六个标记齐、渲染宽 12px、**六个底色互异**、
 //      每个标记的字/底对比度 ≥ 4.5（WCAG AA，页面里对真 computed 色现算）
 // 腿：① desktop 1280（侧栏随流）② narrow 356（点 "Open sidebar" 展开——用户截图那种窄窗）
 //     ③ full-bleed（在 ① 上注入 `--dsh-sidebar-inline-padding:0px`，复现"无侧栏内边距"的布局条件）
