@@ -11,6 +11,8 @@
 3. 复用前逐项校验：戳 schema/version/指纹、tarball 在场且 sha 相符、`lib/index.js` + `lib/client.js`
    在场；vendor sha 取不到 → 强制重建；`--rebuild` 是逃生门。
 4. 单一 owner：`tools/lib/pack-source.mjs`（release 与 dev 共用）；release 指纹语义不变（只搬家）。
+5. 边界：缓存只发生在**安装前**的构建/打包段；`plugin add file:` 与 `dsh --profile company` 的
+   boot 次序原样保留（[runtime-map §一](../../docs/runtime-map.md#一完整-web-链时序)）。
 
 ## 输掉的方案
 
