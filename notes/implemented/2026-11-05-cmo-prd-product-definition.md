@@ -161,6 +161,15 @@
 
 验证：`pnpm test` **145 files / 1154 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS（base-clean ×6）。
 
+## 2026-11-05 矩阵扫描 第 5 轮（goal）
+
+- 发布字节逐项核对（tarball 内 package/locale/README/CMO preset/CMO 章程/mrd 模板）：全部六角色 + 共享挂载 + 模板。
+- **`release-smoke` 首启必需清单漏 `kb/cmo/CHARTER.md`**，且只测干净首启/幂等二启、没测升级形状 →
+  补首启清单；新增真实升级 boot：把既有盘的 `kb/cmo/CHARTER.md` 删掉 → 下次启动补种（PASS）。
+- 反证/实证：release-smoke 单跑（含新升级步）**ALL PASS**；首启 39 件、roster 含 cmo。
+
+验证：`pnpm test` 145/1154、`pnpm typecheck`、`pnpm verify` ALL PASS。
+
 ## 事实落点
 
 `presets/cmo/`、`presets/_shared/skills/product-definition/`、`presets/vp-eng/skills/prd-playbook/`、

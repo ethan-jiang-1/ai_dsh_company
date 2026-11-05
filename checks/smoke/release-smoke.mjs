@@ -266,7 +266,7 @@ try {
   const packBefore = fingerprint(installedPack)
   const has = (rows, rel) => rows !== null && rows.some(row => row.startsWith(`${rel}:`))
   check('首启把公司状态落到 .dsh-company/（含状态/章程；不含根手册/模板）',
-    ['.dsh-company/kb/company.md', '.dsh-company/kb/org.md', '.dsh-company/kb/owners.md', '.dsh-company/kb/motion-ledger.md', '.dsh-company/kb/ceo/CHARTER.md']
+    ['.dsh-company/kb/company.md', '.dsh-company/kb/org.md', '.dsh-company/kb/owners.md', '.dsh-company/kb/motion-ledger.md', '.dsh-company/kb/ceo/CHARTER.md', '.dsh-company/kb/cmo/CHARTER.md']
       .every(rel => has(first, rel)),
     first === null ? `落点不存在：${companyHome}` : `共 ${String(first.length)} 件`)
 
@@ -320,6 +320,15 @@ try {
   check('第二次启动 bundle.json 字节不变（只创建、不覆盖）',
     manifestBefore !== null && readFileSync(manifestPath, 'utf8') === manifestBefore,
     manifestBefore === null ? 'bundle.json 不存在' : '字节一致')
+
+  // 升级形状（2026-11-05）：既有盘缺新角色章程 ⇒ 下次启动补种，不是只在干净首启。
+  rmSync(join(companyHome, '.dsh-company/kb/cmo/CHARTER.md'))
+  await processes.close()
+  const upgraded = processes.start(process.execPath, [cli, '--profile', PROFILE, '--', '--port', '0', '--no-open'], { timeoutMs: 180_000 })
+  await upgraded.waitFor(/http:\/\/127\.0\.0\.1:(\d+)\/\?token=(\S+)/, BOOT_TIMEOUT_MS)
+  await waitFor(() => existsSync(join(companyHome, '.dsh-company/kb/cmo/CHARTER.md')), '升级启动补种 CMO 章程')
+  check('既有盘升级：缺的 CMO 章程在下次启动补种', existsSync(join(companyHome, '.dsh-company/kb/cmo/CHARTER.md')))
+  await processes.close()
 
   console.log('⑦ 卸载与重装（remove 只摘插件、数据全部留下）')
   const beforeRemoveManifest = readFileSync(manifestPath, 'utf8')
