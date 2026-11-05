@@ -20,6 +20,13 @@
 **呈现即验证**（2026-09-30 立，用户裁定；规则唯一见 [dev-loop §1](./guides/dev-loop.md)）：替人起观察窗 = 先自己跑通本节（boot 横幅 + roster + client 零挂载失败），红了当场修，全绿才交 URL——用户不当第一次验收员。
 **机器腿 = [cdp-probe](./guides/cdp-probe.md)**：`node probes/browser-visual/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/全部公司页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
 
+**快序列（交付提速）**：boot 本身是秒级（本机实测 ~9s）；慢通常在等横幅与串行验证。
+① 预检 `$DSH_HOME/company-pack.lock`：pid 存活但无监听端口 = 遗留 writer，先 kill（留着会让公司数据停写）；
+② 后台起服务**不等进程结束**（常驻进程不退出），横幅出现即用；③ `cdp-probe`（只跑一次）与
+`client-load-smoke` 并行，墙钟 = 慢的那个；④ 已在跑的本仓实例优先复用（`lsof -nP -iTCP:<port>`）。
+**提速不换路径**：交付启动走默认同形安装（`pack` + `plugin add file:`，模拟用户安装），
+`--link` 只作改 presets 的调试通道；home 用 `run/env.sh` 的隔离 dev home。
+
 1. `source run/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒）**：
    `pnpm dsh --profile company --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 说明你起的是
    日用 `~/.dsh`（那里另有同名 `web` profile）或 pack 没装。`pnpm company` 首次会按需 pack + `plugin add`。
