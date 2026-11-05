@@ -3,7 +3,7 @@
 // 问询延迟分析器（BUG-021/022 的调参依据）：扫一个 DSH home 的会话日志，量出 `ask_user_question` 的
 // **真人作答延迟分布**，并给出候选窗口的覆盖率——「窗口该钉多少秒」这类决定要有数据，不靠拍脑袋。
 //
-// 何时跑：要改五角色 preset 的 `tool-ask-user.timeout`、或复核该窗口是否仍合适时；升 pin 触碰
+// 何时跑：要改六角色 preset 的 `tool-ask-user.timeout`、或复核该窗口是否仍合适时；升 pin 触碰
 //   tool-ask-user / user-questions 后复核（事件形状变了本器要跟着改）。
 // 成本：纯只读 + zstd 解日志，秒级，无模型无浏览器。用法：source run/env.sh && node tools/ask-latency.mjs [--json]
 //

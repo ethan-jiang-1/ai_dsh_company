@@ -13,8 +13,8 @@ import { fileURLToPath } from 'node:url'
 import { isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { RUN_BUNDLE_DIR, RUN_BUNDLE_REL } from './run-bundle.ts'
 
-/** 五角色（researcher 没有 CHARTER）。 */
-export const COMPANY_ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'] as const
+/** 六角色（researcher 没有 CHARTER）。 */
+export const COMPANY_ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo'] as const
 
 /** 默认章程源目录（pack 内）。 */
 const CHARTERS_SOURCE = 'charters'

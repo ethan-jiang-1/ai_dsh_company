@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 何时跑：preset/browser 行、安装通道、DSH 版本窗口、roster 装配改动后；发布前手动跑 --channel all
-// 成本：~2-4 分钟 keyless（每个 case 一次真装 + 一次 boot + 五角色 session/create）；global 需要网络
+// 成本：~2-4 分钟 keyless（每个 case 一次真装 + 一次 boot + 六角色 session/create）；global 需要网络
 // 前置：已导出 `_dist/dsh-company-pack-<version>.tgz`；global 通道要求 PATH 里有真实 `dsh`；
 //       --with-browser 会从 npm 安装两个 browser 包（仅 global；网络）
 //
 // 证明形状（唯一证明边界：这是“真实启动器通道”的 roster/会话面，不是浏览器 UI 交互）：
-// - vendor：vendor built CLI + DSH_COMPANY_BROWSER=on（vendor 安装侧有 browser 两包）⇒ 五角色零 broken。
-// - global-off：真实全局 dsh + DSH_COMPANY_BROWSER=off + 无 browser 两包 ⇒ 五角色零 broken、五会话可建。
+// - vendor：vendor built CLI + DSH_COMPANY_BROWSER=on（vendor 安装侧有 browser 两包）⇒ 六角色零 broken。
+// - global-off：真实全局 dsh + DSH_COMPANY_BROWSER=off + 无 browser 两包 ⇒ 六角色零 broken、六会话可建。
 //   —— 这是 2026-10-26 P0 的回归线：npm 发布的 DSH meta package 不含 browser 两包，
 //      旧 pack 的五个角色会全部 broken；条件禁用后应绿。
-// - global-auto：全局 dsh + 不设 flag + 无 browser 包 ⇒ 自动禁用，五角色零 broken。
-// - global-auto-browser（--with-browser）：把两个 browser 包装进 profile ⇒ 自动启用，五角色零 broken。
+// - global-auto：全局 dsh + 不设 flag + 无 browser 包 ⇒ 自动禁用，六角色零 broken。
+// - global-auto-browser（--with-browser）：把两个 browser 包装进 profile ⇒ 自动启用，六角色零 broken。
 // 不证明：浏览器页签交互、真模型、Windows/容器、registry 发布。
 
 import { spawn, spawnSync } from 'node:child_process'
@@ -33,7 +33,7 @@ const PACK = process.argv.includes('--pack')
 // Node 的上行解析会把它们“变出来”，全局通道的缺包 bug 就被遮住了（2026-10-26 实测）。
 const BASE = mkdtempSync(join(tmpdir(), 'dsh-channel-matrix-'))
 const CLI = join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js')
-const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
+const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo']
 const failures = []
 const active = new Set()
 

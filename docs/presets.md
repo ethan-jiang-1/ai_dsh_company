@@ -62,7 +62,7 @@
 - **工作流（1 号）**：`eng-workflow`（接活→备料→深挖→出稿→回执）；打法 skill =
   `tech-feasibility-review`（选项枚举 ≥3 → 逐项可行性·成本·风险 → 结论先行）。
 - **PRD 主笔**：接 CMO 的 MRD 写 PRD（`drafts/prd.md`：REQ/AC/slice），用 `prd-playbook` + 共享 `product-definition`；`/prd check <目录名>` 校验。
-- **KB**：`kb/vp-eng/CHARTER.md`（研发条线 18 人、SRE 2 / 无 DBA、Node 22 + SQLite、AI 试点
+- **KB**：`kb/vp-eng/CHARTER.md`（研发条线 16 人、SRE 2 / 无 DBA、Node 22 + SQLite、AI 试点
   API 每案 $200/月硬顶；历史评审三问）+ `journal/`。
 - **验证**：Web 会话选 `vp-eng` → 身份探针 + 产出探针（半页 PRD 出评审意见，不得越权替销售/运营下结论）。
 

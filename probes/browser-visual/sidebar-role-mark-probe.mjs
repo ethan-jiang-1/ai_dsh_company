@@ -18,12 +18,12 @@
 //   G4 同格时钟图标（12px 图元，在场时）不越标题盒（icon.right ≤ title.left + 0.5）
 //   G5 零挂载失败（无 "Failed to load plugins" 错误屏）
 //   G0 非空守卫：真侧栏里至少 1 个标记（零标记 = 判据空转，按红处理）
-//   G6 五角色对照夹具（末段）：真组件渲出的 C/F/O/E/S 五个标记齐、渲染宽 12px、**五个底色互异**、
+//   G6 六角色对照夹具（末段）：真组件渲出的 C/F/O/E/S 六个标记齐、渲染宽 12px、**六个底色互异**、
 //      每个标记的字/底对比度 ≥ 4.5（WCAG AA，页面里对真 computed 色现算）
 // 腿：① desktop 1280（侧栏随流）② narrow 356（点 "Open sidebar" 展开——用户截图那种窄窗）
 //     ③ full-bleed（在 ① 上注入 `--dsh-sidebar-inline-padding:0px`，复现"无侧栏内边距"的布局条件）
 // 图像判据（人/多模态看图）：出 snapshots/visual/sidebar-role-mark/{desktop,narrow,full-bleed}.png
-//   + roles.png（五角色对照图，1× / 6× 两条）；computed.json 另写逐行盒与判据结论。
+//   + roles.png（六角色对照图，1× / 6× 两条）；computed.json 另写逐行盒与判据结论。
 // 用法：source run/env.sh && node probes/browser-visual/sidebar-role-mark-probe.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb } from '../../tools/lib/probe-web.mjs'
@@ -170,8 +170,8 @@ await shoot('full-bleed')
 
 writeFileSync(join(SHOTS, 'computed.json'), JSON.stringify({ seatCeiling: SEAT_CEILING, legs, failures }, null, 2), 'utf8')
 
-// ── 末段：五角色对照图（G6；真组件 + 真 CSS，经 vitest 发射器现算）──
-console.log('── 五角色对照夹具（G6）──')
+// ── 末段：六角色对照图（G6；真组件 + 真 CSS，经 vitest 发射器现算）──
+console.log('── 六角色对照夹具（G6）──')
 const FIXTURE = join(tmpdir(), `sidebar-role-mark-fixture-${String(process.pid)}.json`)
 const emitted = spawnSync('npx', ['vitest', 'run', 'tests/client/ui/role-mark-fixture.spec.ts'],
   { cwd: ROOT, env: { ...process.env, SIDEBAR_ROLE_MARK_EMIT: FIXTURE }, encoding: 'utf8' })
@@ -215,19 +215,19 @@ if (emitted.status !== 0) {
     })
   }, fixture)
   console.log(`  夹具标记：${fixtureMarks.map(m => `${m.preset ?? '?'}=${m.mark ?? '?'}(${String(m.w)}px ${m.background})`).join(' / ')}`)
-  const expectPresets = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']
+  const expectPresets = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales', 'cmo']
   const check = makeFailingCheck(failures)
-  check('G6 五角色标记齐（ceo/cfo/coo/vp-eng/vp-sales）',
+  check('G6 六角色标记齐（ceo/cfo/coo/vp-eng/vp-sales/cmo）',
     expectPresets.every(preset => fixtureMarks.some(m => m.preset === preset)),
     fixtureMarks.map(m => m.preset ?? '?').join(','))
   check('G6 每个对照标记渲染宽 = 12px',
     fixtureMarks.length > 0 && fixtureMarks.every(m => Math.abs(m.w - 12) < 0.05),
     fixtureMarks.map(m => String(m.w)).join(','))
   check('G6 标记带全称 title', fixtureMarks.every(m => (m.title ?? '').length >= 3), fixtureMarks.map(m => m.title ?? '?').join(','))
-  // 第二通道：五角色底色互异（同色 = 字母之外的通道失效）
+  // 第二通道：六角色底色互异（同色 = 字母之外的通道失效）
   // 只取五行"角色行"（同格时钟那一行复用 ceo，不进互异判据）
   const roleRows = fixtureMarks.filter(m => m.shared !== true)
-  check('G6 五角色底色互不相同',
+  check('G6 六角色底色互不相同',
     roleRows.length === expectPresets.length && new Set(roleRows.map(m => m.background)).size === roleRows.length,
     roleRows.map(m => `${m.preset ?? '?'}:${m.background}`).join(' '))
   // 每个标记的字母/底色对比度 ≥ WCAG AA 4.5（字色是设计选择，这里是它在真样式下的实测值）

@@ -144,7 +144,7 @@ try {
   const rpcFactory = companyRpc({ fetch, base, cookie, prefix: 'smoke-', dumpBodyOnError: true })
   const rpc = (b, ck, endpoint, args) => rpcFactory(endpoint, args)
 
-  // ① roster：五个角色都在且零 broken（扫不到就不必谈挂载）
+  // ① roster：六个角色都在且零 broken（扫不到就不必谈挂载）
   //    `agentPresets/list` 无参数 → args 就是空对象；`session/create(request)` → args 是 { request }
   const roster = await rpc(base, cookie, 'agentPresets/list', {})
   const presets = roster.presets ?? []

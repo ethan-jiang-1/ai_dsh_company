@@ -56,6 +56,24 @@
   （4/13/37/0 错）→ CEO `present` final + mrd + prd。产物在
   `company-workspace/.dsh-company/deliverables/2026-11-05-reconciliation-product/`（workspace 数据，不进 git）。
 
+## 2026-11-05 审查修复（系统性缺口）
+
+对最后一次功能提交做整体审查，发现并修：
+
+1. **`bootstrap.COMPANY_ROLES` 仍是五角色**（功能 bug）：新装/已有盘都不会种 `kb/cmo/CHARTER.md`。
+   已加 cmo；release-smoke 干净资料首启件数 **36→39**（多 `kb/cmo/`、`journal/`、`CHARTER.md`）且 PASS。
+2. **编制残留**：`content/charters/vp-eng.md` 与 `docs/presets.md` 仍写研发 18 人 / 含产品 2 →
+   改 **16 人**（产品 2 已归 CMO 线）。
+3. **用户可见面**：安装手册模板（`tools/lib/install-manual.mjs`）五角色→六角色（含排障表）。
+4. **active 面五角色残留**：presets / ledger-participation 注释、channel-matrix-smoke ROLES、
+   preset / replay smoke 注释、sidebar-role-mark-probe G6（含 cmo/M/六底色）、
+   cultivation-method-layer probe ROLES、role-mark-fixture；converge-rules 新增
+   「全员六人 / CMO 末位」用例。
+5. **dev 公司盘**：`kb/org.md` 是旧形状断链（live run 的 CMO 已标【事实·未复核】）→ 替换为当前
+   六条线默认；补 `kb/cmo/CHARTER.md`；`kb/vp-eng/CHARTER.md` 18→16；owners 加 CMO 行。
+6. 0.9.0 重打（同版本未发布）：prepare + verify + release-smoke 全绿；实跑产物仍 13 REQ / 37 AC 且
+   `/prd check` 绿（live 的 final.md 是记录，不回写）。
+
 ## 事实落点
 
 `presets/cmo/`、`presets/_shared/skills/product-definition/`、`presets/vp-eng/skills/prd-playbook/`、

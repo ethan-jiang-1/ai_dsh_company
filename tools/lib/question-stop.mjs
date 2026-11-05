@@ -18,7 +18,7 @@
  * keyless 判据 = `tests/harness/tools/question-stop.spec.ts`；驱动侧用法 = `probes/session-context/ask-user-timed-probe.mjs`。
  */
 
-/** 默认前台窗口（秒）——与五角色 preset 钉的 `timeout: 120` 同值。 */
+/** 默认前台窗口（秒）——与六角色 preset 钉的 `timeout: 120` 同值。 */
 export const DEFAULT_QUESTION_WINDOW_MS = 120_000
 /** 超过这个窗口就"视同无界"（驱动不该陪着等一小时）。 */
 export const DEFAULT_MAX_BOUNDED_WINDOW_MS = 900_000

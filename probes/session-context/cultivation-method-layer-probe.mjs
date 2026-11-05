@@ -18,7 +18,7 @@
 // 判据（六条，全过 = 机制成立）：
 //   ① cfo 新会话 catalog 含预置方法 probe-seeded-method（方法层冷启动发现；目录预先手写）
 //   ② ceo / vp-eng / coo 会话不含它（方法层按角色隔离，不串 CEO、不串其他职能）
-//   ③ 五角色 session/create 全部成功（缺目录容忍：只有 cfo 方法层存在，其余四角色目录缺席）
+//   ③ 六角色 session/create 全部成功（缺目录容忍：只有 cfo 方法层存在，其余五角色目录缺席）
 //   ④ commands/list 含 cultivation；/cultivation correct 落记录到 <cwd>/cultivation/records/
 //   ⑤ /cultivation adopt → 方法 SKILL.md 落 <DSH_HOME>/company/methods/cfo/ + 记录翻 adopted
 //   ⑥ 采纳后**新开**的 cfo 会话 catalog 含该方法（跨会话持续生效）；运行中会话复查 = 观察项
@@ -52,7 +52,7 @@ try {
 const COMPANY = join(ROOT, 'company-workspace')
 const METHOD_ROOT = join(home, 'company', 'methods')
 const RECORDS_DIR = join(COMPANY, 'cultivation', 'records')
-const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
+const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo']
 
 // ── 预置（探针前清掉自己的历史残留，再种 seed 方法到 cfo 方法层）────────────────
 const seedDir = join(METHOD_ROOT, 'cfo', SEED_METHOD)
@@ -91,7 +91,7 @@ try {
   const cookie = await companyCookie({ fetch, base, token, onEmptyCookie: 'throw' })
   const rpc = companyRpc({ fetch, base, cookie, prefix: 'cm-', dumpBodyOnError: true })
 
-  // ③ 五角色可挂载（缺目录容忍：方法层只有 cfo 目录存在）
+  // ③ 六角色可挂载（缺目录容忍：方法层只有 cfo 目录存在）
   const sessionIds = new Map()
   for (const role of ROLES) {
     await check(`session/create 挂上 ${role}（方法层缺目录不炸）`, async () => {

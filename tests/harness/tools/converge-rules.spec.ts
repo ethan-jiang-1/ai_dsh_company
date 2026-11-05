@@ -40,6 +40,14 @@ describe('converge-rules · 台账「参与」列规范化（2026-10-16 立；�
     expect(canonicalParticipation('全员五人')).toBe('全员五人')
   })
 
+  it('六角色全集 ⇒ 全员六人；CMO 追加在末位（历史「全员五人」仍合法）', () => {
+    expect(canonicalParticipation('CEO+VP-Eng+VP-Sales+COO+CFO+CMO')).toBe('全员六人')
+    expect(canonicalParticipation('CMO+CFO+COO+VP-Sales+VP-Eng+CEO')).toBe('全员六人')
+    expect(canonicalParticipation('全员六人')).toBe('全员六人')
+    expect(canonicalParticipation('CMO+CEO')).toBe('CEO+CMO')
+    expect(canonicalParticipation('CEO+VP-Eng+CMO')).toBe('CEO+VP-Eng+CMO')
+  })
+
   it('子集 ⇒ 按固定序 CEO→VP-Eng→VP-Sales→COO→CFO 连接', () => {
     expect(canonicalParticipation('CEO+CFO+COO')).toBe('CEO+COO+CFO')
     expect(canonicalParticipation('CEO+VP-Sales+CFO')).toBe('CEO+VP-Sales+CFO')

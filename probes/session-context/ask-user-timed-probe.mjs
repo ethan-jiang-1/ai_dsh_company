@@ -2,7 +2,7 @@
 // 状态：常驻
 // BUG-021 真模型验收探针：问询在 timed 形态下**能自行收口**（窗口过后转 continued、RPC 可答、答案以新 turn 回来）。
 //
-// 何时跑：改五角色 preset 的 `tool-ask-user` 行（`mode` / `timeout`）、升 pin 触碰 user-questions 或
+// 何时跑：改六角色 preset 的 `tool-ask-user` 行（`mode` / `timeout`）、升 pin 触碰 user-questions 或
 //   tool-ask-user、或复核 BUG-021 已修判定时。改完必须跑——keyless 只证「配置在场」，行为只有真模型能证。
 // 成本：真模型，约 3–6 分钟（含 120s 前台窗口等待），≈3–6 次模型调用（用户自付 key）；凭据取自 DSH 凭据库
 //   （`runtime/harness-home/.credentials.yaml`，**不是**环境变量——`env | grep DEEPSEEK` 为空不代表没配）。

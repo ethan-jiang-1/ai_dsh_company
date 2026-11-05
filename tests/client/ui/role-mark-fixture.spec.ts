@@ -1,5 +1,5 @@
 /**
- * 角色标记**五角色对照夹具的发射器**（2026-10-13 立）：
+ * 角色标记**六角色对照夹具的发射器**（2026-10-13 立）：
  *
  * 视觉认证档 `probes/browser-visual/sidebar-role-mark-probe.mjs` 的末段要一张"一次看全
  * C/F/O/E/S + 16px 座位关系"的对照图。标记必须来自**真组件**（`RoleBadge`，逐 preset 渲染成
@@ -17,8 +17,8 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { ROLE_MARK, ROLE_SHORT, RoleBadge } from '../../../packages/company-pack/src/client/ui/RoleBadge.tsx'
 
-/** 五角色（顺序 = 出厂 preset 顺序；表里的角色少一个就会在图里露馅）。 */
-export const FIXTURE_ROLES: readonly string[] = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']
+/** 六角色（顺序 = 出厂 preset 顺序；表里的角色少一个就会在图里露馅）。 */
+export const FIXTURE_ROLES: readonly string[] = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales', 'cmo']
 
 const SID = 'session-fixture-role-mark' as Parameters<typeof RoleBadge>[0]['sessionId']
 
@@ -88,12 +88,12 @@ ${cells}
 }
 
 describe('角色标记对照夹具', () => {
-  it('五角色各渲染一个 12px 标记（+ 同格时钟一行），并可按 SIDEBAR_ROLE_MARK_EMIT 发射', () => {
+  it('六角色各渲染一个 12px 标记（+ 同格时钟一行），并可按 SIDEBAR_ROLE_MARK_EMIT 发射', () => {
     const html = fixtureHtml()
     for (const role of FIXTURE_ROLES) {
       expect(html, `${role} 的标记没渲出来`).toContain(`data-wk-role="${role}"`)
     }
-    // 1× 条 = 五角色 + 一行同格时钟；6× 条 = 五角色 ⇒ 11 个标记
+    // 1× 条 = 六角色 + 一行同格时钟；6× 条 = 六角色 ⇒ 11 个标记
     expect(html.match(/wk-role-badge/g)).toHaveLength(FIXTURE_ROLES.length * 2 + 1)
     expect(html).toContain('fx-clock')
     const css = shippedCss()

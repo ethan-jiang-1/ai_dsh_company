@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
 
-// ── 3. preset 结构：五角色 × (声明文件 + ≥1 skill，含第二 skill 根) + 委派子人格 × 声明文件 ───
+// ── 3. preset 结构：六角色 × (声明文件 + ≥1 skill，含第二 skill 根) + 委派子人格 × 声明文件 ───
 // 负例留证 2026-09-27：移走一个 SKILL.md → skill-file 红。
 // 0.1.7 起显示名/描述/order 内联进 `agent.cordis.yml` 的 `dsh-agent-preset` 行（原 preset.yml 并入），
 // 故这里只要求声明文件；挂载验证归 preset-smoke（真 web 逐角色建会话）。

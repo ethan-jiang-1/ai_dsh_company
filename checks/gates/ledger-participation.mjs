@@ -10,7 +10,7 @@ import { canonicalParticipation } from '../../tools/lib/converge-rules.mjs'
 // 台账是经营历史的唯一事实家；它的列口径是**机械可判**的 ⇒ 按「机械不变量进执行门禁」立此门禁。
 //
 // 判据（两条，都是口径不是文风）：
-//   ① 取值只有两种形状：**五个角色名之一到五个的 `+` 连接**，或集合恰好五人的 `全员五人`；
+//   ① 取值只有两种形状：**六个角色名之一到六个的 `+` 连接**，或集合恰好六人的 `全员六人`（历史行保留 `全员五人`）；
 //   ② 角色顺序固定 = `COMPANY_ROLE_IDS` 的**降序**（CEO→VP-Eng→VP-Sales→COO→CFO）；
 //      同集合不同拼写是本门禁要抓的腐化（顺序不固定 ⇒ 字符串比对无意义）。
 // ⚠ 本门禁**不证明**的：不证明「列出了正确的参与者」——那要读该场的 journal（人判）。
@@ -54,6 +54,6 @@ export function run({ root, ok, fail }) {
     }
   }
   offenders.length === 0
-    ? ok(`ledger-participation ×${rows}（五角色集合、固定序；口径唯一家 = 本门禁注释）`)
+    ? ok(`ledger-participation ×${rows}（六角色集合、固定序；口径唯一家 = 本门禁注释）`)
     : fail('ledger-participation', `台账「参与」列口径漂移（${offenders.length} 行）：\n      ${offenders.slice(0, 8).join('\n      ')}`)
 }

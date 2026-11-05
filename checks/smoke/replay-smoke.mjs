@@ -79,7 +79,7 @@ const rawLead = join(replayDir, 'raw', 'lead.jsonl')
 const metadata = load(readFileSync(join(scenarioDir, 'snapshot.yml'), 'utf8'))
 const oracle = workspaceOracle(scenarioDir, metadata)
 const HEADLESS = metadata.profile === 'headless'
-// rc.2：五个角色预设行住在 pack 的 `presets/<role>/agent.cordis.yml`（各自是 patch 文件）；
+// rc.2：六个角色预设行住在 pack 的 `presets/<role>/agent.cordis.yml`（各自是 patch 文件）；
 // `--patch` 可重复 ⇒ 组合夹具只声明 registry，预设行由这里追加（单一事实 = pack 的文件）。
 const PRESET_PATCHES = COMPANY_ROLE_IDS
   .flatMap(role => ['--patch', join(ROOT, 'packages/company-pack/presets', role, 'agent.cordis.yml')])

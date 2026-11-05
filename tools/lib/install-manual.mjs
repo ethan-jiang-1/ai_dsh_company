@@ -26,7 +26,7 @@ export function renderInstallManual(input) {
 | 适用 DSH | ${q('engines.dsh')} 窗口内（${q('>=0.2.1-rc.2 <0.3.0')}；已验证基线 ${q(input.expectedTag)}） |
 | 许可 | MIT（${q('LICENSE')} 随包） |
 
-这个安装包是自包含的：bundle 补丁、五个角色 preset、浏览器端、host 行，以及 ${q('content/')}
+这个安装包是自包含的：bundle 补丁、六个角色 preset、浏览器端、host 行，以及 ${q('content/')}
 （公司手册/模板/默认章程/状态默认值）。**没有启动器、没有 package bin、没有可写的 profile 目录。**
 
 **交付形态**：一个 bundle 装进一个 named profile。插件内容全部在包内；运行状态与最终产物
@@ -87,9 +87,9 @@ ${q('did not activate')} 或 ${q('skipping profile bundle')}；${q('--dump-confi
 ### 可选：浏览器能力（条件启用）
 
 npm 发布的 ${q('dsh')} 不含 ${q('dsh-browser-use')} 与 ${q('dsh-experimental-browser-use-playwright-mcp')}，
-所以五个角色默认**不带** browser 工具。要开浏览器，用同一个安装入口装这两个包（GUI 用 Plugins 页；
+所以六个角色默认**不带** browser 工具。要开浏览器，用同一个安装入口装这两个包（GUI 用 Plugins 页；
 headless/自动化用 ${q('dsh plugin --profile company add')}）。装进 profile 后 preset 自动探测并启用；
-也可用 ${q('DSH_COMPANY_BROWSER=on/off')} 强制。**不要**在没装包时设 ${q('on')}——五个角色会报
+也可用 ${q('DSH_COMPANY_BROWSER=on/off')} 强制。**不要**在没装包时设 ${q('on')}——六个角色会报
 ${q('browser-use-def ... never started')}。
 
 ## 二、第一次启动
@@ -242,7 +242,7 @@ ${b}${b}${b}
 | 浏览器首屏要求 Choose workspace | 启动时没有 workspace：从项目目录启动、设 ${q('DSH_COMPANY_HOME')}，或在 picker 里选 |
 | 公司数据停写 | workspace 落点不安全 / ${q('bundle.json')} 坏 / lease 冲突：看启动输出 |
 | 成员会话内容被截断 | host 手册注入预算不足：看 pack README 与 ${q('handbook-budget')} 门禁 |
-| 五角色报 ${q('browser-use-def ... never started')} | 没装 browser 两包却设了 ${q('DSH_COMPANY_BROWSER=on')}：装包或 unset/off |
+| 六角色报 ${q('browser-use-def ... never started')} | 没装 browser 两包却设了 ${q('DSH_COMPANY_BROWSER=on')}：装包或 unset/off |
 | 升级后页面还是旧模块 | 重启 profile + 硬刷新；浏览器模块不热加载 |
 `
 }
