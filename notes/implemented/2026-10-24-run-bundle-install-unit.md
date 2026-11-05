@@ -189,7 +189,7 @@ DSH 首次 boot 生成的 browser-session grant，**不含 A 的标记**（不�
 
 **E6 · 分发件**
 `node tools/export-dist.mjs` ALL PASS：0.3.1 tarball 260 条目 / 23 个 workspace；手册表头 0.3.1、
-含 run bundle/bundle.json/company-workspace、pin `dsh-v0.2.1-rc.2`；`dist-manual` 绿。
+含 run bundle/bundle.json/company-workspace、当时 pin `dsh-v0.2.1-rc.2`（历史）；`dist-manual` 绿。
 `release-smoke` ALL PASS：骨架 30 件、bundle.json（16 哈希）、干净底座 0 件扩张、CHARTER 0 条历史、二次零变更。
 
 ### 测试资产审计（谁在守、哪里是空的）

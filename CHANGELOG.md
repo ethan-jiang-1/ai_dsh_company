@@ -2,6 +2,14 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.8.8 — 2026-11-05
+
+### Changed
+
+- 无用户可见行为变化：基座升 pin `dsh-v0.2.1-rc.5`（兼容台账加列，`release-smoke` 全链重验）；
+  README 兼容段改为 rc.5 为当前基线、rc.2 转历史。证据见
+  `notes/archived/2026-11-05-pin-upgrade-0.2.1-rc.5.md`。
+
 ## 0.8.7 — 2026-11-03
 
 ### Changed

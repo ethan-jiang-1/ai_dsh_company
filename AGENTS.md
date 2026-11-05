@@ -81,4 +81,4 @@ source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的真
 
 ## vendor 簿记
 
-- upstream `https://github.com/deepseek-ai/deepseek-harness.git`；当前钉住：tag `dsh-v0.2.1-rc.2` = `687f282e8625c6b8d11ff58211a90524be2e4317`（`_digested` 审计基线同 pin）。
+- upstream `https://github.com/deepseek-ai/deepseek-harness.git`；当前钉住：tag `dsh-v0.2.1-rc.5` = `b830ec950faba0a46dda564be3e2d854afed94f1`（`_digested` 审计基线同 pin）。
