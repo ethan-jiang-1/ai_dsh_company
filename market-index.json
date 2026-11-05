@@ -49,8 +49,8 @@
         "zh": "梦之队公司包"
       },
       "description": {
-        "en": "Five role presets, the company handbook, and the company Web tabs.",
-        "zh": "五个角色 preset、公司手册与公司 Web 页签。"
+        "en": "Six role presets (CEO / VP-Eng / VP-Sales / COO / CFO / CMO, including MRD/PRD product definition), the company handbook, and the company Web tabs.",
+        "zh": "六个角色 preset（CEO / VP-Eng / VP-Sales / COO / CFO / CMO，含 MRD/PRD 产品定义）、公司手册与公司 Web 页签。"
       },
       "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzFmNmZlYiIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMjAiIHI9IjUiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB4PSIxNSIgeT0iMzEiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxOSIgcng9IjQiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB4PSIyNyIgeT0iMjkiIHdpZHRoPSIxMCIgaGVpZ2h0PSIyMSIgcng9IjQiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB4PSIzOSIgeT0iMzMiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxNyIgcng9IjQiIGZpbGw9IiNmZmYiLz4KPC9zdmc+Cg==",
       "author": "ethan-jiang-1",

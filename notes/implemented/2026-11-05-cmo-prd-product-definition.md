@@ -124,6 +124,19 @@
 验证：`pnpm test` **145 files / 1152 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS；
 `release --prepare/--verify` 全绿（0.9.0 同版本未发布重打）。
 
+## 2026-11-05 矩阵扫描 第 2 轮（goal）
+
+- **市场索引的源头 `locale/en.json` / `zh.json` 描述仍是 Five role / 五个角色**（root market-index 与
+  `_dist/market` 都由它生成）→ 六角色 + CMO（含 MRD/PRD）；重生成两处索引。
+- `ledger-participation` 门禁注释的「角色固定序」仍写降序且缺 CMO → 固定序补到 CMO。
+- dev 盘 `kb/cmo/CHARTER.md` 是 pack 更新前的旧副本（缺模板指引/完整路径）→ 与 pack 默认同步。
+- **仓库入口 `AGENTS.md` 仍写「五个角色 preset / 五个梦之队角色 / 五角色」** → 六角色。
+- 测试资产：market-index 新增「locale 与 tracked index 描述不含 Five/五个角色、含 CMO、同源」；
+  bootstrap 新增「既有盘缺新角色章程时补种」断言（升级形状，不只是干净首启）。
+
+验证：`pnpm test` **145 files / 1153 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS；
+`release --prepare/--verify` 全绿（0.9.0 同版本未发布重打）。
+
 ## 事实落点
 
 `presets/cmo/`、`presets/_shared/skills/product-definition/`、`presets/vp-eng/skills/prd-playbook/`、

@@ -11,7 +11,7 @@ import { canonicalParticipation } from '../../tools/lib/converge-rules.mjs'
 //
 // 判据（两条，都是口径不是文风）：
 //   ① 取值只有两种形状：**六个角色名之一到六个的 `+` 连接**，或集合恰好六人的 `全员六人`（历史行保留 `全员五人`）；
-//   ② 角色顺序固定 = `COMPANY_ROLE_IDS` 的**降序**（CEO→VP-Eng→VP-Sales→COO→CFO）；
+//   ② 角色顺序固定 = `COMPANY_ROLE_IDS` 的**固定序**（CEO→VP-Eng→VP-Sales→COO→CFO→CMO）；
 //      同集合不同拼写是本门禁要抓的腐化（顺序不固定 ⇒ 字符串比对无意义）。
 // ⚠ 本门禁**不证明**的：不证明「列出了正确的参与者」——那要读该场的 journal（人判）。
 //   它证明的是「这一列可以被机器当集合读」。

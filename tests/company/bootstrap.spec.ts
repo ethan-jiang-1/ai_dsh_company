@@ -101,6 +101,7 @@ describe('run bundle v3：applyBootstrap（只补缺 / 绝不覆盖 / 可重入�
       writeFileSync(join(workspace, '.dsh-company/kb/org.md'), '# 我们的 org\n')
       const { result } = bootstrapCompanyWorkspace(pack, workspace)
       expect(result.created).toContain('.dsh-company/kb/company.md')
+      expect(result.created, '既有盘升级：缺的新角色章程要补种').toContain('.dsh-company/kb/cmo/CHARTER.md')
       expect(result.skipped).toContain('.dsh-company/kb/org.md')
       expect(readFileSync(join(workspace, '.dsh-company/kb/org.md'), 'utf8')).toBe('# 我们的 org\n')
     } finally {

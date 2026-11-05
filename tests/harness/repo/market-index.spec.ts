@@ -58,3 +58,16 @@ describe('插件市场 index（format 1）', () => {
     expect(unpublishedVersionInIndex({ index, staged: { version: '9.9.9', requiresPublish: true } })).toBeUndefined()
   })
 })
+
+describe('locale 与 tracked market index 的六角色描述', () => {
+  it('不含 Five/五个角色，含 CMO；tracked index 与 locale 同源', () => {
+    const tracked = JSON.parse(readFileSync(join(ROOT, 'market-index.json'), 'utf8'))
+    const plugin = tracked.plugins.find((item: { name: string }) => item.name === manifest.name)
+    for (const lang of ['en', 'zh']) {
+      const description = locales[lang].meta.description
+      expect(description).not.toMatch(/Five role|五个角色/)
+      expect(description).toContain('CMO')
+      expect(plugin.description[lang]).toBe(description)
+    }
+  })
+})
