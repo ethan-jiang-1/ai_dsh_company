@@ -13,6 +13,10 @@
 4. 单一 owner：`tools/lib/pack-source.mjs`（release 与 dev 共用）；release 指纹语义不变（只搬家）。
 5. 边界：缓存只发生在**安装前**的构建/打包段；`plugin add file:` 与 `dsh --profile company` 的
    boot 次序原样保留（[runtime-map §一](../../docs/runtime-map.md#一完整-web-链时序)）。
+6. **启动次序守卫**（同日加）：`dev-product-parity` 门禁新增两条判据——启动器必须
+   `spawn [cli, '--profile', 'company', '--', ...]`（不得旁路起服务）且必须走 `planDevStart`（安装判定不得被旁路）。
+   反证：把 spawn 改成 `[cli, 'web', ...]` → `FAIL dev-product-parity: dev 启动器没有经 DSH CLI 启动…`；
+   还原即绿。
 
 ## 输掉的方案
 

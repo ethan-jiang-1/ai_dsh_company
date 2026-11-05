@@ -27,6 +27,7 @@
 **提速不换路径**：交付启动走默认同形安装（`pack` + `plugin add file:`，模拟用户安装），
 `--link` 只作改 presets 的调试通道；home 用 `run/env.sh` 的隔离 dev home；源/vendor pin/lockfile 未变时
 wrapper 复用上次 tarball（跳过构建打包，`--rebuild` 强制重打）。
+**启动次序（硬）**：严格按 DSH 原生次序（[runtime-map §一](./runtime-map.md)）；dev 只在安装前做构建缓存，不跳 `plugin add`、不起旁路服务、不复用进程。
 
 1. `source run/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒）**：
    `pnpm dsh --profile company --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 说明你起的是
