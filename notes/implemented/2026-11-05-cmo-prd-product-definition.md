@@ -178,6 +178,15 @@
 - 反证：package description 改回 Five-role → 1 红；converge 去 CMO → 1 红；还原绿。
 - 第 6 轮矩阵**零新发现** ⇒ 按 goal 判据收口；发布 READY 见 manifest 点态。
 
+## 2026-11-05 第 7 轮（畸形输入）
+
+- **发现**：`dependsOn: "REQ-002"`（字符串）被 `asArray` 静默当 `[]`，`validateProductDocs` 返回 **`ok=true`**
+  ——依赖检查被绕过；`source / acceptance / evidence / opportunities` 等非数组也缺显式类型错误。
+- **修**：`requireArray` 显式拒绝非数组，覆盖 MRD `opportunities/evidence`、PRD `slices/requirements`、
+  slice `requirements`、REQ `source/dependsOn/acceptance/changeLog/openQuestions`。
+- **测试**：新增 5 类非数组断言；修前电池证明 `dependsOn` 字符串 `ok=true`，修后明确报错。
+- 验证：test **145 files / 1155 tests**、typecheck、verify；release prepare/verify 全绿。
+
 ## 事实落点
 
 `presets/cmo/`、`presets/_shared/skills/product-definition/`、`presets/vp-eng/skills/prd-playbook/`、

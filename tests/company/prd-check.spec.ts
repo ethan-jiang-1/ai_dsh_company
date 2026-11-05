@@ -118,3 +118,18 @@ describe('来源 MR 的判词边界', () => {
     expect(validateProductDocs(doc(defer), doc(JSON.stringify(p2))).errors).toEqual([])
   })
 })
+
+describe('数组字段类型错误不得静默', () => {
+  it('dependsOn / source / acceptance / opportunities / evidence 非数组 ⇒ 明确报错', () => {
+    const dep = JSON.parse(prd()); dep.prd.requirements[0].dependsOn = 'REQ-002'
+    expect(validateProductDocs(doc(mrd()), doc(JSON.stringify(dep))).errors.join()).toContain('dependsOn 必须是数组')
+    const src = JSON.parse(prd()); src.prd.requirements[0].source = 'MR-001'
+    expect(validateProductDocs(doc(mrd()), doc(JSON.stringify(src))).errors.join()).toContain('source 必须是数组')
+    const acc = JSON.parse(prd()); acc.prd.requirements[0].acceptance = 'x'
+    expect(validateProductDocs(doc(mrd()), doc(JSON.stringify(acc))).errors.join()).toContain('acceptance 必须是数组')
+    const m = JSON.parse(mrd()); m.mrd.opportunities = 'x'
+    expect(validateProductDocs(doc(JSON.stringify(m)), doc(prd())).errors.join()).toContain('opportunities 必须是数组')
+    const ev = JSON.parse(mrd()); ev.mrd.opportunities[0].evidence = 'x'
+    expect(validateProductDocs(doc(JSON.stringify(ev)), doc(prd())).errors.join()).toContain('evidence 必须是数组')
+  })
+})

@@ -93,7 +93,12 @@ export function extractJsonBlock(text: string): { readonly ok: true; readonly va
   }
 }
 
+function requireArray(value: unknown, where: string, name: string, errors: string[]): void {
+  if (value !== undefined && !Array.isArray(value)) errors.push(`${where}.${name} 必须是数组`)
+}
+
 function readEvidence(raw: unknown, where: string, errors: string[]): MrdEvidence[] {
+  requireArray(raw, where, 'evidence', errors)
   const out: MrdEvidence[] = []
   for (const [index, item] of asArray(raw).entries()) {
     if (!isRecord(item)) { errors.push(`${where}.evidence[${index}] 不是对象`); continue }
@@ -115,6 +120,7 @@ function coerceMrd(root: unknown): { readonly doc?: MrdDoc; readonly errors: str
   const mrd = root.mrd
   const version = asString(mrd.version) ?? '0.1'
   const status = asString(mrd.status) ?? 'draft'
+  requireArray(mrd.opportunities, 'mrd', 'opportunities', errors)
   const opportunities: MrdOpportunity[] = []
   const seen = new Set<string>()
   const raw = asArray(mrd.opportunities)
@@ -157,6 +163,8 @@ function coercePrd(root: unknown): { readonly doc?: PrdDoc; readonly errors: str
   const status = asString(prd.status) ?? 'draft'
   if (!['draft', 'ready', 'in-dev', 'accepted'].includes(status)) errors.push(`prd.status 必须是 draft|ready|in-dev|accepted（实际 ${status}）`)
   const slices: PrdSlice[] = []
+  requireArray(prd.slices, 'prd', 'slices', errors)
+  requireArray(prd.requirements, 'prd', 'requirements', errors)
   const sliceSeen = new Set<string>()
   for (const [index, item] of asArray(prd.slices).entries()) {
     if (!isRecord(item)) { errors.push(`slices[${index}] 不是对象`); continue }
@@ -166,6 +174,7 @@ function coercePrd(root: unknown): { readonly doc?: PrdDoc; readonly errors: str
     else if (sliceSeen.has(id)) errors.push(`slices[${index}].id 重号：${id}`)
     else sliceSeen.add(id)
     if (goal === undefined) errors.push(`slices[${index}].goal 缺失`)
+    requireArray(item.requirements, `slices[${index}]`, 'requirements', errors)
     const requirements = asArray(item.requirements).map(value => asString(value)).filter((value): value is string => value !== undefined)
     if (requirements.length === 0) errors.push(`slices[${index}].requirements 不能为空`)
     if (id !== undefined && goal !== undefined && requirements.length > 0) slices.push({ id, goal, requirements })
@@ -196,16 +205,19 @@ function coercePrd(root: unknown): { readonly doc?: PrdDoc; readonly errors: str
       errors.push(`${where}.status 必须是 draft|ready|in-dev|accepted|deferred|withdrawn`)
     }
     if (verification !== 'test' && verification !== 'demo' && verification !== 'review') errors.push(`${where}.verification 必须是 test|demo|review`)
+    requireArray(item.source, where, 'source', errors)
     const source = asArray(item.source).map(value => asString(value)).filter((value): value is string => value !== undefined)
     if (source.length === 0) errors.push(`${where}.source 不能为空（每条 REQ 至少指回一个 MR id）`)
     for (const sourceId of source) {
       if (!/^MR-\d{3}$/.test(sourceId)) errors.push(`${where}.source 含非法 MR id：${sourceId}`)
     }
+    requireArray(item.dependsOn, where, 'dependsOn', errors)
     const dependsOn = asArray(item.dependsOn).map(value => asString(value)).filter((value): value is string => value !== undefined)
     for (const dep of dependsOn) {
       if (!/^REQ-\d{3}$/.test(dep)) errors.push(`${where}.dependsOn 含非法 REQ id：${dep}`)
       if (dep === id) errors.push(`${where}.dependsOn 不能依赖自己`)
     }
+    requireArray(item.acceptance, where, 'acceptance', errors)
     const acceptance: AcceptanceCriterion[] = []
     const acSeen = new Set<string>()
     for (const [acIndex, acRaw] of asArray(item.acceptance).entries()) {
@@ -230,6 +242,7 @@ function coercePrd(root: unknown): { readonly doc?: PrdDoc; readonly errors: str
       }
     }
     if (asArray(item.acceptance).length === 0) errors.push(`${where}.acceptance 不能为空（每条 REQ 至少一条可判真假的 AC）`)
+    requireArray(item.changeLog, where, 'changeLog', errors)
     const changeLog = asArray(item.changeLog).map(entry => {
       if (!isRecord(entry)) return undefined
       const at = asString(entry.at)
@@ -237,6 +250,7 @@ function coercePrd(root: unknown): { readonly doc?: PrdDoc; readonly errors: str
       const change = asString(entry.change)
       return at !== undefined && by !== undefined && change !== undefined ? { at, by, change } : undefined
     }).filter((entry): entry is { at: string; by: string; change: string } => entry !== undefined)
+    requireArray(item.openQuestions, where, 'openQuestions', errors)
     const openQuestions = asArray(item.openQuestions).map(value => asString(value)).filter((value): value is string => value !== undefined)
     if (statusValue !== undefined && statusValue !== 'draft' && changeLog.length === 0) {
       errors.push(`${where}.changeLog 不能为空（状态离开 draft 必须留痕）`)
