@@ -1,0 +1,9 @@
+{
+  "from": "dsh-v0.2.1-rc.2",
+  "to": "dsh-v0.2.1-rc.5",
+  "fromSha": "687f282e8625c6b8d11ff58211a90524be2e4317",
+  "toSha": "b830ec950faba0a46dda564be3e2d854afed94f1",
+  "reviewedBy": "bowhead",
+  "reviewedAt": "2026-11-05",
+  "processContractReview": "用户授权：2026-11-05 对话明确要求升 rc.5，并约定升级后无副作用才 commit & push。vendor 纪律：不手改 vendor 受版本控制内容；升 pin 只走 docs/release.md §升 pin 的 sync-dsh 事务（fetch/checkout/构建/测试/簿记由脚本完成，失败回滚原 HEAD 与受控元数据）。规模核对：rc.2..rc.5 = 19 commits / 667 files / +6097 -1091；本包 import 的 subagent 与 experimental agent-team 包 src/index.ts 未变，client/session/api 包内部有改动，靠 pnpm typecheck + pnpm test 重校。experimental 行重校：本包三条行（agent-team / tool-agent-team / ui-agent-team）与 rc.5 官方 packages/experimental/agent-team-profile/cordis.patch.yml 逐字段一致（maxMembers 8 / maxTasks 256 / maxMessageBytes 65536 / disposalTimeoutMs 5000；freshProvider spawn / forkProvider fork），无偏离。货架过账：本轮未在外部研究树找到当轮 plugin-inventory 快照（如实记为阻断）；以 vendor packages/experimental 清单核对，未见本包消费面新增或退役；browser-use 两行属 profile 依赖而非本包 bundle 行，rc.5 兼容后由 DSH 自行启用，本包不改其行。合成回放：基线红（skill catalog 漂移 + 旧导入路径）已修（导入 lib/types/lib/presence.js + --refresh fixture，commit ccd2b7f），replay-smoke ALL PASS（2s）。声明边界：这是人审声明，不是脚本的语义审计，也不认证签名者身份。"
+}
