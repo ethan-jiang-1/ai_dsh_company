@@ -54,3 +54,20 @@ export function planDevStart({ mode, version, profileExists, currentDependency, 
   steps.push({ kind: 'exec' })
   return { mode, version, spec, steps }
 }
+
+/**
+ * 构建缓存判据（纯逻辑）：戳、指纹、版本、产物与强制位全部允许时才复用。
+ * 任何一项不成立都回落到真实构建，宁可多花 4s 也不拿旧产物冒充新环境。
+ */
+export function shouldReuseBuild({ stamp, fingerprint, version, tarballPresent, tarballShaMatches, libPresent, force = false }) {
+  if (force === true) return false
+  if (stamp === null || typeof stamp !== 'object') return false
+  if (stamp.schema !== 1) return false
+  if (stamp.version !== version) return false
+  if (typeof fingerprint !== 'string' || fingerprint === '' || stamp.fingerprint !== fingerprint) return false
+  if (tarballPresent !== true) return false
+  if (tarballShaMatches !== true) return false
+  if (libPresent !== true) return false
+  return true
+}
+

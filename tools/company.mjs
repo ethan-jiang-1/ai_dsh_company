@@ -10,10 +10,11 @@
 // 不建 profile 之外的写操作（缺 profile 时才用 web 模板初始化）、不写 profile patch、不问 workspace。
 import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { createWriteStream, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync } from 'node:fs'
+import { createWriteStream, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { devTarballName, migrationNotice, planDevStart, resolveDevMode } from './lib/dev-install.mjs'
+import { devTarballName, migrationNotice, planDevStart, resolveDevMode, shouldReuseBuild } from './lib/dev-install.mjs'
+import { devBuildFingerprint } from './lib/pack-source.mjs'
 import { redactTokenUrls } from './lib/session-diagnose.mjs'
 
 const here = fileURLToPath(import.meta.url)
@@ -24,10 +25,11 @@ const valueOf = (name) => {
   return index >= 0 ? args[index + 1] : undefined
 }
 if (args.includes('--help') || args.includes('-h')) {
-  console.log(`用法：pnpm company [--link] [--port <n>] [--no-open] [--home <DSH_HOME>] [--workspace <dir>]
+  console.log(`用法：pnpm company [--link] [--rebuild] [--port <n>] [--no-open] [--home <DSH_HOME>] [--workspace <dir>]
 
 dev-only：默认 tsc + tsdown + npm pack → \`dsh plugin --profile company add file:<tgz>\` → exec dsh。
 --link = 符号链接快速通道（改 presets/** 即刻生效；不验打包面）。
+--rebuild = 忽略构建缓存，强制重新构建打包（默认：源/vendor pin/lockfile 未变时复用上次 tarball）。
 应用内安装/启动见 README 与 _dist 手册；本脚本不写 profile patch、不问 workspace。`)
   process.exit(0)
 }
@@ -55,7 +57,7 @@ const stateDir = join(home, 'tmp/dev-pack')
 const passthrough = []
 for (let i = 0; i < args.length; i += 1) {
   if (args[i] === '--home' || args[i] === '--workspace') { i += 1; continue }
-  if (args[i] === '--link') continue
+  if (args[i] === '--link' || args[i] === '--rebuild') continue
   passthrough.push(args[i])
 }
 const env = { ...process.env, DSH_HOME: home, DSH_COMPANY_HOME: workspace }
@@ -74,24 +76,64 @@ if (!profileExists) {
     { cwd: home, stdio: 'ignore' })
 }
 
+const forceRebuild = args.includes('--rebuild')
+const buildStampPath = join(stateDir, 'build-stamp.json')
+const libIndex = join(packDir, 'lib/index.js')
+const libClient = join(packDir, 'lib/client.js')
+const readBuildStamp = () => {
+  try { return JSON.parse(readFileSync(buildStampPath, 'utf8')) } catch { return undefined }
+}
+const vendorSha = (() => {
+  const result = spawnSync('git', ['-C', join(root, 'vendor/dsh'), 'rev-parse', 'HEAD'], { encoding: 'utf8' })
+  return result.status === 0 ? result.stdout.trim() : undefined
+})()
+const buildFingerprint = devBuildFingerprint(packDir, { vendorSha, lockfilePath: join(root, 'pnpm-lock.yaml') })
+
 let tarballPath
 if (mode === 'tarball') {
-  console.log('company(dev): 构建 + 打包（用户侧同形安装）')
-  run([process.execPath, './node_modules/typescript/bin/tsc', '-b', 'packages/company-pack'])
-  run([join(root, 'node_modules/.bin/tsdown')], { cwd: packDir })
   mkdirSync(stateDir, { recursive: true })
-  const packed = spawnSync('npm', ['pack', '--pack-destination', stateDir, '--json'], {
-    cwd: packDir, env: { ...env, npm_config_cache: join(home, 'cache/npm') }, encoding: 'utf8',
-  })
-  if (packed.status !== 0) {
-    console.error(`company(dev): npm pack 失败：${(packed.stderr ?? '').slice(-800)}`)
-    process.exit(1)
+  const stamp = readBuildStamp()
+  const tarballPresent = typeof stamp?.tarball === 'string' && existsSync(stamp.tarball)
+  let tarballShaMatches = false
+  if (tarballPresent && typeof stamp.tarballSha === 'string') {
+    tarballShaMatches = createHash('sha256').update(readFileSync(stamp.tarball)).digest('hex') === stamp.tarballSha
   }
-  const packedName = JSON.parse(packed.stdout)[0].filename
-  const packedPath = join(stateDir, packedName)
-  const sha256 = createHash('sha256').update(readFileSync(packedPath)).digest('hex')
-  tarballPath = join(stateDir, devTarballName({ name: manifest.name, version: manifest.version, sha256 }))
-  if (packedPath !== tarballPath) renameSync(packedPath, tarballPath)
+  const reuse = vendorSha !== undefined && shouldReuseBuild({
+    stamp, fingerprint: buildFingerprint, version: manifest.version,
+    tarballPresent, tarballShaMatches,
+    libPresent: existsSync(libIndex) && existsSync(libClient),
+    force: forceRebuild,
+  })
+  if (reuse) {
+    tarballPath = stamp.tarball
+    console.log(`company(dev): 源未变，跳过构建打包（复用 ${tarballPath}）`)
+  } else {
+    if (forceRebuild) console.log('company(dev): --rebuild：强制重新构建打包')
+    console.log('company(dev): 构建 + 打包（用户侧同形安装）')
+    run([process.execPath, './node_modules/typescript/bin/tsc', '-b', 'packages/company-pack'])
+    run([join(root, 'node_modules/.bin/tsdown')], { cwd: packDir })
+    const packed = spawnSync('npm', ['pack', '--pack-destination', stateDir, '--json'], {
+      cwd: packDir, env: { ...env, npm_config_cache: join(home, 'cache/npm') }, encoding: 'utf8',
+    })
+    if (packed.status !== 0) {
+      console.error(`company(dev): npm pack 失败：${(packed.stderr ?? '').slice(-800)}`)
+      process.exit(1)
+    }
+    const packedName = JSON.parse(packed.stdout)[0].filename
+    const packedPath = join(stateDir, packedName)
+    const sha256 = createHash('sha256').update(readFileSync(packedPath)).digest('hex')
+    tarballPath = join(stateDir, devTarballName({ name: manifest.name, version: manifest.version, sha256 }))
+    if (packedPath !== tarballPath) renameSync(packedPath, tarballPath)
+    writeFileSync(buildStampPath, `${JSON.stringify({
+      schema: 1,
+      version: manifest.version,
+      fingerprint: buildFingerprint,
+      tarball: tarballPath,
+      tarballSha: sha256,
+      vendorSha,
+      builtAt: new Date().toISOString(),
+    }, null, 2)}\n`)
+  }
 }
 
 const plan = planDevStart({

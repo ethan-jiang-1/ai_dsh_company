@@ -9,6 +9,7 @@ import {
   needsInstall,
   planDevStart,
   resolveDevMode,
+  shouldReuseBuild,
 } from '../../../tools/lib/dev-install.mjs'
 
 const SHA = 'a'.repeat(64)
@@ -59,5 +60,43 @@ describe('dev 启动器安装规划（dev/产品路径 parity）', () => {
     expect(launcher, '缺 npm pack').toMatch(/npm'\s*,\s*\['pack'/)
     expect(launcher, '缺 plugin add file:').toMatch(/'plugin', '--profile', 'company', 'add'/)
     expect(launcher, '默认模式必须从 resolveDevMode 来').toContain('resolveDevMode(args)')
+  })
+})
+
+describe('构建缓存判据（源未变才复用 tarball）', () => {
+  const fingerprint = 'f'.repeat(64)
+  const stamp = { schema: 1, version: '0.8.8', fingerprint, tarball: '/tmp/x.tgz', tarballSha: SHA }
+  const ok = {
+    stamp, fingerprint, version: '0.8.8',
+    tarballPresent: true, tarballShaMatches: true, libPresent: true,
+  }
+
+  it('全部匹配才复用', () => {
+    expect(shouldReuseBuild(ok)).toBe(true)
+  })
+
+  it('指纹变/版本变 → 重建', () => {
+    expect(shouldReuseBuild({ ...ok, fingerprint: 'e'.repeat(64) })).toBe(false)
+    expect(shouldReuseBuild({ ...ok, version: '0.8.9' })).toBe(false)
+    expect(shouldReuseBuild({ ...ok, fingerprint: '' })).toBe(false)
+  })
+
+  it('缺戳/坏戳/缺产物/缺 lib 或 sha 不符 → 重建', () => {
+    expect(shouldReuseBuild({ ...ok, stamp: undefined })).toBe(false)
+    expect(shouldReuseBuild({ ...ok, stamp: { ...stamp, schema: 2 } })).toBe(false)
+    expect(shouldReuseBuild({ ...ok, tarballPresent: false })).toBe(false)
+    expect(shouldReuseBuild({ ...ok, tarballShaMatches: false })).toBe(false)
+    expect(shouldReuseBuild({ ...ok, libPresent: false })).toBe(false)
+  })
+
+  it('--rebuild / 缺 vendor pin 信息 → 强制重建', () => {
+    expect(shouldReuseBuild({ ...ok, force: true })).toBe(false)
+  })
+
+  it('company.mjs 真的调用了判据与指纹（wiring）', () => {
+    const launcher = readFileSync(join(ROOT, 'tools/company.mjs'), 'utf8')
+    expect(launcher).toContain('shouldReuseBuild')
+    expect(launcher).toContain('devBuildFingerprint')
+    expect(launcher).toContain('--rebuild')
   })
 })

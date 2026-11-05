@@ -28,6 +28,7 @@
 |---|---|---|---|
 | runtime | vendor 源码构建（`pnpm dsh` / vendor CLI） | npm 全局 `@deepseek-ai/dsh` | 开发要跑未发布代码；发行版由 npm 管 |
 | workspace | `company-workspace/` | 用户自己的项目目录 | 演练盘与真盘分离（`runtime/README.md`） |
+| 构建缓存 | 源/vendor pin/lockfile 未变时复用上次 tarball（跳过 tsc/tsdown/pack） | 用户装已发布 tarball，本来就不重建 | 同一 tarball 形状；`--rebuild` 强制重打 |
 | 凭据 | dev home 的 `.credentials.yaml` | 用户 home / 环境变量 | 按 home 隔离；不共享 |
 | 浏览器两包 | dev 显式 `DSH_COMPANY_BROWSER=on` | 装了才开；`on/off` 强制 | 源码树可解析、npm 发行版不含两包 |
 | probe / 日志 | 调试工具可自选 profile（多数 `probes/` 仍 boot `web`）；`preset-smoke` / `client-load-smoke` 固定 `company` | 用户无 | 调试必需，不承担用户侧验收；用户侧验收走 `company` 档 |
