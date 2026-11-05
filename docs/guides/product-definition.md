@@ -37,7 +37,7 @@ CEO 收口：final.md（产品决策/合并摘要，引用两份 draft）→ pre
 `.dsh-company/deliverables/<目录名>/drafts/{mrd,prd}.md`，机械校验：
 
 - 编号唯一/格式合法；每条 REQ 至少一条 AC（given/when/then 齐全）；
-- REQ 的来源 `MR-###` 必须在 MRD 里存在；slice 存在且列出该 REQ；依赖存在且无环；
+- REQ 的来源 `MR-###` 必须在 MRD 里存在，且**来源判词守边界**（no-go 不得进 PRD；defer 不得进 P0）；slice 存在且列出该 REQ；依赖存在且无环；
 - 状态合法、离开 `draft` 有 changeLog。
 
 它只挡结构性错误，**不判断需求好坏/市场真伪**；红就退回作者改，不进研发。

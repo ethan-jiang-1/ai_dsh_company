@@ -137,6 +137,19 @@
 验证：`pnpm test` **145 files / 1153 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS；
 `release --prepare/--verify` 全绿（0.9.0 同版本未发布重打）。
 
+## 2026-11-05 矩阵扫描 第 3 轮（goal）
+
+- **`/prd check` 没守住 MRD→PRD 的判词边界**：来源 MR 只查「存在」，`no-go` 仍能进 PRD、`defer` 仍能进 P0
+  而不红。已加机械规则（no-go 不得进 PRD；defer 不得进 P0），guide / handbook / presets 合同同步；
+  新增红证（删规则 → 测试红 → 还原绿）。
+- **测试反证（本轮实跑）**：bootstrap 去掉 cmo → 3 红；CMO 去共享挂载 → 1 红；locale 改回五角色 → 1 红；
+  ROLE_MARK 去 cmo → 1 红；no-go 规则删 → 1 红；全部还原后绿。
+- 残余扫描仅命中历史/legacy（converge-rules 的「五角色全集」历史用例、R2 场景、COO 18 人、注释）。
+- live PRD 13 REQ 只接 MR-001（go）+ MR-002（defer，P2/deferred），补规则后仍绿。
+
+验证：`pnpm test` **145 files / 1154 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS；
+`release --prepare/--verify` 全绿（0.9.0 同版本未发布重打）。
+
 ## 事实落点
 
 `presets/cmo/`、`presets/_shared/skills/product-definition/`、`presets/vp-eng/skills/prd-playbook/`、

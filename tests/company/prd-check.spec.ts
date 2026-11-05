@@ -105,3 +105,16 @@ describe('随包模板与校验器同源', () => {
     expect(result).toMatchObject({ ok: true, mrdCount: 1, reqCount: 1, acCount: 1 })
   })
 })
+
+describe('来源 MR 的判词边界', () => {
+  it('no-go 不得进 PRD；defer 不得进 P0；defer 进 P2 可过', () => {
+    const base = JSON.parse(mrd()).mrd.opportunities[0]
+    const noGo = mrd({ opportunities: [{ ...base, recommendation: 'no-go' }] })
+    expect(validateProductDocs(doc(noGo), doc(prd())).errors.join()).toContain('no-go')
+    const defer = mrd({ opportunities: [{ ...base, recommendation: 'defer' }] })
+    expect(validateProductDocs(doc(defer), doc(prd())).errors.join()).toContain('defer')
+    const p2 = JSON.parse(prd())
+    p2.prd.requirements[0].priority = 'P2'
+    expect(validateProductDocs(doc(defer), doc(JSON.stringify(p2))).errors).toEqual([])
+  })
+})

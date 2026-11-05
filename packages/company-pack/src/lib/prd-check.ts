@@ -265,10 +265,20 @@ export function validateProductDocs(mrdText: string, prdText: string): ProductDo
   const prd = coercePrd(prdBlock.value)
   errors.push(...mrd.errors, ...prd.errors)
   const opportunityIds = new Set(mrd.doc?.opportunities.map(opportunity => opportunity.id) ?? [])
+  const recommendationById = new Map<string, 'go' | 'no-go' | 'defer'>(
+    (mrd.doc?.opportunities ?? []).map(opportunity => [opportunity.id, opportunity.recommendation] as const),
+  )
   const reqIds = new Set(prd.doc?.requirements.map(requirement => requirement.id) ?? [])
   for (const requirement of prd.doc?.requirements ?? []) {
     for (const sourceId of requirement.source) {
       if (!opportunityIds.has(sourceId)) errors.push(`${requirement.id}.source 指向不存在的 MR：${sourceId}`)
+      else {
+        const recommendation = recommendationById.get(sourceId)
+        if (recommendation === 'no-go') errors.push(`${requirement.id}.source 指向 no-go 机会 ${sourceId}（no-go 不得进 PRD）`)
+        if (recommendation === 'defer' && requirement.priority === 'P0') {
+          errors.push(`${requirement.id}.source 指向 defer 机会 ${sourceId}（defer 不得进 P0，应落 P2/deferred）`)
+        }
+      }
     }
     const slice = prd.doc?.slices.find(candidate => candidate.id === requirement.slice)
     if (slice === undefined) errors.push(`${requirement.id}.slice 指向不存在的 slice：${requirement.slice}`)
