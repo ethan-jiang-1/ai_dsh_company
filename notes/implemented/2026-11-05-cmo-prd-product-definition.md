@@ -170,6 +170,14 @@
 
 验证：`pnpm test` 145/1154、`pnpm typecheck`、`pnpm verify` ALL PASS。
 
+## 2026-11-05 矩阵扫描 第 6 轮（goal 收口）
+
+- 历史边界：CHANGELOG 只在 0.9.0 feature commit 加条目；notes/archived、_backlog/_archive、R2 场景未回写。
+- live 盘：org 六条线/50、CMO 章程、owners、台账口径、各角色章程一致；无断链。
+- now-tense 扫描：活跃面零五角色/18 人残留（只剩历史用例与注释）。
+- 反证：package description 改回 Five-role → 1 红；converge 去 CMO → 1 红；还原绿。
+- 第 6 轮矩阵**零新发现** ⇒ 按 goal 判据收口；发布 READY 见 manifest 点态。
+
 ## 事实落点
 
 `presets/cmo/`、`presets/_shared/skills/product-definition/`、`presets/vp-eng/skills/prd-playbook/`、
