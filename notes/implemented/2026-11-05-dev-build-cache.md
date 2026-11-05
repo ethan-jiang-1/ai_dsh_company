@@ -40,6 +40,8 @@
 - 真实启动：Boot A（无戳）5.6s 且输出构建行；Boot B 3.84s 且输出
   「源未变，跳过构建打包（复用 …/dsh-company-pack-0.8.8-*.tgz）」；Boot C（改包源）重建 10.2s。
 - 最终窗口 `cdp-probe`：9 页签全开、零 `tabFailures`、console/exceptions 零。
+- **2026-11-05 17:36 收尾实跑**（当前树，缓存命中）：输出「源未变，跳过构建打包」；boot **8.46s**——
+  同机 load avg ~18，服务器段被系统负载抬高（低负载同路径样本 3.84s）；窗口 `cdp-probe` 仍全绿。
 - `pnpm verify` ALL PASS；`pnpm test` **143 files / 1131 tests**；`pnpm typecheck` 通过。
 - 经验落点：启动序列 = [demo.md §前置](../../docs/demo.md#前置本机)（快序列 + 缓存一句）；
   dev/产品差异表 = [dev-product-parity](../../docs/guides/dev-product-parity.md)。
