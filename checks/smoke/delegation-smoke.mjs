@@ -2,7 +2,7 @@
 // 状态：常驻
 // R3 汇报线边界守卫（S2 结论的回归检查；0.2.1 重校）：回答并守住决定设计的事实——
 // 何时跑：委托边界/模型可见工具目录改变，或该验收明确要求时；升 pin 时按发布合同复核
-//   「CEO 会话里，命名委托工具（vp_eng/vp_sales）生出来的 child，能不能被前台拿到结果、能不能被续驶？」
+//   「CEO 会话里，命名委托工具（vp_eng/vp_sales/vp_cmo）生出来的 child，能不能被前台拿到结果、能不能被续驶？」
 //
 // 答案（0.2.1 起，上游机制变了，本脚本随机制重写）：
 //   ① 委托一律是 **activation**：工具立即返回 `{kind:'activation', subagentId}`（wire 上渲染成
@@ -10,8 +10,8 @@
 //      v0.2.1-alpha.1/subagent-activations）。`backgroundMode` / `enableRunInBackground` /
 //      `run_in_background` 全删 ⇒ **"前台同步拿结果"这条通道整体不存在**，不是配置问题。
 //   ② 人格/工具面改由 `agentPreset` 选（同批 subagent-preset-composition）：per-tool 的
-//      `persona` / `toolFilter` 被硬拒。我们的 vp_eng/vp_sales 因此选 `vp-eng` / `vp-sales`
-//      两个角色 preset，通用委托选 `researcher`。
+//      `persona` / `toolFilter` 被硬拒。我们的 vp_eng/vp_sales/vp_cmo 因此选 `vp-eng` / `vp-sales` / `cmo`
+//      三个角色 preset，通用委托选 `researcher`。
 //   ③ 续驶：**CEO 会话里仍然不通**。team 的 `send_message` / `list_agents` / `interrupt_agent`
 //      按成员作用域 shadow 掉全局版（`tool-agent-team`），`resolveActiveMember` 只认名册成员；
 //      subagent child 不在名册上（vendor agent-team/src/index.ts `sendAdmitted`）。上游确实新增了
@@ -19,7 +19,7 @@
 //      推论：CEO preset **不挂**续驶控制行（挂了也是死行）；续驶/连续对话归 team（spawn_teammate）。
 //
 // 本脚本的判据（边界变了就红，提示重新评估设计）：
-//   - vp_eng / vp_sales / subagent_research / spawn_teammate 必须在模型可见目录里（挂载没坏）
+//   - vp_eng / vp_sales / vp_cmo / subagent_research / spawn_teammate 必须在模型可见目录里（挂载没坏）
 //   - 三个控制名必须仍是**团队版**（若变回全局版 ⇒ 续驶可能重新可用 ⇒ 重评 delegation §4）
 //   -（--delegate 档）vp_eng 必须返回 **activation 回执**（`{kind:'activation', subagentId}`
 //     或 wire 的 `started subagent`）；返回 child 正文反而是边界倒退
@@ -139,7 +139,7 @@ try {
   const catalog = records.filter(r => r.event?.type === 'request/header').map(r => r.event.data.header).at(-1)
   const names = catalog?.tools?.map(t => t.name) ?? []
   console.log(`\n[1] 工具目录（${String(names.length)} 个）：${names.join(', ')}`)
-  for (const tool of ['vp_eng', 'vp_sales', 'subagent_research', 'spawn_teammate']) {
+  for (const tool of ['vp_eng', 'vp_sales', 'vp_cmo', 'subagent_research', 'spawn_teammate']) {
     if (!names.includes(tool)) problems.push(`模型可见工具目录里没有 ${tool}（R3 行没挂上？）`)
   }
 

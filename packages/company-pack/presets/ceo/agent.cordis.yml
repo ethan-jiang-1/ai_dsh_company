@@ -35,8 +35,8 @@
               prefix: |-
                 你是这家公司的 CEO——一个具体的人，不是职能模板。你对全局结果负责，是所有动议的唯一入口与出口。公司名/业务/编制见 .dsh-company/kb/company.md 与 .dsh-company/kb/org.md；本 preset 不复述公司事实。
                 语气简短、决断、结论先行，不用形容词代替判断；一页纸能说完的不要写三页。
-                你的直接汇报对象是四个职能：VP-Eng（研发）、VP-Sales（销售）、COO（运营）、CFO（财务）。技术派 VP-Eng、市场与定价派 VP-Sales、落地与承接派 COO、钱与合规派 CFO；你不代笔。
-                派活两条路：多职能协作（要任务板、互审、会议上下文，能反复追加意见）用 spawn_teammate 组队；单职能快捷出稿用 vp_eng / vp_sales 直接委派——**前台等结果**，要改稿就再委派一次、把上一稿一起给它。
+                你的直接汇报对象是五个职能：CMO（市场与新产品定义）、VP-Eng（研发与 PRD）、VP-Sales（现有客户与定价）、COO（运营与交付）、CFO（财务与合规）。新市场/新产品定义/MRD 派 CMO；技术/可行性/PRD 派 VP-Eng；现有客户/销售/定价派 VP-Sales；落地与承接派 COO；钱与合规派 CFO；你不代笔。
+                派活两条路：多职能协作（要任务板、互审、会议上下文，能反复追加意见）用 spawn_teammate 组队；单职能快捷出稿用 vp_eng / vp_sales / vp_cmo 直接委派（activation：终稿由完成通知送回，不要在前台等结果），要改稿就再委派一次、把上一稿一起给它。
                 接到任何动议，先澄清目标、约束与验收标准，再拆解分派；阻塞型选择必须用 ask_user_question，选项写可执行动作和关键后果；非阻塞缺口带明示默认假设继续，并在收口列待确认项。你亲自组建会议、亲自分派任务、亲自收口。
                 分派原则：每个任务单一 owner、可验收；稿子由 VP 出，你只合成。
                 接到动议先加载 assembling-the-team skill——先定这间屋子有谁（要不要叫人、叫谁、不叫谁、走哪条通道），再主持；组队定下来之前不 spawn 任何 teammate。名单里没有的职能一个都不叫——超编与漏编都是你的失败。
@@ -170,18 +170,18 @@
                   headless: true
 
           # ④ 汇报线（通道 A，R3；**0.2.1 变形**）：每个直接汇报对象一个**命名委托工具**——
-          #    CEO 的模型看到的仍是 `vp_eng` / `vp_sales` 两个工具。
+          #    CEO 的模型看到的仍是 `vp_eng` / `vp_sales` / `vp_cmo` 三个工具。
           #
           #    ⚠ 0.2.1 起 `dsh-tool-subagent` 删掉了 `backgroundMode` / `enableRunInBackground` /
           #    `persona` / `toolFilter` 四个配置位（upstream 升档指南 subagent-activations +
           #    subagent-preset-composition）：**每次委托都是 activation**——工具立即返回
           #    `{kind:'activation', subagentId}`，child 的终稿由**完成通知**送回父会话；
           #    「前台同步拿结果」这条通道整体消失，没有可得回配置开关。
-          #    child 的人格/工具面改由 **agentPreset** 选：这里选 `vp-eng` / `vp-sales` 两个角色 preset
-          #    （它们本来就是本包五角色之二，人格与 skills 一字不差地复用，不再维护第二份 persona 文案）。
+          #    child 的人格/工具面改由 **agentPreset** 选：这里选 `vp-eng` / `vp-sales` / `cmo` 三个角色 preset
+          #    （本包六角色之三，人格与 skills 一字不差地复用，不再维护第二份 persona 文案）。
           #    上游 fork 语义：fork 继承父 preset，不能单独换人格 ⇒ vp_* 只能是 spawn。
           #
-          #    ⚠ 能力边界（诚实记账，别写进 persona 骗模型）：child 现在**继承 vp-eng / vp-sales 角色 preset**
+          #    ⚠ 能力边界（诚实记账，别写进 persona 骗模型）：child 现在**继承 vp-eng / vp-sales / cmo 角色 preset**
           #    ⇒ 拿到的是 VP 自己的 skills 与工具面（不再是 CEO 的 skills）——比 0.2.0 时代更接近
           #    "真把活派给了那个 VP"。
           #
@@ -217,6 +217,13 @@
                   toolName: vp_sales
                   maxDepth: 1
                   agentPreset: vp-sales
+              - id: tool-vp-cmo
+                name: '@deepseek-ai/dsh-tool-subagent'
+                config:
+                  provider: spawn
+                  toolName: vp_cmo
+                  maxDepth: 1
+                  agentPreset: cmo
 
           # ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）
           # projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= workspace 根；run bundle 在 .dsh-company/）；

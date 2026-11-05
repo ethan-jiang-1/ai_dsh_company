@@ -225,7 +225,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     // `backgroundMode` / `enableRunInBackground` / `persona` / `toolFilter` 被 Config 硬拒
     // （"tool-subagent: persona is no longer supported"），child 的人格只能由 agentPreset 选。
     // ⇒ 每个直接汇报对象仍是一个 distinct toolName，但贴身配置 = provider + toolName + maxDepth + agentPreset。
-    for (const [tool, preset] of [['vp_eng', 'vp-eng'], ['vp_sales', 'vp-sales']] as const) {
+    for (const [tool, preset] of [['vp_eng', 'vp-eng'], ['vp_sales', 'vp-sales'], ['vp_cmo', 'cmo']] as const) {
       const match = new RegExp(`toolName: ${tool}([\\s\\S]*?)(?=\\n\\s*- id: |$)`).exec(ceo)
       expect(match, `CEO 缺命名委托工具 ${tool}`).not.toBeNull()
       const block = (match as RegExpExecArray)[1] as string
@@ -242,6 +242,15 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       expect(ceo, `${row} 在 CEO 会话被 team shadow，是死行（见 docs/delegation.md）`)
         .not.toMatch(new RegExp(`^\\s*- id: ${row}$`, 'm'))
     }
+  })
+
+  it('CEO 五职能路由：MRD → CMO、PRD → VP-Eng、现有客户/定价 → VP-Sales', () => {
+    const ceo = roleYml('ceo')
+    expect(ceo, 'CEO persona 必须点名 CMO（六角色）').toContain('CMO（市场与新产品定义）')
+    expect(ceo, 'MRD 必须派 CMO').toMatch(/MRD 派 CMO/)
+    expect(ceo, 'PRD 必须派 VP-Eng').toMatch(/PRD 派 VP-Eng/)
+    expect(ceo, '不得再把「市场」整体派给 VP-Sales').not.toContain('市场与定价派 VP-Sales')
+    expect(ceo, '单职能快捷委派必须含 vp_cmo').toMatch(/vp_eng \/ vp_sales \/ vp_cmo/)
   })
 
   it('委托控制面（R4；0.2.1 不动机制）：职能 preset 声明控制行，CEO 不声明', () => {

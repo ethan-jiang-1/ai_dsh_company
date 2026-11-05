@@ -6,4 +6,4 @@
  * 卡片只是永远不出现。所以 `tests/client/wiring/client-face.spec.ts` 用一条 keyless 守卫把两边钉在一起，
  * 别靠人眼比对（R3）。
  */
-export const DELEGATION_TOOL_KEYS = ['vp_eng', 'vp_sales'] as const
+export const DELEGATION_TOOL_KEYS = ['vp_eng', 'vp_sales', 'vp_cmo'] as const
