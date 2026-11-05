@@ -766,7 +766,7 @@ try {
   }
   // 在场板判据（R5b 提案验收 4）：重放 lead 会话的 team/* 事件喂读模型，产出与录制侧
   // **同形**的非空在场板——team 事件全丢=空板红；成员/任务折错=行不同红。
-  const { presenceFromEvents } = await import(join(ROOT, 'packages/company-pack/lib/index.js'))
+  const { presenceFromEvents } = await import(join(ROOT, 'packages/company-pack/lib/types/lib/presence.js'))
   const boardOf = (text) => presenceFromEvents(records(text).filter(r => typeof r.type === 'string' && r.type.startsWith('team/')))
   const replayBoard = boardOf(parsed[0]?.text ?? '')
   const recordedBoard = boardOf(leadFixture)
