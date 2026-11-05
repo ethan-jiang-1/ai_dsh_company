@@ -26,6 +26,7 @@ import {
 import { readCatalogState } from './host/catalog-state.ts'
 import { regenerateCatalog } from './host/catalog.ts'
 import { registerDeliverablesCommand } from './host/deliverables-command.ts'
+import { registerPrdCommand } from './host/prd-command.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
 import { registerHandbook } from './host/handbook.ts'
 import { migrateLegacyMethodLayers } from './host/cultivation-storage.ts'
@@ -98,6 +99,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   registerClientDiagnostics(ctx, runtime.dshHome)
 
   registerDeliverablesCommand(ctx, { dataBlocked, workspace, ledgerStorePromise, exportNow })
+  registerPrdCommand(ctx, { dataBlocked, workspace })
 
   ctx.on('api-session/added', (summary) => {
     if (summary.origin === 'subagent') return

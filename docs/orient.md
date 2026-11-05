@@ -11,8 +11,8 @@
 
 ## 一问：这仓库是什么？
 
-一句话：一个 DSH 插件包（company-pack；DSH = DeepSeek Harness，钉在 `vendor/dsh` 子模块）扮演一家五角色虚拟公司——梦之队（Dream Team）；CEO、VP-Eng、VP-Sales、
-COO、CFO 各自是独立 preset，跑在 DSH 会话里，你通过 web 观察窗驾驭。
+一句话：一个 DSH 插件包（company-pack；DSH = DeepSeek Harness，钉在 `vendor/dsh` 子模块）扮演一家六角色虚拟公司——梦之队（Dream Team）；CEO、VP-Eng、VP-Sales、
+COO、CFO、CMO 各自是独立 preset，跑在 DSH 会话里，你通过 web 观察窗驾驭。
 
 → 全貌：[README](../README.md) · 空间导航：[项目地图](project-map.md)
 

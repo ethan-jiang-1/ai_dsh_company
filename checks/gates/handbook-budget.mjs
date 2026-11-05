@@ -1,5 +1,5 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 // ── 2c-bis. 公司手册注入预算（2026-10-02 立；2026-11-01 v3 改源）──────────────────
@@ -9,13 +9,18 @@ import { join } from 'node:path'
 export function run({ root, ok, fail }) {
   const HANDBOOK_MAX_BYTES = 32_768
   const handbookBytes = readFileSync(join(root, 'packages/company-pack/content/AGENTS.md')).length
-  const budgets = readdirSync(join(root, 'packages/company-pack/presets')).flatMap(role =>
-    [...readFileSync(join(root, 'packages/company-pack/presets', role, 'agent.cordis.yml'), 'utf8')
-      .matchAll(/maxBytes:\s*(\d+)/g)].map(m => Number(m[1])))
+  const presetsRoot = join(root, 'packages/company-pack/presets')
+  // `presets/` 下不全是 preset：`_shared/` 是共享 skills（无 agent.cordis.yml）。
+  // 判据 = 有声明文件才算 preset；缺声明文件是共享目录，跳过而不是崩。
+  const budgets = readdirSync(presetsRoot)
+    .filter(name => existsSync(join(presetsRoot, name, 'agent.cordis.yml')))
+    .flatMap(role =>
+      [...readFileSync(join(presetsRoot, role, 'agent.cordis.yml'), 'utf8')
+        .matchAll(/maxBytes:\s*(\d+)/g)].map(m => Number(m[1])))
   const maxBytes = Math.max(...budgets)
   new Set(budgets).size === 1
-    ? ok(`handbook-budget 五 preset maxBytes 一致（${maxBytes}；这是用户项目指令面，不是公司手册面）`)
-    : fail('handbook-budget', `五 preset 的 maxBytes 不一致：${budgets.join(', ')}（预算应同值）`)
+    ? ok(`handbook-budget 各 preset maxBytes 一致（${maxBytes}；这是用户项目指令面，不是公司手册面）`)
+    : fail('handbook-budget', `各 preset 的 maxBytes 不一致：${budgets.join(', ')}（预算应同值）`)
   const margin = 1024
   handbookBytes + margin <= HANDBOOK_MAX_BYTES
     ? ok(`handbook-budget content/AGENTS.md ${handbookBytes}B + ${margin}B 余量 ≤ ${HANDBOOK_MAX_BYTES}`)

@@ -33,10 +33,10 @@
             config:
               prefix: |-
                 你是这家公司的 VP of Engineering——研发职能的化身（换人不变职能）。你的视角只有三件事：可行性、成本、技术风险；公司名/业务/编制见 .dsh-company/kb/company.md 与 .dsh-company/kb/org.md，本 preset 不复述公司事实。
-                你对 PRD 与技术方案有 veto 权：技术不可行、成本失控、风险不可接受，你有权直接说不并给一句话理由。
-                产出形态：评审意见与技术评估，按 <company-content>/templates/review-note.md 的结构写——结论先行，一页纸为限，写完落 .dsh-company/deliverables/<slug>/drafts/vp-eng.md。
+                你是 PRD 的主笔：接住 CMO 的 MRD（.dsh-company/deliverables/<slug>/drafts/mrd.md），把它变成可研发、可验收的需求账本（REQ/AC/slice），落 drafts/prd.md；先加载 product-definition（共享脊柱）与 prd-playbook。你对技术方案仍有 veto 权：技术不可行、成本失控、风险不可接受，直接说不并给一句话理由。
+                产出形态：PRD（需求账本 + 结论先行一页纸）落 .dsh-company/deliverables/<slug>/drafts/prd.md；技术评估/评审意见仍按 <company-content>/templates/review-note.md 写，落 drafts/vp-eng.md。
                 需要深挖时你可以用 subagent 生 workers 并行调研：给清晰 brief，汇总后署你自己的判断。
-                你不替别的职能下结论——"有没有人买"问销售，"接不接得住"问运营。
+                你不替别的职能下结论——“有没有人买”问 CMO（新市场/产品机会）或 VP-Sales（现有客户/定价），“接不接得住”问运营。
                 评估前先加载 tech-feasibility-review skill（那是你的评估打法），并引用 .dsh-company/kb/vp-eng/CHARTER.md 的技术栈事实。
                 开工动作：先读 .dsh-company/kb/vp-eng/CHARTER.md 与 .dsh-company/kb/vp-eng/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。可用 schedule_create 给自己立节奏（cron/定频提醒会回到本会话，宿主会恢复冷会话投递）——如定期复盘 journal、重估在池动议。
               # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（R2 内容稳定后评估）
@@ -56,6 +56,7 @@
                 # workspace 沙箱之外（D25 自改否决维持）；缺目录容忍（skill-filesystem ENOENT
                 # 按 absent 处理）。与 host config.cultivationRoot 同一 baseUrl 前缀，构造上对齐。
                 - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('../../company/methods/vp-eng/', baseUrl))"
+                - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/_shared/skills/', baseUrl))"
 
           # ③ 工具面（preset 自包含，必须自己声明；R1 实证：不声明则会话无 fs/skill 工具）
           - id: tool-fs

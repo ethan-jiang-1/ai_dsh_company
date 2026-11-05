@@ -48,11 +48,11 @@ export function statusLabelFor(status: string): string {
 }
 
 /**
- * 五个 preset id——**pack 内名册唯一事实家**（2026-10-21 收拢：cultivation 的 CULTIVATION_ROLES 与
+ * 六个 preset id——**pack 内名册唯一事实家**（2026-10-21 收拢：cultivation 的 CULTIVATION_ROLES 与
  * host 培养工具串改为从这里派生；pack/tools 边界仍由 tools/lib/company-roles.mjs 自持，互不依赖）。
  * 有限键，索引安全；与 `presets/<role>/agent.cordis.yml` 一一对应。
  */
-export const PRESET_KEYS = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'] as const
+export const PRESET_KEYS = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo'] as const
 
 /** 培养域沿用的名册别名（2026-10-27 R3-22：从 `lib/cultivation.ts` 的 barrel 定义点搬来——
  *  那里既 `export *` 又定义常量，和 `cultivation-context` 构成三元环。事实仍只有 PRESET_KEYS 一份。） */
@@ -75,6 +75,7 @@ export const PRESET_DISPLAY_NAMES: Record<PresetRoleId, string> = {
   'vp-sales': '梦之队 VP-Sales',
   coo: '梦之队 COO',
   cfo: '梦之队 CFO',
+  cmo: '梦之队 CMO',
 }
 
 /** 成员名 → 显示名（lead 行特殊：name 恒为 'lead'，按角色映射）。 */
@@ -91,6 +92,7 @@ export const PRESET_SHORT_LABELS: Record<PresetRoleId, string> = {
   'vp-sales': 'VP-Sales',
   coo: 'COO',
   cfo: 'CFO',
+  cmo: 'CMO',
 }
 
 /** 角色 → 显示名（未知角色原样返回；2026-10-21 随短标签收进词汇层——培养域 facade 再导出）。 */

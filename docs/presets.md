@@ -1,7 +1,7 @@
-# presets · 角色 preset 的语义合同（R2：五角色定稿）
+# presets · 角色 preset 的语义合同（R2 五角色定稿 + 2026-11-05 CMO 增设）
 
 > 什么时候读：改 persona、skills 或角色语义时。路线 = 五角色表 → 验证方式节。
-> 顶层合同：五个角色 preset 的"现在时"语义（persona 定稿、skills 清单、验证方式）。
+> 顶层合同：六个角色 preset 的"现在时"语义（persona 定稿、skills 清单、验证方式）。
 > 内容来源 [design/role-content-plan.md](./design/role-content-plan.md)；命名约定见台账 D14
 > （显示名 `梦之队 <角色>`，preset id 保持 kebab）。R1 定稿 CEO / VP-Eng；R2 定稿 VP-Sales / COO，
 > 并增设 CFO（用户 2026-09-22 定案：50 人高科技公司，软件开发 / 服务 / 系统集成）。
@@ -19,15 +19,14 @@
 | `vp-sales` | 梦之队 VP-Sales | system | — | R2 定稿 |
 | `coo` | 梦之队 COO | system | — | R2 定稿 |
 | `cfo` | 梦之队 CFO | system | — | R2 定稿（增设） |
+| `cmo` | 梦之队 CMO | system | — | 2026-11-05 增设（市场机会/产品定义） |
 | `researcher` | 梦之队 Researcher | system | — | 0.2.1 增设（委派用，不是第五个职能——见下） |
 
-实测方式：web 观察窗的 `agentPresets/list` RPC（DSH 出厂 4〔cordis/minimal/ptc/standard，vendor `web-app/presets/`〕+ 本 pack 6，零 broken）。
+实测方式：web 观察窗的 `agentPresets/list` RPC（DSH 出厂 4〔cordis/minimal/ptc/standard，vendor `web-app/presets/`〕+ 本 pack 7，零 broken）。
 
-**`researcher` 为什么存在（0.2.1）**：委托 child 的人格只能由 `agentPreset` 给。CEO 的通用委托工具
-（`subagent_research`）若不钉 preset，child 继承 CEO 组合——一个没有 CEO 判断材料、却带着 CEO 职责的
-"迷你 CEO"。researcher = 只读工具面（fs / search / web / session-query）+ 一次调研一页纸，**没有**
-职责边界、没有 journal 义务、不替任何职能下结论；它是**手**，不是第五个职能。
-UI 按 trust 分组，故六张卡（5 公司角色 + researcher）出现在 **Built-in** 组（`AgentPresetSection.tsx`）。
+**`researcher` 为什么存在（0.2.1）**：委托 child 的人格只能由 `agentPreset` 给；不钉 preset 时 child 继承 CEO 组合，
+成了"没有 CEO 判断材料、却带 CEO 职责"的迷你 CEO。researcher = 只读工具面 + 一次调研一页纸的**手**，
+不是公司角色；UI 按 trust 分组，故七张卡（6 公司角色 + researcher）出现在 **Built-in** 组（`AgentPresetSection.tsx`）。
 
 ## 四形态矩阵：身份、工具与 skills 从哪来（RFC preset-skill-matrix 2026-10-05 立）
 
@@ -62,13 +61,14 @@ UI 按 trust 分组，故六张卡（5 公司角色 + researcher）出现在 **B
   需要深挖时生 workers 并署自己的判断；**不替别的职能下结论**。
 - **工作流（1 号）**：`eng-workflow`（接活→备料→深挖→出稿→回执）；打法 skill =
   `tech-feasibility-review`（选项枚举 ≥3 → 逐项可行性·成本·风险 → 结论先行）。
+- **PRD 主笔**：接 CMO 的 MRD 写 PRD（`drafts/prd.md`：REQ/AC/slice），用 `prd-playbook` + 共享 `product-definition`；`/prd check <目录名>` 校验。
 - **KB**：`kb/vp-eng/CHARTER.md`（研发条线 18 人、SRE 2 / 无 DBA、Node 22 + SQLite、AI 试点
   API 每案 $200/月硬顶；历史评审三问）+ `journal/`。
 - **验证**：Web 会话选 `vp-eng` → 身份探针 + 产出探针（半页 PRD 出评审意见，不得越权替销售/运营下结论）。
 
-## VP of Sales（职能化身：销售/市场，R2 定稿）
+## VP of Sales（职能化身：现有客户/销售，R2 定稿；新市场/新产品归 CMO）
 
-- **persona 要点**：视角=客户 / 市场 / 定价；对"没人买"有 veto（需求不成立 / 商机不成熟 /
+- **persona 要点**：视角=现有客户 / 销售 / 定价；新市场与新产品机会归 CMO；对"没人买"有 veto（需求不成立 / 商机不成熟 /
   定价撑不住交付成本）；产出=市场判断 + 定价建议（`templates/decision-memo.md`，结论先行一页纸）；
   引用 KB 客户与竞品事实，**禁止虚构客户**；不替研发/运营下结论。
 - **工作流（1 号）**：`sales-workflow`（接活→备料→测算→出稿→回执）；打法 skill =
@@ -78,6 +78,11 @@ UI 按 trust 分组，故六张卡（5 公司角色 + researcher）出现在 **B
   定价原则：里程碑收款 3-4-3、维护年费 15–20%、折扣下限 9 折 + CFO 毛利底线 30% 双签）+ `journal/`。
 - **验证**：Web 会话选 `vp-sales` → 三探针（身份=视角与 veto 边界；知识=KB 客户数与定价原则；
   产出=对一页 PRD 出市场意见，不越权）。
+
+## CMO（职能化身：市场与产品定义，2026-11-05 增设）
+- **persona**：视角=市场机会/产品定义/买点；"市场不成立"即 veto；产出 MRD（`templates/mrd.md`，`MR-###`，标【事实/假设】）；不替 VP-Sales 定价、不替 VP-Eng 定技术。
+- **打法**：`mrd-playbook` + 共享 `product-definition`（脊柱 + 项目制/系统集成、硬软一体 playbook）。
+- **KB/验证**：`kb/cmo/CHARTER.md` + `journal/`；选 `cmo` 跑身份/知识/产出三探针；MRD→PRD 交接见 demo.md。
 
 ## COO（职能化身：运营，R2 定稿）
 

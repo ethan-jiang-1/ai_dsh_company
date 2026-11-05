@@ -65,7 +65,7 @@ workspace；换项目不新建 home。bundle 不在 git；本仓 dev 的 `compan
 - 首启只在 workspace 建 `.dsh-company/`（状态只补缺）；**不写**根手册/模板；用户项目指令文件不动。
 - **fresh clone 没有 `company-workspace/`** ⇒ 先 `pnpm bundle:init`；已有盘一个字节不动。
 - 同一 home 顺序服务多个 workspace；不同公司新开 `DSH_HOME`。
-- 进程 cwd ≠ 会话 cwd；启动成功 ≠ 五角色已装配（挂载证据 = preset-smoke）。
+- 进程 cwd ≠ 会话 cwd；启动成功 ≠ 六角色已装配（挂载证据 = preset-smoke）。
 - 搬 home/workspace 后 DSH 的 `storages/workspace.json` 与 session `header.cwd` 仍是旧绝对路径；
   侧栏重新添加/接受旧会话不可续。
 

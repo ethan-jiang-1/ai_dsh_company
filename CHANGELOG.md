@@ -2,6 +2,18 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.9.0 — 2026-11-05
+
+### Added
+
+- 新增第六个公司角色 **CMO**（市场机会 / 产品定义 / MRD）；与 VP-Sales 分工：新市场/新产品归 CMO，
+  现有客户/销售/定价归 VP-Sales。
+- **VP-Eng 增加 PRD 主笔能力**：MRD → PRD 需求账本（REQ/AC/slice、DoR/DoD），一 REQ 一任务。
+- **共享 product-definition 能力**（CMO 与 VP-Eng 共用）：产品定义脊柱 + 品类 playbook
+  （项目制/系统集成、硬软一体）。
+- 新增 `/prd check <目录名>` 命令：机械校验 MRD/PRD 的编号、来源追溯、验收、依赖与状态。
+- CEO 组队升级：按问题选最少角色；产品定义动议默认 CMO + VP-Eng，不默认全员。
+
 ## 0.8.8 — 2026-11-05
 
 ### Changed

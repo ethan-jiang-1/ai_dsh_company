@@ -84,7 +84,7 @@ describe('inboxRows', () => {
       expect(row.count).toBe(0)
       expect(row.entries).toHaveLength(0)
     }
-    expect(rows.map(row => row.label)).toEqual(['CEO', 'VP-Eng', 'VP-Sales', 'COO', 'CFO'])
+    expect(rows.map(row => row.label)).toEqual(['CEO', 'VP-Eng', 'VP-Sales', 'COO', 'CFO', 'CMO'])
   })
 
   it('预览上限 = PREVIEW_LIMIT', () => {

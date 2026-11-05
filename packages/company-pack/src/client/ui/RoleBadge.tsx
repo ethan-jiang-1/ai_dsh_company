@@ -61,6 +61,7 @@ export const ROLE_SHORT: Readonly<Record<string, string>> = {
   ceo: 'CEO',
   cfo: 'CFO',
   coo: 'COO',
+  cmo: 'CMO',
   'vp-eng': 'VPE',
   'vp-sales': 'VPS',
 }
@@ -75,6 +76,7 @@ export const ROLE_MARK: Readonly<Record<string, string>> = {
   ceo: 'C',
   cfo: 'F',
   coo: 'O',
+  cmo: 'M',
   'vp-eng': 'E',
   'vp-sales': 'S',
 }

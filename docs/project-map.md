@@ -25,7 +25,7 @@
 
 | 面 | 位置 | 所有权与用途 |
 |---|---|---|
-| 自写运行包 | [company-pack](../packages/company-pack/) | 五个角色 preset、bundle 行、host 注册与 client 面；发布与分发由 [包声明](../packages/company-pack/package.json) 决定 |
+| 自写运行包 | [company-pack](../packages/company-pack/) | 六个角色 preset、bundle 行、host 注册与 client 面；发布与分发由 [包声明](../packages/company-pack/package.json) 决定 |
 | dev 公司状态的 workspace | `company-workspace/`（**gitignored**；fresh clone 用 `pnpm bundle:init`） | 公司角色会话 cwd；本部署的扩张数据（owners、台账、journal、交付物、培养记录）只住 `.dsh-company/`，不进 git。插件只读内容的家 = [pack content](../packages/company-pack/content/)（随包分发，不复制）。公司状态清单 = `<workspace>/.dsh-company/bundle.json`（v3，legacy 文件名；见 [运行态地图 §二·五](runtime-map.md)） |
 | 启动配置 | [run](../run/)、[env.sh](../run/env.sh) | tracked 启动配置；`pnpm company` 启动入口；源码验证使用开发 DSH_HOME |
 | 运行残留 | [runtime](../runtime/)、[runtime/README](../runtime/README.md) | 开发 DSH_HOME、第二 home、浏览器工具态与排练盘（默认整树忽略 + 显式白名单，逐件见 runtime/README；排练盘成型见 [rehearsal 实现](../tools/lib/rehearsal.mjs)） |
@@ -63,11 +63,11 @@ flowchart TD
 图中实体对应以下真实入口：
 
 - [根包命令](../package.json) 将 `pnpm dsh` 接到 [vendor CLI](../vendor/dsh/apps/cli/src/bin.ts)；[profile boot](../vendor/dsh/apps/cli/src/profile-boot.ts) 按选择的 profile 装配 patch 层；home patch（`$DSH_HOME/cordis.patch.yml`）在 profile patch 之后生效，随后是命令行 `--patch` 与 telemetry switch。
-- [company-pack 包声明](../packages/company-pack/package.json) 的 `dsh.bundle.patch` 合并 [共享 patch](../packages/company-pack/cordis.patch.yml) 与五个角色 preset + 一个委派子人格 preset（`researcher`）文件；[CEO preset](../packages/company-pack/presets/ceo/agent.cordis.yml) 声明 persona、角色 skills 和会话工具。
+- [company-pack 包声明](../packages/company-pack/package.json) 的 `dsh.bundle.patch` 合并 [共享 patch](../packages/company-pack/cordis.patch.yml) 与六个角色 preset + 一个委派子人格 preset（`researcher`）文件；[CEO preset](../packages/company-pack/presets/ceo/agent.cordis.yml) 声明 persona、角色 skills 和会话工具。
 - `company-client` 行接到 [host 入口](../packages/company-pack/src/index.ts)，注册签字工具；[client 入口](../packages/company-pack/src/client/index.ts) 注册品牌、卡片和公司视图，并读取官方会话投影。
 - 公司手册与事实由会话 cwd 进入；[排练实现](../tools/lib/rehearsal.mjs) 为实验换 cwd、刷新参考输入并保留排练产物。
 
-**公司完整操作走 Web profile。** shipped headless 是通用 CLI 面，单独运行它不会自动得到公司组合。headless 实验需要显式组合；[company overlay](../run/company.overlay.yml) 只补部分宿主行，实际组合还由调用脚本的 preset patches 决定。不要把“CLI 可启动”当作“五角色公司已装配”。
+**公司完整操作走 Web profile。** shipped headless 是通用 CLI 面，单独运行它不会自动得到公司组合。headless 实验需要显式组合；[company overlay](../run/company.overlay.yml) 只补部分宿主行，实际组合还由调用脚本的 preset patches 决定。不要把“CLI 可启动”当作“六角色公司已装配”。
 
 **团队成员与独立角色 preset 会话有不同隔离语义。** preset 会话挂自己的角色组合；team teammate 的工具、身份与 KB 使用按团队机制走。选择通道时读 [委派合同](delegation.md) 和 [角色隔离设计](design/roles-isolation.md)，不要从角色名字推断它已挂完整 preset。
 

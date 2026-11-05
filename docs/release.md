@@ -32,7 +32,7 @@ home/数据策略和生命周期承诺。六轴任一格写“默认应该有”
   “已认证”；已认证 tag 台账住 repo，不随包分发。当前窗口与实测见 `package.json` 与
   `checks/gates/lib/compat-tags.json`；`pack-engines` + `pack-compat` 各查一边。
 - **browser 两包条件启用**：npm 的 `@deepseek-ai/dsh` 不含 `dsh-browser-use` 与
-  `dsh-experimental-browser-use-playwright-mcp`；五角色 preset 的 browser 组在可解析时启用、
+  `dsh-experimental-browser-use-playwright-mcp`；六角色 preset 的 browser 组在可解析时启用、
   `DSH_COMPANY_BROWSER=on/off` 强制；两包不进 `dependencies`，保持离线/零 runtime 依赖姿态。
 - **许可与发布**：MIT + `LICENSE`、`author`/`homepage`/`keywords`/`publishConfig.access: public`；
   `private` 已移除。发布面 = npm + 自托管 market index；真实 `npm publish` 是人工 handoff。
@@ -88,7 +88,7 @@ bundles 摘净且 `.dsh-company/` 字节不变（重装可恢复）。`release -
 **启动入口冒烟**（`company-entry-smoke`）：真 tarball 装进干净 profile → `dsh --profile company`
 （cwd=临时 workspace）→ 无 launcher/profile patch/根 seed；它不证明浏览器首屏（client-load 另测）。
 
-**通道矩阵冒烟**（`channel-matrix-smoke --channel all`）：vendor built CLI + 真实全局 `dsh`，验证五角色
+**通道矩阵冒烟**（`channel-matrix-smoke --channel all`）：vendor built CLI + 真实全局 `dsh`，验证六角色
 roster 与 `session/create`；`--with-browser` 另验 browser 两包后自动启用。它证明真实启动器通道，不证明
 浏览器 UI；需要 PATH 有 global `dsh` 与网络，默认不进 `release --verify`，发布前手动跑。
 

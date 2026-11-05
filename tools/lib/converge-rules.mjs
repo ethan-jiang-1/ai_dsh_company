@@ -118,18 +118,23 @@ export function pickArchivedJournal(input) {
  * 为什么住这里：**写入点（`converge.mjs` 追加台账行）与守卫（门禁）必须同一把尺**——否则
  * 收敛写进去的行会被自家门禁判红（2026-10-16 实测：真动议收敛后新增一行即触发
  * `ledger-participation` 红，因为写入点照抄 meta 的「参与」原文 `CEO+VP-Eng+VP-Sales+COO+CFO`）。
- * @param raw - meta 的「参与」字段原文（如 `CEO+VP-Eng+VP-Sales+COO+CFO`、`CEO+全职能`）。
- * @returns 规范写法：五角色集合 ⇒ `全员五人`；否则按固定序 `+` 连接；含非角色名 ⇒ `—`。
+ * @param raw - meta 的「参与」字段原文（如 `CEO+VP-Eng+VP-Sales+COO+CFO+CMO`、`CEO+全职能`）。
+ * @returns 规范写法：五角色集合 ⇒ `全员五人`（历史口径保留）；六角色集合 ⇒ `全员六人`；
+ *   否则按固定序 `+` 连接；含非角色名 ⇒ `—`。
  */
 export function canonicalParticipation(raw) {
-  const ROLES = ['CEO', 'VP-Eng', 'VP-Sales', 'COO', 'CFO']
+  const ROLE_ORDER = ['CEO', 'VP-Eng', 'VP-Sales', 'COO', 'CFO', 'CMO']
+  const FIVE = ROLE_ORDER.slice(0, 5)
   const value = String(raw ?? '').trim()
   if (value === '') return '—'
   if (value === '全员五人' || value === 'CEO+全职能') return '全员五人'
+  if (value === '全员六人') return '全员六人'
   const parts = value.replace(/（[^）]*）/g, '').split('+').map(part => part.trim()).filter(Boolean)
   const uniq = [...new Set(parts)]
-  if (uniq.length === 0 || uniq.some(role => !ROLES.includes(role))) return '—'
-  return uniq.length === ROLES.length ? '全员五人' : uniq.sort((a, b) => ROLES.indexOf(a) - ROLES.indexOf(b)).join('+')
+  if (uniq.length === 0 || uniq.some(role => !ROLE_ORDER.includes(role))) return '—'
+  if (uniq.length === FIVE.length && uniq.every(role => FIVE.includes(role))) return '全员五人'
+  if (uniq.length === ROLE_ORDER.length) return '全员六人'
+  return uniq.sort((a, b) => ROLE_ORDER.indexOf(a) - ROLE_ORDER.indexOf(b)).join('+')
 }
 
 /** CHARTER 是否已有该 slug 的历史纪要**条目**。

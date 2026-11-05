@@ -47,6 +47,7 @@ wrapper 复用上次 tarball（跳过构建打包，`--rebuild` 强制重打）�
 
 > 安装后的部署没有维护者仓库：成品页签的 present 记录来自**部署 host 观测到的 present 事件**（未观测 = 未核），
 > 完整三态审计仍由操作员/维护者在其仓库跑。本仓演示按上面命令；不要把维护者仓库脚本当成产品内命令。
+> 新产品定义的 MRD→PRD 场景与校验 = [product-definition 指南](./guides/product-definition.md)。
 
 ## 分镜 v0（两空间镜头：谁在哪个空间、活怎么交接）
 

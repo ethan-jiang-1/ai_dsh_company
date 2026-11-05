@@ -1,6 +1,6 @@
 {
   "name": "dsh-company-pack",
-  "version": "0.8.8",
+  "version": "0.9.0",
   "type": "module",
   "description": "Five-role virtual company for DSH: CEO / VP-Eng / VP-Sales / COO / CFO presets, company handbook and Web tabs.",
   "license": "MIT",
@@ -146,6 +146,7 @@
         "./presets/vp-sales/agent.cordis.yml",
         "./presets/coo/agent.cordis.yml",
         "./presets/cfo/agent.cordis.yml",
+        "./presets/cmo/agent.cordis.yml",
         "./presets/researcher/agent.cordis.yml"
       ]
     },

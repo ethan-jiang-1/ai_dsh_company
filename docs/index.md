@@ -26,7 +26,8 @@
 | [guides/bootstrap.md](./guides/bootstrap.md) | 指南 | 冷启动引导（clean checkout → 可跑通）：配方、双面构建与实证坑（2026-09-27 自 dev-loop §7 迁入） |
 | [profile.md](./profile.md) | 合同 | host 组合现在时：应用内安装（company profile + workspace）vs dev、行清单语义、开放点 |
 | [delegation.md](./delegation.md) | 合同 | 汇报线现在时（R3 出生，0.2.1 复校）：命名委托 = activation（终稿走完成通知、人格由 `agentPreset` 给）与 team 的分工、team shadow 边界与证据、委派工具卡、分层验证 |
-| [presets.md](./presets.md) | 合同 | 角色 preset 语义（R2：五角色定稿——CEO / VP-Eng / VP-Sales / COO / CFO；0.2.1 增设委派用的 researcher）；名册运行时实测；验证分层；培养回路与学习载体（D25/D43） |
+| [presets.md](./presets.md) | 合同 | 角色 preset 语义（R2：五角色定稿——CEO / VP-Eng / VP-Sales / COO / CFO；2026-11-05 增设 CMO；0.2.1 增设委派用的 researcher）；名册运行时实测；验证分层；培养回路与学习载体（D25/D43） |
+| [guides/product-definition.md](./guides/product-definition.md) | 指南 | 新产品 MRD→PRD：角色分工、交接 DAG、编号/状态/DoR/DoD、`/prd check`、产品类型 playbook |
 | [demo.md](./demo.md) | 合同 | demo 操作合同（R4 立场景 C，2026-09-25 补场景 D 季度经营会 / E 事件复盘）：动议、前置、分镜与观测点、验收判据（含**交付物三态**的机器判据）、已知边界 |
 | [release.md](./release.md) | 合同 | 发行版六轴、发布物与发布字节、兼容台账、启动入口 smoke、升 pin 程序 |
 | [testing.md](./testing.md) | 合同 | **测试宪法**（2026-10-04 立）：什么算证据——分层与证明边界、改动面→最小证据**政策**（行级映射 = tests/README，2026-10-10 迁家）、证据纪律、资产三分法、自测轮授权、已知未覆盖面与升级地图 |

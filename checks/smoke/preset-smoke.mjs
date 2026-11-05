@@ -36,11 +36,35 @@ const ROLES = COMPANY_ROLE_IDS
 const SUPPORT_PRESETS = COMPANY_SUPPORT_PRESET_IDS
 const OUR_PACKAGE = 'dsh-company-pack'
 
-/** 该角色目录里实际存在的 skill（preset 约定：目录名 = skill 名）。 */
-const roleSkills = (role) => readdirSync(join(ROOT, 'packages/company-pack/presets', role, 'skills'), { withFileTypes: true })
-  .filter(entry => entry.isDirectory())
-  .map(entry => entry.name)
-  .sort()
+/** 该角色目录里实际存在的 skill（preset 约定：目录名 = skill 名）。
+ *  外加**共享 skills**（`presets/_shared/skills/`）：那是多角色共用的能力目录（首个用例 =
+ *  2026-11-05 CMO 与 VP-Eng 共用的 product-definition）。断言口径 = 该 preset 在
+ *  `agent.cordis.yml` 里**真声明了** `_shared/skills/`，而不是“目录存在就算”——否则一只
+ *  共享目录会让没声明它的角色也进 expected，掩盖真泄漏；反之声明了却不建目录则仍是红。 */
+const roleSkills = (role) => {
+  const presetDir = join(ROOT, 'packages/company-pack/presets', role)
+  const own = readdirSync(join(presetDir, 'skills'), { withFileTypes: true })
+    .filter(entry => entry.isDirectory())
+    .map(entry => entry.name)
+  const declaresShared = readFileSync(join(presetDir, 'agent.cordis.yml'), 'utf8').includes('presets/_shared/skills/')
+  const shared = declaresShared
+    ? readdirSync(join(ROOT, 'packages/company-pack/presets/_shared/skills'), { withFileTypes: true })
+      .filter(entry => entry.isDirectory())
+      .map(entry => entry.name)
+    : []
+  return [...new Set([...own, ...shared])].sort()
+}
+
+/** 角色声明了共享 skills 目录（presets/_shared/skills）时，pack 内共享 skill 也算 expected。 */
+const sharedSkills = (role) => {
+  const yml = readFileSync(join(ROOT, 'packages/company-pack/presets', role, 'agent.cordis.yml'), 'utf8')
+  if (!yml.includes('presets/_shared/skills/')) return []
+  const dir = join(ROOT, 'packages/company-pack/presets/_shared/skills')
+  return readdirSync(dir, { withFileTypes: true })
+    .filter(entry => entry.isDirectory() && existsSync(join(dir, entry.name, 'SKILL.md')))
+    .map(entry => entry.name)
+    .sort()
+}
 
 /** 该角色公司级方法层里实际存在的 skill（M3 起；旧 profile 路径由 host 启动迁移，不再直接加载）。 */
 const methodSkills = (role, homeDir) => {
@@ -188,7 +212,7 @@ try {
       if (sessionId === undefined) throw new Error('没有会话 id（上一步未通过）')
       const value = await rpc(base, cookie, 'skills/list', { request: { sessionId } })
       const actual = (value.skills ?? []).map(skill => skill.name).sort()
-      const expected = [...new Set([...roleSkills(role), ...methodSkills(role, home)])].sort()
+      const expected = [...new Set([...roleSkills(role), ...sharedSkills(role), ...methodSkills(role, home)])].sort()
       const extra = actual.filter(name => !expected.includes(name))
       const missing = expected.filter(name => !actual.includes(name))
       if (extra.length > 0) throw new Error(`看见了非本角色的 skill：${extra.join(', ')}`)

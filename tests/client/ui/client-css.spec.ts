@@ -143,19 +143,20 @@ describe('客户端 CSS：角色色调（字母之外的第二个通道，2026-1
       color: /(^|;|\s)color:\s*([^;]+)/.exec(rule.body)?.[2]?.trim() ?? '',
     }))
 
-  it('五角色各有色调规则（cfo/coo/vp-eng/vp-sales 走 static 色相，ceo 走 adaptive 品牌对）', () => {
+  it('六角色各有色调规则（cfo/coo/vp-eng/vp-sales/cmo 走 static 色相，ceo 走 adaptive 品牌对）', () => {
     const found = tones()
     expect(found.map(t => t.selector)).toEqual([
       ".wk-role-badge[data-wk-role='cfo']",
       ".wk-role-badge[data-wk-role='coo']",
       ".wk-role-badge[data-wk-role='vp-eng']",
       ".wk-role-badge[data-wk-role='vp-sales']",
+      ".wk-role-badge[data-wk-role='cmo']",
     ])
     expect(found.every(t => t.background.includes('var(--dsw-') && t.color.includes('var(--dsw-')),
       `色调必须只用令牌：${found.map(t => `${t.selector} ${t.background}`).join('；')}`).toBe(true)
   })
 
-  it('四个 static 底色两两不同，且都不等于 CEO 的品牌底（同色 = 第二通道失效）', () => {
+  it('五个 static 底色两两不同，且都不等于 CEO 的品牌底（同色 = 第二通道失效）', () => {
     const backgrounds = tones().map(t => t.background)
     expect(new Set(backgrounds).size).toBe(backgrounds.length)
     expect(backgrounds).not.toContain('var(--dsw-alias-brand-primary)')

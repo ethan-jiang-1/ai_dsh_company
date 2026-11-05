@@ -18,7 +18,7 @@ const YAML_SCHEMA = yaml.DEFAULT_SCHEMA.extend([
 
 /** 公司五角色（本文件持独立字面量 = 独立事实源：与 presets/ 目录内容互相印证——若改为 import
  * 共享常量，常量被误删一角时本文件会静默跳过该角色的全部断言，守卫即失效）。 */
-const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'] as const
+const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo'] as const
 
 /** 读一个角色的 preset 声明文件（本文件各断言共用的唯一读盘入口）。 */
 const roleYml = (role: string): string => readFileSync(join(PRESETS_DIR, role, 'agent.cordis.yml'), 'utf8')
