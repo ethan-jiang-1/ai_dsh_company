@@ -1,16 +1,17 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 
 // ── 基部零部署历史（base-clean，2026-11-01 v3）──────────────────────────────────
 // 为什么：插件只读内容随包分发；CHARTER/手册/模板里带本部署历史，新装公司就会继承我们的
 // 客户/价格/结论。判据（只看随包分发的 content/）：
-//   ① 五份默认章程不含历史条目与归档引用；
+//   ① 六份默认章程不含历史条目与归档引用；
 //   ② 手册/README/模板/状态默认值不含部署日期与 snapshots/archive/deliverables-archive 引用；
 //   ③ content/ 不含 journal/deliverables/cultivation 的运行态文件（只读内容不装 run bundle）。
-const ROLES = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']
+const ROLES = [...COMPANY_ROLE_IDS]
 const TEXT_FILES = ['AGENTS.md', 'README.md', 'state/org.md', 'state/company.md', 'state/owners.md', 'state/motion-ledger.md',
-  ...['decision-memo.md', 'meta.md', 'ops-review-note.md', 'prd.md', 'review-note.md', 'weekly-report.md'].map(name => `templates/${name}`)]
+  ...['decision-memo.md', 'meta.md', 'mrd.md', 'ops-review-note.md', 'prd.md', 'review-note.md', 'weekly-report.md'].map(name => `templates/${name}`)]
 
 export function run({ root, ok, fail }) {
   const content = join(root, 'packages/company-pack/content')
@@ -36,6 +37,6 @@ export function run({ root, ok, fail }) {
     if (existsSync(join(content, dir))) problems.push(`packages/company-pack/content/${dir} 是运行态目录（只读内容不装 run bundle）`)
   }
   problems.length === 0
-    ? ok('base-clean 只读内容零部署历史（CHARNER ×5 + 手册/模板/状态）')
+    ? ok(`base-clean 只读内容零部署历史（CHARTER ×${String(ROLES.length)} + 手册/模板/状态）`)
     : fail('base-clean', problems.slice(0, 8).join('；') + (problems.length > 8 ? ` …共 ${String(problems.length)} 处` : ''))
 }

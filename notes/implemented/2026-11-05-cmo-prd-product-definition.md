@@ -150,6 +150,17 @@
 验证：`pnpm test` **145 files / 1154 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS；
 `release --prepare/--verify` 全绿（0.9.0 同版本未发布重打）。
 
+## 2026-11-05 矩阵扫描 第 4 轮（goal）
+
+- **`base-clean` 门禁只扫五份章程**（CMO 章程不在检查面）且 **`templates/mrd.md` 不在 TEXT_FILES** →
+  改用 `COMPANY_ROLE_IDS`（×6）+ 补 `mrd.md`；消息插值修正。反证：给 cmo 章程加历史行、给 mrd 模板加部署日期
+  → **2 处红**；还原 → 绿。
+- **`probe-smoke` 的 ROLES 已六角色，但 PROBES / PERSONA_MARKERS 仍五角色**（全量档跑到 cmo 会崩），
+  且 VP-Eng 知识题仍期望 **18 人**、VP-Sales 身份题仍把"市场"算作其 veto → 补 cmo 的 marker/probes、
+  VP-Eng 改 16、VP-Sales 边界改客户/定价；`node --check` 通过。
+
+验证：`pnpm test` **145 files / 1154 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS（base-clean ×6）。
+
 ## 事实落点
 
 `presets/cmo/`、`presets/_shared/skills/product-definition/`、`presets/vp-eng/skills/prd-playbook/`、
