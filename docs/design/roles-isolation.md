@@ -61,7 +61,7 @@ async composeAgent(presetId) {
 上下文面：每会话独立 log（model-visible ⟺ logged，可完整回放）、compaction 是 preset 内的
 realm 行（角色可各自选压缩策略）、token 计量按 session 键控。
 
-**所以：五个角色（CEO / VP-Eng / VP-Sales / COO / CFO）各开一个根会话、各挂各的 preset，
+**所以：六个角色（CEO / VP-Eng / VP-Sales / COO / CFO / CMO）各开一个根会话、各挂各的 preset，
 你要的五个独立面一次全拿到，零自定义代码。** 缺的只是它们之间的对话通道——这就到了分水岭。
 
 ## 2. 分水岭的精确表述（这次挖到了底）
@@ -108,7 +108,7 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
 - 代价：每次 brief 是一个新会话，没有"跟 VP 的连续对话记忆"。要连续对话见 M3/M4。
 - **0.2.1 更新（写这一节之后上游前进了一步）**：`dsh-tool-subagent` 的配置位现在带
   **`agentPreset`**——官方 provider 就能让 child 按另一个 preset 组合，M2 的"自己写 provider"
-  那条路在本仓**已不需要**：五个角色 preset 各自可选，CEO 的三行委派工具直接钉 `agentPreset`
+  那条路在本仓**已不需要**：六个角色 preset 各自可选，CEO 的三行委派工具直接钉 `agentPreset`
   （现在时见 [delegation.md §1](../delegation.md)）。本节保留为 seam 来路的记录。
 - 实现提示：自定义 provider 不要从零拼创建窗口——复用 `packages/subagent/subagent`
   的组合路径（`applyChildComposition` / `appendDelegatedPolicyOverrides` / descriptor 追加），

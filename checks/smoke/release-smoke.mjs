@@ -296,7 +296,7 @@ try {
     || /^\.dsh-company\/deliverables\/.+\/(final|meta)\.md/.test(row) || /^\.dsh-company\/cultivation\/records\/.+/.test(row))
   check('干净底座（无 journal / 交付物 / 培养记录）', historyRows.length === 0, `扩张数据 ${String(historyRows.length)} 件：${historyRows.slice(0, 3).join(', ')}`)
   // 2026-10-25：CHARTER 历史条目也必须为零——第一版漏的正是这一层（305 行）。
-  const charterHistory = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales'].flatMap(role => {
+  const charterHistory = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales', 'cmo'].flatMap(role => {
     const path = join(companyHome, '.dsh-company/kb', role, 'CHARTER.md')
     if (!existsSync(path)) return [`缺少 .dsh-company/kb/${role}/CHARTER.md`]
     return readFileSync(path, 'utf8').split('\n').filter(line => /^- 20\d\d-\d\d-\d\d · /.test(line))

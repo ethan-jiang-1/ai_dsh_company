@@ -14,7 +14,7 @@
 
 你的方向合理，但有一个关键的概念纠偏：**"角色"的 DSH 原生载体是 agent preset（组合文件），不是插件（代码包）**。
 正确形状：Option A 独立 repo + **一个 company pack**，pack 里 host/profile 层放共享行，
-`presets/ceo|vp-eng|vp-sales|coo|cfo/` 每角色一个薄 preset（persona + 角色 skills + 角色工具行；五角色 R2 定稿）；
+`presets/ceo|vp-eng|vp-sales|coo|cfo|cmo/` 每角色一个薄 preset（persona + 角色 skills + 角色工具行；R2 五角色 + 2026-11-05 CMO）；
 协作用 DSH 已有的通道（delegation / Agent Teams / workflow），不自造调度器。
 "每角色完全隔离的 skills 面"和"角色间深度协作"在 DSH 里是一对真实的张力（见 §4 分水岭），
 要按场景分层选通道，不能指望一个机制同时给到极致。
@@ -236,7 +236,7 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
    tool-bash/tool-fs/tool-fs-search/tool-skill/goal/planning/compaction/delegation/…。
    故每个角色 preset 声明自己那套工具行（复制式演化——DSH 无 patch 继承）；pack 的
    `cordis.patch.yml` 只负责**全局行**（registry roster、团队两行、present）。
-   代价：五个角色各持一份工具行清单（复制式演化）；换来按角色的最小权限工具面。
+   代价：六个角色各持一份工具行清单（复制式演化）；换来按角色的最小权限工具面。
 2. **presets 进 roster 的落法**（现行组合；rc.2 已核）：registry **一行**（`agent-preset-registry`，用替换
    语法覆盖 web-app 的出厂 insert 行，`default: standard → ceo`）+ **每个预设一行**
    `@deepseek-ai/dsh-agent-preset`（住 `presets/<role>/agent.cordis.yml`，经 `dsh.bundle.patch`

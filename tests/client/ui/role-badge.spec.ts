@@ -34,19 +34,21 @@ describe('sessionTitleOf（会话行标题的防御性双读）', () => {
 })
 
 describe('ROLE_SHORT（角色 → 全称缩写）', () => {
-  it('五角色齐全；非公司 preset 不在表内（⇒ 不渲染）', () => {
+  it('六角色齐全；非公司 preset 不在表内（⇒ 不渲染）', () => {
     expect(ROLE_SHORT.ceo).toBe('CEO')
     expect(ROLE_SHORT.cfo).toBe('CFO')
     expect(ROLE_SHORT.coo).toBe('COO')
     expect(ROLE_SHORT['vp-eng']).toBe('VPE')
     expect(ROLE_SHORT['vp-sales']).toBe('VPS')
+    expect(ROLE_SHORT.cmo).toBe('CMO')
     expect(ROLE_SHORT.standard).toBeUndefined()
   })
 })
 
 describe('ROLE_MARK（座位标记字母；16px 格里放得下）', () => {
-  it('与 ROLE_SHORT 同键（两张表不许漂）：五角色齐全、非公司 preset 不在表内', () => {
+  it('与 ROLE_SHORT 同键（两张表不许漂）：六角色齐全、非公司 preset 不在表内', () => {
     expect(Object.keys(ROLE_MARK).sort()).toEqual(Object.keys(ROLE_SHORT).sort())
+    expect(ROLE_MARK.cmo).toBe('M')
   })
   it('每个标记都是单字母且互不相同（三字缩写 32.45px 塞不进 16px 座位——见 styles.ts 注释）', () => {
     const marks = Object.values(ROLE_MARK)

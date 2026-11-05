@@ -58,14 +58,15 @@ describe('smoke home 隔离：在启动和排练写入前拒绝错误 home', () 
 })
 
 describe('当前角色章程的工具路径以会话 cwd 为基准', () => {
-  it.each(['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo'])('%s 的输入和输出路径可直接使用', (role) => {
+  it.each(['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo'])('%s 的输入和输出路径可直接使用', (role) => {
     // 2026-11-01：默认章程住 pack content/charters；运行态路径一律 .dsh-company/。
     const content = join(ROOT, 'packages/company-pack/content')
     const text = readFileSync(join(content, 'charters', `${role}.md`), 'utf8')
     expect(text).toContain(`.dsh-company/kb/${role}/journal/`)
-    expect(text).toContain(role === 'ceo'
+    const draftRel = role === 'ceo'
       ? '.dsh-company/deliverables/<slug>/final.md'
-      : `.dsh-company/deliverables/<slug>/drafts/${role}.md`)
+      : `.dsh-company/deliverables/<slug>/drafts/${role === 'cmo' ? 'mrd' : role}.md`
+    expect(text).toContain(draftRel)
     if (role !== 'ceo') expect(text).toContain('<company-content>/templates/')
     expect(existsSync(join(content, 'charters', `${role}.md`))).toBe(true)
   })

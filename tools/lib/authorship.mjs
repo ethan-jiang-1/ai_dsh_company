@@ -4,10 +4,10 @@
 import { COMPANY_ROLE_IDS } from './company-roles.mjs'
 
 /** 稿首署名行（兼容两种形状：早期模板 `出稿：CFO（wochen 财务职能）…` 与新形状 `出稿：<角色>｜版本 vN`）。 */
-export const SIG = /出稿[:：]\s*(?:(VP-Eng|VP-Sales|COO|CFO|CEO)|(vp-eng|vp-sales|coo|cfo|ceo))/
+export const SIG = /出稿[:：]\s*(?:(VP-Eng|VP-Sales|COO|CFO|CEO|CMO)|(vp-eng|vp-sales|coo|cfo|ceo|cmo))/
 
 /** 复核收回署名的更正行。 */
-export const RECLAIM = /本稿由\s*(vp-eng|vp-sales|coo|cfo|ceo)\s*根会话复核并署名/
+export const RECLAIM = /本稿由\s*(vp-eng|vp-sales|coo|cfo|ceo|cmo)\s*根会话复核并署名/
 
 /** 文件名里的名义角色（`<角色>.md` / `<角色>-review.md`）。 */
 export function nominalRoleOf(fileName) {
@@ -20,7 +20,7 @@ export function nominalRoleOf(fileName) {
  * 写入者 preset → 基础角色（**只抹掉团队实例后缀**，BUG-018，2026-10-16）。
  *
  * 为什么需要：团队插件给同角色的第 2、3 个成员发的 preset 带实例后缀（`coo-2` / `vp-eng-3`），
- * 这些 id 不在 `packages/company-pack/presets/` 的五个 preset 里。署名行写的是角色名
+ * 这些 id 不在 `packages/company-pack/presets/` 的六个 preset 里。署名行写的是角色名
  * （`出稿：coo`），而写入者归属在「队友会话 → 成员名」映射缺失时会回落到 preset 原文 ⇒
  * 精确字符串相等把**同一角色的两个实例**判成「署名不实」（真盘实测 10 条假阳性）。
  *

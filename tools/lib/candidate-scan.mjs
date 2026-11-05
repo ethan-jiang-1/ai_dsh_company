@@ -18,10 +18,10 @@
  * 可选「假设」段（BUG-011 机械兜底，2026-10-11）：手册「指令与假设分离」要求未经证实的因果猜测
  * 要么标「待证」要么不发；本段给"标了没有"一个机器可读落点（只证标没标，不判假设真假）。
  */
-export const ASSIGN_LINE = /^派活｜(T\d+)｜(vp-eng|vp-sales|coo|cfo|ceo)｜([^｜]*)｜依赖：([^｜]*)｜状态：(待办|已出稿|完成|取消|待补料)(?:｜假设：([^｜]*))?/
+export const ASSIGN_LINE = /^派活｜(T\d+)｜(vp-eng|vp-sales|coo|cfo|ceo|cmo)｜([^｜]*)｜依赖：([^｜]*)｜状态：(待办|已出稿|完成|取消|待补料)(?:｜假设：([^｜]*))?/
 
 /** 自然语言"点名"（R1 用）：任务书正文里出现 `角色 —` 或 `T<n> · 角色` 的地方。 */
-export const MENTION = /^(?:###\s*)?(?:T\d+\s*·\s*|\*\*)?(VP-Eng|VP-Sales|COO|CFO|CEO|vp-eng|vp-sales|coo|cfo|ceo)\b/
+export const MENTION = /^(?:###\s*)?(?:T\d+\s*·\s*|\*\*)?(VP-Eng|VP-Sales|COO|CFO|CEO|CMO|vp-eng|vp-sales|coo|cfo|ceo|cmo)\b/
 const canon = (role) => role === null ? undefined : String(role).toLowerCase()
 
 /** 解析任务书 → 结构化任务清单（R2/R3 的输入）。 */
@@ -172,7 +172,7 @@ export function parseLabelsText(text) {
     if (cells.length < 4 || !cells[0] || cells[0] === 'case' || cells[0] === 'slug') continue
     const tasks = []
     // 分隔符 = `；`，但描述文字里也可能出现 `；` ⇒ 碎片不以下一条的「角色·」开头时并回上一条
-    const ENTRY_HEAD = /^(vp-eng|vp-sales|coo|cfo|ceo|——)·/
+    const ENTRY_HEAD = /^(vp-eng|vp-sales|coo|cfo|ceo|cmo|——)·/
     const fragments = []
     for (const raw of cells[1].split('；')) {
       if (raw === '' || raw === '无') continue

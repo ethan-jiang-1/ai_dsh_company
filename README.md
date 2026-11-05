@@ -1,6 +1,6 @@
 # ai_dsh_company · 梦之队
 
-**公司 Harness 发行版**：可安装单位是一个 DSH bundle（`packages/company-pack`），提供五个角色
+**公司 Harness 发行版**：可安装单位是一个 DSH bundle（`packages/company-pack`），提供六个角色
 preset（CEO / VP-Eng / VP-Sales / COO / CFO）+ 委派子人格 `researcher`。它装进一个 named profile，
 启动后在**用户指定的 workspace** 里做事；插件内容全部在包内，运行状态与最终产物（公司状态）全部在
 workspace。

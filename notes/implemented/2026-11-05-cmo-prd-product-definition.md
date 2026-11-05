@@ -74,6 +74,25 @@
 6. 0.9.0 重打（同版本未发布）：prepare + verify + release-smoke 全绿；实跑产物仍 13 REQ / 37 AC 且
    `/prd check` 绿（live 的 final.md 是记录，不回写）。
 
+## 2026-11-05 第二遍审查（测试资产与漏网）
+
+第二遍按"测试资产有没有钉住新角色/共享能力"扫（用户点名），发现并修：
+
+1. **`tools/bundle-init.mjs` ROLES 仍是五角色**（dev 初始化不建 `kb/cmo/` 与章程）→ 加 cmo；
+   新增测试断言 bundle-init 覆盖 `COMPANY_ROLE_IDS`。
+2. **`tools/lib/authorship.mjs` 的 `SIG`/`RECLAIM` 正则仍五角色**（CMO 的 `出稿：cmo` 不被识别）→
+   加 CMO/cmo；authorship 测试新增 cmo 署名用例。
+3. **`tools/lib/candidate-scan.mjs` 的 `ASSIGN_LINE`/`MENTION`/`ENTRY_HEAD` 仍五角色**（CMO 派活/点名
+   扫不到）→ 加 cmo；candidate-scan 测试新增 cmo 派活行/点名用例。
+4. **测试资产缺口**：bootstrap 无 cmo 章程断言（正是第一遍功能 bug 的漏网口）、共享 skill 挂载/引用无测试、
+   模板与 `/prd check` 同源无测试、CMO 显示名/徽标无测试、presets 的时钟/手册角色循环仍五角色、
+   foundation-safety 的 it.each 五角色 → 全部补齐。
+5. **文档残留**：README / architecture / roles-isolation / ui-demo / multi-human / cdp-probe / presets 的
+   "五角色 / 五色 / C·F·O·E·S" → 六角色（设计层只改现在时陈述；R2 历史场景不改）。
+
+验证：`pnpm test` **145 files / 1149 tests**、`pnpm typecheck`、`pnpm verify` ALL PASS；
+`release --prepare/--verify` 见发布记录（0.9.0 同版本未发布重打）。
+
 ## 事实落点
 
 `presets/cmo/`、`presets/_shared/skills/product-definition/`、`presets/vp-eng/skills/prd-playbook/`、

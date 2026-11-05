@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { COMPANY_ROLE_IDS } from '../../../tools/lib/company-roles.mjs'
 import {
   devInstallSpec,
   devTarballName,
@@ -98,5 +99,12 @@ describe('构建缓存判据（源未变才复用 tarball）', () => {
     expect(launcher).toContain('shouldReuseBuild')
     expect(launcher).toContain('devBuildFingerprint')
     expect(launcher).toContain('--rebuild')
+  })
+})
+
+describe('dev 初始化工具与角色唯一事实家', () => {
+  it('bundle:init 覆盖全部公司角色（含 2026-11-05 新增的 CMO）', () => {
+    const launcher = readFileSync(join(ROOT, 'tools/bundle-init.mjs'), 'utf8')
+    for (const role of COMPANY_ROLE_IDS) expect(launcher, role).toContain(`'${role}'`)
   })
 })

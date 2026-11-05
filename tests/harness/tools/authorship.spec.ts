@@ -10,7 +10,7 @@ describe('署名核对：档位判定（判据单一来源 = tools/lib/authorshi
   // 同一变异下「不吞跨角色差异」那条守卫仍绿——两条一起才钉住「只抹实例后缀」这个边界。
   it('同角色的多实例写入者（coo-2 / vp-eng-3）⇒ match，不是署名不实（BUG-018）', () => {
     // 真盘 2026-10-16 实测：ai-sprint / ai-transformation 两场 10 条「署名不实」，全部是同角色
-    // 多实例（团队插件给第 2、3 个成员发的 preset 带实例后缀，不在 pack 的五个 preset 里）。
+    // 多实例（团队插件给第 2、3 个成员发的 preset 带实例后缀，不在 pack 的六个 preset 里）。
     const r = classifyAuthorship(BODY_SIGNED('coo'), 'coo.md', 'coo-2')
     expect(r.level).toBe('match')
     expect(r.claimed).toBe('coo')
@@ -27,6 +27,12 @@ describe('署名核对：档位判定（判据单一来源 = tools/lib/authorshi
     const r = classifyAuthorship(BODY_SIGNED('cfo'), 'cfo.md', 'cfo')
     expect(r.level).toBe('match')
     expect(r.claimed).toBe('cfo')
+  })
+
+  it('CMO 署名可识别（第六角色）', () => {
+    const r = classifyAuthorship(BODY_SIGNED('cmo'), 'cmo.md', 'cmo')
+    expect(r.level).toBe('match')
+    expect(r.claimed).toBe('cmo')
   })
 
   it('署名 ≠ 写入者但有"复核并署名"更正行 ⇒ reclaimed（观察，不判红）', () => {

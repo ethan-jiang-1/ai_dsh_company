@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseAssignments, parseLabelsText, scoreLabels, scanR2, scanR2Closed, scanR3, scanR3Dual, roleHasDraft } from '../../../tools/lib/candidate-scan.mjs'
+import { mentionedRoles, parseAssignments, parseLabelsText, scoreLabels, scanR2, scanR2Closed, scanR3, scanR3Dual, roleHasDraft } from '../../../tools/lib/candidate-scan.mjs'
 
 // 实验B打分腿的纯逻辑（判据单一来源 = tools/lib/candidate-scan.mjs；格式约定见标注文件头部）。
 // IO（读标注文件/语料/deliverables）在 checks/audit/candidate-scan-eval.mjs——tests/ 不碰驱动脚本的文件面。
@@ -297,4 +297,13 @@ describe('派活行的「假设」段（BUG-011 的机械兜底，2026-10-11）'
   // 红配方（不设 `expect(true)` 空断言占位——空断言不是证据，配方本身写在判据旁边即可）：
   // 注释掉 ASSIGN_LINE 的 `(?:｜假设：([^｜]*))?` 与 parseAssignments 的 assumption 字段
   // ⇒ 上面第一条 `assumption` 断言转红。
+})
+
+describe('第六角色 CMO 的派活/点名（角色正则覆盖）', () => {
+  it('cmo 派活行与点名都可识别', () => {
+    expect(parseAssignments('派活｜T6｜cmo｜写 MRD｜依赖：无｜状态：待办')).toEqual([
+      expect.objectContaining({ id: 'T6', role: 'cmo', status: '待办' }),
+    ])
+    expect(mentionedRoles('### CMO 出 MRD')).toEqual(['cmo'])
+  })
 })

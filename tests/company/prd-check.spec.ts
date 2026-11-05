@@ -1,5 +1,8 @@
 /** MRD/PRD 结构校验（keyless 纯逻辑；`/prd check` 的头注说明边界）。 */
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { extractJsonBlock, validateProductDocs } from '../../packages/company-pack/src/lib/prd-check.ts'
 
 const mrd = (overrides = {}) => JSON.stringify({
@@ -91,5 +94,14 @@ describe('validateProductDocs', () => {
     const m = JSON.parse(mrd())
     m.mrd.opportunities[0].evidence = []
     expect(validateProductDocs(doc(JSON.stringify(m)), doc(prd())).errors.some(error => error.includes('evidence'))).toBe(true)
+  })
+})
+
+describe('随包模板与校验器同源', () => {
+  it('content/templates/{mrd,prd}.md 的示例可直接通过 validateProductDocs', () => {
+    const template = (name: string) => readFileSync(join(ROOT, 'packages/company-pack/content/templates', name), 'utf8')
+    const result = validateProductDocs(template('mrd.md'), template('prd.md'))
+    expect(result.errors).toEqual([])
+    expect(result).toMatchObject({ ok: true, mrdCount: 1, reqCount: 1, acCount: 1 })
   })
 })

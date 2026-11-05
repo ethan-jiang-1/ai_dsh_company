@@ -1,6 +1,6 @@
 # presets · 角色 preset 的语义合同（R2 五角色定稿 + 2026-11-05 CMO 增设）
 
-> 什么时候读：改 persona、skills 或角色语义时。路线 = 五角色表 → 验证方式节。
+> 什么时候读：改 persona、skills 或角色语义时。路线 = 六角色表 → 验证方式节。
 > 顶层合同：六个角色 preset 的"现在时"语义（persona 定稿、skills 清单、验证方式）。
 > 内容来源 [design/role-content-plan.md](./design/role-content-plan.md)；命名约定见台账 D14
 > （显示名 `梦之队 <角色>`，preset id 保持 kebab）。R1 定稿 CEO / VP-Eng；R2 定稿 VP-Sales / COO，
@@ -64,7 +64,7 @@
 - **PRD 主笔**：接 CMO 的 MRD 写 PRD（`drafts/prd.md`：REQ/AC/slice），用 `prd-playbook` + 共享 `product-definition`；`/prd check <目录名>` 校验。
 - **KB**：`kb/vp-eng/CHARTER.md`（研发条线 16 人、SRE 2 / 无 DBA、Node 22 + SQLite、AI 试点
   API 每案 $200/月硬顶；历史评审三问）+ `journal/`。
-- **验证**：Web 会话选 `vp-eng` → 身份探针 + 产出探针（半页 PRD 出评审意见，不得越权替销售/运营下结论）。
+- **验证**：Web 会话选 `vp-eng` → 身份探针 + 产出探针（PRD 出稿：REQ/AC/slice；评审意见；不得越权替销售/运营下结论）。
 
 ## VP of Sales（职能化身：现有客户/销售，R2 定稿；新市场/新产品归 CMO）
 
@@ -77,7 +77,7 @@
 - **KB**：`kb/vp-sales/CHARTER.md`（客户事实：9 家中型企业、痛点=系统间对不上账；竞品两类；
   定价原则：里程碑收款 3-4-3、维护年费 15–20%、折扣下限 9 折 + CFO 毛利底线 30% 双签）+ `journal/`。
 - **验证**：Web 会话选 `vp-sales` → 三探针（身份=视角与 veto 边界；知识=KB 客户数与定价原则；
-  产出=对一页 PRD 出市场意见，不越权）。
+  产出=对 PRD 出定价/现有客户影响意见（新市场归 CMO），不越权）。
 
 ## CMO（职能化身：市场与产品定义，2026-11-05 增设）
 - **persona**：视角=市场机会/产品定义/买点；"市场不成立"即 veto；产出 MRD（`templates/mrd.md`，`MR-###`，标【事实/假设】）；不替 VP-Sales 定价、不替 VP-Eng 定技术。
@@ -113,10 +113,10 @@
 
 ## 职责边界与路由（唯一事实家 = 公司手册 `AGENTS.md`/碰名 `COMPANY.md`）
 
-五角色的"管什么 / 签字线或 veto / 不碰什么"、**问题 → owner 路由表**、冲突升级规则与承诺权，
+六角色的"管什么 / 签字线或 veto / 不碰什么"、**问题 → owner 路由表**、冲突升级规则与承诺权，
 写在**公司手册**里——它经 `agent-instructions` 行随每个成员会话注入，**模型开场可见**
 （不需要谁去"读文档"）。本节不复制正文，避免两处漂移；`pnpm test` 有一条守卫断言手册覆盖
-五角色与「职责边界 / 这事问谁 / 冲突与升级 / 承诺权」四节。
+六角色与「职责边界 / 这事问谁 / 冲突与升级 / 承诺权」四节。
 
 ## 工具面（preset 自包含声明，R1 实证）
 

@@ -1,11 +1,13 @@
 /** 在场板读模型（R5b，Q5–Q8 定案的 keyless 完成定义——提案验收判据 1/4）。 */
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { readFileSync } from 'node:fs'
+import { roleLabel } from '../../packages/company-pack/src/lib/presence-status.ts'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   PRESET_DISPLAY_NAMES,
   diffActivity,
+  displayNameFor,
   memberNames,
   presenceFromEvents,
   rowsFromTeamView,
@@ -258,5 +260,12 @@ describe('presenceFromEvents · nameById 名册补充表', () => {
     const names = memberNames(view)
     expect(names.get('s-eng')).toBe('vp-eng')
     expect(names.get('s-lead')).toBe('lead')
+  })
+})
+
+describe('第六角色 CMO 的显示名映射（防漂移）', () => {
+  it('displayNameFor / roleLabel 认识 cmo', () => {
+    expect(displayNameFor('cmo', 'teammate')).toBe('梦之队 CMO')
+    expect(roleLabel('cmo')).toBe('CMO')
   })
 })

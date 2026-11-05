@@ -1,5 +1,5 @@
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { createRequire } from 'node:module'
 import { describe, expect, it } from 'vitest'
@@ -16,7 +16,7 @@ const YAML_SCHEMA = yaml.DEFAULT_SCHEMA.extend([
   new yaml.Type('tag:yaml.org,2002:js', { kind: 'scalar', construct: data => data }),
 ])
 
-/** 公司五角色（本文件持独立字面量 = 独立事实源：与 presets/ 目录内容互相印证——若改为 import
+/** 公司六角色（本文件持独立字面量 = 独立事实源：与 presets/ 目录内容互相印证——若改为 import
  * 共享常量，常量被误删一角时本文件会静默跳过该角色的全部断言，守卫即失效）。 */
 const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo'] as const
 
@@ -270,7 +270,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     // 上游升档指南 schedule-bundle-retired：宿主 schedule 服务由 web-app 挂，time-context 与
     // tool-schedule 变成 preset 行所有权。persona 点名 schedule_create 的角色，preset 里就必须有工具，
     // 否则是"标志面谎报"。组合层不再替换/插入 time-context（旧替换行已删）。
-    for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']) {
+    for (const role of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo']) {
       const text = roleYml(role)
       expect(text, `${role} 缺 time-context 行（0.2.1 起归 preset 所有）`).toMatch(/^\s*- id: time-context$/m)
       expect(text, `${role} 的 time-context 必须钉住 Asia/Shanghai（回落不依赖进程时区）`).toContain('timeZone: Asia/Shanghai')
@@ -285,7 +285,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
 
   it('公司手册（模型可见）覆盖五角色职责边界、路由与升级规则——不随内容改动悄悄失效', () => {
     const handbook = readFileSync(join(ROOT, 'packages/company-pack/content/AGENTS.md'), 'utf8')
-    for (const role of ['CEO', 'CFO', 'VP-Sales', 'VP-Eng', 'COO']) {
+    for (const role of ['CEO', 'CFO', 'VP-Sales', 'VP-Eng', 'COO', 'CMO']) {
       expect(handbook, `手册缺 ${role} 的职责边界`).toContain(role)
     }
     for (const section of ['职责边界', '这事问谁', '冲突与升级', '承诺权', '交付物三态']) {
@@ -445,5 +445,24 @@ describe('会话检索：isolated provider 组（P0 安装路径守卫）', () =
       expect(roleYml(role), `${role} 仍有 tool-session-query 行；组内工具会与它重复注册`)
         .not.toMatch(/tool-session-query/)
     }
+  })
+})
+
+describe('共享 product-definition 能力（CMO + VP-Eng）', () => {
+  it('共享 skill 在场、声明 name，且只被 CMO/VP-Eng 挂载', () => {
+    const sharedDir = join(PRESETS_DIR, '_shared/skills/product-definition')
+    const skill = readFileSync(join(sharedDir, 'SKILL.md'), 'utf8')
+    expect(skill).toContain('name: product-definition')
+    expect(skill).toContain('references/project-services.md')
+    expect(skill).toContain('references/hardware-software.md')
+    expect(existsSync(join(sharedDir, 'references/project-services.md'))).toBe(true)
+    expect(existsSync(join(sharedDir, 'references/hardware-software.md'))).toBe(true)
+    for (const role of ['cmo', 'vp-eng']) expect(roleYml(role), role).toContain('presets/_shared/skills/')
+    for (const role of ['ceo', 'vp-sales', 'coo', 'cfo']) expect(roleYml(role), role).not.toContain('presets/_shared/skills/')
+  })
+
+  it('CMO mrd-playbook 与 VP-Eng prd-playbook 引用共享能力', () => {
+    expect(readFileSync(join(PRESETS_DIR, 'cmo/skills/mrd-playbook/SKILL.md'), 'utf8')).toContain('product-definition')
+    expect(readFileSync(join(PRESETS_DIR, 'vp-eng/skills/prd-playbook/SKILL.md'), 'utf8')).toContain('product-definition')
   })
 })

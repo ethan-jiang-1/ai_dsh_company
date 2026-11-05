@@ -11,7 +11,7 @@ import { repositoryRoot as repoRoot } from './lib/repository-layout.mjs'
 const CONTENT = join(repoRoot, 'packages/company-pack/content')
 const WORKSPACE = join(repoRoot, 'company-workspace')
 const RUN = join(WORKSPACE, '.dsh-company')
-const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo']
+const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo']
 
 if (existsSync(WORKSPACE)) {
   console.log(`bundle:init 跳过——dev 公司状态 workspace 已在场：${relative(repoRoot, WORKSPACE)}（一个字节都不动）`)
