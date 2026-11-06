@@ -293,6 +293,9 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(qaSkill).toMatch(/V 模型右侧/)
     expect(qaSkill, 'V&V 必须要求可复现判据').toMatch(/判据/)
     expect(qaSkill, '不通过要说清').toMatch(/不通过/)
+    // 2026-11-06 质量审计发现：不钉层级列时，不同运行给出互相不一致的 V 模型组织方式（审计无法机械核对）。
+    expect(qaSkill, 'V&V 行必须有「层级」列（L1–L4）').toMatch(/「层级」列必填/)
+    expect(qaSkill, '四级枚举在场').toMatch(/L1 单元[\s\S]{0,80}L4 验收/)
     expect(roleYml('ceo'), '团队成员读 Lead preset ⇒ 任务书必须写清（否则成员 persona 不生效）')
       .toMatch(/任务书必须写清/)
     expect(readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8'), '组队 skill 要写落地项目怎么起')
