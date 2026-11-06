@@ -255,6 +255,17 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(ceo, 'vp_* 快捷路径只能用于单份单职能').toMatch(/只有用户明确只要一份[\s\S]*vp_eng/)
   })
 
+  it('产物 owner 唯一：编制里查不到 ≠ 换人代行（缺角=补编制/报缺）', () => {
+    // 2026-11-06 用户实证：CEO 在「本部署无 CMO」的旧盘上把 MRD 派给 VP-Sales 代行——
+    // 根因是旧 workspace 的 org.md/owners.md 没 CMO 席位 + 旧 journal 结论被当成事实。
+    const ceo = roleYml('ceo')
+    expect(ceo, 'persona 必须钉「产物 owner 唯一」').toMatch(/产物 owner 唯一/)
+    expect(ceo, '缺角不等于代行').toMatch(/查不到该角色 ≠ 换人代行/)
+    expect(ceo, '旧 journal 的「本部署无 X」不作数').toMatch(/旧 journal[\s\S]*不作数/)
+    const skill = readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
+    expect(skill, '组队 skill 必须同一条规则（MRD 只归 CMO）').toMatch(/owner 唯一，缺角不代行[\s\S]*MRD 只归 CMO/)
+  })
+
   it('委托控制面（R4；0.2.1 不动机制）：职能 preset 声明控制行，CEO 不声明', () => {
     // 机制（vendor 实证）：`tool-agent-team` 的 maybeInstall 只在 `ctx.agentTeams.tryMembership(agent)`
     // 命中（= 团队成员）时才装**团队版**控制名。职能**根**会话不是团队成员 ⇒ 必须自己声明全局版，

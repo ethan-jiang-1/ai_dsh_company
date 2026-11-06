@@ -54,6 +54,7 @@ description: CEO 的组队方法：接到动议先过这六步（要不要叫人
 - 需要外部市场事实才加 `researcher`（或让 CMO 先用 web/bash 取证）；
 - 只有动议明确问到**现有客户/定价**才叫 VP-Sales；**交付承接**才叫 COO；**预算/毛利**才叫 CFO；
 - **两件及以上产物（如 MRD+PRD）或多职能协作必须走 team + 任务板**；`vp_*` 命名委托只用于用户明确只要一份、且只属一个职能的快捷出稿——两件套走快捷 = 没有 team/依赖图/面板，收口也没有互审；
+- **owner 唯一，缺角不代行**：MRD 只归 CMO、PRD 只归 VP-Eng；`.dsh-company/kb/org.md` / `owners.md` 里查不到 CMO ≠ 让 VP-Sales 代行「市场」——先补编制或向用户报缺（写清缺哪个席位、影响什么），用户点名才例外；旧 journal 的「本部署无 CMO」不作数。
 - DAG：VP-Eng 的 PRD 任务 `blockedBy` CMO 的 MRD 任务；任务书写 MRD 路径，不口头转述；
 - 收口：CEO 只合稿与 `present`，不代写 MRD/PRD；MRD 与 PRD 的市场假设/可行性冲突时保留双方结论，交 CEO 拍板；
 - 结果校验：`/prd check <deliverables 目录名>`；不过就退回 VP-Eng/CMO，不进研发。
