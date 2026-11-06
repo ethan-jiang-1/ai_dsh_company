@@ -34,6 +34,7 @@ const runs=[
  {name:'run#1 18:04', lead:'session-69573cd5-54ac-4564-970c-4da7bea30da7', vp:'0f76976f-3f49-4ae3-ae14-194659422ed1', sa:'8e052efa-ae0d-4d30-b366-07c7b6e62331', qa:'3bfbbcba-2156-45c7-aaa8-87a66b4e612b', slug:'2026-11-06-portable-overload-detection'},
  {name:'run#2 19:04', lead:'session-c7bbb913-6cce-44e7-b116-8de41ab1d96c', vp:'66c53afe-5ac6-44d0-a730-401d9bbb4b65', sa:'54ebdb28-572e-4f42-81e0-6cf1319209cc', qa:'04a2c289-4dd6-45d6-8dbb-ea85a0de61c2', slug:'2026-11-06-portable-overload-detection-v2'},
  {name:'run#3 22:15', lead:'session-eedb279c-3f43-4631-97a4-ab3e94e079c0', vp:'55457bac-6897-41f7-b4b6-ee9241e8a4b9', sa:'0ddc6c6e-e274-4bcd-9e76-a804ddd2e1fc', qa:'4ecea922-f09a-4966-96c0-5cc83dcad3ca', slug:'2026-11-06-portable-overload-detection-v4'},
+ {name:'run#4 23:2x', lead:'session-9e124104-9d49-4f00-8e1d-e8f0b65a1931', vp:'1544fed8-7b54-45be-b7b4-f371acdfe36e', sa:'7a76bfce-5e2b-41d2-99ba-78d3792cec1c', qa:'f5c9e076-4c9a-4200-a7d0-bcc72f9dea74', slug:'2026-11-06-portable-overload-detection-v5'},
 ]
 for (const r of runs){
   const lead=header(r.lead), vp=header(r.vp), sa=header(r.sa), qa=header(r.qa)

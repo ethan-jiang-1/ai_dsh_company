@@ -32,7 +32,7 @@ const FAMILIES = [
   { name: 'torque', re: /\b\d+(\.\d+)?\s?N·m\b|扭矩/g },
 ]
 const STANDARDS = {
-  'electrical-current': /GB\/?T?\s?2099|GB\s?1002|GB\s?4943|IEC\s?61010|IEC\s?60529|GB\/?T\s?4208/,
+  'electrical-current': /GB\/?T?\s?2099|GB\s?1002|GB\s?4943|GB\/?T\s?4208|GB\/?T\s?17626|GB\/?T\s?2423|IEC\s?61010|IEC\s?60529|IEC\s?61000/,
   'mechanical-force': /ISO\s?376|JJG\s?391|GB\/?T\s?16825|ISO\s?7500/,
   torque: /ISO\s?6789|JJG\s?707/,
 }
@@ -68,15 +68,37 @@ const allText = (slug) => {
   return parts.join('\n')
 }
 
-/** 从 "16 A→128 mW" 这类主张抽 I²R 校验对。 */
+/**
+ * 从 "16 A→128 mW" 这类主张抽 I²R 校验对。
+ * **只核同一行里出现过电阻值的主张**：同文常有假设分支（"只能买到 1 mΩ → 16 A 耗散 256 mW" 是
+ * 1 mΩ 下的正确值），拿全文默认 R 去套会造出假红（2026-11-06 实踩两条）。
+ */
 function shuntClaims(text) {
-  const out = []
-  const re = /(\d+(?:\.\d+)?)\s?A[^\n]{0,12}?(\d+(?:\.\d+)?)\s?mW/g
-  let m
-  while ((m = re.exec(text)) !== null) out.push({ amps: Number(m[1]), milliwatts: Number(m[2]) })
-  const r = /(\d+(?:\.\d+)?)\s?mΩ/.exec(text)
-  return { claims: out, resistance: r === null ? undefined : Number(r[1]) / 1000 }
+  const claims = []
+  let skipped = 0
+  for (const line of text.split('\n')) {
+    // 同一行常有两个电阻（"0.5 mΩ…只能买到 1 mΩ → 16 A 耗散 256 mW"）：取**该主张之前最近**的那个，
+    // 否则会拿 0.5 mΩ 去套 1 mΩ 的假设分支（2026-11-06 实踩）。
+    const resistances = [...line.matchAll(/(\d+(?:\.\d+)?)\s?mΩ/g)].map(m => ({ at: m.index, r: Number(m[1]) / 1000 }))
+    const found = [...line.matchAll(/(\d+(?:\.\d+)?)\s?A[^\n]{0,12}?(\d+(?:\.\d+)?)\s?mW/g)]
+    if (found.length === 0) continue
+    for (const m of found) {
+      const before = resistances.filter(entry => entry.at < m.index)
+      if (before.length === 0) { skipped += 1; continue }
+      claims.push({ amps: Number(m[1]), milliwatts: Number(m[2]), resistance: before[before.length - 1].r })
+    }
+  }
+  return { claims, skipped }
 }
+
+/**
+ * 已登记的历史分歧：这些运行**故意保留**作为缺陷证据，不因它们让门禁永久红。
+ * 新增分歧必须走这里登记 + 写原因，否则 D1 判红（否则「历史脏数据」会逼人把判据删掉）。
+ */
+const KNOWN_DIVERGENCES = new Map([
+  ['2026-11-06-portable-overload-detection-v2',
+    '任务书只写「便携式过载检测」+「不要问我」⇒ 该轮做成 0–20 kN 力学件；缺在探针 prompt（2026-11-06 已锁定电气侧）'],
+])
 
 let failures = 0
 const rows = []
@@ -86,12 +108,13 @@ for (const slug of runs()) {
   const claims = shuntClaims(text)
   const checks = []
   // D2：任一 "X A→Y mW" 与 R 对不上即错（容差 5%，四舍五入）
-  if (claims.resistance !== undefined && claims.claims.length > 0) {
-    const bad = claims.claims.filter(({ amps, milliwatts }) => {
-      const expect = amps ** 2 * claims.resistance * 1000
+  if (claims.claims.length > 0) {
+    const bad = claims.claims.filter(({ amps, milliwatts, resistance }) => {
+      const expect = amps ** 2 * resistance * 1000
       return Math.abs(expect - milliwatts) / Math.max(expect, 1e-9) > 0.05
     })
-    checks.push(['D2 分流器 I²R 自洽', bad.length === 0, bad.length === 0 ? `${String(claims.claims.length)} 条对账` : `错 ${String(bad.length)} 条`])
+    const note = `${String(claims.claims.length)} 条对账${claims.skipped > 0 ? `（跳过 ${String(claims.skipped)} 条无同行电阻值）` : ''}${bad.length === 0 ? '' : `；错 ${String(bad.length)} 条`}`
+    checks.push(['D2 分流器 I²R 自洽', bad.length === 0, note])
   }
   rows.push({ slug, family, checks })
 }
@@ -104,12 +127,15 @@ for (const row of rows) {
 }
 for (const [stem, group] of byFamilyStem) {
   const kinds = [...new Set(group.map(row => row.family.name))]
-  const ok = kinds.length === 1
+  // 历史分歧不判红（但必须在 KNOWN_DIVERGENCES 里逐条写明原因），新分歧照红。
+  const unexpected = group.filter(row => row.family.name !== group[0].family.name && !KNOWN_DIVERGENCES.has(row.slug))
+  const ok = kinds.length === 1 || unexpected.length === 0
   if (!ok) failures += 1
   console.log(`\n=== ${stem}（${String(group.length)} 轮）===`)
   console.log(`  ${ok ? 'PASS' : 'FAIL'} D1 产品同一性：各轮落同一物理量族（实得 ${kinds.join(' / ')}）`)
   for (const row of group) {
-    console.log(`    · ${row.slug} → ${row.family.name}（命中 ${String(row.family.hits)} 次）`)
+    const known = KNOWN_DIVERGENCES.get(row.slug)
+    console.log(`    · ${row.slug} → ${row.family.name}（命中 ${String(row.family.hits)} 次）${known === undefined ? '' : `｜已登记分歧：${known}`}`)
   }
   for (const row of group) {
     // D3：标准必须与量族匹配
