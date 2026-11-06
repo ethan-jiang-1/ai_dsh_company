@@ -26,7 +26,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 
 | 改动面 | 最窄检查（先跑这个） | 受影响时升档 | 同 diff 义务（政策原则 = [testing.md §2](../docs/testing.md)） |
 |---|---|---|---|
-| persona / skill 文案（`packages/company-pack/presets/`） | `pnpm test tests/presets` | [preset-smoke](../checks/smoke/preset-smoke.mjs) | **行为判据面**改动（改变"模型被要求做什么/判据怎么落"）→ 场景同 diff 必带；纯措辞润色 → 连通档 + 内容档兜 |
+| persona / skill 文案（`packages/company-pack/presets/`） | `pnpm test tests/presets` | [preset-smoke](../checks/smoke/preset-smoke.mjs) | **行为判据面**改动（改变"模型被要求做什么/判据怎么落"）→ 场景同 diff 必带（两件套组队 = [product-team-e2e-smoke](../checks/smoke/product-team-e2e-smoke.mjs)）；纯措辞润色 → 连通档 + 内容档兜 |
 | 手册 / CHARTER / 模板（`packages/company-pack/content/`——**只读注入面**；host 注入，不落 workspace） | `pnpm verify`（handbook-budget + **replay-fixture-freshness**：runnable 场景的注入新鲜度静态比对） | [handbook.spec](./company/handbook.spec.ts)（keyless：content/override/section 注册）+ 受影响 replay 场景重跑（[replay-smoke](../checks/smoke/replay-smoke.mjs)；本仓仅 foundation 合成场景） | 注入内容变化 ⇒ 受影响 runnable 场景**同 diff 重录**或声明降档（带日期理由；本仓无 full 档）；规矩变化 ⇒ 行为判据面义务同上行 |
 | bundle / preset 行 config（机制面） | `pnpm test tests/presets` | + [delegation-smoke](../checks/smoke/delegation-smoke.mjs)（工具行） | 同 diff 必带 |
 | client 面板（用户可见面：视图模型/组件/文案/CSS，`src/client/`） | `pnpm test tests/client`（按模块点名 spec，含 `client-face` / `style-lifecycle`） | [ui-scene-smoke](../checks/smoke/ui-scene-smoke.mjs) `--isolated --golden`（隔离空壳页签文本金样；`--steps` 复现交互）+ [client-load-smoke](../checks/smoke/client-load-smoke.mjs) + [cdp-probe](../probes/browser-visual/cdp-probe.mjs)（活体全页签） | 用户可见改动 → 同 diff 刷金样（`--refresh-golden`）/ 对应 visual probe |

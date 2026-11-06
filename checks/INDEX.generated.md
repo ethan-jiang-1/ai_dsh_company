@@ -3,7 +3,7 @@
 > 生成：`node tools/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。
 > 触发条件/成本/状态唯一源 = 各脚本头注；本文件只回答“有哪些公开入口、在哪”。
 
-## 冒烟 / 真实入口（checks/smoke/，27）
+## 冒烟 / 真实入口（checks/smoke/，28）
 
 [attention-e2e-smoke](smoke/attention-e2e-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs)
 [client-error-chain-smoke](smoke/client-error-chain-smoke.mjs)
@@ -19,9 +19,9 @@
 [permissions-recovery-smoke](smoke/permissions-recovery-smoke.mjs)
 [presence-e2e-smoke](smoke/presence-e2e-smoke.mjs) · [present-catalog-smoke](smoke/present-catalog-smoke.mjs)
 [preset-smoke](smoke/preset-smoke.mjs) · [probe-smoke](smoke/probe-smoke.mjs)
-[profile-row-smoke](smoke/profile-row-smoke.mjs) · [refactor-drift-oracle](smoke/refactor-drift-oracle.mjs)
-[release-smoke](smoke/release-smoke.mjs) · [replay-smoke](smoke/replay-smoke.mjs)
-[revoke-recovery-smoke](smoke/revoke-recovery-smoke.mjs)
+[product-team-e2e-smoke](smoke/product-team-e2e-smoke.mjs) · [profile-row-smoke](smoke/profile-row-smoke.mjs)
+[refactor-drift-oracle](smoke/refactor-drift-oracle.mjs) · [release-smoke](smoke/release-smoke.mjs)
+[replay-smoke](smoke/replay-smoke.mjs) · [revoke-recovery-smoke](smoke/revoke-recovery-smoke.mjs)
 [snapshot-motion-smoke](smoke/snapshot-motion-smoke.mjs) · [ui-scene-smoke](smoke/ui-scene-smoke.mjs)
 [upgrade-while-running-smoke](smoke/upgrade-while-running-smoke.mjs)
 

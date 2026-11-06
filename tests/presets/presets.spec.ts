@@ -251,6 +251,8 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(ceo, 'PRD 必须派 VP-Eng').toMatch(/PRD 派 VP-Eng/)
     expect(ceo, '不得再把「市场」整体派给 VP-Sales').not.toContain('市场与定价派 VP-Sales')
     expect(ceo, '单职能快捷委派必须含 vp_cmo').toMatch(/vp_eng \/ vp_sales \/ vp_cmo/)
+    expect(ceo, '两件及以上必须组队（否则 task board/DAG 空）').toMatch(/产出两件及以上[\s\S]*spawn_teammate/)
+    expect(ceo, 'vp_* 快捷路径只能用于单份单职能').toMatch(/只有用户明确只要一份[\s\S]*vp_eng/)
   })
 
   it('委托控制面（R4；0.2.1 不动机制）：职能 preset 声明控制行，CEO 不声明', () => {
