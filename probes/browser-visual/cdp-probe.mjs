@@ -6,7 +6,7 @@
 //   ③升 pin / 收割后 UI 回归。成本：默认档零模型（真实渲染断言面）；`--ask` 加一次真实模型调用。
 // 前置：GUI URL（demo.md §前置：source run/env.sh → pnpm dsh web -- --port 0 --no-open → 横幅 URL）；
 //   Chrome 二进制：DSH_PROBE_CHROME 环境变量或系统 Chrome（run/env.sh 已指 Chrome for Testing）。
-// 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser] [--evidence] [--texts] [--json-out <path>] [--steps <file>]
+// 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser] [--evidence] [--texts] [--watch-tab <页签标题> --watch-expect <文本>] [--json-out <path>] [--steps <file>]
 //       node probes/browser-visual/cdp-probe.mjs --attach <devtools-port> [--attach-url <substring>] [--evidence]
 //   --attach：附着到用户已开的 Chrome（需 --remote-debugging-port=9222），只做当前页只读快照
 //   （不导航、不关模态、不点页签、不 --ask/--steps）；抓 composer/品牌/错误环/body/截图。
@@ -15,6 +15,8 @@
 //   `[data-company-tab-title=…]` 可见且非空 + console/异常捕获。页签清单从注册源
 //   `company-tab-registration.ts` 解析（不再手写；2026-10-20 审计：旧清单 8 个漏「成品」）。
 //   --ask 会真建会话（registry default = ceo）输入问题发送并等待轮次收口——完整产品环，留测试会话。
+//   --watch-tab/--watch-expect：--ask 前先开该页签取 before，收口后**不刷新页面**再取 after；
+//   给了 --watch-expect 而 after 里没有该文本 ⇒ exit 1（面板不跟会话 = 红证）。用于「面板会不会自己更新」。
 // 退出码：0 = 全部断言成立；1 = 有断言失败（JSON verdict 已打印，含 consoleProblems/exceptions；
 //   失败时另写 runtime/harness-home/diagnosis/cdp-probe-<时间>/ 的截图/body/verdict/console）。
 // 出处：驱动 = ai_dsh_loop_advisor/tools/drivers/cdp-driver.mjs（2026-10-01 owner 指令内化，
@@ -37,7 +39,16 @@ const attachIndex = args.indexOf('--attach');
 const attachPort = attachIndex === -1 ? undefined : Number(args[attachIndex + 1]);
 const attachUrlIndex = args.indexOf('--attach-url');
 const attachUrl = attachUrlIndex === -1 ? undefined : args[attachUrlIndex + 1];
-const positional = args.filter((a, i) => !a.startsWith('--') && !(attachIndex !== -1 && i === attachIndex + 1) && !(attachUrlIndex !== -1 && i === attachUrlIndex + 1));
+// --watch-tab/--watch-expect：验证面板跟不跟「运行中的会话」（2026-11-06 用户报右侧面板不更新）。
+const watchTabIndex = args.indexOf('--watch-tab');
+const watchTab = watchTabIndex === -1 ? undefined : args[watchTabIndex + 1];
+const watchExpectIndex = args.indexOf('--watch-expect');
+const watchExpect = watchExpectIndex === -1 ? undefined : args[watchExpectIndex + 1];
+const positional = args.filter((a, i) => !a.startsWith('--')
+  && !(attachIndex !== -1 && i === attachIndex + 1)
+  && !(attachUrlIndex !== -1 && i === attachUrlIndex + 1)
+  && !(watchTabIndex !== -1 && i === watchTabIndex + 1)
+  && !(watchExpectIndex !== -1 && i === watchExpectIndex + 1));
 const guiUrl = positional[0];
 if (attachPort !== undefined && (!Number.isSafeInteger(attachPort) || attachPort < 1 || attachPort > 65535)) {
   console.error('cdp-probe: --attach 需要一个 1..65535 的 DevTools 端口');
@@ -88,6 +99,7 @@ const verdict = {
   tabTexts: {},
   steps: [],
   stepFailures: [],
+  watch: null,
 };
 
 // 页签清单 = 注册源解析（单一事实）；解析为空直接 fail-loud，不静默退化成少一个也绿。
@@ -221,6 +233,43 @@ try {
   verdict.brandPresent = await evaluate(
     `document.body.innerText.includes('DSH 梦之队')`) === true;
 
+  /**
+   * 开一个公司页签。`direct` 先试页签条（新会话的 dock 可能还停在上一页签）；
+   * 否则走 Start-chip → guide 入口（默认断言面的既有路径）。
+   * @returns {'tab'|'guide'|'absent'}
+   */
+  const openCompanyTab = async (title, { direct = true } = {}) => {
+    if (direct) {
+      const onTabBar = await evaluate(`(() => {
+        const tab = [...document.querySelectorAll('[data-dockkit-tab]')].find(t => (t.textContent ?? '').includes(${JSON.stringify(title)}));
+        if (tab === undefined) return false;
+        tab.click();
+        return true;
+      })()`) === true;
+      if (onTabBar) { await sleep(400); return 'tab'; }
+    }
+    await evaluate(`(() => { const back = [...document.querySelectorAll('[data-dockkit-tab]')].find(t => /start/i.test(t.textContent ?? '')); if (back !== undefined) back.click(); })()`);
+    await sleep(400);
+    const clicked = await evaluate(`(() => {
+      const entry = [...document.querySelectorAll('.wk-guide-entry-label')].find(e => (e.textContent ?? '').includes(${JSON.stringify(title)}));
+      if (entry === undefined) return false;
+      entry.click();
+      return true;
+    })()`) === true;
+    if (clicked) await sleep(400);
+    return clicked ? 'guide' : 'absent';
+  };
+  /**
+   * 读一个公司页签的面板体（title = 面板外框自己的显示名，每会话唯一）。
+   * @returns {{present: boolean, visible: boolean, textLength: number, text: string}}
+   */
+  const readCompanyTab = (title) => evaluate(`(() => {
+    const el = document.querySelector(${JSON.stringify(`[data-company-tab-title="${title}"]`)});
+    if (el === null) return { present: false, visible: false, textLength: 0, text: '' };
+    const rect = el.getBoundingClientRect();
+    const text = (el.innerText ?? '').trim();
+    return { present: true, visible: rect.width > 0 && rect.height > 0, textLength: text.length, text };
+  })()`);
   if (attachPort === undefined) {
   // 右栏全部公司页签：guide 清点 → 逐个开（Start-chip 回切——开一个页签后 guide 列表被
   // 页签条替换，必须回 Start 再开下一个；dock 为每会话保留前后台子树 ⇒ 断言用 includes 扫全文）。
@@ -237,18 +286,9 @@ try {
   }
   // ⚠ 驱动的 evaluate 不 await Promise——时序由场景侧 sleep 控制，页面动作用同步 IIFE。
   for (const tab of tabs) {
-    await evaluate(`(() => { const back = [...document.querySelectorAll('[data-dockkit-tab]')].find(t => /start/i.test(t.textContent ?? '')); if (back !== undefined) back.click(); })()`);
-    await sleep(400);
-    const clicked = await evaluate(`(() => { const entry = [...document.querySelectorAll('.wk-guide-entry-label')].find(e => (e.textContent ?? '').includes(${JSON.stringify(tab.title)})); if (entry === undefined) return false; entry.click(); return true; })()`) === true;
+    const clicked = (await openCompanyTab(tab.title, { direct: false })) === 'guide';
     // title 是面板外框自己拿到的显示名，不受 contentId/kind 语义影响；每个 catalog 条目唯一。
-    const selector = `[data-company-tab-title="${tab.title}"]`;
-    const probeBody = () => evaluate(`(() => {
-      const el = document.querySelector(${JSON.stringify(selector)});
-      if (el === null) return { present: false, visible: false, textLength: 0, text: '' };
-      const rect = el.getBoundingClientRect();
-      const text = (el.innerText ?? '').trim();
-      return { present: true, visible: rect.width > 0 && rect.height > 0, textLength: text.length, text };
-    })()`);
+    const probeBody = () => readCompanyTab(tab.title);
     let rendered = await probeBody();
     for (let i = 0; i < 6 && !(rendered?.present === true && rendered?.visible === true && rendered?.textLength > 0); i++) {
       await sleep(500);
@@ -290,6 +330,20 @@ try {
   verdict.getStartedLate = lateGetStarted;
   if (lateGetStarted === 'dismissed') verdict.modalsDismissed.push('Get started (late)');
   if (lateGetStarted === 'dismissed') await sleep(500);
+  // --watch-tab：先开该页签取 before（--ask 之前），收口后再取 after——全程不刷新页面。
+  if (watchTab !== undefined) {
+    const opened = await openCompanyTab(watchTab, { direct: false });
+    const before = await readCompanyTab(watchTab);
+    verdict.watch = {
+      tab: watchTab,
+      opened,
+      before: { present: before?.present === true, length: Number(before?.textLength ?? 0), text: String(before?.text ?? '').slice(-1200) },
+      after: null,
+      updated: false,
+      expect: watchExpect ?? null,
+      expectFound: null,
+    };
+  }
   } else {
     const body = await evaluate('document.body.innerText').catch(() => '')
     verdict.tabTexts['(attached)'] = typeof body === 'string' ? body : JSON.stringify(body)
@@ -328,6 +382,15 @@ try {
       verdict.askTranscriptGrew = grew;
       verdict.askTranscriptTail = prev.slice(-450);
     }
+  }
+  // --watch-tab 的 after：**不刷新页面**，重新开同一页签再读——这就是「面板跟不跟会话」的判据。
+  if (verdict.watch !== null) {
+    const opened = await openCompanyTab(verdict.watch.tab);
+    const after = await readCompanyTab(verdict.watch.tab);
+    const text = String(after?.text ?? '');
+    verdict.watch.after = { opened, present: after?.present === true, length: text.length, text: text.slice(-1200) };
+    verdict.watch.updated = text !== verdict.watch.before.text;
+    if (watchExpect !== undefined) verdict.watch.expectFound = text.includes(watchExpect);
   }
   // --steps：受控交互（按可见文本点击 / 等文本 / 断言文本 / 向选择器输入），复现“点按钮白了”。
   for (const [index, step] of (attachPort === undefined ? steps.entries() : [].entries())) {
@@ -392,6 +455,7 @@ try {
     || verdict.clientErrors.length > 0
     || verdict.errorRingInstalled !== true
     || verdict.stepFailures.length > 0
+    || (verdict.watch !== null && watchExpect !== undefined && verdict.watch.expectFound !== true)
     || (ask !== undefined && (verdict.askError !== undefined || verdict.askTranscriptGrew !== true));
   if (bad) await writeEvidence('assertion');
   else if (saveEvidence) { verdict.evidenceDir = await writeEvidence('pass'); }
@@ -415,5 +479,6 @@ if (verdict.consoleProblems.some(p => p.startsWith('console.error')) || verdict.
 if (verdict.clientErrors.length > 0) exitCode = 1;
 if (verdict.errorRingInstalled !== true) exitCode = 1;
 if (verdict.stepFailures.length > 0) exitCode = 1;
+if (verdict.watch !== null && watchExpect !== undefined && verdict.watch.expectFound !== true) exitCode = 1;
 if (ask !== undefined && (verdict.askError !== undefined || verdict.askTranscriptGrew !== true)) exitCode = 1;
 process.exit(exitCode);
