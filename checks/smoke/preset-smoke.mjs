@@ -206,7 +206,9 @@ try {
   //    （deployer 根；旧 profile 路径与 M3 后的 home 路径都收）——方法层是数据，不是组合泄漏；
   //    不把它算进 expected 会在 adopt 过的 home 里假红。`includeDefaultRoots` 默认 true 时，
   //    角色会话会额外看见项目根/用户级技能集（`~/.agents/skills` 等），本条仍抓这个泄漏。
-  for (const role of ROLES) {
+  // 子人格里带 skills 的（system-architect / system-qa）同样要证明硬隔离；researcher 没有 skills 目录，跳过。
+  const skillBearing = [...ROLES, ...SUPPORT_PRESETS.filter(preset => existsSync(join(ROOT, 'packages/company-pack/presets', preset, 'skills')))]
+  for (const role of skillBearing) {
     await check(`${role} 只看见自己的 skills`, async () => {
       const sessionId = sessionIds.get(role)
       if (sessionId === undefined) throw new Error('没有会话 id（上一步未通过）')

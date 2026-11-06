@@ -26,8 +26,20 @@ for (const entry of patch) {
   if (!existsSync(join(root, 'packages/company-pack', entry))) fail('preset-bundle', `${entry} 指向的文件不存在`)
 }
 for (const preset of supportPresets) {
-  if (!existsSync(join(root, 'packages/company-pack/presets', preset, 'agent.cordis.yml'))) {
+  const dir = join(root, 'packages/company-pack/presets', preset)
+  if (!existsSync(join(dir, 'agent.cordis.yml'))) {
     fail('preset-file', `${preset}/agent.cordis.yml 缺失（委派子人格 preset 必须随包发布）`)
+  }
+  // 子人格若声明了 skills（SA/SQA），同样要过 frontmatter 校验——否则 skill 会静默不挂。
+  const skillsDir = join(dir, 'skills')
+  if (existsSync(skillsDir)) {
+    for (const entry of readdirSync(skillsDir, { withFileTypes: true }).filter(e => e.isDirectory())) {
+      const skillMd = join(skillsDir, entry.name, 'SKILL.md')
+      if (!existsSync(skillMd)) { fail('skill-file', `${preset}/${entry.name}/SKILL.md 缺失`); continue }
+      if (!readFileSync(skillMd, 'utf8').includes(`name: ${entry.name}`)) {
+        fail('skill-name', `${preset}/${entry.name} frontmatter name 不匹配目录名`)
+      }
+    }
   }
 }
 for (const role of roles) {

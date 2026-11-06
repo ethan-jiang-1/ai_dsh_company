@@ -286,6 +286,17 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(roleYml('ceo'), 'SQA 否决直达 CEO').toMatch(/SQA 的否决直达你/)
     expect(readFileSync(join(PRESETS_DIR, 'system-qa/agent.cordis.yml'), 'utf8'), 'SQA 不通过→原样上报')
       .toMatch(/否决直达 CEO/)
+    // 技能内容也要钉：V 模型两侧、判据、不通过；以及「团队成员读 Lead preset」这条运行时事实。
+    expect(readFileSync(join(PRESETS_DIR, 'system-architect/skills/systems-architecture/SKILL.md'), 'utf8'))
+      .toMatch(/V 模型左侧/)
+    const qaSkill = readFileSync(join(PRESETS_DIR, 'system-qa/skills/vv-playbook/SKILL.md'), 'utf8')
+    expect(qaSkill).toMatch(/V 模型右侧/)
+    expect(qaSkill, 'V&V 必须要求可复现判据').toMatch(/判据/)
+    expect(qaSkill, '不通过要说清').toMatch(/不通过/)
+    expect(roleYml('ceo'), '团队成员读 Lead preset ⇒ 任务书必须写清（否则成员 persona 不生效）')
+      .toMatch(/任务书必须写清/)
+    expect(readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8'), '组队 skill 要写落地项目怎么起')
+      .toMatch(/落地项目（非 demo）[\s\S]{0,80}system_architect/)
   })
 
   it('委托控制面（R4；0.2.1 不动机制）：职能 preset 声明控制行，CEO 不声明', () => {
