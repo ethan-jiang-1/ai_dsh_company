@@ -357,6 +357,14 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(chairing, '必须钉住顺序：先 present、后标终态（缺 present 不得标「已完成」）').toMatch(/present[^\n]{0,40}(先|前)[^\n]{0,20}(标|改)[^\n]{0,20}(已完成|终态)|没有 present/)
   })
 
+  it('追进度必须钉短超时：单次 wait_agent ≤ 3 分钟，禁止 20 分钟长等（2026-11-06 用户判「卡住」）', () => {
+    // 现场：lead 连发 5 次 wait_agent{timeout_ms:1200000}（15:48–15:54），成员在跑，界面长时间停在
+    // 等待态 ⇒ 用户判定会话卡死（实际任务板 9/9 完成后正常收口）。钉住超时上限，防措辞被改回去。
+    const chairing = readFileSync(join(PRESETS_DIR, 'ceo/skills/chairing-staff-meeting/SKILL.md'), 'utf8')
+    expect(chairing, '必须钉 timeout_ms 上限 ≤ 180000').toMatch(/timeout_ms`? ≤ 180000/)
+    expect(chairing, '必须点名禁止一次等 20 分钟').toMatch(/不要一次等 20 分钟/)
+  })
+
   it('任务依赖必须教"两拍落"（板面 id 由板子发号；2026-10-13 实证：同批并行建任务时猜 id）', () => {
     /**
      * 现场（2026-10-13，会话 session-663ff4b6 / turn1 step9）：CEO 在同一批并行里建 T1–T4，
