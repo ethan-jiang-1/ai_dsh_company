@@ -14,7 +14,9 @@ intent: 给下一个 Agent 的问题理解 brief：capture 2026-11-07 对话里�
 
 ## 0.5 五分钟版（给下一个 Agent 的 orientation）
 
-**一句话问题**：在硬软一体、多 discipline（SW/FW/EE/ME/系统测试）的研发体系里，SW/FW 已用 OpenSpec，需求文档规范原本缺失；现在要补 MRD→PRD→StRS→SyRS→IRS 的文档链，需要给人 review 的文档（IRS 是候选检查点）；最终要定一套前缀编号，让**人和 Agent 都容易**，且 **Agent 不能困惑**。
+**一句话问题**：在硬软一体、多 discipline（SW/FW/EE/ME/系统测试）的研发体系里，SW/FW 已用 OpenSpec，需求文档规范原本缺失；现在要补 MRD→PRD→StRS→SyRS→IRS 的文档链，需要给人 review 的文档（IRS 是候选检查点）；并要求一套需求识别/编号机制（前缀只是候选形态之一），让**人和 Agent 都能第一眼正确理解、跨文档/跨组织可解析**，且 **Agent 不困惑**。
+
+**研究目标**：把决策空间整理到**可拍板**的程度——目的/约束/候选/证据；**本阶段不选**。完成判据 = 没参与讨论的人/Agent 能复述问题、复现候选、指出缺什么证据。
 
 **已知**：
 
@@ -36,7 +38,7 @@ intent: 给下一个 Agent 的问题理解 brief：capture 2026-11-07 对话里�
 1. **第一消费者是 Agent，不是人。** 判据 = Agent 不可能读错、没有判断题、机器能判红；"人读得懂"是第二位的。
 2. **prefix 必须第一眼就对。** LLM 看到 prefix 应立刻、深度地理解其语义；不允许"看到一个陌生术语之后还要去揣测"。
 3. **只在现状与约束空间内找答案。** 不新增前缀族、不加逐条必填字段、不发明新机制；能少不多。
-4. **research 未完成前不动任何东西。** 只在 `_backlog/research/requirements-numbering/` 里推敲。
+4. **research 未完成前不动任何东西。** 只在 `_backlog/research/requirements-identification-numbering/` 里推敲。
 5. **不要急着下结论。** 先把空间探索完；现在任何"倾向"都只是待验证假设。
 
 > 这五条改变了前两轮的提问方式：前两轮问"编几套前缀"；本轮先问"Agent 看到这个 token 的第一反应是什么"，再问"编号到底要服务哪几个目的"。
@@ -110,7 +112,7 @@ intent: 给下一个 Agent 的问题理解 brief：capture 2026-11-07 对话里�
 3. **再生成多个候选方案**（不是一个）；每个方案都应能回答 §4.Q 的场景用例，答不上就是缺口。
 4. **最后把 trade-off 摆出来**：用 §6.5 的评估维度 + §9 的测试收集证据；是否取舍、怎么取舍，由用户拍。
 
-**硬边界**：只改 `_backlog/research/requirements-numbering/`；不动 pack/tools/tests/workspace；不把"倾向"写成"结论"；不新增前缀族（除非证据要求）。
+**硬边界**：只改 `_backlog/research/requirements-identification-numbering/`；不动 pack/tools/tests/workspace；不把"倾向"写成"结论"；不新增前缀族（除非证据要求）。
 
 ### 1.6.1 理解自检（答不上就说明还没理解）
 
