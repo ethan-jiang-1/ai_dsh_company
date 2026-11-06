@@ -32,11 +32,22 @@
 - `preset-smoke`：**ALL PASS**（6 个角色 + 3 个委派子人格全部可挂载）。
 - `pnpm typecheck` 通过；`pnpm test` **1163 passed**（presets spec 新增一条：两子人格声明 + 两处委托行
   `maxDepth: 2` + SQA 否决规则）。
-- **真模型 E2E**（新资产 `probes/team/sa-sqa-delegation-probe.mjs`，305s）：CEO 建会话 → `spawn_teammate`
-  起 vp-eng → vp-eng 调 `system_architect` + `system_qa` ⇒ 两个子会话
+- **真模型 E2E（跑到收口，2026-11-06 18:04–18:15，slug `2026-11-06-portable-overload-detection`）**：
+  CEO 建会话 → `spawn_teammate` 起 vp-eng → vp-eng 调 `system_architect` + `system_qa` ⇒ 两个子会话
   `agentPreset = system-architect / system-qa`、**`delegationDepth = 2`**、同一 `parentSession`（VP-Eng）。
-  SA 交架构稿（VP-Eng 落 `drafts/sa.md`）；SQA 交 V&V 计划 + 对架构稿的独立结论（含量化判据），
-  以最终正文送达、由 VP-Eng 原样落盘。
+- **收口证据（六条断言全 PASS，脚本化）**：
+  ① 接线（preset ×2 / depth 2 / 同一 parent）；② `final.md` 出现（6.5KB）；
+  ③ final 点名 SQA（「参与：… system_qa（SQA 子代理）」）；④ final 带裁决词（**「SQA 总判 = 不通过」**、
+  「能否开工 = 否」）；⑤ `drafts/sqa.md`（32KB）＝ SQA 正文原样落盘（文件头写明「未改一字、未删一行」）；
+  ⑥ `drafts/sa.md`（32KB）＝ SA 架构稿（21 条 IF-001…IF-021）。
+  ⇒ **SQA 的否决真的进了 CEO 收口**，不是只写在规则里。
+- 探针已升级为同样断言（等 `final.md` → 点名 SQA → 裁决词 → drafts 里 SA/SQA 稿），后续可一条命令复跑。
+- **探针自身的假绿已修（2026-11-06 19:1x 现场）**：第一版按「目录里出现 system-* preset 会话」判定，
+  第二轮跑时它把**18:05 的旧子会话**当成 19:04 这一轮的成果，报 ALL PASS——典型的假绿。修法：
+  只认 `createdAt >= 探针启动时刻` 的会话。修后用本轮的**真实** id 复核：
+  `lead c7bbb913 → vp-eng 66c53afe（depth 1）→ SA 54ebdb28 / SQA 04a2c289（depth 2）`，
+  收口稿 = `2026-11-06-portable-overload-detection-v2/final.md`（「SQA 总判 = 不通过」）。
+  教训写在此处而不是只改代码：**E2E 的发现逻辑必须按本轮时间窗过滤，否则它证明的是历史**。
 
 ## 后果 / 边界
 
@@ -46,3 +57,27 @@
   团队成员的 per-member preset 是另一条（上游）。
 - `org.md` / `owners.md` 不动：子人格不占编制、不进在场板；若将来要给他们 journal/kb 席位，按研究题的
   16 面清单二期再走。
+
+## 追补（2026-11-06 19:xx）：把「证明」做成可复核的资产，并修掉两处假象
+
+用户指出「没证明 = 质量不够」，对。这一轮把证明补齐，并当场抓到两个假象：
+
+- **假绿（探针发现逻辑）**：`sa-sqa-delegation-probe` 第一版按「目录里出现 system-* preset 会话」判定，
+  第二轮跑时把**上一轮的旧子会话**当成本轮成果 ⇒ 假 PASS。修：只认 `createdAt >= 探针启动时刻`。
+- **假失败（脚本 maxBuffer）**：复核脚本用 `execFileSync` 读会话头，1MB+ 的文件默认 `maxBuffer` 溢出
+  ⇒ header 抛错被吞成 undefined ⇒ 已完成的运行被判 FAIL。修：`maxBuffer: 64MB`（探针同步修）。
+- **超时 ≠ 失败**：探针原来超时也 kill web，把还在跑的 SA/SQA 活干一起毙掉。改为 exit 3 TIMEOUT、
+  保留实例，并把默认墙钟从 10 分钟提到 30 分钟（实测某轮 SQA 单干 25 分钟）。
+
+**新的常驻资产** `probes/team/sa-sqa-closeout-audit.mjs`（零模型成本，纯读盘）：把「一轮运行算不算真的
+跑通」写成 10 条判据，逐轮读该轮自己的 session 头 + 交付物。红证：把 SA 判据改成 `vp-eng` ⇒ exit 1。
+
+复核结果（两轮完整运行，各自用自己的 id）：
+
+| 运行 | lead | VP-Eng（team 成员） | SA | SQA | 收口稿 | 结果 |
+|---|---|---|---|---|---|---|
+| 18:04 | `session-69573cd5` | `0f76976f` depth 1 | `8e052efa` depth 2 | `3bfbbcba` depth 2 | `…/2026-11-06-portable-overload-detection/final.md` | **10/10 PASS** |
+| 19:04 | `session-c7bbb913` | `66c53afe` depth 1 | `54ebdb28` depth 2 | `04a2c289` depth 2 | `…/2026-11-06-portable-overload-detection-v2/final.md` | **10/10 PASS** |
+
+两轮 final.md 都写着「**SQA 总判 = 不通过**」，`drafts/sqa.md`（32KB）为 SQA 正文原样落盘。⇒ 「CEO 组队 →
+VP-Eng 干活 → VP-Eng 自己起两个新角色 → SQA 否决进入 CEO 收口」这条链**有行为证据**，不是规则文本。
