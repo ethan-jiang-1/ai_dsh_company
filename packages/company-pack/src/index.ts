@@ -8,6 +8,7 @@ import { registerSignoffTool } from './host/signoff-tool.ts'
 import { registerWorkspaceDoors } from './host/workspace-doors.ts'
 import {
   applyBootstrap,
+  backfillWorkspaceRoles,
   planBootstrap,
   resolveContentDir,
 } from './host/bootstrap.ts'
@@ -106,6 +107,19 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
     if (!hasWorkspace) return
     if (typeof summary.cwd !== 'string' || summary.cwd === '') return
     const cwd = canonicalPath(summary.cwd)
+    // 非默认公司盘也可能带 .dsh-company（历史 workspace / 排练盘）。它在被公司会话使用前补一次
+    // 编制漂移：否则 CEO 读到的是旧编制（2026-11-06 现场：旧盘无 CMO → MRD 被 VP-Sales「代行」）。
+    if (cwd !== workspace && existsSync(join(cwd, '.dsh-company', 'kb'))) {
+      try {
+        const backfill = backfillWorkspaceRoles(resolveContentDir(import.meta.url), cwd)
+        if (backfill.result.created.length > 0) {
+          ctx.logger?.info?.(`company-pack：workspace ${cwd} 编制已按 pack 补齐（${backfill.result.created.join('、')}）`)
+          process.stderr.write(`dsh: company-pack：workspace ${cwd} 编制已按 pack 补齐（${backfill.result.created.join('、')}）\n`)
+        }
+      } catch (error) {
+        ctx.logger?.warn?.(`company-pack：workspace ${cwd} 编制补齐跳过（不影响运行）：${(error as Error).message}`)
+      }
+    }
     const rel = relative(workspace, cwd)
     if (rel !== '' && (rel.startsWith('..') || isAbsolute(rel))) {
       ctx.logger?.warn?.(`company-pack：会话 ${String(summary.sessionId)} 的 cwd ${cwd} 不在 workspace ${workspace}；`
@@ -192,6 +206,18 @@ function ensureRunBundle(
       const result = applyBootstrap(plan)
       if (result.created.length > 0) {
         ctx.logger?.info?.(`company-pack：run bundle 已初始化 ${workspace}/.dsh-company（新建 ${String(result.created.length)} 件）`)
+      }
+      // 编制漂移：包升级可能新增角色（如 0.9.0 的 CMO）；planBootstrap 只补缺件、不改既有 org/owners，
+      // 这里把缺失角色的部门节/归属行也补上（只补缺，不覆盖用户内容）。
+      const backfill = backfillWorkspaceRoles(contentDir, workspace)
+      if (backfill.result.created.length > 0) {
+        const drift = backfill.plan.drift
+        const detail = [
+          drift.missingCharter.length > 0 ? `章程 ${drift.missingCharter.join('/')}` : '',
+          drift.missingOrg.length > 0 ? `编制 ${drift.missingOrg.join('/')}` : '',
+          drift.missingOwners.length > 0 ? `归属 ${drift.missingOwners.join('/')}` : '',
+        ].filter(Boolean).join('；')
+        ctx.logger?.info?.(`company-pack：workspace 编制已按 pack 补齐（${detail}）`)
       }
     }
     const pack = resolvePackMetadata(import.meta.url)

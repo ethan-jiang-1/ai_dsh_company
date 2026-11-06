@@ -28,6 +28,10 @@ export interface BootstrapEntry {
   readonly sourceRel?: string
   readonly kind: 'dir' | 'file'
   readonly action: 'create' | 'skip'
+  /** 已合并好的内容（`org.md`/`owners.md` 补行用；给出时优先于 `sourceRel`）。 */
+  readonly content?: string
+  /** `replace` = 覆盖写（补席位用）；缺省 `create`（`wx`，绝不覆盖）。 */
+  readonly mode?: 'create' | 'replace'
 }
 
 export interface BootstrapPlan {
@@ -162,6 +166,8 @@ export function applyBootstrap(plan: BootstrapPlan): BootstrapResult {
       try {
         if (entry.rel === RUN_BUNDLE_REL.readme) {
           writeFileSync(target, RUN_BUNDLE_README, { flag: 'wx' })
+        } else if (entry.content !== undefined) {
+          writeFileSync(target, entry.content, { flag: entry.mode === 'replace' ? 'w' : 'wx' })
         } else {
           const source = join(plan.contentDir, entry.sourceRel ?? '')
           writeFileSync(target, readFileSync(source), { flag: 'wx' })
@@ -184,6 +190,171 @@ export function bootstrapCompanyWorkspace(
 ): { readonly plan: BootstrapPlan; readonly result: BootstrapResult } {
   const plan = planBootstrap(contentDir, workspace)
   return { plan, result: applyBootstrap(plan) }
+}
+
+/** 编制漂移：pack 六角色 vs 工作盘的章程 / 编制表（org.md）/ 归属表（owners.md）。 */
+export interface RoleDrift {
+  readonly missingCharter: readonly string[]
+  readonly missingOrg: readonly string[]
+  readonly missingOwners: readonly string[]
+}
+
+export interface RoleBackfillPlan extends BootstrapPlan {
+  readonly drift: RoleDrift
+}
+
+/** 从 canonical `org.md` 切出每角色一节（`### …（ROLE，N）` 起，到下一个 `### ` 前）。 */
+function orgSections(text: string): Map<string, string> {
+  const sections = new Map<string, string>()
+  const lines = text.split('\n')
+  let role: string | undefined
+  let buffer: string[] = []
+  const flush = (): void => {
+    if (role !== undefined && buffer.length > 0) sections.set(role, `${buffer.join('\n').replace(/\s+$/, '')}\n\n`)
+  }
+  for (const line of lines) {
+    const heading = /^###\s+[^\n]*[（(]([A-Za-z-]+)[，,]\s*\d+[）)]/.exec(line)
+    if (heading !== null) {
+      flush()
+      role = heading[1]
+      buffer = [line]
+      continue
+    }
+    if (line.startsWith('### ')) {
+      flush()
+      role = undefined
+      buffer = []
+      continue
+    }
+    if (role !== undefined) buffer.push(line)
+  }
+  flush()
+  return sections
+}
+
+/** 角色 slug → 编制表里的显示名（org/owners 用显示名）。 */
+const ROLE_LABEL: Readonly<Record<string, string>> = {
+  ceo: 'CEO', 'vp-eng': 'VP-Eng', 'vp-sales': 'VP-Sales', coo: 'COO', cfo: 'CFO', cmo: 'CMO',
+}
+
+/** owners.md 里该角色的表格行。 */
+const ownersRow = (role: string): RegExp => new RegExp(`^\\|\\s*${role}\\s*\\|`, 'm')
+
+/** 把 canonical 的部门节插到工作盘「下一个角色」标题之前；没有下一个就追加到文末。 */
+function mergeOrgSection(workspaceText: string, canonicalText: string, role: string): string | undefined {
+  const canonical = orgSections(canonicalText)
+  const section = canonical.get(role)
+  if (section === undefined) return undefined
+  const order = [...canonical.keys()]
+  const lines = workspaceText.split('\n')
+  for (const next of order.slice(order.indexOf(role) + 1)) {
+    const marker = new RegExp(`^###\\s+[^\\n]*[（(]${next}[，,]`)
+    const at = lines.findIndex(line => marker.test(line))
+    if (at !== -1) return [...lines.slice(0, at), ...section.trimEnd().split('\n'), '', ...lines.slice(at)].join('\n')
+  }
+  return `${workspaceText.trimEnd()}\n\n${section.trimEnd()}\n`
+}
+
+/** 把 canonical 的 CMO 行插到 owners.md 最后一个角色行之后（无表行时插在分隔行后）。 */
+function mergeOwnersRow(workspaceText: string, canonicalText: string, role: string): string | undefined {
+  if (ownersRow(role).test(workspaceText)) return undefined
+  const row = canonicalText.split('\n').find(line => ownersRow(role).test(line))
+  if (row === undefined) return undefined
+  const lines = workspaceText.split('\n')
+  let insertAt = -1
+  const anyRoleRow = /^\|\s*(?:CEO|CFO|VP-Sales|VP-Eng|COO|CMO)\s*\|/
+  lines.forEach((line, index) => { if (anyRoleRow.test(line)) insertAt = index })
+  if (insertAt === -1) {
+    const separator = lines.findIndex(line => /^\|[-:|\s]+\|$/.test(line))
+    insertAt = separator === -1 ? lines.length - 1 : separator
+  }
+  return [...lines.slice(0, insertAt + 1), row, ...lines.slice(insertAt + 1)].join('\n')
+}
+
+/** 「## N 条线」计数 +1（只在新补了部门时调用）。 */
+function bumpLineCount(text: string): string {
+  const digits = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
+  return text.replace(/^(##\s+)([一二三四五六七八九十]+)(条线)/m, (whole, head: string, num: string, tail: string) => {
+    const at = digits.indexOf(num)
+    return at === -1 || at === digits.length - 1 ? whole : `${head}${digits[at + 1]}${tail}`
+  })
+}
+
+/**
+ * 编制漂移检查计划：只对**已经是公司盘**（有 `.dsh-company/kb`）的 workspace 做，
+ * 补齐缺的角色章程、`org.md` 的部门节、`owners.md` 的归属行；只补缺，不覆盖既有内容。
+ * @param contentDir - pack 的 `content/`。
+ * @param workspace - 被打开会话的 workspace 根（可以是非默认公司盘）。
+ */
+export function planRoleBackfill(contentDir: string, workspace: string): RoleBackfillPlan {
+  const entries: BootstrapEntry[] = []
+  const drift = { missingCharter: [] as string[], missingOrg: [] as string[], missingOwners: [] as string[] }
+  const base: RoleBackfillPlan = {
+    workspace, contentDir, entries, creates: 0, skips: 0, drift,
+  }
+  if (!existsSync(contentDir) || !lstatSync(contentDir).isDirectory()) {
+    return { ...base, error: `content 目录不存在：${contentDir}` }
+  }
+  const kb = join(workspace, RUN_BUNDLE_REL.kb)
+  if (!existsSync(kb) || !lstatSync(kb).isDirectory()) return base
+  const canonicalOrgPath = join(contentDir, `${STATE_SOURCE}/org.md`)
+  const canonicalOwnersPath = join(contentDir, `${STATE_SOURCE}/owners.md`)
+  const canonicalOrg = existsSync(canonicalOrgPath) ? readFileSync(canonicalOrgPath, 'utf8') : ''
+  const canonicalOwners = existsSync(canonicalOwnersPath) ? readFileSync(canonicalOwnersPath, 'utf8') : ''
+  const orgPath = join(kb, 'org.md')
+  const ownersPath = join(kb, 'owners.md')
+  let orgText = existsSync(orgPath) ? readFileSync(orgPath, 'utf8') : undefined
+  let ownersText = existsSync(ownersPath) ? readFileSync(ownersPath, 'utf8') : undefined
+  for (const role of COMPANY_ROLES) {
+    const label = ROLE_LABEL[role] ?? role
+    const charterRel = `${RUN_BUNDLE_REL.kb}/${role}/CHARTER.md`
+    if (!existsSync(join(workspace, charterRel))) {
+      const sourceRel = `${CHARTERS_SOURCE}/${role}.md`
+      if (existsSync(join(contentDir, sourceRel))) {
+        entries.push({ rel: charterRel, sourceRel, kind: 'file', action: 'create' })
+        drift.missingCharter.push(role)
+      }
+    }
+    if (orgText !== undefined && canonicalOrg !== '') {
+      const hasSection = new RegExp(`^###\\s+[^\\n]*[（(]${label}[，,]\\s*\\d+`, 'm').test(orgText)
+      const hasToken = new RegExp(`\\b${label}\\b`, 'i').test(orgText)
+      if (!hasSection && !hasToken) {
+        const merged = mergeOrgSection(orgText, canonicalOrg, label)
+        if (merged !== undefined) {
+          orgText = bumpLineCount(merged)
+          drift.missingOrg.push(role)
+        }
+      }
+    }
+    if (ownersText !== undefined && canonicalOwners !== '') {
+      const merged = mergeOwnersRow(ownersText, canonicalOwners, label)
+      if (merged !== undefined) {
+        ownersText = merged
+        drift.missingOwners.push(role)
+      }
+    }
+  }
+  if (drift.missingOrg.length > 0 && orgText !== undefined) {
+    entries.push({ rel: `${RUN_BUNDLE_REL.kb}/org.md`, kind: 'file', action: 'create', content: orgText, mode: 'replace' })
+  }
+  if (drift.missingOwners.length > 0 && ownersText !== undefined) {
+    entries.push({ rel: `${RUN_BUNDLE_REL.kb}/owners.md`, kind: 'file', action: 'create', content: ownersText, mode: 'replace' })
+  }
+  return { ...base, entries, creates: entries.length, skips: 0 }
+}
+
+/** 执行编制补种（复用 {@link applyBootstrap}；只补缺）。 */
+export function applyRoleBackfill(plan: RoleBackfillPlan): BootstrapResult {
+  return applyBootstrap(plan)
+}
+
+/** 一步到位：检查 + 补种。 */
+export function backfillWorkspaceRoles(
+  contentDir: string,
+  workspace: string,
+): { readonly plan: RoleBackfillPlan; readonly result: BootstrapResult } {
+  const plan = planRoleBackfill(contentDir, workspace)
+  return { plan, result: applyRoleBackfill(plan) }
 }
 
 /** 校验 workspace 落点：不能等于/包含 DSH_HOME 或 OS home，必须是目录。 */
