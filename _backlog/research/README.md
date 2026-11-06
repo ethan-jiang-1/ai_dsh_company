@@ -58,7 +58,10 @@ opened: YYYY-MM-DD
 
 ## 索引
 
-（无活跃研究题；2026-11-06 的角色新增面题随 SA/SQA 卡迁入[研究归档](../_archive/research/README.md)。）
+- [SA/SQA 产物评审：两个新子人格的产出到底行不行](sa-sqa-product-review/README.md) — 服务 SA/SQA 落地 Note 与
+  BUG-034/035；2026-11-06 开，调研中。
+
+（2026-11-06 的角色新增面题随 SA/SQA 卡迁入[研究归档](../_archive/research/README.md)。）
 
 （此前：2026-11-03 第五/第六轮打扫题随各自消费者卡迁入[研究归档](../_archive/research/README.md)。）
 

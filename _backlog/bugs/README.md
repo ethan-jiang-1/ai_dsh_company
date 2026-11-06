@@ -2,7 +2,7 @@
 
 当场修掉的不建卡。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。
 
-**下一个缺陷号**：Next BUG ID = 34；已分配 BUG-001..033。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 36；已分配 BUG-001..035。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，修相对链接并更新两边清单。
 
@@ -10,6 +10,8 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
+| [BUG-034](BUG-034-no-absolute-time-source-for-signed-records.md) | 无电池设备没有绝对时间源：签名事件记录的时间戳不可用于举证（SA/SQA 双双漏项） | P1 |
+| [BUG-035](BUG-035-short-circuit-withstand-undefined.md) | 串在回路里的装置只有 25 A/10 s 包络，未定义短路电流耐受（边界外≠无责任） | P1 |
 | —（无活跃缺陷卡） | BUG-033 已修并迁 [fixed_bugs](../_archive/fixed_bugs/BUG-033-revoke-recovery-body-edit-loss.md)：journal 目标态推导 + 第三态 conflict；2026-10-23 BUG-032 同模式 | — |
 
 **2026-10-19 BUG-028 收口**：闸门④认总锚（title 或 prompt 点名即算，依赖链一并传递），lingang-recon 由 3 条误报 → 0 条违规；

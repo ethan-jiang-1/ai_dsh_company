@@ -34,13 +34,15 @@ const startedAt = Date.now()
 try {
   const cookie = await companyCookie({ fetch, base, token })
   const rpc = companyRpc({ fetch, base, cookie, prefix: 'saqa-', dumpBodyOnError: true })
+  // 产品必须写死：2026-11-06 实踩「便携式过载检测」有电气/机械两种读法，含糊任务书让不同轮次做出
+  // 不同产品（run2 做成 0–20 kN 力学件）——那是探针的缺陷，不是角色的。
   const prompt = [
     '落地项目验证（一轮内完成，不要问我；这是真实交付项目，不是 demo）：',
     '1) 用 spawn_teammate 起 vp-eng（名字就是 vp-eng）；',
     '2) 任务板建一个任务给 vp-eng，任务书写明：落地项目必须用 system_architect 与 system_qa 各起一个子代理——',
     '   SA 出系统架构稿（含 IF-### 接口清单），SQA 出 V&V 计划并对架构稿给独立结论（不通过就写不通过）；',
     '3) vp-eng 交回后收口，SQA 的原始结论单列一条。',
-    '目标产品写「便携式过载检测」，其它自定；≤ 10 个工具轮；现在开始。',
+    '目标产品锁定为**电气侧**：串在 16 A / 220 VAC 插座回路里的便携过载检测器（不是力学测力计）；其它细节自定；≤ 10 个工具轮；现在开始。',
   ].join('\n')
   const created = await rpc('session/create', { request: { cwd: join(ROOT, 'company-workspace'), agentPreset: 'ceo' } })
   console.log(`lead session: ${created.sessionId}`)
