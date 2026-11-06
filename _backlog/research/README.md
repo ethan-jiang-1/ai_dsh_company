@@ -60,6 +60,8 @@ opened: YYYY-MM-DD
 
 - [SA/SQA 产物评审：两个新子人格的产出到底行不行](sa-sqa-product-review/README.md) — 服务 SA/SQA 落地 Note 与
   BUG-034/035；2026-11-06 开，调研中。
+- [需求编号与多层需求文档：AI 时代该怎么编、编几套](requirements-numbering/README.md) — 服务用户 2026-11-07
+  的提问；硬软一体场景；**实施已全部回滚，仅推敲中**。
 
 （2026-11-06 的角色新增面题随 SA/SQA 卡迁入[研究归档](../_archive/research/README.md)。）
 
