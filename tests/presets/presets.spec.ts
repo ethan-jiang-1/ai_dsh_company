@@ -266,6 +266,28 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(skill, '组队 skill 必须同一条规则（MRD 只归 CMO）').toMatch(/owner 唯一，缺角不代行[\s\S]*MRD 只归 CMO/)
   })
 
+  it('落地项目子人格：SA + SQA 声明、CEO/vp-eng 各能起（maxDepth 2），SQA 否决直达 CEO', () => {
+    // 2026-11-06：VP-Eng 在落地项目里按 V 模型把 E（架构）与 V（验证）分开。子人格档（同 researcher），
+    // 但委托行必须两处都有且 maxDepth: 2——成员会话 depth 1，子代落在 depth 2。
+    for (const preset of ['system-architect', 'system-qa']) {
+      expect(existsSync(join(PRESETS_DIR, preset, 'agent.cordis.yml')), `${preset} 必须随包发布`).toBe(true)
+      const text = readFileSync(join(PRESETS_DIR, preset, 'agent.cordis.yml'), 'utf8')
+      expect(text, `${preset} 身份行`).toMatch(new RegExp(`id: ${preset}`))
+      expect(text, `${preset} 必须写 V 模型分工`).toMatch(/V 模型/)
+    }
+    for (const [label, yml] of [['CEO', roleYml('ceo')], ['VP-Eng', roleYml('vp-eng')]] as const) {
+      for (const [tool, preset] of [['system_architect', 'system-architect'], ['system_qa', 'system-qa']] as const) {
+        expect(yml, `${label} 必须能起 ${preset}`).toMatch(
+          new RegExp(`toolName: ${tool}[\\s\\S]{0,120}?maxDepth: 2[\\s\\S]{0,60}?agentPreset: ${preset}`),
+        )
+      }
+    }
+    expect(roleYml('vp-eng'), 'VP-Eng 只在落地项目起').toMatch(/落地项目（不是 demo）才起/)
+    expect(roleYml('ceo'), 'SQA 否决直达 CEO').toMatch(/SQA 的否决直达你/)
+    expect(readFileSync(join(PRESETS_DIR, 'system-qa/agent.cordis.yml'), 'utf8'), 'SQA 不通过→原样上报')
+      .toMatch(/否决直达 CEO/)
+  })
+
   it('委托控制面（R4；0.2.1 不动机制）：职能 preset 声明控制行，CEO 不声明', () => {
     // 机制（vendor 实证）：`tool-agent-team` 的 maybeInstall 只在 `ctx.agentTeams.tryMembership(agent)`
     // 命中（= 团队成员）时才装**团队版**控制名。职能**根**会话不是团队成员 ⇒ 必须自己声明全局版，

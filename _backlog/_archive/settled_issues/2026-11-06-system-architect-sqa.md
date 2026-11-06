@@ -1,13 +1,13 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-06
 ---
 
 # 推敲：给 VP-Eng 加两个专职子人格——系统架构师（SA）与系统质量保证（SQA·V&V）
 
-> 立卡：2026-11-06 ｜ 状态：推敲中 ｜ 类型：Feature ｜ 毕业：未定 ｜ 可关闭：否
+> 立卡：2026-11-06 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 2026-11-06（用户同日拍定档位/名字/SQA 否决线，本卡一次性交付）
 >
-> **结论/去向**：（未定——定性后写；本卡只做推敲，不授权实施）
+> **结论/去向**：note — [SA/SQA 子人格 Note](../../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md)
 
 **问题与期望结果：** 真实项目落地（不是 demo）时，VP-Eng 一个人既做硬软一体架构、又做需求验证，
 E（工程）与 V（验证）在同一上下文里，质量不独立。期望：VP-Eng 在落地项目里能启动两个**独立上下文**
@@ -56,7 +56,7 @@ E（工程）与 V（验证）在同一上下文里，质量不独立。期望�
   子任务里出现）——需要 1 条规则写清，否则「谁负责」会漂。
 - 未决：成本——一次落地项目多两个子代理，token 与时长上升；是否只在「落地」触发（见未决 5）。
 
-## 验收标准（草稿，定性后定稿）
+## 验收标准（已达成）
 
 1. `presets/system-architect` 与 `presets/system-qa` 声明文件 + 各 ≥1 skill 在场；
    `pnpm verify` 的 `presets ×6 + 子人格 ×N` 计数与目录一致。
@@ -68,3 +68,10 @@ E（工程）与 V（验证）在同一上下文里，质量不独立。期望�
    面板/交付物可见。
 5. `pnpm typecheck` / `pnpm test` / `pnpm verify` / `delegation-smoke` / `release-smoke` 全绿；
    面清单 1–16 逐条勾完（未做的写排除项），同 diff 落 Note 并归档本卡。
+
+## 交付证据
+
+- 提交：SA/SQA 两 preset + 委托行 + `preset-bundle` 门禁 + presets/typecheck/test/verify 全绿；
+  Note = [2026-11-06-sa-sqa-subpersonas.md](../../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md)。
+- 真模型 E2E = `probes/team/sa-sqa-delegation-probe.mjs`（305s，两子会话 preset 正确、depth=2、同一 parent）。
+- 面清单（16 面）与 CMO 实证 = [研究题](../research/role-addition/README.md)。

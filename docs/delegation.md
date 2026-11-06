@@ -22,6 +22,8 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 | `vp_eng` | VP-Eng（研发） | `provider: spawn` · `maxDepth: 1` · `agentPreset: vp-eng` |
 | `vp_sales` | VP-Sales（销售） | `provider: spawn` · `maxDepth: 1` · `agentPreset: vp-sales` |
 | `subagent_research` | 通用研究员（一次性调研） | `provider: spawn` · `agentPreset: researcher`（只读工具面） |
+| `system_architect` | 系统架构师 SA（落地项目，V 模型左侧） | `provider: spawn` · `maxDepth: 2` · `agentPreset: system-architect` |
+| `system_qa` | 系统质量保证 SQA·V&V（落地项目，V 模型右侧） | `provider: spawn` · `maxDepth: 2` · `agentPreset: system-qa` |
 
 - **activation 语义**：调用立刻返回回执 `{ kind: 'activation', subagentId }`（线上文本形如
   `started subagent <id>`）；子代理的**最终正文**作为父会话的完成通知送达
@@ -29,8 +31,9 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 - **人格只能由 `agentPreset` 给**：0.2.1 删除了 per-instance `persona` / `toolFilter` /
   `backgroundMode` / `enableRunInBackground`（Config 硬拒）。每个工具行钉一个角色 preset，
   于是 child 拿到的是**该角色的 skills 与工具面**，而不是 CEO 的继承面。
-- **`maxDepth: 1`**：委托 child 不能再委托 `vp_eng`/`vp_sales`；通用 `subagent` 行的默认深度也是
-  1（`subagent` 包 Config）。要嵌套需在行上显式写 `maxDepth`。
+- **深度**：`maxDepth` 是绝对深度上限（`0` 禁止、`1` 只允许直接子代；行上不写则读 Host 默认 1）。
+  `vp_eng`/`vp_sales` 行是 1；`system_architect`/`system_qa` 行是 **2**——VP-Eng 可能是团队成员
+  （depth 1，见 §3），他起的子代落在 depth 2。团队成员加人只能走命名委托：`spawn_teammate` 仅 Lead 可调。
 - **改稿方式**：再委派一次，把上一稿一起给它。CEO 会话的 `send_message` 是团队版（按成员名寻址），
   够不到 subagent child——所以命名委托不承担"反复追加意见"，那归 team。
 - **工具行归属**：写在 `presets/ceo/agent.cordis.yml` 的 `delegation` 组内（preset 自包含，

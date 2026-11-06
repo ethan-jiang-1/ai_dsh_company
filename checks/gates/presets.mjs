@@ -11,6 +11,20 @@ export const roles = COMPANY_ROLE_IDS
 /** 子人格 preset 只要求声明文件 + 行能挂（skills 由 preset-smoke 真挂载验证）。 */
 export const supportPresets = COMPANY_SUPPORT_PRESET_IDS
 export function run({ root, ok, fail }) {
+// ── 名单 ↔ 包内注册：preset 目录存在 ≠ 装进组合。每个 preset 必须在 package.json 的
+// `dsh.bundle.patch` 数组里登记（它是 patch 的并入清单，不登记则名册里没有它）。
+// 负例留证 2026-11-06：加 SA/SQA 时只建了 preset 目录、忘了登记数组 ⇒ `preset-smoke` 报
+// `Unknown agent preset: system-architect`；本检查就是那次漏项的机械闸门。
+const packJson = JSON.parse(readFileSync(join(root, 'packages/company-pack/package.json'), 'utf8'))
+const patch = packJson?.dsh?.bundle?.patch ?? []
+for (const preset of [...roles, ...supportPresets]) {
+  const rel = `./presets/${preset}/agent.cordis.yml`
+  if (!patch.includes(rel)) fail('preset-bundle', `${rel} 未进 package.json dsh.bundle.patch（装了也不进名册）`)
+}
+for (const entry of patch) {
+  if (!String(entry).startsWith('./presets/')) continue
+  if (!existsSync(join(root, 'packages/company-pack', entry))) fail('preset-bundle', `${entry} 指向的文件不存在`)
+}
 for (const preset of supportPresets) {
   if (!existsSync(join(root, 'packages/company-pack/presets', preset, 'agent.cordis.yml'))) {
     fail('preset-file', `${preset}/agent.cordis.yml 缺失（委派子人格 preset 必须随包发布）`)

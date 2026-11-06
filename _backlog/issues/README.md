@@ -4,10 +4,8 @@
 
 ## 活跃清单
 
-当前活跃 1 张。
+当前活跃 0 张。
 
-- [推敲：给 VP-Eng 加两个专职子人格——系统架构师（SA）与系统质量保证（SQA·V&V）](2026-11-06-system-architect-sqa.md)
-  — 2026-11-06 立，推敲中；16 面清单与 CMO 实证见[研究题](../research/role-addition/README.md)。
 
 2026-11-03 两张打扫卡（第五轮 / 第六轮）均已结归档：改善按五道门落地，证据在各 Note；
 残余项（npm publish 等外部依赖）在卡的「结论/去向」与归档材料里写清。
@@ -16,6 +14,7 @@ v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajecto
 
 ## 近期归档
 
+- SA/SQA 子人格卡 2026-11-06 已结：两个委派子人格（system-architect / system-qa）+ 委托行 maxDepth 2 + SQA 否决直达 CEO；真模型 E2E 证独立会话/preset/depth=2；去向 = [Note](../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md)；卡在[归档](../_archive/settled_issues/2026-11-06-system-architect-sqa.md)。
 - 第六轮七维打扫卡 2026-11-03 已结：fresh agent 复评 A-…A- + 层次化（client/tests/harness）+ 腐化通道四条机械面；去向 = [context-rot-guards Note](../../notes/implemented/2026-11-03-context-rot-guards.md) 与各批 Note；卡在[归档](../_archive/settled_issues/2026-11-03-repo-hygiene-round6.md)。
 - 第五轮七维打扫卡 2026-11-03 已结（消化）：A–F 各批已落地或被第六轮承接；残余 = npm publish（外部）与零入链分诊（已定性不批量迁）；卡在[归档](../_archive/settled_issues/2026-11-03-repo-hygiene-round5.md)。
 

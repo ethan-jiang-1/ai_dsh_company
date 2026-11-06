@@ -18,6 +18,7 @@
 
 | 名头 | 材料 | 历史消费者 | 产出的卡 | 归档 |
 |---|---|---|---|---|
+| [role-addition/](role-addition/README.md) · 角色新增面：加一个角色/子人格到底要动哪些地方（CMO 9 提交/97 文件实证 → SA/SQA 落地） | 1 份 | [SA/SQA 卡](../settled_issues/2026-11-06-system-architect-sqa.md) | 同卡 | 2026-11-06 |
 | [plugin-lifecycle-publish/](plugin-lifecycle-publish/README.md) · 插件生命周期与发布：装/起/升/卸证据与 npm/市场发布面 | 3 份 | [生命周期与发布卡](../settled_issues/2026-11-01-plugin-lifecycle-publish.md) | 同卡 | 2026-11-02 |
 | [plugin-as-product-v3/](plugin-as-product-v3/README.md) · 插件即产品 v3：入口、workspace 与 run bundle 再划线 | 3 份 | [插件即产品 v3 卡](../settled_issues/2026-11-01-plugin-as-product-v3.md) | 同卡（0.6.0 落地，0.7.0 复核） | 2026-11-02 |
 | [plugin-as-product/](plugin-as-product/README.md) · 插件即产品：独立 company profile / workspace run bundle / 生命周期 / 信任 / 发布 | 4 份 | [插件即产品](../settled_issues/2026-11-01-plugin-as-product.md) 等 5 张 | 产品化四卡 + 发布/文档卡 | 2026-11-01 |

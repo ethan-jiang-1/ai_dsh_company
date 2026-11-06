@@ -29,6 +29,7 @@ SA/SQA 应走 **B 档**（VP-Eng 条线下专职岗，不是第七/第八条汇�
 
 | # | 面 | CMO（A 档）改了什么 | SA/SQA（B 档） | 判据 |
 |---|---|---|---|---|
+| 1b | **包内注册** | `package.json` 的 `dsh.bundle.patch` 数组逐行登记每个 preset（0.9.0 已有 CMO 行） | **必需**：两个 `./presets/system-*/agent.cordis.yml` 必须进数组——目录存在但没登记 = 装上了也不进名册（2026-11-06 实踩：preset-smoke 报 `Unknown agent preset`） | `checks/gates/presets.mjs` 新增 `preset-bundle` 检查；`preset-smoke` |
 | 1 | preset 声明 | `presets/cmo/agent.cordis.yml` + `skills/mrd-playbook` | **必需**：两个 `presets/system-architect|system-qa/agent.cordis.yml` + 各 ≥1 skill | `checks/gates/presets.mjs` 声明文件检查；`preset-smoke` 真挂载 |
 | 2 | 名单单一事实家 | `tools/lib/company-roles.mjs` 进 `COMPANY_ROLE_IDS` | **必需**：进 `COMPANY_SUPPORT_PRESET_IDS`（`researcher` 同款；注释写清不是角色） | presets 门禁/preset-smoke 自动收；probe-smoke、release-smoke 若枚举也要收 |
 | 3 | 委派行 + 深度 | CEO preset 加 `vp_cmo` 行（`agentPreset: cmo`） | **必需**：CEO + vp-eng 两处各加 `system_architect` / `system_qa` 行，`maxDepth: 2`（今天 CEO 的 `vp_eng` 是 1，成员 depth 1 起子代 = 2，必须放行） | `delegation-smoke` / 真 E2E：成员会话能起子代 |

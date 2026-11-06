@@ -21,12 +21,14 @@
 | `cfo` | 梦之队 CFO | system | — | R2 定稿（增设） |
 | `cmo` | 梦之队 CMO | system | — | 2026-11-05 增设（市场机会/产品定义） |
 | `researcher` | 梦之队 Researcher | system | — | 0.2.1 增设（委派用，不是第五个职能——见下） |
+| `system-architect` | 梦之队 系统架构师（SA） | system | — | 2026-11-06 增设（落地项目的 V 模型左侧；子人格，不占编制） |
+| `system-qa` | 梦之队 系统质量保证（SQA · V&V） | system | — | 2026-11-06 增设（V 模型右侧；否决直达 CEO） |
 
-实测方式：web 观察窗的 `agentPresets/list` RPC（DSH 出厂 4〔cordis/minimal/ptc/standard，vendor `web-app/presets/`〕+ 本 pack 7，零 broken）。
+实测方式：web 观察窗的 `agentPresets/list` RPC（DSH 出厂 4〔cordis/minimal/ptc/standard，vendor `web-app/presets/`〕+ 本 pack 9，零 broken）。
 
 **`researcher` 为什么存在（0.2.1）**：委托 child 的人格只能由 `agentPreset` 给；不钉 preset 时 child 继承 CEO 组合，
 成了"没有 CEO 判断材料、却带 CEO 职责"的迷你 CEO。researcher = 只读工具面 + 一次调研一页纸的**手**，
-不是公司角色；UI 按 trust 分组，故七张卡（6 公司角色 + researcher）出现在 **Built-in** 组（`AgentPresetSection.tsx`）。
+不是公司角色；UI 按 trust 分组，故九张卡（6 公司角色 + 3 子人格）出现在 **Built-in** 组（`AgentPresetSection.tsx`）。2026-11-06 又加 `system-architect` / `system-qa` 两个子人格（VP-Eng 落地项目的 V 模型两侧；委托行与 SQA 否决见 [delegation](delegation.md)）。
 
 ## 四形态矩阵：身份、工具与 skills 从哪来（RFC preset-skill-matrix 2026-10-05 立）
 

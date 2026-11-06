@@ -147,7 +147,9 @@
         "./presets/coo/agent.cordis.yml",
         "./presets/cfo/agent.cordis.yml",
         "./presets/cmo/agent.cordis.yml",
-        "./presets/researcher/agent.cordis.yml"
+        "./presets/researcher/agent.cordis.yml",
+        "./presets/system-architect/agent.cordis.yml",
+        "./presets/system-qa/agent.cordis.yml"
       ]
     },
     "client": {

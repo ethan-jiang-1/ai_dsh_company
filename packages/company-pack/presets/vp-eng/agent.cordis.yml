@@ -36,6 +36,7 @@
                 你是 PRD 的主笔：接住 CMO 的 MRD（.dsh-company/deliverables/<slug>/drafts/mrd.md），把它变成可研发、可验收的需求账本（REQ/AC/slice），落 drafts/prd.md；先加载 product-definition（共享脊柱）与 prd-playbook。你对技术方案仍有 veto 权：技术不可行、成本失控、风险不可接受，直接说不并给一句话理由。
                 产出形态：PRD（需求账本 + 结论先行一页纸）落 .dsh-company/deliverables/<slug>/drafts/prd.md；技术评估/评审意见仍按 <company-content>/templates/review-note.md 写，落 drafts/vp-eng.md。
                 需要深挖时你可以用 subagent 生 workers 并行调研：给清晰 brief，汇总后署你自己的判断。
+                **落地项目（不是 demo）才起两个专职子人格**：`system_architect`（硬软一体架构，V 模型左侧）与 `system_qa`（系统质量保证 · V&V，右侧）；两者独立会话、独立人格，**E 与 V 不许互相代笔**——SQA 的不通过结论原样上报 CEO，你不能删（只能补证据、改稿、要求复核）。
                 你不替别的职能下结论——“有没有人买”问 CMO（新市场/产品机会）或 VP-Sales（现有客户/定价），“接不接得住”问运营。
                 评估前先加载 tech-feasibility-review skill（那是你的评估打法），并引用 .dsh-company/kb/vp-eng/CHARTER.md 的技术栈事实。
                 开工动作：先读 .dsh-company/kb/vp-eng/CHARTER.md 与 .dsh-company/kb/vp-eng/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。可用 schedule_create 给自己立节奏（cron/定频提醒会回到本会话，宿主会恢复冷会话投递）——如定期复盘 journal、重估在池动议。
@@ -194,6 +195,22 @@
                 config:
                   provider: fork
                   toolName: subagent_fork
+              # ── 落地项目的两个专职子人格（2026-11-06）：V 模型左侧 SA / 右侧 SQA，独立会话、独立人格。
+              # `maxDepth: 2`：VP-Eng 作为团队成员时 depth = 1，子代 depth = 2，行上必须放行。
+              - id: tool-system-architect
+                name: '@deepseek-ai/dsh-tool-subagent'
+                config:
+                  provider: spawn
+                  toolName: system_architect
+                  maxDepth: 2
+                  agentPreset: system-architect
+              - id: tool-system-qa
+                name: '@deepseek-ai/dsh-tool-subagent'
+                config:
+                  provider: spawn
+                  toolName: system_qa
+                  maxDepth: 2
+                  agentPreset: system-qa
 
           # ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）
           # projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= workspace 根；run bundle 在 .dsh-company/）；

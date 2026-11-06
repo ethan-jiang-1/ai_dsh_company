@@ -58,8 +58,7 @@ opened: YYYY-MM-DD
 
 ## 索引
 
-- [角色新增面：加一个角色/子人格到底要动哪些地方](role-addition/README.md) — 服务 SA/SQA 落地卡（16 面清单 +
-  CMO 9 提交实证）；2026-11-06 开，调研中。
+（无活跃研究题；2026-11-06 的角色新增面题随 SA/SQA 卡迁入[研究归档](../_archive/research/README.md)。）
 
 （此前：2026-11-03 第五/第六轮打扫题随各自消费者卡迁入[研究归档](../_archive/research/README.md)。）
 
