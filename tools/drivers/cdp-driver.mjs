@@ -142,6 +142,15 @@ export async function launchCdpBrowser({ url, chromeBin, windowSize = '1600,1000
     `--crash-dumps-dir=${profileDir}`,
     `--user-data-dir=${profileDir}`,
     '--no-first-run',
+    // macOS 钥匙串：Chrome 默认用系统 keychain 存 "Chrome Safe Storage"。本驱动从 DSH 的
+    // 沙箱化 bash 里拉起 Chrome（seatbelt 挡掉 securityd；同类证据：本 shell 里 `log show`
+    // 直接报 "Cannot run while sandboxed"），Chrome 找不到可用钥匙串就弹系统框
+    // 「A keychain cannot be found to store "Chrome"」并索要密码（Reset To Defaults）——
+    // 2026-11-06 用户报「老是弹、修很多次没用」。这两枚开关 = Playwright 自家 launcher 的
+    // 默认参数（playwright-core coreBundle 的 chromium args），让 Chrome 完全不碰 OS 钥匙串：
+    // 一次性 profile 改用内置 basic store + mock keychain。
+    '--password-store=basic',
+    '--use-mock-keychain',
     '--remote-debugging-port=0',
     `--window-size=${windowSize}`,
     url,

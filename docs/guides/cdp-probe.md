@@ -39,17 +39,16 @@ console.log），JSON verdict 的 `evidenceDir` 指向它；`--evidence` 让成�
 驱动层（源自 loop-advisor，逐字保留）：
 - **`--remote-debugging-port=0`** + 从 profile 目录 `DevToolsActivePort` 读真实端口——固定端口会静默连上孤儿 Chrome 的旧页面，判决全错。
 - **`--no-sandbox` + GPU/crashpad 禁用**：受限环境起不来 Chrome 内部沙箱，GPU 进程直接 FATAL。
+- **`--password-store=basic` + `--use-mock-keychain`（2026-11-06）**：从 DSH 沙箱化 bash 起的 Chrome 碰不到系统钥匙串，每起一个一次性 profile 就弹「A keychain cannot be found to store
+  "Chrome"」+ Reset To Defaults（要密码，点多少次也不修）；两枚开关 = Playwright launcher 默认参数，Chrome 完全不碰 OS 钥匙串（`launchChromium` 本来就有，手搓的 `launchCdpBrowser` 曾漏）。
 - **桌面 `--window-size`**：无头默认 800×600，响应式 UI 在窄视口是另一套界面形态。
 - **别用 `--virtual-time-budget`**：页面有活 WebSocket 时虚拟时间永不推进。用真实时间预算 + 轮询。
 - **每个 evaluate 带超时竞速**：socket 断了要 fail，不能挂死探针。
 - **dock 前后台子树并存**：同名节点 DOM 里多份，断言用 `.some()`/全文 `includes` 扫，不取第一个。
 
 本仓借鉴当夜新踩平的（场景层已编码）：
-- **两段式导航**：冷 profile 直接带 token URL，303 换 cookie 链会丢状态、页面停在
-  "authentication required"（CPD 实测，body 只有 68 字节提示行）。先 `location.href = origin`
-  建立上下文，再带 token 进——完整挂载。
-- **驱动的 evaluate 不 await Promise**：`(async () => { … })()` 返回序列化 Promise 恒真值不可用
-  ——时序由场景侧 sleep 控制，页面动作用**同步 IIFE**。
+- **两段式导航**：冷 profile 直接带 token URL，303 换 cookie 链会丢状态、页面停在 "authentication required"（CPD 实测，body 只有 68 字节提示行）；先 `location.href = origin` 建立上下文，再带 token 进——完整挂载。
+- **驱动的 evaluate 不 await Promise**：`(async () => { … })()` 返回序列化 Promise 恒真值不可用——时序由场景侧 sleep 控制，页面动作用**同步 IIFE**。
 - **首启双模态**（Internal Testing Notice + Preview Notice，0.2.0 起两个）：每个新浏览器上下文
   都会弹，Continue 同名按钮逐个关。
 - **Start-chip 回切**：右栏开一个页签后 guide 列表被页签条替换——开下一个页签前先回 Start。
