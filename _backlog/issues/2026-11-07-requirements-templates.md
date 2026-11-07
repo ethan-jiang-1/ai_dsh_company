@@ -54,3 +54,16 @@ opened: 2026-11-07
 - `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；证据并入程序 Note（`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/））；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。
+
+## 交付证据
+
+- 基线：`git rev-parse HEAD` = `40fa060`（A1 提交后）
+- 红（模板未建）：`pnpm vitest run tests/company/requirements-templates.spec.ts` → `7 failed | 1 passed`（strs/syrs/irs/allocation 缺失）
+- 红（PRD 双定义点）：正文标题改回 `### REQ-002` → `1 failed | 8 passed`，断言原话 = 「PRD 正文出现了定义形状的标题：REQ-002」
+- 红（门禁在场）：`mv templates/syrs.md` 后 `pnpm verify` → `FAIL company-skeleton: … templates/syrs.md 缺失`、`FAIL base-clean: … 缺失`，`2 FAILURE(S)`；还原后绿
+- 绿：`pnpm vitest run tests/company/requirements-templates.spec.ts tests/company/prd-check.spec.ts` → `17 passed`；`pnpm vitest run tests/company` → `43 files / 263 tests passed`；`pnpm verify` → `ALL PASS`
+- 资产：`tests/company/requirements-templates.spec.ts`（9 条判据，含门禁在场）；六个模板（mrd/strs/prd/syrs/irs/allocation）；`base-clean`/`company-skeleton` 纳入模板在场 + 负例留证
+- 样例链自洽：MR-001 → StRS REQ-001 → PRD REQ-002（`source`+`traces`）→ SyRS REQ-003 → IRS IF-001；allocation 只引用不立号
+- 真跑：未跑（模板形状不证模型产出；A8 统一跑）
+- 文档/Note：`docs/guides/product-definition.md` 的产物结构节已指向 `definition` 形态；程序 Note 待 W5 落
+- 审查：`审查：agent — 2026-11-07`

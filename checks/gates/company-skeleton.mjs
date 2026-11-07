@@ -16,6 +16,8 @@ export function run({ root, ok, fail }) {
     `${CONTENT}/templates/meta.md`,
     // 负例留证 2026-11-07（A1）：删 `state/process-docs.md` → 本门禁红（「缺失」而非崩）。
     `${CONTENT}/state/process-docs.md`,
+    // 负例留证 2026-11-07（A2）：删任一五层模板 → 本门禁红（「缺失」而非崩）。
+    ...['mrd.md', 'strs.md', 'prd.md', 'syrs.md', 'irs.md', 'allocation.md'].map(file => `${CONTENT}/templates/${file}`),
     ...ROLES.map(role => `${CONTENT}/charters/${role}.md`),
     ...['company.md', 'org.md', 'owners.md', 'motion-ledger.md'].map(file => `${CONTENT}/state/${file}`),
   ]

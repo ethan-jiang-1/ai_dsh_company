@@ -1,8 +1,15 @@
+---
+layer: PRD
+definition: json-ledger
+---
+
 # PRD（产品需求 · 需求账本 + 一页纸）
 
-> 主笔 = **VP-Eng**；输入 = 同目录 `drafts/mrd.md`（CMO 的市场机会）；落 `drafts/prd.md`。
+> 主笔 = **VP-Eng**；输入 = 同目录 `drafts/mrd.md`（CMO 的市场机会）+ `drafts/strs.md`（CMO 的涉众需求）；落 `drafts/prd.md`。
 > **它不是文章**：研发按 slice 一批一批吃，**一 REQ 一任务**；每条 REQ 必须指回 MR id。
-> 机械校验 = `/prd check <deliverables 目录名>`；字段写不出就写"未定"，别用形容词填。
+> **JSON 账本是唯一定义点**（`definition: json-ledger`）：正文小节标题只是引用，不得再以裸 ID 开头。
+> `source` 指 MR 来源、`traces` 指上游 StRS 条目（跨层追溯由这两个字段写边，不靠正文聚集）。
+> 机械校验 = `/prd check <deliverables 目录名>`；编号/追溯 = `/req check <deliverables 目录名>`；字段写不出就写"未定"，别用形容词填。
 > 技术方案 ≠ 本文件（那是 `review-note.md`）；定价 ≠ 本文件（归 VP-Sales / CFO）。
 
 ```json
@@ -11,20 +18,21 @@
     "version": "0.1",
     "status": "draft",
     "slices": [
-      { "id": "S1", "goal": "最小端到端：<能演示/能验收的最小闭环>", "requirements": ["REQ-001"] }
+      { "id": "S1", "goal": "最小端到端：<能演示/能验收的最小闭环>", "requirements": ["REQ-002"] }
     ],
     "requirements": [
       {
-        "id": "REQ-001",
+        "id": "REQ-002",
         "title": "<一句话需求>",
         "type": "functional",
         "priority": "P0",
         "status": "draft",
         "source": ["MR-001"],
+        "traces": ["REQ-001"],
         "slice": "S1",
         "userStory": "作为<谁>，我要<做什么>，以便<得到什么>",
         "acceptance": [
-          { "id": "AC-001-1", "given": "<前置>", "when": "<动作>", "then": "<可观测结果>" }
+          { "id": "AC-002-1", "given": "<前置>", "when": "<动作>", "then": "<可观测结果>" }
         ],
         "dependsOn": [],
         "verification": "test",
@@ -66,14 +74,14 @@
 |---|---|---|---|
 | S1 | | | |
 
-## 需求详述（每个 REQ 一节，与 JSON 账本一一对应）
+## 需求详述（每个 REQ 一节，引用 JSON 定义点；本节不定义号）
 
-### REQ-001 <标题>
+### 需求说明：REQ-002 <标题>
 
-- 来源：MR-001｜slice：S1｜优先级：P0｜状态：draft｜验证：test
+- 来源：MR-001｜StRS：REQ-001｜slice：S1｜优先级：P0｜状态：草案（draft）｜验证：test
 - 用户故事：…
 - 验收：
-  - **AC-001-1** given … / when … / then …
+  - **AC-002-1** given … / when … / then …
 - 依赖：REQ-…（无写"无"）
 - 未决：…
 
@@ -85,4 +93,4 @@
 
 | 任务 | REQ | 依赖 | 验收 |
 |---|---|---|---|
-| | REQ-001 | | AC-001-1 |
+| | REQ-002 | | AC-002-1 |

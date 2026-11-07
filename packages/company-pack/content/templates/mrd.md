@@ -1,3 +1,8 @@
+---
+layer: MRD
+definition: json-ledger
+---
+
 # MRD（市场需求 · 一页纸 + 机会账本）
 
 > 主笔 = **CMO**；落 `drafts/mrd.md`；它是 PRD 的输入（VP-Eng 主笔 PRD）。
