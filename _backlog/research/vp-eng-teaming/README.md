@@ -7,7 +7,7 @@ opened: 2026-11-07
 
 > 问题：VP-Eng 能不能像 CEO 一样组队解决研发问题——简单自己处理、复杂依赖 CMO/SA/SQA，产出 MRD/PRD 与细节，同时不破坏 CEO 组队？
 > 消费者：用户 2026-11-07 直接提出；[落地拆法卡](../../issues/2026-11-07-requirements-teaming-landing.md)（B1/B2）。
-> 产出的卡：[落地拆法卡](../../issues/2026-11-07-requirements-teaming-landing.md)（建议的 B1/B2；拆卡待用户批准）。
+> 产出的卡：[程序伞卡](../../issues/2026-11-07-requirements-teaming-landing.md) + [B1 组队能力](../../issues/2026-11-07-vpeng-teaming.md) / [B2 E2E + 收口](../../issues/2026-11-07-vpeng-evidence-closeout.md)。
 > 结论：**VP-Eng 在自己的根门里可以带“同组合的研发小队”，但不能把 CMO/SA/SQA 拉成 teammate**——teammate 继承 Lead 的 preset，只有命名 child 才由 `agentPreset` 给真人格；跨角色依赖走命名委托。CEO 的组队不动，VP-Eng 组队是“多门模式”的延伸，不是 CEO team 的替代。
 
 ## 材料
