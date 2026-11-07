@@ -44,6 +44,8 @@ function completedRuns() {
 
 /** 接口表行：允许 `| IF-001 |` 与 `| **IF-001** |` 两种写法。 */
 const IF_ROW = /^\|\s*(?:\*\*)?IF-\d{3}/m
+/** 新合同（2026-11-07 编号合同）的 IRS 用 `#### IF-###` 标题定义；旧动议仍是表行。两种都要认。 */
+const IF_HEADING = /^#{2,4}\s+IF-\d{3}/m
 
 /** drafts 里按内容分类：SA-like（有 IF 表格行）/ SQA-like（SQA 家族的验证稿）。
  *  2026-11-07 修两处读错文档的口径（BUG-034 实现时发现，旧口径会让 SQA 侧判据假绿）：
@@ -63,7 +65,7 @@ function classify(dir) {
   const docs = markdownTree(draftsDir).map(path => ({ name: basename(path), text: readFileSync(path, 'utf8') }))
   // SA 稿 = IF 表格行最多的那一份（SQA 的覆盖表也可能以 | IF-### 起头，但列数少；
   // 合并多份会把 minCols 拉低成假失败——2026-11-06 实踩）。
-  const candidates = docs.filter(d => ifIds(d.text).length >= 3 && IF_ROW.test(d.text))
+  const candidates = docs.filter(d => ifIds(d.text).length >= 3 && (IF_ROW.test(d.text) || IF_HEADING.test(d.text)))
   const rowsOf = text => text.split('\n').filter(line => IF_ROW.test(line))
   // 取「最宽的接口表」那一份当 SA 正本：先比最小列数（谁更完整），再比行数。SQA 的覆盖表往往
   // 列数少、行数多，单看行数会选错（2026-11-06 实踩：28 行 3 列盖过 14 行 7 列）。
@@ -115,13 +117,16 @@ for (const dir of completedRuns()) {
   const FAULT_WITHSTAND = /短路(?:电流|分断|耐受|能力)|故障电流|分断能力|分断时间|耐受包络|破坏性试验|熔焊/
   const SQA_WITHSTAND = /短路(?:电流|分断|耐受)|故障电流|分断能力|分断时间|耐受包络|破坏性试验|熔焊/
   const recordClaim = RECORD_CLAIM.test(saText)
+  const headingForm = !IF_ROW.test(saText) && IF_HEADING.test(saText)
   const seriesPath = SERIES_PATH.test(saText)
   const timeSource = TIME_SOURCE.test(saText)
   const sqaTime = SQA_TIME.test(sqaText)
   const withstand = FAULT_WITHSTAND.test(saText)
   const sqaWithstand = SQA_WITHSTAND.test(sqaText)
   const checks = [
-    ['Q1 接口清单 ≥8 条且行 ≥6 列（契约 = 6 字段）', ids.length >= 8 && minCells >= 6, `ids=${ids.length} minCols=${minCells}`],
+    // headings 形态（新合同）没有表格列可数：Q1 退到「接口条数」；列数判据只对旧表行形态成立。
+    ['Q1 接口清单 ≥8 条且行 ≥6 列（契约 = 6 字段）', headingForm ? 'skip' : ids.length >= 8 && minCells >= 6,
+      headingForm ? `headings 形态：ids=${ids.length}（列数判据不适用）` : `ids=${ids.length} minCols=${minCells}`],
     ['Q2 失败语义 + 事实/假设/待验标注', has(saText, /失败/) && has(saText, /【(事实|假设|待验)/), ''],
     ['Q3 SQA 有判据 + 明确裁决', has(sqaText, /判据|放行/) && has(sqaText, /不通过|否决|通过|待验/), ''],
     ['Q4 V 模型四层在场', ['单元', '集成', '系统', '验收'].every(k => sqaText.includes(k)) || /L1[\s\S]{0,400}L4/.test(sqaText), ''],

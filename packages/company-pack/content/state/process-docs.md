@@ -14,7 +14,7 @@
 | 4 | **SyRS** 系统需求 | 系统作为黑盒必须满足什么、每条怎么验 | SA | `drafts/syrs.md` | `headings` | `REQ-###` |
 | 5 | **IRS** 接口需求 | 跨边界的接口长什么样 | SA | `drafts/irs.md` | `headings` | `IF-###` |
 | — | 分配附录 | 需求落到子系统 / 采购件 | SA | IRS 附录 `allocation.md` | `none` | 不立号 |
-| — | V&V 计划 | 怎么验证、谁执行 | SQA | `drafts/vv-plan.md` | `table-rows` | `TC-###` |
+| **V&V** 验证计划 | 怎么验证、谁执行 | SQA | `drafts/vv-plan.md` | `table-rows` | `TC-###` |
 
 **顺序固定，前一份是后一份的输入，不跳级**：MRD → StRS → PRD → SyRS → IRS。下游不替上游做决定。
 `final.md`、评审稿、任务书**不声明 `layer`**——它们只是引用面，不定义任何号。
@@ -43,7 +43,8 @@ definition: headings
 ---
 ```
 
-- `layer` ∈ `MRD / StRS / PRD / SyRS / IRS`；`definition` 见上表。
+- `layer` ∈ `MRD / StRS / PRD / SyRS / IRS`（验证计划另用 `V&V`）；`definition` 见上表。
+- `V&V` 计划的表头必须带 `covers` 列（值 = `REQ-###` / `IF-###`），checker 按表头取覆盖。
 - 文件名只是约定，**机器只认头**：同一份 IR 的摘要表 + 正文标题两种形态并存时，按声明的形态取定义，另一种算引用。
 - 头缺失或被改：checker 报「缺层声明」，不猜。
 

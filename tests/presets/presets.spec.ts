@@ -679,3 +679,32 @@ describe('SA 产出：SyRS + IRS + 架构，验证点只引用不发号（A4a）
     expect(skill, '验证点必须点名引用 REQ/IF').toMatch(/验证点[^\n]*(REQ|IF)/)
   })
 })
+
+describe('SQA 产出：TC-### + V&V 表 + 独立结论（A4b）', () => {
+  const RETIRED = /\b(?:STR|SYR|IFR|VR|VP|V)-(?:#|\d)/
+  const SQA_SKILL = join(PRESETS_DIR, 'system-qa/skills/vv-playbook/SKILL.md')
+
+  it('SQA persona 声明 vv-plan.md 的 TC-### 与 covers', () => {
+    const persona = roleYml('system-qa')
+    expect(persona, 'SQA persona 缺 vv-plan.md').toContain('vv-plan.md')
+    expect(persona, 'SQA persona 缺 TC-###').toContain('TC-###')
+    expect(persona, 'SQA persona 缺 covers').toContain('covers')
+  })
+
+  it('vv-playbook 写 layer: V&V + table-rows + covers 列 + L1–L4', () => {
+    const skill = readFileSync(SQA_SKILL, 'utf8')
+    expect(skill, 'skill 缺 vv-plan.md').toContain('drafts/vv-plan.md')
+    expect(skill, 'skill 缺 layer: V&V').toContain('layer: V&V')
+    expect(skill, 'skill 缺 definition: table-rows').toContain('table-rows')
+    expect(skill, 'skill 缺 covers 列').toContain('covers')
+    for (const level of ['L1', 'L2', 'L3', 'L4']) expect(skill, `skill 缺 ${level}`).toContain(level)
+    expect(skill, 'skill 仍出现退役号形（VP/V/VR-###）').not.toMatch(RETIRED)
+    expect(roleYml('system-qa'), 'SQA persona 仍出现退役号形').not.toMatch(RETIRED)
+  })
+
+  it('结论原样与独立性纪律在场（删结论 = 红）', () => {
+    const skill = readFileSync(SQA_SKILL, 'utf8')
+    expect(skill, 'skill 缺「结论原样」条款').toMatch(/原样/)
+    expect(skill, 'skill 缺不写架构/PRD 的独立性纪律').toMatch(/不写架构/)
+  })
+})
