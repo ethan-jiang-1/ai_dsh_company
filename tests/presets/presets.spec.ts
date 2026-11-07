@@ -708,3 +708,36 @@ describe('SQA 产出：TC-### + V&V 表 + 独立结论（A4b）', () => {
     expect(skill, 'skill 缺不写架构/PRD 的独立性纪律').toMatch(/不写架构/)
   })
 })
+
+describe('VP-Eng 组队：根门带小队 + 命名专家（B1）', () => {
+  const ENG_TEAMING = join(PRESETS_DIR, 'vp-eng/skills/eng-teaming/SKILL.md')
+
+  it('vp-eng 有 vp_cmo 行（maxDepth 2 → cmo）；CEO 的 vp_cmo 仍 maxDepth 1', () => {
+    const eng = roleYml('vp-eng')
+    expect(eng, 'vp-eng 缺 vp_cmo 委派行').toMatch(/toolName: vp_cmo[\s\S]{0,80}maxDepth: 2[\s\S]{0,80}agentPreset: cmo/)
+    const ceo = roleYml('ceo')
+    expect(ceo, 'CEO 的 vp_cmo 必须保持 maxDepth 1（D7：CEO 团队边界不动）').toMatch(/toolName: vp_cmo[\s\S]{0,80}maxDepth: 1/)
+    // 根门已在 keyless 探针证 Lead；这里只钉 JSON 声明面。
+  })
+
+  it('eng-teaming skill 四档决策树与硬规则在场', () => {
+    expect(existsSync(ENG_TEAMING), 'vp-eng 缺 eng-teaming skill').toBe(true)
+    const skill = readFileSync(ENG_TEAMING, 'utf8')
+    for (const tier of ['自己做', '一次性 worker', '命名专家', '持久小队']) {
+      expect(skill, `eng-teaming 缺档位「${tier}」`).toContain(tier)
+    }
+    for (const rule of ['不能冒充', 'spawn_teammate', 'vp_cmo', 'system_architect', 'system_qa']) {
+      expect(skill, `eng-teaming 缺 ${rule}`).toContain(rule)
+    }
+    expect(roleYml('vp-eng'), 'persona 必须点名先加载 eng-teaming').toMatch(/先加载 `eng-teaming` skill/)
+    expect(roleYml('vp-eng'), 'persona 必须写明成员不是角色').toMatch(/成员[^\n]*(不是|而非)[^\n]*角色/)
+  })
+
+  it('继承口径分通道：teammate 继承 Lead；命名 child 由 agentPreset 给组合', () => {
+    const handbook = readFileSync(join(PACK, 'content/AGENTS.md'), 'utf8')
+    expect(handbook, '手册必须写 teammate 继承 Lead 组合').toMatch(/teammate[^\n]*继承[^\n]*组合|继承[^\n]*Lead[^\n]*组合/)
+    expect(handbook, '手册必须写命名 child 按自己的 preset 组合').toMatch(/命名[^\n]*child[^\n]*(agentPreset|preset)/)
+    const delegation = readFileSync(join(ROOT, 'docs/delegation.md'), 'utf8')
+    expect(delegation, 'delegation.md 必须写根会话 = Team Lead').toMatch(/根会话[^\n]*Lead|Lead[^\n]*根会话/)
+  })
+})

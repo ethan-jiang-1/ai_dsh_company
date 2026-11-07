@@ -28,7 +28,8 @@ export function mirrorCompanyReference(workspace, companyRoot, { contentRoot } =
     mkdirSync(dir, { recursive: true })
   }
   const copy = (source, target) => { if (existsSync(source)) cpSync(realpathSync(source), target, { force: true }) }
-  for (const file of ['company.md', 'org.md', 'owners.md', 'motion-ledger.md']) {
+  // 编号合同（A7/A8）也随参考镜像：排练场跑新动议需要它与真盘一致。
+  for (const file of ['company.md', 'org.md', 'owners.md', 'motion-ledger.md', 'process-docs.md']) {
     copy(join(content, 'state', file), join(run, 'kb', file))
   }
   for (const role of ROLES) {

@@ -24,6 +24,7 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 | `subagent_research` | 通用研究员（一次性调研） | `provider: spawn` · `agentPreset: researcher`（只读工具面） |
 | `system_architect` | 系统架构师 SA（落地项目，V 模型左侧） | `provider: spawn` · `maxDepth: 2` · `agentPreset: system-architect` |
 | `system_qa` | 系统质量保证 SQA·V&V（落地项目，V 模型右侧） | `provider: spawn` · `maxDepth: 2` · `agentPreset: system-qa` |
+| `vp_cmo` | CMO（命名专家：MRD/StRS；**只在 vp-eng preset**，CEO 的 vp_cmo 仍 maxDepth 1） | `provider: spawn` · `maxDepth: 2` · `agentPreset: cmo` |
 
 - **activation 语义**：调用立刻返回回执 `{ kind: 'activation', subagentId }`（线上文本形如
   `started subagent <id>`）；子代理的**最终正文**作为父会话的完成通知送达
@@ -55,12 +56,21 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 
 - CEO preset 里**不放** `tool-subagent-control` / `tool-subagent-list-agents`：在 CEO 会话里它们
   是被团队版盖掉的**死行**。`pnpm test` 有**反向守卫**，别"修"回来。
-- 职能 preset（vp-eng / vp-sales / coo / cfo）**要放**：它们的根会话不是团队成员，团队版不会装；
-  缺了这两行，activation child 在职能会话里同样失联。
+- 职能 preset（vp-eng / vp-sales / coo / cfo）**要放**：根门虽是 Lead（团队版会装、这几行被 shadow），
+  但**命名 child 不是 team member**——它加载该职能 preset 时只有全局行可用；缺了就是 activation child 失联。
 - 续驶/连续对话归 team（§3）。
 
 证据：`snapshots/replay/foundation-workspace/replay/session.v3.jsonl` 的第一帧 `request/header`（R2 归档即已如此）；
 `checks/smoke/delegation-smoke.mjs` 在全新会话复现并把它变成回归守卫。
+
+### 2.1 根门 = Team Lead（B1 机制事实）
+
+任何没有 `parentSession` 的根会话都是 Lead（`agentTeam` 投影 = 单成员 `lead`）⇒ **VP-Eng 根门可以
+`spawn_teammate` 带研发小队**（成员继承 VP-Eng 组合，是"VP-Eng 带的工程师"，不是别的角色）。
+三种门的能力不同，别用一个门承诺另一个：① VP-Eng 根门 = Lead，能组 team、能命名请 CMO/SA/SQA；
+② CEO 命名 `vp_eng` child = 不是 member，不能 spawn，但能请专家（depth 2）；③ CEO teammate `vp-eng`
+= 继承 CEO 组合，受 CEO 的 `vp_cmo maxDepth 1` 限制。root=Lead 的 keyless 证据 =
+`probes/team/vp-eng-root-lead-probe.mjs`。
 
 ## 3. 团队（通道 B，主通道 D4）
 
@@ -98,20 +108,8 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 
 ## 6. 验证（分层，只报告实际跑过的）
 
-**分层原则（R3 立，命令与预算 = [tests/README](../tests/README.md)）**：按"要不要模型"切，不按"重不重要"切。真模型/真浏览器
-**不进回归**——它们分钟级且依赖模型配合；回归只跑秒级的 keyless 层。
-
-| 层 | 手段 | 守什么 | 何时跑 |
-|---|---|---|---|
-| keyless 行为 | `pnpm test` → `tests/client/ui/delegation-card.spec.ts`：纯函数视图模型（running/ok/error/stopped、brief 解析、截断 JSON 回退、未知工具名回退）+ `react-dom/server` 静态渲染 | 卡片**渲染语义**（不需要 DOM、不需要模型，毫秒级） | 每次改动 |
-| keyless 装配 | `pnpm test` → `tests/client/wiring/client-face.spec.ts`：卡片 key ↔ preset `toolName` **逐字一致** + 注册走共享常量 + 单独 `inject(['slots'])` | keyed slot 的**静默失效**（key 拼错 = 永不渲染） | 每次改动 |
-| 真页面挂载 | `node checks/smoke/client-load-smoke.mjs`：真浏览器加载真页面，零 loader 错误 + 品牌在场 | client 入口 apply 抛错（slot 名写错会在这里炸，postmortem 0003） | 客户端改动 |
-| 机制 / 边界 | `node checks/smoke/delegation-smoke.mjs`（1 条 prompt ≈30s）：`vp_eng`/`vp_sales`/`subagent_research` 在模型可见目录 + 三个控制名仍是团队版；`--delegate` 真委派一次，断言收到 activation 回执（`started subagent <id>`）、child 日志首帧 `agentPreset = vp-eng`、child 目录无 Team 工具 | activation 语义回归（回执变正文 = 红）；preset 组合没落到 child；Team 工具误入 child 目录 | 该边界改动后 / **升 pin 时** |
-| 挂载（上线前门禁） | `node checks/smoke/preset-smoke.mjs` | 行 config 校验（preset 挂载失败，postmortem 0001） | preset 组合或内容改动后 |
-| 端到端（**历史，R5a**） | 模型真调 `vp_eng` → 真 UI 对话流里的委派卡 | "模型→工具→卡片"全链路 | 原 `replay-smoke --ui` 金样已随真实快照移出产品仓；现行真页面车道 = `ui-scene-smoke`（页签/错误环），委派卡专项断言待合成场景回归 |
-
-**为什么端到端走重放而非每轮真跑（R3 试过并否决）：**先做的是"真浏览器 + 真 composer 驱动模型"
-的 e2e，240s 都等不到卡片——CEO persona 的开工仪式先烧 5–6 步模型往返，且**依赖模型配合**
-（模型不调那个工具就永远绿不了）；改成"RPC 造证据 + 真浏览器只做渲染断言"后，又卡在侧栏
-**会话列表成员/排序**（RPC 建的会话不在侧栏可见行里，属无关的 UI 细节）。结论：这条链的正确
-形态是 replay harness（录制会话 → 无 key 重放；R5a 已交付），不是每轮真跑。
+**分层原则（R3 立）**：按"要不要模型"切，不按"重不重要"切；真模型/真浏览器不进回归。
+**逐层命令、预算与触发条件 = [tests/README](../tests/README.md) 与各脚本头注**（本文件不复述，避免两处漂移）：
+keyless（`pnpm test`：委派卡视图模型 + card key ↔ `toolName` 逐字一致）→ 真页面挂载
+（`client-load-smoke`）→ 机制/边界（`delegation-smoke`：activation 回执、child 首帧 `agentPreset`、
+child 无 Team 工具）→ 挂载（`preset-smoke`）→ 端到端（历史重放；现行真页面车道 = `ui-scene-smoke`）。

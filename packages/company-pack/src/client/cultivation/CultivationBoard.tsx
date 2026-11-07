@@ -127,7 +127,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
           <li>采纳 = 把做法写进那个角色的方法层：新开的该角色会话带着它开工；已经在跑的会话也会随技能目录刷新看到它。当前这段对话不受影响。</li>
           <li>同类任务上见效后回填「{CULTIVATION_COPY.verifyPass}」；不灵了「{CULTIVATION_COPY.revoke}」撤回（会删掉方法，记录也不能再被采纳）。</li>
           <li>分身自己也能提案（工具里叫 cultivation_propose）；采纳、拒绝、撤回、验证只能由人在这里点。</li>
-          <li>CEO 委派出去的分身继承 CEO 组合——职能角色的方法不会进委派 child，要用职能方法就开那个角色的会话。</li>
+          <li>teammate 继承 CEO 组合（职能方法不会进 teammate）；命名委派 child 有自己的 preset——要用职能方法，改走命名委派（如 vp_eng）或开那个角色的会话。</li>
         </ul>
         <details className="wk-cultivation-commands">
           <summary>熟手命令行</summary>

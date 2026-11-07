@@ -54,3 +54,18 @@ VP-Eng 组队（B1/B2）；跨动议键。
 - `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；证据并入程序 Note（`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/））；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。
+
+## 交付证据
+
+- 基线：`git rev-parse HEAD` = `33b3273`（A7 提交后）
+- **第 1 次真跑（2026-11-07 18:02–18:22，20min 墙）**：`session-0197f368-6fc3-492a-9028-19c39bbe983c`，slug `2026-11-07-recon-bank-autorecon` → C1 5/6（缺 `vv-plan.md`）；SA 的 syrs/irs 已落、SQA 子会话 18:18 才创建（被墙钟切断）。判据真红，不是环境错。
+- **第 2 次真跑（重跑 1 次；2026-11-07 18:24–18:44，30min 墙，SQA 并行）**：`session-7e9ddc07-8722-405b-b22d-9fcf279129ef`，slug `2026-11-07-recon-bank-autorecon-v2` → **ALL PASS**：
+  - C1 五层 + V&V：`mrd/strs/prd/syrs/irs/vv-plan` 6/6 落盘（+ `sqa-review.md`、`ceo.md`）
+  - C2 头：六份 `layer/definition` 全部匹配（MRD/PRD=json-ledger；StRS/SyRS/IRS=headings；V&V=table-rows）
+  - C3 meta `编号体系: identity` + `需求层: MRD..V&V`；**checker 绿**：`MR 4 / REQ 44 / IF 8 / TC 49`，索引派生、无退役/重复/悬空/孤儿/覆盖缺口
+  - C4 无 `final.md`；C5 接线：2 个 teammate（继承 ceo 组合）+ `system-architect` / `system-qa` 两个命名 child
+  - C6 `/req check` 命令回执：**环境阻断**（dev home writer lease 被另一个常驻进程 pid 98394 持有 → 宿主的 `dataBlocked` 守卫报「公司数据已停写」；停写守卫本身是期望语义，不是产品红）。命令解析/读盘/回执的 green 路径由 A6 `req-command.spec` 8 条 keyless 断言覆盖；真会话 green 回执待下一次非阻断运行补
+- 两次差异：第 1 次墙钟 20min 且 SQA 串行（新建子会话太晚）→ 缺 V&V；第 2 次墙钟 30min + 任务书要求 SA/SQA 并行 → 全绿。不把单次绿写成「稳定」。
+- 资产：新 `probes/team/requirements-chain-probe.mjs`（C1–C6 判据、逐次结果写 `runtime/requirements-chain-probe/last-run.json`）；`checks/INDEX.generated.md` 重新生成（team 探针 17→18）；`tools/lib/rehearsal.mjs` 镜像补 process-docs
+- 文档/Note：程序 Note 待 W5 落；`docs/guides/product-definition.md` 的操作面已在 A1/A2 落
+- 审查：`审查：agent — 2026-11-07`

@@ -156,9 +156,12 @@ describe('CultivationBoard：数据诚实与能力呈现（V2/V8/V9）', () => {
     expect(verified).toContain('已验证')
   })
 
-  it('诚实边界：委派 child 继承 CEO 组合的说明在场（V9）', () => {
+  it('诚实边界：teammate 继承 Lead 组合、命名 child 有自己 preset 的说明在场（V9；B1 改口径）', () => {
     const markup = render()
-    expect(markup).toContain('继承 CEO 组合')
+    // 2026-11-07 B1：旧文案说「委派出去的分身都继承 CEO 组合」——对 teammate 成立，对命名 child 不成立
+    // （命名 child 由 agentPreset 选组合，职能方法能加载）。文案改成两通道分开说。
+    expect(markup).toContain('teammate 继承 CEO 组合')
+    expect(markup).toContain('命名委派 child 有自己的 preset')
   })
 
   it('不出现开发命令与内部门禁编号（V10；/cultivation 命令是产品操作，不在黑名单）', () => {

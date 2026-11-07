@@ -26,9 +26,7 @@
 
 实测方式：web 观察窗的 `agentPresets/list` RPC（DSH 出厂 4〔cordis/minimal/ptc/standard，vendor `web-app/presets/`〕+ 本 pack 9，零 broken）。
 
-**`researcher` 为什么存在（0.2.1）**：委托 child 的人格只能由 `agentPreset` 给；不钉 preset 时 child 继承 CEO 组合，
-成了"没有 CEO 判断材料、却带 CEO 职责"的迷你 CEO。researcher = 只读工具面 + 一次调研一页纸的**手**，
-不是公司角色；UI 按 trust 分组，故九张卡（6 公司角色 + 3 子人格）出现在 **Built-in** 组（`AgentPresetSection.tsx`）。2026-11-06 又加 `system-architect` / `system-qa` 两个子人格（VP-Eng 落地项目的 V 模型两侧；委托行与 SQA 否决见 [delegation](delegation.md)）。
+**子人格为什么存在（`researcher` / `system-architect` / `system-qa`）**：决定与输掉的方案见程序 Note `2026-11-07-requirements-teaming-program.md` §决定；委托行与 SQA 否决见 [delegation](delegation.md)。
 
 ## 四形态矩阵：身份、工具与 skills 从哪来（RFC preset-skill-matrix 2026-10-05 立）
 
@@ -63,7 +61,8 @@
   需要深挖时生 workers 并署自己的判断；**不替别的职能下结论**。
 - **工作流（1 号）**：`eng-workflow`（接活→备料→深挖→出稿→回执）；打法 skill =
   `tech-feasibility-review`（选项枚举 ≥3 → 逐项可行性·成本·风险 → 结论先行）。
-- **PRD 主笔**：接 CMO 的 MRD 写 PRD（`drafts/prd.md`：REQ/AC/slice），用 `prd-playbook` + 共享 `product-definition`；`/prd check <目录名>` 校验（含 no-go/defer 边界）。
+- **PRD 主笔**：接 CMO 的 MRD+StRS 写产品层 PRD（`drafts/prd.md`：REQ/AC/slice，`source`→MR、`traces`→StRS），用 `prd-playbook` + 共享 `product-definition`；`/prd check`（结构）+ `/req check`（编号/追溯）校验。
+- **组队（2 号工作流）**：`eng-teaming` 四档（自己做 / 一次性 worker / 命名专家 / 持久小队）；vp-eng 根门 = Team Lead，可带研发小队；CMO/SA/SQA 走命名委托（`vp_cmo` / `system_architect` / `system_qa`，depth 2）。
 - **KB**：`kb/vp-eng/CHARTER.md`（研发条线 16 人、SRE 2 / 无 DBA、Node 22 + SQLite、AI 试点
   API 每案 $200/月硬顶；历史评审三问）+ `journal/`。
 - **验证**：Web 会话选 `vp-eng` → 身份探针 + 产出探针（PRD 出稿：REQ/AC/slice；评审意见；不得越权替销售/运营下结论）。
@@ -82,7 +81,7 @@
   产出=对 PRD 出定价/现有客户影响意见（新市场归 CMO），不越权）。
 
 ## CMO（职能化身：市场与产品定义，2026-11-05 增设）
-- **persona**：视角=市场机会/产品定义/买点；"市场不成立"即 veto；产出 MRD（`templates/mrd.md`，`MR-###`，标【事实/假设】）；不替 VP-Sales 定价、不替 VP-Eng 定技术。
+- **persona**：视角=市场机会/产品定义/买点；"市场不成立"即 veto；产出 MRD（`MR-###`）+ StRS（`REQ-###`，`traces`→MR，标【事实/假设】）；不替 VP-Sales 定价、不替 VP-Eng 定技术。
 - **打法**：`mrd-playbook` + 共享 `product-definition`（脊柱 + 项目制/系统集成、硬软一体 playbook）。
 - **KB/验证**：`kb/cmo/CHARTER.md` + `journal/`；选 `cmo` 跑身份/知识/产出三探针；MRD→PRD 交接见 demo.md。
 
