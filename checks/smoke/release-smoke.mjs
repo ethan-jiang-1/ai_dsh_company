@@ -153,7 +153,8 @@ try {
   // 只读内容（2026-11-01 v3）：少了它，第三方装完插件就是"没有手册/模板/默认章程"的裸奔。
   check('安装副本带 content/（手册 + 模板 + 默认章程 + 状态默认值）',
     ['content/AGENTS.md', 'content/templates/meta.md', 'content/charters/ceo.md',
-      'content/state/org.md', 'content/state/owners.md', 'content/state/motion-ledger.md'].every(rel =>
+      'content/state/org.md', 'content/state/owners.md', 'content/state/motion-ledger.md',
+      'content/state/process-docs.md'].every(rel =>
       existsSync(join(installedPack, rel))),
     `根目录 = ${readdirSync(installedPack).sort().join(', ')}`)
   const installedManifest = JSON.parse(readFileSync(join(installedPack, 'package.json'), 'utf8'))

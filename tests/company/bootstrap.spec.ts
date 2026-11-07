@@ -35,6 +35,7 @@ function content(): string {
   writeFileSync(join(dir, 'state/org.md'), '# 组织\n')
   writeFileSync(join(dir, 'state/owners.md'), '# owners\n')
   writeFileSync(join(dir, 'state/motion-ledger.md'), '# 台账\n')
+  writeFileSync(join(dir, 'state/process-docs.md'), '# 编号合同\n')
   return dir
 }
 
@@ -48,6 +49,7 @@ describe('run bundle v3：planBootstrap', () => {
       const rels = plan.entries.map(entry => entry.rel)
       expect(rels).toContain('.dsh-company')
       expect(rels).toContain('.dsh-company/kb/company.md')
+      expect(rels, 'fresh 盘要 seed 编号合同（A7）').toContain('.dsh-company/kb/process-docs.md')
       expect(rels).toContain('.dsh-company/kb/ceo/CHARTER.md')
       expect(rels).toContain('.dsh-company/kb/cmo/CHARTER.md')
       expect(rels).toContain('.dsh-company/deliverables')
@@ -77,6 +79,8 @@ describe('run bundle v3：applyBootstrap（只补缺 / 绝不覆盖 / 可重入�
       const first = bootstrapCompanyWorkspace(pack, workspace)
       expect(first.plan.error).toBeUndefined()
       expect(first.result.created).toContain('.dsh-company/kb/company.md')
+      expect(first.result.created, 'fresh 盘 seed 编号合同').toContain('.dsh-company/kb/process-docs.md')
+      expect(readFileSync(join(workspace, '.dsh-company/kb/process-docs.md'), 'utf8')).toBe('# 编号合同\n')
       expect(first.result.created).toContain('.dsh-company/kb/cmo/CHARTER.md')
       expect(readFileSync(join(workspace, '.dsh-company/kb/cmo/CHARTER.md'), 'utf8')).toBe('# cmo 默认章程\n')
       expect(readFileSync(join(workspace, '.dsh-company/kb/org.md'), 'utf8')).toBe('# 组织\n')
@@ -85,9 +89,11 @@ describe('run bundle v3：applyBootstrap（只补缺 / 绝不覆盖 / 可重入�
       expect(existsSync(join(workspace, 'templates'))).toBe(false)
 
       writeFileSync(join(workspace, '.dsh-company/kb/owners.md'), '# 我们的人\n')
+      writeFileSync(join(workspace, '.dsh-company/kb/process-docs.md'), '# 我们迁移过的合同\n')
       const second = bootstrapCompanyWorkspace(pack, workspace)
       expect(second.result.created).toEqual([])
       expect(readFileSync(join(workspace, '.dsh-company/kb/owners.md'), 'utf8')).toBe('# 我们的人\n')
+      expect(readFileSync(join(workspace, '.dsh-company/kb/process-docs.md'), 'utf8'), '既有合同不得被覆盖').toBe('# 我们迁移过的合同\n')
     } finally {
       rmSync(pack, { recursive: true, force: true }); rmSync(workspace, { recursive: true, force: true })
     }

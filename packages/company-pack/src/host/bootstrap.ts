@@ -56,6 +56,8 @@ const STATE_FILES: readonly { source: string; target: string }[] = [
   { source: `${STATE_SOURCE}/org.md`, target: `${RUN_BUNDLE_REL.kb}/org.md` },
   { source: `${STATE_SOURCE}/owners.md`, target: `${RUN_BUNDLE_REL.kb}/owners.md` },
   { source: `${STATE_SOURCE}/motion-ledger.md`, target: `${RUN_BUNDLE_REL.kb}/motion-ledger.md` },
+  // 编号合同（A7）：fresh 盘 seed；既有盘只在缺失时补种，用户迁移过的版本一个字节不覆盖。
+  { source: `${STATE_SOURCE}/process-docs.md`, target: `${RUN_BUNDLE_REL.kb}/process-docs.md` },
 ]
 
 /** 目录骨架：只建 run bundle 内部目录。 */

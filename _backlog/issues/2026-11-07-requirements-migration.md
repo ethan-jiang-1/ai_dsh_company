@@ -62,3 +62,15 @@ opened: 2026-11-07
 - `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；证据并入程序 Note（`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/））；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。
+
+## 交付证据
+
+- 基线：`git rev-parse HEAD` = `1eb21e2`（A4b 提交后）
+- 红（seed 未接）：`pnpm vitest run tests/company/bootstrap.spec.ts` → `2 failed | 6 passed`（plan 不含 `.dsh-company/kb/process-docs.md`）
+- 绿：`pnpm vitest run tests/company/bootstrap.spec.ts` → `8 passed`（fresh seed + 既有盘 skip 且不覆盖用户改版）；`pnpm verify` → `ALL PASS`；`node checks/smoke/release-smoke.mjs` → `ALL PASS`（含「首启 40 件」「第二次零变更」「既有盘升级补种」）
+- dev 盘迁移：`cp kb/process-docs.md kb/process-docs.md.bak-2026-11-07`（3571B，保留）→ 用 pack 新合同整份替换（6256B）→ `diff -u` 130 行差异（= 旧 STR/SYR/IFR 合同 → 新 R1–R10 合同）；备份与差异路径即本卡证据
+- 旧动议范围：对 `company-workspace/.dsh-company/deliverables/2026-10-29-human-agent-capability-2026` 跑 checker（真 lib）→ `skipped: true / ok: true / reason = meta 无 编号体系: 标记——旧动议只读豁免`，不判红
+- 资产：`src/host/bootstrap.ts` 的 `STATE_FILES` 加 process-docs（只补缺）；`tests/company/bootstrap.spec.ts` 加 seed/skip/不覆盖三条；`checks/smoke/release-smoke.mjs` 的 content 在场清单加 process-docs；`docs/release.md` 版本纪律加「升级既有 workspace」一条（种子只补缺 + 旧动议 skipped）
+- `meta.md` 的 `编号体系` 字段由 A1 落，本卡只读取/验证（bootstrap 不改动议文件）
+- 用户确认：迁移备份就位（若需回滚 = 用 `.bak-2026-11-07` 覆盖回）；待 W5 汇总确认
+- 审查：`审查：agent — 2026-11-07`
