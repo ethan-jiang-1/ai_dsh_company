@@ -647,3 +647,35 @@ describe('需求编号链：CMO 产 MRD+StRS、VP-Eng 产 PRD（A3）', () => {
     expect(prd).not.toMatch(RETIRED)
   })
 })
+
+describe('SA 产出：SyRS + IRS + 架构，验证点只引用不发号（A4a）', () => {
+  const RETIRED = /\b(?:STR|SYR|IFR|VR|VP|V)-(?:#|\d)/
+  const SA_SKILL = join(PRESETS_DIR, 'system-architect/skills/systems-architecture/SKILL.md')
+
+  it('SA persona 声明 SyRS/IRS 两份需求文档 + 架构稿', () => {
+    const persona = roleYml('system-architect')
+    expect(persona, 'SA persona 缺 SyRS 落盘路径').toContain('syrs.md')
+    expect(persona, 'SA persona 缺 IRS 落盘路径').toContain('irs.md')
+    expect(persona, 'SA persona 缺 SyRS 层名').toContain('SyRS')
+    expect(persona, 'SA persona 缺 IRS 层名').toContain('IRS')
+    expect(persona, 'SA persona 缺 system-architecture 架构稿').toContain('system-architecture.md')
+  })
+
+  it('SA skill 写 SyRS（REQ）与 IRS（IF）的层头/追溯，并带 allocation 附录边界', () => {
+    const skill = readFileSync(SA_SKILL, 'utf8')
+    expect(skill, 'skill 缺 SyRS 产出').toContain('SyRS')
+    expect(skill, 'skill 缺 IRS 产出').toContain('IRS')
+    expect(skill, 'skill 缺 drafts/syrs.md').toContain('drafts/syrs.md')
+    expect(skill, 'skill 缺 drafts/irs.md').toContain('drafts/irs.md')
+    expect(skill, 'skill 缺行首 traces 追溯写法').toMatch(/traces:\s*\[REQ-/)
+    expect(skill, 'skill 缺 allocation 附录（不立号）').toContain('allocation')
+  })
+
+  it('验证点是引用清单：不发 VP-###，退役词零出现', () => {
+    const skill = readFileSync(SA_SKILL, 'utf8')
+    const persona = roleYml('system-architect')
+    expect(skill, 'SA skill 仍出现退役号形（VP-### 等）').not.toMatch(RETIRED)
+    expect(persona, 'SA persona 仍出现退役号形').not.toMatch(RETIRED)
+    expect(skill, '验证点必须点名引用 REQ/IF').toMatch(/验证点[^\n]*(REQ|IF)/)
+  })
+})

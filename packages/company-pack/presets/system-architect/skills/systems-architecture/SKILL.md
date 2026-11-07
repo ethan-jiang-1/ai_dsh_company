@@ -1,13 +1,24 @@
 ---
 name: systems-architecture
-description: 系统架构师（SA）的 V 模型左侧打法：系统需求→硬软一体架构→子系统/接口设计，产出架构稿与 IF-### 接口清单，并把「必须验证什么」列成验证点交给 SQA。
+description: 系统架构师（SA）的 V 模型左侧打法：PRD→SyRS（REQ-###）→IRS（IF-###）→硬软一体架构与子系统/接口设计；产出架构稿与接口清单，并把「必须验证什么」列成引用 REQ/IF 的验证点交给 SQA（不发新号）。
 ---
 # 系统架构 playbook（SA · V 模型左侧）
 
 ## 何时用
 
-VP-Eng 在**落地项目**（不是 demo）里把你叫来时。输入：PRD（REQ/AC/slice）或系统需求、公司技术栈
-（`kb/vp-eng/CHARTER.md`）、交付对象与现场约束。输出：`drafts/system-architecture.md` + `IF-###` 接口清单。
+VP-Eng 在**落地项目**（不是 demo）里把你叫来时。输入：PRD（REQ/AC/slice）与 StRS、公司技术栈
+（`kb/vp-eng/CHARTER.md`）、交付对象与现场约束。
+
+输出四件（同一轮）：
+
+| 产物 | 文件 | 头 | 号 |
+|---|---|---|---|
+| 系统需求 | `drafts/syrs.md` | `layer: SyRS` + `definition: headings` | `REQ-###`，每条 `traces: [REQ-###]`（PRD） |
+| 接口需求 | `drafts/irs.md` | `layer: IRS` + `definition: headings` | `IF-###`，每条 `traces: [REQ-###]`（SyRS） |
+| 分配附录 | `drafts/allocation.md` | `definition: none`（不声明 layer） | **不立号**，只引用 REQ/IF |
+| 架构稿 | `drafts/system-architecture.md` | 无（引用面） | 不立号 |
+
+写盘后跑 `/req check <slug>`（操作员命令）；红就改，别绕过。
 
 ## 左边三层（逐层写，别跳）
 
@@ -40,10 +51,11 @@ VP-Eng 在**落地项目**（不是 demo）里把你叫来时。输入：PRD（R
 
 ## 交接给 SQA（你定"要验什么"，他定"怎么验"）
 
-架构稿末尾列 **验证点**，每条：`VP-### | 对应架构/接口 | 必须证明什么 | 判据线索`。
-例：`VP-001 越限判定在临界区只报区间`、`VP-002 断连 30s 重连后数据不重不漏`。
-**记录可举证与故障路径耐受这两类验证点必须单列**（VP-###），不许只写在正文里——SQA 按验证点写判据，写不进清单就等于没交。
+架构稿末尾列 **验证点**，每条是**引用**（不发新号）：`引用 REQ-### / IF-### | 必须证明什么 | 判据线索`。
+例：`REQ-041 越限判定在临界区只报区间`、`IF-014 断连 30s 重连后数据不重不漏`。
+**记录可举证与故障路径耐受这两类验证点必须单列**，不许只写在正文里——SQA 按引用写 `TC-###` 与判据，写不进清单就等于没交。
 **你不写验证方法与通过结论**——那是 SQA 的独立结论；你只保证架构是"可验证的"。
+号只承载身份：验证点不另立前缀，`TC-###` 由 SQA 在 V&V 计划里发（`covers` 指向 REQ/IF）。
 
 ## 禁止
 

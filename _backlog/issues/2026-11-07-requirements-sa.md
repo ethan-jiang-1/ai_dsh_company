@@ -54,3 +54,14 @@ SQA 文案（A4b）、checker（A5）。
 - `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；证据并入程序 Note（`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/））；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。
+
+## 交付证据
+
+- 基线：`git rev-parse HEAD` = `fbe02aa`（A3 提交后）
+- 红（文案未改）：`pnpm vitest run tests/presets` → `3 failed | 41 passed`（SA persona 缺 syrs/irs / skill 缺 SyRS+IRS / skill 仍有 VP-###）
+- 红（负例：加回退役号形）：persona 保留「不写 VP-###」字样 → 1 failed（`SA persona 仍出现退役号形`）→ 改成「不另立验证点号」→ 绿
+- 绿：`pnpm vitest run tests/presets` → `44 passed`；真挂载 `node checks/smoke/preset-smoke.mjs` → `ALL PASS（6 个角色 + 3 个委派子人格）`；`node checks/smoke/probe-smoke.mjs` → `ALL PASS（6/6，快速档）`；`pnpm verify` → `ALL PASS`
+- 资产：`tests/presets/presets.spec.ts` 增「SA 产出」describe（3 条）；SA persona + `systems-architecture` skill 改为四件产物（SyRS/IRS/allocation/架构）+ 引用式验证点
+- 真跑：`probes/team/sa-sqa-delegation-probe.mjs`（真模型 4–9min）未在本卡单跑——E/V 接线由 A8 五层链 + B2 统一证；本卡只证文案/挂载
+- 文档/Note：程序 Note 待 W5 落；合同口径 = `content/state/process-docs.md`
+- 审查：`审查：agent — 2026-11-07`
