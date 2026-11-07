@@ -11,7 +11,7 @@ opened: 2026-11-07
 
 **问题与期望结果：** 用户 2026-11-07 要求把[需求识别与编号研究](../research/requirements-identification-numbering/2026-11-07-consensus.md)的结论落地，并让 VP-Eng 能组队解决研发问题——简单的事自己做，复杂的事依赖 CMO/SA/SQA，产出 MRD/PRD 与细节；同时不能破坏 CEO 已有的组队能力。期望本轮推敲完成 = **一张可评审的拆卡表**（几张、每张的结果/依赖/出口证据）+ 需要用户拍板的决策。**本轮不动 `_backlog/` 之外的任何文件。**
 
-**当前情况：** 已确认；详细证据 = 两份研究材料 + [卡集审计](../research/requirements-identification-numbering/2026-11-07-issue-set-audit.md)（21 项问题/修正/剩余风险）+ [V1/V2/V4/V11 验证](../research/requirements-identification-numbering/2026-11-07-validation-trial.md)（已跑原型）。
+**当前情况：** 已确认；详细证据 = 两份研究材料 + [卡集审计](../research/requirements-identification-numbering/2026-11-07-issue-set-audit.md)（21 项问题/修正/剩余风险）+ [V1/V2/V4/V11 验证](../research/requirements-identification-numbering/2026-11-07-validation-trial.md)（已跑原型）+ [执行计划](../research/requirements-identification-numbering/2026-11-07-execution-plan.md)（W0–W5）。
 
 - **编号**：共识的结构成立，但落地有四个冲突：① PRD 模板同时用 JSON 账本和 `### REQ-001` 当定义点（违反 R4）；② 旧 workspace 的 `kb/process-docs.md` 仍写 `STR/SYR/IFR`，pack 里没有新合同；③ 旧盘有 `V-` 659 / `VP-` 71 / `VR-` 75 处、reflog 里还躺着上一轮实现；④ R10 的强制点、§6 的状态位/层序/并发/范围未拍。详见[落地拆法材料](../research/requirements-identification-numbering/2026-11-07-landing-plan.md)。
 - **VP-Eng 组队**：keyless 实测证明 `vp-eng` 根会话的 `agentTeam` 投影就是 `{name:"lead", role:"lead"}`；teammate 继承 Lead 的 preset（既有 CEO teammate 日志首帧 `agentPreset:"ceo"`）；命名 child 才由 `agentPreset` 给人格；`spawn_teammate` 只有 Lead 能调。⇒ **VP-Eng 根门可以带“同组合的研发小队”，不能把 CMO/SA/SQA 拉成 teammate**；跨角色依赖走命名委托。详见[三门材料](../research/vp-eng-teaming/2026-11-07-three-doors.md)。
@@ -34,6 +34,35 @@ opened: 2026-11-07
 | **B2** | [VP-Eng E2E + 收口](2026-11-07-vpeng-evidence-closeout.md) | 整包 E2E + CEO 回归 + Note/归档 | B1/A8 |
 
 **粒度说明：** 6 张是“结果级”视图（合同/模板、角色、校验器、迁移、E2E、组队+收口）；11 张是“执行级”视图。A4 拆 A4a/A4b 是因为 SA/SQA 是 E/V 独立性的两半、验收不同；B1 不拆是因为文档/手册必须与行为同 diff。每张卡都带 `## 验收标准` + `## 测试资产`（方法 = `validation-design` / `validation-evidence`），A1/A2/A3/A4a/A4b/A5/A6/A7 都能独立验收、独立回滚。
+
+## 实施归属（不另立卡）
+
+| 剩余项 | 归属 | 还缺什么 |
+|---|---|---|
+| A5 真 checker | [A5 卡](2026-11-07-requirements-checker.md) | 实现 `src/lib/requirements-check.ts` + spec |
+| A6 `/req check` 命令 | [A6 卡](2026-11-07-requirements-command.md) | 实现 host 命令 + 注册 |
+| A8 五层真跑 E2E | [A8 卡](2026-11-07-requirements-e2e.md) | 先落 A3/A4a/A4b/A5/A6，再跑 probe |
+| B2 VP-Eng E2E + CEO 回归 | [B2 卡](2026-11-07-vpeng-evidence-closeout.md) | 先落 B1/A8，再跑 probe + smoke |
+| A1/A2/A3/A4a/A4b/B1 的产品代码/文案 | 各自执行卡 | 实现 |
+| 全量 `pnpm verify` / `pnpm test` | **不是独立卡**：各卡 + 本伞卡的证据义务；收口在 B2/本卡 | 实现后跑 |
+| 程序 Note / D57/D58 / docs / 归档 | 本伞卡 + B2 | 实现后收口 |
+
+**结论**：目前没有“现卡范围外”的新结果，所以**不另开实施卡**；`待落地` 只表示“可实施”，不授予实施。开工由用户点名/解除 `_backlog` 边界；出现现卡范围外的新问题才新开卡。
+
+## 执行计划（W0–W5）
+
+完整计划 = [2026-11-07-execution-plan.md](../research/requirements-identification-numbering/2026-11-07-execution-plan.md)。
+
+| Wave | 卡 | 门禁 |
+|---|---|---|
+| W0 基线 | — | `verify/test/typecheck` + HEAD |
+| W1 合同/模板 | A1 → A2 | `verify` + `tests/company` + `prd-check` |
+| W2 校验器 ∥ 角色 | A5 → A6；A3 → A4a → A4b | `tests/company`+`typecheck`+`lint`；`tests/presets`+`preset-smoke`+`probe-smoke` |
+| W3 迁移/E2E | A7 → A8 | `release-smoke`；A8 probe |
+| W4 组队 | B1 → B2 | `preset-smoke`/`probe-smoke`/`delegation-smoke`/`product-team`/`client-load` |
+| W5 收口 | 伞卡 + B2 | 全量 + `notes:audit` + 归档 |
+
+**不另开实施卡**；`待落地` ≠ 授权，用户点名 Wave 1 才开工。
 
 **为什么不是 6：** 6 张结果卡会把 A1–A7 压成 3 张，单卡横跨 content/presets/host/tools/gates 五层，验收和回滚都说不清——CMO 那次就是“一张大卡 + 后面五轮补面”。11 张不是把任务切碎：每张有独立结果、独立可跑的出口证据；实现仍是每卡 1–3 个 commit。
 
