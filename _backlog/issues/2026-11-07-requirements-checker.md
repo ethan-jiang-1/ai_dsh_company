@@ -7,7 +7,9 @@ opened: 2026-11-07
 
 > 立卡：2026-11-07 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
 >
-> **结论/去向**：implementation — 提交即载体；Note 计划 `2026-11-07-requirements-checker.md`（待建）。
+> **结论/去向**：implementation — 提交即载体；决定理由见程序 Note（伞卡）`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/）；本卡不另写 Note。
+>
+> 上游：[程序伞卡](2026-11-07-requirements-teaming-landing.md)（D1–D8）；[编号共识](../research/requirements-identification-numbering/2026-11-07-consensus.md) / [落地材料](../research/requirements-identification-numbering/2026-11-07-landing-plan.md)。
 
 **问题与期望结果：** 纯逻辑 checker 解析 `layer/definition`，建定义/引用索引，判重复/悬空/退役/孤儿/覆盖/计数；V2/V4/V11 有结果；不碰 host/命令。
 
@@ -19,7 +21,7 @@ opened: 2026-11-07
 - `_backlog/methods/validation-design.md`：`## 验收标准` 按行为类别/输入状态/判红/负例/证据 owner/人的判断填。
 - `_backlog/methods/validation-evidence.md`：每个判据路由到现有 owner；新守卫先写负例；无 owner 记 blocked，不造第二套测试系统。
 - `_backlog/methods/issue-to-note.md`：收口 Note 的形状/去向；`待落地` 只写计划路径 inline code，不链未来文件。
-- `preset-change-definition` / `gate-change-definition` / `close-out-definition`：按改动面加载；只报告实跑过的命令。
+- `gate-change-definition` / `close-out-definition`：按改动面加载；只报告实跑过的命令。
 - `_backlog/methods/requirements-probes.md`：V2/V4/V11 的少量结论回本卡，长证据进编号研究材料。
 
 ## 验收标准
@@ -47,6 +49,6 @@ opened: 2026-11-07
 
 ## 关闭条件
 
-- `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；Note 落 `2026-11-07-requirements-checker.md`（待建）；卡翻 `已结` 并归档。
+- `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；证据并入程序 Note（`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/））；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。

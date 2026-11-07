@@ -7,19 +7,21 @@ opened: 2026-11-07
 
 > 立卡：2026-11-07 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
 >
-> **结论/去向**：implementation — 提交即载体；Note 计划 `2026-11-07-requirements-sa.md`（待建）。
+> **结论/去向**：implementation — 提交即载体；决定理由见程序 Note（伞卡）`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/）；本卡不另写 Note。
+>
+> 上游：[程序伞卡](2026-11-07-requirements-teaming-landing.md)（D1–D8）；[编号共识](../research/requirements-identification-numbering/2026-11-07-consensus.md) / [落地材料](../research/requirements-identification-numbering/2026-11-07-landing-plan.md)。
 
 **问题与期望结果：** SA 产 SyRS（`REQ-###`）+ IRS（`IF-###`）+ 架构稿；验证点是引用 REQ/IF 的清单，不再发 `VP-###`；SQA 接手写 `TC-###`。
 
 **范围：** `presets/system-architect` persona + `systems-architecture`；`tests/presets/presets.spec.ts`；`probes/team/sa-sqa-delegation-probe.mjs`（行为证据）。
 
-**依赖：** A1/A2；BUG-034/035 在飞（SA skill 与 `tests/presets` 同文件）——先等它落地。
+**依赖：** A1/A2；BUG-034/035 已修（7da331a，卡归档）；SA skill 与 `tests/presets` 串行改。
 
 **方法义务（先读再动）：**
 - `_backlog/methods/validation-design.md`：`## 验收标准` 按行为类别/输入状态/判红/负例/证据 owner/人的判断填。
 - `_backlog/methods/validation-evidence.md`：每个判据路由到现有 owner；新守卫先写负例；无 owner 记 blocked，不造第二套测试系统。
 - `_backlog/methods/issue-to-note.md`：收口 Note 的形状/去向；`待落地` 只写计划路径 inline code，不链未来文件。
-- `preset-change-definition` / `gate-change-definition` / `close-out-definition`：按改动面加载；只报告实跑过的命令。
+- `gate-change-definition` / `close-out-definition`：按改动面加载；只报告实跑过的命令。
 - `preset-change-definition`：`pnpm test tests/presets` + `preset-smoke`；行为判据面改动同 diff 带场景。
 
 ## 验收标准
@@ -29,7 +31,7 @@ opened: 2026-11-07
 | SA 文案：SyRS（REQ-###）+ IRS（IF-###）+ 架构；验证点引用 REQ/IF，不发 `VP-###` | 确定性 | system-architect persona/skill | `presets.spec` 断言 | 加回 `VP-###` → 红 | `tests/presets/presets.spec.ts` | 无 |
 | 退役词 `STR/SYR/IFR/VP/V/VR` 不在活动文案 | 确定性 | 同上 | spec 断言 | 加 `IFR-001` → 红 | 同上 | 无 |
 | 真挂载 | 编排 | `preset-smoke` | ALL PASS | 行 config 坏 → 红 | `checks/smoke/preset-smoke.mjs` | 无 |
-| 模型行为：SA 出 SyRS/IRS，SQA 可接 | 模型行为 | 既有 SA/SQA 探针 + A8 | probe 绿；A8 绿 | 缺 IRS → checker 红 | `probes/team/sa-sqa-delegation-probe.mjs` + A8 | 用户 review |
+| 模型行为：SA 出 SyRS/IRS，SQA 可接 | 模型行为 | 既有 E/V 接线 + A8 | 既有探针证接线；A8 证 SyRS/IRS | 缺 IRS → checker 红 | `probes/team/sa-sqa-delegation-probe.mjs`（接线） + A8（整链） | 用户 review |
 
 ## 测试资产（计划）
 
@@ -37,6 +39,7 @@ opened: 2026-11-07
 |---|---|---|---|---|---|
 | SA 文案 | 既有 `tests/presets/presets.spec.ts`（加断言） | `pnpm test tests/presets` | 文案/符号 | 模型行为 | 加 `VP-###` → 红 |
 | 真挂载 | 既有 `checks/smoke/preset-smoke.mjs` | `node checks/smoke/preset-smoke.mjs` | 组合 | 内容 | 坏 config → 红 |
+| 角色连通 | 既有 `checks/smoke/probe-smoke.mjs`（快档） | `node checks/smoke/probe-smoke.mjs` | 挂载/回话/人格进 prompt | 内容对错 | 红 = 挂载/人格 |
 | E/V 接线 | 既有 `probes/team/sa-sqa-delegation-probe.mjs` | `node probes/team/sa-sqa-delegation-probe.mjs` | SA/SQA 独立会话/depth | 本轮五层链 | 缺子会话 → 红 |
 | 五层链 | A8 probe | A8 | 整链 | 本卡单独不证 | A8 红 |
 
@@ -48,6 +51,6 @@ SQA 文案（A4b）、checker（A5）。
 
 ## 关闭条件
 
-- `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；Note 落 `2026-11-07-requirements-sa.md`（待建）；卡翻 `已结` 并归档。
+- `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；证据并入程序 Note（`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/））；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。

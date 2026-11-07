@@ -48,6 +48,9 @@ opened: 2026-11-07
 |---|---|---|
 | [2026-11-07-consensus.md](2026-11-07-consensus.md) | **结论**：自说明的共识（背景 / 盘面 / 推理 / 规则 / 未定项）；只读这一份即可 | 2026-11-07 |
 | [2026-11-07-landing-plan.md](2026-11-07-landing-plan.md) | **落地拆法**：四个落地冲突、落地面清单、结果级 C1–C4 / 执行级 A1–A8 卡边界、V1/V2/V4/V11 验证门；不授予实施 | 2026-11-07 |
+| [2026-11-07-issue-set-audit.md](2026-11-07-issue-set-audit.md) | **卡集审计**：结构/依赖/一致性/方法合规、21 项问题与修正、剩余风险；不授予实施 | 2026-11-07 |
+| [2026-11-07-validation-trial.md](2026-11-07-validation-trial.md) | **V1/V2/V4/V11 验证**：盲测、lab 重键、负例、22 IFR trial；原型结果与对 A1/A2/A5 的要求 | 2026-11-07 |
+| [2026-11-07-probe-specs.md](2026-11-07-probe-specs.md) | **A8/B2/B1 探针规格**：prompt/断言/成本；实现时照此落 `probes/team/`，未跑 | 2026-11-07 |
 | [2026-11-07-current-brief.md](research_topic/2026-11-07-current-brief.md) | 当前 brief：问题、场景、约束、用户已拍、未说清单；唯一入口 | 2026-11-07 |
 | [2026-11-07-space.md](research_topic/2026-11-07-space.md) | 探索空间：16 个设计维度、12 个场景用例、先验风险、硬约束、27 个待探索问题 | 2026-11-07 |
 | [2026-11-07-candidates.md](research_topic/2026-11-07-candidates.md) | 候选方案族 S1–S8、假说 H1–H8、评估维度；不排名 | 2026-11-07 |
@@ -64,4 +67,4 @@ opened: 2026-11-07
 立为硬前提，并 capture 了硬软一体/多 discipline/人的 review/IRS 检查点的场景；探索空间已按功能拆成
 current-brief / space / candidates / validation / evidence 五份，另有独立的 Claude / GPT / DeepSeek 三份判断材料，历史三轮冻结在 `history/`。
 **2026-11-07 收敛成 [共识](2026-11-07-consensus.md)**：ID 只承载身份（种类 + 序号），层归文档并声明、状态归条目、专业域与验证方归字段；追溯由作者写边、索引派生、检查判红。参数级未定项（状态位落点、层数层序、IRS 闸、跨动议键、词表盲测 V1）见共识 §6；**未授权实施**；此前实现已全部 git reset 撤回，只留材料。
-**2026-11-07 另出[落地拆法材料](2026-11-07-landing-plan.md)**：把共识翻成 A1–A8 的面清单与卡边界；拆法评审 = [程序伞卡](../../issues/2026-11-07-requirements-teaming-landing.md)；11 张执行卡已建（A1–A8 + B1/B2）。
+**2026-11-07 另出[落地拆法材料](2026-11-07-landing-plan.md)**：把共识翻成 A1–A8 的面清单与卡边界；拆法评审 = [程序伞卡](../../issues/2026-11-07-requirements-teaming-landing.md)；11 张执行卡已建（A1–A8 + B1/B2）；卡集审计 = [审计](2026-11-07-issue-set-audit.md)；V1/V2/V4/V11 = [验证记录](2026-11-07-validation-trial.md)。

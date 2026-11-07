@@ -7,7 +7,9 @@ opened: 2026-11-07
 
 > 立卡：2026-11-07 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
 >
-> **结论/去向**：implementation — 提交即载体；Note 计划 `2026-11-07-requirements-migration.md`（待建）。
+> **结论/去向**：implementation — 提交即载体；决定理由见程序 Note（伞卡）`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/）；本卡不另写 Note。
+>
+> 上游：[程序伞卡](2026-11-07-requirements-teaming-landing.md)（D1–D8）；[编号共识](../research/requirements-identification-numbering/2026-11-07-consensus.md) / [落地材料](../research/requirements-identification-numbering/2026-11-07-landing-plan.md)。
 
 **问题与期望结果：** fresh workspace seed 新 process-docs；旧文件不被覆盖；旧动议无 marker 则 skip；新动议带 marker 才查；dev 盘迁移有备份；发布版有升级说明。
 
@@ -19,7 +21,7 @@ opened: 2026-11-07
 - `_backlog/methods/validation-design.md`：`## 验收标准` 按行为类别/输入状态/判红/负例/证据 owner/人的判断填。
 - `_backlog/methods/validation-evidence.md`：每个判据路由到现有 owner；新守卫先写负例；无 owner 记 blocked，不造第二套测试系统。
 - `_backlog/methods/issue-to-note.md`：收口 Note 的形状/去向；`待落地` 只写计划路径 inline code，不链未来文件。
-- `preset-change-definition` / `gate-change-definition` / `close-out-definition`：按改动面加载；只报告实跑过的命令。
+- `gate-change-definition` / `close-out-definition`：按改动面加载；只报告实跑过的命令。
 - `_backlog/methods/requirements-probes.md`：旧盘迁移的证据（diff/备份）短结论回本卡。
 
 ## 验收标准
@@ -37,10 +39,19 @@ opened: 2026-11-07
 |---|---|---|---|---|---|
 | seed/skip | 既有 `tests/company/bootstrap.spec.ts`（加 process-docs） | `pnpm test tests/company/bootstrap.spec.ts` | 只补缺 | 真实安装 | 预置旧文件 → skip |
 | scope skip | A5 spec + 内联旧动议 | `pnpm test tests/company/requirements-check.spec.ts` | marker 边界 | 语义 | 无 marker 新动议 → 观察/警告 |
-| 迁移 | workspace 备份 + Note | 手动命令 + diff | 不丢内容 | 其他部署 | 覆盖 → 备份回滚 |
+| 迁移 | workspace 备份 + Note | `cp <file> <file>.bak-2026-11-07` + `diff -u`（路径写 Note） | 不丢内容 | 其他部署 | 覆盖 → 备份回滚 |
 | 安装形状 | 既有 `checks/smoke/release-smoke.mjs` | `node checks/smoke/release-smoke.mjs` | fresh install | 升级语义 | 坏包 → 红 |
 
 **资产边界：** 只证 seed/skip、scope 与安装形状；不证旧动议内容正确、不证其他部署的迁移（文档化）。
+
+## 迁移 runbook
+
+1. `cp .dsh-company/kb/process-docs.md .dsh-company/kb/process-docs.md.bak-2026-11-07`
+2. 用 A1 的新合同整份替换（process-docs 是流程合同、不含公司事实；备份保留用户旧版）。
+3. `diff -u .bak-2026-11-07 process-docs.md`；备份/差异路径写程序 Note。
+4. 新动议 `meta.md` 加 `编号体系: identity`；旧动议不加 → checker `skipped`，不是红。
+5. 跑 A6 的 `/req check` 对旧盘抽 1–2 个动议：期望 `skipped`；对新动议：期望 check。
+6. 用户确认备份/迁移后卡翻 `已结`。
 
 ## 排除
 
@@ -48,6 +59,6 @@ opened: 2026-11-07
 
 ## 关闭条件
 
-- `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；Note 落 `2026-11-07-requirements-migration.md`（待建）；卡翻 `已结` 并归档。
+- `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；证据并入程序 Note（`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/））；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。

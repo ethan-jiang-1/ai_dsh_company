@@ -44,14 +44,14 @@ intent: 把已定性的编号共识转成可评审的落地面清单、卡边界
 
 ## 4. 卡边界（结果级 C1–C4；执行级 A1–A8）与出口证据
 
-> 执行级卡号以[拆法卡](../../issues/2026-11-07-requirements-teaming-landing.md)为准：A1=合同/范围，A2=模板，A3=CMO/VP-Eng，A4=SA/SQA（推荐再拆 A4a/A4b），A5=checker，A6=命令，A7=迁移，A8=E2E，B1=组队能力，B2=组队 E2E/收口。下面保留结果级 C1–C4 的写法，避免材料跟着卡号漂。
+> 执行级卡号以[拆法卡](../../issues/2026-11-07-requirements-teaming-landing.md)为准：A1=合同/范围，A2=模板，A3=CMO/VP-Eng，A4a=SA / A4b=SQA（已拆），A5=checker，A6=命令，A7=迁移，A8=E2E，B1=组队能力，B2=组队 E2E/收口。下面保留结果级 C1–C4 的写法，避免材料跟着卡号漂。
 
 ### C1 编号合同与五层模板
 
 - **结果**：新 `process-docs` 与五层模板在场，`pnpm verify` 绿，模板样例可过 `/prd check`；角色还没改。
 - **范围**：`content/state/process-docs.md`、六个模板、`content/AGENTS.md` 的指针、`base-clean`/`company-skeleton`、`bootstrap` seed。
 - **出口**：V1 词表盲测（若用户要）；`pnpm verify`；模板/内容 tests；`node tools/checks-index.mjs --write` 若新增脚本。
-- **不做**：角色文案（A3/A4）、checker（A5/A6）、旧盘迁移（A7）。
+- **不做**：角色文案（A3/A4a/A4b）、checker（A5/A6）、旧盘迁移（A7）。
 
 ### C2 角色产出与交接
 
@@ -89,7 +89,7 @@ intent: 把已定性的编号共识转成可评审的落地面清单、卡边界
 - **旧实现不是资产清单**：`65b6917` 的模板/checker 可参考，但它的 `STR/SYR/IFR` 层前缀与“6 个空间”已被共识推翻；直接 cherry-pick 会把方向带回去。
 - **PRD 模板同源测试**：[prd-check.spec](../../../tests/company/prd-check.spec.ts) 要求 `content/templates/{mrd,prd}.md` 的示例直接过 `validateProductDocs`；改模板必须同步跑它。
 - **文档预算**：`docs/presets.md`、`docs/delegation.md` 已顶格；改文档先搬后写，别先提额。
-- **在飞冲突**：BUG-034/035 相关改动正由另一个 Agent 处理中（工作树里已涉及 SA/SQA preset/skills/tests/probes/bug 卡/Note）；A4 必须等它落地，不能混 diff。
+- **在飞冲突**：BUG-034/035 相关改动正由另一个 Agent 处理中（工作树里已涉及 SA/SQA preset/skills/tests/probes/bug 卡/Note）；A4a/A4b/B1 必须等它落地，不能混 diff。
 - **不做**：第六/第七条汇报线、SA/SQA 独立汇报线、vendor 改动、UI 角色徽标/委派卡 key、发布版本号（按需）。
 
 ## 7. 与共识的边界

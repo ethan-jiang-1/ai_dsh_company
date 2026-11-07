@@ -7,11 +7,13 @@ opened: 2026-11-07
 
 > 立卡：2026-11-07 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
 >
-> **结论/去向**：note — Note 计划 `2026-11-07-vpeng-evidence-closeout.md`（待建）。
+> **结论/去向**：implementation — 提交即载体；程序 Note 由伞卡落 `2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/）；本卡负责 docs/decisions/归档，不另写 Note。
+>
+> 上游：[程序伞卡](2026-11-07-requirements-teaming-landing.md)（D1–D8）；[三门材料](../research/vp-eng-teaming/2026-11-07-three-doors.md)；[探针规格](../research/requirements-identification-numbering/2026-11-07-probe-specs.md)。
 
 **问题与期望结果：** 真模型 VP-Eng 包 E2E；teammate/命名 child 的 preset/depth 证据；CEO `product-team-e2e-smoke` 绿；程序 Note/D57/D58/docs/归档。
 
-**范围：** 新 `vp-eng-teaming-probe.mjs`（待建，落 probes/team/）；`checks/smoke/product-team-e2e-smoke.mjs`；`checks/smoke/delegation-smoke.mjs`；Note/docs/decisions/归档。
+**范围：** 新 `vp-eng-teaming-probe.mjs`（待建，落 probes/team/）；`checks/smoke/product-team-e2e-smoke.mjs`；`checks/smoke/delegation-smoke.mjs`；程序 Note + `docs/index.md`、`docs/decisions.md`（D57/D58）、`docs/design/role-content-plan.md`（按需）；A1/B1 的合同页（`docs/guides/product-definition.md`、`docs/presets.md`、`docs/delegation.md`）只核对、不改正文；归档。
 
 **依赖：** B1/A8。
 
@@ -19,7 +21,7 @@ opened: 2026-11-07
 - `_backlog/methods/validation-design.md`：`## 验收标准` 按行为类别/输入状态/判红/负例/证据 owner/人的判断填。
 - `_backlog/methods/validation-evidence.md`：每个判据路由到现有 owner；新守卫先写负例；无 owner 记 blocked，不造第二套测试系统。
 - `_backlog/methods/issue-to-note.md`：收口 Note 的形状/去向；`待落地` 只写计划路径 inline code，不链未来文件。
-- `preset-change-definition` / `gate-change-definition` / `close-out-definition`：按改动面加载；只报告实跑过的命令。
+- `gate-change-definition` / `close-out-definition`：按改动面加载；只报告实跑过的命令。
 - `_backlog/methods/requirements-probes.md`：真模型证据；长证据进 teaming 研究材料，短结论回本卡。
 - `agent-note-definition` / `close-out-definition`：Note 与收口六行回执。
 
@@ -30,7 +32,8 @@ opened: 2026-11-07
 | VP-Eng 根门 spawn 工程师 + 命名 CMO/SA/SQA；整包产出 | 模型行为 | 排练场真模型 | probe 绿 | 缺专家/缺产物 → 红 | 新 `vp-eng-teaming-probe.mjs`（待建，落 probes/team/） | 用户 review 包 |
 | teammate preset=`vp-eng`；命名 child preset 正确；SQA 结论原样 | 模型行为 | child 日志 | probe 断言 | 冒充/删结论 → 红 | 同上 | 用户 review |
 | CEO 两件套仍走 team | 模型行为/编排 | `product-team-e2e-smoke` | smoke 绿 | 红 = 破坏 | `checks/smoke/product-team-e2e-smoke.mjs` | 无 |
-| Note/D57/D58/docs/归档 | 文档形状 | repo | verify/ledger-routing | 缺路由 → 红 | `pnpm verify` + notes | 用户 review Note |
+| 程序 Note（伞卡）/D57/D58 | 文档形状 | 伞卡 Note + decisions | `pnpm verify` + `pnpm notes:audit` | 缺路由 → 红 | 伞卡 + `pnpm verify` | 用户 review Note |
+| 索引/台账/合同页核对 | 文档形状 | `docs/index.md` / `docs/decisions.md` + 核对 A1/B1 合同页 | `pnpm verify`（md-links/doc-budget） | 断链/超预算/旧说法 → 红 | `docs/*` + `pnpm verify` | 用户 review 文案 |
 
 ## 测试资产（计划）
 
@@ -39,16 +42,17 @@ opened: 2026-11-07
 | VP-Eng 包 | 新 probe（现有 `probes` 形状） | `node probes/team/vp-eng-teaming-probe.mjs` | 组队/专家/产物 | 一般可靠性 | 缺 SQA → 红 |
 | CEO 回归 | 既有 `checks/smoke/product-team-e2e-smoke.mjs` | `node checks/smoke/product-team-e2e-smoke.mjs` | CEO team | VP-Eng 包 | 红 = 破坏 |
 | 委派边界 | 既有 `checks/smoke/delegation-smoke.mjs` | `node checks/smoke/delegation-smoke.mjs` | 工具面 | VP-Eng 包 | 红 |
-| Note/台账 | 新 Note + docs/decisions + archive | `pnpm verify` + `pnpm notes:audit` | 路由/形状 | 内容 | 缺 D 号 → 红 |
+| 程序 Note（伞卡）/台账 | 伞卡 Note + docs/decisions + archive | `pnpm verify` + `pnpm notes:audit` | 路由/形状 | 内容 | 缺 D 号 → 红 |
+| 索引/台账/合同页核对 | `docs/index.md` + `docs/decisions.md` + 核对 A1/B1 合同页 | `pnpm verify`（md-links/doc-budget） | 链接/预算 | 正文语义 | 断链/超预算 → 红 |
 
 **资产边界：** 只证这一轮 VP-Eng 包与 CEO 回归；不证一般可靠性、不证组织设计好坏（用户 review）。真模型成本约 5–10 分钟，不进 `pnpm test`。
 
 ## 排除
 
-重开边界争论；CIO 的 `vp_cmo`；UI 徽标/委派卡。
+重开边界争论；CEO 的 `vp_cmo` maxDepth；UI 徽标/委派卡；A1/B1 合同页正文（只核对）。
 
 ## 关闭条件
 
-- `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；Note 落 `2026-11-07-vpeng-evidence-closeout.md`（待建）；卡翻 `已结` 并归档。
+- `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；程序 Note（伞卡）已落；docs/decisions/归档完成；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。
