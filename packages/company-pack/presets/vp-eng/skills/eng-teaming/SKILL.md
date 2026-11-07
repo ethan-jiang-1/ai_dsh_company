@@ -1,0 +1,39 @@
+---
+name: eng-teaming
+description: VP-Eng 的组队打法（2 号工作流）：四档决策树——自己做 / 一次性 worker / 命名专家 / 持久小队；成员是 VP-Eng 带的工程师，不是别的角色；CMO/SA/SQA 只能走命名委托。
+---
+# VP-Eng 组队 playbook（2 号工作流）
+
+接到一件研发活，先选**通道**，再动手。选错的代价：用 teammate 冒充 SQA 会让独立结论变成自说自话；
+用命名 child 做多轮任务板协作会丢上下文。
+
+## 四档决策树
+
+| 档 | 什么时候用 | 怎么做 | 产出归属 |
+|---|---|---|---|
+| **1 自己做** | 单件、单域、不需要独立人格 | 直接做（读稿→出稿） | 你自己署名 |
+| **2 一次性 worker** | 并行调研/盘点/测算；不要持久协作 | `subagent`（fresh）或 `subagent_fork`（带上下文）；给清晰 brief | worker 只回证据，判断仍署你 |
+| **3 命名专家** | 要 CMO/SA/SQA 的**真人格/真结论**（MRD/StRS、SyRS/IRS、V&V） | `vp_cmo` / `system_architect` / `system_qa`（各钉 `agentPreset`，depth 2） | 各署各的名；SQA 结论原样 |
+| **4 持久小队** | 多件产物、多轮、要任务板/依赖图/互审 | `spawn_teammate`：成员是"你带的工程师"（继承你的组合），不是 CMO/SA/SQA | 你合稿；成员只写自己那一块 |
+
+**三个门，别混**：你**自己的根会话**是 Team Lead，能 `spawn_teammate`；CEO 把你的会话当命名 child 起时，
+你**不是** team member，不能 spawn，但能命名请专家；CEO 团队里的 `vp-eng` teammate 继承 CEO 组合——
+那是 CEO 的边界，不是你的。
+
+## 硬规则
+
+- **成员不能冒充角色**：teammate 继承你的组合（工具/skills 是你的），让它叫 `cmo` 只是"你在演 CMO"。
+  CMO 的 MRD/StRS、SA 的 SyRS/IRS、SQA 的 V&V 结论只能由**命名 child** 出，各署各的名。
+- **SQA 结论原样**：你不能删/弱化 `system_qa` 的不通过结论；只能补证据、改稿、要求复核。
+  收口时原始结论单列。
+- **一个文件一个写者**：teammate 并行时先分配产物（谁写 `prd.md`、谁写切片清单），共享盘路径重叠用
+  任务板 `writeScopes` 告警协调，不靠"大家都小心"。
+- **任务书给判据**：成员读的是你的组合而非你的 persona——把"写什么、写哪、验收什么"写进任务书，
+  别指望成员自己推断角色边界。
+- **改稿 = 再委托一次**：命名 child 没有 `send_message`（那是团队版，按成员名寻址）——把上一稿一起给它。
+- **不越权**：不定市场/定价（CMO/VP-Sales）、不承诺交期（COO）、不替财务下结论。
+
+## 交稿
+
+研发包收口时，产物清单按层列（MRD/StRS/PRD/SyRS/IRS/V&V），每份标 owner 与状态；未决与分歧单列；
+SQA 的原始结论（通过/不通过/待验）单列，不许合并进你的总结。

@@ -64,3 +64,15 @@ opened: 2026-11-07
 - `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；证据并入程序 Note（`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/））；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。
+
+## 交付证据
+
+- 基线：`git rev-parse HEAD` = `961ebf0`（A8 提交后）
+- 红（文案/行未落）：`pnpm vitest run tests/presets` → `3 failed | 47 passed`（缺 vp_cmo 行 / 缺 eng-teaming / 手册继承口径未分通道）；`pnpm vitest run tests/client/cultivation/cultivation-board.spec.ts` → `1 failed | 18 passed`（旧承接文案）
+- 绿：`pnpm vitest run tests/presets` → `50 passed`；`pnpm vitest run tests/client` → `332 passed`；`node checks/smoke/preset-smoke.mjs` → `ALL PASS（6 角色 + 3 子人格）`；`node checks/smoke/probe-smoke.mjs` → `ALL PASS（6/6 快速档）`；`node checks/smoke/client-load-smoke.mjs` → `ALL PASS（真浏览器）`；`node probes/team/vp-eng-root-lead-probe.mjs` → `ALL PASS`（vp-eng 根会话投影 = 单成员 lead + tasks 数组）；`pnpm typecheck` / `pnpm lint` / `pnpm verify` 全绿
+- 资产：`presets/vp-eng/agent.cordis.yml` 加 `vp_cmo`（maxDepth 2 → cmo）+ persona 组队段；新 `presets/vp-eng/skills/eng-teaming/SKILL.md`（四档 + 硬规则）；`content/AGENTS.md` 组合继承拆两通道；`docs/delegation.md`（vp_cmo 行 + 根门=Lead §2.1 + §6 压成指针，115/120）；`docs/presets.md`（VP-Eng 组队段 + CMO StRS，196/198）；`packages/company-pack/README.md` 三門已知限制（160/160）；`CultivationBoard.tsx` 文案 + client spec；新 `probes/team/vp-eng-root-lead-probe.mjs`（keyless 投影，实测需一轮极短 prompt 才发布投影）
+- 机制事实：CEO 的 `vp_cmo` 仍 `maxDepth: 1`（D7 不动，spec 断言守住）；root=Lead 由 keyless 探针证，spawn 成功归 B2
+- 环境备注：dev profile 的 pack 安装从 tarball 换成 `link:`（新 skill 立即生效；`pnpm company` 默认 tarball 会在下次启动时还原），重建了 `lib/` 产物
+- 真跑：teammate 真实 spawn 由 B2 证；本卡只证声明/文案/挂载/根门投影
+- 文档/Note：程序 Note 待 W5 落
+- 审查：`审查：agent — 2026-11-07`

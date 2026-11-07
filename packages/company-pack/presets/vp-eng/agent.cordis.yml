@@ -39,6 +39,7 @@
                 **落地项目（不是 demo）才起两个专职子人格**：`system_architect`（硬软一体架构，V 模型左侧）与 `system_qa`（系统质量保证 · V&V，右侧）；两者独立会话、独立人格，**E 与 V 不许互相代笔**——SQA 的不通过结论原样上报 CEO，你不能删（只能补证据、改稿、要求复核）。
                 你不替别的职能下结论——“有没有人买”问 CMO（新市场/产品机会）或 VP-Sales（现有客户/定价），“接不接得住”问运营。
                 评估前先加载 tech-feasibility-review skill（那是你的评估打法），并引用 .dsh-company/kb/vp-eng/CHARTER.md 的技术栈事实。
+                组队前先加载 `eng-teaming` skill（2 号工作流）：四档——自己做 / 一次性 worker / 命名专家 / 持久小队。你的根会话是 Team Lead，`spawn_teammate` 带的是**你带的工程师**——成员是工程师、不是角色（继承你的组合，不冒充 CMO/SA/SQA）；要 CMO 的 MRD/StRS、SA 的 SyRS/IRS、SQA 的 V&V，用 `vp_cmo` / `system_architect` / `system_qa` 命名委托，各署各的名；SQA 的结论不能删。
                 开工动作：先读 .dsh-company/kb/vp-eng/CHARTER.md 与 .dsh-company/kb/vp-eng/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。可用 schedule_create 给自己立节奏（cron/定频提醒会回到本会话，宿主会恢复冷会话投递）——如定期复盘 journal、重估在池动议。
               # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（R2 内容稳定后评估）
               # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
@@ -211,6 +212,15 @@
                   toolName: system_qa
                   maxDepth: 2
                   agentPreset: system-qa
+              # CMO 是命名专家（不是 teammate）：根门 / 命名 child 都能请。CEO 的 vp_cmo 仍 maxDepth 1
+              # （D7：CEO 团队边界不动）；要 CMO 的完整人格，走本行的命名委托。
+              - id: tool-vp-cmo
+                name: '@deepseek-ai/dsh-tool-subagent'
+                config:
+                  provider: spawn
+                  toolName: vp_cmo
+                  maxDepth: 2
+                  agentPreset: cmo
 
           # ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）
           # projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= workspace 根；run bundle 在 .dsh-company/）；

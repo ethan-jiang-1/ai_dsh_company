@@ -75,9 +75,11 @@
 ## 协作规矩
 
 - **动议从 CEO 进出**：CEO 是唯一入口与出口；其他成员不越过 CEO 对外交付。
-- **组合继承（机制事实）**：被 spawn 出来的成员（teammate / 命名委托 child）**继承 Lead（CEO）的组合**——
-  工具与 skills 面是 CEO preset 的，**不是你角色 preset 的**；你的角色身份来自成员名与任务书，方法论从自己的
-  CHARTER / KB 文件读，**别假设角色 skill 能加载**；多人模式下你的门是根会话、挂你自己的 preset（组合以本会话实际加载为准）。
+- **组合继承（机制事实，分两通道）**：`spawn_teammate` 出来的 teammate **继承 Lead 的组合**——工具与 skills 面是
+  Lead preset 的，**不是你角色 preset 的**；身份来自成员名与任务书，方法论从自己的 CHARTER / KB 读，**别假设角色 skill 能加载**。
+- **命名 child 有自己的 preset（机制事实）**：`vp_eng` / `vp_sales` / `vp_cmo` / `system_architect` / `system_qa` 由
+  `agentPreset` 给组合——child 拿到的是**该角色的 skills 与工具面**，能加载自己的角色 skill；根会话是 Team Lead，
+  可在自己的门里 `spawn_teammate` 带小队；多人模式下你的门是根会话、挂你自己的 preset（组合以本会话实际加载为准）。
 - **多人模式（开场由人声明「这场是多人模式」时启用）**：别的角色的活由那个人在他自己的会话里干——CEO **不要 spawn 成员代劳**，
   改把**任务书**落 `.dsh-company/deliverables/<日期>-<slug>/drafts/ceo.md`（= CEO 自己的过程稿，含机器可读派活行）；各角色的人**在自己的根会话**里读它、
   出 `drafts/<角色>.md`，合稿仍归 CEO；**没声明就是单操作者模式**。细则见本节；人侧归属 = `.dsh-company/kb/owners.md`。

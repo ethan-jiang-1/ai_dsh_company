@@ -146,7 +146,7 @@ rm -f  <DSH_HOME>/storages/company_run_bundle_ledger.json
 - **侧栏内容搜索保持 DSH 出厂行为**：本包不再替换 host 的 `session-query-sqlite`——改值替换会让默认的应用内安装（Plugins 页/`plugin_manager`）在 live recomposition 时报 `file-upload: Agent resolver is already registered`。`company-session-search` 隔离组只给角色 `session_search` 工具用；DSH 侧栏 `session/search` 保持出厂 `openAt: never`（有会话时搜索会报禁用），不是本包承诺。
 - **侧栏角色色调只借平台令牌**：CEO 用 adaptive 的 `--dsw-alias-*` 品牌对（浅/深主题自动反转），其余五色用 **static 色相**（blue/green/amber/red/deepseek，固定值、两主题同观感）+ 按底色选的黑/白字（对比度实测见探针 G6）——**不是**上游策展的分类色板（那份仍缺，见角色身份 UX 提案开放问题 2），换主题观感不一致处即此债。
 - **侧栏角色标记受 16px 座位约束**：行首座位是**可共存的 list 格**（同格还有计划任务时钟，16px 跨度），故标记按 12px 设计、单字母（C/F/O/E/S/M）。与时钟同格时两者合计 28px > 座位 16px，靠"座位居中溢出 + 标题前 4px 间隙"恰好不撞标题盒（几何判据 = [sidebar-role-mark-probe](../../probes/browser-visual/sidebar-role-mark-probe.mjs)）；**再加第三个同格占用者、或把标记改宽，这条就破**。
-- 机制与出厂行替换已对钉版 `dsh-v0.2.1-rc.2` 验证（pack-compat / release-smoke / 全套门禁；本仓嵌套工作区 vendor 自建偏离 = D27）。
+- **VP-Eng 组队的三道门**：根门 = Team Lead（可 `spawn_teammate` 带研发小队，成员继承 VP-Eng 组合、不是别的角色）；命名 child（`vp_eng`）不是 team member、不能 spawn，但能请 `vp_cmo`/SA/SQA（depth 2）；CEO 团队里的 `vp-eng` teammate 受 CEO 的 `vp_cmo maxDepth 1` 限制——要整包就开 VP-Eng 根门。
 - 委派子会话的签字审批到不了人（子会话审批面宿主侧受限）——人机审批实际是 Lead 专属（上游 seam 候选，见[归档搁置池](../../_backlog/_archive/legacy/suspended.md)）。
 - 浮窗 raise 置顶依赖 CSS 垫片（vendor rc.2 缺陷；上游修复后撤垫片）。
 - 依赖图画布按栏宽等比缩放（`transform: scale()`，fitScale 下限 0.75；**不用 CSS 宽度缩放**——Safari 里 foreignObject 文字不跟缩，会堆向左上角）；更宽的图（约 ≥5 个并行根任务）缩到下限后横向滚动。
