@@ -6,7 +6,7 @@ intent: 作为本研究的唯一入口：先把问题、场景、约束、用户
 # 当前 brief（本研究的唯一入口）
 
 > 本文件是 2026-11-07 第三份材料的 §0.5–§2 与 §8.5 的抽取；节号沿用全局编号，跨文件引用按 § 号解析。
-> 阅读顺序：本文件 → [space](2026-11-07-space.md) → [candidates](2026-11-07-candidates.md) → [validation](2026-11-07-validation.md) → [evidence](2026-11-07-evidence.md) → [history](history/)。
+> 阅读顺序：本文件 → [space](2026-11-07-space.md) → [candidates](2026-11-07-candidates.md) → [validation](2026-11-07-validation.md) → [evidence](2026-11-07-evidence.md) → [history](../history/)。
 > 本文件不选方案；只把问题与约束说清。
 > **跨文件节号**：§3/§10 = [evidence](2026-11-07-evidence.md)；§4/§5/§7/§8 = [space](2026-11-07-space.md)；§6 = [candidates](2026-11-07-candidates.md)；§9/§11 = [validation](2026-11-07-validation.md)。
 
@@ -99,7 +99,7 @@ intent: 作为本研究的唯一入口：先把问题、场景、约束、用户
 | 11 | "我最关心的是最后在这个体系底下用什么前缀编号，人和 Agent 都容易" | 核心问题 |
 | 12 | "方案有可能是多个，我们等会儿挑一下" | 先并行生成多个方案族，不提前收敛 |
 
-> 早期两轮还有：CMO 产 MRD 需 StRS、VP-Eng 产 PRD 需 SyRS+IRS；编号必须有；一件东西一个编号；专业域不作前缀；前缀别再加。见 [第一轮 §1](history/2026-11-07-numbering-deliberation.md) 与 [第二轮 §前提](history/2026-11-07-openspec-seam.md)。
+> 早期两轮还有：CMO 产 MRD 需 StRS、VP-Eng 产 PRD 需 SyRS+IRS；编号必须有；一件东西一个编号；专业域不作前缀；前缀别再加。见 [第一轮 §1](../history/2026-11-07-numbering-deliberation.md) 与 [第二轮 §前提](../history/2026-11-07-openspec-seam.md)。
 
 ## 1.6 给下一个 Agent 的 brief（先理解，再探索，最后才选）
 
@@ -127,13 +127,14 @@ intent: 作为本研究的唯一入口：先把问题、场景、约束、用户
 
 | # | 约束 | 出处 |
 |---|---|---|
-| 1 | 编号必须有（不编号无法追溯） | [第一轮 §1](history/2026-11-07-numbering-deliberation.md) |
+| 1 | 编号必须有（不编号无法追溯） | [第一轮 §1](../history/2026-11-07-numbering-deliberation.md) |
 | 2 | 一件东西一个编号，别用两个 | 同上 |
 | 3 | 专业域（HW/ME/FW/SW）不作前缀，作附录 | 同上 |
 | 4 | 前缀已够复杂，不要再加 | 同上 |
-| 5 | 多层需求文档是既定前提（MRD→StRS→PRD→SyRS→IRS） | [第二轮 §前提](history/2026-11-07-openspec-seam.md) |
+| 5 | 多层需求文档是既定前提（MRD→StRS→PRD→SyRS→IRS） | [第二轮 §前提](../history/2026-11-07-openspec-seam.md) |
 | 6 | SW/FW 已用 OpenSpec；OpenSpec 能承载编号 | 同上 |
-| 7 | 硬软一体四条硬约束：ID 可单独读懂、验证分家、接口两端有 owner、专业域只能作附录 | [第一轮 §5](history/2026-11-07-numbering-deliberation.md) |
+| 7 | 硬软一体四条硬约束：ID 可单独读懂、验证分家、接口两端有 owner、专业域只能作附录 | [第一轮 §5](../history/2026-11-07-numbering-deliberation.md) |
+| 8 | **TBD 属状态，不是前缀，不进 ID**：ID 恒为 `<种类>-<号>`（如 `IF-022`）；状态由条目自己的状态位承载，不算新前缀族 | 用户 2026-11-07 对话 |
 
 ## 8.5 用户未说、但场景里必然要回答的（推断清单，需确认）
 

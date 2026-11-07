@@ -61,7 +61,8 @@ opened: YYYY-MM-DD
 - [SA/SQA 产物评审：两个新子人格的产出到底行不行](sa-sqa-product-review/README.md) — 服务 SA/SQA 落地 Note 与
   BUG-034/035；2026-11-06 开，调研中。
 - [需求识别与编号：硬软一体场景下的多层需求文档](requirements-identification-numbering/README.md) — 服务用户 2026-11-07
-  的提问；硬软一体/多 discipline 场景；**实施已全部回滚，仅推敲中**；按功能拆成 brief/space/candidates/validation/evidence（未定论）。
+  的提问；硬软一体/多 discipline 场景；**2026-11-07 已定性**：ID 只承载身份（种类+序号），层/状态/专业域/验证方外置；
+  结论 = [共识](requirements-identification-numbering/2026-11-07-consensus.md)；实施未授权。
 
 （2026-11-06 的角色新增面题随 SA/SQA 卡迁入[研究归档](../_archive/research/README.md)。）
 
