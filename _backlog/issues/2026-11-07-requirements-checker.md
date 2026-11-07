@@ -52,3 +52,15 @@ opened: 2026-11-07
 - `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；证据并入程序 Note（`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/））；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。
+
+## 交付证据
+
+- 基线：`git rev-parse HEAD` = `2bfdb09`（A2 提交后）
+- 红（判据真红）：临时关掉重复定义判据 → `pnpm vitest run tests/company/requirements-check.spec.ts` → `1 failed | 15 passed`（× 重复定义 → 红并点名两处）；还原 → 16 passed
+- 绿：`pnpm vitest run tests/company/requirements-check.spec.ts` → `16 passed`；`pnpm vitest run tests/company` → `43 files / 279 tests passed`；`pnpm typecheck` 全绿；`pnpm lint` 0 warnings 0 errors；`pnpm dup` 0 clones；`pnpm verify` → `ALL PASS`
+- 资产：`packages/company-pack/src/lib/requirements-check.ts`（纯逻辑：层/定义形态解析、重复/悬空/退役/孤儿/覆盖/计数/矩阵、meta 范围豁免）；`tests/company/requirements-check.spec.ts`（16 条判据）
+- V4/V11 回归进 spec：重复/悬空/退役/孤儿 4/4；摘要表是引用（headings 不把表行当定义）；「可追溯性」散文不算字段；区间计数断言（R8）判红
+- V2 记录：沿用 [验证记录](../research/requirements-identification-numbering/2026-11-07-validation-trial.md) §2（lab 重键 16/33/22 无悬空无重复；唯一硬缺口 = 16/16 StR 无机器可解析 MR 上游 → 本卡用孤儿/覆盖判据接住）
+- 真跑：未跑（lab 是旧格式、无 `编号体系` 标记——按合同应 skipped，归 A7 范围；A8 跑新格式真模型）
+- 文档/Note：合同口径已在 A1 落 `content/state/process-docs.md`；程序 Note 待 W5 落
+- 审查：`审查：agent — 2026-11-07`
