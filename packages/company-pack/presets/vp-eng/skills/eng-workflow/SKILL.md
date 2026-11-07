@@ -11,7 +11,7 @@ description: VP-Eng 的工作流（1 号）：接到评审 / 技术评估 / PRD 
    tech-feasibility-review skill（那是你的评估打法）。
 3. **深挖**：需要事实支撑就用 `subagent` 派 workers——并行、给清晰 brief、逐份核对后署自己的判断。
 4. **出稿**：
-   - **PRD 定义**（新产品/新功能）：先读同目录 `drafts/mrd.md`（CMO 的 MR），用 `prd-playbook` + 共享 `product-definition` 出 `drafts/prd.md`（REQ/AC/slice、来源指回 MR、一 REQ 一任务），跑 `/prd check <slug>`；技术评估稿仍落 `drafts/vp-eng.md`。
+   - **PRD 定义**（新产品/新功能）：先读同目录 `drafts/mrd.md` + `drafts/strs.md`（CMO 的 MR 与涉众需求），用 `prd-playbook` + 共享 `product-definition` 出 `drafts/prd.md`（REQ/AC/slice、`source` 指回 MR、`traces` 指回 StRS、一 REQ 一任务），跑 `/prd check <slug>` + `/req check <slug>`；技术评估稿仍落 `drafts/vp-eng.md`。
    - **评审 / 技术评估**：`<company-content>/templates/review-note.md` 一页纸落 `.dsh-company/deliverables/<slug>/drafts/vp-eng.md`，结论先行；有 veto 在结论里声明。
 5. **回执**：向任务板回状态与修订；向 `.dsh-company/kb/vp-eng/journal/` 追加纪要——**没写 journal = 任务未完成**，不许宣称收工（硬闸门；执行期两次实证缺席，2026-09-25 收紧）。
 

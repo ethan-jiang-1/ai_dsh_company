@@ -1,6 +1,6 @@
 ---
 name: product-definition
-description: 产品定义脊柱（CMO 与 VP-Eng 共用）：把市场机会变成可追溯、可验收、可分解的需求账本；按产品类型选 playbook；产出 MRD（CMO）与 PRD（VP-Eng）。
+description: 产品定义脊柱（CMO 与 VP-Eng 共用）：把市场机会变成可追溯、可验收、可分解的需求账本；按产品类型选 playbook；产出 MRD+StRS（CMO）与 PRD（VP-Eng）。
 ---
 # 产品定义（共同能力）
 
@@ -9,7 +9,7 @@ MRD / PRD 是这条脊柱的两种产物，不是两套模板。
 
 ## 什么时候用
 
-- CMO：探索市场机会、判断"该不该做/做什么/为谁做"，写 MRD。
+- CMO：探索市场机会、判断"该不该做/做什么/为谁做"，写 MRD + StRS。
 - VP-Eng：接住 MRD，写可研发、可验收的 PRD。
 - CEO：新产品动议的组队与收口（默认只叫 CMO + VP-Eng；见 CEO 的 `assembling-the-team`）。
 
@@ -36,23 +36,33 @@ MRD / PRD 是这条脊柱的两种产物，不是两套模板。
 **生长方式**：pack 里的 playbook 随版本走；角色自己的打法（本行业话术、评估量表）经培养采纳进
 `<DSH_HOME>/company/methods/<role>/`，不要改共享 playbook 的公共字段。
 
-## 需求账本（PRD 的核心，不是附注）
+## 编号与层（合同 = pack `content/state/process-docs.md`）
 
-- 编号：市场机会 `MR-001…`；需求 `REQ-001…`；验收 `AC-001-1…`。**只增不改号**；撤销用状态
-  `withdrawn`，不重排、不复用。
-- 每条 REQ 必带：来源（至少一个 MR id）、slice、优先级、状态、可判真假的 AC、依赖、验证方式。
-- 切片（slice）：先给**最小端到端**（S1），研发一批一批吃；一条 REQ 只属于一个 slice。
+- 号只承载身份：`MR-###`（市场机会）/ `REQ-###`（需求，**任一层**）/ `IF-###`（接口）/ `TC-###`（验证）；
+  `AC-<REQ号>-<n>` 从属父 REQ。四种各自一条 append-only 序列，动议内全局唯一；号由 owner 登记时取 `max+1`。
+- 层归文档头：每份需求文档写 `layer`（MRD/StRS/PRD/SyRS/IRS）+ `definition`
+  （`json-ledger` / `headings` / `table-rows` / `none`）；层不进号，一份文档一层。
+- 状态归条目：草案 / 生效 / 作废；「建议新增」= 草案，ID 不变；作废留号，不复用。
+- 追溯：下游写行首 `traces:`（PRD 另写 `source:` 指 MR）；矩阵由 `/req check` 派生，不手写；
+  缺上游 = 孤儿红，指向不存在的号 = 悬空红。
+- 计数由索引派生，不写「N 条」区间断言。旧层前缀（`STR/SYR/IFR`）与旧验证前缀（`VP/V/VR`）已退役，出现即红。
+- 每条 REQ 必带：来源、slice、优先级、状态、可判真假的 AC、依赖、验证方式。
+- 切片（slice）：先给**最小端到端**（S1）；一条 REQ 只属于一个 slice。
 - 状态机：`draft → ready → in-dev → accepted`（旁路 `deferred / withdrawn`）。
   `ready` 前过 DoR：字段齐、AC 可判、来源可追、依赖已声明；`accepted` 前过 DoD：全部 AC 验证。
 - **一 REQ 一任务**：进研发任务板时标题带 `REQ-###`，`blockedBy` 照 REQ 依赖；验收按 AC 号核。
-- 质量闸门：`/prd check <slug>` 机械校验编号/必填/来源/依赖/状态；它不替代判断，只挡结构性错误。
+- 质量闸门：`/prd check <slug>` 管 MRD/PRD 结构；`/req check <slug>` 管编号/层/追溯/退役词/计数
+  （操作员命令，角色不自证）。它不替代判断，只挡结构性错误。
 
-## 两种产物
+## 三种产物
 
 - **MRD（CMO 主笔）**：机会编号、细分与买单人、现有替代、竞品、买点、规模【事实/假设】、
-  成功判据、go/no-go 建议。落 `deliverables/<slug>/drafts/mrd.md`。
-- **PRD（VP-Eng 主笔）**：在 MRD 基础上补需求账本、验收、技术约束、可行性与里程碑；落
-  `deliverables/<slug>/drafts/prd.md`，每个 REQ 指回 MR id。
+  成功判据、go/no-go 建议。落 `deliverables/<slug>/drafts/mrd.md`（`layer: MRD`、`definition: json-ledger`）。
+- **StRS（CMO 主笔）**：涉众诉求——谁在乎、在乎什么、验收时谁点头；每条 `REQ-###` 带
+  `traces: [MR-###]`。落 `deliverables/<slug>/drafts/strs.md`（`layer: StRS`、`definition: headings`）。
+- **PRD（VP-Eng 主笔）**：产品层需求账本、验收、技术约束、可行性与里程碑；落
+  `deliverables/<slug>/drafts/prd.md`（`layer: PRD`、`definition: json-ledger`）；每条 REQ 用
+  `source` 指回 MR、`traces` 指回 StRS 的 REQ。SyRS/IRS 归 SA，V&V 归 SQA——不越权代笔。
 
 ## 边界与反模式
 

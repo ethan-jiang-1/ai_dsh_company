@@ -54,3 +54,13 @@ SA/SQA 文案（A4a/A4b）、checker（A5）。
 - `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；证据并入程序 Note（`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/））；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。
+
+## 交付证据
+
+- 基线：`git rev-parse HEAD` = `c6c3d76`（A6 提交后）
+- 红（文案未改）：`pnpm vitest run tests/presets` → `3 failed | 38 passed`（CMO 缺 strs.md / VP-Eng 缺 traces→StRS / 共享词表缺 IF/TC）
+- 绿：`pnpm vitest run tests/presets` → `41 passed`（新增 3 条断言）；真挂载 `node checks/smoke/preset-smoke.mjs` → `ALL PASS（6 个角色 + 3 个委派子人格全部可挂载）`；`pnpm verify` → `ALL PASS`
+- 资产：`tests/presets/presets.spec.ts` 增「需求编号链」describe（CMO MRD+StRS / VP-Eng PRD only / 共享新词表 + 无退役号形）；文案面 = cmo persona + mrd-playbook、vp-eng persona + prd-playbook + eng-workflow、`_shared/skills/product-definition`
+- 真跑：文案能否让模型照做由 A8 五层 probe 证；本卡只证文案/挂载（模型行为未跑）
+- 文档/Note：共享 skill 新增「编号与层」节（指向 `content/state/process-docs.md`）与三种产物；程序 Note 待 W5 落
+- 审查：`审查：agent — 2026-11-07`

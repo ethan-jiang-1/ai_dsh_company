@@ -607,3 +607,43 @@ describe('包元数据与用户可见角色清单', () => {
     expect(readme).not.toContain('Five-role')
   })
 })
+
+describe('需求编号链：CMO 产 MRD+StRS、VP-Eng 产 PRD（A3）', () => {
+  /** 退役号形（`VP-Eng` 是角色名，不算）。 */
+  const RETIRED = /\b(?:STR|SYR|IFR|VR|VP|V)-(?:#|\d)/
+
+  it('CMO persona 声明 MRD + StRS；mrd-playbook 写 StRS 产出与 traces', () => {
+    const persona = roleYml('cmo')
+    expect(persona, 'CMO persona 必须声明 StRS 产出').toContain('strs.md')
+    expect(persona, 'CMO persona 必须点名 StRS 的 REQ 编号').toContain('StRS')
+    const playbook = readFileSync(join(PRESETS_DIR, 'cmo/skills/mrd-playbook/SKILL.md'), 'utf8')
+    expect(playbook, 'mrd-playbook 缺 StRS 产出小节').toContain('StRS')
+    expect(playbook, 'mrd-playbook 缺 drafts/strs.md 落盘路径').toContain('drafts/strs.md')
+    expect(playbook, 'mrd-playbook 缺 traces: [MR- 追溯写法').toMatch(/traces:\s*\[MR-/)
+    expect(playbook, 'mrd-playbook 不得把 PRD 写成 CMO 产出').not.toContain('drafts/prd.md')
+  })
+
+  it('VP-Eng persona/prd-playbook 只写 PRD（source→MR、traces→StRS），不写 SyRS/IRS', () => {
+    const persona = roleYml('vp-eng')
+    expect(persona, 'VP-Eng persona 必须点名 StRS 输入').toContain('StRS')
+    expect(persona, 'VP-Eng persona 必须写明 traces 指 StRS').toMatch(/traces[^\n]*StRS/)
+    const playbook = readFileSync(join(PRESETS_DIR, 'vp-eng/skills/prd-playbook/SKILL.md'), 'utf8')
+    expect(playbook, 'prd-playbook 缺 source→MR').toMatch(/source[^\n]*MR/)
+    expect(playbook, 'prd-playbook 缺 traces→StRS').toMatch(/traces[^\n]*StRS/)
+    expect(playbook, 'prd-playbook 不得把 SyRS/IRS 写成 VP-Eng 产出').not.toMatch(/drafts\/(syrs|irs)\.md/)
+    const workflow = readFileSync(join(PRESETS_DIR, 'vp-eng/skills/eng-workflow/SKILL.md'), 'utf8')
+    expect(workflow, 'eng-workflow 的出稿步必须点名 StRS 输入').toContain('strs.md')
+  })
+
+  it('共享 product-definition 用新词表（层/定义形态/四种号），无退役号形', () => {
+    const shared = readFileSync(join(PRESETS_DIR, '_shared/skills/product-definition/SKILL.md'), 'utf8')
+    for (const needle of ['MR-###', 'REQ-###', 'IF-###', 'TC-###', 'layer', 'definition', 'json-ledger']) {
+      expect(shared, `共享 product-definition 缺 ${needle}`).toContain(needle)
+    }
+    expect(shared, '共享 product-definition 出现退役号形').not.toMatch(RETIRED)
+    const cmo = readFileSync(join(PRESETS_DIR, 'cmo/skills/mrd-playbook/SKILL.md'), 'utf8')
+    const prd = readFileSync(join(PRESETS_DIR, 'vp-eng/skills/prd-playbook/SKILL.md'), 'utf8')
+    expect(cmo).not.toMatch(RETIRED)
+    expect(prd).not.toMatch(RETIRED)
+  })
+})

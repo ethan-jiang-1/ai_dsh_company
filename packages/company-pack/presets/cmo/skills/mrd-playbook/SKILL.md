@@ -1,6 +1,6 @@
 ---
 name: mrd-playbook
-description: CMO 的 MRD 打法：市场机会发现 → 细分/买单人/替代/竞品/买点/规模（事实/假设）→ go/no-go 建议；先读共享 product-definition 脊柱与品类 playbook。
+description: CMO 的打法：MRD 市场机会（细分/买单人/替代/竞品/买点/规模）→ go/no-go，再到 StRS 涉众需求（REQ-### + traces→MR）；先读共享 product-definition 脊柱与品类 playbook。
 ---
 # MRD playbook（CMO）
 
@@ -26,9 +26,18 @@ description: CMO 的 MRD 打法：市场机会发现 → 细分/买单人/替代
 
 ## MRD 产出
 
-按 `<company-content>/templates/mrd.md` 写，落 `deliverables/<slug>/drafts/mrd.md`。
-- 每个机会一个编号 `MR-001…`；标题、细分、买单人、痛点、证据、替代、竞品、价值、规模、成功判据、confidence。
+按 `<company-content>/templates/mrd.md` 写，落 `deliverables/<slug>/drafts/mrd.md`（`layer: MRD`、`definition: json-ledger`）。
+- 每个机会一个编号 `MR-###`；标题、细分、买单人、痛点、证据、替代、竞品、价值、规模、成功判据、confidence。
 - 一页为限；结论先行；不写功能清单（那是 PRD 的事）。
+
+## StRS 产出（涉众需求）
+
+MR 落定后同一轮出 StRS：按 `<company-content>/templates/strs.md` 写，落 `deliverables/<slug>/drafts/strs.md`
+（`layer: StRS`、`definition: headings`）。
+- 每条 `### REQ-###` 一个涉众诉求；标题下一行写 `traces: [MR-###]`（缺上游 = 孤儿红）。
+- 写「谁在乎、在乎什么、验收时谁点头」；**不写口径与阈值**（那是 PRD/SyRS）、不写定价（归 VP-Sales）。
+- `REQ` 是**任一层**的号：StRS/PRD/SyRS 共一条 append-only 序列，号由 owner 登记时取 `max+1`。
+- 落盘后跑 `/req check <slug>`（操作员命令）；红就改，别绕过。
 
 ## 边界
 
