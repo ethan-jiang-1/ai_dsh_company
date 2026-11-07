@@ -52,3 +52,14 @@ checker 逻辑（A5）、迁移（A7）。
 - `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；证据并入程序 Note（`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/））；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。
+
+## 交付证据
+
+- 基线：`git rev-parse HEAD` = `0174e58`（A5 提交后）
+- 红（命令未建）：`pnpm vitest run tests/company/req-command.spec.ts` → `Cannot find module '../../packages/company-pack/src/host/req-command.ts'`（0 test）
+- 红（skipped 分支）：临时关掉 skipped 回执 → `1 failed | 7 passed`（× 旧动议（无编号体系标记）→ skipped 回执，不判红）；还原 → 8 passed
+- 绿：`pnpm vitest run tests/company/req-command.spec.ts tests/company/host-composition.spec.ts` → `16 passed`；`pnpm vitest run tests/company` → `43 files / 287 tests passed`；`pnpm typecheck` 绿；`pnpm lint` 0/0；`pnpm verify` → `ALL PASS`（README 压回 160/160 行）
+- 资产：`src/host/req-command.ts`（`/req check <slug>`：dataBlocked / usage / 读 drafts 五层+allocation+meta / skipped / 判红 / 计数回执）；`src/index.ts` 注册；`tests/company/req-command.spec.ts`（8 条判据）；`host-composition.spec` 命令集加 `req`（集合 → 五个命令）
+- 真跑：命令行为由 keyless handler 测试覆盖；真会话里跑命令归 A8（probe 断言 6）
+- 文档/Note：`packages/company-pack/README.md`（contributes 段 + 已知限制 v1 边界）；`content/AGENTS.md` / `docs/guides/product-definition.md` 已在 A1 写明 /req check 与「角色不自证」；程序 Note 待 W5 落
+- 审查：`审查：agent — 2026-11-07`

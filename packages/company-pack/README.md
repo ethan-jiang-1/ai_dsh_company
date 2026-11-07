@@ -71,8 +71,10 @@ npm CLI / `dsh web` 的 Plugins 页需要 pnpm 在 PATH（或 `corepack enable p
 ## What it contributes
 
 - 六个角色 preset（CEO / VP-Eng / VP-Sales / COO / CFO / CMO）+ 委派子人格 `researcher`；
-- 产品定义：CMO 出 MRD（`MR-###`）、VP-Eng 出 PRD（`REQ-###` / `AC-###-#` / slice 需求账本），
-  共享 `product-definition`（项目制/系统集成、硬软一体）；`/prd check <目录名>` 机械校验；
+- 产品定义：五层需求链 MRD → StRS → PRD → SyRS → IRS（+ SQA 的 V&V/TC）——CMO 出 MRD（`MR-###`）+ StRS（`REQ-###`），
+  VP-Eng 出 PRD（`REQ-###` / `AC-###-#` / slice），SA 出 SyRS/IRS（`REQ-###` / `IF-###`），SQA 出 `TC-###`；
+  编号合同（R1–R10、退役词、范围豁免、并发）住 `content/state/process-docs.md`；共享 `product-definition`；
+  `/prd check <目录名>` 校验 MRD/PRD 结构，`/req check <目录名>` 校验编号/层/追溯/退役词/计数（操作员命令，角色不自证）；
 - host 行：签字、工作区门、团队、present、日期/节律、公司 client 面、公司状态初始化、
   workspace 登记、handbook `systemPrompt.section`、成品目录/账本；
 - `company-session-search`（insert + isolate 组）：角色 `session_search` 工具 + 独立
@@ -137,6 +139,7 @@ rm -f  <DSH_HOME>/storages/company_run_bundle_ledger.json
 
 ## 已知限制（随行为变更同 diff 更新）
 
+- **编号校验（`/req check`）的 v1 边界**：跨动议引用 `<动议键>:<ID>` 未实现（遇到只标未支持）；并发取号不加锁（靠 Lead 串行分配 + 撞号红兜底）；旧动议无 `编号体系:` 标记即 `skipped`（只读豁免，不回溯判红）。
 - **只支持 web 组合**：`company-client` 的 `inject` 声明 `workspaceRegistry`（由 web-app 组合提供）；base-only / headless profile 不加载本包。这不是缺陷，是本包的 app surface = Web（[release.md](../../docs/release.md) 六轴）。
 - **`dsh.client.inject` 的 8 条边** = 本包 client 模块 factory 的真实依赖（不是 bundle require）；删除需上游合同/证据，故保留。
 - **品牌只替换 name 槽**：client 面只占 `sidebar.brand.name`，保留官方 mark 与 `conversation.hero.brand.mark`；这是与 `ui-brand-official` 的 `single` 槽共存的最小侵入，不是“完整皮肤”。
