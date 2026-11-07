@@ -13,16 +13,17 @@ opened: 2026-11-07
 > **人的 review 需要文档**，**IRS 是候选检查点**。最终要答：**这套体系用什么识别/编号机制（前缀是核心落点之一）**，
 > 人和 Agent 都容易；Agent 不能困惑。
 > 消费者：用户 2026-11-07 直接提出（CMO 产 MRD 需 StRS、VP-Eng 产 PRD 需 SyRS+IRS）；本仓
-> [SA/SQA 子人格落地 Note](../../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md) 与
-> [成品评审材料](../sa-sqa-product-review/README.md) 是背景证据。
-> 产出的卡：[程序伞卡](../../issues/2026-11-07-requirements-teaming-landing.md) + 8 张执行卡：
-> [A1 合同](../../issues/2026-11-07-requirements-contract.md) / [A2 模板](../../issues/2026-11-07-requirements-templates.md) /
-> [A3 CMO/VP-Eng](../../issues/2026-11-07-requirements-cmo-vpeng.md) / [A4a SA](../../issues/2026-11-07-requirements-sa.md) /
-> [A4b SQA](../../issues/2026-11-07-requirements-sqa.md) / [A5 校验器](../../issues/2026-11-07-requirements-checker.md) /
-> [A6 命令](../../issues/2026-11-07-requirements-command.md) / [A7 迁移](../../issues/2026-11-07-requirements-migration.md) /
-> [A8 E2E](../../issues/2026-11-07-requirements-e2e.md)（B1/B2 见 [teaming 题](../vp-eng-teaming/README.md)）
+> [SA/SQA 子人格落地 Note](../../../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md) 与
+> [成品评审材料](../../../research/sa-sqa-product-review/README.md) 是背景证据。
+> 产出的卡：[程序伞卡](../../settled_issues/2026-11-07-requirements-teaming-landing.md) + 8 张执行卡：
+> [A1 合同](../../settled_issues/2026-11-07-requirements-contract.md) / [A2 模板](../../settled_issues/2026-11-07-requirements-templates.md) /
+> [A3 CMO/VP-Eng](../../settled_issues/2026-11-07-requirements-cmo-vpeng.md) / [A4a SA](../../settled_issues/2026-11-07-requirements-sa.md) /
+> [A4b SQA](../../settled_issues/2026-11-07-requirements-sqa.md) / [A5 校验器](../../settled_issues/2026-11-07-requirements-checker.md) /
+> [A6 命令](../../settled_issues/2026-11-07-requirements-command.md) / [A7 迁移](../../settled_issues/2026-11-07-requirements-migration.md) /
+> [A8 E2E](../../settled_issues/2026-11-07-requirements-e2e.md)（B1/B2 见 [teaming 题](../vp-eng-teaming/README.md)）
 > **硬前提**：第一消费者是 **Agent**——判据不是"人读得懂"，而是"Agent 不可能读错、没有判断题、机器能判红"。
 > 结论：ID 只承载身份（种类 + 序号）；层归文档并声明、状态归条目、专业域与验证方归字段；追溯由作者写边、
+> 归档：2026-11-07（随程序伞卡整目录迁入；冻结证据，不回填）
 > 索引派生、检查判红。**全文 = [2026-11-07-consensus.md](2026-11-07-consensus.md)**（自说明，只读这一份即可）。
 > **边界**：结论不授权实施、不迁移、不改 pack；参数级未定项见共识 §6，验证项（V1/V2/V4/V11）未跑；实施需另起 issue 或 RFC。
 
@@ -68,4 +69,4 @@ opened: 2026-11-07
 立为硬前提，并 capture 了硬软一体/多 discipline/人的 review/IRS 检查点的场景；探索空间已按功能拆成
 current-brief / space / candidates / validation / evidence 五份，另有独立的 Claude / GPT / DeepSeek 三份判断材料，历史三轮冻结在 `history/`。
 **2026-11-07 收敛成 [共识](2026-11-07-consensus.md)**：ID 只承载身份（种类 + 序号），层归文档并声明、状态归条目、专业域与验证方归字段；追溯由作者写边、索引派生、检查判红。参数级未定项（状态位落点、层数层序、IRS 闸、跨动议键、词表盲测 V1）见共识 §6；**未授权实施**；此前实现已全部 git reset 撤回，只留材料。
-**2026-11-07 另出[落地拆法材料](2026-11-07-landing-plan.md)**：把共识翻成 A1–A8 的面清单与卡边界；拆法评审 = [程序伞卡](../../issues/2026-11-07-requirements-teaming-landing.md)；11 张执行卡已建（A1–A8 + B1/B2）；卡集审计 = [审计](2026-11-07-issue-set-audit.md)；V1/V2/V4/V11 = [验证记录](2026-11-07-validation-trial.md)；执行计划 = [计划](2026-11-07-execution-plan.md)。
+**2026-11-07 另出[落地拆法材料](2026-11-07-landing-plan.md)**：把共识翻成 A1–A8 的面清单与卡边界；拆法评审 = [程序伞卡](../../settled_issues/2026-11-07-requirements-teaming-landing.md)；11 张执行卡已建（A1–A8 + B1/B2）；卡集审计 = [审计](2026-11-07-issue-set-audit.md)；V1/V2/V4/V11 = [验证记录](2026-11-07-validation-trial.md)；执行计划 = [计划](2026-11-07-execution-plan.md)。

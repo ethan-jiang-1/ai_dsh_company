@@ -1,13 +1,13 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-07
 ---
 
 # 落地：VP-Eng 组队能力与机制合同修正
 
-> 立卡：2026-11-07 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-07 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 2026-11-07
 >
-> **结论/去向**：implementation — 提交即载体；决定理由见程序 Note（伞卡）`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/）；本卡不另写 Note。
+> **结论/去向**：implementation — 提交即载体；决定理由见程序 Note（伞卡）[2026-11-07-requirements-teaming-program.md](../../../notes/implemented/2026-11-07-requirements-teaming-program.md)；本卡不另写 Note。
 >
 > 上游：[程序伞卡](2026-11-07-requirements-teaming-landing.md)（D1–D8）；[三门材料](../research/vp-eng-teaming/2026-11-07-three-doors.md)；[探针规格](../research/requirements-identification-numbering/2026-11-07-probe-specs.md)。
 

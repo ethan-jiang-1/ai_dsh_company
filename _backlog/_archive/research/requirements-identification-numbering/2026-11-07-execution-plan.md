@@ -6,19 +6,19 @@ intent: 把 `_backlog/issues` 的 11 张卡排成可执行的波次计划，逐�
 # 完整执行计划（2026-11-07）
 
 > **这份材料是什么**：11 张执行卡（A1–A8 + B1–B2）+ 程序伞卡的**执行计划**。回答三件事：按什么顺序推进、每步怎么保质量、拿什么证明“这张卡真的落地了”。
-> **不是授权**：卡 `待落地` 只表示可实施；用户点名/批准本计划后才动产品代码。Plan Mode 规则 = [policy P1](../../../docs/policy.md)；执行链 = [dev-loop §1](../../../docs/guides/dev-loop.md)；收尾 = [close-out-definition](../../../.agents/skills/close-out-definition/SKILL.md)。
+> **不是授权**：卡 `待落地` 只表示可实施；用户点名/批准本计划后才动产品代码。Plan Mode 规则 = [policy P1](../../../../docs/policy.md)；执行链 = [dev-loop §1](../../../../docs/guides/dev-loop.md)；收尾 = [close-out-definition](../../../../.agents/skills/close-out-definition/SKILL.md)。
 > **起点**：BUG-034/035 已修（`7da331a`，卡归档）；V1/V2/V4/V11 已跑原型（[验证记录](2026-11-07-validation-trial.md)）；A8/B2/B1 探针规格已写（[probe specs](2026-11-07-probe-specs.md)）；卡集审计 21 项已处置（[审计](2026-11-07-issue-set-audit.md)）；`backlog-liveness`/`md-links` 全绿。
 
 ## 1. 流程总图（每张卡都走这条）
 
 | 段 | 做什么 | 判据/产物 | 唯一家 |
 |---|---|---|---|
-| **0 授权** | 用户点名 wave/card；确认范围、非目标、验收；feature 先 Plan Mode | 用户原话 + 批准范围；`待落地` ≠ 授权 | [policy P1](../../../docs/policy.md) / [dev-loop §0.5](../../../docs/guides/dev-loop.md) |
-| **1 切片** | 读卡 + 相关方法 + 合同；`todo_write` 列步骤；点明非目标 | 本次改动/非目标/验收三行 | [dev-loop §1.1](../../../docs/guides/dev-loop.md) |
-| **2 红先行** | 机制面先写会红的 spec/fixture；行为面先立场景；门禁先 prove-it-red；文案面先加会红的断言 | 红输出（命令 + 关键行） | [testing.md §3](../../../docs/testing.md) |
-| **3 实施** | 只改拥有该事实的文件；不扩范围；同步合同/模板/docs | 最窄 diff；同 diff 合同 | [dev-loop §1.2/§1.4](../../../docs/guides/dev-loop.md) |
-| **4 证据** | 先跑最窄检查，再按改动面升档；记录命令/输出/资产 | 四链证据（挂/行为/装/批准） | [tests/README](../../../tests/README.md) / [testing.md §1](../../../docs/testing.md) |
-| **5 收尾** | 对照授权→四链→语义审→收割三问→指针→改口→revert→门禁→六行回执 | 六行回执 + Note + 卡 `审查` | [close-out-definition](../../../.agents/skills/close-out-definition/SKILL.md) |
+| **0 授权** | 用户点名 wave/card；确认范围、非目标、验收；feature 先 Plan Mode | 用户原话 + 批准范围；`待落地` ≠ 授权 | [policy P1](../../../../docs/policy.md) / [dev-loop §0.5](../../../../docs/guides/dev-loop.md) |
+| **1 切片** | 读卡 + 相关方法 + 合同；`todo_write` 列步骤；点明非目标 | 本次改动/非目标/验收三行 | [dev-loop §1.1](../../../../docs/guides/dev-loop.md) |
+| **2 红先行** | 机制面先写会红的 spec/fixture；行为面先立场景；门禁先 prove-it-red；文案面先加会红的断言 | 红输出（命令 + 关键行） | [testing.md §3](../../../../docs/testing.md) |
+| **3 实施** | 只改拥有该事实的文件；不扩范围；同步合同/模板/docs | 最窄 diff；同 diff 合同 | [dev-loop §1.2/§1.4](../../../../docs/guides/dev-loop.md) |
+| **4 证据** | 先跑最窄检查，再按改动面升档；记录命令/输出/资产 | 四链证据（挂/行为/装/批准） | [tests/README](../../../../tests/README.md) / [testing.md §1](../../../../docs/testing.md) |
+| **5 收尾** | 对照授权→四链→语义审→收割三问→指针→改口→revert→门禁→六行回执 | 六行回执 + Note + 卡 `审查` | [close-out-definition](../../../../.agents/skills/close-out-definition/SKILL.md) |
 | **6 归档** | 卡翻 `已结`、`git mv`、双索引、程序 Note 回填 | 归档卡 + 索引绿 | [_backlog 章程](../../README.md) |
 
 > 一张卡 = 一个结果；实现可以是 1–3 个 commit，但**卡不拆成任务清单**；波次只是执行顺序，不是新状态。
@@ -65,7 +65,7 @@ intent: 把 `_backlog/issues` 的 11 张卡排成可执行的波次计划，逐�
 **红绿纪律**：
 
 1. 机制面：先写会红的 spec/fixture，跑红，留输出；再实现；再跑绿。
-2. 门禁面：只回滚实现、保留新测试；制造回归看红→还原看绿→三步留证（[dev-loop §12](../../../docs/guides/dev-loop.md)）。
+2. 门禁面：只回滚实现、保留新测试；制造回归看红→还原看绿→三步留证（[dev-loop §12](../../../../docs/guides/dev-loop.md)）。
 3. 行为面：先立场景（Given/When/Then + 判据点名），再改文案；模型行为由 A8/B2 probe 证，不由文案断言冒充。
 4. 命令链一律 `set -o pipefail`；裸 `cmd | tail` = 假绿。
 5. 未跑 = 写「未执行」，不写成绿；被阻断 = 写阻塞与原因。

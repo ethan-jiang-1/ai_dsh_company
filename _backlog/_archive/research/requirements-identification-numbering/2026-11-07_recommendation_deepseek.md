@@ -106,7 +106,7 @@ B = **3**（`STR` string、`SYR` 叙利亚、`IFR` 航空）。唯一**实测**�
 不是"少见的词"，是**高风险词**——它在两边都退役，但先验账告诉我们别的。
 
 **(d) 已经装上的那一半不用动。** `/prd check` 与两份模板的现行文法就是 `MR / REQ / AC`
-（[prd-check.ts:132-236](../../../packages/company-pack/src/lib/prd-check.ts)、`content/templates/{mrd,prd}.md`）。
+（[prd-check.ts:132-236](../../../../packages/company-pack/src/lib/prd-check.ts)、`content/templates/{mrd,prd}.md`）。
 A **只退役 `VP`、不改检查器文法**；B 要 `IF→IFR` 全量重键 + 改 3 份 preset 里 7 处文案（SA 的 `agent.cordis.yml` 与 systems-architecture SKILL、SQA 的 vv-playbook）。
 
 ## 5. 方案 B（诚实的对手）：层码六词
@@ -147,7 +147,7 @@ A 在这两项都赢；B 只在"人审快一点"赢，而人审是**第二位**�
 ## 7. 配套规则：让"判红"真的发生（这才是包里的主体）
 
 一条命令（**人跑，不是角色跑**——角色不能跑脚本，硬约束 6）：`/req check <动议>`，形状照
-[prd-command.ts](../../../packages/company-pack/src/host/prd-command.ts) 的先例（固定路径、只读、返回 JSON），
+[prd-command.ts](../../../../packages/company-pack/src/host/prd-command.ts) 的先例（固定路径、只读、返回 JSON），
 扫描该动议的文档树，输出 `index.json` + 红绿清单。
 
 | # | 规则 | 红（例子） | 绿 |

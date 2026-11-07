@@ -66,7 +66,7 @@
 - **单轮验收**：`node probes/team/sa-sqa-quality-audit.mjs --run 2026-11-07-portable-overload-detection-v8`
   ⇒ **Q1–Q11 全 PASS、exit 0**（`--run` 是本次新加的单轮过滤；不过滤时历史红会让整体 exit 1）。
 - `pnpm verify`：本变更相关门禁全绿（md-links / link-debt / guard-red-record / backlog-liveness / presets 等）；
-  当时仍有 **2 条 `bare-path` 红**，来自并发会话新增的 `_backlog/research/requirements-identification-numbering/2026-11-07-landing-plan.md`
+  当时仍有 **2 条 `bare-path` 红**，来自并发会话新增的 `_backlog/_archive/research/requirements-identification-numbering/2026-11-07-landing-plan.md`
   （指向尚未创建的测试文件），不属于本变更，未改。`pnpm test`：**1166 passed**；`pnpm typecheck`：通过；
   `node checks/smoke/preset-smoke.mjs`：**ALL PASS**（刷新 company profile 的 tarball 后，9 个 preset 全挂载）。
 - `pnpm lint`：**红**，但命中 `tests/company/roster-backfill.spec.ts` 的 `unicorn(prefer-string-starts-ends-with)`

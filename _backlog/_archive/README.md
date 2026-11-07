@@ -15,6 +15,18 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-07-requirements-teaming-landing.md](settled_issues/2026-11-07-requirements-teaming-landing.md) | 已结；需求识别/编号 + VP-Eng 组队的程序伞卡：D1–D8 口径、11 张执行卡、W0–W5 执行计划全部收口；去向 = [程序 Note](../../notes/implemented/2026-11-07-requirements-teaming-program.md) | 2026-11-07 |
+| [2026-11-07-requirements-contract.md](settled_issues/2026-11-07-requirements-contract.md) | 已结；A1 编号合同（R1–R10/退役词/范围豁免/并发）+ meta 标记 + 门禁 | 2026-11-07 |
+| [2026-11-07-requirements-templates.md](settled_issues/2026-11-07-requirements-templates.md) | 已结；A2 五层模板 + layer/definition 头 + PRD JSON 唯一定义点 + allocation 附录 | 2026-11-07 |
+| [2026-11-07-requirements-checker.md](settled_issues/2026-11-07-requirements-checker.md) | 已结；A5 纯逻辑 checker（重复/悬空/退役/孤儿/覆盖/计数/矩阵） | 2026-11-07 |
+| [2026-11-07-requirements-command.md](settled_issues/2026-11-07-requirements-command.md) | 已结；A6 `/req check` 操作员命令 + 命令集注册 | 2026-11-07 |
+| [2026-11-07-requirements-cmo-vpeng.md](settled_issues/2026-11-07-requirements-cmo-vpeng.md) | 已结；A3 CMO 产 MRD+StRS、VP-Eng 只产 PRD（source/traces） | 2026-11-07 |
+| [2026-11-07-requirements-sa.md](settled_issues/2026-11-07-requirements-sa.md) | 已结；A4a SA 产 SyRS+IRS+allocation+架构，验证点改引用不发号 | 2026-11-07 |
+| [2026-11-07-requirements-sqa.md](settled_issues/2026-11-07-requirements-sqa.md) | 已结；A4b SQA 用 TC-### 写 V&V（layer V&V + table-rows + covers + L1–L4） | 2026-11-07 |
+| [2026-11-07-requirements-migration.md](settled_issues/2026-11-07-requirements-migration.md) | 已结；A7 旧盘迁移/豁免/升级面（process-docs 只补缺 seed） | 2026-11-07 |
+| [2026-11-07-requirements-e2e.md](settled_issues/2026-11-07-requirements-e2e.md) | 已结；A8 五层真跑（重跑一次 ALL PASS：checker 绿 MR4/REQ44/IF8/TC49） | 2026-11-07 |
+| [2026-11-07-vpeng-teaming.md](settled_issues/2026-11-07-vpeng-teaming.md) | 已结；B1 VP-Eng 组队（vp_cmo + eng-teaming 四档 + 继承口径修正） | 2026-11-07 |
+| [2026-11-07-vpeng-evidence-closeout.md](settled_issues/2026-11-07-vpeng-evidence-closeout.md) | 已结；B2 VP-Eng 包 E2E + CEO 回归（ALL PASS）+ 程序收口 | 2026-11-07 |
 | [2026-11-06-system-architect-sqa.md](settled_issues/2026-11-06-system-architect-sqa.md) | 已结；VP-Eng 落地项目的 E/V 分家：SA + SQA 两个委派子人格（子人格档）、委托行 `maxDepth: 2`、SQA 否决直达 CEO；真模型 E2E 证两独立会话/preset/depth=2；去向 = [SA/SQA Note](../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md) | 2026-11-06 |
 | [2026-11-03-repo-hygiene-round6.md](settled_issues/2026-11-03-repo-hygiene-round6.md) | 已结；fresh agent 七维复评（落地后 A-/A/A-/A-/A-/A-/A-）+ 三棵测试树层次化 + 腐化通道四条机械面（retired-claims / command-refs / dist-manual 同源 / ledger 顺序）+ 错误中继与 D7 两项；去向 = [context-rot-guards Note](../../notes/implemented/2026-11-03-context-rot-guards.md) 等 9 篇 | 2026-11-03 |
 | [2026-11-03-repo-hygiene-round5.md](settled_issues/2026-11-03-repo-hygiene-round5.md) | 已结（消化）；A–F 各批已落地或被第六轮承接；残余 = npm publish（外部）与零入链分诊（已定性不批量迁） | 2026-11-03 |

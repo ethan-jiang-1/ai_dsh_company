@@ -4,26 +4,18 @@
 
 ## 活跃清单
 
-当前活跃 13 张（原 SA/SQA 卡 1 + 程序伞卡 1 + 执行卡 11）：
+当前活跃 1 张：
 
 | 卡 | 一句话 | 状态 |
 |---|---|---|
 | [2026-11-07-sa-sqa-capability-organization.md](2026-11-07-sa-sqa-capability-organization.md) | SA/SQA 的全方位能力怎么组织：按场景取用学科域（纯软件只用软件思考；EE/ME 不缺席），牵涉 VP-Eng 任务书 | 推敲中 |
-| [2026-11-07-requirements-teaming-landing.md](2026-11-07-requirements-teaming-landing.md) | 需求识别/编号 + VP-Eng 组队的程序伞卡：11 张执行卡的依赖/验收/测试资产/收口；已按推荐批准 | 待落地 |
 
-执行卡（11，均 `待落地`，每张带 `## 验收标准` + `## 测试资产`）：
-[A1 合同](2026-11-07-requirements-contract.md) ·
-[A2 模板](2026-11-07-requirements-templates.md) ·
-[A3 CMO/VP-Eng](2026-11-07-requirements-cmo-vpeng.md) ·
-[A4a SA](2026-11-07-requirements-sa.md) ·
-[A4b SQA](2026-11-07-requirements-sqa.md) ·
-[A5 校验器](2026-11-07-requirements-checker.md) ·
-[A6 命令](2026-11-07-requirements-command.md) ·
-[A7 迁移](2026-11-07-requirements-migration.md) ·
-[A8 E2E](2026-11-07-requirements-e2e.md) ·
-[B1 组队](2026-11-07-vpeng-teaming.md) ·
-[B2 收口](2026-11-07-vpeng-evidence-closeout.md)
+（2026-11-07 需求识别/编号 + VP-Eng 组队的程序伞卡 + 11 张执行卡（A1–A8、B1/B2）已结归档：
+去向 = [程序 Note](../../notes/implemented/2026-11-07-requirements-teaming-program.md)；卡片见[归档](../_archive/settled_issues/README.md)。）
 
+
+2026-11-07 程序卡 12 张（伞卡 + A1–A8 + B1/B2）已结归档：编号合同/五层模板/checker//req check/角色产出/迁移/E2E/组队
+按 W0–W5 落地，证据在程序 Note 与各卡 `## 交付证据`；残余（跨动议键、并发锁、真会话 /req check 回执）写在 Note 剩余风险。
 
 2026-11-03 两张打扫卡（第五轮 / 第六轮）均已结归档：改善按五道门落地，证据在各 Note；
 残余项（npm publish 等外部依赖）在卡的「结论/去向」与归档材料里写清。

@@ -60,3 +60,5 @@
 | D54 | 发布姿态 = MIT + npm 身份 + 市场 index 交接；npm publish 仍人工（[publish-handoff](./guides/publish-handoff.md)） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |
 | D55 | 发行版六轴与术语对齐：公司状态/run trace；发布字节装 `_dist`、sourceFingerprint；docs-first legacy 名 | [distribution-alignment Note](../notes/implemented/2026-11-02-distribution-alignment.md) |
 | D56 | backlog 五道门：issue `待落地`、研究题名页 `调研中/已定性`、去向封闭集与审查记录、门票由门禁钉住；不加 `落地中/待审` | [five-gates Note](../notes/implemented/2026-11-02-backlog-five-gates.md) |
+| D57 | 需求编号=身份（MR/REQ/IF/TC）；层归文档头、状态归条目；`/req check` 判重复/悬空/退役/孤儿/覆盖 | [teaming Note](../notes/implemented/2026-11-07-requirements-teaming-program.md) |
+| D58 | VP-Eng 三门：根门=Lead（带小队）；命名 child 按 agentPreset 请 CMO/SA/SQA；CEO teammate 受 maxDepth 1 | [teaming Note](../notes/implemented/2026-11-07-requirements-teaming-program.md) |

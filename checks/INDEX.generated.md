@@ -30,7 +30,7 @@
 [authorship-audit](audit/authorship-audit.mjs) · [candidate-scan-eval](audit/candidate-scan-eval.mjs)
 [deliverables-check](audit/deliverables-check.mjs) · [journal-audit](audit/journal-audit.mjs)
 
-## 窄机制与视觉探针（probes/，63）
+## 窄机制与视觉探针（probes/，64）
 
 ### browser-visual（17）
 
@@ -85,7 +85,7 @@
 [reconcile-round-probe](../probes/session-context/reconcile-round-probe.mjs)
 [time-context-probe](../probes/session-context/time-context-probe.mjs)
 
-### team（19）
+### team（20）
 
 [claim-race-probe](../probes/team/claim-race-probe.mjs)
 [dissent-preservation-probe](../probes/team/dissent-preservation-probe.mjs)
@@ -106,6 +106,7 @@
 [team-concurrency-probe](../probes/team/team-concurrency-probe.mjs)
 [team-recovery-probe](../probes/team/team-recovery-probe.mjs)
 [vp-eng-root-lead-probe](../probes/team/vp-eng-root-lead-probe.mjs)
+[vp-eng-teaming-probe](../probes/team/vp-eng-teaming-probe.mjs)
 
 ## 维护工具（tools/，19）
 

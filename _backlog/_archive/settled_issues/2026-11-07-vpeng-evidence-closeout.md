@@ -1,13 +1,13 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-07
 ---
 
 # 落地：VP-Eng E2E、CEO 回归与程序收口
 
-> 立卡：2026-11-07 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-07 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 2026-11-07
 >
-> **结论/去向**：implementation — 提交即载体；程序 Note 由伞卡落 `2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/）；本卡负责 docs/decisions/归档，不另写 Note。
+> **结论/去向**：implementation — 提交即载体；程序 Note 由伞卡落 [2026-11-07-requirements-teaming-program.md](../../../notes/implemented/2026-11-07-requirements-teaming-program.md)；本卡负责 docs/decisions/归档，不另写 Note。
 >
 > 上游：[程序伞卡](2026-11-07-requirements-teaming-landing.md)（D1–D8）；[三门材料](../research/vp-eng-teaming/2026-11-07-three-doors.md)；[探针规格](../research/requirements-identification-numbering/2026-11-07-probe-specs.md)。
 
@@ -56,3 +56,16 @@ opened: 2026-11-07
 - `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；程序 Note（伞卡）已落；docs/decisions/归档完成；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。
+
+## 交付证据
+
+- 基线：`git rev-parse HEAD` = `1cae832`（B1 提交后）
+- **B2 真跑（VP-Eng 包）**：`node probes/team/vp-eng-teaming-probe.mjs` → **ALL PASS**（root `session-29d0a0bf-9975-403d-a75a-adff4b9bf02c`，slug `2026-11-07-recon-bank-autorecon-v3`）：P1 teammate `prd-detail` 继承 vp-eng 组合/depth 1/parent=根；P2 `cmo`/`system-architect`/`system-qa` 三个命名 child preset 正确；P3 产物 8/8；P4 SQA 裁决词在场 + 包索引点名 SQA；P5 无 final.md
+- **CEO 回归**：`node checks/smoke/product-team-e2e-smoke.mjs` → **ALL PASS**（202s；members=[cmo,vp-eng]、任务板 2 条且 PRD blockedBy MRD、未越编）
+- **委派边界**：`node checks/smoke/delegation-smoke.mjs` → **ALL PASS**（activation 回执、child 首帧 `agentPreset`、child 无 Team 工具、控制名仍团队版）
+- 资产：新 `probes/team/vp-eng-teaming-probe.mjs`（P1–P5，逐次结果落 `runtime/vp-eng-teaming-probe/last-run.json`）；`checks/INDEX.generated.md` 重生成
+- 程序 Note：`notes/implemented/2026-11-07-requirements-teaming-program.md`（决定 / 输掉的方案 / 落地提交表 / 验证 / 剩余风险 / 上游卡）；D57/D58 路由已进 `docs/decisions.md`（预算 62→64，论证 = 本 Note）
+- docs：`docs/index.md` 两行更新（presets / product-definition）；A1/B1 合同页只核对未改正文
+- 归档：11 张执行卡 + 伞卡 `git mv` → `_backlog/_archive/settled_issues/`；两个研究题整目录 → `_backlog/_archive/research/`；活跃/归档索引同步
+- 门禁（W5 实跑）：`pnpm verify` ALL PASS；`pnpm test` 150 files / 1218 tests；`pnpm typecheck` 绿；`pnpm lint` 0/0；`pnpm dup` 0 clones；`pnpm notes:audit` 状态行不符 0；`release --check` 未跑（未发版）
+- 审查：`审查：agent — 2026-11-07`；用户对照授权原文验收待办

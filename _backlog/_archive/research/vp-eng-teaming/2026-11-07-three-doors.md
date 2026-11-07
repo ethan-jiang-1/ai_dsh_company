@@ -11,12 +11,12 @@ intent: 用源码事实与一次 keyless 实测，定清 VP-Eng 能在哪里组�
 
 | # | 事实 | 证据 |
 |---|---|---|
-| 1 | **每个根会话本来就是 Team Lead** | [roster.ts](../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts) `tryMembership`：没有 `parentSession` 的 root 直接返回 `{ role: 'lead', name: 'lead' }` |
-| 2 | **teammate 继承 Lead 的 preset** | [child-agent.ts](../../../vendor/dsh/packages/subagent/subagent/src/child-agent.ts) `childSessionMeta`：`selectedPreset ?? parent.composedPreset`；`spawn_teammate` 不传 `selectedPreset` |
-| 3 | **命名 child 才由 `agentPreset` 给真人格** | [ceo preset](../../../packages/company-pack/presets/ceo/agent.cordis.yml) 的 `vp_eng` / `system_architect` / `system_qa` 行；[vp-eng preset](../../../packages/company-pack/presets/vp-eng/agent.cordis.yml) 的 `system_architect` / `system_qa` 行 |
-| 4 | **`spawn_teammate` 只有 Lead 能调** | [tool-agent-team](../../../vendor/dsh/packages/experimental/tool-agent-team/src/index.ts) 的 schema 明写 “Only the Team Lead”；[roster.ts](../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts) `spawnAdmitted` 抛 `TEAM_LEAD_REQUIRED` |
+| 1 | **每个根会话本来就是 Team Lead** | [roster.ts](../../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts) `tryMembership`：没有 `parentSession` 的 root 直接返回 `{ role: 'lead', name: 'lead' }` |
+| 2 | **teammate 继承 Lead 的 preset** | [child-agent.ts](../../../../vendor/dsh/packages/subagent/subagent/src/child-agent.ts) `childSessionMeta`：`selectedPreset ?? parent.composedPreset`；`spawn_teammate` 不传 `selectedPreset` |
+| 3 | **命名 child 才由 `agentPreset` 给真人格** | [ceo preset](../../../../packages/company-pack/presets/ceo/agent.cordis.yml) 的 `vp_eng` / `system_architect` / `system_qa` 行；[vp-eng preset](../../../../packages/company-pack/presets/vp-eng/agent.cordis.yml) 的 `system_architect` / `system_qa` 行 |
+| 4 | **`spawn_teammate` 只有 Lead 能调** | [tool-agent-team](../../../../vendor/dsh/packages/experimental/tool-agent-team/src/index.ts) 的 schema 明写 “Only the Team Lead”；[roster.ts](../../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts) `spawnAdmitted` 抛 `TEAM_LEAD_REQUIRED` |
 | 5 | **team 没有 per-member preset** | `spawn_teammate` 参数只有 `name/description/prompt/context`；`freshProvider` 是全团队一个 provider，provider 本身不带 preset 默认值 |
-| 6 | **命名 child 不是 team member** | [roster.ts](../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)：有 `subagentDescriptor` 的 child 返回 `undefined`，不装团队工具 |
+| 6 | **命名 child 不是 team member** | [roster.ts](../../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)：有 `subagentDescriptor` 的 child 返回 `undefined`，不装团队工具 |
 
 ## 2. 一次 keyless 实测（不是真模型）
 
@@ -41,7 +41,7 @@ agentTeam = {"members":[{"name":"lead","role":"lead","phase":"active"}],"tasks":
 ## 4. 为什么 teammate 不能冒充 CMO/SA/SQA
 
 - teammate 的人格/工具面是 VP-Eng 的；它没有 CMO 的 market 判断材料、没有 SA 的架构 skill、没有 SQA 的 V&V 独立性。
-- 用 teammate 起一个叫 `cmo` 的成员，只是“VP-Eng 组合的成员在演 CMO”——这正是 `researcher` preset 当初要解决的“迷你 CEO”问题（[presets.md](../../../docs/presets.md)）。
+- 用 teammate 起一个叫 `cmo` 的成员，只是“VP-Eng 组合的成员在演 CMO”——这正是 `researcher` preset 当初要解决的“迷你 CEO”问题（[presets.md](../../../../docs/presets.md)）。
 - SQA 尤其不能：独立结论要求独立 preset/独立上下文；teammate 共享 Lead 组合，SQA 的“不通过”会变成 VP-Eng 自说自话。
 - CMO 尤其不能：MRD 的 owner 唯一性会被破坏；`MRD 只归 CMO` 是手册硬条款。
 
@@ -51,11 +51,11 @@ agentTeam = {"members":[{"name":"lead","role":"lead","phase":"active"}],"tasks":
 
 | 位置 | 现在说的 | 实际 | 处置 |
 |---|---|---|---|
-| [docs/delegation.md](../../../docs/delegation.md) §2 | “职能根会话不是团队成员，团队版不会装” | 根会话是 Lead，团队版会装；全局控制行是给**命名 child**（非 team member）用的 | 保留控制行，改理由；补“根门=Lead”的事实 |
-| [content/AGENTS.md](../../../packages/company-pack/content/AGENTS.md) “组合继承” | “teammate / 命名委托 child 都继承 Lead 组合” | teammate 继承；命名 child 由 `agentPreset` 给 | 分通道表述；命名 child 的方法 skill 能加载 |
-| [CultivationBoard.tsx](../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx) | “CEO 委派出去的分身继承 CEO 组合——职能方法不会进 child” | 对 teammate 成立；对命名 child 不成立 | 改文案 + 对应 client test |
-| [presets.spec](../../../tests/presets/presets.spec.ts) 的控制面注释 | 用“根会话不是团队成员”解释为什么职能 preset 要放全局控制行 | 真实原因是命名 child 不是 team member | 改注释/断言说明，行本身保留 |
-| [product-team-e2e-smoke](../../../checks/smoke/product-team-e2e-smoke.mjs) | CEO 两件套必须走 team，不许 `vp_cmo`/`vp_eng` 捷径 | 这是 CEO 路径的守卫，不能因为 VP-Eng 组队而放宽 | B2 必须复跑，证明没破坏 |
+| [docs/delegation.md](../../../../docs/delegation.md) §2 | “职能根会话不是团队成员，团队版不会装” | 根会话是 Lead，团队版会装；全局控制行是给**命名 child**（非 team member）用的 | 保留控制行，改理由；补“根门=Lead”的事实 |
+| [content/AGENTS.md](../../../../packages/company-pack/content/AGENTS.md) “组合继承” | “teammate / 命名委托 child 都继承 Lead 组合” | teammate 继承；命名 child 由 `agentPreset` 给 | 分通道表述；命名 child 的方法 skill 能加载 |
+| [CultivationBoard.tsx](../../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx) | “CEO 委派出去的分身继承 CEO 组合——职能方法不会进 child” | 对 teammate 成立；对命名 child 不成立 | 改文案 + 对应 client test |
+| [presets.spec](../../../../tests/presets/presets.spec.ts) 的控制面注释 | 用“根会话不是团队成员”解释为什么职能 preset 要放全局控制行 | 真实原因是命名 child 不是 team member | 改注释/断言说明，行本身保留 |
+| [product-team-e2e-smoke](../../../../checks/smoke/product-team-e2e-smoke.mjs) | CEO 两件套必须走 team，不许 `vp_cmo`/`vp_eng` 捷径 | 这是 CEO 路径的守卫，不能因为 VP-Eng 组队而放宽 | B2 必须复跑，证明没破坏 |
 
 ## 6. B1/B2 的设计
 

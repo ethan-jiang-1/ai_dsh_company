@@ -1,11 +1,11 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-07
 ---
 
 # 落地：五层真跑 E2E（MRD→StRS→PRD→SyRS→IRS→TC）
 
-> 立卡：2026-11-07 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-07 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 2026-11-07
 >
 > **结论/去向**：implementation — 提交即载体；真跑证据并入程序 Note 验证节 `2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/）（伞卡）；本卡不另写 Note。
 >

@@ -33,6 +33,8 @@
 | [repo-hygiene/](repo-hygiene/README.md) · fresh-agent 六维打扫（四轮） | 4 份 | [卫生审计卡](../settled_issues/2026-10-20-fresh-agent-repo-hygiene.md)、[第三轮](../settled_issues/2026-10-27-repo-hygiene-round3.md)、[第四轮](../settled_issues/2026-10-28-repo-hygiene-round4.md) | — | 2026-10-21 |
 | [run-bundle/](run-bundle/README.md) · run bundle 的现状、边界与迁移面 | 1 份 | [干净底座卡](../settled_issues/2026-10-24-run-bundle-clean-base.md) | — | 2026-10-24 |
 | [notes-consistency/](notes-consistency/README.md) · notes/ 全树分诊与收据治理 | 3 份 | —（无卡；治理轮直接记录） | — | 2026-10-30 |
+| [requirements-identification-numbering/](requirements-identification-numbering/README.md) · 需求识别与编号：ID 只承载身份，层/状态/专业域/验证方外置 | 9 份 | [程序伞卡](../settled_issues/2026-11-07-requirements-teaming-landing.md) 等 9 张 | 同批执行卡 A1–A8 | 2026-11-07 |
+| [vp-eng-teaming/](vp-eng-teaming/README.md) · VP-Eng 组队的三种门：根门 / 命名 child / CEO teammate | 3 份 | [B1/B2 卡](../settled_issues/2026-11-07-vpeng-teaming.md) | B1/B2 | 2026-11-07 |
 
 ## 归档规则
 

@@ -6,15 +6,15 @@ intent: 把已定性的编号共识转成可评审的落地面清单、卡边界
 # 编号共识怎么落地：面清单与卡边界
 
 > **这份材料是什么**：[共识](2026-11-07-consensus.md)回答“规则是什么”；本材料回答“按什么面落地、按什么卡拆、每张卡拿什么证据收”。它不改变共识，也不授予实施。
-> **消费者**：[落地拆法卡](../../issues/2026-11-07-requirements-teaming-landing.md)（拆法与评审）；后续 A1–A8 执行卡。
+> **消费者**：[落地拆法卡](../../settled_issues/2026-11-07-requirements-teaming-landing.md)（拆法与评审）；后续 A1–A8 执行卡。
 > **边界**：只写落地面与顺序；参数级选择（状态位、层序、跨动议键等）仍按共识 §6 待拍。
 
 ## 1. 先看四个“落地才暴露”的冲突
 
 | # | 冲突 | 事实（可复核） | 不处理的后果 | 建议处置 |
 |---|---|---|---|---|
-| 1 | **定义点重复** | [PRD 模板](../../../packages/company-pack/content/templates/prd.md)同时有 JSON 账本和 `### REQ-001` 小节；两者都能被读成“定义” | 违反 R4“一个号只能有一个定义点”；Agent 会把正文小节当定义、把 JSON 当索引，或反过来 | PRD 头声明 `definition: json-ledger`，正文小节标题改成“需求说明：REQ-001”这类**引用**；或反过来只留标题。二选一，写进模板和 checker |
-| 2 | **第二套词表还活着** | [workspace 的 process-docs](../../../company-workspace/.dsh-company/kb/process-docs.md)仍写 `STR/SYR/IFR`；pack 的 HEAD 里没有 `process-docs.md`；dev profile 的 `content/templates/{strs,syrs,irs}.md` 还是上一轮实现的残留 | 换一个 workspace 就换一套语法（研究失败 #2 原样复发）；新装与旧盘两套规则 | 新 `content/state/process-docs.md` + 版本标记；bootstrap 只补缺、不覆盖；旧盘迁移/豁免另卡（C4） |
+| 1 | **定义点重复** | [PRD 模板](../../../../packages/company-pack/content/templates/prd.md)同时有 JSON 账本和 `### REQ-001` 小节；两者都能被读成“定义” | 违反 R4“一个号只能有一个定义点”；Agent 会把正文小节当定义、把 JSON 当索引，或反过来 | PRD 头声明 `definition: json-ledger`，正文小节标题改成“需求说明：REQ-001”这类**引用**；或反过来只留标题。二选一，写进模板和 checker |
+| 2 | **第二套词表还活着** | [workspace 的 process-docs](../../../../company-workspace/.dsh-company/kb/process-docs.md)仍写 `STR/SYR/IFR`；pack 的 HEAD 里没有 `process-docs.md`；dev profile 的 `content/templates/{strs,syrs,irs}.md` 还是上一轮实现的残留 | 换一个 workspace 就换一套语法（研究失败 #2 原样复发）；新装与旧盘两套规则 | 新 `content/state/process-docs.md` + 版本标记；bootstrap 只补缺、不覆盖；旧盘迁移/豁免另卡（C4） |
 | 3 | **旧盘与旧实现** | 现有 deliverables 里 `V-` 659 处、`VP-` 71 处、`VR-` 75 处；reflog 的 `65b6917` / `f2bf55b` / `a1fb07b` 是上一轮“层前缀”实现，已 reset | 全量回扫旧动议 = 永久红；cherry-pick 旧实现 = 把 `STR/SYR/IFR` 又带回来 | 旧动议只读豁免；旧实现只当模板/checker 草稿，不 cherry-pick；C4 负责 marker/迁移 |
 | 4 | **强制点/索引/范围未定** | 共识 R10 要求 host 命令/操作员/钩子；§6-1 状态位、§6-2 层序、§6-4 跨动议键、§6-6 并发、§6-8 范围都未拍 | 角色自查会漂；两个会话同时写会撞号；老动议被误判；跨动议引用没有落点 | `/req check` 走操作员命令（host 命令载体）；号由 owner 登记时取 max+1，Lead 串行分配；范围用 marker；跨动议 v1 不实现、显式标未支持 |
 
@@ -44,7 +44,7 @@ intent: 把已定性的编号共识转成可评审的落地面清单、卡边界
 
 ## 4. 卡边界（结果级 C1–C4；执行级 A1–A8）与出口证据
 
-> 执行级卡号以[拆法卡](../../issues/2026-11-07-requirements-teaming-landing.md)为准：A1=合同/范围，A2=模板，A3=CMO/VP-Eng，A4a=SA / A4b=SQA（已拆），A5=checker，A6=命令，A7=迁移，A8=E2E，B1=组队能力，B2=组队 E2E/收口。下面保留结果级 C1–C4 的写法，避免材料跟着卡号漂。
+> 执行级卡号以[拆法卡](../../settled_issues/2026-11-07-requirements-teaming-landing.md)为准：A1=合同/范围，A2=模板，A3=CMO/VP-Eng，A4a=SA / A4b=SQA（已拆），A5=checker，A6=命令，A7=迁移，A8=E2E，B1=组队能力，B2=组队 E2E/收口。下面保留结果级 C1–C4 的写法，避免材料跟着卡号漂。
 
 ### C1 编号合同与五层模板
 
@@ -87,11 +87,11 @@ intent: 把已定性的编号共识转成可评审的落地面清单、卡边界
 ## 6. 陷阱与排除
 
 - **旧实现不是资产清单**：`65b6917` 的模板/checker 可参考，但它的 `STR/SYR/IFR` 层前缀与“6 个空间”已被共识推翻；直接 cherry-pick 会把方向带回去。
-- **PRD 模板同源测试**：[prd-check.spec](../../../tests/company/prd-check.spec.ts) 要求 `content/templates/{mrd,prd}.md` 的示例直接过 `validateProductDocs`；改模板必须同步跑它。
+- **PRD 模板同源测试**：[prd-check.spec](../../../../tests/company/prd-check.spec.ts) 要求 `content/templates/{mrd,prd}.md` 的示例直接过 `validateProductDocs`；改模板必须同步跑它。
 - **文档预算**：`docs/presets.md`、`docs/delegation.md` 已顶格；改文档先搬后写，别先提额。
 - **在飞冲突**：BUG-034/035 相关改动正由另一个 Agent 处理中（工作树里已涉及 SA/SQA preset/skills/tests/probes/bug 卡/Note）；A4a/A4b/B1 必须等它落地，不能混 diff。
 - **不做**：第六/第七条汇报线、SA/SQA 独立汇报线、vendor 改动、UI 角色徽标/委派卡 key、发布版本号（按需）。
 
 ## 7. 与共识的边界
 
-本材料不改变共识；共识 §6 的参数级未定项仍在 A1/A5/A7 落地时逐项拍板。共识 §7 的“实施需另起 issue 或 RFC”由[落地拆法卡](../../issues/2026-11-07-requirements-teaming-landing.md)的 10 张执行卡（推荐 11）承接；**本材料与拆法卡都不是实施授权。**
+本材料不改变共识；共识 §6 的参数级未定项仍在 A1/A5/A7 落地时逐项拍板。共识 §7 的“实施需另起 issue 或 RFC”由[落地拆法卡](../../settled_issues/2026-11-07-requirements-teaming-landing.md)的 10 张执行卡（推荐 11）承接；**本材料与拆法卡都不是实施授权。**

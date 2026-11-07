@@ -1,13 +1,13 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-07
 ---
 
 # 落地：需求识别/编号与 VP-Eng 组队的程序伞卡
 
-> 立卡：2026-11-07 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-07 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 2026-11-07
 >
-> **结论/去向**：note — 程序 Note `2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/）。
+> **结论/去向**：note — 程序 Note [2026-11-07-requirements-teaming-program.md](../../../notes/implemented/2026-11-07-requirements-teaming-program.md)。
 
 **问题与期望结果：** 用户 2026-11-07 要求把[需求识别与编号研究](../research/requirements-identification-numbering/2026-11-07-consensus.md)的结论落地，并让 VP-Eng 能组队解决研发问题——简单的事自己做，复杂的事依赖 CMO/SA/SQA，产出 MRD/PRD 与细节；同时不能破坏 CEO 已有的组队能力。期望本轮推敲完成 = **一张可评审的拆卡表**（几张、每张的结果/依赖/出口证据）+ 需要用户拍板的决策。**本轮不动 `_backlog/` 之外的任何文件。**
 
@@ -116,3 +116,22 @@ B2 只追加证据，不另写 Note；某卡若偏离伞卡，在 Note 加节或
 ## 关闭条件
 
 - 11 张执行卡全部收口；程序 Note 落 `2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/）；D57/D58、docs 与归档完成；伞卡翻 `已结`。
+
+## 交付证据（程序级）
+
+- 基线：W0 = `3d1c282` + 计划材料提交 `a62c87f`；收口 = 本批 W5 提交（11 卡各自的 `## 交付证据` 记录基线 SHA）
+- 11 张执行卡全部 `已结` 并归档到 `_backlog/_archive/settled_issues/`；程序 Note =
+  `notes/implemented/2026-11-07-requirements-teaming-program.md`（决定 / 输掉的方案 / 落地提交表 / 验证 / 剩余风险 / 上游卡）
+- 波次门禁：W0 `verify/test(1166)/typecheck` 绿；W1 `verify + tests/company + prd-check` 绿；W2 两轨
+  （`tests/company` / `typecheck` / `lint`；`tests/presets` / `preset-smoke` / `probe-smoke`）绿；
+  W3 `release-smoke` + A8 真跑（重跑 1 次 ALL PASS）；W4 `preset-smoke` / `probe-smoke` / `delegation-smoke` /
+  `product-team-e2e-smoke` / `client-load-smoke` 全绿 + B2 真跑 ALL PASS；W5 全量 `verify/test/typecheck/lint/dup`
+  + `notes:audit`（见 W5 提交）
+- 模型行为证据：A8 五层链（`session-7e9ddc07-8722-405b-b22d-9fcf279129ef`，slug `2026-11-07-recon-bank-autorecon-v2`，
+  checker 绿 MR 4 / REQ 44 / IF 8 / TC 49）；B2 VP-Eng 包（`session-29d0a0bf-9975-403d-a75a-adff4b9bf02c`，
+  slug `2026-11-07-recon-bank-autorecon-v3`，P1–P5 ALL PASS）；CEO 回归 `product-team-e2e-smoke` ALL PASS
+- 归档同步：`issues/README` 活跃 1 张（SA/SQA 能力组织）；`_archive/README` 加 12 行；两个研究题
+  （`requirements-identification-numbering` / `vp-eng-teaming`）整目录迁入 `_archive/research/` 并补归档行；
+  `research/README` 活跃索引同步；`backlog-liveness` / `md-links` / `link-debt` 绿
+- 发布：**未发版**（本轮未点名；`release --check` 未作为验收项）
+- 用户验收：待用户对照授权原文（批准执行计划 W0–W5）复核；机器全绿 ≠ 语义通过
