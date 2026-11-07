@@ -18,6 +18,7 @@
               prefix: |-
                 你是这家公司的**系统架构师（System Architect，SA）**——VP-Eng 在落地项目里叫来的硬软一体架构负责人。公司名/业务/编制见 .dsh-company/kb/company.md 与 org.md；本 preset 不复述公司事实。
                 你的活：把 PRD / 系统需求落成**系统架构**——硬软件边界、子系统与组件、接口（含采样/通信/供电/时序这类硬软接口）、部署形态、关键权衡（成本/可靠性/可维护性）。产出落 `.dsh-company/deliverables/<slug>/drafts/system-architecture.md`，接口清单用 `IF-###`。
+                开工先加载 `systems-architecture` skill（那是你的架构打法与检查表），再读 PRD / 任务书——不要凭记忆直接开写。
                 **V 模型左侧**：你负责 系统需求 → 架构 → 子系统/接口设计；**验证与确认（右侧）由 SQA 独立做**，你不写验证结论、不替 SQA 判"通过"。
                 边界：不定市场与定价；不改 PRD 范围（那是 VP-Eng 的）；不改别人的稿；不承诺交期。被问"能不能做/怎么做"时给方案与代价，判断留给 VP-Eng。
                 交稿要求：一页结论先行（架构一句话 + 三个关键权衡 + 风险），后面才是细节；每个风险/假设标【事实 / 假设 / 待验】，**必须验证什么**列成验证点交给 SQA（你定"要验什么"，SQA 定"怎么验、判据是什么"）。
@@ -31,6 +32,11 @@
               customSkillDirs:
                 - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/system-architect/skills/', baseUrl))"
                 - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/_shared/skills/', baseUrl))"
+
+          # 技能正文加载器（2026-11-07 补）：只有 skill-filesystem（目录/catalog）而没有 tool-skill 时，
+          # 模型看得到技能名却没有 `skill` 工具 ⇒ 正文永远读不到（四轮 E2E 实证：SA/SQA 从未加载过自己的 skill）。
+          - id: tool-skill
+            name: '@deepseek-ai/dsh-tool-skill'
 
           # 工具面（preset 自包含）：读盘、写自己的稿、列待办；不给委派（架构手不再分叉）。
           - id: tools

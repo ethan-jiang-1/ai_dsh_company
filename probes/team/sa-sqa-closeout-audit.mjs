@@ -35,12 +35,18 @@ const runs=[
  {name:'run#2 19:04', lead:'session-c7bbb913-6cce-44e7-b116-8de41ab1d96c', vp:'66c53afe-5ac6-44d0-a730-401d9bbb4b65', sa:'54ebdb28-572e-4f42-81e0-6cf1319209cc', qa:'04a2c289-4dd6-45d6-8dbb-ea85a0de61c2', slug:'2026-11-06-portable-overload-detection-v2'},
  {name:'run#3 22:15', lead:'session-eedb279c-3f43-4631-97a4-ab3e94e079c0', vp:'55457bac-6897-41f7-b4b6-ee9241e8a4b9', sa:'0ddc6c6e-e274-4bcd-9e76-a804ddd2e1fc', qa:'4ecea922-f09a-4966-96c0-5cc83dcad3ca', slug:'2026-11-06-portable-overload-detection-v4'},
  {name:'run#4 23:2x', lead:'session-9e124104-9d49-4f00-8e1d-e8f0b65a1931', vp:'1544fed8-7b54-45be-b7b4-f371acdfe36e', sa:'7a76bfce-5e2b-41d2-99ba-78d3792cec1c', qa:'f5c9e076-4c9a-4200-a7d0-bcc72f9dea74', slug:'2026-11-06-portable-overload-detection-v5'},
+ {name:'run#5 10:55（tool-skill + 证据链判据后）', lead:'session-70db30ac-a5c2-40d2-83b5-d8a9b1066dd7', vp:'f73ab4fb-e82b-425b-a9b9-8a20f1c90f57', sa:'1c7dfefd-e3c4-4d7a-88ca-5111d554ca46', qa:'c34bc1c6-33a9-49c1-ae28-a11f6271ee2f', slug:'2026-11-07-portable-overload-detection-v8'},
 ]
+/** drafts 下的 .md（递归）：e/v 稿可能在子目录（run#5 实测 `drafts/eng/vv-plan.md`）。 */
+const markdownTree = dir => readdirSync(dir, { withFileTypes: true })
+  .flatMap(entry => entry.isDirectory()
+    ? markdownTree(join(dir, entry.name))
+    : entry.name.endsWith('.md') ? [join(dir, entry.name)] : [])
 for (const r of runs){
   const lead=header(r.lead), vp=header(r.vp), sa=header(r.sa), qa=header(r.qa)
   const DEL=join(DELIV,r.slug)
   const fin=existsSync(join(DEL,'final.md'))?readFileSync(join(DEL,'final.md'),'utf8'):''
-  const drafts=existsSync(join(DEL,'drafts'))?readdirSync(join(DEL,'drafts')).filter(n=>n.endsWith('.md')).map(n=>readFileSync(join(DEL,'drafts',n),'utf8')):[]
+  const drafts=existsSync(join(DEL,'drafts'))?markdownTree(join(DEL,'drafts')).map(path=>readFileSync(path,'utf8')):[]
   const c=[
    ['CEO 根会话 depth 0', lead?.agentPreset==='ceo'&&lead?.delegationDepth===0],
    ['VP-Eng 是 CEO 的 team 成员（depth 1）', vp?.delegationDepth===1&&vp?.parentSession===r.lead],

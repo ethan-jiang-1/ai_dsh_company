@@ -128,6 +128,9 @@
 | [BUG-032-r3-rerecord-not-replayable.md](fixed_bugs/BUG-032-r3-rerecord-not-replayable.md) | r3 重录不可重放（委派通知到达竞态）：`--record` 自检 + ≤3 次重录；失败保留现场 | 2026-10-23 |
 | [BUG-031-orient-scenario-children-file-shape.md](fixed_bugs/BUG-031-orient-scenario-children-file-shape.md) | orient --scenario 对 children 文件形状 ENOTDIR 崩：statSync 分流（文件计 1 / 目录数 .jsonl） | 2026-10-20 |
 
+| [BUG-034-no-absolute-time-source-for-signed-records.md](fixed_bugs/BUG-034-no-absolute-time-source-for-signed-records.md) | 记录可举证必须有时间源：SA/SQA skill 必查 + 审计 Q8/Q10 + E2E v8 验收 | 2026-11-07 |
+| [BUG-035-short-circuit-withstand-undefined.md](fixed_bugs/BUG-035-short-circuit-withstand-undefined.md) | 通流/承力路径必须有故障电流耐受：SA/SQA skill 必查 + 审计 Q9/Q11 + E2E v8 验收 | 2026-11-07 |
+
 ## 暂停卡
 
 目前无问题卡或缺陷卡停放于对应归档目录。

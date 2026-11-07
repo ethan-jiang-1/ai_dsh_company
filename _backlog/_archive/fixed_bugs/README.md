@@ -4,6 +4,8 @@
 
 ## 修复流水（倒序）
 
+- **BUG-034/035**（2026-11-07）：SA/SQA 证据链两处同源缺口——签名事件记录没有绝对时间源；串在通流回路的装置只给 25 A/10 s、未定义短路电流耐受。修法 = 两个 skill 各加两条条件必查（记录与时间可信 / 故障路径的耐受）+ `sa-sqa-quality-audit` Q8–Q11（SA 侧 + SQA 侧；条件触发、SKIP 不算红）+ 两条 keyless 用例；顺带修掉**让所有 skill 改动失效的前置缺陷**——两个子人格 preset 缺 `tool-skill`、persona 未点名"先加载"，技能正文从没被模型读到（run#3/run#4 日志 0 次 skill 名），并修审计把 SA/VP-Eng 稿当 SQA 的假绿口径、drafts 只扫一层的漏读。红绿 = 删词/删行 ⇒ 本用例 1 failed → 还原 38 passed；真实产物 v4 Q8–Q11 红、v8 Q1–Q11 全 PASS（E2E `2026-11-07-portable-overload-detection-v8`）。教训 = **属性没人测 = 属性不存在**；**装上了 ≠ 读到了**。详见 [BUG-034](BUG-034-no-absolute-time-source-for-signed-records.md) / [BUG-035](BUG-035-short-circuit-withstand-undefined.md) 与 [Note](../../../notes/implemented/2026-11-07-sa-sqa-evidence-chain.md)。
+
 - **BUG-033**（2026-10-27）：revoke 恢复把“已撤销 + 用户后改正文”回滚成旧全文——journal 只存旧全文、用 `revokedAt:` 猜目标态；用户在后改正文（保留 revokedAt）会被整条回滚。修法 = 从旧全文 + revokedAt 纯函数推导目标全文；恢复只认 old/target，第三态 conflict 不覆盖；守卫 = 同 spec 的“revokedAt + 正文被改 ⇒ conflict 且字节不变”。红绿 = 新用例先红（旧实现 restore 旧全文）→ 修复后 4/4 绿。详见 [卡](BUG-033-revoke-recovery-body-edit-loss.md)。
 
 - **BUG-032**（2026-10-23）：r3 重录产不出可重放 fixture——委派完成通知落在 lead 轮内/轮后两种形状（3 vs 4 次模型调用），重放到达时机相反即 `llm-replay: script exhausted`。修法 = `--record` 录完立即 keyless 自检、红则重录（≤3 次），失败如实保留现场；不在重放侧宽容 script 用尽。红绿 = 前三次重录全红 → 修复后连续两次 `--record` 第一次即自检绿、replay ALL PASS。教训 = **录制类命令要自证可回放，别把运气交给下一次**。详见 [卡](BUG-032-r3-rerecord-not-replayable.md)。

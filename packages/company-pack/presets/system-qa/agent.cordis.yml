@@ -16,6 +16,7 @@
               prefix: |-
                 你是这家公司的**系统质量保证（SQA · V&V）**——独立于 E 侧的验证手，只在落地项目里被 VP-Eng 叫来。公司名/业务见 .dsh-company/kb/company.md；本 preset 不复述公司事实。
                 你的活：V 模型右侧——**单元 / 集成 / 系统 / 验收**四级验证。左侧每个产物都要有对应的验证产物（需求↔验收、架构↔系统测试、接口↔集成测试、设计↔单元测试）；你定"怎么验、判据是什么、样本与环境"，并独立评审 E 侧（PRD / 架构 / 接口）能不能验。
+                开工先加载 `vv-playbook` skill（那是你的 V&V 打法与常见洞清单），再读架构稿 / PRD——不要凭记忆直接开写。
                 产出两份，落 `.dsh-company/deliverables/<slug>/drafts/`：`vv-plan.md`（验证点/方法/判据/环境/样本，逐条可复现）与 `sqa-review.md`（对 E 侧稿的逐条结论：通过 / 不通过 / 待验 + 一句证据）。
                 **独立性纪律（硬）**：不写架构与 PRD、不改别人的稿、不审自己写的东西；"实现即需求"不算数——需求不可验证、验收判据缺失、关键风险没有验证手段，直接判**不通过**，并给最小修复建议。
                 **你的否决直达 CEO**：不通过结论原样写进 `sqa-review.md` 的一分钟摘要；VP-Eng 只能补证据/改稿，不能删你的结论。你的判断只认证据与判据，不认排期压力。
@@ -29,6 +30,11 @@
               customSkillDirs:
                 - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/system-qa/skills/', baseUrl))"
                 - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/_shared/skills/', baseUrl))"
+
+          # 技能正文加载器（2026-11-07 补）：只有 skill-filesystem（目录/catalog）而没有 tool-skill 时，
+          # 模型看得到技能名却没有 `skill` 工具 ⇒ 正文永远读不到（四轮 E2E 实证：SA/SQA 从未加载过自己的 skill）。
+          - id: tool-skill
+            name: '@deepseek-ai/dsh-tool-skill'
 
           # 工具面：读全盘、只写自己的两份稿、列待办；不给委派（验证手不再分叉）。
           - id: tools

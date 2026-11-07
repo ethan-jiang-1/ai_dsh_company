@@ -296,10 +296,66 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     // 2026-11-06 质量审计发现：不钉层级列时，不同运行给出互相不一致的 V 模型组织方式（审计无法机械核对）。
     expect(qaSkill, 'V&V 行必须有「层级」列（L1–L4）').toMatch(/「层级」列必填/)
     expect(qaSkill, '四级枚举在场').toMatch(/L1 单元[\s\S]{0,80}L4 验收/)
+    // 2026-11-07 实锤：装了技能目录不等于会读——persona 必须点名"先加载"（同 CEO/VP-Eng 的既有形态）。
+    for (const [preset, skill] of [['system-architect', 'systems-architecture'], ['system-qa', 'vv-playbook']] as const) {
+      expect(readFileSync(join(PRESETS_DIR, preset, 'agent.cordis.yml'), 'utf8'),
+        `${preset} 必须在 persona 里点名先加载 ${skill} skill（否则技能挂上也不读）`)
+        .toMatch(new RegExp(`先加载 \`${skill}\` skill`))
+    }
     expect(roleYml('ceo'), '团队成员读 Lead preset ⇒ 任务书必须写清（否则成员 persona 不生效）')
       .toMatch(/任务书必须写清/)
     expect(readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8'), '组队 skill 要写落地项目怎么起')
       .toMatch(/落地项目（非 demo）[\s\S]{0,80}system_architect/)
+  })
+
+  it('SA/SQA 证据链必查：记录可举证必须有时间源（BUG-034）', () => {
+    // 负例留证 2026-11-07：BUG-034——把 SA skill 的「记录与时间可信」改成「记录可信」⇒
+    // 本用例 FAIL（原话 expected … to match /记录与时间可信/），其余通过；还原后全绿。
+    // 真实产物侧红：v4/v5 两轮都被 probes/team/sa-sqa-quality-audit.mjs 的 Q8/Q10 判红。
+    // 2026-11-06 两轮真实运行都声明了事件记录/签名，但全稿没有绝对时间来源；根因 = 两侧 skill 的
+    // 检查表都没有这一项，通用词（不确定度/失败态）不会让模型想到"时钟从哪来"。断言钉住措辞。
+    const saSkill = readFileSync(join(PRESETS_DIR, 'system-architect/skills/systems-architecture/SKILL.md'), 'utf8')
+    expect(saSkill, '检查表必须有「记录与时间可信」').toMatch(/记录与时间可信/)
+    expect(saSkill, '必须回答上电后时钟从哪来').toMatch(/上电后时钟从哪来/)
+    expect(saSkill, '断电重启后的时间恢复').toMatch(/断电重启后时间怎么恢复/)
+    expect(saSkill, '无 RTC/电池时的替代（对时 + 相对计时）').toMatch(/无 RTC\/电池[\s\S]{0,30}对时协议/)
+    expect(saSkill, '记录类验证点必须单列给 SQA').toMatch(/记录可举证与故障路径耐受这两类验证点必须单列/)
+    const qaSkill = readFileSync(join(PRESETS_DIR, 'system-qa/skills/vv-playbook/SKILL.md'), 'utf8')
+    expect(qaSkill, 'SQA 必查绝对时间来源').toMatch(/绝对时间来源/)
+    expect(qaSkill, '计时精度 ≠ 日期可信').toMatch(/计时精度[\s\S]{0,20}日期可信/)
+    expect(qaSkill, '有签名必须验密钥生命周期').toMatch(/密钥生命周期/)
+  })
+
+  it('SA/SQA 证据链必查：物理在故障路径就要有耐受判据（BUG-035）', () => {
+    // 负例留证 2026-11-07：BUG-035——把 SA skill 的「故障路径的耐受」条目整条删掉 ⇒
+    // 本用例 FAIL（原话 expected … to match /物理上位于[\s\S]{0,20}故障路径/），其余通过；还原后全绿。
+    // 真实产物侧红：v4 被 sa-sqa-quality-audit 的 Q9/Q11 判红（只有 25 A/10 s，没有短路电流耐受）。
+    // 2026-11-06：通流装置只给"25 A/10 s 不损坏"，短路整条划给上游；保护功能归上游 ≠ 耐受责任归上游。
+    const saSkill = readFileSync(join(PRESETS_DIR, 'system-architect/skills/systems-architecture/SKILL.md'), 'utf8')
+    expect(saSkill, '物理位于故障路径 ⇒ 有耐受责任').toMatch(/物理上位于[\s\S]{0,20}故障路径/)
+    expect(saSkill, '保护归上游 ≠ 耐受归上游').toMatch(/保护功能归上游 ≠ 耐受责任归上游/)
+    expect(saSkill, '必须给耐受包络').toMatch(/耐受包络/)
+    expect(saSkill, '耐受类验证点必须单列给 SQA').toMatch(/记录可举证与故障路径耐受这两类验证点必须单列/)
+    const qaSkill = readFileSync(join(PRESETS_DIR, 'system-qa/skills/vv-playbook/SKILL.md'), 'utf8')
+    expect(qaSkill, '边界外但物理在路径内也要有耐受判据').toMatch(/边界外 ≠ 无责任/)
+    expect(qaSkill, '上游负责时逐条问扛不扛得住').toMatch(/由上游负责[\s\S]{0,30}扛不扛得住/)
+    expect(qaSkill, '耐受判据要含破坏性试验与样品量').toMatch(/破坏性试验与样品量/)
+  })
+
+  it('skill 目录必须配加载器：声明 skill-filesystem 的 preset 同时声明 tool-skill', () => {
+    // 2026-11-07 实锤（做 BUG-034/035 的 E2E 时发现）：system-architect / system-qa 只装了 skill-filesystem
+    // （目录 + catalog 摘要），没有 tool-skill（`skill` 加载工具）⇒ 模型看得到技能名却读不到正文。
+    // 证据：run#3/run#4 的 SA/SQA 会话日志里 0 次 `systems-architecture` / `vv-playbook`，工具面也没有 `skill`。
+    // 这条不变量对全部 preset 生效：目录与加载器是一对，缺一个 = 技能永远不生效。
+    const presets = readdirSync(PRESETS_DIR, { withFileTypes: true })
+      .filter(entry => entry.isDirectory() && existsSync(join(PRESETS_DIR, entry.name, 'agent.cordis.yml')))
+      .map(entry => entry.name)
+    for (const preset of presets) {
+      const text = readFileSync(join(PRESETS_DIR, preset, 'agent.cordis.yml'), 'utf8')
+      if (!text.includes('dsh-skill-filesystem')) continue
+      expect(text, `${preset} 装了 skill 目录却没有 tool-skill：模型没有 skill 工具，技能正文永远加载不到`)
+        .toContain('dsh-tool-skill')
+    }
   })
 
   it('委托控制面（R4；0.2.1 不动机制）：职能 preset 声明控制行，CEO 不声明', () => {

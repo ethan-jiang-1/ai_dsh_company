@@ -15,7 +15,7 @@ opened: 2026-11-07
 > 消费者：用户 2026-11-07 直接提出（CMO 产 MRD 需 StRS、VP-Eng 产 PRD 需 SyRS+IRS）；本仓
 > [SA/SQA 子人格落地 Note](../../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md) 与
 > [成品评审材料](../sa-sqa-product-review/README.md) 是背景证据。
-> 产出的卡：—
+> 产出的卡：[落地拆法卡](../../issues/2026-11-07-requirements-teaming-landing.md)（拆法评审；6 张执行卡待用户批准后拆）
 > **硬前提**：第一消费者是 **Agent**——判据不是"人读得懂"，而是"Agent 不可能读错、没有判断题、机器能判红"。
 > 结论：ID 只承载身份（种类 + 序号）；层归文档并声明、状态归条目、专业域与验证方归字段；追溯由作者写边、
 > 索引派生、检查判红。**全文 = [2026-11-07-consensus.md](2026-11-07-consensus.md)**（自说明，只读这一份即可）。
@@ -42,6 +42,7 @@ opened: 2026-11-07
 | 文件 | 作用 | 日期 |
 |---|---|---|
 | [2026-11-07-consensus.md](2026-11-07-consensus.md) | **结论**：自说明的共识（背景 / 盘面 / 推理 / 规则 / 未定项）；只读这一份即可 | 2026-11-07 |
+| [2026-11-07-landing-plan.md](2026-11-07-landing-plan.md) | **落地拆法**：四个落地冲突、落地面清单、C1–C4 卡边界、V1/V2/V4/V11 验证门；不授予实施 | 2026-11-07 |
 | [2026-11-07-current-brief.md](research_topic/2026-11-07-current-brief.md) | 当前 brief：问题、场景、约束、用户已拍、未说清单；唯一入口 | 2026-11-07 |
 | [2026-11-07-space.md](research_topic/2026-11-07-space.md) | 探索空间：16 个设计维度、12 个场景用例、先验风险、硬约束、27 个待探索问题 | 2026-11-07 |
 | [2026-11-07-candidates.md](research_topic/2026-11-07-candidates.md) | 候选方案族 S1–S8、假说 H1–H8、评估维度；不排名 | 2026-11-07 |
@@ -58,3 +59,4 @@ opened: 2026-11-07
 立为硬前提，并 capture 了硬软一体/多 discipline/人的 review/IRS 检查点的场景；探索空间已按功能拆成
 current-brief / space / candidates / validation / evidence 五份，另有独立的 Claude / GPT / DeepSeek 三份判断材料，历史三轮冻结在 `history/`。
 **2026-11-07 收敛成 [共识](2026-11-07-consensus.md)**：ID 只承载身份（种类 + 序号），层归文档并声明、状态归条目、专业域与验证方归字段；追溯由作者写边、索引派生、检查判红。参数级未定项（状态位落点、层数层序、IRS 闸、跨动议键、词表盲测 V1）见共识 §6；**未授权实施**；此前实现已全部 git reset 撤回，只留材料。
+**2026-11-07 另出[落地拆法材料](2026-11-07-landing-plan.md)**：把共识翻成 C1–C4 的面清单与卡边界；拆法评审 = [卡](../../issues/2026-11-07-requirements-teaming-landing.md)，6 张执行卡待用户批准。

@@ -10,9 +10,14 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-034](BUG-034-no-absolute-time-source-for-signed-records.md) | 无电池设备没有绝对时间源：签名事件记录的时间戳不可用于举证（SA/SQA 双双漏项） | P1 |
-| [BUG-035](BUG-035-short-circuit-withstand-undefined.md) | 串在回路里的装置只有 25 A/10 s 包络，未定义短路电流耐受（边界外≠无责任） | P1 |
-| —（无活跃缺陷卡） | BUG-033 已修并迁 [fixed_bugs](../_archive/fixed_bugs/BUG-033-revoke-recovery-body-edit-loss.md)：journal 目标态推导 + 第三态 conflict；2026-10-23 BUG-032 同模式 | — |
+| —（无活跃缺陷卡） | BUG-034 / BUG-035 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：SA/SQA 证据链必查（时间源 + 故障路径耐受）+ 审计 Q8–Q11；2026-11-07 E2E v8 验收 | — |
+
+**2026-11-07 BUG-034/035 收口**：两张 P1 同源——「属性没人测 = 属性不存在」。修法 = 两侧 skill 各加两条条件必查
+（记录与时间可信、故障路径的耐受）+ `sa-sqa-quality-audit` 新增 Q8–Q11（SA 侧 + SQA 侧）+ 两条 keyless 用例；
+E2E `2026-11-07-portable-overload-detection-v8` 的 SA/SQA 产物 Q1–Q11 全 PASS、收口审计 10/10。
+顺带修掉一个让所有 skill 改动都失效的前置缺陷：两个子人格 preset 缺 `tool-skill`、persona 未点名先加载，
+技能正文从没被模型读到（run#3/run#4 日志 0 次 skill 名）。教训同 2026-10-19 三张卡：
+**量得再准，量的也可能是别的东西**——这次是「技能装上了 ≠ 模型读到了」。
 
 **2026-10-19 BUG-028 收口**：闸门④认总锚（title 或 prompt 点名即算，依赖链一并传递），lingang-recon 由 3 条误报 → 0 条违规；
 守卫 = `tests/harness/tools/deliverables-audit.spec.ts` 两条 keyless 断言（锚粒度 + 依赖链）。教训同 BUG-014：

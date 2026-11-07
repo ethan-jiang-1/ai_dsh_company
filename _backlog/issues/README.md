@@ -4,7 +4,12 @@
 
 ## 活跃清单
 
-当前活跃 0 张。
+当前活跃 2 张：
+
+| 卡 | 一句话 | 状态 |
+|---|---|---|
+| [2026-11-07-sa-sqa-capability-organization.md](2026-11-07-sa-sqa-capability-organization.md) | SA/SQA 的全方位能力怎么组织：按场景取用学科域（纯软件只用软件思考；EE/ME 不缺席），牵涉 VP-Eng 任务书 | 推敲中 |
+| [2026-11-07-requirements-teaming-landing.md](2026-11-07-requirements-teaming-landing.md) | 需求识别/编号 + VP-Eng 组队的落地拆法：10 张执行卡（推荐 11）、依赖/证据、旧盘豁免与在飞 BUG-034/035 冲突；待用户评审 | 推敲中 |
 
 
 2026-11-03 两张打扫卡（第五轮 / 第六轮）均已结归档：改善按五道门落地，证据在各 Note；

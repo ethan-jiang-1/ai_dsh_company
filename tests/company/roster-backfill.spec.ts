@@ -28,7 +28,7 @@ function staleDisk(): { workspace: string; kb: string } {
     .replace(/### 市场与产品（CMO，3）[\s\S]*?(?=### )/, '')
     .replace('## 六条线', '## 五条线')
   const owners = readFileSync(join(CONTENT, 'state/owners.md'), 'utf8')
-    .split('\n').filter(line => !/^\| CMO \|/.test(line)).join('\n')
+    .split('\n').filter(line => !line.startsWith('| CMO |')).join('\n')
   writeFileSync(join(kb, 'org.md'), org)
   writeFileSync(join(kb, 'owners.md'), owners)
   return { workspace, kb }

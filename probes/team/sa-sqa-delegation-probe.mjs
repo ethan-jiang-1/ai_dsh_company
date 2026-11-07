@@ -5,6 +5,10 @@
 //   只有 Lead 能调、命名 subagent 行的默认 maxDepth 是 1 ⇒ 默认配置下 VP-Eng **起不了**帮手。本探针
 //   用真模型证明两件事同时成立：① VP-Eng 能调 `system_architect` / `system_qa`；② 两个子代是
 //   **独立会话**（各自 preset、depth 2、同一 parent = VP-Eng）。
+// 2026-11-07（BUG-034/035）：任务书加一条硬需求「过载事件记录 + 事后举证（谁在何时过载、记录能否被篡改）」——
+//   这条需求是那两个缺陷的**触发条件**（记录可举证 ⇒ 必须有时间源；通流装置 ⇒ 必须有故障电流耐受）。
+//   场景不写它，新 run 的 SA 可能根本不谈记录，Q8/Q10 只会 SKIP，证不了修复。产物判据用
+//   `probes/team/sa-sqa-quality-audit.mjs` 的 Q8–Q11 复核（本探针只管接线 + 收口）。
 // 成本/预算：真模型一轮（组队 + VP-Eng 两次委托），约 4–9 分钟；无自动重跑。
 // 用法：source run/env.sh && node probes/team/sa-sqa-delegation-probe.mjs [--wall 600]
 // 收口断言（2026-11-06 补）：等 CEO 出 final.md，断言它点名 SQA、带裁决词，且 drafts 里有 SQA/SA 稿——
@@ -41,6 +45,7 @@ try {
     '1) 用 spawn_teammate 起 vp-eng（名字就是 vp-eng）；',
     '2) 任务板建一个任务给 vp-eng，任务书写明：落地项目必须用 system_architect 与 system_qa 各起一个子代理——',
     '   SA 出系统架构稿（含 IF-### 接口清单），SQA 出 V&V 计划并对架构稿给独立结论（不通过就写不通过）；',
+    '   产品必须有过载事件的记录与事后举证能力（谁在何时过载、记录能否被篡改）——这是本项目的一条硬需求；',
     '3) vp-eng 交回后收口，SQA 的原始结论单列一条。',
     '目标产品锁定为**电气侧**：串在 16 A / 220 VAC 插座回路里的便携过载检测器（不是力学测力计）；其它细节自定；≤ 10 个工具轮；现在开始。',
   ].join('\n')
@@ -102,9 +107,13 @@ try {
   const finalPath = slug === undefined ? undefined : join(DELIV, slug, 'final.md')
   const finalText = finalPath === undefined ? '' : readFileSync(finalPath, 'utf8')
   const draftsDir = slug === undefined ? undefined : join(DELIV, slug, 'drafts')
+  // 递归：VP-Eng 可能把 e/v 稿放子目录（run#5 实测 `drafts/eng/vv-plan.md`）；只扫一层会误判"没落盘"。
+  const markdownTree = dir => readdirSync(dir, { withFileTypes: true })
+    .flatMap(entry => entry.isDirectory()
+      ? markdownTree(join(dir, entry.name))
+      : entry.name.endsWith('.md') ? [join(dir, entry.name)] : [])
   const draftTexts = draftsDir === undefined || !existsSync(draftsDir) ? []
-    : readdirSync(draftsDir).filter(name => name.endsWith('.md'))
-      .map(name => readFileSync(join(draftsDir, name), 'utf8'))
+    : markdownTree(draftsDir).map(path => readFileSync(path, 'utf8'))
   const checks = [
     ['两个子会话接线（preset ×2 / depth=2 / 同一 parent）', wiringOk],
     ['收口稿 final.md 出现', finalPath !== undefined],
