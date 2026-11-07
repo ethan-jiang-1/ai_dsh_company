@@ -10,7 +10,9 @@ import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 //   ② 手册/README/模板/状态默认值不含部署日期与 snapshots/archive/deliverables-archive 引用；
 //   ③ content/ 不含 journal/deliverables/cultivation 的运行态文件（只读内容不装 run bundle）。
 const ROLES = [...COMPANY_ROLE_IDS]
-const TEXT_FILES = ['AGENTS.md', 'README.md', 'state/org.md', 'state/company.md', 'state/owners.md', 'state/motion-ledger.md',
+// 负例留证 2026-11-07（A1）：process-docs 落进 content 后同步纳入本表——删 `state/process-docs.md`
+// 走「缺失」判红（不抛异常）；把 `（2026-11-07` 写回正文 → 「含部署日期」判红。
+const TEXT_FILES = ['AGENTS.md', 'README.md', 'state/org.md', 'state/company.md', 'state/owners.md', 'state/motion-ledger.md', 'state/process-docs.md',
   ...['decision-memo.md', 'meta.md', 'mrd.md', 'ops-review-note.md', 'prd.md', 'review-note.md', 'weekly-report.md'].map(name => `templates/${name}`)]
 
 export function run({ root, ok, fail }) {

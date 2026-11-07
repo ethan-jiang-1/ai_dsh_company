@@ -14,6 +14,8 @@ export function run({ root, ok, fail }) {
   const required = [
     `${CONTENT}/AGENTS.md`,
     `${CONTENT}/templates/meta.md`,
+    // 负例留证 2026-11-07（A1）：删 `state/process-docs.md` → 本门禁红（「缺失」而非崩）。
+    `${CONTENT}/state/process-docs.md`,
     ...ROLES.map(role => `${CONTENT}/charters/${role}.md`),
     ...['company.md', 'org.md', 'owners.md', 'motion-ledger.md'].map(file => `${CONTENT}/state/${file}`),
   ]

@@ -63,3 +63,15 @@ opened: 2026-11-07
 - `## 验收标准` 全绿；`## 测试资产` 的资产在场（新 spec/probe 已跑过、红证已留）；证据并入程序 Note（`2026-11-07-requirements-teaming-program.md`（待建，落 notes/implemented/））；卡翻 `已结` 并归档。
 - 方法义务：`validation-design` / `validation-evidence` / `issue-to-note` 的产物在卡上；只报告实跑过的命令。
 - 证据记录：每条命令附执行时 `git rev-parse HEAD`、输入/产物路径、通过/失败；红证与绿证都留（`validation-evidence` §3）。
+
+## 交付证据
+
+- 基线：`git rev-parse HEAD` = `a62c87f`（W0 绿后；verify/test 1166/typecheck 全绿）
+- 红（合同缺失）：`pnpm vitest run tests/company/requirements-contract.spec.ts` → `6 failed | 1 passed`（缺 process-docs / R1 / 退役节 / 层表 / 门禁两项）
+- 红（唯一词表破了）：正文 R2 行注入 `STR-001` → `1 failed | 6 passed`，断言原话 = 「正文规则出现了退役号形——唯一词表破了」
+- 红（门禁在场）：`mv content/state/process-docs.md` 后 `pnpm verify` → `FAIL company-skeleton: … 缺失`、`FAIL base-clean: … 缺失`，`2 FAILURE(S)`；还原后绿
+- 绿：`pnpm vitest run tests/company/requirements-contract.spec.ts` → `7 passed`；`pnpm vitest run tests/company` → `42 files / 254 tests passed`；`pnpm verify` → `ALL PASS；2 门无对象`
+- 资产：`tests/company/requirements-contract.spec.ts`（新增 7 条判据）；`checks/gates/{base-clean,company-skeleton}.mjs` 各加 process-docs 在场/扫描 + 负例留证注释
+- 真跑：未跑（A1 不涉及模型行为；A8 统一跑）
+- 文档/Note：`content/state/process-docs.md`（新合同，R1–R10）、`templates/meta.md`（编号体系/需求层）、`content/AGENTS.md`（事实的家 + 产品定义行）、`docs/guides/product-definition.md`（59/62 行，先搬后写）；程序 Note 待 W5 落
+- 审查：`审查：agent — 2026-11-07`（W1 波次抬头留独立子代理盲审）
