@@ -1,5 +1,5 @@
 ---
-status: 调研中
+status: 已定性
 opened: 2026-11-09
 ---
 
@@ -14,8 +14,9 @@ opened: 2026-11-09
 > [BUG-043](../../_archive/fixed_bugs/BUG-043-list-subagents-includes-teammates.md)、
 > [BUG-044](../../_archive/fixed_bugs/BUG-044-background-job-lost-on-restart.md) 修复轮；
 > 用户 2026-11-09 研究请求（无卡）。
-> 产出的卡：暂无（盘点与结构性研究进行中；发现的缺口按证据另行分诊）。
-> 结论：（调研中）
+> 产出的卡：暂无（建议的后续 issue/RFC 见结论材料 §7 Q5；待用户裁决）。
+> 结论：存在系统性结构问题（组合重复/能力隐晦、worker=角色克隆、合同角色局部、三通道缺统一模型与面级验证）；
+> 推荐先做“合同单家 + worker profile + 能力清单 + keyless 声明面矩阵”，生成器为第二阶段，team 成员组合/通道统一属上游。
 
 ## 材料
 
@@ -28,3 +29,4 @@ opened: 2026-11-09
 | [2026-11-09-external-practices.md](2026-11-09-external-practices.md) | Anthropic / Claude Code / OpenAI 一手实践 survey，映射 S1–S6 与四层“优雅形状”初步 | 2026-11-09 |
 | [2026-11-09-contract-duplication.md](2026-11-09-contract-duplication.md) | 合同/委派词在 persona、角色 skills、docs 的分布读数（只读词频；S4 证据） | 2026-11-09 |
 | [2026-11-09-composition-experiments.md](2026-11-09-composition-experiments.md) | 两个只读实验：dump-config 声明面读数（H6 原型）+ 底座/delta 矩阵（H1/H2） | 2026-11-09 |
+| [2026-11-09-options-and-conclusion.md](2026-11-09-options-and-conclusion.md) | 结论：四个结构缺口、目标四层、A/B/C 方案、推荐顺序与 5 个待裁决问题 | 2026-11-09 |
