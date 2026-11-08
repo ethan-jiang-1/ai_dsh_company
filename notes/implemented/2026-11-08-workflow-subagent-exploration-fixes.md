@@ -13,7 +13,8 @@
     [BUG-036](../../_backlog/bugs/BUG-036-workflow-schema-enum-type.md)。
   - **F2**（方向 R3 委派深度链）：根会话 = Lead，团队版 `send_message`/`list_agents` shadow 全局版；
     契约 §4.4 与五个 preset 注释误写“职能根会话不是成员”。已修 docs/注释/`eng-teaming` 控制面规则；
-    机制留 [BUG-037](../../_backlog/bugs/BUG-037-root-team-tool-shadowing.md)。
+    M2 natural 复跑仍见 `wait_agent`（`no-active-peer`），已把它补进控制面列表；机制留
+    [BUG-037](../../_backlog/bugs/BUG-037-root-team-tool-shadowing.md)。
   - **F3**（方向 R5 W 分支内再委派）：分支返回值把回执和结论拼在一起（`started subagent … <值>`），
     带 schema 的分支会 null。已加“分支默认是叶子”规则；机制留
     [BUG-038](../../_backlog/bugs/BUG-038-workflow-branch-nested-delegation-result.md)。
@@ -68,6 +69,11 @@
   完整、row 3 半段、row 4/5 null。
 - **取消收敛**（R8）：`session-485bf924-eaf4-459f-b7f2-a3e8ff548318` 12s 后 `session/cancel` →
   `turn/end aborted(user)`、run `cancelled`、6 agents `cancelled`、child `aborted(parent)`、无残留 sleep。
+- **多轮混合**（M2）：`session-0ae9def6-d13e-4e49-8b91-8b1a364bc93a` 1 workflow（4 agents）+
+  2 subagent；report.json 三轮原文、冲突 1 条、分歧保留；`wait_agent` 残留一次（F7 已补规则）。
+- **C 入口 depth 链**（CD2）：`session-a146504e-a210-401d-8201-c3099066e2ab` → child
+  `6ac3bddb-…`；W1 的 `subagent` 被拒 `subagent depth 3 exceeds maxDepth 2`，声明面
+  `current 2 / max 2 / remaining 0`；W1 未读文件、未重试；child 用 `bash sleep 90/75`（F8 观察）。
 - **机制**：`node --import tsx/esm runtime/tmp/explore/keyless-retry.ts` 4/4 PASS（retry-once /
   AGENT_START fatal 穿 parallel / AGENT_RESULT fatal / 两次失败停在 2 starts）。
 - 证据目录：`runtime/tmp/explore/`（gitignored）；研究材料只留脱敏摘要与 session id。

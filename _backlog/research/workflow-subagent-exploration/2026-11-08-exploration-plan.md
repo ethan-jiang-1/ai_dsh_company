@@ -400,6 +400,8 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 | N1 | CEO root | 负例：teammate 名 `vp-eng`，要求 workflow | teammate 明确报告“没有 workflow、也不冒充”，并指出根层与 depth 限制；CEO 指出正确路线是 `vp_eng` 命名 child | PASS（能力边界如实处理） |
 | R7 | vp-eng root | 溢出压力：6 分支各 400 行、父原样返回全量 rows | 完整渲染 ~85.9k 字符；tool result 截到 49,929 字符 + `[truncated: 35806 more characters]`；spill 文件也只有 50,102 字符且含同一截断标记；父只能落 rows 0–2 完整、row 3 半段、row 4/5 null，并如实记 missing | **BUG-039**（P1）；spill 不可恢复 |
 | R8 | vp-eng root | 前台 workflow 6×sleep 45，12s 后 `session/cancel` | turn/end `aborted(user)`、run `cancelled`、6 agents `cancelled`、child `aborted(parent)`、无残留 sleep | 取消收敛 PASS |
+| M2 | vp-eng root | natural 多轮混合：4 模块版本 → 独立 lock 核对 → 冲突补证 | 1 workflow（4 agents completed）+ 2 subagent；最终 report.json 三轮原文、冲突 1 条、分歧原样保留；`wait_agent`（团队版）仍被调用一次并报 `no-active-peer` | 多轮结果未丢（PASS）；**F7** 残留 |
+| CD2 | CEO root | C 入口 depth 链：CEO→`vp_eng`(1)→W1(2)→W2(3) | W1 的 `subagent` 被拒 `subagent depth 3 exceeds maxDepth 2`；W1 声明面 `current 2 / max 2 / remaining 0`；W1 未读文件、未重试、如实回报。`vp_eng` child 用 `bash sleep 90/75` 等 W1（F5 在 child 层的复发）；harness 在通知到达前关 web，child 被中断 | depth 边界 PASS；**F8** 观察 |
 | K1 | keyless | fake `SubagentProvider` + 真 workflow 引擎 | ① refusal→null→第二次 structured，starts=2；② `AGENT_START` 穿过 parallel 为 fatal；③ `AGENT_RESULT` 未捕获→run error；④ 两次 refusal 后停在 2 starts | 4/4 PASS；脚本 `runtime/tmp/explore/keyless-retry.ts` |
 
 辅助观察：R5 的孙代、R3 的 W2 分别落在 depth 2；R4 的 child 全部在取消后进入 aborted 终态。
@@ -416,6 +418,8 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 | F4 | 命名 child 同时用 `send_message` + 完成通知回报，父收到两份 | C1 CEO→vp_eng | 已修 eng-workflow 第 5 步（终稿即回执）；绿 C2 | C1 / C2 |
 | F5 | CEO 用 `bash sleep` 轮询 child，而不是派发后结束本轮 | C1 | 已修 CEO skill/persona（明确禁 sleep/轮询）；绿 C2 | C1 / C2 |
 | F6 | workflow >50k 返回值硬截断；spill 文件也是截断副本，缺段找不回 | R7 原样返回全量 rows 的溢出压力 | 已修 eng-teaming“返回聚合/异常”+ 研究材料 §1.1 更正；机制留 **BUG-039**（P1） | R7 |
+| F7 | 加了控制面规则后，根门仍会用 `wait_agent` 等 subagent child（团队版，报 `no-active-peer`） | M2 natural 多轮混合 | 已把 `wait_agent` / `interrupt_agent` 明确写进 eng-teaming 控制面列表；无绿复跑（预算） | M2 |
+| F8 | 命名 child 也会用 `bash sleep 90/75` 等自己的 worker，而不是回执后等通知 | CD2 C 入口 depth 链 | 观察：与 F5 同型；harness 关 web 时 child 被中断，说明 sleep 期间被父进程终止会丢活。未再改 skill（控制面条已覆盖），记观察 | CD2 |
 
 ### 16.3 未覆盖 / 不记为 bug
 

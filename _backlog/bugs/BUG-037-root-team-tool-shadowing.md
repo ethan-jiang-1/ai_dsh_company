@@ -62,6 +62,8 @@ generic subagent child）有效。本仓注释与 §4.4 把“根”误写成“
 - 同轮修正：`docs/delegation.md` §4.4 改成“根 = Lead（团队版 shadow 全局版）；命名/普通 child 非成员，
   全局行只对它们生效”；五个职能 preset 的续驶控制面注释同步；`eng-teaming` 加控制面规则
   （根门够不到 child；child 终稿走完成通知；不要 sleep 轮询）。
+- M2 natural 复跑仍见 `wait_agent` 被用于 child（团队版，`no-active-peer`）；首版 `eng-teaming` 只列了
+  `send_message` / `list_agents`，已补 `wait_agent` / `interrupt_agent`（2026-11-08 同日）。
 - 机制本身（vendor shadow）未改；可选后续：在本仓加一个不与团队名冲突的全局控制工具名、或接受并
   在合同里写死“根门不提供 child steer”。
 
