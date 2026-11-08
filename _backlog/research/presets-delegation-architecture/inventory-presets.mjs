@@ -1,7 +1,8 @@
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { createRequire } from 'node:module'
-const ROOT = '/Users/bowhead/ai_dsh_company'
+import { fileURLToPath } from 'node:url'
+const ROOT = fileURLToPath(new URL('../../../', import.meta.url))
 const yaml = createRequire(join(ROOT, 'vendor/dsh/package.json'))('js-yaml')
 const schema = yaml.CORE_SCHEMA.extend([
   new yaml.Type('tag:yaml.org,2002:js', { kind: 'scalar', construct: d => d }),
