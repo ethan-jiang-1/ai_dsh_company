@@ -1,4 +1,4 @@
-# 2026-11-08 · workflow + subagent 探索性测试第一轮：5 张卡（1×P1 + 4×P2）+ 2 条当场修
+# 2026-11-08 · workflow + subagent 探索性测试第一轮：6 张卡（2×P1 + 4×P2）+ 2 条当场修
 
 状态：implemented（2026-11-08；第一轮探索已执行并收口）
 上游 = [探索性测试 bug-hunt 问题卡](../../_backlog/issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)
@@ -31,8 +31,12 @@
     `null`（文本答案被丢弃、无诊断），job/run 仍 `completed`。已修 `eng-teaming`（schema 分支明确要
     `structured_output`；验收看 null/count）；机制/上游留
     [BUG-040](../../_backlog/bugs/BUG-040-workflow-schema-text-answer-discarded.md)（P2）。
+  - **F10**（方向 RS1 宿主重启）：child 在跑时 SIGTERM 宿主再重启，父 durable 无新 turn/notice，
+    child durable 记 `interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，无法查询。
+    已在 `eng-teaming` 长跑条加“别跨重启等通知”；机制/上游留
+    [BUG-041](../../_backlog/bugs/BUG-041-host-restart-orphans-inflight-child.md)（P1）。
 - 不把“小任务自己做”（R1/T1）、“natural 选另一条合法通道”记成 bug；不宣称未命中的面没有 bug。
-- 五张缺陷卡（036/037/038/040 P2、039 P1）都是 `调查中`：当场修的是**本仓提示面/合同**，vendor 机制
+- 六张缺陷卡（036/037/038/040 P2、039/041 P1）都是 `调查中`：当场修的是**本仓提示面/合同**，vendor 机制
   （schema 子集、团队 shadow、嵌套结果形状、50k 硬截断）未改。
 
 ## 输掉的方案
@@ -74,6 +78,8 @@
   完整、row 3 半段、row 4/5 null。
 - **取消收敛**（R8）：`session-485bf924-eaf4-459f-b7f2-a3e8ff548318` 12s 后 `session/cancel` →
   `turn/end aborted(user)`、run `cancelled`、6 agents `cancelled`、child `aborted(parent)`、无残留 sleep。
+- **宿主重启**（RS1）：父 `session-24da0c1b-…` 无新 turn；child `48eb730a-…` `turn/end interrupted`；
+  父再问时 `list_agents` 只 lead、`job_list` 空，自述无法查询。
 - **多轮混合**（M2）：`session-0ae9def6-d13e-4e49-8b91-8b1a364bc93a` 1 workflow（4 agents）+
   2 subagent；report.json 三轮原文、冲突 1 条、分歧保留；`wait_agent` 残留一次（F7 已补规则）。
 - **C 入口 depth 链**（CD2）：`session-a146504e-a210-401d-8201-c3099066e2ab` → child

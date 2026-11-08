@@ -2,7 +2,7 @@
 
 当场修掉的不建卡。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。
 
-**下一个缺陷号**：Next BUG ID = 41；已分配 BUG-001..040。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 42；已分配 BUG-001..041。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，修相对链接并更新两边清单。
 
@@ -15,12 +15,13 @@
 | [BUG-038](BUG-038-workflow-branch-nested-delegation-result.md) | workflow 分支内再委派：返回值混入回执，schema 分支会 null | P2 |
 | [BUG-039](BUG-039-workflow-result-truncation-lossy-spill.md) | workflow >50k 结果硬截断，spill 文件也是截断副本，缺段找不回 | P1 |
 | [BUG-040](BUG-040-workflow-schema-text-answer-discarded.md) | 带 schema 的分支只回文本 → 父拿 null，文本答案被丢弃且无诊断 | P2 |
+| [BUG-041](BUG-041-host-restart-orphans-inflight-child.md) | 宿主重启后 in-flight child 成孤儿：child 记 interrupted，父收不到终态也查不到 | P1 |
 | —（历史） | BUG-034 / BUG-035 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：SA/SQA 证据链必查（时间源 + 故障路径耐受）+ 审计 Q8–Q11；2026-11-07 E2E v8 验收 | — |
 
-**2026-11-08 五张卡同轮来源**：workflow + subagent 探索性测试（问题卡
+**2026-11-08 六张卡同轮来源**：workflow + subagent 探索性测试（问题卡
 [exploratory bug hunt](../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)）。发现方向 =
 R2 强制 workflow + 缺失/坏源（036）、R3 委派深度链（037）、R5 W 分支内再委派（038）、
-R7 原样返回全量 rows 的溢出压力（039）、R10 后台 W 中模型自选文本回答（040）；同轮当场修掉的两条（命名 child 双重回执、CEO sleep 轮询）
+R7 原样返回全量 rows 的溢出压力（039）、R10 后台 W 中模型自选文本回答（040）、RS1 宿主重启（041）；同轮当场修掉的两条（命名 child 双重回执、CEO sleep 轮询）
 记在 [探索 Note](../../notes/implemented/2026-11-08-workflow-subagent-exploration-fixes.md) 与
 [研究材料结果节](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
 

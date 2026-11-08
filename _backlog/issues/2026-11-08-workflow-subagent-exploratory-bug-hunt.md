@@ -33,7 +33,7 @@ opened: 2026-11-08
 5. 是否覆盖 background/cancel、`workspace-write` 沙箱、发布安装链、其他职能工具面与长期采纳率？建议本轮以 VP-Eng bug discovery 为主，其余明确延期；用户批准后才可加面。
 6. 真模型证据采用何种合成归档格式和留存期？必须可离线复判且不能收真实业务数据、凭据或用户会话内容。
 
-**下一步：** 第一轮已执行（2026-11-08，结果见下方「第一轮执行结果」）：5 张缺陷卡（1×P1 + 4×P2）+
+**下一步：** 第一轮已执行（2026-11-08，结果见下方「第一轮执行结果」）：6 张缺陷卡（2×P1 + 4×P2）+
 2 条当场修 + keyless 重试机制档。后续只在用户点名扩面时继续；未覆盖项（长期采纳率、部署面、
 其他职能、更多 natural 变体）保持不做，扩面先问用户。
 
@@ -196,6 +196,7 @@ opened: 2026-11-08
 | 根门仍会用 `wait_agent` 等 subagent child（团队版） | M2 natural 多轮混合 | `wait_agent` 报 `no-active-peer` 一次；多轮结果未丢（W 4 agents + 2 S，三轮原文/分歧保留） | 已把 `wait_agent`/`interrupt_agent` 补进 eng-teaming 控制面 |
 | C 入口 depth 链：命名 child 起 W1 后再起 W2 被拒 | CD2 CEO→`vp_eng` | W1 的 `subagent` 被拒 `depth 3 exceeds maxDepth 2`；声明面 `current 2 / max 2 / remaining 0`；W1 未读文件/未重试；child 用 `bash sleep 90/75`（观察） | depth 边界 PASS；sleep 记观察 |
 | 带 schema 的分支只回文本 → 父拿 null，文本答案被丢弃、无诊断 | R10 后台 W 自然完成 + schema | m01 child 读了文件、回正确 JSON 文本、`turn/end completed`；父 `modules[0]=null`、`count:3`；job/run 仍 completed；补跑 subagent 才拿到 m01 | eng-teaming 已加“schema 分支明确要 structured_output / 验收看 null/count”；机制/上游 → [BUG-040](../bugs/BUG-040-workflow-schema-text-answer-discarded.md)（P2） |
+| 宿主重启后 in-flight child 成孤儿，父收不到终态也查不到 | RS1：child 在跑时 SIGTERM 宿主再重启 | 父 durable 无新 turn/notice；child durable `turn/end interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，自述无法查询 | eng-teaming 长跑条已加“别跨重启等通知”；机制/上游 → [BUG-041](../bugs/BUG-041-host-restart-orphans-inflight-child.md)（P1） |
 
 其余观察（不记为 bug）：R1/T1 小任务自己做是合法方法差异；R4 后台取消干净（job killed、run cancelled、
 6 agents cancelled、无残留 sleep），但模型看不到 run stopReason；N1 负例如实报缺并指出正确路线；

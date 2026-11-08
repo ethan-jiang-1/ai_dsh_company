@@ -404,6 +404,7 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 | CD2 | CEO root | C 入口 depth 链：CEO→`vp_eng`(1)→W1(2)→W2(3) | W1 的 `subagent` 被拒 `subagent depth 3 exceeds maxDepth 2`；W1 声明面 `current 2 / max 2 / remaining 0`；W1 未读文件、未重试、如实回报。`vp_eng` child 用 `bash sleep 90/75` 等 W1（F5 在 child 层的复发）；harness 在通知到达前关 web，child 被中断 | depth 边界 PASS；**F8** 观察 |
 | R9 | vp-eng root | BUG-039 绿替代：6 分支各写 400 行文件，父只拿 path/行数 | workflow 返回 ~0.6k 字符、无截断；6 文件各 400 行；父用 wc/awk/md5 独立核对全过；观察：分支回的 `name` 口径不一（m06 回 `m06`），需 enum/pattern 约束元数据 | 替代形状可用（绿） |
 | R10 | vp-eng root | 后台 W 自然完成：4 模块 + schema，不取消 | 1 run/4 agents completed；m01 分支 child 读了文件但只回文本、`turn/end completed`，父拿到 `modules[0]=null`/`count:3`；job/run 仍 completed；父补跑 subagent 拿到 m01=1.0.0 | **BUG-040**（P2）；null 无诊断 |
+| RS1 | vp-eng root | durability：child 在跑时 SIGTERM 宿主，再同 home 重启 | 父 durable 无新 turn/notice；child durable `turn/end interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，自述“无法查询它是否还活着” | **BUG-041**（P1） |
 | K1 | keyless | fake `SubagentProvider` + 真 workflow 引擎 | ① refusal→null→第二次 structured，starts=2；② `AGENT_START` 穿过 parallel 为 fatal；③ `AGENT_RESULT` 未捕获→run error；④ 两次 refusal 后停在 2 starts | 4/4 PASS；脚本 `runtime/tmp/explore/keyless-retry.ts` |
 
 辅助观察：R5 的孙代、R3 的 W2 分别落在 depth 2；R4 的 child 全部在取消后进入 aborted 终态。
@@ -423,6 +424,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 | F7 | 加了控制面规则后，根门仍会用 `wait_agent` 等 subagent child（团队版，报 `no-active-peer`） | M2 natural 多轮混合 | 已把 `wait_agent` / `interrupt_agent` 明确写进 eng-teaming 控制面列表；无绿复跑（预算） | M2 |
 | F8 | 命名 child 也会用 `bash sleep 90/75` 等自己的 worker，而不是回执后等通知 | CD2 C 入口 depth 链 | 观察：与 F5 同型；harness 关 web 时 child 被中断，说明 sleep 期间被父进程终止会丢活。未再改 skill（控制面条已覆盖），记观察 | CD2 |
 | F9 | 带 schema 的分支只回文本 → 父拿 null，文本答案被丢弃、无诊断；run/job 仍 completed | R10 后台 W 自然完成 + schema | 已修 eng-teaming（schema 分支明确要 structured_output；验收看 null/count）；机制/上游留 **BUG-040**（P2） | R10 |
+| F10 | 宿主重启把 in-flight child 变孤儿：child 记 interrupted，父无终态/通知且查不到 | RS1 durability（在 child 在跑时杀宿主再重启） | 已修 eng-teaming 长跑条目（别跨重启等通知）；机制/上游留 **BUG-041**（P1） | RS1 |
 
 ### 16.3 未覆盖 / 不记为 bug
 
@@ -433,6 +435,6 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 
 ### 16.4 资产收割决定
 
-- 五张缺陷卡（036–040）留作后续修复/上游提案的载体；
+- 六张缺陷卡（036–041）留作后续修复/上游提案的载体；
 - keyless retry 脚本暂不进 `pnpm test`（vendor 已有同语义测试；本仓加门禁需 P2 判据，先留证据）；
 - 常驻 probe 不改：本轮是探索，稳定判据（root 控制面、schema 子集）若再次复现再升级为 probe/spec。
