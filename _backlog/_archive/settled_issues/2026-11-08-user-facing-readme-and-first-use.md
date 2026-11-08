@@ -1,13 +1,15 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-08
 ---
 
 # 推敲：README 与安装手册改为使用者面向，补「第一次经营一家公司」，开发面归位
 
-> 立卡：2026-11-08 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：未定 ｜ 可关闭：否
+> 立卡：2026-11-08 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：未定。倾向「做」；落点拟 `note` — `notes/implemented/`（文件名待定）。
+> **结论/去向**：note — [Note](../../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md)（已交付）。
+>
+> 审查：agent — 语义审（对照授权与 10 条验收：冷读 7/7、真实例截图、契约门红→绿、全量检查）；用户 — 跳过（本轮用户点名直接落地归档，未逐页人审）。
 
 **问题与期望结果：** 2026-11-08 用户拿出一张另一个项目的已结卡（`ai_dsh_deep_research/_backlog/_archived/settled_issues/2026-11-07-user-facing-readme-and-install-guide.md`，机器本地路径，刻意不链接），问本仓有没有同类要求。**有，但病不一样**：那边是「用户手册被参考内容淹没」，这边是**缺用户教程**——产品真正的用法只住在维护者的 demo 合同里，而读者最先看到的两份文档（根 README 与随 tarball 的安装手册）都不回答「装好之后第一次怎么用」。
 
@@ -20,10 +22,10 @@ opened: 2026-11-08
 **当前情况（2026-11-08 实测）：**
 
 1. **根 README 87 行，预算 90（余 3 行，顶格）**。前 20 行以交付形态与 profile 语义为主（bundle / 六个角色 preset / named profile / 公司状态）；维护者 dev 12 行（L69–80，≈14%），数据布局节 11 行（L57–67）与手册 §四重复；无截图、无「第一次怎么用」、无「坏了去哪」。入口链在 L85–87。
-2. **《安装手册》229 行**，由 [install-manual.mjs](../../tools/lib/install-manual.mjs) 生成（[dist-manual](../../checks/gates/dist-manual.mjs) 强制「手册 == 当前模板渲染」+ 必含短语表）。§零前置、§一 GUI 安装已可照做；但 §二「第一次启动」只讲 workspace 与首启写盘（「首屏即可开工」一句带过），§三「验证」先给 `--dump-config | grep -c` 机器核对；**全文没有「怎么用这家公司」**，也**没有「要不要模型凭据」**（凭据只在 §四/§七的表里出现）。§四数据布局是平面视角，不是「我的报告在哪」。
-3. **产品的「怎么用」只在 [docs/demo.md](../../docs/demo.md)**（236 行维护者演示合同：动议 → 分镜 → 观测点，含 `node checks/audit/...` 仓内命令）。它不随包分发，也不是用户教程。
-4. **三处安装命令副本**（README L29–35、[pack README](../../packages/company-pack/README.md) Install、手册 §一）。2026-11-02 归档卡已拍板 owner 口径——「手册 = 收件人唯一安装路径；README/pack README = 首屏 + 指针」（见 [harness-release-alignment](../_archive/settled_issues/2026-11-02-harness-release-alignment.md) 噪声退休表）——**口径定了，没落实**。
-5. **前两轮修的不是这件事**：[release-and-docs](../_archive/settled_issues/2026-11-01-release-and-docs.md) 修事实（旧形状、sha、门禁），[harness-release-alignment](../_archive/settled_issues/2026-11-02-harness-release-alignment.md) G8 修「收件人读到内部流程引用」。**受众与首次使用没有被处理过**。
+2. **《安装手册》229 行**，由 [install-manual.mjs](../../../tools/lib/install-manual.mjs) 生成（[dist-manual](../../../checks/gates/dist-manual.mjs) 强制「手册 == 当前模板渲染」+ 必含短语表）。§零前置、§一 GUI 安装已可照做；但 §二「第一次启动」只讲 workspace 与首启写盘（「首屏即可开工」一句带过），§三「验证」先给 `--dump-config | grep -c` 机器核对；**全文没有「怎么用这家公司」**，也**没有「要不要模型凭据」**（凭据只在 §四/§七的表里出现）。§四数据布局是平面视角，不是「我的报告在哪」。
+3. **产品的「怎么用」只在 [docs/demo.md](../../../docs/demo.md)**（236 行维护者演示合同：动议 → 分镜 → 观测点，含 `node checks/audit/...` 仓内命令）。它不随包分发，也不是用户教程。
+4. **三处安装命令副本**（README L29–35、[pack README](../../../packages/company-pack/README.md) Install、手册 §一）。2026-11-02 归档卡已拍板 owner 口径——「手册 = 收件人唯一安装路径；README/pack README = 首屏 + 指针」（见 [harness-release-alignment](2026-11-02-harness-release-alignment.md) 噪声退休表）——**口径定了，没落实**。
+5. **前两轮修的不是这件事**：[release-and-docs](2026-11-01-release-and-docs.md) 修事实（旧形状、sha、门禁），[harness-release-alignment](2026-11-02-harness-release-alignment.md) G8 修「收件人读到内部流程引用」。**受众与首次使用没有被处理过**。
 6. **分发事实**：`market-index.staged.json` 明写 0.9.0「尚未发布到 npm registry」（2026-11-05）；`_dist/*.tgz` 是 gitignored。今天一个仓库外读者**没有可执行的安装入口**——README 的「输入包名」只在发布后成立。
 7. **机械约束**：`doc-budget`（README 90，反向棘轮 ≥72）、`dist-manual`（模板同源 + 必含短语）、`dev-product-parity`（禁旧词）、`md-links` / `command-refs` / `nav-count-claims`（禁「N 个页签」）/ `base-clean`。
 
@@ -40,7 +42,7 @@ opened: 2026-11-08
 | README L22–40 | 安装者：GUI/CLI 两条路径 + caveat | 只留 happy path 三步 + 装好的可见标志；分支进手册 |
 | README L42–55 | 排障者：workspace 解析优先级、token 门 | 保留一句「第一次怎么选 workspace」，其余进手册 |
 | README L57–67 | 维护者：三平面所有权 | 删表，留一行「东西在 `.dsh-company/`」，全表归手册 |
-| README L69–80 | 维护者 dev | 回 [bootstrap](../../docs/guides/bootstrap.md)（已有同内容），README 留一行 |
+| README L69–80 | 维护者 dev | 回 [bootstrap](../../../docs/guides/bootstrap.md)（已有同内容），README 留一行 |
 | 手册 §一–§三 | 安装者 | GUI 三步保留；§二/§三 合并为「装好的标志」+「第一次用」；机器核对进附录 |
 | 手册 §四–§八 | 生命周期参考 | 保留，标题改「你的东西在哪」 |
 | 两份文档的凭据 / 支持 | 使用者：要不要 key、坏了找谁 | 各加一行：模型凭据由 DSH 管理（缺了角色会报什么）；出问题去 issue 或找发布方 |
@@ -50,13 +52,13 @@ opened: 2026-11-08
 | 源卡做法 | 本仓是否借 | 适配与理由 |
 |---|---|---|
 | 七问冷读 + 首屏术语禁令 | 借 | 同是 DSH 用户；但 DSH 平台词（profile / workspace / plugin / bundle）放行，只禁**本仓内部词**（preset / persona / harness home / host 行 / D 号 / 包内路径），首次出现同句给一句人话 |
-| README 产品页，开发面另劈一个 MD | **改** | 不新建 CONTRIBUTING：开发面回 [bootstrap](../../docs/guides/bootstrap.md)（已有「维护者 dev」形状表与完整配方）+ [AGENTS.md](../../AGENTS.md)（Agent 入口）。再开一个 = 第三个开发入口，违反一处事实一个家 |
+| README 产品页，开发面另劈一个 MD | **改** | 不新建 CONTRIBUTING：开发面回 [bootstrap](../../../docs/guides/bootstrap.md)（已有「维护者 dev」形状表与完整配方）+ [AGENTS.md](../../../AGENTS.md)（Agent 入口）。再开一个 = 第三个开发入口，违反一处事实一个家 |
 | 手册 = 收件人唯一完整路径 | 借 | 手册是生成物：改模板再 `node tools/export-dist.mjs`，**禁手改**；`dist-manual` 的必含短语表同 diff |
-| 契约测试：README 命令 ⊆ 手册命令 | 借 | 新增 `readme-manual-commands` 门（`checks/gates/` 下，先红后绿）；现有 [command-refs](../../checks/gates/command-refs.mjs) 只查 `pnpm`/`node`，不查 `dsh` 命令 |
+| 契约测试：README 命令 ⊆ 手册命令 | 借 | 新增 `readme-manual-commands` 门（`checks/gates/` 下，先红后绿）；现有 [command-refs](../../../checks/gates/command-refs.mjs) 只查 `pnpm`/`node`，不查 `dsh` 命令 |
 | 2 张截图 | 借（可选） | 首屏 + Plugins 页安装证据；本仓有 `cdp-probe` 同款抓图机器，能从真实例取、不带 token |
 | 「第一次研究」6 步 | **升级** | 本仓缺的不是顺序，是内容：要写「第一次经营一家公司」（选 workspace → 对 CEO 说一句动议 → 澄清 → 任务板/名册 → 成员会话 → 交付物） |
 | pack README 二期 | 借 | 本轮只收安装副本，保留 npm 页安装块；不改 Data/Backup/Uninstall 结构 |
-| 预算 60→90 提额 | **改** | 本仓 doc-budget 是棘轮、README 已 87/90：先搬（dev 段 → bootstrap；数据表 → 手册）再写；提额是 [docs/AGENTS](../../docs/AGENTS.md) 的第③步且要 Note 论证 |
+| 预算 60→90 提额 | **改** | 本仓 doc-budget 是棘轮、README 已 87/90：先搬（dev 段 → bootstrap；数据表 → 手册）再写；提额是 [docs/AGENTS](../../../docs/AGENTS.md) 的第③步且要 Note 论证 |
 
 ## 方案与取舍
 
@@ -66,9 +68,9 @@ opened: 2026-11-08
 |---|---|---|
 | 使用者（第一次） | 根 README | 这是什么、值不值得装、怎么装、第一次怎么用 |
 | 使用者（边界情况） | 安装手册（随 tarball 分发） | 前置、完整路径、第一次经营、升级、备份、卸载、排障 |
-| 开发者 | [bootstrap](../../docs/guides/bootstrap.md) | 环境怎么立、维护者 dev 与真插件安装的差别 |
-| Agent | [AGENTS.md](../../AGENTS.md) | 入口链、纪律、命令表 |
-| 想懂机制的人 | [docs/index](../../docs/index.md) | 设计、合同、决策台账 |
+| 开发者 | [bootstrap](../../../docs/guides/bootstrap.md) | 环境怎么立、维护者 dev 与真插件安装的差别 |
+| Agent | [AGENTS.md](../../../AGENTS.md) | 入口链、纪律、命令表 |
+| 想懂机制的人 | [docs/index](../../../docs/index.md) | 设计、合同、决策台账 |
 
 ### 根 README 目标结构（≤90 行，骨架不是定稿文案）
 
@@ -123,7 +125,7 @@ opened: 2026-11-08
 
 | 现 README 内容 | 去向 |
 |---|---|
-| 「维护者 dev」4 条命令 | [bootstrap](../../docs/guides/bootstrap.md)（已有同内容）+ README 一行 |
+| 「维护者 dev」4 条命令 | [bootstrap](../../../docs/guides/bootstrap.md)（已有同内容）+ README 一行 |
 | 数据平面表 | 手册 §五 + README 一行 |
 | 「分发」与「入口」链接块 | README「更多」收成 4 条（手册 / 发布 / 开发 / Agent） |
 
@@ -139,19 +141,19 @@ opened: 2026-11-08
 
 **做：** 根 README 重写；手册模板重排 + 新增「第一次经营一家公司」；两份文档补凭据与支持口径；开发面回 bootstrap；README/pack README 安装副本收束；`readme-manual-commands` 门（先红后绿）；可选 2 张截图。
 
-**排除：** 不改产品行为/UI；不动 `docs/` 其他合同（除 README 指针与 index 如有新增——预计不新增）；不新建 CONTRIBUTING；不做 npm publish / GitHub Release（分发另卡）；不改 [demo.md](../../docs/demo.md) 剧本；不做双语；不手改 `_dist`；不改 pack README 的 Data/Backup/Uninstall 结构；不升 vendor pin。
+**排除：** 不改产品行为/UI；不动 `docs/` 其他合同（除 README 指针与 index 如有新增——预计不新增）；不新建 CONTRIBUTING；不做 npm publish / GitHub Release（分发另卡）；不改 [demo.md](../../../docs/demo.md) 剧本；不做双语；不手改 `_dist`；不改 pack README 的 Data/Backup/Uninstall 结构；不升 vendor pin。
 
-## 未决问题（需要用户拍板）
+## 拍板（2026-11-08，用户「全按推荐」）
 
-| # | 问题 | 推荐 | 影响面 |
+| # | 问题 | 拍板 | 边界 |
 |---|---|---|---|
-| 1 | 范围：A（README + 手册 + 开发面 + 契约门）全做，还是先做 README + 手册最小版？ | 全做 | 全做约 1 轮；最小版会留下「命令副本仍三处」 |
-| 2 | 截图：2 张真图（起实例抓，含 Plugins 页证据）还是本轮不配图？ | 2 张 | 需一次真启动 + 抓图；不做则首屏纯文字 |
-| 3 | 分发与支持口径：0.9.0 未发布——README 主路径写「未发布期向发布方索取 tarball」，还是先发布再改 README？「坏了找谁」写仓库 issue 还是发布方？ | 前者 + 仓库 issue | 真实 publish 仍是人工 handoff（另卡）；issue 入口 = 仓库公开面 |
-| 4 | pack README：本轮只收安装副本，还是同轮做完整产品页？ | 只收副本 | 完整改会动 160 行预算与 npm 页结构 |
-| 5 | 预算：搬完仍超 90 时，允许按 docs/AGENTS 第③步在 Note 论证后提额（建议 ≤110）吗？ | 先压到 ≤90；实在不行再提 | 提额会改 `DOC_LINE_BUDGETS` 并需 Note |
+| 1 | 范围 | 全做：README + 手册 + 开发面 + 契约门 | 最小版会留下「命令副本仍三处」 |
+| 2 | 截图 | 2 张真图（首屏 + Plugins 页安装证据） | 需一次真启动 + 抓图；失败则降级为纯文字并如实记录 |
+| 3 | 分发与支持 | 未发布期写明向发布方索取 tarball；支持走仓库 issue | 真实 publish 仍是人工 handoff（另卡） |
+| 4 | pack README | 只收安装副本，保留 npm 页安装块；不动 Data/Backup/Uninstall 结构 | 完整产品页另轮 |
+| 5 | 预算 | 先搬/先压到 ≤90；不直接提额 | 提额须 Note 论证并改 `DOC_LINE_BUDGETS` |
 
-## 候选验收标准（拍板后改名 `## 验收标准` 并翻 `待落地`）
+## 验收标准
 
 1. **冷读探针**：README 与手册各做一次，只给被读文档；七问全对（本卡基线 = 两份各 5.0/7）。问答记录留档；仍有缺口必须写明「出范围」。
 2. **首屏术语**：README 前 25 行正文（代码块除外）不出现本仓内部词（preset / persona / harness home / host 行 / D 号 / 包内路径）；`bundle`、`profile` 若出现，必须同句有 DSH 人话。
@@ -163,6 +165,16 @@ opened: 2026-11-08
 8. **一致性**：README 代码块里的 `dsh` 命令逐字出现在手册（README ⊆ 手册）；新门先红后绿；`dist-manual` / `dev-product-parity` / `md-links` / `command-refs` / `nav-count-claims` 绿；`_dist` 由 `node tools/export-dist.mjs` 重导、不手改。
 9. **预算**：README ≤90（若按第③步提额，Note 里论证并改 `checks/gates/doc-budget.mjs`）；手册表头版本/sha 与重导一致；`pnpm release --check` 不因本次改动变红。
 10. **截图（若做）**：2 张来自真实产品、无 token/密钥、alt 文本在场、放 `docs/assets/*.png`。
+
+## 交付证据（2026-11-08）
+
+- **去向**：[Note](../../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md)（决定、输掉的方案、真证据、未验/环境限制）。
+- **README**：89 行（预算 90）；七问冷读 5.0 → 6.5 → **7.0/7**（补「第一条命令」后换读者复探）；首 25 行零本仓内部词；两张真实例截图进 `docs/assets/`。
+- **手册**：v4 模板（`tools/lib/install-manual.mjs`）；新增 §四「第一次经营一家公司」六步；七问冷读 **7/7**；`node tools/export-dist.mjs` ALL PASS，sha `7cfc216d…`；`dist-manual` 模板同源绿。
+- **契约门**：`readme-manual-commands` 先红（README 三处安装副本不在手册）后绿（README 的 2 条 dsh 命令全在手册）；已接线，`checks/INDEX.generated.md` 重生成。
+- **开发面**：README 开发者内容 1 行 → [bootstrap](../../../docs/guides/bootstrap.md)；pack README 安装段收成一句 + 手册指针（Data/Backup/Uninstall 结构未动）。
+- **全量检查**：`pnpm test` 1,223 PASS、`pnpm typecheck` exit 0、本变更面 `pnpm verify` ALL PASS；`pnpm release --check` 被**并行会话未提交的在途卡**阻断（其计划 Note 未落地 → `bare-path` 红 + 树不干净），非本卡改动引入；详见 Note「全量检查」与「未验 / 环境限制」。
+- **环境限制（如实）**：真跑走查在嵌套沙箱里停在 `danger-full-access` 审批卡（`sandbox-exec` 被上层挡），未观察到 `final.md` 落盘；首用前四步、任务归 VP-Eng、审批卡已实测，审批步骤已写进两份文档。
 
 ## 已知风险
 
@@ -177,4 +189,4 @@ opened: 2026-11-08
 
 ## 关闭条件
 
-用户对未决 1–5 给答复（或「全按推荐」）→ 本卡翻 `待落地`（`毕业：做` + `去向 note` + 候选验收改名 `## 验收标准`）→ 实施、真证据、Note 与归档同变更。**本卡当前不授予实施权限。**
+用户 2026-11-08 对未决 1–5 答复「全按推荐」→ 本卡翻 `待落地`（`毕业：做` + `去向 note` + 候选验收改名 `## 验收标准`）；用户同轮点名「落地并归档」即实施授权。实施、真证据、Note 与归档同一变更；交付后补 `## 交付证据` 再离场。

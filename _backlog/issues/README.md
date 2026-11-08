@@ -6,8 +6,10 @@
 
 当前活跃 1 张。
 
-- [2026-11-08 README 与安装手册使用者面向，补「第一次经营一家公司」](2026-11-08-user-facing-readme-and-first-use.md)
-  —— `推敲中`；等用户拍板范围 / 截图 / 分发口径（未决 1–5）。倾向做，落点拟 `note`。
+- [2026-11-08 VP-Eng 接入 workflow 并行扇出（单角色试点）](2026-11-08-vpeng-workflow-channel.md)
+  —— `等人拍板`；毕业 = 做，拟去向 = `note`；待人批准后翻 `待落地`，先跑 Step 0（沙箱 + 挂载）。
+
+（2026-11-08 README/手册使用者面向卡已结归档：去向 = [Note](../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)。）
 
 （2026-11-08 SA/SQA 能力组织卡已结归档：去向 = [capability-routing Note](../../notes/implemented/2026-11-08-sa-sqa-capability-routing.md)；
 历史摘要只住[归档](../_archive/README.md)，本页不重复。）
@@ -25,6 +27,8 @@
 v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajectory/New terminal 收回卡均已结归档。已结卡见[归档索引](../_archive/README.md)。新问题按 [backlog 入口](../README.md) 立卡，不从归档里自行开工。
 
 ## 近期归档
+
+- README/手册使用者面向卡 2026-11-08 已结：七问冷读 README 5.0→7.0/7、手册 5.0→7/7 + `readme-manual-commands` 门 + 2 张真实例截图；去向 = [Note](../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md)；卡在[归档](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)。
 
 - SA/SQA 子人格卡 2026-11-06 已结：两个委派子人格（system-architect / system-qa）+ 委托行 maxDepth 2 + SQA 否决直达 CEO；真模型 E2E 证独立会话/preset/depth=2；去向 = [Note](../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md)；卡在[归档](../_archive/settled_issues/2026-11-06-system-architect-sqa.md)。
 - 第六轮七维打扫卡 2026-11-03 已结：fresh agent 复评 A-…A- + 层次化（client/tests/harness）+ 腐化通道四条机械面；去向 = [context-rot-guards Note](../../notes/implemented/2026-11-03-context-rot-guards.md) 与各批 Note；卡在[归档](../_archive/settled_issues/2026-11-03-repo-hygiene-round6.md)。

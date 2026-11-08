@@ -24,7 +24,7 @@ const manual = renderInstallManual(INPUT)
 
 describe('安装手册模板（renderInstallManual）', () => {
   it('头部注入版本 / 包名 / sha256 / 日期 / DSH 窗口 / 许可', () => {
-    expect(manual).toContain('# dsh-company-pack 安装手册')
+    expect(manual).toContain('# 梦之队（dsh-company-pack）安装与使用手册')
     expect(manual).toContain('| 版本 | 9.8.7 |')
     expect(manual).toContain('dsh-company-pack-9.8.7.tgz')
     expect(manual).toContain('a'.repeat(64))
@@ -43,7 +43,7 @@ describe('安装手册模板（renderInstallManual）', () => {
   })
 
   it('卸载清单披露真实残留路径（lease 在 home 根、workspace 登记、客户端日志、浏览器本地）', () => {
-    expect(manual).toContain('## 七、卸载')
+    expect(manual).toContain('## 八、卸载')
     expect(manual).toContain('<DSH_HOME>/company-pack.lock')
     expect(manual).toContain('在 home 根，不在')
     expect(manual).toContain('<DSH_HOME>/storages/workspace.json')
@@ -54,6 +54,20 @@ describe('安装手册模板（renderInstallManual）', () => {
     // 彻底删除的命令必须点名锁与日志（只删 company/ 会留下它们）
     expect(manual).toMatch(/rm -f\s+<DSH_HOME>\/company-pack\.lock/)
     expect(manual).toMatch(/rm -f\s+<DSH_HOME>\/logs\/company-client-errors\.log/)
+  })
+
+  it('使用者面向：第一次经营一家公司、凭据入口与支持渠道在场（2026-11-08）', () => {
+    expect(manual).toContain('## 四、第一次经营一家公司')
+    expect(manual).toContain('## 九、故障排查与支持')
+    expect(manual).toContain('Settings → Models')
+    expect(manual).toContain('INVALID_CREDENTIAL')
+    expect(manual).toContain('仓库 issue')
+    expect(manual).toContain('Installed plugins')
+    expect(manual).toContain('Dream Team Company Pack')
+    // 首用终点必须给到可核对的落点
+    expect(manual).toContain('deliverables/<日期>-<slug>/final.md')
+    // 未发布期分发不得退化成「输入包名即可」
+    expect(manual).toContain('向发布方索取')
   })
 
   it('安装形态与「不要删整个 home」的边界在场（防止卸载建议造成数据损失）', () => {

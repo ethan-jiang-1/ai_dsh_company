@@ -13,19 +13,12 @@ kind: "package-reference"
 
 ## Install
 
-**默认在 DSH Plugins 页安装**（web 与 Desktop 同一句）：已发布版本输入包名 `dsh-company-pack`；
-本仓 `_dist` 交付（尚未 publish 时）在 Add plugin 里粘贴 tarball 的**绝对路径**（该入口接受
-tarball/本地目录）。CLI 只是 `dsh web` 自动化：
+在 DSH 的 **Plugins** 页 → **Add plugin** 安装：已发布版本输入包名 `dsh-company-pack`；未发布期粘贴
+tarball 的**绝对路径**。按提示重启正在使用的 profile，之后用同一个入口启动——装进哪个 profile，
+就从哪个入口启动，不要换到别处。
 
-```sh
-dsh --version                                                            # 必须在 engines.dsh 窗口内
-dsh --profile company --from-default-profile web --dump-default-config   # 仅首次
-dsh plugin --profile company add <tarball-or-package-name>
-```
-
-装完重启 `dsh --profile company`。三个成功分开核：安装命令成功 → dependency 写入 →
-`dsh.profile.bundles`；不要用 `--profile desktop`（CLI 不能管理 Desktop）。前置：Desktop 自带 Node/pnpm；
-npm CLI / `dsh web` 的 Plugins 页需要 pnpm 在 PATH（或 `corepack enable pnpm`）。
+完整安装、装好的标志、第一次怎么用、升级、备份、卸载与回退见《安装手册》
+（仓库 `_dist/安装手册.md`；手动分发时与 tarball 同目录）。CLI 安装（仅 `dsh web` 自动化）见该手册附录 A。
 
 ## Verify
 

@@ -66,6 +66,7 @@ import * as specDuplicates from './gates/spec-duplicates.mjs'
 import * as linkDebt from './gates/link-debt.mjs'
 import * as retiredClaims from './gates/retired-claims.mjs'
 import * as commandRefs from './gates/command-refs.mjs'
+import * as readmeManualCommands from './gates/readme-manual-commands.mjs'
 import * as securityScan from './gates/security-scan.mjs'
 import * as trackedToken from './gates/tracked-token.mjs'
 import * as trackedSecrets from './gates/tracked-secrets.mjs'
@@ -139,6 +140,7 @@ specDuplicates.run(ctx)
 linkDebt.run(ctx)
 retiredClaims.run(ctx)
 commandRefs.run(ctx)
+readmeManualCommands.run(ctx)
 securityScan.run(ctx)
 trackedToken.run(ctx)
 trackedSecrets.run(ctx)
