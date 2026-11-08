@@ -208,6 +208,11 @@
                   provider: spawn
               - id: tool-workflow
                 name: '@deepseek-ai/dsh-tool-workflow'
+                # BUG-039 真修（2026-11-08）：默认 50000 会在 spill 之前截断，spill 文件因此
+                # 也是截断副本。抬到 200k（有界）让引擎的 spill 设计生效：头尾预览 + 全文落盘
+                # + 可读路径。锚点 = tests/harness/contract/workflow-result-budget.spec.ts。
+                config:
+                  maxResultChars: 200000
               # ── 落地项目的两个专职子人格（2026-11-06）：V 模型左侧 SA / 右侧 SQA，独立会话、独立人格。
               # `maxDepth: 2`：VP-Eng 作为团队成员时 depth = 1，子代 depth = 2，行上必须放行。
               - id: tool-system-architect

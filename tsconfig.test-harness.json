@@ -23,6 +23,11 @@
     "tests/support/temp-env.ts"
   ],
   "exclude": [
-    "tests/harness/repo/pack-exports.spec.ts"
+    "tests/harness/repo/pack-exports.spec.ts",
+    // 直引 vendor 源码的合同钉子（2026-11-08 修复轮起）：vendor 源内部的裸包导入
+    // （@deepseek-ai/dsh-util-values 等）在本 project 的 paths 下解析不到；与 tests/client、
+    // tests/company 对直引 vendor 源 spec 的处置同形。运行面走 vitest 的 paths（vendor 源），
+    // 不受这里影响；证明边界见 docs/testing.md §5「已知未覆盖面」。
+    "tests/harness/contract/**"
   ]
 }

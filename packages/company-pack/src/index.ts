@@ -39,6 +39,7 @@ import {
   recordLedger,
 } from './host/presented-domain.ts'
 import { registerClientDiagnostics } from './host/client-diagnostics.ts'
+import { registerDelegationControl } from './host/delegation-control.ts'
 import { exportGovernance, type ExportLedgerSource } from './host/governance-export.ts'
 import { prepareCompanyRuntime } from './host/runtime-guard.ts'
 import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace-registry.ts'
@@ -56,6 +57,8 @@ export type HostConfig = CultivationHostConfig
  */
 export async function apply(ctx: Context, config: HostConfig = {}): Promise<void> {
   registerSignoffTool(ctx)
+  // BUG-037/041 真修：根会话被团队版控制名 shadow 时，仍能列出/续驶自己的 subagent child。
+  registerDelegationControl(ctx)
 
   const runtime = prepareCompanyRuntime(ctx)
   const workspace = runtime.workspace
