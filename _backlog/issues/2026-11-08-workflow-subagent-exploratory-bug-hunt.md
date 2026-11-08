@@ -212,6 +212,13 @@ keyless fake-provider 4/4 证明 retry-once 可行、`AGENT_START`/`AGENT_RESULT
 无残留 sleep；R9 用“6 分支各写 400 行文件、父只拿 path/行数”把返回值压到 ~0.6k 字符，父用 wc/awk/md5
 独立核对全过——这是 >50k 结果的可复现替代形状。
 
+## 第三轮（2026-11-08 夜，修复轮之后）
+
+按 [NEXT-ROUND-ADVICE](../../runtime/tmp/explore/NEXT-ROUND-ADVICE.md) 只探未覆盖面：P1 递归 spill、C2 cold resume、
+C3 团队继承 × 新控制名。三条新观察待分诊（F14 spill 长行 read 截断、F15 `lastTurnEnd` 真实装配恒缺、
+F16 `list_subagents` 含 teammate），详见[研究材料 §17](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
+未覆盖：compaction × skill、带 fixture 的 cold resume、one-shot/后台重启、teammate depth 交叉、其他职能新工具。
+
 ## 修复交接（2026-11-08）
 
 用户指示“先停一下，让另外一个 Agent 去修复发现的所有的 bug”。6 张缺陷卡（BUG-036–041）已翻

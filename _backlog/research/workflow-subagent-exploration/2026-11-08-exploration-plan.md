@@ -450,3 +450,38 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
   **2026-11-08 修复轮已取代**：升格为 `checks/smoke/workflow-contract-smoke.mjs`（keyless 机制档，仍不进
   `pnpm test`），理由与新增钉子见[收口 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md)；
 - 常驻 probe 不改：本轮是探索，稳定判据（root 控制面、schema 子集）若再次复现再升级为 probe/spec。
+
+## 17. 2026-11-08 第三轮（修复轮之后，未覆盖面）
+
+> 依据 = `runtime/tmp/explore/NEXT-ROUND-ADVICE.md`（修复轮 Agent 的临时建议）+ 问题卡。只探未做过的：
+> 多层结果变换、cold resume / 新控制工具、团队继承 × 新控制名。workspace-write 本机 Seatbelt 阻塞，不测。
+
+### 17.1 运行
+
+| ID | 入口 | Charter | 观察 | 判定 |
+|---|---|---|---|---|
+| P1 | vp-eng root | 递归 spill：4 分支 ×500 行、父原样返回；再 `read` spill 文件最后 50 行 | workflow 后台 completed（4 agents）；`job_output` 溢出 `Omitted 22019 bytes` + spill 路径；spill 文件 **71,703 字节 / 10 physical lines**（JSON 行是超长单行）；`read` 按行截断到 **2000 字符/行**，取不到尾部；模型改用 `bash tail -c`/`sed` 拿到 `m04-line-500`，完整尾部可达 | **F14**（P2 观察）：spill 全文可达，但 `read` 的按行截断让“用 read 取回”的提示不成立；技能说 `read`/`grep` 可取回需修正 |
+| C2 | vp-eng root | cold resume：child 在跑时 SIGTERM 宿主，重启后用 `list_subagents` / `send_to_subagent` 唤醒 | `list_subagents` 行有 id/label/mode/status=`inactive`，**没有 `lastTurnEnd`**；`send_to_subagent` 返回 `message delivered`，child 从 turn1 `interrupted` 起 turn2 并 `completed`，父收到完成通知；父仍调用了一次 team `wait_agent`（`no-active-peer`） | **F15**（P2，新 bug 候选）：`lastTurnEnd` 在真实装配里不出现——`company-session-query-sqlite` 在 `isolate:{sessionQuery:true}` 组内，host 的 `ctx.get('sessionQuery')` 拿不到；修复轮 spec 用 fake service 没抓到。cold resume 本身 PASS |
+| C3 | vp-eng root | 团队继承 × 新控制名：spawn teammate eng-2，让它用 subagent 起 worker | root 工具 79；eng-2（child `02d92066…`）调 `subagent` + `list_subagents` + `list_agents` + team `send_message`（target=`lead`）；root 的 `list_subagents` **同时列出 teammate eng-2**（它是 subagent catalog 条目）；模型自述“成员与子代理是同一套 child 机制的两个视图” | **F16**（P2，新 bug 候选）：`list_subagents` 包含 teammate，与工具描述“named/generic child 不是 team roster member”的暗示不完全一致；两套寻址可交叉使用 |
+
+### 17.2 新发现（待分诊，不直接改代码）
+
+- **F14**：`read` 对超长单行（spill 里的 JSON rows）按 2000 字符截断；`eng-teaming` 当前写“可用
+  `read`/`grep` 取回全文”对长行不成立。模型改用 `bash tail -c` 才拿到尾部。候选修法 = skill 加一句
+  “长行用 bash 按字节取”；或 vendor 的 spill retrievalHint 补这条。
+- **F15**：`list_subagents` 的 `lastTurnEnd` 在真实 profile 恒缺——`ctx.get('sessionQuery')` 看不到
+  `company-session-search` isolate 组里的 provider；`delegation-control.spec.ts` 用 fake service，
+  所以门禁绿。候选修法 = 把控制工具/终态读取放进能看见 sessionQuery 的组、或改用可用的 durable 读面、
+  或删掉 `lastTurnEnd` 承诺并重写 BUG-041 的验收。
+- **F16**：`list_subagents` 列出 teammate（它们也是 subagent activation/catalog 条目），与 team
+  `list_agents` 名册重叠；工具描述只强调“child 不是 roster member”，没提 teammate 也会出现在列表。
+  候选修法 = 在行上标 `role`/`kind`，或过滤 teammate，或改描述并在技能里写“两套寻址别混”。
+
+### 17.3 未覆盖（第三轮剩余）
+
+- compaction 之后的 `eng-teaming` 规则遵守（长会话把上下文推过压缩阈值，再给 ≥3 同构任务）；
+- cold resume 带 fixture 的干净复跑（C2 本轮漏放 `fixtures/a`，只证了 lifecycle，没证值）；
+- one-shot child 的 resume 拒绝、后台 job + 重启、`job_kill` 后 durable 形状；
+- teammate 的 depth 2/3 与 `send_to_subagent` 的交叉（C3 只到一层）；
+- 其他职能 root 是否看见/误用 `list_subagents` / `send_to_subagent`；
+- workspace-write（本机阻塞，不声称）。
