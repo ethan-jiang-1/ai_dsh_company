@@ -50,9 +50,12 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 - **长跑**：团队会话里前台 run 会阻塞你（先例约 6 分钟，Lead 消息排队）——用 `run_in_background`。
   宿主重启会中断 in-flight child（child 记 interrupted、父收不到终态；2026-11-08 实测）——部署/重启前先收口，
   别跨重启等通知；重启后要确认就 `list_subagents`（inactive 可能是被中断），要结果就 `send_to_subagent` 冷恢复。
+  **后台 job 也不跨重启**：job_list 空、job_output 报 unknown，结果/通知都丢；child 会话仍在（continuable），
+  只能 `list_subagents`/`send_to_subagent` 手动补——别把“job 起了”当“结果可恢复”（2026-11-08 C7 实测）。
 - **返回聚合/异常**：优先让分支各写自己的文件、父只拿 path/行数（大结果首选形状）。返回值 >200k 会被
   **硬截断**（此时 spill 文件也是截断副本）；超过内联预算（约 12.5k tokens）的结果会落 spill 文件——
-  头尾预览 + 全文路径，可用 `read`/`grep` 取回（2026-11-08 修：preset 把上限从 50k 抬到 200k）。
+  头尾预览 + 全文路径；普通行可用 `read`/`grep`，超长单行（JSON rows）用 `bash tail -c`/`sed` 按字节取
+  （`read` 按行截断 2000 字符；2026-11-08 P1 实测）。
   run/job `completed` ≠ 分支成功：分支失败只折成 `null`、不单独通知，验收看数组 `null`/`count`（R10）。
 - **谁开**：teammate 继承你的组合、也能开 workflow；一个复杂包只由 Lead 或任务板指名的 owner 开一摊，
   避免每人各开一摊（workflow 没有深度闸，嵌套 run 会叠加）。

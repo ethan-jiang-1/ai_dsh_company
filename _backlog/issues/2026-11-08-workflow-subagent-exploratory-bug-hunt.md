@@ -215,8 +215,9 @@ keyless fake-provider 4/4 证明 retry-once 可行、`AGENT_START`/`AGENT_RESULT
 ## 第三轮（2026-11-08 夜，修复轮之后）
 
 按 [NEXT-ROUND-ADVICE](../../runtime/tmp/explore/NEXT-ROUND-ADVICE.md) 只探未覆盖面：P1 递归 spill、C2 cold resume、
-C3 团队继承 × 新控制名。三条新观察待分诊（F14 spill 长行 read 截断、F15 `lastTurnEnd` 真实装配恒缺、
-F16 `list_subagents` 含 teammate），详见[研究材料 §17](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
+C3 团队继承 × 新控制名。三条新观察：F14 spill 长行 read 截断（skill 已修）、F15 `lastTurnEnd` 真实装配恒缺（→ BUG-042）、
+F16 `list_subagents` 含 teammate（→ BUG-043）、F17 后台 job 不跨重启（→ BUG-044）；另补 C2b 干净
+cold resume（PASS，仍缺 lastTurnEnd）与 C6 `/compact` 后 4 模块仍走 workflow（PASS）。详见[研究材料 §17](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
 未覆盖：compaction × skill、带 fixture 的 cold resume、one-shot/后台重启、teammate depth 交叉、其他职能新工具。
 
 ## 修复交接（2026-11-08）
