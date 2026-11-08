@@ -61,25 +61,30 @@ R10 后台 workflow 4 分支（m01–m04），父脚本每个 `agent()` 都带 o
 - **机制钉子（2026-11-08）**：`checks/smoke/workflow-contract-smoke.mjs` 第 5 条——fake provider 返回
   `completed` + 纯文本 + schema → `agent()` 返回 null 且 `workflow/agent-end outcome=failed`；
   钉住“父拿裸 null”这一机制事实（不是模型行为）。命令 = `node --import tsx/esm checks/smoke/workflow-contract-smoke.mjs`。
-- **上游真 diff（提案）**——`vendor/dsh/packages/workflow/workflow-ptc/src/runtime.ts` schema 分支：
-  ```diff
-  if (opts.schema !== void 0) {
-    if (result.structured === void 0) {
-      this.observer.agentEnd({
-        ...info,
-        outcome: "failed",
-  +     // 保留可诊断的形状不匹配，而不是丢弃 child 的 final text
-  +     diagnostic: { kind: "shape-mismatch", finalText: outputText(result.output) },
-      });
-      return null;
-    }
-  ```
-  配套：`WorkflowAgentEndInfo` 加 `diagnostic?: { kind: 'shape-mismatch'; finalText: string }`；
-  tool-workflow 的 `tool-workflow/agent-end` 记录透传该字段。上游修好后：本卡判定第一条满足、归档，
-  并把 `eng-teaming` 里“只回文本会被丢弃成 null”改成“会带 shape-mismatch 诊断”。
+- **上游真 diff（提案，2026-11-08 修正版）**：早先那版只给 `agentEnd` 加 `diagnostic` **不够**——
+  父模型看到的是 workflow 的**工具结果文本**，不是 agent-end 事件。要满足判定第一条，诊断必须进工具结果。
+  最小改法（三个文件，本仓不编译验证，仅给改动面与验收点）：
+  1. `vendor/dsh/packages/workflow/workflow/src/index.ts`：`WorkflowResult` 加
+     `diagnostics?: Array<{ label: string; kind: 'shape-mismatch'; finalText: string }>`。
+  2. `vendor/dsh/packages/workflow/workflow-ptc/src/runtime.ts`：schema 分支 `structured === undefined` 时
+     收集一条诊断（`label = info.label`、`finalText = outputText(result.output)`），随 `drive()` 结果返回；
+     若 guest→host 的结果走显式 schema（`host.ts`/`guest.ts`），同步该字段（当前是 JSON 透传则只加类型）。
+  3. `vendor/dsh/packages/workflow/tool-workflow/src/index.ts` 的 `renderResult`（及 `jobOutcomeOf`）：
+     在结果文本追加 `Diagnostics: m01 shape-mismatch — final text: …`（按 `maxResultChars` 截断）。
+  更小但**改契约**的备选：schema 分支缺 `structured` 时把 final text 原样返回（父拿到字符串而非 null）；
+  上游若要兼容现存脚本，推荐 diagnostics 方案。
 - 上游批与退役口径 = [收口 Note](../../notes/implemented/2026-11-08-delegation-contract-repair.md)。
 - **未做（本仓做不到）**：父代理拿不到“答对但形状不对”的诊断——任何本仓层都改不了 `agent()` 的返回值；
   造一个 workflow 包装工具 = 平行实现（质量上不可接受），故不做。
+
+- **推进路径（二选一，需拍板）**：
+  - **A. 上游真修（推荐）**：把上面三处改动提给 DSH upstream → 发布新 tag → 本仓
+    `node tools/sync-dsh.mjs --pin <tag>`（升 pin 是用户策动制）→ 跑 `workflow-contract-smoke`
+    （第 5 条需改断言：`null` + `diagnostics` 进工具结果）→ 改 `eng-teaming` 一句 → 翻 `已修` 归档。
+    依赖：有人能改 upstream + 升 pin；本仓侧我可以先产出可套用的 patch 与 vendor 测试。
+  - **B. 改验收口径（10 分钟、不修机制）**：把判定第一条改成“父代理有可判读的替代证据（skill 明确
+    schema 模式 null 的语义 + 父脚本按 missing 记账）+ 检测锚点”，并注明**这是口径变更、机制仍未修**、
+    上游提案保留。需要用户明确授权（章程禁止改标准迁就实现）。
 
 ## 已修判定
 
