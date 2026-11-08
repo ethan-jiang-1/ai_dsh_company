@@ -35,6 +35,8 @@
     child durable 记 `interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，无法查询。
     已在 `eng-teaming` 长跑条加“别跨重启等通知”；机制/上游留
     [BUG-041](../../_backlog/bugs/BUG-041-host-restart-orphans-inflight-child.md)（P1）。
+  - **F1 补充**（R13）：schema 子集还拒 `type: ['string','null']`；已把“type 只接受单个字符串、
+    联合类型用 oneOf”写进 `eng-teaming`，BUG-036 补第二实例。
   - **F11**（方向 R12 fork 上下文）：`subagent_fork` 只播种**已完成轮**；同一 turn 内刚读的 tool
     result 不在前缀里。已修 `eng-teaming` 五档表（fork 带上下文但要写明这条）；模型如实报
     `NOT-IN-CONTEXT`，未伪造继承。
@@ -96,7 +98,10 @@
 - **fork 上下文**（R12）：`session-2a257704-2d79-4921-ba09-a5e7626448de` 同一 turn 内 read a →
   fork 报 `a = NOT-IN-CONTEXT`（拒绝重读伪造）；b/c workflow 值正确；父记 `fork_inherited_a: false`。
 - **fork after completed turn**（R13）：`session-1351d1e2-4159-43da-9b0a-4ef5f87d8339` fork 仍
-  `cat fixtures/a/package.json` 并声称继承；父记 `not_provable`（F13 方法教训）。
+  `cat fixtures/a/package.json` 并声称继承；父记 `not_provable`（F13 方法教训）。同会话 first run
+  因 `type: ['string','null']` fatal（BUG-036 第二实例）。
+- **fork token 继承**（R14）：`session-9b46b434-10b0-4ecf-b354-1412444f9788` turn1 只记 token，
+  turn2 fork 无工具、原样复述 `FORK-TOKEN-7f3a9c`——已完成轮继承成立（F11 绿）。
 - **宿主重启**（RS1）：父 `session-24da0c1b-…` 无新 turn；child `48eb730a-…` `turn/end interrupted`；
   父再问时 `list_agents` 只 lead、`job_list` 空，自述无法查询。
 - **多轮混合**（M2）：`session-0ae9def6-d13e-4e49-8b91-8b1a364bc93a` 1 workflow（4 agents）+

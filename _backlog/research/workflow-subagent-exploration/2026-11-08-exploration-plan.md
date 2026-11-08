@@ -409,6 +409,7 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 | R13 | vp-eng root | fork 上下文（上一轮读 a，下一轮 fork） | fork 仍 `cat fixtures/a/package.json`，同时声称“来自继承上下文”；父记 `not_provable`；b/c workflow 正确 | **F13** 方法教训 |
 | V1 | vp-sales root | 其他职能负例：要求 workflow | tools=73 无 workflow；4 个 subagent 核查、无假调用；每个 child `read`+`send_message`，父收消息+通知（F4 跨角色） | PASS（能力诚实）；**F12** 观察 |
 | WW1 | vp-eng root | `workspace-write` 探针（`DSH_PERMISSION_MODE` 覆写） | `sandbox-exec: sandbox_apply: Operation not permitted`；模型如实报错、未绕道 | 宿主阻塞，不记 bug |
+| R14 | vp-eng root | fork 继承 token（turn1 只记 token，turn2 fork 复述） | fork 无工具、原样复述 `FORK-TOKEN-7f3a9c`——已完成轮确实被播种；同 turn 读的文件不在前缀（R12）与这条互补 | F11 绿证据 |
 | RS1 | vp-eng root | durability：child 在跑时 SIGTERM 宿主，再同 home 重启 | 父 durable 无新 turn/notice；child durable `turn/end interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，自述“无法查询它是否还活着” | **BUG-041**（P1） |
 | K1 | keyless | fake `SubagentProvider` + 真 workflow 引擎 | ① refusal→null→第二次 structured，starts=2；② `AGENT_START` 穿过 parallel 为 fatal；③ `AGENT_RESULT` 未捕获→run error；④ 两次 refusal 后停在 2 starts | 4/4 PASS；脚本 `runtime/tmp/explore/keyless-retry.ts` |
 
@@ -420,7 +421,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 
 | # | 发现 | 方向 | 处置 | 证据 |
 |---|---|---|---|---|
-| F1 | workflow schema 的 `enum`/`const` 必须配 `type`；模型面描述未说，首跑整轮 fatal | R2 强制 workflow + 模型自拟 schema | 已修 skill 指引（红 R2 / 绿 R6）→ 上游建议留 **BUG-036** | R2 / R6 |
+| F1 | workflow schema 子集与自然写法不符：`enum`/`const` 必须配 `type`；`type` 数组不支持（R13 复现） | R2 强制 workflow + 模型自拟 schema；R13 fork child | 已修 skill 指引（红 R2/R13 / 绿 R6）→ 上游建议留 **BUG-036** | R2 / R6 / R13 |
 | F2 | 根会话是 Lead → 团队版控制名 shadow 全局版；契约 §4.4 与 preset 注释误写“根不是成员”；根无法 steer 自己的 child | R3 委派深度链（模型自然尝试等/催孙代） | 已修 docs/5 preset 注释/eng-teaming；机制留 **BUG-037** | R3 |
 | F3 | W 分支内再委派：返回值混入回执、跨轮拼接；带 schema 的分支会 null | R5 W→S 嵌套 | 已加“分支默认是叶子”规则；机制留 **BUG-038** | R5 |
 | F4 | 命名 child 同时用 `send_message` + 完成通知回报，父收到两份 | C1 CEO→vp_eng | 已修 eng-workflow 第 5 步（终稿即回执）；绿 C2 | C1 / C2 |
@@ -430,7 +431,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 | F8 | 命名 child 也会用 `bash sleep 90/75` 等自己的 worker，而不是回执后等通知 | CD2 C 入口 depth 链 | 观察：与 F5 同型；harness 关 web 时 child 被中断，说明 sleep 期间被父进程终止会丢活。未再改 skill（控制面条已覆盖），记观察 | CD2 |
 | F9 | 带 schema 的分支只回文本 → 父拿 null，文本答案被丢弃、无诊断；run/job 仍 completed | R10 后台 W 自然完成 + schema | 已修 eng-teaming（schema 分支明确要 structured_output；验收看 null/count）；机制/上游留 **BUG-040**（P2） | R10 |
 | F10 | 宿主重启把 in-flight child 变孤儿：child 记 interrupted，父无终态/通知且查不到 | RS1 durability（在 child 在跑时杀宿主再重启） | 已修 eng-teaming 长跑条目（别跨重启等通知）；机制/上游留 **BUG-041**（P1） | RS1 |
-| F11 | `subagent_fork` 只播种已完成轮：同一 turn 内刚读的 tool result 不在 fork 前缀里 | R12 fork 上下文（同 turn 读 a 再 fork） | 已修 eng-teaming 五档表（fork 只带已完成轮，本轮刚读的不在）；模型如实报 NOT-IN-CONTEXT，未伪造 | R12 |
+| F11 | `subagent_fork` 只播种已完成轮：同一 turn 内刚读的 tool result 不在 fork 前缀里 | R12 fork 上下文（同 turn 读 a 再 fork）；R14 token 继承 | 已修 eng-teaming 五档表；R12 红（同 turn 不继承）、R14 绿（已完成轮 token 继承） | R12 / R14 |
 | F12 | 其他职能的 generic child 也会 `send_message` + 完成通知双份回报 | V1 vp-sales 负例 | 观察：F4 跨角色版；vp-sales 无 eng-workflow 规则，未改（避免 token 税），记观察 | V1 |
 | F13 | fork 继承不可用“问 fork”来证明：它会重读源文件并声称来自继承 | R13 fork after completed turn | 方法教训：验证继承/来源要用磁盘上不存在的 token，别用可重读的 fixture | R13 |
 

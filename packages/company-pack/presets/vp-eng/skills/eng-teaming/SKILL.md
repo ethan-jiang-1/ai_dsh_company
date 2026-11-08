@@ -37,7 +37,8 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 - **门自己写**：`missing > 0` / `failures` 非空就自己 `throw`（或返回给父代理读）；不要 `try/catch` 吞 fatal。
 - **schema 只吃子集**：`enum` / `const` 必须同时写 `type`（`{ type: 'string', enum: [...] }`），`oneOf`
   不能和 `type` 并列，根必须是 `object`——否则整轮 `UNSUPPORTED_SCHEMA` fatal，不是分支失败（2026-11-08 实测）。
-  带 schema 的分支还要在 prompt 里明确“调用 `structured_output`”；只回文本会被丢弃成 null（R10 实测）。
+  `type` 只接受单个字符串（`['string','null']` 用 `oneOf`）；带 schema 的分支还要在 prompt 里明确
+  “调用 `structured_output`”；只回文本会被丢弃成 null（R10/R13 实测）。
 - **失败不自动重跑**：`null` 可能是 refusal / error / aborted / 缺结构化结果，不保留原因；先判任务幂等且
   失败可重试，最多同 task / schema 再派一次（attempt label 不同），仍失败记 missing / exhausted。
   `AGENT_START` / `AGENT_RESULT` / 取消是 fatal，不许 catch 后伪装成 null 或安全重试。
