@@ -3,10 +3,11 @@ topic: workflow + subagent 探索测试：只有 W / 只有 S / 混合一次 / �
 intent: 给下一位执行者一份自包含的 briefing + 探索计划——DSH 机制支持、本仓特点、已证事实、场景矩阵、两遍法、fixtures、判据、预算、发现处置与 Review 清单；计划未开跑
 ---
 
-# 探索测试计划：workflow + subagent（v2，自包含 briefing）
+# 探索性测试计划（exploratory testing）：workflow + subagent（v2，自包含 briefing）
 
 > **这是计划，不是结果。** 当前状态 = 等待用户/新 Agent review；review 通过前不跑。
 > 本文件刻意写厚：下一位 Agent 可能没有本轮的对话上下文，必须能只靠这份文档 + 仓库本身接手。
+> 本轮采用 exploratory testing（探索性测试）；单次有界探索称 exploratory test。场景矩阵是覆盖目标与风险边界，不是穷尽脚本或唯一合法路径：执行者在时间盒和场景章程内边学、边设计、边执行，跟进有证据的新线索；仍用会话事件、工具调用、结果和 fixture oracle 判定观察，不以模型自述代替证据。详见 §6 与 §8。
 > 读法：本文件 §1（DSH 支持）→ §2（本仓特点）→ §3（已证事实）→ §4–§8（探索设计）→
 > [workflow 通道 Note](../../../notes/implemented/2026-11-08-vpeng-workflow-channel.md) 与
 > [归档研究材料](../../_archive/research/vp-eng-delegation-topology/2026-11-08-topology.md) 补细节。
