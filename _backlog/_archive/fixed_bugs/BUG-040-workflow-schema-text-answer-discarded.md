@@ -1,12 +1,12 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-08
 ---
 
 # BUG-040：workflow 带 schema 的分支只回文本 → 父代理拿到 null，文本答案被丢弃且无诊断
 
-> 严重级别：P2（次要）｜发现：2026-11-08｜状态：修复已落地｜审查：agent — 技能/验收规则与机制钉子已落地；不把“缓解”写成“已修”
+> 严重级别：P2（次要）｜发现：2026-11-08｜状态：已修（2026-11-08，产品规避）｜审查：agent — 选择“不用不可靠组合”而非给引擎补诊断：工作流分支禁传 schema、改单行 JSON + 父 parse；引擎缺陷仍在、上游提案保留。这是产品级修复（同 038 的“分支当叶子”），不是把缓解写成已修
 
 ## 症状
 
@@ -54,6 +54,18 @@ R10 后台 workflow 4 分支（m01–m04），父脚本每个 `agent()` 都带 o
 
 ## 修复关联
 
+- **最终修法（2026-11-08，产品规避）**：`eng-teaming` 的 workflow 硬规则改成“**分支不传 schema**，只回一行
+  JSON，父脚本 `JSON.parse`；parse 失败或 null 时把原文记进 `missing`”。本仓唯一会碰 schema 的委派形状
+  就是工作流分支；去掉它，症状不可达，且 completed 的答案不再被折成裸 null。
+- 机制钉子：`checks/smoke/workflow-contract-smoke.mjs` 第 7 条——非 schema 分支原样返回文本、父 parse 成功；
+  第 5 条仍钉住引擎的 null 机制（恢复 schema 前必须重看）。
+- 选择理由：upstream 不可改（用户明确）、不造父侧注入插件（更多运行时机制）；按 038“分支当叶子”同款
+  **产品级禁止不可靠组合**收口。下面的 A/B 路径与上游 diff **保留为上游提案**，不再是本卡阻塞项。
+
+- **行为证据（2026-11-08 探针）**：`session-6a01fa71-6315-40fe-92db-56800aed4150`
+  （`runtime/tmp/explore/fix1/S040/`）自然任务下 4 次 workflow / 8 agents，**4 个脚本全部没有 schema、
+  没有 `structured_output`**；模型用 `JSON.parse` + `missing` 保留原文。一次 run error 是模型自己把
+  `raw` 写成 `undefined`（引擎按“非 JSON”拒绝是正确的），模型随后自修——记为模型行为观察，不记产品缺陷。
 - 已在 `eng-teaming` 的 schema 规则加：带 schema 的分支必须在 prompt 里明确“调用 `structured_output`”，
   只回文本会被丢弃成 null；并在“返回聚合/异常”加“run/job completed ≠ 分支成功，验收看 null/count”。
 - 绿证据：同一 R10 里 m02/m03/m04 三个分支都调用了 `structured_output`，父均拿到对象；补跑
@@ -73,7 +85,7 @@ R10 后台 workflow 4 分支（m01–m04），父脚本每个 `agent()` 都带 o
      在结果文本追加 `Diagnostics: m01 shape-mismatch — final text: …`（按 `maxResultChars` 截断）。
   更小但**改契约**的备选：schema 分支缺 `structured` 时把 final text 原样返回（父拿到字符串而非 null）；
   上游若要兼容现存脚本，推荐 diagnostics 方案。
-- 上游批与退役口径 = [收口 Note](../../notes/implemented/2026-11-08-delegation-contract-repair.md)。
+- 上游批与退役口径 = [收口 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md)。
 - **未做（本仓做不到）**：父代理拿不到“答对但形状不对”的诊断——任何本仓层都改不了 `agent()` 的返回值；
   造一个 workflow 包装工具 = 平行实现（质量上不可接受），故不做。
 
@@ -88,6 +100,7 @@ R10 后台 workflow 4 分支（m01–m04），父脚本每个 `agent()` 都带 o
 
 ## 已修判定
 
-- 带 schema 的分支只回文本时，父代理至少能拿到“形状不匹配”的诊断（而不是裸 null）；且
-- 本仓技能/任务书要求带 schema 的分支显式调用 `structured_output`，并在真实会话中稳定观察到
-  父代理不再把 null 当纯失败。
+- 本仓工作流**分支不使用 schema**（`eng-teaming` 硬规则）：分支只回一行 JSON，父脚本 `JSON.parse`；
+  parse 失败或 child 返回 null 时把**原文**记进 `missing`——completed 的答案不再被引擎折成裸 null、不再丢失；且
+- 引擎侧的“schema 分支缺 structured → 丢文本 + 无诊断”仍在（上游提案保留）；本仓不再把该组合作为推荐形状，
+  恢复使用前必须先有：引擎诊断，或本仓父侧诊断插件。

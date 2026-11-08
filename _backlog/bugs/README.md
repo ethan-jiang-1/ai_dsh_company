@@ -10,7 +10,6 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-040](BUG-040-workflow-schema-text-answer-discarded.md) | 带 schema 的分支只回文本 → 父拿 null，文本答案被丢弃且无诊断 | P2 |
 | [BUG-042](BUG-042-list-subagents-lastturnend-missing.md) | `list_subagents` 的 `lastTurnEnd` 真实装配恒缺（sessionQuery 在 isolate 组） | P2 |
 | [BUG-043](BUG-043-list-subagents-includes-teammates.md) | `list_subagents` 把 teammate 也列出来，与 `list_agents` 重叠且描述未说明 | P2 |
 | [BUG-044](BUG-044-background-job-lost-on-restart.md) | 后台 workflow job 不跨宿主重启：job_list 空/unknown，结果与通知丢失 | P2 |
@@ -59,7 +58,7 @@ BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 已修 [fixed_bugs](../_
 | [BUG-037](../_archive/fixed_bugs/BUG-037-root-team-tool-shadowing.md) ✅ | P2 | 已修（2026-11-08）：新增 `list_subagents` / `send_to_subagent`（官方 `ctx.subagents`，名字不被团队版 shadow）+ docs/§4 + `eng-teaming` | agent-team 的 `tryMembership` shadow（提案待上游；修好后退役两工具） |
 | [BUG-038](../_archive/fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md) ✅ | P2 | 已修（2026-11-08）：`eng-teaming` 分支叶子规则 + 真跑观察（模型首轮自纠）+ 钉子 `workflow-contract-smoke` 第 6 条 | `workflow-ptc` 分支结果只取最后一轮结论（提案待上游） |
 | [BUG-039](../_archive/fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md) ✅ | P1 | 已修（2026-11-08）：vp-eng preset 抬 `maxResultChars` 到 200k；探针证 spill 全文 71,677 字符可读；钉子 `tests/harness/contract/workflow-result-budget.spec.ts` | `tool-workflow` 默认值下先截断再落盘的语义（提案待上游） |
-| [BUG-040](BUG-040-workflow-schema-text-answer-discarded.md) | P2 | `eng-teaming` schema/structured_output 规则已有；可补 keyless 复现 | `runtime.ts` 缺形状不匹配诊断 |
+| [BUG-040](../_archive/fixed_bugs/BUG-040-workflow-schema-text-answer-discarded.md) ✅ | P2 | 已修（2026-11-08，产品规避）：`eng-teaming` 分支禁传 schema、改单行 JSON + 父 parse；smoke 第 7 条 | `runtime.ts` 缺形状不匹配诊断（上游提案保留，恢复 schema 前必须有） |
 | [BUG-041](../_archive/fixed_bugs/BUG-041-host-restart-orphans-inflight-child.md) ✅ | P1 | 已修（2026-11-08）：`list_subagents` 带 `lastTurnEnd`（durable 日志读，RS1 实测 interrupted）；ops 部署前置一行 | resume 时补 `subagent/end` 通知（体验增强，不再阻塞） |
 
 **收口要求**：每卡修完翻 `修复已落地`，写 `## 已修判定` 对应的真红→绿证据与 `审查：` 记录，再 `git mv`

@@ -30,7 +30,7 @@
   - **F9**（方向 R10 后台 W 自然完成）：带 schema 的分支只回文本、`turn/end completed`，父却拿到
     `null`（文本答案被丢弃、无诊断），job/run 仍 `completed`。已修 `eng-teaming`（schema 分支明确要
     `structured_output`；验收看 null/count）；机制/上游留
-    [BUG-040](../../_backlog/bugs/BUG-040-workflow-schema-text-answer-discarded.md)（P2）。
+    [BUG-040](../../_backlog/_archive/fixed_bugs/BUG-040-workflow-schema-text-answer-discarded.md)（P2）。
   - **F10**（方向 RS1 宿主重启）：child 在跑时 SIGTERM 宿主再重启，父 durable 无新 turn/notice，
     child durable 记 `interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，无法查询。
     已在 `eng-teaming` 长跑条加“别跨重启等通知”；机制/上游留

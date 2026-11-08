@@ -4,6 +4,8 @@
 
 ## 修复流水（倒序）
 
+- **BUG-040**（2026-11-08）：schema 分支的 child `completed` 但只回文本（没调 `structured_output`）→ 引擎丢文本、给父裸 null，且无诊断（R10）。**按产品规避收口**：`eng-teaming` 工作流分支**禁传 schema**，改“只回一行 JSON + 父脚本 `JSON.parse`；失败把原文记 `missing`”——本仓唯一会碰 schema 的分支形状被去掉，completed 的答案不再被折成 null；smoke 第 7 条钉住“非 schema 分支原样返回文本、父 parse 成功”。引擎缺陷仍在（上游提案与真 diff 在卡内；恢复 schema 前必须先有诊断）。详见 [卡](BUG-040-workflow-schema-text-answer-discarded.md)。
+
 - **BUG-041**（2026-11-08）：宿主重启把 in-flight child 变孤儿——child durable 记 `turn/end interrupted`，父会话没有新 turn/通知，也查不到（R3 之前的控制名 shadow 加剧了“无法查询”）。修法 = `list_subagents` 每行带 `lastTurnEnd`：用 `sessionQuery.readSession(childId)` 读 child **durable 日志**（`openAt: never` 只禁搜索，durable 读仍可用；RS1 真实重启会话实测 `interrupted`）+ 每行 `running/inactive`；`budget-and-ops` 加“升级/重启时还有 subagent 在跑”一行（先收口；重启后查/`send_to_subagent` 冷恢复）。仍缺（不阻塞）：错过的完成通知正文，正文本就要冷恢复或上游 resume 对账。详见 [卡](BUG-041-host-restart-orphans-inflight-child.md)。
 
 - **BUG-038**（2026-11-08）：workflow 分支内再起 subagent 时，`agent()` 返回的是 child **最终文本原样拼接**（`started subagent … <值>`），回执与结论不区分；带 schema 的嵌套分支会因 child 没调 `structured_output` 折成 null（R5）。修法 = 产品规则“分支默认是叶子”（确需两层让父直接起第二层）+ 真跑观察：模型首轮嵌套后自行读到混合回执并重构为父层扇出；同轮修正 skill 的“一定 null”过度断言（3 次复现无 null）；机制钉子 = `checks/smoke/workflow-contract-smoke.mjs` 第 6 条。上游提案 = 分支结果只取最后一轮结论或分开回执。详见 [卡](BUG-038-workflow-branch-nested-delegation-result.md)。

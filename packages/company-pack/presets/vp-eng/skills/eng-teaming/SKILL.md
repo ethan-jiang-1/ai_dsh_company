@@ -13,7 +13,7 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 |---|---|---|---|
 | **1 自己做** | 单件、单域、不需要独立人格 | 直接做（读稿→出稿） | 你自己署名 |
 | **2 一次性 worker** | 1–2 件并行调研/盘点/测算；不要持久协作 | `subagent`（fresh）或 `subagent_fork`（带上下文；**只带已完成轮**，本轮刚读的不在——2026-11-08 实测）；给清晰 brief | worker 只回证据，判断仍署你 |
-| **2.5 并行扇出（workflow）** | ≥3 个同构分支、要合并/交叉核对/只回异常，且不需要独立人格（**默认用 workflow，不是拉多次 subagent**） | `workflow` 写脚本：`parallel`/`pipeline` + `schema` + 异常优先；分支只读或一分支一文件；返回聚合/异常 | 你合稿署名 |
+| **2.5 并行扇出（workflow）** | ≥3 个同构分支、要合并/交叉核对/只回异常，且不需要独立人格（**默认用 workflow，不是拉多次 subagent**） | `workflow` 写脚本：`parallel`/`pipeline` + 异常优先；**分支不传 schema，只回一行 JSON，父脚本 `JSON.parse`**；分支只读或一分支一文件；返回聚合/异常 | 你合稿署名 |
 | **3 命名专家** | 要 CMO/SA/SQA 的**真人格/真结论**（MRD/StRS、SyRS/IRS、V&V） | `vp_cmo` / `system_architect` / `system_qa`（各钉 `agentPreset`，depth 2） | 各署各的名；SQA 结论原样 |
 | **4 持久小队** | 多件产物、多轮、要任务板/依赖图/互审 | `spawn_teammate`：成员是"你带的工程师"（继承你的组合），不是 CMO/SA/SQA | 你合稿；成员只写自己那一块 |
 
@@ -38,8 +38,11 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 - **门自己写**：`missing > 0` / `failures` 非空就自己 `throw`（或返回给父代理读）；不要 `try/catch` 吞 fatal。
 - **schema 只吃子集**：`enum` / `const` 必须同时写 `type`（`{ type: 'string', enum: [...] }`），`oneOf`
   不能和 `type` 并列，根必须是 `object`——否则整轮 `UNSUPPORTED_SCHEMA` fatal，不是分支失败（2026-11-08 实测）。
-  `type` 只接受单个字符串（`['string','null']` 用 `oneOf`）；带 schema 的分支还要在 prompt 里明确
-  “调用 `structured_output`”；只回文本会被丢弃成 null（R10/R13 实测）。
+  `type` 只接受单个字符串（`['string','null']` 用 `oneOf`）。
+- **但工作流分支不传 schema**：引擎在 schema 分支拿不到 structured output 时会把 child 已写好的文本丢掉、
+  只给父脚本 null（BUG-040，无诊断）。分支改成“只回一行 JSON”，父脚本 `JSON.parse`；parse 失败或 null 时
+  把**原文**记进 `missing`（数据不丢、父代理看得见）。schema 只留给单次 `agent()`，且 prompt 明确
+  “调用 `structured_output`”。
 - **失败不自动重跑**：`null` 可能是 refusal / error / aborted / 缺结构化结果，不保留原因；先判任务幂等且
   失败可重试，最多同 task / schema 再派一次（attempt label 不同），仍失败记 missing / exhausted。
   `AGENT_START` / `AGENT_RESULT` / 取消是 fatal，不许 catch 后伪装成 null 或安全重试。

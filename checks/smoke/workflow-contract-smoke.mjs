@@ -231,4 +231,20 @@ const check = (name, fn) => {
   })
 }
 
+// 7) BUG-040 的产品规避（2026-11-08）：分支**不传 schema** 时，child 的最终文本原样返回；
+// 父脚本自己 JSON.parse 即可拿回结构化值——没有"要对象、没对象、文本被丢"这条路。
+{
+  const provider = new ScriptedProvider('scripted', [() => text('{"module":"m01","version":"1.0.0"}')])
+  const { result } = await run(`
+    const raw = await agent('reply with one JSON line only')
+    let parsed = null
+    try { parsed = JSON.parse(raw) } catch { parsed = { missing: true, raw } }
+    return { parsed }
+  `, 'json-line', provider)
+  check('json-line: no-schema branch returns the JSON line verbatim and the parent parses it (BUG-040 avoidance)', () => {
+    assert.equal(result.stopReason, 'completed', result.error)
+    assert.deepEqual(result.value, { parsed: { module: 'm01', version: '1.0.0' } })
+  })
+}
+
 console.log(`workflow-contract-smoke: ${String(passes.length)}/${String(passes.length)} PASS`)
