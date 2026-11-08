@@ -25,3 +25,5 @@ opened: 2026-11-09
 | [inventory.json](inventory.json) | 各角色工具行 / persona 提及 / skill 规模的计数快照 | 2026-11-09 |
 | [2026-11-09-structural-analysis.md](2026-11-09-structural-analysis.md) | 从读数与 BUG-036..044 反推六个结构模式、目标结构候选与只读实验计划（推论稿） | 2026-11-09 |
 | [2026-11-09-dsh-affordances.md](2026-11-09-dsh-affordances.md) | DSH 0.2.1 对 preset / subagent / workflow / team / skills 的真实能力与约束（源码依据） | 2026-11-09 |
+| [2026-11-09-external-practices.md](2026-11-09-external-practices.md) | Anthropic / Claude Code / OpenAI 一手实践 survey，映射 S1–S6 与四层“优雅形状”初步 | 2026-11-09 |
+| [2026-11-09-contract-duplication.md](2026-11-09-contract-duplication.md) | 合同/委派词在 persona、角色 skills、docs 的分布读数（只读词频；S4 证据） | 2026-11-09 |
