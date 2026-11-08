@@ -35,8 +35,8 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 - **深度**：`maxDepth` 是绝对深度上限（`0` 禁止、`1` 只允许直接子代；行上不写则读 Host 默认 1）。
   `vp_eng`/`vp_sales` 行是 1；`system_architect`/`system_qa` 行是 **2**——VP-Eng 可能是团队成员
   （depth 1，见 §3），他起的子代落在 depth 2。团队成员加人只能走命名委托：`spawn_teammate` 仅 Lead 可调。
-- **改稿方式**：再委派一次，把上一稿一起给它。CEO 会话的 `send_message` 是团队版（按成员名寻址），
-  够不到 subagent child——所以命名委托不承担"反复追加意见"，那归 team。
+- **改稿方式**：优先 `send_to_subagent` 续同一个 named child（root/命名 child 都可用；带上一稿原文）；
+  不可续或需要新上下文才再委派一次。CEO 团队的反复追加/互审仍归 team（`send_message` 按名）。
 - **工具行归属**：写在 `presets/ceo/agent.cordis.yml` 的 `delegation` 组内（preset 自包含，
   DSH 无 patch 继承——见 [presets.md](./presets.md) §工具面）。
 

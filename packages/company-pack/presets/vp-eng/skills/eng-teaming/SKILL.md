@@ -26,7 +26,7 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 只认名册成员，够不到你起的 `subagent` child（`send_message` 报 `active teammate not found`，`wait_agent` 报
 `no-active-peer`）。根门控制 child 用 **`list_subagents`**（父会话 durable catalog，宿主重启后仍可查）与
 **`send_to_subagent`**（续驶/催稿）；child 终稿仍走**完成通知**，别等、别催、别用 `bash sleep` 轮询；要改它的稿
-就再委派一次。你自己作为 child 时拿到的是全局版（`agent_id` 可指父），作为 teammate 时是团队版
+就 `send_to_subagent` 续同一个 child（带上一稿），不可续再委派。你自己作为 child 时拿到的是全局版（`agent_id` 可指父），作为 teammate 时是团队版
 （`target` = `lead` / 成员名）——两种寻址别混。
 
 ## workflow 硬规则（2.5 档）
@@ -79,7 +79,8 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
   用于事后举证 / 对外验收）。这三项是 SA 判学科域、SQA 做域审计的上游输入——漏写 = 让下游猜。
   学科域**固定五行**（软件 / 固件 / 电气 / 机械 / 系统测试）：任务书可以追加产品细分，但不得替换这五行；
   给 SA/SQA 的任务书要原样带上这五行，让两侧用同一张表核对。
-- **改稿 = 再委托一次**：命名 child 没有 `send_message`（那是团队版，按成员名寻址）——把上一稿一起给它。
+- **改稿 = 续同一个 child**：用 `send_to_subagent`（按 id）把上一稿一起发；不要用团队版 `send_message`
+  （按成员名，够不到 subagent child）。
 - **不越权**：不定市场/定价（CMO/VP-Sales）、不承诺交期（COO）、不替财务下结论。
 
 ## 交稿

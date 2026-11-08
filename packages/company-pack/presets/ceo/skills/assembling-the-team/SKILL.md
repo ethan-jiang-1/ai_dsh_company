@@ -37,7 +37,7 @@ description: CEO 的组队方法：接到动议先过这六步（要不要叫人
    避免事后"怎么没问财务"。
 5. **走哪条通道**（按"要什么"分，不按亲疏分）：
    - 只要一份单职能稿 → `vp_eng` / `vp_sales` 直接委派（最便宜）；
-     改稿 = 再委派一次、把上一稿一起给它。
+     改稿 = `send_to_subagent` 续同一个 child（带上一稿）；不可续再委派一次。
    - **要 workflow / subagent 的研发取证或并行核查 → `vp_eng` 命名 child**：它拿的是 vp-eng
      完整工具面（workflow / subagent / subagent_fork / SA / SQA）；`spawn_teammate` 的成员继承**你的**
      组合，**没有** workflow/subagent（CEO 团队里叫 "vp-eng" 的成员也不是 vp-eng preset）。
@@ -45,7 +45,7 @@ description: CEO 的组队方法：接到动议先过这六步（要不要叫人
      **命名 child 不是 team member**：终稿走完成通知；不要用 `wait_agent` / `list_agents` / `send_message`
      等它/找它/催它（CEO 的 `send_message` 是团队版，对 `vp_eng` 会报 `active teammate not found`）；
      也不要用 `bash sleep` / 轮询文件等它——派发后**立即结束本轮并回执**（已委派 + 预计交付物），
-     完成通知会开新轮，届时再验收。改稿 = 再委派一次，把上一稿一起给它。
+     完成通知会开新轮，届时再验收。改稿 = `send_to_subagent` 续同一个 child（带上一稿）；不可续再委派。
      **任务书要写死方法**：≥3 个同构分支用 `workflow` 并行（不是拉多条 `subagent`）；1–2 件才用
      `subagent`；独立核对另起一条 `subagent`（可与 workflow 并行）。别写「subagent 或 workflow 都行」——
      那会把通道选择丢给下游即兴。

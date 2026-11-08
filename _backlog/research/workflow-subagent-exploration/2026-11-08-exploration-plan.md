@@ -464,6 +464,10 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 | C2 | vp-eng root | cold resume：child 在跑时 SIGTERM 宿主，重启后用 `list_subagents` / `send_to_subagent` 唤醒 | `list_subagents` 行有 id/label/mode/status=`inactive`，**没有 `lastTurnEnd`**；`send_to_subagent` 返回 `message delivered`，child 从 turn1 `interrupted` 起 turn2 并 `completed`，父收到完成通知；父仍调用了一次 team `wait_agent`（`no-active-peer`） | **F15**（P2，新 bug 候选）：`lastTurnEnd` 在真实装配里不出现——`company-session-query-sqlite` 在 `isolate:{sessionQuery:true}` 组内，host 的 `ctx.get('sessionQuery')` 拿不到；修复轮 spec 用 fake service 没抓到。cold resume 本身 PASS |
 | C3 | vp-eng root | 团队继承 × 新控制名：spawn teammate eng-2，让它用 subagent 起 worker | root 工具 79；eng-2（child `02d92066…`）调 `subagent` + `list_subagents` + `list_agents` + team `send_message`（target=`lead`）；root 的 `list_subagents` **同时列出 teammate eng-2**（它是 subagent catalog 条目）；模型自述“成员与子代理是同一套 child 机制的两个视图” | **BUG-043**（P2）：`list_subagents` 包含 teammate，与工具描述“named/generic child 不是 team roster member”的暗示不完全一致；两套寻址可交叉使用 |
 | C2b | vp-eng root | 干净 cold resume（补 `fixtures/a`）：重启后 `send_to_subagent` 唤醒 | child turn1 `interrupted` → turn2 `completed`，读到 `1.4.2`，父独立 `read` 复核；`lastTurnEnd` 仍缺；父又试了一次 team `wait_agent`（`no-active-peer`）；`sleep 60` 是否跑满无法证实（child 重启后新读文件） | cold resume PASS；**BUG-042** 复现 |
+| V2 | vp-sales root | 其他职能 × 新控制工具：4 lead tier + 问它会不会用 `list_subagents`/`send_to_subagent` | tools=75，**有** `list_subagents`/`send_to_subagent`，无 workflow；模型自读 4 文件、未派 child、也没回答“何时用新工具”；自述 roster 只有自己 | **F18** 观察：新工具全局可见，但 vp-eng 之外没有 guidance，模型不选 |
+| C8 | vp-eng root | 团队 depth × 新控制面：spawn eng-3 → W1 → W2（应拒） | eng-3 报告：W1/W1b 两次 `subagent` 均被 `depth 3` 硬拒、无 W2 创建、未换 `workflow`/`subagent_fork`/命名专家；depth 2 有 prompt 级 “don't delegate” 段；5 个委派工具 cap 均 2。Lead 自己读 vendor 做预测并反复 bash/等待，**turn 到 300s 仍未收口**（harness 超时） | depth PASS；**F19** 观察（Lead 过度验收/等待） |
+| C9 | vp-eng root | bash 2000 行 + 尾标记，测 pruner/保留策略 | bash 结果尾部保留、`TAIL-MARKER-9f3a` 直接可见；模型又落 `/tmp` 用 `wc -l`/`tail -n 1`/`grep -c` 独立复核 | PASS（砍头不砍尾） |
+| C10 | CEO root | named child 复用：先 `vp_eng` 出 v1，再让同一 child 出 v2（加 checked） | CEO 调 `vp_eng` → `send_to_subagent` → `list_subagents`；**同一个 child `2fd302d7…` 出两版**，未新起 VP-Eng；但 CEO skill/§1 仍写“改稿=再委派一次” | **F20**：文档/技能与新工具矛盾；已修（`docs/delegation.md` §1、CEO skill/persona、`eng-teaming`） |
 | C7 | vp-eng root | 后台 job × 重启：`run_in_background` W（4×sleep 30）→ SIGTERM → 重启 → 问 job | `job_list` 空；`job_output` 报 `unknown job`；无完成通知；`list_subagents` 仍有 4 个 `continuable/inactive` child（无 lastTurnEnd、无产出）；父靠自读文件拿地面真值，提议逐个 `send_to_subagent` 唤醒 | **BUG-044**（P2）：后台 job 不跨重启；child 可手动补 |
 | C6 | vp-eng root | compaction × skill：`skill` + `/compact` + 4 模块 natural 任务 | `/compact` 产出会话摘要（摘要里保留了“eng-teaming / 五档”），之后 4 模块自然任务仍走 workflow（1 run/4 agents），没有退回 subagent×N/bash sleep | PASS（规则在摘要后仍生效） |
 
@@ -481,6 +485,14 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
   重启——job 登记表在进程内，重启后 `job_list` 空、`job_output` unknown、无通知；child 会话仍在
   （continuable/inactive）可手动 `send_to_subagent`，但拿不到原 job 返回值。已修 `eng-teaming` 长跑条
   （别把“job 起了”当“结果可恢复”）；机制/上游留 BUG-044。
+- **F20**：`send_to_subagent` 让 named child 可续（C10 同一 child 出两版），但 `docs/delegation.md` §1、
+  CEO `assembling-the-team`/persona、`eng-teaming` 两处仍写“改稿=再委派一次”，与新工具矛盾。**已修文本**
+  （优先 `send_to_subagent` 续同一个 child，不可续再委派）；C10 是红证据（模型照工具描述做了对的事，
+  书面契约却相反）。
+- **F19**：C8 里 Lead 花 300s 自己读 vendor、反复 bash/等待 teammate，turn 未收口——不是深度机制失败
+  （eng-3 的深度链已如实完成），是“验收”没有上限的观察；暂记，不立卡。
+- **F18**：V2 里 vp-sales root 有 `list_subagents`/`send_to_subagent` 却没提/没用——新工具全局可见但
+  只有 vp-eng/CEO 的 guidance；其他职能是否该有说明，待定（可能不是 bug，是覆盖面问题）。
 - **F16 → [BUG-043](../../bugs/BUG-043-list-subagents-includes-teammates.md)**：`list_subagents` 列出
   teammate（它们也是 subagent activation/catalog 条目），与 team `list_agents` 名册重叠；工具描述只强调
   “child 不是 roster member”，没提 teammate 也会出现在列表。候选修法 = 在行上标 `role`/`kind`，或过滤
