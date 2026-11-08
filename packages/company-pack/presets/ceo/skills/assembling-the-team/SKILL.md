@@ -44,7 +44,8 @@ description: CEO 的组队方法：接到动议先过这六步（要不要叫人
      复杂包既要"取证"又要"多轮落地"时：先 `vp_eng` 出证据/汇总，再组队落地（或再委派一次）。
      **命名 child 不是 team member**：终稿走完成通知；不要用 `wait_agent` / `list_agents` / `send_message`
      等它/找它/催它（CEO 的 `send_message` 是团队版，对 `vp_eng` 会报 `active teammate not found`）；
-     改稿 = 再委派一次，把上一稿一起给它。
+     也不要用 `bash sleep` / 轮询文件等它——派发后**立即结束本轮并回执**（已委派 + 预计交付物），
+     完成通知会开新轮，届时再验收。改稿 = 再委派一次，把上一稿一起给它。
      **任务书要写死方法**：≥3 个同构分支用 `workflow` 并行（不是拉多条 `subagent`）；1–2 件才用
      `subagent`；独立核对另起一条 `subagent`（可与 workflow 并行）。别写「subagent 或 workflow 都行」——
      那会把通道选择丢给下游即兴。

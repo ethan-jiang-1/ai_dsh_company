@@ -33,7 +33,9 @@ opened: 2026-11-08
 5. 是否覆盖 background/cancel、`workspace-write` 沙箱、发布安装链、其他职能工具面与长期采纳率？建议本轮以 VP-Eng bug discovery 为主，其余明确延期；用户批准后才可加面。
 6. 真模型证据采用何种合成归档格式和留存期？必须可离线复判且不能收真实业务数据、凭据或用户会话内容。
 
-**下一步：** 按研究材料与本卡 charter 草案收敛一页执行摘要（入口、charter、预算、留存、授权），先请用户批准真模型轮次与范围。未批准前只做只读机制核对与 keyless harness 可行性设计，不运行真模型、不改 preset/vendor、不清共享 rehearsal 数据。
+**下一步：** 第一轮已执行（2026-11-08，结果见下方「第一轮执行结果」）：3 张 P2 缺陷卡 +
+2 条当场修 + keyless 重试机制档。后续只在用户点名扩面时继续；未覆盖项（长期采纳率、部署面、
+其他职能、更多 natural 变体）保持不做，扩面先问用户。
 
 ## 研究范围地图
 
@@ -177,6 +179,24 @@ opened: 2026-11-08
 - **C（不选）：完全无章程、无 oracle、无隔离的自由探索。** 不能复判，可能被旧 journal 带偏，且缺少 P3 停止/取消纪律。
 - **D（不选）：用 prompt 要求 child 自称失败来测试重试。** 文本不能证明 execution lifecycle 或 terminal reason。
 - **E（不选）：将任何 `null`/`error`/timeout/aborted 自动重试。** 当前数据不足以可靠判定可重试性，可能掩盖 fatal 或重复非幂等工作。
+
+## 第一轮执行结果（2026-11-08）
+
+> 预算实际：约 60 分钟、10 个 parent turn、约 24 个 child activation；未触发停止上限。完整运行表、
+> 未覆盖项与资产收割决定 = [研究材料 §16](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
+
+| 发现 | 探索方向 | 效果/证据 | 处置 |
+|---|---|---|---|
+| `agent({schema})` 的 `enum`/`const` 必须配 `type`，模型面描述未说 | R2 强制 workflow + 模型自拟 schema | 首跑整轮 `UNSUPPORTED_SCHEMA`、零 agent；模型补 `type` 后重跑 6 agents 成功 | skill 已修；机制/上游 → [BUG-036](../bugs/BUG-036-workflow-schema-enum-type.md) |
+| 根会话 = Lead，团队版控制名 shadow 全局版；契约误写“根不是成员” | R3 委派深度链（模型自然尝试等/催孙代） | `list_agents` 只回 lead、`send_message` 报 `active teammate not found`、`wait_agent` no-active-peer | docs/5 preset 注释/eng-teaming 已修；机制 → [BUG-037](../bugs/BUG-037-root-team-tool-shadowing.md) |
+| W 分支内再委派：返回值混入回执、跨轮拼接；schema 分支会 null | R5 W→S 嵌套 | 分支返回 `started subagent … <值>`；两轮才拿到值 | “分支默认叶子”规则；机制 → [BUG-038](../bugs/BUG-038-workflow-branch-nested-delegation-result.md) |
+| 命名 child 同时 `send_message` + 完成通知，父收两份 | C1 CEO→`vp_eng` | 父会话收到 “Agent … sent a message” + “finished … closing message” | 已修 `eng-workflow` 第 5 步；绿 C2 |
+| CEO 用 `bash sleep 25/30` 轮询 child，不结束本轮 | C1 | turn 142s；child 完成后才回完整答案 | 已修 CEO skill/persona；绿 C2 |
+
+其余观察（不记为 bug）：R1/T1 小任务自己做是合法方法差异；R4 后台取消干净（job killed、run cancelled、
+6 agents cancelled、无残留 sleep），但模型看不到 run stopReason；N1 负例如实报缺并指出正确路线；
+keyless fake-provider 4/4 证明 retry-once 可行、`AGENT_START`/`AGENT_RESULT` 为 fatal、两次失败停在
+2 starts。
 
 ## 关闭条件
 

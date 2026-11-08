@@ -22,6 +22,11 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 `maxDepth: 2`；worker 到 depth 2 不能再往下）；CEO 团队里的 `vp-eng` teammate 继承 CEO 组合——
 那是 CEO 的边界，不是你的。
 
+**控制面**：根会话是 Lead，`send_message` / `list_agents` 是**团队版**，够不到你起的 `subagent` child
+（会报 `active teammate not found`；2026-11-08 探索实测）。child 终稿走**完成通知**，别等、别催、别用
+`bash sleep` 轮询；要改它的稿就再委派一次。你自己作为 child 时拿到的是全局版（`agent_id` 可指父），
+作为 teammate 时是团队版（`target` = `lead` / 成员名）——两种寻址别混。
+
 ## workflow 硬规则（2.5 档）
 
 - **子代是 fresh 克隆**：同人格/工具面，但不 seed 你的对话——每个 `agent()` 的 prompt 必须自包含
@@ -29,6 +34,14 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
   「极简 brief」会逼 worker 编造或拒绝（2026-11-08 行为烟测实证）。
 - **不能替代独立人格**：`workflow` 无 `agentPreset`；CMO/SA/SQA 的结论仍走命名委托，SQA 原样。
 - **门自己写**：`missing > 0` / `failures` 非空就自己 `throw`（或返回给父代理读）；不要 `try/catch` 吞 fatal。
+- **schema 只吃子集**：`enum` / `const` 必须同时写 `type`（`{ type: 'string', enum: [...] }`），`oneOf`
+  不能和 `type` 并列，根必须是 `object`——否则整轮 `UNSUPPORTED_SCHEMA` fatal，不是分支失败（2026-11-08 实测）。
+- **失败不自动重跑**：`null` 可能是 refusal / error / aborted / 缺结构化结果，不保留原因；先判任务幂等且
+  失败可重试，最多同 task / schema 再派一次（attempt label 不同），仍失败记 missing / exhausted。
+  `AGENT_START` / `AGENT_RESULT` / 取消是 fatal，不许 catch 后伪装成 null 或安全重试。
+- **分支默认是叶子**：分支里再起 `subagent` / `workflow` 只在确需两层时用——回执和结论会混进同一段
+  返回文本（`started subagent … <值>`），带 schema 的分支还会 null（2026-11-08 实测）；确需两层就让
+  父 workflow 直接起第二层，或规定分支只回一行可解析值。
 - **写盘**：分支只读，或一分支一文件；正式交付物只由你写。
 - **长跑**：团队会话里前台 run 会阻塞你（先例约 6 分钟，Lead 消息排队）——用 `run_in_background`。
 - **返回聚合/异常**：别回全量 rows；先例约 125k 字符触发 50k 上限 + spill。

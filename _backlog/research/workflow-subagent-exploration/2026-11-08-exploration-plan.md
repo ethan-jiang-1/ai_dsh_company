@@ -378,3 +378,50 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
   [architecture](../../../docs/design/architecture.md)
 - [常驻 probe](../../../probes/team/vp-eng-workflow-probe.mjs)
 - [preset 改动完成定义](../../../.agents/skills/preset-change-definition/SKILL.md)
+
+## 16. 2026-11-08 第一轮探索结果（真模型 + keyless 机制档）
+
+> 预算实际：墙钟约 60 分钟；10 个 parent turn；约 24 个 child activation；未触发停止上限。
+> 证据落 `runtime/tmp/explore/`（gitignored）；本节只留脱敏摘要与 session id。
+
+### 16.1 运行清单
+
+| ID | 入口 | Charter / 方法 | 观察 | 判定 |
+|---|---|---|---|---|
+| R1 | vp-eng root | natural：4 个 <60B 的 package.json 版本汇总 | 加载 eng-teaming 后自判“第 1 档 自己做”，bash 一次读完 + 独立复核；workflow=0、subagent=0 | 合法方法差异（不记 bug） |
+| R2 | vp-eng root | forced workflow：6 模块 + 缺文件 + 坏 JSON + lock 冲突；要求 schema 聚合、失败最多重试一次 | 第一次 run schema 子集 fatal（`status.enum` 缺 type），第二次 run 6 agents completed；missing/corrupt 正确；deliverable 与 fixture 未变 | **BUG-036**；聚合正确 |
+| R3 | vp-eng root | forced depth 链：根→W1→W2（再 W3） | depth 2 受理；depth 3 被拒 `subagent depth 3 exceeds maxDepth 2`；模型如实转述、未伪造。根门 `list_agents` 只回 lead、`send_message` 报 `active teammate not found`；W1 那层全局控制可用 | **BUG-037**；depth 边界 PASS |
+| R4 | vp-eng root | forced 后台 W（6×sleep 40）+ 5s 后 job_kill | job `killed`、run `stopReason=cancelled`、6 agents `outcome=cancelled`、child `turn/end aborted(parent)`、无残留 sleep；模型看不到 run stopReason（工具面缺口），花约 4 分钟找证据 | 取消/清理 PASS；观测缺口记 §16.4 |
+| R5 | vp-eng root | forced W→S：2 分支各自起孙代并等通知 | 孙代 depth 2 真跑、值沿“孙代→分支→workflow”传回；但分支返回值是 `started subagent … <值>` 的拼接，且分支跨两轮；带 schema 的分支会 null | **BUG-038**；能力通、结果形状不成形 |
+| C1 | CEO root | natural goal-only → `vp_eng` 命名 child | CEO 未用 wait_agent/send_message，但用 `bash sleep 25/30` + 轮询文件等 child（turn 142s）；child 用全局 `send_message` 回报 + 完成通知，父收到两份；值正确 | **F4/F5**（当场修） |
+| C2 | CEO root | C1 绿复跑（修 skill/persona 后） | CEO 派发后立即结束本轮（“已派活，本轮结束”），无 sleep；child 未再发 `send_message`；child 自选 workflow+subagent | 绿证据（F4/F5） |
+| T1 | vp-eng root | teammate：spawn eng-1 + 任务板 | teammate 执行、发消息、更新任务板；Lead 独立复算并落 report/journal；4 个小文件未用 workflow | PASS（方法差异） |
+| N1 | CEO root | 负例：teammate 名 `vp-eng`，要求 workflow | teammate 明确报告“没有 workflow、也不冒充”，并指出根层与 depth 限制；CEO 指出正确路线是 `vp_eng` 命名 child | PASS（能力边界如实处理） |
+| K1 | keyless | fake `SubagentProvider` + 真 workflow 引擎 | ① refusal→null→第二次 structured，starts=2；② `AGENT_START` 穿过 parallel 为 fatal；③ `AGENT_RESULT` 未捕获→run error；④ 两次 refusal 后停在 2 starts | 4/4 PASS；脚本 `runtime/tmp/explore/keyless-retry.ts` |
+
+辅助观察：R5 的孙代、R3 的 W2 分别落在 depth 2；R4 的 child 全部在取消后进入 aborted 终态。
+N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`（探测工具/配置）——这是
+当前权限模式的已知面，不记缺陷，但说明“隔离目录”只保证写入不越界，不保证读侧不可见。
+
+### 16.2 发现与处置
+
+| # | 发现 | 方向 | 处置 | 证据 |
+|---|---|---|---|---|
+| F1 | workflow schema 的 `enum`/`const` 必须配 `type`；模型面描述未说，首跑整轮 fatal | R2 强制 workflow + 模型自拟 schema | 已修 skill 指引（红 R2 / 绿 R6）→ 上游建议留 **BUG-036** | R2 / R6 |
+| F2 | 根会话是 Lead → 团队版控制名 shadow 全局版；契约 §4.4 与 preset 注释误写“根不是成员”；根无法 steer 自己的 child | R3 委派深度链（模型自然尝试等/催孙代） | 已修 docs/5 preset 注释/eng-teaming；机制留 **BUG-037** | R3 |
+| F3 | W 分支内再委派：返回值混入回执、跨轮拼接；带 schema 的分支会 null | R5 W→S 嵌套 | 已加“分支默认是叶子”规则；机制留 **BUG-038** | R5 |
+| F4 | 命名 child 同时用 `send_message` + 完成通知回报，父收到两份 | C1 CEO→vp_eng | 已修 eng-workflow 第 5 步（终稿即回执）；绿 C2 | C1 / C2 |
+| F5 | CEO 用 `bash sleep` 轮询 child，而不是派发后结束本轮 | C1 | 已修 CEO skill/persona（明确禁 sleep/轮询）；绿 C2 | C1 / C2 |
+
+### 16.3 未覆盖 / 不记为 bug
+
+- 长期采纳率、其他四职能的行为 E2E、CEO root/team 的 workflow 扩面、`workspace-write`、release-smoke；
+- natural S-only / M2 多轮、>50k 结果 spill、max-tokens/aborted 的自然案例；
+- R4 中“后台 run 取消后模型看不到 run stopReason”是工具面观测缺口，不是本卡生命周期的失败；
+- R1/T1 的“小任务自己做”是合法方法选择，不记 bug。
+
+### 16.4 资产收割决定
+
+- 三张缺陷卡（036/037/038）留作后续修复/上游提案的载体；
+- keyless retry 脚本暂不进 `pnpm test`（vendor 已有同语义测试；本仓加门禁需 P2 判据，先留证据）；
+- 常驻 probe 不改：本轮是探索，稳定判据（root 控制面、schema 子集）若再次复现再升级为 probe/spec。

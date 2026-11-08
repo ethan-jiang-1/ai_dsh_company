@@ -1,5 +1,5 @@
 ---
-status: 调研中
+status: 已定性
 opened: 2026-11-08
 ---
 
@@ -12,7 +12,7 @@ opened: 2026-11-08
 > [delegation 合同](../../../docs/delegation.md)、[workflow 通道 Note](../../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)、
 > 常驻 probe [vp-eng-workflow-probe](../../../probes/team/vp-eng-workflow-probe.mjs)。
 > 产出的卡：[探索性测试 bug-hunt 问题卡](../../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)；具体缺陷按证据另行分诊。
-> 结论：（调研中；问题卡待定性，真模型探索未授权、未开跑）
+> 结论：（第一轮探索已跑：能力面与主要失败模式已定性——3 张 P2 缺陷卡 + 2 条当场修；剩余方向 = 长期采纳率、部署面、更多 natural 变体，未覆盖项见材料 §16.3）
 
 ## 材料
 

@@ -15,7 +15,9 @@ description: VP-Eng 的工作流（1 号）：接到评审 / 技术评估 / PRD 
 4. **出稿**：
    - **PRD 定义**（新产品/新功能）：先读同目录 `drafts/mrd.md` + `drafts/strs.md`（CMO 的 MR 与涉众需求），用 `prd-playbook` + 共享 `product-definition` 出 `drafts/prd.md`（REQ/AC/slice、`source` 指回 MR、`traces` 指回 StRS、一 REQ 一任务），跑 `/prd check <slug>` + `/req check <slug>`；技术评估稿仍落 `drafts/vp-eng.md`。
    - **评审 / 技术评估**：`<company-content>/templates/review-note.md` 一页纸落 `.dsh-company/deliverables/<slug>/drafts/vp-eng.md`，结论先行；有 veto 在结论里声明。
-5. **回执**：向任务板回状态与修订；向 `.dsh-company/kb/vp-eng/journal/` 追加纪要——**没写 journal = 任务未完成**，不许宣称收工（硬闸门；执行期两次实证缺席，2026-09-25 收紧）。
+5. **回执**：team 会话里向任务板回状态与修订；作为命名 child / worker 时，**终稿就是回执**（完成通知送回
+   父代理），不要再用 `send_message` 给父代理——同一份结论会送两次。向 `.dsh-company/kb/vp-eng/journal/`
+   追加纪要——**没写 journal = 任务未完成**，不许宣称收工（硬闸门；执行期两次实证缺席，2026-09-25 收紧）。
 
 > 这是 VP-Eng 的第 1 个工作流；后续新工作流按 `eng-workflow-<主题>` 命名追加。
 
