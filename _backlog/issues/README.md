@@ -4,11 +4,13 @@
 
 ## 活跃清单
 
-当前活跃 0 张（最近一张 SA/SQA 能力组织卡 2026-11-08 已结归档）。
+当前活跃 1 张。
 
-（2026-11-08 SA/SQA 能力组织卡收口：A+C 口径落三份 skill + 任务书域声明 + 域路由探针；
-去向 = [capability-routing Note](../../notes/implemented/2026-11-08-sa-sqa-capability-routing.md)；
-卡片见[归档](../_archive/settled_issues/2026-11-07-sa-sqa-capability-organization.md)。）
+- [2026-11-08 README 与安装手册使用者面向，补「第一次经营一家公司」](2026-11-08-user-facing-readme-and-first-use.md)
+  —— `推敲中`；等用户拍板范围 / 截图 / 分发口径（未决 1–5）。倾向做，落点拟 `note`。
+
+（2026-11-08 SA/SQA 能力组织卡已结归档：去向 = [capability-routing Note](../../notes/implemented/2026-11-08-sa-sqa-capability-routing.md)；
+历史摘要只住[归档](../_archive/README.md)，本页不重复。）
 
 （2026-11-07 需求识别/编号 + VP-Eng 组队的程序伞卡 + 11 张执行卡（A1–A8、B1/B2）已结归档：
 去向 = [程序 Note](../../notes/implemented/2026-11-07-requirements-teaming-program.md)；卡片见[归档](../_archive/settled_issues/README.md)。）
