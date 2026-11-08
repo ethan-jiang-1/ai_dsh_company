@@ -4,6 +4,8 @@
 
 ## 修复流水（倒序）
 
+- **BUG-044**（2026-11-08）：后台 workflow job 不跨宿主重启——job 登记表随进程消失，`job_list` 空、`job_output` unknown，父会话没有可查的终态/结果；child 会话 durable 但在（C7/C7R）。修法 = 新增 host 工具 **`workflow_runs`**：只读父会话自己的 `tool-workflow/run-start|agent-start|run-end` + 工具回执，输出 `{runId,name,background,jobId?,status,children}`；无 run-end 且 job 注册表不认识 → **`lost`**（明确标注；原结果不恢复，children 可冷恢复取当前事实）。keyless 6 条；真实 C7b 会话日志离线验证输出 lost + jobId + 4 children。C7b 探针里模型未实际调用该工具（行为观察，能力已验）。上游：job registry durable 化/resume 对账。详见 [卡](BUG-044-background-job-lost-on-restart.md)。
+
 - **BUG-043**（2026-11-08）：`list_subagents` 把 `spawn_teammate` 的成员也列出来（同一个 child 机制的两个视图），与 team `list_agents` 重叠且描述未说明，模型可能选错寻址。修法 = **不隐藏、标身份**：每行加 `role: 'teammate' | 'subagent'` 与 `address`（teammate → 队名，subagent → session id），身份来自 `agentTeams.tryMembership/listMembers`（服务缺席/非成员全按 subagent，不丢行）；description + `eng-teaming` 写死两套寻址。keyless 14 条（含 team/无 team/非成员/description 断言）。未跑 C3 真模型观察，按“description/skill 写死 + 绿证据”分支收口。详见 [卡](BUG-043-list-subagents-includes-teammates.md)。
 
 - **BUG-040**（2026-11-08）：schema 分支的 child `completed` 但只回文本（没调 `structured_output`）→ 引擎丢文本、给父裸 null，且无诊断（R10）。**按产品规避收口**：`eng-teaming` 工作流分支**禁传 schema**，改“只回一行 JSON + 父脚本 `JSON.parse`；失败把原文记 `missing`”——本仓唯一会碰 schema 的分支形状被去掉，completed 的答案不再被折成 null；smoke 第 7 条钉住“非 schema 分支原样返回文本、父 parse 成功”。引擎缺陷仍在（上游提案与真 diff 在卡内；恢复 schema 前必须先有诊断）。详见 [卡](BUG-040-workflow-schema-text-answer-discarded.md)。

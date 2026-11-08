@@ -84,6 +84,8 @@ export interface SubagentRow {
   address: string
   /** 子会话 durable 日志里最后一个 `turn/end` 的 reason.kind；读不到时为 `unavailable`（可见降级）。 */
   lastTurnEnd: string
+  /** `unavailable` 时的短原因（错误 code 或截断 message），供模型/日志判断下一步。 */
+  lastTurnEndDetail?: string
 }
 
 /** `sessionPersistence` 的只读一面（root 服务；base 挂 JSONL，agent-loop/team 同款用法）。 */
@@ -110,6 +112,14 @@ export function terminalOf(events: readonly { type: string; data: unknown }[]): 
     return typeof reason?.kind === 'string' ? reason.kind : undefined
   }
   return undefined
+}
+
+/** Short, model-readable reason for a degraded durable read. */
+function readErrorDetail(error: unknown): string {
+  const code = (error as { code?: unknown } | undefined)?.code
+  if (typeof code === 'string' && code !== '') return code
+  const message = error instanceof Error ? error.message : String(error)
+  return message.slice(0, 120)
 }
 
 /**
@@ -182,7 +192,7 @@ export function registerDelegationControl(ctx: Context): void {
       + 'children too. `running` means the child is working; `inactive` means it is '
       + 'not currently working. `lastTurnEnd` is the reason its durable log recorded for the last turn '
       + '(e.g. `interrupted` after a host restart, `completed`); it is `unavailable` when the log cannot be '
-      + 'read (visible degradation, never silently omitted). '
+      + 'read (visible degradation, never silently omitted); `lastTurnEndDetail` names the short reason then. '
       + 'An `interrupted` child never sends a completion notice: continue it with `send_to_subagent` or report the gap.',
     parameters: {},
     output: {
@@ -204,6 +214,7 @@ export function registerDelegationControl(ctx: Context): void {
                 role: { type: 'string', required: true },
                 address: { type: 'string', required: true },
                 lastTurnEnd: { type: 'string', required: true },
+                lastTurnEndDetail: { type: 'string' },
               },
             },
           },
@@ -248,6 +259,7 @@ export function registerDelegationControl(ctx: Context): void {
           }
         }
         row.lastTurnEnd = 'unavailable'
+        row.lastTurnEndDetail = readErrorDetail(lastError)
         ;(ctx as unknown as { logger?: { warn(message: string): void } }).logger?.warn(
           `list_subagents: cannot read durable log for ${row.id}: ${String(lastError)}`,
         )

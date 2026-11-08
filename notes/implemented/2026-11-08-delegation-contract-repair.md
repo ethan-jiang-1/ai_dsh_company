@@ -98,3 +98,38 @@
 - **红配方（负例留证）**：删 preset 的 `maxResultChars` → 渲染钉子第三条红；临时 import
   `tools/drivers/playwright.mjs` → layering 守卫 2 条红；还原即绿。
 - 探针原始证据在 `runtime/tmp/explore/`（gitignored）；本 Note 只留脱敏摘要与会话 id。
+
+## 042–044 修复轮（2026-11-09）：我们自己的工具也要守层契约
+
+> 上一节修的是“引擎没告诉模型的东西”；这一轮修的是**我们自己新增的委派工具**把模型可见视图
+> 接在了错误的层上。三条实例：isolate 的 sessionQuery（042）、单一 catalog 来源（043）、
+> 进程内 job 注册表（044）。
+
+**层契约（新工具/改工具时的判据）**：
+
+| 层 | 能回答什么 | 工具可用性 | 用途 |
+|---|---|---|---|
+| 父会话 durable `session.ownEvents()` | child 目录、workflow run/agent 起止、工具回执 | **永远可达** | 目录、run 视图（首选） |
+| `sessionPersistence.open(id,'read')` | 子会话终态/日志 | root 可达 | 子会话终态（042） |
+| `agentTeams.tryMembership/listMembers` | 名册/role/姓名 | root 可达 | teammate vs subagent 身份（043） |
+| live `agents` / `jobs` | 现在是否在跑 | 可达 | **只作装饰**，不得作为持久事实唯一来源 |
+| isolate 组内 `sessionQuery` | 会话查询 | **host 工具拿不到** | 只在组内用 |
+
+两条铁律：**承诺字段不许静默省略**（读不到给 `unavailable` + `lastTurnEndDetail`）；**durable 读
+用真实服务测**（fake service 会藏住“服务在真实装配里缺席”这一类 bug——042 就是这么漏的）。
+
+**三卡结果**：
+
+- **BUG-043（已修归档）**：`list_subagents` 行加 `role/address`（teammate→队名、subagent→session id；
+  `agentTeams` 缺席/非成员全按 subagent，不丢行）；description + `eng-teaming` 写死两套寻址。
+  keyless 14 条；未跑 C3 真模型观察（按卡里 description/skill 分支收口）。
+- **BUG-044（已修归档）**：新增 `workflow_runs`（父会话自己的 `tool-workflow/*` + 工具回执 →
+  completed/cancelled/running/lost + children；lost = 无 run-end 且 job 注册表不认识）。
+  keyless 6 条；**真实 C7b 会话日志离线验证**输出 `lost` + jobId + 4 children；C7b 探针里模型
+  未实际调用该工具（行为观察，能力已验）。原 job 结果明确不恢复。
+- **BUG-042（修复已落地，未归档）**：终态改读 root `sessionPersistence`（不再用 isolate 的
+  `sessionQuery`）+ `unavailable`/`lastTurnEndDetail` 可见降级 + 有界重试；keyless 3 条真实
+  JSONL 持久化测试（create/append/close + 红配方）。**真实装配仍有缺口**：C2d 干净 home 下
+  重启后第一次查询仍 `unavailable`，`send_to_subagent` 冷恢复后第二次才 `interrupted`；
+  原因未定位（需看 `lastTurnEndDetail` 的下一次探针）。041 的“真实装配 interrupted”证据
+  因此仍未成立。

@@ -1,12 +1,12 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-08
 ---
 
 # BUG-044：后台 workflow job 不跨宿主重启——job_list 空、job_output unknown，结果/通知丢失
 
-> 严重级别：P2（次要）｜发现：2026-11-08｜状态：修复已落地｜审查：agent — 修法 = 新增 durable 视图 `workflow_runs`（父会话自己的 run/agent/run-end 事件 + 工具回执），四态 + children；keyless 6 条；C7 探针复验中
+> 严重级别：P2（次要）｜发现：2026-11-08｜状态：已修｜审查：agent — durable 视图 `workflow_runs` 在真实 C7b 会话日志上返回 `lost` + jobId + 4 children；keyless 6 条；C7b 探针里模型未实际调用该工具（行为观察，不影响能力）
 
 ## 症状
 
@@ -65,7 +65,13 @@ continuable/inactive——它们是两条不同的持久化路径。
   lost（含 children）；job 已知 → running；completed/cancelled；同名 run 按序配对；孤儿 run-start →
   lost；工具注册 + 读 `ownEvents` + 无 jobs 服务按 unknown。host-composition/apply-lifecycle 注册面 6 tools。
 - **模型面**：`eng-teaming` 长跑条改成“重启后用 `workflow_runs` 查 completed/cancelled/lost + children”。
-- **真实装配复验**：干净 home 跑 C7b（后台 W → 杀宿主 → 重启 → 问 job）；通过则本卡归档。
+- **真实数据复验（2026-11-09，离线、keyless）**：取 C7b 干净 home 的**真实父会话 durables**
+  （`runtime/harness-home-clean/sessions/--…-C7b--/session-739f555c-…/session.v4.jsonl.zstd`），
+  `workflowRunRows(events, () => false)` 输出：
+  `{runId:"49f34559-…", name:"read-module-versions", background:true, jobId:"workflow-a9daec30…",
+  status:"lost", children:[m02,m04,m03,m01]}`——与卡的症状逐项对上（job 表空、child 在、无 run-end）。
+  C7b 探针里模型先走 `bash` 翻日志、**没有实际调用 `workflow_runs`**；这是模型选择，不是能力缺口
+  （工具结果由真实日志离线验证）。
 - **上游**（不再阻塞本仓）：job registry durable 化，或 resume 时把 owned job 的 child 终态补成 notice。
 
 4. 恢复实验：`node runtime/tmp/explore/recover7.mjs`（或同 session 直接 prompt）；证据

@@ -72,6 +72,9 @@ read.” 而 child 的 durable 日志里确实记着 `turn/end {"reason":{"kind"
     红配方 = 丢掉日志最后一条 → 2 条红，还原绿。
 - **真实装配复验**：重建 pack 后跑 `runtime/tmp/explore/resume2.mjs`（C2）。通过则 041 的
   “至少 interrupted”恢复成立；本卡归档。
+- **诊断增强（2026-11-09）**：`lastTurnEnd` 为 `unavailable` 时，行上带 **`lastTurnEndDetail`**（错误 code
+  或截断 message），模型/日志可直接看到原因；下一次 C2 用它定位“首次读失败”的具体错误。
+  当前不再增加探针（C2 预算已用尽，等用户裁决 A/B/C）。
 - **真实装配复验（2026-11-09，两次 C2）**：第一次 `list_subagents` 仍返回
   `lastTurnEnd: "unavailable"`；`send_to_subagent` 冷恢复后第二次/第三次返回
   `lastTurnEnd: "interrupted"`。关键环境线索：C2c 的 web 日志两次 boot 都有

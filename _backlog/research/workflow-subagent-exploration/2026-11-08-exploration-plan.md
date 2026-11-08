@@ -486,7 +486,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
   isolate 组里的 provider；`delegation-control.spec.ts` 用 fake service，所以门禁绿。C2b 复现。
   候选修法 = 把控制工具/终态读取放进能看见 sessionQuery 的组、或改用可用的 durable 读面、或删掉
   `lastTurnEnd` 承诺并重写 BUG-041 的验收。
-- **F17 → [BUG-044](../../bugs/BUG-044-background-job-lost-on-restart.md)**：后台 workflow job 不跨宿主
+- **F17 → [BUG-044](../../_archive/fixed_bugs/BUG-044-background-job-lost-on-restart.md)**：后台 workflow job 不跨宿主
   重启——job 登记表在进程内，重启后 `job_list` 空、`job_output` unknown、无通知；child 会话仍在
   （continuable/inactive）可手动 `send_to_subagent`，但拿不到原 job 返回值。已修 `eng-teaming` 长跑条
   （别把“job 起了”当“结果可恢复”）；机制/上游留 BUG-044。

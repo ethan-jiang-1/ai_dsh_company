@@ -187,7 +187,7 @@ describe('delegation control tools', () => {
     const result = await tool.execute({} as never, {
       agent: agentWith([catalog('child-1', 'w1')]),
       signal: new AbortController().signal,
-    } as never) as { subagents: Array<{ lastTurnEnd: string }> }
+    } as never) as { subagents: Array<{ lastTurnEnd: string; lastTurnEndDetail?: string }> }
     expect(result.subagents[0]?.lastTurnEnd).toBe('completed')
     expect(attempts).toBe(3)
   })
@@ -200,8 +200,9 @@ describe('delegation control tools', () => {
     const result = await tool.execute({} as never, {
       agent: agentWith([catalog('child-1', 'w1')]),
       signal: new AbortController().signal,
-    } as never) as { subagents: Array<{ lastTurnEnd: string }> }
+    } as never) as { subagents: Array<{ lastTurnEnd: string; lastTurnEndDetail?: string }> }
     expect(result.subagents[0]?.lastTurnEnd).toBe('unavailable')
+    expect(result.subagents[0]?.lastTurnEndDetail).toBe('persistently unreadable')
     expect(warnings).toHaveLength(1)
     expect(warnings[0]).toContain('cannot read durable log')
   })
@@ -248,7 +249,7 @@ describe('delegation control tools', () => {
       signal: new AbortController().signal,
     } as never)
     expect(result).toEqual({
-      subagents: [{ id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'unavailable' }],
+      subagents: [{ id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'unavailable', lastTurnEndDetail: 'corrupt child log' }],
     })
   })
 
