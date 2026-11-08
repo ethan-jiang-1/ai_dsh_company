@@ -470,6 +470,8 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 | C10 | CEO root | named child 复用：先 `vp_eng` 出 v1，再让同一 child 出 v2（加 checked） | CEO 调 `vp_eng` → `send_to_subagent` → `list_subagents`；**同一个 child `2fd302d7…` 出两版**，未新起 VP-Eng；但 CEO skill/§1 仍写“改稿=再委派一次” | **F20**：文档/技能与新工具矛盾；已修（`docs/delegation.md` §1、CEO skill/persona、`eng-teaming`） |
 | C7 | vp-eng root | 后台 job × 重启：`run_in_background` W（4×sleep 30）→ SIGTERM → 重启 → 问 job | `job_list` 空；`job_output` 报 `unknown job`；无完成通知；`list_subagents` 仍有 4 个 `continuable/inactive` child（无 lastTurnEnd、无产出）；父靠自读文件拿地面真值，提议逐个 `send_to_subagent` 唤醒 | **BUG-044**（P2）：后台 job 不跨重启；child 可手动补 |
 | C11 | vp-eng root | 嵌套指针：分支 bash 20k 行 / 469KB 落 spill，分支回指针，父 read 尾部 | 分支只看到 ~2,065 行 / ~50KB 并**自述“没有截断”**（其实引用了 output truncated）；父用 `read offset=19996 limit=5` 读到 `CHILD-TAIL-7a2b` 与 `total 20000 lines`，`wc -c` 468,886 字节；指针跨 child→parent 可达 | PASS；**F21** 方法教训：别信 child 对截断/长度的自述 |
+| C13 | vp-eng root | teammate 控制名（带提示）：eng-4 复用同一 W1 补 checked | eng-4 用 `subagent → list_subagents → send_to_subagent`，同一 child 出 v1/v2；但任务书预灌了“选哪个工具”的判据，不能算自然选择；eng-4 未加载 `eng-teaming`、两跳间用 `bash sleep`（F7/F5 teammate 版） | PASS（受污染）；**F22** 观察 |
+| C13b | vp-eng root | teammate 控制名（自然）：eng-5 复用同一 W1 补 checked | eng-5 自然选 `subagent → list_subagents → send_to_subagent`（同一 W1），发现 `send_message` 到不了 child；root 用会话血缘核对 root→eng-5→W1，仅一个 child | **F18 完全解除**；teammate 自然选择 PASS |
 | C12 | vp-sales root | 其他职能复用 child：subagent 读 l1 → 同一 child 补 checked | 调 `subagent` → `list_subagents` → `send_to_subagent`，同一 child `2ce45cd7…` 出 v1/v2；child mode=continuable；写 `l1.checked.json`，原文件未改 | PASS；**F18 解除**（新工具对非 vp-eng root 也可用；V2 只是模型没选） |
 | C7R | vp-eng root | 恢复 C7：重启后对 4 个 workflow child 逐个 `send_to_subagent` | 4 个都冷恢复回话（会话 durable），但原 `sleep 30; cat` 输出全丢、只能重读文件；job 仍 unknown；模型明确区分“当前真值”与“job 成功证据” | **BUG-044** 恢复面：只能补当前事实，不能恢复原结果 |
 | C6 | vp-eng root | compaction × skill：`skill` + `/compact` + 4 模块 natural 任务 | `/compact` 产出会话摘要（摘要里保留了“eng-teaming / 五档”），之后 4 模块自然任务仍走 workflow（1 run/4 agents），没有退回 subagent×N/bash sleep | PASS（规则在摘要后仍生效） |
@@ -488,6 +490,9 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
   重启——job 登记表在进程内，重启后 `job_list` 空、`job_output` unknown、无通知；child 会话仍在
   （continuable/inactive）可手动 `send_to_subagent`，但拿不到原 job 返回值。已修 `eng-teaming` 长跑条
   （别把“job 起了”当“结果可恢复”）；机制/上游留 BUG-044。
+- **F22**：C13a 的 teammate eng-4 未加载 `eng-teaming`、两跳间用 `bash sleep`（F7/F5 的 teammate 版）；
+  C13b 的 eng-5 自然选对控制名。结论：控制名不是问题，**skill 加载/纪律遵守**在 teammate 层仍看运气；
+  暂记观察（要硬修就得让任务书显式要求加载，或让成员继承 skill）。
 - **F21**：C11 里分支只看到 ~50KB/2,065 行，却自述“没有截断”（同时引用了 output truncated）；父用
   指针 + `read offset/limit` 拿到 20,000 行尾标记。已修 `eng-teaming`（分支自述的截断/长度不可信，
   父用指针 + read/tail 核）。
@@ -508,8 +513,8 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 ### 17.3 未覆盖（第三轮剩余）
 
 - compaction 的更强版本（本轮 `/compact` 摘要保留了 eng-teaming；未测“摘要丢掉某条规则”的边界）；
-- one-shot child 的 resume 拒绝（本轮 workflow child 实测是 continuable，one-shot 面未覆盖）；
-- teammate depth 2/3 与新控制面的交叉（C8 已覆盖 depth 链，未覆盖 teammate 对 `send_to_subagent` 的选择）；
+- one-shot child 的 resume 拒绝（本 profile 的 workflow/命名 child 实测都是 continuable，one-shot 面未覆盖）；
+- 更深 compaction（`/compact` 摘要保留了 eng-teaming，未测“摘要丢规则”的边界）；
 - one-shot child 的 resume 拒绝、后台 job + 重启、`job_kill` 后 durable 形状；
 - teammate 的 depth 2/3 与 `send_to_subagent` 的交叉（C3 只到一层）；
 - 其他职能 root 是否看见/误用 `list_subagents` / `send_to_subagent`；

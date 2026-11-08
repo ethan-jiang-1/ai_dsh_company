@@ -223,7 +223,9 @@ PASS 但 Lead 300s 未收口（F19 观察）；C9 bash 尾标记保留 PASS；C1
 child 成功，暴露“改稿=再委派”文档/技能过期（F20，已修文本）；C7R 证明后台 job 的 child 可被
 `send_to_subagent` 冷恢复，但只能重读当前值，原 job 结果仍不可恢复（并入 BUG-044）。C11 嵌套指针
 PASS（分支自述截断不可信，父 read offset 拿到尾标记）；C12 vp-sales 用 `send_to_subagent` 复用同一
-child 成功，F18 解除（新工具对其他职能也可用，V2 只是方法选择）。详见[研究材料 §17](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
+child 成功，F18 解除（新工具对其他职能也可用，V2 只是方法选择）；C13b teammate eng-5 也自然选对
+`subagent → list_subagents → send_to_subagent`，同一 W1 出两版；C13a 显示 eng-4 未加载 skill、
+用 bash sleep（F22 观察）。详见[研究材料 §17](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
 未覆盖：compaction × skill、带 fixture 的 cold resume、one-shot/后台重启、teammate depth 交叉、其他职能新工具。
 
 ## 修复交接（2026-11-08）
