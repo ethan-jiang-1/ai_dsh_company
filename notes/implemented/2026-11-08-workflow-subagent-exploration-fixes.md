@@ -1,4 +1,4 @@
-# 2026-11-08 · workflow + subagent 探索性测试第一轮：4 张卡（1×P1 + 3×P2）+ 2 条当场修
+# 2026-11-08 · workflow + subagent 探索性测试第一轮：5 张卡（1×P1 + 4×P2）+ 2 条当场修
 
 状态：implemented（2026-11-08；第一轮探索已执行并收口）
 上游 = [探索性测试 bug-hunt 问题卡](../../_backlog/issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)
@@ -27,8 +27,12 @@
     缺段在模型可读面不可恢复。已修 `eng-teaming`“返回聚合/异常”+ 研究材料 §1.1 更正；
     R9 验证绿色替代（6 分支各写 400 行文件、父只拿 path/行数，~0.6k 字符无截断、wc/awk/md5 全过）；
     机制/上游留 [BUG-039](../../_backlog/bugs/BUG-039-workflow-result-truncation-lossy-spill.md)（P1）。
+  - **F9**（方向 R10 后台 W 自然完成）：带 schema 的分支只回文本、`turn/end completed`，父却拿到
+    `null`（文本答案被丢弃、无诊断），job/run 仍 `completed`。已修 `eng-teaming`（schema 分支明确要
+    `structured_output`；验收看 null/count）；机制/上游留
+    [BUG-040](../../_backlog/bugs/BUG-040-workflow-schema-text-answer-discarded.md)（P2）。
 - 不把“小任务自己做”（R1/T1）、“natural 选另一条合法通道”记成 bug；不宣称未命中的面没有 bug。
-- 四张缺陷卡（036/037/038 P2、039 P1）都是 `调查中`：当场修的是**本仓提示面/合同**，vendor 机制
+- 五张缺陷卡（036/037/038/040 P2、039 P1）都是 `调查中`：当场修的是**本仓提示面/合同**，vendor 机制
   （schema 子集、团队 shadow、嵌套结果形状、50k 硬截断）未改。
 
 ## 输掉的方案
@@ -77,6 +81,9 @@
   `current 2 / max 2 / remaining 0`；W1 未读文件、未重试；child 用 `bash sleep 90/75`（F8 观察）。
 - **溢出绿替代**（R9）：`session-b93091e6-2829-4436-a55c-c711e6c18c36` workflow 返回 ~0.6k 字符、
   6 文件各 400 行；父用 `wc -l`/`awk`/`md5` 独立核对全过。
+- **schema 文本丢弃**（R10）：`session-2f4657e5-ecf4-4004-8007-4d2836d4068b` 后台 W 4 agents；
+  child `a1401bf0-…` read 成功、回文本、`turn/end completed`；父 `modules[0]=null`、`count:3`；
+  补跑 subagent 拿到 m01。
 - **机制**：`node --import tsx/esm runtime/tmp/explore/keyless-retry.ts` 4/4 PASS（retry-once /
   AGENT_START fatal 穿 parallel / AGENT_RESULT fatal / 两次失败停在 2 starts）。
 - 证据目录：`runtime/tmp/explore/`（gitignored）；研究材料只留脱敏摘要与 session id。

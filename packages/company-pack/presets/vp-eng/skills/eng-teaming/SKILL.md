@@ -37,6 +37,7 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 - **门自己写**：`missing > 0` / `failures` 非空就自己 `throw`（或返回给父代理读）；不要 `try/catch` 吞 fatal。
 - **schema 只吃子集**：`enum` / `const` 必须同时写 `type`（`{ type: 'string', enum: [...] }`），`oneOf`
   不能和 `type` 并列，根必须是 `object`——否则整轮 `UNSUPPORTED_SCHEMA` fatal，不是分支失败（2026-11-08 实测）。
+  带 schema 的分支还要在 prompt 里明确“调用 `structured_output`”；只回文本会被丢弃成 null（R10 实测）。
 - **失败不自动重跑**：`null` 可能是 refusal / error / aborted / 缺结构化结果，不保留原因；先判任务幂等且
   失败可重试，最多同 task / schema 再派一次（attempt label 不同），仍失败记 missing / exhausted。
   `AGENT_START` / `AGENT_RESULT` / 取消是 fatal，不许 catch 后伪装成 null 或安全重试。
@@ -47,6 +48,7 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 - **长跑**：团队会话里前台 run 会阻塞你（先例约 6 分钟，Lead 消息排队）——用 `run_in_background`。
 - **返回聚合/异常**：别回全量 rows；50k 是**硬截断**，spill 文件也是截断副本、读不回缺失段
   （2026-11-08 实测）——大结果让分支各写自己的文件、父只拿 path/行数（同日绿验证）。
+  run/job `completed` ≠ 分支成功：分支失败只折成 `null`、不单独通知，验收看数组 `null`/`count`（R10）。
 - **谁开**：teammate 继承你的组合、也能开 workflow；一个复杂包只由 Lead 或任务板指名的 owner 开一摊，
   避免每人各开一摊（workflow 没有深度闸，嵌套 run 会叠加）。
 - **触发**：判据满足即属于「大型多代理编排」，不必等用户再点名；用户点名时直接照办。
