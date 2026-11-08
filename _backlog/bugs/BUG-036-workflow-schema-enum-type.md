@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-08
 ---
 
 # BUG-036：workflow `agent({schema})` 的 enum/const 必须配 type，但模型面描述没说
 
-> 严重级别：P2（次要）｜发现：2026-11-08｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-08｜状态：修复就绪
 
 ## 症状
 
@@ -67,6 +67,9 @@ vendor `tool-workflow` 的 model-facing description 列举了允许关键字，�
   （联合类型用 `oneOf`），oneOf 不能与 type 并列，根必须 object；否则整轮 `UNSUPPORTED_SCHEMA` fatal。
 - 绿证据（R6）：新会话 `session-e25adbbf-22c5-4e38-a999-1b4edb56ca11`，单 run / 7 agents /
   `run-end completed`，schema 已写成 `{ type: 'string', enum: [...] }`；无第一次 fatal。
+- 绿证据（R15，nullable/oneOf）：`session-c6704a13-7917-410d-8f66-240f9c177f75` 单 run / 2 agents /
+  `completed`；模型按 skill 用 `oneOf: [{type:'string'},{type:'null'}]`（未用 type 数组），
+  两分支都调 `structured_output`，缺失文件返回 `version:null`；首跑无 schema fatal。
 - 上游侧仍建议补一句 model-facing description（本仓不改 vendor）。
 
 ## 已修判定

@@ -409,6 +409,7 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 | R13 | vp-eng root | fork 上下文（上一轮读 a，下一轮 fork） | fork 仍 `cat fixtures/a/package.json`，同时声称“来自继承上下文”；父记 `not_provable`；b/c workflow 正确 | **F13** 方法教训 |
 | V1 | vp-sales root | 其他职能负例：要求 workflow | tools=73 无 workflow；4 个 subagent 核查、无假调用；每个 child `read`+`send_message`，父收消息+通知（F4 跨角色） | PASS（能力诚实）；**F12** 观察 |
 | WW1 | vp-eng root | `workspace-write` 探针（`DSH_PERMISSION_MODE` 覆写） | `sandbox-exec: sandbox_apply: Operation not permitted`；模型如实报错、未绕道 | 宿主阻塞，不记 bug |
+| R15 | vp-eng root | nullable schema 绿验证（a 存在 / missing 不存在） | 1 run/2 agents completed；模型用 `oneOf` 而非 type 数组，两分支都调 `structured_output`，missing 返回 null；首跑无 schema fatal | BUG-036 绿证据 |
 | R14 | vp-eng root | fork 继承 token（turn1 只记 token，turn2 fork 复述） | fork 无工具、原样复述 `FORK-TOKEN-7f3a9c`——已完成轮确实被播种；同 turn 读的文件不在前缀（R12）与这条互补 | F11 绿证据 |
 | RS1 | vp-eng root | durability：child 在跑时 SIGTERM 宿主，再同 home 重启 | 父 durable 无新 turn/notice；child durable `turn/end interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，自述“无法查询它是否还活着” | **BUG-041**（P1） |
 | K1 | keyless | fake `SubagentProvider` + 真 workflow 引擎 | ① refusal→null→第二次 structured，starts=2；② `AGENT_START` 穿过 parallel 为 fatal；③ `AGENT_RESULT` 未捕获→run error；④ 两次 refusal 后停在 2 starts | 4/4 PASS；脚本 `runtime/tmp/explore/keyless-retry.ts` |
@@ -421,7 +422,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 
 | # | 发现 | 方向 | 处置 | 证据 |
 |---|---|---|---|---|
-| F1 | workflow schema 子集与自然写法不符：`enum`/`const` 必须配 `type`；`type` 数组不支持（R13 复现） | R2 强制 workflow + 模型自拟 schema；R13 fork child | 已修 skill 指引（红 R2/R13 / 绿 R6）→ 上游建议留 **BUG-036** | R2 / R6 / R13 |
+| F1 | workflow schema 子集与自然写法不符：`enum`/`const` 必须配 `type`；`type` 数组不支持（R13 复现） | R2 强制 workflow + 模型自拟 schema；R13 fork child | 已修 skill 指引（红 R2/R13 / 绿 R6/R15）→ 上游建议留 **BUG-036** | R2 / R6 / R13 / R15 |
 | F2 | 根会话是 Lead → 团队版控制名 shadow 全局版；契约 §4.4 与 preset 注释误写“根不是成员”；根无法 steer 自己的 child | R3 委派深度链（模型自然尝试等/催孙代） | 已修 docs/5 preset 注释/eng-teaming；机制留 **BUG-037** | R3 |
 | F3 | W 分支内再委派：返回值混入回执、跨轮拼接；带 schema 的分支会 null | R5 W→S 嵌套 | 已加“分支默认是叶子”规则；机制留 **BUG-038** | R5 |
 | F4 | 命名 child 同时用 `send_message` + 完成通知回报，父收到两份 | C1 CEO→vp_eng | 已修 eng-workflow 第 5 步（终稿即回执）；绿 C2 | C1 / C2 |

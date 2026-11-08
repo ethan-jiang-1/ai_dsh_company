@@ -49,6 +49,26 @@ status）修复后迁 [fixed_bugs](../_archive/fixed_bugs/BUG-027-false-dependen
 
 BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 已修 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
+## 2026-11-08 修复交接（另一 Agent）
+
+**用户指令（2026-11-08）**：“那这样我们可以先停一下，让另外一个Agent去修复发现的所有的bug。”
+本区 6 张卡已翻 `修复就绪`：该翻转即门票；**因为修复会触碰 company-pack 公开行为 / docs 合同 /
+常设指令，正常自授权不覆盖——本节的用户明确指示才是授权**。修卡不重新推敲范围，按各卡「已修判定」收口。
+
+| 卡 | 级别 | in-repo 修复面（可改） | vendor 侧（只提上游，不改 `vendor/dsh`） |
+|---|---|---|---|
+| [BUG-036](BUG-036-workflow-schema-enum-type.md) | P2 | `eng-teaming` schema 规则已有；补 keyless/探针或 schema 示例 | `tool-workflow` 的 model-facing description / 子集校验提示 |
+| [BUG-037](BUG-037-root-team-tool-shadowing.md) | P2 | docs/delegation §4.4、5 个 preset 注释、`eng-teaming` 控制面已改；如需可加“非冲突控制名”方案 | agent-team 的 `tryMembership` shadow |
+| [BUG-038](BUG-038-workflow-branch-nested-delegation-result.md) | P2 | `eng-teaming` 分支叶子规则已有；可补结果形状契约/示例 | `workflow-ptc` 嵌套分支返回值 |
+| [BUG-039](BUG-039-workflow-result-truncation-lossy-spill.md) | P1 | `eng-teaming` 聚合/落文件规则已有；R9 绿；可升为常驻 probe/判据 | `tool-workflow` 截断与 spill 副本 |
+| [BUG-040](BUG-040-workflow-schema-text-answer-discarded.md) | P2 | `eng-teaming` schema/structured_output 规则已有；可补 keyless 复现 | `runtime.ts` 缺形状不匹配诊断 |
+| [BUG-041](BUG-041-host-restart-orphans-inflight-child.md) | P1 | `eng-teaming` 长跑/重启规则已有；补部署前置或 resume 对账文档 | resume 时的 orphan child 对账 |
+
+**收口要求**：每卡修完翻 `修复已落地`，写 `## 已修判定` 对应的真红→绿证据与 `审查：` 记录，再 `git mv`
+到 [fixed_bugs](../_archive/fixed_bugs/) 并同步两张索引；`pnpm verify` + `pnpm test` 全绿；
+不修改 `vendor/dsh/`（vendor 侧写清上游提案即可）。探索轮已落地的缓解（skill/docs/注释）不重复做，
+先核对再补缺口；证据落 `runtime/tmp/explore/`（gitignored）或新 keyless spec。
+
 ## frontmatter 与模板
 
 第一行 `---`，字段按 `status` / `severity` / `opened` 顺序。活跃状态 = `调查中`（原 `活跃`，2026-10-12 改名——与「活跃清单」撞词）/ `修复就绪` / `修复已落地` / `等人拍板`，出口值 `已修`/`待修`；翻转法与修复授权边界唯一家 = 章程「双轨状态生命周期」「缺陷的通道」。严重级为 `P0` 阻断 / `P1` 重要 / `P2` 次要——哪个级别走哪条通道见章程（severity 的消费者）。迁档时仅改 `status`，其余字段保留，状态行补 `审查：agent｜用户｜跳过 — 理由`。

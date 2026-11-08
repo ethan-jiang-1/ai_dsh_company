@@ -100,6 +100,8 @@
 - **fork after completed turn**（R13）：`session-1351d1e2-4159-43da-9b0a-4ef5f87d8339` fork 仍
   `cat fixtures/a/package.json` 并声称继承；父记 `not_provable`（F13 方法教训）。同会话 first run
   因 `type: ['string','null']` fatal（BUG-036 第二实例）。
+- **nullable schema 绿**（R15）：`session-c6704a13-7917-410d-8f66-240f9c177f75` 1 run/2 agents
+  completed；`oneOf` 替代 type 数组、两分支均调 `structured_output`、missing 返回 null，首跑无 fatal。
 - **fork token 继承**（R14）：`session-9b46b434-10b0-4ecf-b354-1412444f9788` turn1 只记 token，
   turn2 fork 无工具、原样复述 `FORK-TOKEN-7f3a9c`——已完成轮继承成立（F11 绿）。
 - **宿主重启**（RS1）：父 `session-24da0c1b-…` 无新 turn；child `48eb730a-…` `turn/end interrupted`；
