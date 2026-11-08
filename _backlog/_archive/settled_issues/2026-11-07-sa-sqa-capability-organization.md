@@ -7,7 +7,7 @@ opened: 2026-11-07
 
 > 立卡：2026-11-07 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 2026-11-08
 >
-> **结论/去向**：note — 决定与证据落 `notes/implemented/2026-11-08-sa-sqa-capability-routing.md`（待建，落 notes/implemented/）。
+> **结论/去向**：note — 决定与证据落 [2026-11-08-sa-sqa-capability-routing.md](../../../notes/implemented/2026-11-08-sa-sqa-capability-routing.md)（已落）。
 
 **问题与期望结果：** SA（`system-architect`）与 SQA（`system-qa`）应当具备硬软一体、EE/ME 的全方位判断力，
 但**能力要按场景取用**：纯软件问题只用纯粹软件的思考（状态机、并发、契约、可观测性、迁移回滚），
@@ -44,6 +44,9 @@ opened: 2026-11-07
 
 - 分支（1）域判定的形状 = **A 单 skill 域路由**：不拆 skill；SA 的 `systems-architecture` 顶部加「先判域」，
   五学科（软件 / 固件 / 电气 / 机械 / 系统测试）逐域写「在 / 不在 + 依据」。
+  （2026-11-08 复审澄清：**五行固定、不得替换**；任务书可追加产品细分行，但五行原样保留；
+  任务书边界与 SA 判定冲突时以任务书边界为准、SA 写明偏差、SQA 点名。此前一轮曾把「任务书划分优先」
+  写进 skill，复审判定那是未获批准的合同变更，已回退。）
 - 分支（2）谁声明域 = **A + C 组合**：VP-Eng 任务书声明现场边界与产物用途（上游输入），SA 必写五学科判定
   （下游责任）；冲突以任务书边界为准，SA 判定偏差由 SQA 在评审里点名。任务书面住 `eng-teaming`（不改
   `content/AGENTS.md` 注入面，避免 replay 新鲜度义务）。
@@ -67,7 +70,7 @@ opened: 2026-11-07
   结构审计与质量审计是两件不同的事（前者证流程跑通，后者证产物结构够格）。
 - 已知：真实运行里"同一动议做出两个不同产品"的事故（机械力 vs 电气电流）说明**域不锁定**会直接改产品
   定义——这是本卡最硬的需求侧证据（见 `probes/team/sa-sqa-domain-audit.mjs` 头注）。
-- 未决：域判定要不要进入 `handbook`/任务书模板（那会改 `content/` 注入面，触发 replay 新鲜度义务）。
+- **已决（2026-11-08）**：域判定不进 `handbook`（避免改 `content/` 注入面与 replay 新鲜度义务）；进任务书（`eng-teaming`）与两份 skill。
 
 ## 方案与取舍
 
@@ -78,7 +81,7 @@ opened: 2026-11-07
 | C 任务书声明域 | VP-Eng 在任务书写明学科域与边界，SA/SQA 据此取清单 | 域在上游锁定，SQA 可机械核 | 改 VP-Eng 交付面与手册；VP-Eng 判错会放大到两侧 |
 | D 现状 + 窄判据 | 只保留 BUG-034/035 两条条件判据 | 零新机制 | 纯软件场景仍无"只用软件思考"的明确指令；跨域漏项靠运气 |
 
-倾向（待用户裁定）：**A + C 的组合**——SA 必须写五学科"在/不在 + 依据"（能力可见、可被 SQA 反驳），
+**已批准（2026-11-08，用户）**：**A + C 的组合**——SA 必须写五学科"在/不在 + 依据"（能力可见、可被 SQA 反驳），
 VP-Eng 任务书提供现场边界与交付物用途作为输入；不拆 skill（避免选择成本与漏选），Q8–Q11 保持窄判据。
 
 ## 验收标准
@@ -107,18 +110,22 @@ VP-Eng 任务书提供现场边界与交付物用途作为输入；不拆 skill�
 ## 交付证据
 
 - 基线：`git rev-parse HEAD` = `0976520`（程序收口后）
-- 红：`pnpm vitest run tests/presets` → `4 failed | 50 passed`（SA 缺先判域/五学科、SQA 缺域审计、任务书缺域声明）
+- 红：`pnpm vitest run tests/presets` → `4 failed | 50 passed`（SA 缺先判域/五学科、SQA 缺域审计、任务书缺域声明）；
+  删 SA 表「固件」行 → 断言点名缺行；探针喂「删一行」的目录副本 → R2 红（`rows=4`）
 - 绿：`pnpm vitest run tests/presets` → `54 passed`；`preset-smoke` ALL PASS；`probe-smoke` ALL PASS（6/6）
-- 真跑（三次，差异如实记录）：
-  1. 08:48–08:54 v4：探针停表只看前 3 份稿 → SQA 未落盘即收表（R2–R4 红，R5 绿）
-  2. 08:57：API `DeepSeek Messages transport failed`（root + 子会话）→ 无新产物；健康检查通过后再跑
-  3. 09:21–09:39：模型接着 v4 写（无新目录）→ 探针读不到；改 `--audit` 对 v4 产物跑同一组 R0–R6 → **ALL PASS**
-- 资产：`probes/team/sa-sqa-domain-routing-probe.mjs`（真跑 + `--audit` 零模型审计，共用 R0–R6；停表条件
-  改为「新目录或启动后有改动的目录」）；三份 skill（SA 先判域 / SQA 域审计 / eng-teaming 任务书域声明）；
-  `tests/presets/presets.spec.ts` 4 条断言
-- 行为证据（v4 产物）：SA §0 五学科表以任务书五行为准并显式声明与 skill 默认五行的差异；电气/机械/热/控制
-  四域「不在」各三条依据 + 改判触发；SQA 独立域审计（域审计通过 + 总评不通过 1 条 + 待验 1 条）原样保留
-- 全量门禁：`pnpm test` **150 files / 1222 tests**；`typecheck` / `lint` / `dup` / `verify` 全绿
+- **真跑（`--live`，2026-11-08 12:22–12:46）**：`session-ed9f8519-4656-49d9-a8bd-d6c3be456632`，
+  slug `2026-11-08-domain-routing-v1` → **R0–R7 ALL PASS**：五份产物齐；架构稿五行原样 + 每行判词/三列依据/承接；
+  软件=在、固件/电气/机械=不在；SQA 逐行域审计（五行原样/改名合并/追加行/承接面）并原样保留结论；任务书三声明 + 五行；
+  无 final.md；root turn 已结束（按会话日志 `turn/end`，不靠 mtime）
+- 历史三跑（不作为最终证据）：08:48 v4 停表过早；08:57 API transport 失败；09:21 模型续写 v4、改用 `--audit` 才读到
+  （v4 是任务书五域拆分，与批准的固定五行不一致）
+- 资产：`probes/team/sa-sqa-domain-routing-probe.mjs`（live + `--audit`，R0–R7；停表 = 五份产物 + turn 结束 + 30s 稳定；
+  收尾 SIGTERM→等待→SIGKILL 防孤儿占 lease）；三份 skill；`tests/presets/presets.spec.ts` 4 条结构化断言
+- 复审：Standards + Spec 两个独立子代理盲审（2026-11-08），修复——① 未获批准的「任务书划分优先」回退为固定五行
+  （额外域只能追加行）；② 探针 R2 钉架构稿五行（不再数散文名字）、R4 要域审计裁决、R7 要 turn 结束；③ 归档卡去向改活链、
+  清掉「待建/未决」旧句；④ decisions 预算 64→65 在本 Note「预算」节论证；⑤ 探针孤儿进程与旧链接修复
+- 全量门禁：`pnpm test` **150 files / 1222 tests**；`typecheck` / `lint`（0/0）/ `dup`（0 clones）/
+  `verify` ALL PASS；`notes:audit` 状态行不符 0
 - 文档/Note：[2026-11-08-sa-sqa-capability-routing.md](../../../notes/implemented/2026-11-08-sa-sqa-capability-routing.md)；
-  归档后本卡与本 Note 互链
-- 审查：`审查：agent — 2026-11-08`；用户已定分支（A+C），对照原文验收待办
+  卡与 Note 互链
+- 审查：`审查：agent — 2026-11-08`（含双轴复审）；用户已定分支（A+C），对照原文验收待办

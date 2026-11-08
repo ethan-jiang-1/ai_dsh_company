@@ -747,44 +747,66 @@ describe('SA/SQA 能力组织：按场景取用学科域（用户 2026-11-08 批
   const SQA = join(PRESETS_DIR, 'system-qa/skills/vv-playbook/SKILL.md')
   const TEAMING = join(PRESETS_DIR, 'vp-eng/skills/eng-teaming/SKILL.md')
   const DISCIPLINES = ['软件', '固件', '电气', '机械', '系统测试']
+  /** 把 markdown 表格拆成 cells；只用于「先判域」表。 */
+  const domainRows = (text: string): string[][] => text.split('\n')
+    .map(line => line.trim())
+    .filter(line => line.startsWith('|'))
+    .map(line => line.split('|').slice(1, -1).map(cell => cell.trim().replace(/\*\*/g, '')))
+    .filter(cells => DISCIPLINES.includes(cells[0] ?? '') && /^(?:在|不在)(?:\s*\/\s*(?:在|不在))?(?=\s|（|\(|$)/.test(cells[1] ?? ''))
 
-  it('SA skill 有「先判域」五学科表：逐域写 在/不在 + 依据', () => {
+  it('SA skill 有「先判域」五学科固定行：逐行 在/不在 + 非空依据', () => {
     const skill = readFileSync(SA, 'utf8')
     expect(skill, 'SA skill 缺「先判域」步骤').toContain('先判域')
+    const rows = domainRows(skill)
+    expect(rows.length, `五学科固定行应为 5，实际 ${String(rows.length)}（删一行必须红）`).toBe(5)
     for (const discipline of DISCIPLINES) {
-      expect(skill, `SA 域判定缺学科 ${discipline}`).toContain(discipline)
+      const row = rows.find(cells => cells[0] === discipline)
+      expect(row, `域判定表缺「${discipline}」行`).toBeDefined()
+      expect((row?.[1] ?? ''), `${discipline} 行必须写「在」或「不在」`).toMatch(/^(?:在|不在)(?:\s*\/\s*(?:在|不在))?(?=\s|（|\(|$)/)
+      expect((row?.[2] ?? '').length, `${discipline} 行的依据不能为空`).toBeGreaterThan(0)
     }
-    expect(skill, '域判定必须写「在/不在」').toMatch(/在\s*\/\s*不在|在\/不在/)
-    expect(skill, '域判定必须写「依据」').toContain('依据')
+    expect(skill, '五行不得被别的划分替换').toMatch(/不得用别的划分替换|不得替换/)
+    expect(skill, '任务书给的额外域只能作追加行').toMatch(/追加行/)
+    expect(skill, '冲突必须以任务书边界为准并写明偏差').toMatch(/冲突[^\n]*任务书边界[^\n]*为准/)
+    expect(skill, '远程设备/云边/采集类必须有归类规则（未决问题 3）').toMatch(/远程设备|云边|采集类/)
   })
 
   it('纯软件不硬凑、含物理件不漏域：两条边界都在 SA skill', () => {
     const skill = readFileSync(SA, 'utf8')
-    // 纯软件：用软件自己的判断（状态机/并发/契约/可观测/迁移回滚），不许硬凑采样/供电/耐受。
     expect(skill, '缺「纯软件只用软件思考」的指令').toMatch(/纯软件/)
     for (const lens of ['状态机', '并发', '契约', '可观测']) {
       expect(skill, `纯软件镜头缺 ${lens}`).toContain(lens)
     }
     expect(skill, '缺「不硬凑」边界').toMatch(/不(?:许)?硬凑|不凑|不要硬凑/)
-    // 含物理件：执行器/市电/承力 ⇒ 电气/机械不得以「不是我的专业」缺席。
-    expect(skill, '缺物理件触发词（执行器/市电/承力）').toMatch(/执行器[\s\S]{0,120}市电|市电[\s\S]{0,120}承力|承力/)
+    // 三个物理件触发词分别断言，别用一个 `a|b` 让缺失项逃掉。
+    expect(skill, '缺物理件触发词「执行器」').toContain('执行器')
+    expect(skill, '缺物理件触发词「市电」').toContain('市电')
+    expect(skill, '缺物理件触发词「承力」').toContain('承力')
     expect(skill, '缺「不是我的专业」反例').toMatch(/不是我的专业/)
   })
 
-  it('SQA skill 有「域审计」：SA 排除某域却出现该域特征词 → 不通过', () => {
+  it('SQA skill 有「域审计」：五行为准、矛盾即不通过、冲突以任务书边界为准', () => {
     const skill = readFileSync(SQA, 'utf8')
     expect(skill, 'SQA skill 缺「域审计」步骤').toContain('域审计')
-    expect(skill, '域审计必须点名「排除」与「特征词」判据').toMatch(/排除[\s\S]{0,120}特征|特征词/)
-    expect(skill, '域审计结论必须能判不通过').toMatch(/不通过/)
     for (const discipline of DISCIPLINES) {
       expect(skill, `SQA 域审计缺学科 ${discipline}`).toContain(discipline)
     }
+    expect(skill, '缺「固定五行 / 缺一行不通过」判据').toMatch(/固定五行[\s\S]{0,120}缺一行/)
+    // 矛盾判据限定在承接面：依据里的反证（"没有市电"）不算矛盾。
+    expect(skill, '矛盾判据必须限定在需求/接口/判据承接面').toMatch(/需求[^\n]*接口[^\n]*判据|承接面/)
+    expect(skill, '缺「排除要举证」').toMatch(/排除[\s\S]{0,80}举证/)
+    expect(skill, '缺「特征词」判据').toContain('特征词')
+    expect(skill, '缺冲突以任务书边界为准').toMatch(/冲突[^\n]*任务书边界[^\n]*为准/)
+    expect(skill, '域审计结论必须能判不通过').toMatch(/不通过/)
   })
 
-  it('VP-Eng 任务书承载域声明：现场边界 / 执行器·市电·承力 / 产物用途', () => {
+  it('VP-Eng 任务书承载域声明：现场边界 / 执行器·市电·承力 / 产物用途 / 固定五行', () => {
     const skill = readFileSync(TEAMING, 'utf8')
     expect(skill, 'eng-teaming 任务书缺「现场边界」').toContain('现场边界')
-    expect(skill, 'eng-teaming 任务书缺物理件声明').toMatch(/执行器[\s\S]{0,80}市电|市电[\s\S]{0,80}承力/)
+    expect(skill, 'eng-teaming 任务书缺物理件「执行器」').toContain('执行器')
+    expect(skill, 'eng-teaming 任务书缺物理件「市电」').toContain('市电')
+    expect(skill, 'eng-teaming 任务书缺物理件「承力」').toContain('承力')
     expect(skill, 'eng-teaming 任务书缺产物用途（是否举证）').toMatch(/产物用途|是否.*举证|记录.*举证/)
+    expect(skill, '任务书必须带固定五行且不得替换').toMatch(/固定五行[\s\S]{0,120}不得替换/)
   })
 })

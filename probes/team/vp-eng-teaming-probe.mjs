@@ -156,6 +156,11 @@ try {
   console.error(`probe error: ${error.message}`)
   exitCode = 2
 } finally {
-  if (!KEEP) child.kill('SIGTERM')
+  if (!KEEP) {
+    // SIGTERM 异步：立刻 process.exit 会把子 web 留成孤儿并占 home 的 writer lease（2026-11-08 修）。
+    child.kill('SIGTERM')
+    await sleep(1500)
+    if (child.exitCode === null) child.kill('SIGKILL')
+  }
 }
 process.exit(exitCode)

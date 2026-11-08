@@ -15,7 +15,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
-| [2026-11-07-sa-sqa-capability-organization.md](settled_issues/2026-11-07-sa-sqa-capability-organization.md) | 已结；SA/SQA 能力组织按场景取用学科域（A+C：单 skill 域路由 + 任务书声明 + SQA 域审计）；纯软件真跑 R0–R6 全绿 | 2026-11-08 |
+| [2026-11-07-sa-sqa-capability-organization.md](settled_issues/2026-11-07-sa-sqa-capability-organization.md) | 已结；SA/SQA 能力组织按场景取用学科域（A+C：固定五行 + 任务书统一声明 + SQA 逐行域审计）；纯软件 live 真跑 R0–R7 全绿 | 2026-11-08 |
 | [2026-11-07-requirements-teaming-landing.md](settled_issues/2026-11-07-requirements-teaming-landing.md) | 已结；需求识别/编号 + VP-Eng 组队的程序伞卡：D1–D8 口径、11 张执行卡、W0–W5 执行计划全部收口；去向 = [程序 Note](../../notes/implemented/2026-11-07-requirements-teaming-program.md) | 2026-11-07 |
 | [2026-11-07-requirements-contract.md](settled_issues/2026-11-07-requirements-contract.md) | 已结；A1 编号合同（R1–R10/退役词/范围豁免/并发）+ meta 标记 + 门禁 | 2026-11-07 |
 | [2026-11-07-requirements-templates.md](settled_issues/2026-11-07-requirements-templates.md) | 已结；A2 五层模板 + layer/definition 头 + PRD JSON 唯一定义点 + allocation 附录 | 2026-11-07 |
