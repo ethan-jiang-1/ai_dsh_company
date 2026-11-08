@@ -73,7 +73,7 @@ generic subagent child）有效。本仓注释与 §4.4 把“根”误写成“
   （注册名、catalog 折叠、send 透传、服务缺席 fail-loud）。
 - **文档同步**：`docs/delegation.md` §4 控制面段改成“根门用这两个名字”；`eng-teaming` 控制面与长跑条目同步。
 - 机制本身（vendor shadow）未改；上游提案 = 让根会话直接用全局控制名（`tool-agent-team` 的 install 条件）。
-- **退役条件**：上游修好后删除这两个工具（台账 `[CT-LIFE]`），避免双控制面长期并存。
+- **退役条件**：上游修好后删除这两个工具（台账 `[CT-LIFE]`，[收口 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md)），避免双控制面长期并存。
 
 ## 已修判定
 

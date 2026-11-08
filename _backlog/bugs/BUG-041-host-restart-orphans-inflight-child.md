@@ -68,7 +68,7 @@ local subagent 是进程内 agent；宿主进程死亡时 child 的 turn 被记�
   `tests/company/delegation-control.spec.ts` 折叠 durable catalog、inactive/running 状态；
   RS1 的 durable 事实（child `turn/end interrupted`、父无新 turn）仍是原证据。
 - **上游**：resume 时对父侧 `subagent/catalog` 里没有终态的 child 补 `subagent/end`（interrupted），
-  或让 durable child 查询带 terminal reason。
+  或让 durable child 查询带 terminal reason（收口 Note 的上游批第 5 条）。
 
 ## 已修判定
 

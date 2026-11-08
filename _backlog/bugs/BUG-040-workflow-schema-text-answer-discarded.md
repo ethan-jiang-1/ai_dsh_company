@@ -77,6 +77,7 @@ R10 后台 workflow 4 分支（m01–m04），父脚本每个 `agent()` 都带 o
   配套：`WorkflowAgentEndInfo` 加 `diagnostic?: { kind: 'shape-mismatch'; finalText: string }`；
   tool-workflow 的 `tool-workflow/agent-end` 记录透传该字段。上游修好后：本卡判定第一条满足、归档，
   并把 `eng-teaming` 里“只回文本会被丢弃成 null”改成“会带 shape-mismatch 诊断”。
+- 上游批与退役口径 = [收口 Note](../../notes/implemented/2026-11-08-delegation-contract-repair.md)。
 - **未做（本仓做不到）**：父代理拿不到“答对但形状不对”的诊断——任何本仓层都改不了 `agent()` 的返回值；
   造一个 workflow 包装工具 = 平行实现（质量上不可接受），故不做。
 

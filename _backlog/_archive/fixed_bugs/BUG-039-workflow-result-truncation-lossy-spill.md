@@ -75,7 +75,8 @@ rendered.slice(0, maxChars) + "\n… [truncated: N more characters]"
 - **资产**：`tests/harness/contract/workflow-result-budget.spec.ts`——钉住 `maxResultChars` 控制渲染，
   且 vp-eng preset 真带 200000；红配方 = 删 preset config → 第三条红。
   缺口（如实记）：端到端“spill 文件完整”目前靠一次性探针，未进 CI；钉子只覆盖“工具不截断”。
-- vendor 未改；上游仍建议 workflow 工具在截断前把完整渲染值交给 spill store（默认值下的其它消费者受益）。
+- vendor 未改；上游仍建议 workflow 工具在截断前把完整渲染值交给 spill store（默认值下的其它消费者受益；
+  [收口 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md) §上游批）。
 
 ## 已修判定
 

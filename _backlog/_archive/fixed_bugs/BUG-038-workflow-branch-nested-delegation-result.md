@@ -66,7 +66,7 @@ result 等待的是整个 child run，跨轮拼接），但 workflow 的 `agent(
 - **机制钉子**：`checks/smoke/workflow-contract-smoke.mjs` 第 6 条——非 schema 分支的返回值就是 child
   最终文本原样拼接（回执与结论不区分），钉住“为什么分支要当叶子”。
 - 未做机制修复（vendor `runtime.ts` 的分支结果语义不改）；上游提案 = 分支结果只取最后一轮结论/或把
-  activation 回执与结论分开（与 BUG-040 同批）。
+  activation 回执与结论分开（与 BUG-040 同批；[收口 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md) §上游批）。
 
 ## 已修判定
 

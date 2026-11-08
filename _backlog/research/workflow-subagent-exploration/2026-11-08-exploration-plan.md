@@ -447,4 +447,6 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 
 - 六张缺陷卡（036–041）留作后续修复/上游提案的载体；
 - keyless retry 脚本暂不进 `pnpm test`（vendor 已有同语义测试；本仓加门禁需 P2 判据，先留证据）；
+  **2026-11-08 修复轮已取代**：升格为 `checks/smoke/workflow-contract-smoke.mjs`（keyless 机制档，仍不进
+  `pnpm test`），理由与新增钉子见[收口 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md)；
 - 常驻 probe 不改：本轮是探索，稳定判据（root 控制面、schema 子集）若再次复现再升级为 probe/spec。

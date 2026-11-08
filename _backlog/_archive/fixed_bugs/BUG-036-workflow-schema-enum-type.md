@@ -75,8 +75,8 @@ vendor `tool-workflow` 的 model-facing description 列举了允许关键字，�
   （enum/const 需单值 type、无 type 数组、oneOf 不与 type 并列、根 object）。红配方 = 把 fixture
   换成上游修复后的形状（enum 被接受）→ 断言翻转；红 = 上游变了，处理是删/改 skill 与台账 [CT-IN]，
   不是改断言凑绿。
-- **上游提案**：修复轮收口 Note（`notes/implemented/2026-11-08-delegation-contract-repair.md`，B6 落）
-  §上游批——`tool-workflow` description 补子集约束。
+- **上游提案**：[收口 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md) §上游批——`tool-workflow` description 补子集约束；
+  台账 `[CT-IN]` 的锚点即本卡 spec。
 
 ## 已修判定
 
