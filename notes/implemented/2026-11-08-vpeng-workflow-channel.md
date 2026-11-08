@@ -80,6 +80,15 @@
   `assembling-the-team` 后选 `vp_eng`，calls `["skill","bash",…,"vp_eng",…]`，**无 `wait_agent` / `send_message`**；
   child `session-3154914b-…` calls `["bash","workflow","subagent",…]`；`workflow` 1 个 run / 3 agents completed；
   `subagent` 返回 `started subagent 03cb5ed0-…`；VP-Eng 最终 3/3 一致 → **PASS**。
+- **严格内化 E2E（2026-11-08，goal-only）**：CEO 会话 `session-bf7485f6-…`，prompt 只给目标、明确
+  「方法由 VP-Eng 按它的 skill 定」；CEO calls `["skill","bash",…,"vp_eng"]`，无 `wait_agent`/`send_message`；
+  child `session-003012e8-…` calls `["read","read","skill","bash",…,"workflow","subagent",…]`；
+  `workflow` 1 run / 3 agents completed；`subagent` 返回 `started 107a3def-…`；最终 3/3 一致 →
+  **PASS（skill=true、workflow=1、subagent=true）**。
+- **严格 VP-Eng root（2026-11-08，无方法提示）**：`session-1393a73e-…` calls
+  `["skill","bash","workflow","bash"]`；`workflow` 1 run / 4 agents（3 取证 + 1 独立核对分支）；
+  模型**自己加载 skill 并选 workflow**；没拉 subagent 是因为交叉核对并进 workflow 第 4 条分支更省——
+  这是方法选择，不是能力缺失。
 - **内化前的两次反例（同轮修掉）**：① CEO 对 `vp_eng` 命名 child 用 `wait_agent`（`no-active-peer`）和
   `send_message`（`active teammate not found`）——`assembling-the-team`/persona 补边界；② CEO 任务书写
   「subagent 或 workflow 都行」、VP-Eng 未加载 `eng-teaming`，实际拉了 4 个 subagent、`workflow=0`——
@@ -92,12 +101,12 @@
 
 ## 未验 / 限制
 
-- 真实先例是 CFO teammate，不是 VP-Eng；VP-Eng 的行为只做了上面的 2 条烟测，不是长期采纳率。
+- 真实先例是 CFO teammate；VP-Eng 的行为由 2 条烟测 + 4 轮 E2E（最小 workflow、CEO→VP-Eng、自主路由、
+  goal-only/root 严格）覆盖，但都不是长期采纳率。
 - `workspace-write` 下的 workflow 未验（历史一败一成）；部署前按卡 C 重验。
 - 回滚配方（撤两行 + 两 peer + skill/文档）未实跑；卡上留了配方。
 - 行为判据由常驻 probe 覆盖（真模型，不进 `pnpm test`）；长期采纳率仍是后续卡 B 的事。
-- 自主路由轮的 VP-Eng 子会话**没有调用 `skill`**（它按 CEO 任务书执行）；VP-Eng 自己的通道选择由
-  根会话 probe 证明。若要求「CEO 只给目标、不给方法」也能选对，需要再加一条行为判据（未做）。
+- 严格内化两轮（CEO goal-only / VP-Eng root 无方法提示）都跑通；仍不是长期采纳率，长期归卡 B。
 - Step 0 的最小 workflow 用一次性探针（`runtime/tmp`，gitignored，未入库）；常驻 probe 覆盖的是通道选择，
   不是引擎启动。
 - **generic `subagent` 深度限制（已修，2026-11-08）**：CEO 委派的 VP-Eng（depth 1）原先调 `subagent`

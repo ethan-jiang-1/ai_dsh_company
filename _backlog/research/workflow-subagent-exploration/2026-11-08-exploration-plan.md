@@ -1,0 +1,379 @@
+---
+topic: workflow + subagent 探索测试：只有 W / 只有 S / 混合一次 / 混合多次
+intent: 给下一位执行者一份自包含的 briefing + 探索计划——DSH 机制支持、本仓特点、已证事实、场景矩阵、两遍法、fixtures、判据、预算、发现处置与 Review 清单；计划未开跑
+---
+
+# 探索测试计划：workflow + subagent（v2，自包含 briefing）
+
+> **这是计划，不是结果。** 当前状态 = 等待用户/新 Agent review；review 通过前不跑。
+> 本文件刻意写厚：下一位 Agent 可能没有本轮的对话上下文，必须能只靠这份文档 + 仓库本身接手。
+> 读法：本文件 §1（DSH 支持）→ §2（本仓特点）→ §3（已证事实）→ §4–§8（探索设计）→
+> [workflow 通道 Note](../../../notes/implemented/2026-11-08-vpeng-workflow-channel.md) 与
+> [归档研究材料](../../_archive/research/vp-eng-delegation-topology/2026-11-08-topology.md) 补细节。
+
+## 0. 术语与符号
+
+| 符号 | 含义 |
+|---|---|
+| **W** | workflow 通道（脚本 `agent()` 扇出；同身份、fresh 子代） |
+| **S** | subagent 通道（`subagent` / `subagent_fork`；命名 child 人格可选，generic 继承调用者） |
+| **M1** | 混合一次：一次 W 扇出 + 一次 S（独立核对或单件细节） |
+| **M2** | 混合多次：W → S → 再 W（或 S → W → S），多轮 |
+| **R** | VP-Eng root（`agentPreset: vp-eng`，depth 0，Team Lead） |
+| **C** | CEO → `vp_eng` 命名 child（depth 1，vp-eng preset） |
+| **T** | VP-Eng teammate（`spawn_teammate`，继承 vp-eng 组合，depth 1） |
+| **N** | 负例：CEO teammate（名字叫 vp-eng，但继承 CEO 组合，没有 W/S） |
+| **forced** | prompt 明确指定通道，用来证“工具链路通不通” |
+| **natural** | prompt 只给目标，用来证“模型会不会按 skill 选” |
+| **tool catalog** | 会话首帧 `request/header.tools`；判断“看不看得见”的唯一证据 |
+
+## 1. DSH 的机制支持（先钉死，别靠猜）
+
+### 1.1 workflow 通道
+
+**组成**：`@deepseek-ai/dsh-workflow`（服务 `ctx.workflowEngine`）+ `workflow-ptc`（PTC 进程引擎）+
+`tool-workflow`（模型工具）。`tool-workflow` 必须与引擎在同一个 `isolate.workflowEngine` 组；
+`ptc-runtime` 由 base 提供。权威：
+[tool-workflow README](../../../vendor/dsh/packages/workflow/tool-workflow/README.md)、
+[workflow-ptc README](../../../vendor/dsh/packages/workflow/workflow-ptc/README.md)、
+[workflow 子系统](../../../vendor/dsh/docs/subsystems/workflow.md)、
+引擎源码 [`runtime.ts`](../../../vendor/dsh/packages/workflow/workflow-ptc/src/runtime.ts) 与
+[`host.ts`](../../../vendor/dsh/packages/workflow/workflow-ptc/src/host.ts)。
+
+**工具调用**：`{ script, meta, args?, run_in_background? }`。`script` 是纯 JS body（不是 TS），顶层 await；
+`meta` 是 JSON 数据（name/description/whenToUse/phases），引擎先校验后执行；`args` 原样给脚本。
+
+**脚本 hooks**（模型面描述里的完整合同）：
+
+| hook | 语义 | 失败语义 |
+|---|---|---|
+| `agent(prompt, opts?)` | 起一个子代理并等它完成；返回 final text 或 `schema` 校验后的 object | 子代理非 completed → `null`；hook 误用/超帽 → 抛 fatal |
+| `parallel(thunks)` | 并发跑，等全部（barrier） | thunk 抛错 → 该项 `null`；fatal 重新抛 |
+| `pipeline(items, ...stages)` | 每 item 独立走 stages，无 barrier | 某 stage 抛错 → 该 item `null`，跳过剩余 stages |
+| `phase(title)` / `log(message)` | 进度分组 / 叙事（observer 事件） | 参数错 → fatal |
+| `args` | 调用方 JSON | — |
+
+**`agent()` 只认五个选项**：`label` / `phase` / `schema` / `provider` / `model`。
+**没有** `agentPreset`、`maxDepth`、工具过滤；`effort` / `isolation` / `agentType` 被显式列为 deferred 并拒绝。
+`provider` / `model` 可做独立路由覆盖（cross-model 核对的唯一口子）。
+
+**子代身份**：`startActivation` 的 request 不带 `agentPreset` ⇒ 子代加入**调用者当前的 preset revision**：
+同人格、同工具面、同 cwd；但 `provider: spawn` 是 **fresh 上下文**，不 seed 父对话。
+所以“workflow 子是独立人格”是假的；“workflow 子是 fresh 的同人格克隆线程”才是准确的。
+
+**上下文**：`delivery: 'caller'`，引擎自己收结果、不发 completion notice；父模型只看脚本最终 JSON
+（渲染上限 `maxResultChars=50000` 字符，超出截断；canonical 值仍完整）。中间子消息不进父会话。
+结果很大时会触发 spill；父代理可能需要读 spill 文件。
+
+**失败/上限**：run 级没有 partial success；子代失败折成 `null`，hook/超帽/取消 → 整轮 `error`/`cancelled`。
+引擎默认：`maxConcurrentAgents=0`（按 CPU）、`maxTotalAgents=1000`、`maxItemsPerCall=4096`、
+`syncTimeoutMs=5000`；**没有 overall elapsed deadline**。runtime 只抛 rejection，脚本 `try/catch` 可以吞——
+所以“失败即停”是默认不是强制；模板要写“不 catch fatal / `missing>0` 自己 throw”。
+
+**沙箱**：脚本在 PTC Node 进程里跑，捕获调用会话的 cwd 与文件策略；`read-only` / `workspace-write` 需要
+可用的 confinement，否则失败；`danger-full-access` 才允许无 confinement。VM 不是安全边界；
+网络不受文件策略限制。本机 dev 的 vp-eng 会话是 `danger-full-access`；`workspace-write` 历史上一败一成。
+
+**深度**：`host.ts` 的 `startChild` **不传 `maxDepth`** ⇒ workflow 子代没有深度闸；如果子代继承
+`tool-workflow`，它可以再开 run（嵌套）。这是已知治理洞（research L5 / Note 已记），不是本轮能靠 config 修的。
+
+**工具自带提示**：`tool-workflow` 注册一条固定 system prompt 段：
+“Use the `<toolName>` tool ONLY when the user explicitly asks for a workflow or for large multi-agent
+orchestration… For one or two delegations, prefer plain subagent calls.”
+角色 skill 把判据写成可自检的“大型多代理编排”是当前解释路径；残余风险是模型保守不调用。
+
+**background**：`run_in_background: true` 立即返回 `{kind:'background', jobId, runId}`；run 注册为
+owned job，job 输出环流 phase/log/lifecycle；`job_kill` / owner teardown 取消；完成值随 job settlement
+的 completion notice 到达。没有中间值。
+
+### 1.2 subagent 通道
+
+**组成**：`subagent` 服务 + `tool-subagent` 实例 + provider（in-process `spawn` / `fork`；外部 ACP /
+Codex / Claude Code / DSH SDK）+ `tool-subagent-control` / `list-agents`。权威：
+[tool-subagent README](../../../vendor/dsh/packages/subagent/tool-subagent/README.md)、
+[subagent 子系统](../../../vendor/dsh/docs/subsystems/subagent.md)。
+
+**每次调用 = activation**：工具立即返回 `started subagent <childId>`（或 `{kind:'activation', subagentId}`）；
+终稿（output / structured / diagnostic / stopReason）由 **completion notice** 送回父会话，不塞工具结果。
+子代理的工作上下文留在 child；父只看终稿 + 通知。
+
+**Config 关键字段**：`provider` / `toolName` / `modelSelectionSettings` / `agentOptions` /
+`agentPreset` / `allowedAgentPresets` / `maxDepth`。`maxDepth` 是**子代被启动时的绝对深度上限**
+（0 禁止；省略读 Host 默认 1；`provider-managed` 交给外部 provider）。`agentPreset` 只在 in-process
+spawn 支持；fork/外部 backend 拒绝。
+
+**子代身份**：省略 `agentPreset` = 加入父的当前 preset revision（spawn 是 fresh；fork 带父的已完成轮前缀）。
+命名委托工具（`vp_eng` / `system_qa` / `vp_cmo`）各自钉 `agentPreset`，于是 child 拿到该角色人格/工具面。
+`modelSelectionSettings: true` 额外暴露 provider/model/reasoning_effort + `list_subagent_models`。
+
+**续驶**：local spawn/fork child 可被 `send_message`（steering）、`interrupt_agent`、`list_agents` 管理；
+外部 backend one-shot，不接受后续消息。fork 子代复制父的已完成轮前缀（子代成本，父代没有更干净）。
+
+**团队作用域陷阱**：CEO 会话从第一帧起是 team-scoped，`tool-agent-team` 把 `send_message` /
+`list_agents` / `interrupt_agent` 换成团队版（按成员名寻址）。命名 subagent child **不是 team member**，
+所以 CEO 的团队版 `send_message` 够不到它（会报 `active teammate not found`）；改稿只能再委派一次。
+
+### 1.3 team 通道（对照，不要混）
+
+`spawn_teammate` 只有 Lead 能调；成员持久、共享任务板（CAS 修订号 + `blockedBy` DAG + `writeScopes`
+告警但**不阻塞**）；**成员继承 Lead 的组合**，不是另一个 preset。CEO 团队里的 “vp-eng” 成员 ≠
+vp-eng preset：它没有 vp-eng 的 workflow/subagent/SA/SQA。没有嵌套 team、没有自动 owner release。
+权威：[agent-team README](../../../vendor/dsh/packages/experimental/agent-team/README.md)。
+
+### 1.4 三通道边界表
+
+| 通道 | 子代人格 | 父上下文收到 | 并发 | 持久/可续 | 失败语义 | 深度 |
+|---|---|---|---|---|---|---|
+| `workflow` | 继承调用者组合；fresh | 只收脚本最终 JSON（≤50k 渲染） | 脚本 `parallel`/`pipeline` | 外壳不给续驶；local 子在 catalog，可旁路 cold resume | 子失败→null；fatal→整轮 error（可被 catch） | 引擎不传 maxDepth；无闸 |
+| `subagent` | 继承调用者；可钉 preset | ack + completion notice（终稿） | 同轮多调用 | 可续（控制行） | 子失败进通知 | 绝对 maxDepth；Host 默认 1 |
+| 命名 child | 真 preset（vp-eng/SA/SQA/CMO） | ack + completion notice | 同轮多调用 | 可续 | 同上 | 行上 maxDepth（SA/SQA/CMO 2） |
+| teammate | 继承 Lead 组合 | 每条成员消息进历史 | 成员并行 | 持久、冷恢复 | 不自动释放任务 | Lead-only；无嵌套 |
+
+### 1.5 深度/继承矩阵（本仓当前）
+
+| 会话 | 组合 | depth | W visible | S visible | 备注 |
+|---|---|---|---|---|---|
+| CEO root | ceo | 0 | 否 | 否（有 `subagent_research`） | 编排 = team + 命名委托 |
+| CEO teammate（叫 vp-eng） | ceo（继承） | 1 | 否 | 否 | 不是 vp-eng preset |
+| CEO → `vp_eng` child | vp-eng（preset） | 1 | 是 | 是 | 主商业路径 |
+| VP-Eng root | vp-eng | 0 | 是 | 是 | |
+| VP-Eng teammate | vp-eng（继承） | 1 | 是 | 是 | |
+| VP-Eng subagent child | vp-eng（继承） | 1 | 是 | 是 | 再往下 S 到 depth 2 可，depth 3 不可 |
+| VP-Eng workflow child | vp-eng（继承） | 1 | 是 | 是 | 再往下 W 可（无闸），S depth 3 不可 |
+| VP-Sales/COO/CFO/CMO root | 各自 | 0 | 否 | 是 | 只有 subagent |
+| SA/SQA/researcher | 各自 | — | 否 | 否 | 窄工具面 |
+
+## 2. 本仓的特点（新 Agent 必须知道）
+
+### 2.1 布局与权威
+
+- `vendor/dsh/` = **钉 SHA 的 DSH 源码**，只读；机制核对一律以它为准。本仓机制事实的权威不是记忆。
+- `packages/company-pack/` = 唯一自写包：`presets/<role>/`（persona + skills + 工具行）、`content/`（手册/模板）、
+  `src/`（host/client）；preset **自包含**，DSH 无 patch 继承。
+- `company-workspace/` = dev 公司状态（gitignored）：`.dsh-company/kb/`、`deliverables/`、`journal/`。
+- `runtime/` = 运行残留（gitignored）：`harness-home`（dev DSH_HOME）、`rehearsal-workspace`（排练/探针 cwd）、`tmp`。
+- `docs/` = 当前合同（只写 now）；`notes/` = 决策记忆；`_backlog/` = 推敲层（research/issues/bugs/methods）；
+  `checks/` = 门禁；`tests/` = keyless 回归；`probes/` = 真实入口探针；`tools/` = 维护工具。
+- **不是普通 Node 库**：它是 DSH 的 company pack + 六角色 preset + 测试/门禁/流程的复合仓。改动先问
+  “这个事实的 owner 是谁”：preset/合同/docs/Note/gate，别在错误层写第二份。
+
+### 2.2 启动、测试与证据分层
+
+```sh
+git submodule update --init
+corepack enable pnpm && pnpm install
+source run/env.sh              # 双 home + 裸 dsh 拦截 + pre-push 接线
+pnpm company --no-open         # pack + plugin add file: + exec dsh --profile company
+pnpm verify                    # 结构门禁（秒级，~58 门）
+pnpm test                      # keyless 回归（当前 150 files / 1223 tests）
+pnpm typecheck                 # 类型面（改 TS/src 时）
+```
+
+- **keyless 回归**：`pnpm test` / `pnpm verify`；真模型/真浏览器**不进**回归。
+- **真实挂载**：`node checks/smoke/preset-smoke.mjs`（6 角色 + 3 委派子人格；preset 改动的必跑）。
+- **真实入口探针**：`probes/team/`（如 `vp-eng-workflow-probe.mjs`）、`checks/smoke/delegation-smoke.mjs`；
+  真模型，手工跑，不进 `pnpm test`。
+- **浏览器面**：`client-load-smoke` / `ui-scene-smoke`；本轮不需要。
+- **凭据**：`DEEPSEEK_API_KEY` 住 dev home 的 `.credentials.yaml`（不是 env）；`env | grep` 为空不代表没配；
+  不要打印/提交。
+- **dev profile 是 link 模式**：`runtime/harness-home/profiles/company/package.json` 里 pack 是
+  `link:/.../packages/company-pack`；preset/skill 改动即刻生效；tarball 安装面另验（`release-smoke`）。
+
+### 2.3 角色、preset 与工具面
+
+- 六角色：CEO、VP-Eng、VP-Sales、COO、CFO、CMO；支持 preset：`researcher`、`system-architect`、`system-qa`。
+- CEO 工具面：`subagent_research`（只读研究员）、`vp_eng`、`vp_sales`、`vp_cmo`、`system_architect`、
+  `system_qa`、team 工具；**没有** generic `subagent`、**没有** `workflow`。
+- vp-eng：`subagent` + `subagent_fork`（`maxDepth: 2`）、`workflow-ptc` + `tool-workflow`（同组）、
+  `system_architect` / `system_qa` / `vp_cmo`（`maxDepth: 2`）。
+- vp-sales / coo / cfo / cmo：`subagent` + `subagent_fork`（`maxDepth: 2`）；无 workflow。
+- SA/SQA/researcher：窄工具面；无 workflow/generic subagent。
+- 行清单的唯一家 = 各 `presets/<role>/agent.cordis.yml`；`docs/presets.md` 只是摘要。
+
+### 2.4 流程与门禁（别绕过）
+
+- `_backlog/research/` = 证据材料（本文件就是）；`issues/` = 问题卡；`bugs/` = 缺陷卡；卡片不是任务源/授权。
+- `notes/implemented/` = 决策记忆；非平凡变更同 diff 带 Note；Note 写决定/输掉的方案/验证。
+- `docs/` 只写当前合同；改了行为没改合同 = 谎报。
+- 门禁：`pnpm verify` 查结构/链接/backlog 形状/文档预算/retired claims 等；`pnpm test` 查 keyless 行为；
+  `preset-smoke` 查真挂载；`retired-claims` 会把已证伪的旧断言判红（本轮删过一条“通道 D 已退役”）。
+- 发现 bug：**简单 → 立刻修**（prompt/skill/config，红→绿留证）；**复杂 → 开 `_backlog/bugs/` 卡**，
+  不硬改 vendor；方法差异只记录。
+- 证据纪律：命令链 `set -o pipefail`；不写“应该跑了”；未跑标“未执行”；单次真跑不写“稳定”。
+
+### 2.5 当前工作树与并行会话（2026-11-08）
+
+- 工作树有**未提交**改动，其中一部分来自并行会话（README/安装手册等）。**不要** `git checkout`/`revert` 整树。
+- 本工作相关：五个职能 preset 的 `maxDepth: 2`、vp-eng 的 workflow 两行、`eng-teaming`/`eng-workflow`、
+  CEO `assembling-the-team`/persona、`docs/{delegation,presets,terminology,index}.md`、
+  `docs/design/architecture.md`、`docs/guides/budget-and-ops.md`、
+  `notes/implemented/2026-11-08-vpeng-workflow-channel.md`、`probes/team/vp-eng-workflow-probe.mjs`、
+  `checks/gates/retired-claims.mjs`、`checks/INDEX.generated.md`、`pnpm-lock.yaml`（两行 peer）、
+  本轮新增的 research 题。
+- 环境：cwd = 仓库根；dev home `runtime/harness-home`（`source run/env.sh` 后的 `DSH_HOME`）；排练场 `runtime/rehearsal-workspace`。
+
+### 2.6 本仓最容易被误判的三件事
+
+1. **“看见工具” ≠ “能用”**：CEO 的 `subagent_research` 名字里有 subagent，但不是 generic `subagent`；
+   工具目录要看 `request/header.tools` 的 `name`，不是猜。
+2. **“继承 Lead 组合” ≠ “继承角色”**：CEO 团队成员继承 CEO，不是它名字叫的那个角色；要 vp-eng 的
+   workflow/subagent，走 `vp_eng` 命名 child。
+3. **“测试绿” ≠ “模型会选”**：`preset-smoke` 只证挂载；选择要靠真实会话的行为探针/矩阵。
+
+## 3. 已证事实（别重复测）
+
+- workflow + subagent 已进 vp-eng；五个职能 `subagent`/`subagent_fork` `maxDepth: 2`；CEO 的 `vp_eng`
+  命名 child 两者都有；CEO root/team 两者都没有。
+- 代表证据（详见 Note）：最小 workflow `session-65ac58d6-…`；CEO→vp_eng 强制方法 `session-ea85593e-…`
+  → child `755101e2-…`；CEO goal-only `session-bf7485f6-…` → child `003012e8-…`；严格 VP-Eng root
+  `session-1393a73e-…`；常驻 probe；`preset-smoke` ALL PASS；`pnpm test` 1223；`pnpm verify` ALL PASS。
+- 已知限制：CEO root/team 无 W/S（设计）；其他四职能只有 S；workflow 无深度闸；`workspace-write` 未验；
+  `release-smoke` 未跑；长期采纳率未测；其他四职能只验挂载。
+
+## 4. 探索问题与假设
+
+| # | 假设 | 证伪 |
+|---|---|---|
+| H1 | 只 W：≥3 同构任务能只走 workflow，N 路真并行、结果完整 | workflow 未起 / 串行 / 结果缺 |
+| H2 | 只 S：1–2 件细节能只走 subagent，不误用 workflow | 只自己做 / 误用 W / S 失败 |
+| H3 | M1：W 扇出 + S 核对能各一次都成功，结果一致 | 任一失败 / 结果不一致 / 父上下文被中间消息污染 |
+| H4 | M2：W→S→W 多轮都能成功，无 depth/丢失 | 第二轮起不来 / depth 错 / 结果丢 |
+| H5 | 三个入口（R/C/T）能力一致（C/T 继承 vp-eng） | C/T 看不到或跑不通 |
+| H6 | 负例 N 不会假装有 W/S；应路由 `vp_eng` 或报缺 | N 声称用了 W/S 但没有对应调用 |
+
+## 5. 场景矩阵
+
+| ID | 入口 | 任务形状（自然 prompt 的意图） | 期望 | 判据 |
+|---|---|---|---|---|
+| W-R | R | 4 个同构文件各核一个事实 + 汇总 | 只有 W | W ≥3 agents completed；无 S |
+| S-R | R | 2 个互不相同的细节核查 | 只有 S | S started；无 W |
+| M1-R | R | 3 路扇出 + 1 次独立交叉核对 | W + S 各一次 | 两者成功；结果一致 |
+| M2-R | R | 扇出 → 核对 → 对不一致项再扇出 | W×2 + S×1 | 多轮成功；无 depth 错 |
+| W-C | C | 同 W-R，CEO 只给目标 | CEO 选 `vp_eng`；child W | CEO 无 wait/send；child W |
+| S-C | C | 同 S-R，CEO 只给目标 | child S | S started；无 W |
+| M1-C | C | 同 M1-R，CEO 只给目标 | child W+S | 两者成功；CEO 无 wait/send |
+| M1-T | T | 同 M1-R | teammate W+S | teammate 工具面 + 执行 |
+| N-C | N | 同 M1-R | 无 W/S；路由或报缺 | 不得假装 |
+| D1 | R→S child(d1) | 子代再派 S(d2) | 成功 | started |
+| D2 | R→W child(d2) | 子代再派 S(d3) | depth 拒；W 可用 | 预期失败，记录 |
+| F1 | R | W 中一个分支缺失/坏 JSON | 显式报缺 | 不静默当成功 |
+
+自然 prompt 不点名工具；强制 prompt 才点名。S-C/T/N 是 natural-only（强制会掩盖“选不选”的问题）。
+
+## 6. 两遍法
+
+- **Pass A（forced mechanics）**：W-R / S-R / M1-R / M2-R，prompt 明确指定“用 workflow / 用 subagent /
+  两者都用”。证工具链路、并发、聚合、depth；不证选择。
+- **Pass B（natural selection）**：同四格 + W-C / S-C / M1-C / M1-T / N-C，prompt 只给目标。
+  证 `eng-teaming`/`eng-workflow`/CEO 任务书是否真的内化。
+- 上一轮教训：CEO 任务书“subagent 或 workflow 都行” → VP-Eng 拉 4 个 subagent、workflow=0；
+  改死方法后才稳定。强制遍和自然遍必须分开，否则会把“工具坏了”和“提示面歪了”混为一谈。
+
+## 7. Fixtures
+
+在 `runtime/rehearsal-workspace/` 下新建 exp 目录（本轮尚未创建）：
+
+| 文件 | 内容 | 用途 |
+|---|---|---|
+| a.json / b.json / c.json / d.json / e.json | 各一个已知 version（含一个 beta、一个 0.x） | W/M1/M2 |
+| bad.json | 非法 JSON | F1 |
+| missing.json（不创建） | — | F1 缺文件 |
+
+每轮前清理 rehearsal 的 `.dsh-company` 里上一轮实验 journal/deliverables（旧 journal 的“subagent 不可用”
+曾把模型带偏）；fixtures 保留。sha256 写进任务书/结果表，证明只读。
+
+## 8. Harness
+
+- **探针**：计划在 `probes/team/` 下新增参数化矩阵探针（文件名待定；`--scenario` + `--mode forced|natural`），
+  或先用 `runtime/tmp` 的一次性脚本。复用 `tools/lib/probe-web.mjs`（`startWeb`/`companyCookie`/`companyRpc`）、
+  `tools/lib/session-log.mjs`（`readRecords`）、`tools/lib/rehearsal.mjs`、`tools/lib/runtime-home.mjs`。
+- **流程**：`source run/env.sh` → `startWeb({ profile: 'company' })` → `session/create`（`agentPreset` 按入口）
+  → `session/prompt` → 等新的 `turn/end` → 读 raw session log（zstd）→ 解析
+  `tool/call`、`tool-workflow/run-start|agent-start|agent-end|run-end` 时间戳、`tool/result`、终稿。
+- **child 定位**：命名 subagent 从 `vp_eng` result 的 `started subagent <id>` 拿；workflow 子代从
+  `tool-workflow/agent-start` 的 `childId` 拿；teammate 从 `team/member` 事件或扫 `runtime/harness-home/sessions`
+  下 `parentSession` 匹配的会话目录；teammate 的 `agentPreset` 会是 Lead 的 preset。
+- **代码骨架**（伪代码，真实脚本照 `probes/team/vp-eng-root-lead-probe.mjs` / `runtime/tmp/e2e-*.mjs`）：
+
+```js
+const { child, base, token } = await startWeb({ spawn, root: ROOT, home, profile: 'company' })
+const cookie = await companyCookie({ fetch, base, token, onEmptyCookie: 'throw' })
+const rpc = companyRpc({ fetch, base, cookie, prefix: 'exp-', dumpBodyOnError: true })
+const { sessionId } = await rpc('session/create', { request: { cwd: rehearsal, agentPreset: entry } })
+await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', content: [{ type: 'text', text }], clientTimeZone: 'Asia/Shanghai' } })
+// poll session/page until turn/end count increases; then read raw zstd log for tool events
+```
+
+- **证据表**（一行一场景）：ID / 期望通道 / 实际 calls / workflow run+agents+timestamps /
+  subagent result / 并发或串行 / 终稿摘要 / 判定（PASS / 方法差异 / BUG）。
+- **不要只看终稿**：模型可以说“我用了 workflow”而实际没调；以 `tool/call` + `tool-workflow/*` 为准。
+
+## 9. 判据（五问）
+
+1. **看得见**：`request/header.tools` 有目标工具（N 应为没有）。
+2. **选得对**：natural 下通道符合 `eng-teaming` 五档；偏离记提示面 finding。
+3. **跑得通**：W `completed` / S `started`；无 depth/sandbox/maxDepth 错。
+4. **合得对**：结果完整一致、无静默丢分支；父只收聚合/终稿。
+5. **并发/边界**：W 的 N 路 start 时间重叠；M1/M2 记录 S 是并发还是串行；depth 2 边界符合预期。
+
+## 10. 预算与停止
+
+- P1：4 轮 forced，约 10–15 min；P2：8 轮 natural，约 15–20 min；P3：3 轮边界，约 8–10 min。
+- 每轮墙钟 ≤300s、prompt ≤3；连续两次基础设施失败停；flaky 场景 2 次；单次不写“稳定”。
+
+## 11. 发现处置
+
+- **简单**（prompt/skill/config）：当场修，复跑该格，红→绿留证。
+- **复杂**（vendor/depth/后台/结果丢失）：开 [_backlog/bugs/](../../bugs/README.md) 卡，带证据，不硬改 vendor。
+- **方法差异**：natural 下选了另一条合法通道（如独立核对并进 W 第 4 条分支）——记录，不判 bug。
+- **并发差异**：S 与 W 串行/并发是方法选择；两者都真跑成功即不算失败。
+
+## 12. 不做 / 边界
+
+- 不发明第二套编排；只用现有 workflow/subagent/team。
+- 不改 vendor；workflow 无 depth 闸是已知限制，只记录。
+- 不把“模型这次没选”当“工具坏了”；forced 负责后者。
+- 其他四职能 / CEO root 的 workflow 扩面不在本轮；只验挂载（另立卡）。
+- `workspace-write`、`release-smoke`、长期采纳率不在本轮。
+
+## 13. Review 清单（请先审这 12 条）
+
+1. **S-only 是否可测**：2 件小事模型可能“自己做”；接受“自己做”为合法替代，还是必须 forced 才判 S 机制？
+2. **入口优先级**：C（主商业路径）与 T（团队路径）先跑哪个？预算够两条吗？
+3. **M2 定义**：W→S→W 算不算“混合多次”？固定两轮 W + 一轮 S，还是让模型自己决定轮数？
+4. **并发**：要不要专测“S 在 W 运行中起”？现有 mix 可能默认串行；并发是方法维度还是必测？
+5. **失败面**：F1（缺分支/坏 JSON）与 background/cancel 进 P3 吗？不进就写“未覆盖”。
+6. **重复次数**：flaky 2 次够吗？M2/T 要 3 次吗？
+7. **允许改提示面吗**：发现 prompt 问题当场改 skill 再复跑，还是先记录统一改？
+8. **证据够不够**：session id + tool calls + 时间戳 + 终稿，足以判“没问题”吗？要 token/墙钟吗？
+9. **结果落点**：矩阵结果写回本题材料，还是另开 issue？简单修复同 diff 更新 Note 吗？
+10. **负例 N**：CEO teammate 叫 vp-eng 时，期望“路由到 vp_eng”还是“明确报缺”？两者都算 PASS 吗？
+11. **入口遗漏**：VP-Sales/COO/CFO/CMO（只有 S）、CEO root（无 W/S）、SA/SQA/researcher（都无）——
+    要不要各加一条“只验可见性”的负例？还是只做 vp-eng？
+12. **DSH 版本**：本计划基于 `vendor/dsh` 当前钉的 SHA；若下一位 Agent 升 pin，先重校 §1 的机制事实。
+
+## 14. 交接步骤（新 Agent 第一小时）
+
+1. 读本文件 §1–§3；读 [Note](../../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)、
+   [eng-teaming](../../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md)、
+   [delegation 合同](../../../docs/delegation.md) §3/§4。
+2. 基线：`source run/env.sh && pnpm verify && pnpm test`；`node checks/smoke/preset-smoke.mjs`。
+   全绿预期；若红先分清工作树里其他人的改动。
+3. 清 rehearsal 的旧实验 journal/deliverables；建 exp fixtures。
+4. 先跑 P1 forced 四格；结果表贴回本题材料；再决定 P2/P3。
+5. 发现按 §11 处置；简单修复同 diff 更新 skill/Note；复杂开 BUG 卡；最后 `pnpm verify`/`pnpm test` 全绿。
+
+## 15. 参考
+
+- [workflow 通道 Note](../../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)
+- [归档研究材料](../../_archive/research/vp-eng-delegation-topology/2026-11-08-topology.md)
+- [tool-workflow README](../../../vendor/dsh/packages/workflow/tool-workflow/README.md)
+- [workflow-ptc README](../../../vendor/dsh/packages/workflow/workflow-ptc/README.md)
+- [workflow 子系统](../../../vendor/dsh/docs/subsystems/workflow.md)
+- [tool-subagent README](../../../vendor/dsh/packages/subagent/tool-subagent/README.md)
+- [subagent 子系统](../../../vendor/dsh/docs/subsystems/subagent.md)
+- [agent-team README](../../../vendor/dsh/packages/experimental/agent-team/README.md)
+- [delegation 合同](../../../docs/delegation.md) · [presets 摘要](../../../docs/presets.md) ·
+  [architecture](../../../docs/design/architecture.md)
+- [常驻 probe](../../../probes/team/vp-eng-workflow-probe.mjs)
+- [preset 改动完成定义](../../../.agents/skills/preset-change-definition/SKILL.md)
