@@ -7,7 +7,7 @@
  * 不证明：真实装配里工具可见性（preset-smoke / 真会话探针）、cold resume 的 provider 行为。
  */
 import { describe, expect, it } from 'vitest'
-import { registerDelegationControl, subagentRows } from '../../packages/company-pack/src/host/delegation-control.ts'
+import { registerDelegationControl, subagentRows, terminalOf } from '../../packages/company-pack/src/host/delegation-control.ts'
 
 type ToolDefinition = {
   name: string
@@ -15,11 +15,14 @@ type ToolDefinition = {
   output: { render(args: never, value: never): Array<{ type: string; text: string }> }
 }
 
-function harness(options: { subagents?: unknown; agents?: unknown } = {}) {
+function harness(options: { subagents?: unknown; agents?: unknown; sessionQuery?: unknown } = {}) {
   const tools = new Map<string, ToolDefinition>()
   const ctx = {
     tools: { register: (definition: ToolDefinition) => { tools.set(definition.name, definition) } },
-    get: (name: string) => (name === 'subagents' ? options.subagents : name === 'agents' ? options.agents : undefined),
+    get: (name: string) => name === 'subagents' ? options.subagents
+      : name === 'agents' ? options.agents
+        : name === 'sessionQuery' ? options.sessionQuery
+          : undefined,
   }
   registerDelegationControl(ctx as never)
   return tools
@@ -101,4 +104,53 @@ describe('delegation control tools', () => {
     await expect(tool.execute({ subagent_id: 'x', message: 'y' } as never, { agent: agentWith([]) } as never))
       .rejects.toThrow(/subagents service/)
   })
+  it('terminalOf takes the last turn/end reason and ignores malformed rows', () => {
+    expect(terminalOf([
+      { type: 'turn/start', data: {} },
+      { type: 'turn/end', data: { reason: { kind: 'completed' } } },
+      { type: 'turn/start', data: {} },
+      { type: 'turn/end', data: { reason: { kind: 'interrupted' } } },
+    ])).toBe('interrupted')
+    expect(terminalOf([{ type: 'turn/end', data: {} }])).toBeUndefined()
+    expect(terminalOf([])).toBeUndefined()
+  })
+
+  // 负例留证 2026-11-08：BUG-041 的终态守卫——把 list_subagents 的 sessionQuery 终态增强临时关掉
+  //   （`const query = undefined`）→ 本用例 1 failed / 8 passed；还原 → 9 passed。
+  //   红判依据：终态来自 readSession 的最后一个 turn/end，增强关掉后行上没有 lastTurnEnd，断言即红。
+  it('list_subagents adds the durable terminal reason after a host restart (BUG-041)', async () => {
+    const sessionQuery = {
+      readSession: async (id: string) => ({
+        events: id === 'child-1'
+          ? [{ type: 'turn/start', data: {} }, { type: 'turn/end', data: { reason: { kind: 'interrupted' } } }]
+          : [{ type: 'turn/end', data: { reason: { kind: 'completed' } } }],
+      }),
+    }
+    const tool = harness({ sessionQuery }).get('list_subagents')
+    if (tool === undefined) throw new Error('list_subagents not registered')
+    const result = await tool.execute({} as never, {
+      agent: agentWith([catalog('child-1', 'w1'), catalog('child-2', 'w2')]),
+      signal: new AbortController().signal,
+    } as never)
+    expect(result).toEqual({
+      subagents: [
+        { id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', lastTurnEnd: 'interrupted' },
+        { id: 'child-2', label: 'w2', mode: 'continuable', status: 'inactive', lastTurnEnd: 'completed' },
+      ],
+    })
+  })
+
+  it('list_subagents keeps the rows when a child log cannot be read (fail-soft)', async () => {
+    const sessionQuery = { readSession: async () => { throw new Error('corrupt child log') } }
+    const tool = harness({ sessionQuery }).get('list_subagents')
+    if (tool === undefined) throw new Error('list_subagents not registered')
+    const result = await tool.execute({} as never, {
+      agent: agentWith([catalog('child-1', 'w1')]),
+      signal: new AbortController().signal,
+    } as never)
+    expect(result).toEqual({
+      subagents: [{ id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive' }],
+    })
+  })
+
 })

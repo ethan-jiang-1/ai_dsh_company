@@ -11,7 +11,6 @@
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
 | [BUG-040](BUG-040-workflow-schema-text-answer-discarded.md) | 带 schema 的分支只回文本 → 父拿 null，文本答案被丢弃且无诊断 | P2 |
-| [BUG-041](BUG-041-host-restart-orphans-inflight-child.md) | 宿主重启后 in-flight child 成孤儿：child 记 interrupted，父收不到终态也查不到 | P1 |
 | —（历史） | BUG-034 / BUG-035 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：SA/SQA 证据链必查（时间源 + 故障路径耐受）+ 审计 Q8–Q11；2026-11-07 E2E v8 验收 | — |
 
 **2026-11-08 六张卡同轮来源**：workflow + subagent 探索性测试（问题卡
@@ -58,7 +57,7 @@ BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 已修 [fixed_bugs](../_
 | [BUG-038](../_archive/fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md) ✅ | P2 | 已修（2026-11-08）：`eng-teaming` 分支叶子规则 + 真跑观察（模型首轮自纠）+ 钉子 `workflow-contract-smoke` 第 6 条 | `workflow-ptc` 分支结果只取最后一轮结论（提案待上游） |
 | [BUG-039](../_archive/fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md) ✅ | P1 | 已修（2026-11-08）：vp-eng preset 抬 `maxResultChars` 到 200k；探针证 spill 全文 71,677 字符可读；钉子 `tests/harness/contract/workflow-result-budget.spec.ts` | `tool-workflow` 默认值下先截断再落盘的语义（提案待上游） |
 | [BUG-040](BUG-040-workflow-schema-text-answer-discarded.md) | P2 | `eng-teaming` schema/structured_output 规则已有；可补 keyless 复现 | `runtime.ts` 缺形状不匹配诊断 |
-| [BUG-041](BUG-041-host-restart-orphans-inflight-child.md) | P1 | `eng-teaming` 长跑/重启规则已有；补部署前置或 resume 对账文档 | resume 时的 orphan child 对账 |
+| [BUG-041](../_archive/fixed_bugs/BUG-041-host-restart-orphans-inflight-child.md) ✅ | P1 | 已修（2026-11-08）：`list_subagents` 带 `lastTurnEnd`（durable 日志读，RS1 实测 interrupted）；ops 部署前置一行 | resume 时补 `subagent/end` 通知（体验增强，不再阻塞） |
 
 **收口要求**：每卡修完翻 `修复已落地`，写 `## 已修判定` 对应的真红→绿证据与 `审查：` 记录，再 `git mv`
 到 [fixed_bugs](../_archive/fixed_bugs/) 并同步两张索引；`pnpm verify` + `pnpm test` 全绿；

@@ -149,6 +149,7 @@
 | [BUG-039-workflow-result-truncation-lossy-spill.md](fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md) | >50k 结果先截断再落盘：preset 抬 maxResultChars 到 200k，spill 全文可读；探针 71,677 字符 + 渲染钉子 | 2026-11-08 |
 | [BUG-037-root-team-tool-shadowing.md](fixed_bugs/BUG-037-root-team-tool-shadowing.md) | 根门被团队版控制名 shadow：新增 `list_subagents` / `send_to_subagent`（官方服务、不被 shadow）+ 合同/技能同步 | 2026-11-08 |
 | [BUG-038-workflow-branch-nested-delegation-result.md](fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md) | 分支内再委派返回值混回执：分支当叶子规则 + 真跑自纠观察 + 机制钉子（回执拼接） | 2026-11-08 |
+| [BUG-041-host-restart-orphans-inflight-child.md](fixed_bugs/BUG-041-host-restart-orphans-inflight-child.md) | 重启后 in-flight child 成孤儿：`list_subagents` 带 durable `lastTurnEnd`（interrupted）+ ops 部署前置 | 2026-11-08 |
 
 ## 暂停卡
 

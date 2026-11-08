@@ -34,7 +34,7 @@
   - **F10**（方向 RS1 宿主重启）：child 在跑时 SIGTERM 宿主再重启，父 durable 无新 turn/notice，
     child durable 记 `interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，无法查询。
     已在 `eng-teaming` 长跑条加“别跨重启等通知”；机制/上游留
-    [BUG-041](../../_backlog/bugs/BUG-041-host-restart-orphans-inflight-child.md)（P1）。
+    [BUG-041](../../_backlog/_archive/fixed_bugs/BUG-041-host-restart-orphans-inflight-child.md)（P1）。
   - **F1 补充**（R13）：schema 子集还拒 `type: ['string','null']`；已把“type 只接受单个字符串、
     联合类型用 oneOf”写进 `eng-teaming`，BUG-036 补第二实例。
   - **F11**（方向 R12 fork 上下文）：`subagent_fork` 只播种**已完成轮**；同一 turn 内刚读的 tool

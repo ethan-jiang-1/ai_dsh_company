@@ -8,12 +8,13 @@
  * `ctx.subagents.sendMessage()` 与父会话自己的 durable catalog 暴露给模型（不是平行实现）。
  *
  * 数据来源：父会话 `session.ownEvents()` 里的 `subagent/catalog`（父拥有的 durable 事件，
- * 宿主重启后随会话重放）——不依赖 `sessionQuery`（本 profile 根 provider 是 `openAt: never`）。
- * 状态只读 live Agent registry：`running` / `inactive`；重启后 in-flight child 会显示 inactive，
- * 终态（interrupted）仍由 child 自己的会话记录，卡 BUG-041 的剩余缺口在此如实记账。
+ * 宿主重启后随会话重放）；**终态**用 `sessionQuery.readSession(childId)` 读 child 的 durable 日志
+ * 最后一个 `turn/end`（`openAt: never` 只禁搜索，durable 读仍可用；服务缺席时 fail-soft 省略）。
+ * 状态只读 live Agent registry：`running` / `inactive`。
+ * 已知边界：`readSession` 只给 reason.kind（如 `interrupted`），不给错过的完成通知内容。
  *
  * 退役条件：上游让根会话拿到全局控制名（team shadow 修复）后，本工具删除；
- * 检测锚点见 `tests/harness/contract/` 与台账 `[CT-LIFE]`。
+ * 检测锚点 = `tests/company/delegation-control.spec.ts` 与台账 `[CT-LIFE]`。
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
@@ -58,6 +59,29 @@ export interface SubagentRow {
   label: string
   mode: string
   status: 'running' | 'inactive'
+  /** 子会话 durable 日志里最后一个 `turn/end` 的 reason.kind（宿主重启后常见 `interrupted`）。 */
+  lastTurnEnd?: string
+}
+
+/** 只用到 durable 读一面；`sessionQuery` 在 `openAt: never` 下仍支持 readSession（搜索被禁）。 */
+interface SessionQueryLike {
+  readSession(id: string): Promise<{ events: readonly { type: string; data: unknown }[] }>
+}
+
+/**
+ * Last `turn/end` reason kind from a child's durable event log.
+ * Pure: the spec pins the exact value the model sees after a host restart.
+ * @param events - the child session's raw event log.
+ * @returns `data.reason.kind` of the last turn/end, or undefined when absent/malformed.
+ */
+export function terminalOf(events: readonly { type: string; data: unknown }[]): string | undefined {
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const event = events[index]
+    if (event?.type !== 'turn/end') continue
+    const reason = (event.data as { reason?: { kind?: unknown } } | undefined)?.reason
+    return typeof reason?.kind === 'string' ? reason.kind : undefined
+  }
+  return undefined
 }
 
 /**
@@ -99,8 +123,9 @@ export function registerDelegationControl(ctx: Context): void {
       + '(the list survives a host restart). Use it when the team-scoped `list_agents` only returns roster '
       + 'members — named and generic subagent children are not team roster members, so in a root (Team Lead) '
       + 'session `list_agents` cannot see them. `running` means the child is working; `inactive` means it is '
-      + 'not currently working. An `inactive` child that was interrupted by a host restart never sends a '
-      + 'completion notice: continue it with `send_to_subagent` or report the gap.',
+      + 'not currently working. `lastTurnEnd` is the reason its durable log recorded for the last turn '
+      + '(e.g. `interrupted` after a host restart, `completed`); it is absent when the log cannot be read. '
+      + 'An `interrupted` child never sends a completion notice: continue it with `send_to_subagent` or report the gap.',
     parameters: {},
     output: {
       schema: {
@@ -118,6 +143,7 @@ export function registerDelegationControl(ctx: Context): void {
                 label: { type: 'string' },
                 mode: { type: 'string' },
                 status: { type: 'string', required: true },
+                lastTurnEnd: { type: 'string' },
               },
             },
           },
@@ -128,7 +154,18 @@ export function registerDelegationControl(ctx: Context): void {
     async execute(_args, exec) {
       const agent = exec.agent as AgentLike | undefined
       if (agent === undefined) throw new Error('list_subagents requires a calling agent')
-      return { subagents: subagentRows(agent.session.ownEvents(), statusOf) }
+      const rows = subagentRows(agent.session.ownEvents(), statusOf)
+      // 终态读取是**可选增强**：服务缺席或单条日志坏了都不影响列出 child（fail-soft，逐条）。
+      const query = ctx.get('sessionQuery') as SessionQueryLike | undefined
+      if (query !== undefined) {
+        await Promise.all(rows.map(async row => {
+          try {
+            const terminal = terminalOf((await query.readSession(row.id)).events)
+            if (terminal !== undefined) row.lastTurnEnd = terminal
+          } catch { /* durable log unavailable for this child; keep the row without a terminal */ }
+        }))
+      }
+      return { subagents: rows }
     },
   }))
 

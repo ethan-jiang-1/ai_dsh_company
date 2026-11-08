@@ -1,12 +1,12 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P1
 opened: 2026-11-08
 ---
 
 # BUG-041：宿主重启后 in-flight child 成孤儿——child 记 interrupted，父收不到终态也查不到
 
-> 严重级别：P1（重要）｜发现：2026-11-08｜状态：修复已落地｜审查：agent — 查询面与部署前置已落地；判定第一条「至少 interrupted」只部分满足（`list_subagents` 报 inactive，不报 turn/end reason），故不归档、不假结
+> 严重级别：P1（重要）｜发现：2026-11-08｜状态：已修（2026-11-08）｜审查：agent — 判定两条均满足：父会话可主动查询 child 终态（`list_subagents` 的 `lastTurnEnd` 读 child durable 日志，RS1 真实重启会话实测 `interrupted`）+ 部署前置已写进 ops；未补的是“错过的完成通知内容”，不是终态
 
 ## 症状
 
@@ -61,14 +61,18 @@ local subagent 是进程内 agent；宿主进程死亡时 child 的 turn 被记�
   冷恢复。这修掉了“父自述没有任何接口查询”的一半。
 - **部署前置（判定第二条）**：`docs/guides/budget-and-ops.md` 加“升级/重启时还有 subagent 在跑”一行
   （重启前先收口；重启后用 `list_subagents` 查、`send_to_subagent` 冷恢复）；`eng-teaming` 长跑条目同步。
-- **仍缺（不假结）**：工具只报 `running` / `inactive`，**不报终态 reason**（`turn/end interrupted`）；
-  判定的“至少 interrupted”因此只算部分满足。终态读取需要 `sessionQuery`（本 profile 根 provider 是
-  `openAt: never`）或上游在 resume 时对账补 `subagent/end`——列为上游提案与后续项。
+- **终态查询（2026-11-08 补）**：`list_subagents` 的每行带 `lastTurnEnd`——用
+  `sessionQuery.readSession(childId)` 读 child 的 **durable 日志**最后一个 `turn/end` 的 `reason.kind`。
+  关键事实：`openAt: never` 只禁搜索（`searchSessions`/`searchEvents`），`readSession` 仍可读
+  （standalone 实测：RS1 真实会话 `48eb730a-…` → 23 events，`turn/end {"reason":{"kind":"interrupted"}}`）。
+  服务缺席或单条日志坏了则 fail-soft 省略该字段，不影响列出 child。
 - **绿证据**：真挂载会话工具目录含 `list_subagents`（`runtime/tmp/explore/fix1/S039/summary.json`）；
-  `tests/company/delegation-control.spec.ts` 折叠 durable catalog、inactive/running 状态；
-  RS1 的 durable 事实（child `turn/end interrupted`、父无新 turn）仍是原证据。
-- **上游**：resume 时对父侧 `subagent/catalog` 里没有终态的 child 补 `subagent/end`（interrupted），
-  或让 durable child 查询带 terminal reason（收口 Note 的上游批第 5 条）。
+  `tests/company/delegation-control.spec.ts` 9 条（catalog 折叠、inactive/running、`terminalOf`、
+  interrupted/completed、日志读失败 fail-soft）；standalone durable 读实测见上。
+- **仍缺（不假结，但不阻塞判定）**：父会话拿不到**错过的完成通知内容**（只有终态 kind）；要正文仍需
+  `send_to_subagent` 冷恢复或上游 resume 对账。
+- **上游（可选，不再阻塞）**：resume 时对父侧 `subagent/catalog` 里没有终态的 child 补 `subagent/end`
+  （interrupted），让父会话**不用主动查询**也能收到；收口 Note 的上游批第 5 条随之降为“体验增强”。
 
 ## 已修判定
 

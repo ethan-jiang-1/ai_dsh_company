@@ -197,7 +197,7 @@ opened: 2026-11-08
 | C 入口 depth 链：命名 child 起 W1 后再起 W2 被拒 | CD2 CEO→`vp_eng` | W1 的 `subagent` 被拒 `depth 3 exceeds maxDepth 2`；声明面 `current 2 / max 2 / remaining 0`；W1 未读文件/未重试；child 用 `bash sleep 90/75`（观察） | depth 边界 PASS；sleep 记观察 |
 | 带 schema 的分支只回文本 → 父拿 null，文本答案被丢弃、无诊断 | R10 后台 W 自然完成 + schema | m01 child 读了文件、回正确 JSON 文本、`turn/end completed`；父 `modules[0]=null`、`count:3`；job/run 仍 completed；补跑 subagent 才拿到 m01 | eng-teaming 已加“schema 分支明确要 structured_output / 验收看 null/count”；机制/上游 → [BUG-040](../bugs/BUG-040-workflow-schema-text-answer-discarded.md)（P2） |
 | `subagent_fork` 只带已完成轮，同一 turn 刚读的不在 | R12：同 turn 内 read a 再 fork；R14 token 继承 | R12 fork 报 `a = NOT-IN-CONTEXT`；R14 fork 无工具复述 `FORK-TOKEN-7f3a9c` | eng-teaming 五档表已写明；R12 红/R14 绿 |
-| 宿主重启后 in-flight child 成孤儿，父收不到终态也查不到 | RS1：child 在跑时 SIGTERM 宿主再重启 | 父 durable 无新 turn/notice；child durable `turn/end interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，自述无法查询 | eng-teaming 长跑条已加“别跨重启等通知”；机制/上游 → [BUG-041](../bugs/BUG-041-host-restart-orphans-inflight-child.md)（P1） |
+| 宿主重启后 in-flight child 成孤儿，父收不到终态也查不到 | RS1：child 在跑时 SIGTERM 宿主再重启 | 父 durable 无新 turn/notice；child durable `turn/end interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，自述无法查询 | eng-teaming 长跑条已加“别跨重启等通知”；机制/上游 → [BUG-041](../_archive/fixed_bugs/BUG-041-host-restart-orphans-inflight-child.md)（P1） |
 
 第二轮补充观察（不新增缺陷卡）：R11 pipeline 两阶段 4 项×2 stage 全过（8 agents 超出 6-agent 探索上限，
 未强制，过程记录）；V1 vp-sales 无 workflow、如实改用 4 个 subagent（PASS），但 generic child 双份

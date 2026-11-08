@@ -1,6 +1,6 @@
 # 2026-11-08 · 委派面合同修复轮：BUG-036..041 的处置、资产与上游批
 
-状态：implemented（2026-11-08；4 张归档 / 2 张留活，缺口逐条写明）
+状态：implemented（2026-11-08；5 张归档 / 1 张留活〔040〕，缺口逐条写明）
 上游 = [探索性测试问题卡](../../_backlog/issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)
 （第一轮发现 = [探索 Note](2026-11-08-workflow-subagent-exploration-fixes.md)；修复交接 =
 [bugs/README §2026-11-08 修复交接](../../_backlog/bugs/README.md)）
@@ -25,7 +25,7 @@
 | [BUG-038](../../_backlog/_archive/fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md) | 已修 | 分支当叶子规则 + 真跑观察（首轮嵌套→模型自纠为父层扇出）；修正 skill 的“必 null”过度断言 | `checks/smoke/workflow-contract-smoke.mjs` 第 6 条；上游分支结果语义 |
 | [BUG-039](../../_backlog/_archive/fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md) | 已修 | **配置真修**：vp-eng preset 的 `tool-workflow.maxResultChars` 50k→200k，spill 设计生效（头尾预览 + 全文落盘 + 可读路径）；删掉“spill 是截断副本”旧句 | 钉子 `tests/harness/contract/workflow-result-budget.spec.ts`；探针见下；上游默认值语义 |
 | [BUG-040](../../_backlog/bugs/BUG-040-workflow-schema-text-answer-discarded.md) | 修复已落地（**留活**） | 技能/验收规则 + 机制钉子（completed 纯文本 + schema → null 且 agentEnd failed） | `workflow-contract-smoke` 第 5 条；判定第一条要引擎诊断，本仓做不到（卡内已写上游真 diff） |
-| [BUG-041](../../_backlog/bugs/BUG-041-host-restart-orphans-inflight-child.md) | 修复已落地（**留活**） | 查询面（`list_subagents` 读 durable catalog）+ 部署前置（budget-and-ops 行） | `delegation-control.spec.ts`；**缺口**：只报 running/inactive，不报 `turn/end interrupted` |
+| [BUG-041](../../_backlog/_archive/fixed_bugs/BUG-041-host-restart-orphans-inflight-child.md) | 修复已落地（**留活**） | 查询面（`list_subagents` 读 durable catalog）+ 部署前置（budget-and-ops 行） | `delegation-control.spec.ts`；**缺口**：只报 running/inactive，不报 `turn/end interrupted` |
 
 **引擎语义缺口台账（三类；锚点即“上游变了会红”的地方）**：
 
@@ -33,7 +33,7 @@
 |---|---|---|---|---|
 | `[CT-IN]` 输入合同 | schema 只吃子集：enum/const 需单值 type、无 type 数组、oneOf 不与 type 并列、根 object；违反 = 整轮 fatal 零 agent | `eng-teaming`「schema 只吃子集」 | `json-schema-subset.spec.ts` | 上游：tool-workflow description 补一句 |
 | `[CT-OUT]` 输出通道 | 默认 50k 截断且先截断再落 spill；schema 分支缺 structured → null 无诊断；非 schema 分支返回 child 最终文本原样拼接 | 「返回聚合/异常」「分支默认是叶子」 | `workflow-result-budget.spec.ts` + smoke 5/6 条 | 上游：截断前交全文给 spill、分支保留 final text/diagnostic |
-| `[CT-LIFE]` 控制与生命周期 | 根 = Lead，团队版控制名 shadow 全局版；重启后 child 记 interrupted，父无终态通知 | 「控制面」「长跑」 | `delegation-control.spec.ts` + budget-and-ops 行 | 上游修 shadow/对账后：**删两个控制工具**、删控制面段 |
+| `[CT-LIFE]` 控制与生命周期 | 根 = Lead，团队版控制名 shadow 全局版；重启后 child 记 interrupted，父无终态通知（durable 可查） | 「控制面」「长跑」 | `delegation-control.spec.ts`（含 `lastTurnEnd`）+ budget-and-ops 行 | 上游修 shadow/对账后：**删两个控制工具**、删控制面段 |
 
 **上游批（真 diff/真描述，不是“建议补一句”）**：
 
@@ -61,8 +61,9 @@
 
 ## 后果与边界
 
-- **归档 4 / 留活 2**：040 等上游诊断；041 等终态读取（`sessionQuery` 根 provider 是 `openAt: never`，
-  或在 resume 时对账）。两张卡的“修好动作”都写在卡内，上游/口径一到即可翻面。
+- **归档 5 / 留活 1**：040 等上游诊断；它的“修好动作”写在卡内（真 diff），上游一到即可翻面。
+  041 的终态读取在复盘中确认可行：`openAt: never` 只禁搜索，`readSession` 仍读 durable 日志，
+  因此判定第一条（至少 interrupted）由 `lastTurnEnd` 满足。
 - **双控制面并存**：根门用 `list_subagents` / `send_to_subagent`，child 用全局 `send_message`；
   上游修 shadow 后必须按退役条件删，避免长期两套名字。
 - **200k 是产品选择**：>200k 仍硬截断且 spill 是副本；端到端“spill 完整”目前靠一次性探针，**未进 CI**
@@ -80,6 +81,9 @@
 - `pnpm vitest run tests/presets` → 54 passed；`node checks/smoke/preset-smoke.mjs` → **ALL PASS**
   （6 角色 + 3 子人格可挂载；含改过 config 的 vp-eng）。
 - `node --import tsx/esm checks/smoke/workflow-contract-smoke.mjs` → **6/6 PASS**。
+- **BUG-041 durable 读实测**（standalone，RS1 的真实重启会话）：`sessionQuery.readSession('48eb730a-…')`
+  → 23 events，最后 `turn/end {"reason":{"kind":"interrupted"}}`（`openAt: never` 下可用）。
+  守卫红配方：关掉 `list_subagents` 的终态增强 → 该用例 1 failed / 8 passed；还原 → 9 passed。
 - **BUG-039 真模型探针**（`runtime/tmp/explore/fix1/S039/`，会话 `session-88afce0d-…`）：4 分支 × 500 行；
   工具结果 49,931 字符 + `(Omitted 21993 bytes … stored at: …)`、**无 `[truncated:`**；spill 文件
   **71,677 字符**，含 `m01-line-1` 与 `m04-line-500`、无截断标记；模型 read/grep 核对。对照原症状
