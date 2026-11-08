@@ -25,6 +25,7 @@
   - **F6**（方向 R7 溢出压力）：workflow >50k 返回值是**硬截断**，spill notice 说 “Full formatted result”，
     但 spill 文件同样是截断副本（50,102 字符，含同一 `[truncated: 35806 more characters]` 标记），
     缺段在模型可读面不可恢复。已修 `eng-teaming`“返回聚合/异常”+ 研究材料 §1.1 更正；
+    R9 验证绿色替代（6 分支各写 400 行文件、父只拿 path/行数，~0.6k 字符无截断、wc/awk/md5 全过）；
     机制/上游留 [BUG-039](../../_backlog/bugs/BUG-039-workflow-result-truncation-lossy-spill.md)（P1）。
 - 不把“小任务自己做”（R1/T1）、“natural 选另一条合法通道”记成 bug；不宣称未命中的面没有 bug。
 - 四张缺陷卡（036/037/038 P2、039 P1）都是 `调查中`：当场修的是**本仓提示面/合同**，vendor 机制
@@ -74,6 +75,8 @@
 - **C 入口 depth 链**（CD2）：`session-a146504e-a210-401d-8201-c3099066e2ab` → child
   `6ac3bddb-…`；W1 的 `subagent` 被拒 `subagent depth 3 exceeds maxDepth 2`，声明面
   `current 2 / max 2 / remaining 0`；W1 未读文件、未重试；child 用 `bash sleep 90/75`（F8 观察）。
+- **溢出绿替代**（R9）：`session-b93091e6-2829-4436-a55c-c711e6c18c36` workflow 返回 ~0.6k 字符、
+  6 文件各 400 行；父用 `wc -l`/`awk`/`md5` 独立核对全过。
 - **机制**：`node --import tsx/esm runtime/tmp/explore/keyless-retry.ts` 4/4 PASS（retry-once /
   AGENT_START fatal 穿 parallel / AGENT_RESULT fatal / 两次失败停在 2 starts）。
 - 证据目录：`runtime/tmp/explore/`（gitignored）；研究材料只留脱敏摘要与 session id。

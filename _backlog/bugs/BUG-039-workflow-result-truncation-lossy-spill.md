@@ -62,6 +62,9 @@ rendered.slice(0, maxChars) + "\n… [truncated: N more characters]"
 - 已在 `eng-teaming` 的“返回聚合/异常”条目加一句：50k 是硬截断，spill 文件也是截断副本，别指望
   读 spill 找回；大结果让分支落文件或只回聚合/异常。
 - 研究材料 §1.1 的 “canonical 值仍完整” 已就地更正为“引擎内存完整、模型可读面截断”。
+- 绿色替代已验证（R9）：6 分支各自把 400 行写到 `.dsh-company/deliverables/spill2/branch-m0X.txt`，
+  父脚本只返回 `{name,path,lines}`（约 0.6k 字符，未触发截断）；父代理再用 `wc -l`/`awk`/`md5` 独立
+  核对 6×400 行，全部通过。
 - vendor 未改；可选上游修法：workflow 工具在截断前把完整渲染值交给 spill store，或返回一个可读的
   完整结果 locator（而不是截断副本）。
 

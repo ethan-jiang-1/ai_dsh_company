@@ -192,7 +192,7 @@ opened: 2026-11-08
 | W 分支内再委派：返回值混入回执、跨轮拼接；schema 分支会 null | R5 W→S 嵌套 | 分支返回 `started subagent … <值>`；两轮才拿到值 | “分支默认叶子”规则；机制 → [BUG-038](../bugs/BUG-038-workflow-branch-nested-delegation-result.md) |
 | 命名 child 同时 `send_message` + 完成通知，父收两份 | C1 CEO→`vp_eng` | 父会话收到 “Agent … sent a message” + “finished … closing message” | 已修 `eng-workflow` 第 5 步；绿 C2 |
 | CEO 用 `bash sleep 25/30` 轮询 child，不结束本轮 | C1 | turn 142s；child 完成后才回完整答案 | 已修 CEO skill/persona；绿 C2 |
-| workflow >50k 结果硬截断，spill 文件也是截断副本 | R7：**原样返回全量 rows 的溢出压力** | 完整 ~85.9k 字符 → 实际收到 49,929；spill 文件 50,102 且含同一截断标记；父只能落 rows 0–2 完整、row 3 半段、row 4/5 null | eng-teaming 已加“别指望 spill”；机制/上游 → [BUG-039](../bugs/BUG-039-workflow-result-truncation-lossy-spill.md)（P1） |
+| workflow >50k 结果硬截断，spill 文件也是截断副本 | R7：**原样返回全量 rows 的溢出压力** | 完整 ~85.9k 字符 → 实际收到 49,929；spill 文件 50,102 且含同一截断标记；父只能落 rows 0–2 完整、row 3 半段、row 4/5 null | eng-teaming 已加“别指望 spill”；R9 验证“分支落文件 + 父拿元数据”绿替代；机制/上游 → [BUG-039](../bugs/BUG-039-workflow-result-truncation-lossy-spill.md)（P1） |
 | 根门仍会用 `wait_agent` 等 subagent child（团队版） | M2 natural 多轮混合 | `wait_agent` 报 `no-active-peer` 一次；多轮结果未丢（W 4 agents + 2 S，三轮原文/分歧保留） | 已把 `wait_agent`/`interrupt_agent` 补进 eng-teaming 控制面 |
 | C 入口 depth 链：命名 child 起 W1 后再起 W2 被拒 | CD2 CEO→`vp_eng` | W1 的 `subagent` 被拒 `depth 3 exceeds maxDepth 2`；声明面 `current 2 / max 2 / remaining 0`；W1 未读文件/未重试；child 用 `bash sleep 90/75`（观察） | depth 边界 PASS；sleep 记观察 |
 
@@ -200,7 +200,8 @@ opened: 2026-11-08
 6 agents cancelled、无残留 sleep），但模型看不到 run stopReason；N1 负例如实报缺并指出正确路线；
 keyless fake-provider 4/4 证明 retry-once 可行、`AGENT_START`/`AGENT_RESULT` 为 fatal、两次失败停在
 2 starts；R8 的 `session/cancel` 让前台 workflow 的 turn/run/6 agents/child 全部收敛到 cancelled/aborted，
-无残留 sleep。
+无残留 sleep；R9 用“6 分支各写 400 行文件、父只拿 path/行数”把返回值压到 ~0.6k 字符，父用 wc/awk/md5
+独立核对全过——这是 >50k 结果的可复现替代形状。
 
 ## 关闭条件
 
