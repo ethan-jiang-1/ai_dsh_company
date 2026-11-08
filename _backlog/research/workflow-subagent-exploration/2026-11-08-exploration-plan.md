@@ -519,3 +519,17 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 - teammate 的 depth 2/3 与 `send_to_subagent` 的交叉（C3 只到一层）；
 - 其他职能 root 是否看见/误用 `list_subagents` / `send_to_subagent`；
 - workspace-write（本机阻塞，不声称）。
+
+## 18. 修复后定向回归（2026-11-09）
+
+> 范围 = 按“只验修复、不扩面”的 20–30 分钟定向回归：042 的 `lastTurnEnd` 真实装配、044 的
+> `workflow_runs`、043 的 `role/address`。不做新 charter。
+
+| ID | 回归目标 | 结果 | 判定 |
+|---|---|---|---|
+| C2f | BUG-042：重启后 `list_subagents` 的终态 + cold resume | 首次查询：`lastTurnEnd: "interrupted"`、`lastTurnEndDetail: "inferred-open-turn"`；`send_to_subagent` 后 child turn2 `completed`，读到 `1.4.2`，父独立复核；模型明确“中断+重跑，不是一次跑完” | **PASS**（真实装配，非 fake service） |
+| C7b | BUG-044：重启后 job 视图 | `job_list` 空、`job_output` unknown；`workflow_runs` 报该 run `lost` + 4 个 child；child 日志的 `turn/start` 后无 `tool/call`（未执行）；模型明确“结果不可恢复，可续 child 或重跑” | **PASS**（`lost` 明确） |
+| C13c | BUG-043：teammate 行的 `role/address` | `list_subagents` 单行：`role: "teammate"`、`address: "eng-7"`、`lastTurnEnd: "completed"`；模型正确区分 team `send_message`（按名）vs `send_to_subagent`（按 id） | **PASS** |
+
+观测：vp-eng 工具面从 79 → **80**（新增 `workflow_runs`）；C7b 里模型仍会 `session_event_search` 超时后退回
+直接读 child JSONL（文件层取证），这是已知工具面缺口，不是新 bug。定向回归未发现新缺陷。

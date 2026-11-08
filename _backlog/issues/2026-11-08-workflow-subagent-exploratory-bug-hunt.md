@@ -228,6 +228,13 @@ child 成功，F18 解除（新工具对其他职能也可用，V2 只是方法�
 用 bash sleep（F22 观察）。详见[研究材料 §17](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
 未覆盖：compaction × skill、带 fixture 的 cold resume、one-shot/后台重启、teammate depth 交叉、其他职能新工具。
 
+## 修复后定向回归（2026-11-09）
+
+042/043/044 修复归档后做了 20–30 分钟定向回归（不扩面）：C2f（重启后 `lastTurnEnd: interrupted` +
+`send_to_subagent` 续跑读到 1.4.2）、C7b（`workflow_runs` 报 `lost` + 4 child，job 仍 unknown）、
+C13c（`role: teammate` / `address: eng-7` / `lastTurnEnd: completed`，寻址选择正确）。三条 **PASS**，
+未发现新缺陷；详见[研究材料 §18](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
+
 ## 修复交接（2026-11-08）
 
 用户指示“先停一下，让另外一个 Agent 去修复发现的所有的 bug”。6 张缺陷卡（BUG-036–041）已翻

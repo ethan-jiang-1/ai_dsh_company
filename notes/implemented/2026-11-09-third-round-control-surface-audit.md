@@ -44,7 +44,9 @@
 
 - 双控制面（`list_agents`/`send_message` vs `list_subagents`/`send_to_subagent`）在 C13b 里被 teammate
   自然选对：先看到 child 不在 roster，再用 `send_to_subagent`；C10 里 CEO 也用它复用 named child。
-- 三张新卡都是 `调查中`（042 由修复 Agent 接；043/044 待用户/修复 Agent 定）。
+- 三张新卡已由修复 Agent 收口（042/043/044 归档）；本轮随后做了 20–30 分钟定向回归：C2f
+  （`lastTurnEnd: interrupted` + cold resume 读到 1.4.2）、C7b（`workflow_runs` 报 `lost` + 4 child）、
+  C13c（`role: teammate` / `address: eng-7`），三条 PASS，未发现新缺陷。
 - 未覆盖：one-shot child 的 resume 拒绝（本 profile 的 workflow/命名 child 实测都是 continuable）；
   更深 compaction（`/compact` 摘要保留了 eng-teaming，未测“摘要丢规则”的边界）；teammate 对新控制面的
   正式选择矩阵（只做了 C13b 一条自然样本）；workspace-write（Seatbelt 阻塞）。
