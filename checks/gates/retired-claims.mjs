@@ -15,8 +15,9 @@ import { join } from 'node:path'
 const CLAIMS = [
   { pattern: /company`?\s*profile\s*已退役/, claim: 'company profile 已退役',
     truth: '`company` 是产品入口（v3/D52）；GUI 安装落当前 profile，CLI 从 web 模板建 company profile', since: '2026-11-01 v3' },
-  { pattern: /四条协作通道/, claim: '四条协作通道',
-    truth: '通道 D（workflow 脚本）已于 0.8.0 退役；现役三条（命名委托 / Agent Teams / SDK 子进程）', since: '2026-11-01 0.8.0' },
+  // 2026-11-08：移除「四条协作通道」条目——workflow 以 vp-eng 同身份扇出回归（architecture.md §3），
+  //   四条通道重新成立；旧条目会把真话判红。负例留证：docs/tmp-retired-claim-check.md 写「四条协作通道」
+  //   在旧条目下红（真话被误判）；删条目后同文件绿；临时文件同轮删除。
   { pattern: /CompanyView\.tsx[^\n]{0,20}未注册/, claim: 'CompanyView.tsx 未注册、仅测试引用',
     truth: 'CompanyView.tsx 已于 2026-11-02 删除（主视图 = Chat + 培养）', since: '2026-11-02' },
 ]

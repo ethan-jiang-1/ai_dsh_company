@@ -88,13 +88,16 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
    `delegation-smoke --delegate` 的 [3] 守卫钉住两件事：child 日志首帧 `agentPreset = vp-eng`；
    child 工具目录**没有** Team 工具（0.2.1 起组合按 preset 解析，旧的"one-shot child 误见 Team
    工具"限制已不在本仓复现；若回归，先看 vendor `tool-agent-team` README 的 Known Limitations）。
-2. **要自定义组合/多角色编排** ⇒ 四个职能角色的 `subagent_fork`（可续跑的自身分叉）；workflow 第三通道
-   已于 0.8.0 退役（pack 三源零引用），CEO 的编排面 = team + 命名委托；命名委托仍是**单职能快捷出稿**的主路。
+2. **要自定义组合/多角色编排** ⇒ 四个职能角色的 `subagent_fork`（可续跑的自身分叉）+ 命名委托；
+   `workflow` 是 vp-eng 的**同身份并行扇出**通道（`workflow-ptc` + `tool-workflow`，不能带 `agentPreset`，
+   不能替代 SA/SQA 的独立结论）；CEO 的编排面仍是 team + 命名委托；命名委托仍是**单职能快捷出稿**的主路。
 3. **并行快捷派活**：多个工具调用可在同一轮并行发起；每个都是独立 activation，完成通知分别回来。
    要共享任务板/互审仍走 team。
 4. **控制面现状**：四个职能 preset 声明 `tool-subagent-control` + `.../list-agents`（R4；上游成对
    形状——vendor 的 maybeInstall 只对 team 成员装团队版控制名，职能根会话不是成员）；CEO preset
-   不放全局控制行（team-scoped 死行，有反向守卫）。
+   不放全局控制行（team-scoped 死行，有反向守卫）。职能 preset 自己的 `subagent` / `subagent_fork`
+   行 `maxDepth: 2`——CEO 把 VP 当命名 child 起时（depth 1），generic worker 落 depth 2；再往下
+   depth 3 > 2 被拒（2026-11-08 E2E 实证；此前默认 1 会让被委派的 VP 生不出 worker）。
 
 ## 5. UI：委派工具卡
 

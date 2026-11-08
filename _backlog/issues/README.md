@@ -4,10 +4,9 @@
 
 ## 活跃清单
 
-当前活跃 1 张。
+当前无活跃问题。
 
-- [2026-11-08 VP-Eng 接入 workflow 并行扇出（单角色试点）](2026-11-08-vpeng-workflow-channel.md)
-  —— `等人拍板`；毕业 = 做，拟去向 = `note`；待人批准后翻 `待落地`，先跑 Step 0（沙箱 + 挂载）。
+（2026-11-08 VP-Eng workflow 通道卡已结归档：去向 = [Note](../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)。）
 
 （2026-11-08 README/手册使用者面向卡已结归档：去向 = [Note](../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)。）
 

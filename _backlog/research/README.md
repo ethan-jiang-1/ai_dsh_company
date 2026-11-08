@@ -58,10 +58,9 @@ opened: YYYY-MM-DD
 
 ## 索引
 
-- [VP-Eng 复杂任务的委派拓扑：team / 命名专家 / subagent / workflow 怎么组合](vp-eng-delegation-topology/README.md)
-  — 服务 VP-Eng 的 `eng-teaming`、delegation 合同与 SA/SQA 能力组织；2026-11-08 开，调研中（只立题，未结论）。
 - [SA/SQA 产物评审：两个新子人格的产出到底行不行](sa-sqa-product-review/README.md) — 服务 SA/SQA 落地 Note 与
   BUG-034/035；2026-11-06 开，调研中。
+（2026-11-08 VP-Eng 委派拓扑题随 workflow 通道卡归档，迁入[研究归档](../_archive/research/README.md)。）
 （2026-11-07 需求识别/编号题与 VP-Eng 组队题随程序伞卡归档，迁入[研究归档](../_archive/research/README.md)。）
 
 （2026-11-06 的角色新增面题随 SA/SQA 卡迁入[研究归档](../_archive/research/README.md)。）

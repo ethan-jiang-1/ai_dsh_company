@@ -93,16 +93,17 @@ teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱�
 
 行清单的唯一家 = [cordis.patch.yml](../../packages/company-pack/cordis.patch.yml)（bundle 层）与
 [presets/](../../packages/company-pack/presets/) 各角色的 `agent.cordis.yml`（per-preset 层）；这里不复刻枚举（D28）。
-workflow 行已于 0.8.0 退役（见 [delegation.md §4](../delegation.md)）。
+workflow 行：CEO 不挂；vp-eng 的 `delegation` 组挂 `workflow-ptc` + `tool-workflow`（同身份并行扇出，
+2026-11-08；见 [delegation.md §4](../delegation.md)）。
 
 ---
 
-## 3. 协作通道盘点：DSH 已经给了四条，选着用（通道 D 已退役）
+## 3. 协作通道盘点：DSH 已经给了四条，选着用（通道 D 只在 vp-eng）
 
 > 术语约定：本节按**机制**分四条通道（A–D）；[roles-isolation.md](./roles-isolation.md) §3
 > 按**用法**分四种编排（M1–M4）。映射：M1 人中继＝多会话直用机制；M2 隔离委托＝通道 A 的
-> 自定义 provider 强化版；M3 SDK 编排＝通道 C；M4 团队＝通道 B。通道 D（workflow）已于 0.8.0
-> 退役，编号保留作历史，不再作为本仓通道。
+> 自定义 provider 强化版；M3 SDK 编排＝通道 C；M4 团队＝通道 B。通道 D（workflow）：0.8.0 从 CEO
+> 退役；2026-11-08 起只在 vp-eng 作为同身份并行扇出工具，不是组织通道。
 
 ### 通道 A · 命名委托工具（stable，最贴近"汇报线"）
 
@@ -165,11 +166,11 @@ profile（`profile` + `patches` 配置）、自己的 composition/skills/model r
   child 自己的 session root）；不支持 persona/toolFilter（由 child profile 自己决定）。
 - 适合"出一份稿子"式的任务式协作，不适合持续对话。
 
-### 通道 D · Workflow 脚本（已退役，0.8.0）
+### 通道 D · Workflow 脚本（vp-eng 专用，2026-11-08）
 
-`dsh-tool-workflow` + worker-thread 引擎在 0.8.0 从本包移除：imports / preset 行 / patch 三源零引用，
-peer 同版删除。现行编排面 = team + 命名委托；这里只留否决记忆——脚本化流水线是一次 run，
-不常驻组织，也不该再按旧表加行。
+`dsh-tool-workflow` + `workflow-ptc` 现在只在 vp-eng 的 `delegation` 组：脚本用 `parallel`/`pipeline`
+扇出同身份子代理，父只收最终 JSON；子代理无 `agentPreset`、fresh 上下文，不能替代 SA/SQA。它是一次 run，
+不常驻组织；团队会话里的长 run 用后台 job，结果大时走聚合/异常（50k 上限 + spill）。
 
 ---
 

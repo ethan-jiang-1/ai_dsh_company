@@ -62,7 +62,7 @@
 - **工作流（1 号）**：`eng-workflow`（接活→备料→深挖→出稿→回执）；打法 skill =
   `tech-feasibility-review`（选项枚举 ≥3 → 逐项可行性·成本·风险 → 结论先行）。
 - **PRD 主笔**：接 CMO 的 MRD+StRS 写产品层 PRD（`drafts/prd.md`：REQ/AC/slice，`source`→MR、`traces`→StRS），用 `prd-playbook` + 共享 `product-definition`；`/prd check`（结构）+ `/req check`（编号/追溯）校验。
-- **组队（2 号工作流）**：`eng-teaming` 四档（自己做 / 一次性 worker / 命名专家 / 持久小队）；vp-eng 根门 = Team Lead，可带研发小队；CMO/SA/SQA 走命名委托（`vp_cmo` / `system_architect` / `system_qa`，depth 2）。
+- **组队（2 号工作流）**：`eng-teaming` 五档（自己做 / 一次性 worker / 并行扇出（workflow）/ 命名专家 / 持久小队）；vp-eng 根门 = Team Lead，可带研发小队；CMO/SA/SQA 走命名委托（`vp_cmo` / `system_architect` / `system_qa`，depth 2）。
 - **KB**：`kb/vp-eng/CHARTER.md`（研发条线 16 人、SRE 2 / 无 DBA、Node 22 + SQLite、AI 试点
   API 每案 $200/月硬顶；历史评审三问）+ `journal/`。
 - **验证**：Web 会话选 `vp-eng` → 身份探针 + 产出探针（PRD 出稿：REQ/AC/slice；评审意见；不得越权替销售/运营下结论）。
@@ -123,10 +123,10 @@
 
 | 角色 | 工具行 | 说明 |
 |---|---|---|
-| CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` / **`tool-web`** + `delegation` 组（`subagent_research` / `vp_eng` / `vp_sales` 三行） | 读 KB、写交付物、加载 skill、澄清提问、声明交付、**上网（搜/取）**；**汇报线两条路**（R3）：命名委托 = activation 快捷出稿（终稿走完成通知），协作走 team；编排面 = team + 命名委托（workflow 已退役，见下行）；语义见 [delegation.md](./delegation.md) |
-| VP-Eng / VP-Sales / COO / CFO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-present` / **`tool-ask-user`** / **`tool-web`** + `delegation` 组 | 独立会话可直接问人；动议内仍升级 CEO——手册「问人两条路」两模式约束（承诺权与单一对外口径不动，R3/D18 维持）；`delegation` 供深挖调研 / 盘点 / 测算；VPS 引客户事实时可用 web 核价/竞品 |
+| CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` / **`tool-web`** + `delegation` 组（`subagent_research` / `vp_eng` / `vp_sales` 三行） | 读 KB、写交付物、加载 skill、澄清提问、声明交付、**上网（搜/取）**；**汇报线两条路**（R3）：命名委托 = activation 快捷出稿（终稿走完成通知），协作走 team；编排面 = team + 命名委托；workflow 归 vp-eng（同身份扇出，见下行）；语义见 [delegation.md](./delegation.md) |
+| VP-Eng / VP-Sales / COO / CFO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-present` / **`tool-ask-user`** / **`tool-web`** + `delegation` 组 | 独立会话可直接问人；动议内仍升级 CEO——手册「问人两条路」两模式约束（承诺权与单一对外口径不动，R3/D18 维持）；`delegation` 供深挖调研 / 盘点 / 测算；VPS 引客户事实时可用 web 核价/竞品；vp-eng 另有 `workflow-ptc` + `tool-workflow`（同身份并行扇出）；五个职能的 `subagent` / `subagent_fork` 行 `maxDepth: 2`（被 CEO 委派时也能生 worker；worker 到 depth 2 不能再往下） |
 | 全体 | **`tool-jobs`**（后台任务）/ **`tool-goal` + `/goal`**（跨轮目标）/ **`compaction` 组**（compaction-basic + `/compact` + tool-result-pruner：长会话历史压缩）/ delegation 组内 **`subagent_fork`**（可续跑自身分叉；**四个职能角色有，CEO 不挂**——CEO 会话的 team 工具 shadow 续驶控制名，挂了是死行只会骗模型）/ **`planning` 组**（`plan-mode`：先探索后落笔 / `exit_plan_mode` 唯一收尾）/ `preset-clock` 组（`time-context` 日期通道钉 `Asia/Shanghai` + `tool-schedule` 四件） | 行形状的范本 = `vendor/dsh/packages/bundle/web-app/presets/standard.patch.yml`；fork 编排位 = [delegation.md](./delegation.md) §4；session-query 授权域 = 本工作区（跨角色可查，合稿引用校对受益）；「上次动议定了什么」先查会话全文再问人；clock 宿主 `schedule` 服务由 web-app 组合提供；五角色另有**条件启用**的 browser 组（npm 发布版 DSH 不含 browser 两包，缺包时整组禁用、角色照常可用；装包后自动开，`DSH_COMPANY_BROWSER` 可强制）；**会话检索工具不在此列**——由 bundle 的 `company-session-search` 隔离组全局提供（见下一行） |
-| CEO（编排面） | **无 workflow 行**（0.8.0 退役 `workflow-ptc` + `tool-workflow`；pack 的 imports / preset 行 / patch 三源零引用） | 编排面 = team + 命名委托；workflow 第三通道已退役（peer 也已从 0.8.0 删除），别按旧文档加行 |
+| CEO（编排面） | **无 workflow 行**；vp-eng 的 `delegation` 组有 `workflow-ptc` + `tool-workflow`（同身份扇出，不能带人格） | 编排面 = team + 命名委托；vp-eng 用 workflow 做并行取证/覆盖审计，不替代 SA/SQA |
 | 全局（pack bundle） | `agent-preset-registry` roster 替换 + 全局行 insert（`tool-present` / `agent-team` / `tool-agent-team` / `ui-agent-team` / `company-client` / `company-session-search` / `time-context` 等——行清单唯一源 = [cordis.patch.yml](../packages/company-pack/cordis.patch.yml)） | 只放全局行；工具面主体仍随 preset（**例外 = 会话检索隔离组**：工具必须与 isolated provider 同组，否则工具看的是未打开的 host provider）；`company-session-search` 用 insert + isolate，不替换 base 的 `session-query-sqlite`（改值替换会让默认的应用内安装红） |
 
 ⚠ **preset 是自包含组合**：DSH 无 patch 继承，工具行必须写在 preset 里（会话检索是唯一例外：工具必须与 isolated provider 同组）——R1 首跑就是漏了这一步，

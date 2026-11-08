@@ -14,7 +14,7 @@
 
 | 文档 | 层 | 回答什么 |
 |---|---|---|
-| [design/architecture.md](./design/architecture.md) | 设计 | repo 形态与组合层（Option A + 单 pack）；角色=preset 纠偏；插件计数（**1 个包**）；协作通道（现役三条，通道 D 已退役）；KB 三载体 |
+| [design/architecture.md](./design/architecture.md) | 设计 | repo 形态与组合层（Option A + 单 pack）；角色=preset 纠偏；插件计数（**1 个包**）；协作通道（四条；通道 D 只在 vp-eng）；KB 三载体 |
 | [design/roles-isolation.md](./design/roles-isolation.md) | 设计 | 每角色独立六面的机制安排；composition 继承分水岭与 `mount()` 裂缝；M1–M4 编排选型；两个诚实的缺口（§4） |
 | [design/ui-demo.md](./design/ui-demo.md) | 设计 | Web UI 演示层：现成团队 UI（零代码）、公司皮肤（slots/Remote）、demo 分镜 |
 | [design/role-content-plan.md](./design/role-content-plan.md) | 设计 | 角色内容的设计原则与落点（persona/skills/KB 分工依据；现时语义唯一家 = [presets.md](./presets.md)） |
