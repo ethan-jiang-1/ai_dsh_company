@@ -14,7 +14,7 @@
   - **F2**（方向 R3 委派深度链）：根会话 = Lead，团队版 `send_message`/`list_agents` shadow 全局版；
     契约 §4.4 与五个 preset 注释误写“职能根会话不是成员”。已修 docs/注释/`eng-teaming` 控制面规则；
     M2 natural 复跑仍见 `wait_agent`（`no-active-peer`），已把它补进控制面列表；机制留
-    [BUG-037](../../_backlog/bugs/BUG-037-root-team-tool-shadowing.md)。
+    [BUG-037](../../_backlog/_archive/fixed_bugs/BUG-037-root-team-tool-shadowing.md)。
   - **F3**（方向 R5 W 分支内再委派）：分支返回值把回执和结论拼在一起（`started subagent … <值>`），
     带 schema 的分支会 null。已加“分支默认是叶子”规则；机制留
     [BUG-038](../../_backlog/bugs/BUG-038-workflow-branch-nested-delegation-result.md)。
@@ -26,7 +26,7 @@
     但 spill 文件同样是截断副本（50,102 字符，含同一 `[truncated: 35806 more characters]` 标记），
     缺段在模型可读面不可恢复。已修 `eng-teaming`“返回聚合/异常”+ 研究材料 §1.1 更正；
     R9 验证绿色替代（6 分支各写 400 行文件、父只拿 path/行数，~0.6k 字符无截断、wc/awk/md5 全过）；
-    机制/上游留 [BUG-039](../../_backlog/bugs/BUG-039-workflow-result-truncation-lossy-spill.md)（P1）。
+    机制/上游留 [BUG-039](../../_backlog/_archive/fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md)（P1）。
   - **F9**（方向 R10 后台 W 自然完成）：带 schema 的分支只回文本、`turn/end completed`，父却拿到
     `null`（文本答案被丢弃、无诊断），job/run 仍 `completed`。已修 `eng-teaming`（schema 分支明确要
     `structured_output`；验收看 null/count）；机制/上游留

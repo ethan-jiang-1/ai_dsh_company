@@ -33,6 +33,7 @@
 | **页面某面板空白 / 页签点不开 / 按钮没反应** | 先看是「环境未就绪」还是「渲染坏」 | 一条命令复现：`node checks/smoke/ui-scene-smoke.mjs`（自起实例 → 全页签 + 浏览器错误环 → exit 2 = 未登录，exit 1 = 真断言失败）；加 `--steps <file>` 可复现点击/输入；证据落 `runtime/harness-home/diagnosis/`（默认 7 天后被 `prune-runtime` 清；要留档先复制） |
 | **用户报「刚才页面报错了」** | 浏览器错误不进会话事件，但进页面内错误环，并由 client 追加到宿主诊断日志（`$DSH_HOME/logs/company-client-errors.log`；旧 `cultivation/client-errors.log` 只读留一版） | `ui-scene-smoke` 或对已起实例跑 `cdp-probe <url> --evidence`，看 verdict 的 `clientErrors`；**整链回归 = `node checks/smoke/client-error-chain-smoke.mjs`**（隔离单 writer；dev home 若 writer-held，命令会被拒）；agent 也可直接 read `$DSH_HOME/logs/company-client-errors.log`（token 已脱敏；256 KiB 轮转 `.1`） |
 | **会话卡住 / 以为崩了** | 可能是在等用户回答或审批，不是进程死 | `pnpm diagnose --session <slug>/<id>`：`NONZERO` 列 bash 非零退出；中断轮会标「等人回答/等审批/真崩溃」；child 目录也可点名 |
+| **升级/重启时还有 subagent 在跑** | 宿主进程退出把 in-flight child 记成 `interrupted`；父会话收不到终态，也没有补发的通知（父侧只剩 durable catalog） | **重启前先收口**（等 child 终态或 cancel）；重启后父会话用 `list_subagents` 查（`inactive` 可能就是被中断），要结果就 `send_to_subagent` 冷恢复；别在父会话里干等通知 |
 | 改了手册/CHARTER，进行中的成员会话「看不到」 | 指令注入是**触达驱动**（无 watcher）：外部编辑只在下次成功 read/write/edit 或 resume 对齐时可见（2026-09-28 借 FAQ 05） | 让该成员**碰一次工作区文件**（任意 read/edit）或重开会话；不是挂载坏了 |
 | 服务端启动/挂载报错随终端消失 | `pnpm company` 现已自动 tee 到 `runtime/web-logs/company-<ts>.log`（token 脱敏；目录 gitignored）；`pnpm dsh web` 仍只有终端 | 起窗后先看 `company(dev): 启动日志 → …` 那行；vendor 直起时手动 `2>&1 \| tee …`（原文含 token，绝不提交） |
 | 浏览器里找不到某场会话 | 会话列表按**工作目录**过滤，且必须用带 token 的 URL | 先选/加 `company-workspace`；直接开端口会卡鉴权（启动横幅里的 `/?token=` 一定要带上） |

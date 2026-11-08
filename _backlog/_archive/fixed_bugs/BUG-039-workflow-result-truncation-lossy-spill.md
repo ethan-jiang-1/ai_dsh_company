@@ -1,12 +1,12 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P1
 opened: 2026-11-08
 ---
 
 # BUG-039：workflow 大结果被 50k 硬截断，spill 文件也是截断副本——缺的段找不回来
 
-> 严重级别：P1（重要）｜发现：2026-11-08｜状态：修复就绪
+> 严重级别：P1（重要）｜发现：2026-11-08｜状态：已修（2026-11-08）｜审查：agent — 修法选“配置真修”而非教模型绕：tool-workflow 的 maxResultChars 是配置项（默认 50000），本仓 vp-eng preset 抬到 200k；真模型探针证明 71,677 字符的全量结果落 spill 且可读，工具结果无截断标记。判定第一条满足
 
 ## 症状
 
@@ -59,14 +59,23 @@ rendered.slice(0, maxChars) + "\n… [truncated: N more characters]"
 
 ## 修复关联
 
-- 已在 `eng-teaming` 的“返回聚合/异常”条目加一句：50k 是硬截断，spill 文件也是截断副本，别指望
-  读 spill 找回；大结果让分支落文件或只回聚合/异常。
+- 探索轮的 `eng-teaming` 那句“50k 硬截断、spill 也是截断副本”**已被修复轮取代**（不要再写回去）：
+  现行规则 = 上限 200k；超过内联预算（约 12.5k tokens）落 spill（头尾预览 + 全文路径）；>200k 才硬截断。
+- **真修（2026-11-08）**：`tool-workflow` 的 `maxResultChars` 是配置项（`packages/company-pack/presets/vp-eng/agent.cordis.yml`
+  的 workflow 行，200000）。这让引擎的 spill 设计生效：工具交全文 → spill-policy 保留头尾 + 把**全文**写盘 +
+  给可读路径。默认 50000 时是“先截断再落盘”，所以旧 spill 文件才是截断副本。
 - 研究材料 §1.1 的 “canonical 值仍完整” 已就地更正为“引擎内存完整、模型可读面截断”。
 - 绿色替代已验证（R9）：6 分支各自把 400 行写到 `.dsh-company/deliverables/spill2/branch-m0X.txt`，
   父脚本只返回 `{name,path,lines}`（约 0.6k 字符，未触发截断）；父代理再用 `wc -l`/`awk`/`md5` 独立
   核对 6×400 行，全部通过。
-- vendor 未改；可选上游修法：workflow 工具在截断前把完整渲染值交给 spill store，或返回一个可读的
-  完整结果 locator（而不是截断副本）。
+- **证据（修复轮真模型探针）**：`runtime/tmp/explore/fix1/S039/`；会话 `session-88afce0d-…`。
+  4 分支 × 500 行、父原样返回全量 rows：工具结果 49,931 字符 + `(Omitted 21993 bytes … stored at: …)`、
+  **无 `[truncated:`**；spill 文件 71,677 字符，含 `m01-line-1` 与 `m04-line-500`，无 Omitted/截断标记；
+  模型 `read`/`grep` 读回并核对。对照原症状（49,929 + `[truncated: 35806 more characters]`、spill 50,102 且含同一标记）。
+- **资产**：`tests/harness/contract/workflow-result-budget.spec.ts`——钉住 `maxResultChars` 控制渲染，
+  且 vp-eng preset 真带 200000；红配方 = 删 preset config → 第三条红。
+  缺口（如实记）：端到端“spill 文件完整”目前靠一次性探针，未进 CI；钉子只覆盖“工具不截断”。
+- vendor 未改；上游仍建议 workflow 工具在截断前把完整渲染值交给 spill store（默认值下的其它消费者受益）。
 
 ## 已修判定
 

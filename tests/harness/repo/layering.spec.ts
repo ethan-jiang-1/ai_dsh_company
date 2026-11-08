@@ -74,7 +74,10 @@ describe('测试分层纪律（真模型/真浏览器不进回归）', () => {
     for (const file of specFiles(TESTS)) {
       if (file === SELF) continue
       const text = readFileSync(file, 'utf8')
-      if (/(?:from|import)\s*\(?['"][^'"]*(?:checks|probes|tools)\/(?!lib\/)/.test(text)) importers.push(relative(ROOT, file))
+      // 只认**仓库根驱动目录**（相对路径从本文件向根走：`./tools/…` / `../../tools/…`）；
+      // 旧正则 `[^'"]*tools/` 会把 `vendor/dsh/packages/core/tools/...` 这类同名目录误判
+      // （2026-11-08 合同钉子直引 vendor 源时实测假红）——它们不在本仓驱动面上。
+      if (/(?:from|import)\s*\(?['"](?:\.\/|(?:\.\.\/)+)(?:checks|probes|tools)\/(?!lib\/)/.test(text)) importers.push(relative(ROOT, file))
     }
     expect(importers, '驱动脚本（*-smoke / replay-smoke）不得被 tests/ import（tools/lib/ 纯逻辑库除外）').toEqual([])
 

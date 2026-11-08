@@ -188,11 +188,11 @@ opened: 2026-11-08
 | 发现 | 探索方向 | 效果/证据 | 处置 |
 |---|---|---|---|
 | `agent({schema})` 的 `enum`/`const` 必须配 `type`，模型面描述未说 | R2 强制 workflow + 模型自拟 schema | 首跑整轮 `UNSUPPORTED_SCHEMA`、零 agent；模型补 `type` 后重跑 6 agents 成功 | skill 已修；机制/上游 → [BUG-036](../_archive/fixed_bugs/BUG-036-workflow-schema-enum-type.md) |
-| 根会话 = Lead，团队版控制名 shadow 全局版；契约误写“根不是成员” | R3 委派深度链（模型自然尝试等/催孙代） | `list_agents` 只回 lead、`send_message` 报 `active teammate not found`、`wait_agent` no-active-peer | docs/5 preset 注释/eng-teaming 已修；机制 → [BUG-037](../bugs/BUG-037-root-team-tool-shadowing.md) |
+| 根会话 = Lead，团队版控制名 shadow 全局版；契约误写“根不是成员” | R3 委派深度链（模型自然尝试等/催孙代） | `list_agents` 只回 lead、`send_message` 报 `active teammate not found`、`wait_agent` no-active-peer | docs/5 preset 注释/eng-teaming 已修；机制 → [BUG-037](../_archive/fixed_bugs/BUG-037-root-team-tool-shadowing.md) |
 | W 分支内再委派：返回值混入回执、跨轮拼接；schema 分支会 null | R5 W→S 嵌套 | 分支返回 `started subagent … <值>`；两轮才拿到值 | “分支默认叶子”规则；机制 → [BUG-038](../bugs/BUG-038-workflow-branch-nested-delegation-result.md) |
 | 命名 child 同时 `send_message` + 完成通知，父收两份 | C1 CEO→`vp_eng` | 父会话收到 “Agent … sent a message” + “finished … closing message” | 已修 `eng-workflow` 第 5 步；绿 C2 |
 | CEO 用 `bash sleep 25/30` 轮询 child，不结束本轮 | C1 | turn 142s；child 完成后才回完整答案 | 已修 CEO skill/persona；绿 C2 |
-| workflow >50k 结果硬截断，spill 文件也是截断副本 | R7：**原样返回全量 rows 的溢出压力** | 完整 ~85.9k 字符 → 实际收到 49,929；spill 文件 50,102 且含同一截断标记；父只能落 rows 0–2 完整、row 3 半段、row 4/5 null | eng-teaming 已加“别指望 spill”；R9 验证“分支落文件 + 父拿元数据”绿替代；机制/上游 → [BUG-039](../bugs/BUG-039-workflow-result-truncation-lossy-spill.md)（P1） |
+| workflow >50k 结果硬截断，spill 文件也是截断副本 | R7：**原样返回全量 rows 的溢出压力** | 完整 ~85.9k 字符 → 实际收到 49,929；spill 文件 50,102 且含同一截断标记；父只能落 rows 0–2 完整、row 3 半段、row 4/5 null | eng-teaming 已加“别指望 spill”；R9 验证“分支落文件 + 父拿元数据”绿替代；机制/上游 → [BUG-039](../_archive/fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md)（P1） |
 | 根门仍会用 `wait_agent` 等 subagent child（团队版） | M2 natural 多轮混合 | `wait_agent` 报 `no-active-peer` 一次；多轮结果未丢（W 4 agents + 2 S，三轮原文/分歧保留） | 已把 `wait_agent`/`interrupt_agent` 补进 eng-teaming 控制面 |
 | C 入口 depth 链：命名 child 起 W1 后再起 W2 被拒 | CD2 CEO→`vp_eng` | W1 的 `subagent` 被拒 `depth 3 exceeds maxDepth 2`；声明面 `current 2 / max 2 / remaining 0`；W1 未读文件/未重试；child 用 `bash sleep 90/75`（观察） | depth 边界 PASS；sleep 记观察 |
 | 带 schema 的分支只回文本 → 父拿 null，文本答案被丢弃、无诊断 | R10 后台 W 自然完成 + schema | m01 child 读了文件、回正确 JSON 文本、`turn/end completed`；父 `modules[0]=null`、`count:3`；job/run 仍 completed；补跑 subagent 才拿到 m01 | eng-teaming 已加“schema 分支明确要 structured_output / 验收看 null/count”；机制/上游 → [BUG-040](../bugs/BUG-040-workflow-schema-text-answer-discarded.md)（P2） |

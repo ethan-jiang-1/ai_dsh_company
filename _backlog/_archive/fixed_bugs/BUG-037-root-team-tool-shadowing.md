@@ -1,12 +1,12 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-08
 ---
 
 # BUG-037：根会话的团队版控制名 shadow 全局版——契约说“根不是成员”，实际根就是 Lead
 
-> 严重级别：P2（次要）｜发现：2026-11-08｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-08｜状态：已修（2026-11-08）｜审查：agent — 判定第二条走“替代控制名”分支：本包注册 `list_subagents` / `send_to_subagent`（官方 `ctx.subagents` + 父会话 durable catalog），名字不被团队版 shadow；真挂载工具目录含两者（探针 79 tools）
 
 ## 症状
 
@@ -64,8 +64,16 @@ generic subagent child）有效。本仓注释与 §4.4 把“根”误写成“
   （根门够不到 child；child 终稿走完成通知；不要 sleep 轮询）。
 - M2 natural 复跑仍见 `wait_agent` 被用于 child（团队版，`no-active-peer`）；首版 `eng-teaming` 只列了
   `send_message` / `list_agents`，已补 `wait_agent` / `interrupt_agent`（2026-11-08 同日）。
-- 机制本身（vendor shadow）未改；可选后续：在本仓加一个不与团队名冲突的全局控制工具名、或接受并
-  在合同里写死“根门不提供 child steer”。
+- **真修（2026-11-08）**：选了“不与团队名冲突的替代控制名”，不是再劝模型——新增 host 工具
+  `list_subagents`（父会话 `subagent/catalog` durable 事件 → id/label/mode/status）与 `send_to_subagent`
+  （`ctx.subagents.sendMessage`，续驶/催稿）。两个名字团队版 shadow 不到；实现 =
+  `packages/company-pack/src/host/delegation-control.ts`，在 pack host 的 `apply` 注册。
+- **绿证据**：真挂载会话的工具目录含 `list_subagents` / `send_to_subagent`
+  （`runtime/tmp/explore/fix1/S039/summary.json`，79 tools）；行为 spec `tests/company/delegation-control.spec.ts`
+  （注册名、catalog 折叠、send 透传、服务缺席 fail-loud）。
+- **文档同步**：`docs/delegation.md` §4 控制面段改成“根门用这两个名字”；`eng-teaming` 控制面与长跑条目同步。
+- 机制本身（vendor shadow）未改；上游提案 = 让根会话直接用全局控制名（`tool-agent-team` 的 install 条件）。
+- **退役条件**：上游修好后删除这两个工具（台账 `[CT-LIFE]`），避免双控制面长期并存。
 
 ## 已修判定
 

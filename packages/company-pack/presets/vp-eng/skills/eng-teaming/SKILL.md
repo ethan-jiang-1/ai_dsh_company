@@ -23,10 +23,11 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 那是 CEO 的边界，不是你的。
 
 **控制面**：根会话是 Lead，`send_message` / `list_agents` / `wait_agent` / `interrupt_agent` 是**团队版**，
-够不到你起的 `subagent` child（`send_message` 报 `active teammate not found`，`wait_agent` 报
-`no-active-peer`；2026-11-08 探索实测，加规则后 M2 仍复现一次）。child 终稿走**完成通知**，别等、别催、
-别用 `bash sleep` 轮询；要改它的稿就再委派一次。你自己作为 child 时拿到的是全局版（`agent_id` 可指父），
-作为 teammate 时是团队版（`target` = `lead` / 成员名）——两种寻址别混。
+只认名册成员，够不到你起的 `subagent` child（`send_message` 报 `active teammate not found`，`wait_agent` 报
+`no-active-peer`）。根门控制 child 用 **`list_subagents`**（父会话 durable catalog，宿主重启后仍可查）与
+**`send_to_subagent`**（续驶/催稿）；child 终稿仍走**完成通知**，别等、别催、别用 `bash sleep` 轮询；要改它的稿
+就再委派一次。你自己作为 child 时拿到的是全局版（`agent_id` 可指父），作为 teammate 时是团队版
+（`target` = `lead` / 成员名）——两种寻址别混。
 
 ## workflow 硬规则（2.5 档）
 
@@ -47,10 +48,11 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
   父 workflow 直接起第二层，或规定分支只回一行可解析值。
 - **写盘**：分支只读，或一分支一文件；正式交付物只由你写。
 - **长跑**：团队会话里前台 run 会阻塞你（先例约 6 分钟，Lead 消息排队）——用 `run_in_background`。
-  宿主重启会中断 in-flight child（child 记 interrupted、父收不到终态、root 也查不到；2026-11-08 实测）
-  ——部署/重启前先收口，别跨重启等通知。
-- **返回聚合/异常**：别回全量 rows；50k 是**硬截断**，spill 文件也是截断副本、读不回缺失段
-  （2026-11-08 实测）——大结果让分支各写自己的文件、父只拿 path/行数（同日绿验证）。
+  宿主重启会中断 in-flight child（child 记 interrupted、父收不到终态；2026-11-08 实测）——部署/重启前先收口，
+  别跨重启等通知；重启后要确认就 `list_subagents`（inactive 可能是被中断），要结果就 `send_to_subagent` 冷恢复。
+- **返回聚合/异常**：优先让分支各写自己的文件、父只拿 path/行数（大结果首选形状）。返回值 >200k 会被
+  **硬截断**（此时 spill 文件也是截断副本）；超过内联预算（约 12.5k tokens）的结果会落 spill 文件——
+  头尾预览 + 全文路径，可用 `read`/`grep` 取回（2026-11-08 修：preset 把上限从 50k 抬到 200k）。
   run/job `completed` ≠ 分支成功：分支失败只折成 `null`、不单独通知，验收看数组 `null`/`count`（R10）。
 - **谁开**：teammate 继承你的组合、也能开 workflow；一个复杂包只由 Lead 或任务板指名的 owner 开一摊，
   避免每人各开一摊（workflow 没有深度闸，嵌套 run 会叠加）。

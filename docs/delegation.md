@@ -95,10 +95,11 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
    不能替代 SA/SQA 的独立结论）；CEO 的编排面仍是 team + 命名委托；命名委托仍是**单职能快捷出稿**的主路。
 3. **并行快捷派活**：多个工具调用可在同一轮并行发起；每个都是独立 activation，完成通知分别回来。
    要共享任务板/互审仍走 team。
-4. **控制面现状**：四个职能 preset 声明 `tool-subagent-control` + `.../list-agents`——只对**非成员 child**
-   生效；根会话是 Lead，团队版 shadow 全局版（实测根门 `list_agents` 只回 `lead`、`send_message` 报
-   `active teammate not found`；机制与守卫 = §2）。`subagent`/`subagent_fork` 行 `maxDepth: 2`：CEO 的
-   命名 child（depth 1）能生 depth 2 worker，depth 3 被拒（2026-11-08 E2E；默认 1 会让被委派的 VP 生不出 worker）。
+4. **控制面现状**：根会话是 Lead，`send_message` / `list_agents` / `wait_agent` / `interrupt_agent` 是团队版、
+   只认名册成员，够不到根起的 `subagent` child（`list_agents` 只回 `lead`、`send_message` 报
+   `active teammate not found`；机制 = §2）。根门改用 `list_subagents`（父会话 durable catalog，重启后可查）
+   与 `send_to_subagent`（官方 `ctx.subagents`，续驶/催稿），名字不被 shadow。`subagent`/`subagent_fork` 行
+   `maxDepth: 2`：CEO 命名 child（depth 1）能生 depth 2 worker，depth 3 被拒（2026-11-08 E2E；默认 1 会让 VP 生不出 worker）。
 
 ## 5. UI：委派工具卡
 
