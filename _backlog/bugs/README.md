@@ -11,7 +11,6 @@
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
 | [BUG-042](BUG-042-list-subagents-lastturnend-missing.md) | `list_subagents` 的 `lastTurnEnd` 真实装配恒缺（sessionQuery 在 isolate 组） | P2 |
-| [BUG-043](BUG-043-list-subagents-includes-teammates.md) | `list_subagents` 把 teammate 也列出来，与 `list_agents` 重叠且描述未说明 | P2 |
 | [BUG-044](BUG-044-background-job-lost-on-restart.md) | 后台 workflow job 不跨宿主重启：job_list 空/unknown，结果与通知丢失 | P2 |
 | —（历史） | BUG-034 / BUG-035 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：SA/SQA 证据链必查（时间源 + 故障路径耐受）+ 审计 Q8–Q11；2026-11-07 E2E v8 验收 | — |
 

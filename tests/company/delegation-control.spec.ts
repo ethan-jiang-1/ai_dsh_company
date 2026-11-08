@@ -11,19 +11,21 @@ import { readChildTerminal, registerDelegationControl, subagentRows, terminalOf 
 
 type ToolDefinition = {
   name: string
+  description: string
   execute(args: never, exec: never): Promise<unknown>
   output: { render(args: never, value: never): Array<{ type: string; text: string }> }
 }
 
-function harness(options: { subagents?: unknown; agents?: unknown; sessionPersistence?: unknown; warnings?: string[] } = {}) {
+function harness(options: { subagents?: unknown; agents?: unknown; agentTeams?: unknown; sessionPersistence?: unknown; warnings?: string[] } = {}) {
   const tools = new Map<string, ToolDefinition>()
   const ctx = {
     logger: { warn: (message: string) => { options.warnings?.push(message) } },
     tools: { register: (definition: ToolDefinition) => { tools.set(definition.name, definition) } },
     get: (name: string) => name === 'subagents' ? options.subagents
       : name === 'agents' ? options.agents
-        : name === 'sessionPersistence' ? options.sessionPersistence
-          : undefined,
+        : name === 'agentTeams' ? options.agentTeams
+          : name === 'sessionPersistence' ? options.sessionPersistence
+            : undefined,
   }
   registerDelegationControl(ctx as never)
   return tools
@@ -47,7 +49,14 @@ const agentWith = (events: unknown[]) => ({ session: { id: 'parent', ownEvents: 
 
 describe('delegation control tools', () => {
   it('registers names the team shadow cannot occupy', () => {
-    expect([...harness().keys()].sort()).toEqual(['list_subagents', 'send_to_subagent'])
+    const tools = harness()
+    expect([...tools.keys()].sort()).toEqual(['list_subagents', 'send_to_subagent'])
+    // 两条寻址规则写在模型面：role/address + team send_message vs send_to_subagent。
+    const list = tools.get('list_subagents')?.description ?? ''
+    expect(list).toContain('`role`')
+    expect(list).toContain('`address`')
+    expect(list).toContain('teammate')
+    expect(tools.get('send_to_subagent')?.description ?? '').toContain('teammate')
   })
 
   it('folds the parent durable catalog last-wins and ignores unrelated events', () => {
@@ -59,8 +68,8 @@ describe('delegation control tools', () => {
       { type: 'subagent/catalog', data: {} },
     ], id => (id === 'b' ? 'running' : 'inactive'))
     expect(rows).toEqual([
-      { id: 'a', label: '新标签', mode: 'continuable', status: 'inactive', lastTurnEnd: 'unavailable' },
-      { id: 'b', label: 'worker-b', mode: 'one-shot', status: 'running', lastTurnEnd: 'unavailable' },
+      { id: 'a', label: '新标签', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'a', lastTurnEnd: 'unavailable' },
+      { id: 'b', label: 'worker-b', mode: 'one-shot', status: 'running', role: 'subagent', address: 'b', lastTurnEnd: 'unavailable' },
     ])
   })
 
@@ -74,8 +83,8 @@ describe('delegation control tools', () => {
     } as never)
     expect(result).toEqual({
       subagents: [
-        { id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', lastTurnEnd: 'unavailable' },
-        { id: 'child-2', label: 'w2', mode: 'continuable', status: 'running', lastTurnEnd: 'unavailable' },
+        { id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'unavailable' },
+        { id: 'child-2', label: 'w2', mode: 'continuable', status: 'running', role: 'subagent', address: 'child-2', lastTurnEnd: 'unavailable' },
       ],
     })
   })
@@ -131,6 +140,34 @@ describe('delegation control tools', () => {
     }
     await expect(readChildTerminal(persistence, 'child-1')).resolves.toBe('interrupted')
     expect(calls).toEqual(['open:child-1:read', 'read:0', 'close'])
+  })
+
+  it('marks roster teammates with role/address and leaves plain children as subagents', async () => {
+    const agentTeams = {
+      tryMembership: () => ({ lead: 'parent' }),
+      listMembers: () => [{ id: 'child-2', name: 'eng-2', role: 'teammate' }],
+    }
+    const tool = harness({ agentTeams }).get('list_subagents')
+    if (tool === undefined) throw new Error('list_subagents not registered')
+    const result = await tool.execute({} as never, {
+      agent: agentWith([catalog('child-1', 'worker'), catalog('child-2', 'eng-2')]),
+      signal: new AbortController().signal,
+    } as never) as { subagents: Array<{ id: string; role: string; address: string }> }
+    expect(result.subagents).toEqual([
+      { id: 'child-1', label: 'worker', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'unavailable' },
+      { id: 'child-2', label: 'eng-2', mode: 'continuable', status: 'inactive', role: 'teammate', address: 'eng-2', lastTurnEnd: 'unavailable' },
+    ])
+  })
+
+  it('treats every child as a subagent when the caller is not in a team', async () => {
+    const agentTeams = { tryMembership: () => undefined, listMembers: () => [] }
+    const tool = harness({ agentTeams }).get('list_subagents')
+    if (tool === undefined) throw new Error('list_subagents not registered')
+    const result = await tool.execute({} as never, {
+      agent: agentWith([catalog('child-1', 'worker')]),
+      signal: new AbortController().signal,
+    } as never) as { subagents: Array<{ role: string; address: string }> }
+    expect(result.subagents[0]).toMatchObject({ role: 'subagent', address: 'child-1' })
   })
 
   it('retries a transient durable-read failure and still reports the terminal', async () => {
@@ -196,8 +233,8 @@ describe('delegation control tools', () => {
     } as never)
     expect(result).toEqual({
       subagents: [
-        { id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', lastTurnEnd: 'interrupted' },
-        { id: 'child-2', label: 'w2', mode: 'continuable', status: 'inactive', lastTurnEnd: 'completed' },
+        { id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'interrupted' },
+        { id: 'child-2', label: 'w2', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-2', lastTurnEnd: 'completed' },
       ],
     })
   })
@@ -211,7 +248,7 @@ describe('delegation control tools', () => {
       signal: new AbortController().signal,
     } as never)
     expect(result).toEqual({
-      subagents: [{ id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', lastTurnEnd: 'unavailable' }],
+      subagents: [{ id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'unavailable' }],
     })
   })
 

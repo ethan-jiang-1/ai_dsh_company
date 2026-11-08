@@ -4,6 +4,8 @@
 
 ## 修复流水（倒序）
 
+- **BUG-043**（2026-11-08）：`list_subagents` 把 `spawn_teammate` 的成员也列出来（同一个 child 机制的两个视图），与 team `list_agents` 重叠且描述未说明，模型可能选错寻址。修法 = **不隐藏、标身份**：每行加 `role: 'teammate' | 'subagent'` 与 `address`（teammate → 队名，subagent → session id），身份来自 `agentTeams.tryMembership/listMembers`（服务缺席/非成员全按 subagent，不丢行）；description + `eng-teaming` 写死两套寻址。keyless 14 条（含 team/无 team/非成员/description 断言）。未跑 C3 真模型观察，按“description/skill 写死 + 绿证据”分支收口。详见 [卡](BUG-043-list-subagents-includes-teammates.md)。
+
 - **BUG-040**（2026-11-08）：schema 分支的 child `completed` 但只回文本（没调 `structured_output`）→ 引擎丢文本、给父裸 null，且无诊断（R10）。**按产品规避收口**：`eng-teaming` 工作流分支**禁传 schema**，改“只回一行 JSON + 父脚本 `JSON.parse`；失败把原文记 `missing`”——本仓唯一会碰 schema 的分支形状被去掉，completed 的答案不再被折成 null；smoke 第 7 条钉住“非 schema 分支原样返回文本、父 parse 成功”。引擎缺陷仍在（上游提案与真 diff 在卡内；恢复 schema 前必须先有诊断）。详见 [卡](BUG-040-workflow-schema-text-answer-discarded.md)。
 
 - **BUG-041**（2026-11-08）：宿主重启把 in-flight child 变孤儿——child durable 记 `turn/end interrupted`，父会话没有新 turn/通知，也查不到（R3 之前的控制名 shadow 加剧了“无法查询”）。修法 = `list_subagents` 每行带 `lastTurnEnd`：用 `sessionQuery.readSession(childId)` 读 child **durable 日志**（`openAt: never` 只禁搜索，durable 读仍可用；RS1 真实重启会话实测 `interrupted`）+ 每行 `running/inactive`；`budget-and-ops` 加“升级/重启时还有 subagent 在跑”一行（先收口；重启后查/`send_to_subagent` 冷恢复）。仍缺（不阻塞）：错过的完成通知正文，正文本就要冷恢复或上游 resume 对账。详见 [卡](BUG-041-host-restart-orphans-inflight-child.md)。

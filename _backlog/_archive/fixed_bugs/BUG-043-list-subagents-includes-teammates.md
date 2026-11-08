@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-08
 ---
 
 # BUG-043：`list_subagents` 把 teammate 也列出来，与 `list_agents` 名册重叠且描述未说明
 
-> 严重级别：P2（次要）｜发现：2026-11-08｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-08｜状态：已修｜审查：agent — 输出加 role/address（teammate 用队名、subagent 用 session id）；description 与 eng-teaming 写死两套寻址；keyless 测试覆盖有 team/无 team/非成员
 
 ## 症状
 
@@ -48,10 +48,18 @@ subagent children are not team roster members, so ... `list_agents` cannot see t
 
 ## 修复关联
 
-- 候选修法：① `list_subagents` 行加 `role: 'teammate' | 'subagent'`（用 team membership 判定）；
-  ② 过滤 teammate（保持“只列非名册 child”）；③ 若保留重叠，改 tool description + `eng-teaming`
-  明确“两套寻址：team 按名、subagent 按 id；teammate 两边都在”。
-- 已在本卡记录，不改代码等用户/修复 Agent 定。
+- **修法（2026-11-08 已落树）**：不隐藏、标出来——`list_subagents` 每行加
+  `role: 'teammate' | 'subagent'` 与 `address`（teammate = 队名；subagent = session id）。
+  身份来自 `ctx.get('agentTeams')`：`tryMembership(agent)` 有值才读 `listMembers(agent)`，
+  把 `role === 'teammate'` 的 id→name 建表；服务缺席/非成员 → 全部按 subagent（**不静默丢行**）。
+- **模型面**：`list_subagents` description 写清“teammate 用 team `send_message` 按 address、subagent 用
+  `send_to_subagent` 按 address”；`send_to_subagent` description 补一句“teammate 行走 team send_message”；
+  `eng-teaming` 控制面加同一句。
+- **keyless 测试资产**：`tests/company/delegation-control.spec.ts` 14 条——纯折叠默认 subagent；
+  team 成员 + 普通 child 的 role/address；非成员（tryMembership=undefined）全 subagent；
+  description 含 role/address/teammate 断言；无 team 服务不丢行。
+- **收口口径**：按已修判定第二条的“description/skill 写死两套寻址 + 绿证据”分支收口；
+  **未跑真模型自然任务观察**（C3），因此不声称“模型必选对”，只声称“输出可判 + 规则在模型面”。
 
 ## 已修判定
 

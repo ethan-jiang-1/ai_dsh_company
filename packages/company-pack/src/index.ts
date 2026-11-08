@@ -40,6 +40,7 @@ import {
 } from './host/presented-domain.ts'
 import { registerClientDiagnostics } from './host/client-diagnostics.ts'
 import { registerDelegationControl } from './host/delegation-control.ts'
+import { registerWorkflowRuns } from './host/workflow-runs.ts'
 import { exportGovernance, type ExportLedgerSource } from './host/governance-export.ts'
 import { prepareCompanyRuntime } from './host/runtime-guard.ts'
 import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace-registry.ts'
@@ -59,6 +60,8 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   registerSignoffTool(ctx)
   // BUG-037/041 真修：根会话被团队版控制名 shadow 时，仍能列出/续驶自己的 subagent child。
   registerDelegationControl(ctx)
+  // BUG-044 修复：后台 workflow run 的 durable 视图（job 注册表随进程死，run 记录不死）。
+  registerWorkflowRuns(ctx)
 
   const runtime = prepareCompanyRuntime(ctx)
   const workspace = runtime.workspace

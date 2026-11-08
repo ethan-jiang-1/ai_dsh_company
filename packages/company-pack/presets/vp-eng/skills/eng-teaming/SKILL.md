@@ -25,7 +25,9 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 **控制面**：根会话是 Lead，`send_message` / `list_agents` / `wait_agent` / `interrupt_agent` 是**团队版**，
 只认名册成员，够不到你起的 `subagent` child（`send_message` 报 `active teammate not found`，`wait_agent` 报
 `no-active-peer`）。根门控制 child 用 **`list_subagents`**（父会话 durable catalog，宿主重启后仍可查）与
-**`send_to_subagent`**（续驶/催稿）；child 终稿仍走**完成通知**，别等、别催、别用 `bash sleep` 轮询；要改它的稿
+**`send_to_subagent`**（续驶/催稿）；每行带 **`role` / `address`**——`teammate` 用 team `send_message` 按
+`address`（队名）寻址，`subagent` 用 `send_to_subagent` 按 `address`（session id）寻址，两套别混。
+child 终稿仍走**完成通知**，别等、别催、别用 `bash sleep` 轮询；要改它的稿
 就 `send_to_subagent` 续同一个 child（带上一稿），不可续再委派。你自己作为 child 时拿到的是全局版（`agent_id` 可指父），作为 teammate 时是团队版
 （`target` = `lead` / 成员名）——两种寻址别混。
 
@@ -53,8 +55,9 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 - **长跑**：团队会话里前台 run 会阻塞你（先例约 6 分钟，Lead 消息排队）——用 `run_in_background`。
   宿主重启会中断 in-flight child（child 记 interrupted、父收不到终态；2026-11-08 实测）——部署/重启前先收口，
   别跨重启等通知；重启后要确认就 `list_subagents`（inactive 可能是被中断），要结果就 `send_to_subagent` 冷恢复。
-  **后台 job 也不跨重启**：job_list 空、job_output 报 unknown，结果/通知都丢；child 会话仍在（continuable），
-  只能 `list_subagents`/`send_to_subagent` 手动补——别把“job 起了”当“结果可恢复”（2026-11-08 C7 实测）。
+  **后台 job 也不跨重启**：`job_list` 空、`job_output` 报 unknown；重启后用 **`workflow_runs`** 查 run 的
+  completed/cancelled/lost + children（`lost` = 原结果不可恢复），要当前事实就 `send_to_subagent` 冷恢复
+  ——别把“job 起了”当“结果可恢复”（2026-11-08 C7 实测）。
 - **返回聚合/异常**：优先让分支各写自己的文件、父只拿 path/行数（大结果首选形状）。返回值 >200k 会被
   **硬截断**（此时 spill 文件也是截断副本）；超过内联预算（约 12.5k tokens）的结果会落 spill 文件——
   头尾预览 + 全文路径；普通行可用 `read`/`grep`，超长单行（JSON rows）用 `bash tail -c`/`sed` 按字节取

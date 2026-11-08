@@ -1,0 +1,187 @@
+/**
+ * `workflow_runs`：后台/前台 workflow run 的 durable 视图（BUG-044 修复）。
+ *
+ * 为什么存在：job 登记表是**进程内**的；宿主重启后 `job_list` 空、`job_output` unknown，
+ * 父会话没有任何 durable 句柄可查。但父会话自己的日志里已有 `tool-workflow/run-start|
+ * agent-start|run-end` 与工具回执——本工具把它们折叠成模型可读的 run 行：
+ * 有 run-end 给终态；没有 run-end 且 job 注册表不认识该 jobId → **`lost`**（明确标注已丢失）；
+ * 注册表认识 → `running`。children 一并列出，可 `send_to_subagent` 冷恢复取当前事实
+ * （不恢复原 job 的结果——卡里写死了这个边界）。
+ *
+ * 层契约：只读 `session.ownEvents()`（永远可达）+ `ctx.get('jobs')`（仅作 liveness 装饰，
+ * 不是持久事实的来源）；不依赖 isolate 组里的 `sessionQuery`。
+ */
+import type { Context } from '@deepseek-ai/cordis'
+import { defineTool } from '@deepseek-ai/dsh-tools'
+
+type SessionEventLike = { type: string; data: unknown; seq?: number }
+
+/** 一条模型可见 workflow run 行。 */
+export interface WorkflowRunRow {
+  runId: string
+  name: string
+  background: boolean
+  jobId?: string
+  status: 'completed' | 'cancelled' | 'error' | 'lost' | 'running'
+  children: Array<{ label: string; childId: string }>
+}
+
+interface JobRegistryLike {
+  list?(caller?: string): Array<{ id?: string }>
+}
+
+const TERMINAL = new Set(['completed', 'cancelled', 'error'])
+
+/**
+ * Fold the parent session's durable workflow records into run rows.
+ * Pure so the spec can pin every status without a live runtime.
+ * @param events - the calling session's own durable events.
+ * @param jobKnown - whether the process-local job registry still knows a job id.
+ * @returns one row per workflow run, in first-run-start order.
+ */
+export function workflowRunRows(
+  events: readonly SessionEventLike[],
+  jobKnown: (jobId: string) => boolean = () => false,
+): WorkflowRunRow[] {
+  const starts: Array<{ seq: number; runId: string; name: string }> = []
+  const ends = new Map<string, string>()
+  const children = new Map<string, Array<{ label: string; childId: string }>>()
+  const calls: Array<{ seq: number; callId: string; name: string; background: boolean }> = []
+  const results = new Map<string, string>()
+  for (const [index, event] of events.entries()) {
+    const data = event.data as Record<string, unknown> | undefined
+    const seq = typeof event.seq === 'number' ? event.seq : index
+    if (event.type === 'tool-workflow/run-start' && typeof data?.runId === 'string') {
+      starts.push({ seq, runId: data.runId, name: typeof data.name === 'string' ? data.name : '' })
+    } else if (event.type === 'tool-workflow/run-end' && typeof data?.runId === 'string') {
+      ends.set(data.runId, typeof data.stopReason === 'string' ? data.stopReason : 'error')
+    } else if (event.type === 'tool-workflow/agent-start' && typeof data?.runId === 'string' && typeof data.childId === 'string') {
+      const list = children.get(data.runId) ?? []
+      list.push({ label: typeof data.label === 'string' ? data.label : '', childId: data.childId })
+      children.set(data.runId, list)
+    } else if (event.type === 'tool/call' && typeof data?.callId === 'string') {
+      let args: unknown
+      try { args = JSON.parse(String(data.arguments ?? '{}')) } catch { continue }
+      const record = args as { script?: unknown; meta?: { name?: unknown }; run_in_background?: unknown }
+      if (typeof record?.script !== 'string' || typeof record.meta?.name !== 'string') continue
+      calls.push({ seq, callId: data.callId, name: record.meta.name, background: record.run_in_background === true })
+    } else if (event.type === 'tool/result') {
+      const message = data?.message as { toolCallId?: unknown; content?: Array<{ type?: string; text?: string }> } | undefined
+      if (typeof message?.toolCallId !== 'string') continue
+      const text = (message.content ?? []).filter(block => block?.type === 'text' && typeof block.text === 'string')
+        .map(block => block.text).join('\n')
+      results.set(message.toolCallId, text)
+    }
+  }
+
+  const byName = new Map<string, Array<{ seq: number; runId: string; name: string }>>()
+  for (const start of starts) {
+    const list = byName.get(start.name) ?? []
+    list.push(start)
+    byName.set(start.name, list)
+  }
+  const used = new Set<string>()
+  const rows: Array<WorkflowRunRow & { order: number }> = []
+  for (const call of calls) {
+    const candidates = byName.get(call.name) ?? []
+    const start = candidates.find(candidate => !used.has(candidate.runId) && candidate.seq > call.seq)
+      ?? candidates.find(candidate => !used.has(candidate.runId))
+    if (start === undefined) continue
+    used.add(start.runId)
+    const text = results.get(call.callId) ?? ''
+    const jobMatch = /started in the background as job (\S+?)\./.exec(text) ?? /as job (\S+)/.exec(text)
+    const jobId = jobMatch?.[1]
+    const background = call.background || jobId !== undefined
+    const end = ends.get(start.runId)
+    const status: WorkflowRunRow['status'] = end !== undefined && TERMINAL.has(end)
+      ? end as WorkflowRunRow['status']
+      : background && jobId !== undefined && jobKnown(jobId)
+        ? 'running'
+        : 'lost'
+    rows.push({
+      order: start.seq,
+      runId: start.runId,
+      name: start.name,
+      background,
+      ...jobId === undefined ? {} : { jobId },
+      status,
+      children: children.get(start.runId) ?? [],
+    })
+  }
+  // 未被 call 配对上的 run-start 也不能藏：给 lost/终态，jobId 未知。
+  for (const start of starts) {
+    if (used.has(start.runId)) continue
+    const end = ends.get(start.runId)
+    rows.push({
+      order: start.seq,
+      runId: start.runId,
+      name: start.name,
+      background: false,
+      status: end !== undefined && TERMINAL.has(end) ? end as WorkflowRunRow['status'] : 'lost',
+      children: children.get(start.runId) ?? [],
+    })
+  }
+  return rows.sort((a, b) => a.order - b.order).map(({ order: _order, ...row }) => row)
+}
+
+/** 注册 `workflow_runs`；只读父会话自己的 durable 记录，job 注册表只作 liveness 装饰。 */
+export function registerWorkflowRuns(ctx: Context): void {
+  ctx.tools.register(defineTool({
+    name: 'workflow_runs',
+    description: 'List the workflow runs recorded in THIS session\'s durable log, including runs whose '
+      + 'host process died. `status` is `completed`/`cancelled`/`error` when the run recorded an end; '
+      + 'a background run with no end whose job id is unknown to the current process is `lost` (the '
+      + 'original job result is NOT recoverable — `children` lists the child sessions so you can continue '
+      + 'them with `send_to_subagent` for current facts). `running` means the live job registry still owns it.',
+    parameters: {},
+    output: {
+      schema: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          runs: {
+            type: 'array',
+            required: true,
+            items: {
+              type: 'object',
+              additionalProperties: false,
+              properties: {
+                runId: { type: 'string', required: true },
+                name: { type: 'string', required: true },
+                background: { type: 'boolean', required: true },
+                jobId: { type: 'string' },
+                status: { type: 'string', required: true },
+                children: {
+                  type: 'array',
+                  required: true,
+                  items: {
+                    type: 'object',
+                    additionalProperties: false,
+                    properties: {
+                      label: { type: 'string', required: true },
+                      childId: { type: 'string', required: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      render: (_args, value) => [{ type: 'text', text: JSON.stringify(value, null, 2) }],
+    },
+    async execute(_args, exec) {
+      const agent = exec.agent as { session: { id: string; ownEvents(): readonly SessionEventLike[] } } | undefined
+      if (agent === undefined) throw new Error('workflow_runs requires a calling agent')
+      const jobs = ctx.get('jobs') as JobRegistryLike | undefined
+      const jobKnown = (jobId: string): boolean => {
+        try {
+          return jobs?.list?.(agent.session.id)?.some(job => String(job?.id) === jobId) ?? false
+        } catch {
+          return false
+        }
+      }
+      return { runs: workflowRunRows(agent.session.ownEvents(), jobKnown) }
+    },
+  }))
+}

@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-08
 ---
 
 # BUG-044：后台 workflow job 不跨宿主重启——job_list 空、job_output unknown，结果/通知丢失
 
-> 严重级别：P2（次要）｜发现：2026-11-08｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-08｜状态：修复已落地｜审查：agent — 修法 = 新增 durable 视图 `workflow_runs`（父会话自己的 run/agent/run-end 事件 + 工具回执），四态 + children；keyless 6 条；C7 探针复验中
 
 ## 症状
 
@@ -54,8 +54,19 @@ continuable/inactive——它们是两条不同的持久化路径。
 
 - 已在 `eng-teaming` 长跑条目加“后台 job 不跨重启（job_list 空、job_output unknown）；child 会话仍在，
   可 `list_subagents`/`send_to_subagent` 手动补”。
-- vendor 未改；候选上游：job registry durable 化，或 resume 时把 owned job 的 child 终态补成 notice；
-  本仓可选：部署前置（重启前 drain）+ 文档写死“后台结果跨重启不可恢复”。
+
+- **修法（2026-11-08 已落树）**：新增 host 工具 **`workflow_runs`**——只读父会话自己的
+  `tool-workflow/run-start|agent-start|run-end` 与 `tool/call`/`tool/result`（后台回执里的 jobId），
+  输出每 run：`{runId, name, background, jobId?, status, children[]}`。
+  `status`：有 `run-end` → completed/cancelled/error；无 run-end + job 注册表认识 → running；
+  否则 **`lost`**（明确标注已丢失）。`children` 列出 childId，可 `send_to_subagent` 冷恢复当前事实
+  （不恢复原 job 结果——卡里写死的边界）。
+- **keyless 测试资产**：`tests/company/workflow-runs.spec.ts` 6 条——background+无 run-end+job 未知 →
+  lost（含 children）；job 已知 → running；completed/cancelled；同名 run 按序配对；孤儿 run-start →
+  lost；工具注册 + 读 `ownEvents` + 无 jobs 服务按 unknown。host-composition/apply-lifecycle 注册面 6 tools。
+- **模型面**：`eng-teaming` 长跑条改成“重启后用 `workflow_runs` 查 completed/cancelled/lost + children”。
+- **真实装配复验**：干净 home 跑 C7b（后台 W → 杀宿主 → 重启 → 问 job）；通过则本卡归档。
+- **上游**（不再阻塞本仓）：job registry durable 化，或 resume 时把 owned job 的 child 终态补成 notice。
 
 4. 恢复实验：`node runtime/tmp/explore/recover7.mjs`（或同 session 直接 prompt）；证据
    `runtime/tmp/explore/ex4/C7/recover.json`；4 个 child 均 continuable、冷恢复后重读文件。

@@ -151,6 +151,7 @@
 | [BUG-038-workflow-branch-nested-delegation-result.md](fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md) | 分支内再委派返回值混回执：分支当叶子规则 + 真跑自纠观察 + 机制钉子（回执拼接） | 2026-11-08 |
 | [BUG-041-host-restart-orphans-inflight-child.md](fixed_bugs/BUG-041-host-restart-orphans-inflight-child.md) | 重启后 in-flight child 成孤儿：`list_subagents` 带 durable `lastTurnEnd`（interrupted）+ ops 部署前置 | 2026-11-08 |
 | [BUG-040-workflow-schema-text-answer-discarded.md](fixed_bugs/BUG-040-workflow-schema-text-answer-discarded.md) | schema 分支丢文本：产品规避（分支禁 schema、单行 JSON + 父 parse）+ smoke 第 7 条；引擎诊断仍缺 | 2026-11-08 |
+| [BUG-043-list-subagents-includes-teammates.md](fixed_bugs/BUG-043-list-subagents-includes-teammates.md) | teammate 混入 subagent 列表：行加 role/address（队名/session id）+ description/skill 两套寻址；keyless 14 条 | 2026-11-08 |
 
 ## 暂停卡
 

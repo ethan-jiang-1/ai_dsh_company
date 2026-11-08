@@ -11,7 +11,8 @@
  * durable 事件，宿主重启后随会话重放）；**终态**用 root 可用的 `sessionPersistence.open(id,'read')`
  * 读 child durable 日志的最后一个 `turn/end`——**不用** `sessionQuery`（它在本 package 的
  * `isolate: { sessionQuery: true }` 组内，host 工具拿不到；2026-11-08 实测）。状态只读 live
- * Agent registry：`running` / `inactive`。承诺字段不静默省略：读不到时输出 `lastTurnEnd:
+ * Agent registry：`running` / `inactive`；**身份**用 `agentTeams.tryMembership/listMembers`（teammate vs
+ * subagent + 寻址：team 名 / session id）。承诺字段不静默省略：读不到时输出 `lastTurnEnd:
  * 'unavailable'`（可见降级）。已知边界：只给 reason.kind（如 `interrupted`），不给错过的通知内容。
  *
  * 退役条件：上游让根会话拿到全局控制名（team shadow 修复）后，本工具删除；
@@ -54,12 +55,33 @@ interface AgentLike {
   session: SessionLike
 }
 
+interface TeamMemberLike {
+  id: string
+  name: string
+  role: string
+}
+
+interface AgentTeamsLike {
+  tryMembership(agent: unknown): unknown
+  listMembers(agent: unknown): TeamMemberLike[]
+}
+
+/** 一条 child 的身份：teammate 按 team 名寻址，subagent 按 session id 寻址。 */
+export interface ChildIdentity {
+  role: 'teammate' | 'subagent'
+  address: string
+}
+
 /** 一条模型可见 child 行。 */
 export interface SubagentRow {
   id: string
   label: string
   mode: string
   status: 'running' | 'inactive'
+  /** teammate（team 名册成员）或普通 subagent child。 */
+  role: 'teammate' | 'subagent'
+  /** 寻址：teammate 用 team 名，subagent 用 session id。 */
+  address: string
   /** 子会话 durable 日志里最后一个 `turn/end` 的 reason.kind；读不到时为 `unavailable`（可见降级）。 */
   lastTurnEnd: string
 }
@@ -122,17 +144,21 @@ export async function readChildTerminal(
 export function subagentRows(
   events: readonly { type: string; data: unknown }[],
   statusOf: (id: string) => 'running' | 'inactive',
+  roleOf: (id: string) => ChildIdentity = id => ({ role: 'subagent', address: id }),
 ): SubagentRow[] {
   const rows = new Map<string, SubagentRow>()
   for (const event of events) {
     if (event.type !== 'subagent/catalog') continue
     const data = (event as CatalogEvent).data
     if (typeof data?.childId !== 'string') continue
+    const identity = roleOf(data.childId)
     rows.set(data.childId, {
       id: data.childId,
       label: typeof data.label === 'string' ? data.label : '',
       mode: typeof data.mode === 'string' ? data.mode : 'unknown',
       status: statusOf(data.childId),
+      role: identity.role,
+      address: identity.address,
       lastTurnEnd: 'unavailable',
     })
   }
@@ -148,10 +174,12 @@ export function registerDelegationControl(ctx: Context): void {
 
   ctx.tools.register(defineTool({
     name: 'list_subagents',
-    description: 'List the subagent children THIS session started, from the session\'s durable catalog '
-      + '(the list survives a host restart). Use it when the team-scoped `list_agents` only returns roster '
-      + 'members — named and generic subagent children are not team roster members, so in a root (Team Lead) '
-      + 'session `list_agents` cannot see them. `running` means the child is working; `inactive` means it is '
+    description: 'List the children THIS session started, from the session\'s durable catalog (the list '
+      + 'survives a host restart). Every row carries `role` and `address`: `teammate` rows are Team roster '
+      + 'members — address them with the team `send_message` by `address` (their team name); `subagent` rows '
+      + 'are plain/named subagent children — address them with `send_to_subagent` by `address` (their session '
+      + 'id). Use it when the team-scoped `list_agents` only returns roster members and you need the non-roster '
+      + 'children too. `running` means the child is working; `inactive` means it is '
       + 'not currently working. `lastTurnEnd` is the reason its durable log recorded for the last turn '
       + '(e.g. `interrupted` after a host restart, `completed`); it is `unavailable` when the log cannot be '
       + 'read (visible degradation, never silently omitted). '
@@ -173,6 +201,8 @@ export function registerDelegationControl(ctx: Context): void {
                 label: { type: 'string' },
                 mode: { type: 'string' },
                 status: { type: 'string', required: true },
+                role: { type: 'string', required: true },
+                address: { type: 'string', required: true },
                 lastTurnEnd: { type: 'string', required: true },
               },
             },
@@ -184,7 +214,20 @@ export function registerDelegationControl(ctx: Context): void {
     async execute(_args, exec) {
       const agent = exec.agent as AgentLike | undefined
       if (agent === undefined) throw new Error('list_subagents requires a calling agent')
-      const rows = subagentRows(agent.session.ownEvents(), statusOf)
+      // 身份：team 成员标 role/address；没有 team 服务或非 Lead 时全部按 subagent（不隐藏任何 child）。
+      const teammateByName = new Map<string, string>()
+      try {
+        const teams = ctx.get('agentTeams') as AgentTeamsLike | undefined
+        if (teams?.tryMembership(agent) !== undefined) {
+          for (const member of teams.listMembers(agent)) {
+            if (member.role === 'teammate') teammateByName.set(String(member.id), member.name)
+          }
+        }
+      } catch { /* no team context; every child is a plain subagent */ }
+      const roleOf = (id: string): ChildIdentity => teammateByName.has(id)
+        ? { role: 'teammate', address: teammateByName.get(id) as string }
+        : { role: 'subagent', address: id }
+      const rows = subagentRows(agent.session.ownEvents(), statusOf, roleOf)
       // 终态读 root 的 sessionPersistence（不用 isolate 组里的 sessionQuery）；读不到就**可见降级**。
       const persistence = ctx.get('sessionPersistence') as SessionPersistenceLike | undefined
       await Promise.all(rows.map(async row => {
@@ -218,7 +261,8 @@ export function registerDelegationControl(ctx: Context): void {
     description: 'Send a message to a subagent child THIS session started, or continue its conversation '
       + '(an idle child starts a new turn). Use it when the team-scoped `send_message` reports '
       + '"active teammate not found": named and generic subagent children are not team roster members, so '
-      + 'the team-scoped name cannot reach them. Returns delivery confirmation, not the child\'s answer. '
+      + 'the team-scoped name cannot reach them. For a `role: teammate` row from list_subagents use the team '
+      + '`send_message` by team name instead. Returns delivery confirmation, not the child\'s answer. '
       + 'One-shot children reject continuation.',
     parameters: {
       subagent_id: {

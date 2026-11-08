@@ -14,7 +14,7 @@
     `list_subagents` 的 `lastTurnEnd` 真实装配恒缺——`company-session-query-sqlite` 在
     `isolate:{sessionQuery:true}` 组内，host 的 `ctx.get('sessionQuery')` 拿不到；修复轮 spec 用 fake
     service，所以门禁绿。C2/C2b/C7 三次复现。**修复 Agent 已接 042，本轮不动。**
-  - [BUG-043](../../_backlog/bugs/BUG-043-list-subagents-includes-teammates.md)（P2）：`list_subagents`
+  - [BUG-043](../../_backlog/_archive/fixed_bugs/BUG-043-list-subagents-includes-teammates.md)（P2）：`list_subagents`
     也列 teammate，与 team `list_agents` 名册重叠；工具描述只说“child 不是 roster member”。
   - [BUG-044](../../_backlog/bugs/BUG-044-background-job-lost-on-restart.md)（P2）：后台 workflow job
     不跨宿主重启（`job_list` 空/`unknown job`/无通知）；child 会话仍在且可 `send_to_subagent` 冷恢复，

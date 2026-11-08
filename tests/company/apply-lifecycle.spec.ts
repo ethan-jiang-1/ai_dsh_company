@@ -58,7 +58,7 @@ describe('Host apply 生命周期：迟到 inject 与卸载后事件（R4-05）'
   it('apply 后才 provide workspaceRegistry：迟到 inject 回调真跑，并点名失效路径', async () => {
     const { ctx, warns, toolRegistrations } = mount()
     const scoped = await start(ctx)
-    expect(toolRegistrations()).toBe(5)
+    expect(toolRegistrations()).toBe(6)
     scoped.provide('workspaceRegistry', { list: () => [{ path: '/definitely-missing-r4-9f3a' }] } as never)
     await wait()
     expect(warns.some(message => message.includes('路径已不存在'))).toBe(true)
@@ -68,7 +68,7 @@ describe('Host apply 生命周期：迟到 inject 与卸载后事件（R4-05）'
   it('dispose 后 api-session/added 不再触发告警（事件监听已摘）', async () => {
     const { ctx, warns, toolRegistrations } = mount()
     const scoped = await start(ctx)
-    expect(toolRegistrations()).toBe(5)
+    expect(toolRegistrations()).toBe(6)
     scoped.emit('api-session/added', { sessionId: 'session-x', cwd: '/outside-r4', origin: 'human', running: true, projections: { values: {} } })
     await wait()
     expect(warns.some(message => message.includes('不在 workspace'))).toBe(true)

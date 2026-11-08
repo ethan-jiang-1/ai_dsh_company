@@ -505,7 +505,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 - **F18（C12 解除）**：V2 里 vp-sales 没提/没用新工具，但 C12 里同一个角色在“要复用 child”时
   `subagent → list_subagents → send_to_subagent` 一次走通，同一 child 出 v1/v2。结论：不是能力缺口，
   是“小任务自读”的方法选择；无需给其他职能加 guidance。
-- **F16 → [BUG-043](../../bugs/BUG-043-list-subagents-includes-teammates.md)**：`list_subagents` 列出
+- **F16 → [BUG-043](../../_archive/fixed_bugs/BUG-043-list-subagents-includes-teammates.md)**：`list_subagents` 列出
   teammate（它们也是 subagent activation/catalog 条目），与 team `list_agents` 名册重叠；工具描述只强调
   “child 不是 roster member”，没提 teammate 也会出现在列表。候选修法 = 在行上标 `role`/`kind`，或过滤
   teammate，或改描述并在技能里写“两套寻址别混”。
