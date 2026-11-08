@@ -469,6 +469,8 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 | C9 | vp-eng root | bash 2000 行 + 尾标记，测 pruner/保留策略 | bash 结果尾部保留、`TAIL-MARKER-9f3a` 直接可见；模型又落 `/tmp` 用 `wc -l`/`tail -n 1`/`grep -c` 独立复核 | PASS（砍头不砍尾） |
 | C10 | CEO root | named child 复用：先 `vp_eng` 出 v1，再让同一 child 出 v2（加 checked） | CEO 调 `vp_eng` → `send_to_subagent` → `list_subagents`；**同一个 child `2fd302d7…` 出两版**，未新起 VP-Eng；但 CEO skill/§1 仍写“改稿=再委派一次” | **F20**：文档/技能与新工具矛盾；已修（`docs/delegation.md` §1、CEO skill/persona、`eng-teaming`） |
 | C7 | vp-eng root | 后台 job × 重启：`run_in_background` W（4×sleep 30）→ SIGTERM → 重启 → 问 job | `job_list` 空；`job_output` 报 `unknown job`；无完成通知；`list_subagents` 仍有 4 个 `continuable/inactive` child（无 lastTurnEnd、无产出）；父靠自读文件拿地面真值，提议逐个 `send_to_subagent` 唤醒 | **BUG-044**（P2）：后台 job 不跨重启；child 可手动补 |
+| C11 | vp-eng root | 嵌套指针：分支 bash 20k 行 / 469KB 落 spill，分支回指针，父 read 尾部 | 分支只看到 ~2,065 行 / ~50KB 并**自述“没有截断”**（其实引用了 output truncated）；父用 `read offset=19996 limit=5` 读到 `CHILD-TAIL-7a2b` 与 `total 20000 lines`，`wc -c` 468,886 字节；指针跨 child→parent 可达 | PASS；**F21** 方法教训：别信 child 对截断/长度的自述 |
+| C12 | vp-sales root | 其他职能复用 child：subagent 读 l1 → 同一 child 补 checked | 调 `subagent` → `list_subagents` → `send_to_subagent`，同一 child `2ce45cd7…` 出 v1/v2；child mode=continuable；写 `l1.checked.json`，原文件未改 | PASS；**F18 解除**（新工具对非 vp-eng root 也可用；V2 只是模型没选） |
 | C7R | vp-eng root | 恢复 C7：重启后对 4 个 workflow child 逐个 `send_to_subagent` | 4 个都冷恢复回话（会话 durable），但原 `sleep 30; cat` 输出全丢、只能重读文件；job 仍 unknown；模型明确区分“当前真值”与“job 成功证据” | **BUG-044** 恢复面：只能补当前事实，不能恢复原结果 |
 | C6 | vp-eng root | compaction × skill：`skill` + `/compact` + 4 模块 natural 任务 | `/compact` 产出会话摘要（摘要里保留了“eng-teaming / 五档”），之后 4 模块自然任务仍走 workflow（1 run/4 agents），没有退回 subagent×N/bash sleep | PASS（规则在摘要后仍生效） |
 
@@ -486,14 +488,18 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
   重启——job 登记表在进程内，重启后 `job_list` 空、`job_output` unknown、无通知；child 会话仍在
   （continuable/inactive）可手动 `send_to_subagent`，但拿不到原 job 返回值。已修 `eng-teaming` 长跑条
   （别把“job 起了”当“结果可恢复”）；机制/上游留 BUG-044。
+- **F21**：C11 里分支只看到 ~50KB/2,065 行，却自述“没有截断”（同时引用了 output truncated）；父用
+  指针 + `read offset/limit` 拿到 20,000 行尾标记。已修 `eng-teaming`（分支自述的截断/长度不可信，
+  父用指针 + read/tail 核）。
 - **F20**：`send_to_subagent` 让 named child 可续（C10 同一 child 出两版），但 `docs/delegation.md` §1、
   CEO `assembling-the-team`/persona、`eng-teaming` 两处仍写“改稿=再委派一次”，与新工具矛盾。**已修文本**
   （优先 `send_to_subagent` 续同一个 child，不可续再委派）；C10 是红证据（模型照工具描述做了对的事，
   书面契约却相反）。
 - **F19**：C8 里 Lead 花 300s 自己读 vendor、反复 bash/等待 teammate，turn 未收口——不是深度机制失败
   （eng-3 的深度链已如实完成），是“验收”没有上限的观察；暂记，不立卡。
-- **F18**：V2 里 vp-sales root 有 `list_subagents`/`send_to_subagent` 却没提/没用——新工具全局可见但
-  只有 vp-eng/CEO 的 guidance；其他职能是否该有说明，待定（可能不是 bug，是覆盖面问题）。
+- **F18（C12 解除）**：V2 里 vp-sales 没提/没用新工具，但 C12 里同一个角色在“要复用 child”时
+  `subagent → list_subagents → send_to_subagent` 一次走通，同一 child 出 v1/v2。结论：不是能力缺口，
+  是“小任务自读”的方法选择；无需给其他职能加 guidance。
 - **F16 → [BUG-043](../../bugs/BUG-043-list-subagents-includes-teammates.md)**：`list_subagents` 列出
   teammate（它们也是 subagent activation/catalog 条目），与 team `list_agents` 名册重叠；工具描述只强调
   “child 不是 roster member”，没提 teammate 也会出现在列表。候选修法 = 在行上标 `role`/`kind`，或过滤
@@ -503,7 +509,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 
 - compaction 的更强版本（本轮 `/compact` 摘要保留了 eng-teaming；未测“摘要丢掉某条规则”的边界）；
 - one-shot child 的 resume 拒绝（本轮 workflow child 实测是 continuable，one-shot 面未覆盖）；
-- 其他职能 root 是否看见/误用 `list_subagents` / `send_to_subagent`；teammate depth 2/3 与新控制面的交叉；
+- teammate depth 2/3 与新控制面的交叉（C8 已覆盖 depth 链，未覆盖 teammate 对 `send_to_subagent` 的选择）；
 - one-shot child 的 resume 拒绝、后台 job + 重启、`job_kill` 后 durable 形状；
 - teammate 的 depth 2/3 与 `send_to_subagent` 的交叉（C3 只到一层）；
 - 其他职能 root 是否看见/误用 `list_subagents` / `send_to_subagent`；
