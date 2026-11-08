@@ -80,6 +80,8 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
   **这才是"跟 VP 连续对话"的载体**（Q1 的答案）。
 - 代价：teammates **共享 Lead 的组合**（工具/skills 面是 CEO 的，角色差异靠
   name/description + `team:policy` + KB 目录约定做软隔离；上下文隔离仍是硬的）。
+  所以 CEO 团队成员**没有** vp-eng 的 `workflow` / `subagent`；这两个只在 `vp_eng` 命名 child
+  （vp-eng preset）里。要 workflow/subagent 的活走命名委托；团队里叫 "vp-eng" 的成员不是 vp-eng preset。
 
 ## 4. 能力边界（诚实记账，别假装没有）
 

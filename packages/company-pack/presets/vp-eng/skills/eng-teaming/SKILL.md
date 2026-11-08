@@ -12,8 +12,8 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 | 档 | 什么时候用 | 怎么做 | 产出归属 |
 |---|---|---|---|
 | **1 自己做** | 单件、单域、不需要独立人格 | 直接做（读稿→出稿） | 你自己署名 |
-| **2 一次性 worker** | 并行调研/盘点/测算；不要持久协作 | `subagent`（fresh）或 `subagent_fork`（带上下文）；给清晰 brief | worker 只回证据，判断仍署你 |
-| **2.5 并行扇出（workflow）** | ≥3 个同构分支、要合并/交叉核对/只回异常，且不需要独立人格 | `workflow` 写脚本：`parallel`/`pipeline` + `schema` + 异常优先；分支只读或一分支一文件；返回聚合/异常 | 你合稿署名 |
+| **2 一次性 worker** | 1–2 件并行调研/盘点/测算；不要持久协作 | `subagent`（fresh）或 `subagent_fork`（带上下文）；给清晰 brief | worker 只回证据，判断仍署你 |
+| **2.5 并行扇出（workflow）** | ≥3 个同构分支、要合并/交叉核对/只回异常，且不需要独立人格（**默认用 workflow，不是拉多次 subagent**） | `workflow` 写脚本：`parallel`/`pipeline` + `schema` + 异常优先；分支只读或一分支一文件；返回聚合/异常 | 你合稿署名 |
 | **3 命名专家** | 要 CMO/SA/SQA 的**真人格/真结论**（MRD/StRS、SyRS/IRS、V&V） | `vp_cmo` / `system_architect` / `system_qa`（各钉 `agentPreset`，depth 2） | 各署各的名；SQA 结论原样 |
 | **4 持久小队** | 多件产物、多轮、要任务板/依赖图/互审 | `spawn_teammate`：成员是"你带的工程师"（继承你的组合），不是 CMO/SA/SQA | 你合稿；成员只写自己那一块 |
 
