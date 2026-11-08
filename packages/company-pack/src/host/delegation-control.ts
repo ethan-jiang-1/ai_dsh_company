@@ -171,7 +171,7 @@ export function registerDelegationControl(ctx: Context): void {
         agent,
         args.subagent_id,
         [{ type: 'text', text: args.message }],
-        { ...exec.signal === undefined ? {} : { signal: exec.signal } },
+        { signal: exec.signal },
       )
       return { messageId: String(messageId) }
     },
