@@ -26,7 +26,7 @@
    （谁在何时过载、记录能否被篡改）」——场景不含这个用途，Q8/Q10 只会 SKIP，证不了修复。
 
 **范围外**：SA/SQA 的全方位能力组织（按场景取用软件/硬件/电气/机械清单）另立问题卡
-[2026-11-07-sa-sqa-capability-organization](../../_backlog/issues/2026-11-07-sa-sqa-capability-organization.md)；
+[2026-11-07-sa-sqa-capability-organization](../../_backlog/_archive/settled_issues/2026-11-07-sa-sqa-capability-organization.md)；
 它牵涉 VP-Eng 任务书，不在缺陷修复里扩围。
 
 ## 输掉的方案
@@ -95,7 +95,7 @@
 
 - 卡：[BUG-034](../../_backlog/_archive/fixed_bugs/BUG-034-no-absolute-time-source-for-signed-records.md)、
   [BUG-035](../../_backlog/_archive/fixed_bugs/BUG-035-short-circuit-withstand-undefined.md)
-- 能力组织问题（范围外）：[2026-11-07-sa-sqa-capability-organization](../../_backlog/issues/2026-11-07-sa-sqa-capability-organization.md)
+- 能力组织问题（范围外）：[2026-11-07-sa-sqa-capability-organization](../../_backlog/_archive/settled_issues/2026-11-07-sa-sqa-capability-organization.md)
 - 仪器：`probes/team/sa-sqa-quality-audit.mjs`（Q8–Q11）、`probes/team/sa-sqa-delegation-probe.mjs`（场景）
 - 守卫：`tests/presets/presets.spec.ts`（两个 BUG 各一条用例）
 - 被更新的旧 Note：[SA/SQA 子人格](2026-11-06-sa-sqa-subpersonas.md)

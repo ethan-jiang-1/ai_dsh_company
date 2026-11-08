@@ -75,4 +75,4 @@ node probes/team/sa-sqa-quality-audit.mjs      # → v4 的 Q9/Q11 FAIL（2026-1
   （补 `tool-skill` + persona 先加载）、`probes/team/sa-sqa-quality-audit.mjs`、`probes/team/sa-sqa-delegation-probe.mjs`、
   `tests/presets/presets.spec.ts`。
 - 范围外：SA/SQA 的学科域能力组织另立问题卡
-  [2026-11-07-sa-sqa-capability-organization](../../issues/2026-11-07-sa-sqa-capability-organization.md)。
+  [2026-11-07-sa-sqa-capability-organization](../settled_issues/2026-11-07-sa-sqa-capability-organization.md)。

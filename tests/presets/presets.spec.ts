@@ -741,3 +741,50 @@ describe('VP-Eng 组队：根门带小队 + 命名专家（B1）', () => {
     expect(delegation, 'delegation.md 必须写根会话 = Team Lead').toMatch(/根会话[^\n]*Lead|Lead[^\n]*根会话/)
   })
 })
+
+describe('SA/SQA 能力组织：按场景取用学科域（用户 2026-11-08 批准 A+C）', () => {
+  const SA = join(PRESETS_DIR, 'system-architect/skills/systems-architecture/SKILL.md')
+  const SQA = join(PRESETS_DIR, 'system-qa/skills/vv-playbook/SKILL.md')
+  const TEAMING = join(PRESETS_DIR, 'vp-eng/skills/eng-teaming/SKILL.md')
+  const DISCIPLINES = ['软件', '固件', '电气', '机械', '系统测试']
+
+  it('SA skill 有「先判域」五学科表：逐域写 在/不在 + 依据', () => {
+    const skill = readFileSync(SA, 'utf8')
+    expect(skill, 'SA skill 缺「先判域」步骤').toContain('先判域')
+    for (const discipline of DISCIPLINES) {
+      expect(skill, `SA 域判定缺学科 ${discipline}`).toContain(discipline)
+    }
+    expect(skill, '域判定必须写「在/不在」').toMatch(/在\s*\/\s*不在|在\/不在/)
+    expect(skill, '域判定必须写「依据」').toContain('依据')
+  })
+
+  it('纯软件不硬凑、含物理件不漏域：两条边界都在 SA skill', () => {
+    const skill = readFileSync(SA, 'utf8')
+    // 纯软件：用软件自己的判断（状态机/并发/契约/可观测/迁移回滚），不许硬凑采样/供电/耐受。
+    expect(skill, '缺「纯软件只用软件思考」的指令').toMatch(/纯软件/)
+    for (const lens of ['状态机', '并发', '契约', '可观测']) {
+      expect(skill, `纯软件镜头缺 ${lens}`).toContain(lens)
+    }
+    expect(skill, '缺「不硬凑」边界').toMatch(/不(?:许)?硬凑|不凑|不要硬凑/)
+    // 含物理件：执行器/市电/承力 ⇒ 电气/机械不得以「不是我的专业」缺席。
+    expect(skill, '缺物理件触发词（执行器/市电/承力）').toMatch(/执行器[\s\S]{0,120}市电|市电[\s\S]{0,120}承力|承力/)
+    expect(skill, '缺「不是我的专业」反例').toMatch(/不是我的专业/)
+  })
+
+  it('SQA skill 有「域审计」：SA 排除某域却出现该域特征词 → 不通过', () => {
+    const skill = readFileSync(SQA, 'utf8')
+    expect(skill, 'SQA skill 缺「域审计」步骤').toContain('域审计')
+    expect(skill, '域审计必须点名「排除」与「特征词」判据').toMatch(/排除[\s\S]{0,120}特征|特征词/)
+    expect(skill, '域审计结论必须能判不通过').toMatch(/不通过/)
+    for (const discipline of DISCIPLINES) {
+      expect(skill, `SQA 域审计缺学科 ${discipline}`).toContain(discipline)
+    }
+  })
+
+  it('VP-Eng 任务书承载域声明：现场边界 / 执行器·市电·承力 / 产物用途', () => {
+    const skill = readFileSync(TEAMING, 'utf8')
+    expect(skill, 'eng-teaming 任务书缺「现场边界」').toContain('现场边界')
+    expect(skill, 'eng-teaming 任务书缺物理件声明').toMatch(/执行器[\s\S]{0,80}市电|市电[\s\S]{0,80}承力/)
+    expect(skill, 'eng-teaming 任务书缺产物用途（是否举证）').toMatch(/产物用途|是否.*举证|记录.*举证/)
+  })
+})

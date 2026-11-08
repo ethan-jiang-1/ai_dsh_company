@@ -30,7 +30,7 @@
 [authorship-audit](audit/authorship-audit.mjs) · [candidate-scan-eval](audit/candidate-scan-eval.mjs)
 [deliverables-check](audit/deliverables-check.mjs) · [journal-audit](audit/journal-audit.mjs)
 
-## 窄机制与视觉探针（probes/，64）
+## 窄机制与视觉探针（probes/，65）
 
 ### browser-visual（17）
 
@@ -85,7 +85,7 @@
 [reconcile-round-probe](../probes/session-context/reconcile-round-probe.mjs)
 [time-context-probe](../probes/session-context/time-context-probe.mjs)
 
-### team（20）
+### team（21）
 
 [claim-race-probe](../probes/team/claim-race-probe.mjs)
 [dissent-preservation-probe](../probes/team/dissent-preservation-probe.mjs)
@@ -100,6 +100,7 @@
 [sa-sqa-closeout-audit](../probes/team/sa-sqa-closeout-audit.mjs)
 [sa-sqa-delegation-probe](../probes/team/sa-sqa-delegation-probe.mjs)
 [sa-sqa-domain-audit](../probes/team/sa-sqa-domain-audit.mjs)
+[sa-sqa-domain-routing-probe](../probes/team/sa-sqa-domain-routing-probe.mjs)
 [sa-sqa-quality-audit](../probes/team/sa-sqa-quality-audit.mjs)
 [team-atomicity-probe](../probes/team/team-atomicity-probe.mjs)
 [team-claim-loser-probe](../probes/team/team-claim-loser-probe.mjs)

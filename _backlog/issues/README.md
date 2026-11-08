@@ -4,11 +4,11 @@
 
 ## 活跃清单
 
-当前活跃 1 张：
+当前活跃 0 张（最近一张 SA/SQA 能力组织卡 2026-11-08 已结归档）。
 
-| 卡 | 一句话 | 状态 |
-|---|---|---|
-| [2026-11-07-sa-sqa-capability-organization.md](2026-11-07-sa-sqa-capability-organization.md) | SA/SQA 的全方位能力怎么组织：按场景取用学科域（纯软件只用软件思考；EE/ME 不缺席），牵涉 VP-Eng 任务书 | 推敲中 |
+（2026-11-08 SA/SQA 能力组织卡收口：A+C 口径落三份 skill + 任务书域声明 + 域路由探针；
+去向 = [capability-routing Note](../../notes/implemented/2026-11-08-sa-sqa-capability-routing.md)；
+卡片见[归档](../_archive/settled_issues/2026-11-07-sa-sqa-capability-organization.md)。）
 
 （2026-11-07 需求识别/编号 + VP-Eng 组队的程序伞卡 + 11 张执行卡（A1–A8、B1/B2）已结归档：
 去向 = [程序 Note](../../notes/implemented/2026-11-07-requirements-teaming-program.md)；卡片见[归档](../_archive/settled_issues/README.md)。）
