@@ -33,7 +33,7 @@ opened: 2026-11-08
 5. 是否覆盖 background/cancel、`workspace-write` 沙箱、发布安装链、其他职能工具面与长期采纳率？建议本轮以 VP-Eng bug discovery 为主，其余明确延期；用户批准后才可加面。
 6. 真模型证据采用何种合成归档格式和留存期？必须可离线复判且不能收真实业务数据、凭据或用户会话内容。
 
-**下一步：** 第一轮已执行（2026-11-08，结果见下方「第一轮执行结果」）：3 张 P2 缺陷卡 +
+**下一步：** 第一轮已执行（2026-11-08，结果见下方「第一轮执行结果」）：4 张缺陷卡（1×P1 + 3×P2）+
 2 条当场修 + keyless 重试机制档。后续只在用户点名扩面时继续；未覆盖项（长期采纳率、部署面、
 其他职能、更多 natural 变体）保持不做，扩面先问用户。
 
@@ -192,11 +192,13 @@ opened: 2026-11-08
 | W 分支内再委派：返回值混入回执、跨轮拼接；schema 分支会 null | R5 W→S 嵌套 | 分支返回 `started subagent … <值>`；两轮才拿到值 | “分支默认叶子”规则；机制 → [BUG-038](../bugs/BUG-038-workflow-branch-nested-delegation-result.md) |
 | 命名 child 同时 `send_message` + 完成通知，父收两份 | C1 CEO→`vp_eng` | 父会话收到 “Agent … sent a message” + “finished … closing message” | 已修 `eng-workflow` 第 5 步；绿 C2 |
 | CEO 用 `bash sleep 25/30` 轮询 child，不结束本轮 | C1 | turn 142s；child 完成后才回完整答案 | 已修 CEO skill/persona；绿 C2 |
+| workflow >50k 结果硬截断，spill 文件也是截断副本 | R7：**原样返回全量 rows 的溢出压力** | 完整 ~85.9k 字符 → 实际收到 49,929；spill 文件 50,102 且含同一截断标记；父只能落 rows 0–2 完整、row 3 半段、row 4/5 null | eng-teaming 已加“别指望 spill”；机制/上游 → [BUG-039](../bugs/BUG-039-workflow-result-truncation-lossy-spill.md)（P1） |
 
 其余观察（不记为 bug）：R1/T1 小任务自己做是合法方法差异；R4 后台取消干净（job killed、run cancelled、
 6 agents cancelled、无残留 sleep），但模型看不到 run stopReason；N1 负例如实报缺并指出正确路线；
 keyless fake-provider 4/4 证明 retry-once 可行、`AGENT_START`/`AGENT_RESULT` 为 fatal、两次失败停在
-2 starts。
+2 starts；R8 的 `session/cancel` 让前台 workflow 的 turn/run/6 agents/child 全部收敛到 cancelled/aborted，
+无残留 sleep。
 
 ## 关闭条件
 

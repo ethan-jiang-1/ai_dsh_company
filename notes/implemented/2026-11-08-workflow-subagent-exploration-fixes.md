@@ -1,4 +1,4 @@
-# 2026-11-08 · workflow + subagent 探索性测试第一轮：3 张 P2 卡 + 2 条当场修
+# 2026-11-08 · workflow + subagent 探索性测试第一轮：4 张卡（1×P1 + 3×P2）+ 2 条当场修
 
 状态：implemented（2026-11-08；第一轮探索已执行并收口）
 上游 = [探索性测试 bug-hunt 问题卡](../../_backlog/issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)
@@ -21,9 +21,13 @@
     已修 `eng-workflow` 第 5 步：作为命名 child / worker 时终稿就是回执，不再 `send_message` 给父。
   - **F5**（方向 C1）：CEO 用 `bash sleep 25/30` 轮询 child，而不是派发后结束本轮。已修 CEO
     `assembling-the-team` + persona：明确禁止 sleep/轮询，派发后立即结束本轮、完成通知开新轮。
+  - **F6**（方向 R7 溢出压力）：workflow >50k 返回值是**硬截断**，spill notice 说 “Full formatted result”，
+    但 spill 文件同样是截断副本（50,102 字符，含同一 `[truncated: 35806 more characters]` 标记），
+    缺段在模型可读面不可恢复。已修 `eng-teaming`“返回聚合/异常”+ 研究材料 §1.1 更正；
+    机制/上游留 [BUG-039](../../_backlog/bugs/BUG-039-workflow-result-truncation-lossy-spill.md)（P1）。
 - 不把“小任务自己做”（R1/T1）、“natural 选另一条合法通道”记成 bug；不宣称未命中的面没有 bug。
-- 三张缺陷卡都是 P2、`调查中`：当场修的是**本仓提示面/合同**，vendor 机制（schema 子集、团队 shadow、
-  嵌套结果形状）未改。
+- 四张缺陷卡（036/037/038 P2、039 P1）都是 `调查中`：当场修的是**本仓提示面/合同**，vendor 机制
+  （schema 子集、团队 shadow、嵌套结果形状、50k 硬截断）未改。
 
 ## 输掉的方案
 
@@ -32,6 +36,8 @@
   把“缓解”写成“已修”会让下一轮误判机制已解决。
 - **给 keyless retry 加门禁**：vendor 已有同语义测试；本仓加门禁需 P2 判据（复发过 + 可机械判定 +
   负例），本轮只留证据脚本，不预铺。
+- **把 50k 截断当“显示问题”不建卡**：R7 证明 spill 文件也截断、缺段找不回；只加 skill 提示会让下一轮
+  仍误以为可恢复。
 - **让 CEO 前台等 child**：activation 合同是完成通知开新轮；用 sleep 等待会占住 turn、依赖固定睡眠。
 - **在 skill 写“任何 null 都重试一次”**：`null` 不保留 stopReason，refusal/error/aborted/缺结构化结果
   无法区分；只允许对**声明为幂等且可重试**的任务有界重派一次。
@@ -42,8 +48,8 @@
   `eng-workflow` 第 5 步区分 team 任务板与命名 child 回执；CEO 两处加“禁 sleep 轮询”。
 - 机制事实（读侧）：根门 `list_agents` 只列 lead；child 那层才有全局版控制名；workflow 分支内再委派
   的值会跨轮拼接。这些已写进 [delegation 合同](../../docs/delegation.md) §4.4 与技能。
-- 未覆盖：长期采纳率、其他四职能行为、`workspace-write`、release-smoke、natural S-only/M2、结果 spill、
-  max-tokens/aborted 自然案例（详见研究材料 §16.3）。
+- 未覆盖：长期采纳率、其他四职能行为、`workspace-write`、release-smoke、natural S-only/M2、
+  max-tokens/aborted 自然案例；R7 覆盖了 >50k 截断，但未覆盖“分支落文件再汇总”的绿色替代（详见研究材料 §16.3）。
 
 ## 验证（实跑）
 
@@ -57,6 +63,11 @@
   `send_message` + 完成通知双份。
 - **绿**（C2）：`session-08fd1621-98e9-4956-bc89-ee7d0be09c75` CEO 派发后立即结束本轮
   （“已派活，本轮结束”），无 sleep；child 未发 `send_message`。
+- **红**（R7）：`session-c839c3c9-6117-49dd-a9ab-2a21e47b865b` 完整渲染 ~85.9k 字符 → tool result
+  49,929 字符 + `[truncated: 35806 more characters]`；spill 文件 50,102 字符且含同一标记；父落 rows 0–2
+  完整、row 3 半段、row 4/5 null。
+- **取消收敛**（R8）：`session-485bf924-eaf4-459f-b7f2-a3e8ff548318` 12s 后 `session/cancel` →
+  `turn/end aborted(user)`、run `cancelled`、6 agents `cancelled`、child `aborted(parent)`、无残留 sleep。
 - **机制**：`node --import tsx/esm runtime/tmp/explore/keyless-retry.ts` 4/4 PASS（retry-once /
   AGENT_START fatal 穿 parallel / AGENT_RESULT fatal / 两次失败停在 2 starts）。
 - 证据目录：`runtime/tmp/explore/`（gitignored）；研究材料只留脱敏摘要与 session id。

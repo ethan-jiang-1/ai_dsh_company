@@ -63,8 +63,9 @@ intent: 给下一位执行者一份自包含的 briefing + 探索计划——DSH
 所以“workflow 子是独立人格”是假的；“workflow 子是 fresh 的同人格克隆线程”才是准确的。
 
 **上下文**：`delivery: 'caller'`，引擎自己收结果、不发 completion notice；父模型只看脚本最终 JSON
-（渲染上限 `maxResultChars=50000` 字符，超出截断；canonical 值仍完整）。中间子消息不进父会话。
-结果很大时会触发 spill；父代理可能需要读 spill 文件。
+（渲染上限 `maxResultChars=50000` 字符，超出**硬截断**；canonical 值只在引擎内存完整，spill 文件是
+截断副本、模型读不回缺失段——2026-11-08 R7 实证）。中间子消息不进父会话。结果很大时会触发 spill，
+但别指望从 spill 找回被截断的尾段。
 
 **失败/上限**：run 级没有 partial success；子代失败折成 `null`，hook/超帽/取消 → 整轮 `error`/`cancelled`。
 引擎默认：`maxConcurrentAgents=0`（按 CPU）、`maxTotalAgents=1000`、`maxItemsPerCall=4096`、
@@ -397,6 +398,8 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 | C2 | CEO root | C1 绿复跑（修 skill/persona 后） | CEO 派发后立即结束本轮（“已派活，本轮结束”），无 sleep；child 未再发 `send_message`；child 自选 workflow+subagent | 绿证据（F4/F5） |
 | T1 | vp-eng root | teammate：spawn eng-1 + 任务板 | teammate 执行、发消息、更新任务板；Lead 独立复算并落 report/journal；4 个小文件未用 workflow | PASS（方法差异） |
 | N1 | CEO root | 负例：teammate 名 `vp-eng`，要求 workflow | teammate 明确报告“没有 workflow、也不冒充”，并指出根层与 depth 限制；CEO 指出正确路线是 `vp_eng` 命名 child | PASS（能力边界如实处理） |
+| R7 | vp-eng root | 溢出压力：6 分支各 400 行、父原样返回全量 rows | 完整渲染 ~85.9k 字符；tool result 截到 49,929 字符 + `[truncated: 35806 more characters]`；spill 文件也只有 50,102 字符且含同一截断标记；父只能落 rows 0–2 完整、row 3 半段、row 4/5 null，并如实记 missing | **BUG-039**（P1）；spill 不可恢复 |
+| R8 | vp-eng root | 前台 workflow 6×sleep 45，12s 后 `session/cancel` | turn/end `aborted(user)`、run `cancelled`、6 agents `cancelled`、child `aborted(parent)`、无残留 sleep | 取消收敛 PASS |
 | K1 | keyless | fake `SubagentProvider` + 真 workflow 引擎 | ① refusal→null→第二次 structured，starts=2；② `AGENT_START` 穿过 parallel 为 fatal；③ `AGENT_RESULT` 未捕获→run error；④ 两次 refusal 后停在 2 starts | 4/4 PASS；脚本 `runtime/tmp/explore/keyless-retry.ts` |
 
 辅助观察：R5 的孙代、R3 的 W2 分别落在 depth 2；R4 的 child 全部在取消后进入 aborted 终态。
@@ -412,16 +415,17 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 | F3 | W 分支内再委派：返回值混入回执、跨轮拼接；带 schema 的分支会 null | R5 W→S 嵌套 | 已加“分支默认是叶子”规则；机制留 **BUG-038** | R5 |
 | F4 | 命名 child 同时用 `send_message` + 完成通知回报，父收到两份 | C1 CEO→vp_eng | 已修 eng-workflow 第 5 步（终稿即回执）；绿 C2 | C1 / C2 |
 | F5 | CEO 用 `bash sleep` 轮询 child，而不是派发后结束本轮 | C1 | 已修 CEO skill/persona（明确禁 sleep/轮询）；绿 C2 | C1 / C2 |
+| F6 | workflow >50k 返回值硬截断；spill 文件也是截断副本，缺段找不回 | R7 原样返回全量 rows 的溢出压力 | 已修 eng-teaming“返回聚合/异常”+ 研究材料 §1.1 更正；机制留 **BUG-039**（P1） | R7 |
 
 ### 16.3 未覆盖 / 不记为 bug
 
 - 长期采纳率、其他四职能的行为 E2E、CEO root/team 的 workflow 扩面、`workspace-write`、release-smoke；
-- natural S-only / M2 多轮、>50k 结果 spill、max-tokens/aborted 的自然案例；
+- natural S-only / M2 多轮、max-tokens/aborted 的自然案例；R7 已覆盖 >50k 截断，但未覆盖“分支落文件再汇总”的绿色替代；
 - R4 中“后台 run 取消后模型看不到 run stopReason”是工具面观测缺口，不是本卡生命周期的失败；
 - R1/T1 的“小任务自己做”是合法方法选择，不记 bug。
 
 ### 16.4 资产收割决定
 
-- 三张缺陷卡（036/037/038）留作后续修复/上游提案的载体；
+- 四张缺陷卡（036–039）留作后续修复/上游提案的载体；
 - keyless retry 脚本暂不进 `pnpm test`（vendor 已有同语义测试；本仓加门禁需 P2 判据，先留证据）；
 - 常驻 probe 不改：本轮是探索，稳定判据（root 控制面、schema 子集）若再次复现再升级为 probe/spec。

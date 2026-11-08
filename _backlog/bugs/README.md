@@ -2,7 +2,7 @@
 
 当场修掉的不建卡。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。
 
-**下一个缺陷号**：Next BUG ID = 39；已分配 BUG-001..038。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 40；已分配 BUG-001..039。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，修相对链接并更新两边清单。
 
@@ -13,13 +13,14 @@
 | [BUG-036](BUG-036-workflow-schema-enum-type.md) | workflow schema 的 enum/const 必须配 type，模型面描述没说 → 首跑 fatal | P2 |
 | [BUG-037](BUG-037-root-team-tool-shadowing.md) | 根会话是 Lead，团队版控制名 shadow 全局版；契约误写“根不是成员” | P2 |
 | [BUG-038](BUG-038-workflow-branch-nested-delegation-result.md) | workflow 分支内再委派：返回值混入回执，schema 分支会 null | P2 |
+| [BUG-039](BUG-039-workflow-result-truncation-lossy-spill.md) | workflow >50k 结果硬截断，spill 文件也是截断副本，缺段找不回 | P1 |
 | —（历史） | BUG-034 / BUG-035 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：SA/SQA 证据链必查（时间源 + 故障路径耐受）+ 审计 Q8–Q11；2026-11-07 E2E v8 验收 | — |
 
-**2026-11-08 三张卡同轮来源**：workflow + subagent 探索性测试（问题卡
+**2026-11-08 四张卡同轮来源**：workflow + subagent 探索性测试（问题卡
 [exploratory bug hunt](../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)）。发现方向 =
-R2 强制 workflow + 缺失/坏源（036）、R3 委派深度链（037）、R5 W 分支内再委派（038）；同轮当场修掉的
-两条（命名 child 双重回执、CEO sleep 轮询）记在
-[探索 Note](../../notes/implemented/2026-11-08-workflow-subagent-exploration-fixes.md) 与
+R2 强制 workflow + 缺失/坏源（036）、R3 委派深度链（037）、R5 W 分支内再委派（038）、
+R7 原样返回全量 rows 的溢出压力（039）；同轮当场修掉的两条（命名 child 双重回执、CEO sleep 轮询）
+记在 [探索 Note](../../notes/implemented/2026-11-08-workflow-subagent-exploration-fixes.md) 与
 [研究材料结果节](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
 
 **2026-11-07 BUG-034/035 收口**：两张 P1 同源——「属性没人测 = 属性不存在」。修法 = 两侧 skill 各加两条条件必查
