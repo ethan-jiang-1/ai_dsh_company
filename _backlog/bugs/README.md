@@ -10,7 +10,6 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-036](BUG-036-workflow-schema-enum-type.md) | workflow schema 的 enum/const 必须配 type，模型面描述没说 → 首跑 fatal | P2 |
 | [BUG-037](BUG-037-root-team-tool-shadowing.md) | 根会话是 Lead，团队版控制名 shadow 全局版；契约误写“根不是成员” | P2 |
 | [BUG-038](BUG-038-workflow-branch-nested-delegation-result.md) | workflow 分支内再委派：返回值混入回执，schema 分支会 null | P2 |
 | [BUG-039](BUG-039-workflow-result-truncation-lossy-spill.md) | workflow >50k 结果硬截断，spill 文件也是截断副本，缺段找不回 | P1 |
@@ -57,7 +56,7 @@ BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 已修 [fixed_bugs](../_
 
 | 卡 | 级别 | in-repo 修复面（可改） | vendor 侧（只提上游，不改 `vendor/dsh`） |
 |---|---|---|---|
-| [BUG-036](BUG-036-workflow-schema-enum-type.md) | P2 | `eng-teaming` schema 规则已有；补 keyless/探针或 schema 示例 | `tool-workflow` 的 model-facing description / 子集校验提示 |
+| [BUG-036](../_archive/fixed_bugs/BUG-036-workflow-schema-enum-type.md) ✅ | P2 | 已修（2026-11-08）：`eng-teaming` 四条子集约束 + 合同钉子 `tests/harness/contract/json-schema-subset.spec.ts` | `tool-workflow` 的 model-facing description / 子集校验提示（提案待上游） |
 | [BUG-037](BUG-037-root-team-tool-shadowing.md) | P2 | docs/delegation §4.4、5 个 preset 注释、`eng-teaming` 控制面已改；如需可加“非冲突控制名”方案 | agent-team 的 `tryMembership` shadow |
 | [BUG-038](BUG-038-workflow-branch-nested-delegation-result.md) | P2 | `eng-teaming` 分支叶子规则已有；可补结果形状契约/示例 | `workflow-ptc` 嵌套分支返回值 |
 | [BUG-039](BUG-039-workflow-result-truncation-lossy-spill.md) | P1 | `eng-teaming` 聚合/落文件规则已有；R9 绿；可升为常驻 probe/判据 | `tool-workflow` 截断与 spill 副本 |

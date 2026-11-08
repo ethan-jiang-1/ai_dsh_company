@@ -10,7 +10,7 @@
 - **发现的方向与处置**（完整表 = [研究材料 §16](../../_backlog/research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)）：
   - **F1**（方向 R2 强制 workflow + 模型自拟 schema）：`agent({schema})` 的 `enum`/`const` 必须配 `type`，
     模型面描述没说 → 首跑整轮 `UNSUPPORTED_SCHEMA`。已加 `eng-teaming` 规则；机制/上游留
-    [BUG-036](../../_backlog/bugs/BUG-036-workflow-schema-enum-type.md)。
+    [BUG-036](../../_backlog/_archive/fixed_bugs/BUG-036-workflow-schema-enum-type.md)。
   - **F2**（方向 R3 委派深度链）：根会话 = Lead，团队版 `send_message`/`list_agents` shadow 全局版；
     契约 §4.4 与五个 preset 注释误写“职能根会话不是成员”。已修 docs/注释/`eng-teaming` 控制面规则；
     M2 natural 复跑仍见 `wait_agent`（`no-active-peer`），已把它补进控制面列表；机制留

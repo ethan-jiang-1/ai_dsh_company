@@ -1,12 +1,12 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-08
 ---
 
 # BUG-036：workflow `agent({schema})` 的 enum/const 必须配 type，但模型面描述没说
 
-> 严重级别：P2（次要）｜发现：2026-11-08｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-08｜状态：已修（2026-11-08）｜审查：agent — 判据两条均满足（skill 明确写四条子集约束；R6/R15 两次首跑 completed 零 UNSUPPORTED_SCHEMA），新增合同钉子钉住引擎侧语义
 
 ## 症状
 
@@ -71,6 +71,12 @@ vendor `tool-workflow` 的 model-facing description 列举了允许关键字，�
   `completed`；模型按 skill 用 `oneOf: [{type:'string'},{type:'null'}]`（未用 type 数组），
   两分支都调 `structured_output`，缺失文件返回 `version:null`；首跑无 schema fatal。
 - 上游侧仍建议补一句 model-facing description（本仓不改 vendor）。
+- **资产**：`tests/harness/contract/json-schema-subset.spec.ts`——按当前 pin 钉住四条子集语义
+  （enum/const 需单值 type、无 type 数组、oneOf 不与 type 并列、根 object）。红配方 = 把 fixture
+  换成上游修复后的形状（enum 被接受）→ 断言翻转；红 = 上游变了，处理是删/改 skill 与台账 [CT-IN]，
+  不是改断言凑绿。
+- **上游提案**：修复轮收口 Note（`notes/implemented/2026-11-08-delegation-contract-repair.md`，B6 落）
+  §上游批——`tool-workflow` description 补子集约束。
 
 ## 已修判定
 
