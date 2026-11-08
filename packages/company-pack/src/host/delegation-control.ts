@@ -7,11 +7,12 @@
  * 团队版问题在 vendor；本仓能做的是**换一个不被 shadow 的名字**，把官方
  * `ctx.subagents.sendMessage()` 与父会话自己的 durable catalog 暴露给模型（不是平行实现）。
  *
- * 数据来源：父会话 `session.ownEvents()` 里的 `subagent/catalog`（父拥有的 durable 事件，
- * 宿主重启后随会话重放）；**终态**用 `sessionQuery.readSession(childId)` 读 child 的 durable 日志
- * 最后一个 `turn/end`（`openAt: never` 只禁搜索，durable 读仍可用；服务缺席时 fail-soft 省略）。
- * 状态只读 live Agent registry：`running` / `inactive`。
- * 已知边界：`readSession` 只给 reason.kind（如 `interrupted`），不给错过的完成通知内容。
+ * 数据来源（层契约，BUG-042）：父会话 `session.ownEvents()` 里的 `subagent/catalog`（父拥有的
+ * durable 事件，宿主重启后随会话重放）；**终态**用 root 可用的 `sessionPersistence.open(id,'read')`
+ * 读 child durable 日志的最后一个 `turn/end`——**不用** `sessionQuery`（它在本 package 的
+ * `isolate: { sessionQuery: true }` 组内，host 工具拿不到；2026-11-08 实测）。状态只读 live
+ * Agent registry：`running` / `inactive`。承诺字段不静默省略：读不到时输出 `lastTurnEnd:
+ * 'unavailable'`（可见降级）。已知边界：只给 reason.kind（如 `interrupted`），不给错过的通知内容。
  *
  * 退役条件：上游让根会话拿到全局控制名（team shadow 修复）后，本工具删除；
  * 检测锚点 = `tests/company/delegation-control.spec.ts` 与台账 `[CT-LIFE]`。
@@ -59,13 +60,18 @@ export interface SubagentRow {
   label: string
   mode: string
   status: 'running' | 'inactive'
-  /** 子会话 durable 日志里最后一个 `turn/end` 的 reason.kind（宿主重启后常见 `interrupted`）。 */
-  lastTurnEnd?: string
+  /** 子会话 durable 日志里最后一个 `turn/end` 的 reason.kind；读不到时为 `unavailable`（可见降级）。 */
+  lastTurnEnd: string
 }
 
-/** 只用到 durable 读一面；`sessionQuery` 在 `openAt: never` 下仍支持 readSession（搜索被禁）。 */
-interface SessionQueryLike {
-  readSession(id: string): Promise<{ events: readonly { type: string; data: unknown }[] }>
+/** `sessionPersistence` 的只读一面（root 服务；base 挂 JSONL，agent-loop/team 同款用法）。 */
+interface PersistedHandleLike {
+  read(from: number, to?: number, options?: { signal?: AbortSignal }): Promise<{ events: readonly { type: string; data: unknown }[] }>
+  close(): Promise<void>
+}
+
+interface SessionPersistenceLike {
+  open(id: string, access: 'read', options?: { signal?: AbortSignal }): Promise<PersistedHandleLike>
 }
 
 /**
@@ -82,6 +88,28 @@ export function terminalOf(events: readonly { type: string; data: unknown }[]): 
     return typeof reason?.kind === 'string' ? reason.kind : undefined
   }
   return undefined
+}
+
+/**
+ * Read one child's last `turn/end` reason through the root-available durable persistence.
+ * Throws when the session cannot be opened/read; the caller maps that to a visible `unavailable`.
+ * @param persistence - the session persistence service (root; not the isolated sessionQuery).
+ * @param id - the child session id from the parent catalog.
+ * @param signal - optional cancellation for open/read.
+ * @returns the last turn/end reason kind, or undefined when the log has no turn/end.
+ */
+export async function readChildTerminal(
+  persistence: SessionPersistenceLike,
+  id: string,
+  signal?: AbortSignal,
+): Promise<string | undefined> {
+  const handle = await persistence.open(id, 'read', signal === undefined ? undefined : { signal })
+  try {
+    const { events } = await handle.read(0, undefined, signal === undefined ? undefined : { signal })
+    return terminalOf(events)
+  } finally {
+    await handle.close()
+  }
 }
 
 /**
@@ -105,6 +133,7 @@ export function subagentRows(
       label: typeof data.label === 'string' ? data.label : '',
       mode: typeof data.mode === 'string' ? data.mode : 'unknown',
       status: statusOf(data.childId),
+      lastTurnEnd: 'unavailable',
     })
   }
   return [...rows.values()]
@@ -124,7 +153,8 @@ export function registerDelegationControl(ctx: Context): void {
       + 'members — named and generic subagent children are not team roster members, so in a root (Team Lead) '
       + 'session `list_agents` cannot see them. `running` means the child is working; `inactive` means it is '
       + 'not currently working. `lastTurnEnd` is the reason its durable log recorded for the last turn '
-      + '(e.g. `interrupted` after a host restart, `completed`); it is absent when the log cannot be read. '
+      + '(e.g. `interrupted` after a host restart, `completed`); it is `unavailable` when the log cannot be '
+      + 'read (visible degradation, never silently omitted). '
       + 'An `interrupted` child never sends a completion notice: continue it with `send_to_subagent` or report the gap.',
     parameters: {},
     output: {
@@ -143,7 +173,7 @@ export function registerDelegationControl(ctx: Context): void {
                 label: { type: 'string' },
                 mode: { type: 'string' },
                 status: { type: 'string', required: true },
-                lastTurnEnd: { type: 'string' },
+                lastTurnEnd: { type: 'string', required: true },
               },
             },
           },
@@ -155,16 +185,30 @@ export function registerDelegationControl(ctx: Context): void {
       const agent = exec.agent as AgentLike | undefined
       if (agent === undefined) throw new Error('list_subagents requires a calling agent')
       const rows = subagentRows(agent.session.ownEvents(), statusOf)
-      // 终态读取是**可选增强**：服务缺席或单条日志坏了都不影响列出 child（fail-soft，逐条）。
-      const query = ctx.get('sessionQuery') as SessionQueryLike | undefined
-      if (query !== undefined) {
-        await Promise.all(rows.map(async row => {
+      // 终态读 root 的 sessionPersistence（不用 isolate 组里的 sessionQuery）；读不到就**可见降级**。
+      const persistence = ctx.get('sessionPersistence') as SessionPersistenceLike | undefined
+      await Promise.all(rows.map(async row => {
+        if (persistence === undefined) {
+          row.lastTurnEnd = 'unavailable'
+          return
+        }
+        // 宿主刚重启时 durable 根可能还在 settle（首次读偶发失败，C2 实测）；有界重试，
+        // 仍失败则**可见降级**并留一条 warn 供诊断——不静默、不无限重试。
+        let lastError: unknown
+        for (let attempt = 0; attempt < 3; attempt += 1) {
           try {
-            const terminal = terminalOf((await query.readSession(row.id)).events)
-            if (terminal !== undefined) row.lastTurnEnd = terminal
-          } catch { /* durable log unavailable for this child; keep the row without a terminal */ }
-        }))
-      }
+            row.lastTurnEnd = (await readChildTerminal(persistence, row.id, exec.signal)) ?? 'unavailable'
+            return
+          } catch (error) {
+            lastError = error
+            if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 50 * (attempt + 1)))
+          }
+        }
+        row.lastTurnEnd = 'unavailable'
+        ;(ctx as unknown as { logger?: { warn(message: string): void } }).logger?.warn(
+          `list_subagents: cannot read durable log for ${row.id}: ${String(lastError)}`,
+        )
+      }))
       return { subagents: rows }
     },
   }))

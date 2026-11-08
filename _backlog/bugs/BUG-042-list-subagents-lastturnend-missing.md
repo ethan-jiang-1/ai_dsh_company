@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-08
 ---
 
 # BUG-042：`list_subagents` 的 `lastTurnEnd` 在真实装配里恒缺——sessionQuery 在 isolate 组内
 
-> 严重级别：P2（次要）｜发现：2026-11-08｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-08｜状态：修复已落地｜审查：agent — 修法 = 换层：终态读 root 的 `sessionPersistence`，读不到输出 `unavailable`；keyless 真服务测试 + C2 复验中
 
 ## 症状
 
@@ -59,10 +59,26 @@ read.” 而 child 的 durable 日志里确实记着 `turn/end {"reason":{"kind"
 
 ## 修复关联
 
-- 候选修法：① 把 `registerDelegationControl`（或至少 `lastTurnEnd` 的读面）放进能看见 `sessionQuery`
-  的组；② 从 host 能拿到的 durable 读面注入一个 reader；③ 如果两者都不做，删掉 `lastTurnEnd` 承诺
-  并重写 BUG-041 的验收（“至少 interrupted”改由别的可读面满足）。
-- 已在本卡记录，不改代码等用户/修复 Agent 定。
+- **修法（2026-11-08 已落树）**：换层，不搬组——`readChildTerminal` 改用 root 可用的
+  `sessionPersistence.open(id, 'read')` → `read(0)` → 最后一个 `turn/end` → `close`；**不再依赖**
+  `sessionQuery`（isolate 组内，host 拿不到）。服务缺席或单条日志读失败 → `lastTurnEnd: 'unavailable'`
+  （可见降级，禁止静默省略；输出 schema 改为 required）。
+- **keyless 测试资产**：
+  - `tests/company/delegation-control.spec.ts`：fake persistence 三态（present / absent → unavailable /
+    read 抛错 → unavailable）+ 有界重试（前两次失败、第三次成功 → 仍报终态）+ 三次全失败 →
+    `unavailable` 且留一条 warn + `readChildTerminal` 的 open(read)/read(0)/close 调用序。
+  - `tests/harness/contract/session-persistence-terminal.spec.ts`：**真实** `JsonlSessionPersistence`
+    临时 root + `create/append/close` 写日志，读回 `interrupted` / `completed` / 无 turn-end / 不存在；
+    红配方 = 丢掉日志最后一条 → 2 条红，还原绿。
+- **真实装配复验**：重建 pack 后跑 `runtime/tmp/explore/resume2.mjs`（C2）。通过则 041 的
+  “至少 interrupted”恢复成立；本卡归档。
+- **真实装配复验（2026-11-09，两次 C2）**：第一次 `list_subagents` 仍返回
+  `lastTurnEnd: "unavailable"`；`send_to_subagent` 冷恢复后第二次/第三次返回
+  `lastTurnEnd: "interrupted"`。关键环境线索：C2c 的 web 日志两次 boot 都有
+  `另一个 writer 正在使用这个 home（pid 98394）`——探针与另一个实例共用 dev home，
+  **首次读失败可能是重叠 writer 的环境混淆，不是持久化路径本身**。
+  待办：用**独立 DSH_HOME** 的干净重启复验；在那之前本卡保持 `修复已落地`，不归档，
+  041 的“真实装配”证据仍不成立。
 
 ## 已修判定
 
