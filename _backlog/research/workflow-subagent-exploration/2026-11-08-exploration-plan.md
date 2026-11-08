@@ -469,6 +469,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 | C9 | vp-eng root | bash 2000 行 + 尾标记，测 pruner/保留策略 | bash 结果尾部保留、`TAIL-MARKER-9f3a` 直接可见；模型又落 `/tmp` 用 `wc -l`/`tail -n 1`/`grep -c` 独立复核 | PASS（砍头不砍尾） |
 | C10 | CEO root | named child 复用：先 `vp_eng` 出 v1，再让同一 child 出 v2（加 checked） | CEO 调 `vp_eng` → `send_to_subagent` → `list_subagents`；**同一个 child `2fd302d7…` 出两版**，未新起 VP-Eng；但 CEO skill/§1 仍写“改稿=再委派一次” | **F20**：文档/技能与新工具矛盾；已修（`docs/delegation.md` §1、CEO skill/persona、`eng-teaming`） |
 | C7 | vp-eng root | 后台 job × 重启：`run_in_background` W（4×sleep 30）→ SIGTERM → 重启 → 问 job | `job_list` 空；`job_output` 报 `unknown job`；无完成通知；`list_subagents` 仍有 4 个 `continuable/inactive` child（无 lastTurnEnd、无产出）；父靠自读文件拿地面真值，提议逐个 `send_to_subagent` 唤醒 | **BUG-044**（P2）：后台 job 不跨重启；child 可手动补 |
+| C7R | vp-eng root | 恢复 C7：重启后对 4 个 workflow child 逐个 `send_to_subagent` | 4 个都冷恢复回话（会话 durable），但原 `sleep 30; cat` 输出全丢、只能重读文件；job 仍 unknown；模型明确区分“当前真值”与“job 成功证据” | **BUG-044** 恢复面：只能补当前事实，不能恢复原结果 |
 | C6 | vp-eng root | compaction × skill：`skill` + `/compact` + 4 模块 natural 任务 | `/compact` 产出会话摘要（摘要里保留了“eng-teaming / 五档”），之后 4 模块自然任务仍走 workflow（1 run/4 agents），没有退回 subagent×N/bash sleep | PASS（规则在摘要后仍生效） |
 
 ### 17.2 新发现（待分诊，不直接改代码）
