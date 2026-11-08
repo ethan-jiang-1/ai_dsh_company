@@ -74,6 +74,10 @@ local subagent 是进程内 agent；宿主进程死亡时 child 的 turn 被记�
 - **上游（可选，不再阻塞）**：resume 时对父侧 `subagent/catalog` 里没有终态的 child 补 `subagent/end`
   （interrupted），让父会话**不用主动查询**也能收到；收口 Note 的上游批第 5 条随之降为“体验增强”。
 
+- **复核（2026-11-09，BUG-042 修复后）**：干净 home 的 C2f 探针里，重启后**首次** `list_subagents` 即返回
+  `lastTurnEnd: interrupted` + `lastTurnEndDetail: inferred-open-turn`（open turn + inactive 的 durable 推断），
+  `send_to_subagent` 冷恢复后续跑完成。本卡“至少 interrupted”的验收由 BUG-042 的修复恢复成立。
+
 ## 已修判定
 
 - 宿主重启后，父会话能收到（或能主动查询到）每个 in-flight child 的终态（至少 `interrupted`）；

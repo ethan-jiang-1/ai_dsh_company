@@ -2,11 +2,11 @@
 // 层契约钉子（BUG-042 修复轮）：child 终止态必须从 **root 可用的 sessionPersistence** 读，
 // 不是 isolate 组里的 sessionQuery（host 工具拿不到它——真实装配实测，见 BUG-042 卡）。
 //
-// 钉什么：`readChildTerminal` 对**真实** JsonlSessionPersistence 的行为——open(read) → read(0) →
-//   最后一个 turn/end 的 reason.kind → close；日志由真实 persistence.create/append 写入（不是 fake）。
+// 钉什么：`readChildTurnState` 对**真实** JsonlSessionPersistence 的行为——open(read) → read(0) →
+//   `childTurnState`（终态 / open turn / 无 turn）→ close；日志由真实 create/append 写入（不是 fake）。
 //   这条用真服务而不是 fake：fake 只能证明代码形状，证明不了"host 能拿到这个服务"。
 //
-// 红配方（prove-it-red）：让 readChildTerminal 丢掉日志最后一条（`events.slice(0,-1)`）→ 前两条红；
+// 红配方（prove-it-red）：让 readChildTurnState 丢掉日志最后一条（`events.slice(0,-1)`）→ 前两条红；
 //   或改回读 `sessionQuery`（isolate 组，host 没有）→ open 不可用，红。还原 → 绿。
 //
 // 证明不了什么：真实 company profile 里 host 插件能否拿到 sessionPersistence（由 C2 探针验）；
@@ -18,7 +18,7 @@ import { describe, expect, it } from 'vitest'
 import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
 import * as JsonlSessionPersistence from '../../../vendor/dsh/packages/session/session-persistence-jsonl/src/index.ts'
 import { SESSION_FORMAT_VERSION, SessionId } from '../../../vendor/dsh/packages/core/session/src/types.ts'
-import { readChildTerminal } from '../../../packages/company-pack/src/host/delegation-control.ts'
+import { readChildTurnState } from '../../../packages/company-pack/src/host/delegation-control.ts'
 
 /** Mount the real JSONL persistence on a temp root. */
 async function mount(root: string): Promise<Context> {
@@ -58,7 +58,8 @@ describe('child terminal via the real session persistence', () => {
     const ctx = await mount(root)
     try {
       await writeChildLog(ctx.sessionPersistence, root, 'child-1', [turnStart, turnEnd('interrupted')])
-      await expect(readChildTerminal(ctx.sessionPersistence, 'child-1')).resolves.toBe('interrupted')
+      await expect(readChildTurnState(ctx.sessionPersistence, 'child-1'))
+        .resolves.toEqual({ terminal: 'interrupted', openTurn: false, sawTurn: true })
     } finally {
       await ctx.fiber.dispose()
       await rm(root, { recursive: true, force: true })
@@ -70,10 +71,12 @@ describe('child terminal via the real session persistence', () => {
     const ctx = await mount(root)
     try {
       await writeChildLog(ctx.sessionPersistence, root, 'child-2', [turnStart, turnEnd('completed')])
-      await expect(readChildTerminal(ctx.sessionPersistence, 'child-2')).resolves.toBe('completed')
+      await expect(readChildTurnState(ctx.sessionPersistence, 'child-2'))
+        .resolves.toEqual({ terminal: 'completed', openTurn: false, sawTurn: true })
 
       await writeChildLog(ctx.sessionPersistence, root, 'child-3', [turnStart])
-      await expect(readChildTerminal(ctx.sessionPersistence, 'child-3')).resolves.toBeUndefined()
+      await expect(readChildTurnState(ctx.sessionPersistence, 'child-3'))
+        .resolves.toEqual({ openTurn: true, sawTurn: true })
     } finally {
       await ctx.fiber.dispose()
       await rm(root, { recursive: true, force: true })
@@ -84,7 +87,7 @@ describe('child terminal via the real session persistence', () => {
     const root = await mkdtemp(join(tmpdir(), 'dsh-terminal-persist-'))
     const ctx = await mount(root)
     try {
-      await expect(readChildTerminal(ctx.sessionPersistence, 'missing-child')).rejects.toThrow()
+      await expect(readChildTurnState(ctx.sessionPersistence, 'missing-child')).rejects.toThrow()
     } finally {
       await ctx.fiber.dispose()
       await rm(root, { recursive: true, force: true })

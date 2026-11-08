@@ -481,7 +481,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 - **F14**：`read` 对超长单行（spill 里的 JSON rows）按 2000 字符截断；`eng-teaming` 当前写“可用
   `read`/`grep` 取回全文”对长行不成立。模型改用 `bash tail -c` 才拿到尾部。**已修 skill**
   （长行用 bash 按字节取；2026-11-08 同日），vendor 的 spill retrievalHint 仍可补。
-- **F15 → [BUG-042](../../bugs/BUG-042-list-subagents-lastturnend-missing.md)**：`list_subagents` 的
+- **F15 → [BUG-042](../../_archive/fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md)**：`list_subagents` 的
   `lastTurnEnd` 在真实 profile 恒缺——`ctx.get('sessionQuery')` 看不到 `company-session-search`
   isolate 组里的 provider；`delegation-control.spec.ts` 用 fake service，所以门禁绿。C2b 复现。
   候选修法 = 把控制工具/终态读取放进能看见 sessionQuery 的组、或改用可用的 durable 读面、或删掉

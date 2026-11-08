@@ -10,7 +10,7 @@
   多层结果变换、cold resume/新控制工具、团队继承×新控制名、compaction×skill；workspace-write 本机
   Seatbelt 阻塞，不测不声称。
 - **新发现分诊**（不是全部都要修）：
-  - [BUG-042](../../_backlog/bugs/BUG-042-list-subagents-lastturnend-missing.md)（P2）：
+  - [BUG-042](../../_backlog/_archive/fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md)（P2）：
     `list_subagents` 的 `lastTurnEnd` 真实装配恒缺——`company-session-query-sqlite` 在
     `isolate:{sessionQuery:true}` 组内，host 的 `ctx.get('sessionQuery')` 拿不到；修复轮 spec 用 fake
     service，所以门禁绿。C2/C2b/C7 三次复现。**修复 Agent 已接 042，本轮不动。**

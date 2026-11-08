@@ -4,6 +4,8 @@
 
 ## 修复流水（倒序）
 
+- **BUG-042**（2026-11-08）：`list_subagents.lastTurnEnd` 在真实装配恒缺——终态读的是 `sessionQuery`，而它在本 pack 的 `isolate: {sessionQuery:true}` 组内，host 工具 `ctx.get` 拿不到；fake service 的单测把它藏住了。修法 = **换层**读 root 的 `sessionPersistence.open(id,'read')`；`childTurnState` 区分终态/open turn/无 turn——**open turn + inactive = `interrupted` + `inferred-open-turn`**（宿主被杀且 terminal 未落盘的 durable 签名）；读失败才 `unavailable` + detail；有界重试 + warn。keyless = 17 单元 + 3 真实 JsonlSessionPersistence（create/append/close，红配方）；真实装配 C2f 干净 home 首次查询即 interrupted，041 的“至少 interrupted”证据恢复。详见 [卡](BUG-042-list-subagents-lastturnend-missing.md)。
+
 - **BUG-044**（2026-11-08）：后台 workflow job 不跨宿主重启——job 登记表随进程消失，`job_list` 空、`job_output` unknown，父会话没有可查的终态/结果；child 会话 durable 但在（C7/C7R）。修法 = 新增 host 工具 **`workflow_runs`**：只读父会话自己的 `tool-workflow/run-start|agent-start|run-end` + 工具回执，输出 `{runId,name,background,jobId?,status,children}`；无 run-end 且 job 注册表不认识 → **`lost`**（明确标注；原结果不恢复，children 可冷恢复取当前事实）。keyless 6 条；真实 C7b 会话日志离线验证输出 lost + jobId + 4 children。C7b 探针里模型未实际调用该工具（行为观察，能力已验）。上游：job registry durable 化/resume 对账。详见 [卡](BUG-044-background-job-lost-on-restart.md)。
 
 - **BUG-043**（2026-11-08）：`list_subagents` 把 `spawn_teammate` 的成员也列出来（同一个 child 机制的两个视图），与 team `list_agents` 重叠且描述未说明，模型可能选错寻址。修法 = **不隐藏、标身份**：每行加 `role: 'teammate' | 'subagent'` 与 `address`（teammate → 队名，subagent → session id），身份来自 `agentTeams.tryMembership/listMembers`（服务缺席/非成员全按 subagent，不丢行）；description + `eng-teaming` 写死两套寻址。keyless 14 条（含 team/无 team/非成员/description 断言）。未跑 C3 真模型观察，按“description/skill 写死 + 绿证据”分支收口。详见 [卡](BUG-043-list-subagents-includes-teammates.md)。

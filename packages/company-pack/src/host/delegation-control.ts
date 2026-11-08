@@ -98,6 +98,42 @@ interface SessionPersistenceLike {
   open(id: string, access: 'read', options?: { signal?: AbortSignal }): Promise<PersistedHandleLike>
 }
 
+/** Durable turn shape: a recorded terminal, an open turn, or no turn at all. */
+export interface ChildTurnState {
+  terminal?: string
+  openTurn: boolean
+  sawTurn: boolean
+}
+
+/**
+ * Classify a child's durable log by its last turn boundary.
+ * An open turn (turn/start without a later turn/end) on an inactive child is the
+ * durable signature of a host kill: the engine never got to write a terminal.
+ * @param events - the child session's raw event log.
+ * @returns the last terminal kind, or the open/no-turn shape.
+ */
+export function childTurnState(events: readonly { type: string; data: unknown; seq?: number }[]): ChildTurnState {
+  let lastStart = -1
+  let lastEnd: { seq: number; kind?: string } | undefined
+  let sawTurn = false
+  for (const [index, event] of events.entries()) {
+    const seq = typeof event.seq === 'number' ? event.seq : index
+    if (event.type === 'turn/start') {
+      sawTurn = true
+      lastStart = seq
+    } else if (event.type === 'turn/end') {
+      sawTurn = true
+      const reason = (event.data as { reason?: { kind?: unknown } } | undefined)?.reason
+      lastEnd = { seq, ...typeof reason?.kind === 'string' ? { kind: reason.kind } : {} }
+    }
+  }
+  if (!sawTurn) return { openTurn: false, sawTurn: false }
+  if (lastEnd !== undefined && lastEnd.seq > lastStart) {
+    return { openTurn: false, sawTurn: true, ...lastEnd.kind === undefined ? {} : { terminal: lastEnd.kind } }
+  }
+  return { openTurn: true, sawTurn: true }
+}
+
 /**
  * Last `turn/end` reason kind from a child's durable event log.
  * Pure: the spec pins the exact value the model sees after a host restart.
@@ -130,15 +166,15 @@ function readErrorDetail(error: unknown): string {
  * @param signal - optional cancellation for open/read.
  * @returns the last turn/end reason kind, or undefined when the log has no turn/end.
  */
-export async function readChildTerminal(
+export async function readChildTurnState(
   persistence: SessionPersistenceLike,
   id: string,
   signal?: AbortSignal,
-): Promise<string | undefined> {
+): Promise<ChildTurnState> {
   const handle = await persistence.open(id, 'read', signal === undefined ? undefined : { signal })
   try {
     const { events } = await handle.read(0, undefined, signal === undefined ? undefined : { signal })
-    return terminalOf(events)
+    return childTurnState(events)
   } finally {
     await handle.close()
   }
@@ -193,6 +229,8 @@ export function registerDelegationControl(ctx: Context): void {
       + 'not currently working. `lastTurnEnd` is the reason its durable log recorded for the last turn '
       + '(e.g. `interrupted` after a host restart, `completed`); it is `unavailable` when the log cannot be '
       + 'read (visible degradation, never silently omitted); `lastTurnEndDetail` names the short reason then. '
+      + 'An inactive child whose durable log has an open turn (started, never ended — e.g. the host was killed) '
+      + 'is reported as `interrupted` with `lastTurnEndDetail: inferred-open-turn`; `none` means no open turn. '
       + 'An `interrupted` child never sends a completion notice: continue it with `send_to_subagent` or report the gap.',
     parameters: {},
     output: {
@@ -251,7 +289,20 @@ export function registerDelegationControl(ctx: Context): void {
         let lastError: unknown
         for (let attempt = 0; attempt < 3; attempt += 1) {
           try {
-            row.lastTurnEnd = (await readChildTerminal(persistence, row.id, exec.signal)) ?? 'unavailable'
+            const state = await readChildTurnState(persistence, row.id, exec.signal)
+            if (state.terminal !== undefined) {
+              row.lastTurnEnd = state.terminal
+            } else if (state.openTurn && row.status === 'inactive') {
+              // durable signature of a host kill: turn started, never ended, child not running
+              row.lastTurnEnd = 'interrupted'
+              row.lastTurnEndDetail = 'inferred-open-turn'
+            } else if (state.openTurn) {
+              row.lastTurnEnd = 'none'
+              row.lastTurnEndDetail = 'turn-in-progress'
+            } else {
+              row.lastTurnEnd = 'none'
+              row.lastTurnEndDetail = 'no-turn-recorded'
+            }
             return
           } catch (error) {
             lastError = error

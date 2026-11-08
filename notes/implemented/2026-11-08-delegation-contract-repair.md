@@ -127,9 +127,10 @@
   completed/cancelled/running/lost + children；lost = 无 run-end 且 job 注册表不认识）。
   keyless 6 条；**真实 C7b 会话日志离线验证**输出 `lost` + jobId + 4 children；C7b 探针里模型
   未实际调用该工具（行为观察，能力已验）。原 job 结果明确不恢复。
-- **BUG-042（修复已落地，未归档）**：终态改读 root `sessionPersistence`（不再用 isolate 的
-  `sessionQuery`）+ `unavailable`/`lastTurnEndDetail` 可见降级 + 有界重试；keyless 3 条真实
-  JSONL 持久化测试（create/append/close + 红配方）。**真实装配仍有缺口**：C2d 干净 home 下
-  重启后第一次查询仍 `unavailable`，`send_to_subagent` 冷恢复后第二次才 `interrupted`；
-  原因未定位（需看 `lastTurnEndDetail` 的下一次探针）。041 的“真实装配 interrupted”证据
-  因此仍未成立。
+- **BUG-042（已修归档）**：终态改读 root `sessionPersistence`（不再用 isolate 的 `sessionQuery`）；
+  诊断发现首次查询的 `unavailable` **不带 detail** ⇒ 不是读失败，而是 child 日志里还没有 `turn/end`
+  （宿主被杀时 terminal 未落盘）。修法 = `childTurnState` 分类：有终态用终态；**open turn + inactive
+  → `interrupted` + `inferred-open-turn`**；open + running → `none/turn-in-progress`；无 turn →
+  `none/no-turn-recorded`；只有读失败才 `unavailable` + detail。keyless 20 条（17 单元 + 3 真实 JSONL
+  持久化，红配方）。**真实装配 C2f（干净 home）首次查询即 `interrupted`**；041 的“至少 interrupted”
+  验收随之恢复成立（已在 041 归档卡补复核行）。

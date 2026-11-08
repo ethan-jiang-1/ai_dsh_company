@@ -153,6 +153,7 @@
 | [BUG-040-workflow-schema-text-answer-discarded.md](fixed_bugs/BUG-040-workflow-schema-text-answer-discarded.md) | schema 分支丢文本：产品规避（分支禁 schema、单行 JSON + 父 parse）+ smoke 第 7 条；引擎诊断仍缺 | 2026-11-08 |
 | [BUG-043-list-subagents-includes-teammates.md](fixed_bugs/BUG-043-list-subagents-includes-teammates.md) | teammate 混入 subagent 列表：行加 role/address（队名/session id）+ description/skill 两套寻址；keyless 14 条 | 2026-11-08 |
 | [BUG-044-background-job-lost-on-restart.md](fixed_bugs/BUG-044-background-job-lost-on-restart.md) | 后台 job 不跨重启：新增 `workflow_runs` durable 视图（lost+running+children）；keyless 6 条 + 真实 C7b 日志离线验证 | 2026-11-08 |
+| [BUG-042-list-subagents-lastturnend-missing.md](fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md) | `lastTurnEnd` 恒缺：换 sessionPersistence 读 + open-turn 推断 interrupted（inferred-open-turn）；keyless 20 条 + C2f 真实验证 | 2026-11-08 |
 
 ## 暂停卡
 

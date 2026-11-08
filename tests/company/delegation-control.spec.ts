@@ -7,7 +7,7 @@
  * 不证明：真实装配里工具可见性（preset-smoke / 真会话探针）、cold resume 的 provider 行为。
  */
 import { describe, expect, it } from 'vitest'
-import { readChildTerminal, registerDelegationControl, subagentRows, terminalOf } from '../../packages/company-pack/src/host/delegation-control.ts'
+import { childTurnState, readChildTurnState, registerDelegationControl, subagentRows, terminalOf } from '../../packages/company-pack/src/host/delegation-control.ts'
 
 type ToolDefinition = {
   name: string
@@ -124,7 +124,7 @@ describe('delegation control tools', () => {
     await expect(tool.execute({ subagent_id: 'x', message: 'y' } as never, { agent: agentWith([]) } as never))
       .rejects.toThrow(/subagents service/)
   })
-  it('readChildTerminal opens read-only, reads from 0, and always closes the handle', async () => {
+  it('readChildTurnState opens read-only, reads from 0, and always closes the handle', async () => {
     const calls: string[] = []
     const persistence = {
       open: async (id: string, access: string) => {
@@ -138,7 +138,8 @@ describe('delegation control tools', () => {
         }
       },
     }
-    await expect(readChildTerminal(persistence, 'child-1')).resolves.toBe('interrupted')
+    await expect(readChildTurnState(persistence, 'child-1'))
+      .resolves.toEqual({ terminal: 'interrupted', openTurn: false, sawTurn: true })
     expect(calls).toEqual(['open:child-1:read', 'read:0', 'close'])
   })
 
@@ -205,6 +206,46 @@ describe('delegation control tools', () => {
     expect(result.subagents[0]?.lastTurnEndDetail).toBe('persistently unreadable')
     expect(warnings).toHaveLength(1)
     expect(warnings[0]).toContain('cannot read durable log')
+  })
+
+  it('childTurnState distinguishes a recorded terminal, an open turn, and no turn', () => {
+    expect(childTurnState([
+      { type: 'turn/start', seq: 0, data: {} },
+      { type: 'turn/end', seq: 1, data: { reason: { kind: 'completed' } } },
+    ])).toEqual({ terminal: 'completed', openTurn: false, sawTurn: true })
+    expect(childTurnState([
+      { type: 'turn/start', seq: 0, data: {} },
+      { type: 'turn/end', seq: 1, data: { reason: { kind: 'completed' } } },
+      { type: 'turn/start', seq: 2, data: {} },
+    ])).toEqual({ openTurn: true, sawTurn: true })
+    expect(childTurnState([{ type: 'message', seq: 0, data: {} }]))
+      .toEqual({ openTurn: false, sawTurn: false })
+  })
+
+  it('reports interrupted for an inactive child with an open durable turn (host-kill signature)', async () => {
+    const sessionPersistence = persistenceOf({
+      'child-1': [{ type: 'turn/start', data: {} }],
+    })
+    const tool = harness({ sessionPersistence }).get('list_subagents')
+    if (tool === undefined) throw new Error('list_subagents not registered')
+    const result = await tool.execute({} as never, {
+      agent: agentWith([catalog('child-1', 'w1')]),
+      signal: new AbortController().signal,
+    } as never) as { subagents: Array<{ lastTurnEnd: string; lastTurnEndDetail?: string }> }
+    expect(result.subagents[0]).toMatchObject({ lastTurnEnd: 'interrupted', lastTurnEndDetail: 'inferred-open-turn' })
+  })
+
+  it('reports none (turn in progress) for a running child with an open turn', async () => {
+    const sessionPersistence = persistenceOf({
+      'child-1': [{ type: 'turn/start', data: {} }],
+    })
+    const tool = harness({ sessionPersistence, agents: { get: () => ({ status: 'running' }) } }).get('list_subagents')
+    if (tool === undefined) throw new Error('list_subagents not registered')
+    const result = await tool.execute({} as never, {
+      agent: agentWith([catalog('child-1', 'w1')]),
+      signal: new AbortController().signal,
+    } as never) as { subagents: Array<{ lastTurnEnd: string; lastTurnEndDetail?: string }> }
+    expect(result.subagents[0]).toMatchObject({ lastTurnEnd: 'none', lastTurnEndDetail: 'turn-in-progress' })
   })
 
   it('terminalOf takes the last turn/end reason and ignores malformed rows', () => {

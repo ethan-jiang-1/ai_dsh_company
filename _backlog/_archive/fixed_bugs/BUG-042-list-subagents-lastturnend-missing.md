@@ -1,12 +1,12 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-08
 ---
 
 # BUG-042：`list_subagents` 的 `lastTurnEnd` 在真实装配里恒缺——sessionQuery 在 isolate 组内
 
-> 严重级别：P2（次要）｜发现：2026-11-08｜状态：修复已落地｜审查：agent — 修法 = 换层：终态读 root 的 `sessionPersistence`，读不到输出 `unavailable`；keyless 真服务测试 + C2 复验中
+> 严重级别：P2（次要）｜发现：2026-11-08｜状态：已修｜审查：agent — 真实装配 C2f 首次查询返回 interrupted + inferred-open-turn（干净 home）；keyless 17 单元 + 3 真实持久化；041 的“至少 interrupted”证据恢复
 
 ## 症状
 
@@ -72,10 +72,25 @@ read.” 而 child 的 durable 日志里确实记着 `turn/end {"reason":{"kind"
     红配方 = 丢掉日志最后一条 → 2 条红，还原绿。
 - **真实装配复验**：重建 pack 后跑 `runtime/tmp/explore/resume2.mjs`（C2）。通过则 041 的
   “至少 interrupted”恢复成立；本卡归档。
+- **根因（2026-11-09 诊断，C2e）**：首次查询输出 `lastTurnEnd: unavailable` **但没有 `lastTurnEndDetail`**
+  ⇒ 不是持久化读失败；是 child 的 durable 日志里**还没有 turn/end**（`turn/start` 后宿主被杀，
+  terminal 尚未落盘）。`terminalOf` 返回 undefined → 旧的映射把它当成 unavailable。
+- **修法（2026-11-09）**：`childTurnState(events)` 分类：
+  - 有 turn/end → 终态（interrupted/completed/…）；
+  - **open turn + child inactive → `interrupted` + detail `inferred-open-turn`**（durable 的宿主被杀签名）；
+  - open turn + running → `none` + `turn-in-progress`；无 turn → `none` + `no-turn-recorded`；
+  - 只有**读失败**才是 `unavailable` + detail。
+  keyless：单元 17 条（含 open-turn 推断、running、childTurnState 三态）+ 真实持久化 3 条。
+
 - **诊断增强（2026-11-09）**：`lastTurnEnd` 为 `unavailable` 时，行上带 **`lastTurnEndDetail`**（错误 code
   或截断 message），模型/日志可直接看到原因；下一次 C2 用它定位“首次读失败”的具体错误。
   当前不再增加探针（C2 预算已用尽，等用户裁决 A/B/C）。
-- **真实装配复验（2026-11-09，两次 C2）**：第一次 `list_subagents` 仍返回
+- **真实装配复验（2026-11-09，C2b–C2f）**：C2b/C2c（共用 dev home，有 writer）/C2d（干净 home）首次查询
+  都是 `unavailable`；C2e 带诊断字段后确认**没有 detail** ⇒ 不是读失败，是日志里还没有 turn/end。
+  加 `childTurnState` 推断后，**C2f（干净 home）首次查询即返回**
+  `lastTurnEnd: "interrupted"` + `lastTurnEndDetail: "inferred-open-turn"`（status inactive），
+  `send_to_subagent` 冷恢复后续跑完成。机器 transcript 为准（模型自述此前有误）。
+：第一次 `list_subagents` 仍返回
   `lastTurnEnd: "unavailable"`；`send_to_subagent` 冷恢复后第二次/第三次返回
   `lastTurnEnd: "interrupted"`。关键环境线索：C2c 的 web 日志两次 boot 都有
   `另一个 writer 正在使用这个 home（pid 98394）`——探针与另一个实例共用 dev home，
