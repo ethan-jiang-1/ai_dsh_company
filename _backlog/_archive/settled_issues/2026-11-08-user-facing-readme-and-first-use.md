@@ -173,7 +173,7 @@ opened: 2026-11-08
 - **手册**：v4 模板（`tools/lib/install-manual.mjs`）；新增 §四「第一次经营一家公司」六步；七问冷读 **7/7**；`node tools/export-dist.mjs` ALL PASS，sha `7cfc216d…`；`dist-manual` 模板同源绿。
 - **契约门**：`readme-manual-commands` 先红（README 三处安装副本不在手册）后绿（README 的 2 条 dsh 命令全在手册）；已接线，`checks/INDEX.generated.md` 重生成。
 - **开发面**：README 开发者内容 1 行 → [bootstrap](../../../docs/guides/bootstrap.md)；pack README 安装段收成一句 + 手册指针（Data/Backup/Uninstall 结构未动）。
-- **全量检查**：`pnpm test` 1,223 PASS、`pnpm typecheck` exit 0、本变更面 `pnpm verify` ALL PASS；`pnpm release --check` 被**并行会话未提交的在途卡**阻断（其计划 Note 未落地 → `bare-path` 红 + 树不干净），非本卡改动引入；详见 Note「全量检查」与「未验 / 环境限制」。
+- **全量检查**：`pnpm test` 1,223 PASS、`pnpm typecheck` exit 0、`pnpm verify` ALL PASS、`pnpm release --check` **READY 0.9.0**（7 项检查 pass）；并行会话在途研究文件在 stamp/check 短窗口内临时 stash、随后原样恢复。
 - **环境限制（如实）**：真跑走查在嵌套沙箱里停在 `danger-full-access` 审批卡（`sandbox-exec` 被上层挡），未观察到 `final.md` 落盘；首用前四步、任务归 VP-Eng、审批卡已实测，审批步骤已写进两份文档。
 
 ## 已知风险
