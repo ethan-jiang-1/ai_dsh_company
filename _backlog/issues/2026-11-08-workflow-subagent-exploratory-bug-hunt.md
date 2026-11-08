@@ -196,7 +196,14 @@ opened: 2026-11-08
 | 根门仍会用 `wait_agent` 等 subagent child（团队版） | M2 natural 多轮混合 | `wait_agent` 报 `no-active-peer` 一次；多轮结果未丢（W 4 agents + 2 S，三轮原文/分歧保留） | 已把 `wait_agent`/`interrupt_agent` 补进 eng-teaming 控制面 |
 | C 入口 depth 链：命名 child 起 W1 后再起 W2 被拒 | CD2 CEO→`vp_eng` | W1 的 `subagent` 被拒 `depth 3 exceeds maxDepth 2`；声明面 `current 2 / max 2 / remaining 0`；W1 未读文件/未重试；child 用 `bash sleep 90/75`（观察） | depth 边界 PASS；sleep 记观察 |
 | 带 schema 的分支只回文本 → 父拿 null，文本答案被丢弃、无诊断 | R10 后台 W 自然完成 + schema | m01 child 读了文件、回正确 JSON 文本、`turn/end completed`；父 `modules[0]=null`、`count:3`；job/run 仍 completed；补跑 subagent 才拿到 m01 | eng-teaming 已加“schema 分支明确要 structured_output / 验收看 null/count”；机制/上游 → [BUG-040](../bugs/BUG-040-workflow-schema-text-answer-discarded.md)（P2） |
+| `subagent_fork` 只带已完成轮，同一 turn 刚读的不在 | R12：同 turn 内 read a 再 fork | fork 报 `a = NOT-IN-CONTEXT`，拒绝重读伪造；b/c workflow 值正确；父记 `fork_inherited_a: false` | eng-teaming 五档表已写明；观察 |
 | 宿主重启后 in-flight child 成孤儿，父收不到终态也查不到 | RS1：child 在跑时 SIGTERM 宿主再重启 | 父 durable 无新 turn/notice；child durable `turn/end interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，自述无法查询 | eng-teaming 长跑条已加“别跨重启等通知”；机制/上游 → [BUG-041](../bugs/BUG-041-host-restart-orphans-inflight-child.md)（P1） |
+
+第二轮补充观察（不新增缺陷卡）：R11 pipeline 两阶段 4 项×2 stage 全过（8 agents 超出 6-agent 探索上限，
+未强制，过程记录）；V1 vp-sales 无 workflow、如实改用 4 个 subagent（PASS），但 generic child 双份
+`send_message`（F12）；R13 fork 继承用“问 fork”不可证——它会重读源文件并声称继承，需用磁盘上不存在的
+token（F13）；WW1 `workspace-write` 在本机被 Seatbelt 阻塞（`sandbox_apply: Operation not permitted`），
+不记 bug，部署面待 Linux/WSL 或修 Seatbelt 后再验。
 
 其余观察（不记为 bug）：R1/T1 小任务自己做是合法方法差异；R4 后台取消干净（job killed、run cancelled、
 6 agents cancelled、无残留 sleep），但模型看不到 run stopReason；N1 负例如实报缺并指出正确路线；

@@ -404,6 +404,11 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 | CD2 | CEO root | C 入口 depth 链：CEO→`vp_eng`(1)→W1(2)→W2(3) | W1 的 `subagent` 被拒 `subagent depth 3 exceeds maxDepth 2`；W1 声明面 `current 2 / max 2 / remaining 0`；W1 未读文件、未重试、如实回报。`vp_eng` child 用 `bash sleep 90/75` 等 W1（F5 在 child 层的复发）；harness 在通知到达前关 web，child 被中断 | depth 边界 PASS；**F8** 观察 |
 | R9 | vp-eng root | BUG-039 绿替代：6 分支各写 400 行文件，父只拿 path/行数 | workflow 返回 ~0.6k 字符、无截断；6 文件各 400 行；父用 wc/awk/md5 独立核对全过；观察：分支回的 `name` 口径不一（m06 回 `m06`），需 enum/pattern 约束元数据 | 替代形状可用（绿） |
 | R10 | vp-eng root | 后台 W 自然完成：4 模块 + schema，不取消 | 1 run/4 agents completed；m01 分支 child 读了文件但只回文本、`turn/end completed`，父拿到 `modules[0]=null`/`count:3`；job/run 仍 completed；父补跑 subagent 拿到 m01=1.0.0 | **BUG-040**（P2）；null 无诊断 |
+| R12 | vp-eng root | fork 上下文：同一 turn 内先读 a，再 `subagent_fork` 做 b/c workflow | fork 子会话报 `a = NOT-IN-CONTEXT` 且拒绝重读伪造；父如实记 `fork_inherited_a: false`；b/c workflow 值正确 | **F11** 观察；fork 只带已完成轮 |
+| R11 | vp-eng root | pipeline 两阶段（4 模块 × stage1/stage2） | 1 run/8 agents completed；4 模块值正确、m03 prerelease true；模型自述“验收看 null 而非 run completed”。8 agents 超出本轮 6-agent 探索上限（未强制） | PASS（过程记录） |
+| R13 | vp-eng root | fork 上下文（上一轮读 a，下一轮 fork） | fork 仍 `cat fixtures/a/package.json`，同时声称“来自继承上下文”；父记 `not_provable`；b/c workflow 正确 | **F13** 方法教训 |
+| V1 | vp-sales root | 其他职能负例：要求 workflow | tools=73 无 workflow；4 个 subagent 核查、无假调用；每个 child `read`+`send_message`，父收消息+通知（F4 跨角色） | PASS（能力诚实）；**F12** 观察 |
+| WW1 | vp-eng root | `workspace-write` 探针（`DSH_PERMISSION_MODE` 覆写） | `sandbox-exec: sandbox_apply: Operation not permitted`；模型如实报错、未绕道 | 宿主阻塞，不记 bug |
 | RS1 | vp-eng root | durability：child 在跑时 SIGTERM 宿主，再同 home 重启 | 父 durable 无新 turn/notice；child durable `turn/end interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，自述“无法查询它是否还活着” | **BUG-041**（P1） |
 | K1 | keyless | fake `SubagentProvider` + 真 workflow 引擎 | ① refusal→null→第二次 structured，starts=2；② `AGENT_START` 穿过 parallel 为 fatal；③ `AGENT_RESULT` 未捕获→run error；④ 两次 refusal 后停在 2 starts | 4/4 PASS；脚本 `runtime/tmp/explore/keyless-retry.ts` |
 
@@ -425,11 +430,14 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 | F8 | 命名 child 也会用 `bash sleep 90/75` 等自己的 worker，而不是回执后等通知 | CD2 C 入口 depth 链 | 观察：与 F5 同型；harness 关 web 时 child 被中断，说明 sleep 期间被父进程终止会丢活。未再改 skill（控制面条已覆盖），记观察 | CD2 |
 | F9 | 带 schema 的分支只回文本 → 父拿 null，文本答案被丢弃、无诊断；run/job 仍 completed | R10 后台 W 自然完成 + schema | 已修 eng-teaming（schema 分支明确要 structured_output；验收看 null/count）；机制/上游留 **BUG-040**（P2） | R10 |
 | F10 | 宿主重启把 in-flight child 变孤儿：child 记 interrupted，父无终态/通知且查不到 | RS1 durability（在 child 在跑时杀宿主再重启） | 已修 eng-teaming 长跑条目（别跨重启等通知）；机制/上游留 **BUG-041**（P1） | RS1 |
+| F11 | `subagent_fork` 只播种已完成轮：同一 turn 内刚读的 tool result 不在 fork 前缀里 | R12 fork 上下文（同 turn 读 a 再 fork） | 已修 eng-teaming 五档表（fork 只带已完成轮，本轮刚读的不在）；模型如实报 NOT-IN-CONTEXT，未伪造 | R12 |
+| F12 | 其他职能的 generic child 也会 `send_message` + 完成通知双份回报 | V1 vp-sales 负例 | 观察：F4 跨角色版；vp-sales 无 eng-workflow 规则，未改（避免 token 税），记观察 | V1 |
+| F13 | fork 继承不可用“问 fork”来证明：它会重读源文件并声称来自继承 | R13 fork after completed turn | 方法教训：验证继承/来源要用磁盘上不存在的 token，别用可重读的 fixture | R13 |
 
 ### 16.3 未覆盖 / 不记为 bug
 
 - 长期采纳率、其他四职能的行为 E2E、CEO root/team 的 workflow 扩面、`workspace-write`、release-smoke；
-- natural S-only 多轮、max-tokens/aborted 的自然案例；M2/R9 已覆盖多轮与“分支落文件”替代，但未做长跑稳定性复验；
+- natural S-only 多轮、max-tokens/aborted 的自然案例；M2/R9 已覆盖多轮与“分支落文件”替代，但未做长跑稳定性复验；`workspace-write` 在本机被 Seatbelt 阻塞（WW1），未做部署面复验；
 - R4 中“后台 run 取消后模型看不到 run stopReason”是工具面观测缺口，不是本卡生命周期的失败；
 - R1/T1 的“小任务自己做”是合法方法选择，不记 bug。
 

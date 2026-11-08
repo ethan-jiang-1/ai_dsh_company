@@ -35,6 +35,15 @@
     child durable 记 `interrupted`；父再问时 `list_agents` 只 lead、`job_list` 空，无法查询。
     已在 `eng-teaming` 长跑条加“别跨重启等通知”；机制/上游留
     [BUG-041](../../_backlog/bugs/BUG-041-host-restart-orphans-inflight-child.md)（P1）。
+  - **F11**（方向 R12 fork 上下文）：`subagent_fork` 只播种**已完成轮**；同一 turn 内刚读的 tool
+    result 不在前缀里。已修 `eng-teaming` 五档表（fork 带上下文但要写明这条）；模型如实报
+    `NOT-IN-CONTEXT`，未伪造继承。
+  - **F12**（方向 V1 其他职能负例）：vp-sales 根门没有 workflow，如实改用 4 个 subagent（PASS）；
+    但每个 generic child 都 `send_message` + 完成通知双份——F4 的跨角色版，未改（无共享规则的合适家）。
+  - **F13**（方向 R13 fork after completed turn）：fork 仍 `cat` 源文件却声称“来自继承上下文”，
+    父只能记 `not_provable`。方法教训：验证继承/来源要用**磁盘上不存在的 token**，别用可重读的 fixture。
+  - **WW1**（workspace-write 探针）：本机 `sandbox-exec: sandbox_apply: Operation not permitted`；
+    模型如实报错、未绕道。宿主阻塞，不记 bug；部署面仍需 Linux/WSL 或修 Seatbelt 后复验。
 - 不把“小任务自己做”（R1/T1）、“natural 选另一条合法通道”记成 bug；不宣称未命中的面没有 bug。
 - 六张缺陷卡（036/037/038/040 P2、039/041 P1）都是 `调查中`：当场修的是**本仓提示面/合同**，vendor 机制
   （schema 子集、团队 shadow、嵌套结果形状、50k 硬截断）未改。
@@ -78,6 +87,16 @@
   完整、row 3 半段、row 4/5 null。
 - **取消收敛**（R8）：`session-485bf924-eaf4-459f-b7f2-a3e8ff548318` 12s 后 `session/cancel` →
   `turn/end aborted(user)`、run `cancelled`、6 agents `cancelled`、child `aborted(parent)`、无残留 sleep。
+- **pipeline**（R11）：`session-f97fcc10-4ecc-4d40-97e6-be8c2264e5f4` 1 run/8 agents，4 模块值正确；
+  8 agents 超出本轮 6-agent 探索上限（未强制，过程记录）。
+- **其他职能负例**（V1）：`session-7ce4fba0-67a7-4aae-a795-dfbbc0450636` tools=73 无 workflow，
+  4 subagent 核查、无假调用；children 均 `send_message`（F12）。
+- **workspace-write**（WW1）：`session-c40f3947-d771-49d7-829e-13d8f55c9d71` bash 在 sandbox 初始化
+  阶段失败（`sandbox_apply: Operation not permitted`），模型未绕道。
+- **fork 上下文**（R12）：`session-2a257704-2d79-4921-ba09-a5e7626448de` 同一 turn 内 read a →
+  fork 报 `a = NOT-IN-CONTEXT`（拒绝重读伪造）；b/c workflow 值正确；父记 `fork_inherited_a: false`。
+- **fork after completed turn**（R13）：`session-1351d1e2-4159-43da-9b0a-4ef5f87d8339` fork 仍
+  `cat fixtures/a/package.json` 并声称继承；父记 `not_provable`（F13 方法教训）。
 - **宿主重启**（RS1）：父 `session-24da0c1b-…` 无新 turn；child `48eb730a-…` `turn/end interrupted`；
   父再问时 `list_agents` 只 lead、`job_list` 空，自述无法查询。
 - **多轮混合**（M2）：`session-0ae9def6-d13e-4e49-8b91-8b1a364bc93a` 1 workflow（4 agents）+
