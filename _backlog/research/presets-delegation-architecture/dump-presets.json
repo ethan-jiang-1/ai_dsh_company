@@ -1,0 +1,539 @@
+[
+  {
+    "id": "standard",
+    "childRows": 29,
+    "subagent": [
+      {
+        "toolName": "subagent",
+        "provider": "spawn"
+      },
+      {
+        "toolName": "subagent_fork",
+        "provider": "fork"
+      }
+    ],
+    "control": true,
+    "workflow": true,
+    "names": [
+      "agent-instructions",
+      "command-compact",
+      "command-goal",
+      "compaction-basic",
+      "compaction-tool-result-pruner",
+      "persona",
+      "plan-mode",
+      "plugin-manager/tools",
+      "plugin-market/tools",
+      "skill-filesystem",
+      "time-context",
+      "tool-ask-user",
+      "tool-bash",
+      "tool-fs",
+      "tool-fs-search",
+      "tool-goal",
+      "tool-jobs",
+      "tool-present",
+      "tool-pwsh",
+      "tool-schedule",
+      "tool-skill",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent-control",
+      "tool-subagent-control/list-agents",
+      "tool-todo",
+      "tool-web",
+      "tool-workflow",
+      "workflow-ptc"
+    ]
+  },
+  {
+    "id": "ptc",
+    "childRows": 30,
+    "subagent": [
+      {
+        "toolName": "subagent",
+        "provider": "spawn"
+      },
+      {
+        "toolName": "subagent_fork",
+        "provider": "fork"
+      }
+    ],
+    "control": true,
+    "workflow": true,
+    "names": [
+      "agent-instructions",
+      "agent-tool-presentation",
+      "command-compact",
+      "command-goal",
+      "compaction-basic",
+      "compaction-tool-result-pruner",
+      "persona",
+      "plan-mode",
+      "plugin-manager/tools",
+      "plugin-market/tools",
+      "skill-filesystem",
+      "time-context",
+      "tool-ask-user",
+      "tool-bash",
+      "tool-fs",
+      "tool-fs-search",
+      "tool-goal",
+      "tool-jobs",
+      "tool-present",
+      "tool-pwsh",
+      "tool-schedule",
+      "tool-skill",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent-control",
+      "tool-subagent-control/list-agents",
+      "tool-todo",
+      "tool-web",
+      "tool-workflow",
+      "workflow-ptc"
+    ]
+  },
+  {
+    "id": "minimal",
+    "childRows": 9,
+    "subagent": [],
+    "control": false,
+    "workflow": false,
+    "names": [
+      "command-compact",
+      "compaction-basic",
+      "persona",
+      "terminal",
+      "terminal-bash",
+      "terminal-bash",
+      "tool-bash-persistent",
+      "tool-fs",
+      "tool-pwsh-persistent"
+    ]
+  },
+  {
+    "id": "cordis",
+    "childRows": 30,
+    "subagent": [
+      {
+        "toolName": "subagent",
+        "provider": "spawn"
+      },
+      {
+        "toolName": "subagent_fork",
+        "provider": "fork"
+      }
+    ],
+    "control": true,
+    "workflow": true,
+    "names": [
+      "agent-instructions",
+      "command-compact",
+      "command-goal",
+      "compaction-basic",
+      "compaction-tool-result-pruner",
+      "persona",
+      "plan-mode",
+      "plugin-manager/tools",
+      "plugin-market/tools",
+      "skill-filesystem",
+      "time-context",
+      "tool-ask-user",
+      "tool-bash",
+      "tool-cordis",
+      "tool-fs",
+      "tool-fs-search",
+      "tool-goal",
+      "tool-jobs",
+      "tool-present",
+      "tool-pwsh",
+      "tool-schedule",
+      "tool-skill",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent-control",
+      "tool-subagent-control/list-agents",
+      "tool-todo",
+      "tool-web",
+      "tool-workflow",
+      "workflow-ptc"
+    ]
+  },
+  {
+    "id": "ceo",
+    "childRows": 29,
+    "subagent": [
+      {
+        "toolName": "subagent_research",
+        "agentPreset": "researcher",
+        "provider": "spawn"
+      },
+      {
+        "toolName": "vp_eng",
+        "agentPreset": "vp-eng",
+        "maxDepth": 1,
+        "provider": "spawn"
+      },
+      {
+        "toolName": "vp_sales",
+        "agentPreset": "vp-sales",
+        "maxDepth": 1,
+        "provider": "spawn"
+      },
+      {
+        "toolName": "system_architect",
+        "agentPreset": "system-architect",
+        "maxDepth": 2,
+        "provider": "spawn"
+      },
+      {
+        "toolName": "system_qa",
+        "agentPreset": "system-qa",
+        "maxDepth": 2,
+        "provider": "spawn"
+      },
+      {
+        "toolName": "vp_cmo",
+        "agentPreset": "cmo",
+        "maxDepth": 1,
+        "provider": "spawn"
+      }
+    ],
+    "control": false,
+    "workflow": false,
+    "names": [
+      "agent-instructions",
+      "browser-use",
+      "command-compact",
+      "command-goal",
+      "compaction-basic",
+      "compaction-tool-result-pruner",
+      "experimental-browser-use-playwright-mcp",
+      "persona",
+      "plan-mode",
+      "skill-filesystem",
+      "time-context",
+      "tool-ask-user",
+      "tool-bash",
+      "tool-cordis",
+      "tool-fs",
+      "tool-fs-search",
+      "tool-goal",
+      "tool-jobs",
+      "tool-present",
+      "tool-schedule",
+      "tool-skill",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-todo",
+      "tool-web"
+    ]
+  },
+  {
+    "id": "vp-eng",
+    "childRows": 32,
+    "subagent": [
+      {
+        "toolName": "subagent",
+        "maxDepth": 2,
+        "provider": "spawn"
+      },
+      {
+        "toolName": "subagent_fork",
+        "maxDepth": 2,
+        "provider": "fork"
+      },
+      {
+        "toolName": "system_architect",
+        "agentPreset": "system-architect",
+        "maxDepth": 2,
+        "provider": "spawn"
+      },
+      {
+        "toolName": "system_qa",
+        "agentPreset": "system-qa",
+        "maxDepth": 2,
+        "provider": "spawn"
+      },
+      {
+        "toolName": "vp_cmo",
+        "agentPreset": "cmo",
+        "maxDepth": 2,
+        "provider": "spawn"
+      }
+    ],
+    "control": true,
+    "workflow": true,
+    "names": [
+      "agent-instructions",
+      "browser-use",
+      "command-compact",
+      "command-goal",
+      "compaction-basic",
+      "compaction-tool-result-pruner",
+      "experimental-browser-use-playwright-mcp",
+      "persona",
+      "plan-mode",
+      "skill-filesystem",
+      "time-context",
+      "tool-ask-user",
+      "tool-bash",
+      "tool-cordis",
+      "tool-fs",
+      "tool-fs-search",
+      "tool-goal",
+      "tool-jobs",
+      "tool-present",
+      "tool-schedule",
+      "tool-skill",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent-control",
+      "tool-subagent-control/list-agents",
+      "tool-todo",
+      "tool-web",
+      "tool-workflow",
+      "workflow-ptc"
+    ]
+  },
+  {
+    "id": "vp-sales",
+    "childRows": 27,
+    "subagent": [
+      {
+        "toolName": "subagent",
+        "maxDepth": 2,
+        "provider": "spawn"
+      },
+      {
+        "toolName": "subagent_fork",
+        "maxDepth": 2,
+        "provider": "fork"
+      }
+    ],
+    "control": true,
+    "workflow": false,
+    "names": [
+      "agent-instructions",
+      "browser-use",
+      "command-compact",
+      "command-goal",
+      "compaction-basic",
+      "compaction-tool-result-pruner",
+      "experimental-browser-use-playwright-mcp",
+      "persona",
+      "plan-mode",
+      "skill-filesystem",
+      "time-context",
+      "tool-ask-user",
+      "tool-bash",
+      "tool-cordis",
+      "tool-fs",
+      "tool-fs-search",
+      "tool-goal",
+      "tool-jobs",
+      "tool-present",
+      "tool-schedule",
+      "tool-skill",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent-control",
+      "tool-subagent-control/list-agents",
+      "tool-todo",
+      "tool-web"
+    ]
+  },
+  {
+    "id": "coo",
+    "childRows": 27,
+    "subagent": [
+      {
+        "toolName": "subagent",
+        "maxDepth": 2,
+        "provider": "spawn"
+      },
+      {
+        "toolName": "subagent_fork",
+        "maxDepth": 2,
+        "provider": "fork"
+      }
+    ],
+    "control": true,
+    "workflow": false,
+    "names": [
+      "agent-instructions",
+      "browser-use",
+      "command-compact",
+      "command-goal",
+      "compaction-basic",
+      "compaction-tool-result-pruner",
+      "experimental-browser-use-playwright-mcp",
+      "persona",
+      "plan-mode",
+      "skill-filesystem",
+      "time-context",
+      "tool-ask-user",
+      "tool-bash",
+      "tool-cordis",
+      "tool-fs",
+      "tool-fs-search",
+      "tool-goal",
+      "tool-jobs",
+      "tool-present",
+      "tool-schedule",
+      "tool-skill",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent-control",
+      "tool-subagent-control/list-agents",
+      "tool-todo",
+      "tool-web"
+    ]
+  },
+  {
+    "id": "cfo",
+    "childRows": 27,
+    "subagent": [
+      {
+        "toolName": "subagent",
+        "maxDepth": 2,
+        "provider": "spawn"
+      },
+      {
+        "toolName": "subagent_fork",
+        "maxDepth": 2,
+        "provider": "fork"
+      }
+    ],
+    "control": true,
+    "workflow": false,
+    "names": [
+      "agent-instructions",
+      "browser-use",
+      "command-compact",
+      "command-goal",
+      "compaction-basic",
+      "compaction-tool-result-pruner",
+      "experimental-browser-use-playwright-mcp",
+      "persona",
+      "plan-mode",
+      "skill-filesystem",
+      "time-context",
+      "tool-ask-user",
+      "tool-bash",
+      "tool-cordis",
+      "tool-fs",
+      "tool-fs-search",
+      "tool-goal",
+      "tool-jobs",
+      "tool-present",
+      "tool-schedule",
+      "tool-skill",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent-control",
+      "tool-subagent-control/list-agents",
+      "tool-todo",
+      "tool-web"
+    ]
+  },
+  {
+    "id": "cmo",
+    "childRows": 27,
+    "subagent": [
+      {
+        "toolName": "subagent",
+        "maxDepth": 2,
+        "provider": "spawn"
+      },
+      {
+        "toolName": "subagent_fork",
+        "maxDepth": 2,
+        "provider": "fork"
+      }
+    ],
+    "control": true,
+    "workflow": false,
+    "names": [
+      "agent-instructions",
+      "browser-use",
+      "command-compact",
+      "command-goal",
+      "compaction-basic",
+      "compaction-tool-result-pruner",
+      "experimental-browser-use-playwright-mcp",
+      "persona",
+      "plan-mode",
+      "skill-filesystem",
+      "time-context",
+      "tool-ask-user",
+      "tool-bash",
+      "tool-cordis",
+      "tool-fs",
+      "tool-fs-search",
+      "tool-goal",
+      "tool-jobs",
+      "tool-present",
+      "tool-schedule",
+      "tool-skill",
+      "tool-subagent",
+      "tool-subagent",
+      "tool-subagent-control",
+      "tool-subagent-control/list-agents",
+      "tool-todo",
+      "tool-web"
+    ]
+  },
+  {
+    "id": "researcher",
+    "childRows": 5,
+    "subagent": [],
+    "control": false,
+    "workflow": false,
+    "names": [
+      "persona",
+      "tool-fs",
+      "tool-fs-search",
+      "tool-todo",
+      "tool-web"
+    ]
+  },
+  {
+    "id": "system-architect",
+    "childRows": 6,
+    "subagent": [],
+    "control": false,
+    "workflow": false,
+    "names": [
+      "persona",
+      "skill-filesystem",
+      "tool-fs",
+      "tool-fs-search",
+      "tool-skill",
+      "tool-todo"
+    ]
+  },
+  {
+    "id": "system-qa",
+    "childRows": 6,
+    "subagent": [],
+    "control": false,
+    "workflow": false,
+    "names": [
+      "persona",
+      "skill-filesystem",
+      "tool-fs",
+      "tool-fs-search",
+      "tool-skill",
+      "tool-todo"
+    ]
+  }
+]

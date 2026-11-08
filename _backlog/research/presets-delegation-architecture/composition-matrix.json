@@ -1,0 +1,496 @@
+{
+  "roles": [
+    "ceo",
+    "cfo",
+    "cmo",
+    "coo",
+    "researcher",
+    "system-architect",
+    "system-qa",
+    "vp-eng",
+    "vp-sales"
+  ],
+  "totalRows": 186,
+  "distinctRows": 29,
+  "common": [
+    "@deepseek-ai/dsh-persona",
+    "@deepseek-ai/dsh-tool-fs-search",
+    "@deepseek-ai/dsh-tool-todo"
+  ],
+  "shared": [
+    {
+      "name": "@deepseek-ai/dsh-agent-instructions",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-browser-use",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-command-compact",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-command-goal",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-compaction-basic",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-compaction-tool-result-pruner",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-browser-use-playwright-mcp",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-plan-mode",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-skill-filesystem",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "system-architect",
+        "system-qa",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-time-context",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-ask-user",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-bash",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-cordis",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-fs",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "system-architect",
+        "system-qa",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-goal",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-jobs",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-present",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-schedule",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-skill",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "system-architect",
+        "system-qa",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-subagent",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-subagent-control",
+      "roles": [
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-subagent-control/list-agents",
+      "roles": [
+        "cfo",
+        "cmo",
+        "coo",
+        "vp-eng",
+        "vp-sales"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-web",
+      "roles": [
+        "ceo",
+        "cfo",
+        "cmo",
+        "coo",
+        "researcher",
+        "vp-eng",
+        "vp-sales"
+      ]
+    }
+  ],
+  "unique": [
+    {
+      "name": "@deepseek-ai/dsh-tool-fs",
+      "role": "researcher"
+    },
+    {
+      "name": "@deepseek-ai/dsh-tool-workflow",
+      "role": "vp-eng"
+    },
+    {
+      "name": "@deepseek-ai/dsh-workflow-ptc",
+      "role": "vp-eng"
+    }
+  ],
+  "deltas": {
+    "ceo": {
+      "total": 29,
+      "delta": 26,
+      "names": [
+        "@deepseek-ai/dsh-time-context",
+        "@deepseek-ai/dsh-tool-schedule",
+        "@deepseek-ai/dsh-skill-filesystem",
+        "@deepseek-ai/dsh-tool-fs",
+        "@deepseek-ai/dsh-tool-jobs",
+        "@deepseek-ai/dsh-command-goal",
+        "@deepseek-ai/dsh-tool-goal",
+        "@deepseek-ai/dsh-plan-mode",
+        "@deepseek-ai/dsh-compaction-basic",
+        "@deepseek-ai/dsh-command-compact",
+        "@deepseek-ai/dsh-compaction-tool-result-pruner",
+        "@deepseek-ai/dsh-tool-skill",
+        "@deepseek-ai/dsh-tool-cordis",
+        "@deepseek-ai/dsh-tool-ask-user",
+        "@deepseek-ai/dsh-tool-present",
+        "@deepseek-ai/dsh-tool-web",
+        "@deepseek-ai/dsh-tool-bash",
+        "@deepseek-ai/dsh-browser-use",
+        "@deepseek-ai/dsh-experimental-browser-use-playwright-mcp",
+        "@deepseek-ai/dsh-tool-subagent",
+        "@deepseek-ai/dsh-agent-instructions"
+      ]
+    },
+    "cfo": {
+      "total": 27,
+      "delta": 24,
+      "names": [
+        "@deepseek-ai/dsh-time-context",
+        "@deepseek-ai/dsh-tool-schedule",
+        "@deepseek-ai/dsh-skill-filesystem",
+        "@deepseek-ai/dsh-tool-fs",
+        "@deepseek-ai/dsh-tool-jobs",
+        "@deepseek-ai/dsh-command-goal",
+        "@deepseek-ai/dsh-tool-goal",
+        "@deepseek-ai/dsh-plan-mode",
+        "@deepseek-ai/dsh-compaction-basic",
+        "@deepseek-ai/dsh-command-compact",
+        "@deepseek-ai/dsh-compaction-tool-result-pruner",
+        "@deepseek-ai/dsh-tool-skill",
+        "@deepseek-ai/dsh-tool-cordis",
+        "@deepseek-ai/dsh-tool-ask-user",
+        "@deepseek-ai/dsh-tool-present",
+        "@deepseek-ai/dsh-tool-web",
+        "@deepseek-ai/dsh-tool-bash",
+        "@deepseek-ai/dsh-browser-use",
+        "@deepseek-ai/dsh-experimental-browser-use-playwright-mcp",
+        "@deepseek-ai/dsh-tool-subagent-control",
+        "@deepseek-ai/dsh-tool-subagent-control/list-agents",
+        "@deepseek-ai/dsh-tool-subagent",
+        "@deepseek-ai/dsh-agent-instructions"
+      ]
+    },
+    "cmo": {
+      "total": 27,
+      "delta": 24,
+      "names": [
+        "@deepseek-ai/dsh-time-context",
+        "@deepseek-ai/dsh-tool-schedule",
+        "@deepseek-ai/dsh-skill-filesystem",
+        "@deepseek-ai/dsh-tool-fs",
+        "@deepseek-ai/dsh-tool-jobs",
+        "@deepseek-ai/dsh-command-goal",
+        "@deepseek-ai/dsh-tool-goal",
+        "@deepseek-ai/dsh-plan-mode",
+        "@deepseek-ai/dsh-compaction-basic",
+        "@deepseek-ai/dsh-command-compact",
+        "@deepseek-ai/dsh-compaction-tool-result-pruner",
+        "@deepseek-ai/dsh-tool-skill",
+        "@deepseek-ai/dsh-tool-cordis",
+        "@deepseek-ai/dsh-tool-ask-user",
+        "@deepseek-ai/dsh-tool-present",
+        "@deepseek-ai/dsh-tool-web",
+        "@deepseek-ai/dsh-tool-bash",
+        "@deepseek-ai/dsh-browser-use",
+        "@deepseek-ai/dsh-experimental-browser-use-playwright-mcp",
+        "@deepseek-ai/dsh-tool-subagent-control",
+        "@deepseek-ai/dsh-tool-subagent-control/list-agents",
+        "@deepseek-ai/dsh-tool-subagent",
+        "@deepseek-ai/dsh-agent-instructions"
+      ]
+    },
+    "coo": {
+      "total": 27,
+      "delta": 24,
+      "names": [
+        "@deepseek-ai/dsh-time-context",
+        "@deepseek-ai/dsh-tool-schedule",
+        "@deepseek-ai/dsh-skill-filesystem",
+        "@deepseek-ai/dsh-tool-fs",
+        "@deepseek-ai/dsh-tool-jobs",
+        "@deepseek-ai/dsh-command-goal",
+        "@deepseek-ai/dsh-tool-goal",
+        "@deepseek-ai/dsh-plan-mode",
+        "@deepseek-ai/dsh-compaction-basic",
+        "@deepseek-ai/dsh-command-compact",
+        "@deepseek-ai/dsh-compaction-tool-result-pruner",
+        "@deepseek-ai/dsh-tool-skill",
+        "@deepseek-ai/dsh-tool-cordis",
+        "@deepseek-ai/dsh-tool-ask-user",
+        "@deepseek-ai/dsh-tool-present",
+        "@deepseek-ai/dsh-tool-web",
+        "@deepseek-ai/dsh-tool-bash",
+        "@deepseek-ai/dsh-browser-use",
+        "@deepseek-ai/dsh-experimental-browser-use-playwright-mcp",
+        "@deepseek-ai/dsh-tool-subagent-control",
+        "@deepseek-ai/dsh-tool-subagent-control/list-agents",
+        "@deepseek-ai/dsh-tool-subagent",
+        "@deepseek-ai/dsh-agent-instructions"
+      ]
+    },
+    "researcher": {
+      "total": 5,
+      "delta": 2,
+      "names": [
+        "@deepseek-ai/dsh-tool-fs",
+        "@deepseek-ai/dsh-tool-web"
+      ]
+    },
+    "system-architect": {
+      "total": 6,
+      "delta": 3,
+      "names": [
+        "@deepseek-ai/dsh-skill-filesystem",
+        "@deepseek-ai/dsh-tool-skill",
+        "@deepseek-ai/dsh-tool-fs"
+      ]
+    },
+    "system-qa": {
+      "total": 6,
+      "delta": 3,
+      "names": [
+        "@deepseek-ai/dsh-skill-filesystem",
+        "@deepseek-ai/dsh-tool-skill",
+        "@deepseek-ai/dsh-tool-fs"
+      ]
+    },
+    "vp-eng": {
+      "total": 32,
+      "delta": 29,
+      "names": [
+        "@deepseek-ai/dsh-time-context",
+        "@deepseek-ai/dsh-tool-schedule",
+        "@deepseek-ai/dsh-skill-filesystem",
+        "@deepseek-ai/dsh-tool-fs",
+        "@deepseek-ai/dsh-tool-jobs",
+        "@deepseek-ai/dsh-command-goal",
+        "@deepseek-ai/dsh-tool-goal",
+        "@deepseek-ai/dsh-plan-mode",
+        "@deepseek-ai/dsh-compaction-basic",
+        "@deepseek-ai/dsh-command-compact",
+        "@deepseek-ai/dsh-compaction-tool-result-pruner",
+        "@deepseek-ai/dsh-tool-skill",
+        "@deepseek-ai/dsh-tool-cordis",
+        "@deepseek-ai/dsh-tool-ask-user",
+        "@deepseek-ai/dsh-tool-present",
+        "@deepseek-ai/dsh-tool-web",
+        "@deepseek-ai/dsh-tool-bash",
+        "@deepseek-ai/dsh-browser-use",
+        "@deepseek-ai/dsh-experimental-browser-use-playwright-mcp",
+        "@deepseek-ai/dsh-tool-subagent-control",
+        "@deepseek-ai/dsh-tool-subagent-control/list-agents",
+        "@deepseek-ai/dsh-tool-subagent",
+        "@deepseek-ai/dsh-workflow-ptc",
+        "@deepseek-ai/dsh-tool-workflow",
+        "@deepseek-ai/dsh-agent-instructions"
+      ]
+    },
+    "vp-sales": {
+      "total": 27,
+      "delta": 24,
+      "names": [
+        "@deepseek-ai/dsh-time-context",
+        "@deepseek-ai/dsh-tool-schedule",
+        "@deepseek-ai/dsh-skill-filesystem",
+        "@deepseek-ai/dsh-tool-fs",
+        "@deepseek-ai/dsh-tool-jobs",
+        "@deepseek-ai/dsh-command-goal",
+        "@deepseek-ai/dsh-tool-goal",
+        "@deepseek-ai/dsh-plan-mode",
+        "@deepseek-ai/dsh-compaction-basic",
+        "@deepseek-ai/dsh-command-compact",
+        "@deepseek-ai/dsh-compaction-tool-result-pruner",
+        "@deepseek-ai/dsh-tool-skill",
+        "@deepseek-ai/dsh-tool-cordis",
+        "@deepseek-ai/dsh-tool-ask-user",
+        "@deepseek-ai/dsh-tool-present",
+        "@deepseek-ai/dsh-tool-web",
+        "@deepseek-ai/dsh-tool-bash",
+        "@deepseek-ai/dsh-browser-use",
+        "@deepseek-ai/dsh-experimental-browser-use-playwright-mcp",
+        "@deepseek-ai/dsh-tool-subagent-control",
+        "@deepseek-ai/dsh-tool-subagent-control/list-agents",
+        "@deepseek-ai/dsh-tool-subagent",
+        "@deepseek-ai/dsh-agent-instructions"
+      ]
+    }
+  }
+}

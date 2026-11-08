@@ -27,3 +27,4 @@ opened: 2026-11-09
 | [2026-11-09-dsh-affordances.md](2026-11-09-dsh-affordances.md) | DSH 0.2.1 对 preset / subagent / workflow / team / skills 的真实能力与约束（源码依据） | 2026-11-09 |
 | [2026-11-09-external-practices.md](2026-11-09-external-practices.md) | Anthropic / Claude Code / OpenAI 一手实践 survey，映射 S1–S6 与四层“优雅形状”初步 | 2026-11-09 |
 | [2026-11-09-contract-duplication.md](2026-11-09-contract-duplication.md) | 合同/委派词在 persona、角色 skills、docs 的分布读数（只读词频；S4 证据） | 2026-11-09 |
+| [2026-11-09-composition-experiments.md](2026-11-09-composition-experiments.md) | 两个只读实验：dump-config 声明面读数（H6 原型）+ 底座/delta 矩阵（H1/H2） | 2026-11-09 |
