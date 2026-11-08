@@ -21,6 +21,7 @@
 | 查看已运行页面 | [cdp-probe](../probes/browser-visual/cdp-probe.mjs)；指南 = [CDP 指南](../docs/guides/cdp-probe.md) |
 | **页面报错了但日志里没有** | [client-error-chain-smoke](smoke/client-error-chain-smoke.mjs)：隔离单 writer 真页面 → `console.error` → 错误环 → `$DSH_HOME/logs/company-client-errors.log`（keyless ~40s） |
 | 确认录制行为与工作区判据 | [replay-smoke](smoke/replay-smoke.mjs)（当前仅 headless 合成场景） |
+| 确认 workflow 引擎机制（失败重试/fatal/null/回执拼接） | [workflow-contract-smoke](smoke/workflow-contract-smoke.mjs)（keyless ~2s，fake provider + 真引擎） |
 | 审计动议输出与角色留痕 | [deliverables-check](audit/deliverables-check.mjs) · [authorship-audit](audit/authorship-audit.mjs) · [journal-audit](audit/journal-audit.mjs) |
 | 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs) · [export-dist](../tools/export-dist.mjs) · [market-index](../tools/market-index.mjs) |
 | **dev 启动** | `pnpm company --no-open` → [company](../tools/company.mjs)：缺 profile 时初始化；默认构建 + `npm pack` + `plugin add file:<tgz>` → exec `dsh --profile company`；`--link` 快速通道 |

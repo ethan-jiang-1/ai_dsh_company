@@ -4,6 +4,8 @@
 
 ## 修复流水（倒序）
 
+- **BUG-038**（2026-11-08）：workflow 分支内再起 subagent 时，`agent()` 返回的是 child **最终文本原样拼接**（`started subagent … <值>`），回执与结论不区分；带 schema 的嵌套分支会因 child 没调 `structured_output` 折成 null（R5）。修法 = 产品规则“分支默认是叶子”（确需两层让父直接起第二层）+ 真跑观察：模型首轮嵌套后自行读到混合回执并重构为父层扇出；同轮修正 skill 的“一定 null”过度断言（3 次复现无 null）；机制钉子 = `checks/smoke/workflow-contract-smoke.mjs` 第 6 条。上游提案 = 分支结果只取最后一轮结论或分开回执。详见 [卡](BUG-038-workflow-branch-nested-delegation-result.md)。
+
 - **BUG-037**（2026-11-08）：根会话必是 Team Lead ⇒ `tool-agent-team` 按同名 shadow 掉全局 `send_message` / `list_agents`，根门够不到自己起的 `subagent` child（R3：`list_agents` 只回 lead、`send_message` 报 `active teammate not found`、`wait_agent` no-active-peer）。修法 = **替代控制名**（不是再劝模型）：新增 host 工具 `list_subagents`（父会话 `subagent/catalog` durable 事件 → id/label/mode/status）与 `send_to_subagent`（官方 `ctx.subagents.sendMessage`）；`docs/delegation.md` §4 与 `eng-teaming` 控制面同步；真挂载 79 tools 含两者 + 行为 spec。上游提案 = 让根直接用全局控制名；修好后退役这两个工具。详见 [卡](BUG-037-root-team-tool-shadowing.md)。
 
 - **BUG-039**（2026-11-08）：workflow >50k 结果被工具**先截断再落盘**，spill 文件因此只是截断副本、notice 还写 "Full formatted result"——模型可读面缺段找不回（R7：完整 85.9k → 收到 49,929 + `[truncated: 35806]`；spill 50,102 含同一标记）。修法 = **配置真修**：tool-workflow 的 `maxResultChars` 是配置项（默认 50000），vp-eng preset 抬到 200k，让引擎 spill 设计生效（头尾预览 + 全文落盘 + 可读路径）；同日真模型探针 4×500 行：工具结果无截断标记、spill 71,677 字符含首尾行、模型 read/grep 核对；合同钉子 `tests/harness/contract/workflow-result-budget.spec.ts` 钉渲染上限与 preset 配置。上游仍建议默认值下先交全文给 spill。详见 [卡](BUG-039-workflow-result-truncation-lossy-spill.md)。

@@ -1,12 +1,12 @@
 ---
-status: 修复就绪
+status: 修复已落地
 severity: P2
 opened: 2026-11-08
 ---
 
 # BUG-040：workflow 带 schema 的分支只回文本 → 父代理拿到 null，文本答案被丢弃且无诊断
 
-> 严重级别：P2（次要）｜发现：2026-11-08｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-08｜状态：修复已落地｜审查：agent — 技能/验收规则与机制钉子已落地；不把“缓解”写成“已修”
 
 ## 症状
 
@@ -58,8 +58,27 @@ R10 后台 workflow 4 分支（m01–m04），父脚本每个 `agent()` 都带 o
   只回文本会被丢弃成 null；并在“返回聚合/异常”加“run/job completed ≠ 分支成功，验收看 null/count”。
 - 绿证据：同一 R10 里 m02/m03/m04 三个分支都调用了 `structured_output`，父均拿到对象；补跑
   `subagent` 也拿到了 m01。
-- vendor 未改；可选上游：`agentEnd`/结果里保留 child 的 final text 或 diagnostic（如
-  `outcome:'shape-mismatch'`），让父代理能区分“失败”与“答对但形状不对”。
+- **机制钉子（2026-11-08）**：`checks/smoke/workflow-contract-smoke.mjs` 第 5 条——fake provider 返回
+  `completed` + 纯文本 + schema → `agent()` 返回 null 且 `workflow/agent-end outcome=failed`；
+  钉住“父拿裸 null”这一机制事实（不是模型行为）。命令 = `node --import tsx/esm checks/smoke/workflow-contract-smoke.mjs`。
+- **上游真 diff（提案）**——`vendor/dsh/packages/workflow/workflow-ptc/src/runtime.ts` schema 分支：
+  ```diff
+  if (opts.schema !== void 0) {
+    if (result.structured === void 0) {
+      this.observer.agentEnd({
+        ...info,
+        outcome: "failed",
+  +     // 保留可诊断的形状不匹配，而不是丢弃 child 的 final text
+  +     diagnostic: { kind: "shape-mismatch", finalText: outputText(result.output) },
+      });
+      return null;
+    }
+  ```
+  配套：`WorkflowAgentEndInfo` 加 `diagnostic?: { kind: 'shape-mismatch'; finalText: string }`；
+  tool-workflow 的 `tool-workflow/agent-end` 记录透传该字段。上游修好后：本卡判定第一条满足、归档，
+  并把 `eng-teaming` 里“只回文本会被丢弃成 null”改成“会带 shape-mismatch 诊断”。
+- **未做（本仓做不到）**：父代理拿不到“答对但形状不对”的诊断——任何本仓层都改不了 `agent()` 的返回值；
+  造一个 workflow 包装工具 = 平行实现（质量上不可接受），故不做。
 
 ## 已修判定
 

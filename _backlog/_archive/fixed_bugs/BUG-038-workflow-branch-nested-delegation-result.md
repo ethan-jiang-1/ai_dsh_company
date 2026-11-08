@@ -1,12 +1,12 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-08
 ---
 
 # BUG-038：workflow 分支内再委派时，分支返回值把回执和结论拼在一起（schema 分支会 null）
 
-> 严重级别：P2（次要）｜发现：2026-11-08｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-08｜状态：已修（2026-11-08）｜审查：agent — 判定第一条走“本仓明确禁止 + 真实会话观察”分支：一次真跑首轮嵌套后模型自行读到混合回执、并重构为父层扇出；同轮修正了 skill 里“一定会 null”的过度断言。观察为单次，未重复多跑
 
 ## 症状
 
@@ -57,8 +57,16 @@ result 等待的是整个 child run，跨轮拼接），但 workflow 的 `agent(
 ## 修复关联
 
 - 已在 `eng-teaming` 加“分支默认是叶子”：分支里再委派只在确需两层时用，且要规定只回一行可解析值；
-  带 schema 的分支不要嵌套委派；确需两层就让父 workflow 直接起第二层。
-- 未做机制修复（vendor `runtime.ts` 的 schema 分支语义不改）；未加 keyless 守卫。
+  确需两层就让父 workflow 直接起第二层。
+- **真跑观察（2026-11-08）**：`session-03fe693d-…`（`runtime/tmp/explore/fix1/S038/`）3 次 workflow / 8 agents。
+  首轮把 `subagent` 放进分支，模型自己读到 `started subagent … <值>` 的混合返回，随后重构为父层直接扇出，
+  最终返回干净对象并写明理由；同轮**如实修正**了 skill 的“嵌套 schema 分支一定 null”——3 次复现都没 null，
+  null 来自 child 没调 `structured_output`（BUG-040），不是嵌套本身。skill 已改成“回执/自述会混入；
+  schema 只约束形状，不保证干净值”。
+- **机制钉子**：`checks/smoke/workflow-contract-smoke.mjs` 第 6 条——非 schema 分支的返回值就是 child
+  最终文本原样拼接（回执与结论不区分），钉住“为什么分支要当叶子”。
+- 未做机制修复（vendor `runtime.ts` 的分支结果语义不改）；上游提案 = 分支结果只取最后一轮结论/或把
+  activation 回执与结论分开（与 BUG-040 同批）。
 
 ## 已修判定
 

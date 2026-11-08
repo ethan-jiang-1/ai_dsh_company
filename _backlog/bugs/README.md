@@ -10,7 +10,6 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-038](BUG-038-workflow-branch-nested-delegation-result.md) | workflow 分支内再委派：返回值混入回执，schema 分支会 null | P2 |
 | [BUG-040](BUG-040-workflow-schema-text-answer-discarded.md) | 带 schema 的分支只回文本 → 父拿 null，文本答案被丢弃且无诊断 | P2 |
 | [BUG-041](BUG-041-host-restart-orphans-inflight-child.md) | 宿主重启后 in-flight child 成孤儿：child 记 interrupted，父收不到终态也查不到 | P1 |
 | —（历史） | BUG-034 / BUG-035 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：SA/SQA 证据链必查（时间源 + 故障路径耐受）+ 审计 Q8–Q11；2026-11-07 E2E v8 验收 | — |
@@ -56,7 +55,7 @@ BUG-001..022 已修迁、BUG-023 误报已结、BUG-024 已修 [fixed_bugs](../_
 |---|---|---|---|
 | [BUG-036](../_archive/fixed_bugs/BUG-036-workflow-schema-enum-type.md) ✅ | P2 | 已修（2026-11-08）：`eng-teaming` 四条子集约束 + 合同钉子 `tests/harness/contract/json-schema-subset.spec.ts` | `tool-workflow` 的 model-facing description / 子集校验提示（提案待上游） |
 | [BUG-037](../_archive/fixed_bugs/BUG-037-root-team-tool-shadowing.md) ✅ | P2 | 已修（2026-11-08）：新增 `list_subagents` / `send_to_subagent`（官方 `ctx.subagents`，名字不被团队版 shadow）+ docs/§4 + `eng-teaming` | agent-team 的 `tryMembership` shadow（提案待上游；修好后退役两工具） |
-| [BUG-038](BUG-038-workflow-branch-nested-delegation-result.md) | P2 | `eng-teaming` 分支叶子规则已有；可补结果形状契约/示例 | `workflow-ptc` 嵌套分支返回值 |
+| [BUG-038](../_archive/fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md) ✅ | P2 | 已修（2026-11-08）：`eng-teaming` 分支叶子规则 + 真跑观察（模型首轮自纠）+ 钉子 `workflow-contract-smoke` 第 6 条 | `workflow-ptc` 分支结果只取最后一轮结论（提案待上游） |
 | [BUG-039](../_archive/fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md) ✅ | P1 | 已修（2026-11-08）：vp-eng preset 抬 `maxResultChars` 到 200k；探针证 spill 全文 71,677 字符可读；钉子 `tests/harness/contract/workflow-result-budget.spec.ts` | `tool-workflow` 默认值下先截断再落盘的语义（提案待上游） |
 | [BUG-040](BUG-040-workflow-schema-text-answer-discarded.md) | P2 | `eng-teaming` schema/structured_output 规则已有；可补 keyless 复现 | `runtime.ts` 缺形状不匹配诊断 |
 | [BUG-041](BUG-041-host-restart-orphans-inflight-child.md) | P1 | `eng-teaming` 长跑/重启规则已有；补部署前置或 resume 对账文档 | resume 时的 orphan child 对账 |

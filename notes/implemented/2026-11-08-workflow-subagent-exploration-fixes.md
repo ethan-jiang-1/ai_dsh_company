@@ -17,7 +17,7 @@
     [BUG-037](../../_backlog/_archive/fixed_bugs/BUG-037-root-team-tool-shadowing.md)。
   - **F3**（方向 R5 W 分支内再委派）：分支返回值把回执和结论拼在一起（`started subagent … <值>`），
     带 schema 的分支会 null。已加“分支默认是叶子”规则；机制留
-    [BUG-038](../../_backlog/bugs/BUG-038-workflow-branch-nested-delegation-result.md)。
+    [BUG-038](../../_backlog/_archive/fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md)。
   - **F4**（方向 C1 CEO→vp_eng）：命名 child 同时用 `send_message` + 完成通知回报，父收到两份。
     已修 `eng-workflow` 第 5 步：作为命名 child / worker 时终稿就是回执，不再 `send_message` 给父。
   - **F5**（方向 C1）：CEO 用 `bash sleep 25/30` 轮询 child，而不是派发后结束本轮。已修 CEO

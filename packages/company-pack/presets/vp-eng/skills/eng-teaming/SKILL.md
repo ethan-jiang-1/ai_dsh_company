@@ -43,9 +43,9 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 - **失败不自动重跑**：`null` 可能是 refusal / error / aborted / 缺结构化结果，不保留原因；先判任务幂等且
   失败可重试，最多同 task / schema 再派一次（attempt label 不同），仍失败记 missing / exhausted。
   `AGENT_START` / `AGENT_RESULT` / 取消是 fatal，不许 catch 后伪装成 null 或安全重试。
-- **分支默认是叶子**：分支里再起 `subagent` / `workflow` 只在确需两层时用——回执和结论会混进同一段
-  返回文本（`started subagent … <值>`），带 schema 的分支还会 null（2026-11-08 实测）；确需两层就让
-  父 workflow 直接起第二层，或规定分支只回一行可解析值。
+- **分支默认是叶子**：分支里再起 `subagent` / `workflow` 只在确需两层时用——回执和自述会混进同一段
+  返回文本（`started subagent … <值>`，2026-11-08 实测）；**schema 只约束输出形状，不保证分支拿到干净值**。
+  确需两层就让父 workflow 直接起第二层，或规定分支只回一行可解析值。
 - **写盘**：分支只读，或一分支一文件；正式交付物只由你写。
 - **长跑**：团队会话里前台 run 会阻塞你（先例约 6 分钟，Lead 消息排队）——用 `run_in_background`。
   宿主重启会中断 in-flight child（child 记 interrupted、父收不到终态；2026-11-08 实测）——部署/重启前先收口，
