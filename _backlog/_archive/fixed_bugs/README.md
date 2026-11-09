@@ -4,6 +4,8 @@
 
 ## 修复流水（倒序）
 
+- **BUG-048**（2026-11-09）：`ui-scene-smoke --isolated --golden` 红——金样仍写“梦之队 CEO”，页面已按 D14 收窄为“CEO”。修法 = 先确认产品意图（显示名收窄是有意行为）与 diff 只有「在场」一行，再 `--refresh-golden`；`--golden` 复核 9 页签一致。同 diff 在 `tests/README` content 行补“显示名/品牌文案变化 ⇒ 同 diff 刷 UI 金样”的映射；按 policy P2 不升门禁（首犯 + 真浏览器成本）。详见 [卡](BUG-048-ui-golden-brand-name-drift.md)。
+
 - **BUG-046**（2026-11-09）：父代理看不到 child 的 `agentPreset` / `delegationDepth`——引擎把身份写在 child durable header，`list_subagents` 只投影 catalog + 最后一个 `turn/end`，父代理只能信 child 自述。修法 = 同一次 `sessionPersistence.open()` 读 `handle.header`，`SubagentRow` 增必填 `agentPreset` / `delegationDepth`（十进制字符串）+ `identityDetail`；读不到显式 `unavailable`（不默认 worker/0，`0` 是真值）。红→绿：临时不读 header ⇒ 3 failed（readChildTurnState 身份、list 暴露、depth 0），还原 ⇒ 20 passed；`pnpm verify` / `pnpm test` / `pnpm typecheck` 全绿。详见 [卡](BUG-046-parent-cannot-verify-child-preset-depth.md) 与 [Note](../../../notes/implemented/2026-11-09-subagent-identity-observable.md)。
 
 - **BUG-047**（2026-11-09）：公司手册豁免只写 `['worker']`，新增的 `worker-orchestrator` / `worker-researcher` 默认被注入全文——orchestrator persona 说“不读手册”，system 却给了。修法 = 边界按 archetype 派生（模型 `handbookSkipPresets()` 与 pack `WORKER_FAMILY_PRESETS` 同源），`registerHandbook` 默认取 family、配置只作覆盖，`cordis.patch.yml` 删掉窄列表；researcher 明确不注入（公司事实按 brief 读 `company.md`）。红→绿：family 表收窄回 `['worker']` ⇒ 2 failed（模型 parity + handbook family），还原 ⇒ 17 passed；`pnpm verify` / `pnpm test` / `pnpm typecheck` 全绿。详见 [卡](BUG-047-worker-family-handbook-scope.md) 与 [Note](../../../notes/implemented/2026-11-09-handbook-worker-family.md)。

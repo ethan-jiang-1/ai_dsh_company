@@ -1,17 +1,14 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-09
 ---
 
 # BUG-048：`ui-scene-smoke --isolated --golden` 红——金样仍写“梦之队 CEO”，页面已收窄为“CEO”
 
-> 严重级别：P2（次要）｜发现：2026-11-09｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-09｜状态：已修（2026-11-09：修复就绪 → 修复已落地 → 已修）
 > 来源：2026-11-09 委派面重构后第四轮探索（U1 图/UI 透镜）。
-> 授权：2026-11-09 用户指令「按照我们的流程排一个计划，之后逐一修复吧」「从根上去解决」——
-> 刷新金样触碰验收资产；产品意图已由 D14 收窄决定与 `2026-11-09-generic-specific-separation` Note 确认。
-> 修法 = 先确认金样 diff 只含预期显示名收窄，再 `--refresh-golden` 并 `--golden` 复核；
-> 同 diff 补 content→金样的变更映射，不把“金样红”当“测试坏了”。
+> 审查：agent — 先确认 diff 只含预期显示名收窄，再刷新并复核；不再升门禁（理由见「修复落地」）。
 
 ## 症状
 
@@ -29,7 +26,7 @@ GOLDEN FAIL 页签「在场」第 14 字符起不同：
 ## 根因（假设）
 
 2026-11-09 的内容三层分离提交（`763abc29`，Note =
-[generic-specific-separation](../../notes/implemented/2026-11-09-generic-specific-separation.md)）按 D14
+[generic-specific-separation](../../../notes/implemented/2026-11-09-generic-specific-separation.md)）按 D14
 把品牌显示名收窄为角色名，但没有同 diff 刷新
 `snapshots/visual/company-shell/ui.golden.json`。`pnpm verify` 的 `ui-golden-freshness` 只检查
 九页签注册面与金样存在，不检查文本内容；真正的内容守卫是 `ui-scene-smoke --isolated --golden`，
@@ -69,3 +66,16 @@ node checks/smoke/ui-scene-smoke.mjs --isolated --golden
 - `ui-scene-smoke --isolated --golden` 绿；金样 diff 只包含已批准的显示名收窄，没有其他页面文本漂移。
 - `--refresh-golden` 后 `--golden` 复核绿；`pnpm verify` 仍 ALL PASS。
 - 若决定加门禁：改 `content/` 品牌/显示名文案时有一条可执行的同 diff 提示或检查；不靠人记忆。
+
+## 修复落地（2026-11-09）
+
+- **意图确认**：显示名收窄为角色名是 D14 的有意行为（`763abc29` +
+  [generic-specific-separation Note](../../../notes/implemented/2026-11-09-generic-specific-separation.md)），不是页面回归。
+- **红→绿**：`node checks/smoke/ui-scene-smoke.mjs --isolated --golden` 红（「在场」第 14 字符起
+  `梦之队 CEO` vs `CEO`）；`--refresh-golden` 后 `git diff` 只有「在场」这一行、`梦之队 CEO` → `CEO`；
+  `--golden` 复核 **9 个页签一致 / ALL PASS**。
+- **同 diff 映射**：[`tests/README.md`](../../../tests/README.md) 的 content 行补“显示名/品牌文案变化 ⇒
+  同 diff 刷 UI 金样（`--refresh-golden` 后 `--golden` 复核）”——这是这次漏掉的那条连线。
+- **不升门禁**：按 [policy P2](../../../docs/policy.md)（复发 + 可机械判定 + 负例已证会失败），这是首犯，
+  且真浏览器金样不适合秒级 verify；先补映射与程序，复发再按 P2 立门。
+- **全量**：`pnpm verify` ALL PASS（`ui-golden-freshness` 仍绿）；`ui-scene-smoke --isolated --golden` 绿。
