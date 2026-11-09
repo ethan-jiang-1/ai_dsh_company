@@ -19,7 +19,7 @@ opened: 2026-11-08
 > 假阳性（误报归档）；teammate/workflow 身份行与 retry 正样本无新缺陷。**第五轮（修复后探索）**：
 > 重启身份 / vp-sales/teammate 预算 / workflow 分支 retry / 分支 depth 3 边界四条 PASS；
 > **新发现 BUG-051（P2）**：worker-orchestrator 的“1–2 leaf”只是 persona，4 件 brief 起 4 个 leaf；
-> vp-sales generic depth 2 的 retry 边界仍正确拒绝。
+> vp-sales generic depth 2 的 retry 边界仍正确拒绝；**第六轮新发现 BUG-052（P2）**：worker leaf 的工具面仍有 control，sibling 发送被运行时拒绝；**第七轮新发现 BUG-053（P1）**：取消 parent turn 不能中止 `subagent_retry` 的阻塞 child，root/child 无 `turn/end`；depth 4 负例 PASS（`depth 4 exceeds maxDepth 3`）；W7-C 重启后 retry child/workflow 分支身份行 PASS；W7-E coo/cfo retry 预算 PASS；W7-F 重启后 retry 正样本 PASS（新 child/second-ok）；W7-G retry child 跨宿主重启 PASS（interrupted + unknown-outcome 诊断）；W7-D 的客户端图模型在真实 session 数据上 PASS（W7C 4 nodes/d1、D1 8 nodes/d3），React 真页面 harness-blocked 未覆盖。
 > 运行表/未覆盖/资产收割 = [第四轮 §9](2026-11-09-post-refactor-round.md)）
 
 ## 材料

@@ -391,6 +391,38 @@ coo/cfo root 的逐个采用；长期采纳率 / workspace-write / release-smoke
 结果正确，不记新 bug。W5-B 的 teammate 回执走 `send_message`，工具面正确；W5-C 的分支用了
 `subagent_retry` + `list_subagents`，没有漏值/重复。
 
+### 9.8 第六轮：能力边界（2026-11-09 夜）
+
+> 小预算：约 12 分钟 / 5 parent turns / 6 children；证据 `runtime/tmp/explore/round4/wave6-*`。
+> **新发现 1 张 P2：** [BUG-052](../../bugs/BUG-052-worker-leaf-control-surface.md)。
+
+| ID | charter | 观察 | 判定 |
+|---|---|---|---|
+| W6-A | leaf 控制面 | VP `session-78dda9a0-…` 起 alpha `3eec1647-…` / beta `59ef9ee7-…`（均 depth 1 / worker）；alpha 工具面有 `list_subagents`（空）与 `send_to_subagent`；对 sibling beta 调用返回 `Error: subagent "…" belongs to another parent session`，beta 未收到（2→2） | **BUG-052（P2）**：control 工具对 leaf 可见，与 preset“无 control”声明不一致；运行时按 parent ownership 拒绝 sibling，非跨 parent 越权 |
+| W6-B | teammate 重启身份 | VP root 起 teammate `restart-team`；停宿主、同 home 重启后 `list_subagents` 行仍 `role: teammate` / `address: restart-team` / `agentPreset: vp-eng` / `delegationDepth: "1"` / `completed` | **PASS**（team roster + durable header 重启后都在） |
+| W6-C | CMO 重启深度 | CEO→VP(1)→CMO(2)；停宿主重启后 CMO 调 `subagent_retry` | `attempts: 0` / `depth-exceeded` / 无 worker；诊断点名 cmo 预算 2 | **PASS**（冷恢复后深度门仍生效） |
+
+**未覆盖**：真页面 DagTab 图里的 retry/worker 节点；depth 4 负例；真实 error/interrupted/live retry；
+coo/cfo root 的逐个 retry 采用；长期采纳/workspace-write/release。
+
+### 9.9 第七轮：取消与生命周期（2026-11-09 夜）
+
+> 本轮目标：`subagent_retry` 是同步等 child 的 host 原语，旧 R8 只证过 workflow 取消；先打这条缝。
+
+| ID | charter | 观察 | 判定 |
+|---|---|---|---|
+| W7-A | 取消阻塞 retry | VP root `session-fc94c2fb-…` 用 `subagent_retry` 起 child `eb0e4c26-…`（depth 1 / worker），child 已发 `tool/call bash {command: "sleep 117; echo done"}`；对 root 调 `session/cancel` 返回 `accepted:true`。30/45/90s 后 root/child 都无 `turn/end`，tool result 未出现；sleep 117 进程仍在（90s 时）；没有 aborted 终态 | **BUG-053（P1）**：取消不中止阻塞 retry child；parent turn 悬在工具里 |
+| W7-B | depth 4 负例 | CEO→VP(1)→workflow 分支 `146bf216-…`（depth 2）→ worker-orchestrator `d079e28d-…`（depth 3）；orchestrator 调 `subagent` 起 leaf → `Error: subagent depth 4 exceeds maxDepth 3`，无 leaf 落地；orchestrator 自己 read 了 fixture，但未冒充 leaf | **PASS**（行级 maxDepth 在 depth 4 拒绝，链上没有越界） |
+| W7-C | 重启身份（retry/workflow） | VP root `session-3feeb864-…` 先 retry child `b49cbdd4-…`（worker/d1）、再 workflow 分支 `4269dc83-…` / `15b2bf8c-…`（vp-eng/d1）；停宿主重启后 `list_subagents` 三行全在，均 completed、无 unavailable | **PASS**（retry child 与 workflow 分支的 durable header 身份都保留） |
+| W7-E | coo/cfo 预算 | coo root `session-4f82ad21-…` retry → child `b2ab8a57-…` depth 1 / worker；cfo root `session-47954bb3-…` retry → child `a9c1d459-…` depth 1 / worker | **PASS**（五 full role 的 retry 采用面补齐） |
+| W7-F | 重启后 retry 正样本 | VP root `session-af35da4f-…` 重启前 retry child `19f9f31d-…` / first-ok；停宿主重启后再次 retry → 新 child `9495ee5b-…` / second-ok / depth 1 / worker；turn 2 的 tool/result 指向新 child | **PASS**（冷恢复后 retry 仍新起 child；脚本的 `find()` 曾取到 turn 1 旧结果，已按 root 日志更正） |
+| W7-G | retry child 跨宿主重启 | VP root `session-6a94690d-…` 用 `subagent_retry` 起 child `06b1ced1-…`（worker/d1）跑 `bash sleep 117`；SIGTERM 宿主、重启后：root `turn/end interrupted`、child `turn/end interrupted`；retry tool call 无原 result，宿主注入 outcome-unknown 诊断；`list_subagents` 行 `lastTurnEnd: interrupted` / `inferred-open-turn` / worker / d1 | **PASS**（宿主重启有 interrupted 终态和诊断，不是 cancel 的无终态；与 BUG-053 区分） |
+| W7-D | 真页面 DagTab | **React**：三次 setup（凭据/cpmposer 会话入口/RPC+预置 sessionIds boot）均未拿到 UI 断言，harness-blocked。**数据面**：`session/list`（2060 sessions）+ `buildDelegationTree`：W7C VP root `session-3feeb864-…` → 4 nodes / maxDepth 1（vp-eng + worker/vp-eng/vp-eng，terminal completed）；D1 CEO root `session-18cd2615-…` → 8 nodes / maxDepth 3（ceo→vp-eng→3 分支→3 worker），preset/terminal/missing 全对 | 数据面 **PASS**；React 页面**未覆盖**（不伪造） |
+
+**根因假设**：`subagent_retry` `await activation.result` 没有和 `exec.signal` abort race；child 被 abort 但没有 result，工具悬挂到 300s timeout；child bash 继续。与旧 R8 的 workflow 取消（run/agents 收敛）不同。
+
+**未覆盖**：真页面 DagTab 图；真实 error/interrupted live retry；coo/cfo root 的逐个 retry 采用。
+
 ## 10. 不做 / 边界
 
 - 不重跑 BUG-036..044 的原场景；不把修复后的 green 当新探索。

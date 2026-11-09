@@ -84,7 +84,8 @@ oracle、证据形式、预算与停止办法写清，且真模型范围/成本�
 （2026-11-09 晚）已跑：keyless 138 tests / verify / preset-smoke / UI golden 全绿；profile 指向当前源码后
 BUG-045 的 depth-denial、BUG-046 的身份行、BUG-047 的 handbook skip 均真装配通过；**BUG-050 复核为
 dev profile 旧安装副本导致的假阳性**，已迁 `fixed_bugs`。继续探索 teammate/workflow 身份行、retry 正样本与边界；第五轮 W5-E 新发现
-**BUG-051（P2：worker-orchestrator 的 1–2 leaf 只是 persona，4 件 brief 起 4 个 leaf）**，其余 charter PASS；
+**BUG-051（P2：worker-orchestrator 的 1–2 leaf 只是 persona，4 件 brief 起 4 个 leaf）**；第六轮 W6-A 再发现
+**BUG-052（P2：worker leaf 的工具面仍有 control，sibling 发送被运行时拒绝）**；其余 charter PASS；
 详细证据 = 下方「修复后验证」「第五轮结果」与研究材料 §9.6/§9.7。
 
 | 卡 | 根因组 | 去向 |
@@ -372,6 +373,39 @@ error/interrupted live retry、depth 4 等（见研究材料 §9.4/§9.6）。
 **观察**：workflow 分支可调 retry 生成 depth 2/3 worker，与“分支默认叶子”的 prose 有张力，但不是新机制；
 DagTab 真页面图、depth 4、真实 error live retry 仍未覆盖。
 
+
+## 第六轮（能力边界，2026-11-09 夜）
+
+> 用户 2026-11-09 晚：继续找；选“代码背后可能藏东西”的能力边界。小预算：约 12 分钟 / 5 turns / 6 children。
+
+| Charter | 探索方向 | 结果 |
+|---|---|---|
+| W6-A leaf 控制面 | VP root 起两个 leaf worker；让 alpha 用 `list_subagents`/`send_to_subagent` 给 sibling beta 发消息 | 两个工具**都在**；alpha 调用 `send_to_subagent` 得到 `Error: ... belongs to another parent session`；beta 没收到（injection=false）。**BUG-052（P2）**：worker leaf 的工具面仍有 control，和 preset“无 control”声明不一致；运行时防护在 |
+| W6-B teammate 重启身份 | VP root 起 teammate → 停宿主 → 同 home 重启 → `list_subagents` | 行仍 `role: teammate` / `address: restart-team` / `agentPreset: vp-eng` / `delegationDepth: "1"` / `completed`。**PASS** |
+| W6-C CMO 重启深度 | CEO→VP(1)→CMO(2) → 停宿主 → 重启 → CMO 调 `subagent_retry` | 仍 `attempts: 0` / `depth-exceeded` / 无 worker。**PASS**（冷恢复后深度门仍生效） |
+
+**新缺陷：** [BUG-052](../bugs/BUG-052-worker-leaf-control-surface.md)（P2，leaf 控制面可见）。
+**观察**：W6-A 的 sibling 注入被运行时按 parent ownership 拒绝；`list_subagents` 在 leaf 里为空；
+不是跨 parent 越权，但 preset 的“无 control”文案与工具面不一致。W6-B/C 说明 restart 对 teammate 身份与
+CMO 深度门都正确。
+
+## 第七轮（取消 / 生命周期，2026-11-09 夜）
+
+> 继续按“代码背后可能藏东西”选面；本轮先打 `subagent_retry` 的取消收敛，再打 depth 4 负例。
+
+| Charter | 探索方向 | 结果 |
+|---|---|---|
+| W7-A 取消阻塞 retry | VP root 用 `subagent_retry` 起 `bash sleep 117` 的 worker；child 起来后 `session/cancel` root | cancel 返回 `accepted: true`，但 root/child **都没有 `turn/end`**；child 的 bash 仍在跑（90s 时 sleep 进程仍在）；没有 `aborted` 终态。**BUG-053（P1）** |
+| W7-B depth 4 负例 | CEO→VP(1)→workflow 分支(2)→worker-orchestrator(3)→leaf(4)，应被行级 `maxDepth` 拒 | 分支 depth 2 / orchestrator depth 3 均正确；orchestrator 的 `subagent` 返回 `Error: subagent depth 4 exceeds maxDepth 3`，无 leaf 落地；orchestrator 自己读文件但未冒充 leaf。**PASS** |
+| W7-C 重启身份（retry/workflow） | VP root 先 retry 一个 worker、再跑 workflow 2 分支 → 停宿主重启 → `list_subagents` | 3 行全在：retry child `worker`/depth 1；workflow 分支 `vp-eng`/depth 1；均 `completed`、无 `unavailable`/`identityDetail`。**PASS** |
+| W7-D 真页面 DagTab | 隔离 home + 真浏览器打开真实委派会话，点“依赖图”，断言 `委派流程`/节点/preset/depth | **React 页面未覆盖**：三次 setup（凭据 → composer 入口 → RPC+预置 sessionIds boot）都没拿到 UI 断言，harness-blocked。**数据面 PASS**：用 `session/list` 真实数据 + `buildDelegationTree`：W7C VP root 4 nodes / maxDepth 1（vp-eng + 3 子：worker/vp-eng/vp-eng，terminal completed）；D1 CEO root 8 nodes / maxDepth 3（ceo→vp-eng→3 分支→3 worker），preset/terminal/missing 全部正确 | 数据面 **PASS**；React 页面**未覆盖**，不伪造 |
+| W7-E coo/cfo 预算 | coo/cfo root 各自调 `subagent_retry` | coo: attempts 1 / child `b2ab8a57…` depth 1 / worker；cfo: attempts 1 / child `a9c1d459…` depth 1 / worker。预算 2 均正确放行 | **PASS**（五 full role 的 retry 采用面补齐） |
+| W7-F 重启后 retry 正样本 | VP root `subagent_retry` → 停宿主 → 重启 → 再次 `subagent_retry` | 重启前 child `19f9f31d…` / first-ok；重启后新 child `9495ee5b…` / second-ok / depth 1 / worker，attempts 1。**PASS**（冷恢复后 `subagent_retry` 仍能新起 child，不复用旧结果） |
+| W7-G retry child 跨宿主重启 | VP root `subagent_retry` 起 `bash sleep 117` worker；宿主 SIGTERM → 重启 | root `turn/end interrupted`；child `turn/end interrupted`；retry tool call 无原 result，宿主注入“outcome unknown / 按幂等性决定是否重试”的诊断；`list_subagents` 行 `lastTurnEnd: interrupted` / `worker` / depth 1 / `inferred-open-turn`。**PASS**（与 BUG-053 的 cancel 不同：宿主重启有 interrupted 终态与诊断；不是新 bug） |
+
+**新缺陷：** [BUG-053](../bugs/BUG-053-cancel-does-not-abort-subagent-retry.md)（P1，取消不中止阻塞 retry child）。
+**观察**：旧 R8 的 workflow 取消是 PASS；`subagent_retry` 是同步等待 child 的 host 原语，取消没有传播到
+`activation.result`/child；这是与旧 R8 不同的一条路。
 
 ## 历史结果（重构前，不要重复跑）
 
