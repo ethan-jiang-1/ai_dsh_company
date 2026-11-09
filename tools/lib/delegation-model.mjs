@@ -109,26 +109,35 @@ export const WORKER_PROFILES = {
  * 合同：两个 owner、两个生命周期。
  * - company：随公司委派教义变；共享 skill。
  * - dsh：随 vendor pin 变；capability-scoped prompt section。
- * 本 P1 只声明；载体在 P2 落（status = planned）。
+ *
+ * `status` 是**载体状态**，不是计划：
+ * - `delivered`：载体已随包发布；`carrierPath` 必须指向真实文件（spec 查存在）。
+ * - `merged`：没有独立载体，规则并入 `mergedInto` 指向的合同（避免第二份散文）。
+ * - `planned`：载体未落；只允许在卡/RFC 里声明，随包里不应出现（spec 查红）。
  */
 export const CONTRACTS = {
   'policy.delegation': {
     owner: 'company',
     carrier: 'skill',
+    carrierPath: 'packages/company-pack/presets/_shared/delegation/skills/delegation-policy/SKILL.md',
     scopeChannels: ['spawn', 'fork', 'workflow', 'team'],
-    status: 'planned',
+    status: 'delivered',
   },
   'engine.workflow': {
     owner: 'dsh',
     carrier: 'section',
+    carrierPath: 'packages/company-pack/content/contracts/workflow.md',
+    section: 'company:workflow-contract',
     scopeChannels: ['workflow'],
-    status: 'planned',
+    status: 'delivered',
   },
   'engine.subagent': {
     owner: 'dsh',
-    carrier: 'section',
+    carrier: 'inline',
     scopeChannels: ['spawn', 'fork'],
-    status: 'planned',
+    // 没有独立 section：引擎规则住在自治 policy skill 与工具描述里（2026-11-09 收口，别另起散文）。
+    status: 'merged',
+    mergedInto: 'policy.delegation',
   },
 }
 
@@ -302,6 +311,10 @@ export const RETRY = {
     noRetry: ['completed', 'aborted', 'refusal', 'max-tokens'],
     idempotentOnly: true,
     runtimeTool: 'subagent_retry',
+    // 注册面 = full role 且有通用 `subagent` 行；深度 = **同一行**的 maxDepth（不另立一份预算）。
+    // 唯一投影函数 = retrySurface()；host 运行时表 SUBAGENT_RETRY_SURFACE 由 spec 钉同源。
+    childPreset: 'worker',
+    depth: 'caller-generic-subagent-row',
     visibility: ['attempt label', 'list_subagents lastTurnEnd', 'graph terminal'],
     reliableAlternative: 'workflow',
   },
@@ -313,6 +326,23 @@ export const RETRY = {
     visibility: ['attempt label', 'workflow_runs', 'graph terminal'],
     reliableAlternative: null,
   },
+}
+
+/**
+ * `subagent_retry` 的注册面与逐 preset 深度预算（唯一期望源）。
+ *
+ * 注册面 = **full role 里有通用 `subagent` 行**的 preset（CEO 是 lead、worker family 是执行手，
+ * 都不挂 retry）；深度就是那一行的 `maxDepth`。这样“普通 spawn 能到多深”和“retry 能到多深”
+ * 永远是同一个数——不另立第二份预算。
+ * @returns `{ childPreset, presets }`；`presets` 是 preset id → 允许的**子代绝对深度**。
+ */
+export function retrySurface() {
+  const presets = {}
+  for (const [id, spec] of Object.entries(COMPOSITIONS)) {
+    const depth = spec.depthRows?.subagent
+    if (spec.archetype === 'full' && typeof depth === 'number') presets[id] = depth
+  }
+  return { childPreset: RETRY.subagent.childPreset, presets }
 }
 
 /**
@@ -398,6 +428,31 @@ export function modelProblems() {
   for (const [id, contract] of Object.entries(CONTRACTS)) {
     for (const channel of contract.scopeChannels) {
       if (CHANNELS[channel] === undefined) problems.push(`合同 ${id}: 未知作用域通道 ${channel}`)
+    }
+    if (!['delivered', 'merged', 'planned'].includes(contract.status)) {
+      problems.push(`合同 ${id}: 未知载体状态 ${contract.status}`)
+    }
+    if (contract.status === 'delivered' && typeof contract.carrierPath !== 'string') {
+      problems.push(`合同 ${id}: delivered 缺 carrierPath`)
+    }
+    if (contract.status === 'merged'
+      && (typeof contract.mergedInto !== 'string' || CONTRACTS[contract.mergedInto] === undefined)) {
+      problems.push(`合同 ${id}: merged 缺合法的 mergedInto`)
+    }
+  }
+  const surface = retrySurface()
+  if (WORKER_PROFILES[surface.childPreset] === undefined) {
+    problems.push(`retry childPreset 指向未知 worker profile ${surface.childPreset}`)
+  }
+  for (const [preset, depth] of Object.entries(surface.presets)) {
+    if (COMPOSITIONS[preset].depthRows.subagent !== depth) {
+      problems.push(`retry ${preset}: 深度 ${depth} 与通用 subagent 行不一致`)
+    }
+  }
+  for (const [id, spec] of Object.entries(COMPOSITIONS)) {
+    if (spec.archetype === 'full' && typeof spec.depthRows.subagent === 'number'
+      && surface.presets[id] === undefined) {
+      problems.push(`retry ${id}: full role 有通用 subagent 行却不在注册面`)
     }
   }
   return problems

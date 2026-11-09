@@ -97,7 +97,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
    只认名册成员，够不到根起的 `subagent` child（`list_agents` 只回 `lead`、`send_message` 报
    `active teammate not found`；机制 = §2）。根门改用 `list_subagents`（父会话 durable catalog，重启后可查）
    与 `send_to_subagent`（官方 `ctx.subagents`，续驶/催稿），名字不被 shadow。`subagent`/`subagent_fork` 行
-   `maxDepth: 3`：CEO→VP（1）→workflow 分支（2）→worker（3）放行；VP 根门→分支→worker 仍有余量（2026-11-09 源码：分支/成员都是 activation 子代，深度 parent+1）。重试敏感的小活可用 `subagent_retry`（host 原语，仅五个有 generic subagent 的 full role；同步、最多 2 attempts、attempts/exhausted 可见；长/批量走 workflow）；generic child 需要子层时 `agent_preset` 选 `worker-orchestrator`（它只带 leaf）。
+   `maxDepth: 3`：CEO→VP（1）→workflow 分支（2）→worker（3）放行；VP 根门→分支→worker 仍有余量（2026-11-09 源码：分支/成员都是 activation 子代，深度 parent+1）。重试敏感的小活可用 `subagent_retry`（host 原语，仅五个有 generic subagent 的 full role；同步、最多 2 attempts、attempts/exhausted 可见；长/批量走 workflow）；**它的子代深度不另立预算**——上限 = 该 preset 通用 `subagent` 行的 `maxDepth`（vp-eng 3 / 其余四个 2），到预算底部返回 `stopReason: depth-exceeded` 且不起 child（BUG-045）；generic child 需要子层时 `agent_preset` 选 `worker-orchestrator`（它只带 leaf）。
 
 ## 5. UI：委派工具卡
 

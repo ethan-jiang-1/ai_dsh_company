@@ -53,7 +53,7 @@ preset/depth，但那是 client/host 投影，不是模型工具。模型可见�
 
 **“身份/预算不可观测”**：父代理请求 worker profile 或深度后，没有独立于 child 自述的核对面。
 后果：worker 配错（full role clone）、深度预算被绕过（见
-[BUG-045](BUG-045-subagent-retry-depth-budget-bypass.md)）、或 child 声称“我是 worker”时，父代理无法
+[BUG-045](../_archive/fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md)）、或 child 声称“我是 worker”时，父代理无法
 分辨。它同时削弱了本轮的 H1/H6/H8：验收只能靠人类读 header 或 UI，不能靠模型自己的工具闭环。
 
 ## 复现
@@ -94,5 +94,5 @@ header；读不到时 `unavailable`），或提供等价的只读 `subagent_info
   `delegationDepth`；读不到时明确 `unavailable`，不伪造。
 - D1 形状下父代理能独立核对 `worker` 与 `depth=3`，不再写“只能信自述”。
 - keyless spec 覆盖 header 来源与 `unavailable` 降级；红形态 = 故意不返回 preset/depth 时断言红。
-- 与 [BUG-045](BUG-045-subagent-retry-depth-budget-bypass.md) 一起看：深度/身份绕过必须能被父代理
+- 与 [BUG-045](../_archive/fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md) 一起看：深度/身份绕过必须能被父代理
   在工具面观察到。

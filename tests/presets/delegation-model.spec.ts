@@ -1,3 +1,5 @@
+// 负例留证 2026-11-09：把 CONTRACTS['policy.delegation'].status 从 delivered 改回 planned ⇒
+// 「合同载体状态与真实载体一致」用例红（`expected 'planned' to be 'delivered'`）；还原 ⇒ 10 passed。BUG-049
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -82,6 +84,23 @@ describe('delegation model：唯一期望源', () => {
     expect(CONTRACTS['policy.delegation'].scopeChannels).toEqual(['spawn', 'fork', 'workflow', 'team'])
     expect(CONTRACTS['engine.workflow'].scopeChannels).toEqual(['workflow'])
     expect(CONTRACTS['engine.subagent'].scopeChannels).toEqual(['spawn', 'fork'])
+  })
+
+  it('合同载体状态与真实载体一致：已落载体不得再标 planned（BUG-049）', () => {
+    expect(CONTRACTS['policy.delegation'].status).toBe('delivered')
+    expect(CONTRACTS['engine.workflow'].status).toBe('delivered')
+    expect(CONTRACTS['engine.subagent'].status).toBe('merged')
+    expect(CONTRACTS['engine.subagent'].mergedInto).toBe('policy.delegation')
+    for (const [id, contract] of Object.entries(CONTRACTS)) {
+      expect(['delivered', 'merged', 'planned'], `${id} 状态词`).toContain(contract.status)
+      if (contract.status === 'delivered') {
+        expect(typeof contract.carrierPath, `${id} 缺 carrierPath`).toBe('string')
+        expect(existsSync(join(ROOT, contract.carrierPath)), `${id} carrierPath 不存在`).toBe(true)
+      }
+      if (contract.status === 'merged') {
+        expect(CONTRACTS[contract.mergedInto], `${id} mergedInto 指向未知合同`).toBeDefined()
+      }
+    }
   })
 
   it('组合的合同覆盖：有 spawn/fork 就要 engine.subagent；有 workflow 就要 engine.workflow；有委派就要 policy', () => {

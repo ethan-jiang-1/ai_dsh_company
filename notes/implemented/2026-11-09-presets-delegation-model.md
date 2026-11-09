@@ -2,6 +2,7 @@
 
 状态：implemented（2026-11-09 交付；P1–P4 的交付面完成：模型/静态矩阵、两层合同、P-A/B/C/D/J 真探针、UI 树形流程+completed/failed 终态、深度预算、`subagent_retry`（P-H 采用 PASS）、worker leaf+小工头；P5 不生成、P-I host 不自动重试为显式决定；worker-workflow no-go（P-K 采用不稳定，见 [no-go Note](./2026-11-09-worker-workflow-no-go.md)）；P-H/P-I 确定性失败注入（tool-boundary fake + adoption）；interrupted/aborted/max-tokens/refusal 由 companyDelegationTerminal host 投影接 UI，lost 仅当 host 提供）—— 批准：用户 2026-11-09「开始推进」，按“长期正确 / 长期可维护 / 结构柔韧”拍板。
 > 后续修正：worker-researcher / specialist 边界见 [2026-11-09-specialist-worker-taxonomy](../archived/2026-11-09-specialist-worker-taxonomy.md)（2026-11-09）。
+> 部分取代：retry 的注册面/深度与合同载体状态见 [2026-11-09-delegation-surface-single-source](./2026-11-09-delegation-surface-single-source.md)（2026-11-09，BUG-049/045）。
 上游 = [RFC 卡](../../_backlog/_archive/settled_issues/2026-11-09-presets-delegation-architecture.md)；
 研究 = [preset 委派架构：盘点与结构性研究](../../_backlog/research/presets-delegation-architecture/README.md)（已定性）。
 
@@ -81,7 +82,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针 / UI）
 
 - **原则**：可见、有界、按幂等性判断；不做静默自动重试。
 - **分类**：`error` / `interrupted` / `lost` 在幂等任务上重试一次；`refusal` / `aborted` / `completed` 不重试；`max-tokens` 不自动（缩任务/提预算/交人）。
-- **机制**：父代理用 `list_subagents.lastTurnEnd` 分类，最多再派一次（attempt 2 label），仍失败 `exhausted`；批量/必须成功的活走 workflow；**`subagent_retry` host 原语已落**（per-agent 五个 full role；同步、最多 2 attempts、幂等门、attempts/childIds/stopReason/exhausted；worker/leaf/CEO 不挂）；keyless fake-subagents spec 覆盖分类；P-H 真实采用 PASS，真失败注入仍待。
+- **机制**：父代理用 `list_subagents.lastTurnEnd` 分类，最多再派一次（attempt 2 label），仍失败 `exhausted`；批量/必须成功的活走 workflow；**`subagent_retry` host 原语已落**（per-agent 五个 full role；同步、最多 2 attempts、幂等门、attempts/childIds/stopReason/exhausted；worker/leaf/CEO 不挂）；**子代深度上限 = 该 preset 通用 `subagent` 行的 `maxDepth`，越界返回 `depth-exceeded` 不起 child**（见 [single-source Note](./2026-11-09-delegation-surface-single-source.md)）；keyless fake-subagents spec 覆盖分类；P-H 真实采用 PASS，真失败注入仍待。
 - **模型**：`RETRY` + `retryDecision` 是纯决策；spec 覆盖 error/interrupted/lost、refusal/aborted/max-tokens、非幂等、exhausted、workflow 对照。
 - **禁止**：静默自动、无限重试、对 refusal/aborted 重试、把 max-tokens 当普通 error、重试非幂等写操作。
 

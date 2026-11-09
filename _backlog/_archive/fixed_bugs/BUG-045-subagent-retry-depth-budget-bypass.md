@@ -1,17 +1,14 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P1
 opened: 2026-11-09
 ---
 
 # BUG-045：`subagent_retry` 的默认 `maxDepth: 3` 绕过 CMO 等 preset 的行级深度预算
 
-> 严重级别：P1（重要）｜发现：2026-11-09｜状态：修复就绪
+> 严重级别：P1（重要）｜发现：2026-11-09｜状态：已修（2026-11-09：修复就绪 → 修复已落地 → 已修）
 > 来源：2026-11-09 委派面重构后第四轮探索（R1b，CMO depth 2 → retry depth 3）。
-> 授权：2026-11-09 用户指令「按照我们的流程排一个计划，之后逐一修复吧」「从根上去解决」——
-> 本修复触碰 company-pack 公开行为与 docs 合同，按[章程](../README.md)「缺陷的通道」由用户明确指示授权；
-> 修法 = 与 [BUG-049](BUG-049-model-contract-retry-drift.md) 同根一起收（retry 深度从模型/组合派生，
-> host 按调用者 preset 预算放行），不单独打全局默认值补丁。
+> 审查：agent — 对照「已修判定」逐条核过；真红→绿与长链放行见「修复落地」，未跑真模型（keyless 机制档）。
 
 ## 症状
 
@@ -35,7 +32,7 @@ opened: 2026-11-09
 （vp-sales/coo/cfo 同款）。工具与行级预算各说各话。
 
 同类风险：`subagent_retry` 的注册列表与默认深度不在
-[`tools/lib/delegation-model.mjs`](../../tools/lib/delegation-model.mjs) 的模型里；模型是“唯一期望源”，
+[`tools/lib/delegation-model.mjs`](../../../tools/lib/delegation-model.mjs) 的模型里；模型是“唯一期望源”，
 但这条能力面目前只在 host 代码里硬编码，静态 spec 无法发现注册面/深度漂移。
 
 ## 暴露的失败类
@@ -67,13 +64,13 @@ opened: 2026-11-09
 
 ## 修复关联
 
-- host 工具：[`packages/company-pack/src/host/delegation/subagent-retry.ts`](../../packages/company-pack/src/host/delegation/subagent-retry.ts)
+- host 工具：[`packages/company-pack/src/host/delegation/subagent-retry.ts`](../../../packages/company-pack/src/host/delegation/subagent-retry.ts)
   的 `DEFAULT_MAX_DEPTH = 3` 与 `registerSubagentRetry` 的默认值。
-- 注册面：[`packages/company-pack/src/index.ts`](../../packages/company-pack/src/index.ts) 的
+- 注册面：[`packages/company-pack/src/index.ts`](../../../packages/company-pack/src/index.ts) 的
   `registerSubagentRetry(ctx, { allowedPresets: [...] })`。
 - 组合声明：CMO / vp-sales / coo / cfo 的 `tool-subagent` 行 `maxDepth: 2`；
-  [`tools/lib/delegation-model.mjs`](../../tools/lib/delegation-model.mjs) 的 `COMPOSITIONS.*.depthRows`。
-- 测试：[`tests/host/delegation/subagent-retry.spec.ts`](../../tests/host/delegation/subagent-retry.spec.ts)
+  [`tools/lib/delegation-model.mjs`](../../../tools/lib/delegation-model.mjs) 的 `COMPOSITIONS.*.depthRows`。
+- 测试：[`tests/host/delegation/subagent-retry.spec.ts`](../../../tests/host/delegation/subagent-retry.spec.ts)
   目前只在 `allowedPresets: ['vp-eng']` 下断言 `maxDepth: 3`，没有按 preset 覆盖深度预算。
 
 候选修法（待定，不在本卡直接改）：按调用者 preset 解析允许深度（如从模型 `depthRows.subagent`
@@ -89,3 +86,19 @@ opened: 2026-11-09
   改回 3 时对应断言红；还原后绿。
 - `delegation-model.mjs` 至少声明 retry 的注册面与深度策略，或由 spec 从 host 注册面反查；
   不再出现“模型不知道这条能力面”的空白。
+
+## 修复落地（2026-11-09）
+
+- **host**：[`subagent-retry.ts`](../../../packages/company-pack/src/host/delegation/subagent-retry.ts)
+  删掉 `DEFAULT_MAX_DEPTH` / `DEFAULT_PRESETS`；注册面与逐 preset 深度只读
+  `SUBAGENT_RETRY_SURFACE`（= 各 preset 通用 `subagent` 行的 `maxDepth`，模型 `retrySurface()` 同源）。
+- **越界可见拒绝**：执行前按 `max(header.delegationDepth, options.subagentDepth) + 1` 与调用者预算比较
+  （与 vendor `delegationDepthOf` 同口径）；越界返回 `attempts: 0` / `childIds: []` /
+  `stopReason: depth-exceeded` / `exhausted: true` + 点名 preset/预算的 `diagnostic`，**不调**
+  `startActivation`；预算内把同一预算作为 `maxDepth` 传给引擎（第二道闸）。
+- **长链仍放行**：vp-eng 在 depth 2 调用 retry，child = depth 3 ≤ 预算 3（spec 用例）。
+- **文档**：`docs/delegation.md` §4、`docs/presets.md` 工具面、delegation-policy skill §7 同步。
+- **真红→绿**：`SUBAGENT_RETRY_SURFACE.presets.cmo` 2→3 ⇒ host spec **2 failed**
+  （CMO depth 2 起了 child、subagentDepth 取大失效）；还原 ⇒ 两文件 **22 passed**。
+- **全量**：`pnpm verify`、`pnpm test`（166 files / **1331 tests**）、`pnpm typecheck` 全绿（同提交）。
+- 决定与输掉的方案 = [single-source Note](../../../notes/implemented/2026-11-09-delegation-surface-single-source.md)。

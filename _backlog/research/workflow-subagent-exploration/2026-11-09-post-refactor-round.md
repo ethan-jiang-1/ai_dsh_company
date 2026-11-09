@@ -291,11 +291,11 @@ spawn teammate，但能 spawn worker / 请 CMO）；N 的 CEO teammate = 继承 
 
 | 卡 | 级别 | 一句话 | 证据 |
 |---|---:|---|---|
-| [BUG-045](../../bugs/BUG-045-subagent-retry-depth-budget-bypass.md) | P1 | CMO depth 2 用 `subagent_retry` 起出 depth 3 worker，绕过 CMO 行级 `maxDepth: 2` | `r4-2026-11-09T09-43-57-731Z/r1b-cmo-depth-bypass.json` |
+| [BUG-045](../../_archive/fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md) | P1 | CMO depth 2 用 `subagent_retry` 起出 depth 3 worker，绕过 CMO 行级 `maxDepth: 2` | `r4-2026-11-09T09-43-57-731Z/r1b-cmo-depth-bypass.json` |
 | [BUG-046](../../bugs/BUG-046-parent-cannot-verify-child-preset-depth.md) | P2 | `list_subagents` 不返回 child 的 `agentPreset`/`delegationDepth`，父代理只能信自述/看日志/UI | `r4-2026-11-09T09-37-34-306Z/d1-long-chain.json` |
 | [BUG-047](../../bugs/BUG-047-worker-family-handbook-scope.md) | P2 | `handbookSkipPresets` 只跳过 `worker`；`worker-orchestrator`/`worker-researcher` 被注入公司手册，与 persona 矛盾 | `r4-2026-11-09T09-47-02-512Z/w1b-orchestrator.json`、W1c |
 | [BUG-048](../../bugs/BUG-048-ui-golden-brand-name-drift.md) | P2 | `ui-scene-smoke --isolated --golden` 红：金样仍写“梦之队 CEO”，页面已收窄为“CEO” | `ui-scene-smoke` 回执 + golden diff |
-| [BUG-049](../../bugs/BUG-049-model-contract-retry-drift.md) | P2 | 模型仍把已落合同标 `planned`；`subagent_retry` 注册面/深度不在模型 | `k0.json` |
+| [BUG-049](../../_archive/fixed_bugs/BUG-049-model-contract-retry-drift.md) | P2 | 模型仍把已落合同标 `planned`；`subagent_retry` 注册面/深度不在模型 | `k0.json` |
 
 ### 9.3 观察（不建卡）
 

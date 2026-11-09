@@ -61,6 +61,7 @@ child 看不到你本轮刚读的东西（fresh）；fork 才带已完成轮。b
 - 不重试：`refusal` / `aborted` / `completed`；`max-tokens` 不自动（缩任务/提预算/交人）。
 - 批量/必须成功：走 workflow，脚本内显式 `missing`/`exhausted`。
 - **短、幂等、重试敏感的活**可用 `subagent_retry`（同步等待、最多 2 attempts、结果带 attempts/exhausted）；长/批量仍走 workflow。
+- `subagent_retry` 的子代深度**不另算**：上限 = 你这条 preset 的通用 `subagent` 行 `maxDepth`。到预算底部再调用会返回 `stopReason: depth-exceeded`（不起 child）——换普通 subagent 在预算内派活，或走 workflow；retry 不是深度后门。
 - 不静默自动重试；attempt/terminal 要可见。
 
 ## 8. worker profile
