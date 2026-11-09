@@ -14,7 +14,7 @@ opened: 2026-10-17
 >
 > **结论（2026-10-18 已修）**：根因收敛到一行配置——`tool-ask-user` 的 `legacy` 形态前台窗口无界，而 RPC 只吃 `continued`；
 > 五角色 preset 改钉 vendor 既有的 `mode: timed`（`timeout: 120`），**不改 vendor**。证据、未验残留与去向（真模型档缺口）
-> = [毕业 Note](../../../notes/implemented/2026-10-18-bug021-timed-user-question.md)。
+> = [毕业 Note](../../../notes/archived/2026-10-18-bug021-timed-user-question.md)。
 
 ## 症状（真现场）
 

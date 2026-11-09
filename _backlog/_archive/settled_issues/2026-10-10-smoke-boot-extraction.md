@@ -34,7 +34,7 @@ preset、probe、replay。
 | 差异 | 涉及文件 | 处置 |
 |---|---|---|
 | 固定 `--port String(PORT)`（非 0） | client-load、delegation、entry-probe、handbook、preset、probe | `startWeb` 的 `port` 参数（已支持） |
-| `--patch run/entry-probe.patch.yml` + env 钉 `DSH_PERMISSION_MODE: 'read-only'` | entry-probe | `patch` 参数（已支持）+ `env` 基础环境传入。⚠ **read-only 是有意的 fail-closed 档，一个字节不许动**（见 [sandbox-backend-probe Note](../../../notes/implemented/2026-10-10-sandbox-backend-probe.md) 的核查记录） |
+| `--patch run/entry-probe.patch.yml` + env 钉 `DSH_PERMISSION_MODE: 'read-only'` | entry-probe | `patch` 参数（已支持）+ `env` 基础环境传入。⚠ **read-only 是有意的 fail-closed 档，一个字节不许动**（见 [sandbox-backend-probe Note](../../../notes/archived/2026-10-10-sandbox-backend-probe.md) 的核查记录） |
 | 多重 `--patch`（patch + PRESET_PATCHES 展开） | replay | **本卡给 `startWeb` 扩**：`patch` 接受 `string \| string[]` |
 | token 交换**无** AbortSignal | delegation、handbook、preset、probe、presence-e2e、replay | **统一到 15s**（本卡接受的唯一行为统一；失败路径的挂起时机，非请求形状）——与上游卡统一 boot 错误文案同类 |
 | 空 cookie 时 **throw**（`token 交换没有拿到 cookie`） | delegation、handbook、preset、probe | **本卡给 `companyCookie` 扩**：`onEmptyCookie: 'throw'`（默认 `'join'` = 探针面现状，25 个已迁探针零扰动） |

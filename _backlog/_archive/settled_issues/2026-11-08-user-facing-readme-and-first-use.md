@@ -7,7 +7,7 @@ opened: 2026-11-08
 
 > 立卡：2026-11-08 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：note — [Note](../../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md)（已交付）。
+> **结论/去向**：note — [Note](./2026-11-08-user-facing-readme-and-first-use.md)（已交付）。
 >
 > 审查：agent — 语义审（对照授权与 10 条验收：冷读 7/7、真实例截图、契约门红→绿、全量检查）；用户 — 跳过（本轮用户点名直接落地归档，未逐页人审）。
 
@@ -168,7 +168,7 @@ opened: 2026-11-08
 
 ## 交付证据（2026-11-08）
 
-- **去向**：[Note](../../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md)（决定、输掉的方案、真证据、未验/环境限制）。
+- **去向**：[Note](./2026-11-08-user-facing-readme-and-first-use.md)（决定、输掉的方案、真证据、未验/环境限制）。
 - **README**：89 行（预算 90）；七问冷读 5.0 → 6.5 → **7.0/7**（补「第一条命令」后换读者复探）；首 25 行零本仓内部词；两张真实例截图进 `docs/assets/`。
 - **手册**：v4 模板（`tools/lib/install-manual.mjs`）；新增 §四「第一次经营一家公司」六步；七问冷读 **7/7**；`node tools/export-dist.mjs` ALL PASS，sha `7cfc216d…`；`dist-manual` 模板同源绿。
 - **契约门**：`readme-manual-commands` 先红（README 三处安装副本不在手册）后绿（README 的 2 条 dsh 命令全在手册）；已接线，`checks/INDEX.generated.md` 重生成。

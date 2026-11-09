@@ -168,13 +168,13 @@ truncated）写进记录 frontmatter；客户端只做预览。有背景或 `--w
 记账，成员继承 CEO 的方法层——指向成员名的 suggest 改不到该成员。机制判据 =
 [cultivation-context-probe](../probes/session-context/cultivation-context-probe.mjs)。
 
-**生效边界按面**（D25；依据 = vendor 源码 + [2026-09-24 活体探针](../notes/implemented/2026-09-24-twin-cultivation.md)）：
+**生效边界按面**（D25；依据 = vendor 源码 + [2026-09-24 活体探针](../notes/archived/2026-09-24-twin-cultivation.md)）：
 
 | 改动面 | 生效时点 | 依据 |
 |---|---|---|
 | persona / 组合文件（工具行、skill 根） | **新会话**（运行中的会话保持自己的 generation）；⚠ **新增依赖模块 / 新行解析时还须重启观察窗**——2026-09-29 实测：旧进程上新开会话仍是 25 工具（无 `web_search`），重启后 27 工具含之（该轮两个变量同时变，故取稳妥口径） | vendor `agent-preset` 的 preset stamp 机制；**活体已跑**（2026-09-29 联网整治，见 [role-web-access](../notes/archived/2026-09-29-role-web-access.md)） |
 | skill 正文（`SKILL.md` body，含方法层） | **同会话下一轮**（`get()` 每次读盘） | 活体实证（日志工具结果层）+ vendor 源码一致；**修正** 2026-09-22 U1"只有新会话变"（U1 量的是模型转述） |
-| skill 条目（增删改名，含方法层） | 下一轮（pre-step digest 重算 → 替换目录注入）；2026-10-13 实测 watcher 连**运行中会话**的 catalog 都会刷新（探针 NOTE 行） | vendor skill digest；培养决定 = [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) |
+| skill 条目（增删改名，含方法层） | 下一轮（pre-step digest 重算 → 替换目录注入）；2026-10-13 实测 watcher 连**运行中会话**的 catalog 都会刷新（探针 NOTE 行） | vendor skill digest；培养决定 = [twin-cultivation](../notes/archived/2026-09-24-twin-cultivation.md) |
 | 方法层撤回（`revoke` 删目录） | 删除后新会话不再加载；已加载进历史的正文不回改（append-only） | 2026-10-13 机制探针 |
 
 **培养验收**：完整完成定义 = [preset-change-definition skill](../.agents/skills/preset-change-definition/SKILL.md)（次序/最小证据/场景义务的唯一家；`pnpm test`/`preset-smoke`/场景义务都在那里）。本段只补“培养内容”特有的一条：`probe-smoke --full`（5–10 分钟，内容质量档）按需跑，不是完成门槛——最小证据按 skill + [tests/README](../tests/README.md) 的改动面选择。方法层机制改动另跑

@@ -7,9 +7,9 @@ opened: 2026-10-30
 
 > 立卡：2026-10-30 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：P1/P2 已落地，去向 = [entry-followup Note](../../../notes/implemented/2026-10-30-cultivation-entry-followup.md)。主任务自然语言 IA 未在本卡实施，仍是独立决定；真人走查不在卡门口。
+> **结论/去向**：P1/P2 已落地，去向 = [entry-followup Note](./2026-10-30-cultivation-entry-followup.md)。主任务自然语言 IA 未在本卡实施，仍是独立决定；真人走查不在卡门口。
 >
-> 用户 2026-10-30「好的, 听你的建议」授权按上轮复核建议开卡并收口 P1/P2。上轮已结卡 = [培养 UX 卡](./2026-10-29-cultivation-experience.md)；上轮实施 = [traceability Note](../../../notes/implemented/2026-10-30-cultivation-work-improvement-traceability.md)。
+> 用户 2026-10-30「好的, 听你的建议」授权按上轮复核建议开卡并收口 P1/P2。上轮已结卡 = [培养 UX 卡](./2026-10-29-cultivation-experience.md)；上轮实施 = [traceability Note](../../../notes/archived/2026-10-30-cultivation-work-improvement-traceability.md)。
 
 **问题与期望结果：** 上轮把“让角色今后的工作更好”做成主任务横幅与单一入口，并补了来源/决定/验证历史；但入口之后仍是旧表单，且几个高影响细节会让用户误发、误读或看不出状态区别。期望在不改数据模型、角色闸和 AI 起草边界的前提下，先把“不误发、不误导、证据可读”收口，再决定是否重做主任务 IA。
 
@@ -46,4 +46,4 @@ P1/P2 已落地并由 implemented Note 承接；真人走查不在本卡门口�
 
 ## 下一步
 
-本卡已归档，不再有常规下一步。主任务自然语言 IA 与真人走查另开卡或归 [entry-followup Note](../../../notes/implemented/2026-10-30-cultivation-entry-followup.md) 的后续观察。
+本卡已归档，不再有常规下一步。主任务自然语言 IA 与真人走查另开卡或归 [entry-followup Note](./2026-10-30-cultivation-entry-followup.md) 的后续观察。

@@ -42,7 +42,7 @@ intent: "核对钉住的 DSH 能力，判断公司角色个性化培养与 CEO �
 
 ## 机制限制与范围
 
-- **“人人培养自己角色分身”目前不等于每个运行时 agent 自己改 preset。** 本仓合同规定培养权是 repo 写权限，skill/preset 自改已否决；DSH preset 是部署组合，不是角色会话的自助 profile editor。角色定制可能有 workspace/local skill 载体，但要验证授权人、作用域及部署边界，不能绕过 repo/pack 权限事实。既有裁定见 [`notes/implemented/2026-09-24-twin-cultivation.md`](../../../../notes/implemented/2026-09-24-twin-cultivation.md) 与 [`docs/presets.md`](../../../../docs/presets.md) §培养回路。
+- **“人人培养自己角色分身”目前不等于每个运行时 agent 自己改 preset。** 本仓合同规定培养权是 repo 写权限，skill/preset 自改已否决；DSH preset 是部署组合，不是角色会话的自助 profile editor。角色定制可能有 workspace/local skill 载体，但要验证授权人、作用域及部署边界，不能绕过 repo/pack 权限事实。既有裁定见 [`notes/implemented/2026-09-24-twin-cultivation.md`](../../../../notes/archived/2026-09-24-twin-cultivation.md) 与 [`docs/presets.md`](../../../../docs/presets.md) §培养回路。
 - **CEO spawn 继承错挂风险真实存在。** 本仓记录 teammate/child 使用 `composeFrom ⇒ agentPreset=ceo`，不是目标职能 preset（[`docs/presets.md`](../../../../docs/presets.md)）；若为非 CEO 个性化技能仅加在其独立 preset，CEO 委派出的对应角色不会自动加载它。反之，若将个人技能放在 global root，可能扩散给所有可见其根的 agent。两种结果都需从 live 会话 scope/catalog 验证。
 - **Preset 定义更新不会改已有 Agent 组合。** 更新 preset 后需新 Agent 才使用定义；恢复 session 按 id 使用当前定义。不要把已有会话的 prompt prefix 变化误当成即时热更新。
 - **Skill 正文历史是 append-only。** 已加载旧正文留在工具历史；更改文件不会改写旧结果，且正文改动没有独立版本提醒。培养评审需要比较实际读到的正文/日志。
@@ -69,5 +69,5 @@ intent: "核对钉住的 DSH 能力，判断公司角色个性化培养与 CEO �
 ## 引用入口
 
 - DSH pin 与只读政策：根 [`AGENTS.md`](../../../../AGENTS.md)；本轮实际 pin 查询如上。
-- 现有培养合同：[`docs/presets.md`](../../../../docs/presets.md) §培养回路与学习载体；决定证据：[`notes/implemented/2026-09-24-twin-cultivation.md`](../../../../notes/implemented/2026-09-24-twin-cultivation.md)。
+- 现有培养合同：[`docs/presets.md`](../../../../docs/presets.md) §培养回路与学习载体；决定证据：[`notes/implemented/2026-09-24-twin-cultivation.md`](../../../../notes/archived/2026-09-24-twin-cultivation.md)。
 - Vendor mechanism: skill registry [`packages/skill/skill/src/index.ts`](../../../../vendor/dsh/packages/skill/skill/src/index.ts), filesystem provider [`packages/skill/skill-filesystem/src/index.ts`](../../../../vendor/dsh/packages/skill/skill-filesystem/src/index.ts), tool consumer [`packages/skill/tool-skill/README.md`](../../../../vendor/dsh/packages/skill/tool-skill/README.md), preset [`packages/preset/agent-preset-registry/README.md`](../../../../vendor/dsh/packages/preset/agent-preset-registry/README.md), feedback [`packages/feedback/message-feedback/README.md`](../../../../vendor/dsh/packages/feedback/message-feedback/README.md), session query [`packages/session-query/tool-session-query/README.md`](../../../../vendor/dsh/packages/experimental/tool-session-query/README.md), approval [`packages/interaction/user-approval/README.md`](../../../../vendor/dsh/packages/interaction/user-approval/README.md), user questions [`packages/interaction/user-questions/README.md`](../../../../vendor/dsh/packages/interaction/user-questions/README.md)。

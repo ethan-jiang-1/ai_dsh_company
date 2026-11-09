@@ -9,7 +9,7 @@
 
 > **2026-10-28 M3 部分取代（方法层）**：§后果 的“方法层仍是 profile 级；同 home 多 profile 不共享”
 > 已作废——方法层公司级共享（[data-model](../../docs/data-model.md) §四）。上面的 banner 只覆盖 M2。
-> 备份口径 meanwhile 取代 [run-bundle](../implemented/2026-10-24-run-bundle-install-unit.md) §7。
+> 备份口径 meanwhile 取代 [run-bundle](./2026-10-24-run-bundle-install-unit.md) §7。
 
 ## 问题
 

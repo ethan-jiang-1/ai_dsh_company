@@ -8,7 +8,7 @@ opened: 2026-10-17
 > 立卡：2026-10-17 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
 > **结论（2026-10-17 当日结）**：六条待裁点由用户令采推荐项，S1–S6 全部实施并验收（真浏览器点按 → 真落盘 + 真日志）。
-> 去向 = 毕业 Note [2026-10-17-cultivation-gui-actions](../../../notes/implemented/2026-10-17-cultivation-gui-actions.md)（决定/证据/未验残留）；
+> 去向 = 毕业 Note [2026-10-17-cultivation-gui-actions](./2026-10-17-cultivation-gui-actions.md)（决定/证据/未验残留）；
 > 本卡保留 UX 推敲与体验协议原文（下一轮迭代的输入）。
 
 **问题与期望结果：** 用户 2026-10-17 读「怎么养」后提两问——①「命令行没挂上」②「可以支持 GUI 培养体验吗」；
@@ -35,7 +35,7 @@ UX 视角、人的输入清单（把手审计）、迭代框架与落地切片 S
 | 5 | 验证时机 | v1 只做实「未验证」+ 一键回填（推荐项） |
 | 6 | S3 无困惑重排 | 进 v1（推荐项） |
 
-实施契约 = [毕业 Note：培养面板 GUI 行动面 v1](../../../notes/implemented/2026-10-17-cultivation-gui-actions.md)（六片 S1–S6 + 验收 + 实跑证据）；
+实施契约 = [毕业 Note：培养面板 GUI 行动面 v1](./2026-10-17-cultivation-gui-actions.md)（六片 S1–S6 + 验收 + 实跑证据）；
 本卡在实施完成后按章程归档（去向写进毕业 Note）。
 
 ## 现场事实（两问的答案）
@@ -52,7 +52,7 @@ UX 视角、人的输入清单（把手审计）、迭代框架与落地切片 S
 装的是日用插件集、没有公司五角色）；自检一行 = `source run/env.sh && pnpm dsh --profile web --dump-config | grep -c company-pack` ≥ 1。
 
 dev 组合里命令面确实是挂着的：培养机制探针判据④（`commands/list` 含 `cultivation`，且 `correct` 真落记录到公司盘）
-在 2026-10-13/15 实跑 ALL PASS——收据 = [agent-cultivation-loop](../../../notes/implemented/2026-10-13-agent-cultivation-loop.md) ⑤，
+在 2026-10-13/15 实跑 ALL PASS——收据 = [agent-cultivation-loop](../../../notes/archived/2026-10-13-agent-cultivation-loop.md) ⑤，
 探针 = [cultivation-method-layer-probe.mjs](../../../probes/session-context/cultivation-method-layer-probe.mjs)。
 
 ### ② 面板里的命令是**纯文本**，板没有动作面

@@ -34,7 +34,7 @@ oracle、证据形式、预算与停止办法写清，且真模型范围/成本�
 - 重构已交付：[模型/合同/worker/UI Note](../../notes/implemented/2026-11-09-presets-delegation-model.md)、
   [残差收口](../../notes/implemented/2026-11-09-delegation-residuals-closeout.md)、
   [SA/SQA 退役](../../notes/implemented/2026-11-09-retire-sa-sqa.md)、
-  [worker-workflow no-go](../../notes/implemented/2026-11-09-worker-workflow-no-go.md)。
+  [worker-workflow no-go](../../notes/archived/2026-11-09-worker-workflow-no-go.md)。
 - 当前 9 个 preset：6 角色 + `worker` / `worker-researcher` / `worker-orchestrator`；清单唯一源 =
   [`delegation-model.mjs`](../../tools/lib/delegation-model.mjs)。`worker` 是 leaf（无委派/团队/workflow/
   control）；`worker-orchestrator` 只多一条 `subagent` 行（钉 `worker`，`maxDepth: 3`）；`worker-researcher`

@@ -25,7 +25,7 @@ opened: 2026-10-19
 - **样式**：依赖列 `white-space: normal`、`min-width: 10rem`；`.wk-deps` 可换行；`.wk-dep-subject` 2 行钳制（全量文本在 DOM）；id 只进 `title`/`data`。
 - **测试**：`tests/client/tabs/tasks-table.spec.ts` 从 3 条扩到 6 条（依赖 owner/subject/title、悬空 id、deleted 不进表 + 死映射移除）。
 - **探针**：新 [tasks-panel-probe](../../../probes/browser-visual/tasks-panel-probe.mjs)（真 web，1440/390；入口可见/焦点/Tab 序/Enter 落点；`--fixture` 落图）；[checks/README](../../../checks/README.md) 索引；[snapshots/README](../../../snapshots/README.md) 场景行。
-- **Note**：[2026-10-19-taskboard-dependency-labels](../../../notes/implemented/2026-10-19-taskboard-dependency-labels.md)。
+- **Note**：[2026-10-19-taskboard-dependency-labels](../../../notes/archived/2026-10-19-taskboard-dependency-labels.md)。
 
 ## 官方 layer 0 与 compact skin（边界声明）
 

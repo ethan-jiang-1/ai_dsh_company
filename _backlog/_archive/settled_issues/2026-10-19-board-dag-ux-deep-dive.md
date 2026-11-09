@@ -28,7 +28,7 @@ opened: 2026-10-19
 - **DAG 徽章**：`company-panels.tsx` 的 `statusBadge` 对 in_progress 返回 `wk-dag-progress`；`styles.ts` 用 `--dsw-alias-state-business-primary`。
 - **测试**：新增 `tests/client/tabs/panel-freshness.spec.ts`；更新 `tests/client/tabs/dag-panel.spec.ts`（默认文案 + 徽章独立类）；`tests/lib/dag.spec.ts` 加 21 节点链高 > 视口；`tests/client/tabs/dag-visual-fixture.spec.ts` 发 21 节点 chain SVG。
 - **探针**：`dag-visual-probe` 加「进行中徽章 ≠ 可开工」与 21 节点窄栏度量；`dag-midflight-probe` 加 `--narrow`（真 app 390×900，读页签文案，落 `narrow-metrics.json` + 截图）；`board-drift-probe` 复跑。
-- **Note**：[2026-10-19-company-panel-freshness-and-dag-badge](../../../notes/implemented/2026-10-19-company-panel-freshness-and-dag-badge.md)。
+- **Note**：[2026-10-19-company-panel-freshness-and-dag-badge](../../../notes/archived/2026-10-19-company-panel-freshness-and-dag-badge.md)。
 
 ## 事实与证据（本轮实跑）
 

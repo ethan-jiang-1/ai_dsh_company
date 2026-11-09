@@ -7,7 +7,7 @@ opened: 2026-10-16
 # BUG-018：署名审计把同角色的多实例 preset 判成「署名不实」（假阳性 10 条）
 
 > 严重级别：P2（次要——不阻断任何验收，但让该仪器常年带伤红，真信号被噪音淹没）｜发现：2026-10-16｜状态：已修（2026-10-16 同日修复）
-> **修复**：候选 A 落地——`tools/lib/authorship.mjs` 新增 `baseRoleOf`（只抹 `<角色>-<数字>` 实例后缀）并用于判档，原始 preset 另存 `writerRaw` 保留诊断信息；真盘 `authorship-audit` 由「署名不实 10 + exit 1」变「署名不实 0 + ALL PASS」。收据 = [implemented/2026-10-16-authorship-instance-preset.md](../../../notes/implemented/2026-10-16-authorship-instance-preset.md)（红→绿原文、守卫用例、输掉的方案在内）。候选 B（修 `sessionId → 成员名` 映射构建路径）留作后续。
+> **修复**：候选 A 落地——`tools/lib/authorship.mjs` 新增 `baseRoleOf`（只抹 `<角色>-<数字>` 实例后缀）并用于判档，原始 preset 另存 `writerRaw` 保留诊断信息；真盘 `authorship-audit` 由「署名不实 10 + exit 1」变「署名不实 0 + ALL PASS」。收据 = [implemented/2026-10-16-authorship-instance-preset.md](../../../notes/archived/2026-10-16-authorship-instance-preset.md)（红→绿原文、守卫用例、输掉的方案在内）。候选 B（修 `sessionId → 成员名` 映射构建路径）留作后续。
 
 ## 症状
 

@@ -6,15 +6,15 @@
 
 - [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：第四轮 5 张缺陷卡 BUG-045–049 已修复；修复后验证通过（keyless/挂载/UI golden + 真装配 retry/身份行/handbook）；BUG-050 复核为环境陈旧误报；用户 2026-11-09 晚指示继续探索；第五轮（重启身份 / 预算面 / 分支 retry / 深度边界）四条 PASS，新发现 BUG-051（P2，worker-orchestrator 1–2 leaf 只是 persona）；未覆盖项见研究材料 §9.7。
 
-（2026-11-08 VP-Eng workflow 通道卡已结归档：去向 = [Note](../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)。）
+（2026-11-08 VP-Eng workflow 通道卡已结归档：去向 = [Note](../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)。）
 
-（2026-11-08 README/手册使用者面向卡已结归档：去向 = [Note](../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)。）
+（2026-11-08 README/手册使用者面向卡已结归档：去向 = [Note](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)。）
 
 （2026-11-08 SA/SQA 能力组织卡已结归档：去向 = [capability-routing Note](../../notes/archived/2026-11-08-sa-sqa-capability-routing.md)；
 历史摘要只住[归档](../_archive/README.md)，本页不重复。）
 
 （2026-11-07 需求识别/编号 + VP-Eng 组队的程序伞卡 + 11 张执行卡（A1–A8、B1/B2）已结归档：
-去向 = [程序 Note](../../notes/implemented/2026-11-07-requirements-teaming-program.md)；卡片见[归档](../_archive/settled_issues/README.md)。）
+去向 = [程序 Note](../../notes/archived/2026-11-07-requirements-teaming-program.md)；卡片见[归档](../_archive/settled_issues/README.md)。）
 
 
 2026-11-07 程序卡 12 张（伞卡 + A1–A8 + B1/B2）已结归档：编号合同/五层模板/checker//req check/角色产出/迁移/E2E/组队
@@ -27,7 +27,7 @@ v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajecto
 
 ## 近期归档
 
-- README/手册使用者面向卡 2026-11-08 已结：七问冷读 README 5.0→7.0/7、手册 5.0→7/7 + `readme-manual-commands` 门 + 2 张真实例截图；去向 = [Note](../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md)；卡在[归档](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)。
+- README/手册使用者面向卡 2026-11-08 已结：七问冷读 README 5.0→7.0/7、手册 5.0→7/7 + `readme-manual-commands` 门 + 2 张真实例截图；去向 = [Note](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)；卡在[归档](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)。
 
 - SA/SQA 子人格卡 2026-11-06 已结：两个委派子人格（system-architect / system-qa）+ 委托行 maxDepth 2 + SQA 否决直达 CEO；真模型 E2E 证独立会话/preset/depth=2；去向 = [Note](../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)；卡在[归档](../_archive/settled_issues/2026-11-06-system-architect-sqa.md)。
 - 第六轮七维打扫卡 2026-11-03 已结：fresh agent 复评 A-…A- + 层次化（client/tests/harness）+ 腐化通道四条机械面；去向 = [context-rot-guards Note](../../notes/archived/2026-11-03-context-rot-guards.md) 与各批 Note；卡在[归档](../_archive/settled_issues/2026-11-03-repo-hygiene-round6.md)。
@@ -41,13 +41,13 @@ v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajecto
 - 生命周期发布卡 2026-11-02 已结：0.7.0 发布就绪 + 本地 registry 按名安装演练 + market index 校验；公有 publish/托管 = [handoff](../../docs/guides/publish-handoff.md)；卡在 [归档](../_archive/settled_issues/2026-11-01-plugin-lifecycle-publish.md)。
 - v3 产品化卡 2026-11-02 已结：0.7.0 复核通过（入口/workspace/内容/账本；原生 picker、不自动迁移写实）；去向 = [v3 Note](../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)；卡在 [归档](../_archive/settled_issues/2026-11-01-plugin-as-product-v3.md)。
 - 发布与文档卡 2026-11-01 已结：`_dist` 手册/README/docs/CI 验收落地；去向 = [v2 manifest Note](../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)；卡在 [归档](../_archive/settled_issues/2026-11-01-release-and-docs.md)。
-- 培养工作优先单入口卡 2026-10-30 已结：work 字段 + 单表单 + 实时预览落地；实施 = [case-entry Note](../../notes/implemented/2026-10-30-cultivation-case-entry.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-case-entry.md)。
-- 培养入口收口卡 2026-10-30 已结：目标角色显式选择、入口文案、自纠正状态、验证历史逐条、对话失败保留草稿；实施 = [entry-followup Note](../../notes/implemented/2026-10-30-cultivation-entry-followup.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)。
-- 培养 UX 卡 2026-10-29 已结：结论 = 做；案例工坊 A 主线、来源/决定/验证历史落地；实施 = [traceability Note](../../notes/implemented/2026-10-30-cultivation-work-improvement-traceability.md)；卡在 [归档](../_archive/settled_issues/2026-10-29-cultivation-experience.md)。
+- 培养工作优先单入口卡 2026-10-30 已结：work 字段 + 单表单 + 实时预览落地；实施 = [case-entry Note](../_archive/settled_issues/2026-10-30-cultivation-case-entry.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-case-entry.md)。
+- 培养入口收口卡 2026-10-30 已结：目标角色显式选择、入口文案、自纠正状态、验证历史逐条、对话失败保留草稿；实施 = [entry-followup Note](../_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)。
+- 培养 UX 卡 2026-10-29 已结：结论 = 做；案例工坊 A 主线、来源/决定/验证历史落地；实施 = [traceability Note](../../notes/archived/2026-10-30-cultivation-work-improvement-traceability.md)；卡在 [归档](../_archive/settled_issues/2026-10-29-cultivation-experience.md)。
 - 二轮削洋葱卡 2026-10-28 已结：8 项残余 5 修 / 3 边界；0.4.1；实施 = [round2 Note](../_archive/settled_issues/2026-10-28-data-design-round2.md)；卡在 [归档](../_archive/settled_issues/2026-10-28-data-design-round2.md)。
 - 数据设计硬化卡 2026-10-28 已结：结论=做；实施 = [data-design-hardening](../_archive/settled_issues/2026-10-28-data-design-hardening.md)；M1–M4 落地（0.4.0）；卡在 [归档](../_archive/settled_issues/2026-10-28-data-design-hardening.md)。
 - run bundle 卡 2026-10-24 已结：按建议转 RFC 并实施，Note =
-  [run-bundle-install-unit](../../notes/implemented/2026-10-24-run-bundle-install-unit.md)；卡在
+  [run-bundle-install-unit](../../notes/archived/2026-10-24-run-bundle-install-unit.md)；卡在
   [归档](../_archive/settled_issues/2026-10-24-run-bundle-clean-base.md)。
 - 培养背景卡 2026-10-23 已交付归档：D1=A/D2=A；RFC 实施为
   [Note](../../notes/archived/2026-10-23-cultivation-context.md)，卡在

@@ -12,7 +12,7 @@ intent: 给下一位执行者一份重构后 delta、入口矩阵、charters、�
 > 决策记忆：[presets 委派面的模型化重构](../../../notes/implemented/2026-11-09-presets-delegation-model.md)、
 > [残差收口](../../../notes/implemented/2026-11-09-delegation-residuals-closeout.md)、
 > [SA/SQA 退役](../../../notes/implemented/2026-11-09-retire-sa-sqa.md)、
-> [worker-workflow no-go](../../../notes/implemented/2026-11-09-worker-workflow-no-go.md)。
+> [worker-workflow no-go](../../../notes/archived/2026-11-09-worker-workflow-no-go.md)。
 > 当前 vendor pin = `dsh-v0.2.1-rc.5`；真模型运行前先核当前 `git status`/`HEAD`。
 
 ## 0. 一句话

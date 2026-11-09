@@ -44,8 +44,8 @@ opened: 2026-10-24
 ## 为什么是现在（历史负担的来路）
 
 - **2026-10-13 已做了一半**：制度件（手册/章程/org/模板/起动件）搬进 `packages/company-pack/workspace/`
-  随包分发；host 首启“只补缺”地把骨架落到 `<DSH_HOME>/company-workspace`（[骨架 Note](../../../notes/implemented/2026-10-13-company-workspace-skeleton-shipped.md)、
-  [首启 Note](../../../notes/implemented/2026-10-13-first-run-bootstrap.md)）。所以**新装的骨架已经是干净的**——本卡不是从零开始。
+  随包分发；host 首启“只补缺”地把骨架落到 `<DSH_HOME>/company-workspace`（[骨架 Note](../../../notes/archived/2026-10-13-company-workspace-skeleton-shipped.md)、
+  [首启 Note](../../../notes/archived/2026-10-13-first-run-bootstrap.md)）。所以**新装的骨架已经是干净的**——本卡不是从零开始。
 - **但只做了“骨架”，没做“安装单元”**：首启不写 manifest、不区分“新安装/复用 home”、不隔离第二个 CEO；
   复用 home 会共享 sessions、凭据、profile 方法层与 workspace 登记。
 - **2026-10-13 瘦身只把 drafts 请出 git**：[瘦身 Note](../../../notes/archived/2026-10-13-workspace-slimming.md)
@@ -83,7 +83,7 @@ opened: 2026-10-24
 6. 分发版本：是否 bump 到 0.3.0 并同 diff 重导 `_dist`（手册写清 workspace 与 bundle 步骤，门禁扩到内容而不只是版本号）？
 
 **结论（2026-10-24）：** 用户授权按卡上建议推进（「那就 setup goal 来都弄好吧」），已按建议实施并交付：
-[Note run-bundle-install-unit](../../../notes/implemented/2026-10-24-run-bundle-install-unit.md)。
+[Note run-bundle-install-unit](../../../notes/archived/2026-10-24-run-bundle-install-unit.md)。
 六项按建议落定：① run bundle = 物理安装单元（四件套改称 run trace）；② dev 整盘去 tracked；
 ③ 一个 DSH home = 一个 bundle，第二个 CEO 新开 home；④ 哈希升级（未改的基部替换、改过的保留）；
 ⑤ 迁移前全量导出 + 备份口径；⑥ 0.3.0 + `_dist` 重导 + `dist-manual` 内容门禁。
@@ -94,7 +94,7 @@ opened: 2026-10-24
 ## 给第二个 review agent 的导读（purpose review）
 
 **这张卡是什么**：一个**目的与边界**的讨论卡——回答“为什么做、做到什么算对、哪些不做”。
-它**不是**实施合同；实施合同 = [已交付 Note](../../../notes/implemented/2026-10-24-run-bundle-install-unit.md)。
+它**不是**实施合同；实施合同 = [已交付 Note](../../../notes/archived/2026-10-24-run-bundle-install-unit.md)。
 review 这张卡时不要先看代码，先回答：这些决定是否忠实于上面的用户原话。
 
 **先读什么（按顺序）**

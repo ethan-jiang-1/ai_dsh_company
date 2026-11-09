@@ -8,7 +8,7 @@ opened: 2026-10-13
 > 立卡：2026-10-13 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 > 2026-10-13 拍板（用户三项全选建议项，本卡 🔒 项全部落定）：① 对象粒度 = **公司盘×角色**（不先造个人实例）；② 第一版生效路径 = **C：工作台＋部署本地角色方法层**（本人采纳后跨会话生效，B 的工作台是 C 的 UI 半边）；③ CEO 跨角色 = **仅建议权，目标角色本人采纳**。
 > 授权链：2026-10-13 用户令「按 _backlog/methods/ 流程处理后想办法落地，setup goal」——goal-372de4e9 已立；实施授权来自该会话指令，非本卡状态。
-> 结论与去向：**做并已落地**（2026-10-13 拍板→实施→验收同日完成，S0–S5 全走）——C 路径首版全量：公司页第四子页＝培养（不依赖 team）、培养记录闭环（提案/采纳/拒绝/验证/撤回＋回执）、角色方法层跨会话生效（新会话实测加载）。实施与验证收据 = [implemented/2026-10-13-agent-cultivation-loop](../../../notes/implemented/2026-10-13-agent-cultivation-loop.md)（台账 D43；[twin-cultivation](../../../notes/implemented/2026-09-24-twin-cultivation.md) D25 部分取代）。研究材料随卡迁研究归档；按钮式采纳与多人回路见回执「未验残留」。
+> 结论与去向：**做并已落地**（2026-10-13 拍板→实施→验收同日完成，S0–S5 全走）——C 路径首版全量：公司页第四子页＝培养（不依赖 team）、培养记录闭环（提案/采纳/拒绝/验证/撤回＋回执）、角色方法层跨会话生效（新会话实测加载）。实施与验证收据 = [implemented/2026-10-13-agent-cultivation-loop](../../../notes/archived/2026-10-13-agent-cultivation-loop.md)（台账 D43；[twin-cultivation](../../../notes/archived/2026-09-24-twin-cultivation.md) D25 部分取代）。研究材料随卡迁研究归档；按钮式采纳与多人回路见回执「未验残留」。
 
 **问题与期望结果：** 用户看到公司页“用量”子页后，提出把该位置改为“培养”：CEO 培养自己的 CEO 分身，也能给非 CEO 提意见，每个人培养自己。本轮先研究透彻，利用 backlog 推敲，之后再形成可执行 issue。本卡是本地推敲 owner，不是 GitHub 发布或实施授权。
 **当前情况：** 公司主面仍为用量第四页；已有培养侧栏仅列 journal 待审与本会话赞/踩。现行培养由人提炼 journal、维护者改 pack skill；分身不能运行时自改正式技能。消息赞/踩不进入模型历史。[现状与方案](../research/agent-cultivation/2026-10-13-cultivation-design.md) 已整理。
@@ -38,7 +38,7 @@ opened: 2026-10-13
 1. [产品研究稿](../research/agent-cultivation/2026-10-13-cultivation-design.md)：对象、归属、内容分类、具体用户闭环、页面结构、A/B/C/D 候选和判断依赖。
 2. [DSH 源码证据](../research/agent-cultivation/2026-10-13-dsh-capabilities.md)：pin skill scope/provider、反馈不进入模型、组合生效、建议通道与待探针边界。
 3. [外部一手证据](../research/agent-cultivation/2026-10-13-external-patterns.md)：12 组官方文档/作者论文，每组原句、版本、借鉴和反证。搜索服务失败，直接读取一手 URL；未完成全网检索或复现实验。
-4. 仍有效的培养否决：[twin-cultivation](../../../notes/implemented/2026-09-24-twin-cultivation.md)；当前语义：[preset 合同](../../../docs/presets.md)、[多人合同](../../../docs/multi-human.md)。本研究未改写这些决定。
+4. 仍有效的培养否决：[twin-cultivation](../../../notes/archived/2026-09-24-twin-cultivation.md)；当前语义：[preset 合同](../../../docs/presets.md)、[多人合同](../../../docs/multi-human.md)。本研究未改写这些决定。
 
 ## 方案与取舍（研究建议，未拍板）
 

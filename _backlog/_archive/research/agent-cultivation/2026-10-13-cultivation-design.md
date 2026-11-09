@@ -25,7 +25,7 @@ intent: "把公司面培养的用户意图、当前边界与外部证据组织�
 | 公司主面第四个子页签为 budget；培养已有独立侧栏类型 | [已删：CompanyView](../../../../notes/archived/2026-11-03-d2-companyview-removal.md)、[client 注册](../../../../packages/company-pack/src/client/index.ts) | 改入口可复用同一培养领域视图；主面和侧栏不各造一套 |
 | 培养侧栏目前显示五角色 journal 计数、标题及本会话赞/踩，并展示开发操作说明 | [CultivationTab](../../../../packages/company-pack/src/client/tabs/CultivationTab.tsx) | 可复用来源，现有面板还不能兑现角色归属、意见处理、训练和生效 |
 | 培养读模型把缺失清单折为 0；注册闭包在失败时返回 null；feedback 的 follow 会寻址 lead | [读模型](../../../../packages/company-pack/src/lib/cultivation.ts)、[client 注册](../../../../packages/company-pack/src/client/index.ts) | 数据不可达不能呈现成“无待审”；成员页的反馈不能未经归因就算成员的教学输入 |
-| 运行学习载体为角色 journal，人收敛入 CHARTER；通用方法论提升进 pack skill | [preset 合同](../../../../docs/presets.md)、[已落地培养决定](../../../../notes/implemented/2026-09-24-twin-cultivation.md) | journal 清空只证明处理/归档动作，不证明能力变强；应区分材料与已验证能力 |
+| 运行学习载体为角色 journal，人收敛入 CHARTER；通用方法论提升进 pack skill | [preset 合同](../../../../docs/presets.md)、[已落地培养决定](../../../../notes/archived/2026-09-24-twin-cultivation.md) | journal 清空只证明处理/归档动作，不证明能力变强；应区分材料与已验证能力 |
 | persona/组合与 skill 的生效时点不同；角色运行时自改 skill 已否决 | [preset 合同](../../../../docs/presets.md) | “已采纳”不能等于“所有会话已生效”；不让分身静默修改正式技能 |
 | 人侧归属在 owners；DSH 当前多人形态没有账号级人身份，审批按会话路由 | [owners 起动件](../../../../packages/company-pack/content/state/owners.md)、[多人合同](../../../../docs/multi-human.md) | 可以做归属提示与操作范围，不能宣称多人安全隔离 |
 | CEO spawn 的成员继承 Lead 组合，与独立角色根会话不同 | [运行态地图](../../../../docs/runtime-map.md)、[preset 合同](../../../../docs/presets.md) | 培养对象不是一个会话名；需说明实际 preset 与训练会话形态 |

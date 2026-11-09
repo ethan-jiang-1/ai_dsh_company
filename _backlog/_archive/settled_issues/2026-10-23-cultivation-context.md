@@ -914,9 +914,9 @@ contexts: {"v":1,"items":[{"kind":"deliverable","ref":"<workspace-relative-path>
 | [session-reference README](../../../vendor/dsh/packages/context/session-reference/README.md) | 有界、不可信、只取文字的跨会话快照先例 |
 | [workspace-files README](../../../vendor/dsh/packages/api/workspace-files/README.md) | 只读、list/read/stat/changes、无 mutation |
 | [auto-review](../../../vendor/dsh/packages/experimental/auto-review/src/index.ts) | `ctx.llm.stream` 单次模型调用先例 |
-| [培养 GUI 行动面 Note](../../../notes/implemented/2026-10-17-cultivation-gui-actions.md) | S1–S6 的决定、失败面、未验残留 |
-| [第一人称走查 Note](../../../notes/implemented/2026-10-18-cultivation-firsttimer-audit.md) | 已有 UX 缺陷与判据；本卡应避免重犯 |
-| [场景轮 Note](../../../notes/implemented/2026-10-18-cultivation-scenario-audit.md) | 长文本/窄栏/浮窗/键盘/失败态的真实教训 |
+| [培养 GUI 行动面 Note](./2026-10-17-cultivation-gui-actions.md) | S1–S6 的决定、失败面、未验残留 |
+| [第一人称走查 Note](../../../notes/archived/2026-10-18-cultivation-firsttimer-audit.md) | 已有 UX 缺陷与判据；本卡应避免重犯 |
+| [场景轮 Note](../../../notes/archived/2026-10-18-cultivation-scenario-audit.md) | 长文本/窄栏/浮窗/键盘/失败态的真实教训 |
 | [培养设计研究](../research/agent-cultivation/2026-10-13-cultivation-design.md) | “显示来源和一句证据，展开再看上下文”的早期设计依据 |
 
 ## 附录 C：参考资料与先例

@@ -7,9 +7,9 @@ opened: 2026-10-30
 
 > 立卡：2026-10-30 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：第一切片已落地，去向 = [case-entry Note](../../../notes/implemented/2026-10-30-cultivation-case-entry.md)。对话式梳理/候选草稿/多段背景/真人走查不在本切片；AI 起草 v2 维持独立决定。
+> **结论/去向**：第一切片已落地，去向 = [case-entry Note](./2026-10-30-cultivation-case-entry.md)。对话式梳理/候选草稿/多段背景/真人走查不在本切片；AI 起草 v2 维持独立决定。
 >
-> 用户 2026-10-30「继续」延续上轮结论：主任务自然语言 IA 另立项。上轮已结卡 = [培养入口收口](./2026-10-30-cultivation-entry-followup.md)；上轮 Note = [entry-followup](../../../notes/implemented/2026-10-30-cultivation-entry-followup.md)。
+> 用户 2026-10-30「继续」延续上轮结论：主任务自然语言 IA 另立项。上轮已结卡 = [培养入口收口](./2026-10-30-cultivation-entry-followup.md)；上轮 Note = [entry-followup](./2026-10-30-cultivation-entry-followup.md)。
 
 **问题与期望结果：** 当前主任务仍是“开始记录一项工作 → 选纠正/建议 → 期望句 + 做法证据”的旧表单：先让人选内部记录类型，再写抽象期望，工作事实被挤进正文/背景。原型的核心是“先说这次什么工作/想改善什么，再形成一条下次做法”。本卡做第一切片：单入口表单以工作事实为第一字段，目标角色显式可见，提交前有实时预览；不要求先选纠正/建议。
 

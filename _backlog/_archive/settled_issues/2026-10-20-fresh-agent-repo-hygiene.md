@@ -23,7 +23,7 @@ r2 presence + `--ui` 全绿。问题集中在**总账与反馈面**：新增角�
 （观察窗 token 第二次随 runtime 日志入库）已修：untrack + `.gitignore` + tracked-token 窄扫，
 批次 0–2 + 结构切片已完成；剩余三件见下。
 
-**进展（2026-10-20）：** 批次 0（BUG-029/类级 token 守卫）、批次 1（角色数/快照索引/cdp-probe 9 页签+内容/失败现场/src README/runtime/成本声明/checks 索引+script-index 门禁/release-smoke researcher）、批次 2（testing.md 分层与 mock、tests/README 映射、PASS/SKIP、`pnpm diagnose`）与结构切片（docs/index 拆 decisions/external、design 预算、firstText/memberDot、数据面工厂、catalog 契约、SSR 警告）均已完成；证据 = [consistency sweep Note](../../../notes/implemented/2026-10-20-fresh-agent-consistency-sweep.md)。
+**进展（2026-10-20）：** 批次 0（BUG-029/类级 token 守卫）、批次 1（角色数/快照索引/cdp-probe 9 页签+内容/失败现场/src README/runtime/成本声明/checks 索引+script-index 门禁/release-smoke researcher）、批次 2（testing.md 分层与 mock、tests/README 映射、PASS/SKIP、`pnpm diagnose`）与结构切片（docs/index 拆 decisions/external、design 预算、firstText/memberDot、数据面工厂、catalog 契约、SSR 警告）均已完成；证据 = [consistency sweep Note](../../../notes/archived/2026-10-20-fresh-agent-consistency-sweep.md)。
 
 **进展（2026-10-20 第二轮，同日晚）：** 用户令持续跟进，四子代理 + 主 agent 亲跑七条 keyless lane 复评六维度，报告 =
 [research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md](../research/repo-hygiene/2026-10-20-followup-six-dimension-audit.md)。

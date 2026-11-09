@@ -13,7 +13,7 @@
 - [台账](../../../_backlog/_archive/settled_issues/2026-10-19-ledger-ux-deep-dive.md)：40 行/全文入口/30s/人读接受（收口时的数）。
 - [成品台账](../../../_backlog/_archive/settled_issues/2026-10-19-deliverables-ledger.md)：生成索引 + 第 9 页签「成品」+ `present` 状态 + `converge` 自动重建。
 
-关键 Note：[成品目录](../../implemented/2026-10-19-deliverables-catalog.md)、[新鲜度 + DAG 徽章](../../implemented/2026-10-19-company-panel-freshness-and-dag-badge.md)、[任务板依赖](../../implemented/2026-10-19-taskboard-dependency-labels.md)。决策行 = [D44](../../../docs/index.md)。
+关键 Note：[成品目录](../2026-10-19-deliverables-catalog.md)、[新鲜度 + DAG 徽章](../2026-10-19-company-panel-freshness-and-dag-badge.md)、[任务板依赖](../2026-10-19-taskboard-dependency-labels.md)。决策行 = [D44](../../../docs/index.md)。
 
 ## 这次清理（2026-10-20）
 

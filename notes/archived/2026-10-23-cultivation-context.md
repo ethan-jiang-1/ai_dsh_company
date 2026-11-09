@@ -379,6 +379,6 @@ npx vitest run tests/client/cultivation/cultivation-board.spec.ts
 - 上游卡：[§14](../../_backlog/_archive/settled_issues/2026-10-23-cultivation-context.md) 已记录拍板与 RFC 去向；卡本身的归档/索引机械改动按 [_backlog 章程](../../_backlog/README.md) 另行处理（本 Note 不宣称卡已归档）。
 - 机制先例：`session-reference` 的“有界、不可信、快照不可变、原文另开”语义；v1 明确排除 checkpoint
   （与先例不同，理由 = 它只是压缩摘要，不伪装成用户原话）。
-- 相关 Note：[培养 GUI 行动面](../implemented/2026-10-17-cultivation-gui-actions.md)、
-  [第一人称走查](../implemented/2026-10-18-cultivation-firsttimer-audit.md)、
-  [场景轮](../implemented/2026-10-18-cultivation-scenario-audit.md)。
+- 相关 Note：[培养 GUI 行动面](../../_backlog/_archive/settled_issues/2026-10-17-cultivation-gui-actions.md)、
+  [第一人称走查](./2026-10-18-cultivation-firsttimer-audit.md)、
+  [场景轮](./2026-10-18-cultivation-scenario-audit.md)。

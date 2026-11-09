@@ -34,5 +34,5 @@ worker family 的第三档 `worker-workflow` 想把 2–4 个独立核查分到 
 
 ## 相关
 
-- 原 worker family Note：[presets 委派面的模型化重构](./2026-11-09-presets-delegation-model.md)。
+- 原 worker family Note：[presets 委派面的模型化重构](../implemented/2026-11-09-presets-delegation-model.md)。
 - 前序 specialist/worker 边界：[archived](../archived/2026-11-09-specialist-worker-taxonomy.md)。

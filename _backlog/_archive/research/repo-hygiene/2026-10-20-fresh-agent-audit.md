@@ -284,7 +284,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 验收：`git ls-files runtime/web-logs` 空；`.gitignore` 命中；守卫红/绿留证；`pnpm verify` + `pnpm test` 绿。
 **结果（2026-10-20）：已完成**——两件日志 untrack 并删除；`.gitignore` + 根 `AGENTS.md` + `runtime/README.md`
 同步；`tracked-token` 门禁 + 4 条测试落地；红/绿见 [BUG-029](../../fixed_bugs/BUG-029-committed-web-token-recurrence.md)
-与 [Note](../../../../notes/implemented/2026-10-20-tracked-token-guard.md)。
+与 [Note](../../../../notes/archived/2026-10-20-tracked-token-guard.md)。
 
 ### 批次 1 · 一致性清扫（≈半天，低风险）
 
@@ -347,7 +347,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 - **批次 1**：角色数统一；`snapshots/README.md` 补 4 场景并去过期计数；`cdp-probe` 从注册源解析 9 页签、断言面板体内容、失败落诊断区；`client-load`/`replay --ui` 失败现场同落诊断区；`src/README`/`runtime`/`project-map`/成本声明同步；`checks/README.md` 补 5 入口 + script-index 门禁；`release-smoke` 覆盖 researcher。
 - **批次 2**：`docs/testing.md` whole-client/mock 声明；`tests/README.md` 映射补 cdp-probe/researcher；`PASS`/`SKIP` 分离；新增 `pnpm diagnose` 日志失败摘要。
 - **结构切片**：`docs/index.md` 拆出 [decisions.md](../../../../docs/decisions.md) / [external-research.md](../../../../docs/external-research.md)（129→60 行）；`docs/design` 加预算、architecture §7/§10 降指针；`firstText`/`memberDot` 收进共享层；`client/index.ts` 数据面收成 `company-data-plane.ts`；成品目录 generator→parser 契约测试；SSR layout warning 消除。
-- **证据**：`pnpm verify` ALL PASS、`pnpm test` 76/711、`client-load` ALL PASS、`cdp-probe` 9/9、`release-smoke` ALL PASS（含 researcher）、`replay --ui` ALL PASS（SKIP 显式）。详见 [consistency sweep Note](../../../../notes/implemented/2026-10-20-fresh-agent-consistency-sweep.md)。
+- **证据**：`pnpm verify` ALL PASS、`pnpm test` 76/711、`client-load` ALL PASS、`cdp-probe` 9/9、`release-smoke` ALL PASS（含 researcher）、`replay --ui` ALL PASS（SKIP 显式）。详见 [consistency sweep Note](../../../../notes/archived/2026-10-20-fresh-agent-consistency-sweep.md)。
 ## 5. 剩余与决定（2026-10-20 更新）
 
 用户已授权全部修复；批次 0–2 + 结构切片完成。剩余三件不阻塞当前绿：

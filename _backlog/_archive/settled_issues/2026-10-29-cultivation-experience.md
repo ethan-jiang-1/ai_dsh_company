@@ -7,7 +7,7 @@ opened: 2026-10-29
 
 > 立卡：2026-10-29 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；生产主线与追溯切片已落地，去向 = [implemented Note](../../../notes/implemented/2026-10-30-cultivation-work-improvement-traceability.md)。2026-10-30 用户指出该卡应结束、不应继续悬挂；本卡按章程归档，真人新手走查转入 Note 的后续体验观察，不再作为卡的关闭条件。
+> **结论/去向**：做；生产主线与追溯切片已落地，去向 = [implemented Note](../../../notes/archived/2026-10-30-cultivation-work-improvement-traceability.md)。2026-10-30 用户指出该卡应结束、不应继续悬挂；本卡按章程归档，真人新手走查转入 Note 的后续体验观察，不再作为卡的关闭条件。
 >
 > 2026-10-29 用户先授权 UX 研究与 `_backlog/` 原型；2026-10-29 后续新授权更新边界：「看上去还可以，这样吧，你就落地实现了, setup goal, 静默自主执行如何?」并继续确认「静默，自主执行，克服一切障碍，不要反问我好吗？你总自己在想办法。」现已按主视图 A 结构落地已批准切片；AI 起草 v2 仍需单独批准。
 
@@ -15,7 +15,7 @@ opened: 2026-10-29
 
 **当前情况：** 培养主线、信息组织及验证证据已落入生产 `CultivationBoard` 与既有公司盘记录：记录显示提出者角色语境、目标角色、可用的原始工作依据、决定与采纳后有据验证；来源缺失和旧格式验证历史缺失明确呈现为未记录。不得推断自然人身份。
 
-**实现材料：** [implemented Note](../../../notes/implemented/2026-10-30-cultivation-work-improvement-traceability.md)。UX 研究稿与原型保存在分支 `prototype/cultivation-ia-2026-10-29`；原型不是本次实施授权的替代物。
+**实现材料：** [implemented Note](../../../notes/archived/2026-10-30-cultivation-work-improvement-traceability.md)。UX 研究稿与原型保存在分支 `prototype/cultivation-ia-2026-10-29`；原型不是本次实施授权的替代物。
 
 **实现决定：** 在已存在的左侧培养板中采用案例工坊 A 的主线提示与单一开始动作，复用原有纠正/建议表单、角色权限与培养区块；验证动作要求具体后续工作依据，并追加有界验证历史。AI 起草未开放。
 
@@ -60,4 +60,4 @@ opened: 2026-10-29
 
 ## 下一步
 
-本卡已归档，不再有常规下一步。真人新手走查与任何 IA 变更归 [implemented Note](../../../notes/implemented/2026-10-30-cultivation-work-improvement-traceability.md) 的后续观察；若体验反馈要求改变 IA，另开新卡引用本卡。AI 起草 v2 仍是独立决定，不在本卡范围。
+本卡已归档，不再有常规下一步。真人新手走查与任何 IA 变更归 [implemented Note](../../../notes/archived/2026-10-30-cultivation-work-improvement-traceability.md) 的后续观察；若体验反馈要求改变 IA，另开新卡引用本卡。AI 起草 v2 仍是独立决定，不在本卡范围。

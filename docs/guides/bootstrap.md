@@ -75,7 +75,7 @@ node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名�
 > `pnpm install` → `pnpm bundle:init` → `pnpm verify`（手动 + 每周一 03:00 UTC）——证明主仓树
 > 能装、能建 dev workspace、能过全部门禁。**它不跑**下面这条 host/native/pack/test 构建链：
 > 该链在 7GB runner 上仍有已知缺口（vendor 双 lock、全 host 构建 OOM、client aggregate 测试类型、
-> musl-gcc），登记在 [repo-hygiene Note](../../notes/implemented/2026-10-25-repo-hygiene-contract.md)；
+> musl-gcc），登记在 [repo-hygiene Note](../../notes/archived/2026-10-25-repo-hygiene-contract.md)；
 > 构建链按本节在开发机执行，不要把它当成 CI 已证明。
 
 实证过的坑与解法：

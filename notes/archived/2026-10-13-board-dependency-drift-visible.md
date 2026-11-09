@@ -26,7 +26,7 @@
 - 我在最近 12 个公司会话里扫了一遍：**只有这一场有团队任务，且正好命中**（1 个任务缺边）——
   单点、但类别真实（协议本身鼓励并行批量建 + 文本声明）。
 
-所以补的不只是文案（那一半 = [任务依赖两拍落](../implemented/2026-10-13-task-dependency-two-phase.md)），
+所以补的不只是文案（那一半 = [任务依赖两拍落](./2026-10-13-task-dependency-two-phase.md)），
 还有**看得见的判据**：声明没落板，卡上必须自己说出来。
 
 ## 输掉的方案
@@ -61,4 +61,4 @@
 - 渲染：`packages/company-pack/src/client/tabs/company-panels.tsx`（BoardPanel 卡脚）。
 - keyless：`tests/lib/board.spec.ts`、`tests/client/tabs/board-panel.spec.ts`；夹具发射器 `tests/client/tabs/board-drift-fixture.spec.ts`。
 - 真渲染判据 + 图像：`probes/browser-visual/board-drift-probe.mjs`、`snapshots/visual/board-drift/`。
-- 姊妹决定（协议侧）：[任务依赖"两拍落"](../implemented/2026-10-13-task-dependency-two-phase.md)。
+- 姊妹决定（协议侧）：[任务依赖"两拍落"](./2026-10-13-task-dependency-two-phase.md)。

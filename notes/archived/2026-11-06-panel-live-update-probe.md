@@ -31,7 +31,7 @@
 ## 后果
 
 - 结论：**面板本身会跟会话更新**；用户此前看到的「空/不更新」最可能是当时根本没有 team（CEO 走
-  `vp_*` 快捷委托），已被 2026-11-06 的 persona 修复（[两件套必须组队](../implemented/2026-11-06-ceo-two-artifact-team-rule.md)）。
+  `vp_*` 快捷委托），已被 2026-11-06 的 persona 修复（[两件套必须组队](./2026-11-06-ceo-two-artifact-team-rule.md)）。
 - 以后再报「面板不更新」，第一步不是改客户端，而是用这条腿取 before/after：`expectFound=false` 才是真红。
 - 已知边界：本腿的 before 取在**新会话建立之前**的同一 dock 上；若将来出现「同一会话内第二任务不显示」，
   要用同一会话续跑一轮再取 after（脚本支持：不开 `--ask` 时 before/after 各取一次）。

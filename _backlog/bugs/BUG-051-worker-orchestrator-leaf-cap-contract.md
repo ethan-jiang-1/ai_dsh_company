@@ -8,7 +8,7 @@ opened: 2026-11-09
 
 > 严重级别：P2（次要）｜发现：2026-11-09｜状态：调查中
 > 来源：2026-11-09 修复后第五轮（W5-E）。关联：[worker family 设计 Note](../../notes/implemented/2026-11-09-presets-delegation-model.md)、
-> [worker-workflow no-go](../../notes/implemented/2026-11-09-worker-workflow-no-go.md)。
+> [worker-workflow no-go](../../notes/archived/2026-11-09-worker-workflow-no-go.md)。
 
 ## 症状
 

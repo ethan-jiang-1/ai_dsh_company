@@ -9,7 +9,7 @@ intent: 给下一位执行者一份自包含的 briefing + 探索计划——DSH
 > 本文件刻意写厚：下一位 Agent 可能没有本轮的对话上下文，必须能只靠这份文档 + 仓库本身接手。
 > 本轮采用 exploratory testing（探索性测试）；单次有界探索称 exploratory test。场景矩阵是覆盖目标与风险边界，不是穷尽脚本或唯一合法路径：执行者在时间盒和场景章程内边学、边设计、边执行，跟进有证据的新线索；仍用会话事件、工具调用、结果和 fixture oracle 判定观察，不以模型自述代替证据。详见 §6 与 §8。
 > 读法：本文件 §1（DSH 支持）→ §2（本仓特点）→ §3（已证事实）→ §4–§8（探索设计）→
-> [workflow 通道 Note](../../../notes/implemented/2026-11-08-vpeng-workflow-channel.md) 与
+> [workflow 通道 Note](../../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md) 与
 > [归档研究材料](../../_archive/research/vp-eng-delegation-topology/2026-11-08-topology.md) 补细节。
 
 ## 0. 术语与符号
@@ -209,7 +209,7 @@ pnpm typecheck                 # 类型面（改 TS/src 时）
 - 本工作相关：五个职能 preset 的 `maxDepth: 2`、vp-eng 的 workflow 两行、`eng-teaming`/`eng-workflow`、
   CEO `assembling-the-team`/persona、`docs/{delegation,presets,terminology,index}.md`、
   `docs/design/architecture.md`、`docs/guides/budget-and-ops.md`、
-  `notes/implemented/2026-11-08-vpeng-workflow-channel.md`、`probes/team/vp-eng-workflow-probe.mjs`、
+  [vpeng workflow 频道](../../../notes/archived/2026-11-08-vpeng-workflow-channel.md)、`probes/team/vp-eng-workflow-probe.mjs`、
   `checks/gates/retired-claims.mjs`、`checks/INDEX.generated.md`、`pnpm-lock.yaml`（两行 peer）、
   本轮新增的 research 题。
 - 环境：cwd = 仓库根；dev home `runtime/harness-home`（`source run/env.sh` 后的 `DSH_HOME`）；排练场 `runtime/rehearsal-workspace`。
@@ -356,7 +356,7 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 
 ## 14. 交接步骤（新 Agent 第一小时）
 
-1. 读本文件 §1–§3；读 [Note](../../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)、
+1. 读本文件 §1–§3；读 [Note](../../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)、
    [eng-teaming](../../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md)、
    [delegation 合同](../../../docs/delegation.md) §3/§4。
 2. 基线：`source run/env.sh && pnpm verify && pnpm test`；`node checks/smoke/preset-smoke.mjs`。
@@ -367,7 +367,7 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 
 ## 15. 参考
 
-- [workflow 通道 Note](../../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)
+- [workflow 通道 Note](../../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)
 - [归档研究材料](../../_archive/research/vp-eng-delegation-topology/2026-11-08-topology.md)
 - [tool-workflow README](../../../vendor/dsh/packages/workflow/tool-workflow/README.md)
 - [workflow-ptc README](../../../vendor/dsh/packages/workflow/workflow-ptc/README.md)

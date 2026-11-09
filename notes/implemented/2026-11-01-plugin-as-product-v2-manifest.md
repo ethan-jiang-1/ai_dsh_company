@@ -9,8 +9,8 @@
 > （已结；Q1–Q7 已按用户授权落地）、
 > [落地顺序卡](../../_backlog/_archive/settled_issues/2026-11-01-landing-plan.md)（P0–P6）、
 > 研究题 [plugin-as-product](../../_backlog/_archive/research/plugin-as-product/README.md)（4 份材料）。
-> 取代 = [run-bundle-install-unit](./2026-10-24-run-bundle-install-unit.md) 的 §决定 1/2/5（身份落点与
-> manifest 形状）与 [multi-profile-contract](./2026-10-26-multi-profile-contract.md) 的「产品入口 = 通用 `web`」
+> 取代 = [run-bundle-install-unit](../archived/2026-10-24-run-bundle-install-unit.md) 的 §决定 1/2/5（身份落点与
+> manifest 形状）与 [multi-profile-contract](../archived/2026-10-26-multi-profile-contract.md) 的「产品入口 = 通用 `web`」
 > 一条；manifests v1 的 home 形状仍作为迁移来源保留。
 
 ## 决定

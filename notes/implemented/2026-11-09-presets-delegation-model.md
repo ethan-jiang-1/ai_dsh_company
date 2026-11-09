@@ -1,6 +1,6 @@
 # 2026-11-09 · presets 委派面的模型化重构（RFC）
 
-状态：implemented（2026-11-09 交付；P1–P4 的交付面完成：模型/静态矩阵、两层合同、P-A/B/C/D/J 真探针、UI 树形流程+completed/failed 终态、深度预算、`subagent_retry`（P-H 采用 PASS）、worker leaf+小工头；P5 不生成、P-I host 不自动重试为显式决定；worker-workflow no-go（P-K 采用不稳定，见 [no-go Note](./2026-11-09-worker-workflow-no-go.md)）；P-H/P-I 确定性失败注入（tool-boundary fake + adoption）；interrupted/aborted/max-tokens/refusal 由 companyDelegationTerminal host 投影接 UI，lost 仅当 host 提供）—— 批准：用户 2026-11-09「开始推进」，按“长期正确 / 长期可维护 / 结构柔韧”拍板。
+状态：implemented（2026-11-09 交付；P1–P4 的交付面完成：模型/静态矩阵、两层合同、P-A/B/C/D/J 真探针、UI 树形流程+completed/failed 终态、深度预算、`subagent_retry`（P-H 采用 PASS）、worker leaf+小工头；P5 不生成、P-I host 不自动重试为显式决定；worker-workflow no-go（P-K 采用不稳定，见 [no-go Note](../archived/2026-11-09-worker-workflow-no-go.md)）；P-H/P-I 确定性失败注入（tool-boundary fake + adoption）；interrupted/aborted/max-tokens/refusal 由 companyDelegationTerminal host 投影接 UI，lost 仅当 host 提供）—— 批准：用户 2026-11-09「开始推进」，按“长期正确 / 长期可维护 / 结构柔韧”拍板。
 > 后续修正：worker-researcher / specialist 边界见 [2026-11-09-specialist-worker-taxonomy](../archived/2026-11-09-specialist-worker-taxonomy.md)（2026-11-09）。
 > 部分取代：retry 的注册面/深度与合同载体状态见 [2026-11-09-delegation-surface-single-source](./2026-11-09-delegation-surface-single-source.md)（2026-11-09，BUG-049/045）。
 上游 = [RFC 卡](../../_backlog/_archive/settled_issues/2026-11-09-presets-delegation-architecture.md)；

@@ -28,7 +28,7 @@
 | D20 | 交付物三态判据：成品 = Lead 的 `present`；比对按 slug+角色身份不按路径 | [r4-workshop-flow](../notes/archived/2026-09-22-r4-workshop-flow.md) |
 | D22 | 在场板主键 = team roster；冷启动 = 读 `agentTeam` 投影推送（历史：拉式 RPC + 5s 轮询，0.1.7 起退役） | [org-presence-board](../notes/archived/2026-09-22-org-presence-board.md) |
 | D23+D24 | 开发流条目制 **历史**：队列 owner ROADMAP.md 已由 D32 退役 | [roadmap-retirement](../notes/archived/2026-09-28-roadmap-retirement.md) |
-| D25 | 培养 = 改 `presets/<role>/`（生效边界按面）；学习 = journal 唯一载体（2026-10-13 扩三面 → D43） | [twin-cultivation](../notes/implemented/2026-09-24-twin-cultivation.md) |
+| D25 | 培养 = 改 `presets/<role>/`（生效边界按面）；学习 = journal 唯一载体（2026-10-13 扩三面 → D43） | [twin-cultivation](../notes/archived/2026-09-24-twin-cultivation.md) |
 | D26 | 文档卫生按指导价值取舍；文件/行数仅观察，不是完成门槛 | [dev-loop](./guides/dev-loop.md) |
 | D27 | 升 pin 偏离官方事务（嵌套工作区不能 vendor 自建）⇒ 手工簿记 + 门禁留证 | [pin-upgrade-0.2.0-rc.2](../notes/archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md) |
 | D28 | 枚举型事实的家 = 实现自己（文档只留分层原则 + 指针） | [entry-execution-chain-debt](../notes/archived/2026-09-26-entry-execution-chain-debt.md) |
@@ -43,14 +43,14 @@
 | D37 | `docs/` 分层规则唯一家住 `docs/AGENTS.md`（含「不属于这层」列）+ `doc-taxonomy` 门禁 | [docs-tier-taxonomy](../notes/archived/2026-10-09-docs-tier-taxonomy.md) |
 | D38 | implemented/ Note 的**事实落点**随改动就地改新（决定正文仍冻结）；生效日分档 + `zz-` 假路径记号 | [implemented-note-currency](../notes/implemented/2026-10-09-implemented-note-currency.md) |
 | D39 | 完成定义 skills 住 `.agents/skills/`（清单 = 目录本身）；程序进 skill、可机械判断的才进 gate | [completion-definition-skills](../notes/archived/2026-10-09-completion-definition-skills.md) |
-| D40 | 事故护栏复原：`preset-required-config` 门禁（判据 = vendor committed config-catalog） | [postmortem-guard-restoration](../notes/implemented/2026-10-09-postmortem-guard-restoration.md) |
+| D40 | 事故护栏复原：`preset-required-config` 门禁（判据 = vendor committed config-catalog） | [postmortem-guard-restoration](../notes/archived/2026-10-09-postmortem-guard-restoration.md) |
 | D41 | 公司名 = 梦之队（Dream Team）；公司名只在品牌/身份面（D14 前缀 2026-11-09 收窄） | [dreamteam-naming](../notes/archived/2026-10-10-dreamteam-naming.md) |
 | D42 | vendor 升 pin＝用户策动制（agent 不盯不评不建议）＋渠道只认 RC/正式版，alpha/beta 通通不管 | [pin-upgrade-policy](../notes/archived/2026-10-12-pin-upgrade-policy.md) |
-| D43 | 培养三面：第三主视图＝培养（立时第四子页）；方法层公司级（M3 起）；CEO 仅建议权（D25 部分取代） | [agent-cultivation-loop](../notes/implemented/2026-10-13-agent-cultivation-loop.md) |
-| D44 | 成品目录 = 盘上 meta/final 的生成索引 + 只读右栏页签；host 生成（present 事件投影，未核=null）；完整审计仍归操作员 | [deliverables-catalog](../notes/implemented/2026-10-19-deliverables-catalog.md)（补充 = [installed-shape-self-sufficient](../notes/archived/2026-10-25-installed-shape-self-sufficient.md)） |
-| D45 | run bundle = 一次安装的物理单元（bundle.json + home + workspace）；身份落点被 D51/D52 取代 | [RFC run-bundle-install-unit](../notes/implemented/2026-10-24-run-bundle-install-unit.md) |
-| D46 | 产品仓历史只留产品与合成 fixtures；真实部署证据移私有仓；remote 重建为 private | [run-bundle-install-unit](../notes/implemented/2026-10-24-run-bundle-install-unit.md) |
-| D47 | backlog→notes 交接契约：用户是队列；notes 不是收件箱；卡顶结论/去向为记录家；关闭以结论确认为准 | [handoff-contract](../notes/implemented/2026-10-25-backlog-notes-handoff-contract.md) |
+| D43 | 培养三面：第三主视图＝培养（立时第四子页）；方法层公司级（M3 起）；CEO 仅建议权（D25 部分取代） | [agent-cultivation-loop](../notes/archived/2026-10-13-agent-cultivation-loop.md) |
+| D44 | 成品目录 = 盘上 meta/final 的生成索引 + 只读右栏页签；host 生成（present 事件投影，未核=null）；完整审计仍归操作员 | [deliverables-catalog](../notes/archived/2026-10-19-deliverables-catalog.md)（补充 = [installed-shape-self-sufficient](../notes/archived/2026-10-25-installed-shape-self-sufficient.md)） |
+| D45 | run bundle = 一次安装的物理单元（bundle.json + home + workspace）；身份落点被 D51/D52 取代 | [RFC run-bundle-install-unit](../notes/archived/2026-10-24-run-bundle-install-unit.md) |
+| D46 | 产品仓历史只留产品与合成 fixtures；真实部署证据移私有仓；remote 重建为 private | [run-bundle-install-unit](../notes/archived/2026-10-24-run-bundle-install-unit.md) |
+| D47 | backlog→notes 交接契约：用户是队列；notes 不是收件箱；卡顶结论/去向为记录家；关闭以结论确认为准 | [handoff-contract](../notes/archived/2026-10-25-backlog-notes-handoff-contract.md) |
 | D48 | 目录独立启动 = 隔离 home + web profile + copy 骨架；产品入口被 D51/D52 取代 | [standalone-deployment](../notes/archived/2026-10-25-standalone-deployment.md) |
 | D49 | notes 长期治理：取代门禁 + 收据层 + 机械审计；收敛证据随归档件 | [governance](../notes/implemented/2026-10-30-notes-consistency-governance.md) · [converge-evidence](../notes/implemented/2026-10-30-converge-evidence-home.md) |
 | D50 | 研究按研究题组织：题目录 + 题名页（问题/消费者/产出的卡/材料）；双索引一题一行；`backlog-liveness` 两级校验 | [_backlog/research](../_backlog/research/README.md) · [research-topics Note](../notes/implemented/2026-10-30-backlog-research-topics.md) |
@@ -60,6 +60,6 @@
 | D54 | 发布姿态 = MIT + npm 身份 + 市场 index 交接；npm publish 仍人工（[publish-handoff](./guides/publish-handoff.md)） | [lifecycle Note](../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) |
 | D55 | 发行版六轴与术语对齐：公司状态/run trace；发布字节装 `_dist`、sourceFingerprint；docs-first legacy 名 | [distribution-alignment Note](../notes/implemented/2026-11-02-distribution-alignment.md) |
 | D56 | backlog 五道门：issue `待落地`、研究题名页 `调研中/已定性`、去向封闭集与审查记录、门票由门禁钉住；不加 `落地中/待审` | [five-gates Note](../notes/implemented/2026-11-02-backlog-five-gates.md) |
-| D57 | 需求编号=身份（MR/REQ/IF/TC）；层归文档头、状态归条目；`/req check` 判重复/悬空/退役/孤儿/覆盖 | [teaming Note](../notes/implemented/2026-11-07-requirements-teaming-program.md) |
-| D58 | VP-Eng 三门：根门=Lead（带小队）；命名 child 按 agentPreset 请 CMO；CEO teammate 受 maxDepth 1 | [teaming Note](../notes/implemented/2026-11-07-requirements-teaming-program.md) |
+| D57 | 需求编号=身份（MR/REQ/IF/TC）；层归文档头、状态归条目；`/req check` 判重复/悬空/退役/孤儿/覆盖 | [teaming Note](../notes/archived/2026-11-07-requirements-teaming-program.md) |
+| D58 | VP-Eng 三门：根门=Lead（带小队）；命名 child 按 agentPreset 请 CMO；CEO teammate 受 maxDepth 1 | [teaming Note](../notes/archived/2026-11-07-requirements-teaming-program.md) |
 | D59 | ~~SA 先判域、SQA 域审计~~ 2026-11-09 退役 SA/SQA；SyRS/IRS/V&V 改为按需指派 owner | [退役 Note](../notes/implemented/2026-11-09-retire-sa-sqa.md) |

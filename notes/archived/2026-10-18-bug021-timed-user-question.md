@@ -64,7 +64,7 @@ r3 回放场景的 snapshot.yml（2026-10-18 条；该场景已随真实证据�
 
 - **模型可单次把窗口要回无界**（顶层 `timeout: -1`，vendor schema 允许：*"Use -1 only when an answer is required
   before proceeding"*）——真跑实测：该路径下无 `pending`、无 `turn/end`、`userQuestions/answer` 返回 false
-  ⇒ 无人值守驱动仍会静默停住。**残留已由 [BUG-022 的驱动侧停点判定](../../notes/implemented/2026-10-18-bug022-question-stop-guard.md) 收掉**
+  ⇒ 无人值守驱动仍会静默停住。**残留已由 [BUG-022 的驱动侧停点判定](./2026-10-18-bug022-question-stop-guard.md) 收掉**
   （`tools/lib/question-stop.mjs`：看到无界停点就停并报，不再干等；卡 = [BUG-022（已归档）](../../_backlog/_archive/fixed_bugs/BUG-022-ask-user-unbounded-timeout-override.md)）。
 - 窗口秒数（120）**已在 2026-10-18 用真数据核过，结论 = 维持不改**：分析器 `tools/ask-latency.mjs` 扫 dev home
   645 份日志得 **41 条真人作答**样本——p50 **42s**、p75 **138s**、p90 1559s（尾部是"人隔了很久回来答"）；

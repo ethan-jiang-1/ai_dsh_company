@@ -1,6 +1,6 @@
 # converge 第二刀：`steps()` 让 dry-run 就是计划
 
-状态：implemented（2026-10-23；用户令「B → A 都要做」；上一刀 = [assess](../implemented/2026-10-23-converge-assess.md)）
+状态：implemented（2026-10-23；用户令「B → A 都要做」；上一刀 = [assess](./2026-10-23-converge-assess.md)）
 
 ## 决定
 

@@ -6,7 +6,7 @@ opened: 2026-10-16
 # 推敲：收口纪律缺口——动议可「结果=已完成」收口而不经 `present`（all-in-ai-2026 现场）
 
 > 立卡：2026-10-16 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
-> 2026-10-16 拍板（用户「继续按你推荐」）：选 **A+B** —— A 公司侧立纪律（手册「工作纪律」加成品收口必须先 `present`，1 行 188/190）；B 工具侧加前置（`converge` 拦「有未结审计发现」，判据复用 `deliverables-check --only <slug>`，放行 = `--allow-open-findings`）。实施与验证收据 = [implemented/2026-10-16-closeout-requires-present.md](../../../notes/implemented/2026-10-16-closeout-requires-present.md)。
+> 2026-10-16 拍板（用户「继续按你推荐」）：选 **A+B** —— A 公司侧立纪律（手册「工作纪律」加成品收口必须先 `present`，1 行 188/190）；B 工具侧加前置（`converge` 拦「有未结审计发现」，判据复用 `deliverables-check --only <slug>`，放行 = `--allow-open-findings`）。实施与验证收据 = [implemented/2026-10-16-closeout-requires-present.md](../../../notes/archived/2026-10-16-closeout-requires-present.md)。
 > **剩余（未结，归公司侧）**：`all-in-ai-2026` 本条仍需一次**真实收口**（补 `present` 后 meta「结果」方可标终态）——preset 只在 Web 面挂载（`dev-loop §3.6`），headless/sdk 绕过 preset ⇒ **不能由维护者在这一侧替代**；收敛前置会继续拦住它（fail-closed），这是正确状态。诊断链 = [BUG-019](../fixed_bugs/BUG-019-final-present-evidence-lost.md)。
 
 **问题与期望结果：** `deliverables-check` 在真盘常红一条 `final-not-presented`（`deliverables/2026-10-13-all-in-ai-2026/final.md`）。追查到底发现**不是工具误判**：该动议的收口会话**从未调用 `present`**，而公司手册的收口纪律要求 CEO 用 `present` 声明成品。期望结果 = 拍板「收口纪律怎么落地」（改公司侧流程 / 加收敛前置 / 两者都做），把这条红变成一次可解释的处置而不是常年噪声。

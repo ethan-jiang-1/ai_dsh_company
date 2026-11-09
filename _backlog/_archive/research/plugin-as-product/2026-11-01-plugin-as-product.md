@@ -821,7 +821,7 @@ TTY 询问；无 TTY 且无值 → 非零退出 + 两条命令。**Host 只认 `
 
 **历史决定**
 
-- [run-bundle-install-unit](../../../../notes/implemented/2026-10-24-run-bundle-install-unit.md)、
+- [run-bundle-install-unit](../../../../notes/archived/2026-10-24-run-bundle-install-unit.md)、
   [data-model-alignment](../../../../notes/archived/2026-10-27-data-model-alignment.md)、
   [data-design-hardening](../../settled_issues/2026-10-28-data-design-hardening.md)、
   [standalone-deployment](../../../../notes/archived/2026-10-25-standalone-deployment.md)

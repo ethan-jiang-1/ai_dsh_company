@@ -45,4 +45,4 @@
 9. **沙箱后端探测**：`env.sh` 实跑一次 `sandbox-exec` 探测，**不可用则自动导出 `DSH_PERMISSION_MODE=danger-full-access`**
    （macOS 26 本机禁了 Seatbelt；不落则每条 bash 都退化成「请求升级」，连 `ls` 也一样）。探测结果**明示**（stderr 一行取舍）；
    逃生阀 = `DSH_SKIP_SANDBOX_PROBE=1` 或自行设 `DSH_PERMISSION_MODE`；后端恢复自动回到 `workspace-write`。
-   理由、输掉的方案与红绿证据见 [sandbox-backend-probe](../../notes/implemented/2026-10-10-sandbox-backend-probe.md)。
+   理由、输掉的方案与红绿证据见 [sandbox-backend-probe](../../notes/archived/2026-10-10-sandbox-backend-probe.md)。

@@ -41,4 +41,4 @@
 `presets/**`、`content/**`、`locale/`、`icon.svg`、`cordis.patch.yml`、`LICENSE`，不发 `src/**`（v3 起也没有 `workspace/**`））
 ——发布面是 `lib/`（generated，owner 表 = [pack README](../README.md)）。
 
-**质量命令**：`pnpm lint`（oxlint）/ `pnpm dup`（jscpd）——范围与阈值住 [package.json](../../../package.json) scripts 与 [.jscpd.json](../../../.jscpd.json)（D28：文档不复述枚举），取舍 = [Note](../../../notes/implemented/2026-11-04-lint-and-dup-upstream.md)。
+**质量命令**：`pnpm lint`（oxlint）/ `pnpm dup`（jscpd）——范围与阈值住 [package.json](../../../package.json) scripts 与 [.jscpd.json](../../../.jscpd.json)（D28：文档不复述枚举），取舍 = [Note](../../../notes/archived/2026-11-04-lint-and-dup-upstream.md)。

@@ -5,7 +5,7 @@
 > 上游 = [插件即产品 v3 卡](../../_backlog/_archive/settled_issues/2026-11-01-plugin-as-product-v3.md)（已结，0.7.0 复核）、
 > 研究题 [plugin-as-product-v3](../../_backlog/_archive/research/plugin-as-product-v3/README.md)（边界稿 + 失败复盘）。
 > 取代 = [v2 manifest Note](./2026-11-01-plugin-as-product-v2-manifest.md) 的入口/workspace/内容边界三条、
-> [run-bundle-install-unit](./2026-10-24-run-bundle-install-unit.md) 的 run bundle 物理单元位置（v3 收进 `.dsh-company/`）、
+> [run-bundle-install-unit](../archived/2026-10-24-run-bundle-install-unit.md) 的 run bundle 物理单元位置（v3 收进 `.dsh-company/`）、
 > [standalone-deployment](../archived/2026-10-25-standalone-deployment.md) 的独立启动器形状。
 > 不改 = 方法层/账本留 host（D25/M2）、五角色内容、vendor pin。
 

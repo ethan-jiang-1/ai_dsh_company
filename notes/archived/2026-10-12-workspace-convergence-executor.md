@@ -5,7 +5,7 @@
 > **2026-10-30 部分取代（证据家 + 归档搬移）**：journal 副本改随交付物进
 > `deliverables-archive/<目录>/journal/`，不再写 `snapshots/archive`；归档搬移不再做 `git add`
 > （run bundle 后 `company-workspace/` 整树 gitignored）。本文 §决定 的旧落点与 §后果 的
-> “snapshots 体积随收敛增长”作废；新 owner = [converge-evidence-home](./2026-10-30-converge-evidence-home.md)。
+> “snapshots 体积随收敛增长”作废；新 owner = [converge-evidence-home](../implemented/2026-10-30-converge-evidence-home.md)。
 
 ## 问题
 

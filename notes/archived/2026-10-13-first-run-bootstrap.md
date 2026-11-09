@@ -3,7 +3,7 @@
 状态：implemented（2026-10-13；起因 = 用户令「如果 company-workspace 不在，你需要建立一下；当然建立好了就不用再建立了」）
 
 > **已被 v3 取代（2026-11-01）**：首启落点从 `<DSH_HOME>/company-workspace` 改为用户 workspace 的
-> `.dsh-company/`；`bundle:init` 只建状态，不复制/不建符号链接。现行 = [v3 native entry](./2026-11-01-plugin-as-product-v3-native-entry.md)。
+> `.dsh-company/`；`bundle:init` 只建状态，不复制/不建符号链接。现行 = [v3 native entry](../implemented/2026-11-01-plugin-as-product-v3-native-entry.md)。
 
 > **2026-10-24 部分取代（升级结论）**：基部制度件不再“永不升级”——manifest 逐文件哈希判定，
 > 未改过的替换、改过的保留（见 [run-bundle](./2026-10-24-run-bundle-install-unit.md) §5 与

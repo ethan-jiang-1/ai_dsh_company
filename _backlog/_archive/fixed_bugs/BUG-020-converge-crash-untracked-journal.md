@@ -7,7 +7,7 @@ opened: 2026-10-16
 # BUG-020：converge 在「角色刚写、未入库的 journal」上崩，且崩后无续跑路径
 
 > 严重级别：P2（次要——不损坏数据，但**收敛中断在半途且无官方恢复路径**，只能靠人按证据手工补完）｜发现：2026-10-16｜状态：已修（2026-10-16 同日修完两条）
-> **两条根因均已修（2026-10-16 同日）**：① `git rm` 撞未跟踪 ⇒ 判 tracked 分支（`clearLiveJournal`）；② 崩后无续跑 ⇒ 新增 `converge --resume <目录名>`（只做剩余步骤、不搬移交付物；不可续跑时 fail-loud 并给恢复指引）。判据纯函数 = `convergenceResume`（lib），收据 = [implemented/2026-10-16-converge-resume.md](../../../notes/implemented/2026-10-16-converge-resume.md)。
+> **两条根因均已修（2026-10-16 同日）**：① `git rm` 撞未跟踪 ⇒ 判 tracked 分支（`clearLiveJournal`）；② 崩后无续跑 ⇒ 新增 `converge --resume <目录名>`（只做剩余步骤、不搬移交付物；不可续跑时 fail-loud 并给恢复指引）。判据纯函数 = `convergenceResume`（lib），收据 = [implemented/2026-10-16-converge-resume.md](../../../notes/archived/2026-10-16-converge-resume.md)。
 
 ## 症状（真现场，非构造）
 

@@ -14,14 +14,14 @@ M4 已落地（peer + 受控 lock、0.4.0、安装手册/CHANGELOG、`release --
 > `dshCachePath`、`deliverables/presented` 均在）与 FAQ 26（数据家/承诺）。现合同 =
 > [data-model.md](../../docs/data-model.md)；用户侧摘要 = [pack README Data](../../packages/company-pack/README.md#data)。
 >
-> **取代关系**：部分取代 [agent-cultivation-loop](../implemented/2026-10-13-agent-cultivation-loop.md)
+> **取代关系**：部分取代 [agent-cultivation-loop](./2026-10-13-agent-cultivation-loop.md)
 > 的「方法层 = profile×角色」作用域与路径（其余决定、尤其是「workspace 根被否」保留）；
 > 部分取代 [r4-d6-client-errors](./2026-10-28-r4-d6-client-errors.md) 的 client-errors
 > 落点；部分取代 [data-model-alignment](./2026-10-27-data-model-alignment.md) 的
 > 「presented 账本留 W」落点（「bundle.json 不迁 storageDomain」维持）。事实落点随改动就地更新
 > [data-model-p1-p2](./2026-10-27-data-model-p1-p2.md)、
 > [data-model-r1-r6](./2026-10-27-data-model-r1-r6.md)、
-> [run-bundle-install-unit](../implemented/2026-10-24-run-bundle-install-unit.md) 中被改路径的引用。
+> [run-bundle-install-unit](./2026-10-24-run-bundle-install-unit.md) 中被改路径的引用。
 
 > **2026-10-30 复核更正**：上面的“已就地更新 p1-p2”当时**没有真正做到**——p1-p2 的方法层句
 > （profile 级隔离）未同步，留成了与 data-model 相反的说法。已在

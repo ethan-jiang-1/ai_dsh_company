@@ -67,7 +67,7 @@ token 值不复制到卡、报告或测试输出里。
 
 ## 修复关联
 
-已执行（2026-10-20，用户授权全部修复；决定与证据的持久记录 = [tracked-token guard Note](../../../notes/implemented/2026-10-20-tracked-token-guard.md)）：
+已执行（2026-10-20，用户授权全部修复；决定与证据的持久记录 = [tracked-token guard Note](../../../notes/archived/2026-10-20-tracked-token-guard.md)）：
 
 1. `git rm --cached` 两件日志并删除本地文件；`.gitignore` 增加 `runtime/web-logs/`；
    `AGENTS.md:25` 与 `runtime/README.md` 的 tracked/ignored 说明同步。

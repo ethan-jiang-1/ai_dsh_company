@@ -34,7 +34,7 @@
 
 **支持矩阵 = macOS + Linux（CI 双跑）；Windows 原生不支持（POSIX 符号链接/权限/原生插件假设），用 WSL2。**
 CI 证明 install + `bundle:init` + `verify`；vendor 全量构建/测试的干净复现是已知缺口，见
-[repo-hygiene Note](../notes/implemented/2026-10-25-repo-hygiene-contract.md)。
+[repo-hygiene Note](../notes/archived/2026-10-25-repo-hygiene-contract.md)。
 
 1. **行尾**：文本一律 LF（`.gitattributes` 的 `* text=auto eol=lf`）；禁止提交 CRLF；二进制按后缀标记。
 2. **路径**：活动 tracked 文件不写绝对 home 路径（macOS 的 Users 段、Linux 的 home 段、Windows 盘符）；
