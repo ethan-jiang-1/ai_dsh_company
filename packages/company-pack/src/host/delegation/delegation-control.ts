@@ -12,8 +12,10 @@
  * 读 child durable 日志的最后一个 `turn/end`——**不用** `sessionQuery`（它在本 package 的
  * `isolate: { sessionQuery: true }` 组内，host 工具拿不到；2026-11-08 实测）。状态只读 live
  * Agent registry：`running` / `inactive`；**身份**用 `agentTeams.tryMembership/listMembers`（teammate vs
- * subagent + 寻址：team 名 / session id）。承诺字段不静默省略：读不到时输出 `lastTurnEnd:
- * 'unavailable'`（可见降级）。已知边界：只给 reason.kind（如 `interrupted`），不给错过的通知内容。
+ * subagent + 寻址：team 名 / session id）。**引擎身份**（preset / 委派深度）来自同一次
+ * `sessionPersistence.open()` 的 durable header（BUG-046）：`agentPreset` / `delegationDepth`
+ * 读不到时输出 `unavailable`（可见降级，不默认 worker/0）。承诺字段不静默省略：读不到时输出
+ * `lastTurnEnd: 'unavailable'`。已知边界：只给 reason.kind（如 `interrupted`），不给错过的通知内容。
  *
  * 退役条件：上游让根会话拿到全局控制名（team shadow 修复）后，本工具删除；
  * 检测锚点 = `tests/host/delegation/delegation-control.spec.ts` 与台账 `[CT-LIFE]`。
@@ -86,10 +88,27 @@ export interface SubagentRow {
   lastTurnEnd: string
   /** `unavailable` 时的短原因（错误 code 或截断 message），供模型/日志判断下一步。 */
   lastTurnEndDetail?: string
+  /**
+   * 子会话 durable header 的 `agentPreset`（引擎实际生效的组合，不是 child 自述）。
+   * 读不到时为 `unavailable`——不默认成 `worker`（BUG-046）。
+   */
+  agentPreset: string
+  /**
+   * 子会话 durable header 的 `delegationDepth`（十进制字符串，例 `"3"`）。
+   * 读不到时为 `unavailable`——不默认成 0（BUG-046）。
+   */
+  delegationDepth: string
+  /** 身份字段读不到时的短原因（与 `lastTurnEndDetail` 同一次 durable 读失败）。 */
+  identityDetail?: string
 }
 
 /** `sessionPersistence` 的只读一面（root 服务；base 挂 JSONL，agent-loop/team 同款用法）。 */
 interface PersistedHandleLike {
+  /** durable header：引擎在 child 创建时写入的 preset 与委派深度。 */
+  readonly header?: {
+    readonly agentPreset?: string
+    readonly delegationDepth?: number
+  }
   read(from: number, to?: number, options?: { signal?: AbortSignal }): Promise<{ events: readonly { type: string; data: unknown }[] }>
   close(): Promise<void>
 }
@@ -103,6 +122,10 @@ export interface ChildTurnState {
   terminal?: string
   openTurn: boolean
   sawTurn: boolean
+  /** durable header 的 preset id；header 缺字段时省略（调用方降级为 unavailable）。 */
+  agentPreset?: string
+  /** durable header 的委派深度；header 缺字段时省略。 */
+  delegationDepth?: number
 }
 
 /**
@@ -174,7 +197,15 @@ export async function readChildTurnState(
   const handle = await persistence.open(id, 'read', signal === undefined ? undefined : { signal })
   try {
     const { events } = await handle.read(0, undefined, signal === undefined ? undefined : { signal })
-    return childTurnState(events)
+    const state = childTurnState(events)
+    // 同一次 open 顺带读 durable header：preset/depth 是引擎写入的事实，不需要第二次 IO。
+    const preset = handle.header?.agentPreset
+    const depth = handle.header?.delegationDepth
+    return {
+      ...state,
+      ...(typeof preset === 'string' && preset !== '' ? { agentPreset: preset } : {}),
+      ...(typeof depth === 'number' && Number.isSafeInteger(depth) && depth >= 0 ? { delegationDepth: depth } : {}),
+    }
   } finally {
     await handle.close()
   }
@@ -206,6 +237,9 @@ export function subagentRows(
       role: identity.role,
       address: identity.address,
       lastTurnEnd: 'unavailable',
+      // 身份字段的默认形态：显式 unavailable，等 durable header 到了再填（不默认 worker/0）。
+      agentPreset: 'unavailable',
+      delegationDepth: 'unavailable',
     })
   }
   return [...rows.values()]
@@ -231,7 +265,11 @@ export function registerDelegationControl(ctx: Context): void {
       + 'read (visible degradation, never silently omitted); `lastTurnEndDetail` names the short reason then. '
       + 'An inactive child whose durable log has an open turn (started, never ended — e.g. the host was killed) '
       + 'is reported as `interrupted` with `lastTurnEndDetail: inferred-open-turn`; `none` means no open turn. '
-      + 'An `interrupted` child never sends a completion notice: continue it with `send_to_subagent` or report the gap.',
+      + 'An `interrupted` child never sends a completion notice: continue it with `send_to_subagent` or report the gap. '
+      + 'Every row also carries the engine-applied identity from the child durable header: `agentPreset` and '
+      + '`delegationDepth` (a decimal string such as "3"). Use them to verify the preset/depth the engine actually '
+      + 'applied instead of trusting the child\'s self-report. Both are `unavailable` when the durable log cannot be '
+      + 'read — they are never guessed as `worker` or 0; `identityDetail` names the short reason then.',
     parameters: {},
     output: {
       schema: {
@@ -253,6 +291,9 @@ export function registerDelegationControl(ctx: Context): void {
                 address: { type: 'string', required: true },
                 lastTurnEnd: { type: 'string', required: true },
                 lastTurnEndDetail: { type: 'string' },
+                agentPreset: { type: 'string', required: true },
+                delegationDepth: { type: 'string', required: true },
+                identityDetail: { type: 'string' },
               },
             },
           },
@@ -290,6 +331,9 @@ export function registerDelegationControl(ctx: Context): void {
         for (let attempt = 0; attempt < 3; attempt += 1) {
           try {
             const state = await readChildTurnState(persistence, row.id, exec.signal)
+            // 同一次 durable 读也带回 header 身份：preset/depth 是引擎写入的事实。
+            if (state.agentPreset !== undefined) row.agentPreset = state.agentPreset
+            if (state.delegationDepth !== undefined) row.delegationDepth = String(state.delegationDepth)
             if (state.terminal !== undefined) {
               row.lastTurnEnd = state.terminal
             } else if (state.openTurn && row.status === 'inactive') {
@@ -311,6 +355,7 @@ export function registerDelegationControl(ctx: Context): void {
         }
         row.lastTurnEnd = 'unavailable'
         row.lastTurnEndDetail = readErrorDetail(lastError)
+        row.identityDetail = readErrorDetail(lastError)
         ;(ctx as unknown as { logger?: { warn(message: string): void } }).logger?.warn(
           `list_subagents: cannot read durable log for ${row.id}: ${String(lastError)}`,
         )

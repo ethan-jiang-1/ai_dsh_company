@@ -1,11 +1,14 @@
 /**
- * host 半 `list_subagents` / `send_to_subagent` 行为 spec（BUG-037/041 真修的机械锚点）。
+ * host 半 `list_subagents` / `send_to_subagent` 行为 spec（BUG-037/041/046 的机械锚点）。
  *
  * 证明什么：① 控制面名字不与 vendor 的 `send_message` / `list_agents` 相撞（团队版 shadow 不到）；
- *   ② list 从**父会话自己的 durable catalog** 折叠；终态读 root 的 `sessionPersistence`（不是 isolate 组里的
- *   `sessionQuery`），读不到输出 `unavailable` 而不是省略；③ send 把 target/content/signal 原样交官方服务。
+ *   ② list 从**父会话自己的 durable catalog** 折叠；终态与引擎身份（preset/depth）读 root 的
+ *   `sessionPersistence`（不是 isolate 组里的 `sessionQuery`），读不到输出 `unavailable` 而不是省略；
+ *   ③ send 把 target/content/signal 原样交官方服务。
  * 不证明：真实装配里工具可见性（preset-smoke / 真会话探针）、cold resume 的 provider 行为。
  */
+// 负例留证 2026-11-09：让 readChildTurnState 不返回 durable header 的 preset/depth（或把 rows 初始化成
+// worker/0）⇒「暴露 header 身份」与「缺 header 显式 unavailable」两条红；还原 ⇒ 绿。BUG-046
 import { describe, expect, it } from 'vitest'
 import { childTurnState, readChildTurnState, registerDelegationControl, subagentRows, terminalOf } from '../../../packages/company-pack/src/host/delegation/delegation-control.ts'
 
@@ -32,12 +35,15 @@ function harness(options: { subagents?: unknown; agents?: unknown; agentTeams?: 
 }
 
 /** `sessionPersistence` 的只读假件：按 id 返回事件日志；值是 Error 时模拟读失败。 */
-const persistenceOf = (logs: Record<string, unknown[] | Error>) => ({
+const persistenceOf = (
+  logs: Record<string, unknown[] | Error>,
+  header?: { agentPreset?: string; delegationDepth?: number },
+) => ({
   open: async (id: string) => {
     const events = logs[id]
     if (events instanceof Error) throw events
     if (events === undefined) throw new Error(`session ${id} not found`)
-    return { read: async () => ({ events }), close: async () => {} }
+    return { header, read: async () => ({ events }), close: async () => {} }
   },
 })
 
@@ -68,8 +74,8 @@ describe('delegation control tools', () => {
       { type: 'subagent/catalog', data: {} },
     ], id => (id === 'b' ? 'running' : 'inactive'))
     expect(rows).toEqual([
-      { id: 'a', label: '新标签', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'a', lastTurnEnd: 'unavailable' },
-      { id: 'b', label: 'worker-b', mode: 'one-shot', status: 'running', role: 'subagent', address: 'b', lastTurnEnd: 'unavailable' },
+      { id: 'a', label: '新标签', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'a', lastTurnEnd: 'unavailable', agentPreset: 'unavailable', delegationDepth: 'unavailable' },
+      { id: 'b', label: 'worker-b', mode: 'one-shot', status: 'running', role: 'subagent', address: 'b', lastTurnEnd: 'unavailable', agentPreset: 'unavailable', delegationDepth: 'unavailable' },
     ])
   })
 
@@ -83,8 +89,8 @@ describe('delegation control tools', () => {
     } as never)
     expect(result).toEqual({
       subagents: [
-        { id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'unavailable' },
-        { id: 'child-2', label: 'w2', mode: 'continuable', status: 'running', role: 'subagent', address: 'child-2', lastTurnEnd: 'unavailable' },
+        { id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'unavailable', agentPreset: 'unavailable', delegationDepth: 'unavailable' },
+        { id: 'child-2', label: 'w2', mode: 'continuable', status: 'running', role: 'subagent', address: 'child-2', lastTurnEnd: 'unavailable', agentPreset: 'unavailable', delegationDepth: 'unavailable' },
       ],
     })
   })
@@ -124,12 +130,13 @@ describe('delegation control tools', () => {
     await expect(tool.execute({ subagent_id: 'x', message: 'y' } as never, { agent: agentWith([]) } as never))
       .rejects.toThrow(/subagents service/)
   })
-  it('readChildTurnState opens read-only, reads from 0, and always closes the handle', async () => {
+  it('readChildTurnState opens read-only, reads from 0, always closes, and returns header identity', async () => {
     const calls: string[] = []
     const persistence = {
       open: async (id: string, access: string) => {
         calls.push(`open:${id}:${access}`)
         return {
+          header: { agentPreset: 'worker', delegationDepth: 3 },
           read: async (from: number) => {
             calls.push(`read:${String(from)}`)
             return { events: [{ type: 'turn/end', data: { reason: { kind: 'interrupted' } } }] }
@@ -139,7 +146,13 @@ describe('delegation control tools', () => {
       },
     }
     await expect(readChildTurnState(persistence, 'child-1'))
-      .resolves.toEqual({ terminal: 'interrupted', openTurn: false, sawTurn: true })
+      .resolves.toEqual({
+        terminal: 'interrupted',
+        openTurn: false,
+        sawTurn: true,
+        agentPreset: 'worker',
+        delegationDepth: 3,
+      })
     expect(calls).toEqual(['open:child-1:read', 'read:0', 'close'])
   })
 
@@ -155,8 +168,8 @@ describe('delegation control tools', () => {
       signal: new AbortController().signal,
     } as never) as { subagents: Array<{ id: string; role: string; address: string }> }
     expect(result.subagents).toEqual([
-      { id: 'child-1', label: 'worker', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'unavailable' },
-      { id: 'child-2', label: 'eng-2', mode: 'continuable', status: 'inactive', role: 'teammate', address: 'eng-2', lastTurnEnd: 'unavailable' },
+      { id: 'child-1', label: 'worker', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'unavailable', agentPreset: 'unavailable', delegationDepth: 'unavailable' },
+      { id: 'child-2', label: 'eng-2', mode: 'continuable', status: 'inactive', role: 'teammate', address: 'eng-2', lastTurnEnd: 'unavailable', agentPreset: 'unavailable', delegationDepth: 'unavailable' },
     ])
   })
 
@@ -275,8 +288,8 @@ describe('delegation control tools', () => {
     } as never)
     expect(result).toEqual({
       subagents: [
-        { id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'interrupted' },
-        { id: 'child-2', label: 'w2', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-2', lastTurnEnd: 'completed' },
+        { id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'interrupted', agentPreset: 'unavailable', delegationDepth: 'unavailable' },
+        { id: 'child-2', label: 'w2', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-2', lastTurnEnd: 'completed', agentPreset: 'unavailable', delegationDepth: 'unavailable' },
       ],
     })
   })
@@ -290,8 +303,49 @@ describe('delegation control tools', () => {
       signal: new AbortController().signal,
     } as never)
     expect(result).toEqual({
-      subagents: [{ id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'unavailable', lastTurnEndDetail: 'corrupt child log' }],
+      subagents: [{ id: 'child-1', label: 'w1', mode: 'continuable', status: 'inactive', role: 'subagent', address: 'child-1', lastTurnEnd: 'unavailable', lastTurnEndDetail: 'corrupt child log', agentPreset: 'unavailable', delegationDepth: 'unavailable', identityDetail: 'corrupt child log' }],
     })
+  })
+
+  it('list_subagents exposes the engine-applied preset/depth from the durable header (BUG-046)', async () => {
+    const sessionPersistence = persistenceOf(
+      { 'child-1': [{ type: 'turn/end', data: { reason: { kind: 'completed' } } }] },
+      { agentPreset: 'worker', delegationDepth: 3 },
+    )
+    const tool = harness({ sessionPersistence }).get('list_subagents')
+    if (tool === undefined) throw new Error('list_subagents not registered')
+    const result = await tool.execute({} as never, {
+      agent: agentWith([catalog('child-1', 'w1')]),
+      signal: new AbortController().signal,
+    } as never) as { subagents: Array<{ agentPreset: string; delegationDepth: string; lastTurnEnd: string }> }
+    expect(result.subagents[0]).toMatchObject({ agentPreset: 'worker', delegationDepth: '3', lastTurnEnd: 'completed' })
+  })
+
+  it('reports unavailable when the durable header has no preset/depth (never guesses worker/0)', async () => {
+    const sessionPersistence = persistenceOf({
+      'child-1': [{ type: 'turn/end', data: { reason: { kind: 'completed' } } }],
+    })
+    const tool = harness({ sessionPersistence }).get('list_subagents')
+    if (tool === undefined) throw new Error('list_subagents not registered')
+    const result = await tool.execute({} as never, {
+      agent: agentWith([catalog('child-1', 'w1')]),
+      signal: new AbortController().signal,
+    } as never) as { subagents: Array<{ agentPreset: string; delegationDepth: string }> }
+    expect(result.subagents[0]).toMatchObject({ agentPreset: 'unavailable', delegationDepth: 'unavailable' })
+  })
+
+  it('depth 0 is a real value (top-level header), not unavailable', async () => {
+    const sessionPersistence = persistenceOf(
+      { 'child-1': [{ type: 'turn/end', data: { reason: { kind: 'completed' } } }] },
+      { delegationDepth: 0 },
+    )
+    const tool = harness({ sessionPersistence }).get('list_subagents')
+    if (tool === undefined) throw new Error('list_subagents not registered')
+    const result = await tool.execute({} as never, {
+      agent: agentWith([catalog('child-1', 'w1')]),
+      signal: new AbortController().signal,
+    } as never) as { subagents: Array<{ agentPreset: string; delegationDepth: string }> }
+    expect(result.subagents[0]).toMatchObject({ agentPreset: 'unavailable', delegationDepth: '0' })
   })
 
 })

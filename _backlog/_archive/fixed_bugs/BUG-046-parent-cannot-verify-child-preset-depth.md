@@ -1,17 +1,14 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-09
 ---
 
 # BUG-046：父代理看不到 child 的 `agentPreset` / `delegationDepth`，worker family 与深度只能信自述
 
-> 严重级别：P2（次要）｜发现：2026-11-09｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-09｜状态：已修（2026-11-09：修复就绪 → 修复已落地 → 已修）
 > 来源：2026-11-09 委派面重构后第四轮探索（D1 长链；R1b 深度）。
-> 授权：2026-11-09 用户指令「按照我们的流程排一个计划，之后逐一修复吧」「从根上去解决」——
-> 本修复触碰 company-pack 公开行为（`list_subagents` 输出面）与 docs 合同，由用户明确指示授权。
-> 修法 = 同一次 `sessionPersistence.open()` 读 child durable header，把 `agentPreset`/`delegationDepth`
-> 投影进 `SubagentRow`；读不到显式 `unavailable`。它同时是 BUG-045/047 的父侧核对面。
+> 审查：agent — 对照「已修判定」逐条核过；真红→绿见「修复落地」，未跑真模型（keyless 工具面）。
 
 ## 症状
 
@@ -53,7 +50,7 @@ preset/depth，但那是 client/host 投影，不是模型工具。模型可见�
 
 **“身份/预算不可观测”**：父代理请求 worker profile 或深度后，没有独立于 child 自述的核对面。
 后果：worker 配错（full role clone）、深度预算被绕过（见
-[BUG-045](../_archive/fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md)）、或 child 声称“我是 worker”时，父代理无法
+[BUG-045](BUG-045-subagent-retry-depth-budget-bypass.md)）、或 child 声称“我是 worker”时，父代理无法
 分辨。它同时削弱了本轮的 H1/H6/H8：验收只能靠人类读 header 或 UI，不能靠模型自己的工具闭环。
 
 ## 复现
@@ -75,7 +72,7 @@ preset/depth，但那是 client/host 投影，不是模型工具。模型可见�
 
 ## 修复关联
 
-- [`delegation-control.ts`](../../packages/company-pack/src/host/delegation/delegation-control.ts)：
+- [`delegation-control.ts`](../../../packages/company-pack/src/host/delegation/delegation-control.ts)：
   `SubagentRow`、`subagentRows`、`list_subagents` 的 output schema/描述。
 - 可用的 durable 读面：`sessionPersistence.open(childId, 'read')` 已在该文件用于 `lastTurnEnd`；
   header 的 `agentPreset`/`delegationDepth` 是同一份 durable 日志的元数据，理论上可读。
@@ -94,5 +91,18 @@ header；读不到时 `unavailable`），或提供等价的只读 `subagent_info
   `delegationDepth`；读不到时明确 `unavailable`，不伪造。
 - D1 形状下父代理能独立核对 `worker` 与 `depth=3`，不再写“只能信自述”。
 - keyless spec 覆盖 header 来源与 `unavailable` 降级；红形态 = 故意不返回 preset/depth 时断言红。
-- 与 [BUG-045](../_archive/fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md) 一起看：深度/身份绕过必须能被父代理
+- 与 [BUG-045](BUG-045-subagent-retry-depth-budget-bypass.md) 一起看：深度/身份绕过必须能被父代理
   在工具面观察到。
+
+## 修复落地（2026-11-09）
+
+- **同一次 durable 读带回身份**：[`delegation-control.ts`](../../../packages/company-pack/src/host/delegation/delegation-control.ts)
+  的 `readChildTurnState` 在 `open()` 后顺带取 `handle.header` 的 `agentPreset` / `delegationDepth`；
+  `ChildTurnState` 增可选字段，不新增第二次 IO、不新增工具。
+- **行字段**：`SubagentRow` 增必填 `agentPreset: string` / `delegationDepth: string`（十进制字符串）
+  与 `identityDetail?`；初始值 `unavailable`，header 到了才覆盖——不默认 worker/0；`depth: 0` 是真值。
+- **模型面**：输出 schema + description 同步（“引擎实际生效的身份，用来核对，不要信 child 自述”）。
+- **真红→绿**：把 header 读取临时改成 `undefined` ⇒ **3 failed**（`readChildTurnState ... header identity`、
+  `list_subagents exposes ...（BUG-046）`、`depth 0 is a real value`）；还原 ⇒ **20 passed**。
+- **全量**：`pnpm verify`、`pnpm test`、`pnpm typecheck` 全绿（同提交）。
+- 决定与输掉的方案 = [subagent identity Note](../../../notes/implemented/2026-11-09-subagent-identity-observable.md)。

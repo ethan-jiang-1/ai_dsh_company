@@ -3,7 +3,8 @@
 // 不是 isolate 组里的 sessionQuery（host 工具拿不到它——真实装配实测，见 BUG-042 卡）。
 //
 // 钉什么：`readChildTurnState` 对**真实** JsonlSessionPersistence 的行为——open(read) → read(0) →
-//   `childTurnState`（终态 / open turn / 无 turn）→ close；日志由真实 create/append 写入（不是 fake）。
+//   `childTurnState`（终态 / open turn / 无 turn）+ durable header 身份（BUG-046）→ close；
+//   日志由真实 create/append 写入（不是 fake）。
 //   这条用真服务而不是 fake：fake 只能证明代码形状，证明不了"host 能拿到这个服务"。
 //
 // 红配方（prove-it-red）：让 readChildTurnState 丢掉日志最后一条（`events.slice(0,-1)`）→ 前两条红；
@@ -41,6 +42,7 @@ async function writeChildLog(
     cwd: root,
     isSeeded: false,
     delegationDepth: 1,
+    agentPreset: 'worker',
   })
   try {
     await handle.append(events)
@@ -59,7 +61,7 @@ describe('child terminal via the real session persistence', () => {
     try {
       await writeChildLog(ctx.sessionPersistence, root, 'child-1', [turnStart, turnEnd('interrupted')])
       await expect(readChildTurnState(ctx.sessionPersistence, 'child-1'))
-        .resolves.toEqual({ terminal: 'interrupted', openTurn: false, sawTurn: true })
+        .resolves.toEqual({ terminal: 'interrupted', openTurn: false, sawTurn: true, agentPreset: 'worker', delegationDepth: 1 })
     } finally {
       await ctx.fiber.dispose()
       await rm(root, { recursive: true, force: true })
@@ -72,11 +74,11 @@ describe('child terminal via the real session persistence', () => {
     try {
       await writeChildLog(ctx.sessionPersistence, root, 'child-2', [turnStart, turnEnd('completed')])
       await expect(readChildTurnState(ctx.sessionPersistence, 'child-2'))
-        .resolves.toEqual({ terminal: 'completed', openTurn: false, sawTurn: true })
+        .resolves.toEqual({ terminal: 'completed', openTurn: false, sawTurn: true, agentPreset: 'worker', delegationDepth: 1 })
 
       await writeChildLog(ctx.sessionPersistence, root, 'child-3', [turnStart])
       await expect(readChildTurnState(ctx.sessionPersistence, 'child-3'))
-        .resolves.toEqual({ openTurn: true, sawTurn: true })
+        .resolves.toEqual({ openTurn: true, sawTurn: true, agentPreset: 'worker', delegationDepth: 1 })
     } finally {
       await ctx.fiber.dispose()
       await rm(root, { recursive: true, force: true })
