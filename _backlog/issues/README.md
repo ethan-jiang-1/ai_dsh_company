@@ -4,6 +4,7 @@
 
 ## 活跃清单
 
+- [presets 委派面的模型化重构（worker family + 链合同 + 图观测）](2026-11-09-presets-delegation-architecture.md) — 等人拍板：模型/切片待用户逐项回答；不授权生产代码。
 - [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：设计 bug-hunt charter 与有限重跑验证；真模型运行待用户明确批准。
 
 （2026-11-08 VP-Eng workflow 通道卡已结归档：去向 = [Note](../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)。）

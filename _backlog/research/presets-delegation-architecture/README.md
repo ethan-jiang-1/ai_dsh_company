@@ -14,7 +14,7 @@ opened: 2026-11-09
 > [BUG-043](../../_archive/fixed_bugs/BUG-043-list-subagents-includes-teammates.md)、
 > [BUG-044](../../_archive/fixed_bugs/BUG-044-background-job-lost-on-restart.md) 修复轮；
 > 用户 2026-11-09 研究请求（无卡）。
-> 产出的卡：暂无（建议的后续 issue/RFC 见结论材料 §7 Q5；待用户裁决）。
+> 产出的卡：[presets 委派面的模型化重构（worker family + 链合同 + 图观测）](../../issues/2026-11-09-presets-delegation-architecture.md)（等人拍板；本卡不授权生产代码）。
 > 结论：存在系统性结构问题（组合重复/能力隐晦、worker=角色克隆、合同角色局部、三通道缺统一模型与面级验证）；
 > 推荐先做“合同单家 + worker profile + 能力清单 + keyless 声明面矩阵”，生成器为第二阶段，team 成员组合/通道统一属上游。
 
