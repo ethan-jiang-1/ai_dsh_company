@@ -17,7 +17,7 @@ opened: 2026-10-19
 
 **排序判据**（本卡采用）：① 现有证据 owner 能否直接复用（keyless spec / 视觉探针 / 夹具）；② 用户可感知影响（指挥视图 > 表格可读性 > 归档查阅）；③ 单张卡的实施代价。三项一起看，不单看「缺陷数量」。
 
-**已确认**：BUG-026 是误报（wire 视图 owner 齐全，[结论](BUG-026-owner-missing-from-team-projection.md)）；BUG-027 已按真根因修复（徽章门槛，[卡](../fixed_bugs/BUG-027-false-dependency-ready-badge.md)）。三个候选面板的已确认问题都落在呈现/可读性层，没有哪张有「指挥错误」级的证据优势。
+**已确认**：BUG-026 是误报（wire 视图 owner 齐全，[结论](../fixed_bugs/BUG-026-owner-missing-from-team-projection.md)）；BUG-027 已按真根因修复（徽章门槛，[卡](../fixed_bugs/BUG-027-false-dependency-ready-badge.md)）。三个候选面板的已确认问题都落在呈现/可读性层，没有哪张有「指挥错误」级的证据优势。
 
 **拆出**：「成品台账」已独立成 [新卡](2026-10-19-deliverables-ledger.md)，不在本卡范围。
 

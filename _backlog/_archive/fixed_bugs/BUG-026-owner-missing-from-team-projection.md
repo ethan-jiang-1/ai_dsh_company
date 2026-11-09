@@ -1,12 +1,12 @@
 ---
-status: 已结
+status: 已修
 severity: P1
 opened: 2026-10-19
 ---
 
 # BUG-026：owner 全线缺失——`agentTeam` 投影不带 `ownerName`，看板/依赖图/任务板全显示「未分配」
 
-> 严重级别：P1（重要）｜发现：2026-10-19｜状态：已结（2026-10-19 当日结：误报——缺陷不成立）
+> 严重级别：P1（重要）｜发现：2026-10-19｜状态：已修（2026-10-19 当日结：误报——缺陷不成立；2026-11-09 改判归位：原记「已结」走 `settled_issues`，用户裁定误报卡归已修缺陷）
 
 ## 症状
 
@@ -162,9 +162,10 @@ rows 379 / unassigned 35 / ownerResolved 344 / readyOnNonPending 0
 3. **防复发判据**（本轮补，见 `tests/lib/board.spec.ts`）：以**真 wire 形状**为输入断言
    owner 解析不丢、且非 pending 任务 `ready === false`——现有 spec 的 `view()` 夹具手造对象，
    从没喂过真形状。
-4. **卡按误报归档**：章程的缺陷出口只有 `已修`/`待修`，用 `已修` 会失真声明"修好了"，
-   故照 [BUG-023](BUG-023-cultivation-float-actions-dead.md) 先例走 `已结`
-   → `settled_issues`，并在此记明这一读法。
+4. **卡按误报归档**：章程的缺陷出口只有 `已修`/`待修`，当时判断用 `已修` 会失真声明"修好了"，
+   故照 [BUG-023](BUG-023-cultivation-float-actions-dead.md) 先例走 `已结` → `settled_issues`。
+   **2026-11-09 用户裁定**：误报卡归 [fixed_bugs](README.md)（`status: 已修`）——本卡真价值与防复发判据
+   （`tests/lib/board.spec.ts` 真 wire 形状断言）都已落树，归已修缺陷表；原位置作废。
 
 ### 五、暴露的失败类（这才是本卡的真价值）
 

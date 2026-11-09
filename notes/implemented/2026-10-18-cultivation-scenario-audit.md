@@ -25,7 +25,7 @@
 | S2 校验：拒绝空理由 | ✅ 行内校验提示、命令不发 |
 | S3 规模与长文本 | ✅ 12 条待办 + 60 行正文：折叠后行高 **195px**（修复前 1156px），展开/收起正常 |
 | S4a 窄视口 | ✅ 按钮不重叠、尺寸可点 |
-| S4b 浮窗 | ⚠ **已知缺陷** → [BUG-023](../../_backlog/_archive/settled_issues/BUG-023-cultivation-float-actions-dead.md)（见下） |
+| S4b 浮窗 | ⚠ **已知缺陷** → [BUG-023](../../_backlog/_archive/fixed_bugs/BUG-023-cultivation-float-actions-dead.md)（见下） |
 | S5 跨角色流向 | ✅ CEO 提给 CFO 的建议：`targetRole: cfo`、只在「我提交的」、不进「需要我处理」 |
 | S6 键盘可达 | ✅ 页首 Tab **1 步**进面板内可操作控件；键盘模态下焦点可见（平台全局 `:focus-visible`）；Enter 能真触发采纳 |
 | S7 非公司 preset（PTC/Standard） | ✅ 按"未选角色"处理（**本轮修的**，见下） |
@@ -43,7 +43,7 @@
 ## 当时立卡的那处 → **当日复盘：误报**（教训比 bug 值钱）
 
 当时看到的：浮出后浮窗容器内同名行 **2 份**、逐份 `force` 点击都不生效（记录不翻、行内无回执）。
-立了 [BUG-023](../../_backlog/_archive/settled_issues/BUG-023-cultivation-float-actions-dead.md)（P2，浮窗内动作静默失效）。
+立了 [BUG-023](../../_backlog/_archive/fixed_bugs/BUG-023-cultivation-float-actions-dead.md)（P2，浮窗内动作静默失效）。
 
 **同日澄清：浮窗功能正常，是我的探针/诊断错了三处。** ① 记录 id **跨轮复用**，上一轮采纳留下的 `method-<id>` 没清 ⇒
 这一点「采纳」被 host **明确拒绝**；② 我的判据只查**记录文件状态**（仍 open），没读**行内原话**——而那行原话一直写着
@@ -309,4 +309,4 @@ cultivation_propose 调用：2 次
 ## 指针
 
 - 探针：[cultivation-ux-scenarios.mjs](../../probes/browser-visual/cultivation-ux-scenarios.mjs)（`--shots`）｜顺路档：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough.mjs)
-- 新卡：[BUG-023](../../_backlog/_archive/settled_issues/BUG-023-cultivation-float-actions-dead.md)｜前一轮：[firsttimer-audit](./2026-10-18-cultivation-firsttimer-audit.md)
+- 新卡：[BUG-023](../../_backlog/_archive/fixed_bugs/BUG-023-cultivation-float-actions-dead.md)｜前一轮：[firsttimer-audit](./2026-10-18-cultivation-firsttimer-audit.md)

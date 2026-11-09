@@ -45,4 +45,6 @@
 - **BUG-009**（2026-10-11）：对账回合的行为验证落地（`probes/session-context/reconcile-round-probe.mjs`）：V4 = `no-reconcile`，新场景 = `reconciled`（CEO 双向转述对方数值）。
 - **BUG-012**（2026-10-11）：5 份带「AI 使用声明」的模板各加「复核独立性层级」与「边际宽度」两栏；`tests/content/templates.spec.ts` keyless 断言守（删栏位即红）。行为面等下一份带复核的 final 观察。
 - **BUG-011**（2026-10-11）：派活行扩可选 `｜假设：<待证/内容>` 段（`tools/lib/candidate-scan.mjs` 解析出该字段）；`tests/harness/tools/candidate-scan-labels.spec.ts` 断言新旧行都解析。统计面等下一场派活跑法。
+- **BUG-023**（2026-10-18，2026-11-09 由 `settled_issues` 改归）：查证为**误报**——浮窗功能正常，"点了没反应"来自探针跨轮复用稳定 id 撞上上一轮遗留的 `method-<id>` 目录（host 明确拒绝，行内原话一直在）。修复落在**探针卫生**：每轮唯一 id + 失败路径必读行内原话 + 收尾连方法层残留一起清，改完 S4b 从已知缺陷档恢复硬判并 PASS。详见 [卡](BUG-023-cultivation-float-actions-dead.md)。
+- **BUG-026**（2026-10-19，2026-11-09 由 `settled_issues` 改归）：查证为**误报**——wire 视图 `ownerName` 273/273 齐全，卡读的是 projcache 的 **state** 行（`TeamTaskSnapshot` 本就不含 `ownerName`/`ready`）。修复落在**防复发判据**：`tests/lib/board.spec.ts` 以真 wire 形状断言 owner 解析不丢、非 pending 任务 `ready === false`。失败类 = 读盘上存了什么 ≠ 读消费者那一层。详见 [卡](BUG-026-owner-missing-from-team-projection.md)。
 - **BUG-008**（2026-10-10）：deliverables-check 归档件存量降 `legacy-archive` 观察项（exit 1→0）；原 recon-pack 判据漂移清零。
