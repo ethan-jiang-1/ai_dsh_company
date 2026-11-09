@@ -163,6 +163,9 @@
 | [BUG-046-parent-cannot-verify-child-preset-depth.md](fixed_bugs/BUG-046-parent-cannot-verify-child-preset-depth.md) | `list_subagents` 从 child durable header 暴露 `agentPreset`/`delegationDepth`（十进制字符串），读不到显式 `unavailable`；keyless 红→绿 | 2026-11-09 |
 | [BUG-048-ui-golden-brand-name-drift.md](fixed_bugs/BUG-048-ui-golden-brand-name-drift.md) | 金样随 D14 显示名收窄刷新（`--refresh-golden` 后 `--golden` 绿）；tests/README 的 `src/lib` 读模型行补“显示名 → 同 diff 金样”映射；不升门禁 | 2026-11-09 |
 | [BUG-050-retry-depth-fix-fails-in-real-assembly.md](fixed_bugs/BUG-050-retry-depth-fix-fails-in-real-assembly.md) | 复核为**环境陈旧误报**：dev profile 旧安装副本，`plugin add link:` 当前源码后 CMO depth 2 正常 `depth-exceeded`；教训 = 真入口探针前确认 profile = 当前源码/构建 | 2026-11-09 |
+| [BUG-051-worker-orchestrator-leaf-cap-contract.md](fixed_bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md) | fan-out 改成父代理 brief 预算（模型 `fanOut: parent-brief`，preset 去掉“1–2”硬数字）+ spec 钉文案；4-task 真装配仍 4 leaf（观察） | 2026-11-10 |
+| [BUG-052-worker-leaf-control-surface.md](fixed_bugs/BUG-052-worker-leaf-control-surface.md) | control 工具 per-agent 安装，worker family 不装；真装配 alpha 工具目录 21 个、无 control；sibling 注入仍被运行时拒 | 2026-11-10 |
+| [BUG-053-cancel-does-not-abort-subagent-retry.md](fixed_bugs/BUG-053-cancel-does-not-abort-subagent-retry.md) | `abortable` race + `ctx.subagents.interrupt(child)`；cancel 后 35ms root/child `aborted`、无 sleep 残留；keyless + 真装配 | 2026-11-10 |
 | [BUG-026-owner-missing-from-team-projection.md](fixed_bugs/BUG-026-owner-missing-from-team-projection.md) | 误报证伪（wire 视图 ownerName 齐全，卡读的是 projcache state 行）→ 防复发判据 = `tests/lib/board.spec.ts` 真 wire 形状断言；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-19 |
 | [BUG-023-cultivation-float-actions-dead.md](fixed_bugs/BUG-023-cultivation-float-actions-dead.md) | 误报证伪（浮窗正常；真凶 = 探针跨轮复用 id 撞遗留方法目录）→ 修复落探针卫生，S4b 恢复硬判 PASS；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-18 |
 

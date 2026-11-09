@@ -8,6 +8,8 @@
  *   `maxDepth`；模型 `retrySurface()` 同源）。本工具不另立一份深度预算——BUG-045 的教训：
  *   “普通 spawn 能到多深”与“retry 能到多深”必须是同一个数。CEO/leaf/worker 不挂。
  * - 调用者已在预算底部时不静默起 child：返回 `stopReason: depth-exceeded` + 诊断（attempts 0）。
+ * - 取消（BUG-053）：`exec.signal` abort 时 interrupt child 并返回 `stopReason: 'aborted'`，
+ *   不悬挂到 300s timeout；child 的 durable 终态由引擎写 `aborted(parent)`。
  * - `delivery: 'caller'`：结果只回本次工具调用，不再发完成通知（避免双重投递）。
  * - 不是新引擎：只调官方 `ctx.subagents.startActivation`；不新增调度语义。
  *
@@ -16,6 +18,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { composedPresetOf } from '../prompt/handbook.ts'
+import { abortable } from '../../lib/abortable.ts'
 import { SUBAGENT_RETRY, subagentRetryDecision, type SubagentRetrySurface } from '../../lib/retry-policy.ts'
 
 interface TextBlock {
@@ -47,6 +50,8 @@ interface SubagentsLike {
       readonly maxDepth: number
     }
   }): Promise<ActivationLike>
+  /** 中断一个本 session 的 live child（官方 `ctx.subagents.interrupt`；ancestor 授权）。 */
+  interrupt?(targetSessionId: string, authority: { readonly kind: 'ancestor'; readonly agent: unknown }): void
 }
 
 interface ToolsLike {
@@ -122,6 +127,7 @@ export function registerSubagentRetry(ctx: Context, options: SubagentRetryOption
             + 'Do NOT retry refusal/aborted/completed/max-tokens; do NOT use for non-idempotent writes. '
             + 'The child depth is capped by THIS preset\'s ordinary `subagent` row: when the caller is already at that '
             + 'budget it returns attempts: 0 / stopReason: depth-exceeded with a diagnostic instead of starting a child. '
+            + 'Caller cancellation interrupts the child and returns stopReason: aborted instead of hanging. '
             + 'Returns attempts/childIds/stopReason/exhausted. Blocking — use only for short tasks; long or batch work uses workflow.',
           parameters: {
             prompt: {
@@ -160,6 +166,16 @@ export function registerSubagentRetry(ctx: Context, options: SubagentRetryOption
             if (exec.agent === undefined) {
               return { attempts: 0, childIds: [], stopReason: 'unavailable', exhausted: false, output: '', diagnostic: '需要发起会话（agent）上下文。' }
             }
+            if (exec.signal.aborted) {
+              return {
+                attempts: 0,
+                childIds: [],
+                stopReason: 'aborted',
+                exhausted: false,
+                output: '',
+                diagnostic: 'parent turn already cancelled；未启动 child。',
+              }
+            }
             // 真实调用者优先（exec.agent）；测试/无 session 的桩回落到安装时的 agent。
             const live = exec.agent as AgentLike
             const caller = live.session === undefined ? agent : live
@@ -185,7 +201,7 @@ export function registerSubagentRetry(ctx: Context, options: SubagentRetryOption
               attempt += 1
               let activation: ActivationLike
               try {
-                activation = await subagents.startActivation({
+                activation = await abortable(subagents.startActivation({
                   provider,
                   label: args.description,
                   delivery: 'caller',
@@ -196,15 +212,39 @@ export function registerSubagentRetry(ctx: Context, options: SubagentRetryOption
                     agentPreset: surface.childPreset,
                     maxDepth,
                   },
-                })
+                }), exec.signal, 'subagent start')
               } catch (error) {
+                if (exec.signal.aborted) {
+                  return {
+                    attempts: 0,
+                    childIds,
+                    stopReason: 'aborted',
+                    exhausted: false,
+                    output: '',
+                    diagnostic: 'parent turn cancelled while starting child。',
+                  }
+                }
                 diagnostic = messageOf(error)
                 break
               }
               childIds.push(activation.childId)
               try {
-                last = await activation.result
+                last = await abortable(activation.result, exec.signal, 'subagent result')
               } catch (error) {
+                if (exec.signal.aborted) {
+                  // 取消 parent turn：先中断 child（官方 interrupt，ancestor 授权），再返回可见 aborted。
+                  try {
+                    subagents.interrupt?.(activation.childId, { kind: 'ancestor', agent: exec.agent })
+                  } catch { /* child 已结束/服务未提供：仍返回 aborted，不把取消变成错误 */ }
+                  return {
+                    attempts: attempt,
+                    childIds,
+                    stopReason: 'aborted',
+                    exhausted: false,
+                    output: '',
+                    diagnostic: 'parent turn cancelled；child 已 interrupt，等 durable turn/end aborted(parent)。',
+                  }
+                }
                 diagnostic = messageOf(error)
                 break
               }

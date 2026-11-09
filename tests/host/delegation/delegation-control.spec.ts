@@ -9,6 +9,8 @@
  */
 // 负例留证 2026-11-09：让 readChildTurnState 不返回 durable header 的 preset/depth（或把 rows 初始化成
 // worker/0）⇒「暴露 header 身份」与「缺 header 显式 unavailable」两条红；还原 ⇒ 绿。BUG-046
+// 负例留证 2026-11-10：把 install 的 worker family 过滤去掉（或只跳过 worker）⇒「worker family 不安装
+// control」红（orchestrator 出现 control 名）；还原 ⇒ 绿。BUG-052
 import { describe, expect, it } from 'vitest'
 import { childTurnState, readChildTurnState, registerDelegationControl, subagentRows, terminalOf } from '../../../packages/company-pack/src/host/delegation/delegation-control.ts'
 
@@ -19,11 +21,17 @@ type ToolDefinition = {
   output: { render(args: never, value: never): Array<{ type: string; text: string }> }
 }
 
-function harness(options: { subagents?: unknown; agents?: unknown; agentTeams?: unknown; sessionPersistence?: unknown; warnings?: string[] } = {}) {
+function harness(
+  options: { subagents?: unknown; agents?: unknown; agentTeams?: unknown; sessionPersistence?: unknown; warnings?: string[] } = {},
+  preset: string | undefined = 'vp-eng',
+) {
   const tools = new Map<string, ToolDefinition>()
+  const listeners = new Map<string, ((payload: unknown) => void)[]>()
   const ctx = {
     logger: { warn: (message: string) => { options.warnings?.push(message) } },
-    tools: { register: (definition: ToolDefinition) => { tools.set(definition.name, definition) } },
+    on: (name: string, listener: (payload: unknown) => void) => {
+      listeners.set(name, [...(listeners.get(name) ?? []), listener])
+    },
     get: (name: string) => name === 'subagents' ? options.subagents
       : name === 'agents' ? options.agents
         : name === 'agentTeams' ? options.agentTeams
@@ -31,6 +39,26 @@ function harness(options: { subagents?: unknown; agents?: unknown; agentTeams?: 
             : undefined,
   }
   registerDelegationControl(ctx as never)
+  // control 工具现在是 per-agent 安装（BUG-052）：fake 一个 agent scope，触发 agent/created。
+  const agent = {
+    session: { id: 'parent', ownEvents: () => [] },
+    ctx: {
+      get: (name: string) => name === 'agentPresets' ? { composedPreset: () => preset } : undefined,
+      inject: (_deps: readonly string[], callback: (scope: unknown) => void) => {
+        callback({
+          tools: {
+            register: (definition: ToolDefinition) => {
+              tools.set(definition.name, definition)
+              return () => {}
+            },
+          },
+          effect: (callback: () => () => void) => callback(),
+        })
+        return { dispose: async () => {} }
+      },
+    },
+  }
+  for (const listener of listeners.get('agent/created') ?? []) listener({ agent })
   return tools
 }
 
@@ -63,6 +91,17 @@ describe('delegation control tools', () => {
     expect(list).toContain('`address`')
     expect(list).toContain('teammate')
     expect(tools.get('send_to_subagent')?.description ?? '').toContain('teammate')
+  })
+
+  it('worker family 不安装 control 工具；company 角色保留（BUG-052）', () => {
+    for (const preset of ['worker', 'worker-researcher', 'worker-orchestrator']) {
+      expect([...harness({}, preset).keys()], preset).toEqual([])
+    }
+    for (const preset of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo']) {
+      expect([...harness({}, preset).keys()].sort(), preset).toEqual(['list_subagents', 'send_to_subagent'])
+    }
+    // 未知 preset（非 company 组合）保持旧行为：安装，不因过滤漏掉根会话。
+    expect([...harness({}, undefined).keys()].sort()).toEqual(['list_subagents', 'send_to_subagent'])
   })
 
   it('folds the parent durable catalog last-wins and ignores unrelated events', () => {

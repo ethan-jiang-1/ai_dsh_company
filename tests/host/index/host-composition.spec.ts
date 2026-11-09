@@ -4,7 +4,8 @@
  * 为什么补：`apply()` 此前只用 stub ctx 调（catalog-wiring/apply-rebind），`host/index.ts` 的函数覆盖
  * 37.5%——`ctx.inject` 的等待、注册/卸载的 fiber 语义、`request_signoff` 的无会话守卫都没跑过。
  * 本档用真 `Context` + 假 services（tools/commands/approval/logger）跑真实入口，断言：
- * ① 注册面固定（模型可见工具与命令的名单漂移会红）；② dispose 后注册被摘掉；③ 无 agent 时签字工具
+ * ① 全局注册面固定（模型可见工具与命令的名单漂移会红；`list_subagents`/`send_to_subagent`
+ * 已改 per-agent，见 delegation-control.spec）；② dispose 后注册被摘掉；③ 无 agent 时签字工具
  * 给 `unavailable` 而不是抛错。
  *
  * 不主张：真 profile 装配、真审批应答、真会话日志（那些归 preset-smoke / 真模型档）。
@@ -61,11 +62,11 @@ function mount(): { ctx: Context; tools: Map<string, unknown>; commands: Map<str
 const wait = (): Promise<void> => new Promise(resolve => { setImmediate(resolve) })
 
 describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）', () => {
-  it('注册面固定：六个工具 + 五个命令（名单漂移即红）', async () => {
+  it('全局注册面固定：四个工具 + 五个命令（两个 control 工具改 per-agent；名单漂移即红）', async () => {
     const { ctx, tools, commands } = mount()
     ctx.plugin({ inject: ['tools', 'approval', 'commands'], apply: (scoped: Context) => { apply(scoped, {}) } })
     await wait()
-    expect([...tools.keys()].sort()).toEqual(['cultivation_propose', 'list_subagents', 'request_signoff', 'send_to_subagent', 'workflow_runs', 'workspace_doors'])
+    expect([...tools.keys()].sort()).toEqual(['cultivation_propose', 'request_signoff', 'workflow_runs', 'workspace_doors'])
     expect([...commands.keys()].sort()).toEqual(['company-diagnostics', 'cultivation', 'deliverables', 'prd', 'req'])
     await ctx.fiber.dispose()
   })
@@ -135,7 +136,7 @@ describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）'
     const { ctx, tools, commands } = mount()
     ctx.plugin({ inject: ['tools', 'approval', 'commands'], apply: (scoped: Context) => { apply(scoped, {}) } })
     await wait()
-    expect(tools.size).toBe(6)
+    expect(tools.size).toBe(4)
     await ctx.fiber.dispose()
     expect(tools.size).toBe(0)
     expect(commands.size).toBe(0)

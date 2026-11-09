@@ -1,21 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-09
 ---
 
 # BUG-051：worker-orchestrator 的“1–2 个 leaf”只是 persona——4 件 brief 下实际起 4 个 leaf
 
-> 严重级别：P2（次要）｜发现：2026-11-09｜状态：修复就绪
-> 来源：2026-11-09 修复后第五轮（W5-E）。关联：[worker family 设计 Note](../../notes/implemented/2026-11-09-presets-delegation-model.md)、
-> [worker-workflow no-go](../../notes/archived/2026-11-09-worker-workflow-no-go.md)。
-> 授权：2026-11-10 用户指令「_backlog/bugs 里面还有3个bug，如法炮制……按照我们这个repo的来修复吧……
-> 系统性……而不是一个一个修」——本修复触碰 company-pack 公开行为（preset description/persona）与 docs 合同，
-> 由用户明确指示授权。
-> 修法（2026-11-10 选定）：**诚实声明**，不发明 fan-out 闸——模型 `WORKER_PROFILES` 声明
-> `fanOut: { policy: 'parent-brief', hardMax: null }`（worker/researcher = none）；description/persona
-> 去掉“1–2”硬数字，改为“按 brief 分配，fan-out 预算由父代理决定”；spec 钉文案，真实 4-task
-> 探针保留为观察。与 [BUG-052](BUG-052-worker-leaf-control-surface.md) 同根：声明面/执行面分裂。
+> 严重级别：P2（次要）｜发现：2026-11-09｜状态：已修（2026-11-10：修复就绪 → 修复已落地 → 已修）
+> 来源：2026-11-09 修复后第五轮（W5-E）。关联：[worker family 设计 Note](../../../notes/implemented/2026-11-09-presets-delegation-model.md)、
+> [worker-workflow no-go](../../../notes/archived/2026-11-09-worker-workflow-no-go.md)。
+> 审查：agent — 对照「已修判定」逐条核过；真红→绿与真装配 4-task 观察见「修复落地」。
 
 ## 症状
 
@@ -63,7 +57,7 @@ persona/description 里，模型按 brief 的 4 件任务直接 spawn 4 次，�
 1. VP-Eng root 起一个 `worker-orchestrator`。
 2. brief：4 件独立读文件（fixtures/a,b,c,d 的 version），每件分给一个 leaf，自己汇总。
 3. 观察：orchestrator 起 4 个 leaf（headers 均为 depth 2 / preset worker），没有拒绝或升级。
-4. 对照 [`worker-orchestrator/agent.cordis.yml`](../../packages/company-pack/presets/worker-orchestrator/agent.cordis.yml)
+4. 对照 [`worker-orchestrator/agent.cordis.yml`](../../../packages/company-pack/presets/worker-orchestrator/agent.cordis.yml)
    的 description/persona“1–2 个 leaf”。
 
 关键会话（本地 durable 日志，gitignored）：
@@ -77,7 +71,7 @@ persona/description 里，模型按 brief 的 4 件任务直接 spawn 4 次，�
 
 ## 修复关联
 
-- [`worker-orchestrator/agent.cordis.yml`](../../packages/company-pack/presets/worker-orchestrator/agent.cordis.yml)
+- [`worker-orchestrator/agent.cordis.yml`](../../../packages/company-pack/presets/worker-orchestrator/agent.cordis.yml)
   的 description/persona。
 - `tool-subagent` 行本身没有 child-count 配置；若要做硬上限，需要 host 侧 wrapper / 计数闸，
   或等 vendor 提供 per-tool fan-out cap（不改 `vendor/dsh`）。
@@ -85,7 +79,7 @@ persona/description 里，模型按 brief 的 4 件任务直接 spawn 4 次，�
   并在 policy/skill 写清升级路径；但那就不能再把 1–2 当硬承诺。
 - 测试：若加硬闸，spec 断言第 3 个 child 被拒绝/可见诊断；若只改文案，spec 断言 description/persona
   不再承诺硬数字，并保留真实 4-task 探针作为行为观察。
-- 与 [BUG-050](../_archive/fixed_bugs/BUG-050-retry-depth-fix-fails-in-real-assembly.md) 的教训一致：
+- 与 [BUG-050](BUG-050-retry-depth-fix-fails-in-real-assembly.md) 的教训一致：
   真模型探针要覆盖“模型按 brief 压能力面”的形状，不能只测 happy path。
 
 ## 已修判定
@@ -96,3 +90,21 @@ persona/description 里，模型按 brief 的 4 件任务直接 spawn 4 次，�
   2. **改承诺**：description/persona/policy 不再写“带 1–2 个”，改为“按 brief 分配，父代理负责
      fan-out 预算”，并有 spec 钉文案；真实 4-task 观察保留，不把 4 leaf 当故障。
 - 无论哪条，都要有一条真实 4-task 探针记录实际 fan-out，避免“文案改了、行为没测”。
+
+## 修复落地（2026-11-10，选 2 = 改承诺）
+
+- **模型**：[`delegation-model.mjs`](../../../tools/lib/delegation-model.mjs) 的 `WORKER_PROFILES`
+  增 `fanOut`：worker/researcher `{ policy: 'none' }`，orchestrator
+  `{ policy: 'parent-brief', hardMax: null }`；`modelProblems()` 拒绝 `parent-brief` 带数字。
+- **文案**：worker-orchestrator 的 description/persona/头注去掉“1–2 个”，改为“按 brief 分配，
+  件数与 fan-out 预算由父代理决定”；不发明 child-count 硬闸（vendor 无 per-tool cap）。
+- **spec**：`delegation-model.spec.ts` 钉 fanOut 策略；`delegation-composition.spec.ts` 读
+  description/persona，断言不再出现 `1–2` 且写了“按 brief/父代理”。
+- **文档/技能**：`docs/presets.md`、`docs/delegation.md`、delegation-policy §8、`eng-teaming`
+  第 2 档、旧模型 Note §2 同口径。
+- **真红→绿**：`fanOut.hardMax` 改成 2 + description 写回“1–2” ⇒ 3 failed；还原 ⇒ 28 passed。
+- **真装配 4-task 观察**：`wave5-orchestrator-cap`（VP `session-bb793ff1-…`、orchestrator
+  `2f0ca87e-…`）仍起 **4 个 leaf**（depth 2 / worker），符合“父代理 brief 决定”的诚实声明；
+  不再把 4 当故障。
+- **全量**：`pnpm verify` / `pnpm test` / `pnpm typecheck` / `pnpm lint` / `pnpm dup` 绿（同提交）。
+- 决定与输掉的方案 = [capability surface Note](../../../notes/implemented/2026-11-10-capability-surface-enforcement.md)。

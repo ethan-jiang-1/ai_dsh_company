@@ -1,3 +1,5 @@
+// 负例留证 2026-11-10：把 worker-orchestrator 的 description/persona 写回「1–2 个 leaf」⇒
+// 「fan-out 不承诺硬数字」用例红；还原 ⇒ 绿。BUG-051
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -156,6 +158,16 @@ describe('delegation composition：YAML 是模型的投影', () => {
       dsh?: { bundle?: { patch?: readonly string[] } }
     }).dsh?.bundle?.patch ?? []
     expect(patch).toContain('./presets/worker/agent.cordis.yml')
+  })
+
+  it('worker-orchestrator：fan-out 不承诺硬数字，文案按父代理 brief（BUG-051）', () => {
+    const doc = loadPresetDoc('worker-orchestrator')
+    const description = doc.description ?? ''
+    const persona = String(pluginConfig(rowById(doc, 'persona')).prefix ?? '')
+    for (const [label, text] of [['description', description], ['persona', persona]] as const) {
+      expect(text, `${label} 仍在承诺 1–2`).not.toMatch(/1[–-]2/)
+      expect(text, `${label} 缺父代理 brief 口径`).toMatch(/按 brief|父代理/)
+    }
   })
 
   it('worker-orchestrator：一条 spawn 行钉 leaf worker；没有 team/workflow/control/ask-user/present/skill', () => {

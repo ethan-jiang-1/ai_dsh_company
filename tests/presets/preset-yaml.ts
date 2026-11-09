@@ -34,12 +34,14 @@ export interface PresetDoc {
   readonly id: string
   readonly plugins: readonly PresetPlugin[]
   readonly raw: string
+  /** preset 行自己的 description（模型可见的 profile 描述；BUG-051 的文案守卫读它）。 */
+  readonly description?: string
 }
 
 interface PresetFile {
   readonly insert?: readonly {
     readonly name?: string
-    readonly config?: { readonly id?: string; readonly plugins?: readonly PresetPlugin[] }
+    readonly config?: { readonly id?: string; readonly description?: string; readonly plugins?: readonly PresetPlugin[] }
   }[]
 }
 
@@ -51,7 +53,12 @@ export function loadPresetDoc(id: string): PresetDoc {
   const row = docs?.[0]?.insert?.find(item => item?.name === '@deepseek-ai/dsh-agent-preset')
   if (row?.config?.id !== id) throw new Error(`${id}: 缺 dsh-agent-preset 行或 config.id 不匹配`)
   if (!Array.isArray(row.config.plugins)) throw new Error(`${id}: config.plugins 不是数组`)
-  return { id, plugins: row.config.plugins, raw }
+  return {
+    id,
+    plugins: row.config.plugins,
+    raw,
+    ...(typeof row.config.description === 'string' ? { description: row.config.description } : {}),
+  }
 }
 
 /** 递归展开 group 行（`config` 是数组时才是子行）。 */

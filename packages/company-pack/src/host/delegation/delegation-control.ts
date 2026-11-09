@@ -15,13 +15,17 @@
  * subagent + 寻址：team 名 / session id）。**引擎身份**（preset / 委派深度）来自同一次
  * `sessionPersistence.open()` 的 durable header（BUG-046）：`agentPreset` / `delegationDepth`
  * 读不到时输出 `unavailable`（可见降级，不默认 worker/0）。承诺字段不静默省略：读不到时输出
- * `lastTurnEnd: 'unavailable'`。已知边界：只给 reason.kind（如 `interrupted`），不给错过的通知内容。
+ * `lastTurnEnd: 'unavailable'`。工具是 **per-agent 安装**的：worker family（声明无 control）不装，
+ * full role / CEO / 未知 preset 保留（BUG-052）。已知边界：只给 reason.kind（如 `interrupted`），
+ * 不给错过的通知内容。
  *
  * 退役条件：上游让根会话拿到全局控制名（team shadow 修复）后，本工具删除；
  * 检测锚点 = `tests/host/delegation/delegation-control.spec.ts` 与台账 `[CT-LIFE]`。
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
+import { composedPresetOf } from '../prompt/handbook.ts'
+import { WORKER_FAMILY_PRESETS } from '../../lib/delegation-surface.ts'
 
 /** 父会话 durable catalog 里的 `subagent/catalog` 事件（只取本模块用到的字段）。 */
 interface CatalogEvent {
@@ -54,7 +58,18 @@ interface SessionLike {
 }
 
 interface AgentLike {
+  readonly ctx: Context
   session: SessionLike
+}
+
+/** 受控 scope 的 tools 面（per-agent 安装；与 `subagent-retry` 同模式）。 */
+interface ToolsLike {
+  register(tool: unknown): () => void
+}
+
+interface ToolScopeLike {
+  readonly tools?: ToolsLike
+  effect(callback: () => () => void): void
 }
 
 interface TeamMemberLike {
@@ -245,168 +260,199 @@ export function subagentRows(
   return [...rows.values()]
 }
 
-/** 注册两个控制工具；服务缺席时 execute 报明确错误，而不是静默无操作。 */
+/**
+ * 注册两个控制工具；**per-agent 安装**（BUG-052）：worker family 的声明里没有 control 面，
+ * 所以不装；full role / CEO / 未知 preset 保留。服务缺席时 execute 报明确错误，而不是静默无操作。
+ */
 export function registerDelegationControl(ctx: Context): void {
   const statusOf = (id: string): 'running' | 'inactive' => {
     const agents = ctx.get('agents') as AgentsLike | undefined
     return agents?.get(id)?.status === 'running' ? 'running' : 'inactive'
   }
 
-  ctx.tools.register(defineTool({
-    name: 'list_subagents',
-    description: 'List the children THIS session started, from the session\'s durable catalog (the list '
-      + 'survives a host restart). Every row carries `role` and `address`: `teammate` rows are Team roster '
-      + 'members — address them with the team `send_message` by `address` (their team name); `subagent` rows '
-      + 'are plain/named subagent children — address them with `send_to_subagent` by `address` (their session '
-      + 'id). Use it when the team-scoped `list_agents` only returns roster members and you need the non-roster '
-      + 'children too. `running` means the child is working; `inactive` means it is '
-      + 'not currently working. `lastTurnEnd` is the reason its durable log recorded for the last turn '
-      + '(e.g. `interrupted` after a host restart, `completed`); it is `unavailable` when the log cannot be '
-      + 'read (visible degradation, never silently omitted); `lastTurnEndDetail` names the short reason then. '
-      + 'An inactive child whose durable log has an open turn (started, never ended — e.g. the host was killed) '
-      + 'is reported as `interrupted` with `lastTurnEndDetail: inferred-open-turn`; `none` means no open turn. '
-      + 'An `interrupted` child never sends a completion notice: continue it with `send_to_subagent` or report the gap. '
-      + 'Every row also carries the engine-applied identity from the child durable header: `agentPreset` and '
-      + '`delegationDepth` (a decimal string such as "3"). Use them to verify the preset/depth the engine actually '
-      + 'applied instead of trusting the child\'s self-report. Both are `unavailable` when the durable log cannot be '
-      + 'read — they are never guessed as `worker` or 0; `identityDetail` names the short reason then.',
-    parameters: {},
-    output: {
-      schema: {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          subagents: {
-            type: 'array',
-            required: true,
-            items: {
+  const fibers = new Map<AgentLike, ReturnType<Context['inject']>>()
+
+  const install = (agent: AgentLike): void => {
+    if (fibers.has(agent)) return
+    const preset = composedPresetOf(agent.ctx)
+    // worker family 的声明里没有 control 面：host 不能靠全局注册绕过它（BUG-052）。
+    if (preset !== undefined && (WORKER_FAMILY_PRESETS as readonly string[]).includes(preset)) return
+    const fiber = agent.ctx.inject(['tools'], scope => {
+      const scoped = scope as unknown as ToolScopeLike
+      const tools = scoped.tools
+      if (tools === undefined) return
+      scoped.effect(() => {
+        const unregisterList = tools.register(defineTool({
+          name: 'list_subagents',
+          description: 'List the children THIS session started, from the session\'s durable catalog (the list '
+            + 'survives a host restart). Every row carries `role` and `address`: `teammate` rows are Team roster '
+            + 'members — address them with the team `send_message` by `address` (their team name); `subagent` rows '
+            + 'are plain/named subagent children — address them with `send_to_subagent` by `address` (their session '
+            + 'id). Use it when the team-scoped `list_agents` only returns roster members and you need the non-roster '
+            + 'children too. `running` means the child is working; `inactive` means it is '
+            + 'not currently working. `lastTurnEnd` is the reason its durable log recorded for the last turn '
+            + '(e.g. `interrupted` after a host restart, `completed`); it is `unavailable` when the log cannot be '
+            + 'read (visible degradation, never silently omitted); `lastTurnEndDetail` names the short reason then. '
+            + 'An inactive child whose durable log has an open turn (started, never ended — e.g. the host was killed) '
+            + 'is reported as `interrupted` with `lastTurnEndDetail: inferred-open-turn`; `none` means no open turn. '
+            + 'An `interrupted` child never sends a completion notice: continue it with `send_to_subagent` or report the gap. '
+            + 'Every row also carries the engine-applied identity from the child durable header: `agentPreset` and '
+            + '`delegationDepth` (a decimal string such as "3"). Use them to verify the preset/depth the engine actually '
+            + 'applied instead of trusting the child\'s self-report. Both are `unavailable` when the durable log cannot be '
+            + 'read — they are never guessed as `worker` or 0; `identityDetail` names the short reason then.',
+          parameters: {},
+          output: {
+            schema: {
               type: 'object',
               additionalProperties: false,
               properties: {
-                id: { type: 'string', required: true },
-                label: { type: 'string' },
-                mode: { type: 'string' },
-                status: { type: 'string', required: true },
-                role: { type: 'string', required: true },
-                address: { type: 'string', required: true },
-                lastTurnEnd: { type: 'string', required: true },
-                lastTurnEndDetail: { type: 'string' },
-                agentPreset: { type: 'string', required: true },
-                delegationDepth: { type: 'string', required: true },
-                identityDetail: { type: 'string' },
+                subagents: {
+                  type: 'array',
+                  required: true,
+                  items: {
+                    type: 'object',
+                    additionalProperties: false,
+                    properties: {
+                      id: { type: 'string', required: true },
+                      label: { type: 'string' },
+                      mode: { type: 'string' },
+                      status: { type: 'string', required: true },
+                      role: { type: 'string', required: true },
+                      address: { type: 'string', required: true },
+                      lastTurnEnd: { type: 'string', required: true },
+                      lastTurnEndDetail: { type: 'string' },
+                      agentPreset: { type: 'string', required: true },
+                      delegationDepth: { type: 'string', required: true },
+                      identityDetail: { type: 'string' },
+                    },
+                  },
+                },
               },
             },
+            render: (_args, value) => [{ type: 'text', text: JSON.stringify(value, null, 2) }],
           },
-        },
-      },
-      render: (_args, value) => [{ type: 'text', text: JSON.stringify(value, null, 2) }],
-    },
-    async execute(_args, exec) {
-      const agent = exec.agent as AgentLike | undefined
-      if (agent === undefined) throw new Error('list_subagents requires a calling agent')
-      // 身份：team 成员标 role/address；没有 team 服务或非 Lead 时全部按 subagent（不隐藏任何 child）。
-      const teammateByName = new Map<string, string>()
-      try {
-        const teams = ctx.get('agentTeams') as AgentTeamsLike | undefined
-        if (teams?.tryMembership(agent) !== undefined) {
-          for (const member of teams.listMembers(agent)) {
-            if (member.role === 'teammate') teammateByName.set(String(member.id), member.name)
-          }
-        }
-      } catch { /* no team context; every child is a plain subagent */ }
-      const roleOf = (id: string): ChildIdentity => teammateByName.has(id)
-        ? { role: 'teammate', address: teammateByName.get(id) as string }
-        : { role: 'subagent', address: id }
-      const rows = subagentRows(agent.session.ownEvents(), statusOf, roleOf)
-      // 终态读 root 的 sessionPersistence（不用 isolate 组里的 sessionQuery）；读不到就**可见降级**。
-      const persistence = ctx.get('sessionPersistence') as SessionPersistenceLike | undefined
-      await Promise.all(rows.map(async row => {
-        if (persistence === undefined) {
-          row.lastTurnEnd = 'unavailable'
-          return
-        }
-        // 宿主刚重启时 durable 根可能还在 settle（首次读偶发失败，C2 实测）；有界重试，
-        // 仍失败则**可见降级**并留一条 warn 供诊断——不静默、不无限重试。
-        let lastError: unknown
-        for (let attempt = 0; attempt < 3; attempt += 1) {
-          try {
-            const state = await readChildTurnState(persistence, row.id, exec.signal)
-            // 同一次 durable 读也带回 header 身份：preset/depth 是引擎写入的事实。
-            if (state.agentPreset !== undefined) row.agentPreset = state.agentPreset
-            if (state.delegationDepth !== undefined) row.delegationDepth = String(state.delegationDepth)
-            if (state.terminal !== undefined) {
-              row.lastTurnEnd = state.terminal
-            } else if (state.openTurn && row.status === 'inactive') {
-              // durable signature of a host kill: turn started, never ended, child not running
-              row.lastTurnEnd = 'interrupted'
-              row.lastTurnEndDetail = 'inferred-open-turn'
-            } else if (state.openTurn) {
-              row.lastTurnEnd = 'none'
-              row.lastTurnEndDetail = 'turn-in-progress'
-            } else {
-              row.lastTurnEnd = 'none'
-              row.lastTurnEndDetail = 'no-turn-recorded'
-            }
-            return
-          } catch (error) {
-            lastError = error
-            if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 50 * (attempt + 1)))
-          }
-        }
-        row.lastTurnEnd = 'unavailable'
-        row.lastTurnEndDetail = readErrorDetail(lastError)
-        row.identityDetail = readErrorDetail(lastError)
-        ;(ctx as unknown as { logger?: { warn(message: string): void } }).logger?.warn(
-          `list_subagents: cannot read durable log for ${row.id}: ${String(lastError)}`,
-        )
-      }))
-      return { subagents: rows }
-    },
-  }))
+          async execute(_args, exec) {
+            const agent = exec.agent as AgentLike | undefined
+            if (agent === undefined) throw new Error('list_subagents requires a calling agent')
+            // 身份：team 成员标 role/address；没有 team 服务或非 Lead 时全部按 subagent（不隐藏任何 child）。
+            const teammateByName = new Map<string, string>()
+            try {
+              const teams = ctx.get('agentTeams') as AgentTeamsLike | undefined
+              if (teams?.tryMembership(agent) !== undefined) {
+                for (const member of teams.listMembers(agent)) {
+                  if (member.role === 'teammate') teammateByName.set(String(member.id), member.name)
+                }
+              }
+            } catch { /* no team context; every child is a plain subagent */ }
+            const roleOf = (id: string): ChildIdentity => teammateByName.has(id)
+              ? { role: 'teammate', address: teammateByName.get(id) as string }
+              : { role: 'subagent', address: id }
+            const rows = subagentRows(agent.session.ownEvents(), statusOf, roleOf)
+            // 终态读 root 的 sessionPersistence（不用 isolate 组里的 sessionQuery）；读不到就**可见降级**。
+            const persistence = ctx.get('sessionPersistence') as SessionPersistenceLike | undefined
+            await Promise.all(rows.map(async row => {
+              if (persistence === undefined) {
+                row.lastTurnEnd = 'unavailable'
+                return
+              }
+              // 宿主刚重启时 durable 根可能还在 settle（首次读偶发失败，C2 实测）；有界重试，
+              // 仍失败则**可见降级**并留一条 warn 供诊断——不静默、不无限重试。
+              let lastError: unknown
+              for (let attempt = 0; attempt < 3; attempt += 1) {
+                try {
+                  const state = await readChildTurnState(persistence, row.id, exec.signal)
+                  // 同一次 durable 读也带回 header 身份：preset/depth 是引擎写入的事实。
+                  if (state.agentPreset !== undefined) row.agentPreset = state.agentPreset
+                  if (state.delegationDepth !== undefined) row.delegationDepth = String(state.delegationDepth)
+                  if (state.terminal !== undefined) {
+                    row.lastTurnEnd = state.terminal
+                  } else if (state.openTurn && row.status === 'inactive') {
+                    // durable signature of a host kill: turn started, never ended, child not running
+                    row.lastTurnEnd = 'interrupted'
+                    row.lastTurnEndDetail = 'inferred-open-turn'
+                  } else if (state.openTurn) {
+                    row.lastTurnEnd = 'none'
+                    row.lastTurnEndDetail = 'turn-in-progress'
+                  } else {
+                    row.lastTurnEnd = 'none'
+                    row.lastTurnEndDetail = 'no-turn-recorded'
+                  }
+                  return
+                } catch (error) {
+                  lastError = error
+                  if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 50 * (attempt + 1)))
+                }
+              }
+              row.lastTurnEnd = 'unavailable'
+              row.lastTurnEndDetail = readErrorDetail(lastError)
+              row.identityDetail = readErrorDetail(lastError)
+              ;(ctx as unknown as { logger?: { warn(message: string): void } }).logger?.warn(
+                `list_subagents: cannot read durable log for ${row.id}: ${String(lastError)}`,
+              )
+            }))
+            return { subagents: rows }
+          },
+        }))
 
-  ctx.tools.register(defineTool({
-    name: 'send_to_subagent',
-    description: 'Send a message to a subagent child THIS session started, or continue its conversation '
-      + '(an idle child starts a new turn). Use it when the team-scoped `send_message` reports '
-      + '"active teammate not found": named and generic subagent children are not team roster members, so '
-      + 'the team-scoped name cannot reach them. For a `role: teammate` row from list_subagents use the team '
-      + '`send_message` by team name instead. Returns delivery confirmation, not the child\'s answer. '
-      + 'One-shot children reject continuation.',
-    parameters: {
-      subagent_id: {
-        type: 'string',
-        required: true,
-        description: 'The child session id, as returned by list_subagents or by the start receipt.',
-      },
-      message: {
-        type: 'string',
-        required: true,
-        description: 'The message to deliver to the child.',
-      },
-    },
-    output: {
-      schema: {
-        type: 'object',
-        additionalProperties: false,
-        properties: { messageId: { type: 'string', required: true } },
-      },
-      render: (args, _value) => [{
-        type: 'text',
-        text: `message delivered to subagent ${args.subagent_id}`,
-      }],
-    },
-    async execute(args, exec) {
-      const agent = exec.agent
-      if (agent === undefined) throw new Error('send_to_subagent requires a calling agent')
-      const subagents = ctx.get('subagents') as SubagentsLike | undefined
-      if (subagents === undefined) throw new Error('send_to_subagent requires the subagents service')
-      const messageId = await subagents.sendMessage(
-        agent,
-        args.subagent_id,
-        [{ type: 'text', text: args.message }],
-        { signal: exec.signal },
-      )
-      return { messageId: String(messageId) }
-    },
-  }))
+
+        const unregisterSend = tools.register(defineTool({
+          name: 'send_to_subagent',
+          description: 'Send a message to a subagent child THIS session started, or continue its conversation '
+            + '(an idle child starts a new turn). Use it when the team-scoped `send_message` reports '
+            + '"active teammate not found": named and generic subagent children are not team roster members, so '
+            + 'the team-scoped name cannot reach them. For a `role: teammate` row from list_subagents use the team '
+            + '`send_message` by team name instead. Returns delivery confirmation, not the child\'s answer. '
+            + 'One-shot children reject continuation.',
+          parameters: {
+            subagent_id: {
+              type: 'string',
+              required: true,
+              description: 'The child session id, as returned by list_subagents or by the start receipt.',
+            },
+            message: {
+              type: 'string',
+              required: true,
+              description: 'The message to deliver to the child.',
+            },
+          },
+          output: {
+            schema: {
+              type: 'object',
+              additionalProperties: false,
+              properties: { messageId: { type: 'string', required: true } },
+            },
+            render: (args, _value) => [{
+              type: 'text',
+              text: `message delivered to subagent ${args.subagent_id}`,
+            }],
+          },
+          async execute(args, exec) {
+            const agent = exec.agent
+            if (agent === undefined) throw new Error('send_to_subagent requires a calling agent')
+            const subagents = ctx.get('subagents') as SubagentsLike | undefined
+            if (subagents === undefined) throw new Error('send_to_subagent requires the subagents service')
+            const messageId = await subagents.sendMessage(
+              agent,
+              args.subagent_id,
+              [{ type: 'text', text: args.message }],
+              { signal: exec.signal },
+            )
+            return { messageId: String(messageId) }
+          },
+        }))
+
+        return () => { unregisterList(); unregisterSend() }
+      })
+    })
+    fibers.set(agent, fiber)
+  }
+
+  ctx.on('agent/created', payload => { install(payload.agent as unknown as AgentLike) })
+  ctx.on('agent/disposed', payload => {
+    const agent = payload.agent as unknown as AgentLike
+    const fiber = fibers.get(agent)
+    if (fiber === undefined) return
+    fibers.delete(agent)
+    void fiber.dispose().catch(() => {})
+  })
 }

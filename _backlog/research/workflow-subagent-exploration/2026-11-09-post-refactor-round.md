@@ -372,7 +372,7 @@ error/interrupted/live retry（不可确定性注入）；depth 4 负例；`suba
 ### 9.7 第五轮：修复后探索（2026-11-09 夜）
 
 > 用户 2026-11-09 晚：不要只验收，继续往前探。小预算 wave：约 15 分钟 / 6 parent turns / 8 children；
-> 证据在 `runtime/tmp/explore/round4/wave5-*`。**本轮新发现 1 张 P2：** [BUG-051](../../bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（worker-orchestrator 的 1–2 leaf 只是 persona，4 件 brief 起 4 个 leaf）。其余 charter PASS。
+> 证据在 `runtime/tmp/explore/round4/wave5-*`。**本轮新发现 1 张 P2：** [BUG-051](../../_archive/fixed_bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（worker-orchestrator 的 1–2 leaf 只是 persona，4 件 brief 起 4 个 leaf）。其余 charter PASS。
 
 | ID | charter | 观察 | 判定 |
 |---|---|---|---|
@@ -394,7 +394,7 @@ coo/cfo root 的逐个采用；长期采纳率 / workspace-write / release-smoke
 ### 9.8 第六轮：能力边界（2026-11-09 夜）
 
 > 小预算：约 12 分钟 / 5 parent turns / 6 children；证据 `runtime/tmp/explore/round4/wave6-*`。
-> **新发现 1 张 P2：** [BUG-052](../../bugs/BUG-052-worker-leaf-control-surface.md)。
+> **新发现 1 张 P2：** [BUG-052](../../_archive/fixed_bugs/BUG-052-worker-leaf-control-surface.md)。
 
 | ID | charter | 观察 | 判定 |
 |---|---|---|---|

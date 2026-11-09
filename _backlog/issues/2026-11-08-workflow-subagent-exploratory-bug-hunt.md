@@ -95,6 +95,15 @@ dev profile 旧安装副本导致的假阳性**，已迁 `fixed_bugs`。继续�
 | [BUG-047](../_archive/fixed_bugs/BUG-047-worker-family-handbook-scope.md) | B family 边界按 ID 白名单 | [handbook Note](../../notes/implemented/2026-11-09-handbook-worker-family.md) |
 | [BUG-046](../_archive/fixed_bugs/BUG-046-parent-cannot-verify-child-preset-depth.md) | C 可见面窄于引擎语义 | [identity Note](../../notes/implemented/2026-11-09-subagent-identity-observable.md) |
 | [BUG-048](../_archive/fixed_bugs/BUG-048-ui-golden-brand-name-drift.md) | D 验收资产未同 diff 刷新 | 卡内 + `tests/README.md` 映射 |
+| [BUG-051](../_archive/fixed_bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（P2） | E 声明面/执行面分裂（过度承诺） | [capability surface Note](../../notes/implemented/2026-11-10-capability-surface-enforcement.md) |
+| [BUG-052](../_archive/fixed_bugs/BUG-052-worker-leaf-control-surface.md)（P2） | E 声明面/执行面分裂（漏声明） | 同上 |
+| [BUG-053](../_archive/fixed_bugs/BUG-053-cancel-does-not-abort-subagent-retry.md)（P1） | F 阻塞原语没有取消语义 | [cancellation Note](../../notes/implemented/2026-11-10-blocking-tool-cancellation.md) |
+
+**2026-11-10 修复收口（E/F）**：第五/六/七轮新发现的 051/052/053 已按根因分两组修复归档——
+E = control 工具 per-agent 安装（worker family 不装）+ fan-out 改成父代理 brief 预算（preset 去掉
+“1–2”硬数字，spec 钉文案）；F = `abortable` + `ctx.subagents.interrupt(child)`，cancel 后 35ms
+root/child `aborted`、无 sleep 残留。真装配探针另证：只跑 `tsc -b` 不更新 `lib/index.js`，必须
+`tsdown` 重建 bundle（BUG-050 同型教训）。剩余探索面不变。
 
 剩余探索面 = long-term adoption / workspace-write / 真页面图 / 其他职能逐个采用 retry / 重启后身份行。
 用户 2026-11-09 晚已点名继续探索，本卡回 `推敲中`；上述未覆盖项是下一轮候选，不写“没有 bug”。
@@ -369,7 +378,7 @@ error/interrupted live retry、depth 4 等（见研究材料 §9.4/§9.6）。
 | W5-E orchestrator 上限 | VP→worker-orchestrator(1)，4 件独立读文件 brief → 实际起 **4 个 leaf**（depth 2 / worker）；preset 写“1–2 个 leaf” | **BUG-051（P2）**：preset 承诺与能力面不一致；设计 Note 明说 1–2 只是 persona |
 | W5-F 通用 child 深度边界 | vp-sales root→generic child(1)→generic child(2) 调 retry：attempts 0 / `depth-exceeded` / 无 worker；预算 2 | **PASS**（修复对继承 vp-sales 的 generic child 也生效） |
 
-**新缺陷：** [BUG-051](../bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（P2，worker-orchestrator 的 1–2 leaf 只是 persona）。
+**新缺陷：** [BUG-051](../_archive/fixed_bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（P2，worker-orchestrator 的 1–2 leaf 只是 persona）。
 **观察**：workflow 分支可调 retry 生成 depth 2/3 worker，与“分支默认叶子”的 prose 有张力，但不是新机制；
 DagTab 真页面图、depth 4、真实 error live retry 仍未覆盖。
 
@@ -384,7 +393,7 @@ DagTab 真页面图、depth 4、真实 error live retry 仍未覆盖。
 | W6-B teammate 重启身份 | VP root 起 teammate → 停宿主 → 同 home 重启 → `list_subagents` | 行仍 `role: teammate` / `address: restart-team` / `agentPreset: vp-eng` / `delegationDepth: "1"` / `completed`。**PASS** |
 | W6-C CMO 重启深度 | CEO→VP(1)→CMO(2) → 停宿主 → 重启 → CMO 调 `subagent_retry` | 仍 `attempts: 0` / `depth-exceeded` / 无 worker。**PASS**（冷恢复后深度门仍生效） |
 
-**新缺陷：** [BUG-052](../bugs/BUG-052-worker-leaf-control-surface.md)（P2，leaf 控制面可见）。
+**新缺陷：** [BUG-052](../_archive/fixed_bugs/BUG-052-worker-leaf-control-surface.md)（P2，leaf 控制面可见）。
 **观察**：W6-A 的 sibling 注入被运行时按 parent ownership 拒绝；`list_subagents` 在 leaf 里为空；
 不是跨 parent 越权，但 preset 的“无 control”文案与工具面不一致。W6-B/C 说明 restart 对 teammate 身份与
 CMO 深度门都正确。
@@ -403,7 +412,7 @@ CMO 深度门都正确。
 | W7-F 重启后 retry 正样本 | VP root `subagent_retry` → 停宿主 → 重启 → 再次 `subagent_retry` | 重启前 child `19f9f31d…` / first-ok；重启后新 child `9495ee5b…` / second-ok / depth 1 / worker，attempts 1。**PASS**（冷恢复后 `subagent_retry` 仍能新起 child，不复用旧结果） |
 | W7-G retry child 跨宿主重启 | VP root `subagent_retry` 起 `bash sleep 117` worker；宿主 SIGTERM → 重启 | root `turn/end interrupted`；child `turn/end interrupted`；retry tool call 无原 result，宿主注入“outcome unknown / 按幂等性决定是否重试”的诊断；`list_subagents` 行 `lastTurnEnd: interrupted` / `worker` / depth 1 / `inferred-open-turn`。**PASS**（与 BUG-053 的 cancel 不同：宿主重启有 interrupted 终态与诊断；不是新 bug） |
 
-**新缺陷：** [BUG-053](../bugs/BUG-053-cancel-does-not-abort-subagent-retry.md)（P1，取消不中止阻塞 retry child）。
+**新缺陷：** [BUG-053](../_archive/fixed_bugs/BUG-053-cancel-does-not-abort-subagent-retry.md)（P1，取消不中止阻塞 retry child）。
 **观察**：旧 R8 的 workflow 取消是 PASS；`subagent_retry` 是同步等待 child 的 host 原语，取消没有传播到
 `activation.result`/child；这是与旧 R8 不同的一条路。
 

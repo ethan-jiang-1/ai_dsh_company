@@ -71,6 +71,10 @@ export const CHANNELS = {
 /**
  * worker family（不是“一个 worker”）。默认最窄 leaf；需要子层时显式升级。
  * `status`：implemented = 随包发布；当前没有 planned profile（worker-workflow no-go）。
+ *
+ * `fanOut` 是**声明策略**，不是硬闸（BUG-051）：worker/researcher 没有子代；
+ * orchestrator 的件数由父代理 brief 决定，不承诺硬上限——preset 的 description/persona 不得写
+ * “1–2 个 leaf”这类硬数字（spec 钉文案）；要硬上限得先有 vendor 的 per-tool child cap。
  */
 export const WORKER_PROFILES = {
   worker: {
@@ -79,6 +83,7 @@ export const WORKER_PROFILES = {
     status: 'implemented',
     channels: [],
     depthBudget: 0,
+    fanOut: { policy: 'none' },
     capabilities: ['fs', 'bash', 'web', 'todo', 'compaction'],
     contracts: [],
     exposure: 'generic',
@@ -89,6 +94,7 @@ export const WORKER_PROFILES = {
     status: 'implemented',
     channels: [],
     depthBudget: 0,
+    fanOut: { policy: 'none' },
     capabilities: ['fs-readonly', 'fs-search', 'web', 'todo'],
     contracts: [],
     exposure: 'named',
@@ -99,6 +105,7 @@ export const WORKER_PROFILES = {
     status: 'implemented',
     channels: ['spawn'],
     depthBudget: 1,
+    fanOut: { policy: 'parent-brief', hardMax: null },
     capabilities: ['fs', 'bash', 'web', 'todo', 'compaction', 'spawn'],
     contracts: ['engine.subagent'],
     exposure: 'generic',
@@ -437,6 +444,13 @@ export function modelProblems() {
     }
     for (const contract of profile.contracts) {
       if (CONTRACTS[contract] === undefined) problems.push(`worker profile ${id}: 未知合同 ${contract}`)
+    }
+    const fanOut = profile.fanOut
+    if (!['none', 'parent-brief'].includes(fanOut?.policy)) {
+      problems.push(`worker profile ${id}: 未知 fanOut 策略 ${String(fanOut?.policy)}`)
+    }
+    if (fanOut?.policy === 'parent-brief' && fanOut.hardMax !== null) {
+      problems.push(`worker profile ${id}: parent-brief 必须 hardMax=null（没有硬闸就别声明数字）`)
     }
   }
   for (const [id, contract] of Object.entries(CONTRACTS)) {

@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-051 / BUG-052**（2026-11-10，同一根因：声明面/执行面分裂）：051 = `worker-orchestrator` 的 description/persona 写“1–2 个 leaf”，运行面只有 depth、没有 child-count 闸（4 件 brief 起 4 个 leaf）；052 = host 全局注册的 `list_subagents`/`send_to_subagent` 绕过 worker leaf 的“无 control”声明。修法 = 051 诚实声明（模型 `fanOut: parent-brief, hardMax: null`，preset 去掉硬数字，spec 钉文案）；052 硬过滤（control 工具 per-agent 安装，跳过 `WORKER_FAMILY_PRESETS`；full role/CEO/未知 preset 保留）。真装配：alpha `request/header` 21 tools、无 control，模型自报缺工具；4-task orchestrator 仍 4 leaf（观察，不把 4 当故障）。红→绿：052 过滤收窄 ⇒ 1 failed；051 fanOut/文案改回 ⇒ 3 failed；还原全绿。详见 [BUG-051](BUG-051-worker-orchestrator-leaf-cap-contract.md) / [BUG-052](BUG-052-worker-leaf-control-surface.md) 与 [Note](../../../notes/implemented/2026-11-10-capability-surface-enforcement.md)。
+
+- **BUG-053**（2026-11-10，P1）：cancel parent turn 不能中止 `subagent_retry` 的阻塞 child——root/child 无 `turn/end`、bash sleep 继续跑。修法 = 新增 `abortable`（promise 与 `AbortSignal` race + 摘监听），`startActivation`/`activation.result` 接入；abort 时 `ctx.subagents.interrupt(childId, {kind:'ancestor', agent})` 并返回 `stopReason: aborted`。真装配：cancel 后 35ms root `aborted(user)` / child `aborted(parent)`，retry result `tool call aborted`，`sleep 117` 无残留。红→绿：裸 `await activation.result` ⇒ hung；还原 ⇒ 4 + 15 passed。详见 [卡](BUG-053-cancel-does-not-abort-subagent-retry.md) 与 [Note](../../../notes/implemented/2026-11-10-blocking-tool-cancellation.md)。
+
 - **BUG-050**（2026-11-09，复核为**环境陈旧误报**）：初报“BUG-045 的深度修复在真实装配下失效”来自
   dev profile 的旧安装副本（`profiles/company/node_modules/dsh-company-pack` 13:58 的副本），
   `startWeb --profile company` 加载它，而非当前源码；`pnpm test`/`lib` 重建都不能更新该副本。

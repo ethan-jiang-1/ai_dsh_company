@@ -3,6 +3,7 @@
 状态：implemented（2026-11-09 交付；P1–P4 的交付面完成：模型/静态矩阵、两层合同、P-A/B/C/D/J 真探针、UI 树形流程+completed/failed 终态、深度预算、`subagent_retry`（P-H 采用 PASS）、worker leaf+小工头；P5 不生成、P-I host 不自动重试为显式决定；worker-workflow no-go（P-K 采用不稳定，见 [no-go Note](../archived/2026-11-09-worker-workflow-no-go.md)）；P-H/P-I 确定性失败注入（tool-boundary fake + adoption）；interrupted/aborted/max-tokens/refusal 由 companyDelegationTerminal host 投影接 UI，lost 仅当 host 提供）—— 批准：用户 2026-11-09「开始推进」，按“长期正确 / 长期可维护 / 结构柔韧”拍板。
 > 后续修正：worker-researcher / specialist 边界见 [2026-11-09-specialist-worker-taxonomy](../archived/2026-11-09-specialist-worker-taxonomy.md)（2026-11-09）。
 > 部分取代：retry 的注册面/深度与合同载体状态见 [2026-11-09-delegation-surface-single-source](./2026-11-09-delegation-surface-single-source.md)（2026-11-09，BUG-049/045）。
+> 后续修正：worker family 的 control 面与 fan-out 声明见 [2026-11-10-capability-surface-enforcement](./2026-11-10-capability-surface-enforcement.md)（2026-11-10，BUG-051/052）。
 上游 = [RFC 卡](../../_backlog/_archive/settled_issues/2026-11-09-presets-delegation-architecture.md)；
 研究 = [preset 委派架构：盘点与结构性研究](../../_backlog/research/presets-delegation-architecture/README.md)（已定性）。
 
@@ -36,7 +37,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针 / UI）
 
 - `worker.leaf`（已落）：fs / bash / web / todo / compaction；**无** subagent/team/workflow/control。
 - `worker.orchestrator`（已落）：需要子层时显式升级；`worker.workflow`（planned）：并行扇出待切片；由 `allowedAgentPresets` 暴露，默认最窄。
-- 小工头的窄规则（1–2 个 leaf / 不组队 / 不问用户）住 persona；不挂共享 delegation skill，contracts 只声明 `engine.subagent`。
+- 小工头的窄规则（不组队 / 不问用户）住 persona；**fan-out 件数由父代理 brief 决定，preset 不承诺硬数字**（2026-11-10 修正：原“1–2 个 leaf”是无硬闸的软承诺，4 件 brief 实际起 4 个 leaf——BUG-051；见 [capability surface Note](./2026-11-10-capability-surface-enforcement.md)）；不挂共享 delegation skill，contracts 只声明 `engine.subagent`。
 - `subagent_fork` 保持 clone：fork provider 的 `agentPreset` 为 false 且继承父上下文；这是通道事实，不是妥协。
 - P1 只把 vp-eng 的通用 `subagent` 钉到 worker；其余 full role 记 target，试点通过后铺开。
 

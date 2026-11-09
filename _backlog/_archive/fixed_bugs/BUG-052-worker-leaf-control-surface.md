@@ -1,20 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-09
 ---
 
 # BUG-052：worker leaf 的工具面仍可见 `list_subagents` / `send_to_subagent`，与“无 control”声明不一致
 
-> 严重级别：P2（次要）｜发现：2026-11-09｜状态：修复就绪
-> 来源：2026-11-09 修复后第六轮（W6-A）。关联：[worker family 设计 Note](../../notes/implemented/2026-11-09-presets-delegation-model.md)、
-> [worker/researcher 边界 Note](../../notes/archived/2026-11-09-specialist-worker-taxonomy.md)。
-> 授权：2026-11-10 用户指令「_backlog/bugs 里面还有3个bug，如法炮制……按照我们这个repo的来修复吧……
-> 系统性……而不是一个一个修」——本修复触碰 company-pack 公开行为（模型可见工具面）与 docs 合同，
-> 由用户明确指示授权。
-> 修法（2026-11-10 选定）：**硬过滤**——`registerDelegationControl` 改成 per-agent 安装（与
-> `subagent_retry` 同模式），跳过 `WORKER_FAMILY_PRESETS`（leaf/researcher/orchestrator 都没有
-> control 行）；full role/CEO/未知 preset 保留。真装配 probe 读 `request/header` 工具目录断言。
+> 严重级别：P2（次要）｜发现：2026-11-09｜状态：已修（2026-11-10：修复就绪 → 修复已落地 → 已修）
+> 来源：2026-11-09 修复后第六轮（W6-A）。关联：[worker family 设计 Note](../../../notes/implemented/2026-11-09-presets-delegation-model.md)、
+> [worker/researcher 边界 Note](../../../notes/archived/2026-11-09-specialist-worker-taxonomy.md)。
+> 审查：agent — 对照「已修判定」逐条核过；真红→绿与真装配工具目录见「修复落地」。
 
 ## 症状
 
@@ -72,3 +67,21 @@ beta 的 user message 数 2 → 2，**没有注入**。运行时防住了跨 par
   1. **过滤**：worker leaf 的工具面不再出现 `list_subagents` / `send_to_subagent`（或只保留不可调用的占位）；真装配 probe 断言工具目录。
   2. **改文案**：`worker` preset 注释、policy/eng-teaming 不再声称“无 control”，改为“control 名可能可见，但仅对本 session child 有效；sibling 会被拒绝”；真探针记录调用与拒绝。
 - 无论哪条，都要保留一条 sibling 注入探针，证明运行时防护仍在；不能因为工具可见就假设能跨 parent。
+
+## 修复落地（2026-11-10，选 1 = 过滤）
+
+- **host**：[`delegation-control.ts`](../../../packages/company-pack/src/host/delegation/delegation-control.ts)
+  的 `registerDelegationControl` 改为 **per-agent 安装**（`agent/created` + `agent.ctx.inject(['tools'])`，
+  与 `subagent_retry` 同模式）；`composedPresetOf(agent.ctx)` ∈ `WORKER_FAMILY_PRESETS` 时跳过；
+  full role / CEO / 未知 preset 保留。
+- **为什么连 orchestrator 也跳**：它的 YAML/设计声明“没有控制面”；收 leaf 结果走 `subagent`
+  的完成通知，不靠 `list_subagents`/`send_to_subagent`。父代理仍有 control 续驶直接子代。
+- **spec**：`delegation-control.spec.ts` 按 preset 断言安装面（worker family 空、六角色有）；
+  负例 = 过滤收窄成只跳 `worker` ⇒ `worker-researcher` 红。
+- **真装配**：`wave6-leaf-control`（VP `session-5c5d6462-…`；alpha `d0b355c6-…`）的
+  `request/header` 工具目录 **21 个、control present: []**；alpha 回复“缺少工具”，beta
+  user message 2→2、injected=false（运行时防护仍在）。
+- **环境事实**：第一次 wave6 在只跑 `tsc -b` 后仍看到 control（`lib/index.js` 是旧 bundle）；
+  `tsdown` 重建 bundle 后复跑才得到上面的目录（BUG-050 同型教训）。
+- **全量**：`pnpm verify` / `pnpm test` / `pnpm typecheck` / `pnpm lint` / `pnpm dup` 绿（同提交）。
+- 决定与输掉的方案 = [capability surface Note](../../../notes/implemented/2026-11-10-capability-surface-enforcement.md)。

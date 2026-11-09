@@ -12,7 +12,7 @@ description: VP-Eng 的组队打法（2 号工作流）：五档决策树——�
 | 档 | 什么时候用 | 怎么做 | 产出归属 |
 |---|---|---|---|
 | **1 自己做** | 单件、单域、不需要独立人格 | 直接做（读稿→出稿） | 你自己署名 |
-| **2 一次性 worker** | 1–2 件并行调研/盘点/测算；不要持久协作 | `subagent`（fresh）或 `subagent_fork`（带上下文；**只带已完成轮**，本轮刚读的不在——2026-11-08 实测）；给清晰 brief；需要子层时把 `agent_preset` 设为 `worker-orchestrator`（它只能再带 leaf），默认 `worker` | worker 只回证据，判断仍署你 |
+| **2 一次性 worker** | 1–2 件并行调研/盘点/测算；不要持久协作 | `subagent`（fresh）或 `subagent_fork`（带上下文；**只带已完成轮**，本轮刚读的不在——2026-11-08 实测）；给清晰 brief；需要子层时把 `agent_preset` 设为 `worker-orchestrator`（它只能再带 leaf；件数由你的 brief 决定，别在 brief 里假设硬上限），默认 `worker` | worker 只回证据，判断仍署你 |
 | **2.5 并行扇出（workflow）** | ≥3 个同构分支、要合并/交叉核对/只回异常，且不需要独立人格（**默认用 workflow，不是拉多次 subagent**） | `workflow` 写脚本：`parallel`/`pipeline` + 异常优先；**分支不传 schema，只回一行 JSON，父脚本 `JSON.parse`**；分支只读或一分支一文件；返回聚合/异常 | 你合稿署名 |
 | **3 命名专家** | 要 CMO 的**真人格/真结论**（MRD/StRS） | `vp_cmo`（钉 `agentPreset`，depth 2） | 署 CMO 的名 |
 | **4 持久小队** | 多件产物、多轮、要任务板/依赖图/互审 | `spawn_teammate`：成员是"你带的工程师"（继承你的组合），不是 CMO | 你合稿；成员只写自己那一块 |

@@ -2,6 +2,8 @@
 // 「合同载体状态与真实载体一致」用例红（`expected 'planned' to be 'delivered'`）；还原 ⇒ 10 passed。BUG-049
 // 负例留证 2026-11-09：把 WORKER_FAMILY_PRESETS 只留 ['worker'] ⇒「handbook 边界按 worker family」用例红；
 // 还原 ⇒ 绿。BUG-047
+// 负例留证 2026-11-10：把 WORKER_PROFILES['worker-orchestrator'].fanOut.hardMax 改成数字（或把 policy
+// 改成 'hard'）⇒「fan-out 是声明策略」用例红；还原 ⇒ 绿。BUG-051
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -67,6 +69,13 @@ describe('delegation model：唯一期望源', () => {
     expect(handbookSkipPresets()).toEqual(['worker', 'worker-researcher', 'worker-orchestrator'])
     expect([...WORKER_FAMILY_PRESETS]).toEqual(handbookSkipPresets())
     for (const id of FULL_ROLE_IDS) expect(handbookSkipPresets(), `${id} 是公司角色，应注入手册`).not.toContain(id)
+  })
+
+  it('worker family 的 fan-out 是声明策略，不是硬承诺（BUG-051）', () => {
+    // 没有 vendor per-tool child cap：orchestrator 的件数由父代理 brief 决定，preset 不承诺硬数字。
+    expect(WORKER_PROFILES.worker.fanOut).toEqual({ policy: 'none' })
+    expect(WORKER_PROFILES['worker-researcher'].fanOut).toEqual({ policy: 'none' })
+    expect(WORKER_PROFILES['worker-orchestrator'].fanOut).toEqual({ policy: 'parent-brief', hardMax: null })
   })
 
   it('worker 铺开目标：vp-eng 已钉 leaf，其余 full role 记 target；CEO 不直接钉 worker', () => {

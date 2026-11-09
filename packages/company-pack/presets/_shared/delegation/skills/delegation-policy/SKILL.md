@@ -67,7 +67,7 @@ child 看不到你本轮刚读的东西（fresh）；fork 才带已完成轮。b
 ## 8. worker profile
 
 - 默认 `worker`（leaf）：只做单件活、只回证据、不再委派。
-- 需要子层时显式升级 `worker-orchestrator`（已落；它只带 leaf）；并行扇出已判定 no-go（P-K 采用不稳定后不发布）；不要给 leaf 加万能开关。
+- 需要子层时显式升级 `worker-orchestrator`（已落；它只带 leaf；**件数与 fan-out 预算由父代理 brief 决定，不承诺硬上限**）；并行扇出已判定 no-go（P-K 采用不稳定后不发布）；不要给 leaf 加万能开关。
 
 ## 9. 三条硬规则
 

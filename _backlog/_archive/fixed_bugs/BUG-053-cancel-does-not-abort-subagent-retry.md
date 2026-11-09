@@ -1,21 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P1
 opened: 2026-11-09
 ---
 
 # BUG-053：取消 parent turn 不能中止 `subagent_retry` 的阻塞 child——root/child 都没有 `turn/end`
 
-> 严重级别：P1（重要）｜发现：2026-11-09｜状态：修复就绪
-> 来源：2026-11-09 第七轮（W7-A 取消探针）。关联：[subagent_retry 原语](../../packages/company-pack/src/host/delegation/subagent-retry.ts)、
-> [旧 R8 workflow 取消 PASS](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
-> 授权：2026-11-10 用户指令「_backlog/bugs 里面还有3个bug，如法炮制……按照我们这个repo的来修复吧……
-> 系统性……而不是一个一个修」——P1 且触碰 company-pack 公开行为（阻塞工具契约）与 docs 合同，
-> 由用户明确指示授权。
-> 修法（2026-11-10 选定）：抽 `src/lib/abortable.ts`（promise 与 `AbortSignal` race + 监听清理）；
-> `subagent_retry` 等 `activation.result` 时响应 `exec.signal`；abort 时
-> `ctx.subagents.interrupt(childId, { kind: 'ancestor', agent })` 并返回 `stopReason: 'aborted'`；
-> keyless + 真装配 `sleep 117` + `session/cancel` 复跑。
+> 严重级别：P1（重要）｜发现：2026-11-09｜状态：已修（2026-11-10：修复就绪 → 修复已落地 → 已修）
+> 来源：2026-11-09 第七轮（W7-A 取消探针）。关联：[subagent_retry 原语](../../../packages/company-pack/src/host/delegation/subagent-retry.ts)、
+> [旧 R8 workflow 取消 PASS](../../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
+> 审查：agent — 对照「已修判定」逐条核过；真红→绿与真装配 cancel 探针见「修复落地」。
 
 ## 症状
 
@@ -71,7 +65,7 @@ parent turn 后：
 
 ## 修复关联
 
-- [`subagent-retry.ts`](../../packages/company-pack/src/host/delegation/subagent-retry.ts)：`activation.result` 的等待需要与 `exec.signal` 取消做 race；abort 时主动取消 child（官方 `ctx.subagents`/activation cancel 面），返回可见 `stopReason: aborted`，并确保 child durable `turn/end`。
+- [`subagent-retry.ts`](../../../packages/company-pack/src/host/delegation/subagent-retry.ts)：`activation.result` 的等待需要与 `exec.signal` 取消做 race；abort 时主动取消 child（官方 `ctx.subagents`/activation cancel 面），返回可见 `stopReason: aborted`，并确保 child durable `turn/end`。
 - 或把 `subagent_retry` 改成非阻塞/队列式（父 turn 不被工具 hold）；但那会改变工具契约，需另决。
 - 测试：keyless 注入一个永不 resolve 的 activation result + abort signal，断言 `execute` 在 abort 后返回且不悬挂；真装配探针复现 `sleep 117` + cancel，断言 root/child 都有 `turn/end aborted` 且无残留进程。
 - 与旧 R8 的 workflow 取消对照：workflow 已收敛；本条是 host 原语自己的缺口，不要拿 workflow 的绿当本条证据。
@@ -83,3 +77,21 @@ parent turn 后：
 - child 的 `bash sleep` 进程被中止，无残留；`list_subagents` / durable 日志看到 child 的 aborted 终态。
 - keyless spec 覆盖 abort race + 永不 resolve 的 activation；真装配探针 `sleep 117` + cancel 复跑通过。
 - 重复取消/取消后再 prompt 不产生孤儿；长任务仍建议走 workflow，但误用 retry 时不能把 host 卡死。
+
+## 修复落地（2026-11-10）
+
+- **可取消 await**：新增 [`abortable.ts`](../../../packages/company-pack/src/lib/abortable.ts)（promise 与
+  `AbortSignal` race、原样抛 `signal.reason`、`finally` 摘监听，对齐 vendor `agent-loop.raceAbort`）。
+- **工具接入**：[`subagent-retry.ts`](../../../packages/company-pack/src/host/delegation/subagent-retry.ts)
+  的 `startActivation` 与 `activation.result` 都经 `abortable`；已 abort 时不起 child；
+  abort 后 `ctx.subagents.interrupt(childId, { kind: 'ancestor', agent: exec.agent })`，
+  返回 `stopReason: 'aborted'`，不悬挂到 300s timeout。
+- **keyless**：`tests/lib/abortable.spec.ts` 4 条（透传/abort reject/已 abort/摘监听）；
+  `subagent-retry.spec.ts` 的新用例用永不 resolve 的 activation + 1000ms 守卫；
+  红形态 = 改回裸 `await activation.result` ⇒ `hung`；还原 ⇒ 4 + 15 passed。
+- **真装配**（`wave8-cancel-retry`，gitignored）：VP `session-d6c8161b-…`、child
+  `31dbd01f-…`（worker / depth 1）已发 `bash -c 'sleep 117; echo done'`；root `session/cancel`
+  `accepted: true` 后 **35ms**：root `turn/end aborted(user)`、child `turn/end aborted(parent)`、
+  retry tool result `Error: tool call aborted`、`pgrep -fl 'sleep 117'` 为空。
+- **全量**：`pnpm verify` / `pnpm test` / `pnpm typecheck` / `pnpm lint` / `pnpm dup` 绿（同提交）。
+- 决定与输掉的方案 = [blocking tool cancellation Note](../../../notes/implemented/2026-11-10-blocking-tool-cancellation.md)。

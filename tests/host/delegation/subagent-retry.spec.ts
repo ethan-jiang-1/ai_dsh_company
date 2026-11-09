@@ -8,6 +8,8 @@
 // 负例留证 2026-11-09：把 `SUBAGENT_RETRY_SURFACE.presets.cmo` 从 2 改回 3 ⇒「CMO 在 depth 2 拒绝」
 // 与「运行时 subagentDepth 取大」两条红（child 被起了，`expected [...] to have a length of 0 but got 1`）；
 // 还原 ⇒ 22 passed。BUG-045
+// 负例留证 2026-11-10：把 `abortable(activation.result, exec.signal)` 改回裸 `await activation.result`
+// ⇒「abort parent signal」用例在 1s 守卫上红（hung）；还原 ⇒ 绿。BUG-053
 import { describe, expect, it } from 'vitest'
 import { registerSubagentRetry } from '../../../packages/company-pack/src/host/delegation/subagent-retry.ts'
 import { SUBAGENT_RETRY_SURFACE } from '../../../packages/company-pack/src/lib/retry-policy.ts'
@@ -20,6 +22,7 @@ interface FakeResult {
 interface Harness {
   readonly tool: { execute: (args: unknown, exec: unknown) => Promise<Record<string, unknown>> } | undefined
   readonly calls: Array<{ label: string; agentPreset: string; maxDepth: number; prompt: string }>
+  readonly interrupts: Array<{ childId: string; authority: unknown }>
 }
 
 interface HarnessOptions {
@@ -30,10 +33,13 @@ interface HarnessOptions {
   /** 运行时 `AgentOptions.subagentDepth`（与 header 取大，模拟引擎口径）。 */
   readonly runtimeDepth?: number
   readonly results: Array<FakeResult | Error>
+  /** 模拟永不 resolve 的 activation.result（取消探针）。 */
+  readonly neverResolve?: boolean
 }
 
 function harness(options: HarnessOptions): Harness {
   const calls: Harness['calls'] = []
+  const interrupts: Harness['interrupts'] = []
   let captured: Harness['tool']
   const listeners = new Map<string, ((payload: unknown) => void)[]>()
   const ctx = {
@@ -61,11 +67,15 @@ function harness(options: HarnessOptions): Harness {
         maxDepth: spec.request.maxDepth,
         prompt: spec.request.prompt[0]?.text ?? '',
       })
+      if (options.neverResolve === true) {
+        return { childId: `child-${String(calls.length)}`, result: new Promise<never>(() => {}) }
+      }
       const next = options.results.shift()
       if (next === undefined) throw new Error('no fake result left')
       if (next instanceof Error) throw next
       return { childId: `child-${String(calls.length)}`, result: Promise.resolve(next) }
     },
+    interrupt: (childId: string, authority: unknown) => { interrupts.push({ childId, authority }) },
   }
   ctx.subagents = subagents
   const scope = {
@@ -86,17 +96,17 @@ function harness(options: HarnessOptions): Harness {
   }
   registerSubagentRetry(ctx as never, { surface: SUBAGENT_RETRY_SURFACE })
   for (const listener of listeners.get('agent/created') ?? []) listener({ agent })
-  return { tool: captured, calls }
+  return { tool: captured, calls, interrupts }
 }
 
 const completed = (text: string): FakeResult => ({ output: [{ type: 'text', text }], stopReason: 'completed' })
 const failure = (stopReason: string): FakeResult => ({ output: [], stopReason })
 
-const run = async (h: Harness, idempotent = true) => {
+const run = async (h: Harness, idempotent = true, signal = new AbortController().signal) => {
   if (h.tool === undefined) throw new Error('tool not registered')
   return h.tool.execute(
     { prompt: 'do one thing', description: 'probe', idempotent },
-    { agent: {}, signal: new AbortController().signal },
+    { agent: {}, signal },
   )
 }
 
@@ -200,5 +210,33 @@ describe('subagent_retry：重试分类（既有语义不回归）', () => {
     const result = await run(h, true)
     expect(result).toMatchObject({ attempts: 1, stopReason: 'error', exhausted: false, diagnostic: 'spawn unavailable' })
     expect(h.calls).toHaveLength(1)
+  })
+})
+
+describe('subagent_retry：取消收敛（BUG-053）', () => {
+  it('parent signal abort：interrupt child 并返回 aborted，不悬挂', async () => {
+    const h = harness({ preset: 'vp-eng', neverResolve: true, results: [] })
+    const controller = new AbortController()
+    const pending = run(h, true, controller.signal)
+    for (let i = 0; i < 100 && h.calls.length === 0; i += 1) await new Promise(resolve => setTimeout(resolve, 2))
+    expect(h.calls).toHaveLength(1)
+    controller.abort(new Error('parent cancelled'))
+    const result = await Promise.race([
+      pending,
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('hung')), 1000)),
+    ])
+    expect(result).toMatchObject({ attempts: 1, childIds: ['child-1'], stopReason: 'aborted', exhausted: false })
+    expect(h.interrupts).toHaveLength(1)
+    expect(h.interrupts[0]?.childId).toBe('child-1')
+    expect(h.interrupts[0]?.authority).toMatchObject({ kind: 'ancestor' })
+  })
+
+  it('已经 abort 的 signal：不启动 child、直接返回 aborted', async () => {
+    const h = harness({ preset: 'vp-eng', results: [completed('should not run')] })
+    const controller = new AbortController()
+    controller.abort(new Error('already'))
+    const result = await run(h, true, controller.signal)
+    expect(result).toMatchObject({ attempts: 0, childIds: [], stopReason: 'aborted' })
+    expect(h.calls).toHaveLength(0)
   })
 })
