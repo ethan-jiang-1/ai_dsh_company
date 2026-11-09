@@ -1,13 +1,17 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P1
 opened: 2026-11-09
 ---
 
 # BUG-045：`subagent_retry` 的默认 `maxDepth: 3` 绕过 CMO 等 preset 的行级深度预算
 
-> 严重级别：P1（重要）｜发现：2026-11-09｜状态：调查中
+> 严重级别：P1（重要）｜发现：2026-11-09｜状态：修复就绪
 > 来源：2026-11-09 委派面重构后第四轮探索（R1b，CMO depth 2 → retry depth 3）。
+> 授权：2026-11-09 用户指令「按照我们的流程排一个计划，之后逐一修复吧」「从根上去解决」——
+> 本修复触碰 company-pack 公开行为与 docs 合同，按[章程](../README.md)「缺陷的通道」由用户明确指示授权；
+> 修法 = 与 [BUG-049](BUG-049-model-contract-retry-drift.md) 同根一起收（retry 深度从模型/组合派生，
+> host 按调用者 preset 预算放行），不单独打全局默认值补丁。
 
 ## 症状
 

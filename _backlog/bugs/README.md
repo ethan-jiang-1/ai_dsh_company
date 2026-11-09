@@ -48,6 +48,24 @@ status）修复后迁 [fixed_bugs](../_archive/fixed_bugs/BUG-027-false-dependen
 
 BUG-001..022 已修迁、BUG-023 误报 [fixed_bugs](../_archive/fixed_bugs/BUG-023-cultivation-float-actions-dead.md)（2026-11-09 由 `settled_issues` 改归）、BUG-024 已修 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
+## 2026-11-09 修复交接（本轮）
+
+**用户指令（2026-11-09）**：「按照我们的流程排一个计划，之后逐一修复吧」「最好是系统性地看明白了，
+从根上去解决……放在一块儿看看根上可能有问题，导致了两个现象或者三个现象」。五张卡（BUG-045..049）
+已翻 `修复就绪`；本次修复触碰 company-pack 公开行为 / docs 合同，正常自授权不覆盖——本节用户明确指示
+即授权（截至 2026-11-09 的授权记录）。修复按根因分组，不逐症状打补丁：
+
+| 根因 | 卡 | 收口方式 |
+|---|---|---|
+| A 唯一期望源不覆盖后加能力面（声明↔运行时双源） | [BUG-049](BUG-049-model-contract-retry-drift.md) + [BUG-045](BUG-045-subagent-retry-depth-budget-bypass.md) | 模型声明合同载体与 retry 注册面/深度（从 `depthRows.subagent` 派生）；pack `SUBAGENT_RETRY_SURFACE` 成唯一运行时表；`subagent_retry` 按调用者 preset 预算放行/可见拒绝 |
+| B worker family 边界按 ID 白名单 | [BUG-047](BUG-047-worker-family-handbook-scope.md) | 模型声明 handbook 归属；pack 默认按 worker family 派生 skip 集合 |
+| C 模型可见面窄于引擎 durable 语义 | [BUG-046](BUG-046-parent-cannot-verify-child-preset-depth.md) | `list_subagents` 读 child header 暴露 `agentPreset`/`delegationDepth`，缺失显式 `unavailable` |
+| D content 显示名变化未触发 UI 金样刷新 | [BUG-048](BUG-048-ui-golden-brand-name-drift.md) | 确认意图后刷新金样；补 content→金样同 diff 映射 |
+
+**收口要求**：每卡按「已修判定」留真红→绿证据与 `审查：` 记录，再 `git mv` 到
+[fixed_bugs](../_archive/fixed_bugs/) 并同步两张索引；`pnpm verify` + `pnpm test` 全绿（TS 面加
+`pnpm typecheck`）；不修改 `vendor/dsh/`。
+
 ## 2026-11-08 修复交接（另一 Agent）
 
 **用户指令（2026-11-08）**：“那这样我们可以先停一下，让另外一个Agent去修复发现的所有的bug。”

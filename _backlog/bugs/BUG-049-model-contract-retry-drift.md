@@ -1,13 +1,18 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-09
 ---
 
 # BUG-049：delegation-model 声明面漂移——两个已落合同仍标 `planned`，`subagent_retry` 注册/深度不在模型
 
-> 严重级别：P2（次要）｜发现：2026-11-09｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-09｜状态：修复就绪
 > 来源：2026-11-09 委派面重构后第四轮探索（K1 静态/合同对账）。
+> 授权：2026-11-09 用户指令「按照我们的流程排一个计划，之后逐一修复吧」「从根上去解决」——
+> 本修复触碰 docs 合同与已记录决定（模型是唯一期望源），由用户明确指示授权。
+> 修法 = 合同状态改为 `delivered`/`merged` + `carrierPath`；retry 注册面与深度写进模型并**从
+> `COMPOSITIONS.*.depthRows.subagent` 派生**；pack 运行时表 `SUBAGENT_RETRY_SURFACE` 是唯一注册来源，
+> parity spec 钉住两边 + 红形态。
 
 ## 症状
 

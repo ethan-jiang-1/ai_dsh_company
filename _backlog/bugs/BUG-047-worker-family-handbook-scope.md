@@ -1,13 +1,18 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-09
 ---
 
 # BUG-047：worker-orchestrator（及 worker-researcher）被注入公司手册，违背 worker family 的边界
 
-> 严重级别：P2（次要）｜发现：2026-11-09｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-09｜状态：修复就绪
 > 来源：2026-11-09 委派面重构后第四轮探索（W1b，worker-orchestrator 真 prompt 面）。
+> 授权：2026-11-09 用户指令「按照我们的流程排一个计划，之后逐一修复吧」「从根上去解决」——
+> 本修复触碰 company-pack 公开行为（prompt 注入面）与 docs 合同，由用户明确指示授权。
+> 修法 = 归属写成 worker family 属性（模型声明 + pack 运行时按 family 派生），
+> 三个 worker profile 全跳过；worker-researcher 的取舍显式记录（它按 persona 读 `company.md`，
+> 不需要角色/汇报线/编制手册）。
 
 ## 症状
 

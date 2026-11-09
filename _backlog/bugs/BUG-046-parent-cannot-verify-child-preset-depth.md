@@ -1,13 +1,17 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-09
 ---
 
 # BUG-046：父代理看不到 child 的 `agentPreset` / `delegationDepth`，worker family 与深度只能信自述
 
-> 严重级别：P2（次要）｜发现：2026-11-09｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-09｜状态：修复就绪
 > 来源：2026-11-09 委派面重构后第四轮探索（D1 长链；R1b 深度）。
+> 授权：2026-11-09 用户指令「按照我们的流程排一个计划，之后逐一修复吧」「从根上去解决」——
+> 本修复触碰 company-pack 公开行为（`list_subagents` 输出面）与 docs 合同，由用户明确指示授权。
+> 修法 = 同一次 `sessionPersistence.open()` 读 child durable header，把 `agentPreset`/`delegationDepth`
+> 投影进 `SubagentRow`；读不到显式 `unavailable`。它同时是 BUG-045/047 的父侧核对面。
 
 ## 症状
 
