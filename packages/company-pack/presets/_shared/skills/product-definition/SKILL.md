@@ -31,7 +31,7 @@ MRD / PRD 是这条脊柱的两种产物，不是两套模板。
 |---|---|---|
 | 项目制 / 系统集成 | `references/project-services.md` | SOW 边界、第三方依赖、UAT、实施里程碑 |
 | 硬软一体产品 | `references/hardware-software.md` | BOM/供应链、认证、固件与软件联动、试产与售后 |
-| 新类型 | 还没有 → 按同结构新增 `references/<type>.md`；**不要**把新类型塞进旧 playbook | 先写一页"这个类型多了哪几个字段/风险" |
+| 新类型 | 还没有 → 按同结构新增 `references/<type>.md`（**随包发布**；workspace 覆盖暂不支持）；**不要**把新类型塞进旧 playbook | 先写一页"这个类型多了哪几个字段/风险" |
 
 **生长方式**：pack 里的 playbook 随版本走；角色自己的打法（本行业话术、评估量表）经培养采纳进
 `<DSH_HOME>/company/methods/<role>/`，不要改共享 playbook 的公共字段。

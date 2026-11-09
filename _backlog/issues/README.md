@@ -4,6 +4,7 @@
 
 ## 活跃清单
 
+- [把通用能力与公司/领域特殊性分离并显性化](2026-11-09-company-specificity-externalization.md) — 待落地：三层已定（单位 = productType）；第一刀 d 已落地，a+c 进行中。
 - [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：设计 bug-hunt charter 与有限重跑验证；真模型运行待用户明确批准。
 
 （2026-11-08 VP-Eng workflow 通道卡已结归档：去向 = [Note](../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)。）
