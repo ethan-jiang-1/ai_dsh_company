@@ -83,8 +83,9 @@ oracle、证据形式、预算与停止办法写清，且真模型范围/成本�
 未触发停止上限）；发现 **5 张缺陷卡（BUG-045–049）**，已按根因分组全部修复归档。修复后验证轮
 （2026-11-09 晚）已跑：keyless 138 tests / verify / preset-smoke / UI golden 全绿；profile 指向当前源码后
 BUG-045 的 depth-denial、BUG-046 的身份行、BUG-047 的 handbook skip 均真装配通过；**BUG-050 复核为
-dev profile 旧安装副本导致的假阳性**，已迁 `fixed_bugs`。继续探索 teammate/workflow 身份行、retry 正样本，
-未发现新的产品级缺陷；详细证据 = 下方「修复后验证」与研究材料 §9.6。
+dev profile 旧安装副本导致的假阳性**，已迁 `fixed_bugs`。继续探索 teammate/workflow 身份行、retry 正样本与边界；第五轮 W5-E 新发现
+**BUG-051（P2：worker-orchestrator 的 1–2 leaf 只是 persona，4 件 brief 起 4 个 leaf）**，其余 charter PASS；
+详细证据 = 下方「修复后验证」「第五轮结果」与研究材料 §9.6/§9.7。
 
 | 卡 | 根因组 | 去向 |
 |---|---|---|
@@ -363,8 +364,12 @@ error/interrupted live retry、depth 4 等（见研究材料 §9.4/§9.6）。
 | W5-A 重启身份 | VP-Eng root + worker；SIGTERM 停宿主、同 home 重启；`list_subagents` 行仍为 `agentPreset: worker` / `delegationDepth: "1"` / `lastTurnEnd: completed` | **PASS** |
 | W5-B 预算面 | vp-sales root retry：attempts 1 / child depth 1 / worker；vp-eng teammate retry：attempts 1 / child depth 2 / worker | **PASS** |
 | W5-C 分支 retry | VP root 的 2 个 workflow 分支各调 `subagent_retry`：attempts 1 / child depth 2；分支 header depth 1 | **PASS**（观察：分支仍可再 spawn；`eng-teaming` 的“分支默认叶子”是 prose，engine 允许，旧 `subagent` 也同样） |
+| W5-D 边界深度 | CEO→VP(1)→workflow 分支(2) 内各调 `subagent_retry`：attempts 1 / child depth 3；预算 3 放行 | **PASS**（边界正确；模型口述“与根同级”是措辞错误，header 是 3） |
+| W5-E orchestrator 上限 | VP→worker-orchestrator(1)，4 件独立读文件 brief → 实际起 **4 个 leaf**（depth 2 / worker）；preset 写“1–2 个 leaf” | **BUG-051（P2）**：preset 承诺与能力面不一致；设计 Note 明说 1–2 只是 persona |
+| W5-F 通用 child 深度边界 | vp-sales root→generic child(1)→generic child(2) 调 retry：attempts 0 / `depth-exceeded` / 无 worker；预算 2 | **PASS**（修复对继承 vp-sales 的 generic child 也生效） |
 
-**新缺陷：无**（不写“没有 bug”）。**观察**：workflow 分支可调 retry 生成 depth 2 worker，与“分支默认叶子”的 prose 有张力，但不是新机制；
+**新缺陷：** [BUG-051](../bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（P2，worker-orchestrator 的 1–2 leaf 只是 persona）。
+**观察**：workflow 分支可调 retry 生成 depth 2/3 worker，与“分支默认叶子”的 prose 有张力，但不是新机制；
 DagTab 真页面图、depth 4、真实 error live retry 仍未覆盖。
 
 

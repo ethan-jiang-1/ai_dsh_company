@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-- [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：第四轮 5 张缺陷卡 BUG-045–049 已修复；修复后验证通过（keyless/挂载/UI golden + 真装配 retry/身份行/handbook）；BUG-050 复核为环境陈旧误报；用户 2026-11-09 晚指示继续探索；第五轮（重启身份 / 预算面 / 分支 retry）三条 PASS，未发现新产品级缺陷；未覆盖项见研究材料 §9.7。
+- [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：第四轮 5 张缺陷卡 BUG-045–049 已修复；修复后验证通过（keyless/挂载/UI golden + 真装配 retry/身份行/handbook）；BUG-050 复核为环境陈旧误报；用户 2026-11-09 晚指示继续探索；第五轮（重启身份 / 预算面 / 分支 retry / 深度边界）四条 PASS，新发现 BUG-051（P2，worker-orchestrator 1–2 leaf 只是 persona）；未覆盖项见研究材料 §9.7。
 
 （2026-11-08 VP-Eng workflow 通道卡已结归档：去向 = [Note](../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)。）
 

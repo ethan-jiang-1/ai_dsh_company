@@ -372,13 +372,16 @@ error/interrupted/live retry（不可确定性注入）；depth 4 负例；`suba
 ### 9.7 第五轮：修复后探索（2026-11-09 夜）
 
 > 用户 2026-11-09 晚：不要只验收，继续往前探。小预算 wave：约 15 分钟 / 6 parent turns / 8 children；
-> 证据在 `runtime/tmp/explore/round4/wave5-*`。**本轮未发现新的产品级缺陷**（如实写，不写“没有 bug”）。
+> 证据在 `runtime/tmp/explore/round4/wave5-*`。**本轮新发现 1 张 P2：** [BUG-051](../../bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（worker-orchestrator 的 1–2 leaf 只是 persona，4 件 brief 起 4 个 leaf）。其余 charter PASS。
 
 | ID | charter | 观察 | 判定 |
 |---|---|---|---|
 | W5-A | 重启身份 | VP-Eng root `session-43902f98-…` 先起 worker `d443113b-…`；SIGTERM 停宿主、同 home 重启后，root 冷恢复并 `list_subagents`：行仍为 `agentPreset: worker` / `delegationDepth: "1"` / `lastTurnEnd: completed` | **PASS**（durable header 身份在重启后仍可读） |
 | W5-B | 预算面 | vp-sales root `session-e8856b3a-…` retry → attempts 1 / child `b4b9f4e1-…` depth 1 / worker；vp-eng teammate `7a63349a-…` retry → attempts 1 / child `0436386c-…` depth 2 / worker | **PASS**（工具实例/预算与调用者一致） |
 | W5-C | workflow 分支 retry | VP root 的 2 个分支 `a711559e-…` / `d82f2fcb-…`（depth 1）各调 `subagent_retry`：attempts 1 / child `2db00e98-…` / `816351ec-…` depth 2 | **PASS**；观察：分支仍可再 spawn，`eng-teaming` 的“分支默认叶子”是 prose，engine 允许（旧 `subagent` 同样） |
+| W5-D | 分支边界深度 | CEO→VP(1)→workflow 分支(`9c215882-…`/`e861faf9-…`, depth 2) 内各调 `subagent_retry`：attempts 1 / child `fcb0eb1a-…` / `32a1fb9f-…` depth 3；预算 3 放行 | **PASS**（边界正确；VP 口述“与根同级”是措辞错误，header 是 3） |
+| W5-E | orchestrator 上限 | VP `session-95b708f6-…` → `worker-orchestrator` `b694b3c5-…`（depth 1）；4 件独立读文件 brief → 起 **4 个 leaf**（`e2c42870-…`/`ab22dcad-…`/`709ed0b2-…`/`624f10de-…`，depth 2 / worker）；preset 写“1–2 个 leaf” | **BUG-051（P2）**；设计 Note 明说 1–2 只是 persona，属于承诺/能力面不一致，不是引擎崩溃 |
+| W5-F | 通用 child 深度边界 | vp-sales root→generic child `691d8ce5-…`（depth 1 / vp-sales）→generic child `ecc6b81c-…`（depth 2 / vp-sales）调 retry：attempts 0 / `depth-exceeded` / 无 worker；预算 2 | **PASS**（修复对继承 vp-sales 的 generic child 同样生效） |
 
 **未覆盖（下一轮候选）**：真页面 DagTab 图里的 retry/worker 节点（本轮只跑 isolated 金样与静态 spec）；
 depth 4 负例；真实 `error`/`interrupted`/`lost` 的 live retry（不可确定性注入）；`subagent_retry` 在

@@ -22,8 +22,7 @@
 ## 后果
 
 preset 改动的完成定义 = `node checks/smoke/preset-smoke.mjs`（真挂载）。client 面的完成定义
-= 浏览器零挂载失败。事故复盘 = [postmortem 0001](../postmortem/0001-preset-required-config-mount-failure.md)
-与 [0003](../postmortem/0003-duplicate-remote-mount.md)。操作落点 = [dev-loop §1](../../docs/guides/dev-loop.md)。
+= 浏览器零挂载失败。事故复盘曾记在 postmortem 0001（preset 挂载失败）与 0003（重复挂载砖全 UI）；该目录 2026-11-09 裁撤，历史归 git。操作落点 = [dev-loop §1](../../docs/guides/dev-loop.md)。
 
 ## 验证
 

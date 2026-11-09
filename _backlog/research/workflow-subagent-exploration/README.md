@@ -17,7 +17,9 @@ opened: 2026-11-08
 > BUG-045–049**（1×P1 retry 深度绕过 + 4×P2）；D1 的 CEO→VP→workflow→worker depth 3 首次真跑 PASS。
 > **修复后验证（2026-11-09 晚）**：045–049 真装配/真挂载通过；BUG-050 复核为 dev profile 旧安装副本
 > 假阳性（误报归档）；teammate/workflow 身份行与 retry 正样本无新缺陷。**第五轮（修复后探索）**：
-> 重启身份 / vp-sales/teammate 预算 / workflow 分支 retry 三条 PASS，未发现新的产品级缺陷。
+> 重启身份 / vp-sales/teammate 预算 / workflow 分支 retry / 分支 depth 3 边界四条 PASS；
+> **新发现 BUG-051（P2）**：worker-orchestrator 的“1–2 leaf”只是 persona，4 件 brief 起 4 个 leaf；
+> vp-sales generic depth 2 的 retry 边界仍正确拒绝。
 > 运行表/未覆盖/资产收割 = [第四轮 §9](2026-11-09-post-refactor-round.md)）
 
 ## 材料

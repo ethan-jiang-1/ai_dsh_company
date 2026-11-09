@@ -17,7 +17,6 @@
 | [implemented/](implemented/README.md) | 已交付决定 + 击败的备选 + 后果与验证 | `状态：` 行以 implemented / 已交付 / 已消化 开头（门禁查新写） | **当前 rationale owner**——决定正文冻结，**事实落点（路径/符号/默认值）随改动就地改新**（§三 bare-path） |
 | [rejected/](rejected/README.md) | 被推翻/过时的**研究稿**（负知识；被否决的方案住各 Note 的「输掉的方案」） | `rejected` | 只在还能阻止同一个可信错误时保留；失效即删 |
 | [archived/](archived/README.md) | 顶层 = 仍能阻止重开的冻结判定（+ release.md 点名的现行 pin 人审证据）；`receipts/` = 只帮复核的历史证据（非否决） | 冻结 | 顶层与 implemented 同一条记录判据；receipts 不做现行权威；失效可删（按 §五） |
-| [postmortem/](postmortem/README.md) | 事故复盘（编号 000N） | — | 事故 ≠ 设计推敲（[_backlog 章程](../_backlog/README.md)同款区分） |
 
 **状态行**：新写或**再编辑**的 Note 首部有「状态：」行（存量不回扫；`notes-liveness` 门禁查 implemented/ 新写侧）。
 **收据层**：`archived/receipts/` 只放演练/E2E/批次/状态快照等历史证据——不是决定、不是否决；
@@ -68,8 +67,8 @@ no-index 教义下没有主题索引：**目录树 + 全文检索就是清单**�
   archived 目标豁免（冻结层不回写）。判据 = §五。
 - `notes-archived-links`（2026-10-30 立）：`archived/**/*.md` 的 markdown `.md` 链接必须存在——
   `md-links` 不扫该层，移动/归档后的断链由本门补。
-- `md-links`（implemented/proposed/postmortem 硬查；**archived 不扫**）/ `bare-path`（**proposed/ +
-  implemented/ 新写为硬档**；`postmortem/` 与 `_backlog/_archive/` = 观察档；**archived 不扫**）。**事实落点时效**（2026-10-09 N5 修）：implemented/ 的
+- `md-links`（implemented/proposed 硬查；**archived 不扫**）/ `bare-path`（**proposed/ +
+  implemented/ 新写为硬档**；`_backlog/_archive/` = 观察档；**archived 不扫**）。**事实落点时效**（2026-10-09 N5 修）：implemented/ 的
   **决定正文不动**，但**路径/符号/默认值这类事实落点随改动就地改新**——依据 = vendor
   `.agents/notes/implemented/AGENTS.md`「keep paths … current in the same change that alters them；
   This is not a license to rewrite the *decision*」。分生效日：文件名日期 ≥ 2026-10-09 的进硬档，
@@ -86,8 +85,8 @@ no-index 教义下没有主题索引：**目录树 + 全文检索就是清单**�
 **适配**：TDD 红绿环住 proposed/README（RFC 执行合同，2026-10-05 同日先立，见
 [rfc-tdd-loop](./archived/2026-10-05-rfc-tdd-loop.md)），本文件只管分类与证据门槛——两文件分工不重叠；
 生命周期细则从 dev-loop §12 迁来。sdlc-01 里明确不吸纳的（class 子目录、seal manifest、中心索引、状态值域门禁）已过时或已由本文件 §四写明，吸收稿已删。
-**偏离**：① `postmortem/` 独立保留（借源仓并入 implemented；本仓 _backlog 章程已立「事故复盘 ≠ 设计
-推敲」区分，编号逐件以目录为准）；② 不借「文件名日期 == 状态行日期」门禁——本仓时间轴 = 文件名日期 +
+**偏离**：① 事故复盘曾独立成 `postmortem/`（借源仓并入 implemented），2026-11-09 用户裁掉：无护栏以它为
+唯一取证依据，历史归 git；② 不借「文件名日期 == 状态行日期」门禁——本仓时间轴 = 文件名日期 +
 git log（D34），状态行不重复载日期；③ 不借 `{lifecycle}/{class}/` 两级路径（生命周期轴已够用，class
 正交——同借源仓偏离 DSH 的理由）；④ 不设计数清单（路径树即清单，D34 同款教义）；⑤ `proposed/` 语义：本地（D32）只收已批 RFC，借源仓是待点头取舍的停车场——**结论未确认**的“做”留 `_backlog/issues` 的 `等人拍板`；结论已确认但下游未受理的记 `去向=用户（日期）`，不进 `proposed/`；受理后由用户指令进入。
 
