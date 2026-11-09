@@ -12,10 +12,14 @@ opened: 2026-11-08
 > [delegation 合同](../../../docs/delegation.md)、[workflow 通道 Note](../../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)、
 > 常驻 probe [vp-eng-workflow-probe](../../../probes/team/vp-eng-workflow-probe.mjs)。
 > 产出的卡：[探索性测试 bug-hunt 问题卡](../../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)；具体缺陷按证据另行分诊。
-> 结论：（两轮探索已跑并收口：6 张缺陷卡（2×P1 + 4×P2）+ 2 条当场修；修复交另一 Agent（卡已翻 `修复就绪`）；剩余方向 = 长期采纳率、部署面、更多 natural 变体，未覆盖项见材料 §16.3）
+> 结论：（重构前探索轮（§16–§18）已跑并收口：6 张缺陷卡（2×P1 + 4×P2）+ 2 条当场修；后续 042/043/044 已归档；
+> 2026-11-09 委派面重构后，第四轮已执行（约 22 分钟/19 turns/27 children）：**5 张缺陷卡
+> BUG-045–049**（1×P1 retry 深度绕过 + 4×P2）；D1 的 CEO→VP→workflow→worker depth 3 首次真跑 PASS；
+> 运行表/未覆盖/资产收割 = [第四轮 §9](2026-11-09-post-refactor-round.md)）
 
 ## 材料
 
 | 文件 | 作用 | 日期 |
 |---|---|---|
-| [2026-11-08-exploration-plan.md](2026-11-08-exploration-plan.md) | 探索测试计划：背景/已证事实/场景矩阵/两遍法/fixtures/判据/预算/处置/Review 清单/交接 | 2026-11-08 |
+| [2026-11-08-exploration-plan.md](2026-11-08-exploration-plan.md) | 重构前探索计划与结果：背景/已证事实/场景矩阵/两遍法/fixtures/判据/预算/处置/§16–§18 运行表 | 2026-11-08 |
+| [2026-11-09-post-refactor-round.md](2026-11-09-post-refactor-round.md) | 重构后第四轮：当前机制事实、delta、入口矩阵、charters、假设、fixtures、预算、停止与交接；§9 = 2026-11-09 执行结果 | 2026-11-09 |

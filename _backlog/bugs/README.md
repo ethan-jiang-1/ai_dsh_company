@@ -2,7 +2,7 @@
 
 当场修掉的不建卡。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。
 
-**下一个缺陷号**：Next BUG ID = 45；已分配 BUG-001..044。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 50；已分配 BUG-001..049。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，修相对链接并更新两边清单。
 
@@ -10,6 +10,11 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
+| [BUG-045](BUG-045-subagent-retry-depth-budget-bypass.md) | `subagent_retry` 默认 `maxDepth: 3` 让 depth 2 的 CMO 起出 depth 3 worker，绕过 CMO 行级 `maxDepth: 2` | P1 |
+| [BUG-046](BUG-046-parent-cannot-verify-child-preset-depth.md) | `list_subagents` 不返回 child 的 `agentPreset`/`delegationDepth`，父代理只能信自述或看日志/UI | P2 |
+| [BUG-047](BUG-047-worker-family-handbook-scope.md) | `handbookSkipPresets` 只跳过 `worker`；`worker-orchestrator` 被注入公司手册，与 persona 矛盾 | P2 |
+| [BUG-048](BUG-048-ui-golden-brand-name-drift.md) | `ui-scene-smoke --isolated --golden` 红：金样仍写“梦之队 CEO”，页面已收窄为“CEO” | P2 |
+| [BUG-049](BUG-049-model-contract-retry-drift.md) | `delegation-model` 仍把已落合同标 `planned`；`subagent_retry` 注册面/深度不在模型 | P2 |
 | —（历史） | BUG-034 / BUG-035 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：SA/SQA 证据链必查（时间源 + 故障路径耐受）+ 审计 Q8–Q11；2026-11-07 E2E v8 验收 | — |
 
 **2026-11-08 六张卡同轮来源**：workflow + subagent 探索性测试（问题卡
