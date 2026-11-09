@@ -33,6 +33,11 @@ describe('subagent_retry 注册面：模型是唯一期望源，pack 运行时�
   it('子代 preset 是已发布的 worker profile', () => {
     expect(SUBAGENT_RETRY_SURFACE.childPreset).toBe(RETRY.subagent.childPreset)
   })
+
+  it('调用前拒绝词表同源，且不是 subagent 终态（不进 noRetry）', () => {
+    expect(SUBAGENT_RETRY.depthDenial).toBe(RETRY.subagent.depthDenial)
+    expect(RETRY.subagent.noRetry).not.toContain(RETRY.subagent.depthDenial)
+  })
 })
 
 describe('subagent/workflow 重试决策：可见、有界、幂等', () => {

@@ -74,7 +74,7 @@ node checks/smoke/ui-scene-smoke.mjs --isolated --golden
 - **红→绿**：`node checks/smoke/ui-scene-smoke.mjs --isolated --golden` 红（「在场」第 14 字符起
   `梦之队 CEO` vs `CEO`）；`--refresh-golden` 后 `git diff` 只有「在场」这一行、`梦之队 CEO` → `CEO`；
   `--golden` 复核 **9 个页签一致 / ALL PASS**。
-- **同 diff 映射**：[`tests/README.md`](../../../tests/README.md) 的 content 行补“显示名/品牌文案变化 ⇒
+- **同 diff 映射**：[`tests/README.md`](../../../tests/README.md) 的 `src/lib` 读模型行补“显示名变化 ⇒
   同 diff 刷 UI 金样（`--refresh-golden` 后 `--golden` 复核）”——这是这次漏掉的那条连线。
 - **不升门禁**：按 [policy P2](../../../docs/policy.md)（复发 + 可机械判定 + 负例已证会失败），这是首犯，
   且真浏览器金样不适合秒级 verify；先补映射与程序，复发再按 P2 立门。

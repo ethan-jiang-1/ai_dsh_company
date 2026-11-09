@@ -1,11 +1,14 @@
 ---
-status: 推敲中
+status: 等人拍板
 opened: 2026-11-08
 ---
 
 # 推敲：用探索性测试系统寻找委派面（workflow + subagent + worker family）缺陷
 
-> 立卡：2026-11-08 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：未定 ｜ 可关闭：否
+> 立卡：2026-11-08 ｜ 状态：等人拍板 🔒 ｜ 类型：Task ｜ 毕业：以后做 ｜ 可关闭：否
+>
+> 第四轮已执行并收口（2026-11-09）；5 张缺陷卡已全部修复归档。剩余只有**是否扩面**，
+> 仅用户可判（🔒，见「下一步」）。
 >
 > 上游研究题：[workflow + subagent 探索题](../research/workflow-subagent-exploration/README.md)。
 > 重构前的完整 briefing、场景矩阵与前三轮结果 = [2026-11-08 计划](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)；
@@ -76,11 +79,46 @@ oracle、证据形式、预算与停止办法写清，且真模型范围/成本�
   不直接改；修复另按授权边界。UI 只作观察透镜，不单开视觉扫。
 - 用户原话（2026-11-09）：「1,2,3 都希望跑，找到问题就提 BUG 然后继续探索寻找下一个 BUG」。
 
-**下一步：** 第四轮已执行（2026-11-09，约 22 分钟/19 turns/27 children，未触发停止上限）；发现
-**5 张缺陷卡（BUG-045–049）**：1×P1（retry 深度绕过）+ 4×P2（父代理看不到 preset/depth、
-worker family 手册注入、UI 金样漂移、模型合同/retry 声明漂移）。详细运行表 = 研究材料 §9。
-后续等用户决定：修复哪些卡、是否扩面（long-term adoption / workspace-write / 真页面图）；
-未覆盖项如实列在研究材料 §9.4，不写“没有 bug”。
+**下一步（🔒 仅用户可判）：** 第四轮已执行并收口（2026-11-09，约 22 分钟/19 turns/27 children，
+未触发停止上限）；发现 **5 张缺陷卡（BUG-045–049）**，已按根因分组全部修复归档：
+
+| 卡 | 根因组 | 去向 |
+|---|---|---|
+| [BUG-045](../_archive/fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md)（P1） | A 声明↔运行时双源 | [single-source Note](../../notes/implemented/2026-11-09-delegation-surface-single-source.md) |
+| [BUG-049](../_archive/fixed_bugs/BUG-049-model-contract-retry-drift.md) | A | 同上 |
+| [BUG-047](../_archive/fixed_bugs/BUG-047-worker-family-handbook-scope.md) | B family 边界按 ID 白名单 | [handbook Note](../../notes/implemented/2026-11-09-handbook-worker-family.md) |
+| [BUG-046](../_archive/fixed_bugs/BUG-046-parent-cannot-verify-child-preset-depth.md) | C 可见面窄于引擎语义 | [identity Note](../../notes/implemented/2026-11-09-subagent-identity-observable.md) |
+| [BUG-048](../_archive/fixed_bugs/BUG-048-ui-golden-brand-name-drift.md) | D 验收资产未同 diff 刷新 | 卡内 + `tests/README.md` 映射 |
+
+剩余 = **是否扩面**：long-term adoption / workspace-write / 真页面图 / 其他职能逐个采用 retry。
+未覆盖项如实列在研究材料 §9.4，不写“没有 bug”。用户点名后再开新轮；本卡转 `已结` 或按新证据
+继续都在用户答复后（沉默不翻转）。第四轮资产（keyless）见本节下方「第四轮收口」。
+
+## 第四轮收口（2026-11-09）
+
+**五卡修复的共同形状**：先把“期望源”补成可执行声明（模型 / family / header），再让运行时只从
+那一个来源读，最后用**真红→绿**的 keyless spec 钉住；不逐症状打补丁。
+
+- **A（045+049）**：`retrySurface()` 从 `COMPOSITIONS.*.depthRows.subagent` 派生；pack
+  `SUBAGENT_RETRY_SURFACE` 成唯一运行时表；`subagent_retry` 按调用者 preset 预算放行，越界返回
+  `depth-exceeded` 不起 child；合同载体状态 `delivered`/`merged` + `carrierPath`。红 = CMO 预算
+  2→3（4 failed）/ 状态 delivered→planned（1 failed）。
+- **B（047）**：`handbookSkipPresets()` 按 archetype 派生；pack `WORKER_FAMILY_PRESETS` 默认跳过
+  三个 worker profile；researcher 明确不注入。红 = family 表收窄（2 failed）。
+- **C（046）**：`list_subagents` 同一次 durable open 读 header，行带 `agentPreset`/`delegationDepth`
+  （`unavailable` 显式降级；真实 JsonlSessionPersistence 契约也钉住）。红 = 不读 header（3 failed）。
+- **D（048）**：确认 D14 收窄意图与单行 diff 后 `--refresh-golden`，`--golden` 9 页签一致；
+  `tests/README.md` 的 `src/lib` 读模型行补“显示名 → 同 diff 金样”映射；按 policy P2 暂不升门禁。
+
+**资产增量**：`tests/presets/delegation-retry.spec.ts`（parity + 红形态）、
+`tests/host/delegation/subagent-retry.spec.ts`（per-preset 深度/拒绝）、
+`tests/host/prompt/handbook.spec.ts`（family 注入面）、
+`tests/host/delegation/delegation-control.spec.ts` + `tests/harness/contract/session-persistence-terminal.spec.ts`
+（header 身份/真实持久化）、`snapshots/visual/company-shell/ui.golden.json`（显示名收窄）。
+
+**未执行/未覆盖**：真模型复跑（本轮修复只做 keyless 机制档；第四轮真模型证据仍在研究材料 §9.4）；
+long-term adoption / workspace-write / 真页面 DagTab 图 / 其他职能逐个采用 retry；`preset-smoke` 未在
+重装 pack 后重跑（本 diff 只动 host/preset 注释，keyless + 真浏览器金样已覆盖）。
 
 ## 第四轮（重构后）探索设计
 

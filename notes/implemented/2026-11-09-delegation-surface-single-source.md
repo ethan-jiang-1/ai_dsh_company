@@ -1,7 +1,9 @@
 # 2026-11-09 · 委派能力的声明面收口：retry 注册面/深度单源 + 合同载体状态
 
 状态：implemented（2026-11-09 交付；上游 = [BUG-049](../../_backlog/_archive/fixed_bugs/BUG-049-model-contract-retry-drift.md) + [BUG-045](../../_backlog/_archive/fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md)；模型重构的同一根因：期望源不覆盖后加能力面）
-> 部分取代：[presets 委派面的模型化重构](./2026-11-09-presets-delegation-model.md) §8（`subagent_retry` 只写 `runtimeTool`、深度另算）与 §9（深度面只讲 `subagent` 行）：本 Note 把“retry 的注册面与深度 = 通用 `subagent` 行”补进唯一期望源，并让 host 真按它执行。
+> 同机制的上游决定：[presets 委派面的模型化重构](./2026-11-09-presets-delegation-model.md) §8/§9。
+> 本 Note 补全其 retry 注册面/深度事实（原 §8 只写 `runtimeTool`、深度另算；§9 的深度面只讲
+> `subagent` 行）；旧 Note 已就地更新事实落点并在头部回链，决定正文未改。
 
 ## 问题
 
@@ -36,7 +38,7 @@
 4. **越界是可见拒绝，不是静默起 child**：`subagent_retry` 在调用前按
    `max(header.delegationDepth, options.subagentDepth) + 1` 与调用者 preset 预算比较（与 vendor
    `delegationDepthOf` 同口径）；越界返回 `attempts: 0` / `childIds: []` /
-   `stopReason: depth-exceeded` / `exhausted: true` + 点名 preset 与预算的 `diagnostic`，不调
+   `stopReason: depth-exceeded`（模型 `RETRY.subagent.depthDenial` 与 pack 同源）/ `exhausted: true` + 点名 preset 与预算的 `diagnostic`，不调
    `startActivation`。预算内仍把该预算作为 `maxDepth` 传给引擎，作为第二道闸。
 
 ## 输掉的方案

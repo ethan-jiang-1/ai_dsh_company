@@ -315,6 +315,8 @@ export const RETRY = {
     // 唯一投影函数 = retrySurface()；host 运行时表 SUBAGENT_RETRY_SURFACE 由 spec 钉同源。
     childPreset: 'worker',
     depth: 'caller-generic-subagent-row',
+    // 调用前拒绝的 stopReason（不是 subagent 终态；不进 noRetry 分类）。
+    depthDenial: 'depth-exceeded',
     visibility: ['attempt label', 'list_subagents lastTurnEnd', 'graph terminal'],
     reliableAlternative: 'workflow',
   },

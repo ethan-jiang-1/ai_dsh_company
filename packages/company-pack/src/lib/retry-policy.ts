@@ -11,6 +11,8 @@ export interface RetryPolicy {
   readonly retryable: readonly string[]
   readonly noRetry: readonly string[]
   readonly idempotentOnly: boolean
+  /** 调用前拒绝（调用者已在深度预算底部）的 stopReason；不是 subagent 终态，不进 noRetry。 */
+  readonly depthDenial: string
 }
 
 export const SUBAGENT_RETRY: RetryPolicy = {
@@ -18,6 +20,7 @@ export const SUBAGENT_RETRY: RetryPolicy = {
   retryable: ['error', 'interrupted', 'lost'],
   noRetry: ['completed', 'aborted', 'refusal', 'max-tokens'],
   idempotentOnly: true,
+  depthDenial: 'depth-exceeded',
 }
 
 /** `subagent_retry` 的注册面：哪些 preset 有工具、能起多深、子代是谁。 */
@@ -33,8 +36,8 @@ export interface SubagentRetrySurface {
  *
  * 为什么 pack 里要有一份深度数字：host 工具随包发布，不能 import 仓内
  * `tools/lib/delegation-model.mjs`；但 BUG-045/049 的教训是“两份声明必然漂移”，所以
- * `tests/presets/delegation-retry.spec.ts` 同时钉三件事：本表 == 模型 `retrySurface()`
- * == 各 preset YAML 通用 `subagent` 行的 maxDepth。改任何一个都会红。
+ * `tests/presets/delegation-retry.spec.ts` 钉本表 == 模型 `retrySurface()`；模型的 `depthRows`
+ * 又由 `delegation-composition.spec.ts` 与各 preset YAML 的通用 `subagent` 行钉住。改任何一个都会红。
  */
 export const SUBAGENT_RETRY_SURFACE: SubagentRetrySurface = {
   childPreset: 'worker',

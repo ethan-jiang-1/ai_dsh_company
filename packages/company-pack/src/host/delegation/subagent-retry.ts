@@ -70,10 +70,19 @@ export interface SubagentRetryOptions {
   readonly maxAttempts?: number
 }
 
+/** 读一个深度值：与 vendor `delegationDepthOf` 同口径；非法值抛 TypeError（不静默当 0）。 */
+const readDepth = (value: number | undefined, field: string): number => {
+  if (value === undefined) return 0
+  if (!Number.isSafeInteger(value) || value < 0 || Object.is(value, -0)) {
+    throw new TypeError(`${field} must be a non-negative safe integer`)
+  }
+  return value
+}
+
 /** 调用者的委派深度：header 与运行时取大（与 vendor `delegationDepthOf` 同口径）。 */
 const depthOf = (agent: AgentLike): number => Math.max(
-  agent.session?.header?.delegationDepth ?? 0,
-  agent.options?.subagentDepth ?? 0,
+  readDepth(agent.session?.header?.delegationDepth, 'session.header.delegationDepth'),
+  readDepth(agent.options?.subagentDepth, 'agent.options.subagentDepth'),
 )
 
 const DEFAULT_PROVIDER = 'spawn'
@@ -151,13 +160,16 @@ export function registerSubagentRetry(ctx: Context, options: SubagentRetryOption
             if (exec.agent === undefined) {
               return { attempts: 0, childIds: [], stopReason: 'unavailable', exhausted: false, output: '', diagnostic: '需要发起会话（agent）上下文。' }
             }
-            const callerDepth = depthOf(agent)
+            // 真实调用者优先（exec.agent）；测试/无 session 的桩回落到安装时的 agent。
+            const live = exec.agent as AgentLike
+            const caller = live.session === undefined ? agent : live
+            const callerDepth = depthOf(caller)
             const childDepth = callerDepth + 1
             if (childDepth > maxDepth) {
               return {
                 attempts: 0,
                 childIds: [],
-                stopReason: 'depth-exceeded',
+                stopReason: SUBAGENT_RETRY.depthDenial,
                 exhausted: true,
                 output: '',
                 diagnostic: `subagent_retry 拒绝：调用者 preset ${preset} 在 depth ${String(callerDepth)}，`

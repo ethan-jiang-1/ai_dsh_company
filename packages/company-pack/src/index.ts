@@ -54,7 +54,7 @@ import { canonicalPath } from './host/run-bundle/paths.ts'
 export const inject = ['tools', 'approval', 'commands', 'workspaceRegistry']
 
 export type HostConfig = CultivationHostConfig & {
-  /** 不注入公司手册的 preset id；worker 是执行手，不是公司角色（默认 `['worker']`）。 */
+  /** 覆盖不注入公司手册的 preset id（默认 = `handbook.ts` 按 `WORKER_FAMILY_PRESETS` 派生的 worker family）。 */
   readonly handbookSkipPresets?: readonly string[]
 }
 

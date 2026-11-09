@@ -161,7 +161,7 @@
 | [BUG-049-model-contract-retry-drift.md](fixed_bugs/BUG-049-model-contract-retry-drift.md) | 模型声明漂移：合同 `delivered`/`merged` + `carrierPath`；`retrySurface()` 派生注册面/深度；parity spec 钉运行时/YAML/模型三边 | 2026-11-09 |
 | [BUG-047-worker-family-handbook-scope.md](fixed_bugs/BUG-047-worker-family-handbook-scope.md) | handbook 边界按 worker family 派生（三个 profile 都不注入）；默认取 family，配置只作覆盖；keyless 按 preset 断言 | 2026-11-09 |
 | [BUG-046-parent-cannot-verify-child-preset-depth.md](fixed_bugs/BUG-046-parent-cannot-verify-child-preset-depth.md) | `list_subagents` 从 child durable header 暴露 `agentPreset`/`delegationDepth`（十进制字符串），读不到显式 `unavailable`；keyless 红→绿 | 2026-11-09 |
-| [BUG-048-ui-golden-brand-name-drift.md](fixed_bugs/BUG-048-ui-golden-brand-name-drift.md) | 金样随 D14 显示名收窄刷新（`--refresh-golden` 后 `--golden` 绿）；tests/README 补 content 显示名 → 同 diff 金样映射；不升门禁 | 2026-11-09 |
+| [BUG-048-ui-golden-brand-name-drift.md](fixed_bugs/BUG-048-ui-golden-brand-name-drift.md) | 金样随 D14 显示名收窄刷新（`--refresh-golden` 后 `--golden` 绿）；tests/README 的 `src/lib` 读模型行补“显示名 → 同 diff 金样”映射；不升门禁 | 2026-11-09 |
 | [BUG-026-owner-missing-from-team-projection.md](fixed_bugs/BUG-026-owner-missing-from-team-projection.md) | 误报证伪（wire 视图 ownerName 齐全，卡读的是 projcache state 行）→ 防复发判据 = `tests/lib/board.spec.ts` 真 wire 形状断言；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-19 |
 | [BUG-023-cultivation-float-actions-dead.md](fixed_bugs/BUG-023-cultivation-float-actions-dead.md) | 误报证伪（浮窗正常；真凶 = 探针跨轮复用 id 撞遗留方法目录）→ 修复落探针卫生，S4b 恢复硬判 PASS；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-18 |
 

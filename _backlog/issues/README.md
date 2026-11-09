@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-- [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：已按 2026-11-09 委派面重构改写为第四轮（worker family / retry / depth 3 / 合同 / 图 UI）；第四轮已执行：5 张缺陷卡 BUG-045–049（1×P1 + 4×P2）；D1 长链 depth 3 PASS；待用户决定修复/扩面。
+- [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — **等人拍板 🔒**：第四轮已执行并收口；5 张缺陷卡 BUG-045–049 已全部修复归档（按根因分组）；剩余 = 是否扩面（long-term adoption / workspace-write / 真页面图 / 其他职能逐个采用 retry），待用户点名；未覆盖项见研究材料 §9.4。
 
 （2026-11-08 VP-Eng workflow 通道卡已结归档：去向 = [Note](../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)。）
 
