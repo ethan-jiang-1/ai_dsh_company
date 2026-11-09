@@ -17,7 +17,7 @@
   并更新 gitignored manifest 的 `manualSha256`，`dist-manual` / `dist-freshness` 保持绿。
 - **三篇旧 Note 加 v3 取代 banner**：`company-workspace-skeleton-shipped` / `first-run-bootstrap` /
   `faq24-alignment` 的 `workspace/**`、符号链接、`<DSH_HOME>/company-workspace` 叙述统一指向
-  [v3 native entry](./2026-11-01-plugin-as-product-v3-native-entry.md)；`presence-status-seam` 的
+  [v3 native entry](../implemented/2026-11-01-plugin-as-product-v3-native-entry.md)；`presence-status-seam` 的
   `files` 列表就地改新（决定正文不动，只改事实落点）。
 - **tests/README 四区表补 support / fixtures 两行**：它们是**支撑**不是新 zone；spec 清单仍是目录本身。
 

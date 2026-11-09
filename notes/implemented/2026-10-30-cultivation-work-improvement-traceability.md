@@ -2,7 +2,7 @@
 
 状态：已交付（用户于 2026-10-29 授权「看上去还可以，这样吧，你就落地实现了, setup goal, 静默自主执行如何?」，后续明确「静默，自主执行，克服一切障碍」并批准实施计划）
 上游 = [_backlog/_archive/settled_issues/2026-10-29-cultivation-experience.md](../../_backlog/_archive/settled_issues/2026-10-29-cultivation-experience.md)
-前决定：[培养主视图](./2026-10-28-cultivation-main-view.md)、[GUI 行动面](./2026-10-17-cultivation-gui-actions.md)、[培养回路](./2026-10-13-agent-cultivation-loop.md)；这些关于页面位置、命令通道和人侧角色闸的决定继续有效。
+前决定：[培养主视图](../archived/2026-10-28-cultivation-main-view.md)、[GUI 行动面](./2026-10-17-cultivation-gui-actions.md)、[培养回路](./2026-10-13-agent-cultivation-loop.md)；这些关于页面位置、命令通道和人侧角色闸的决定继续有效。
 
 ## 决定
 

@@ -19,7 +19,7 @@
 1. **死 ROADMAP 指针 ×3**：[demo.md L53](../../../docs/demo.md)、[ui-demo.md L54](../../../docs/design/ui-demo.md)、[index.md L53](../../../docs/index.md)（台账前言「搁置池准入条件见 ROADMAP」）。D32 声称「痕迹彻底清理」仍有漏网；index.md 台账行内 `plans/roadmap` 属历史语境可留。
 2. **pre-D32 Note 无「已废」横幅**：重 ×2——foundation-remediation L9（已删，历史在 git）（「ROADMAP.md 是活动/暂停项的唯一调度家」，读作现行路由）、[multi-human-ux L5](../../../notes/archived/2026-09-26-multi-human-ux.md)（「已入搁置池并成提案稿」，所指两物现均不存在、无前向链接）；轻 ×3——notebook-hygiene、enforcement-channel-and-boundaries、client-review-fixes（修法 = 仿 research-notes-lifecycle L3（已删，历史在 git） 的 ⚠ 一行横幅）。
 3. **`scripts/migration-rehearsal.mjs`**：C1 迁移已执行（2026-10-03，卡已毕业），头注仍是活触发器口径且 `--execute` 写真盘——最危险的一件。
-4. **[motion-ledger L3](../../../company-workspace/kb/motion-ledger.md)**：成品口径仍写 `deliverables/<slug>/final.md`，而 27 个动议全已迁 `deliverables-archive/`——台账自己的定义在当前盘上为假。
+4. **[motion-ledger L3](../../../packages/company-pack/content/state/motion-ledger.md)**：成品口径仍写 `deliverables/<slug>/final.md`，而 27 个动议全已迁 `deliverables-archive/`——台账自己的定义在当前盘上为假。
 5. **[demo.md L180](../../../docs/demo.md)**：场景 F 可粘贴脚本教人写「日期待核」占位——违反手册 2026-09-30 日期口径（真日期；占位仅限注入故障 fail-closed）。照脚本执行 = 违反手册。
 
 ### B. 概念相左（同一事实两处说法不一）
@@ -37,7 +37,7 @@
 13. **AGENTS.md ~40/101 行是参考材料**：三实体表（② npm 全局 ③ 外部研究树对未跑过任何东西的 agent 无意义）、十行纪律表（唯一真正必须的一点——本仓 docs/testing.md ≠ vendor 同名文件——是表格前言里的一句脚注）、布局树内联 D 号考古（D31/D33 在阅读顺序上未定义）。修法方向 = KEEP 入口五件（身份句/任务路由/notes 段/命令表核心/vendor 铁律一句），其余 DEFER 到指针。
 14. **任务源句被三套退役机制历史包裹**：AGENTS.md L22 要解析并 mental-discard 中心队列/磨清单/搁置桶三套死机制 + 两个 D 号才提取出一条活规则（dev-loop L23-26、README.md L12 同病）。
 15. **scripts/ 混住常驻门禁与已耗一次性探针**：harvest-probe 自标「一次性」（诚实）、candidate-scan-eval / dag-midflight-probe 无标记；sync-dsh.mjs 是唯一无「何时跑」头注的脚本（32/32 合规的 script-triggers 门只扫模式名文件）。
-16. **motion-ledger 无户口**：公司手册「事实的家」不提 `kb/motion-ledger.md`（grep 0 命中），但它是「台账」页签数据源、交付物多处引它、自带维护职责；[cfo CHARTER L39](../../../company-workspace/kb/cfo/CHARTER.md) 「日期待核」标题与同行「已回填并更名」自相矛盾。
+16. **motion-ledger 无户口**：公司手册「事实的家」不提 `kb/motion-ledger.md`（grep 0 命中），但它是「台账」页签数据源、交付物多处引它、自带维护职责；[cfo CHARTER L39](../../../runtime/backups/charter-full-2026-10-24/CHARTER.md) 「日期待核」标题与同行「已回填并更名」自相矛盾。
 17. **杂项**：两张已归档 BDD 卡状态行残留祈使「下一步」、引用标签写 `reference/`（实已随卡迁 `_done/_reference/`）；date-rule/time-context-probe 判据指向坟场卡；intents.md 底部 5 行 backfill 的排序注记只写在归档文件头；`_done/_misc` 外 167 个 .md 权限 600 与 README 644 混杂（无害）。
 
 **未决**：C 类砍到多薄是品味问题（doc-budget 棘轮下 AGENTS.md 101/105 只余 4 行，须先搬后压）；发现 1 中 index.md L53 属台账历史语境还是活指针、批次②的三个裁断，均需用户拍板。

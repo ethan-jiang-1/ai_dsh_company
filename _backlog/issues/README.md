@@ -30,7 +30,7 @@ v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajecto
 - README/手册使用者面向卡 2026-11-08 已结：七问冷读 README 5.0→7.0/7、手册 5.0→7/7 + `readme-manual-commands` 门 + 2 张真实例截图；去向 = [Note](../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md)；卡在[归档](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)。
 
 - SA/SQA 子人格卡 2026-11-06 已结：两个委派子人格（system-architect / system-qa）+ 委托行 maxDepth 2 + SQA 否决直达 CEO；真模型 E2E 证独立会话/preset/depth=2；去向 = [Note](../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)；卡在[归档](../_archive/settled_issues/2026-11-06-system-architect-sqa.md)。
-- 第六轮七维打扫卡 2026-11-03 已结：fresh agent 复评 A-…A- + 层次化（client/tests/harness）+ 腐化通道四条机械面；去向 = [context-rot-guards Note](../../notes/implemented/2026-11-03-context-rot-guards.md) 与各批 Note；卡在[归档](../_archive/settled_issues/2026-11-03-repo-hygiene-round6.md)。
+- 第六轮七维打扫卡 2026-11-03 已结：fresh agent 复评 A-…A- + 层次化（client/tests/harness）+ 腐化通道四条机械面；去向 = [context-rot-guards Note](../../notes/archived/2026-11-03-context-rot-guards.md) 与各批 Note；卡在[归档](../_archive/settled_issues/2026-11-03-repo-hygiene-round6.md)。
 - 第五轮七维打扫卡 2026-11-03 已结（消化）：A–F 各批已落地或被第六轮承接；残余 = npm publish（外部）与零入链分诊（已定性不批量迁）；卡在[归档](../_archive/settled_issues/2026-11-03-repo-hygiene-round5.md)。
 
 - Trajectory/New terminal 收回卡 2026-11-03 已结：pack 禁 `ui-trajectory` / `ui-sidebar-terminal` 两行，主区 = Chat + 培养、右栏无 New terminal，真页面 + 组合面双证据；去向 = [remove-trajectory-terminal-ui Note](../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md)；卡在 [归档](../_archive/settled_issues/2026-11-02-remove-trajectory-terminal-ui.md)。
@@ -44,8 +44,8 @@ v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajecto
 - 培养工作优先单入口卡 2026-10-30 已结：work 字段 + 单表单 + 实时预览落地；实施 = [case-entry Note](../../notes/implemented/2026-10-30-cultivation-case-entry.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-case-entry.md)。
 - 培养入口收口卡 2026-10-30 已结：目标角色显式选择、入口文案、自纠正状态、验证历史逐条、对话失败保留草稿；实施 = [entry-followup Note](../../notes/implemented/2026-10-30-cultivation-entry-followup.md)；卡在 [归档](../_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)。
 - 培养 UX 卡 2026-10-29 已结：结论 = 做；案例工坊 A 主线、来源/决定/验证历史落地；实施 = [traceability Note](../../notes/implemented/2026-10-30-cultivation-work-improvement-traceability.md)；卡在 [归档](../_archive/settled_issues/2026-10-29-cultivation-experience.md)。
-- 二轮削洋葱卡 2026-10-28 已结：8 项残余 5 修 / 3 边界；0.4.1；实施 = [round2 Note](../../notes/implemented/2026-10-28-data-design-round2.md)；卡在 [归档](../_archive/settled_issues/2026-10-28-data-design-round2.md)。
-- 数据设计硬化卡 2026-10-28 已结：结论=做；实施 = [data-design-hardening](../../notes/implemented/2026-10-28-data-design-hardening.md)；M1–M4 落地（0.4.0）；卡在 [归档](../_archive/settled_issues/2026-10-28-data-design-hardening.md)。
+- 二轮削洋葱卡 2026-10-28 已结：8 项残余 5 修 / 3 边界；0.4.1；实施 = [round2 Note](../_archive/settled_issues/2026-10-28-data-design-round2.md)；卡在 [归档](../_archive/settled_issues/2026-10-28-data-design-round2.md)。
+- 数据设计硬化卡 2026-10-28 已结：结论=做；实施 = [data-design-hardening](../_archive/settled_issues/2026-10-28-data-design-hardening.md)；M1–M4 落地（0.4.0）；卡在 [归档](../_archive/settled_issues/2026-10-28-data-design-hardening.md)。
 - run bundle 卡 2026-10-24 已结：按建议转 RFC 并实施，Note =
   [run-bundle-install-unit](../../notes/implemented/2026-10-24-run-bundle-install-unit.md)；卡在
   [归档](../_archive/settled_issues/2026-10-24-run-bundle-clean-base.md)。

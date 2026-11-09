@@ -8,9 +8,9 @@ opened: 2026-10-27
 > 立卡：2026-10-27 ｜ 状态：已结 ｜ 类型：任务 ｜ 毕业：做 ｜ 可关闭：是
 >
 > **结论/去向**：D1/D4/D5 全部提到 **A-**（六维至此全部 A-）。去向 = 四篇 Note：
-> [D1 开工最小路径](../../../notes/implemented/2026-10-27-d1-start-path.md)、
-> [D4 版本与产物收口](../../../notes/implemented/2026-10-27-d4-release-and-dist-guard.md)、
-> [D5 UI 金样与认证档](../../../notes/implemented/2026-10-28-d5-ui-golden.md)。
+> [D1 开工最小路径](../../../notes/archived/2026-10-27-d1-start-path.md)、
+> [D4 版本与产物收口](../../../notes/archived/2026-10-27-d4-release-and-dist-guard.md)、
+> [D5 UI 金样与认证档](../../../notes/archived/2026-10-28-d5-ui-golden.md)。
 > 剩余明确不作：probe-source 切片 spec（留待下一轮）、4 个单 it 巨测（生命周期叙事，拆的收益低于回归风险）。
 >
 > 用户口径：A- 以下（D1/D4/D5 = B+）全部想办法提高；已批"按顺序全做（含版本 bump；真模型档待授权）"。
@@ -32,10 +32,10 @@ entry-probe 语义审阅仍待人；`dist-freshness` 不判断"产物是否落�
 上一轮收口评分：D2/D3/D6 = A-，D1/D4/D5 = B+。本卡把三个 B+ 推到 A-，判据 = 该维无已知结构债，
 或剩余项不再增加 agent 的日常判断成本。**完成 = 三批落地 + 实跑证据 + 评分复评**。
 
-**进展（2026-10-27/28 深夜）：** 批一 D1 已落（[Note](../../../notes/implemented/2026-10-27-d1-start-path.md)：
+**进展（2026-10-27/28 深夜）：** 批一 D1 已落（[Note](../../../notes/archived/2026-10-27-d1-start-path.md)：
 AGENTS 顶部三样开工、锚点、三件套分工；走查页签任务文档读入 570→206 行）；批二 D4 已落
-（[Note](../../../notes/implemented/2026-10-27-d4-release-and-dist-guard.md)：0.3.15 就位、release 8 项全绿、
-dist-freshness 第 49 门、canonicalPath/isRecord 收家）。批三 D5 UI 金样已落（[Note](../../../notes/implemented/2026-10-28-d5-ui-golden.md)：隔离场景 3.8s、9 页签金样、`ui-golden-freshness` 第 50 门、cdp-probe `--texts/--json-out`）。批四认证档已跑（用户授权）：entry-probe **13/13 机器通过**、delegation-smoke **ALL PASS**，答卷归档并在 snapshots/README 登记；fixtures 出处已落；拆 4 个单 it 巨测**明确不作**（理由见 D5 Note）。**三批完成，待复评收口。**
+（[Note](../../../notes/archived/2026-10-27-d4-release-and-dist-guard.md)：0.3.15 就位、release 8 项全绿、
+dist-freshness 第 49 门、canonicalPath/isRecord 收家）。批三 D5 UI 金样已落（[Note](../../../notes/archived/2026-10-28-d5-ui-golden.md)：隔离场景 3.8s、9 页签金样、`ui-golden-freshness` 第 50 门、cdp-probe `--texts/--json-out`）。批四认证档已跑（用户授权）：entry-probe **13/13 机器通过**、delegation-smoke **ALL PASS**，答卷归档并在 snapshots/README 登记；fixtures 出处已落；拆 4 个单 it 巨测**明确不作**（理由见 D5 Note）。**三批完成，待复评收口。**
 probe-source 切片 spec 未动（明确留待下一轮）。
 
 ## 当前情况（本轮实测，2026-10-27 深夜）

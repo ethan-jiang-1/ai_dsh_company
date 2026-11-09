@@ -7,7 +7,7 @@ opened: 2026-11-03
 
 > 立卡：2026-11-03 ｜ 状态：已结 ｜ 类型：卫生审计 ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：用户 — 2026-11-03 点名清空活跃 issues（本轮指令）
 >
-> **结论/去向**：note — [context-rot-guards](../../../notes/implemented/2026-11-03-context-rot-guards.md) 与 A–H 各批 Note；R6-01…19 的处置见审计 §9。
+> **结论/去向**：note — [context-rot-guards](../../../notes/archived/2026-11-03-context-rot-guards.md) 与 A–H 各批 Note；R6-01…19 的处置见审计 §9。
 
 **问题与期望结果：** 用户要求再以 fresh agent 视角评七个维度（①文档/代码结构与渐进披露、②代码与测试层次、③文档—执行—验收结构、④上下文腐化、⑤测试资产、⑥反馈通路、⑦DSH 插件约定），先给 A/B 评级，再 REVIEW 确认 GAP、拟计划并持续改善；本轮特别强调**避免平铺、要有层次地暴露**（代码与测试都算），以及清掉孤立/老旧资产、提高整仓信噪比。
 
@@ -25,15 +25,15 @@ opened: 2026-11-03
 - 已落地（2026-11-03，批 A/B/G）：R6-01/02（DAG spec 恢复 + 重复 spec 门禁）、R6-03（harness tsconfig glob）、
   R6-04/05/06（`orient` 首屏与 `--scenario` 分派、`--help`/未知参数）、R6-08/09（设计层两处现状 + 过期枚举）、
   R6-13/14（安装=启动 profile、卸载残留披露）、一次性探针删除。Note =
-  [round6-hygiene-batch](../../../notes/implemented/2026-11-03-round6-hygiene-batch.md)。
+  [round6-hygiene-batch](../../../notes/archived/receipts/2026-11-03-round6-hygiene-batch.md)。
 - 已落地（批 C/D/E，2026-11-03）：R6-07（`link-debt` 棘轮：archived 32 / moved 0 / live 0，超基线即红）、
   R6-10（`src/client` 五分目录 + `tests/client` 镜像；Note =
-  [client-layering-restructure](../../../notes/implemented/2026-11-03-client-layering-restructure.md)）。
+  [client-layering-restructure](../../../notes/archived/2026-11-03-client-layering-restructure.md)）。
 - 已落地（2026-11-03 后半）：R6-15/16（settings tier 真的写、lease 挪到解析后）、R6-11（workspace-doors /
   install-manual / 错误中继判据、空断言与同义反复清理）、R6-10 收尾（`tests/harness` 五分目录）、
-  D6 端到端补「加载即报错」段。Note = [workspace-choice-and-lease-order](../../../notes/implemented/2026-11-03-workspace-choice-and-lease-order.md)
-  · [test-tree-layering](../../../notes/implemented/2026-11-03-test-tree-layering.md) ·
-  [client-error-relay](../../../notes/implemented/2026-11-03-client-error-relay.md)。
+  D6 端到端补「加载即报错」段。Note = [workspace-choice-and-lease-order](../../../notes/archived/2026-11-03-workspace-choice-and-lease-order.md)
+  · [test-tree-layering](../../../notes/archived/2026-11-03-test-tree-layering.md) ·
+  [client-error-relay](../../../notes/archived/2026-11-03-client-error-relay.md)。
 - 待做：R6-12 剩余源码文本断言（刻意保留的装配面）、`checks/gates`/`tools/lib` 已判不搬（复访条件见材料 §8）。
 
 ## 验收标准

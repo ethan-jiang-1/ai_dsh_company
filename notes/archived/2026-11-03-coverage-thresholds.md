@@ -3,8 +3,8 @@
 状态：implemented（2026-11-03；七维复评 Phase 4）
 
 > 上游 = 2026-11-03 fresh 复评 D5「覆盖率是观察值，无阈值；高风险模块靠人记得看」。
-> 前置 = [context-wiring 抽出](../implemented/2026-11-03-d2-context-wiring-extraction.md) +
-> [member/title 抽出](../implemented/2026-11-03-d2-member-title-extraction.md)（先把可测单元抽出来，再设棘轮）。
+> 前置 = [context-wiring 抽出](./2026-11-03-d2-context-wiring-extraction.md) +
+> [member/title 抽出](./2026-11-03-d2-member-title-extraction.md)（先把可测单元抽出来，再设棘轮）。
 
 ## 决定
 

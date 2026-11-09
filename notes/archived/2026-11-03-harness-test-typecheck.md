@@ -2,8 +2,8 @@
 
 状态：implemented（2026-11-03；七维复评 D5 类型面，company 面之后的增量）
 
-> 上游 = [tests/client 进 tsc](../implemented/2026-11-03-client-test-typecheck.md) /
-> [tests/host 进 tsc](../implemented/2026-11-03-company-test-typecheck.md)。
+> 上游 = [tests/client 进 tsc](./2026-11-03-client-test-typecheck.md) /
+> [tests/host 进 tsc](./2026-11-03-company-test-typecheck.md)。
 > harness 全量严格 192 / 非严格 118 errors；本轮只收 51 个判据型 spec（17→0），其余宽松测试仍未。
 
 ## 决定

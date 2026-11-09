@@ -7,7 +7,7 @@ opened: 2026-10-27
 
 > 立卡：2026-10-27 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；F1/BUG-033 已修迁 fixed_bugs，F2–F10 落 [Review follow-up Note](../../../notes/implemented/2026-10-27-data-model-review-followup.md)。
+> **结论/去向**：做；F1/BUG-033 已修迁 fixed_bugs，F2–F10 落 [Review follow-up Note](./2026-10-27-data-model-review-followup.md)。
 
 **问题与期望结果：** 0.3.13 的代码面已收口，但复盘发现“实现正确”不等于“证据与运维合同完整”：还有 1 个数据丢失缺陷、2 个 UI/证据真实性缺口、1 个备份证据缺口、1 个保留/删除缺口，以及审计命令、迁移演练、敏感摘录三个小口。期望按 F1–F9 收口，而不是把边界当完成。
 

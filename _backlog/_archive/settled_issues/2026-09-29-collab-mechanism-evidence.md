@@ -91,7 +91,7 @@ Team 寻址、多机只剩共享盘（[multi-human.md](../../../docs/multi-human
 
 - 工具落地：`$DSH_HOME` 的 zstd 多帧日志 → 明文平铺 `.jsonl`（`--workspace` 过滤单 bucket 或全导）；
   实跑 349 份导出 / 0 失败（company-workspace bucket）。
-- **闭环验证**：[memory-convergence-2026-09-26](../../../snapshots/archive/memory-convergence-2026-09-26/README.md)
+- **闭环验证**：[memory-convergence-2026-09-26](../../../README.md)
   的 4 场动议快照审计全 **0 违规**——snapshots README 登记过的"快照无可用日志源"缺口**闭合**。
 - **彩蛋**：`renewal-y-2026` 的两场撞车被 `slug-collision` 观察项**当场指认**（"成品被 2 个不同的
   Lead 会话声明过"）——散文记录里的事故第一次变成机器可见证据。

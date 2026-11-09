@@ -22,7 +22,7 @@ intent: "把公司面培养的用户意图、当前边界与外部证据组织�
 
 | 已确认事实 | 依据 | 设计含义 |
 |---|---|---|
-| 公司主面第四个子页签为 budget；培养已有独立侧栏类型 | [已删：CompanyView](../../../../notes/implemented/2026-11-03-d2-companyview-removal.md)、[client 注册](../../../../packages/company-pack/src/client/index.ts) | 改入口可复用同一培养领域视图；主面和侧栏不各造一套 |
+| 公司主面第四个子页签为 budget；培养已有独立侧栏类型 | [已删：CompanyView](../../../../notes/archived/2026-11-03-d2-companyview-removal.md)、[client 注册](../../../../packages/company-pack/src/client/index.ts) | 改入口可复用同一培养领域视图；主面和侧栏不各造一套 |
 | 培养侧栏目前显示五角色 journal 计数、标题及本会话赞/踩，并展示开发操作说明 | [CultivationTab](../../../../packages/company-pack/src/client/tabs/CultivationTab.tsx) | 可复用来源，现有面板还不能兑现角色归属、意见处理、训练和生效 |
 | 培养读模型把缺失清单折为 0；注册闭包在失败时返回 null；feedback 的 follow 会寻址 lead | [读模型](../../../../packages/company-pack/src/lib/cultivation.ts)、[client 注册](../../../../packages/company-pack/src/client/index.ts) | 数据不可达不能呈现成“无待审”；成员页的反馈不能未经归因就算成员的教学输入 |
 | 运行学习载体为角色 journal，人收敛入 CHARTER；通用方法论提升进 pack skill | [preset 合同](../../../../docs/presets.md)、[已落地培养决定](../../../../notes/implemented/2026-09-24-twin-cultivation.md) | journal 清空只证明处理/归档动作，不证明能力变强；应区分材料与已验证能力 |

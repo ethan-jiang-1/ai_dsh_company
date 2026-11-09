@@ -5,7 +5,7 @@
 进度：三 tab / 左板 / 右栏独立培养会话 / 自有 composer / 流式文本 / 工具行 / attach（选记录附上下文）已落地；真页面已跑通一问一答。审批卡仍走平台审批面；写回走左侧 `/cultivation adopt`（AI 只提案/不提权）。
 
 > **被部分取代（2026-11-02）**：Trajectory 已在 company profile 禁用；当前主区 = Chat + 培养。
-> 新决定与证据 = [remove-trajectory-terminal-ui](./2026-11-02-remove-trajectory-terminal-ui.md)
+> 新决定与证据 = [remove-trajectory-terminal-ui](../implemented/2026-11-02-remove-trajectory-terminal-ui.md)
 > （用户反馈「主 Tab 这里 Trajectory 不需要，去掉」）。下文三 tab 的原文保留为历史，现行以新 Note 为准。
 
 > 依据：用户走查判断「只有培养需要这个对话，其他面板不需要」，要求把培养从公司子页拎出来；

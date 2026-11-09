@@ -3,7 +3,7 @@
 状态：已交付（2026-11-02；2026-11-03 用户真页面走查通过、卡已归档到 settled_issues）
 
 > 上游 = [去掉 Trajectory 页签与 New Terminal 入口卡](../../_backlog/_archive/settled_issues/2026-11-02-remove-trajectory-terminal-ui.md)。
-> 部分取代 = [培养主视图 Note](./2026-10-28-cultivation-main-view.md) 的「主区三 tab」；该 Note 已加回链。
+> 部分取代 = [培养主视图 Note](../archived/2026-10-28-cultivation-main-view.md) 的「主区三 tab」；该 Note 已加回链。
 > 不改 = vendor `dsh`、pin、五角色 persona、公司九页签、`terminal-controller` 宿主服务、3080 日用 home。
 
 ## 决定

@@ -2,7 +2,7 @@
 
 状态：已交付（用户 2026-10-30「继续」；上游卡于同日结案）
 上游 = [_backlog/_archive/settled_issues/2026-10-30-cultivation-case-entry.md](../../_backlog/_archive/settled_issues/2026-10-30-cultivation-case-entry.md)
-前决定：[培养主线与证据](./2026-10-30-cultivation-work-improvement-traceability.md)、[培养入口收口](./2026-10-30-cultivation-entry-followup.md)、[培养主视图](./2026-10-28-cultivation-main-view.md)。这些决定继续有效；本 Note 只把主任务第一步从「选记录类型」换成「先说工作」。
+前决定：[培养主线与证据](./2026-10-30-cultivation-work-improvement-traceability.md)、[培养入口收口](./2026-10-30-cultivation-entry-followup.md)、[培养主视图](../archived/2026-10-28-cultivation-main-view.md)。这些决定继续有效；本 Note 只把主任务第一步从「选记录类型」换成「先说工作」。
 
 > **同日部分取代**：本文取代 [entry-followup](./2026-10-30-cultivation-entry-followup.md) §决定 1–2
 > （目标角色不预选/入口文案）；其 #3–#6 继续有效。

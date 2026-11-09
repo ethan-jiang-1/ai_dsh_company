@@ -27,7 +27,7 @@ opened: 2026-11-08
 - **真实先例**：2026-10-12，CEO 团队的 teammate `cfo` 自主用 `workflow` 做四路取证（密钥扫描 / SAST /
   AI 数据条款 / 许可与 IP），4/4 completed、371s、结果溢出 spill 后写 `cfo.md`（302 行）。证据 = dev home 会话
   `77cc8c50-…`（`runtime/harness-home/sessions/...`，gitignored 本地证据，不随仓分发）。这条同时推翻
-  [d4-semantic-drift](../../../notes/implemented/2026-11-03-d4-semantic-drift.md) 的「没有使用场景」。
+  [d4-semantic-drift](../../../notes/archived/2026-11-03-d4-semantic-drift.md) 的「没有使用场景」。
 - **沙箱反例**：2026-10-10 的 depth probe 在 `workspace-write` 下以
   `sandbox-unavailable: sandbox-exec: Operation not permitted` 失败；真跑是 `danger-full-access`。这是 Step 0 的第一道门。
 - 固定税：`workflow` 的 tool schema 在 catalog 里 4311 字符，每轮常驻；`subagent` 段 3026、`subagent-control` 段 2716。

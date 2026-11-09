@@ -8,7 +8,7 @@
 
 > **2026-10-27 部分取代（备份口径）**：备份分两档——业务盘（盘 + `bundle.json` + domain 账本 + 方法层）与
 > 完整 home（含凭据）；“整个 home = bundle、排除凭据”是当时口径，已由
-> [data-model-alignment](./2026-10-27-data-model-alignment.md) §5 与 [data-model](../../docs/data-model.md) 取代。
+> [data-model-alignment](../archived/2026-10-27-data-model-alignment.md) §5 与 [data-model](../../docs/data-model.md) 取代。
 
 > 来源：问题卡（已归档）+ [研究稿](../../_backlog/_archive/research/run-bundle/2026-10-24-run-bundle-boundary.md)。
 > 一句话：把“产品源码”和“一个正在运行的部署”拆开——产品仓只留基部；每次安装产生一个独立、

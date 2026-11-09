@@ -1,8 +1,8 @@
 # 第六轮卫生批：腐化通道止血、首屏反馈、一次性资产清理
 
 状态：implemented（2026-11-03，随第六轮七维打扫落地）
-上游 = [第六轮七维打扫卡](../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round6.md) ·
-材料 = [第七维审计](../../_backlog/_archive/research/repo-hygiene-round6/2026-11-03-seven-dimension-audit-round6.md)
+上游 = [第六轮七维打扫卡](../../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round6.md) ·
+材料 = [第七维审计](../../../_backlog/_archive/research/repo-hygiene-round6/2026-11-03-seven-dimension-audit-round6.md)
 
 ## 决定
 

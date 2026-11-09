@@ -7,11 +7,11 @@ opened: 2026-10-27
 
 > 立卡：2026-10-27 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；R1–R6 全部落树并验证，去向 = [R1–R6 Note](../../../notes/implemented/2026-10-27-data-model-r1-r6.md)。
+> **结论/去向**：做；R1–R6 全部落树并验证，去向 = [R1–R6 Note](../../../notes/archived/2026-10-27-data-model-r1-r6.md)。
 
 **问题与期望结果：** G1–G12 已落树，但“完全落地”还差四类收尾：面板仍全量读记录、多 Host 共享 home 只有文档边界没有运行时护栏、revoke 只有同步回滚没有崩溃恢复、presented 从会话事件重建只有 keyless 证据。期望按 R1–R6 收口，并把每条边界写进数据卡，不再用“已知边界”代替行为。
 
-**当前情况：** R1–R6 已全部落树并验证，证据 = [R1–R6 Note](../../../notes/implemented/2026-10-27-data-model-r1-r6.md)。`pnpm test` 97 files / 898 tests、`pnpm verify` 与 release/lifecycle/concurrent/present/isolation/upgrade smoke 全绿。
+**当前情况：** R1–R6 已全部落树并验证，证据 = [R1–R6 Note](../../../notes/archived/2026-10-27-data-model-r1-r6.md)。`pnpm test` 97 files / 898 tests、`pnpm verify` 与 release/lifecycle/concurrent/present/isolation/upgrade smoke 全绿。
 
 **未决问题：** R1 的“只读最近 N 条”不能藏旧 open；R2 的锁/租约在崩溃后如何判定 stale；R4 的崩溃恢复需要 pending journal 的格式与容忍度；R5 的孤儿方法是否自动修复还是只报告。
 

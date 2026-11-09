@@ -7,11 +7,11 @@
 
 > **2026-10-28 M3 部分取代作用域**：方法层已从 `<profile>/company-cultivation/<role>/` 迁
 > `<DSH_HOME>/company/methods/<role>/`（旧 profile 路径只读留一版，host 启动一次性迁移）；
-> 提案/采纳/角色闸/沙箱边界等其余决定保留。见 [数据设计硬化 Note](./2026-10-28-data-design-hardening.md)。
+> 提案/采纳/角色闸/沙箱边界等其余决定保留。见 [数据设计硬化 Note](../archived/2026-10-28-data-design-hardening.md)。
 >
 > **2026-10-28 主视图取代入口**：培养从“公司页第四子页”升为第三个主视图 tab（`CultivationView`），
 > 公司总览退回右栏、无对话入口；本文 §② 的入口句作废。见
-> [培养主视图](./2026-10-28-cultivation-main-view.md)。
+> [培养主视图](../archived/2026-10-28-cultivation-main-view.md)。
 
 ## ① Motivation（外部可观察行为）
 

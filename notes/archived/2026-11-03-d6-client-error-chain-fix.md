@@ -3,7 +3,7 @@
 状态：implemented（2026-11-03；七维复评 Phase 3 D6）
 
 > 上游 = 2026-11-03 fresh 复评 D6「页面→host log 全链路未端到端」。
-> 关联 = [Phase 0](./2026-11-03-release-truth-phase0.md)。
+> 关联 = [Phase 0](./receipts/2026-11-03-release-truth-phase0.md)。
 
 ## 病与根因
 

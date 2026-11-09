@@ -34,7 +34,7 @@ opened: 2026-10-19
 | 行长度已受控 | 是：`-webkit-line-clamp: 2` + 量溢出给「全文」 | 代码 + 真浏览器探针 | [`styles.ts:179-184`](../../../packages/company-pack/src/client/ui/styles.ts#L179-L184) + `ledger-summary-probe` |
 | 折叠/筛选/搜索/按日期分组 | 无 | 读码 | 面板源码 grep |
 | 刷新间隔 | **30 秒**；页签显示「每 30 秒自动刷新」 | 代码 + 真 app 探针 | [`LedgerTab.tsx:28`](../../../packages/company-pack/src/client/tabs/LedgerTab.tsx#L28) / `ledger-summary-probe` label |
-| 公司视图顶部「每 5 秒刷新」 | 已修：推送面显示「投影更新」 | 看板卡 | [`已删：CompanyView.tsx`](../../../notes/implemented/2026-11-03-d2-companyview-removal.md) |
+| 公司视图顶部「每 5 秒刷新」 | 已修：推送面显示「投影更新」 | 看板卡 | [`已删：CompanyView.tsx`](../../../notes/archived/2026-11-03-d2-companyview-removal.md) |
 | 「成品」列的 ✅ | 文本代理，不是 D20 的 `present` 机器判据 | 代码 | [`ledger.ts:61`](../../../packages/company-pack/src/lib/ledger.ts#L61) |
 
 ## 范围与排除项

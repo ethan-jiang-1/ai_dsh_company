@@ -7,13 +7,13 @@ opened: 2026-10-28
 
 > 立卡：2026-10-28 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：做；0.4.1 实施 = [二轮削洋葱 Note](../../../notes/implemented/2026-10-28-data-design-round2.md)；8 项中 5 项修、3 项明确边界；卡按章程关闭，不阻塞后续验收。
+> **结论/去向**：做；0.4.1 实施 = [二轮削洋葱 Note](./2026-10-28-data-design-round2.md)；8 项中 5 项修、3 项明确边界；卡按章程关闭，不阻塞后续验收。
 
 **问题与期望结果：** 0.4.0 把账本、方法层、client-errors、records、数据卡与发布收口后，按 FAQ 24 的
 01–10 再走一遍：交付面/数据面已闭合，但仍有 8 个**结构性残余**。期望逐项决定「做 / 不做 / 明确边界」，
 避免“机器全绿、实际漏掉写通道或读信任”。
 
-**当前情况（2026-10-28，0.4.0 @ c826191）：** 主交付 = [数据设计硬化 Note](../../../notes/implemented/2026-10-28-data-design-hardening.md)；
+**当前情况（2026-10-28，0.4.0 @ c826191）：** 主交付 = [数据设计硬化 Note](./2026-10-28-data-design-hardening.md)；
 合同 = [data-model.md](../../../docs/data-model.md)。同期清理运行态 714M → 643M（旧 startup 日志 / diagnosis /
 ux-shots / tmp / member/probe evidence / cache / session_projcache / rehearsal sessions/workspace / web-logs /
 空 legacy 方法目录），保留 `harness-home/b`（登记的第二 home，含凭据）、公司 sessions、公司盘业务数据、
@@ -37,7 +37,7 @@ ux-shots / tmp / member/probe evidence / cache / session_projcache / rehearsal s
 | 8 | **P2 发布面** | `dsh.client.inject` 的 8 个包未全部进 peerDependencies（仅 workspace 在 peer） | web profile 真装通过；但非 web 组合无声明；见 [package.json](../../../packages/company-pack/package.json) | A) 补齐 peer + 受控 lock；B) 只对 web profile 承诺并写清 |
 
 处置（0.4.1）：#1 `ctx.fs` 写通道、#2 派生显示标注、#3 K cache 落点、#5 日志轮转、#8 client inject peers 已修；
-#4 指令/治理面文档边界、#6 `company/` 命名空间边界、#7 T4/T7 证据边界。证据 = [二轮削洋葱 Note](../../../notes/implemented/2026-10-28-data-design-round2.md)。
+#4 指令/治理面文档边界、#6 `company/` 命名空间边界、#7 T4/T7 证据边界。证据 = [二轮削洋葱 Note](./2026-10-28-data-design-round2.md)。
 
 ## 已在本轮处理的（不算残余）
 

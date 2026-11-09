@@ -16,11 +16,11 @@ M4 已落地（peer + 受控 lock、0.4.0、安装手册/CHANGELOG、`release --
 >
 > **取代关系**：部分取代 [agent-cultivation-loop](../implemented/2026-10-13-agent-cultivation-loop.md)
 > 的「方法层 = profile×角色」作用域与路径（其余决定、尤其是「workspace 根被否」保留）；
-> 部分取代 [r4-d6-client-errors](../implemented/2026-10-28-r4-d6-client-errors.md) 的 client-errors
-> 落点；部分取代 [data-model-alignment](../implemented/2026-10-27-data-model-alignment.md) 的
+> 部分取代 [r4-d6-client-errors](./2026-10-28-r4-d6-client-errors.md) 的 client-errors
+> 落点；部分取代 [data-model-alignment](./2026-10-27-data-model-alignment.md) 的
 > 「presented 账本留 W」落点（「bundle.json 不迁 storageDomain」维持）。事实落点随改动就地更新
-> [data-model-p1-p2](../implemented/2026-10-27-data-model-p1-p2.md)、
-> [data-model-r1-r6](../implemented/2026-10-27-data-model-r1-r6.md)、
+> [data-model-p1-p2](./2026-10-27-data-model-p1-p2.md)、
+> [data-model-r1-r6](./2026-10-27-data-model-r1-r6.md)、
 > [run-bundle-install-unit](../implemented/2026-10-24-run-bundle-install-unit.md) 中被改路径的引用。
 
 > **2026-10-30 复核更正**：上面的“已就地更新 p1-p2”当时**没有真正做到**——p1-p2 的方法层句
@@ -139,7 +139,7 @@ upgrade log 轮转、全量 `company/` namespace、T4/T7 视觉/回放证据、c
 - **`$DSH_HOME/company/` 全量大迁（含 bundle.json）**：身份文件被工具/手册/smoke 直接引用，一次性
   搬风险大于收益；采用增量命名空间。
 - **`bundle.json` 迁 `ctx.storageDomain`**：需在插件加载前存在、被人读、被备份/smoke 引用
-  （[data-model-alignment](../implemented/2026-10-27-data-model-alignment.md) 已否决，维持）。
+  （[data-model-alignment](./2026-10-27-data-model-alignment.md) 已否决，维持）。
 - **公司内容搬 H/数据库**：用户要看见、编辑、带走；违反 P2。
 - **per-role 数据隔离**：DSH 没有 per-role tenant；共享盘是产品事实，只能写清不是隔离。
 - **会话索引跨 profile 共享**：`session-query-sqlite` 明确每个索引路径单进程 owner；共享会争用。

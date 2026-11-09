@@ -2,7 +2,7 @@
 
 状态：已交付（用户 2026-10-30「好的, 听你的建议」）
 上游 = [_backlog/_archive/settled_issues/2026-10-30-cultivation-entry-followup.md](../../_backlog/_archive/settled_issues/2026-10-30-cultivation-entry-followup.md)
-前决定：[培养主线与证据](./2026-10-30-cultivation-work-improvement-traceability.md)、[培养主视图](./2026-10-28-cultivation-main-view.md)、[GUI 行动面](./2026-10-17-cultivation-gui-actions.md)。这些决定继续有效；本 Note 只收口入口后的误发/误导/可读性。
+前决定：[培养主线与证据](./2026-10-30-cultivation-work-improvement-traceability.md)、[培养主视图](../archived/2026-10-28-cultivation-main-view.md)、[GUI 行动面](./2026-10-17-cultivation-gui-actions.md)。这些决定继续有效；本 Note 只收口入口后的误发/误导/可读性。
 
 > **2026-10-30 同日部分取代（#1–#2）**：[case-entry](./2026-10-30-cultivation-case-entry.md) 把入口改成
 > 单表单、目标角色默认当前角色、纠正/建议由目标角色推导；本文 §决定 1–2 作废，**#3–#6 仍有效**。

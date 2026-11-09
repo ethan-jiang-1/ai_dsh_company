@@ -46,7 +46,7 @@ opened: 2026-11-02
   `terminal-controller`（web-app:130）。
 - **合法改动点**（C/T）：本包 bundle 层 = `packages/company-pack/cordis.patch.yml`；`- id:` 可替换
   web-app 已存在的行。两行都在 web-app bundle 顶层，pack 在其后叠加，不需要 vendor patch。
-- **前序决定**（C）：[培养主视图 Note](../../../notes/implemented/2026-10-28-cultivation-main-view.md) 决定 1
+- **前序决定**（C）：[培养主视图 Note](../../../notes/archived/2026-10-28-cultivation-main-view.md) 决定 1
   与验收「主区严格三 tab：Chat / Trajectory / 培养」；[ui-demo](../../../docs/design/ui-demo.md) 命名表同句。
   本卡落地是**部分取代**，新 Note 必须写清并给旧 Note/文档加指针。
 - **发布面**（C）：0.7.0 未发布；本改动只改 pack 的 profile patch，不改 tarball 结构/版本；产品发布
@@ -77,7 +77,7 @@ opened: 2026-11-02
 - keyless：新增/扩展断言（patch 里两行 `disabled: true`；或 client 组合 spec 断言 view 列表无 trajectory）。
 - 真页面：`client-load-smoke` + `ui-scene-smoke`（主区 tab 清单、右栏 guide 清单、公司九页签仍在）。
 - 文档/Note 指针：[ui-demo](../../../docs/design/ui-demo.md) 的「三 tab」句、
-  [培养主视图 Note](../../../notes/implemented/2026-10-28-cultivation-main-view.md) 的部分取代回链；
+  [培养主视图 Note](../../../notes/archived/2026-10-28-cultivation-main-view.md) 的部分取代回链；
   产品行为合同若提到主视图，同 diff 更新。
 - 全量：`pnpm verify` / `pnpm test` / `pnpm typecheck` / `release --check`；preset/client 冒烟。
 
@@ -148,7 +148,7 @@ ALL PASS；真页面主区 = Chat + 培养、右栏 guide = 9 公司页签、无
 ## 关联
 
 - 用户反馈来源：2026-11-02 观察窗走查（dev home `runtime/harness-home`，`company` profile，端口 57849）。
-- 前序决定：[培养主视图 Note](../../../notes/implemented/2026-10-28-cultivation-main-view.md)（三 tab；本卡部分取代）。
+- 前序决定：[培养主视图 Note](../../../notes/archived/2026-10-28-cultivation-main-view.md)（三 tab；本卡部分取代）。
 - 同形约束：[dev/产品 parity 卡](./2026-11-02-dev-product-path-parity.md)、
   [parity 指南](../../../docs/guides/dev-product-parity.md)。
 - 现行合同/设计：[profile](../../../docs/profile.md)、[ui-demo](../../../docs/design/ui-demo.md)。

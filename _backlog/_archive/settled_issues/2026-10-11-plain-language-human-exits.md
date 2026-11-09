@@ -27,7 +27,7 @@ opened: 2026-10-11
   （[LedgerTab](../../../packages/company-pack/src/client/tabs/LedgerTab.tsx) 整行渲染 `row.summary`，无 clamp）。
   台账行随动议复杂度退化：最长 sea-entry 184 字、realtime-recon 165、renewal-u 157，
   夹 κ>0.70 / allowed-once / fail-closed 等内部术语。
-- 模板在推密度：[templates/meta.md](../../../company-workspace/templates/meta.md) 要求「一句话结论」
+- 模板在推密度：[templates/meta.md](../../../packages/company-pack/content/templates/meta.md) 要求「一句话结论」
   「数字带【事实/假设】标注」——诚实标注的义务该住 final 报告体，灌进行内人话正是 835 字的成分之一。
 - ask 卡文案：手册已有「把上下文备到人能一眼决定」总则；V4 无 live 样本（授权走普通用户消息），未核。
 
