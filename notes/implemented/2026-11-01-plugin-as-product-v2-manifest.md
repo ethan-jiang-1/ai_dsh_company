@@ -52,11 +52,11 @@
 ## 实现与落点
 
 - packages/company-pack/bin/dsh-company.mjs（0.6.0 已删除）（唯一启动器实现）+ `tools/company.mjs`（repo 形态转发，`pnpm company`）。
-- `packages/company-pack/src/host/bootstrap.ts`：`planBootstrap` / `applyBootstrap` / `seedAllowed` /
+- `packages/company-pack/src/host/run-bundle/bootstrap.ts`：`planBootstrap` / `applyBootstrap` / `seedAllowed` /
   `validateCompanyHome` / `chooseHandbookTarget` / consent 读写。
-- `packages/company-pack/src/host/bundle-manifest.ts`：`BUNDLE_MANIFEST_VERSION = 2`、`bundleManifestPath(workspace)`、
+- `packages/company-pack/src/host/run-bundle/bundle-manifest.ts`：`BUNDLE_MANIFEST_VERSION = 2`、`bundleManifestPath(workspace)`、
   `identityBackupPath`、`migrateLegacyManifest`、`planBundleManifest({ handbookTarget })`。
-- `packages/company-pack/src/host/runtime-guard.ts`：`prepareCompanyRuntime` 返回 `CompanyRuntime`
+- `packages/company-pack/src/host/run-bundle/runtime-guard.ts`：`prepareCompanyRuntime` 返回 `CompanyRuntime`
   （`dshHome` / `companyHome` / `dataBlocked` / `bundleState` / `handbookTarget` / `hasWorkspace`），
   lease 失败与坏 manifest 走 `dataBlocked` 停写。
 - packages/company-pack/src/host/register-workspace.ts（0.6.0 已删除）（新）：boot 登记 row；**不放进 pack bundle**（会被
@@ -79,7 +79,7 @@
 | `upgrade-while-running-smoke` | ALL PASS（旧实例运行中 remove/add 0.5.1，旧 session/数据在，重启前移） |
 | `handbook-smoke --cwd <temp with COMPANY.md>` | ALL PASS（`COMPANY.md` 注入，不混开发仓库 AGENTS） |
 | 真实旧 home v1 迁移演练 | PASS（v2 id/createdAt 保留；旧文件 `.migrated-*`） |
-| `tests/company/untrusted-project.spec.ts` | 5/5 PASS（恶意 AGENTS 不覆盖、symlink 不写穿、伪造 consent/危险落点拒绝） |
+| `tests/host/run-bundle/untrusted-project.spec.ts` | 5/5 PASS（恶意 AGENTS 不覆盖、symlink 不写穿、伪造 consent/危险落点拒绝） |
 
 **红证（本 Note 覆盖的机械面）**
 - `script-index`：`tools/company.mjs` 未进 `checks/README.md` ⇒

@@ -67,7 +67,7 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack
 #   历史：file: 拷贝时代，presets/*.yml 用编辑工具改会换 inode、安装副本是真拷贝（link count 1），
 #   不重装则改动不可见——默认 tarball 按内容寻址（内容变 → spec 变 → 重装），启动器吸收该坑。
 node checks/smoke/client-load-smoke.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）
-pnpm test tests/company/handbook.spec.ts    # 手册注入完成定义（keyless：content/override/systemPrompt section）
+pnpm test tests/host/prompt/handbook.spec.ts    # 手册注入完成定义（keyless：content/override/systemPrompt section）
 node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
 ```
 

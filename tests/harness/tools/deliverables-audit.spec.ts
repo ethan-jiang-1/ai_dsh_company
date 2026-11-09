@@ -572,5 +572,5 @@ describe('让位行的机器可查面（BUG-004，2026-10-06 修复轮立——�
   })
 })
 
-// 工作区门投影（doors.ts）的 keyless 守卫住在 tests/company/doors.spec.ts（2026-10-14 重构轮迁出：
+// 工作区门投影（doors.ts）的 keyless 守卫住在 tests/lib/doors.spec.ts（2026-10-14 重构轮迁出：
 // 那之前它寄居在本模块 spec 尾部，是唯一的跨模块寄居块）。

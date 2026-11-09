@@ -157,7 +157,7 @@ review 这张卡时不要先看代码，先回答：这些决定是否忠实于�
 
 ### 已知（有证据）
 - 空 home 的安装/首启路径已实测（见研究稿 §2）；产品安装的骨架是干净的。
-- 方法层按 `profile × role` 隔离，pack 升级不擦；CEO 无分层例外（[cultivation host](../../../packages/company-pack/src/host/cultivation.ts)）。
+- 方法层按 `profile × role` 隔离，pack 升级不擦；CEO 无分层例外（[cultivation host](../../../packages/company-pack/src/host/cultivation/cultivation.ts)）。
 - 本仓 146 件 tracked 的具体分类与体量（研究稿 §3.1）。
 - `company-skeleton`、`handbook-budget`、`ledger-participation`、`drafts-untracked`、`md-links` 都直接耦合“公司盘在仓库里”（研究稿 §6）。
 - 2026-10-05/07 的“不物化 run bundle”否决针对**复制证据**，不针对**部署单元**；本次是把 live 单元命名并加边界，不是造第二权威。

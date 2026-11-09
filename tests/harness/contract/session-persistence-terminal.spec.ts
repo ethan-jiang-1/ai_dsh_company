@@ -18,7 +18,7 @@ import { describe, expect, it } from 'vitest'
 import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
 import * as JsonlSessionPersistence from '../../../vendor/dsh/packages/session/session-persistence-jsonl/src/index.ts'
 import { SESSION_FORMAT_VERSION, SessionId } from '../../../vendor/dsh/packages/core/session/src/types.ts'
-import { readChildTurnState } from '../../../packages/company-pack/src/host/delegation-control.ts'
+import { readChildTurnState } from '../../../packages/company-pack/src/host/delegation/delegation-control.ts'
 
 /** Mount the real JSONL persistence on a temp root. */
 async function mount(root: string): Promise<Context> {

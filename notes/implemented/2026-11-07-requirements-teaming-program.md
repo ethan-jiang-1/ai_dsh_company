@@ -14,7 +14,7 @@
    矩阵由 `/req check` 派生；缺上游 = 孤儿红、指向空号 = 悬空红、重复定义红、退役词红、覆盖缺口红、
    区间计数断言红。跨动议 `<动议键>:<ID>` v1 不实现（遇 `:` 标未支持）。
 4. **强制点 = `/req check <slug>` 操作员命令**（R10）：纯逻辑住 `src/lib/requirements-check.ts`，命令住
-   `src/host/req-command.ts`；`/prd check` 管 MRD/PRD 结构，`/req check` 管编号/层/追溯/退役词/计数；
+   `src/host/commands/req-command.ts`；`/prd check` 管 MRD/PRD 结构，`/req check` 管编号/层/追溯/退役词/计数；
    角色只能引用结果，不自证。
 5. **范围 marker + 旧盘豁免**：新动议在 `.dsh-company` 的 meta 写 `编号体系: identity`（可另写 `需求层:`）
    才进入编号检查；无标记的旧动议只读豁免，checker 记 `skipped`，不回溯判红。dev 盘 process-docs 手动迁移 +
@@ -49,7 +49,7 @@
 | A1 编号合同 | `content/state/process-docs.md`（R1–R10/退役词/范围豁免/并发）、meta 标记、`content/AGENTS.md`、`docs/guides/product-definition.md`、`base-clean`/`company-skeleton` | `40fa060` |
 | A2 五层模板 | `content/templates/{mrd,strs,prd,syrs,irs,allocation}.md`（layer+definition；PRD JSON 唯一定义点；allocation `none`） | `2bfdb09` |
 | A5 校验器 | `packages/company-pack/src/lib/requirements-check.ts` | `0174e58` |
-| A6 命令 | `packages/company-pack/src/host/req-command.ts`、`src/index.ts`、pack README | `c6c3d76` |
+| A6 命令 | `packages/company-pack/src/host/commands/req-command.ts`、`src/index.ts`、pack README | `c6c3d76` |
 | A3 CMO/VP-Eng | cmo persona + `mrd-playbook`（MRD+StRS）、vp-eng persona + `prd-playbook`/`eng-workflow`、共享 `product-definition` | `fbe02aa` |
 | A4a SA | system-architect persona + `systems-architecture`（SyRS/IRS/allocation/架构；验证点改引用） | `a23ec20` |
 | A4b SQA | system-qa persona + `vv-playbook`（`layer: V&V` + table-rows + covers + L1–L4） | `1eb21e2` |
@@ -67,7 +67,7 @@ docs 6 处。`checks/INDEX.generated.md` 随新探针重新生成。
   [validation-trial](../../_backlog/_archive/research/requirements-identification-numbering/2026-11-07-validation-trial.md)。
 - **V2/V4/V11 原型 trial**：lab 重键 16 StR / 33 SyR / 22 IR 无悬空无重复；4/4 负例红；22 IFR 无计数漂移；
   V11 的"摘要表 = 引用、字段锚定行首"两条教训进 A5 spec 回归。
-- **A1–A7 keyless**：`pnpm test tests/company`（43 files / 287 tests）+ `pnpm test tests/presets`（50）+
+- **A1–A7 keyless**：`pnpm test tests/host`（43 files / 287 tests）+ `pnpm test tests/presets`（50）+
   `tests/client`（332）；**W5 全量**：`pnpm test` 150 files / 1218 tests、`pnpm typecheck`、`pnpm lint`
   （0 warnings / 0 errors）、`pnpm dup`（0 clones）、`pnpm verify` ALL PASS、`pnpm notes:audit`（状态行不符 0）。
   红证：合同/模板缺失、双定义点、checker 判据关掉、命令 skipped 分支、bootstrap 未 seed、SA/SQA 退役号形、

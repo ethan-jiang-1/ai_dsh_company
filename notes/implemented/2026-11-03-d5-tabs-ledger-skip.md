@@ -10,7 +10,7 @@
 1. 新增 `tests/client/tabs/company-tabs-body.spec.ts`：静态渲染 `BoardTab` / `DagTab` / `BudgetTab` /
    `TasksTab` / `PresenceTab`，断言标题与空态；与 `panel-frame.spec` 联跑后 `company-tabs.tsx`
    **53.7% → 75.92% stmt**（branch 36.36% → 49.09%）。
-2. 修 `tests/company/ledger.spec.ts` 的 live 路径：`company-workspace/kb/...` → `company-workspace/.dsh-company/kb/...`
+2. 修 `tests/lib/ledger.spec.ts` 的 live 路径：`company-workspace/kb/...` → `company-workspace/.dsh-company/kb/...`
    （`deliverables-archive` 同）。此前路径是 v2 布局，`hasLive` 永远 false ⇒ 3 例**永久静默 skip**；
    修后 dev home 6 例全跑，fresh clone 仍按设计 skip。
 
@@ -25,7 +25,7 @@
 ```text
 npx vitest run tests/client/tabs/company-tabs-body.spec.ts tests/client/tabs/panel-frame.spec.ts --coverage
 # company-tabs.tsx | 75.92 stmt / 49.09 branch
-npx vitest run tests/company/ledger.spec.ts
+npx vitest run tests/lib/ledger.spec.ts
 # 6 passed（此前 3 passed + 3 skipped）
 pnpm test
 # 134 files / 1073 tests（0 skipped on this dev home）

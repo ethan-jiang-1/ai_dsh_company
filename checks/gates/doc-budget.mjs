@@ -42,7 +42,7 @@ const DOC_LINE_BUDGETS = [
   ['docs/demo.md', 237],        // 2026-10-21 冻结增长（六维度 Phase D3：无预算合同中最大三份立冻结预算）
   ['docs/multi-human.md', 199], // 2026-10-21 冻结增长
   ['docs/presets.md', 198],     // 2026-10-21 冻结增长（工具面表同轮去历史化）
-  ['packages/company-pack/content/AGENTS.md', 190], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面，同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates；2026-10-12 瘦身轮 195→190（机制证据段收指针、证据叙事压缩、陈旧日期戳退役——同 diff Note）
+  ['packages/company-pack/content/AGENTS.md', 37], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面，同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates；2026-10-12 瘦身轮 195→190（机制证据段收指针、证据叙事压缩、陈旧日期戳退役——同 diff Note）
   // ── 2026-10-27 R3-17：入口链与最大合同补预算（原先 852 行 docs 无棘轮；checks/README 已从 193 压到 78）──
   ['checks/README.md', 59],        // 2026-11-03 A- D1：手工库存改为 INDEX.generated.md 生成物；README 只留快速选择 + 指针（56 行，+5% 棘轮）
   ['tests/README.md', 100],         // 改动面 → 最窄检查（入口链第四跳）

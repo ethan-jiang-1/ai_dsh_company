@@ -60,12 +60,12 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 
 ### D2 代码与测试层次（B）
 
-**成立**：81 文件 / 214 条内部边，**0 环、0 反向边**；7 条合法方向；两条独立守卫（`src-layering` 门禁 + `tsc -b` 的 TS6307）；`gate-wiring` 防哑弹；`tests/company/host-composition.spec.ts` 存在（“host 无组合测试”的旧判断已不成立）。
+**成立**：81 文件 / 214 条内部边，**0 环、0 反向边**；7 条合法方向；两条独立守卫（`src-layering` 门禁 + `tsc -b` 的 TS6307）；`gate-wiring` 防哑弹；`tests/host/index/host-composition.spec.ts` 存在（“host 无组合测试”的旧判断已不成立）。
 
 **问题**：
 
 - **测试粒度反了**（R5-23）：原 cultivation spec（929 行，2026-11-03 已拆） / 44 个 it，覆盖 `host/cultivation` + `host/cultivation-storage` + `lib/cultivation` + `lib/cultivation-context` 四模块；源码是一模块一文件。`tests/client/cultivation/cultivation-board-actions.spec.ts` 574 行。
-- **测试分区无主**（R5-24）：`src/lib`（20 模块）没有自己的区；9 个纯 lib spec 住 `tests/company/`，1 个住 `tests/client/`；`tools/lib` 的 2 个 spec 也住 `tests/company/`（`dev-install`/`market-index`），而 `tests/README.md:16-19` 把 tools/lib 判据划给 harness。
+- **测试分区无主**（R5-24）：`src/lib`（20 模块）没有自己的区；9 个纯 lib spec 住 `tests/host/`，1 个住 `tests/client/`；`tools/lib` 的 2 个 spec 也住 `tests/host/`（`dev-install`/`market-index`），而 `tests/README.md:16-19` 把 tools/lib 判据划给 harness。
 - **共享面漏测**（R5-25）：`lib/tool-card.ts`（75 行，两个卡片共用）无直接 spec，且 `:44` 内联复制了 `lib/guards.ts:5` 的 `isRecord`；`lib/guards.ts` 本身也无 spec。
 - **入口导出面**（R5-26）：`src/index.ts:43-44` `export *` 出 17 个符号，仓内无消费者（只有 `apply` 被 7 处 import）；`tests/harness/repo/pack-exports.spec.ts` 钉了 inject/apply，没钉导出集合，公开面可静默变宽。
 - **静默盲区**：`checks/gates/src-layering.mjs` 只认字面量 specifier，`await import(v)` / 模板串可穿（未复发，注释已明说）。
@@ -86,7 +86,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 
 **主形态 = 半应用改名 + 发布状态漂移。**
 
-- `workspace/` → `content/` 只改了一半（R5-11）：`shipped-links`（`:12`）、`nav-count-claims`（`:31`）、`tools/lib/markdown-links.mjs:39` 的 EXCLUDED_PATHS、`replay-fixture-freshness.mjs:4` 注释、`tests/company/templates.spec.ts:10`、`.gitignore:23`、`packages/company-pack/src/README.md:31-32` 都还写旧路径。
+- `workspace/` → `content/` 只改了一半（R5-11）：`shipped-links`（`:12`）、`nav-count-claims`（`:31`）、`tools/lib/markdown-links.mjs:39` 的 EXCLUDED_PATHS、`replay-fixture-freshness.mjs:4` 注释、`tests/content/templates.spec.ts:10`、`.gitignore:23`、`packages/company-pack/src/README.md:31-32` 都还写旧路径。
 - **tools/standalone.mjs**（已删除）的删除只改了产品面，没改浏览器检验消费者（R5-01）。
 - `retired-path` 门禁的退役前缀只有两个 `_backlog` 项，`workspace/`、`standalone.mjs`、`snapshots/ui` 都不在，所以这类残留全绿。
 - **发布状态**（R5-03 / R5-13 / R5-14）：`release --check` 红；`_dist` manifest 是 2026-11-02 22:21、tgz 21:11、手册 21:44（同代），但源码 HEAD 已前进 5 个提交；`market-index.json` 声明 0.7.1（npm 404，`market-index.staged.json` 自认未发布）；`compat-tags.json` 只到 rc.2，而 pack README 声称 rc.5 已验证。
@@ -102,7 +102,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 
 - **用户可见面三处空白可全绿**（R5-06 / R5-27）：`CultivationTab` 0%、`CultivationContextPicker` 56.5% 且 0 分支（会话/成果检索承诺零 spec）、`company-tabs` 浮窗几何 24.1%。
 - **preset 只有文本**（R5-15）：`tests/presets/presets.spec.ts` 26 个 YAML 正则断言；真挂载只在 `checks/smoke/preset-smoke.mjs`（不在 `pnpm test`）。schema 非法的 preset 在 keyless 档仍绿。
-- **静默 skip**（R5-16）：`tests/company/ledger.spec.ts:43` 的 `describe.skipIf(!hasLive)` 正是本轮 3 个 skip；它是 live 台账的唯一结构断言，fresh clone 上消失，且没有「预期 N 个真跑」守卫（宪法 §3.6 要求）。
+- **静默 skip**（R5-16）：`tests/lib/ledger.spec.ts:43` 的 `describe.skipIf(!hasLive)` 正是本轮 3 个 skip；它是 live 台账的唯一结构断言，fresh clone 上消失，且没有「预期 N 个真跑」守卫（宪法 §3.6 要求）。
 - **测试重心**：harness 48 文件 / 504 例 = 48%，一半断言守仓库自身；产品面是少数。
 - **mock 白名单漂移**（R5-28）：`docs/testing.md:49` 说只有两处；`tests/harness/session/probe-web.spec.ts:151-207` 有 11 处 fetch/spawn stub（网络边界），未登记。
 - **fixture emitter 混入 tests**（R5-29）：`role-mark-fixture.spec.ts`、`board-drift-fixture.spec.ts`、`dag-visual-fixture.spec.ts` 是产物生成器，不是行为测试，但计入 124。

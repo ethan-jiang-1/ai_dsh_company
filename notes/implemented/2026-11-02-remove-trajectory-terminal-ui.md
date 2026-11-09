@@ -37,7 +37,7 @@
 
 | 断言 | 命令/环境 | 结果 |
 |---|---|---|
-| patch 形状 | `pnpm test tests/company/ui-surface.spec.ts` | 5 passed：两条行 `disabled: true`、web-app 真行存在、controller 未禁用 |
+| patch 形状 | `pnpm test tests/host/ui-surface.spec.ts` | 5 passed：两条行 `disabled: true`、web-app 真行存在、controller 未禁用 |
 | 干净 home 产品形安装 | `tools/company.mjs --home <tmp> --workspace company-workspace --port 0 --no-open` | `dep=file:…dsh-company-pack-0.7.0-5fe5f189.tgz`；banner 出 |
 | 真挂载 | 同上 home + `preset-smoke` | ALL PASS（5 角色 + researcher；client 闭包 lint 69 模块） |
 | 运行态行状态 | 运行实例 `pluginInventory/list` | `ui-trajectory` / `ui-sidebar-terminal` `enabled:false`；`terminal-controller`/`ui-attachment`/`ui-chat`/`ui-conversation` `active` |

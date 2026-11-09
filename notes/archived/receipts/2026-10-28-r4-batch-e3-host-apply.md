@@ -26,7 +26,7 @@
 
 ## 验证
 
-- `pnpm test tests/company/host-composition.spec.ts tests/company/apply-lifecycle.spec.ts tests/company/catalog-wiring.spec.ts` → 10 passed。
+- `pnpm test tests/host/index/host-composition.spec.ts tests/host/index/apply-lifecycle.spec.ts tests/host/ledger/catalog-wiring.spec.ts` → 10 passed。
 - `pnpm verify` → ALL PASS；`pnpm typecheck` → exit 0。
 - 注册面仍 3 工具 + 2 命令（host-composition 的名单断言未改）。
 

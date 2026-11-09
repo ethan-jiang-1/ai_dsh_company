@@ -29,7 +29,7 @@ read.” 而 child 的 durable 日志里确实记着 `turn/end {"reason":{"kind"
 `registerDelegationControl(ctx)` 在 pack host 插件上下文里执行，而 `company-session-query-sqlite` 挂在
 `cordis.patch.yml` 的 `company-session-search` **`isolate: { sessionQuery: true }`** 组内——host 的
 `ctx.get('sessionQuery')` 是 `undefined`，`list_subagents` 的终态增强整段被 `fail-soft` 跳过。
-修复轮的 `tests/company/delegation-control.spec.ts` 给 `list_subagents` 注入的是 **fake `sessionQuery`**，
+修复轮的 `tests/host/delegation/delegation-control.spec.ts` 给 `list_subagents` 注入的是 **fake `sessionQuery`**，
 所以门禁全绿；真装配里没有这个服务。修复 Note 的 standalone durable 读（`sessionQuery.readSession`）
 用的是另一条上下文，不能证明 host 工具能拿到它。
 
@@ -64,7 +64,7 @@ read.” 而 child 的 durable 日志里确实记着 `turn/end {"reason":{"kind"
   `sessionQuery`（isolate 组内，host 拿不到）。服务缺席或单条日志读失败 → `lastTurnEnd: 'unavailable'`
   （可见降级，禁止静默省略；输出 schema 改为 required）。
 - **keyless 测试资产**：
-  - `tests/company/delegation-control.spec.ts`：fake persistence 三态（present / absent → unavailable /
+  - `tests/host/delegation/delegation-control.spec.ts`：fake persistence 三态（present / absent → unavailable /
     read 抛错 → unavailable）+ 有界重试（前两次失败、第三次成功 → 仍报终态）+ 三次全失败 →
     `unavailable` 且留一条 warn + `readChildTerminal` 的 open(read)/read(0)/close 调用序。
   - `tests/harness/contract/session-persistence-terminal.spec.ts`：**真实** `JsonlSessionPersistence`

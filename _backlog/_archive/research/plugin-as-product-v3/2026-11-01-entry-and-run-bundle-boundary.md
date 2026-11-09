@@ -20,7 +20,7 @@ intent: "消化 FAQ 26 最新更新并复核 0.5.0 产品化：入口、workspac
 5. **「装成功」有三个状态。** pnpm exit 0 → dependency 写入 → 进 `dsh.profile.bundles`；只有第三个让功能存在。没有 `dsh.bundle.patch` 的包 exit 0、roster 不变，只给一句 warning。dump 有 row 也不等于真启动能挂上；必须真启动并读 `did not activate` / `skipping profile bundle`。（C：FAQ 26 `10-foundations/18-install-upgrade.md` §安装三成功、`10-foundations/17-config-layers.md` §dump 与真启动）
 6. **home 层能覆盖、不能供货。** 往 home patch 插一个该 profile 没装的包，dump 有行，真启动 `ERR_MODULE_NOT_FOUND`，服务照常起。所以产品行为不能靠 profile/home patch「补」进一个已安装的 bundle；bundle 自己的 patch 必须带齐行。（C：FAQ 26 `10-foundations/17-config-layers.md` §home 层；T：前轮隔离实验 #33）
 7. **0.5.0 的入口走反了。** 当前产品入口是 bin/dsh-company.mjs（历史，已删除） + `pnpm company`：它建/修 profile、装 pack、写 profile patch、TTY 询问 workspace、拒绝同 home 第二盘。这是 FAQ 明确列出的 package bin/第二层 launcher + profile 写者；而且应用内 Plugins 页装包时不会跑这个启动器，registrar/seed 都不会发生。（C：packages/company-pack/bin/dsh-company.mjs（0.6.0 已删除）、`packages/company-pack/package.json` 的 `bin`、`docs/profile.md`、`_dist/安装手册.md`；T：前轮 company-entry/release smoke 只证启动器路径）
-8. **0.5.0 把「插件内容」和「run bundle」混了。** `packages/company-pack/content/` 里的手册、模板、org、章程被 `applyBootstrap` 复制到用户 workspace；用户要的是「插件内容全部在插件内部，生产状态/最终 artifacts（run bundle）在 workspace」。手册/模板是只读产品内容，不应成为每个 workspace 的副本；`kb/`、`deliverables/`、`cultivation/`、`.dsh-company/` 才是 run bundle 状态/产物。（C：`src/host/bootstrap.ts`、`src/host/bundle-manifest.ts`、`packages/company-pack/content/README.md`）
+8. **0.5.0 把「插件内容」和「run bundle」混了。** `packages/company-pack/content/` 里的手册、模板、org、章程被 `applyBootstrap` 复制到用户 workspace；用户要的是「插件内容全部在插件内部，生产状态/最终 artifacts（run bundle）在 workspace」。手册/模板是只读产品内容，不应成为每个 workspace 的副本；`kb/`、`deliverables/`、`cultivation/`、`.dsh-company/` 才是 run bundle 状态/产物。（C：`src/host/run-bundle/bootstrap.ts`、`src/host/run-bundle/bundle-manifest.ts`、`packages/company-pack/content/README.md`）
 9. **0.5.0 用「一 home 一 workspace」回避了多 workspace 的治理冲突，但这不是产品答案。** 用户要的是装一次、指向用户指定的 workspace；换项目不该新建 home/重装。正确做法是让 workspace 解析跟启动上下文走，并把 presented 账本按 workspace 分区；不是把产品缩成「一个公司盘」。版本建议 `0.6.0`（破坏性）。（P）
 
 一句话：**产品单位是 bundle，不是 launcher；workspace 是每次启动的输入，不是 home 的绑定；插件内容住包，run bundle 住 workspace。**
@@ -243,10 +243,10 @@ packages/company-pack/                 <workspace>/
 - 删除 packages/company-pack/bin/dsh-company.mjs（0.6.0 已删除）、`package.json` 的 `bin`、`files` 的 `bin/**`。
 - `tools/company.mjs`：删除或降为 dev-only exec wrapper；不建 profile/不装包/不问 workspace。
 - 新增/改造 host startup：workspace 解析（env/cwd/saved/无）、bundle registrar、handbook `systemPrompt.section`、client onboarding 的 host 端。
-- `src/host/bootstrap.ts`：拆 `content/` vs seed；不再复制手册/模板；只补缺状态实例；`hasCompanyMarker` 改为 `.dsh-company/bundle.json` 或 `kb/company.md`，不再靠 `AGENTS.md`。
-- `src/host/bundle-manifest.ts`：v3；seed 只记状态文件；迁移 v2→v3。
-- `src/host/runtime-guard.ts`：不再要求 `DSH_COMPANY_HOME`；不再单 workspace `expectedWorkspace`；按 session/启动 workspace 解析；dataBlocked 条件改为「已知 workspace 但落点不安全/身份坏/lease 败」。
-- `src/host/catalog.ts` / `presented-domain.ts`：账本按 workspace 分区；catalog 仍 per workspace。
+- `src/host/run-bundle/bootstrap.ts`：拆 `content/` vs seed；不再复制手册/模板；只补缺状态实例；`hasCompanyMarker` 改为 `.dsh-company/bundle.json` 或 `kb/company.md`，不再靠 `AGENTS.md`。
+- `src/host/run-bundle/bundle-manifest.ts`：v3；seed 只记状态文件；迁移 v2→v3。
+- `src/host/run-bundle/runtime-guard.ts`：不再要求 `DSH_COMPANY_HOME`；不再单 workspace `expectedWorkspace`；按 session/启动 workspace 解析；dataBlocked 条件改为「已知 workspace 但落点不安全/身份坏/lease 败」。
+- `src/host/ledger/catalog.ts` / `presented-domain.ts`：账本按 workspace 分区；catalog 仍 per workspace。
 - `src/index.ts`：工具/命令从「当前公司盘」改为「当前 session 的 workspace」或「当前 process active workspace」；多 workspace 时命令要能拒绝跨盘操作。
 - `src/client/**`：onboarding/最近 workspace/选中 session；公司页签读当前 session cwd 的 run bundle。
 - `packages/company-pack/cordis.patch.yml`：startup 行；不再要求 profile patch。
@@ -337,5 +337,5 @@ packages/company-pack/                 <workspace>/
 
 - 外部 FAQ 26（本轮同步）：`10-foundations/16-startup-resolution.md`、`17-config-layers.md`、`18-install-upgrade.md`、`30-external/37-lifecycle-stages.md`、`50-launch/40-profile-integration.md`、`50-launch/90-evidence.md`。
 - 本仓前轮：[插件即产品卡](../../settled_issues/2026-11-01-plugin-as-product.md)、[落地顺序卡](../../settled_issues/2026-11-01-landing-plan.md)、[主研究稿](../plugin-as-product/2026-11-01-plugin-as-product.md)。
-- 当前代码：0.5.0 launcher（已删除）、[bootstrap](../../../../packages/company-pack/src/host/bootstrap.ts)、[manifest](../../../../packages/company-pack/src/host/bundle-manifest.ts)、[runtime guard](../../../../packages/company-pack/src/host/runtime-guard.ts)、[presented domain](../../../../packages/company-pack/src/host/presented-domain.ts)、[client composition spec](../../../../tests/client/company-client-composition.spec.ts)。
+- 当前代码：0.5.0 launcher（已删除）、[bootstrap](../../../../packages/company-pack/src/host/run-bundle/bootstrap.ts)、[manifest](../../../../packages/company-pack/src/host/run-bundle/bundle-manifest.ts)、[runtime guard](../../../../packages/company-pack/src/host/run-bundle/runtime-guard.ts)、[presented domain](../../../../packages/company-pack/src/host/ledger/presented-domain.ts)、[client composition spec](../../../../tests/client/company-client-composition.spec.ts)。
 - 当前合同：[README](../../../../README.md)、[profile](../../../../docs/profile.md)、[runtime map](../../../../docs/runtime-map.md)、[data model](../../../../docs/data-model.md)、[release](../../../../docs/release.md)、[`_dist` 手册](../../../../_dist/安装手册.md)。

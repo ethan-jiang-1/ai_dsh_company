@@ -7,7 +7,7 @@ import { cpSync, existsSync, mkdirSync, readdirSync, realpathSync, rmSync } from
 import { dirname, join } from 'node:path'
 
 export const REHEARSAL_REL = join('runtime', 'rehearsal-workspace')
-const ROLES = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']
+const ROLES = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales', 'cmo']
 
 /**
  * 公司参考镜像（幂等纯 fs）：`.dsh-company/kb` 状态 + 角色章程 + 空产物目录。

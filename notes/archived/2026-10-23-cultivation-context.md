@@ -120,12 +120,12 @@ export interface CultivationContext {
   `背景格式坏：不是合法的 base64url。` / `背景格式坏：JSON 解析失败（<原因>）。` /
   `背景格式坏：不支持的版本 / kind / 字段。` / `背景只能带一段（v1）。` /
   `背景太大（超过 <N> 字节），请选短一点的材料。` / `这段背景读不到：<原因>。可以换一段，或不带背景提交。`
-- 旧语法回归：`tests/company/cultivation.spec.ts` 现有用例全绿；新增 `--context` 无 `=` 与
+- 旧语法回归：`tests/host/cultivation.spec.ts` 现有用例全绿；新增 `--context` 无 `=` 与
   `--context=` 坏 token 两个用例。
 
 ### Host 读取（唯一证据来源）
 
-`packages/company-pack/src/host/cultivation.ts` 的 handler 改为 **async**（先核对 `commands.register`
+`packages/company-pack/src/host/cultivation/cultivation.ts` 的 handler 改为 **async**（先核对 `commands.register`
 接受 Promise；类型在 `vendor/dsh/packages/interaction/commands/src/types.ts`）。读取逻辑：
 
 1. **会话**：`const query = ctx.get('sessionQuery')`；缺席 → `这个界面读不了会话历史（sessionQuery 未挂）`。
@@ -275,7 +275,7 @@ npx vitest run tests/client/cultivation/cultivation-context.spec.ts tests/client
 **怎么测**：
 
 ```sh
-npx vitest run tests/company/cultivation.spec.ts
+npx vitest run tests/host/cultivation.spec.ts
 ```
 
 （扩展现有文件。）

@@ -1,0 +1,15 @@
+{
+  "productType": "hardware-software",
+  "layers": ["MRD", "StRS", "PRD", "SyRS", "IRS", "V&V"],
+  "defaultLayers": ["MRD", "StRS", "PRD"],
+  "files": {
+    "MRD": "mrd.md",
+    "StRS": "strs.md",
+    "PRD": "prd.md",
+    "SyRS": "syrs.md",
+    "IRS": "irs.md",
+    "V&V": "vv-plan.md"
+  },
+  "retiredPrefixes": ["STR", "SYR", "IFR", "VR", "VP", "V"],
+  "notes": "系统工程 V 模型：需求分层、接口与分配是 IRS 附录；验收含检验/送检/现场。"
+}

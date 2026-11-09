@@ -29,6 +29,12 @@ import * as gitignoreShape from './gates/gitignore-shape.mjs'
 import * as companySkeleton from './gates/company-skeleton.mjs'
 import * as shippedLinks from './gates/shipped-links.mjs'
 import * as baseClean from './gates/base-clean.mjs'
+import * as contentSingleHome from './gates/content-single-home.mjs'
+import * as genericClean from './gates/generic-clean.mjs'
+import * as contentManifest from './gates/content-manifest.mjs'
+import * as rosterConsistency from './gates/roster-consistency.mjs'
+import * as testsLiterals from './gates/tests-literals.mjs'
+import * as seedIntegrity from './gates/seed-integrity.mjs'
 import * as ledgerRouting from './gates/ledger-routing.mjs'
 import * as ledgerParticipation from './gates/ledger-participation.mjs'
 import * as docTaxonomy from './gates/doc-taxonomy.mjs'
@@ -103,6 +109,12 @@ gitignoreShape.run(ctx)
 companySkeleton.run(ctx)
 shippedLinks.run(ctx)
 baseClean.run(ctx)
+contentSingleHome.run(ctx)
+genericClean.run(ctx)
+contentManifest.run(ctx)
+rosterConsistency.run(ctx)
+testsLiterals.run(ctx)
+seedIntegrity.run(ctx)
 ledgerRouting.run(ctx)
 ledgerParticipation.run(ctx)
 docTaxonomy.run(ctx)

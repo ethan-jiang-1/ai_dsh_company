@@ -18,6 +18,7 @@
 
 | 名头 | 材料 | 历史消费者 | 产出的卡 | 归档 |
 |---|---|---|---|---|
+| [company-specificity-externalization/](company-specificity-externalization/README.md) · 通用/产品类型/公司三层：盘点、原型、测试资产与目标目录 | 3 份 | [三层分离卡](../settled_issues/2026-11-09-company-specificity-externalization.md) | 同卡 | 2026-11-09 |
 | [vp-eng-delegation-topology/](vp-eng-delegation-topology/README.md) · VP-Eng 委派拓扑：workflow 控流程 / subagent 保信噪比 | 2 份 | [workflow 通道卡](../settled_issues/2026-11-08-vpeng-workflow-channel.md) | 同卡 | 2026-11-08 |
 | [role-addition/](role-addition/README.md) · 角色新增面：加一个角色/子人格到底要动哪些地方（CMO 9 提交/97 文件实证 → SA/SQA 落地） | 1 份 | [SA/SQA 卡](../settled_issues/2026-11-06-system-architect-sqa.md) | 同卡 | 2026-11-06 |
 | [plugin-lifecycle-publish/](plugin-lifecycle-publish/README.md) · 插件生命周期与发布：装/起/升/卸证据与 npm/市场发布面 | 3 份 | [生命周期与发布卡](../settled_issues/2026-11-01-plugin-lifecycle-publish.md) | 同卡 | 2026-11-02 |

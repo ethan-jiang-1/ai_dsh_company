@@ -63,7 +63,7 @@ UI 半边，不是独立过渡）；③ CEO 跨角色 = **仅建议权，目标�
 | 检查 | 结果 |
 |---|---|
 | 红（先立后实现） | 新 spec 三文件在实现前实跑红 **8 断言**（`CultivationBoard` 不存在 / 方法层根未声明 / 读模型缺 exports / inboxRows 无 reach）→ 实现后全绿（红绿皆在对话与卡上留证） |
-| `npx vitest run tests/company/cultivation.spec.ts tests/client/cultivation/cultivation-board.spec.ts tests/presets/presets.spec.ts` | 40/40 |
+| `npx vitest run tests/host/cultivation.spec.ts tests/client/cultivation/cultivation-board.spec.ts tests/presets/presets.spec.ts` | 40/40 |
 | `pnpm test` | **538/538**（54 spec 文件） |
 | `pnpm verify` | ALL PASS |
 | `node checks/smoke/preset-smoke.mjs` | 5/5 ALL PASS（方法层缺目录容忍 ⇒ 挂载不炸；「只看见自己的 skills」隔离断言维持） |

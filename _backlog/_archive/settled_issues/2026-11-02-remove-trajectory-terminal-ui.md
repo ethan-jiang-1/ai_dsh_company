@@ -117,7 +117,7 @@ opened: 2026-11-02
 顶层替换行（`disabled: true`）；`terminal-controller` 保持 active。落地 Note =
 [remove-trajectory-terminal-ui](../../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md)。
 
-**P1 完成**：`tests/company/ui-surface.spec.ts` 5 条 keyless；干净 home 产品形安装 + `preset-smoke`
+**P1 完成**：`tests/host/ui-surface.spec.ts` 5 条 keyless；干净 home 产品形安装 + `preset-smoke`
 ALL PASS；真页面主区 = Chat + 培养、右栏 guide = 9 公司页签、无 New terminal；`pluginInventory`
 两条 `enabled:false`；`pnpm verify` / `pnpm test`（124 files / 1042 passed）/ `pnpm typecheck` 绿。
 

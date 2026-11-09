@@ -18,6 +18,8 @@ import { createAttentionRegistry } from './wiring/attention-registry.ts'
 import { installAttentionObservers } from './wiring/attention-observers.ts'
 import { createCultivationView } from './cultivation/CultivationView.tsx'
 import { createCompanyDataPlane, WORKSPACE_TEXT_PATHS } from './data/company-data-plane.ts'
+import { parseCompanyIdentity, setCompanyIdentity } from './data/company-identity.ts'
+import { RUN_BUNDLE_PATHS } from '../lib/run-bundle-paths.ts'
 import { makeContextWiring, type ContextWiringScoped } from './wiring/context-wiring.ts'
 import { makeOpenMember } from './wiring/member-navigation.ts'
 import { titleUpdateFor } from './wiring/title-state.ts'
@@ -225,7 +227,7 @@ function registerToolCards(ctx: ClientContext): void {
 }
 
 function registerSidebarIdentity(ctx: ClientContext): void {
-  ctx.inject(['sessions', 'sidebarRight', 'slots'], (scoped) => {
+  ctx.inject(['sessions', 'remote.workspaceFiles', 'sidebarRight', 'slots'], (scoped) => {
     scoped.slots.inject('sidebar.brand.name', () =>
       scoped.slots.register({ name: 'sidebar.brand.name' }, DreamTeamBrandName))
 
@@ -243,6 +245,24 @@ function registerSidebarIdentity(ctx: ClientContext): void {
 
     const sessions = scoped.sessions
     const leadSessionId = createLeadLookup(sessions)
+
+    // 部署身份（2026-11-09）：读一次 workspace 的 company.md，品牌从它取 productName。
+    // 读不到（无会话/无文件/读失败）保持出厂词标——品牌是装饰面，不阻塞页面。
+    const identityFiles = scoped.remote.workspaceFiles
+    const loadIdentity = async (): Promise<void> => {
+      try {
+        const first = Object.values(sessions.list.getSnapshot().byId as Record<string, { id: string }>)[0]
+        if (first === undefined) return
+        const result = await identityFiles.read(first.id as never, RUN_BUNDLE_PATHS.company, { limit: 200 }, new AbortController().signal)
+        if (!result.ok) return
+        const parsed = parseCompanyIdentity(result.value.text)
+        if (parsed !== null) setCompanyIdentity(parsed)
+      } catch {
+        // 品牌读不到就用出厂词标；不把装饰面错误升级成页面错误。
+      }
+    }
+    void loadIdentity()
+
     // 条目 ② S3：头部按钮从 anchored 弹窗改为打开右栏平台页签（与官方 Agent Team 弹窗不再互盖）。
     scoped.slots.inject('conversation.session.header.actions', () =>
       scoped.slots.register({

@@ -9,7 +9,7 @@
 
 /** `request_signoff` 工具的入参（模型侧 schema 同形）。 */
 export interface SignoffRequest {
-  /** 触的哪条签字线（如「毛利<30% 双签」「折扣<9折 双签」）。 */
+  /** 触的哪条签字线（如「毛利线双签」「折扣线双签」；具体数值见部署 policy）。 */
   readonly line: string
   /** 一句话：具体要人拍什么（带数字）。 */
   readonly summary: string

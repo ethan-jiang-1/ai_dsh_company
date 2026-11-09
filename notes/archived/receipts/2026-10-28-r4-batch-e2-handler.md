@@ -29,7 +29,7 @@
 
 ## 验证
 
-- `pnpm test tests/company/cultivation.spec.ts` → **40 tests passed**（命令/守卫/revoke 回滚覆盖）。
+- `pnpm test tests/host/cultivation.spec.ts` → **40 tests passed**（命令/守卫/revoke 回滚覆盖）。
 - `pnpm test` → **110 files / 974 tests**；`pnpm verify` → ALL PASS；`pnpm typecheck` → exit 0。
 - `git grep -n "function cultivationCommandHandler"`：338 → 206 行（按下一函数行号差计）。
 

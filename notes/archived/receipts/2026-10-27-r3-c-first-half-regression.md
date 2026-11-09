@@ -15,7 +15,7 @@
 2. **客户端三档新 spec**：`attention-tab.spec.ts`（happy-dom 真挂载：空态/挂起项/「去处理」跳转/断流错误行）、
    `attention-observers.spec.ts`（5 例：登记、委托、销账、无主不登记、缺字段占位）、
    `company-panels.spec.ts`（在场/用量两面板首次有渲染断言：空态、行、Lead 标记、份额、缺数据显示破折号）。
-3. **Host 真实组合 spec**（`tests/company/host-composition.spec.ts`）：真 `Context` + 假 services 跑 `apply()`，
+3. **Host 真实组合 spec**（`tests/host/index/host-composition.spec.ts`）：真 `Context` + 假 services 跑 `apply()`，
    断言注册面固定（`request_signoff` / `workspace_doors` / `cultivation_propose` + `deliverables` / `cultivation`）、
    `dispose` 摘净、无 agent 时签字工具回 `unavailable` 且不发审批、schema 必填键可判。
 4. **propose 五条治理守卫表驱动 spec**（8 例）：无会话 / 不在名册 / 跨角色 correction / suggestion 给自己 /
@@ -49,8 +49,8 @@
 npx vitest run tests/client/tabs/attention-tab.spec.ts            → 5 passed
 npx vitest run tests/client/wiring/attention-observers.spec.ts      → 5 passed
 npx vitest run tests/client/tabs/company-panels.spec.ts           → 5 passed
-npx vitest run tests/company/host-composition.spec.ts        → 4 passed
-npx vitest run tests/company/cultivation-propose-guards.spec.ts → 8 passed
+npx vitest run tests/host/index/host-composition.spec.ts        → 4 passed
+npx vitest run tests/host/index/cultivation-propose-guards.spec.ts → 8 passed
 npx vitest run tests/harness/session/session-diagnose.spec.ts        → 8 passed（新增中断轮/工具计数 2 例）
 npx vitest run                                               → 103 files / 944 tests passed
 node checks/run-gates.mjs                                    → verify: ALL PASS

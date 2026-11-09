@@ -6,13 +6,13 @@
 
 ## 决定
 
-1. **`tests/company/dag.spec.ts` 恢复原 DAG 判据，并给「重复 spec」立门。** `d6d1f92` 把该文件整体覆盖成
-   `tests/company/cultivation-lib.spec.ts` 的字节副本——`lib/dag.ts`（261 行布局算法）失去唯一单测、
+1. **`tests/lib/dag.spec.ts` 恢复原 DAG 判据，并给「重复 spec」立门。** `d6d1f92` 把该文件整体覆盖成
+   `tests/lib/cultivation.spec.ts` 的字节副本——`lib/dag.ts`（261 行布局算法）失去唯一单测、
    套件多 21 条重复用例，而 `verify`/`test`/`typecheck` 全绿。恢复原 spec 时只差 `TaskRow.description`
    一个新必填字段（补 `description: ''`）。新增 `checks/gates/spec-duplicates.mjs`：`tests/**/*.spec.ts`
    归一化正文的 sha256 重复即红——只判「整文件同一」，不判语义相似（平行的跨面双守卫不误伤）。
 2. **`tsconfig.test-harness.json` 从 51 行 include 清单改成 glob + 单条 exclude。** 同目录的
-   `tests/client` / `tests/company` 早已是 glob+exclude；手工清单会静默漏新 spec，且它藏着一个真
+   `tests/client` / `tests/host` 早已是 glob+exclude；手工清单会静默漏新 spec，且它藏着一个真
    type error（`company-tab-catalog.spec.ts` 少传第二个参数——被排除所以从没进 tsc）。
    唯一排除项 `tests/harness/repo/pack-exports.spec.ts` 是**混合面**：host 与 client 两半同文件，host 项目
    缺 jsx、client 项目缺 node `process` 全局，实测两向皆红，只能留在 tsc 外并在测试宪法里写清。
@@ -62,13 +62,13 @@
 ```text
 # 1) dag 恢复：原 spec 20 例过 + 类型过（修复前 tsconfig.test-company 报 TaskRow.description 缺失）
 node ./node_modules/typescript/bin/tsc -p tsconfig.test-company.json        # exit 0
-npx vitest run tests/company/dag.spec.ts                                    # 20 passed
+npx vitest run tests/lib/dag.spec.ts                                    # 20 passed
 
 # 2) 重复 spec 门禁：造红 → 还原 → 绿（原话）
-cp tests/company/dag.spec.ts tests/company/zz-copy.spec.ts
+cp tests/lib/dag.spec.ts tests/host/zz-copy.spec.ts
 node checks/run-gates.mjs
-# FAIL spec-duplicates: 2 份 spec 内容完全相同（sha256:fdbe9b51…）：tests/company/dag.spec.ts；tests/company/zz-copy.spec.ts
-rm tests/company/zz-copy.spec.ts
+# FAIL spec-duplicates: 2 份 spec 内容完全相同（sha256:fdbe9b51…）：tests/lib/dag.spec.ts；tests/host/zz-copy.spec.ts
+rm tests/host/zz-copy.spec.ts
 node checks/run-gates.mjs
 # PASS spec-duplicates ×139（测试文件正文唯一；复制即红）
 

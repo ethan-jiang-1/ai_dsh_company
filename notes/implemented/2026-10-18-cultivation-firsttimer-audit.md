@@ -29,7 +29,7 @@ source run/env.sh && node probes/browser-visual/cultivation-ux-walkthrough.mjs -
 |---|---|---|---|
 | 1 | 待办行里同一句话出现两次：先当摘要显示"做法：…"，下面正文块又从这句开始 | 纯噪音；新人会以为"这两条不一样吗" | 正文就地展开时不再渲染首句摘要（只留出处行）；交互档加断言"首句只出现一次" |
 | 2 | 撤回的后果说明**夹在按钮中间**（这条有用 ｜ 没起作用 ｜ 撤回警告 ｜ 确认撤回） | 破坏性动作的警告必须在按钮**之前**读，夹在中间等于没读就被点 | 后果独占一行、确认按钮另起一块；交互档加 DOM 顺序断言（`compareDocumentPosition` = FOLLOWING） |
-| 3 | 宿主回执甩命令行词：*"验证后用 verify 回填结果；不灵了用 revoke … 撤回"* | 面板上没有叫 verify/revoke 的控件（按钮叫「这条有用」「撤回…」）⇒ 指引对不上控件 | 回执改人话并与按钮同名（命令留在括号里给熟手）；`tests/company` 断言同步 |
+| 3 | 宿主回执甩命令行词：*"验证后用 verify 回填结果；不灵了用 revoke … 撤回"* | 面板上没有叫 verify/revoke 的控件（按钮叫「这条有用」「撤回…」）⇒ 指引对不上控件 | 回执改人话并与按钮同名（命令留在括号里给熟手）；`tests/host` 断言同步 |
 | 4 | 创作表单只有 placeholder：打完字标签就没了，正文栏也没说"证据写什么" | 不熟的人中途会忘哪栏是哪栏；"证据"没有样例 | 两栏改**常驻标签** + 正文栏加一行提示（做法 + 出处坐标）；交互档断言标签在打字后仍在场 |
 
 ## 七条 UX 完成定义 · 自评（模拟口径）
@@ -59,5 +59,5 @@ source run/env.sh && node probes/browser-visual/cultivation-ux-walkthrough.mjs -
 ## 指针
 
 - 走查探针：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough.mjs)（`--protocol` / `--shots`）
-- 面板合同与实现：[CultivationBoard.tsx](../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx)｜[CultivationCompose.tsx](../../packages/company-pack/src/client/cultivation/CultivationCompose.tsx)｜宿主回执：[cultivation.ts](../../packages/company-pack/src/host/cultivation.ts)
+- 面板合同与实现：[CultivationBoard.tsx](../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx)｜[CultivationCompose.tsx](../../packages/company-pack/src/client/cultivation/CultivationCompose.tsx)｜宿主回执：[cultivation.ts](../../packages/company-pack/src/host/cultivation/cultivation.ts)
 - 前决定：[培养 GUI 行动面](./2026-10-17-cultivation-gui-actions.md)（其「体验协议」节即本轮的入口）

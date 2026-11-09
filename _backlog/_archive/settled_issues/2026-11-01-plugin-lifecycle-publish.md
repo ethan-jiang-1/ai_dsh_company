@@ -221,7 +221,7 @@ rc.2 与 rc.5 的 in-app 安装均为 `application: applied`；真模型 `sessio
 `sha256=abef80f4…dc55ff`；manifest 记录版本/HEAD/检查项（`--stamp` 后 `dirty=false`）。
 
 **P3 完成（到 handoff）**：本地 registry 按名安装演练通过（`dsh plugin add dsh-company-pack --registry ...` → `^0.7.0` + 六角色 boot）；`tools/market-index.mjs`（manifest→format 1 + DSH 校验器真验）、
-`tests/company/market-index.spec.ts`、`docs/guides/publish-handoff.md`；仓库根 `market-index.json`
+`tests/host/market-index.spec.ts`、`docs/guides/publish-handoff.md`；仓库根 `market-index.json`
 （tracked，图标内联）以 `dsh-company-pack@0.7.0` 通过校验。**真实 npm publish 与 https 托管 = 人工 handoff（D6）**，
 本机无 npm 凭据，未执行。
 

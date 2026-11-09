@@ -1,0 +1,19 @@
+{
+  "productType": "b2b-saas",
+  "layers": [
+    "ROADMAP",
+    "US",
+    "RELEASE"
+  ],
+  "defaultLayers": [
+    "ROADMAP",
+    "US"
+  ],
+  "files": {
+    "ROADMAP": "roadmap.md",
+    "RELEASE": "release.md",
+    "US": "user-story.md"
+  },
+  "retiredPrefixes": [],
+  "notes": "订阅制：路线图 → User Story → 发布；验收看激活/留存/SLO，不看系统需求层。"
+}

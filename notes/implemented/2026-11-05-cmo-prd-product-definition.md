@@ -191,4 +191,4 @@
 
 `presets/cmo/`、`presets/_shared/skills/product-definition/`、`presets/vp-eng/skills/prd-playbook/`、
 `presets/ceo/skills/assembling-the-team/`、`content/templates/{mrd,prd}.md`、
-`src/host/prd-command.ts`、`src/lib/prd-check.ts`、`docs/guides/product-definition.md`。
+`src/host/commands/prd-command.ts`、`src/lib/prd-check.ts`、`docs/guides/product-definition.md`。

@@ -34,7 +34,7 @@
 ## 验证
 
 - `tests/client/wiring/error-ring.spec.ts` → 4 passed；新增 reporter 脱敏 + reporter 抛错不影响环。
-- `tests/company/host-composition.spec.ts` → 5 passed；真实 apply 注册 3 工具 + 3 命令，执行 `company-diagnostics` 后日志含 `页面 boom`、不含 `SECRET`。2026-10-28 M1 后 → 6 passed（新 home logs 路径 + 256 KiB 轮转）。
+- `tests/host/index/host-composition.spec.ts` → 5 passed；真实 apply 注册 3 工具 + 3 命令，执行 `company-diagnostics` 后日志含 `页面 boom`、不含 `SECRET`。2026-10-28 M1 后 → 6 passed（新 home logs 路径 + 256 KiB 轮转）。
 - `pnpm test` → **110 files / 976 tests**；`pnpm verify` → ALL PASS；`pnpm typecheck` → exit 0。
 
 ## 附：observer 生产接线

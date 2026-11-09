@@ -24,7 +24,7 @@ intent: 把 13 张卡放在一起查系统性/结构/一致性/逻辑与方法�
 | 2 | 一致性 | 卡里各自写不同的 Note 文件名 | 机械审计：`Note 计划 \`2026-11-07-...\`` | 统一到**一份**程序 Note（文件名 `2026-11-07-requirements-teaming-program.md`，待建，落 `notes/implemented/`）；未建件只写文件名不写完整路径（`_backlog/` 活跃卡在 bare-path 硬档） |
 | 3 | 可追溯 | 11 张卡缺回链到伞卡/研究题 | `research/README`：新卡要链回题名页 | 每卡加 `> 上游：` 链伞卡 + 研究材料 |
 | 4 | 自洽 | 卡 `去向=implementation` 却指向程序 Note，类型语义冲突 | `issue-to-note` 的类型表 | 伞卡 = `note`（程序 Note）；执行卡 = `implementation`（提交即载体，决定理由见伞卡 Note） |
-| 5 | 证据 owner | A1 的 `meta` 字段路由到 `tests/company/bootstrap.spec.ts`，实际 `validateMeta` 在 `tests/harness/tools/deliverables.spec.ts` | 目录实况 | 改 owner，补 `meta` 测试资产行 |
+| 5 | 证据 owner | A1 的 `meta` 字段路由到 `tests/host/run-bundle/bootstrap.spec.ts`，实际 `validateMeta` 在 `tests/harness/tools/deliverables.spec.ts` | 目录实况 | 改 owner，补 `meta` 测试资产行 |
 | 6 | 过度声明 | A4a 用既有 SA/SQA 探针证“SA 出 SyRS/IRS”，但该探针只证 E/V 接线 | 探针任务书 | 改为“既有探针证接线；A8 证 SyRS/IRS” |
 | 7 | 过度声明 | A4b 写“结论不被删”，但探针只断言“结论在场” | 探针断言 | 改为“结论在场；删除会红” |
 | 8 | 弱 owner | A6 的“角色不自证”路由到 `presets.spec`/`handbook.spec`，两者未断言此条 | 现有 spec | 改为“handbook 文案 + 用户 review；如加断言落 `handbook.spec`” |

@@ -23,7 +23,7 @@
 ## 验证（实跑，2026-11-03 12:1x +08）
 
 ```text
-npx vitest run tests/company/deliverables-command.spec.ts   # 5 passed
+npx vitest run tests/host/commands/deliverables-command.spec.ts   # 5 passed
 pnpm test                                                   # 139 files / 1107 tests
 pnpm verify                                                 # ALL PASS
 node ./node_modules/typescript/bin/tsc -b packages/company-pack  # exit 0
@@ -31,6 +31,6 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack  # exit 0
 
 ## 事实落点
 
-- 命令注册/解析新家 = `packages/company-pack/src/host/deliverables-command.ts`；
+- 命令注册/解析新家 = `packages/company-pack/src/host/commands/deliverables-command.ts`；
   `src/index.ts` 只保留一行 `registerDeliverablesCommand(...)`。
 - 0.8.5 之后又改了 pack 源码；下一次发布需 bump 0.8.6（本刀不单独发）。

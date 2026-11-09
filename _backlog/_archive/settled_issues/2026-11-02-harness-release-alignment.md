@@ -74,7 +74,7 @@ README 元数据与门禁也有事实漂移。
 | 重复的发布/安装叙事 | README、release.md、release-runbook、publish-handoff、pack README、`_dist/安装手册.md` 各写一份安装/升级/卸载；release.md 里还有冒烟程序与升 pin 程序 | 定 owner：release.md = 发行版合同；runbook = 操作步骤；handoff = 字节离开仓库；手册 = 收件人唯一安装路径；README/pack README = 首屏 + 指针。删重复段 | 版本史归 CHANGELOG；脚本步骤归脚本头注 |
 | 过期指针/版本 | 26_plugin-data-model / 26_plugin-as-product 两个不存在的目录；release-runbook 1「0.3.x」/30「0.3.4」；publish-handoff 87 指向归档卡；README 0.6.0/0.5.0 版本说明；release.md 0.6.0/OpenSpec/旧 FAQ 13 | 修正/删除；发布回执改落当轮 Note + manifest | 归档卡不改内容；历史 decisions 只加 D55 |
 | 门禁钉旧文案 | `dist-manual` 强制「不需要 Node」；`dev-product-parity` 固定旧指南名/旧词；`pack-shape`/`company-skeleton` 消息写「产品入口」；`run-bundle-clean` 名称 | 改判据/消息；新增 optional peer、发布源指纹、run/README 退役词等断言 | 门禁红证与历史注释可保留，但要标“负例留证” |
-| 代码/工具/测试注释 | `tools/company.mjs`、`tools/bundle-init.mjs`、`tools/lib/install-manual.mjs`、`tools/orient.mjs`、`checks/smoke/*`、`tests/company/*` 的 run bundle/产品/launcher 字样 | 读者面注释与测试标题改新词；纯标识符/路径保留并标 legacy | 不改测试断言语义来“凑绿” |
+| 代码/工具/测试注释 | `tools/company.mjs`、`tools/bundle-init.mjs`、`tools/lib/install-manual.mjs`、`tools/orient.mjs`、`checks/smoke/*`、`tests/host/*` 的 run bundle/产品/launcher 字样 | 读者面注释与测试标题改新词；纯标识符/路径保留并标 legacy | 不改测试断言语义来“凑绿” |
 | 计数/清单第二份 | checks/README.md:30/51/58 28/13/52（实为 26/12/53）；`docs/profile.md` 行清单；`docs/release.md` 手册 required 词表 | 改成“清单 = 目录本身”或实测值；required 词表归门禁 | D28：枚举型事实的家 = 实现自己 |
 | 历史/未来混入合同 | release.md 0.6.0 史、OpenSpec 触发、日期实证；profile.md 0.5.0 registrar；runtime-map REBIND/0.5.0；project-map 目录整理结论；demo 实测回执 | 删除/搬 notes 或 CHANGELOG；合同只写 now | 不把历史层本身当噪声删除 |
 

@@ -25,4 +25,9 @@ export function run({ root, ok, fail }) {
   handbookBytes + margin <= HANDBOOK_MAX_BYTES
     ? ok(`handbook-budget content/AGENTS.md ${handbookBytes}B + ${margin}B 余量 ≤ ${HANDBOOK_MAX_BYTES}`)
     : fail('handbook-budget', `content/AGENTS.md ${handbookBytes}B + ${margin}B > ${HANDBOOK_MAX_BYTES}——host 注入会超预算（先瘦身手册）`)
+  // T0 预算（2026-11-09 三层）：开场常驻面 ≤ 6KB；细则一律挪 generic/ 按需读。
+  const T0_MAX_BYTES = 6_144
+  handbookBytes <= T0_MAX_BYTES
+    ? ok(`handbook-budget T0 常驻 ${handbookBytes}B ≤ ${T0_MAX_BYTES}B`)
+    : fail('handbook-budget', `T0 常驻面 ${handbookBytes}B > ${T0_MAX_BYTES}B——手册又胖了，细则应挪 generic/ 按需读`)
 }

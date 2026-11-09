@@ -25,8 +25,8 @@
 
 ## 验证（实跑）
 
-- 红：`pnpm exec vitest run tests/company/cultivation.spec.ts tests/client/cultivation/cultivation-board.spec.ts tests/client/cultivation/cultivation-board-actions.spec.ts` 在实现前分别因缺失验证历史、host 接受空依据、主任务/来源 UI 不存在而失败。
-- 绿：`pnpm exec vitest run tests/company/cultivation.spec.ts tests/client/cultivation/cultivation-board.spec.ts tests/client/cultivation/cultivation-board-actions.spec.ts tests/client/cultivation/cultivation-compose-context.spec.ts`：4 files / 98 tests PASS。
+- 红：`pnpm exec vitest run tests/host/cultivation.spec.ts tests/client/cultivation/cultivation-board.spec.ts tests/client/cultivation/cultivation-board-actions.spec.ts` 在实现前分别因缺失验证历史、host 接受空依据、主任务/来源 UI 不存在而失败。
+- 绿：`pnpm exec vitest run tests/host/cultivation.spec.ts tests/client/cultivation/cultivation-board.spec.ts tests/client/cultivation/cultivation-board-actions.spec.ts tests/client/cultivation/cultivation-compose-context.spec.ts`：4 files / 98 tests PASS。
 - `pnpm test`：118 files / 1011 tests PASS。
 - `pnpm typecheck`：exit 0。
 - `pnpm verify`：初跑在 bare-path 因卡上的研究路径指针只存在于原型分支而红；移除不存在的活跃路径指针后复跑 ALL PASS。Replay fixture freshness 和 replay UI freshness 因当前盘无对应对象而 SKIP。

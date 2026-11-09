@@ -81,7 +81,7 @@ export function renderInstallManual(input) {
 - Plugins 页的 **Installed plugins** 里出现「Dream Team Company Pack」（包名 ${q('dsh-company-pack')}），
   状态为已安装/已启用；
 - 侧栏品牌变成「DSH 梦之队」；
-- 新建会话的默认角色是「梦之队 CEO」，右栏菜单里出现公司页签（任务板 / 在场 / 成品等，清单以界面为准）。
+- 新建会话的默认角色是「CEO」，右栏菜单里出现公司页签（任务板 / 在场 / 成品等，清单以界面为准）。
 
 **不要装错 profile**：DSH 的 Desktop 与 ${q('dsh web')} 各是一个 profile；装进哪个，就从哪个入口启动。
 Desktop 用的是它自己的内置 profile，界面上不需要你输入名字；CLI 才需要 ${q('--profile')}。

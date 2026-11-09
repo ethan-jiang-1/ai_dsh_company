@@ -156,7 +156,7 @@ upgrade log 轮转、全量 `company/` namespace、T4/T7 视觉/回放证据、c
 
 - `pnpm verify` 绿（doc-budget / md-links / bare-path / proposals）；红样：删除 data-model 的
   「写者·通道」列或制造死链 → 对应门禁红，还原 → 绿。
-- `pnpm test tests/presets tests/company tests/client` 绿；新增 records schema 断言在实现前红
+- `pnpm test tests/presets tests/host tests/client` 绿；新增 records schema 断言在实现前红
   （旧解析器不写 `schema`）→ 实现后绿；红样可临时删 `recordText` 的 schema 行。
 - `source run/env.sh && node checks/smoke/preset-smoke.mjs` 绿；在 dev profile 方法层放一个
   `SKILL.md` 后旧断言红（extra skill）→ 数据感知后绿。

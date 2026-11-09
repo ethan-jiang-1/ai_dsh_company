@@ -25,11 +25,11 @@
 ## 验证（实跑）
 
 ```text
-npx vitest run tests/company/catalog.spec.ts
+npx vitest run tests/host/ledger/catalog.spec.ts
 # 15 passed（新增 2 例；修复 slug 后绿）
 npx vitest run tests/client/cultivation/cultivation-context-picker.spec.ts
 # 5 passed（新增 problem 态）
-npx vitest run tests/company/catalog.spec.ts --coverage
+npx vitest run tests/host/ledger/catalog.spec.ts --coverage
 # catalog.ts | 76.29 stmt / 62.98 branch（此前 55.84/41.98）
 pnpm test
 # 134 files / 1076 tests（0 skipped）

@@ -93,5 +93,5 @@ describe('meta.md 形状校验（validateMeta / parseMeta）', () => {
   })
 })
 
-// 工作区门投影（doors.ts）的 keyless 守卫已迁 tests/company/doors.spec.ts（2026-10-14 重构轮：
+// 工作区门投影（doors.ts）的 keyless 守卫已迁 tests/lib/doors.spec.ts（2026-10-14 重构轮：
 // 本文件主体守 tools/lib/deliverables.mjs，doors 块是唯一跨模块寄居——迁出恢复一一对应）。

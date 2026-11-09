@@ -66,7 +66,7 @@
 
 | 轴 | 结果 |
 |---|---|
-| S9 **时间感** | **真缺陷（已修）**：待办行**完全没有时间信息**——人分不清谁新谁旧、该先处理哪条；而记录 id 里一直带着时间戳（`<YYYYMMDD>-<HHMMSS>-xxxx`，host `newRecordId` 口径）。修：`lib/cultivation.ts` 新增 `recordStampOf`（id→本地时间，形状不符给 null 不猜）+ `timeLabel`（刚刚/N 分钟前/N 小时前/昨天 HH:MM/MM-DD HH:MM/年-月-日），待办与已采纳行都显示「… 提出」；判据 = tests/company 两条 + 交互档两条 + 场景档 S9 硬判（截图 `S9-time-perception.png`，行内实测「刚刚 提出」） |
+| S9 **时间感** | **真缺陷（已修）**：待办行**完全没有时间信息**——人分不清谁新谁旧、该先处理哪条；而记录 id 里一直带着时间戳（`<YYYYMMDD>-<HHMMSS>-xxxx`，host `newRecordId` 口径）。修：`lib/cultivation.ts` 新增 `recordStampOf`（id→本地时间，形状不符给 null 不猜）+ `timeLabel`（刚刚/N 分钟前/N 小时前/昨天 HH:MM/MM-DD HH:MM/年-月-日），待办与已采纳行都显示「… 提出」；判据 = tests/host 两条 + 交互档两条 + 场景档 S9 硬判（截图 `S9-time-perception.png`，行内实测「刚刚 提出」） |
 | S10 并发/陈旧 | ✅ 另一端（直接改记录文件 = 另一个窗口先动手）之后，本端**陈旧副本**再点采纳 → host 明确拒绝且**行内说清**（不是静默失效） |
 | S11 极端文案 | ✅ 超长期望句（82 字 + emoji）：行高 124px，按钮仍在行内（不挤坏排版） |
 

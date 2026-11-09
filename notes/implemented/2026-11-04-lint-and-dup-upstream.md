@@ -60,7 +60,7 @@ sh .githooks/pre-push </dev/null → 全链绿（verify + typecheck + lint + dup
 整机 `cdp-probe` 未跑：3080 被本 GUI 占用（另起实例会撞端口 + 同一 `company-workspace` 的 writer），
 驱动两条路径改用合成页真 Chrome 验证；probe 自身的断言逻辑本次未改。
 
-存储重构的局部判据：`tests/company/cultivation-maintenance.spec.ts` + `revoke-journal.spec.ts` 9 例绿
+存储重构的局部判据：`tests/host/cultivation/cultivation-maintenance.spec.ts` + `revoke-journal.spec.ts` 9 例绿
 （`resolveMethodDir` 抽出前后同一份断言；读/删共用一条路径阶梯）。
 
 ## 边界与触发

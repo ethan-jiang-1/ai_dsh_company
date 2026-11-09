@@ -5,7 +5,7 @@
  * 数据面 = `remote.workspaceFiles`（list/read 经会话身份读工作区；子代理会话归到 Lead）。
  * **不可达 ≠ 0**（V2）：单角色 journal 目录缺失/读取失败 → null → 行呈「不可达」；记录目录
  * 不可达 → records 保持 null → 面板呈「尚未读到」，都不折成 0 或空。
- * keyless 判据 = `tests/client/cultivation/cultivation-board.spec.ts`（纯渲染）+ `tests/company/cultivation.spec.ts`
+ * keyless 判据 = `tests/client/cultivation/cultivation-board.spec.ts`（纯渲染）+ `tests/host/cultivation.spec.ts`
  * （读模型）。
  */
 import { useCallback, useEffect, useState } from 'react'

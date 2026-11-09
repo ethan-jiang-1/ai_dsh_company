@@ -40,5 +40,5 @@ pnpm verify                                                           # ALL PASS
 ## 边界
 
 - 覆盖：`tests/client`（除 3 个 vendor-src spec）+ `tests/support/temp-env.ts`。
-- 不覆盖：`tests/company` / `tests/harness`（vendor 源码直引 + 宽松测试代码；另轮）。
+- 不覆盖：`tests/host` / `tests/lib` / `tests/content` / `tests/harness`（vendor 源码直引 + 宽松测试代码；另轮）。
 - `tsconfig.test-client.json` 是 tracked 配置；改 client 测试签名/导入面时 `pnpm typecheck` 会先红。

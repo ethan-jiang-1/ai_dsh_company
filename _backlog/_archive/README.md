@@ -15,6 +15,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-09-company-specificity-externalization.md](settled_issues/2026-11-09-company-specificity-externalization.md) | 已结；三层分离（generic/product-types/company + contracts 版本轴）、T0–T3 加载与 manifest 预算、政策/复核/编号单家、两公司 fixture 与测试字面量门；verify ALL PASS、166 files/1319 tests、release-smoke ALL PASS；去向 = [Note](../../notes/implemented/2026-11-09-generic-specific-separation.md) | 2026-11-09 |
 | [2026-11-09-delegation-residuals-closeout.md](settled_issues/2026-11-09-delegation-residuals-closeout.md) | 已结；P-H/P-I 确定性注入、worker-workflow no-go、companyDelegationTerminal 投影；1300、6+3、9 页签全绿；去向 = [残差收口 Note](../../notes/implemented/2026-11-09-delegation-residuals-closeout.md) | 2026-11-09 |
 | [2026-11-09-retire-sa-sqa.md](settled_issues/2026-11-09-retire-sa-sqa.md) | 已结；退役 system-architect/system-qa：目录/父行/patch/support/模型 specialist/文档/测试/探针清理；worker family 保留；6+3、1297、verify 全绿；去向 = [退役 Note](../../notes/implemented/2026-11-09-retire-sa-sqa.md) | 2026-11-09 |
 | [2026-11-09-specialist-worker-taxonomy.md](settled_issues/2026-11-09-specialist-worker-taxonomy.md) | 已结；researcher→worker-researcher（只读 named-only worker profile）；SA/SQA 升 specialist（skills/authority）；删 leaf；CEO subagent_research 改钉；P-L + preset-smoke 6+5 + 全量绿 | 2026-11-09 |

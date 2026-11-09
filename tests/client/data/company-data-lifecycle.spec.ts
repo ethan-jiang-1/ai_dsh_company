@@ -110,7 +110,7 @@ describe('useCompanyData 订阅生命周期', () => {
     expect(h.last().streamError).toBeNull()
     expect(h.last().tasks[0]?.subject).toBe('出评审意见')
     expect(h.last().rows, 'rowsFromTeamView：成员一行、带在办任务').toEqual([
-      expect.objectContaining({ id: 'm-1', displayName: '梦之队 VP-Eng', currentTask: '出评审意见' }),
+      expect.objectContaining({ id: 'm-1', displayName: 'VP-Eng', currentTask: '出评审意见' }),
     ])
     expect(h.last().summary.turns).toBe(3)
     h.unmount()
@@ -176,7 +176,7 @@ describe('useCompanyData 订阅生命周期', () => {
     expect(h.last().activity[0]?.text, '名册缺席时裸 id 原样').toContain('m-9')
     store = { projectionsBySession: { 's-1': { values: { agentTeam: { ...teamView, members: [...teamView.members, { id: 'm-9', name: 'vp-sales', role: 'teammate', phase: 'active' }] } } } } }
     await h.rerender({ store })
-    expect(h.last().activity[0]?.text, '名册到达后换显示名').toContain('梦之队 VP-Sales')
+    expect(h.last().activity[0]?.text, '名册到达后换显示名').toContain('VP-Sales')
     h.unmount()
   })
 })

@@ -29,7 +29,7 @@
 - `presence.ts`：注释补「别去 projcache 找 ownerName」。
 - `TasksPanel.tsx`：**同族第二处**——任务板表格的「（阻塞）」也只看 `task.ready === false`，
   真 wire 实测 298 行里 280 行挂该标记、其中 273 行非 pending。同样加 `status === 'pending'` 门槛。
-- 判据：`tests/company/board.spec.ts`（真 wire 形状夹具）+ `tests/client/tabs/board-panel.spec.ts`（渲染面）
+- 判据：`tests/lib/board.spec.ts`（真 wire 形状夹具）+ `tests/client/tabs/board-panel.spec.ts`（渲染面）
   + `tests/client/tabs/tasks-table.spec.ts`（表格「（阻塞）」）+ `tests/client/wiring/client-face.spec.ts`（台账数据面接线）。
 
 ## 输掉的方案
@@ -58,7 +58,7 @@
 
 真跑过的命令与形态（红 → 还原 → 绿，三步都留了证）：
 
-- `npx vitest run tests/company/board.spec.ts tests/client/tabs/board-panel.spec.ts` ⇒ 22 passed。
+- `npx vitest run tests/lib/board.spec.ts tests/client/tabs/board-panel.spec.ts` ⇒ 22 passed。
   **红配方**：把 `board.ts` 的 `ready: task.ready ?? (status === 'pending' && readyOf(...))` 改回
   `ready: task.ready ?? readyOf(...)` ⇒ **2 failed**；把 `company-panels.tsx` 的徽章门槛改回无条件
   `card.blockedBy.length > 0` ⇒ **2 failed**。两处各自还原后复绿。

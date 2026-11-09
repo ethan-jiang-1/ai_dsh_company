@@ -45,7 +45,7 @@
 
 ```text
 pnpm typecheck                              → exit 0
-npx vitest run tests/company/host-composition.spec.ts tests/company/cultivation.spec.ts tests/company/apply-rebind.spec.ts
+npx vitest run tests/host/index/host-composition.spec.ts tests/host/cultivation.spec.ts tests/host/apply-rebind.spec.ts
                                             → 3 files / 50 tests passed
 npx vitest run                              → 104 files / 947 tests passed
 node checks/run-gates.mjs                   → ALL PASS；2 门无对象

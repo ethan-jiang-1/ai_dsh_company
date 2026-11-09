@@ -24,7 +24,7 @@ intent: 把已定性的编号共识转成可评审的落地面清单、卡边界
 |---|---|---|
 | **content 合同** | `content/state/process-docs.md`（新模型、R1–R10、退役词表、范围/豁免、并发口径）；`templates/{mrd,prd,strs,syrs,irs,allocation}.md`；`content/AGENTS.md` 的五层表与文件指针 | `pnpm verify`（base-clean/company-skeleton）；内容 tests；模板可被 `/prd check` 的样例通过 |
 | **presets 角色** | CMO（MRD+StRS）、VP-Eng（PRD only）、SA（SyRS+IRS+架构+验证点）、SQA（TC+V&V）、CEO（组队/收口口径）；共享 `product-definition` | `pnpm test tests/presets`；`preset-smoke`；五层行为场景 |
-| **host** | `STATE_FILES` 加 process-docs；`/req check` 命令（`src/host/req-command.ts` + `src/index.ts` 注册）；`host-composition.spec` 的命令集合 | 命令 tests；`bootstrap` tests；`release-smoke` |
+| **host** | `STATE_FILES` 加 process-docs；`/req check` 命令（`src/host/commands/req-command.ts` + `src/index.ts` 注册）；`host-composition.spec` 的命令集合 | 命令 tests；`bootstrap` tests；`release-smoke` |
 | **tools/lib** | `requirements-check` 纯逻辑（层/定义形态/唯一性/悬空/退役词/孤儿/覆盖/计数）；索引派生 | keyless 单测（含红证）；V2/V4/V11 夹具 |
 | **gates/tests** | `base-clean` 的 `TEXT_FILES`；`company-skeleton` 的 `required`；`handbook-budget`；`prd-check.spec` 的“模板同源”约束；`presets.spec`；`host-composition.spec` | `pnpm verify`；`pnpm test` |
 | **docs** | `guides/product-definition.md`、`presets.md`、`delegation.md`、`index.md`、`decisions.md`；注意前两份已顶格，**先搬后写** | `pnpm verify`（md-links/doc-budget） |
@@ -64,7 +64,7 @@ intent: 把已定性的编号共识转成可评审的落地面清单、卡边界
 ### C3 编号校验器与命令
 
 - **结果**：`/req check` 能对一份动议判红/绿，索引可派生；V2/V4/V11 有结果。
-- **范围**（本节列的是**待建**文件，A5/A6 执行时才有；未建的只写文件名不写路径，避免被当作现存的活指针）：`src/lib/requirements-check.ts`、`src/host/req-command.ts`、`src/index.ts`、现存 `host-composition.spec`；待建 spec = requirements-check.spec.ts / req-command.spec.ts（均落 tests/company/）。
+- **范围**（本节列的是**待建**文件，A5/A6 执行时才有；未建的只写文件名不写路径，避免被当作现存的活指针）：`src/lib/requirements-check.ts`、`src/host/commands/req-command.ts`、`src/index.ts`、现存 `host-composition.spec`；待建 spec = requirements-check.spec.ts / req-command.spec.ts（均落 tests/host/）。
 - **出口**：keyless 单测（红证：重复定义/悬空/退役词/孤儿各一）；命令测试；lab 夹具（V2 重键、V4 负例、V11 试跑）结果。
 - **不做**：旧盘迁移（A7）、跨动议键。
 
@@ -87,7 +87,7 @@ intent: 把已定性的编号共识转成可评审的落地面清单、卡边界
 ## 6. 陷阱与排除
 
 - **旧实现不是资产清单**：`65b6917` 的模板/checker 可参考，但它的 `STR/SYR/IFR` 层前缀与“6 个空间”已被共识推翻；直接 cherry-pick 会把方向带回去。
-- **PRD 模板同源测试**：[prd-check.spec](../../../../tests/company/prd-check.spec.ts) 要求 `content/templates/{mrd,prd}.md` 的示例直接过 `validateProductDocs`；改模板必须同步跑它。
+- **PRD 模板同源测试**：[prd-check.spec](../../../../tests/lib/prd-check.spec.ts) 要求 `content/templates/{mrd,prd}.md` 的示例直接过 `validateProductDocs`；改模板必须同步跑它。
 - **文档预算**：`docs/presets.md`、`docs/delegation.md` 已顶格；改文档先搬后写，别先提额。
 - **在飞冲突**：BUG-034/035 相关改动正由另一个 Agent 处理中（工作树里已涉及 SA/SQA preset/skills/tests/probes/bug 卡/Note）；A4a/A4b/B1 必须等它落地，不能混 diff。
 - **不做**：第六/第七条汇报线、SA/SQA 独立汇报线、vendor 改动、UI 角色徽标/委派卡 key、发布版本号（按需）。

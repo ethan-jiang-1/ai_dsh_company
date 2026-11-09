@@ -1,13 +1,13 @@
 /**
  * 培养 host spec 的共享测试脚手架（R5-23 拆族后）：Cordis 注册面替身 + 临时培养盘 + 命令调用。
- * 不是产品代码；只被 tests/company/cultivation-*.spec.ts 使用。
+ * 不是产品代码；只被 tests/host/cultivation-*.spec.ts 使用。
  */
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { CommandDefinition } from '@deepseek-ai/dsh-commands'
 import type { Context } from '@deepseek-ai/cordis'
-import { registerCultivation, type CultivationHostConfig } from '../../packages/company-pack/src/host/cultivation.ts'
+import { registerCultivation, type CultivationHostConfig } from '../../packages/company-pack/src/host/cultivation/cultivation.ts'
 
 /** 注册真正的培养工具/命令；只替身 Cordis 注册面，回调仍是生产实现。 */
 type RegisteredCultivationTool = Parameters<Context['tools']['register']>[0]

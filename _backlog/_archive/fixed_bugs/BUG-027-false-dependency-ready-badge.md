@@ -92,7 +92,7 @@ console.log({cardsShowing_dependencyReadyTag_on_nonPending:falseReady, legit_pen
 2. `board.ts:156-164` 的注释订正：说清 `readyOf` = `taskReady`（只查依赖），**不等于** `ready`。
 3. 徽章的渲染门槛也顺带改：只有 `pending` 卡才需要「依赖已就绪 / 等 …」——已完成/进行中的卡
    不该出现这枚徽章（131 张白带换成 0 张，6 张真值留下）。
-4. 判据（防复发）：`tests/company/board.spec.ts` 加一条**以真投影的字段组合**为输入断言
+4. 判据（防复发）：`tests/lib/board.spec.ts` 加一条**以真投影的字段组合**为输入断言
    `ready === false` 当 `status !== 'pending'`——现有 spec 的夹具（`view()` 手造对象）**没有一条
    钉住"非 pending 不许报 ready"**，这是它从未红过的原因。
 
@@ -101,7 +101,7 @@ console.log({cardsShowing_dependencyReadyTag_on_nonPending:falseReady, legit_pen
 - 与官方 `projectTaskView` 同义：`ready === true` ⟺ `status === 'pending'` ∧ 依赖全完成。
 - 看板上「依赖已就绪」徽章只出现在 pending 卡上；真投影复跑该脚本时
   `cardsShowing_dependencyReadyTag_on_nonPending` **必须为 0**、`legit_pending_tags` 不变。
-- `tests/company/board.spec.ts` 有真形状夹具断言；`readyOf` 注释不再自称与 `ready` 同义。
+- `tests/lib/board.spec.ts` 有真形状夹具断言；`readyOf` 注释不再自称与 `ready` 同义。
 - 依赖图同源（`dag.ts` 的 `waitingOn`）复核一遍：`会显示「可开工」的节点必须真的可开工`
   （现 `statusBadge` 对 pending 与 in_progress 都吐 `wk-dag-ready` 样式——见调研 §四，
   这是**同一族**的文案问题，是否搭车修由实施者判）。
@@ -143,7 +143,7 @@ console.log({cardsShowing_dependencyReadyTag_on_nonPending:falseReady, legit_pen
 
 ### 四、判据（全部红/绿实证过）
 
-- `tests/company/board.spec.ts`：**真 wire 形状**夹具（带 ownerName/ready/writeScopes）断言非 pending
+- `tests/lib/board.spec.ts`：**真 wire 形状**夹具（带 ownerName/ready/writeScopes）断言非 pending
   一律不报 `ready`；另一条断言 `ready` 缺失时回落也不许放宽。
   **反证**：把回落改回 `readyOf(...)` ⇒ 2 failed；还原 ⇒ 17 passed。
 - `tests/client/tabs/board-panel.spec.ts`：渲染面断言已完成的卡与进行中的卡**都不出现**依赖徽章，

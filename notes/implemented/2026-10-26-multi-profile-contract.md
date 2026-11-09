@@ -23,7 +23,7 @@
 - 新增 [multi-install-smoke.mjs](../../checks/smoke/multi-install-smoke.mjs)：两 home 真装、非空 home 后装、
   同 home 两 profile 反例、自定义 profile 补 web-app、空 bundle 共存/卸载、重复安装幂等、用户 profile patch 保留。
   已进 [checks/README](../../checks/README.md)；成本 ~3-4 分钟，**未进 release --verify**，发布前手动跑。
-- [two-homes.spec.ts](../../tests/company/two-homes.spec.ts)：keyless 双 home identity/company/catalog 隔离。
+- [two-homes.spec.ts](../../tests/host/run-bundle/two-homes.spec.ts)：keyless 双 home identity/company/catalog 隔离。
 - `bundle-manifest.spec.ts`：用户删基部补建、v2 移除基部不删用户盘。
 - `lifecycle-smoke`：home `sessions`/`storages` sentinel 跨升级逐字节不变。
 - `release-smoke`：同版本重复 add 不产生重复 bundle。

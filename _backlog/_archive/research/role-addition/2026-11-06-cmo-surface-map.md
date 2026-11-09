@@ -34,7 +34,7 @@ SA/SQA 应走 **B 档**（VP-Eng 条线下专职岗，不是第七/第八条汇�
 | 2 | 名单单一事实家 | `tools/lib/company-roles.mjs` 进 `COMPANY_ROLE_IDS` | **必需**：进 `COMPANY_SUPPORT_PRESET_IDS`（`researcher` 同款；注释写清不是角色） | presets 门禁/preset-smoke 自动收；probe-smoke、release-smoke 若枚举也要收 |
 | 3 | 委派行 + 深度 | CEO preset 加 `vp_cmo` 行（`agentPreset: cmo`） | **必需**：CEO + vp-eng 两处各加 `system_architect` / `system_qa` 行，`maxDepth: 2`（今天 CEO 的 `vp_eng` 是 1，成员 depth 1 起子代 = 2，必须放行） | `delegation-smoke` / 真 E2E：成员会话能起子代 |
 | 4 | 编制 `org.md` | 加「市场与产品（CMO，3）」节 + 条线计数 +1 | 可选：VP-Eng 条线加两行岗位（不改六条线计数） | bootstrap/backfill 测试；`org.md` 渲染检查 |
-| 5 | 归属 `owners.md` | 加 CMO 行 | 不加（不是汇报线） | `tests/company/bootstrap.spec.ts` |
+| 5 | 归属 `owners.md` | 加 CMO 行 | 不加（不是汇报线） | `tests/host/run-bundle/bootstrap.spec.ts` |
 | 6 | 章程 `content/charters/<role>.md` + kb 种子 | `charters/cmo.md`；`COMPANY_ROLES` 驱动 kb 目录 | **不加**（`researcher` 无 CHARTER 先例）；如要 journal 二期再议 | `base-clean`、`release-smoke` 首启清单 |
 | 7 | 模板/手册 `content/templates`、`content/AGENTS.md` | `mrd.md`、`prd.md`；手册角色表与路由 | 建议：架构/接口模板 + V&V 计划模板；手册加「谁起 SA/SQA」 | handbook-budget；
 | 8 | 客户端身份面 | `RoleBadge.tsx`、`styles.ts`、`client-css.spec`、`role-badge.spec`、`role-mark-fixture`、`presence-status.ts` | **若子代会话会在 UI 被打开**：需要徽标颜色/标签，否则显示「未知角色」 | 真页面探针（`sidebar-role-mark-probe`） |

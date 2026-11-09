@@ -20,9 +20,9 @@
 
 ## 决定
 
-- `src/host/client-diagnostics.ts`：`const input = rawInput.trimStart()`，后续判断/切片都用 `input`；
+- `src/host/commands/client-diagnostics.ts`：`const input = rawInput.trimStart()`，后续判断/切片都用 `input`；
   注释写明 vendor 形状与 2026-11-03 真页面断链。
-- `tests/company/host-composition.spec.ts`：handler 调用改成 **真实 dispatch 形状**
+- `tests/host/index/host-composition.spec.ts`：handler 调用改成 **真实 dispatch 形状**
   （`` rawInput: ` client-error ${payload}` ``），并注明为什么前导空白必须覆盖。四条同类调用全部改。
 - 不 trim 客户端 line：命令 handler 的契约就是接收 dispatch 后的 rawInput；客户端已按 `/命令 参数` 发。
 
@@ -46,7 +46,7 @@ commands/execute 返回 session/writer-held（dev home 另有 writer 持有该�
 # 真页面（isolated 单 writer；2026-11-03 补）
 node checks/smoke/client-error-chain-smoke.mjs
 # ALL PASS：会话打开（单 writer）→ 错误环捕获 → host 日志落盘
-npx vitest run tests/company/host-composition.spec.ts   # 8 passed
+npx vitest run tests/host/index/host-composition.spec.ts   # 8 passed
 pnpm test                                                # 135 files / 1084 tests
 pnpm verify                                              # ALL PASS
 ```

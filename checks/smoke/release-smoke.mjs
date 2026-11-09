@@ -151,11 +151,14 @@ try {
   check('安装副本无 bin/启动器', !existsSync(join(installedPack, 'bin')))
   check('安装副本带 locale/icon（可发现性元数据）', ['locale/en.json', 'locale/zh.json', 'icon.svg'].every(rel => existsSync(join(installedPack, rel))))
   // 只读内容（2026-11-01 v3）：少了它，第三方装完插件就是"没有手册/模板/默认章程"的裸奔。
-  check('安装副本带 content/（手册 + 模板 + 默认章程 + 状态默认值）',
-    ['content/AGENTS.md', 'content/templates/meta.md', 'content/charters/ceo.md',
-      'content/state/org.md', 'content/state/owners.md', 'content/state/motion-ledger.md',
-      'content/state/process-docs.md'].every(rel =>
-      existsSync(join(installedPack, rel))),
+  // 清单驱动（2026-11-09 三层）：安装副本必须带 manifest 里声明的全部内容，外加默认章程样本。
+  // 不再手抄文件清单——加/改名只改 manifest，smoke 自动跟随。
+  const contentManifest = JSON.parse(readFileSync(join(installedPack, 'content/manifest.json'), 'utf8'))
+  const manifestFiles = Object.values(contentManifest.tiers ?? {}).flat().map(rel => `content/${rel}`)
+  check('安装副本带 content/（按 manifest 清单）',
+    manifestFiles.every(rel => existsSync(join(installedPack, rel)))
+      && existsSync(join(installedPack, 'content/templates/meta.md'))
+      && existsSync(join(installedPack, 'content/charters/ceo.md')),
     `根目录 = ${readdirSync(installedPack).sort().join(', ')}`)
   const installedManifest = JSON.parse(readFileSync(join(installedPack, 'package.json'), 'utf8'))
   check('安装副本 peers 进 tarball', Object.keys(installedManifest.peerDependencies ?? {}).length >= 15 && installedManifest.dependencies === undefined)

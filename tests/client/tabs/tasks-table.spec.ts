@@ -68,11 +68,11 @@ describe('TasksTableView：「（阻塞）」只在待办行上（BUG-027 同族
 describe('TasksTableView：依赖列人读优先（owner · subject + id 次要）', () => {
   it('依赖列能直接回答「谁在等什么」，不是裸 task-N', () => {
     const blocked = row('t4')
-    expect(blocked, '依赖列缺 owner，读的人还得二次查').toContain('梦之队 COO')
+    expect(blocked, '依赖列缺 owner，读的人还得二次查').toContain('COO')
     expect(blocked, '依赖列缺 subject，读的人还得二次查').toContain('没做完的前置')
     expect(blocked, 'id 只做 title/data 次要信息，不占可见列宽').toContain('data-dep-id="t9"')
     expect(blocked).not.toContain('wk-dep-id')
-    expect(blocked, 'title 给全量文本（hover 增强，不是唯一入口）').toContain('title="梦之队 COO · 没做完的前置 · t9"')
+    expect(blocked, 'title 给全量文本（hover 增强，不是唯一入口）').toContain('title="COO · 没做完的前置 · t9"')
   })
 
   it('悬空依赖显式标「未找到」，不静默丢', () => {

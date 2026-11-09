@@ -147,7 +147,7 @@ A 在这两项都赢；B 只在"人审快一点"赢，而人审是**第二位**�
 ## 7. 配套规则：让"判红"真的发生（这才是包里的主体）
 
 一条命令（**人跑，不是角色跑**——角色不能跑脚本，硬约束 6）：`/req check <动议>`，形状照
-[prd-command.ts](../../../../packages/company-pack/src/host/prd-command.ts) 的先例（固定路径、只读、返回 JSON），
+[prd-command.ts](../../../../packages/company-pack/src/host/commands/prd-command.ts) 的先例（固定路径、只读、返回 JSON），
 扫描该动议的文档树，输出 `index.json` + 红绿清单。
 
 | # | 规则 | 红（例子） | 绿 |

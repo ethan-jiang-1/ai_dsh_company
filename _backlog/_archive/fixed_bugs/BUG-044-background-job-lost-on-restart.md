@@ -61,7 +61,7 @@ continuable/inactive——它们是两条不同的持久化路径。
   `status`：有 `run-end` → completed/cancelled/error；无 run-end + job 注册表认识 → running；
   否则 **`lost`**（明确标注已丢失）。`children` 列出 childId，可 `send_to_subagent` 冷恢复当前事实
   （不恢复原 job 结果——卡里写死的边界）。
-- **keyless 测试资产**：`tests/company/workflow-runs.spec.ts` 6 条——background+无 run-end+job 未知 →
+- **keyless 测试资产**：`tests/host/delegation/workflow-runs.spec.ts` 6 条——background+无 run-end+job 未知 →
   lost（含 children）；job 已知 → running；completed/cancelled；同名 run 按序配对；孤儿 run-start →
   lost；工具注册 + 读 `ownEvents` + 无 jobs 服务按 unknown。host-composition/apply-lifecycle 注册面 6 tools。
 - **模型面**：`eng-teaming` 长跑条改成“重启后用 `workflow_runs` 查 completed/cancelled/lost + children”。

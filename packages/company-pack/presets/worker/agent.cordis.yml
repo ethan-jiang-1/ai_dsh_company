@@ -13,7 +13,7 @@
       name: '@deepseek-ai/dsh-agent-preset'
       config:
         id: worker
-        name: 梦之队 Worker（执行手）
+        name: Worker（执行手）
         description: '内部执行手：按 brief 做单件活，只回证据，不再委派（不是公司角色）'
         # 排在角色/子人格之后：它不是同级职能，也不进公司名册语义。
         order: 90

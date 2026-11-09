@@ -4,7 +4,7 @@
 
 ## 决定
 
-1. **P-H/P-I**：以 tool-boundary fake-subagents 做确定性失败注入（`tests/company/subagent-retry.spec.ts` 6 条：error→success、error→error exhausted、refusal/aborted/max-tokens 不重试、非幂等、start 失败），并有真实 P-H 采用探针。真实 LLM 的“失败”不可确定性复现，不作为门禁；不声称真 LLM failure 已跑。
+1. **P-H/P-I**：以 tool-boundary fake-subagents 做确定性失败注入（`tests/host/delegation/subagent-retry.spec.ts` 6 条：error→success、error→error exhausted、refusal/aborted/max-tokens 不重试、非幂等、start 失败），并有真实 P-H 采用探针。真实 LLM 的“失败”不可确定性复现，不作为门禁；不声称真 LLM failure 已跑。
 2. **worker-workflow**：no-go（见 [no-go Note](./2026-11-09-worker-workflow-no-go.md)）；不从 planned 继续制造假希望。
 3. **host terminal**：新增 host-only session projection `companyDelegationTerminal`（`turn/end.reason.kind`）；客户端 `delegation-tree` 优先读它，UI 显示 completed / failed / interrupted / aborted / max-tokens / refusal / lost（lost 仅当投影提供；workflow run 的 lost 不在 session tree）；缺失才回退 `subagentTiming`，再缺才 unavailable。
 4. P-I：workflow 的 retry/missing 在脚本层，host 不自动重试（沿用 2026-11-09 决定）。
@@ -24,7 +24,7 @@
 ## 验证
 
 - `pnpm test tests/presets`：73 passed；`pnpm test`：**1300 / 164 files**。
-- `tests/company/delegation-terminal.spec.ts`：纯 fold/view + registration seam 2 条。
+- `tests/host/delegation/delegation-terminal.spec.ts`：纯 fold/view + registration seam 2 条。
 - `tests/client/data/delegation-tree.spec.ts`：host 投影 interrupted/aborted 断言；`delegation-flow-panel` 显示“中断”。
 - `pnpm typecheck` 绿；`pnpm verify` **ALL PASS**；`pnpm lint` 0/0；`pnpm dup` 0 clones。
 - `preset-smoke`：**6+3**；`ui-scene --isolated --refresh-golden` / `--golden`：**9 页签 ALL PASS**（头部改为“终态来自 host 投影；缺时不可见”）。

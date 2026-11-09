@@ -19,9 +19,9 @@ intent: "第六轮七维打扫（2026-11-03）：fresh agent 独立复评七个�
 | 维 | 本轮 | 上轮 | 判据（证据） |
 |---|---|---|---|
 | D1 文档与渐进披露 | **A-** | A- | 入口链真实薄：根 AGENTS 84 行自动注入，`docs/AGENTS.md` / `_backlog/AGENTS.md` 触碰注入；32/32 文档有「何时读」；契约层 0 死链。残余：设计层两处与现役矛盾（`docs/design/ui-demo.md:139` 仍称已删的 `CompanyView.tsx`「仅测试引用」；`docs/index.md:17`「四条协作通道」而通道 D 已退役）；"51+6 名单"式过期枚举 7 处；129 篇 implemented 中 76 篇零入链。 |
-| D2 代码与测试层次 | **B+** | A- | 源码三面（host/lib/client）方向由 `src-layering` + `tsc -b` 双守、0 环 0 反向边；但**平铺**：`src/client` 41 文件、`tests/client` 48、`tools/lib` 48、`checks/gates` 53、`tests/harness` 53；85 个源码模块只有 36 个有同名 spec（42%）；`src/host/cultivation.ts`（710 行）无直接 spec，只有 `tests/support/cultivation-harness.ts` 间接引用。用户本轮明示要求层次化——与上轮 D2「不建议重组」相反，改判为 GAP。 |
+| D2 代码与测试层次 | **B+** | A- | 源码三面（host/lib/client）方向由 `src-layering` + `tsc -b` 双守、0 环 0 反向边；但**平铺**：`src/client` 41 文件、`tests/client` 48、`tools/lib` 48、`checks/gates` 53、`tests/harness` 53；85 个源码模块只有 36 个有同名 spec（42%）；`src/host/cultivation/cultivation.ts`（710 行）无直接 spec，只有 `tests/support/cultivation-harness.ts` 间接引用。用户本轮明示要求层次化——与上轮 D2「不建议重组」相反，改判为 GAP。 |
 | D3 文档—执行—验收 | **A-** | A- | 授权（policy P1–P5）、执行（dev-loop 六节 + 重定向）、验收（testing 宪法 + tests/README 行级映射 + 五个完成定义 skill + 六行回执）各单家；pre-push 三件套接线。残余：验收结论仍靠人贴（`审查：` 手写）；`_backlog` 制度面 ~427 行服务 3 张活卡，比例偏重。 |
-| D4 上下文腐化 | **B** | A- | **当日实证腐化**：`d6d1f92` 把 `tests/company/dag.spec.ts` 整体覆盖为 `cultivation-lib.spec.ts` 的字节副本（md5 相同），全绿、无人发现（→ 已修，见 §2 R6-01）。41 条死链全落在门禁三个豁免区（`snapshots/`、`runtime/`、`company-workspace/` 前缀 / `archive` 目录名 / 归档只查 `.md`）；设计层"现状声明"无人守（bare 文件名不进 `bare-path`）；76 篇零入链在"分诊"后数量不变。 |
+| D4 上下文腐化 | **B** | A- | **当日实证腐化**：`d6d1f92` 把 `tests/lib/dag.spec.ts` 整体覆盖为 `cultivation-lib.spec.ts` 的字节副本（md5 相同），全绿、无人发现（→ 已修，见 §2 R6-01）。41 条死链全落在门禁三个豁免区（`snapshots/`、`runtime/`、`company-workspace/` 前缀 / `archive` 目录名 / 归档只查 `.md`）；设计层"现状声明"无人守（bare 文件名不进 `bare-path`）；76 篇零入链在"分诊"后数量不变。 |
 | D5 测试资产 | **B+** | A- | 1108 例 / 覆盖率阈值 10 模块 / 21 条 BUG 守卫带红配方 / layering 守卫真实；但被腐化面击中一次（重复 spec 21 例、DAG 模块 0 单测）+ 15 处源码文本断言 + `expect(true).toBe(true)` 式同义反复 + `catalog-wiring` 两条空断言 + vitest 内零快照比对 + presets 仅文本断言 + 18 模块无直接 spec。 |
 | D6 反馈通路 | **B+** | A- | 真页面车道真的通（本轮亲跑 `ui-scene-smoke --isolated --golden` = 9/9 页签金样一致）；`--steps`/截图/`body.txt`/`verdict.json` 可复现失败。但**首屏不指路**：`pnpm orient` 只列 verify/test/orient，不提真页面、`diagnose`、`diagnosis/`、客户端错误日志；`orient --scenario visual/*` 给出会崩的 `replay-smoke` 命令；`diagnose --help` 静默忽略参数去打一份会话摘要；客户端错误落盘条件苛刻（历史上只写过 1 行）。 |
 | D7 DSH 插件约定 | **A-** | A- | 机制面教科书级：bundle patch 数组 / 六 preset insert / `dsh.client` / `files`（无 src、无 bin）/ `engines.dsh` / 应用内安装形状 / 卸载与重装冒烟（release-smoke ⑦）/ market index 经 DSH 真校验器。**seam 面偏离**：①「安装 profile ≠ 启动 profile」——Plugins 页装当前 profile，文档却把 `dsh --profile company` 写成唯一入口（R6-13）；②卸载残留清单不准（lease 在 home 根不在 `company/`，workspace 登记/客户端日志/localStorage 未列，R6-14）；③`<DSH_HOME>/company/settings.json` 被文档当现行 tier，生产只读不写（R6-15）；④lease 在 workspace 解析前获取，与「无 workspace 零写」表述相反（R6-16）；⑤market index 只列单版本 + 生成时 `publishTimestamp`，与参考生成器行为不同（R6-17，外部发布面）。 |
@@ -34,7 +34,7 @@ intent: "第六轮七维打扫（2026-11-03）：fresh agent 独立复评七个�
 
 | # | 维 | 级 | 发现 | 状态 |
 |---|---|---|---|---|
-| R6-01 | D4/D5 | **P0** | `tests/company/dag.spec.ts` 在 `d6d1f92` 被覆盖成 `cultivation-lib.spec.ts` 的字节副本：`lib/dag.ts`（261 行布局算法）失去唯一单测，套件多 21 条重复用例且全绿（`md5` 相同；`git show d6d1f92 -- tests/company/dag.spec.ts` 为整文件替换）。 | **已修**：恢复原 spec + 补 `TaskRow.description` 字段（`pnpm typecheck` 0 / 该 spec 20 例绿） |
+| R6-01 | D4/D5 | **P0** | `tests/lib/dag.spec.ts` 在 `d6d1f92` 被覆盖成 `cultivation-lib.spec.ts` 的字节副本：`lib/dag.ts`（261 行布局算法）失去唯一单测，套件多 21 条重复用例且全绿（`md5` 相同；`git show d6d1f92 -- tests/lib/dag.spec.ts` 为整文件替换）。 | **已修**：恢复原 spec + 补 `TaskRow.description` 字段（`pnpm typecheck` 0 / 该 spec 20 例绿） |
 | R6-02 | D4 | **P0** | 腐化通道无门：任何一份 spec 被复制/覆盖时，另一份仍在跑，套件全绿。 | **已修**：新增 `checks/gates/spec-duplicates.mjs`（测试文件字节重复即红，带造红留证） |
 | R6-03 | D2/D5 | **P1** | `tsconfig.test-harness.json` 用 51 行手工 include 清单代替目录 glob；同目录 `tests/client` / `tests/company` 早已是 glob+exclude。手工清单会静默漏新 spec，并在本轮暴露真实 type error（`company-tab-catalog.spec.ts:20` 少传第二个参数）。 | **已修**：改 glob + 单条 exclude（`pack-exports`，混合面无法被任一项目类型检查——实测两向均红）；补参数；`pnpm typecheck` 0 |
 | R6-04 | D6 | **P1** | `orient --scenario <visual/场景>` 的「验证命令」硬编码为 `replay-smoke --scenario`，实跑 ENOENT（visual 场景没有 `snapshot.yml`）；正确入口 = `ui-scene-smoke --isolated --golden`。 | 待修 |
@@ -93,7 +93,7 @@ node checks/smoke/ui-scene-smoke.mjs --isolated --golden   # PASS：9/9 页签�
 node tools/orient.mjs             # 6 slug / 凭据 ✓；「便宜检查」只有 verify/test/orient
 node tools/orient.mjs --scenario visual/company-shell      # 「验证命令」= replay-smoke（实跑 ENOENT）
 node tools/diagnose.mjs --help    # 忽略 --help，打印最新会话摘要 exit 0
-md5 tests/company/dag.spec.ts tests/company/cultivation-lib.spec.ts   # 修复前同值 3255b4cedbe1f35b193e156756a3f889
+md5 tests/lib/dag.spec.ts tests/lib/cultivation-lib.spec.ts   # 修复前同值 3255b4cedbe1f35b193e156756a3f889
 ```
 
 ## 6. 本轮没覆盖的

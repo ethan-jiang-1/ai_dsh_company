@@ -44,7 +44,7 @@ isPlaceholderYield(body) === true   // 让位  ← 两者本该互斥（BUG-004 
 
 ## 判据的边界（为什么是"标题"而不是"正文提到"）
 
-**反例**：`tests/company/signoff-tool.spec.ts:34` 的注释提到 BUG-002，但它**不声称守卫 BUG-002**
+**反例**：`tests/host/commands/signoff-tool.spec.ts:34` 的注释提到 BUG-002，但它**不声称守卫 BUG-002**
 ——它是在解释"mock 为何要 no-op"（BUG-002 修复给 `apply` 加了 api-session 监听，
 harness 只需让 `ctx.on` 不炸）。它测的是 `request_signoff`。
 若判据放宽到"正文提到 BUG 号"，这篇 spec 会被迫交一条它挣不到的红配方 ⇒ **判据会说假话**。

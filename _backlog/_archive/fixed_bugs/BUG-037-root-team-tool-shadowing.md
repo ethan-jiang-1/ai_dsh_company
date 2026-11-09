@@ -67,9 +67,9 @@ generic subagent child）有效。本仓注释与 §4.4 把“根”误写成“
 - **真修（2026-11-08）**：选了“不与团队名冲突的替代控制名”，不是再劝模型——新增 host 工具
   `list_subagents`（父会话 `subagent/catalog` durable 事件 → id/label/mode/status）与 `send_to_subagent`
   （`ctx.subagents.sendMessage`，续驶/催稿）。两个名字团队版 shadow 不到；实现 =
-  `packages/company-pack/src/host/delegation-control.ts`，在 pack host 的 `apply` 注册。
+  `packages/company-pack/src/host/delegation/delegation-control.ts`，在 pack host 的 `apply` 注册。
 - **绿证据**：真挂载会话的工具目录含 `list_subagents` / `send_to_subagent`
-  （`runtime/tmp/explore/fix1/S039/summary.json`，79 tools）；行为 spec `tests/company/delegation-control.spec.ts`
+  （`runtime/tmp/explore/fix1/S039/summary.json`，79 tools）；行为 spec `tests/host/delegation/delegation-control.spec.ts`
   （注册名、catalog 折叠、send 透传、服务缺席 fail-loud）。
 - **文档同步**：`docs/delegation.md` §4 控制面段改成“根门用这两个名字”；`eng-teaming` 控制面与长跑条目同步。
 - 机制本身（vendor shadow）未改；上游提案 = 让根会话直接用全局控制名（`tool-agent-team` 的 install 条件）。

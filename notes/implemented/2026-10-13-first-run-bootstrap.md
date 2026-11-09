@@ -15,7 +15,7 @@
 host 半（`packages/company-pack/src/index.ts` 的 `apply`）在每次装载时跑一次**幂等自举**：
 把包内 `workspace/` 骨架落到 `companyHome`（默认 `<DSH_HOME>/company-workspace`）。
 
-三条纪律（住 `src/host/bootstrap.ts` 头注，机器判据 = `tests/company/bootstrap.spec.ts`）：
+三条纪律（住 `src/host/run-bundle/bootstrap.ts` 头注，机器判据 = `tests/host/run-bundle/bootstrap.spec.ts`）：
 
 1. **只补缺**：目标已存在的一律 skip——已有公司盘（尤其本仓 `company-workspace/`，制度件还是符号链接）
    一个字节都不动；缺件补齐（additive migration 语义）。
@@ -49,7 +49,7 @@ host 半（`packages/company-pack/src/index.ts` 的 `apply`）在每次装载时
 
 ## 验证（都真跑过）
 
-- `pnpm test` —— **53 files / 522 tests 绿**，含 `tests/company/bootstrap.spec.ts`（8 条：全 create / 骨架缺失带 error 不抛 /
+- `pnpm test` —— **53 files / 522 tests 绿**，含 `tests/host/run-bundle/bootstrap.spec.ts`（8 条：全 create / 骨架缺失带 error 不抛 /
   第一次落盘 + 第二次全 skip + 已有文件内容不改 / 部分缺件只补缺 / error 计划是纯 no-op / 落点优先级 / 开关 /
   **路径算术防"多套一层 workspace"**）。
 - **模拟安装**：`source run/env.sh && node checks/smoke/release-smoke.mjs` —— **ALL PASS**，新增：
@@ -72,9 +72,9 @@ host 半（`packages/company-pack/src/index.ts` 的 `apply`）在每次装载时
 
 ## 落点
 
-- 纯逻辑：`packages/company-pack/src/host/bootstrap.ts`（`planBootstrap` / `applyBootstrap` / `bootstrapCompanyWorkspace` /
+- 纯逻辑：`packages/company-pack/src/host/run-bundle/bootstrap.ts`（`planBootstrap` / `applyBootstrap` / `bootstrapCompanyWorkspace` /
   `resolveSkeletonDir` / `resolveCompanyHome` / `bootstrapEnabled`）；host 接线：`packages/company-pack/src/index.ts`（apply 末尾）。
 - 编译面：`tsconfig.host.json`（`include` 加 `src/host` + `types: ["node"]`）；client 叶注释点明 `src/host/**` 不进它。
-- 判据：`tests/company/bootstrap.spec.ts`；模拟安装：`checks/smoke/release-smoke.mjs` ④⑥；
+- 判据：`tests/host/run-bundle/bootstrap.spec.ts`；模拟安装：`checks/smoke/release-smoke.mjs` ④⑥；
   文档：`docs/release.md` §真实安装冒烟程序 6、`packages/company-pack/README.md`、`packages/company-pack/src/README.md`、`run/env.sh`。
 - 同伴决定：[出厂公司盘骨架随包分发](2026-10-13-company-workspace-skeleton-shipped.md)。

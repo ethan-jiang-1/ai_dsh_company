@@ -9,7 +9,7 @@
       name: '@deepseek-ai/dsh-agent-preset'
       config:
         id: cfo
-        name: 梦之队 CFO
+        name: CFO
         description: '财务职能的化身——视角：现金/成本/合规；对资金与账务红线有 veto；产出项目经济性测算与财务合规意见'
         order: 5
         plugins:

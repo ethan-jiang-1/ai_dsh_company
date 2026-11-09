@@ -16,7 +16,7 @@ opened: 2026-10-19
 3. **窄栏/长链有实测**：21 节点合成样本高 **2366px**，390×520 pane 的 `scrollHeight=2366`、`overflowY=true`；真 7 节点样本（`session-41515cf5…`）在 390px 下 `scrollWidth=468 / clientWidth=365`、`overflowX=true`；真 21 节点样本（`session-133c5cde…`，宽图 1716×321）在 390px 下 `scrollWidth=1716 / clientWidth=365`、`overflowX=true`、`overflowY=false`，整页 `scrollHeight=900` 无纵向双滚动。见 [narrow-21.png](../../../snapshots/visual/dag-visual/narrow-21.png) 与 [narrow.png](../../../snapshots/visual/dag-midflight/narrow.png)。
 4. **用户判**：接受 pane 自带纵向滚动；**不改 DAG 布局**（压缩会动缩放/阅读语义，另卡才做）。
 5. **drift 真图复验通过**：`board-drift-probe` ALL PASS，图落 `snapshots/visual/board-drift/board.png`。
-6. **golden 不新建**：用 `tests/company/board.spec.ts` 的真 wire 夹具（`TeamTaskView` 形状），不把 `record.rows.agentTeam.val`（state）当 golden。
+6. **golden 不新建**：用 `tests/lib/board.spec.ts` 的真 wire 夹具（`TeamTaskView` 形状），不把 `record.rows.agentTeam.val`（state）当 golden。
 
 **已执行（2026-10-20）**：真 21 节点会话 `session-133c5cde…` 的标题问题 = `dag-midflight-probe` 取**第一条** `session/title`，UI 用的是最后一条；改为取最后一条后按标题搜索打开成功。实测：宽图 **1716×321**，390px 下 `scrollWidth=1716 / clientWidth=365`、`overflowX=true`、`overflowY=false`，整页 `scrollHeight=900`（= 视口）⇒ **真实 21 节点样本只横向滚动，不触发纵向双滚动**。纵向 2366px 只在**合成 21 串行链**上成立；用户接受的是串行链 pane 自身纵向滚动，不是真实 21 节点样本。
 
@@ -26,7 +26,7 @@ opened: 2026-10-19
 
 - **新鲜度**：`company-tabs.tsx` 默认 `投影更新`；`CompanyView.tsx` 非培养子页 `投影更新`；`LedgerTab.tsx` 传 30s；`AttentionTab.tsx` 传 2s；`CultivationTab.tsx` 已有 30s。同 diff 修 `docs/design/ui-demo.md` 的「挂载即拉 + 5s 轮询」与 `docs/index.md` D22 的旧说法。
 - **DAG 徽章**：`company-panels.tsx` 的 `statusBadge` 对 in_progress 返回 `wk-dag-progress`；`styles.ts` 用 `--dsw-alias-state-business-primary`。
-- **测试**：新增 `tests/client/tabs/panel-freshness.spec.ts`；更新 `tests/client/tabs/dag-panel.spec.ts`（默认文案 + 徽章独立类）；`tests/company/dag.spec.ts` 加 21 节点链高 > 视口；`tests/client/tabs/dag-visual-fixture.spec.ts` 发 21 节点 chain SVG。
+- **测试**：新增 `tests/client/tabs/panel-freshness.spec.ts`；更新 `tests/client/tabs/dag-panel.spec.ts`（默认文案 + 徽章独立类）；`tests/lib/dag.spec.ts` 加 21 节点链高 > 视口；`tests/client/tabs/dag-visual-fixture.spec.ts` 发 21 节点 chain SVG。
 - **探针**：`dag-visual-probe` 加「进行中徽章 ≠ 可开工」与 21 节点窄栏度量；`dag-midflight-probe` 加 `--narrow`（真 app 390×900，读页签文案，落 `narrow-metrics.json` + 截图）；`board-drift-probe` 复跑。
 - **Note**：[2026-10-19-company-panel-freshness-and-dag-badge](../../../notes/implemented/2026-10-19-company-panel-freshness-and-dag-badge.md)。
 
@@ -42,7 +42,7 @@ opened: 2026-10-19
 | 真 app 窄栏（7 节点） | `scrollWidth=468 / clientWidth=365`、`overflowX=true`、`overflowY=false` | `dag-midflight-probe --session session-41515cf5… --narrow` |
 | 真 21 节点会话 | **已执行**：`session-133c5cde…` 打开成功；1716×321 宽图，390 窄栏 `overflowX=true / overflowY=false`，整页无纵向双滚动 | `dag-midflight-probe --session session-133c5cde… --narrow` |
 | drift | ALL PASS；图落 `snapshots/visual/board-drift/board.png` | `board-drift-probe` |
-| golden | 真 wire 夹具在 `tests/company/board.spec.ts`；未新建 state 快照 | `pnpm test tests/company/board.spec.ts` |
+| golden | 真 wire 夹具在 `tests/lib/board.spec.ts`；未新建 state 快照 | `pnpm test tests/lib/board.spec.ts` |
 | 84 板/379 任务、max 21、非空中位 4 | projcache **state** 全量（1738 会话），非 wire | [真相复核 §三](../research/company-panels-ux/2026-10-19-panel-truth-audit.md) |
 
 ## 范围与排除项

@@ -189,7 +189,7 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 1. 拟建 tests/client/company-view.spec.ts（happy-dom + createRoot）：四子页签切换、`data.error`/`team=null`、浮出调 `floatPanel(kind)`、CompanyIdentity 三态。
 2. 拟建 tests/client/data/workspace-text.spec.ts：loading→ready、null→unreadable、abort 后不 setState、refreshMs 到点重读；同 diff 补 Ledger/Deliverables 容器 error 行。
 3. 拟建 tests/client/company-client-wiring.spec.ts：派发 `approval/request` 与 `user-questions/request`，断同一 registry 进 `getPending`；openContext 四分支。
-4. 拟建 tests/company/apply-lifecycle.spec.ts：同 ctx 二次 apply、dispose 后发 `session/event` 不写账本、apply 后 provide `workspaceRegistry` 触发迟到 inject。
+4. 拟建 tests/host/index/apply-lifecycle.spec.ts：同 ctx 二次 apply、dispose 后发 `session/event` 不写账本、apply 后 provide `workspaceRegistry` 触发迟到 inject。
 5. 测试分区：6 个 `tools/lib` spec 迁 `tests/harness`；重名 `deliverables-catalog.spec.ts` 改名；5 份 env/mkdtemp 样板收进拟建的 tests/support 共享夹具；最大单 it 拆成 describe/it。
 
 ### 批 E · 结构（2–4 天，可选/分期）

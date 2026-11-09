@@ -22,7 +22,7 @@
    启动在 stderr 明确告警，并跳过自举/升级/目录重建；不在新路径建第二份公司盘。换盘/搬家 = 新
    `DSH_HOME`，或备份后删除 `bundle.json` 重建。搬 home 后 DSH 自己的 `storages/workspace.json`
    仍存绝对旧路径：host 只读体检并在启动输出点名，**不改**上游存储（新模块
-   [`workspace-registry.ts`](../../packages/company-pack/src/host/workspace-registry.ts)）。
+   [`workspace-registry.ts`](../../packages/company-pack/src/host/workspace/workspace-registry.ts)）。
 4. **`export-dist` 先 build**：`tsc -b` + `tsdown` 后才 `npm pack`；`lib/` 是 gitignored 的构建目录，
    直接打包会静默打旧代码。发布 `files` 只留 `lib/index.js`、`lib/client.js`、
    `lib/types/**/*.d.ts`；tsc 中间 `.js`/`.map`/`.tsbuildinfo` 不进包。

@@ -83,7 +83,7 @@ opened: 2026-11-09
 | F5 | `maxDepth` 散在行上；CEO→VP→worker 到 2 层到顶 | [ceo preset](../../../packages/company-pack/presets/ceo/agent.cordis.yml)、[vp-eng preset](../../../packages/company-pack/presets/vp-eng/agent.cordis.yml) |
 | F6 | 现有观测是分通道的；没有混合链的统一图 | `list_subagents` / `workflow_runs` / team roster |
 | F7 | 共享 skill 目录机制已有先例（`_shared/skills/product-definition` 被 4 角色共用） | preset 的 `customSkillDirs` |
-| F8 | host 插件可在 `agent/created` 注册 per-agent `systemPrompt.section` | [handbook.ts](../../../packages/company-pack/src/host/handbook.ts)；`tool-workflow` 同款 |
+| F8 | host 插件可在 `agent/created` 注册 per-agent `systemPrompt.section` | [handbook.ts](../../../packages/company-pack/src/host/prompt/handbook.ts)；`tool-workflow` 同款 |
 | F9 | `--dump-config` 可读声明面，但不能进 `pnpm test`（`tests/` 禁子进程） | [layering.spec.ts](../../../tests/harness/repo/layering.spec.ts) |
 
 ### 未决（需要 spike，不是拍脑袋）
@@ -321,7 +321,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针）
 | worker 真挂载 | 编排 | 已建 pack + dev home/profile | `preset-smoke` 零 broken；worker + worker-orchestrator 的 `session/create` 成功 | worker 行 config 缺必填、未进 roster → preset-smoke 红 | `node checks/smoke/preset-smoke.mjs` | 无 |
 | loader 声明面 = 模型 | 编排 | 真实 `--dump-config` | preset-matrix-smoke 的 10 个 preset 与模型一致 | 改一行 YAML 不同步 → 红；还原绿 | preset-matrix-smoke（待建，P1/P2） | 无 |
 | 合同可见性 | 模型行为 + 编排 | 六个 full role + vp-eng 真会话 | policy skill 被加载/尝试；engine section 只在 vp-eng；未加载时 fallback section | policy 未加载 → fallback；section 不在 → 红；不得静默缺失 | P-A/P-B 探针 + P2 section 真 systemPrompt（2026-11-09） | 规则是否被遵守（定性） |
-| subagent 失败重试 | 模型行为 + 编排 | `retryDecision` 纯模型；`subagent_retry` 的 fake-subagents；P-H 真失败注入待 | error/interrupted/lost + 幂等 + attempt 1 → 允许一次；attempt 2 → exhausted；attempt/terminal 可见 | refusal/aborted/completed/max-tokens/非幂等 → 不重试；重试后仍失败 → exhausted 不第三次 | `tests/presets/delegation-retry.spec.ts` + `tests/company/subagent-retry.spec.ts`；P-H 真探针待 | 重试是否恰当（定性，必要时人） |
+| subagent 失败重试 | 模型行为 + 编排 | `retryDecision` 纯模型；`subagent_retry` 的 fake-subagents；P-H 真失败注入待 | error/interrupted/lost + 幂等 + attempt 1 → 允许一次；attempt 2 → exhausted；attempt/terminal 可见 | refusal/aborted/completed/max-tokens/非幂等 → 不重试；重试后仍失败 → exhausted 不第三次 | `tests/presets/delegation-retry.spec.ts` + `tests/host/delegation/subagent-retry.spec.ts`；P-H 真探针待 | 重试是否恰当（定性，必要时人） |
 | 两条长链的图 | 编排 | CEO→VP→workflow→subagent；VP-Eng→workflow→subagent 的录制或真事件 | 节点/边/channel/depth/terminal/address 正确；重启后 interrupted/lost 可见 | 硬折 parentId 把“缺失”说成状态 → 红；缺数据标 unavailable | 图 spec + 链场景（待建，P3） | 无（结构）；链是否符合预期由人抽检 |
 | UI 流程/状态 | 编排 + 人的判断 | 真页面 DagTab 体内 | 九页签不变；流程/状态可见；`tests/client` + client-load + ui-scene/金样绿 | 金样未刷新、槽位变化、DAG 事故钉破 → 红 | `pnpm test tests/client`、client-load-smoke、ui-scene-smoke --isolated --golden（P3） | 可读性/信息密度（用户） |
 | 测试资产迁移 | 确定性 + 过程 | 模型/组合/树/retry specs；旧 content spec 去重 2 条 | 模型 spec 是唯一期望源；旧断言退役有理由；无第四份矩阵 | 第二份期望矩阵、重复 spec → spec-duplicates/spec 红 | `pnpm test tests/presets` 89 + `pnpm verify` | 旧 content spec 仍保留内容/唯一结构断言 |

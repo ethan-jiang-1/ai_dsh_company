@@ -77,7 +77,7 @@ node tools/export-dist.mjs  → ALL PASS
 
 - `pnpm verify` — 本次改动面 **ALL PASS**（两门 SKIP = replay-fixture-freshness / replay-ui-freshness 盘上无对象，预期）；`release --verify` 内的全树重跑被**并行会话未提交的** VP-Eng workflow 卡（现已归档）挡住 2 条 `bare-path`（该卡计划 Note 未落地，非本变更引入）。
 - `pnpm test` — **150 files / 1,223 tests PASS**（含 manual spec 同轮更新：新标题、§八卸载、首用/凭据/支持/分发新判据）。
-- `pnpm typecheck` — **exit 0**（pack 两面 + tests/client + tests/company + tests/harness）。
+- `pnpm typecheck` — **exit 0**（pack 两面 + tests/client + tests/host + tests/harness）。
 - `pnpm release --check` — **READY 0.9.0**（tgz 154 条目；7 项检查 pass；tarball/手册 sha 一致，`7cfc216d…`）。并行会话的在途研究文件在 stamp/check 的短窗口内临时 stash、随后原样 pop 恢复。
 
 ## 未验 / 环境限制

@@ -103,7 +103,7 @@ sed -n '36,42p' vendor/dsh/packages/experimental/agent-team/src/task-view.ts    
   （二选一：计数并显示「N 项 owner 无法解析」，或在 keyless 判据里钉住"投影缺 owner 名字段时
   不许静默把所有卡标未分配"）。
 - `presence.ts:161-163` 那句反了的注释**订正**（它曾经把后两轮读码带偏）。
-- 机器判据：`tests/company/board.spec.ts` 加一条以**真投影形状**（含 `ownerId`、无 `ownerName`）
+- 机器判据：`tests/lib/board.spec.ts` 加一条以**真投影形状**（含 `ownerId`、无 `ownerName`）
   为输入的断言——现在 spec 的 `view()` 夹具手造了 `ownerName`，这就是为什么 379/379 缺字段
   在测试里从未红过。
 
@@ -159,7 +159,7 @@ rows 379 / unassigned 35 / ownerResolved 344 / readyOnNonPending 0
    卡的第二条正路说"走不通"——**它走得通**，wire 视图已经把 ownerId 解析成 ownerName 了。
 2. **不修代码**：`board.ts:186` 读 `task.ownerName`、`presence.ts:164-177` 按 ownerName 关联 currentTask，
    **在真 wire 视图上都是对的**。
-3. **防复发判据**（本轮补，见 `tests/company/board.spec.ts`）：以**真 wire 形状**为输入断言
+3. **防复发判据**（本轮补，见 `tests/lib/board.spec.ts`）：以**真 wire 形状**为输入断言
    owner 解析不丢、且非 pending 任务 `ready === false`——现有 spec 的 `view()` 夹具手造对象，
    从没喂过真形状。
 4. **卡按误报归档**：章程的缺陷出口只有 `已修`/`待修`，用 `已修` 会失真声明"修好了"，

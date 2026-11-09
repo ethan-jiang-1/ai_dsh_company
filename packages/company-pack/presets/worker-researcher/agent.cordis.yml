@@ -10,7 +10,7 @@
       name: '@deepseek-ai/dsh-agent-preset'
       config:
         id: worker-researcher
-        name: 梦之队 Worker（调研）
+        name: Worker（调研）
         description: '只读调研执行手：按 brief 查证据、给一页结论；不写盘、不委派、不下职能结论'
         # 排在 worker family：它是只读能力档，不是角色。
         order: 93

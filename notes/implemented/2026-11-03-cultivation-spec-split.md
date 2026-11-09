@@ -9,7 +9,7 @@
 
 把原 `cultivation.spec.ts`（640 行，现已拆为 command/context/maintenance 三份）中**纯 `src/lib/cultivation.ts`** 的 7 个 describe（recordStamp/timeLabel、
 journalTitle、inboxRows、record 写读往返、recordInbox、methodSkillText、feedbackItems）原样移到
-`tests/company/cultivation-lib.spec.ts`；原文件保留 host 命令/存储/背景/CAS/revoke/archive/check 的 23 例。
+`tests/lib/cultivation.spec.ts`；原文件保留 host 命令/存储/背景/CAS/revoke/archive/check 的 23 例。
 断言零改动，只搬位置与 import。
 
 ## 输掉的方案
@@ -25,7 +25,7 @@ journalTitle、inboxRows、record 写读往返、recordInbox、methodSkillText�
 ## 验证（实跑）
 
 ```text
-npx vitest run tests/company/cultivation.spec.ts tests/company/cultivation-lib.spec.ts
+npx vitest run tests/host/cultivation/cultivation-command.spec.ts tests/lib/cultivation.spec.ts
 # 2 files / 44 tests passed（lib 21 + host 23）
 ```
 

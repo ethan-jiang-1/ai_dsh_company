@@ -5,7 +5,7 @@
 
 > **2026-10-28 M3 部分取代（G7 方法层边界）**：方法层已迁公司级 `<DSH_HOME>/company/methods/<role>/`，
 > 同 home 多 profile 共享；本文 §决定 4 与 §后果 的“按 profile 隔离/各一份”作废。
-> 见 [data-model](../../docs/data-model.md) §四、[profiles.ts](../../packages/company-pack/src/host/profiles.ts) 与
+> 见 [data-model](../../docs/data-model.md) §四、[profiles.ts](../../packages/company-pack/src/host/run-bundle/profiles.ts) 与
 > [数据设计硬化 Note](./2026-10-28-data-design-hardening.md)；
 > 其余 G6/G8/G11/G12 仍有效。
 
@@ -49,7 +49,7 @@ P0 收口后，Gap 卡还剩 G6（record CAS/revoke 半状态）、G7（方法�
 | `node checks/smoke/upgrade-while-running-smoke.mjs` | ALL PASS（0.3.12 运行中升 0.3.13；session/data 保留） |
 | `node checks/smoke/present-catalog-smoke.mjs` | ALL PASS（presented 账本） |
 
-红证（实跑）：临时把 `validateCompanyHome` 改成直接 `{ ok: true }` → `pnpm exec vitest run tests/company/apply-rebind.spec.ts -t "DSH_COMPANY_HOME=DSH_HOME"` 红：`expected false to be true`（home 根出现 `AGENTS.md`）；还原 → 绿。
+红证（实跑）：临时把 `validateCompanyHome` 改成直接 `{ ok: true }` → `pnpm exec vitest run tests/host/apply-rebind.spec.ts -t "DSH_COMPANY_HOME=DSH_HOME"` 红：`expected false to be true`（home 根出现 `AGENTS.md`）；还原 → 绿。
 
 ## 范围 / 排除
 

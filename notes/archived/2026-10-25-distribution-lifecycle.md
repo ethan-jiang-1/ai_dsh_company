@@ -14,7 +14,7 @@
 
 - 包声明 [package.json](../../packages/company-pack/package.json) 有 `private: true`，无 `engines`、`license`、`repository`；DSH 运行时不读 `dsh.compatibility.dshReleases`，真正拦安装的是 peers。
 - 手册 [_dist/安装手册.md](../../_dist/安装手册.md) 由 [tools/export-dist.mjs](../../tools/export-dist.mjs) 生成，没有 sha256/前置/回退。
-- [release-smoke.mjs](../../checks/smoke/release-smoke.mjs) 只覆盖首启/二启；升级只有 [bundle-manifest.spec.ts](../../tests/company/bundle-manifest.spec.ts) 的单测。
+- [release-smoke.mjs](../../checks/smoke/release-smoke.mjs) 只覆盖首启/二启；升级只有 [bundle-manifest.spec.ts](../../tests/host/run-bundle/bundle-manifest.spec.ts) 的单测。
 - 门禁 [pack-shape.mjs](../../checks/gates/pack-shape.mjs) 只查 patch 与台账；[dist-manual.mjs](../../checks/gates/dist-manual.mjs) 只查版本/keywords/pin。
 
 ## 方案

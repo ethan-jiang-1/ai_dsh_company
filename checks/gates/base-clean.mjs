@@ -12,8 +12,9 @@ import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 const ROLES = [...COMPANY_ROLE_IDS]
 // 负例留证 2026-11-07（A1）：process-docs 落进 content 后同步纳入本表——删 `state/process-docs.md`
 // 走「缺失」判红（不抛异常）；把 `（2026-11-07` 写回正文 → 「含部署日期」判红。
-const TEXT_FILES = ['AGENTS.md', 'README.md', 'state/org.md', 'state/company.md', 'state/owners.md', 'state/motion-ledger.md', 'state/process-docs.md',
-  ...['allocation.md', 'decision-memo.md', 'meta.md', 'mrd.md', 'ops-review-note.md', 'prd.md', 'review-note.md', 'strs.md', 'syrs.md', 'irs.md', 'weekly-report.md'].map(name => `templates/${name}`)]
+const TEXT_FILES = ['AGENTS.md', 'README.md', 'state/org.md', 'state/company.md', 'state/owners.md', 'state/motion-ledger.md', 'product-types/hardware-software/requirements-model.md', 'company/policy-lines.md', 'company/review-protocol.md',
+  ...['decision-memo.md', 'meta.md', 'mrd.md', 'ops-review-note.md', 'prd.md', 'review-note.md', 'strs.md', 'weekly-report.md'].map(name => `templates/${name}`),
+  ...['syrs.md', 'irs.md', 'allocation.md'].map(name => `product-types/hardware-software/templates/${name}`)]
 
 export function run({ root, ok, fail }) {
   const content = join(root, 'packages/company-pack/content')
@@ -33,6 +34,10 @@ export function run({ root, ok, fail }) {
     for (const [index, line] of readFileSync(path, 'utf8').split('\n').entries()) {
       if (/snapshots\/archive/.test(line)) problems.push(`packages/company-pack/content/${rel}:${String(index + 1)} 含归档引用`)
       if (/（2026-\d\d-\d\d/.test(line)) problems.push(`packages/company-pack/content/${rel}:${String(index + 1)} 含部署日期`)
+      // 具体部署交付物路径（slug 不是占位）——pack 是出厂内容，换一家公司就是死链。
+      if (/\.dsh-company\/deliverables\/(?!<)[A-Za-z0-9][\w.-]*\//.test(line)) {
+        problems.push(`packages/company-pack/content/${rel}:${String(index + 1)} 指向具体部署交付物（应留 <日期>-<slug> 占位）`)
+      }
     }
   }
   for (const dir of ['kb', 'deliverables', 'deliverables-archive', 'cultivation']) {

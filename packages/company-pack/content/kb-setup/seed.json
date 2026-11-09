@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "note": "target 相对 workspace；mode 恒为 only-fill（wx，绝不覆盖）。source 相对 content/。缺源 = 装配错误（fail-loud）。",
+  "seeds": [
+    {
+      "source": "state/company.md",
+      "target": ".dsh-company/kb/company.md"
+    },
+    {
+      "source": "state/org.md",
+      "target": ".dsh-company/kb/org.md"
+    },
+    {
+      "source": "state/owners.md",
+      "target": ".dsh-company/kb/owners.md"
+    },
+    {
+      "source": "state/motion-ledger.md",
+      "target": ".dsh-company/kb/motion-ledger.md"
+    },
+    {
+      "source": "company/policy-lines.md",
+      "target": ".dsh-company/kb/policy-lines.md"
+    },
+    {
+      "source": "company/review-protocol.md",
+      "target": ".dsh-company/kb/review-protocol.md"
+    },
+    {
+      "source": "product-types/hardware-software/requirements-model.md",
+      "target": ".dsh-company/kb/process-docs.md"
+    },
+    {
+      "source": "kb-setup/guide.md",
+      "target": ".dsh-company/kb/AGENTS.md"
+    },
+    {
+      "source": "kb-setup/run-bundle.md",
+      "target": ".dsh-company/README.md"
+    },
+    {
+      "source": "charters/ceo.md",
+      "target": ".dsh-company/kb/ceo/CHARTER.md"
+    },
+    {
+      "source": "charters/cfo.md",
+      "target": ".dsh-company/kb/cfo/CHARTER.md"
+    },
+    {
+      "source": "charters/coo.md",
+      "target": ".dsh-company/kb/coo/CHARTER.md"
+    },
+    {
+      "source": "charters/cmo.md",
+      "target": ".dsh-company/kb/cmo/CHARTER.md"
+    },
+    {
+      "source": "charters/vp-eng.md",
+      "target": ".dsh-company/kb/vp-eng/CHARTER.md"
+    },
+    {
+      "source": "charters/vp-sales.md",
+      "target": ".dsh-company/kb/vp-sales/CHARTER.md"
+    }
+  ]
+}

@@ -20,20 +20,20 @@
 - `company-workspace/templates/meta.md`：补充业务结论、无硬长度限制和逐层承载规则。
 - `company-workspace/kb/motion-ledger.md`：补充 meta 逐字引用规矩，并新增 V4 台账行。
 - `company-workspace/deliverables-archive/2026-10-10-ai-transformation-2026-v4/meta.md`：将 835 字内部复盘段改为业务结论，保留 V4 达标、反事实未达标原因和真实缺陷已修复三项核心事实。
-- `tests/company/ledger.spec.ts`：增加生产 V4 meta 与台账逐字同源、V4 必须登记的确定性断言。
+- `tests/lib/ledger.spec.ts`：增加生产 V4 meta 与台账逐字同源、V4 必须登记的确定性断言。
 
 ## 验证
 
 ### 红
 
-命令：`pnpm exec vitest run tests/company/ledger.spec.ts -t 'V4 活跃 meta'`
+命令：`pnpm exec vitest run tests/lib/ledger.spec.ts -t 'V4 活跃 meta'`
 
 结果：失败（1 failed，5 skipped），断言 `V4 活跃交付物必须在台账登记: expected undefined to be defined`。这证明旧状态确实缺少 V4 台账行。
 
 ### 绿与回归
 
-- `pnpm exec vitest run tests/company/ledger.spec.ts -t 'V4 活跃 meta'`：通过（1 passed）。
-- `pnpm exec vitest run tests/company/ledger.spec.ts`：通过（6 passed）。
+- `pnpm exec vitest run tests/lib/ledger.spec.ts -t 'V4 活跃 meta'`：通过（1 passed）。
+- `pnpm exec vitest run tests/lib/ledger.spec.ts`：通过（6 passed）。
 - `git diff --check`：通过。
 - `pnpm verify`：`verify: ALL PASS`；包含 `proposal-scheduled ×1`、`backlog-liveness` 和全部现有结构门禁。
 - 语义审查的实际 diff 仅包含本批模板、V4 meta、台账和测试文件；未发现其他历史台账行或 archive 被修改。

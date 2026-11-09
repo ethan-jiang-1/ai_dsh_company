@@ -67,7 +67,7 @@ local subagent 是进程内 agent；宿主进程死亡时 child 的 turn 被记�
   （standalone 实测：RS1 真实会话 `48eb730a-…` → 23 events，`turn/end {"reason":{"kind":"interrupted"}}`）。
   服务缺席或单条日志坏了则 fail-soft 省略该字段，不影响列出 child。
 - **绿证据**：真挂载会话工具目录含 `list_subagents`（`runtime/tmp/explore/fix1/S039/summary.json`）；
-  `tests/company/delegation-control.spec.ts` 9 条（catalog 折叠、inactive/running、`terminalOf`、
+  `tests/host/delegation/delegation-control.spec.ts` 9 条（catalog 折叠、inactive/running、`terminalOf`、
   interrupted/completed、日志读失败 fail-soft）；standalone durable 读实测见上。
 - **仍缺（不假结，但不阻塞判定）**：父会话拿不到**错过的完成通知内容**（只有终态 kind）；要正文仍需
   `send_to_subagent` 冷恢复或上游 resume 对账。

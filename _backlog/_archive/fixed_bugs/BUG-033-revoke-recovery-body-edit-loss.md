@@ -27,11 +27,11 @@ revoke 在“记录已写 revokedAt、方法尚未删除”之间崩溃后，用
 3. 再手动改该记录正文（保留 `revokedAt`）。
 4. 调 `recoverPendingRevoke` → 记录被 `restoreRecord` 成旧全文，正文修改丢失。
 
-现有 `tests/company/revoke-journal.spec.ts` 只覆盖“第三种形状（无 revokedAt）”→ conflict，未覆盖“有 revokedAt + 正文被改”。
+现有 `tests/host/cultivation/revoke-journal.spec.ts` 只覆盖“第三种形状（无 revokedAt）”→ conflict，未覆盖“有 revokedAt + 正文被改”。
 
 ## 修复关联
 
-`packages/company-pack/src/host/revoke-journal.ts`；`packages/company-pack/src/host/cultivation.ts` 的 revoke 写 journal 处。
+`packages/company-pack/src/host/cultivation/revoke-journal.ts`；`packages/company-pack/src/host/cultivation/cultivation.ts` 的 revoke 写 journal 处。
 
 ## 已修判定
 

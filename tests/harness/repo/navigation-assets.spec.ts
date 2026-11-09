@@ -18,9 +18,9 @@ describe('tests/README 导航骨架', () => {
     expect(existsSync(join(repositoryRoot, 'tests/README.md'))).toBe(true)
   })
 
-  it('四区各被点名且带「不证明」列', () => {
+  it('各领域分区被点名且带「不证明」列', () => {
     const text = read('tests/README.md')
-    for (const domain of ['tests/company', 'tests/client', 'tests/presets', 'tests/harness']) {
+    for (const domain of ['tests/host', 'tests/lib', 'tests/content', 'tests/client', 'tests/presets', 'tests/harness']) {
       expect(text).toContain(domain)
     }
     expect(text).toContain('不证明')

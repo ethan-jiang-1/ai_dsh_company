@@ -18,7 +18,7 @@
 - [bootstrap.md](../../docs/guides/bootstrap.md) 是长配方；[fresh-clone.yml](../../.github/workflows/fresh-clone.yml) 只跑 install + bundle:init + verify，不构建/不启动。
 - DSH 源码直跑 = 先 `pnpm run build`，再 `pnpm dsh`；launcher 不检查产物新鲜度。
 - 品牌硬编码在 [Brand.tsx](../../packages/company-pack/src/client/ui/Brand.tsx)；出厂 org 是样例；没有“会话 cwd 是不是公司盘”的守卫。
-- `bundle.json` 的 workspace 在盘内记相对、盘外记绝对（[bundle-manifest.ts](../../packages/company-pack/src/host/bundle-manifest.ts)）。
+- `bundle.json` 的 workspace 在盘内记相对、盘外记绝对（[bundle-manifest.ts](../../packages/company-pack/src/host/run-bundle/bundle-manifest.ts)）。
 
 ## 方案
 

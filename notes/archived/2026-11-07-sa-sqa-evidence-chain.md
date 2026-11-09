@@ -69,7 +69,7 @@
   当时仍有 **2 条 `bare-path` 红**，来自并发会话新增的 `_backlog/_archive/research/requirements-identification-numbering/2026-11-07-landing-plan.md`
   （指向尚未创建的测试文件），不属于本变更，未改。`pnpm test`：**1166 passed**；`pnpm typecheck`：通过；
   `node checks/smoke/preset-smoke.mjs`：**ALL PASS**（刷新 company profile 的 tarball 后，9 个 preset 全挂载）。
-- `pnpm lint`：**红**，但命中 `tests/company/roster-backfill.spec.ts` 的 `unicorn(prefer-string-starts-ends-with)`
+- `pnpm lint`：**红**，但命中 `tests/host/run-bundle/roster-backfill.spec.ts` 的 `unicorn(prefer-string-starts-ends-with)`
   （未改动文件，既有问题）；本 diff 未新增 lint 告警。
 - E2E（真模型，`sa-sqa-delegation-probe --wall 1800`）：见「E2E 运行」节。
 

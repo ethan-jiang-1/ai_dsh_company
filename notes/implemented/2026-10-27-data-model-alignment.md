@@ -58,7 +58,7 @@
 
 红证（实跑，用于证明判据不是空断言）：
 
-- 临时把 `companyScopeOf` 的子目录分支改成直接返回 `{ root }` → `pnpm exec vitest run tests/company/cultivation.spec.ts -t "公司数据只认盘根"` 红：`expected 'success' to match { kind: 'error' }`；还原 → 绿。
+- 临时把 `companyScopeOf` 的子目录分支改成直接返回 `{ root }` → `pnpm exec vitest run tests/host/cultivation.spec.ts -t "公司数据只认盘根"` 红：`expected 'success' to match { kind: 'error' }`；还原 → 绿。
 - `dist-manual` 新关键句删掉后 `pnpm verify` 红：`FAIL dist-manual: 手册缺安装形状/契约关键句：DSH_COMPANY_REBIND（run bundle / bundle.json / workspace 骨架 / sha256 / Node / DSH / 卸载 / 回退）`；还原原字节 → `PASS dist-manual（版本 0.3.11 + run bundle 安装形状 + sha256 + pin dsh-v0.2.1-rc.2）`，`verify: ALL PASS`。
 
 ## 范围 / 排除

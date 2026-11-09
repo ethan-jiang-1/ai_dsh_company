@@ -67,7 +67,7 @@ opened: 2026-10-12
 | journal 匹配不吞后继 slug | 确定性 | 实跑：收敛 ai-coding-security-2026 清出未闭合 -light/-v2 共 11 篇 | 规则加精确名排除 + 11 篇 git 恢复 | git status + converge --plan |
 | 证据不双份存储 | 确定性 | snapshots-budget 红（84.1M > 64M） | journal-only 副本，56.7M/64M | snapshots-budget 门禁 |
 | 跨引用不断链 | 确定性 | bare-path 红（COO CHARTER 断链）+ foundation-safety 红 | CHARTER 重指步骤 + Note 就地改新，全绿 | bare-path + foundation-safety |
-| 台账不重不漏 | 确定性 | ledger.spec 红（slug 重复 34/32）+ V4 锚断 | CLI 查重守卫 + spec 锚随迁归档位，6/6 绿 | tests/company/ledger.spec.ts |
+| 台账不重不漏 | 确定性 | ledger.spec 红（slug 重复 34/32）+ V4 锚断 | CLI 查重守卫 + spec 锚随迁归档位，6/6 绿 | tests/lib/ledger.spec.ts |
 | 历史纪要落盘 | 确定性 | 红 = 4 slug 无 CHARTER 纪要（CLI TODO 打印即缺口） | 绿 = --charter-backfill 19 条落盘（5 角色 × 4 slug，coo ai-sprint 查重跳过） | converge --charter-backfill |
 | 常态化入轮末 | 确定性 | 红 = dev-loop §12 无收敛行 | 绿 = 收尾清单含收敛步（--plan/--slug/--charter-backfill） | dev-loop §12 |
 

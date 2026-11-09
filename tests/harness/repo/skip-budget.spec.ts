@@ -13,7 +13,7 @@ import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs
 
 /** 唯一允许的 skip：dev-only live 台账；预期 dev home 真跑 3 例，fresh clone 0 例。 */
 const ALLOWED = new Map([
-  ['tests/company/ledger.spec.ts', 'dev-only live 台账：预期 3 例（dev home）/ 0 例（fresh clone）'],
+  ['tests/lib/ledger.spec.ts', 'dev-only live 台账：预期 3 例（dev home）/ 0 例（fresh clone）'],
 ])
 const TOKENS = [/\b(?:describe|it|test)\.(?:skipIf|skip)\(/]
 

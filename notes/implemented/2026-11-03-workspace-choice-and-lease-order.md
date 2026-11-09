@@ -34,7 +34,7 @@
 
 ```text
 # 1) 记住最近选择（新增断言：文件真的出现且内容 = canonical workspace）
-npx vitest run tests/company/runtime-guard.spec.ts   # 4 passed
+npx vitest run tests/host/run-bundle/runtime-guard.spec.ts   # 4 passed
 # 造红：把写入行换成 `void readSavedWorkspace` →
 #   × 干净 workspace + 无 manifest：可写，bundleState=missing
 #   （读 settings.json 时 ENOENT）；还原 → 4 passed

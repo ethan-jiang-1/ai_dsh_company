@@ -13,7 +13,7 @@ opened: 2026-11-07
 
 **问题与期望结果：** 纯逻辑 checker 解析 `layer/definition`，建定义/引用索引，判重复/悬空/退役/孤儿/覆盖/计数；V2/V4/V11 有结果；不碰 host/命令。
 
-**范围：** `src/lib/requirements-check.ts`；`requirements-check.spec.ts`（待建，落 tests/company/）（内联 fixture 字符串）；lab docs 只读。
+**范围：** `src/lib/requirements-check.ts`；`requirements-check.spec.ts`（待建，落 tests/host/）（内联 fixture 字符串）；lab docs 只读。
 
 **依赖：** A1/A2。
 
@@ -28,7 +28,7 @@ opened: 2026-11-07
 
 | 行为 | 类别 | 输入·状态 | 判红·通过信号 | 负例·恢复 | 证据 owner | 人的判断 |
 |---|---|---|---|---|---|---|
-| 解析 `layer/definition`（json-ledger/headings/table-rows）；定义 vs 引用 | 确定性 | 内联 fixture 字符串 | spec 通过 | 重复定义/悬空 → 红 | 新 `requirements-check.spec.ts`（待建，落 tests/company/） | 无 |
+| 解析 `layer/definition`（json-ledger/headings/table-rows）；定义 vs 引用 | 确定性 | 内联 fixture 字符串 | spec 通过 | 重复定义/悬空 → 红 | 新 `requirements-check.spec.ts`（待建，落 tests/host/） | 无 |
 | 退役词/范围 marker；旧动议 skip | 确定性 | 内联 fixture | spec | 旧动议被扫 → 红 | 同上 | 无 |
 | 孤儿/覆盖/计数；索引输出 | 确定性 | 内联 fixture | spec | 缺覆盖 → 红 | 同上 | 无 |
 | V2 重键 / V4 负例 / V11 试跑 | 人工 trial + 内联映射 | lab 只读 + 内联 fixture | 结果记录 | 夹具过期 → 记 blocked，不编造 | 人工 trial + 研究材料 | 无（记录） |
@@ -37,7 +37,7 @@ opened: 2026-11-07
 
 | 判据 | 现有 owner / 新资产 | 命令 | 证明什么 | 不证明什么 | 红证·负例 |
 |---|---|---|---|---|---|
-| 解析/判红 | 新 `requirements-check.spec.ts`（待建，落 tests/company/） + 内联 fixture（不建新 fixture 目录） | `pnpm test tests/company/requirements-check.spec.ts` | 纯逻辑 | 命令/模型 | 先写红（重复定义 fixture）再实现 |
+| 解析/判红 | 新 `requirements-check.spec.ts`（待建，落 tests/host/） + 内联 fixture（不建新 fixture 目录） | `pnpm test tests/lib/requirements-check.spec.ts` | 纯逻辑 | 命令/模型 | 先写红（重复定义 fixture）再实现 |
 | lab trial | 人工读 `runtime/lifecycle-lab/real-ws/...`（只读；不进 `pnpm test`） | 人工读 docs + 记录映射 | 真实形状 | 回归/自动判红 | 路径缺 → 记 blocked，不编造 |
 | 索引派生 | spec 断言输出 | 同上 | 计数/矩阵 | 语义 | 缺 ID → 红 |
 
@@ -56,9 +56,9 @@ opened: 2026-11-07
 ## 交付证据
 
 - 基线：`git rev-parse HEAD` = `2bfdb09`（A2 提交后）
-- 红（判据真红）：临时关掉重复定义判据 → `pnpm vitest run tests/company/requirements-check.spec.ts` → `1 failed | 15 passed`（× 重复定义 → 红并点名两处）；还原 → 16 passed
-- 绿：`pnpm vitest run tests/company/requirements-check.spec.ts` → `16 passed`；`pnpm vitest run tests/company` → `43 files / 279 tests passed`；`pnpm typecheck` 全绿；`pnpm lint` 0 warnings 0 errors；`pnpm dup` 0 clones；`pnpm verify` → `ALL PASS`
-- 资产：`packages/company-pack/src/lib/requirements-check.ts`（纯逻辑：层/定义形态解析、重复/悬空/退役/孤儿/覆盖/计数/矩阵、meta 范围豁免）；`tests/company/requirements-check.spec.ts`（16 条判据）
+- 红（判据真红）：临时关掉重复定义判据 → `pnpm vitest run tests/lib/requirements-check.spec.ts` → `1 failed | 15 passed`（× 重复定义 → 红并点名两处）；还原 → 16 passed
+- 绿：`pnpm vitest run tests/lib/requirements-check.spec.ts` → `16 passed`；`pnpm vitest run tests/company` → `43 files / 279 tests passed`；`pnpm typecheck` 全绿；`pnpm lint` 0 warnings 0 errors；`pnpm dup` 0 clones；`pnpm verify` → `ALL PASS`
+- 资产：`packages/company-pack/src/lib/requirements-check.ts`（纯逻辑：层/定义形态解析、重复/悬空/退役/孤儿/覆盖/计数/矩阵、meta 范围豁免）；`tests/lib/requirements-check.spec.ts`（16 条判据）
 - V4/V11 回归进 spec：重复/悬空/退役/孤儿 4/4；摘要表是引用（headings 不把表行当定义）；「可追溯性」散文不算字段；区间计数断言（R8）判红
 - V2 记录：沿用 [验证记录](../research/requirements-identification-numbering/2026-11-07-validation-trial.md) §2（lab 重键 16/33/22 无悬空无重复；唯一硬缺口 = 16/16 StR 无机器可解析 MR 上游 → 本卡用孤儿/覆盖判据接住）
 - 真跑：未跑（lab 是旧格式、无 `编号体系` 标记——按合同应 skipped，归 A7 范围；A8 跑新格式真模型）

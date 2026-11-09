@@ -6,6 +6,20 @@ import { describe, expect, it } from 'vitest'
 
 const PACK = join(ROOT, 'packages/company-pack')
 const PRESETS_DIR = join(PACK, 'presets')
+
+/** 手册面（2026-11-09 三层拆分）：T0 常驻手册 + `generic/` 按需细则。
+ * 判据是"规则在场且被 T0 指针点名"，不再假设全部规则都在常驻面。 */
+function handbookSurface(): string {
+  const content = join(PACK, 'content')
+  const genericDir = join(content, 'generic')
+  const parts = [readFileSync(join(content, 'AGENTS.md'), 'utf8')]
+  if (existsSync(genericDir)) {
+    for (const name of readdirSync(genericDir).filter(entry => entry.endsWith('.md')).sort()) {
+      parts.push(readFileSync(join(genericDir, name), 'utf8'))
+    }
+  }
+  return parts.join('\n\n')
+}
 const yaml = createRequire(join(ROOT, 'vendor/dsh/package.json'))('js-yaml') as {
   load(text: string, options?: unknown): unknown
   Type: new (tag: string, options: { kind: string, construct: (data: string) => string }) => unknown
@@ -177,7 +191,8 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       expect(match, `${role} 行内 config.name 缺失`).not.toBeNull()
       return (match as RegExpExecArray)[1]!.trim()
     })
-    expect(names.every(name => name.startsWith('梦之队 ')), `显示名未共用 梦之队 前缀：${names.join(' / ')}`).toBe(true)
+    expect(names.every(name => !name.includes('梦之队')), `显示名仍带部署公司名（应只留角色名）：${names.join(' / ')}`).toBe(true)
+    expect(names, '显示名 = 角色名（D14 2026-11-09 收窄）').toEqual(['CEO', 'VP-Eng', 'VP-Sales', 'COO', 'CFO', 'CMO'])
   })
 
   it('bundle 行：agent-preset-registry 用替换语义（覆盖 web-app 出厂行 default），其余新增走 insert', () => {
@@ -230,11 +245,11 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
-  it('CEO 五职能路由：MRD → CMO、PRD → VP-Eng、现有客户/定价 → VP-Sales', () => {
+  it('CEO 五职能在位；产物链归产品类型包（persona 不再内联 MRD/PRD）', () => {
     const ceo = roleYml('ceo')
-    expect(ceo, 'CEO persona 必须点名 CMO（六角色）').toContain('CMO（市场与新产品定义）')
-    expect(ceo, 'MRD 必须派 CMO').toMatch(/MRD 派 CMO/)
-    expect(ceo, 'PRD 必须派 VP-Eng').toMatch(/PRD 派 VP-Eng/)
+    expect(ceo, 'CEO persona 必须点名 CMO（六角色）').toContain('CMO（市场与产品定义）')
+    expect(ceo, 'persona 不得内联产品链术语').not.toMatch(/MRD|StRS|SyRS|IRS/)
+    expect(ceo, 'persona 必须指到产品类型包的 document-map').toMatch(/document-map|产品类型包/)
     expect(ceo, '不得再把「市场」整体派给 VP-Sales').not.toContain('市场与定价派 VP-Sales')
     expect(ceo, '单职能快捷委派必须含 vp_cmo').toMatch(/vp_eng \/ vp_sales \/ vp_cmo/)
     expect(ceo, '两件及以上必须组队（否则 task board/DAG 空）').toMatch(/产出两件及以上[\s\S]*spawn_teammate/)
@@ -308,7 +323,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   })
 
   it('公司手册（模型可见）覆盖六角色职责边界、路由与升级规则——不随内容改动悄悄失效', () => {
-    const handbook = readFileSync(join(ROOT, 'packages/company-pack/content/AGENTS.md'), 'utf8')
+    const handbook = handbookSurface()
     for (const role of ['CEO', 'CFO', 'VP-Sales', 'VP-Eng', 'COO', 'CMO']) {
       expect(handbook, `手册缺 ${role} 的职责边界`).toContain(role)
     }
@@ -320,8 +335,16 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(handbook).toMatch(/交付日期|排期/)
   })
 
+  it('渐进式披露：T0 手册只留指针，细则在 generic/ 且被点名', () => {
+    const t0 = readFileSync(join(PACK, 'content/AGENTS.md'), 'utf8')
+    for (const name of ['deliverable-states', 'role-boundary', 'routing', 'collaboration', 'human-interface']) {
+      expect(t0, `T0 手册未点名 generic/${name}.md`).toContain(`generic/${name}.md`)
+    }
+    expect(Buffer.byteLength(t0, 'utf8'), 'T0 常驻面 ≤ 6KB').toBeLessThanOrEqual(6144)
+  })
+
   it('交付物三态（R4）：手册写清成品归 CEO、职能写 drafts；模板不再是占位', () => {
-    const handbook = readFileSync(join(ROOT, 'packages/company-pack/content/AGENTS.md'), 'utf8')
+    const handbook = handbookSurface()
     // 三态的字面形状必须与产品内词表一致（src/lib/deliverables-catalog.ts 的 META_TYPES/META_RESULTS）
     expect(handbook, '三态必须点明成品路径').toContain('deliverables/<日期>-<slug>/final.md')
     expect(handbook, '三态必须点明过程稿路径').toContain('deliverables/<日期>-<slug>/drafts/<角色>.md')
@@ -382,7 +405,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(chairing, '必须说明板面 id 形状 task-N').toContain('task-N')
     expect(chairing, '必须点破"同批建的还没有 id、不许猜"').toMatch(/不许猜|还没有 id/)
     expect(chairing, '必须区分纸面号与板面 id').toContain('纸面号')
-    const handbook = readFileSync(join(ROOT, 'packages/company-pack/content/AGENTS.md'), 'utf8')
+    const handbook = handbookSurface()
     expect(handbook, '派活行格式 owner（手册）必须点明 T 号是纸面号').toMatch(/`T<N>` 是纸面号/)
   })
 
@@ -415,7 +438,7 @@ describe('组队健壮性三层防御（2026-10-12 用户裁定；issue 2026-10-
   })
 
   it('B3 · 成员侧打回规范在场（手册：域内核对义务 + 打回三件套 + 不追责）', () => {
-    const handbook = readFileSync(join(ROOT, 'packages/company-pack/content', 'AGENTS.md'), 'utf8')
+    const handbook = handbookSurface()
     expect(handbook, '缺成员「域内核对」义务（收到分派先答：我的域？判据给我了吗？）')
       .toMatch(/域内核对/)
     expect(handbook, '打回缺三件套形状（为什么不是我 / 缺什么 / 建议谁接）')
@@ -524,8 +547,8 @@ describe('需求编号链：CMO 产 MRD+StRS、VP-Eng 产 PRD（A3）', () => {
 
   it('CMO persona 声明 MRD + StRS；mrd-playbook 写 StRS 产出与 traces', () => {
     const persona = roleYml('cmo')
-    expect(persona, 'CMO persona 必须声明 StRS 产出').toContain('strs.md')
-    expect(persona, 'CMO persona 必须点名 StRS 的 REQ 编号').toContain('StRS')
+    expect(persona, 'CMO persona 必须指到产品类型包的 document-map').toMatch(/document-map|产品类型包/)
+    expect(persona, '产品链细节归类型包，persona 不内联').not.toMatch(/StRS|strs\.md/)
     const playbook = readFileSync(join(PRESETS_DIR, 'cmo/skills/mrd-playbook/SKILL.md'), 'utf8')
     expect(playbook, 'mrd-playbook 缺 StRS 产出小节').toContain('StRS')
     expect(playbook, 'mrd-playbook 缺 drafts/strs.md 落盘路径').toContain('drafts/strs.md')
@@ -535,8 +558,8 @@ describe('需求编号链：CMO 产 MRD+StRS、VP-Eng 产 PRD（A3）', () => {
 
   it('VP-Eng persona/prd-playbook 只写 PRD（source→MR、traces→StRS），不写 SyRS/IRS', () => {
     const persona = roleYml('vp-eng')
-    expect(persona, 'VP-Eng persona 必须点名 StRS 输入').toContain('StRS')
-    expect(persona, 'VP-Eng persona 必须写明 traces 指 StRS').toMatch(/traces[^\n]*StRS/)
+    expect(persona, 'VP-Eng persona 必须指到产品类型包的 document-map').toMatch(/document-map|产品类型包/)
+    expect(persona, '产品链细节归类型包，persona 不内联').not.toMatch(/StRS|traces[^\n]*StRS/)
     const playbook = readFileSync(join(PRESETS_DIR, 'vp-eng/skills/prd-playbook/SKILL.md'), 'utf8')
     expect(playbook, 'prd-playbook 缺 source→MR').toMatch(/source[^\n]*MR/)
     expect(playbook, 'prd-playbook 缺 traces→StRS').toMatch(/traces[^\n]*StRS/)
@@ -575,7 +598,7 @@ describe('VP-Eng 组队：根门带小队 + 命名专家（B1）', () => {
   })
 
   it('继承口径分通道：teammate 继承 Lead；命名 child 由 agentPreset 给组合', () => {
-    const handbook = readFileSync(join(PACK, 'content/AGENTS.md'), 'utf8')
+    const handbook = handbookSurface()
     expect(handbook, '手册必须写 teammate 继承 Lead 组合').toMatch(/teammate[^\n]*继承[^\n]*组合|继承[^\n]*Lead[^\n]*组合/)
     expect(handbook, '手册必须写命名 child 按自己的 preset 组合').toMatch(/命名[^\n]*child[^\n]*(agentPreset|preset)/)
     const delegation = readFileSync(join(ROOT, 'docs/delegation.md'), 'utf8')

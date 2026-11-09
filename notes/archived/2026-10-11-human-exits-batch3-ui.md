@@ -28,7 +28,7 @@
 - `packages/company-pack/src/client/ui/styles.ts`：台账行独立单列 grid（元数据与摘要分行）；`.wk-row-task` 一律两行 `-webkit-line-clamp`，只有展开态解除。
 - `tests/client/wiring/client-face.spec.ts`：UI 合同（aria、可聚焦控件、真展开态、两行边界、**不许有免裁口子**、按溢出量、栏宽重测）。
 - `tests/client/tabs/ledger-summary.spec.ts`：长短 fixture 静态渲染（长文首帧带入入口、短摘要不预置、120/121 首屏提示边界、摘要本体不挂 title）。
-- `tests/company/ledger.spec.ts`：V4 结论除逐字同源外，另钉三项事实在场、长度不退回长句、机制名不入结论主体。
+- `tests/lib/ledger.spec.ts`：V4 结论除逐字同源外，另钉三项事实在场、长度不退回长句、机制名不入结论主体。
 - `docs/demo.md`：compact 语义（简洁/标准/详细都折叠、只有完全展开逐条展开）与 open-in-app 现场步骤。
 
 ## 验证
@@ -37,7 +37,7 @@
 
 - `pnpm exec vitest run tests/client/wiring/client-face.spec.ts -t 'LedgerTab 长摘要'` 在实现前失败：源码只有 `title={row.summary}`，没有全文 aria 入口。⚠ 复核轮发现当时 4 条断言里 2 条恒绿（`/summary/` 命中 `row.summary`、`/height:/` 命中 `line-height:`），已改写成 7 条**逐条在 6094d67 基线上都红**的断言（脚本核对：基线红 7/7）。
 - 行高红：`node probes/browser-visual/ledger-summary-probe.mjs '<token-url>' '研究AI改造公司方案V4'` 在旧实现上报 `行高超两行的摘要：[{"length":103,"lines":3},…{"length":109,"lines":4}]`（1440px 即 9 行超界）。
-- V4 结论红配方：把 meta 结论换成 835 字长句 ⇒ `tests/company/ledger.spec.ts` `1 failed`（已还原，6 passed）。
+- V4 结论红配方：把 meta 结论换成 835 字长句 ⇒ `tests/lib/ledger.spec.ts` `1 failed`（已还原，6 passed）。
 
 ### 绿与回归
 

@@ -4,50 +4,50 @@ import type {} from '@deepseek-ai/dsh-user-approval'
 import type {} from '@deepseek-ai/dsh-api-session-controller/types'
 import { existsSync, readFileSync } from 'node:fs'
 import { isAbsolute, join, relative } from 'node:path'
-import { registerSignoffTool } from './host/signoff-tool.ts'
-import { registerWorkspaceDoors } from './host/workspace-doors.ts'
+import { registerSignoffTool } from './host/commands/signoff-tool.ts'
+import { registerWorkspaceDoors } from './host/workspace/workspace-doors.ts'
 import {
   applyBootstrap,
   backfillWorkspaceRoles,
   planBootstrap,
   resolveContentDir,
-} from './host/bootstrap.ts'
+} from './host/run-bundle/bootstrap.ts'
 import {
   appendUpgradeLog,
   bundleManifestPath,
   planBundleManifest,
   resolvePackMetadata,
   writeBundleManifest,
-} from './host/bundle-manifest.ts'
+} from './host/run-bundle/bundle-manifest.ts'
 import {
   presentedFromEvent,
   presentedFromSessions,
   type PresentedSessionQuery,
-} from './host/presented-ledger.ts'
-import { readCatalogState } from './host/catalog-state.ts'
-import { regenerateCatalog } from './host/catalog.ts'
-import { registerDeliverablesCommand } from './host/deliverables-command.ts'
-import { registerPrdCommand } from './host/prd-command.ts'
-import { registerReqCommand } from './host/req-command.ts'
-import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
-import { registerHandbook } from './host/handbook.ts'
-import { registerWorkflowContract } from './host/contracts.ts'
-import { registerSubagentRetry } from './host/subagent-retry.ts'
-import { registerDelegationTerminal } from './host/delegation-terminal.ts'
-import { migrateLegacyMethodLayers } from './host/cultivation-storage.ts'
+} from './host/ledger/presented-ledger.ts'
+import { readCatalogState } from './host/ledger/catalog-state.ts'
+import { regenerateCatalog } from './host/ledger/catalog.ts'
+import { registerDeliverablesCommand } from './host/commands/deliverables-command.ts'
+import { registerPrdCommand } from './host/commands/prd-command.ts'
+import { registerReqCommand } from './host/commands/req-command.ts'
+import { registerCultivation, type CultivationHostConfig } from './host/cultivation/cultivation.ts'
+import { registerHandbook } from './host/prompt/handbook.ts'
+import { registerWorkflowContract } from './host/prompt/contracts.ts'
+import { registerSubagentRetry } from './host/delegation/subagent-retry.ts'
+import { registerDelegationTerminal } from './host/delegation/delegation-terminal.ts'
+import { migrateLegacyMethodLayers } from './host/cultivation/cultivation-storage.ts'
 import {
   createPresentedLedgerStore,
   ensureLedger,
   type PresentedLedgerStore,
   recordLedger,
-} from './host/presented-domain.ts'
-import { registerClientDiagnostics } from './host/client-diagnostics.ts'
-import { registerDelegationControl } from './host/delegation-control.ts'
-import { registerWorkflowRuns } from './host/workflow-runs.ts'
-import { exportGovernance, type ExportLedgerSource } from './host/governance-export.ts'
-import { prepareCompanyRuntime } from './host/runtime-guard.ts'
-import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace-registry.ts'
-import { canonicalPath } from './host/paths.ts'
+} from './host/ledger/presented-domain.ts'
+import { registerClientDiagnostics } from './host/commands/client-diagnostics.ts'
+import { registerDelegationControl } from './host/delegation/delegation-control.ts'
+import { registerWorkflowRuns } from './host/delegation/workflow-runs.ts'
+import { exportGovernance, type ExportLedgerSource } from './host/ledger/governance-export.ts'
+import { prepareCompanyRuntime } from './host/run-bundle/runtime-guard.ts'
+import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace/workspace-registry.ts'
+import { canonicalPath } from './host/run-bundle/paths.ts'
 
 /** Host half registers tools, approval and the cultivation command family. */
 export const inject = ['tools', 'approval', 'commands', 'workspaceRegistry']
@@ -120,7 +120,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
 
   registerDeliverablesCommand(ctx, { dataBlocked, workspace, ledgerStorePromise, exportNow })
   registerPrdCommand(ctx, { dataBlocked, workspace })
-  registerReqCommand(ctx, { dataBlocked, workspace })
+  registerReqCommand(ctx, { dataBlocked, workspace, contentDir })
 
   ctx.on('api-session/added', (summary) => {
     if (summary.origin === 'subagent') return

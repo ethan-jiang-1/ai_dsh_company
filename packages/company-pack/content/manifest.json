@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "note": "三层加载清单（2026-11-09）。t0 常驻 / t1 摘要 / t2 按需；legacy = 尚未迁移的 state 文件（b 阶段搬入 product-types）。新增/改名文件必须同改本清单。",
+  "tiers": {
+    "t0": [
+      "AGENTS.md"
+    ],
+    "t1": [
+      "company/policy-lines.md",
+      "state/company.md"
+    ],
+    "t2": [
+      "company/review-protocol.md",
+      "generic/collaboration.md",
+      "generic/deliverable-states.md",
+      "generic/human-interface.md",
+      "generic/role-boundary.md",
+      "generic/routing.md",
+      "generic/work-handoff.md",
+      "product-types/b2b-saas/glossary.md",
+      "product-types/b2b-saas/overview.md",
+      "product-types/hardware-software/document-map.md",
+      "product-types/hardware-software/glossary.md",
+      "product-types/hardware-software/overview.md",
+      "product-types/hardware-software/requirements-model.md",
+      "product-types/hardware-software/templates/allocation.md",
+      "product-types/hardware-software/templates/irs.md",
+      "product-types/hardware-software/templates/syrs.md"
+    ],
+    "legacy": [
+      "state/org.md",
+      "state/owners.md",
+      "state/motion-ledger.md"
+    ]
+  }
+}

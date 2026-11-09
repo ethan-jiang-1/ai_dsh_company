@@ -10,7 +10,7 @@
       name: '@deepseek-ai/dsh-agent-preset'
       config:
         id: worker-orchestrator
-        name: 梦之队 Worker（小工头）
+        name: Worker（小工头）
         description: '内部执行手的小工头：带 1–2 个 leaf worker，只回证据与判断，不组队/不开 workflow'
         order: 91
         plugins:

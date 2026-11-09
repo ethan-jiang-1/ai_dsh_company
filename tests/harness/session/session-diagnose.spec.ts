@@ -133,12 +133,12 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
 
   it('approval/asked 没有 decided → pendingApprovals（不是已完成审批）', () => {
     const summary = summarize([
-      { type: 'approval/asked', data: { id: 'a1', toolName: 'request_signoff', reason: '毛利 <30%' } },
+      { type: 'approval/asked', data: { id: 'a1', toolName: 'request_signoff', reason: '毛利低于底线' } },
       { type: 'turn/start', data: { turn: 3 } },
       { type: 'tool/call', data: { name: 'request_signoff', callId: 's1', turn: 3 } },
     ])
     expect(summary.approvals).toEqual([])
-    expect(summary.pendingApprovals).toEqual([{ id: 'a1', toolName: 'request_signoff', reason: '毛利 <30%' }])
+    expect(summary.pendingApprovals).toEqual([{ id: 'a1', toolName: 'request_signoff', reason: '毛利低于底线' }])
     expect(summary.interruptedHints).toEqual([{ turn: 3, kind: 'waiting-approval', detail: 'request_signoff' }])
   })
 

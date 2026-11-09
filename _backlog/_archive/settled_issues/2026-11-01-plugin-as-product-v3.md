@@ -220,11 +220,11 @@ run： <workspace>/.dsh-company/{kb,deliverables,deliverables-archive,cultivatio
 | P1.5 | 入口 | `company-entry-smoke` + `pack-no-bin` 门禁 | `checks/smoke/`、`checks/gates/pack-shape.mjs`、`tests/README.md` | 干净 home + tarball + 直接 `dsh --profile company` 绿；无 bin 红证 | P1.1–P1.4 |
 | P1.6 | 入口 | README/manual 安装/启动草稿（先于实现定稿） | `README.md`、`tools/export-dist.mjs` 模板 | 默认句 = Plugins 页；CLI 仅 web；无 `--workspace`/新 home | P0.6 |
 | P2.1 | 内容 | pack `workspace/` → `content/`；files/build/gates 更新 | `packages/company-pack/content/**`、`package.json`、`tsdown.config.ts` | tarball 含 `content/**` 无 `workspace/**`；角色仍能读模板/手册 | P1.6 |
-| P2.2 | 内容 | run bundle 状态初始化：只建 `kb/`/`deliverables/`/`cultivation/`/`.dsh-company/` 与最小状态；不 seed 手册/模板 | `src/host/bootstrap.ts`、`bundle-manifest.ts` | 新 workspace 无 `AGENTS.md`/`COMPANY.md`/`templates/`；已有用户 `AGENTS.md` 不动；二启稳定 | P2.1 |
+| P2.2 | 内容 | run bundle 状态初始化：只建 `kb/`/`deliverables/`/`cultivation/`/`.dsh-company/` 与最小状态；不 seed 手册/模板 | `src/host/run-bundle/bootstrap.ts`、`bundle-manifest.ts` | 新 workspace 无 `AGENTS.md`/`COMPANY.md`/`templates/`；已有用户 `AGENTS.md` 不动；二启稳定 | P2.1 |
 | P2.3 | 内容 | handbook 注入：pack `content/AGENTS.md` → `systemPrompt.section`；预算门禁 | host row、presets、`checks/gates/handbook-budget.mjs` | 真模型注入；workspace 无副本；超预算红 | P0.3 |
 | P2.4 | 内容 | 模板/章程解析：pack 默认 + `.dsh-company/overrides/`；角色引用改变量/路径 | presets/skills、host resolver | 无 override 读 pack；有 override 优先；不复制默认内容 | P2.1 |
 | P2.5 | 首启 | client onboarding：无 workspace 选目录、有 workspace 选中目标会话；Desktop 同面板 | `src/client/**`、host remote、`client-load-smoke` | 无 `Choose workspace`；无 welcome-notice 依赖；取消可恢复 | P0.4/P2.2 |
-| P2.6 | 内容 | content-boundary / handbook-injection / manifest-v3 specs + handbook/company-skeleton smokes | `tests/company/`、`checks/smoke/` | 每道新判据红→绿；旧 workspace 不覆盖 | P2.2–P2.5 |
+| P2.6 | 内容 | content-boundary / handbook-injection / manifest-v3 specs + handbook/company-skeleton smokes | `tests/host/`、`checks/smoke/` | 每道新判据红→绿；旧 workspace 不覆盖 | P2.2–P2.5 |
 | P3.1 | 多盘 | 去掉一 home 一 workspace 限制；`settings.json` 仅最近选择 | `bin` 删除后的 host/startup、`runtime-guard.ts` | 同 home 顺序 A/B 不拒绝；旧 settings 只是 hint | P1.3 |
 | P3.2 | 多盘 | presented 账本 v2 per workspace + v1 迁移 | `presented-domain.ts`、`catalog.ts`、specs | A/B 同相对路径不串；true/false 保留；旧文件 `.v1` | P0.5 |
 | P3.3 | 多盘 | host 运行态/命令按 active workspace；不跨盘写 | `src/index.ts`、commands、client data plane | 当前 workspace 命令正确；跨盘拒绝；方法层留 home | P3.1–P3.2 |

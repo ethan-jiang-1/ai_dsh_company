@@ -7,7 +7,7 @@
 
 ## 决定
 
-新增 `tests/company/runtime-guard.spec.ts`，用临时 home/workspace 直接跑真实
+新增 `tests/host/run-bundle/runtime-guard.spec.ts`，用临时 home/workspace 直接跑真实
 `prepareCompanyRuntime`，钉住四种写盘决策：
 
 1. 干净 workspace + 无 manifest → `hasWorkspace=true`、`dataBlocked=false`、`bundleState=missing`；
@@ -27,7 +27,7 @@
 ## 验证（实跑）
 
 ```text
-npx vitest run tests/company/runtime-guard.spec.ts
+npx vitest run tests/host/run-bundle/runtime-guard.spec.ts
 # 4 passed
 ```
 

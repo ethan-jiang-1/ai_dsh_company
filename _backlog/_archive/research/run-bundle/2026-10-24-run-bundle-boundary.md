@@ -103,7 +103,7 @@ DSH_HOME="$W/home" node vendor/dsh/apps/cli/lib/bin.js web -- --port 0 --no-open
 
 **错位点**：基部在 pack 里是对的；扩张层的方法层在 home 里（不进 git）也是对的；但扩张层的记忆与经营事实有一部分在**本仓 git** 里。这与“装完清爽、用户自己长”的方向相反。
 
-**对全部五角色成立**：方法层按 `profile × role` 隔离（`src/host/cultivation.ts` 头注）；CEO 没有特权——CEO 的“仅建议权”是采纳权限，不是能力分层例外。
+**对全部五角色成立**：方法层按 `profile × role` 隔离（`src/host/cultivation/cultivation.ts` 头注）；CEO 没有特权——CEO 的“仅建议权”是采纳权限，不是能力分层例外。
 
 ## 5. 泄漏与失效模式
 

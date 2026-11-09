@@ -104,7 +104,7 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 
 | 条目 | 归宿 | 真证据 |
 |---|---|---|
-| 批 1｜摘要与台账来源治理 | [批 1 Note](2026-10-11-human-exits-batch1.md)：`templates/meta.md` 规格、`kb/motion-ledger.md` 同源规矩、V4 活跃 meta 改写 | 红：V4 meta 无对应台账行 → focused ledger test 失败；绿：`tests/company/ledger.spec.ts` 6 passed + `pnpm verify` |
+| 批 1｜摘要与台账来源治理 | [批 1 Note](2026-10-11-human-exits-batch1.md)：`templates/meta.md` 规格、`kb/motion-ledger.md` 同源规矩、V4 活跃 meta 改写 | 红：V4 meta 无对应台账行 → focused ledger test 失败；绿：`tests/lib/ledger.spec.ts` 6 passed + `pnpm verify` |
 | 批 2｜阻塞型选择 | [批 2 Note](2026-10-11-human-exits-batch2-contract.md)：CEO preset 与主持动议 skill 的 ask 规则 | `probes/session-context/human-exits-probe.mjs`：真实 CEO 会话记录到 `ask_user_question` + 首段结论/下一步/拍板 |
 | 批 2｜非阻塞缺口 | 同上：显式默认假设 + 轮末待确认项 | `probes/session-context/human-exits-nonblocking-probe.mjs`：`asked:false`、显式假设、轮末「待你拍板」，事件落盘 `runtime/human-exits-evidence/` |
 | 批 2｜比较结构与数字锚 | 同上：条件 GFM 表格/列表 + 关键数字文件行锚 | `probes/session-context/human-exits-expression-probe.mjs`：短表 + `#L` 行锚 PASS |

@@ -31,7 +31,7 @@
 ## 验证（实跑）
 
 ```text
-npx vitest run tests/company/host-composition.spec.ts
+npx vitest run tests/host/index/host-composition.spec.ts
 # 8 passed（新增：bundle.json 损坏 → dataBlocked 时 client-error 仍写 home logs）
 npx vitest run tests/client/wiring/error-ring.spec.ts
 # 5 passed（新增：sessionStorage 恢复；恢复条目不回放 reporter）

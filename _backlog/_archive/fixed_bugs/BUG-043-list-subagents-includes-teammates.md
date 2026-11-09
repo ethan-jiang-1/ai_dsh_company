@@ -55,7 +55,7 @@ subagent children are not team roster members, so ... `list_agents` cannot see t
 - **模型面**：`list_subagents` description 写清“teammate 用 team `send_message` 按 address、subagent 用
   `send_to_subagent` 按 address”；`send_to_subagent` description 补一句“teammate 行走 team send_message”；
   `eng-teaming` 控制面加同一句。
-- **keyless 测试资产**：`tests/company/delegation-control.spec.ts` 14 条——纯折叠默认 subagent；
+- **keyless 测试资产**：`tests/host/delegation/delegation-control.spec.ts` 14 条——纯折叠默认 subagent；
   team 成员 + 普通 child 的 role/address；非成员（tryMembership=undefined）全 subagent；
   description 含 role/address/teammate 断言；无 team 服务不丢行。
 - **收口口径**：按已修判定第二条的“description/skill 写死两套寻址 + 绿证据”分支收口；

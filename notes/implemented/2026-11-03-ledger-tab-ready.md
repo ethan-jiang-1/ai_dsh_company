@@ -10,7 +10,7 @@
 新增 `tests/client/tabs/ledger-tab.spec.ts`（happy-dom 真挂 `LedgerTab`）：喂一段合法台账，断言统计
 「共 1 场动议 / 成品 1」、行 slug、`日期 · 类型 · 参与`、结论与成品标记；另一例喂 `null` 断言
 「台账不可读」。随后删掉 `client-face.spec.ts` 里「源码出现 `parseMotionLedger` / `parseCatalog`」
-两条断言——行为已由真渲染覆盖，`parseMotionLedger` 本身另有 `tests/company/ledger.spec.ts`。
+两条断言——行为已由真渲染覆盖，`parseMotionLedger` 本身另有 `tests/lib/ledger.spec.ts`。
 
 ## 输掉的方案
 

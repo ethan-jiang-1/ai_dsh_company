@@ -16,7 +16,7 @@ import { LedgerSummary } from '../../../packages/company-pack/src/client/tabs/Le
  * `.wk-row-summary:not(.is-long)` 解除裁剪 ⇒ `client-face.spec.ts` 的「不许有免裁切口子」转红。
  */
 const LONG_FIXTURE = 'V4 达标，反事实未达标的原因是修复前的占位缺陷；真实缺陷已修复，结论保留对应来源与复核记录。'.repeat(3)
-const SHORT_FIXTURE = '方向批做、只批只读窄口径（$50 首月/$200 硬顶），owner 未指派不启动'
+const SHORT_FIXTURE = '方向批做、只批只读窄口径（首月赠送、按日硬顶），owner 未指派不启动'
 
 describe('台账摘要行（Human Exits 批 3 keyless：长短 fixture 静态渲染）', () => {
   it('超长摘要：首帧就给可聚焦的全文入口，并标记长行', () => {

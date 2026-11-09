@@ -11,7 +11,7 @@ opened: 2026-10-16
 
 **当前情况：**
 - 基线（2026-10-16 实跑）：`pnpm verify` ALL PASS；`pnpm test` 60 文件 / 559 用例全绿——本轮是绿基线上的纯结构提案，无行为变更目标。
-- 快评一项误判已修正：doors 寄居块 2026-10-14 已迁出，[tests/company](../../../tests/company/doors.spec.ts) 的 `<模块>.spec.ts` 一一对应已恢复（[deliverables.spec 尾注](../../../tests/harness/tools/deliverables.spec.ts) 是迁出墓碑，非活债务）。
+- 快评一项误判已修正：doors 寄居块 2026-10-14 已迁出，[tests/company](../../../tests/lib/doors.spec.ts) 的 `<模块>.spec.ts` 一一对应已恢复（[deliverables.spec 尾注](../../../tests/harness/tools/deliverables.spec.ts) 是迁出墓碑，非活债务）。
 - 本卡是第三轮：前两轮 owner = [2026-10-14 六项重构](../../../notes/archived/2026-10-14-code-restructure.md) 与 [client-host-replay 局部化](../../../notes/archived/2026-10-14-client-host-replay-locality.md)；本卡只接它们未接的面，不翻它们的案。
 - 用户 2026-10-16 已言「按你的推荐就行」——推荐 A 记为首选范围；开工仍待明示（卡不授予实施权）。
 
@@ -137,7 +137,7 @@ source run/env.sh && node checks/audit/deliverables-check.mjs \
 
 | 行为 | 类别 | 通过信号 | 负例（红配方） | 证据 owner |
 |---|---|---|---|---|
-| 发布面零漂移（facade 设计目标） | 编排 | `pnpm exec vitest run tests/company/presence-board.spec.ts tests/harness/repo/pack-exports.spec.ts` 全绿 | — | [presence-board.spec](../../../tests/company/presence-board.spec.ts) + [pack-exports.spec](../../../tests/harness/repo/pack-exports.spec.ts) |
+| 发布面零漂移（facade 设计目标） | 编排 | `pnpm exec vitest run tests/lib/presence-board.spec.ts tests/harness/repo/pack-exports.spec.ts` 全绿 | — | [presence-board.spec](../../../tests/lib/presence-board.spec.ts) + [pack-exports.spec](../../../tests/harness/repo/pack-exports.spec.ts) |
 | 回归全绿 | 确定性 | pnpm test：60 文件 559 用例全绿 | — | `pnpm test` |
 | 两半构建 | 编排 | tsc -b + tsdown 两面 complete | — | pack 构建 |
 | client 真挂载 | 编排 | `source run/env.sh && node checks/smoke/client-load-smoke.mjs` ALL PASS | — | [client-load-smoke](../../../checks/smoke/client-load-smoke.mjs) |

@@ -52,7 +52,7 @@ intent: "为「插件即产品：独立 company profile、启动即进入用户 
 8. **本仓现在的 run bundle 不在 workspace**：`bundle.json` 写 `<DSH_HOME>/bundle.json`，v1 里还有
    `workspace` 字段；默认公司盘是 `<DSH_HOME>/company-workspace`；`DSH_COMPANY_REBIND` 是“一个
    home 只能有一个盘”的补救。这和用户要的“生产状态/产物在用户 workspace”正相反。
-   **C**（`src/host/bootstrap.ts`、`src/host/bundle-manifest.ts`、`src/host/runtime-guard.ts`）
+   **C**（`src/host/run-bundle/bootstrap.ts`、`src/host/run-bundle/bundle-manifest.ts`、`src/host/run-bundle/runtime-guard.ts`）
 9. **这是一次产品形状变更，不是小改**：它同时动 profile 入口、workspace 解析、bundle 身份、
    骨架/手册文件名、方法层/审计账本落点、`README`/`_dist` 手册、6+ 个 smoke 与多道门禁；
    必须按破坏性版本（建议 `0.5.0`）做，并保留 v1 数据的迁移窗口。**P**
@@ -263,7 +263,7 @@ DSH_HOME=$T/h DSH_COMPANY_HOME=$T/ws \
 
 ### 4.3 当前 `bundle.json` / rebind 的行为
 
-`src/host/bundle-manifest.ts` 的 v1：
+`src/host/run-bundle/bundle-manifest.ts` 的 v1：
 
 ```json
 {
@@ -426,17 +426,17 @@ Host 侧只认 `DSH_COMPANY_HOME`（启动器负责 1/3/4），缺省时**不写
 
 ### 7.1 代码 / 数据面
 
-- `src/host/bootstrap.ts`：默认落点去掉 `<DSH_HOME>/company-workspace`；`resolveCompanyHome` 只认
+- `src/host/run-bundle/bootstrap.ts`：默认落点去掉 `<DSH_HOME>/company-workspace`；`resolveCompanyHome` 只认
   显式 env；seed consent；手册 seed 目标碰撞感知（`AGENTS.md` 优先，已存在则 `COMPANY.md`）。
-- `src/host/bundle-manifest.ts`：v2 + workspace 路径；删 `workspaceRecord` / rebind 计划/执行；
+- `src/host/run-bundle/bundle-manifest.ts`：v2 + workspace 路径；删 `workspaceRecord` / rebind 计划/执行；
   `bundleManifestPath(workspace)`；升级日志路径；v1 迁移；记录实际手册目标。
-- `src/host/runtime-guard.ts`：不再 resolve/rebind home 盘；读 workspace manifest；`dataBlocked`
+- `src/host/run-bundle/runtime-guard.ts`：不再 resolve/rebind home 盘；读 workspace manifest；`dataBlocked`
   覆盖“无 workspace / 无 consent / manifest 坏 / lease 败”；保留多 profile 体检。
 - `src/index.ts`：bootstrap/manifest/catalog 调用改 workspace；注册 workspace（新 host row）；
   治理导出（methods/ledger 只读快照）；**不**把方法层/账本搬家。
-- `src/host/presented-domain.ts` / `catalog.ts`：账本保持 home domain（M2）；新增只读导出；
+- `src/host/ledger/presented-domain.ts` / `catalog.ts`：账本保持 home domain（M2）；新增只读导出；
   不改权威路径。
-- `src/host/cultivation-storage.ts` / `presets/*`：方法层保持 `<home>/company/methods`；
+- `src/host/cultivation/cultivation-storage.ts` / `presets/*`：方法层保持 `<home>/company/methods`；
   `customSkillDirs` 不改 env；只新增导出/备份；无需 composition-time workspace 路径。
 - `src/host/register-workspace.ts`（新）：boot 时 `workspaceRegistry.create(path)`；失败只告警；
   必须在 Web readiness 前完成（独立 row，`inject: ['workspaceRegistry']`，async apply）。
@@ -656,7 +656,7 @@ TTY 询问；无 TTY 且无值 → 非零退出 + 两条命令。**Host 只认 `
 ### 10.3 seed 与 consent
 
 当前骨架逻辑：`planBootstrap(skeletonDir, companyHome)` 只读、产出 `entries`；`applyBootstrap`
-只创建、`wx` 防覆盖、可重入（C：`src/host/bootstrap.ts`）。保留这套；新增：
+只创建、`wx` 防覆盖、可重入（C：`src/host/run-bundle/bootstrap.ts`）。保留这套；新增：
 
 - consent 文件 `<workspace>/.dsh-company/.seed-consent`：
   ```json
@@ -731,7 +731,7 @@ TTY 询问；无 TTY 且无值 → 非零退出 + 两条命令。**Host 只认 `
 
 - 权威不动：`presentedDomain`（`<home>/storages/company_deliverables.json`）与
   `<home>/company/methods/<role>/`；`presented-domain.ts` / `cultivation-storage.ts` 不改路径。
-- 新增计划文件 src/host/governance-export.ts：
+- 新增计划文件 src/host/ledger/governance-export.ts：
   - `exportMethods(dshHome, workspace)`：`cpSync`/逐文件复制到
     `<workspace>/.dsh-company/exports/methods/`；先写 staging 临时目录再 rename；缺目录跳过；
     写 `README.md`（“derived export，权威在 home；不要编辑”）。

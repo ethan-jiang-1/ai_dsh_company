@@ -22,7 +22,7 @@
 ## 验证（实跑，2026-11-03 10:3x +08）
 
 ```text
-# 红证：临时在 src/host/paths.ts 写 `const __hook_red: number = "x"`
+# 红证：临时在 src/host/run-bundle/paths.ts 写 `const __hook_red: number = "x"`
 sh .githooks/pre-push < /dev/null
 # exit 1：verify ALL PASS → TS2322 Type 'string' is not assignable to type 'number'（在 test 之前拦下）
 

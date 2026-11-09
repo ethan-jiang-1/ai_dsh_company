@@ -48,11 +48,11 @@
 
 ## 实现与落点
 
-- **manifest / 升级逻辑**：[`src/host/bundle-manifest.ts`](../../packages/company-pack/src/host/bundle-manifest.ts)
+- **manifest / 升级逻辑**：[`src/host/run-bundle/bundle-manifest.ts`](../../packages/company-pack/src/host/run-bundle/bundle-manifest.ts)
   （`planBundleManifest` / `writeBundleManifest` / `readBundleManifest` / `planSkeletonUpgrade` /
   `applySkeletonUpgrade` / `writeUpgradedManifest`）；host 接线 = [`src/index.ts`](../../packages/company-pack/src/index.ts)
   apply 末尾（与 bootstrap 开关解耦：dev 也写身份）。
-- **判据**：[`tests/company/bundle-manifest.spec.ts`](../../tests/company/bundle-manifest.spec.ts)
+- **判据**：[`tests/host/run-bundle/bundle-manifest.spec.ts`](../../tests/host/run-bundle/bundle-manifest.spec.ts)
   （6 条：首启创建 / 不覆盖 / 外部根 / 无盘不冒充 / 指纹跳过 dotfile+symlink / 升级保留用户编辑）。
 - **门禁**：新增 [`checks/gates/run-bundle-clean.mjs`](../../checks/gates/run-bundle-clean.mjs)（替代
   `drafts-untracked`）；`company-skeleton` 改为“pack 单源恒查 + dev 盘在场才查符号链接”；

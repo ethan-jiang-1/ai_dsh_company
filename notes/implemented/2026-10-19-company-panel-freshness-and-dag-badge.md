@@ -16,7 +16,7 @@
 - **让 in_progress 继续用 `wk-dag-ready`，只改文案**：文案早已是「进行中」，问题在颜色；同色 = 同一枚徽章两个意思。
 - **为新鲜度另开一张 Wave 1 小卡**：一事实多 owner 会再造第二张卡；看板卡本来就是共享事实 owner（2026-10-19 父卡收口时确认）。
 - **本轮顺手压缩 DAG 长链布局**：会动缩放/阅读语义与视觉夹具，超出「呈现层小修」；用户判不接受时另开卡。
-- **为 golden 新建 state 快照**：生产读 wire；`tests/company/board.spec.ts` 已有真 wire 夹具，再存 state 会重犯 BUG-026 的假绿。
+- **为 golden 新建 state 快照**：生产读 wire；`tests/lib/board.spec.ts` 已有真 wire 夹具，再存 state 会重犯 BUG-026 的假绿。
 
 ## 后果
 

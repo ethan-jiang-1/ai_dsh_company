@@ -5,7 +5,7 @@
  * 机械可判的部分（重复定义 / 悬空 / 退役词 / 孤儿 / 覆盖 / 计数）必须由代码判红，否则
  * 「每个号都要解到一行」只能靠人记得。边界：只管编号与追溯，不判断需求好坏。
  *
- * 判据口径（合同 = pack `content/state/process-docs.md`）：
+ * 判据口径（合同 = 产品类型包 `content/product-types/<id>/requirements-model.md`）：
  * - 文档头 `layer` ∈ MRD/StRS/PRD/SyRS/IRS/V&V；`definition` ∈ json-ledger/headings/table-rows/none；
  *   层与定义形态必须匹配（MRD/PRD = json-ledger；StRS/SyRS/IRS = headings；V&V = table-rows；附录 = none）。
  * - 号形 `KIND-NNN`（KIND ∈ MR/REQ/IF/TC），`AC-<REQ号>-<n>` 从属父 REQ。
@@ -55,6 +55,10 @@ export interface MotionSnapshot {
 export interface CheckOptions {
   /** 期望在场的层（覆盖 meta 声明与默认值）；缺层 = 红。 */
   readonly layers?: readonly Layer[]
+  /** meta 没有声明 `需求层:` 时的默认范围（产品类型包给；缺省 = 本仓默认到 PRD）。 */
+  readonly defaultLayers?: readonly Layer[]
+  /** 退役号前缀（产品类型包给；缺省 = 本仓默认）。空数组 = 该产品类型没有退役号概念。 */
+  readonly retiredPrefixes?: readonly string[]
 }
 
 export interface Definition {
@@ -100,7 +104,13 @@ export interface RequirementsCheckResult {
 const ID_PATTERN = /^(MR|REQ|IF|TC)-\d{3}$/
 const AC_PATTERN = /^AC-(\d{3})-(\d+)$/
 /** 退役号形（不是角色名：`VP-Eng` 不匹配）。 */
-const RETIRED = /\b(?:STR|SYR|IFR|VR|VP|V)-(?:#+|\d+)/g
+const DEFAULT_RETIRED_PREFIXES: readonly string[] = ['STR', 'SYR', 'IFR', 'VR', 'VP', 'V']
+/** 退役号形（不是角色名：`VP-Eng` 不匹配）；前缀可由产品类型包覆盖。 */
+function retiredPattern(prefixes: readonly string[]): RegExp {
+  if (prefixes.length === 0) return /(?!x)x/g
+  const escaped = prefixes.map(prefix => prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')
+  return new RegExp(`\\b(?:${escaped})-(?:#+|\\d+)`, 'g')
+}
 const RANGE_CLAIM = /\b(?:MR|REQ|IF|TC)-\d{3}\s*[~～]\s*(?:MR|REQ|IF|TC)-\d{3}/g
 const CANONICAL: Readonly<Record<Layer, string>> = {
   MRD: 'mrd.md',
@@ -358,7 +368,8 @@ export function checkRequirements(snapshot: MotionSnapshot, options: CheckOption
   if (scope.skipped) {
     return { ok: true, skipped: true, reason: scope.reason, errors: [], warnings: [], layers: [], index: emptyIndex() }
   }
-  const declared = options.layers ?? scope.layers ?? DEFAULT_LAYERS
+  const declared = options.layers ?? scope.layers ?? options.defaultLayers ?? DEFAULT_LAYERS
+  const retired = retiredPattern(options.retiredPrefixes ?? DEFAULT_RETIRED_PREFIXES)
   const layers = LAYERS.filter(layer => declared.includes(layer))
 
   const definitions: Definition[] = []
@@ -396,7 +407,7 @@ export function checkRequirements(snapshot: MotionSnapshot, options: CheckOption
     else if (formValue === 'table-rows') definitions.push(...tableRowDefinitions(doc.rel, doc.text, layer))
     // 退役词 / 区间断言：只扫声明了层的需求文档（评审稿与 final 是引用面）。
     for (const [index, line] of doc.text.split('\n').entries()) {
-      for (const match of line.matchAll(RETIRED)) errors.push(`${doc.rel}:${String(index + 1)} 退役词 ${match[0]}`)
+      for (const match of line.matchAll(retired)) errors.push(`${doc.rel}:${String(index + 1)} 退役词 ${match[0]}`)
       for (const match of line.matchAll(RANGE_CLAIM)) errors.push(`${doc.rel}:${String(index + 1)} 区间计数断言 ${match[0]}（R8：计数由索引派生）`)
     }
   }

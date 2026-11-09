@@ -40,29 +40,29 @@
 全部实跑；基线与红证存 `runtime/e2e/round3b-baseline/`、`runtime/e2e/round3b-receipts/`（gitignored）。
 
 - **导出面守恒（零漂移的机械判据）**：拆前 `presence.ts` 17 个导出；拆后 `presence.ts` + `presence-status.ts` 并集**恰好 17**，`丢失: 无 | 新增: 无`；**11 个留守符号实现体逐字未改**、**6 个迁移符号定义逐字未改**（脚本按 brace 配平切片比对，非肉眼）。
-- **对外取用面**：`src/index.ts` 的 `export *` 不动；**6 个 client 文件 + `board.ts` + 4 个测试文件**（`tests/company/presence-board.spec.ts`、`tests/company/board.spec.ts`、`tests/client/tabs/board-panel.spec.ts`、`tests/client/tabs/board-drift-fixture.spec.ts`）的 import 路径与符号**全未改**（`git status` 只列 `presence.ts` / `presence-status.ts` / `src/README.md` 三个文件）。
+- **对外取用面**：`src/index.ts` 的 `export *` 不动；**6 个 client 文件 + `board.ts` + 4 个测试文件**（`tests/lib/presence-board.spec.ts`、`tests/lib/board.spec.ts`、`tests/client/tabs/board-panel.spec.ts`、`tests/client/tabs/board-drift-fixture.spec.ts`）的 import 路径与符号**全未改**（`git status` 只列 `presence.ts` / `presence-status.ts` / `src/README.md` 三个文件）。
 - **回归**：`pnpm test` → `61 passed (61)` / `559 passed (559)`；`pnpm verify` → `verify: ALL PASS`。
 - **两面构建（卡验收）**：`pnpm exec tsc -b packages/company-pack` exit 0；`(cd packages/company-pack && pnpm exec tsdown)` → host `Build complete`（`lib/index.js` 54.06 kB）、client `Build complete`（`lib/client.js` 196.98 kB）。产物体积较拆前各小 0.09 kB（再导出摊平了重复引用），sourcemap 略大（多一个模块），属结构变化的预期形状。
 - **built 入口契约**：`await import('packages/company-pack/lib/index.js')` 断言词汇面 5 个**运行值**全在（`PresenceStatus` 是 type-only，按 `.d.ts` 验）；抽查 `statusLabelFor('bogus') === '未知'`、`displayNameFor('lead','lead') === '梦之队 CEO'`。类型面：`lib/types/lib/presence-status.d.ts` 定义 6 个符号，`presence.d.ts` 以 `export {…}` / `export type {…}` 再导出它们。
 - **client 真挂载（卡验收）**：`source run/env.sh && node checks/smoke/client-load-smoke.mjs` → `ALL PASS`（真浏览器：零挂载失败 + 零 loader 错误 + 品牌槽在场）。
 - **重放真消费面（卡验收）**：`node checks/smoke/replay-smoke.mjs --scenario r2-motion` → `ALL PASS`（在场板 5 行与录制同形，presence 判据走 built 再导出链）。
-- **词汇钉子（卡要求的红证）**：卡写「若现无未知值断言，同 diff 先补」——实测**已在场**（`tests/company/presence-board.spec.ts:164` 的「未知 status 值 → 「未知」，不抛」），无需新补。红证：把 `statusLabelFor` 的兜底从 `?? STATUS_LABEL.unknown` 改成直显裸值 → `× 未知 status 值 → 「未知」，不抛 → expected 'warping' to be '未知'`（exit 1）→ 还原 → `16 passed (16)`。
+- **词汇钉子（卡要求的红证）**：卡写「若现无未知值断言，同 diff 先补」——实测**已在场**（`tests/lib/presence-board.spec.ts:164` 的「未知 status 值 → 「未知」，不抛」），无需新补。红证：把 `statusLabelFor` 的兜底从 `?? STATUS_LABEL.unknown` 改成直显裸值 → `× 未知 status 值 → 「未知」，不抛 → expected 'warping' to be '未知'`（exit 1）→ 还原 → `16 passed (16)`。
 - **文档同 diff（卡义务）**：`packages/company-pack/src/README.md` 源码图 lib 清单 10→11 模块 + 依赖链补 `presence → presence-status`。
-- **同轮修掉一处我亲手引入的腐化指针**（语义审 finding）：新模块头注与 `PRESET_DISPLAY_NAMES` 的 JSDoc 照抄旧文「与 `presets/<role>/preset.yml` 的 `name` 同源」，而该文件 0.1.7 起已并入 `agent.cordis.yml`（`preset.yml` 全仓不存在）——真实事实家 = 各 `presets/<role>/agent.cordis.yml` 的 `config.name`（防漂移断言钉的就是它，见 `tests/company/presence-board.spec.ts:225-233`）。三处指针已改指真实家：**新模块正是「改文案的人」唯一入口，指错文件的代价最高**。
+- **同轮修掉一处我亲手引入的腐化指针**（语义审 finding）：新模块头注与 `PRESET_DISPLAY_NAMES` 的 JSDoc 照抄旧文「与 `presets/<role>/preset.yml` 的 `name` 同源」，而该文件 0.1.7 起已并入 `agent.cordis.yml`（`preset.yml` 全仓不存在）——真实事实家 = 各 `presets/<role>/agent.cordis.yml` 的 `config.name`（防漂移断言钉的就是它，见 `tests/lib/presence-board.spec.ts:225-233`）。三处指针已改指真实家：**新模块正是「改文案的人」唯一入口，指错文件的代价最高**。
 - **语义审（独立子代理盲审，§13 四输入）**：见下方「语义审回执」。
 
 ## 语义审回执
 
 （独立子代理盲审；四输入 = 授权/验收原文、该面合同文档、证据选层、本 Note。审查者不接受本 Note 自述，自写脚本读 diff 与实跑。）
 
-**审查者结论**：① 导出面守恒 **成立**（TS compiler API 切片：旧 17 = 新 11 ∪ 6，`LOST none / ADDED none / DUP none`，17/17 声明文本逐字相同；全文件行多重集 diff 里唯一消失的行是旧顶部 JSDoc ⇒ **0 代码行被改**）② facade 够用 **成立**（client face 495 文件 diagnostics 0；消费方取用的 17 个名字全部经 barrel 解析到位、值/类型语义正确；host/client `tsc -b` 各 exit 0；旧/新 host barrel 运行时键集各 13 键完全相同）③ 方向与环 **成立**（`presence-status.ts` import 计数 0；`CYCLES: none`）④ 测试面 **成立**（22 文件 / 116 用例 passed，含 `tests/client` 与补跑的 `tests/company/board.spec.ts` 15/15）。**blocker 无。**
+**审查者结论**：① 导出面守恒 **成立**（TS compiler API 切片：旧 17 = 新 11 ∪ 6，`LOST none / ADDED none / DUP none`，17/17 声明文本逐字相同；全文件行多重集 diff 里唯一消失的行是旧顶部 JSDoc ⇒ **0 代码行被改**）② facade 够用 **成立**（client face 495 文件 diagnostics 0；消费方取用的 17 个名字全部经 barrel 解析到位、值/类型语义正确；host/client `tsc -b` 各 exit 0；旧/新 host barrel 运行时键集各 13 键完全相同）③ 方向与环 **成立**（`presence-status.ts` import 计数 0；`CYCLES: none`）④ 测试面 **成立**（22 文件 / 116 用例 passed，含 `tests/client` 与补跑的 `tests/lib/board.spec.ts` 15/15）。**blocker 无。**
 
 **findings 与处置**：
 
 | # | finding | 处置 |
 |---|---|---|
 | 1 | 新模块两处（`presence-status.ts:7`、`:61`）照抄旧文「与 `presets/<role>/preset.yml` 的 `name` 同源」，但该文件 0.1.7 起已并入 `agent.cordis.yml`，全仓无 `preset.yml`——**新模块正是改文案者的唯一入口，指错文件代价最高** | 收：**三处**指针（含我复查发现的第 3 处 `:50`）全改指真实事实家 `presets/<role>/agent.cordis.yml` 的 `config.name`；已复查新模块内 `preset.yml` 计数 = 0 |
-| 2 | 消费方基数记述不准：「零改动」结论成立但枚举错——client 侧实为 6 个文件（4 type-only + `TasksPanel.tsx` 取值 + `use-company-data.ts` 取 3 个留守值），测试侧 4 个（我漏了 `tests/company/board.spec.ts`） | 收：本 Note 的基数与符号面已按实测改准（本条与上表第一行的「实读复核」同处） |
+| 2 | 消费方基数记述不准：「零改动」结论成立但枚举错——client 侧实为 6 个文件（4 type-only + `TasksPanel.tsx` 取值 + `use-company-data.ts` 取 3 个留守值），测试侧 4 个（我漏了 `tests/lib/board.spec.ts`） | 收：本 Note 的基数与符号面已按实测改准（本条与上表第一行的「实读复核」同处） |
 | 3 | 观察（非本 diff 引入）：`lib/types/lib/presence.d.ts` 新增相对导入 `'./presence-status.ts'`；同目录既有 `.d.ts` 也是 `.ts` 说明符风格 ⇒ 非回归 | 记（不改）：发布 types 的解析前提与既有同形 |
 
 **未验证（审查者按窄口指示未跑，本轮自查跑过并记于验证节）**：`client-load-smoke` 与 `replay-smoke` 真浏览器/真重放路径；client barrel 的运行时键集（node 直挂 client 因 CSS module 失败，新旧同败 = 环境限制，该面由 `tests/client` + client face `tsc` 覆盖）；`tests/` 的独立 tsc 面（仓库无 tsconfig/gate 覆盖 tests/）；`pnpm verify` 各门禁（本轮收尾已跑，ALL PASS）。

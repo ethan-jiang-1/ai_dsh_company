@@ -10,14 +10,15 @@ import { join } from 'node:path'
 export function run({ root, ok, fail }) {
   const PACK = 'packages/company-pack'
   const CONTENT = `${PACK}/content`
-  const ROLES = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']
+  const ROLES = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales', 'cmo']
   const required = [
     `${CONTENT}/AGENTS.md`,
     `${CONTENT}/templates/meta.md`,
-    // 负例留证 2026-11-07（A1）：删 `state/process-docs.md` → 本门禁红（「缺失」而非崩）。
-    `${CONTENT}/state/process-docs.md`,
+    // 负例留证 2026-11-07（A1）：删编号合同 → 本门禁红（「缺失」而非崩）；2026-11-09 迁入产品类型包。
+    `${CONTENT}/product-types/hardware-software/requirements-model.md`,
     // 负例留证 2026-11-07（A2）：删任一五层模板 → 本门禁红（「缺失」而非崩）。
-    ...['mrd.md', 'strs.md', 'prd.md', 'syrs.md', 'irs.md', 'allocation.md'].map(file => `${CONTENT}/templates/${file}`),
+    ...['mrd.md', 'strs.md', 'prd.md'].map(file => `${CONTENT}/templates/${file}`),
+    ...['syrs.md', 'irs.md', 'allocation.md'].map(file => `${CONTENT}/product-types/hardware-software/templates/${file}`),
     ...ROLES.map(role => `${CONTENT}/charters/${role}.md`),
     ...['company.md', 'org.md', 'owners.md', 'motion-ledger.md'].map(file => `${CONTENT}/state/${file}`),
   ]

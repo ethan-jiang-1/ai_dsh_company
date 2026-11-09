@@ -15,7 +15,7 @@
   **只补缺、不覆盖**：其余内容原样保留；既有部门节/行绝不再插第二次（幂等）。
 - 接线两处：`ensureRunBundle`（默认盘 boot，补后日志一行）与 `api-session/added`（**任何** cwd 带
   `.dsh-company/kb` 且不是默认盘时，在会话创建时就地补种，并落一行 `编制已按 pack 补齐`）。
-- `tests/company/roster-backfill.spec.ts` 四条：缺 CMO 的旧盘 / 幂等 / 不覆盖用户内容 / 非公司盘不动手。
+- `tests/host/run-bundle/roster-backfill.spec.ts` 四条：缺 CMO 的旧盘 / 幂等 / 不覆盖用户内容 / 非公司盘不动手。
 
 ## 输掉的方案
 
@@ -26,7 +26,7 @@
 
 ## 验证（实跑）
 
-- `pnpm test tests/company/roster-backfill.spec.ts tests/company/bootstrap.spec.ts tests/presets`
+- `pnpm test tests/host/run-bundle/roster-backfill.spec.ts tests/host/run-bundle/bootstrap.spec.ts tests/presets`
   ⇒ **3 files / 45 tests passed**。
 - **红证**：把 `planRoleBackfill` 里两处 `merge…` 调用短路成 `undefined` ⇒
   `1 failed | 3 passed`（「缺 CMO 的旧盘」红）；还原 ⇒ `4 passed`。

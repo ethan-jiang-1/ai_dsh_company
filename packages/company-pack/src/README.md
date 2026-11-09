@@ -7,14 +7,14 @@
   声明依赖、`apply(ctx)` 编排签字工具（`request_signoff`）、工作区门投影工具（`workspace_doors`）、培养工具/命令
   （接线在 `host/cultivation.ts`）、公司盘首启自举（接线在 `host/bootstrap.ts`）与成品目录生成/present 投影
   （接线在 `host/catalog.ts`）；公开面只导出 loader 需要的 `apply`/`inject`（0.8.0 收窄，读模型走内部 import）。消费方向 = vendor runtime → 本入口。
-- `host/` —— **host-only 逻辑**（用 node 内建，浏览器面不许进）：`bootstrap.ts` 负责公司盘骨架首启自举
-  （只补缺 / 不抛 / 可重入）；`catalog.ts` 只留扫描成品 meta/final 与幂等生成
-  `kb/deliverables-index.json`（读取/校验 = `catalog-state.ts`，审计账本 = `presented-ledger.ts`）；`cultivation.ts` 负责培养提案工具与人侧 `/cultivation` 命令语义；
-  `cultivation-storage.ts` = 存储适配器（路径安全：id 与各目录组件校验、拒 symlink、独占建文件、原子改写），
-  注册仍留在入口。
+- `host/` —— **host-only 逻辑**（用 node 内建，浏览器面不许进），按关切分 **8 组**（2026-11-09；每组 = 一个目录，
+  文件清单 = 目录本身，组地图 = [host/README](./host/README.md)）：`run-bundle/`（首启播种、bundle 身份、租约、
+  运行前提）、`workspace/`（解析/登记/门）、`cultivation/`（提案与存储）、`ledger/`（presented 账本、成品目录、
+  治理导出）、`delegation/`（child 控制、turn 终态、重试、workflow run 视图）、`commands/`（四个 `/命令` +
+  浏览器诊断）、`prompt/`（手册与能力域合同注入）、`logging/`（有界追加日志）。公开入口 = `index.ts`。
   **为什么单开一层**：`src/lib/` 同时被 client 叶编译（`tsconfig.client.json`），带 node 内建的模块住那儿
   会让 client 叶报 TS2591（2026-10-13 现场）——host-only 的东西住 `host/`。
-- `lib/` —— **host/client 共享读模型与纯逻辑**，keyless 单测（`tests/company/`）的直接对象。
+- `lib/` —— **host/client 共享读模型与纯逻辑**，keyless 单测（`tests/host/`）的直接对象。
   **模块清单 = `src/lib/` 目录本身**（D28：不再手抄枚举；2026-10-20 审计抓到「十一模块」漏
   `deliverables-catalog`，10-21 又抓到消费面句过期——枚举必漂）。已知依赖链 =
   `dag → board → presence`、`presence → presence-status`（`presence` 是 facade）；

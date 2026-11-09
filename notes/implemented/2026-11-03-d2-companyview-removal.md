@@ -16,8 +16,8 @@
 - **保留 CompanyView 的历史引用**：两篇 `_backlog/_archive` 卡的代码链接改指本条（原文件已删；
   链接目标是“删除决定”而不是死文件）。
 - **附带收口**：`pack-exports.spec.ts` 补 client 入口集合断言 `['apply','inject']`（host 已有）；
-  4 个只测 `tools/lib` / pack 结构的 spec 从 `tests/company` 移到 `tests/harness`；
-  新增 `tests/company/workspace-resolution.spec.ts` 12 例（env/cwd/saved/none + 危险落点）。
+  4 个只测 `tools/lib` / pack 结构的 spec 从 `tests/host` 移到 `tests/harness`；
+  新增 `tests/host/workspace/workspace-resolution.spec.ts` 12 例（env/cwd/saved/none + 危险落点）。
 
 ## 输掉的方案
 
@@ -31,7 +31,7 @@
 
 ```text
 rg -n "CompanyView|createCompanyView" packages/company-pack/src tests   # 0 命中
-npx vitest run tests/company/workspace-resolution.spec.ts tests/client/ui/brand.spec.ts tests/harness/repo/pack-exports.spec.ts
+npx vitest run tests/host/workspace/workspace-resolution.spec.ts tests/client/ui/brand.spec.ts tests/harness/repo/pack-exports.spec.ts
 # 15 passed（12 + 1 + 2）
 pnpm test                                                               # 见本轮提交后的读数
 pnpm verify                                                             # 删文件后 archived 链接 4 处红 → 改指本条 → 绿

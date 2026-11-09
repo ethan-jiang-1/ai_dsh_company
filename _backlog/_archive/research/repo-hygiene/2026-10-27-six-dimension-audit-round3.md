@@ -88,7 +88,7 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 - **用户实际接触的那层最薄**：`client/index.ts` 行覆盖 53.8% / **分支 10.5%**（待办观察者 `user-questions/request`、`approval/request` 从未在测试里执行）；`company-tabs.tsx` 18.2%/7.3%；`AttentionTab.tsx` 4.9%/**0%**；`CompanyView.tsx` 20.8%/21.1%；`CultivationTab` 无渲染测试（仅注册面触达）；`PresencePanel`/`BudgetPanel` **没有任何渲染测试**（`grep` tests 零命中）。也就是说：一个永远空的「待办」收件箱、一个渲染即空白的面板，907 例全绿。
 - **host 没有真组合测试**：`apply()` 只用 stub ctx 调（`catalog-wiring.spec.ts:52-64`），`host/index.ts` 行 70% 但**函数 37.5%**——`ctx.inject(['sessionQuery'])` 回扫、`ctx.effect` 清理、dispose 后事件不再写、double-apply 都不在覆盖里。client 有 whole-client 档，host 没有对应物。
 - **治理守卫未测**：`host/cultivation.ts:657-685` 的五条 propose 守卫（目标角色不在名册 / 跨角色 correct / 对自己 suggest / 非法 kind / dataBlocked）零用例，分支覆盖 68.6%——而"一个角色不能往另一个角色记录里塞纠错"正是产品卖点里的不变量。
-- **空转/条件跳**：`tests/company/ledger.spec.ts:43` 的 `describe.skipIf(!hasLive)` 在 fresh clone 上跳过 3 例（907→904），与 `docs/testing.md` §3.6 "现状零 skip，引入须配预期 N 守卫"直接矛盾。
+- **空转/条件跳**：`tests/lib/ledger.spec.ts:43` 的 `describe.skipIf(!hasLive)` 在 fresh clone 上跳过 3 例（907→904），与 `docs/testing.md` §3.6 "现状零 skip，引入须配预期 N 守卫"直接矛盾。
 - **源码文本断言承重**：`client-face.spec.ts` 11 个 `toMatch` 打在 `.tsx` 源码上、`panel-freshness.spec.ts:56-68` 断言字面量 `refreshLabel = '投影更新'`——格式/改名重构即红，最容易诱发"改测试凑绿"。
 - **夹具无出处机制**：`tests/fixtures/` 四个夹具全是 10-25 之后的合成物（session.jsonl 2 行、`cwd: /synthetic/...`、占位 digest），没有 provenance 字段或新鲜度门禁；`deliverables-audit.spec.ts:91` 仍叫它"R1 归档 oracle"。
 
@@ -130,7 +130,7 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 | R3-11 | D5 | P1 | host 无真组合测试：`apply()` 只 stub ctx；`host/index.ts` 函数覆盖 37.5%，dispose/double-apply/inject 未测 |
 | R3-12 | D5 | P1 | 治理守卫未测：propose 五条守卫零用例（`host/cultivation.ts:657-685`，分支 68.6%） |
 | R3-13 | D5 | P2 | 测试重心偏斜 49.4% 仓库不变量；最弱形态 = 切探针源码 vm 求值（`collaboration-probe-verdict.spec.ts:16-24`） |
-| R3-14 | D5 | P2 | `describe.skipIf(!hasLive)` 与"零 skip"政策矛盾（`tests/company/ledger.spec.ts:43`；907 vs fresh clone 904） |
+| R3-14 | D5 | P2 | `describe.skipIf(!hasLive)` 与"零 skip"政策矛盾（`tests/lib/ledger.spec.ts:43`；907 vs fresh clone 904） |
 | R3-15 | D4 | P2 | 计数/事实漂移：包 README "五个页签"（实际 9，门禁不扫包 README）；entry-probe Q4 仍答 0.1.7 且判据抓不到；doc-budget 注释三处"内容 N"过期 |
 | R3-16 | D4 | P2 | `docs/data-model.md` 同一规则写 3 次（:15/:67/:70）；`docs/demo.md` 引 4 个不存在的 `snapshots/archive/...`（:68/:152/:171/:228），并把合成场景称作真实归档 |
 | R3-17 | D1 | P2 | 行预算棘轮失真：10/20 文件头寸 <5%、反向空置 20–45%、链上 334 行无预算（`checks/gates/doc-budget.mjs` 表 vs 实跑） |

@@ -38,7 +38,7 @@ node tools/release.mjs --verify --allow-stale-manifest   # 7/7 pass
 node tools/release.mjs --stamp                           # stamp 0.8.2 @ 258637d6
 node tools/release.mjs --check                           # READY 0.8.2 @ 258637d6（127 条目；7 项 pass）
 node tools/market-index.mjs --check --hosted             # exit 1（staged 0.8.2 未发布；预期红证）
-npx vitest run tests/company/market-index.spec.ts        # 5 passed（含 hosted 纯函数）
+npx vitest run tests/host/market-index.spec.ts        # 5 passed（含 hosted 纯函数）
 pnpm verify                                              # ALL PASS 53 门 + 2 无对象
 pnpm test                                                # 135 files / 1078 tests
 ```
