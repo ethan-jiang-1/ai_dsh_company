@@ -30,3 +30,4 @@ opened: 2026-11-09
 | [2026-11-09-contract-duplication.md](2026-11-09-contract-duplication.md) | 合同/委派词在 persona、角色 skills、docs 的分布读数（只读词频；S4 证据） | 2026-11-09 |
 | [2026-11-09-composition-experiments.md](2026-11-09-composition-experiments.md) | 两个只读实验：dump-config 声明面读数（H6 原型）+ 底座/delta 矩阵（H1/H2） | 2026-11-09 |
 | [2026-11-09-options-and-conclusion.md](2026-11-09-options-and-conclusion.md) | 结论：四个结构缺口、目标四层、A/B/C 方案、推荐顺序与 5 个待裁决问题 | 2026-11-09 |
+| [2026-11-09-awesome-dsh-patterns.md](2026-11-09-awesome-dsh-patterns.md) | 外部补遗：18 个协作样本的十个可迁移模式与对 A/B/C 的两条加强 | 2026-11-09 |

@@ -130,3 +130,15 @@ team 成员 preset、workflow 子代无 preset、workflow 无 depth gate（affor
   都只有静态/声明面证据；实现后需一次定向探针。
 - 未验证生成器的 YAML 保真（注释/`!!js`/顺序）；B 阶段先做 `/tmp` 原型。
 - 外部数字（90.2%、15×、40%）是各自场景结果，不是本仓承诺。
+
+## 10. 补遗（2026-11-09，awesome-dsh-plugin 18 样本）
+
+外部 18 样本（源码级 memo）与本文结论同向，并补强两条：
+
+1. **能力清单必须可执行**：样本 04 的 `leases`/`dependencyIds` 是“schema 有、代码没有”的反例；
+   本仓的清单若只写成文档，会重演同一类失效。清单必须被 `--dump-config` 矩阵/生成器消费。
+2. **偏离要登记**：`list_subagents`/`send_to_subagent`/`workflow_runs` 按“接缝 / 代价 / 退出条件”
+   记账（外部接缝表的六条立场）；并明确“结果可读性优先（结构化输出/文件引用），续驶是补丁”。
+
+其余映射（三笔税、三个买点、min 额度、投递≠消费、DAG/恢复/重放三分）见
+[2026-11-09-awesome-dsh-patterns.md](2026-11-09-awesome-dsh-patterns.md)。
