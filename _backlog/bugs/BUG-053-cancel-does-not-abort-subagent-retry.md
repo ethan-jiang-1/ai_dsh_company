@@ -1,14 +1,21 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P1
 opened: 2026-11-09
 ---
 
 # BUG-053：取消 parent turn 不能中止 `subagent_retry` 的阻塞 child——root/child 都没有 `turn/end`
 
-> 严重级别：P1（重要）｜发现：2026-11-09｜状态：调查中
+> 严重级别：P1（重要）｜发现：2026-11-09｜状态：修复就绪
 > 来源：2026-11-09 第七轮（W7-A 取消探针）。关联：[subagent_retry 原语](../../packages/company-pack/src/host/delegation/subagent-retry.ts)、
 > [旧 R8 workflow 取消 PASS](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
+> 授权：2026-11-10 用户指令「_backlog/bugs 里面还有3个bug，如法炮制……按照我们这个repo的来修复吧……
+> 系统性……而不是一个一个修」——P1 且触碰 company-pack 公开行为（阻塞工具契约）与 docs 合同，
+> 由用户明确指示授权。
+> 修法（2026-11-10 选定）：抽 `src/lib/abortable.ts`（promise 与 `AbortSignal` race + 监听清理）；
+> `subagent_retry` 等 `activation.result` 时响应 `exec.signal`；abort 时
+> `ctx.subagents.interrupt(childId, { kind: 'ancestor', agent })` 并返回 `stopReason: 'aborted'`；
+> keyless + 真装配 `sleep 117` + `session/cancel` 复跑。
 
 ## 症状
 

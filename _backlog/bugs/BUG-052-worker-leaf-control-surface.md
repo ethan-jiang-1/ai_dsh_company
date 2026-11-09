@@ -1,14 +1,20 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-09
 ---
 
 # BUG-052：worker leaf 的工具面仍可见 `list_subagents` / `send_to_subagent`，与“无 control”声明不一致
 
-> 严重级别：P2（次要）｜发现：2026-11-09｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-09｜状态：修复就绪
 > 来源：2026-11-09 修复后第六轮（W6-A）。关联：[worker family 设计 Note](../../notes/implemented/2026-11-09-presets-delegation-model.md)、
 > [worker/researcher 边界 Note](../../notes/archived/2026-11-09-specialist-worker-taxonomy.md)。
+> 授权：2026-11-10 用户指令「_backlog/bugs 里面还有3个bug，如法炮制……按照我们这个repo的来修复吧……
+> 系统性……而不是一个一个修」——本修复触碰 company-pack 公开行为（模型可见工具面）与 docs 合同，
+> 由用户明确指示授权。
+> 修法（2026-11-10 选定）：**硬过滤**——`registerDelegationControl` 改成 per-agent 安装（与
+> `subagent_retry` 同模式），跳过 `WORKER_FAMILY_PRESETS`（leaf/researcher/orchestrator 都没有
+> control 行）；full role/CEO/未知 preset 保留。真装配 probe 读 `request/header` 工具目录断言。
 
 ## 症状
 

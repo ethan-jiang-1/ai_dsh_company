@@ -1,14 +1,21 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-09
 ---
 
 # BUG-051：worker-orchestrator 的“1–2 个 leaf”只是 persona——4 件 brief 下实际起 4 个 leaf
 
-> 严重级别：P2（次要）｜发现：2026-11-09｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-09｜状态：修复就绪
 > 来源：2026-11-09 修复后第五轮（W5-E）。关联：[worker family 设计 Note](../../notes/implemented/2026-11-09-presets-delegation-model.md)、
 > [worker-workflow no-go](../../notes/archived/2026-11-09-worker-workflow-no-go.md)。
+> 授权：2026-11-10 用户指令「_backlog/bugs 里面还有3个bug，如法炮制……按照我们这个repo的来修复吧……
+> 系统性……而不是一个一个修」——本修复触碰 company-pack 公开行为（preset description/persona）与 docs 合同，
+> 由用户明确指示授权。
+> 修法（2026-11-10 选定）：**诚实声明**，不发明 fan-out 闸——模型 `WORKER_PROFILES` 声明
+> `fanOut: { policy: 'parent-brief', hardMax: null }`（worker/researcher = none）；description/persona
+> 去掉“1–2”硬数字，改为“按 brief 分配，fan-out 预算由父代理决定”；spec 钉文案，真实 4-task
+> 探针保留为观察。与 [BUG-052](BUG-052-worker-leaf-control-surface.md) 同根：声明面/执行面分裂。
 
 ## 症状
 
