@@ -1,14 +1,14 @@
 ---
-status: 等人拍板
+status: 推敲中
 opened: 2026-11-08
 ---
 
 # 推敲：用探索性测试系统寻找委派面（workflow + subagent + worker family）缺陷
 
-> 立卡：2026-11-08 ｜ 状态：等人拍板 🔒 ｜ 类型：Task ｜ 毕业：以后做 ｜ 可关闭：否
+> 立卡：2026-11-08 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
 >
-> 第四轮已执行并收口（2026-11-09）；5 张缺陷卡已全部修复归档。剩余只有**是否扩面**，
-> 仅用户可判（🔒，见「下一步」）。
+> 用户 2026-11-09 晚答复：**继续探索**（此前「是否扩面」的 🔒 已解除）；本卡回 `推敲中`，
+> 修复后验证轮已执行，见下方「修复后验证」。
 >
 > 上游研究题：[workflow + subagent 探索题](../research/workflow-subagent-exploration/README.md)。
 > 重构前的完整 briefing、场景矩阵与前三轮结果 = [2026-11-08 计划](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)；
@@ -79,8 +79,12 @@ oracle、证据形式、预算与停止办法写清，且真模型范围/成本�
   不直接改；修复另按授权边界。UI 只作观察透镜，不单开视觉扫。
 - 用户原话（2026-11-09）：「1,2,3 都希望跑，找到问题就提 BUG 然后继续探索寻找下一个 BUG」。
 
-**下一步（🔒 仅用户可判）：** 第四轮已执行并收口（2026-11-09，约 22 分钟/19 turns/27 children，
-未触发停止上限）；发现 **5 张缺陷卡（BUG-045–049）**，已按根因分组全部修复归档：
+**下一步（用户 2026-11-09 晚已答复：继续探索）：** 第四轮已执行并收口（2026-11-09，约 22 分钟/19 turns/27 children，
+未触发停止上限）；发现 **5 张缺陷卡（BUG-045–049）**，已按根因分组全部修复归档。修复后验证轮
+（2026-11-09 晚）已跑：keyless 138 tests / verify / preset-smoke / UI golden 全绿；profile 指向当前源码后
+BUG-045 的 depth-denial、BUG-046 的身份行、BUG-047 的 handbook skip 均真装配通过；**BUG-050 复核为
+dev profile 旧安装副本导致的假阳性**，已迁 `fixed_bugs`。继续探索 teammate/workflow 身份行、retry 正样本，
+未发现新的产品级缺陷；详细证据 = 下方「修复后验证」与研究材料 §9.6。
 
 | 卡 | 根因组 | 去向 |
 |---|---|---|
@@ -90,9 +94,9 @@ oracle、证据形式、预算与停止办法写清，且真模型范围/成本�
 | [BUG-046](../_archive/fixed_bugs/BUG-046-parent-cannot-verify-child-preset-depth.md) | C 可见面窄于引擎语义 | [identity Note](../../notes/implemented/2026-11-09-subagent-identity-observable.md) |
 | [BUG-048](../_archive/fixed_bugs/BUG-048-ui-golden-brand-name-drift.md) | D 验收资产未同 diff 刷新 | 卡内 + `tests/README.md` 映射 |
 
-剩余 = **是否扩面**：long-term adoption / workspace-write / 真页面图 / 其他职能逐个采用 retry。
-未覆盖项如实列在研究材料 §9.4，不写“没有 bug”。用户点名后再开新轮；本卡转 `已结` 或按新证据
-继续都在用户答复后（沉默不翻转）。第四轮资产（keyless）见本节下方「第四轮收口」。
+剩余探索面 = long-term adoption / workspace-write / 真页面图 / 其他职能逐个采用 retry / 重启后身份行。
+用户 2026-11-09 晚已点名继续探索，本卡回 `推敲中`；上述未覆盖项是下一轮候选，不写“没有 bug”。
+第四轮资产（keyless）见本节下方「第四轮收口」。
 
 ## 第四轮收口（2026-11-09）
 
@@ -311,6 +315,58 @@ orchestrator 交叉；`subagent_retry` 在 vp-sales/coo/cfo root 的逐个采用
 **资产收割：** 5 张 bug 卡为主产物；证据留 `runtime/tmp/explore/round4/`（gitignored）。候选 keyless
 资产（修复时同 diff）：per-preset retry 深度、`list_subagents` preset/depth、worker family handbook skip、
 golden refresh 触发、模型合同/retry parity；D1 长链值得升常驻 probe/replay，本轮先留证据。
+
+## 修复后验证（2026-11-09 晚）
+
+> 用户 2026-11-09 告知 BUG-045–049 已修；本轮先验证修复，再探索未覆盖面。
+> **关键环境事实**：真入口 `startWeb --profile company` 读的是 profile 安装副本
+> （`runtime/harness-home/profiles/company/node_modules/dsh-company-pack`），不读
+> `packages/company-pack/lib`；修复提交后只重建 `lib` 不会改变真入口。第一次 R5 的“修复失效”
+> 因此是旧副本假阳性（已复核归档为 BUG-050 误报）。真入口探针前必须 `plugin add link:` 或走
+> `pnpm company` 更新 profile。
+
+| 验证 | 结果 |
+|---|---|
+| keyless / 结构 | `pnpm test` 12 files / **138 tests**；`pnpm verify` ALL PASS；`preset-smoke` 6 角色 + 3 子人格 ALL PASS |
+| BUG-045 / BUG-050 | profile link 后 CMO depth 2 调 `subagent_retry` → `attempts: 0` / `depth-exceeded` / `childIds: []`，**无 worker**；vp-eng root 正样本 `attempts: 1` / completed |
+| BUG-046 | `list_subagents` 真行：worker-orchestrator/`"1"`、worker/`"1"`、teammate `vp-eng`/`"1"`、workflow 分支 `vp-eng`/`"1"` |
+| BUG-047 | `worker-orchestrator` / `worker-researcher` 的 handbook=false；leaf 仍 false；full role 不变 |
+| BUG-048 | `ui-scene-smoke --isolated --golden` **ALL PASS（9 页签）** |
+| BUG-049 | 模型/合同/retry parity specs 全绿（含 `delivered`/`merged` + retrySurface） |
+| 新探索 | teammate/ workflow 身份行、retry 正样本、depth 2 拒绝均正确；**未发现新的产品级缺陷** |
+
+**过程发现（不是产品 bug）**：dev profile 的安装副本不会随 `pnpm test`/`lib` 重建自动更新；
+真入口探针必须显式更新 profile（`pnpm company` 或 `plugin add link:`），否则旧副本会制造假阳性/假阴性。
+本轮的 BUG-050 已按误报迁 `fixed_bugs`，不计入活跃缺陷；未覆盖仍包括真页面 DagTab 图、真实
+error/interrupted live retry、depth 4 等（见研究材料 §9.4/§9.6）。
+
+## 第五轮（修复后探索，2026-11-09 夜）
+
+> 用户 2026-11-09 晚：不要只验收，继续往前探。只选上一轮没覆盖、且能独立判定的面。
+> 预算候选：60 分钟 / 12 parent turns / 24 children（本波小预算；超限即收口）。
+
+| Charter | 探索方向 | oracle / 失败信号 |
+|---|---|---|
+| W5-A 重启身份 | VP-Eng root 起 worker → 停宿主 → 同 home 重启 → 让 root 调 `list_subagents` | 每行 `agentPreset`/`delegationDepth` 仍来自 durable header；`unavailable` 不是默认；`lastTurnEnd` 准确 |
+| W5-B 预算面 | vp-sales root、teammate、workflow 分支各自调 `subagent_retry`；对照各自 preset 的 `subagent` 行预算 | 预算内成功（attempts 1，child 深度正确）；越界 `depth-exceeded`；工具实例的 preset/预算与调用者一致 |
+| W5-C 分支 retry | 若前两项有余量，跑 workflow 分支内的 `subagent_retry`；DagTab 图本轮未跑（预算/设置成本） | 分支内能调用、child 深度正确；越界可见拒绝；不把分支自述当独立证据 |
+
+执行顺序 W5-A → W5-B →（有余量才 W5-C）；每个 trial 唯一 cwd，证据落 `runtime/tmp/explore/round4/`。
+发现新缺陷按 `_backlog/bugs/` 开卡；未命中如实写，不把验收写成探索。
+
+### 第五轮结果（2026-11-09 夜）
+
+> 实际约 15 分钟 / 6 parent turns / 8 child activations；证据在 `runtime/tmp/explore/round4/wave5-*`。
+
+| ID | 结果 | 判定 |
+|---|---|---|
+| W5-A 重启身份 | VP-Eng root + worker；SIGTERM 停宿主、同 home 重启；`list_subagents` 行仍为 `agentPreset: worker` / `delegationDepth: "1"` / `lastTurnEnd: completed` | **PASS** |
+| W5-B 预算面 | vp-sales root retry：attempts 1 / child depth 1 / worker；vp-eng teammate retry：attempts 1 / child depth 2 / worker | **PASS** |
+| W5-C 分支 retry | VP root 的 2 个 workflow 分支各调 `subagent_retry`：attempts 1 / child depth 2；分支 header depth 1 | **PASS**（观察：分支仍可再 spawn；`eng-teaming` 的“分支默认叶子”是 prose，engine 允许，旧 `subagent` 也同样） |
+
+**新缺陷：无**（不写“没有 bug”）。**观察**：workflow 分支可调 retry 生成 depth 2 worker，与“分支默认叶子”的 prose 有张力，但不是新机制；
+DagTab 真页面图、depth 4、真实 error live retry 仍未覆盖。
+
 
 ## 历史结果（重构前，不要重复跑）
 

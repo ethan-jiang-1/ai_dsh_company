@@ -332,6 +332,62 @@ spawn teammate，但能 spawn worker / 请 CMO）；N 的 CEO teammate = 继承 
 - D1 的 CEO→VP→workflow→worker 链值得升常驻 probe/replay；本轮先留证据，未改 probe。
 - 不把 W2 的 4-leaf 观察升门禁（设计是 persona 软约束）；若用户要硬边界，另开问题。
 
+### 9.6 修复后验证（2026-11-09 晚）
+
+> 用户告知 BUG-045–049 已修；本轮先验证修复，再探未覆盖面。**关键环境事实**：真入口
+> `startWeb --profile company` 读 profile 安装副本，不读 `packages/company-pack/lib`；修复后只重建
+> `lib` 不够，必须 `plugin add link:` 或走 `pnpm company` 更新 profile。第一轮 R5 的“修复失效”正是
+> 旧副本造成的假阳性，已归档为 [BUG-050](../../_archive/fixed_bugs/BUG-050-retry-depth-fix-fails-in-real-assembly.md)（误报）。
+
+| 验证 | 命令 / 证据 | 结果 |
+|---|---|---|
+| 结构 / keyless | `pnpm verify`；`pnpm test`（12 files） | **ALL PASS / 138 tests** |
+| 挂载 | `preset-smoke` | **6 角色 + 3 子人格 ALL PASS** |
+| UI 金样 | `ui-scene-smoke --isolated --golden` | **9 页签 ALL PASS** |
+| BUG-045/050 | CMO `2fa5113b-…` depth 2 调 `subagent_retry` | `attempts: 0` / `depth-exceeded` / `childIds: []`；无 worker；**PASS** |
+| retry 正样本 | VP-Eng root `7bc31294-…` | `attempts: 1` / completed / worker depth 1；**PASS** |
+| BUG-046 | `list_subagents` 真行 | worker-orchestrator/`"1"`、worker/`"1"`、teammate `vp-eng`/`"1"`、workflow 分支 `vp-eng`/`"1"`；**PASS** |
+| BUG-047 | orchestrator `1e979407-…` / researcher `46a9e2a2-…` | handbook=false（leaf 也 false；full role 不变）；**PASS** |
+| BUG-048 | golden | ALL PASS；**PASS** |
+| BUG-049 | 模型/合同/retry parity specs | 全绿；**PASS** |
+
+**新探索（无新产品缺陷）**：
+
+- VP-Eng root → teammate `a23d2692-…`：`list_subagents` 行 `role=teammate`、`address=pf-teammate`、
+  `agentPreset=vp-eng`、`delegationDepth="1"`，与 header 一致。
+- VP-Eng root → workflow 2 分支：行 `role=subagent`、`agentPreset=vp-eng`、`delegationDepth="1"`；
+  分支继承父组合，正确。
+- 旧 `wait_agent`/`bash sleep` 等待行为仍出现（VP 层观察），但未造成漏值/重复；不记新 bug。
+- BUG-050 初报的 CMO depth 2 放行在 profile 指向当前源码后不再复现；该卡已按误报归档，活跃缺陷归零。
+
+**过程教训（进交接清单）**：真模型/真入口探针前，先确认
+`runtime/harness-home/profiles/company/node_modules/dsh-company-pack` 指向当前源码/当前构建
+（`pnpm company` 或 `plugin add link:`）；`pnpm test` 与 `packages/company-pack/lib` 重建都不能替代
+这一步。否则旧副本会制造假阳性（本轮）或假阴性。
+
+**仍未覆盖**：真页面 DagTab 图里的 retry/worker 节点；重启后的 `list_subagents` 身份行；真实
+error/interrupted/live retry（不可确定性注入）；depth 4 负例；`subagent_retry` 在 vp-sales/coo/cfo root
+的逐个采用；长期采纳率 / workspace-write / release-smoke。
+
+### 9.7 第五轮：修复后探索（2026-11-09 夜）
+
+> 用户 2026-11-09 晚：不要只验收，继续往前探。小预算 wave：约 15 分钟 / 6 parent turns / 8 children；
+> 证据在 `runtime/tmp/explore/round4/wave5-*`。**本轮未发现新的产品级缺陷**（如实写，不写“没有 bug”）。
+
+| ID | charter | 观察 | 判定 |
+|---|---|---|---|
+| W5-A | 重启身份 | VP-Eng root `session-43902f98-…` 先起 worker `d443113b-…`；SIGTERM 停宿主、同 home 重启后，root 冷恢复并 `list_subagents`：行仍为 `agentPreset: worker` / `delegationDepth: "1"` / `lastTurnEnd: completed` | **PASS**（durable header 身份在重启后仍可读） |
+| W5-B | 预算面 | vp-sales root `session-e8856b3a-…` retry → attempts 1 / child `b4b9f4e1-…` depth 1 / worker；vp-eng teammate `7a63349a-…` retry → attempts 1 / child `0436386c-…` depth 2 / worker | **PASS**（工具实例/预算与调用者一致） |
+| W5-C | workflow 分支 retry | VP root 的 2 个分支 `a711559e-…` / `d82f2fcb-…`（depth 1）各调 `subagent_retry`：attempts 1 / child `2db00e98-…` / `816351ec-…` depth 2 | **PASS**；观察：分支仍可再 spawn，`eng-teaming` 的“分支默认叶子”是 prose，engine 允许（旧 `subagent` 同样） |
+
+**未覆盖（下一轮候选）**：真页面 DagTab 图里的 retry/worker 节点（本轮只跑 isolated 金样与静态 spec）；
+depth 4 负例；真实 `error`/`interrupted`/`lost` 的 live retry（不可确定性注入）；`subagent_retry` 在
+coo/cfo root 的逐个采用；长期采纳率 / workspace-write / release-smoke。
+
+**过程备注**：W5-A 的 root 在重启后先用 `wait_agent` 等 child（旧 F5/F7 行为）才 `list_subagents`；
+结果正确，不记新 bug。W5-B 的 teammate 回执走 `send_message`，工具面正确；W5-C 的分支用了
+`subagent_retry` + `list_subagents`，没有漏值/重复。
+
 ## 10. 不做 / 边界
 
 - 不重跑 BUG-036..044 的原场景；不把修复后的 green 当新探索。

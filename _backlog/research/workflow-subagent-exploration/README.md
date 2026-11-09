@@ -14,7 +14,10 @@ opened: 2026-11-08
 > 产出的卡：[探索性测试 bug-hunt 问题卡](../../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)；具体缺陷按证据另行分诊。
 > 结论：（重构前探索轮（§16–§18）已跑并收口：6 张缺陷卡（2×P1 + 4×P2）+ 2 条当场修；后续 042/043/044 已归档；
 > 2026-11-09 委派面重构后，第四轮已执行（约 22 分钟/19 turns/27 children）：**5 张缺陷卡
-> BUG-045–049**（1×P1 retry 深度绕过 + 4×P2）；D1 的 CEO→VP→workflow→worker depth 3 首次真跑 PASS；
+> BUG-045–049**（1×P1 retry 深度绕过 + 4×P2）；D1 的 CEO→VP→workflow→worker depth 3 首次真跑 PASS。
+> **修复后验证（2026-11-09 晚）**：045–049 真装配/真挂载通过；BUG-050 复核为 dev profile 旧安装副本
+> 假阳性（误报归档）；teammate/workflow 身份行与 retry 正样本无新缺陷。**第五轮（修复后探索）**：
+> 重启身份 / vp-sales/teammate 预算 / workflow 分支 retry 三条 PASS，未发现新的产品级缺陷。
 > 运行表/未覆盖/资产收割 = [第四轮 §9](2026-11-09-post-refactor-round.md)）
 
 ## 材料

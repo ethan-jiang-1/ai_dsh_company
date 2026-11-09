@@ -2,8 +2,8 @@
 
 状态：implemented（2026-11-03；用户授权「打扫卫生 + 持续改善」，批次 A 为真实性止血，不动 `_backlog` 章程）
 
-> 上游 = [第五轮七维打扫卡](../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round5.md)
-> 审计 = [第五轮七维审计](../../_backlog/_archive/research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)
+> 上游 = [第五轮七维打扫卡](../../../_backlog/_archive/settled_issues/2026-11-03-repo-hygiene-round5.md)
+> 审计 = [第五轮七维审计](../../../_backlog/_archive/research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md)
 > 批次 A 范围 = R5-01 / R5-02 / R5-08 / R5-11 / R5-21 / R5-22 + E1（R5-30）。R5-03/04/05/06/07/10/31 等留给后续批次。
 
 ## 决定
@@ -41,7 +41,7 @@ node checks/smoke/ui-scene-smoke.mjs                        # dev 模式
 
 红证（逐条，真破坏真文件）：
 
-- `shipped-links`：在 `content/AGENTS.md` 末尾加 `[broken](zz-missing-shipped.md)` →
+- `shipped-links`：在 `content/AGENTS.md` 末尾加一个指向 `zz-missing-shipped.md` 的链接（负例假路径）→
   `FAIL shipped-links: packages/company-pack/content/AGENTS.md:158 链接目标不在随包 content：zz-missing-shipped.md`；
   还原 → PASS；`root` 缺失 → `FAIL … content 不在盘上`（不抛异常）。
 - `nav-count-claims`：在 `content/AGENTS.md` 末尾加「右栏五个页签」→

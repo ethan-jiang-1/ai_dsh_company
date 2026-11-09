@@ -5,7 +5,7 @@
 > **2026-10-30 部分取代**：run bundle 后 `company-workspace/` 整树 gitignored，归档搬移已改**纯 fs rename**
 > （不再 `git add`）；探针不再写 `snapshots/archive`，journal 副本随归档件进
 > `deliverables-archive/<目录>/journal/`。本文 §决定 3、§输掉的方案 的 “runtime 未忽略/git add” 与
-> §后果 的 snapshots 路径作废；新 owner = [converge-evidence-home](./2026-10-30-converge-evidence-home.md)。
+> §后果 的 snapshots 路径作废；新 owner = [converge-evidence-home](../implemented/2026-10-30-converge-evidence-home.md)。
 
 ## 决定
 
@@ -45,4 +45,4 @@ pnpm verify   # ALL PASS（snapshot-index 复绿）
 ## 未验
 
 - `resume` 仍未**全量**端到端覆盖：探针只跑 `--dry-run`（退出 0、不动盘）；真搬移/清 journal 仍缺半态夹具。
-- `--charter-backfill` 已真执行并有探针覆盖（退出 0 / 全员 5 角色 / 两次幂等），见 [converge-evidence-home](./2026-10-30-converge-evidence-home.md) §验证；本段其余是 2026-10-23 当时的未验状态。
+- `--charter-backfill` 已真执行并有探针覆盖（退出 0 / 全员 5 角色 / 两次幂等），见 [converge-evidence-home](../implemented/2026-10-30-converge-evidence-home.md) §验证；本段其余是 2026-10-23 当时的未验状态。

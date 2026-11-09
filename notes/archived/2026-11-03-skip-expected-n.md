@@ -3,7 +3,7 @@
 状态：implemented（2026-11-03；七维复评 Phase 2 收尾）
 
 > 上游 = 2026-11-03 fresh 复评 D5「skip 守卫只 allowlist 文件，没校验‘预期 N 个真跑’」。
-> 前身 = [review-integrity-fixes](./2026-11-03-review-integrity-fixes.md) 的 skip-budget 首刀。
+> 前身 = [review-integrity-fixes](../implemented/2026-11-03-review-integrity-fixes.md) 的 skip-budget 首刀。
 
 ## 决定
 

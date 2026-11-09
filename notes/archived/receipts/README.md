@@ -1,7 +1,7 @@
 # archived/receipts/ —— 历史运行证据（不是决定，不是否决）
 
 > 为什么有这个子目录：演练场次、E2E 首检、批次流水、状态快照没有“持久决定”，按
-> [notes/README §二](../../README.md) 的负例不该住 `implemented/`；但它们也不该进
+> [notes/README §二](../../../README.md) 的负例不该住 `implemented/`；但它们也不该进
 > `archived/` 顶层——那一层只留“仍能阻止重开的冻结判定”。这里给它们一个**明确的证据层**：
 > 与决定分离、与否决分离，检索得到、不被当现行 rationale。
 

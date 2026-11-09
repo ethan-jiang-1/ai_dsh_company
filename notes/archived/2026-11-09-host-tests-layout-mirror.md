@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-09；verify/test/typecheck 全绿）
 上游 = [三层分离卡](../../_backlog/_archive/settled_issues/2026-11-09-company-specificity-externalization.md)
-（决定正文 = [三层 Note](2026-11-09-generic-specific-separation.md)）
+（决定正文 = [三层 Note](../implemented/2026-11-09-generic-specific-separation.md)）
 
 ## 决定
 

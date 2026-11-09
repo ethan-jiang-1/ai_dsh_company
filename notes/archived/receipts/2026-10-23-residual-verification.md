@@ -21,7 +21,7 @@
    修法 = 六个含 `veto` 的断言加 `i` 旗标（大小写不是语义）；**不补同义词**（追措辞跑，下一轮换词还会红）。
    修后真跑 **15/15 ALL PASS**（此前长期 14/15）。
 
-3. **打回探针是假绿，判据已修（当场修，按 [_backlog 章程](../../../_backlog/bugs/README.md)不建卡）。**
+3. **打回探针是假绿，判据已修（当场修，按 [_backlog 章程](../README.md)不建卡）。**
    探针报 `bounce-back` / exit 0，但同一会话里成员跑了 62 次 bash 在**执行**超域任务，且该轮 `turn/end` 缺席
    （423s 撞 420s 墙）。根因三条：① `collectText(e.data)` 把 reasoning 一起收进「正文」，模型推理里那句
    「I should push back」被当成回复；② 超时就退出、不要求 `turn/end`，到期照判 verdict；③ 场景单开 vp-sales，
@@ -32,10 +32,10 @@
    **执行了超域任务，没有打回**。
 
 4. **占位/让位 = 已验。**
-   [claim-race](../../probes/team/claim-race-probe.mjs) 两会话同刻竞速 T1：恰一人持认领（cfo），
+   [claim-race](../../../probes/team/claim-race-probe.mjs) 两会话同刻竞速 T1：恰一人持认领（cfo），
    coo 写标准让位行并转 T3；判据 B1 true / B2 false（无双认领缺口）。
 
-5. **团队上下文打回 = 已验（新探针 [member-reject-in-team-probe](../../probes/team/member-reject-in-team-probe.mjs)）。**
+5. **团队上下文打回 = 已验（新探针 [member-reject-in-team-probe](../../../probes/team/member-reject-in-team-probe.mjs)）。**
    场景：lead 建任务「CI 密钥扫描整改技术稿」+ spawn vp-sales，成员指令只写「认领并按公司规矩推进」。
    实跑（`session-b0a7e90b`，lead 与成员均 completed）：VP-Sales 认领后核域、判整任务错配、
    `send_message` 回 lead——【待澄清】+ **为什么不是我**（路由表 / CHARTER 不碰技术）+ **缺什么**
@@ -61,7 +61,7 @@
 - 打回探针不再假绿：超时样本一律 exit 2，且能区分「说打回」与「做了超域活」。
 - **打回两面都验了**：独立会话（无 CEO）= 成员硬接并落稿；真团队（有 lead）= 三件套打回 + 释放任务 + 不落稿。
   前者的 hard-accept 不能判违规（单会话里人是直接委托人、打回条款前置不成立），只能判「那个场景测不了打回」。
-- 新增团队打回探针 1 个（`probes/team/`），已进 [脚本索引](../../../checks/README.md)。
+- 新增团队打回探针 1 个（`probes/team/`），已进 [脚本索引](../README.md)。
 - **仍未建**：`replay --ui` 金样与 session 的配对 freshness 门禁；`--full` 的同义词漂移仍会误红（大写已不误杀）。
 
 ## 验证（全部真跑）

@@ -1,22 +1,22 @@
 # 2026-11-09 · 第三轮探索收口：控制面/多层的模型可见面审计
 
 状态：implemented（2026-11-09；第三轮探索收口，3 张新卡 + 3 处文本修正）
-上游 = [探索性测试问题卡](../../_backlog/issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)
-（修复轮 = [委派面合同修复](2026-11-08-delegation-contract-repair.md)；运行表 = [研究材料 §17](../../_backlog/research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)）
+上游 = [探索性测试问题卡](../../../_backlog/issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)
+（修复轮 = [委派面合同修复](../../implemented/2026-11-08-delegation-contract-repair.md)；运行表 = [研究材料 §17](../../../_backlog/research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)）
 
 ## 决定
 
-- 修复轮之后按 [NEXT-ROUND-ADVICE](../../runtime/tmp/explore/NEXT-ROUND-ADVICE.md) 只探未覆盖面：
+- 修复轮之后按 [NEXT-ROUND-ADVICE](../../../runtime/tmp/explore/NEXT-ROUND-ADVICE.md) 只探未覆盖面：
   多层结果变换、cold resume/新控制工具、团队继承×新控制名、compaction×skill；workspace-write 本机
   Seatbelt 阻塞，不测不声称。
 - **新发现分诊**（不是全部都要修）：
-  - [BUG-042](../../_backlog/_archive/fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md)（P2）：
+  - [BUG-042](../../../_backlog/_archive/fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md)（P2）：
     `list_subagents` 的 `lastTurnEnd` 真实装配恒缺——`company-session-query-sqlite` 在
     `isolate:{sessionQuery:true}` 组内，host 的 `ctx.get('sessionQuery')` 拿不到；修复轮 spec 用 fake
     service，所以门禁绿。C2/C2b/C7 三次复现。**修复 Agent 已接 042，本轮不动。**
-  - [BUG-043](../../_backlog/_archive/fixed_bugs/BUG-043-list-subagents-includes-teammates.md)（P2）：`list_subagents`
+  - [BUG-043](../../../_backlog/_archive/fixed_bugs/BUG-043-list-subagents-includes-teammates.md)（P2）：`list_subagents`
     也列 teammate，与 team `list_agents` 名册重叠；工具描述只说“child 不是 roster member”。
-  - [BUG-044](../../_backlog/_archive/fixed_bugs/BUG-044-background-job-lost-on-restart.md)（P2）：后台 workflow job
+  - [BUG-044](../../../_backlog/_archive/fixed_bugs/BUG-044-background-job-lost-on-restart.md)（P2）：后台 workflow job
     不跨宿主重启（`job_list` 空/`unknown job`/无通知）；child 会话仍在且可 `send_to_subagent` 冷恢复，
     但只能重读当前值，原 job 输出不可恢复（C7R）。
 - **当场修的文本**（简单缺陷，无卡）：
@@ -62,5 +62,5 @@
   C8（teammate depth 链 PASS；Lead 300s 未收口）、C9（bash 尾标记保留）、C10（CEO 复用 named child；
   旧指引过期）、C11（嵌套指针跨 child→parent 可达；child 自述截断不可信）、C12/C13b（vp-sales/teammate
   自然选对 `send_to_subagent`）。
-- 会话/证据路径在[研究材料 §17](../../_backlog/research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)
+- 会话/证据路径在[研究材料 §17](../../../_backlog/research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)
   与三张卡内；原始证据在 `runtime/tmp/explore/`（gitignored）。

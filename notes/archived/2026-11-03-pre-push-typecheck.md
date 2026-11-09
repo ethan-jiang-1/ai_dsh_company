@@ -9,7 +9,7 @@
 - `.githooks/pre-push` 在 `checks/run-gates.mjs` 之后、`pnpm test` 之前加
   `node ./node_modules/typescript/bin/tsc -b packages/company-pack || exit 1`。
 - 只覆盖 pack 两面（host + client）——tests 进 tsc 需要 host/client 两个 test project（单项目实测
-  527 errors；见 [D2 Note](./2026-11-03-d2-companyview-removal.md)），不在本刀硬接。
+  527 errors；见 [D2 Note](../implemented/2026-11-03-d2-companyview-removal.md)），不在本刀硬接。
 - 同步两处描述：`docs/testing.md` §5、`docs/guides/dev-loop.md` §12 push 段。
 
 ## 输掉的方案

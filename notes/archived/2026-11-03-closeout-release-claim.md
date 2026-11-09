@@ -22,6 +22,6 @@
 ## 验证
 
 - 规则落点 = [close-out-definition SKILL](../../.agents/skills/close-out-definition/SKILL.md)（步骤 2 + 完成判据）。
-- 本仓当前的发布声明示例 = [0.8.5 Note](./2026-11-03-release-0.8.5.md)（贴了 `READY 0.8.5 @d2105027`
+- 本仓当前的发布声明示例 = [0.8.5 Note](../implemented/2026-11-03-release-0.8.5.md)（贴了 `READY 0.8.5 @d2105027`
   与 7 项检查），可作正例。
 - 这是散文规则，无新增可跑脚本；`pnpm verify` 只证链接/预算。
