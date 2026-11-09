@@ -7,7 +7,7 @@ opened: 2026-11-06
 
 > 立卡：2026-11-06 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 2026-11-06（用户同日拍定档位/名字/SQA 否决线，本卡一次性交付）
 >
-> **结论/去向**：note — [SA/SQA 子人格 Note](../../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md)
+> **结论/去向**：note — [SA/SQA 子人格 Note](../../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)
 
 **问题与期望结果：** 真实项目落地（不是 demo）时，VP-Eng 一个人既做硬软一体架构、又做需求验证，
 E（工程）与 V（验证）在同一上下文里，质量不独立。期望：VP-Eng 在落地项目里能启动两个**独立上下文**
@@ -72,6 +72,6 @@ E（工程）与 V（验证）在同一上下文里，质量不独立。期望�
 ## 交付证据
 
 - 提交：SA/SQA 两 preset + 委托行 + `preset-bundle` 门禁 + presets/typecheck/test/verify 全绿；
-  Note = [2026-11-06-sa-sqa-subpersonas.md](../../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md)。
+  Note = [2026-11-06-sa-sqa-subpersonas.md](../../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)。
 - 真模型 E2E = `probes/team/sa-sqa-delegation-probe.mjs`（305s，两子会话 preset 正确、depth=2、同一 parent）。
 - 面清单（16 面）与 CMO 实证 = [研究题](../research/role-addition/README.md)。

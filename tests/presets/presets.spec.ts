@@ -51,22 +51,8 @@ function rowBlock(role: string, rowId: string): string {
 }
 
 describe('company roster（R1 回归：preset 必须可挂载）', () => {
-  it('六个角色各声明一个 dsh-agent-preset 行，且都列进 dsh.bundle.patch 数组（0.1.7 声明模型）', () => {
-    const patch = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')).dsh.bundle.patch as string[]
-    expect(Array.isArray(patch), '0.1.7 起 dsh.bundle.patch 为数组（registry 一行 + 每预设一行）').toBe(true)
-    for (const role of ROLES) {
-      const rel = `./presets/${role}/agent.cordis.yml`
-      expect(patch, `${role} 未列进 dsh.bundle.patch`).toContain(rel)
-      const text = roleYml(role)
-      expect(text, `${role} 缺 preset-${role} 声明行`).toMatch(new RegExp(`^\\s+- id: preset-${role}$`, 'm'))
-      expect(text, `${role} 的 config.id 必须等于角色 id`).toMatch(new RegExp(`^\\s+id: ${role}$`, 'm'))
-      expect(text, `${role} 缺 config.plugins`).toMatch(/^\s+plugins:$/m)
-      // 真正"挂得上"的完成定义在 preset-smoke（真 web 逐角色建会话）——这里只守声明形状。
-    }
-  })
-
   it('YAML 结构可解析：顶层数组 → insert → dsh-agent-preset → config.plugins（R5-15 keyless schema）', () => {
-    for (const role of [...ROLES, 'researcher']) {
+    for (const role of [...ROLES, 'worker-researcher']) {
       const docs = yaml.load(roleYml(role), { schema: YAML_SCHEMA }) as Array<{ insert?: Array<{ name?: string, config?: { id?: string, plugins?: Array<{ id?: string, name?: string }> } }> }>
       expect(Array.isArray(docs), `${role} 顶层必须是数组`).toBe(true)
       const insert = docs[0]?.insert
@@ -86,7 +72,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   })
 
   it('preset 定义不携带公司数据（FAQ 24 D 平面）：样本公司事实只在 kb/company.md / kb/org.md', () => {
-    for (const role of [...ROLES, 'researcher']) {
+    for (const role of [...ROLES, 'worker-researcher']) {
       const text = roleYml(role)
       expect(text, `${role} persona 写死了样本公司事实`).not.toMatch(/这家公司（梦之队）|梦之队 是高科技|三类业务|全员 50 人|梦之队的调研手/)
       expect(text, `${role} persona 应指向部署身份/编制`).toMatch(/kb\/(company|org)\.md/)
@@ -101,7 +87,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     // “没有把它写进指令面”，不能断言“模型不可见”（可见性见 docs/data-model.md 数据卡）。
     const agents = readFileSync(join(PACK, 'content/AGENTS.md'), 'utf8')
     expect(agents).not.toContain('deliverables-index')
-    for (const role of [...ROLES, 'researcher']) expect(roleYml(role)).not.toContain('deliverables-index')
+    for (const role of [...ROLES, 'worker-researcher']) expect(roleYml(role)).not.toContain('deliverables-index')
   })
 
   it('preset 行引用的插件都在 pack 依赖声明里（DSH verify-cordis-config 同构；R5a 起 deps ∪ peers）', () => {
@@ -162,27 +148,27 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
   })
 
-  it('researcher preset（0.2.1）：只读工具面、无职责边界、进 bundle 数组——委托 child 的人格载体', () => {
+  it('worker-researcher preset（0.2.1）：只读工具面、无职责边界、进 bundle 数组——委托 child 的人格载体', () => {
     // 为什么需要它：0.2.1 起委托 child 的人格只能由 agentPreset 给；CEO 的通用委托行不钉 preset
-    // 就会生出"迷你 CEO"。researcher 是**手**不是第五个职能 ⇒ 它不该有写盘工具、不该有 journal 义务。
+    // 就会生出"迷你 CEO"。worker-researcher 是**手**不是第五个职能 ⇒ 它不该有写盘工具、不该有 journal 义务。
     const patch = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')).dsh.bundle.patch as string[]
-    expect(patch, 'researcher/preset 未列进 dsh.bundle.patch（真挂载会缺这个 preset）')
-      .toContain('./presets/researcher/agent.cordis.yml')
-    const text = roleYml('researcher')
-    expect(text, 'researcher 缺 preset-researcher 声明行').toMatch(/^\s+- id: preset-researcher$/m)
-    expect(text, 'researcher 的 config.id 必须等于 researcher').toMatch(/^\s+id: researcher$/m)
+    expect(patch, 'worker-researcher/preset 未列进 dsh.bundle.patch（真挂载会缺这个 preset）')
+      .toContain('./presets/worker-researcher/agent.cordis.yml')
+    const text = roleYml('worker-researcher')
+    expect(text, 'worker-researcher 缺 preset-worker-researcher 声明行').toMatch(/^\s+- id: preset-worker-researcher$/m)
+    expect(text, 'worker-researcher 的 config.id 必须等于 worker-researcher').toMatch(/^\s+id: worker-researcher$/m)
     // 「只读」不能只写在 persona 里：tool-fs 行必须显式关掉 write/edit（vendor Config 的开关）。
-    const fsRow = rowBlock('researcher', 'tool-fs')
-    expect(fsRow, 'researcher 缺 tool-fs 行（读盘面）').not.toBe('')
-    expect(fsRow, 'researcher 的 tool-fs 必须 write: false（只读手的写能力面）').toContain('write: false')
-    expect(fsRow, 'researcher 的 tool-fs 必须 edit: false').toContain('edit: false')
+    const fsRow = rowBlock('worker-researcher', 'tool-fs')
+    expect(fsRow, 'worker-researcher 缺 tool-fs 行（读盘面）').not.toBe('')
+    expect(fsRow, 'worker-researcher 的 tool-fs 必须 write: false（只读手的写能力面）').toContain('write: false')
+    expect(fsRow, 'worker-researcher 的 tool-fs 必须 edit: false').toContain('edit: false')
     for (const row of ['tool-fs-search', 'tool-web', 'tool-todo']) {
-      expect(text, `researcher 缺 ${row}（调研手没有检索面就等于没有手）`).toMatch(new RegExp(`^\\s+- id: ${row}$`, 'm'))
+      expect(text, `worker-researcher 缺 ${row}（调研手没有检索面就等于没有手）`).toMatch(new RegExp(`^\\s+- id: ${row}$`, 'm'))
     }
     // 它是手不是职能：不能带角色职责（journal 纪要义务、CHARTER 开场）。注释里解释"没有这些义务"不算。
-    const personaRow = rowBlock('researcher', 'persona')
-    expect(personaRow, 'researcher 的 persona 不得给 journal 纪要义务').not.toMatch(/journal/i)
-    expect(personaRow, 'researcher 的 persona 不得给 CHARTER 开场仪式').not.toMatch(/CHARTER/)
+    const personaRow = rowBlock('worker-researcher', 'persona')
+    expect(personaRow, 'worker-researcher 的 persona 不得给 journal 纪要义务').not.toMatch(/journal/i)
+    expect(personaRow, 'worker-researcher 的 persona 不得给 CHARTER 开场仪式').not.toMatch(/CHARTER/)
   })
 
   it('五角色显示名共用公司前缀（D14 系列命名，R2 补角色时不许忘）', () => {
@@ -236,7 +222,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     }
     // 通用委托：必须钉 agentPreset（否则 spawn 继承 CEO preset），且工具名即语义。
     const generic = /toolName: subagent_research([\s\S]*?)(?=\n\s*- id: |$)/.exec(ceo)?.[1] ?? ''
-    expect(generic, 'CEO 通用委托的 child 必须钉 researcher 人格（spawn 不钉会继承 CEO）').toContain('agentPreset: researcher')
+    expect(generic, 'CEO 通用委托的 child 必须钉 worker-researcher 人格（spawn 不钉会继承 CEO）').toContain('agentPreset: worker-researcher')
     // 反向守卫：两个续驶控制行在 CEO 会话里被团队版 shadow（是死行），别再"修"回来。
     for (const row of ['tool-subagent-control', 'tool-subagent-list-agents']) {
       expect(ceo, `${row} 在 CEO 会话被 team shadow，是死行（见 docs/delegation.md）`)
@@ -264,82 +250,6 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(ceo, '旧 journal 的「本部署无 X」不作数').toMatch(/旧 journal[\s\S]*不作数/)
     const skill = readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
     expect(skill, '组队 skill 必须同一条规则（MRD 只归 CMO）').toMatch(/owner 唯一，缺角不代行[\s\S]*MRD 只归 CMO/)
-  })
-
-  it('落地项目子人格：SA + SQA 声明、CEO/vp-eng 各能起（maxDepth 2），SQA 否决直达 CEO', () => {
-    // 2026-11-06：VP-Eng 在落地项目里按 V 模型把 E（架构）与 V（验证）分开。子人格档（同 researcher），
-    // 但委托行必须两处都有且 maxDepth: 2——成员会话 depth 1，子代落在 depth 2。
-    for (const preset of ['system-architect', 'system-qa']) {
-      expect(existsSync(join(PRESETS_DIR, preset, 'agent.cordis.yml')), `${preset} 必须随包发布`).toBe(true)
-      const text = readFileSync(join(PRESETS_DIR, preset, 'agent.cordis.yml'), 'utf8')
-      expect(text, `${preset} 身份行`).toMatch(new RegExp(`id: ${preset}`))
-      expect(text, `${preset} 必须写 V 模型分工`).toMatch(/V 模型/)
-    }
-    for (const [label, yml] of [['CEO', roleYml('ceo')], ['VP-Eng', roleYml('vp-eng')]] as const) {
-      for (const [tool, preset] of [['system_architect', 'system-architect'], ['system_qa', 'system-qa']] as const) {
-        expect(yml, `${label} 必须能起 ${preset}`).toMatch(
-          new RegExp(`toolName: ${tool}[\\s\\S]{0,120}?maxDepth: 2[\\s\\S]{0,60}?agentPreset: ${preset}`),
-        )
-      }
-    }
-    expect(roleYml('vp-eng'), 'VP-Eng 只在落地项目起').toMatch(/落地项目（不是 demo）才起/)
-    expect(roleYml('ceo'), 'SQA 否决直达 CEO').toMatch(/SQA 的否决直达你/)
-    expect(readFileSync(join(PRESETS_DIR, 'system-qa/agent.cordis.yml'), 'utf8'), 'SQA 不通过→原样上报')
-      .toMatch(/否决直达 CEO/)
-    // 技能内容也要钉：V 模型两侧、判据、不通过；以及「团队成员读 Lead preset」这条运行时事实。
-    expect(readFileSync(join(PRESETS_DIR, 'system-architect/skills/systems-architecture/SKILL.md'), 'utf8'))
-      .toMatch(/V 模型左侧/)
-    const qaSkill = readFileSync(join(PRESETS_DIR, 'system-qa/skills/vv-playbook/SKILL.md'), 'utf8')
-    expect(qaSkill).toMatch(/V 模型右侧/)
-    expect(qaSkill, 'V&V 必须要求可复现判据').toMatch(/判据/)
-    expect(qaSkill, '不通过要说清').toMatch(/不通过/)
-    // 2026-11-06 质量审计发现：不钉层级列时，不同运行给出互相不一致的 V 模型组织方式（审计无法机械核对）。
-    expect(qaSkill, 'V&V 行必须有「层级」列（L1–L4）').toMatch(/「层级」列必填/)
-    expect(qaSkill, '四级枚举在场').toMatch(/L1 单元[\s\S]{0,80}L4 验收/)
-    // 2026-11-07 实锤：装了技能目录不等于会读——persona 必须点名"先加载"（同 CEO/VP-Eng 的既有形态）。
-    for (const [preset, skill] of [['system-architect', 'systems-architecture'], ['system-qa', 'vv-playbook']] as const) {
-      expect(readFileSync(join(PRESETS_DIR, preset, 'agent.cordis.yml'), 'utf8'),
-        `${preset} 必须在 persona 里点名先加载 ${skill} skill（否则技能挂上也不读）`)
-        .toMatch(new RegExp(`先加载 \`${skill}\` skill`))
-    }
-    expect(roleYml('ceo'), '团队成员读 Lead preset ⇒ 任务书必须写清（否则成员 persona 不生效）')
-      .toMatch(/任务书必须写清/)
-    expect(readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8'), '组队 skill 要写落地项目怎么起')
-      .toMatch(/落地项目（非 demo）[\s\S]{0,80}system_architect/)
-  })
-
-  it('SA/SQA 证据链必查：记录可举证必须有时间源（BUG-034）', () => {
-    // 负例留证 2026-11-07：BUG-034——把 SA skill 的「记录与时间可信」改成「记录可信」⇒
-    // 本用例 FAIL（原话 expected … to match /记录与时间可信/），其余通过；还原后全绿。
-    // 真实产物侧红：v4/v5 两轮都被 probes/team/sa-sqa-quality-audit.mjs 的 Q8/Q10 判红。
-    // 2026-11-06 两轮真实运行都声明了事件记录/签名，但全稿没有绝对时间来源；根因 = 两侧 skill 的
-    // 检查表都没有这一项，通用词（不确定度/失败态）不会让模型想到"时钟从哪来"。断言钉住措辞。
-    const saSkill = readFileSync(join(PRESETS_DIR, 'system-architect/skills/systems-architecture/SKILL.md'), 'utf8')
-    expect(saSkill, '检查表必须有「记录与时间可信」').toMatch(/记录与时间可信/)
-    expect(saSkill, '必须回答上电后时钟从哪来').toMatch(/上电后时钟从哪来/)
-    expect(saSkill, '断电重启后的时间恢复').toMatch(/断电重启后时间怎么恢复/)
-    expect(saSkill, '无 RTC/电池时的替代（对时 + 相对计时）').toMatch(/无 RTC\/电池[\s\S]{0,30}对时协议/)
-    expect(saSkill, '记录类验证点必须单列给 SQA').toMatch(/记录可举证与故障路径耐受这两类验证点必须单列/)
-    const qaSkill = readFileSync(join(PRESETS_DIR, 'system-qa/skills/vv-playbook/SKILL.md'), 'utf8')
-    expect(qaSkill, 'SQA 必查绝对时间来源').toMatch(/绝对时间来源/)
-    expect(qaSkill, '计时精度 ≠ 日期可信').toMatch(/计时精度[\s\S]{0,20}日期可信/)
-    expect(qaSkill, '有签名必须验密钥生命周期').toMatch(/密钥生命周期/)
-  })
-
-  it('SA/SQA 证据链必查：物理在故障路径就要有耐受判据（BUG-035）', () => {
-    // 负例留证 2026-11-07：BUG-035——把 SA skill 的「故障路径的耐受」条目整条删掉 ⇒
-    // 本用例 FAIL（原话 expected … to match /物理上位于[\s\S]{0,20}故障路径/），其余通过；还原后全绿。
-    // 真实产物侧红：v4 被 sa-sqa-quality-audit 的 Q9/Q11 判红（只有 25 A/10 s，没有短路电流耐受）。
-    // 2026-11-06：通流装置只给"25 A/10 s 不损坏"，短路整条划给上游；保护功能归上游 ≠ 耐受责任归上游。
-    const saSkill = readFileSync(join(PRESETS_DIR, 'system-architect/skills/systems-architecture/SKILL.md'), 'utf8')
-    expect(saSkill, '物理位于故障路径 ⇒ 有耐受责任').toMatch(/物理上位于[\s\S]{0,20}故障路径/)
-    expect(saSkill, '保护归上游 ≠ 耐受归上游').toMatch(/保护功能归上游 ≠ 耐受责任归上游/)
-    expect(saSkill, '必须给耐受包络').toMatch(/耐受包络/)
-    expect(saSkill, '耐受类验证点必须单列给 SQA').toMatch(/记录可举证与故障路径耐受这两类验证点必须单列/)
-    const qaSkill = readFileSync(join(PRESETS_DIR, 'system-qa/skills/vv-playbook/SKILL.md'), 'utf8')
-    expect(qaSkill, '边界外但物理在路径内也要有耐受判据').toMatch(/边界外 ≠ 无责任/)
-    expect(qaSkill, '上游负责时逐条问扛不扛得住').toMatch(/由上游负责[\s\S]{0,30}扛不扛得住/)
-    expect(qaSkill, '耐受判据要含破坏性试验与样品量').toMatch(/破坏性试验与样品量/)
   })
 
   it('skill 目录必须配加载器：声明 skill-filesystem 的 preset 同时声明 tool-skill', () => {
@@ -563,7 +473,7 @@ describe('会话检索：isolated provider 组（P0 安装路径守卫）', () =
   })
 
   it('六个 preset 不再各持 tool-session-query 行（工具面收敛到 bundle 组）', () => {
-    for (const role of [...ROLES, 'researcher']) {
+    for (const role of [...ROLES, 'worker-researcher']) {
       expect(roleYml(role), `${role} 仍有 tool-session-query 行；组内工具会与它重复注册`)
         .not.toMatch(/tool-session-query/)
     }
@@ -603,7 +513,7 @@ describe('包元数据与用户可见角色清单', () => {
     expect(manifest.description).toContain('CMO')
     expect(manifest.description).not.toContain('Five-role')
     const readme = readFileSync(join(PACK, 'README.md'), 'utf8')
-    expect(readme).toContain('cmo / researcher')
+    expect(readme).toContain('worker-researcher')
     expect(readme).not.toContain('Five-role')
   })
 })
@@ -648,77 +558,8 @@ describe('需求编号链：CMO 产 MRD+StRS、VP-Eng 产 PRD（A3）', () => {
   })
 })
 
-describe('SA 产出：SyRS + IRS + 架构，验证点只引用不发号（A4a）', () => {
-  const RETIRED = /\b(?:STR|SYR|IFR|VR|VP|V)-(?:#|\d)/
-  const SA_SKILL = join(PRESETS_DIR, 'system-architect/skills/systems-architecture/SKILL.md')
-
-  it('SA persona 声明 SyRS/IRS 两份需求文档 + 架构稿', () => {
-    const persona = roleYml('system-architect')
-    expect(persona, 'SA persona 缺 SyRS 落盘路径').toContain('syrs.md')
-    expect(persona, 'SA persona 缺 IRS 落盘路径').toContain('irs.md')
-    expect(persona, 'SA persona 缺 SyRS 层名').toContain('SyRS')
-    expect(persona, 'SA persona 缺 IRS 层名').toContain('IRS')
-    expect(persona, 'SA persona 缺 system-architecture 架构稿').toContain('system-architecture.md')
-  })
-
-  it('SA skill 写 SyRS（REQ）与 IRS（IF）的层头/追溯，并带 allocation 附录边界', () => {
-    const skill = readFileSync(SA_SKILL, 'utf8')
-    expect(skill, 'skill 缺 SyRS 产出').toContain('SyRS')
-    expect(skill, 'skill 缺 IRS 产出').toContain('IRS')
-    expect(skill, 'skill 缺 drafts/syrs.md').toContain('drafts/syrs.md')
-    expect(skill, 'skill 缺 drafts/irs.md').toContain('drafts/irs.md')
-    expect(skill, 'skill 缺行首 traces 追溯写法').toMatch(/traces:\s*\[REQ-/)
-    expect(skill, 'skill 缺 allocation 附录（不立号）').toContain('allocation')
-  })
-
-  it('验证点是引用清单：不发 VP-###，退役词零出现', () => {
-    const skill = readFileSync(SA_SKILL, 'utf8')
-    const persona = roleYml('system-architect')
-    expect(skill, 'SA skill 仍出现退役号形（VP-### 等）').not.toMatch(RETIRED)
-    expect(persona, 'SA persona 仍出现退役号形').not.toMatch(RETIRED)
-    expect(skill, '验证点必须点名引用 REQ/IF').toMatch(/验证点[^\n]*(REQ|IF)/)
-  })
-})
-
-describe('SQA 产出：TC-### + V&V 表 + 独立结论（A4b）', () => {
-  const RETIRED = /\b(?:STR|SYR|IFR|VR|VP|V)-(?:#|\d)/
-  const SQA_SKILL = join(PRESETS_DIR, 'system-qa/skills/vv-playbook/SKILL.md')
-
-  it('SQA persona 声明 vv-plan.md 的 TC-### 与 covers', () => {
-    const persona = roleYml('system-qa')
-    expect(persona, 'SQA persona 缺 vv-plan.md').toContain('vv-plan.md')
-    expect(persona, 'SQA persona 缺 TC-###').toContain('TC-###')
-    expect(persona, 'SQA persona 缺 covers').toContain('covers')
-  })
-
-  it('vv-playbook 写 layer: V&V + table-rows + covers 列 + L1–L4', () => {
-    const skill = readFileSync(SQA_SKILL, 'utf8')
-    expect(skill, 'skill 缺 vv-plan.md').toContain('drafts/vv-plan.md')
-    expect(skill, 'skill 缺 layer: V&V').toContain('layer: V&V')
-    expect(skill, 'skill 缺 definition: table-rows').toContain('table-rows')
-    expect(skill, 'skill 缺 covers 列').toContain('covers')
-    for (const level of ['L1', 'L2', 'L3', 'L4']) expect(skill, `skill 缺 ${level}`).toContain(level)
-    expect(skill, 'skill 仍出现退役号形（VP/V/VR-###）').not.toMatch(RETIRED)
-    expect(roleYml('system-qa'), 'SQA persona 仍出现退役号形').not.toMatch(RETIRED)
-  })
-
-  it('结论原样与独立性纪律在场（删结论 = 红）', () => {
-    const skill = readFileSync(SQA_SKILL, 'utf8')
-    expect(skill, 'skill 缺「结论原样」条款').toMatch(/原样/)
-    expect(skill, 'skill 缺不写架构/PRD 的独立性纪律').toMatch(/不写架构/)
-  })
-})
-
 describe('VP-Eng 组队：根门带小队 + 命名专家（B1）', () => {
   const ENG_TEAMING = join(PRESETS_DIR, 'vp-eng/skills/eng-teaming/SKILL.md')
-
-  it('vp-eng 有 vp_cmo 行（maxDepth 2 → cmo）；CEO 的 vp_cmo 仍 maxDepth 1', () => {
-    const eng = roleYml('vp-eng')
-    expect(eng, 'vp-eng 缺 vp_cmo 委派行').toMatch(/toolName: vp_cmo[\s\S]{0,80}maxDepth: 2[\s\S]{0,80}agentPreset: cmo/)
-    const ceo = roleYml('ceo')
-    expect(ceo, 'CEO 的 vp_cmo 必须保持 maxDepth 1（D7：CEO 团队边界不动）').toMatch(/toolName: vp_cmo[\s\S]{0,80}maxDepth: 1/)
-    // 根门已在 keyless 探针证 Lead；这里只钉 JSON 声明面。
-  })
 
   it('eng-teaming skill 四档决策树与硬规则在场', () => {
     expect(existsSync(ENG_TEAMING), 'vp-eng 缺 eng-teaming skill').toBe(true)
@@ -726,7 +567,7 @@ describe('VP-Eng 组队：根门带小队 + 命名专家（B1）', () => {
     for (const tier of ['自己做', '一次性 worker', '命名专家', '持久小队']) {
       expect(skill, `eng-teaming 缺档位「${tier}」`).toContain(tier)
     }
-    for (const rule of ['不能冒充', 'spawn_teammate', 'vp_cmo', 'system_architect', 'system_qa']) {
+    for (const rule of ['不能冒充', 'spawn_teammate', 'vp_cmo']) {
       expect(skill, `eng-teaming 缺 ${rule}`).toContain(rule)
     }
     expect(roleYml('vp-eng'), 'persona 必须点名先加载 eng-teaming').toMatch(/先加载 `eng-teaming` skill/)
@@ -739,74 +580,5 @@ describe('VP-Eng 组队：根门带小队 + 命名专家（B1）', () => {
     expect(handbook, '手册必须写命名 child 按自己的 preset 组合').toMatch(/命名[^\n]*child[^\n]*(agentPreset|preset)/)
     const delegation = readFileSync(join(ROOT, 'docs/delegation.md'), 'utf8')
     expect(delegation, 'delegation.md 必须写根会话 = Team Lead').toMatch(/根会话[^\n]*Lead|Lead[^\n]*根会话/)
-  })
-})
-
-describe('SA/SQA 能力组织：按场景取用学科域（用户 2026-11-08 批准 A+C）', () => {
-  const SA = join(PRESETS_DIR, 'system-architect/skills/systems-architecture/SKILL.md')
-  const SQA = join(PRESETS_DIR, 'system-qa/skills/vv-playbook/SKILL.md')
-  const TEAMING = join(PRESETS_DIR, 'vp-eng/skills/eng-teaming/SKILL.md')
-  const DISCIPLINES = ['软件', '固件', '电气', '机械', '系统测试']
-  /** 把 markdown 表格拆成 cells；只用于「先判域」表。 */
-  const domainRows = (text: string): string[][] => text.split('\n')
-    .map(line => line.trim())
-    .filter(line => line.startsWith('|'))
-    .map(line => line.split('|').slice(1, -1).map(cell => cell.trim().replace(/\*\*/g, '')))
-    .filter(cells => DISCIPLINES.includes(cells[0] ?? '') && /^(?:在|不在)(?:\s*\/\s*(?:在|不在))?(?=\s|（|\(|$)/.test(cells[1] ?? ''))
-
-  it('SA skill 有「先判域」五学科固定行：逐行 在/不在 + 非空依据', () => {
-    const skill = readFileSync(SA, 'utf8')
-    expect(skill, 'SA skill 缺「先判域」步骤').toContain('先判域')
-    const rows = domainRows(skill)
-    expect(rows.length, `五学科固定行应为 5，实际 ${String(rows.length)}（删一行必须红）`).toBe(5)
-    for (const discipline of DISCIPLINES) {
-      const row = rows.find(cells => cells[0] === discipline)
-      expect(row, `域判定表缺「${discipline}」行`).toBeDefined()
-      expect((row?.[1] ?? ''), `${discipline} 行必须写「在」或「不在」`).toMatch(/^(?:在|不在)(?:\s*\/\s*(?:在|不在))?(?=\s|（|\(|$)/)
-      expect((row?.[2] ?? '').length, `${discipline} 行的依据不能为空`).toBeGreaterThan(0)
-    }
-    expect(skill, '五行不得被别的划分替换').toMatch(/不得用别的划分替换|不得替换/)
-    expect(skill, '任务书给的额外域只能作追加行').toMatch(/追加行/)
-    expect(skill, '冲突必须以任务书边界为准并写明偏差').toMatch(/冲突[^\n]*任务书边界[^\n]*为准/)
-    expect(skill, '远程设备/云边/采集类必须有归类规则（未决问题 3）').toMatch(/远程设备|云边|采集类/)
-  })
-
-  it('纯软件不硬凑、含物理件不漏域：两条边界都在 SA skill', () => {
-    const skill = readFileSync(SA, 'utf8')
-    expect(skill, '缺「纯软件只用软件思考」的指令').toMatch(/纯软件/)
-    for (const lens of ['状态机', '并发', '契约', '可观测']) {
-      expect(skill, `纯软件镜头缺 ${lens}`).toContain(lens)
-    }
-    expect(skill, '缺「不硬凑」边界').toMatch(/不(?:许)?硬凑|不凑|不要硬凑/)
-    // 三个物理件触发词分别断言，别用一个 `a|b` 让缺失项逃掉。
-    expect(skill, '缺物理件触发词「执行器」').toContain('执行器')
-    expect(skill, '缺物理件触发词「市电」').toContain('市电')
-    expect(skill, '缺物理件触发词「承力」').toContain('承力')
-    expect(skill, '缺「不是我的专业」反例').toMatch(/不是我的专业/)
-  })
-
-  it('SQA skill 有「域审计」：五行为准、矛盾即不通过、冲突以任务书边界为准', () => {
-    const skill = readFileSync(SQA, 'utf8')
-    expect(skill, 'SQA skill 缺「域审计」步骤').toContain('域审计')
-    for (const discipline of DISCIPLINES) {
-      expect(skill, `SQA 域审计缺学科 ${discipline}`).toContain(discipline)
-    }
-    expect(skill, '缺「固定五行 / 缺一行不通过」判据').toMatch(/固定五行[\s\S]{0,120}缺一行/)
-    // 矛盾判据限定在承接面：依据里的反证（"没有市电"）不算矛盾。
-    expect(skill, '矛盾判据必须限定在需求/接口/判据承接面').toMatch(/需求[^\n]*接口[^\n]*判据|承接面/)
-    expect(skill, '缺「排除要举证」').toMatch(/排除[\s\S]{0,80}举证/)
-    expect(skill, '缺「特征词」判据').toContain('特征词')
-    expect(skill, '缺冲突以任务书边界为准').toMatch(/冲突[^\n]*任务书边界[^\n]*为准/)
-    expect(skill, '域审计结论必须能判不通过').toMatch(/不通过/)
-  })
-
-  it('VP-Eng 任务书承载域声明：现场边界 / 执行器·市电·承力 / 产物用途 / 固定五行', () => {
-    const skill = readFileSync(TEAMING, 'utf8')
-    expect(skill, 'eng-teaming 任务书缺「现场边界」').toContain('现场边界')
-    expect(skill, 'eng-teaming 任务书缺物理件「执行器」').toContain('执行器')
-    expect(skill, 'eng-teaming 任务书缺物理件「市电」').toContain('市电')
-    expect(skill, 'eng-teaming 任务书缺物理件「承力」').toContain('承力')
-    expect(skill, 'eng-teaming 任务书缺产物用途（是否举证）').toMatch(/产物用途|是否.*举证|记录.*举证/)
-    expect(skill, '任务书必须带固定五行且不得替换').toMatch(/固定五行[\s\S]{0,120}不得替换/)
   })
 })

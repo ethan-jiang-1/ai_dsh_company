@@ -6,7 +6,7 @@ opened: 2026-11-06
 # SA/SQA 产物评审：两个新子人格的产出到底行不行
 
 > 问题：VP-Eng 起的系统架构师（SA）与系统质量保证（SQA）产出的架构稿与 V&V 计划，技术判断站不站得住？
-> 消费者：[SA/SQA 落地 Note](../../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md)、
+> 消费者：[SA/SQA 落地 Note](../../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)、
 > [BUG-034](../../_archive/fixed_bugs/BUG-034-no-absolute-time-source-for-signed-records.md)、
 > [BUG-035](../../_archive/fixed_bugs/BUG-035-short-circuit-withstand-undefined.md)
 > 产出的卡：BUG-034、BUG-035

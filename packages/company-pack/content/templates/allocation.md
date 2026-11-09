@@ -5,7 +5,7 @@ definition: none
 # 分配附录（allocation · 需求落到子系统 / 采购件）
 
 > 附录**不是一层**：不立号、不声明 `layer`；只**引用**上游 REQ/IF，回答"这条需求由哪块子系统 / 采购件兑现"。
-> 主笔 = **SA**；随 IRS 一起交（可作 `drafts/irs.md` 的附录，也可独立成 `allocation.md`）。
+> 主笔 = **<assigned>**；随 IRS 一起交（可作 `drafts/irs.md` 的附录，也可独立成 `allocation.md`）。
 
 | 需求 / 接口 | 子系统 / 采购件 | 负责人 | 备注 |
 |---|---|---|---|

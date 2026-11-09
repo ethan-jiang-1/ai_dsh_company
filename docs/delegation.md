@@ -21,9 +21,7 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 |---|---|---|
 | `vp_eng` | VP-Eng（研发） | `provider: spawn` · `maxDepth: 1` · `agentPreset: vp-eng` |
 | `vp_sales` | VP-Sales（销售） | `provider: spawn` · `maxDepth: 1` · `agentPreset: vp-sales` |
-| `subagent_research` | 通用研究员（一次性调研） | `provider: spawn` · `agentPreset: researcher`（只读工具面） |
-| `system_architect` | 系统架构师 SA（落地项目，V 模型左侧） | `provider: spawn` · `maxDepth: 2` · `agentPreset: system-architect` |
-| `system_qa` | 系统质量保证 SQA·V&V（落地项目，V 模型右侧） | `provider: spawn` · `maxDepth: 2` · `agentPreset: system-qa` |
+| `subagent_research` | 只读调研执行手（一次性调研） | `provider: spawn` · `agentPreset: worker-researcher`（只读工具面） |
 | `vp_cmo` | CMO（命名专家：MRD/StRS；**只在 vp-eng preset**，CEO 的 vp_cmo 仍 maxDepth 1） | `provider: spawn` · `maxDepth: 2` · `agentPreset: cmo` |
 
 - **activation 语义**：调用立刻返回回执 `{ kind: 'activation', subagentId }`（线上文本形如
@@ -33,7 +31,7 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
   `backgroundMode` / `enableRunInBackground`（Config 硬拒）。每个工具行钉一个角色 preset，
   于是 child 拿到的是**该角色的 skills 与工具面**，而不是 CEO 的继承面。
 - **深度**：`maxDepth` 是绝对深度上限（`0` 禁止、`1` 只允许直接子代；行上不写则读 Host 默认 1）。
-  `vp_eng`/`vp_sales` 行是 1；`system_architect`/`system_qa` 行是 **2**——VP-Eng 可能是团队成员
+  `vp_eng`/`vp_sales` 行是 1——VP-Eng 可能是团队成员
   （depth 1，见 §3），他起的子代落在 depth 2。团队成员加人只能走命名委托：`spawn_teammate` 仅 Lead 可调。
 - **改稿方式**：优先 `send_to_subagent` 续同一个 named child（root/命名 child 都可用；带上一稿原文）；
   不可续或需要新上下文才再委派一次。CEO 团队的反复追加/互审仍归 team（`send_message` 按名）。
@@ -67,7 +65,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 
 任何没有 `parentSession` 的根会话都是 Lead（`agentTeam` 投影 = 单成员 `lead`）⇒ **VP-Eng 根门可以
 `spawn_teammate` 带研发小队**（成员继承 VP-Eng 组合，是"VP-Eng 带的工程师"，不是别的角色）。
-三种门的能力不同，别用一个门承诺另一个：① VP-Eng 根门 = Lead，能组 team、能命名请 CMO/SA/SQA；
+三种门的能力不同，别用一个门承诺另一个：① VP-Eng 根门 = Lead，能组 team、能命名请 CMO；
 ② CEO 命名 `vp_eng` child = 不是 member，不能 spawn，但能请专家（depth 2）；③ CEO teammate `vp-eng`
 = 继承 CEO 组合，受 CEO 的 `vp_cmo maxDepth 1` 限制。root=Lead 的 keyless 证据 =
 `probes/team/vp-eng-root-lead-probe.mjs`。
@@ -92,14 +90,14 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
    工具"限制已不在本仓复现；若回归，先看 vendor `tool-agent-team` README 的 Known Limitations）。
 2. **要自定义组合/多角色编排** ⇒ 四个职能角色的 `subagent_fork`（可续跑的自身分叉）+ 命名委托；
    `workflow` 是 vp-eng 的**同身份并行扇出**通道（`workflow-ptc` + `tool-workflow`，不能带 `agentPreset`，
-   不能替代 SA/SQA 的独立结论）；CEO 的编排面仍是 team + 命名委托；命名委托仍是**单职能快捷出稿**的主路。
+   不能替代独立结论）；CEO 的编排面仍是 team + 命名委托；命名委托仍是**单职能快捷出稿**的主路。
 3. **并行快捷派活**：多个工具调用可在同一轮并行发起；每个都是独立 activation，完成通知分别回来。
    要共享任务板/互审仍走 team。
 4. **控制面现状**：根会话是 Lead，`send_message` / `list_agents` / `wait_agent` / `interrupt_agent` 是团队版、
    只认名册成员，够不到根起的 `subagent` child（`list_agents` 只回 `lead`、`send_message` 报
    `active teammate not found`；机制 = §2）。根门改用 `list_subagents`（父会话 durable catalog，重启后可查）
    与 `send_to_subagent`（官方 `ctx.subagents`，续驶/催稿），名字不被 shadow。`subagent`/`subagent_fork` 行
-   `maxDepth: 2`：CEO 命名 child（depth 1）能生 depth 2 worker，depth 3 被拒（2026-11-08 E2E；默认 1 会让 VP 生不出 worker）。
+   `maxDepth: 3`：CEO→VP（1）→workflow 分支（2）→worker（3）放行；VP 根门→分支→worker 仍有余量（2026-11-09 源码：分支/成员都是 activation 子代，深度 parent+1）。重试敏感的小活可用 `subagent_retry`（host 原语，仅五个有 generic subagent 的 full role；同步、最多 2 attempts、attempts/exhausted 可见；长/批量走 workflow）；generic child 需要子层时 `agent_preset` 选 `worker-orchestrator`（它只带 leaf）。
 
 ## 5. UI：委派工具卡
 

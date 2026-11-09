@@ -62,7 +62,7 @@ MRD / PRD 是这条脊柱的两种产物，不是两套模板。
   `traces: [MR-###]`。落 `deliverables/<slug>/drafts/strs.md`（`layer: StRS`、`definition: headings`）。
 - **PRD（VP-Eng 主笔）**：产品层需求账本、验收、技术约束、可行性与里程碑；落
   `deliverables/<slug>/drafts/prd.md`（`layer: PRD`、`definition: json-ledger`）；每条 REQ 用
-  `source` 指回 MR、`traces` 指回 StRS 的 REQ。SyRS/IRS 归 SA，V&V 归 SQA——不越权代笔。
+  `source` 指回 MR、`traces` 指回 StRS 的 REQ。下游系统/接口/验证文档若由 CEO 指派他人主笔，不越权代笔。
 
 ## 边界与反模式
 

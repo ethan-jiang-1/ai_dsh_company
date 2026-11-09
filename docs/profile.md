@@ -37,7 +37,7 @@
 
 | 行 | 语义 | 状态 |
 |---|---|---|
-| `agent-preset-registry`（替换出厂行；default: ceo） | 五公司角色 + researcher 各一行 `agent-preset` 声明（`presets/<role>/agent.cordis.yml` 经 `dsh.bundle.patch` 数组并入） | ✅ dump 实测在列 |
+| `agent-preset-registry`（替换出厂行；default: ceo） | 六公司角色 + worker support 各一行 `agent-preset` 声明（`presets/<role>/agent.cordis.yml` 经 `dsh.bundle.patch` 数组并入） | ✅ dump 实测在列 |
 | `session-persistence-jsonl` | 会话持久化；team 激活前提 | ✅（base 已有） |
 | `tool-present`（insert） | 交付物声明（deliverables 卡片） | ✅ |
 | `agent-team` + `tool-agent-team`（insert） | 团队协作主通道（M4/D4） | ✅ |

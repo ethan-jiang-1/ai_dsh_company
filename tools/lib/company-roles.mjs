@@ -10,9 +10,9 @@
 export const COMPANY_ROLE_IDS = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo']
 
 /** 非角色的**委派子人格** preset id（0.2.1 起委托 child 的人格只能由 agentPreset 给）：
- *  `researcher` 是 CEO 通用委托的默认 child（只读调研手）——不是第五个职能，
+ *  `worker-researcher` 是 CEO 通用委托的只读 worker profile——不是第五个职能，
  *  所以**不进** COMPANY_ROLE_IDS（在场板/培养面/交付物署名都不该出现它），但它是本包声明并发布的一个 preset，
  *  故声明面门禁（presets 门禁的声明文件检查、preset-smoke 的真挂载）要一起覆盖。
- *  2026-11-06 追加 `system-architect` / `system-qa`：VP-Eng 在**落地项目**里起的两个专职子人格
- *  （V 模型左/右两侧；E 与 V 分会话分人格）。它们同样不是汇报线，不进编制/在场板/署名。 */
-export const COMPANY_SUPPORT_PRESET_IDS = ['researcher', 'system-architect', 'system-qa']
+ *  2026-11-09 追加 `worker` / `worker-orchestrator`：worker family 的 leaf 与小工头（RFC presets 委派面模型化重构）；
+ *  不是角色、不是子人格。它们进声明面/挂载/发布门禁，但不进 COMPANY_ROLE_IDS。 */
+export const COMPANY_SUPPORT_PRESET_IDS = ['worker', 'worker-researcher', 'worker-orchestrator']

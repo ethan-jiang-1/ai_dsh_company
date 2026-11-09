@@ -39,7 +39,7 @@ description: CEO 的组队方法：接到动议先过这六步（要不要叫人
    - 只要一份单职能稿 → `vp_eng` / `vp_sales` 直接委派（最便宜）；
      改稿 = `send_to_subagent` 续同一个 child（带上一稿）；不可续再委派一次。
    - **要 workflow / subagent 的研发取证或并行核查 → `vp_eng` 命名 child**：它拿的是 vp-eng
-     完整工具面（workflow / subagent / subagent_fork / SA / SQA）；`spawn_teammate` 的成员继承**你的**
+     完整工具面（workflow / subagent / subagent_fork）；`spawn_teammate` 的成员继承**你的**
      组合，**没有** workflow/subagent（CEO 团队里叫 "vp-eng" 的成员也不是 vp-eng preset）。
      复杂包既要"取证"又要"多轮落地"时：先 `vp_eng` 出证据/汇总，再组队落地（或再委派一次）。
      **命名 child 不是 team member**：终稿走完成通知；不要用 `wait_agent` / `list_agents` / `send_message`
@@ -62,10 +62,9 @@ description: CEO 的组队方法：接到动议先过这六步（要不要叫人
 
 默认在屋 = **CMO + VP-Eng**：CMO 出 MRD（`drafts/mrd.md`，`MR-###`），VP-Eng 接 MRD 出 PRD
 （`drafts/prd.md`，`REQ-###` / `AC-###-#` / slice）。**不默认叫全员**：
-- 需要外部市场事实才加 `researcher`（或让 CMO 先用 web/bash 取证）；
+- 需要外部市场事实才加 `worker-researcher`（或让 CMO 先用 web/bash 取证）；
 - 只有动议明确问到**现有客户/定价**才叫 VP-Sales；**交付承接**才叫 COO；**预算/毛利**才叫 CFO；
 - **两件及以上产物（如 MRD+PRD）或多职能协作必须走 team + 任务板**；`vp_*` 命名委托只用于用户明确只要一份、且只属一个职能的快捷出稿——两件套走快捷 = 没有 team/依赖图/面板，收口也没有互审；
-- **落地项目（非 demo）**：任务书写明让 VP-Eng 用 `system_architect` + `system_qa` 各起一个子代理（V 模型左/右两侧）；demo 不起；SQA 的否决原样进收口（VP-Eng 不能删）。
 - **owner 唯一，缺角不代行**：MRD 只归 CMO、PRD 只归 VP-Eng；`.dsh-company/kb/org.md` / `owners.md` 里查不到 CMO ≠ 让 VP-Sales 代行「市场」——先补编制或向用户报缺（写清缺哪个席位、影响什么），用户点名才例外；旧 journal 的「本部署无 CMO」不作数。
 - DAG：VP-Eng 的 PRD 任务 `blockedBy` CMO 的 MRD 任务；任务书写 MRD 路径，不口头转述；
 - 收口：CEO 只合稿与 `present`，不代写 MRD/PRD；MRD 与 PRD 的市场假设/可行性冲突时保留双方结论，交 CEO 拍板；

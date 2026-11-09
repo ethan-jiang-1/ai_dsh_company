@@ -169,7 +169,7 @@ profile（`profile` + `patches` 配置）、自己的 composition/skills/model r
 ### 通道 D · Workflow 脚本（vp-eng 专用，2026-11-08）
 
 `dsh-tool-workflow` + `workflow-ptc` 现在只在 vp-eng 的 `delegation` 组：脚本用 `parallel`/`pipeline`
-扇出同身份子代理，父只收最终 JSON；子代理无 `agentPreset`、fresh 上下文，不能替代 SA/SQA。它是一次 run，
+扇出同身份子代理，父只收最终 JSON；子代理无 `agentPreset`、fresh 上下文，不能替代独立结论。它是一次 run，
 不常驻组织；团队会话里的长 run 用后台 job，结果大时走聚合/异常（50k 上限 + spill）。
 
 ---

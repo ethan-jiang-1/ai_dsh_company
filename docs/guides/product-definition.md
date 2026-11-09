@@ -2,15 +2,14 @@
 
 > 什么时候读：新产品/新功能动议、写 MRD/StRS/PRD、或要校验结构时。
 > 角色语义 = [presets.md](../presets.md)；公司级规矩 = [content/AGENTS.md](../../packages/company-pack/content/AGENTS.md)；
-> 模板 = `content/templates/`；五层链与编号合同 = `content/state/process-docs.md`；共享打法 = `presets/_shared/skills/product-definition/`。
+> 模板 = `content/templates/`；编号合同 = `content/state/process-docs.md`；共享打法 = `presets/_shared/skills/product-definition/`。
 
 ## 谁做什么
 
-- **CEO**：按问题选人（默认 **CMO + VP-Eng**；要外部事实才加 researcher）；建 DAG；收口 `present`。
+- **CEO**：按问题选人（默认 **CMO + VP-Eng**；要外部事实才加 worker-researcher）；建 DAG；收口 `present`。
   **不默认叫全员**——动议没问的域不进屋（见 CEO skill `assembling-the-team`）。
 - **CMO**：市场机会 → **MRD**（`drafts/mrd.md`，`MR-###`）；涉众诉求 → **StRS**（`drafts/strs.md`，`REQ-###`，证据标【事实/假设】）。
 - **VP-Eng**：接 MRD/StRS → **PRD**（`drafts/prd.md`，`REQ-###`、验收 `AC-###-#`、slice）。
-- **SA**：PRD → **SyRS**（`drafts/syrs.md`）+ **IRS**（`drafts/irs.md`）；**SQA**：V&V 计划（`drafts/vv-plan.md`，`TC-###`）。
 - **VP-Sales / COO / CFO**：只有动议明确问到现有客户定价 / 交付承接 / 预算毛利才进屋。
 
 ## 交接（一条 DAG）
@@ -25,7 +24,7 @@ CEO 收口：final.md（产品决策/合并摘要，引用两份 draft）→ pre
 ## 产物结构
 
 - **MRD**：`json` 头（`mrd.opportunities[]` + `openQuestions`）+ 正文一页纸；`definition: json-ledger`。
-- **StRS / SyRS / IRS**：`layer` + `definition: headings` 头 + `### <ID>` 条目（字段 = 合同「条目形态」）。
+- **StRS（及按需的 SyRS / IRS）**：`layer` + `definition: headings` 头 + `### <ID>` 条目（字段 = 合同「条目形态」）。
 - **PRD**：`json` 头（`slices[]` + `requirements[]`）是**唯一定义点**；正文标题写成「需求说明：REQ-001」这类引用。
 - 编号**只增不改**：`MR-###`、`REQ-###`、`IF-###`、`TC-###`、`AC-###-#`；撤销用状态，不重排、不复用。
 
@@ -44,7 +43,7 @@ CEO 收口：final.md（产品决策/合并摘要，引用两份 draft）→ pre
 - REQ 的来源 `MR-###` 必须在 MRD 里存在，且**来源判词守边界**（no-go 不得进 PRD；defer 不得进 P0）；slice 存在且列出该 REQ；依赖存在且无环；
 - 状态合法、离开 `draft` 有 changeLog。
 
-`/req check <deliverables 目录名>` 管**编号/层/追溯/退役词/计数**（五层全链，含 StRS/SyRS/IRS/TC）；两者都是操作员命令，角色只能引用结果。
+`/req check <deliverables 目录名>` 管**编号/层/追溯/退役词/计数**（默认链 + 可选层，含 StRS/SyRS/IRS/TC）；两者都是操作员命令，角色只能引用结果。
 
 它只挡结构性错误，**不判断需求好坏/市场真伪**；红就退回作者改，不进研发。
 

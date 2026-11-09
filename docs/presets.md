@@ -20,13 +20,11 @@
 | `coo` | 梦之队 COO | system | — | R2 定稿 |
 | `cfo` | 梦之队 CFO | system | — | R2 定稿（增设） |
 | `cmo` | 梦之队 CMO | system | — | 2026-11-05 增设（市场机会/产品定义） |
-| `researcher` | 梦之队 Researcher | system | — | 0.2.1 增设（委派用，不是第五个职能——见下） |
-| `system-architect` | 梦之队 系统架构师（SA） | system | — | 2026-11-06 增设（落地项目的 V 模型左侧；子人格，不占编制） |
-| `system-qa` | 梦之队 系统质量保证（SQA · V&V） | system | — | 2026-11-06 增设（V 模型右侧；否决直达 CEO） |
+| `worker` / `worker-researcher` / `worker-orchestrator` | 梦之队 Worker（执行手 / 只读调研 / 小工头） | system | — | 2026-11-09 增设（leaf / 只读 / 可带 leaf；不占编制、不组队/不 workflow） |
 
 实测方式：web 观察窗的 `agentPresets/list` RPC（DSH 出厂 4〔cordis/minimal/ptc/standard，vendor `web-app/presets/`〕+ 本 pack 9，零 broken）。
 
-**子人格为什么存在（`researcher` / `system-architect` / `system-qa`）**：决定与输掉的方案见程序 Note `2026-11-07-requirements-teaming-program.md` §决定；委托行与 SQA 否决见 [delegation](delegation.md)。
+**worker-researcher 为什么存在**：它是 worker family 的只读调研档（CEO 的 `subagent_research`），不是角色、不是 specialist；SA/SQA 已退役，SyRS/IRS/V&V 如由 CEO 指派 owner 仍可按需使用模板。
 
 ## 四形态矩阵：身份、工具与 skills 从哪来（RFC preset-skill-matrix 2026-10-05 立）
 
@@ -37,7 +35,7 @@
 | 独立角色 preset 根会话（人选 preset 开门） | `presets/<role>/agent.cordis.yml` persona row | **preset 自声明**（自包含、无继承——见下「工具面」） | 人连接的 workspace；手册经 `agent-instructions` 注入、KB = cwd 的 `kb/<role>/` | `$DSH_HOME/sessions/<slug>/<id>/`（世代选择唯一口径 = session-log-generation） | `tool-ask-user` 直问人 |
 | CEO Lead 动议会话 | `presets/ceo/`（同上） | 同上（ceo 自声明，含 delegation 组） | `company-workspace`；spawn 队友 | 同上（Lead 目录） | Lead 直问人；成员升级 CEO |
 | teammate（Agent Teams 成员） | **继承 Lead 组合**（composeFrom ⇒ `agentPreset=ceo`）——身份来自成员名、任务书与手册注入，**不是成员角色的 preset** | 继承 Lead 组合（delegation 行无 `toolFilter` 不裁剪） | 同 Lead 工作区；读自己的 CHARTER | 各自 sessionId 目录（authorship 按 `team/member` 事件建 sessionId→成员名映射） | 动议内升级 CEO（不直问） |
-| 命名 child（activation） | **工具行钉的 `agentPreset`**（`vp_eng`→vp-eng / `vp_sales`→vp-sales / `subagent_research`→researcher；0.2.1 起人格与组合都由 preset 给，不再继承 Lead）——child 日志首帧 `agentPreset` 是唯一取证件，**名册角色名 ≠ 加载 preset** 这条旧坑以此字段核对（旧反例 = 2026-09-26 sea-reconcile，[authorship-audit](../checks/audit/authorship-audit.mjs) 头注） | 该 preset 自声明的那一套（role skills 随 preset 一起到） | 同 Lead | child 自带 sessionId 日志 | 经 Lead |
+| 命名 child（activation） | **工具行钉的 `agentPreset`**（`vp_eng`→vp-eng / `vp_sales`→vp-sales / `subagent_research`→worker-researcher；0.2.1 起人格与组合都由 preset 给，不再继承 Lead）——child 日志首帧 `agentPreset` 是唯一取证件，**名册角色名 ≠ 加载 preset** 这条旧坑以此字段核对（旧反例 = 2026-09-26 sea-reconcile，[authorship-audit](../checks/audit/authorship-audit.mjs) 头注） | 该 preset 自声明的那一套（role skills 随 preset 一起到） | 同 Lead | child 自带 sessionId 日志 | 经 Lead |
 
 改哪一列 → 哪个文件：persona/工具/skills → `presets/<role>/`（owner 表 = [pack README](../packages/company-pack/README.md)）；手册/模板/默认章程 → `packages/company-pack/content/`（只读；默认章程与状态首启只补缺到 `.dsh-company/`，实例才在 workspace）；生效时点 = 下文「生效边界按面」表。
 
@@ -62,7 +60,7 @@
 - **工作流（1 号）**：`eng-workflow`（接活→备料→深挖→出稿→回执）；打法 skill =
   `tech-feasibility-review`（选项枚举 ≥3 → 逐项可行性·成本·风险 → 结论先行）。
 - **PRD 主笔**：接 CMO 的 MRD+StRS 写产品层 PRD（`drafts/prd.md`：REQ/AC/slice，`source`→MR、`traces`→StRS），用 `prd-playbook` + 共享 `product-definition`；`/prd check`（结构）+ `/req check`（编号/追溯）校验。
-- **组队（2 号工作流）**：`eng-teaming` 五档（自己做 / 一次性 worker / 并行扇出（workflow）/ 命名专家 / 持久小队）；vp-eng 根门 = Team Lead，可带研发小队；CMO/SA/SQA 走命名委托（`vp_cmo` / `system_architect` / `system_qa`，depth 2）。
+- **组队（2 号工作流）**：`eng-teaming` 五档（自己做 / 一次性 worker / 并行扇出（workflow）/ 命名专家 / 持久小队）；vp-eng 根门 = Team Lead，可带研发小队；CMO 走命名委托（`vp_cmo`，depth 2）。
 - **KB**：`kb/vp-eng/CHARTER.md`（研发条线 16 人、SRE 2 / 无 DBA、Node 22 + SQLite、AI 试点
   API 每案 $200/月硬顶；历史评审三问）+ `journal/`。
 - **验证**：Web 会话选 `vp-eng` → 身份探针 + 产出探针（PRD 出稿：REQ/AC/slice；评审意见；不得越权替销售/运营下结论）。
@@ -124,9 +122,9 @@
 | 角色 | 工具行 | 说明 |
 |---|---|---|
 | CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` / **`tool-web`** + `delegation` 组（`subagent_research` / `vp_eng` / `vp_sales` 三行） | 读 KB、写交付物、加载 skill、澄清提问、声明交付、**上网（搜/取）**；**汇报线两条路**（R3）：命名委托 = activation 快捷出稿（终稿走完成通知），协作走 team；编排面 = team + 命名委托；workflow 归 vp-eng（同身份扇出，见下行）；语义见 [delegation.md](./delegation.md) |
-| VP-Eng / VP-Sales / COO / CFO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-present` / **`tool-ask-user`** / **`tool-web`** + `delegation` 组 | 独立会话可直接问人；动议内仍升级 CEO——手册「问人两条路」两模式约束（承诺权与单一对外口径不动，R3/D18 维持）；`delegation` 供深挖调研 / 盘点 / 测算；VPS 引客户事实时可用 web 核价/竞品；vp-eng 另有 `workflow-ptc` + `tool-workflow`（同身份并行扇出）；五个职能的 `subagent` / `subagent_fork` 行 `maxDepth: 2`（被 CEO 委派时也能生 worker；worker 到 depth 2 不能再往下） |
+| VP-Eng / VP-Sales / COO / CFO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-present` / **`tool-ask-user`** / **`tool-web`** + `delegation` 组 | 独立会话可直接问人；动议内仍升级 CEO——手册「问人两条路」两模式约束（承诺权与单一对外口径不动，R3/D18 维持）；`delegation` 供深挖调研 / 盘点 / 测算；VPS 引客户事实时可用 web 核价/竞品；vp-eng 另有 `workflow-ptc` + `tool-workflow`（同身份并行扇出）；五个职能的 `subagent` / `subagent_fork` 行 `maxDepth: 2`，**vp-eng 的通用两行是 3**（CEO→VP→workflow 分支→worker 长链；见 [delegation.md](./delegation.md)）；vp-eng 的 generic child 可选 `worker` / `worker-orchestrator` |
 | 全体 | **`tool-jobs`**（后台任务）/ **`tool-goal` + `/goal`**（跨轮目标）/ **`compaction` 组**（compaction-basic + `/compact` + tool-result-pruner：长会话历史压缩）/ delegation 组内 **`subagent_fork`**（可续跑自身分叉；**四个职能角色有，CEO 不挂**——CEO 会话的 team 工具 shadow 续驶控制名，挂了是死行只会骗模型）/ **`planning` 组**（`plan-mode`：先探索后落笔 / `exit_plan_mode` 唯一收尾）/ `preset-clock` 组（`time-context` 日期通道钉 `Asia/Shanghai` + `tool-schedule` 四件） | 行形状的范本 = `vendor/dsh/packages/bundle/web-app/presets/standard.patch.yml`；fork 编排位 = [delegation.md](./delegation.md) §4；session-query 授权域 = 本工作区（跨角色可查，合稿引用校对受益）；「上次动议定了什么」先查会话全文再问人；clock 宿主 `schedule` 服务由 web-app 组合提供；五角色另有**条件启用**的 browser 组（npm 发布版 DSH 不含 browser 两包，缺包时整组禁用、角色照常可用；装包后自动开，`DSH_COMPANY_BROWSER` 可强制）；**会话检索工具不在此列**——由 bundle 的 `company-session-search` 隔离组全局提供（见下一行） |
-| CEO（编排面） | **无 workflow 行**；vp-eng 的 `delegation` 组有 `workflow-ptc` + `tool-workflow`（同身份扇出，不能带人格） | 编排面 = team + 命名委托；vp-eng 用 workflow 做并行取证/覆盖审计，不替代 SA/SQA |
+| CEO（编排面） | **无 workflow 行**；vp-eng 的 `delegation` 组有 `workflow-ptc` + `tool-workflow`（同身份扇出，不能带人格） | 编排面 = team + 命名委托；vp-eng 用 workflow 做并行取证/覆盖审计，不替代独立结论 |
 | 全局（pack bundle） | `agent-preset-registry` roster 替换 + 全局行 insert（`tool-present` / `agent-team` / `tool-agent-team` / `ui-agent-team` / `company-client` / `company-session-search` / `time-context` 等——行清单唯一源 = [cordis.patch.yml](../packages/company-pack/cordis.patch.yml)） | 只放全局行；工具面主体仍随 preset（**例外 = 会话检索隔离组**：工具必须与 isolated provider 同组，否则工具看的是未打开的 host provider）；`company-session-search` 用 insert + isolate，不替换 base 的 `session-query-sqlite`（改值替换会让默认的应用内安装红） |
 
 ⚠ **preset 是自包含组合**：DSH 无 patch 继承，工具行必须写在 preset 里（会话检索是唯一例外：工具必须与 isolated provider 同组）——R1 首跑就是漏了这一步，

@@ -11,12 +11,12 @@
 | 1 | **MRD** 市场需求 | 该不该做、为谁做、凭什么赢 | CMO | `drafts/mrd.md` | `json-ledger` | `MR-###` |
 | 2 | **StRS** 涉众需求 | 谁在乎、在乎什么、验收时谁点头 | CMO | `drafts/strs.md` | `headings` | `REQ-###` |
 | 3 | **PRD** 产品需求 | 我们卖的到底是什么产品 | VP-Eng | `drafts/prd.md` | `json-ledger` | `REQ-###` / `AC-###-#` |
-| 4 | **SyRS** 系统需求 | 系统作为黑盒必须满足什么、每条怎么验 | SA | `drafts/syrs.md` | `headings` | `REQ-###` |
-| 5 | **IRS** 接口需求 | 跨边界的接口长什么样 | SA | `drafts/irs.md` | `headings` | `IF-###` |
-| — | 分配附录 | 需求落到子系统 / 采购件 | SA | IRS 附录 `allocation.md` | `none` | 不立号 |
-| **V&V** 验证计划 | 怎么验证、谁执行 | SQA | `drafts/vv-plan.md` | `table-rows` | `TC-###` |
+| 4 | **SyRS** 系统需求 | 系统作为黑盒必须满足什么、每条怎么验 | <assigned> | `drafts/syrs.md` | `headings` | `REQ-###` |
+| 5 | **IRS** 接口需求 | 跨边界的接口长什么样 | <assigned> | `drafts/irs.md` | `headings` | `IF-###` |
+| — | 分配附录 | 需求落到子系统 / 采购件 | <assigned> | IRS 附录 `allocation.md` | `none` | 不立号 |
+| **V&V** 验证计划 | 怎么验证、谁执行 | <assigned> | `drafts/vv-plan.md` | `table-rows` | `TC-###` |
 
-**顺序固定，前一份是后一份的输入，不跳级**：MRD → StRS → PRD → SyRS → IRS。下游不替上游做决定。
+**默认链**：MRD → StRS → PRD。SyRS / IRS / V&V 是可选层，由 CEO 指派 owner 才做；做了仍按原顺序，下游不替上游做决定。
 `final.md`、评审稿、任务书**不声明 `layer`**——它们只是引用面，不定义任何号。
 
 ## 编号规则（R1–R10）

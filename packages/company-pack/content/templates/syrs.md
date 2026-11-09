@@ -5,7 +5,7 @@ definition: headings
 
 # SyRS（系统需求 · 系统作为黑盒必须满足什么、每条怎么验）
 
-> 主笔 = **SA**（系统架构师）；输入 = 同目录 `drafts/prd.md`；落 `drafts/syrs.md`。
+> 主笔 = **<assigned>**；输入 = 同目录 `drafts/prd.md`；落 `drafts/syrs.md`。
 > `shall` 句式、单一可验证、带验证方法与追溯；**不写设计**（模块划分 / 代码结构归架构稿）。
 > 定义点 = `### REQ-###` 标题（`definition: headings`）；每条必须带行首 `traces: [REQ-###]`（上游 PRD）。
 
@@ -17,8 +17,8 @@ definition: headings
 
 - kind: FR
 - status: 草案
-- owner: system-architect
-- verifier: <SQA / 第三方实验室 / 客户现场>
+- owner: <assigned>
+- verifier: <assigned / 第三方实验室 / 客户现场>
 - traces: [REQ-002]
 - 需求（shall）：系统应当…
 - 验证方法：测试 / 分析 / 演示 / 检验（可组合）

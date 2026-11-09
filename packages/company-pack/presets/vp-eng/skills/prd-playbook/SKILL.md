@@ -39,7 +39,7 @@ description: VP-Eng 的 PRD 打法：接 CMO 的 MRD+StRS，产出产品层可�
 ## 边界
 
 - 不替 CMO 判断"有没有人买"；不替 VP-Sales 定价；不替 COO 承诺交付日期。
-- **只写产品层**：SyRS/IRS 归 system_architect（SA）、V&V 归 system_qa（SQA）——不代笔、不预填。
+- **只写产品层**：下游系统/接口/验证文档若由 CEO 指派他人主笔，不代笔、不预填。
 - 技术不可行 / 成本失控 / 风险不可接受 → veto + 一句话理由；MRD 与 PRD 冲突时保留双方结论，
   交 CEO 拍板。
 - PRD 通过后，研发按"一 REQ 一任务"进任务板；验收按 AC 号核，不按"感觉做完了"。

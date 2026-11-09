@@ -256,6 +256,23 @@ const CSS = `
 .wk-node[data-status='completed'] .wk-dag-card,
 .wk-node[data-status='completed'] .wk-dag-node { opacity: 0.55; }
 
+/* 委派流程（DagTab 体内；只读树）。类名与委派卡 .wk-delegation 分开，避免吃卡片色带。 */
+.wk-delegation-flow { margin-top: 10px; border-top: 1px solid var(--dsw-alias-border-l2); padding-top: 8px; }
+.wk-delegation-flow-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-bottom: 6px; }
+.wk-delegation-flow-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.wk-delegation-flow-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; }
+.wk-delegation-flow-branch { position: relative; flex: none; width: 14px; height: 1.4em; }
+.wk-delegation-flow-branch::before {
+  content: ''; position: absolute; left: 6px; top: 0; bottom: 50%;
+  border-left: 1px solid var(--dsw-alias-border-l2);
+}
+.wk-delegation-flow-branch[data-last='true']::after {
+  content: ''; position: absolute; left: 6px; top: 50%; width: 8px;
+  border-top: 1px solid var(--dsw-alias-border-l2);
+}
+.wk-delegation-flow-label { font-weight: 600; color: var(--dsw-alias-label-primary); overflow-wrap: anywhere; }
+.wk-delegation-flow-depth { color: var(--dsw-alias-label-tertiary); font-variant-numeric: tabular-nums; }
+
 /* ── S2 皮肤：旧组件（委派卡 / 任务板弹窗 / 驾驶舱行）令牌化 ── */
 
 /* 委派工具卡：左边色带表状态（绿=已交稿 / 红=失败 / 黄=中止 / 中性=进行中） */

@@ -11,9 +11,9 @@ intent: 把「架构/验证稿到底行不行」从我口头的判断变成可�
 
 | 层 | 资产 | 判什么 | 结果 |
 |---|---|---|---|
-| 收口 | `probes/team/sa-sqa-closeout-audit.mjs` | 接线是否真成立（CEO→VP-Eng→SA/SQA）、否决是否进收口 | 3 轮各 10/10 PASS |
-| 结构 | `probes/team/sa-sqa-quality-audit.mjs` | 接口完整度、判据在场、V 模型四层、声称一致 | run1/run4 全过；run2 缺 V 模型层级（改动前产物） |
-| 领域 | `probes/team/sa-sqa-domain-audit.mjs` | 产品同一性、I²R 算术、标准与量族匹配 | run2 产品漂移（力学件）；I²R 5 条对账自洽 |
+| 收口 | SA/SQA 资产（已退役删除） | 接线是否真成立（CEO→VP-Eng→SA/SQA）、否决是否进收口 | 3 轮各 10/10 PASS |
+| 结构 | SA/SQA 资产（已退役删除） | 接口完整度、判据在场、V 模型四层、声称一致 | run1/run4 全过；run2 缺 V 模型层级（改动前产物） |
+| 领域 | SA/SQA 资产（已退役删除） | 产品同一性、I²R 算术、标准与量族匹配 | run2 产品漂移（力学件）；I²R 5 条对账自洽 |
 
 ## 逐条核过的量化主张（run4 的 SA 稿）
 

@@ -15,6 +15,10 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-09-delegation-residuals-closeout.md](settled_issues/2026-11-09-delegation-residuals-closeout.md) | 已结；P-H/P-I 确定性注入、worker-workflow no-go、companyDelegationTerminal 投影；1300、6+3、9 页签全绿；去向 = [残差收口 Note](../../notes/implemented/2026-11-09-delegation-residuals-closeout.md) | 2026-11-09 |
+| [2026-11-09-retire-sa-sqa.md](settled_issues/2026-11-09-retire-sa-sqa.md) | 已结；退役 system-architect/system-qa：目录/父行/patch/support/模型 specialist/文档/测试/探针清理；worker family 保留；6+3、1297、verify 全绿；去向 = [退役 Note](../../notes/implemented/2026-11-09-retire-sa-sqa.md) | 2026-11-09 |
+| [2026-11-09-specialist-worker-taxonomy.md](settled_issues/2026-11-09-specialist-worker-taxonomy.md) | 已结；researcher→worker-researcher（只读 named-only worker profile）；SA/SQA 升 specialist（skills/authority）；删 leaf；CEO subagent_research 改钉；P-L + preset-smoke 6+5 + 全量绿 | 2026-11-09 |
+| [2026-11-09-presets-delegation-architecture.md](settled_issues/2026-11-09-presets-delegation-architecture.md) | 已结；模型/两层合同/静态矩阵/UI 树+completed/failed/retry/worker leaf+小工头；P5 不生成、P-I host 不自动重试；worker-workflow planned；去向 = [Note](../../notes/implemented/2026-11-09-presets-delegation-model.md) | 2026-11-09 |
 | [2026-11-08-vpeng-workflow-channel.md](settled_issues/2026-11-08-vpeng-workflow-channel.md) | 已结；vp-eng 接入 workflow 同身份扇出（两行 + 两 peer + 五档 skill + 文档/Note）；Step 0 最小 workflow 绿（danger-full-access）、常驻行为 probe ALL PASS；去向 = [Note](../../notes/implemented/2026-11-08-vpeng-workflow-channel.md) | 2026-11-08 |
 | [2026-11-08-user-facing-readme-and-first-use.md](settled_issues/2026-11-08-user-facing-readme-and-first-use.md) | 已结；README/手册改使用者面向 + 「第一次经营一家公司」六步 + 凭据/支持口径；`readme-manual-commands` 门先红后绿；冷读 README 7.0/7、手册 7/7；去向 = [Note](../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md) | 2026-11-08 |
 | [2026-11-07-sa-sqa-capability-organization.md](settled_issues/2026-11-07-sa-sqa-capability-organization.md) | 已结；SA/SQA 能力组织按场景取用学科域（A+C：固定五行 + 任务书统一声明 + SQA 逐行域审计）；纯软件 live 真跑 R0–R7 全绿 | 2026-11-08 |
@@ -30,7 +34,7 @@
 | [2026-11-07-requirements-e2e.md](settled_issues/2026-11-07-requirements-e2e.md) | 已结；A8 五层真跑（重跑一次 ALL PASS：checker 绿 MR4/REQ44/IF8/TC49） | 2026-11-07 |
 | [2026-11-07-vpeng-teaming.md](settled_issues/2026-11-07-vpeng-teaming.md) | 已结；B1 VP-Eng 组队（vp_cmo + eng-teaming 四档 + 继承口径修正） | 2026-11-07 |
 | [2026-11-07-vpeng-evidence-closeout.md](settled_issues/2026-11-07-vpeng-evidence-closeout.md) | 已结；B2 VP-Eng 包 E2E + CEO 回归（ALL PASS）+ 程序收口 | 2026-11-07 |
-| [2026-11-06-system-architect-sqa.md](settled_issues/2026-11-06-system-architect-sqa.md) | 已结；VP-Eng 落地项目的 E/V 分家：SA + SQA 两个委派子人格（子人格档）、委托行 `maxDepth: 2`、SQA 否决直达 CEO；真模型 E2E 证两独立会话/preset/depth=2；去向 = [SA/SQA Note](../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md) | 2026-11-06 |
+| [2026-11-06-system-architect-sqa.md](settled_issues/2026-11-06-system-architect-sqa.md) | 已结；VP-Eng 落地项目的 E/V 分家：SA + SQA 两个委派子人格（子人格档）、委托行 `maxDepth: 2`、SQA 否决直达 CEO；真模型 E2E 证两独立会话/preset/depth=2；去向 = [SA/SQA Note](../../notes/archived/2026-11-06-sa-sqa-subpersonas.md) | 2026-11-06 |
 | [2026-11-03-repo-hygiene-round6.md](settled_issues/2026-11-03-repo-hygiene-round6.md) | 已结；fresh agent 七维复评（落地后 A-/A/A-/A-/A-/A-/A-）+ 三棵测试树层次化 + 腐化通道四条机械面（retired-claims / command-refs / dist-manual 同源 / ledger 顺序）+ 错误中继与 D7 两项；去向 = [context-rot-guards Note](../../notes/implemented/2026-11-03-context-rot-guards.md) 等 9 篇 | 2026-11-03 |
 | [2026-11-03-repo-hygiene-round5.md](settled_issues/2026-11-03-repo-hygiene-round5.md) | 已结（消化）；A–F 各批已落地或被第六轮承接；残余 = npm publish（外部）与零入链分诊（已定性不批量迁） | 2026-11-03 |
 | [2026-11-02-remove-trajectory-terminal-ui.md](settled_issues/2026-11-02-remove-trajectory-terminal-ui.md) | 已结；pack 禁 `ui-trajectory` / `ui-sidebar-terminal` 两行，主区 = Chat + 培养、右栏无 New terminal；组合面 + 真页面验收通过；去向 = [Note](../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md) | 2026-11-03 |

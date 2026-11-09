@@ -239,8 +239,8 @@ try {
   mkdirSync(rehearsal, { recursive: true })
   const created = await rpc('session/create', { request: { cwd: rehearsal, agentPreset: 'ceo' } })
   check('session/create 挂上 ceo', created?.agentPreset === 'ceo' || created?.preset === 'ceo', JSON.stringify(created).slice(0, 120))
-  const createdResearch = await rpc('session/create', { request: { cwd: rehearsal, agentPreset: 'researcher' } })
-  check('session/create 挂上 researcher', createdResearch?.agentPreset === 'researcher' || createdResearch?.preset === 'researcher', JSON.stringify(createdResearch).slice(0, 120))
+  const createdResearch = await rpc('session/create', { request: { cwd: rehearsal, agentPreset: 'worker-researcher' } })
+  check('session/create 挂上 worker-researcher', createdResearch?.agentPreset === 'worker-researcher' || createdResearch?.preset === 'worker-researcher', JSON.stringify(createdResearch).slice(0, 120))
   const html = await (await request('/', { headers: { cookie } })).text()
   check('浏览器模块表含 dsh-company-pack/client.js', html.includes('dsh-company-pack/client.js') || html.includes('"dsh-company-pack"'))
 

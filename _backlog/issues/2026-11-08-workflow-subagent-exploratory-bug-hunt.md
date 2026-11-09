@@ -19,7 +19,7 @@ opened: 2026-11-08
 - 本研究题的完整 briefing、场景矩阵、fixtures、harness、判据、预算和交接步骤在[研究材料](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。该材料目前是机制依据与初版计划草稿，不是结果；原有固定矩阵含已识别的深度、成功判据与轮数矛盾，须按本卡重新收敛，不得原样执行。
 - 归档的委派拓扑研究[机制材料](../_archive/research/vp-eng-delegation-topology/2026-11-08-topology.md)解释 workflow 与 subagent 的互补职责、质量保证边界、复杂任务判据、模板、风险及上游历史；它也是本轮 charters 的设计依据，不是当前执行授权。
 - 当前合同与模型面 owner 包括 [delegation 合同](../../docs/delegation.md)、[VP-Eng eng-teaming](../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md)、[VP-Eng eng-workflow](../../packages/company-pack/presets/vp-eng/skills/eng-workflow/SKILL.md)、[CEO team 路由 skill](../../packages/company-pack/presets/ceo/skills/assembling-the-team/SKILL.md)、[VP-Eng preset](../../packages/company-pack/presets/vp-eng/agent.cordis.yml) 和 [CEO preset](../../packages/company-pack/presets/ceo/agent.cordis.yml)。tool 行以 preset 为准，docs 为合同摘要。
-- 现有真模型入口探针 [vp-eng-workflow-probe](../../probes/team/vp-eng-workflow-probe.mjs) 覆盖两题：N≥3 同构事实应调用 workflow；独立 V&V 应走 `system_qa` 且不以 workflow 替代。它是窄回归锚点，不足以替代本轮 bug hunt。
+- 现有真模型入口探针 [vp-eng-workflow-probe](../../probes/team/vp-eng-workflow-probe.mjs) 覆盖两题：N≥3 同构事实应调用 workflow；独立 V&V 已无专职 preset，改由 CEO 按需指派；不得以 workflow 冒充独立结论。它是窄回归锚点，不足以替代本轮 bug hunt。
 - DSH 机制一手来源、对应段落和本仓边界已在[研究材料 §1–§3](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)逐项列出。要确认 API 或失败语义时回到材料引用的 `vendor/dsh` workflow/subagent/team README、subsystem 文档与源码，不凭记忆推断。
 - 确认的关键失败分类：workflow child 非 completed 或缺 structured result 可折为 `null`；child startup 拒绝 `AGENT_START`、child result promise rejection `AGENT_RESULT`、取消和 fatal script error 不能作为普通 child 失败吞掉。`stopReason: error` 本身不能证明可重试。subagent `started` 只代表 activation accepted，不能当作完成。入口 depth 不同，已知 workflow 本身没有 maxDepth 闸不应报成新 bug。
 - 隔离与测试限制：`runtime/rehearsal-workspace` 持久且旧 journal 可能误导；`ensureRehearsalWorkspace` 只幂等成型，不清旧状态。真模型探针不进 `pnpm test`；keyless fake-provider/纯逻辑测试与真模型行为观察必须分开报告。详见研究材料 §2、§8–§12 及所链接的 repo 合同。
@@ -81,7 +81,7 @@ opened: 2026-11-08
 **不做：**
 
 - 不宣称一次没有命中 bug 即系统稳定、没有其他 bug 或达到长期采纳率。
-- 不把 workflow child/generic subagent 的同模异线程结果称为独立人格评审；独立结论仍由命名 SA/SQA 或人负责。
+- 不把 workflow child/generic subagent 的同模异线程结果称为独立人格评审；独立结论仍由人负责。
 - 不把 `started subagent` 当完成；不把 `null`、`error`、取消、拒绝、max-tokens 与 infrastructure failure 合并成可重试类别。
 - 不改 `vendor/dsh/`；不因本卡或 research 草稿自行改 preset、skill、合同、Note 或业务实现。修复和行为改变需有对应授权。
 - 不写真实 `company-workspace`，不打印/提交凭据，不清理共享 rehearsal workspace 历史；每个 trial 用唯一目录与 allowlist 清理。

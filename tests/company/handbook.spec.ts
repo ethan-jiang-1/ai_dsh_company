@@ -68,4 +68,36 @@ describe('registerHandbook', () => {
       expect(sections[0]?.text()).toContain('只认本手册的规则')
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
+
+  it('skipPresets：worker 不注册公司手册（执行手不是公司角色）', () => {
+    const dir = content()
+    const sections: Array<{ name: string }> = []
+    const listeners = new Map<string, ((payload: unknown) => void)[]>()
+    let injected = false
+    const ctx = {
+      logger: { warn: () => {} },
+      on: (name: string, listener: (payload: unknown) => void) => {
+        listeners.set(name, [...(listeners.get(name) ?? []), listener])
+      },
+    }
+    const agent = {
+      ctx: {
+        get: (name: string) => name === 'agentPresets' ? { composedPreset: () => 'worker' } : undefined,
+        inject: (_deps: readonly string[], callback: (scope: unknown) => void) => {
+          injected = true
+          callback({ systemPrompt: { section: (section: { name: string }) => {
+            sections.push(section)
+            return () => {}
+          } } })
+          return { dispose: async () => {} }
+        },
+      },
+    }
+    try {
+      registerHandbook(ctx as never, dir, undefined, { skipPresets: ['worker'] })
+      for (const listener of listeners.get('agent/created') ?? []) listener({ agent })
+      expect(injected).toBe(false)
+      expect(sections).toHaveLength(0)
+    } finally { rmSync(dir, { recursive: true, force: true }) }
+  })
 })

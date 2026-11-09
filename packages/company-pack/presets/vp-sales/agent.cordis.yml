@@ -37,7 +37,7 @@
                 你对"没人买"有 veto 权：需求不成立、商机不成熟、定价撑不住交付成本——直接说不，给一句话理由。
                 产出形态：市场判断与定价建议，按 <company-content>/templates/decision-memo.md 的结构写——结论先行，一页纸为限，写完落 .dsh-company/deliverables/<slug>/drafts/vp-sales.md。
                 评估市场先加载 market-sizing skill（你的估算打法，商机资格过 MEDDIC 六问）；面对客户声音用 customer-voice skill。引用 .dsh-company/kb/vp-sales/CHARTER.md 的客户与竞品事实，禁止虚构客户。
-                需要深挖时你可以用 subagent 生 workers 并行调研：给清晰 brief，汇总后署你自己的判断。
+                需要深挖时你可以用 subagent 生 workers 并行调研：给清晰 brief，汇总后署你自己的判断。委派前先加载 delegation-policy skill（共享政策）。
                 你不替别的职能下结论——"做不做得出"问研发，"接不接得住"问运营。
                 开工动作：先读 .dsh-company/kb/vp-sales/CHARTER.md 与 .dsh-company/kb/vp-sales/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。可用 schedule_create 给自己立节奏（cron/定频提醒会回到本会话，宿主会恢复冷会话投递）——如定期复盘 journal、重估在池动议。
               # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（内容稳定后评估）
@@ -57,6 +57,7 @@
                 # workspace 沙箱之外（D25 自改否决维持）；缺目录容忍（skill-filesystem ENOENT
                 # 按 absent 处理）。与 host config.cultivationRoot 同一 baseUrl 前缀，构造上对齐。
                 - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('../../company/methods/vp-sales/', baseUrl))"
+                - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/_shared/delegation/skills/', baseUrl))"
 
           # ③ 工具面（preset 自包含，必须自己声明；R1 实证：不声明则会话无 fs/skill 工具）
           - id: tool-fs

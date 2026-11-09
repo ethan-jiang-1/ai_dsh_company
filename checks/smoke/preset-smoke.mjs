@@ -31,27 +31,31 @@ const PROFILE = arg('profile', 'company')
 // `--cwd` 可显式覆盖（确需指回真盘时）。
 const CWD = resolve(arg('cwd', join(ROOT, REHEARSAL_REL)))
 const ROLES = COMPANY_ROLE_IDS
-// 0.2.1：委派子人格（researcher）也随包发布 ⇒ 它必须能真挂上（CEO 的 subagent_research 依赖它）。
+// 0.2.1：只读调研 worker（worker-researcher）也随包发布 ⇒ 它必须能真挂上（CEO 的 subagent_research 依赖它）。
 // 它不是职能 ⇒ 只断言 roster/挂载，不断言 skills 面（它没有专属 skills）。
 const SUPPORT_PRESETS = COMPANY_SUPPORT_PRESET_IDS
 const OUR_PACKAGE = 'dsh-company-pack'
 
 /** 该角色目录里实际存在的 skill（preset 约定：目录名 = skill 名）。
- *  外加**共享 skills**（`presets/_shared/skills/`）：那是多角色共用的能力目录（首个用例 =
- *  2026-11-05 CMO 与 VP-Eng 共用的 product-definition）。断言口径 = 该 preset 在
- *  `agent.cordis.yml` 里**真声明了** `_shared/skills/`，而不是“目录存在就算”——否则一只
+ *  外加**共享 skills**：`_shared/skills/`（product-definition）与
+ *  `_shared/delegation/skills/`（delegation-policy）。断言口径 = 该 preset 在
+ *  `agent.cordis.yml` 里**真声明了**对应根，而不是“目录存在就算”——否则一只
  *  共享目录会让没声明它的角色也进 expected，掩盖真泄漏；反之声明了却不建目录则仍是红。 */
 const roleSkills = (role) => {
   const presetDir = join(ROOT, 'packages/company-pack/presets', role)
   const own = readdirSync(join(presetDir, 'skills'), { withFileTypes: true })
     .filter(entry => entry.isDirectory())
     .map(entry => entry.name)
-  const declaresShared = readFileSync(join(presetDir, 'agent.cordis.yml'), 'utf8').includes('presets/_shared/skills/')
-  const shared = declaresShared
-    ? readdirSync(join(ROOT, 'packages/company-pack/presets/_shared/skills'), { withFileTypes: true })
+  const yml = readFileSync(join(presetDir, 'agent.cordis.yml'), 'utf8')
+  const sharedRoots = [
+    ['presets/_shared/skills/', join(ROOT, 'packages/company-pack/presets/_shared/skills')],
+    ['presets/_shared/delegation/skills/', join(ROOT, 'packages/company-pack/presets/_shared/delegation/skills')],
+  ]
+  const shared = sharedRoots.flatMap(([token, dir]) => yml.includes(token)
+    ? readdirSync(dir, { withFileTypes: true })
       .filter(entry => entry.isDirectory())
       .map(entry => entry.name)
-    : []
+    : [])
   return [...new Set([...own, ...shared])].sort()
 }
 
@@ -206,7 +210,7 @@ try {
   //    （deployer 根；旧 profile 路径与 M3 后的 home 路径都收）——方法层是数据，不是组合泄漏；
   //    不把它算进 expected 会在 adopt 过的 home 里假红。`includeDefaultRoots` 默认 true 时，
   //    角色会话会额外看见项目根/用户级技能集（`~/.agents/skills` 等），本条仍抓这个泄漏。
-  // 子人格里带 skills 的（system-architect / system-qa）同样要证明硬隔离；researcher 没有 skills 目录，跳过。
+  // support preset 目前没有 skills 目录；worker-researcher 只读由 spec 守，smoke 只证明能挂载。
   const skillBearing = [...ROLES, ...SUPPORT_PRESETS.filter(preset => existsSync(join(ROOT, 'packages/company-pack/presets', preset, 'skills')))]
   for (const role of skillBearing) {
     await check(`${role} 只看见自己的 skills`, async () => {

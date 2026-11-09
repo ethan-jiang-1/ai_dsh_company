@@ -2,8 +2,8 @@
 // 状态：常驻
 // 何时跑：改 vp-eng 的 workflow 两行 / eng-teaming 判据 / 通道选择规则后；卡 A 验收 5（行为烟测）。
 // 为什么存在：preset-smoke 只证「挂得上」，不证「模型按判据选通道」。
-//   本探针两条题：A = N≥3 同构取证（应选 workflow）；B = 独立 V&V（应选 system_qa，且不用 workflow 替代）。
-// 判据：A 的 tool/call 含 workflow ≥1；B 含 system_qa ≥1 且 workflow=0。
+//   本探针：N≥3 同构取证应选 workflow。独立 V&V 已无专职 preset，不再由本探针覆盖。
+// 判据：tool/call 含 workflow ≥1。
 // 成本：真模型 2 会话 / 2 条 prompt，约 2–5 分钟；不进 pnpm test。
 // 用法：source run/env.sh && node probes/team/vp-eng-workflow-probe.mjs
 import { spawn } from 'node:child_process'
@@ -66,20 +66,9 @@ try {
   console.log(`[A] calls=${JSON.stringify(ca)} workflow=${String(workflowA)}`)
   console.log(`[A] tail: ${tail(ra)}`)
 
-  const b = await mk()
-  const rb = await ask(b, [
-    '先加载 eng-teaming skill，按它的判据选通道。这份系统设计需要一个独立的 V&V 结论（不是你自己评估）。',
-    '选一条通道并调用一次；子代理 brief 只要一句「只回复：收到」。不要用 workflow 代替独立结论。',
-  ].join('\n'))
-  const cb = calls(rb)
-  const qaB = cb.filter(n => n === 'system_qa').length
-  const wfB = cb.filter(n => n === 'workflow').length
-  console.log(`[B] calls=${JSON.stringify(cb)} system_qa=${String(qaB)} workflow=${String(wfB)}`)
-  console.log(`[B] tail: ${tail(rb)}`)
-
-  const ok = workflowA >= 1 && qaB >= 1 && wfB === 0
-  console.log(ok ? 'vp-eng-workflow-probe: ALL PASS（A 用 workflow；B 用 system_qa）'
-    : 'vp-eng-workflow-probe: FAIL（通道选择不符：A 需 workflow，B 需 system_qa 且不得用 workflow）')
+  const ok = workflowA >= 1
+  console.log(ok ? 'vp-eng-workflow-probe: ALL PASS（N≥3 同构取证用 workflow）'
+    : 'vp-eng-workflow-probe: FAIL（通道选择不符：N≥3 同构取证需 workflow）')
   code = ok ? 0 : 1
 } catch (error) {
   console.error(`probe error: ${error.message}`)

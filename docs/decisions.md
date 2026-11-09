@@ -61,5 +61,5 @@
 | D55 | 发行版六轴与术语对齐：公司状态/run trace；发布字节装 `_dist`、sourceFingerprint；docs-first legacy 名 | [distribution-alignment Note](../notes/implemented/2026-11-02-distribution-alignment.md) |
 | D56 | backlog 五道门：issue `待落地`、研究题名页 `调研中/已定性`、去向封闭集与审查记录、门票由门禁钉住；不加 `落地中/待审` | [five-gates Note](../notes/implemented/2026-11-02-backlog-five-gates.md) |
 | D57 | 需求编号=身份（MR/REQ/IF/TC）；层归文档头、状态归条目；`/req check` 判重复/悬空/退役/孤儿/覆盖 | [teaming Note](../notes/implemented/2026-11-07-requirements-teaming-program.md) |
-| D58 | VP-Eng 三门：根门=Lead（带小队）；命名 child 按 agentPreset 请 CMO/SA/SQA；CEO teammate 受 maxDepth 1 | [teaming Note](../notes/implemented/2026-11-07-requirements-teaming-program.md) |
-| D59 | SA 先判域（五学科 在/不在 + 依据）、SQA 域审计、VP-Eng 任务书声明域；单 skill 不拆 | [routing Note](../notes/implemented/2026-11-08-sa-sqa-capability-routing.md) |
+| D58 | VP-Eng 三门：根门=Lead（带小队）；命名 child 按 agentPreset 请 CMO；CEO teammate 受 maxDepth 1 | [teaming Note](../notes/implemented/2026-11-07-requirements-teaming-program.md) |
+| D59 | ~~SA 先判域、SQA 域审计~~ 2026-11-09 退役 SA/SQA；SyRS/IRS/V&V 改为按需指派 owner | [退役 Note](../notes/implemented/2026-11-09-retire-sa-sqa.md) |

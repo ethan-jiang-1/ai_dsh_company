@@ -33,13 +33,12 @@
             config:
               prefix: |-
                 你是这家公司的 VP of Engineering——研发职能的化身（换人不变职能）。你的视角只有三件事：可行性、成本、技术风险；公司名/业务/编制见 .dsh-company/kb/company.md 与 .dsh-company/kb/org.md，本 preset 不复述公司事实。
-                你是 PRD 的主笔：接住 CMO 的 MRD（.dsh-company/deliverables/<slug>/drafts/mrd.md）与 StRS（drafts/strs.md），把**产品层**需求变成可研发、可验收的账本（REQ/AC/slice），落 drafts/prd.md；每条 REQ 用 source 指 MR、traces 指 StRS 的 REQ。先加载 product-definition（共享脊柱）与 prd-playbook。SyRS/IRS 归 system_architect、V&V 归 system_qa——你不代笔。你对技术方案仍有 veto 权：技术不可行、成本失控、风险不可接受，直接说不并给一句话理由。
+                你是 PRD 的主笔：接住 CMO 的 MRD（.dsh-company/deliverables/<slug>/drafts/mrd.md）与 StRS（drafts/strs.md），把**产品层**需求变成可研发、可验收的账本（REQ/AC/slice），落 drafts/prd.md；每条 REQ 用 source 指 MR、traces 指 StRS 的 REQ。先加载 product-definition（共享脊柱）与 prd-playbook。你对技术方案仍有 veto 权：技术不可行、成本失控、风险不可接受，直接说不并给一句话理由。
                 产出形态：PRD（需求账本 + 结论先行一页纸）落 .dsh-company/deliverables/<slug>/drafts/prd.md；技术评估/评审意见仍按 <company-content>/templates/review-note.md 写，落 drafts/vp-eng.md。
-                任何需要并行/派活的任务，开工前先加载 `eng-teaming`（五档判据），不要凭 brief 即兴选通道。需要深挖时：1–2 件用 `subagent`；**≥3 件同构、要合并/交叉核对/只回异常用 `workflow`**（同身份并行扇出，不能替代 SA/SQA；分支只读或一分支一文件，返回聚合/异常；团队会话里长跑用 `run_in_background`）；给清晰 brief，汇总后署你自己的判断。
-                **落地项目（不是 demo）才起两个专职子人格**：`system_architect`（硬软一体架构，V 模型左侧）与 `system_qa`（系统质量保证 · V&V，右侧）；两者独立会话、独立人格，**E 与 V 不许互相代笔**——SQA 的不通过结论原样上报 CEO，你不能删（只能补证据、改稿、要求复核）。
+                任何需要并行/派活的任务，开工前先加载 `eng-teaming`（五档判据），不要凭 brief 即兴选通道。需要深挖时：1–2 件用 `subagent`；**≥3 件同构、要合并/交叉核对/只回异常用 `workflow`**（同身份并行扇出；分支只读或一分支一文件，返回聚合/异常；团队会话里长跑用 `run_in_background`）；给清晰 brief，汇总后署你自己的判断。
                 你不替别的职能下结论——“有没有人买”问 CMO（新市场/产品机会）或 VP-Sales（现有客户/定价），“接不接得住”问运营。
                 评估前先加载 tech-feasibility-review skill（那是你的评估打法），并引用 .dsh-company/kb/vp-eng/CHARTER.md 的技术栈事实。
-                组队前先加载 `eng-teaming` skill（2 号工作流）：五档——自己做 / 一次性 worker / 并行扇出（workflow）/ 命名专家 / 持久小队。`workflow` 只做同身份扇出（同人格克隆线程，不替代 SA/SQA 的独立结论）。你的根会话是 Team Lead，`spawn_teammate` 带的是**你带的工程师**——成员是工程师、不是角色（继承你的组合，不冒充 CMO/SA/SQA）；要 CMO 的 MRD/StRS、SA 的 SyRS/IRS、SQA 的 V&V，用 `vp_cmo` / `system_architect` / `system_qa` 命名委托，各署各的名；SQA 的结论不能删。
+                组队前先加载 `eng-teaming` skill（2 号工作流）：五档——自己做 / 一次性 worker / 并行扇出（workflow）/ 命名专家 / 持久小队。`workflow` 只做同身份扇出（同人格克隆线程）。你的根会话是 Team Lead，`spawn_teammate` 带的是**你带的工程师**——成员是工程师、不是角色（继承你的组合，不冒充 CMO）；要 CMO 的 MRD/StRS 用 `vp_cmo` 命名委托。委派前先加载 delegation-policy skill（共享政策）；引擎事实由 workflow-contract section 给。
                 开工动作：先读 .dsh-company/kb/vp-eng/CHARTER.md 与 .dsh-company/kb/vp-eng/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。可用 schedule_create 给自己立节奏（cron/定频提醒会回到本会话，宿主会恢复冷会话投递）——如定期复盘 journal、重估在池动议。
               # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（R2 内容稳定后评估）
               # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
@@ -59,6 +58,7 @@
                 # 按 absent 处理）。与 host config.cultivationRoot 同一 baseUrl 前缀，构造上对齐。
                 - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('../../company/methods/vp-eng/', baseUrl))"
                 - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/_shared/skills/', baseUrl))"
+                - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/_shared/delegation/skills/', baseUrl))"
 
           # ③ 工具面（preset 自包含，必须自己声明；R1 实证：不声明则会话无 fs/skill 工具）
           - id: tool-fs
@@ -182,26 +182,34 @@
                 name: '@deepseek-ai/dsh-tool-subagent-control'
               - id: tool-subagent-list-agents
                 name: '@deepseek-ai/dsh-tool-subagent-control/list-agents'
-              # `maxDepth: 2`（2026-11-08）：CEO 把 VP-Eng 当命名 child 起时 depth = 1，
-              # generic worker 落 2；与命名专家行同档。worker 再往下是 depth 3 > 2，被拒。
+              # `maxDepth: 3`（2026-11-09）：CEO 把 VP-Eng 当命名 child 起时 depth = 1；
+              # workflow 分支也是 activation 子代（depth 2）；分支里的 generic worker depth = 3。
+              # 2 会在 CEO→VP→workflow→subagent 这条长链上恰好拒掉 worker；3 放行，roots 仍有余量。
               - id: tool-subagent
                 name: '@deepseek-ai/dsh-tool-subagent'
                 config:
                   provider: spawn
                   toolName: subagent
                   modelSelectionSettings: true
-                  maxDepth: 2
+                  maxDepth: 3
+                  # 通用 worker 不再继承 vp-eng 全套（workflow/命名委派/control）。
+                  # worker family：默认 leaf；需要子层时显式升级到 worker-orchestrator。
+                  # worker-workflow 已 no-go（P-K 采用不稳定，不发布）。
+                  agentPreset: worker
+                  allowedAgentPresets:
+                    - worker
+                    - worker-orchestrator
               # 0.2.0 harvest 批1：subagent_fork 可续跑的自身分叉（行形状照抄 standard）；
-              # fork 与 subagent 同档 `maxDepth: 2`（被委派的 VP-Eng 也能分叉出 worker）。
+              # fork 与 subagent 同档 `maxDepth: 3`（被委派的 VP-Eng 也能分叉出 worker）。
               - id: tool-subagent-fork
                 name: '@deepseek-ai/dsh-tool-subagent'
                 config:
                   provider: fork
                   toolName: subagent_fork
-                  maxDepth: 2
+                  maxDepth: 3
               # ── workflow 并行扇出（2026-11-08）：同身份、多分支、要聚合/交叉核对的取证活。
               # 两行必须同组：tool-workflow 消费组内 isolate 的 workflowEngine；子代继承本 preset
-              # 且是 fresh 上下文（不是独立人格）——SA/SQA 的独立结论仍走下面的命名委托。
+              # 且是 fresh 上下文（不是独立人格）。
               - id: workflow-ptc
                 name: '@deepseek-ai/dsh-workflow-ptc'
                 config:
@@ -213,22 +221,6 @@
                 # + 可读路径。锚点 = tests/harness/contract/workflow-result-budget.spec.ts。
                 config:
                   maxResultChars: 200000
-              # ── 落地项目的两个专职子人格（2026-11-06）：V 模型左侧 SA / 右侧 SQA，独立会话、独立人格。
-              # `maxDepth: 2`：VP-Eng 作为团队成员时 depth = 1，子代 depth = 2，行上必须放行。
-              - id: tool-system-architect
-                name: '@deepseek-ai/dsh-tool-subagent'
-                config:
-                  provider: spawn
-                  toolName: system_architect
-                  maxDepth: 2
-                  agentPreset: system-architect
-              - id: tool-system-qa
-                name: '@deepseek-ai/dsh-tool-subagent'
-                config:
-                  provider: spawn
-                  toolName: system_qa
-                  maxDepth: 2
-                  agentPreset: system-qa
               # CMO 是命名专家（不是 teammate）：根门 / 命名 child 都能请。CEO 的 vp_cmo 仍 maxDepth 1
               # （D7：CEO 团队边界不动）；要 CMO 的完整人格，走本行的命名委托。
               - id: tool-vp-cmo

@@ -81,6 +81,7 @@
     "@deepseek-ai/dsh-home-paths": "^0.2.1-rc.2",
     "@deepseek-ai/dsh-persona": "^0.2.1-rc.2",
     "@deepseek-ai/dsh-plan-mode": "^0.2.1-rc.2",
+    "@deepseek-ai/dsh-scope": "^0.2.1-rc.2",
     "@deepseek-ai/dsh-session-query-sqlite": "^0.2.1-rc.2",
     "@deepseek-ai/dsh-storage-domain": "^0.2.1-rc.2",
     "@deepseek-ai/dsh-skill-filesystem": "^0.2.1-rc.2",
@@ -149,9 +150,9 @@
         "./presets/coo/agent.cordis.yml",
         "./presets/cfo/agent.cordis.yml",
         "./presets/cmo/agent.cordis.yml",
-        "./presets/researcher/agent.cordis.yml",
-        "./presets/system-architect/agent.cordis.yml",
-        "./presets/system-qa/agent.cordis.yml"
+        "./presets/worker-researcher/agent.cordis.yml",
+        "./presets/worker/agent.cordis.yml",
+        "./presets/worker-orchestrator/agent.cordis.yml"
       ]
     },
     "client": {

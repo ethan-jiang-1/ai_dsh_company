@@ -80,7 +80,7 @@ const PRD = yaml('PRD', 'json-ledger', `# PRD
 const SYRS = yaml('SyRS', 'headings', `### REQ-003 系统应能对账
 
 - status: 草案
-- owner: system-architect
+- owner: vp-eng
 - traces: [REQ-002]
 `)
 

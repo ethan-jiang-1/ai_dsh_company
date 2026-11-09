@@ -195,6 +195,9 @@ importers:
       '@deepseek-ai/dsh-plan-mode':
         specifier: ^0.2.1-rc.2
         version: link:../../vendor/dsh/packages/plan/plan-mode
+      '@deepseek-ai/dsh-scope':
+        specifier: ^0.2.1-rc.2
+        version: link:../../vendor/dsh/packages/core/scope
       '@deepseek-ai/dsh-session-query-sqlite':
         specifier: ^0.2.1-rc.2
         version: link:../../vendor/dsh/packages/session-query/session-query-sqlite

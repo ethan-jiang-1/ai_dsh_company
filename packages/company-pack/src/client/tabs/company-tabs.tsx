@@ -21,6 +21,8 @@ import type { PresenceRow } from '../../lib/presence.ts'
 import { memberDot } from '../../lib/presence-status.ts'
 import { clampRect, loadFloatRect, saveFloatRect, type FloatRectLike } from '../ui/float-geometry.ts'
 import { BoardPanel, BudgetPanel, DagPanel, StateNote } from './company-panels.tsx'
+import { DelegationFlowPanel } from './DelegationFlowPanel.tsx'
+import { buildDelegationTree, type DelegationSessionSummaryLike } from '../../lib/delegation-tree.ts'
 import { TasksTableView } from './TasksPanel.tsx'
 import { useCompanyData, type CompanyDataInjected } from '../data/use-company-data.ts'
 
@@ -173,6 +175,10 @@ export function BoardTab(props: CompanyTabProps) {
  */
 export function DagTab(props: CompanyTabProps) {
   const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
+  const byId = props.useSessions(state => (state as unknown as {
+    readonly byId?: Readonly<Record<string, DelegationSessionSummaryLike>>
+  }).byId)
+  const tree = buildDelegationTree(byId === undefined ? {} : { byId }, props.leadOf(props.sessionId))
   const [redrawKey, setRedrawKey] = useState(0)
   return (
     <PanelFrame
@@ -191,6 +197,7 @@ export function DagTab(props: CompanyTabProps) {
       )}
     >
       {data.error !== null && <div className="wk-error">{data.error}</div>}
+      <DelegationFlowPanel tree={tree} />
       <DagPanel key={redrawKey} layout={data.dag} />
     </PanelFrame>
   )

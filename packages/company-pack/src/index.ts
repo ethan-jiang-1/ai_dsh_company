@@ -31,6 +31,9 @@ import { registerPrdCommand } from './host/prd-command.ts'
 import { registerReqCommand } from './host/req-command.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation.ts'
 import { registerHandbook } from './host/handbook.ts'
+import { registerWorkflowContract } from './host/contracts.ts'
+import { registerSubagentRetry } from './host/subagent-retry.ts'
+import { registerDelegationTerminal } from './host/delegation-terminal.ts'
 import { migrateLegacyMethodLayers } from './host/cultivation-storage.ts'
 import {
   createPresentedLedgerStore,
@@ -49,7 +52,10 @@ import { canonicalPath } from './host/paths.ts'
 /** Host half registers tools, approval and the cultivation command family. */
 export const inject = ['tools', 'approval', 'commands', 'workspaceRegistry']
 
-export type HostConfig = CultivationHostConfig
+export type HostConfig = CultivationHostConfig & {
+  /** 不注入公司手册的 preset id；worker 是执行手，不是公司角色（默认 `['worker']`）。 */
+  readonly handbookSkipPresets?: readonly string[]
+}
 
 /**
  * Host plugin body. Workspace is resolved at boot from env/cwd/saved; no launcher/TTY.
@@ -103,7 +109,13 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   }
 
   registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked)
-  registerHandbook(ctx, resolveContentDir(import.meta.url), hasWorkspace ? workspace : undefined)
+  const contentDir = resolveContentDir(import.meta.url)
+  registerHandbook(ctx, contentDir, hasWorkspace ? workspace : undefined, {
+    skipPresets: config.handbookSkipPresets ?? ['worker'],
+  })
+  registerWorkflowContract(ctx, contentDir, { workflowPresets: ['vp-eng'] })
+  registerSubagentRetry(ctx, { allowedPresets: ['vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo'] })
+  registerDelegationTerminal(ctx)
   registerClientDiagnostics(ctx, runtime.dshHome)
 
   registerDeliverablesCommand(ctx, { dataBlocked, workspace, ledgerStorePromise, exportNow })

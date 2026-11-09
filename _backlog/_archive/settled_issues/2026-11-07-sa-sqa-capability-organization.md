@@ -7,7 +7,7 @@ opened: 2026-11-07
 
 > 立卡：2026-11-07 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 2026-11-08
 >
-> **结论/去向**：note — 决定与证据落 [2026-11-08-sa-sqa-capability-routing.md](../../../notes/implemented/2026-11-08-sa-sqa-capability-routing.md)（已落）。
+> **结论/去向**：note — 决定与证据落 [2026-11-08-sa-sqa-capability-routing.md](../../../notes/archived/2026-11-08-sa-sqa-capability-routing.md)（已落）。
 
 **问题与期望结果：** SA（`system-architect`）与 SQA（`system-qa`）应当具备硬软一体、EE/ME 的全方位判断力，
 但**能力要按场景取用**：纯软件问题只用纯粹软件的思考（状态机、并发、契约、可观测性、迁移回滚），
@@ -66,7 +66,7 @@ opened: 2026-11-07
 
 ## 已知与未决
 
-- 已知：SA/SQA 的 persona 与委托接线见 [SA/SQA Note](../../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md)；
+- 已知：SA/SQA 的 persona 与委托接线见 [SA/SQA Note](../../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)；
   结构审计与质量审计是两件不同的事（前者证流程跑通，后者证产物结构够格）。
 - 已知：真实运行里"同一动议做出两个不同产品"的事故（机械力 vs 电气电流）说明**域不锁定**会直接改产品
   定义——这是本卡最硬的需求侧证据（见 `probes/team/sa-sqa-domain-audit.mjs` 头注）。
@@ -126,6 +126,6 @@ VP-Eng 任务书提供现场边界与交付物用途作为输入；不拆 skill�
   清掉「待建/未决」旧句；④ decisions 预算 64→65 在本 Note「预算」节论证；⑤ 探针孤儿进程与旧链接修复
 - 全量门禁：`pnpm test` **150 files / 1222 tests**；`typecheck` / `lint`（0/0）/ `dup`（0 clones）/
   `verify` ALL PASS；`notes:audit` 状态行不符 0
-- 文档/Note：[2026-11-08-sa-sqa-capability-routing.md](../../../notes/implemented/2026-11-08-sa-sqa-capability-routing.md)；
+- 文档/Note：[2026-11-08-sa-sqa-capability-routing.md](../../../notes/archived/2026-11-08-sa-sqa-capability-routing.md)；
   卡与 Note 互链
 - 审查：`审查：agent — 2026-11-08`（含双轴复审）；用户已定分支（A+C），对照原文验收待办

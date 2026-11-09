@@ -50,19 +50,31 @@ export function readHandbook(contentDir: string, workspace?: string): HandbookIn
 
 /**
  * 给每个 agent 注册公司手册 section；agent 作用域，unload/dispose 时释放。
+ *
+ * worker（执行手）不是公司角色：它按 brief 干活，不应被注入角色/汇报线/编制手册。
+ * 默认跳过 `worker`（见 `src/index.ts` 的 `handbookSkipPresets`），未来 worker profile
+ * 由配置扩展，不在 persona 里假装看不见。
  * @param ctx - Host 上下文。
  * @param contentDir - pack 的 `content/`。
  * @param workspace - 当前 workspace（可选；用于 override 与内容目录提示）。
+ * @param options - `skipPresets`：不注入手册的 preset id（默认由调用方给 `['worker']`）。
  */
-export function registerHandbook(ctx: Context, contentDir: string, workspace?: string): void {
+export function registerHandbook(
+  ctx: Context,
+  contentDir: string,
+  workspace?: string,
+  options: { readonly skipPresets?: readonly string[] } = {},
+): void {
   const handbook = readHandbook(contentDir, workspace)
   if (handbook.bytes > HANDBOOK_MAX_BYTES) {
     ctx.logger?.warn?.(`company-pack：公司手册 ${String(handbook.bytes)}B 超过注入预算 ${String(HANDBOOK_MAX_BYTES)}B；`
       + 'handbook-budget 门禁会红；运行时仍注入全文，不静默截断')
   }
+  const skip = new Set(options.skipPresets ?? [])
   const fibers = new Map<AgentLike, ReturnType<Context['inject']>>()
   const install = (agent: AgentLike): void => {
     if (fibers.has(agent)) return
+    if (skip.has(composedPresetOf(agent.ctx) ?? '')) return
     const fiber = agent.ctx.inject(['systemPrompt'], (scope) => {
       scope.systemPrompt.section({
         name: HANDBOOK_SECTION,
@@ -80,4 +92,15 @@ export function registerHandbook(ctx: Context, contentDir: string, workspace?: s
     fibers.delete(agent)
     void fiber.dispose().catch(() => {})
   })
+}
+
+interface PresetReader {
+  composedPreset(ctx: Context): string | undefined
+}
+
+/** 读 agent 当前 preset id；没有 preset 服务（测试/无 preset 组合）时返回 undefined。 */
+export function composedPresetOf(ctx: Context): string | undefined {
+  const get = (ctx as unknown as { get?: (name: string) => unknown }).get
+  const presets = get?.('agentPresets') as PresetReader | undefined
+  return presets?.composedPreset?.(ctx)
 }

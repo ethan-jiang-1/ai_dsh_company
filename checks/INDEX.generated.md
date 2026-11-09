@@ -31,7 +31,7 @@
 [authorship-audit](audit/authorship-audit.mjs) · [candidate-scan-eval](audit/candidate-scan-eval.mjs)
 [deliverables-check](audit/deliverables-check.mjs) · [journal-audit](audit/journal-audit.mjs)
 
-## 窄机制与视觉探针（probes/，66）
+## 窄机制与视觉探针（probes/，65）
 
 ### browser-visual（17）
 
@@ -86,9 +86,11 @@
 [reconcile-round-probe](../probes/session-context/reconcile-round-probe.mjs)
 [time-context-probe](../probes/session-context/time-context-probe.mjs)
 
-### team（22）
+### team（21）
 
 [claim-race-probe](../probes/team/claim-race-probe.mjs)
+[delegation-contract-probe](../probes/team/delegation-contract-probe.mjs)
+[delegation-depth-probe](../probes/team/delegation-depth-probe.mjs)
 [dissent-preservation-probe](../probes/team/dissent-preservation-probe.mjs)
 [member-inquiry-probe](../probes/team/member-inquiry-probe.mjs)
 [member-interrupt-probe](../probes/team/member-interrupt-probe.mjs)
@@ -97,12 +99,7 @@
 [member-stale-write-probe](../probes/team/member-stale-write-probe.mjs)
 [multi-user-e2e-probe](../probes/team/multi-user-e2e-probe.mjs)
 [index](../probes/team/read-barrier/index.mjs)
-[requirements-chain-probe](../probes/team/requirements-chain-probe.mjs)
-[sa-sqa-closeout-audit](../probes/team/sa-sqa-closeout-audit.mjs)
-[sa-sqa-delegation-probe](../probes/team/sa-sqa-delegation-probe.mjs)
-[sa-sqa-domain-audit](../probes/team/sa-sqa-domain-audit.mjs)
-[sa-sqa-domain-routing-probe](../probes/team/sa-sqa-domain-routing-probe.mjs)
-[sa-sqa-quality-audit](../probes/team/sa-sqa-quality-audit.mjs)
+[subagent-retry-probe](../probes/team/subagent-retry-probe.mjs)
 [team-atomicity-probe](../probes/team/team-atomicity-probe.mjs)
 [team-claim-loser-probe](../probes/team/team-claim-loser-probe.mjs)
 [team-concurrency-probe](../probes/team/team-concurrency-probe.mjs)
@@ -110,6 +107,8 @@
 [vp-eng-root-lead-probe](../probes/team/vp-eng-root-lead-probe.mjs)
 [vp-eng-teaming-probe](../probes/team/vp-eng-teaming-probe.mjs)
 [vp-eng-workflow-probe](../probes/team/vp-eng-workflow-probe.mjs)
+[worker-orchestrator-probe](../probes/team/worker-orchestrator-probe.mjs)
+[worker-researcher-probe](../probes/team/worker-researcher-probe.mjs)
 
 ## 维护工具（tools/，19）
 

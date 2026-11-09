@@ -4,14 +4,13 @@
 
 ## 活跃清单
 
-- [presets 委派面的模型化重构（worker family + 链合同 + 图观测）](2026-11-09-presets-delegation-architecture.md) — 等人拍板：模型/切片待用户逐项回答；不授权生产代码。
 - [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：设计 bug-hunt charter 与有限重跑验证；真模型运行待用户明确批准。
 
 （2026-11-08 VP-Eng workflow 通道卡已结归档：去向 = [Note](../../notes/implemented/2026-11-08-vpeng-workflow-channel.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)。）
 
 （2026-11-08 README/手册使用者面向卡已结归档：去向 = [Note](../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)。）
 
-（2026-11-08 SA/SQA 能力组织卡已结归档：去向 = [capability-routing Note](../../notes/implemented/2026-11-08-sa-sqa-capability-routing.md)；
+（2026-11-08 SA/SQA 能力组织卡已结归档：去向 = [capability-routing Note](../../notes/archived/2026-11-08-sa-sqa-capability-routing.md)；
 历史摘要只住[归档](../_archive/README.md)，本页不重复。）
 
 （2026-11-07 需求识别/编号 + VP-Eng 组队的程序伞卡 + 11 张执行卡（A1–A8、B1/B2）已结归档：
@@ -30,7 +29,7 @@ v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajecto
 
 - README/手册使用者面向卡 2026-11-08 已结：七问冷读 README 5.0→7.0/7、手册 5.0→7/7 + `readme-manual-commands` 门 + 2 张真实例截图；去向 = [Note](../../notes/implemented/2026-11-08-user-facing-readme-and-first-use.md)；卡在[归档](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)。
 
-- SA/SQA 子人格卡 2026-11-06 已结：两个委派子人格（system-architect / system-qa）+ 委托行 maxDepth 2 + SQA 否决直达 CEO；真模型 E2E 证独立会话/preset/depth=2；去向 = [Note](../../notes/implemented/2026-11-06-sa-sqa-subpersonas.md)；卡在[归档](../_archive/settled_issues/2026-11-06-system-architect-sqa.md)。
+- SA/SQA 子人格卡 2026-11-06 已结：两个委派子人格（system-architect / system-qa）+ 委托行 maxDepth 2 + SQA 否决直达 CEO；真模型 E2E 证独立会话/preset/depth=2；去向 = [Note](../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)；卡在[归档](../_archive/settled_issues/2026-11-06-system-architect-sqa.md)。
 - 第六轮七维打扫卡 2026-11-03 已结：fresh agent 复评 A-…A- + 层次化（client/tests/harness）+ 腐化通道四条机械面；去向 = [context-rot-guards Note](../../notes/implemented/2026-11-03-context-rot-guards.md) 与各批 Note；卡在[归档](../_archive/settled_issues/2026-11-03-repo-hygiene-round6.md)。
 - 第五轮七维打扫卡 2026-11-03 已结（消化）：A–F 各批已落地或被第六轮承接；残余 = npm publish（外部）与零入链分诊（已定性不批量迁）；卡在[归档](../_archive/settled_issues/2026-11-03-repo-hygiene-round5.md)。
 

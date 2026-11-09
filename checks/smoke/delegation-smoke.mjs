@@ -11,7 +11,7 @@
 //      `run_in_background` 全删 ⇒ **"前台同步拿结果"这条通道整体不存在**，不是配置问题。
 //   ② 人格/工具面改由 `agentPreset` 选（同批 subagent-preset-composition）：per-tool 的
 //      `persona` / `toolFilter` 被硬拒。我们的 vp_eng/vp_sales/vp_cmo 因此选 `vp-eng` / `vp-sales` / `cmo`
-//      三个角色 preset，通用委托选 `researcher`。
+//      三个角色 preset，通用委托选 `worker-researcher`。
 //   ③ 续驶：**CEO 会话里仍然不通**。team 的 `send_message` / `list_agents` / `interrupt_agent`
 //      按成员作用域 shadow 掉全局版（`tool-agent-team`），`resolveActiveMember` 只认名册成员；
 //      subagent child 不在名册上（vendor agent-team/src/index.ts `sendAdmitted`）。上游确实新增了

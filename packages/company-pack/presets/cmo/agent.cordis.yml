@@ -37,7 +37,7 @@
                 产出形态：MRD（市场需求文档，`MR-###`）+ StRS（涉众需求，`REQ-###`）——结论先行、一页为限；MRD 落 .dsh-company/deliverables/<slug>/drafts/mrd.md，StRS 落同目录 drafts/strs.md（每条带 traces: [MR-###]），模板见 <company-content>/templates/；证据标【事实/假设】。PRD 归 VP-Eng，你不代笔。
                 产品定义先加载 product-definition skill（共享脊柱 + 品类 playbook）；写 MRD 用 mrd-playbook skill。与 VP-Eng 的分工：你回答“该不该做/为谁做/凭什么赢”；PRD 由 VP-Eng 主笔，你只回看 PRD 的市场假设，不替研发定技术方案。
                 你不替别的职能下结论——“卖多少钱/现有客户怎么想”问 VP-Sales，“做不做得出”问 VP-Eng，“接不接得住”问 COO。
-                需要深挖市场事实时用 subagent 生 workers，或用 web/bash 取证；引用 .dsh-company/kb/cmo/CHARTER.md，禁止虚构客户与市场数字。
+                需要深挖市场事实时用 subagent 生 workers，或用 web/bash 取证；引用 .dsh-company/kb/cmo/CHARTER.md，禁止虚构客户与市场数字。委派前先加载 delegation-policy skill（共享政策）。
                 开工动作：先读 .dsh-company/kb/cmo/CHARTER.md 与 .dsh-company/kb/cmo/journal/ 最近 3 篇；收工向 journal 追加纪要；要回溯更早的动议细节用 session_search 查会话全文（journal 是摘要，会话库是全文）。可用 schedule_create 给自己立节奏（cron/定频提醒会回到本会话，宿主会恢复冷会话投递）——如定期复盘 journal、重估市场机会。
               # complete: true              # 极端收紧：整个 system prompt 只剩 prefix（内容稳定后评估）
               # includeRuntimeContext: false  # 关掉运行时上下文快照（同上）
@@ -57,6 +57,7 @@
                 # 按 absent 处理）。与 host config.cultivationRoot 同一 baseUrl 前缀，构造上对齐。
                 - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('../../company/methods/cmo/', baseUrl))"
                 - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/_shared/skills/', baseUrl))"
+                - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/_shared/delegation/skills/', baseUrl))"
 
           # ③ 工具面（preset 自包含，必须自己声明；R1 实证：不声明则会话无 fs/skill 工具）
           - id: tool-fs

@@ -1,0 +1,67 @@
+# Worker（执行手）preset —— 通用/可升级的窄执行组合；不是公司角色，不进编制/在场板/署名。
+#
+# 为什么需要它（RFC 2026-11-09）：通用 `subagent` 不钉 `agentPreset` 时继承父的完整组合——
+#   VP-Eng 的 worker 会带 workflow、subagent 行、control，可在 depth 2 内继续生。worker 本应是
+#   “受限执行组合”：按 brief 做单件活、只回证据、不再委派。
+#
+# 形态：leaf 工具面（fs/bash/web/todo/compaction），**没有** subagent/team/workflow/control/
+#   ask-user/present/goal/schedule/agent-instructions。能力是“缺行”表达的，不是 persona 说“别委派”。
+#   后续 profile（worker-researcher / worker-orchestrator）是独立 preset，不在本文件里加开关。
+
+- insert:
+    - id: preset-worker
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: worker
+        name: 梦之队 Worker（执行手）
+        description: '内部执行手：按 brief 做单件活，只回证据，不再委派（不是公司角色）'
+        # 排在角色/子人格之后：它不是同级职能，也不进公司名册语义。
+        order: 90
+        plugins:
+          # ① 身份：故意短。活由父会话的 brief 定义；这里只钉不可越界的边界。
+          - id: persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: |-
+                你是执行手（worker），不是公司角色。按 brief 完成单件任务，只回证据与结果。
+                不委派、不生 subagent、不组队、不开 workflow、不直接问用户；缺口回给委派者。
+                只写 brief 允许的路径；不读公司手册/CHARTER/journal，除非 brief 明确要求。
+                结论先行、中文回答；每条判断带出处（文件路径 / 命令输出 / URL），查不到就直说“查不到”，不要编。
+
+          # ② 工具面：只给“做单件活”的手。没有 subagent/team/workflow/control/ask-user/present。
+          - id: tool-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+          - id: tool-fs-search
+            name: '@deepseek-ai/dsh-tool-fs-search'
+            config:
+              sampleOverCapGlobResults: false
+          - id: tool-bash
+            name: '@deepseek-ai/dsh-tool-bash'
+          - id: tool-web
+            name: '@deepseek-ai/dsh-tool-web'
+            config:
+              fetch: true
+              searchTimeoutMs: 60000
+          - id: tool-todo
+            name: '@deepseek-ai/dsh-tool-todo'
+            config:
+              allowParallelInProgress: true
+
+          # ③ 长活压缩：worker 可能读大文件/跑长命令；没有压缩迟早爆上下文。
+          - id: compaction
+            name: cordis:group
+            group: true
+            isolate:
+              compaction: true
+              toolResultPruner: true
+            config:
+              - id: compaction-basic
+                name: '@deepseek-ai/dsh-compaction-basic'
+              - id: command-compact
+                name: '@deepseek-ai/dsh-command-compact'
+              - id: tool-result-pruner
+                name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+                config:
+                  thresholdChars: 8192
+                  headChars: 4096
+                  tailChars: 1024
