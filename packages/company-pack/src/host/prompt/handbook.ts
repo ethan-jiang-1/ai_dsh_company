@@ -13,6 +13,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { WORKER_FAMILY_PRESETS } from '../../lib/delegation-surface.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
 
 export const HANDBOOK_SECTION = 'company:handbook'
@@ -51,13 +52,13 @@ export function readHandbook(contentDir: string, workspace?: string): HandbookIn
 /**
  * 给每个 agent 注册公司手册 section；agent 作用域，unload/dispose 时释放。
  *
- * worker（执行手）不是公司角色：它按 brief 干活，不应被注入角色/汇报线/编制手册。
- * 默认跳过 `worker`（见 `src/index.ts` 的 `handbookSkipPresets`），未来 worker profile
- * 由配置扩展，不在 persona 里假装看不见。
+ * worker family（执行手）不是公司角色：它按 brief 干活，不应被注入角色/汇报线/编制手册。
+ * 默认跳过**整个 family**（`WORKER_FAMILY_PRESETS`，与模型 `handbookSkipPresets()` 同源），
+ * 不按单个 ID 白名单——新增 worker profile 自动继承；`skipPresets` 只作部署覆盖旋钮。
  * @param ctx - Host 上下文。
  * @param contentDir - pack 的 `content/`。
  * @param workspace - 当前 workspace（可选；用于 override 与内容目录提示）。
- * @param options - `skipPresets`：不注入手册的 preset id（默认由调用方给 `['worker']`）。
+ * @param options - `skipPresets`：覆盖默认跳过集合的 preset id。
  */
 export function registerHandbook(
   ctx: Context,
@@ -70,7 +71,7 @@ export function registerHandbook(
     ctx.logger?.warn?.(`company-pack：公司手册 ${String(handbook.bytes)}B 超过注入预算 ${String(HANDBOOK_MAX_BYTES)}B；`
       + 'handbook-budget 门禁会红；运行时仍注入全文，不静默截断')
   }
-  const skip = new Set(options.skipPresets ?? [])
+  const skip = new Set(options.skipPresets ?? WORKER_FAMILY_PRESETS)
   const fibers = new Map<AgentLike, ReturnType<Context['inject']>>()
   const install = (agent: AgentLike): void => {
     if (fibers.has(agent)) return

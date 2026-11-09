@@ -3,7 +3,7 @@
 #   工具面只能由 **agentPreset** 选（上游升档指南 subagent-preset-composition）；spawn 不指定
 #   agentPreset 时**继承父会话的 preset** ⇒ 会造出一个 "没有 CEO 判断材料的迷你 CEO"。
 # 定位：worker family 的调研能力档（named-only），不是公司角色；只读、给 brief、交一页证据，结论由父代理下。
-# 文案纪律：不复述公司手册（手册由 agent-instructions 随会话注入，一处事实一个家）。
+# 文案纪律：不复述公司手册（worker family 不注入公司手册；公司事实按 brief 读 `.dsh-company/kb/company.md`）。
 
 - insert:
     - id: preset-worker-researcher

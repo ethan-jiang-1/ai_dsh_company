@@ -1,9 +1,12 @@
 // 负例留证 2026-11-09：把 CONTRACTS['policy.delegation'].status 从 delivered 改回 planned ⇒
 // 「合同载体状态与真实载体一致」用例红（`expected 'planned' to be 'delivered'`）；还原 ⇒ 10 passed。BUG-049
+// 负例留证 2026-11-09：把 WORKER_FAMILY_PRESETS 只留 ['worker'] ⇒「handbook 边界按 worker family」用例红；
+// 还原 ⇒ 绿。BUG-047
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { WORKER_FAMILY_PRESETS } from '../../packages/company-pack/src/lib/delegation-surface.ts'
 import {
   CHANNELS,
   COMPOSITIONS,
@@ -12,6 +15,7 @@ import {
   PRESET_IDS,
   SUPPORT_PRESET_IDS,
   WORKER_PROFILES,
+  handbookSkipPresets,
   implementedWorkerProfiles,
   modelProblems,
   presetPath,
@@ -56,6 +60,13 @@ describe('delegation model：唯一期望源', () => {
     for (const [id, profile] of Object.entries(WORKER_PROFILES)) {
       if (profile.status === 'planned') expect(PRESET_IDS, `${id} 不该在 P1 发布`).not.toContain(profile.preset)
     }
+  })
+
+  it('handbook 边界按 worker family 派生（BUG-047）', () => {
+    // 唯一期望源：archetype=worker 的全部 preset；不写 ID 白名单。
+    expect(handbookSkipPresets()).toEqual(['worker', 'worker-researcher', 'worker-orchestrator'])
+    expect([...WORKER_FAMILY_PRESETS]).toEqual(handbookSkipPresets())
+    for (const id of FULL_ROLE_IDS) expect(handbookSkipPresets(), `${id} 是公司角色，应注入手册`).not.toContain(id)
   })
 
   it('worker 铺开目标：vp-eng 已钉 leaf，其余 full role 记 target；CEO 不直接钉 worker', () => {

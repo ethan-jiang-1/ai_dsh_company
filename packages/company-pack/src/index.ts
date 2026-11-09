@@ -111,9 +111,10 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
 
   registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked)
   const contentDir = resolveContentDir(import.meta.url)
-  registerHandbook(ctx, contentDir, hasWorkspace ? workspace : undefined, {
-    skipPresets: config.handbookSkipPresets ?? ['worker'],
-  })
+  registerHandbook(ctx, contentDir, hasWorkspace ? workspace : undefined,
+    // 默认跳过集合由 handbook.ts 按 WORKER_FAMILY_PRESETS 派生（不在这里写 ID 白名单）；
+    // 部署配置只作覆盖旋钮（BUG-047）。
+    config.handbookSkipPresets === undefined ? {} : { skipPresets: config.handbookSkipPresets })
   registerWorkflowContract(ctx, contentDir, { workflowPresets: ['vp-eng'] })
   // 注册面/深度只从 SUBAGENT_RETRY_SURFACE 读（= 各 preset 通用 subagent 行的 maxDepth；
   // 模型 retrySurface() 同源，parity spec 钉着）；这里不再写第二份 preset 列表（BUG-045/049）。

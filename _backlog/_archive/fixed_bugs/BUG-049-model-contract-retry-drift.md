@@ -46,7 +46,7 @@ spec，没有进“唯一期望源”的模型字段；`src/index.ts` 的注册�
 - 读 `tools/lib/delegation-model.mjs` 的 `CONTRACTS` / `RETRY` / `COMPOSITIONS`；
 - 读 `packages/company-pack/src/index.ts` 的 `registerSubagentRetry(...)`；
 - 读 `packages/company-pack/cordis.patch.yml` 的 `handbookSkipPresets`（另见
-  [BUG-047](../../bugs/BUG-047-worker-family-handbook-scope.md)）；
+  [BUG-047](BUG-047-worker-family-handbook-scope.md)）；
 - 跑 `pnpm test tests/presets`：全绿，但不覆盖上述漂移。
 
 证据摘要：`runtime/tmp/explore/round4/k0.json`（gitignored；K0 静态对账输出）。

@@ -257,7 +257,7 @@ role 工具；父把 acknowledgement 当完成；run completed 但分支 null/�
 
 **新开缺陷卡：** [BUG-045](../_archive/fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md)（P1）、
 [BUG-046](../bugs/BUG-046-parent-cannot-verify-child-preset-depth.md)、
-[BUG-047](../bugs/BUG-047-worker-family-handbook-scope.md)、
+[BUG-047](../_archive/fixed_bugs/BUG-047-worker-family-handbook-scope.md)、
 [BUG-048](../bugs/BUG-048-ui-golden-brand-name-drift.md)、
 [BUG-049](../_archive/fixed_bugs/BUG-049-model-contract-retry-drift.md)（均 P2）。
 

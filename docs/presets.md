@@ -20,11 +20,11 @@
 | `coo` | COO | system | — | R2 定稿 |
 | `cfo` | CFO | system | — | R2 定稿（增设） |
 | `cmo` | CMO | system | — | 2026-11-05 增设（市场机会/产品定义） |
-| `worker` / `worker-researcher` / `worker-orchestrator` | 梦之队 Worker（执行手 / 只读调研 / 小工头） | system | — | 2026-11-09 增设（leaf / 只读 / 可带 leaf；不占编制、不组队/不 workflow） |
+| `worker` / `worker-researcher` / `worker-orchestrator` | 梦之队 Worker（执行手 / 只读调研 / 小工头） | system | — | 2026-11-09 增设（leaf / 只读 / 可带 leaf；不占编制、不组队/不 workflow、**不注入公司手册**——按 worker family 派生，三个 profile 一致） |
 
 实测方式：web 观察窗的 `agentPresets/list` RPC（DSH 出厂 4〔cordis/minimal/ptc/standard，vendor `web-app/presets/`〕+ 本 pack 9，零 broken）。
 
-**worker-researcher 为什么存在**：它是 worker family 的只读调研档（CEO 的 `subagent_research`），不是角色、不是 specialist；SA/SQA 已退役，SyRS/IRS/V&V 如由 CEO 指派 owner 仍可按需使用模板。
+**worker-researcher 为什么存在**：它是 worker family 的只读调研档（CEO 的 `subagent_research`），不是角色、不是 specialist；SA/SQA 已退役，SyRS/IRS/V&V 如由 CEO 指派 owner 仍可按需使用模板。它和 orchestrator 都不注入公司手册：公司事实按 brief 读 `.dsh-company/kb/company.md`，角色/汇报线/编制手册不进来（BUG-047；取舍见 [Note](../notes/implemented/2026-11-09-handbook-worker-family.md)）。
 
 ## 四形态矩阵：身份、工具与 skills 从哪来（RFC preset-skill-matrix 2026-10-05 立）
 

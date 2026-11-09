@@ -159,6 +159,7 @@
 | [BUG-042-list-subagents-lastturnend-missing.md](fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md) | `lastTurnEnd` 恒缺：换 sessionPersistence 读 + open-turn 推断 interrupted（inferred-open-turn）；keyless 20 条 + C2f 真实验证 | 2026-11-08 |
 | [BUG-045-subagent-retry-depth-budget-bypass.md](fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md) | retry 绕过行级深度：注册面/深度单源（`SUBAGENT_RETRY_SURFACE` = 通用 `subagent` 行）+ 越界 `depth-exceeded` 不起 child；keyless 红→绿 | 2026-11-09 |
 | [BUG-049-model-contract-retry-drift.md](fixed_bugs/BUG-049-model-contract-retry-drift.md) | 模型声明漂移：合同 `delivered`/`merged` + `carrierPath`；`retrySurface()` 派生注册面/深度；parity spec 钉运行时/YAML/模型三边 | 2026-11-09 |
+| [BUG-047-worker-family-handbook-scope.md](fixed_bugs/BUG-047-worker-family-handbook-scope.md) | handbook 边界按 worker family 派生（三个 profile 都不注入）；默认取 family，配置只作覆盖；keyless 按 preset 断言 | 2026-11-09 |
 | [BUG-026-owner-missing-from-team-projection.md](fixed_bugs/BUG-026-owner-missing-from-team-projection.md) | 误报证伪（wire 视图 ownerName 齐全，卡读的是 projcache state 行）→ 防复发判据 = `tests/lib/board.spec.ts` 真 wire 形状断言；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-19 |
 | [BUG-023-cultivation-float-actions-dead.md](fixed_bugs/BUG-023-cultivation-float-actions-dead.md) | 误报证伪（浮窗正常；真凶 = 探针跨轮复用 id 撞遗留方法目录）→ 修复落探针卫生，S4b 恢复硬判 PASS；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-18 |
 

@@ -362,6 +362,18 @@ export function retryDecision(channel, terminal, attempt, idempotent) {
   return { retry: false, reason: `not retryable ${terminal}` }
 }
 
+/**
+ * 不注入公司手册的 preset（唯一期望源）。
+ *
+ * 边界按 **archetype** 派生，不按 ID 白名单：worker family 是执行手（按 brief 干活），
+ * 不是公司角色；角色/汇报线/编制手册对它是 token 税与人格矛盾。新增 worker profile 自动继承，
+ * 不再需要人记得把它加进某个列表（BUG-047 的失败类）。
+ * @returns worker archetype 的 preset id（顺序 = PRESET_IDS）。
+ */
+export function handbookSkipPresets() {
+  return PRESET_IDS.filter(id => COMPOSITIONS[id].archetype === 'worker')
+}
+
 /** 一个 preset 的 YAML 相对路径（仓库根起）。 */
 export function presetPath(id) {
   return `packages/company-pack/presets/${id}/agent.cordis.yml`

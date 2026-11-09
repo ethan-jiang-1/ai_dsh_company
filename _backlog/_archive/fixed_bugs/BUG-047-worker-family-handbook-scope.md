@@ -1,18 +1,14 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-09
 ---
 
 # BUG-047：worker-orchestrator（及 worker-researcher）被注入公司手册，违背 worker family 的边界
 
-> 严重级别：P2（次要）｜发现：2026-11-09｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-09｜状态：已修（2026-11-09：修复就绪 → 修复已落地 → 已修）
 > 来源：2026-11-09 委派面重构后第四轮探索（W1b，worker-orchestrator 真 prompt 面）。
-> 授权：2026-11-09 用户指令「按照我们的流程排一个计划，之后逐一修复吧」「从根上去解决」——
-> 本修复触碰 company-pack 公开行为（prompt 注入面）与 docs 合同，由用户明确指示授权。
-> 修法 = 归属写成 worker family 属性（模型声明 + pack 运行时按 family 派生），
-> 三个 worker profile 全跳过；worker-researcher 的取舍显式记录（它按 persona 读 `company.md`，
-> 不需要角色/汇报线/编制手册）。
+> 审查：agent — 对照「已修判定」逐条核过；真红→绿见「修复落地」，未跑真模型（keyless 注入面）。
 
 ## 症状
 
@@ -79,3 +75,19 @@ researcher `9e7b0406-…`（preset `worker-researcher`）的 system prompt 含 `
 - keyless spec 按 preset 断言 skip 名单；红形态 = 把 `worker-orchestrator` 从 skip 移除时断言红；
   还原后绿。
 - 若 researcher 保留注入，docs/persona 说明“它需要公司事实”的理由，不留下“persona 说不要、系统却给”的矛盾。
+
+## 修复落地（2026-11-09）
+
+- **模型**：[`delegation-model.mjs`](../../../tools/lib/delegation-model.mjs) 新增
+  `handbookSkipPresets()`：`archetype === 'worker'` 的全部 preset（三个）；不按 ID 列表。
+- **运行时**：[`delegation-surface.ts`](../../../packages/company-pack/src/lib/delegation-surface.ts) 的
+  `WORKER_FAMILY_PRESETS` 是 pack 唯一运行时表；[`handbook.ts`](../../../packages/company-pack/src/host/prompt/handbook.ts)
+  默认 `skipPresets = WORKER_FAMILY_PRESETS`；`src/index.ts` 只在部署显式配置时覆盖；
+  [`cordis.patch.yml`](../../../packages/company-pack/cordis.patch.yml) 删掉窄覆盖 `['worker']`。
+- **researcher 取舍**：不注入；公司事实按 brief 读 `.dsh-company/kb/company.md`（persona 原本就这么写），
+  researcher preset 头注同步改掉“手册由 agent-instructions 注入”的旧说法。
+- **文档**：`docs/presets.md` 的 worker family 行与 researcher 说明写明“三个 profile 都不注入”。
+- **真红→绿**：把 `WORKER_FAMILY_PRESETS` 收窄成 `['worker']` ⇒ **2 failed**（模型 parity +
+  handbook family 用例 `worker-researcher: ... got 1`）；还原 ⇒ **17 passed**（两文件）。
+- **全量**：`pnpm verify`、`pnpm test`、`pnpm typecheck` 全绿（同提交）。
+- 决定与输掉的方案 = [handbook worker family Note](../../../notes/implemented/2026-11-09-handbook-worker-family.md)。
