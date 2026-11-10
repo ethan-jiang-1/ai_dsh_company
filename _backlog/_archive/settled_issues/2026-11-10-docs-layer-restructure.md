@@ -33,7 +33,7 @@ opened: 2026-11-10
 - 预算：10 个 `DOC_LINE_BUDGETS` 键；未提额。
 - 证据：`pnpm verify` ALL PASS（2 门无对象）；`pnpm test` 全量 167 files / 1347 passed。
 - 迁移清单：`runtime/docs-migration/manifest.json`（gitignored；old→new + 逐条 link edit）。
-- 工作树：187 文件（177 M + 10 rename）；未 commit。
+- 工作树：187 文件（177 M + 10 rename）；随本卡与 Note 同一次 commit。
 
 ## 流程问题（本卡为什么是补记）
 
