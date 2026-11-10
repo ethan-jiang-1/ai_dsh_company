@@ -15,6 +15,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-10-content-charter.md](settled_issues/2026-11-10-content-charter.md) | 已结；内容宪章（四槽/三层/四问/两测/两消费者/成本表/红牌/变更协议）+ 归位 skill + 入口门 `charter-entry`（5 条负例留证 / 3 支全覆盖）+ 卡模板 `## 抽象度` + P5 归位一问；verify ALL PASS、167 files/1347 tests；冷读证「撞得到 + 用得上」；去向 = [Note](../../notes/implemented/2026-11-10-content-charter.md) | 2026-11-10 |
 | [2026-11-10-docs-dsh-alignment.md](settled_issues/2026-11-10-docs-dsh-alignment.md) | 已结；五步 DSH 对齐（值 / index 书架 / design→notes+architecture / genre 拆分 / 5% headroom）+ 四篇 rationale 收口 + canonical 守卫；verify ALL PASS、167 files/1347 tests、typecheck；去向 = [Note](../../notes/implemented/2026-11-10-docs-dsh-alignment.md) | 2026-11-10 |
 | [2026-11-10-docs-layer-restructure.md](settled_issues/2026-11-10-docs-layer-restructure.md) | 已结；docs/ 分层重整（顶层 8 门/宪法 + contracts/ 7 + reference/ 3）；index 首屏按目的路由；227+ 链接跟随后 verify ALL PASS、167 files/1347 tests；冻结层 122 文件只改路径；用户“都提交”＝接受；去向 = [Note](../../notes/implemented/2026-11-10-docs-layer-restructure.md) | 2026-11-10 |
 | [2026-11-09-company-specificity-externalization.md](settled_issues/2026-11-09-company-specificity-externalization.md) | 已结；三层分离（generic/product-types/company + contracts 版本轴）、T0–T3 加载与 manifest 预算、政策/复核/编号单家、两公司 fixture 与测试字面量门；verify ALL PASS、166 files/1319 tests、release-smoke ALL PASS；去向 = [Note](../../notes/implemented/2026-11-09-generic-specific-separation.md) | 2026-11-09 |

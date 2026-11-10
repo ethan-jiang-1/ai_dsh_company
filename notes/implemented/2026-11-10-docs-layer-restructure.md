@@ -1,7 +1,7 @@
 # 2026-11-10 · docs/ 分层重整：顶层门与宪法 + contracts/ + reference/
 
 状态：implemented（2026-11-10 交付；上游 = [docs 分层重整卡](../../_backlog/_archive/settled_issues/2026-11-10-docs-layer-restructure.md)；用户 2026-11-10 答复“都提交”= 接受本次形状）
-> 触发：同日的 [内容宪章](../../_backlog/issues/2026-11-10-content-charter.md) 与
+> 触发：同日的 [内容宪章](../../_backlog/_archive/settled_issues/2026-11-10-content-charter.md) 与
 > [producer/verifier 质量环](../../_backlog/issues/2026-11-10-producer-verifier-quality-loop.md) 推演——
 > “先想清楚归位、再动手”同样适用于 `docs/`。本 Note 只记这次**形状**调整，不含内容值修正（另卡）。
 

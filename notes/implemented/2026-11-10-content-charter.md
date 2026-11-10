@@ -1,7 +1,7 @@
 # 内容宪章：四槽归位 + 四条入口链
 
 状态：implemented — 宪章正本 + 归位 skill + 入口门 + 卡/Note 字段，2026-11-10 同 diff 落地
-上游 = [内容宪章卡](../../_backlog/issues/2026-11-10-content-charter.md)；材料 = [研究题](../../_backlog/research/capability-placement-and-quality-loop/README.md)（推演 + 宪章草案）
+上游 = [内容宪章卡](../../_backlog/_archive/settled_issues/2026-11-10-content-charter.md)；材料 = [研究题](../../_backlog/research/capability-placement-and-quality-loop/README.md)（推演 + 宪章草案）
 
 ## 决定
 

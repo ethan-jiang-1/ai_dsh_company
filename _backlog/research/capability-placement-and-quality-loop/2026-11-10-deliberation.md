@@ -169,7 +169,7 @@ intent: 记录 2026-11-10 从 SA/SQA 历史需求到四槽/三层方案与宪章
 
 ## 9. 产出的卡
 
-- [2026-11-10-content-charter.md](../../issues/2026-11-10-content-charter.md)：宪章正本 + 入口链 + 卡/Note 字段 + 入口门。
+- [2026-11-10-content-charter.md](../../_archive/settled_issues/2026-11-10-content-charter.md)：宪章正本 + 入口链 + 卡/Note 字段 + 入口门。
 - [2026-11-10-producer-verifier-quality-loop.md](../../issues/2026-11-10-producer-verifier-quality-loop.md)：两个能力档 + VP-Eng 两行 + 流程 skill + 方法槽 + 审计探针（一张卡）。
 
 ## 10. 证据边界
