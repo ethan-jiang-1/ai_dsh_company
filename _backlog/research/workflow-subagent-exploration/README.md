@@ -22,9 +22,14 @@ opened: 2026-11-08
 > vp-sales generic depth 2 的 retry 边界仍正确拒绝；**第六轮新发现 BUG-052（P2）**：worker leaf 的工具面仍有 control，sibling 发送被运行时拒绝；**第七轮新发现 BUG-053（P1）**：取消 parent turn 不能中止 `subagent_retry` 的阻塞 child，root/child 无 `turn/end`；depth 4 负例 PASS（`depth 4 exceeds maxDepth 3`）；W7-C 重启后 retry child/workflow 分支身份行 PASS；W7-E coo/cfo retry 预算 PASS；W7-F 重启后 retry 正样本 PASS（新 child/second-ok）；W7-G retry child 跨宿主重启 PASS（interrupted + unknown-outcome 诊断）；W7-D 的客户端图模型在真实 session 数据上 PASS（W7C 4 nodes/d1、D1 8 nodes/d3），React 真页面 harness-blocked 未覆盖。
 > 运行表/未覆盖/资产收割 = [第四轮 §9](2026-11-09-post-refactor-round.md)）
 
+> **2026-11-10 晚（资产先行）**：用户要求先研究测试资产/探针再继续探索；审计结论 = 先补运行时面矩阵、
+> 会话证据包、UI 全文证据（A 批无模型），再跑缩小的第九轮 live（B 批待批）。设计与 round-8 实测矩阵 =
+> [2026-11-10 资产计划](2026-11-10-asset-first-round.md)。
+
 ## 材料
 
 | 文件 | 作用 | 日期 |
 |---|---|---|
+| [2026-11-10-asset-first-round.md](2026-11-10-asset-first-round.md) | 资产先行：八轮缺陷家族、第八轮摩擦账、现有资产盘点、round-8 日志实测矩阵、A/B 资产、红证、不建清单与第九轮预算 | 2026-11-10 |
 | [2026-11-08-exploration-plan.md](2026-11-08-exploration-plan.md) | 重构前探索计划与结果：背景/已证事实/场景矩阵/两遍法/fixtures/判据/预算/处置/§16–§18 运行表 | 2026-11-08 |
 | [2026-11-09-post-refactor-round.md](2026-11-09-post-refactor-round.md) | 重构后第四轮：当前机制事实、delta、入口矩阵、charters、假设、fixtures、预算、停止与交接；§9 = 2026-11-09 执行结果 | 2026-11-09 |

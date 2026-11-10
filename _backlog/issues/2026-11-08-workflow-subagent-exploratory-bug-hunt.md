@@ -10,10 +10,15 @@ opened: 2026-11-08
 > 用户 2026-11-09 晚答复：**继续探索**（此前「是否扩面」的 🔒 已解除）；本卡回 `推敲中`，
 > 修复后验证轮已执行，见下方「修复后验证」。
 >
+> 用户 2026-11-10 晚：**先研究测试资产/探针，调整本卡，再继续探索**；本卡据此改为「资产先行」，
+> A 批（无模型）可做，B 批 live 仍按授权门等批准。
+>
 > 上游研究题：[workflow + subagent 探索题](../research/workflow-subagent-exploration/README.md)。
 > 重构前的完整 briefing、场景矩阵与前三轮结果 = [2026-11-08 计划](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)；
-> **重构后第四轮计划 = [2026-11-09 计划](../research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md)**。
+> **重构后第四轮计划 = [2026-11-09 计划](../research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md)**；
+> **资产审计与第九轮设计 = [2026-11-10 资产计划](../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md)**。
 > 本卡只保留问题、当前事实、轮次摘要与交接；机制长文、fixtures、逐条运行表住研究材料。
+> **读法**：当前计划 = §9「第九轮（资产先行）」；第八轮结果 = §8；§4–7 是历史，不重跑。
 > **授权门**：真模型探索需用户明确批准入口、charter、轮数/墙钟/child/输出预算、权限模式与证据落点；
 > 未批准不启动。计划 review、issue 定性、目录状态、handoff、基线检查都不等于真模型授权。
 
@@ -25,6 +30,9 @@ skill？质量环 starter 能不能被 VP-Eng 真加载？旧 worker/retry/workf
 目标是用一轮 guided exploratory testing 主动找真实、可复现的副作用，保留独立 oracle、来源坐标、可复判证据与
 停止边界；不是把一张新矩阵跑绿，也不是宣称找尽所有 bug。**本轮推敲完成 = 入口、charters、oracle、证据形式、
 预算与停止办法写清，且真模型范围/成本按用户 2026-11-10 的授权执行。**
+
+并回答资产问题：**继续探索前该先补哪些测试资产/探针**，才能把「声明↔运行时」「生命周期终态」「UI 证据」
+这三类盲区变成可复判的机器证据；目标不是资产越多越好，是让下一轮少花在取证、假阳性和重复读取上。
 
 **当前情况（2026-11-10 后）：**
 
@@ -51,6 +59,11 @@ skill？质量环 starter 能不能被 VP-Eng 真加载？旧 worker/retry/workf
   五条 CEO 命名行。
 - **旧轮次**：第四–七轮（2026-11-09/10）的 036–053 已修复归档；旧运行表、F4/F5 等观察不要重跑。复发按新
   证据记为回归，不拿旧结论当本轮 PASS。第四–七轮设计保留在下方作历史，**不是本轮的矩阵**。
+- **资产面（2026-11-10 晚审计）**：keyless 170 files / 1409 tests、60+ probes、`delegation-smoke`/
+  `preset-smoke`/`ui-scene-smoke` 都在；但 **model ↔ YAML 有 keyless 对账，YAML ↔ runtime 没有矩阵**；
+  child header 读取在 3 个 probe 各一份；`cdp-probe --ask` 只留 transcript 尾 450 字（OBS-5 因此不能判）。
+  缺口、实测基线与资产设计 = §9 与
+  [资产计划](../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md)。
 
 **已定（用户 2026-11-09 批准）：**
 
@@ -79,12 +92,20 @@ skill？质量环 starter 能不能被 VP-Eng 真加载？旧 worker/retry/workf
 - 发现处置：真缺陷开 `_backlog/bugs/` 卡；静态漂移/文案矛盾记观察并指明 owner；**本轮不改代码**，
   修复另按用户授权边界。
 
-**下一步（2026-11-10）：** 第八轮已执行（见下方「第八轮执行结果」）；
-[BUG-054](../_archive/fixed_bugs/BUG-054-dev-rehearsal-kb-policy-lines-missing.md) /
+**已定（用户 2026-11-10 晚）：**
+
+- 用户要求：**先研究测试资产/探针，再继续 exploratory test**；本卡据此调整为「资产先行」。
+- 资产批 A（A1 运行时面矩阵、A2 会话证据包、A3 UI 全文证据）= 0 模型、可自证红绿，可自主推进；
+  live 批 B（B1 生命周期、B2 矩阵 live 基线、B3 团队角色包、B4 UI、B5 `/req check`）= 仍按授权门等批准。
+- 边界不变：不改产品代码、不重跑第四–八轮旧矩阵、真缺陷先开 `_backlog/bugs/` 卡；
+  资产工作不以“绿”代替行为结论。
+
+**下一步（2026-11-10 晚）：** 先做 A 批资产（§9.2），红证齐后把矩阵/证据包结果回填本节；
+B 批 live 需用户批准入口与预算后启动（不批准不跑）。A 批完成前不重跑第八轮、不扩 CEO root 的 workflow。
+第八轮的 [BUG-054](../_archive/fixed_bugs/BUG-054-dev-rehearsal-kb-policy-lines-missing.md) /
 [BUG-055](../_archive/fixed_bugs/BUG-055-team-role-packet-missing-taskbook.md) /
-[BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md) 均已由另一 Agent 修复归档；
-剩余 OBS-2 静态漂移与 OBS-5 UI 卡片可视性。
-未执行面保留，不写“没有 bug”。第四–七轮只作历史，不重跑。
+[BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md) 已由另一 Agent 修复归档；
+剩余 OBS-2/OBS-5/OBS-6 见 §8 与 §9。未执行面保留，不写“没有 bug”。第四–七轮只作历史，不重跑。
 
 **历史（2026-11-09 第四轮）：** 第四轮已执行并收口（2026-11-09，约 22 分钟/19 turns/27 children，
 未触发停止上限）；发现 **5 张缺陷卡（BUG-045–049）**，已按根因分组全部修复归档。修复后验证轮
@@ -115,6 +136,78 @@ root/child `aborted`、无 sleep 残留。真装配探针另证：只跑 `tsc -b
 剩余探索面 = long-term adoption / workspace-write / 真页面图 / 其他职能逐个采用 retry / 重启后身份行。
 用户 2026-11-09 晚已点名继续探索，本卡回 `推敲中`；上述未覆盖项是下一轮候选，不写“没有 bug”。
 第四轮资产（keyless）见本节下方「第四轮收口」。
+
+## 第九轮（2026-11-10 晚）：资产先行，再探索
+
+> 用户 2026-11-10 晚：最近改了一大堆，先研究测试资产/探针，调整本卡，再继续探索。
+> 本节是本轮唯一计划；第八轮结果 = §8，第四–七轮只作历史。长证据、实测矩阵与设计细节 =
+> [资产审计与第九轮设计](../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md)。
+
+### 9.1 为什么先补资产
+
+- 20 张有效委派面缺陷卡（036–056 扣除 BUG-050 误报）里，**8 张是「声明/可观测面 ≠ 运行时面」**
+  （037/043/045/046/047/049/051/052），**3 张是生命周期**（041/044/053）。前者适合矩阵化对账，
+  后者适合故障注入；都不是“再跑一个场景”能稳定抓到的。
+- 第八轮的成本大头不是模型，是取证与盲区：20 条 prompt（预算 16）、UI 对照 4 条、`/req check`
+  被 dataBlocked、质量环跑两次（audit FAIL 后 verify-only 复跑）、成员会话只能解盘上 zstd、
+  `--ask` 只看 transcript 尾 450 字（OBS-5 因此无法判）。
+- 现有链：`model ↔ YAML` 有 keyless 对账（`tests/presets/delegation-composition.spec.ts`），
+  `YAML ↔ runtime` **没有矩阵**；`delegation-smoke` 只覆盖 CEO/vp_eng 一条链。
+- round-8 日志只读实测（47 观察 / 27 child）：CEO root 80 工具、coo/cfo child 71、vp-eng root 81 /
+  named child 75 / member 81、worker 21、producer 31→22（root→child）、verifier 28→19；root−named child = 9 或 6。
+  这证明矩阵可零模型、秒级跑。详见资产计划 §5。
+
+### 9.2 资产批 A（无模型；可立即做）
+
+| ID | 资产 | 落点 | 判据 / oracle | 红证 | 成本 |
+|---|---|---|---|---|---|
+| A1 | 运行时面矩阵 judge + audit | 待建：tools/lib/surface-matrix.mjs、checks/audit/surface-matrix-audit.mjs、spec；YAML 派生收成 tools/lib/preset-rows.mjs | 11 preset × 4 类入口：工具面/命名行/control/workflow/handbook/合同/skill catalog/preset/depth；root 只判 Lead/overlay | 合成观察四例：worker 带 `list_subagents`、verifier 带 `write`、CEO 缺 `coo`、handbook 反置 | 0 模型；秒级 |
+| A2 | 会话证据包 | 待建：tools/lib/session-evidence.mjs、tools/explore-evidence.mjs、spec | 树/child durable header/终态/工具调用/写盘/catalog；缺 header 显式 `unavailable` | 合成日志缺 header → `unavailable`，不默认 worker/0 | 0 模型；秒级 |
+| A3 | UI 全文证据 | `probes/browser-visual/cdp-probe.mjs` 加 `--body-out`（~15 行） | `--ask`/`--steps` 后写完整 `document.body.innerText`；label 正/负控 | 已知不存在的 label 必须不命中 | 0 模型 |
+
+A1 验收：spec 红→绿；在 round-8 窗口（HEAD 后）的 47 条观察上零假阳性；`--since` 是必需参数
+（旧日志会报旧状态，见资产计划 §5.2）。**不证明**模型行为、UI、生命周期。
+A2 验收：spec 红→绿；`--session <root>` 出 JSON+markdown；替掉 3 个 probe 的重复 child 读取（或写明保留理由）。
+A3 验收：负控 label 不命中；`COO（运营与交付）` / `CFO（财务与合规）` 命中与否都有全文可判。
+
+### 9.3 资产批 B（live，待用户批准）
+
+| ID | 试验 | 形状 | oracle | 预算 |
+|---|---|---|---|---|
+| B1 | 生命周期注入 | `probes/team/delegation-lifecycle-probe.mjs --fault cancel\|sigterm`：vp-eng 用 `subagent_retry` 起 sleep worker，child 起后 cancel/停宿主 | root/child `turn/end` 终态；`list_subagents` 行；retry 结果；重启后冷恢复 | 2–4 prompts |
+| B2 | 矩阵 live 基线 | 复用 `delegation-smoke --delegate` + `delegation-depth-probe` + B3 的会话，跑 A1 | A1 零问题；root/child delta = 9/6 | 0–2 prompts（复用） |
+| B3 | 团队角色包 × 非 COO | CEO 1 人 CFO 成员，任务书带 CFO 角色包 | 成员 read CFO skills、`drafts/cfo.md`、不越权 | 1–2 prompts |
+| B4 | UI 卡可视性 | `ui-scene-smoke --ask` + A3 全文 | `COO（运营与交付）`/`CFO（财务与合规）` 命中或不命中都有全文 | 1 prompt |
+| B5 | `/req check` live | GUI 会话跑一次；仍 dataBlocked 就记未覆盖 | 回执层/动议类型 | 0–1 prompt |
+
+- 预算：60 分钟 / 10 parent prompt / 16 child activation / 1 浏览器 / 8 MiB；超限停新试验。
+- 权限：当前 workspace-write + 排练场 cwd；证据 = `runtime/tmp/explore/round9/` + 卡内摘要；
+  真模型范围按本表，不扩 CEO root 的 workflow、不重跑旧矩阵。
+- 停止：单 turn 300s；连续两次 infra 失败暂停诊断；抓到 P1 先开卡再继续下一个；本轮不改产品代码。
+
+### 9.4 本轮不建（明确排除）
+
+- **replay/snapshot**：replay lane 不加载 company-pack；snapshots 只收合成场景，真实会话证据不进仓。
+- **文档散文门禁**：policy P2 只对复发 + 可机械判定的错误；OBS-2/OBS-6 一次修 + owner。
+- **`/req check` 命令宿主夹具**：keyless 已覆盖解析；live 缺的是 workspace/lease，不是产品类型。
+- **每 bug 一个常驻 probe**：修完的 bug 进 keyless judge；live probe 只留模型行为/生命周期/UI 三类。
+- **无人值守 fuzz / 全 preset E2E**：P3 轻任务；模型成本与 flake 不可控。
+
+### 9.5 资产 ROI 规则
+
+1. 补验证链缺口，或让新假设更便宜；否则放 `runtime/tmp`，不入库。
+2. judge 进 `tools/lib` + spec；live/browser 只采集（judge + thin runner）。
+3. 先有红证；没红过的资产不算证据（[testing.md](../../docs/testing.md) §3.7）。
+4. 头注写清「不证明什么」；矩阵绿 ≠ 行为绿。
+5. 资产有层（keyless/smoke/probe/audit/evidence）；不把模型塞进 `pnpm test`。
+6. 同类形状第二次出现、或某 charter 被盲区卡住才建；不预建每 bug 场景。
+
+### 9.6 完成判据（资产批）
+
+- A1/A2/A3 各有落点、spec 红→绿、头注「何时跑/成本/不证明」；A1 在 round-8 窗口零假阳性。
+- A 批不调模型；B 批未批准前不启动。
+- OBS-2/OBS-6 静态漂移有 owner 与处置（修或明确不修）；不把文档漂移混进资产绿。
+- 收口回答：矩阵抓到什么、证据包省了什么、哪些面仍未覆盖。
 
 ## 第八轮（2026-11-10 后）：新面与回归
 
@@ -330,6 +423,11 @@ spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全
   都看不到角色卡标签；默认 transcript 只显示最终文本 / `Completed`，点 `Completed` 或 `Agent Team`
   仍未露出。`client-load-smoke` 与 shell golden 全绿；卡片是否真渲染**未证**，不据此开 bug，
   归入“UI 卡片可视性未覆盖”。
+- **OBS-6（静态漂移，owner = docs）**：`docs/contracts/delegation.md` §5 仍写卡片 key =
+  `vp_eng` / `vp_sales` 两项，且渲染文案仍指“VP 交回的稿子”；代码
+  [`delegation-keys.ts`](../../packages/company-pack/src/client/wiring/delegation-keys.ts) 已是五项
+  （`vp_eng`/`vp_sales`/`vp_cmo`/`coo`/`cfo`），`DelegationCard` 也已是通用职能卡。
+  与 OBS-2 同批处置；不影响运行，但会误导下一轮 UI 判据。
 - **未发现**产品类型/五汇报线的硬缺陷；质量环 catalog/加载 PASS，完整质量环 audit `body-modified`
   已由另一 Agent 修复归档（[BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)）；
   UI 卡片标签未证实。不能据此说“没有 bug”，未跑面见下。
@@ -666,7 +764,8 @@ CMO 深度门都正确。
 
 | 材料 | 用途 |
 |---|---|
-| [重构后第四轮计划](../research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md) | 当前轮次的完整 delta、入口、charters、假设、fixtures、预算、停止与交接 |
+| [资产审计与第九轮设计](../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md) | 当前轮的资产结论、八轮缺陷家族、round-8 实测矩阵、A/B 资产、红证、预算与不建清单 |
+| [重构后第四轮计划](../research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md) | 第四轮 delta、入口、charters、假设、fixtures、预算、停止与交接（历史） |
 | [2026-11-08 计划](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md) | §1–§15 机制/设计（部分已被重构取代）；§16–§18 前三轮结果与未覆盖 |
 | [模型](../../tools/lib/delegation-model.mjs) | preset/通道/worker profile/合同/深度的唯一期望源；静态对账对象 |
 | [delegation 合同](../../docs/contracts/delegation.md) / [presets 合同](../../docs/contracts/presets.md) | 当前人读合同；tool 行以 preset 为准 |

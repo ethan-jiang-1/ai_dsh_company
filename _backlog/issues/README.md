@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-- [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：第四轮 5 张缺陷卡 BUG-045–049 已修复；修复后验证通过（keyless/挂载/UI golden + 真装配 retry/身份行/handbook）；BUG-050 复核为环境陈旧误报；用户 2026-11-09 晚指示继续探索；第五轮新发现 BUG-051（P2）、第六轮 BUG-052（P2）、第七轮 BUG-053（P1），**三张已于 2026-11-10 按 E/F 根因修复归档**（control per-agent + fan-out 诚实声明；abortable + interrupt）；depth 4 负例 / 重启后 retry+workflow 身份行 PASS；真页面 DagTab 仍未定位会话入口（harness-blocked，不伪造 PASS/FAIL）；未覆盖项见研究材料 §9.7–§9.9。
+- [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：第四–七轮发现 BUG-045–053 已全部修复归档；第八轮（2026-11-10）新发现 BUG-054/055/056 已修复归档；P1–P5 的 keyless/静态/live 基线通过，`/req check` live 仍 dataBlocked、UI 卡标签 OBS-5 未证实、新增 OBS-6 文档漂移。**用户 2026-11-10 晚要求先补测试资产再继续探索**：第九轮改为「资产先行」——A 批（运行时面矩阵 / 会话证据包 / UI 全文证据，0 模型）可做；B 批 live（生命周期/矩阵基线/CFO 角色包/UI/`/req check`，60 分钟 / 10 prompts）待批准。设计与实测矩阵见[资产计划](../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md)。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
 
