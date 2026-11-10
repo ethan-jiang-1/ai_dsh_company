@@ -17,6 +17,20 @@ vi.mocked(homedir).mockReturnValue(fixture)
 afterEach(() => vi.unstubAllEnvs())
 afterAll(() => rmSync(fixture, { recursive: true, force: true }))
 
+/** 排练/录制镜像的 kb 清单（v3：旁路只从 seed.json 派生，BUG-054）。 */
+const MIRROR_ROLES = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']
+const MIRROR_SEEDS = [
+  ...['company.md', 'org.md', 'owners.md', 'motion-ledger.md']
+    .map(name => ({ source: `state/${name}`, target: `.dsh-company/kb/${name}` })),
+  ...MIRROR_ROLES.map(role => ({ source: `charters/${role}.md`, target: `.dsh-company/kb/${role}/CHARTER.md` })),
+]
+
+function writeSeedManifest(repo: string, seeds: Array<{ source: string, target: string }>): void {
+  const dir = join(repo, 'packages/company-pack/content/kb-setup')
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(join(dir, 'seed.json'), JSON.stringify({ seeds }))
+}
+
 describe('smoke home 隔离：在启动和排练写入前拒绝错误 home', () => {
   it.each([undefined, '', '   '])('拒绝未明确设置的 home：%s', (value) => {
     vi.stubEnv('DSH_HOME', value)
@@ -87,6 +101,7 @@ describe('排练场镜像：v3 run bundle 状态', () => {
       for (const role of ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']) {
         writeFileSync(join(repo, 'packages/company-pack/content/charters', `${role}.md`), `# ${role}\n`)
       }
+      writeSeedManifest(repo, MIRROR_SEEDS)
       const rehearsal = ensureRehearsalWorkspace(repo)
       for (const name of ['company.md', 'org.md', 'owners.md', 'motion-ledger.md']) {
         expect(existsSync(join(rehearsal, '.dsh-company/kb', name)), `缺 ${name}`).toBe(true)
@@ -118,6 +133,7 @@ describe('录制工作区参考镜像（v3）', () => {
       for (const role of ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales']) {
         writeFileSync(join(repo, 'packages/company-pack/content/charters', `${role}.md`), `# ${role}\n`)
       }
+      writeSeedManifest(repo, MIRROR_SEEDS)
       mkdirSync(company, { recursive: true })
       mkdirSync(join(workspace, '.dsh-company/deliverables'), { recursive: true })
       writeFileSync(join(workspace, '.dsh-company/deliverables/keep.md'), '# 不触碰\n')

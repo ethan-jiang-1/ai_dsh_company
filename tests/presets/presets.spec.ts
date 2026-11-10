@@ -258,10 +258,30 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
 
   it('team spawn 角色包：CHARTER + 角色 skill + KB + 产出 + 边界', () => {
     const skill = readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
-    for (const needle of ['角色包', 'CHARTER', '<company-content>/../presets/', '产出', '边界']) {
+    for (const needle of ['角色包', 'CHARTER', '<company-content>/../presets/', '产出', '边界', '任务书']) {
       expect(skill, `assembling-the-team 缺角色包要素：${needle}`).toContain(needle)
     }
     expect(handbookSurface(), '通用协作面必须写 team 角色包').toContain('team 角色包')
+  })
+
+  // 负例留证 2026-11-10：BUG-055 —— 修前本条实跑红：角色包没有 `任务书` 字段，`work-handoff`
+  //   却把 `drafts/ceo.md` 写成固定路径；真跑探针里成员只能套默认路径，指向不存在的文件。
+  //   红配方 = 把 `任务书` 字段与 fallback 句删掉（或还原固定路径模板），本条即红。
+  it('team 角色包给任务书路径，署名行不得编造（BUG-055）', () => {
+    const skill = readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
+    expect(skill, '角色包必须带任务书路径字段（成员署名行靠它）')
+      .toMatch(/任务书[^\n]{0,8}[：:]\s*`?\.dsh-company\/deliverables\/<slug>\/drafts\/ceo\.md/)
+    expect(skill, '角色包必须给署名行格式（成员只看到角色包，不保证读 work-handoff）')
+      .toMatch(/署名行[^\n]*出稿：<角色>｜版本 v<N>｜任务书 = <任务书路径>/)
+    expect(skill, 'CEO 必须先落任务书再 spawn（spawn prompt 不是可回溯文件）')
+      .toMatch(/spawn 前[^\n]*任务书|先落任务书|任务书落盘后[^\n]*spawn/)
+    const handoff = readFileSync(join(PACK, 'content/generic/work-handoff.md'), 'utf8')
+    expect(handoff, '署名行路径必须从角色包抄，不能写死默认路径')
+      .toMatch(/任务书 = <角色包给的任务书路径>|任务书 = <任务书路径>/)
+    expect(handoff, '没有任务书文件时显式写无文件，不得编造路径')
+      .toContain('任务书 = 角色包（无文件）')
+    const collaboration = readFileSync(join(PACK, 'content/generic/collaboration.md'), 'utf8')
+    expect(collaboration, '手册的角色包清单必须含任务书').toMatch(/角色包[\s\S]*任务书/)
   })
 
   it('产物 owner 唯一：编制里查不到 ≠ 换人代行（缺角=补编制/报缺）', () => {

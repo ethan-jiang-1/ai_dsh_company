@@ -3,8 +3,10 @@
 // 形状（2026-11-01 v3）：只读内容在 pack `content/`；排练场只建 `.dsh-company/` 状态/产物。
 // 不再复制手册/模板到根，也不建根 AGENTS.md（host 注入 pack handbook）。
 // 排练产物永不触碰真实 workspace 的 journal/deliverables；这里只做参考状态镜像。
-import { cpSync, existsSync, mkdirSync, readdirSync, realpathSync, rmSync } from 'node:fs'
+// kb 文件清单 = seed.json 派生（不手抄第三份；BUG-054）。
+import { existsSync, mkdirSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
+import { KB_DIR, seedKbFiles } from './kb-seeds.mjs'
 
 export const REHEARSAL_REL = join('runtime', 'rehearsal-workspace')
 const ROLES = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales', 'cmo']
@@ -23,19 +25,14 @@ export function mirrorCompanyReference(workspace, companyRoot, { contentRoot } =
     throw new Error(`mirror: 找不到 pack content 手册 ${join(content, 'AGENTS.md')}——repo 布局变了吗？`)
   }
   const run = join(workspace, '.dsh-company')
-  for (const dir of [run, join(run, 'kb'), join(run, 'deliverables'), join(run, 'deliverables-archive'),
+  for (const dir of [run, join(workspace, KB_DIR), join(run, 'deliverables'), join(run, 'deliverables-archive'),
     join(run, 'cultivation'), join(run, 'cultivation/records'), join(run, 'logs'), join(run, 'exports')]) {
     mkdirSync(dir, { recursive: true })
   }
-  const copy = (source, target) => { if (existsSync(source)) cpSync(realpathSync(source), target, { force: true }) }
-  // 编号合同（A7/A8）也随参考镜像：排练场跑新动议需要它与真盘一致。
-  for (const file of ['company.md', 'org.md', 'owners.md', 'motion-ledger.md', 'process-docs.md']) {
-    copy(join(content, 'state', file), join(run, 'kb', file))
-  }
-  for (const role of ROLES) {
-    mkdirSync(join(run, 'kb', role, 'journal'), { recursive: true })
-    copy(join(content, 'charters', `${role}.md`), join(run, 'kb', role, 'CHARTER.md'))
-  }
+  // 公司事实 / 章程 / 编号合同都按 pack 的 seed.json 镜像；排练场刷新参考状态（覆盖），
+  // 与生产首启"只补缺"不同——这是排练场语义，不是用户 workspace。
+  seedKbFiles(content, workspace)
+  for (const role of ROLES) mkdirSync(join(workspace, KB_DIR, role, 'journal'), { recursive: true })
   return workspace
 }
 

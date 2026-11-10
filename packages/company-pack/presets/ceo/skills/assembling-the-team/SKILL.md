@@ -56,6 +56,10 @@ description: CEO 的组队方法：接到动议先过这六步（要不要叫人
    **同一步写产品类型**：在 `meta.md` 写 `产品类型: hardware-software|business-software`。用户声明优先；
    没说就问一句，或按 `company.md` 的 `productType` 默认并在任务书标假设——不要按习惯猜。类型写错，
    `/req check` 会用错编号规则；改类型要重新确认层与文档链。
+   **先落任务书再 spawn**：`spawn_teammate` 之前，把任务书写到
+   `.dsh-company/deliverables/<slug>/drafts/ceo.md`——目标/约束/验收、在屋名单与通道、每个成员的
+   角色包、机器可读派活行都在里面；成员稿首的 `任务书 = …` 就指这份真实文件。spawn prompt 不是
+   可回溯文件，不落盘就 spawn = 署名行悬空（2026-11-10 BUG-055）。
 
 ### team spawn 的角色包
 
@@ -64,14 +68,17 @@ team 成员继承**你的**组合，没有角色 preset 的 `skill` catalog；�
 成员时，任务书必须带**角色包**，否则它只是“叫那个名字的 CEO”：
 
 - **角色**：`COO` / `CFO` / …
+- **任务书**：`.dsh-company/deliverables/<slug>/drafts/ceo.md`（spawn 前已落盘；成员按这个真实路径署名）
+- **署名行**：稿首 `出稿：<角色>｜版本 v<N>｜任务书 = <任务书路径>`（照抄真实路径，不得编造）
 - **CHARTER**：`.dsh-company/kb/<role>/CHARTER.md`
 - **角色 skill**：`<company-content>/../presets/<role>/skills/<skill>/SKILL.md`（列全；用 `read` 读正文）
 - **KB**：`.dsh-company/kb/<role>/`、`kb/org.md`、`kb/policy-lines.md`（按需）
 - **产出**：`.dsh-company/deliverables/<slug>/drafts/<role>.md`
 - **边界**：不越权、不替别的职能签字；缺口回你
 
-成员先 `read` CHARTER + 角色 skill + KB，再动笔。`skill` 工具加载不到角色 skill 是机制事实（成员继承你的
-catalog），**用 `read`，不要凭记忆**；任务书写明“先读再干”。
+成员先 `read` CHARTER + 角色 skill + KB，再动笔。`任务书` 是 spawn 前置：**盘上没有这份文件就不要
+spawn**（先补落）；成员稿首的署名行照抄这个路径，不许按默认模板编造。`skill` 工具加载不到角色
+skill 是机制事实（成员继承你的 catalog），**用 `read`，不要凭记忆**；任务书写明“先读再干”。
 
 > **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
 > 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对

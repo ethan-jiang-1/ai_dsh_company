@@ -31,7 +31,7 @@
 [authorship-audit](audit/authorship-audit.mjs) · [candidate-scan-eval](audit/candidate-scan-eval.mjs)
 [deliverables-check](audit/deliverables-check.mjs) · [journal-audit](audit/journal-audit.mjs)
 
-## 窄机制与视觉探针（probes/，66）
+## 窄机制与视觉探针（probes/，67）
 
 ### browser-visual（17）
 
@@ -66,7 +66,7 @@
 [taskboard-presence-probe](../probes/fs-taskboard/taskboard-presence-probe.mjs)
 [taskboard-scope-probe](../probes/fs-taskboard/taskboard-scope-probe.mjs)
 
-### session-context（17）
+### session-context（18）
 
 [ask-user-timed-probe](../probes/session-context/ask-user-timed-probe.mjs)
 [budget-signoff-probe](../probes/session-context/budget-signoff-probe.mjs)
@@ -84,6 +84,7 @@
 [journal-boundary-probe](../probes/session-context/journal-boundary-probe.mjs)
 [member-bounceback-probe](../probes/session-context/member-bounceback-probe.mjs)
 [reconcile-round-probe](../probes/session-context/reconcile-round-probe.mjs)
+[team-taskbook-probe](../probes/session-context/team-taskbook-probe.mjs)
 [time-context-probe](../probes/session-context/time-context-probe.mjs)
 
 ### team（22）

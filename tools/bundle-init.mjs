@@ -1,11 +1,13 @@
 // 状态：常驻
 // 何时跑：fresh clone、或 dev 的 company-workspace 被清掉之后——重建 dev 公司状态的 workspace。
 // 形状：只在 `company-workspace/.dsh-company/` 建状态/产物目录与状态实例；
-// 插件内容（手册/模板/默认章程）住 pack `content/`，不复制、不建符号链接。已有 workspace 时跳过。
+// 公司事实/章程按 pack `kb-setup/seed.json` 复制（与生产 bootstrap 同清单，不再手抄；BUG-054）；
+// 手册/模板等注入面仍住 pack `content/`，不复制、不建符号链接。已有 workspace 时跳过。
 //
 // 应用内安装不需要本脚本——`dsh --profile company` 首启会自己初始化 `.dsh-company/`；这里只补 dev 盘。
-import { copyFileSync, existsSync, mkdirSync } from 'node:fs'
+import { existsSync, mkdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { seedKbFiles } from './lib/kb-seeds.mjs'
 import { repositoryRoot as repoRoot } from './lib/repository-layout.mjs'
 
 const CONTENT = join(repoRoot, 'packages/company-pack/content')
@@ -35,16 +37,8 @@ for (const dir of [
   join(RUN, 'overrides'),
 ]) mkdirSync(dir, { recursive: true })
 
-for (const file of ['company.md', 'org.md', 'owners.md', 'motion-ledger.md']) {
-  const source = join(CONTENT, 'state', file)
-  const target = join(RUN, 'kb', file)
-  if (existsSync(source) && !existsSync(target)) copyFileSync(source, target)
-}
-for (const role of ROLES) {
-  const source = join(CONTENT, 'charters', `${role}.md`)
-  const target = join(RUN, 'kb', role, 'CHARTER.md')
-  if (existsSync(source) && !existsSync(target)) copyFileSync(source, target)
-}
+// 公司事实 / 章程按 seed.json 只补缺（与生产 bootstrap 同清单；旁路不再维护第二份）。
+const seeded = seedKbFiles(CONTENT, WORKSPACE, { onlyMissing: true })
 
-console.log(`bundle:init 完成——${relative(repoRoot, WORKSPACE)}/.dsh-company（状态实例 ×${ROLES.length + 4}；插件内容不复制）`)
+console.log(`bundle:init 完成——${relative(repoRoot, WORKSPACE)}/.dsh-company（seed kb 文件 ×${seeded.length}；手册/模板不复制）`)
 console.log('下一步：source run/env.sh；`pnpm company --no-open` 或 `cd company-workspace && pnpm dsh --profile company`。')

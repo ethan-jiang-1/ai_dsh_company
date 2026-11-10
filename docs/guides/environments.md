@@ -34,7 +34,8 @@
    `git status --porcelain` **无新增**（bundle 整树 gitignored，不进 git）且
    `find company-workspace -type f | wc -l` 与跑前一致（ignored 的本地过程稿也要看，否则这层会漏成“零改动”）。
    排练场不建手册副本或符号链接；手册由 host 从 pack `content/` 注入（与真盘同一份基线），
-   CHARTER/org/templates 每次刷新，**journal 不镜像**（排练记忆不混真记忆）；`snapshot-motion` /
+   seed.json 的公司事实/章程（`kb/`，含 policy-lines / review-protocol / process-docs）每次刷新，
+   **journal 不镜像**（排练记忆不混真记忆）；`snapshot-motion` /
    `deliverables-check` 默认仍指真盘——归档与审计本来就属于运行场。
 9. **沙箱后端探测**：`env.sh` 实跑一次 `sandbox-exec` 探测，**不可用则自动导出 `DSH_PERMISSION_MODE=danger-full-access`**
    （macOS 26 本机禁了 Seatbelt；不落则每条 bash 都退化成「请求升级」，连 `ls` 也一样）。探测结果**明示**（stderr 一行取舍）；

@@ -24,7 +24,7 @@ git submodule update --init             # vendor/dsh 钉 tag
 corepack enable pnpm                    # 一次性：pnpm 读根 packageManager（钉 11.7.0）
 pnpm install                            # 根 workspace（vendor/dsh 全树含 vendored cordis 与 native/system）
 (cd vendor/dsh && pnpm install --frozen-lockfile --ignore-scripts)  # vendor 自己的 lock：pi-ai 1.1.0 / vite 8.2.2 等；根 lock 会解析到更新版 → 类型漂移
-pnpm bundle:init                        # dev 公司状态 的 workspace（company-workspace/ 整树 gitignored；只建 .dsh-company/ 状态，不复制/不建符号链接）
+pnpm bundle:init                        # dev 公司状态 的 workspace（company-workspace/ 整树 gitignored；只建 .dsh-company/——公司事实/章程按 seed.json 补缺，手册/模板不复制）
 # host 面最小 dev type graph（fresh-clone CI 跑这档；源码直跑需要的 typert 产物）：
 node ./node_modules/typescript/bin/tsc -b \
   vendor/dsh/packages/typert/generator \
