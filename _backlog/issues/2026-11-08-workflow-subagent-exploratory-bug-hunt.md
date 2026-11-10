@@ -299,6 +299,18 @@ B5 从「未证」改 PASS。
 - **结果**：`quality-loop-audit --deliverable 2026-11-10-probe-qloop` **ALL PASS**（2 轮 / 2 侧）。
 - **未覆盖**：R3（上限 2，不允许）；方法判断质量仍归人审；R2 未再触发新的产品级硬缺陷。
 
+### 9.11 定点：picker 会话 + VP-Sales 角色包（2026-11-10/11）
+
+- **picker 会话（BUG-060，已修）**：启动无 workspace（`DSH_COMPANY_HOME=/tmp/nonexistent`）+
+  建 cwd=`company-workspace` 的会话 → 修前 `/req check` 仍 dataBlocked；修后 **success**
+  （层 MRD/StRS/PRD、动议类型 business-software）。修法 = 只读 `/req`/`/prd` 用
+  `agent.session.header.cwd` 回落；写命令仍走停写守卫。真正的 GUI picker 点击未自动化，
+  本卡证的是 picker 会话的命令路径；写命令（`/deliverables`、`/cultivation`）仍需重启。
+- **VP-Sales 角色包（PASS）**：CEO 1 人 VP-Sales 成员，任务书带角色包 →
+  `drafts/ceo.md`、`drafts/vp-sales.md` 在场；署名行 `任务书 = …` 指向真实文件；
+  任务书含 VP-Sales 角色包（3600 chars）；成员继承 CEO 组合，不冒充 preset。无新缺陷。
+- **判定**：两个定点一个 PASS、一个抓出 BUG-060 并修复；未发现新的产品级硬缺陷。
+
 ## 第八轮（2026-11-10 后）：新面与回归
 
 > 用户 2026-11-10 要求：先把本卡适配现状，再做 exploratory test。**本节是本轮唯一矩阵**；

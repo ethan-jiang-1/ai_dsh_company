@@ -8,6 +8,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { blockedCompanyText } from './blocked-text.ts'
+import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
 import { validateProductDocs } from '../../lib/prd-check.ts'
 
@@ -40,13 +41,19 @@ export function registerPrdCommand(ctx: Context, options: PrdCommandOptions): vo
     name: 'prd',
     description: '产品需求校验：检查 MRD/PRD 的编号、来源追溯、验收标准、依赖与状态（人命令）',
     input: { hint: 'check <deliverables 目录名>' },
-    handler: async ({ rawInput }: { readonly rawInput: string }) => {
-      if (options.dataBlocked) {
-        return { kind: 'error' as const, text: blockedCompanyText(options.blockedReason, '校验') }
+    handler: async ({ rawInput, agent }: { readonly rawInput: string, readonly agent?: CommandAgent }) => {
+      const workspace = commandWorkspace(options.workspace, agent)
+      if (workspace === '') {
+        return {
+          kind: 'error' as const,
+          text: options.dataBlocked
+            ? blockedCompanyText(options.blockedReason, '校验')
+            : '未指定 workspace；先选 workspace 再校验。',
+        }
       }
       const parsed = parsePrdCheck(rawInput)
       if (!parsed.ok) return { kind: 'error' as const, text: parsed.text }
-      const resolved = resolveDeliverablePath(options.workspace, parsed.slug)
+      const resolved = resolveDeliverablePath(workspace, parsed.slug)
       if (!resolved.ok) return { kind: 'error' as const, text: resolved.text }
       const { dir } = resolved
       const mrdPath = join(dir, 'mrd.md')

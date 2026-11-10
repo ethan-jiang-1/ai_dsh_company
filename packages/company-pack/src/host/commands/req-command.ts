@@ -11,6 +11,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { blockedCompanyText } from './blocked-text.ts'
+import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
 import { checkRequirements, isLayer, type MotionDoc } from '../../lib/requirements-check.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
@@ -123,13 +124,19 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
     name: 'req',
     description: '需求编号与追溯校验：层/定义形态、重复/悬空/退役词/孤儿/覆盖/计数（操作员命令，角色不自证）',
     input: { hint: 'check <deliverables 目录名>' },
-    handler: async ({ rawInput }: { readonly rawInput: string }) => {
-      if (options.dataBlocked) {
-        return { kind: 'error' as const, text: blockedCompanyText(options.blockedReason, '校验') }
+    handler: async ({ rawInput, agent }: { readonly rawInput: string, readonly agent?: CommandAgent }) => {
+      const workspace = commandWorkspace(options.workspace, agent)
+      if (workspace === '') {
+        return {
+          kind: 'error' as const,
+          text: options.dataBlocked
+            ? blockedCompanyText(options.blockedReason, '校验')
+            : '未指定 workspace；先选 workspace 再校验。',
+        }
       }
       const parsed = parseReqCheck(rawInput)
       if (!parsed.ok) return { kind: 'error' as const, text: parsed.text }
-      const resolved = resolveDeliverablePath(options.workspace, parsed.slug)
+      const resolved = resolveDeliverablePath(workspace, parsed.slug)
       if (!resolved.ok) return { kind: 'error' as const, text: resolved.text }
       const { root, dir } = resolved
       const docs: MotionDoc[] = []
@@ -140,7 +147,7 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
       if (docs.length === 0) {
         return { kind: 'error' as const, text: `缺需求文档：${dir}（至少要有 mrd.md / strs.md / prd.md）` }
       }
-      const resolution = resolveProductType(options.contentDir, options.workspace, root)
+      const resolution = resolveProductType(options.contentDir, workspace, root)
       if (resolution.error !== null) {
         return { kind: 'error' as const, text: resolution.error }
       }

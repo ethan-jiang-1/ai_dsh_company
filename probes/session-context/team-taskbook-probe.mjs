@@ -39,10 +39,16 @@ const ROLE_SPEC = {
     skills: ['cfo-workflow', 'finance-compliance', 'project-economics'],
     charter: 'cfo/CHARTER.md',
   },
+  'vp-sales': {
+    label: 'VP-Sales',
+    motion: '现有客户与定价核查，只问客户买不买、价格接不接得住',
+    skills: ['customer-voice', 'market-sizing', 'sales-workflow'],
+    charter: 'vp-sales/CHARTER.md',
+  },
 }
 const SPEC = ROLE_SPEC[ROLE]
 if (SPEC === undefined) {
-  console.error('team-taskbook-probe: --role 只支持 coo / cfo')
+  console.error('team-taskbook-probe: --role 只支持 coo / cfo / vp-sales')
   process.exit(2)
 }
 const sleep = (ms) => new Promise(resolveSleep => setTimeout(resolveSleep, ms))

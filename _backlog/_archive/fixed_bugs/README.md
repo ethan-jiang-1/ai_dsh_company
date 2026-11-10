@@ -4,6 +4,13 @@
 
 ## 修复流水（倒序）
 
+- **BUG-060**（2026-11-10，P2）：启动无 workspace 时 `dataBlocked` 把 `/req`/`/prd` 一起挡住，
+  侧栏选 workspace 后的会话仍要重启；只读命令不需要 lease。修法 = `commandWorkspace` 用
+  `agent.session.header.cwd` 回落；只为「有 workspace」放行只读，写命令仍停写。
+  红→绿：两 spec 新用例修前 2 failed → 22 passed；真入口无 workspace 启动 + 会话 cwd 有效 →
+  `/req check` success。详见 [卡](BUG-060-readonly-command-session-workspace.md) 与
+  [Note](../../../notes/implemented/2026-11-10-readonly-command-session-workspace.md)。
+
 - **BUG-059**（2026-11-10，P2）：质量环 audit 的原文索引用**跨轮全局** `lastTextIndex`；R2 换了新
   verifier session（`cdf67a74`）后仍从 R1（`7ae15c99`）的 index+1 找，新 session 的正文被跳过，
   误报 `not-verbatim`。修法 = `lastTextIndexBySession`（按 session id 记；同 child 续跑才沿用）。

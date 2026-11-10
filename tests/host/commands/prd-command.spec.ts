@@ -4,6 +4,8 @@
  * 负例留证 2026-11-10：slug 校验缺席时 `check ../zz-outside` 会读到 deliverables 根外并调用
  *   validateProductDocs ⇒「越界 slug」用例红（BUG-057）；加校验后绿。
  */
+// 负例留证 2026-11-10：把 `if (options.dataBlocked) return blocked` 放回 handler ⇒「dataBlocked + 会话 cwd 有效」用例红（BUG-060）；移除即绿。
+
 // 负例留证 2026-11-10：去掉 blockedReason / 改回旧「无 workspace/身份/lease 问题」文案 ⇒「回执点名真实原因（BUG-058）」用例红；还原即绿。
 
 // 负例留证 2026-11-10：删掉 slug 校验 ⇒「越界 slug」用例红（读根外 + 调用 checker；BUG-057）；还原即绿。
@@ -33,7 +35,7 @@ const prdJson = JSON.stringify({
 })
 
 function mount(workspace = '/w', options = {}) {
-  type Def = { handler: (input: { readonly rawInput: string }) => Promise<{ readonly kind: string, readonly text: string }> }
+  type Def = { handler: (input: { readonly rawInput: string, readonly agent?: { session?: { header?: { cwd?: string } } } }) => Promise<{ readonly kind: string, readonly text: string }> }
   let definition: Def | undefined
   const ctx = { commands: { register: (def: Def) => { definition = def } } }
   registerPrdCommand(ctx as unknown as Context, { dataBlocked: false, workspace, ...options })
@@ -57,8 +59,8 @@ describe('parsePrdCheck', () => {
 })
 
 describe('registerPrdCommand', () => {
-  it('dataBlocked → 错误，不读盘；回执点名真实原因（BUG-058）', async () => {
-    const definition = mount('/w', { dataBlocked: true, blockedReason: '未指定 workspace（测试）' })
+  it('无 workspace + dataBlocked → 错误，不读盘；回执点名真实原因（BUG-058）', async () => {
+    const definition = mount('', { dataBlocked: true, blockedReason: '未指定 workspace（测试）' })
     const result = await definition.handler({ rawInput: 'check demo' })
     expect(result.kind).toBe('error')
     expect(result.text).toContain('公司数据已停写')
@@ -85,6 +87,24 @@ describe('registerPrdCommand', () => {
       expect(called).toBe(false)
     } finally {
       rmSync(workspace, { recursive: true, force: true })
+    }
+  })
+
+  it('dataBlocked + 会话 cwd 有效 → 只读命令仍可跑（BUG-060）', async () => {
+    const { workspace, cleanup } = fixture()
+    try {
+      const dir = join(workspace, '.dsh-company/deliverables/2026-11-05-demo/drafts')
+      writeFileSync(join(dir, 'mrd.md'), doc(mrdJson))
+      writeFileSync(join(dir, 'prd.md'), doc(prdJson))
+      const definition = mount('', { dataBlocked: true, blockedReason: 'writer lease 被占用：另一个 writer' })
+      const result = await definition.handler({
+        rawInput: 'check 2026-11-05-demo',
+        agent: { session: { header: { cwd: workspace } } },
+      })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('PRD 校验通过')
+    } finally {
+      cleanup()
     }
   })
 
