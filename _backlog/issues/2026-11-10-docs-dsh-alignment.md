@@ -1,13 +1,15 @@
 ---
-status: 推敲中
+status: 待落地
 opened: 2026-11-10
 ---
 
 # docs/ DSH 对齐：四个实质偏离怎么收
 
-> 立卡：2026-11-10 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：未定 ｜ 可关闭：否
+> 立卡：2026-11-10 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
 >
-> 背景：结构收敛已落（commit `35ffbb05` + `59fc0162`）；DSH 对齐只到骨架。本卡只做**决策与排序**，不动文件——选定的项各自再立实施卡。
+> **结论/去向**：note — 计划 `docs-dsh-alignment.md`（落 `notes/implemented/`，落地同变更成立）
+>
+> 背景：结构收敛已落（commit `35ffbb05` + `59fc0162`）；DSH 对齐只到骨架。**本卡是实施总卡**：五步按序落地，每步一个 commit + 证据；不另拆卡（步骤共享同一验收）。
 
 ## 问题
 
@@ -49,13 +51,40 @@ opened: 2026-11-10
 4. **genre 拆分**（demo/multi-human/presets）：内容手术，独立。
 5. **5% headroom 收口**：结构定稿后统一瘦身，避免同一内容搬两次；再加 `doc-budget` 规则。
 
-## 需要用户拍板
+## 拍板（2026-11-10）
 
-1. 先做哪一项？推荐 1（14 值）→ 2（index）。
-2. `design/`：先 A（瘦身）还是直接 B（并 notes）？
-3. index：保留登记表（受控例外）还是改 tier map？
-4. 5% headroom：只做内容瘦身，还是同时进 `doc-budget` 门禁？
-5. genre：拆不拆？先拆哪一篇？
+用户原话：“按照你的次序推进吧，把它把发现的东西都改了”；随后指定本卡为实施载体，“按照我们的流程”。
+
+- 顺序 = 1 → 2 → 3 → 4 → 5（见上）。
+- `design/` = **B**（并回 `notes/` + 顶层 `architecture.md`）。
+- index = **B**（tier map；改 `doc-taxonomy`）。
+- 5% headroom = **B**（进 `doc-budget` 门禁 + 瘦身）。
+- genre = **B**（拆 demo / multi-human / presets）。
+- “发现的东西都改”：14 值在步 1；历史/日期/R1/R2/已退役叙述在步 3/4/5 随文清理，不另留存量。
+
+## 实施切片
+
+| # | 切片 | 出口物（写不出就翻不动） |
+|---|---|---|
+| 1 | 值/死路径/矛盾修正 | 14+ 处改完；`pnpm verify` 绿；commit |
+| 2 | index → tier map | index 只列 tier + 入口；`doc-taxonomy` 改 tier 可达性；层表新文档规则；commit |
+| 3 | design/ → notes/ + architecture.md | 4 篇写成主题 Note；顶层有序地图；`design/` 移除/瘦成指针；commit |
+| 4 | genre 拆分 | demo/multi-human/presets 各拆合同 + guide/scenario；commit |
+| 5 | 5% headroom + now-only | `doc-budget` 加 95% 规则；顶格瘦身；历史散文清完；commit |
+
+## 验收标准
+
+1. **步 1**：14+ 处过期值/死路径/矛盾修正（删数不改数；含 architecture 的 tool-face 矛盾与 roles-isolation 死引用）；`pnpm verify` ALL PASS。
+2. **步 2**：`docs/index.md` 改为 tier map（5 层 + 入口），不再逐文档登记；`doc-taxonomy` 改“tier 可达性”而非“逐文件登记”；`docs/AGENTS.md` 新文档规则同步；树 = inventory。
+3. **步 3**：`design/` 4 篇的 still-guiding why 写成 `notes/implemented/` 主题 Note；当前语义归 `contracts/`；顶层新增有序地图 `docs/architecture.md`；`design/` 不留 rationale 正文；全站链接在场。
+4. **步 4**：`contracts/demo.md` / `multi-human.md` / `presets.md` 的合同部分与 guide/scenario 部分分开；`contracts/` 只留当前语义；指南/场景进 `guides/`；无 58% 分镜混合同。
+5. **步 5**：`doc-budget` 加“内容 ≤ 95% 上限”（≥5% headroom）；所有活跃文档达标；未提额；日期/R1/R2/已退役叙述在活跃文档清完，历史归 Note/git。
+6. **证据**：每步 commit；`pnpm verify` + `pnpm test`（步 2/3/4 后至少窄测）+ `pnpm typecheck`（末次）；落地 Note 记决定/输掉的方案/证据；`_backlog/_archive` 只允许路径-only 改动。
+7. **关闭**：用户验收 + Note 落盘 + 卡归档；不把“骨架对齐”冒充“DSH 全合规”。
+
+## 关闭条件
+
+验收标准全绿 + 用户验收 + `docs-dsh-alignment.md` Note 落盘 + 卡归档。
 
 ## 抽象度
 
