@@ -1,7 +1,9 @@
 # 2026-11-10 · 架构决策：repo 形态、组合层与角色=preset
 
-状态：implemented（2026-11-10 由 `docs/architecture.md` 转为 Note；现行语义以 `contracts/` 与 `docs/architecture.md` 为准，本 Note 保留决定与机制依据）
+状态：implemented（2026-11-10 由原 design/architecture 稿转为 Note；现行语义以 `contracts/` 与 `docs/architecture.md` 为准，本 Note 只留决定与理由）
 上游 = [docs-dsh-alignment](../../_backlog/issues/2026-11-10-docs-dsh-alignment.md)（步 3：design/ → notes/ + architecture.md）
+
+> 现行语义（canonical）= 文末链接；本 Note 只留决定/理由/证据，不复制现行表。
 
 ## 决定
 
@@ -14,290 +16,23 @@
 
 - N 个角色插件包；共享行放 host、preset 只放差异；自造调度器；自建数据库 / 记忆。
 
-## 原设计正文（机制依据与证据）
+## 为什么
 
----
+- DSH 的原生载体已经够用：package → bundle → profile/patch → agent preset；角色是 preset（组合），不是新插件，避免自造调度器/身份层。
+- 一个 company pack 覆盖公司组合：host 共享行 + 六个角色 preset + 共享 KB/模板；只有真代码才拆包（FAQ 13）。
+- 工具面必须逐 preset 自包含：DSH 无 patch 继承；R1 首跑漏了工具行，CEO 只拿到 10 个团队工具，读不了 CHARTER、写不出交付物。
+- 协作按“隔离 vs 协作”选 A/B/C/D：没有单一机制同时给足独立组合与持续对话；不自造调度器。
+- KB 按寿命分三载体；双 home 把开发态与日用态隔开；headless 不挂 preset，角色内容只在 Web 面生效。
 
-## 0. 一句话结论
+## 证据 / 历史
 
-你的方向合理，但有一个关键的概念纠偏：**"角色"的 DSH 原生载体是 agent preset（组合文件），不是插件（代码包）**。
-正确形状：Option A 独立 repo + **一个 company pack**，pack 里 host/profile 层放共享行，
-`presets/ceo|vp-eng|vp-sales|coo|cfo|cmo/` 每角色一个薄 preset（persona + 角色 skills + 角色工具行；R2 五角色 + 2026-11-05 CMO）；
-协作用 DSH 已有的通道（delegation / Agent Teams / workflow），不自造调度器。
-"每角色完全隔离的 skills 面"和"角色间深度协作"在 DSH 里是一对真实的张力（见 §4 分水岭），
-要按场景分层选通道，不能指望一个机制同时给到极致。
+- 完整原稿：`git show ab0fd622^:docs/design/architecture.md`（2026-11-10 迁移前）；本 Note 只留决定与理由，不复制现行表。
+- 机制核对：vendor/dsh 钉住 tag 的 `packages/preset/*`、`subagent/*`、`experimental/agent-team/*`、`workflow/*`；R1 首跑证据与 R3 判定见原稿/相关 Note。
+- 决策台账：[D1–D5/D7](../../docs/reference/decisions.md)。
 
----
+## 现行语义（canonical）
 
-## 1. 概念纠偏：角色 = preset，不是插件
-
-### 1.1 DSH 的四个层次，别混
-
-| 层次 | 载体 | 回答的问题 | 在本项目的对应 |
-|---|---|---|---|
-| 代码包（plugin package） | npm 包，导出 Cordis 插件 | 有没有**新代码**（自定义工具/服务/流） | 只在角色需要专属工具时才出现 |
-| bundle（`dsh.bundle.patch`） | pack 的 `cordis.patch.yml` | 装进来时默认加哪些**行** | company pack 的 host 层共享行 |
-| profile / patch | `$DSH_HOME/profiles/<p>` | 部署级组合选择 | 产品入口 = `company` profile（CLI 从 web 模板建；v3 起不再是「已退役」）；GUI 安装落当前 profile（装进 `web` 就用 `web`） |
-| **agent preset** | 一个目录一个 `agent.cordis.yml` | **一个会话**挂什么（工具/prompt sections/skills/persona） | **每个角色一个 preset** |
-
-依据：`vendor/dsh/docs/architecture.md` 的组合链（package → bundle → profile/patch → app 启动 Loader）；
-`packages/preset/README.md`（"a session composed from a preset runs that preset's tools, prompt
-sections, and skills while every other session keeps its own"）。
-
-### 1.2 一个角色 preset 里有什么（shipped 出厂范本 + 声明教义）
-
-出厂范本 = `packages/bundle/web-app/presets/standard.patch.yml`（0.1.7 起**每预设一行
-`- insert:` 声明**，`name: '@deepseek-ai/dsh-agent-preset'`）；声明语义原文 =
-`packages/preset/agent-preset/README.md`。**最小形状以 [presets/ceo/agent.cordis.yml](../../packages/company-pack/presets/ceo/agent.cordis.yml) 为准**（身份、skills 与工具行都收在 `plugins:` 下；本仓 preset 是自包含声明），这里只留三个机制要点：
-
-三个机制要点（都已在源码核实）：
-
-- **persona**（`packages/preset/persona`）：`prefix`/`suffix` 是模板；`complete: true` 让整个
-  system prompt 只剩 persona；`includeRuntimeContext: false` 连运行时上下文快照都关掉。
-  只能挂在 preset 组合内（全局挂会与 prompt registry 的部署 persona 冲突、fail loud）。
-- **skills 硬隔离**（`vendor/dsh/docs/subsystems/skills.md`）：registry 是 host + per-scope 分层，
-  "a plugin mounted by an agent preset's standing composition lands in that preset's layer"，
-  读时合并 scope 链、最近层同名直接赢。→ CEO preset 挂 CEO skills 目录，VP preset 挂 VP
-  skills 目录，**互不可见**，这正是"每个角色有自己的 skill、单独隔离"的官方载体。
-- **preset 目录可以带资产**：0.1.7 起的 shipped preset 目录 = `agent.cordis.yml`（**显示名/描述已内联**
-  进 `dsh-agent-preset` 行；旧的独立 `preset.yml` 随升 pin 删除）+ `skills/`。
-
-### 1.3 所以"组织插件 + N 个角色插件"应该倒过来
-
-不是写 N 个插件包，而是：**一个 pack 提供“公司”这个组合的全部能力**——
-host 层共享行 + N 个角色 preset + 共享 KB + 模板。插件包（代码）只在两种情况出现：
-① 有真正要写的自定义工具/服务（如 org_chart 工具、公司知识检索工具）；② 某角色的代码独立演化
-到值得拆包（FAQ 13 决策 2：拆分只在角色独立演化时发生；生态 90%+ 单包起步）。
-
----
-
-## 2. 插件计数：到底写几个包
-
-**直接答案：1 个（company-pack），而且第 0 天它可以是零行 JS 的"纯配置插件"。**
-
-角色数量与包数量无关——角色是 pack 里的**目录**（preset），不是包。DSH 语义里：
-**包 = 发布单位（npm 包，一个 `dsh.bundle.patch`），行 = 组合条目（cordis.yml 里一行）**。
-一个包可以提供多行（subpath 行，如官方 `@deepseek-ai/dsh-tool-subagent-control/list-agents` 的写法）。
-所以本项目会组合出 ~15-20 个**行**，但自写的**包**始终是 1 个，直到出现拆包触发条件。
-
-### 2.1 三层拆解（代码量从零开始长）
-
-| 层 | 内容 | 自写 JS |
-|---|---|---|
-| ① 纯配置层（第 0 天） | `presets/<role>/`（agent.cordis.yml + persona 行 + skills/ 目录）、共享 KB、`cordis.patch.yml` | **0 行** |
-| ② 第一段真代码（按需） | M2 委托 provider（给委托 child 挂角色 preset，见 [roles-isolation.md](./2026-11-10-roles-isolation-rationale.md) §2/§3，百行级）；自定义工具行（org_chart、公司检索） | 同一 pack 内新增行 |
-| ③ 拆第二/三个包 | 触发条件（FAQ 13 决策 2 纪律）：某块代码独立演化 / 出现第二个消费方 / 独立发版需求；长出一窝专家才升方案 D | — |
-
-### 2.2 编排主通道（已核定，见 [decisions.md](../../docs/reference/decisions.md) D4）
-
-demo 形态"事件从 CEO 进、从 CEO 出"首选 **Agent Teams（M4）**——只有 Lead 能创建/interrupt
-teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱、teammates 保留 `subagent` 工具
-给各自 workers（官方 `agent-team-profile/cordis.patch.yml` 对 `tool-subagent-control` /
-`tool-subagent-list-agents` / `tool-subagent` 均 `disabled: true`——续驶控制与委派一并被关，
-故本仓直插这些行自配；直插取舍见 §3 冲突注）。
-因此 demo 第 0 天不需要任何自定义 provider——层② 是组合隔离的增强，不是 demo 门槛。
-
-### 2.3 装但不写的行（全是现成包）
-
-行清单的唯一家 = [cordis.patch.yml](../../packages/company-pack/cordis.patch.yml)（bundle 层）与
-[presets/](../../packages/company-pack/presets) 各角色的 `agent.cordis.yml`（per-preset 层）；这里不复刻枚举（D28）。
-workflow 行：CEO 不挂；vp-eng 的 `delegation` 组挂 `workflow-ptc` + `tool-workflow`（同身份并行扇出，
-2026-11-08；见 [delegation.md §4](../../docs/contracts/delegation.md)）。
-
----
-
-## 3. 协作通道盘点：DSH 已经给了四条，选着用（通道 D 只在 vp-eng）
-
-> 术语约定：本节按**机制**分四条通道（A–D）；[roles-isolation.md](./2026-11-10-roles-isolation-rationale.md) §3
-> 按**用法**分四种编排（M1–M4）。映射：M1 人中继＝多会话直用机制；M2 隔离委托＝通道 A 的
-> 自定义 provider 强化版；M3 SDK 编排＝通道 C；M4 团队＝通道 B。通道 D（workflow）：0.8.0 从 CEO
-> 退役；2026-11-08 起只在 vp-eng 作为同身份并行扇出工具，不是组织通道。
-
-### 通道 A · 命名委托工具（stable，最贴近"汇报线"）
-
-CEO preset 里给每个直接汇报对象配一个 `dsh-tool-subagent` 实例（persona 是 **per-instance 固定**的，
-`packages/subagent/tool-subagent/README.md`："another persona … requires another distinctly named tool"）：
-
-```yaml
-- id: tool-vp-eng
-  name: '@deepseek-ai/dsh-tool-subagent'
-  config:
-    provider: spawn
-    toolName: vp_eng          # CEO 的模型看到的就是一个叫 vp_eng 的工具
-    maxDepth: 1               # 禁止 VP→VP 平级派活
-    agentPreset: vp-eng       # 0.2.1：child 的人格与工具面只能由 preset 给
-- id: tool-vp-sales
-  name: '@deepseek-ai/dsh-tool-subagent'
-  config: { provider: spawn, toolName: vp_sales, maxDepth: 1, agentPreset: vp-sales }
-```
-
-- 每次调用 = 一次 **activation**：立即回执 `{ kind: 'activation', subagentId }`，child 的最终正文
-  以**父会话完成通知**送达；`job_output` / `job_kill` 不再代收 subagent。
-- child 按 `agentPreset` 组合 ⇒ 拿到的是**角色自己的** skills 与工具面（0.2.1 的收益；旧模型
-  "继承父会话、persona 写在行上" 已随 activation 移除）。
-- 消息只能相邻层级（父↔子）；VP 之间不能直接通信，要经 CEO 中转——这恰好就是"汇报线"的形状。
-- **与 team bundle 的组合冲突（核实过 patch 源）**：`agent-team-profile` 会 disable 全局
-  `tool-subagent-control`（send_message/interrupt_agent/list_agents）并关掉 `tool-subagent`，
-  而团队的九个工具**只覆盖 team 成员**——若装着 bundle 再加命名委托行，这些 child 将无法被续驶。
-  两条解法：① **已定（R1 起就是这么做的）**：不装官方
-  bundle，把 `agent-team` + `tool-agent-team` 两行直接 insert 进本包 `cordis.patch.yml`
-  （仍是零 JS；R3 的"改直插行"因此已完成）；② 保持 bundle，放弃命名委托的续驶能力。
-  ✅ **R3 的待验证点已判定（2026-09-22，别再当开放问题读）**：当时问的是"CEO 会话 spawn 过
-  teammate 之后，还能不能用团队版 `send_message`/`list_agents` 驱动命名委托生出来的非 team
-  child"。**结论 = 不能**——child 不在名册上，续驶/中断/列举全不可达，故命名委托不承担
-  "反复追加意见"（D18；team 才是连续对话的载体）。结论与证据在
-  [delegation.md §2](../../docs/contracts/delegation.md)，回归守卫 = `checks/smoke/delegation-smoke.mjs`。
-
-### 通道 B · Agent Teams（experimental，最贴近"公司开会"）
-
-`packages/experimental/agent-team` + `tool-agent-team`：Lead（CEO 会话）用 `spawn_teammate`
-创建具名 teammates（VP 们），全员拿到 9 个工具（spawn_teammate / send_message / list_agents /
-wait_agent / interrupt_agent / team_task_*）。
-
-- **持久邮箱**：任意成员↔任意成员（VP 之间可以直接通信），消息 Steer 投递（running 就近步边界、
-  idle 开新轮、inactive 冷恢复），不丢不重，崩溃可恢复。
-- **共享任务板**：CAS 修订号、`blockedBy` DAG、`writeScopes` 路径提示（advisory 重叠告警），
-  Lead 可指派，成员认领/完成/释放/重开。
-- teammate 可以 `fresh`（干净上下文）或 `fork`（继承 Lead 已完成轮次——**会议上下文下发的现成机制**）。
-- 代价与约束：**experimental、无稳定性承诺**（必须钉 vendor tag + 升级环）；teammates 共享 Lead 的
-  composition（§4）；flat roster（只有 Lead 能建人、不能嵌套团队、名字不复用）；一个进程一个共享
-  checkout；`maxMembers` 官方 bundle 与 pack 钉 8（代码默认 16）；需要 `dsh-session-persistence-jsonl` 才激活。
-
-### 通道 C · dsh-sdk 子进程（hard isolation，one-shot）
-
-`packages/subagent/subagent-dsh-sdk`：每个 child 是**完整独立的 Harness runtime**——自己的
-profile（`profile` + `patches` 配置）、自己的 composition/skills/model route。
-
-- 这是"每个角色真正独立组合"的唯一 in-tree 通道：给每个角色配一个 provider 实例 + 一份角色
-  profile（内含该角色 preset 的行），CEO 委托时选对应工具。
-- 代价：每 run 起一个完整 runtime 进程（无池化）；**one-shot**，父只拿到最终文本（中间过程留在
-  child 自己的 session root）；不支持 persona/toolFilter（由 child profile 自己决定）。
-- 适合"出一份稿子"式的任务式协作，不适合持续对话。
-
-### 通道 D · Workflow 脚本（vp-eng 专用，2026-11-08）
-
-`dsh-tool-workflow` + `workflow-ptc` 现在只在 vp-eng 的 `delegation` 组：脚本用 `parallel`/`pipeline`
-扇出同身份子代理，父只收最终 JSON；子代理无 `agentPreset`、fresh 上下文，不能替代独立结论。它是一次 run，
-不常驻组织；团队会话里的长 run 用后台 job，结果大时走聚合/异常（50k 上限 + spill）。
-
----
-
-## 4. 分水岭约束：composition 继承（设计前必须想清楚的一条）
-
-现行教义（`packages/subagent/subagent/src/child-agent.ts:24-28`，**旧版 README 原句已随 0.1.7 拆包消失**）：
-**child "inherits its parent's composition opportunistically (the documented `ctx.get` pattern),
-never as a hard dep"**——即继承是**机会性**的（拿到就用、拿不到不报错），不是硬依赖；
-包级索引另见 `packages/subagent/subagent/README.md`（"Child composition, delegated policy, depth helpers"）。
-
-也就是说，在通道 A/B/D 里：
-
-| 隔离维度 | team/委托树内的 child | 独立 preset 会话（各开各的） | dsh-sdk child |
-|---|---|---|---|
-| 会话历史/上下文 | ✅ 独立 session | ✅ 独立 | ✅ 独立 |
-| 人格（system prompt 身份） | ✅ per-child persona / name+description+team:policy | ✅ preset persona | ✅ child profile 决定 |
-| 工具面 | ⚠️ 继承父（toolFilter 只能裁） | ✅ preset 自选 | ✅ 独立 |
-| **skills catalog** | ❌ 共享父会话的 | ✅ **per-preset layer 硬隔离** | ✅ 独立 |
-| 角色间直接通信 | B✅（邮箱）/ A❌（相邻才可） | ❌（人来中转或无） | ❌ |
-
-结论：**"每角色硬隔离的 skills/工具面"与"一个组织里深度协作"不可兼得于一处**，按场景分层：
-
-- 隔离优先（各写各的深度文档、各自的专业判断）：独立 preset 会话（日常）或 sdk child（编排内）。
-- 协作优先（会议、任务板、互相 review）：Agent Teams，角色差异靠 name/description +
-  team:policy + KB 目录约定（软隔离），上下文隔离（每成员独立 session）仍然是硬的。
-
-注意你说的"上下文管理来得方便"这半句直觉是对的：**无论哪条通道，每个角色的会话历史、
-compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache 友好。
-
----
-
-## 5. 知识库（KB）的三个载体，按性质分
-
-| KB 性质 | 载体 | 机制 |
-|---|---|---|
-| 随包发布的角色知识（随版本走） | 各 preset 目录内 `skills/` | per-preset scope layer，硬隔离（§1.2） |
-| 公司共享手册（全员可见） | 全局 skills root（`<dshHome>/skills`）或项目 `.dsh/skills` | skills registry 全局层；project root rank 更高 |
-| 活数据（公司 wiki、产出物、会议纪要） | 共享 workspace 文件 + fs 工具 | 团队共享一个 checkout；最终产物用 `present` 工具标记 deliverable |
-
-- spill store（`ctx.spillStore`）**不是**这个用途——它是 tool 输出溢出的持久化，别拿来当公司记忆。
-- 团队的任务板/邮箱状态在 Lead session 日志里（durable、可回放），不需要自建数据库。
-- "角色私有目录"在团队里靠约定（`kb/<role>/` + 任务板 writeScopes 是 advisory 告警不是锁），
-  真要硬隔离就回到独立 preset 会话。
-
----
-
-## 6. repo 形态（Option A，单 pack 起步）
-
-形态一句话：**独立 repo + `vendor/dsh` 钉 SHA submodule + 单 company-pack（唯一发布载体）+
-`company-workspace/` 共享盘 + 双 home**（日用 `~/.dsh` 不动，开发 `DSH_HOME=runtime/harness-home`，
-环境脚本兜底）。装法与取舍的判定依据 = FAQ 13 `option-a-standalone-with-pinned-dsh.md`
-（外部研究材料，登记见 [external-research.md](../../docs/reference/external-research.md)）。**本节不复刻目录树**：
-现行目录逐件 owner 与产物落点的唯一家 = [项目地图](../../docs/project-map.md)（秒级快览 = 根
-[AGENTS.md 布局块](../../AGENTS.md)，受 layout-block 门禁钉住）——第二张空间地图必漂
-（实测：本树漏 tests/_backlog/_dist 三面，snapshots 与 company-workspace 两行注释过期，
-2026-10-12 退役）。
-
-要点：
-
-1. **工具面归 preset 自己声明（自包含）；profile/bundle 行只管全局服务与默认行**（R1 二次实证：
-   原设计"共享行放 host/profile 层、preset 只放差异"**对工具面不成立**——R1 首跑 CEO 会话只拿到
-   bundle 加的 10 个工具（团队 9 + present），没有 fs/skill，于是读不了 CHARTER、加载不了 skill、
-   **写不出交付物**）。shipped `standard` 同样是自包含：自己声明
-   tool-bash/tool-fs/tool-fs-search/tool-skill/goal/planning/compaction/delegation/…。
-   故每个角色 preset 声明自己那套工具行（复制式演化——DSH 无 patch 继承）；pack 的
-   `cordis.patch.yml` 只负责**全局行**（registry roster、团队两行、present）。
-   代价：六个角色各持一份工具行清单（复制式演化）；换来按角色的最小权限工具面。
-2. **presets 进 roster 的落法**（现行组合；rc.2 已核）：registry **一行**（`agent-preset-registry`，用替换
-   语法覆盖 web-app 的出厂 insert 行，`default: standard → ceo`）+ **每个预设一行**
-   `@deepseek-ai/dsh-agent-preset`（住 `presets/<role>/agent.cordis.yml`，经 `dsh.bundle.patch`
-   **数组**并入）。（旧模型 = `dsh-agent-presets` 一行 + `roots` 目录扫描 + `!!js`/`baseUrl` 自定位；
-   0.1.7 已把该包拆成 `agent-preset` + `agent-preset-registry`，**roots 机制已废**。）
-   纯 headless 组合没有 registry 行，用 `run/company.overlay.yml` 的 insert 补。
-3. **experimental team 两包是 host 行**（服务注册 + per-member scoped 工具安装），加
-   `dsh-session-persistence-jsonl` 才激活；以 `- insert:` 行随 bundle 走（R1 起直插，
-   不装官方 bundle，故无续驶控制冲突）。
-4. **双 home**：日用 `~/.dsh` 不动，开发 `DSH_HOME=<repo>/runtime/harness-home`，环境脚本兜底
-   （coding agent 不会自己想起这个区别）。
-6. **preset 挂载只在 Web 面**（R1 实测，机制级）：只有 `web-app` bundle 组合 `session-controller`
-   （headless / sdk / acp 都是 0），而 `composeAgent`（"session 未指定 preset 时挂 default"）
-   住在 session-controller 里。**headless 一次性驱动直接经 core agent registry 建 agent，绕过
-   preset 组合**——所以 headless 会话永远是部署默认人格（headless bundle 自己那行
-   `personaPrefix: "You are a coding agent…"`），角色内容（persona / 专属 skills）**只能在 Web
-   会话里生效**。推论：入戏探针与 demo 动议必须走 Web UI；自动化验证属 R5 的 web 快照 lane。
-
----
-
-## 7. 落地节奏（指针）
-
-开发队列已退役（D32，2026-09-28）；任务源、实施次序与未成熟问题的入口 = [开发环 §0.5](../../docs/guides/dev-loop.md) 与 [_backlog](../../_backlog/README.md)。
-本节保留节号，防既有引用断链。
-
-## 8. 风险与先验证清单
-
-- **experimental 漂移**：agent-team 无稳定性承诺，契约可自由变。→ vendor 钉 tag + SHA 簿记 +
-  `sync-dsh.mjs` 升级环 + compatibility 矩阵；升级前看 `_digested/_change_log/`。
-- **maxMembers 本仓钉 8**（代码默认 16，官方 bundle 同钉 8）：当前六角色，8 够用；要扩编制就调 config（startup 校验，fail loud）。
-- **共享 checkout 的越界写**：writeScopes/KB 私有目录都是约定级；要硬隔离用独立 preset 会话或
-  sdk child。
-- **日志税**：以后写自定义工具时，每个模型可见的新状态都要配 `SessionEventMap` 成员，否则
-  JSONL 回放不出来（dev-loop 第 3 阶段第 2 问）。
-- **preset 复制式演化的坑**：工具行必须逐 preset 声明（DSH 无 patch 继承）；host 层只放全局行。别把“preset 内只放差异”套到工具面——R1 已证伪。
-- **第 0 天别做**：registry.json / shared 包 / 每角色一个 npm 包 / OpenSpec——等触发条件
-  （第二个独立演化的专家、第二贡献者）再上（FAQ 13 推荐路径）。
-
-## 9. 触发升级的路径（预埋，不预建）
-
-- 角色长出独立演化的自定义代码 → `company-pack` 内拆内部包（发布载体仍是 pack）。
-- 长出一窝专家（市场部、法务部……各自独立产品）→ 升 FAQ 13 方案 D：本 repo 结构原样变成
-  `packages/<one-expert>/`，加 registry + templates。
-- 要给 DSH 上游提 seam（比如 per-teammate composition）→ 方案 B 通道进 DSH repo 做，本 repo
-  只留消费者。
-
-## 10. 改动归属表（指针）
-
-> 2026-10-20 审计：本表是**当前操作映射**，不属设计层——改什么 → 最窄检查唯一家 =
-> [tests/README「改动面 → 最窄检查」](../../tests/README.md)；安装/发布 = [release](../../docs/contracts/release.md)；
-> vendor = [release §vendor 政策](../../docs/contracts/release.md)；文档/合同 = `pnpm verify`。本层只留指针。
-
+- [docs/architecture.md](../../docs/architecture.md)（组合/地图）· [contracts/profile.md](../../docs/contracts/profile.md)（host 行）· [contracts/presets.md](../../docs/contracts/presets.md)（角色/四形态）· [contracts/delegation.md](../../docs/contracts/delegation.md)（通道/深度）· [runtime-map.md](../../docs/runtime-map.md)（时序/轴）。
 
 ## 相关
 
