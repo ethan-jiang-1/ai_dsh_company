@@ -1,10 +1,8 @@
-# presets · 角色 preset 的语义合同（R2 五角色定稿 + 2026-11-05 CMO 增设）
+# presets · 角色 preset 的语义合同
 
 > 什么时候读：改 persona、skills 或角色语义时。路线 = 六角色表 → 验证方式节；培养回路/方法层 = [cultivation.md](./cultivation.md)。
 > 合同：六个角色 preset 的"现在时"语义（persona 定稿、skills 清单、验证方式）。
-> 内容来源 [role-content Note](../../notes/implemented/2026-11-10-role-content-rationale.md)；命名约定见台账 D14
-> （显示名 = 角色名；公司名只在品牌/身份面；preset id 保持 kebab）。R1 定稿 CEO / VP-Eng；R2 定稿 VP-Sales / COO，
-> 并增设 CFO（用户 2026-09-22 定案：50 人高科技公司，软件开发 / 服务 / 系统集成）。
+> 内容来源 [role-content Note](../../notes/implemented/2026-11-10-role-content-rationale.md)；命名约定见台账 D14（显示名 = 角色名；公司名只在品牌/身份面；preset id 保持 kebab）。
 > **编制唯一事实家 = `company-workspace/.dsh-company/kb/org.md`**（细到岗位）；各角色 CHARTER 只留本条线事实
 > 并引用它（Q3：公司事实活数据留 workspace，pack 不含公司事实——D17）。
 > **工作流惯例**：每个角色至少 1 个自己的端到端工作流 skill（`<role>-workflow`，1 号）；

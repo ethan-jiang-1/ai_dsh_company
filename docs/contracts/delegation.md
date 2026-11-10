@@ -2,7 +2,7 @@
 
 > 什么时候读：CEO 派活方式要改、或委派行为不符预期时。路线 = 通道表（A/B）→ 边界节。
 > 合同：CEO 的"派活"现在时语义——哪条路走什么、边界在哪、被什么检查守住。
-> 机制依据 [architecture.md](../architecture.md) §3（通道 A/B）与
+> 机制依据 [architecture Note](../../notes/implemented/2026-11-10-architecture-rationale.md) §3（通道 A/B）与
 > [roles-isolation Note](../../notes/implemented/2026-11-10-roles-isolation-rationale.md) §2–§3；0.2.1 的激活模型见
 > vendor `docs/upgrade-guide/v0.2.1-alpha.1/subagent-activations/guide.md`。
 
@@ -110,3 +110,5 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
   `pnpm test` 的 client-face 守卫比对 preset 的 `toolName`。
 - 卡片只依赖 `slots` 服务（不读团队状态），单独 `ctx.inject(['slots'], …)` 注册——不被 team
   remote 的缺席拖住。
+
+验证分层与命令 = [tests/README](../../tests/README.md)；本文件不复述。

@@ -61,7 +61,9 @@ const DOC_LINE_BUDGETS = [
   ['notes/README.md', 132],
   ['packages/company-pack/README.md', 160],
   ['docs/guides/publish-handoff.md', 95],
-  // 负例留证 2026-11-03（R5-17）：publish-handoff 上限临时 95→80 →
+  // 负例留证 2026-11-10（DSH 步 5，5% headroom）：加规则后 docs/reference/decisions 65/65、delegation 120/120、
+//   environments 48/48、release-runbook 75/75 等 11 项 FAIL；瘦身/拆 reference 豁免后 PASS。
+// 负例留证 2026-11-03（R5-17）：publish-handoff 上限临时 95→80 →
   //   `FAIL doc-budget: docs/guides/publish-handoff.md 90 行超上限 80`；还原 95 → PASS。
 ]
 for (const [rel, cap] of DOC_LINE_BUDGETS) {

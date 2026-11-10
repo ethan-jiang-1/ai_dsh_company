@@ -6,13 +6,13 @@
 
 | # | 一句话 | 决定的家 |
 |---|---|---|
-| D1 | 自写包只有一个（company-pack）；角色是 preset 目录不是包 | [architecture](../architecture.md) §2 |
-| D2 | 角色 = agent preset（persona 行 + 自有 skills/ + 工具行），preset 只放差异 | [architecture](../architecture.md) §1/§6 |
-| D3 | repo 形态 = 独立 repo + `vendor/dsh` pinned submodule + 双 home | [architecture](../architecture.md) §6 |
-| D4 | demo 主通道 = Agent Teams；事件从 CEO 进出由 Lead-only 权威内建 | [architecture](../architecture.md) §2.2 |
-| D5 | 第 0 天零自定义 JS：纯配置 pack 即可跑通 demo v0 | [architecture](../architecture.md) §2.1 |
+| D1 | 自写包只有一个（company-pack）；角色是 preset 目录不是包 | [architecture Note](../../notes/implemented/2026-11-10-architecture-rationale.md) §2 |
+| D2 | 角色 = agent preset（persona 行 + 自有 skills/ + 工具行），preset 只放差异 | [architecture Note](../../notes/implemented/2026-11-10-architecture-rationale.md) §1/§6 |
+| D3 | repo 形态 = 独立 repo + `vendor/dsh` pinned submodule + 双 home | [architecture Note](../../notes/implemented/2026-11-10-architecture-rationale.md) §6 |
+| D4 | demo 主通道 = Agent Teams；事件从 CEO 进出由 Lead-only 权威内建 | [architecture Note](../../notes/implemented/2026-11-10-architecture-rationale.md) §2.2 |
+| D5 | 第 0 天零自定义 JS：纯配置 pack 即可跑通 demo v0 | [architecture Note](../../notes/implemented/2026-11-10-architecture-rationale.md) §2.1 |
 | D6 | UI 分层：第 0 层用现成 `client-ui-agent-team`，皮肤层进同 pack client 面 | [ui-demo](../../notes/implemented/2026-11-10-ui-demo-rationale.md) §0/§2 |
-| D7 | KB 三载体：角色知识→preset skills；公司手册→project root；活数据→workspace | [architecture](../architecture.md) §5 |
+| D7 | KB 三载体：角色知识→preset skills；公司手册→project root；活数据→workspace | [architecture Note](../../notes/implemented/2026-11-10-architecture-rationale.md) §5 |
 | D8 | 跨会话角色记忆 = workspace journal 文件（`kb/<role>/journal/`） | [roles-isolation](../../notes/implemented/2026-11-10-roles-isolation-rationale.md) §4.2 |
 | D9 | 上游缺口若成刚需→提 seam，不 vendor patch | [roles-isolation](../../notes/implemented/2026-11-10-roles-isolation-rationale.md) §4.1 |
 | D10 | docs/ 按性质分层，不按时间分层；否决「初始化/」目录方案 | [docs/AGENTS.md](../AGENTS.md) |

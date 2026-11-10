@@ -43,5 +43,6 @@
 ## 相关
 
 - 卡：[docs-dsh-alignment](../../_backlog/issues/2026-11-10-docs-dsh-alignment.md)。
+- 前序结构收敛：[docs-layer-restructure](./2026-11-10-docs-layer-restructure.md)。
 - 地图：[docs/index.md](../../docs/index.md)；层表：[docs/AGENTS.md](../../docs/AGENTS.md)；架构：[docs/architecture.md](../../docs/architecture.md)。
 - 四篇理由 Note：[architecture](./2026-11-10-architecture-rationale.md) · [roles-isolation](./2026-11-10-roles-isolation-rationale.md) · [ui-demo](./2026-11-10-ui-demo-rationale.md) · [role-content](./2026-11-10-role-content-rationale.md)。

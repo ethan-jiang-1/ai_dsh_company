@@ -79,3 +79,7 @@ pnpm typecheck # 通过（无类型/导入面改动）
 - `link-debt` 未升（archived 20 / moved 0 / live 0）；`doc-taxonomy` 绿；预算 10 键更新、未提额。
 - 迁移清单：`runtime/docs-migration/manifest.json`（gitignored；old→new + 逐条 link edit）。
 - 工作树：187 文件（177 M + 10 rename）一次 commit；本 Note 与卡归档同提交。
+
+## 相关
+
+- 后续 DSH 对齐：[docs-dsh-alignment](./2026-11-10-docs-dsh-alignment.md)。

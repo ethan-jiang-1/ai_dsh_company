@@ -15,7 +15,7 @@ CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 校验）
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml、src/（host）+ src/client/、content/（只读手册/模板/默认章程/状态默认值）；无 bin/启动器
 company-workspace/      **dev 公司状态的 workspace**（会话 cwd；整树 gitignored，不进 git）：只有 `.dsh-company/`（kb/、deliverables/、cultivation/、logs/、exports/、bundle.json v3，legacy 文件名）；`pnpm bundle:init` 建；插件内容不复制
 vendor/dsh/             DSH 源码 submodule（钉 SHA，只读铁律见下节）
-docs/                   当前合同与导航：index（地图）+ 顶层宪法（AGENTS / architecture / policy / testing / repo-hygiene）→ contracts/ guides/ + reference/（台账/术语/外部材料）
+docs/                   当前合同与导航：index（地图）+ 顶层门/宪法（AGENTS / architecture / policy / testing / repo-hygiene）→ contracts/ guides/ + reference/（台账/术语/外部材料）
 notes/                  开发记忆：proposed/（RFC）→ implemented/（活跃决策记忆）；离场目录不复述于此——分类规则唯一家 = notes/README.md
 _backlog/               推敲层：issues/bugs/research/methods/_archive + triggers.md（触发器）；章程与账本 = 其 README；agent 门牌 = AGENTS.md
 checks/                 验证面：run-gates 门禁；smoke/（真实入口冒烟）+ audit/（盘面日志判据）

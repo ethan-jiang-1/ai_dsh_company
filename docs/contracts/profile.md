@@ -4,7 +4,7 @@
 > 合同：部署形状与 host 行清单语义。行清单源文件（bundle 层）：
 > [packages/company-pack/cordis.patch.yml](../../packages/company-pack/cordis.patch.yml)。
 > 插件只读内容 = [content/](../../packages/company-pack/content)；公司状态 = `<workspace>/.dsh-company/`。
-> 设计依据 [architecture.md](../architecture.md) §6。
+> 设计依据 [architecture Note](../../notes/implemented/2026-11-10-architecture-rationale.md) §6。
 
 ## 安装形状
 
@@ -47,7 +47,7 @@
 | `time-context`（preset 内声明） | 日期通道（Asia/Shanghai） | ✅ |
 
 工具行走 preset 的自包含组合，不随 host bundle 增补（R1 实证；机制见
-[architecture §6 要点 1](../architecture.md)）。**例外 = `company-session-search` 隔离组**：
+[architecture Note](../../notes/implemented/2026-11-10-architecture-rationale.md) §6 要点 1）。**例外 = `company-session-search` 隔离组**：
 检索工具必须与 isolated `sessionQuery` provider 同组，所以它由 bundle 全局提供、不再逐 preset 声明；
 host 的 `session/search`（侧栏内容搜索）保持出厂 `openAt: never`（有会话时会报禁用），不是本包承诺。
 **没有 profile patch registrar**：旧 profile 里的 `company-workspace-register` 行会被忽略/告警，不写新行。

@@ -104,6 +104,18 @@ opened: 2026-11-10
 - 残留：`reference/` 的 5% 豁免是有意例外；now-only 未逐句清完（证据日期/R1/R2 保留，DSH 允许 version-specific evidence）；四篇主题 Note 保留决定时快照，canonical 语义在 contracts/architecture；预算仍按行计，非 DSH 词数。
 - 用户验收：待。
 
+## 验收对照（2026-11-10）
+
+| # | 状态 | 证据 / 边界 |
+|---|---|---|
+| 1 | PASS | `69706354`；14+ 值/死路径/矛盾修正 |
+| 2 | PASS | `177f887f`；index 书架 + doc-taxonomy tier 可达（红证 3 条） |
+| 3 | PASS | `ab0fd622`；design/ 四篇 Note + 顶层 architecture.md |
+| 4 | PASS | `3beabcca`；demo-scenes / multi-human-runbook / cultivation |
+| 5 | **PASS（headroom）/ PARTIAL（now-only）** | `abb02d1e`；docs/ 全部 ≥5%（reference/ 豁免）；历史证据日期保留（DSH 允许 version-specific evidence），未逐句清零 |
+| 6 | PASS | verify ALL PASS；test 1347；typecheck 绿；Note 落盘 |
+| 7 | 待用户 | 卡未归档；用户验收后 `git mv` |
+
 ## 关闭条件
 
 验收标准全绿 + 用户验收 + `docs-dsh-alignment.md` Note 落盘 + 卡归档。

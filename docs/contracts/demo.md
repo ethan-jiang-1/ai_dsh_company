@@ -1,12 +1,9 @@
 # demo · 动议操作合同
 
 > 什么时候读：演示前核对判据、判断交付物三态时。开门/分镜/场景 = [guides/demo-scenes.md](../guides/demo-scenes.md)。
-> 合同：demo 的剧本、分镜与观测点。R1 雏形（两人公司单动议）已并入本篇；R2 按
-> [ui-demo Note](../../notes/implemented/2026-11-10-ui-demo-rationale.md) §3 分镜 v0 重排为**两空间镜头**并加场景 B；
-> **R4 定稿、后补场景 D/E**：R4 立的是场景 C（写作流水线）+ 交付物三态的落盘形状与**机器验收**（`deliverables/<日期>-<slug>/`，A1 命名）；
-> 场景 D（季度经营会）与 E（事件复盘）是 2026-09-25 新增动议类型的实战（见下方对应节）。
+> 合同：demo 的动议、验收判据与已知边界；分镜、场景与观测点 = [guides/demo-scenes.md](../guides/demo-scenes.md)。
 
-## 动议（R2）
+## 动议
 
 > 把我们的对账 / 票据核对能力产品化，卖给现有 9 家客户——做不做、怎么定价、接不接得住
 
@@ -17,7 +14,7 @@
 
 > 前置、分镜与场景 B–F 已迁 [guides/demo-scenes.md](../guides/demo-scenes.md)；本文件只留合同（动议 / 验收 / 已知边界）。
 
-## 验收判据（R2）
+## 验收判据
 
 - 一场完整会话日志（`$DSH_HOME/sessions/`）——CEO + 四 VP 会话都在
 - `deliverables/` 有本动议的定稿（CEO `present` 声明过）
@@ -38,7 +35,7 @@
 
 ## 已知边界
 
-- 动议必须在 **Web 面**跑（preset 只在 Web 面挂载，[architecture §6](../architecture.md) 要点 6）。
+- 动议必须在 **Web 面**跑（preset 只在 Web 面挂载，[architecture Note](../../notes/implemented/2026-11-10-architecture-rationale.md) §6 要点 6）。
 - 团队里的 VP 是 **软隔离**（名册身份 + `team:policy` + KB 约定），不是 preset 级硬隔离；
   硬隔离在独立 preset 会话里成立（[roles-isolation Note](../../notes/implemented/2026-11-10-roles-isolation-rationale.md) §4 分水岭）。
   要让团队内成员拿到完整 preset 面，走 R3 命名委托或上游 seam（D9）。
