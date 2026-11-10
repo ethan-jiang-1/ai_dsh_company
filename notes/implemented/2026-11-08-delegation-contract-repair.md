@@ -1,7 +1,7 @@
 # 2026-11-08 · 委派面合同修复轮：BUG-036..041 的处置、资产与上游批
 
 状态：implemented（2026-11-08；6 张全部归档；040 按产品规避收口，引擎缺陷留档）
-上游 = [探索性测试问题卡](../../_backlog/issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)
+上游 = [探索性测试问题卡](../../_backlog/_archive/settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)
 （第一轮发现 = [探索 Note](2026-11-08-workflow-subagent-exploration-fixes.md)；修复交接 =
 [bugs/README §2026-11-08 修复交接](../../_backlog/bugs/README.md)）
 

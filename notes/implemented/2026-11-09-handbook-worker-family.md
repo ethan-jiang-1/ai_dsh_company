@@ -63,4 +63,4 @@ pnpm exec vitest run tests/presets/delegation-model.spec.ts tests/host/prompt/ha
 
 **真模型/真装配回归（2026-11-09 晚）**：profile 指向当前源码后，`worker-orchestrator` 与
 `worker-researcher` 的 system prompt 均不含 `Company content (read-only):`，leaf 仍不含；full role
-不变。证据见[研究材料 §9.6](../../_backlog/research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md)。
+不变。证据见[研究材料 §9.6](../../_backlog/_archive/research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md)。

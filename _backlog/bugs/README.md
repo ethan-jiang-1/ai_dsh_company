@@ -69,11 +69,11 @@ CMO depth 2 正常返回 `depth-exceeded`。教训：真模型/真入口探针�
 `pnpm test` + 重建 `lib` 都不能替代那一步。
 
 **2026-11-08 六张卡同轮来源**：workflow + subagent 探索性测试（问题卡
-[exploratory bug hunt](../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)）。发现方向 =
+[exploratory bug hunt](../_archive/settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)）。发现方向 =
 R2 强制 workflow + 缺失/坏源（036）、R3 委派深度链（037）、R5 W 分支内再委派（038）、
 R7 原样返回全量 rows 的溢出压力（039）、R10 后台 W 中模型自选文本回答（040）、RS1 宿主重启（041）；同轮当场修掉的两条（命名 child 双重回执、CEO sleep 轮询）
 记在 [探索 Note](../../notes/implemented/2026-11-08-workflow-subagent-exploration-fixes.md) 与
-[研究材料结果节](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
+[研究材料结果节](../_archive/research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
 
 **2026-11-07 BUG-034/035 收口**：两张 P1 同源——「属性没人测 = 属性不存在」。修法 = 两侧 skill 各加两条条件必查
 （记录与时间可信、故障路径的耐受）+ `sa-sqa-quality-audit` 新增 Q8–Q11（SA 侧 + SQA 侧）+ 两条 keyless 用例；

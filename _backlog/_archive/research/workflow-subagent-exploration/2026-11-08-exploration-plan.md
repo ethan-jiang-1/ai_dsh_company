@@ -9,8 +9,8 @@ intent: 给下一位执行者一份自包含的 briefing + 探索计划——DSH
 > 本文件刻意写厚：下一位 Agent 可能没有本轮的对话上下文，必须能只靠这份文档 + 仓库本身接手。
 > 本轮采用 exploratory testing（探索性测试）；单次有界探索称 exploratory test。场景矩阵是覆盖目标与风险边界，不是穷尽脚本或唯一合法路径：执行者在时间盒和场景章程内边学、边设计、边执行，跟进有证据的新线索；仍用会话事件、工具调用、结果和 fixture oracle 判定观察，不以模型自述代替证据。详见 §6 与 §8。
 > 读法：本文件 §1（DSH 支持）→ §2（本仓特点）→ §3（已证事实）→ §4–§8（探索设计）→
-> [workflow 通道 Note](../../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md) 与
-> [归档研究材料](../../_archive/research/vp-eng-delegation-topology/2026-11-08-topology.md) 补细节。
+> [workflow 通道 Note](../../settled_issues/2026-11-08-vpeng-workflow-channel.md) 与
+> [归档研究材料](../vp-eng-delegation-topology/2026-11-08-topology.md) 补细节。
 
 ## 0. 术语与符号
 
@@ -35,11 +35,11 @@ intent: 给下一位执行者一份自包含的 briefing + 探索计划——DSH
 **组成**：`@deepseek-ai/dsh-workflow`（服务 `ctx.workflowEngine`）+ `workflow-ptc`（PTC 进程引擎）+
 `tool-workflow`（模型工具）。`tool-workflow` 必须与引擎在同一个 `isolate.workflowEngine` 组；
 `ptc-runtime` 由 base 提供。权威：
-[tool-workflow README](../../../vendor/dsh/packages/workflow/tool-workflow/README.md)、
-[workflow-ptc README](../../../vendor/dsh/packages/workflow/workflow-ptc/README.md)、
-[workflow 子系统](../../../vendor/dsh/docs/subsystems/workflow.md)、
-引擎源码 [`runtime.ts`](../../../vendor/dsh/packages/workflow/workflow-ptc/src/runtime.ts) 与
-[`host.ts`](../../../vendor/dsh/packages/workflow/workflow-ptc/src/host.ts)。
+[tool-workflow README](../../../../vendor/dsh/packages/workflow/tool-workflow/README.md)、
+[workflow-ptc README](../../../../vendor/dsh/packages/workflow/workflow-ptc/README.md)、
+[workflow 子系统](../../../../vendor/dsh/docs/subsystems/workflow.md)、
+引擎源码 [`runtime.ts`](../../../../vendor/dsh/packages/workflow/workflow-ptc/src/runtime.ts) 与
+[`host.ts`](../../../../vendor/dsh/packages/workflow/workflow-ptc/src/host.ts)。
 
 **工具调用**：`{ script, meta, args?, run_in_background? }`。`script` 是纯 JS body（不是 TS），顶层 await；
 `meta` 是 JSON 数据（name/description/whenToUse/phases），引擎先校验后执行；`args` 原样给脚本。
@@ -92,8 +92,8 @@ owned job，job 输出环流 phase/log/lifecycle；`job_kill` / owner teardown �
 
 **组成**：`subagent` 服务 + `tool-subagent` 实例 + provider（in-process `spawn` / `fork`；外部 ACP /
 Codex / Claude Code / DSH SDK）+ `tool-subagent-control` / `list-agents`。权威：
-[tool-subagent README](../../../vendor/dsh/packages/subagent/tool-subagent/README.md)、
-[subagent 子系统](../../../vendor/dsh/docs/subsystems/subagent.md)。
+[tool-subagent README](../../../../vendor/dsh/packages/subagent/tool-subagent/README.md)、
+[subagent 子系统](../../../../vendor/dsh/docs/subsystems/subagent.md)。
 
 **每次调用 = activation**：工具立即返回 `started subagent <childId>`（或 `{kind:'activation', subagentId}`）；
 终稿（output / structured / diagnostic / stopReason）由 **completion notice** 送回父会话，不塞工具结果。
@@ -120,7 +120,7 @@ spawn 支持；fork/外部 backend 拒绝。
 `spawn_teammate` 只有 Lead 能调；成员持久、共享任务板（CAS 修订号 + `blockedBy` DAG + `writeScopes`
 告警但**不阻塞**）；**成员继承 Lead 的组合**，不是另一个 preset。CEO 团队里的 “vp-eng” 成员 ≠
 vp-eng preset：它没有 vp-eng 的 workflow/subagent/SA/SQA。没有嵌套 team、没有自动 owner release。
-权威：[agent-team README](../../../vendor/dsh/packages/experimental/agent-team/README.md)。
+权威：[agent-team README](../../../../vendor/dsh/packages/experimental/agent-team/README.md)。
 
 ### 1.4 三通道边界表
 
@@ -209,7 +209,7 @@ pnpm typecheck                 # 类型面（改 TS/src 时）
 - 本工作相关：五个职能 preset 的 `maxDepth: 2`、vp-eng 的 workflow 两行、`eng-teaming`/`eng-workflow`、
   CEO `assembling-the-team`/persona、`docs/{delegation,presets,terminology,index}.md`、
   `docs/architecture.md`、`docs/guides/budget-and-ops.md`、
-  [vpeng workflow 频道](../../../notes/archived/2026-11-08-vpeng-workflow-channel.md)、`probes/team/vp-eng-workflow-probe.mjs`、
+  [vpeng workflow 频道](../../../../notes/archived/2026-11-08-vpeng-workflow-channel.md)、`probes/team/vp-eng-workflow-probe.mjs`、
   `checks/gates/retired-claims.mjs`、`checks/INDEX.generated.md`、`pnpm-lock.yaml`（两行 peer）、
   本轮新增的 research 题。
 - 环境：cwd = 仓库根；dev home `runtime/harness-home`（`source run/env.sh` 后的 `DSH_HOME`）；排练场 `runtime/rehearsal-workspace`。
@@ -326,7 +326,7 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 ## 11. 发现处置
 
 - **简单**（prompt/skill/config）：当场修，复跑该格，红→绿留证。
-- **复杂**（vendor/depth/后台/结果丢失）：开 [_backlog/bugs/](../../bugs/README.md) 卡，带证据，不硬改 vendor。
+- **复杂**（vendor/depth/后台/结果丢失）：开 [_backlog/bugs/](../../../bugs/README.md) 卡，带证据，不硬改 vendor。
 - **方法差异**：natural 下选了另一条合法通道（如独立核对并进 W 第 4 条分支）——记录，不判 bug。
 - **并发差异**：S 与 W 串行/并发是方法选择；两者都真跑成功即不算失败。
 
@@ -356,9 +356,9 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 
 ## 14. 交接步骤（新 Agent 第一小时）
 
-1. 读本文件 §1–§3；读 [Note](../../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)、
-   [eng-teaming](../../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md)、
-   [delegation 合同](../../../docs/contracts/delegation.md) §3/§4。
+1. 读本文件 §1–§3；读 [Note](../../settled_issues/2026-11-08-vpeng-workflow-channel.md)、
+   [eng-teaming](../../../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md)、
+   [delegation 合同](../../../../docs/contracts/delegation.md) §3/§4。
 2. 基线：`source run/env.sh && pnpm verify && pnpm test`；`node checks/smoke/preset-smoke.mjs`。
    全绿预期；若红先分清工作树里其他人的改动。
 3. 清 rehearsal 的旧实验 journal/deliverables；建 exp fixtures。
@@ -367,18 +367,18 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 
 ## 15. 参考
 
-- [workflow 通道 Note](../../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)
-- [归档研究材料](../../_archive/research/vp-eng-delegation-topology/2026-11-08-topology.md)
-- [tool-workflow README](../../../vendor/dsh/packages/workflow/tool-workflow/README.md)
-- [workflow-ptc README](../../../vendor/dsh/packages/workflow/workflow-ptc/README.md)
-- [workflow 子系统](../../../vendor/dsh/docs/subsystems/workflow.md)
-- [tool-subagent README](../../../vendor/dsh/packages/subagent/tool-subagent/README.md)
-- [subagent 子系统](../../../vendor/dsh/docs/subsystems/subagent.md)
-- [agent-team README](../../../vendor/dsh/packages/experimental/agent-team/README.md)
-- [delegation 合同](../../../docs/contracts/delegation.md) · [presets 摘要](../../../docs/contracts/presets.md) ·
-  [architecture](../../../docs/architecture.md)
-- [常驻 probe](../../../probes/team/vp-eng-workflow-probe.mjs)
-- [preset 改动完成定义](../../../.agents/skills/preset-change-definition/SKILL.md)
+- [workflow 通道 Note](../../settled_issues/2026-11-08-vpeng-workflow-channel.md)
+- [归档研究材料](../vp-eng-delegation-topology/2026-11-08-topology.md)
+- [tool-workflow README](../../../../vendor/dsh/packages/workflow/tool-workflow/README.md)
+- [workflow-ptc README](../../../../vendor/dsh/packages/workflow/workflow-ptc/README.md)
+- [workflow 子系统](../../../../vendor/dsh/docs/subsystems/workflow.md)
+- [tool-subagent README](../../../../vendor/dsh/packages/subagent/tool-subagent/README.md)
+- [subagent 子系统](../../../../vendor/dsh/docs/subsystems/subagent.md)
+- [agent-team README](../../../../vendor/dsh/packages/experimental/agent-team/README.md)
+- [delegation 合同](../../../../docs/contracts/delegation.md) · [presets 摘要](../../../../docs/contracts/presets.md) ·
+  [architecture](../../../../docs/architecture.md)
+- [常驻 probe](../../../../probes/team/vp-eng-workflow-probe.mjs)
+- [preset 改动完成定义](../../../../.agents/skills/preset-change-definition/SKILL.md)
 
 ## 16. 2026-11-08 第一轮探索结果（真模型 + keyless 机制档）
 
@@ -448,7 +448,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 - 六张缺陷卡（036–041）留作后续修复/上游提案的载体；
 - keyless retry 脚本暂不进 `pnpm test`（vendor 已有同语义测试；本仓加门禁需 P2 判据，先留证据）；
   **2026-11-08 修复轮已取代**：升格为 `checks/smoke/workflow-contract-smoke.mjs`（keyless 机制档，仍不进
-  `pnpm test`），理由与新增钉子见[收口 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md)；
+  `pnpm test`），理由与新增钉子见[收口 Note](../../../../notes/implemented/2026-11-08-delegation-contract-repair.md)；
 - 常驻 probe 不改：本轮是探索，稳定判据（root 控制面、schema 子集）若再次复现再升级为 probe/spec。
 
 ## 17. 2026-11-08 第三轮（修复轮之后，未覆盖面）
@@ -481,12 +481,12 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 - **F14**：`read` 对超长单行（spill 里的 JSON rows）按 2000 字符截断；`eng-teaming` 当前写“可用
   `read`/`grep` 取回全文”对长行不成立。模型改用 `bash tail -c` 才拿到尾部。**已修 skill**
   （长行用 bash 按字节取；2026-11-08 同日），vendor 的 spill retrievalHint 仍可补。
-- **F15 → [BUG-042](../../_archive/fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md)**：`list_subagents` 的
+- **F15 → [BUG-042](../../fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md)**：`list_subagents` 的
   `lastTurnEnd` 在真实 profile 恒缺——`ctx.get('sessionQuery')` 看不到 `company-session-search`
   isolate 组里的 provider；`delegation-control.spec.ts` 用 fake service，所以门禁绿。C2b 复现。
   候选修法 = 把控制工具/终态读取放进能看见 sessionQuery 的组、或改用可用的 durable 读面、或删掉
   `lastTurnEnd` 承诺并重写 BUG-041 的验收。
-- **F17 → [BUG-044](../../_archive/fixed_bugs/BUG-044-background-job-lost-on-restart.md)**：后台 workflow job 不跨宿主
+- **F17 → [BUG-044](../../fixed_bugs/BUG-044-background-job-lost-on-restart.md)**：后台 workflow job 不跨宿主
   重启——job 登记表在进程内，重启后 `job_list` 空、`job_output` unknown、无通知；child 会话仍在
   （continuable/inactive）可手动 `send_to_subagent`，但拿不到原 job 返回值。已修 `eng-teaming` 长跑条
   （别把“job 起了”当“结果可恢复”）；机制/上游留 BUG-044。
@@ -505,7 +505,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 - **F18（C12 解除）**：V2 里 vp-sales 没提/没用新工具，但 C12 里同一个角色在“要复用 child”时
   `subagent → list_subagents → send_to_subagent` 一次走通，同一 child 出 v1/v2。结论：不是能力缺口，
   是“小任务自读”的方法选择；无需给其他职能加 guidance。
-- **F16 → [BUG-043](../../_archive/fixed_bugs/BUG-043-list-subagents-includes-teammates.md)**：`list_subagents` 列出
+- **F16 → [BUG-043](../../fixed_bugs/BUG-043-list-subagents-includes-teammates.md)**：`list_subagents` 列出
   teammate（它们也是 subagent activation/catalog 条目），与 team `list_agents` 名册重叠；工具描述只强调
   “child 不是 roster member”，没提 teammate 也会出现在列表。候选修法 = 在行上标 `role`/`kind`，或过滤
   teammate，或改描述并在技能里写“两套寻址别混”。

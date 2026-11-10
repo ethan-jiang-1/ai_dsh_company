@@ -58,8 +58,8 @@ opened: YYYY-MM-DD
 
 ## 索引
 
-- [workflow + subagent 探索测试：只有 W / 只有 S / 混合一次 / 混合多次](workflow-subagent-exploration/README.md) — 服务 VP-Eng 的 eng-teaming / delegation 与 workflow 通道；2026-11-08 开，调研中（计划待 review，未开跑）。
 
+（2026-11-11 workflow + subagent 探索题随其最后一张活卡归档，迁入[研究归档](../_archive/research/README.md)。）
 （2026-11-10 preset 委派架构 / SA-SQA 产物评审 / 组织协同拓扑三题随各自末张活卡归档，迁入[研究归档](../_archive/research/README.md)。）
 （2026-11-08 VP-Eng 委派拓扑题随 workflow 通道卡归档，迁入[研究归档](../_archive/research/README.md)。）
 （2026-11-07 需求识别/编号题与 VP-Eng 组队题随程序伞卡归档，迁入[研究归档](../_archive/research/README.md)。）

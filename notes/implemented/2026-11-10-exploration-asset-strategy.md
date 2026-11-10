@@ -1,6 +1,6 @@
 # 2026-11-10 · 探索测试的资产策略：运行时面矩阵、证据包与生命周期注入
 
-状态：implemented（2026-11-10 交付；上游 = [bug-hunt 卡 §9](../../_backlog/issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md) + [资产审计](../../_backlog/research/workflow-subagent-exploration/2026-11-10-asset-first-round.md)）
+状态：implemented（2026-11-10 交付；上游 = [bug-hunt 卡 §9](../../_backlog/_archive/settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md) + [资产审计](../../_backlog/_archive/research/workflow-subagent-exploration/2026-11-10-asset-first-round.md)）
 > 同机制的上游决定：[presets 委派面的模型化重构](./2026-11-09-presets-delegation-model.md)（model 是期望源）、
 > [能力面的执行承载](./2026-11-10-capability-surface-enforcement.md)（声明面 ≠ 执行面的两次事故）。
 > 本 Note 补的是**验证链的中间一环**：model ↔ YAML 有 keyless 对账，YAML ↔ runtime 此前没有资产。

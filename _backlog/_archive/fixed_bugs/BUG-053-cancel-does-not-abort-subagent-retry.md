@@ -8,7 +8,7 @@ opened: 2026-11-09
 
 > 严重级别：P1（重要）｜发现：2026-11-09｜状态：已修（2026-11-10：修复就绪 → 修复已落地 → 已修）
 > 来源：2026-11-09 第七轮（W7-A 取消探针）。关联：[subagent_retry 原语](../../../packages/company-pack/src/host/delegation/subagent-retry.ts)、
-> [旧 R8 workflow 取消 PASS](../../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
+> [旧 R8 workflow 取消 PASS](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)。
 > 审查：agent — 对照「已修判定」逐条核过；真红→绿与真装配 cancel 探针见「修复落地」。
 
 ## 症状

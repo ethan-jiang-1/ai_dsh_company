@@ -66,4 +66,4 @@ pnpm exec vitest run tests/host/delegation/delegation-control.spec.ts
 **真模型/真装配回归（2026-11-09 晚）**：profile 指向当前源码后，`list_subagents` 真行带
 `agentPreset`/`delegationDepth`：worker-orchestrator/`"1"`、worker/`"1"`、teammate `vp-eng`/`"1"`、
 workflow 分支 `vp-eng`/`"1"`，与 child durable header 一致；证据见
-[研究材料 §9.6](../../_backlog/research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md)。
+[研究材料 §9.6](../../_backlog/_archive/research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md)。

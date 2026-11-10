@@ -7,8 +7,8 @@ intent: 回答「继续探索前要不要先补资产」——用八轮缺陷家
 
 > 性质：**资产审计 + 计划**，不是执行结果。真模型 live 面未跑；实测数据全部来自
 > round-8（2026-11-10 17:10–18:00）已落盘的会话日志，只读、零模型。
-> 消费者：[bug-hunt 问题卡](../../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md) §9；
-> 落地决定 = [探索测试的资产策略 Note](../../../notes/implemented/2026-11-10-exploration-asset-strategy.md)。
+> 消费者：[bug-hunt 问题卡](../../settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md) §9；
+> 落地决定 = [探索测试的资产策略 Note](../../../../notes/implemented/2026-11-10-exploration-asset-strategy.md)。
 > 上游材料：[2026-11-08 plan](2026-11-08-exploration-plan.md)、[2026-11-09 plan](2026-11-09-post-refactor-round.md)。
 > 当前基线：HEAD `02bf9607`（2026-11-10）；vendor pin `dsh-v0.2.1-rc.5`。
 
@@ -172,7 +172,7 @@ model (delegation-model.mjs)  ──keyless spec──▶  preset YAML  ──�
 
 | 不建 | 理由 |
 |---|---|
-| replay / snapshot 场景 | replay lane 不加载 company-pack；snapshots 只收合成场景，真实会话证据不入仓（[snapshots/README](../../../snapshots/README.md)） |
+| replay / snapshot 场景 | replay lane 不加载 company-pack；snapshots 只收合成场景，真实会话证据不入仓（[snapshots/README](../../../../snapshots/README.md)） |
 | 文档散文门禁 | policy P2：只对「复发 + 可机械判定」加门；OBS-2/OBS-6 一次修 + owner |
 | `/req check` 命令宿主夹具 | keyless 已覆盖解析；live 缺的是 workspace/lease，不是产品类型；ROI 低 |
 | 每个已知 bug 一个常驻 probe | 修完的 bug 进 keyless judge；live probe 只留模型行为/生命周期/UI 三类 |
@@ -183,7 +183,7 @@ model (delegation-model.mjs)  ──keyless spec──▶  preset YAML  ──�
 
 1. **补验证链缺口**，或让一个**新假设更便宜**；否则放 `runtime/tmp`，不入库。
 2. **judge 进 `tools/lib` + spec**；live/browser 只做采集（judge + thin runner）。
-3. **先有红证**：合成反例或历史 bug；没红过的资产不算证据（[testing.md](../../../docs/testing.md) §3.7）。
+3. **先有红证**：合成反例或历史 bug；没红过的资产不算证据（[testing.md](../../../../docs/testing.md) §3.7）。
 4. **头注写清「不证明什么」**；矩阵绿 ≠ 行为绿。
 5. **资产有层**：keyless / smoke / probe / audit / evidence；不把模型塞进 `pnpm test`。
 6. **同类形状第二次出现**、或某 charter 被盲区卡住才建；不预建每 bug 场景。

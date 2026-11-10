@@ -92,4 +92,4 @@ parity 两条（`expected ... to deeply equal ...`、`cmo: expected 2 to be 3`�
 `CEO→VP(1)→CMO(2)` 的 CMO 调 `subagent_retry` 返回 `attempts: 0` / `stopReason: depth-exceeded` /
 `childIds: []`，无 worker；vp-eng root 的正样本仍 `attempts: 1` / completed。首次“修复失效”是
 profile 旧安装副本导致的假阳性（BUG-050 误报），已归档；证据见
-[研究材料 §9.6](../../_backlog/research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md)。
+[研究材料 §9.6](../../_backlog/_archive/research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md)。

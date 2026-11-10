@@ -15,6 +15,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-08-workflow-subagent-exploratory-bug-hunt.md](settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md) | 已结；八轮探索 + 资产先行（A/B）；BUG-045–060 修复归档；研究题随卡归档；去向 = [Note](../../notes/implemented/2026-11-10-exploration-asset-strategy.md) | 2026-11-11 |
 | [2026-11-10-product-type-semantics.md](settled_issues/2026-11-10-product-type-semantics.md) | 已结；`b2b-saas` → `business-software`（MRD/StRS/PRD；SaaS 交付模式）+ product-definition/manifest/fixture/tests/docs；verify/test/typecheck/preset-smoke 全绿；去向 = [Note](../../notes/implemented/2026-11-10-business-software-product-type.md) | 2026-11-10 |
 | [2026-11-10-motion-product-type.md](settled_issues/2026-11-10-motion-product-type.md) | 已结；`meta.md` 产品类型 + `/req check` 动议优先/company 回落/未知报错 + 角色/手册/测试；verify/test/typecheck/preset-smoke 全绿；去向 = [Note](../../notes/implemented/2026-11-10-motion-product-type.md) | 2026-11-10 |
 | [2026-11-10-coo-cfo-delegation.md](settled_issues/2026-11-10-coo-cfo-delegation.md) | 已结；CEO 五条命名行（`coo`/`cfo` maxDepth 1）+ team 角色包 + model/UI/tests/docs；verify/test/typecheck/preset-smoke 全绿；去向 = [Note](../../notes/implemented/2026-11-10-coo-cfo-delegation.md) | 2026-11-10 |

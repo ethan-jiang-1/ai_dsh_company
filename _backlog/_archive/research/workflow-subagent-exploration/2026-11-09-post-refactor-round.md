@@ -8,11 +8,11 @@ intent: 给下一位执行者一份重构后 delta、入口矩阵、charters、�
 > 性质：**计划，不是结果**。本文件只写 2026-11-09 委派面重构之后的 delta 与第四轮设计；
 > 机制长文、重构前设计、前三轮运行表与发现仍在
 > [2026-11-08 plan](2026-11-08-exploration-plan.md)。
-> 消费者：[bug-hunt 问题卡](../../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)。
-> 决策记忆：[presets 委派面的模型化重构](../../../notes/implemented/2026-11-09-presets-delegation-model.md)、
-> [残差收口](../../../notes/implemented/2026-11-09-delegation-residuals-closeout.md)、
-> [SA/SQA 退役](../../../notes/implemented/2026-11-09-retire-sa-sqa.md)、
-> [worker-workflow no-go](../../../notes/archived/2026-11-09-worker-workflow-no-go.md)。
+> 消费者：[bug-hunt 问题卡](../../settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)。
+> 决策记忆：[presets 委派面的模型化重构](../../../../notes/implemented/2026-11-09-presets-delegation-model.md)、
+> [残差收口](../../../../notes/implemented/2026-11-09-delegation-residuals-closeout.md)、
+> [SA/SQA 退役](../../../../notes/implemented/2026-11-09-retire-sa-sqa.md)、
+> [worker-workflow no-go](../../../../notes/archived/2026-11-09-worker-workflow-no-go.md)。
 > 当前 vendor pin = `dsh-v0.2.1-rc.5`；真模型运行前先核当前 `git status`/`HEAD`。
 
 ## 0. 一句话
@@ -28,10 +28,10 @@ intent: 给下一位执行者一份重构后 delta、入口矩阵、charters、�
 
 - 随包 9 个 preset：6 角色（`ceo` / `vp-eng` / `vp-sales` / `coo` / `cfo` / `cmo`）+ 3 个 support
   （`worker` / `worker-researcher` / `worker-orchestrator`）；清单唯一源 =
-  [`delegation-model.mjs`](../../../tools/lib/delegation-model.mjs) 的 `PRESET_IDS`。
+  [`delegation-model.mjs`](../../../../tools/lib/delegation-model.mjs) 的 `PRESET_IDS`。
 - `worker`（leaf）：fs / bash / web / todo / compaction；无 subagent / team / workflow / control /
   ask-user / present / goal / schedule / skill。见
-  [`presets/worker/agent.cordis.yml`](../../../packages/company-pack/presets/worker/agent.cordis.yml)。
+  [`presets/worker/agent.cordis.yml`](../../../../packages/company-pack/presets/worker/agent.cordis.yml)。
 - `worker-orchestrator`：leaf 工具面 + 一条 `subagent` 行（`agentPreset: worker`、`maxDepth: 3`）；
   无 control / team / workflow。persona 说 1–2 个 leaf、不组队、不问用户。
 - `worker-researcher`：只读 fs（`write:false/edit:false`）/ fs-search / web / todo；无 bash /
@@ -48,9 +48,9 @@ intent: 给下一位执行者一份重构后 delta、入口矩阵、charters、�
 - 默认子代 = `worker`，`maxDepth: 3`，最多 2 attempts；只对幂等任务的
   `error` / `interrupted` / `lost` 重试一次；`refusal` / `aborted` / `completed` / `max-tokens` 不重试；
   返回 `attempts` / `childIds` / `stopReason` / `exhausted` / `output`（可选 `diagnostic`）。
-- 证据：源码 [`subagent-retry.ts`](../../../packages/company-pack/src/host/delegation/subagent-retry.ts)、
-  keyless spec [`subagent-retry.spec.ts`](../../../tests/host/delegation/subagent-retry.spec.ts)、
-  真实采用探针 [`subagent-retry-probe.mjs`](../../../probes/team/subagent-retry-probe.mjs)。
+- 证据：源码 [`subagent-retry.ts`](../../../../packages/company-pack/src/host/delegation/subagent-retry.ts)、
+  keyless spec [`subagent-retry.spec.ts`](../../../../tests/host/delegation/subagent-retry.spec.ts)、
+  真实采用探针 [`subagent-retry-probe.mjs`](../../../../probes/team/subagent-retry-probe.mjs)。
 - **真实 LLM 失败不可确定性复现**：P-H 只证“模型会调用、attempts=1/completed”；确定性失败注入在
   keyless tool-boundary spec，不在真模型门禁里。本轮不要用“让 child 自称失败”来补齐。
 
@@ -71,7 +71,7 @@ intent: 给下一位执行者一份重构后 delta、入口矩阵、charters、�
 - `delegation-policy` 共享 skill 挂在六个 full role 的 `customSkillDirs`；内容是通道/brief/effort/
   控制寻址/结果可读性/链设计/重试/worker profile 的政策唯一家。
 - `company:workflow-contract` host section 按“工具面是否真有 workflow”注入，fallback preset 白名单 =
-  `['vp-eng']`；正文在 [`content/contracts/workflow.md`](../../../packages/company-pack/content/contracts/workflow.md)。
+  `['vp-eng']`；正文在 [`content/contracts/workflow.md`](../../../../packages/company-pack/content/contracts/workflow.md)。
 - 旧 Note 已证：vp-eng 真 systemPrompt 含 section，CEO/worker/worker-orchestrator 零命中；P-A 证
   vp-eng 加载 `eng-teaming` + `delegation-policy`。**未覆盖**：其他 full role 的 policy 加载、
   workflow 分支/fork 的 section 继承、worker family 的 prompt 面（尤其 handbook 注入）。
@@ -81,8 +81,8 @@ intent: 给下一位执行者一份重构后 delta、入口矩阵、charters、�
 - host 只读投影 `companyDelegationTerminal`（key = `companyDelegationTerminal`）把每会话最新
   `turn/end.reason.kind` 折成 `lastTurnEnd`；客户端 `delegation-tree` 优先读它，缺失回退
   `subagentTiming`，再缺标 `unavailable`。见
-  [`delegation-terminal.ts`](../../../packages/company-pack/src/host/delegation/delegation-terminal.ts) 与
-  [`delegation-tree.ts`](../../../packages/company-pack/src/lib/delegation-tree.ts)。
+  [`delegation-terminal.ts`](../../../../packages/company-pack/src/host/delegation/delegation-terminal.ts) 与
+  [`delegation-tree.ts`](../../../../packages/company-pack/src/lib/delegation-tree.ts)。
 - UI 的 `DelegationFlowPanel` 落在现有 DagTab 体内；九页签不变；终态显示 completed / failed /
   interrupted / aborted / max-tokens / refusal / lost（lost 仅当投影提供）。workflow run 的 `lost`
   不在 session tree，属 `workflow_runs` 的域。
@@ -291,11 +291,11 @@ spawn teammate，但能 spawn worker / 请 CMO）；N 的 CEO teammate = 继承 
 
 | 卡 | 级别 | 一句话 | 证据 |
 |---|---:|---|---|
-| [BUG-045](../../_archive/fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md) | P1 | CMO depth 2 用 `subagent_retry` 起出 depth 3 worker，绕过 CMO 行级 `maxDepth: 2` | `r4-2026-11-09T09-43-57-731Z/r1b-cmo-depth-bypass.json` |
-| [BUG-046](../../_archive/fixed_bugs/BUG-046-parent-cannot-verify-child-preset-depth.md) | P2 | `list_subagents` 不返回 child 的 `agentPreset`/`delegationDepth`，父代理只能信自述/看日志/UI | `r4-2026-11-09T09-37-34-306Z/d1-long-chain.json` |
-| [BUG-047](../../_archive/fixed_bugs/BUG-047-worker-family-handbook-scope.md) | P2 | `handbookSkipPresets` 只跳过 `worker`；`worker-orchestrator`/`worker-researcher` 被注入公司手册，与 persona 矛盾 | `r4-2026-11-09T09-47-02-512Z/w1b-orchestrator.json`、W1c |
-| [BUG-048](../../_archive/fixed_bugs/BUG-048-ui-golden-brand-name-drift.md) | P2 | `ui-scene-smoke --isolated --golden` 红：金样仍写“梦之队 CEO”，页面已收窄为“CEO” | `ui-scene-smoke` 回执 + golden diff |
-| [BUG-049](../../_archive/fixed_bugs/BUG-049-model-contract-retry-drift.md) | P2 | 模型仍把已落合同标 `planned`；`subagent_retry` 注册面/深度不在模型 | `k0.json` |
+| [BUG-045](../../fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md) | P1 | CMO depth 2 用 `subagent_retry` 起出 depth 3 worker，绕过 CMO 行级 `maxDepth: 2` | `r4-2026-11-09T09-43-57-731Z/r1b-cmo-depth-bypass.json` |
+| [BUG-046](../../fixed_bugs/BUG-046-parent-cannot-verify-child-preset-depth.md) | P2 | `list_subagents` 不返回 child 的 `agentPreset`/`delegationDepth`，父代理只能信自述/看日志/UI | `r4-2026-11-09T09-37-34-306Z/d1-long-chain.json` |
+| [BUG-047](../../fixed_bugs/BUG-047-worker-family-handbook-scope.md) | P2 | `handbookSkipPresets` 只跳过 `worker`；`worker-orchestrator`/`worker-researcher` 被注入公司手册，与 persona 矛盾 | `r4-2026-11-09T09-47-02-512Z/w1b-orchestrator.json`、W1c |
+| [BUG-048](../../fixed_bugs/BUG-048-ui-golden-brand-name-drift.md) | P2 | `ui-scene-smoke --isolated --golden` 红：金样仍写“梦之队 CEO”，页面已收窄为“CEO” | `ui-scene-smoke` 回执 + golden diff |
+| [BUG-049](../../fixed_bugs/BUG-049-model-contract-retry-drift.md) | P2 | 模型仍把已落合同标 `planned`；`subagent_retry` 注册面/深度不在模型 | `k0.json` |
 
 ### 9.3 观察（不建卡）
 
@@ -337,7 +337,7 @@ spawn teammate，但能 spawn worker / 请 CMO）；N 的 CEO teammate = 继承 
 > 用户告知 BUG-045–049 已修；本轮先验证修复，再探未覆盖面。**关键环境事实**：真入口
 > `startWeb --profile company` 读 profile 安装副本，不读 `packages/company-pack/lib`；修复后只重建
 > `lib` 不够，必须 `plugin add link:` 或走 `pnpm company` 更新 profile。第一轮 R5 的“修复失效”正是
-> 旧副本造成的假阳性，已归档为 [BUG-050](../../_archive/fixed_bugs/BUG-050-retry-depth-fix-fails-in-real-assembly.md)（误报）。
+> 旧副本造成的假阳性，已归档为 [BUG-050](../../fixed_bugs/BUG-050-retry-depth-fix-fails-in-real-assembly.md)（误报）。
 
 | 验证 | 命令 / 证据 | 结果 |
 |---|---|---|
@@ -372,7 +372,7 @@ error/interrupted/live retry（不可确定性注入）；depth 4 负例；`suba
 ### 9.7 第五轮：修复后探索（2026-11-09 夜）
 
 > 用户 2026-11-09 晚：不要只验收，继续往前探。小预算 wave：约 15 分钟 / 6 parent turns / 8 children；
-> 证据在 `runtime/tmp/explore/round4/wave5-*`。**本轮新发现 1 张 P2：** [BUG-051](../../_archive/fixed_bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（worker-orchestrator 的 1–2 leaf 只是 persona，4 件 brief 起 4 个 leaf）。其余 charter PASS。
+> 证据在 `runtime/tmp/explore/round4/wave5-*`。**本轮新发现 1 张 P2：** [BUG-051](../../fixed_bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（worker-orchestrator 的 1–2 leaf 只是 persona，4 件 brief 起 4 个 leaf）。其余 charter PASS。
 
 | ID | charter | 观察 | 判定 |
 |---|---|---|---|
@@ -394,7 +394,7 @@ coo/cfo root 的逐个采用；长期采纳率 / workspace-write / release-smoke
 ### 9.8 第六轮：能力边界（2026-11-09 夜）
 
 > 小预算：约 12 分钟 / 5 parent turns / 6 children；证据 `runtime/tmp/explore/round4/wave6-*`。
-> **新发现 1 张 P2：** [BUG-052](../../_archive/fixed_bugs/BUG-052-worker-leaf-control-surface.md)。
+> **新发现 1 张 P2：** [BUG-052](../../fixed_bugs/BUG-052-worker-leaf-control-surface.md)。
 
 | ID | charter | 观察 | 判定 |
 |---|---|---|---|
@@ -446,18 +446,18 @@ coo/cfo root 的逐个 retry 采用；长期采纳/workspace-write/release。
 ## 12. 参考
 
 - 机制：`vendor/dsh` 的 `tool-workflow`、`workflow-ptc`、`tool-subagent`、`agent-team` README/源码；
-  [workflow 子系统](../../../vendor/dsh/docs/subsystems/workflow.md)、
-  [subagent 子系统](../../../vendor/dsh/docs/subsystems/subagent.md)。
-- 本仓合同：[delegation](../../../docs/contracts/delegation.md)、[presets](../../../docs/contracts/presets.md)、
-  [testing](../../../docs/testing.md)、[tests README](../../../tests/README.md)。
-- 模型/资产：[delegation-model.mjs](../../../tools/lib/delegation-model.mjs)、
-  [delegation-tree.ts](../../../packages/company-pack/src/lib/delegation-tree.ts)、
-  [DelegationFlowPanel.tsx](../../../packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx)、
-  [subagent-retry.ts](../../../packages/company-pack/src/host/delegation/subagent-retry.ts)。
-- 探针：[delegation-contract-probe](../../../probes/team/delegation-contract-probe.mjs)、
-  [delegation-depth-probe](../../../probes/team/delegation-depth-probe.mjs)、
-  [subagent-retry-probe](../../../probes/team/subagent-retry-probe.mjs)、
-  [worker-orchestrator-probe](../../../probes/team/worker-orchestrator-probe.mjs)、
-  [worker-researcher-probe](../../../probes/team/worker-researcher-probe.mjs)、
-  [vp-eng-workflow-probe](../../../probes/team/vp-eng-workflow-probe.mjs)。
+  [workflow 子系统](../../../../vendor/dsh/docs/subsystems/workflow.md)、
+  [subagent 子系统](../../../../vendor/dsh/docs/subsystems/subagent.md)。
+- 本仓合同：[delegation](../../../../docs/contracts/delegation.md)、[presets](../../../../docs/contracts/presets.md)、
+  [testing](../../../../docs/testing.md)、[tests README](../../../../tests/README.md)。
+- 模型/资产：[delegation-model.mjs](../../../../tools/lib/delegation-model.mjs)、
+  [delegation-tree.ts](../../../../packages/company-pack/src/lib/delegation-tree.ts)、
+  [DelegationFlowPanel.tsx](../../../../packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx)、
+  [subagent-retry.ts](../../../../packages/company-pack/src/host/delegation/subagent-retry.ts)。
+- 探针：[delegation-contract-probe](../../../../probes/team/delegation-contract-probe.mjs)、
+  [delegation-depth-probe](../../../../probes/team/delegation-depth-probe.mjs)、
+  [subagent-retry-probe](../../../../probes/team/subagent-retry-probe.mjs)、
+  [worker-orchestrator-probe](../../../../probes/team/worker-orchestrator-probe.mjs)、
+  [worker-researcher-probe](../../../../probes/team/worker-researcher-probe.mjs)、
+  [vp-eng-workflow-probe](../../../../probes/team/vp-eng-workflow-probe.mjs)。
 - 旧轮次：[2026-11-08 plan](2026-11-08-exploration-plan.md)（§1–§15 重构前设计；§16–§18 结果）。

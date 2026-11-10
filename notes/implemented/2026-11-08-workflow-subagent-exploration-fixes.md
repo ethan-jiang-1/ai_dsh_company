@@ -1,13 +1,13 @@
 # 2026-11-08 · workflow + subagent 探索性测试第一轮：6 张卡（2×P1 + 4×P2）+ 2 条当场修
 
 状态：implemented（2026-11-08；第一轮探索已执行并收口）
-上游 = [探索性测试 bug-hunt 问题卡](../../_backlog/issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)
+上游 = [探索性测试 bug-hunt 问题卡](../../_backlog/_archive/settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)
 
 ## 决定
 
 - 按问题卡执行一轮**探索性测试**（不是固定矩阵全绿）：forced 锚点 + guided natural charters +
   keyless fake-provider 重试档；入口 R（VP-Eng root）/ C（CEO→`vp_eng`）/ T（teammate）/ N（负例）。
-- **发现的方向与处置**（完整表 = [研究材料 §16](../../_backlog/research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)）：
+- **发现的方向与处置**（完整表 = [研究材料 §16](../../_backlog/_archive/research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)）：
   - **F1**（方向 R2 强制 workflow + 模型自拟 schema）：`agent({schema})` 的 `enum`/`const` 必须配 `type`，
     模型面描述没说 → 首跑整轮 `UNSUPPORTED_SCHEMA`。已加 `eng-teaming` 规则；机制/上游留
     [BUG-036](../../_backlog/_archive/fixed_bugs/BUG-036-workflow-schema-enum-type.md)。

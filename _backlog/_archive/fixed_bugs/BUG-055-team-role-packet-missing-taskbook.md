@@ -8,7 +8,7 @@ opened: 2026-11-10
 
 > 严重级别：P2（次要）｜发现：2026-11-10｜状态：已修（2026-11-10：调查中 → 修复就绪 → 修复已落地 → 已修）
 >
-> 来源：第八轮 exploratory test（[问题卡](../../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)）；
+> 来源：第八轮 exploratory test（[问题卡](../settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)）；
 > 证据 = 团队探针输出
 > `runtime/rehearsal-workspace/.dsh-company/deliverables/2026-11-10-probe-team-role-packet/drafts/coo.md`。
 > 留痕：Note [2026-11-10-team-role-packet-taskbook](../../../notes/implemented/2026-11-10-team-role-packet-taskbook.md)。

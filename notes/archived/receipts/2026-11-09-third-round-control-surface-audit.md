@@ -1,8 +1,8 @@
 # 2026-11-09 · 第三轮探索收口：控制面/多层的模型可见面审计
 
 状态：implemented（2026-11-09；第三轮探索收口，3 张新卡 + 3 处文本修正）
-上游 = [探索性测试问题卡](../../../_backlog/issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)
-（修复轮 = [委派面合同修复](../../implemented/2026-11-08-delegation-contract-repair.md)；运行表 = [研究材料 §17](../../../_backlog/research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)）
+上游 = [探索性测试问题卡](../../../_backlog/_archive/settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)
+（修复轮 = [委派面合同修复](../../implemented/2026-11-08-delegation-contract-repair.md)；运行表 = [研究材料 §17](../../../_backlog/_archive/research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)）
 
 ## 决定
 
@@ -62,5 +62,5 @@
   C8（teammate depth 链 PASS；Lead 300s 未收口）、C9（bash 尾标记保留）、C10（CEO 复用 named child；
   旧指引过期）、C11（嵌套指针跨 child→parent 可达；child 自述截断不可信）、C12/C13b（vp-sales/teammate
   自然选对 `send_to_subagent`）。
-- 会话/证据路径在[研究材料 §17](../../../_backlog/research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)
+- 会话/证据路径在[研究材料 §17](../../../_backlog/_archive/research/workflow-subagent-exploration/2026-11-08-exploration-plan.md)
   与三张卡内；原始证据在 `runtime/tmp/explore/`（gitignored）。

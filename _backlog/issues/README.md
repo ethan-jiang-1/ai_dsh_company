@@ -4,7 +4,6 @@
 
 ## 活跃清单
 
-- [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：第四–七轮发现 BUG-045–053 已全部修复归档；第八轮（2026-11-10）新发现 BUG-054/055/056 已修复归档；P1–P5 的 keyless/静态/live 基线通过，`/req check` live 仍 dataBlocked、UI 卡标签 OBS-5 未证实、新增 OBS-6 文档漂移。**用户 2026-11-10 晚批准 A 批 + B 批 60 分钟**：A 批已落地（运行时面矩阵 / 会话证据包 / UI 全文证据，0 模型；矩阵在 round-8 47 观察 0 问题、旧日志红证复现 BUG-052 同型）；B 批已跑（B1 cancel+sigterm PASS、B2 15 观察 0 问题、B3 CFO 角色包 PASS、B4 卡在 DOM 但折叠隐藏 = OBS-5、B5 已补 PASS（清掉陈旧 writer lease 后））。深夜追猎新发现 [BUG-057](../_archive/fixed_bugs/BUG-057-command-slug-path-traversal.md)（命令 slug 越界读）与 [BUG-058](../_archive/fixed_bugs/BUG-058-command-datablocked-reason.md)（dataBlocked 丢真实原因），均已修归档；质量环 R2 又抓到 [BUG-059](../_archive/fixed_bugs/BUG-059-quality-loop-audit-r2-session-index.md)（audit 跨轮原文索引假红）并修复，R2 audit ALL PASS；picker 定点抓到 [BUG-060](../_archive/fixed_bugs/BUG-060-readonly-command-session-workspace.md)（只读命令被启动态 dataBlocked 挡住）并修复，VP-Sales 角色包 PASS。详见卡 §9.7–§9.8；设计与实测矩阵见[资产计划](../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md)。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
 
@@ -35,6 +34,7 @@ v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajecto
 
 ## 近期归档
 
+- workflow + subagent 探索测试 bug hunt 2026-11-08 已结：八轮探索 + 资产先行（A/B），BUG-045–060 全部修复归档；决策记忆 = [资产策略 Note](../../notes/implemented/2026-11-10-exploration-asset-strategy.md)；卡在[归档](../_archive/settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)。
 - 问题与缺陷的留痕决定点卡 2026-11-10 已结：材料性 = 授权与留痕共用判据（章程一处定义）+ 缺陷轨 `留痕：` 裁决 + 归档卡去向落点解析门（self-link 红→绿）；2 卡 + 6 索引行落点修复；`verify` ALL PASS、167 files/1348 tests；去向 = [Note](../../notes/implemented/2026-11-10-materiality-and-trace-decision.md)；卡在[归档](../_archive/settled_issues/2026-11-10-materiality-and-trace-decision.md)。
 - README/手册使用者面向卡 2026-11-08 已结：七问冷读 README 5.0→7.0/7、手册 5.0→7/7 + `readme-manual-commands` 门 + 2 张真实例截图；去向 = [Note](../../notes/archived/2026-11-08-user-facing-readme-and-first-use.md)；卡在[归档](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)。
 

@@ -1,11 +1,13 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-08
 ---
 
 # 推敲：用探索性测试系统寻找委派面（workflow + subagent + worker family）缺陷
 
-> 立卡：2026-11-08 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-08 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 收口证据见 §9–§9.11 与各 Note，未跑面已列
+>
+> **结论/去向**：note — 八轮探索 + 资产先行（A/B）；BUG-045–060 全部修复归档；决策记忆 = [探索测试的资产策略](../../../notes/implemented/2026-11-10-exploration-asset-strategy.md)；研究材料随题归档（[题名页](../research/workflow-subagent-exploration/README.md)）。
 >
 > 用户 2026-11-09 晚答复：**继续探索**（此前「是否扩面」的 🔒 已解除）；本卡回 `推敲中`，
 > 修复后验证轮已执行，见下方「修复后验证」。
@@ -38,11 +40,11 @@ skill？质量环 starter 能不能被 VP-Eng 真加载？旧 worker/retry/workf
 
 - **11 个 preset**：6 角色 + 5 support（`worker` / `worker-researcher` / `worker-orchestrator` +
   `quality-loop-producer` / `quality-loop-verifier`）；清单唯一源 =
-  [`delegation-model.mjs`](../../tools/lib/delegation-model.mjs)。`worker` 是 leaf；`worker-orchestrator`
+  [`delegation-model.mjs`](../../../tools/lib/delegation-model.mjs)。`worker` 是 leaf；`worker-orchestrator`
   只多一条 `subagent` 行（钉 `worker`，`maxDepth: 3`）；`worker-researcher` 只读、named-only。
 - **CEO 五条角色命名行**：`vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo`，全部 `maxDepth: 1`；另有
   `subagent_research`；CEO 没有 generic `subagent` / workflow / 控制行。UI key =
-  [`delegation-keys.ts`](../../packages/company-pack/src/client/wiring/delegation-keys.ts) 五条；
+  [`delegation-keys.ts`](../../../packages/company-pack/src/client/wiring/delegation-keys.ts) 五条；
   `delegation-smoke` 的可见工具清单已加 `coo`/`cfo`（只证挂载，未证真激活）。
 - **产品类型**：`business-software`（`MRD → StRS → PRD`）替代 `b2b-saas`；`hardware-software` 保持
   `MRD/StRS/PRD` + 可选 SyRS/IRS/V&V；`meta.md` 有 `产品类型`，`/req check` 按「动议 meta >
@@ -105,9 +107,9 @@ skill？质量环 starter 能不能被 VP-Eng 真加载？旧 worker/retry/workf
 
 **下一步（2026-11-10 晚）：** A 批资产已完成（§9.7）；B 批 live 按用户 2026-11-10 批准的
 60 分钟 / 10 prompt / 16 child 执行（§9.3），结果回填 §9.8。B 批前不重跑第八轮、不扩 CEO root 的 workflow。
-第八轮的 [BUG-054](../_archive/fixed_bugs/BUG-054-dev-rehearsal-kb-policy-lines-missing.md) /
-[BUG-055](../_archive/fixed_bugs/BUG-055-team-role-packet-missing-taskbook.md) /
-[BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md) 已由另一 Agent 修复归档；
+第八轮的 [BUG-054](../fixed_bugs/BUG-054-dev-rehearsal-kb-policy-lines-missing.md) /
+[BUG-055](../fixed_bugs/BUG-055-team-role-packet-missing-taskbook.md) /
+[BUG-056](../fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md) 已由另一 Agent 修复归档；
 剩余 OBS-2/OBS-5（OBS-6 已修）见 §8 与 §9。未执行面保留，不写“没有 bug”。第四–七轮只作历史，不重跑。
 
 **历史（2026-11-09 第四轮）：** 第四轮已执行并收口（2026-11-09，约 22 分钟/19 turns/27 children，
@@ -121,14 +123,14 @@ dev profile 旧安装副本导致的假阳性**，已迁 `fixed_bugs`。继续�
 
 | 卡 | 根因组 | 去向 |
 |---|---|---|
-| [BUG-045](../_archive/fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md)（P1） | A 声明↔运行时双源 | [single-source Note](../../notes/implemented/2026-11-09-delegation-surface-single-source.md) |
-| [BUG-049](../_archive/fixed_bugs/BUG-049-model-contract-retry-drift.md) | A | 同上 |
-| [BUG-047](../_archive/fixed_bugs/BUG-047-worker-family-handbook-scope.md) | B family 边界按 ID 白名单 | [handbook Note](../../notes/implemented/2026-11-09-handbook-worker-family.md) |
-| [BUG-046](../_archive/fixed_bugs/BUG-046-parent-cannot-verify-child-preset-depth.md) | C 可见面窄于引擎语义 | [identity Note](../../notes/implemented/2026-11-09-subagent-identity-observable.md) |
-| [BUG-048](../_archive/fixed_bugs/BUG-048-ui-golden-brand-name-drift.md) | D 验收资产未同 diff 刷新 | 卡内 + `tests/README.md` 映射 |
-| [BUG-051](../_archive/fixed_bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（P2） | E 声明面/执行面分裂（过度承诺） | [capability surface Note](../../notes/implemented/2026-11-10-capability-surface-enforcement.md) |
-| [BUG-052](../_archive/fixed_bugs/BUG-052-worker-leaf-control-surface.md)（P2） | E 声明面/执行面分裂（漏声明） | 同上 |
-| [BUG-053](../_archive/fixed_bugs/BUG-053-cancel-does-not-abort-subagent-retry.md)（P1） | F 阻塞原语没有取消语义 | [cancellation Note](../../notes/implemented/2026-11-10-blocking-tool-cancellation.md) |
+| [BUG-045](../fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md)（P1） | A 声明↔运行时双源 | [single-source Note](../../../notes/implemented/2026-11-09-delegation-surface-single-source.md) |
+| [BUG-049](../fixed_bugs/BUG-049-model-contract-retry-drift.md) | A | 同上 |
+| [BUG-047](../fixed_bugs/BUG-047-worker-family-handbook-scope.md) | B family 边界按 ID 白名单 | [handbook Note](../../../notes/implemented/2026-11-09-handbook-worker-family.md) |
+| [BUG-046](../fixed_bugs/BUG-046-parent-cannot-verify-child-preset-depth.md) | C 可见面窄于引擎语义 | [identity Note](../../../notes/implemented/2026-11-09-subagent-identity-observable.md) |
+| [BUG-048](../fixed_bugs/BUG-048-ui-golden-brand-name-drift.md) | D 验收资产未同 diff 刷新 | 卡内 + `tests/README.md` 映射 |
+| [BUG-051](../fixed_bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（P2） | E 声明面/执行面分裂（过度承诺） | [capability surface Note](../../../notes/implemented/2026-11-10-capability-surface-enforcement.md) |
+| [BUG-052](../fixed_bugs/BUG-052-worker-leaf-control-surface.md)（P2） | E 声明面/执行面分裂（漏声明） | 同上 |
+| [BUG-053](../fixed_bugs/BUG-053-cancel-does-not-abort-subagent-retry.md)（P1） | F 阻塞原语没有取消语义 | [cancellation Note](../../../notes/implemented/2026-11-10-blocking-tool-cancellation.md) |
 
 **2026-11-10 修复收口（E/F）**：第五/六/七轮新发现的 051/052/053 已按根因分两组修复归档——
 E = control 工具 per-agent 安装（worker family 不装）+ fan-out 改成父代理 brief 预算（preset 去掉
@@ -200,7 +202,7 @@ A3 验收：负控 label 不命中；`COO（运营与交付）` / `CFO（财务�
 
 1. 补验证链缺口，或让新假设更便宜；否则放 `runtime/tmp`，不入库。
 2. judge 进 `tools/lib` + spec；live/browser 只采集（judge + thin runner）。
-3. 先有红证；没红过的资产不算证据（[testing.md](../../docs/testing.md) §3.7）。
+3. 先有红证；没红过的资产不算证据（[testing.md](../../../docs/testing.md) §3.7）。
 4. 头注写清「不证明什么」；矩阵绿 ≠ 行为绿。
 5. 资产有层（keyless/smoke/probe/audit/evidence）；不把模型塞进 `pnpm test`。
 6. 同类形状第二次出现、或某 charter 被盲区卡住才建；不预建每 bug 场景。
@@ -214,7 +216,7 @@ A3 验收：负控 label 不命中；`COO（运营与交付）` / `CFO（财务�
 
 ### 9.7 A 批执行结果（2026-11-10 晚）
 
-> 决策记忆 = [探索测试的资产策略](../../notes/implemented/2026-11-10-exploration-asset-strategy.md)
+> 决策记忆 = [探索测试的资产策略](../../../notes/implemented/2026-11-10-exploration-asset-strategy.md)
 > （ROI 六条、入口语义、输掉的方案与验证/未验面）。
 
 - **A1**：`tools/lib/surface-matrix.mjs` + `checks/audit/surface-matrix-audit.mjs` + spec（14 tests）。
@@ -244,7 +246,7 @@ A3 验收：负控 label 不命中；`COO（运营与交付）` / `CFO（财务�
 | B2 矩阵 | A1 audit 扫 B1/B3/B4 新会话 | **PASS**：15 观察（7 root / 7 child / 1 member）、0 问题；coo/cfo child 71 工具 / control 2 / 无 team；CEO team member 继承 80 工具。 |
 | B3 CFO 角色包 | CEO 1 人 CFO 成员，任务书带 CFO 角色包 | **PASS**：`drafts/ceo.md`、`drafts/cfo.md` 在场；署名行 `任务书 = …` 指向真实任务书；任务书含 CFO 角色包（2794 chars）；成员继承 CEO 组合（preset ceo / d1），不冒充 preset CFO。 |
 | B4 UI 卡 | 同一 CEO 会话调 coo + cfo；`--body-out` / `--html-out` | **卡在 DOM、默认不可见**：DOM 有 `data-slot="tool.call.toolview"`、`data-tool=coo/cfo`、`wk-delegation-role = 委派 COO（运营与交付）/ CFO（财务与合规）`、`data-state=ok`；但卡在 `data-step-process-body hidden="until-found"`（`data-turn-process-member=true`）里，默认 transcript、`--body-out`、点 `Completed`/`Called tools` 都未露出。**OBS-5 判为折叠/探针限制，不是卡未渲染**；不据此开 bug。 |
-| B5 `/req check` live | 命令宿主 RPC（非 GUI ask）：`session/create` + `commands/execute` | **PASS（2026-11-10 深夜补齐）**：清掉 dev home 陈旧 writer lease（pid 98394）后，`/req check 2026-11-10-probe-cmd-business-software` 真回执 = `层 = MRD/StRS/PRD；动议类型 = business-software；索引 = 4 条定义 / 4 条追溯`；`missing-slug` → 缺需求文档；空参数 → usage。另发现 [BUG-057](../_archive/fixed_bugs/BUG-057-command-slug-path-traversal.md) / [BUG-058](../_archive/fixed_bugs/BUG-058-command-datablocked-reason.md)。 |
+| B5 `/req check` live | 命令宿主 RPC（非 GUI ask）：`session/create` + `commands/execute` | **PASS（2026-11-10 深夜补齐）**：清掉 dev home 陈旧 writer lease（pid 98394）后，`/req check 2026-11-10-probe-cmd-business-software` 真回执 = `层 = MRD/StRS/PRD；动议类型 = business-software；索引 = 4 条定义 / 4 条追溯`；`missing-slug` → 缺需求文档；空参数 → usage。另发现 [BUG-057](../fixed_bugs/BUG-057-command-slug-path-traversal.md) / [BUG-058](../fixed_bugs/BUG-058-command-datablocked-reason.md)。 |
 
 - 判定：B1（cancel/sigterm）、B2、B3 PASS；B4 解 OBS-5（卡渲染正确、默认不可见）；B5 未覆盖。
   未发现新的产品级硬缺陷。
@@ -265,10 +267,10 @@ B5 从「未证」改 PASS。
 
 **新缺陷（2 张 P2）**：
 
-- [BUG-057](../_archive/fixed_bugs/BUG-057-command-slug-path-traversal.md)：`/req check ../zz-outside` 返回 **success**；
+- [BUG-057](../fixed_bugs/BUG-057-command-slug-path-traversal.md)：`/req check ../zz-outside` 返回 **success**；
   `/prd check ../zz-outside` 读到根外目录的内容判据错误。两个 handler 都把 slug 直接 `join`，`..`
   可越界；只读、本地操作员触发 → P2。已复现（fixture 用完即删）。
-- [BUG-058](../_archive/fixed_bugs/BUG-058-command-datablocked-reason.md)：dataBlocked 回执说「无 workspace/身份/lease 问题」，
+- [BUG-058](../fixed_bugs/BUG-058-command-datablocked-reason.md)：dataBlocked 回执说「无 workspace/身份/lease 问题」，
   但本轮真实原因正是 lease 被占；runtime guard 的 stderr 有原因，命令层只剩布尔。另：raw session 的
   cwd 不改变命令的启动态；GUI picker 是否 re-init 未证。
 
@@ -487,7 +489,7 @@ spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全
   `system-architecture`/`vv-plan`，且 `skill(name=system-architecture)` 成功加载到各自 side 的正文。
   第一次 live 在 300s wall 处截断于 verify 启动；复用产物只跑 verify 的 follow-up 写出 verdict
   `pass` + 4 条 advisory 处置，但 `quality-loop-audit` 报 `body-modified`：头 hash 含尾随换行，
-  audit 归一化后不一致（[BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)）。
+  audit 归一化后不一致（[BUG-056](../fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)）。
   把副本头 hash 改成归一化值后 audit **ALL PASS**——其余八项都过，唯一失败是 hash 口径。
   裁决文本本身 pass、检查表/处置都在，但机械锚对不上；R2/复验未跑。
 - **P3 team 角色包：PASS（路径 + CMO 产出）**。COO 成员盘日志证明它读了 CHARTER + 两个 COO skill
@@ -501,12 +503,12 @@ spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全
 
 ### 新发现
 
-- [BUG-054](../_archive/fixed_bugs/BUG-054-dev-rehearsal-kb-policy-lines-missing.md)（P2，**已由另一 Agent 修复归档**）：
+- [BUG-054](../fixed_bugs/BUG-054-dev-rehearsal-kb-policy-lines-missing.md)（P2，**已由另一 Agent 修复归档**）：
   dev/rehearsal 盘缺 `policy-lines.md` / `review-protocol.md`；COO 在探针里因此把预算/并行判据标
   「唯一事实家缺失」。生产 `seed.json` 有这两条，缺口在 `bundle-init` / `mirrorCompanyReference`。
-- [BUG-055](../_archive/fixed_bugs/BUG-055-team-role-packet-missing-taskbook.md)（P2，**已修复归档**）：
+- [BUG-055](../fixed_bugs/BUG-055-team-role-packet-missing-taskbook.md)（P2，**已修复归档**）：
   team 角色包没有 `任务书` 字段；COO 稿首署名行指向不存在的 `drafts/ceo.md`。
-- [BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)（P2，**已修归档**）：quality-loop
+- [BUG-056](../fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)（P2，**已修归档**）：quality-loop
   `verdict-r1.md` 的 body-sha256 含尾随换行；首次真跑 audit `body-modified`。文本 pass、机械锚对不上。
 - **OBS-1（探针限制，不是产品缺陷）**：团队成员的会话不能通过 `session/page` 读（地址/边界），
   本次改用磁盘 `session.v4.jsonl.zstd`；证到成员真读了角色 skill。
@@ -518,7 +520,7 @@ spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全
   已加“2026-11-10 后已变”指针（研究材料正文不回填；两处指针已落，owner 归 research 维护）。
 - **OBS-3（已解；真实原因转 BUG-058）**：`commands/execute` 首跑返回 `公司数据已停写` 的真实原因是
   dev home writer lease 被陈旧进程持有（pid 98394），不是 workspace 缺失；清掉 holder 后 B5 真回执 PASS。
-  但回执把原因说成「无 workspace/身份/lease 问题」→ [BUG-058](../_archive/fixed_bugs/BUG-058-command-datablocked-reason.md)；
+  但回执把原因说成「无 workspace/身份/lease 问题」→ [BUG-058](../fixed_bugs/BUG-058-command-datablocked-reason.md)；
   命令宿主 RPC 本身可用。
 - **OBS-4（流程风险）**：VP-Eng 在 verdict 后改了产物（F1/F3 订正），没有开 R2；处置表明确标
   「已修但未经复验」。本轮是我们的 prompt 限定只跑一轮，但这说明**裁决与产物版本没有被同一 hash 绑定**，
@@ -530,10 +532,10 @@ spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全
   探针选择器限制；本轮不据此开 bug，产品若要默认展开另立判断。
 - **OBS-6（静态漂移，已修 2026-11-10）**：`docs/contracts/delegation.md` §5 原写卡片 key =
   `vp_eng` / `vp_sales` 两项、渲染文案仍指“VP 交回的稿子”；代码
-  [`delegation-keys.ts`](../../packages/company-pack/src/client/wiring/delegation-keys.ts) 已是五项
+  [`delegation-keys.ts`](../../../packages/company-pack/src/client/wiring/delegation-keys.ts) 已是五项
   （`vp_eng`/`vp_sales`/`vp_cmo`/`coo`/`cfo`），`DelegationCard` 也已是通用职能卡。A 批同 diff 已修。
 - **未发现**产品类型/五汇报线的硬缺陷；质量环 catalog/加载 PASS，完整质量环 audit `body-modified`
-  已由另一 Agent 修复归档（[BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)）；
+  已由另一 Agent 修复归档（[BUG-056](../fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)）；
   UI 卡片标签未证实。不能据此说“没有 bug”，未跑面见下。
 
 ### 未执行
@@ -743,11 +745,11 @@ role 工具；父把 acknowledgement 当完成；run completed 但分支 null/�
 | U1 图/UI | `ui-scene-smoke --isolated --golden` 红：金样 `梦之队 CEO` vs 页面 `CEO`；九页签/委派流程区在场 | **BUG-048 P2** |
 | K0 静态 | 已落合同仍标 `planned`；`subagent_retry` 注册面/深度不在模型；handbook skip 只列 worker | **BUG-049 P2**（+ BUG-047） |
 
-**新开缺陷卡：** [BUG-045](../_archive/fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md)（P1）、
-[BUG-046](../_archive/fixed_bugs/BUG-046-parent-cannot-verify-child-preset-depth.md)、
-[BUG-047](../_archive/fixed_bugs/BUG-047-worker-family-handbook-scope.md)、
-[BUG-048](../_archive/fixed_bugs/BUG-048-ui-golden-brand-name-drift.md)、
-[BUG-049](../_archive/fixed_bugs/BUG-049-model-contract-retry-drift.md)（均 P2）。
+**新开缺陷卡：** [BUG-045](../fixed_bugs/BUG-045-subagent-retry-depth-budget-bypass.md)（P1）、
+[BUG-046](../fixed_bugs/BUG-046-parent-cannot-verify-child-preset-depth.md)、
+[BUG-047](../fixed_bugs/BUG-047-worker-family-handbook-scope.md)、
+[BUG-048](../fixed_bugs/BUG-048-ui-golden-brand-name-drift.md)、
+[BUG-049](../fixed_bugs/BUG-049-model-contract-retry-drift.md)（均 P2）。
 
 **观察（不建卡）：** `wait_agent`/`sleep` 等 child 的旧 F5/F7/F8 行为在 VP-Eng 层复发；CEO 派发后
 继续 `ls/grep/read` 查证（W1c）；`list_agents(descendants)` 的 depth 是相对值（D1 CEO 已解释）；
@@ -813,7 +815,7 @@ error/interrupted live retry、depth 4 等（见研究材料 §9.4/§9.6）。
 | W5-E orchestrator 上限 | VP→worker-orchestrator(1)，4 件独立读文件 brief → 实际起 **4 个 leaf**（depth 2 / worker）；preset 写“1–2 个 leaf” | **BUG-051（P2）**：preset 承诺与能力面不一致；设计 Note 明说 1–2 只是 persona |
 | W5-F 通用 child 深度边界 | vp-sales root→generic child(1)→generic child(2) 调 retry：attempts 0 / `depth-exceeded` / 无 worker；预算 2 | **PASS**（修复对继承 vp-sales 的 generic child 也生效） |
 
-**新缺陷：** [BUG-051](../_archive/fixed_bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（P2，worker-orchestrator 的 1–2 leaf 只是 persona）。
+**新缺陷：** [BUG-051](../fixed_bugs/BUG-051-worker-orchestrator-leaf-cap-contract.md)（P2，worker-orchestrator 的 1–2 leaf 只是 persona）。
 **观察**：workflow 分支可调 retry 生成 depth 2/3 worker，与“分支默认叶子”的 prose 有张力，但不是新机制；
 DagTab 真页面图、depth 4、真实 error live retry 仍未覆盖。
 
@@ -828,7 +830,7 @@ DagTab 真页面图、depth 4、真实 error live retry 仍未覆盖。
 | W6-B teammate 重启身份 | VP root 起 teammate → 停宿主 → 同 home 重启 → `list_subagents` | 行仍 `role: teammate` / `address: restart-team` / `agentPreset: vp-eng` / `delegationDepth: "1"` / `completed`。**PASS** |
 | W6-C CMO 重启深度 | CEO→VP(1)→CMO(2) → 停宿主 → 重启 → CMO 调 `subagent_retry` | 仍 `attempts: 0` / `depth-exceeded` / 无 worker。**PASS**（冷恢复后深度门仍生效） |
 
-**新缺陷：** [BUG-052](../_archive/fixed_bugs/BUG-052-worker-leaf-control-surface.md)（P2，leaf 控制面可见）。
+**新缺陷：** [BUG-052](../fixed_bugs/BUG-052-worker-leaf-control-surface.md)（P2，leaf 控制面可见）。
 **观察**：W6-A 的 sibling 注入被运行时按 parent ownership 拒绝；`list_subagents` 在 leaf 里为空；
 不是跨 parent 越权，但 preset 的“无 control”文案与工具面不一致。W6-B/C 说明 restart 对 teammate 身份与
 CMO 深度门都正确。
@@ -847,7 +849,7 @@ CMO 深度门都正确。
 | W7-F 重启后 retry 正样本 | VP root `subagent_retry` → 停宿主 → 重启 → 再次 `subagent_retry` | 重启前 child `19f9f31d…` / first-ok；重启后新 child `9495ee5b…` / second-ok / depth 1 / worker，attempts 1。**PASS**（冷恢复后 `subagent_retry` 仍能新起 child，不复用旧结果） |
 | W7-G retry child 跨宿主重启 | VP root `subagent_retry` 起 `bash sleep 117` worker；宿主 SIGTERM → 重启 | root `turn/end interrupted`；child `turn/end interrupted`；retry tool call 无原 result，宿主注入“outcome unknown / 按幂等性决定是否重试”的诊断；`list_subagents` 行 `lastTurnEnd: interrupted` / `worker` / depth 1 / `inferred-open-turn`。**PASS**（与 BUG-053 的 cancel 不同：宿主重启有 interrupted 终态与诊断；不是新 bug） |
 
-**新缺陷：** [BUG-053](../_archive/fixed_bugs/BUG-053-cancel-does-not-abort-subagent-retry.md)（P1，取消不中止阻塞 retry child）。
+**新缺陷：** [BUG-053](../fixed_bugs/BUG-053-cancel-does-not-abort-subagent-retry.md)（P1，取消不中止阻塞 retry child）。
 **观察**：旧 R8 的 workflow 取消是 PASS；`subagent_retry` 是同步等待 child 的 host 原语，取消没有传播到
 `activation.result`/child；这是与旧 R8 不同的一条路。
 
@@ -858,8 +860,8 @@ CMO 深度门都正确。
 
 | 轮次 | 发现/结果 | 处置 |
 |---|---|---|
-| 第一轮（2026-11-08） | `agent({schema})` 的 enum/const 缺 type → [BUG-036](../_archive/fixed_bugs/BUG-036-workflow-schema-enum-type.md)；根门团队版控制名 shadow → [BUG-037](../_archive/fixed_bugs/BUG-037-root-team-tool-shadowing.md)；分支内再委派回执/跨轮/ null → [BUG-038](../_archive/fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md)；>50k 结果截断且 spill 也是截断副本 → [BUG-039](../_archive/fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md)；schema 分支只回文本 → 父拿 null、无诊断 → [BUG-040](../_archive/fixed_bugs/BUG-040-workflow-schema-text-answer-discarded.md)；宿主重启孤儿 child → [BUG-041](../_archive/fixed_bugs/BUG-041-host-restart-orphans-inflight-child.md) | 6 张卡（2×P1 + 4×P2）已修归档；F4/F5 当场修；R9 的“分支落文件 + 父拿元数据”是可复现替代 |
-| 第三轮（2026-11-08 夜） | F14 read 长行截断；F15 `lastTurnEnd` 恒缺 → [BUG-042](../_archive/fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md)；F16 `list_subagents` 含 teammate → [BUG-043](../_archive/fixed_bugs/BUG-043-list-subagents-includes-teammates.md)；F17 后台 job 不跨重启 → [BUG-044](../_archive/fixed_bugs/BUG-044-background-job-lost-on-restart.md)；F18–F22 观察 | 均已修/收口；详见 §17 |
+| 第一轮（2026-11-08） | `agent({schema})` 的 enum/const 缺 type → [BUG-036](../fixed_bugs/BUG-036-workflow-schema-enum-type.md)；根门团队版控制名 shadow → [BUG-037](../fixed_bugs/BUG-037-root-team-tool-shadowing.md)；分支内再委派回执/跨轮/ null → [BUG-038](../fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md)；>50k 结果截断且 spill 也是截断副本 → [BUG-039](../fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md)；schema 分支只回文本 → 父拿 null、无诊断 → [BUG-040](../fixed_bugs/BUG-040-workflow-schema-text-answer-discarded.md)；宿主重启孤儿 child → [BUG-041](../fixed_bugs/BUG-041-host-restart-orphans-inflight-child.md) | 6 张卡（2×P1 + 4×P2）已修归档；F4/F5 当场修；R9 的“分支落文件 + 父拿元数据”是可复现替代 |
+| 第三轮（2026-11-08 夜） | F14 read 长行截断；F15 `lastTurnEnd` 恒缺 → [BUG-042](../fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md)；F16 `list_subagents` 含 teammate → [BUG-043](../fixed_bugs/BUG-043-list-subagents-includes-teammates.md)；F17 后台 job 不跨重启 → [BUG-044](../fixed_bugs/BUG-044-background-job-lost-on-restart.md)；F18–F22 观察 | 均已修/收口；详见 §17 |
 | 修复后定向回归（2026-11-09） | C2f（重启后 `lastTurnEnd: interrupted` + cold resume）、C7b（`workflow_runs` 报 `lost`）、C13c（teammate `role/address`） | 三条 PASS，未发现新缺陷；详见 §18 |
 
 > 这些卡/场景不是本轮的 PASS 来源；若在新组合下复发，按新证据记回归并引用旧卡，不重开旧卡。
@@ -871,12 +873,12 @@ CMO 深度门都正确。
 | [资产审计与第九轮设计](../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md) | 当前轮的资产结论、八轮缺陷家族、round-8 实测矩阵、A/B 资产、红证、预算与不建清单 |
 | [重构后第四轮计划](../research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md) | 第四轮 delta、入口、charters、假设、fixtures、预算、停止与交接（历史） |
 | [2026-11-08 计划](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md) | §1–§15 机制/设计（部分已被重构取代）；§16–§18 前三轮结果与未覆盖 |
-| [模型](../../tools/lib/delegation-model.mjs) | preset/通道/worker profile/合同/深度的唯一期望源；静态对账对象 |
-| [delegation 合同](../../docs/contracts/delegation.md) / [presets 合同](../../docs/contracts/presets.md) | 当前人读合同；tool 行以 preset 为准 |
-| [presets](../../packages/company-pack/presets) | vp-eng / CEO / worker family 的声明面 |
-| [subagent-retry.ts](../../packages/company-pack/src/host/delegation/subagent-retry.ts) / [spec](../../tests/host/delegation/subagent-retry.spec.ts) | 重试原语与 keyless 分类 |
-| [delegation-tree.ts](../../packages/company-pack/src/lib/delegation-tree.ts) / [DelegationFlowPanel](../../packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx) | 图/UI 投影与终态 |
-| [vendor/dsh](../../vendor/dsh) | workflow/subagent/team 机制一手来源；只读 |
+| [模型](../../../tools/lib/delegation-model.mjs) | preset/通道/worker profile/合同/深度的唯一期望源；静态对账对象 |
+| [delegation 合同](../../../docs/contracts/delegation.md) / [presets 合同](../../../docs/contracts/presets.md) | 当前人读合同；tool 行以 preset 为准 |
+| [presets](../../../packages/company-pack/presets) | vp-eng / CEO / worker family 的声明面 |
+| [subagent-retry.ts](../../../packages/company-pack/src/host/delegation/subagent-retry.ts) / [spec](../../../tests/host/delegation/subagent-retry.spec.ts) | 重试原语与 keyless 分类 |
+| [delegation-tree.ts](../../../packages/company-pack/src/lib/delegation-tree.ts) / [DelegationFlowPanel](../../../packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx) | 图/UI 投影与终态 |
+| [vendor/dsh](../../../vendor/dsh) | workflow/subagent/team 机制一手来源；只读 |
 
 ## 范围与排除项
 
