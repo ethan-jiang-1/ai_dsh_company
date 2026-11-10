@@ -100,12 +100,12 @@ skill？质量环 starter 能不能被 VP-Eng 真加载？旧 worker/retry/workf
 - 边界不变：不改产品代码、不重跑第四–八轮旧矩阵、真缺陷先开 `_backlog/bugs/` 卡；
   资产工作不以“绿”代替行为结论。
 
-**下一步（2026-11-10 晚）：** 先做 A 批资产（§9.2），红证齐后把矩阵/证据包结果回填本节；
-B 批 live 需用户批准入口与预算后启动（不批准不跑）。A 批完成前不重跑第八轮、不扩 CEO root 的 workflow。
+**下一步（2026-11-10 晚）：** A 批资产已完成（§9.7）；B 批 live 按用户 2026-11-10 批准的
+60 分钟 / 10 prompt / 16 child 执行（§9.3），结果回填 §9.8。B 批前不重跑第八轮、不扩 CEO root 的 workflow。
 第八轮的 [BUG-054](../_archive/fixed_bugs/BUG-054-dev-rehearsal-kb-policy-lines-missing.md) /
 [BUG-055](../_archive/fixed_bugs/BUG-055-team-role-packet-missing-taskbook.md) /
 [BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md) 已由另一 Agent 修复归档；
-剩余 OBS-2/OBS-5/OBS-6 见 §8 与 §9。未执行面保留，不写“没有 bug”。第四–七轮只作历史，不重跑。
+剩余 OBS-2/OBS-5（OBS-6 已修）见 §8 与 §9。未执行面保留，不写“没有 bug”。第四–七轮只作历史，不重跑。
 
 **历史（2026-11-09 第四轮）：** 第四轮已执行并收口（2026-11-09，约 22 分钟/19 turns/27 children，
 未触发停止上限）；发现 **5 张缺陷卡（BUG-045–049）**，已按根因分组全部修复归档。修复后验证轮
@@ -188,7 +188,7 @@ A3 验收：负控 label 不命中；`COO（运营与交付）` / `CFO（财务�
 ### 9.4 本轮不建（明确排除）
 
 - **replay/snapshot**：replay lane 不加载 company-pack；snapshots 只收合成场景，真实会话证据不进仓。
-- **文档散文门禁**：policy P2 只对复发 + 可机械判定的错误；OBS-2/OBS-6 一次修 + owner。
+- **文档散文门禁**：policy P2 只对复发 + 可机械判定的错误；OBS-6 已修，OBS-2 复核为两条非漂移 + 研究材料指针（owner = research）。
 - **`/req check` 命令宿主夹具**：keyless 已覆盖解析；live 缺的是 workspace/lease，不是产品类型。
 - **每 bug 一个常驻 probe**：修完的 bug 进 keyless judge；live probe 只留模型行为/生命周期/UI 三类。
 - **无人值守 fuzz / 全 preset E2E**：P3 轻任务；模型成本与 flake 不可控。
@@ -206,8 +206,24 @@ A3 验收：负控 label 不命中；`COO（运营与交付）` / `CFO（财务�
 
 - A1/A2/A3 各有落点、spec 红→绿、头注「何时跑/成本/不证明」；A1 在 round-8 窗口零假阳性。
 - A 批不调模型；B 批未批准前不启动。
-- OBS-2/OBS-6 静态漂移有 owner 与处置（修或明确不修）；不把文档漂移混进资产绿。
+- OBS-6 已修；OBS-2 有复核结论与 owner（研究材料指针）；不把文档漂移混进资产绿。
 - 收口回答：矩阵抓到什么、证据包省了什么、哪些面仍未覆盖。
+
+### 9.7 A 批执行结果（2026-11-10 晚）
+
+- **A1**：`tools/lib/surface-matrix.mjs` + `checks/audit/surface-matrix-audit.mjs` + spec（14 tests）。
+  round-8 窗口（`--since 2026-11-10T17:00+08:00`）= **47 观察（20 root / 19 child / 8 member）**、
+  54 个无模型轮跳过、**0 问题**；红证 = 同一 audit 对 `--since 2026-11-09` 旧日志 **exit 1**，
+  含 `worker d1 control=list_subagents,send_to_subagent`（BUG-052 同型）与旧 vp-eng 缺 `quality_loop_*` 行。
+- **A2**：`tools/lib/session-evidence.mjs` + `tools/explore-evidence.mjs` + spec（6 tests）；在
+  `session-2110bd4a` 上出 root + 2 children（80/71/71 工具、3 轮 completed）；缺首帧显式 `unavailable`。
+  3 个 probe 的 `rawHeader` 暂保留：probe 走 `session/page` 的 mode fallback，evidence 包走盘上直读，
+  输入面不同；统一另开（不是本轮资产绿）。
+- **A3**：`cdp-probe --body-out` 在 `ui-scene-smoke --isolated --keep` 实例上落 761B 全文（9 页签、0 失败），
+  负控 `COO（运营与交付）` 不在空壳正文；正控留 B4。
+- **静态漂移**：OBS-6 已修（`delegation.md` §5 五 key + 通用职能卡）；OBS-2 复核 = cordis 注释是反例警示、
+  release-smoke 是历史注释（均非活漂移），两处研究材料已加“2026-11-10 后已变”指针。
+- **验证**：`pnpm verify` ALL PASS；`pnpm typecheck` 绿；新 spec 20 tests 绿。
 
 ## 第八轮（2026-11-10 后）：新面与回归
 
@@ -408,11 +424,12 @@ spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全
   `verdict-r1.md` 的 body-sha256 含尾随换行；首次真跑 audit `body-modified`。文本 pass、机械锚对不上。
 - **OBS-1（探针限制，不是产品缺陷）**：团队成员的会话不能通过 `session/page` 读（地址/边界），
   本次改用磁盘 `session.v4.jsonl.zstd`；证到成员真读了角色 skill。
-- **OBS-2（静态漂移，owner = 文档/研究）**：
-  `packages/company-pack/cordis.patch.yml:104` 的注释仍写 `handbookSkipPresets: ['worker']`；
-  `checks/smoke/release-smoke.mjs:164` 的历史注释仍写「9 个 preset」；
-  `2026-11-10-sa-sqa-method-packs.md` 与 `2026-11-10-org-coordination-topology.md` 的
-  “没有默认方法包 / 三个工具”是落地前快照，应加“2026-11-10 后已变”的指针（研究材料是证据，不回填正文）。
+- **OBS-2（静态漂移复核，owner = 文档/研究）**：2026-11-10 晚复核——
+  `packages/company-pack/cordis.patch.yml:104` 的 `handbookSkipPresets: ['worker']` 是“别把单 profile
+  白名单写回来”的反例警示，不是活漂移；`checks/smoke/release-smoke.mjs:164` 的「9 个 preset」是
+  2026-11-10 前 stale `_dist` 的历史注释，也不是活口径。只剩两份研究材料
+  （`2026-11-10-sa-sqa-method-packs.md` / `2026-11-10-org-coordination-topology.md`）的落地前快照
+  已加“2026-11-10 后已变”指针（研究材料正文不回填；两处指针已落，owner 归 research 维护）。
 - **OBS-3（探针限制，不是产品缺陷）**：`commands/execute` 在无 workspace/lease 的临时 CEO 会话里返回
   `公司数据已停写`；`/req check`/`/prd check` 的 live 面需要 GUI 选 workspace 或命令宿主夹具，
   本轮未搭。keyless 已覆盖命令解析与 checker。
@@ -423,11 +440,10 @@ spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全
   都看不到角色卡标签；默认 transcript 只显示最终文本 / `Completed`，点 `Completed` 或 `Agent Team`
   仍未露出。`client-load-smoke` 与 shell golden 全绿；卡片是否真渲染**未证**，不据此开 bug，
   归入“UI 卡片可视性未覆盖”。
-- **OBS-6（静态漂移，owner = docs）**：`docs/contracts/delegation.md` §5 仍写卡片 key =
-  `vp_eng` / `vp_sales` 两项，且渲染文案仍指“VP 交回的稿子”；代码
+- **OBS-6（静态漂移，已修 2026-11-10）**：`docs/contracts/delegation.md` §5 原写卡片 key =
+  `vp_eng` / `vp_sales` 两项、渲染文案仍指“VP 交回的稿子”；代码
   [`delegation-keys.ts`](../../packages/company-pack/src/client/wiring/delegation-keys.ts) 已是五项
-  （`vp_eng`/`vp_sales`/`vp_cmo`/`coo`/`cfo`），`DelegationCard` 也已是通用职能卡。
-  与 OBS-2 同批处置；不影响运行，但会误导下一轮 UI 判据。
+  （`vp_eng`/`vp_sales`/`vp_cmo`/`coo`/`cfo`），`DelegationCard` 也已是通用职能卡。A 批同 diff 已修。
 - **未发现**产品类型/五汇报线的硬缺陷；质量环 catalog/加载 PASS，完整质量环 audit `body-modified`
   已由另一 Agent 修复归档（[BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)）；
   UI 卡片标签未证实。不能据此说“没有 bug”，未跑面见下。

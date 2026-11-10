@@ -103,8 +103,9 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 
 ## 5. UI：委派工具卡
 
-- 槽 `tool.call.toolview`（keyed），key = `vp_eng` / `vp_sales`；渲染"委派 · VP-Eng｜brief｜VP 交回的稿子"，
-  状态 running/ok/error/stopped 只从 call/result 切片推导（可回放）。
+- 槽 `tool.call.toolview`（keyed），key = `vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo`（五条；共享常量
+  `DELEGATION_TOOL_KEYS`）；渲染“给职能的 brief 卡”（任务进、稿子出），状态 running/ok/error/stopped
+  只从 call/result 切片推导（可回放）。
 - ⚠ **key 必须与 preset 的 `toolName` 逐字一致**：keyed key 域开放，拼错**不报错**、只是永不渲染；两边由共享常量
   `src/client/wiring/delegation-keys.ts` 钉住，`pnpm test` 的 client-face 守卫比对 `toolName`。
 - 卡片只依赖 `slots` 服务（不读团队状态），单独 `ctx.inject(['slots'], …)` 注册——不被 team remote 的缺席拖住。

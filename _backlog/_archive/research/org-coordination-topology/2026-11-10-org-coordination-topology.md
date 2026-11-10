@@ -8,6 +8,11 @@ intent: 解释 CEO 的命名 delegation 为什么只有三条、SA/SQA 退役后
 > 读法：§1 先分清「公司编制」和「运行时 agent 图」；§2 回答 CEO 为什么只有三条命名行；§3 讲两条通道的代价；
 > §4 讲 VP-Eng 与 SA/SQA；§5 给全组织通道地图；§6 评分；§7 选项与建议；§8 待裁决；§9 证据边界。
 > 本轮只做静态研究：读文件、git 历史、vendor 源码、既有 Note；**没有改代码、没有跑真模型、没有跑门禁**。
+>
+> **2026-11-10 后已变**：本文的「三条命名行 / 没有默认方法包」是落地前快照；现状 = 五条命名行
+> （`vp_eng`/`vp_sales`/`vp_cmo`/`coo`/`cfo`）+ `pnpm methods:init` 四份 starter 方法包，见
+> [资产审计](../../../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md) 与
+> [delegation 合同](../../../../docs/contracts/delegation.md)。
 
 ## 0. 一句话
 

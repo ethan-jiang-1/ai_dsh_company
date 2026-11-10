@@ -7,6 +7,11 @@ intent: 把旧 SA/SQA 的方法、作者身份、否决权映射到 quality-loop
 
 > 本文是[组织协同拓扑](README.md)的 SA/SQA 分支材料。只做研究，不改代码。
 > 触发：用户 2026-11-10「VP-Eng 的 SA/SQA 退役后靠什么承接硬软一体研发」。
+>
+> **2026-11-10 后已变**：本文的「没有默认方法包」是落地前快照；现状 = `pnpm methods:init` + 四份
+> starter 方法包（producer/verifier 各两份），见
+> [资产审计](../../../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md) 与
+> [delegation 合同](../../../../docs/contracts/delegation.md)。
 
 ## 0. 一句话
 
