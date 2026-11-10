@@ -1,6 +1,6 @@
 # presets · 角色 preset 的语义合同（R2 五角色定稿 + 2026-11-05 CMO 增设）
 
-> 什么时候读：改 persona、skills 或角色语义时。路线 = 六角色表 → 验证方式节。
+> 什么时候读：改 persona、skills 或角色语义时。路线 = 六角色表 → 验证方式节；培养回路/方法层 = [cultivation.md](./cultivation.md)。
 > 合同：六个角色 preset 的"现在时"语义（persona 定稿、skills 清单、验证方式）。
 > 内容来源 [role-content Note](../../notes/implemented/2026-11-10-role-content-rationale.md)；命名约定见台账 D14
 > （显示名 = 角色名；公司名只在品牌/身份面；preset id 保持 kebab）。R1 定稿 CEO / VP-Eng；R2 定稿 VP-Sales / COO，
@@ -117,78 +117,16 @@
 （不需要谁去"读文档"）。本节不复制正文，避免两处漂移；`pnpm test` 有一条守卫断言手册覆盖
 六角色与「职责边界 / 这事问谁 / 冲突与升级 / 承诺权」四节。
 
-## 工具面（preset 自包含声明，R1 实证）
+## 工具面（owner = 实现）
 
-| 角色 | 工具行 | 说明 |
-|---|---|---|
-| CEO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-ask-user` / `tool-present` / **`tool-web`** + `delegation` 组（`subagent_research` / `vp_eng` / `vp_sales` 三行） | 读 KB、写交付物、加载 skill、澄清提问、声明交付、**上网（搜/取）**；**汇报线两条路**（R3）：命名委托 = activation 快捷出稿（终稿走完成通知），协作走 team；编排面 = team + 命名委托；workflow 归 vp-eng（同身份扇出，见下行）；语义见 [delegation.md](./delegation.md) |
-| VP-Eng / VP-Sales / COO / CFO | `tool-fs` / `tool-fs-search` / `tool-skill` / `tool-todo` / `tool-present` / **`tool-ask-user`** / **`tool-web`** + `delegation` 组 | 独立会话可直接问人；动议内仍升级 CEO——手册「问人两条路」两模式约束（承诺权与单一对外口径不动，R3/D18 维持）；`delegation` 供深挖调研 / 盘点 / 测算；VPS 引客户事实时可用 web 核价/竞品；vp-eng 另有 `workflow-ptc` + `tool-workflow`（同身份并行扇出）；**vp-sales / COO / CFO / CMO** 的 `subagent` / `subagent_fork` 行 `maxDepth: 2`，**vp-eng 的通用两行是 3**（CEO→VP→workflow 分支→worker 长链；见 [delegation.md](./delegation.md)）；`subagent_retry` 的深度上限 = 同一行 `maxDepth`（不另立预算，越界返回 `depth-exceeded`）；vp-eng 的 generic child 可选 `worker` / `worker-orchestrator` |
-| 全体 | **`tool-jobs`**（后台任务）/ **`tool-goal` + `/goal`**（跨轮目标）/ **`compaction` 组**（compaction-basic + `/compact` + tool-result-pruner：长会话历史压缩）/ delegation 组内 **`subagent_fork`**（可续跑自身分叉；**四个职能角色有，CEO 不挂**——CEO 会话的 team 工具 shadow 续驶控制名，挂了是死行只会骗模型）/ **`planning` 组**（`plan-mode`：先探索后落笔 / `exit_plan_mode` 唯一收尾）/ `preset-clock` 组（`time-context` 日期通道钉 `Asia/Shanghai` + `tool-schedule` 四件） | 行形状的范本 = `vendor/dsh/packages/bundle/web-app/presets/standard.patch.yml`；fork 编排位 = [delegation.md](./delegation.md) §4；session-query 授权域 = 本工作区（跨角色可查，合稿引用校对受益）；「上次动议定了什么」先查会话全文再问人；clock 宿主 `schedule` 服务由 web-app 组合提供；角色 preset 另有**条件启用**的 browser 组（npm 发布版 DSH 不含 browser 两包，缺包时整组禁用、角色照常可用；装包后自动开，`DSH_COMPANY_BROWSER` 可强制）；**会话检索工具不在此列**——由 bundle 的 `company-session-search` 隔离组全局提供（见下一行） |
-| CEO（编排面） | **无 workflow 行**；vp-eng 的 `delegation` 组有 `workflow-ptc` + `tool-workflow`（同身份扇出，不能带人格） | 编排面 = team + 命名委托；vp-eng 用 workflow 做并行取证/覆盖审计，不替代独立结论 |
-| 全局（pack bundle） | `agent-preset-registry` roster 替换 + 全局行 insert（`tool-present` / `agent-team` / `tool-agent-team` / `ui-agent-team` / `company-client` / `company-session-search` / `time-context` 等——行清单唯一源 = [cordis.patch.yml](../../packages/company-pack/cordis.patch.yml)） | 只放全局行；工具面主体仍随 preset（**例外 = 会话检索隔离组**：工具必须与 isolated provider 同组，否则工具看的是未打开的 host provider）；`company-session-search` 用 insert + isolate，不替换 base 的 `session-query-sqlite`（改值替换会让默认的应用内安装红） |
-
-⚠ **preset 是自包含组合**：DSH 无 patch 继承，工具行必须写在 preset 里（会话检索是唯一例外：工具必须与 isolated provider 同组）——R1 首跑就是漏了这一步，
-CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）。`pnpm test` 已加门禁检查（R2 起覆盖五角色）。
-
-⚠ **联网（`tool-web`）天生不继承，必须逐 preset 声明**（2026-09-29 补）：`web-app` bundle 把 host 上的
-`tool-web` 行 `disabled: true`，**改为按 agent preset 组合**（vendor base 注释原文）——所以漏写这一行时
-角色**静默无联网**（不报错，只是目录里少两个工具）。**子会话不用另配**：`subagent` 与 team teammate
-走 `composeFrom` **继承 Lead 的组合**（[roles-isolation §2/§4](../../notes/implemented/2026-11-10-roles-isolation-rationale.md)；本组 delegation 行无 `toolFilter`，故不裁剪）——
-实测 Lead 27 工具含 `web_search`/`web_fetch`，摘掉该行即回 25 且两个工具消失，委派子会话（depth=1）同含。
+工具行逐 preset 声明（自包含；DSH 无 patch 继承）；行清单唯一源 = `presets/<role>/agent.cordis.yml`
+与 [cordis.patch.yml](../../packages/company-pack/cordis.patch.yml)；本文件不复刻枚举（D28）。
+三条不变式：① 工具行必须写在 preset 里（会话检索是唯一例外，必须与 isolated provider 同组）；
+② `tool-web` 天生不继承，漏写 = 静默无联网；③ `maxDepth` / `agentPreset` / `subagent_fork` 的行级语义 =
+[delegation.md](./delegation.md) §1/§4。
 
 ## 验证方式
 
 完成定义唯一家 = [preset-change-definition skill](../../.agents/skills/preset-change-definition/SKILL.md)；
 改动面 → 最窄检查 = [tests/README](../../tests/README.md)。本文件不复述层级/命令/证据（旧分层表 2026-11-03 删除：
 它与 skill 口径已漂，且带日期证据）。
-
-## 培养回路与学习载体（分身成长条目出生，2026-09-24；2026-10-13 培养卡扩三面）
-
-**培养动作分三面**（2026-10-13 培养卡拍板：对象 = 公司盘×角色，人人培养自己的分身）：
-
-| 面 | 动作 | 谁 |
-|---|---|---|
-| **通用方法**（pack skills） | 改 `packages/company-pack/presets/<role>/skills/`——跨公司可复用的方法论 | 维护者（repo 写权限 = 培养权不变） |
-| **角色方法层**（2026-10-13 新增；2026-10-17 加 GUI 行动面；2026-10-28 M3 公司级） | 本人采纳培养记录 ⇒ host 写 `<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`——公司级、按角色隔离、pack 升级不擦；旧 `<profile>/company-cultivation/` 只读留一版 | 角色驾驭者（人）在培养面板点「采纳」或敲 `/cultivation adopt`——**同一条人侧命令通道**（面板经 `remote.commands.execute` 发同一行命令，host 照旧记 `source: user`，角色闸不变）；分身只能用 `cultivation_propose` 工具提案 |
-| **素材**（journal） | 角色会话收工纪要，人审后按「轮末收敛」压进 CHARTER | 分身写、人收敛 |
-
-**培养记录 = 公司盘 `cultivation/records/*.md`**（纠正/建议/采纳回执/验证引用；UI 经
-`workspaceFiles` 读、分身经 fs 读——写留日志）。闭环：纠正或跨角色建议（CEO 仅建议权，
-目标角色本人采纳）→ 本人采纳 → 方法落方法层 → 新会话生效 → 同类任务验证回填（`verify`）
-→ 不灵可撤回（`revoke`）。每次验证都附一项采纳后的相似工作事实，pass/fail、证据和时间追加到记录历史；失败只记为观察、不自动撤回。缺少原始出处显示为未记录，不推断来源或自然人身份。数据诚实 = 不可达 ≠ 0、未验证 ≠ 已掌握。机制与判据 =
-[cultivation-method-layer-probe](../../probes/session-context/cultivation-method-layer-probe.mjs)。
-
-**可选参考背景（2026-10-23）**：`/cultivation correct|suggest` 接受可选的
-`--context=<base64url(ref JSON)>`（GUI 培养面板发出；不带 flag 的旧语法逐字不变）。命令只带引用
-（session/成品 path + turn/address），**host 读后**把自包含 `contexts`（kind/ref/title/at/turn/excerpt/
-truncated）写进记录 frontmatter；客户端只做预览。有背景或 `--work=` 时正文可空（方法正文回落为期望句）；
-两者都无仍必填。
-成品只认 `kb/deliverables-index.json` 条目；host 读不到就不落记录。背景随记录共享、相关角色可见；
-只取用户/助手文字（排除 tool/reasoning/checkpoint）。teammate 会话只做背景源：记录按 Lead（CEO）身份
-记账，成员继承 CEO 的方法层——指向成员名的 suggest 改不到该成员。机制判据 =
-[cultivation-context-probe](../../probes/session-context/cultivation-context-probe.mjs)。
-
-**生效边界按面**（D25；依据 = vendor 源码 + [2026-09-24 活体探针](../../notes/archived/2026-09-24-twin-cultivation.md)）：
-
-| 改动面 | 生效时点 | 依据 |
-|---|---|---|
-| persona / 组合文件（工具行、skill 根） | **新会话**（运行中的会话保持自己的 generation）；⚠ **新增依赖模块 / 新行解析时还须重启观察窗**——2026-09-29 实测：旧进程上新开会话仍是 25 工具（无 `web_search`），重启后 27 工具含之（该轮两个变量同时变，故取稳妥口径） | vendor `agent-preset` 的 preset stamp 机制；**活体已跑**（2026-09-29 联网整治，见 [role-web-access](../../notes/archived/2026-09-29-role-web-access.md)） |
-| skill 正文（`SKILL.md` body，含方法层） | **同会话下一轮**（`get()` 每次读盘） | 活体实证（日志工具结果层）+ vendor 源码一致；**修正** 2026-09-22 U1"只有新会话变"（U1 量的是模型转述） |
-| skill 条目（增删改名，含方法层） | 下一轮（pre-step digest 重算 → 替换目录注入）；2026-10-13 实测 watcher 连**运行中会话**的 catalog 都会刷新（探针 NOTE 行） | vendor skill digest；培养决定 = [twin-cultivation](../../notes/archived/2026-09-24-twin-cultivation.md) |
-| 方法层撤回（`revoke` 删目录） | 删除后新会话不再加载；已加载进历史的正文不回改（append-only） | 2026-10-13 机制探针 |
-
-**培养验收**：完整完成定义 = [preset-change-definition skill](../../.agents/skills/preset-change-definition/SKILL.md)（次序/最小证据/场景义务的唯一家；`pnpm test`/`preset-smoke`/场景义务都在那里）。本段只补“培养内容”特有的一条：`probe-smoke --full`（5–10 分钟，内容质量档）按需跑，不是完成门槛——最小证据按 skill + [tests/README](../../tests/README.md) 的改动面选择。方法层机制改动另跑
-[cultivation-method-layer-probe](../../probes/session-context/cultivation-method-layer-probe.mjs)（keyless 真 boot；
-判写隔离前先钉 `DSH_PERMISSION_MODE=workspace-write`——本机 Seatbelt 禁用时 env.sh 的
-danger-full-access 处方会让围栏缺席，这是机器条件不是机制缺口）。
-
-**学习载体 = workspace journal 唯一**（D8：`kb/<role>/journal/`，经工具调用进日志）。
-提升回路 = **人读 journal → 提炼 → 写进 pack skills**：只采纳有证据的教训、不自动提升、
-单人维护者的 bus factor 写进风险（照 DSH `human-review-skill-maintenance` 提案取舍）；
-提升文本只写方法论、不含公司事实与出处（D17——出处留收尾 Note，pack 换公司可复用）。
-**分身运行时自改 skill 已否决**；写隔离实测口径（2026-10-13）：**workspace-write 部署下**
-分身 fs 写方法层被沙箱拒（`[sandbox: file access denied]` 活体留证），danger-full-access
-部署无围栏——不宣称绝对隔离；采纳/拒绝/撤回/验证只走 `/cultivation` 人侧命令
-（不经模型、run 进会话日志），模型侧无这些动作的工具；
-**自主节律**已由 0.2.0 收割批 3 落地（schedule 工具 ×4 + time-context 日期通道，见上文工具面「批 3」行；
-原搁置池复活项随 D32 队列层退役而消化）。

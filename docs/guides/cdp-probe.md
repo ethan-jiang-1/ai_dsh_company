@@ -17,7 +17,7 @@
 
 ```sh
 source run/env.sh   # 提供 DSH_PROBE_CHROME 备选；二进制默认复用 loadChromium 解析（ms-playwright 缓存）
-pnpm company --no-open   # 起公司，横幅拿 URL（demo.md §前置）
+pnpm company --no-open   # 起公司，横幅拿 URL（demo-scenes.md §前置）
 node probes/browser-visual/cdp-probe.mjs 'http://127.0.0.1:<port>/?token=<t>'          # 默认断言面（零模型）
 node probes/browser-visual/cdp-probe.mjs '<url>' --ask '用一句话自报角色与职责。'      # + 完整公司环（真模型一次调用）
 node probes/browser-visual/cdp-probe.mjs '<url>' --steps /tmp/ui-steps.json   # 受控交互（clickText/waitText/expectText/typeText）
@@ -64,4 +64,4 @@ console.log），JSON verdict 的 `evidenceDir` 指向它；`--evidence` 让成�
 | client 面健康（零挂载失败 + 品牌） | `client-load-smoke` | 真浏览器（自起实例） |
 | 自起实例跑同一套断言 | `ui-scene-smoke`（起窗 → 本探针 → 证据） | 真浏览器（自起实例） |
 | **运行中实例的真实渲染 + 全环** | **本探针** | 真浏览器（附着运行实例） |
-| owner 亲眼看 | demo.md §前置 | 人 |
+| owner 亲眼看 | [demo-scenes.md §前置](./demo-scenes.md#前置本机) | 人 |

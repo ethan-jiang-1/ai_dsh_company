@@ -9,7 +9,7 @@
 | 我要… | 先读 | 再读 |
 |---|---|---|
 | 第一次接管 / 看全貌 | [orient.md](./orient.md) | [project-map.md](./project-map.md) |
-| 跑起来 / 演示 | [demo.md §前置](./contracts/demo.md#前置本机) | [guides/bootstrap.md](./guides/bootstrap.md) |
+| 跑起来 / 演示 | [演示 runbook](./guides/demo-scenes.md#前置本机) | [guides/bootstrap.md](./guides/bootstrap.md) |
 | 改代码 / 改角色 | [project-map.md](./project-map.md) | [contracts/presets.md](./contracts/presets.md) / [src/README](../packages/company-pack/src/README.md) |
 | 交证据 / 收尾 | [testing.md](./testing.md) | [guides/dev-loop.md](./guides/dev-loop.md) §1/§12 |
 | 查某个决定 | [reference/decisions.md](./reference/decisions.md) | 对应 Note |

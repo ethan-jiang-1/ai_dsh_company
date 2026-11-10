@@ -35,10 +35,13 @@ const DOC_LINE_BUDGETS = [
   ['docs/guides/dev-loop.md', 120], // 2026-09-26/27 升至 467（§13、inspect 句）后同日瘦身轮：§7 整段迁 guides/bootstrap.md、§7 留指针防断链（当时 467→376），棘轮 467→395；2026-10-12 二轮瘦身：§8 整段迁 guides/web-rpc.md、§5 时点表退役随迁 release.md（程序/人审/矩阵唯一家）、§0 导航表补全 13 节、§2/§12 同文件复述去重（patch 语法=§4、pipefail=§1），棘轮 395→367；2026-11-03 删 9 个空壳重定向节（§2/§4–§8/§9.1/§10–§11/§13，正文引用改指 debugging/tests README/policy），157→113 行，棘轮 165→120
   ['docs/testing.md', 75],       // 2026-10-04 立测试宪法（_digested/test-strategy 消化采纳轮；政策唯一家，只写 now——膨胀先迁，不加预算）；同日 61（§3.8 红/场景先行）；同日 75（§1.1 资产命名语法，用户点破 DSH「后缀即层」实践）；2026-10-09 §3.7 prove-it-red 补「标题带 BUG-nnn 的 describe/it = 守卫声明」判据句（guard-red-record 门禁接上；原句只写「三步留证」没给可判形状），**同 diff 压回 75 顶格**（引用链改「见该 Note」，不重复路径）。⚠ 顶格：下一句加进来前先迁——§1 分层表与 tests/README「改动面→最窄检查」有重叠面可搬
   ['docs/AGENTS.md', 62],        // 2026-10-09 N1 立（docs/ 分层规矩唯一家：一处事实一个家表 + 长度棘轮 + 更新时机 + 负知识；行数上限唯一源在 run-gates 不复述数字）；反证 = doc-taxonomy 门禁（表头/不属于这层 列缺失即红）
-  ['docs/contracts/demo.md', 237],        // 2026-10-21 冻结增长（六维度 Phase D3：无预算合同中最大三份立冻结预算）
+  ['docs/contracts/demo.md', 51],         // 2026-11-10 DSH 步 4：genre 拆分，场景/前置 → guides/demo-scenes；237→51
+  ['docs/guides/demo-scenes.md', 207],    // 2026-11-10 步 4：演示前置 + 分镜 + 场景 B–F（内容 +5%）
   ['docs/architecture.md', 88], // 2026-11-10 DSH 步 3：design/architecture → 顶层有序地图（83 行 +5%）
-  ['docs/contracts/multi-human.md', 199], // 2026-10-21 冻结增长
-  ['docs/contracts/presets.md', 198],     // 2026-10-21 冻结增长（工具面表同轮去历史化）
+  ['docs/contracts/multi-human.md', 76],  // 2026-11-10 步 4：runbook 迁 guides/multi-human-runbook；199→76
+  ['docs/guides/multi-human-runbook.md', 133], // 2026-11-10 步 4：开门/交接/前提/迁移（内容 +5%）
+  ['docs/contracts/presets.md', 139],     // 2026-11-10 步 4：工具枚举去重 + 培养回路迁 cultivation；198→139
+  ['docs/contracts/cultivation.md', 58],  // 2026-11-10 步 4：培养回路/方法层（内容 +5%）
   ['packages/company-pack/content/AGENTS.md', 37], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面，同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates；2026-10-12 瘦身轮 195→190（机制证据段收指针、证据叙事压缩、陈旧日期戳退役——同 diff Note）
   // ── 2026-10-27 R3-17：入口链与最大合同补预算（原先 852 行 docs 无棘轮；checks/README 已从 193 压到 78）──
   ['checks/README.md', 59],        // 2026-11-03 A- D1：手工库存改为 INDEX.generated.md 生成物；README 只留快速选择 + 指针（56 行，+5% 棘轮）

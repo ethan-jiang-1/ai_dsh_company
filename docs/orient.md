@@ -21,7 +21,7 @@ COO、CFO、CMO 各自是独立 preset，跑在 DSH 会话里，你通过 web �
 白话三步：进开发环境（`source run/env.sh`）→ 起公司（`pnpm company …`）→ 浏览器开门
 （token URL 在启动横幅里读）。**headless 只证明 CLI 能跑，不是公司运行。**
 
-→ 唯一步步骤：[demo.md §前置](./contracts/demo.md)
+→ 唯一步步骤：[演示 runbook](./guides/demo-scenes.md#前置本机)
 
 ## 三问：改东西从哪进？
 
