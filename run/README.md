@@ -20,7 +20,7 @@ workspace 登记 / lease / 方法层 / presented 账本 / 身份备份）。一�
 
 | 件 | 权威位置 | 本目录相关件 |
 |---|---|---|
-| 代码与组合 | `vendor/dsh`（钉 SHA）+ company-pack（bundle 行 + 五 preset） | —— |
+| 代码与组合 | `vendor/dsh`（钉 SHA）+ company-pack（bundle 行 + 11 preset：6 角色 + 5 support） | —— |
 | DSH 运行状态 | `runtime/harness-home/`（dev 安装的 home；第二 home = `harness-home-b/`） | `env.sh` 选定它 |
 | 会话 cwd / 业务产物 | `company-workspace/`（dev 安装的 workspace；用户侧 = 用户自己的项目目录） | `env.sh` 设 `DSH_COMPANY_HOME` |
 | 证据 | `snapshots/<类型>/<场景>/` | —— |

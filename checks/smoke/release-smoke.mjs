@@ -161,6 +161,15 @@ try {
       && existsSync(join(installedPack, 'content/charters/ceo.md')),
     `根目录 = ${readdirSync(installedPack).sort().join(', ')}`)
   const installedManifest = JSON.parse(readFileSync(join(installedPack, 'package.json'), 'utf8'))
+  // 2026-11-10：stale `_dist` 的安装副本自身自洽（10 条 patch/9 个 preset），boot 又因
+  // 安装锚遮蔽跑源码 roster——只查 `presets/ceo` + RPC 会假绿。安装副本必须与源码声明对齐。
+  const sourceManifest = JSON.parse(readFileSync(join(PACK_DIR, 'package.json'), 'utf8'))
+  const sourcePatch = sourceManifest?.dsh?.bundle?.patch ?? []
+  const installedPatch = installedManifest?.dsh?.bundle?.patch ?? []
+  check('安装副本 patch 清单 == 源码', JSON.stringify(sourcePatch) === JSON.stringify(installedPatch),
+    `源码 ${String(sourcePatch.length)} 条 / 安装 ${String(installedPatch.length)} 条`)
+  const missingPatches = sourcePatch.filter(rel => !existsSync(join(installedPack, rel)))
+  check('安装副本含全部源码声明的 patch', missingPatches.length === 0, missingPatches.join(', '))
   check('安装副本 peers 进 tarball', Object.keys(installedManifest.peerDependencies ?? {}).length >= 15 && installedManifest.dependencies === undefined)
   check('安装副本带 engines.dsh 运行时窗口', typeof installedManifest?.engines?.dsh === 'string')
   check('安装副本不再携带 dsh.compatibility（FAQ 24 §9.2）', installedManifest?.dsh?.compatibility === undefined)

@@ -87,7 +87,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
         <strong>{viewer === null ? '请选择负责的角色' : `我的分身：${props.viewerLabel ?? viewer}`}</strong>
         <div className="wk-meta">
           {viewer === null
-            ? '当前会话不是公司角色——用五角色之一开会话，这里就是那个角色的培养台。'
+            ? '当前会话不是公司角色——用公司角色之一开会话，这里就是那个角色的培养台。'
             : `培养对象 = 公司盘 × ${props.viewerLabel ?? viewer}（每个人培养自己的角色分身）。`}
         </div>
       </div>

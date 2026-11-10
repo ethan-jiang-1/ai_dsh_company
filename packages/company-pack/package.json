@@ -1,8 +1,8 @@
 {
   "name": "dsh-company-pack",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "type": "module",
-  "description": "Six-role virtual company for DSH: CEO / VP-Eng / VP-Sales / COO / CFO / CMO presets (MRD/PRD product definition), company handbook and Web tabs.",
+  "description": "Six-role virtual company for DSH: CEO / VP-Eng / VP-Sales / COO / CFO / CMO presets (MRD/PRD product definition), worker/quality-loop support presets, company handbook and Web tabs.",
   "license": "MIT",
   "author": "ethan-jiang-1",
   "homepage": "https://github.com/ethan-jiang-1/ai_dsh_company#readme",

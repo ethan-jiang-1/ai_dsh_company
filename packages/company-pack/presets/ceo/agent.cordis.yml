@@ -1,8 +1,8 @@
 # CEO 角色 preset —— 会话挂上它即获得该角色的人格、专属 skills 与工具面。
-# 设计依据：docs/design/architecture.md §1；**R1 实证修正**：preset 是自包含组合
+# 设计依据：docs/architecture.md §1；**R1 实证修正**：preset 是自包含组合
 #   （DSH 无 patch 继承，shipped standard 自己声明全部工具行）——**工具行必须随 preset 声明**，
 #   否则会话只拿到全局 bundle 的少数行（R1 首跑：CEO 只有 10 个团队工具，读不了文件、写不出交付物）。
-# 文案定稿：docs/design/role-content-plan §1（R1：CEO 个体，非职能模板）。
+# 文案定稿：notes/implemented/2026-11-10-role-content-rationale.md §1（R1：CEO 个体，非职能模板）。
 
 # ① 身份：persona row，shadow 掉部署默认人格，只对本 preset 的会话生效
 - insert:
@@ -157,7 +157,7 @@
           - id: browser-use
             name: cordis:group
             group: true
-            # 浏览器是可选面：npm 发布的 DSH meta package 不含这两个包；缺包时整组禁用，五角色照常可用。
+            # 浏览器是可选面：npm 发布的 DSH meta package 不含这两个包；缺包时整组禁用，公司角色照常可用。
             # 装包后 profile 可解析即自动开；也可用 DSH_COMPANY_BROWSER=on/off 强制（dev 的 run/env.sh 设 on）。
             disabled: !!js "process.env.DSH_COMPANY_BROWSER === 'off' || (process.env.DSH_COMPANY_BROWSER !== 'on' && (() => { try { const r = process.getBuiltinModule('node:module').createRequire(new URL('package.json', baseUrl)); r.resolve('@deepseek-ai/dsh-browser-use'); r.resolve('@deepseek-ai/dsh-experimental-browser-use-playwright-mcp'); return false } catch { return true } })())"
             isolate:

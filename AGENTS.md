@@ -1,11 +1,11 @@
 # AGENTS.md — 本仓库的入口链
 
-梦之队（Dream Team）虚拟公司 DSH 插件（DSH = DeepSeek Harness，唯一权威 = `vendor/dsh` 钉 SHA 子模块，见下「DSH 源码」节）：一个 company pack 提供六个角色 preset 与 host/client 面。
+梦之队（Dream Team）虚拟公司 DSH 插件（DSH = DeepSeek Harness，唯一权威 = `vendor/dsh` 钉 SHA 子模块，见下「DSH 源码」节）：一个 company pack 提供六个公司角色 preset + 五个 support preset（共 11 个），以及 host/client 面。
 **开工最小路径**（读完这三样就够开工，其余按需；feature 任务先 Plan Mode，规则 = [policy P1](docs/policy.md)）：① 本文件（纪律 + 命令表）；② 你任务那一份 owner——改角色内容 = [presets.md](./docs/contracts/presets.md)、改 host/Web 代码 = [src/README](packages/company-pack/src/README.md)、改文档 = [docs/AGENTS.md](docs/AGENTS.md)、新增/搬内容 = [content-charter](./docs/content-charter.md)、改机制/组合 = [profile.md](./docs/contracts/profile.md)；③ [tests/README.md](tests/README.md) 的「改动面 → 最窄检查」对应行。
 **按需**：[项目地图](docs/project-map.md)（空间）、[运行态地图](docs/runtime-map.md)（时序与四轴）、[开发环 §0.5](docs/guides/dev-loop.md#05-任务入口与交接) / [§1](docs/guides/dev-loop.md#1-执行链从授权到有证据交接)（流程细节）、[policy](docs/policy.md)（授权与常设边界）、[测试宪法](docs/testing.md)（证据边界）、[脚本索引](checks/README.md)（逐脚本）、[orient 七问](docs/orient.md)（白话速读）。
-**四条命令**：`pnpm company --no-open`（repo dev-only；默认 pack + `plugin add file:`，`--link` 快速通道；启动入口 = `dsh --profile company`）/ `pnpm verify`（结构门禁）/ `pnpm test`（keyless 回归）/ `pnpm typecheck`（类型面）。新 Agent 首跑验收 = [tests/README.md](tests/README.md) 首跑节。
+**四条命令**：`pnpm company --no-open`（repo dev-only；默认 pack + `plugin add file:`，`--link` 快速通道；启动入口 = `dsh --profile company`）/ `pnpm verify`（结构门禁）/ `pnpm test`（keyless 回归）/ `pnpm typecheck`（类型面）。新 Agent 首跑验收 = [tests/README.md](tests/README.md) 首跑节；fresh clone 先按 [bootstrap](docs/guides/bootstrap.md) 建 vendor/client，再跑 `pnpm company` / `pnpm test`（`pnpm verify` 只需 `pnpm install`）。
 
-**你（读者）= 维护本 repo 的开发 agent**；六个梦之队角色是你**维护的产物**（跑在 DSH 会话里，由 `pnpm dsh` / web 观察窗驱动）——别把自己混进公司角色，也别替角色执行公司手册。
+**你（读者）= 维护本 repo 的开发 agent**；六个公司角色 + 五个 support preset 是你**维护的产物**（跑在 DSH 会话里，由 `pnpm dsh` / web 观察窗驱动）——别把自己混进公司角色，也别替角色执行公司手册。
 
 ## 布局
 
@@ -50,7 +50,7 @@ pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需
 source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的真挂载检查（完整完成定义 = preset-change-definition skill；前置 = bootstrap 构建完成）
 ```
 
-逐脚本触发/成本/状态唯一源 = 脚本头注（门禁强制自述）；索引见 [检查索引](checks/README.md)——**别抄回本文件，复述必漂**。web 观察窗开门步骤唯一见 [演示 runbook](./docs/guides/demo-scenes.md#前置本机)：**先 `source run/env.sh`**——日用 `~/.dsh` 另有同名 `web` profile（起得来不报错、六角色不出现）；端口是环境状态，token URL 从启动横幅读；现场运维 = [budget-and-ops](docs/guides/budget-and-ops.md)。**push 走 `ssh.github.com:443`**（origin 已配好）。
+逐脚本触发/成本/状态唯一源 = 脚本头注（门禁强制自述）；索引见 [检查索引](checks/README.md)——**别抄回本文件，复述必漂**。web 观察窗开门步骤唯一见 [演示 runbook](./docs/guides/demo-scenes.md#前置本机)：**先 `source run/env.sh`**——日用 `~/.dsh` 另有同名 `web` profile（起得来不报错、公司角色不出现）；端口是环境状态，token URL 从启动横幅读；现场运维 = [budget-and-ops](docs/guides/budget-and-ops.md)。**push 走 `ssh.github.com:443`**（origin 已配好）。
 
 ## 密钥
 

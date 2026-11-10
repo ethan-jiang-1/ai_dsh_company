@@ -2,6 +2,23 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.10.0 — 2026-11-10
+
+### Added
+
+- 新增 worker family 三档：`worker`（执行手）、`worker-researcher`（只读调研）、`worker-orchestrator`
+  （可带 leaf 的小工头）；不占公司编制、不注入公司手册。
+- 新增质量环两档：`quality-loop-producer`（做）与 `quality-loop-verifier`（只读验）；配套 VP-Eng
+  的 `quality_loop_produce` / `quality_loop_verify` 两条命名委托，严格串行、方法由任务书点名。
+- 新增共享 `quality-loop` skill：产出 → 独立验证 → 三选一处置 → 复验的流程契约。
+
+### Fixed
+
+- 发布物与源码重新对齐：`_dist` tarball 现在包含 `dsh.bundle.patch` 声明的全部 11 个 preset；
+  `dist-freshness` 与 `release-smoke` 增加 source→artifact 校验，防止 tarball 少 preset 仍假绿。
+- 清理“五角色/六角色/六个 preset”旧口径，统一为“6 公司角色 + 5 support preset”；修复 preset 注释里
+  指向已不存在的 `docs/design/*` 的指针。
+
 ## 0.9.0 — 2026-11-05
 
 ### Added

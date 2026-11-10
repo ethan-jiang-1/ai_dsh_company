@@ -21,6 +21,7 @@ import { tmpdir } from 'node:os'
 import { companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { plainNodeEnv } from '../../tools/drivers/release-process.mjs'
+import { COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
 
 const KEEP = process.argv.includes('--keep')
 const CHANNEL = process.argv.includes('--channel') ? process.argv[process.argv.indexOf('--channel') + 1] : 'vendor'
@@ -34,6 +35,10 @@ const PACK = process.argv.includes('--pack')
 const BASE = mkdtempSync(join(tmpdir(), 'dsh-channel-matrix-'))
 const CLI = join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js')
 const ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo']
+// roster-consistency 钉 ROLES = 六公司角色；support preset 另列，不混进 ROLES
+//（2026-11-10：stale `_dist` 缺 quality-loop 两档，六角色全绿也看不出来）。
+const SUPPORT_PRESETS = COMPANY_SUPPORT_PRESET_IDS
+const ALL_PRESETS = [...ROLES, ...SUPPORT_PRESETS]
 const failures = []
 const active = new Set()
 
@@ -139,7 +144,7 @@ async function assertRoster(name, instance, base) {
   const cookie = await companyCookie({ fetch: globalThis.fetch, base: instance.base, token: instance.token })
   const rpc = companyRpc({ fetch: globalThis.fetch, base: instance.base, cookie, prefix: 'ch-', dumpBodyOnError: true })
   const list = await rpc('agentPresets/list', {})
-  for (const id of ROLES) {
+  for (const id of ALL_PRESETS) {
     const preset = list.presets?.find(candidate => candidate.id === id)
     check(`${name} roster ${id}`, preset !== undefined, preset === undefined ? 'missing' : '')
     if (preset === undefined) continue

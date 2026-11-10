@@ -164,7 +164,7 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
   return async ({ agent, rawInput }: { readonly agent?: AgentLike, readonly rawInput: string }) => {
     const face = sessionFaceOf(agent)
     if (face === null) {
-      return { kind: 'error' as const, text: '培养命令需要公司角色会话（当前会话不是五角色 preset，或 cwd 缺席）。' }
+      return { kind: 'error' as const, text: '培养命令需要公司角色会话（当前会话不是公司角色 preset，或 cwd 缺席）。' }
     }
     if (dataBlocked) {
       return { kind: 'error' as const, text: '公司数据已停写（bundle 身份损坏/版本不兼容，或公司盘落点不安全）；先修复 manifest/DSH_COMPANY_HOME 再培养。' }
