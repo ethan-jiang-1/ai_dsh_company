@@ -10,6 +10,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { resolveDeliverablePath } from './deliverable-path.ts'
 import { checkRequirements, isLayer, type MotionDoc } from '../../lib/requirements-check.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
 
@@ -125,8 +126,9 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
       }
       const parsed = parseReqCheck(rawInput)
       if (!parsed.ok) return { kind: 'error' as const, text: parsed.text }
-      const root = join(options.workspace, '.dsh-company/deliverables', parsed.slug)
-      const dir = join(root, 'drafts')
+      const resolved = resolveDeliverablePath(options.workspace, parsed.slug)
+      if (!resolved.ok) return { kind: 'error' as const, text: resolved.text }
+      const { root, dir } = resolved
       const docs: MotionDoc[] = []
       for (const name of REQ_DOCS) {
         const text = readIfExists(join(dir, name))

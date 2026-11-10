@@ -7,6 +7,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { resolveDeliverablePath } from './deliverable-path.ts'
 import { validateProductDocs } from '../../lib/prd-check.ts'
 
 export const PRD_USAGE = '用法：/prd check <deliverables 目录名>（读 .dsh-company/deliverables/<name>/drafts/{mrd,prd}.md）'
@@ -42,7 +43,9 @@ export function registerPrdCommand(ctx: Context, options: PrdCommandOptions): vo
       }
       const parsed = parsePrdCheck(rawInput)
       if (!parsed.ok) return { kind: 'error' as const, text: parsed.text }
-      const dir = join(options.workspace, '.dsh-company/deliverables', parsed.slug, 'drafts')
+      const resolved = resolveDeliverablePath(options.workspace, parsed.slug)
+      if (!resolved.ok) return { kind: 'error' as const, text: resolved.text }
+      const { dir } = resolved
       const mrdPath = join(dir, 'mrd.md')
       const prdPath = join(dir, 'prd.md')
       let mrd: string

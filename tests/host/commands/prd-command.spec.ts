@@ -1,4 +1,10 @@
-/** `/prd check` 命令：解析 + 文件读取 + 回执（结构校验本身 = prd-check.spec）。 */
+/**
+ * `/prd check` 命令：解析 + 文件读取 + 回执（结构校验本身 = prd-check.spec）。
+ *
+ * 负例留证 2026-11-10：slug 校验缺席时 `check ../zz-outside` 会读到 deliverables 根外并调用
+ *   validateProductDocs ⇒「越界 slug」用例红（BUG-057）；加校验后绿。
+ */
+// 负例留证 2026-11-10：删掉 slug 校验 ⇒「越界 slug」用例红（读根外 + 调用 checker；BUG-057）；还原即绿。
 import { describe, expect, it } from 'vitest'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -53,6 +59,28 @@ describe('registerPrdCommand', () => {
     const definition = mount('/w', { dataBlocked: true })
     const result = await definition.handler({ rawInput: 'check demo' })
     expect(result).toEqual({ kind: 'error', text: '公司数据已停写（无 workspace/身份/lease 问题）；先选 workspace 再校验。' })
+  })
+
+  it('越界 slug（BUG-057）→ 错误，且不读根外 drafts / 不调用 checker', async () => {
+    const workspace = mkdtempSync(join(tmpdir(), 'prd-command-outside-'))
+    const outside = join(workspace, '.dsh-company/zz-outside/drafts')
+    mkdirSync(outside, { recursive: true })
+    writeFileSync(join(outside, 'mrd.md'), doc(mrdJson))
+    writeFileSync(join(outside, 'prd.md'), doc(prdJson))
+    let called = false
+    const definition = mount(workspace, {
+      check: () => { called = true; return { ok: false, errors: ['should not run'] } },
+    })
+    try {
+      for (const slug of ['../zz-outside', '.', '..', 'a/b']) {
+        const result = await definition.handler({ rawInput: `check ${slug}` })
+        expect(result.kind).toBe('error')
+        expect(result.text).toContain('非法 deliverables 目录名')
+      }
+      expect(called).toBe(false)
+    } finally {
+      rmSync(workspace, { recursive: true, force: true })
+    }
   })
 
   it('缺 MRD / PRD → 点名路径', async () => {

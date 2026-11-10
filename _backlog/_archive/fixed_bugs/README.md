@@ -4,6 +4,13 @@
 
 ## 修复流水（倒序）
 
+- **BUG-057**（2026-11-10，P2）：`/req check` / `/prd check` 把操作员 slug 直接 `join` 成路径，
+  `../zz-outside` 能读出 deliverables 根之外（只读）。修法 = 共享 host-only `resolveDeliverablePath`
+  （单段 slug 正则 + `relative` 纵深校验），两条命令不再各拼路径。红→绿：两条 spec 先各 1 failed
+  （根外 fixture 被读到且 checker 被调用）→ 20 passed；真入口 `../zz-outside` / `.` / `..` /
+  `..%2Fzz-outside` 全拒，合法 slug 回执不变。详见 [卡](BUG-057-command-slug-path-traversal.md) 与
+  [Note](../../../notes/implemented/2026-11-10-command-slug-boundary.md)。
+
 - **BUG-056**（2026-11-10，P2）：质量环 verdict 头的 `body-sha256` 靠手算，模型用了 `tail -n +2 | shasum`（含文件尾随换行），audit 按「去掉结尾空白」判 `body-modified`；裁决后改产物只在处置表写「未复验」，audit 看不见。修法 = pack 内新增 `presets/_shared/skills/quality-loop/scripts/verdict-hash.mjs`（`--fix` 按 audit 同口径回填、`--check`/`--body`）；skill §3/guide §2 只教工具并明确排除 `tail | shasum`；`body-modified` detail 补尾随换行提示；audit 对最后一轮 dispositions 的「未复验」给 `post-verdict-unverified` warning；不新增 `artifact-sha256`（理由见 Note 输掉的方案）。红→绿：quality-loop spec 修前 1 failed → **39 passed**；真盘 `--deliverable` 显示 `body-modified`（`5738a1…` vs `d9d252…`）+ 新 warning；工具对副本 `--check` MISMATCH → `--fix` → `--check` OK；audit `--self-test` 7 支 ALL PASS。详见 [卡](BUG-056-quality-loop-verdict-hash-trailing-newline.md) 与 [Note](../../../notes/implemented/2026-11-10-quality-loop-verdict-hash.md)。
 
 - **BUG-055**（2026-11-10，P2）：team 角色包没有「任务书」字段，`work-handoff` 却把署名行路径写死；CEO 只发 spawn prompt 时，成员只能套默认路径，`drafts/coo.md` 的 `任务书` 指向不存在的 `drafts/ceo.md`。修法 = 角色包加 `任务书` + `署名行` 两字段；`assembling-the-team` 第 6 步把「先落任务书再 spawn」写成硬前置；`work-handoff` 署名行改成 `<角色包给的任务书路径>` + `任务书 = 角色包（无文件）` fallback；`collaboration` 角色包清单同步。红→绿：presets spec 新断言修前 1 failed → 43 passed；真模型 `team-taskbook-probe` ALL PASS（294s）：`drafts/coo.md` 首行 `出稿：COO｜版本 v1｜任务书 = .dsh-company/deliverables/2026-11-10-taskbook-probe/drafts/ceo.md`，指向真实文件。详见 [卡](BUG-055-team-role-packet-missing-taskbook.md) 与 [Note](../../../notes/implemented/2026-11-10-team-role-packet-taskbook.md)。

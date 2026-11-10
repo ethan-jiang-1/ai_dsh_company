@@ -10,7 +10,6 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-057](BUG-057-command-slug-path-traversal.md) | `/req check` / `/prd check` 的 slug 未校验，`../zz-outside` 可读出 deliverables 根之外（只读）；2026-11-10 探索轮发现，待裁断是否修 | P2 |
 | [BUG-058](BUG-058-command-datablocked-reason.md) | `dataBlocked` 回执压成布尔，丢失真实原因并声称「无 workspace/身份/lease 问题」；启动态不随 raw session cwd 更新 | P2 |
 | —（历史） | BUG-056 已修并迁 [fixed_bugs](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)：质量环裁决头哈希改由 pack 内 `verdict-hash.mjs` 回填；`未复验` 成为 audit warning | — |
 | —（历史） | BUG-054 / BUG-055 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：dev/rehearsal kb 改由 seed.json 派生；team 角色包补任务书路径 + 署名行只抄真实文件 | — |
@@ -18,6 +17,15 @@
 | —（历史） | BUG-050 复核为**环境陈旧误报**（dev profile 安装副本未更新），已迁 [fixed_bugs](../_archive/fixed_bugs/BUG-050-retry-depth-fix-fails-in-real-assembly.md)；BUG-045 / 046 / 047 / 048 / 049 已修 | — |
 | —（历史） | BUG-045 / BUG-046 / BUG-047 / BUG-048 / BUG-049 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：retry 注册面/深度单源 + 越界可见拒绝；`list_subagents` 暴露引擎身份；handbook 按 worker family 派生；UI 金样随显示名收窄刷新 | — |
 | —（历史） | BUG-034 / BUG-035 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：SA/SQA 证据链必查（时间源 + 故障路径耐受）+ 审计 Q8–Q11；2026-11-07 E2E v8 验收 | — |
+
+## 2026-11-10 修复交接（BUG-057）
+
+**用户指令（2026-11-10）**：「先修 BUG-057；058 留决策」——本句即授权。BUG-057 触碰 pack 公开命令面
+（`/req check` / `/prd check`），属材料性；留痕 = Note。
+
+| 根因 | 卡 | 留痕 | 收口方式 |
+|---|---|---|---|
+| 操作员 slug 直接 `join` 进 deliverables 路径 | [BUG-057](../_archive/fixed_bugs/BUG-057-command-slug-path-traversal.md) | [Note](../../notes/implemented/2026-11-10-command-slug-boundary.md) | 共享 host-only `resolveDeliverablePath`（单段正则 + `relative` 纵深）；两条命令 spec 红→绿 + 真入口复跑 |
 
 ## 2026-11-10 修复交接（第二轮：BUG-054 / BUG-055）
 

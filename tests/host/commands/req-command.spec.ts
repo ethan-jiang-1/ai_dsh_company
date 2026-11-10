@@ -7,7 +7,10 @@
  *
  * 红配方：删掉命令注册 / 改坏 usage / 让 skipped 也报红 → 转红。
  * 负例留证 2026-11-07：命令未实现时本 spec 首跑 7 failed（模块不存在）；实现后全绿。
+ * 负例留证 2026-11-10：slug 校验缺席时 `check ../zz-outside` 会读到 deliverables 根外并调用 checker
+ *   ⇒「越界 slug」用例红（BUG-057）；加校验后绿。
  */
+// 负例留证 2026-11-10：删掉 slug 校验 ⇒「越界 slug」用例红（读根外 + 调用 checker；BUG-057）；还原即绿。
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -80,6 +83,29 @@ describe('registerReqCommand', () => {
     const result = await definition.handler({ rawInput: 'check demo' })
     expect(result.kind).toBe('error')
     expect(result.text).toContain('公司数据已停写')
+  })
+
+  it('越界 slug（BUG-057）→ 错误，且不读根外 drafts / 不调用 checker', async () => {
+    const workspace = mkdtempSync(join(tmpdir(), 'req-command-outside-'))
+    const outside = join(workspace, '.dsh-company/zz-outside/drafts')
+    mkdirSync(outside, { recursive: true })
+    writeFileSync(join(outside, 'mrd.md'), MRD)
+    writeFileSync(join(outside, 'strs.md'), STRS)
+    writeFileSync(join(outside, 'prd.md'), PRD)
+    let called = false
+    const definition = mount(workspace, {
+      check: () => { called = true; return { skipped: false, ok: false, errors: ['should not run'] } },
+    })
+    try {
+      for (const slug of ['../zz-outside', '.', '..', 'a/b']) {
+        const result = await definition.handler({ rawInput: `check ${slug}` })
+        expect(result.kind).toBe('error')
+        expect(result.text).toContain('非法 deliverables 目录名')
+      }
+      expect(called).toBe(false)
+    } finally {
+      rmSync(workspace, { recursive: true, force: true })
+    }
   })
 
   it('无需求文档 → 点名目录', async () => {
