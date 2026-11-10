@@ -1,13 +1,14 @@
 ---
-status: 待落地
+status: 等人拍板
 opened: 2026-11-10
 ---
 
 # docs/ DSH 对齐：四个实质偏离怎么收
 
-> 立卡：2026-11-10 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-10 ｜ 状态：等人拍板 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
 >
-> **结论/去向**：note — 计划 `docs-dsh-alignment.md`（落 `notes/implemented/`，落地同变更成立）
+> **结论/去向**：note — [2026-11-10-docs-dsh-alignment.md](../../notes/implemented/2026-11-10-docs-dsh-alignment.md)
+> ｜ 审查：agent — 五步自审 + verify/test/typecheck；用户 — 待验收
 >
 > 背景：结构收敛已落（commit `35ffbb05` + `59fc0162`）；DSH 对齐只到骨架。**本卡是实施总卡**：五步按序落地，每步一个 commit + 证据；不另拆卡（步骤共享同一验收）。
 
@@ -81,6 +82,27 @@ opened: 2026-11-10
 5. **步 5**：`doc-budget` 加“内容 ≤ 95% 上限”（≥5% headroom）；所有活跃文档达标；未提额；日期/R1/R2/已退役叙述在活跃文档清完，历史归 Note/git。
 6. **证据**：每步 commit；`pnpm verify` + `pnpm test`（步 2/3/4 后至少窄测）+ `pnpm typecheck`（末次）；落地 Note 记决定/输掉的方案/证据；`_backlog/_archive` 只允许路径-only 改动。
 7. **关闭**：用户验收 + Note 落盘 + 卡归档；不把“骨架对齐”冒充“DSH 全合规”。
+
+## 交付证据（2026-11-10）
+
+| 步 | commit | 出口 |
+|---|---|---|
+| 1 值/死路径/矛盾 | `69706354` | 14+ 处修正；verify |
+| 2 index → tier 书架 | `177f887f` | doc-taxonomy 改 tier 可达；docs/AGENTS 新文档规则 |
+| 3 design/ → notes/ + architecture | `ab0fd622` | 4 篇 Note；顶层 `docs/architecture.md`；design tier 移除 |
+| 4 genre 拆分 | `3beabcca` | demo-scenes / multi-human-runbook / cultivation；合同瘦身 |
+| 5 5% headroom | `abb02d1e` | doc-budget 95% 规则；9 篇瘦身；未提额 |
+
+- `pnpm verify` ALL PASS（2 门无对象）；`pnpm test` 167 files / 1347 passed；`pnpm typecheck` 绿。
+- `doc-taxonomy` 红证 3 条：顶层 stray / stray tier / tier 未链接（实跑红→还原→绿）。
+- `doc-budget`：`docs/` 全部 ≥5% headroom（`reference/` 豁免）；无提额。
+- 链接全站绿；冻结层只做路径替换。
+
+## 审查（自审）
+
+- 五步按卡内顺序执行；本卡先转 `待落地` 再实施，未重复“先做后补”。
+- 残留：`reference/` 的 5% 豁免是有意例外；now-only 未逐句清完（证据日期/R1/R2 保留，DSH 允许 version-specific evidence）；四篇主题 Note 保留决定时快照，canonical 语义在 contracts/architecture；预算仍按行计，非 DSH 词数。
+- 用户验收：待。
 
 ## 关闭条件
 
