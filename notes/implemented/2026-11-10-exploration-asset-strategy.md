@@ -75,12 +75,13 @@
   B1 sigterm：SIGTERM + 同 home 重启 → root/child=`interrupted`。
 - B2 audit（B1/B3/B4 新会话）：15 观察（7 root / 7 child / 1 member）、0 问题。
 - B3 `team-taskbook-probe --role cfo`：任务书 + `drafts/cfo.md` + 署名锚 + CFO 角色包全 PASS。
-- B4 `--html-out`：DOM 有卡、`hidden="until-found"`；B5 `/req check` 未证（composer 菜单/workspace 选择）。
+- B4 `--html-out`：DOM 有卡、`hidden="until-found"`；B5 已补：清掉 dev home 陈旧 writer lease（pid 98394）后
+  `/req check` 真回执 PASS；同轮发现 BUG-057（命令 slug 越界）/ BUG-058（dataBlocked 丢原因）。
 - `pnpm verify` ALL PASS；`pnpm test` 173 files / 1440 tests；`pnpm typecheck` 绿；`pnpm lint` /
   `pnpm dup` 0 警告 / 0 克隆。
 
 ## 未验 / 未覆盖
 
-- B5 `/req check` 真回执（仍 dataBlocked/OBS-3）；B4 的稳定展开路径（step-process 选择器/默认展开策略）。
+- B5 已补 PASS；GUI picker 的 re-init 未证（BUG-058 的开放面）；B4 的稳定展开路径（step-process 选择器/默认展开策略）。
 - B1 的 retry 工具结果 cancel 回执（本次 cancel 先到，工具结果未回；只证 durable 终态）。
 - 真实 error/interrupted/lost 注入与 OS 进程终止证明（只证 durable `turn/end`，不证 kill 了 `sleep` 的 OS 进程；实测无残留进程）。
