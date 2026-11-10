@@ -6,6 +6,8 @@
 // 用法：source run/env.sh && node probes/team/quality-loop-audit.mjs [--workspace <dir>] [--deliverable <dir>]
 //       [--home <dir>] [--methods <dir>] [--self-test] [--json]
 // 判据（实现 = tools/lib/quality-loop.mjs，spec 钉同源）：
+//   ① 两个独立 activation：裁决头的 session/preset/depth/producer 对得上真实 child durable header；
+//   ⓪ 先生产再验证：验证者会话必须在产出者**首轮 turn/end 之后**才创建（顺序发工，不是并行）；
 //   ① 两个独立 activation：裁决头的 session/preset/depth 对得上真实 child durable header（preset=quality-loop-verifier）；
 //   ② 裁决原文：文件正文 sha256 == 头里 body-sha256 == child 最终消息正文哈希（不是同一次就红）；
 //   ③ 未被改：正文与头对不上即红（append-only 的机械面）；
