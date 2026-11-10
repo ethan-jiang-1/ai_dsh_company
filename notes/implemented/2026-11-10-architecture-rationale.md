@@ -1,7 +1,7 @@
 # 2026-11-10 · 架构决策：repo 形态、组合层与角色=preset
 
 状态：implemented（2026-11-10 由原 design/architecture 稿转为 Note；现行语义以 `contracts/` 与 `docs/architecture.md` 为准，本 Note 只留决定与理由）
-上游 = [docs-dsh-alignment](../../_backlog/issues/2026-11-10-docs-dsh-alignment.md)（步 3：design/ → notes/ + architecture.md）
+上游 = [docs-dsh-alignment](../../_backlog/_archive/settled_issues/2026-11-10-docs-dsh-alignment.md)（步 3：design/ → notes/ + architecture.md）
 
 > 现行语义（canonical）= 文末链接；本 Note 只留决定/理由/证据，不复制现行表。
 
@@ -37,4 +37,4 @@
 ## 相关
 
 - 现行语义与地图：[docs/architecture.md](../../docs/architecture.md)；文档层规矩：[docs/AGENTS.md](../../docs/AGENTS.md)。
-- 上游卡：[docs-dsh-alignment](../../_backlog/issues/2026-11-10-docs-dsh-alignment.md)。
+- 上游卡：[docs-dsh-alignment](../../_backlog/_archive/settled_issues/2026-11-10-docs-dsh-alignment.md)。

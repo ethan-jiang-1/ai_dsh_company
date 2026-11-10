@@ -15,6 +15,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-10-docs-dsh-alignment.md](settled_issues/2026-11-10-docs-dsh-alignment.md) | 已结；五步 DSH 对齐（值 / index 书架 / design→notes+architecture / genre 拆分 / 5% headroom）+ 四篇 rationale 收口 + canonical 守卫；verify ALL PASS、167 files/1347 tests、typecheck；去向 = [Note](../../notes/implemented/2026-11-10-docs-dsh-alignment.md) | 2026-11-10 |
 | [2026-11-10-docs-layer-restructure.md](settled_issues/2026-11-10-docs-layer-restructure.md) | 已结；docs/ 分层重整（顶层 8 门/宪法 + contracts/ 7 + reference/ 3）；index 首屏按目的路由；227+ 链接跟随后 verify ALL PASS、167 files/1347 tests；冻结层 122 文件只改路径；用户“都提交”＝接受；去向 = [Note](../../notes/implemented/2026-11-10-docs-layer-restructure.md) | 2026-11-10 |
 | [2026-11-09-company-specificity-externalization.md](settled_issues/2026-11-09-company-specificity-externalization.md) | 已结；三层分离（generic/product-types/company + contracts 版本轴）、T0–T3 加载与 manifest 预算、政策/复核/编号单家、两公司 fixture 与测试字面量门；verify ALL PASS、166 files/1319 tests、release-smoke ALL PASS；去向 = [Note](../../notes/implemented/2026-11-09-generic-specific-separation.md) | 2026-11-09 |
 | [2026-11-09-delegation-residuals-closeout.md](settled_issues/2026-11-09-delegation-residuals-closeout.md) | 已结；P-H/P-I 确定性注入、worker-workflow no-go、companyDelegationTerminal 投影；1300、6+3、9 页签全绿；去向 = [残差收口 Note](../../notes/implemented/2026-11-09-delegation-residuals-closeout.md) | 2026-11-09 |

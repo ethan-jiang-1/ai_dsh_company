@@ -1,14 +1,14 @@
 ---
-status: 等人拍板
+status: 已结
 opened: 2026-11-10
 ---
 
 # docs/ DSH 对齐：四个实质偏离怎么收
 
-> 立卡：2026-11-10 ｜ 状态：等人拍板 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-10 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：note — [2026-11-10-docs-dsh-alignment.md](../../notes/implemented/2026-11-10-docs-dsh-alignment.md)
-> ｜ 审查：agent — 五步自审 + verify/test/typecheck；用户 — 待验收
+> **结论/去向**：note — [2026-11-10-docs-dsh-alignment.md](../../../notes/implemented/2026-11-10-docs-dsh-alignment.md)
+> ｜ 审查：agent — 五步自审 + verify/test/typecheck + 收口审查；用户 — 2026-11-10“都做完了”＝接受
 >
 > 背景：结构收敛已落（commit `35ffbb05` + `59fc0162`）；DSH 对齐只到骨架。**本卡是实施总卡**：五步按序落地，每步一个 commit + 证据；不另拆卡（步骤共享同一验收）。
 
@@ -102,7 +102,7 @@ opened: 2026-11-10
 
 - 五步按卡内顺序执行；本卡先转 `待落地` 再实施，未重复“先做后补”。
 - 残留：`reference/` 的 5% 豁免是有意例外；now-only 未逐句清完（证据日期/R1/R2 保留，DSH 允许 version-specific evidence）；预算仍按行计，非 DSH 词数。四篇 rationale Note 已收口 + `notes-liveness` canonical 检查（重复权威风险已降为链接指针）。
-- 用户验收：待。
+- 用户验收：2026-11-10“都做完了”＝接受；now-only 的 PARTIAL 作为已知边界保留。
 
 ## 验收对照（2026-11-10）
 
@@ -114,7 +114,7 @@ opened: 2026-11-10
 | 4 | PASS | `3beabcca`；demo-scenes / multi-human-runbook / cultivation |
 | 5 | **PASS（headroom）/ PARTIAL（now-only）** | `abb02d1e`；docs/ 全部 ≥5%（reference/ 豁免）；历史证据日期保留（DSH 允许 version-specific evidence），未逐句清零 |
 | 6 | PASS | verify ALL PASS；test 1347；typecheck 绿；Note 落盘 |
-| 7 | 待用户 | 卡未归档；用户验收后 `git mv` |
+| 7 | PASS | 用户 2026-11-10“都做完了”接受；卡归档 |
 
 ## 关闭条件
 
@@ -132,8 +132,8 @@ opened: 2026-11-10
 
 用户 2026-11-10：「`docs-dsh-alignment` 已经落地了，你们要同步一下，免得修改的时候 base 已经变了。」
 
-- [content-charter](2026-11-10-content-charter.md) 与 [producer-verifier-quality-loop](2026-11-10-producer-verifier-quality-loop.md)
+- [content-charter](../../issues/2026-11-10-content-charter.md) 与 [producer-verifier-quality-loop](../../issues/2026-11-10-producer-verifier-quality-loop.md)
   已按本卡后的 docs 基座同步：tier 书架（index 不再逐文档登记）、design→notes、
   `docs/architecture.md`、`docs/contracts/cultivation.md`、doc-budget 5% headroom；
   两卡各带「基座同步」节 + 实施前核对命令。
-- 本卡仍 `等人拍板`：正式验收与归档待用户明确；本节只确认“已落地”是依赖卡的基座。
+- 用户 2026-11-10 验收“都做完了”；本卡归档。

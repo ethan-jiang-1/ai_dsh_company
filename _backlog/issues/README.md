@@ -4,12 +4,13 @@
 
 ## 活跃清单
 
-- [docs/ DSH 对齐：四个实质偏离怎么收](2026-11-10-docs-dsh-alignment.md) — 等人拍板（实施完成）：五步 commit `69706354`/`177f887f`/`ab0fd622`/`3beabcca`/`abb02d1e`；verify/test/typecheck 绿；Note 已落；待用户验收。
 - [内容宪章：按寿命分层，按成本抽象](2026-11-10-content-charter.md) — 待落地：宪章正本（docs/ 顶层门/宪法层）+ doc 书架/层表 + execution 双链入口 + 卡/Note 字段 + 入口门；核 = 新 agent 冷读能找到并答四问。**基座已同步 2026-11-10 DSH 对齐（tier 书架 / design→notes / 5% headroom / cultivation.md）。**
 - [producer/verifier 质量环：独立上下文 + 外部方法层](2026-11-10-producer-verifier-quality-loop.md) — 待落地：两 support preset + VP-Eng 两行 + 共享 quality-loop skill + 方法槽 + 审计探针；一张卡（不拆），理由见卡内。**基座已同步 2026-11-10 DSH 对齐（流程→guides / 理由→Note / cultivation.md）。**
 - [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：第四轮 5 张缺陷卡 BUG-045–049 已修复；修复后验证通过（keyless/挂载/UI golden + 真装配 retry/身份行/handbook）；BUG-050 复核为环境陈旧误报；用户 2026-11-09 晚指示继续探索；第五轮新发现 BUG-051（P2）、第六轮 BUG-052（P2）、第七轮 BUG-053（P1），**三张已于 2026-11-10 按 E/F 根因修复归档**（control per-agent + fan-out 诚实声明；abortable + interrupt）；depth 4 负例 / 重启后 retry+workflow 身份行 PASS；真页面 DagTab 仍未定位会话入口（harness-blocked，不伪造 PASS/FAIL）；未覆盖项见研究材料 §9.7–§9.9。
 
 （2026-11-10 docs/ 分层重整卡已结归档：用户“都提交”＝接受；去向 = [Note](../../notes/implemented/2026-11-10-docs-layer-restructure.md)，卡片见[归档](../_archive/settled_issues/2026-11-10-docs-layer-restructure.md)。）
+
+（2026-11-10 docs/ DSH 对齐卡已结归档：用户“都做完了”＝接受；去向 = [Note](../../notes/implemented/2026-11-10-docs-dsh-alignment.md)，卡片见[归档](../_archive/settled_issues/2026-11-10-docs-dsh-alignment.md)。）
 
 （2026-11-08 VP-Eng workflow 通道卡已结归档：去向 = [Note](../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)；卡片见[归档](../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)。）
 

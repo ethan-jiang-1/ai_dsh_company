@@ -1,7 +1,7 @@
 # 2026-11-10 · 角色内容决策：persona / skills / KB 的分工
 
 状态：implemented（2026-11-10 由原 design/role-content-plan 稿转为 Note；现行角色语义 = `contracts/presets.md`）
-上游 = [docs-dsh-alignment](../../_backlog/issues/2026-11-10-docs-dsh-alignment.md)（步 3：design/ → notes/ + architecture.md）
+上游 = [docs-dsh-alignment](../../_backlog/_archive/settled_issues/2026-11-10-docs-dsh-alignment.md)（步 3：design/ → notes/ + architecture.md）
 
 > 现行语义（canonical）= 文末链接；本 Note 只留决定/理由/证据，不复制现行表。
 
@@ -35,4 +35,4 @@
 ## 相关
 
 - 现行语义与地图：[docs/architecture.md](../../docs/architecture.md)；文档层规矩：[docs/AGENTS.md](../../docs/AGENTS.md)。
-- 上游卡：[docs-dsh-alignment](../../_backlog/issues/2026-11-10-docs-dsh-alignment.md)。
+- 上游卡：[docs-dsh-alignment](../../_backlog/_archive/settled_issues/2026-11-10-docs-dsh-alignment.md)。
