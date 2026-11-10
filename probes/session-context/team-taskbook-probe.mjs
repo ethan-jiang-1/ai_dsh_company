@@ -2,14 +2,14 @@
 // 状态：常驻
 // 何时跑：改 assembling-the-team 的角色包 / 任务书 / 署名行契约后；或要复核 team 成员产出的
 //         provenance 指针是否可回溯。
-// 用法：node 本脚本 [--wall 240]
+// 用法：node 本脚本 [--role coo|cfo] [--wall 240]
 // 成本：真模型 1–2 轮（≈$0.05–0.2）；cwd = 排练场（绝不写 live 公司盘）。
 // 判据（Given/When/Then）：
-//   Given 一个单域交付承接动议，CEO 按 assembling-the-team 组一个 COO 成员；
+//   Given 一个单域交付承接动议，CEO 按 assembling-the-team 组一个 COO/CFO 成员；
 //   When  成员出稿；
 //   Then  ① `drafts/ceo.md` 存在（任务书在 spawn 前/时落盘）；
-//         ② `drafts/coo.md` 的署名行 `任务书 = <路径>` 指向盘上真实文件（不是编造的默认路径）；
-//         ③ 任务书里带 COO 角色包（CHARTER / 产出路径），成员稿与它同目录。
+//         ② `drafts/<role>.md` 的署名行 `任务书 = <路径>` 指向盘上真实文件（不是编造的默认路径）；
+//         ③ 任务书里带对应角色包（CHARTER / 产出路径），成员稿与它同目录。
 // 退出码：0 = 三条全过；1 = 任一条红；2 = 前置缺失（凭据 / web 起不来）。
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
@@ -25,9 +25,29 @@ const arg = (name, fallback) => {
   return index === -1 ? fallback : process.argv[index + 1]
 }
 const WALL_MS = Number(arg('wall', '240')) * 1000
+const ROLE = arg('role', 'coo')
+const ROLE_SPEC = {
+  coo: {
+    label: 'COO',
+    motion: '单域交付承接核查，只问交付侧接不接得住',
+    skills: ['ops-feasibility', 'budget-check'],
+    charter: 'coo/CHARTER.md',
+  },
+  cfo: {
+    label: 'CFO',
+    motion: '单职能毛利测算，只问钱与合规接不接得住',
+    skills: ['cfo-workflow', 'finance-compliance', 'project-economics'],
+    charter: 'cfo/CHARTER.md',
+  },
+}
+const SPEC = ROLE_SPEC[ROLE]
+if (SPEC === undefined) {
+  console.error('team-taskbook-probe: --role 只支持 coo / cfo')
+  process.exit(2)
+}
 const sleep = (ms) => new Promise(resolveSleep => setTimeout(resolveSleep, ms))
 const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai' }).format(new Date())
-const SLUG = `${today}-taskbook-probe`
+const SLUG = `${today}-taskbook-${ROLE}-probe`
 
 let home
 try {
@@ -62,14 +82,14 @@ try {
 
   const prompt = [
     '按 assembling-the-team 的六步组队（验证用；一轮内完成，任何问题都不要问我）：',
-    '动议 = 单域交付承接核查，只问交付侧接不接得住。',
-    `只叫 coo 一个成员；不要叫别人、不要开 workflow、不要建多个成员。交付目录固定为 .dsh-company/deliverables/${SLUG}/。`,
+    `动议 = ${SPEC.motion}。`,
+    `只叫 ${ROLE} 一个成员；不要叫别人、不要开 workflow、不要建多个成员。交付目录固定为 .dsh-company/deliverables/${SLUG}/。`,
     '硬要求：',
-    `1) spawn_teammate 之前，先把任务书落 .dsh-company/deliverables/${SLUG}/drafts/ceo.md——目标/约束/验收、在屋名单、COO 角色包、派活行都写进去；`,
-    '2) spawn prompt 带 COO 角色包，其中「任务书」指上面这份真实文件；',
-    '3) 让 coo 先 read .dsh-company/kb/coo/CHARTER.md 与 presets/coo/skills/ops-feasibility/SKILL.md、presets/coo/skills/budget-check/SKILL.md，',
-    `   再写 .dsh-company/deliverables/${SLUG}/drafts/coo.md，稿首署名行照抄任务书路径；`,
-    '4) 完成后回我 coo 的产出路径。≤ 8 个工具轮。',
+    `1) spawn_teammate 之前，先把任务书落 .dsh-company/deliverables/${SLUG}/drafts/ceo.md——目标/约束/验收、在屋名单、${SPEC.label} 角色包、派活行都写进去；`,
+    `2) spawn prompt 带 ${SPEC.label} 角色包，其中「任务书」指上面这份真实文件；`,
+    `3) 让 ${ROLE} 先 read .dsh-company/kb/${SPEC.charter} 与 ${SPEC.skills.map(skill => `presets/${ROLE}/skills/${skill}/SKILL.md`).join('、')}，`,
+    `   再写 .dsh-company/deliverables/${SLUG}/drafts/${ROLE}.md，稿首署名行照抄任务书路径；`,
+    `4) 完成后回我 ${ROLE} 的产出路径。≤ 8 个工具轮。`,
   ].join('\n')
   await rpc('session/prompt', {
     request: {
@@ -82,7 +102,7 @@ try {
 
   const deliverableDir = join(rehearsal, '.dsh-company/deliverables', SLUG)
   const taskbookPath = join(deliverableDir, 'drafts/ceo.md')
-  const memberPath = join(deliverableDir, 'drafts/coo.md')
+  const memberPath = join(deliverableDir, `drafts/${ROLE}.md`)
   let turnEnded = false
   let turnEndedAt
   while (Date.now() - startedAt < WALL_MS) {
@@ -98,7 +118,7 @@ try {
   }
 
   check('CEO 已落任务书 drafts/ceo.md', existsSync(taskbookPath), relative(ROOT, taskbookPath))
-  check('成员稿 drafts/coo.md 已出', existsSync(memberPath), relative(ROOT, memberPath))
+  check(`成员稿 drafts/${ROLE}.md 已出`, existsSync(memberPath), relative(ROOT, memberPath))
   check('CEO 轮已收口（有 turn/end）', turnEnded, turnEnded ? '' : `wall ${String(Math.round((Date.now() - startedAt) / 1000))}s`)
 
   if (existsSync(memberPath)) {
@@ -120,7 +140,7 @@ try {
   if (existsSync(taskbookPath)) {
     const taskbook = readFileSync(taskbookPath, 'utf8')
     evidence.files.taskbookChars = taskbook.length
-    check('任务书含 COO 角色包', /coo/i.test(taskbook) && /CHARTER/.test(taskbook), `${String(taskbook.length)} chars`)
+    check(`任务书含 ${SPEC.label} 角色包`, new RegExp(ROLE, 'i').test(taskbook) && /CHARTER/.test(taskbook), `${String(taskbook.length)} chars`)
     check('任务书点名署名锚（任务书路径）', /任务书|署名/.test(taskbook), '')
   }
   evidence.checks.failureCount = failures
@@ -131,7 +151,7 @@ try {
 } finally {
   child.kill('SIGTERM')
   await sleep(300)
-  const evidencePath = join(ROOT, `runtime/team-taskbook-probe-${today}.json`)
+  const evidencePath = join(ROOT, `runtime/team-taskbook-${ROLE}-probe-${today}.json`)
   writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`)
   console.log(`evidence: ${relative(ROOT, evidencePath)}`)
 }

@@ -225,6 +225,28 @@ A3 验收：负控 label 不命中；`COO（运营与交付）` / `CFO（财务�
   release-smoke 是历史注释（均非活漂移），两处研究材料已加“2026-11-10 后已变”指针。
 - **验证**：`pnpm verify` ALL PASS；`pnpm typecheck` 绿；新 spec 20 tests 绿。
 
+### 9.8 B 批执行结果（2026-11-10 晚）
+
+> 预算实际：约 **20 分钟 live**、**8 parent prompt**、**8 child activation**、1 浏览器；
+> 未触发 60 分钟 / 10 prompt / 16 child 上限。证据 = `runtime/tmp/explore/round9/`
+> （矩阵 JSON/MD、B4 body/DOM 片段、B5 body）+ 会话日志（`runtime/harness-home`，gitignored）。
+
+| ID | 试验 | 结果 |
+|---|---|---|
+| B1 cancel | vp-eng `subagent_retry` → worker `bash sleep 120`；child bash 起后 cancel | **PASS**：cancel accepted；root/child `turn/end` = `aborted`；无 `sleep 120` 残留；retry 工具结果在 cancel 前未回（如实记，不伪造）。 |
+| B1 sigterm | 同上 → SIGTERM 宿主 → 同 home 重启 | **PASS**：重启后 root/child durable `turn/end` = `interrupted`。前两次失败是探针在 kill 后仍读旧 web（`fetch failed`）+ 重启等待不足；修正后 PASS，不是产品结论。 |
+| B2 矩阵 | A1 audit 扫 B1/B3/B4 新会话 | **PASS**：15 观察（7 root / 7 child / 1 member）、0 问题；coo/cfo child 71 工具 / control 2 / 无 team；CEO team member 继承 80 工具。 |
+| B3 CFO 角色包 | CEO 1 人 CFO 成员，任务书带 CFO 角色包 | **PASS**：`drafts/ceo.md`、`drafts/cfo.md` 在场；署名行 `任务书 = …` 指向真实任务书；任务书含 CFO 角色包（2794 chars）；成员继承 CEO 组合（preset ceo / d1），不冒充 preset CFO。 |
+| B4 UI 卡 | 同一 CEO 会话调 coo + cfo；`--body-out` / `--html-out` | **卡在 DOM、默认不可见**：DOM 有 `data-slot="tool.call.toolview"`、`data-tool=coo/cfo`、`wk-delegation-role = 委派 COO（运营与交付）/ CFO（财务与合规）`、`data-state=ok`；但卡在 `data-step-process-body hidden="until-found"`（`data-turn-process-member=true`）里，默认 transcript、`--body-out`、点 `Completed`/`Called tools` 都未露出。**OBS-5 判为折叠/探针限制，不是卡未渲染**；不据此开 bug。 |
+| B5 `/req check` live | GUI `--ask '/req check 2026-11-10-probe-cmd-business-software'` | **未证**：新建会话无命令回执（composer 菜单/workspace 选择未走通）；仍归 OBS-3，不伪造 PASS。 |
+
+- 判定：B1（cancel/sigterm）、B2、B3 PASS；B4 解 OBS-5（卡渲染正确、默认不可见）；B5 未覆盖。
+  未发现新的产品级硬缺陷。
+- 资产回填：B1 探针 = `probes/team/delegation-lifecycle-probe.mjs`；B3 探针参数化 =
+  `probes/session-context/team-taskbook-probe.mjs --role cfo`；B4 证据 = cdp-probe `--body-out` / `--html-out`。
+- 未执行/未覆盖：B5 的 `/req check` 真回执；B4 展开后的稳定可见性（需要 step-process 展开的稳定选择器，
+  或产品决定默认展开）；B1 的 retry 工具结果 cancel 回执（本次 cancel 先到）。
+
 ## 第八轮（2026-11-10 后）：新面与回归
 
 > 用户 2026-11-10 要求：先把本卡适配现状，再做 exploratory test。**本节是本轮唯一矩阵**；
@@ -436,10 +458,11 @@ spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全
 - **OBS-4（流程风险）**：VP-Eng 在 verdict 后改了产物（F1/F3 订正），没有开 R2；处置表明确标
   「已修但未经复验」。本轮是我们的 prompt 限定只跑一轮，但这说明**裁决与产物版本没有被同一 hash 绑定**，
   与 BUG-056 的修复面相邻。
-- **OBS-5（UI 探针限制，不是 coo/cfo 回归）**：`ui-scene-smoke --ask` 的 coo/cfo 与 vp_eng 对照
-  都看不到角色卡标签；默认 transcript 只显示最终文本 / `Completed`，点 `Completed` 或 `Agent Team`
-  仍未露出。`client-load-smoke` 与 shell golden 全绿；卡片是否真渲染**未证**，不据此开 bug，
-  归入“UI 卡片可视性未覆盖”。
+- **OBS-5（UI 折叠，不是卡未渲染 / 不是 coo/cfo 回归）**：B4 用 `--html-out` 证明 DOM 里有完整卡
+  （`data-tool=coo/cfo`、`委派 COO（运营与交付）`/`委派 CFO（财务与合规）`、`已交稿`），但它挂在
+  `data-step-process-body hidden="until-found"`（`data-turn-process-member=true`）下；默认 transcript、
+  `--body-out`、点 `Completed`/`Called tools` 都不露出。卡注册/渲染正确，默认可见性是折叠策略 +
+  探针选择器限制；本轮不据此开 bug，产品若要默认展开另立判断。
 - **OBS-6（静态漂移，已修 2026-11-10）**：`docs/contracts/delegation.md` §5 原写卡片 key =
   `vp_eng` / `vp_sales` 两项、渲染文案仍指“VP 交回的稿子”；代码
   [`delegation-keys.ts`](../../packages/company-pack/src/client/wiring/delegation-keys.ts) 已是五项
@@ -453,7 +476,7 @@ spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全
 - `/req check` / `/prd check` 的真实命令回执（`dataBlocked`，见 OBS-3；keyless 已覆盖解析）；
 - 质量环 R2/复验（首次 live 只做了 produce→verify→R1 处置；audit 已 FAIL，见 BUG-056）；
 - `business-software` 动议的 `/prd check` + `/req check` 端到端（同 OBS-3）；
-- UI 卡片标签可视性（shell/加载已验；默认 transcript / Agent Team / 展开均未露出，见 OBS-5）；
+- UI 卡片标签默认可见性（B4 已定位：DOM 有卡、折叠在 step process 下；展开路径未稳定，见 OBS-5）；
 - `project-services` 未知类型报错的 live 面。
 
 ## 第四轮收口（2026-11-09）

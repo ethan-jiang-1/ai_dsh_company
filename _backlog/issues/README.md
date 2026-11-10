@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-- [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：第四–七轮发现 BUG-045–053 已全部修复归档；第八轮（2026-11-10）新发现 BUG-054/055/056 已修复归档；P1–P5 的 keyless/静态/live 基线通过，`/req check` live 仍 dataBlocked、UI 卡标签 OBS-5 未证实、新增 OBS-6 文档漂移。**用户 2026-11-10 晚要求先补测试资产再继续探索**：第九轮改为「资产先行」——A 批（运行时面矩阵 / 会话证据包 / UI 全文证据，0 模型）可做；B 批 live（生命周期/矩阵基线/CFO 角色包/UI/`/req check`，60 分钟 / 10 prompts）待批准。设计与实测矩阵见[资产计划](../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md)。
+- [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：第四–七轮发现 BUG-045–053 已全部修复归档；第八轮（2026-11-10）新发现 BUG-054/055/056 已修复归档；P1–P5 的 keyless/静态/live 基线通过，`/req check` live 仍 dataBlocked、UI 卡标签 OBS-5 未证实、新增 OBS-6 文档漂移。**用户 2026-11-10 晚批准 A 批 + B 批 60 分钟**：A 批已落地（运行时面矩阵 / 会话证据包 / UI 全文证据，0 模型；矩阵在 round-8 47 观察 0 问题、旧日志红证复现 BUG-052 同型）；B 批已跑（B1 cancel+sigterm PASS、B2 15 观察 0 问题、B3 CFO 角色包 PASS、B4 卡在 DOM 但折叠隐藏 = OBS-5、B5 `/req check` 未证）。详见卡 §9.7–§9.8；设计与实测矩阵见[资产计划](../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md)。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
 

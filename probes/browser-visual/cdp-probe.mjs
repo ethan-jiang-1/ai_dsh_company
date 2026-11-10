@@ -6,11 +6,12 @@
 //   ③升 pin / 收割后 UI 回归。成本：默认档零模型（真实渲染断言面）；`--ask` 加一次真实模型调用。
 // 前置：GUI URL（demo.md §前置：source run/env.sh → pnpm dsh web -- --port 0 --no-open → 横幅 URL）；
 //   Chrome 二进制：DSH_PROBE_CHROME 环境变量或系统 Chrome（run/env.sh 已指 Chrome for Testing）。
-// 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser] [--evidence] [--texts] [--watch-tab <页签标题> --watch-expect <文本>] [--json-out <path>] [--steps <file>] [--body-out <path>]
+// 用法：node probes/browser-visual/cdp-probe.mjs '<gui-url>' [--ask '问题'] [--keep-browser] [--evidence] [--texts] [--watch-tab <页签标题> --watch-expect <文本>] [--json-out <path>] [--steps <file>] [--body-out <path>] [--html-out <path>]
 //       node probes/browser-visual/cdp-probe.mjs --attach <devtools-port> [--attach-url <substring>] [--evidence]
 //   --attach：附着到用户已开的 Chrome（需 --remote-debugging-port=9222），只做当前页只读快照
 //   （不导航、不关模态、不点页签、不 --ask/--steps）；抓 composer/品牌/错误环/body/截图。
-//   --body-out：--ask/--steps 之后把完整 `document.body.innerText` 写到文件（不截 450 字）；
+//   --body-out / --html-out：--ask/--steps 之后把完整 `document.body.innerText` / `outerHTML` 写到文件；
+//     前者判“可见文本”，后者判“在但不可见”（hidden/折叠）；
 //     用于「卡片/toolview 到底渲染没有」这类全文判据（OBS-5 教训：transcript 尾不是证据）。
 //   --steps：受控动作 JSON（clickText / waitText / expectText / typeText），复现“点按钮/面板”症状；
 //   默认断言面 = composer + 品牌 + 右栏**全部**公司页签逐个开（Start-chip 回切）+ 面板体
@@ -65,6 +66,12 @@ const saveEvidence = flag('--evidence');   // 成功也落 verdict/截图（R3-2
 const captureTexts = flag('--texts');
 const jsonOutIndex = args.indexOf('--json-out');
 const jsonOut = jsonOutIndex === -1 ? undefined : args[jsonOutIndex + 1];
+const htmlOutIndex = args.indexOf('--html-out');
+const htmlOut = htmlOutIndex === -1 ? undefined : args[htmlOutIndex + 1];
+if (htmlOutIndex !== -1 && (htmlOut === undefined || htmlOut.startsWith('--'))) {
+  console.error('cdp-probe: --html-out 需要一个文件路径');
+  process.exit(2);
+}
 const bodyOutIndex = args.indexOf('--body-out');
 const bodyOut = bodyOutIndex === -1 ? undefined : args[bodyOutIndex + 1];
 if (bodyOutIndex !== -1 && (bodyOut === undefined || bodyOut.startsWith('--'))) {
@@ -109,6 +116,7 @@ const verdict = {
   stepFailures: [],
   bodyOut: null,
   bodyTextLength: 0,
+  htmlOut: null,
   watch: null,
 };
 
@@ -410,7 +418,7 @@ try {
     const waitMs = step.timeoutMs ?? 5000;
     if (step.action === 'clickText') {
       ok = await evaluate(`(() => {
-        const els = [...document.querySelectorAll('button,[role="tab"],[role="button"],a,[data-dockkit-tab],.wk-guide-entry-label')];
+        const els = [...document.querySelectorAll('button,[role="tab"],[role="button"],[role="treeitem"],a,[data-dockkit-tab],[data-session-id],.wk-guide-entry-label')];
         const el = els.find(e => (e.textContent ?? '').includes(${JSON.stringify(step.value)}));
         if (el === undefined) return false;
         el.click();
@@ -441,6 +449,18 @@ try {
     if (!ok) {
       verdict.stepFailures.push(`step ${String(at)} ${step.action}: ${detail}`);
       break;
+    }
+  }
+  // --html-out：完整 DOM（innerText 排除 display:none/折叠子树；排查 toolview 是否“在但不可见”）。
+  if (htmlOut !== undefined) {
+    const html = await evaluate('document.documentElement.outerHTML').catch(() => '');
+    try {
+      const target = resolve(htmlOut);
+      mkdirSync(dirname(target), { recursive: true });
+      writeFileSync(target, String(html ?? ''), 'utf8');
+      verdict.htmlOut = target;
+    } catch (error) {
+      verdict.htmlOutError = String(error?.message ?? error);
     }
   }
   // --body-out：完整的可见正文（含 transcript 里被 450 字截断的 toolview/卡片标签）。

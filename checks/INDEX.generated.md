@@ -32,7 +32,7 @@
 [deliverables-check](audit/deliverables-check.mjs) · [journal-audit](audit/journal-audit.mjs)
 [surface-matrix-audit](audit/surface-matrix-audit.mjs)
 
-## 窄机制与视觉探针（probes/，67）
+## 窄机制与视觉探针（probes/，68）
 
 ### browser-visual（17）
 
@@ -88,11 +88,12 @@
 [team-taskbook-probe](../probes/session-context/team-taskbook-probe.mjs)
 [time-context-probe](../probes/session-context/time-context-probe.mjs)
 
-### team（22）
+### team（23）
 
 [claim-race-probe](../probes/team/claim-race-probe.mjs)
 [delegation-contract-probe](../probes/team/delegation-contract-probe.mjs)
 [delegation-depth-probe](../probes/team/delegation-depth-probe.mjs)
+[delegation-lifecycle-probe](../probes/team/delegation-lifecycle-probe.mjs)
 [dissent-preservation-probe](../probes/team/dissent-preservation-probe.mjs)
 [member-inquiry-probe](../probes/team/member-inquiry-probe.mjs)
 [member-interrupt-probe](../probes/team/member-interrupt-probe.mjs)
