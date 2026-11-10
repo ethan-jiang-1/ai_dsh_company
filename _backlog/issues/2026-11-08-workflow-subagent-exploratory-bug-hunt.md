@@ -237,7 +237,7 @@ A3 验收：负控 label 不命中；`COO（运营与交付）` / `CFO（财务�
 | ID | 试验 | 结果 |
 |---|---|---|
 | B1 cancel | vp-eng `subagent_retry` → worker `bash sleep 120`；child bash 起后 cancel | **PASS**：cancel accepted；root/child `turn/end` = `aborted`；无 `sleep 120` 残留；retry 工具结果在 cancel 前未回（如实记，不伪造）。 |
-| B1 sigterm | 同上 → SIGTERM 宿主 → 同 home 重启 | **PASS**：重启后 root/child durable `turn/end` = `interrupted`。前两次失败是探针在 kill 后仍读旧 web（`fetch failed`）+ 重启等待不足；修正后 PASS，不是产品结论。 |
+| B1 sigterm | 同上 → SIGTERM 宿主 → 同 home 重启 | **PASS**：重启后 root/child durable `turn/end` = `interrupted`。B1 共 3 次失败：cancel 首跑因探针吞掉 `session/page` 错误而空读；sigterm 前两跑在 kill 后仍读旧 web（`fetch failed`）+ 重启等待不足；修正后 2 次 PASS，不是产品结论。 |
 | B2 矩阵 | A1 audit 扫 B1/B3/B4 新会话 | **PASS**：15 观察（7 root / 7 child / 1 member）、0 问题；coo/cfo child 71 工具 / control 2 / 无 team；CEO team member 继承 80 工具。 |
 | B3 CFO 角色包 | CEO 1 人 CFO 成员，任务书带 CFO 角色包 | **PASS**：`drafts/ceo.md`、`drafts/cfo.md` 在场；署名行 `任务书 = …` 指向真实任务书；任务书含 CFO 角色包（2794 chars）；成员继承 CEO 组合（preset ceo / d1），不冒充 preset CFO。 |
 | B4 UI 卡 | 同一 CEO 会话调 coo + cfo；`--body-out` / `--html-out` | **卡在 DOM、默认不可见**：DOM 有 `data-slot="tool.call.toolview"`、`data-tool=coo/cfo`、`wk-delegation-role = 委派 COO（运营与交付）/ CFO（财务与合规）`、`data-state=ok`；但卡在 `data-step-process-body hidden="until-found"`（`data-turn-process-member=true`）里，默认 transcript、`--body-out`、点 `Completed`/`Called tools` 都未露出。**OBS-5 判为折叠/探针限制，不是卡未渲染**；不据此开 bug。 |
