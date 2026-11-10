@@ -2,7 +2,7 @@
 
 > 什么时候读：找某主题的事实家、查决策台账、或不确定该信哪份文档时（白话入口 = [orient.md](./orient.md)）。
 > 性质：**当前合同 + 设计依据**——只写 now、随代码同 diff；决定、替代方案与验证证据归 `notes/`。
-> 组织原则：**按性质分层，不按时间分层**；目录 = `contracts/`（按主题的当前语义）· `reference/`（查表与台账）· `design/`（为什么）· `guides/`（怎么做）；分层规矩唯一家 = [docs/AGENTS.md](./AGENTS.md)。
+> 组织原则：**按性质分层，不按时间分层**；**树就是 inventory**——本页只列书架与入口，不逐份登记；新增文档放进对应 tier，顶层门/宪法才逐项列出。分层规矩唯一家 = [docs/AGENTS.md](./AGENTS.md)。
 
 ## 先读（按目的）
 
@@ -14,42 +14,17 @@
 | 交证据 / 收尾 | [testing.md](./testing.md) | [guides/dev-loop.md](./guides/dev-loop.md) §1/§12 |
 | 查某个决定 | [reference/decisions.md](./reference/decisions.md) | 对应 Note |
 
-## 现有文档（登记）
+## 书架（按层）
 
-| 文档 | 层 | 回答什么 |
-|---|---|---|
-| [design/architecture.md](./design/architecture.md) | 设计 | repo 形态与组合层（Option A + 单 pack）；角色=preset 纠偏；插件计数（**1 个包**）；协作通道（四条；通道 D 只在 vp-eng）；KB 三载体 |
-| [design/roles-isolation.md](./design/roles-isolation.md) | 设计 | 每角色独立六面的机制安排；composition 继承分水岭与 `mount()` 裂缝；M1–M4 编排选型；两个诚实的缺口（§4） |
-| [design/ui-demo.md](./design/ui-demo.md) | 设计 | Web UI 演示层：现成团队 UI（零代码）、公司皮肤（slots/Remote）、demo 分镜 |
-| [design/role-content-plan.md](./design/role-content-plan.md) | 设计 | 角色内容的设计原则与落点（persona/skills/KB 分工依据；现时语义唯一家 = [presets.md](./contracts/presets.md)） |
-| [policy.md](./policy.md) | 政策 | 常设规则唯一家：授权边界（P1）、门禁升格（P2）、自动化上限（P3）、越界写入（P4）、自主协议（P5） |
-| [guides/debugging.md](./guides/debugging.md) | 指南 | 插件开发的排查阶梯：组合层 → 装载层 → 生效层 → 会话层 → 回归层（自 dev-loop §2 迁出） |
-| [guides/environments.md](./guides/environments.md) | 指南 | 双 home / 双 DSH / 凭据 / 端口 / 排练场 / 沙箱后端的运行环境细节（自 dev-loop §6 迁出） |
-| [guides/budget-and-ops.md](./guides/budget-and-ops.md) | 指南 | 限流旋钮总表、成本结构、demo 运维 runbook（症状→动作）、回放复盘 |
-| [guides/dev-loop.md](./guides/dev-loop.md) | 指南 | 开发操作手册：任务入口与授权（§0.5）、实施和证据交接（§1）、设计四问（§3）、门禁分层（§9）、收尾（§12）；其余按改动面查 debugging / bootstrap / release / environments / web-rpc |
-| [guides/bootstrap.md](./guides/bootstrap.md) | 指南 | 冷启动引导（clean checkout → 可跑通）：配方、双面构建与实证坑（2026-09-27 自 dev-loop §7 迁入） |
-| [profile.md](./contracts/profile.md) | 合同 | host 组合现在时：应用内安装（company profile + workspace）vs dev、行清单语义、开放点 |
-| [delegation.md](./contracts/delegation.md) | 合同 | 汇报线现在时（R3 出生，0.2.1 复校）：命名委托 = activation（终稿走完成通知、人格由 `agentPreset` 给）与 team 的分工、team shadow 边界与证据、委派工具卡、分层验证 |
-| [presets.md](./contracts/presets.md) | 合同 | 角色 preset 语义（六角色 + 三个委派子人格；VP-Eng 组队四档 `eng-teaming`）；名册运行时实测；验证分层；培养回路与学习载体（D25/D43） |
-| [guides/product-definition.md](./guides/product-definition.md) | 指南 | 新产品定义：默认链 MRD→StRS→PRD + 可选 SyRS/IRS/V&V、交接 DAG、编号/状态/DoR/DoD、`/prd check` + `/req check`、产品类型 playbook |
-| [demo.md](./contracts/demo.md) | 合同 | demo 操作合同（R4 立场景 C，2026-09-25 补场景 D 季度经营会 / E 事件复盘）：动议、前置、分镜与观测点、验收判据（含**交付物三态**的机器判据）、已知边界 |
-| [release.md](./contracts/release.md) | 合同 | 发行版六轴、发布物与发布字节、兼容台账、启动入口 smoke、升 pin 程序 |
-| [testing.md](./testing.md) | 合同 | **测试宪法**（2026-10-04 立）：什么算证据——分层与证明边界、改动面→最小证据**政策**（行级映射 = tests/README，2026-10-10 迁家）、证据纪律、资产三分法、自测轮授权、已知未覆盖面与升级地图 |
-| [multi-human.md](./contracts/multi-human.md) | 合同 | **多人协作现在时**（2026-09-26 出生）：机制边界（卡按会话作用域、成员拉不到人）/ 形态 / 开门 runbook / 协作前提三条 / 迁移清单 / 边界 |
-| [runtime-map.md](./runtime-map.md) | 合同 | **运行态地图**：安装 → company profile boot → workspace 解析/登记 → session cwd 的时序、公司状态（workspace v3）与四条状态轴 |
-| [data-model.md](./contracts/data-model.md) | 合同 | 事实级数据卡：workspace 公司状态 vs home 治理、公司状态清单 v3、方法层/账本、备份/迁移/导出 |
-| [project-map.md](./project-map.md) | 导航 | 空间导航：目录逐件 owner、产物落点 |
-| [repo-hygiene.md](./repo-hygiene.md) | 合同 | 什么进 git / 什么不进、跨环境规则、例外与执行面 |
-| [guides/cdp-probe.md](./guides/cdp-probe.md) | 指南 | 观察窗「呈现即验证」机器腿：client 面改动后的呈现前走查、页面异常定位 |
-| [guides/web-rpc.md](./guides/web-rpc.md) | 指南 | 驱动 Web 面会话的 HTTP RPC runbook：脚本化建会话/发 prompt/读日志 |
-| [guides/release-runbook.md](./guides/release-runbook.md) | 指南 | 发布五步 runbook：bump/CHANGELOG/prepare/verify/check；产物、manifest 与失败定位 |
-| [guides/publish-handoff.md](./guides/publish-handoff.md) | 指南 | 字节离开仓库：npm publish、vendor generator 生成 market index、https 托管与 Discover 发现、回滚与回执 |
-| [guides/dev-product-parity.md](./guides/dev-product-parity.md) | 指南 | dev 启动器与应用内安装路径的同形点/允许差异表；`pnpm company` 默认 tarball、`--link` 快速通道 |
-| [terminology.md](./reference/terminology.md) | 参考 | 术语映射查表：本项目用法 ↔ DSH 官方 ↔ vendor/dsh 源码直达 |
-| [external-research.md](./reference/external-research.md) | 参考 | repo 外研究材料登记与吸收落点（2026-10-20 自 index 迁出） |
-| [decisions.md](./reference/decisions.md) | 参考 | 决策台账路由（D 号 → 一句话 → 家；2026-10-20 自 index 迁出） |
-| [orient.md](./orient.md) | 常驻入口 | 驾驭者白话七问（只导航，不复述事实） |
-| [AGENTS.md](./AGENTS.md) | 规范 | 本层分层规矩唯一家（一处事实一个家 / 长度棘轮 / 更新时机 / 负知识） |
+| 层 | 目录 | 放什么 | 读者怎么进 |
+|---|---|---|---|
+| 门/宪法 | 顶层 | 每个人都可能先读：入口、规范、政策、测试宪法、git 边界、空间/运行态地图 | [AGENTS.md](./AGENTS.md) · [orient.md](./orient.md) · [policy.md](./policy.md) · [testing.md](./testing.md) · [repo-hygiene.md](./repo-hygiene.md) · [project-map.md](./project-map.md) · [runtime-map.md](./runtime-map.md) |
+| 合同 | [contracts/](./contracts/) | 按主题/子系统的当前语义；随代码同 diff | 进目录按文件名选；先看文件头「什么时候读」 |
+| 设计 | [design/](./design/) | 为什么选 A 不选 B；仍指导未来选择的机制依据 | 进目录；已定稿的先查 `notes/` |
+| 指南 | [guides/](./guides/) | 怎么做：runbook、环境、排障、发布 | 进目录按任务选 |
+| 参考 | [reference/](./reference/) | 查表与登记：D 号、术语、外部材料 | 进目录按需查 |
+
+> 这张表是**书架**，不是清单：tier 内新增文档不逐份登记；目录本身就是 inventory。选文档先看文件头部的「什么时候读」。
 
 ### notes/（决策与教训，不进 docs）
 
@@ -65,6 +40,6 @@
 | 面 | 事实家 / 导航 |
 |---|---|
 | 机制——公司怎么组装、角色怎么隔离、UI 往哪挂 | design/architecture + design/roles-isolation + design/ui-demo；源码与运行结论按对应合同核对 |
-| 内容——角色说什么话、带什么技能、KB 放哪 | design/role-content-plan + presets.md + `company-workspace/.dsh-company/kb/` + `packages/company-pack/content/AGENTS.md`（host 注入，不落盘） |
+| 内容——角色说什么话、带什么技能、KB 放哪 | design/role-content-plan + contracts/presets.md + `company-workspace/.dsh-company/kb/` + `packages/company-pack/content/AGENTS.md`（host 注入，不落盘） |
 | 运营——token 怎么省、现场出状况怎么办 | guides/budget-and-ops |
 | 流程——任务怎么进、证据怎么交、门禁怎么守 | guides/dev-loop + `notes/` + `checks/run-gates.mjs` |

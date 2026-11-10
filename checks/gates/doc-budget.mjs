@@ -17,7 +17,7 @@ const SLACK_FLOOR = 0.2   // 上限最多比现行内容高 20%；超过即视�
 export function run({ root, ok, fail }) {
 const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 84],             // 2026-09-23 二次收口；2026-09-27 瘦身轮 108→100、棘轮 115→105；2026-10-06 条目 D 纯路由化（删复述与括号链，纪律指针化；当时 95→72），棘轮 105→84
-  ['docs/index.md', 72],         // 2026-10-20 台账/外部材料迁出：131→70（只留地图 + 路由指针）
+  ['docs/index.md', 48],         // 2026-10-20 台账/外部材料迁出：131→70；2026-11-10 DSH 步 2：逐文档登记 → 书架（树即 inventory），内容 +5% = 48
   ['docs/reference/decisions.md', 65],     // 2026-10-20 自 index 迁出：D 路由表独立页；2026-10-30 +1（D50）；2026-11-02 +1（D56）；2026-11-07 +2（D57/D58）；2026-11-08 +1（D59 域路由，论证 = notes/implemented/2026-11-08-sa-sqa-capability-routing）
   ['docs/reference/external-research.md', 30], // 2026-10-20 自 index 迁出（外部材料登记；只登记吸收落点，不承载合同事实）
   ['docs/repo-hygiene.md', 80], // 2026-10-25 立：git 边界与跨环境合同（新增门禁 tracked-portability 的解释面）
