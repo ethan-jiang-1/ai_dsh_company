@@ -82,6 +82,10 @@ node runtime/team-role-packet-exploratory-2026-11-10.mjs
   `policy-lines.md` / `review-protocol.md` / `process-docs.md` / `AGENTS.md`。
 - dev 盘：对 `company-workspace` 跑生产 `bootstrapCompanyWorkspace`（与 app 首启同一函数）→
   created = `policy-lines.md`、`review-protocol.md`、`AGENTS.md`；skipped = 33（只补缺，不覆盖）。
+- 真模型复跑：`node runtime/team-role-packet-exploratory-2026-11-10.mjs` → COO v2 稿明说
+  v1 的「policy-lines.md / review-protocol.md 不存在」已被本盘实测推翻；`policy-lines.md` 12 行 /
+  `review-protocol.md` 12 行均在场（证据 `runtime/team-role-packet-exploratory-2026-11-10.json`，
+  gitignored）。
 - 证据家：`tests/harness/tools/kb-seeds.spec.ts`（回归）；conversation evidence 见提交说明。
 
 ## 已修判定
