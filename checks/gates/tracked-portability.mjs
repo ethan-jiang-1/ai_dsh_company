@@ -4,12 +4,21 @@
 // macOS 专属命令会在一台机器上绿、另一台上红。规则唯一家 = docs/repo-hygiene.md §四。
 // 负例留证 2026-10-25：`docs/zz-portability.md` 写 `/Users/someone/tmp` → 红（点名 file:line）；
 // 删除 → 绿。删 .gitattributes → 红；还原 → 绿。
+// 负例留证 2026-11-10（误报收紧）：`docs/guides/quality-loop.md` 尾部加一行 `/Users/bowhead/probe-abs/`
+// → 红（点名 `quality-loop.md:88`）；`git checkout HEAD --` 还原 → 绿（×784）。
+// 同轮反证「相对路径不再误红」：`tests/fixtures/methods/home/company/methods/` 三处（guide / Note / spec）
+// 在收紧前连报 3 处假红，收紧后仍绿而真绝对路径仍红——两者都是本次实跑，不是推测。
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 const MAX_BYTES = 2 * 1024 * 1024
-const HOME_PATH_RE = /\/(?:Users|home)\/[A-Za-z0-9][A-Za-z0-9._-]*\//g
+// 「绝对」是这条规则的判据（规则唯一家 = docs/repo-hygiene.md §四.2），所以起点必须是真路径根：
+// 行首，或紧跟在一个不可能构成路径段边界的字符之后（空格/引号/括号/等号/反引号/`:` 之外的标点）。
+// 反例（2026-11-10 实证）：`tests/fixtures/methods/home/company/methods/` 这类**仓库内相对路径**
+// 里字面目录名 `home` 曾被当成 Linux 家目录根，连报 3 处误红——相对路径永远不该命中。
+// 前置 `(?<![\w.~/\\-])` 排除前面紧贴路径字符的情形（`a/home/x`、`.home/x`、`../home/x`）。
+const HOME_PATH_RE = /(?<![\w.~/\\-])\/(?:Users|home)\/[A-Za-z0-9][A-Za-z0-9._-]*\//g
 const MACOS_ONLY_RE = /\bsed -i\b|\bstat -f\b|\bdate -j\b|\bxargs -r\b|\bgrep -P\b|\brealpath \b|\bopen -a\b|\bpbcopy\b|\bpbpaste\b|security find-generic-password/
 const SELF = 'checks/gates/tracked-portability.mjs'
 const ALLOW_PREFIXES = [
@@ -79,7 +88,9 @@ export function run({ root, ok, fail }) {
     }
   }
 
-  problems.length === 0
-    ? ok(`tracked-portability ×${String(scanned)}（LF/无 home 路径/无大小写冲突/无 macOS 专属命令）`)
-    : fail('tracked-portability', problems.slice(0, 12).join('；') + (problems.length > 12 ? '；…' : ''))
+  if (problems.length === 0) {
+    ok(`tracked-portability ×${String(scanned)}（LF/无 home 路径/无大小写冲突/无 macOS 专属命令）`)
+  } else {
+    fail('tracked-portability', problems.slice(0, 12).join('；') + (problems.length > 12 ? '；…' : ''))
+  }
 }
