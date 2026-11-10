@@ -24,7 +24,7 @@ tarball 的**绝对路径**。按提示重启正在使用的 profile，之后用
 
 - `dsh --profile company --dump-config`：能看到 `company-client` 与 `company-session-search` 行；
 - 真启动一次：stderr 没有 `did not activate` / `skipping profile bundle`；
-- Plugins 页：bundle 卡片可见，九条 preset 行（ceo / vp-eng / vp-sales / coo / cfo / cmo / worker / worker-researcher / worker-orchestrator）不 broken；
+- Plugins 页：bundle 卡片可见，十一条 preset 行（ceo / vp-eng / vp-sales / coo / cfo / cmo / worker / worker-researcher / worker-orchestrator / quality-loop-producer / quality-loop-verifier）不 broken；
 - 应用内安装的结果是 `application: applied`，或 `restart-required`（按提示重启后再验）；`failed` 才是失败。
 
 ## 交付形态
@@ -63,7 +63,7 @@ tarball 的**绝对路径**。按提示重启正在使用的 profile，之后用
 
 ## What it contributes
 
-- 六个角色 preset（CEO / VP-Eng / VP-Sales / COO / CFO / CMO）+ worker family（worker / worker-researcher / worker-orchestrator）；
+- 六个角色 preset（CEO / VP-Eng / VP-Sales / COO / CFO / CMO）+ worker family（worker / worker-researcher / worker-orchestrator）+ 质量环两档（quality-loop-producer / quality-loop-verifier）；
 - 产品定义：默认链 MRD → StRS → PRD——CMO 出 MRD（`MR-###`）+ StRS（`REQ-###`），VP-Eng 出 PRD（`REQ-###` / `AC-###-#` / slice）；SyRS/IRS/V&V 改为按需指派 owner；
   编号合同（R1–R10、退役词、范围豁免、并发）住 `content/state/process-docs.md`；共享 `product-definition`；
   `/prd check <目录名>` 校验 MRD/PRD 结构，`/req check <目录名>` 校验编号/层/追溯/退役词/计数（操作员命令，角色不自证）；
@@ -152,3 +152,4 @@ rm -f  <DSH_HOME>/storages/company_run_bundle_ledger.json
 - **上网能力（`web_search` / `web_fetch`）必须随每个 preset 声明**：web-app bundle 把 host 上的 `tool-web` 行 `disabled: true`，改为按 agent preset 组合（vendor base 注释原文）——所以它**不是**全局继承来的；漏声明时角色与它 spawn 的 child 都静默无联网。子会话（`subagent` / team teammate）**继承 Lead 的组合**（`composeFrom`；roles-isolation §2/§4），故 Lead 有即可，不必另配。
 - **one-shot 委托 child 的目录里看得见 Team 工具但调不通**（上游已登记限制，vendor tool-agent-team README "One-shot child tool visibility"；2026-10-02 真跑实证：child 目录 41 工具含全部六个 Team 工具，调用在身份确认后被拒）。防线 = CEO preset 两份委托 persona 各一句「别碰 team 工具，并行调研只用 subagent」+ `delegation-smoke --delegate` 的 [3] 守卫（边界变了就红）。
 - **搜索成本 = 一次完整模型回合**：DeepSeek 无独立检索端点，每次 `web_search` 都按一次 Messages 调用计延迟与 token（故 `searchTimeoutMs` 设 60s）；凭据复用 `DEEPSEEK_API_KEY`，缺失即 fail-loud 结构化报错、不静默降级。`web_fetch` 为匿名抓取，只接受公开 HTTP(S) 目标。
+- **质量环的验证者是「真只读」，所以它跑不了测试**：`quality-loop-verifier` 没有 `write`/`edit`/`bash`（能力面关闭），动态证据由 `quality-loop-producer` 跑、原始输出交给它评；裁决原文与 `presets/_shared/skills/quality-loop/SKILL.md` 的流程契约由开发侧探针事后核（审计不是运行时 veto——父代理理论上有手，改了会红）。两档共用 `quality-loop-` 前缀，也不进 `/cultivation` 名册：方法由人放进 `<DSH_HOME>/company/methods/<preset id>/<pack>/`。

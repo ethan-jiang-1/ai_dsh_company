@@ -13,6 +13,8 @@
 | **角色方法层**（2026-10-13 新增；2026-10-17 加 GUI 行动面；2026-10-28 M3 公司级） | 本人采纳培养记录 ⇒ host 写 `<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`——公司级、按角色隔离、pack 升级不擦；旧 `<profile>/company-cultivation/` 只读留一版 | 角色驾驭者（人）在培养面板点「采纳」或敲 `/cultivation adopt`——**同一条人侧命令通道**（面板经 `remote.commands.execute` 发同一行命令，host 照旧记 `source: user`，角色闸不变）；分身只能用 `cultivation_propose` 工具提案 |
 | **素材**（journal） | 角色会话收工纪要，人审后按「轮末收敛」压进 CHARTER | 分身写、人收敛 |
 
+**名册外的能力档**（worker family / `quality-loop-*` 两档）不走 `/cultivation`（名册 = 六角色）：方法由**人**直接放进 `<DSH_HOME>/company/methods/<能力档 id>/<pack>/`，v1 没有采纳/撤回流水线（扩名册是另一张卡；质量环见 [presets.md](./presets.md) 名册）。
+
 **培养记录 = 公司盘 `cultivation/records/*.md`**（纠正/建议/采纳回执/验证引用；UI 经
 `workspaceFiles` 读、分身经 fs 读——写留日志）。闭环：纠正或跨角色建议（CEO 仅建议权，
 目标角色本人采纳）→ 本人采纳 → 方法落方法层 → 新会话生效 → 同类任务验证回填（`verify`）
@@ -50,6 +52,4 @@ danger-full-access 处方会让围栏缺席，这是机器条件不是机制缺�
 **分身运行时自改 skill 已否决**；写隔离实测口径（2026-10-13）：**workspace-write 部署下**
 分身 fs 写方法层被沙箱拒（`[sandbox: file access denied]` 活体留证），danger-full-access
 部署无围栏——不宣称绝对隔离；采纳/拒绝/撤回/验证只走 `/cultivation` 人侧命令
-（不经模型、run 进会话日志），模型侧无这些动作的工具；
-**自主节律**已由 0.2.0 收割批 3 落地（schedule 工具 ×4 + time-context 日期通道，见上文工具面「批 3」行；
-原搁置池复活项随 D32 队列层退役而消化）。
+（不经模型、run 进会话日志），模型侧无这些动作的工具。

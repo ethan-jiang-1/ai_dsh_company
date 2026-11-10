@@ -248,6 +248,6 @@ try {
 }
 
 console.log(failures.length === 0
-  ? `\npreset-smoke: ALL PASS（${ROLES.length} 个角色 + ${SUPPORT_PRESETS.length} 个委派子人格全部可挂载）`
+  ? `\npreset-smoke: ALL PASS（${ROLES.length} 个角色 + ${SUPPORT_PRESETS.length} 个非角色 preset 全部可挂载）`
   : `\npreset-smoke: ${failures.length} FAILURE(S)\n${failures.join('\n')}`)
 process.exit(failures.length === 0 ? 0 : 1)

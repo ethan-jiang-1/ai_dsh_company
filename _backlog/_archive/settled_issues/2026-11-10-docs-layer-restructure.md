@@ -20,7 +20,7 @@ opened: 2026-11-10
 
 - DSH 自己的 `docs/` 就是这么分的：顶层 `architecture.md` / `testing.md` / `glossary.md`，其余进 `subsystems/`、`cookbook/`、`defensive-patterns/`、`postmortem/`、`user/`；`docs/AGENTS.md` 明说“文档的主题与树位置共同界定它的 scope；下层细节链接到 owner”。
 - 本仓已有 `design/`、`guides/`，缺的是合同与查表两层的目录化；这不是“按时间分目录”，不违反 [docs/AGENTS.md](../../../docs/AGENTS.md) 的负知识。
-- 触发：用户在做 [内容宪章](./2026-11-10-content-charter.md) 与 [producer/verifier](../../issues/2026-11-10-producer-verifier-quality-loop.md) 时，发现“先想清楚归位、再动手”同样适用于 `docs/`；两张卡是引子，不是本卡的范围。
+- 触发：用户在做 [内容宪章](./2026-11-10-content-charter.md) 与 [producer/verifier](2026-11-10-producer-verifier-quality-loop.md) 时，发现“先想清楚归位、再动手”同样适用于 `docs/`；两张卡是引子，不是本卡的范围。
 
 ## 当前情况（实施已发生，待验收）
 

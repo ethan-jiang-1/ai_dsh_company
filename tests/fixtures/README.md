@@ -11,6 +11,7 @@
 | `deliverables-r1/session.jsonl` | authored（2026-10-27，合成 2 行；cwd = `/synthetic/company-workspace`） | 手写最小会话：`session` 头 + `deliverables/presented` 事件；不含任何真实会话内容 | `tests/harness/tools/deliverables-audit.spec.ts`：presented 事件 → 审计判据的输入 |
 | `deliverables-r1/workspace.expected/` | authored（同上） | 与 `session.jsonl` 配套的期望工作区树（两份 final.md）；**不是**录制副本 | 同上：审计对工作区的期望态；与 session 分离，避免"同一录制既当输入又当期望" |
 | `companies/` | authored（2026-11-09，三层分离测试资产） | 两家合成公司（`acme-hardware-software` / `beta-b2b-saas`），每家 `identity.md`（frontmatter: company/productName/productType/timeZone）+ `organization.md` / `policy-lines.md`（`- key: value`）；**零真实数据** | `tests/host/run-bundle/company-fixture.spec.ts` 等：同一套 spec 换公司 fixture 跑，证明"换公司/换类型"不改测试；改 profile 格式时同 diff 更新本行与加载器 |
+| `methods/home/` | authored（2026-11-10，质量环方法层夹具） | 合成 `<DSH_HOME>/company/methods/` 子树：两套方法包（`requirements-trace@1.0.0` / `api-contract@2.1.0`），每套两侧各一份 `SKILL.md`（frontmatter `metadata.method/version/side` + check-id 表）；**零真实数据、零公司事实** | `tests/harness/tools/quality-loop.spec.ts` 与 `probes/team/quality-loop-audit.mjs --home`：核方法配对（两侧同 id 同版本）、check-id 覆盖、以及"换一套方法只换方法层"；改方法包格式时同 diff 更新本行与解析器 |
 
 ## 更新触发
 

@@ -23,7 +23,7 @@
 1. **control 工具 per-agent 安装，worker family 不装**：
    `registerDelegationControl` 改成 `agent/created` 时在该 agent 的 `tools` scope 注册（与
    [`subagent-retry.ts`](../../packages/company-pack/src/host/delegation/subagent-retry.ts) 同模式）。
-   `composedPresetOf(agent.ctx)` ∈ `WORKER_FAMILY_PRESETS` 就跳过；full role / CEO / 未知 preset 保留。
+   `composedPresetOf(agent.ctx)` ∈ `NON_ROLE_PRESETS` 就跳过；full role / CEO / 未知 preset 保留。
    worker-orchestrator 也在 family 内：它的 YAML 已声明“没有控制面”，收 leaf 结果靠 `subagent`
    的完成通知，不靠 `list_subagents`/`send_to_subagent`；父代理（VP/CEO）仍有 control 去续驶直接子代。
 2. **fan-out 是父代理预算，不是 profile 硬承诺**：模型 `WORKER_PROFILES` 增
@@ -46,7 +46,7 @@
   且 worker 的 preset 注释继续是假话。052 的根因就是全局注册绕过 preset，不修注册层等于没修。
 - **只过滤 worker leaf，保留 researcher/orchestrator 的 control**：researcher 没有 child；
   orchestrator 的 YAML/设计都声明“没有控制面”。按 ID 挑一个固定，下一次加 profile 又漂——
-  这正是 family 常量 `WORKER_FAMILY_PRESETS` 要避免的。
+  这正是 family 常量 `NON_ROLE_PRESETS` 要避免的。
 - **给 orchestrator 保留 control 以便续驶 leaf**：会与“worker family 无 control”的既有声明冲突；
   它收 leaf 结果走完成通知，确需续驶由父代理重新派。保留为**明确输掉**的备选，未来若出现
   “orchestrator 必须续驶 leaf”的真实需求再单独立卡。

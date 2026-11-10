@@ -1,17 +1,19 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-10
 ---
 
 # 落地：producer/verifier 质量环——独立上下文 + 外部方法层
 
-> 立卡：2026-11-10 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-10 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 语义审（对照验收 9 条）+ keyless/typecheck/verify/preset-smoke/审计探针/真模型 E2E 实跑，证据见 Note「验证」
 >
-> **结论/去向**：note — 计划 `producer-verifier-quality-loop.md`（落 `notes/implemented/`，落地同变更成立）
+> **结论/去向**：note — [2026-11-10-producer-verifier-quality-loop.md](../../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md)（落地同变更；决定号 [D60](../../../docs/reference/decisions.md)）
+>
+> **落地时的命名裁定**：两个能力档改用一个共用前缀——`quality-loop-producer` / `quality-loop-verifier`（工具名 `quality_loop_produce` / `quality_loop_verify`）；裸名 `producer` / `verifier` 太泛，且要体现「先生产、再验证」的次序（用户 2026-11-10 两次裁定）。卡内下文保留立卡时的原用词。
 >
 > **基座同步（2026-11-10）**：`docs-dsh-alignment` 五步已落地（`69706354`…`abb02d1e` + 收尾）：
-> 原 docs 的 design 层（已移除）已并回 `notes/`；`docs/index.md` 改为 tier 书架；新增 [docs/architecture.md](../../docs/architecture.md)；
-> 方法层/培养回路事实改由 [docs/contracts/cultivation.md](../../docs/contracts/cultivation.md) 承载；`doc-budget`
+> 原 docs 的 design 层（已移除）已并回 `notes/`；`docs/index.md` 改为 tier 书架；新增 [docs/architecture.md](../../../docs/architecture.md)；
+> 方法层/培养回路事实改由 [docs/contracts/cultivation.md](../../../docs/contracts/cultivation.md) 承载；`doc-budget`
 > 加 **≥5% headroom**。本卡 docs 落点按新层表更新：**流程/操作进 `guides/`**，**理由/备选进落地 Note**
 > （docs 只写 now），方法层事实引 `cultivation.md`。实施前先 `git log --oneline -8` 确认基座未再变。
 
@@ -19,11 +21,11 @@ opened: 2026-11-10
 
 ## 背景：SA/SQA 的完整弧，以及这次为什么不一样
 
-**原来的问题（2026-11-06）。** 真实项目落地（不是 demo）时，VP-Eng 一个人既做硬软一体架构、又做需求验证；E（工程）与 V（验证）在同一上下文里，质量不独立。用户当时的拍板：两个**委派子人格**——`system-architect`（SA，V 模型左侧：系统需求→架构→子系统/接口）与 `system-qa`（SQA·V&V，右侧：单元/集成/系统/验收、独立评审 E 侧产物、质量否决）；子人格档不占编制；CEO 与 vp-eng 各加命名行 `maxDepth: 2`；SQA 否决直达 CEO；E 与 V 不许互相代笔。落地 Note 见 [2026-11-06-sa-sqa-subpersonas.md](../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)。
+**原来的问题（2026-11-06）。** 真实项目落地（不是 demo）时，VP-Eng 一个人既做硬软一体架构、又做需求验证；E（工程）与 V（验证）在同一上下文里，质量不独立。用户当时的拍板：两个**委派子人格**——`system-architect`（SA，V 模型左侧：系统需求→架构→子系统/接口）与 `system-qa`（SQA·V&V，右侧：单元/集成/系统/验收、独立评审 E 侧产物、质量否决）；子人格档不占编制；CEO 与 vp-eng 各加命名行 `maxDepth: 2`；SQA 否决直达 CEO；E 与 V 不许互相代笔。落地 Note 见 [2026-11-06-sa-sqa-subpersonas.md](../../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)。
 
-**后来怎么长（2026-11-07/08）。** 需求链落地：SA 产 SyRS（`REQ-###`）+ IRS（`IF-###`）+ 架构稿；SQA 产 `TC-###`（`covers` 回 REQ/IF）+ V&V 的 L1–L4 分层；再往后加学科域路由（五学科先判域、VP-Eng 任务书声明、SQA 逐行域审计）。方法越来越具体，也越来越绑"系统工程 V 模型 + 硬软一体"这个产品类型。见 [2026-11-07-requirements-teaming-program.md](../../notes/archived/2026-11-07-requirements-teaming-program.md) 与 [2026-11-08-sa-sqa-capability-routing.md](../../notes/archived/2026-11-08-sa-sqa-capability-routing.md)。
+**后来怎么长（2026-11-07/08）。** 需求链落地：SA 产 SyRS（`REQ-###`）+ IRS（`IF-###`）+ 架构稿；SQA 产 `TC-###`（`covers` 回 REQ/IF）+ V&V 的 L1–L4 分层；再往后加学科域路由（五学科先判域、VP-Eng 任务书声明、SQA 逐行域审计）。方法越来越具体，也越来越绑"系统工程 V 模型 + 硬软一体"这个产品类型。见 [2026-11-07-requirements-teaming-program.md](../../../notes/archived/2026-11-07-requirements-teaming-program.md) 与 [2026-11-08-sa-sqa-capability-routing.md](../../../notes/archived/2026-11-08-sa-sqa-capability-routing.md)。
 
-**为什么退役（2026-11-09）。** 用户要求清理这两个旧 preset：它们是"旧思路的专职 V 模型子人格"，方法写在 persona 与 skill 里——换一家公司（比如纯 SaaS）就要改包；保留 `specialist` 会让模型/文档继续维护一套不再需要的身份与 veto 语义。退役拆掉了 preset、委托行、`specialist` 字段、support/patch、文档/测试/探针，见 [2026-11-09-retire-sa-sqa.md](../../notes/implemented/2026-11-09-retire-sa-sqa.md)。
+**为什么退役（2026-11-09）。** 用户要求清理这两个旧 preset：它们是"旧思路的专职 V 模型子人格"，方法写在 persona 与 skill 里——换一家公司（比如纯 SaaS）就要改包；保留 `specialist` 会让模型/文档继续维护一套不再需要的身份与 veto 语义。退役拆掉了 preset、委托行、`specialist` 字段、support/patch、文档/测试/探针，见 [2026-11-09-retire-sa-sqa.md](../../../notes/implemented/2026-11-09-retire-sa-sqa.md)。
 
 **教训不是"E/V 分家错了"，是"放错层"。** 结构（独立上下文 + 一个做 + 一个验 + 裁决独立）是对的；错的是把"怎么做"（V 模型、TC 编号、五学科）放进了"我是谁"（persona/skill）。所以这次把四样拆开：身份/工具面进 preset（极短，不含方法）；流程进共享 skill（交接、轮次、裁决）；方法进角色方法层（公司/项目自己装，换方法不换 preset）；政策进公司层（是否强制、升级线、对外签字）。
 

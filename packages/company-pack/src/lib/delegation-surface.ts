@@ -6,8 +6,13 @@
  */
 
 /**
- * worker family：执行手，不是公司角色。按 brief 干活，不读角色/汇报线/编制手册
- * （token 税 + persona 矛盾；BUG-047）。新增 worker profile 先加进这里，模型与 host 同 diff 跟上——
- * 默认值取本表，不取某个写死的 preset id。
+ * 非公司角色的 preset：worker family（执行手）+ 质量环能力档（`quality-loop-*` 两个）。
+ * 它们是**按 brief/任务书干活的能力档**，不是公司角色 ⇒ ① 不注入角色/汇报线/编制手册
+ * （token 税 + persona 矛盾；BUG-047）；② 不装 subagent 控制面（它们的声明里没有这一面，
+ * host 不能靠全局注册绕过去；BUG-052）。
+ *
+ * 新增非角色 preset 先加进这里，模型与 host 同 diff 跟上——默认值取本表，不取某个写死的 preset id。
  */
-export const WORKER_FAMILY_PRESETS = ['worker', 'worker-researcher', 'worker-orchestrator'] as const
+export const NON_ROLE_PRESETS = [
+  'worker', 'worker-researcher', 'worker-orchestrator', 'quality-loop-producer', 'quality-loop-verifier',
+] as const

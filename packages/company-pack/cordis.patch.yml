@@ -98,7 +98,7 @@
         # preset 加载构造上对齐；端到端实证 = probes/session-context/cultivation-method-layer-probe.mjs。
         # 旧 `<profile>/company-cultivation/` 只读留一版，host 启动一次性迁移（含冲突备份）。
         cultivationRoot: !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('../../company/methods/', baseUrl))"
-        # worker family（执行手）不是公司角色：默认不注入角色/汇报线/编制手册。
-        # 默认集合由 host 的 WORKER_FAMILY_PRESETS 按 family 派生（新增 profile 自动继承）；
+        # 非公司角色（worker family 执行手 + 质量环能力档 producer/verifier）默认不注入角色/汇报线/编制手册。
+        # 默认集合由 host 的 NON_ROLE_PRESETS 按「是否公司角色」派生（新增非角色 preset 自动继承）；
         # 只有部署要额外排除某个公司角色时才在这里覆盖，别再把单 profile 白名单写回来（BUG-047）。
         # handbookSkipPresets: ['worker']

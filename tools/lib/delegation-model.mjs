@@ -14,7 +14,7 @@
  * 具体行仍以 YAML 为准，模型只声明“应该长什么样”。
  */
 
-/** 当前随包发布的 preset（顺序 = 名册语义序；worker 是 support，不是公司角色）。 */
+/** 当前随包发布的 preset（顺序 = 名册语义序；worker family / 质量环能力档是 support，不是公司角色）。 */
 export const PRESET_IDS = [
   'ceo',
   'vp-eng',
@@ -25,13 +25,17 @@ export const PRESET_IDS = [
   'worker',
   'worker-researcher',
   'worker-orchestrator',
+  'quality-loop-producer',
+  'quality-loop-verifier',
 ]
 
-/** 公司六角色（汇报线/在场板/培养面）；worker 不在此列。 */
+/** 公司六角色（汇报线/在场板/培养面）；worker family 与质量环能力档都不在此列。 */
 export const FULL_ROLE_IDS = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo']
 
-/** 非角色的委派子人格/执行手；进 support preset 门禁与 preset-smoke。 */
-export const SUPPORT_PRESET_IDS = ['worker', 'worker-researcher', 'worker-orchestrator']
+/** 非角色的委派子人格/执行手/能力档；进 support preset 门禁与 preset-smoke。 */
+export const SUPPORT_PRESET_IDS = [
+  'worker', 'worker-researcher', 'worker-orchestrator', 'quality-loop-producer', 'quality-loop-verifier',
+]
 
 /**
  * 四条通道的硬能力。`depth` 是语义标签，不是行上的数字：
@@ -152,8 +156,10 @@ export const CONTRACTS = {
  * 每个 preset 的期望组合。
  *
  * 字段：
- * - archetype：lead / full / worker。
- * - teamLead：根会话是否天然是 Team Lead（full role 都是；leaf/worker 不是）。
+ * - archetype：lead / full / worker / support。
+ *   `support` = 非角色的能力档（质量环的 producer / verifier）：有方法槽与流程 skill，
+ *   但没有任何委派面（不是 worker family 的 leaf 执行手）。
+ * - teamLead：根会话是否天然是 Team Lead（full role 都是；leaf/worker/support 不是）。
  * - genericSpawn：是否有通用 `subagent` 行（toolName = subagent）。
  * - workerProfile：当前已钉的 worker profile；null = 仍继承父组合（待铺开）。
  * - targetWorkerProfile：目标 profile（长期）；pilot 阶段只 vp-eng 已落地。
@@ -197,11 +203,19 @@ export const COMPOSITIONS = {
     targetWorkerProfile: 'worker',
     allowedWorkerProfiles: ['worker', 'worker-orchestrator'],
     channels: ['spawn', 'fork', 'workflow', 'team'],
-    namedDelegates: ['vp_cmo'],
-    namedProfiles: { vp_cmo: 'cmo' },
+    // 质量环两条命名行（produce / verify）：独立上下文 + 独立工具面才叫"验的人不是做的人"；
+    // 深度 2 = 团队成员（depth 1）起的 child 落 2，CEO 命名 vp_eng child 时同样成立。
+    namedDelegates: ['quality_loop_produce', 'quality_loop_verify', 'vp_cmo'],
+    namedProfiles: {
+      quality_loop_produce: 'quality-loop-producer',
+      quality_loop_verify: 'quality-loop-verifier',
+      vp_cmo: 'cmo',
+    },
     depthRows: {
       subagent: 3,
       subagent_fork: 3,
+      quality_loop_produce: 2,
+      quality_loop_verify: 2,
       vp_cmo: 2,
     },
     control: true,
@@ -300,6 +314,35 @@ export const COMPOSITIONS = {
     workflow: false,
     contracts: [],
   },
+  // ── 质量环能力档（2026-11-10）：只由 VP-Eng 的 quality_loop_produce / quality_loop_verify 命名行点名，
+  //    不暴露给通用 subagent。同一个 `quality-loop-` 前缀 = 一套东西，人按前缀就找齐。 ──
+  'quality-loop-producer': {
+    archetype: 'support',
+    teamLead: false,
+    genericSpawn: false,
+    workerProfile: null,
+    targetWorkerProfile: null,
+    channels: [],
+    namedDelegates: [],
+    depthRows: {},
+    control: false,
+    workflow: false,
+    // 方法不在 preset 里（任务书点名 <pack>@<version>）；流程 = _shared/skills/quality-loop。
+    contracts: [],
+  },
+  'quality-loop-verifier': {
+    archetype: 'support',
+    teamLead: false,
+    genericSpawn: false,
+    workerProfile: null,
+    targetWorkerProfile: null,
+    channels: [],
+    namedDelegates: [],
+    depthRows: {},
+    control: false,
+    workflow: false,
+    contracts: [],
+  },
 }
 
 /**
@@ -374,13 +417,14 @@ export function retryDecision(channel, terminal, attempt, idempotent) {
 /**
  * 不注入公司手册的 preset（唯一期望源）。
  *
- * 边界按 **archetype** 派生，不按 ID 白名单：worker family 是执行手（按 brief 干活），
- * 不是公司角色；角色/汇报线/编制手册对它是 token 税与人格矛盾。新增 worker profile 自动继承，
- * 不再需要人记得把它加进某个列表（BUG-047 的失败类）。
- * @returns worker archetype 的 preset id（顺序 = PRESET_IDS）。
+ * 边界按 **是否为公司角色** 派生，不按 ID 白名单：worker family 与质量环能力档都不是公司角色
+ * （前者按 brief 执行，后者按任务书 + 外部方法产出/复核），角色/汇报线/编制手册对它们是 token 税与人格矛盾。
+ * 新增非角色 preset 自动继承，不再需要人记得把它加进某个列表（BUG-047 的失败类；
+ * 2026-11-10 加 producer/verifier 时正是靠这条派生没有漏）。
+ * @returns 非公司角色的 preset id（顺序 = PRESET_IDS）。
  */
 export function handbookSkipPresets() {
-  return PRESET_IDS.filter(id => COMPOSITIONS[id].archetype === 'worker')
+  return PRESET_IDS.filter(id => !FULL_ROLE_IDS.includes(id))
 }
 
 /** 一个 preset 的 YAML 相对路径（仓库根起）。 */
@@ -417,7 +461,7 @@ export function modelProblems() {
     if (!PRESET_IDS.includes(id)) problems.push(`COMPOSITIONS 含 ${id}，但 PRESET_IDS 没有`)
   }
   for (const [id, spec] of Object.entries(COMPOSITIONS)) {
-    if (!['lead', 'full', 'worker'].includes(spec.archetype)) problems.push(`${id}: 未知 archetype ${spec.archetype}`)
+    if (!['lead', 'full', 'worker', 'support'].includes(spec.archetype)) problems.push(`${id}: 未知 archetype ${spec.archetype}`)
     for (const [tool, preset] of Object.entries(spec.namedProfiles ?? {})) {
       if (!PRESET_IDS.includes(preset)) problems.push(`${id}: namedProfiles.${tool} 指向未知 preset ${preset}`)
     }

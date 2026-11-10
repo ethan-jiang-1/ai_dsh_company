@@ -152,7 +152,9 @@
         "./presets/cmo/agent.cordis.yml",
         "./presets/worker-researcher/agent.cordis.yml",
         "./presets/worker/agent.cordis.yml",
-        "./presets/worker-orchestrator/agent.cordis.yml"
+        "./presets/worker-orchestrator/agent.cordis.yml",
+        "./presets/quality-loop-producer/agent.cordis.yml",
+        "./presets/quality-loop-verifier/agent.cordis.yml"
       ]
     },
     "client": {

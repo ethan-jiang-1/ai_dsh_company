@@ -1,6 +1,6 @@
 // 负例留证 2026-11-09：把 CONTRACTS['policy.delegation'].status 从 delivered 改回 planned ⇒
 // 「合同载体状态与真实载体一致」用例红（`expected 'planned' to be 'delivered'`）；还原 ⇒ 10 passed。BUG-049
-// 负例留证 2026-11-09：把 WORKER_FAMILY_PRESETS 只留 ['worker'] ⇒「handbook 边界按 worker family」用例红；
+// 负例留证 2026-11-09：把 NON_ROLE_PRESETS 只留 ['worker'] ⇒「handbook 边界按非公司角色」用例红；
 // 还原 ⇒ 绿。BUG-047
 // 负例留证 2026-11-10：把 WORKER_PROFILES['worker-orchestrator'].fanOut.hardMax 改成数字（或把 policy
 // 改成 'hard'）⇒「fan-out 是声明策略」用例红；还原 ⇒ 绿。BUG-051
@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { WORKER_FAMILY_PRESETS } from '../../packages/company-pack/src/lib/delegation-surface.ts'
+import { NON_ROLE_PRESETS } from '../../packages/company-pack/src/lib/delegation-surface.ts'
 import {
   CHANNELS,
   COMPOSITIONS,
@@ -64,10 +64,10 @@ describe('delegation model：唯一期望源', () => {
     }
   })
 
-  it('handbook 边界按 worker family 派生（BUG-047）', () => {
-    // 唯一期望源：archetype=worker 的全部 preset；不写 ID 白名单。
-    expect(handbookSkipPresets()).toEqual(['worker', 'worker-researcher', 'worker-orchestrator'])
-    expect([...WORKER_FAMILY_PRESETS]).toEqual(handbookSkipPresets())
+  it('handbook 边界按「非公司角色」派生（BUG-047）', () => {
+    // 唯一期望源：非公司角色的全部 preset（worker family + 质量环能力档）；不写 ID 白名单。
+    expect(handbookSkipPresets()).toEqual(['worker', 'worker-researcher', 'worker-orchestrator', 'quality-loop-producer', 'quality-loop-verifier'])
+    expect([...NON_ROLE_PRESETS]).toEqual(handbookSkipPresets())
     for (const id of FULL_ROLE_IDS) expect(handbookSkipPresets(), `${id} 是公司角色，应注入手册`).not.toContain(id)
   })
 

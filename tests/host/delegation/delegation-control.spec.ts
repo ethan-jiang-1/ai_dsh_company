@@ -93,8 +93,9 @@ describe('delegation control tools', () => {
     expect(tools.get('send_to_subagent')?.description ?? '').toContain('teammate')
   })
 
-  it('worker family 不安装 control 工具；company 角色保留（BUG-052）', () => {
-    for (const preset of ['worker', 'worker-researcher', 'worker-orchestrator']) {
+  it('非角色 preset 不安装 control 工具；company 角色保留（BUG-052）', () => {
+    // 表 = 模型 handbookSkipPresets() 同一张（worker family + 质量环能力档）；验证者尤其不该拿 send_to_subagent。
+    for (const preset of ['worker', 'worker-researcher', 'worker-orchestrator', 'quality-loop-producer', 'quality-loop-verifier']) {
       expect([...harness({}, preset).keys()], preset).toEqual([])
     }
     for (const preset of ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo']) {

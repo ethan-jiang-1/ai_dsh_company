@@ -3,12 +3,12 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
 
-// ── 3. preset 结构：六角色 × (声明文件 + ≥1 skill，含第二 skill 根) + 委派子人格 × 声明文件 ───
+// ── 3. preset 结构：六角色 × (声明文件 + ≥1 skill，含第二 skill 根) + 非角色 preset × 声明文件 ───
 // 负例留证 2026-09-27：移走一个 SKILL.md → skill-file 红。
 // 0.1.7 起显示名/描述/order 内联进 `agent.cordis.yml` 的 `dsh-agent-preset` 行（原 preset.yml 并入），
 // 故这里只要求声明文件；挂载验证归 preset-smoke（真 web 逐角色建会话）。
 export const roles = COMPANY_ROLE_IDS
-/** 子人格 preset 只要求声明文件 + 行能挂（skills 由 preset-smoke 真挂载验证）。 */
+/** 非角色 preset（worker family / 质量环能力档）只要求声明文件 + 行能挂（skills 由 preset-smoke 真挂载验证）。 */
 export const supportPresets = COMPANY_SUPPORT_PRESET_IDS
 export function run({ root, ok, fail }) {
 // ── 名单 ↔ 包内注册：preset 目录存在 ≠ 装进组合。每个 preset 必须在 package.json 的
@@ -28,9 +28,9 @@ for (const entry of patch) {
 for (const preset of supportPresets) {
   const dir = join(root, 'packages/company-pack/presets', preset)
   if (!existsSync(join(dir, 'agent.cordis.yml'))) {
-    fail('preset-file', `${preset}/agent.cordis.yml 缺失（委派子人格 preset 必须随包发布）`)
+    fail('preset-file', `${preset}/agent.cordis.yml 缺失（非角色 preset 必须随包发布）`)
   }
-  // 子人格若声明了 skills（SA/SQA），同样要过 frontmatter 校验——否则 skill 会静默不挂。
+  // 非角色 preset 若声明了自己的 skills 目录，同样要过 frontmatter 校验——否则 skill 会静默不挂。
   const skillsDir = join(dir, 'skills')
   if (existsSync(skillsDir)) {
     for (const entry of readdirSync(skillsDir, { withFileTypes: true }).filter(e => e.isDirectory())) {
@@ -55,5 +55,5 @@ for (const role of roles) {
     if (!body.includes(`name: ${s.name}`)) fail('skill-name', `${role}/${s.name} frontmatter name 不匹配目录名`)
   }
 }
-ok(`presets ×${roles.length} + 子人格 ×${supportPresets.length}`)
+ok(`presets ×${roles.length} + 非角色 ×${supportPresets.length}`)
 }

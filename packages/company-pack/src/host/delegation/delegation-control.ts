@@ -25,7 +25,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { composedPresetOf } from '../prompt/handbook.ts'
-import { WORKER_FAMILY_PRESETS } from '../../lib/delegation-surface.ts'
+import { NON_ROLE_PRESETS } from '../../lib/delegation-surface.ts'
 
 /** 父会话 durable catalog 里的 `subagent/catalog` 事件（只取本模块用到的字段）。 */
 interface CatalogEvent {
@@ -275,8 +275,9 @@ export function registerDelegationControl(ctx: Context): void {
   const install = (agent: AgentLike): void => {
     if (fibers.has(agent)) return
     const preset = composedPresetOf(agent.ctx)
-    // worker family 的声明里没有 control 面：host 不能靠全局注册绕过它（BUG-052）。
-    if (preset !== undefined && (WORKER_FAMILY_PRESETS as readonly string[]).includes(preset)) return
+    // 非角色 preset 的声明里没有 control 面：host 不能靠全局注册绕过它（BUG-052；2026-11-10 起
+    // producer/verifier 也在表内——验证者尤其不该拿 send_to_subagent）。
+    if (preset !== undefined && (NON_ROLE_PRESETS as readonly string[]).includes(preset)) return
     const fiber = agent.ctx.inject(['tools'], scope => {
       const scoped = scope as unknown as ToolScopeLike
       const tools = scoped.tools

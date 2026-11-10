@@ -132,7 +132,7 @@ opened: 2026-11-10
 
 用户 2026-11-10：「`docs-dsh-alignment` 已经落地了，你们要同步一下，免得修改的时候 base 已经变了。」
 
-- [content-charter](./2026-11-10-content-charter.md) 与 [producer-verifier-quality-loop](../../issues/2026-11-10-producer-verifier-quality-loop.md)
+- [content-charter](./2026-11-10-content-charter.md) 与 [producer-verifier-quality-loop](2026-11-10-producer-verifier-quality-loop.md)
   已按本卡后的 docs 基座同步：tier 书架（index 不再逐文档登记）、design→notes、
   `docs/architecture.md`、`docs/contracts/cultivation.md`、doc-budget 5% headroom；
   两卡各带「基座同步」节 + 实施前核对命令。

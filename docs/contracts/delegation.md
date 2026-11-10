@@ -23,6 +23,13 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 | `vp_sales` | VP-Sales（销售） | `provider: spawn` · `maxDepth: 1` · `agentPreset: vp-sales` |
 | `subagent_research` | 只读调研执行手（一次性调研） | `provider: spawn` · `agentPreset: worker-researcher`（只读工具面） |
 | `vp_cmo` | CMO（命名专家：MRD/StRS；**只在 vp-eng preset**，CEO 的 vp_cmo 仍 maxDepth 1） | `provider: spawn` · `maxDepth: 2` · `agentPreset: cmo` |
+| `quality_loop_produce` | 产出者（质量环"做"的一侧；**只在 vp-eng preset**） | `provider: spawn` · `maxDepth: 2` · `agentPreset: quality-loop-producer` |
+| `quality_loop_verify` | 验证者（质量环"验"的一侧，只读手；**只在 vp-eng preset**） | `provider: spawn` · `maxDepth: 2` · `agentPreset: quality-loop-verifier` |
+
+- **质量环两条行（2026-11-10）**：一个做、一个验，两个**独立 activation** 且**严格串行**（先 `quality_loop_produce` 收工，
+  再 `quality_loop_verify`；同时发 = 让验证者看半成品），preset 共用 `quality-loop-` 前缀——流程住
+  `_shared/skills/quality-loop`、方法住 `<DSH_HOME>/company/methods/<preset id>/`（任务书点名 `<pack>@<version>`，缺了 fail-closed）；行只管独立上下文与工具面
+  （[presets.md](./presets.md)「质量环能力档」）。
 
 - **activation 语义**：调用立刻返回回执 `{ kind: 'activation', subagentId }`（线上文本形如
   `started subagent <id>`）；子代理的**最终正文**作为父会话的完成通知送达
@@ -58,8 +65,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
   但**命名 child 不是 team member**——它加载该职能 preset 时只有全局行可用；缺了就是 activation child 失联。
 - 续驶/连续对话归 team（§3）。
 
-证据：`snapshots/replay/foundation-workspace/replay/session.v3.jsonl` 的第一帧 `request/header`（R2 归档即已如此）；
-`checks/smoke/delegation-smoke.mjs` 在全新会话复现并把它变成回归守卫。
+证据 = `snapshots/replay/foundation-workspace/replay/session.v3.jsonl` 首帧 `request/header`，及 `checks/smoke/delegation-smoke.mjs`（全新会话复现，已固化为守卫）。
 
 ### 2.1 根门 = Team Lead（B1 机制事实）
 
@@ -83,16 +89,12 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 
 ## 4. 能力边界（诚实记账，别假装没有）
 
-1. **委托 child 现在按 `agentPreset` 组合**（0.2.1 的收益）：`vp_eng` 的 child 有自己的角色 skills
-   （`eng-workflow` / `tech-feasibility-review`），不再继承 CEO 的 `chairing-staff-meeting`。
-   `delegation-smoke --delegate` 的 [3] 守卫钉住两件事：child 日志首帧 `agentPreset = vp-eng`；
-   child 工具目录**没有** Team 工具（0.2.1 起组合按 preset 解析，旧的"one-shot child 误见 Team
-   工具"限制已不在本仓复现；若回归，先看 vendor `tool-agent-team` README 的 Known Limitations）。
-2. **要自定义组合/多角色编排** ⇒ 四个职能角色的 `subagent_fork`（可续跑的自身分叉）+ 命名委托；
-   `workflow` 是 vp-eng 的**同身份并行扇出**通道（`workflow-ptc` + `tool-workflow`，不能带 `agentPreset`，
-   不能替代独立结论）；CEO 的编排面仍是 team + 命名委托；命名委托仍是**单职能快捷出稿**的主路。
-3. **并行快捷派活**：多个工具调用可在同一轮并行发起；每个都是独立 activation，完成通知分别回来。
-   要共享任务板/互审仍走 team。
+1. **委托 child 按 `agentPreset` 组合**（0.2.1 的收益）：`vp_eng` 的 child 有自己的角色 skills，不再继承 CEO 的。
+   `delegation-smoke --delegate` [3] 钉住 child 首帧 `agentPreset = vp-eng` 且工具目录**没有** Team 工具
+   （组合按 preset 解析，旧的"one-shot child 误见 Team 工具"不再复现；若回归先看 vendor Known Limitations）。
+2. **要自定义组合/多角色编排** ⇒ 四个职能角色的 `subagent_fork`（可续跑的自身分叉）+ 命名委托；`workflow` 是
+   vp-eng 的**同身份并行扇出**（不能带 `agentPreset`、不能替代独立结论）；CEO 的编排面仍是 team + 命名委托。
+3. **并行快捷派活**：同一轮可并行发起多个调用，每个都是独立 activation；共享任务板/互审仍走 team。
 4. **控制面现状**：根会话是 Lead，`send_message` / `list_agents` / `wait_agent` / `interrupt_agent` 是团队版、
    只认名册成员，够不到根起的 `subagent` child（`list_agents` 只回 `lead`、`send_message` 报
    `active teammate not found`；机制 = §2）。根门改用 `list_subagents`（父会话 durable catalog，重启后可查）
@@ -103,12 +105,10 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 
 ## 5. UI：委派工具卡
 
-- 槽 `tool.call.toolview`（keyed），key = `vp_eng` / `vp_sales`；渲染"委派 · VP-Eng｜brief｜
-  VP 交回的稿子"，状态 running/ok/error/stopped 只从 call/result 切片推导（可回放）。
-- ⚠ **key 必须与 preset 的 `toolName` 逐字一致**：keyed key 域是开放的，拼错**不报错**、只是永不
-  渲染。两边由共享常量 `packages/company-pack/src/client/wiring/delegation-keys.ts` 钉住，
-  `pnpm test` 的 client-face 守卫比对 preset 的 `toolName`。
-- 卡片只依赖 `slots` 服务（不读团队状态），单独 `ctx.inject(['slots'], …)` 注册——不被 team
-  remote 的缺席拖住。
+- 槽 `tool.call.toolview`（keyed），key = `vp_eng` / `vp_sales`；渲染"委派 · VP-Eng｜brief｜VP 交回的稿子"，
+  状态 running/ok/error/stopped 只从 call/result 切片推导（可回放）。
+- ⚠ **key 必须与 preset 的 `toolName` 逐字一致**：keyed key 域开放，拼错**不报错**、只是永不渲染；两边由共享常量
+  `src/client/wiring/delegation-keys.ts` 钉住，`pnpm test` 的 client-face 守卫比对 `toolName`。
+- 卡片只依赖 `slots` 服务（不读团队状态），单独 `ctx.inject(['slots'], …)` 注册——不被 team remote 的缺席拖住。
 
 验证分层与命令 = [tests/README](../../tests/README.md)；本文件不复述。

@@ -54,7 +54,7 @@ import { canonicalPath } from './host/run-bundle/paths.ts'
 export const inject = ['tools', 'approval', 'commands', 'workspaceRegistry']
 
 export type HostConfig = CultivationHostConfig & {
-  /** 覆盖不注入公司手册的 preset id（默认 = `handbook.ts` 按 `WORKER_FAMILY_PRESETS` 派生的 worker family）。 */
+  /** 覆盖不注入公司手册的 preset id（默认 = `handbook.ts` 按 `NON_ROLE_PRESETS` 派生的非角色 preset）。 */
   readonly handbookSkipPresets?: readonly string[]
 }
 
@@ -112,7 +112,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked)
   const contentDir = resolveContentDir(import.meta.url)
   registerHandbook(ctx, contentDir, hasWorkspace ? workspace : undefined,
-    // 默认跳过集合由 handbook.ts 按 WORKER_FAMILY_PRESETS 派生（不在这里写 ID 白名单）；
+    // 默认跳过集合由 handbook.ts 按 NON_ROLE_PRESETS 派生（不在这里写 ID 白名单）；
     // 部署配置只作覆盖旋钮（BUG-047）。
     config.handbookSkipPresets === undefined ? {} : { skipPresets: config.handbookSkipPresets })
   registerWorkflowContract(ctx, contentDir, { workflowPresets: ['vp-eng'] })

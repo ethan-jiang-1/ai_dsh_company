@@ -11,10 +11,10 @@ intent: 记录 2026-11-10 从 SA/SQA 历史需求到四槽/三层方案与宪章
 
 ## 1. 起点：历史 SA/SQA 的需求与退役
 
-- 原始需求卡：[2026-11-06-system-architect-sqa.md](../../_archive/settled_issues/2026-11-06-system-architect-sqa.md)（立卡于 2026-11-06，commit `5e21f8b3`）。原话的问题：真实项目落地时，VP-Eng 一个人既做硬软一体架构、又做需求验证，E（工程）与 V（验证）在同一上下文里，质量不独立。
-- 当时的方案：两个委派子人格 `system-architect`（SA）与 `system-qa`（SQA·V&V），按 V 模型分工——SA 管左侧（系统需求→架构→子系统/接口），SQA 管右侧（单元/集成/系统/验收、独立评审 E 侧产物、质量否决）。子人格档不占编制；CEO 与 vp-eng 各加命名委托行 `maxDepth: 2`；SQA 否决直达 CEO，E 与 V 不许互相代笔。落地 Note = [2026-11-06-sa-sqa-subpersonas.md](../../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)。
-- 后续补强：2026-11-07 需求链（SA 产 SyRS/IRS，SQA 产 `TC-###` + V&V 的 L1–L4，D57/D58）见 [2026-11-07-requirements-teaming-program.md](../../../notes/archived/2026-11-07-requirements-teaming-program.md)；2026-11-08 学科域路由（五学科先判域、任务书声明、SQA 逐行域审计，D59）见 [2026-11-08-sa-sqa-capability-routing.md](../../../notes/archived/2026-11-08-sa-sqa-capability-routing.md)。
-- 2026-11-09 先升 `specialist`，随即退役：两个 preset 目录、委托行、`specialist` 模型字段、support/patch、文档/测试/探针同步删除，见 [2026-11-09-retire-sa-sqa.md](../../../notes/implemented/2026-11-09-retire-sa-sqa.md)。退役理由：它们是"旧思路的专职 V 模型子人格"——方法（V 模型层级、TC 编号、五学科清单）写进了 persona 与 skill，换一家公司就要改包；保留 specialist 会让模型和文档继续维护一套不再需要的身份与 veto 语义。
+- 原始需求卡：[2026-11-06-system-architect-sqa.md](../../settled_issues/2026-11-06-system-architect-sqa.md)（立卡于 2026-11-06，commit `5e21f8b3`）。原话的问题：真实项目落地时，VP-Eng 一个人既做硬软一体架构、又做需求验证，E（工程）与 V（验证）在同一上下文里，质量不独立。
+- 当时的方案：两个委派子人格 `system-architect`（SA）与 `system-qa`（SQA·V&V），按 V 模型分工——SA 管左侧（系统需求→架构→子系统/接口），SQA 管右侧（单元/集成/系统/验收、独立评审 E 侧产物、质量否决）。子人格档不占编制；CEO 与 vp-eng 各加命名委托行 `maxDepth: 2`；SQA 否决直达 CEO，E 与 V 不许互相代笔。落地 Note = [2026-11-06-sa-sqa-subpersonas.md](../../../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)。
+- 后续补强：2026-11-07 需求链（SA 产 SyRS/IRS，SQA 产 `TC-###` + V&V 的 L1–L4，D57/D58）见 [2026-11-07-requirements-teaming-program.md](../../../../notes/archived/2026-11-07-requirements-teaming-program.md)；2026-11-08 学科域路由（五学科先判域、任务书声明、SQA 逐行域审计，D59）见 [2026-11-08-sa-sqa-capability-routing.md](../../../../notes/archived/2026-11-08-sa-sqa-capability-routing.md)。
+- 2026-11-09 先升 `specialist`，随即退役：两个 preset 目录、委托行、`specialist` 模型字段、support/patch、文档/测试/探针同步删除，见 [2026-11-09-retire-sa-sqa.md](../../../../notes/implemented/2026-11-09-retire-sa-sqa.md)。退役理由：它们是"旧思路的专职 V 模型子人格"——方法（V 模型层级、TC 编号、五学科清单）写进了 persona 与 skill，换一家公司就要改包；保留 specialist 会让模型和文档继续维护一套不再需要的身份与 veto 语义。
 - **教训**：E/V 分家这个**结构**是对的；错的是把**方法**放在了身份层。结构复用，方法外置。
 
 ## 2. 新要求（2026-11-10）
@@ -71,7 +71,7 @@ intent: 记录 2026-11-10 从 SA/SQA 历史需求到四槽/三层方案与宪章
 
 ### 4.1 内容三层（已有）
 
-2026-11-09 的通用/产品类型/公司三层 + 机制层，加载 T0/T1/T2，唯一清单 = `packages/company-pack/content/manifest.json`。见 [2026-11-09-generic-specific-separation.md](../../../notes/implemented/2026-11-09-generic-specific-separation.md)。
+2026-11-09 的通用/产品类型/公司三层 + 机制层，加载 T0/T1/T2，唯一清单 = `packages/company-pack/content/manifest.json`。见 [2026-11-09-generic-specific-separation.md](../../../../notes/implemented/2026-11-09-generic-specific-separation.md)。
 
 - 换公司：只改公司层（`company.md` / `policy-lines.md` / 章程）。
 - 换产品类型：换 `content/product-types/<id>/` 包。
@@ -169,8 +169,8 @@ intent: 记录 2026-11-10 从 SA/SQA 历史需求到四槽/三层方案与宪章
 
 ## 9. 产出的卡
 
-- [2026-11-10-content-charter.md](../../_archive/settled_issues/2026-11-10-content-charter.md)：宪章正本 + 入口链 + 卡/Note 字段 + 入口门。
-- [2026-11-10-producer-verifier-quality-loop.md](../../issues/2026-11-10-producer-verifier-quality-loop.md)：两个能力档 + VP-Eng 两行 + 流程 skill + 方法槽 + 审计探针（一张卡）。
+- [2026-11-10-content-charter.md](../../settled_issues/2026-11-10-content-charter.md)：宪章正本 + 入口链 + 卡/Note 字段 + 入口门。
+- [2026-11-10-producer-verifier-quality-loop.md](../../settled_issues/2026-11-10-producer-verifier-quality-loop.md)：两个能力档 + VP-Eng 两行 + 流程 skill + 方法槽 + 审计探针（一张卡）。
 
 ## 10. 证据边界
 

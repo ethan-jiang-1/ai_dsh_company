@@ -1,4 +1,4 @@
-# 2026-11-09 · 公司手册的 worker family 边界：按 archetype 派生，不按 ID 白名单
+# 2026-11-09 · 公司手册的 worker family 边界：按「是否公司角色」派生，不按 ID 白名单
 
 状态：implemented（2026-11-09 交付；上游 = [BUG-047](../../_backlog/_archive/fixed_bugs/BUG-047-worker-family-handbook-scope.md)；根因同 [delegation-surface-single-source](./2026-11-09-delegation-surface-single-source.md)：期望源不覆盖后加 profile）
 
@@ -16,12 +16,12 @@
 
 ## 决定
 
-1. **归属按 archetype 派生**：模型新增 `handbookSkipPresets()`，返回
+1. **归属按「是否公司角色」派生**（2026-11-10 起；原表述 = archetype=worker）：模型新增 `handbookSkipPresets()`，返回
    `archetype === 'worker'` 的全部 preset（`worker` / `worker-researcher` / `worker-orchestrator`）。
    worker family 是执行手，不是公司角色；新增 worker profile 自动继承。company 角色（lead/full）继续注入。
-2. **运行时默认取 family**：pack 的 `WORKER_FAMILY_PRESETS` 是唯一运行时表；
+2. **运行时默认取 family**：pack 的 `NON_ROLE_PRESETS` 是唯一运行时表；
    [`handbook.ts`](../../packages/company-pack/src/host/prompt/handbook.ts) 的 `registerHandbook`
-   默认 `skipPresets = WORKER_FAMILY_PRESETS`（不再默认空集），`src/index.ts` 只在部署显式配置时传覆盖。
+   默认 `skipPresets = NON_ROLE_PRESETS`（不再默认空集），`src/index.ts` 只在部署显式配置时传覆盖。
    `cordis.patch.yml` 删掉 `handbookSkipPresets: ['worker']` 的窄覆盖——默认就是对的。
 3. **worker-researcher 的取舍写死**：它不注入公司手册；公司事实按 brief 读
    `.dsh-company/kb/company.md`（persona 原本就这么写）。不保留“persona 说不要、系统却给”的矛盾。
@@ -42,7 +42,7 @@
 ## 后果
 
 - 新增 worker profile：加进 `PRESET_IDS`/`COMPOSITIONS`（archetype worker）与 pack 的
-  `WORKER_FAMILY_PRESETS`；两份 spec 会同时钉住模型与主机默认值，不再靠记忆。
+  `NON_ROLE_PRESETS`；两份 spec 会同时钉住模型与主机默认值，不再靠记忆。
 - 公司角色的手册注入不变（`content/AGENTS.md` 仍是只读产品内容；`agent-instructions` 仍只加载
   用户项目自己的 AGENTS.md/CLAUDE.md，两者不混）。
 - `cordis.patch.yml` 的注释保留一行示例（注释掉），说明部署要覆盖时怎么写，避免下一个人把窄列表写回来。
@@ -54,7 +54,7 @@ pnpm exec vitest run tests/presets/delegation-model.spec.ts tests/host/prompt/ha
 # 绿：2 files / 17 tests passed（handbook family 用例覆盖三个 profile；full role 仍注入）
 ```
 
-**红形态**：把 `WORKER_FAMILY_PRESETS` 收窄成 `['worker']`（模拟“只跳 leaf”的旧行为）⇒
+**红形态**：把 `NON_ROLE_PRESETS` 收窄成 `['worker']`（模拟“只跳 leaf”的旧行为）⇒
 **2 failed**：模型 parity 用例（`expected [ 'worker' ] to deeply equal [ 'worker', 'worker-researcher', … ]`）
 与 handbook family 用例（`worker-researcher: expected [ { name: 'company:handbook', … } ] to have a length of 0 but got 1`）。
 还原后 17 passed。

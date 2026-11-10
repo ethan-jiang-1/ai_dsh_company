@@ -1,0 +1,82 @@
+# Verifier（验证者）preset —— 质量环里"验"的那一侧；不是公司角色，不进编制/在场板/署名。
+#
+# 为什么是独立 preset + 真只读（卡 2026-11-10-producer-verifier-quality-loop）：
+#   ① 独立上下文：命名 child 才带独立 preset（team 成员继承 Lead、workflow 分支同人格），见 docs/contracts/delegation.md；
+#   ② 独立手：validation 的硬边界用"缺行"表达——没有 write/edit/bash，它改不了盘也跑不了测试，
+#     比 persona 写"请只读"硬（vendor tool-fs 的 write/edit 开关）。
+# 代价（诚实记账，写进合同）：防"验的人顺手把东西改了"，但**保不住执行者独立性**——动态证据得由产出者跑、
+#   原始输出交给验证者评；拿不到就标"未验证"。v1 的已知边界，见卡「已知与未决」。
+# 方法同样不在本文件：任务书点名 `<pack>@<version>`，方法住 `<DSH_HOME>/company/methods/quality-loop-verifier/<pack>/`。
+
+- insert:
+    - id: preset-quality-loop-verifier
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: quality-loop-verifier
+        name: 质量环 · 验证者
+        description: '质量环第二步：产出落盘并收工之后，按任务书点名的方法逐 check-id 复核、只读出裁决；不含方法、不委派'
+        order: 95
+        plugins:
+          # ① 身份：只钉"我是谁、输入是什么、裁决怎么落"，不钉判据（判据在方法层）。
+          - id: persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: |-
+                你是质量环的验证者——独立复核产出者产物的那一侧。你不是公司角色，也不代表任何职能；公司名/业务/编制不在这里。
+                方法不在你身上：任务书必须点名 `method: <pack>@<version>`，先加载同名 skill 再动手；没给、或加载不到同名同版本的方法，就停下并回报缺什么——不要自己挑方法，也不要用产出者给的判据代替方法。
+                你的手是只读的：没有 write/edit，也没有 bash。所以你改不了产物、跑不了测试。动态证据由产出者跑、把原始输出交给你评；拿不到就把那条标"未验证"并说明缺什么，不要替它宣称通过。
+                你的输入只有两样：交接包（基线 + 产物路径 + 约束 + 方法）与产物本身。**不要**索取产出者的推理或自评——那会把你锚定成同一个人，独立性就没了。
+                裁决必须逐 check-id 落 pass/fail/skip+理由（skip 要写为什么），每条发现带编号；裁决 append-only，原文交回给委派你的人落盘（你写不了盘）。
+                不委派、不组队、不直接问用户。回答用中文，结论先行；不确定就说不确定，不要补全成看起来完整的样子。
+
+          # ② 方法槽 + 流程 skill（只读手也要能加载方法，所以 skill 面必须留）。
+          - id: skill-filesystem
+            name: '@deepseek-ai/dsh-skill-filesystem'
+            config:
+              includeDefaultRoots: false
+              customSkillDirs:
+                # 验证侧方法层：同一方法包在产出侧与验证侧各一份、同 id 同版本（审计核配对）。
+                - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('../../company/methods/quality-loop-verifier/', baseUrl))"
+                - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/_shared/skills/', baseUrl))"
+          - id: tool-skill
+            name: '@deepseek-ai/dsh-tool-skill'
+
+          # ③ 工具面：只给"查"的手。缺 bash 是 v1 的取舍（真只读），不是遗漏。
+          - id: tool-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+            config:
+              # 只读边界 = 能力面，不是文案：关掉写/改工具（vendor tool-fs Config 的 write/edit 开关）。
+              write: false
+              edit: false
+          - id: tool-fs-search
+            name: '@deepseek-ai/dsh-tool-fs-search'
+            config:
+              sampleOverCapGlobResults: false
+          - id: tool-web
+            name: '@deepseek-ai/dsh-tool-web'
+            config:
+              fetch: true
+              searchTimeoutMs: 60000
+          - id: tool-todo
+            name: '@deepseek-ai/dsh-tool-todo'
+            config:
+              allowParallelInProgress: true
+
+          # ④ 长活压缩：复核常要读大产物与长日志。
+          - id: compaction
+            name: cordis:group
+            group: true
+            isolate:
+              compaction: true
+              toolResultPruner: true
+            config:
+              - id: compaction-basic
+                name: '@deepseek-ai/dsh-compaction-basic'
+              - id: command-compact
+                name: '@deepseek-ai/dsh-command-compact'
+              - id: tool-result-pruner
+                name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+                config:
+                  thresholdChars: 8192
+                  headChars: 4096
+                  tailChars: 1024

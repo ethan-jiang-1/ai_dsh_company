@@ -63,3 +63,4 @@
 | D57 | 需求编号=身份（MR/REQ/IF/TC）；层归文档头、状态归条目；`/req check` 判重复/悬空/退役/孤儿/覆盖 | [teaming Note](../../notes/archived/2026-11-07-requirements-teaming-program.md) |
 | D58 | VP-Eng 三门：根门=Lead（带小队）；命名 child 按 agentPreset 请 CMO；CEO teammate 受 maxDepth 1 | [teaming Note](../../notes/archived/2026-11-07-requirements-teaming-program.md) |
 | D59 | ~~SA 先判域、SQA 域审计~~ 2026-11-09 退役 SA/SQA；SyRS/IRS/V&V 改为按需指派 owner | [退役 Note](../../notes/implemented/2026-11-09-retire-sa-sqa.md) |
+| D60 | 质量环 = 两个 support 能力档 + 流程 skill + 角色方法层（任务书点名 `<pack>@<version>`）+ 事后审计；对外签字归人 | [Note](../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md) · [卡](../../_backlog/_archive/settled_issues/2026-11-10-producer-verifier-quality-loop.md) |

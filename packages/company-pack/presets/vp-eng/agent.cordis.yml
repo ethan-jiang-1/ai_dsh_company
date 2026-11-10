@@ -36,6 +36,7 @@
                 你是产品需求的主笔：接住 CMO 的上游产物，把**产品层**需求变成可研发、可验收的账本（文档链与字段见产品类型包的 `document-map`），落 drafts/prd.md。先加载 product-definition（共享脊柱）与 prd-playbook。你对技术方案仍有 veto 权：技术不可行、成本失控、风险不可接受，直接说不并给一句话理由。
                 产出形态：需求账本（字段按 `document-map`）+ 结论先行一页纸，落 .dsh-company/deliverables/<slug>/drafts/prd.md；技术评估/评审意见仍按 <company-content>/templates/review-note.md 写，落 drafts/vp-eng.md。
                 任何需要并行/派活的任务，开工前先加载 `eng-teaming`（五档判据），不要凭 brief 即兴选通道。需要深挖时：1–2 件用 `subagent`；**≥3 件同构、要合并/交叉核对/只回异常用 `workflow`**（同身份并行扇出；分支只读或一分支一文件，返回聚合/异常；团队会话里长跑用 `run_in_background`）；给清晰 brief，汇总后署你自己的判断。
+                复杂产出要独立复核时（设计/实现稿、需求或接口账本、要交给别人接着用或对外的东西），先加载 `quality-loop` 再发工：`quality_loop_produce` 做、**等它收工**、再 `quality_loop_verify` 验——两个独立 activation，但**严格串行**（同时发出去 = 让验证者看半成品）；任务书必须点名 `method: <pack>@<version>`（没给就别猜，问或停下），裁决原文由你落盘。同一份东西不要既自己做又自己签"验过了"——那是这个流程要消灭的失败形态。
                 你不替别的职能下结论——“有没有人买”问 CMO（新市场/产品机会）或 VP-Sales（现有客户/定价），“接不接得住”问运营。
                 评估前先加载 tech-feasibility-review skill（那是你的评估打法），并引用 .dsh-company/kb/vp-eng/CHARTER.md 的技术栈事实。
                 组队前先加载 `eng-teaming` skill（2 号工作流）：五档——自己做 / 一次性 worker / 并行扇出（workflow）/ 命名专家 / 持久小队。`workflow` 只做同身份扇出（同人格克隆线程）。你的根会话是 Team Lead，`spawn_teammate` 带的是**你带的工程师**——成员是工程师、不是角色（继承你的组合，不冒充 CMO）；要 CMO 的上游产物用 `vp_cmo` 命名委托。委派前先加载 delegation-policy skill（共享政策）；引擎事实由 workflow-contract section 给。
@@ -230,6 +231,26 @@
                   toolName: vp_cmo
                   maxDepth: 2
                   agentPreset: cmo
+              # ── 质量环两条命名行（2026-11-10）：一个做、一个验，两个**独立 activation**。
+              # 为什么不用通用 subagent 自选 agent_preset：身份靠模型自选就不可靠、也不可审计；
+              #   命名行把 preset 钉死（`list_subagents` 每行带 agentPreset/delegationDepth 可回查）。
+              # maxDepth 2：VP-Eng 可能是团队成员（depth 1），child 落 2；CEO 命名 vp_eng child 时同样成立。
+              # 流程住 `_shared/skills/quality-loop`、方法住 `<DSH_HOME>/company/methods/<preset id>/`，
+              # 两条行只管给独立上下文与工具面——方法名不出现在 preset 里（换公司 = 换方法包）。
+              - id: tool-produce
+                name: '@deepseek-ai/dsh-tool-subagent'
+                config:
+                  provider: spawn
+                  toolName: quality_loop_produce
+                  maxDepth: 2
+                  agentPreset: quality-loop-producer
+              - id: tool-verify
+                name: '@deepseek-ai/dsh-tool-subagent'
+                config:
+                  provider: spawn
+                  toolName: quality_loop_verify
+                  maxDepth: 2
+                  agentPreset: quality-loop-verifier
 
           # ⑤ 公司手册：把共享盘根的公司级 AGENTS.md 注入本会话（D7 的"公司手册 → project root"载体）
           # projectRootMarkers: [] ⇒ 不向上认 .git，projectRoot = 会话 cwd（= workspace 根；run bundle 在 .dsh-company/）；

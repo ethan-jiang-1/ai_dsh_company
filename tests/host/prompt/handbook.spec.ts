@@ -1,5 +1,5 @@
 /** 公司手册注入 v3：只读内容来自 pack content/；override 优先；system prompt section 注册。 */
-// 负例留证 2026-11-09：把 WORKER_FAMILY_PRESETS 只留 ['worker'] ⇒「默认跳过整个 worker family」用例红；
+// 负例留证 2026-11-09：把 NON_ROLE_PRESETS 只留 ['worker'] ⇒「默认跳过整张非角色表」用例红；
 // 还原 ⇒ 绿。BUG-047
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -133,11 +133,11 @@ function sectionsFor(dir: string, preset: string, options?: { skipPresets?: read
 }
 
 describe('worker family 的 handbook 边界（BUG-047）', () => {
-  it('默认跳过整个 worker family：orchestrator/researcher 不再被注入', () => {
+  it('默认跳过整张非角色表：worker family 与质量环能力档都不注入', () => {
     const dir = content()
     try {
       // 期望集合来自模型（不是被删窄的运行时表），这样“少跳一个 profile”会真红。
-      expect([...handbookSkipPresets()]).toEqual(['worker', 'worker-researcher', 'worker-orchestrator'])
+      expect([...handbookSkipPresets()]).toEqual(['worker', 'worker-researcher', 'worker-orchestrator', 'quality-loop-producer', 'quality-loop-verifier'])
       for (const preset of handbookSkipPresets()) {
         expect(sectionsFor(dir, preset), preset).toHaveLength(0)
       }

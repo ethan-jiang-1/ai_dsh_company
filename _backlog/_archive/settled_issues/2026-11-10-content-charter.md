@@ -35,7 +35,7 @@ opened: 2026-11-10
 
 **"抽象"在这里到底指什么。** 不是"写得更通用、更漂亮"，而是**让内容跟它真正会一起变的东西住一层**：换公司会变的（政策、阈值、公司事实）→ 公司层；换产品类型会变的（需求链、模板、领域词）→ 产品类型层；换做法会变的（方法、检查表、判据）→ 方法层；换公司/产品类型/方法都不变的（身份、工具面、流程契约）→ 通用层。判断标准是**寿命 / 改动成本**，不是审美。历史上几次踩坑的共性：把"方法"或"公司事实"放进了高成本层（preset/代码），于是换公司 = 改包。
 
-**为什么这次要宪章，而不是再来一次"这次注意点"。** 前几次调整都是人当场判断，没有留下"以后怎么判断"的规则；下一次 agent 仍会从手上的文件开始改。宪章 + 归位 skill + 入口门 + 卡/Note 字段，是把这次判断变成默认动作。更细的过程与证据见研究题 [README](../../research/capability-placement-and-quality-loop/README.md) 与 [推演材料](../../research/capability-placement-and-quality-loop/2026-11-10-deliberation.md)。
+**为什么这次要宪章，而不是再来一次"这次注意点"。** 前几次调整都是人当场判断，没有留下"以后怎么判断"的规则；下一次 agent 仍会从手上的文件开始改。宪章 + 归位 skill + 入口门 + 卡/Note 字段，是把这次判断变成默认动作。更细的过程与证据见研究题 [README](../research/capability-placement-and-quality-loop/README.md) 与 [推演材料](../research/capability-placement-and-quality-loop/2026-11-10-deliberation.md)。
 
 **术语。** 三层 = 通用 / 产品类型 / 公司（+ 机制引擎、方法正交轴）；四槽 = 人 / 流程 / 方法 / 政策；方法层 = `<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`；归位 = 先答"换什么会改它"，再决定住哪层；宪章 = 归位与抽象层次的规则家，skill = 步骤，门禁 = 必须，卡/Note = 记录。
 
@@ -43,7 +43,7 @@ opened: 2026-11-10
 
 - 三层内容模型、方法层、独立性口径都已现行：内容分层见 [2026-11-09-generic-specific-separation.md](../../../notes/implemented/2026-11-09-generic-specific-separation.md)；方法层见 [cultivation.md](../../../docs/contracts/cultivation.md)；复核独立性见 [review-protocol.md](../../../packages/company-pack/content/company/review-protocol.md)。
 - 旧 SA/SQA 的教训：E/V 分家的结构对，但方法写进 persona/skill，换公司要改包，2026-11-09 退役。历史见 [原问题卡](./2026-11-06-system-architect-sqa.md) 与 [退役 Note](../../../notes/implemented/2026-11-09-retire-sa-sqa.md)。
-- 本轮全过程与宪章草案见研究题：[README](../../research/capability-placement-and-quality-loop/README.md)、[推演材料](../../research/capability-placement-and-quality-loop/2026-11-10-deliberation.md)、[宪章草案](../../research/capability-placement-and-quality-loop/2026-11-10-charter-draft.md)。
+- 本轮全过程与宪章草案见研究题：[README](../research/capability-placement-and-quality-loop/README.md)、[推演材料](../research/capability-placement-and-quality-loop/2026-11-10-deliberation.md)、[宪章草案](../research/capability-placement-and-quality-loop/2026-11-10-charter-draft.md)。
 - 用户 2026-11-10 约束：本轮只改 `_backlog/`，落地时才动仓库其他部分。
 
 **未决问题：**

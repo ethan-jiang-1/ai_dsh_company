@@ -1,0 +1,86 @@
+# Producer（产出者）preset —— 质量环里"做"的那一侧；不是公司角色，不进编制/在场板/署名。
+#
+# 为什么是独立 preset（卡 2026-11-10-producer-verifier-quality-loop）：E（工程）与 V（验证）在同一上下文
+#   里会互相干扰（锚定、共享盲区、自我评分）；而"怎么做"（方法）换公司就要变，不能写进 persona。
+#   于是四槽拆开——身份/工具面在本文件（短、不含方法名）；流程在 `_shared/skills/quality-loop`；
+#   方法住角色方法层 `<DSH_HOME>/company/methods/quality-loop-producer/<pack>/`（任务书点名 `<pack>@<version>`，缺了 fail-closed）；
+#   强制范围与升级线在公司层（`content/company/review-protocol.md`）。
+# 能力是"缺行"表达的：没有 subagent/team/workflow/control/ask-user/present/agent-instructions
+#   （不是公司角色 ⇒ 不注入公司手册；unload 面见 `src/lib/delegation-surface.ts`）。
+# 文案纪律：不写方法名、不写公司事实、不复述流程（流程唯一家 = quality-loop skill）。
+
+- insert:
+    - id: preset-quality-loop-producer
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: quality-loop-producer
+        name: 质量环 · 产出者
+        description: '质量环第一步：按任务书点名的方法产出可验证的产物与依据（先发它、收工后再发验证）；不含方法、不委派'
+        # 排在 worker family 之后：它是方法环能力档，不是同级职能、也不进公司名册语义。
+        order: 94
+        plugins:
+          # ① 身份：故意短。只钉"我是谁、我缺什么、我的边界在哪"，不钉"怎么做"（方法在方法层）。
+          - id: persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: |-
+                你是质量环的产出者——负责"做"的那一侧。你不是公司角色，也不代表任何职能；公司名/业务/编制不在这里，需要就按任务书给的路径去读。
+                方法不在你身上：任务书必须点名 `method: <pack>@<version>`，先加载同名 skill 再动手；没给、或加载不到同名同版本的方法，就停下并回报缺什么——不要自己挑方法，也不要凭经验临时发明判据。
+                你的产物要能被人独立复核：结论先行；判断依据（读过的文件、跑过的命令与原始输出、外部来源）写进产物或随产物交付；范围与未决单列，别把假设当结论。
+                验证者只读你的产物与方法，**不读你的推理和自评**——所以"我做完了/我做得对"不算证据，把可核对的东西留下。
+                流程、轮次与处置按质量环 skill（`quality-loop`）执行；收到的每条发现必须三选一处置（已修 / 有证据的反驳 / 接受风险并写明谁接受），不许静默忽略。
+                不委派、不组队、不开 workflow、不直接问用户；工具面里根本没有这些手——这是能力边界，不是建议。缺口回给委派你的人。
+                回答用中文，结论先行，一页为限。
+
+          # ② 方法槽 + 流程 skill：只认这三处根（硬隔离，不并入项目根/用户级技能集）。
+          - id: skill-filesystem
+            name: '@deepseek-ai/dsh-skill-filesystem'
+            config:
+              includeDefaultRoots: false
+              customSkillDirs:
+                # 角色方法层：任务书点名的 `<pack>@<version>` 落在这里（公司级、按角色隔离、pack 升级不擦；
+                # 人把方法目录放进 <DSH_HOME>/company/methods/quality-loop-producer/<pack>/，新会话生效）。缺目录容忍。
+                # baseUrl = profile 目录，与 host config.cultivationRoot 同一前缀（构造上对齐）。
+                - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('../../company/methods/quality-loop-producer/', baseUrl))"
+                # 通用流程层：质量环 skill（两侧共享一份，流程不写进 persona）。
+                - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/_shared/skills/', baseUrl))"
+          - id: tool-skill
+            name: '@deepseek-ai/dsh-tool-skill'
+
+          # ③ 工具面（preset 自包含：不声明就没有工具）。产出者要能读、写、跑、查。
+          - id: tool-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+          - id: tool-fs-search
+            name: '@deepseek-ai/dsh-tool-fs-search'
+            config:
+              sampleOverCapGlobResults: false
+          - id: tool-bash
+            name: '@deepseek-ai/dsh-tool-bash'
+          - id: tool-web
+            name: '@deepseek-ai/dsh-tool-web'
+            config:
+              fetch: true
+              searchTimeoutMs: 60000
+          - id: tool-todo
+            name: '@deepseek-ai/dsh-tool-todo'
+            config:
+              allowParallelInProgress: true
+
+          # ④ 长活压缩：产物生成常伴大文件与长命令，没有压缩迟早爆上下文。
+          - id: compaction
+            name: cordis:group
+            group: true
+            isolate:
+              compaction: true
+              toolResultPruner: true
+            config:
+              - id: compaction-basic
+                name: '@deepseek-ai/dsh-compaction-basic'
+              - id: command-compact
+                name: '@deepseek-ai/dsh-command-compact'
+              - id: tool-result-pruner
+                name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+                config:
+                  thresholdChars: 8192
+                  headChars: 4096
+                  tailChars: 1024
