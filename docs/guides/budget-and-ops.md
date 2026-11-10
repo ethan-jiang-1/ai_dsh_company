@@ -10,9 +10,9 @@
 
 | 旋钮 | 默认 | 在哪调 | 对本项目的意义 |
 |---|---|---|---|
-| team `maxMembers` | 8 | host 行 config（startup 校验 fail-loud） | CEO+4 职能=5，留 3 个余量；扩编制才调 |
+| team `maxMembers` | 8 | host 行 config（startup 校验 fail-loud） | 当前六角色，8 够用；扩编制才调 |
 | team `maxTasks` / `maxMessageBytes` | 256 / 64KiB | 同上 | 默认够一场 demo；消息超 64KiB 会拒（长稿走文件+消息里给路径）。0.2.1 删了 `maxPendingMessagesPerMember` |
-| subagent `maxDepth` | **1**（rc.2 默认；0.1.7 曾为 3） | `tool-subagent` 行（本仓 VP 委托行显式 `maxDepth: 1`） | 组织深度：默认只一层（root→child），child 再生 worker 需显式调大——调大前想清楚失控半径 |
+| subagent `maxDepth` | **1**（rc.2 默认；0.1.7 曾为 3） | `tool-subagent` 行（CEO 的 VP 委托行 = 1；职能 preset 的通用行 = 2，vp-eng = 3） | 组织深度：默认只一层（root→child），child 再生 worker 需显式调大——调大前想清楚失控半径 |
 | `maxTokens`（每次请求输出上限） | adapter/route 默认 | 会话创建 `agentOptions` / 委托工具行 | 防单角色长篇失控（路由 = 全员同模型默认，D16） |
 | compaction 阈值 | preset 行配置 | 各角色 preset 的 compaction 行 | VP 长会话靠压缩保上下文；按角色差异化 |
 
@@ -50,7 +50,7 @@
 | 演示中途要撤回某 VP 的话 | — | Lead `interrupt_agent` + 任务板 reopen；会话日志不可改，复盘时用回放解释 |
 | demo 崩了要重来 | 所有团队状态在 Lead session log（durable） | 重开进程冷恢复：teammates inactive 冷恢复收 queued 消息；或从 JSONL 回放叙事 |
 
-每场 demo/排练结束跑一遍**收割三问**（机制家 = [dev-loop §12](./dev-loop.md)）：①抓到异常没 → BUG 卡 + 红绿；②行为值得钉吗（「变了我们要不要知道」）→ `--record` 录 replay 场景或钉判据；③撞到运行态事实没 → 调试阶梯 / 本篇。三问全「无」如实记，不硬凑。
+每场 demo/排练结束跑一遍**收割三问**（机制家 = [close-out-definition skill](../../.agents/skills/close-out-definition/SKILL.md)）：①抓到异常没 → BUG 卡 + 红绿；②行为值得钉吗（「变了我们要不要知道」）→ `--record` 录 replay 场景或钉判据；③撞到运行态事实没 → 调试阶梯 / 本篇。三问全「无」如实记，不硬凑。
 
 ## 4. 回放与复盘
 

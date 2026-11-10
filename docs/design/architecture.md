@@ -153,7 +153,7 @@ wait_agent / interrupt_agent / team_task_*）。
 - teammate 可以 `fresh`（干净上下文）或 `fork`（继承 Lead 已完成轮次——**会议上下文下发的现成机制**）。
 - 代价与约束：**experimental、无稳定性承诺**（必须钉 vendor tag + 升级环）；teammates 共享 Lead 的
   composition（§4）；flat roster（只有 Lead 能建人、不能嵌套团队、名字不复用）；一个进程一个共享
-  checkout；`maxMembers` 默认 8；需要 `dsh-session-persistence-jsonl` 才激活。
+  checkout；`maxMembers` 官方 bundle 与 pack 钉 8（代码默认 16）；需要 `dsh-session-persistence-jsonl` 才激活。
 
 ### 通道 C · dsh-sdk 子进程（hard isolation，one-shot）
 
@@ -233,7 +233,7 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
 1. **工具面归 preset 自己声明（自包含）；profile/bundle 行只管全局服务与默认行**（R1 二次实证：
    原设计"共享行放 host/profile 层、preset 只放差异"**对工具面不成立**——R1 首跑 CEO 会话只拿到
    bundle 加的 10 个工具（团队 9 + present），没有 fs/skill，于是读不了 CHARTER、加载不了 skill、
-   **写不出交付物**）。shipped `standard` 同样是自包含：255 行里自己声明
+   **写不出交付物**）。shipped `standard` 同样是自包含：自己声明
    tool-bash/tool-fs/tool-fs-search/tool-skill/goal/planning/compaction/delegation/…。
    故每个角色 preset 声明自己那套工具行（复制式演化——DSH 无 patch 继承）；pack 的
    `cordis.patch.yml` 只负责**全局行**（registry roster、团队两行、present）。
@@ -267,13 +267,12 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
 
 - **experimental 漂移**：agent-team 无稳定性承诺，契约可自由变。→ vendor 钉 tag + SHA 簿记 +
   `sync-dsh.mjs` 升级环 + compatibility 矩阵；升级前看 `_digested/_change_log/`。
-- **maxMembers 本仓钉 8**（代码默认 16，官方 bundle 同钉 8）：CEO + 4 职能 = 5 没问题；要扩编制就调 config（startup 校验，fail loud）。
+- **maxMembers 本仓钉 8**（代码默认 16，官方 bundle 同钉 8）：当前六角色，8 够用；要扩编制就调 config（startup 校验，fail loud）。
 - **共享 checkout 的越界写**：writeScopes/KB 私有目录都是约定级；要硬隔离用独立 preset 会话或
   sdk child。
 - **日志税**：以后写自定义工具时，每个模型可见的新状态都要配 `SessionEventMap` 成员，否则
   JSONL 回放不出来（dev-loop 第 3 阶段第 2 问）。
-- **preset 复制式演化的坑**：改共享行要记得 4 个 preset 都看得到的是 host 层那份；preset 内只放
-  差异，别把共享行复制进 preset。
+- **preset 复制式演化的坑**：工具行必须逐 preset 声明（DSH 无 patch 继承）；host 层只放全局行。别把“preset 内只放差异”套到工具面——R1 已证伪。
 - **第 0 天别做**：registry.json / shared 包 / 每角色一个 npm 包 / OpenSpec——等触发条件
   （第二个独立演化的专家、第二贡献者）再上（FAQ 13 推荐路径）。
 

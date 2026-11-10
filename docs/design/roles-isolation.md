@@ -72,9 +72,8 @@ realm 行（角色可各自选压缩策略）、token 计量按 session 键控�
   （join 父会话正在用的同一 preset generation），
   `packages/subagent/subagent/src/child-agent.ts:199-218` 的 `applyChildComposition`：
   先 join 父 preset，再叠 per-child persona（scoped section shadow）和 toolFilter（restrict）。
-  **continuable 孩子（含 Agent Teams 的 teammates）被 continuation manager 固定走这条路**
-  （`continuation-activation.ts:579-587`：`materializeTracked` 的 setup 无条件调
-  `applyChildComposition`）——想给 teammate 换 preset，当前只能提上游 seam 或 vendor patch。
+  **Agent Teams 的 teammates 仍被 continuation manager 固定走这条路**（命名 child 0.2.1 起
+  由工具行 `agentPreset` 给组合，见 §4）——想给 teammate 换 preset，当前只能提上游 seam 或 vendor patch。
 - **官方裂缝**：`ctx.agentPresets.mount(agentCtx, id)` 是公开 API，JSDoc 明说
   "Call from the agent factory's `setup(agentCtx)`"，而 `ctx.agents.create` 的 setup
   **是可 await 的**（`CreateAgentOptions.setup`：factory awaits setup after minting agentCtx，

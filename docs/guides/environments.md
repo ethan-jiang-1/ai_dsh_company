@@ -4,7 +4,7 @@
 > （2026-10-27 自 [开发环 §6](./dev-loop.md) 迁出；节号保留防断链）。
 > 冷启动配方 = [bootstrap](./bootstrap.md)；运行态四轴 = [运行态地图](../runtime-map.md)。
 
-机制与崩溃半径见 FAQ 13 `dual-home-isolation.md`（外部材料）；本 repo 已落 `run/env.sh`。操作面四条：
+机制与崩溃半径见 FAQ 13 `dual-home-isolation.md`（外部材料）；本 repo 已落 `run/env.sh`。操作面如下：
 
 1. **环境兜底优先**：一切会话先 `source run/env.sh`（`DSH_HOME=<repo>/runtime/harness-home`）；
    agent 不会自己想起双 home 的区别，靠环境不靠提醒。

@@ -13,7 +13,7 @@
 |---|---|---|
 | 运行时 | 用户已装 DSH（npm/Desktop）；本包不捆绑运行时；`engines.dsh >=0.2.1-rc.2 <0.3.0` | `dsh --version` / `pack-engines` |
 | profile | 自定义具名 `company`；首次 `--from-default-profile web`；用户/DSH 拥有；本包不写 profile patch | `$DSH_HOME/profiles/company/package.json` 的 `dsh.profile.bundles` |
-| patch 层 | 7 个 `dsh.bundle.patch`；默认值在 bundle patch；profile/home 可覆盖；`config` 整份替换 | `dsh --profile company --dump-config` |
+| patch 层 | `dsh.bundle.patch` 数组；默认值在 bundle patch；profile/home 可覆盖；`config` 整份替换 | `dsh --profile company --dump-config` |
 | app surface | Web（`dsh --profile company`）；client 面随包；Desktop 仅 Plugins 页安装、未真机验证 | 启动横幅 / `client-load-smoke` |
 | Harness home 与数据 | `<workspace>/.dsh-company/` 公司状态；`$DSH_HOME/company/` 治理；sessions/凭据归 DSH | [data-model.md](./data-model.md) |
 | 生命周期 | 应用内 Plugins 页默认；CLI 仅 `dsh web` 自动化；装完重启；无命令级回滚；卸载不删数据 | 安装三态 + 真启动 |

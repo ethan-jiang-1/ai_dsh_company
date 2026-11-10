@@ -10,7 +10,7 @@
 ```text
 安装（Plugins 页 / CLI 仅 web）→ profile boot（$DSH_HOME/profiles/company）
   → 组合层：bundles → profile patch → home patch → --patch
-  → company-pack（bundle 行 + 五 preset 声明 + content/ 只读内容）
+  → company-pack（bundle 行 + preset 声明 + content/ 只读内容）
   → host startup：workspace 解析（DSH_COMPANY_HOME → cwd → saved → none）
   → 公司状态清单（<workspace>/.dsh-company/bundle.json v3 = id / createdAt / pack）
   → 公司状态（.dsh-company/ 只补缺；不 seed 手册/模板）

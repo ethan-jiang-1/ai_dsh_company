@@ -77,7 +77,7 @@ client 模块的声明（pack 的 package.json，对照 dsh-market/团队 UI 两
 ```jsonc
 {
   "dsh": {
-    "bundle": { "patch": ["./cordis.patch.yml", "./presets/ceo/agent.cordis.yml", "…（六角色各一）"] },
+    "bundle": { "patch": ["./cordis.patch.yml", "./presets/ceo/agent.cordis.yml", "…"] },
     "client": {
       "platform": "web",
       "inject": [                       // 依赖边：这些包的工厂先到，我们的行再物化

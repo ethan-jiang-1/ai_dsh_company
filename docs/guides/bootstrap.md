@@ -130,7 +130,7 @@ node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名�
   1. **防线一（快，`pnpm test`）**：已知必填 config 字段必须随工具行给出（如
      `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`）。
   2. **防线二（真，`node checks/smoke/preset-smoke.mjs`）**：boot 真 company profile（`pnpm company` 默认安装目标）→ `agentPresets/list`
-     断言 5 公司角色 + researcher 零 broken → **逐个 `session/create` 真挂一次**。
+     断言六个公司角色 + worker family 零 broken → **逐个 `session/create` 真挂一次**。
   **只有防线二能抓"preset 挂载失败"**：行 config 校验发生在挂载时，roster 扫描与 `--dump-config`
   都看不到，UI 还会吞掉错误（症状就是"新建会话点了没反应"）。已反证：去掉一个必填 config 即变红
   （精确指向 preset 与缺失字段），恢复后 ALL PASS。
