@@ -95,6 +95,10 @@ VP-Eng 一个人既做设计又做验证时，E（工程）与 V（验证）在�
 - **什么会逼它搬家**：若"不同产品类型要用完全不同的质量流程"成为常态，流程要下沉到产品类型包
   （`content/product-types/<id>/`），而不是往 persona 里加分支；若上游给 per-child 只读沙箱，
   验证者可以考虑带 bash（届时改的是工具面与审计判据，流程不动）。
+- **第二家公司 = 不改任何文件**：persona、流程 skill、方法包夹具里都没有公司名/编制/阈值/产品类型词
+  （机械面 = spec 断言 persona 不出现 `kb/company.md` 之类指针、不含退役方法论词）；质量环**不读公司身份**，
+  所以"换一家公司"这件事对本能力是空操作——比拿第二家公司 fixture 跑一遍更强的证据，也因此没有消费
+  `tests/fixtures/companies/`（那两家 fixture 服务的是内容层，不是本能力）。
 - **更低的层被排除**：公司层（只一家公司的 V 模型）不够；产品类型层（只一个产品类型）不够；
   方法层才是"方法"的家，而"流程"比方法更稳定，所以流程不能再跟着方法走。
 
@@ -104,22 +108,19 @@ VP-Eng 一个人既做设计又做验证时，E（工程）与 V（验证）在�
 
 | 命令 | 结果 | 红形态（实跑过） |
 |---|---|---|
-| `pnpm test` | 全绿（169 个 spec 文件 / 1393 项） | 改 `quality-loop-verifier` 的 `write: false` → presets spec 红；把 `handbookSkipPresets()` 收窄 → 模型 parity 红 |
+| `pnpm test` | 全绿（169 个 spec 文件 / 1398 项） | 改 `quality-loop-verifier` 的 `write: false` → presets spec 红；把 `handbookSkipPresets()` 收窄 → 模型 parity 红 |
 | `pnpm typecheck` | 全绿（pack 两面 + 四条 tests 面） | `NON_ROLE_PRESETS` 改名漏一处 import → TS 红 |
 | `pnpm verify` | ALL PASS（含 doc-budget / md-links / bare-path / script-index） | 新 guides 文档无预算、content 里写部署日期、INDEX 未重生成——三处各红过一次，逐项修回 |
 | `node checks/smoke/preset-smoke.mjs` | ALL PASS（6 角色 + 5 非角色 preset 全部真挂载） | 未加 `bundle.patch` 登记时曾 `Unknown agent preset`（门禁 presets 也拦） |
 | `node probes/team/quality-loop-audit.mjs --self-test` | ALL PASS（7 支：基线绿 → 改正文/删处置/换版本/**并行发工**/验证者写盘 各红 → 还原绿） | 自带破坏逐支断言 code |
 | 真盘红证（临时交付目录 + 夹具方法层） | 改裁决正文 → `body-modified` exit 1；删一条处置 → `disposition-missing` exit 1；把验证侧方法版本改成 1.0.1 → `version-mismatch` + `header-method` exit 1；逐项还原 → exit 0 | 三种破坏各自只出对应 code |
-| **真模型 E2E**（一次） | VP-Eng 会话 `session-1ba03b70…`：`quality_loop_produce` → child `5695a114…`（preset=quality-loop-producer / depth=1）；`quality_loop_verify` → child `412c9b7d…`（preset=quality-loop-verifier / depth=1，工具面只调过 `skill`+`read`）。裁决 R1 = fail（RT-01…RT-04 全覆盖，1 blocker + 1 advisory）→ 处置 → R2（同一 child 续跑）= pass。**这次 E2E 在改名之前跑**（当时 preset id = `producer` / `verifier`），改名只换 id 与目录名、判据与流程未变。`quality-loop-audit --deliverable …` = ALL PASS（2 条 `carried-forward` warning） | E2E 首跑时审计报 6 处红，分成两类并各自处置：**判据过严**（原文只认最后一条消息、处置首格带标题不认编号）→ 改判据 + 加 spec；**契约缺口**（R2 没出处置表，因为发工 prompt 只点了 r1）→ 定为"处置归首轮"语义并写进 skill |
+| **真模型 E2E**（最终一轮） | VP-Eng 会话 `session-1b5a948b…`，**严格串行**：`quality_loop_produce` → child `77dfbd4c…`（preset=quality-loop-producer / depth=1）收工后，才 `quality_loop_verify` → child `b9844a02…`（preset=quality-loop-verifier / depth=1；工具面只调过 `skill` + `read`×2 + `grep`×2，**零 write/edit/bash**）。裁决 R1 = fail（RT-01…RT-04 全覆盖，4 条发现：2 已修 + 2 有证据的反驳），裁决头 `session/preset/depth/producer/method/body-sha256` 齐全且与正文、与该 child 正文三方一致。`quality-loop-audit --deliverable …` = **ALL PASS、零 warning**（含 `order-violation` 未触发 = 先产后验成立）。证据副本留在 dev workspace 的 `deliverables/2026-11-10-qloop-e2e-r3/`（gitignored），随时可重跑审计 | 头两轮 E2E 是**改判据的证据来源**（三轮才绿）：第一轮抓出「原文只认最后一条消息」「处置首格带标题不认编号」两条判据过严 → 改判据 + 加 spec；第二轮抓到发工 prompt 漏了 `preset`/`producer` 字段（我自己写错）→ 证明头的字段缺一个就红；第三轮抓出「处置词带 `**加粗**` 判红」「处置表夹 `无` 行冒假 id」→ 归一化排版 + 只认 `F<n>` 行 |
 
-E2E 的方法层夹具 = `tests/fixtures/methods/home/company/methods/`（两套合成方法包：`requirements-trace@1.0.0`
-与 `api-contract@2.1.0`），装进 dev home 的 `company/methods/<preset id>/` 后跑。E2E 交付物是 dev workspace
-里的临时目录，跑完即删（它的裁决头记着改名前的 preset id，留着会让后续审计按现行 id 报 `header-preset`）；
-证据以本节与下面这段裁决摘录为准：
+E2E 的方法层夹具 = `tests/fixtures/methods/dsh-home/company/methods/`（两套合成方法包：`requirements-trace@1.0.0`
+与 `api-contract@2.1.0`），装进 dev home 的 `company/methods/<preset id>/` 后跑。最后一轮的裁决摘录：
 
-> R1（fail）：`RT-04 | fail | 非范围已单列（第 14–21 行），但与需求冲突：第 10 行 REQ-001 规定「其余字符每个计 1 列」……`；
-> 发现 `- F1 [RT-04][blocker] …冲突…` + `- F2 [RT-04][advisory] …边界摩擦…`。
-> R2（pass）：`F1 … 已消除。依据：第 10 行不再使用「其余字符每个计 1 列」的开放式表述……`；`无新增发现（F3 起为空）`。
+> `## 裁决：fail` · `RT-03 | fail | …`；发现 `- F1 [RT-03][blocker] \`AC-REQ-002-2\` 期望结果 \`A中\` 与「输出须是输入的前缀」自相矛盾`、
+> `- F4 [meta][advisory] 验证侧无法执行 shasum -a 256，冻结哈希「未验证」`；处置表里 F1/F2 = 已修、F3/F4 = 反驳（带可核对证据）。
 
 **未验项（如实记）**：① 没跑真浏览器/UI 面（本轮没有 client 改动）；② 没跑 `release-smoke`
 （发布面未变，且 E2E 走的是 dev 的 tarball 安装）；③ 多公司 fixture 只证了"同一套判据能审第二套方法包"，

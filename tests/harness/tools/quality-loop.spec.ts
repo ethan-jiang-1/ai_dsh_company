@@ -23,7 +23,7 @@ import {
   verdictBodyHash,
 } from '../../../tools/lib/quality-loop.mjs'
 
-const METHODS_HOME = join(ROOT, 'tests/fixtures/methods/home/company/methods')
+const METHODS_HOME = join(ROOT, 'tests/fixtures/methods/dsh-home/company/methods')
 /** 方法层根 = preset id（人按前缀找齐）；`side` 是方法包自己的词表。 */
 const METHOD_ROOT = { producer: 'quality-loop-producer', verifier: 'quality-loop-verifier' } as const
 const packOf = (side: string, name: string): ReturnType<typeof parseMethodSkill> =>
@@ -339,6 +339,14 @@ describe('审计判据：一条红配方一支用例', () => {
     const result = auditQualityLoop(input({ rounds }))
     expect(result.problems).toEqual([])
     expect(result.warnings.map(warning => warning.code)).toEqual([])
+  })
+
+  it('处置词带排版（`**已修**`）仍按词认', () => {
+    const rounds = [{
+      ...input().rounds[0],
+      dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| F1 | **已修** | 补了来源 |\n',
+    }]
+    expect(codes(auditQualityLoop(input({ rounds })))).toEqual([])
   })
 
   it('裁决目录常量是唯一口径（流程 skill 与探针都引用它）', () => {

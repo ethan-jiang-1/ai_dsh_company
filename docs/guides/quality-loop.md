@@ -28,7 +28,7 @@ cp <pack>/verifier/SKILL.md "$DSH_HOME/company/methods/quality-loop-verifier/<pa
 - 生效：**新会话**（preset 的 `customSkillDirs` 在建会话时读）；正文改动同会话下一轮可见。
 - 没进 `/cultivation` 名册（名册 = 六角色）：v1 没有采纳/撤回流水线，直接放目录。
 - 没有默认方法包：任务书不点名 = 两侧都 fail-closed 停下。**不要**把某一套方法写进 preset。
-- 参考形状 = `tests/fixtures/methods/home/company/methods/`（两套合成包，`requirements-trace` / `api-contract`）。
+- 参考形状 = `tests/fixtures/methods/dsh-home/company/methods/`（两套合成包，`requirements-trace` / `api-contract`）。
 
 ## 2. 发工（VP-Eng 会话里）
 
