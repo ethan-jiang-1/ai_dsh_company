@@ -7,7 +7,7 @@ opened: 2026-11-08
 
 > 立卡：2026-11-08 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：note — [Note](./2026-11-08-vpeng-workflow-channel.md)（已交付）。
+> **结论/去向**：note — [Note](../../../notes/archived/2026-11-08-vpeng-workflow-channel.md)（已交付）。
 >
 > 审查：agent — 语义审（授权/合同/证据/Note 四输入）+ 真跑；用户 — 跳过（2026-11-08 批范围，未逐页人审实现）。
 
@@ -52,7 +52,7 @@ opened: 2026-11-08
   `eng-workflow` 第 3 步「深挖」点名判据。
 - `docs/contracts/delegation.md` §4、`docs/contracts/presets.md` 两行工具面、`docs/architecture.md` §2.3/§3、
   `docs/guides/budget-and-ops.md` §2 的既有漂移同 diff 改。
-- 交付 Note：[2026-11-08-vpeng-workflow-channel.md](./2026-11-08-vpeng-workflow-channel.md)：
+- 交付 Note：[2026-11-08-vpeng-workflow-channel.md](../../../notes/archived/2026-11-08-vpeng-workflow-channel.md)：
   决定、输掉的方案、真证据、2026-10-12 先例与「没有使用场景」的更正。
 - 测试：`preset-smoke`（挂载）+ 工具目录含 `workflow` + `pnpm test` + `pnpm verify`（当前已 ALL PASS；
   若他人未落改动再造成红，先分清归属）。
@@ -105,7 +105,7 @@ opened: 2026-11-08
   `workflow "vpeng-min-smoke" completed (1 agent). Return value: { "child": "WF_OK" }`。
 - 行为：常驻 probe `probes/team/vp-eng-workflow-probe.mjs` **ALL PASS**（A 用 workflow；B 用 system_qa）。
 - 回归：`pnpm test` 150 files / 1223 tests passed；`pnpm verify` ALL PASS。
-- 详见 [Note](./2026-11-08-vpeng-workflow-channel.md)。
+- 详见 [Note](../../../notes/archived/2026-11-08-vpeng-workflow-channel.md)。
 
 ## 关闭条件
 

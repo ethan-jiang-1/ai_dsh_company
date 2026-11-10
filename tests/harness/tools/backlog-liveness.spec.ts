@@ -12,10 +12,18 @@ const scratch = join(ROOT, 'node_modules/.cache/company-backlog-liveness')
 const pools = ['issues', 'bugs', 'research', 'methods', '_archive/settled_issues',
   '_archive/suspended_issues', '_archive/fixed_bugs', '_archive/suspended_bugs',
   '_archive/research', '_archive/legacy']
+// 2026-11-10：夹具根 = <repo>/ 而不是 <repo>/_backlog——归档卡 `去向=note` 的落点以 <repo>/notes 为基准，
+// 只有把 notes/ 摆在 _backlog/ 旁边，落点解析才能被正向验证（负例见文件末的解析用例）。
+let repoRoot: string
 let root: string
 const put = (path: string, text: string) => {
   mkdirSync(dirname(join(root, path)), { recursive: true })
   writeFileSync(join(root, path), text)
+}
+// Note 侧夹具：相对仓库根（= root 的父目录）落文件，路径形状与真实仓一致（notes/implemented/...）。
+const putNote = (path: string, text: string) => {
+  mkdirSync(dirname(join(repoRoot, path)), { recursive: true })
+  writeFileSync(join(repoRoot, path), text)
 }
 // 研究题自 2026-10-30 起由自己的 shelf 索引（一题一行）持有；其余归档池共用 _archive/README.md。
 const index = (pool: string, path: string) => {
@@ -45,12 +53,14 @@ const issue = (extra = '', status = '推敲中', graduation = '未定') =>
   `---\nstatus: ${status}\nopened: 2026-10-09\n---\n\n# Issue\n\n> 立卡：2026-10-09 ｜ 状态：${status} ｜ 类型：Task ｜ 毕业：${graduation} ｜ 可关闭：否\n\n${extra}\n`
 beforeEach(() => {
   mkdirSync(scratch, { recursive: true })
-  root = mkdtempSync(join(scratch, 'fixture-'))
+  repoRoot = mkdtempSync(join(scratch, 'fixture-'))
+  root = join(repoRoot, '_backlog')
+  mkdirSync(root, { recursive: true })
   for (const pool of ['', '_archive', ...pools]) put(`${pool ? `${pool}/` : ''}README.md`, '# Index\n')
 })
 afterEach(() => {
-  if (!resolve(root).startsWith(`${resolve(scratch)}/fixture-`)) throw new Error('unexpected fixture path')
-  rmSync(root, { recursive: true, force: true })
+  if (!resolve(repoRoot).startsWith(`${resolve(scratch)}/fixture-`)) throw new Error('unexpected fixture path')
+  rmSync(repoRoot, { recursive: true, force: true })
 })
 
 describe('backlog institution, migrated headers and recursive membership', () => {
@@ -233,8 +243,9 @@ describe('backlog institution, migrated headers and recursive membership', () =>
       `---\nstatus: 已结\nopened: ${date}\n---\n\n# Issue\n\n> 立卡：${date} ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是\n${extra}\n`
     put('_archive/settled_issues/2026-11-03-no-destination.md', archived('2026-11-03'))
     put('_archive/settled_issues/2026-11-03-prose.md', archived('2026-11-03', '\n> **结论/去向**：用户已拍板「就这么办」'))
-    put('_archive/settled_issues/2026-11-03-with-destination.md', archived('2026-11-03', '\n> **结论/去向**：note — `notes/implemented/2026-11-03-demo.md`\n> 审查：agent — 语义审过'))
-    put('_archive/settled_issues/2026-11-03-no-review.md', archived('2026-11-03', '\n> **结论/去向**：note — `notes/implemented/2026-11-03-demo.md`'))
+    putNote('notes/implemented/2026-11-03-demo.md', '# Note\n')
+    put('_archive/settled_issues/2026-11-03-with-destination.md', archived('2026-11-03', '\n> **结论/去向**：note — [Note](../../../notes/implemented/2026-11-03-demo.md)\n> 审查：agent — 语义审过'))
+    put('_archive/settled_issues/2026-11-03-no-review.md', archived('2026-11-03', '\n> **结论/去向**：note — [Note](../../../notes/implemented/2026-11-03-demo.md)'))
     put('_archive/settled_issues/2026-11-02-old.md', archived('2026-11-02'))
     for (const name of ['2026-11-03-no-destination.md', '2026-11-03-prose.md', '2026-11-03-with-destination.md', '2026-11-03-no-review.md', '2026-11-02-old.md']) index('_archive/settled_issues', name)
     const problems = check(root).join('\n')
@@ -243,6 +254,28 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     expect(problems).toContain('_backlog/_archive/settled_issues/2026-11-03-no-review.md:1 归档「毕业：做」卡缺审查记录')
     expect(problems).not.toContain('2026-11-03-with-destination')
     expect(problems).not.toContain('2026-11-02-old')
+  })
+
+  // 2026-11-10（材料性与留痕决定点）：`去向=note` 的落点必须解析到 notes/ 下真实文件。
+  // 为什么：两张 2026-11-08 卡把「Note」链回卡自己，而 md-links 不红（目标确实存在）——self-link 顺不上理由。
+  // 反证方向：self-link → 红；inline code（未落地写法的残留）→ 红；点名的文件不存在 → 红；
+  //   真实 notes/ 链接 → 绿；2026-11-03 之前开的旧卡 → 祖父豁免。
+  it('resolves an archived note destination to a real file under notes/ instead of the card itself', () => {
+    const archived = (date: string, dest: string) =>
+      `---\nstatus: 已结\nopened: ${date}\n---\n\n# Issue\n\n> 立卡：${date} ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是\n\n> **结论/去向**：${dest}\n> 审查：agent — 语义审过\n`
+    putNote('notes/implemented/2026-11-10-real-note.md', '# Note\n')
+    put('_archive/settled_issues/2026-11-10-self-link.md', archived('2026-11-10', 'note — [Note](./2026-11-10-self-link.md)'))
+    put('_archive/settled_issues/2026-11-10-inline-code.md', archived('2026-11-10', 'note — `notes/implemented/2026-11-10-real-note.md`'))
+    put('_archive/settled_issues/2026-11-10-absent.md', archived('2026-11-10', 'note — [Note](../../../notes/implemented/2026-11-10-absent.md)'))
+    put('_archive/settled_issues/2026-11-10-real-link.md', archived('2026-11-10', 'note — [Note](../../../notes/implemented/2026-11-10-real-note.md)'))
+    put('_archive/settled_issues/2026-11-02-old-self-link.md', archived('2026-11-02', 'note — [Note](./2026-11-02-old-self-link.md)'))
+    for (const name of ['2026-11-10-self-link.md', '2026-11-10-inline-code.md', '2026-11-10-absent.md',
+      '2026-11-10-real-link.md', '2026-11-02-old-self-link.md']) index('_archive/settled_issues', name)
+    const problems = check(root).join('\n')
+    for (const name of ['2026-11-10-self-link.md', '2026-11-10-inline-code.md', '2026-11-10-absent.md'])
+      expect(problems).toContain(`_backlog/_archive/settled_issues/${name}:10 归档「去向=note」的落点未解析到 notes/ 下的真实文件`)
+    expect(problems).not.toContain('2026-11-10-real-link')
+    expect(problems).not.toContain('2026-11-02-old-self-link')
   })
 
   // 2026-11-02（五道门）：待落地 = 已过定性门（结论=做 + 门票 + 去向）；其余结论不占落地门。

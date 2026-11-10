@@ -18,6 +18,7 @@
 
 | 名头 | 材料 | 历史消费者 | 产出的卡 | 归档 |
 |---|---|---|---|---|
+| [issue-bug-traceability/](issue-bug-traceability/README.md) · 问题与缺陷的留痕：材料性判据、缺陷轨留痕裁决与落点解析 | 2 份 | [留痕决定点卡](../settled_issues/2026-11-10-materiality-and-trace-decision.md) | 同卡 | 2026-11-10 |
 | [company-specificity-externalization/](company-specificity-externalization/README.md) · 通用/产品类型/公司三层：盘点、原型、测试资产与目标目录 | 3 份 | [三层分离卡](../settled_issues/2026-11-09-company-specificity-externalization.md) | 同卡 | 2026-11-09 |
 | [vp-eng-delegation-topology/](vp-eng-delegation-topology/README.md) · VP-Eng 委派拓扑：workflow 控流程 / subagent 保信噪比 | 2 份 | [workflow 通道卡](../settled_issues/2026-11-08-vpeng-workflow-channel.md) | 同卡 | 2026-11-08 |
 | [role-addition/](role-addition/README.md) · 角色新增面：加一个角色/子人格到底要动哪些地方（CMO 9 提交/97 文件实证 → SA/SQA 落地） | 1 份 | [SA/SQA 卡](../settled_issues/2026-11-06-system-architect-sqa.md) | 同卡 | 2026-11-06 |

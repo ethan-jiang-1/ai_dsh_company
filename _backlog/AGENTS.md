@@ -12,6 +12,10 @@
 | [methods/](methods/README.md) | 走卡方法（常驻 SOP，不归档） |
 | [_archive/](_archive/README.md) | 离开活跃区的卡（默认不读，点名才开） |
 
+## 手上有个 bug：先分诊
+
+**材料性** → 立缺陷卡 + 请示（同一份请示里报留痕）；**非材料性** → 当场修，commit 写根因与影响面，不建卡。判据唯一家 = [章程](README.md)「缺陷的通道」。
+
 ## 五道门：`status` 就是你的位置
 
 研究 → 定性 → 落地 → 审 → 归档。看 frontmatter `status` 对下表；一格只有一个出口物，写不出来就翻不动（`pnpm verify` 查形状）。

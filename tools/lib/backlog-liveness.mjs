@@ -13,8 +13,10 @@
 //   ① 缺陷轨「活跃」改名「调查中」并扩到四活跃值（修复就绪/修复已落地/等人拍板）；② 新增状态行↔
 //   frontmatter 镜像互查；③ 问题卡状态行「毕业：」封闭头。制度唯一家 = _backlog/README.md
 //   「双轨状态生命周期」「缺陷的通道」；负例留证见新增块注释。
+// 2026-11-10（卡 _backlog/issues/2026-11-10-materiality-and-trace-decision.md 落地）：归档卡 `去向=note` 的落点
+//   必须解析到 notes/ 下真实文件（见下方 settled_issues 分支的检查块；负例留证 = checks/gates/backlog-liveness.mjs 头注）。
 import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from 'node:fs'
-import { basename, join, resolve } from 'node:path'
+import { basename, isAbsolute, join, relative, resolve } from 'node:path'
 import { createRequire } from 'node:module'
 import { markdownLinkTargets } from './markdown-links.mjs'
 
@@ -33,6 +35,8 @@ const loadYaml = (() => {
 export function backlogLivenessProblems(backlogRoot) {
   const problems = []
   const effectiveDate = '2026-10-09'
+  // 归档卡的 `去向` 落点以 notes/ 为基准（本仓布局 = <repo>/_backlog + <repo>/notes）。
+  const notesRoot = resolve(backlogRoot, '..', 'notes')
   const pools = ['issues', 'bugs', 'research', 'methods', '_archive/settled_issues',
     '_archive/suspended_issues', '_archive/fixed_bugs', '_archive/suspended_bugs',
     '_archive/research', '_archive/legacy']
@@ -243,6 +247,21 @@ export function backlogLivenessProblems(backlogRoot) {
           else if (!DESTINATIONS.includes(dest)) problems.push(`${where}:1 去向「${dest}」不在封闭集（rfc|note|implementation|pending|none|rejected）`)
           if (!/审查\s*[:：]\s*(agent|用户|跳过)/.test(head))
             problems.push(`${where}:1 归档「毕业：做」卡缺审查记录（状态行写 审查：agent|用户|跳过 — …；跳过要写理由）`)
+          // 2026-11-10（材料性与留痕决定点）：`去向=note` 的落点必须解析到 notes/ 下的真实文件。
+          //   为什么：self-link 实证复发（两张 2026-11-08 卡把「Note」链回卡自己，归档索引另有 6 行同样），
+          //   `md-links` 也不会红——目标确实存在，就是卡自己。失败形态是「顺着卡找不到理由」，与没留等价；
+          //   门禁此前只查封闭集里的词。（制度唯一家 = _backlog/README.md「缺陷的通道」的材料性/留痕规则。）
+          //   判据：只认 `去向` 行上的 Markdown 链接；inline code / 散文 / 链到卡自己都不算。
+          //   生效日 = 2026-11-03（与去向封闭集同一生效日），旧卡祖父豁免、不回填正文。
+          if (dest === 'note') {
+            const destLine = headText(text).split('\n').find(line => /去向\s*[:：=＝]/.test(line)) ?? ''
+            const resolved = [...markdownLinkTargets(full, destLine)].some((target) => {
+              const inside = relative(notesRoot, target)
+              return inside !== '' && !inside.startsWith('..') && !isAbsolute(inside) && isFile(target)
+            })
+            if (!resolved)
+              problems.push(`${where}:${lineOf(text, '去向')} 归档「去向=note」的落点未解析到 notes/ 下的真实文件——写 Markdown 链接到 Note（链到卡自己/inline code/散文都顺不上理由）`)
+          }
         }
       }
       // 2026-10-12 立（借鉴卡落地）：状态行↔frontmatter 镜像互查 + 问题卡「毕业：」封闭头。
