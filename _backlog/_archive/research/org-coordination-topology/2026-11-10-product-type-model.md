@@ -23,34 +23,34 @@ intent: 把 b2b-saas 的语义问题、两种产品类型的文档链/检查器/
 
 - 改名前的 `check-rules.json`：`layers = [ROADMAP, US, RELEASE]`、`defaultLayers = [ROADMAP, US]`，
   `files = roadmap.md / user-story.md / release.md`；改名后已是 `MRD/StRS/PRD`
-  （[`content/product-types/business-software/check-rules.json`](../../../packages/company-pack/content/product-types/business-software/check-rules.json)）。
+  （[`content/product-types/business-software/check-rules.json`](../../../../packages/company-pack/content/product-types/business-software/check-rules.json)）。
 - 改名前的 `overview.md`：订阅制、多租户、SLA/续约，明确写「没有 SyRS/IRS/采购件」；改名后已泛化为
-  纯软/企业软件（[`overview.md`](../../../packages/company-pack/content/product-types/business-software/overview.md)）。
+  纯软/企业软件（[`overview.md`](../../../../packages/company-pack/content/product-types/business-software/overview.md)）。
 - 改名前的目录只有 `check-rules.json` / `overview.md` / `glossary.md`，**没有** `document-map.md` /
   `requirements-model.md`；改名后已补齐。
 - `product-definition` 的品类表在改名后已加 `business-software` reference（原先只有
   `project-services` / `hardware-software`）。
-  （[`product-definition/SKILL.md`](../../../packages/company-pack/presets/_shared/skills/product-definition/SKILL.md)）。
+  （[`product-definition/SKILL.md`](../../../../packages/company-pack/presets/_shared/skills/product-definition/SKILL.md)）。
 
 ### 1.2 两条 checker 的入口
 
 - `/prd check` 读 `drafts/mrd.md` + `drafts/prd.md`，校验 MRD/PRD 的 JSON 账本
-  （[`prd-command.ts`](../../../packages/company-pack/src/host/commands/prd-command.ts)）；
+  （[`prd-command.ts`](../../../../packages/company-pack/src/host/commands/prd-command.ts)）；
   `b2b-saas` 的 `ROADMAP/US/RELEASE` 链没有 MRD/PRD，进不了这个检查。
 - `/req check` 读 `company.md` 的 `productType`，再读 `product-types/<id>/check-rules.json`
-  （[`req-command.ts:49-62`](../../../packages/company-pack/src/host/commands/req-command.ts)）。
+  （[`req-command.ts:49-62`](../../../../packages/company-pack/src/host/commands/req-command.ts)）。
   遇到 `ROADMAP/US/RELEASE` 这类非五层时，它返回一句「本产品类型不走五层编号体系，按 overview 自查」，
-  **不做机械校验**（[`req-command.ts:100`](../../../packages/company-pack/src/host/commands/req-command.ts)）。
+  **不做机械校验**（[`req-command.ts:100`](../../../../packages/company-pack/src/host/commands/req-command.ts)）。
 - 所以 `b2b-saas` 现在既没有 PRD 结构检查，也没有编号/追溯检查；它的「质量门」只有人读 overview。
 
 ### 1.3 `hardware-software` 包
 
 - `check-rules.json`：`layers = [MRD, StRS, PRD, SyRS, IRS, V&V]`、
   `defaultLayers = [MRD, StRS, PRD]`，五层 checker 可直接跑
-  （[`hardware-software/check-rules.json`](../../../packages/company-pack/content/product-types/hardware-software/check-rules.json)）。
+  （[`hardware-software/check-rules.json`](../../../../packages/company-pack/content/product-types/hardware-software/check-rules.json)）。
 - 有 `document-map.md` / `requirements-model.md` / SyRS/IRS/allocation 模板；
   `product-definition` 有 `hardware-software` reference
-  （[`requirements-model.md`](../../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)）。
+  （[`requirements-model.md`](../../../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)）。
 - 这是目前唯一「文档链 + 检查器 + playbook + 模板」都闭合的类型。
 
 ### 1.4 第三类：`project-services`
@@ -58,7 +58,7 @@ intent: 把 b2b-saas 的语义问题、两种产品类型的文档链/检查器/
 - `product-definition` 有 `project-services` reference（SOW/UAT/里程碑），但
   `content/product-types/` 下**没有** `project-services` 包，也没有 check-rules。
 - `content/templates/mrd.md` 的 JSON 示例还写着 `"productType": "project-services"`
-  （[`mrd.md:17`](../../../packages/company-pack/content/templates/mrd.md)），这是一个悬空示例。
+  （[`mrd.md:17`](../../../../packages/company-pack/content/templates/mrd.md)），这是一个悬空示例。
 - 公司 `org.md` 有三条业务线（软件 / 服务 / 系统集成），所以「两种类型」只覆盖前两条；
   服务/集成要不要第三个类型，是后续缺口，不在本轮两个类型里硬塞。
 
@@ -122,7 +122,7 @@ intent: 把 b2b-saas 的语义问题、两种产品类型的文档链/检查器/
 - 用户明确说「硬软一体」/「纯软」时，CEO 按声明写；没说时问一句，或用公司默认并标假设；
 - `/req check` 解析顺序 = 动议 `meta.md` > `company.md`；
 - `company.md` 不被逐动议改写（它是公司身份，不是动议属性；client 也读它显示公司信息
-  [`company-identity.ts`](../../../packages/company-pack/src/client/data/company-identity.ts)）。
+  [`company-identity.ts`](../../../../packages/company-pack/src/client/data/company-identity.ts)）。
 
 ### 4.2 为什么不能只改角色提示
 

@@ -11,12 +11,12 @@ opened: 2026-11-09
 >
 > **结论/去向**：rfc — [notes/implemented/2026-11-09-presets-delegation-model.md](../../../notes/implemented/2026-11-09-presets-delegation-model.md)（已落 RFC；P1 核心 + P2 keyless 载体 + P-A/P-B/P-C/P-D/P-J 真探针 + P3 UI 首片 + 深度预算 + `subagent_retry` + `worker-orchestrator` 完成，P-H/P-I/生成器待切片；worker-workflow planned（P-K 已耗））。
 >
-> 上游研究题：[preset 委派架构：盘点与结构性研究](../../research/presets-delegation-architecture/README.md)（已定性）。
+> 上游研究题：[preset 委派架构：盘点与结构性研究](../../_archive/research/presets-delegation-architecture/README.md)（已定性）。
 > 决策记忆（RFC）：[presets 委派面的模型化重构](../../../notes/implemented/2026-11-09-presets-delegation-model.md)（implemented；批准：用户 2026-11-09「开始推进」；P1 核心 + P2 keyless + P-A/P-B/P-C/P-D/P-J + P3 UI 首片 + 深度预算 + `subagent_retry` + `worker-orchestrator` 完成；`worker-workflow` 回 planned）。
-> 事实基线：[结论材料](../../research/presets-delegation-architecture/2026-11-09-options-and-conclusion.md) +
-> [DSH affordances](../../research/presets-delegation-architecture/2026-11-09-dsh-affordances.md) +
-> [组合实验](../../research/presets-delegation-architecture/2026-11-09-composition-experiments.md) +
-> [合同分布](../../research/presets-delegation-architecture/2026-11-09-contract-duplication.md)；
+> 事实基线：[结论材料](../../_archive/research/presets-delegation-architecture/2026-11-09-options-and-conclusion.md) +
+> [DSH affordances](../../_archive/research/presets-delegation-architecture/2026-11-09-dsh-affordances.md) +
+> [组合实验](../../_archive/research/presets-delegation-architecture/2026-11-09-composition-experiments.md) +
+> [合同分布](../../_archive/research/presets-delegation-architecture/2026-11-09-contract-duplication.md)；
 > 上一轮修复的层契约见 [委派合同修复 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md)；vendor pin = `dsh-v0.2.1-rc.5`。
 
 **问题与期望结果：** 当前 11 个 preset 是“隐式模型”：能力藏在插件行里，合同藏在角色 skill 里，通道差异散在政策散文与 docs 里；长链（CEO→VP-Eng→workflow→subagent，以及 VP-Eng→workflow→subagent）没有可执行的声明与统一观测。结果是：worker = 角色克隆、合同随修 bug 逐句膨胀、长链在半路撞 `maxDepth`、父会话只能看到自己直接起的 child。期望建立一个**显式的 capability / contract / composition 模型**，配 **worker family**、**链合同**、**静态矩阵 + 运行时图投影**；当前两条链可验收，未来新增链（如 VP-Sales 带副手）只加 delta/场景，不重做架构。

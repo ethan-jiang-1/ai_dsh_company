@@ -38,19 +38,19 @@ intent: 解释 CEO 的命名 delegation 为什么只有三条、SA/SQA 退役后
 
 | 层 | 载体 | 数量 | 回答什么 |
 |---|---|---|---|
-| 公司编制（部署配置 / KB 事实） | [`content/state/org.md`](../../../packages/company-pack/content/state/org.md) | 50 人、六条线、岗位级 | 角色做判断时引用的公司事实：多少人、什么岗位、预算线、并行上限 |
-| 运行时角色（agent preset） | [`presets/<role>/agent.cordis.yml`](../../../packages/company-pack/presets/) + [`PRESET_IDS`](../../../tools/lib/delegation-model.mjs) | 11 个 preset：6 个公司角色 + 5 个 support（worker ×3、质量环 ×2） | 一个会话挂什么人格、工具、skills |
-| 协同通道 | [`docs/contracts/delegation.md`](../../../docs/contracts/delegation.md) | 4 条：命名 child / team / subagent/fork / workflow | 活怎么分、子代是谁、父代怎么收 |
+| 公司编制（部署配置 / KB 事实） | [`content/state/org.md`](../../../../packages/company-pack/content/state/org.md) | 50 人、六条线、岗位级 | 角色做判断时引用的公司事实：多少人、什么岗位、预算线、并行上限 |
+| 运行时角色（agent preset） | [`presets/<role>/agent.cordis.yml`](../../../../packages/company-pack/presets/) + [`PRESET_IDS`](../../../../tools/lib/delegation-model.mjs) | 11 个 preset：6 个公司角色 + 5 个 support（worker ×3、质量环 ×2） | 一个会话挂什么人格、工具、skills |
+| 协同通道 | [`docs/contracts/delegation.md`](../../../../docs/contracts/delegation.md) | 4 条：命名 child / team / subagent/fork / workflow | 活怎么分、子代是谁、父代怎么收 |
 
 - 50 人编制里，CEO 的直接汇报是 5 个职能：CMO、VP-Eng、VP-Sales、COO、CFO
-  （[`ceo/agent.cordis.yml:38`](../../../packages/company-pack/presets/ceo/agent.cordis.yml)）。
+  （[`ceo/agent.cordis.yml:38`](../../../../packages/company-pack/presets/ceo/agent.cordis.yml)）。
 - 运行时里，这 5 个职能对应 5 个 preset（`cmo` / `vp-eng` / `vp-sales` / `coo` / `cfo`），
   加上 CEO 自己 = 6 个公司角色 preset；其余 5 个是 support，不占编制、不进名册。
 - 50 人里的产品经理、测试、SRE、PMO、会计……**不是 agent**，是角色做判断时引用的编制事实。把它们当成
   「CEO 应该有 50 个手下」会误读运行时的委派图。
 - 即便只看运行时，CEO 的「手下」也不是 5 条固定边：team 的 `maxMembers: 8` 只数 teammate
-  （Lead 不在 `state.members` 里；[`roster.ts:257`](../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)、
-  [`projection.ts:148`](../../../vendor/dsh/packages/experimental/agent-team/src/projection.ts)），
+  （Lead 不在 `state.members` 里；[`roster.ts:257`](../../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)、
+  [`projection.ts:148`](../../../../vendor/dsh/packages/experimental/agent-team/src/projection.ts)），
   5 个汇报 = 5 名成员，够用；命名 child 则只有 3 个角色 + 1 个调研手。**两条边的集合不一样**，这正是 §2 的问题。
 
 > 结论：用户看到的「少」是**运行时命名边**少，不是公司编制少。公司编制是 50 人；运行时角色是 6 个；
@@ -60,7 +60,7 @@ intent: 解释 CEO 的命名 delegation 为什么只有三条、SA/SQA 退役后
 
 ### 2.1 事实：三条角色行 + 一条调研行
 
-CEO preset 的 `delegation` 组（[`ceo/agent.cordis.yml:192-228`](../../../packages/company-pack/presets/ceo/agent.cordis.yml)）
+CEO preset 的 `delegation` 组（[`ceo/agent.cordis.yml:192-228`](../../../../packages/company-pack/presets/ceo/agent.cordis.yml)）
 只有四行：
 
 | 工具名 | 指向 | `maxDepth` | 是不是公司角色 |
@@ -76,11 +76,11 @@ CEO preset 的 `delegation` 组（[`ceo/agent.cordis.yml:192-228`](../../../pack
 
 - `vp_cmo` 是历史工具名（与 `vp_eng` / `vp_sales` 同前缀），实际指向 `cmo` preset；公司编制里 CMO 是
   CEO 的直接汇报，不是「VP of CMO」。UI 委派卡也把它显示为「CMO（市场与产品定义）」
-  （[`DelegationCard.tsx:12-14`](../../../packages/company-pack/src/client/ui/DelegationCard.tsx)）。
+  （[`DelegationCard.tsx:12-14`](../../../../packages/company-pack/src/client/ui/DelegationCard.tsx)）。
 - CEO 没有 generic `subagent` / `subagent_fork` / `workflow`，这不是漏配：合同把 CEO 定位为**编排者**
   （team + 命名 child），深挖/并行交给 VP-Eng 命名 child；CEO 的通用调研手只有 `subagent_research`
   （`worker-researcher`）。所以这个 `delegation` 组的语义是「CEO 的委派面」，不是「全公司工具箱」
-  （[`docs/contracts/delegation.md:92-96`](../../../docs/contracts/delegation.md)）。
+  （[`docs/contracts/delegation.md:92-96`](../../../../docs/contracts/delegation.md)）。
 
 同一份文件第 174 行的注释写的是：
 
@@ -90,7 +90,7 @@ CEO preset 的 `delegation` 组（[`ceo/agent.cordis.yml:192-228`](../../../pack
 但没有解释为什么不是五个。测试也复制了这个盲点：`tests/presets/presets.spec.ts:223-246` 的
 「CEO 汇报线」测试只循环断言 `vp_eng` / `vp_sales` / `vp_cmo` 三条工具；`:248-256` 的
 「CEO 五职能在位」只查 persona 文案，不查工具行。**没有测试断言 COO/CFO 的命名行。** 静态模型
-（[`delegation-model.mjs:181`](../../../tools/lib/delegation-model.mjs)）同样只列了四条 `namedDelegates`
+（[`delegation-model.mjs:181`](../../../../tools/lib/delegation-model.mjs)）同样只列了四条 `namedDelegates`
 （三条角色 + 一条调研），所以模型矩阵也不会报这个缺口。
 
 ### 2.2 历史：不是一次「五汇报」设计，是逐步长出来的
@@ -126,21 +126,21 @@ git 历史把因果说得很清楚：
 证据：
 
 - 合同直说 teammate「共享 Lead 的组合」：
-  [`docs/contracts/delegation.md:83-87`](../../../docs/contracts/delegation.md)；
+  [`docs/contracts/delegation.md:83-87`](../../../../docs/contracts/delegation.md)；
   公司手册也把这条写成机制事实：
-  [`content/generic/collaboration.md:8-11`](../../../packages/company-pack/content/generic/collaboration.md)。
+  [`content/generic/collaboration.md:8-11`](../../../../packages/company-pack/content/generic/collaboration.md)。
 - vendor 源码：teammate 的 `startActivation` 只传 `parent: root`，没有 `agentPreset`
-  （[`agent-team/src/roster.ts:264-272`](../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)）；
+  （[`agent-team/src/roster.ts:264-272`](../../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)）；
   named child 的 `agentPreset` 来自工具行 config，两者不是同一条路。
 - 2026-11-06 的两件套 Note 已经承认这个边界：
   「team member 的人格仍是 lead 继承……不保证成员是 CMO/VP-Eng 的 preset 人格——那是另一条（上游
   per-member preset）」，
-  [`notes/archived/2026-11-06-ceo-two-artifact-team-rule.md`](../../../notes/archived/2026-11-06-ceo-two-artifact-team-rule.md)。
+  [`notes/archived/2026-11-06-ceo-two-artifact-team-rule.md`](../../../../notes/archived/2026-11-06-ceo-two-artifact-team-rule.md)。
 
 **后果**：CEO 可以用 team 起一个叫 `coo` 的成员，也可以用命名行起一个真的 `vp-eng` child；但
 **不能**用 team 起一个「真的 COO preset」。在**单操作者 / CEO 会话**里，COO/CFO 只有软角色这一条路；
 如果把 COO/CFO 作为**根会话**由人直接开门（多人模式），它们拿到的是真 preset——但那是另一条路，
-不是 CEO 的 delegation（[`multi-human-runbook.md:21`](../../../docs/guides/multi-human-runbook.md)）。
+不是 CEO 的 delegation（[`multi-human-runbook.md:21`](../../../../docs/guides/multi-human-runbook.md)）。
 它们的 CHARTER/KB 读得到，但 `ops-feasibility` / `budget-check` / `project-economics` / `finance-compliance`
 这些**完整方法**在角色 skill 里，CHARTER 只留部分事实/规则；team 成员的 skill catalog 是 CEO 的，加载不到
 （可以 `read` 文件，但当前合同没有这条约定）。
@@ -166,10 +166,10 @@ git 历史把因果说得很清楚：
 但这个解释**不能完全成立**，因为：
 
 1. 它们的角色内容（preset persona 与 CHARTER）都写了产出路径：COO 写 `drafts/coo.md`、CFO 写
-   `drafts/cfo.md`（[`coo/agent.cordis.yml:38`](../../../packages/company-pack/presets/coo/agent.cordis.yml)、
-   [`cfo/agent.cordis.yml:38`](../../../packages/company-pack/presets/cfo/agent.cordis.yml)；
-   [`content/charters/coo.md`](../../../packages/company-pack/content/charters/coo.md)、
-   [`content/charters/cfo.md`](../../../packages/company-pack/content/charters/cfo.md)）；
+   `drafts/cfo.md`（[`coo/agent.cordis.yml:38`](../../../../packages/company-pack/presets/coo/agent.cordis.yml)、
+   [`cfo/agent.cordis.yml:38`](../../../../packages/company-pack/presets/cfo/agent.cordis.yml)；
+   [`content/charters/coo.md`](../../../../packages/company-pack/content/charters/coo.md)、
+   [`content/charters/cfo.md`](../../../../packages/company-pack/content/charters/cfo.md)）；
    「一份单职能稿」正是命名行存在的理由。
 2. 它们的**方法**在角色 skill 里，不在 CHARTER 里。team 路径没有方法注入约定；如果 H2 是故意设计，
    应该能看到「teammate 如何拿到角色方法」的合同，但现在的合同只说「从 CHARTER / KB 读」。
@@ -203,16 +203,16 @@ CEO 的组队 skill 有一条硬规则：
 
 > 「**两件及以上产物（如 MRD+PRD）或多职能协作必须走 team + 任务板**；`vp_*` 命名委托只用于用户明确
 > 只要一份、且只属一个职能的快捷出稿」，
-> [`ceo/skills/assembling-the-team/SKILL.md:67`](../../../packages/company-pack/presets/ceo/skills/assembling-the-team/SKILL.md)。
+> [`ceo/skills/assembling-the-team/SKILL.md:67`](../../../../packages/company-pack/presets/ceo/skills/assembling-the-team/SKILL.md)。
 
 这条规则的目的是让看板/依赖图/互审有数据（2026-11-06 用户实证：两件套拆成 `vp_cmo`/`vp_eng` 后
 右侧看板全空）。但它与另一条事实冲突：
 
 - CMO 的 persona/CHARTER 说：写 MRD 先加载 `product-definition`，再用 `mrd-playbook`
-  （[`cmo/agent.cordis.yml:38`](../../../packages/company-pack/presets/cmo/agent.cordis.yml)、
-  [`content/charters/cmo.md`](../../../packages/company-pack/content/charters/cmo.md)）。
+  （[`cmo/agent.cordis.yml:38`](../../../../packages/company-pack/presets/cmo/agent.cordis.yml)、
+  [`content/charters/cmo.md`](../../../../packages/company-pack/content/charters/cmo.md)）。
 - VP-Eng 的 persona 说：写 PRD 先加载 `product-definition` 与 `prd-playbook`
-  （[`vp-eng/agent.cordis.yml:36`](../../../packages/company-pack/presets/vp-eng/agent.cordis.yml)）。
+  （[`vp-eng/agent.cordis.yml:36`](../../../../packages/company-pack/presets/vp-eng/agent.cordis.yml)）。
 - 但 team 成员继承 CEO 的组合；CEO 的 `skill-filesystem` 只挂了 CEO skills + 共享 delegation，
   **没有 CMO/VP-Eng 的 skills 目录**。所以 team 里的 `cmo` / `vp-eng` 成员**加载不到** `mrd-playbook` /
   `prd-playbook` / `product-definition`。
@@ -241,7 +241,7 @@ CEO 的组队 skill 有一条硬规则：
 
 ### 4.1 VP-Eng 现在有什么
 
-VP-Eng 的 `delegation` 组（[`vp-eng/agent.cordis.yml:170-253`](../../../packages/company-pack/presets/vp-eng/agent.cordis.yml)）
+VP-Eng 的 `delegation` 组（[`vp-eng/agent.cordis.yml:170-253`](../../../../packages/company-pack/presets/vp-eng/agent.cordis.yml)）
 是六个角色里最全的：
 
 | 行 | 指向 | `maxDepth` | 用途 |
@@ -259,12 +259,12 @@ VP-Eng 的 `delegation` 组（[`vp-eng/agent.cordis.yml:170-253`](../../../packa
 **深度预算**：CEO(0) → VP-Eng(1) → workflow 分支(2) → worker(3)，恰好用满 `maxDepth: 3`；VP-Eng 根门(0)
 → 分支(1) → worker(2) 仍有余量。这是 2026-11-09 为长链专门调的，源码事实是 workflow 分支/team 成员都走
 `startActivation(parent)`，深度 = parent+1
-（[`workflow-ptc/src/host.ts:203-215`](../../../vendor/dsh/packages/workflow/workflow-ptc/src/host.ts)、
-[`agent-team/src/roster.ts:264-272`](../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)）。
+（[`workflow-ptc/src/host.ts:203-215`](../../../../vendor/dsh/packages/workflow/workflow-ptc/src/host.ts)、
+[`agent-team/src/roster.ts:264-272`](../../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)）。
 
 ### 4.2 SA/SQA 原来是什么
 
-2026-11-06 落地的两个 support 子人格（[`notes/archived/2026-11-06-sa-sqa-subpersonas.md`](../../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)）：
+2026-11-06 落地的两个 support 子人格（[`notes/archived/2026-11-06-sa-sqa-subpersonas.md`](../../../../notes/archived/2026-11-06-sa-sqa-subpersonas.md)）：
 
 - **system-architect（SA）**：V 模型左侧，先判五学科域（软件/固件/电气/机械/系统测试，固定五行 + 依据），
   再写 PRD → SyRS → IRS → 硬软一体架构；产出 `drafts/syrs.md` / `drafts/irs.md` / `allocation.md` /
@@ -284,9 +284,9 @@ git show bf04ab1c:packages/company-pack/presets/system-qa/skills/vv-playbook/SKI
 
 ### 4.3 为什么退役
 
-退役动作见 [`notes/implemented/2026-11-09-retire-sa-sqa.md`](../../../notes/implemented/2026-11-09-retire-sa-sqa.md)；
+退役动作见 [`notes/implemented/2026-11-09-retire-sa-sqa.md`](../../../../notes/implemented/2026-11-09-retire-sa-sqa.md)；
 对「方法写死在人格里」的复盘，质量环 Note 写得更准确
-（[`2026-11-10-producer-verifier-quality-loop.md:13`](../../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md)）：
+（[`2026-11-10-producer-verifier-quality-loop.md:13`](../../../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md)）：
 
 - 用户明确要求清理这两个旧 preset（旧思路的专职 V 模型子人格）；
 - 质量环 Note 的复盘：历史 SA/SQA 用两个子人格解决了 **E/V 分家的结构**，但把方法（V 模型层级、TC 编号、
@@ -301,19 +301,19 @@ git show bf04ab1c:packages/company-pack/presets/system-qa/skills/vv-playbook/SKI
 
 ### 4.4 质量链接过了结构，但没接过方法
 
-2026-11-10 的质量环（[`notes/implemented/2026-11-10-producer-verifier-quality-loop.md`](../../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md)）
+2026-11-10 的质量环（[`notes/implemented/2026-11-10-producer-verifier-quality-loop.md`](../../../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md)）
 用两个 support preset 接过 E/V 分家：
 
 - `quality-loop-producer`：有手（read/write/edit/bash/web/todo/skill/compaction），按任务书点名的方法产出。
 - `quality-loop-verifier`：**真只读**（`write: false` + `edit: false`，无 bash），逐 check-id 出裁决。
 - 方法住 `<DSH_HOME>/company/methods/<preset id>/<pack>/`，任务书必须写 `method: <pack>@<version>`；
   **没有默认方法包**，缺了任一侧就 fail-closed 停下
-  （[`docs/guides/quality-loop.md:30`](../../../docs/guides/quality-loop.md)、
-  [`quality-loop/SKILL.md:19`](../../../packages/company-pack/presets/_shared/skills/quality-loop/SKILL.md)）。
+  （[`docs/guides/quality-loop.md:30`](../../../../docs/guides/quality-loop.md)、
+  [`quality-loop/SKILL.md:19`](../../../../packages/company-pack/presets/_shared/skills/quality-loop/SKILL.md)）。
 - 验证者只读，**跑不了测试**；动态证据由产出者跑、原始输出交给它评，拿不到就标「未验证」
-  （[`docs/guides/quality-loop.md:86`](../../../docs/guides/quality-loop.md)）。
+  （[`docs/guides/quality-loop.md:86`](../../../../docs/guides/quality-loop.md)）。
 - 两条命名行只在 VP-Eng；CEO/其他角色没有质量环入口
-  （[`docs/guides/quality-loop.md:14`](../../../docs/guides/quality-loop.md)）。
+  （[`docs/guides/quality-loop.md:14`](../../../../docs/guides/quality-loop.md)）。
 
 **所以质量环是「E/V 复核的骨架」，不是「系统架构能力」**：
 
@@ -329,15 +329,15 @@ git show bf04ab1c:packages/company-pack/presets/system-qa/skills/vv-playbook/SKI
 
 出厂默认公司是 **hardware-software**：
 
-- [`content/state/company.md:4`](../../../packages/company-pack/content/state/company.md)：`productType: hardware-software`；
+- [`content/state/company.md:4`](../../../../packages/company-pack/content/state/company.md)：`productType: hardware-software`；
 - 它的需求链包含 SyRS / IRS / V&V：
-  [`requirements-model.md:13-18`](../../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)
+  [`requirements-model.md:13-18`](../../../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)
   写的是 `owner: <assigned>`，默认链只到 PRD；
 - VP-Eng 的 persona 只明确自己是 **PRD 主笔**，没有说 SyRS/IRS/V&V 归它
-  （[`vp-eng/agent.cordis.yml:36-39`](../../../packages/company-pack/presets/vp-eng/agent.cordis.yml)）；
+  （[`vp-eng/agent.cordis.yml:36-39`](../../../../packages/company-pack/presets/vp-eng/agent.cordis.yml)）；
 - README 却对外说 VP-Eng 管「工程可行性、技术方案、**系统与测试**」，产品链「从 MRD 到 PRD，
   再到**系统需求与测试用例**」
-  （[`README.md:13,21`](../../../README.md)）。
+  （[`README.md:13,21`](../../../../README.md)）。
 
 这是**README 的表述宽于运行时能力**的典型缺口：
 
@@ -378,13 +378,13 @@ git show bf04ab1c:packages/company-pack/presets/system-qa/skills/vv-playbook/SKI
 两条 vendor 事实钉死边界：
 
 - workflow 的 `agent()` 只支持 `label / phase / schema / provider / model`，没有 `agentPreset`
-  （[`workflow-ptc/src/runtime.ts:33`](../../../vendor/dsh/packages/workflow/workflow-ptc/src/runtime.ts)）；
+  （[`workflow-ptc/src/runtime.ts:33`](../../../../vendor/dsh/packages/workflow/workflow-ptc/src/runtime.ts)）；
   `startChild` 只传 `parent`，不传 preset
-  （[`workflow-ptc/src/host.ts:203-215`](../../../vendor/dsh/packages/workflow/workflow-ptc/src/host.ts)）。
+  （[`workflow-ptc/src/host.ts:203-215`](../../../../vendor/dsh/packages/workflow/workflow-ptc/src/host.ts)）。
 - team 的 `spawn_teammate` 只有 `name / description / prompt / context`，没有 preset
-  （[`tool-agent-team/src/index.ts:193-204`](../../../vendor/dsh/packages/experimental/tool-agent-team/src/index.ts)）；
+  （[`tool-agent-team/src/index.ts:193-204`](../../../../vendor/dsh/packages/experimental/tool-agent-team/src/index.ts)）；
   `roster.spawn` 只传 `parent: root`
-  （[`agent-team/src/roster.ts:264-272`](../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)）。
+  （[`agent-team/src/roster.ts:264-272`](../../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)）。
 
 ### 5.2 全组织通道矩阵
 
@@ -401,7 +401,7 @@ git show bf04ab1c:packages/company-pack/presets/system-qa/skills/vv-playbook/SKI
 | `worker` / `worker-researcher` / `worker-orchestrator` | support | — | 各自 | — | 无 | 无 | 无 |
 | `quality-loop-producer` / `quality-loop-verifier` | support | — | 无 | — | 无 | 无 | 无 |
 
-来源：[`tools/lib/delegation-model.mjs:173-345`](../../../tools/lib/delegation-model.mjs)。
+来源：[`tools/lib/delegation-model.mjs:173-345`](../../../../tools/lib/delegation-model.mjs)。
 
 三个值得注意的不对称：
 
@@ -473,7 +473,7 @@ git show bf04ab1c:packages/company-pack/presets/system-qa/skills/vv-playbook/SKI
 - 优点：命名图 5/5，与 persona 的「五个直接汇报」一致；COO/CFO 能拿真人格与角色 skills；
   单职能稿（`drafts/coo.md` / `drafts/cfo.md`）有真路径；UI 委派卡可复用现有模式。
 - 代价：CEO 工具面 +2；UI `DELEGATION_TOOL_KEYS` 要加两个 key
-  （[`delegation-keys.ts:9`](../../../packages/company-pack/src/client/wiring/delegation-keys.ts)）；
+  （[`delegation-keys.ts:9`](../../../../packages/company-pack/src/client/wiring/delegation-keys.ts)）；
   测试/模型/patch/docs 同步；需要一次真模型挂载探针。
 - 适用：用户希望 CEO 能像叫 VP-Eng 一样叫 COO/CFO 出单职能稿。
 

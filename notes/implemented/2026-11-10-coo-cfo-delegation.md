@@ -3,7 +3,7 @@
 状态：implemented（2026-11-10 落地；验证见下）
 
 上游 = [COO/CFO 通道卡](../../_backlog/_archive/settled_issues/2026-11-10-coo-cfo-delegation.md)；
-证据 = [组织拓扑 §2/§7.1](../../_backlog/research/org-coordination-topology/2026-11-10-org-coordination-topology.md)。
+证据 = [组织拓扑 §2/§7.1](../../_backlog/_archive/research/org-coordination-topology/2026-11-10-org-coordination-topology.md)。
 
 ## 问题
 

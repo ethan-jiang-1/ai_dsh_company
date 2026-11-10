@@ -3,7 +3,7 @@
 状态：implemented（2026-11-10 落地；验证见下）
 
 上游 = [产品类型语义卡](../../_backlog/_archive/settled_issues/2026-11-10-product-type-semantics.md)；
-证据 = [产品类型模型](../../_backlog/research/org-coordination-topology/2026-11-10-product-type-model.md)；
+证据 = [产品类型模型](../../_backlog/_archive/research/org-coordination-topology/2026-11-10-product-type-model.md)；
 相关 = [产品定义指南](../../docs/guides/product-definition.md)。
 
 ## 问题

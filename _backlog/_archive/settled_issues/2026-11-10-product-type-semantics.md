@@ -9,7 +9,7 @@ opened: 2026-11-10
 >
 > **结论/去向**：note — [Note](../../../notes/implemented/2026-11-10-business-software-product-type.md)。
 >
-> 上游研究：[产品类型模型](../../research/org-coordination-topology/2026-11-10-product-type-model.md)（组织拓扑研究题的一份材料）。
+> 上游研究：[产品类型模型](../../_archive/research/org-coordination-topology/2026-11-10-product-type-model.md)（组织拓扑研究题的一份材料）。
 > 本卡只决定「产品类型是什么、文档链是什么、要不要 `project-services`」；动议级路由另卡
 > [动议级产品类型](2026-11-10-motion-product-type.md)。
 >

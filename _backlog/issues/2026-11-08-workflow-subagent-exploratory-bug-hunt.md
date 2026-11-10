@@ -17,52 +17,40 @@ opened: 2026-11-08
 > **授权门**：真模型探索需用户明确批准入口、charter、轮数/墙钟/child/输出预算、权限模式与证据落点；
 > 未批准不启动。计划 review、issue 定性、目录状态、handoff、基线检查都不等于真模型授权。
 
-**问题与期望结果：** 2026-11-09 委派面重构落地后，旧探索证据只覆盖重构前：当时没有
-worker family、没有 `subagent_retry`、vp-eng 通用行是 `maxDepth: 2`、没有 policy skill / workflow
-contract section、没有 `DelegationFlowPanel` 与 host 终态投影，SA/SQA 也还在。现在的风险不再是
-“workflow/subagent 能不能跑”，而是**新模型、新 worker、新重试原语、新深度预算与新图/UI 是否言行一致**：
-模型选对 profile 吗？leaf/orchestrator/researcher 会越界吗？`subagent_retry` 真的只重试幂等失败、
-真的尊重各 preset 的深度预算吗？CEO→VP→workflow→worker 的 depth 3 只是源码推算还是真能跑？合同
-只挂在有能力的地方吗？终态/图会把“缺失”说成状态吗？
+**问题与期望结果：** 2026-11-10 的四组改动（`business-software` 产品类型 + 动议级类型 + CEO 五汇报线/team 角色包 +
+SA/SQA 方法包）落地后，旧探索证据（第四–七轮）只覆盖 2026-11-09 的委派面；本轮要回答的是**新面与旧面的交界**：
+产品类型路由会不会误判/误红？五条命名行会不会挂不上 / UI 不渲染 / 深度错？team 角色包能不能让成员真读到角色
+skill？质量环 starter 能不能被 VP-Eng 真加载？旧 worker/retry/workflow/depth/合同有没有被改坏？
 
-目标是用一轮 guided exploratory testing 主动找真实、可复现的缺陷，并保留独立 oracle、来源坐标、
-可复判证据与停止边界；不是把一张新矩阵跑绿，也不是宣称找尽所有 bug。**本轮推敲完成 = 入口、charters、
-oracle、证据形式、预算与停止办法写清，且真模型范围/成本已向用户明确提出并获批准；未批准前不启动。**
+目标是用一轮 guided exploratory testing 主动找真实、可复现的副作用，保留独立 oracle、来源坐标、可复判证据与
+停止边界；不是把一张新矩阵跑绿，也不是宣称找尽所有 bug。**本轮推敲完成 = 入口、charters、oracle、证据形式、
+预算与停止办法写清，且真模型范围/成本按用户 2026-11-10 的授权执行。**
 
-**当前情况：**
+**当前情况（2026-11-10 后）：**
 
-- 重构已交付：[模型/合同/worker/UI Note](../../notes/implemented/2026-11-09-presets-delegation-model.md)、
-  [残差收口](../../notes/implemented/2026-11-09-delegation-residuals-closeout.md)、
-  [SA/SQA 退役](../../notes/implemented/2026-11-09-retire-sa-sqa.md)、
-  [worker-workflow no-go](../../notes/archived/2026-11-09-worker-workflow-no-go.md)。
-- 当前 9 个 preset：6 角色 + `worker` / `worker-researcher` / `worker-orchestrator`；清单唯一源 =
-  [`delegation-model.mjs`](../../tools/lib/delegation-model.mjs)。`worker` 是 leaf（无委派/团队/workflow/
-  control）；`worker-orchestrator` 只多一条 `subagent` 行（钉 `worker`，`maxDepth: 3`）；`worker-researcher`
-  是只读、named-only（CEO `subagent_research`）。
-- vp-eng 的 generic `subagent` 钉 `agentPreset: worker`、暴露 `allowedAgentPresets: [worker, worker-orchestrator]`、
-  `maxDepth: 3`；`subagent_fork` 也 3。其他 full role 的通用两行仍 2，且不暴露 `agent_preset`。
-- `subagent_retry` 已落 host 原语：五个有 generic subagent 的 full role（vp-eng/vp-sales/coo/cfo/cmo）；
-  默认子代 `worker`、`maxDepth: 3`、最多 2 attempts；只对幂等任务的 error/interrupted/lost 重试；
-  返回 attempts/childIds/stopReason/exhausted。keyless spec 已覆盖分类；真实失败注入**不可确定性复现**，
-  P-H 只证“模型会调用、attempts=1/completed”。
-- 深度事实：spawn/fork/workflow 分支/team 成员都走 `startActivation(parent)` → parent+1；workflow 引擎
-  无独立 depth 闸但行级 `maxDepth` 生效。文档声称 CEO(0)→VP(1)→workflow 分支(2)→worker(3) 放行；
-  **这条链本身没有真跑过**（P-C/P-D 只证 VP-Eng 根分支 depth 1 / worker 2、teammate depth 1 /
-  成员内 worker 2）。
-- 合同：`delegation-policy` 共享 skill 挂六个 full role；`company:workflow-contract` section 按
-  “工具面真有 workflow”注入（fallback `vp-eng`）。旧探针只证 vp-eng 的 policy/section，未覆盖其他
-  full role、分支/fork 继承、worker family 的 prompt 面。
-- 图/UI：`DelegationFlowPanel` 在 DagTab 体内（九页签不变）；host `companyDelegationTerminal` 投影
-  把 `turn/end.reason.kind` 折成 `lastTurnEnd`；客户端优先读它，缺时回退 `subagentTiming`，再缺标
-  `unavailable`。真实 retry 后两个 child 的图/UI 形状、worker 节点、终态精确性未覆盖。
-- 已知的**待验证矛盾**（是假设，不是发现）：① `subagent_retry` 默认 `maxDepth: 3` 对 CMO 也生效，
-  而 CMO 的 `subagent` 行是 2——CEO→VP→CMO(2)→retry worker(3) 可能绕过 CMO 的深度预算；
-  ② `handbookSkipPresets` 只列 `worker`，`worker-orchestrator` / `worker-researcher` 仍被注入公司手册，
-  与 orchestrator persona“不读公司手册/CHARTER”有张力；③ `delegation-model.mjs` 的
-  `CONTRACTS.status` 仍写 `planned`，但 policy skill / workflow section 已落；`subagent_retry` 的注册面
-  与默认深度也不在模型里——“模型是唯一期望源”出现静态漂移。
-- 重构前的 6 张缺陷卡（036–041）与 042–044 均已修复归档；旧运行表、F4/F5 等观察、资产收割决定见
-  研究材料 §16–§18。**这些场景不要重跑**；复发按新证据记为回归，不拿旧结论当本轮 PASS。
+- **11 个 preset**：6 角色 + 5 support（`worker` / `worker-researcher` / `worker-orchestrator` +
+  `quality-loop-producer` / `quality-loop-verifier`）；清单唯一源 =
+  [`delegation-model.mjs`](../../tools/lib/delegation-model.mjs)。`worker` 是 leaf；`worker-orchestrator`
+  只多一条 `subagent` 行（钉 `worker`，`maxDepth: 3`）；`worker-researcher` 只读、named-only。
+- **CEO 五条角色命名行**：`vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo`，全部 `maxDepth: 1`；另有
+  `subagent_research`；CEO 没有 generic `subagent` / workflow / 控制行。UI key =
+  [`delegation-keys.ts`](../../packages/company-pack/src/client/wiring/delegation-keys.ts) 五条；
+  `delegation-smoke` 的可见工具清单已加 `coo`/`cfo`（只证挂载，未证真激活）。
+- **产品类型**：`business-software`（`MRD → StRS → PRD`）替代 `b2b-saas`；`hardware-software` 保持
+  `MRD/StRS/PRD` + 可选 SyRS/IRS/V&V；`meta.md` 有 `产品类型`，`/req check` 按「动议 meta >
+  `company.md`」解析，未知类型报错、模板占位 `<...>` 回落；`project-services` 第三类**未实现**。
+- **SA/SQA 方法包**：`content/methods/quality-loop-{producer,verifier}/{system-architecture,vv-plan}/SKILL.md`
+  四份；`pnpm methods:init` 复制到 `<DSH_HOME>/company/methods/`（已存在跳过）；VP-Eng persona 指向
+  starter；旧 `system-architect` / `system-qa` persona 仍退役。
+- **team 角色包**：`assembling-the-team` 与 `generic/collaboration.md` 写了角色名 / CHARTER /
+  `<company-content>/../presets/<role>/skills/<skill>/SKILL.md` / KB / 产出 / 边界；成员仍继承 Lead 组合，
+  角色包只是任务书约定，不是 per-member preset。
+- **旧矛盾已收口**（按 2026-11-10 的代码/测试重新核对，不再沿用旧卡）：`subagent_retry` 的深度从各 preset
+  的通用 `subagent` 行派生（`retrySurface()`）；`handbookSkipPresets` 按 `NON_ROLE_PRESETS` 派生，5 个
+  support 全跳过；`CONTRACTS.status` 是 `delivered` / `merged`，不是 `planned`；`delegation-model` 已含
+  五条 CEO 命名行。
+- **旧轮次**：第四–七轮（2026-11-09/10）的 036–053 已修复归档；旧运行表、F4/F5 等观察不要重跑。复发按新
+  证据记为回归，不拿旧结论当本轮 PASS。第四–七轮设计保留在下方作历史，**不是本轮的矩阵**。
 
 **已定（用户 2026-11-09 批准）：**
 
@@ -79,7 +67,26 @@ oracle、证据形式、预算与停止办法写清，且真模型范围/成本�
   不直接改；修复另按授权边界。UI 只作观察透镜，不单开视觉扫。
 - 用户原话（2026-11-09）：「1,2,3 都希望跑，找到问题就提 BUG 然后继续探索寻找下一个 BUG」。
 
-**下一步（用户 2026-11-09 晚已答复：继续探索）：** 第四轮已执行并收口（2026-11-09，约 22 分钟/19 turns/27 children，
+**已定（用户 2026-11-10）：**
+
+- 用户要求：**先把本卡内容适配 2026-11-10 的现状，再做 exploratory test**；本轮 = 第八轮。
+- 入口 = CEO root / VP-Eng root / CEO 的 `coo`·`cfo` 命名 child / CEO team（角色包）/
+  `quality-loop-producer`·`quality-loop-verifier` / `/req check` 命令 / UI 透镜；不重跑第四–七轮旧矩阵。
+- charters = P1（产品类型路由）、P2（五汇报线）、P3（team 角色包）、P4（质量环 starter）、P5（回归边界）；
+  P5 的 keyless/静态对账先做，P1–P4 的 live 按预算跑。
+- 预算：全局 120 分钟、16 个 parent turn、24 个 child activation、1 个 workflow run、1 次质量环、
+  单 turn 300 秒、合成证据 8 MiB；超限停止新 charter，保留现有证据。
+- 发现处置：真缺陷开 `_backlog/bugs/` 卡；静态漂移/文案矛盾记观察并指明 owner；**本轮不改代码**，
+  修复另按用户授权边界。
+
+**下一步（2026-11-10）：** 第八轮已执行（见下方「第八轮执行结果」）；
+[BUG-054](../_archive/fixed_bugs/BUG-054-dev-rehearsal-kb-policy-lines-missing.md) /
+[BUG-055](../_archive/fixed_bugs/BUG-055-team-role-packet-missing-taskbook.md) /
+[BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md) 均已由另一 Agent 修复归档；
+剩余 OBS-2 静态漂移与 OBS-5 UI 卡片可视性。
+未执行面保留，不写“没有 bug”。第四–七轮只作历史，不重跑。
+
+**历史（2026-11-09 第四轮）：** 第四轮已执行并收口（2026-11-09，约 22 分钟/19 turns/27 children，
 未触发停止上限）；发现 **5 张缺陷卡（BUG-045–049）**，已按根因分组全部修复归档。修复后验证轮
 （2026-11-09 晚）已跑：keyless 138 tests / verify / preset-smoke / UI golden 全绿；profile 指向当前源码后
 BUG-045 的 depth-denial、BUG-046 的身份行、BUG-047 的 handbook skip 均真装配通过；**BUG-050 复核为
@@ -108,6 +115,232 @@ root/child `aborted`、无 sleep 残留。真装配探针另证：只跑 `tsc -b
 剩余探索面 = long-term adoption / workspace-write / 真页面图 / 其他职能逐个采用 retry / 重启后身份行。
 用户 2026-11-09 晚已点名继续探索，本卡回 `推敲中`；上述未覆盖项是下一轮候选，不写“没有 bug”。
 第四轮资产（keyless）见本节下方「第四轮收口」。
+
+## 第八轮（2026-11-10 后）：新面与回归
+
+> 用户 2026-11-10 要求：先把本卡适配现状，再做 exploratory test。**本节是本轮唯一矩阵**；
+> 下方第四–七轮只作历史，不重跑。本轮不改代码：真缺陷开 bug 卡，静态漂移记观察并指明 owner。
+
+### 8.1 为什么本轮不同
+
+2026-11-10 的四组改动把委派面从“9 preset + 3 命名行”扩成“11 preset + 5 命名行 + 产品类型路由 +
+方法包 + team 角色包”。旧矩阵（D1/R1/W1/K1/U1）只覆盖 2026-11-09 的 worker/retry/workflow 面；
+继续按旧矩阵跑，会把新增的合法行为误判为失败，也会漏掉新面与旧面的交界。本轮只探：
+
+1. 产品类型：`business-software` / `hardware-software` / `meta.md` / `/req check`；
+2. 五汇报线：`coo` / `cfo` 命名行、UI key、child preset/depth；
+3. team 角色包：成员能否真读到 `<company-content>/../presets/<role>/skills/...`；
+4. 质量环 starter：四份方法包是否被 producer/verifier 加载、配对、只读边界；
+5. 回归：旧 worker/retry/workflow/depth/handbook/合同有没有被改坏。
+
+### 8.2 入口矩阵
+
+| ID | 入口 | 深度 | 组合 / 工具面 | 本轮用途 |
+|---|---|---:|---|---|
+| C | CEO root | 0 | 五命名行 + research + team；无 generic subagent / workflow / control | 五汇报线、产品类型、team 角色包 |
+| V | VP-Eng root | 0 | worker / fork / workflow / quality loop / `vp_cmo` | 质量环 starter、workflow 回归 |
+| Ncoo / Ncfo | CEO → `coo` / `cfo` 命名 child | 1 | 对应角色 preset；generic subagent/fork `maxDepth: 2` | 五汇报线真激活、preset/depth/UI |
+| T | CEO team（任务书带角色包） | 1 | 继承 CEO 组合；角色包给 CHARTER + skill 路径 | 角色包读路径与产出 |
+| QP / QV | `quality-loop-producer` / `quality-loop-verifier` | 1 | 方法槽 + `_shared/skills/quality-loop` | starter 加载、配对、只读 |
+| RQ | `/req check`（操作员命令） | — | 读动议 `meta.md` > `company.md` | 产品类型路由 |
+| U | 委派卡 / DagTab 透镜 | — | 只读投影 | 五 key、widget 状态、终态 |
+
+三种门不要混：C 是编排者，V 是研发根门，Ncoo/Ncfo 是命名 child（不是 team member）；T 是软角色，
+角色包只是任务书约定；QP/QV 是 support 能力档，不是公司角色。
+
+### 8.3 Charters
+
+#### P1 · 产品类型路由（keyless + 1 live）
+
+**任务形状**：keyless 跑 `pnpm vitest run tests/host/commands/req-command.spec.ts
+tests/content/product-types.spec.ts tests/host/run-bundle/company-fixture.spec.ts`；live 给 CEO 一条
+“纯软动议、只做一份 MRD”的 prompt，看它是否在 `deliverables/<slug>/meta.md` 写
+`产品类型: business-software`，以及是否按 `product-definition` 选 business-software playbook。
+
+**oracle**：`meta.md` 字段；`/req check` 回执的 `层 = MRD/StRS/PRD` 与“动议类型”；未知类型错误文本；
+`business-software/check-rules.json` 三层；`hardware-software` 仍可走系统层；模板占位 `<...>` 不误红。
+
+**失败信号**：CEO 只在对话里说类型、不写 meta；`/req check` 仍读 company.md；`business-software`
+被 `/prd check` 判缺 MRD/PRD；未知类型静默回落五层；旧 `b2b-saas` 不报错。
+
+#### P2 · 五汇报线（live，2–3 个 parent turn）
+
+**任务形状**：CEO root 分别发“让 COO 出一份单职能交付核查”/“让 CFO 出一份单职能毛利测算”，
+brief 只要一份、单职能；看工具调用名、child 首帧 preset/depth、完成通知、UI 委派卡。
+
+**oracle**：CEO 工具目录含 `coo`/`cfo`；call 名 = `coo`/`cfo`；child `agentPreset` = `coo`/`cfo`、
+`delegationDepth = 1`；child 工具面有该角色 skills、**没有** Team 工具；`DELEGATION_TOOL_KEYS` 五条；
+UI 卡渲染对应 label；不误用 `vp_*` 或 team。
+
+**失败信号**：工具可见但调用报 unknown / depth；child preset 错；UI 不渲染 coo/cfo；CEO 用 team 软角色
+冒充真 COO/CFO；命名 child 被 team 控制名误等。
+
+#### P3 · team 角色包（live，1–2 个 parent turn）
+
+**任务形状**：CEO 组一个 1 人 team（成员名 `coo`），任务书带角色包：
+`角色 / CHARTER / <company-content>/../presets/coo/skills/ops-feasibility/SKILL.md / budget-check/SKILL.md /
+KB / 产出 / 边界`；任务只要求一页交付核查。看成员是否 `read` 这些文件、是否按 COO 边界产出。
+
+**oracle**：成员工具调用含 `read` 指向上述路径；不出现 `skill` unknown 后直接凭记忆编；产出文件在
+`drafts/coo.md`；成员没有越权（不定技术/定价）；成员是继承 CEO 组合，不声称自己是 preset COO。
+
+**失败信号**：`<company-content>/../presets` 路径读不到；成员因 `skill` 加载不到就跳过；产出是 CEO 口吻/
+没有 COO 判据；角色包路径写错或越界（沙箱拒绝）。
+
+#### P4 · 质量环 starter（keyless + 1 live turn）
+
+**任务形状**：keyless `pnpm methods:init`（幂等）、四份方法包 parse/pair/check-id；live 给
+`quality-loop-producer` / `quality-loop-verifier` 各一条“列出你可用的 skill 名，不要调用”的 prompt，
+看 catalog 是否含 `system-architecture` / `vv-plan`；可选一次 VP-Eng 质量环（budget 允许 1 次）。
+
+**oracle**：`<DSH_HOME>/company/methods/quality-loop-{producer,verifier}/...` 四份在场；producer/verifier
+同 method/version；verifier 工具面没有 write/edit/bash；skill catalog 含两包；VP-Eng persona 指向
+starter；任务书不点名时 fail-closed。
+
+**失败信号**：`methods:init` 覆盖人的版本；两包版本/check-id 不配对；verifier 能写盘/跑 bash；
+catalog 看不到 starter；VP-Eng 自己编方法；旧 `system-architect`/`system-qa` 仍被提到为可用。
+
+#### P5 · 回归边界（keyless/static 先做，spot live）
+
+**任务形状**：跑 `pnpm verify`、`pnpm test`、`pnpm typecheck`、`preset-smoke`；静态对账：
+`retrySurface()`、`handbookSkipPresets()`、`CONTRACTS.status`、CEO `namedDelegates`、`DELEGATION_TOOL_KEYS`；
+`rg` 活跃面的旧断言（`9 个 preset`、`三个工具`、`b2b-saas`、`没有默认方法包`、`handbookSkipPresets: ['worker']`）。
+spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全矩阵。
+
+**oracle**：门禁/测试全绿；静态事实与 2026-11-10 代码一致；旧卡只作历史；没有“文档说 3、代码说 5”的
+活口径；没有新增的 `planned`/`三个工具`/`b2b-saas` 活跃引用。
+
+**失败信号**：测试红；`preset-smoke` 挂载失败；静态对账仍出现旧数字；`delegation-smoke` 的可见工具
+清单缺 coo/cfo；旧探测场景被误当成本轮 PASS。
+
+### 8.4 可证伪假设
+
+| # | 假设 | 通过信号 | 失败信号 |
+|---|---|---|---|
+| H12 | `/req check` 按 meta > company，未知类型报错，business-software 走三层 | 回执层/来源正确；未知类型有诊断 | 仍读 company；静默回落；三层被误红 |
+| H13 | CEO 五条角色命名行可激活，child preset/depth 正确 | call/child header/UI 一致 | 工具不可见、preset 错、UI 不渲染 |
+| H14 | team 角色包的 `<company-content>/../presets` 路径可读 | 成员 `read` 成功并产出 | 路径不可读、成员凭记忆、越权 |
+| H15 | 质量环 starter 两侧可加载、配对、verifier 只读 | catalog 含两包；无写/跑工具 | 包缺失/版本不配/verifier 能写 |
+| H16 | 旧 worker/retry/workflow/depth/handbook/合同无回归 | 旧 keyless + spot live 全绿 | 任一旧行为退化 |
+| H17 | CEO 在 live 里真写 `meta.md` 的产品类型 | 文件有真类型，不是占位 | 只在对话里说，或写 `<...>` |
+| H18 | 未知 `b2b-saas` / `project-services` 明确报错 | `/req check` 报未知并列可用 | 静默用五层/旧规则 |
+| H19 | `methods:init` 幂等、不覆盖人的方法 | 二次运行 skipped；内容不变 | 覆盖、重复、假成功 |
+
+### 8.5 Oracle 与证据
+
+- 独立 oracle：`meta.md`、`/req check` 回执、child 首帧 `agentPreset`/`delegationDepth`、工具目录
+  `request/header.tools`、skill catalog、`read`/`write` 工具调用、文件内容、`DELEGATION_TOOL_KEYS`、
+  `preset-smoke` 的 roster/挂载行。
+- 模型自述只作诊断，不参与 PASS；UI 只作观察透镜，不单开视觉扫。
+- 证据落点：会话 id + 关键 JSON 片段写回本卡；大文件放 `runtime/`（gitignored）并在卡内给路径；
+  不进 `snapshots/` 除非要固化为回归资产。
+- 不重复第四–七轮旧场景；复发按新证据记为回归。
+
+### 8.6 预算与停止（用户 2026-11-10 授权）
+
+| 维度 | 上限 | 超限动作 |
+|---|---:|---|
+| 全轮墙钟 | 120 分钟 | 停止新 charter，取消在途 session/job，收口 |
+| parent prompt/turn | 16 | 不再发新 turn；未覆盖标未执行 |
+| child activation | 24（含 retry/嵌套） | 不再启动 child；保存证据 |
+| workflow run | 1 | 不再开第二个 |
+| 质量环 | 1 次 | 不追加轮次；超限按质量环 skill 升级 |
+| 单 turn 等待 | 300 秒 | cancel/kill；连续两次 infra 失败暂停诊断 |
+| 合成证据 | 8 MiB | 停止新探索，保留关键判据 |
+
+### 8.7 本轮完成判据
+
+- 用户 2026-11-10 授权已记录；P5 的 keyless/静态先做，P1–P4 至少各有一条 live 或明确“未执行”。
+- 每个 charter 有 session id / 命令、oracle、判定、未覆盖；不写“没有 bug”。
+- 真缺陷开 `_backlog/bugs/` 卡；静态漂移/文案矛盾记观察并指明 owner；本轮不改代码。
+- 收口回答：抓到什么副作用；哪些值得升 keyless/probe/replay；哪些没跑；是否触发停止上限。
+
+## 第八轮执行结果（2026-11-10）
+
+> 环境 = HEAD `6ae536d3` + dev `DSH_HOME` + `runtime/rehearsal-workspace`；真实模型 = deepseek。
+> 实际预算：约 **50 分钟**、**20 条 parent prompt**、**22 个 child activation**、**1 个 workflow run**、
+> **1 次完整质量环 + 1 次 verify-only 复跑**；prompt 比 16 的预算多 4 条（UI 对照探针），
+> 未触发墙钟/child 上限。临时探针住 `runtime/`（gitignored），不随包发布。
+
+### 实际运行
+
+| 入口 | 会话 / child | 结果 |
+|---|---|---|
+| C · CEO root | `session-2110bd4a-627d-4f44-abd0-a2b15054783b` | 工具目录含 `coo`/`cfo`；五命名行可见 |
+| Ncoo · CEO→`coo` | child `3b726373-c87f-4133-b9db-c101179ce756` | `started subagent`；child `agentPreset=coo`；71 工具；无 Team 工具 |
+| Ncfo · CEO→`cfo` | child `91911489-111a-463d-9094-72ceadbb3f3a` | `started subagent`；child `agentPreset=cfo`；71 工具；无 Team 工具 |
+| P1 · meta 产品类型 | CEO 同会话 | `drafts/.../meta.md` = 一行 `产品类型: business-software`；CEO 真写盘 |
+| P1 · `/req check` live | `commands/execute`（CEO 会话） | **dataBlocked**（探针会话无 workspace/lease）；keyless 覆盖解析，live 未证 |
+| QP / QV · 质量环 catalog | `session-1ef5a82f-913c-405d-aaa6-67036f726b87` / `session-8ab5af86-b8cb-4697-9689-1bbbb5bebf0b` | 两侧 catalog 都含 `system-architecture` / `vv-plan` |
+| QP / QV · skill 真加载 | `session-c08f1dab-0145-492a-9b46-70f5fbdaa65a` / `session-f5e6a01f-9e7b-4578-8749-4bfb4aa1c5c8` | 两侧都 `skill(name=system-architecture)` 成功；producer/verifier 正文各是自己的 side |
+| P4 · 质量环 live | VP-Eng `session-9762e5c2…`（首次）/ `session-9144774f…`（verify-only 复跑）；producer `b877f4de…`；verifier `7ae15c99…` | verdict pass + 4 条 advisory 处置；**audit FAIL `body-modified`**（BUG-056） |
+| T · team 角色包 | CEO `session-69cabf06-dd57-4cb5-8f82-cadf47c82c42`；member `2955f432-25d5-490a-92a1-1b58a7883c77` | spawn PASS；成员盘日志有 `read` CHARTER + `ops-feasibility` + `budget-check`；`drafts/coo.md` 在场 |
+| T · CMO 真实产出 | CEO `session-b8eef8a8-4703-477a-9496-8dbf117aaf9b`；member `366ba724-f890-4db5-b110-352e9034829b` | `drafts/cmo.md` 在场（MRD `defer`）；成员日志提及 `product-definition` / `business-software` / `mrd-playbook`；任务书 `drafts/ceo.md` 真实 |
+| UI · client-load | `client-load-smoke` | ALL PASS（真浏览器零挂载失败 / 零 loader 错 / 品牌槽） |
+| UI · shell golden | `ui-scene-smoke --isolated --golden` | ALL PASS（9 页签 + 错误环零命中） |
+| UI · 卡片标签 | `ui-scene-smoke --ask` + `--steps`（coo/cfo + vp_eng 对照） | **未证实**：默认 transcript、点 `Completed`、点 `Agent Team` 都看不到 `COO（…）` / `VP-Eng（…）`；非 coo/cfo 专有，按 UI/折叠/探针限制记 OBS-5 |
+| P5 · delegation smoke | `delegation-smoke --delegate` `session-6e69bfb5-7df4-4c40-8086-9518cb689046` | ALL PASS；CEO 工具目录五命名行齐；vp_eng child preset 正确、无 Team 工具 |
+| P5 · retry | `subagent-retry-probe` `session-555420d3-a428-4e21-b0c8-87d4d2a5d408`；child `e248e6da…` | ALL PASS；worker depth 1、`completed` |
+| P5 · depth | `delegation-depth-probe` `session-5a9ca2b4…`（P-C）/ `session-81ee96a6…`（P-D） | ALL PASS；workflow 分支 1、worker 2；teammate 1、worker 2 |
+
+### 判定
+
+- **P2 五汇报线：PASS**。`coo`/`cfo` 可见、被调用、child preset 正确、无 Team 工具；UI key 静态五条。
+- **P1 产品类型：PASS（写入面）**。CEO 真写了 `meta.md` 的产品类型；`/req check` 的 live 命令面
+  被 `dataBlocked` 挡住（探针会话无 workspace/lease），由 keyless spec 覆盖 meta 优先/回落/未知/占位。
+- **P4 质量环 starter：catalog/加载 PASS；完整质量环 FAIL（audit）**。producer/verifier 都看得到
+  `system-architecture`/`vv-plan`，且 `skill(name=system-architecture)` 成功加载到各自 side 的正文。
+  第一次 live 在 300s wall 处截断于 verify 启动；复用产物只跑 verify 的 follow-up 写出 verdict
+  `pass` + 4 条 advisory 处置，但 `quality-loop-audit` 报 `body-modified`：头 hash 含尾随换行，
+  audit 归一化后不一致（[BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)）。
+  把副本头 hash 改成归一化值后 audit **ALL PASS**——其余八项都过，唯一失败是 hash 口径。
+  裁决文本本身 pass、检查表/处置都在，但机械锚对不上；R2/复验未跑。
+- **P3 team 角色包：PASS（路径 + CMO 产出）**。COO 成员盘日志证明它读了 CHARTER + 两个 COO skill
+  （绝对路径 `<company-content>/../presets/coo/skills/...`），产出 `drafts/coo.md`。CMO 成员真出了
+  `drafts/cmo.md`（MRD `defer`），日志提及 shared `product-definition`、`business-software` 与
+  `mrd-playbook`；任务书 `drafts/ceo.md` 真实（BUG-055 修复后的形状）。
+- **P5 回归：PASS（keyless/静态 + 三条 live smoke + UI 壳）**。`pnpm verify` ALL PASS、`pnpm test`
+  170 files / 1409 tests、`pnpm typecheck` 绿、`preset-smoke` ALL PASS、`delegation-smoke --delegate`
+  ALL PASS、`subagent-retry-probe` ALL PASS、`delegation-depth-probe` ALL PASS；`client-load-smoke` 与
+  `ui-scene-smoke --isolated --golden` 也 ALL PASS。第四–七轮旧矩阵未重跑。
+
+### 新发现
+
+- [BUG-054](../_archive/fixed_bugs/BUG-054-dev-rehearsal-kb-policy-lines-missing.md)（P2，**已由另一 Agent 修复归档**）：
+  dev/rehearsal 盘缺 `policy-lines.md` / `review-protocol.md`；COO 在探针里因此把预算/并行判据标
+  「唯一事实家缺失」。生产 `seed.json` 有这两条，缺口在 `bundle-init` / `mirrorCompanyReference`。
+- [BUG-055](../_archive/fixed_bugs/BUG-055-team-role-packet-missing-taskbook.md)（P2，**已修复归档**）：
+  team 角色包没有 `任务书` 字段；COO 稿首署名行指向不存在的 `drafts/ceo.md`。
+- [BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)（P2，**已修归档**）：quality-loop
+  `verdict-r1.md` 的 body-sha256 含尾随换行；首次真跑 audit `body-modified`。文本 pass、机械锚对不上。
+- **OBS-1（探针限制，不是产品缺陷）**：团队成员的会话不能通过 `session/page` 读（地址/边界），
+  本次改用磁盘 `session.v4.jsonl.zstd`；证到成员真读了角色 skill。
+- **OBS-2（静态漂移，owner = 文档/研究）**：
+  `packages/company-pack/cordis.patch.yml:104` 的注释仍写 `handbookSkipPresets: ['worker']`；
+  `checks/smoke/release-smoke.mjs:164` 的历史注释仍写「9 个 preset」；
+  `2026-11-10-sa-sqa-method-packs.md` 与 `2026-11-10-org-coordination-topology.md` 的
+  “没有默认方法包 / 三个工具”是落地前快照，应加“2026-11-10 后已变”的指针（研究材料是证据，不回填正文）。
+- **OBS-3（探针限制，不是产品缺陷）**：`commands/execute` 在无 workspace/lease 的临时 CEO 会话里返回
+  `公司数据已停写`；`/req check`/`/prd check` 的 live 面需要 GUI 选 workspace 或命令宿主夹具，
+  本轮未搭。keyless 已覆盖命令解析与 checker。
+- **OBS-4（流程风险）**：VP-Eng 在 verdict 后改了产物（F1/F3 订正），没有开 R2；处置表明确标
+  「已修但未经复验」。本轮是我们的 prompt 限定只跑一轮，但这说明**裁决与产物版本没有被同一 hash 绑定**，
+  与 BUG-056 的修复面相邻。
+- **OBS-5（UI 探针限制，不是 coo/cfo 回归）**：`ui-scene-smoke --ask` 的 coo/cfo 与 vp_eng 对照
+  都看不到角色卡标签；默认 transcript 只显示最终文本 / `Completed`，点 `Completed` 或 `Agent Team`
+  仍未露出。`client-load-smoke` 与 shell golden 全绿；卡片是否真渲染**未证**，不据此开 bug，
+  归入“UI 卡片可视性未覆盖”。
+- **未发现**产品类型/五汇报线的硬缺陷；质量环 catalog/加载 PASS，完整质量环 audit `body-modified`
+  已由另一 Agent 修复归档（[BUG-056](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)）；
+  UI 卡片标签未证实。不能据此说“没有 bug”，未跑面见下。
+
+### 未执行
+
+- `/req check` / `/prd check` 的真实命令回执（`dataBlocked`，见 OBS-3；keyless 已覆盖解析）；
+- 质量环 R2/复验（首次 live 只做了 produce→verify→R1 处置；audit 已 FAIL，见 BUG-056）；
+- `business-software` 动议的 `/prd check` + `/req check` 端到端（同 OBS-3）；
+- UI 卡片标签可视性（shell/加载已验；默认 transcript / Agent Team / 展开均未露出，见 OBS-5）；
+- `project-services` 未知类型报错的 live 面。
 
 ## 第四轮收口（2026-11-09）
 

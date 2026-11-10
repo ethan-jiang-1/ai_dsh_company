@@ -69,7 +69,7 @@ intent: 用只读词频读数量化“委派/引擎合同”在 persona、角色
 ## 复算
 
 ```sh
-node _backlog/research/presets-delegation-architecture/contract-terms.mjs
+node _backlog/_archive/research/presets-delegation-architecture/contract-terms.mjs
 ```
 
 脚本只读文件，不写盘；输出为 JSON（本次快照 = `contract-terms.json`）。

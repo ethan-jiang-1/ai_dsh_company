@@ -9,8 +9,8 @@ opened: 2026-11-10
 >
 > **结论/去向**：note — [Note](../../../notes/implemented/2026-11-10-sa-sqa-method-packs.md)。
 >
-> 上游研究：[SA/SQA 方法包](../../research/org-coordination-topology/2026-11-10-sa-sqa-method-packs.md)；
-> 组织拓扑 [README](../../research/org-coordination-topology/README.md)。
+> 上游研究：[SA/SQA 方法包](../../_archive/research/org-coordination-topology/2026-11-10-sa-sqa-method-packs.md)；
+> 组织拓扑 [README](../../_archive/research/org-coordination-topology/README.md)。
 > 前置：产品类型语义由[另一卡](2026-11-10-product-type-semantics.md)定；本卡只做“硬软一体的系统能力怎么回来”。
 >
 > **已定（实现）：** 两个方法包 `system-architecture@1.0.0` + `vv-plan@1.0.0`（各含 producer/verifier 两侧）；

@@ -82,8 +82,8 @@ node --import tsx/esm vendor/dsh/apps/cli/src/bin.ts --profile company --dump-co
 ## 复算
 
 ```sh
-node _backlog/research/presets-delegation-architecture/composition-matrix.mjs
-node _backlog/research/presets-delegation-architecture/composition-names.mjs
+node _backlog/_archive/research/presets-delegation-architecture/composition-matrix.mjs
+node _backlog/_archive/research/presets-delegation-architecture/composition-names.mjs
 node --import tsx/esm vendor/dsh/apps/cli/src/bin.ts --profile company --dump-config > /tmp/dump.yml
-node _backlog/research/presets-delegation-architecture/dump-presets.mjs /tmp/dump.yml
+node _backlog/_archive/research/presets-delegation-architecture/dump-presets.mjs /tmp/dump.yml
 ```

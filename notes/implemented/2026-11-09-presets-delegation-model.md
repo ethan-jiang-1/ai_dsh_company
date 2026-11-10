@@ -5,7 +5,7 @@
 > 部分取代：retry 的注册面/深度与合同载体状态见 [2026-11-09-delegation-surface-single-source](./2026-11-09-delegation-surface-single-source.md)（2026-11-09，BUG-049/045）。
 > 后续修正：worker family 的 control 面与 fan-out 声明见 [2026-11-10-capability-surface-enforcement](./2026-11-10-capability-surface-enforcement.md)（2026-11-10，BUG-051/052）。
 上游 = [RFC 卡](../../_backlog/_archive/settled_issues/2026-11-09-presets-delegation-architecture.md)；
-研究 = [preset 委派架构：盘点与结构性研究](../../_backlog/research/presets-delegation-architecture/README.md)（已定性）。
+研究 = [preset 委派架构：盘点与结构性研究](../../_backlog/_archive/research/presets-delegation-architecture/README.md)（已定性）。
 
 ## 问题
 

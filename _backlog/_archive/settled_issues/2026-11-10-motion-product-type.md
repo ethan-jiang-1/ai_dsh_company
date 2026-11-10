@@ -9,8 +9,8 @@ opened: 2026-11-10
 >
 > **结论/去向**：note — [Note](../../../notes/implemented/2026-11-10-motion-product-type.md)。
 >
-> 上游研究：[产品类型模型 §4](../../research/org-coordination-topology/2026-11-10-product-type-model.md)；
-> 组织拓扑 [README](../../research/org-coordination-topology/README.md)。
+> 上游研究：[产品类型模型 §4](../../_archive/research/org-coordination-topology/2026-11-10-product-type-model.md)；
+> 组织拓扑 [README](../../_archive/research/org-coordination-topology/README.md)。
 > 前置：产品类型语义由[另一卡](2026-11-10-product-type-semantics.md)定；本卡只做“怎么按动议切换”。
 >
 > **已定（实现）：** `meta.md` 加 `产品类型`；`/req check` 解析顺序 = 动议 `meta.md` > `company.md`；

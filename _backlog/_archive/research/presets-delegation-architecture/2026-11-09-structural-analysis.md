@@ -6,7 +6,7 @@ intent: 从 9 个 preset 的静态读数与 BUG-036..044 反推委派面的结�
 # presets 委派面的结构性分析（第一版）
 
 > 状态：**推论稿**。读数来自 [inventory.json](inventory.json)（脚本 [inventory-presets.mjs](inventory-presets.mjs)，
-> 只读）；bug 事实来自 [fixed_bugs](../../_archive/fixed_bugs/README.md) 里的 BUG-036..044；DSH 机制尚未逐条核对源码，标为待验。
+> 只读）；bug 事实来自 [fixed_bugs](../../../_archive/fixed_bugs/README.md) 里的 BUG-036..044；DSH 机制尚未逐条核对源码，标为待验。
 > 本文回答“有没有结构问题、可能是什么”；不回答“该怎么改”（下一份材料）。
 
 ## 0. 一句话判断（假设，待验）

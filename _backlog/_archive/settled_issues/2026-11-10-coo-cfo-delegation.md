@@ -9,8 +9,8 @@ opened: 2026-11-10
 >
 > **结论/去向**：note — [Note](../../../notes/implemented/2026-11-10-coo-cfo-delegation.md)。
 >
-> 上游研究：[组织协同拓扑 §2/§7.1](../../research/org-coordination-topology/2026-11-10-org-coordination-topology.md)；
-> 研究题 [README](../../research/org-coordination-topology/README.md)。
+> 上游研究：[组织协同拓扑 §2/§7.1](../../_archive/research/org-coordination-topology/2026-11-10-org-coordination-topology.md)；
+> 研究题 [README](../../_archive/research/org-coordination-topology/README.md)。
 > 本卡只决定「COO/CFO 怎么被 CEO 叫到、怎么拿到角色方法、文档/测试怎么改」；产品类型与方法包另卡。
 >
 > **已定（实现）：** A + 角色包——CEO 补 `coo` / `cfo` 命名行（`maxDepth: 1`），多职能仍走 team；

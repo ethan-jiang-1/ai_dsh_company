@@ -3,7 +3,7 @@
 状态：implemented（2026-11-10 落地；验证见下）
 
 上游 = [SA/SQA 方法包卡](../../_backlog/_archive/settled_issues/2026-11-10-sa-sqa-method-packs.md)；
-证据 = [SA/SQA 方法包研究](../../_backlog/research/org-coordination-topology/2026-11-10-sa-sqa-method-packs.md)。
+证据 = [SA/SQA 方法包研究](../../_backlog/_archive/research/org-coordination-topology/2026-11-10-sa-sqa-method-packs.md)。
 
 ## 问题
 

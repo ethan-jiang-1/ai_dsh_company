@@ -18,7 +18,7 @@ persona 把方法写回去。
 
 ## 1. 旧 SA/SQA 到底是什么
 
-2026-11-06 落地、2026-11-09 退役（[退役 Note](../../../notes/implemented/2026-11-09-retire-sa-sqa.md)）。
+2026-11-06 落地、2026-11-09 退役（[退役 Note](../../../../notes/implemented/2026-11-09-retire-sa-sqa.md)）。
 旧文件仍在 git：`bf04ab1c`。
 
 ### 1.1 system-architect（SA）
@@ -45,14 +45,14 @@ persona 把方法写回去。
 ### 1.3 为什么退役
 
 - 方法（V 模型层级、TC 编号、五学科清单）写进了 persona/skill，换公司要改包
-  （[质量环 Note:13](../../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md)）。
+  （[质量环 Note:13](../../../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md)）。
 - 用户明确要求清理旧 preset；退役删除 preset、父级委托行、specialist 模型、support/patch、文档/测试/探针。
 - SyRS/IRS/V&V 改为可选文档；默认链缩到 MRD→StRS→PRD；不再有 SQA veto 直达 CEO 的运行时路径。
 
 ## 2. 质量环现在给什么、不给什么
 
 质量环 = `quality_loop_produce`（producer，有手）→ 收工 → `quality_loop_verify`（verifier，只读）
-（[`quality-loop/SKILL.md`](../../../packages/company-pack/presets/_shared/skills/quality-loop/SKILL.md)）。
+（[`quality-loop/SKILL.md`](../../../../packages/company-pack/presets/_shared/skills/quality-loop/SKILL.md)）。
 
 | 给 | 不给 |
 |---|---|
@@ -115,7 +115,7 @@ persona 把方法写回去。
 
 > 检查表 id 只是研究草案；真正落包时要按质量环方法契约（`metadata.method/version/side` +
 > check-id 表 + 输入/程序/检查表/输出四段）写成两份 `SKILL.md`。审计工具会核两侧
-> `method/version` 配对与 check-id 全覆盖（[`quality-loop.mjs`](../../../tools/lib/quality-loop.mjs)）。
+> `method/version` 配对与 check-id 全覆盖（[`quality-loop.mjs`](../../../../tools/lib/quality-loop.mjs)）。
 
 ### 3.3 为什么不是一个大包
 
@@ -127,7 +127,7 @@ persona 把方法写回去。
 ## 4. 安装与启动：没有默认方法包是当前的断点
 
 - 方法层路径：`<DSH_HOME>/company/methods/quality-loop-producer/<pack>/SKILL.md` 与
-  `.../quality-loop-verifier/<pack>/SKILL.md`（[`docs/guides/quality-loop.md:1-30`](../../../docs/guides/quality-loop.md)）。
+  `.../quality-loop-verifier/<pack>/SKILL.md`（[`docs/guides/quality-loop.md:1-30`](../../../../docs/guides/quality-loop.md)）。
 - 当前没有默认包；任务书不点名 = fail-closed。SA/SQA 的方法在 git 里，不在运行时。
 - 三种启动方案：
 

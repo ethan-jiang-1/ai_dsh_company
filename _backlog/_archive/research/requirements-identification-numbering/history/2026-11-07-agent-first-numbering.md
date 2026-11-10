@@ -148,7 +148,7 @@ intent: 给下一个 Agent 的问题理解 brief：capture 2026-11-07 对话里�
 - v5 SA 稿的接口清单标题写 "21 条"（`company-workspace/.dsh-company/deliverables/2026-11-06-portable-overload-detection-v5/drafts/sa-architecture.md:364`）；文末自检写 "IF-001~IF-021 共 21 条"（同文件 `:589`）；"21 条连续不跳号"（`:597`）。
 - v5 final 写 "21 条接口（IF-001~IF-021）"（`.../v5/final.md:8`）。
 - `IF-022` / `IF-023` 只出现在 SQA 稿的 "B-05 最小修复方向：①补 2 条 IF"（`.../v5/drafts/sqa-vv.md:109`）；SQA 同一稿 `:196` 写 "覆盖 21/21 齐全"。
-- 研究材料把它写成 "final 说 21，文档实有 23"（[artifact-review.md:66](../../../../research/sa-sqa-product-review/2026-11-06-artifact-review.md)、[numbering-deliberation.md:41](2026-11-07-numbering-deliberation.md)）。
+- 研究材料把它写成 "final 说 21，文档实有 23"（[artifact-review.md:66](../../sa-sqa-product-review/2026-11-06-artifact-review.md)、[numbering-deliberation.md:41](2026-11-07-numbering-deliberation.md)）。
 
 **这暴露的问题（不是结论，是失败模式）**
 

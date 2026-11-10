@@ -14,7 +14,7 @@ opened: 2026-11-07
 > 人和 Agent 都容易；Agent 不能困惑。
 > 消费者：用户 2026-11-07 直接提出（CMO 产 MRD 需 StRS、VP-Eng 产 PRD 需 SyRS+IRS）；本仓
 > [SA/SQA 子人格落地 Note](../../../../notes/archived/2026-11-06-sa-sqa-subpersonas.md) 与
-> [成品评审材料](../../../research/sa-sqa-product-review/README.md) 是背景证据。
+> [成品评审材料](../sa-sqa-product-review/README.md) 是背景证据。
 > 产出的卡：[程序伞卡](../../settled_issues/2026-11-07-requirements-teaming-landing.md) + 8 张执行卡：
 > [A1 合同](../../settled_issues/2026-11-07-requirements-contract.md) / [A2 模板](../../settled_issues/2026-11-07-requirements-templates.md) /
 > [A3 CMO/VP-Eng](../../settled_issues/2026-11-07-requirements-cmo-vpeng.md) / [A4a SA](../../settled_issues/2026-11-07-requirements-sa.md) /

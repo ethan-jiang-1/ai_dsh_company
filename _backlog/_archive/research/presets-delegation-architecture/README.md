@@ -8,13 +8,14 @@ opened: 2026-11-09
 > 问题：六个角色 preset 的委派/控制行实际长什么样（工具行、persona 提及、skill 规模），哪些行重叠或成死行？
 > **延伸**：这套“九份自包含装配”在 DSH 的 subagent / workflow / agent-team 三通道下是否存在系统性、
 > 结构性设计问题？若有，优雅的调整方向是什么（组合形状、能力声明、合同归属、工作组合 vs 角色组合）？
-> 消费者：[委派面合同修复 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md)；
-> [BUG-037](../../_archive/fixed_bugs/BUG-037-root-team-tool-shadowing.md)、
-> [BUG-042](../../_archive/fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md)、
-> [BUG-043](../../_archive/fixed_bugs/BUG-043-list-subagents-includes-teammates.md)、
-> [BUG-044](../../_archive/fixed_bugs/BUG-044-background-job-lost-on-restart.md) 修复轮；
+> 消费者：[委派面合同修复 Note](../../../../notes/implemented/2026-11-08-delegation-contract-repair.md)；
+> [BUG-037](../../../_archive/fixed_bugs/BUG-037-root-team-tool-shadowing.md)、
+> [BUG-042](../../../_archive/fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md)、
+> [BUG-043](../../../_archive/fixed_bugs/BUG-043-list-subagents-includes-teammates.md)、
+> [BUG-044](../../../_archive/fixed_bugs/BUG-044-background-job-lost-on-restart.md) 修复轮；
 > 用户 2026-11-09 研究请求（无卡）。
-> 产出的卡：[presets 委派面的模型化重构（worker family + 链合同 + 图观测）](../../_archive/settled_issues/2026-11-09-presets-delegation-architecture.md)（等人拍板；本卡不授权生产代码）。
+> 产出的卡：[presets 委派面的模型化重构（worker family + 链合同 + 图观测）](../../../_archive/settled_issues/2026-11-09-presets-delegation-architecture.md)（等人拍板；本卡不授权生产代码）。
+> 归档：2026-11-10（末张活卡已结）；归档后仍可被活跃卡引用，引用不等于让研究「复活」。
 > 结论：存在系统性结构问题（组合重复/能力隐晦、worker=角色克隆、合同角色局部、三通道缺统一模型与面级验证）；
 > 推荐先做“合同单家 + worker profile + 能力清单 + keyless 声明面矩阵”，生成器为第二阶段，team 成员组合/通道统一属上游。
 
