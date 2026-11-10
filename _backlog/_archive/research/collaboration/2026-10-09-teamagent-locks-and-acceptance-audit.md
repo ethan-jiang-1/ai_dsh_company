@@ -27,7 +27,7 @@ intent: "复核多人协作的锁与 teamagent 保证、历史研究的落地和
 | task CAS / owner | 同 Team 日志中旧 revision 被拒；任务生命周期有 owner 权限 | 文件写权限、跨 root 仲裁、owner 自动释放 | [task-board](../../../../vendor/dsh/packages/experimental/agent-team/src/task-board.ts)、[上游限制](../../../../vendor/dsh/packages/experimental/agent-team/README.md#known-limitations-and-deferred-work) |
 | freshness guard | 同实例 read-check-publish 串行；读后版本变化拒写 | 重读后的业务覆盖是否合理；非参与写者；跨实例事务 | [fs-local:101–130](../../../../vendor/dsh/packages/fs/fs-local/src/index.ts#L101-L130)、[write:202–254](../../../../vendor/dsh/packages/fs/fs-local/src/index.ts#L202-L254) |
 | atomic publish | 替换文件只发布完整载荷；createIfAbsent 用 hard-link no-replace | 多次读改写之间互斥、两个更新都保留 | [fsio:573–586](../../../../vendor/dsh/packages/fs/fs-local/src/fsio.ts#L573-L586) |
-| 逻辑单 owner | 手册要求先认领再动笔、占位后重读让位 | 机制强制只一个人干活、没有重复劳动 | [公司手册](../../../../AGENTS.md)、[多人合同](../../../../docs/multi-human.md) |
+| 逻辑单 owner | 手册要求先认领再动笔、占位后重读让位 | 机制强制只一个人干活、没有重复劳动 | [公司手册](../../../../AGENTS.md)、[多人合同](../../../../docs/contracts/multi-human.md) |
 
 | 拓扑 | Team 层 | 文件层 | 判断 |
 |---|---|---|---|

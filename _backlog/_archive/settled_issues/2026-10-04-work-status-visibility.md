@@ -36,7 +36,7 @@ H6 悬案（2026-10-04 走查发现）：注意力中心只推「需要你」四
 ## 毕业门
 
 - **该不该**：已判该做（用户裁决出方向）。
-- **何时**：选 (a) → 随手毕业（预期行为判据 + [multi-human.md](../../../docs/multi-human.md) 或
-  [presets.md](../../../docs/presets.md) 合同行）；选 (b)/(c) → RFC。
+- **何时**：选 (a) → 随手毕业（预期行为判据 + [multi-human.md](../../../docs/contracts/multi-human.md) 或
+  [presets.md](../../../docs/contracts/presets.md) 合同行）；选 (b)/(c) → RFC。
 - **次序**：真实动议走查在场板 → 形状裁决 → 落地/毕业。
 - **放弃**：无——方向已定，本卡只剩形状选择。

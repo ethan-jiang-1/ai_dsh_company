@@ -5,7 +5,7 @@
 
 > 上游 = 用户点名（2026-10-30 会话）；无 `_backlog` 卡（制度整理，不是推敲卡毕业）。
 > 借源 = 外部仓 ai_dsh_deep_research 的 `_backlog`（维护者本机；2026-10-30 当日态，登记见
-> [external-research](../../docs/external-research.md)）；与本仓旧制（D31/D33）同源，本次是**研究层**的
+> [external-research](../../docs/reference/external-research.md)）；与本仓旧制（D31/D33）同源，本次是**研究层**的
 > 形状升级，不是制度重立。现行规则 = [_backlog/research/README.md](../../_backlog/research/README.md)
 > 与 [_archive/research/README.md](../../_backlog/_archive/research/README.md)。
 
@@ -48,7 +48,7 @@
 - 归档：整目录迁移 + 归档行 + 索引一行；不再往 `_archive/README.md` 的卡表里塞研究行。
 - 历史例外如实留在题名页：`repo-hygiene/` 的 round3/round4 材料曾于 2026-10-27/28 直接写入归档目录；
   `multi-user-ux/` 原平铺在 shelf 根，2026-10-30 归题。旧材料 frontmatter 不回填（现行旧制不变）。
-- 台账登记 D50：`docs/decisions.md` 行数 60→61，`doc-budget` 上限同日 60→61（路由表按决定增长；
+- 台账登记 D50：`docs/reference/decisions.md` 行数 60→61，`doc-budget` 上限同日 60→61（路由表按决定增长；
   本轮不顺手压缩尾部历史段——那属另一轮，避免把两件事塞进同一变更）。
 - 无待办：门禁与 spec 同 diff 已接；后续写研究按
   [_backlog/research/README.md](../../_backlog/research/README.md) 的模板走。唯一不回填项 = 历史消费者卡

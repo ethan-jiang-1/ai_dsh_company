@@ -1,7 +1,7 @@
 # dev 与用户侧路径 parity（同机制、有界差异）
 
 > 什么时候读：改 `pnpm company` / dev home / 观察窗启动方式，或怀疑"dev 绿能不能推出用户绿"时。
-> 合同：安装/发布形态 = [release.md](../release.md)；profile 与 workspace = [profile.md](../profile.md)。
+> 合同：安装/发布形态 = [release.md](../contracts/release.md)；profile 与 workspace = [profile.md](../contracts/profile.md)。
 > 本页只回答一件事：**哪条机制 dev 必须和用户走同一条，哪条允许不同、为什么。**
 
 ## 一句话
@@ -15,8 +15,8 @@
 | 机制点 | dev（默认） | 用户侧 | 证据 |
 |---|---|---|---|
 | 安装源 | `npm pack` 的 tarball，`plugin add file:<tgz>` | tarball / registry `name@version` | `tools/company.mjs`、`tools/lib/dev-install.mjs` |
-| 安装写入者 | `dsh plugin add` 写 profile 依赖与 `dsh.profile.bundles` | 同左（应用内 Plugins 页同款操作） | 不手写 roster；`docs/profile.md` |
-| profile 名 | `company` | `company` | `docs/profile.md`、smokes |
+| 安装写入者 | `dsh plugin add` 写 profile 依赖与 `dsh.profile.bundles` | 同左（应用内 Plugins 页同款操作） | 不手写 roster；`docs/contracts/profile.md` |
+| profile 名 | `company` | `company` | `docs/contracts/profile.md`、smokes |
 | 版本门 | 包 `engines.dsh` 在安装/启动时校验 | 同左 | `release-smoke`、`pack-engines` |
 | 打包面 | `files` 过滤后的 tarball（LICENSE/content/locale/icon 都在） | 同左 | `npm pack` + `export-dist` 清单 |
 | profile 用户层 | 用户侧不写；dev 也不写 | 不写 | `dev-product-parity` 门禁 + `company-entry-smoke` |

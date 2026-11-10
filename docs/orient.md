@@ -6,7 +6,7 @@
 > 词表：「观察窗」=「驾驶舱」=「驾驶座」同指人侧 web 窗口——「驾驶舱」是 UI 切片的历史名
 > （驾驶舱①–④，多数页签后来并入右栏公司页签），「驾驶座」是维护文档的比喻用法。
 > 词表补：「research」在本仓——活跃调研 = `_backlog/research/`（随最后一张活卡迁 `_archive/research/`）；
-> notes 侧旧 research 层已退役（D30）；「外部研究材料」= repo 外登记（[external-research](external-research.md)）。
+> notes 侧旧 research 层已退役（D30）；「外部研究材料」= repo 外登记（[external-research](./reference/external-research.md)）。
 > 层数口径：四问的「三层」是粗分组，testing.md §1 的「九层」是细表——前者是后者的视图，不是两套制度。
 
 ## 一问：这仓库是什么？
@@ -21,7 +21,7 @@ COO、CFO、CMO 各自是独立 preset，跑在 DSH 会话里，你通过 web �
 白话三步：进开发环境（`source run/env.sh`）→ 起公司（`pnpm company …`）→ 浏览器开门
 （token URL 在启动横幅里读）。**headless 只证明 CLI 能跑，不是公司运行。**
 
-→ 唯一步步骤：[demo.md §前置](demo.md)
+→ 唯一步步骤：[demo.md §前置](./contracts/demo.md)
 
 ## 三问：改东西从哪进？
 

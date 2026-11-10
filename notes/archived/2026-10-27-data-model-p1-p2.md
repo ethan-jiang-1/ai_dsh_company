@@ -5,7 +5,7 @@
 
 > **2026-10-28 M3 部分取代（G7 方法层边界）**：方法层已迁公司级 `<DSH_HOME>/company/methods/<role>/`，
 > 同 home 多 profile 共享；本文 §决定 4 与 §后果 的“按 profile 隔离/各一份”作废。
-> 见 [data-model](../../docs/data-model.md) §四、[profiles.ts](../../packages/company-pack/src/host/run-bundle/profiles.ts) 与
+> 见 [data-model](../../docs/contracts/data-model.md) §四、[profiles.ts](../../packages/company-pack/src/host/run-bundle/profiles.ts) 与
 > [数据设计硬化 Note](./2026-10-28-data-design-hardening.md)；
 > 其余 G6/G8/G11/G12 仍有效。
 

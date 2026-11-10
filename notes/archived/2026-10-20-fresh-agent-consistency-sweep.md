@@ -11,7 +11,7 @@
 **不按「逐条改字」收口，按「总账 + 反馈原语 + 结构切片」收口。**
 
 1. **总账**：角色数统一为「5 公司角色 + researcher」；`snapshots/README.md` 补 4 个场景、去掉过期的 44/9 场景/1 可跑；`src/README` 删手写模块枚举；`checks/README.md` 补 5 个公开入口；`docs/index.md` 把决策台账与外部材料登记迁出为
-   [decisions.md](../../docs/decisions.md) / [external-research.md](../../docs/external-research.md)，index 从 129 行降到 60 行。
+   [decisions.md](../../docs/reference/decisions.md) / [external-research.md](../../docs/reference/external-research.md)，index 从 129 行降到 60 行。
 2. **类级守卫**：`snapshot-index`（目录 ↔ README 场景表）、`script-index`（公开入口 ↔ checks/README）、`tracked-token`（tracked 面 token URL）；三条都有红→还原→绿证据。
 3. **真实页面反馈**：`cdp-probe` 的页签清单改从 `company-tab-registration.ts` 解析，9/9；面板体断言 `data-company-tab-title` 可见且非空，不再只查 `body.innerText`；失败写
    `runtime/harness-home/diagnosis/cdp-probe-<timestamp>/`（截图/body/verdict/console）。`client-load` / `replay --ui` 失败现场同走 `diagnosisDir`，不再覆盖 `/tmp` 固定名。

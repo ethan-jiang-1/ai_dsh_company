@@ -9,7 +9,7 @@
 ## 决定
 
 1. **版本 0.3.15 就位**（`--bump patch`）：修三处交付记录不一致——tarball 0.3.14、manifest 0.3.10、
-   package 0.3.14（`release --check` 实跑红）。CHANGELOG 写本版用户/收件人可见变化；`docs/release.md`
+   package 0.3.14（`release --check` 实跑红）。CHANGELOG 写本版用户/收件人可见变化；`docs/contracts/release.md`
    版本字面量随 bump 更新；旧 0.3.14 tgz/sha 与 0.3.10 manifest 删除（gitignored，防同目录混两份字节）。
 2. **`dist-freshness` 门禁（第 49 门）**：`_dist/release-manifest.json` 在场时校验
    `manifest.version == package.version`、`artifact.sha256` 与 tgz 一致、`manualSha256` 与手册一致；

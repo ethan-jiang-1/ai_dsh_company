@@ -12,7 +12,7 @@
   preset-smoke / present-catalog-smoke）全 pass；`--stamp` 后 `--check` 输出
   `READY 0.8.2 @ 258637d6`。0.8.2 Note 原先的 READY 行没有实跑输出，已按本条读数改写。
 - **READY 是点态，不是仓库不变量**：`release --check` 只对 `--stamp` 钉住的 commit 成立；之后再有提交，
-  `gitSha` 落后、`--check` 变红是设计。语义落 [release.md §版本纪律](../../../docs/release.md)，runbook 只留一行指针。
+  `gitSha` 落后、`--check` 变红是设计。语义落 [release.md §版本纪律](../../../docs/contracts/release.md)，runbook 只留一行指针。
 - **`coverage/` 进 .gitignore**：`vitest.config.ts` 教 `npx vitest run --coverage`，此前生成物未忽略，
   跑一次覆盖率就弄脏工作树并让 `release --check` 报“工作树不干净”。`gitignore-shape` 加规则与
   `check-ignore` 断言（负例：删 `.gitignore` 的 `coverage/` → `FAIL gitignore-shape: 缺规则 /^coverage\/$/m`）。

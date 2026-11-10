@@ -76,4 +76,4 @@ r3 回放场景的 snapshot.yml（2026-10-18 条；该场景已随真实证据�
 
 - 卡（现场/两轮深挖/修法候选与输掉的方案）=[BUG-021（已归档）](../../_backlog/_archive/fixed_bugs/BUG-021-ask-user-question-no-scripted-answer-path.md)
 - 文档面：[web-rpc.md](../../docs/guides/web-rpc.md)（口径改正 + 本 Note 指针）
-- 组合面：[preset 合同](../../docs/presets.md)；回放金样台账 r3 回放场景的 snapshot.yml（已移出产品仓）
+- 组合面：[preset 合同](../../docs/contracts/presets.md)；回放金样台账 r3 回放场景的 snapshot.yml（已移出产品仓）

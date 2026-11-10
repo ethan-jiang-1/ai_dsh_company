@@ -58,6 +58,7 @@ opened: YYYY-MM-DD
 
 ## 索引
 
+- [能力归位与质量环：从 SA/SQA 到四槽/三层](capability-placement-and-quality-loop/README.md) — 服务内容宪章与 producer/verifier 两张卡；2026-11-10 开，已定性。
 - [preset 委派架构：盘点与结构性研究](presets-delegation-architecture/README.md) — 服务委派面合同与 BUG-037/042/043/044；结论 = 需结构性调整（合同单家 + worker profile + 能力清单 + keyless 矩阵）；2026-11-09 开，已定性。
 - [workflow + subagent 探索测试：只有 W / 只有 S / 混合一次 / 混合多次](workflow-subagent-exploration/README.md) — 服务 VP-Eng 的 eng-teaming / delegation 与 workflow 通道；2026-11-08 开，调研中（计划待 review，未开跑）。
 - [SA/SQA 产物评审：两个新子人格的产出到底行不行](sa-sqa-product-review/README.md) — 服务 SA/SQA 落地 Note 与

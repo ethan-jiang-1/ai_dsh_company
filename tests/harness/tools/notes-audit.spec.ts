@@ -183,7 +183,7 @@ describe('notes-audit · 活引用与状态', () => {
 
   // 2026-11-03 第六轮 D4-6：两个口径分开报——note→note 为 0 不等于"没人读"。
   it('被当前文档（docs/_backlog）点到 → 仍是 note→note orphan，但不是 orphansAnyDoc', () => {
-    const docs = [{ file: 'docs/decisions.md', text: '见 [old](../notes/implemented/2026-10-01-old.md)。\n' }]
+    const docs = [{ file: 'docs/reference/decisions.md', text: '见 [old](../../notes/implemented/2026-10-01-old.md)。\n' }]
     const result = auditNotes([orphan], { root: process.cwd(), externalDocs: docs })
     expect(result.summary.orphans).toEqual(['notes/implemented/2026-10-01-old.md'])
     expect(result.summary.orphansAnyDoc).toEqual([])

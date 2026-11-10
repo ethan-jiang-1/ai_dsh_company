@@ -11,7 +11,7 @@ opened: 2026-10-27
 
 **问题与期望结果：** 发布后部署最怕的不是功能少，而是数据作用域、版本、备份、迁移和审计账本没有合同。对照 FAQ 26 审计本包后确认了 12 个 Gap；期望把 P0（部署阻断）收口，P1/P2 显性登记，不再只活在会话里。
 
-**当前情况：** P0（G1–G5/G9/G10）已落树并验证，证据 = [P0 Note](../../../notes/archived/2026-10-27-data-model-alignment.md)；P1/P2（G6/G7/G8/G11/G12）已落树，证据 = [P1/P2 Note](../../../notes/archived/2026-10-27-data-model-p1-p2.md)。G8 的面板全量读仍保留为已知边界。详细合同 = [docs/data-model.md](../../../docs/data-model.md)。
+**当前情况：** P0（G1–G5/G9/G10）已落树并验证，证据 = [P0 Note](../../../notes/archived/2026-10-27-data-model-alignment.md)；P1/P2（G6/G7/G8/G11/G12）已落树，证据 = [P1/P2 Note](../../../notes/archived/2026-10-27-data-model-p1-p2.md)。G8 的面板全量读仍保留为已知边界。详细合同 = [docs/contracts/data-model.md](../../../docs/contracts/data-model.md)。
 
 **未决问题：** 只剩 G8 的面板全量读（分页）与多 Host 事务边界；方法层是否从 profile 级迁 home 级留作真实多 profile 需求。P0/P1/P2 以 0.3.12 真实安装/生命周期/隔离/升级 smoke 为准。
 
@@ -35,7 +35,7 @@ opened: 2026-10-27
 | G7 | 方法层 profile 级，同 home 多 profile 不一致 | 中 | 已落树并验证：启动点名多 profile；一公司一 web profile 合同 |
 | G8 | records 无 GC；坏记录静默隐藏；面板全量读 | 中 | 已落树并验证：archive + 坏记录点名 + 摘要全扫/open/最近 120 全文 + 未展开计数 |
 | G9 | 读 DSH 私有 `storages/workspace.json` | 中低 | 已落树：优先 `ctx.workspaceRegistry`（inject），旧文件仅保底 |
-| G10 | 数据卡不完整、FAQ 26 未登记 | 中低 | 已落树：`docs/data-model.md` + external-research 行 |
+| G10 | 数据卡不完整、FAQ 26 未登记 | 中低 | 已落树：`docs/contracts/data-model.md` + external-research 行 |
 | G11 | `DSH_COMPANY_HOME` 等于 home/祖先时可能污染 home | 低中 | 已落树并验证：不安全落点停写 + 告警 |
 | G12 | localStorage 键未命名空间/版本；降级未验 | 低 | 已落树并验证：float/instances v1 + 旧 float 迁移 + 降级 smoke |
 

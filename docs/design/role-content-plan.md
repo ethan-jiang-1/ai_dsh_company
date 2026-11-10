@@ -1,6 +1,6 @@
 # 角色内容设计（persona / skills / KB / 模板）
 
-> 什么时候读：设计或重构角色内容（persona、skills、KB 骨架）时；现时语义查 [../presets.md](../presets.md)。
+> 什么时候读：设计或重构角色内容（persona、skills、KB 骨架）时；现时语义查 [../presets.md](../contracts/presets.md)。
 > 机制已定（[10](./architecture.md) / [20](./roles-isolation.md)）；本篇只留**内容面的设计原则与落点**。
 > 状态：已定稿——六角色内容随 R2 + CMO（2026-11-05）落地；逐角色清单已退役
 > （[navigation-enumeration-retirement](../../notes/archived/2026-10-12-navigation-enumeration-retirement.md)）。
@@ -32,4 +32,4 @@
 - 入戏三探针（身份 / 知识 / 产出）的现行判据 = [`probe-smoke.mjs`](../../checks/smoke/probe-smoke.mjs) 头注；
   `--full` 档按 KB 事实与 veto 语义断言。
 - 闭合接口：Q2 → D16（全员同模型）、Q3 → D17（事实留 workspace）、Q4 → 2026-09-22 动议；
-  台账 = [decisions.md](../decisions.md)。
+  台账 = [decisions.md](../reference/decisions.md)。

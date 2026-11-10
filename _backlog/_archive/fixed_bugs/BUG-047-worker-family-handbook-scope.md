@@ -86,7 +86,7 @@ researcher `9e7b0406-…`（preset `worker-researcher`）的 system prompt 含 `
   [`cordis.patch.yml`](../../../packages/company-pack/cordis.patch.yml) 删掉窄覆盖 `['worker']`。
 - **researcher 取舍**：不注入；公司事实按 brief 读 `.dsh-company/kb/company.md`（persona 原本就这么写），
   researcher preset 头注同步改掉“手册由 agent-instructions 注入”的旧说法。
-- **文档**：`docs/presets.md` 的 worker family 行与 researcher 说明写明“三个 profile 都不注入”。
+- **文档**：`docs/contracts/presets.md` 的 worker family 行与 researcher 说明写明“三个 profile 都不注入”。
 - **真红→绿**：把 `WORKER_FAMILY_PRESETS` 收窄成 `['worker']` ⇒ **2 failed**（模型 parity +
   handbook family 用例 `worker-researcher: ... got 1`）；还原 ⇒ **17 passed**（两文件）。
 - **全量**：`pnpm verify`、`pnpm test`、`pnpm typecheck` 全绿（同提交）。

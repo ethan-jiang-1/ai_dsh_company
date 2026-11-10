@@ -9,7 +9,7 @@
 ## 决定
 
 1. **第二跳 owner 加发现信号**：`packages/company-pack/src/README.md`、`tests/README.md`、`checks/README.md` 顶部各加一行“什么时候读”。它们正是入口链第二跳，却此前没有“按需加载”的行为提示。
-2. **preset 完成定义单家**：`docs/presets.md` 的“培养验收”不再自称完整完成定义，改为“完整完成定义 = preset-change-definition skill；本段只补培养内容特有的入戏证据”。根 AGENTS 命令表已在批 A 改成“真挂载检查 + skill 指针”，两处不再互指。
+2. **preset 完成定义单家**：`docs/contracts/presets.md` 的“培养验收”不再自称完整完成定义，改为“完整完成定义 = preset-change-definition skill；本段只补培养内容特有的入戏证据”。根 AGENTS 命令表已在批 A 改成“真挂载检查 + skill 指针”，两处不再互指。
 3. **不新增清单**：没有建第二份 preset 检查表；skill 仍是次序/最小证据/场景义务的唯一家。
 
 ## 输掉的方案

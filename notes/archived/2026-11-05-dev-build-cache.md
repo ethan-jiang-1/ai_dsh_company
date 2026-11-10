@@ -43,5 +43,5 @@
 - **2026-11-05 17:36 收尾实跑**（当前树，缓存命中）：输出「源未变，跳过构建打包」；boot **8.46s**——
   同机 load avg ~18，服务器段被系统负载抬高（低负载同路径样本 3.84s）；窗口 `cdp-probe` 仍全绿。
 - `pnpm verify` ALL PASS；`pnpm test` **143 files / 1131 tests**；`pnpm typecheck` 通过。
-- 经验落点：启动序列 = [demo.md §前置](../../docs/demo.md#前置本机)（快序列 + 缓存一句）；
+- 经验落点：启动序列 = [demo.md §前置](../../docs/contracts/demo.md#前置本机)（快序列 + 缓存一句）；
   dev/产品差异表 = [dev-product-parity](../../docs/guides/dev-product-parity.md)。

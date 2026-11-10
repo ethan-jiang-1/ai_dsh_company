@@ -6,7 +6,7 @@ import { cardStateOf, parseArgsObject, resultTextOf, textOf, type CardState } fr
 
 /**
  * 工具名 → 汇报对象显示名。这三个 key 是 CEO preset 的**命名委托工具**
- * （`presets/ceo/agent.cordis.yml` ④，语义见 docs/delegation.md）。
+ * （`presets/ceo/agent.cordis.yml` ④，语义见 docs/contracts/delegation.md）。
  */
 const ROLE_LABEL: Record<string, string> = {
   vp_eng: 'VP-Eng（研发）',

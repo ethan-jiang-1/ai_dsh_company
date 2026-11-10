@@ -16,17 +16,17 @@
 
 ### A. 误导级（fresh agent 会被引向不存在/已废对象）
 
-1. **死 ROADMAP 指针 ×3**：[demo.md L53](../../../docs/demo.md)、[ui-demo.md L54](../../../docs/design/ui-demo.md)、[index.md L53](../../../docs/index.md)（台账前言「搁置池准入条件见 ROADMAP」）。D32 声称「痕迹彻底清理」仍有漏网；index.md 台账行内 `plans/roadmap` 属历史语境可留。
+1. **死 ROADMAP 指针 ×3**：[demo.md L53](../../../docs/contracts/demo.md)、[ui-demo.md L54](../../../docs/design/ui-demo.md)、[index.md L53](../../../docs/index.md)（台账前言「搁置池准入条件见 ROADMAP」）。D32 声称「痕迹彻底清理」仍有漏网；index.md 台账行内 `plans/roadmap` 属历史语境可留。
 2. **pre-D32 Note 无「已废」横幅**：重 ×2——foundation-remediation L9（已删，历史在 git）（「ROADMAP.md 是活动/暂停项的唯一调度家」，读作现行路由）、[multi-human-ux L5](../../../notes/archived/2026-09-26-multi-human-ux.md)（「已入搁置池并成提案稿」，所指两物现均不存在、无前向链接）；轻 ×3——notebook-hygiene、enforcement-channel-and-boundaries、client-review-fixes（修法 = 仿 research-notes-lifecycle L3（已删，历史在 git） 的 ⚠ 一行横幅）。
 3. **`scripts/migration-rehearsal.mjs`**：C1 迁移已执行（2026-10-03，卡已毕业），头注仍是活触发器口径且 `--execute` 写真盘——最危险的一件。
 4. **[motion-ledger L3](../../../packages/company-pack/content/state/motion-ledger.md)**：成品口径仍写 `deliverables/<slug>/final.md`，而 27 个动议全已迁 `deliverables-archive/`——台账自己的定义在当前盘上为假。
-5. **[demo.md L180](../../../docs/demo.md)**：场景 F 可粘贴脚本教人写「日期待核」占位——违反手册 2026-09-30 日期口径（真日期；占位仅限注入故障 fail-closed）。照脚本执行 = 违反手册。
+5. **[demo.md L180](../../../docs/contracts/demo.md)**：场景 F 可粘贴脚本教人写「日期待核」占位——违反手册 2026-09-30 日期口径（真日期；占位仅限注入故障 fail-closed）。照脚本执行 = 违反手册。
 
 ### B. 概念相左（同一事实两处说法不一）
 
 6. **公司页签数 5 vs 8**：[ui-demo.md L131/L138](../../../docs/design/ui-demo.md) + [index.md L146](../../../docs/index.md) 说五个平台页签；[cdp-probe.md L12](../../../docs/guides/cdp-probe.md) 说八个，代码 `packages/company-pack/src/client/index.ts` L250 起注册八个（待办/看板/依赖图/在场/用量/任务板/培养/台账）。探针文档对，设计合同 + 地图过期。
-7. **[presets.md](../../../docs/presets.md) 自相矛盾**：L102 说自主节律已由 0.2.0 收割批 3 落地；L149 说缺上游 seam 住退役搁置池——批 3 落地后尾行没跟上。
-8. **[multi-human.md L38-39](../../../docs/multi-human.md)**「手册缺这条区分——已登记待补」：手册 L91-94、L149-150 早已含该区分（根会话 vs 被委派成员的分水岭）——「待补」已失效。
+7. **[presets.md](../../../docs/contracts/presets.md) 自相矛盾**：L102 说自主节律已由 0.2.0 收割批 3 落地；L149 说缺上游 seam 住退役搁置池——批 3 落地后尾行没跟上。
+8. **[multi-human.md L38-39](../../../docs/contracts/multi-human.md)**「手册缺这条区分——已登记待补」：手册 L91-94、L149-150 早已含该区分（根会话 vs 被委派成员的分水岭）——「待补」已失效。
 9. **证据纪律条数三说**：[dev-loop L267](../../../docs/guides/dev-loop.md)「七条」/ [testing.md L50](../../../docs/testing.md) 标题「九条教义」/ 实列 8 条（testing.md L52-59）。
 10. **测试分层两张不重合的表**：dev-loop §9.1（8 层，含重放 lane、CLI 集成）vs testing.md §1（7 层，含行为质量档）——后者自称证明边界「唯一家」。
 11. **[architecture.md L148/L154](../../../docs/design/architecture.md)** 通道 A 示例 YAML 用 `backgroundMode: continuable`——与 delegation.md/D18（one-shot，R3 实证）相反，且是可直接照抄的配置，更正只在 15 行后的散文里。

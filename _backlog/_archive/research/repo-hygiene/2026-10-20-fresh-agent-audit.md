@@ -77,8 +77,8 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
    `docs/AGENTS.md` 对设计层的要求是「只保留仍指导未来选择的机制依据，已落地的叙述归 Note」——
    这些内容已经越层，但没有预算/门禁拦。
 5. **角色数量在 7 处写成「五」**：实际 `dsh.bundle.patch` 有 6 个 preset（5 公司角色 + researcher）。
-   `README.md:19`、`docs/presets.md:30`（「五张卡」）、`docs/release.md:77`、`docs/guides/bootstrap.md` 第 75/105 行、
-   `docs/profile.md:39`、`docs/design/architecture.md:119` 都还写五；而 `docs/presets.md:24` 同一页又写
+   `README.md:19`、`docs/contracts/presets.md:30`（「五张卡」）、`docs/contracts/release.md:77`、`docs/guides/bootstrap.md` 第 75/105 行、
+   `docs/contracts/profile.md:39`、`docs/design/architecture.md:119` 都还写五；而 `docs/contracts/presets.md:24` 同一页又写
    「本 pack 6」——**同页自相矛盾**。这是 0.2.1 加 researcher 后没有做全量措辞清扫的典型上下文漂移。
 6. **`src/README` 的模块枚举也漂了**：写「十一模块」并列出 11 个，实际 `src/lib/` 有 12 个
    （漏 `deliverables-catalog.ts`）。`nav-enumeration` 门禁只查 `tests/README.md` §四区，不覆盖这里。
@@ -130,12 +130,12 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 |---|---|---|---|
 | 1 | 7 处写「五角色 / 五张卡」 | 6 个 preset（5 角色 + researcher） | `preset-smoke` 末尾 6 个 PASS；`package.json` 的 bundle 数组 6 个 preset 文件 |
 | 2 | `README.md:19`「roster 可见五角色 preset」 | roster 含 researcher | 同上 |
-| 3 | `docs/release.md:77`「roster 五角色零 broken」 | release-smoke 只验 5 个公司角色；researcher 没验 | `checks/smoke/release-smoke.mjs` 第 15/20 行 `ROLES = COMPANY_ROLE_IDS` |
+| 3 | `docs/contracts/release.md:77`「roster 五角色零 broken」 | release-smoke 只验 5 个公司角色；researcher 没验 | `checks/smoke/release-smoke.mjs` 第 15/20 行 `ROLES = COMPANY_ROLE_IDS` |
 | 4 | `snapshots/README.md:15`「索引覆盖当前场景」 | 43 行 vs 47 个场景；漏 4 个 | `find snapshots -mindepth 2 -maxdepth 2 -type d | wc -l` = 47 |
 | 5 | `snapshots/README.md:34`「44 行 = 索引」 | 生成索引 47 条 | `company-workspace/kb/deliverables-index.json` `counts.total=47`；`snapshots/visual/deliverables-catalog/computed.json` `total=47` |
 | 6 | `snapshots/README.md:82`「9 个场景只有 1 个 runnable」 | 10 个场景，runnable 2 | `pnpm verify` 的 `replay-scene-liveness ×10（runnable 2 / archived 4 / baseline 4）` |
 | 7 | `probes/browser-visual/cdp-probe.mjs:111` tabs 8 个 | 注册面 9 个（成品缺） | `company-tab-registration.ts` 9 个 `id: 'dsh-company-pack/...`；`tab-icons.tsx:149`「九个页签」 |
-| 8 | `docs/demo.md:21` / `docs/guides/cdp-probe.md:14`「全部公司页签」 | 探针只开 8 个，且只验文本词 | 见 §2.5 |
+| 8 | `docs/contracts/demo.md:21` / `docs/guides/cdp-probe.md:14`「全部公司页签」 | 探针只开 8 个，且只验文本词 | 见 §2.5 |
 | 9 | `packages/company-pack/README.md:39`「手册 ≈17.4KB」 | 26,424B | `handbook-budget` 输出 26424B + 1024B ≤ 32768 |
 | 10 | `packages/company-pack/src/README.md:16`「十一模块」 | 12 个 lib 模块 | `ls src/lib/*.ts` 12 个 |
 | 11 | `docs/project-map.md:29`「runtime 全部 gitignored」 | 审计时 11 件 tracked；修复后 9 件（两件日志已 untrack） | `git ls-files runtime` |
@@ -155,13 +155,13 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 **上下文面饱和的量化**
 
 - 受预算文档：`AGENTS.md` 77/84、`docs/index.md` 129/131、`docs/orient.md` 75/80、
-  `docs/terminology.md` 19/22、`docs/guides/web-rpc.md` 47/47、`docs/guides/dev-loop.md` 350/367、
+  `docs/reference/terminology.md` 19/22、`docs/guides/web-rpc.md` 47/47、`docs/guides/dev-loop.md` 350/367、
   `docs/testing.md` 71/75、`docs/AGENTS.md` 55/62、`company-workspace/AGENTS.md` 190/190。
 - 公司手册：190 行 / 26,424B，`agent-instructions.maxBytes=32768`，只剩 5.3KB 头寸；它是**每个公司
   会话首帧注入**的最大常驻面。手册里已经有 12+ 条按日期追加的规则（任务板、派活行、HITL 前排空、
   复核独立性、present 顺序……），继续追加会先撞预算，再撞静默截断。
-- `docs/design/` 718 行不在预算内；`docs/demo.md` 226 行、`docs/multi-human.md` 190 行、
-  `docs/presets.md` 189 行也不在。不是说这些必须短，而是**没有棘轮的地方最会长出历史叙述**。
+- `docs/design/` 718 行不在预算内；`docs/contracts/demo.md` 226 行、`docs/contracts/multi-human.md` 190 行、
+  `docs/contracts/presets.md` 189 行也不在。不是说这些必须短，而是**没有棘轮的地方最会长出历史叙述**。
 
 ### 2.4 轴⑤ 测试资产组织、测试点、覆盖、类型
 
@@ -346,7 +346,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 - **批次 0**：BUG-029 已修（untrack + `.gitignore` + tracked-token 窄扫 + 红绿守卫）。
 - **批次 1**：角色数统一；`snapshots/README.md` 补 4 场景并去过期计数；`cdp-probe` 从注册源解析 9 页签、断言面板体内容、失败落诊断区；`client-load`/`replay --ui` 失败现场同落诊断区；`src/README`/`runtime`/`project-map`/成本声明同步；`checks/README.md` 补 5 入口 + script-index 门禁；`release-smoke` 覆盖 researcher。
 - **批次 2**：`docs/testing.md` whole-client/mock 声明；`tests/README.md` 映射补 cdp-probe/researcher；`PASS`/`SKIP` 分离；新增 `pnpm diagnose` 日志失败摘要。
-- **结构切片**：`docs/index.md` 拆出 [decisions.md](../../../../docs/decisions.md) / [external-research.md](../../../../docs/external-research.md)（129→60 行）；`docs/design` 加预算、architecture §7/§10 降指针；`firstText`/`memberDot` 收进共享层；`client/index.ts` 数据面收成 `company-data-plane.ts`；成品目录 generator→parser 契约测试；SSR layout warning 消除。
+- **结构切片**：`docs/index.md` 拆出 [decisions.md](../../../../docs/reference/decisions.md) / [external-research.md](../../../../docs/reference/external-research.md)（129→60 行）；`docs/design` 加预算、architecture §7/§10 降指针；`firstText`/`memberDot` 收进共享层；`client/index.ts` 数据面收成 `company-data-plane.ts`；成品目录 generator→parser 契约测试；SSR layout warning 消除。
 - **证据**：`pnpm verify` ALL PASS、`pnpm test` 76/711、`client-load` ALL PASS、`cdp-probe` 9/9、`release-smoke` ALL PASS（含 researcher）、`replay --ui` ALL PASS（SKIP 显式）。详见 [consistency sweep Note](../../../../notes/archived/2026-10-20-fresh-agent-consistency-sweep.md)。
 ## 5. 剩余与决定（2026-10-20 更新）
 

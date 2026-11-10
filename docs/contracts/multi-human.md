@@ -1,10 +1,10 @@
 # 多人协作 · 同一工作目录，各自开自己的门（现在时）
 
 > 什么时候读：多个物理人要进同一家公司盘协作、或协作行为不符预期时。路线 = 形态表 → 开门 runbook。
-> 顶层合同：**多个物理人**在同一家公司共享盘上协作的**形态、开门配方、边界与迁移清单**。
-> 人侧归属与授权面的事实家 = [`kb/owners.md`（dev bundle workspace；pack 单源）](../packages/company-pack/content/state/owners.md)；
-> 成员侧的协作规矩 = [`AGENTS.md`（pack 单源）](../packages/company-pack/content/AGENTS.md)。
-> 来源与取舍（含输掉的方案）= [multi-human-role-routing（已归档）](../notes/archived/2026-09-26-multi-human-role-routing.md)。
+> 合同：**多个物理人**在同一家公司共享盘上协作的**形态、开门配方、边界与迁移清单**。
+> 人侧归属与授权面的事实家 = [`kb/owners.md`（dev bundle workspace；pack 单源）](../../packages/company-pack/content/state/owners.md)；
+> 成员侧的协作规矩 = [`AGENTS.md`（pack 单源）](../../packages/company-pack/content/AGENTS.md)。
+> 来源与取舍（含输掉的方案）= [multi-human-role-routing（已归档）](../../notes/archived/2026-09-26-multi-human-role-routing.md)。
 > **不许复杂化**（用户定的）：不搞 client/server、不搞账号体系、**不在 DSH 里造"人"这一层**。
 
 ## 0. 先读这条：机制边界（决定一切怎么摆）
@@ -39,7 +39,7 @@
 实测依据：`probes/session-context/budget-signoff-probe.mjs` 的正例——CFO 根会话确实会发 `request_signoff`。
 
 （手册「问人两条路」与「审批三档」均已含这条根会话 vs 被委派成员的区分——见两节的 ⚠ 段；
-[RFC](../notes/archived/2026-09-26-multi-human-role-routing.md) 进度表 f 行随之闭合。）
+[RFC](../../notes/archived/2026-09-26-multi-human-role-routing.md) 进度表 f 行随之闭合。）
 
 ## 1. 形态（已定，可逆）
 
@@ -69,7 +69,7 @@ CI=true pnpm company --no-open   # 端口是环境状态；见下方"端口不�
    （`drafts/<角色>.md`、`kb/<角色>/journal/`、`final.md` 归 CEO）+ 说一声"我写完了"。
 4. **角色一眼可辨（2026-09-26 起 client 面自带）**：侧栏每个公司会话行首有**角色标记**
    （座位 12px、单字母 C/F/O/E/S/M + **六色底色**——字母管是谁、底色管一眼扫过是谁，悬停出全称缩写；
-   几何与色调/对比度判据 = [sidebar-role-mark-probe](../probes/browser-visual/sidebar-role-mark-probe.mjs)）：
+   几何与色调/对比度判据 = [sidebar-role-mark-probe](../../probes/browser-visual/sidebar-role-mark-probe.mjs)）：
    CEO 黑、CFO 蓝、COO 绿、VPE 橙、VPS 红；
    当前会话的**浏览器窗口标题**带【角色】前缀、窗口最顶有一条细色带——多窗并排也不会认错门。
    **开每扇门时记得选对 preset**（默认是 `ceo`，已实测踩坑）。

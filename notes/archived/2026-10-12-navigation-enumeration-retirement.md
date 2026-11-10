@@ -94,7 +94,7 @@ checks/README 对在盘脚本全覆盖零漂移）。
   派活行格式与状态枚举、署名行形状、「待补料·<slug>·<T号>」锚、「日期待核」fail-closed 全部逐字保留；
   presets.spec 钉的职责边界/这事问谁/冲突与升级/承诺权四节未动）：
   - **搬**：审批三档与问人两条路的机制证据段（子会话审批受限 / 根会话分水岭）收紧为操作要点 +
-    [multi-human §0](../../docs/multi-human.md) 指针——机制证据唯一家在彼处；
+    [multi-human §0](../../docs/contracts/multi-human.md) 指针——机制证据唯一家在彼处；
   - **压**：证据叙事退役（V4 反例数字、E1/E2 实测计数、真盘人原话引文、陈旧日期戳）——规则本体
     与教训保留，案例细节归 docs/ 与 Note；
   - 195 → **180 行**（-7.7%）、24.4KB → 24.2KB。
@@ -145,7 +145,7 @@ checks/README 对在盘脚本全覆盖零漂移）。
   README.md；「一」豁免（「开一个页签」是操作叙述非清点）、notes/ 与快照载荷不扫（历史证据豁免，
   与 retired-path 归档豁免同边界）。红证：orient.md:6 插「五个平台页签」→ FAIL 点名短语与行号，还原即绿；
   豁免方向：cdp-probe「开一个页签」绿。ui-demo v4 行「五个平台页签」→「首批 = …」（留冻结清单、去计数）。
-- **预算健康度**：**术语映射整节迁出 index → [terminology.md](../../docs/terminology.md)**（16 行查表面
+- **预算健康度**：**术语映射整节迁出 index → [terminology.md](../../docs/reference/terminology.md)**（16 行查表面
   不占登记表绑定型文件的头寸；AGENTS/profile 指针随改）、**dev-loop §8 迁 [web-rpc.md](../../docs/guides/web-rpc.md)**
   （36 行 RPC runbook 独立成指南）、§5 压缩、**§0 导航表补全 13 节**（「一面墙」的结构解法：按节查表
   成为真承诺）。棘轮：index 143→**131**（内容 124，头寸 7 行 = 未来 ~7 个 D 号）、dev-loop 395→**367**

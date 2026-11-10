@@ -4,7 +4,7 @@
 
 > **体裁说明（2026-10-30）**：本文是 2026-10-25 RFC 的毕业正文；§问题/§当前事实/§方案/§实施顺序 是**当时快照**，
 > 其中“无 engines/license/repository”“peers 才是安装拦截”“手册无 sha256/回退”均已不成立。
-> 现行合同 = [release](../../docs/release.md) + [data-model](../../docs/data-model.md)；决定（engines 窗口/手册 sha/生命周期证据）仍有效。
+> 现行合同 = [release](../../docs/contracts/release.md) + [data-model](../../docs/contracts/data-model.md)；决定（engines 窗口/手册 sha/生命周期证据）仍有效。
 
 ## 问题
 
@@ -64,7 +64,7 @@ node checks/smoke/lifecycle-smoke.mjs
 
 ## 范围 / 排除
 
-- 范围：manifest、手册生成器、`pack-shape` / `dist-manual`、`release-smoke` 复用、新 lifecycle smoke、`docs/release.md`。
+- 范围：manifest、手册生成器、`pack-shape` / `dist-manual`、`release-smoke` 复用、新 lifecycle smoke、`docs/contracts/release.md`。
 - 排除：npm publish、market、代码签名、离线预构建、跨 OS 升级、降级。
 
 ## 实施顺序
@@ -81,7 +81,7 @@ node checks/smoke/lifecycle-smoke.mjs
 - manifest：`engines.node >=22.19.0`、`engines.dsh >=0.2.1-rc.2 <0.3.0`、`license: UNLICENSED`、`repository`；`private: true` 保留。`pack-shape` 新增 `pack-engines`（semver 从 vendor app-boot 解析；窗口不覆盖当前 pin 即红）。
 - 手册生成器 [tools/export-dist.mjs](../../tools/export-dist.mjs)：算 tgz sha256、写 `*.tgz.sha256`、注入前置/校验/卸载/失败与回退/许可；[dist-manual](../../checks/gates/dist-manual.mjs) 在本体在场时逐字节核对。
 - [lifecycle-smoke.mjs](../../checks/smoke/lifecycle-smoke.mjs)：v1 真装 → 改 `AGENTS.md`/`kb/org.md` + 加 journal/交付物 → v2 真装 → 启动；断言保留/替换/扩张不动/`bundle.json` 前移/二启零变更；卸载后数据仍在；搬 home 后重装启动。另含“bad engines.dsh 真装被拒绝”与 profile 未被污染。
-- 合同：[docs/release.md](../../docs/release.md) 写明 engines 是运行时窗口、台账是认证记录、sha256 是产物身份；[checks/README.md](../../checks/README.md) 登记新 smoke；pack README 顶部给收件人入口。
+- 合同：[docs/contracts/release.md](../../docs/contracts/release.md) 写明 engines 是运行时窗口、台账是认证记录、sha256 是产物身份；[checks/README.md](../../checks/README.md) 登记新 smoke；pack README 顶部给收件人入口。
 
 红/绿收据（实跑）：
 

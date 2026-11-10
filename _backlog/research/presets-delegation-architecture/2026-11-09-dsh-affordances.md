@@ -37,7 +37,7 @@ intent: 核对 DSH 0.2.1 对 preset 组合、subagent/workflow/team 委派、ski
 
 | 事实 | 依据 | 意义 |
 |---|---|---|
-| 团队成员**继承 Lead 组合**（`composeFrom`），`SpawnTeammateRequest` **没有 agentPreset** | `agent-team/src/types.ts`（165–172 行）；`docs/presets.md` 四形态矩阵 | **H4 对 teammate 不可用**：worker 组合只能约束 subagent 子代，不能约束队友；队友的能力面 = Lead 的能力面 |
+| 团队成员**继承 Lead 组合**（`composeFrom`），`SpawnTeammateRequest` **没有 agentPreset** | `agent-team/src/types.ts`（165–172 行）；`docs/contracts/presets.md` 四形态矩阵 | **H4 对 teammate 不可用**：worker 组合只能约束 subagent 子代，不能约束队友；队友的能力面 = Lead 的能力面 |
 | `tool-agent-team` 按 membership 安装；根会话是 Lead（`tryMembership`）→ 团队版控制名 shadow 全局版 | `experimental/tool-agent-team/src/index.ts`（183、418–423 行）；`agent-team/src/roster.ts` | S5 的 shadow 是机制事实；preset 声明全局控制行在根是**死行**（BUG-037） |
 | team 工具不在 preset 行里，是 bundle 级安装 | 本仓 `cordis.patch.yml` / preset 行；inventory | 委派面被拆成 preset（subagent 行）+ bundle（team）+ host（补丁工具）三处 |
 
@@ -54,8 +54,8 @@ intent: 核对 DSH 0.2.1 对 preset 组合、subagent/workflow/team 委派、ski
 
 | 事实 | 依据 | 意义 |
 |---|---|---|
-| 会话实际工具面 = `request/header.tools`；`--dump-config` 只证组合层 | `docs/presets.md`（生效证据节）；本仓研究材料 | H6 的“声明 vs 实际”测试要么读会话 header（需要一次模型请求），要么找 Loader 级 dump（keyless） |
-| `agentPresets/list` 可列名册/预设（web RPC） | `docs/presets.md` 名册；preset-smoke | keyless 可验“预设在场/可挂载”，但不能证明 per-session 工具面 |
+| 会话实际工具面 = `request/header.tools`；`--dump-config` 只证组合层 | `docs/contracts/presets.md`（生效证据节）；本仓研究材料 | H6 的“声明 vs 实际”测试要么读会话 header（需要一次模型请求），要么找 Loader 级 dump（keyless） |
+| `agentPresets/list` 可列名册/预设（web RPC） | `docs/contracts/presets.md` 名册；preset-smoke | keyless 可验“预设在场/可挂载”，但不能证明 per-session 工具面 |
 | preset-smoke 通过 `session/create` 真挂载，零模型 | `checks/smoke/preset-smoke.mjs` 头注 | 面级测试可以复用这条真入口；要读工具面需再找 RPC/日志点 |
 
 ## 7. 对结构选项的裁决（本轮）

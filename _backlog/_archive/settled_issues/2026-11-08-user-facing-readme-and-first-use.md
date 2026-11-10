@@ -23,7 +23,7 @@ opened: 2026-11-08
 
 1. **根 README 87 行，预算 90（余 3 行，顶格）**。前 20 行以交付形态与 profile 语义为主（bundle / 六个角色 preset / named profile / 公司状态）；维护者 dev 12 行（L69–80，≈14%），数据布局节 11 行（L57–67）与手册 §四重复；无截图、无「第一次怎么用」、无「坏了去哪」。入口链在 L85–87。
 2. **《安装手册》229 行**，由 [install-manual.mjs](../../../tools/lib/install-manual.mjs) 生成（[dist-manual](../../../checks/gates/dist-manual.mjs) 强制「手册 == 当前模板渲染」+ 必含短语表）。§零前置、§一 GUI 安装已可照做；但 §二「第一次启动」只讲 workspace 与首启写盘（「首屏即可开工」一句带过），§三「验证」先给 `--dump-config | grep -c` 机器核对；**全文没有「怎么用这家公司」**，也**没有「要不要模型凭据」**（凭据只在 §四/§七的表里出现）。§四数据布局是平面视角，不是「我的报告在哪」。
-3. **产品的「怎么用」只在 [docs/demo.md](../../../docs/demo.md)**（236 行维护者演示合同：动议 → 分镜 → 观测点，含 `node checks/audit/...` 仓内命令）。它不随包分发，也不是用户教程。
+3. **产品的「怎么用」只在 [docs/contracts/demo.md](../../../docs/contracts/demo.md)**（236 行维护者演示合同：动议 → 分镜 → 观测点，含 `node checks/audit/...` 仓内命令）。它不随包分发，也不是用户教程。
 4. **三处安装命令副本**（README L29–35、[pack README](../../../packages/company-pack/README.md) Install、手册 §一）。2026-11-02 归档卡已拍板 owner 口径——「手册 = 收件人唯一安装路径；README/pack README = 首屏 + 指针」（见 [harness-release-alignment](2026-11-02-harness-release-alignment.md) 噪声退休表）——**口径定了，没落实**。
 5. **前两轮修的不是这件事**：[release-and-docs](2026-11-01-release-and-docs.md) 修事实（旧形状、sha、门禁），[harness-release-alignment](2026-11-02-harness-release-alignment.md) G8 修「收件人读到内部流程引用」。**受众与首次使用没有被处理过**。
 6. **分发事实**：`market-index.staged.json` 明写 0.9.0「尚未发布到 npm registry」（2026-11-05）；`_dist/*.tgz` 是 gitignored。今天一个仓库外读者**没有可执行的安装入口**——README 的「输入包名」只在发布后成立。
@@ -141,7 +141,7 @@ opened: 2026-11-08
 
 **做：** 根 README 重写；手册模板重排 + 新增「第一次经营一家公司」；两份文档补凭据与支持口径；开发面回 bootstrap；README/pack README 安装副本收束；`readme-manual-commands` 门（先红后绿）；可选 2 张截图。
 
-**排除：** 不改产品行为/UI；不动 `docs/` 其他合同（除 README 指针与 index 如有新增——预计不新增）；不新建 CONTRIBUTING；不做 npm publish / GitHub Release（分发另卡）；不改 [demo.md](../../../docs/demo.md) 剧本；不做双语；不手改 `_dist`；不改 pack README 的 Data/Backup/Uninstall 结构；不升 vendor pin。
+**排除：** 不改产品行为/UI；不动 `docs/` 其他合同（除 README 指针与 index 如有新增——预计不新增）；不新建 CONTRIBUTING；不做 npm publish / GitHub Release（分发另卡）；不改 [demo.md](../../../docs/contracts/demo.md) 剧本；不做双语；不手改 `_dist`；不改 pack README 的 Data/Backup/Uninstall 结构；不升 vendor pin。
 
 ## 拍板（2026-11-08，用户「全按推荐」）
 

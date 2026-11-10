@@ -18,11 +18,11 @@ export function run({ root, ok, fail }) {
 const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 84],             // 2026-09-23 二次收口；2026-09-27 瘦身轮 108→100、棘轮 115→105；2026-10-06 条目 D 纯路由化（删复述与括号链，纪律指针化；当时 95→72），棘轮 105→84
   ['docs/index.md', 72],         // 2026-10-20 台账/外部材料迁出：131→70（只留地图 + 路由指针）
-  ['docs/decisions.md', 65],     // 2026-10-20 自 index 迁出：D 路由表独立页；2026-10-30 +1（D50）；2026-11-02 +1（D56）；2026-11-07 +2（D57/D58）；2026-11-08 +1（D59 域路由，论证 = notes/implemented/2026-11-08-sa-sqa-capability-routing）
-  ['docs/external-research.md', 30], // 2026-10-20 自 index 迁出（外部材料登记；只登记吸收落点，不承载合同事实）
+  ['docs/reference/decisions.md', 65],     // 2026-10-20 自 index 迁出：D 路由表独立页；2026-10-30 +1（D50）；2026-11-02 +1（D56）；2026-11-07 +2（D57/D58）；2026-11-08 +1（D59 域路由，论证 = notes/implemented/2026-11-08-sa-sqa-capability-routing）
+  ['docs/reference/external-research.md', 30], // 2026-10-20 自 index 迁出（外部材料登记；只登记吸收落点，不承载合同事实）
   ['docs/repo-hygiene.md', 80], // 2026-10-25 立：git 边界与跨环境合同（新增门禁 tracked-portability 的解释面）
   ['docs/orient.md', 80],        // 2026-10-06 立（RFC driver-surface-package 条目 C：驾驭者白话五问单页，只导航不复述事实；反证 = 初稿超限红）
-  ['docs/terminology.md', 22],   // 2026-10-12 立：术语映射查表自 index 迁出（登记型查表，随 pin 升级演进；行数稳定，头寸宽于 5% 起步）
+  ['docs/reference/terminology.md', 22],   // 2026-10-12 立：术语映射查表自 index 迁出（登记型查表，随 pin 升级演进；行数稳定，头寸宽于 5% 起步）
   ['docs/guides/web-rpc.md', 30], // 2026-10-12 立；2026-10-27 R3-17 棘轮下调：原 47 让 21 行长期空置，按现行内容 + 5% 收紧
   ['docs/guides/release-runbook.md', 75], // 2026-10-26 立：发布五步 runbook（合同仍住 release.md；本文件只留操作与失败定位）
   ['docs/guides/dev-product-parity.md', 60], // 2026-11-02 立：dev/产品差异表（合同 = release.md/profile.md；本文件只留同形点与允许差异）
@@ -39,20 +39,20 @@ const DOC_LINE_BUDGETS = [
   ['docs/design/roles-isolation.md', 187], // 2026-10-20：冻结增长；§3 选型表可降为合同指针
   ['docs/design/ui-demo.md', 129], // 2026-10-20：冻结增长；§1–§2 实现指引可降为合同指针；2026-11-04 减法轮 147→123（§5 分层归轮/命名表退役，历史归 Notes），上限随内容下调
   ['docs/design/role-content-plan.md', 37], // 2026-10-20：冻结增长；现时语义归 presets.md；2026-11-04 减法轮 51→35（探针/闭合接口改指针），上限随内容下调
-  ['docs/demo.md', 237],        // 2026-10-21 冻结增长（六维度 Phase D3：无预算合同中最大三份立冻结预算）
-  ['docs/multi-human.md', 199], // 2026-10-21 冻结增长
-  ['docs/presets.md', 198],     // 2026-10-21 冻结增长（工具面表同轮去历史化）
+  ['docs/contracts/demo.md', 237],        // 2026-10-21 冻结增长（六维度 Phase D3：无预算合同中最大三份立冻结预算）
+  ['docs/contracts/multi-human.md', 199], // 2026-10-21 冻结增长
+  ['docs/contracts/presets.md', 198],     // 2026-10-21 冻结增长（工具面表同轮去历史化）
   ['packages/company-pack/content/AGENTS.md', 37], // 2026-09-28 借 FAQ 04：公司手册是随每个成员会话注入的最大常驻面，同享棘轮（只降不升、上调须 Note 论证）；岗位细节的家 = CHARTER/templates；2026-10-12 瘦身轮 195→190（机制证据段收指针、证据叙事压缩、陈旧日期戳退役——同 diff Note）
   // ── 2026-10-27 R3-17：入口链与最大合同补预算（原先 852 行 docs 无棘轮；checks/README 已从 193 压到 78）──
   ['checks/README.md', 59],        // 2026-11-03 A- D1：手工库存改为 INDEX.generated.md 生成物；README 只留快速选择 + 指针（56 行，+5% 棘轮）
   ['tests/README.md', 100],         // 改动面 → 最窄检查（入口链第四跳）
   ['docs/project-map.md', 99],     // 空间导航（入口链第一跳）
   ['docs/runtime-map.md', 88],     // 运行态地图（入口链第一跳之二）
-  ['docs/release.md', 172],        // 最大未受管合同：发布形状与升 pin 程序
+  ['docs/contracts/release.md', 172],        // 最大未受管合同：发布形状与升 pin 程序
   ['docs/guides/bootstrap.md', 165], // 冷启动配方
-  ['docs/delegation.md', 120],     // 汇报线合同
-  ['docs/data-model.md', 40],      // 数据卡合同
-  ['docs/profile.md', 66],         // host 组合合同
+  ['docs/contracts/delegation.md', 120],     // 汇报线合同
+  ['docs/contracts/data-model.md', 40],      // 数据卡合同
+  ['docs/contracts/profile.md', 66],         // host 组合合同
   // ── 2026-11-03 R5-17：三份最大 owner 文档 + 根 README + 发布 handoff 补预算 ──
   // 审计实测：它们是活文档里最大的几份，却完全在棘轮外；预算 = 现行内容 +5–7%（只降不升）。
   ['README.md', 90],

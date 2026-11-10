@@ -97,7 +97,7 @@ opened: 2026-11-09
   `stopReason: depth-exceeded` / `exhausted: true` + 点名 preset/预算的 `diagnostic`，**不调**
   `startActivation`；预算内把同一预算作为 `maxDepth` 传给引擎（第二道闸）。
 - **长链仍放行**：vp-eng 在 depth 2 调用 retry，child = depth 3 ≤ 预算 3（spec 用例）。
-- **文档**：`docs/delegation.md` §4、`docs/presets.md` 工具面、delegation-policy skill §7 同步。
+- **文档**：`docs/contracts/delegation.md` §4、`docs/contracts/presets.md` 工具面、delegation-policy skill §7 同步。
 - **真红→绿**：`SUBAGENT_RETRY_SURFACE.presets.cmo` 2→3 ⇒ host spec **2 failed**
   （CMO depth 2 起了 child、subagentDepth 取大失效）；还原 ⇒ 两文件 **22 passed**。
 - **全量**：`pnpm verify`、`pnpm test`（166 files / **1331 tests**）、`pnpm typecheck` 全绿（同提交）。

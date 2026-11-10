@@ -41,7 +41,7 @@ agentTeam = {"members":[{"name":"lead","role":"lead","phase":"active"}],"tasks":
 ## 4. 为什么 teammate 不能冒充 CMO/SA/SQA
 
 - teammate 的人格/工具面是 VP-Eng 的；它没有 CMO 的 market 判断材料、没有 SA 的架构 skill、没有 SQA 的 V&V 独立性。
-- 用 teammate 起一个叫 `cmo` 的成员，只是“VP-Eng 组合的成员在演 CMO”——这正是 `researcher` preset 当初要解决的“迷你 CEO”问题（[presets.md](../../../../docs/presets.md)）。
+- 用 teammate 起一个叫 `cmo` 的成员，只是“VP-Eng 组合的成员在演 CMO”——这正是 `researcher` preset 当初要解决的“迷你 CEO”问题（[presets.md](../../../../docs/contracts/presets.md)）。
 - SQA 尤其不能：独立结论要求独立 preset/独立上下文；teammate 共享 Lead 组合，SQA 的“不通过”会变成 VP-Eng 自说自话。
 - CMO 尤其不能：MRD 的 owner 唯一性会被破坏；`MRD 只归 CMO` 是手册硬条款。
 
@@ -51,7 +51,7 @@ agentTeam = {"members":[{"name":"lead","role":"lead","phase":"active"}],"tasks":
 
 | 位置 | 现在说的 | 实际 | 处置 |
 |---|---|---|---|
-| [docs/delegation.md](../../../../docs/delegation.md) §2 | “职能根会话不是团队成员，团队版不会装” | 根会话是 Lead，团队版会装；全局控制行是给**命名 child**（非 team member）用的 | 保留控制行，改理由；补“根门=Lead”的事实 |
+| [docs/contracts/delegation.md](../../../../docs/contracts/delegation.md) §2 | “职能根会话不是团队成员，团队版不会装” | 根会话是 Lead，团队版会装；全局控制行是给**命名 child**（非 team member）用的 | 保留控制行，改理由；补“根门=Lead”的事实 |
 | [content/AGENTS.md](../../../../packages/company-pack/content/AGENTS.md) “组合继承” | “teammate / 命名委托 child 都继承 Lead 组合” | teammate 继承；命名 child 由 `agentPreset` 给 | 分通道表述；命名 child 的方法 skill 能加载 |
 | [CultivationBoard.tsx](../../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx) | “CEO 委派出去的分身继承 CEO 组合——职能方法不会进 child” | 对 teammate 成立；对命名 child 不成立 | 改文案 + 对应 client test |
 | [presets.spec](../../../../tests/presets/presets.spec.ts) 的控制面注释 | 用“根会话不是团队成员”解释为什么职能 preset 要放全局控制行 | 真实原因是命名 child 不是 team member | 改注释/断言说明，行本身保留 |
@@ -89,7 +89,7 @@ agentTeam = {"members":[{"name":"lead","role":"lead","phase":"active"}],"tasks":
 
 - 手册「星型汇报」从“一切经 CEO”泛化为“一切经 Lead”：CEO 动议的 Lead 是 CEO，VP-Eng 包的 Lead 是 VP-Eng；公司级对外收口仍 CEO。
 - 手册「多门模式」补一句：VP-Eng 的门可以带研发小队；成员是 VP-Eng 组合的工程师，角色身份来自任务书，不是 preset。
-- `docs/delegation.md` 加“三种门”表；`docs/presets.md` 加 `eng-teaming` 与 `vp_cmo` 行；`docs/guides/product-definition.md` 补“VP-Eng 根门整包”的交接。
+- `docs/contracts/delegation.md` 加“三种门”表；`docs/contracts/presets.md` 加 `eng-teaming` 与 `vp_cmo` 行；`docs/guides/product-definition.md` 补“VP-Eng 根门整包”的交接。
 - 文档预算：`presets.md`/`delegation.md` 已顶格，**先搬后写**。
 
 ### 6.4 证据计划

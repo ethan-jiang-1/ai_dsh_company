@@ -1,8 +1,8 @@
 # demo · 动议操作合同
 
 > 什么时候读：要启动公司看效果、演示前核对判据时。路线 = §前置（起观察窗）→ 分镜 → 验收判据。
-> 顶层合同：demo 的剧本、分镜与观测点。R1 雏形（两人公司单动议）已并入本篇；R2 按
-> [design/ui-demo.md](./design/ui-demo.md) §3 分镜 v0 重排为**两空间镜头**并加场景 B；
+> 合同：demo 的剧本、分镜与观测点。R1 雏形（两人公司单动议）已并入本篇；R2 按
+> [design/ui-demo.md](../design/ui-demo.md) §3 分镜 v0 重排为**两空间镜头**并加场景 B；
 > **R4 定稿、后补场景 D/E**：R4 立的是场景 C（写作流水线）+ 交付物三态的落盘形状与**机器验收**（`deliverables/<日期>-<slug>/`，A1 命名）；
 > 场景 D（季度经营会）与 E（事件复盘）是 2026-09-25 新增动议类型的实战（见下方对应节）。
 
@@ -17,8 +17,8 @@
 
 **启动口令约定**：在本仓库上下文中，“启动一下这个插件”“启动一下这个”或“把这个跑起来”，默认指启动当前 Dream Team company pack 的独立 DSH Web 环境。完成定义是：使用仓库隔离 home，启动一个非 3080 的新 DSH 端口，拿到带 token 的 URL，并通过插件挂载冒烟；这一步不包含创建会话或运行 demo，除非用户另行指定。
 
-**呈现即验证**（2026-09-30 立，用户裁定；规则唯一见 [dev-loop §1](./guides/dev-loop.md)）：替人起观察窗 = 先自己跑通本节（boot 横幅 + roster + client 零挂载失败），红了当场修，全绿才交 URL——用户不当第一次验收员。
-**机器腿 = [cdp-probe](./guides/cdp-probe.md)**：`node probes/browser-visual/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/全部公司页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
+**呈现即验证**（2026-09-30 立，用户裁定；规则唯一见 [dev-loop §1](../guides/dev-loop.md)）：替人起观察窗 = 先自己跑通本节（boot 横幅 + roster + client 零挂载失败），红了当场修，全绿才交 URL——用户不当第一次验收员。
+**机器腿 = [cdp-probe](../guides/cdp-probe.md)**：`node probes/browser-visual/cdp-probe.mjs '<URL>'` 对运行中实例断言真实渲染（composer/品牌/全部公司页签/console 零 error；`--ask` 加一次真实调用全环）——红了当场修的判据就是它的 verdict。
 
 **快序列（交付提速）**：boot 本身是秒级（复用构建缓存时 ~4s；源变重建 ~6–10s）；慢通常在等横幅与串行验证。
 ① 预检 `$DSH_HOME/company-pack.lock`：pid 存活但无监听端口 = 遗留 writer，先 kill（留着会让公司数据停写）；
@@ -27,7 +27,7 @@
 **提速不换路径**：交付启动走默认同形安装（`pack` + `plugin add file:`，模拟用户安装），
 `--link` 只作改 presets 的调试通道；home 用 `run/env.sh` 的隔离 dev home；源/vendor pin/lockfile 未变时
 wrapper 复用上次 tarball（跳过构建打包，`--rebuild` 强制重打）。
-**启动次序（硬）**：严格按 DSH 原生次序（[runtime-map §一](./runtime-map.md)）；dev 只在安装前做构建缓存，不跳 `plugin add`、不起旁路服务、不复用进程。
+**启动次序（硬）**：严格按 DSH 原生次序（[runtime-map §一](../runtime-map.md)）；dev 只在安装前做构建缓存，不跳 `plugin add`、不起旁路服务、不复用进程。
 
 1. `source run/env.sh`（双 home；**新 shell 必须**）。**自证落对了 home（10 秒）**：
    `pnpm dsh --profile company --dump-config | grep -c company-pack` 必须 **≥1**；得 **0** 说明你起的是
@@ -47,7 +47,7 @@ wrapper 复用上次 tarball（跳过构建打包，`--rebuild` 强制重打）�
 
 > 安装后的部署没有维护者仓库：成品页签的 present 记录来自**部署 host 观测到的 present 事件**（未观测 = 未核），
 > 完整三态审计仍由操作员/维护者在其仓库跑。本仓演示按上面命令；不要把维护者仓库脚本当成产品内命令。
-> 新产品定义的 MRD→PRD 场景与校验 = [product-definition 指南](./guides/product-definition.md)。
+> 新产品定义的 MRD→PRD 场景与校验 = [product-definition 指南](../guides/product-definition.md)。
 
 ## 分镜 v0（两空间镜头：谁在哪个空间、活怎么交接）
 
@@ -65,7 +65,7 @@ wrapper 复用上次 tarball（跳过构建打包，`--rebuild` 强制重打）�
 
 **镜头纪律**：每一步先指"这是谁的空间"（会话头部/侧栏），再指"活怎么交接"（任务板 owner/依赖、
 消息记录）。跨空间动态：「在场」页签的动态流 = `session/follow` 流式（打开即见全程；消息级聚合留
-升级路径——原「搁置池」项已随 D32 队列层退役归档，见 docs/decisions.md D32 行）；另可走「公司」视图四面板 + 各空间对话流。
+升级路径——原「搁置池」项已随 D32 队列层退役归档，见 docs/reference/decisions.md D32 行）；另可走「公司」视图四面板 + 各空间对话流。
 
 ## 验收判据（R2）
 
@@ -88,9 +88,9 @@ wrapper 复用上次 tarball（跳过构建打包，`--rebuild` 强制重打）�
 
 ## 已知边界
 
-- 动议必须在 **Web 面**跑（preset 只在 Web 面挂载，[architecture §6](./design/architecture.md) 要点 6）。
+- 动议必须在 **Web 面**跑（preset 只在 Web 面挂载，[architecture §6](../design/architecture.md) 要点 6）。
 - 团队里的 VP 是 **软隔离**（名册身份 + `team:policy` + KB 约定），不是 preset 级硬隔离；
-  硬隔离在独立 preset 会话里成立（[design/roles-isolation](./design/roles-isolation.md) §4 分水岭）。
+  硬隔离在独立 preset 会话里成立（[design/roles-isolation](../design/roles-isolation.md) §4 分水岭）。
   要让团队内成员拿到完整 preset 面，走 R3 命名委托或上游 seam（D9）。
 - 五人同时在线时模型调用量上升；预算口径见 `kb/org.md`（AI 试点每案 $200/月硬顶）。
 - **交付物三态是硬约定，不是习惯**：`packages/company-pack/content/AGENTS.md` 的「交付物三态」一节随每个成员

@@ -22,7 +22,7 @@
 - **当场修的文本**（简单缺陷，无卡）：
   - `eng-teaming`“返回聚合/异常”补：spill 长行用 `bash tail -c`/`sed` 按字节取（`read` 按 2000 字符/行
     截断；P1）；分支自述的“是否截断/长度”不可信，父用指针 + `read`/`tail` 自己核（C11）。
-  - `docs/delegation.md` §1、CEO `assembling-the-team`/persona、`eng-teaming` 两处：改稿优先
+  - `docs/contracts/delegation.md` §1、CEO `assembling-the-team`/persona、`eng-teaming` 两处：改稿优先
     `send_to_subagent` 续同一个 named child（带上一稿），不可续再委派。C10 红（模型照工具描述做了对的事，
     书面契约却相反）。
 - **只记观察、不立卡的**：F18（V2 里 vp-sales 没提/没用新工具，但 C12/C13b 证明能力可用，属方法选择）；

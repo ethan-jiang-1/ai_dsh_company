@@ -220,7 +220,7 @@ role 工具；父把 acknowledgement 当完成；run completed 但分支 null/�
   `pnpm test tests/client/data/delegation-tree.spec.ts`、`pnpm test tests/client/tabs/delegation-flow-panel.spec.ts`。
 - 静态对账（只读，不改代码）：`delegation-model.mjs` 的 `CONTRACTS.status` 是否仍是 `planned` 而实际
   skill/section 已落；`subagent_retry` 的注册列表/默认 `maxDepth` 是否在模型里没有声明；
-  `handbookSkipPresets` 是否只覆盖 leaf；`docs/presets.md` 是否只把 worker 选择写在 vp-eng。
+  `handbookSkipPresets` 是否只覆盖 leaf；`docs/contracts/presets.md` 是否只把 worker 选择写在 vp-eng。
 - live：vp-eng 是否加载 `delegation-policy` + `eng-teaming`；vp-sales 是否加载 policy；vp-eng 的
   systemPrompt 是否含 workflow contract section，CEO/worker/orchestrator 是否零命中；启动 worker 后
   child 系统提示是否被注入 handbook（leaf 应无）。
@@ -436,7 +436,7 @@ CMO 深度门都正确。
 | [重构后第四轮计划](../research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md) | 当前轮次的完整 delta、入口、charters、假设、fixtures、预算、停止与交接 |
 | [2026-11-08 计划](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md) | §1–§15 机制/设计（部分已被重构取代）；§16–§18 前三轮结果与未覆盖 |
 | [模型](../../tools/lib/delegation-model.mjs) | preset/通道/worker profile/合同/深度的唯一期望源；静态对账对象 |
-| [delegation 合同](../../docs/delegation.md) / [presets 合同](../../docs/presets.md) | 当前人读合同；tool 行以 preset 为准 |
+| [delegation 合同](../../docs/contracts/delegation.md) / [presets 合同](../../docs/contracts/presets.md) | 当前人读合同；tool 行以 preset 为准 |
 | [presets](../../packages/company-pack/presets) | vp-eng / CEO / worker family 的声明面 |
 | [subagent-retry.ts](../../packages/company-pack/src/host/delegation/subagent-retry.ts) / [spec](../../tests/host/delegation/subagent-retry.spec.ts) | 重试原语与 keyless 分类 |
 | [delegation-tree.ts](../../packages/company-pack/src/lib/delegation-tree.ts) / [DelegationFlowPanel](../../packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx) | 图/UI 投影与终态 |

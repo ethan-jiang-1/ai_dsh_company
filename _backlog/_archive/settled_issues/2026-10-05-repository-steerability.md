@@ -84,7 +84,7 @@ repo package.json
 **工作项**：
 
 - 盘点根目录和关键子树，标注 tracked、gitignored generated、gitignored runtime、vendor read-only。
-- 读取并交叉核对 `AGENTS.md`、`docs/project-map.md`、`docs/profile.md`、`docs/demo.md`、`docs/guides/bootstrap.md`、`docs/testing.md`、`scripts/README.md`、`snapshots/README.md`、pack/src README。
+- 读取并交叉核对 `AGENTS.md`、`docs/project-map.md`、`docs/contracts/profile.md`、`docs/contracts/demo.md`、`docs/guides/bootstrap.md`、`docs/testing.md`、`scripts/README.md`、`snapshots/README.md`、pack/src README。
 - 显式记录当前 Web profile、退役 company profile、headless 形状、第二 home、rehearsal home、浏览器缓存和系统 tmp 出口；只读审查不得无脑 `source dev/env.sh`，需要运行时用显式子进程环境并记录副作用。
 - 为每个事实标 owner、证据来源、当前状态和是否允许改写；历史描述与现在时合同分开。
 

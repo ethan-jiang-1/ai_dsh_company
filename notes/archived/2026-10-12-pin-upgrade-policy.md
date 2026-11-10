@@ -10,7 +10,7 @@
 
 - **升 pin = 用户策动制**：agent 不主动盯上游 tag、不评估、不建议、不记录候选——上游出任何新 tag 都是零动作。只有用户明确指示「升」才进 release.md §升 pin 程序。
 - **渠道只认 RC 与正式版（stable）**：alpha/beta 及其他预发布 tag 通通不管；即使被点名也不作为升 pin 对象（改渠道须新 Note 翻案）。
-- 政策家 = `docs/release.md` §升 pin 程序首段（随本 diff 写入）；升 pin 的其余程序（sync-dsh 簿记、人审 JSON、experimental 行重校、货架过账、release-smoke）不变。
+- 政策家 = `docs/contracts/release.md` §升 pin 程序首段（随本 diff 写入）；升 pin 的其余程序（sync-dsh 簿记、人审 JSON、experimental 行重校、货架过账、release-smoke）不变。
 
 ## 输掉的方案
 
@@ -27,6 +27,6 @@
 
 ## 验证
 
-- 政策行落 `docs/release.md` §升 pin 程序首段（文档面变更——无代码/机制面，无 keyless spec 可言）。
+- 政策行落 `docs/contracts/release.md` §升 pin 程序首段（文档面变更——无代码/机制面，无 keyless spec 可言）。
 - `pnpm verify` ALL PASS（含 ledger-routing 对 D42 的路由核验）。
 - 无未验面：政策本身无运行时行为。

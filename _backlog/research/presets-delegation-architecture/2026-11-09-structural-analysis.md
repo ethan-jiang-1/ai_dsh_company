@@ -61,7 +61,7 @@ prose 的隐含组合里。BUG-036..044 不是九个孤立事故，而是这套�
 - F：深度 1 vs 2 并存（CEO→VP=1，CEO→SA/SQA=2，vp-eng→SA/SQA/CMO=2）；CEO 的 researcher 行
   没有 maxDepth；workflow 只有 vp-eng；leaf preset 没有任何委派行。
 - I：读一个角色“能做什么委派”必须同时读 YAML、bundle（team 安装）、docs 矩阵和 skills；
-  docs/presets.md 的四形态矩阵是第四份副本，已出现漂移事故（BUG-037 的“根不是成员”）。
+  docs/contracts/presets.md 的四形态矩阵是第四份副本，已出现漂移事故（BUG-037 的“根不是成员”）。
 - V：DSH 是否提供 per-row toolFilter/能力声明？若无，能力模型只能由本仓生成器/测试承载。
 
 **S3 工作组合 vs 角色组合混用**
@@ -74,7 +74,7 @@ prose 的隐含组合里。BUG-036..044 不是九个孤立事故，而是这套�
 
 **S4 合同散文散落、无单一锚**
 - F：委派规则出现在 persona（CEO 2,069 / vp-eng 1,707 字符）、角色 skill（eng-teaming 93 行、
-  assembling-the-team 73 行）、docs/delegation.md、tool description、host 代码注释五处；
+  assembling-the-team 73 行）、docs/contracts/delegation.md、tool description、host 代码注释五处；
   一天内 eng-teaming 从约 72 行涨到 93 行，新增的主要是引擎合同（schema 子集/截断/schema null/
   分支叶子/重启）。
 - I：角色 skill 同时承担“领域方法”和“引擎合同”，两者生命周期不同（方法稳定、合同随 pin 变）；

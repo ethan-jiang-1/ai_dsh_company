@@ -29,7 +29,7 @@
 - **host**：`host/cultivation.ts` 解析 `--context=`、`sessionQuery.observeSession` 读会话、成品目录读成品、写 `contexts`、空正文放行；读取失败不落记录。
 - **客户端**：新增 `client/cultivation-context-data.ts`（会话/成品候选、标签、预览读）、`client/CultivationContextPicker.tsx`（内联选择面板）；`CultivationCompose` 背景区/默认当前轮/移除/更换/超时；`CultivationBoard` 背景卡、空正文提示、“我提交的”摘要、打开原文回调。
 - **注入**：`client/index.ts` 两个注入块共用 `makeContextWiring`（会话查 list/subagentAddress、文件先 stat）；`CultivationTab` / `CompanyView` 两壳同语义。
-- **文档**：`docs/presets.md` 培养合同加可选背景段；`checks/README.md` 加背景探针索引。
+- **文档**：`docs/contracts/presets.md` 培养合同加可选背景段；`checks/README.md` 加背景探针索引。
 - **探针**：新增 `probes/session-context/cultivation-context-probe.mjs`；扩 `probes/browser-visual/cultivation-gui-probe.mjs` ⑤b（成品背景 + 空正文 + 记录 contexts）。
 
 ## 输掉的方案（真实考虑过）
@@ -343,7 +343,7 @@ npx vitest run tests/client/cultivation/cultivation-board.spec.ts
 - `pnpm verify` ALL PASS。
 - `pnpm test` 全绿（新增 spec 计入）。
 - `node checks/smoke/client-load-smoke.mjs` ALL PASS。
-- `docs/presets.md` 的培养命令合同同 diff 更新：`--context=`、正文可空、`contexts` 字段。
+- `docs/contracts/presets.md` 的培养命令合同同 diff 更新：`--context=`、正文可空、`contexts` 字段。
 - 实施 Note 进 `notes/implemented/`：决定、输掉的方案、红/绿命令与输出、未验残留。
 - `pnpm verify` 再跑一次（Note 门禁/链接）。
 

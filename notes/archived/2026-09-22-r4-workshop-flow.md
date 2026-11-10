@@ -112,7 +112,7 @@ pnpm test    # 38 条；其中 tests/deliverables.spec.ts 13 条守判据本身�
 
 **第 5 步 · 自己跑一场看真的（真模型，分钟级）**
 
-按 `docs/demo.md` 场景 C 起观察窗（`pnpm dsh web -- --port 3086 --no-open`；**3080 是 GUI，别动**），
+按 `docs/contracts/demo.md` 场景 C 起观察窗（`pnpm dsh web -- --port 3086 --no-open`；**3080 是 GUI，别动**），
 选 `wochen CEO`，跑那条写作动议，收场再跑第 1 步。期望 `deliverables/<slug>/` 出
 `final.md` + `drafts/*.md`，判据 0 违规。
 
@@ -138,5 +138,5 @@ pnpm test    # 38 条；其中 tests/deliverables.spec.ts 13 条守判据本身�
   当前状态、`demo.md` 定稿、`intents.md` 的 R4 行改 implemented）。
 - **teammate / CEO 根会话里的 `subagent`(continuable) 仍与 team shadow 相冲**：职能 preset 的根会话
   已修好（控制行补齐），但 teammate 共享的是 CEO preset 的组合，那条张力属上游层，留 R5 与升 pin
-  一起处理；本轮不扩面（见 `docs/delegation.md` §4.4）。
+  一起处理；本轮不扩面（见 `docs/contracts/delegation.md` §4.4）。
 - **端到端真 UI（委派卡在对话流里渲染）** → R5 replay harness（R3 就留下的那笔）。

@@ -131,7 +131,7 @@
 ## L3 · 并发：**缩小冲突面 + 版本纪律**（不是"消掉锁需求"）
 
 ⚠ **我原先写的"DSH 无锁"过宽，且"真正的共享写者不存在"只能当目标、不能当机制事实**（评审修正；
-一手摘录已删，机制实况留在本表，合同见 [multi-human.md](../../docs/multi-human.md)）。机制实况：
+一手摘录已删，机制实况留在本表，合同见 [multi-human.md](../../docs/contracts/multi-human.md)）。机制实况：
 
 | | 有 / 没有 | 证据 |
 |---|---|---|
@@ -277,7 +277,7 @@ demo 期继续 A+D 但按缓解方向走（色板 seam、开门时把"你是谁/
 - 机制：①-b 探针（`scripts/member-inquiry-probe.mjs`）+ `vendor/dsh/packages/interaction/user-questions/src/index.ts:101-106` +
   `vendor/dsh/packages/subagent/subagent/src/child-agent.ts:254`；本提案的 symlink 分组实测 = 会话 bucket 名
   `--Users-...-dev-homes-bob-company-workspace--`（按字面路径）。
-- 合同：[docs/multi-human.md](../../docs/multi-human.md)（§0 机制边界 / §2 开门 runbook / §3 交接协议）。
+- 合同：[docs/contracts/multi-human.md](../../docs/contracts/multi-human.md)（§0 机制边界 / §2 开门 runbook / §3 交接协议）。
 - 真盘实测那场：slug `sea-reconcile-2026`（見 §问题 的 preset 默认坑）。
 
 ## 可核清单（**每条结论都能被独立核实**——评审请优先打这里）
@@ -291,8 +291,8 @@ demo 期继续 A+D 但按缓解方向走（色板 seam、开门时把"你是谁/
 | 5 | **侧栏按 `cwd` 字面分组**（symlink 能隔离） | 建 `dev/homes/bob/company-workspace -> 真盘`，用该路径 `session/create`，看 `$DSH_HOME/sessions/` 新 bucket 名 = `--Users-…-dev-homes-bob-company-workspace--`（**未被解析成真盘**） |
 | 6 | `deliverables-check` 按 **resolve 后**的路径算 bucket ⇒ symlink 门会漏 | `scripts/deliverables-check.mjs:80`（`-${workspace.replaceAll('/','-')}--`，`workspace` 来自 `resolve`） |
 | 7 | `journal-audit` 认 `endsWith('company-workspace')` ⇒ symlink 门照样认 | `scripts/journal-audit.mjs:78` |
-| 8 | 卡按**"发起它的那个 agent 的会话"**作用域 | RFC §机制核实（两门实测 A=true / B=false）；落点 `docs/multi-human.md` §0 |
-| 9 | **新建会话 preset 默认 = `ceo`**（第二扇门极易开错） | `docs/demo.md` §前置 第 4 步；真盘实证：会话 `0e7ead3b`（preset `ceo`）写了 `kb/cfo/journal/…` |
+| 8 | 卡按**"发起它的那个 agent 的会话"**作用域 | RFC §机制核实（两门实测 A=true / B=false）；落点 `docs/contracts/multi-human.md` §0 |
+| 9 | **新建会话 preset 默认 = `ceo`**（第二扇门极易开错） | `docs/contracts/demo.md` §前置 第 4 步；真盘实证：会话 `0e7ead3b`（preset `ceo`）写了 `kb/cfo/journal/…` |
 | 10 | **`journal-audit` 查在场、不查署名** | 同上：CFO 的 journal 由 ceo 会话写，审计仍判 ✅ |
 
 **仓库自带的探索路径**（评审不必从零摸）：

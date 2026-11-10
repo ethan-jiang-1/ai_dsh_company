@@ -1,9 +1,9 @@
 # delegation · 汇报线合同（0.2.1：activation 世界里的两条路）
 
 > 什么时候读：CEO 派活方式要改、或委派行为不符预期时。路线 = 通道表（A/B）→ 边界节。
-> 顶层合同：CEO 的"派活"现在时语义——哪条路走什么、边界在哪、被什么检查守住。
-> 机制依据 [design/architecture.md](./design/architecture.md) §3（通道 A/B）与
-> [design/roles-isolation.md](./design/roles-isolation.md) §2–§3；0.2.1 的激活模型见
+> 合同：CEO 的"派活"现在时语义——哪条路走什么、边界在哪、被什么检查守住。
+> 机制依据 [design/architecture.md](../design/architecture.md) §3（通道 A/B）与
+> [design/roles-isolation.md](../design/roles-isolation.md) §2–§3；0.2.1 的激活模型见
 > vendor `docs/upgrade-guide/v0.2.1-alpha.1/subagent-activations/guide.md`。
 
 ## 0. 一句话
@@ -114,7 +114,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 ## 6. 验证（分层，只报告实际跑过的）
 
 **分层原则（R3 立）**：按"要不要模型"切，不按"重不重要"切；真模型/真浏览器不进回归。
-**逐层命令、预算与触发条件 = [tests/README](../tests/README.md) 与各脚本头注**（本文件不复述，避免两处漂移）：
+**逐层命令、预算与触发条件 = [tests/README](../../tests/README.md) 与各脚本头注**（本文件不复述，避免两处漂移）：
 keyless（`pnpm test`：委派卡视图模型 + card key ↔ `toolName` 逐字一致）→ 真页面挂载
 （`client-load-smoke`）→ 机制/边界（`delegation-smoke`：activation 回执、child 首帧 `agentPreset`、
 child 无 Team 工具）→ 挂载（`preset-smoke`）→ 端到端（历史重放；现行真页面车道 = `ui-scene-smoke`）。

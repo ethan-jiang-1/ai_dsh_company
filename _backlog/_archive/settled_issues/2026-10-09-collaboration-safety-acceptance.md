@@ -24,12 +24,12 @@ opened: 2026-10-09
 | 词汇 | 定义 | 主源 |
 |---|---|---|
 | 任务 owner（机制义） | 任务快照 `ownerId`：claim 成功或 Lead reassign 写入，revision 随事务 +1。授权面**仅任务生命周期操作**（release/edit/complete/reopen/delete 需 owner 或 Lead；reassign 仅 Lead）；不绑定文件写权限、不自动释放（release/reassign/reopen 是仅有的显式去除途径）、不是锁 | [task-board](../../../vendor/dsh/packages/experimental/agent-team/src/task-board.ts#L105-L209)、[上游限制](../../../vendor/dsh/packages/experimental/agent-team/README.md#known-limitations-and-deferred-work) |
-| 负责人（房间义 owner） | 一份产物/逻辑任务的唯一负责人：署名行 + 对终态负责。跨根无共同任务板 ⇒ 负责人 = 派活预指定 + 占位/让位协议（持认 = 占位 ∧ ¬让位） | [multi-human §3/§4](../../../docs/multi-human.md)、[BUG-004](../fixed_bugs/BUG-004-claim-yield-not-machine-readable.md)、[公司手册](../../../AGENTS.md) :87-88 |
+| 负责人（房间义 owner） | 一份产物/逻辑任务的唯一负责人：署名行 + 对终态负责。跨根无共同任务板 ⇒ 负责人 = 派活预指定 + 占位/让位协议（持认 = 占位 ∧ ¬让位） | [multi-human §3/§4](../../../docs/contracts/multi-human.md)、[BUG-004](../fixed_bugs/BUG-004-claim-yield-not-machine-readable.md)、[公司手册](../../../AGENTS.md) :87-88 |
 | 认领失败（claim failure） | 同 Team claim 事务被拒，两码：revision CAS 落败 = `TEAM_TASK_STALE_REVISION`（他人先以同 revision 认领成功）；owner 已占 = `TEAM_TASK_ALREADY_CLAIMED`（拿新 revision 重试仍拒）。败者侧无自动状态、无通知；重试夺不回被持有任务 | [task-board](../../../vendor/dsh/packages/experimental/agent-team/src/task-board.ts#L115-L136)；真实双成员事件见[双成员验收研究](../research/collaboration/2026-10-09-team-read-barrier-acceptance.md) |
-| owner-bound 产物 | 只应由该任务 owner（或显式改派的新负责人）写的目标文件；房间形状 = `drafts/<角色>.md`、个人 journal、`final.md` 归 CEO。机制不拦（守卫不管授权），约束住任务书/手册层 | [multi-human §4](../../../docs/multi-human.md)、[公司手册](../../../AGENTS.md) :87-88 |
+| owner-bound 产物 | 只应由该任务 owner（或显式改派的新负责人）写的目标文件；房间形状 = `drafts/<角色>.md`、个人 journal、`final.md` 归 CEO。机制不拦（守卫不管授权），约束住任务书/手册层 | [multi-human §4](../../../docs/contracts/multi-human.md)、[公司手册](../../../AGENTS.md) :87-88 |
 | 共享产物（shared artifact） | **显式授权**多名成员共写的目标文件；协调靠 freshness guard（一胜一 stale、败者重读合并）+ 合并纪律，不靠 owner；≠「谁都能写」 | [fs-local](../../../vendor/dsh/packages/fs/fs-local/src/index.ts#L101-L131)、[双成员验收研究](../research/collaboration/2026-10-09-team-read-barrier-acceptance.md) |
-| 返工（rework） | 房间概念：已出稿/已合稿产物需再修改；现行合同 = 显式通知合稿人 + 新版本号（署名行 `版本 v<N>`）。机制层无返工概念，只有读/写/守卫 | [multi-human §4](../../../docs/multi-human.md) |
-| 覆盖（overwrite） | 对已存在文件的写，三条路径：`replaceIfVersion` 版本不符 → `FS_STALE_VERSION`；`createIfAbsent` 撞已有 → `FS_NOT_OBSERVED`；**不带期望 → 无条件原子覆盖**（edit 同构：无 expected 版本即无守卫）。守卫管新鲜度不管授权——重读后覆盖别人工作机制合法（「后写者静默胜出」）；跨进程检查与发布无原子性（E2/T3：20/20 互踩），`createIfAbsent` 跨进程仍原子（T4：一胜一拒） | [fs-local writeText/editText](../../../vendor/dsh/packages/fs/fs-local/src/index.ts#L202-L291)、[multi-human §4](../../../docs/multi-human.md) |
+| 返工（rework） | 房间概念：已出稿/已合稿产物需再修改；现行合同 = 显式通知合稿人 + 新版本号（署名行 `版本 v<N>`）。机制层无返工概念，只有读/写/守卫 | [multi-human §4](../../../docs/contracts/multi-human.md) |
+| 覆盖（overwrite） | 对已存在文件的写，三条路径：`replaceIfVersion` 版本不符 → `FS_STALE_VERSION`；`createIfAbsent` 撞已有 → `FS_NOT_OBSERVED`；**不带期望 → 无条件原子覆盖**（edit 同构：无 expected 版本即无守卫）。守卫管新鲜度不管授权——重读后覆盖别人工作机制合法（「后写者静默胜出」）；跨进程检查与发布无原子性（E2/T3：20/20 互踩），`createIfAbsent` 跨进程仍原子（T4：一胜一拒） | [fs-local writeText/editText](../../../vendor/dsh/packages/fs/fs-local/src/index.ts#L202-L291)、[multi-human §4](../../../docs/contracts/multi-human.md) |
 
 ### 四问裁决稿（已裁决 2026-10-10）
 
@@ -48,7 +48,7 @@ opened: 2026-10-09
 - 建议：**A**——与现行合同同构，只是把隐含语义显式化。
 
 **裁3 · 跨根会话共享写是否为受支持形态**
-- 事实：拓扑分两层——跨根同服务（多门协作）：实例内 freshness 真实生效（E1），多门协作已按 [multi-human](../../../docs/multi-human.md) 合同真盘验收（2026-10-04）；跨进程同盘：守卫窗 20/20 互踩（E2/T3），手册已要求「写共享盘的 DSH 进程保持一个」，跨 home 无消息寻址。
+- 事实：拓扑分两层——跨根同服务（多门协作）：实例内 freshness 真实生效（E1），多门协作已按 [multi-human](../../../docs/contracts/multi-human.md) 合同真盘验收（2026-10-04）；跨进程同盘：守卫窗 20/20 互踩（E2/T3），手册已要求「写共享盘的 DSH 进程保持一个」，跨 home 无消息寻址。
 - 选项：**A** 继续支持·维持现行边界（跨根共享写受支持，约束 = 单写进程 + freshness + 占位协议；跨进程不承诺）；**B** 收窄为不支持（多门协作退化为单门 + 文件交接）；**C** 升级为跨进程机制支持（协调服务 = 排除项）。
 - 建议：**A**——现行合同已按此验收；B 推翻已批准的多人形态且无新证据；C 超授权。
 
@@ -101,7 +101,7 @@ opened: 2026-10-09
 
 ## 下游申请（2026-10-10 提交，待用户授权）
 
-1. **手册/多人合同补句（裁2＋裁4 文档化）**：①「owner-bound 产物仅 owner（或显式改派的新负责人）可覆盖；共享产物需显式授权，被授权成员先读后写、被拒重读合并」②「认领失败让位：不写该任务 owner-bound 产物，回报 lead 后转干别的」。落点候选＝[公司手册](../../../AGENTS.md)写盘守卫/任务板行＋[multi-human §4](../../../docs/multi-human.md)纪律区；属模型可见生产内容，需用户授权后另行实施；验收＝对应文档面检查＋team-claim-loser-probe 复跑保持绿。
+1. **手册/多人合同补句（裁2＋裁4 文档化）**：①「owner-bound 产物仅 owner（或显式改派的新负责人）可覆盖；共享产物需显式授权，被授权成员先读后写、被拒重读合并」②「认领失败让位：不写该任务 owner-bound 产物，回报 lead 后转干别的」。落点候选＝[公司手册](../../../AGENTS.md)写盘守卫/任务板行＋[multi-human §4](../../../docs/contracts/multi-human.md)纪律区；属模型可见生产内容，需用户授权后另行实施；验收＝对应文档面检查＋team-claim-loser-probe 复跑保持绿。
 2. **无 Note 申请**：判据取舍已由 [claim-loser-yield-entry](../../../notes/archived/2026-10-10-claim-loser-yield-entry.md) 承载（2026-10-10 已交付）；本卡结论不需新 Note。
 
 去向：2026-10-10 随收口回复向用户提交（backlog 章程默认）；未指定接收会话。申请不授予实施权限。

@@ -76,7 +76,7 @@ opened: 2026-11-09
 1. **模型**：`WORKER_PROFILES` 加 `worker-researcher`（named-only、只读）；`COMPOSITIONS` 删除 `researcher`、加 `worker-researcher` worker 组合；SA/SQA 改 `specialist` 加 `skills`/`authority`；`namedProfiles` 进 CEO/vp-eng；`modelProblems` 校验：specialist 必须有 skills；worker-researcher 必须无写/无 bash；namedProfiles 目标必须存在；删除 `leaf`。
 2. **preset**：新增 `presets/worker-researcher/agent.cordis.yml`（只读 fs + fs-search + web + todo；persona 短；无 skill/compaction）；删除 `presets/researcher/`；CEO `subagent_research` 行改 `agentPreset: worker-researcher`；SA/SQA YAML 只改注释中“子人格”措辞，工具/skill 不动。
 3. **测试**：`delegation-composition` 增 `specialist` 形状与 `namedProfiles` 派生；`delegation-model` 增 specialist/worker-researcher/namedProfiles 断言；`presets.spec` 的 researcher 断言迁到 worker-researcher（只读仍是硬断言）；`preset-smoke` 预期 6+5。
-4. **文档**：`docs/presets.md` roster 的 researcher 行并入 worker 行（`worker / worker-researcher / worker-orchestrator`），SA/SQA 标 specialist；`docs/delegation.md` 表更新 `subagent_research` 目标；`packages/company-pack/README.md` 的角色清单同步；`docs/presets.md` §四形态的“子人格”改 specialist。
+4. **文档**：`docs/contracts/presets.md` roster 的 researcher 行并入 worker 行（`worker / worker-researcher / worker-orchestrator`），SA/SQA 标 specialist；`docs/contracts/delegation.md` 表更新 `subagent_research` 目标；`packages/company-pack/README.md` 的角色清单同步；`docs/contracts/presets.md` §四形态的“子人格”改 specialist。
 5. **验证**：`pnpm test tests/presets`；`preset-smoke` 6+5；真实 CEO → `subagent_research` 探针验 child `agentPreset=worker-researcher` 且无 write/bash；`pnpm test`/`typecheck`/`verify`/`lint`/`dup` 全绿。红配方：删 worker-researcher 的 patch、把 CEO 行改回 researcher、给 specialist 留 channel、把 SQA authority 删掉——对应 spec/门禁应红。
 
 ## 未决问题

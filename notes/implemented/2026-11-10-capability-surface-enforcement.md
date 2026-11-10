@@ -34,7 +34,7 @@
    `tests/presets/delegation-composition.spec.ts` 读 YAML 的 description/persona，断言不再出现
    `1–2` 且写了“按 brief/父代理”；`tests/host/delegation/delegation-control.spec.ts` 按 preset
    断言 control 安装面。真实 4-task 探针保留为观察，不把 4 leaf 当故障。
-4. **文档/技能/旧 Note 同 diff**：`docs/presets.md`、`docs/delegation.md`、delegation-policy §8、
+4. **文档/技能/旧 Note 同 diff**：`docs/contracts/presets.md`、`docs/contracts/delegation.md`、delegation-policy §8、
    `eng-teaming` 第 2 档、`worker-orchestrator` 头注、旧模型 Note §2 全部改成同一口径。
 
 ## 输掉的方案

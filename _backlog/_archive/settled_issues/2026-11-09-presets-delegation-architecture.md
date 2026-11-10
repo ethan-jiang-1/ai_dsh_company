@@ -79,7 +79,7 @@ opened: 2026-11-09
 | F1 | 只有 `subagent`（spawn）能按行钉 `agentPreset`；fork/workflow/team 不能 | vendor 源码 + 研究 affordance 材料 |
 | F2 | `subagent_fork` 继承父上下文与父组合，语义上是“带我上下文继续”，不是通用 worker | [fork provider](../../../vendor/dsh/packages/subagent/subagent-fork-in-process/src/index.ts) |
 | F3 | workflow 分支克隆父组合，无 `maxDepth` 闸；分支里再 spawn 的深度算法未证 | [workflow runtime](../../../vendor/dsh/packages/workflow/workflow-ptc/src/runtime.ts) |
-| F4 | team 成员继承 Lead 组合，不是角色 preset；控制名被团队版 shadow | [agent-team types](../../../vendor/dsh/packages/experimental/agent-team/src/types.ts) + [delegation 合同](../../../docs/delegation.md) |
+| F4 | team 成员继承 Lead 组合，不是角色 preset；控制名被团队版 shadow | [agent-team types](../../../vendor/dsh/packages/experimental/agent-team/src/types.ts) + [delegation 合同](../../../docs/contracts/delegation.md) |
 | F5 | `maxDepth` 散在行上；CEO→VP→worker 到 2 层到顶 | [ceo preset](../../../packages/company-pack/presets/ceo/agent.cordis.yml)、[vp-eng preset](../../../packages/company-pack/presets/vp-eng/agent.cordis.yml) |
 | F6 | 现有观测是分通道的；没有混合链的统一图 | `list_subagents` / `workflow_runs` / team roster |
 | F7 | 共享 skill 目录机制已有先例（`_shared/skills/product-definition` 被 4 角色共用） | preset 的 `customSkillDirs` |
@@ -159,7 +159,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针）
 | `policy.delegation` | 公司教义 | 共享 skill（`_shared` 下的独立 delegation 目录） | 所有有委派能力的 full role |
 | `engine.workflow` | DSH pin | capability-scoped prompt section（只在有 workflow 的 preset 注入） | 有 workflow 的组合 |
 | `engine.subagent` | DSH pin | 视探针结果：短 section 或并入 policy skill | 有 subagent 的组合 |
-| 维护面 | 本仓维护者 | [delegation 合同](../../../docs/delegation.md) + [presets 合同](../../../docs/presets.md) | 人读；链接到上面两个 owner，不复制 |
+| 维护面 | 本仓维护者 | [delegation 合同](../../../docs/contracts/delegation.md) + [presets 合同](../../../docs/contracts/presets.md) | 人读；链接到上面两个 owner，不复制 |
 
 **policy skill 内容**：通道表、何时用哪条、brief 四要素、effort 预算、控制/寻址、结果可读性、链设计（先扁平后嵌套、每条边有结果契约、父只控制直接子代、失败按图对账）。**engine section 内容**：schema 子集、分支 null、截断/spill、重启、嵌套 workflow/subagent 的已知语义。两者都不长（policy < 2k 字符；engine section 10–15 行）。
 
@@ -342,7 +342,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针）
 - **section 能力探测失败**：fallback 是按 preset id 列表注入；仍在 host 层，不改 vendor。
 - **深度算法与预期不符**：先探针、再改 `maxDepth`；不靠猜把链拉长。
 - **图数据不完整**：先只投影已证明的事件；缺口如实标 `unavailable`，不伪造。
-- **docs 预算**：`docs/delegation.md` 120/120、`docs/presets.md` 196/198；加内容前先压缩或搬去合同文件。
+- **docs 预算**：`docs/contracts/delegation.md` 120/120、`docs/contracts/presets.md` 196/198；加内容前先压缩或搬去合同文件。
 - **生成器保真**：注释/`!!js`/顺序；第二阶段用生成后回读 + dump 比对，不靠肉眼。
 - **测试资产膨胀/重复**：模型 spec、组合 spec、dump smoke 三者都消费同一模型；发现第二份期望矩阵即停。
 - **旧测试的假安全感**：旧 presets spec 已去掉 2 条矩阵重复；保留内容/唯一结构；新 worker/链由 model/composition/树 specs 守。

@@ -19,10 +19,10 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
 
 | # | 痛点 | 证据 |
 |---|---|---|
-| P1 | **同文件并发写**：跨进程/跨 home/外部编辑器没有共享租约——"一个文件同一时刻一个写者"只是流程政策，不是机制保证 | [multi-human.md §4](../../../docs/multi-human.md) |
+| P1 | **同文件并发写**：跨进程/跨 home/外部编辑器没有共享租约——"一个文件同一时刻一个写者"只是流程政策，不是机制保证 | [multi-human.md §4](../../../docs/contracts/multi-human.md) |
 | P2 | **撞 slug / 撞稿**：两场动议共用 `renewal-y-2026`，产物互相覆盖、两场混装，三态判据看不出 | [memory-convergence-2026-09-26 §边界 1](../../../README.md)；已有观察项 `slug-collision`（纯逻辑，带回归） |
 | P3 | **版本一致性**：quote-z-2026 双签 allowed-once 但**只对 cfo v2 生效**，盘面已 v3，final 只能记"版号待对齐"；署名行版号是手写的 | 台账 `quote-z-2026` 行结论；`scripts/authorship-audit.mjs` 头注 |
-| P4 | **感知/通知**：根会话之间**没有消息通道**（Agent Teams 按队伍作用域，不同根会话是不同队）；"我写完了"靠人开口说；实时卡刷新即丢 | [multi-human.md §0+§3](../../../docs/multi-human.md)（§0 证卡按会话作用域，§3 证非团队会话互不通信）；手册「待办」节"刷新即丢" |
+| P4 | **感知/通知**：根会话之间**没有消息通道**（Agent Teams 按队伍作用域，不同根会话是不同队）；"我写完了"靠人开口说；实时卡刷新即丢 | [multi-human.md §0+§3](../../../docs/contracts/multi-human.md)（§0 证卡按会话作用域，§3 证非团队会话互不通信）；手册「待办」节"刷新即丢" |
 | P5 | **审计与日期**：谁在何时写了什么，唯一权威 = `$DSH_HOME` 会话日志（zstd 多帧），**按 home 分桶**（跨 home 审计要每家跑一遍）、~~快照里没有日志（导出缺口）~~ **导出缺口已闭合（2026-09-30 E3：`session-log-export.mjs` + 09-26 快照 4 场审计 0 违规）**，日期要靠它回填 | [journal-date-mechanism](../../../notes/archived/2026-09-26-journal-date-mechanism.md)；memory-convergence README"登记一条缺口"；**E3 收据 = 研究卡 E3 结论** |
 | P6 | **派活状态回写滞后**：任务书状态行不回写，扫盘把过期待办报成活 | 公司手册「机器可读派活行」节（实验实证） |
 
@@ -42,7 +42,7 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
    败者天然先读后合法重写 = 后写者静默胜出，机械拒只在败者恰好盲写时出现（收据 = 研究卡 E1 结论）
    ⇒ R0-2 的「占位=认领」主张语义是必需品。
 2. **fs 后端实例内 per-target 排队锁**：同一 DSH 进程内所有会话共享（`fs-local` 的 `withLock`）。
-   **而现行多人 runbook = 一个 `dsh web` 服务进程 + 三扇浏览器门**（[multi-human.md §2](../../../docs/multi-human.md)）
+   **而现行多人 runbook = 一个 `dsh web` 服务进程 + 三扇浏览器门**（[multi-human.md §2](../../../docs/contracts/multi-human.md)）
    ⇒ **今天的三门并发全在这一个进程里，锁和版本守卫都罩得住**。真正的裸区是：两个服务进程共用一张盘
    （双 home 开发态、未来的多机形态）和外部编辑器。
    **E2 实测（2026-09-30，真 fs-local × 2 进程）**：裸区比想象的更秃——跨进程**同版本守卫写**
@@ -64,7 +64,7 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
    ——这条论证对 Redis 锁**同样成立**（外部写者照样绕过；崩溃 owner 要 TTL，TTL 到期写一半要 fencing token）。
    我们引 Redis 进来并不会让这条消失，只是把"绕过面"从 DSH 会话换成"没装 Redis 客户端的写者"。
 5. **跨机形态的事实**：Agent Teams 消息跨 home 无寻址路径，多机协作**只剩共享盘**
-   （[multi-human.md §5](../../../docs/multi-human.md)）⇒ 即使多机，协调面也只有文件 + git——
+   （[multi-human.md §5](../../../docs/contracts/multi-human.md)）⇒ 即使多机，协调面也只有文件 + git——
    除非再引网络服务（用户已裁决"不搞 client/server"，multi-human.md 篇首）。
 6. **官方已有跨进程文件写锁件（2026-09-29 新核实）**：[`dsh-atomic-write`](../../../vendor/dsh/packages/util/atomic-write/README.md)
    （util 库，零依赖、非插件）——`wx` 创建 `<file>.lock` 兄弟文件**串行化跨进程读-改-写循环**；
@@ -135,7 +135,7 @@ Redis 来做，至少这里头有锁的概念，同时 redis 里是不是有好�
      + `handbook-budget` 门禁）——与布局卡修正 7 共享同一预算池；**字节侧约束已除，仅余行数棘轮（且更紧）**，
      两条 RFC 的改文须排收敛顺序，RFC 带腾位/扩额计划）；
   2. 抢注语义显式化——**拆两段**（盲审：原稿隐含反向依赖姊妹卡 meta 未拍板；且与
-     [multi-human.md §4](../../../docs/multi-human.md) "文件存在≠收到/认领/授权/完成"既有合同打架，
+     [multi-human.md §4](../../../docs/contracts/multi-human.md) "文件存在≠收到/认领/授权/完成"既有合同打架，
      给"存在"第二语义须同 diff 改合同）：(a) **不依赖 meta 的版本** = 开场建 `drafts/<角色>.md` 占位、
      **首行写明"占位=认领，非出稿"**、门禁认占位形状；(b) **meta 建档抢注**（前置 = 布局卡 B1 毕业），
      两卡接缝合并。原稿"createIfAbsent 天然幂等"措辞撤回——它是一次性抢注，重写被拒，这正是本义；
@@ -203,5 +203,5 @@ Q2 定跨根感知归面板还是等机制（已定案：跨根不可用 = 无�
   ——剩 **用户点头 R0 四条清单** 这一道。E2/Q1 已答并写回本卡（差价已钉死，不再是待办）。
 - **R2 的待触发门**：触发条件两条齐 + 用户批；只做实验不进产品形态。
 - **放弃门**：E1 全绿 + N 场真多人动议（N 用户定）无触发证据 ⇒ Redis 线关门，结论并进
-  [multi-human.md](../../../docs/multi-human.md) §4 的机制事实栏（"锁已由 X 提供"），本卡迁 `_done`。
+  [multi-human.md](../../../docs/contracts/multi-human.md) §4 的机制事实栏（"锁已由 X 提供"），本卡迁 `_done`。
 - 卡本身不阻塞姊妹卡：deliverables 迁移（那张）先行不依赖本卡结论。

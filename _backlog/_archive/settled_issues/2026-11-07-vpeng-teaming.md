@@ -13,7 +13,7 @@ opened: 2026-11-07
 
 **问题与期望结果：** `vp-eng` 加 `vp_cmo`；`eng-teaming` skill（四档决策树）；persona 写明成员不是角色；docs/handbook/UI 的继承说法修正；根=Lead 探针；CEO 不变。
 
-**范围：** `presets/vp-eng`（`vp_cmo` 行、persona、新 skill）；`docs/delegation.md`、`docs/presets.md`、`content/AGENTS.md`（只改「组合继承」「星型汇报」「多门模式」「问人两条路」段）、`docs/runtime-map.md`/`docs/design/roles-isolation.md`（如引用旧继承说法）、`packages/company-pack/README.md`（已知限制）、`CultivationBoard.tsx` + 测试；`tests/presets/presets.spec.ts`。
+**范围：** `presets/vp-eng`（`vp_cmo` 行、persona、新 skill）；`docs/contracts/delegation.md`、`docs/contracts/presets.md`、`content/AGENTS.md`（只改「组合继承」「星型汇报」「多门模式」「问人两条路」段）、`docs/runtime-map.md`/`docs/design/roles-isolation.md`（如引用旧继承说法）、`packages/company-pack/README.md`（已知限制）、`CultivationBoard.tsx` + 测试；`tests/presets/presets.spec.ts`。
 
 **依赖：** A1/A3/A4a/A4b；BUG-034/035 已修（7da331a，卡归档）；`tests/presets` 串行改。
 
@@ -52,8 +52,8 @@ opened: 2026-11-07
 
 ## 文档预算（先搬后写）
 
-- `docs/presets.md` 当前 197/198 行：把 researcher/SA/SQA 的长理由段移到程序 Note，正文留一行指针；腾出约 10 行再写 `eng-teaming`/`vp_cmo`。
-- `docs/delegation.md` 当前 117/120 行：把 §6 验证表细节移到 `tests/README.md`/脚本头注，正文留指针；腾出约 15 行再写「三种门」。
+- `docs/contracts/presets.md` 当前 197/198 行：把 researcher/SA/SQA 的长理由段移到程序 Note，正文留一行指针；腾出约 10 行再写 `eng-teaming`/`vp_cmo`。
+- `docs/contracts/delegation.md` 当前 117/120 行：把 §6 验证表细节移到 `tests/README.md`/脚本头注，正文留指针；腾出约 15 行再写「三种门」。
 
 ## 排除
 
@@ -70,7 +70,7 @@ opened: 2026-11-07
 - 基线：`git rev-parse HEAD` = `961ebf0`（A8 提交后）
 - 红（文案/行未落）：`pnpm vitest run tests/presets` → `3 failed | 47 passed`（缺 vp_cmo 行 / 缺 eng-teaming / 手册继承口径未分通道）；`pnpm vitest run tests/client/cultivation/cultivation-board.spec.ts` → `1 failed | 18 passed`（旧承接文案）
 - 绿：`pnpm vitest run tests/presets` → `50 passed`；`pnpm vitest run tests/client` → `332 passed`；`node checks/smoke/preset-smoke.mjs` → `ALL PASS（6 角色 + 3 子人格）`；`node checks/smoke/probe-smoke.mjs` → `ALL PASS（6/6 快速档）`；`node checks/smoke/client-load-smoke.mjs` → `ALL PASS（真浏览器）`；`node probes/team/vp-eng-root-lead-probe.mjs` → `ALL PASS`（vp-eng 根会话投影 = 单成员 lead + tasks 数组）；`pnpm typecheck` / `pnpm lint` / `pnpm verify` 全绿
-- 资产：`presets/vp-eng/agent.cordis.yml` 加 `vp_cmo`（maxDepth 2 → cmo）+ persona 组队段；新 `presets/vp-eng/skills/eng-teaming/SKILL.md`（四档 + 硬规则）；`content/AGENTS.md` 组合继承拆两通道；`docs/delegation.md`（vp_cmo 行 + 根门=Lead §2.1 + §6 压成指针，115/120）；`docs/presets.md`（VP-Eng 组队段 + CMO StRS，196/198）；`packages/company-pack/README.md` 三門已知限制（160/160）；`CultivationBoard.tsx` 文案 + client spec；新 `probes/team/vp-eng-root-lead-probe.mjs`（keyless 投影，实测需一轮极短 prompt 才发布投影）
+- 资产：`presets/vp-eng/agent.cordis.yml` 加 `vp_cmo`（maxDepth 2 → cmo）+ persona 组队段；新 `presets/vp-eng/skills/eng-teaming/SKILL.md`（四档 + 硬规则）；`content/AGENTS.md` 组合继承拆两通道；`docs/contracts/delegation.md`（vp_cmo 行 + 根门=Lead §2.1 + §6 压成指针，115/120）；`docs/contracts/presets.md`（VP-Eng 组队段 + CMO StRS，196/198）；`packages/company-pack/README.md` 三門已知限制（160/160）；`CultivationBoard.tsx` 文案 + client spec；新 `probes/team/vp-eng-root-lead-probe.mjs`（keyless 投影，实测需一轮极短 prompt 才发布投影）
 - 机制事实：CEO 的 `vp_cmo` 仍 `maxDepth: 1`（D7 不动，spec 断言守住）；root=Lead 由 keyless 探针证，spawn 成功归 B2
 - 环境备注：dev profile 的 pack 安装从 tarball 换成 `link:`（新 skill 立即生效；`pnpm company` 默认 tarball 会在下次启动时还原），重建了 `lib/` 产物
 - 真跑：teammate 真实 spawn 由 B2 证；本卡只证声明/文案/挂载/根门投影

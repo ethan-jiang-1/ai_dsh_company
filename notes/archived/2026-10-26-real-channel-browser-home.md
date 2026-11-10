@@ -4,7 +4,7 @@
 
 > **2026-10-27 部分取代（换盘）**：换盘默认硬阻断；`DSH_COMPANY_REBIND=1` + 旧盘已不存在 + 新盘形状正确才搬家；
 > 删除 `bundle.json` 重建 = 最后手段（丢基部哈希）。本文 §3 的“新 home 或删除 manifest”作废，告警/跳过半仍有效。
-本文记录 0.3.10 的决定、输掉的方案与真跑证据；不是功能合同，合同住 [release](../../docs/release.md)、
+本文记录 0.3.10 的决定、输掉的方案与真跑证据；不是功能合同，合同住 [release](../../docs/contracts/release.md)、
 [pack README](../../packages/company-pack/README.md) 与生成式《安装手册》。
 
 ## 决定

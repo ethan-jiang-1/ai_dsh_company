@@ -53,7 +53,7 @@ r2 presence + `--ui` 全绿。问题集中在**总账与反馈面**：新增角�
 - `snapshots/README.md` 43 行 vs 盘上 47 个场景；4 个新场景未登记；成品目录仍写「44 行」而
   生成索引是 47；「9 场景 1 可跑」已过期为「10 场景 2 可跑」。
 - `cdp-probe.mjs` 的 tabs 数组 8 个（少「成品」），且只断言 `body.innerText` 含页签词，
-  不断言面板体内容；`docs/demo.md` 与 `docs/guides/cdp-probe.md` 仍称「全部公司页签」。
+  不断言面板体内容；`docs/contracts/demo.md` 与 `docs/guides/cdp-probe.md` 仍称「全部公司页签」。
 - `docs/testing.md` 说 keyless「不证明装配」「现状零 mock」，但
   `tests/client/company-client-composition.spec.ts` 真 boot 生产 client + RemoteMock，
   `tests/harness/repo/foundation-safety.spec.ts` 用 `vi.mock('node:os')`；层表与成本预算都过期。

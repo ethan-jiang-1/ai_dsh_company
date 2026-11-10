@@ -64,7 +64,7 @@ export function run({ root, ok, fail }) {
   if (existsSync(bootstrapPath)) {
     const bootstrap = readFileSync(bootstrapPath, 'utf8')
     for (const [pattern, message] of [
-      [/装进 \*\*web profile\*\*/, 'bootstrap 仍写「装进 web profile」（观察窗 profile 是 company；与 docs/profile.md 矛盾）'],
+      [/装进 \*\*web profile\*\*/, 'bootstrap 仍写「装进 web profile」（观察窗 profile 是 company；与 docs/contracts/profile.md 矛盾）'],
       [/dev = link:/, 'bootstrap 仍把 link 写成 dev 默认（dev = link:；日常通道应是 tarball，link 只作 --link 快速通道）'],
       [/重指 link/, 'bootstrap 升级配方仍写「重指 link」（默认安装是 tarball，重跑即构建 + 重装）'],
     ]) {
@@ -104,7 +104,7 @@ export function run({ root, ok, fail }) {
     ['_dist/安装手册.md', /产品形状|产品安装|产品入口|产品 home|产品文件|产品承诺|run bundle/],
     ['run/README.md', /一 home 一 workspace|启动器强制|第二个 CEO 新开 home|v2/],
     ['docs/orient.md', /一次安装一个|第二个 CEO 新开 home|run bundle 四件套/],
-    ['docs/external-research.md', /26_plugin-data-model|26_plugin-as-product/],
+    ['docs/reference/external-research.md', /26_plugin-data-model|26_plugin-as-product/],
   ]
   for (const [rel, pattern] of retired) {
     const file = join(root, rel)

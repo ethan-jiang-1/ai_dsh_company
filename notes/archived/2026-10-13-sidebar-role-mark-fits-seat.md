@@ -76,5 +76,5 @@
 - 实现：`packages/company-pack/src/client/ui/RoleBadge.tsx`（`ROLE_MARK`）、`packages/company-pack/src/client/ui/styles.ts`（`.wk-role-badge`）。
 - keyless 守卫：`tests/client/ui/client-css.spec.ts`、`tests/client/ui/role-badge.spec.ts`。
 - 真几何判据 + 图像判据：`probes/browser-visual/sidebar-role-mark-probe.mjs`（发射器 = `tests/client/ui/role-mark-fixture.spec.ts`，真组件 + 真 CSS）、`snapshots/visual/sidebar-role-mark/`。
-- 合同/runbook：`docs/multi-human.md` §2 第 4 条、`packages/company-pack/README.md` 已知限制。
+- 合同/runbook：`docs/contracts/multi-human.md` §2 第 4 条、`packages/company-pack/README.md` 已知限制。
 - 前身：`notes/archived/2026-09-26-role-identity-ux.md` B 段（标记形态由本 Note 部分取代；A/C 段与其数据来源结论仍现行）。

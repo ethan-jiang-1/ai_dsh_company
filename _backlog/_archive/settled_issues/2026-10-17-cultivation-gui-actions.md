@@ -48,7 +48,7 @@ UX 视角、人的输入清单（把手审计）、迭代框架与落地切片 S
 `lsof` 实测全机两个 HTTP 实例 = 3080（日用）与 3083（`/Users/bowhead/ai_dsh_deep_research` 的 research profile，cwd 实证），
 **本仓没有 dev web 在跑**。⇒ 在那儿敲 `/cultivation …` 只是一行普通文本，不解析；不是命令面坏了。
 
-这条事实的既有唯一家 = [demo.md §前置 1](../../../docs/demo.md)（原话：日用 `~/.dsh` 里也有个同名 `web` profile，
+这条事实的既有唯一家 = [demo.md §前置 1](../../../docs/contracts/demo.md)（原话：日用 `~/.dsh` 里也有个同名 `web` profile，
 装的是日用插件集、没有公司五角色）；自检一行 = `source run/env.sh && pnpm dsh --profile web --dump-config | grep -c company-pack` ≥ 1。
 
 dev 组合里命令面确实是挂着的：培养机制探针判据④（`commands/list` 含 `cultivation`，且 `correct` 真落记录到公司盘）
@@ -251,7 +251,7 @@ method-r-2026… ［未验证］
    按在错会话上会被 host 角色闸拒（安全），但用户看不到原因 ⇒ 回到第 2 条。
 4. **并发/重复点击**：host 侧 `installMethod` 独占建文件（返回 false 即不覆盖）+ 记录 `open` 态守卫 ⇒ 第二击不会损坏数据；
    客户端仍要飞行中禁用 + 完成后重读。
-5. **误触面变大**：多人合同早写了「同一台机器上谁都能按那个按钮」（[multi-human.md](../../../docs/multi-human.md)「多人合同」节）；
+5. **误触面变大**：多人合同早写了「同一台机器上谁都能按那个按钮」（[multi-human.md](../../../docs/contracts/multi-human.md)「多人合同」节）；
    按钮把「一键采纳」摆进待办列表。UX 缓解 = 待办行只放两个主动作、撤回进次要位置且说明后果、按钮带对象（`采纳`后面跟着期望行为）。
 6. **两个互动面**：面板按钮与裸 `/cultivation` 弹窗（`commandUi.decorate`，vendor 有 `/permission` 的 `popupSelect` 先例）
    服务不同时刻；v1 只做面板，弹窗列为第 2 轮候选（预案 4），避免一份行为两套交互同时返工。

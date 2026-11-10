@@ -29,7 +29,7 @@
 - `tests/client/wiring/client-face.spec.ts`：UI 合同（aria、可聚焦控件、真展开态、两行边界、**不许有免裁口子**、按溢出量、栏宽重测）。
 - `tests/client/tabs/ledger-summary.spec.ts`：长短 fixture 静态渲染（长文首帧带入入口、短摘要不预置、120/121 首屏提示边界、摘要本体不挂 title）。
 - `tests/lib/ledger.spec.ts`：V4 结论除逐字同源外，另钉三项事实在场、长度不退回长句、机制名不入结论主体。
-- `docs/demo.md`：compact 语义（简洁/标准/详细都折叠、只有完全展开逐条展开）与 open-in-app 现场步骤。
+- `docs/contracts/demo.md`：compact 语义（简洁/标准/详细都折叠、只有完全展开逐条展开）与 open-in-app 现场步骤。
 
 ## 验证
 

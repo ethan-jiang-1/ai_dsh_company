@@ -1,7 +1,7 @@
 # archived
 
 与 [notes/README](../README.md) 同一条记录判据：只留仍能阻止一个决定被重开的冻结判定，
-以及 [release.md](../../docs/release.md) 点名的现行 pin 人审证据。
+以及 [release.md](../../docs/contracts/release.md) 点名的现行 pin 人审证据。
 
 从 `implemented/` 移入的，是已经落地的决定：合同或代码是现行权威，本文件只冻住否决。
 不要把这里当现行 rationale owner，也不要往里续写。

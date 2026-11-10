@@ -12,7 +12,7 @@
 - `eng-workflow` 第 3 步「深挖」按 1–2 件 `subagent` / ≥3 件同构 `workflow` / 独立结论命名专家分流。
 - **边界**：`workflow` 子代无 `agentPreset`、fresh 上下文、继承调用者组合——只做同身份扇出，
   **不能替代 SA/SQA 的独立结论**；SQA 结论原样。正式交付物父代理单写；分支只读或一分支一文件。
-- `docs/delegation.md` §4、`docs/presets.md` 工具面/VP-Eng 节、`docs/design/architecture.md` §2.3/§3、
+- `docs/contracts/delegation.md` §4、`docs/contracts/presets.md` 工具面/VP-Eng 节、`docs/design/architecture.md` §2.3/§3、
   `docs/guides/budget-and-ops.md` §2 同 diff 对齐；`retired-claims` 的「四条协作通道」条目删除
   （workflow 以 vp-eng 同身份扇出回归，四条通道重新成立；旧条目会把真话判红）。
 
@@ -26,7 +26,7 @@
   team member（终稿走完成通知，`wait_agent`/`list_agents`/`send_message` 够不到；改稿=再委派）；任务书写死
   「≥3 同构用 workflow，1–2 件才用 subagent，独立核对另起 subagent」，不写「subagent 或 workflow 都行」。
 - `vp-eng` persona：任何并行/派活任务开工前先加载 `eng-teaming`（五档判据），≥3 同构默认 workflow。
-- `docs/delegation.md` §3 记「CEO 团队成员没有 vp-eng 的 workflow/subagent；只在 `vp_eng` 命名 child」。
+- `docs/contracts/delegation.md` §3 记「CEO 团队成员没有 vp-eng 的 workflow/subagent；只在 `vp_eng` 命名 child」。
 
 ## 输掉的方案
 

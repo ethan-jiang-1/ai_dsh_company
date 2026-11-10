@@ -40,7 +40,7 @@ RFC/实施。**本卡不是实施授权。**
   （落点/搬家）、`concurrent-home-smoke`（lease）。这些证明“现有 happy path”，不证明产品化后的
   `company` profile/`bundle.json` v2/`COMPANY.md` 碰撞/导出/无 consent 等新面。
 - 现有文档教“装新 tgz + 重启、删 manifest 重建、rebind”；新形状下 rebind 退役、manifest 在
-  workspace、方法/账本留 home，旧步骤部分失效（C：`docs/release.md`、`_dist/安装手册.md`）。
+  workspace、方法/账本留 home，旧步骤部分失效（C：`docs/contracts/release.md`、`_dist/安装手册.md`）。
 - 未测：升级中断、降级到更高 schema、workspace 搬移、恢复后 identity/方法/账本、profile 被
   `--from-default-profile` 替换、磁盘满/权限、运行中升级（C/U）。
 

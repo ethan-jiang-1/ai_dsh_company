@@ -192,7 +192,7 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
     const lead = parseSessionLog(JSON.stringify({ type: 'session', id: 'lead', agentPreset: 'ceo', delegationDepth: 0 }))
     const teammate = parseSessionLog(JSON.stringify({ type: 'session', id: 'tm', agentPreset: 'ceo', delegationDepth: 1 }))
     expect(lead.agentPreset).toBe('ceo')
-    expect(teammate.agentPreset).toBe('ceo') // teammates 共享 Lead 的组合（docs/delegation.md §3）
+    expect(teammate.agentPreset).toBe('ceo') // teammates 共享 Lead 的组合（docs/contracts/delegation.md §3）
     expect(isLeadSession(lead)).toBe(true)
     expect(isLeadSession(teammate)).toBe(false)
   })

@@ -98,7 +98,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
 
   it('catalog 未注入模型指令面（T4：workspace 文件仍可被 fs 读取，故不声称不可见）', () => {
     // 2026-10-28 数据设计硬化 M1：catalog 在 workspace 内，模型可经 fs 读到；这里只能断言
-    // “没有把它写进指令面”，不能断言“模型不可见”（可见性见 docs/data-model.md 数据卡）。
+    // “没有把它写进指令面”，不能断言“模型不可见”（可见性见 docs/contracts/data-model.md 数据卡）。
     const agents = readFileSync(join(PACK, 'content/AGENTS.md'), 'utf8')
     expect(agents).not.toContain('deliverables-index')
     for (const role of [...ROLES, 'worker-researcher']) expect(roleYml(role)).not.toContain('deliverables-index')
@@ -106,7 +106,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
 
   it('preset 行引用的插件都在 pack 依赖声明里（DSH verify-cordis-config 同构；R5a 起 deps ∪ peers）', () => {
     const manifest = JSON.parse(readFileSync(join(PACK, 'package.json'), 'utf8')) as { dependencies?: Record<string, string>, peerDependencies?: Record<string, string> }
-    // R5a 起 runtime 依赖 = peerDependencies（docs/release.md：不精确钉死）；本断言按包名归一，
+    // R5a 起 runtime 依赖 = peerDependencies（docs/contracts/release.md：不精确钉死）；本断言按包名归一，
     // 两种声明都算"在列"——与 checks/gates/preset-row-deps.mjs 的门禁同口径。
     const deps = new Set([...Object.keys(manifest.dependencies ?? {}), ...Object.keys(manifest.peerDependencies ?? {})])
     const missing = [...new Set(ROLES.flatMap(rowPlugins))].filter(name => !deps.has(name))
@@ -240,7 +240,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(generic, 'CEO 通用委托的 child 必须钉 worker-researcher 人格（spawn 不钉会继承 CEO）').toContain('agentPreset: worker-researcher')
     // 反向守卫：两个续驶控制行在 CEO 会话里被团队版 shadow（是死行），别再"修"回来。
     for (const row of ['tool-subagent-control', 'tool-subagent-list-agents']) {
-      expect(ceo, `${row} 在 CEO 会话被 team shadow，是死行（见 docs/delegation.md）`)
+      expect(ceo, `${row} 在 CEO 会话被 team shadow，是死行（见 docs/contracts/delegation.md）`)
         .not.toMatch(new RegExp(`^\\s*- id: ${row}$`, 'm'))
     }
   })
@@ -353,7 +353,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(handbook, '三态要指向操作员核对入口').toContain('操作员在会话外核对')
     expect(handbook, '注入内容不得再引用仓库审计脚本').not.toContain('checks/audit/')
 
-    const presetGuide = readFileSync(join(ROOT, 'docs/presets.md'), 'utf8')
+    const presetGuide = readFileSync(join(ROOT, 'docs/contracts/presets.md'), 'utf8')
     expect(presetGuide, 'COO 运营核查必须路由到 COO 专用模板').toContain('产出=运营方案 + 预算核查（`templates/ops-review-note.md`）')
     for (const template of ['prd.md', 'weekly-report.md', 'review-note.md', 'decision-memo.md', 'ops-review-note.md']) {
       const body = readFileSync(join(ROOT, 'packages/company-pack/content/templates', template), 'utf8')
@@ -601,7 +601,7 @@ describe('VP-Eng 组队：根门带小队 + 命名专家（B1）', () => {
     const handbook = handbookSurface()
     expect(handbook, '手册必须写 teammate 继承 Lead 组合').toMatch(/teammate[^\n]*继承[^\n]*组合|继承[^\n]*Lead[^\n]*组合/)
     expect(handbook, '手册必须写命名 child 按自己的 preset 组合').toMatch(/命名[^\n]*child[^\n]*(agentPreset|preset)/)
-    const delegation = readFileSync(join(ROOT, 'docs/delegation.md'), 'utf8')
+    const delegation = readFileSync(join(ROOT, 'docs/contracts/delegation.md'), 'utf8')
     expect(delegation, 'delegation.md 必须写根会话 = Team Lead').toMatch(/根会话[^\n]*Lead|Lead[^\n]*根会话/)
   })
 })

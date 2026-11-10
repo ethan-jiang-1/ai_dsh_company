@@ -36,7 +36,7 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 ### 批 3：浏览和显示
 
 - LedgerTab 对摘要设置稳定的视觉行数边界，同时提供键盘和触屏可达的完整文本查看；`title` hover 不能作为唯一全文入口。此边界只约束展示，不约束内容字数。
-- 将 compact TranscriptView 的开窗步骤维护在 `docs/demo.md` §前置；说明过程行折叠但不声称折叠助手长文。
+- 将 compact TranscriptView 的开窗步骤维护在 `docs/contracts/demo.md` §前置；说明过程行折叠但不声称折叠助手长文。
 - 现场核实 bundle 已启用的 `open-in-app`，成功后补公司手册说明；若现场因环境失败，记录运行态证据，不修改上游或凭源码存在判通过。
 
 ## 依赖与顺序
@@ -77,7 +77,7 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 
 1. 组件/视图测试使用超长摘要 fixture：宽、窄视口均保持稳定行高；摘要有省略提示；鼠标、键盘和触屏均能打开完整文本；短摘要直接可读。仅有 `title` hover 或 clamp 后无全文入口均失败。
 2. 真实装配运行 `client-load-smoke`，确认 LedgerTab 可挂载；若代码触及已组装 browser 输出，再运行仓库规定的 web replay 检查。
-3. 依 `docs/demo.md` §前置完成 compact 操作，确认过程行折叠而最终回复仍可见；说明不得声称 compact 会折叠助手长文。
+3. 依 `docs/contracts/demo.md` §前置完成 compact 操作，确认过程行折叠而最终回复仍可见；说明不得声称 compact 会折叠助手长文。
 4. 在真实观察窗对交付物执行 `open-in-app`，确认目标文档在侧栏预览；源码存在但现场入口不可用不算通过，环境缺失须记录为阻断。
 
 ### 批次共同收口
@@ -109,8 +109,8 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 | 批 2｜非阻塞缺口 | 同上：显式默认假设 + 轮末待确认项 | `probes/session-context/human-exits-nonblocking-probe.mjs`：`asked:false`、显式假设、轮末「待你拍板」，事件落盘 `runtime/human-exits-evidence/` |
 | 批 2｜比较结构与数字锚 | 同上：条件 GFM 表格/列表 + 关键数字文件行锚 | `probes/session-context/human-exits-expression-probe.mjs`：短表 + `#L` 行锚 PASS |
 | 批 3｜LedgerTab 有界显示与全文入口 | [批 3 Note](2026-10-11-human-exits-batch3-ui.md)：`LedgerTab.tsx` 全文切换、`styles.ts` 台账专属布局 | 红：摘要宽度归零且短摘要被隐藏无入口 → 修复；绿：`probes/browser-visual/ledger-summary-probe.mjs` 1440/390px、键盘/触屏全文 PASS |
-| 批 3｜compact 显示模式 | 同上 + `docs/demo.md` §前置步骤 5 | `probes/browser-visual/compact-view-probe.mjs`：简洁/标准/详细 2471 字符且 198 条过程行折叠，完全展开 19874 字符，助手最终长回复逐字保留（1257 字，切回后逐字一致） |
-| 批 3｜open-in-app 现场 | 同上 + `docs/demo.md` §前置步骤 6 | `probes/browser-visual/open-in-app-probe.mjs`：`final.md` 进侧栏预览后 `POST /api/session/openWorkspacePath` 200 且携带目标绝对路径，无 alert |
+| 批 3｜compact 显示模式 | 同上 + `docs/contracts/demo.md` §前置步骤 5 | `probes/browser-visual/compact-view-probe.mjs`：简洁/标准/详细 2471 字符且 198 条过程行折叠，完全展开 19874 字符，助手最终长回复逐字保留（1257 字，切回后逐字一致） |
+| 批 3｜open-in-app 现场 | 同上 + `docs/contracts/demo.md` §前置步骤 6 | `probes/browser-visual/open-in-app-probe.mjs`：`final.md` 进侧栏预览后 `POST /api/session/openWorkspacePath` 200 且携带目标绝对路径，无 alert |
 
 仍按 RFC 暂缓或未单测的两项：长期语料评估；简单二选/窄屏列表场景。两张 issue 已随本 RFC 毕业离场到 `_backlog/_archive/settled_issues/`。
 

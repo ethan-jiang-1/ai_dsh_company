@@ -3,7 +3,7 @@
 > 什么时候读：发布、打包、装进真实 profile、升 vendor pin 时。
 > 本仓交付一份 **Harness 发行版**：bundle + `company` profile + workspace 公司状态 + Harness home 策略 +
 > 生命周期。**发布物（release artifact）** 只是可下载的 tarball/安装手册；发行版包含六轴。
-> 每次发布的操作步骤 = [guides/release-runbook.md](./guides/release-runbook.md)；一条命令入口 = `pnpm release`。
+> 每次发布的操作步骤 = [guides/release-runbook.md](../guides/release-runbook.md)；一条命令入口 = `pnpm release`。
 > 外部规范 = `_faq_on_digested/26_harness-release`（研究材料，不是 DSH 合同）；DSH 合同仍以
 > `vendor/dsh` 钉住 tag 为准。执行器 = `release-smoke` / `tools/sync-dsh.mjs`。
 
@@ -124,7 +124,7 @@ reset/clean，不覆盖并发修改。安装限 180 秒、vendor build 与 relea
 
 ## 版本纪律
 
-- 版本与每版变化唯一家 = `packages/company-pack/package.json` + [CHANGELOG](../CHANGELOG.md)；此处不写变更史。
+- 版本与每版变化唯一家 = `packages/company-pack/package.json` + [CHANGELOG](../../CHANGELOG.md)；此处不写变更史。
 - 发布字节 = `_dist` 的 tarball；`npm publish` 用它，不从包目录重打。改内容必 bump。
 - tarball/git 安装的版本门在安装后判定，失败会回滚；已允许的 build-script 副作用可能保留（FAQ 18）。
 - 发布前必跑：`pnpm verify` + `pnpm test`（迭代环）+ `pnpm release --check`（dist 与源码指纹；

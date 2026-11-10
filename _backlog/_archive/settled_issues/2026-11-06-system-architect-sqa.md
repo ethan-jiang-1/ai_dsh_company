@@ -43,7 +43,7 @@ E（工程）与 V（验证）在同一上下文里，质量不独立。期望�
 
 - 范围：`packages/company-pack/presets/{system-architect,system-qa}/`、CEO/vp-eng preset 的委托行、
   `tools/lib/company-roles.mjs` 的 support list、presets 门禁/preset-smoke/delegation-smoke、
-  `docs/presets.md`/`docs/delegation.md`、内容模板与手册、Note。
+  `docs/contracts/presets.md`/`docs/contracts/delegation.md`、内容模板与手册、Note。
 - 排除：新增第七/第八条汇报线（除非用户选角色档）；`vendor/dsh` 改动（`spawn_teammate` 加 preset
   是上游的事，不在此卡）；demo 路径（`vp_*` 快捷委托不动）；SA/SQA 的 kb charter 与独立 journal（二期）。
 

@@ -62,7 +62,7 @@
 
 1. **`bootstrap.COMPANY_ROLES` 仍是五角色**（功能 bug）：新装/已有盘都不会种 `kb/cmo/CHARTER.md`。
    已加 cmo；release-smoke 干净资料首启件数 **36→39**（多 `kb/cmo/`、`journal/`、`CHARTER.md`）且 PASS。
-2. **编制残留**：`content/charters/vp-eng.md` 与 `docs/presets.md` 仍写研发 18 人 / 含产品 2 →
+2. **编制残留**：`content/charters/vp-eng.md` 与 `docs/contracts/presets.md` 仍写研发 18 人 / 含产品 2 →
    改 **16 人**（产品 2 已归 CMO 线）。
 3. **用户可见面**：安装手册模板（`tools/lib/install-manual.mjs`）五角色→六角色（含排障表）。
 4. **active 面五角色残留**：presets / ledger-participation 注释、channel-matrix-smoke ROLES、

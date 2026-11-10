@@ -29,5 +29,5 @@ CPU 满载 = 死循环；比砍配置二分快得多（R1 三刀二分全白切�
 
 **进程内查询（rc.2 收割）**：角色会话里 `cordis_inspect_list` 发现 Inspect Provider 与方法、
 `cordis_inspect_query` 按 schema 精查挂载与 Config（preset 已挂 `tool-cordis` 行）；组合层另有
-`dsh --dump-config-schema` 自描述配置 schema——三者回答"这台进程现在真跑着什么"（升 pin 扫描 = [release.md](../release.md)）。
+`dsh --dump-config-schema` 自描述配置 schema——三者回答"这台进程现在真跑着什么"（升 pin 扫描 = [release.md](../contracts/release.md)）。
 ⚠ inspect 是**可见性工具，不是授权边界**（vm 只防意外全局污染，不替代 sandbox/approval）——「查得到」不等于「被授权」（FAQ 07 四边界；2026-09-27 补）。

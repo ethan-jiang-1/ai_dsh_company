@@ -2,7 +2,7 @@
 
 > 什么时候读：开工前定任务与授权（§0.5）、实施中选检查（§1）、收尾交证据（§12）——其余章节按改动面查。
 > 性质：指南层——"怎么操作"的展开与查表处；纪律压缩版在根 AGENTS.md。来源 = FAQ 13 `dev-loop.md` +
-> `dual-home-isolation.md`（外部材料，登记见 [external-research.md](../external-research.md)）；机制结论以
+> `dual-home-isolation.md`（外部材料，登记见 [external-research.md](../reference/external-research.md)）；机制结论以
 > `vendor/dsh/` 工作树为权威，旗标与行为已在**钉住的 vendor 基线**核对——基线版本与 SHA 的唯一事实家 =
 > 根 `AGENTS.md` §vendor 簿记（升 pin 重校记录 = [pin-upgrade Note](../../notes/archived/2026-09-30-pin-upgrade-0.2.0-rc.2.md)）。
 > 行注记 `R1`–`R5b` = 退役轮次制的历史出处标记（D11），只作 git 考古索引；与 snapshots 场景号
@@ -17,7 +17,7 @@
 | 排查运行问题 | [debugging.md](./debugging.md)（组合层→会话层阶梯） |
 | 写新代码前的四问 | §3 |
 | 插拔与装法速查 | [bootstrap §插拔速查](./bootstrap.md) |
-| 升级环与发布 | [release.md](../release.md)（程序唯一家） |
+| 升级环与发布 | [release.md](../contracts/release.md)（程序唯一家） |
 | 双 home 与双 DSH | [environments.md](./environments.md) |
 | 环境引导 | [bootstrap.md](./bootstrap.md) |
 | 驱动 Web 面会话（RPC） | [web-rpc 指南](./web-rpc.md) |
@@ -51,7 +51,7 @@
 
 完成定义是该面的最小真实检查通过（D15）；未跑的关键验收明确标缺口。按改动面选择检查与入口验证，细则唯一见 [tests/README](../../tests/README.md)；结构检查不能替代运行验收。
 **证据不许假绿**：命令链一律 `set -o pipefail` + `&&`——`pnpm verify | tail` 的退出码是 `tail` 的，不带 pipefail 必假绿。
-**呈现即验证（2026-09-30 立，用户裁定）**：凡「启动给我看 / 呈现给我」类请求——起观察窗、交付 URL、演示一个面——**先自己跑通，红了当场修，全绿才呈现**；用户不当第一次验收员。观察窗的最小真检查与操作程序 = [web-window-ops skill](../../.agents/skills/web-window-ops/SKILL.md)（规则源 = [demo.md §前置](../demo.md)）；真模型面另加一轮真实会话。修不动时如实报告卡点与已排除项，不硬呈现半红的东西。
+**呈现即验证（2026-09-30 立，用户裁定）**：凡「启动给我看 / 呈现给我」类请求——起观察窗、交付 URL、演示一个面——**先自己跑通，红了当场修，全绿才呈现**；用户不当第一次验收员。观察窗的最小真检查与操作程序 = [web-window-ops skill](../../.agents/skills/web-window-ops/SKILL.md)（规则源 = [demo.md §前置](../contracts/demo.md)）；真模型面另加一轮真实会话。修不动时如实报告卡点与已排除项，不硬呈现半红的东西。
 
 **交付记录**：feature 或非平凡变更同 diff 更新实现、当前合同、必要验证与 Note；机械单步只改事实 owner 并运行相关检查，不新建意图或 RFC。
 
@@ -101,7 +101,7 @@
 **流程规则**：
 
 - 任务入口见 §0.5；Plan Mode 适用条件见 [policy §P1](../policy.md)；多步任务的 todo 规则见 §1。
-- 默认遵循钉住的 DSH 纪律；vendor 原文是权威，本仓适配按 D 号记录约束与证据。根 `AGENTS.md` 只提供纪律落点索引，不是逐源清单。升 pin 时按 [release.md](../release.md) 重校流程合同。
+- 默认遵循钉住的 DSH 纪律；vendor 原文是权威，本仓适配按 D 号记录约束与证据。根 `AGENTS.md` 只提供纪律落点索引，不是逐源清单。升 pin 时按 [release.md](../contracts/release.md) 重校流程合同。
 - 按改动面选择验证（[tests/README](../../tests/README.md)）；结构门禁不替代运行验收。入口探针机器通过不等于语义审阅通过。
 - 新门禁反证的操作口径 = **只回滚实现、保留新测试**——连测试一起回滚会得全绿假象；红→还原→绿三步留证。
 - 收到人审/用户反馈：成立就修复并补证据；不成立用技术事实反驳，**不作表演式同意**。

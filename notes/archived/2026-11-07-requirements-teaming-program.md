@@ -53,7 +53,7 @@
 | A3 CMO/VP-Eng | cmo persona + `mrd-playbook`（MRD+StRS）、vp-eng persona + `prd-playbook`/`eng-workflow`、共享 `product-definition` | `fbe02aa` |
 | A4a SA | system-architect persona + `systems-architecture`（SyRS/IRS/allocation/架构；验证点改引用） | `a23ec20` |
 | A4b SQA | system-qa persona + `vv-playbook`（`layer: V&V` + table-rows + covers + L1–L4） | `1eb21e2` |
-| A7 迁移 | `STATE_FILES` 加 process-docs；release-smoke 内容清单；`docs/release.md` 升级说明；dev 盘迁移 + 备份 | `33b3273` |
+| A7 迁移 | `STATE_FILES` 加 process-docs；release-smoke 内容清单；`docs/contracts/release.md` 升级说明；dev 盘迁移 + 备份 | `33b3273` |
 | A8 E2E | SA/SQA 资产（已退役删除） | `961ebf0` |
 | B1 组队 | vp-eng `vp_cmo` 行 + `eng-teaming` skill + 手册/delegation/presets/README/board 继承口径修正 + `probes/team/vp-eng-root-lead-probe.mjs` | `1cae832` |
 | B2 收口 | `probes/team/vp-eng-teaming-probe.mjs` + 本 Note + D57/D58 + 归档 | 见 W5 收口提交 |
@@ -95,7 +95,7 @@ docs 6 处。`checks/INDEX.generated.md` 随新探针重新生成。
 - `需求层` 默认到 PRD；声明 SyRS/IRS/V&V 才查对应层与 TC 覆盖。
 - dev profile 的 pack 安装临时改为 `link:`（让新 skill 生效并重建 `lib/`）；`pnpm company` 默认 tarball
   会在下次启动时还原安装形状。
-- 旧盘迁移只覆盖 dev 盘（备份 `process-docs.md.bak-2026-11-07`）；其他部署按 `docs/release.md` 的升级说明
+- 旧盘迁移只覆盖 dev 盘（备份 `process-docs.md.bak-2026-11-07`）；其他部署按 `docs/contracts/release.md` 的升级说明
   （种子只补缺 + 旧动议 skipped）。
 
 ## 上游卡

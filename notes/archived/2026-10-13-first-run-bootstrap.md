@@ -7,7 +7,7 @@
 
 > **2026-10-24 部分取代（升级结论）**：基部制度件不再“永不升级”——manifest 逐文件哈希判定，
 > 未改过的替换、改过的保留（见 [run-bundle](./2026-10-24-run-bundle-install-unit.md) §5 与
-> [data-model](../../docs/data-model.md) 基部行）。本文 §决定 1/§后果 的“已有盘制度件不会升级”
+> [data-model](../../docs/contracts/data-model.md) 基部行）。本文 §决定 1/§后果 的“已有盘制度件不会升级”
 > 与“版本标记未做”作废；**自举的只补缺/不抛/可重入三条仍有效**（首启与升级现在共用同一骨架计划）。
 
 ## 决定
@@ -76,5 +76,5 @@ host 半（`packages/company-pack/src/index.ts` 的 `apply`）在每次装载时
   `resolveSkeletonDir` / `resolveCompanyHome` / `bootstrapEnabled`）；host 接线：`packages/company-pack/src/index.ts`（apply 末尾）。
 - 编译面：`tsconfig.host.json`（`include` 加 `src/host` + `types: ["node"]`）；client 叶注释点明 `src/host/**` 不进它。
 - 判据：`tests/host/run-bundle/bootstrap.spec.ts`；模拟安装：`checks/smoke/release-smoke.mjs` ④⑥；
-  文档：`docs/release.md` §真实安装冒烟程序 6、`packages/company-pack/README.md`、`packages/company-pack/src/README.md`、`run/env.sh`。
+  文档：`docs/contracts/release.md` §真实安装冒烟程序 6、`packages/company-pack/README.md`、`packages/company-pack/src/README.md`、`run/env.sh`。
 - 同伴决定：[出厂公司盘骨架随包分发](2026-10-13-company-workspace-skeleton-shipped.md)。

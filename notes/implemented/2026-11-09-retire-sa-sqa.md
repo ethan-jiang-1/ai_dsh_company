@@ -17,7 +17,7 @@
 4. 删除 `specialist` archetype、`skills` / `authority` 字段与校验；模型回到 `lead / full / worker`。
 5. 保留 worker family：`worker` / `worker-researcher` / `worker-orchestrator`；`worker-researcher` 继续只读、named-only。
 6. SyRS / IRS / V&V 文档不再有专职 preset；保留为**可选文档**，若 CEO 指派 owner，owner 写在文档头；默认产品定义链 = MRD → StRS → PRD。
-7. 同步从 `docs/presets.md` / `docs/delegation.md` / `docs/profile.md` / `docs/project-map.md` / `README` / `content/AGENTS` / process-docs / templates / tests / checks / probes 清理 SA/SQA 引用；SA/SQA 专用 probes 删除，`vp-eng-workflow-probe` 只保留 workflow A 题。
+7. 同步从 `docs/contracts/presets.md` / `docs/contracts/delegation.md` / `docs/contracts/profile.md` / `docs/project-map.md` / `README` / `content/AGENTS` / process-docs / templates / tests / checks / probes 清理 SA/SQA 引用；SA/SQA 专用 probes 删除，`vp-eng-workflow-probe` 只保留 workflow A 题。
 
 ## 输掉的方案
 
@@ -47,7 +47,7 @@
 
 - 没有对“删除 SA/SQA 后长链项目行为”做真模型 E2E；这是预期能力移除，不是回归。P-L（worker-researcher）仍有效。
 - SyRS/IRS/V&V 的模板/checker 保留为可选工具，但没有 preset owner；若未来需要，另开 worker/specialist 设计。
-- `docs/decisions.md` D59 已标退役；旧 SA/SQA Notes 已归档，历史证据保留。
+- `docs/reference/decisions.md` D59 已标退役；旧 SA/SQA Notes 已归档，历史证据保留。
 
 ## 相关
 

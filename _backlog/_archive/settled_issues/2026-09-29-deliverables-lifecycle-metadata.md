@@ -36,7 +36,7 @@
    multi-human §4.2 写入边界须收录 meta.md；CFO veto 由 CEO 转录是否违反"不得替别人签字"待裁）。
 6. **P6 病复发 + 门禁单向**：结果靠 CEO 自觉回写 = 派活行同款病；门禁须加**反向**检查
    （present 在而结果≠终态 → 红），或终态由 present 日志推导、CEO 只标否决/搁置这类散文判断。
-7. **迁移涟漪补全**：docs/multi-human.md §4 实路径 + notes/ 两篇活指针会烂（D26 须修，同 diff 清单补
+7. **迁移涟漪补全**：docs/contracts/multi-human.md §4 实路径 + notes/ 两篇活指针会烂（D26 须修，同 diff 清单补
    docs/notes）；token-cn-idc / token-works 两场**未 git add** ⇒ "git 提交日补"对它们不存在（只靠 E3）；
    workspace.actual 历史切片**不重写**（与 expected 区分）；迁移与轮末收敛四步**并步**（次序待定死）；
    11 个 skill 文件的 `deliverables/<slug>/` 文案按命名方案分支列清单；手册"同名检查"在 A2 下给

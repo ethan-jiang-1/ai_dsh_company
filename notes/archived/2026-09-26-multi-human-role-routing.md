@@ -10,11 +10,11 @@
 | a | 解阻与落盘 | 队列行的"待你裁"是**假阻塞**（形态早在 §形态 自裁）；已转 ▶ 并开工 |
 | b | **成员能不能拉人**（头号机制问题） | 答「**被拒**」——静态三跳 + 活体一次（探针 `scripts/member-inquiry-probe.mjs`，可复跑）；**结论重塑了 demo 形态**，见 §机制结论 |
 | c | `owners.md` v1 单操作者 → **v2 多物理人** | `company-workspace/.dsh-company/kb/owners.md`（甲 CEO 线 / 乙 财务线 / 丙 业务与交付线）+ **三条操作口径**；`routing.ts` 的代码副本同步（那份重复事实家已进磨清单） |
-| d | 多门 runbook | 合同 [docs/multi-human.md](../../docs/multi-human.md) §2（含最容易漏的"先连工作区 + **必须点 `Edit path`**"） |
+| d | 多门 runbook | 合同 [docs/contracts/multi-human.md](../../docs/contracts/multi-human.md) §2（含最容易漏的"先连工作区 + **必须点 `Edit path`**"） |
 | e | 迁移清单 | 同一合同 §4（要搬 4 类 / **不能搬会话库** / 迁移后第一件事 = 把 owners 的甲乙丙换真名） |
 | f | **一场真动议验收** | slug `sea-reconcile-2026`，见 §后果与验证 |
 
-**合同与手册**：[docs/multi-human.md](../../docs/multi-human.md)（现在时：机制边界 / 形态 / runbook /
+**合同与手册**：[docs/contracts/multi-human.md](../../docs/contracts/multi-human.md)（现在时：机制边界 / 形态 / runbook /
 **§3 交接协议** / 协作前提 / 迁移清单 / 边界）；公司手册立「**多人模式**」（开场由人声明即启用）。
 **接续提案**（门的边界与对齐，L1/L2/L3 分层）= [proposed/multi-human-ux](./2026-09-26-multi-human-ux.md)。
 

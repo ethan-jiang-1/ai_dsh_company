@@ -36,7 +36,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | 启动入口 / workspace 解析 / 公司状态（`src/host/startup*`、`tools/company.mjs` dev-only） | `pnpm test tests/host`（bootstrap/manifest/presented-domain） | [company-entry-smoke](../checks/smoke/company-entry-smoke.mjs) + [release-smoke](../checks/smoke/release-smoke.mjs) + [client-load-smoke](../checks/smoke/client-load-smoke.mjs) | 新入口同 diff 进 checks/README；`pnpm verify` script-index/status |
 | 类型面（改 `src/**` 的导出/导入签名） | `pnpm typecheck`（pack 两面 + `tests/client` + `tests/host` + `tests/lib` + `tests/content` + `tests/harness` 全量 spec（`pack-exports` 混合面除外）；fresh clone 需先按 [bootstrap](../docs/guides/bootstrap.md) 构建 vendor client 类型） | [release-smoke](../checks/smoke/release-smoke.mjs)（发布前）；`verify` 的 src-layering 只守方向不守类型 | — |
 | pack 导出/注册面（Host / Client 注册改动） | `pnpm test tests/harness`（导出形态）+ `pnpm test tests/host`（Host 注册回调行为）+ `pnpm test tests/client`（Client 槽注册） | [release-smoke](../checks/smoke/release-smoke.mjs)（真实安装形状；含 researcher） | — |
-| 发布 / 升 pin | `pnpm test tests/harness`（release-foundation 等） | [release-smoke](../checks/smoke/release-smoke.mjs) + 升 pin 程序（合同 = [release.md](../docs/release.md)；**本仓只有不加载 pack 的合成回放，只证管线可跑，不是升 pin 第一道**） | — |
+| 发布 / 升 pin | `pnpm test tests/harness`（release-foundation 等） | [release-smoke](../checks/smoke/release-smoke.mjs) + 升 pin 程序（合同 = [release.md](../docs/contracts/release.md)；**本仓只有不加载 pack 的合成回放，只证管线可跑，不是升 pin 第一道**） | — |
 | 检查与工具入口（`checks/**`、`probes/**`、`tools/**`） | 消费它的 keyless spec + `pnpm verify`（头注/结构门禁） | 真实入口冒烟按脚本头注「何时跑」 | — |
 | 文档 / 指针 | `pnpm verify`（md-links / bare-path / doc-budget） | [entry-probe-smoke](../checks/smoke/entry-probe-smoke.mjs)（入口链文档改动后） | — |
 
@@ -67,7 +67,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
 | **重放 lane（第三档，无 key）** | 现行场景 ~2s | `replay-smoke`（仅 foundation 合成场景，不加载 company-pack；会话日志 + sidecar）——要起进程，不进 `pnpm test`。真页面车道 = `ui-scene-smoke`（自起实例，~40s） |
 | CLI 集成（keyless，需子进程） | 秒级 | `node checks/smoke/snapshot-motion-smoke.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） |
-| 发布与分发（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../docs/release.md)） |
+| 发布与分发（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../docs/contracts/release.md)） |
 | 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件与成本见其头注「何时跑」**；`script-triggers` 门禁强制） |
 | 行为质量档（认证） | 分钟级 | `probe --full`（内容档三探针）；`candidate-scan-eval` 语料已移出本仓，现报缺失 exit 2（判据 = [testing.md §4](../docs/testing.md)） |
 
@@ -87,7 +87,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
    keyless 单测直接断言它——组件层就永远不需要模型与浏览器。
 3. **认证档要能"重放"而不是"重跑"**：真模型跑一次 → 会话日志归档 → 后续用归档做回放断言
    （R5a replay harness）。**重跑只在升 pin 或行为确实要改时做**；R3 的委派卡端到端（模型→工具→卡片）
-   就留给 R5a 的 replay harness（试过的慢 e2e 已否决，原因见 [delegation.md §6](../docs/delegation.md)）。
+   就留给 R5a 的 replay harness（试过的慢 e2e 已否决，原因见 [delegation.md §6](../docs/contracts/delegation.md)）。
 
 **回归层预算**：`pnpm test` 的 **tests 阶段秒级**（vitest 输出 Tests 行；进程全程含 transform/imports，视缓存冷温与用例数波动——2026-10-20 实测 Tests 4–14s、全程热 5–24s / 冷 55s，不算超）。tests 阶段自身明显变大才先怀疑"有人把模型/浏览器塞进来了"，拆层而不是加超时。
 

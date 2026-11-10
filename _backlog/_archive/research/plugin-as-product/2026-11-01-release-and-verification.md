@@ -24,7 +24,7 @@ intent: "把插件即产品的分发、版本兼容、构建产物、手册/READ
    home 治理 / 备份/卸载”。用户点名要改。
 4. **兼容性有四种，不是一种**：`engines.dsh` 窗口（可安装）、peerDependencies（声明 API 面）、
    已认证 tag 台账（实测过）、DSH 版本升级/降级（pin 政策）。只有 `engines.dsh` 是运行时硬门；
-   台账不随包分发（C：`docs/release.md`）。
+   台账不随包分发（C：`docs/contracts/release.md`）。
 5. **验证分层不能混**：keyless spec、真实入口 smoke（release/lifecycle/company-entry/
    client-load）、真模型/浏览器、跨机器/跨 OS，各证不同东西；不能用 `pnpm verify` 绿冒充安装
    可用，也不能用 release-smoke 冒充浏览器 UX（C：`docs/testing.md`）。
@@ -47,7 +47,7 @@ intent: "把插件即产品的分发、版本兼容、构建产物、手册/READ
 | 预构建目录 | 复制构建产物 | 未承诺 | 不做（vendor 政策/新鲜度） |
 | 容器/镜像 | — | 未承诺 | 不做（目标环境明确再做） |
 
-- `_dist` 是导出目的地，不是源；tgz 全 gitignore，手册是唯一 tracked 例外（C：`docs/release.md`）。
+- `_dist` 是导出目的地，不是源；tgz 全 gitignore，手册是唯一 tracked 例外（C：`docs/contracts/release.md`）。
 - `export-dist` 先 build（tsc -b + tsdown），再 `npm pack`（cache 钉 scratch），再对产物本体断言
   清单边界，再算 sha256、注入手册；导出 ≠ 发布（不 bump、不跑认证档、不进 registry）。
 - 新增产品面后，tarball 必须含：bin/dsh-company.mjs（历史，已删除）（计划）、`lib/register-workspace.js`

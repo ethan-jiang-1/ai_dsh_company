@@ -12,7 +12,7 @@ M4 已落地（peer + 受控 lock、0.4.0、安装手册/CHANGELOG、`release --
 > 依据：外部研究 FAQ 24（发布与 agent 数据平面；rc.3 基线，但本仓 pin rc.2 已核
 > `ctx.storageDomain`、storage-json `single`、`fs-sandbox`、`sessionQuery`、`workspaceRegistry`、
 > `dshCachePath`、`deliverables/presented` 均在）与 FAQ 26（数据家/承诺）。现合同 =
-> [data-model.md](../../docs/data-model.md)；用户侧摘要 = [pack README Data](../../packages/company-pack/README.md#data)。
+> [data-model.md](../../docs/contracts/data-model.md)；用户侧摘要 = [pack README Data](../../packages/company-pack/README.md#data)。
 >
 > **取代关系**：部分取代 [agent-cultivation-loop](./2026-10-13-agent-cultivation-loop.md)
 > 的「方法层 = profile×角色」作用域与路径（其余决定、尤其是「workspace 根被否」保留）；
@@ -78,7 +78,7 @@ upgrade log 轮转、全量 `company/` namespace、T4/T7 视觉/回放证据、c
 
 ### M1 · 合同 + 低风险（不改数据路径）
 
-- 重写 `docs/data-model.md`：数据卡 v2（事实 / 拥有·关于 / 写者·通道 / 权威 / 落点·键 / 可见性 /
+- 重写 `docs/contracts/data-model.md`：数据卡 v2（事实 / 拥有·关于 / 写者·通道 / 权威 / 落点·键 / 可见性 /
   寿命·删除 / 版本·测试）、写矩阵、硬软边界表、六个版本、标识符 API 清单、威胁模型；备份/删除
   细节搬到 README 或安装手册，保住 doc-budget（现 71/76）。
 - `packages/company-pack/README.md` Data 节：按 6+2 分行（D/C/W/U/S/H/K/X），把 `U` 与 `H` 拆开，
@@ -118,7 +118,7 @@ upgrade log 轮转、全量 `company/` namespace、T4/T7 视觉/回放证据、c
   告警可以退役或降为提示。
 - `$DSH_HOME/company/` 作为增量命名空间：M3 曾设想 methods、client-errors、lease/logs 中至少 methods 与
   client-errors 先入住；**M4 定案只收方法层**——client-errors 住 `<DSH_HOME>/logs/`（见 §M4 与
-  [data-model](../../docs/data-model.md)）；`bundle.json` 保持原位一版，后续再议。
+  [data-model](../../docs/contracts/data-model.md)）；`bundle.json` 保持原位一版，后续再议。
 
 ### M4 · 收口
 

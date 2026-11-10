@@ -1,6 +1,6 @@
 # 发布 runbook
 
-> 什么时候读：每次发布/导出/升 pin 前。性质：操作步骤（how）。合同（发布形态 / 兼容 / 版本政策）唯一家 = [release.md](../release.md)；
+> 什么时候读：每次发布/导出/升 pin 前。性质：操作步骤（how）。合同（发布形态 / 兼容 / 版本政策）唯一家 = [release.md](../contracts/release.md)；
 > 本文只把“每次发布到底做什么”固定成一条可执行路径。命令入口 = `tools/release.mjs`。
 
 ## 0. 先决
@@ -33,7 +33,7 @@ pnpm release --check
 ```
 
 `--prepare` / `--verify` 会改 tracked 的 `_dist/安装手册.md`，所以它们允许发布产物造成的脏树；`--check` 默认要求干净树。`--verify` 装 `_dist` 同一份 tarball，并用 `sourceFingerprint` 拒绝“源变但产物没重打”；`--all` = prepare + verify，不 commit/push/publish。
-READY 是点态（只对 `--stamp` 的 commit 成立，之后提交再红是设计）；语义与证据要求 = [release.md §版本纪律](../release.md)。
+READY 是点态（只对 `--stamp` 的 commit 成立，之后提交再红是设计）；语义与证据要求 = [release.md §版本纪律](../contracts/release.md)。
 
 ## 2. 产物与证据
 

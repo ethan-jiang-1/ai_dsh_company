@@ -3,7 +3,7 @@
 > 性质：顶层合同——profile / bundle / preset / session / cwd / 日志 / workspace / snapshot 的**时序关系**与
 > **四条状态轴**的唯一家。什么时候读 = 排查运行链时序、确认某状态在哪条轴、或分不清「现场 vs 证据」时。
 > 空间导航 = [项目地图](project-map.md)；runtime/ 运行残留逐件 owner = [runtime/README](../runtime/README.md)、
-> run/ 启动配置 = [run/README](../run/README.md)；证据政策 = [testing.md](testing.md)；四形态 = [presets.md](presets.md)。
+> run/ 启动配置 = [run/README](../run/README.md)；证据政策 = [testing.md](testing.md)；四形态 = [presets.md](./contracts/presets.md)。
 
 ## 一、完整 Web 链（时序）
 
@@ -25,7 +25,7 @@
 ```
 
 并列面别混：**headless 通用 CLI**（无 preset 装配）；**Web 观察窗**（完整公司面）；
-**会话四形态**（独立 preset 根/CEO Lead/teammate/命名 child；[presets.md](presets.md)）。spawn 成员
+**会话四形态**（独立 preset 根/CEO Lead/teammate/命名 child；[presets.md](./contracts/presets.md)）。spawn 成员
 **继承 Lead 组合** ≠ 根会话「自包含、无继承」——分水岭 = [roles-isolation §2](design/roles-isolation.md)。
 
 ## 二、四条状态轴（权威位置、生命周期、不能推断什么）
@@ -73,8 +73,8 @@ workspace；换项目不新建 home。bundle 不在 git；本仓 dev 的 `compan
 
 | 问 | 唯一入口 |
 |---|---|
-| 怎么启动公司运行 | [demo.md §前置](demo.md) / 根 README；`cd company-workspace && pnpm dsh --profile company` 或 `pnpm company` |
-| 改哪里 | [项目地图](project-map.md) + [pack owner 表](../packages/company-pack/README.md) + [四形态](presets.md) |
+| 怎么启动公司运行 | [demo.md §前置](./contracts/demo.md) / 根 README；`cd company-workspace && pnpm dsh --profile company` 或 `pnpm company` |
+| 改哪里 | [项目地图](project-map.md) + [pack owner 表](../packages/company-pack/README.md) + [四形态](./contracts/presets.md) |
 | 用什么局部验证 | [tests/README](../tests/README.md) + [testing.md §2](testing.md) |
 | 运行卡点先查什么 | [项目地图](project-map.md) 现象表 + [debugging](guides/debugging.md) |
 | 产物与证据从哪来 | 本图 §一/§二·五 + [快照规则](../snapshots/README.md) |

@@ -1,8 +1,8 @@
 # 数据模型：每份事实一个权威
 
 > 性质：数据卡的当前时。什么时候读 = 改落点/身份/账本/备份策略时。
-> 公司状态布局 = `.dsh-company/`（[run-bundle-paths](../packages/company-pack/src/lib/run-bundle-paths.ts)）；
-> 时序 = [runtime-map](runtime-map.md)；发布/安装 = [release](release.md)、[_dist 手册](../_dist/安装手册.md)。
+> 公司状态布局 = `.dsh-company/`（[run-bundle-paths](../../packages/company-pack/src/lib/run-bundle-paths.ts)）；
+> 时序 = [runtime-map](../runtime-map.md)；发布/安装 = [release](./release.md)、[_dist 手册](../../_dist/安装手册.md)。
 
 **用户拥有的业务字节留在 workspace；host 治理留 home；插件只拥有身份/方法/账本/索引。**
 一个事实只有一个权威。workspace 是模型可写区（`workspace-write`）；方法层（D25）与 presented 账本

@@ -4,7 +4,7 @@
 
 ## 决定
 
-1. **快序列写进 [demo.md §前置](../../docs/demo.md#前置本机)**——观察窗启动步骤与判据的规则 owner（skill 与
+1. **快序列写进 [demo.md §前置](../../docs/contracts/demo.md#前置本机)**——观察窗启动步骤与判据的规则 owner（skill 与
    [dev-loop §1](../../docs/guides/dev-loop.md#1-执行链从授权到有证据交接) 都指向它）。不新建文档、不改进程技能。
 2. 快序列 = 预检遗留 writer lease → 后台起服务**不等进程结束**（横幅出现即用）→ `cdp-probe` 只跑一次并与
    `client-load-smoke` 并行 → 已在跑的本仓实例优先复用。

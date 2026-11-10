@@ -41,7 +41,7 @@ opened: 2026-11-03
 - `panel-freshness` 的 freshness 源码断言改为真实渲染断言（AttentionTab/CompanyView/LedgerTab 各自渲染面已覆盖）。
 - 台账长摘要的 7 条源码断言改为 `LedgerSummary` 真点按钮（全文/收起/aria/class；新增 `ledger-summary-interaction.spec.ts`，保留原 5 例静态渲染）
 - `Brand.tsx` 补静态渲染（侧栏词标，首屏第一笔）；`debugging.md`/`dev-loop.md` 的两处空壳节引用改指 bootstrap/policy 现行家。
-- 发布 readiness 指路：`AGENTS.md` 命令表加 `pnpm release --check`；`docs/release.md` 发布前清单补它；两个 readiness PASS 行划界。Note = [release-readiness-pointer](../../../notes/archived/receipts/2026-11-03-release-readiness-pointer.md)。
+- 发布 readiness 指路：`AGENTS.md` 命令表加 `pnpm release --check`；`docs/contracts/release.md` 发布前清单补它；两个 readiness PASS 行划界。Note = [release-readiness-pointer](../../../notes/archived/receipts/2026-11-03-release-readiness-pointer.md)。
 - B 授权单一真相源：`_backlog/AGENTS.md` 与 `_backlog/README.md` 摘要改为纯指针，不再复述/截断排除项。Note = [backlog-auth-single-source](../../../notes/archived/2026-11-03-backlog-auth-single-source.md)。
 - C 发布 0.7.2：bump + `_dist` 重打 + `release --verify` 全绿（含卸载/重装）；market index/staged 同步 0.7.2；rc.5 兼容表述降为“生命周期 host 面”。Note = [release-0.7.2](../../../notes/archived/receipts/2026-11-03-release-0.7.2.md)。
 - D1 第一批：checks 库存生成化（`INDEX.generated.md` + `script-index` 新鲜度门禁）；README 80→56；32/32 文档 when-to-read。Note = [d1-generated-inventory](../../../notes/archived/2026-11-03-d1-generated-inventory.md)。

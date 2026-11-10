@@ -35,8 +35,8 @@ intent: "2026-10-30 第二轮 notes/ 复核的实证：5 簇 74 篇逐篇对账�
 | `2026-10-20-tracked-token-guard` | 「runtime/web-logs/ 进 .gitignore」→「runtime/ 默认拒绝 + 白名单」 | `.gitignore:14-19`；owner = repo-hygiene-contract |
 | `2026-10-23-converge-e2e` | 未验段：backfill 已真执行且探针覆盖；resume 只覆盖 `--dry-run` | `converge.mjs:401`、`converge-e2e-probe.mjs:65-105` |
 | `2026-10-23-converge-steps` | `from/to/gitArgs` + `git ls-files` → `from/to` + 纯 fs rename（2 处） | `converge-rules.mjs:177`、`converge.mjs:299-305` |
-| `2026-10-27-data-model-r1-r6` | 排除项「方法层迁 home 级」→ M3 已落地（补 owner 指针） | `docs/data-model.md:53` |
-| `2026-10-28-data-design-hardening` | M3 候选句补「M4 定案只收方法层」；`ctx.fs` 未做 → round2 已补（2 处） | `docs/data-model.md:25`、round2:14 |
+| `2026-10-27-data-model-r1-r6` | 排除项「方法层迁 home 级」→ M3 已落地（补 owner 指针） | `docs/contracts/data-model.md:53` |
+| `2026-10-28-data-design-hardening` | M3 候选句补「M4 定案只收方法层」；`ctx.fs` 未做 → round2 已补（2 处） | `docs/contracts/data-model.md:25`、round2:14 |
 | `2026-10-28-r4-batch-e6-client-apply` | 「四个入口级函数现状」→「当时读数」（2 处） | 现 apply 51 行 / Board 146 / handler 63；不把历史读数改成今天的数 |
 | `postmortem/0001-…` | `scripts/preset-smoke.mjs` → `checks/smoke/…`；门禁路径 → `checks/gates/…` | 两处路径均已迁移 |
 
@@ -50,7 +50,7 @@ intent: "2026-10-30 第二轮 notes/ 复核的实证：5 簇 74 篇逐篇对账�
 ## 四、不采纳的判断（附理由）
 
 1. **`2026-10-26-faq24-alignment` → archive**：不采纳。它虽带「问题/验收/实施顺序」，但同时有
-   `## 决定` + `## 输掉的方案`（FAQ 24 §9.2 的 why）；`docs/release.md` 承接结论，不承接取舍。
+   `## 决定` + `## 输掉的方案`（FAQ 24 §9.2 的 why）；`docs/contracts/release.md` 承接结论，不承接取舍。
 2. **`2026-10-20-fresh-agent-consistency-sweep` → receipts**：不采纳。六条决定（类级守卫/诊断/
    验收合同/结构切片…）仍是唯一理由家；「批次」是工作单位，不是体裁。
 3. **bug022「web-rpc 47/47」**：不改。属验证节当时的真跑读数；现行预算 30 由 `doc-budget` 合同承载，
@@ -78,7 +78,7 @@ intent: "2026-10-30 第二轮 notes/ 复核的实证：5 簇 74 篇逐篇对账�
 2. **`CompanyView` 的注册面**：`COMPANY_PANELS` **不是死表**（`CompanyView.tsx:100/119` 用它渲染页签，
    `tests/client/company-view.spec.ts` 直接挂载），子代理的「死代码」判断已撤回；真实情况是
    `createCompanyView` 在 `src/client/index.ts` 无注册——组件有测试、无生产注册。是否退役整页由 code owner 定。
-3. **台账路由指向 archived**：`docs/decisions.md` 约 15 行 D 号把「决定的家」指到 `notes/archived/`
+3. **台账路由指向 archived**：`docs/reference/decisions.md` 约 15 行 D 号把「决定的家」指到 `notes/archived/`
    （D14/D15/D20/D27/D28/D31/D36/D37/D39/D41/D42/D48…），其中 D28/D42 等政策仍现行，与
    「archived 不是当前权威」有张力。建议给这些行补现行 docs 家，archived 留作源。
 

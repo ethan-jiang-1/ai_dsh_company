@@ -14,7 +14,7 @@ opened: 2026-10-28
 按 profile 路径而非公司归位、数据卡缺“写者/通道/可见性/硬软/版本”。期望把每条事实的“谁写、走哪条通道、
 谁看得见、坏了谁负责”写成可执行合同，并让测试/备份/卸载同 diff 收口。
 
-**当前情况（只读审计，2026-10-28）：** 详见下表；现合同 = [data-model.md](../../../docs/data-model.md)，
+**当前情况（只读审计，2026-10-28）：** 详见下表；现合同 = [data-model.md](../../../docs/contracts/data-model.md)，
 用户侧摘要 = [pack README Data](../../../packages/company-pack/README.md#data)。基线实跑：`pnpm verify`
 ALL PASS；`pnpm test` 111 files / 980 tests 全绿（RFC 写入前的基线）。
 
@@ -40,11 +40,11 @@ data-model 数据卡 v2/硬软表/六版本/标识符、README Data 6+2 与 Back
 
 | # | 严重级 | 事实 | 现在 | 证据 |
 |---|---|---|---|---|
-| 1 | **P0 权威** | `presented` 账本是操作员审计权威，却在公司盘 W，模型可写 | 每个角色挂 `tool-fs`；账本在 `company-workspace/kb/deliverables-presented.json`；bash 同样可写 | [data-model.md](../../../docs/data-model.md)（账本行）、[ceo preset](../../../packages/company-pack/presets/ceo/agent.cordis.yml#L67)、[catalog.ts](../../../packages/company-pack/src/host/ledger/catalog.ts#L8-L10) |
+| 1 | **P0 权威** | `presented` 账本是操作员审计权威，却在公司盘 W，模型可写 | 每个角色挂 `tool-fs`；账本在 `company-workspace/kb/deliverables-presented.json`；bash 同样可写 | [data-model.md](../../../docs/contracts/data-model.md)（账本行）、[ceo preset](../../../packages/company-pack/presets/ceo/agent.cordis.yml#L67)、[catalog.ts](../../../packages/company-pack/src/host/ledger/catalog.ts#L8-L10) |
 | 2 | **P0 信任** | `kb/deliverables-index.json` 是派生视图，客户端直接读它展示 `presented` | 索引可被模型改写；host 只在启动/present/audit 重生成 | [company-data-plane.ts](../../../packages/company-pack/src/client/data/company-data-plane.ts#L28-L30)、[catalog.ts](../../../packages/company-pack/src/host/ledger/catalog.ts#L86-L88) |
 | 3 | **P1 作用域** | 方法层住 `<profile>/company-cultivation/<role>/`，跟 profile 而非公司 | 换 profile 丢方法；同 home 两 profile 各一份；dev home 已实测 2 个 profile 告警 | [cordis.patch.yml](../../../packages/company-pack/cordis.patch.yml#L71)、[preset customSkillDirs](../../../packages/company-pack/presets/ceo/agent.cordis.yml#L58-L64)、[agent-cultivation-loop](../../../notes/archived/2026-10-13-agent-cultivation-loop.md) |
 | 4 | **P1 混居** | 浏览器诊断日志写进公司盘 `cultivation/client-errors.log`；home 根散落 bundle/lease/logs | 运维日志混进公司内容；所有权不一眼可见 | [client-diagnostics.ts](../../../packages/company-pack/src/host/commands/client-diagnostics.ts#L16)、[release-smoke.mjs](../../../checks/smoke/release-smoke.mjs) |
-| 5 | **P2 数据卡** | 现表缺“谁拥有/关于谁、谁必须看见、谁可以写、哪条通道、硬/软、版本/测试” | 账本问题在表里看不见；方法层隔离强度无“沙箱模式”列 | [data-model.md](../../../docs/data-model.md)（事实表） |
+| 5 | **P2 数据卡** | 现表缺“谁拥有/关于谁、谁必须看见、谁可以写、哪条通道、硬/软、版本/测试” | 账本问题在表里看不见；方法层隔离强度无“沙箱模式”列 | [data-model.md](../../../docs/contracts/data-model.md)（事实表） |
 | 6 | **P2 口径** | “分身写不了方法层”“角色私有”被写成绝对句 | 只在 `workspace-write`/`read-only` 成立；`danger-full-access` 无围栏；角色目录只是约定 | [run/env.sh](../../../run/env.sh#L47)、[fs-sandbox README](../../../vendor/dsh/packages/fs/fs-sandbox/README.md) |
 | 7 | **P2 测试** | `preset-smoke` 断言 `skills/list` 恰好等于包内技能；T4 说“catalog 没有模型可见路径” | dev home 有 adopt 方法就假红；索引在 workspace 内、fs 可读 | [preset-smoke.mjs](../../../checks/smoke/preset-smoke.mjs#L147-L165)、[presets.spec.ts](../../../tests/presets/presets.spec.ts#L69) |
 | 8 | **P2 发布** | `files`/`exports`/技能发现/`dsh.client.inject` peers 与数据路径耦合 | 改数据路径/资源时缺一条 T0 断言 | [release-smoke.mjs](../../../checks/smoke/release-smoke.mjs#L205-L255) |

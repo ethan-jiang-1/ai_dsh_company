@@ -9,7 +9,7 @@ import { roles } from './presets.mjs'
 // DSH 的 verify-cordis-config 同构门禁（AGENTS.md：cordis.yml 的裸插件必须出现在
 // 其解析清单的 dependencies）。漏了 → profile 安装后行解析不到 → preset 标记 broken，
 // UI 里给不出可用角色（R1 实证：persona / skill-filesystem 缺依赖）。
-// R5a 起 runtime 依赖声明从 dependencies 精确钉改 peerDependencies（合同 = docs/release.md：
+// R5a 起 runtime 依赖声明从 dependencies 精确钉改 peerDependencies（合同 = docs/contracts/release.md：
 // pre-stable API 拒绝钉死；profile 模板自带 autoInstallPeers: false，行解析走安装锚
 // 兜底）——本门禁按包名归一，两种声明都算"在列"。
 export function run({ root, ok, fail }) {

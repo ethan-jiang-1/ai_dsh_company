@@ -20,7 +20,7 @@
    - [tests/README](../../tests/README.md) ← dev-loop §9.1 命令与预算速查（验证地图的第四块：改动面→检查 + 命令 + 预算 + 首跑）。
 3. **dev-loop 只留入口与执行**：§0 导航、§0.5 入口三步、§1 执行链、§3 设计四问、§7/§8 指针、§9 连通/内容档、§12 记录与收尾；
    其余节号**保留为一行指针**（防所有既有「dev-loop §X」引用断链）。
-   §5 升级环压成 4 行指针（程序唯一家本来就是 [release.md](../../docs/release.md)）。
+   §5 升级环压成 4 行指针（程序唯一家本来就是 [release.md](../../docs/contracts/release.md)）。
 4. **引用与门禁同步**：`AGENTS.md`（纪律表、双 home 两处、原生纪律）、`testing.md`、`delegation.md`、`release.md`、
    `decisions.md` D12、`web-rpc.md`、`entry-probe.spec.ts` 的 Q13 答案、`layering.spec.ts` 的「纪律有家」守卫
    全部改指新家；守卫从「dev-loop §9.1 必须含纪律句」改为「tests/README 的验证分层节含纪律句 + dev-loop §9.1 指针仍在」。

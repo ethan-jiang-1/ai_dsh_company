@@ -10,7 +10,7 @@ opened: 2026-11-08
 > 也没有把 `workflow` 编排纳入比较；`workflow` 子代理**不能带 `agentPreset`**（vendor capability），
 > 所以它和 SA/SQA 的独立人格不是同一类东西——这条边界要先钉死再谈组合。
 > 消费者：[eng-teaming](../../../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md)、
-> [delegation 合同](../../../../docs/delegation.md)、[SA/SQA 能力组织（已结）](../../settled_issues/2026-11-07-sa-sqa-capability-organization.md)、
+> [delegation 合同](../../../../docs/contracts/delegation.md)、[SA/SQA 能力组织（已结）](../../settled_issues/2026-11-07-sa-sqa-capability-organization.md)、
 > A8/B2 真跑（并行与重委派现象）。
 > 产出的卡：[2026-11-08 VP-Eng 接入 workflow 并行扇出（单角色试点）](../../settled_issues/2026-11-08-vpeng-workflow-channel.md)
 > （已结归档；条件卡 C 未触发）。

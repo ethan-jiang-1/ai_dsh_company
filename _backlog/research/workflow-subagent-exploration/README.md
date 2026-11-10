@@ -9,7 +9,7 @@ opened: 2026-11-08
 > （只 workflow / 只 subagent / 混合一次 / 混合多次）是否都能看见、选对、跑通、合对？并发与 depth 边界如何？
 > 消费者：[探索性测试 bug-hunt 问题卡](../../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)、
 > [eng-teaming](../../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md)、
-> [delegation 合同](../../../docs/delegation.md)、[workflow 通道 Note](../../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)、
+> [delegation 合同](../../../docs/contracts/delegation.md)、[workflow 通道 Note](../../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)、
 > 常驻 probe [vp-eng-workflow-probe](../../../probes/team/vp-eng-workflow-probe.mjs)。
 > 产出的卡：[探索性测试 bug-hunt 问题卡](../../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)；具体缺陷按证据另行分诊。
 > 结论：（重构前探索轮（§16–§18）已跑并收口：6 张缺陷卡（2×P1 + 4×P2）+ 2 条当场修；后续 042/043/044 已归档；

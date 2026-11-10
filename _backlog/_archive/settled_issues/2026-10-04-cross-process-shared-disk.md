@@ -47,6 +47,6 @@ Teams 跨 home 不可达**（进程内能力）——协调面用它的**文件�
 - E1 守卫实证 + E2 互踩实证：[collab-mechanism-evidence](./2026-09-29-collab-mechanism-evidence.md)
 - Agent Teams 能力与边界（process-local / advisory writeScopes / 无文件锁）：vendor 树
   `packages/experimental/agent-team/README.md`（pin 0.2.0-rc.2）
-- 手册侧地基：[multi-human.md §4](../../../docs/multi-human.md) + 公司手册「协作规矩」节
+- 手册侧地基：[multi-human.md §4](../../../docs/contracts/multi-human.md) + 公司手册「协作规矩」节
 - 被搁置的重型路线不复述于此；负知识已由 [writing-collab-locks-redis](./2026-09-29-writing-collab-locks-redis.md)
   （TTL 家族两连否）与 multi-human.md §4（dsh-atomic-write 脚本侧指针）承载。

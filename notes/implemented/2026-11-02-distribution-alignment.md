@@ -75,10 +75,10 @@
 
 ## 指针
 
-- 读者面：`README.md`、`AGENTS.md`、`docs/index.md`、`docs/profile.md`、`docs/release.md`、
-  `docs/runtime-map.md`、`docs/data-model.md`、`docs/project-map.md`、`docs/orient.md`、
-  `docs/external-research.md`、`docs/terminology.md`、`run/README.md`、`packages/company-pack/README.md`。
+- 读者面：`README.md`、`AGENTS.md`、`docs/index.md`、`docs/contracts/profile.md`、`docs/contracts/release.md`、
+  `docs/runtime-map.md`、`docs/contracts/data-model.md`、`docs/project-map.md`、`docs/orient.md`、
+  `docs/reference/external-research.md`、`docs/reference/terminology.md`、`run/README.md`、`packages/company-pack/README.md`。
 - 发布链：`tools/release.mjs`、`checks/smoke/release-smoke.mjs`、`docs/guides/release-runbook.md`、
   `docs/guides/publish-handoff.md`、`checks/gates/dist-manual.mjs`、`checks/gates/pack-shape.mjs`。
 - 门禁：`checks/gates/dev-product-parity.mjs`（退役词 + 市场 staged + optional peer 邻接）。
-- 历史：D55 路由在 `docs/decisions.md`；本 Note 不取代 v3 Note 的入口/数据边界。
+- 历史：D55 路由在 `docs/reference/decisions.md`；本 Note 不取代 v3 Note 的入口/数据边界。

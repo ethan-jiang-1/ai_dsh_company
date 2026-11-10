@@ -97,7 +97,7 @@ opened: 2026-11-01
 ### P0 · 修默认安装路径（G1）
 
 - **交付**：bundle patch 去掉 `session-query-sqlite` 改值替换；新增 isolated provider 组；五个 preset 的
-  `tool-session-query` 行收敛到组内；`cordis.patch.yml` 注释与 `docs/presets.md` 同步；新增/更新
+  `tool-session-query` 行收敛到组内；`cordis.patch.yml` 注释与 `docs/contracts/presets.md` 同步；新增/更新
   smoke：in-app 安装（`pluginManager/installBundle`）与 CLI 安装两条都跑。
 - **出场门**：rc.2 与 rc.5 干净 web profile 上，in-app 安装 `application: applied`；六 preset 零 broken；
   `session/create` ceo 成功；client 模块表在场；stderr 无 `did not activate`；CLI 路径不回归；重启不再是
@@ -214,7 +214,7 @@ opened: 2026-11-01
 rc.2 与 rc.5 的 in-app 安装均为 `application: applied`；真模型 `session_search` 命中前一会话（证据见 Note）。
 
 **P1 完成**：`license: MIT` + `LICENSE`、`author`/`homepage`/`bugs`/`keywords`/`publishConfig`；
-`private` 移除；`pack-engines`/`pack-files` 改为发布姿态；README/手册模板/`docs/release.md` 同步。
+`private` 移除；`pack-engines`/`pack-files` 改为发布姿态；README/手册模板/`docs/contracts/release.md` 同步。
 `npm publish --dry-run`：127 files、LICENSE 在场、无 `bin/`、public access。
 
 **P2 完成**：`pnpm release --prepare`（0.7.0）→ `--verify` 六项认证档全绿；tarball
@@ -271,7 +271,7 @@ v3 卡 0.7.0 复核见其「0.7.0 复核」节；两卡边界一致，没有互�
   - [发布面事实](../research/plugin-lifecycle-publish/2026-11-01-publish-surface.md)
 - 前序：[v3 卡](2026-11-01-plugin-as-product-v3.md)、[v3 研究题](../research/plugin-as-product-v3/README.md)、
   [v3 实现 Note](../../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)
-- 现行合同：[README](../../../README.md)、[release](../../../docs/release.md)、
+- 现行合同：[README](../../../README.md)、[release](../../../docs/contracts/release.md)、
   [安装手册](../../../_dist/安装手册.md)、[包 README](../../../packages/company-pack/README.md)、
   [release-smoke](../../../checks/smoke/release-smoke.mjs)
 - 外部规范（只读）：`_faq_on_digested/26_plugin-as-product/50-lifecycle/`、

@@ -8,7 +8,7 @@
 ## 决定
 
 1. 根 `AGENTS.md` 命令表新增 `pnpm release --check`（注释：dist 与源码指纹；verify 绿 ≠ 可发布）。
-2. `docs/release.md` 的“发布前必跑”清单补 `pnpm release --check`，并明确 `verify` 绿不等于可发布。
+2. `docs/contracts/release.md` 的“发布前必跑”清单补 `pnpm release --check`，并明确 `verify` 绿不等于可发布。
 3. `dist-freshness` 的 PASS 行补“可发布性看 `release --check`”；`release-ready` 的 PASS 行补
    “源码指纹看 `release --check`”。两个绿不再看起来像同一个 readiness。
 

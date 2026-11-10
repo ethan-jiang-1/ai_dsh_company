@@ -53,10 +53,10 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 **问题**：
 
 - **空壳节与引用漂移**（R5-19）：`docs/guides/dev-loop.md` 保留 10 个「防断链」空壳节（§2/§4/§5/§6/§7/§8/§9.1/§10/§11/§13），12 处活引用指过去；`docs/guides/debugging.md:8` 甚至说 patch 语法 owner 是 §4，实际在 `bootstrap.md:138`。一跳变两跳，部分是死胡同。
-- **行预算错位**（R5-17）：`docs/decisions.md` 62/62 零头寸，而台账规则「编号不重用、不删行」（`:5`）；4 份零头寸、15/35 <5%；`docs/guides/publish-handoff.md`（90 行，最新分发指南）**无预算**；`_backlog/README.md`（132）、`notes/README.md`（124）两个最大 owner 文档完全在棘轮外。反向棘轮因此长期常亮。
+- **行预算错位**（R5-17）：`docs/reference/decisions.md` 62/62 零头寸，而台账规则「编号不重用、不删行」（`:5`）；4 份零头寸、15/35 <5%；`docs/guides/publish-handoff.md`（90 行，最新分发指南）**无预算**；`_backlog/README.md`（132）、`notes/README.md`（124）两个最大 owner 文档完全在棘轮外。反向棘轮因此长期常亮。
 - **索引与教义矛盾**（R5-18）：`checks/README.md` 头部说「触发/成本唯一家 = 脚本头注」，正文却手工枚举 26 smoke / 4 audit / 58 逻辑探针 / 53 门 / 18 工具；而 `script-index` 门禁**强制**每个公开脚本必须在 README 出现（`checks/gates/script-index.mjs`）。这与 D28「枚举的家 = 实现自己」相抵；要么生成索引段，要么放宽门禁。
 - **9/32 文档无「什么时候读」**（`project-map`、`repo-hygiene`、`release-runbook`、`orient`、`decisions` 等在列）；靠嵌套 AGENTS 注入补偿了一部分。
-- **`docs/terminology.md:12`** 把组合链指向 `docs/architecture.md`，文件不存在（实际 `docs/design/architecture.md`）；`bare-path` 不查存在性，故绿。
+- **`docs/reference/terminology.md:12`** 把组合链指向 `docs/architecture.md`，文件不存在（实际 `docs/design/architecture.md`）；`bare-path` 不查存在性，故绿。
 
 ### D2 代码与测试层次（B）
 
@@ -78,7 +78,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 
 - **授权截断**（R5-04）：门牌与章程摘要都丢了排除项；`dev-loop.md:35` 自己写「缩写即漏边界」，但门牌仍在缩写。
 - **语义审 owner 空壳**（R5-05）。
-- **preset 完成定义仍有三份不等价**（R5-12）：`AGENTS.md:49`（只说 preset-smoke）、`docs/presets.md:180`（另加 `pnpm verify` + `probe-smoke --full`，5–10 分钟）、`preset-change-definition/SKILL.md:10-16`（preset-smoke + verify/test + 场景）。取最低成本读法即可自称完成。
+- **preset 完成定义仍有三份不等价**（R5-12）：`AGENTS.md:49`（只说 preset-smoke）、`docs/contracts/presets.md:180`（另加 `pnpm verify` + `probe-smoke --full`，5–10 分钟）、`preset-change-definition/SKILL.md:10-16`（preset-smoke + verify/test + 场景）。取最低成本读法即可自称完成。
 - **收尾不在首屏**：`AGENTS.md:5` 的「按需」只列 dev-loop §0.5/§1，六行回执与收尾 skill 没有第一跳指针（DSH skill catalog 会自动发现，部分补偿）。
 - **`checks/README.md` 的「待触发复查」表**（:70-80）与「触发/成本唯一家 = 头注」自相矛盾；它确实在手工维护触发句。
 
@@ -90,7 +90,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 - **tools/standalone.mjs**（已删除）的删除只改了产品面，没改浏览器检验消费者（R5-01）。
 - `retired-path` 门禁的退役前缀只有两个 `_backlog` 项，`workspace/`、`standalone.mjs`、`snapshots/ui` 都不在，所以这类残留全绿。
 - **发布状态**（R5-03 / R5-13 / R5-14）：`release --check` 红；`_dist` manifest 是 2026-11-02 22:21、tgz 21:11、手册 21:44（同代），但源码 HEAD 已前进 5 个提交；`market-index.json` 声明 0.7.1（npm 404，`market-index.staged.json` 自认未发布）；`compat-tags.json` 只到 rc.2，而 pack README 声称 rc.5 已验证。
-- **台账顺序**（R5-21）：`docs/decisions.md:56-57` D51 在 D50 前；`ledger-routing` 只查可解析，不查单调。
+- **台账顺序**（R5-21）：`docs/reference/decisions.md:56-57` D51 在 D50 前；`ledger-routing` 只查可解析，不查单调。
 - **归档断链**（R5-20）：`_backlog/` 27 条 + `notes/` 19 条 = 46 条冻结层断链；`notes-archived-links` 只查 `.md` 目标，`.mjs`/`.png`/`.yml` 证据指针静默腐烂。
 - **Note 事实落点**（R5-22）：`notes/implemented/2026-10-19-deliverables-catalog.md`（`:13`/`:29`） 仍写 `company-workspace/kb/deliverables-index.json`，实际在 `.dsh-company/kb/`；`notes:audit` 报死路径。
 
@@ -163,7 +163,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 
 > 原则：先止血（让绿有意义），再补层次（测试/文档），最后收口发布与体验。每批都要同 diff 证据；不合并成一次大爆炸。
 
-- **A · 真实性止血（keyless，半天）**：R5-01（把 isolated 档改成 `profile init + plugin add <pack dir> + boot`，或彻底删档并改三份索引；优选前者，实测约 +15s）、R5-02（两门禁根改 `content/` + 断言根存在、扫到 ≥1 份）、R5-08（删掉假声明或实现 call 检查）、R5-11（`src/README`、`.gitignore`、`templates.spec` 注释、`markdown-links` 排除项）、R5-21/R5-22 小漂移、`docs/terminology.md` 死路径。完成后 `pnpm verify` + `pnpm test` + `ui-scene-smoke --isolated --golden` 三绿。
+- **A · 真实性止血（keyless，半天）**：R5-01（把 isolated 档改成 `profile init + plugin add <pack dir> + boot`，或彻底删档并改三份索引；优选前者，实测约 +15s）、R5-02（两门禁根改 `content/` + 断言根存在、扫到 ≥1 份）、R5-08（删掉假声明或实现 call 检查）、R5-11（`src/README`、`.gitignore`、`templates.spec` 注释、`markdown-links` 排除项）、R5-21/R5-22 小漂移、`docs/reference/terminology.md` 死路径。完成后 `pnpm verify` + `pnpm test` + `ui-scene-smoke --isolated --golden` 三绿。
 - **B · 授权与收尾单家（P1，半天）**：R5-04（门牌/摘要改纯指针，不列边界）、R5-05（7 处引用改指 `policy.md#p5`，删 §13 空壳或改成重定向表）、R5-12（preset 完成定义三份收成 skill 一份）、`AGENTS.md:5` 补收尾指针。需要用户点头改 `_backlog` 制度面。
 - **C · 发布单一 readiness（P1，半天）**：R5-03（让 `verify` 的发布面调用 `release --check` 的同一判据，或把 `dist-freshness` 降级为「产物自洽」并在 README 标明；重跑 `--prepare`）、R5-10（`release-smoke` 加 remove → boot → re-add → 数据仍在）、R5-14（compat 台账补 rc.5 或删 README 声明）、R5-13（发布前不把未发布版本写进 served index；staged 语义写进 handoff）。
 - **D · 测试层次（P1，2–3 天）**：R5-06（`CultivationTab` happy-dom 渲染 + 抛错路径）、R5-07（`runtime-guard` 表驱动）、R5-09（15 处文本断言改 DOM/props，保留 CSS/token 不变量）、R5-23（拆 929 行 spec 为 adopt/revoke/verify/purge 四族）、R5-15（preset YAML schema keyless 校验）、R5-16（skip 配预期 N 或移出）、R5-27（`CultivationContextPicker` 静态渲染 + 过滤纯函数）、R5-24（lib 测试归区）、R5-26（导出集合钉住）、R5-28/R5-29（mock 白名单登记、fixture emitter 移出 tests）。
@@ -227,7 +227,7 @@ git -C vendor/dsh rev-parse 'dsh-v0.2.1-rc.2^{commit}'
 
 **仍未收的**：
 - npm publish / HTTPS 市场托管仍人工；`market-index.staged.json` 标记 0.7.2 未发布（发布后删）；
-- `docs/decisions.md` 62/62 零头寸（R5-17 剩余面）、`checks/README.md` 手工库存（R5-18）、dev-loop 空壳节（R5-19）、归档链接只查 `.md`（R5-20）；
+- `docs/reference/decisions.md` 62/62 零头寸（R5-17 剩余面）、`checks/README.md` 手工库存（R5-18）、dev-loop 空壳节（R5-19）、归档链接只查 `.md`（R5-20）；
 - 剩余约 13 处源码文本断言（`client-face` 的 toolview 优先级是刻意保留的装配面）。
 
 ## 9. A- 收口（2026-11-03，0.8.2；review 后内部维护）

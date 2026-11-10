@@ -13,7 +13,7 @@ opened: 2026-11-07
 
 **问题与期望结果：** 真模型 VP-Eng 包 E2E；teammate/命名 child 的 preset/depth 证据；CEO `product-team-e2e-smoke` 绿；程序 Note/D57/D58/docs/归档。
 
-**范围：** 新 `vp-eng-teaming-probe.mjs`（待建，落 probes/team/）；`checks/smoke/product-team-e2e-smoke.mjs`；`checks/smoke/delegation-smoke.mjs`；程序 Note + `docs/index.md`、`docs/decisions.md`（D57/D58）、`docs/design/role-content-plan.md`（按需）；A1/B1 的合同页（`docs/guides/product-definition.md`、`docs/presets.md`、`docs/delegation.md`）只核对、不改正文；归档。
+**范围：** 新 `vp-eng-teaming-probe.mjs`（待建，落 probes/team/）；`checks/smoke/product-team-e2e-smoke.mjs`；`checks/smoke/delegation-smoke.mjs`；程序 Note + `docs/index.md`、`docs/reference/decisions.md`（D57/D58）、`docs/design/role-content-plan.md`（按需）；A1/B1 的合同页（`docs/guides/product-definition.md`、`docs/contracts/presets.md`、`docs/contracts/delegation.md`）只核对、不改正文；归档。
 
 **依赖：** B1/A8。
 
@@ -33,7 +33,7 @@ opened: 2026-11-07
 | teammate preset=`vp-eng`；命名 child preset 正确；SQA 结论原样 | 模型行为 | child 日志 | probe 断言 | 冒充/删结论 → 红 | 同上 | 用户 review |
 | CEO 两件套仍走 team | 模型行为/编排 | `product-team-e2e-smoke` | smoke 绿 | 红 = 破坏 | `checks/smoke/product-team-e2e-smoke.mjs` | 无 |
 | 程序 Note（伞卡）/D57/D58 | 文档形状 | 伞卡 Note + decisions | `pnpm verify` + `pnpm notes:audit` | 缺路由 → 红 | 伞卡 + `pnpm verify` | 用户 review Note |
-| 索引/台账/合同页核对 | 文档形状 | `docs/index.md` / `docs/decisions.md` + 核对 A1/B1 合同页 | `pnpm verify`（md-links/doc-budget） | 断链/超预算/旧说法 → 红 | `docs/*` + `pnpm verify` | 用户 review 文案 |
+| 索引/台账/合同页核对 | 文档形状 | `docs/index.md` / `docs/reference/decisions.md` + 核对 A1/B1 合同页 | `pnpm verify`（md-links/doc-budget） | 断链/超预算/旧说法 → 红 | `docs/*` + `pnpm verify` | 用户 review 文案 |
 
 ## 测试资产（计划）
 
@@ -43,7 +43,7 @@ opened: 2026-11-07
 | CEO 回归 | 既有 `checks/smoke/product-team-e2e-smoke.mjs` | `node checks/smoke/product-team-e2e-smoke.mjs` | CEO team | VP-Eng 包 | 红 = 破坏 |
 | 委派边界 | 既有 `checks/smoke/delegation-smoke.mjs` | `node checks/smoke/delegation-smoke.mjs` | 工具面 | VP-Eng 包 | 红 |
 | 程序 Note（伞卡）/台账 | 伞卡 Note + docs/decisions + archive | `pnpm verify` + `pnpm notes:audit` | 路由/形状 | 内容 | 缺 D 号 → 红 |
-| 索引/台账/合同页核对 | `docs/index.md` + `docs/decisions.md` + 核对 A1/B1 合同页 | `pnpm verify`（md-links/doc-budget） | 链接/预算 | 正文语义 | 断链/超预算 → 红 |
+| 索引/台账/合同页核对 | `docs/index.md` + `docs/reference/decisions.md` + 核对 A1/B1 合同页 | `pnpm verify`（md-links/doc-budget） | 链接/预算 | 正文语义 | 断链/超预算 → 红 |
 
 **资产边界：** 只证这一轮 VP-Eng 包与 CEO 回归；不证一般可靠性、不证组织设计好坏（用户 review）。真模型成本约 5–10 分钟，不进 `pnpm test`。
 
@@ -64,7 +64,7 @@ opened: 2026-11-07
 - **CEO 回归**：`node checks/smoke/product-team-e2e-smoke.mjs` → **ALL PASS**（202s；members=[cmo,vp-eng]、任务板 2 条且 PRD blockedBy MRD、未越编）
 - **委派边界**：`node checks/smoke/delegation-smoke.mjs` → **ALL PASS**（activation 回执、child 首帧 `agentPreset`、child 无 Team 工具、控制名仍团队版）
 - 资产：新 `probes/team/vp-eng-teaming-probe.mjs`（P1–P5，逐次结果落 `runtime/vp-eng-teaming-probe/last-run.json`）；`checks/INDEX.generated.md` 重生成
-- 程序 Note：`notes/implemented/2026-11-07-requirements-teaming-program.md`（决定 / 输掉的方案 / 落地提交表 / 验证 / 剩余风险 / 上游卡）；D57/D58 路由已进 `docs/decisions.md`（预算 62→64，论证 = 本 Note）
+- 程序 Note：`notes/implemented/2026-11-07-requirements-teaming-program.md`（决定 / 输掉的方案 / 落地提交表 / 验证 / 剩余风险 / 上游卡）；D57/D58 路由已进 `docs/reference/decisions.md`（预算 62→64，论证 = 本 Note）
 - docs：`docs/index.md` 两行更新（presets / product-definition）；A1/B1 合同页只核对未改正文
 - 归档：11 张执行卡 + 伞卡 `git mv` → `_backlog/_archive/settled_issues/`；两个研究题整目录 → `_backlog/_archive/research/`；活跃/归档索引同步
 - 门禁（W5 实跑）：`pnpm verify` ALL PASS；`pnpm test` 150 files / 1218 tests；`pnpm typecheck` 绿；`pnpm lint` 0/0；`pnpm dup` 0 clones；`pnpm notes:audit` 状态行不符 0；`release --check` 未跑（未发版）

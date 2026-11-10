@@ -1,7 +1,7 @@
 # 产品定义：MRD → StRS → PRD（新产品立项的交接与质量闸门）
 
 > 什么时候读：新产品/新功能动议、写 MRD/StRS/PRD、或要校验结构时。
-> 角色语义 = [presets.md](../presets.md)；公司级规矩 = [content/AGENTS.md](../../packages/company-pack/content/AGENTS.md)；
+> 角色语义 = [presets.md](../contracts/presets.md)；公司级规矩 = [content/AGENTS.md](../../packages/company-pack/content/AGENTS.md)；
 > 模板 = `content/templates/`；编号合同 = `content/state/process-docs.md`；共享打法 = `presets/_shared/skills/product-definition/`。
 
 ## 谁做什么

@@ -25,7 +25,7 @@
 //     或 wire 的 `started subagent`）；返回 child 正文反而是边界倒退
 //   -（--delegate 档）child 必须由 **vp-eng 角色 preset** 组合（人格/工具面不再由幻影 persona 给）
 //   -（--delegate 档）child 目录里 **没有** Team 工具——0.2.1 的 install-timing 修掉了 0.2.0 的
-//     "one-shot child 误当 Lead"污染；Team 工具若回来 ⇒ 重评 docs/delegation.md §4 的记账
+//     "one-shot child 误当 Lead"污染；Team 工具若回来 ⇒ 重评 docs/contracts/delegation.md §4 的记账
 //
 // 预算（[policy §P3](../..//docs/policy.md)）：墙钟 ≤ `--wall`（默认 300s）；模型 prompt 1 条（--delegate 档 2 条）。
 // 前置：DSH_HOME + 已装 pack + 模型凭据。
@@ -152,7 +152,7 @@ try {
     console.log(`[1] ${name} → ${owner}${detail}`)
     if (owner === 'absent') problems.push(`${name} 不在目录里`)
     // 边界变了（团队不再 shadow）⇒ 续驶可能重新可用 ⇒ 必须重评 one-shot 决定，别静默放过。
-    else if (owner !== 'team') problems.push(`${name} 不再是团队版（现在是 ${owner}）——shadow 边界变了，重评 docs/delegation.md 的 one-shot 决定`)
+    else if (owner !== 'team') problems.push(`${name} 不再是团队版（现在是 ${owner}）——shadow 边界变了，重评 docs/contracts/delegation.md 的 one-shot 决定`)
   }
 
   // ── 档 2（--delegate）：真委派一次，断言 **0.2.1 activation 契约** ──
@@ -178,7 +178,7 @@ try {
     // 0.2.0 时 child 是 one-shot 前台、用 CEO 的 persona，且被 Team 安装误当 Lead（目录里看得见
     // 六个 Team 工具、调用被拒，vendor tool-agent-team README "Known Limitations"）。
     // 0.2.1：child 改由 agentPreset 组合 ⇒ ① 组合来源不再是 CEO preset；② Team 工具污染消失。
-    // 这两条都是"边界动了"的信号，任一条回退都要重评 docs/delegation.md。
+    // 这两条都是"边界动了"的信号，任一条回退都要重评 docs/contracts/delegation.md。
     // 读 child 日志不加 prompt 预算；child 定位 = CEO 日志的 subagent/catalog（data.childId 裸 UUID
     // + data.mode；subagent/start 的 data.id 作兜底），读日志用 subagent 地址（session/page 拒绝裸 child id）。
     const childEntries = after.flatMap(r => {
@@ -217,7 +217,7 @@ try {
         problems.push(`child preset = ${String(presetOf)}（期望 vp-eng：per-tool persona 已删，人格只能由 agentPreset 给）`)
       }
       if (teamTools.length > 0) {
-        problems.push(`child ${childId.slice(0, 8)} 目录里又出现 Team 工具（${teamTools.join(', ')}）——0.2.1 修掉的 install-timing 污染回来了，重评 docs/delegation.md §4`)
+        problems.push(`child ${childId.slice(0, 8)} 目录里又出现 Team 工具（${teamTools.join(', ')}）——0.2.1 修掉的 install-timing 污染回来了，重评 docs/contracts/delegation.md §4`)
       }
     }
   }

@@ -51,10 +51,10 @@ vendor）与**执行链**（取任务 → 判授权 → 实施 → 选验证 →
 
 | # | 位置 | 问题 | 处置 |
 |---|---|---|---|
-| B1 | `scripts/release-smoke.mjs:60`、`docs/release.md:64`、`packages/company-pack/tsdown.config.ts:9` | solution root 上 `tsc -p` 不展开 references ⇒ 零输入静默退出 0（TS18002 报错条件被非空 references 抑制）⇒ 发布门禁**要么 no-op、要么验旧产物** | 三处统一 `tsc -b`；反证 = `rm -rf lib` 后跑 release-smoke 红 → 还原绿 |
+| B1 | `scripts/release-smoke.mjs:60`、`docs/contracts/release.md:64`、`packages/company-pack/tsdown.config.ts:9` | solution root 上 `tsc -p` 不展开 references ⇒ 零输入静默退出 0（TS18002 报错条件被非空 references 抑制）⇒ 发布门禁**要么 no-op、要么验旧产物** | 三处统一 `tsc -b`；反证 = `rm -rf lib` 后跑 release-smoke 红 → 还原绿 |
 | B2 | `docs/guides/dev-loop.md:6`（+`:140`） | 唯一执行手册头部核对基线 = `dsh-v0.1.5-rc.2`（实际 0.1.7-rc.2）；`:76` 同文件已写 rc.2 | 改 rc.2 并指向 pin-upgrade Note 实况节 |
 | B3 | `docs/guides/dev-loop.md:25`、`docs/index.md:80` | `rejected/` 层已废（2026-09-25 裁断不设）却写在**执行链第一跳**与台账里；裸词逃过 bare-path 门禁 | 改指各 Note「输掉的方案」节；台账行标"部分处置" |
-| B4 | `docs/release.md:10`、`:27` | 依赖版本与 compat 矩阵过期；照抄会让 `pack-compat` 变红 | 改 rc.2；矩阵块改指针（以 manifest 为准） |
+| B4 | `docs/contracts/release.md:10`、`:27` | 依赖版本与 compat 矩阵过期；照抄会让 `pack-compat` 变红 | 改 rc.2；矩阵块改指针（以 manifest 为准） |
 | B5 | `docs/index.md:83`（D22） | 已移除的 `remote.agentTeams` / `openSubagent` 写成现在时 | 改写为投影读法或按体例标历史 |
 | B6 | `AGENTS.md:36` vs `:87` | 同一门禁集合两份清单互不一致，**两份都漏 `bare-path`** | 删 `:36` 那份，只留 `:87` 并补 bare-path |
 | B7 | `docs/guides/dev-loop.md:338-347`（§9.1） | "何时跑"唯一家漏 6 个已存在脚本（human-loop-e2e / journal-audit / date-rule / dag-visual / dag-midflight / entry-probe） | 补行（需先腾行预算） |

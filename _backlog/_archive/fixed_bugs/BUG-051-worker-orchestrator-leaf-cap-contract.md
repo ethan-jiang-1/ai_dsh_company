@@ -100,7 +100,7 @@ persona/description 里，模型按 brief 的 4 件任务直接 spawn 4 次，�
   件数与 fan-out 预算由父代理决定”；不发明 child-count 硬闸（vendor 无 per-tool cap）。
 - **spec**：`delegation-model.spec.ts` 钉 fanOut 策略；`delegation-composition.spec.ts` 读
   description/persona，断言不再出现 `1–2` 且写了“按 brief/父代理”。
-- **文档/技能**：`docs/presets.md`、`docs/delegation.md`、delegation-policy §8、`eng-teaming`
+- **文档/技能**：`docs/contracts/presets.md`、`docs/contracts/delegation.md`、delegation-policy §8、`eng-teaming`
   第 2 档、旧模型 Note §2 同口径。
 - **真红→绿**：`fanOut.hardMax` 改成 2 + description 写回“1–2” ⇒ 3 failed；还原 ⇒ 28 passed。
 - **真装配 4-task 观察**：`wave5-orchestrator-cap`（VP `session-bb793ff1-…`、orchestrator

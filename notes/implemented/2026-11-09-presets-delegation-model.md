@@ -45,7 +45,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针 / UI）
 
 - 公司委派政策 → 共享 skill（`_shared` 下的独立 delegation 目录）；随公司教义变。
 - DSH 引擎合同 → capability-scoped prompt section（只在有 workflow 的 preset 注入）；随 vendor pin 变。
-- 维护面 → [delegation 合同](../../docs/delegation.md) + [presets 合同](../../docs/presets.md)；人读，链接到上面两个 owner，不复制。
+- 维护面 → [delegation 合同](../../docs/contracts/delegation.md) + [presets 合同](../../docs/contracts/presets.md)；人读，链接到上面两个 owner，不复制。
 - 不在角色 skill 里继续堆引擎合同；“分支默认叶子”从禁令改为“默认叶 + 预算 + 升级路径”。
 
 ### 4. 图是只读观测层
@@ -121,7 +121,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针 / UI）
 - `subagent_fork`/workflow/team 仍不能钉 preset：长链要靠父层编排、预算和图观测，不能靠 worker 万能。
 - UI 金样、`tests/client`、`client-load`、`ui-scene` 都要同 diff 维护；DagTab 内加区仍会改金样。
 - 公司手册当前对每个 agent 注入；worker 是否跳过由 host 侧配置/探针决定，不能靠 persona 假装看不见。
-- `docs/delegation.md` 已 120/120、`docs/presets.md` 197/198；文档更新前先压缩或搬去合同文件。
+- `docs/contracts/delegation.md` 已 120/120、`docs/contracts/presets.md` 197/198；文档更新前先压缩或搬去合同文件。
 
 ## 验收
 

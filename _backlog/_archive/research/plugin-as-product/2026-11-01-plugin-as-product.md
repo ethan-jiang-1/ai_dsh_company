@@ -192,7 +192,7 @@ DSH 当前行为以 `vendor/dsh` 的源码与 docs 为准。本稿把两者分�
 - 卸载 bundle 只摘依赖与 bundle layer，不删产品数据、用户项目文件、Workspace contents 或 Session
   history；`workspace.delete` 只删登记。**C**（FAQ 26 `00-answer.md`、`10-foundations/15`）
 - 真实 npm 发布版 `@deepseek-ai/dsh` 不含 browser 两包；本包 browser 组条件启用。
-  **C**（`docs/release.md`；`_dist/安装手册.md`）
+  **C**（`docs/contracts/release.md`；`_dist/安装手册.md`）
 
 ## 4. 本仓现状（0.4.6）
 
@@ -258,7 +258,7 @@ DSH_HOME=$T/h DSH_COMPANY_HOME=$T/ws \
 | 产品入口 | 文档叫 `web` profile；`standalone` 也建 `web` | 换 `company` 产品入口；`web` 退为通用/旧部署 |
 | 分发手册 | `_dist/安装手册.md` 教“一个 home 一个 bundle、公司盘在 home、侧栏手工加工作区” | 重写：company profile、workspace 参数/询问、workspace 业务备份 + home 治理导出 |
 
-证据：`docs/data-model.md`、`docs/runtime-map.md §二·五`、`docs/profile.md`、`packages/company-pack/README.md` Data 节、
+证据：`docs/contracts/data-model.md`、`docs/runtime-map.md §二·五`、`docs/contracts/profile.md`、`packages/company-pack/README.md` Data 节、
 `run/README.md`、`_dist/安装手册.md`。
 
 ### 4.3 当前 `bundle.json` / rebind 的行为
@@ -488,17 +488,17 @@ Host 侧只认 `DSH_COMPANY_HOME`（启动器负责 1/3/4），缺省时**不写
 | `packages/company-pack/README.md` | Install/Config/Data/Backup/Uninstall 全部换新形状；`DSH_COMPANY_HOME` 必填；方法层/账本留 home + 导出 |
 | `packages/company-pack/content/README.md` | 用户 workspace 说明：run bundle 在此、手册目标（`AGENTS.md`/`COMPANY.md` 碰撞）、`.dsh-company/`、备份/迁移 |
 | 手册目标（`AGENTS.md` 优先；已有则 `COMPANY.md`） | 不改 pack 源文件名；文档写清碰撞 seed 与两份并存时的加载顺序 |
-| `docs/profile.md` | 部署形状：产品安装（company profile + 独立 home/一 workspace）、dev 形状、standalone 退役/别名；`web` 不再是产品入口 |
+| `docs/contracts/profile.md` | 部署形状：产品安装（company profile + 独立 home/一 workspace）、dev 形状、standalone 退役/别名；`web` 不再是产品入口 |
 | `docs/runtime-map.md` | run bundle 重定义（workspace + `.dsh-company/bundle.json` + 公司盘）；home = DSH 运行时 + host 治理；首启/登记/选择时序 |
-| `docs/data-model.md` | 数据卡逐行换路径；v2；方法层/账本留 home + 只读导出；迁移；`bundle.json` 可写边界 |
-| `docs/release.md` | 发布形状、手册、smoke 矩阵、版本 0.5.0、rebind 退役 |
+| `docs/contracts/data-model.md` | 数据卡逐行换路径；v2；方法层/账本留 home + 只读导出；迁移；`bundle.json` 可写边界 |
+| `docs/contracts/release.md` | 发布形状、手册、smoke 矩阵、版本 0.5.0、rebind 退役 |
 | `docs/project-map.md` | 目录/入口/数据落点；`company-workspace` 说明；`bin/` |
 | `docs/guides/bootstrap.md` | 先选形状表：产品安装 vs dev；命令换 `company`；workspace 解析；`pnpm company` |
-| `docs/demo.md` | 启动口令、workspace 已自动登记、CEO 会话；删“手点 Edit path 加工作区”主路径 |
+| `docs/contracts/demo.md` | 启动口令、workspace 已自动登记、CEO 会话；删“手点 Edit path 加工作区”主路径 |
 | `docs/guides/environments.md` | 双 home；产品 home vs dev home；workspace 不在 home；凭据/端口 |
 | `docs/guides/release-runbook.md` | 导出/手册/校验；新 smoke |
-| `docs/index.md` / `docs/decisions.md` / `docs/external-research.md` | 登记本 Card/研究；加 D51（产品形状）；FAQ 26 `plugin-as-product` 吸收落点 |
-| `docs/orient.md` / `docs/multi-human.md` / `docs/presets.md` / `docs/delegation.md` / design 篇 | 清掉“home 公司盘 / 一个 home 一个 bundle / 侧栏手工加”的旧叙述，留指针；doc-budget 超限先搬后压 |
+| `docs/index.md` / `docs/reference/decisions.md` / `docs/reference/external-research.md` | 登记本 Card/研究；加 D51（产品形状）；FAQ 26 `plugin-as-product` 吸收落点 |
+| `docs/orient.md` / `docs/contracts/multi-human.md` / `docs/contracts/presets.md` / `docs/contracts/delegation.md` / design 篇 | 清掉“home 公司盘 / 一个 home 一个 bundle / 侧栏手工加”的旧叙述，留指针；doc-budget 超限先搬后压 |
 | 全仓 stale-reference 清扫 | `rg 'company-workspace|bundle\.json|DSH_COMPANY_REBIND|--profile web|一个 home 一个 bundle|侧栏.*工作区'`：现行合同改、历史 Note 加取代 banner、归档不动 |
 | `doc-budget` | 现有余量很小（data-model 75/76、profile 63/66）；新增内容优先搬旧形状到 notes/archived + 链接，确需提额按 docs/AGENTS 规则写 Note |
 | `run/README.md` / `runtime/README.md` | bundle.json 新家；`.dsh-company`；runtime 只留 home |
@@ -802,8 +802,8 @@ TTY 询问；无 TTY 且无值 → 非零退出 + 两条命令。**Host 只认 `
 
 **本仓当前合同**
 
-- [运行态地图](../../../../docs/runtime-map.md)、[数据模型](../../../../docs/data-model.md)、
-  [profile 合同](../../../../docs/profile.md)、[发布合同](../../../../docs/release.md)
+- [运行态地图](../../../../docs/runtime-map.md)、[数据模型](../../../../docs/contracts/data-model.md)、
+  [profile 合同](../../../../docs/contracts/profile.md)、[发布合同](../../../../docs/contracts/release.md)
 - [公司包 README](../../../../packages/company-pack/README.md)、
   [公司盘 README](../../../../packages/company-pack/content/README.md)
 - [run/README](../../../../run/README.md)、[runtime/README](../../../../runtime/README.md)

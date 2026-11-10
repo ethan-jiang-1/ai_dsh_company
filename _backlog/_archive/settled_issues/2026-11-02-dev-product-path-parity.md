@@ -56,11 +56,11 @@ workspace、安装副本就是仓库源码——所以"dev 里看着对"与"用�
 - **link 绕过打包面**（C）：`docs/guides/bootstrap.md` 现文：「**真实安装形状的验证归 R5a release-smoke**
   （干净 profile + file:/registry）」——即作者自己承认日常 dev 不验打包面。`files` 漏项（LICENSE、
   `content/**`、`locale/*.json`、`icon.svg`）在 link 下**不可见**，只有 `npm pack` + 安装副本能看到。
-- **peer 解析不同**（C）：`docs/release.md` 写明「dev profile 的 `link:` 安装不替代这条验证」；
+- **peer 解析不同**（C）：`docs/contracts/release.md` 写明「dev profile 的 `link:` 安装不替代这条验证」；
   link 下依赖/peer 从 workspace 解析，安装副本从 profile 解析。
 - **profile 身份已对齐**（T/C）：dev 与产品都用 `company`；**但** `docs/guides/bootstrap.md` 观察窗一节
-  仍写「pack 装进 **web profile**」——与 `docs/profile.md` 的 `company` 矛盾，是活文档漂移。
-- **观察窗 home 不一致**（C/T）：`docs/demo.md` 明确提醒「得 0 说明你起的是日用 `~/.dsh`（那里另有同名
+  仍写「pack 装进 **web profile**」——与 `docs/contracts/profile.md` 的 `company` 矛盾，是活文档漂移。
+- **观察窗 home 不一致**（C/T）：`docs/contracts/demo.md` 明确提醒「得 0 说明你起的是日用 `~/.dsh`（那里另有同名
   `web` profile）」；3080 是全局 home 的 `web`，不是 dev home 的 `company`。同一页面、两套挂载。
 - **market index 自称 registry**（T/C）：仓库根 `market-index.json` 的版本条目 `source: { type: 'npm' }`、
   `publishTimestamp` = 生成时刻；包**尚未发布**。index 是 format 1 的展示/推荐层，安装仍读包 manifest，
@@ -107,7 +107,7 @@ workspace、安装副本就是仓库源码——所以"dev 里看着对"与"用�
   必须覆盖：安装源、profile 名、profile 用户层写入者、版本门、重建语义、runtime、workspace、凭据、
   浏览器包、观察窗 home、market index。
 - 修 `docs/guides/bootstrap.md` 观察窗一节：`web profile` → `company` profile；并补「日常通道默认 tarball」。
-- 出场门：表非空且每条能指到文件；`docs/profile.md`/`docs/demo.md`/`policy.md` 与表一致。
+- 出场门：表非空且每条能指到文件；`docs/contracts/profile.md`/`docs/contracts/demo.md`/`policy.md` 与表一致。
 
 ### P2 · market index 真实性
 
@@ -204,6 +204,6 @@ README/checks 索引仍写「只 exec / 不装包」；run/README 把 `pnpm comp
   （发布/安装形已收口；本卡补的是**日常 dev 回路**与产品回路的同形）。
 - 证据：[生命周期 Note](../../../notes/implemented/2026-11-01-plugin-lifecycle-publish.md) 的
   「发布字节与验收」；[v3 Note](../../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)。
-- 现行合同：[profile](../../../docs/profile.md)、[policy](../../../docs/policy.md)、[demo](../../../docs/demo.md)、
-  [bootstrap](../../../docs/guides/bootstrap.md)、[release](../../../docs/release.md)。
+- 现行合同：[profile](../../../docs/contracts/profile.md)、[policy](../../../docs/policy.md)、[demo](../../../docs/contracts/demo.md)、
+  [bootstrap](../../../docs/guides/bootstrap.md)、[release](../../../docs/contracts/release.md)。
 - 补偿面：`release-smoke` / `company-entry-smoke` / `export-dist`。

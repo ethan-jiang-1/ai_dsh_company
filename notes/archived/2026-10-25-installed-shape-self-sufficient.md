@@ -4,7 +4,7 @@
 
 > **体裁/部分取代（2026-10-30）**：本文是 2026-10-25 RFC 的毕业正文；§问题/§当前事实/§方案 是当时快照。
 > `presented` 权威已迁 domain（2026-10-28 M2），§2 的“读旧 catalog、保留 true、其余 null”只描述一次性迁移。
-> 现行合同 = [data-model](../../docs/data-model.md)；shipped-links 与去仓库化的决定仍有效。
+> 现行合同 = [data-model](../../docs/contracts/data-model.md)；shipped-links 与去仓库化的决定仍有效。
 
 ## 问题
 
@@ -28,7 +28,7 @@
 - 13 份 skill 的“归仓库的门禁/审计脚本”尾注：改成“可机械核对的部分由操作员在收口时核对（见 workspace/README 操作员节）”，或删除；chairing skill 的 `node tools/converge.mjs` 改为人工收口步骤。
 - 模板 `meta.md`：把 `类型` / `结果` 的枚举值直接写进模板；删除 `tools/lib/deliverables.mjs` 与 `deliverables-check` 的仓库路径引用，改指 `kb/motion-ledger.md` 与操作员节。
 - 新增门禁 `shipped-links`：以“安装读者”视角扫描 pack 的 `workspace/**` 与 `presets/**/skills/**` Markdown；相对链接穿出 workspace 即红；`docs/`、`checks/`、`tools/`、`runtime/`、`snapshots/`、`notes/`、`_backlog/`、`vendor/` 等仓库顶目录在注入内容里出现即红（维护者附录文件除外，按路径白名单）。
-- 负例：往一份 skill 加 `../docs/release.md` → 红；删除 → 绿。把手册的 `snapshots/README.md` 恢复 → 红。
+- 负例：往一份 skill 加 `../docs/contracts/release.md` → 红；删除 → 绿。把手册的 `snapshots/README.md` 恢复 → 红。
 
 ### 2. 成品目录 + present 投影
 
@@ -63,7 +63,7 @@ node checks/smoke/preset-smoke.mjs
 
 断言：
 
-- `shipped-links` 在旧树上因仓库引用红；改写后绿；负例（植入 `../docs/release.md`）红。
+- `shipped-links` 在旧树上因仓库引用红；改写后绿；负例（植入 `../docs/contracts/release.md`）红。
 - 新装（干净 home）：`kb/deliverables-index.json` 在场且 `counts.total=0`；页签空态是“还没有成品”，不是“维护者运行 node tools/...”。
 - 在 workspace 建 `deliverables/<date>-<slug>/final.md` + `meta.md`，触发一次 `deliverables/presented` 事件后：catalog 出现该条目且 `presented=true`；未观测 present 的条目为 `null`。
 - `pnpm test` 覆盖 catalog 生成/present 投影/空态解析；`handbook-smoke` / `preset-smoke` 仍绿。
@@ -94,8 +94,8 @@ node checks/smoke/preset-smoke.mjs
 
 红/绿收据（实跑）：
 
-- 红：只加 `shipped-links`、未改内容 → `FAIL shipped-links: …/AGENTS.md:23 链接指向仓库/穿出 workspace：../docs/demo.md；…templates/meta.md:3 裸路径指向仓库：tools/lib/deliverables.mjs；…chairing…:58 裸路径指向仓库：node tools/converge.mjs`。
-- 红（审查轮，当前门禁）：往 chairing skill 植入 `../../docs/release.md` 与 fenced `node tools/x.mjs` → `FAIL shipped-links: …:72 链接指向仓库/穿出 workspace；…:75 代码块指向仓库`；还原 → `ALL PASS`。
+- 红：只加 `shipped-links`、未改内容 → `FAIL shipped-links: …/AGENTS.md:23 链接指向仓库/穿出 workspace：../docs/contracts/demo.md；…templates/meta.md:3 裸路径指向仓库：tools/lib/deliverables.mjs；…chairing…:58 裸路径指向仓库：node tools/converge.mjs`。
+- 红（审查轮，当前门禁）：往 chairing skill 植入 `../../docs/contracts/release.md` 与 fenced `node tools/x.mjs` → `FAIL shipped-links: …:72 链接指向仓库/穿出 workspace；…:75 代码块指向仓库`；还原 → `ALL PASS`。
 - 绿：改完内容后 `pnpm verify` → `ALL PASS`（含 `shipped-links`、`handbook-budget`、`gate-wiring ×46`）。
 - 绿：`node checks/smoke/release-smoke.mjs` → `ALL PASS`，其中 `首启生成成品目录（空目录，不依赖仓库工具）` 与 `第二次启动零变更` 均 PASS。
 - 绿：`pnpm test` → 89 files / 848 tests passed（含 catalog/wiring/identity/contract）。

@@ -29,7 +29,7 @@ opened: 2026-10-19
 
 ## 官方 layer 0 与 compact skin（边界声明）
 
-官方 [`client-ui-agent-team`](../../../vendor/dsh/packages/experimental/client-ui-agent-team/README.md) 的任务板覆盖 roster、owner、blockers、readiness、writeScopes、overlap warnings、description、failure；本表是**紧凑 skin**，只画任务/依赖/状态/owner。**不重复**官方已覆盖的 writeScopes/overlap/description，也不自建任务存储；若只为「可浮出的右栏」而保留本表，按 [release.md](../../../docs/release.md) §vendor 政策先记录「官方面板不能 dock」的证伪，再决定留 skin 或提上游 seam。
+官方 [`client-ui-agent-team`](../../../vendor/dsh/packages/experimental/client-ui-agent-team/README.md) 的任务板覆盖 roster、owner、blockers、readiness、writeScopes、overlap warnings、description、failure；本表是**紧凑 skin**，只画任务/依赖/状态/owner。**不重复**官方已覆盖的 writeScopes/overlap/description，也不自建任务存储；若只为「可浮出的右栏」而保留本表，按 [release.md](../../../docs/contracts/release.md) §vendor 政策先记录「官方面板不能 dock」的证伪，再决定留 skin 或提上游 seam。
 
 ## 事实与证据（本轮实跑）
 

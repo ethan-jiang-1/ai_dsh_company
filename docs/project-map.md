@@ -4,7 +4,7 @@
 
 这份地图供项目驾驭者与维护 Coding Agent 使用。根 [AGENTS.md](../AGENTS.md) 路由开发任务；[公司手册](../packages/company-pack/content/AGENTS.md) 是角色会话的运行时输入（host 从 pack `content/` 注入，不落盘；dev 盘不建符号链接）。先用下表选入口，政策和操作细节由链接目标维护。
 
-**快读（happy path）**：启动公司 → [demo.md §前置](demo.md)；改东西 → 下表按任务进入；验证 → [tests/README](../tests/README.md) 最窄检查表；卡住 → 本页「交互与调试入口」现象表；时序与状态轴 → [运行态地图](runtime-map.md)。
+**快读（happy path）**：启动公司 → [demo.md §前置](./contracts/demo.md)；改东西 → 下表按任务进入；验证 → [tests/README](../tests/README.md) 最窄检查表；卡住 → 本页「交互与调试入口」现象表；时序与状态轴 → [运行态地图](runtime-map.md)。
 
 ## 按任务进入
 
@@ -12,14 +12,14 @@
 |---|---|---|
 | 第一次进入或还不能启动 | [引导指南](guides/bootstrap.md) | 安装 workspace、构建 host/client 与 Web 产物 |
 | 开始代码或文档变更 | [开发环](guides/dev-loop.md) §0.5/§1 | 判断任务、范围、授权与完成证据 |
-| 启动并操作公司 | [动议合同](demo.md) §前置 | 打开带 token 的观察窗、连接公司盘、创建 CEO 会话 |
+| 启动并操作公司 | [动议合同](./contracts/demo.md) §前置 | 打开带 token 的观察窗、连接公司盘、创建 CEO 会话 |
 | 查运行态与时序 | [运行态地图](runtime-map.md) | 分清代码/运行态/会话事实/证据四轴与首跑错误入口 |
-| 查组合和工具装载 | [profile 合同](profile.md)、[debugging](guides/debugging.md) | dump 组合、检查名册与实际会话挂载 |
-| 修改角色内容 | [preset 合同](presets.md) | 找到 persona、skill 与 workspace 事实的各自 owner |
+| 查组合和工具装载 | [profile 合同](./contracts/profile.md)、[debugging](guides/debugging.md) | dump 组合、检查名册与实际会话挂载 |
+| 修改角色内容 | [preset 合同](./contracts/presets.md) | 找到 persona、skill 与 workspace 事实的各自 owner |
 | 修改 host 或 Web | [源码地图](../packages/company-pack/src/README.md) | 找到注册入口、读模型与渲染实现 |
 | 选择验证 | [测试宪法](testing.md)、[tests/README](../tests/README.md)、[脚本索引](../checks/README.md) | 选择证明当前性质的最窄检查 |
 | 查证据与归档 | [快照规则](../snapshots/README.md) | 区分录制、副本、独立 oracle、视觉夹具和归档 |
-| 查设计理由或旧决定 | [主题导航](index.md)、[决策台账](decisions.md) | 从主题进入合同和关联 Note |
+| 查设计理由或旧决定 | [主题导航](index.md)、[决策台账](./reference/decisions.md) | 从主题进入合同和关联 Note |
 
 ## 运行、开发、排练与证据各在哪里
 
@@ -69,18 +69,18 @@ flowchart TD
 
 **公司完整操作走 Web profile。** shipped headless 是通用 CLI 面，单独运行它不会自动得到公司组合。headless 实验需要显式组合；[company overlay](../run/company.overlay.yml) 只补部分宿主行，实际组合还由调用脚本的 preset patches 决定。不要把“CLI 可启动”当作“六角色公司已装配”。
 
-**团队成员与独立角色 preset 会话有不同隔离语义。** preset 会话挂自己的角色组合；team teammate 的工具、身份与 KB 使用按团队机制走。选择通道时读 [委派合同](delegation.md) 和 [角色隔离设计](design/roles-isolation.md)，不要从角色名字推断它已挂完整 preset。
+**团队成员与独立角色 preset 会话有不同隔离语义。** preset 会话挂自己的角色组合；team teammate 的工具、身份与 KB 使用按团队机制走。选择通道时读 [委派合同](./contracts/delegation.md) 和 [角色隔离设计](design/roles-isolation.md)，不要从角色名字推断它已挂完整 preset。
 
 ## 交互与调试入口
 
-Web 操作按 [动议合同 §前置](demo.md) 执行：启动输出给出当前 token URL；浏览器连接公司盘、创建 CEO 会话；团队名册或在场板进入成员会话。签字与人机停点见 [多人合同](multi-human.md)；呈现前的机器走查见 [CDP 指南](guides/cdp-probe.md)。端口、token 与当前进程状态以本次启动输出为准。
+Web 操作按 [动议合同 §前置](./contracts/demo.md) 执行：启动输出给出当前 token URL；浏览器连接公司盘、创建 CEO 会话；团队名册或在场板进入成员会话。签字与人机停点见 [多人合同](./contracts/multi-human.md)；呈现前的机器走查见 [CDP 指南](guides/cdp-probe.md)。端口、token 与当前进程状态以本次启动输出为准。
 
 | 现象 | 从哪一层查 | 下一步证据 |
 |---|---|---|
 | 公司角色没有出现 | profile 与最终组合 | `pnpm dsh --profile company --dump-config`，核对 bundle/preset 行 |
 | 名册有角色但创建失败 | 实际 preset 挂载 | [preset-smoke](../checks/smoke/preset-smoke.mjs)，dump/名册扫描不能证明 schema 挂载成功 |
 | 工具缺失或委派续驶不可达 | 会话组合、工具目录、团队名册 | [delegation-smoke](../checks/smoke/delegation-smoke.mjs) 与对应机制探针 |
-| 改动没进入当前会话或页面 | 生效方式与构建产物 | [debugging](guides/debugging.md)、[构建指南](guides/bootstrap.md)、[培养合同](presets.md) |
+| 改动没进入当前会话或页面 | 生效方式与构建产物 | [debugging](guides/debugging.md)、[构建指南](guides/bootstrap.md)、[培养合同](./contracts/presets.md) |
 | 页面挂载或面板异常 | client 装配与真实渲染 | [client-load-smoke](../checks/smoke/client-load-smoke.mjs)、[cdp-probe](../probes/browser-visual/cdp-probe.mjs) |
 | 交付物、作者或 journal 不对 | 会话日志与实际工作区 | [deliverables-check](../checks/audit/deliverables-check.mjs)、[authorship-audit](../checks/audit/authorship-audit.mjs)、[journal-audit](../checks/audit/journal-audit.mjs) |
 | 会话行为回归 | 录制场景与明确判据 | [replay-smoke](../checks/smoke/replay-smoke.mjs)（本仓仅 foundation 合成场景；公司行为真实录制在部署仓） |

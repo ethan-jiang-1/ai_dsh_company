@@ -43,7 +43,7 @@ opened: 2026-10-25
 （初稿；RFC 时定稿。）
 
 - 新门禁 `shipped-links` 以“安装读者”视角解析 `workspace/` 与 `presets/` 的 Markdown：`..` 不得穿出 workspace，`checks/`、`tools/`、`runtime/`、`snapshots/` 等仓库路径为红。
-- 负例：往一份 skill 加 `../docs/release.md` → 红；还原 → 绿。
+- 负例：往一份 skill 加 `../docs/contracts/release.md` → 红；还原 → 绿。
 - `handbook-smoke`、`preset-smoke` 仍绿；release tarball 扫描无仓库专属引用（或全部在非注入文件）。
 - 人工走查：手册 + 14 份 skill + 模板，逐条能执行或明确标“维护者”。
 

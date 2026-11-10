@@ -8,7 +8,7 @@
 > `kb/deliverables-presented.json` 只读留一版。见 [数据设计硬化 Note](./2026-10-28-data-design-hardening.md)。
 
 > **2026-10-28 M3 部分取代（方法层）**：§后果 的“方法层仍是 profile 级；同 home 多 profile 不共享”
-> 已作废——方法层公司级共享（[data-model](../../docs/data-model.md) §四）。上面的 banner 只覆盖 M2。
+> 已作废——方法层公司级共享（[data-model](../../docs/contracts/data-model.md) §四）。上面的 banner 只覆盖 M2。
 > 备份口径 meanwhile 取代 [run-bundle](./2026-10-24-run-bundle-install-unit.md) §7。
 
 ## 问题
@@ -23,7 +23,7 @@
 4. **版本与原子写**：`bundle.json` 校验 `v`/必填字段；v 更高 → `unsupported`，保留原文件并告警，不 cast 成 v1。catalog/账本 schema 更高同样告警。首建 manifest 改为临时文件 + hard link 发布；基部升级改临时文件 + rename；目标为符号链接/目录时 `keep`，绝不覆盖。
 5. **备份合同拆两档**：安装手册写 `business`（公司盘 + `bundle.json` + 方法层；不含 sessions/密钥/搜索索引）与 `full`（整 home，加密限权），补恢复与显式换盘步骤；`dist-manual` 门禁检查关键句。
 6. **N1 workspace 登记**：优先 `ctx.workspaceRegistry.list()`（`ctx.inject` 等就绪），旧 `storages/workspace.json` 只做无 registry 组合的诊断保底。
-7. **事实级数据卡**：新增 [docs/data-model.md](../../docs/data-model.md)，README Data 保留平面摘要并链接；FAQ 26 登记进 [docs/external-research.md](../../docs/external-research.md)。
+7. **事实级数据卡**：新增 [docs/contracts/data-model.md](../../docs/contracts/data-model.md)，README Data 保留平面摘要并链接；FAQ 26 登记进 [docs/reference/external-research.md](../../docs/reference/external-research.md)。
 
 ## 输掉的方案
 

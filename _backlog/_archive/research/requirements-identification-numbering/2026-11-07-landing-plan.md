@@ -88,7 +88,7 @@ intent: 把已定性的编号共识转成可评审的落地面清单、卡边界
 
 - **旧实现不是资产清单**：`65b6917` 的模板/checker 可参考，但它的 `STR/SYR/IFR` 层前缀与“6 个空间”已被共识推翻；直接 cherry-pick 会把方向带回去。
 - **PRD 模板同源测试**：[prd-check.spec](../../../../tests/lib/prd-check.spec.ts) 要求 `content/templates/{mrd,prd}.md` 的示例直接过 `validateProductDocs`；改模板必须同步跑它。
-- **文档预算**：`docs/presets.md`、`docs/delegation.md` 已顶格；改文档先搬后写，别先提额。
+- **文档预算**：`docs/contracts/presets.md`、`docs/contracts/delegation.md` 已顶格；改文档先搬后写，别先提额。
 - **在飞冲突**：BUG-034/035 相关改动正由另一个 Agent 处理中（工作树里已涉及 SA/SQA preset/skills/tests/probes/bug 卡/Note）；A4a/A4b/B1 必须等它落地，不能混 diff。
 - **不做**：第六/第七条汇报线、SA/SQA 独立汇报线、vendor 改动、UI 角色徽标/委派卡 key、发布版本号（按需）。
 

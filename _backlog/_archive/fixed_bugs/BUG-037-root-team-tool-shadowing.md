@@ -21,7 +21,7 @@ VP-Eng 根会话（无 parentSession）里，模型起了一个 `subagent` child
 （全局版）被 shadow；根无法 steer 自己起的 generic child。模型在 R3 为此浪费了 3 次工具调用，
 最后只能结束本轮等完成通知。
 
-同一机制在 `docs/delegation.md` §4.4 与五个职能 preset 的注释里被写成“职能根会话不是团队成员”，
+同一机制在 `docs/contracts/delegation.md` §4.4 与五个职能 preset 的注释里被写成“职能根会话不是团队成员”，
 与 §2.1“任何没有 parentSession 的根会话都是 Lead”自相矛盾。R3 的 child（W1，有 subagent
 descriptor）反而拿到全局版：`list_agents {scope:'children'}` 能看到自己的 W2，`send_message
 {agent_id}` 能回父——证明“根 = Lead、命名/普通 child = 非成员”的分野。
@@ -59,7 +59,7 @@ generic subagent child）有效。本仓注释与 §4.4 把“根”误写成“
 
 ## 修复关联
 
-- 同轮修正：`docs/delegation.md` §4.4 改成“根 = Lead（团队版 shadow 全局版）；命名/普通 child 非成员，
+- 同轮修正：`docs/contracts/delegation.md` §4.4 改成“根 = Lead（团队版 shadow 全局版）；命名/普通 child 非成员，
   全局行只对它们生效”；五个职能 preset 的续驶控制面注释同步；`eng-teaming` 加控制面规则
   （根门够不到 child；child 终稿走完成通知；不要 sleep 轮询）。
 - M2 natural 复跑仍见 `wait_agent` 被用于 child（团队版，`no-active-peer`）；首版 `eng-teaming` 只列了
@@ -71,7 +71,7 @@ generic subagent child）有效。本仓注释与 §4.4 把“根”误写成“
 - **绿证据**：真挂载会话的工具目录含 `list_subagents` / `send_to_subagent`
   （`runtime/tmp/explore/fix1/S039/summary.json`，79 tools）；行为 spec `tests/host/delegation/delegation-control.spec.ts`
   （注册名、catalog 折叠、send 透传、服务缺席 fail-loud）。
-- **文档同步**：`docs/delegation.md` §4 控制面段改成“根门用这两个名字”；`eng-teaming` 控制面与长跑条目同步。
+- **文档同步**：`docs/contracts/delegation.md` §4 控制面段改成“根门用这两个名字”；`eng-teaming` 控制面与长跑条目同步。
 - 机制本身（vendor shadow）未改；上游提案 = 让根会话直接用全局控制名（`tool-agent-team` 的 install 条件）。
 - **退役条件**：上游修好后删除这两个工具（台账 `[CT-LIFE]`，[收口 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md)），避免双控制面长期并存。
 

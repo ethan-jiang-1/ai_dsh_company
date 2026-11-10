@@ -4,7 +4,7 @@
 
 > **已被 v3 部分取代（2026-11-01）**：第 2 条“公司盘根 = `<DSH_HOME>/company-workspace`”不再成立；
 > v3 用用户 workspace 的 `.dsh-company/`。现行 = [v3 native entry](../implemented/2026-11-01-plugin-as-product-v3-native-entry.md) +
-> [data-model](../../docs/data-model.md)。其余条目（`dsh.compatibility` 退役等）仍有效。
+> [data-model](../../docs/contracts/data-model.md)。其余条目（`dsh.compatibility` 退役等）仍有效。
 
 ## 问题
 
@@ -21,8 +21,8 @@
 3. **catalog 的 node:fs 是显式例外**：bootstrap/catalog 是部署 provisioning 与 UI 派生索引，不是模型文件访问；模型文件访问仍走 `ctx.fs`。README Data 写明；若未来要进 model 可见面，另立 RFC 迁 `ctx.fs`。
 4. **preset 文件名保留 `agent.cordis.yml`**：它由 `dsh.bundle.patch` 显式引用，不是旧 `.agent-presets/` 目录扫描；改名到 `preset.patch.yml` 只影响可读性、会牵动大量历史指针，本轮不做，README 说明。
 5. **locale/icon 补上**：`locale/en.json`、`zh.json` 与原创 `icon.svg`，`exports`/`files` 同步；Config 本轮不引入（只有一个可选 `cultivationRoot`，引入 schemastery peer 会扩大依赖面，记录为显式例外）。
-6. **发布知识内化**：`docs/release.md` 收敛为合同；[发布 runbook](../../docs/guides/release-runbook.md)、[CHANGELOG](../../CHANGELOG.md)、[release.mjs](../../tools/release.mjs)、`_dist/release-manifest.json`、[release-ready](../../checks/gates/release-ready.mjs) 与 `pnpm release` 已落树。
-7. **FAQ 24 登记**：`docs/external-research.md` 增加一行，指向该目录与吸收落点。
+6. **发布知识内化**：`docs/contracts/release.md` 收敛为合同；[发布 runbook](../../docs/guides/release-runbook.md)、[CHANGELOG](../../CHANGELOG.md)、[release.mjs](../../tools/release.mjs)、`_dist/release-manifest.json`、[release-ready](../../checks/gates/release-ready.mjs) 与 `pnpm release` 已落树。
+7. **FAQ 24 登记**：`docs/reference/external-research.md` 增加一行，指向该目录与吸收落点。
 
 ## 验收
 

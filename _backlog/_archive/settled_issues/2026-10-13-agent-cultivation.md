@@ -38,7 +38,7 @@ opened: 2026-10-13
 1. [产品研究稿](../research/agent-cultivation/2026-10-13-cultivation-design.md)：对象、归属、内容分类、具体用户闭环、页面结构、A/B/C/D 候选和判断依赖。
 2. [DSH 源码证据](../research/agent-cultivation/2026-10-13-dsh-capabilities.md)：pin skill scope/provider、反馈不进入模型、组合生效、建议通道与待探针边界。
 3. [外部一手证据](../research/agent-cultivation/2026-10-13-external-patterns.md)：12 组官方文档/作者论文，每组原句、版本、借鉴和反证。搜索服务失败，直接读取一手 URL；未完成全网检索或复现实验。
-4. 仍有效的培养否决：[twin-cultivation](../../../notes/archived/2026-09-24-twin-cultivation.md)；当前语义：[preset 合同](../../../docs/presets.md)、[多人合同](../../../docs/multi-human.md)。本研究未改写这些决定。
+4. 仍有效的培养否决：[twin-cultivation](../../../notes/archived/2026-09-24-twin-cultivation.md)；当前语义：[preset 合同](../../../docs/contracts/presets.md)、[多人合同](../../../docs/contracts/multi-human.md)。本研究未改写这些决定。
 
 ## 方案与取舍（研究建议，未拍板）
 
@@ -99,7 +99,7 @@ opened: 2026-10-13
 
 - **交付**：公司页第四子页＝培养（`COMPANY_PANELS`；面板不依赖 team 数据——独立角色根会话可看，用量保留平台页签）；培养领域视图三壳共享（`CultivationBoard`：我的分身/需要我处理/我提交的·我已处理/已采纳的方法/journal 待审/赞踩/怎么养）；记录读模型（`recordText`/`parseRecord`/`recordInbox`；不可达≠0、未验证≠已掌握）；host 面 = `cultivation_propose` 工具（分身只开提案）+ `/cultivation` 命令族（correct/suggest/adopt/reject/verify/revoke；采纳角色闸 = 会话 preset === 目标角色）；方法层 = 五 preset 第二 `customSkillDirs` 锚 `baseUrl` + `cordis.patch.yml` `cultivationRoot`（构造对齐，实测 `<profile>/company-cultivation/<role>/`）。
 - **实跑**：新 spec 先立后实现（实现前红 8 断言 → 绿）；`pnpm test` 538/538（54 文件）；`pnpm verify` ALL PASS；preset-smoke 5/5；delegation-smoke ALL PASS；client-load-smoke ALL PASS；probe-smoke 快速档 5/5；机制探针 12 判据 ALL PASS；`--full` ⑦ 写隔离 PASS（先钉 `DSH_PERMISSION_MODE=workspace-write`）。
-- **证伪与修正**：⑦ 首跑在本机默认（danger-full-access）红——「无条件沙箱拒」被证伪，根因 = 本机 Seatbelt 禁用的 env.sh 机器条件处方；钉 workspace-write 重跑绿。V6 行与定稿第 4 条、`docs/presets.md` 均改**模式依赖**口径（workspace-write 部署下分身不可写；不宣称绝对隔离）。另实测 watcher 强于合同：运行中会话的 catalog 也刷新。
+- **证伪与修正**：⑦ 首跑在本机默认（danger-full-access）红——「无条件沙箱拒」被证伪，根因 = 本机 Seatbelt 禁用的 env.sh 机器条件处方；钉 workspace-write 重跑绿。V6 行与定稿第 4 条、`docs/contracts/presets.md` 均改**模式依赖**口径（workspace-write 部署下分身不可写；不宣称绝对隔离）。另实测 watcher 强于合同：运行中会话的 catalog 也刷新。
 - **测试资产收割**：`tests/host/cultivation.spec`（记录读写往返/坏形状/归属分箱/不可达）；`tests/client/cultivation-board.spec`（V1/V2/V7/V8/V9/V10 静态渲染）；`tests/presets` 方法层根断言；`probes/session-context/cultivation-method-layer-probe.mjs`（常驻；头注写明复跑条件与模式依赖）；pack-exports/signoff-tool spec 同步 inject/commands 面。
 - **语义审**：对照拍板三项与验收标准逐行重读全部变更——blocker 0；两处自查修正（spec 黑名单误把产品命令 verify 当开发命令；夹具期望值漏列已采纳自纠记录）。
 - **未验残留（显式）**：`probe-smoke --full` 内容档（本轮仅组合改动未动 persona 文案）；培养面板的浏览器视觉走查/视觉夹具（keyless 静态渲染 + client-load-smoke 真挂载已过，视觉档留给下次观察窗走查）；按钮式采纳（钉版无 pack 自有 UI→host 动作通道，另立卡引用本卡）；多人真实使用回路（单操作者现实）。

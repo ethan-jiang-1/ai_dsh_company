@@ -223,9 +223,9 @@ intent: 盘点通用能力、领域知识与公司细节在仓库里的实际分
 
 ## 10. 与既有合同的关系（立卡理由）
 
-- **D17**（`docs/decisions.md:25`）："pack 不含公司事实（出厂样例除外——`content/state` 与 `charters` 是首启只补缺的默认值）"。
+- **D17**（`docs/reference/decisions.md:25`）："pack 不含公司事实（出厂样例除外——`content/state` 与 `charters` 是首启只补缺的默认值）"。
   手册是只读产品内容、**不在例外内**，却装了公司事实与政策数字——合同自相矛盾。
-- **`docs/presets.md:113`**：把"职责边界与路由"的唯一事实家指定为这份手册——等于把公司模型焊进产品内容。
+- **`docs/contracts/presets.md:113`**：把"职责边界与路由"的唯一事实家指定为这份手册——等于把公司模型焊进产品内容。
 - **`role-content-plan §0.2`**：persona 管"是谁"、skills 管"怎么做"、KB 管"知道什么"；手册是这套三分法之外的第四载体，
   没被任何设计覆盖。
 - **三处"声称可替换、保证只到口头或半边"**（§7.3）：`company.md` 声称会话/视图都读它，UI 侧却写死在 `presence-status.ts`；

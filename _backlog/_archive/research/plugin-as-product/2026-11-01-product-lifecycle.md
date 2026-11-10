@@ -58,7 +58,7 @@ intent: "补齐插件即产品的生命周期状态机、失败模式与验收�
   `packageManager` 时 corepack 可能取 12.x）；DSH CLI 在 PATH 或显式 `DSH_BIN`；Web dist 在场
   （源码通道）；vendor 产物在场（源码通道）；目标 home 可写；目标 workspace 存在/可建。
 - `engines.dsh` 是运行时硬门；README/手册写“可安装 ≠ 已认证”，兼容台账不住包里（C：
-  `docs/release.md`）。
+  `docs/contracts/release.md`）。
 
 ### 2.2 profile 建/装
 

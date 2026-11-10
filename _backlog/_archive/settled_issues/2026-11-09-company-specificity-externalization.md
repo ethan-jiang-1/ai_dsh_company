@@ -27,7 +27,7 @@ opened: 2026-11-09
 - 原型实跑（`checkRequirements`）：不写 `需求层` 时默认要求 StRS 到场（纯软件队红）；显式 `需求层: MRD, PRD` 可豁免；`VR-001` 这类别家编号**无豁免**，直接判退役词。
 - 需求链内部要再分档：**MRD/PRD 半通用**（概念跨行业存在，形态各异；敏捷 + AI 团队常写 User Story / OpenSpec）；**StRS/SyRS/IRS/V&V + 编号合同是特殊**。通用层只保留"该不该做 → 做什么 → 怎么验"的问题脊柱，不给文档名。
 - **包的单位是产品类型，不是行业**：纯软件也不是一条路——2B 项目制、2B SaaS、2C、游戏、工具、服务的主干不同。所以第二个 fixture 选一个具体类型（`b2b-saas`），不建笼统的 `software` 包；每个类型一份自包含包，先不做继承。
-- 与既有合同冲突：D17 只豁免 `content/state` 与 `charters`，手册不在内却装公司事实；`docs/presets.md:113` 又把职责边界与路由的唯一事实家指定为这份手册。
+- 与既有合同冲突：D17 只豁免 `content/state` 与 `charters`，手册不在内却装公司事实；`docs/contracts/presets.md:113` 又把职责边界与路由的唯一事实家指定为这份手册。
 - 载体可行：`systemPrompt.section` 可多段注入；`skills.register/registerProvider` 可挂领域 skill；`checkRequirements` 已接受 `options.layers`。三层不需要新 DSL，唯一要改代码的是 checker 词表参数化。
 - 二轮逐文件审计（[覆盖审计](../research/company-specificity-externalization/2026-11-09-coverage-audit.md)）补了 13 条漏项：`content/contracts/workflow.md` 是**机制/引擎事实**（随 DSH pin，按能力注入——T0 的现成范式）；`org.md:73` 引用具体部署交付物；4 份 charter 各写条线人数、违背 org 自称的"唯一事实家"；"AI 使用声明 + 复核层级"在 4 个模板里逐字复制；persona 是第二混合载体（0.8–1.9KB/人）；公司角色注入基线 21–25KB；client 有 15 类公司文案、显示名三份事实；tools 侧有独立角色名册（漏改不红但错判）。
 

@@ -723,7 +723,7 @@ contexts: {"v":1,"items":[{"kind":"deliverable","ref":"<workspace-relative-path>
 5. **审批行**：`CultivationBoard` 背景卡、展开、打开回调、空正文、坏 contexts；静态 + 交互 spec。
 6. **真浏览器**：扩 `cultivation-gui-probe` 或新 probe；出视觉夹具；窄栏/浮窗。
 7. **结构门禁**：`pnpm verify`；`pnpm test`；`client-load-smoke`。
-8. **文档与 Note**：同 diff 更新 [docs/presets.md](../../../docs/presets.md) 的 `/cultivation` 合同（可选背景 / 空正文 / 记录 `contexts`）；按 [notes/README](../../../notes/README.md) 写实施 Note（决定、输掉的方案、红/绿证据）。本卡只做决策与交接，§6.1 不是实施授权。
+8. **文档与 Note**：同 diff 更新 [docs/contracts/presets.md](../../../docs/contracts/presets.md) 的 `/cultivation` 合同（可选背景 / 空正文 / 记录 `contexts`）；按 [notes/README](../../../notes/README.md) 写实施 Note（决定、输掉的方案、红/绿证据）。本卡只做决策与交接，§6.1 不是实施授权。
 
 **不做**：journal/file 入口、换轮列表（若 v1 成本高可只默认最近一轮）、AI 起草、多段、任务；teammate child 是否纳入先按 §9 Q9 拍板，未拍板不实现。
 
@@ -933,7 +933,7 @@ contexts: {"v":1,"items":[{"kind":"deliverable","ref":"<workspace-relative-path>
 
 | # | 发现 | 证据 | 修正 |
 |---|---|---|---|
-| P0-1 | **角色模型与公司实证不符。** 主协作通道 Agent Teams 的 teammate 会话是 `origin: 'subagent'`，且 `agentPreset` **继承 Lead（ceo）**；`vp-eng`/`cfo` 只出现在根会话或命名委托 child。§5.6“根会话优先 + 按 agentPreset 排目标角色”会把 CFO teammate 标成 CEO，甚至直接过滤掉。 | replay 首帧实证：`snapshots/replay/r2-motion/sessions/cfo-*.jsonl` / `coo-*.jsonl` / `vp-*.jsonl` 均 `agentPreset: "ceo"`、`origin: "subagent"`；合同 = [docs/presets.md](../../../docs/presets.md) 角色组合表 + [docs/delegation.md](../../../docs/delegation.md) §3；`agentTeam` 投影 `members[].name` 是 teammate 身份（[presence.ts](../../../packages/company-pack/src/lib/presence.ts) 已在用）。 | 角色标签按优先级解析：① `agentPreset` 属五角色名册（根/命名 child）；② Lead 的 `agentTeam` 投影 `members[].name`；③ 无证据 → 不显示角色徽标。**不要 root-only**；把 direct child 及其 address 纳入，记录存 `parentSessionId`/`mode`（或 child address）。补 teammate 夹具 spec。 |
+| P0-1 | **角色模型与公司实证不符。** 主协作通道 Agent Teams 的 teammate 会话是 `origin: 'subagent'`，且 `agentPreset` **继承 Lead（ceo）**；`vp-eng`/`cfo` 只出现在根会话或命名委托 child。§5.6“根会话优先 + 按 agentPreset 排目标角色”会把 CFO teammate 标成 CEO，甚至直接过滤掉。 | replay 首帧实证：`snapshots/replay/r2-motion/sessions/cfo-*.jsonl` / `coo-*.jsonl` / `vp-*.jsonl` 均 `agentPreset: "ceo"`、`origin: "subagent"`；合同 = [docs/contracts/presets.md](../../../docs/contracts/presets.md) 角色组合表 + [docs/contracts/delegation.md](../../../docs/contracts/delegation.md) §3；`agentTeam` 投影 `members[].name` 是 teammate 身份（[presence.ts](../../../packages/company-pack/src/lib/presence.ts) 已在用）。 | 角色标签按优先级解析：① `agentPreset` 属五角色名册（根/命名 child）；② Lead 的 `agentTeam` 投影 `members[].name`；③ 无证据 → 不显示角色徽标。**不要 root-only**；把 direct child 及其 address 纳入，记录存 `parentSessionId`/`mode`（或 child address）。补 teammate 夹具 spec。 |
 | P0-2 | **`session.follow` 会 promote 冷会话。** Host 在 snapshot 之后对 `prepared` 的 ordinary session 调 `promote`（后台 `resolveObservedAgent`）。§2.4 把它列为“未实测”，但代码已明写；只取第一帧并让迭代器 `break`/`return` 才跳过（**单独 abort 不够**）。 | `vendor/dsh/packages/api/session-controller/src/history.ts:204-212`；`vendor/dsh/packages/api/session-controller/src/index.ts:225`（`promote`）。 | 明写“只取第一帧 + `break`/`return`，不拉第二帧”，并加探针断言无 Agent 激活；或冷会话改走 host `ctx.sessionQuery.observeSession`（非激活）。把这条从“未实测”升为“代码已确认、运行时待验”。 |
 | P0-3 | **“打开原文失败时明说”实现不了。** `uiWorkspace.openSession` / `sidebarRight.openResource` 都是同步 fire-and-forget，没有失败回调；`openResource` 在会话 store 未 adopt 时静默 no-op。 | `vendor/dsh/packages/client/ui-workspace/src/client/navigation.ts:499-529`；`vendor/dsh/packages/client/ui-sidebar-right/src/client/service.ts:322-330`。 | 渲染前预检：会话查 `sessions.list`/`subagentAddress`，文件查 `workspaceFiles.stat`；缺失就不出按钮并写明“原文不在了”。同步抛错可 catch；异步历史加载失败归会话视图，不承诺卡片内提示。 |
 | P0-4 | **快照归属（谁读、谁写）没有比较。** 卡里直接选“客户端读 + base64 客户端快照”，没有和 **host 侧 `sessionQuery` 读后快照** / **只存结构化引用 + 按需打开** 比较。客户端快照可伪造、可过期，并把 base64 复制进会话日志。 | `ctx.sessionQuery.observeSession/readSurface` 明确不激活 Agent（[session-query README](../../../vendor/dsh/packages/session-query/session-query/README.md)）；[session-reference README](../../../vendor/dsh/packages/context/session-reference/README.md) 的投影先例；`commands` 的 `recordInput` 选项（[types.ts](../../../vendor/dsh/packages/interaction/commands/src/types.ts)）。 | §5.13 增加 K（host 读后快照）与 L（结构化引用 + 按需打开）；先拍板“快照是自包含证据还是可打开引用”。若保留客户端快照，明写信任模型并接受日志副本；或设 `recordInput: false`（代价：失去命令 args 审计）。 |
@@ -949,7 +949,7 @@ contexts: {"v":1,"items":[{"kind":"deliverable","ref":"<workspace-relative-path>
 6. **`record.title` 空正文 = `（空）`**：`journalTitle('')` 返回“（空）”；§4.5 处理了待办行，但“我提交的”仍用 `record.title`。补背景摘要/空正文回落。
 7. **换轮列表 vs follow 窗口**：§4.3 承诺“最近 6 轮”，§5.6 只取 `maxMessages: 20, minTurns: 2`。要么把窗口抬到覆盖 6 轮，要么把换轮放 v1.1，别两处都写。
 8. **`readCatalog` 2000 行上限**：索引当前约 580 行没问题，但成品增长后会截断 JSON；§5.10 说“一次读”没提上限。用 `read` 的 `limit: 5000`（maxLines）或 `readBytes` + 解析失败可读错误。
-9. **文档与 Note**：`docs/presets.md` 是 `/cultivation` 与培养记录的现行合同，改命令/记录/空正文必须同 diff 更新；非平凡变更还要按 [notes/README](../../../notes/README.md) 落 Note。§6/§7 没有这两项。
+9. **文档与 Note**：`docs/contracts/presets.md` 是 `/cultivation` 与培养记录的现行合同，改命令/记录/空正文必须同 diff 更新；非平凡变更还要按 [notes/README](../../../notes/README.md) 落 Note。§6/§7 没有这两项。
 10. **§11 的“按 §6.1 实施”与本卡“不是实施授权”冲突**：拍板「做」应先收敛验收标准 + 提交下游申请（[issue-to-note](../../methods/issue-to-note.md)），由下游决定实施；§6.1 只是建议顺序。
 
 ### 12.3 DSH 支持面（本卡漏掉/低估的）
@@ -1036,7 +1036,7 @@ contexts: {"v":1,"items":[{"kind":"deliverable","ref":"<workspace-relative-path>
 ### 13.3 P1：小改，但会误导实现
 
 1. **P0-3 的证据写错**：`sidebarRight.openResource` 在无会话面时**抛错**（`vendor/dsh/packages/client/ui-sidebar-right/src/client/service.ts:723-733`），不是“静默 no-op”；静默 no-op 是 tab 域路径（同文件 337-340）。结论（无异步失败回调、需预检）不变，改这句话即可。
-2. **P1-9 已过期**：§6.1 第 8 步已写 `docs/presets.md` + Note，§12.2 P1-9 的“§6/§7 没有这两项”不成立；改成“§7 未给 docs 更新设验收项”。
+2. **P1-9 已过期**：§6.1 第 8 步已写 `docs/contracts/presets.md` + Note，§12.2 P1-9 的“§6/§7 没有这两项”不成立；改成“§7 未给 docs 更新设验收项”。
 3. **P1-1/P1-7/P1-8 仍是 ⚠ 不是决定**：§5.2 还写 `--context <payload>`（空格形），§7.1 说“按 §5.2 的 `--context=` 或拒绝规则断言”——验收标准不能是“或”。选一个：`--context=` 精确形（推荐），或“期望句以 `--context` 开头就拒绝”。换轮：§4.3 承诺最近 6 轮，§5.6 的 `minMessages 6/minTurns 2` 覆盖不了；要么抬到 `maxMessages ≥ 12, minTurns 6`，要么把换轮放 v1.1 并从 §4.3 删。`readCatalog`：改共享的 `readCatalog` 会同时影响成品页签（`packages/company-pack/src/client/index.ts:202`），写明爆炸半径。
 4. **§3.3 的 ≤3/≤5 次交互没有验收**：§7 没有一条测它；要么在 probe 里数点击并断言，要么把数字降成“原则”。
 5. **§4.5 的“我提交的”空正文**：P1-6 说改用背景标题，§7.3 只测了待办行；补一条。

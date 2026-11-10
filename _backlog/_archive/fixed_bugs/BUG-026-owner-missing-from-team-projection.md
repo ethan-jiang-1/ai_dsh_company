@@ -75,7 +75,7 @@ sed -n '36,42p' vendor/dsh/packages/experimental/agent-team/src/task-view.ts    
 ## 修复关联
 
 **能不能修，取决于 DSH 能不能给我们 ownerId**——**vendor 铁律不许改 `vendor/`**，所以三条正路
-（[release.md §vendor 政策](../../../docs/release.md)）：
+（[release.md §vendor 政策](../../../docs/contracts/release.md)）：
 
 1. **正路一（首选，最可能是真解）**：`teamTaskViewSchema` 把 `ownerName` 加回去/`ownerId` 露出来——
    **提上游升 pin**。这是上游的一个真缺口：官方 `client-ui-agent-team` 的 TeamAction 若要显示 owner，

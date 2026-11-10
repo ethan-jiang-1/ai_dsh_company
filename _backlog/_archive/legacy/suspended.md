@@ -11,8 +11,8 @@
 | **每角色一色的分类色板令牌** | [role-identity-ux §七-2](../../../notes/archived/2026-09-26-role-identity-ux.md) | 平台无分类色板令牌（182 令牌只有语义状态色），feature 包禁写字面色；用户实测同色药丸方向感"勉强能"。**裁定留本仓** | MVP 视觉打磨需要时，或未来决定与上游协作 |
 | **审批载荷带稿件版本/哈希** | [multi-human-ux](../../../notes/archived/2026-09-26-multi-human-ux.md) 签署腿 | 审批→版本绑定只在自由文本，事件无结构化版本字段（源码核实）；实测 v2/v3 穿透错位。**裁定留本仓** | MVP 对账需求出现，或未来决定与上游协作 |
 | **自主节律**（分身定期复盘） | [implemented/twin-cultivation](../../../notes/archived/2026-09-24-twin-cultivation.md) | 机制不闭合：`goal` 需人类授权且 session-start 一律 disarm；`schedule` 只在 live 会话投递且默认没装；全树无 cron | 上游补"外部触发 ↔ 会话内自主续跑"的 seam——**提 seam，不自建调度器**（D9/D13） |
-| **并行快捷派活**（同时开几个 VP） | [delegation.md](../../../docs/delegation.md) §4.4 | 本组合无干净解法：缺 per-child composition 与不撞名的控制面 | 上游 seam |
-| **可重放叙事场景**（原拟名「场景 D」，与 [demo.md](../../../docs/demo.md) 现行场景 D 撞名 ⇒ 已改名） | implemented/presentation-narrative（已删，历史在 git） §切片二 | 需求未出现：无放映场合；素材已备 | demo／放映需求出现 |
+| **并行快捷派活**（同时开几个 VP） | [delegation.md](../../../docs/contracts/delegation.md) §4.4 | 本组合无干净解法：缺 per-child composition 与不撞名的控制面 | 上游 seam |
+| **可重放叙事场景**（原拟名「场景 D」，与 [demo.md](../../../docs/contracts/demo.md) 现行场景 D 撞名 ⇒ 已改名） | implemented/presentation-narrative（已删，历史在 git） §切片二 | 需求未出现：无放映场合；素材已备 | demo／放映需求出现 |
 | **注意力中心「带假设走的」条目类别**（人机合一 B3） | [implemented/human-agent-integration](../../../notes/archived/2026-09-25-human-agent-integration.md) B3 | 证伪：假设只写稿件未决项，无机器事件可折；造事件 = 发明假设工具（D13 边缘） | 多物理人进场，或假设事件源出现 |
 | **注意力面板「决策来源显示」**（人机合一 B4） | 同上 B4 | client 红线（用户 2026-09-25 裁决退化）；审批成对审计 + journal 留痕已覆盖回看 | 用户点名做 client 增强 |
 | RemoteStream 双工流 | 收割判定（记录已删） | 无交互式面板需求 | 交互式面板（插话/追加油）立项 |

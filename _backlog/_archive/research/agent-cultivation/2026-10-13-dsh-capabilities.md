@@ -11,7 +11,7 @@ intent: "核对钉住的 DSH 能力，判断公司角色个性化培养与 CEO �
 
 本研究依据仓库 pin 的 `vendor/dsh`，不是日用全局安装：根 `AGENTS.md` 记载 tag `dsh-v0.2.0-rc.2`、SHA `639ed015397290b3745d163aafe02ffee4aa3f84`；本轮 `git -C vendor/dsh rev-parse HEAD` 得到同一 SHA，`git -C vendor/dsh status --short` 无输出。只读 vendor 文件。源码证据链接均为相对 `vendor/dsh/` 的路径。
 
-公司当前合同与 live Inspect 不混为一谈：[`docs/presets.md`](../../../../docs/presets.md) 及 [`packages/company-pack/cordis.patch.yml`](../../../../packages/company-pack/cordis.patch.yml) 是本仓合同/装配；当前 global Inspect 返回的是运行中组合的事实，不能代替 pin 源码，也不能单独证明 CEO/非 CEO preset 的会话行为。Inspect 是只读查询面，不是可供角色调用的业务 Service API。live `conversation.view` 只显 chat/trajectory、没有 company occupant，因此该 Inspect 视图也不是公司挂载截图证据。
+公司当前合同与 live Inspect 不混为一谈：[`docs/contracts/presets.md`](../../../../docs/contracts/presets.md) 及 [`packages/company-pack/cordis.patch.yml`](../../../../packages/company-pack/cordis.patch.yml) 是本仓合同/装配；当前 global Inspect 返回的是运行中组合的事实，不能代替 pin 源码，也不能单独证明 CEO/非 CEO preset 的会话行为。Inspect 是只读查询面，不是可供角色调用的业务 Service API。live `conversation.view` 只显 chat/trajectory、没有 company occupant，因此该 Inspect 视图也不是公司挂载截图证据。
 
 ## 确证事实
 
@@ -21,7 +21,7 @@ intent: "核对钉住的 DSH 能力，判断公司角色个性化培养与 CEO �
 - `dsh-skill-filesystem` 可扫描 project、custom、user roots；配置 `customSkillDirs` 将附加根插在项目根之后、user 根之前，多个目录按声明顺序提供。frontmatter 是 catalog 元数据，正文按需加载；skill 正文每次 load 重读当前文件。见 [`packages/skill/skill-filesystem/README.md`](../../../../vendor/dsh/packages/skill/skill-filesystem/README.md) 与 [`packages/skill/skill-filesystem/src/index.ts`](../../../../vendor/dsh/packages/skill/skill-filesystem/src/index.ts)。因此“部署本地个性化 root + pack 通用技能”是无改 DSH 源码的候选：custom root 可承载部署资料，pack 可承载通用技能；但个性化能否按角色隔离，不能仅凭“root 本地”推断，仍须验证 scope、root 设置位置、优先级与同名覆盖行为。
 - `dsh-tool-skill` 在首个请求前给模型技能名与摘要目录，使用 `skill` 工具加载全文；catalog 成员变化追加完整替换目录。正文改动不改 catalog digest、不通知模型；后续再次调用会读新正文，既有工具结果不会被改写或提示正文已更新。见 [`packages/skill/tool-skill/README.md`](../../../../vendor/dsh/packages/skill/tool-skill/README.md)。
 - `skill-filesystem` 的 watcher 会使新增、改名、删除和 frontmatter 编辑在后续模型步骤刷新 catalog；正文每次 load 读盘，不需版本/cache invalidation。references/assets 等资源子树编辑不触发 catalog refresh。无 watcher 时另有第一方 fs write/edit invalidation 路径；shell 与外部写入的检测边界以 README 为准。见 [`packages/skill/skill-filesystem/README.md`](../../../../vendor/dsh/packages/skill/skill-filesystem/README.md)。
-- 每个 Agent preset 是声明式、独立组合；preset registry 不提供目录扫描或 preset 文件编辑 API。存活 Agent 保留创建时的组合，新 Agent 使用当前定义；恢复后按保存的 preset id 取当前定义。见 [`packages/preset/agent-preset/README.md`](../../../../vendor/dsh/packages/preset/agent-preset/README.md) 与 [`packages/preset/agent-preset-registry/README.md`](../../../../vendor/dsh/packages/preset/agent-preset-registry/README.md)。本仓自己的四形态合同也明确工具/skills 不继承，角色根 preset 自包含；teammate 和 child 继承 Lead 组合。见 [`docs/presets.md`](../../../../docs/presets.md) §四形态矩阵与工具面。
+- 每个 Agent preset 是声明式、独立组合；preset registry 不提供目录扫描或 preset 文件编辑 API。存活 Agent 保留创建时的组合，新 Agent 使用当前定义；恢复后按保存的 preset id 取当前定义。见 [`packages/preset/agent-preset/README.md`](../../../../vendor/dsh/packages/preset/agent-preset/README.md) 与 [`packages/preset/agent-preset-registry/README.md`](../../../../vendor/dsh/packages/preset/agent-preset-registry/README.md)。本仓自己的四形态合同也明确工具/skills 不继承，角色根 preset 自包含；teammate 和 child 继承 Lead 组合。见 [`docs/contracts/presets.md`](../../../../docs/contracts/presets.md) §四形态矩阵与工具面。
 
 ### 2. 两种 session feedback 都不是模型的“培养输入”
 
@@ -42,8 +42,8 @@ intent: "核对钉住的 DSH 能力，判断公司角色个性化培养与 CEO �
 
 ## 机制限制与范围
 
-- **“人人培养自己角色分身”目前不等于每个运行时 agent 自己改 preset。** 本仓合同规定培养权是 repo 写权限，skill/preset 自改已否决；DSH preset 是部署组合，不是角色会话的自助 profile editor。角色定制可能有 workspace/local skill 载体，但要验证授权人、作用域及部署边界，不能绕过 repo/pack 权限事实。既有裁定见 [`notes/implemented/2026-09-24-twin-cultivation.md`](../../../../notes/archived/2026-09-24-twin-cultivation.md) 与 [`docs/presets.md`](../../../../docs/presets.md) §培养回路。
-- **CEO spawn 继承错挂风险真实存在。** 本仓记录 teammate/child 使用 `composeFrom ⇒ agentPreset=ceo`，不是目标职能 preset（[`docs/presets.md`](../../../../docs/presets.md)）；若为非 CEO 个性化技能仅加在其独立 preset，CEO 委派出的对应角色不会自动加载它。反之，若将个人技能放在 global root，可能扩散给所有可见其根的 agent。两种结果都需从 live 会话 scope/catalog 验证。
+- **“人人培养自己角色分身”目前不等于每个运行时 agent 自己改 preset。** 本仓合同规定培养权是 repo 写权限，skill/preset 自改已否决；DSH preset 是部署组合，不是角色会话的自助 profile editor。角色定制可能有 workspace/local skill 载体，但要验证授权人、作用域及部署边界，不能绕过 repo/pack 权限事实。既有裁定见 [`notes/implemented/2026-09-24-twin-cultivation.md`](../../../../notes/archived/2026-09-24-twin-cultivation.md) 与 [`docs/contracts/presets.md`](../../../../docs/contracts/presets.md) §培养回路。
+- **CEO spawn 继承错挂风险真实存在。** 本仓记录 teammate/child 使用 `composeFrom ⇒ agentPreset=ceo`，不是目标职能 preset（[`docs/contracts/presets.md`](../../../../docs/contracts/presets.md)）；若为非 CEO 个性化技能仅加在其独立 preset，CEO 委派出的对应角色不会自动加载它。反之，若将个人技能放在 global root，可能扩散给所有可见其根的 agent。两种结果都需从 live 会话 scope/catalog 验证。
 - **Preset 定义更新不会改已有 Agent 组合。** 更新 preset 后需新 Agent 才使用定义；恢复 session 按 id 使用当前定义。不要把已有会话的 prompt prefix 变化误当成即时热更新。
 - **Skill 正文历史是 append-only。** 已加载旧正文留在工具历史；更改文件不会改写旧结果，且正文改动没有独立版本提醒。培养评审需要比较实际读到的正文/日志。
 - **Feedback 不自带审批或建议路由。** message-feedback API 没有 actor 身份；任何 Web gateway 的身份/授权必须由部署另证。approval 的“allow once”不应借用作建议确认或持久授权。
@@ -69,5 +69,5 @@ intent: "核对钉住的 DSH 能力，判断公司角色个性化培养与 CEO �
 ## 引用入口
 
 - DSH pin 与只读政策：根 [`AGENTS.md`](../../../../AGENTS.md)；本轮实际 pin 查询如上。
-- 现有培养合同：[`docs/presets.md`](../../../../docs/presets.md) §培养回路与学习载体；决定证据：[`notes/implemented/2026-09-24-twin-cultivation.md`](../../../../notes/archived/2026-09-24-twin-cultivation.md)。
+- 现有培养合同：[`docs/contracts/presets.md`](../../../../docs/contracts/presets.md) §培养回路与学习载体；决定证据：[`notes/implemented/2026-09-24-twin-cultivation.md`](../../../../notes/archived/2026-09-24-twin-cultivation.md)。
 - Vendor mechanism: skill registry [`packages/skill/skill/src/index.ts`](../../../../vendor/dsh/packages/skill/skill/src/index.ts), filesystem provider [`packages/skill/skill-filesystem/src/index.ts`](../../../../vendor/dsh/packages/skill/skill-filesystem/src/index.ts), tool consumer [`packages/skill/tool-skill/README.md`](../../../../vendor/dsh/packages/skill/tool-skill/README.md), preset [`packages/preset/agent-preset-registry/README.md`](../../../../vendor/dsh/packages/preset/agent-preset-registry/README.md), feedback [`packages/feedback/message-feedback/README.md`](../../../../vendor/dsh/packages/feedback/message-feedback/README.md), session query [`packages/session-query/tool-session-query/README.md`](../../../../vendor/dsh/packages/experimental/tool-session-query/README.md), approval [`packages/interaction/user-approval/README.md`](../../../../vendor/dsh/packages/interaction/user-approval/README.md), user questions [`packages/interaction/user-questions/README.md`](../../../../vendor/dsh/packages/interaction/user-questions/README.md)。

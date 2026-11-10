@@ -93,7 +93,7 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 ### R4-03（P1，D4）回放证据链仍有两套相反说法
 
 - `tests/README.md:33`：“**语料回放全绿 = 升 pin 回归网第一道**”。
-- `docs/release.md:123-125`：本仓现行回放只有一个**不加载 company-pack** 的 headless 合成场景，只证明“回放管线可跑”，**不要把它当第一道**；公司行为真实录制已移私有仓。
+- `docs/contracts/release.md:123-125`：本仓现行回放只有一个**不加载 company-pack** 的 headless 合成场景，只证明“回放管线可跑”，**不要把它当第一道**；公司行为真实录制已移私有仓。
 - `tests/README.md:27` 仍要求“受影响 replay 场景同 diff 重录”，并引用已不存在的 r3 full 档。
 - `checks/smoke/replay-smoke.mjs` 头注第 7、16-22 行仍把 `--ui` / r3-delegation 写成可用模式；代码第 91-95 行直接 exit 2。
 - `docs/testing.md:19` 仍把 `candidate-scan 语料` 列为行为质量档；`:62` 又说本仓无该资产、eval exit 2。`tests/README.md:66`、`docs/project-map.md:90` 同族。
@@ -134,9 +134,9 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 
 | ID | 级 | 维 | 文件:行 | 证据 / 影响 |
 |---|---|---|---|---|
-| R4-09 | P2 | D1/D4 | `AGENTS.md:31`、`docs/AGENTS.md:4`（另见第 14 行）、`docs/project-map.md:20`、`docs/design/architecture.md:4`（另见第 106 行） | 仍把“决策台账”路由到 `index.md`；实际家 = `docs/decisions.md`（`index.md:53` 自己说已迁）。同时 5 处“外部研究材料登记”仍指 index，实际家 = `docs/external-research.md`。 |
+| R4-09 | P2 | D1/D4 | `AGENTS.md:31`、`docs/AGENTS.md:4`（另见第 14 行）、`docs/project-map.md:20`、`docs/design/architecture.md:4`（另见第 106 行） | 仍把“决策台账”路由到 `index.md`；实际家 = `docs/reference/decisions.md`（`index.md:53` 自己说已迁）。同时 5 处“外部研究材料登记”仍指 index，实际家 = `docs/reference/external-research.md`。 |
 | R4-10 | P2 | D1/D4 | `docs/design/architecture.md:44-79` | “下面是完整配方”的 YAML 是顶层 `- id: persona`；真实 preset 是 `- insert: - id: preset-ceo` + `plugins:`（`presets/ceo/agent.cordis.yml:9-16`）。照抄出不了可挂载 preset；设计层还明文排除实现细节。 |
-| R4-11 | P2 | D3 | `AGENTS.md:48`、`docs/presets.md:179-180`、`.agents/skills/preset-change-definition/SKILL.md:13-16`、`.agents/skills/close-out-definition/SKILL.md:35` | 四份“preset 完成定义”：仅 preset-smoke／+verify+test+probe --full／+场景+收割／verify+test。最低成本读法也能自称完成。 |
+| R4-11 | P2 | D3 | `AGENTS.md:48`、`docs/contracts/presets.md:179-180`、`.agents/skills/preset-change-definition/SKILL.md:13-16`、`.agents/skills/close-out-definition/SKILL.md:35` | 四份“preset 完成定义”：仅 preset-smoke／+verify+test+probe --full／+场景+收割／verify+test。最低成本读法也能自称完成。 |
 | R4-12 | P2 | D3 | `docs/guides/dev-loop.md:45-46` vs `:72`、`docs/testing.md:55` | §1 顺序 = 实施→选证据；§3④ / 宪法 §3.8 = 测试/场景先行。照 §1 字面执行即违反测试先行。 |
 | R4-13 | P2 | D1/D5 | `tests/README.md:24-35` | 映射表只有 src/lib、src/client、“pack 导出/注册面”；`src/host/` 的 bootstrap/catalog/cultivation/lease 等 8 模块 3226 行没有行。场景②只能猜检查层。 |
 | R4-14 | P2 | D1 | `docs/AGENTS.md:30`、`checks/gates/doc-budget.mjs:15` | 文档称“留 ≥5% 头寸”，门禁只拒 >20% 空置；实测 11/32 篇 <5%（release-runbook 0%、presets 1.5%、decisions 1.7%、AGENTS 2.4%…）。`docs/guides/budget-and-ops.md`（68 行）与 `docs/guides/cdp-probe.md`（64 行）无预算，门禁无完整性断言。 |
@@ -144,9 +144,9 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 | R4-16 | P2 | D2/D5 | `client/DeliverablesTab.tsx:98`；`host/bundle-manifest.ts:225`、`host/catalog.ts:43`、`client/cultivation-context-data.ts:89`；`lib/presence.ts:147`、`lib/cultivation-inbox.ts:59`、`lib/cultivation-context.ts:338`；`tests/{client,company}/deliverables-catalog.spec.ts` | `parseCatalog` 埋在 .tsx 却被数据模块与 company spec 反向依赖；`isRecord` 3 份逐字相同；`clip` 3 份语义不同；同名 spec + 同名对象（src/lib 与 tools/lib）并存。 |
 | R4-17 | P2 | D2 | `checks/gates/src-layering.mjs:25`；`tools/lib/src-layering.mjs` | 只守字面相对 import 的方向：模板串/计算式 dynamic import、`require()`、`import x = require()` 全不可见；注释里的 `from '../host/x.ts'` 会被扫成违规（假阳）；无环/导出面检查。 |
 | R4-18 | P2 | D6 | `checks/smoke/ui-scene-smoke.mjs` 第 128-139、162-177 行；另见第 81-82 行 | golden 失败时 `scene.json` 仍 `probeExit:0`、无 golden 结果；`--keep` 只打 base，不打带 token 的 URL；证据无 URL/home。 |
-| R4-19 | P3 | D4 | `docs/decisions.md:51-53`；`docs/data-model.md:15`（另见第 67 行）；`AGENTS.md:40`；`docs/project-map.md:90` | D46 排在 D45 前；D44 指两个 Note 家；data-model 同一规则写 2 次；AGENTS 说“environments §6”而该文件只有 1 个标题；project-map 仍说“行为质量语料有独立标注”。 |
+| R4-19 | P3 | D4 | `docs/reference/decisions.md:51-53`；`docs/contracts/data-model.md:15`（另见第 67 行）；`AGENTS.md:40`；`docs/project-map.md:90` | D46 排在 D45 前；D44 指两个 Note 家；data-model 同一规则写 2 次；AGENTS 说“environments §6”而该文件只有 1 个标题；project-map 仍说“行为质量语料有独立标注”。 |
 | R4-20 | P3 | D1 | `docs/orient.md:42`；`checks/README.md:5`（另见第 16 行） | `orient` 说“不复制门名”后立刻复制四条，第四条写“批得下”（owner = “已获批”）；checks/README 把分层指向 dev-loop §9.1，而 §9.1 是三行转指 tests/README 的桩。 |
-| R4-21 | P3 | D4 | `docs/profile.md:12`；`docs/design/ui-demo.md:132`；`packages/company-pack/README.md:23` | profile 把 `headless` 写成“源码直跑 ✅ R0 已验收”，而 README/AGENTS 都说 headless 不是公司运行；ui-demo v3 仍写四面板“用量”（现第四 = 培养）；包 README 的“关注”同上。 |
+| R4-21 | P3 | D4 | `docs/contracts/profile.md:12`；`docs/design/ui-demo.md:132`；`packages/company-pack/README.md:23` | profile 把 `headless` 写成“源码直跑 ✅ R0 已验收”，而 README/AGENTS 都说 headless 不是公司运行；ui-demo v3 仍写四面板“用量”（现第四 = 培养）；包 README 的“关注”同上。 |
 | R4-22 | P3 | D1 | `docs/index.md:34`（另见第 39-43 行）、`docs/AGENTS.md:12`（另见第 12-19 行） | 索引出现“规范”“导航”两个层表未定义的标签；“导航/常驻入口”两套叫法，层词汇不封闭。 |
 
 ## 5. 健康面（别动）

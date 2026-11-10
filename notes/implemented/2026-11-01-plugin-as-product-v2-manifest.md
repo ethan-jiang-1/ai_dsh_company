@@ -93,7 +93,7 @@
 ## 新门禁红→还原→绿（原话）
 
 - `dist-manual`：把手册唯一合同句 `一次安装 = 一个 DSH home` 改成 `多个` → `FAIL dist-manual: 手册缺「一次安装 = 一个 home + 一个用户 workspace」合同`；还原 → `verify: ALL PASS`。
-- `doc-budget`：`docs/data-model.md` 临时加 2 行 → `FAIL doc-budget: docs/data-model.md 78 行超上限 76`；还原 → `verify: ALL PASS`。
+- `doc-budget`：`docs/contracts/data-model.md` 临时加 2 行 → `FAIL doc-budget: docs/contracts/data-model.md 78 行超上限 76`；还原 → `verify: ALL PASS`。
 - `script-index`：从 `checks/README.md` 删掉 `company-entry-smoke` 行 → `FAIL script-index: 未入索引的公开入口：checks/smoke/company-entry-smoke.mjs`；还原 → `verify: ALL PASS`。
 - `tracked-portability`（push 前实际红）：研究稿 `$T/home` 命中 `/home/<name>/` 绝对路径规则 → `FAIL tracked-portability`；改 `$T/h` → 全绿。
 - `dist-freshness`（重导前实际红）：手册/tarball sha 与 manifest 不同代 → `FAIL dist-freshness`；`release --prepare --force` → 全绿。

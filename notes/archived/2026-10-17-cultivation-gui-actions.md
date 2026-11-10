@@ -87,4 +87,4 @@
 - 推敲卡（含输入清单把手审计 / 时刻地图 / 迭代框架与单向门 / 体验协议 / 第 2 轮预案）=
   [_backlog/_archive/settled_issues/2026-10-17-cultivation-gui-actions.md](../../_backlog/_archive/settled_issues/2026-10-17-cultivation-gui-actions.md)
 - 前决定：[agent-cultivation-loop](./2026-10-13-agent-cultivation-loop.md)（其「输掉的方案」里"UI 按钮采纳"一条的**前提**被本 Note 证伪）；
-  合同面：[presets.md 角色方法层行](../../docs/presets.md)
+  合同面：[presets.md 角色方法层行](../../docs/contracts/presets.md)

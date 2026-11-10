@@ -11,7 +11,7 @@ E1/E2（调研卡，已实测）钉死了地基：**会话内守卫真实生效�
 
 1. **守卫边界进手册**（R0-1）：[公司手册](../../packages/company-pack/content/AGENTS.md)「协作规矩」新增**写盘守卫**
    条（先读再写/盲写拒/stale 拒/会话记账进程重启清零/**管新鲜度不管独占**）；
-   [multi-human.md §3](../../docs/multi-human.md)「机制实况」刷新为 E1/E2 实测版（原"read-before-write
+   [multi-human.md §3](../../docs/contracts/multi-human.md)「机制实况」刷新为 E1/E2 实测版（原"read-before-write
    是可选插件的按会话观察"改判：base bundle 常驻 + 行为实测 4/4 绿）。
 2. **占位=认领**（R0-2(a)）：抢注语义 = 开场先落 `drafts/<角色>.md`，**首行一字不差**
    「占位=认领，非出稿」——合同家 = multi-human §3 **纪律 5**（"文件已存在≠认领"的唯一例外）+

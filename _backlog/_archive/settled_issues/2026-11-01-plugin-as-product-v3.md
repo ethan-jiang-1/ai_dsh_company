@@ -111,7 +111,7 @@ opened: 2026-11-01
 ## 当前情况（0.5.0，2026-11-01）
 
 - **入口**：packages/company-pack/bin/dsh-company.mjs（0.6.0 已删除）；`package.json` `bin.dsh-company`；`tools/company.mjs` 转发；`_dist/安装手册.md` 教 .../node_modules/.bin/dsh-company --workspace（历史，已删除）。
-- **profile 写者**：`ensureProfile` 建/验 profile；`ensureRegistrarPatch` 写 `profiles/company/cordis.patch.yml` 的 `company-workspace-register` 行；`docs/profile.md` 明说 registrar 放 profile patch。
+- **profile 写者**：`ensureProfile` 建/验 profile；`ensureRegistrarPatch` 写 `profiles/company/cordis.patch.yml` 的 `company-workspace-register` 行；`docs/contracts/profile.md` 明说 registrar 放 profile patch。
 - **workspace 绑定**：`resolveWorkspace` 用 `--workspace` / `DSH_COMPANY_HOME` / `settings.json` 最近；`run()` 拒绝同 home 第二盘；无 TTY 直接 fail。
 - **内容 copy**：`bootstrap.ts` 的 `planBootstrap`/`applyBootstrap` 复制 pack `workspace/` 到用户 workspace；`bundle-manifest.ts` 把 `AGENTS.md`/`templates` 哈希写进 v2；`workspace/README.md` 说「启动器指定/seed 骨架」。
 - **账本**：`presented-domain.ts` 是单一 `company_deliverables` domain，`paths`/`slugs` 单表；多 workspace 同相对路径会撞。
@@ -368,5 +368,5 @@ run： <workspace>/.dsh-company/{kb,deliverables,deliverables-archive,cultivatio
 
 - 本轮研究：[插件即产品 v3 研究稿](../research/plugin-as-product-v3/2026-11-01-entry-and-run-bundle-boundary.md)。
 - 上一轮：[伞卡](../../_archive/settled_issues/2026-11-01-plugin-as-product.md)、[落地卡](../../_archive/settled_issues/2026-11-01-landing-plan.md)、[主研究稿](../../_archive/research/plugin-as-product/2026-11-01-plugin-as-product.md)、[v2 manifest Note](../../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)。
-- 当前合同：[README](../../../README.md)、[profile](../../../docs/profile.md)、[runtime map](../../../docs/runtime-map.md)、[data model](../../../docs/data-model.md)、[release](../../../docs/release.md)、[`_dist` 手册](../../../_dist/安装手册.md)。
+- 当前合同：[README](../../../README.md)、[profile](../../../docs/contracts/profile.md)、[runtime map](../../../docs/runtime-map.md)、[data model](../../../docs/contracts/data-model.md)、[release](../../../docs/contracts/release.md)、[`_dist` 手册](../../../_dist/安装手册.md)。
 - 外部 FAQ 26（只读）：`_faq_on_digested/26_plugin-as-product`（2026-11-01 更新：37 生命周期、40 启动/安装、18 安装三成功、17 home 不能供货、16 首启令牌门）。

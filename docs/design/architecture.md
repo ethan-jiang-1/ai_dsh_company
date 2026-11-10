@@ -1,12 +1,12 @@
 # 架构：repo 形态、组合层设计与插件计数
 
 > 什么时候读：想懂公司怎么组装、组合层怎么分层，或改机制前。这份是设计总纲——repo 怎么摆、插件怎么计数，细节按节进。
-> 总入口 = [index.md](../index.md)；决策台账 = [decisions.md](../decisions.md)。
+> 总入口 = [index.md](../index.md)；决策台账 = [decisions.md](../reference/decisions.md)。
 > 依据：FAQ 13（`_faq_on_digested/13_expert-plugin-repo-organization`）+ DSH 源码工作树逐条核实
 > （`packages/preset/*`、`packages/subagent/*`、`packages/experimental/agent-team/*`、`packages/workflow/*`、
 > `vendor/dsh/docs/subsystems/{agent-team,subagent,skills,workflow,spill}.md`）。
 > 性质：设计层——只保留仍指导未来选择的机制依据（为什么选 A 不选 B）；已落地的现在时语义归
-> docs 顶层合同，单次决策归 `notes/`（分层规矩唯一家 = [docs/AGENTS.md](../AGENTS.md)）。
+> docs 当前合同层，单次决策归 `notes/`（分层规矩唯一家 = [docs/AGENTS.md](../AGENTS.md)）。
 
 ---
 
@@ -80,7 +80,7 @@ host 层共享行 + N 个角色 preset + 共享 KB + 模板。插件包（代码
 | ② 第一段真代码（按需） | M2 委托 provider（给委托 child 挂角色 preset，见 [roles-isolation.md](./roles-isolation.md) §2/§3，百行级）；自定义工具行（org_chart、公司检索） | 同一 pack 内新增行 |
 | ③ 拆第二/三个包 | 触发条件（FAQ 13 决策 2 纪律）：某块代码独立演化 / 出现第二个消费方 / 独立发版需求；长出一窝专家才升方案 D | — |
 
-### 2.2 编排主通道（已核定，见 [decisions.md](../decisions.md) D4）
+### 2.2 编排主通道（已核定，见 [decisions.md](../reference/decisions.md) D4）
 
 demo 形态"事件从 CEO 进、从 CEO 出"首选 **Agent Teams（M4）**——只有 Lead 能创建/interrupt
 teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱、teammates 保留 `subagent` 工具
@@ -94,7 +94,7 @@ teammates（组织指挥权内建）、共享任务板 DAG、VP 间持久邮箱�
 行清单的唯一家 = [cordis.patch.yml](../../packages/company-pack/cordis.patch.yml)（bundle 层）与
 [presets/](../../packages/company-pack/presets/) 各角色的 `agent.cordis.yml`（per-preset 层）；这里不复刻枚举（D28）。
 workflow 行：CEO 不挂；vp-eng 的 `delegation` 组挂 `workflow-ptc` + `tool-workflow`（同身份并行扇出，
-2026-11-08；见 [delegation.md §4](../delegation.md)）。
+2026-11-08；见 [delegation.md §4](../contracts/delegation.md)）。
 
 ---
 
@@ -138,7 +138,7 @@ CEO preset 里给每个直接汇报对象配一个 `dsh-tool-subagent` 实例（
   teammate 之后，还能不能用团队版 `send_message`/`list_agents` 驱动命名委托生出来的非 team
   child"。**结论 = 不能**——child 不在名册上，续驶/中断/列举全不可达，故命名委托不承担
   "反复追加意见"（D18；team 才是连续对话的载体）。结论与证据在
-  [delegation.md §2](../delegation.md)，回归守卫 = `checks/smoke/delegation-smoke.mjs`。
+  [delegation.md §2](../contracts/delegation.md)，回归守卫 = `checks/smoke/delegation-smoke.mjs`。
 
 ### 通道 B · Agent Teams（experimental，最贴近"公司开会"）
 
@@ -222,7 +222,7 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
 形态一句话：**独立 repo + `vendor/dsh` 钉 SHA submodule + 单 company-pack（唯一发布载体）+
 `company-workspace/` 共享盘 + 双 home**（日用 `~/.dsh` 不动，开发 `DSH_HOME=runtime/harness-home`，
 环境脚本兜底）。装法与取舍的判定依据 = FAQ 13 `option-a-standalone-with-pinned-dsh.md`
-（外部研究材料，登记见 [external-research.md](../external-research.md)）。**本节不复刻目录树**：
+（外部研究材料，登记见 [external-research.md](../reference/external-research.md)）。**本节不复刻目录树**：
 现行目录逐件 owner 与产物落点的唯一家 = [项目地图](../project-map.md)（秒级快览 = 根
 [AGENTS.md 布局块](../../AGENTS.md)，受 layout-block 门禁钉住）——第二张空间地图必漂
 （实测：本树漏 tests/_backlog/_dist 三面，snapshots 与 company-workspace 两行注释过期，
@@ -288,5 +288,5 @@ compaction、token 计量都是独立的**；persona 前缀稳定还对 KV cache
 ## 10. 改动归属表（指针）
 
 > 2026-10-20 审计：本表是**当前操作映射**，不属设计层——改什么 → 最窄检查唯一家 =
-> [tests/README「改动面 → 最窄检查」](../../tests/README.md)；安装/发布 = [release](../release.md)；
-> vendor = [release §vendor 政策](../release.md)；文档/合同 = `pnpm verify`。本层只留指针。
+> [tests/README「改动面 → 最窄检查」](../../tests/README.md)；安装/发布 = [release](../contracts/release.md)；
+> vendor = [release §vendor 政策](../contracts/release.md)；文档/合同 = `pnpm verify`。本层只留指针。

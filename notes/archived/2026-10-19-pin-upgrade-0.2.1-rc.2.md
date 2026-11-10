@@ -129,10 +129,10 @@ vendor 树内 `pnpm install --frozen-lockfile`（vendor node_modules 是 .gitign
   拒（`must be a non-negative safe integer`）；② 相邻对重排（保留 seq）—— 换了个形状的同一处红（投递
   还会跨 `step/start`），且等于把判据放宽到能吞掉真漂移。
 - `replay-smoke --scenario r2-motion`：green（presence 档不吃这两节）。
-- `pnpm verify`：`vendor-pin` / `pin-currency` / `bare-path docs/profile.md:61` /
+- `pnpm verify`：`vendor-pin` / `pin-currency` / `bare-path docs/contracts/profile.md:61` /
   `link _backlog/_archive/.../2026-10-13-dsh-capabilities.md` 四处红 → 逐条修指针 → ALL PASS。
 
-**顺带修的旧债**：`docs/profile.md` 的 `agent-team/src/mailbox.ts` 指针（0.2.1 已无此文件）、
+**顺带修的旧债**：`docs/contracts/profile.md` 的 `agent-team/src/mailbox.ts` 指针（0.2.1 已无此文件）、
 归档研究文里 `session-query/tool-session-query/README.md` 指针（包已搬）、
 `notes/archived/2026-10-12-backlog-process-made-explicit.md` 的过期 pin 字面量。
 

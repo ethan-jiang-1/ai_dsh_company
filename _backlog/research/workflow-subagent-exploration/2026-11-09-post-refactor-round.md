@@ -193,7 +193,7 @@ spawn teammate，但能 spawn worker / 请 CMO）；N 的 CEO teammate = 继承 
   `pnpm test tests/client/data/delegation-tree.spec.ts`、`pnpm test tests/client/tabs/delegation-flow-panel.spec.ts`。
 - 静态对账（只读，不改代码）：`delegation-model.mjs` 的 `CONTRACTS.status` 是否仍是 `planned`
   而实际 skill/section 已落；`subagent_retry` 的注册列表/默认 `maxDepth` 是否在模型里没有声明；
-  `handbookSkipPresets` 是否只覆盖 leaf；`docs/presets.md` 是否只把 worker 选择写在 vp-eng。
+  `handbookSkipPresets` 是否只覆盖 leaf；`docs/contracts/presets.md` 是否只把 worker 选择写在 vp-eng。
 - live：vp-eng 是否加载 `delegation-policy` + `eng-teaming`；vp-sales 是否加载 policy；
   vp-eng 的 systemPrompt 是否含 workflow contract section，CEO/worker/orchestrator 是否零命中；
   启动 worker 后 child 系统提示是否被注入 handbook（leaf 应无）。
@@ -448,7 +448,7 @@ coo/cfo root 的逐个 retry 采用；长期采纳/workspace-write/release。
 - 机制：`vendor/dsh` 的 `tool-workflow`、`workflow-ptc`、`tool-subagent`、`agent-team` README/源码；
   [workflow 子系统](../../../vendor/dsh/docs/subsystems/workflow.md)、
   [subagent 子系统](../../../vendor/dsh/docs/subsystems/subagent.md)。
-- 本仓合同：[delegation](../../../docs/delegation.md)、[presets](../../../docs/presets.md)、
+- 本仓合同：[delegation](../../../docs/contracts/delegation.md)、[presets](../../../docs/contracts/presets.md)、
   [testing](../../../docs/testing.md)、[tests README](../../../tests/README.md)。
 - 模型/资产：[delegation-model.mjs](../../../tools/lib/delegation-model.mjs)、
   [delegation-tree.ts](../../../packages/company-pack/src/lib/delegation-tree.ts)、

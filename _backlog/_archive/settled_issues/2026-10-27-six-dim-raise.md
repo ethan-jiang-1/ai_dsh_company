@@ -107,7 +107,7 @@ probe-source 切片 spec 未动（明确留待下一轮）。
 
 ## 风险与边界
 
-- **版本 bump 会改 `docs/release.md` 的版本字面量与 CHANGELOG**；`release --verify` 跑全套约 10–20 分钟。
+- **版本 bump 会改 `docs/contracts/release.md` 的版本字面量与 CHANGELOG**；`release --verify` 跑全套约 10–20 分钟。
 - **UI 金样只覆盖外壳与空态**（无会话数据面），不冒充"会话内渲染"回归；数据面仍由 keyless spec 覆盖。
 - **隔离场景依赖 pnpm + built lib**（与 dev 车道同前置）；缺构建时 exit 2，不假绿。
 - 真模型档只有在用户明确授权后才跑，成本极低但需要点头。

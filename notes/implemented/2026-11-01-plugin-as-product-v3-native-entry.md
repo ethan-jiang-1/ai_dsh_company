@@ -104,7 +104,7 @@ v3 的边界没有被 0.7.0 生命周期轮改动；本轮补了真模型与认�
 
 - 研究/复盘：[plugin-as-product-v3](../../_backlog/_archive/research/plugin-as-product-v3/README.md)。
 - 卡：[插件即产品 v3](../../_backlog/_archive/settled_issues/2026-11-01-plugin-as-product-v3.md)（已结）。
-- 合同：[profile](../../docs/profile.md)、[runtime-map](../../docs/runtime-map.md)、[data-model](../../docs/data-model.md)、
-  [release](../../docs/release.md)、[`_dist` 手册](../../_dist/安装手册.md)。
+- 合同：[profile](../../docs/contracts/profile.md)、[runtime-map](../../docs/runtime-map.md)、[data-model](../../docs/contracts/data-model.md)、
+  [release](../../docs/contracts/release.md)、[`_dist` 手册](../../_dist/安装手册.md)。
 - 代码：`src/host/run-bundle/bootstrap.ts`、`workspace-resolution.ts`、`handbook.ts`、`run-bundle.ts`、
   `presented-domain.ts`、`src/index.ts`；`content/`；`tests/host/{bootstrap,bundle-manifest,handbook,presented-domain}.spec.ts`。

@@ -10,7 +10,7 @@ opened: 2026-11-01
 > **结论/去向**：已结（2026-11-01）。workspace 选/切/搬/备/删、lease、登记、v2 身份、seed consent、
 > 方法/账本留 host + 导出均有实现与证据；不可信项目边界（恶意 AGENTS、symlink、伪造 consent、危险落点）
 > 有 `untrusted-project.spec`。v1 边界：不承诺消除 prompt injection/恶意脚本；`danger-full-access` 下降级约定。
-> 去向 = [v2 manifest Note](../../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md) + [data-model](../../../docs/data-model.md)。
+> 去向 = [v2 manifest Note](../../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md) + [data-model](../../../docs/contracts/data-model.md)。
 
 ## 问题与期望结果
 
@@ -34,7 +34,7 @@ RFC/实施。**本卡不是实施授权。**
 
 - 研究依据：[信任边界与数据安全](../research/plugin-as-product/2026-11-01-trust-and-data.md)；
   主稿 [§5 数据卡/§6 方案/§10.5–10.6 技术设计](../research/plugin-as-product/2026-11-01-plugin-as-product.md)。
-- 现有数据卡（`docs/data-model.md`）已写“公司盘/方法/账本/会话/凭据/登记”的 owner，但仍是
+- 现有数据卡（`docs/contracts/data-model.md`）已写“公司盘/方法/账本/会话/凭据/登记”的 owner，但仍是
   “home 公司盘”旧形状；新形状下 `bundle.json` 在 workspace、导出在 workspace、方法/账本留
   home，数据卡要重写。
 - 现有 `validateCompanyHome` 拒绝等于/包含 home/OS home/普通文件；但“已存在项目”“符号链接

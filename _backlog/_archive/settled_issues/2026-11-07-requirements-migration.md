@@ -70,7 +70,7 @@ opened: 2026-11-07
 - 绿：`pnpm vitest run tests/host/run-bundle/bootstrap.spec.ts` → `8 passed`（fresh seed + 既有盘 skip 且不覆盖用户改版）；`pnpm verify` → `ALL PASS`；`node checks/smoke/release-smoke.mjs` → `ALL PASS`（含「首启 40 件」「第二次零变更」「既有盘升级补种」）
 - dev 盘迁移：`cp kb/process-docs.md kb/process-docs.md.bak-2026-11-07`（3571B，保留）→ 用 pack 新合同整份替换（6256B）→ `diff -u` 130 行差异（= 旧 STR/SYR/IFR 合同 → 新 R1–R10 合同）；备份与差异路径即本卡证据
 - 旧动议范围：对 `company-workspace/.dsh-company/deliverables/2026-10-29-human-agent-capability-2026` 跑 checker（真 lib）→ `skipped: true / ok: true / reason = meta 无 编号体系: 标记——旧动议只读豁免`，不判红
-- 资产：`src/host/run-bundle/bootstrap.ts` 的 `STATE_FILES` 加 process-docs（只补缺）；`tests/host/run-bundle/bootstrap.spec.ts` 加 seed/skip/不覆盖三条；`checks/smoke/release-smoke.mjs` 的 content 在场清单加 process-docs；`docs/release.md` 版本纪律加「升级既有 workspace」一条（种子只补缺 + 旧动议 skipped）
+- 资产：`src/host/run-bundle/bootstrap.ts` 的 `STATE_FILES` 加 process-docs（只补缺）；`tests/host/run-bundle/bootstrap.spec.ts` 加 seed/skip/不覆盖三条；`checks/smoke/release-smoke.mjs` 的 content 在场清单加 process-docs；`docs/contracts/release.md` 版本纪律加「升级既有 workspace」一条（种子只补缺 + 旧动议 skipped）
 - `meta.md` 的 `编号体系` 字段由 A1 落，本卡只读取/验证（bootstrap 不改动议文件）
 - 用户确认：迁移备份就位（若需回滚 = 用 `.bak-2026-11-07` 覆盖回）；待 W5 汇总确认
 - 审查：`审查：agent — 2026-11-07`

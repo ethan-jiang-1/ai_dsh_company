@@ -188,7 +188,7 @@
           #    "真把活派给了那个 VP"。
           #
           #    maxDepth: 1 ⇒ VP child 不能再往下派活（禁止 VP→VP 平级派活）。
-          #    出处：docs/delegation.md；探针 checks/smoke/delegation-smoke.mjs（= 这条边界的回归守卫）。
+          #    出处：docs/contracts/delegation.md；探针 checks/smoke/delegation-smoke.mjs（= 这条边界的回归守卫）。
           - id: delegation
             name: cordis:group
             group: true

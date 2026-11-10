@@ -68,7 +68,7 @@
 - `eng-teaming` 多了 4 条硬规则（schema 子集 / 失败不自动重跑 / 分支默认叶子 / 控制面 shadow）；
   `eng-workflow` 第 5 步区分 team 任务板与命名 child 回执；CEO 两处加“禁 sleep 轮询”。
 - 机制事实（读侧）：根门 `list_agents` 只列 lead；child 那层才有全局版控制名；workflow 分支内再委派
-  的值会跨轮拼接。这些已写进 [delegation 合同](../../docs/delegation.md) §4.4 与技能。
+  的值会跨轮拼接。这些已写进 [delegation 合同](../../docs/contracts/delegation.md) §4.4 与技能。
 - 未覆盖：长期采纳率、其他四职能行为、`workspace-write`、release-smoke、natural S-only/M2、
   max-tokens/aborted 自然案例；R7 覆盖了 >50k 截断，但未覆盖“分支落文件再汇总”的绿色替代（详见研究材料 §16.3）。
 

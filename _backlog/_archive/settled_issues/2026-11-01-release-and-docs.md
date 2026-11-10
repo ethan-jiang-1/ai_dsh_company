@@ -42,9 +42,9 @@ RFC/实施。**本卡不是实施授权。**
 - `_dist/安装手册.md` 是 tracked 生成物；`tools/export-dist.mjs` 内嵌旧手册模板；
   `checks/gates/dist-manual.mjs` required 含 `company-workspace`/`DSH_COMPANY_REBIND`/
   “一个 DSH_HOME 只对应一个 run bundle”（C）。
-- `checks/gates/doc-budget.mjs` 对 active docs 是棘轮；`docs/data-model.md` 75/76、
-  `docs/profile.md` 63/66、`docs/runtime-map.md` 83/88，几乎没有余量（C）。
-- 根 `README.md`、pack README、workspace README 仍写旧形状；`docs/release.md` 的发布形状/
+- `checks/gates/doc-budget.mjs` 对 active docs 是棘轮；`docs/contracts/data-model.md` 75/76、
+  `docs/contracts/profile.md` 63/66、`docs/runtime-map.md` 83/88，几乎没有余量（C）。
+- 根 `README.md`、pack README、workspace README 仍写旧形状；`docs/contracts/release.md` 的发布形状/
   smoke 矩阵需重写；`CHANGELOG` 需 0.5.0（C）。
 - `export-dist` 清单没含 bin/第二 host entry（尚未有）；`release.mjs`/`release-manifest.json`
   需同步（C）。
@@ -68,7 +68,7 @@ RFC/实施。**本卡不是实施授权。**
 **范围**
 - `_dist/安装手册.md` + `tools/export-dist.mjs` 模板 + `dist-manual` 关键句 + sha/清单；
 - 根 `README.md`、`packages/company-pack/README.md`、`packages/company-pack/content/README.md`；
-- `docs/profile.md`、`runtime-map.md`、`data-model.md`、`release.md`、`project-map.md`、`index.md`、
+- `docs/contracts/profile.md`、`runtime-map.md`、`data-model.md`、`release.md`、`project-map.md`、`index.md`、
   `decisions.md`、`external-research.md`、`orient.md`、`demo.md`、`guides/{bootstrap,environments,
   release-runbook}.md`；active docs 的 stale 引用清扫；
 - `CHANGELOG.md`、`.agents/skills/web-window-ops/SKILL.md`、`tests/README.md`、`checks/README.md`；

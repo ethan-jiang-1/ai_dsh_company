@@ -19,7 +19,7 @@ intent: "消化 FAQ 26 最新更新并复核 0.5.0 产品化：入口、workspac
 4. **首启不是安装。** `dsh web` 只有 token 门（无 token 401；带 token 303 + 30 天 HttpOnly cookie → SPA），没有欢迎页/向导；`settings.onboarding` 只是设置面板的 step，`welcome-notice` 在 Desktop 不注册。第一次看到什么必须由产品 bundle/client 回答。（C：FAQ 26 `10-foundations/16-startup-resolution.md` §首启不是安装）
 5. **「装成功」有三个状态。** pnpm exit 0 → dependency 写入 → 进 `dsh.profile.bundles`；只有第三个让功能存在。没有 `dsh.bundle.patch` 的包 exit 0、roster 不变，只给一句 warning。dump 有 row 也不等于真启动能挂上；必须真启动并读 `did not activate` / `skipping profile bundle`。（C：FAQ 26 `10-foundations/18-install-upgrade.md` §安装三成功、`10-foundations/17-config-layers.md` §dump 与真启动）
 6. **home 层能覆盖、不能供货。** 往 home patch 插一个该 profile 没装的包，dump 有行，真启动 `ERR_MODULE_NOT_FOUND`，服务照常起。所以产品行为不能靠 profile/home patch「补」进一个已安装的 bundle；bundle 自己的 patch 必须带齐行。（C：FAQ 26 `10-foundations/17-config-layers.md` §home 层；T：前轮隔离实验 #33）
-7. **0.5.0 的入口走反了。** 当前产品入口是 bin/dsh-company.mjs（历史，已删除） + `pnpm company`：它建/修 profile、装 pack、写 profile patch、TTY 询问 workspace、拒绝同 home 第二盘。这是 FAQ 明确列出的 package bin/第二层 launcher + profile 写者；而且应用内 Plugins 页装包时不会跑这个启动器，registrar/seed 都不会发生。（C：packages/company-pack/bin/dsh-company.mjs（0.6.0 已删除）、`packages/company-pack/package.json` 的 `bin`、`docs/profile.md`、`_dist/安装手册.md`；T：前轮 company-entry/release smoke 只证启动器路径）
+7. **0.5.0 的入口走反了。** 当前产品入口是 bin/dsh-company.mjs（历史，已删除） + `pnpm company`：它建/修 profile、装 pack、写 profile patch、TTY 询问 workspace、拒绝同 home 第二盘。这是 FAQ 明确列出的 package bin/第二层 launcher + profile 写者；而且应用内 Plugins 页装包时不会跑这个启动器，registrar/seed 都不会发生。（C：packages/company-pack/bin/dsh-company.mjs（0.6.0 已删除）、`packages/company-pack/package.json` 的 `bin`、`docs/contracts/profile.md`、`_dist/安装手册.md`；T：前轮 company-entry/release smoke 只证启动器路径）
 8. **0.5.0 把「插件内容」和「run bundle」混了。** `packages/company-pack/content/` 里的手册、模板、org、章程被 `applyBootstrap` 复制到用户 workspace；用户要的是「插件内容全部在插件内部，生产状态/最终 artifacts（run bundle）在 workspace」。手册/模板是只读产品内容，不应成为每个 workspace 的副本；`kb/`、`deliverables/`、`cultivation/`、`.dsh-company/` 才是 run bundle 状态/产物。（C：`src/host/run-bundle/bootstrap.ts`、`src/host/run-bundle/bundle-manifest.ts`、`packages/company-pack/content/README.md`）
 9. **0.5.0 用「一 home 一 workspace」回避了多 workspace 的治理冲突，但这不是产品答案。** 用户要的是装一次、指向用户指定的 workspace；换项目不该新建 home/重装。正确做法是让 workspace 解析跟启动上下文走，并把 presented 账本按 workspace 分区；不是把产品缩成「一个公司盘」。版本建议 `0.6.0`（破坏性）。（P）
 
@@ -125,7 +125,7 @@ if (previousWorkspace !== requestedWorkspace && existsSync(join(previousWorkspac
 
 ### 2.4 文档歪：把 workaround 写成产品合同
 
-`README.md`、`_dist/安装手册.md`、`docs/profile.md`、`docs/runtime-map.md`、`docs/data-model.md`、`docs/release.md`、`tests/README.md` 都把启动器、`--workspace`、一 home 一 workspace、骨架 copy 写成现行产品形状。`dist-manual` 门禁还把这些词钉成必含。代码改对但文档不改，产品仍然是错的；用户点名 README 和 `_dist`，方向正确。
+`README.md`、`_dist/安装手册.md`、`docs/contracts/profile.md`、`docs/runtime-map.md`、`docs/contracts/data-model.md`、`docs/contracts/release.md`、`tests/README.md` 都把启动器、`--workspace`、一 home 一 workspace、骨架 copy 写成现行产品形状。`dist-manual` 门禁还把这些词钉成必含。代码改对但文档不改，产品仍然是错的；用户点名 README 和 `_dist`，方向正确。
 
 ### 2.5 为什么会歪
 
@@ -289,11 +289,11 @@ packages/company-pack/                 <workspace>/
 | `packages/company-pack/README.md` | Install/Config/Data/Backup/Uninstall 换新形状；无 bin；`content/` 与 run bundle 分家；多 workspace 顺序；方法层 home 公司级；账本 per workspace |
 | `packages/company-pack/content/README.md` | 改为 run bundle 说明（或移到 `content/README`）；不再说「启动器指定/seed 骨架」 |
 | `AGENTS.md` | 布局（`content/`、无 `bin/`、dev workspace）、命令表（`pnpm dsh --profile company` / dev wrapper）、产品入口指针；`_dist`/README 同 diff |
-| `docs/profile.md` | 形状表：产品安装（Plugins 页）/ CLI web 自动化 / dev；无 launcher；startup 行在 bundle；workspace cwd/env/client；多 workspace 顺序 |
+| `docs/contracts/profile.md` | 形状表：产品安装（Plugins 页）/ CLI web 自动化 / dev；无 launcher；startup 行在 bundle；workspace cwd/env/client；多 workspace 顺序 |
 | `docs/runtime-map.md` | 时序：install → boot → startup row → workspace 解析/登记 → client onboarding → session；run bundle 在 workspace；home=DSH 运行时 + 公司治理；无 profile patch registrar |
-| `docs/data-model.md` | 数据卡逐行换：插件内容 vs run bundle vs home 治理；manifest v3；账本 v2 per workspace；无手册 seed；overrides |
-| `docs/release.md` | 发布形状、tarball 清单（无 bin、含 content）、smoke 矩阵、0.6.0、安装三成功、首启/onboarding 验证 |
-| `docs/project-map.md` / `docs/demo.md` / `docs/index.md` / `docs/decisions.md` / `docs/orient.md` / `docs/guides/{bootstrap,environments,budget-and-ops,release-runbook}.md` / `docs/multi-human.md` / `docs/presets.md` | 删旧主路径，留新入口；decisions 记 D 号；demo 的启动口令换 cwd；bootstrap 先选形状 |
+| `docs/contracts/data-model.md` | 数据卡逐行换：插件内容 vs run bundle vs home 治理；manifest v3；账本 v2 per workspace；无手册 seed；overrides |
+| `docs/contracts/release.md` | 发布形状、tarball 清单（无 bin、含 content）、smoke 矩阵、0.6.0、安装三成功、首启/onboarding 验证 |
+| `docs/project-map.md` / `docs/contracts/demo.md` / `docs/index.md` / `docs/reference/decisions.md` / `docs/orient.md` / `docs/guides/{bootstrap,environments,budget-and-ops,release-runbook}.md` / `docs/contracts/multi-human.md` / `docs/contracts/presets.md` | 删旧主路径，留新入口；decisions 记 D 号；demo 的启动口令换 cwd；bootstrap 先选形状 |
 | `tests/README.md` / `checks/README.md` | 新 smoke/spec 的改动面映射与索引；产品入口行从 bin 改为 startup + client |
 | `run/README.md` / `runtime/README.md` / `.agents/skills/web-window-ops/SKILL.md` | dev 启动、home/workspace、web 观察窗口令 |
 | `CHANGELOG.md` | 0.6.0 破坏性：入口/workspace/内容边界/账本/manifest；0.5.0 迁移 |
@@ -338,4 +338,4 @@ packages/company-pack/                 <workspace>/
 - 外部 FAQ 26（本轮同步）：`10-foundations/16-startup-resolution.md`、`17-config-layers.md`、`18-install-upgrade.md`、`30-external/37-lifecycle-stages.md`、`50-launch/40-profile-integration.md`、`50-launch/90-evidence.md`。
 - 本仓前轮：[插件即产品卡](../../settled_issues/2026-11-01-plugin-as-product.md)、[落地顺序卡](../../settled_issues/2026-11-01-landing-plan.md)、[主研究稿](../plugin-as-product/2026-11-01-plugin-as-product.md)。
 - 当前代码：0.5.0 launcher（已删除）、[bootstrap](../../../../packages/company-pack/src/host/run-bundle/bootstrap.ts)、[manifest](../../../../packages/company-pack/src/host/run-bundle/bundle-manifest.ts)、[runtime guard](../../../../packages/company-pack/src/host/run-bundle/runtime-guard.ts)、[presented domain](../../../../packages/company-pack/src/host/ledger/presented-domain.ts)、[client composition spec](../../../../tests/client/company-client-composition.spec.ts)。
-- 当前合同：[README](../../../../README.md)、[profile](../../../../docs/profile.md)、[runtime map](../../../../docs/runtime-map.md)、[data model](../../../../docs/data-model.md)、[release](../../../../docs/release.md)、[`_dist` 手册](../../../../_dist/安装手册.md)。
+- 当前合同：[README](../../../../README.md)、[profile](../../../../docs/contracts/profile.md)、[runtime map](../../../../docs/runtime-map.md)、[data model](../../../../docs/contracts/data-model.md)、[release](../../../../docs/contracts/release.md)、[`_dist` 手册](../../../../_dist/安装手册.md)。

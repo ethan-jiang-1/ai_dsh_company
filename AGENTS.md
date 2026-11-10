@@ -1,7 +1,7 @@
 # AGENTS.md — 本仓库的入口链
 
 梦之队（Dream Team）虚拟公司 DSH 插件（DSH = DeepSeek Harness，唯一权威 = `vendor/dsh` 钉 SHA 子模块，见下「DSH 源码」节）：一个 company pack 提供六个角色 preset 与 host/client 面。
-**开工最小路径**（读完这三样就够开工，其余按需；feature 任务先 Plan Mode，规则 = [policy P1](docs/policy.md)）：① 本文件（纪律 + 命令表）；② 你任务那一份 owner——改角色内容 = [presets.md](docs/presets.md)、改 host/Web 代码 = [src/README](packages/company-pack/src/README.md)、改文档 = [docs/AGENTS.md](docs/AGENTS.md)、改机制/组合 = [profile.md](docs/profile.md)；③ [tests/README.md](tests/README.md) 的「改动面 → 最窄检查」对应行。
+**开工最小路径**（读完这三样就够开工，其余按需；feature 任务先 Plan Mode，规则 = [policy P1](docs/policy.md)）：① 本文件（纪律 + 命令表）；② 你任务那一份 owner——改角色内容 = [presets.md](./docs/contracts/presets.md)、改 host/Web 代码 = [src/README](packages/company-pack/src/README.md)、改文档 = [docs/AGENTS.md](docs/AGENTS.md)、改机制/组合 = [profile.md](./docs/contracts/profile.md)；③ [tests/README.md](tests/README.md) 的「改动面 → 最窄检查」对应行。
 **按需**：[项目地图](docs/project-map.md)（空间）、[运行态地图](docs/runtime-map.md)（时序与四轴）、[开发环 §0.5](docs/guides/dev-loop.md#05-任务入口与交接) / [§1](docs/guides/dev-loop.md#1-执行链从授权到有证据交接)（流程细节）、[policy](docs/policy.md)（授权与常设边界）、[测试宪法](docs/testing.md)（证据边界）、[脚本索引](checks/README.md)（逐脚本）、[orient 七问](docs/orient.md)（白话速读）。
 **四条命令**：`pnpm company --no-open`（repo dev-only；默认 pack + `plugin add file:`，`--link` 快速通道；启动入口 = `dsh --profile company`）/ `pnpm verify`（结构门禁）/ `pnpm test`（keyless 回归）/ `pnpm typecheck`（类型面）。新 Agent 首跑验收 = [tests/README.md](tests/README.md) 首跑节。
 
@@ -15,20 +15,20 @@ CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 校验）
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml、src/（host）+ src/client/、content/（只读手册/模板/默认章程/状态默认值）；无 bin/启动器
 company-workspace/      **dev 公司状态的 workspace**（会话 cwd；整树 gitignored，不进 git）：只有 `.dsh-company/`（kb/、deliverables/、cultivation/、logs/、exports/、bundle.json v3，legacy 文件名）；`pnpm bundle:init` 建；插件内容不复制
 vendor/dsh/             DSH 源码 submodule（钉 SHA，只读铁律见下节）
-docs/                   当前合同与导航：index（地图）+ decisions（台账）→ design/ guides/ + 顶层合同（git 边界 = repo-hygiene.md）
+docs/                   当前合同与导航：index（地图）+ 顶层宪法（AGENTS / policy / testing / repo-hygiene）→ contracts/ design/ guides/ + reference/（台账/术语/外部材料）
 notes/                  开发记忆：proposed/（RFC）→ implemented/（活跃决策记忆）；离场目录不复述于此——分类规则唯一家 = notes/README.md
 _backlog/               推敲层：issues/bugs/research/methods/_archive + triggers.md（触发器）；章程与账本 = 其 README；agent 门牌 = AGENTS.md
 checks/                 验证面：run-gates 门禁；smoke/（真实入口冒烟）+ audit/（盘面日志判据）
 tests/                  keyless 回归（company/client/presets/harness 四区 spec）；真模型/浏览器不进本树——分区导航 = tests/README.md
 probes/                 调试面：窄机制与视觉探针，按机制域四子目录（team/fs-taskboard/browser-visual/session-context）
 tools/                  工具面：维护工具；lib/ 纯逻辑、drivers/ 真实驱动、archive/ 已耗仪器
-_dist/                  导出目的地：tarball（gitignored）+ 生成式《安装手册》（唯一 tracked 例外）；owner = docs/release.md
+_dist/                  导出目的地：tarball（gitignored）+ 生成式《安装手册》（唯一 tracked 例外）；owner = docs/contracts/release.md
 run/                    运行面（tracked 启动配置）：env.sh（双 home+裸 dsh 拦截）+ README + company/entry-probe 两 overlay
 runtime/                运行残留家（默认整树 gitignored + 极少数 tracked 白名单；白名单唯一家 = runtime/README.md，本节不复述）：harness-home（开发 DSH_HOME）、第二 home、pw-browsers、排练盘、web-logs（含 token 绝不入库）
 snapshots/              回归证据资产；规则与分类 = snapshots/README.md
 ```
 
-设计全貌 = `docs/index.md`；决策台账 = `docs/decisions.md`。
+设计全貌 = `docs/index.md`；决策台账 = `docs/reference/decisions.md`。
 
 **一条流水线**（位置唯一家 = 卡 frontmatter `status`；门与守卫 = [_backlog 门牌](_backlog/AGENTS.md)）：卡 `研究 → 定性 → 落地 → 审 → 归档`，毕业 = 门票 + `去向`（`rfc｜note｜implementation｜pending｜none｜rejected`），去向落 `notes/proposed` RFC 或 `notes/implemented` Note，实施见 [dev-loop §1](docs/guides/dev-loop.md)。任务源 = 已批 RFC（proposed 带「批准：」）与用户点名；唯一例外 = 缺陷卡 `修复就绪` 自授权（边界唯一家 = [_backlog 章程](_backlog/README.md)「缺陷的通道」）。**notes/ 是决策记忆**：开工按主题检索，非平凡变更同 diff 更新（分类与收尾唯一家 = [notes/README.md](notes/README.md)）。**条目状态不镜像进本文件**。
 
@@ -50,7 +50,7 @@ pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需
 source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的真挂载检查（完整完成定义 = preset-change-definition skill；前置 = bootstrap 构建完成）
 ```
 
-逐脚本触发/成本/状态唯一源 = 脚本头注（门禁强制自述）；索引见 [检查索引](checks/README.md)——**别抄回本文件，复述必漂**。web 观察窗开门步骤唯一见 [demo.md §前置](docs/demo.md)：**先 `source run/env.sh`**——日用 `~/.dsh` 另有同名 `web` profile（起得来不报错、六角色不出现）；端口是环境状态，token URL 从启动横幅读；现场运维 = [budget-and-ops](docs/guides/budget-and-ops.md)。**push 走 `ssh.github.com:443`**（origin 已配好）。
+逐脚本触发/成本/状态唯一源 = 脚本头注（门禁强制自述）；索引见 [检查索引](checks/README.md)——**别抄回本文件，复述必漂**。web 观察窗开门步骤唯一见 [demo.md §前置](./docs/contracts/demo.md)：**先 `source run/env.sh`**——日用 `~/.dsh` 另有同名 `web` profile（起得来不报错、六角色不出现）；端口是环境状态，token URL 从启动横幅读；现场运维 = [budget-and-ops](docs/guides/budget-and-ops.md)。**push 走 `ssh.github.com:443`**（origin 已配好）。
 
 ## 密钥
 
@@ -58,7 +58,7 @@ source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的真
 
 ## DSH 源码：三个实体，别混
 
-**① 唯一权威 = `vendor/dsh/`**（钉 SHA 只读；机制核对一律 `pnpm dsh`）。**② 裸 `dsh` = 日用全局安装**（版本随全局漂移，不作本仓依据；已被 env.sh 拦截，确要日用 `command dsh`）。**③ 外部研究树**（维护者本机路径；`_digested`/FAQ 宿主，只读；登记见 [external-research](docs/external-research.md)）。全局不变量 = `vendor/dsh/AGENTS.md` Conventions 节；概念→源码直达 = [术语映射](docs/terminology.md)。
+**① 唯一权威 = `vendor/dsh/`**（钉 SHA 只读；机制核对一律 `pnpm dsh`）。**② 裸 `dsh` = 日用全局安装**（版本随全局漂移，不作本仓依据；已被 env.sh 拦截，确要日用 `command dsh`）。**③ 外部研究树**（维护者本机路径；`_digested`/FAQ 宿主，只读；登记见 [external-research](./docs/reference/external-research.md)）。全局不变量 = `vendor/dsh/AGENTS.md` Conventions 节；概念→源码直达 = [术语映射](./docs/reference/terminology.md)。
 
 ## 纪律（沿 DSH 研发纪律；默认严格照做，偏离必须登记）
 
@@ -69,13 +69,13 @@ source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的真
 | 任务反馈面；按变更选检查、只报告实跑过的 | `packages/todo` / `packages/plan` / `AGENTS.md` | [dev-loop](docs/guides/dev-loop.md) §0.5/§1/§12 + [policy §P5](docs/policy.md)（语义审） |
 | docs = 当前合同（一处事实一个家，只写 now）；文档卫生 | `docs/AGENTS.md` | docs/ 分层；行预算 = doc-budget 门禁 `DOC_LINE_BUDGETS`；细则 = [docs/AGENTS.md](docs/AGENTS.md) |
 | 非平凡变更同 diff 带 Note（决定/输掉的方案/验证什么）；日志税 | `.agents/notes/README.md` / `AGENTS.md` Conventions | notes/proposed/ → notes/implemented/；写什么 = [notes/README.md](notes/README.md) |
-| 完成定义 = 最小真检查；测试分层；真实入口与安装形状 | `docs/testing.md` / `docs/postmortem/0003-web-agent-gui-feedback-loop.md` | 本仓 [测试宪法](docs/testing.md) + layering 守卫；preset = preset-smoke；安装 = release-smoke（[release.md](docs/release.md)） |
-| 源码/产物面不混；vendor 钉版本，升 pin 时流程合同重校 | `AGENTS.md` Conventions / [release.md §vendor 政策](docs/release.md) | 根 tsconfig extends vendor base；簿记见下节 + `tools/sync-dsh.mjs` |
+| 完成定义 = 最小真检查；测试分层；真实入口与安装形状 | `docs/testing.md` / `docs/postmortem/0003-web-agent-gui-feedback-loop.md` | 本仓 [测试宪法](docs/testing.md) + layering 守卫；preset = preset-smoke；安装 = release-smoke（[release.md](./docs/contracts/release.md)） |
+| 源码/产物面不混；vendor 钉版本，升 pin 时流程合同重校 | `AGENTS.md` Conventions / [release.md §vendor 政策](./docs/contracts/release.md) | 根 tsconfig extends vendor base；簿记见下节 + `tools/sync-dsh.mjs` |
 | 机械不变量进执行门禁 + 每门带反证（红→还原→绿） | `AGENTS.md` Conventions | `checks/gates/` 目录（清单唯一源；装配 = run-gates.mjs；本表不复述） |
 
 ### vendor 铁律（`pnpm verify` 双门禁强制）
 
-**`vendor/` 下受版本控制的内容一个字节都不许改**（submodule HEAD == 簿记 SHA + 工作树零改动）。允许面与三条正路（bundle patch / 提上游升 pin / 先证伪"不可用"再自建）= [release.md §vendor 政策](docs/release.md)；⚠ 禁 `git clean -x`。
+**`vendor/` 下受版本控制的内容一个字节都不许改**（submodule HEAD == 簿记 SHA + 工作树零改动）。允许面与三条正路（bundle patch / 提上游升 pin / 先证伪"不可用"再自建）= [release.md §vendor 政策](./docs/contracts/release.md)；⚠ 禁 `git clean -x`。
 
 **本仓原生纪律**：工具态与越界写入（工具状态先落仓库 gitignored 区）、自主优先协议（先探索后发明、借鉴成熟插件）——规则唯一见 [policy §P4/§P5](docs/policy.md)。**不发明**：不自造 spec 流程/调度器/记忆/门禁，优先用 DSH 现成载体。
 

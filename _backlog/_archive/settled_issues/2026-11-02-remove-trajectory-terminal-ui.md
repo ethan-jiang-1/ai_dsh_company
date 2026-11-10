@@ -151,6 +151,6 @@ ALL PASS；真页面主区 = Chat + 培养、右栏 guide = 9 公司页签、无
 - 前序决定：[培养主视图 Note](../../../notes/archived/2026-10-28-cultivation-main-view.md)（三 tab；本卡部分取代）。
 - 同形约束：[dev/产品 parity 卡](./2026-11-02-dev-product-path-parity.md)、
   [parity 指南](../../../docs/guides/dev-product-parity.md)。
-- 现行合同/设计：[profile](../../../docs/profile.md)、[ui-demo](../../../docs/design/ui-demo.md)。
+- 现行合同/设计：[profile](../../../docs/contracts/profile.md)、[ui-demo](../../../docs/design/ui-demo.md)。
 - 上游载体：`vendor/dsh/packages/bundle/web-app/cordis.patch.yml`（行 300/457）、
   `vendor/dsh/packages/client/ui-sidebar-terminal/`、`vendor/dsh/packages/client/ui-trajectory/`。

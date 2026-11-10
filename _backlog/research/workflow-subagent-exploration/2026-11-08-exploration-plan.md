@@ -190,7 +190,7 @@ pnpm typecheck                 # 类型面（改 TS/src 时）
   `system_architect` / `system_qa` / `vp_cmo`（`maxDepth: 2`）。
 - vp-sales / coo / cfo / cmo：`subagent` + `subagent_fork`（`maxDepth: 2`）；无 workflow。
 - SA/SQA/researcher：窄工具面；无 workflow/generic subagent。
-- 行清单的唯一家 = 各 `presets/<role>/agent.cordis.yml`；`docs/presets.md` 只是摘要。
+- 行清单的唯一家 = 各 `presets/<role>/agent.cordis.yml`；`docs/contracts/presets.md` 只是摘要。
 
 ### 2.4 流程与门禁（别绕过）
 
@@ -358,7 +358,7 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 
 1. 读本文件 §1–§3；读 [Note](../../_archive/settled_issues/2026-11-08-vpeng-workflow-channel.md)、
    [eng-teaming](../../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md)、
-   [delegation 合同](../../../docs/delegation.md) §3/§4。
+   [delegation 合同](../../../docs/contracts/delegation.md) §3/§4。
 2. 基线：`source run/env.sh && pnpm verify && pnpm test`；`node checks/smoke/preset-smoke.mjs`。
    全绿预期；若红先分清工作树里其他人的改动。
 3. 清 rehearsal 的旧实验 journal/deliverables；建 exp fixtures。
@@ -375,7 +375,7 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 - [tool-subagent README](../../../vendor/dsh/packages/subagent/tool-subagent/README.md)
 - [subagent 子系统](../../../vendor/dsh/docs/subsystems/subagent.md)
 - [agent-team README](../../../vendor/dsh/packages/experimental/agent-team/README.md)
-- [delegation 合同](../../../docs/delegation.md) · [presets 摘要](../../../docs/presets.md) ·
+- [delegation 合同](../../../docs/contracts/delegation.md) · [presets 摘要](../../../docs/contracts/presets.md) ·
   [architecture](../../../docs/design/architecture.md)
 - [常驻 probe](../../../probes/team/vp-eng-workflow-probe.mjs)
 - [preset 改动完成定义](../../../.agents/skills/preset-change-definition/SKILL.md)
@@ -467,7 +467,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 | V2 | vp-sales root | 其他职能 × 新控制工具：4 lead tier + 问它会不会用 `list_subagents`/`send_to_subagent` | tools=75，**有** `list_subagents`/`send_to_subagent`，无 workflow；模型自读 4 文件、未派 child、也没回答“何时用新工具”；自述 roster 只有自己 | **F18** 观察：新工具全局可见，但 vp-eng 之外没有 guidance，模型不选 |
 | C8 | vp-eng root | 团队 depth × 新控制面：spawn eng-3 → W1 → W2（应拒） | eng-3 报告：W1/W1b 两次 `subagent` 均被 `depth 3` 硬拒、无 W2 创建、未换 `workflow`/`subagent_fork`/命名专家；depth 2 有 prompt 级 “don't delegate” 段；5 个委派工具 cap 均 2。Lead 自己读 vendor 做预测并反复 bash/等待，**turn 到 300s 仍未收口**（harness 超时） | depth PASS；**F19** 观察（Lead 过度验收/等待） |
 | C9 | vp-eng root | bash 2000 行 + 尾标记，测 pruner/保留策略 | bash 结果尾部保留、`TAIL-MARKER-9f3a` 直接可见；模型又落 `/tmp` 用 `wc -l`/`tail -n 1`/`grep -c` 独立复核 | PASS（砍头不砍尾） |
-| C10 | CEO root | named child 复用：先 `vp_eng` 出 v1，再让同一 child 出 v2（加 checked） | CEO 调 `vp_eng` → `send_to_subagent` → `list_subagents`；**同一个 child `2fd302d7…` 出两版**，未新起 VP-Eng；但 CEO skill/§1 仍写“改稿=再委派一次” | **F20**：文档/技能与新工具矛盾；已修（`docs/delegation.md` §1、CEO skill/persona、`eng-teaming`） |
+| C10 | CEO root | named child 复用：先 `vp_eng` 出 v1，再让同一 child 出 v2（加 checked） | CEO 调 `vp_eng` → `send_to_subagent` → `list_subagents`；**同一个 child `2fd302d7…` 出两版**，未新起 VP-Eng；但 CEO skill/§1 仍写“改稿=再委派一次” | **F20**：文档/技能与新工具矛盾；已修（`docs/contracts/delegation.md` §1、CEO skill/persona、`eng-teaming`） |
 | C7 | vp-eng root | 后台 job × 重启：`run_in_background` W（4×sleep 30）→ SIGTERM → 重启 → 问 job | `job_list` 空；`job_output` 报 `unknown job`；无完成通知；`list_subagents` 仍有 4 个 `continuable/inactive` child（无 lastTurnEnd、无产出）；父靠自读文件拿地面真值，提议逐个 `send_to_subagent` 唤醒 | **BUG-044**（P2）：后台 job 不跨重启；child 可手动补 |
 | C11 | vp-eng root | 嵌套指针：分支 bash 20k 行 / 469KB 落 spill，分支回指针，父 read 尾部 | 分支只看到 ~2,065 行 / ~50KB 并**自述“没有截断”**（其实引用了 output truncated）；父用 `read offset=19996 limit=5` 读到 `CHILD-TAIL-7a2b` 与 `total 20000 lines`，`wc -c` 468,886 字节；指针跨 child→parent 可达 | PASS；**F21** 方法教训：别信 child 对截断/长度的自述 |
 | C13 | vp-eng root | teammate 控制名（带提示）：eng-4 复用同一 W1 补 checked | eng-4 用 `subagent → list_subagents → send_to_subagent`，同一 child 出 v1/v2；但任务书预灌了“选哪个工具”的判据，不能算自然选择；eng-4 未加载 `eng-teaming`、两跳间用 `bash sleep`（F7/F5 teammate 版） | PASS（受污染）；**F22** 观察 |
@@ -496,7 +496,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 - **F21**：C11 里分支只看到 ~50KB/2,065 行，却自述“没有截断”（同时引用了 output truncated）；父用
   指针 + `read offset/limit` 拿到 20,000 行尾标记。已修 `eng-teaming`（分支自述的截断/长度不可信，
   父用指针 + read/tail 核）。
-- **F20**：`send_to_subagent` 让 named child 可续（C10 同一 child 出两版），但 `docs/delegation.md` §1、
+- **F20**：`send_to_subagent` 让 named child 可续（C10 同一 child 出两版），但 `docs/contracts/delegation.md` §1、
   CEO `assembling-the-team`/persona、`eng-teaming` 两处仍写“改稿=再委派一次”，与新工具矛盾。**已修文本**
   （优先 `send_to_subagent` 续同一个 child，不可续再委派）；C10 是红证据（模型照工具描述做了对的事，
   书面契约却相反）。

@@ -6,7 +6,7 @@ intent: 用只读词频读数量化“委派/引擎合同”在 persona、角色
 # 合同散文分布读数（只读）
 
 > 方法：脚本 [contract-terms.mjs](contract-terms.mjs)（只读）对 9 个 preset 的 persona 正文、
-> 19 个角色 SKILL.md + `_shared`、`docs/delegation.md`、`docs/presets.md` 统计 15 个委派/引擎词的出现次数；
+> 19 个角色 SKILL.md + `_shared`、`docs/contracts/delegation.md`、`docs/contracts/presets.md` 统计 15 个委派/引擎词的出现次数；
 > 输出 [contract-terms.json](contract-terms.json)。**词频只是代理指标**，不区分“规则/例子/叙述”，
 > 也可能把域名叙述里的 workflow 计入；用它看**集中/分散**，不拿它当结论本身。
 
@@ -16,9 +16,9 @@ intent: 用只读词频读数量化“委派/引擎合同”在 persona、角色
 
 | 文件 | 类型 | 行数 | 命中 |
 |---|---|---:|---:|
-| `docs/delegation.md` | 合同 | 119 | 73 |
+| `docs/contracts/delegation.md` | 合同 | 119 | 73 |
 | `packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md` | 角色 skill | 93 | 64 |
-| `docs/presets.md` | 合同 | 198 | 40 |
+| `docs/contracts/presets.md` | 合同 | 198 | 40 |
 | `packages/company-pack/presets/ceo/skills/assembling-the-team/SKILL.md` | 角色 skill | 73 | 28 |
 | `packages/company-pack/presets/ceo/agent.cordis.yml`（persona） | persona | — | 12 |
 | `packages/company-pack/presets/vp-eng/agent.cordis.yml`（persona） | persona | — | 8 |
@@ -52,7 +52,7 @@ intent: 用只读词频读数量化“委派/引擎合同”在 persona、角色
    但它是**角色局部**的——其他角色（以及继承其组合的 worker）不会自动看到这些规则。
 3. **F**：`eng-teaming` 93 行里命中 64 个合同词，是 persona（8）的 8 倍；**I**：该 skill 同时承担
    “五档委派方法”和“引擎合同手册”，两种生命期不同（方法稳定、合同随 pin 变），导致“修 bug 就加句”。
-4. **F**：`docs/delegation.md` 是词频最高的合同文件，但它不是模型面（模型不读 docs）；**I**：
+4. **F**：`docs/contracts/delegation.md` 是词频最高的合同文件，但它不是模型面（模型不读 docs）；**I**：
    维护面合同与模型面合同是两套载体，规则需要人工搬运，天然漂移。
 
 ## 对结构选项的含义（I）

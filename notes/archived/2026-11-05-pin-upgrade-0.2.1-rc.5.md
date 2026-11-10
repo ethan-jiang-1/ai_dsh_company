@@ -57,7 +57,7 @@ llm 42、apps/web 27、session 21）。本包 import 的 subagent 与 experiment
 
 - vendor 面：`git checkout b830ec95` → `pnpm install`（2m05s）→ vendor `pnpm run build`
   （9/9，39s，333 client artifacts）→ vendor 工作树零改动。
-- 消费面：`pin.mjs` / `AGENTS.md` / `compat-tags.json` / site README 兼容段 / `docs/external-research.md` /
+- 消费面：`pin.mjs` / `AGENTS.md` / `compat-tags.json` / site README 兼容段 / `docs/reference/external-research.md` /
   旧 Note 的 pin 字面量（标历史）；`tools/lib/install-manual.mjs`（基线注入）；`market-index.staged.json`。
 - 回滚边界（sync-dsh 实测）：只恢复 HEAD/簿记/lockfile，**不恢复依赖与构建产物**；手动路径随后按
   rc.5 重装重建，未留下 rc.2/rc.5 混装。

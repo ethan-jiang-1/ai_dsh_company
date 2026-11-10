@@ -1,7 +1,7 @@
 # role-web-access：角色的上网能力（搜 + 取）必须逐 preset 声明（2026-09-29）
 
 > 状态：已交付｜触发 = 用户令「我们的 DSH 插件需要上网搜索/下载的能力，**不论是主 Agent 还是 Subagent**，
-> 确保他们运行的时候都有；是否要配置」｜合同落点 = [presets.md §工具面](../../docs/presets.md) +
+> 确保他们运行的时候都有；是否要配置」｜合同落点 = [presets.md §工具面](../../docs/contracts/presets.md) +
 > [pack README §已知限制](../../packages/company-pack/README.md)
 
 ## 结论（先答"是否要配置"）
@@ -26,7 +26,7 @@
    `tool-web` / `fetch: true` / `searchTimeoutMs: 60000`（DeepSeek 搜索 = 一次完整模型回合，故放宽到 60s）。
 2. 依赖三处对齐：pack `peerDependencies`（运行时合同，`^0.1.7-rc.2`）+ 根 `devDependencies`
    `workspace:*`（源码域解析）+ `pnpm install`（建链接）。**漏了任一**：`preset-dep` 门禁红或行解析不到 → preset broken。
-3. 合同同步：[presets.md §工具面](../../docs/presets.md)（逐行列工具面的表 + 一条"联网天生不继承"注）、
+3. 合同同步：[presets.md §工具面](../../docs/contracts/presets.md)（逐行列工具面的表 + 一条"联网天生不继承"注）、
    pack README 已知限制（成本与凭据口径）、presets.md §生效边界（新增"须重启观察窗"，见下）。
 
 ## 证据（全部实跑，2026-09-29）
@@ -65,7 +65,7 @@ Lead（depth=0）与**委派子会话（depth=1）都含** `web_search`×2 / `we
 ## 输掉的方案
 
 - **只在 CEO preset 加、靠继承覆盖全员**：不够。多人与"每角色一扇门"形态下，每个角色都是**根会话**、
-  挂各自的 preset（[multi-human §2](../../docs/multi-human.md)），不经过 CEO。
+  挂各自的 preset（[multi-human §2](../../docs/contracts/multi-human.md)），不经过 CEO。
 - **把 host 行改回来**（去掉 web-app 的 `disabled: true`）：那是 web-app 的**显式设计决定**，
   且改 vendor 行为违vendor 铁律；要改只能提上游。
 - **给 subagent 配 `toolFilter` 或 per-child preset**：不必要（继承已够）；且 per-child composition

@@ -71,10 +71,10 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 - **回放舰队撤空，但活跃面仍把它当现行**：`snapshots/replay` 只剩一个 headless 合成场景（`foundation-workspace`，其 `snapshot.yml` 自述"产品仓唯一合成场景"）。而 r2-motion / r3-delegation 在活跃树被引用 **43 处**，其中至少 10 处是**指令性**的：`checks/smoke/replay-smoke.mjs` 头注（"何时跑…r3 ~15s / r2 五会话 ~80–100s"、`--ui` 说明）、`checks/smoke/client-load-smoke.mjs:14`、`docs/guides/dev-loop.md:227`、`docs/testing.md:15`、`docs/guides/cdp-probe.md:59`、`tools/snapshot-motion.mjs`（默认输出 `r2-motion`，:10/:28）、`tests/harness/repo/repository-layout.spec.ts` 的示例名。**最刺眼的是 `docs/design/ui-demo.md:132-133`**：同一张表里 v1 行已写"UI 端到端断言已随真实 snapshots 移出产品仓而退役"，v3/v4 行却仍把 `replay-smoke --ui`（r3 金样 / r2 端到端）列为验收证据。
 - **语义真空绿**：`replay-fixture-freshness` 输出 `×0 场景`（唯一 runnable 是 headless，按设计跳过注入面比对）；`replay-ui-freshness` 在**盘上 0 个 `ui.expected.md`** 的情况下 PASS。门禁把"没有对象"和"检查通过"渲染成同一个词。
 - **声明资产不存在**：`docs/testing.md:62` 与 `checks/audit/candidate-scan-eval.mjs:20` 都指向 `snapshots/corpora/candidate-scan-corpus/`；盘上 `snapshots/` 下只有 `replay/`。实测该脚本 **ENOENT 崩栈、exit 1**（不是优雅报"语料缺失"），因此"行为质量档"只剩真模型 `probe --full` 一条腿。
-- **升 pin 的“第一道回归网”已名存实亡（最重的一条）**：`docs/release.md:123-125` 仍写“语料回放全绿 = vendor 换 tag 后先跑 `checks/smoke/replay-smoke.mjs`（r2/r3 会话判据 + foundation workspace oracle）…replay = 升 pin 回归网第一道”，并列出“已知漂移红（r3 ×2 / foundation ×3）”。现实是：r2/r3 已不在盘上，foundation 是 authored 合成场景且我实跑全绿；`docs/guides/dev-loop.md:133` 与 `docs/testing.md:62` 的同一句也指向已不存在的语料。**升 pin 程序会拿一个不加载本包的合成回放当“全绿”证据。**
+- **升 pin 的“第一道回归网”已名存实亡（最重的一条）**：`docs/contracts/release.md:123-125` 仍写“语料回放全绿 = vendor 换 tag 后先跑 `checks/smoke/replay-smoke.mjs`（r2/r3 会话判据 + foundation workspace oracle）…replay = 升 pin 回归网第一道”，并列出“已知漂移红（r3 ×2 / foundation ×3）”。现实是：r2/r3 已不在盘上，foundation 是 authored 合成场景且我实跑全绿；`docs/guides/dev-loop.md:133` 与 `docs/testing.md:62` 的同一句也指向已不存在的语料。**升 pin 程序会拿一个不加载本包的合成回放当“全绿”证据。**
 - **计数与事实漂移**：`packages/company-pack/README.md:23` 写"公司视图与**五个页签**"——注册面实际 9 个（`company-tab-registration.ts` 九个 `id:`，cdp-probe 活体也验到 9 个）。`nav-count-claims` 门禁的扫描面是 `docs/** + AGENTS.md + README.md`，**不含包 README**，所以这条活到了收货人文档里。同类：`tests/harness/session/entry-probe.spec.ts:13` 的 Q4 旧标准答案仍是 `dsh-v0.1.7-rc.2`（现行 pin 是 `dsh-v0.2.1-rc.2`），而判据 `tools/lib/entry-probe.mjs:6` 只匹配 `/dsh-v\d+\.\d+/`——这个"入口链新鲜度"探针抓不到版本腐化；`checks/gates/doc-budget.mjs` 第 13-15 行刚写"注释里不要复述当前行数"，随后三处"内容 N"已过期（64/59/351 写成 60/55/348）。
-- **同文件内重复**：`docs/data-model.md` 把"面板摘要全扫 + open/最近 120 全文"写了三次（:15 表格、:67、:70——后两条几乎逐字重复）。
-- **归档指针失效**：`docs/demo.md` 在 :68/:152/:171/:228 引 `snapshots/archive/...` 四个路径，盘上都不存在；:68 还把合成的 `foundation-workspace` 称作一场真实动议的"归档"。
+- **同文件内重复**：`docs/contracts/data-model.md` 把"面板摘要全扫 + open/最近 120 全文"写了三次（:15 表格、:67、:70——后两条几乎逐字重复）。
+- **归档指针失效**：`docs/contracts/demo.md` 在 :68/:152/:171/:228 引 `snapshots/archive/...` 四个路径，盘上都不存在；:68 还把合成的 `foundation-workspace` 称作一场真实动议的"归档"。
 - **设计层标签过期**：`docs/design/architecture.md:273` "（0.1.7 模型）"、`docs/design/roles-isolation.md:130` "（0.1.7 现状）"、`docs/design/ui-demo.md` 多处——机制在 rc.2 下仍成立（子代理回查 vendor 确认），但"现状"写在旧版本号上，读者无法判断。
 - **探针默认值失效**：六个面板探针（attention/presence/tasks/budget/deliverables/…）默认会话标题 `动议观察 · 23684`，dev home 里不存在（grep 零命中），按头注跑会得到栈而不是截图。
 
@@ -132,7 +132,7 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 | R3-13 | D5 | P2 | 测试重心偏斜 49.4% 仓库不变量；最弱形态 = 切探针源码 vm 求值（`collaboration-probe-verdict.spec.ts:16-24`） |
 | R3-14 | D5 | P2 | `describe.skipIf(!hasLive)` 与"零 skip"政策矛盾（`tests/lib/ledger.spec.ts:43`；907 vs fresh clone 904） |
 | R3-15 | D4 | P2 | 计数/事实漂移：包 README "五个页签"（实际 9，门禁不扫包 README）；entry-probe Q4 仍答 0.1.7 且判据抓不到；doc-budget 注释三处"内容 N"过期 |
-| R3-16 | D4 | P2 | `docs/data-model.md` 同一规则写 3 次（:15/:67/:70）；`docs/demo.md` 引 4 个不存在的 `snapshots/archive/...`（:68/:152/:171/:228），并把合成场景称作真实归档 |
+| R3-16 | D4 | P2 | `docs/contracts/data-model.md` 同一规则写 3 次（:15/:67/:70）；`docs/contracts/demo.md` 引 4 个不存在的 `snapshots/archive/...`（:68/:152/:171/:228），并把合成场景称作真实归档 |
 | R3-17 | D1 | P2 | 行预算棘轮失真：10/20 文件头寸 <5%、反向空置 20–45%、链上 334 行无预算（`checks/gates/doc-budget.mjs` 表 vs 实跑） |
 | R3-18 | D1 | P2 | 入口链 836 行 ≈21k tokens，开工只需 35 行；三处热链无 `#anchor`（`AGENTS.md:4,29`、`docs/project-map.md:12`） |
 | R3-19 | D1 | P2 | 无"政策"层，授权/门禁升格/自动化上限/越界/自主协议都住在指南（`docs/guides/dev-loop.md` 285 行）；`docs/AGENTS.md:16` 自身禁止"完成定义进指南" |
@@ -142,7 +142,7 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 | R3-23 | D6 | P2 | cdp-probe 把未登录判成渲染失败（盘上 2026-10-26 证据）；成功不落图；`cdp-probe.md:14` 选择器名过期 |
 | R3-24 | D6 | P2 | 症状→动作表无 UI 行；证据 7 天被 prune、web stderr 不落盘、`web-logs` 仅手抄 banner |
 | R3-25 | D1/D2 | P3 | 设计层"0.1.7 现状"标签过期、`architecture.md:284-287` 保留已撤回开放点；`src/client` 30 文件平铺（建议 >40 再拆）；六个面板探针默认会话标题失效 |
-| R3-26 | D4/D5/D6 | P1 | 升 pin 回归网名存实亡：`docs/release.md:123-125` 仍以 r2/r3 + foundation 作“replay = 第一道”，并记“已知漂移红 r3 ×2 / foundation ×3”；r2/r3 已撤、foundation 实跑全绿且不加载本包；`dev-loop.md:133`/`testing.md:62` 同指失效语料 |
+| R3-26 | D4/D5/D6 | P1 | 升 pin 回归网名存实亡：`docs/contracts/release.md:123-125` 仍以 r2/r3 + foundation 作“replay = 第一道”，并记“已知漂移红 r3 ×2 / foundation ×3”；r2/r3 已撤、foundation 实跑全绿且不加载本包；`dev-loop.md:133`/`testing.md:62` 同指失效语料 |
 
 ## 4. 建议批次（待 REVIEW 选批）
 

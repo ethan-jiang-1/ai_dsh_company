@@ -4,7 +4,7 @@
 
 > **2026-10-25/28 部分取代（所有权）**：host 侧 catalog + domain `presented` 账本成为权威；
 > 本文只保留“派生索引 + 只读页签 + 不建第二份手写事实”的决定与当时证据。writer/presented 权威、
-> tracked 状态与筛选档数按现行合同（[data-model](../../docs/data-model.md) §二/§三）为准。
+> tracked 状态与筛选档数按现行合同（[data-model](../../docs/contracts/data-model.md) §二/§三）为准。
 
 ## 决定
 

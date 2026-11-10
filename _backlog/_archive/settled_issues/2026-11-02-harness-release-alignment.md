@@ -46,20 +46,20 @@ README 元数据与门禁也有事实漂移。
 
 | ID | 严重度 | GAP | 代表证据 | 落地动作 |
 |---|---|---|---|---|
-| G1 | P0 | 「插件即产品 / 产品形状 / 产品安装 / 产品入口 / 产品 home / 产品文件 / 产品承诺 / 产品设置」仍在首屏与合同 | `README.md` 3/14/58/74-75；`docs/profile.md` 6/13/19/28/52；`docs/release.md` 1/4；`docs/index.md` 25/29/40；`docs/data-model.md` 25 | 改词：Harness 发行版/交付形态/应用内安装/启动入口/Harness home/本包写出的文件/本包承诺/便利设置 |
-| G2 | P0 | `bundle` 五义（DSH bundle / run bundle / dev bundle / `bundle.json` / pack）；`run bundle` 与 `run trace` 混用；`run/README.md` 仍 v2 一 home 一 workspace + 启动器 + 产品 `--workspace`；`orient` 同病 | `run/README.md` 12-15/27/32；`docs/orient.md` 56-57/69/76；`docs/runtime-map.md` 42-45；`docs/data-model.md` 4/15/20 | 用户面统一「公司状态」；`run trace` 只指四件套；`run/README.md` 重写 v3；代码/文件 legacy 名保留并登记 |
+| G1 | P0 | 「插件即产品 / 产品形状 / 产品安装 / 产品入口 / 产品 home / 产品文件 / 产品承诺 / 产品设置」仍在首屏与合同 | `README.md` 3/14/58/74-75；`docs/contracts/profile.md` 6/13/19/28/52；`docs/contracts/release.md` 1/4；`docs/index.md` 25/29/40；`docs/contracts/data-model.md` 25 | 改词：Harness 发行版/交付形态/应用内安装/启动入口/Harness home/本包写出的文件/本包承诺/便利设置 |
+| G2 | P0 | `bundle` 五义（DSH bundle / run bundle / dev bundle / `bundle.json` / pack）；`run bundle` 与 `run trace` 混用；`run/README.md` 仍 v2 一 home 一 workspace + 启动器 + 产品 `--workspace`；`orient` 同病 | `run/README.md` 12-15/27/32；`docs/orient.md` 56-57/69/76；`docs/runtime-map.md` 42-45；`docs/contracts/data-model.md` 4/15/20 | 用户面统一「公司状态」；`run trace` 只指四件套；`run/README.md` 重写 v3；代码/文件 legacy 名保留并登记 |
 | G3 | P0 | 发布字节 ≠ 认证档字节：`release-smoke` 另打临时 tarball；`_dist` 未被 `release --verify` 安装；`--stamp` 可把旧产物钉到新 HEAD；`publish-handoff` 从包目录 publish 重打 | `_dist` 0.7.0 tarball sha `abef80f4…` vs 当前树重打 `5fe5f189…`；`_dist` 缺 HEAD 的 `ui-trajectory`/`ui-sidebar-terminal` 两行；`tools/release.mjs` 245-249；`checks/smoke/release-smoke.mjs` 98-103；`docs/guides/publish-handoff.md` 24/29-30 | `release-smoke --tarball/--expect-sha` 装 `_dist`；`release --check/--stamp` 加 `sourceFingerprint`；`--verify` 加 `company-entry-smoke`；handoff 发 tarball |
 | G4 | P0 | 「不需要用户安装 Node/pnpm」过宽；`dist-manual` 门禁强制这句话；CLI/Web-on-CLI 需要 pnpm 在 PATH | `README.md` 34-35；`packages/company-pack/README.md` 5/22；`tools/lib/install-manual.mjs` 9/42/223；`checks/gates/dist-manual.mjs` 35；FAQ 20:60；vendor CLI `plugin.ts` 98 | 按 Desktop 自带 / npm CLI 需 pnpm 分开写；门禁改判据；smoke 加 `pnpm --version` 前置 |
-| G5 | P1 | profile 初始化手写 `package.json`/`pnpm-workspace`；`patchReload` 已从 vendor 删除，docs 与 4 个 smoke 仍当有效字段 | `checks/smoke/release-smoke.mjs` 107-119/154-165；`docs/guides/debugging.md` 11；`docs/guides/bootstrap.md` 123；`docs/release.md` 93；`rg patchReload vendor` = 0 | 用官方 `--from-default-profile web`；删 `patchReload`；一次性 profile 用 `hmr disabled`；smoke 断言 dependencies 对象且无 `patchReload` |
-| G6 | P1 | 恢复/演示把 `plugin add` 当第一步，新 home 建 base-only，起不了 Web；`docs/profile.md` 教手写 `dsh.profile.bundles`；multi-install 直接赋 roster | `packages/company-pack/README.md` 93-94；`docs/design/ui-demo.md` 18；`docs/profile.md` 57-58；`checks/smoke/multi-install-smoke.mjs` 174-177 | 恢复先 `--from-default-profile web` 再 add；删手写 roster 建议；smoke 走官方 add |
-| G7 | P1/P2 | 包 README 缺 `description`/`kind`、缺升级/排障；browser peer 未标 optional；`engines.node` 比 DSH 宽；数据卡缺 source/scope/readers/rebuildability | `packages/company-pack/README.md` 1-6/111；`packages/company-pack/package.json` 25/58-78；`docs/data-model.md` 11 | 加 front matter、两节；加 `peerDependenciesMeta.optional`；对齐 node range；补数据卡字段/指针 |
-| G8 | P1/P2 | current docs 混历史/未来/失效指针；门禁钉旧文案；预算顶格 | `docs/release.md` 9/105/140/148/160-162；`docs/guides/release-runbook.md` 1/30；`docs/guides/publish-handoff.md` 87；`docs/profile.md` 52；`README.md` 80-86；`docs/runtime-map.md` 70-71；`docs/project-map.md` 94；`docs/external-research.md` 23-24 | 删除/搬迁；更新指针；门禁/预算同步；历史层不动 |
+| G5 | P1 | profile 初始化手写 `package.json`/`pnpm-workspace`；`patchReload` 已从 vendor 删除，docs 与 4 个 smoke 仍当有效字段 | `checks/smoke/release-smoke.mjs` 107-119/154-165；`docs/guides/debugging.md` 11；`docs/guides/bootstrap.md` 123；`docs/contracts/release.md` 93；`rg patchReload vendor` = 0 | 用官方 `--from-default-profile web`；删 `patchReload`；一次性 profile 用 `hmr disabled`；smoke 断言 dependencies 对象且无 `patchReload` |
+| G6 | P1 | 恢复/演示把 `plugin add` 当第一步，新 home 建 base-only，起不了 Web；`docs/contracts/profile.md` 教手写 `dsh.profile.bundles`；multi-install 直接赋 roster | `packages/company-pack/README.md` 93-94；`docs/design/ui-demo.md` 18；`docs/contracts/profile.md` 57-58；`checks/smoke/multi-install-smoke.mjs` 174-177 | 恢复先 `--from-default-profile web` 再 add；删手写 roster 建议；smoke 走官方 add |
+| G7 | P1/P2 | 包 README 缺 `description`/`kind`、缺升级/排障；browser peer 未标 optional；`engines.node` 比 DSH 宽；数据卡缺 source/scope/readers/rebuildability | `packages/company-pack/README.md` 1-6/111；`packages/company-pack/package.json` 25/58-78；`docs/contracts/data-model.md` 11 | 加 front matter、两节；加 `peerDependenciesMeta.optional`；对齐 node range；补数据卡字段/指针 |
+| G8 | P1/P2 | current docs 混历史/未来/失效指针；门禁钉旧文案；预算顶格 | `docs/contracts/release.md` 9/105/140/148/160-162；`docs/guides/release-runbook.md` 1/30；`docs/guides/publish-handoff.md` 87；`docs/contracts/profile.md` 52；`README.md` 80-86；`docs/runtime-map.md` 70-71；`docs/project-map.md` 94；`docs/reference/external-research.md` 23-24 | 删除/搬迁；更新指针；门禁/预算同步；历史层不动 |
 | P0-0 | P0 | 当前 0.7.0 `_dist` 已实证早于 HEAD，`release --check` 仍 READY | 同上 G3 实测 | 0.7.1 重新 prepare/verify/check；旧 0.7.0 不发布 |
 | P1-a | P1 | 把 `application: applied` 写成唯一成功态；`restart-required` 是合法结果 | `packages/company-pack/README.md` 29；`docs/guides/publish-handoff.md` 73；FAQ 18:61 | 改成 applied 或 restart-required 后重启；failed 才是失败 |
 | P1-b | P1 | 市场 staged 生命周期没进 handoff；手册未发布期仍教加源；门禁只查字面量 `market-index.json` | `docs/guides/publish-handoff.md` 38-57；`_dist/安装手册.md` 63-67；`checks/gates/dev-product-parity.mjs` 80-83 | handoff 写 staged → 发布 → 刷新 → 删 staged；门禁语义检测；手册未发布期写“无源可加” |
 | P1-c | P1 | 两个 browser 包是必装 peer，违反离线/零 runtime 依赖姿态 | `packages/company-pack/package.json` 65/78；无 `peerDependenciesMeta` | 加 optional + `pack-shape` 断言 |
 | P2-a | P2 | tarball/git 安装版本门是“装后判定 + 回滚”，手册未写；`npm pack` mtime 理由不成立 | vendor plugin-manager README 69；`tools/release.mjs` 195-196 | 手册补差异；删 mtime 解释，改“lib/ 陈旧或树已变” |
-| P2-b | P2 | `checks/README.md` 计数过期（28→26、13→12、52→53）；`external-research` 破指针不被 `bare-path` 扫；`run/README.md` 退役词无门禁 | `checks/README.md` 30/51/58；`docs/external-research.md` 23-24；`run/README.md` 12-15 | 改计数；加 external-research 人工/门禁核验；`retired-path` 加退役词判据 |
+| P2-b | P2 | `checks/README.md` 计数过期（28→26、13→12、52→53）；`external-research` 破指针不被 `bare-path` 扫；`run/README.md` 退役词无门禁 | `checks/README.md` 30/51/58；`docs/reference/external-research.md` 23-24；`run/README.md` 12-15 | 改计数；加 external-research 人工/门禁核验；`retired-path` 加退役词判据 |
 
 ## 噪声退休表（插件分发 / 安装 / 初始化）
 
@@ -68,14 +68,14 @@ README 元数据与门禁也有事实漂移。
 
 | 噪声类 | 代表残留 | 处置 | 边界 |
 |---|---|---|---|
-| 旧交付框架词 | README.md:3「插件即产品」；docs/profile.md:13/19「产品安装/产品形状」；docs/release.md:1/4「发布形状/产品形状」；docs/index.md:25/29；docs/data-model.md:25「产品设置」；pack README/手册同族 | 全部改写为 Harness 发行版 / 交付形态 / 应用内安装 / 启动入口 / Harness home / 本包写出的文件 / 便利设置 | 历史层与 demo 业务动议原文不改 |
+| 旧交付框架词 | README.md:3「插件即产品」；docs/contracts/profile.md:13/19「产品安装/产品形状」；docs/contracts/release.md:1/4「发布形状/产品形状」；docs/index.md:25/29；docs/contracts/data-model.md:25「产品设置」；pack README/手册同族 | 全部改写为 Harness 发行版 / 交付形态 / 应用内安装 / 启动入口 / Harness home / 本包写出的文件 / 便利设置 | 历史层与 demo 业务动议原文不改 |
 | `bundle` 五义 | 同一段里 DSH bundle、run bundle、dev bundle、bundle.json、pack 混用；run/README.md 12-15 还写 v2 | 用户面只用「公司状态（company state）」；`run trace` 只指四件套；`bundle` 只指 DSH 发布单位；`pack` 只作包简称；`bundle.json` 标 legacy 文件名 | 代码标识符 `RUN_BUNDLE_*`、storage domain 保留；不批量改名 |
 | 已退役形状 | 一 home 一 workspace、启动器强制、产品 `--workspace`、seed-consent、profile patch registrar、`DSH_COMPANY_REBIND`、`patchReload`、Update 按钮、删整个 `DSH_HOME` | current docs/脚本/测试里删或改写；负面断言（如“无 seed-consent”）保留作现状守卫 | 历史卡与归档保留原文 |
 | 重复的发布/安装叙事 | README、release.md、release-runbook、publish-handoff、pack README、`_dist/安装手册.md` 各写一份安装/升级/卸载；release.md 里还有冒烟程序与升 pin 程序 | 定 owner：release.md = 发行版合同；runbook = 操作步骤；handoff = 字节离开仓库；手册 = 收件人唯一安装路径；README/pack README = 首屏 + 指针。删重复段 | 版本史归 CHANGELOG；脚本步骤归脚本头注 |
 | 过期指针/版本 | 26_plugin-data-model / 26_plugin-as-product 两个不存在的目录；release-runbook 1「0.3.x」/30「0.3.4」；publish-handoff 87 指向归档卡；README 0.6.0/0.5.0 版本说明；release.md 0.6.0/OpenSpec/旧 FAQ 13 | 修正/删除；发布回执改落当轮 Note + manifest | 归档卡不改内容；历史 decisions 只加 D55 |
 | 门禁钉旧文案 | `dist-manual` 强制「不需要 Node」；`dev-product-parity` 固定旧指南名/旧词；`pack-shape`/`company-skeleton` 消息写「产品入口」；`run-bundle-clean` 名称 | 改判据/消息；新增 optional peer、发布源指纹、run/README 退役词等断言 | 门禁红证与历史注释可保留，但要标“负例留证” |
 | 代码/工具/测试注释 | `tools/company.mjs`、`tools/bundle-init.mjs`、`tools/lib/install-manual.mjs`、`tools/orient.mjs`、`checks/smoke/*`、`tests/host/*` 的 run bundle/产品/launcher 字样 | 读者面注释与测试标题改新词；纯标识符/路径保留并标 legacy | 不改测试断言语义来“凑绿” |
-| 计数/清单第二份 | checks/README.md:30/51/58 28/13/52（实为 26/12/53）；`docs/profile.md` 行清单；`docs/release.md` 手册 required 词表 | 改成“清单 = 目录本身”或实测值；required 词表归门禁 | D28：枚举型事实的家 = 实现自己 |
+| 计数/清单第二份 | checks/README.md:30/51/58 28/13/52（实为 26/12/53）；`docs/contracts/profile.md` 行清单；`docs/contracts/release.md` 手册 required 词表 | 改成“清单 = 目录本身”或实测值；required 词表归门禁 | D28：枚举型事实的家 = 实现自己 |
 | 历史/未来混入合同 | release.md 0.6.0 史、OpenSpec 触发、日期实证；profile.md 0.5.0 registrar；runtime-map REBIND/0.5.0；project-map 目录整理结论；demo 实测回执 | 删除/搬 notes 或 CHANGELOG；合同只写 now | 不把历史层本身当噪声删除 |
 
 **执行顺序**：本卡（噪声清单）→ `notes/implemented/2026-11-02-distribution-alignment.md`（方案/验收）→ 逐 Phase 落地
@@ -94,8 +94,8 @@ README 元数据与门禁也有事实漂移。
 
 ### Phase 0 · 术语与登记
 
-- `docs/terminology.md`：bundle/profile/pack、公司状态/run trace/发布物/发行版。
-- `docs/external-research.md`：合并为 `26_harness-release/`；删两个不存在的 26 目录。
+- `docs/reference/terminology.md`：bundle/profile/pack、公司状态/run trace/发布物/发行版。
+- `docs/reference/external-research.md`：合并为 `26_harness-release/`；删两个不存在的 26 目录。
 - 收口 Note + D55（发行版六轴与术语对齐）。
 
 ### Phase 0.5 · 发布证据链（P0）
@@ -104,16 +104,16 @@ README 元数据与门禁也有事实漂移。
   sha + `company-entry-smoke`。
 - `checks/smoke/release-smoke.mjs`：`--tarball/--expect-sha`；装 `_dist`；官方 profile 初始化。
 - `docs/guides/publish-handoff.md`：发 `_dist` tarball；staged 生命周期；回执落 Note。
-- `docs/release.md`：发布字节措辞与 0.7.1 版本行。
+- `docs/contracts/release.md`：发布字节措辞与 0.7.1 版本行。
 
 ### Phase 1 · current docs / 合同
 
-- `README.md`、`AGENTS.md`、`docs/index.md`、`docs/profile.md`、`docs/release.md`、`docs/runtime-map.md`、
-  `docs/data-model.md`、`docs/project-map.md`、`docs/orient.md`、`docs/guides/environments.md`、
+- `README.md`、`AGENTS.md`、`docs/index.md`、`docs/contracts/profile.md`、`docs/contracts/release.md`、`docs/runtime-map.md`、
+  `docs/contracts/data-model.md`、`docs/project-map.md`、`docs/orient.md`、`docs/guides/environments.md`、
   `docs/guides/dev-product-parity.md`、`docs/guides/release-runbook.md`、`checks/README.md`、`tests/README.md`。
 - `run/README.md` 重写 v3；`packages/company-pack/README.md` 加 front matter/升级/排障并改词。
 - `tools/lib/install-manual.mjs` + `_dist/安装手册.md` 重生成；`dist-manual` 门禁同步。
-- 六轴 owner 表进 `docs/release.md`；删历史/未来/重复程序，守 172 行预算。
+- 六轴 owner 表进 `docs/contracts/release.md`；删历史/未来/重复程序，守 172 行预算。
 
 ### Phase 2 · practice
 

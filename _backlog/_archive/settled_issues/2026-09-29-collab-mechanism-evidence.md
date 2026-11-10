@@ -22,7 +22,7 @@
 0.1.7 时代引 277 行，0.2.0-rc.2 实测已移至 278–279）；fs-local
 实例内锁 + `FS_STALE_VERSION` 官方测试；Agent Teams 任务板 CAS / 邮箱 / `wait_agent` 语义
 （[vendor Note](../../../vendor/dsh/.agents/notes/implemented/feature/2026-08-05-agent-teams.md)）；跨 home 无
-Team 寻址、多机只剩共享盘（[multi-human.md](../../../docs/multi-human.md) §5）。
+Team 寻址、多机只剩共享盘（[multi-human.md](../../../docs/contracts/multi-human.md) §5）。
 
 **推断未实测的 = 本卡的活**，见下。
 
