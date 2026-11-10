@@ -62,7 +62,7 @@ opened: YYYY-MM-DD
 - [workflow + subagent 探索测试：只有 W / 只有 S / 混合一次 / 混合多次](workflow-subagent-exploration/README.md) — 服务 VP-Eng 的 eng-teaming / delegation 与 workflow 通道；2026-11-08 开，调研中（计划待 review，未开跑）。
 - [SA/SQA 产物评审：两个新子人格的产出到底行不行](sa-sqa-product-review/README.md) — 服务 SA/SQA 落地 Note 与
   BUG-034/035；2026-11-06 开，调研中。
-- [组织协同拓扑：CEO 五条汇报线、VP-Eng 研发负载与 workflow/subagent 的分工](org-coordination-topology/README.md) — 服务用户 2026-11-10 研究请求；结论 = 方向对、闭环没做完（CEO 3/5 覆盖、团队方法缺口、SA/SQA 方法包缺位、产品类型需按动议声明、workflow 仅同身份扇出）；产出 4 张推敲卡（产品类型语义 / 动议级路由 / SA-SQA 方法包 / COO-CFO 通道）；2026-11-10 开，已定性。
+- [组织协同拓扑：CEO 五条汇报线、VP-Eng 研发负载与 workflow/subagent 的分工](org-coordination-topology/README.md) — 服务用户 2026-11-10 研究请求；结论 = 方向对、闭环没做完（CEO 3/5 覆盖、团队方法缺口、SA/SQA 方法包缺位、产品类型需按动议声明、workflow 仅同身份扇出）；产出 4 张卡（产品类型语义 / 动议级路由 / SA-SQA 方法包 / COO-CFO 通道），已结归档；2026-11-10 开，已定性。
 （2026-11-08 VP-Eng 委派拓扑题随 workflow 通道卡归档，迁入[研究归档](../_archive/research/README.md)。）
 （2026-11-07 需求识别/编号题与 VP-Eng 组队题随程序伞卡归档，迁入[研究归档](../_archive/research/README.md)。）
 

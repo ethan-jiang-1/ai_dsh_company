@@ -1,16 +1,16 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-10
 ---
 
 # 推敲：动议级产品类型——`meta.md` 声明 + `/req check` 解析
 
-> 立卡：2026-11-10 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-10 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 语义审（对照验收 4 条）+ keyless/verify/typecheck/full test/preset-smoke 实跑，证据见 Note
 >
-> **结论/去向**：note — 实现后落 `notes/implemented/2026-11-10-motion-product-type.md`。
+> **结论/去向**：note — [Note](../../../notes/implemented/2026-11-10-motion-product-type.md)。
 >
-> 上游研究：[产品类型模型 §4](../research/org-coordination-topology/2026-11-10-product-type-model.md)；
-> 组织拓扑 [README](../research/org-coordination-topology/README.md)。
+> 上游研究：[产品类型模型 §4](../../research/org-coordination-topology/2026-11-10-product-type-model.md)；
+> 组织拓扑 [README](../../research/org-coordination-topology/README.md)。
 > 前置：产品类型语义由[另一卡](2026-11-10-product-type-semantics.md)定；本卡只做“怎么按动议切换”。
 >
 > **已定（实现）：** `meta.md` 加 `产品类型`；`/req check` 解析顺序 = 动议 `meta.md` > `company.md`；
@@ -18,9 +18,9 @@ opened: 2026-11-10
 
 **问题与期望结果：** 用户 2026-11-10 提出：不固定公司默认类型；动议说硬软一体就用 `hardware-software`，
 说纯软就用 `business-software`。当前 `company.md` 的 `productType` 是**部署级唯一来源**
-（[`company.md:4`](../../packages/company-pack/content/state/company.md)），`/req check` 只读它
-（[`req-command.ts:49-62`](../../packages/company-pack/src/host/commands/req-command.ts)），`meta.md`
-只有 `需求层`、没有 `产品类型`（[`meta.md`](../../packages/company-pack/content/templates/meta.md)）。
+（[`company.md:4`](../../../packages/company-pack/content/state/company.md)），`/req check` 只读它
+（[`req-command.ts:49-62`](../../../packages/company-pack/src/host/commands/req-command.ts)），`meta.md`
+只有 `需求层`、没有 `产品类型`（[`meta.md`](../../../packages/company-pack/content/templates/meta.md)）。
 期望结果：CEO 开局按用户声明记录类型；缺省回落公司默认；`/req check` 用对类型的 check-rules；
 `company.md` 仍是公司身份，不被动议改写。推敲完成 = 字段形状、解析顺序、未知类型行为、迁移口径
 写清，能直接拆实施卡。
@@ -28,13 +28,13 @@ opened: 2026-11-10
 **当前情况：**
 
 - `company.md` 是公司身份（client 也读它显示公司信息，
-  [`company-identity.ts`](../../packages/company-pack/src/client/data/company-identity.ts)）。
+  [`company-identity.ts`](../../../packages/company-pack/src/client/data/company-identity.ts)）。
 - `meta.md` 是动议户口，已有 `需求层`、`编号体系`；没有 `产品类型`。
 - `/req check` 读 `company.md` → `product-types/<id>/check-rules.json`；未知类型返回 null，
-  退到五层默认（[`req-command.ts:49-62`](../../packages/company-pack/src/host/commands/req-command.ts)）。
+  退到五层默认（[`req-command.ts:49-62`](../../../packages/company-pack/src/host/commands/req-command.ts)）。
 - `/prd check` 不读 `productType`；它认 MRD/PRD JSON，两种拟议类型都可以不读（见 product-type 材料 §4.3）。
 - 角色侧 CEO 的 `assembling-the-team` 只说“按产品类型包的 owner/路由”，没有“开局记录类型”的步骤
-  （[`assembling-the-team/SKILL.md`](../../packages/company-pack/presets/ceo/skills/assembling-the-team/SKILL.md)）。
+  （[`assembling-the-team/SKILL.md`](../../../packages/company-pack/presets/ceo/skills/assembling-the-team/SKILL.md)）。
 - 测试 `tests/host/commands/req-command.spec.ts` 覆盖 `b2b-saas` 的 custom-layers 分支，但没有
   “meta 优先/回落”的用例。
 

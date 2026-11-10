@@ -5,7 +5,7 @@
  * check-rules 的 layers/files/defaultLayers 自洽，productType 与目录名一致。
  * 至少两家类型（换类型才有对照）。
  *
- * 红配方：删 `b2b-saas/check-rules.json` → 文件在场红；从 files 删一个层 → 自洽红。
+ * 红配方：删 `business-software/check-rules.json` → 文件在场红；从 files 删一个层 → 自洽红。
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

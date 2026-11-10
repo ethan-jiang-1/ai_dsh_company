@@ -12,7 +12,7 @@ const PRESETS_DIR = join(PACK, 'presets')
 describe('client 面（R3：委派工具卡）', () => {
   it('工具卡的 key 与 CEO preset 的命名委托工具逐字一致（keyed slot 拼错不报错，只是永不渲染）', () => {
     const ceo = readFileSync(join(PRESETS_DIR, 'ceo', 'agent.cordis.yml'), 'utf8')
-    const toolNames = [...ceo.matchAll(/toolName: (vp_[a-z]+)$/gm)].map(m => m[1] as string).sort()
+    const toolNames = [...ceo.matchAll(/toolName: (vp_[a-z]+|coo|cfo)$/gm)].map(m => m[1] as string).sort()
     expect(toolNames.length, 'CEO preset 里没找到命名委托工具').toBeGreaterThan(0)
     expect([...DELEGATION_TOOL_KEYS].sort(), 'key 与 preset 的 toolName 不一致 → 卡片永远不渲染').toEqual(toolNames)
   })

@@ -4,7 +4,7 @@
  * 病根：测试把"这家公司是什么"写成常量（名字/人数/政策数字），换公司时测试仍在替旧公司作证。
  * 判据：同一套 spec 用两家不同公司跑；期望值只从 fixture profile 读。
  *
- * 红配方：删 `tests/fixtures/companies/beta-b2b-saas/policy-lines.md` → 本 spec 红（fixture 缺件）；
+ * 红配方：删 `tests/fixtures/companies/beta-business-software/policy-lines.md` → 本 spec 红（fixture 缺件）；
  * 把 beta 的 productType 改成与 acme 相同 → "产品类型不同"红。
  */
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs'

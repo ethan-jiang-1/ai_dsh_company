@@ -147,7 +147,7 @@ rm -f  <DSH_HOME>/storages/company_run_bundle_ledger.json
 - 浮窗几何记忆（位置/大小按页签 contentId 存 localStorage）按 **origin** 隔离：同一次服务运行 + 页面刷新有效；换端口重启即新 origin、记忆清零（vendor 侧栏布局持久化同此边界）。
 - **三层内容与加载档位（2026-11-09）**：`content/generic/`（T0 常驻 + T2 按需）/ `content/product-types/<id>/`（T1 摘要 + T2/T3）/ `content/company/`（T0–T2）；`content/contracts/` 随 DSH pin。`content/manifest.json` 是唯一清单（`content-manifest` 门禁查完整性与预算：T0 ≤6KB、T1 ≤4KB、T2 单文件 ≤6KB）。host 只把 `content/AGENTS.md`（T0）注入 system prompt section，其余按指针读；超预算运行时告警、门禁红。
 - **显示名 = 角色名**（D14 2026-11-09 收窄）：公司名只在品牌/身份面；品牌读 `.dsh-company/kb/company.md` frontmatter 的 `productName`，旧盘无 frontmatter 时回退出厂词标 `DSH 梦之队`。
-- **产品类型包的边界**：`/req check` 按 `company.md` 的 `productType` 读 `check-rules.json`——非五层类型（如 `b2b-saas`）返回"不走五层编号体系"而不是判红；时区仍写死 `Asia/Shanghai`（未接 profile）。
+- **产品类型包的边界**：`/req check` 按动议 `meta.md` 的 `产品类型` 优先、缺省回落 `company.md` 的 `productType`，再读 `check-rules.json`——非五层类型（如自定义 `custom`）返回"不走五层编号体系"而不是判红；声明的类型不在盘上则报错并列可用类型；时区仍写死 `Asia/Shanghai`（未接 profile）。
 - **培养页的可追溯链**：主任务入口为“让角色今后的工作更好”；方法行展示提出者角色语境、目标角色、来源（缺失则明说未知）、采纳时间和采纳后验证历史。pass/fail 都要求一条后续相似工作的依据并保留事件；失败不自动撤回。AI 起草候选仍未获批，入口只提供人写纠正/建议。
 - **上网能力（`web_search` / `web_fetch`）必须随每个 preset 声明**：web-app bundle 把 host 上的 `tool-web` 行 `disabled: true`，改为按 agent preset 组合（vendor base 注释原文）——所以它**不是**全局继承来的；漏声明时角色与它 spawn 的 child 都静默无联网。子会话（`subagent` / team teammate）**继承 Lead 的组合**（`composeFrom`；roles-isolation §2/§4），故 Lead 有即可，不必另配。
 - **one-shot 委托 child 的目录里看得见 Team 工具但调不通**（上游已登记限制，vendor tool-agent-team README "One-shot child tool visibility"；2026-10-02 真跑实证：child 目录 41 工具含全部六个 Team 工具，调用在身份确认后被拒）。防线 = CEO preset 两份委托 persona 各一句「别碰 team 工具，并行调研只用 subagent」+ `delegation-smoke --delegate` 的 [3] 守卫（边界变了就红）。

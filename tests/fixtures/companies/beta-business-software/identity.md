@@ -1,9 +1,9 @@
 ---
-company: Beta SaaS
+company: Beta Software
 productName: Beta Cloud
-productType: b2b-saas
+productType: business-software
 timeZone: America/Los_Angeles
 ---
-# Beta SaaS · 身份
+# Beta Software · 身份
 
-> 测试 fixture：2B SaaS 公司，验证换产品类型时需求链与政策线都换。
+> 测试 fixture：企业软件公司，验证换产品类型时需求链与政策线都换。

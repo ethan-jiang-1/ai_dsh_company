@@ -12,8 +12,8 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 
 - **要协作面**（任务板、互审、会议上下文、能反复追加意见）→ `spawn_teammate`（Agent Teams，
   主通道 D4）。
-- **只要一份稿**（单职能快捷出稿）→ `vp_eng` / `vp_sales` / `subagent_research`（命名委托工具，
-  通道 A；0.2.1 起每次调用都是一次 **activation**）。
+- **只要一份稿**（单职能快捷出稿）→ `vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo` / `subagent_research`
+  （命名委托工具，通道 A；0.2.1 起每次调用都是一次 **activation**）。
 
 ## 1. 命名委托工具（通道 A）
 
@@ -22,14 +22,14 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 | `vp_eng` | VP-Eng（研发） | `provider: spawn` · `maxDepth: 1` · `agentPreset: vp-eng` |
 | `vp_sales` | VP-Sales（销售） | `provider: spawn` · `maxDepth: 1` · `agentPreset: vp-sales` |
 | `subagent_research` | 只读调研执行手（一次性调研） | `provider: spawn` · `agentPreset: worker-researcher`（只读工具面） |
-| `vp_cmo` | CMO（命名专家：MRD/StRS；**只在 vp-eng preset**，CEO 的 vp_cmo 仍 maxDepth 1） | `provider: spawn` · `maxDepth: 2` · `agentPreset: cmo` |
+| `vp_cmo` | CMO（市场与产品定义；CEO 版 `maxDepth: 1` / VP-Eng 版 `maxDepth: 2`） | `provider: spawn` · `agentPreset: cmo` |
+| `coo` | COO（运营与交付） | `provider: spawn` · `maxDepth: 1` · `agentPreset: coo` |
+| `cfo` | CFO（财务与合规） | `provider: spawn` · `maxDepth: 1` · `agentPreset: cfo` |
 | `quality_loop_produce` | 产出者（质量环"做"的一侧；**只在 vp-eng preset**） | `provider: spawn` · `maxDepth: 2` · `agentPreset: quality-loop-producer` |
 | `quality_loop_verify` | 验证者（质量环"验"的一侧，只读手；**只在 vp-eng preset**） | `provider: spawn` · `maxDepth: 2` · `agentPreset: quality-loop-verifier` |
 
-- **质量环两条行（2026-11-10）**：一个做、一个验，两个**独立 activation** 且**严格串行**（先 `quality_loop_produce` 收工，
-  再 `quality_loop_verify`；同时发 = 让验证者看半成品），preset 共用 `quality-loop-` 前缀——流程住
-  `_shared/skills/quality-loop`、方法住 `<DSH_HOME>/company/methods/<preset id>/`（任务书点名 `<pack>@<version>`，缺了 fail-closed）；行只管独立上下文与工具面
-  （[presets.md](./presets.md)「质量环能力档」）。
+- **CEO 五个直接汇报各有命名行**（`vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo`，均 `maxDepth: 1`）；child 拿自己的 preset/skills，但一次性、无任务板；多职能仍走 team，team 成员是软角色，要角色方法用命名行或任务书角色包。
+- **质量环两条行**：`quality_loop_produce` → 收工 → `quality_loop_verify`，两个独立 activation、严格串行；流程住 `_shared/skills/quality-loop`，方法住 `<DSH_HOME>/company/methods/<preset id>/`（任务书名 `<pack>@<version>`，缺了 fail-closed）；行只管独立上下文与工具面（[presets.md](./presets.md)「质量环能力档」）。
 
 - **activation 语义**：调用立刻返回回执 `{ kind: 'activation', subagentId }`（线上文本形如
   `started subagent <id>`）；子代理的**最终正文**作为父会话的完成通知送达
@@ -37,9 +37,7 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 - **人格只能由 `agentPreset` 给**：0.2.1 删除了 per-instance `persona` / `toolFilter` /
   `backgroundMode` / `enableRunInBackground`（Config 硬拒）。每个工具行钉一个角色 preset，
   于是 child 拿到的是**该角色的 skills 与工具面**，而不是 CEO 的继承面。
-- **深度**：`maxDepth` 是绝对深度上限（`0` 禁止、`1` 只允许直接子代；行上不写则读 Host 默认 1）。
-  `vp_eng`/`vp_sales` 行是 1——VP-Eng 可能是团队成员
-  （depth 1，见 §3），他起的子代落在 depth 2。团队成员加人只能走命名委托：`spawn_teammate` 仅 Lead 可调。
+- **深度**：`maxDepth` 是绝对上限（`0` 禁止、`1` 只允许直接子代；省略读 Host 默认 1）。`vp_eng`/`vp_sales` 行是 1——VP-Eng 可能是团队成员（depth 1），子代落 2；`spawn_teammate` 仅 Lead 可调。
 - **改稿方式**：优先 `send_to_subagent` 续同一个 named child（root/命名 child 都可用；带上一稿原文）；
   不可续或需要新上下文才再委派一次。CEO 团队的反复追加/互审仍归 team（`send_message` 按名）。
 - **工具行归属**：写在 `presets/ceo/agent.cordis.yml` 的 `delegation` 组内（preset 自包含，

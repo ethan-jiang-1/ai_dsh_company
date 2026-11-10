@@ -8,13 +8,14 @@ definition: json-ledger
 > 主笔 = **CMO**；落 `drafts/mrd.md`；它是 PRD 的输入（VP-Eng 主笔 PRD）。
 > 回答"该不该做、做什么、为谁做、凭什么赢"；**不是功能清单**（那是 PRD），**不是定价判断**（归 VP-Sales/CFO）。
 > 每个机会一个编号 `MR-001…`；证据标【事实】/【假设】并给出处或待验证说明。
+> `productType` 按动议类型替换：纯软/企业软件 = `business-software`，硬软一体 = `hardware-software`。
 
 ```json
 {
   "mrd": {
     "version": "0.1",
     "status": "draft",
-    "productType": "project-services",
+    "productType": "business-software",
     "opportunities": [
       {
         "id": "MR-001",

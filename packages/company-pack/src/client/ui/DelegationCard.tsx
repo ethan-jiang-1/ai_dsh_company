@@ -1,24 +1,26 @@
-/** 委派工具卡（R3，S2 令牌化）：把 `vp_eng` / `vp_sales` / `vp_cmo` 的调用渲染成"给 VP 的 brief 卡"——任务进、稿子出。 */
+/** 委派工具卡（R3，S2 令牌化）：把 CEO 的命名委托工具渲染成"给职能的 brief 卡"——任务进、稿子出。 */
 import { useState, type KeyboardEvent, type ReactNode } from 'react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
 import { cardStateOf, parseArgsObject, resultTextOf, textOf, type CardState } from '../../lib/tool-card.ts'
 
 /**
- * 工具名 → 汇报对象显示名。这三个 key 是 CEO preset 的**命名委托工具**
+ * 工具名 → 汇报对象显示名。这些 key 是 CEO preset 的**命名委托工具**
  * （`presets/ceo/agent.cordis.yml` ④，语义见 docs/contracts/delegation.md）。
  */
 const ROLE_LABEL: Record<string, string> = {
   vp_eng: 'VP-Eng（研发）',
   vp_sales: 'VP-Sales（销售）',
   vp_cmo: 'CMO（市场与产品定义）',
+  coo: 'COO（运营与交付）',
+  cfo: 'CFO（财务与合规）',
 }
 
 /** 卡片生命周期（S2 起与团队工具卡共用同一实现，见 `lib/tool-card.ts`）。 */
 export type { CardState }
 
 const STATE_LABEL: Record<CardState, string> = {
-  running: '等 VP 出稿…',
+  running: '等职能出稿…',
   ok: '已交稿',
   error: '委派失败',
   stopped: '已中止',

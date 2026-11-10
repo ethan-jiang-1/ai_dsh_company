@@ -24,7 +24,7 @@ const BANNED = [
   { kind: '产品类型', name: '系统工程中间层 StRS/SyRS/IRS', re: /\b(?:StRS|SyRS|IRS)\b/ },
   { kind: '产品类型', name: '硬件生命周期词', re: /BOM|试产|量产|EVT|DVT|PVT|供应链|认证/ },
   { kind: '产品类型', name: '按域研发切词 slice', re: /\bslice\b/i },
-  { kind: '产品类型', name: '具体类型 id', re: /hardware-software|b2b-saas/ },
+  { kind: '产品类型', name: '具体类型 id', re: /hardware-software|business-software/ },
 ]
 
 function markdownFiles(dir, prefix = '') {

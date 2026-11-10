@@ -1,18 +1,21 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-10
 ---
 
 # 推敲：SA/SQA 方法包——系统架构 + V&V 的两侧方法与升级
 
-> 立卡：2026-11-10 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：未定 ｜ 可关闭：否
+> 立卡：2026-11-10 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 语义审（对照验收 5 条）+ keyless/verify/typecheck/full test/preset-smoke 实跑，证据见 Note
 >
-> 上游研究：[SA/SQA 方法包](../research/org-coordination-topology/2026-11-10-sa-sqa-method-packs.md)；
-> 组织拓扑 [README](../research/org-coordination-topology/README.md)。
+> **结论/去向**：note — [Note](../../../notes/implemented/2026-11-10-sa-sqa-method-packs.md)。
+>
+> 上游研究：[SA/SQA 方法包](../../research/org-coordination-topology/2026-11-10-sa-sqa-method-packs.md)；
+> 组织拓扑 [README](../../research/org-coordination-topology/README.md)。
 > 前置：产品类型语义由[另一卡](2026-11-10-product-type-semantics.md)定；本卡只做“硬软一体的系统能力怎么回来”。
 >
-> **结论/去向**：待推敲（研究建议：两个方法包 `system-architecture` + `vv-plan`，starter 安装；
-> 不恢复旧 SA/SQA persona；独立 V&V 作者档与 blocker 升级按需另定）。
+> **已定（实现）：** 两个方法包 `system-architecture@1.0.0` + `vv-plan@1.0.0`（各含 producer/verifier 两侧）；
+> starter 随 pack 发布，`pnpm methods:init` 复制到方法层（已存在跳过）；不恢复旧 SA/SQA persona；
+> V&V 计划由通用 producer 按 `vv-plan` 写、verifier 只读复核；blocker 必须原样进裁决/升级，不得接受结案。
 
 **问题与期望结果：** SA/SQA 在 2026-11-09 退役后，VP-Eng 只剩质量环骨架：
 `quality_loop_produce` / `quality_loop_verify` 两个 support 能力档 + 外部方法层，**没有默认方法包**；
@@ -27,17 +30,17 @@ blocker 怎么升级」，让硬软动议能按需跑系统架构/V&V；不恢�
   `git show bf04ab1c:packages/company-pack/presets/system-architect/skills/systems-architecture/SKILL.md`
   与 `.../system-qa/skills/vv-playbook/SKILL.md` 取（不链历史 blob，避免当前树无文件）。
 - 旧 SA = 架构作者（SyRS/IRS/architecture）；旧 SQA = V&V 计划作者 + 独立评审，否决直达 CEO
-  （[退役 Note](../../notes/implemented/2026-11-09-retire-sa-sqa.md)）。
+  （[退役 Note](../../../notes/implemented/2026-11-09-retire-sa-sqa.md)）。
 - 质量环：verifier `write:false` / `edit:false` / 无 bash
-  （[`quality-loop-verifier/agent.cordis.yml:44-51`](../../packages/company-pack/presets/quality-loop-verifier/agent.cordis.yml)）；
+  （[`quality-loop-verifier/agent.cordis.yml:44-51`](../../../packages/company-pack/presets/quality-loop-verifier/agent.cordis.yml)）；
   方法必须点名 `<pack>@<version>`，没有默认包
-  （[`docs/guides/quality-loop.md:30`](../../docs/guides/quality-loop.md)）；
-  只在 VP-Eng 有两条命名行（[`:14`](../../docs/guides/quality-loop.md)）。
+  （[`docs/guides/quality-loop.md:30`](../../../docs/guides/quality-loop.md)）；
+  只在 VP-Eng 有两条命名行（[`:14`](../../../docs/guides/quality-loop.md)）。
 - 方法层路径：`<DSH_HOME>/company/methods/quality-loop-producer/<pack>/SKILL.md` 与
   `.../quality-loop-verifier/<pack>/SKILL.md`；示例夹具在
   `tests/fixtures/methods/dsh-home/company/methods/{requirements-trace,api-contract}`。
 - 审计核：两侧 method/version 配对、check-id 全覆盖、verifier 只读、先产后验、裁决原文
-  （[`tools/lib/quality-loop.mjs`](../../tools/lib/quality-loop.mjs)）。
+  （[`tools/lib/quality-loop.mjs`](../../../tools/lib/quality-loop.mjs)）。
 - `business-software`（用户 2026-11-10 已定名）不需要 SyRS/IRS/V&V（见产品类型卡）；本卡只服务
   `hardware-software`。
 
@@ -77,6 +80,18 @@ starter 安装 + keyless method fixture + 一次真模型质量环；不恢复�
 | D 只写文档 | 保持可选、用户自装 | 零改动 | 能力仍空；README 承诺要降级 |
 
 **建议 A**；只有真实动议反复出现“producer 写 V&V 不可接受”时才上 B。
+
+## 验收标准
+
+- `content/methods/quality-loop-{producer,verifier}/{system-architecture,vv-plan}/SKILL.md` 四份在场；
+  同 `method`/`version`、`side` 正确、check-id 表同批且非空。
+- `pnpm methods:init` 复制四包到 `<DSH_HOME>/company/methods/...`，已存在跳过、不覆盖；
+  `tools/lib/methods-init.mjs` 有 keyless spec（配对 / 幂等 / 源缺失）。
+- VP-Eng persona 指向 starter 方法包；`docs/guides/quality-loop.md` 写 `methods:init` 与 starter；
+  `content/manifest.json` 列四份；`pnpm verify` 全绿。
+- blocker 升级合同写进两侧方法包与 quality-loop skill/VP-Eng persona；不恢复旧 SA/SQA persona。
+- `pnpm test`、`pnpm typecheck`、`preset-smoke` 绿；Note 落
+  `notes/implemented/2026-11-10-sa-sqa-method-packs.md`；卡归档。
 
 ## 关闭条件
 

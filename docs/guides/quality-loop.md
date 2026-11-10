@@ -15,20 +15,17 @@ VP-Eng 有两条命名行：`quality_loop_produce`（`quality-loop-producer`，�
 `quality_loop_verify`（`quality-loop-verifier`，**只读**）——共用 `quality-loop-` 前缀。
 它们不带方法——方法由任务书点名 `<pack>@<version>`，两侧各一份同 id 同版本，装在人手里（方法层）。
 
-## 1. 装一套方法包（人做，v1 手工）
+## 1. 装方法包（starter 或人做）
 
-两侧各一份 `SKILL.md`（同 `method`、同 `version`，`side` 不同；正文要有 check-id 表）：
+pack 自带 starter `system-architecture@1.0.0` / `vv-plan@1.0.0`：`pnpm methods:init` 复制到方法层（已存在跳过、不覆盖人的版本；先 `source run/env.sh` 给 `DSH_HOME`）。
+
+自定义包：两侧各一份 `SKILL.md`（同 `method`/`version`，`side` 不同；正文有 check-id 表）：
 
 ```sh
-mkdir -p "$DSH_HOME/company/methods/quality-loop-producer/<pack>" "$DSH_HOME/company/methods/quality-loop-verifier/<pack>"
-cp <pack>/producer/SKILL.md "$DSH_HOME/company/methods/quality-loop-producer/<pack>/SKILL.md"
-cp <pack>/verifier/SKILL.md "$DSH_HOME/company/methods/quality-loop-verifier/<pack>/SKILL.md"
+mkdir -p "$DSH_HOME/company/methods/quality-loop-producer/<pack>" "$DSH_HOME/company/methods/quality-loop-verifier/<pack>" && cp <pack>/producer/SKILL.md "$DSH_HOME/company/methods/quality-loop-producer/<pack>/SKILL.md" && cp <pack>/verifier/SKILL.md "$DSH_HOME/company/methods/quality-loop-verifier/<pack>/SKILL.md"
 ```
 
-- 生效：**新会话**（preset 的 `customSkillDirs` 在建会话时读）；正文改动同会话下一轮可见。
-- 没进 `/cultivation` 名册（名册 = 六角色）：v1 没有采纳/撤回流水线，直接放目录。
-- 没有默认方法包：任务书不点名 = 两侧都 fail-closed 停下。**不要**把某一套方法写进 preset。
-- 参考形状 = `tests/fixtures/methods/dsh-home/company/methods/`（两套合成包，`requirements-trace` / `api-contract`）。
+- 生效：新会话；正文改动同会话下一轮可见；没进 `/cultivation` 名册。starter 不自动生效：不跑 `methods:init` 或任务书不点名 = fail-closed；别把方法写进 preset；参考形状 = `tests/fixtures/methods/dsh-home/company/methods/`。
 
 ## 2. 发工（VP-Eng 会话里）
 

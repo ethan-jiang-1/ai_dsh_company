@@ -8,7 +8,7 @@
  * 追溯/退役词/计数（五层全链）。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { checkRequirements, isLayer, type MotionDoc } from '../../lib/requirements-check.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
@@ -46,18 +46,61 @@ interface ProductTypeRules {
   readonly retiredPrefixes?: readonly string[]
 }
 
-/** 读当前部署的产品类型规则：company.md frontmatter 的 `productType` → pack 的类型包。 */
-function readProductTypeRules(contentDir: string | undefined, workspace: string): ProductTypeRules | null {
-  if (contentDir === undefined) return null
+/** 产品类型解析结果：来源 / 规则 / 错误（未知类型不静默回落）。 */
+interface ProductTypeResolution {
+  readonly rules: ProductTypeRules | null
+  readonly id: string | null
+  readonly source: 'motion' | 'company' | null
+  readonly error: string | null
+}
+
+/** 读 `产品类型:` / `productType:` 行；模板占位 `<...>` 视为未声明。 */
+function parseProductType(text: string | undefined): string | null {
+  if (text === undefined) return null
+  const match = /^(?:产品类型|productType)\s*[:：]\s*(\S+)\s*$/m.exec(text)
+  const value = match?.[1]?.trim() ?? ''
+  if (value === '' || (value.startsWith('<') && value.endsWith('>'))) return null
+  return value
+}
+
+/** 盘上可用的产品类型 id（只用于错误提示）。 */
+function availableProductTypes(contentDir: string): string[] {
   try {
-    const identity = readIfExists(join(workspace, RUN_BUNDLE_PATHS.company))
-    const match = identity === undefined ? null : /^productType:\s*(\S+)\s*$/m.exec(identity)
-    if (match === null) return null
-    const rules = readIfExists(join(contentDir, 'product-types', match[1] as string, 'check-rules.json'))
-    if (rules === undefined) return null
-    return JSON.parse(rules) as ProductTypeRules
+    return readdirSync(join(contentDir, 'product-types'), { withFileTypes: true })
+      .filter(entry => entry.isDirectory())
+      .map(entry => entry.name)
+      .sort()
   } catch {
-    return null
+    return []
+  }
+}
+
+/**
+ * 解析当前动议的产品类型规则：动议 `meta.md` 的 `产品类型` 优先，回落 `company.md` 的
+ * `productType`；都没有 = 五层默认。声明了类型但 check-rules 不在 = 报错，不静默用错规则。
+ */
+function resolveProductType(contentDir: string | undefined, workspace: string, root: string): ProductTypeResolution {
+  if (contentDir === undefined) return { rules: null, id: null, source: null, error: null }
+  const motionType = parseProductType(readIfExists(join(root, 'meta.md')))
+  const companyType = parseProductType(readIfExists(join(workspace, RUN_BUNDLE_PATHS.company)))
+  const id = motionType ?? companyType
+  const source = motionType !== null ? 'motion' : companyType !== null ? 'company' : null
+  if (id === null) return { rules: null, id: null, source: null, error: null }
+  const rulesText = readIfExists(join(contentDir, 'product-types', id, 'check-rules.json'))
+  if (rulesText === undefined) {
+    const available = availableProductTypes(contentDir)
+    const where = source === 'motion' ? '动议 meta.md' : 'company.md'
+    return {
+      rules: null,
+      id,
+      source,
+      error: `未知产品类型「${id}」（来自 ${where}）；可用类型：${available.length > 0 ? available.join(' / ') : '（无）'}`,
+    }
+  }
+  try {
+    return { rules: JSON.parse(rulesText) as ProductTypeRules, id, source, error: null }
+  } catch {
+    return { rules: null, id, source, error: `产品类型「${id}」的 check-rules.json 不可解析` }
   }
 }
 
@@ -92,7 +135,12 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
       if (docs.length === 0) {
         return { kind: 'error' as const, text: `缺需求文档：${dir}（至少要有 mrd.md / strs.md / prd.md）` }
       }
-      const rules = readProductTypeRules(options.contentDir, options.workspace)
+      const resolution = resolveProductType(options.contentDir, options.workspace, root)
+      if (resolution.error !== null) {
+        return { kind: 'error' as const, text: resolution.error }
+      }
+      const rules = resolution.rules
+      const typeNote = resolution.source === 'motion' ? `；动议类型 = ${String(resolution.id)}` : ''
       const customLayers = (rules?.layers ?? []).filter(layer => !isLayer(layer))
       if (rules !== null && customLayers.length > 0) {
         return {
@@ -118,7 +166,7 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
       const { counts, definitions, edges } = result.index
       return {
         kind: 'success' as const,
-        text: `编号校验通过（${parsed.slug}）：MR ${String(counts.MR)} / REQ ${String(counts.REQ)} / IF ${String(counts.IF)} / TC ${String(counts.TC)} / AC ${String(counts.AC)}；层 = ${result.layers.join('/')}；索引 = ${String(definitions.length)} 条定义 / ${String(edges.length)} 条追溯。`,
+        text: `编号校验通过（${parsed.slug}）：MR ${String(counts.MR)} / REQ ${String(counts.REQ)} / IF ${String(counts.IF)} / TC ${String(counts.TC)} / AC ${String(counts.AC)}；层 = ${result.layers.join('/')}${typeNote}；索引 = ${String(definitions.length)} 条定义 / ${String(edges.length)} 条追溯。`,
       }
     },
   })

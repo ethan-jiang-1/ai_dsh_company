@@ -53,6 +53,25 @@ description: CEO 的组队方法：接到动议先过这六步（要不要叫人
    - 单职能但要来回改 → 也是组队（成员持久）。
 6. **定 slug**：给这次交付定 `<slug>`（短横线小写英文），分派时全员共用；
    过程稿落 `.dsh-company/deliverables/<slug>/drafts/<角色>.md`，定稿只有你能 `present`。
+   **同一步写产品类型**：在 `meta.md` 写 `产品类型: hardware-software|business-software`。用户声明优先；
+   没说就问一句，或按 `company.md` 的 `productType` 默认并在任务书标假设——不要按习惯猜。类型写错，
+   `/req check` 会用错编号规则；改类型要重新确认层与文档链。
+
+### team spawn 的角色包
+
+team 成员继承**你的**组合，没有角色 preset 的 `skill` catalog；但公司手册给了 `<company-content>` 的绝对路径，
+角色方法就在 `<company-content>/../presets/<role>/skills/`。spawn 一个承担职能角色（COO/CFO/CMO/VP-Eng 等）的
+成员时，任务书必须带**角色包**，否则它只是“叫那个名字的 CEO”：
+
+- **角色**：`COO` / `CFO` / …
+- **CHARTER**：`.dsh-company/kb/<role>/CHARTER.md`
+- **角色 skill**：`<company-content>/../presets/<role>/skills/<skill>/SKILL.md`（列全；用 `read` 读正文）
+- **KB**：`.dsh-company/kb/<role>/`、`kb/org.md`、`kb/policy-lines.md`（按需）
+- **产出**：`.dsh-company/deliverables/<slug>/drafts/<role>.md`
+- **边界**：不越权、不替别的职能签字；缺口回你
+
+成员先 `read` CHARTER + 角色 skill + KB，再动笔。`skill` 工具加载不到角色 skill 是机制事实（成员继承你的
+catalog），**用 `read`，不要凭记忆**；任务书写明“先读再干”。
 
 > **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
 > 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对

@@ -49,7 +49,7 @@ CEO 收口：final.md（产品决策/合并摘要，引用两份 draft）→ pre
 
 ## 产品类型 playbook
 
-先判断这次是哪种产品（决定 MRD/PRD 多出哪些字段），再读共享 skill 的 references：`project-services.md`（项目制/系统集成）/ `hardware-software.md`（硬软一体）；新类型按同结构新增，不改公共字段。
+先判断这次是哪种产品（决定 MRD/PRD 多出哪些字段），再读共享 skill 的 references：`project-services.md`（项目制/系统集成）/ `hardware-software.md`（硬软一体）/ `business-software.md`（纯软/企业软件）；新类型按同结构新增，不改公共字段。**类型看动议**：`meta.md` 的 `产品类型` 优先，缺省回落 `company.md` 的 `productType`；用户口头声明优先于默认，并写进 meta。
 
 ## 最小场景（3 人，不叫全员）
 

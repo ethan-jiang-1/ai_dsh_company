@@ -226,7 +226,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     // `backgroundMode` / `enableRunInBackground` / `persona` / `toolFilter` 被 Config 硬拒
     // （"tool-subagent: persona is no longer supported"），child 的人格只能由 agentPreset 选。
     // ⇒ 每个直接汇报对象仍是一个 distinct toolName，但贴身配置 = provider + toolName + maxDepth + agentPreset。
-    for (const [tool, preset] of [['vp_eng', 'vp-eng'], ['vp_sales', 'vp-sales'], ['vp_cmo', 'cmo']] as const) {
+    for (const [tool, preset] of [['vp_eng', 'vp-eng'], ['vp_sales', 'vp-sales'], ['vp_cmo', 'cmo'], ['coo', 'coo'], ['cfo', 'cfo']] as const) {
       const match = new RegExp(`toolName: ${tool}([\\s\\S]*?)(?=\\n\\s*- id: |$)`).exec(ceo)
       expect(match, `CEO 缺命名委托工具 ${tool}`).not.toBeNull()
       const block = (match as RegExpExecArray)[1] as string
@@ -251,9 +251,17 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(ceo, 'persona 不得内联产品链术语').not.toMatch(/MRD|StRS|SyRS|IRS/)
     expect(ceo, 'persona 必须指到产品类型包的 document-map').toMatch(/document-map|产品类型包/)
     expect(ceo, '不得再把「市场」整体派给 VP-Sales').not.toContain('市场与定价派 VP-Sales')
-    expect(ceo, '单职能快捷委派必须含 vp_cmo').toMatch(/vp_eng \/ vp_sales \/ vp_cmo/)
+    expect(ceo, '单职能快捷委派必须含五职能').toMatch(/vp_eng \/ vp_sales \/ vp_cmo \/ coo \/ cfo/)
     expect(ceo, '两件及以上必须组队（否则 task board/DAG 空）').toMatch(/产出两件及以上[\s\S]*spawn_teammate/)
     expect(ceo, 'vp_* 快捷路径只能用于单份单职能').toMatch(/只有用户明确只要一份[\s\S]*vp_eng/)
+  })
+
+  it('team spawn 角色包：CHARTER + 角色 skill + KB + 产出 + 边界', () => {
+    const skill = readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
+    for (const needle of ['角色包', 'CHARTER', '<company-content>/../presets/', '产出', '边界']) {
+      expect(skill, `assembling-the-team 缺角色包要素：${needle}`).toContain(needle)
+    }
+    expect(handbookSurface(), '通用协作面必须写 team 角色包').toContain('team 角色包')
   })
 
   it('产物 owner 唯一：编制里查不到 ≠ 换人代行（缺角=补编制/报缺）', () => {
@@ -510,10 +518,20 @@ describe('共享 product-definition 能力（CMO + VP-Eng）', () => {
     expect(skill).toContain('name: product-definition')
     expect(skill).toContain('references/project-services.md')
     expect(skill).toContain('references/hardware-software.md')
+    expect(skill).toContain('references/business-software.md')
     expect(existsSync(join(sharedDir, 'references/project-services.md'))).toBe(true)
     expect(existsSync(join(sharedDir, 'references/hardware-software.md'))).toBe(true)
+    expect(existsSync(join(sharedDir, 'references/business-software.md'))).toBe(true)
     for (const role of ['cmo', 'vp-eng']) expect(roleYml(role), role).toContain('presets/_shared/skills/')
     for (const role of ['ceo', 'vp-sales', 'coo', 'cfo']) expect(roleYml(role), role).not.toContain('presets/_shared/skills/')
+  })
+
+  it('产品类型按动议 meta 选；CEO 开局记录类型', () => {
+    const shared = readFileSync(join(PRESETS_DIR, '_shared/skills/product-definition/SKILL.md'), 'utf8')
+    expect(shared, 'product-definition 必须写 meta 优先/company 回落').toMatch(/meta\.md[\s\S]*产品类型/)
+    expect(shared, 'product-definition 必须写 company.md 回落').toContain('company.md')
+    const ceo = readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
+    expect(ceo, 'CEO 开局必须写产品类型').toMatch(/产品类型: hardware-software\|business-software/)
   })
 
   it('CMO mrd-playbook 与 VP-Eng prd-playbook 引用共享能力', () => {

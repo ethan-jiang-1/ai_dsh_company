@@ -41,6 +41,26 @@ function fixture(withDocs: readonly string[] = ['mrd.md', 'strs.md', 'prd.md'], 
   return { workspace, dir, cleanup: () => rmSync(workspace, { recursive: true, force: true }) }
 }
 
+/** 临时产品类型包：hardware-software 只到 MRD，business-software 到 PRD（便于断言 meta 优先）。 */
+function typeContentDir(): string {
+  const contentDir = mkdtempSync(join(tmpdir(), 'req-command-content-'))
+  const write = (id: string, layers: readonly string[]): void => {
+    const files: Record<string, string> = {}
+    for (const layer of layers) files[layer] = layer === 'MRD' ? 'mrd.md' : layer === 'StRS' ? 'strs.md' : 'prd.md'
+    mkdirSync(join(contentDir, 'product-types', id), { recursive: true })
+    writeFileSync(join(contentDir, 'product-types', id, 'check-rules.json'), JSON.stringify({
+      productType: id,
+      layers,
+      defaultLayers: layers,
+      files,
+      retiredPrefixes: [],
+    }))
+  }
+  write('hardware-software', ['MRD'])
+  write('business-software', ['MRD', 'StRS', 'PRD'])
+  return contentDir
+}
+
 describe('parseReqCheck', () => {
   it('check <slug>；其余 → 用法', () => {
     expect(parseReqCheck('check 2026-11-07-demo')).toEqual({ ok: true, slug: '2026-11-07-demo' })
@@ -116,15 +136,102 @@ describe('registerReqCommand', () => {
     } finally { cleanup() }
   })
 
-  it('产品类型包（b2b-saas）：不走五层编号体系，返回说明而不是判红', async () => {
+  it('产品类型包（business-software）：MRD/StRS/PRD 三层走五层 checker', async () => {
+    const { workspace, cleanup } = fixture()
+    const contentDir = mkdtempSync(join(tmpdir(), 'req-command-content-'))
+    try {
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: business-software\n---\n')
+      mkdirSync(join(contentDir, 'product-types/business-software'), { recursive: true })
+      writeFileSync(join(contentDir, 'product-types/business-software/check-rules.json'), JSON.stringify({
+        productType: 'business-software',
+        layers: ['MRD', 'StRS', 'PRD'],
+        defaultLayers: ['MRD', 'StRS', 'PRD'],
+        files: { MRD: 'mrd.md', StRS: 'strs.md', PRD: 'prd.md' },
+        retiredPrefixes: [],
+      }))
+      const result = await mount(workspace, { contentDir }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('编号校验通过')
+      expect(result.text).toContain('MRD/StRS/PRD')
+    } finally {
+      cleanup()
+      rmSync(contentDir, { recursive: true, force: true })
+    }
+  })
+
+  it('meta 的产品类型优先于 company.md', async () => {
+    const { workspace, cleanup } = fixture(undefined, `${META}产品类型: business-software\n`)
+    const contentDir = typeContentDir()
+    try {
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: hardware-software\n---\n')
+      const result = await mount(workspace, { contentDir }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('层 = MRD/StRS/PRD')
+      expect(result.text).toContain('动议类型 = business-software')
+    } finally {
+      cleanup()
+      rmSync(contentDir, { recursive: true, force: true })
+    }
+  })
+
+  it('meta 缺产品类型时回落 company.md', async () => {
+    const { workspace, cleanup } = fixture()
+    const contentDir = typeContentDir()
+    try {
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: hardware-software\n---\n')
+      const result = await mount(workspace, { contentDir }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('层 = MRD')
+      expect(result.text).not.toContain('动议类型')
+    } finally {
+      cleanup()
+      rmSync(contentDir, { recursive: true, force: true })
+    }
+  })
+
+  it('未知产品类型 → 报错并列可用类型', async () => {
+    const { workspace, cleanup } = fixture(undefined, `${META}产品类型: nope\n`)
+    const contentDir = typeContentDir()
+    try {
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: hardware-software\n---\n')
+      const result = await mount(workspace, { contentDir }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('error')
+      expect(result.text).toContain('未知产品类型')
+      expect(result.text).toContain('business-software')
+    } finally {
+      cleanup()
+      rmSync(contentDir, { recursive: true, force: true })
+    }
+  })
+
+  it('meta 的模板占位 <...> 视为未声明', async () => {
+    const { workspace, cleanup } = fixture(undefined, `${META}产品类型: <hardware-software|business-software>\n`)
+    const contentDir = typeContentDir()
+    try {
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: hardware-software\n---\n')
+      const result = await mount(workspace, { contentDir }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('层 = MRD')
+    } finally {
+      cleanup()
+      rmSync(contentDir, { recursive: true, force: true })
+    }
+  })
+
+  it('产品类型包（custom）：不走五层编号体系，返回说明而不是判红', async () => {
     const workspace = mkdtempSync(join(tmpdir(), 'req-command-type-'))
     const contentDir = mkdtempSync(join(tmpdir(), 'req-command-content-'))
     try {
       mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
-      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: b2b-saas\n---\n')
-      mkdirSync(join(contentDir, 'product-types/b2b-saas'), { recursive: true })
-      writeFileSync(join(contentDir, 'product-types/b2b-saas/check-rules.json'), JSON.stringify({
-        productType: 'b2b-saas',
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: custom\n---\n')
+      mkdirSync(join(contentDir, 'product-types/custom'), { recursive: true })
+      writeFileSync(join(contentDir, 'product-types/custom/check-rules.json'), JSON.stringify({
+        productType: 'custom',
         layers: ['ROADMAP', 'US', 'RELEASE'],
         defaultLayers: ['ROADMAP', 'US'],
         files: { ROADMAP: 'roadmap.md', US: 'user-story.md', RELEASE: 'release.md' },

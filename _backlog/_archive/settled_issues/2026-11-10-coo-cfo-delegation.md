@@ -1,16 +1,16 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-10
 ---
 
 # 推敲：COO/CFO 通道——命名行还是 team 角色包
 
-> 立卡：2026-11-10 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-10 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 语义审（对照验收 4 条）+ keyless/verify/typecheck/full test/preset-smoke 实跑，证据见 Note
 >
-> **结论/去向**：note — 实现后落 `notes/implemented/2026-11-10-coo-cfo-delegation.md`。
+> **结论/去向**：note — [Note](../../../notes/implemented/2026-11-10-coo-cfo-delegation.md)。
 >
-> 上游研究：[组织协同拓扑 §2/§7.1](../research/org-coordination-topology/2026-11-10-org-coordination-topology.md)；
-> 研究题 [README](../research/org-coordination-topology/README.md)。
+> 上游研究：[组织协同拓扑 §2/§7.1](../../research/org-coordination-topology/2026-11-10-org-coordination-topology.md)；
+> 研究题 [README](../../research/org-coordination-topology/README.md)。
 > 本卡只决定「COO/CFO 怎么被 CEO 叫到、怎么拿到角色方法、文档/测试怎么改」；产品类型与方法包另卡。
 >
 > **已定（实现）：** A + 角色包——CEO 补 `coo` / `cfo` 命名行（`maxDepth: 1`），多职能仍走 team；
@@ -19,14 +19,14 @@ opened: 2026-11-10
 
 **问题与期望结果：** CEO persona 说直接汇报是五个职能（CMO、VP-Eng、VP-Sales、COO、CFO），
 但 `delegation` 组只有 `vp_eng` / `vp_sales` / `vp_cmo` 三条角色命名行
-（[`ceo/agent.cordis.yml:38`](../../packages/company-pack/presets/ceo/agent.cordis.yml)、
-[`:192-228`](../../packages/company-pack/presets/ceo/agent.cordis.yml)）。COO/CFO 没有命名行；
+（[`ceo/agent.cordis.yml:38`](../../../packages/company-pack/presets/ceo/agent.cordis.yml)、
+[`:192-228`](../../../packages/company-pack/presets/ceo/agent.cordis.yml)）。COO/CFO 没有命名行；
 用 team 起一个叫 `coo` / `cfo` 的成员时，成员继承 CEO 组合，拿不到 COO/CFO preset 的
 `ops-feasibility` / `budget-check` / `project-economics` / `finance-compliance`，也没有 COO/CFO
 preset 的 generic `subagent` / `fork`；它还是 depth 1，CEO 的命名行对它来说是 depth 2，会被拒
-（[`collaboration.md:8-11`](../../packages/company-pack/content/generic/collaboration.md)、
-[`delegation.md:83-87`](../../docs/contracts/delegation.md)、
-[`roster.ts:264-272`](../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)）。
+（[`collaboration.md:8-11`](../../../packages/company-pack/content/generic/collaboration.md)、
+[`delegation.md:83-87`](../../../docs/contracts/delegation.md)、
+[`roster.ts:264-272`](../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)）。
 期望结果：定一条**可解释、可执行**的通道规则；修掉注释/测试的“五汇报”谎言；让 COO/CFO 要么有真
 preset 的一次性通道，要么在 team 里能拿到角色方法。推敲完成 = 通道选择、角色包形状、改动面、
 验收口径写清。
@@ -34,21 +34,21 @@ preset 的一次性通道，要么在 team 里能拿到角色方法。推敲完�
 **当前情况：**
 
 - CEO 命名行：`subagent_research` + `vp_eng` + `vp_sales` + `vp_cmo`；没有 `coo`/`cfo`
-  （[`delegation-model.mjs:181`](../../tools/lib/delegation-model.mjs)）。
+  （[`delegation-model.mjs:181`](../../../tools/lib/delegation-model.mjs)）。
 - COO/CFO preset 都存在，有角色 skills；它们的 `delegation` 组只有 generic `subagent` / `fork`
-  （[`coo/agent.cordis.yml:169-200`](../../packages/company-pack/presets/coo/agent.cordis.yml)、
-  [`cfo/agent.cordis.yml:168-199`](../../packages/company-pack/presets/cfo/agent.cordis.yml)）。
+  （[`coo/agent.cordis.yml:169-200`](../../../packages/company-pack/presets/coo/agent.cordis.yml)、
+  [`cfo/agent.cordis.yml:168-199`](../../../packages/company-pack/presets/cfo/agent.cordis.yml)）。
 - 注释说「每个直接汇报对象一个命名委托工具」，紧接着自己列三个工具
-  （[`ceo:174-175`](../../packages/company-pack/presets/ceo/agent.cordis.yml)）；测试
+  （[`ceo:174-175`](../../../packages/company-pack/presets/ceo/agent.cordis.yml)）；测试
   `presets.spec.ts:223-246` 只循环三个工具，`:248-256` 只查 persona 文案
-  （[`presets.spec.ts`](../../tests/presets/presets.spec.ts)）。
+  （[`presets.spec.ts`](../../../tests/presets/presets.spec.ts)）。
 - UI 委派卡 key 只有 `vp_eng` / `vp_sales` / `vp_cmo`
-  （[`delegation-keys.ts:9`](../../packages/company-pack/src/client/wiring/delegation-keys.ts)）。
+  （[`delegation-keys.ts:9`](../../../packages/company-pack/src/client/wiring/delegation-keys.ts)）。
 - team 的 `maxMembers: 8` 只数 teammate；5 个汇报 = 5 名成员，容量不是问题
-  （[`cordis.patch.yml:77`](../../packages/company-pack/cordis.patch.yml)、
-  [`roster.ts:257`](../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)）。
+  （[`cordis.patch.yml:77`](../../../packages/company-pack/cordis.patch.yml)、
+  [`roster.ts:257`](../../../vendor/dsh/packages/experimental/agent-team/src/roster.ts)）。
 - 多人模式下，人可以给 COO/CFO 开**根会话**，拿真 preset；但这不是 CEO 的 delegation
-  （[`multi-human-runbook.md:21`](../../docs/guides/multi-human-runbook.md)）。
+  （[`multi-human-runbook.md:21`](../../../docs/guides/multi-human-runbook.md)）。
 
 **未决问题：**
 

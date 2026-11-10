@@ -7,7 +7,10 @@
 - **动议从 CEO 进出**：CEO 是唯一入口与出口；其他成员不越过 CEO 对外交付。
 - **组合继承（机制事实，分两通道）**：`spawn_teammate` 出来的 teammate **继承 Lead 的组合**——工具与 skills 面是
   Lead preset 的，**不是你角色 preset 的**；身份来自成员名与任务书，方法论从自己的 CHARTER / KB 读，**别假设角色 skill 能加载**。
-- **命名 child 有自己的 preset（机制事实）**：`vp_eng` / `vp_sales` / `vp_cmo` 由
+- **team 角色包（补丁，不是机制）**：spawn 承担职能角色时，任务书带**角色包**——角色名 / CHARTER /
+  `<company-content>/../presets/<role>/skills/<skill>/SKILL.md` / KB / 产出 / 边界；成员先 `read` 这些文件再干，
+  不要因为 `skill` 加载不到角色 skill 就跳过。角色包是任务书约定，不改变“成员继承 Lead 组合”的机制事实。
+- **命名 child 有自己的 preset（机制事实）**：`vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo` 由
   `agentPreset` 给组合——child 拿到的是**该角色的 skills 与工具面**，能加载自己的角色 skill；根会话是 Team Lead，
   可在自己的门里 `spawn_teammate` 带小队；多人模式下你的门是根会话、挂你自己的 preset（组合以本会话实际加载为准）。
 - **多人模式（开场由人声明「这场是多人模式」时启用）**：别的角色的活由那个人在他自己的会话里干——CEO **不要 spawn 成员代劳**，

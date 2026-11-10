@@ -1,15 +1,15 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-10
 ---
 
 # 推敲：产品类型语义——`b2b-saas` 太窄，`business-software` 怎么定
 
-> 立卡：2026-11-10 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-10 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 语义审（对照验收 6 条）+ keyless/verify/typecheck/full test/preset-smoke 实跑，证据见 Note
 >
-> **结论/去向**：note — 实现后落 `notes/implemented/2026-11-10-business-software-product-type.md`。
+> **结论/去向**：note — [Note](../../../notes/implemented/2026-11-10-business-software-product-type.md)。
 >
-> 上游研究：[产品类型模型](../research/org-coordination-topology/2026-11-10-product-type-model.md)（组织拓扑研究题的一份材料）。
+> 上游研究：[产品类型模型](../../research/org-coordination-topology/2026-11-10-product-type-model.md)（组织拓扑研究题的一份材料）。
 > 本卡只决定「产品类型是什么、文档链是什么、要不要 `project-services`」；动议级路由另卡
 > [动议级产品类型](2026-11-10-motion-product-type.md)。
 >
@@ -27,22 +27,22 @@ playbook 与命名；决定 `project-services` 是否同期补。本轮推敲完
 
 - 改名后的 `business-software/check-rules.json`：`layers = [MRD, StRS, PRD]`，
   `defaultLayers = [MRD, StRS, PRD]`，`files` 与三层一一对应
-  （[`check-rules.json`](../../packages/company-pack/content/product-types/business-software/check-rules.json)）。
+  （[`check-rules.json`](../../../packages/company-pack/content/product-types/business-software/check-rules.json)）。
 - `business-software/overview.md`：纯软/企业软件；SaaS / 私有化 / 永久授权是交付模式；
   明确「没有 SyRS/IRS/V&V」
-  （[`overview.md`](../../packages/company-pack/content/product-types/business-software/overview.md)）。
+  （[`overview.md`](../../../packages/company-pack/content/product-types/business-software/overview.md)）。
 - `product-definition` 的品类表已含 `business-software` reference
-  （[`product-definition/SKILL.md`](../../packages/company-pack/presets/_shared/skills/product-definition/SKILL.md)）。
+  （[`product-definition/SKILL.md`](../../../packages/company-pack/presets/_shared/skills/product-definition/SKILL.md)）。
 - `/prd check` 读 MRD/PRD JSON 账本；`business-software` 现在有 MRD/PRD/StRS 三层。
-  （[`prd-command.ts`](../../packages/company-pack/src/host/commands/prd-command.ts)）。
+  （[`prd-command.ts`](../../../packages/company-pack/src/host/commands/prd-command.ts)）。
 - `/req check` 读 `company.md` 的 `productType`；非五层走“说明”分支
-  （[`req-command.ts:49-62`](../../packages/company-pack/src/host/commands/req-command.ts)、
-  [`:100`](../../packages/company-pack/src/host/commands/req-command.ts)）。
+  （[`req-command.ts:49-62`](../../../packages/company-pack/src/host/commands/req-command.ts)、
+  [`:100`](../../../packages/company-pack/src/host/commands/req-command.ts)）。
 - `hardware-software` 是唯一「文档链 + 检查器 + playbook + 模板」都闭合的类型
-  （[`requirements-model.md`](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)）。
+  （[`requirements-model.md`](../../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)）。
 - `project-services` 只有 `product-definition` reference，没有 `content/product-types/project-services/`；
   `content/templates/mrd.md` 的 JSON 示例还写着 `"productType": "project-services"`
-  （[`mrd.md:17`](../../packages/company-pack/content/templates/mrd.md)），是悬空示例。
+  （[`mrd.md:17`](../../../packages/company-pack/content/templates/mrd.md)），是悬空示例。
 
 **未决问题：**
 

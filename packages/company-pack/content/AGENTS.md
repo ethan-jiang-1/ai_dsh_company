@@ -13,6 +13,7 @@
 - **你的岗位**：`.dsh-company/kb/<你的角色>/CHARTER.md`；**你的历史纪要**：`.dsh-company/kb/<你的角色>/journal/`。
 - **动议台账**（历史动议一览 + 一句话结论；「台账」页签数据源）：`.dsh-company/kb/motion-ledger.md`。
 - **编号合同**（需求层 / 退役词 / 范围豁免 / 并发口径）：pack `content/product-types/<id>/requirements-model.md`（`<id>` = `productType`）；workspace 的 `kb/process-docs.md` 只是播种副本。
+- **动议的产品类型**：写在 `.dsh-company/deliverables/<slug>/meta.md` 的 `产品类型`；缺省回落 `company.md` 的 `productType`。具体类型 id 见产品类型包；不要按习惯猜，用户没说就问一句或标假设。
 - **交付物**：落 `.dsh-company/deliverables/<日期>-<slug>/`（A1 命名；三态见 `generic/deliverable-states.md`）；**写作模板**：`<company-content>/templates/`。
 
 ## 细则（按需读，不进常驻上下文）

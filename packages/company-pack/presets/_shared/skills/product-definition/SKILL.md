@@ -25,12 +25,15 @@ MRD / PRD 是这条脊柱的两种产物，不是两套模板。
 
 ## 产品类型 → playbook
 
-先判断这次是哪种产品，再读对应 reference（相对本 skill 目录）：
+先判断这次是哪种产品，再读对应 reference（相对本 skill 目录）。**类型看动议户口**：
+`.dsh-company/deliverables/<slug>/meta.md` 的 `产品类型` 优先；没写才回落 `company.md` 的 `productType`；
+用户口头声明与默认不一致时，以用户声明为准并写进 meta（别只记在对话里）。
 
 | 类型 | playbook | 典型问题 |
 |---|---|---|
 | 项目制 / 系统集成 | `references/project-services.md` | SOW 边界、第三方依赖、UAT、实施里程碑 |
 | 硬软一体产品 | `references/hardware-software.md` | BOM/供应链、认证、固件与软件联动、试产与售后 |
+| 纯软 / 企业软件 | `references/business-software.md` | 交付模式（SaaS/私有化/永久）、升级/回滚、激活/留存/SLO、数据边界 |
 | 新类型 | 还没有 → 按同结构新增 `references/<type>.md`（**随包发布**；workspace 覆盖暂不支持）；**不要**把新类型塞进旧 playbook | 先写一页"这个类型多了哪几个字段/风险" |
 
 **生长方式**：pack 里的 playbook 随版本走；角色自己的打法（本行业话术、评估量表）经培养采纳进
@@ -42,6 +45,7 @@ MRD / PRD 是这条脊柱的两种产物，不是两套模板。
   `AC-<REQ号>-<n>` 从属父 REQ。四种各自一条 append-only 序列，动议内全局唯一；号由 owner 登记时取 `max+1`。
 - 层归文档头：每份需求文档写 `layer`（MRD/StRS/PRD/SyRS/IRS）+ `definition`
   （`json-ledger` / `headings` / `table-rows` / `none`）；层不进号，一份文档一层。
+  `business-software` 只到 PRD，不写 SyRS/IRS/V&V；`hardware-software` 可按需扩系统层。
 - 状态归条目：草案 / 生效 / 作废；「建议新增」= 草案，ID 不变；作废留号，不复用。
 - 追溯：下游写行首 `traces:`（PRD 另写 `source:` 指 MR）；矩阵由 `/req check` 派生，不手写；
   缺上游 = 孤儿红，指向不存在的号 = 悬空红。

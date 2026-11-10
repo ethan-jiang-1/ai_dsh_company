@@ -10,6 +10,7 @@
     "dsh": "node --import tsx/esm vendor/dsh/apps/cli/src/bin.ts",
     "company": "node tools/company.mjs",
     "bundle:init": "node tools/bundle-init.mjs",
+    "methods:init": "node tools/methods-init.mjs",
     "orient": "node tools/orient.mjs",
     "notes:audit": "node tools/notes-audit.mjs",
     "diagnose": "node tools/diagnose.mjs",

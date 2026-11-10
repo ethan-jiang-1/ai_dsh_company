@@ -1,4 +1,4 @@
-# Beta SaaS · 政策线
+# Beta Software · 政策线
 
 - 毛利底线: 70%
 - 折扣底线: 85%
