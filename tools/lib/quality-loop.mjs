@@ -214,7 +214,9 @@ export function auditQualityLoop(input) {
   /** 已被处置过的发现 id（跨轮累计：处置归首次提出它的那一轮）。 */
   const disposed = new Set()
   /** 上一轮命中的助手正文下标：原文一致必须**单调向后**（不许拿早期草稿冒充后一轮的原文）。 */
-  let lastTextIndex = -1
+  // 原文索引进度按**会话**记：R2 可能是新 verifier session（本轮实测），不能沿用 R1 的索引，
+  // 否则新 session 的第一条正文会被从中间开始找，误报 not-verbatim（BUG-059）。
+  const lastTextIndexBySession = new Map()
   const seenRounds = new Set()
   for (const round of rounds) {
     if (seenRounds.has(round.round)) add('duplicate-round', `${round.file}：第 ${String(round.round)} 轮出现两次（裁决 append-only，不许覆盖）`)
@@ -304,6 +306,8 @@ export function auditQualityLoop(input) {
       // 原文一致性：命中的是**该会话任何一条助手正文**，不限定最后一条——同一 child 可被
       // `send_to_subagent` 续跑（R2 复验就是同一 session 的下一条正文；2026-11-10 E2E 实测：
       // 只认最后一条会把 R1 裁决误判成"不是原文"）。
+      const sessionKey = header.session === null ? `round:${String(round.round)}` : header.session
+      const lastTextIndex = lastTextIndexBySession.get(sessionKey) ?? -1
       const texts = Array.isArray(session.assistantTexts)
         ? session.assistantTexts
         : (typeof session.finalText === 'string' ? [session.finalText] : [])
@@ -319,7 +323,7 @@ export function auditQualityLoop(input) {
             `${where}：正文与该会话第 ${String(lastTextIndex + 2)} 条起的 ${String(texts.length)} 条助手正文都不一致`
             + `（${bodyHash.slice(0, 12)}…）——裁决必须原文落盘，且要按轮次先后对应`)
         } else {
-          lastTextIndex = matched
+          lastTextIndexBySession.set(sessionKey, matched)
         }
       }
       // 次序：质量环是"先生产、再验证"，不是两条并行的手。并行发工 = 验证者拿到的是半成品，

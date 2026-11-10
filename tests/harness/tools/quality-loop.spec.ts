@@ -1,4 +1,5 @@
 // 负例留证 2026-11-10（实跑）：把 `verdictBodyHash` 改成不归一结尾换行 ⇒「裁决原文」用例红；
+// 负例留证 2026-11-10：把原文索引改回跨轮全局 ⇒「R2 换新 verifier session」用例红（BUG-059）；
 // 把 `parseDispositions` 的「接受」校验删掉 ⇒「接受必须写接受人」用例红；还原 ⇒ 绿。
 // 真盘红证（探针驱动，同样实跑）见 `node probes/team/quality-loop-audit.mjs --self-test`：
 // 改裁决正文 / 删一条处置 / 换方法版本 / 验证者写盘 各自变红，还原回绿。
@@ -192,6 +193,20 @@ describe('审计判据：一条红配方一支用例', () => {
   it('裁决不是 child 最终消息原文 = 红', () => {
     const sessions = { s1: { ...input().sessions.s1, finalText: `${BODY}\n我另外补充了一段` } }
     expect(codes(auditQualityLoop(input({ sessions })))).toContain('not-verbatim')
+  })
+
+  it('R2 换新 verifier session：索引按会话重置，不误报 not-verbatim（BUG-059）', () => {
+    const r1 = input().rounds[0]
+    const r2 = {
+      file: 'verdict-r2.md',
+      round: 2,
+      verdictText: `${header(BODY, { round: '2', session: 's2' })}\n${BODY}`,
+    }
+    const sessions = {
+      ...input().sessions,
+      s2: { preset: 'quality-loop-verifier', depth: 2, createdAt: 300, finalText: BODY, toolNames: ['read', 'skill'] },
+    }
+    expect(codes(auditQualityLoop(input({ rounds: [r1, r2], sessions })))).not.toContain('not-verbatim')
   })
 
   it('会话日志读不到 = warning，不假装核过原文', () => {

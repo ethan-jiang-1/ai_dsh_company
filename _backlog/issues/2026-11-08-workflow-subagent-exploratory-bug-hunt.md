@@ -283,6 +283,22 @@ B5 从「未证」改 PASS。
 **验证**：B5 回执、`/prd check` 越界读取、`/req check ../zz-outside` 越界 success 均为真跑；
 `pnpm verify` ALL PASS。
 
+### 9.10 质量环 R2（2026-11-10 深夜）
+
+> 用户：继续修，抓到任何一个 bug 就修。本轮 = 质量环完整环的 R2（1 prompt / 1 verifier child）。
+
+- **会话**：VP-Eng `session-c33f9412…`；R1 verifier `7ae15c99…`；R2 verifier `cdf67a74…`（depth 1）。
+- **裁决**：R2 `pass`，7/7 check-id、0 blocker；R1 的 F1 已消除，F2/F3/F4 仍 advisory，新增 F5 接受；
+  `dispositions-r2.md` 在场。
+- **BUG-059（audit 假红）**：`tools/lib/quality-loop.mjs` 的原文索引用跨轮全局 `lastTextIndex`；
+  R2 换新 verifier session 后仍从 R1 的 index+1 找，误报 `not-verbatim`。合成用例修前 1 failed →
+  40 passed；真盘 R2 audit 复跑 **ALL PASS**。已修归档。
+- **R1 artifact**：`verdict-r1.md` 头 hash `d9d252…` 与正文 `5738a1…` 不一致；正文与 R1 verifier
+  第 2 条助手正文逐字一致，用 `verdict-hash.mjs --fix` 重算头（不改正文）后 audit 绿。不是代码 bug，
+  是 round-8 手算/旧副本残留。
+- **结果**：`quality-loop-audit --deliverable 2026-11-10-probe-qloop` **ALL PASS**（2 轮 / 2 侧）。
+- **未覆盖**：R3（上限 2，不允许）；方法判断质量仍归人审；R2 未再触发新的产品级硬缺陷。
+
 ## 第八轮（2026-11-10 后）：新面与回归
 
 > 用户 2026-11-10 要求：先把本卡适配现状，再做 exploratory test。**本节是本轮唯一矩阵**；

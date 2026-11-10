@@ -50,6 +50,11 @@ audit 的归一化口径是「正文去掉结尾空白」——两位哈希只�
 - pack 多一个 `presets/_shared/skills/quality-loop/scripts/` 入口；`preset-smoke`/`presets` spec 继续覆盖
   skill 目录与 pack 发布形状。
 
+## 后续
+
+2026-11-10 R2：audit 的原文索引跨轮全局，新 verifier session 被误报 `not-verbatim`（[BUG-059](../../_backlog/_archive/fixed_bugs/BUG-059-quality-loop-audit-r2-session-index.md)，已修）；
+R1 盘上旧头 hash 用 `verdict-hash.mjs --fix` 按正文重算（正文已核为 verifier 原文），audit ALL PASS。
+
 ## 验证
 
 - 红：`pnpm exec vitest run tests/harness/tools/quality-loop.spec.ts` → 修前 1 failed（导入的

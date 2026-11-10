@@ -4,6 +4,13 @@
 
 ## 修复流水（倒序）
 
+- **BUG-059**（2026-11-10，P2）：质量环 audit 的原文索引用**跨轮全局** `lastTextIndex`；R2 换了新
+  verifier session（`cdf67a74`）后仍从 R1（`7ae15c99`）的 index+1 找，新 session 的正文被跳过，
+  误报 `not-verbatim`。修法 = `lastTextIndexBySession`（按 session id 记；同 child 续跑才沿用）。
+  红→绿：合成 R1/R2 不同 session 用例修前 1 failed → 40 passed；真盘 R2 audit ALL PASS。
+  同轮另修正 R1 头 hash（正文已核为 verifier 原文，`verdict-hash.mjs --fix` 重算；不是本卡根因）。
+  详见 [卡](BUG-059-quality-loop-audit-r2-session-index.md)。
+
 - **BUG-058**（2026-11-10，P2）：`dataBlocked` 被压成布尔，`/req`/`/prd`/`/deliverables`/`/cultivation`
   回执硬编码「无 workspace/身份/lease 问题」，真实原因却是 lease 被占/未选 workspace；raw session cwd
   不改变启动态。修法 = `CompanyRuntime.blockedReason` 收 guard 的六类原因，`blockedCompanyText` 四处共用
