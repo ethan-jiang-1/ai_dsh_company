@@ -7,7 +7,7 @@ opened: 2026-11-10
 
 > 立卡：2026-11-10 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
 >
-> **结论/去向**：note — 计划 `content-charter.md`（落 `notes/implemented/`，落地同变更成立）
+> **结论/去向**：note — 已落 [content-charter Note](../../notes/implemented/2026-11-10-content-charter.md)（2026-11-10 同变更）
 >
 > **基座同步（2026-11-10）**：`docs-dsh-alignment` 五步已落地（`69706354`…`abb02d1e` + 收尾）：
 > 原 docs 的 design 层（已移除）已并回 `notes/`；`docs/index.md` 改为 **tier 书架**（树即 inventory，顶层门/宪法才逐项列出）；
@@ -54,7 +54,13 @@ opened: 2026-11-10
 4. 冷读怎么算证据？给 fresh agent 一句"给公司加一个新能力"，看它是否从入口链撞到宪章并答出四问；会话 id + 原文摘录进落地 Note，不进 CI。
 5. 宪章落地本身要不要 Note？要——它是非平凡决定，按 `agent-note-definition` 落，且与宪章同 diff。
 
-**下一步：** 用户点头本卡后，按验收标准实施；第二张卡（producer/verifier）作为首个适用案例，验证宪章的 `## 抽象度` 不是纸面文章。
+**下一步：** 用户验收 README/宪章/skill 的取舍与措辞；通过后归档（`status: 已结` + `git mv` 进 `_archive/settled_issues/` + 两边索引 + 状态行 `审查：`）。第二张卡（producer/verifier）作为首个适用案例，验证宪章的 `## 抽象度` 不是纸面文章。
+
+## 交付证据（2026-11-10）
+
+- 落点与理由、造红原文、冷读会话 id 与摘录 = [落地 Note](../../notes/implemented/2026-11-10-content-charter.md)（本卡不复制证据）。
+- 机械面：`pnpm verify` ALL PASS（含新门 `charter-entry` PASS 行）、`pnpm test` 167 files / 1347 tests 绿。
+- 遗留：`## 抽象度` 的机械强制仍为 v1「模板 + 语义审」；第二消费者证据待第二张卡。
 
 ## 范围与排除项
 

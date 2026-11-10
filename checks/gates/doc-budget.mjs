@@ -54,6 +54,7 @@ const DOC_LINE_BUDGETS = [
   ['docs/contracts/delegation.md', 120],     // 汇报线合同
   ['docs/contracts/data-model.md', 40],      // 数据卡合同
   ['docs/contracts/profile.md', 66],         // host 组合合同
+  ['docs/content-charter.md', 110],          // 2026-11-10 立：内容宪章（归位与抽象层次的唯一家；四槽/三层/四问/两测/两消费者/成本表/红牌/变更协议）104 行 +5%；宪法只写判据，步骤住 skill、清单住目录
   // ── 2026-11-03 R5-17：三份最大 owner 文档 + 根 README + 发布 handoff 补预算 ──
   // 审计实测：它们是活文档里最大的几份，却完全在棘轮外；预算 = 现行内容 +5–7%（只降不升）。
   ['README.md', 90],

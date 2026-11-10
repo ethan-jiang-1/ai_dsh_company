@@ -82,6 +82,7 @@ import * as devProductParity from './gates/dev-product-parity.mjs'
 import * as replayFixtureFreshness from './gates/replay-fixture-freshness.mjs'
 import * as replayUiFreshness from './gates/replay-ui-freshness.mjs'
 import * as gateWiring from './gates/gate-wiring.mjs'
+import * as charterEntry from './gates/charter-entry.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const failures = []
@@ -118,6 +119,7 @@ seedIntegrity.run(ctx)
 ledgerRouting.run(ctx)
 ledgerParticipation.run(ctx)
 docTaxonomy.run(ctx)
+charterEntry.run(ctx)
 snapshotsBudget.run(ctx)
 barePath.run(ctx)
 layoutBlock.run(ctx)

@@ -18,7 +18,7 @@
 
 | 层 | 目录 | 放什么 | 读者怎么进 |
 |---|---|---|---|
-| 门/宪法 | 顶层 | 每个人都可能先读：入口、架构地图、规范、政策、测试宪法、git 边界、空间/运行态地图 | [AGENTS.md](./AGENTS.md) · [architecture.md](./architecture.md) · [orient.md](./orient.md) · [policy.md](./policy.md) · [testing.md](./testing.md) · [repo-hygiene.md](./repo-hygiene.md) · [project-map.md](./project-map.md) · [runtime-map.md](./runtime-map.md) |
+| 门/宪法 | 顶层 | 每个人都可能先读：入口、架构地图、规范、政策、测试宪法、git 边界、空间/运行态地图 | [AGENTS.md](./AGENTS.md) · [architecture.md](./architecture.md) · [orient.md](./orient.md) · [policy.md](./policy.md) · [testing.md](./testing.md) · [repo-hygiene.md](./repo-hygiene.md) · [content-charter.md](./content-charter.md) · [project-map.md](./project-map.md) · [runtime-map.md](./runtime-map.md) |
 | 合同 | [contracts/](./contracts/) | 按主题/子系统的当前语义；随代码同 diff | 进目录按文件名选；先看文件头「什么时候读」 |
 | 指南 | [guides/](./guides/) | 怎么做：runbook、环境、排障、发布 | 进目录按任务选 |
 | 参考 | [reference/](./reference/) | 查表与登记：D 号、术语、外部材料 | 进目录按需查 |
