@@ -76,6 +76,7 @@ describe('运行前提守卫：写盘决策（R5-07）', () => {
     expect(runtime.hasWorkspace).toBe(true)
     expect(runtime.dataBlocked).toBe(true)
     expect(runtime.bundleState?.status).toBe('corrupt')
+    expect(runtime.blockedReason).toContain('bundle.json 损坏')
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('bundle.json 损坏'))
   })
 
@@ -85,6 +86,7 @@ describe('运行前提守卫：写盘决策（R5-07）', () => {
     const runtime = prepareCompanyRuntime(value)
     expect(runtime.hasWorkspace).toBe(true)
     expect(runtime.dataBlocked).toBe(true)
+    expect(runtime.blockedReason).toContain('writer lease 被占用')
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('公司数据已停写'))
   })
 
@@ -95,6 +97,7 @@ describe('运行前提守卫：写盘决策（R5-07）', () => {
     const runtime = prepareCompanyRuntime(value)
     expect(runtime.hasWorkspace).toBe(false)
     expect(runtime.dataBlocked).toBe(true)
+    expect(runtime.blockedReason).toMatch(/未指定 workspace|DSH_COMPANY_HOME/)
     expect(runtime.workspace).toBe('')
     // 没有 workspace 就不写「最近选择」（零写在无 workspace 时仍成立）。
     expect(existsSync(join(env.home, 'company/settings.json'))).toBe(false)

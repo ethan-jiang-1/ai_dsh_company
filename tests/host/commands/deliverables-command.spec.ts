@@ -2,6 +2,8 @@
  * `/deliverables audit` 解析与注册（2026-11-03 从 src/index 抽出）。
  * 解析分支 + dataBlocked/无账本/成功路径；账本实现本身归 presented-domain-real.spec。
  */
+// 负例留证 2026-11-10：去掉 blockedReason / 改回旧「无 workspace/身份/lease 问题」文案 ⇒「回执点名真实原因（BUG-058）」用例红；还原即绿。
+
 import { describe, expect, it, vi } from 'vitest'
 import type { Context } from '@deepseek-ai/cordis'
 import { parseDeliverablesAudit, registerDeliverablesCommand } from '../../../packages/company-pack/src/host/commands/deliverables-command.ts'
@@ -43,11 +45,13 @@ describe('parseDeliverablesAudit', () => {
 })
 
 describe('registerDeliverablesCommand', () => {
-  it('dataBlocked → 错误，不碰账本', async () => {
-    const { definition, audit } = mount({ dataBlocked: true })
+  it('dataBlocked → 错误，不碰账本；回执点名真实原因（BUG-058）', async () => {
+    const { definition, audit } = mount({ dataBlocked: true, blockedReason: 'bundle.json 损坏：test' })
     const result = await definition.handler({ rawInput: 'audit x true' })
     expect(result.kind).toBe('error')
     expect(result.text).toContain('公司数据已停写')
+    expect(result.text).toContain('原因：bundle.json 损坏：test')
+    expect(result.text).not.toContain('无 workspace/身份/lease 问题')
     expect(audit).not.toHaveBeenCalled()
   })
 

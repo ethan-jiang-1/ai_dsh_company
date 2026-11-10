@@ -33,6 +33,8 @@ export interface CompanyRuntime {
   readonly bundleState: BundleManifestState | undefined
   readonly hasWorkspace: boolean
   readonly resolutionError?: string
+  /** `dataBlocked` 的人可读原因（BUG-058）；false 时为 undefined。 */
+  readonly blockedReason?: string
 }
 
 /** 告警落 logger + stderr（启动输出里必须能看到数据分裂/停写风险）。 */
@@ -45,6 +47,11 @@ function warn(ctx: Context, message: string): void {
 export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
   const dshHome = resolveDshHome()
   let dataBlocked = false
+  let blockedReason: string | undefined
+  const block = (reason: string): void => {
+    blockedReason = blockedReason === undefined ? reason : `${blockedReason}；${reason}`
+    dataBlocked = true
+  }
 
   const resolution = resolveWorkspace({ dshHome })
   if (resolution.workspace === undefined) {
@@ -61,6 +68,7 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
       dataBlocked: true,
       bundleState: undefined,
       hasWorkspace: false,
+      blockedReason: why,
       ...(resolution.error === undefined ? {} : { resolutionError: resolution.error }),
     }
   }
@@ -71,7 +79,7 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
   const lease = acquireCompanyLease(dshHome)
   if (!lease.acquired) {
     warn(ctx, `company-pack：${lease.reason}；公司数据已停写（DSH 会话仍可用），先关掉另一个 writer`)
-    dataBlocked = true
+    block(`writer lease 被占用：${lease.reason}`)
   } else {
     const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
     if (typeof effect === 'function') effect.call(ctx, () => () => lease.release())
@@ -92,7 +100,7 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
   const check = validateCompanyHome(dshHome, configured)
   if (!check.ok) {
     warn(ctx, `company-pack：workspace 落点不安全（${check.error}）；公司数据已停写`)
-    dataBlocked = true
+    block(`workspace 落点不安全：${check.error}`)
   }
   if (!existsSync(configured)) {
     warn(ctx, `company-pack：workspace 不存在：${configured}；本次不写盘。`)
@@ -104,6 +112,7 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
       dataBlocked: true,
       bundleState: undefined,
       hasWorkspace: false,
+      blockedReason: `workspace 不存在：${configured}`,
     }
   }
 
@@ -112,17 +121,18 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
   if (bundleState.status === 'corrupt') {
     warn(ctx, `company-pack：bundle.json 损坏，已保留原文件并停写公司数据（${bundleState.path}：${bundleState.error}）；`
       + `修好后重启，或从 home 身份备份恢复（${join(dshHome, 'company/identity')}/<bundle-id>.json，仅作恢复参考）`)
-    dataBlocked = true
+    block(`bundle.json 损坏：${bundleState.error}`)
   }
   if (bundleState.status === 'unsupported') {
     warn(ctx, `company-pack：bundle.json 是更高版本（v${String(bundleState.version)}，本包支持 v3），`
       + '已保留原文件并跳过身份/升级；请安装匹配的新版 pack，或从备份恢复 manifest')
-    dataBlocked = true
+    block(`bundle.json 版本不支持：v${String(bundleState.version)}（本包支持 v3）`)
   }
   if (bundleState.status === 'legacy') {
     ctx.logger?.info?.('company-pack：检测到 v2 run bundle 身份；本次原地升级为 v3（旧文件备份 bundle.v2.json）')
   }
 
+  // check.ok=false 已在上面 block()；保留这一行只防后续分支漏判（幂等）。
   if (!check.ok) dataBlocked = true
   try {
     const profiles = profilesWithCompanyPack(join(dshHome, 'profiles'))
@@ -142,5 +152,6 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
     dataBlocked,
     bundleState,
     hasWorkspace: true,
+    ...(blockedReason === undefined ? {} : { blockedReason }),
   }
 }

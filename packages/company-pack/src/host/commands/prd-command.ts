@@ -7,6 +7,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { blockedCompanyText } from './blocked-text.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
 import { validateProductDocs } from '../../lib/prd-check.ts'
 
@@ -25,6 +26,8 @@ export function parsePrdCheck(rawInput: string): ParsedPrdCheck {
 
 export interface PrdCommandOptions {
   readonly dataBlocked: boolean
+  /** dataBlocked 的人可读原因（BUG-058）；缺省回退到通用措辞。 */
+  readonly blockedReason?: string
   readonly workspace: string
   /** 测试注入；缺省 = 真实校验器。 */
   readonly check?: typeof validateProductDocs
@@ -39,7 +42,7 @@ export function registerPrdCommand(ctx: Context, options: PrdCommandOptions): vo
     input: { hint: 'check <deliverables 目录名>' },
     handler: async ({ rawInput }: { readonly rawInput: string }) => {
       if (options.dataBlocked) {
-        return { kind: 'error' as const, text: '公司数据已停写（无 workspace/身份/lease 问题）；先选 workspace 再校验。' }
+        return { kind: 'error' as const, text: blockedCompanyText(options.blockedReason, '校验') }
       }
       const parsed = parsePrdCheck(rawInput)
       if (!parsed.ok) return { kind: 'error' as const, text: parsed.text }

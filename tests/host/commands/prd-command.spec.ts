@@ -4,6 +4,8 @@
  * 负例留证 2026-11-10：slug 校验缺席时 `check ../zz-outside` 会读到 deliverables 根外并调用
  *   validateProductDocs ⇒「越界 slug」用例红（BUG-057）；加校验后绿。
  */
+// 负例留证 2026-11-10：去掉 blockedReason / 改回旧「无 workspace/身份/lease 问题」文案 ⇒「回执点名真实原因（BUG-058）」用例红；还原即绿。
+
 // 负例留证 2026-11-10：删掉 slug 校验 ⇒「越界 slug」用例红（读根外 + 调用 checker；BUG-057）；还原即绿。
 import { describe, expect, it } from 'vitest'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
@@ -55,10 +57,13 @@ describe('parsePrdCheck', () => {
 })
 
 describe('registerPrdCommand', () => {
-  it('dataBlocked → 错误，不读盘', async () => {
-    const definition = mount('/w', { dataBlocked: true })
+  it('dataBlocked → 错误，不读盘；回执点名真实原因（BUG-058）', async () => {
+    const definition = mount('/w', { dataBlocked: true, blockedReason: '未指定 workspace（测试）' })
     const result = await definition.handler({ rawInput: 'check demo' })
-    expect(result).toEqual({ kind: 'error', text: '公司数据已停写（无 workspace/身份/lease 问题）；先选 workspace 再校验。' })
+    expect(result.kind).toBe('error')
+    expect(result.text).toContain('公司数据已停写')
+    expect(result.text).toContain('原因：未指定 workspace（测试）')
+    expect(result.text).not.toContain('无 workspace/身份/lease 问题')
   })
 
   it('越界 slug（BUG-057）→ 错误，且不读根外 drafts / 不调用 checker', async () => {

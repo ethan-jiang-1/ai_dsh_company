@@ -4,6 +4,14 @@
 
 ## 修复流水（倒序）
 
+- **BUG-058**（2026-11-10，P2）：`dataBlocked` 被压成布尔，`/req`/`/prd`/`/deliverables`/`/cultivation`
+  回执硬编码「无 workspace/身份/lease 问题」，真实原因却是 lease 被占/未选 workspace；raw session cwd
+  不改变启动态。修法 = `CompanyRuntime.blockedReason` 收 guard 的六类原因，`blockedCompanyText` 四处共用
+  （原因 + 动作 + 重启提示），不改变停写守卫本身。红→绿：guard 三例 reason 断言 + 四命令 spec 文案断言
+  （修前红）→ 1442 tests 绿；真入口无 workspace 回执点名 `DSH_COMPANY_HOME 指向的目录不存在…`，有效 env
+  重启后正常。详见 [卡](BUG-058-command-datablocked-reason.md) 与
+  [Note](../../../notes/implemented/2026-11-10-command-blocked-reason.md)。
+
 - **BUG-057**（2026-11-10，P2）：`/req check` / `/prd check` 把操作员 slug 直接 `join` 成路径，
   `../zz-outside` 能读出 deliverables 根之外（只读）。修法 = 共享 host-only `resolveDeliverablePath`
   （单段 slug 正则 + `relative` 纵深校验），两条命令不再各拼路径。红→绿：两条 spec 先各 1 failed

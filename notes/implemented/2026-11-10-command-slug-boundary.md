@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-10 交付；上游 = [BUG-057](../../_backlog/_archive/fixed_bugs/BUG-057-command-slug-path-traversal.md)）
 > 同机制的上游决定：[需求命令](../../_backlog/_archive/settled_issues/2026-11-07-requirements-command.md)（操作员命令、命令层不写盘）、
-> [BUG-058](../../_backlog/bugs/BUG-058-command-datablocked-reason.md)（同一命令面的诊断缺口；本 Note 不覆盖）。
+> [BUG-058](../../_backlog/_archive/fixed_bugs/BUG-058-command-datablocked-reason.md)（同一命令面的诊断缺口；本 Note 不覆盖）。
 
 ## 问题
 

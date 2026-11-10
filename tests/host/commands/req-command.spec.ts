@@ -10,6 +10,8 @@
  * 负例留证 2026-11-10：slug 校验缺席时 `check ../zz-outside` 会读到 deliverables 根外并调用 checker
  *   ⇒「越界 slug」用例红（BUG-057）；加校验后绿。
  */
+// 负例留证 2026-11-10：去掉 blockedReason / 改回旧「无 workspace/身份/lease 问题」文案 ⇒「回执点名真实原因（BUG-058）」用例红；还原即绿。
+
 // 负例留证 2026-11-10：删掉 slug 校验 ⇒「越界 slug」用例红（读根外 + 调用 checker；BUG-057）；还原即绿。
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -78,11 +80,14 @@ describe('registerReqCommand', () => {
     expect(mount().name).toBe('req')
   })
 
-  it('dataBlocked → 错误，不读盘', async () => {
-    const definition = mount('/w', { dataBlocked: true })
+  it('dataBlocked → 错误，不读盘；回执点名真实原因（BUG-058）', async () => {
+    const definition = mount('/w', { dataBlocked: true, blockedReason: 'writer lease 被占用：另一个 writer' })
     const result = await definition.handler({ rawInput: 'check demo' })
     expect(result.kind).toBe('error')
     expect(result.text).toContain('公司数据已停写')
+    expect(result.text).toContain('原因：writer lease 被占用：另一个 writer')
+    expect(result.text).not.toContain('无 workspace/身份/lease 问题')
+    expect(result.text).toContain('重启宿主')
   })
 
   it('越界 slug（BUG-057）→ 错误，且不读根外 drafts / 不调用 checker', async () => {

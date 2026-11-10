@@ -244,7 +244,7 @@ A3 验收：负控 label 不命中；`COO（运营与交付）` / `CFO（财务�
 | B2 矩阵 | A1 audit 扫 B1/B3/B4 新会话 | **PASS**：15 观察（7 root / 7 child / 1 member）、0 问题；coo/cfo child 71 工具 / control 2 / 无 team；CEO team member 继承 80 工具。 |
 | B3 CFO 角色包 | CEO 1 人 CFO 成员，任务书带 CFO 角色包 | **PASS**：`drafts/ceo.md`、`drafts/cfo.md` 在场；署名行 `任务书 = …` 指向真实任务书；任务书含 CFO 角色包（2794 chars）；成员继承 CEO 组合（preset ceo / d1），不冒充 preset CFO。 |
 | B4 UI 卡 | 同一 CEO 会话调 coo + cfo；`--body-out` / `--html-out` | **卡在 DOM、默认不可见**：DOM 有 `data-slot="tool.call.toolview"`、`data-tool=coo/cfo`、`wk-delegation-role = 委派 COO（运营与交付）/ CFO（财务与合规）`、`data-state=ok`；但卡在 `data-step-process-body hidden="until-found"`（`data-turn-process-member=true`）里，默认 transcript、`--body-out`、点 `Completed`/`Called tools` 都未露出。**OBS-5 判为折叠/探针限制，不是卡未渲染**；不据此开 bug。 |
-| B5 `/req check` live | 命令宿主 RPC（非 GUI ask）：`session/create` + `commands/execute` | **PASS（2026-11-10 深夜补齐）**：清掉 dev home 陈旧 writer lease（pid 98394）后，`/req check 2026-11-10-probe-cmd-business-software` 真回执 = `层 = MRD/StRS/PRD；动议类型 = business-software；索引 = 4 条定义 / 4 条追溯`；`missing-slug` → 缺需求文档；空参数 → usage。另发现 [BUG-057](../_archive/fixed_bugs/BUG-057-command-slug-path-traversal.md) / [BUG-058](../bugs/BUG-058-command-datablocked-reason.md)。 |
+| B5 `/req check` live | 命令宿主 RPC（非 GUI ask）：`session/create` + `commands/execute` | **PASS（2026-11-10 深夜补齐）**：清掉 dev home 陈旧 writer lease（pid 98394）后，`/req check 2026-11-10-probe-cmd-business-software` 真回执 = `层 = MRD/StRS/PRD；动议类型 = business-software；索引 = 4 条定义 / 4 条追溯`；`missing-slug` → 缺需求文档；空参数 → usage。另发现 [BUG-057](../_archive/fixed_bugs/BUG-057-command-slug-path-traversal.md) / [BUG-058](../_archive/fixed_bugs/BUG-058-command-datablocked-reason.md)。 |
 
 - 判定：B1（cancel/sigterm）、B2、B3 PASS；B4 解 OBS-5（卡渲染正确、默认不可见）；B5 未覆盖。
   未发现新的产品级硬缺陷。
@@ -268,7 +268,7 @@ B5 从「未证」改 PASS。
 - [BUG-057](../_archive/fixed_bugs/BUG-057-command-slug-path-traversal.md)：`/req check ../zz-outside` 返回 **success**；
   `/prd check ../zz-outside` 读到根外目录的内容判据错误。两个 handler 都把 slug 直接 `join`，`..`
   可越界；只读、本地操作员触发 → P2。已复现（fixture 用完即删）。
-- [BUG-058](../bugs/BUG-058-command-datablocked-reason.md)：dataBlocked 回执说「无 workspace/身份/lease 问题」，
+- [BUG-058](../_archive/fixed_bugs/BUG-058-command-datablocked-reason.md)：dataBlocked 回执说「无 workspace/身份/lease 问题」，
   但本轮真实原因正是 lease 被占；runtime guard 的 stderr 有原因，命令层只剩布尔。另：raw session 的
   cwd 不改变命令的启动态；GUI picker 是否 re-init 未证。
 
@@ -490,7 +490,7 @@ spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全
   已加“2026-11-10 后已变”指针（研究材料正文不回填；两处指针已落，owner 归 research 维护）。
 - **OBS-3（已解；真实原因转 BUG-058）**：`commands/execute` 首跑返回 `公司数据已停写` 的真实原因是
   dev home writer lease 被陈旧进程持有（pid 98394），不是 workspace 缺失；清掉 holder 后 B5 真回执 PASS。
-  但回执把原因说成「无 workspace/身份/lease 问题」→ [BUG-058](../bugs/BUG-058-command-datablocked-reason.md)；
+  但回执把原因说成「无 workspace/身份/lease 问题」→ [BUG-058](../_archive/fixed_bugs/BUG-058-command-datablocked-reason.md)；
   命令宿主 RPC 本身可用。
 - **OBS-4（流程风险）**：VP-Eng 在 verdict 后改了产物（F1/F3 订正），没有开 R2；处置表明确标
   「已修但未经复验」。本轮是我们的 prompt 限定只跑一轮，但这说明**裁决与产物版本没有被同一 hash 绑定**，

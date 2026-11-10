@@ -10,6 +10,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { blockedCompanyText } from './blocked-text.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
 import { checkRequirements, isLayer, type MotionDoc } from '../../lib/requirements-check.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
@@ -32,6 +33,8 @@ export function parseReqCheck(rawInput: string): ParsedReqCheck {
 
 export interface ReqCommandOptions {
   readonly dataBlocked: boolean
+  /** dataBlocked 的人可读原因（BUG-058）；缺省回退到通用措辞。 */
+  readonly blockedReason?: string
   readonly workspace: string
   /** pack 的 content 目录；给了才读产品类型包的 check-rules（缺省 = 五层默认）。 */
   readonly contentDir?: string
@@ -122,7 +125,7 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
     input: { hint: 'check <deliverables 目录名>' },
     handler: async ({ rawInput }: { readonly rawInput: string }) => {
       if (options.dataBlocked) {
-        return { kind: 'error' as const, text: '公司数据已停写（无 workspace/身份/lease 问题）；先选 workspace 再校验。' }
+        return { kind: 'error' as const, text: blockedCompanyText(options.blockedReason, '校验') }
       }
       const parsed = parseReqCheck(rawInput)
       if (!parsed.ok) return { kind: 'error' as const, text: parsed.text }

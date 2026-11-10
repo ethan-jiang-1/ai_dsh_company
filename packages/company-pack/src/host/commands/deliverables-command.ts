@@ -5,6 +5,7 @@
  * 证明边界：不证 presented-domain 的账本实现（→ presented-domain-real.spec）。
  */
 import type { Context } from '@deepseek-ai/cordis'
+import { blockedCompanyText } from './blocked-text.ts'
 import { auditLedger, type PresentedLedgerStore } from '../ledger/presented-domain.ts'
 import { regenerateCatalog } from '../ledger/catalog.ts'
 import type { ExportLedgerSource } from '../ledger/governance-export.ts'
@@ -28,6 +29,8 @@ export function parseDeliverablesAudit(rawInput: string): ParsedDeliverablesAudi
 
 export interface DeliverablesCommandOptions {
   readonly dataBlocked: boolean
+  /** dataBlocked 的人可读原因（BUG-058）；缺省回退到通用措辞。 */
+  readonly blockedReason?: string
   readonly workspace: string
   readonly ledgerStorePromise: Promise<PresentedLedgerStore> | undefined
   readonly exportNow: (ledger?: ExportLedgerSource) => void
@@ -46,7 +49,7 @@ export function registerDeliverablesCommand(ctx: Context, options: DeliverablesC
     input: { hint: 'audit .dsh-company/deliverables/<dir>/final.md true|false' },
     handler: async ({ rawInput }: { readonly rawInput: string }) => {
       if (options.dataBlocked) {
-        return { kind: 'error' as const, text: '公司数据已停写（无 workspace/身份/lease 问题）；先选 workspace 再审计。' }
+        return { kind: 'error' as const, text: blockedCompanyText(options.blockedReason, '审计') }
       }
       const parsed = parseDeliverablesAudit(rawInput)
       if (!parsed.ok) return { kind: 'error' as const, text: parsed.text }

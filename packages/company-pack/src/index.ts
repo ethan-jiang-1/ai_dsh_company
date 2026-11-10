@@ -74,6 +74,10 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   const workspace = runtime.workspace
   const hasWorkspace = workspace !== ''
   const dataBlocked = runtime.dataBlocked || !hasWorkspace
+  const blockedReason = runtime.blockedReason
+    ?? (hasWorkspace ? undefined : '未指定 workspace（DSH_COMPANY_HOME 为空，cwd 不是可用项目目录，也没有已保存选择）')
+  // exactOptionalPropertyTypes：可选属性不能显式传 undefined，只在有原因时展开。
+  const blockedFields = blockedReason === undefined ? {} : { blockedReason }
 
   const ledgerStorePromise: Promise<PresentedLedgerStore> | undefined =
     hasWorkspace && !runtime.dataBlocked
@@ -109,7 +113,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
     }
   }
 
-  registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked)
+  registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked, blockedReason)
   const contentDir = resolveContentDir(import.meta.url)
   registerHandbook(ctx, contentDir, hasWorkspace ? workspace : undefined,
     // 默认跳过集合由 handbook.ts 按 NON_ROLE_PRESETS 派生（不在这里写 ID 白名单）；
@@ -122,9 +126,9 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   registerDelegationTerminal(ctx)
   registerClientDiagnostics(ctx, runtime.dshHome)
 
-  registerDeliverablesCommand(ctx, { dataBlocked, workspace, ledgerStorePromise, exportNow })
-  registerPrdCommand(ctx, { dataBlocked, workspace })
-  registerReqCommand(ctx, { dataBlocked, workspace, contentDir })
+  registerDeliverablesCommand(ctx, { dataBlocked, ...blockedFields, workspace, ledgerStorePromise, exportNow })
+  registerPrdCommand(ctx, { dataBlocked, ...blockedFields, workspace })
+  registerReqCommand(ctx, { dataBlocked, ...blockedFields, workspace, contentDir })
 
   ctx.on('api-session/added', (summary) => {
     if (summary.origin === 'subagent') return

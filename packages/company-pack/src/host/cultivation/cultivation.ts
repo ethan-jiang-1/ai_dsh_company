@@ -23,6 +23,7 @@
  * 隔离/命令 wiring/跨会话生效）= `probes/session-context/cultivation-method-layer-probe.mjs`。
  */
 import type { Context } from '@deepseek-ai/cordis'
+import { blockedCompanyText } from '../commands/blocked-text.ts'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 // 纯类型导入：ctx.commands 的 Context 增强（服务本体由 base bundle 挂载，vendor patch 钉行）。
 import type {} from '@deepseek-ai/dsh-commands'
@@ -160,14 +161,14 @@ interface CultivationCommandContext {
 type CultivationCommandResult = { readonly kind: 'error' | 'success'; readonly text: string }
 
 /** 命令行为只依赖会话输入、配置与培养存储；Cordis 注册留在外层适配器。 */
-function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false) {
+function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false, blockedReason?: string) {
   return async ({ agent, rawInput }: { readonly agent?: AgentLike, readonly rawInput: string }) => {
     const face = sessionFaceOf(agent)
     if (face === null) {
       return { kind: 'error' as const, text: '培养命令需要公司角色会话（当前会话不是公司角色 preset，或 cwd 缺席）。' }
     }
     if (dataBlocked) {
-      return { kind: 'error' as const, text: '公司数据已停写（bundle 身份损坏/版本不兼容，或公司盘落点不安全）；先修复 manifest/DSH_COMPANY_HOME 再培养。' }
+      return { kind: 'error' as const, text: blockedCompanyText(blockedReason, '培养') }
     }
     const scope = companyScopeOf(face, companyHome)
     if (scope.problem !== undefined) return { kind: 'error' as const, text: scope.problem }
@@ -595,7 +596,7 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
 }
 
 /** 「/cultivation」命令族与提案工具的注册面。 */
-export function registerCultivation(ctx: Context, config: CultivationHostConfig, companyHome?: string, dataBlocked = false): void {
+export function registerCultivation(ctx: Context, config: CultivationHostConfig, companyHome?: string, dataBlocked = false, blockedReason?: string): void {
   const storage = nodeCultivationStorage
   if (!dataBlocked && companyHome !== undefined && config.cultivationRoot !== undefined) {
     try {
@@ -660,7 +661,7 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
         return { id: '', recorded: false, note: '提案需要公司角色会话上下文（agent preset + cwd）。' }
       }
       if (dataBlocked) {
-        return { id: '', recorded: false, note: '公司数据已停写（bundle 身份损坏/版本不兼容，或公司盘落点不安全）；先修复 manifest/DSH_COMPANY_HOME。' }
+        return { id: '', recorded: false, note: blockedCompanyText(blockedReason, '记录提案') }
       }
       const scope = companyScopeOf(face, companyHome)
       if (scope.problem !== undefined) {
@@ -705,6 +706,6 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
     name: 'cultivation',
     description: '培养回路：给自己的角色提交纠正、给别的角色提建议、采纳/拒绝/验证/撤回方法（采纳仅目标角色本人）',
     input: { hint: 'correct <期望行为> :: <做法与证据> | suggest <角色> <期望行为> :: <建议> | adopt <id> [as <slug>] | reject <id> :: <理由> | verify <id> <pass|fail> :: <后续相似工作的具体依据> | revoke <slug>' },
-    handler: cultivationCommandHandler(config, storage, ctx, companyHome, dataBlocked),
+    handler: cultivationCommandHandler(config, storage, ctx, companyHome, dataBlocked, blockedReason),
   })
 }

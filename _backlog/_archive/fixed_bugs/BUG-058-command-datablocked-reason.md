@@ -1,14 +1,16 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-10
 ---
 
 # BUG-058：`/req` / `/prd` 的 `dataBlocked` 回执丢掉真实原因，并声称「无 workspace/身份/lease 问题」
 
-> 严重级别：P2（次要）｜发现：2026-11-10｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-10｜状态：已修
 >
-> **留痕**：（未修；发现于 2026-11-10 探索轮。修复时按材料性规则定 Note/commit。）
+> **留痕**：Note [notes/implemented/2026-11-10-command-blocked-reason.md](../../../notes/implemented/2026-11-10-command-blocked-reason.md)
+>
+> **审查**：agent — 重读 diff + runtime-guard/四命令 spec 红→绿 + 真入口无 workspace 复跑；见「修复证据」。
 
 ## 症状
 
@@ -53,13 +55,12 @@ opened: 2026-11-10
 
 ## 修复关联
 
-- `packages/company-pack/src/host/run-bundle/runtime-guard.ts`：把 `dataBlocked` 的原因
-  （`resolutionError` / `lease.reason` / `bundleState` / `validateCompanyHome` 的 error）收成一个
-  可枚举的 `blockedReason`。
-- `packages/company-pack/src/index.ts`：把 reason 传给命令/培养注册；如果 GUI picker 有 workspace
-  变更事件，接上重算（否则至少在回执里要求重启，不说「先选 workspace」）。
-- `req-command.ts` / `prd-command.ts` / `cultivation.ts`：回执按 reason 分支（未选 workspace /
-  lease 被占 / bundle 坏 / 落点不安全），不再硬编码「无 … 问题」；保留「公司数据已停写」总句。
+- `packages/company-pack/src/host/run-bundle/runtime-guard.ts`：`CompanyRuntime.blockedReason`
+  收 `resolutionError` / `lease.reason` / `bundleState` / `validateCompanyHome` 的原因。
+- `packages/company-pack/src/index.ts`：把 reason 传给命令/培养注册；**不做**每命令重取 lease；
+  回执明确写「重启宿主」。
+- `commands/blocked-text.ts`：`blockedCompanyText(reason, action)`；`req-command.ts` / `prd-command.ts` /
+  `deliverables-command.ts` / `cultivation.ts` 共用，保留「公司数据已停写」总句。
 - keyless：`req-command.spec` / `prd-command.spec` 加 `blockedReason` 三种输入的文案断言；
   若接 workspace 变更，加一条「picker 后重算」的纯逻辑 spec。
 - 真入口：lease 冲突 + 无 workspace 两场景各一次，回执必须点名原因；清因后同命令成功。
@@ -73,3 +74,15 @@ opened: 2026-11-10
 - keyless spec 覆盖三类 reason 的文案与一条合法路径；`pnpm verify` + `pnpm test` 绿。
 - 若确认 GUI picker 会 re-init：补一条「选 workspace 后同进程命令恢复」的真入口证据；
   若不会：回执明确写「需重启宿主」，不把用户送到错误的动作。
+
+## 修复证据（2026-11-10）
+
+- **红**：`runtime-guard.spec` 三例先加 `blockedReason` 断言（修前 `undefined`）；
+  `req-command.spec` / `prd-command.spec` / `deliverables-command.spec` 的 dataBlocked 用例先断言
+  `原因：<reason>` 且不含「无 … 问题」（修前红）。
+- **绿**：`pnpm test` 173 files / 1442 tests；`pnpm typecheck` 绿；`pnpm lint` 0 warnings；
+  guard 的 corrupt / lease / 无 workspace 三例 reason 断言通过。
+- **真入口**：`DSH_COMPANY_HOME=/tmp/definitely-not-a-company-workspace` 起 web →
+  `/req check` = `公司数据已停写（原因：DSH_COMPANY_HOME 指向的目录不存在：…）；先处理该原因再校验。…`；
+  同一 web 内有效 cwd 会话仍停写；`DSH_COMPANY_HOME=company-workspace` 重启 → 正常回执。
+- **未覆盖**：GUI picker 是否 re-init（回执已明确要求重启）；lease 冲突的 live 回执（keyless guard 覆盖）。
