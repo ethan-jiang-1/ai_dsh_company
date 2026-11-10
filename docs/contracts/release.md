@@ -65,7 +65,7 @@ tag（升 pin 走 sync-dsh，冒烟过了才加列）；`sync-dsh` 检查模式�
 |---|---|
 | 组合/配置差异 | 本 pack 的 bundle `cordis.patch.yml`（`- id:` 替换 / `- insert:` 新增）或 profile patch |
 | 需要上游修 | 改 **DSH upstream** → 升 pin（`tools/sync-dsh.mjs`）；期间记入 `notes/` |
-| 上游功能在本形态不可用 | **先证伪“不可用”再自建**（postmortem 0003；`dsh.client.inject` 是 informational only）。确属不可用才在本 pack 实现等价面 |
+| 上游功能在本形态不可用 | **先证伪“不可用”再自建**（postmortem 0003；`dsh.client.inject` 不排 Cordis 激活，但排浏览器模块 factory arrival——准确语义见 [pack README](../../packages/company-pack/README.md)）。确属不可用才在本 pack 实现等价面 |
 
 - **为什么用 SHA 而不用 tag**：tag 可被移动/别名，SHA 才是钉住的合同。
 - **submodule 首次克隆技巧**：本地路径 + `-c protocol.file.allow=always`（单命令放行，未改全局配置）；

@@ -32,7 +32,7 @@
 
 | 形态 | persona 来源 | 工具 / skills 来源 | cwd 与 CHARTER·KB | 日志 | 问人权限 |
 |---|---|---|---|---|---|
-| 独立角色 preset 根会话（人选 preset 开门） | `presets/<role>/agent.cordis.yml` persona row | **preset 自声明**（自包含、无继承——见下「工具面」） | 人连接的 workspace；手册经 `agent-instructions` 注入、KB = cwd 的 `kb/<role>/` | `$DSH_HOME/sessions/<slug>/<id>/`（世代选择唯一口径 = session-log-generation） | `tool-ask-user` 直问人 |
+| 独立角色 preset 根会话（人选 preset 开门） | `presets/<role>/agent.cordis.yml` persona row | **preset 自声明**（自包含、无继承——见下「工具面」） | 人连接的 workspace；T0 手册由 host `systemPrompt.section` 注入，`agent-instructions` 只加载用户项目 AGENTS/CLAUDE；KB = cwd 的 `kb/<role>/` | `$DSH_HOME/sessions/<slug>/<id>/`（世代选择唯一口径 = session-log-generation） | `tool-ask-user` 直问人 |
 | CEO Lead 动议会话 | `presets/ceo/`（同上） | 同上（ceo 自声明，含 delegation 组） | `company-workspace`；spawn 队友 | 同上（Lead 目录） | Lead 直问人；成员升级 CEO |
 | teammate（Agent Teams 成员） | **继承 Lead 组合**（composeFrom ⇒ `agentPreset=ceo`）——身份来自成员名、任务书与手册注入，**不是成员角色的 preset** | 继承 Lead 组合（delegation 行无 `toolFilter` 不裁剪） | 同 Lead 工作区；读自己的 CHARTER | 各自 sessionId 目录（authorship 按 `team/member` 事件建 sessionId→成员名映射） | 动议内升级 CEO（不直问） |
 | 命名 child（activation） | **工具行钉的 `agentPreset`**（`vp_eng`→vp-eng / `vp_sales`→vp-sales / `subagent_research`→worker-researcher；0.2.1 起人格与组合都由 preset 给，不再继承 Lead）——child 日志首帧 `agentPreset` 是唯一取证件，**名册角色名 ≠ 加载 preset** 这条旧坑以此字段核对（旧反例 = 2026-09-26 sea-reconcile，[authorship-audit](../../checks/audit/authorship-audit.mjs) 头注） | 该 preset 自声明的那一套（role skills 随 preset 一起到） | 同 Lead | child 自带 sessionId 日志 | 经 Lead |
@@ -112,9 +112,10 @@
 ## 职责边界与路由（唯一事实家 = 公司手册 `AGENTS.md`/碰名 `COMPANY.md`）
 
 六角色的"管什么 / 签字线或 veto / 不碰什么"、**问题 → owner 路由表**、冲突升级规则与承诺权，
-写在**公司手册**里——它经 `agent-instructions` 行随每个成员会话注入，**模型开场可见**
-（不需要谁去"读文档"）。本节不复制正文，避免两处漂移；`pnpm test` 有一条守卫断言手册覆盖
-六角色与「职责边界 / 这事问谁 / 冲突与升级 / 承诺权」四节。
+写在**公司手册**里——T0 `content/AGENTS.md` 由 host 注册 `systemPrompt.section` 随成员会话注入；
+细则是 `content/generic/*`（T2）按需读，`agent-instructions` 不注入公司手册。
+本节不复制正文，避免两处漂移；`pnpm test` 的 `handbookSurface()` 静态守卫断言 T0+generic
+覆盖六角色与「职责边界 / 这事问谁 / 冲突与升级 / 承诺权」四节，**不证明 T2 在模型 prompt 里可见**。
 
 ## 工具面（owner = 实现）
 

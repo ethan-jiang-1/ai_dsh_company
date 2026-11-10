@@ -11,6 +11,15 @@ export function resolveDevMode(argv = []) {
   return argv.includes('--link') ? 'link' : 'tarball'
 }
 
+/**
+ * 端口是环境状态：用户没点名 `--port` 时交系统分配（0），避免撞上日用 GUI（常见 3080）。
+ * 显式 `--port <n>` 或 `--port=<n>` 一律尊重；只补默认，不改调用者参数。
+ */
+export function ensureDefaultPort(argv = []) {
+  const hasPort = argv.some(arg => arg === '--port' || arg.startsWith('--port='))
+  return hasPort ? [...argv] : [...argv, '--port', '0']
+}
+
 /** 内容寻址的 tarball 文件名：内容一变 spec 就变，pnpm 才会真的换安装副本。 */
 export function devTarballName({ name, version, sha256 }) {
   if (typeof name !== 'string' || name === '') throw new Error('devTarballName: name 缺失')

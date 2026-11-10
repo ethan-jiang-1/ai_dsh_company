@@ -51,7 +51,7 @@ audit 分区）→ **录制回放与证据**（[snapshots](../snapshots/README.m
   别在本仓里找主循环，也别改 vendor。
 - **skills**：`packages/company-pack/presets/<角色>/skills/`——盘上可见，一角色一目录。
 - **运行态**：[runtime/](../runtime/README.md)（gitignored，跑过留下的状态全在这）；
-  一条命令看全景：`pnpm orient`。
+  一条命令看全景：`source run/env.sh && pnpm orient`（dev 仓库；不 source 会读日用 home）。
 - **公司状态（workspace 单元）**：用户 workspace + `<workspace>/.dsh-company/`（v3；`bundle.json` 为 legacy 文件名）+ 公司盘；home 只留 DSH 运行时与 host 治理；
   一个安装 = 一个公司；同一 home 可顺序服务多个 workspace，不同公司才新开 home。**不进 git**。定义与 base/grown 分层 = [运行态地图 §二·五](runtime-map.md)。
   **run trace（四件套）** = 代码与组合 / DSH 运行状态 / 会话 cwd / 证据——`pnpm orient` 默认全景直接显示这四件；

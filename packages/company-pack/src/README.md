@@ -1,12 +1,12 @@
 # src/ —— 本包源码面（host 半 + client 半）
 
 > 什么时候读：改 host/client 源码、找注册入口 / 读模型 / 渲染实现时。
-**布局**（2026-10-05 按盘核对重写；旧文两处失效指针已修：`routing.ts` 从未存在、`delegation-keys` 实际住 client 半）：
+**布局**（2026-11-11 按盘重校；host 组路径以 [host/README](./host/README.md) 为准）：
 
-- `index.ts` —— **host 注册入口**（bundle 行 `company-client` 指向它）：`inject = ['tools','approval','commands']`
+- `index.ts` —— **host 注册入口**（bundle 行 `company-client` 指向它）：`inject = ['tools','approval','commands','workspaceRegistry']`
   声明依赖、`apply(ctx)` 编排签字工具（`request_signoff`）、工作区门投影工具（`workspace_doors`）、培养工具/命令
-  （接线在 `host/cultivation.ts`）、公司盘首启自举（接线在 `host/bootstrap.ts`）与成品目录生成/present 投影
-  （接线在 `host/catalog.ts`）；公开面只导出 loader 需要的 `apply`/`inject`（0.8.0 收窄，读模型走内部 import）。消费方向 = vendor runtime → 本入口。
+  （接线在 `host/cultivation/cultivation.ts`）、公司盘首启自举（接线在 `host/run-bundle/bootstrap.ts`）与成品目录生成/present 投影
+  （接线在 `host/ledger/catalog.ts`）；公开面只导出 loader 需要的 `apply`/`inject`（0.8.0 收窄，读模型走内部 import）。消费方向 = vendor runtime → 本入口。
 - `host/` —— **host-only 逻辑**（用 node 内建，浏览器面不许进），按关切分 **8 组**（2026-11-09；每组 = 一个目录，
   文件清单 = 目录本身，组地图 = [host/README](./host/README.md)）：`run-bundle/`（首启播种、bundle 身份、租约、
   运行前提）、`workspace/`（解析/登记/门）、`cultivation/`（提案与存储）、`ledger/`（presented 账本、成品目录、

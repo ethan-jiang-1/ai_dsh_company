@@ -36,7 +36,7 @@ dsh() {
 #   本文件一切判断都打印一行，因为这里的坑与双 home 同形：不报错、只是行为悄悄变糟。
 # 逃生阀：已显式设过 DSH_PERMISSION_MODE 则尊重它；DSH_SKIP_SANDBOX_PROBE=1 可跳过探测。
 if [ -n "${DSH_PERMISSION_MODE:-}" ]; then
-  echo "沙箱：沿用已设的 DSH_PERMISSION_MODE=$DSH_PERMISSION_MODE（跳过探测）。"
+  echo "沙箱：沿用已设的 DSH_PERMISSION_MODE=${DSH_PERMISSION_MODE}（跳过探测）。"
 elif [ "${DSH_SKIP_SANDBOX_PROBE:-}" = "1" ]; then
   echo "沙箱：DSH_SKIP_SANDBOX_PROBE=1，跳过探测（将按上游默认 workspace-write 起，后端不可用时又会步步要批准）。"
 elif [ "$(uname -s)" != "Darwin" ]; then
@@ -58,7 +58,7 @@ git -C "$_repo_root" config core.hooksPath "$_repo_root/.githooks" \
   || echo "warn: pre-push hook 接线失败（enforcement 通道未生效）" >&2
 unset _repo_root
 
-echo "DSH_HOME=$DSH_HOME（日用 home ~/.dsh 不受影响）；验证用 pnpm dsh（vendor 基线），裸 dsh 已拦截。"
+echo "DSH_HOME=${DSH_HOME}（日用 home ~/.dsh 不受影响）；验证用 pnpm dsh（vendor 基线），裸 dsh 已拦截。"
 
 # 浏览器可选面（2026-10-26）：npm 发布的 DSH meta package 不含 browser-use 两包；本仓 dev 用
 # vendor 源码树，两包在安装侧可解析，但 preset 的自动探测从 profile 看，故这里显式开。

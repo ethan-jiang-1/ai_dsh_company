@@ -3,7 +3,7 @@
 梦之队（Dream Team）虚拟公司 DSH 插件（DSH = DeepSeek Harness，唯一权威 = `vendor/dsh` 钉 SHA 子模块，见下「DSH 源码」节）：一个 company pack 提供六个公司角色 preset + 五个 support preset（共 11 个），以及 host/client 面。
 **开工最小路径**（读完这三样就够开工，其余按需；feature 任务先 Plan Mode，规则 = [policy P1](docs/policy.md)）：① 本文件（纪律 + 命令表）；② 你任务那一份 owner——改角色内容 = [presets.md](./docs/contracts/presets.md)、改 host/Web 代码 = [src/README](packages/company-pack/src/README.md)、改文档 = [docs/AGENTS.md](docs/AGENTS.md)、新增/搬内容 = [content-charter](./docs/content-charter.md)、改机制/组合 = [profile.md](./docs/contracts/profile.md)；③ [tests/README.md](tests/README.md) 的「改动面 → 最窄检查」对应行。
 **按需**：[项目地图](docs/project-map.md)（空间）、[运行态地图](docs/runtime-map.md)（时序与四轴）、[开发环 §0.5](docs/guides/dev-loop.md#05-任务入口与交接) / [§1](docs/guides/dev-loop.md#1-执行链从授权到有证据交接)（流程细节）、[policy](docs/policy.md)（授权与常设边界）、[测试宪法](docs/testing.md)（证据边界）、[脚本索引](checks/README.md)（逐脚本）、[orient 七问](docs/orient.md)（白话速读）。
-**四条命令**：`pnpm company --no-open`（repo dev-only；默认 pack + `plugin add file:`，`--link` 快速通道；启动入口 = `dsh --profile company`）/ `pnpm verify`（结构门禁）/ `pnpm test`（keyless 回归）/ `pnpm typecheck`（类型面）。新 Agent 首跑验收 = [tests/README.md](tests/README.md) 首跑节；fresh clone 先按 [bootstrap](docs/guides/bootstrap.md) 建 vendor/client，再跑 `pnpm company` / `pnpm test`（`pnpm verify` 只需 `pnpm install`）。
+**四条命令**：`pnpm company --no-open`（repo dev-only；默认 pack + `plugin add file:`，默认 `--port 0`（URL 读启动横幅），`--link` 快速通道；启动入口 = `dsh --profile company`）/ `pnpm verify`（结构门禁）/ `pnpm test`（keyless 回归）/ `pnpm typecheck`（类型面）。新 Agent 首跑验收 = [tests/README.md](tests/README.md) 首跑节；fresh clone 先按 [bootstrap](docs/guides/bootstrap.md) 建 vendor/client，再跑 `pnpm company` / `pnpm test`（`pnpm verify` 只需 `pnpm install`）。
 
 **你（读者）= 维护本 repo 的开发 agent**；六个公司角色 + 五个 support preset 是你**维护的产物**（跑在 DSH 会话里，由 `pnpm dsh` / web 观察窗驱动）——别把自己混进公司角色，也别替角色执行公司手册。
 
@@ -39,12 +39,12 @@ git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 corepack enable pnpm && pnpm install   # workspace 解析；全配方（含 vendor 构建）见 guides/bootstrap
 source run/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 接线（⚠ coding 会话 DSH_HOME 带日用值——[environments](docs/guides/environments.md)）
 pnpm bundle:init                       # fresh clone：建 dev 的 .dsh-company/ 状态（插件内容不复制；已有盘不动）
-pnpm company --no-open                 # repo dev-only：pack + plugin add file: + exec `dsh --profile company`（--link = 快速通道）
+pnpm company --no-open                 # repo dev-only：pack + plugin add file: + exec `dsh --profile company`（缺省 --port 0；--link = 快速通道）
 pnpm verify                            # 结构门禁（清单唯一源 = checks/gates/ 目录）
 pnpm test                              # keyless 回归（真模型/浏览器不进；layering 守卫）
 pnpm typecheck                         # pack 两面 + tests/client + tests/company + tests/harness（glob 全收，混合面 pack-exports 除外）（类型/导入面改动；fresh clone 先按 bootstrap 构建 vendor client 类型）
 pnpm release --check                   # 发布就绪（dist 与源码指纹；verify 绿 ≠ 可发布）
-pnpm orient                            # 运行态全景（keyless 只读；--scenario = run trace 场景视图）
+source run/env.sh && pnpm orient        # 运行态全景（先 source 才看 dev home；keyless 只读；--scenario = run trace 场景视图）
 pnpm diagnose --session <slug>/<id>     # 会话失败摘要（只读；失败 turn/工具错误/非零 bash/待审批/问询/present；child 也可点名）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）
 source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的真挂载检查（完整完成定义 = preset-change-definition skill；前置 = bootstrap 构建完成）
@@ -54,7 +54,7 @@ source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的真
 
 ## 密钥
 
-`pnpm dsh` 与真模型冒烟需 `DEEPSEEK_API_KEY`；**密钥住凭据库 `<home>/.credentials.yaml`，不是环境变量**——`env | grep DEEPSEEK` 为空**不代表**没配（2026-10-18 实证：真模型探针曾因此被误判搁置）；自检 = `pnpm orient` 的「凭据」行。凭据按 home 隔离（`runtime/harness-home` 配一次，[environments](docs/guides/environments.md)）；永不提交密钥。
+`pnpm dsh` 与真模型冒烟需 `DEEPSEEK_API_KEY`；**密钥住凭据库 `<home>/.credentials.yaml`，不是环境变量**——`env | grep DEEPSEEK` 为空**不代表**没配（2026-10-18 实证：真模型探针曾因此被误判搁置）；自检 = `source run/env.sh && pnpm orient` 的「凭据」行。凭据按 home 隔离（`runtime/harness-home` 配一次，[environments](docs/guides/environments.md)）；永不提交密钥。
 
 ## DSH 源码：三个实体，别混
 

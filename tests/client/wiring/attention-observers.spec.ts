@@ -9,13 +9,19 @@ import { describe, expect, it, vi } from 'vitest'
 import { createAttentionRegistry } from '../../../packages/company-pack/src/client/wiring/attention-registry.ts'
 import { installAttentionObservers, registerAttentionObservers, type AttentionRemote, type AttentionSessions } from '../../../packages/company-pack/src/client/wiring/attention-observers.ts'
 
-/** 假远端：记下 handler，测试自己派发（this 由调用方给）。 */
+/** 假远端：记下 handler 与退订函数，测试自己派发（this 由调用方给）。 */
 function fakeRemote() {
   const handlers = new Map<string, (this: unknown, request: unknown, next: () => unknown) => unknown>()
+  const offs = new Map<string, ReturnType<typeof vi.fn>>()
   const remote: AttentionRemote = {
-    $on: (event, handler) => { handlers.set(event, handler as never); return () => {} },
+    $on: (event, handler) => {
+      handlers.set(event, handler as never)
+      const off = vi.fn()
+      offs.set(event, off)
+      return off
+    },
   }
-  return { remote, handlers }
+  return { remote, handlers, offs }
 }
 
 /** 假会话服务：只有 owner-1 有归属。 */
@@ -25,12 +31,17 @@ const sessions: AttentionSessions = {
 
 describe('待办观察者：登记、委托与销账（R3-10）', () => {
   it('生产接线 installAttentionObservers 把观察者挂到注入的 remote 上', async () => {
-    const { remote, handlers } = fakeRemote()
+    const { remote, handlers, offs } = fakeRemote()
     const registry = createAttentionRegistry()
+    let cleanup: (() => void) | undefined
     const ctx = {
       inject: (deps: readonly string[], callback: (scoped: unknown) => void) => {
         expect(deps).toEqual(['sessions', 'remote'])
-        callback({ remote, sessions })
+        callback({
+          remote,
+          sessions,
+          effect: (fn: () => (() => void)) => { cleanup = fn(); return () => {} },
+        })
       },
     }
     installAttentionObservers(ctx as never, registry)
@@ -41,6 +52,19 @@ describe('待办观察者：登记、委托与销账（R3-10）', () => {
     await handlers.get('approval/request')?.call('owner-1', { toolName: 'request_signoff', reason: '发布' }, next)
     expect(next).toHaveBeenCalledTimes(1)
     expect(registry.list()).toEqual([])
+    expect(cleanup).toBeTypeOf('function')
+    cleanup?.()
+    expect(offs.get('user-questions/request')).toHaveBeenCalledTimes(1)
+    expect(offs.get('approval/request')).toHaveBeenCalledTimes(1)
+  })
+
+  it('cleanup 同时退订问询与审批两个事件', () => {
+    const { remote, offs } = fakeRemote()
+    const registry = createAttentionRegistry()
+    const cleanup = registerAttentionObservers({ remote, sessions, attention: registry })
+    cleanup()
+    expect(offs.get('user-questions/request')).toHaveBeenCalledTimes(1)
+    expect(offs.get('approval/request')).toHaveBeenCalledTimes(1)
   })
 
   it('问询事件登记挂起项，并永远把 next() 的返回值原样交回', async () => {

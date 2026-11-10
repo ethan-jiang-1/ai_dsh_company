@@ -2,6 +2,7 @@
 // 状态：常驻（repo dev-only）
 // 何时跑：维护者要在 dev workspace 起一个 `company` profile 看交付形态时。
 // 用法：pnpm company [--link] [--port <n>] [--no-open] [--home <DSH_HOME>] [--workspace <dir>]
+// 端口缺省 = 0（交系统分配；避免撞上日常 GUI 的 3080），显式 --port 优先。
 //
 // 这**不是**启动入口，也不进 tarball：启动入口是 `dsh --profile company`。
 // **默认走用户侧同形安装**：tsc + tsdown → npm pack → `dsh plugin --profile company add file:<tgz>`
@@ -13,7 +14,7 @@ import { createHash } from 'node:crypto'
 import { createWriteStream, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { devTarballName, migrationNotice, planDevStart, resolveDevMode, shouldReuseBuild } from './lib/dev-install.mjs'
+import { devTarballName, ensureDefaultPort, migrationNotice, planDevStart, resolveDevMode, shouldReuseBuild } from './lib/dev-install.mjs'
 import { devBuildFingerprint } from './lib/pack-source.mjs'
 import { redactTokenUrls } from './lib/session-diagnose.mjs'
 
@@ -30,6 +31,7 @@ if (args.includes('--help') || args.includes('-h')) {
 dev-only：默认 tsc + tsdown + npm pack → \`dsh plugin --profile company add file:<tgz>\` → exec dsh。
 --link = 符号链接快速通道（改 presets/** 即刻生效；不验打包面）。
 --rebuild = 忽略构建缓存，强制重新构建打包（默认：源/vendor pin/lockfile 未变时复用上次 tarball）。
+--port 缺省 = 0（交系统分配；URL 从启动横幅读），显式 --port 优先。
 应用内安装/启动见 README 与 _dist 手册；本脚本不写 profile patch、不问 workspace。`)
   process.exit(0)
 }
@@ -60,6 +62,8 @@ for (let i = 0; i < args.length; i += 1) {
   if (args[i] === '--link' || args[i] === '--rebuild') continue
   passthrough.push(args[i])
 }
+// 端口是环境状态：没点名 --port 时交系统分配，避免撞上日常 GUI（通常 3080）。
+const childArgs = ensureDefaultPort(passthrough)
 const env = { ...process.env, DSH_HOME: home, DSH_COMPANY_HOME: workspace }
 const run = (argv, options = {}) => {
   const result = spawnSync(argv[0], argv.slice(1), { cwd: root, env, stdio: 'inherit', ...options })
@@ -164,7 +168,7 @@ const stamp = new Date().toISOString().replace(/[:.]/g, '-')
 const logPath = join(logDir, `company-${stamp}.log`)
 const logStream = createWriteStream(logPath, { flags: 'a' })
 console.log(`company(dev): 启动日志 → ${logPath}（含运行输出，token 已脱敏；勿提交）`)
-const child = spawn(process.execPath, [cli, '--profile', 'company', '--', ...passthrough], {
+const child = spawn(process.execPath, [cli, '--profile', 'company', '--', ...childArgs], {
   cwd: workspace, env, stdio: ['inherit', 'pipe', 'pipe'],
 })
 const tee = (stream, target, sink) => {

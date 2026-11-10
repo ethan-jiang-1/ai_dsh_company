@@ -10,6 +10,7 @@ import { join } from 'node:path'
 import { devHomeStatus } from './runtime-home.mjs'
 import { scanR3Dual } from './candidate-scan.mjs'
 import { repositoryRoot, snapshotScenes } from './repository-layout.mjs'
+import { FULL_ROLE_IDS, SUPPORT_PRESET_IDS } from './delegation-model.mjs'
 
 /** 双 home 判定的观测包装：只分类与警告，不拒绝执行。 */
 export function homeStatus(env = process.env, { dailyHome } = {}) {
@@ -136,7 +137,7 @@ export function fourPieceState({ home, profiles, workspaceRoot, root = repositor
   for (const scene of scenes) byKind[scene.kind] = (byKind[scene.kind] ?? 0) + 1
   const kinds = Object.entries(byKind).map(([kind, count]) => `${kind} ${count}`).join(' · ')
   return {
-    code: 'vendor/dsh（钉 SHA 只读）+ packages/company-pack（bundle 行 + 5 公司角色 + researcher 组合）',
+    code: `vendor/dsh（钉 SHA 只读）+ packages/company-pack（bundle 行 + ${String(FULL_ROLE_IDS.length)} 公司角色 + ${String(SUPPORT_PRESET_IDS.length)} support preset）`,
     runState: `DSH_HOME ${home.kind === 'ok' ? home.home : `（${home.kind}）`}${profiles.length > 0 ? ` · profiles: ${profiles.join(', ')}` : ''}`,
     sessionCwd: `${workspaceRoot}（排练 = runtime/rehearsal-workspace/，gitignored）`,
     evidence: `snapshots/ 共 ${scenes.length} 场景${kinds ? `（${kinds}）` : ''}`,

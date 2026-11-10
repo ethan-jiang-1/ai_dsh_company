@@ -1,5 +1,5 @@
 # CEO 角色 preset —— 会话挂上它即获得该角色的人格、专属 skills 与工具面。
-# 设计依据：docs/architecture.md §1；**R1 实证修正**：preset 是自包含组合
+# 设计依据：docs/architecture.md「组合层」；**R1 实证修正**：preset 是自包含组合
 #   （DSH 无 patch 继承，shipped standard 自己声明全部工具行）——**工具行必须随 preset 声明**，
 #   否则会话只拿到全局 bundle 的少数行（R1 首跑：CEO 只有 10 个团队工具，读不了文件、写不出交付物）。
 # 文案定稿：notes/implemented/2026-11-10-role-content-rationale.md §1（R1：CEO 个体，非职能模板）。

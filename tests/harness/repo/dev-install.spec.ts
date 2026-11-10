@@ -6,6 +6,7 @@ import { COMPANY_ROLE_IDS } from '../../../tools/lib/company-roles.mjs'
 import {
   devInstallSpec,
   devTarballName,
+  ensureDefaultPort,
   migrationNotice,
   needsInstall,
   planDevStart,
@@ -20,6 +21,13 @@ describe('dev 启动器安装规划（dev/产品路径 parity）', () => {
     expect(resolveDevMode([])).toBe('tarball')
     expect(resolveDevMode(['--port', '0'])).toBe('tarball')
     expect(resolveDevMode(['--link'])).toBe('link')
+  })
+
+  it('端口缺省补 0；显式 --port / --port= 不被覆盖', () => {
+    expect(ensureDefaultPort(['--no-open'])).toEqual(['--no-open', '--port', '0'])
+    expect(ensureDefaultPort(['--port', '3081'])).toEqual(['--port', '3081'])
+    expect(ensureDefaultPort(['--port=3082'])).toEqual(['--port=3082'])
+    expect(ensureDefaultPort([])).toEqual(['--port', '0'])
   })
 
   it('tarball spec 是 file:，link spec 是 link:', () => {

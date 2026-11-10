@@ -133,7 +133,7 @@ rm -f  <DSH_HOME>/storages/company_run_bundle_ledger.json
 
 - **编号校验（`/req check`）的 v1 边界**：跨动议引用 `<动议键>:<ID>` 未实现（遇到只标未支持）；并发取号不加锁（靠 Lead 串行分配 + 撞号红兜底）；旧动议无 `编号体系:` 标记即 `skipped`（只读豁免，不回溯判红）。
 - **只支持 web 组合**：`company-client` 的 `inject` 声明 `workspaceRegistry`（由 web-app 组合提供）；base-only / headless profile 不加载本包。这不是缺陷，是本包的 app surface = Web（[release.md](../../docs/contracts/release.md) 六轴）。
-- **`dsh.client.inject` 的 8 条边** = 本包 client 模块 factory 的真实依赖（不是 bundle require）；删除需上游合同/证据，故保留。
+- **`dsh.client.inject` 的 8 条边** = 本包 client 模块 factory 的依赖边：Cordis 激活顺序仍由服务 inject 决定；但浏览器模块 factory 会沿这些边在 consumer 前到达（vendor `packages/client/modules/src/client/system.ts` 的 `arriveGraphRow`）。删除需上游合同/证据，故保留。
 - **品牌只替换 name 槽**：client 面只占 `sidebar.brand.name`，保留官方 mark 与 `conversation.hero.brand.mark`；这是与 `ui-brand-official` 的 `single` 槽共存的最小侵入，不是“完整皮肤”。
 - **侧栏内容搜索保持 DSH 出厂行为**：本包不再替换 host 的 `session-query-sqlite`——改值替换会让默认的应用内安装（Plugins 页/`plugin_manager`）在 live recomposition 时报 `file-upload: Agent resolver is already registered`。`company-session-search` 隔离组只给角色 `session_search` 工具用；DSH 侧栏 `session/search` 保持出厂 `openAt: never`（有会话时搜索会报禁用），不是本包承诺。
 - **侧栏角色色调只借平台令牌**：CEO 用 adaptive 的 `--dsw-alias-*` 品牌对（浅/深主题自动反转），其余五色用 **static 色相**（blue/green/amber/red/deepseek，固定值、两主题同观感）+ 按底色选的黑/白字（对比度实测见探针 G6）——**不是**上游策展的分类色板（那份仍缺，见角色身份 UX 提案开放问题 2），换主题观感不一致处即此债。

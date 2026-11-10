@@ -45,9 +45,9 @@ const CULTIVATION_VIEW_ID = 'dsh-company-pack/cultivation'
  * 谁挂 remote：官方 `client-ui-agent-team` 行（本包 cordis.patch.yml 插入的 `ui-agent-team`）
  * 自己 `$mount` 生成的 Team Remote——本入口**不再重复挂**。同一描述符挂第二次会在 client
  * api 抛 "already mounted"，把整个 Web UI 砖在 BootPage 错误屏（postmortem 0003）。
- * 90ce2f1 "官方模块在本构建形态挂不上"的前提已证伪：`dsh.client.inject` 是 informational
- * only（不排序、不 gate 加载），`ui-primitives` 是 shell 预置的 baseline 模块
- * （vendor `packages/client/web/src/platform.ts` 的 `PLATFORM_MODULES`）。
+ * 90ce2f1 "官方模块在本构建形态挂不上"的前提已证伪：`dsh.client.inject` 不排 Cordis 激活，
+ * 但它是浏览器模块 factory 的依赖边（vendor `packages/client/modules` 的 `arriveGraphRow`）；
+ * `ui-primitives` 是 shell 预置的 baseline 模块（vendor `packages/client/web/src/platform.ts` 的 `PLATFORM_MODULES`）。
  * 任务板与品牌槽读 Lead 的 `agentTeam` 投影（0.1.7 起 team 态不走 RPC）：fiber 等官方挂载完成才注册；
  * 官方缺席时本贡献保持 PENDING（板不出现），不会崩。
  * **委派工具卡只依赖 `slots`**（它渲染的是 call/result 切片，不读团队状态），所以单独 inject——

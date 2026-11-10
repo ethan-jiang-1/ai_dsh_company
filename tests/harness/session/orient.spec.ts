@@ -103,6 +103,7 @@ describe('orientState + renderOrient', () => {
     expect(text).toContain(home)
     expect(text).toContain('headless, web')
     expect(text).toContain('slug-company')
+    expect(text, '角色计数取自 delegation-model，别再写死 5/6').toContain('6 公司角色 + 5 support preset')
     expect(text).toContain('new-motion')
     expect(text).toContain('3')
     expect(text).toContain('run trace 四件套')
@@ -183,7 +184,7 @@ describe('session preset（observation-hardening 条目 B）', () => {
     expect(text).toContain('（无——非 preset 会话）')
     expect(text).toContain('（不可用）')
     const plain = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace }))
-    expect(plain).not.toContain('preset')
+    expect(plain, '未注入时不得渲染 session preset 列（代码组合行的 support preset 不算）').not.toContain('preset ceo')
   })
 })
 

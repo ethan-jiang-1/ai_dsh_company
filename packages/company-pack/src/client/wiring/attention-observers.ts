@@ -15,7 +15,7 @@ import type { AttentionRegistry } from './attention-registry.ts'
 
 /** 远端事件面（只用到 $on；handler 的 this = 事件归属 owner）。 */
 export interface AttentionRemote {
-  readonly $on: (event: string, handler: (this: unknown, request: never, next: () => unknown) => unknown) => unknown
+  readonly $on: (event: string, handler: (this: unknown, request: never, next: () => unknown) => unknown) => () => void
 }
 
 /** 会话服务面（只用到 scopeOf）。 */
@@ -29,9 +29,9 @@ export interface AttentionObserverDeps {
   readonly attention: AttentionRegistry
 }
 
-/** 注册两个观察者（幂等：每个 apply 闭包一份登记处，重复 apply 由宿主 fiber 卸载旧实例）。 */
-export function registerAttentionObservers({ remote, sessions, attention }: AttentionObserverDeps): void {
-  remote.$on('user-questions/request', function (this: unknown, request: unknown, next: () => unknown) {
+/** 注册两个观察者；返回退订函数（client fiber 卸载时释放两个 `$on`）。 */
+export function registerAttentionObservers({ remote, sessions, attention }: AttentionObserverDeps): () => void {
+  const offQuestion = remote.$on('user-questions/request', function (this: unknown, request: unknown, next: () => unknown) {
     const sessionId = sessions.scopeOf(this)
     if (sessionId === undefined) return next()
     const questions = (request as { questions?: readonly { question?: unknown }[] }).questions ?? []
@@ -45,7 +45,7 @@ export function registerAttentionObservers({ remote, sessions, attention }: Atte
     })
     return (async () => { try { return await next() } finally { done() } })()
   })
-  remote.$on('approval/request', function (this: unknown, request: unknown, next: () => unknown) {
+  const offApproval = remote.$on('approval/request', function (this: unknown, request: unknown, next: () => unknown) {
     const sessionId = sessions.scopeOf(this)
     if (sessionId === undefined) return next()
     const approval = request as { readonly toolName?: unknown; readonly reason?: unknown }
@@ -59,19 +59,24 @@ export function registerAttentionObservers({ remote, sessions, attention }: Atte
     })
     return (async () => { try { return await next() } finally { done() } })()
   })
+  return () => {
+    offQuestion()
+    offApproval()
+  }
 }
 
 
 /**
  * 生产接线：把两个观察者挂到 client context 的 `sessions`/`remote` 注入块。
  * 单独抽出是为了让 spec 能断言“apply 里真的调了同一注册函数”，而不只测纯函数。
+ * `scoped.effect` 让两个 `$on` 随注入块/fiber 卸载一起退订（vendor `ui-session` 同款）。
  */
 export function installAttentionObservers(ctx: Pick<Context, 'inject'>, attention: AttentionRegistry): void {
   ctx.inject(['sessions', 'remote'], (scoped) => {
-    registerAttentionObservers({
+    scoped.effect(() => registerAttentionObservers({
       remote: scoped.remote as unknown as AttentionRemote,
       sessions: scoped.sessions as unknown as AttentionSessions,
       attention,
-    })
+    }))
   })
 }

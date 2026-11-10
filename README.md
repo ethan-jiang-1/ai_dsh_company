@@ -77,7 +77,7 @@ Desktop 自带 Node/pnpm；命令行版 DSH 需 pnpm 在 PATH（或 `corepack en
 ## 常见问题
 
 - **要模型 key 吗？** 要。DSH 提供模型——在 **Settings → Models** 填 DeepSeek API Key；缺了发消息会报凭据错误。
-- **支持哪些平台？** DSH Desktop 与 `dsh web`（本包只挂 Web 面）；浏览器能力另装两包，见手册附录 A。
+- **支持哪些平台？** DSH 的 Web 面（`dsh web` 与 Desktop）；Desktop 安装走 Plugins 页，仓库未做逐平台真机认证。浏览器能力另装两包，见手册附录 A。
 - **卸载会删数据吗？** 不会。卸载只摘插件，`.dsh-company/` 原样留下；要删按手册 §八手动删。
 - **怎么升级？** 用新版本覆盖安装，重启 profile、硬刷新页面；状态只补缺、不覆盖你改过的文件。
 

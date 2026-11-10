@@ -10,10 +10,10 @@
 
 | 形状 | 入口 | 状态 |
 |---|---|---|
-| **应用内安装（默认）** | DSH **Plugins** 页安装 `dsh-company-pack`（web/Desktop 同一句） | ✅ 跨面；装完重启 profile |
+| **应用内安装（默认）** | DSH **Plugins** 页安装 `dsh-company-pack`（web/Desktop 同一句） | ✅ 安装句跨面；Desktop 真机未认证（[已知开放点](#已知开放点)） |
 | **CLI web 自动化** | `dsh --profile company --from-default-profile web --dump-default-config` → `dsh plugin --profile company add <tgz>` | ✅ **仅 `dsh web`**；不能 `desktop` |
 | **启动** | 装进哪个 profile 就启动哪个：GUI 装进 `web` → `dsh web`/Desktop；固定公司 profile → `cd <workspace> && dsh --profile company`（或 `DSH_COMPANY_HOME`） | ✅ 无 bin；`company` 不是出厂 profile，缺失时 DSH 报错（CLI 用 `--from-default-profile web` 建）；workspace 只从启动 cwd / `DSH_COMPANY_HOME` / DSH picker 解析 |
-| **维护者 dev** | `source run/env.sh` → `pnpm company --no-open`（默认 pack + `plugin add file:`；`--link` 快速通道） | ✅ dev home = `runtime/harness-home`，差异表 = [dev-product-parity](../guides/dev-product-parity.md) |
+| **维护者 dev** | `source run/env.sh` → `pnpm company --no-open`（默认 pack + `plugin add file:`；缺省 `--port 0`，URL 读启动横幅；`--link` 快速通道） | ✅ dev home = `runtime/harness-home`，差异表 = [dev-product-parity](../guides/dev-product-parity.md) |
 | **通用/旧部署** | 任意 web profile 装本包 | ✅ 兼容形状；不承诺 Desktop shell |
 
 交付形态细节：

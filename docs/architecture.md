@@ -15,7 +15,7 @@ delegation / Agent Teams / workflow，不自造调度器。
 | 层 | 载体 | 回答什么 | 本仓对应 |
 |---|---|---|---|
 | 代码包 | npm 包，导出 Cordis 插件 | 有没有**新代码** | 只在角色需要专属工具时出现 |
-| bundle | `dsh.bundle.patch`（pack 的 `cordis.patch.yml`） | 装进来默认加哪些**行** | company pack 的 host 层共享行 |
+| bundle | `dsh.bundle.patch` 数组（`cordis.patch.yml` + 11 个 preset 文件） | 装进来默认加哪些**行** | company pack 的 host 共享行 + 每个 preset 行 |
 | profile / patch | `$DSH_HOME/profiles/<p>` | 部署级组合选择 | `company` profile；GUI 安装落当前 profile |
 | **agent preset** | 一个目录一个 `agent.cordis.yml` | **一个会话**挂什么（工具 / prompt sections / skills / persona） | 每个角色一个 preset |
 
@@ -52,7 +52,7 @@ host 行 = [contracts/profile.md](./contracts/profile.md)；工具面 owner = `p
 | 性质 | 载体 | 机制 |
 |---|---|---|
 | 随包角色知识 | 各 preset 的 `skills/` | per-preset layer，硬隔离 |
-| 公司共享手册 | 全局 skills root / 项目 `.dsh/skills` | registry 全局层 |
+| 公司共享手册 | `content/AGENTS.md`（T0）+ `content/generic/*`（T2） | host `systemPrompt.section` 注入 T0；T2 按需读 |
 | 活数据 | workspace 文件 + fs 工具 | 共享 checkout；最终产物用 `present` 标记 |
 
 边界与“spill store 不是公司记忆”等细节 = [roles-isolation Note](../notes/implemented/2026-11-10-roles-isolation-rationale.md)；
