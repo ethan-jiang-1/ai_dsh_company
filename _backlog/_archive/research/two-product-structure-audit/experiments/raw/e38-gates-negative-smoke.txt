@@ -1,0 +1,11 @@
+PASS method-contract：未知交付模式 → 红
+  FAIL method-contract: packages/company-pack/presets/cfo/skills/project-economics/SKILL.md: 适用交付模式「nope」没有交付模式包（可用：managed-service / project-services）
+PASS pack-content-paths：content/nope.md → 红
+  FAIL pack-content-paths: packages/company-pack/content/AGENTS.md:39 死指针 `content/nope.md`（packages/company-pack/content/nope.md 不存在）
+PASS content-single-home：删服务信用 → 红
+  FAIL content-single-home: packages/company-pack/content/company/policy-lines.md 缺政策线「服务信用」
+PASS content-manifest：未登记文件 → 红
+  FAIL content-manifest: 未登记的 content 文件：company/zz-unlisted.md（在 manifest.json 声明 tier）
+PASS base-clean：部署个案语言 → 红
+  FAIL base-clean: packages/company-pack/content/charters/cfo.md:18 含部署个案语言「公司…agent…案」（出厂章程只写中性事实）；packages/company-pack/content/charters/cfo.md:18 含部署个案语言「日期待核」（出厂章程只写中性事实）
+gates-negative-smoke: ALL PASS

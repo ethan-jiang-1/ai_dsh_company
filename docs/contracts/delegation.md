@@ -37,7 +37,8 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 - **人格只能由 `agentPreset` 给**：0.2.1 删除了 per-instance `persona` / `toolFilter` /
   `backgroundMode` / `enableRunInBackground`（Config 硬拒）。每个工具行钉一个角色 preset，
   于是 child 拿到的是**该角色的 skills 与工具面**，而不是 CEO 的继承面。
-- **深度**：`maxDepth` 是绝对上限（`0` 禁止、`1` 只允许直接子代；省略读 Host 默认 1）。`vp_eng`/`vp_sales` 行是 1——VP-Eng 可能是团队成员（depth 1），子代落 2；`spawn_teammate` 仅 Lead 可调。
+- **深度**：`maxDepth` 是 **child 的绝对 depth 上限**（`0` 禁止、`1` 只允许直接子代）；`parent+1 > maxDepth` 即抛 `SubagentDepthError`。真值：`0/1→1 ALLOW`、`1/1→2 THROW`、`1/2→2 ALLOW`、`2/3→3 ALLOW`、`2/2→3 THROW`。
+  `vp_eng`/`vp_sales` 行=1：只能从 depth 0（根/Lead）调用；depth 1 的成员调用会抛。`vp_cmo` 行=2：depth 1 的 VP-Eng 可调、child 落 2。`spawn_teammate` 仅 Lead 可调。
 - **改稿方式**：优先 `send_to_subagent` 续同一个 named child（root/命名 child 都可用；带上一稿原文）；
   不可续或需要新上下文才再委派一次。CEO 团队的反复追加/互审仍归 team（`send_message` 按名）。
 - **工具行归属**：写在 `presets/ceo/agent.cordis.yml` 的 `delegation` 组内（preset 自包含，

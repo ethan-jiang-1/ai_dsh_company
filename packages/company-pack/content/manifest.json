@@ -11,6 +11,7 @@
     ],
     "t2": [
       "company/review-protocol.md",
+      "company/rates.md",
       "generic/collaboration.md",
       "generic/deliverable-states.md",
       "generic/human-interface.md",
@@ -31,11 +32,32 @@
       "methods/quality-loop-producer/system-architecture/SKILL.md",
       "methods/quality-loop-producer/vv-plan/SKILL.md",
       "methods/quality-loop-verifier/system-architecture/SKILL.md",
-      "methods/quality-loop-verifier/vv-plan/SKILL.md"
+      "methods/quality-loop-verifier/vv-plan/SKILL.md",
+      "delivery-modes/project-services/overview.md",
+      "delivery-modes/project-services/document-map.md",
+      "delivery-modes/project-services/glossary.md",
+      "delivery-modes/project-services/delivery-rules.json",
+      "delivery-modes/project-services/templates/acceptance.md",
+      "delivery-modes/project-services/templates/sow.md",
+      "delivery-modes/project-services/templates/milestones.md",
+      "delivery-modes/project-services/templates/raci.md",
+      "delivery-modes/project-services/templates/uat.md",
+      "delivery-modes/managed-service/overview.md",
+      "delivery-modes/managed-service/document-map.md",
+      "delivery-modes/managed-service/glossary.md",
+      "delivery-modes/managed-service/delivery-rules.json",
+      "delivery-modes/managed-service/templates/sla.md",
+      "delivery-modes/managed-service/templates/service-catalog.md",
+      "delivery-modes/managed-service/templates/runbook.md",
+      "delivery-modes/managed-service/templates/incident.md",
+      "delivery-modes/managed-service/templates/monthly-report.md",
+      "delivery-modes/managed-service/templates/renewal.md",
+      "product-types/hardware-software/capabilities.md"
     ],
     "legacy": [
       "state/org.md",
       "state/owners.md",
+      "state/roster.md",
       "state/motion-ledger.md"
     ]
   }

@@ -23,23 +23,41 @@ MRD / PRD 是这条脊柱的两种产物，不是两套模板。
 6. **需求与验收**：每个需求一条编号、一组可判真假的验收标准。
 7. **风险与未决**：最可能翻车的一件事 + 兜底；未决项单列，不许当结论用。
 
-## 产品类型 → playbook
+## 产品类型 × 交付模式（两轴）
 
-先判断这次是哪种产品，再读对应 reference（相对本 skill 目录）。**类型看动议户口**：
+先判断这次**造什么**、**怎么交付**，再读对应内容包。**类型看动议户口**：
 `.dsh-company/deliverables/<slug>/meta.md` 的 `产品类型` 优先；没写才回落 `company.md` 的 `productType`；
 用户口头声明与默认不一致时，以用户声明为准并写进 meta（别只记在对话里）。
 
+**第一轴：产品类型（造什么）**
+
 | 类型 | playbook | 典型问题 |
 |---|---|---|
-| 项目制 / 系统集成 | `references/project-services.md` | SOW 边界、第三方依赖、UAT、实施里程碑 |
 | 硬软一体产品 | `references/hardware-software.md` | BOM/供应链、认证、固件与软件联动、试产与售后 |
 | 纯软 / 企业软件 | `references/business-software.md` | 交付模式（SaaS/私有化/永久）、升级/回滚、激活/留存/SLO、数据边界 |
-| 新类型 | 还没有 → 按同结构新增 `references/<type>.md`（**随包发布**；workspace 覆盖暂不支持）；**不要**把新类型塞进旧 playbook | 先写一页"这个类型多了哪几个字段/风险" |
+| 新类型 | 还没有 → 按同结构新增 `content/product-types/<id>/`（**随包发布**；workspace 覆盖暂不支持）；**不要**把新类型塞进旧 playbook | 先写一页"这个类型多了哪几个字段/风险" |
+
+**能力前置**：`hardware-software` 进入 PRD / 报价前先过 `content/product-types/hardware-software/capabilities.md`；
+缺席位（硬件/固件/电气/机械/认证/供应链/试产/现场）报缺，不进入报价/对外承诺。
+
+**可选值只有一处**：`content/product-types/<id>/` 下的类型包；上表与它一一对应。
+
+**第二轴：交付模式（怎么交付）**——写在 `meta.md` 的 `交付模式`；不写 = `productized`。
+**它不是产品类型，不要写进 `产品类型`。** 规则、文档映射与模板 = `content/delivery-modes/<id>/`：
+
+| 交付模式 | 触发 | 追加文档 |
+|---|---|---|
+| `productized` | 标准产品售卖；无 SOW/UAT/SLA | 无 |
+| `project-services` | SOW / UAT / 驻场 / 里程碑验收 | SOW / UAT / RACI / 里程碑 |
+| `managed-service` | 持续 SLA / 值班 / 月报 / 续费 | SLA / 服务目录 / Runbook / 事件 / 月报 / 续约 |
+
+动议组合示例：`产品类型: business-software` + `交付模式: project-services`——需求链仍走
+business-software 的 MRD→StRS→PRD，另加 SOW/UAT/RACI/里程碑，不改需求层。
 
 **生长方式**：pack 里的 playbook 随版本走；角色自己的打法（本行业话术、评估量表）经培养采纳进
 `<DSH_HOME>/company/methods/<role>/`，不要改共享 playbook 的公共字段。
 
-## 编号与层（合同 = pack `content/state/process-docs.md`）
+## 编号与层（合同 = pack `content/product-types/<id>/requirements-model.md`，`<id>` = `productType`）
 
 - 号只承载身份：`MR-###`（市场机会）/ `REQ-###`（需求，**任一层**）/ `IF-###`（接口）/ `TC-###`（验证）；
   `AC-<REQ号>-<n>` 从属父 REQ。四种各自一条 append-only 序列，动议内全局唯一；号由 owner 登记时取 `max+1`。

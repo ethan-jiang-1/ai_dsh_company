@@ -4,7 +4,7 @@
 > `结果` ∈ 进行中 / 已采纳 / 已否决 / 已搁置 / 已废弃 / 判不了 / 已完成；不合词表或缺行 = 成品页签标「meta 形状错」，操作员收口核对。逐字替换尖括号占位；「结果」开局可留空（观察项盯守），**收口时必标终态词**
 > ——present 在而结果非终态 = 操作员收口判「结果未终态」。补充说明（模式/口径/风险
 > 闸门等散文）写在核心字段**之后**：非字段行解析时忽略，不进判据，留作人读。
-> `编号体系` / `需求层` 是**编号范围标记**（合同 = pack `content/state/process-docs.md`）：写 `identity` 才进
+> `编号体系` / `需求层` 是**编号范围标记**（合同 = pack `content/product-types/<id>/requirements-model.md`，`<id>` = `productType`）：写 `identity` 才进
 > `/req check` 的编号检查；旧动议不写 = 只读豁免（`skipped`）。`需求层` 声明本轮要到的层，缺层按声明判红。
 >
   > **入档前置检查**（曾经有入档件长期停在 `参与: CEO（待补）` / `一句话结论:（待补——见 final 正文）`）：本件从 `.dsh-company/deliverables/` 移入
@@ -19,7 +19,8 @@ slug: <slug-短横线小写英文>
 kickoff: <YYYY-MM-DD——会话注入的真日期，不猜>
 类型: <决策｜生产｜诊断｜口径问答>
 编号体系: <identity（新动议统一写它）｜不写 = 旧动议只读豁免>
-产品类型: <hardware-software｜business-software（用户声明优先；不写 = 回落 company.md 的 productType）>
+产品类型: <类型 id＝content/product-types/ 下的目录名（用户声明优先；不写 = 回落 company.md 的 productType）>
+交付模式: <productized｜project-services｜managed-service（不写 = productized；有 SOW/UAT/驻场/里程碑验收 = project-services；有持续 SLA/值班/月报/续费 = managed-service；与产品类型正交）>
 需求层: <MRD, StRS, PRD, SyRS, IRS（本轮声明的层；不写 = 到 PRD 为止）>
 参与: <CEO+参与角色，如 CEO+CFO+COO>（收口时由 CEO 回填，与 `present` 同一动作；须与 `.dsh-company/kb/motion-ledger.md` 对应行第 4 列**集合等价**；`（待补）` 占位不得入档）
 结果: <开局留空或"进行中"；收口时换终态词：已采纳｜已否决｜已搁置｜已废弃｜判不了｜已完成>

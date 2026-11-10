@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /Users/bowhead/ai_dsh_company
+
+ ✓ tests/host/commands/delivery-command.spec.ts (9 tests) 14ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  07:18:36
+   Duration  137ms (transform 37ms, setup 0ms, import 46ms, tests 14ms, environment 0ms)

@@ -1,0 +1,16 @@
+== E10 T1 header vs manifest tier ==
+product-types/hardware-software/overview.md	tier=t2	header=> 层：产品类型 · 加载：按需（T2）；本文件是 ≤2KB 摘要。用于带硬件（设备/模组/整机）与软件联动、或以系统集成交付的产品。
+product-types/business-software/overview.md	tier=t2	header=> 层：产品类型 · 加载：按需（T2）；本文件是 ≤2KB 摘要。用于**纯软 / 企业软件**：没有现场硬件、没有固件/电气/机械交付物，
+
+== E10 10% policy: CFO charter vs policy-lines ==
+
+# charters/cfo.md (0 hits)
+
+# company/policy-lines.md (1 hits)
+23: - **服务信用**：违约补偿、只抵扣不下现金，**≤ 当年维护费 10%**；不得当赠品 / 附赠额度（禁科目串用）；与「客户礼品」（非现金实物、不写入合同作对价）不同类。
+
+== content-manifest on real root ==
+OK content-manifest（30 份；T0 1 / T1 2 / T2 23）
+
+== content-single-home on real root ==
+OK content-single-home（policy-lines 9 个政策数字；49 份 Markdown + 代码面零复述）

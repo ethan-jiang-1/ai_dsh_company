@@ -1,0 +1,46 @@
+== E1 matrix: which source names which product type ==
+source	hardware-software	business-software	project-services
+content/product-types/ (dirs)	YES	YES	—
+packages/company-pack/presets/_shared/skills/product-definition/SKILL.md	YES	YES	YES
+packages/company-pack/content/charters/cmo.md	YES	—	YES
+packages/company-pack/content/templates/meta.md	YES	YES	—
+packages/company-pack/content/templates/mrd.md	YES	YES	—
+packages/company-pack/presets/ceo/skills/assembling-the-team/SKILL.md	YES	YES	—
+docs/guides/product-definition.md	YES	YES	YES
+packages/company-pack/content/AGENTS.md	—	—	—
+packages/company-pack/content/product-types/hardware-software/check-rules.json	YES	—	—
+packages/company-pack/content/product-types/business-software/check-rules.json	—	YES	—
+
+== E1 exact lines (up to 2 per source) ==
+
+# packages/company-pack/presets/_shared/skills/product-definition/SKILL.md
+34: | 项目制 / 系统集成 | `references/project-services.md` | SOW 边界、第三方依赖、UAT、实施里程碑 |
+35: | 硬软一体产品 | `references/hardware-software.md` | BOM/供应链、认证、固件与软件联动、试产与售后 |
+
+# packages/company-pack/content/charters/cmo.md
+10: - **方法论**：先加载共享 `product-definition`（脊柱 + 品类 playbook：`project-services` / `hardware-software`）；
+
+# packages/company-pack/content/templates/meta.md
+22: 产品类型: <hardware-software｜business-software（用户声明优先；不写 = 回落 company.md 的 productType）>
+
+# packages/company-pack/content/templates/mrd.md
+11: > `productType` 按动议类型替换：纯软/企业软件 = `business-software`，硬软一体 = `hardware-software`。
+18: "productType": "business-software",
+
+# packages/company-pack/presets/ceo/skills/assembling-the-team/SKILL.md
+56: **同一步写产品类型**：在 `meta.md` 写 `产品类型: hardware-software|business-software`。用户声明优先；
+
+# docs/guides/product-definition.md
+52: 先判断这次是哪种产品（决定 MRD/PRD 多出哪些字段），再读共享 skill 的 references：`project-services.md`（项目制/系统集成）/ `hardware-software.md`（硬软一体）/ `business-software.md`（纯软/企业软件）；新类型按同结构新增，不改公共字段。**类型看动议**：`meta.md` 的 `产品类型` 优先，缺省回落 `company.md` 的 `productType`；用户口头声明优先于默认，并写进 meta。
+
+# packages/company-pack/content/product-types/hardware-software/check-rules.json
+2: "productType": "hardware-software",
+
+# packages/company-pack/content/product-types/business-software/check-rules.json
+2: "productType": "business-software",
+
+== E3 default vs business vs opportunity ==
+packages/company-pack/content/state/company.md	productType: hardware-software
+packages/company-pack/content/state/company.md	> `productType` 决定加载哪份产品类型包（需求链/术语/模板）；出厂 = `hardware-software`。
+packages/company-pack/content/state/org.md	> 公司业务（同日定案）：高科技公司，三类业务 = 软件开发 / 服务 / 系统集成。
+packages/company-pack/content/charters/cmo.md	- 可能的新机会方向：项目制/系统集成沉淀为可复用产品、硬软一体产品、行业模板化。

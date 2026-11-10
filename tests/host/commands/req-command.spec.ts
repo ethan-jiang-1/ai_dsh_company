@@ -21,11 +21,16 @@ import { join } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
 import { describe, expect, it } from 'vitest'
 import { parseReqCheck, registerReqCommand } from '../../../packages/company-pack/src/host/commands/req-command.ts'
+import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+
+const CONTENT_DIR = join(ROOT, 'packages/company-pack/content')
 
 const MRD = `---\nlayer: MRD\ndefinition: json-ledger\n---\n\n\`\`\`json\n{"mrd":{"version":"0.1","status":"draft","opportunities":[{"id":"MR-001","title":"机会","recommendation":"go"}]}}\n\`\`\`\n`
 const STRS = `---\nlayer: StRS\ndefinition: headings\n---\n\n### REQ-001 涉众诉求\n\n- status: 草案\n- traces: [MR-001]\n`
 const PRD = `---\nlayer: PRD\ndefinition: json-ledger\n---\n\n\`\`\`json\n{"prd":{"version":"0.1","status":"draft","slices":[{"id":"S1","goal":"闭环","requirements":["REQ-002"]}],"requirements":[{"id":"REQ-002","title":"需求","type":"functional","priority":"P0","status":"draft","source":["MR-001"],"traces":["REQ-001"],"slice":"S1","userStory":"作为用户我要它","acceptance":[{"id":"AC-002-1","given":"g","when":"w","then":"t"}],"dependsOn":[],"verification":"test","openQuestions":[],"changeLog":[]}]}}\n\`\`\`\n`
 const META = 'slug: demo\nkickoff: 2026-11-07\n编号体系: identity\n'
+const META_DELIVERY = `${META}交付模式: project-services\n`
+const META_MANAGED = `${META}交付模式: managed-service\n`
 const META_LEGACY = 'slug: old-demo\nkickoff: 2026-01-01\n'
 
 type Definition = { name: string; handler: (input: { readonly rawInput: string, readonly agent?: { session?: { header?: { cwd?: string } } } }) => Promise<{ readonly kind: string, readonly text: string }> }
@@ -157,6 +162,55 @@ describe('registerReqCommand', () => {
     } finally { cleanup() }
   })
 
+  it('meta 交付模式 project-services → 回执点名模式与交付文档', async () => {
+    const { workspace, cleanup } = fixture(['mrd.md', 'strs.md', 'prd.md'], META_DELIVERY)
+    try {
+      const result = await mount(workspace, { contentDir: CONTENT_DIR }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('交付模式 = project-services')
+      expect(result.text).toContain('content/delivery-modes/project-services/')
+    } finally { cleanup() }
+  })
+
+  it('meta 交付模式 managed-service → 回执点名模式与交付文档', async () => {
+    const { workspace, cleanup } = fixture(['mrd.md', 'strs.md', 'prd.md'], META_MANAGED)
+    try {
+      const result = await mount(workspace, { contentDir: CONTENT_DIR }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('交付模式 = managed-service')
+      expect(result.text).toContain('content/delivery-modes/managed-service/')
+    } finally { cleanup() }
+  })
+
+  it('交付模式未知 → error，列可用模式（productized + 包）', async () => {
+    const { workspace, cleanup } = fixture(['mrd.md', 'strs.md', 'prd.md'], `${META}交付模式: nope\n`)
+    try {
+      const result = await mount(workspace, { contentDir: CONTENT_DIR }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('error')
+      expect(result.text).toContain('未知交付模式「nope」')
+      expect(result.text).toContain('project-services')
+      expect(result.text).toContain('managed-service')
+    } finally { cleanup() }
+  })
+
+  it('交付模式 productized（显式）→ success，回执点名', async () => {
+    const { workspace, cleanup } = fixture(['mrd.md', 'strs.md', 'prd.md'], `${META}交付模式: productized\n`)
+    try {
+      const result = await mount(workspace, { contentDir: CONTENT_DIR }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('交付模式 = productized')
+    } finally { cleanup() }
+  })
+
+  it('交付模式缺省 → success，回执点名 productized（默认）', async () => {
+    const { workspace, cleanup } = fixture()
+    try {
+      const result = await mount(workspace, { contentDir: CONTENT_DIR }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('交付模式 = productized（默认）')
+    } finally { cleanup() }
+  })
+
   it('旧动议（无 编号体系 标记）→ skipped 回执，不判红', async () => {
     const { workspace, cleanup } = fixture(['mrd.md', 'strs.md', 'prd.md'], META_LEGACY)
     try {
@@ -217,14 +271,14 @@ describe('registerReqCommand', () => {
       const result = await mount(workspace, { contentDir }).handler({ rawInput: 'check 2026-11-07-demo' })
       expect(result.kind).toBe('success')
       expect(result.text).toContain('层 = MRD/StRS/PRD')
-      expect(result.text).toContain('动议类型 = business-software')
+      expect(result.text).toContain('动议类型 = business-software（meta.md）')
     } finally {
       cleanup()
       rmSync(contentDir, { recursive: true, force: true })
     }
   })
 
-  it('meta 缺产品类型时回落 company.md', async () => {
+  it('meta 缺产品类型时回落 company.md，且回执点名来源', async () => {
     const { workspace, cleanup } = fixture()
     const contentDir = typeContentDir()
     try {
@@ -233,7 +287,22 @@ describe('registerReqCommand', () => {
       const result = await mount(workspace, { contentDir }).handler({ rawInput: 'check 2026-11-07-demo' })
       expect(result.kind).toBe('success')
       expect(result.text).toContain('层 = MRD')
-      expect(result.text).not.toContain('动议类型')
+      expect(result.text, '回落必须点名来源，不再静默').toContain('动议类型 = hardware-software（company.md 默认，未在 meta 声明）')
+    } finally {
+      cleanup()
+      rmSync(contentDir, { recursive: true, force: true })
+    }
+  })
+
+  it('company.md 的 YAML 引号/行尾注释不误判类型', async () => {
+    const { workspace, cleanup } = fixture()
+    const contentDir = typeContentDir()
+    try {
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: "business-software" # 默认\n---\n')
+      const result = await mount(workspace, { contentDir }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('动议类型 = business-software（company.md 默认')
     } finally {
       cleanup()
       rmSync(contentDir, { recursive: true, force: true })

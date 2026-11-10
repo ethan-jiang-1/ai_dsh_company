@@ -1,0 +1,7 @@
+== E9 current charters: case-like language ==
+
+== E9 base-clean on current copy ==
+OK base-clean 只读内容零部署历史（CHARTER ×6 + 手册/模板/状态）
+
+== E9 base-clean after adding a new case line to a charter copy ==
+FAIL base-clean: packages/company-pack/content/charters/cfo.md:2 含部署个案语言「客户…agent…案」（出厂章程只写中性事实）；packages/company-pack/content/charters/cfo.md:2 含部署个案语言「日期待核」（出厂章程只写中性事实）

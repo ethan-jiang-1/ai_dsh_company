@@ -23,6 +23,7 @@ describe('readHandbook', () => {
       expect(handbook.source).toBe(join(dir, 'AGENTS.md'))
       expect(handbook.text).toContain('只认本手册的规则')
       expect(handbook.text).toContain(`Company content (read-only): ${dir}`)
+      expect(handbook.text).toContain('Pack-relative paths like `content/...`')
       expect(handbook.text).toContain('.dsh-company/overrides')
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })

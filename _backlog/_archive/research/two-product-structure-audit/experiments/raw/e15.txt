@@ -1,0 +1,3 @@
+H1 org sum = 50 -> REFUTED (等于 50)
+H2 worker forbidden tool rows = [] -> REFUTED (没有)
+H3 verifier write:false=true edit:false=true bash=false -> REFUTED (只读)

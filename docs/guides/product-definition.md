@@ -43,14 +43,14 @@ CEO 收口：final.md（产品决策/合并摘要，引用两份 draft）→ pre
 - REQ 的来源 `MR-###` 必须在 MRD 里存在，且**来源判词守边界**（no-go 不得进 PRD；defer 不得进 P0）；slice 存在且列出该 REQ；依赖存在且无环；
 - 状态合法、离开 `draft` 有 changeLog。
 
-`/req check <deliverables 目录名>` 管**编号/层/追溯/退役词/计数**（默认链 + 可选层，含 StRS/SyRS/IRS/TC）；两者都是操作员命令，角色只能引用结果。
+`/req check <deliverables 目录名>` 管**编号/层/追溯/退役词/计数**（默认链 + 可选层，含 StRS/SyRS/IRS/TC）；`/delivery check` 管交付模式文档（project-services / managed-service 按 rules 查文档与 section）；两者都是操作员命令，角色只能引用结果。
 
 它只挡结构性错误，**不判断需求好坏/市场真伪**；红就退回作者改，不进研发。
 
 ## 产品类型 playbook
 
-先判断这次是哪种产品（决定 MRD/PRD 多出哪些字段），再读共享 skill 的 references：`project-services.md`（项目制/系统集成）/ `hardware-software.md`（硬软一体）/ `business-software.md`（纯软/企业软件）；新类型按同结构新增，不改公共字段。**类型看动议**：`meta.md` 的 `产品类型` 优先，缺省回落 `company.md` 的 `productType`；用户口头声明优先于默认，并写进 meta。
-
+先判断这次是哪种产品（决定 MRD/PRD 多出哪些字段）；**类型与 playbook 的唯一表** = 共享 skill 的「产品类型 → playbook」，可选值 = pack `content/product-types/<id>/` 的目录。
+**第二轴 = 交付模式**（`meta.md` 的 `交付模式`）：`productized`（默认）/ `project-services`（SOW/UAT/驻场）/ `managed-service`（持续 SLA/值班/月报/续费）；它不是产品类型，规则与模板 = `content/delivery-modes/<id>/`，组合示例 `business-software × project-services`。新类型按同结构新增并随包发布，不改公共字段。**类型看动议**：`meta.md` 的 `产品类型` 优先，缺省回落 `company.md` 的 `productType`（回执会点名来源）；用户口头声明优先于默认，并写进 meta。
 ## 最小场景（3 人，不叫全员）
 
 CEO 收到"要不要做对账产品" → 只叫 CMO + VP-Eng：

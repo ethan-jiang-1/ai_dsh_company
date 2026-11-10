@@ -26,7 +26,7 @@ export function clip(text: string, max: number): string {
   return text.length <= max ? text : `${text.slice(0, max)}…`
 }
 
-/** 头 70% + 尾 30% 的摘录（保留结论与结尾；由调用方决定是否展示 truncated）。 */
+/** 头 7 成 + 尾 3 成的摘录（保留结论与结尾；由调用方决定是否展示 truncated）。 */
 export function clipExcerpt(text: string, max = 1_200): { readonly text: string; readonly truncated: boolean } {
   const chars = [...text]
   if (chars.length <= max) return { text, truncated: false }

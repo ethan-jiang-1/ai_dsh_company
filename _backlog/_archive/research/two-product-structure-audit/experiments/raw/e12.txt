@@ -1,0 +1,16 @@
+preset	fs	write	bash	web	skill	subagent	workflow	control	team	ask	present	handbook
+ceo	Y	—	Y	Y	Y	Y	—	—	—	Y	Y	Y
+cfo	Y	—	Y	Y	Y	Y	—	Y	Y	Y	Y	Y
+cmo	Y	—	Y	Y	Y	Y	—	Y	Y	Y	Y	Y
+coo	Y	—	Y	Y	Y	Y	—	Y	Y	Y	Y	Y
+quality-loop-producer	Y	—	Y	Y	Y	—	—	—	—	—	—	—
+quality-loop-verifier	Y	Y	—	Y	Y	—	—	—	—	—	—	—
+vp-eng	Y	—	Y	Y	Y	Y	Y	Y	Y	Y	Y	Y
+vp-sales	Y	—	Y	Y	Y	Y	—	Y	Y	Y	Y	Y
+worker	Y	—	Y	Y	—	—	—	—	—	—	—	—
+worker-orchestrator	Y	—	Y	Y	—	Y	—	—	—	—	—	—
+worker-researcher	Y	Y	—	Y	—	Y	—	—	—	—	—	—
+
+== E12 write/edit off ==
+quality-loop-verifier	writeFalse=true	editFalse=true
+worker-researcher	writeFalse=true	editFalse=true

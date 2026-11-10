@@ -1,0 +1,43 @@
+== E6 per-file term counts ==
+file	business-software	hardware	project
+packages/company-pack/presets/cfo/skills/cfo-workflow/SKILL.md	0	0	0
+packages/company-pack/presets/cfo/skills/finance-compliance/SKILL.md	0	0	0
+packages/company-pack/presets/cfo/skills/project-economics/SKILL.md	0	0	3
+packages/company-pack/presets/coo/skills/budget-check/SKILL.md	0	0	2
+packages/company-pack/presets/coo/skills/ops-feasibility/SKILL.md	0	0	2
+packages/company-pack/presets/coo/skills/ops-workflow/SKILL.md	0	0	0
+packages/company-pack/presets/vp-sales/skills/customer-voice/SKILL.md	0	0	0
+packages/company-pack/presets/vp-sales/skills/market-sizing/SKILL.md	0	0	0
+packages/company-pack/presets/vp-sales/skills/sales-workflow/SKILL.md	0	0	0
+packages/company-pack/content/charters/cfo.md	0	0	2
+packages/company-pack/content/charters/coo.md	0	0	3
+packages/company-pack/content/charters/vp-sales.md	0	0	1
+
+== E6 exact business-software / hardware hits (if any) ==
+
+== E6 project assumptions (first 3 per file) ==
+
+# packages/company-pack/presets/cfo/skills/project-economics/SKILL.md
+3: description: 项目经济性测算：报价毛利底线（签字线见 `.dsh-company/kb/policy-lines.md`）、人力成本按"人·周"分摊、里程碑收款曲线与垫资；一页纸（<company-content>/templates/decision-memo.md）。
+9: 1. **收入侧**：合同额按里程碑拆收款曲线（公司惯例 3-4-3）；维护年费单列（≈ 项目额 15–20%）。
+10: 2. **成本侧**：人力按"人·周"× 条线分摊（编制与费率基准见 `.dsh-company/kb/org.md` 与 `.dsh-company/kb/cfo/CHARTER.md`）；
+
+# packages/company-pack/presets/coo/skills/budget-check/SKILL.md
+3: description: 预算核查：花费逐项对照 .dsh-company/kb/coo/CHARTER.md 预算基准；人力换算成"人·周"记机会成本；按最坏档压力测试；超限即 veto。
+9: 3. **人力是大头**：开发/服务业务的真成本是"人·周"——方案换算成占用几人几周，挤占并行项目上限的按机会成本记账。
+
+# packages/company-pack/presets/coo/skills/ops-feasibility/SKILL.md
+3: description: 运营可行性核查：人力/流程/时程三条逐项过——谁执行（RACI）、走什么流程（SOW/里程碑验收）、时间线是否成立；不过即 veto。
+10: 2. **流程**：交付类工作必须走 SOW + 里程碑验收（UAT 通过才算数）；分工用 RACI 表说清——写不出 R（谁执行）= 没人负责；流程没有现成载体（模板/例会/手册）就先立载体，"靠自觉"不算流程。
+
+# packages/company-pack/content/charters/cfo.md
+9: - **服务类附赠（免费人天 / 免费培训 / 驻场折现）**——**常设口径**（同类第 2 次出现时回流立法，日期待核；此后不再重复问）：
+17: - 现金流原则：收款曲线跟随里程碑（3-4-3）；垫资超一个月的合同先过 CFO。
+
+# packages/company-pack/content/charters/coo.md
+7: - 交付制：项目按 SOW + 里程碑验收（UAT 通过才算数）；并行上限与预算线见 `.dsh-company/kb/policy-lines.md`，超出即"接不住"；
+13: - **流程载体**：`<company-content>/templates/` 可用模板 5 份（review-note、decision-memo、ops-review-note、prd、weekly-report——R4 已全部补齐为完整骨架）；SOW / UAT 验收单 / RACI 矩阵 / 项目池台账仍缺（需要时先落模板再走流程）。产出指认见「产出」条（ops-review-note）。
+14: - **归属（CEO 裁定 · 回流点）**：**`<company-content>/templates/` 正文 owner = COO**；其中**"对外件口径"条目经 CEO 线商务 / 法务过目**。同日落正文：五份模板各加「AI 使用声明」栏（起草 = 人/AI 具名｜具名复核人｜复核日期｜版本）+ 「缺声明不得进 SOW / UAT / 对客材料」；`weekly-report.md` 加「本周重复劳动（供给输入，非 KPI、不考核）」一行；`meta.md` 是动议户口表，**不加**。
+
+# packages/company-pack/content/charters/vp-sales.md
+12: - **定价原则**：项目按里程碑收款（3-4-3）；折扣线与维护年费口径见 `.dsh-company/kb/policy-lines.md`——

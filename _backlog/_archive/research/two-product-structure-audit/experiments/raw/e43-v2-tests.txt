@@ -1,0 +1,10 @@
+
+ RUN  v4.1.11 /Users/bowhead/ai_dsh_company
+
+ ✓ tests/content/hardware-capabilities.spec.ts (2 tests) 2ms
+ ✓ tests/host/commands/delivery-command.spec.ts (9 tests) 16ms
+
+ Test Files  2 passed (2)
+      Tests  11 passed (11)
+   Start at  07:19:06
+   Duration  125ms (transform 60ms, setup 0ms, import 75ms, tests 18ms, environment 0ms)

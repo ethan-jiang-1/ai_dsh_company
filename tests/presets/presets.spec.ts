@@ -536,10 +536,12 @@ describe('共享 product-definition 能力（CMO + VP-Eng）', () => {
     const sharedDir = join(PRESETS_DIR, '_shared/skills/product-definition')
     const skill = readFileSync(join(sharedDir, 'SKILL.md'), 'utf8')
     expect(skill).toContain('name: product-definition')
-    expect(skill).toContain('references/project-services.md')
+    expect(skill, 'project-services 是交付模式，不是产品类型；品类表不得提供它').not.toContain('references/project-services.md')
     expect(skill).toContain('references/hardware-software.md')
     expect(skill).toContain('references/business-software.md')
-    expect(existsSync(join(sharedDir, 'references/project-services.md'))).toBe(true)
+    expect(skill, '品类表必须指向唯一枚举报').toContain('content/product-types/')
+    expect(skill, '交付模式必须作为第二轴出现').toContain('content/delivery-modes/')
+    expect(existsSync(join(PRESETS_DIR, '../content/delivery-modes/project-services/overview.md')), '交付模式包必须随包在场').toBe(true)
     expect(existsSync(join(sharedDir, 'references/hardware-software.md'))).toBe(true)
     expect(existsSync(join(sharedDir, 'references/business-software.md'))).toBe(true)
     for (const role of ['cmo', 'vp-eng']) expect(roleYml(role), role).toContain('presets/_shared/skills/')
@@ -551,7 +553,10 @@ describe('共享 product-definition 能力（CMO + VP-Eng）', () => {
     expect(shared, 'product-definition 必须写 meta 优先/company 回落').toMatch(/meta\.md[\s\S]*产品类型/)
     expect(shared, 'product-definition 必须写 company.md 回落').toContain('company.md')
     const ceo = readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
-    expect(ceo, 'CEO 开局必须写产品类型').toMatch(/产品类型: hardware-software\|business-software/)
+    expect(ceo, 'CEO 开局必须写产品类型，可选值指向类型包目录').toMatch(/产品类型: <id>/)
+    expect(ceo, 'CEO 不手写第二套类型枚举').not.toMatch(/hardware-software\|business-software/)
+    expect(shared, 'product-definition 必须写交付模式是第二轴').toContain('交付模式')
+    expect(ceo, 'CEO 开局必须写交付模式').toMatch(/交付模式: productized\|project-services/)
   })
 
   it('CMO mrd-playbook 与 VP-Eng prd-playbook 引用共享能力', () => {
@@ -641,5 +646,49 @@ describe('VP-Eng 组队：根门带小队 + 命名专家（B1）', () => {
     expect(handbook, '手册必须写命名 child 按自己的 preset 组合').toMatch(/命名[^\n]*child[^\n]*(agentPreset|preset)/)
     const delegation = readFileSync(join(ROOT, 'docs/contracts/delegation.md'), 'utf8')
     expect(delegation, 'delegation.md 必须写根会话 = Team Lead').toMatch(/根会话[^\n]*Lead|Lead[^\n]*根会话/)
+  })
+})
+
+describe('经营侧方法契约（CFO / COO / VP-Sales）', () => {
+  const ROLES = ['cfo', 'coo', 'vp-sales'] as const
+
+  it('每个 skill 都声明方法契约（适用产品类型 + 需要事实）', () => {
+    for (const role of ROLES) {
+      const dir = join(PRESETS_DIR, role, 'skills')
+      const skills = readdirSync(dir, { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => entry.name)
+      expect(skills.length, `${role} 没有 skill`).toBeGreaterThan(0)
+      for (const skill of skills) {
+        const text = readFileSync(join(dir, skill, 'SKILL.md'), 'utf8')
+        expect(text, `${role}/${skill} 缺方法契约`).toContain('**方法契约**')
+        expect(text, `${role}/${skill} 缺适用产品类型`).toContain('适用产品类型 =')
+        expect(text, `${role}/${skill} 缺需要事实`).toContain('需要事实 =')
+      }
+    }
+  })
+
+  it('项目制方法按交付模式适用；pricing 是独立方法；managed-service 有对应方法', () => {
+    const econ = readFileSync(join(PRESETS_DIR, 'cfo/skills/project-economics/SKILL.md'), 'utf8')
+    expect(econ).toContain('适用交付模式 = project-services')
+    expect(econ).toContain('fail-closed')
+    expect(econ).toContain('rates.md')
+    const ops = readFileSync(join(PRESETS_DIR, 'coo/skills/ops-feasibility/SKILL.md'), 'utf8')
+    expect(ops).toContain('配置缺口')
+    expect(ops).toContain('roster.md')
+    expect(ops, '不能再把「写不出人名」直接判成没人').not.toContain('写不出人名 = "没人"')
+    const pricing = readFileSync(join(PRESETS_DIR, 'vp-sales/skills/pricing/SKILL.md'), 'utf8')
+    expect(pricing).toContain('适用交付模式 = project-services')
+    expect(pricing).toContain('3-4-3')
+    const managed = readFileSync(join(PRESETS_DIR, 'cfo/skills/managed-service-economics/SKILL.md'), 'utf8')
+    expect(managed).toContain('适用交付模式 = managed-service')
+    expect(managed).toContain('policy-lines.md')
+  })
+
+  it('三个 workflow 都有交付模式分派与 fail-closed', () => {
+    const pairs = [['cfo', 'cfo-workflow'], ['coo', 'ops-workflow'], ['vp-sales', 'sales-workflow']] as const
+    for (const [role, workflow] of pairs) {
+      const text = readFileSync(join(PRESETS_DIR, role, 'skills', workflow, 'SKILL.md'), 'utf8')
+      expect(text, `${role}/${workflow} 缺交付模式分派`).toContain('交付模式')
+      expect(text, `${role}/${workflow} 缺 fail-closed`).toContain('fail-closed')
+    }
   })
 })

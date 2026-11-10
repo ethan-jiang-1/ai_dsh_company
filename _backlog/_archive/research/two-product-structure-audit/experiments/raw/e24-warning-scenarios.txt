@@ -1,0 +1,12 @@
+
+ RUN  v4.1.11 /Users/bowhead/ai_dsh_company
+
+ ✓ tests/content/delivery-modes.spec.ts (7 tests) 5ms
+ ✓ tests/host/commands/product-type-scenarios.spec.ts (7 tests) 20ms
+ ✓ tests/host/commands/delivery-mode-scenarios.spec.ts (12 tests) 29ms
+ ✓ tests/host/commands/req-command.spec.ts (22 tests) 44ms
+
+ Test Files  4 passed (4)
+      Tests  48 passed (48)
+   Start at  06:05:35
+   Duration  278ms (transform 223ms, setup 0ms, import 267ms, tests 98ms, environment 0ms)

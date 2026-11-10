@@ -14,6 +14,8 @@ export function run({ root, ok, fail }) {
   const required = [
     `${CONTENT}/AGENTS.md`,
     `${CONTENT}/templates/meta.md`,
+    `${CONTENT}/company/rates.md`,
+    `${CONTENT}/state/roster.md`,
     // 负例留证 2026-11-07（A1）：删编号合同 → 本门禁红（「缺失」而非崩）；2026-11-09 迁入产品类型包。
     `${CONTENT}/product-types/hardware-software/requirements-model.md`,
     // 负例留证 2026-11-07（A2）：删任一五层模板 → 本门禁红（「缺失」而非崩）。

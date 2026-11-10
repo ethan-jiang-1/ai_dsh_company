@@ -1,0 +1,79 @@
+== E6 per-file term counts ==
+file	business-software	hardware	project
+packages/company-pack/presets/cfo/skills/cfo-workflow/SKILL.md	0	0	1
+packages/company-pack/presets/cfo/skills/finance-compliance/SKILL.md	0	0	0
+packages/company-pack/presets/cfo/skills/project-economics/SKILL.md	1	0	5
+packages/company-pack/presets/coo/skills/budget-check/SKILL.md	0	0	3
+packages/company-pack/presets/coo/skills/ops-feasibility/SKILL.md	1	0	4
+packages/company-pack/presets/coo/skills/ops-workflow/SKILL.md	0	0	1
+packages/company-pack/presets/vp-sales/skills/customer-voice/SKILL.md	0	0	0
+packages/company-pack/presets/vp-sales/skills/market-sizing/SKILL.md	0	0	0
+packages/company-pack/presets/vp-sales/skills/pricing/SKILL.md	2	0	6
+packages/company-pack/presets/vp-sales/skills/sales-workflow/SKILL.md	1	0	1
+packages/company-pack/content/charters/cfo.md	1	0	1
+packages/company-pack/content/charters/coo.md	0	0	3
+packages/company-pack/content/charters/vp-sales.md	1	0	2
+
+== E6 exact business-software / hardware hits (if any) ==
+
+# packages/company-pack/presets/cfo/skills/project-economics/SKILL.md
+24: **类型边界**：本方法只用于 `hardware-software`（项目制 / SI 交付）。`business-software`（SaaS / 私有化 / 永久授权）缺订阅 / ARR / CAC / 留存 / SLO 与交付模式口径 → 先报「缺方法」，不套 3-4-3 / 维护年费。
+
+# packages/company-pack/presets/coo/skills/ops-feasibility/SKILL.md
+13: 2. **流程**：`hardware-software`（项目制 / SI）走 SOW + 里程碑验收（UAT 通过才算数）；`business-software` 缺 SaaS / 私有化交付验收方法 → **fail-closed 报缺**，不套 SOW。分工用 RACI 表说清——写不出 R（谁执行）= 没人负责；流程没有现成载体（模板 / 例会 / 手册）就先立载体，"靠自觉"不算流程。
+
+# packages/company-pack/presets/vp-sales/skills/pricing/SKILL.md
+13: - `business-software`（SaaS / 私有化 / 永久授权）**不适用**：订阅、ARR、CAC、留存、SLO 与交付模式的定价口径还没有方法包——先报「缺方法」，不要拿项目制收款曲线硬套。
+25: - 把 SaaS 订阅 / 永久授权套成 3-4-3；
+
+# packages/company-pack/presets/vp-sales/skills/sales-workflow/SKILL.md
+23: > `hardware-software`（项目制 / SI）。`business-software` 的订阅 / 私有化 / 永久授权定价先报「缺方法」，
+
+# packages/company-pack/content/charters/cfo.md
+12: - 现金流原则：项目制 / SI 的收款曲线跟随里程碑（3-4-3）；business-software 的订阅 / 永久授权收款口径由定价方法给出，缺口径 → fail-closed；垫资超一个月的合同先过 CFO。
+
+# packages/company-pack/content/charters/vp-sales.md
+12: business-software（订阅 / 私有化 / 永久授权）缺定价方法 → **fail-closed 报缺**，不套 3-4-3。
+
+== E6 project assumptions (first 3 per file) ==
+
+# packages/company-pack/presets/cfo/skills/cfo-workflow/SKILL.md
+20: > `hardware-software`（项目制 / SI）。`business-software` 动议先报「缺方法」，**不套 3-4-3 / 维护年费**。
+
+# packages/company-pack/presets/cfo/skills/project-economics/SKILL.md
+3: description: 项目经济性测算：报价毛利底线（签字线见 `.dsh-company/kb/policy-lines.md`）、人力成本按"人·周"分摊、里程碑收款曲线与垫资；一页纸（<company-content>/templates/decision-memo.md）。
+8: > 需要事实 = kb/roster.md（席位 / 人力）、kb/rates.md（人·周成本）；缺 = fail-closed（报「缺方法 / 配置缺口」，不套 3-4-3、不编数）。
+12: 1. **收入侧**：合同额按里程碑拆收款曲线（公司惯例 3-4-3）；维护年费单列，口径见 `.dsh-company/kb/policy-lines.md`。
+
+# packages/company-pack/presets/coo/skills/budget-check/SKILL.md
+3: description: 预算核查：花费逐项对照 .dsh-company/kb/coo/CHARTER.md 预算基准；人力换算成"人·周"记机会成本；按最坏档压力测试；超限即 veto。
+7: > **方法契约**：适用产品类型 = all；需要事实 = kb/rates.md（人·周成本）；缺 = fail-closed（报「配置缺口」，不编数）。
+11: 3. **人力是大头**：开发 / 服务业务的真成本是"人·周"——方案换算成占用几人几周，挤占并行项目上限的按机会成本记账；费率卡 = `.dsh-company/kb/rates.md`，`<待填>` = 配置缺口，先要费率，不编美元数。
+
+# packages/company-pack/presets/coo/skills/ops-feasibility/SKILL.md
+3: description: 运营可行性核查：人力/流程/时程三条逐项过——谁执行（RACI）、走什么流程（SOW/里程碑验收）、时间线是否成立；不过即 veto。
+7: > **方法契约**：适用产品类型 = hardware-software（SOW / UAT 交付；project-services 为未来类型，未随包发布）；
+13: 2. **流程**：`hardware-software`（项目制 / SI）走 SOW + 里程碑验收（UAT 通过才算数）；`business-software` 缺 SaaS / 私有化交付验收方法 → **fail-closed 报缺**，不套 SOW。分工用 RACI 表说清——写不出 R（谁执行）= 没人负责；流程没有现成载体（模板 / 例会 / 手册）就先立载体，"靠自觉"不算流程。
+
+# packages/company-pack/presets/coo/skills/ops-workflow/SKILL.md
+18: > `hardware-software`（SOW / UAT）。`business-software` 动议先报「缺方法」，**不套 SOW / UAT**。
+
+# packages/company-pack/presets/vp-sales/skills/pricing/SKILL.md
+3: description: 定价方法（项目制 / SI）：里程碑收款 3-4-3、维护年费、折扣 / 毛利双签；business-software 缺定价方法 → fail-closed。
+8: > 需要事实 = kb/policy-lines.md（折扣 / 毛利 / 维护年费）、kb/rates.md（人·周成本）；缺 = fail-closed（报「缺方法 / 配置缺口」，不套 3-4-3）。
+17: 1. **收款曲线**：合同额按里程碑拆（公司惯例 3-4-3）；维护年费单列，口径见 `.dsh-company/kb/policy-lines.md`。
+
+# packages/company-pack/presets/vp-sales/skills/sales-workflow/SKILL.md
+24: > **不套 3-4-3 / 维护年费**。
+
+# packages/company-pack/content/charters/cfo.md
+12: - 现金流原则：项目制 / SI 的收款曲线跟随里程碑（3-4-3）；business-software 的订阅 / 永久授权收款口径由定价方法给出，缺口径 → fail-closed；垫资超一个月的合同先过 CFO。
+
+# packages/company-pack/content/charters/coo.md
+7: - 交付制：项目制 / SI 按 SOW + 里程碑验收（UAT 通过才算数；方法见 `ops-feasibility`）；business-software 缺交付验收方法 → fail-closed 报缺，不套 SOW；并行上限与预算线见 `.dsh-company/kb/policy-lines.md`，超出即"接不住"；
+14: - **流程载体**：`<company-content>/templates/` 可用模板 5 份（review-note、decision-memo、ops-review-note、prd、weekly-report——R4 已全部补齐为完整骨架）；SOW / UAT 验收单 / RACI 矩阵 / 项目池台账仍缺（需要时先落模板再走流程）。产出指认见「产出」条（ops-review-note）。
+15: - **归属（CEO 裁定 · 回流点）**：**`<company-content>/templates/` 正文 owner = COO**；其中**"对外件口径"条目经 CEO 线商务 / 法务过目**。同日落正文：五份模板各加「AI 使用声明」栏（起草 = 人/AI 具名｜具名复核人｜复核日期｜版本）+ 「缺声明不得进 SOW / UAT / 对客材料」；`weekly-report.md` 加「本周重复劳动（供给输入，非 KPI、不考核）」一行；`meta.md` 是动议户口表，**不加**。
+
+# packages/company-pack/content/charters/vp-sales.md
+11: - **定价原则**：项目制 / SI 按 `pricing` skill（里程碑 3-4-3；维护年费口径见 `.dsh-company/kb/policy-lines.md`）；
+12: business-software（订阅 / 私有化 / 永久授权）缺定价方法 → **fail-closed 报缺**，不套 3-4-3。

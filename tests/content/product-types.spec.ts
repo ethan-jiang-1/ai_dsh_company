@@ -12,7 +12,11 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 
-const DIR = join(ROOT, 'packages/company-pack/content/product-types')
+const CONTENT = join(ROOT, 'packages/company-pack/content')
+const DIR = join(CONTENT, 'product-types')
+const MANIFEST = JSON.parse(readFileSync(join(CONTENT, 'manifest.json'), 'utf8')) as { tiers: Record<string, string[]> }
+const TIER_BUDGETS: Record<string, number> = { t0: 6_144, t1: 4_096, t2: 6_144, legacy: 6_144 }
+const tierOf = (rel: string): string => Object.entries(MANIFEST.tiers).find(([, files]) => files.includes(rel))?.[0] ?? 't2'
 const ids = existsSync(DIR)
   ? readdirSync(DIR, { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => entry.name).sort()
   : []
@@ -30,7 +34,8 @@ describe.each(ids)('产品类型包：%s', (id) => {
     const rules = join(DIR, id, 'check-rules.json')
     expect(existsSync(overview), `${id} 缺 overview.md`).toBe(true)
     expect(existsSync(rules), `${id} 缺 check-rules.json`).toBe(true)
-    expect(statSync(overview).size, `${id} overview 超过 T1 预算`).toBeLessThanOrEqual(4096)
+    const tier = tierOf(`product-types/${id}/overview.md`)
+    expect(statSync(overview).size, `${id} overview 超过 ${tier} 预算 ${String(TIER_BUDGETS[tier] ?? 6_144)}B`).toBeLessThanOrEqual(TIER_BUDGETS[tier] ?? 6_144)
   })
 
   it('check-rules 自洽：productType 同名、层与文件一一对应、默认层是子集', () => {

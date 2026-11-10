@@ -4,6 +4,37 @@
 
 ## 修复流水（倒序）
 
+- **BUG-067 / BUG-068 / BUG-069 / BUG-070**（2026-11-11，内容/门禁组 C + D）：
+  [067](BUG-067-process-docs-dead-pointers.md) process-docs 的 4 处 pack-relative 死指针——新增
+  `pack-content-paths` 门禁，指针改类型包；[068](BUG-068-base-clean-deployment-case-language.md)
+  章程个案语言——服务类附赠整块搬 `policy-lines.md`，`base-clean` 加 charter denylist；
+  [069](BUG-069-tier-policy-gate-coverage.md) tier / 10%——`content-manifest` 对账 `加载：` 头，
+  `content-single-home` 从 policy-lines 派生 9 个政策数字；[070](BUG-070-delegation-maxdepth-example-wrong.md)
+  `maxDepth` 例子——绝对语义真值 + vendor `resolveChildDepth` keyless spec（1/1→THROW、1/2→ALLOW）。
+  红→绿：pack 路径 / tier / 30% / 个案句 / 1/1 期望各自造红后还原；`pnpm test` 175 files / 1463 tests；
+  `pnpm verify` ALL PASS。详见
+  [Note](../../../notes/implemented/2026-11-11-declaration-carrier-gates.md)。
+
+- **BUG-064 / BUG-065 / BUG-066**（2026-11-11，经营组 B/E）：[064](BUG-064-methods-not-product-type-aware.md)
+  方法不随类型——10 个经营侧 skill 加 `方法契约`（适用产品类型 + 需要事实 + 缺则 fail-closed），
+  项目制方法只适用 `hardware-software`，business-software fail-closed；三个 workflow 加类型分派。
+  [065](BUG-065-cfo-rate-card-missing.md) 费率无出处——新增 `content/company/rates.md`（seed `kb/rates.md`），
+  CFO 方法改读，`<待填>` = 配置缺口。[066](BUG-066-coo-person-level-staffing-without-roster.md) 证据粒度错位——
+  新增 `content/state/roster.md`（seed `kb/roster.md`），COO 三态区分配置缺口 / 真没人。
+  新门禁 `method-contract`；红→绿：删契约 / 类型 nope / 事实未播种 / workflow 无 fail-closed → 红，还原 → PASS；
+  `pnpm test` 174 files / 1458 tests；`preset-smoke` ALL PASS。详见
+  [Note](../../../notes/implemented/2026-11-11-method-contract-type-facts.md)。
+
+- **BUG-061 / BUG-062 / BUG-063**（2026-11-11，P1，根因组 A）：产品类型轴三处各自为政——
+  [061](BUG-061-product-type-allowed-values-drift.md) 允许值多源（`project-services` 被 agent 面点名、
+  CMO 漏 `business-software`）；[062](BUG-062-default-product-type-contradicts-business.md) 默认
+  `hardware-software` 与公司主业相反；[063](BUG-063-bootstrap-process-docs-always-hardware.md) fresh 盘
+  恒播 hardware-software 合同。修法 = 类型目录成唯一枚举 + `product-type-sources` 门禁；默认改
+  `business-software` + `/req check` 回执点名回落来源；seed 用 `{productType}` 占位 + bootstrap/tools
+  按类型解析、缺/未知 fail-closed。红→绿：新门 3 类反证 + `seed-integrity` 3 类反证；`pnpm test`
+  174 files / 1455 tests；`pnpm typecheck` 绿；`preset-smoke` ALL PASS；E4 差分
+  `business == hardware` true→false。详见 [Note](../../../notes/implemented/2026-11-11-product-type-single-source.md)。
+
 - **BUG-060**（2026-11-10，P2）：启动无 workspace 时 `dataBlocked` 把 `/req`/`/prd` 一起挡住，
   侧栏选 workspace 后的会话仍要重启；只读命令不需要 lease。修法 = `commandWorkspace` 用
   `agent.session.header.cwd` 回落；只为「有 workspace」放行只读，写命令仍停写。

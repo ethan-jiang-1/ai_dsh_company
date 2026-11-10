@@ -29,6 +29,7 @@ import { regenerateCatalog } from './host/ledger/catalog.ts'
 import { registerDeliverablesCommand } from './host/commands/deliverables-command.ts'
 import { registerPrdCommand } from './host/commands/prd-command.ts'
 import { registerReqCommand } from './host/commands/req-command.ts'
+import { registerDeliveryCommand } from './host/commands/delivery-command.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation/cultivation.ts'
 import { registerHandbook } from './host/prompt/handbook.ts'
 import { registerWorkflowContract } from './host/prompt/contracts.ts'
@@ -129,6 +130,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   registerDeliverablesCommand(ctx, { dataBlocked, ...blockedFields, workspace, ledgerStorePromise, exportNow })
   registerPrdCommand(ctx, { dataBlocked, ...blockedFields, workspace })
   registerReqCommand(ctx, { dataBlocked, ...blockedFields, workspace, contentDir })
+  registerDeliveryCommand(ctx, { dataBlocked, ...blockedFields, workspace, contentDir })
 
   ctx.on('api-session/added', (summary) => {
     if (summary.origin === 'subagent') return
@@ -231,6 +233,8 @@ function ensureRunBundle(
     if (plan.error !== undefined) {
       ctx.logger?.warn?.(`company-pack run bundle 初始化跳过：${plan.error}`)
     } else {
+      // 类型相关 seed 缺/未知 productType：不猜类型播种，但其余状态照常补缺（BUG-063）。
+      for (const warning of plan.warnings) ctx.logger?.warn?.(`company-pack：${warning}`)
       const result = applyBootstrap(plan)
       if (result.created.length > 0) {
         ctx.logger?.info?.(`company-pack：run bundle 已初始化 ${workspace}/.dsh-company（新建 ${String(result.created.length)} 件）`)

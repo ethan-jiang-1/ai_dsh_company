@@ -1,0 +1,36 @@
+== E7 “费率/成本基准”事实搜索 ==
+
+# org: packages/company-pack/content/state/org.md (0 hits)
+
+# cfoCharter: packages/company-pack/content/charters/cfo.md (1 hits)
+9: - **服务类附赠（免费人天 / 免费培训 / 驻场折现）**——**常设口径**（同类第 2 次出现时回流立法，日期待核；此后不再重复问）：
+
+# cooCharter: packages/company-pack/content/charters/coo.md (0 hits)
+
+# policy: packages/company-pack/content/company/policy-lines.md (0 hits)
+
+# cfoWorkflow: packages/company-pack/presets/cfo/skills/cfo-workflow/SKILL.md (1 hits)
+10: 2. **备料**：读 `.dsh-company/kb/cfo/CHARTER.md` + `.dsh-company/kb/cfo/journal/` 最近 3 篇 + `.dsh-company/kb/org.md`（编制与费率基准）。
+
+# projectEconomics: packages/company-pack/presets/cfo/skills/project-economics/SKILL.md (4 hits)
+3: description: 项目经济性测算：报价毛利底线（签字线见 `.dsh-company/kb/policy-lines.md`）、人力成本按"人·周"分摊、里程碑收款曲线与垫资；一页纸（<company-content>/templates/decision-memo.md）。
+10: 2. **成本侧**：人力按"人·周"× 条线分摊（编制与费率基准见 `.dsh-company/kb/org.md` 与 `.dsh-company/kb/cfo/CHARTER.md`）；
+11: 云与外包按预算基准；漏项按最坏档补——"先低报后追加"不算口径。**跨职能数字（研发人天、
+12: 交付人天等）取 owner 口径重算，不自行占位**——自己的估算只作对照并标【我的估算】，
+
+== E7 “人名/列到人”事实搜索 ==
+org	packages/company-pack/content/state/org.md	<待填>=0	人名/列到人=1
+cfoCharter	packages/company-pack/content/charters/cfo.md	<待填>=0	人名/列到人=0
+cooCharter	packages/company-pack/content/charters/coo.md	<待填>=0	人名/列到人=0
+owners	packages/company-pack/content/state/owners.md	<待填>=8	人名/列到人=0
+
+== E7 引用句 vs 事实 ==
+cfo-workflow 说读 org.md 的费率基准
+  claim: 2. **备料**：读 `.dsh-company/kb/cfo/CHARTER.md` + `.dsh-company/kb/cfo/journal/` 最近 3 篇 + `.dsh-company/kb/org.md`（编制与费率基准）。
+  org 费率=false cfo charter 费率=false owners 有真人名=false
+project-economics 说费率基准见 org.md/CHARTER
+  claim: 2. **成本侧**：人力按"人·周"× 条线分摊（编制与费率基准见 `.dsh-company/kb/org.md` 与 `.dsh-company/kb/cfo/CHARTER.md`）；
+  org 费率=false cfo charter 费率=false owners 有真人名=false
+ops-feasibility 说列到“8 人编制里谁”
+  claim: 1. **人力**：每项工作量列到人——具体到"8 人编制里谁、每周几小时"（编制事实见 `.dsh-company/kb/coo/CHARTER.md`）；写不出人名 = "没人"，直接判"接不住"。
+  org 费率=false cfo charter 费率=false owners 有真人名=false

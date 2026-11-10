@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /Users/bowhead/ai_dsh_company
+
+ ✓ tests/host/commands/delivery-mode-scenarios.spec.ts (15 tests) 30ms
+
+ Test Files  1 passed (1)
+      Tests  15 passed (15)
+   Start at  06:05:48
+   Duration  156ms (transform 51ms, setup 0ms, import 63ms, tests 30ms, environment 0ms)

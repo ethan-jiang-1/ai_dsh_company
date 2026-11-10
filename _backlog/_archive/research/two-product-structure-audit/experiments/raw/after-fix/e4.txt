@@ -1,0 +1,43 @@
+
+== productType: business-software ==
+created=35 skipped=3
+plan entry: source=product-types/business-software/requirements-model.md rel=.dsh-company/kb/process-docs.md
+sha256=fbbb32d3916d54dd
+has hardware-software: true
+has SyRS/IRS/V&V: true/true/true
+--- first 12 lines ---
+# 产品文档链与编号合同（business-software）
+
+> **编号合同唯一家**：哪一层由谁写、编号怎么排、怎么追溯、机器怎么判红。
+> 编制 / 人 / 格式各有其家（org / owners / templates）；ID 只承载身份（种类 + 序号）。
+
+## 三层与 owner
+
+| 序 | 层 | 回答什么 | owner | 文件 | `definition` | 编号 |
+|---|---|---|---|---|---|---|
+| 1 | **MRD** 市场需求 | 该不该做、为谁做、凭什么赢 | CMO | `drafts/mrd.md` | `json-ledger` | `MR-###` |
+| 2 | **StRS** 涉众需求 | 谁在乎、在乎什么、验收时谁点头 | CMO | `drafts/strs.md` | `headings` | `REQ-###` |
+| 3 | **PRD** 产品需求 | 我们卖的到底是什么产品、怎么验收、怎么切片 | VP-Eng | `drafts/prd.md` | `json-ledger` | `REQ-###` / `AC-###-#` |
+
+== productType: hardware-software ==
+created=35 skipped=3
+plan entry: source=product-types/hardware-software/requirements-model.md rel=.dsh-company/kb/process-docs.md
+sha256=7502db2644f99b28
+has hardware-software: true
+has SyRS/IRS/V&V: true/true/true
+--- first 12 lines ---
+# 产品文档链与编号合同（hardware-software）
+
+> **编号合同唯一家**：哪一层由谁写、编号怎么排、怎么追溯、机器怎么判红。
+> 编制 / 人 / 格式各有其家（org / owners / templates）；ID 只承载身份（种类 + 序号）。
+
+## 五层与 owner
+
+| 序 | 层 | 回答什么 | owner | 文件 | `definition` | 编号 |
+|---|---|---|---|---|---|---|
+| 1 | **MRD** 市场需求 | 该不该做、为谁做、凭什么赢 | CMO | `drafts/mrd.md` | `json-ledger` | `MR-###` |
+| 2 | **StRS** 涉众需求 | 谁在乎、在乎什么、验收时谁点头 | CMO | `drafts/strs.md` | `headings` | `REQ-###` |
+| 3 | **PRD** 产品需求 | 我们卖的到底是什么产品 | VP-Eng | `drafts/prd.md` | `json-ledger` | `REQ-###` / `AC-###-#` |
+
+== differential ==
+business == hardware: false

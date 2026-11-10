@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /Users/bowhead/ai_dsh_company
+
+ ✓ tests/presets/two-axis-applicability.spec.ts (6 tests) 5ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  06:38:21
+   Duration  131ms (transform 32ms, setup 0ms, import 39ms, tests 5ms, environment 0ms)

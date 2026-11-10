@@ -1,0 +1,33 @@
+== E1 matrix: which source names which product type ==
+source	hardware-software	business-software	project-services
+content/product-types/ (dirs)	YES	YES	—
+packages/company-pack/presets/_shared/skills/product-definition/SKILL.md	YES	YES	—
+packages/company-pack/content/charters/cmo.md	—	—	—
+packages/company-pack/content/templates/meta.md	—	—	—
+packages/company-pack/content/templates/mrd.md	—	YES	—
+packages/company-pack/presets/ceo/skills/assembling-the-team/SKILL.md	—	—	—
+docs/guides/product-definition.md	—	—	—
+packages/company-pack/content/AGENTS.md	—	—	—
+packages/company-pack/content/product-types/hardware-software/check-rules.json	YES	—	—
+packages/company-pack/content/product-types/business-software/check-rules.json	—	YES	—
+
+== E1 exact lines (up to 2 per source) ==
+
+# packages/company-pack/presets/_shared/skills/product-definition/SKILL.md
+34: | 硬软一体产品 | `references/hardware-software.md` | BOM/供应链、认证、固件与软件联动、试产与售后 |
+35: | 纯软 / 企业软件 | `references/business-software.md` | 交付模式（SaaS/私有化/永久）、升级/回滚、激活/留存/SLO、数据边界 |
+
+# packages/company-pack/content/templates/mrd.md
+18: "productType": "business-software",
+
+# packages/company-pack/content/product-types/hardware-software/check-rules.json
+2: "productType": "hardware-software",
+
+# packages/company-pack/content/product-types/business-software/check-rules.json
+2: "productType": "business-software",
+
+== E3 default vs business vs opportunity ==
+packages/company-pack/content/state/company.md	productType: business-software
+packages/company-pack/content/state/company.md	> `productType` 决定加载哪份产品类型包（需求链/术语/模板）；出厂 = `business-software`（公司主业：软件开发 / 服务 / 系统集成）。
+packages/company-pack/content/state/org.md	> 公司业务（同日定案）：高科技公司，三类业务 = 软件开发 / 服务 / 系统集成。
+packages/company-pack/content/charters/cmo.md	- 可能的新机会方向：项目制/系统集成沉淀为可复用产品、硬软一体产品、行业模板化。

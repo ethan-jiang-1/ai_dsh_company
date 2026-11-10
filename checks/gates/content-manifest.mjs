@@ -14,7 +14,7 @@ const CONTENT = 'packages/company-pack/content'
 const MANIFEST = join(CONTENT, 'manifest.json')
 const BUDGETS = { t0: 6_144, t1: 4_096, t2: 6_144 }
 const TOTAL_BUDGETS = { t0: 6_144, t1: 4_096 }
-const REQUIRED_DIRS = ['generic', 'company', 'product-types']
+const REQUIRED_DIRS = ['generic', 'company', 'product-types', 'delivery-modes']
 
 function markdownFiles(dir, prefix = '') {
   const out = []
@@ -24,6 +24,19 @@ function markdownFiles(dir, prefix = '') {
     else if (entry.name.endsWith('.md')) out.push(rel)
   }
   return out
+}
+
+/** 从文件头解析 `加载：` 声明的 tier；没有声明返回 null。 */
+function declaredTier(text) {
+  const head = text.split('\n').slice(0, 12).join('\n')
+  const match = /加载：([^；;。\n]+)/.exec(head)
+  if (match === null) return null
+  const value = match[1]
+  if (/legacy/i.test(value)) return 'legacy'
+  if (/\bT0\b|常驻/.test(value)) return 't0'
+  if (/\bT1\b|摘要/.test(value)) return 't1'
+  if (/\bT2\b|按需/.test(value)) return 't2'
+  return null
 }
 
 export function run({ root, ok, fail }) {
@@ -61,6 +74,15 @@ export function run({ root, ok, fail }) {
       if (!existsSync(join(content, rel))) continue
       const size = statSync(join(content, rel)).size
       if (size > BUDGETS[tier]) problems.push(`${tier} 单文件 ${rel} ${String(size)}B > ${String(BUDGETS[tier])}B（拆成更具体的问题）`)
+    }
+  }
+  // 文件头的 `加载：` 是 agent 的读法；manifest 是 host 的读法。两者不一致 = 两份事实。
+  for (const [rel, tier] of listed) {
+    const path = join(content, rel)
+    if (!existsSync(path)) continue
+    const declared = declaredTier(readFileSync(path, 'utf8'))
+    if (declared !== null && declared !== tier) {
+      problems.push(`tier 声明不一致：${rel}（manifest=${tier}，文件头=${declared}）`)
     }
   }
   for (const dir of REQUIRED_DIRS) {

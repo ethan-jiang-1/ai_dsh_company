@@ -42,6 +42,7 @@ export function readHandbook(contentDir: string, workspace?: string): HandbookIn
   const text = [
     `Company content (read-only): ${contentDir}`,
     `When a role or skill says \`<company-content>/...\`, read that absolute path.`,
+    `Pack-relative paths like \`content/...\` in skills and content resolve against this same directory.`,
     `If \`.dsh-company/overrides/...\` exists, prefer the override for templates/charters/handbook.`,
     '',
     raw,

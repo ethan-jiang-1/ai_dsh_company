@@ -1,0 +1,34 @@
+  PASS roster 含 ceo
+  PASS roster 含 vp-eng
+  PASS roster 含 vp-sales
+  PASS roster 含 coo
+  PASS roster 含 cfo
+  PASS roster 含 cmo
+  PASS roster 含 worker
+  PASS roster 含 worker-researcher
+  PASS roster 含 worker-orchestrator
+  PASS roster 含 quality-loop-producer
+  PASS roster 含 quality-loop-verifier
+  PASS session/create 挂上 ceo
+  PASS session/create 挂上 vp-eng
+  PASS session/create 挂上 vp-sales
+  PASS session/create 挂上 coo
+  PASS session/create 挂上 cfo
+  PASS session/create 挂上 cmo
+  PASS session/create 挂上 worker
+  PASS session/create 挂上 worker-researcher
+  PASS session/create 挂上 worker-orchestrator
+  PASS session/create 挂上 quality-loop-producer
+  PASS session/create 挂上 quality-loop-verifier
+  PASS 并发两会话创建不串
+  PASS session-search 隔离组挂载（provider + tool active，且无重复行）
+  PASS ceo 只看见自己的 skills
+  PASS vp-eng 只看见自己的 skills
+  PASS vp-sales 只看见自己的 skills
+  PASS coo 只看见自己的 skills
+  PASS cfo 只看见自己的 skills
+  PASS cmo 只看见自己的 skills
+  PASS client 模块闭包 lint（70 个模块，本包缺失 0）
+  WARN 非本包模块 inject 引用未知包名（上游配置可疑）：@deepseek-ai/dsh-client-ui-attachment → @deepseek-ai/dsh-client-ui-trajectory
+
+preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）

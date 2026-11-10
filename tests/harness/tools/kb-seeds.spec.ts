@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import { readSeeds } from '../../../packages/company-pack/src/host/run-bundle/bootstrap.ts'
-import { readKbSeeds, seedKbFiles } from '../../../tools/lib/kb-seeds.mjs'
+import { readKbSeeds, readProductType, seedKbFiles } from '../../../tools/lib/kb-seeds.mjs'
 import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
 import { mirrorCompanyReference } from '../../../tools/lib/rehearsal.mjs'
 
@@ -19,10 +19,14 @@ const tempDir = (prefix: string): string => {
   return dir
 }
 
+/** pack 的出厂 productType（唯一来源 = `content/state/company.md`，不在测试里写死字面量）。 */
+const DEFAULT_TYPE = readProductType(readFileSync(join(CONTENT, 'state/company.md'), 'utf8'))
+
 /** 生产 bootstrap 会 seed 的 kb 文件清单（唯一期望源 = pack 的 seed.json）。 */
 function productionKbTargets(): string[] {
-  const { seeds, error } = readSeeds(CONTENT)
+  const { seeds, error } = readSeeds(CONTENT, { productType: DEFAULT_TYPE })
   expect(error, '生产 seed 清单必须可读').toBeUndefined()
+  expect(seeds.some(seed => seed.target === `${KB_DIR}/process-docs.md`), '类型相关 seed 不能被跳过').toBe(true)
   return seeds.map(seed => seed.target).filter(target => target.startsWith(`${KB_DIR}/`)).sort()
 }
 
@@ -71,6 +75,26 @@ describe('kb 旁路装配与生产 seed 同形（BUG-054）', () => {
     writeFileSync(target, '# 用户改过的公司身份\n')
     seedKbFiles(CONTENT, workspace, { onlyMissing: true })
     expect(readFileSync(target, 'utf8')).toBe('# 用户改过的公司身份\n')
+  })
+
+  it('类型相关 seed 随 productType 解析（process-docs 不写死单一类型）', () => {
+    const processDocs = readKbSeeds(CONTENT).find(seed => seed.target === `${KB_DIR}/process-docs.md`)
+    expect(processDocs?.source, '缺省 = pack company.md 的出厂类型').toBe('product-types/business-software/requirements-model.md')
+    const workspace = tempDir('kb-hardware-')
+    seedKbFiles(CONTENT, workspace, { productType: 'hardware-software' })
+    expect(readFileSync(join(workspace, `${KB_DIR}/process-docs.md`), 'utf8'))
+      .toBe(readFileSync(join(CONTENT, 'product-types/hardware-software/requirements-model.md'), 'utf8'))
+  })
+
+  it('缺/未知 productType 时旁路 fail-loud（不猜类型）', () => {
+    expect(() => seedKbFiles(CONTENT, tempDir('kb-bad-'), { productType: 'mystery' })).toThrow(/mystery/)
+    expect(() => seedKbFiles(CONTENT, tempDir('kb-null-'), { productType: '' })).toThrow(/productType/)
+  })
+
+  it('company.md 的 YAML 引号/注释按标量解析', () => {
+    expect(readProductType('---\nproductType: "business-software" # 默认\n---\n')).toBe('business-software')
+    expect(readProductType("productType: 'hardware-software'")).toBe('hardware-software')
+    expect(readProductType('productType: <类型 id>')).toBeNull()
   })
 
   it('排练场 mirror 与 bootstrap seed 的 kb 文件清单一致（缺 policy-lines = COO/CFO 判据闭合不了）', () => {

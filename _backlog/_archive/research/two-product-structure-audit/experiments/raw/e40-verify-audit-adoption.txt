@@ -1,0 +1,231 @@
+$ node checks/run-gates.mjs
+  PASS md-utf8/newline ×749
+  PASS md-links (含 notes) ×3665 / 432 files
+  PASS doc-budget AGENTS.md (84/84)
+  PASS doc-budget docs/index.md (44/48)
+  PASS doc-budget docs/reference/decisions.md (66/66)
+  PASS doc-budget docs/reference/external-research.md (29/30)
+  PASS doc-budget docs/repo-hygiene.md (73/80)
+  PASS doc-budget docs/orient.md (76/80)
+  PASS doc-budget docs/reference/terminology.md (20/22)
+  PASS doc-budget docs/guides/web-rpc.md (26/30)
+  PASS doc-budget docs/guides/release-runbook.md (71/75)
+  PASS doc-budget docs/guides/dev-product-parity.md (53/60)
+  PASS doc-budget docs/guides/product-definition.md (58/62)
+  PASS doc-budget docs/guides/quality-loop.md (85/91)
+  PASS doc-budget docs/guides/budget-and-ops.md (67/72)
+  PASS doc-budget docs/guides/cdp-probe.md (63/68)
+  PASS doc-budget docs/policy.md (94/100)
+  PASS doc-budget docs/guides/debugging.md (33/38)
+  PASS doc-budget docs/guides/environments.md (43/48)
+  PASS doc-budget docs/guides/dev-loop.md (114/120)
+  PASS doc-budget docs/testing.md (70/75)
+  PASS doc-budget docs/AGENTS.md (58/62)
+  PASS doc-budget docs/contracts/demo.md (45/51)
+  PASS doc-budget docs/guides/demo-scenes.md (196/207)
+  PASS doc-budget docs/architecture.md (83/88)
+  PASS doc-budget docs/contracts/multi-human.md (72/76)
+  PASS doc-budget docs/guides/multi-human-runbook.md (126/133)
+  PASS doc-budget docs/contracts/presets.md (131/139)
+  PASS doc-budget docs/contracts/cultivation.md (55/58)
+  PASS doc-budget packages/company-pack/content/AGENTS.md (37/37)
+  PASS doc-budget checks/README.md (58/59)
+  PASS doc-budget tests/README.md (100/100)
+  PASS doc-budget docs/project-map.md (94/99)
+  PASS doc-budget docs/runtime-map.md (80/88)
+  PASS doc-budget docs/contracts/release.md (145/172)
+  PASS doc-budget docs/guides/bootstrap.md (156/165)
+  PASS doc-budget docs/contracts/delegation.md (114/120)
+  PASS doc-budget docs/contracts/data-model.md (38/40)
+  PASS doc-budget docs/contracts/profile.md (61/66)
+  PASS doc-budget docs/content-charter.md (104/110)
+  PASS doc-budget README.md (89/90)
+  PASS doc-budget _backlog/README.md (136/140)
+  PASS doc-budget notes/README.md (125/132)
+  PASS doc-budget packages/company-pack/README.md (155/160)
+  PASS doc-budget docs/guides/publish-handoff.md (90/95)
+  PASS handbook-budget 各 preset maxBytes 一致（32768；这是用户项目指令面，不是公司手册面）
+  PASS handbook-budget content/AGENTS.md 3729B + 1024B 余量 ≤ 32768
+  PASS handbook-budget T0 常驻 3729B ≤ 6144B
+  PASS run-bundle-clean 公司盘与 dev home 零 tracked（bundle 只住 git 外）
+  PASS no-tracked-ignored（索引零命中；没有 `git add -f` 绕过的 ignored 文件）
+  PASS tracked-file-size ×1350（最大 pnpm-lock.yaml 0.91MB / 上限 2.00MB）
+  PASS gitignore-shape（runtime 默认拒绝 + 2 件白名单；check-ignore ×11）
+  PASS company-skeleton content ×21（只读内容在 pack；无 bin/workspace；dev 盘无根残留）
+  PASS shipped-links（content 66 份 + skill 26 份 + persona 11 份；零仓库路径/穿出 content）
+  PASS base-clean 只读内容零部署历史（CHARTER ×6 + 手册/模板/状态）
+  PASS content-single-home（policy-lines 9 个政策数字；66 份 Markdown + 代码面零复述）
+  PASS generic-clean（7 份通用面；零公司词/产品类型词）
+  PASS content-manifest（49 份；T0 1 / T1 2 / T2 42）
+  PASS product-type-sources ×2（品类表/默认/选值面与 packages/company-pack/content/product-types 一致；未来类型 0 个已标注）
+  PASS delivery-mode-sources ×2（包形状 + 规则模板 + meta 字段 + 手册指针）
+  PASS method-contract ×13（三个经营角色；类型/交付模式解析 + 事实已播种 + workflow 分派）
+  PASS pack-content-paths ×25（pack 内反引号 content/... 路径均可解析）
+  PASS roster-consistency（8 份角色清单一致：ceo/cfo/cmo/coo/vp-eng/vp-sales）
+  PASS tests-literals（183 个 spec；公司事实零字面量，例外 4 条）
+  PASS seed-integrity（17 条 seed；源在场、target 唯一、guide 对齐；类型占位 ×1 → business-software）
+  PASS ledger-routing ×58（表头锚在场，每行三列、一句话 ≤100 字符、家可解析）
+  PASS ledger-participation 跳过（本机无 dev bundle workspace；台账只住 bundle）
+  PASS doc-taxonomy（分层规矩在场 + 9 顶层门/宪法 + 25 tier 文档由目录承载）
+  PASS charter-entry（宪章在场 + 四处入口：文档链 3 + 归位 skill 1）
+  PASS snapshots-budget 总量 0.1M/2M
+  PASS snapshots-budget 收敛切片 0.0M/1M（精确 0B）
+  PASS bare-path ×2416（188 文件反引号裸路径存在性）+ 纯文本 notes 引用 ×1；另观察档 287 文件
+  观察项 107 条（观察档 = `notes/postmortem/**` 与 `_backlog/_archive/**`：记录**当时**事实的档案，里面引的路径当时是对的——**改它就是篡改记录**，故只提醒不判红）：
+    _backlog/_archive/fixed_bugs/BUG-017-record-hygiene-residue.md:11 → `notes/implemented/2026-10-12-workspace-convergence-executor.md`
+    _backlog/_archive/fixed_bugs/BUG-034-no-absolute-time-source-for-signed-records.md:25 → `probes/team/sa-sqa-quality-audit.mjs`
+    _backlog/_archive/fixed_bugs/BUG-034-no-absolute-time-source-for-signed-records.md:76 → `packages/company-pack/presets/system-architect/skills/systems-architecture/SKILL.md`
+    _backlog/_archive/fixed_bugs/BUG-034-no-absolute-time-source-for-signed-records.md:77 → `packages/company-pack/presets/system-qa/skills/vv-playbook/SKILL.md`
+    _backlog/_archive/fixed_bugs/BUG-034-no-absolute-time-source-for-signed-records.md:78 → `packages/company-pack/presets/system-architect/agent.cordis.yml`
+    _backlog/_archive/fixed_bugs/BUG-034-no-absolute-time-source-for-signed-records.md:78 → `packages/company-pack/presets/system-qa/agent.cordis.yml`
+    _backlog/_archive/fixed_bugs/BUG-034-no-absolute-time-source-for-signed-records.md:79 → `probes/team/sa-sqa-quality-audit.mjs`
+    _backlog/_archive/fixed_bugs/BUG-034-no-absolute-time-source-for-signed-records.md:79 → `probes/team/sa-sqa-delegation-probe.mjs`
+    _backlog/_archive/fixed_bugs/BUG-035-short-circuit-withstand-undefined.md:72 → `packages/company-pack/presets/system-architect/skills/systems-architecture/SKILL.md`
+    _backlog/_archive/fixed_bugs/BUG-035-short-circuit-withstand-undefined.md:73 → `packages/company-pack/presets/system-qa/skills/vv-playbook/SKILL.md`
+    _backlog/_archive/fixed_bugs/BUG-035-short-circuit-withstand-undefined.md:74 → `packages/company-pack/presets/system-architect/agent.cordis.yml`
+    _backlog/_archive/fixed_bugs/BUG-035-short-circuit-withstand-undefined.md:74 → `packages/company-pack/presets/system-qa/agent.cordis.yml`
+    _backlog/_archive/fixed_bugs/BUG-035-short-circuit-withstand-undefined.md:75 → `probes/team/sa-sqa-quality-audit.mjs`
+    _backlog/_archive/fixed_bugs/BUG-035-short-circuit-withstand-undefined.md:75 → `probes/team/sa-sqa-delegation-probe.mjs`
+    _backlog/_archive/fixed_bugs/README.md:84 → `tests/README`
+    _backlog/_archive/research/agent-cultivation/2026-10-13-dsh-capabilities.md:30 → `packages/session-query/tool-session-query/README.md`
+    _backlog/_archive/research/agent-cultivation/2026-10-13-dsh-capabilities.md:41 → `packages/session-query/tool-session-query/README.md`
+    _backlog/_archive/research/agent-cultivation/2026-10-13-dsh-capabilities.md:45 → `notes/implemented/2026-09-24-twin-cultivation.md`
+    _backlog/_archive/research/agent-cultivation/2026-10-13-dsh-capabilities.md:72 → `notes/implemented/2026-09-24-twin-cultivation.md`
+    _backlog/_archive/research/agent-cultivation/2026-10-13-dsh-capabilities.md:73 → `packages/session-query/tool-session-query/README.md`
+    _backlog/_archive/research/notes-consistency/2026-10-30-receipts-digest.md:24 → `probes/.../probe-smoke`
+    _backlog/_archive/research/notes-consistency/2026-10-30-triage-round2.md:63 → `notes/archived/2026-09-22-dynamic-team-assembly.md`
+    _backlog/_archive/research/notes-consistency/2026-10-30-triage-round2.md:65 → `notes/archived/2026-10-09-n3-negative-control-retraction.md`
+    _backlog/_archive/research/notes-consistency/2026-10-30-triage-round2.md:79 → `tests/client/company-view.spec.ts`
+    _backlog/_archive/research/notes-consistency/2026-10-30-triage.md:20 → `_backlog/README`
+    _backlog/_archive/research/notes-consistency/2026-10-30-triage.md:20 → `_backlog/README`
+    _backlog/_archive/research/notes-consistency/2026-10-30-triage.md:21 → `_backlog/README`
+    _backlog/_archive/research/plugin-as-product/2026-11-01-plugin-as-product.md:453 → `tools/standalone.mjs`
+    _backlog/_archive/research/plugin-as-product/2026-11-01-plugin-as-product.md:458 → `tools/standalone.mjs`
+    _backlog/_archive/research/repo-hygiene/2026-10-20-fresh-agent-audit.md:75 → `docs/design`
+    _backlog/_archive/research/repo-hygiene/2026-10-20-fresh-agent-audit.md:163 → `docs/design`
+    _backlog/_archive/research/repo-hygiene/2026-10-20-fresh-agent-audit.md:329 → `docs/design`
+    _backlog/_archive/research/repo-hygiene/2026-10-20-fresh-agent-audit.md:349 → `docs/design`
+    _backlog/_archive/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md:58 → `tests/company`
+    _backlog/_archive/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md:81 → `tools/standalone.mjs`
+    _backlog/_archive/research/repo-hygiene/2026-10-28-six-dimension-audit-round4.md:109 → `packages/company-pack/src/client/CompanyView.tsx`
+    _backlog/_archive/research/repo-hygiene-round5/2026-11-03-fresh-recheck.md:20 → `tests/company`
+    _backlog/_archive/research/repo-hygiene-round5/2026-11-03-seven-dimension-audit.md:95 → `notes/implemented/2026-10-19-deliverables-catalog.md`
+    _backlog/_archive/research/repo-hygiene-round6/2026-11-03-seven-dimension-audit-round6.md:39 → `tests/company`
+    _backlog/_archive/research/repo-hygiene-round6/2026-11-03-seven-dimension-audit-round6.md:66 → `tests/company`
+    _backlog/_archive/research/requirements-identification-numbering/history/2026-11-07-agent-first-numbering.md:41 → `_backlog/research/requirements-identification-numbering`
+    _backlog/_archive/research/requirements-identification-numbering/history/2026-11-07-agent-first-numbering.md:115 → `_backlog/research/requirements-identification-numbering`
+    _backlog/_archive/research/requirements-identification-numbering/research_topic/2026-11-07-current-brief.md:39 → `_backlog/research/requirements-identification-numbering`
+    _backlog/_archive/research/requirements-identification-numbering/research_topic/2026-11-07-current-brief.md:113 → `_backlog/research/requirements-identification-numbering`
+    _backlog/_archive/research/run-bundle/2026-10-24-run-bundle-boundary.md:98 → `packages/company-pack/workspace`
+    _backlog/_archive/research/vp-eng-delegation-topology/2026-11-08-topology.md:85 → `notes/implemented/2026-11-03-d4-semantic-drift.md`
+    _backlog/_archive/settled_issues/2026-09-28-sidebar-split-budget.md:3 → `_backlog/_done/_closed_plans`
+    _backlog/_archive/settled_issues/2026-09-29-deliverables-lifecycle-metadata.md:11 → `tests/deliverables.spec.ts`
+    _backlog/_archive/settled_issues/2026-09-29-deliverables-lifecycle-metadata.md:169 → `tests/deliverables.spec.ts`
+    _backlog/_archive/settled_issues/2026-10-04-work-status-visibility.md:20 → `tests/presence-board.spec.ts`
+    _backlog/_archive/settled_issues/2026-10-09-decision-ledger-home-migration.md:35 → `docs/design`
+    _backlog/_archive/settled_issues/2026-10-09-decision-ledger-home-migration.md:74 → `docs/00-index.md`
+    _backlog/_archive/settled_issues/2026-10-09-decision-ledger-home-migration.md:84 → `docs/00-index.md`
+    _backlog/_archive/settled_issues/2026-10-09-stale-pointer-cleanup.md:23 → `notes/research`
+    _backlog/_archive/settled_issues/2026-10-09-stale-pointer-cleanup.md:23 → `notes/intents.md`
+    _backlog/_archive/settled_issues/2026-10-09-stale-pointer-cleanup.md:23 → `notes/archived/intents-2026-10.md`
+    _backlog/_archive/settled_issues/2026-10-09-stale-pointer-cleanup.md:23 → `tests/presets.spec.ts`
+    _backlog/_archive/settled_issues/2026-10-09-stale-pointer-cleanup.md:25 → `tests/foo|bar.spec.ts`
+    _backlog/_archive/settled_issues/2026-10-09-stale-pointer-cleanup.md:34 → `notes/research`
+    _backlog/_archive/settled_issues/2026-10-09-stale-pointer-cleanup.md:34 → `notes/intents.md`
+    _backlog/_archive/settled_issues/2026-10-13-agent-cultivation.md:71 → `tests/company`
+    _backlog/_archive/settled_issues/2026-10-13-agent-cultivation.md:72 → `tests/company`
+    _backlog/_archive/settled_issues/2026-10-13-agent-cultivation.md:73 → `tests/company`
+    _backlog/_archive/settled_issues/2026-10-13-agent-cultivation.md:76 → `tests/company`
+    _backlog/_archive/settled_issues/2026-10-13-agent-cultivation.md:77 → `tests/company`
+    _backlog/_archive/settled_issues/2026-10-13-agent-cultivation.md:83 → `tests/company`
+    _backlog/_archive/settled_issues/2026-10-13-agent-cultivation.md:103 → `tests/host/cultivation.spec`
+    _backlog/_archive/settled_issues/2026-10-13-agent-cultivation.md:103 → `tests/client/cultivation-board.spec`
+    _backlog/_archive/settled_issues/2026-10-17-cultivation-gui-actions.md:292 → `tests/company`
+    _backlog/_archive/settled_issues/2026-10-20-fresh-agent-repo-hygiene.md:67 → `docs/design`
+    _backlog/_archive/settled_issues/2026-10-20-fresh-agent-repo-hygiene.md:85 → `docs/design`
+    _backlog/_archive/settled_issues/2026-10-23-cultivation-context.md:770 → `tests/host/cultivation.spec.ts`
+    _backlog/_archive/settled_issues/2026-10-24-run-bundle-clean-base.md:46 → `packages/company-pack/workspace`
+    _backlog/_archive/settled_issues/2026-10-27-data-model-gaps.md:10 → `notes/implemented/2026-10-27-data-model-alignment.md`
+    _backlog/_archive/settled_issues/2026-10-28-repo-hygiene-round4.md:21 → `tests/company`
+    _backlog/_archive/settled_issues/2026-11-01-plugin-as-product.md:131 → `tools/standalone.mjs`
+    _backlog/_archive/settled_issues/2026-11-01-plugin-lifecycle-publish.md:224 → `tests/host/market-index.spec.ts`
+    _backlog/_archive/settled_issues/2026-11-02-dev-product-path-parity.md:15 → `_backlog/issues/2026-11-02-dev-product-path-parity.md`
+    _backlog/_archive/settled_issues/2026-11-02-remove-trajectory-terminal-ui.md:120 → `tests/host/ui-surface.spec.ts`
+    _backlog/_archive/settled_issues/2026-11-06-system-architect-sqa.md:76 → `probes/team/sa-sqa-delegation-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-e2e.md:16 → `probes/team/sa-sqa-delegation-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-e2e.md:43 → `probes/team/sa-sqa-quality-audit.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-e2e.md:69 → `probes/team/requirements-chain-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-sa.md:16 → `probes/team/sa-sqa-delegation-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-sa.md:34 → `probes/team/sa-sqa-delegation-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-sa.md:43 → `probes/team/sa-sqa-delegation-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-sa.md:65 → `probes/team/sa-sqa-delegation-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-sqa.md:16 → `probes/team/sa-sqa-delegation-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-sqa.md:16 → `probes/team/sa-sqa-quality-audit.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-sqa.md:32 → `probes/team/sa-sqa-delegation-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-sqa.md:43 → `probes/team/sa-sqa-delegation-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-sqa.md:63 → `probes/team/sa-sqa-quality-audit.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-teaming-landing.md:59 → `tests/company`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-teaming-landing.md:60 → `tests/company`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-teaming-landing.md:124 → `notes/implemented/2026-11-07-requirements-teaming-program.md`
+    _backlog/_archive/settled_issues/2026-11-07-requirements-teaming-landing.md:126 → `tests/company`
+    _backlog/_archive/settled_issues/2026-11-07-sa-sqa-capability-organization.md:28 → `packages/company-pack/presets/system-architect/skills/systems-architecture/SKILL.md`
+    _backlog/_archive/settled_issues/2026-11-07-sa-sqa-capability-organization.md:29 → `packages/company-pack/presets/system-qa/skills/vv-playbook/SKILL.md`
+    _backlog/_archive/settled_issues/2026-11-07-sa-sqa-capability-organization.md:40 → `probes/team/sa-sqa-quality-audit.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-sa-sqa-capability-organization.md:65 → `probes/team/sa-sqa-quality-audit.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-sa-sqa-capability-organization.md:72 → `probes/team/sa-sqa-domain-audit.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-sa-sqa-capability-organization.md:94 → `probes/team/sa-sqa-domain-routing-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-sa-sqa-capability-organization.md:103 → `probes/team/sa-sqa-domain-routing-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-sa-sqa-capability-organization.md:122 → `probes/team/sa-sqa-domain-routing-probe.mjs`
+    _backlog/_archive/settled_issues/2026-11-07-vpeng-evidence-closeout.md:67 → `notes/implemented/2026-11-07-requirements-teaming-program.md`
+    _backlog/_archive/settled_issues/2026-11-09-presets-delegation-architecture.md:227 → `tests/company`
+    _backlog/_archive/settled_issues/2026-11-10-docs-layer-restructure.md:65 → `_backlog/issues/2026-11-10-content-charter.md`
+  PASS layout-block ×12（AGENTS.md fenced 布局块首列路径存在性）
+  PASS retired-path ×196 文件 + 451 脚本注释面（退役目录前缀扫描：活跃面零残留）
+  PASS nav-enumeration（§四区 无枚举清单/spec 名——D28 复发门；清单的家 = 目录本身）
+  PASS nav-count-claims ×104（导航面零页签计数声明；数量随切片增长必过期）
+  PASS pin-bookkeeping (AGENTS.md §vendor 簿记 = dsh-v0.2.1-rc.5 @ b830ec95)
+  PASS pin-currency ×4（现在时文件的 dsh-v 字面量 = dsh-v0.2.1-rc.5）
+  PASS script-triggers ×102（每个门禁/探针脚本头注自述「何时跑」）
+  PASS script-status ×198（头注自述「状态：常驻|已耗（日期+原因）」）
+  PASS dist-manual（版本 0.10.0 + DSH 安装形状 + sha256 + 模板同源 + pin dsh-v0.2.1-rc.5）
+  PASS script-port（脚本默认端口一律 --port 0：端口是环境状态，真实端口从启动横幅读）
+  PASS presets ×6 + 非角色 ×5
+  PASS preset-required-config ×24 行（声明了 config 的行，必填字段齐——判据 = vendor config-catalog）
+  PASS claude-symlink
+  PASS vendor-pin (dsh-v0.2.1-rc.5 @ b830ec95)
+  PASS vendor-clean (工作树零改动)
+  PASS pack-bundle ×12
+  PASS pack-compat (dsh-v0.2.1-rc.5 ×5)
+  PASS pack-engines（node ^22.19.0 || >=24.0.0 / dsh >=0.2.1-rc.2 <0.3.0 / MIT / 发布身份齐全）
+  PASS pack-files（runtime 两半 + .d.ts；无 lib/** 中间产物）
+  PASS release-ready（0.10.0；条目 2026-11-10；源码指纹看 release --check）
+  PASS dist-freshness（0.10.0；tarball/manual sha 与 manifest 一致；可发布性看 release --check）
+  PASS ui-golden-freshness（9 页签；金样与注册面一致）
+  PASS preset-row-deps ×29
+  PASS client-halves ×1
+  PASS src-layering ×105 文件 / 257 条相对引用（client→lib、host→lib、root→{host,lib}；反向零）
+  PASS proposal-scheduled ×0（批准标记 + 验收节）
+  PASS proposal-graduated (proposed/ 里只剩未落地的)
+  PASS notes-liveness ×46（状态行；决定节生效日 2026-11-04 起 ×34；rationale 现行语义 ×4）
+  PASS notes-supersession ×46 篇（取代均有回链）
+  PASS notes-archived-links ×230（归档层 markdown 链接全部在场）
+  PASS backlog-liveness（制度目录/README、卡头、关闭判断、method 形状、递归索引、研究题两级索引、归档做卡去向、五道门门票/去向/审查）
+  PASS replay-scene-liveness ×1（声明↔磁盘一致；runnable 1 / archived 0 / baseline 0）
+  PASS snapshot-index ×3（盘上场景全部在 README 场景表）
+  PASS guard-red-record ×44 条守卫声明（183 个 spec；每条都对到真事故卡 + 自带红配方）
+  PASS spec-duplicates ×183（测试文件正文唯一；复制即红）
+  PASS link-debt（archived 20 / moved 0 / live 0；基线 32/0/0——archived 已低于基线，可下调 link-debt.json）
+  PASS retired-claims ×42（活跃面零已证伪断言；清单 2 条）
+  PASS command-refs ×214（文档里的 pnpm 脚本与 node 仓内路径都存在）
+  PASS readme-manual-commands ×3（README 的 dsh 命令全在手册里）
+  PASS security-scan（自测 8+3 支有区分度、指纹 34 件 = 冻结副本、真扫无拦项：packages/company-pack/content scanned=72 逐道=a1:3,a2:0,b1:3,b2:3,b3:3；3 = 覆盖度如实，不等于通过）[件 = checks/lib/ci-security-gates/]
+  PASS tracked-token ×1351（tracked 面零 token URL；跳过 0 个 >2MB 或非普通文件）
+  PASS tracked-secrets ×1325（tracked 面零硬编码凭据赋值；跳过 2 个二进制/超大/夹具件）
+  PASS tracked-portability ×794（LF/无 home 路径/无大小写冲突/无 macOS 专属命令）
+  PASS script-index ×126（生成库存与目录一致；README 已链接）
+  PASS dev-product-parity（启动器默认 tarball + parity 指南 + bootstrap/profile 一致 + 市场 staged 规则 + 退役词）
+  SKIP replay-fixture-freshness: 盘上没有需查注入面的 runnable 场景（headless 跳过 1 / presence 跳过 0）——公司行为回放已移私有仓
+  SKIP replay-ui-freshness: 盘上没有任何 ui.expected.md 金样（公司 UI 场景 = ui-scene-smoke 自起实例车道）
+  PASS gate-wiring ×69（gates/ 目录与 run-gates.mjs 接线一致，零静默哑弹）
+
+verify: ALL PASS；2 门无对象（replay-fixture-freshness / replay-ui-freshness）

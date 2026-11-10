@@ -1,0 +1,90 @@
+{
+  "deliveryMode": "project-services",
+  "kind": "delivery",
+  "entry": "overview.md",
+  "documents": {
+    "SOW": {
+      "file": "drafts/sow.md",
+      "owner": "COO",
+      "template": "templates/sow.md"
+    },
+    "MILESTONES": {
+      "file": "drafts/milestones.md",
+      "owner": "COO",
+      "template": "templates/milestones.md"
+    },
+    "RACI": {
+      "file": "drafts/raci.md",
+      "owner": "COO",
+      "template": "templates/raci.md"
+    },
+    "UAT": {
+      "file": "drafts/uat.md",
+      "owner": "COO",
+      "template": "templates/uat.md"
+    },
+    "ACCEPTANCE": {
+      "file": "drafts/acceptance.md",
+      "owner": "COO",
+      "template": "templates/acceptance.md"
+    }
+  },
+  "requiredFields": {
+    "SOW": [
+      "scopeIn",
+      "scopeOut",
+      "dependencies",
+      "milestones",
+      "acceptance",
+      "changeControl"
+    ],
+    "MILESTONES": [
+      "exitCriteria",
+      "owner",
+      "payment"
+    ],
+    "RACI": [
+      "activity",
+      "responsible",
+      "accountable"
+    ],
+    "UAT": [
+      "covers",
+      "entry",
+      "exit",
+      "signoff"
+    ],
+    "ACCEPTANCE": [
+      "checklist",
+      "openItems",
+      "handover",
+      "signoff"
+    ]
+  },
+  "notes": "交付模式不是产品类型；需求链仍由产品类型决定。v1 不新增 /delivery check，操作员按 document-map 收口。",
+  "requiredSections": {
+    "SOW": [
+      "## 2. 范围",
+      "## 4. 里程碑与验收",
+      "## 5. 变更控制"
+    ],
+    "MILESTONES": [
+      "| # | 里程碑 |"
+    ],
+    "RACI": [
+      "| 活动 / 交付物 |"
+    ],
+    "UAT": [
+      "## 2. 用例",
+      "## 3. 准入 / 退出"
+    ],
+    "ACCEPTANCE": [
+      "## 1. 验收清单",
+      "## 4. 签字"
+    ]
+  },
+  "v1Reminder": [
+    "SOW",
+    "UAT"
+  ]
+}

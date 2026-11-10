@@ -1,0 +1,18 @@
+== E11 truth table: child = parent + 1; allowed iff child <= maxDepth ==
+parentDepth	maxDepth	childDepth	result
+0	1	1	ALLOW
+0	2	1	ALLOW
+0	3	1	ALLOW
+1	1	2	THROW SubagentDepthError
+1	2	2	ALLOW
+1	3	2	ALLOW
+2	1	3	THROW SubagentDepthError
+2	2	3	THROW SubagentDepthError
+2	3	3	ALLOW
+
+== E11 delegation.md line 40 ==
+40: - **深度**：`maxDepth` 是绝对上限（`0` 禁止、`1` 只允许直接子代；省略读 Host 默认 1）。`vp_eng`/`vp_sales` 行是 1——VP-Eng 可能是团队成员（depth 1），子代落 2；`spawn_teammate` 仅 Lead 可调。
+
+== E11 vp_eng / vp_cmo rows ==
+| `vp_eng` | VP-Eng（研发） | `provider: spawn` · `maxDepth: 1` · `agentPreset: vp-eng` |
+| `vp_cmo` | CMO（市场与产品定义；CEO 版 `maxDepth: 1` / VP-Eng 版 `maxDepth: 2`） | `provider: spawn` · `agentPreset: cmo` |

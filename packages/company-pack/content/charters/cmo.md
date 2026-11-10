@@ -7,7 +7,7 @@
   - 现有客户 9 家中型企业（制造 4、零售连锁 3、专业服务 2）——现有客户的销售/定价归 **VP-Sales**，
     本章程只负责**新市场/新产品机会**；
   - 可能的新机会方向：项目制/系统集成沉淀为可复用产品、硬软一体产品、行业模板化。
-- **方法论**：先加载共享 `product-definition`（脊柱 + 品类 playbook：`project-services` / `hardware-software`）；
+- **方法论**：先加载共享 `product-definition`（脊柱 + 品类 playbook；**可选类型与 playbook 的唯一表** = 该 skill 的「产品类型 → playbook」，本行不复述）；
   写 MRD 用 `mrd-playbook`。产品类型决定套路，不套一个死模板。
 - **veto**："市场不成立"——没有可验证的需求、没有清晰买单人、竞品已把价值打平，直接说不，给一句话理由。
 - **产出**：MRD，按 `<company-content>/templates/mrd.md` 的结构写，落 `.dsh-company/deliverables/<slug>/drafts/mrd.md`；机会编号 `MR-###`，

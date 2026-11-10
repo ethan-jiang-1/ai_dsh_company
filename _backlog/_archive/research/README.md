@@ -18,6 +18,7 @@
 
 | 名头 | 材料 | 历史消费者 | 产出的卡 | 归档 |
 |---|---|---|---|---|
+| [two-product-structure-audit/](two-product-structure-audit/README.md) · 两产品结构审计：产品类型 / 组织 / 角色 / 流程 | 3 份 + experiments/ | [BUG-061–070](../fixed_bugs/README.md)、[两轴 v1](../settled_issues/2026-11-11-delivery-mode-axis.md)、[v2](../settled_issues/2026-11-11-delivery-mode-v2.md) | 同批卡 | 2026-11-11 |
 | [workflow-subagent-exploration/](workflow-subagent-exploration/README.md) · workflow + subagent 探索测试：八轮 + 资产先行 | 3 份 | [探索 bug-hunt 卡](../settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md) | BUG-036–060（多轮） | 2026-11-11 |
 | [org-coordination-topology/](org-coordination-topology/README.md) · 组织协同拓扑：CEO 五条汇报线、VP-Eng 研发负载与 workflow/subagent 的分工 | 3 份 | [产品类型语义](../settled_issues/2026-11-10-product-type-semantics.md)、[动议级产品类型](../settled_issues/2026-11-10-motion-product-type.md)、[SA/SQA 方法包](../settled_issues/2026-11-10-sa-sqa-method-packs.md)、[COO/CFO 通道](../settled_issues/2026-11-10-coo-cfo-delegation.md) | 同四张卡 | 2026-11-10 |
 | [presets-delegation-architecture/](presets-delegation-architecture/README.md) · preset 委派架构：盘点与结构性研究 | 7 份 + 脚本/读数 | [委派面合同修复 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md)、[BUG-037](../fixed_bugs/BUG-037-root-team-tool-shadowing.md)、[BUG-042](../fixed_bugs/BUG-042-list-subagents-lastturnend-missing.md)、[BUG-043](../fixed_bugs/BUG-043-list-subagents-includes-teammates.md)、[BUG-044](../fixed_bugs/BUG-044-background-job-lost-on-restart.md) | [模型化重构卡](../settled_issues/2026-11-09-presets-delegation-architecture.md) | 2026-11-10 |

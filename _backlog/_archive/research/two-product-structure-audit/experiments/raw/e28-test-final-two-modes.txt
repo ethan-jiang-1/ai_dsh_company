@@ -1,0 +1,300 @@
+$ vitest run
+
+ RUN  v4.1.11 /Users/bowhead/ai_dsh_company
+
+ ✓ tests/harness/tools/backlog-liveness.spec.ts (33 tests) 751ms
+ ✓ tests/harness/repo/layering.spec.ts (4 tests) 465ms
+     ✓ replay lane 是第三档：只由 checks/smoke/replay-smoke.mjs 驱动，不进 pnpm test  442ms
+ ✓ tests/host/delegation/delegation-control.spec.ts (21 tests) 666ms
+ ✓ tests/harness/repo/foundation-safety.spec.ts (20 tests) 94ms
+stderr | tests/client/cultivation/cultivation-data.spec.ts > 跨实例刷新广播：订阅侧（事件 ⇒ 重读） > 收到 CULTIVATION_CHANGED_EVENT ⇒ 立刻重读一次（不等 30s 轮询）
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/client/cultivation/cultivation-data.spec.ts > 跨实例刷新广播：订阅侧（事件 ⇒ 重读） > 收到 CULTIVATION_CHANGED_EVENT ⇒ 立刻重读一次（不等 30s 轮询）
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/client/cultivation/cultivation-data.spec.ts > 跨实例刷新广播：订阅侧（事件 ⇒ 重读） > 收到 CULTIVATION_CHANGED_EVENT ⇒ 立刻重读一次（不等 30s 轮询）
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/client/cultivation/cultivation-data.spec.ts > 跨实例刷新广播：订阅侧（事件 ⇒ 重读） > 收到 CULTIVATION_CHANGED_EVENT ⇒ 立刻重读一次（不等 30s 轮询）
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/client/cultivation/cultivation-data.spec.ts > records 摘要全扫 + open/最近 N 全文（2026-10-27 R1） > open 全部读全文；非 open 只读最近 FULL_RECORD_LIMIT 条；未展开可见
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/client/cultivation/cultivation-data.spec.ts > records 摘要全扫 + open/最近 N 全文（2026-10-27 R1） > open 全部读全文；非 open 只读最近 FULL_RECORD_LIMIT 条；未展开可见
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/client/cultivation/cultivation-data.spec.ts > records 摘要全扫 + open/最近 N 全文（2026-10-27 R1） > open 全部读全文；非 open 只读最近 FULL_RECORD_LIMIT 条；未展开可见
+Warning: The current testing environment is not configured to support act(...)
+
+ ✓ tests/client/cultivation/cultivation-data.spec.ts (2 tests) 93ms
+dsh: company-pack：bundle.json 损坏，已保留原文件并停写公司数据（/private/var/folders/0_/42sp51652_79fdjkf6s2xj3w0000gp/T/host-composition-sSLdGN/company/.dsh-company/bundle.json：Expected property name or '}' in JSON at position 1 (line 1 column 2)）；修好后重启，或从 home 身份备份恢复（/var/folders/0_/42sp51652_79fdjkf6s2xj3w0000gp/T/host-composition-sSLdGN/home/company/identity/<bundle-id>.json，仅作恢复参考）
+stderr | tests/client/cultivation/cultivation-board-actions.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+stderr | tests/client/tabs/attention-tab.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+stderr | tests/client/cultivation/cultivation-board-actions.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+stderr | tests/client/tabs/attention-tab.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+dsh: company-pack：bundle.json 损坏，已保留原文件并停写公司数据（/private/var/folders/0_/42sp51652_79fdjkf6s2xj3w0000gp/T/propose-guards-Ftt0di/company/.dsh-company/bundle.json：Expected property name or '}' in JSON at position 2 (line 1 column 3)）；修好后重启，或从 home 身份备份恢复（/var/folders/0_/42sp51652_79fdjkf6s2xj3w0000gp/T/propose-guards-Ftt0di/home/company/identity/<bundle-id>.json，仅作恢复参考）
+ ✓ tests/host/index/cultivation-propose-guards.spec.ts (8 tests) 150ms
+ ✓ tests/host/index/host-composition.spec.ts (8 tests) 143ms
+dsh: company-pack：bundle.json 损坏，已保留原文件并停写公司数据（/private/var/folders/0_/42sp51652_79fdjkf6s2xj3w0000gp/T/catalog-wiring-pRPLr7/workspace/.dsh-company/bundle.json：Unterminated string in JSON at position 16 (line 1 column 17)）；修好后重启，或从 home 身份备份恢复（/var/folders/0_/42sp51652_79fdjkf6s2xj3w0000gp/T/catalog-wiring-pRPLr7/company/identity/<bundle-id>.json，仅作恢复参考）
+ ✓ tests/host/ledger/catalog-wiring.spec.ts (5 tests) 187ms
+stderr | tests/client/tabs/cultivation-tab.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+stderr | tests/client/tabs/cultivation-tab.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ tests/host/run-bundle/bootstrap.spec.ts (13 tests) 206ms
+ ✓ tests/harness/repo/foundation-links.spec.ts (17 tests) 414ms
+ ✓ tests/host/index/signoff-tool.spec.ts (4 tests) 264ms
+stderr | tests/client/tabs/attention-tab.spec.ts > 待办页签：挂起项、空态与断流（R3-10） > 挂起项被销账后下一轮轮询回到空态（登记处是活的，不是一次性快照）
+Warning: An update to Root inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+
+ ✓ tests/client/tabs/attention-tab.spec.ts (5 tests) 45ms
+ ✓ tests/client/tabs/cultivation-tab.spec.ts (3 tests) 205ms
+ ✓ tests/harness/session/orient.spec.ts (21 tests) 215ms
+stderr | tests/client/cultivation/cultivation-compose-context.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+stderr | tests/client/company-client-composition.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+stderr | tests/client/cultivation/cultivation-compose-context.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ tests/client/cultivation/cultivation-board-actions.spec.ts (37 tests) 1184ms
+stderr | tests/client/company-client-composition.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ tests/harness/tools/workspace-oracle.spec.ts (10 tests) 49ms
+ ✓ tests/client/data/company-data-lifecycle.spec.ts (6 tests) 58ms
+ ✓ tests/harness/contract/session-persistence-terminal.spec.ts (3 tests) 159ms
+ ✓ tests/client/cultivation/cultivation-chat-panel.spec.ts (5 tests) 76ms
+ ✓ tests/client/ui/client-css.spec.ts (7 tests) 56ms
+ ✓ tests/harness/repo/repository-layout.spec.ts (10 tests) 62ms
+stderr | tests/client/tabs/ledger-tab.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ tests/host/commands/req-command.spec.ts (22 tests) 46ms
+stderr | tests/client/tabs/ledger-tab.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+dsh: company-pack：DSH workspace 登记里有 1 条路径已不存在（/definitely-missing-r4-9f3a）；搬 home/改名后请在侧栏重新添加工作区，旧 session 仍在旧路径下；本包不自动改 DSH 的登记。
+ ✓ tests/host/index/apply-lifecycle.spec.ts (2 tests) 39ms
+ ✓ tests/client/cultivation/cultivation-compose-context.spec.ts (6 tests) 142ms
+ ✓ tests/host/ledger/catalog.spec.ts (15 tests) 42ms
+ ✓ tests/host/cultivation/cultivation-context.spec.ts (8 tests) 23ms
+ ✓ tests/client/cultivation/cultivation-actions.spec.ts (16 tests) 60ms
+ ✓ tests/host/cultivation/method-migration.spec.ts (4 tests) 34ms
+ ✓ tests/host/commands/delivery-mode-scenarios.spec.ts (15 tests) 48ms
+stderr | tests/client/cultivation/cultivation-context-picker.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+stderr | tests/client/cultivation/cultivation-context-picker.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ tests/harness/repo/market-index.spec.ts (6 tests) 41ms
+ ✓ tests/presets/presets.spec.ts (46 tests) 88ms
+ ✓ tests/client/tabs/ledger-tab.spec.ts (2 tests) 54ms
+ ✓ tests/harness/tools/kb-seeds.spec.ts (8 tests) 70ms
+ ✓ tests/client/data/workspace-text.spec.ts (4 tests) 113ms
+ ✓ tests/harness/session/probe-kit.spec.ts (3 tests) 35ms
+stderr | tests/client/tabs/panel-frame.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ tests/client/cultivation/cultivation-context-data.spec.ts (7 tests) 23ms
+stderr | tests/client/tabs/panel-frame.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ tests/client/cultivation/cultivation-context-picker.spec.ts (5 tests) 74ms
+ ✓ tests/presets/delegation-composition.spec.ts (18 tests) 32ms
+ ✓ tests/host/cultivation/cultivation-command.spec.ts (10 tests) 230ms
+ ✓ tests/harness/tools/quality-loop.spec.ts (40 tests) 45ms
+ ✓ tests/harness/evidence/collaboration-probe-verdict.spec.ts (33 tests) 31ms
+ ✓ tests/host/cultivation/cultivation-maintenance.spec.ts (5 tests) 47ms
+ ✓ tests/client/tabs/panel-frame.spec.ts (3 tests) 47ms
+stderr | tests/client/cultivation/cultivation-view.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ tests/host/cultivation/fs-record-sandbox.spec.ts (1 test) 23ms
+stderr | tests/client/cultivation/cultivation-view.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ tests/host/commands/product-type-scenarios.spec.ts (7 tests) 81ms
+ ✓ tests/presets/quality-loop.spec.ts (14 tests) 43ms
+ ✓ tests/host/run-bundle/roster-backfill.spec.ts (4 tests) 54ms
+ ✓ tests/harness/repo/skip-budget.spec.ts (2 tests) 16ms
+ ✓ tests/host/cultivation/fs-record-write.spec.ts (1 test) 23ms
+dsh: company-pack：bundle.json 损坏，已保留原文件并停写公司数据（/private/var/folders/0_/42sp51652_79fdjkf6s2xj3w0000gp/T/runtime-guard-iaAxb4/company/.dsh-company/bundle.json：Expected property name or '}' in JSON at position 1 (line 1 column 2)）；修好后重启，或从 home 身份备份恢复（/var/folders/0_/42sp51652_79fdjkf6s2xj3w0000gp/T/runtime-guard-iaAxb4/home/company/identity/<bundle-id>.json，仅作恢复参考）
+dsh: company-pack：另一个 writer 正在使用这个 home（pid 39803）；公司数据已停写（DSH 会话仍可用），先关掉另一个 writer
+dsh: company-pack：DSH_COMPANY_HOME 指向的目录不存在：/var/folders/0_/42sp51652_79fdjkf6s2xj3w0000gp/T/runtime-guard-2te3mr/missing-workspace；本次不写 run bundle/身份/登记，也不取 lease。在项目目录执行 `dsh --profile company`、设 DSH_COMPANY_HOME，或从侧栏选择 workspace。
+ ✓ tests/host/run-bundle/runtime-guard.spec.ts (4 tests) 18ms
+ ✓ tests/client/cultivation/cultivation-view.spec.ts (3 tests) 53ms
+stderr | tests/client/tabs/ledger-summary-interaction.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ tests/host/run-bundle/two-homes.spec.ts (1 test) 20ms
+ ✓ tests/presets/delegation-retry.spec.ts (10 tests) 14ms
+stderr | tests/client/tabs/ledger-summary-interaction.spec.ts
+Warning: KaTeX doesn't work in quirks mode. Make sure your website has a suitable doctype.
+
+ ✓ tests/host/delegation/subagent-retry.spec.ts (15 tests) 35ms
+ ✓ tests/host/workspace/workspace-resolution.spec.ts (12 tests) 30ms
+ ✓ tests/host/cultivation/revoke-journal.spec.ts (4 tests) 20ms
+ ✓ tests/harness/tools/converge-rules.spec.ts (53 tests) 23ms
+ ✓ tests/client/tabs/ledger-summary-interaction.spec.ts (2 tests) 16ms
+ ✓ tests/client/cultivation/cultivation-board.spec.ts (19 tests) 32ms
+ ✓ tests/lib/requirements-check.spec.ts (19 tests) 14ms
+ ✓ tests/client/wiring/instance-guard.spec.ts (4 tests) 6ms
+ ✓ tests/client/tabs/company-tab-registration.spec.ts (3 tests) 23ms
+ ✓ tests/harness/session/session-log-generation.spec.ts (11 tests) 12ms
+ ✓ tests/harness/tools/deliverables-audit.spec.ts (41 tests) 27ms
+ ✓ tests/host/run-bundle/untrusted-project.spec.ts (3 tests) 22ms
+ ✓ tests/harness/repo/pack-source.spec.ts (4 tests) 19ms
+ ✓ tests/host/ledger/governance-export.spec.ts (2 tests) 27ms
+ ✓ tests/client/tabs/dag-visual-fixture.spec.ts (1 test) 14ms
+ ✓ tests/harness/repo/release-foundation.spec.ts (9 tests) 15ms
+ ✓ tests/client/tabs/board-panel.spec.ts (5 tests) 28ms
+ ✓ tests/client/data/catalog-contract.spec.ts (5 tests) 28ms
+ ✓ tests/harness/repo/runtime-layout.spec.ts (5 tests) 9ms
+ ✓ tests/host/run-bundle/bundle-manifest.spec.ts (5 tests) 16ms
+ ✓ tests/host/run-bundle/company-fixture.spec.ts (5 tests) 24ms
+ ✓ tests/lib/doors.spec.ts (3 tests) 13ms
+ ✓ tests/host/commands/prd-command.spec.ts (6 tests) 19ms
+ ✓ tests/client/cultivation/cultivation-context.spec.ts (43 tests) 17ms
+ ✓ tests/host/prompt/handbook.spec.ts (6 tests) 13ms
+ ✓ tests/client/data/delegation-tree.spec.ts (9 tests) 11ms
+ ✓ tests/harness/session/entry-probe.spec.ts (20 tests) 10ms
+ ✓ tests/client/wiring/error-ring.spec.ts (5 tests) 10ms
+ ✓ tests/lib/dag.spec.ts (20 tests) 10ms
+ ✓ tests/harness/tools/methods-init.spec.ts (4 tests) 11ms
+ ✓ tests/client/tabs/tasks-table.spec.ts (6 tests) 10ms
+ ✓ tests/host/delegation/workflow-runs.spec.ts (6 tests) 5ms
+ ✓ tests/client/tabs/company-tabs-body.spec.ts (2 tests) 13ms
+ ✓ tests/host/workspace/workspace-doors.spec.ts (4 tests) 17ms
+ ✓ tests/harness/tools/notes-audit.spec.ts (23 tests) 12ms
+ ✓ tests/harness/session/probe-web.spec.ts (16 tests) 13ms
+ ✓ tests/client/tabs/dag-panel.spec.ts (13 tests) 13ms
+ ✓ tests/host/ledger/presented-domain.spec.ts (7 tests) 16ms
+ ✓ tests/content/requirements-templates.spec.ts (9 tests) 8ms
+ ✓ tests/presets/delegation-model.spec.ts (12 tests) 8ms
+ ✓ tests/harness/tools/authorship.spec.ts (19 tests) 8ms
+ ✓ tests/lib/prd-check.spec.ts (8 tests) 7ms
+ ✓ tests/client/tabs/company-panels.spec.ts (5 tests) 7ms
+ ✓ tests/harness/repo/keyless-imports.spec.ts (5 tests) 16ms
+ ✓ tests/client/ui/style-lifecycle.spec.ts (3 tests) 6ms
+ ✓ tests/harness/evidence/surface-matrix.spec.ts (14 tests) 7ms
+ ✓ tests/client/ui/role-badge.spec.ts (8 tests) 8ms
+ ✓ tests/harness/evidence/collaboration-evidence.spec.ts (8 tests) 4ms
+ ✓ tests/client/ui/delegation-card.spec.ts (7 tests) 11ms
+ ✓ tests/lib/cultivation.spec.ts (21 tests) 10ms
+ ✓ tests/client/ui/team-tool-card.spec.ts (9 tests) 10ms
+ ✓ tests/client/wiring/attention.spec.ts (9 tests) 4ms
+ ✓ tests/client/tabs/ledger-summary.spec.ts (5 tests) 4ms
+ ✓ tests/presets/delivery-mode-coverage.spec.ts (7 tests) 4ms
+ ✓ tests/lib/presence-board.spec.ts (17 tests) 6ms
+ ✓ tests/host/prompt/contracts.spec.ts (5 tests) 5ms
+ ✓ tests/client/tabs/panel-freshness.spec.ts (2 tests) 6ms
+ ✓ tests/client/wiring/company-context-wiring.spec.ts (8 tests) 5ms
+ ✓ tests/client/tabs/deliverables-catalog.spec.ts (11 tests) 4ms
+ ✓ tests/host/ledger/presented-domain-real.spec.ts (1 test) 6ms
+ ✓ tests/harness/tools/candidate-scan-labels.spec.ts (26 tests) 6ms
+ ✓ tests/host/run-bundle/lease.spec.ts (2 tests) 7ms
+ ✓ tests/lib/board.spec.ts (17 tests) 9ms
+ ✓ tests/presets/product-type-coverage.spec.ts (9 tests) 6ms
+ ✓ tests/client/ui/brand.spec.ts (4 tests) 6ms
+ ✓ tests/content/templates.spec.ts (4 tests) 5ms
+ ✓ tests/harness/contract/workflow-result-budget.spec.ts (3 tests) 8ms
+ ✓ tests/harness/evidence/claim-loser-evidence.spec.ts (9 tests) 4ms
+ ✓ tests/harness/repo/navigation-assets.spec.ts (7 tests) 4ms
+ ✓ tests/client/wiring/member-navigation.spec.ts (4 tests) 3ms
+ ✓ tests/harness/repo/src-layering.spec.ts (6 tests) 6ms
+ ✓ tests/lib/ledger.spec.ts (6 tests) 5ms
+ ✓ tests/harness/evidence/team-barrier-evidence.spec.ts (4 tests) 3ms
+ ✓ tests/harness/evidence/member-stale-evidence.spec.ts (4 tests) 3ms
+ ✓ tests/harness/tools/question-stop.spec.ts (13 tests) 5ms
+ ✓ tests/content/delivery-modes.spec.ts (7 tests) 5ms
+ ✓ tests/harness/repo/snapshots-budget.spec.ts (4 tests) 2ms
+ ✓ tests/harness/repo/pack-engines.spec.ts (1 test) 3ms
+ ✓ tests/harness/session/replay-fixture-freshness.spec.ts (5 tests) 5ms
+ ✓ tests/content/product-types.spec.ts (5 tests) 3ms
+ ✓ tests/harness/session/session-evidence.spec.ts (6 tests) 4ms
+ ✓ tests/client/wiring/client-face.spec.ts (5 tests) 4ms
+ ✓ tests/client/wiring/error-relay.spec.ts (5 tests) 5ms
+ ✓ tests/harness/ui/ui-surface.spec.ts (5 tests) 4ms
+ ✓ tests/client/tabs/delegation-flow-panel.spec.ts (2 tests) 9ms
+ ✓ tests/harness/tools/deliverables.spec.ts (8 tests) 4ms
+ ✓ tests/client/ui/role-mark-fixture.spec.ts (1 test) 5ms
+ ✓ tests/content/requirements-contract.spec.ts (7 tests) 3ms
+ ✓ tests/harness/repo/checks-index.spec.ts (3 tests) 4ms
+ ✓ tests/harness/repo/dev-install.spec.ts (13 tests) 4ms
+ ✓ tests/harness/session/session-diagnose.spec.ts (13 tests) 8ms
+ ✓ tests/host/run-bundle/profiles.spec.ts (1 test) 3ms
+ ✓ tests/harness/session/probe-steps.spec.ts (4 tests) 5ms
+ ✓ tests/harness/ui/ui-golden.spec.ts (5 tests) 4ms
+ ✓ tests/client/ui/motion-css.spec.ts (3 tests) 4ms
+ ✓ tests/harness/evidence/recovery-scope-evidence.spec.ts (4 tests) 4ms
+ ✓ tests/harness/repo/prune-policy.spec.ts (3 tests) 3ms
+ ✓ tests/client/wiring/title-state.spec.ts (5 tests) 2ms
+ ✓ tests/client/wiring/attention-observers.spec.ts (6 tests) 6ms
+ ✓ tests/harness/repo/install-manual.spec.ts (5 tests) 4ms
+ ✓ tests/harness/repo/fixture-provenance.spec.ts (2 tests) 3ms
+ ✓ tests/client/wiring/company-session-adapters.spec.ts (1 test) 2ms
+ ✓ tests/harness/repo/pack-metadata.spec.ts (2 tests) 4ms
+ ✓ tests/presets/delegation-contract.spec.ts (4 tests) 4ms
+ ✓ tests/lib/abortable.spec.ts (4 tests) 5ms
+ ✓ tests/host/commands/deliverables-command.spec.ts (5 tests) 7ms
+ ✓ tests/client/ui/float-geometry.spec.ts (11 tests) 7ms
+ ✓ tests/harness/session/replay-logic.spec.ts (6 tests) 3ms
+ ✓ tests/harness/repo/tracked-secrets.spec.ts (5 tests) 2ms
+ ✓ tests/client/tabs/board-drift-fixture.spec.ts (1 test) 6ms
+ ✓ tests/lib/budget.spec.ts (4 tests) 5ms
+ ✓ tests/harness/repo/snapshot-index.spec.ts (2 tests) 2ms
+ ✓ tests/harness/ui/company-tab-catalog.spec.ts (2 tests) 4ms
+ ✓ tests/lib/yaml-scalar.spec.ts (2 tests) 3ms
+ ✓ tests/harness/contract/json-schema-subset.spec.ts (4 tests) 3ms
+ ✓ tests/lib/text-and-status.spec.ts (2 tests) 3ms
+ ✓ tests/harness/tools/deliverables-catalog-tools.spec.ts (5 tests) 3ms
+ ✓ tests/harness/tools/audit-verdict.spec.ts (3 tests) 1ms
+ ✓ tests/harness/session/cdp-attach.spec.ts (1 test) 3ms
+ ✓ tests/harness/repo/tracked-token.spec.ts (3 tests) 5ms
+ ✓ tests/harness/contract/delegation-depth-truth-table.spec.ts (5 tests) 3ms
+ ✓ tests/host/workspace/workspace-registry.spec.ts (2 tests) 1ms
+ ✓ tests/harness/repo/gitignore-guards.spec.ts (3 tests) 2ms
+ ✓ tests/host/delegation/delegation-terminal.spec.ts (2 tests) 3ms
+ ✓ tests/lib/signoff.spec.ts (3 tests) 1ms
+ ✓ tests/client/company-client-composition.spec.ts (3 tests) 7474ms
+     ✓ boots the pack row and registers the nine company tabs with keyed slots  7143ms
+ ✓ tests/harness/repo/pack-exports.spec.ts (2 tests) 2ms
+
+ Test Files  180 passed (180)
+      Tests  1513 passed (1513)
+   Start at  06:07:32
+   Duration  12.01s (transform 23.63s, setup 0ms, import 54.98s, tests 15.80s, environment 4.83s)

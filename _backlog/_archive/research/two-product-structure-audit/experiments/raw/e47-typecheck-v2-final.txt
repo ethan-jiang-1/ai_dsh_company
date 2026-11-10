@@ -1,0 +1,1 @@
+$ node ./node_modules/typescript/bin/tsc -b packages/company-pack && node ./node_modules/typescript/bin/tsc -p tsconfig.test-client.json && node ./node_modules/typescript/bin/tsc -p tsconfig.test-company.json && node ./node_modules/typescript/bin/tsc -p tsconfig.test-harness.json

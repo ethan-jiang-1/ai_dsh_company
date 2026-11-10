@@ -12,6 +12,8 @@
 | `policy-lines.md` | 签字线 / 预算线 / 并行上限 | 人 | 报缺；**没有它不许报价** |
 | `owners.md` | 谁对应哪个角色、能答什么 | 人 | 报缺；按角色问人 |
 | `review-protocol.md` | 复核声明 / 对外件闸门 | 人 | 报缺；对外件 fail-closed |
+| `roster.md` | 席位名册（席位 → 谁 / 投入 / 可承接） | 人 | 报缺；`<待填>` = 配置缺口，不判“没人” |
+| `rates.md` | 人力费率卡（人·周成本） | 人 | 报缺；`<待填>` = 配置缺口，不编费率 |
 | `motion-ledger.md` | 动议台账 | CEO / 操作员 | 空可继续，台账从 0 起 |
 | `process-docs.md` | 编号合同的播种副本（权威在 pack 的类型包） | 人 | 报缺；以 pack 版为准 |
 | `<role>/CHARTER.md` | 角色长期摘要 | 人（收敛时） | 报缺；从默认章程重建 |
@@ -21,7 +23,7 @@
 
 1. `company.md` —— 我是谁、哪个 `productType`
 2. `policy-lines.md` —— 钱与线（报价 / 折扣 / 预算前必读）
-3. 按需：`org.md`（编制）、`owners.md`（人）、`review-protocol.md`（对外件）
+3. 按需：`org.md`（编制）、`roster.md`（席位）、`rates.md`（费率）、`owners.md`（人）、`review-protocol.md`（对外件）
 4. 自己的 `CHARTER.md` + 最近 3 篇 `journal/`
 
 ## 缺件纪律（fail-loud）

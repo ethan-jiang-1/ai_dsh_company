@@ -6,6 +6,7 @@
 > **编制唯一事实家 = `company-workspace/.dsh-company/kb/org.md`**（细到岗位）；各角色 CHARTER 只留本条线事实
 > 并引用它（Q3：公司事实活数据留 workspace，pack 不含公司事实——D17）。
 > **工作流惯例**：每个角色至少 1 个自己的端到端工作流 skill（`<role>-workflow`，1 号）；
+> **方法契约惯例**：CFO/COO/VP-Sales 的每个 skill 顶部声明 `适用产品类型` 与 `需要事实`；类型/事实不适用 → fail-closed（门禁 `method-contract`）。
 > 后续按 `<role>-workflow-<主题>` 追加第 2、3 个——CEO 的工作流即 `chairing-staff-meeting`。
 
 ## 名册（运行时实测）
@@ -60,8 +61,8 @@
   `tech-feasibility-review`（选项枚举 ≥3 → 逐项可行性·成本·风险 → 结论先行）。
 - **PRD 主笔**：接 CMO 的 MRD+StRS 写产品层 PRD（`drafts/prd.md`：REQ/AC/slice，`source`→MR、`traces`→StRS），用 `prd-playbook` + 共享 `product-definition`；`/prd check`（结构）+ `/req check`（编号/追溯）校验。
 - **组队（2 号工作流）**：`eng-teaming` 五档（自己做 / 一次性 worker / 并行扇出（workflow）/ 命名专家 / 持久小队）；vp-eng 根门 = Team Lead，可带研发小队；CMO 走命名委托（`vp_cmo`，depth 2）。
-- **KB**：`kb/vp-eng/CHARTER.md`（研发条线 16 人、SRE 2 / 无 DBA、Node 22 + SQLite、AI 试点
-  API 每案 $200/月硬顶；历史评审三问）+ `journal/`。
+- **KB**：`kb/vp-eng/CHARTER.md`（研发条线 16 人、SRE 2 / 无 DBA、Node 22 + SQLite、历史评审三问；
+  AI 试点 API 硬顶见 `policy-lines.md`「试点预算」）+ `journal/`。
 - **验证**：Web 会话选 `vp-eng` → 身份探针 + 产出探针（PRD 出稿：REQ/AC/slice；评审意见；不得越权替销售/运营下结论）。
 
 ## VP of Sales（职能化身：现有客户/销售，R2 定稿；新市场/新产品归 CMO）
@@ -71,15 +72,15 @@
   引用 KB 客户与竞品事实，**禁止虚构客户**；不替研发/运营下结论。
 - **工作流（1 号）**：`sales-workflow`（接活→备料→测算→出稿→回执）；打法 skill =
   `market-sizing`（双向估算 + **MEDDIC 六问**单单资格 + 敏感度；数字标【事实/假设】）、
-  `customer-voice`（只认行为不认表态；每条判断带 KB 出处）。
+  `customer-voice`（只认行为不认表态；每条判断带 KB 出处）、`pricing`（项目制/SI；business-software fail-closed）。
 - **KB**：`kb/vp-sales/CHARTER.md`（客户事实：9 家中型企业、痛点=系统间对不上账；竞品两类；
-  定价原则：里程碑收款 3-4-3、维护年费 15–20%、折扣下限 9 折 + CFO 毛利底线 30% 双签）+ `journal/`。
+  定价原则：项目制/SI 3-4-3；维护年费、折扣/毛利线见 `policy-lines.md`；business-software 缺定价方法 → fail-closed）+ `journal/`。
 - **验证**：Web 会话选 `vp-sales` → 三探针（身份=视角与 veto 边界；知识=KB 客户数与定价原则；
   产出=对 PRD 出定价/现有客户影响意见（新市场归 CMO），不越权）。
 
 ## CMO（职能化身：市场与产品定义，2026-11-05 增设）
 - **persona**：视角=市场机会/产品定义/买点；"市场不成立"即 veto；产出 MRD（`MR-###`）+ StRS（`REQ-###`，`traces`→MR，标【事实/假设】）；不替 VP-Sales 定价、不替 VP-Eng 定技术。
-- **打法**：`mrd-playbook` + 共享 `product-definition`（脊柱 + 项目制/系统集成、硬软一体 playbook）。
+- **打法**：`mrd-playbook` + 共享 `product-definition`（脊柱 + 硬软一体 / 纯软 playbook；交付模式另轴 = `content/delivery-modes/` 的 `project-services` / `managed-service`，不是产品类型）。
 - **KB/验证**：`kb/cmo/CHARTER.md` + `journal/`；选 `cmo` 跑身份/知识/产出三探针；MRD→PRD 交接见 demo.md。
 
 ## COO（职能化身：运营，R2 定稿）
@@ -88,11 +89,10 @@
   合规过不去）；产出=运营方案 + 预算核查（`templates/ops-review-note.md`）；核查语言 =
   SOW / 里程碑验收 / RACI；不替研发/销售下结论。
 - **工作流（1 号）**：`ops-workflow`（接活→备料→核查→出稿→回执）；打法 skill =
-  `ops-feasibility`（人力列到人、SOW/RACI、外部依赖单列）、`budget-check`（对照预算基准标
+  `ops-feasibility`（席位名册三态、SOW/RACI、外部依赖单列）、`budget-check`（对照预算基准标
   【基准内/新增/超限】；人力换算"人·周"记机会成本；最坏档压力测试）。
-- **KB**：`kb/coo/CHARTER.md`（交付条线 18 人；并行交付项目上限 8；交付制 SOW + UAT；
-  预算基准引 org.md：云 $2,000/月、AI 试点每案 $200/月、固定支出 ≥$500/月 CFO 会签 + CEO 签）
-  + `journal/`。
+- **KB**：`kb/coo/CHARTER.md`（交付条线 18 人；交付制 SOW + UAT（项目制/SI；business-software
+  fail-closed）；并行上限 / 预算线见 `policy-lines.md`，席位见 `roster.md`，费率见 `rates.md`）+ `journal/`。
 - **验证**：Web 会话选 `coo` → 三探针（身份=视角与 veto 边界；知识=并行项目上限与审批线；
   产出=对一页方案出落地核查，不越权）。
 
@@ -102,7 +102,7 @@
   底线 / 账务或税务不合规）；产出=项目经济性测算 + 财务合规意见（`templates/decision-memo.md`）；
   SoD 与留痕是硬闸门；不替研发/运营下结论。
 - **工作流（1 号）**：`cfo-workflow`（接活→备料→测算→合规→出稿→回执）；打法 skill =
-  `project-economics`（毛利底线 30% 签字线、人·周分摊、3-4-3 收款曲线与垫资）、
+  `project-economics`（项目制/SI；毛利线见 `policy-lines.md`、人·周 × `rates.md`、3-4-3 与垫资）、
   `finance-compliance`（SoD、留痕字段、四流一致、AI 产出不得入账——影子账闸门）。
 - **KB**：`kb/cfo/CHARTER.md`（财务条线 4 人；SoD 纪律；毛利底线与双签线；审批线与现金流原则）
   + `journal/`。

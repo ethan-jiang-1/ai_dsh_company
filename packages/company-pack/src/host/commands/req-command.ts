@@ -15,6 +15,7 @@ import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
 import { checkRequirements, isLayer, type MotionDoc } from '../../lib/requirements-check.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
+import { yamlScalar } from '../../lib/yaml-scalar.ts'
 
 export const REQ_USAGE = '用法：/req check <deliverables 目录名>（读 .dsh-company/deliverables/<name>/drafts/{mrd,strs,prd,syrs,irs,vv-plan}.md + meta.md）'
 
@@ -62,16 +63,76 @@ interface ProductTypeResolution {
 /** 读 `产品类型:` / `productType:` 行；模板占位 `<...>` 视为未声明。 */
 function parseProductType(text: string | undefined): string | null {
   if (text === undefined) return null
-  const match = /^(?:产品类型|productType)\s*[:：]\s*(\S+)\s*$/m.exec(text)
-  const value = match?.[1]?.trim() ?? ''
+  const match = /^(?:产品类型|productType)\s*[:：]\s*(.+)$/m.exec(text)
+  const value = yamlScalar(match?.[1] ?? '')
   if (value === '' || (value.startsWith('<') && value.endsWith('>'))) return null
   return value
+}
+
+/** 读 `交付模式:` / `deliveryMode:` 行；缺省 = productized（不阻塞旧动议）。 */
+function parseDeliveryMode(text: string | undefined): string {
+  if (text === undefined) return 'productized'
+  const match = /^(?:交付模式|deliveryMode)\s*[:：]\s*(.+)$/m.exec(text)
+  const value = yamlScalar(match?.[1] ?? '')
+  if (value === '' || (value.startsWith('<') && value.endsWith('>'))) return 'productized'
+  return value
+}
+
+/** 读 meta 的 `需求层:` 声明（空 = 未声明）。 */
+function parseDeclaredLayers(text: string | undefined): string[] {
+  if (text === undefined) return []
+  const match = /^需求层:\s*(.*)$/m.exec(text)
+  if (match === null) return []
+  return (match[1] ?? '').split(/[,，、;；\s]+/).map(item => item.trim()).filter(item => item !== '')
+}
+
+/** 是否显式声明了真实交付模式（缺省/占位符不算）。 */
+function hasDeclaredDeliveryMode(text: string | undefined): boolean {
+  if (text === undefined) return false
+  const match = /^(?:交付模式|deliveryMode)\s*[:：]\s*(.+)$/m.exec(text)
+  const value = yamlScalar(match?.[1] ?? '')
+  return value !== '' && !(value.startsWith('<') && value.endsWith('>'))
+}
+
+/** v1 交付提醒文档：优先读 delivery-rules 的 `v1Reminder`，缺规则时用内置两条兜底。 */
+function deliveryReminderFiles(contentDir: string | undefined, mode: string): string[] {
+  const fallback: Record<string, string[]> = {
+    'project-services': ['sow.md', 'uat.md'],
+    'managed-service': ['sla.md', 'runbook.md'],
+  }
+  if (contentDir === undefined) return fallback[mode] ?? []
+  try {
+    const rules = JSON.parse(readFileSync(join(contentDir, 'delivery-modes', mode, 'delivery-rules.json'), 'utf8')) as {
+      v1Reminder?: unknown
+      documents?: Record<string, { file?: unknown }>
+    }
+    const docs = rules.documents ?? {}
+    const keys = Array.isArray(rules.v1Reminder) ? rules.v1Reminder : Object.keys(docs)
+    return keys
+      .map(key => docs[String(key)]?.file)
+      .filter((file): file is string => typeof file === 'string' && /^drafts\/[a-z0-9-]+\.md$/.test(file))
+      .map(file => file.replace(/^drafts\//, ''))
+  } catch {
+    return fallback[mode] ?? []
+  }
 }
 
 /** 盘上可用的产品类型 id（只用于错误提示）。 */
 function availableProductTypes(contentDir: string): string[] {
   try {
     return readdirSync(join(contentDir, 'product-types'), { withFileTypes: true })
+      .filter(entry => entry.isDirectory())
+      .map(entry => entry.name)
+      .sort()
+  } catch {
+    return []
+  }
+}
+
+/** 盘上可用的交付模式 id（只用于错误提示；productized 是默认，不建包）。 */
+function availableDeliveryModes(contentDir: string): string[] {
+  try {
+    return readdirSync(join(contentDir, 'delivery-modes'), { withFileTypes: true })
       .filter(entry => entry.isDirectory())
       .map(entry => entry.name)
       .sort()
@@ -152,7 +213,47 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
         return { kind: 'error' as const, text: resolution.error }
       }
       const rules = resolution.rules
-      const typeNote = resolution.source === 'motion' ? `；动议类型 = ${String(resolution.id)}` : ''
+      // 回落不再静默（BUG-062）：回执点名来源，用户能看见「没在 meta 声明」。
+      const typeNote = resolution.id === null
+        ? ''
+        : resolution.source === 'motion'
+          ? `；动议类型 = ${resolution.id}（meta.md）`
+          : `；动议类型 = ${resolution.id}（company.md 默认，未在 meta 声明）`
+      const metaText = readIfExists(join(root, 'meta.md'))
+      const deliveryMode = parseDeliveryMode(metaText)
+      if (options.contentDir !== undefined && deliveryMode !== 'productized'
+        && !existsSync(join(options.contentDir, 'delivery-modes', deliveryMode))) {
+        const available = ['productized', ...availableDeliveryModes(options.contentDir)]
+        return {
+          kind: 'error' as const,
+          text: `未知交付模式「${deliveryMode}」（来自 meta.md）；可用：${available.join(' / ')}`,
+        }
+      }
+      const deliveryDeclared = hasDeclaredDeliveryMode(metaText)
+      const deliveryNote = deliveryMode === 'project-services'
+        ? '；交付模式 = project-services（SOW/UAT/RACI 归 COO；项目经济性归 CFO；文档见 content/delivery-modes/project-services/）'
+        : deliveryMode === 'managed-service'
+          ? '；交付模式 = managed-service（SLA/值班/月报归 COO；续费经济性归 CFO；文档见 content/delivery-modes/managed-service/）'
+          : `；交付模式 = ${deliveryMode}${deliveryDeclared ? '' : '（默认）'}`
+      if (rules !== null && rules.layers !== undefined) {
+        const allowed = new Set(rules.layers)
+        const unsupported = parseDeclaredLayers(metaText).filter(isLayer).filter(layer => !allowed.has(layer))
+        if (unsupported.length > 0) {
+          return {
+            kind: 'error' as const,
+            text: `产品类型「${rules.productType ?? resolution.id ?? '未知'}」不支持需求层 ${unsupported.join('/')}；可用层：${rules.layers.join('/')}`,
+          }
+        }
+      }
+      const hasDoc = (name: string): boolean => existsSync(join(dir, name))
+      const deliveryWarnings: string[] = []
+      if (deliveryMode === 'project-services' || deliveryMode === 'managed-service') {
+        const missing = deliveryReminderFiles(options.contentDir, deliveryMode).filter(name => !hasDoc(name))
+        if (missing.length > 0) deliveryWarnings.push(`缺 ${missing.join(' / ')}（${deliveryMode} 需要）`)
+      } else if (hasDoc('sow.md') || hasDoc('sla.md')) {
+        deliveryWarnings.push('productized 动议出现 SOW/SLA 文档，确认交付模式是否选错')
+      }
+      const deliveryWarningNote = deliveryWarnings.length === 0 ? '' : `；交付提醒：${deliveryWarnings.join('；')}`
       const customLayers = (rules?.layers ?? []).filter(layer => !isLayer(layer))
       if (rules !== null && customLayers.length > 0) {
         return {
@@ -160,7 +261,6 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
           text: `本产品类型（${rules.productType ?? '未知'}）不走五层编号体系（层 = ${(rules.layers ?? []).join('/')}）；按 product-types/${rules.productType ?? ''}/overview.md 的文档链自查。`,
         }
       }
-      const metaText = readIfExists(join(root, 'meta.md'))
       const checkOptions = rules === null
         ? {}
         : {
@@ -178,7 +278,7 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
       const { counts, definitions, edges } = result.index
       return {
         kind: 'success' as const,
-        text: `编号校验通过（${parsed.slug}）：MR ${String(counts.MR)} / REQ ${String(counts.REQ)} / IF ${String(counts.IF)} / TC ${String(counts.TC)} / AC ${String(counts.AC)}；层 = ${result.layers.join('/')}${typeNote}；索引 = ${String(definitions.length)} 条定义 / ${String(edges.length)} 条追溯。`,
+        text: `编号校验通过（${parsed.slug}）：MR ${String(counts.MR)} / REQ ${String(counts.REQ)} / IF ${String(counts.IF)} / TC ${String(counts.TC)} / AC ${String(counts.AC)}；层 = ${result.layers.join('/')}${typeNote}${deliveryNote}${deliveryWarningNote}；索引 = ${String(definitions.length)} 条定义 / ${String(edges.length)} 条追溯。`,
       }
     },
   })

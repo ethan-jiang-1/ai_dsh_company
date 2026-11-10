@@ -4,10 +4,14 @@ description: 项目经济性测算：报价毛利底线（签字线见 `.dsh-com
 ---
 # 项目经济性测算（一页纸）
 
+> **方法契约**：适用产品类型 = all；适用交付模式 = project-services；
+> 需要事实 = kb/roster.md（席位 / 人力）、kb/rates.md（人·周成本）；缺 = fail-closed（报「缺方法 / 配置缺口」，不套 3-4-3、不编数）。
+> 交付文档 = `content/delivery-modes/project-services/document-map.md`。
+
 对任何报价 / 预算 / 立项的标准打法：
 
-1. **收入侧**：合同额按里程碑拆收款曲线（公司惯例 3-4-3）；维护年费单列（≈ 项目额 15–20%）。
-2. **成本侧**：人力按"人·周"× 条线分摊（编制与费率基准见 `.dsh-company/kb/org.md` 与 `.dsh-company/kb/cfo/CHARTER.md`）；
+1. **收入侧**：合同额按里程碑拆收款曲线（公司惯例 3-4-3）；维护年费单列，口径见 `.dsh-company/kb/policy-lines.md`。
+2. **成本侧**：人力按"人·周"× 条线分摊（编制见 `.dsh-company/kb/org.md`；席位见 `.dsh-company/kb/roster.md`；费率卡 = `.dsh-company/kb/rates.md`——`<待填>` = 配置缺口，先要费率；拿不到用区间 / 上界并标【未证明成立】，不编美元数）；
    云与外包按预算基准；漏项按最坏档补——"先低报后追加"不算口径。**跨职能数字（研发人天、
    交付人天等）取 owner 口径重算，不自行占位**——自己的估算只作对照并标【我的估算】，
    两家口径不收敛时并列报出交 CEO 裁。
@@ -17,6 +21,8 @@ description: 项目经济性测算：报价毛利底线（签字线见 `.dsh-com
    被拒绝就按拒绝意见改写或行使 veto；无人应答（fail-closed）则把该事项写进未决项，不落对外结论。
 4. **现金风险**：垫资月数 = 成本先于收款的时间；垫资超一个月的合同先过 CFO；收款滞后一档公司现金能不能撑——撑不住即 veto。
 5. **格式与交付**：按 `<company-content>/templates/decision-memo.md` 结构，一页纸为限，交付到 `.dsh-company/deliverables/<slug>/drafts/cfo.md`。
+
+**交付模式边界**：本方法只用于 `交付模式 = project-services`。`productized` 动议（含 SaaS / 私有化 / 永久授权）缺产品定价 / 经济方法 → 先报「缺方法」，不套 3-4-3 / 维护年费。
 
 红线：数字要可复现（算式 + 乘数逐项列出）；**门槛类算式过边界值自查**——每个乘数加在哪一项
 逐项点名、临界值代回原式验方向（乘数加错项的偏差是系统性的，可达 2 倍量级）；

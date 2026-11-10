@@ -11,6 +11,7 @@ import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSy
 import { homedir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 import { isAbsolute, join, relative, resolve, sep } from 'node:path'
+import { yamlScalar } from '../../lib/yaml-scalar.ts'
 import { RUN_BUNDLE_DIR, RUN_BUNDLE_REL } from '../run-bundle/run-bundle.ts'
 
 /** 六角色（researcher 没有 CHARTER）。 */
@@ -18,6 +19,10 @@ export const COMPANY_ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo'] 
 
 /** kb 装配清单（pack 内，source → workspace target）。 */
 const SEED_MANIFEST = 'kb-setup/seed.json'
+/** 类型相关 seed 的 source 占位：`product-types/{productType}/requirements-model.md`。 */
+export const PRODUCT_TYPE_TOKEN = '{productType}'
+/** 部署默认类型的来源（workspace 盘没有时读 pack 的出厂值）。 */
+const COMPANY_SOURCE = 'state/company.md'
 /** 编制漂移补种源（与 seed 清单分开：这里用 canonical 文本合并节/行）。 */
 const ORG_SOURCE = 'state/org.md'
 const OWNERS_SOURCE = 'state/owners.md'
@@ -42,6 +47,8 @@ export interface BootstrapPlan {
   readonly entries: readonly BootstrapEntry[]
   readonly creates: number
   readonly skips: number
+  /** 可继续的装配告警（如类型相关 seed 缺 productType）：不阻断其余 seed。 */
+  readonly warnings: readonly string[]
   readonly error?: string
 }
 
@@ -75,18 +82,49 @@ export function resolveContentDir(moduleUrl: string): string {
   return fileURLToPath(new URL('../content/', moduleUrl))
 }
 
+/** 部署默认产品类型：workspace 的 company.md 优先；没有则读 pack 的出厂 `state/company.md`。 */
+export interface CompanyProductType {
+  readonly type: string | null
+  readonly source: 'workspace' | 'pack' | null
+}
+
+/** 从 company.md 读 `productType:`（模板占位 `<...>` 视为未声明）。 */
+function readProductType(path: string): string | null {
+  if (!existsSync(path)) return null
+  try {
+    const match = /^(?:productType|产品类型)\s*[:：]\s*(.+)$/m.exec(readFileSync(path, 'utf8'))
+    const value = yamlScalar(match?.[1] ?? '')
+    return value === '' || (value.startsWith('<') && value.endsWith('>')) ? null : value
+  } catch {
+    return null
+  }
+}
+
+/**
+ * 解析本次装配要用的产品类型：workspace 的 `kb/company.md` 优先（部署配置），
+ * 没有这份盘再读 pack 的 `state/company.md`（首启要播种的出厂值）。
+ */
+export function resolveCompanyProductType(contentDir: string, workspace: string): CompanyProductType {
+  const workspaceCompany = join(workspace, RUN_BUNDLE_REL.kb, 'company.md')
+  if (existsSync(workspaceCompany)) return { type: readProductType(workspaceCompany), source: 'workspace' }
+  const packCompany = join(contentDir, COMPANY_SOURCE)
+  if (existsSync(packCompany)) return { type: readProductType(packCompany), source: 'pack' }
+  return { type: null, source: null }
+}
+
 /**
  * 读 content/ + 目标 workspace，算出「要建什么」。只读不写。
  * @param contentDir - pack 的 `content/`。
  * @param workspace - 用户 workspace 根（绝对路径）。
  */
 export function planBootstrap(contentDir: string, workspace: string): BootstrapPlan {
-  const base = { workspace, contentDir }
+  const base = { workspace, contentDir, warnings: [] as string[] }
   if (!existsSync(contentDir) || !lstatSync(contentDir).isDirectory()) {
     return { ...base, entries: [], creates: 0, skips: 0, error: `content 目录不存在：${contentDir}` }
   }
-  const { seeds, error } = readSeeds(contentDir)
-  if (error !== undefined) return { ...base, entries: [], creates: 0, skips: 0, error }
+  const company = resolveCompanyProductType(contentDir, workspace)
+  const { seeds, error, warnings = [] } = readSeeds(contentDir, { productType: company.type })
+  if (error !== undefined) return { ...base, entries: [], creates: 0, skips: 0, warnings, error }
   const entries: BootstrapEntry[] = []
   let creates = 0
   let skips = 0
@@ -103,7 +141,7 @@ export function planBootstrap(contentDir: string, workspace: string): BootstrapP
     const exists = existsSync(join(workspace, seed.target))
     add({ rel: seed.target, sourceRel: seed.source, kind: 'file', action: exists ? 'skip' : 'create' })
   }
-  return { ...base, entries, creates, skips }
+  return { ...base, entries, creates, skips, warnings }
 }
 
 /** 读 kb 装配清单；缺源 / target 越界 / 重复 target 都在这里 fail-loud。 */
@@ -112,7 +150,25 @@ export interface SeedEntry {
   readonly target: string
 }
 
-export function readSeeds(contentDir: string): { readonly seeds: readonly SeedEntry[]; readonly error?: string } {
+export interface ReadSeedsOptions {
+  /** 运行盘 company.md 的 productType；`null` = 未声明。 */
+  readonly productType?: string | null
+}
+
+export interface SeedReadResult {
+  readonly seeds: readonly SeedEntry[]
+  readonly error?: string
+  readonly warnings?: readonly string[]
+}
+
+/** 合法类型 id（与 `/req check` 的盘上目录名口径一致）。 */
+const TYPE_ID = /^[a-z][a-z0-9-]*$/
+
+/**
+ * 读 kb 装配清单，解析 `{productType}` 占位。类型相关条目缺类型 / 未知类型时
+ * **跳过该条并给 warning**（fail-closed：不猜一个类型播种），其余条目照常。
+ */
+export function readSeeds(contentDir: string, options: ReadSeedsOptions = {}): SeedReadResult {
   const path = join(contentDir, SEED_MANIFEST)
   if (!existsSync(path)) return { seeds: [], error: `缺 kb 装配清单：${SEED_MANIFEST}（安装形状不完整）` }
   let parsed: { seeds?: unknown }
@@ -123,28 +179,47 @@ export function readSeeds(contentDir: string): { readonly seeds: readonly SeedEn
   }
   const items = Array.isArray(parsed.seeds) ? parsed.seeds : []
   if (items.length === 0) return { seeds: [], error: `kb 装配清单为空：${SEED_MANIFEST}` }
+  const productType = options.productType ?? null
+  const warnings: string[] = []
+  const seeds: SeedEntry[] = []
   const sources = new Set<string>()
   const targets = new Set<string>()
   for (const item of items) {
     const record = item as { source?: unknown; target?: unknown }
-    const source = typeof record.source === 'string' ? record.source : ''
+    const rawSource = typeof record.source === 'string' ? record.source : ''
     const target = typeof record.target === 'string' ? record.target : ''
-    if (source === '' || target === '') return { seeds: [], error: `kb 装配清单条目不完整：${JSON.stringify(item)}` }
+    if (rawSource === '' || target === '') return { seeds: [], error: `kb 装配清单条目不完整：${JSON.stringify(item)}` }
     if (isAbsolute(target) || target.split('/').includes('..')) {
       return { seeds: [], error: `kb 装配 target 越界：${target}` }
     }
     if (!target.startsWith(`${RUN_BUNDLE_DIR}/`)) {
       return { seeds: [], error: `kb 装配 target 必须在 ${RUN_BUNDLE_DIR}/ 内：${target}` }
     }
-    if (!existsSync(join(contentDir, source))) {
+    if (targets.has(target)) return { seeds: [], error: `kb 装配重复 target：${target}` }
+    targets.add(target)
+    let source = rawSource
+    if (source.includes(PRODUCT_TYPE_TOKEN)) {
+      if (productType === null || productType === '') {
+        warnings.push(`kb 装配条目 ${target} 需要 company.md 的 productType，但 company.md 未声明；跳过该条`)
+        continue
+      }
+      if (!TYPE_ID.test(productType)) {
+        warnings.push(`kb 装配条目 ${target} 的 productType「${productType}」不是合法类型 id；跳过该条`)
+        continue
+      }
+      source = source.split(PRODUCT_TYPE_TOKEN).join(productType)
+      if (!existsSync(join(contentDir, source))) {
+        warnings.push(`kb 装配条目 ${target} 的 productType「${productType}」解析不到 ${source}；跳过该条`)
+        continue
+      }
+    } else if (!existsSync(join(contentDir, source))) {
       return { seeds: [], error: `kb 装配缺源：${source}（${SEED_MANIFEST} 指向的文件不存在）` }
     }
     if (sources.has(source)) return { seeds: [], error: `kb 装配重复 source：${source}` }
-    if (targets.has(target)) return { seeds: [], error: `kb 装配重复 target：${target}` }
     sources.add(source)
-    targets.add(target)
+    seeds.push({ source, target })
   }
-  return { seeds: items.map(item => item as SeedEntry) }
+  return { seeds, ...(warnings.length > 0 ? { warnings } : {}) }
 }
 
 /**
@@ -291,7 +366,7 @@ export function planRoleBackfill(contentDir: string, workspace: string): RoleBac
   const entries: BootstrapEntry[] = []
   const drift = { missingCharter: [] as string[], missingOrg: [] as string[], missingOwners: [] as string[] }
   const base: RoleBackfillPlan = {
-    workspace, contentDir, entries, creates: 0, skips: 0, drift,
+    workspace, contentDir, entries, creates: 0, skips: 0, drift, warnings: [],
   }
   if (!existsSync(contentDir) || !lstatSync(contentDir).isDirectory()) {
     return { ...base, error: `content 目录不存在：${contentDir}` }

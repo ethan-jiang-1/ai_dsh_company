@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "target 相对 workspace；mode 恒为 only-fill（wx，绝不覆盖）。source 相对 content/。缺源 = 装配错误（fail-loud）。",
+  "note": "target 相对 workspace；mode 恒为 only-fill（wx，绝不覆盖）。source 相对 content/；`{productType}` = company.md 的 productType（缺/未知 fail-closed，不猜）。缺源 = 装配错误（fail-loud）。",
   "seeds": [
     {
       "source": "state/company.md",
@@ -15,6 +15,10 @@
       "target": ".dsh-company/kb/owners.md"
     },
     {
+      "source": "state/roster.md",
+      "target": ".dsh-company/kb/roster.md"
+    },
+    {
       "source": "state/motion-ledger.md",
       "target": ".dsh-company/kb/motion-ledger.md"
     },
@@ -27,7 +31,11 @@
       "target": ".dsh-company/kb/review-protocol.md"
     },
     {
-      "source": "product-types/hardware-software/requirements-model.md",
+      "source": "company/rates.md",
+      "target": ".dsh-company/kb/rates.md"
+    },
+    {
+      "source": "product-types/{productType}/requirements-model.md",
       "target": ".dsh-company/kb/process-docs.md"
     },
     {

@@ -6,7 +6,9 @@
  * ② 状态实例（company/org/owners/ledger/charter）只补缺；
  * ③ 手册/模板不进 run bundle（只读内容住 pack `content/`）；
  * ④ 可重入：第二次全 skip，已有文件字节不变；
- * ⑤ content 缺失/落点不安全时不抛，返回可诊断错误。
+ * ⑤ content 缺失/落点不安全时不抛，返回可诊断错误；
+ * ⑥ 类型相关 seed（`{productType}`）按运行盘 company.md 的 productType 解析；缺/未知不猜
+ *    （跳过该条 + warning，其余 seed 照常）。
  */
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
@@ -32,7 +34,7 @@ function content(): string {
   writeFileSync(join(dir, 'templates/meta.md'), '# meta 模板\n')
   const roles = ['ceo', 'cfo', 'coo', 'cmo', 'vp-eng', 'vp-sales']
   for (const role of roles) writeFileSync(join(dir, `charters/${role}.md`), `# ${role} 默认章程\n`)
-  writeFileSync(join(dir, 'state/company.md'), '# 公司身份\n')
+  writeFileSync(join(dir, 'state/company.md'), '---\nproductType: business-software\n---\n# 公司身份\n')
   writeFileSync(join(dir, 'state/org.md'), '# 组织\n')
   writeFileSync(join(dir, 'state/owners.md'), '# owners\n')
   writeFileSync(join(dir, 'state/motion-ledger.md'), '# 台账\n')
@@ -40,8 +42,10 @@ function content(): string {
   const margin = loadCompanyFixture('acme-hardware-software').policy['毛利底线'] ?? '样例'
   writeFileSync(join(dir, 'company/policy-lines.md'), `# 政策线\n\n- 毛利底线: ${margin}\n`)
   writeFileSync(join(dir, 'company/review-protocol.md'), '# 复核协议\n')
-  mkdirSync(join(dir, 'product-types/hardware-software'), { recursive: true })
-  writeFileSync(join(dir, 'product-types/hardware-software/requirements-model.md'), '# 编号合同\n')
+  for (const [id, text] of Object.entries({ 'hardware-software': '# 五层合同\n', 'business-software': '# 三层合同\n' })) {
+    mkdirSync(join(dir, 'product-types', id), { recursive: true })
+    writeFileSync(join(dir, 'product-types', id, 'requirements-model.md'), text)
+  }
   mkdirSync(join(dir, 'kb-setup'), { recursive: true })
   writeFileSync(join(dir, 'kb-setup/guide.md'), '# kb 地图\n')
   writeFileSync(join(dir, 'kb-setup/run-bundle.md'), '# run bundle\n')
@@ -53,7 +57,7 @@ function content(): string {
     { source: 'state/motion-ledger.md', target: '.dsh-company/kb/motion-ledger.md' },
     { source: 'company/policy-lines.md', target: '.dsh-company/kb/policy-lines.md' },
     { source: 'company/review-protocol.md', target: '.dsh-company/kb/review-protocol.md' },
-    { source: 'product-types/hardware-software/requirements-model.md', target: '.dsh-company/kb/process-docs.md' },
+    { source: 'product-types/{productType}/requirements-model.md', target: '.dsh-company/kb/process-docs.md' },
     { source: 'kb-setup/guide.md', target: '.dsh-company/kb/AGENTS.md' },
     { source: 'kb-setup/run-bundle.md', target: '.dsh-company/README.md' },
   ]
@@ -118,7 +122,7 @@ describe('run bundle v3：applyBootstrap（只补缺 / 绝不覆盖 / 可重入�
       expect(first.plan.error).toBeUndefined()
       expect(first.result.created).toContain('.dsh-company/kb/company.md')
       expect(first.result.created, 'fresh 盘 seed 编号合同').toContain('.dsh-company/kb/process-docs.md')
-      expect(readFileSync(join(workspace, '.dsh-company/kb/process-docs.md'), 'utf8')).toBe('# 编号合同\n')
+      expect(readFileSync(join(workspace, '.dsh-company/kb/process-docs.md'), 'utf8')).toBe('# 三层合同\n')
       expect(first.result.created).toContain('.dsh-company/kb/cmo/CHARTER.md')
       expect(readFileSync(join(workspace, '.dsh-company/kb/cmo/CHARTER.md'), 'utf8')).toBe('# cmo 默认章程\n')
       expect(readFileSync(join(workspace, '.dsh-company/kb/org.md'), 'utf8')).toBe('# 组织\n')
@@ -162,6 +166,72 @@ describe('run bundle v3：applyBootstrap（只补缺 / 绝不覆盖 / 可重入�
       expect(existsSync(workspace)).toBe(false)
     } finally {
       rmSync(workspace, { recursive: true, force: true })
+    }
+  })
+})
+
+describe('类型相关播种：按 company.md 的 productType 选合同', () => {
+  it('workspace 的 company.md 指定 hardware-software ⇒ 五层合同', () => {
+    const pack = content()
+    const workspace = mkdtempSync(join(tmpdir(), 'company-ws-'))
+    try {
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: "hardware-software" # 默认\n---\n')
+      const { plan, result } = bootstrapCompanyWorkspace(pack, workspace)
+      expect(plan.error).toBeUndefined()
+      const entry = plan.entries.find(item => item.rel === '.dsh-company/kb/process-docs.md')
+      expect(entry?.sourceRel, '播种源要随类型解析').toBe('product-types/hardware-software/requirements-model.md')
+      expect(result.created).toContain('.dsh-company/kb/process-docs.md')
+      expect(readFileSync(join(workspace, '.dsh-company/kb/process-docs.md'), 'utf8')).toBe('# 五层合同\n')
+    } finally {
+      rmSync(pack, { recursive: true, force: true }); rmSync(workspace, { recursive: true, force: true })
+    }
+  })
+
+  it('company.md 缺 productType ⇒ 不播 process-docs，warning 点名缺什么，其余照常', () => {
+    const pack = content()
+    const workspace = mkdtempSync(join(tmpdir(), 'company-ws-'))
+    try {
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '# 公司身份（没写类型）\n')
+      const { plan, result } = bootstrapCompanyWorkspace(pack, workspace)
+      expect(plan.entries.some(entry => entry.rel === '.dsh-company/kb/process-docs.md')).toBe(false)
+      expect(plan.warnings.join('\n')).toContain('productType')
+      expect(existsSync(join(workspace, '.dsh-company/kb/process-docs.md'))).toBe(false)
+      expect(result.skipped).toContain('.dsh-company/kb/company.md')
+      expect(result.created, '其余 seed 不能被一个坏类型连坐').toContain('.dsh-company/kb/org.md')
+    } finally {
+      rmSync(pack, { recursive: true, force: true }); rmSync(workspace, { recursive: true, force: true })
+    }
+  })
+
+  it('未知 productType ⇒ 不播 process-docs，warning 点名类型', () => {
+    const pack = content()
+    const workspace = mkdtempSync(join(tmpdir(), 'company-ws-'))
+    try {
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: mystery\n---\n')
+      const { plan } = bootstrapCompanyWorkspace(pack, workspace)
+      expect(plan.entries.some(entry => entry.rel === '.dsh-company/kb/process-docs.md')).toBe(false)
+      expect(plan.warnings.join('\n')).toContain('mystery')
+      expect(existsSync(join(workspace, '.dsh-company/kb/process-docs.md'))).toBe(false)
+    } finally {
+      rmSync(pack, { recursive: true, force: true }); rmSync(workspace, { recursive: true, force: true })
+    }
+  })
+
+  it('既有 process-docs 不被覆盖（only-fill）', () => {
+    const pack = content()
+    const workspace = mkdtempSync(join(tmpdir(), 'company-ws-'))
+    try {
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: hardware-software\n---\n')
+      writeFileSync(join(workspace, '.dsh-company/kb/process-docs.md'), '# 用户迁移过的三层合同\n')
+      const { result } = bootstrapCompanyWorkspace(pack, workspace)
+      expect(result.skipped).toContain('.dsh-company/kb/process-docs.md')
+      expect(readFileSync(join(workspace, '.dsh-company/kb/process-docs.md'), 'utf8')).toBe('# 用户迁移过的三层合同\n')
+    } finally {
+      rmSync(pack, { recursive: true, force: true }); rmSync(workspace, { recursive: true, force: true })
     }
   })
 })

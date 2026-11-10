@@ -2,20 +2,86 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮拿到 ≥3 张卡，先按根因分组列表再逐卡修——逐症状打补丁会把同一根因修三遍。
 
-**下一个缺陷号**：Next BUG ID = 61；已分配 BUG-001..060。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 71；已分配 BUG-001..070。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。
 
 ## 活跃清单
 
+**2026-11-11 根因组 A（产品类型轴三处各自为政）——已收口**：允许值、默认值、播种各有一份事实。
+三张卡已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；次序 = 先定单一来源 → 再校准默认 →
+再让播种消费；证据 = [Note](../../notes/implemented/2026-11-11-product-type-single-source.md)。
+
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
+| — | 当前无活跃缺陷卡（071+ 为新卡号） | — |
+| —（历史） | BUG-067 / BUG-068 / BUG-069 / BUG-070 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：pack 路径 / tier / 政策数字 / 委派真值四类声明↔载体对账；见 [Note](../../notes/implemented/2026-11-11-declaration-carrier-gates.md) | — |
+| —（历史） | BUG-064 / BUG-065 / BUG-066 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：方法契约（类型适用性 + 事实载体 + fail-closed）+ `method-contract` 门禁；见 [Note](../../notes/implemented/2026-11-11-method-contract-type-facts.md) | — |
 | —（历史） | BUG-056 已修并迁 [fixed_bugs](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)：质量环裁决头哈希改由 pack 内 `verdict-hash.mjs` 回填；`未复验` 成为 audit warning | — |
 | —（历史） | BUG-054 / BUG-055 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：dev/rehearsal kb 改由 seed.json 派生；team 角色包补任务书路径 + 署名行只抄真实文件 | — |
 | —（历史） | BUG-051 / BUG-052 / BUG-053 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：worker family 的 control 过滤 + fan-out 诚实声明；`subagent_retry` 取消收敛 | — |
 | —（历史） | BUG-050 复核为**环境陈旧误报**（dev profile 安装副本未更新），已迁 [fixed_bugs](../_archive/fixed_bugs/BUG-050-retry-depth-fix-fails-in-real-assembly.md)；BUG-045 / 046 / 047 / 048 / 049 已修 | — |
 | —（历史） | BUG-045 / BUG-046 / BUG-047 / BUG-048 / BUG-049 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：retry 注册面/深度单源 + 越界可见拒绝；`list_subagents` 暴露引擎身份；handbook 按 worker family 派生；UI 金样随显示名收窄刷新 | — |
 | —（历史） | BUG-034 / BUG-035 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：SA/SQA 证据链必查（时间源 + 故障路径耐受）+ 审计 Q8–Q11；2026-11-07 E2E v8 验收 | — |
+
+**2026-11-11 后续（E5–E11，根因组 B/C/D/E）——已全部收口**：经营组 B/E（064–066）与
+内容/门禁组 C（067–069）+ 委派语义（070）均已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；
+证据 = [经营组 Note](../../notes/implemented/2026-11-11-method-contract-type-facts.md) ·
+[声明↔载体 Note](../../notes/implemented/2026-11-11-declaration-carrier-gates.md)。
+
+## 2026-11-11 修复交接（内容/门禁组 C + D：BUG-067 / 068 / 069 / 070）
+
+**用户指令（2026-11-11）**：按审计建议 064 → 065/066 → 067–069 → 070 排期继续收口。
+四张卡同型 = 声明↔载体漂移（pack 路径 / tier 标签 / 政策数字 / `maxDepth` 例子）；
+修法 = 新 `pack-content-paths` + `content-manifest` tier 对账 + `content-single-home` 派生词表 +
+`base-clean` 个案语言 denylist + 委派真值表 spec；留痕 = Note。
+
+| 卡 | 根因 | 修法 | 留痕 |
+|---|---|---|---|
+| [BUG-067](../_archive/fixed_bugs/BUG-067-process-docs-dead-pointers.md) | pack-relative 死指针 | 新门禁 `pack-content-paths`；4 处 process-docs 指针改类型包 | Note |
+| [BUG-068](../_archive/fixed_bugs/BUG-068-base-clean-deployment-case-language.md) | 门禁判据窄于教义 | 服务类附赠整块搬 policy-lines；`base-clean` 加 charter 个案语言 denylist | Note |
+| [BUG-069](../_archive/fixed_bugs/BUG-069-tier-policy-gate-coverage.md) | tier / 政策数字自由文本 | `content-manifest` 解析 `加载：` 对账；`content-single-home` 从 policy-lines 派生词表 | Note |
+| [BUG-070](../_archive/fixed_bugs/BUG-070-delegation-maxdepth-example-wrong.md) | 文档例子违背绝对语义 | `delegation.md` 真值；vendor `resolveChildDepth` keyless spec | Note |
+
+**收口（2026-11-11）**：四张卡已修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；`pnpm verify` / `pnpm test` /
+`pnpm typecheck` / `pnpm lint` 绿；决定与红→绿证据 = [Note](../../notes/implemented/2026-11-11-declaration-carrier-gates.md)。
+
+## 2026-11-11 修复交接（经营组 B/E：BUG-064 / 065 / 066）
+
+**用户指令（2026-11-11）**：「没事，出来的继续做……都修好」「按审计建议 064 → 065/066 → 067–069 → 070 排期」——
+本句即本轮授权（材料性：presets / content / docs）。三张卡同型 = 方法没有声明类型 / 事实、缺了不 fail-closed；
+修法 = 方法契约 + 事实载体（`kb/rates.md` / `kb/roster.md`）+ `method-contract` 门禁；留痕 = Note。
+
+| 卡 | 根因 | 修法 | 留痕 |
+|---|---|---|---|
+| [BUG-064](../_archive/fixed_bugs/BUG-064-methods-not-product-type-aware.md) | 方法不随类型 | 10 个经营侧 skill 加方法契约；项目制方法只适用 hardware-software，business-software fail-closed；三个 workflow 加类型分派 | Note |
+| [BUG-065](../_archive/fixed_bugs/BUG-065-cfo-rate-card-missing.md) | 费率无出处 | 新增 `content/company/rates.md` → seed `kb/rates.md`；CFO 方法改读；`<待填>` = 配置缺口 | Note |
+| [BUG-066](../_archive/fixed_bugs/BUG-066-coo-person-level-staffing-without-roster.md) | 证据粒度错位 | 新增 `content/state/roster.md` → seed `kb/roster.md`；COO 三态区分配置缺口 / 真没人 | Note |
+
+**收口（2026-11-11）**：三张卡已修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；`pnpm verify` / `pnpm test` /
+`pnpm typecheck` 绿、`preset-smoke` ALL PASS；决定与红→绿证据 = [Note](../../notes/implemented/2026-11-11-method-contract-type-facts.md)。
+
+## 2026-11-11 修复交接（根因组 A：BUG-061 / 062 / 063）
+
+**用户指令（2026-11-11）**：「_backlog/bugs 也发现了几个bug，你看一看，判断一下修的次序，我们把它都修好吧」——本句即本轮授权。
+三张卡同根因（产品类型轴三处各自为政：允许值 / 默认值 / 播种），按「先定单一来源 → 再校准默认 → 再让播种消费」
+次序修复；修复触碰 `presets/_shared/skills/product-definition/`、`content/{charters,templates,state,kb-setup,product-types}/`、
+`docs/guides/` 与 host 代码（company-pack 公开行为 + docs 合同 = 材料性），按章程「材料性修复不自授权」本应请示；
+用户本轮明确点名修复，按「已由用户授权的工作按原授权继续」执行；留痕 = Note。
+
+| 次序 | 卡 | 根因 | 修法 | 留痕 |
+|---|---|---|---|---|
+| 1 | [BUG-061](../_archive/fixed_bugs/BUG-061-product-type-allowed-values-drift.md) | 允许值多源 + 幽灵第三类 | 类型目录 = 唯一枚举；agent 面改指针；新门禁 `product-type-sources`；`project-services` 标未来类型（沿用 2026-11-10 决定） | Note |
+| 2 | [BUG-062](../_archive/fixed_bugs/BUG-062-default-product-type-contradicts-business.md) | 默认值不随业务 | 默认改 `business-software`；`/req check` 回执点名 company 回落来源 | Note |
+| 3 | [BUG-063](../_archive/fixed_bugs/BUG-063-bootstrap-process-docs-always-hardware.md) | 播种不看类型 | seed 用 `{productType}` 占位；bootstrap/tools 解析 + 缺/未知 fail-closed | Note |
+
+**收口（2026-11-11）**：三张卡已按上述次序修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；
+`pnpm verify` / `pnpm test` / `pnpm typecheck` 绿、`preset-smoke` ALL PASS；决定与红→绿证据 =
+[Note](../../notes/implemented/2026-11-11-product-type-single-source.md)。
+
+**收口要求**：每卡按「已修判定」留真红→绿证据与 `审查：` 记录，再 `git mv` 到
+[fixed_bugs](../_archive/fixed_bugs/) 并同步两张索引；`pnpm verify` + `pnpm test` 全绿
+（TS 面加 `pnpm typecheck`）；改 preset skill 后跑 `preset-smoke`。
 
 ## 2026-11-10 修复交接（BUG-057）
 

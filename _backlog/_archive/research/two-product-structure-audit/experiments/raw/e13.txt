@@ -1,0 +1,18 @@
+
+# packages/company-pack/presets/_shared/skills/quality-loop/SKILL.md (2 hits)
+3: description: 质量环（quality-loop-producer → quality-loop-verifier → 处置 → 复验）：把复杂产出交给两个独立 activation——一个按外部方法包做、一个按同一方法包独立复核，裁决原文落盘可审计。任务书必须点名方法包 `<pack>@<version>`，没给就 fail-closed 停下。
+155: - 标注 = **上下文独立复核（同模异上下文，独立性有限）**——不得报成"异人"或"双人复核"。
+
+# packages/company-pack/content/company/review-protocol.md (3 hits)
+6: - **复核独立性层级** =（机械全量重算（规则确定性 ⇒ 独立性成立）｜上下文独立复核（同模但异上下文/异检索，独立性有限，**不得报成「异人」**）｜判断类复核（同模异线程，独立性有限））｜**关键结论边际宽度** =（差几格 / 几个百分点翻面；本件无因果结论写「无」）。
+9: - **质量环的独立性口径**：`quality-loop-producer` / `quality-loop-verifier` 两个能力档跑出来的裁决 = **上下文独立复核**（同模异上下文，独立性有限）——
+10: 它解决锚定、自我评分与注意力稀释，**不解决**同源盲区与模型相关性，**不得**记成「异人复核」或「双人复核」，关键结论旁仍标边际宽度。
+
+# docs/guides/quality-loop.md (1 hits)
+84: - **不解决同源盲区**：独立性层级 = 上下文独立复核（同模异上下文），对外签字仍归人（`review-protocol.md`）。
+
+# packages/company-pack/presets/quality-loop-verifier/agent.cordis.yml (1 hits)
+25: 你是质量环的验证者——独立复核产出者产物的那一侧。你不是公司角色，也不代表任何职能；公司名/业务/编制不在这里。
+
+# packages/company-pack/presets/quality-loop-producer/agent.cordis.yml (1 hits)
+29: 你的产物要能被人独立复核：结论先行；判断依据（读过的文件、跑过的命令与原始输出、外部来源）写进产物或随产物交付；范围与未决单列，别把假设当结论。

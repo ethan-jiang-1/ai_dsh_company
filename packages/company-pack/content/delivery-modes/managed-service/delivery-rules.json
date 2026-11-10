@@ -1,0 +1,104 @@
+{
+  "deliveryMode": "managed-service",
+  "kind": "delivery",
+  "entry": "overview.md",
+  "documents": {
+    "SLA": {
+      "file": "drafts/sla.md",
+      "owner": "COO",
+      "template": "templates/sla.md"
+    },
+    "SERVICE_CATALOG": {
+      "file": "drafts/service-catalog.md",
+      "owner": "COO",
+      "template": "templates/service-catalog.md"
+    },
+    "RUNBOOK": {
+      "file": "drafts/runbook.md",
+      "owner": "COO",
+      "template": "templates/runbook.md"
+    },
+    "INCIDENT": {
+      "file": "drafts/incidents.md",
+      "owner": "COO",
+      "template": "templates/incident.md"
+    },
+    "MONTHLY_REPORT": {
+      "file": "drafts/monthly-report.md",
+      "owner": "COO",
+      "template": "templates/monthly-report.md"
+    },
+    "RENEWAL": {
+      "file": "drafts/renewal.md",
+      "owner": "VP-Sales",
+      "template": "templates/renewal.md"
+    }
+  },
+  "requiredFields": {
+    "SLA": [
+      "scope",
+      "hours",
+      "response",
+      "resolution",
+      "credits",
+      "exclusions"
+    ],
+    "SERVICE_CATALOG": [
+      "services",
+      "tiers",
+      "hours",
+      "pricePointer"
+    ],
+    "RUNBOOK": [
+      "monitoring",
+      "backup",
+      "escalation",
+      "maintenanceWindow"
+    ],
+    "INCIDENT": [
+      "severity",
+      "owner",
+      "communication",
+      "postmortem"
+    ],
+    "MONTHLY_REPORT": [
+      "slaActuals",
+      "incidents",
+      "changes",
+      "risks",
+      "next"
+    ],
+    "RENEWAL": [
+      "valueReview",
+      "churnRisk",
+      "price",
+      "exitPlan"
+    ]
+  },
+  "notes": "持续服务不是一次性项目；一个动议一个交付模式。实施 + 维护拆成两个动议。v1 不新增 /delivery check。",
+  "requiredSections": {
+    "SLA": [
+      "## 2. 服务时间与可用性",
+      "## 3. 响应与恢复"
+    ],
+    "SERVICE_CATALOG": [
+      "## 分级 / 套餐"
+    ],
+    "RUNBOOK": [
+      "## 4. 值班与升级路径"
+    ],
+    "INCIDENT": [
+      "## 复盘规则"
+    ],
+    "MONTHLY_REPORT": [
+      "## 1. SLA 实际值"
+    ],
+    "RENEWAL": [
+      "## 3. 退出 / 移交"
+    ]
+  },
+  "v1Reminder": [
+    "SLA",
+    "RUNBOOK"
+  ]
+}

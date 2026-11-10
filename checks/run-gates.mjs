@@ -32,6 +32,10 @@ import * as baseClean from './gates/base-clean.mjs'
 import * as contentSingleHome from './gates/content-single-home.mjs'
 import * as genericClean from './gates/generic-clean.mjs'
 import * as contentManifest from './gates/content-manifest.mjs'
+import * as productTypeSources from './gates/product-type-sources.mjs'
+import * as deliveryModeSources from './gates/delivery-mode-sources.mjs'
+import * as methodContract from './gates/method-contract.mjs'
+import * as packContentPaths from './gates/pack-content-paths.mjs'
 import * as rosterConsistency from './gates/roster-consistency.mjs'
 import * as testsLiterals from './gates/tests-literals.mjs'
 import * as seedIntegrity from './gates/seed-integrity.mjs'
@@ -113,6 +117,10 @@ baseClean.run(ctx)
 contentSingleHome.run(ctx)
 genericClean.run(ctx)
 contentManifest.run(ctx)
+productTypeSources.run(ctx)
+deliveryModeSources.run(ctx)
+methodContract.run(ctx)
+packContentPaths.run(ctx)
 rosterConsistency.run(ctx)
 testsLiterals.run(ctx)
 seedIntegrity.run(ctx)

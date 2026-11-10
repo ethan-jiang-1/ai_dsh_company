@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 /Users/bowhead/ai_dsh_company
+
+ ✓ tests/content/product-types.spec.ts (5 tests) 3ms
+ ✓ tests/content/type-seed-divergence.spec.ts (3 tests) 3ms
+ ✓ tests/host/run-bundle/bootstrap-content.spec.ts (3 tests) 21ms
+
+ Test Files  3 passed (3)
+      Tests  11 passed (11)
+   Start at  06:39:00
+   Duration  139ms (transform 93ms, setup 0ms, import 116ms, tests 28ms, environment 0ms)

@@ -34,6 +34,8 @@ v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajecto
 
 ## 近期归档
 
+- 两轴交付模式 v2 卡 2026-11-11 已结：`/delivery check`（独立命令，查 documents.file + requiredSections）+ 硬软能力前置 `capabilities.md`；productized 方法“以后做”、默认交付模式保留 `productized`；去向 = [Note](../../notes/implemented/2026-11-11-delivery-check-v2.md)；卡在[归档](../_archive/settled_issues/2026-11-11-delivery-mode-v2.md)。
+- 两轴交付模式卡 2026-11-11 已结：`project-services` + `managed-service` 落成 content 一等能力；meta 交付模式 / 经营方法 / workflow 分派 / awareness / sources 门禁 / 两轴测试矩阵；去向 = [Note](../../notes/implemented/2026-11-11-delivery-mode-axis.md)；卡在[归档](../_archive/settled_issues/2026-11-11-delivery-mode-axis.md)。
 - workflow + subagent 探索测试 bug hunt 2026-11-08 已结：八轮探索 + 资产先行（A/B），BUG-045–060 全部修复归档；决策记忆 = [资产策略 Note](../../notes/implemented/2026-11-10-exploration-asset-strategy.md)；卡在[归档](../_archive/settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)。
 - 问题与缺陷的留痕决定点卡 2026-11-10 已结：材料性 = 授权与留痕共用判据（章程一处定义）+ 缺陷轨 `留痕：` 裁决 + 归档卡去向落点解析门（self-link 红→绿）；2 卡 + 6 索引行落点修复；`verify` ALL PASS、167 files/1348 tests；去向 = [Note](../../notes/implemented/2026-11-10-materiality-and-trace-decision.md)；卡在[归档](../_archive/settled_issues/2026-11-10-materiality-and-trace-decision.md)。
 - README/手册使用者面向卡 2026-11-08 已结：七问冷读 README 5.0→7.0/7、手册 5.0→7/7 + `readme-manual-commands` 门 + 2 张真实例截图；去向 = [Note](../../notes/archived/2026-11-08-user-facing-readme-and-first-use.md)；卡在[归档](../_archive/settled_issues/2026-11-08-user-facing-readme-and-first-use.md)。

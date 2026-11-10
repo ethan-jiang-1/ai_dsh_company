@@ -1,0 +1,95 @@
+// 状态：常驻
+// 何时跑：改 `checks/gates/` 的判据、或发布前；keyless，秒级。
+// 跑法：`node checks/smoke/gates-negative-smoke.mjs`
+//
+// 为什么在 smoke 而不在 tests/：门禁读的是根驱动面（checks/gates），tests/ 的 layering 守卫
+// 禁止 import checks 驱动；负例要复制 content/presets 再跑门禁，属于入口级检查。
+//
+// gate → 破坏方式 → 期望消息：
+//   method-contract       project-economics 的 `适用交付模式 = nope`          → 没有交付模式包
+//   pack-content-paths    AGENTS 加 `` `content/nope.md` ``                    → 死指针
+//   content-single-home   删 policy-lines 的“服务信用”行                     → 缺政策线
+//   content-manifest      company/ 加一份未登记 .md                           → 未登记的 content 文件
+//   base-clean            charter 加“公司财务 agent 案（日期待核）”           → 含部署个案语言
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import * as baseClean from '../gates/base-clean.mjs'
+import * as contentManifest from '../gates/content-manifest.mjs'
+import * as contentSingleHome from '../gates/content-single-home.mjs'
+import * as methodContract from '../gates/method-contract.mjs'
+import * as packContentPaths from '../gates/pack-content-paths.mjs'
+
+const ROOT = new URL('../../', import.meta.url).pathname
+
+function makeRoot() {
+  const root = mkdtempSync(join(tmpdir(), 'gates-negative-'))
+  cpSync(join(ROOT, 'packages/company-pack/content'), join(root, 'packages/company-pack/content'), { recursive: true })
+  cpSync(join(ROOT, 'packages/company-pack/presets'), join(root, 'packages/company-pack/presets'), { recursive: true })
+  return root
+}
+
+function run(gate, root) {
+  const messages = []
+  gate.run({
+    root,
+    ok: (msg) => messages.push(`OK ${msg}`),
+    fail: (name, msg) => messages.push(`FAIL ${name}: ${msg}`),
+  })
+  return messages
+}
+
+let failures = 0
+const report = (label, messages, needle) => {
+  const passed = messages.some(msg => msg.startsWith('FAIL') && msg.includes(needle))
+  if (!passed) failures += 1
+  console.log(`${passed ? 'PASS' : 'FAIL'} ${label}`)
+  for (const message of messages.slice(0, 2)) console.log(`  ${message}`)
+}
+
+{
+  const root = makeRoot()
+  try {
+    const path = join(root, 'packages/company-pack/presets/cfo/skills/project-economics/SKILL.md')
+    writeFileSync(path, readFileSync(path, 'utf8').replace('适用交付模式 = project-services', '适用交付模式 = nope'))
+    report('method-contract：未知交付模式 → 红', run(methodContract, root), '没有交付模式包')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  const root = makeRoot()
+  try {
+    const path = join(root, 'packages/company-pack/content/AGENTS.md')
+    writeFileSync(path, `${readFileSync(path, 'utf8')}\n死指针：\`content/nope.md\`\n`)
+    report('pack-content-paths：content/nope.md → 红', run(packContentPaths, root), '死指针')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  const root = makeRoot()
+  try {
+    const path = join(root, 'packages/company-pack/content/company/policy-lines.md')
+    writeFileSync(path, readFileSync(path, 'utf8').replace(/^- \*\*服务信用\*\*.*$/m, ''))
+    report('content-single-home：删服务信用 → 红', run(contentSingleHome, root), '缺政策线「服务信用」')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  const root = makeRoot()
+  try {
+    writeFileSync(join(root, 'packages/company-pack/content/company/zz-unlisted.md'), '# 未登记\n')
+    report('content-manifest：未登记文件 → 红', run(contentManifest, root), '未登记的 content 文件')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  const root = makeRoot()
+  try {
+    const path = join(root, 'packages/company-pack/content/charters/cfo.md')
+    writeFileSync(path, readFileSync(path, 'utf8').replace('## 历史纪要', '- 公司财务 agent 案（日期待核）。\n\n## 历史纪要'))
+    report('base-clean：部署个案语言 → 红', run(baseClean, root), '含部署个案语言')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+console.log(failures === 0 ? 'gates-negative-smoke: ALL PASS' : `gates-negative-smoke: ${failures} FAILURE(S)`)
+process.exitCode = failures === 0 ? 0 : 1

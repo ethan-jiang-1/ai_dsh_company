@@ -59,7 +59,7 @@ opened: YYYY-MM-DD
 ## 索引
 
 
-（2026-11-11 workflow + subagent 探索题随其最后一张活卡归档，迁入[研究归档](../_archive/research/README.md)。）
+（2026-11-11 两产品结构审计题随其末张活卡归档，迁入[研究归档](../_archive/research/README.md)；同批 workflow + subagent 探索题也已归档。）
 （2026-11-10 preset 委派架构 / SA-SQA 产物评审 / 组织协同拓扑三题随各自末张活卡归档，迁入[研究归档](../_archive/research/README.md)。）
 （2026-11-08 VP-Eng 委派拓扑题随 workflow 通道卡归档，迁入[研究归档](../_archive/research/README.md)。）
 （2026-11-07 需求识别/编号题与 VP-Eng 组队题随程序伞卡归档，迁入[研究归档](../_archive/research/README.md)。）

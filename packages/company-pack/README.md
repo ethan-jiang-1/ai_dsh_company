@@ -65,7 +65,7 @@ tarball 的**绝对路径**。按提示重启正在使用的 profile，之后用
 
 - 六个角色 preset（CEO / VP-Eng / VP-Sales / COO / CFO / CMO）+ worker family（worker / worker-researcher / worker-orchestrator）+ 质量环两档（quality-loop-producer / quality-loop-verifier）；
 - 产品定义：默认链 MRD → StRS → PRD——CMO 出 MRD（`MR-###`）+ StRS（`REQ-###`），VP-Eng 出 PRD（`REQ-###` / `AC-###-#` / slice）；SyRS/IRS/V&V 改为按需指派 owner；
-  编号合同（R1–R10、退役词、范围豁免、并发）住 `content/state/process-docs.md`；共享 `product-definition`；
+  编号合同（R1–R10、退役词、范围豁免、并发）住 `content/product-types/<id>/requirements-model.md`（`<id>` = `productType`）；共享 `product-definition`；
   `/prd check <目录名>` 校验 MRD/PRD 结构，`/req check <目录名>` 校验编号/层/追溯/退役词/计数（操作员命令，角色不自证）；
 - host 行：签字、工作区门、团队、present、日期/节律、公司 client 面、公司状态初始化、
   workspace 登记、handbook `systemPrompt.section`、成品目录/账本；
@@ -145,9 +145,9 @@ rm -f  <DSH_HOME>/storages/company_run_bundle_ledger.json
 - **依赖图串行长链高度可超单屏**：`fitScale` 只缩宽、不缩高；21 节点**串行链**合成样本高 2366px，窄 pane 自带纵向滚动（用户接受）。真 21 节点会话是宽图（1716×321），390 窄栏只横向滚动、无纵向双滚动，见[看板卡](../../_backlog/_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md)。
 - **成品目录读生成索引**：`kb/deliverables-index.json` 由本部署 host 在首启 / `present` 后生成（`presented` 来自 host 观测到的 present 事件；未核 = `null`，不冒充 false）；面板只读、不实时。完整审计仍是操作员/第二阶段职责。
 - 浮窗几何记忆（位置/大小按页签 contentId 存 localStorage）按 **origin** 隔离：同一次服务运行 + 页面刷新有效；换端口重启即新 origin、记忆清零（vendor 侧栏布局持久化同此边界）。
-- **三层内容与加载档位（2026-11-09）**：`content/generic/`（T0 常驻 + T2 按需）/ `content/product-types/<id>/`（T1 摘要 + T2/T3）/ `content/company/`（T0–T2）；`content/contracts/` 随 DSH pin。`content/manifest.json` 是唯一清单（`content-manifest` 门禁查完整性与预算：T0 ≤6KB、T1 ≤4KB、T2 单文件 ≤6KB）。host 只把 `content/AGENTS.md`（T0）注入 system prompt section，其余按指针读；超预算运行时告警、门禁红。
+- **三层内容与加载档位（2026-11-09）**：`content/generic/`（T0 常驻 + T2 按需）/ `content/product-types/<id>/`（T1 摘要 + T2/T3）/ `content/delivery-modes/<id>/`（T2 交付模式）/ `content/company/`（T0–T2）；`content/contracts/` 随 DSH pin。`content/manifest.json` 是唯一清单（`content-manifest` 门禁查完整性与预算：T0 ≤6KB、T1 ≤4KB、T2 单文件 ≤6KB）。host 只把 `content/AGENTS.md`（T0）注入 system prompt section，其余按指针读；超预算运行时告警、门禁红。
 - **显示名 = 角色名**（D14 2026-11-09 收窄）：公司名只在品牌/身份面；品牌读 `.dsh-company/kb/company.md` frontmatter 的 `productName`，旧盘无 frontmatter 时回退出厂词标 `DSH 梦之队`。
-- **产品类型包的边界**：`/req check` 按动议 `meta.md` 的 `产品类型` 优先、缺省回落 `company.md` 的 `productType`，再读 `check-rules.json`——非五层类型（如自定义 `custom`）返回"不走五层编号体系"而不是判红；声明的类型不在盘上则报错并列可用类型；时区仍写死 `Asia/Shanghai`（未接 profile）。
+- **产品类型 / 交付模式的边界**：`/req check` 按动议 `meta.md` 的 `产品类型` 优先、缺省回落 `company.md` 的 `productType`，再读 `check-rules.json`；`交付模式` 是第二轴（`productized` 默认 / `project-services` / `managed-service`），按 `content/delivery-modes/<id>/` 解析，未知模式报错；`/delivery check` 按 `content/delivery-modes/<id>/delivery-rules.json` 查交付文档与 section；非五层类型（如自定义 `custom`）返回"不走五层编号体系"而不是判红；声明的类型不在盘上则报错并列可用类型；时区仍写死 `Asia/Shanghai`（未接 profile）。
 - **培养页的可追溯链**：主任务入口为“让角色今后的工作更好”；方法行展示提出者角色语境、目标角色、来源（缺失则明说未知）、采纳时间和采纳后验证历史。pass/fail 都要求一条后续相似工作的依据并保留事件；失败不自动撤回。AI 起草候选仍未获批，入口只提供人写纠正/建议。
 - **上网能力（`web_search` / `web_fetch`）必须随每个 preset 声明**：web-app bundle 把 host 上的 `tool-web` 行 `disabled: true`，改为按 agent preset 组合（vendor base 注释原文）——所以它**不是**全局继承来的；漏声明时角色与它 spawn 的 child 都静默无联网。子会话（`subagent` / team teammate）**继承 Lead 的组合**（`composeFrom`；roles-isolation §2/§4），故 Lead 有即可，不必另配。
 - **one-shot 委托 child 的目录里看得见 Team 工具但调不通**（上游已登记限制，vendor tool-agent-team README "One-shot child tool visibility"；2026-10-02 真跑实证：child 目录 41 工具含全部六个 Team 工具，调用在身份确认后被拒）。防线 = CEO preset 两份委托 persona 各一句「别碰 team 工具，并行调研只用 subagent」+ `delegation-smoke --delegate` 的 [3] 守卫（边界变了就红）。

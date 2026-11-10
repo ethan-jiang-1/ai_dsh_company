@@ -15,6 +15,8 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-11-delivery-mode-v2.md](settled_issues/2026-11-11-delivery-mode-v2.md) | 已结；`/delivery check`（productized 无要求 / project-services + managed-service 按 rules 查文档与 section）+ 硬软能力前置 capabilities.md；productized 方法以后做、默认交付模式保留；verify/test/typecheck/preset-smoke 全绿；去向 = [Note](../../notes/implemented/2026-11-11-delivery-check-v2.md) | 2026-11-11 |
+| [2026-11-11-delivery-mode-axis.md](settled_issues/2026-11-11-delivery-mode-axis.md) | 已结；两轴交付模式 `project-services` + `managed-service`（content/delivery-modes + meta 交付模式 + 经营方法 + workflow 分派 + awareness + sources 门禁 + 两轴测试矩阵）；verify/test/typecheck/preset-smoke/two-axis-gates-smoke 全绿；去向 = [Note](../../notes/implemented/2026-11-11-delivery-mode-axis.md) | 2026-11-11 |
 | [2026-11-08-workflow-subagent-exploratory-bug-hunt.md](settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md) | 已结；八轮探索 + 资产先行（A/B）；BUG-045–060 修复归档；研究题随卡归档；去向 = [Note](../../notes/implemented/2026-11-10-exploration-asset-strategy.md) | 2026-11-11 |
 | [2026-11-10-product-type-semantics.md](settled_issues/2026-11-10-product-type-semantics.md) | 已结；`b2b-saas` → `business-software`（MRD/StRS/PRD；SaaS 交付模式）+ product-definition/manifest/fixture/tests/docs；verify/test/typecheck/preset-smoke 全绿；去向 = [Note](../../notes/implemented/2026-11-10-business-software-product-type.md) | 2026-11-10 |
 | [2026-11-10-motion-product-type.md](settled_issues/2026-11-10-motion-product-type.md) | 已结；`meta.md` 产品类型 + `/req check` 动议优先/company 回落/未知报错 + 角色/手册/测试；verify/test/typecheck/preset-smoke 全绿；去向 = [Note](../../notes/implemented/2026-11-10-motion-product-type.md) | 2026-11-10 |
@@ -185,6 +187,19 @@
 | [BUG-057-command-slug-path-traversal.md](fixed_bugs/BUG-057-command-slug-path-traversal.md) | `/req`/`/prd` 的 slug 越界读：共享 host-only `resolveDeliverablePath`（单段正则 + `relative` 纵深）；两 spec 红→绿 + 真入口复跑 | 2026-11-10 |
 | [BUG-026-owner-missing-from-team-projection.md](fixed_bugs/BUG-026-owner-missing-from-team-projection.md) | 误报证伪（wire 视图 ownerName 齐全，卡读的是 projcache state 行）→ 防复发判据 = `tests/lib/board.spec.ts` 真 wire 形状断言；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-19 |
 | [BUG-023-cultivation-float-actions-dead.md](fixed_bugs/BUG-023-cultivation-float-actions-dead.md) | 误报证伪（浮窗正常；真凶 = 探针跨轮复用 id 撞遗留方法目录）→ 修复落探针卫生，S4b 恢复硬判 PASS；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-18 |
+
+| [BUG-061-product-type-allowed-values-drift.md](fixed_bugs/BUG-061-product-type-allowed-values-drift.md) | 产品类型允许值单一来源：类型目录 = 唯一枚举 + `product-type-sources` 门禁；`project-services` 标未来类型 | 2026-11-11 |
+| [BUG-062-default-product-type-contradicts-business.md](fixed_bugs/BUG-062-default-product-type-contradicts-business.md) | 默认 `productType` 改 `business-software`（与公司主业一致）；`/req check` 回落回执点名来源 | 2026-11-11 |
+| [BUG-063-bootstrap-process-docs-always-hardware.md](fixed_bugs/BUG-063-bootstrap-process-docs-always-hardware.md) | seed `{productType}` 占位：process-docs 按类型播种，缺/未知 fail-closed；E4 差分 true→false | 2026-11-11 |
+
+| [BUG-064-methods-not-product-type-aware.md](fixed_bugs/BUG-064-methods-not-product-type-aware.md) | 方法契约：类型适用性 + 需要事实 + 缺则 fail-closed；`method-contract` 门禁；business-software 不套项目制 | 2026-11-11 |
+| [BUG-065-cfo-rate-card-missing.md](fixed_bugs/BUG-065-cfo-rate-card-missing.md) | 新增 `kb/rates.md` 事实载体（`<待填>` = 配置缺口）；CFO 方法改读，不再声称 org/CHARTER 有费率 | 2026-11-11 |
+| [BUG-066-coo-person-level-staffing-without-roster.md](fixed_bugs/BUG-066-coo-person-level-staffing-without-roster.md) | 新增 `kb/roster.md` 席位名册；COO 三态（可承接 / 配置缺口 / 真没人），不编人名 | 2026-11-11 |
+
+| [BUG-067-process-docs-dead-pointers.md](fixed_bugs/BUG-067-process-docs-dead-pointers.md) | 4 处 process-docs 死指针改类型包 + `pack-content-paths` 门禁 | 2026-11-11 |
+| [BUG-068-base-clean-deployment-case-language.md](fixed_bugs/BUG-068-base-clean-deployment-case-language.md) | 服务类附赠搬 policy-lines + `base-clean` charter 个案语言 denylist | 2026-11-11 |
+| [BUG-069-tier-policy-gate-coverage.md](fixed_bugs/BUG-069-tier-policy-gate-coverage.md) | `加载：` 头与 manifest 对账 + policy 数字从 policy-lines 派生（9 个） | 2026-11-11 |
+| [BUG-070-delegation-maxdepth-example-wrong.md](fixed_bugs/BUG-070-delegation-maxdepth-example-wrong.md) | `maxDepth` 绝对语义真值 + vendor `resolveChildDepth` keyless spec | 2026-11-11 |
 
 ## 暂停卡
 

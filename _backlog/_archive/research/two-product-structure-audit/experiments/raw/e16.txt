@@ -1,0 +1,37 @@
+
+== C0 当前真树（应红：project-services 仍在可选面） (expected RED) ==
+verdict: GREEN
+OK product-type-sources ×2（品类表/默认/选值面与 packages/company-pack/content/product-types 一致；未来类型 1 个已标注）
+
+== C1 修复方终态（应绿） (expected GREEN) ==
+verdict: GREEN
+OK product-type-sources ×2（品类表/默认/选值面与 packages/company-pack/content/product-types 一致；未来类型 1 个已标注）
+
+== C2 默认值加引号（YAML 合法，应绿？） (expected GREEN) ==
+verdict: RED
+FAIL product-type-sources: packages/company-pack/content/state/company.md: productType「"business-software"」解析不到 packages/company-pack/content/product-types/"business-software"/check-rules.json（可用：business-software / hardware-software）
+
+== C3 默认值带行内注释（YAML 合法，应绿？） (expected GREEN) ==
+verdict: RED
+FAIL product-type-sources: packages/company-pack/content/state/company.md: 缺 productType（默认产品类型不能为空）
+
+== C4 可选面裸写 project-services（应红？） (expected RED) ==
+verdict: GREEN
+OK product-type-sources ×2（品类表/默认/选值面与 packages/company-pack/content/product-types 一致；未来类型 1 个已标注）
+
+== C5 品类表保留“未来类型”行（应红？） (expected GREEN) ==
+verdict: RED
+FAIL product-type-sources: packages/company-pack/presets/_shared/skills/product-definition/SKILL.md:34 品类表指向 project-services，但 packages/company-pack/content/product-types/project-services/ 不存在（宣告了不可执行的类型）；packages/company-pack/presets/_shared/skills/product-definition/SKILL.md:34: playbook 链接「project-services」解析不到类型包（可用：business-software / hardware-software）
+
+== C6 受支持类型从 CMO/meta/CEO 全部删掉（应红？） (expected RED) ==
+verdict: GREEN
+OK product-type-sources ×2（品类表/默认/选值面与 packages/company-pack/content/product-types 一致；未来类型 1 个已标注）
+
+== summary ==
+UNEXPECTED C0 当前真树（应红：project-services 仍在可选面）: GREEN
+PASS C1 修复方终态（应绿）: GREEN
+UNEXPECTED C2 默认值加引号（YAML 合法，应绿？）: RED
+UNEXPECTED C3 默认值带行内注释（YAML 合法，应绿？）: RED
+UNEXPECTED C4 可选面裸写 project-services（应红？）: GREEN
+UNEXPECTED C5 品类表保留“未来类型”行（应红？）: RED
+UNEXPECTED C6 受支持类型从 CMO/meta/CEO 全部删掉（应红？）: GREEN

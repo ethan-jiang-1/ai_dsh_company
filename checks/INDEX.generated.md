@@ -3,7 +3,7 @@
 > 生成：`node tools/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。
 > 触发条件/成本/状态唯一源 = 各脚本头注；本文件只回答“有哪些公开入口、在哪”。
 
-## 冒烟 / 真实入口（checks/smoke/，29）
+## 冒烟 / 真实入口（checks/smoke/，31）
 
 [attention-e2e-smoke](smoke/attention-e2e-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs)
 [client-error-chain-smoke](smoke/client-error-chain-smoke.mjs)
@@ -11,6 +11,7 @@
 [concurrent-home-smoke](smoke/concurrent-home-smoke.mjs) · [delegation-smoke](smoke/delegation-smoke.mjs)
 [entry-probe-smoke](smoke/entry-probe-smoke.mjs)
 [external-workspace-smoke](smoke/external-workspace-smoke.mjs)
+[gates-negative-smoke](smoke/gates-negative-smoke.mjs)
 [human-loop-e2e-smoke](smoke/human-loop-e2e-smoke.mjs)
 [interrupted-install-smoke](smoke/interrupted-install-smoke.mjs)
 [isolation-matrix-smoke](smoke/isolation-matrix-smoke.mjs)
@@ -22,7 +23,8 @@
 [product-team-e2e-smoke](smoke/product-team-e2e-smoke.mjs) · [profile-row-smoke](smoke/profile-row-smoke.mjs)
 [refactor-drift-oracle](smoke/refactor-drift-oracle.mjs) · [release-smoke](smoke/release-smoke.mjs)
 [replay-smoke](smoke/replay-smoke.mjs) · [revoke-recovery-smoke](smoke/revoke-recovery-smoke.mjs)
-[snapshot-motion-smoke](smoke/snapshot-motion-smoke.mjs) · [ui-scene-smoke](smoke/ui-scene-smoke.mjs)
+[snapshot-motion-smoke](smoke/snapshot-motion-smoke.mjs)
+[two-axis-gates-smoke](smoke/two-axis-gates-smoke.mjs) · [ui-scene-smoke](smoke/ui-scene-smoke.mjs)
 [upgrade-while-running-smoke](smoke/upgrade-while-running-smoke.mjs)
 [workflow-contract-smoke](smoke/workflow-contract-smoke.mjs)
 
@@ -129,6 +131,6 @@
 [snapshot-motion](../tools/snapshot-motion.mjs) · [snapshot-path](../tools/snapshot-path.mjs)
 [sync-dsh](../tools/sync-dsh.mjs)
 
-## 结构门禁（checks/gates/，65 个模块）
+## 结构门禁（checks/gates/，69 个模块）
 
 清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，接线一致性由 `gate-wiring` 门禁强制。

@@ -9,11 +9,12 @@
 
 ## 事实的家（别在别处复述数字）
 
-- **组织与编制**（人数、条线、岗位与预算上限）：`.dsh-company/kb/org.md` —— **唯一事实家**。
+- **组织 / 席位 / 费率**：编制与预算上限见 `.dsh-company/kb/org.md`（唯一事实家）；席位与投入见 `.dsh-company/kb/roster.md`；人·周成本见 `.dsh-company/kb/rates.md`——`<待填>` = 配置缺口，不得编人名 / 费率。
 - **你的岗位**：`.dsh-company/kb/<你的角色>/CHARTER.md`；**你的历史纪要**：`.dsh-company/kb/<你的角色>/journal/`。
 - **动议台账**（历史动议一览 + 一句话结论；「台账」页签数据源）：`.dsh-company/kb/motion-ledger.md`。
 - **编号合同**（需求层 / 退役词 / 范围豁免 / 并发口径）：pack `content/product-types/<id>/requirements-model.md`（`<id>` = `productType`）；workspace 的 `kb/process-docs.md` 只是播种副本。
 - **动议的产品类型**：写在 `.dsh-company/deliverables/<slug>/meta.md` 的 `产品类型`；缺省回落 `company.md` 的 `productType`。具体类型 id 见产品类型包；不要按习惯猜，用户没说就问一句或标假设。
+- **动议的交付模式**：写在 `meta.md` 的 `交付模式`；不写 = `productized`；有 SOW/UAT/驻场/里程碑验收 = `project-services`；有持续 SLA/值班/月报/续费 = `managed-service`。产品类型回答“造什么”，交付模式回答“怎么交付”；规则、模板与组合示例见 `content/delivery-modes/`；操作员用 `/delivery check <slug>` 收口交付文档。
 - **交付物**：落 `.dsh-company/deliverables/<日期>-<slug>/`（A1 命名；三态见 `generic/deliverable-states.md`）；**写作模板**：`<company-content>/templates/`。
 
 ## 细则（按需读，不进常驻上下文）
@@ -26,7 +27,6 @@
 - 协作规矩（派活、打回、问询、任务板）：`<company-content>/generic/collaboration.md`
 - 派活行 / 署名行 / 收工 / 日期 / 轮末：`<company-content>/generic/work-handoff.md`
 - 人机接口（待办 / 审批 / 节流）：`<company-content>/generic/human-interface.md`
-
 
 ## 工作纪律
 
