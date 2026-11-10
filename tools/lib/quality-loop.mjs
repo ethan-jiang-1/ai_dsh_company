@@ -280,7 +280,10 @@ export function auditQualityLoop(input) {
     }
     const bodyHash = verdictBodyHash(body)
     if (header.bodySha256 !== bodyHash) {
-      add('body-modified', `${where}：正文 sha256=${bodyHash.slice(0, 12)}… ≠ 头里 ${String(header.bodySha256).slice(0, 12)}…（裁决被改过，或头算错了）`)
+      add('body-modified',
+        `${where}：正文 sha256=${bodyHash.slice(0, 12)}… ≠ 头里 ${String(header.bodySha256).slice(0, 12)}…`
+        + '（裁决被改过，或头算错了；若用 `tail -n +2 | shasum` 算过，尾随换行会让它差一位——'
+        + '用 quality-loop skill 的 `verdict-hash.mjs --fix` 重算）')
     }
     if (producer !== null && verifierMethod !== null && header.method !== null
       && header.method !== `${verifierMethod.method}@${verifierMethod.version}`) {
@@ -413,6 +416,16 @@ export function auditQualityLoop(input) {
       if (!findingIds.has(row.id)) warn('disposition-extra', `${where}：处置表里的 ${row.id} 没有对应发现`)
       disposed.add(row.id)
     }
+  }
+
+  // 裁决后订正产物：处置表显式标了「未复验」且这是最后一轮 ⇒ warning 让它可见（BUG-056）。
+  // 不是硬拦：接受残留由授权人决定；这里只保证审计不把「裁决后改产物」误报成原文一致。
+  const latest = rounds.at(-1)
+  const latestDispositions = latest?.dispositionsText
+  if (typeof latestDispositions === 'string'
+    && /未(?:经|获)?[^\n]{0,8}复验|未复验/u.test(latestDispositions)) {
+    warn('post-verdict-unverified',
+      `${String(latest?.file)}：处置表标了「未复验」但这是最后一轮——裁决后改产物必须 R2，或由授权人接受该残留`)
   }
 
   return { problems, warnings }

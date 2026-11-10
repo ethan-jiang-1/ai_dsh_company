@@ -13,7 +13,8 @@
 //   ③ 未被改：正文与头对不上即红（append-only 的机械面）；
 //   ④ 处置覆盖：裁决里每条 F<n> 都有三选一处置，且「接受」写了接受人；
 //   ⑤ 方法配对：两侧 method+version 相同、side 正确、brief 点名与之一致、检查表逐 check-id 有结论；
-//   ⑥ 只读手：验证者会话没有 write/edit/bash 调用。
+//   ⑥ 只读手：验证者会话没有 write/edit/bash 调用；
+//   ⑦ 裁决后订正：最后一轮 dispositions 显式写「未复验」→ warning `post-verdict-unverified`（不冒充原文一致）。
 // 不证明：不证明产物质量、不证明验证者的判断对（那是人审）；不是运行时 veto——事后检测，改盘仍可能发生。
 //   会话日志已轮转/归档时只核文件自洽并打 warning（`session-log-missing`），不假装核过原文。
 import { spawnSync } from 'node:child_process'

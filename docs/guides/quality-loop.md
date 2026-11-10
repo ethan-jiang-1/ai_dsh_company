@@ -40,11 +40,12 @@ mkdir -p "$DSH_HOME/company/methods/quality-loop-producer/<pack>" "$DSH_HOME/com
 quality-loop/{brief.md, handoff-r<N>.md, verdict-r<N>.md, dispositions-r<N>.md}
 ```
 
-算头里的哈希（正文口径 = 去掉结尾空白）：
-
+算/回填头里的哈希（正文口径 = 去掉结尾空白）**只走工具，不手算**：
 ```sh
-printf '%s' "$(tail -n +2 quality-loop/verdict-r1.md)" | shasum -a 256
+node <company-content>/../presets/_shared/skills/quality-loop/scripts/verdict-hash.mjs --fix quality-loop/verdict-r1.md
 ```
+`--body <正文文件>` 只取哈希、`--check <verdict文件>` 核对；脚本随 pack 分发（维护者在仓库内用
+`packages/company-pack/presets/_shared/skills/quality-loop/scripts/verdict-hash.mjs`）。**不要用 `tail -n +2 | shasum`**——尾随换行会进哈希，audit 判 `body-modified`（BUG-056 真实事故）。
 
 ## 3. 审计（开发侧，keyless）
 
@@ -62,7 +63,7 @@ node probes/team/quality-loop-audit.mjs --deliverable <交付目录>          # 
 
 | code | 含义 / 处置 |
 |---|---|
-| `body-modified` | 正文与头里的 `body-sha256` 不符 → 裁决被改过（或头算错）。**append-only**：别修旧的，重开一轮 |
+| `body-modified` | 正文与头里的 `body-sha256` 不符 → 裁决被改过（或头算错）。**append-only**：别修旧的，重开一轮；只是头算错（如 `tail \| shasum` 含尾随换行）用 `verdict-hash.mjs --fix` 重算 |
 | `not-verbatim` | 文件正文 ≠ 验证者最终消息 → 不是原文。重贴 |
 | `disposition-missing` / `no-dispositions` | 有发现没处置。三选一补齐（已修 / 反驳 / 接受+接受人） |
 | `version-mismatch` / `header-method` | 两侧方法不同版本，或头写的方法与方法层实际不符 |
@@ -72,6 +73,7 @@ node probes/team/quality-loop-audit.mjs --deliverable <交付目录>          # 
 | `producer-missing` | 裁决头没写 `producer=<产出者 sessionId>` → 补上，否则先产后验无从核对 |
 | `session-log-missing`（warning） | 日志已轮转：只核到文件自洽，原文一致性未核。不是通过，也不是红 |
 | `carried-forward`（warning） | 复验轮重列了上一轮已处置的发现——闭环陈述，处置仍归上一轮 |
+| `post-verdict-unverified`（warning） | 最后一轮处置表标了「未复验」，但裁决后改过产物/稿 → 开 R2，或由授权人接受残留 |
 
 **轮次语义**：处置归**首次提出该发现的那一轮**；`verdict-r2.md` 只补检查表与新发现。裁决原文按轮次**单调向后**对账
 （同一 child 续跑时，R1 对应它较早那条正文、R2 对应较晚那条；拿早期草稿冒充后一轮会红）。

@@ -6,9 +6,11 @@
 // 质量环判据的 keyless 单测：**判据住 tools/lib/quality-loop.mjs，这一层只喂合成输入**。
 // 它证明"契约判得对"，不证明"真会话里 agent 照做了"（那是 preset-smoke + 一次真模型 E2E）。
 import { readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { fixVerdictText, hashBody } from '../../../packages/company-pack/presets/_shared/skills/quality-loop/scripts/verdict-hash.mjs'
 import {
   DISPOSITION_VALUES,
   MAX_ROUNDS,
@@ -354,5 +356,47 @@ describe('审计判据：一条红配方一支用例', () => {
     const skill = readFileSync(join(ROOT, 'packages/company-pack/presets/_shared/skills/quality-loop/SKILL.md'), 'utf8')
     expect(skill).toContain(QUALITY_LOOP_DIR)
     expect(skill).toContain('body-sha256')
+  })
+})
+
+// 负例留证 2026-11-10：BUG-056 —— 修前没有 verdict-hash 工具；`--fix` 不归一尾随换行时，
+// 「含尾随换行的旧 hash」用例会红（audit 判 body-modified）。补工具 + audit warning 后绿。
+describe('verdict hash 工具与「未复验」可见性（BUG-056）', () => {
+  it('尾随换行/空白不改变正文哈希（与 audit 同口径）', () => {
+    for (const body of ['x\n', 'x\n\n', 'x \n', 'x\t\n']) {
+      expect(hashBody(body)).toBe(verdictBodyHash(body))
+    }
+  })
+
+  it('--fix 把含尾随换行的旧 hash 回填成 audit 口径', () => {
+    const naive = createHash('sha256').update(`${BODY}\n`).digest('hex')
+    const text = `<!-- quality-loop: round=1 session=s1 preset=quality-loop-verifier depth=2 producer=p1 method=requirements-trace@1.0.0 body-sha256=${naive} -->\n${BODY}`
+    const fixed = fixVerdictText(text)
+    const { header, body } = splitVerdict(fixed)
+    expect(header?.bodySha256).toBe(verdictBodyHash(body))
+    expect(body).toBe(BODY)
+  })
+
+  it('缺头 fail-loud', () => {
+    expect(() => fixVerdictText('没有 quality-loop 头\n')).toThrow(/quality-loop 头/)
+  })
+
+  it('skill / guide 指向 verdict-hash 工具，不再教 `tail | shasum`', () => {
+    const skill = readFileSync(join(ROOT, 'packages/company-pack/presets/_shared/skills/quality-loop/SKILL.md'), 'utf8')
+    expect(skill).toContain('verdict-hash.mjs --fix')
+    expect(skill).toContain('不要用 `tail -n +2 file | shasum`')
+    const guide = readFileSync(join(ROOT, 'docs/guides/quality-loop.md'), 'utf8')
+    expect(guide).toContain('verdict-hash.mjs --fix')
+    expect(guide).toContain('不要用 `tail -n +2 | shasum`')
+  })
+
+  it('处置表标「未经复验」且没有 R2 → warning（不冒充原文一致）', () => {
+    const rounds = [{
+      ...input().rounds[0],
+      dispositionsText: `${DISPOSITIONS}\n规则：本轮裁决后订正产物，未经第二个验证者复验。\n`,
+    }]
+    const result = auditQualityLoop(input({ rounds }))
+    expect(result.problems).toEqual([])
+    expect(result.warnings.map(warning => warning.code)).toContain('post-verdict-unverified')
   })
 })

@@ -73,7 +73,8 @@ description: 质量环（quality-loop-producer → quality-loop-verifier → 处
   dispositions-r<N>.md  处置表
 ```
 
-`verdict-r<N>.md` 头行（**一行，机器解析**，`body-sha256` = 头行之后全部正文的 sha256）：
+`verdict-r<N>.md` 头行（**一行，机器解析**，`body-sha256` = 头行之后全部正文的 sha256；
+可先写 `body-sha256=待填`，落盘后用下面的命令回填）：
 
 ```
 <!-- quality-loop: round=1 session=<验证者 sessionId> preset=quality-loop-verifier depth=<delegationDepth> producer=<产出者 sessionId> method=<pack>@<version> body-sha256=<hex64> -->
@@ -81,7 +82,16 @@ description: 质量环（quality-loop-producer → quality-loop-verifier → 处
 
 取 session / depth / producer = `list_subagents` 对应行（读 child durable header；读不到写 `unavailable` 并说明）。
 `producer` 不是装饰：审计用它核**先产后验**（验证者会话必须在产出者首轮收工之后才创建）。
-写盘次序：先写正文 → `shasum -a 256` 算正文（`tail -n +2` 去掉头行后算，或先算后拼头）→ 拼头。
+
+**哈希只走工具，不手算**：先把正文和头写进 `verdict-r<N>.md`，再运行
+
+```sh
+node <company-content>/../presets/_shared/skills/quality-loop/scripts/verdict-hash.mjs --fix .dsh-company/deliverables/<slug>/quality-loop/verdict-r1.md
+```
+
+它按审计同一口径（正文去掉结尾空白）重算并回填。**不要用 `tail -n +2 file | shasum`**——它把文件
+尾随换行也算进哈希，audit 会判 `body-modified`（2026-11-10 真实事故 BUG-056）。只取正文哈希用
+`--body <正文文件>`；核对用 `--check <verdict文件>`。
 **别手改正文**：改了就与头、与验证者会话对不上（审计会红）。
 
 ## 4. 处置（每条发现三选一，不许静默忽略）
@@ -97,6 +107,10 @@ description: 质量环（quality-loop-producer → quality-loop-verifier → 处
 ```
 
 `blocker` 级发现不许用"接受"结案（要接受就升级给授权人，写进说明）。
+
+**裁决后改了产物/稿**：不能停在"裁决过、后来改了"——要么开 R2 新裁决（`verdict-r2.md`），
+要么在处置说明里显式写「未复验」并由授权人接受该残留。audit 对最后一轮 dispositions 里的
+「未复验」给 `post-verdict-unverified` warning（不冒充原文一致；不是运行时 veto）。
 
 ## 5. 轮次与升级
 

@@ -177,6 +177,7 @@
 | [BUG-053-cancel-does-not-abort-subagent-retry.md](fixed_bugs/BUG-053-cancel-does-not-abort-subagent-retry.md) | `abortable` race + `ctx.subagents.interrupt(child)`；cancel 后 35ms root/child `aborted`、无 sleep 残留；keyless + 真装配 | 2026-11-10 |
 | [BUG-054-dev-rehearsal-kb-policy-lines-missing.md](fixed_bugs/BUG-054-dev-rehearsal-kb-policy-lines-missing.md) | 旁路 kb 清单改由 seed.json 派生（mirror 10 件 vs seed 14 件）；parity spec 钉同清单/同字节/only-fill；`policy-lines` / `review-protocol` 归位 | 2026-11-10 |
 | [BUG-055-team-role-packet-missing-taskbook.md](fixed_bugs/BUG-055-team-role-packet-missing-taskbook.md) | 角色包补 `任务书` + `署名行`，CEO 先落 `drafts/ceo.md` 再 spawn；署名行只抄真实路径；真模型 probe ALL PASS（294s） | 2026-11-10 |
+| [BUG-056-quality-loop-verdict-hash-trailing-newline.md](fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md) | 裁决头 hash 改由 pack 内 `verdict-hash.mjs` 回填（`--fix`/`--check`）；skill/guide 排除 `tail \| shasum`；`未复验` 成为 audit `post-verdict-unverified` warning | 2026-11-10 |
 | [BUG-026-owner-missing-from-team-projection.md](fixed_bugs/BUG-026-owner-missing-from-team-projection.md) | 误报证伪（wire 视图 ownerName 齐全，卡读的是 projcache state 行）→ 防复发判据 = `tests/lib/board.spec.ts` 真 wire 形状断言；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-19 |
 | [BUG-023-cultivation-float-actions-dead.md](fixed_bugs/BUG-023-cultivation-float-actions-dead.md) | 误报证伪（浮窗正常；真凶 = 探针跨轮复用 id 撞遗留方法目录）→ 修复落探针卫生，S4b 恢复硬判 PASS；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-18 |
 
