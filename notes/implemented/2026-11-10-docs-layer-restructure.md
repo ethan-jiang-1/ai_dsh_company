@@ -61,8 +61,10 @@ index 首屏按目的路由。
   preset 计数、presets browser 角色数、dev-loop 角色数、architecture 255 行/4 preset、ui-demo patch
   数组、bootstrap 角色数、environments“四条”、product-definition 死路径、budget-and-ops maxDepth 等），
   留“docs 值修正”独立卡。
-- 四个 DSH 对齐偏离保留且**有意**：`design/` 与 Agent Notes 重叠；`index` 仍承担第二本清单；
-  行预算不留 5% headroom；文档仍带日期/历史。真正要动这三个大偏离时另立卡，不顺手做。
+- 四个 DSH 对齐偏离在当时**有意保留**：`design/` 与 Agent Notes 重叠；`index` 仍承担第二本清单；
+  行预算不留 5% headroom；文档仍带日期/历史。随后 2026-11-10 的 [DSH 对齐](./2026-11-10-docs-dsh-alignment.md)
+  已处理前三个（design→notes、index→tier 书架、doc-budget 5% headroom），now-only 部分处理
+  （证据日期保留，DSH 允许 version-specific evidence）；本 Note 记录结构收敛那一层，后续以对齐 Note 为准。
 
 ## 验证
 

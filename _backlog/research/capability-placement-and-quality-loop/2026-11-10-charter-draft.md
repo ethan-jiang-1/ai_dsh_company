@@ -5,7 +5,7 @@ intent: 内容宪章全文草案——供第一张卡落地时评审与落盘
 
 # 内容宪章（草案 v1，2026-11-10）
 
-> 这是草案，不是现行合同；落盘后以 `content-charter.md`（`docs/`）为准。
+> 这是草案，不是现行合同；落盘后以 `content-charter.md`（`docs/` 顶层门/宪法层，与 testing/repo-hygiene 同层）为准。
 > 草案来源 = 2026-11-10 的抽象推演，过程见 [2026-11-10-deliberation.md](2026-11-10-deliberation.md)。
 
 # 内容宪章：按寿命分层，按成本抽象

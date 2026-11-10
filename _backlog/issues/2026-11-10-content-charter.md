@@ -8,6 +8,13 @@ opened: 2026-11-10
 > 立卡：2026-11-10 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
 >
 > **结论/去向**：note — 计划 `content-charter.md`（落 `notes/implemented/`，落地同变更成立）
+>
+> **基座同步（2026-11-10）**：`docs-dsh-alignment` 五步已落地（`69706354`…`abb02d1e` + 收尾）：
+> 原 docs 的 design 层（已移除）已并回 `notes/`；`docs/index.md` 改为 **tier 书架**（树即 inventory，顶层门/宪法才逐项列出）；
+> 新增 [docs/architecture.md](../../docs/architecture.md)；培养回路/方法层改由
+> [docs/contracts/cultivation.md](../../docs/contracts/cultivation.md) 承载；`doc-budget` 加 **≥5% headroom**
+> （内容 ≤ 95% 上限）。本卡下面的入口/路径/预算已按此更新；实施前先 `git log --oneline -8` 确认基座未再变，
+> 变了就先把差异折回本卡，不带着旧基座动工。
 
 **问题与期望结果：** 三层内容结构（通用/产品类型/公司 + 方法层）已经想清楚，但下一个 agent 未必读到；只写一份宪章仍是散文，挡不住"匆匆忙忙把具体东西贴进骨架"。本轮要落的是**宪章 + 让 agent 撞得到的入口**：doc chain（`AGENTS.md` / `docs/index.md` / `docs/AGENTS.md`）与 execution chain（归位 skill / 入口门 / 卡与 Note 字段）至少各有一条硬路径；新 agent 被要求"加一个新能力"时，先答四问，再动文件。
 
@@ -34,16 +41,16 @@ opened: 2026-11-10
 
 ## 当前情况（事实与依据）
 
-- 三层内容模型、方法层、独立性口径都已现行：内容分层见 [2026-11-09-generic-specific-separation.md](../../notes/implemented/2026-11-09-generic-specific-separation.md)；方法层见 [presets.md](../../docs/contracts/presets.md) §培养回路；复核独立性见 [review-protocol.md](../../packages/company-pack/content/company/review-protocol.md)。
+- 三层内容模型、方法层、独立性口径都已现行：内容分层见 [2026-11-09-generic-specific-separation.md](../../notes/implemented/2026-11-09-generic-specific-separation.md)；方法层见 [cultivation.md](../../docs/contracts/cultivation.md)；复核独立性见 [review-protocol.md](../../packages/company-pack/content/company/review-protocol.md)。
 - 旧 SA/SQA 的教训：E/V 分家的结构对，但方法写进 persona/skill，换公司要改包，2026-11-09 退役。历史见 [原问题卡](../_archive/settled_issues/2026-11-06-system-architect-sqa.md) 与 [退役 Note](../../notes/implemented/2026-11-09-retire-sa-sqa.md)。
 - 本轮全过程与宪章草案见研究题：[README](../research/capability-placement-and-quality-loop/README.md)、[推演材料](../research/capability-placement-and-quality-loop/2026-11-10-deliberation.md)、[宪章草案](../research/capability-placement-and-quality-loop/2026-11-10-charter-draft.md)。
 - 用户 2026-11-10 约束：本轮只改 `_backlog/`，落地时才动仓库其他部分。
 
 **未决问题：**
 
-1. 入口链放几处？推荐三处硬链（`AGENTS.md` 开工最小路径、`docs/index.md` 登记、`docs/AGENTS.md` 层规范）+ 归位 skill 的 description；入口门断言三处都在。
+1. 入口链放几处？推荐三处文档硬链（`AGENTS.md` 开工最小路径、`docs/index.md` 的 **tier 书架**登记、`docs/AGENTS.md` 层规范）+ 归位 skill 的 description；入口门断言四处指针都在。
 2. 卡里的 `## 抽象度` 要不要机械强制？v1 推荐模板 + 语义审；等它真被跳过再加门（不先造宽泛术语黑名单）。
-3. 入口门查什么？推荐只查"宪章被三处链接 + skill 在场并链回宪章"；不查 agent 是否读懂（那是真模型冷读的证据，不是门禁的活）。
+3. 入口门查什么？推荐只查"宪章被四处链接（AGENTS / index 书架 / docs/AGENTS 层表 / skill）+ skill 在场并链回宪章"；不查 agent 是否读懂（那是真模型冷读的证据，不是门禁的活）。
 4. 冷读怎么算证据？给 fresh agent 一句"给公司加一个新能力"，看它是否从入口链撞到宪章并答出四问；会话 id + 原文摘录进落地 Note，不进 CI。
 5. 宪章落地本身要不要 Note？要——它是非平凡决定，按 `agent-note-definition` 落，且与宪章同 diff。
 
@@ -51,12 +58,12 @@ opened: 2026-11-10
 
 ## 范围与排除项
 
-- 范围：宪章正本（`content-charter.md`，落 `docs/`）；`docs/index.md` / `AGENTS.md` / `docs/AGENTS.md` 三处指针；归位 skill（`capability-addition-definition/SKILL.md`，落 `.agents/skills/`）；入口门（`charter-entry.mjs`，落 `checks/gates/`）；`_backlog/issues/README.md` 的写卡模板加 `## 抽象度`；`notes/README.md` 或 `agent-note-definition` 加"归位"节；`docs/policy.md` P5 加一句语义审问；`DOC_LINE_BUDGETS` 为宪章加预算。
+- 范围：宪章正本（`content-charter.md`，落 `docs/` **顶层门/宪法层**，与 testing/repo-hygiene 同层；`docs/AGENTS.md` 层表加行）；`docs/index.md` 书架 / `AGENTS.md` / `docs/AGENTS.md` / 归位 skill 四处指针；归位 skill（`capability-addition-definition/SKILL.md`，落 `.agents/skills/`）；入口门（`charter-entry.mjs`，落 `checks/gates/`）；`_backlog/issues/README.md` 的写卡模板加 `## 抽象度`；`notes/README.md` 或 `agent-note-definition` 加"归位"节；`docs/policy.md` P5 加一句语义审问；`DOC_LINE_BUDGETS` 为宪章加预算（内容 ≤ 95% 上限）。
 - 排除：SA/SQA 的具体实现（第二张卡）；三层模型本身；`presets/` 内容；`vendor/`；新建角色/调度器/第二套文档体系；宽泛术语黑名单。
 
 ## 已知与未决
 
-- **预算压力**：`AGENTS.md`、`docs/index.md`、`docs/AGENTS.md`、`docs/policy.md` 都有行预算；加入口行前先看 `doc-budget`，超限先搬再压，不直接抬上限（抬上限要 Note 论证）。
+- **预算压力**：`AGENTS.md`、`docs/index.md`、`docs/AGENTS.md`、`docs/policy.md` 都有行预算，且 `doc-budget` 已加 **≥5% headroom**（内容 ≤ 95% 上限，docs/ 适用；`reference/` 豁免）；加入口行前先看 `doc-budget`，超限/不足 5% 先搬再压，不直接抬上限（抬上限要 Note 论证）。
 - **入口门是代理**：它证明"链接在场"，不证明"agent 读了/懂了"；后者靠冷读证据，别把门禁当行为证明。
 - **`## 抽象度` 的强制力**：v1 是模板 + 语义审，不是机械门；若两个真实案例都没填，再升级为门。
 - **单例例外**：宪章允许"只有一个消费者但高成本缝"登记例外；本卡不把例外做成阻断。
@@ -79,9 +86,9 @@ opened: 2026-11-10
 
 ## 验收标准
 
-1. **宪章正本**：新增 `content-charter.md`（落 `docs/`），含四槽、三层、三条铁律、四问、两测、两消费者、成本表、红牌、变更协议、宪章自改、指针；`docs/index.md` / `AGENTS.md` / `docs/AGENTS.md` 三处同 diff 登记或指针；`DOC_LINE_BUDGETS` 给预算（超限先搬后加）。
+1. **宪章正本**：新增 `content-charter.md`（落 `docs/` **顶层门/宪法层**，与 testing/repo-hygiene 同层），含四槽、三层、三条铁律、四问、两测、两消费者、成本表、红牌、变更协议、宪章自改、指针；`docs/index.md`（书架）/ `AGENTS.md` / `docs/AGENTS.md`（层表）/ 归位 skill 四处同 diff 指针；`DOC_LINE_BUDGETS` 给预算（内容 ≤ 95%，留 ≥5% headroom；超限/不足先搬后加）。
 2. **归位 skill**：新增 `capability-addition-definition/SKILL.md`（落 `.agents/skills/`），含四问、两测、两消费者、成本表、红牌、SA/SQA 归位样例，并链回宪章；description 在"新增角色/能力/方法/模板"时触发；skill catalog 可见。
-3. **入口门**：新增 `charter-entry.mjs`（落 `checks/gates/`），断言宪章被 `AGENTS.md`、`docs/index.md`、归位 skill 三处链接；红证 = 删 `AGENTS.md` 链接 → 红，还原 → 绿；按 `gate-change-definition` 记红证据。
+3. **入口门**：新增 `charter-entry.mjs`（落 `checks/gates/`），断言宪章被 `AGENTS.md`、`docs/index.md`（书架）、`docs/AGENTS.md`（层表）、归位 skill 四处链接；红证 = 删 `AGENTS.md` 链接 → 红，还原 → 绿；按 `gate-change-definition` 记红证据。
 4. **卡/Note 字段**：`_backlog/issues/README.md` 的写卡模板加 `## 抽象度`（四问 + 第二消费者/例外 + 搬家成本）；`notes/README.md` 或 `agent-note-definition` 加"归位"节（为什么这层 / 什么会逼它搬家 / 哪个更低的层被排除）；`docs/policy.md` P5 加"换公司/产品类型/方法要改吗"一句。
 5. **新 agent 冷读**：fresh agent 接到"给公司加一个新能力"的题，能从入口链撞到宪章并答出四问；证据 = 会话 id + 原文摘录写进落地 Note（真模型，不进回归）。
 6. **机械**：`pnpm verify` ALL PASS；相关 `pnpm test` spec 绿（若加 spec）；本次不因 doc-budget 超限；无 `vendor/` 改动。

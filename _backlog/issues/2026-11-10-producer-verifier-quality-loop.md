@@ -8,6 +8,12 @@ opened: 2026-11-10
 > 立卡：2026-11-10 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否
 >
 > **结论/去向**：note — 计划 `producer-verifier-quality-loop.md`（落 `notes/implemented/`，落地同变更成立）
+>
+> **基座同步（2026-11-10）**：`docs-dsh-alignment` 五步已落地（`69706354`…`abb02d1e` + 收尾）：
+> 原 docs 的 design 层（已移除）已并回 `notes/`；`docs/index.md` 改为 tier 书架；新增 [docs/architecture.md](../../docs/architecture.md)；
+> 方法层/培养回路事实改由 [docs/contracts/cultivation.md](../../docs/contracts/cultivation.md) 承载；`doc-budget`
+> 加 **≥5% headroom**。本卡 docs 落点按新层表更新：**流程/操作进 `guides/`**，**理由/备选进落地 Note**
+> （docs 只写 now），方法层事实引 `cultivation.md`。实施前先 `git log --oneline -8` 确认基座未再变。
 
 **问题与期望结果：** VP-Eng 接到复杂产出时，一个人既做设计又做验证，E（工程）与 V（验证）在同一上下文里互相干扰（锚定、共享盲区、自我评分、注意力稀释）。期望：两个**独立 activation** 的能力档——一个产出、一个验证——按外部方法包工作，流程与裁决可审计。历史 SA/SQA 的 E/V 分家结构是对的，但方法写进了 persona/skill，2026-11-09 退役；本卡复用结构，不复用旧 preset。
 
@@ -35,7 +41,7 @@ opened: 2026-11-10
 
 ## 当前情况（事实与依据）
 
-- DSH 机制事实（核过）：人格/工具面只能由 `agentPreset` 给；命名 child 才是独立上下文 + 独立人格，team 成员继承 Lead、workflow 分支同人格且无 `agentPreset`；方法层 = `<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`，公司级、角色隔离、pack 升级不擦、人采纳、热生效；能力边界是"缺行"（`tool-fs` 的 `write`/`edit` 开关），`read-only` 沙箱是会话级、不是 per-child；`list_subagents` 带 `agentPreset`/`delegationDepth`。依据见 `docs/contracts/delegation.md`、`docs/contracts/presets.md` 与 [推演材料](../research/capability-placement-and-quality-loop/2026-11-10-deliberation.md)。
+- DSH 机制事实（核过）：人格/工具面只能由 `agentPreset` 给；命名 child 才是独立上下文 + 独立人格，team 成员继承 Lead、workflow 分支同人格且无 `agentPreset`；方法层 = `<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`，公司级、角色隔离、pack 升级不擦、人采纳、热生效；能力边界是"缺行"（`tool-fs` 的 `write`/`edit` 开关），`read-only` 沙箱是会话级、不是 per-child；`list_subagents` 带 `agentPreset`/`delegationDepth`。依据见 `docs/contracts/delegation.md`、`docs/contracts/presets.md`、`docs/contracts/cultivation.md`（方法层）与 [推演材料](../research/capability-placement-and-quality-loop/2026-11-10-deliberation.md)。
 - 设计：四槽（人/流程/方法/政策）——两个能力档进 preset、质量环流程进通用层、方法进角色方法层、强制范围进公司层。研究题见 [README](../research/capability-placement-and-quality-loop/README.md)。
 - 用户 2026-11-10 约束：本轮只改 `_backlog/`，落地时才动仓库其他部分。
 
@@ -52,7 +58,7 @@ opened: 2026-11-10
 
 ## 范围与排除项
 
-- 范围：两个 support preset（`producer` / `verifier`，落 `presets/`）；VP-Eng 两条命名行 `produce` / `verify`；共享 `quality-loop` skill（落 `presets/_shared/skills/`）；方法包契约 + fixture（`tests/fixtures/`）；审计探针（`quality-loop-audit.mjs`，落 `probes/team/`）；`docs/contracts/presets.md` / `docs/contracts/delegation.md` / `review-protocol.md` 同步；keyless spec 与 `preset-smoke` 计数。
+- 范围：两个 support preset（`producer` / `verifier`，落 `presets/`）；VP-Eng 两条命名行 `produce` / `verify`；共享 `quality-loop` skill（落 `presets/_shared/skills/`）；方法包契约 + fixture（`tests/fixtures/`）；审计探针（`quality-loop-audit.mjs`，落 `probes/team/`）；`docs/contracts/presets.md` / `docs/contracts/delegation.md` / `docs/contracts/cultivation.md`（方法槽）/ `review-protocol.md` 同步；guides tier 下的 quality-loop 文档（流程/操作，若落文档）；keyless spec 与 `preset-smoke` 计数。
 - 排除：宪章正本与入口链（第一张卡）；扩 `CULTIVATION_ROLES`；把方法包做成产品默认（只放 fixture）；UI 委派卡；host 代码；运行时 veto；不同模型路由；验证者 bash（v1）；第三方 runner。
 
 ## 已知与未决
@@ -86,7 +92,7 @@ opened: 2026-11-10
 3. **流程 skill**：`quality-loop` 落 `presets/_shared/skills/`，含任务书字段、交接包（不给产出者推理/自评）、轮次上限 2、处置三选一、裁决 append-only/原文、check-id 全覆盖、独立性标注（按 `review-protocol.md`）、升级路径。
 4. **方法包契约 + fixture**：`tests/fixtures/` 里一对 producer/verifier 方法包，`SKILL.md` 的 `metadata` 带 `method` / `version` / `side`，正文带 check-id 表；文档写清安装到 `<DSH_HOME>/company/methods/<role>/<pack>/`；任务书不给方法时 fail-closed；**不发布默认方法包**。
 5. **审计探针**：`quality-loop-audit.mjs`（落 `probes/team/`）核两个独立会话/preset/depth、裁决文件与 child 最终消息同哈希、裁决未被改、处置覆盖全部发现、两侧方法同版本、验证者无 `write`/`edit` 调用；红证 = 改裁决文件/删一条处置/换方法版本 → 红，还原 → 绿。
-6. **文档**：`docs/contracts/presets.md` 加两个 support 档一行；`docs/contracts/delegation.md` 加两行与深度说明；`quality-loop.md`（落 `docs/`，或只留 skill 指针）说明流程与方法槽；`review-protocol.md` 加"质量环的独立性口径与对外签字仍归人"一节。
+6. **文档**：`docs/contracts/presets.md` 加两个 support 档一行；`docs/contracts/delegation.md` 加两行与深度说明；`docs/contracts/cultivation.md` 加 support profile 方法槽（若采纳）；quality-loop 文档落 guides tier（流程/操作；或只留 skill 指针）说明流程与方法槽；`docs/architecture.md` 若流程成为常驻面加一行路由；`review-protocol.md` 加"质量环的独立性口径与对外签字仍归人"一节；理由/备选进落地 Note（docs 只写 now）。
 7. **测试**：keyless（`pnpm test tests/presets` + 审计 fixture）绿；一次真模型 E2E 证两独立会话、验证者只读、裁决原文、处置覆盖；E2E 证据进 Note，不进 CI。
 8. **抽象度**：卡的 `## 抽象度` 四问已答；第二消费者 = 第二套方法包 fixture + 第二家公司 fixture（`tests/fixtures/companies/`）；高成本缝（preset/工具面/流程）第一天抽象，方法（低成本）放方法层。
 9. **不做**：host 代码、UI 委派卡、运行时 veto、`PRESET_KEYS` 改动、默认方法包、验证者 bash（v1）。

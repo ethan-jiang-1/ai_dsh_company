@@ -41,7 +41,7 @@ intent: 记录 2026-11-10 从 SA/SQA 历史需求到四槽/三层方案与宪章
 
 ### 3.3 方法层是现成的"外部约定"槽
 
-- 路径 = `<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`；公司级、按角色隔离、pack 升级不擦、**人**采纳才生效（`/cultivation adopt`），分身只能提案。见 `docs/contracts/presets.md` §培养回路。
+- 路径 = `<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`；公司级、按角色隔离、pack 升级不擦、**人**采纳才生效（`/cultivation adopt`），分身只能提案。见 `docs/contracts/cultivation.md`。
 - 生效时点：skill 正文同会话下一轮；条目增删改名下一轮刷新目录（watcher 连运行中会话都刷）。换方法不用重启、不用发版。
 - 写隔离：workspace-write 部署下，分身 fs 写方法层被沙箱拒（`[sandbox: file access denied]` 活体留证）；danger-full-access 无围栏——这是机器条件，不是机制缺口。
 - 限制：`/cultivation` 的名册 = `CULTIVATION_ROLES` = 六个角色（`PRESET_KEYS`），support profile 不在其中。新能力档若要走采纳流水线，需要扩名册（另一张卡）；v1 人工放目录即可。见 `packages/company-pack/src/host/cultivation/cultivation.ts`。

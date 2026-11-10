@@ -101,7 +101,7 @@ opened: 2026-11-10
 ## 审查（自审）
 
 - 五步按卡内顺序执行；本卡先转 `待落地` 再实施，未重复“先做后补”。
-- 残留：`reference/` 的 5% 豁免是有意例外；now-only 未逐句清完（证据日期/R1/R2 保留，DSH 允许 version-specific evidence）；四篇主题 Note 保留决定时快照，canonical 语义在 contracts/architecture；预算仍按行计，非 DSH 词数。
+- 残留：`reference/` 的 5% 豁免是有意例外；now-only 未逐句清完（证据日期/R1/R2 保留，DSH 允许 version-specific evidence）；预算仍按行计，非 DSH 词数。四篇 rationale Note 已收口 + `notes-liveness` canonical 检查（重复权威风险已降为链接指针）。
 - 用户验收：待。
 
 ## 验收对照（2026-11-10）
@@ -127,3 +127,13 @@ opened: 2026-11-10
 - 第二消费者：无；单例例外 = 本仓唯一的 `docs/` 树。
 - 搬家成本：index/预算低；design/、genre 高 ⇒ 先做低成本项，高成本项各自立卡。
 - 排除了更低的层：公司层/产品类型层只服务产品内容，不服务仓库文档。
+
+## 依赖卡基座同步（2026-11-10）
+
+用户 2026-11-10：「`docs-dsh-alignment` 已经落地了，你们要同步一下，免得修改的时候 base 已经变了。」
+
+- [content-charter](2026-11-10-content-charter.md) 与 [producer-verifier-quality-loop](2026-11-10-producer-verifier-quality-loop.md)
+  已按本卡后的 docs 基座同步：tier 书架（index 不再逐文档登记）、design→notes、
+  `docs/architecture.md`、`docs/contracts/cultivation.md`、doc-budget 5% headroom；
+  两卡各带「基座同步」节 + 实施前核对命令。
+- 本卡仍 `等人拍板`：正式验收与归档待用户明确；本节只确认“已落地”是依赖卡的基座。
