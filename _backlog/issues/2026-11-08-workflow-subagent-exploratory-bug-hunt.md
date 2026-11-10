@@ -211,6 +211,9 @@ A3 验收：负控 label 不命中；`COO（运营与交付）` / `CFO（财务�
 
 ### 9.7 A 批执行结果（2026-11-10 晚）
 
+> 决策记忆 = [探索测试的资产策略](../../notes/implemented/2026-11-10-exploration-asset-strategy.md)
+> （ROI 六条、入口语义、输掉的方案与验证/未验面）。
+
 - **A1**：`tools/lib/surface-matrix.mjs` + `checks/audit/surface-matrix-audit.mjs` + spec（14 tests）。
   round-8 窗口（`--since 2026-11-10T17:00+08:00`）= **47 观察（20 root / 19 child / 8 member）**、
   54 个无模型轮跳过、**0 问题**；红证 = 同一 audit 对 `--since 2026-11-09` 旧日志 **exit 1**，

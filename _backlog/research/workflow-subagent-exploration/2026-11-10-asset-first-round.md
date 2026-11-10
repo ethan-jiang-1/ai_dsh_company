@@ -7,7 +7,8 @@ intent: 回答「继续探索前要不要先补资产」——用八轮缺陷家
 
 > 性质：**资产审计 + 计划**，不是执行结果。真模型 live 面未跑；实测数据全部来自
 > round-8（2026-11-10 17:10–18:00）已落盘的会话日志，只读、零模型。
-> 消费者：[bug-hunt 问题卡](../../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md) §9。
+> 消费者：[bug-hunt 问题卡](../../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md) §9；
+> 落地决定 = [探索测试的资产策略 Note](../../../notes/implemented/2026-11-10-exploration-asset-strategy.md)。
 > 上游材料：[2026-11-08 plan](2026-11-08-exploration-plan.md)、[2026-11-09 plan](2026-11-09-post-refactor-round.md)。
 > 当前基线：HEAD `02bf9607`（2026-11-10）；vendor pin `dsh-v0.2.1-rc.5`。
 
