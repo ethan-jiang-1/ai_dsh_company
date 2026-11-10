@@ -2,6 +2,10 @@
 
 状态：implemented（2026-11-10 落地；上游 = [BUG-055](../../_backlog/_archive/fixed_bugs/BUG-055-team-role-packet-missing-taskbook.md)；
 授权 = 用户 2026-11-10「我有两个bug，你看一看，按照我们的流程把它修了吧」）
+> 语义审：agent — 对照授权原文、skill/work-handoff 合同、keyless+真模型证据与「输掉的方案」重读
+> diff；无 blocker。非阻塞观察：角色包路径沿既有 `<slug>` 写法（handbook 的 A1 目录名是
+> `<日期>-<slug>`），命名张力未在本轮扩围。前置：真模型 probe 前把 dev profile 重装到当前 0.10.0
+> tarball（BUG-050 同型教训），否则加载旧安装副本。
 
 ## 问题
 

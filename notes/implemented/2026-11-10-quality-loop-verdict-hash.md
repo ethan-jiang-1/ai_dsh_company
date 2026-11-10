@@ -2,6 +2,9 @@
 
 状态：implemented（2026-11-10 落地；上游 = [BUG-056](../../_backlog/_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)；
 授权 = 用户 2026-11-10「你这两个半修好了之后，现在又有多余的一个新的bug了，你就继续修」）
+> 语义审：agent — 对照授权原文、quality-loop skill/audit 合同、keyless/self-test/真盘证据与
+> 「输掉的方案」重读 diff；无 blocker。非阻塞观察：未做 `artifact-sha256`，以「未复验」warning 替代，
+> 理由已记；审计仍是事后检测，不是运行时 veto。
 
 ## 问题
 
