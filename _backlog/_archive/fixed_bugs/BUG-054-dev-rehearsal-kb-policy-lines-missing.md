@@ -11,7 +11,7 @@ opened: 2026-11-10
 > 来源：第八轮 exploratory test（[问题卡](../../issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md)）；
 > 证据 = `runtime/team-role-packet-exploratory-2026-11-10.json`（gitignored）与 COO 输出
 > `runtime/rehearsal-workspace/.dsh-company/deliverables/2026-11-10-probe-team-role-packet/drafts/coo.md`。
-> 留痕：none — 非材料性（只动 `tools/` + tests + 指南事实句）；修复在工作树交付，共享工作树有并发会话改动，未单独提交。
+> 留痕：commit `684d09db`（非材料性；只动 `tools/` + tests + 指南事实句，根因与影响面在 commit message）。
 > 修复 = `tools/lib/kb-seeds.mjs`（seed.json 唯一读取面）+ 两条旁路改走它；旁路不再维护第三份清单。
 > 审查：agent — 对照「已修判定」逐条核过；红→绿与真入口见「修复落地」。
 
