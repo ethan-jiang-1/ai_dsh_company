@@ -29,9 +29,8 @@
 | 凭据 | 用户/home | provider | 用户 | `<DSH_HOME>/.credentials.yaml` / env | 永不进 workspace/备份共享 |
 | 浏览器状态 | 设备/origin | client | 浏览器 | localStorage | 换 origin 即丢；不参与模型 |
 
-**版本**：`bundle.json` v3；catalog 1；presented 账本 schema 1（domain `company_run_bundle_ledger` v1，
-按 workspace key）；records 1；lease 1。旧 `company_deliverables` domain / workspace
-`kb/deliverables-presented.json` / 根目录骨架不读不迁；旧文件保留。
+**版本**：`bundle.json` v3；catalog 1；presented 账本 schema 1（domain `company_run_bundle_ledger` v1，按 workspace key）；records 1；lease 1。
+旧 `company_deliverables` domain / workspace `kb/deliverables-presented.json` / 根目录骨架不读不迁；旧文件保留。
 
 **边界**：workspace 写入受 `workspace-write` 约束；`danger-full-access` 下无围栏。方法层/账本在
 workspace 外（workspace-write 硬；danger 下仍是约定）。`bundle.json` 在 workspace 内，模型可写，

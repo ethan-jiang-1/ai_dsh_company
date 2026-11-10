@@ -110,11 +110,3 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
   `pnpm test` 的 client-face 守卫比对 preset 的 `toolName`。
 - 卡片只依赖 `slots` 服务（不读团队状态），单独 `ctx.inject(['slots'], …)` 注册——不被 team
   remote 的缺席拖住。
-
-## 6. 验证（分层，只报告实际跑过的）
-
-**分层原则（R3 立）**：按"要不要模型"切，不按"重不重要"切；真模型/真浏览器不进回归。
-**逐层命令、预算与触发条件 = [tests/README](../../tests/README.md) 与各脚本头注**（本文件不复述，避免两处漂移）：
-keyless（`pnpm test`：委派卡视图模型 + card key ↔ `toolName` 逐字一致）→ 真页面挂载
-（`client-load-smoke`）→ 机制/边界（`delegation-smoke`：activation 回执、child 首帧 `agentPreset`、
-child 无 Team 工具）→ 挂载（`preset-smoke`）→ 端到端（历史重放；现行真页面车道 = `ui-scene-smoke`）。

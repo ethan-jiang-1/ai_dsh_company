@@ -2,8 +2,7 @@
 
 > 什么时候读：`pnpm release --check` 打出 `READY` 之后，把当前版本真正发出去的人。合同 = [release.md](../contracts/release.md)；
 > 五步发布字节流程 = [release-runbook.md](./release-runbook.md)；本页只补“字节离开仓库”的那一段。
-> 为什么单独成页：npm publish 不可逆（同版本不能覆盖）、market index 是外部托管，两者都不该混进本地
-> `pnpm release`（它故意不 publish）。
+> 为什么单独成页：npm publish 不可逆（同版本不能覆盖）、market index 是外部托管，两者都不该混进本地 `pnpm release`（它故意不 publish）。
 
 ## 0 先决
 

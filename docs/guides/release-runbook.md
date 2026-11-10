@@ -57,13 +57,9 @@ READY 是点态（只对 `--stamp` 的 commit 成立，之后提交再红是设�
 
 | 规则 | 现在的载体 |
 |---|---|
-| 发布物是 bundle；profile 是用户侧；preset 是行 | `package.json` 的 `dsh.bundle.patch` + preset 文件 |
 | 运行时兼容只看 `engines.dsh` | `pack-engines` 门禁 + release-smoke 真装 |
-| 已认证 tag 是本地台账，不是 DSH 字段 | `checks/gates/lib/compat-tags.json`（不随包） |
-| 包目录只读；用户数据在 workspace/home/session | README Data 节 + release-smoke 包目录零写入 |
 | 版本/变化/手册/sha 必须同步 | `release-ready` 门禁 + `release --check` |
 | 每次交付有可追溯回执 | `_dist/release-manifest.json` |
-| 测试按失败面分层 | [testing.md](../testing.md) + `checks/` 索引 + release runbook 第 1 节 |
 
 ## 5. 供应链（T8）
 

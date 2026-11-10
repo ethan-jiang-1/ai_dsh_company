@@ -13,6 +13,7 @@ import { join } from 'node:path'
 // ⚠ 注释里**不要复述当前行数**——那是易腐常量，实测值由每次跑出的 PASS 行给出（2026-09-26 修：
 //   原注释写"后 107 行"/"整治后 131"，实为 108 / 142，属"枚举型事实写两处"那一类腐化）。
 const SLACK_FLOOR = 0.2   // 上限最多比现行内容高 20%；超过即视为棘轮未落实（R3-17）
+const HEADROOM_FLOOR = 0.05 // DSH：目标内留 ≥5% headroom（docs/ 适用；2026-11-10 步 5）
 
 export function run({ root, ok, fail }) {
 const DOC_LINE_BUDGETS = [
@@ -73,6 +74,10 @@ for (const [rel, cap] of DOC_LINE_BUDGETS) {
   const lines = readFileSync(join(root, rel), 'utf8').split('\n').length - 1
   if (lines > cap) {
     fail('doc-budget', `${rel} ${lines} 行超上限 ${cap}（先搬内容到该去的家，再压；不直接加行）`)
+  } else if (rel.startsWith('docs/') && !rel.startsWith('docs/reference/') && lines > Math.floor(cap * (1 - HEADROOM_FLOOR))) {
+    // DSH：目标内至少 5% headroom；顶格=饱和信号，处置是搬/压，不是提额。
+    // reference/ 是查表/台账（DSH: reference may be exhaustive），不设 5% 留白；仍受 20% 反棘轮。
+    fail('doc-budget', `${rel} ${lines}/${cap} 行，headroom <5%（DSH 目标内留白；先搬/压，不提额）`)
   } else if (lines < Math.ceil(cap * (1 - SLACK_FLOOR))) {
     // 反向棘轮（R3-17）：上限长期悬空 = 「顶格即饱和」信号失效（web-rpc 曾长期空置，已下调）。
     // 处置是**下调上限**（不是写内容凑数）；确需预留空间 → Note 论证后显式下调到 content+5%。

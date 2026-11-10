@@ -68,7 +68,3 @@
 - **tests 部分不在 tsc（已知未覆盖面）**：`tests/client` 已接（`tsconfig.test-client.json`；排除 3 个直引 vendor 源码的 spec）；`tests/host` / `tests/lib` / `tests/content` 已接（同一个 `tsconfig.test-company.json`；排除 7 个直引 vendor 源码 / host-composition 的 spec）；`tests/harness` 已接（`tsconfig.test-harness.json`；glob 全收，唯一例外 = `tests/harness/repo/pack-exports.spec.ts`——它同时 import host 与 client 两半，任一面的全局环境（`process`/`client-build-environment`）都会让另一半报错，实测两向皆红，只能留在 tsc 外）。
 - **自测轮**（全门禁 sweep + UX 走查 + entry-probe 语义探针）：agent 阶段收口时提案、用户批后跑（2026-10-04 定）；预算按 [policy §P3](./policy.md) 轻任务纪律。
 - **已知未覆盖面（明说不覆盖）**：多人交互/协作 UX 面——2026-10-06 用户立项首轮猎捕已立 4 个判据探针（dual-ceo / task-discovery / claim-race / dual-signoff，真模型档、常驻，触发见头注）+ 4 张 bug 卡（BUG-002..005 **已修闭环**——修复落地+复跑转绿，卡迁 [_fixed_bugs](../_backlog/_archive/fixed_bugs/)；BUG-006 于 2026-10-07 发现即修。台账 = 那些已修卡，不另留猎捕日记）；机制面 E1/E2 与 `fs-guard-probe` 不变。
-
-## 6. 升级地图（长大后再借的形状；触发条件即准入门，不预建）
-
-脚本化模型 adapter 进程内 harness（回放覆盖不到的会话级行为；vendor `core/agent-loop/tests/mock-adapter.ts` 源码平面可复用）→ Config 两脸断言（首个带 Config 的 host 插件）→ 自跳过计数守卫（出现 skipIf）→ coverage 死代码扫描（lib 判据逻辑可疑）→ 交互性能预算常数化（性能回归指控）→ 快照世代模型（vendor 会话格式再 bump 且存有跨格式场景）→ 函数复杂度读数（同一函数两次事故）→ 变异测试（关键判据模块覆盖达标仍反复出错）。

@@ -16,15 +16,9 @@
    基线版本唯一见 `AGENTS.md` §vendor 簿记）。验证一律 `pnpm dsh`；`env.sh` 已把裸 `dsh` 设为拦截提醒（bypass：`command dsh`）。
    注意 `DSH_HOME` 只护数据层：source 过 env.sh 后裸 `dsh` 也落在 dev home，但跑的
    仍是全局代码。
-5. **新 shell 陷阱（R1 实证 + R4 更正）**：任何 `pnpm dsh` / `node bin.ts` 调用前必须先 `source run/env.sh`，
-   否则**静默**落日用 home `~/.dsh`（写 profile、装包都进日用数据；R1 实证一次未 source 的 `plugin add` 被
-   沙箱 EPERM 拦下——沙箱是最后防线，不是第一防线）。⚠ **coding 会话里 `DSH_HOME` 是继承且带值的**
-   （值 = 日用 home `~/.dsh`，实测不 source 直接 `echo $DSH_HOME` 可证）——后果比"没设"更坏：脚本里
-   "未设则报错"的防线**根本不触发**，会安静地拿日用 home 的会话库当输入。所以：**判据/审计类脚本一律接入
-   `tools/lib/runtime-home.mjs`**（启动前拒绝日用目录、重叠路径及其符号链接；接入清单 = 各脚本自己的 import，
-   `rg -l runtime-home checks tools -g '*.mjs'` 即得——**别在文档里列名单**，实测名单必漂）；
-   `deliverables-check` / `release-smoke` / `entry-probe` / `snapshot-motion` 均已调用 `requireDevHome`，
-   `sync-dsh --pin` 也要求隔离 home；守卫不涵盖未接入该 helper 的任意脚本，也不防守检查后的并发符号链接替换。
+5. **新 shell 陷阱（R1 实证 + R4 更正）**：任何 `pnpm dsh` / `node bin.ts` 调用前必须先 `source run/env.sh`，否则**静默**落日用 home `~/.dsh`（写 profile、装包都进日用数据；R1 实证一次未 source 的 `plugin add` 被沙箱 EPERM 拦下——沙箱是最后防线，不是第一防线）。
+   ⚠ **coding 会话里 `DSH_HOME` 是继承且带值的**（值 = 日用 home `~/.dsh`，实测不 source 直接 `echo $DSH_HOME` 可证）——后果比"没设"更坏：脚本里"未设则报错"的防线**根本不触发**，会安静地拿日用 home 的会话库当输入。
+   所以：**判据/审计类脚本一律接入 `tools/lib/runtime-home.mjs`**（启动前拒绝日用目录、重叠路径及其符号链接；接入清单 = 各脚本自己的 import，`rg -l runtime-home checks tools -g '*.mjs'` 即得——**别在文档里列名单**，实测名单必漂）；`deliverables-check` / `release-smoke` / `entry-probe` / `snapshot-motion` 均已调用 `requireDevHome`，`sync-dsh --pin` 也要求隔离 home；守卫不涵盖未接入该 helper 的任意脚本，也不防守检查后的并发符号链接替换。
 6. **端口与实例隔离（部署事实）**：headless 形态（探针/动议）**无端口**——单次任务
    进程，stdout 出结果，日志落 `$DSH_HOME/sessions/`。web 形态（观察窗）起**本地**
    HTTP 端口（值见启动横幅）；因 `DSH_HOME` 指 dev home，它与日用 DSH 的 web 实例

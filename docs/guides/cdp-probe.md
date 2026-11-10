@@ -4,8 +4,6 @@
 
 **为什么存在**：插件 client 半（侧栏面板、卡片、对话区）在 stub/静态冒烟里是绿的，在真实渲染器里仍可能崩——钩子绑定、会话作用域、主题、布局都是真实环境才有的变量。这个工具起一个**一次性无头 Chrome**，把 booted 的观察窗当真实用户一样驱动，然后报告**实际渲染出了什么**。它是「执行冒烟」和「owner 亲眼看」之间的那一环——呈现即验证（dev-loop §1）的机器实现。
 
-**出处**：2026-10-01 从 `ai_dsh_loop_advisor` 项目借鉴（owner 指令「想办法借鉴过来」）。驱动层 launch 路径按其文档契约**逐字保留**（2026-10-28 追加 attach 路径，不改 launch）；场景层换成本仓观察窗的面（六角色驾驶舱）。借鉴当夜即抓到驱动层两个新坑并回灌本文（见下）。
-
 ## 架构（两层，借用只拷第一层）
 
 | 文件 | 职责 | 可移植性 |
@@ -39,8 +37,7 @@ console.log），JSON verdict 的 `evidenceDir` 指向它；`--evidence` 让成�
 驱动层（源自 loop-advisor，逐字保留）：
 - **`--remote-debugging-port=0`** + 从 profile 目录 `DevToolsActivePort` 读真实端口——固定端口会静默连上孤儿 Chrome 的旧页面，判决全错。
 - **`--no-sandbox` + GPU/crashpad 禁用**：受限环境起不来 Chrome 内部沙箱，GPU 进程直接 FATAL。
-- **`--password-store=basic` + `--use-mock-keychain`（2026-11-06）**：从 DSH 沙箱化 bash 起的 Chrome 碰不到系统钥匙串，每起一个一次性 profile 就弹「A keychain cannot be found to store
-  "Chrome"」+ Reset To Defaults（要密码，点多少次也不修）；两枚开关 = Playwright launcher 默认参数，Chrome 完全不碰 OS 钥匙串（`launchChromium` 本来就有，手搓的 `launchCdpBrowser` 曾漏）。
+- **`--password-store=basic` + `--use-mock-keychain`**：从 DSH 沙箱化 bash 起的 Chrome 碰不到系统钥匙串，每起一个一次性 profile 就弹「A keychain cannot be found to store "Chrome"」+ Reset To Defaults（要密码，点多少次也不修）；两枚开关 = Playwright launcher 默认参数，Chrome 完全不碰 OS 钥匙串（`launchChromium` 本来就有，手搓的 `launchCdpBrowser` 曾漏）。
 - **桌面 `--window-size`**：无头默认 800×600，响应式 UI 在窄视口是另一套界面形态。
 - **别用 `--virtual-time-budget`**：页面有活 WebSocket 时虚拟时间永不推进。用真实时间预算 + 轮询。
 - **每个 evaluate 带超时竞速**：socket 断了要 fail，不能挂死探针。
@@ -60,7 +57,6 @@ console.log），JSON verdict 的 `evidenceDir` 指向它；`--evidence` 让成�
 
 | 面 | 检查 | 层 |
 |---|---|---|
-| 结构/契约 | `pnpm verify` / `pnpm test` | 静态 |
 | client 面健康（零挂载失败 + 品牌） | `client-load-smoke` | 真浏览器（自起实例） |
 | 自起实例跑同一套断言 | `ui-scene-smoke`（起窗 → 本探针 → 证据） | 真浏览器（自起实例） |
 | **运行中实例的真实渲染 + 全环** | **本探针** | 真浏览器（附着运行实例） |
