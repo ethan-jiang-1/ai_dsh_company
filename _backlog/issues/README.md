@@ -5,6 +5,10 @@
 ## 活跃清单
 
 - [workflow + subagent 探索性测试 bug hunt](2026-11-08-workflow-subagent-exploratory-bug-hunt.md) — 推敲中：第四轮 5 张缺陷卡 BUG-045–049 已修复；修复后验证通过（keyless/挂载/UI golden + 真装配 retry/身份行/handbook）；BUG-050 复核为环境陈旧误报；用户 2026-11-09 晚指示继续探索；第五轮新发现 BUG-051（P2）、第六轮 BUG-052（P2）、第七轮 BUG-053（P1），**三张已于 2026-11-10 按 E/F 根因修复归档**（control per-agent + fan-out 诚实声明；abortable + interrupt）；depth 4 负例 / 重启后 retry+workflow 身份行 PASS；真页面 DagTab 仍未定位会话入口（harness-blocked，不伪造 PASS/FAIL）；未覆盖项见研究材料 §9.7–§9.9。
+- [产品类型语义：b2b-saas 太窄，business-software 怎么定](2026-11-10-product-type-semantics.md) — 推敲中：纯软类型是 `business-software` 还是 `software`、链是否改 MRD/StRS/PRD、SaaS 降为交付模式、project-services 是否第三类；研究 = [产品类型模型](../research/org-coordination-topology/2026-11-10-product-type-model.md)。
+- [动议级产品类型：meta 声明 + /req check 解析](2026-11-10-motion-product-type.md) — 推敲中：`meta.md` 加 `产品类型`，`/req check` 按「动议 meta > company.md」解析；公司默认只做回落；研究 = [产品类型模型 §4](../research/org-coordination-topology/2026-11-10-product-type-model.md)。
+- [SA/SQA 方法包：系统架构 + V&V 的两侧方法与升级](2026-11-10-sa-sqa-method-packs.md) — 推敲中：两个方法包、starter 安装、V&V 作者身份、blocker 升级；不恢复旧 SA/SQA persona；研究 = [SA/SQA 方法包](../research/org-coordination-topology/2026-11-10-sa-sqa-method-packs.md)。
+- [COO/CFO 通道：命名行还是 team 角色包](2026-11-10-coo-cfo-delegation.md) — 推敲中：补 `coo`/`cfo` 命名行还是明确 team-only + 角色包；修「五个直接汇报 / 每个汇报一个命名工具」文案与测试盲点；研究 = [组织拓扑 §2/§7.1](../research/org-coordination-topology/2026-11-10-org-coordination-topology.md)。
 
 （2026-11-10 producer/verifier 质量环卡已结归档：两 support 能力档（共用 `quality-loop-` 前缀）+ VP-Eng `quality_loop_produce`/`quality_loop_verify` 两行 + 共享 `quality-loop` skill + 角色方法层 + 事后审计探针；一张卡不拆；去向 = [Note](../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md)，卡片见[归档](../_archive/settled_issues/2026-11-10-producer-verifier-quality-loop.md)。）
 
