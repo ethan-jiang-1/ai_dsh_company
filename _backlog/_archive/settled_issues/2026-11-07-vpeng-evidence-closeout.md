@@ -13,7 +13,7 @@ opened: 2026-11-07
 
 **问题与期望结果：** 真模型 VP-Eng 包 E2E；teammate/命名 child 的 preset/depth 证据；CEO `product-team-e2e-smoke` 绿；程序 Note/D57/D58/docs/归档。
 
-**范围：** 新 `vp-eng-teaming-probe.mjs`（待建，落 probes/team/）；`checks/smoke/product-team-e2e-smoke.mjs`；`checks/smoke/delegation-smoke.mjs`；程序 Note + `docs/index.md`、`docs/reference/decisions.md`（D57/D58）、`docs/design/role-content-plan.md`（按需）；A1/B1 的合同页（`docs/guides/product-definition.md`、`docs/contracts/presets.md`、`docs/contracts/delegation.md`）只核对、不改正文；归档。
+**范围：** 新 `vp-eng-teaming-probe.mjs`（待建，落 probes/team/）；`checks/smoke/product-team-e2e-smoke.mjs`；`checks/smoke/delegation-smoke.mjs`；程序 Note + `docs/index.md`、`docs/reference/decisions.md`（D57/D58）、`notes/implemented/2026-11-10-role-content-rationale.md`（按需）；A1/B1 的合同页（`docs/guides/product-definition.md`、`docs/contracts/presets.md`、`docs/contracts/delegation.md`）只核对、不改正文；归档。
 
 **依赖：** B1/A8。
 

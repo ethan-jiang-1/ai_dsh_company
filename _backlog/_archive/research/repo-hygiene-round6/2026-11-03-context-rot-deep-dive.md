@@ -14,7 +14,7 @@ intent: "2026-11-03 上下文腐化（D4）深挖：找出「当前文档/生成
 
 | # | 通道 | 现状/实证 | 谁该守 | 结论 |
 |---|---|---|---|---|
-| D4-1 | **设计层的"现在时"断言** | `docs/design/architecture.md:32` 仍写「开发用 `web` profile…；`company` profile 已退役」——与 README/profile/release 的「产品入口 = `company`」相反。上一轮只修了 index/ui-demo/terminology，**漏了这份**。`bare-path` 只认「以顶层目录开头的反引号路径」，这种散文矛盾永远不会红。 | 无 | **修 + 立 `retired-claims` 门**（已知假断言的禁写表） |
+| D4-1 | **设计层的"现在时"断言** | `docs/architecture.md:32` 仍写「开发用 `web` profile…；`company` profile 已退役」——与 README/profile/release 的「产品入口 = `company`」相反。上一轮只修了 index/ui-demo/terminology，**漏了这份**。`bare-path` 只认「以顶层目录开头的反引号路径」，这种散文矛盾永远不会红。 | 无 | **修 + 立 `retired-claims` 门**（已知假断言的禁写表） |
 | D4-2 | **文档里的命令** | 往 `docs/orient.md` 加 `pnpm nonexistent-script` → `verify` 全绿；把 `package.json` 的 `orient` 改名 → `verify` 仍全绿。命令表、指南、README 里的 `pnpm <script>` 与脚本无任何机械联系。 | 无 | **立 `command-refs` 门**（`pnpm <script>` 必须存在于 package.json；`node <path>` 必须存在） |
 | D4-3 | **tracked 生成物 vs 生成器** | `_dist/安装手册.md` 是 tracked 生成物；本轮改了模板（卸载清单），`verify` 仍绿、手册仍是旧内容。`dist-manual` 只查版本/sha/关键句，不查「是否由当前模板生成」。 | `dist-manual`（缺一半） | **重生成 + 渲染比对门**（模板→字节，确定性） |
 | D4-4 | **台账顺序** | `docs/reference/decisions.md` 的 `D19+D21` 行排在 `D20` 之后；`ledger-routing` 只查三列/长度/家可解析，不查编号单调。 | `ledger-routing`（缺一条） | **修顺序 + 单调断言** |

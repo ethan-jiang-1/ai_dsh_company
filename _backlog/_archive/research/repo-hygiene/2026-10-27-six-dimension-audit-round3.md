@@ -68,14 +68,14 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 
 上轮的判断是"腐化主形态转为检索层退化 + 常驻层饱和"；本轮观察到新形态：**入口还在，对象没了**。
 
-- **回放舰队撤空，但活跃面仍把它当现行**：`snapshots/replay` 只剩一个 headless 合成场景（`foundation-workspace`，其 `snapshot.yml` 自述"产品仓唯一合成场景"）。而 r2-motion / r3-delegation 在活跃树被引用 **43 处**，其中至少 10 处是**指令性**的：`checks/smoke/replay-smoke.mjs` 头注（"何时跑…r3 ~15s / r2 五会话 ~80–100s"、`--ui` 说明）、`checks/smoke/client-load-smoke.mjs:14`、`docs/guides/dev-loop.md:227`、`docs/testing.md:15`、`docs/guides/cdp-probe.md:59`、`tools/snapshot-motion.mjs`（默认输出 `r2-motion`，:10/:28）、`tests/harness/repo/repository-layout.spec.ts` 的示例名。**最刺眼的是 `docs/design/ui-demo.md:132-133`**：同一张表里 v1 行已写"UI 端到端断言已随真实 snapshots 移出产品仓而退役"，v3/v4 行却仍把 `replay-smoke --ui`（r3 金样 / r2 端到端）列为验收证据。
+- **回放舰队撤空，但活跃面仍把它当现行**：`snapshots/replay` 只剩一个 headless 合成场景（`foundation-workspace`，其 `snapshot.yml` 自述"产品仓唯一合成场景"）。而 r2-motion / r3-delegation 在活跃树被引用 **43 处**，其中至少 10 处是**指令性**的：`checks/smoke/replay-smoke.mjs` 头注（"何时跑…r3 ~15s / r2 五会话 ~80–100s"、`--ui` 说明）、`checks/smoke/client-load-smoke.mjs:14`、`docs/guides/dev-loop.md:227`、`docs/testing.md:15`、`docs/guides/cdp-probe.md:59`、`tools/snapshot-motion.mjs`（默认输出 `r2-motion`，:10/:28）、`tests/harness/repo/repository-layout.spec.ts` 的示例名。**最刺眼的是 `notes/implemented/2026-11-10-ui-demo-rationale.md:132-133`**：同一张表里 v1 行已写"UI 端到端断言已随真实 snapshots 移出产品仓而退役"，v3/v4 行却仍把 `replay-smoke --ui`（r3 金样 / r2 端到端）列为验收证据。
 - **语义真空绿**：`replay-fixture-freshness` 输出 `×0 场景`（唯一 runnable 是 headless，按设计跳过注入面比对）；`replay-ui-freshness` 在**盘上 0 个 `ui.expected.md`** 的情况下 PASS。门禁把"没有对象"和"检查通过"渲染成同一个词。
 - **声明资产不存在**：`docs/testing.md:62` 与 `checks/audit/candidate-scan-eval.mjs:20` 都指向 `snapshots/corpora/candidate-scan-corpus/`；盘上 `snapshots/` 下只有 `replay/`。实测该脚本 **ENOENT 崩栈、exit 1**（不是优雅报"语料缺失"），因此"行为质量档"只剩真模型 `probe --full` 一条腿。
 - **升 pin 的“第一道回归网”已名存实亡（最重的一条）**：`docs/contracts/release.md:123-125` 仍写“语料回放全绿 = vendor 换 tag 后先跑 `checks/smoke/replay-smoke.mjs`（r2/r3 会话判据 + foundation workspace oracle）…replay = 升 pin 回归网第一道”，并列出“已知漂移红（r3 ×2 / foundation ×3）”。现实是：r2/r3 已不在盘上，foundation 是 authored 合成场景且我实跑全绿；`docs/guides/dev-loop.md:133` 与 `docs/testing.md:62` 的同一句也指向已不存在的语料。**升 pin 程序会拿一个不加载本包的合成回放当“全绿”证据。**
 - **计数与事实漂移**：`packages/company-pack/README.md:23` 写"公司视图与**五个页签**"——注册面实际 9 个（`company-tab-registration.ts` 九个 `id:`，cdp-probe 活体也验到 9 个）。`nav-count-claims` 门禁的扫描面是 `docs/** + AGENTS.md + README.md`，**不含包 README**，所以这条活到了收货人文档里。同类：`tests/harness/session/entry-probe.spec.ts:13` 的 Q4 旧标准答案仍是 `dsh-v0.1.7-rc.2`（现行 pin 是 `dsh-v0.2.1-rc.2`），而判据 `tools/lib/entry-probe.mjs:6` 只匹配 `/dsh-v\d+\.\d+/`——这个"入口链新鲜度"探针抓不到版本腐化；`checks/gates/doc-budget.mjs` 第 13-15 行刚写"注释里不要复述当前行数"，随后三处"内容 N"已过期（64/59/351 写成 60/55/348）。
 - **同文件内重复**：`docs/contracts/data-model.md` 把"面板摘要全扫 + open/最近 120 全文"写了三次（:15 表格、:67、:70——后两条几乎逐字重复）。
 - **归档指针失效**：`docs/contracts/demo.md` 在 :68/:152/:171/:228 引 `snapshots/archive/...` 四个路径，盘上都不存在；:68 还把合成的 `foundation-workspace` 称作一场真实动议的"归档"。
-- **设计层标签过期**：`docs/design/architecture.md:273` "（0.1.7 模型）"、`docs/design/roles-isolation.md:130` "（0.1.7 现状）"、`docs/design/ui-demo.md` 多处——机制在 rc.2 下仍成立（子代理回查 vendor 确认），但"现状"写在旧版本号上，读者无法判断。
+- **设计层标签过期**：`docs/architecture.md:273` "（0.1.7 模型）"、`notes/implemented/2026-11-10-roles-isolation-rationale.md:130` "（0.1.7 现状）"、`notes/implemented/2026-11-10-ui-demo-rationale.md` 多处——机制在 rc.2 下仍成立（子代理回查 vendor 确认），但"现状"写在旧版本号上，读者无法判断。
 - **探针默认值失效**：六个面板探针（attention/presence/tasks/budget/deliverables/…）默认会话标题 `动议观察 · 23684`，dev home 里不存在（grep 零命中），按头注跑会得到栈而不是截图。
 
 ### D5 测试资产的组织、测点、覆盖与类型 —— 判定：诚实、覆盖偏上，但重心偏在仓库自身
@@ -125,7 +125,7 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 | R3-06 | D4 | P1 | 语义真空绿：`replay-fixture-freshness ×0 场景`、`replay-ui-freshness` 在 0 个金样上 PASS（verify 输出；`checks/gates/replay-ui-freshness.mjs:19-24`） |
 | R3-07 | D3 | P1 | 授权边界被复述且截断：`docs/guides/dev-loop.md:35` 丢 `_backlog/README.md:86` 的排除项；`AGENTS.md:29` 点名两个 owner |
 | R3-08 | D3 | P1 | 两份收尾清单顺序相反、互指 owner，且指南不链 skill（`dev-loop.md:296-306` vs `SKILL.md:8,20-35`） |
-| R3-09 | D4 | P1 | r2/r3 指令性残留 10+ 处；`docs/design/ui-demo.md:132-133` 同表内自相矛盾（v1 说已退役、v3v4 当验收） |
+| R3-09 | D4 | P1 | r2/r3 指令性残留 10+ 处；`notes/implemented/2026-11-10-ui-demo-rationale.md:132-133` 同表内自相矛盾（v1 说已退役、v3v4 当验收） |
 | R3-10 | D5 | P1 | 客户端连接层最薄：`client/index.ts` 分支 10.5%、`AttentionTab` 0%、两面板零渲染测试；空待办/白面板可全绿 |
 | R3-11 | D5 | P1 | host 无真组合测试：`apply()` 只 stub ctx；`host/index.ts` 函数覆盖 37.5%，dispose/double-apply/inject 未测 |
 | R3-12 | D5 | P1 | 治理守卫未测：propose 五条守卫零用例（`host/cultivation.ts:657-685`，分支 68.6%） |

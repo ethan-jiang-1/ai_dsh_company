@@ -36,7 +36,7 @@
 - `pnpm verify` → **ALL PASS**（50 门 + 2 门 SKIP：`replay-fixture-freshness` / `replay-ui-freshness` 无对象）。
 - `pnpm test` → **106 files / 954 tests passed**（7.50s）。
 - `git grep -nE "snapshots/ui|48 个模块|语料回放全绿|replay-smoke --ui|index §外部研究材料|index 决策台账" -- docs checks tests packages AGENTS.md README.md notes` → 仅剩明确标“历史”的 `docs/contracts/delegation.md` 与 `notes/{archived,implemented}` 的旧记录；活文档/头注零命中。
-- `doc-budget` 新增 `budget-and-ops` / `cdp-probe` 后仍 PASS；`docs/design/architecture.md` 删伪配方后仍在反向棘轮区间。
+- `doc-budget` 新增 `budget-and-ops` / `cdp-probe` 后仍 PASS；`docs/architecture.md` 删伪配方后仍在反向棘轮区间。
 
 ## 未验
 

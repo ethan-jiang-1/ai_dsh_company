@@ -21,7 +21,7 @@
 5. **`notes:audit` 双口径**：同时报「零 Note 入链」（note→note）与「零任何当前文档入链」
    （notes + docs + `_backlog` 活区）。单一数字曾被读成"N 篇孤立"，而分诊结论是"不批量迁"。
 
-同时修掉现行腐化：`docs/design/architecture.md` 的「company profile 已退役」错句、`D19+D21` 的
+同时修掉现行腐化：`docs/architecture.md` 的「company profile 已退役」错句、`D19+D21` 的
 台账顺序、以及两个已耗仪器（`cultivation-gui-probe` 710 行、`replay-ui`）从活树删除。
 
 ## 输掉的方案

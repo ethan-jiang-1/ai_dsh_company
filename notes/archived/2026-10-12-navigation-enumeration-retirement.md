@@ -16,7 +16,7 @@ spec / 页签这类**持续增长的清单**从导航文档退役——件名与
   用量/任务板）」，客户端注册面同期已有待办/培养/台账切片——[cdp-probe](../../docs/guides/cdp-probe.md)
   断言面写 8，两文相左。改为「页签清单 = 客户端注册面，随切片增长、不在此枚举」。
 - [docs/orient](../../docs/orient.md) 词表：「并入右栏五页签」同病，去计数。
-- [ui-demo §5 命名表](../../docs/design/ui-demo.md)：「右栏页签（五个）」+ 代码实体只写
+- [ui-demo §5 命名表](../implemented/2026-11-10-ui-demo-rationale.md)：「右栏页签（五个）」+ 代码实体只写
   `company-tabs.tsx`（实际注册面多文件）——改为指向客户端注册面；v4 行「五个平台页签」是交付
   时点记录（✅ 2026-09-23），历史层保留不改。
 - [cdp-probe.md](../../docs/guides/cdp-probe.md) 与探针头注：「8 公司页签」计数改「全部公司页签」

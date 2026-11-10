@@ -2,7 +2,7 @@
 
 > 本目录只收「怎么启动」的 tracked 配置；跑过留下的状态一律住 [runtime/](../runtime/README.md)
 > （gitignored 运行残留，逐件 owner = 其 README）。双 home 纪律与机制 =
-> [architecture §6](../docs/design/architecture.md)；进入开发环境 = `source run/env.sh`
+> [architecture §6](../docs/architecture.md)；进入开发环境 = `source run/env.sh`
 > （双 home 兜底 + 裸 `dsh` 拦截 + pre-push 接线，幂等）；全链时序 = [运行态地图](../docs/runtime-map.md)。
 
 ## 公司状态（workspace 单元）与 run trace（一次运行的追溯视图）

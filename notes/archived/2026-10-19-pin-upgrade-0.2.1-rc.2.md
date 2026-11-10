@@ -9,7 +9,7 @@
 
 先搜后写：本决定**部分取代** [2026-09-30 升 0.2.0 的 Note](2026-09-30-pin-upgrade-0.2.0-rc.2.md) §收割项候选
 （schedule-bundle 那一项**本轮判收**：退役并被 preset 行所有权接管，见 D-E）与
-[roles-isolation §2](../../docs/design/roles-isolation.md) 的"M2 需自写 provider"结论（就地补记已不需要）。
+[roles-isolation §2](../implemented/2026-11-10-roles-isolation-rationale.md) 的"M2 需自写 provider"结论（就地补记已不需要）。
 没有同主题的第二本账。
 
 0.2.1 不是发布 bump 而是**模型级改动**（三份上游升档指南：`v0.2.1-alpha.1/subagent-activations`、
@@ -61,7 +61,7 @@
 - **先改代码再切候选**：`backgroundMode` 残留在 0.2.0 上是合法的、在 0.2.1 上是 broken——两侧都绿的时刻
   只有"合并事务"这一种（0.2.0 先例同理）⇒ 输给测量窗口内一并重校。
 - **persist/mount 卡在旧 provider**：`agentPreset` 是官方 provider 的性质，自写 provider 无必要 ⇒
-  输给"三行工具各钉一个 preset"（`docs/design/roles-isolation.md` §2 已就地补记）。
+  输给"三行工具各钉一个 preset"（`notes/implemented/2026-11-10-roles-isolation-rationale.md` §2 已就地补记）。
 - **replay 侧放宽判据**（把 r3 降档 presence）：会丢掉 r3 独有的全量保真 ⇒ 输给**重录 + 归一化补词**。
 - **改 provider 让 `session/page` 认 child 地址**：为读一个字段动 vendor = 违反铁律 ⇒ 输给"读 child 日志首帧"。
 

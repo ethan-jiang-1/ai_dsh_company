@@ -204,7 +204,7 @@ intent: 盘点通用能力、领域知识与公司细节在仓库里的实际分
 | 只补缺种子 | `host/bootstrap.ts` `flag: 'wx'` | 已有"换公司不动既有数据"的原则 |
 | 跳过注入 | `handbookSkipPresets: ['worker']` | 加载器已承认"能力档 ≠ 公司角色" |
 | 按类型分 playbook | `product-definition/references/<type>.md` + 「新类型 → 新增」 | 领域知识外置的现成范式 |
-| persona / skills / KB 三载体 | `docs/design/role-content-plan.md §0.2` | 内容分工原则已存在，手册是没被纳入的第四载体 |
+| persona / skills / KB 三载体 | `notes/implemented/2026-11-10-role-content-rationale.md §0.2` | 内容分工原则已存在，手册是没被纳入的第四载体 |
 | 干净共享层 | `delegation-policy/SKILL.md` | 通用层可以做到零公司事实 |
 
 ## 9. 改动面估计

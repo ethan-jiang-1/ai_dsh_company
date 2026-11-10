@@ -65,8 +65,8 @@
 | 问 | 判据 | 本 repo 落点 |
 |---|---|---|
 | ① 占哪个 ctx 键 / 发哪些事件 | 每个新能力一个自己的键，`inject` 声明依赖，不劫持别人的 | company-pack `src/` 的设计节 |
-| ② 模型会看见什么新状态 | **日志税**：每个新的模型可见输入配 `SessionEventMap` 成员（并定 `ignorable`），否则 JSONL 回放不出来 | [architecture.md](../design/architecture.md) §8 已预警；漏了在第 5 阶段以"日志读不全"还债 |
-| ③ UI 走哪层 | presenter 纯函数 → `tool.call.toolview` 槽 → `dsh.client.inject`，不一步到顶 | [ui-demo.md](../design/ui-demo.md) 分层（D6） |
+| ② 模型会看见什么新状态 | **日志税**：每个新的模型可见输入配 `SessionEventMap` 成员（并定 `ignorable`），否则 JSONL 回放不出来 | [architecture.md](../architecture.md) §8 已预警；漏了在第 5 阶段以"日志读不全"还债 |
+| ③ UI 走哪层 | presenter 纯函数 → `tool.call.toolview` 槽 → `dsh.client.inject`，不一步到顶 | [ui-demo.md](../../notes/implemented/2026-11-10-ui-demo-rationale.md) 分层（D6） |
 | ④ 证据是什么 | **红/场景先行**（2026-10-04 升格）：机制面 = 实现前那个测试已写且红；行为/UX 面 = 场景先立（Given/When/Then + 判据点名）；口头担忧第二次提起 → 立卡或明确否决，不留复发性话题 | 该变更的 Note"需验证什么"；场景规格写在该变更自己的 Note 或探针头注 |
 
 ## 9. 门禁分层：连通档（默认，秒级）vs 内容档（按需，分钟级）

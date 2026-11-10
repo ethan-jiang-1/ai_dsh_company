@@ -22,7 +22,7 @@ opened: 2026-10-09
 
 1. **N1 立的章程说这是错位的。** [docs/AGENTS.md](../../../docs/AGENTS.md)「设计层的边界」写明：
    一个决定**已经落地**之后，它的叙述就不该留在 `design/`——落地的决定归**它出生那轮的决定记录**。
-   而 D1–D9 九行的「决定的家」全部指向 `docs/design/architecture.md` / `roles-isolation.md` / `ui-demo.md`
+   而 D1–D9 九行的「决定的家」全部指向 `docs/architecture.md` / `roles-isolation.md` / `ui-demo.md`
    的**节锚点**（如 `§2`、`§1/§6`、`§4.2`），不是 Note。
 2. **N4 把台账顶到了上限。** 加 D37–D40 四行后 `docs/index.md` 卡在 143/143 顶格，
    靠同 diff 压掉复述才腾出空间。[run-gates 预算注释](../../../checks/run-gates.mjs)已写明：

@@ -37,7 +37,7 @@ intent: 把 13 张卡放在一起查系统性/结构/一致性/逻辑与方法�
 | 15 | 测试资产 | A3/A4a/A4b/B1 改角色内容，却没排 `probe-smoke`（角色连通/人格进 prompt） | `checks/smoke/probe-smoke.mjs` 头注：角色内容改动后跑 | 四卡补 `probe-smoke` 快档行 |
 | 16 | 测试资产 | B1 改 `CultivationBoard` 用户可见文案，却没排 `client-load-smoke`/`ui-scene-smoke` | `tests/README.md` client 面板行 | 补 `client-load-smoke` + `ui-scene-smoke --isolated --golden`（如金样含文案） |
 | 17 | 覆盖 | A6/B1 改包行为/已知限制，却没排 `packages/company-pack/README.md` | `notes/README.md`：pack 行为面同 diff 更新 README 已知限制 | A6/B1 补 pack README |
-| 18 | 覆盖 | B1 没排 `docs/runtime-map.md`/`docs/design/roles-isolation.md` 的旧继承说法 | 两文有“继承 Lead 组合”表述 | B1 补“如引用旧说法” |
+| 18 | 覆盖 | B1 没排 `docs/runtime-map.md`/`notes/implemented/2026-11-10-roles-isolation-rationale.md` 的旧继承说法 | 两文有“继承 Lead 组合”表述 | B1 补“如引用旧说法” |
 | 19 | 覆盖 | A1 改了 `docs/guides/product-definition.md`，却没有对应验收行 | A1 scope 有该文件 | 补文档形状验收行 |
 | 20 | 证据 | A7 迁移只写“手动命令 + diff”，不可复现 | `validation-evidence` §3 要 exact command/artifact | 补 `cp <file> <file>.bak-2026-11-07` + `diff -u` |
 | 21 | 覆盖 | V1 词表盲测只在伞卡 D2/研究材料，没落到任何执行卡的验收/测试资产 | 共识 §7 / 伞卡 D2 | A1 补 V1 人工 gate（不写代码；结果记研究材料） |

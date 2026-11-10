@@ -12,7 +12,7 @@
 2. **隔离真页面档走产品同形预置。** `ui-scene-smoke --isolated` 不再 spawn 已删除的独立启动器：官方 web 模板建 `company` profile → `plugin add <pack 目录>`（link）→ 以 `--profile company` boot；`.dsh-company/` 由 host 首启自举。`--golden` 金样随现行 UI 刷新，连续两次隔离跑一致。
 3. **`diagnose` 的非零退出匹配未截断全文。** 先 slice 再正则会把末尾的 `[exit code: N]` 切掉；改为全文匹配、证据取尾部片段，并补 >400 字符失败输出的守卫。
 4. **`md-utf8` 跳过 gitignored 运行态。** `runtime/`、`company-workspace/`、`.pnpm-store/` 不是本仓 Markdown 源；隔离探针留下的 pnpm 缓存 README 不再把 `pnpm verify` 打红。
-5. **同批真相修正**：`src/README` 的 `files` 清单改指 `package.json`；`terminology` 的组合链改指 `docs/design/architecture.md`；`.gitignore`、`templates.spec`、`markdown-links`、`replay-fixture-freshness`、`runtime/README` 的旧 `workspace/` / 独立启动器指针改指现行家；`layering.spec` 删掉“fetch/spawn/exec 由下方 call 表达式检查”的假声明；决策台账 D50/D51 按编号排序；`deliverables-catalog` Note 的生成索引路径改到 `.dsh-company/kb/`。
+5. **同批真相修正**：`src/README` 的 `files` 清单改指 `package.json`；`terminology` 的组合链改指 `docs/architecture.md`；`.gitignore`、`templates.spec`、`markdown-links`、`replay-fixture-freshness`、`runtime/README` 的旧 `workspace/` / 独立启动器指针改指现行家；`layering.spec` 删掉“fetch/spawn/exec 由下方 call 表达式检查”的假声明；决策台账 D50/D51 按编号排序；`deliverables-catalog` Note 的生成索引路径改到 `.dsh-company/kb/`。
 
 ## 输掉的方案
 

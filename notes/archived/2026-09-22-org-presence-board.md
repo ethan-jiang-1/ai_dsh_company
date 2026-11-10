@@ -27,7 +27,7 @@ Q5–Q8](../../docs/index.md)，内容与选项见 r5-plus-readiness（原审计
 
 ## 提案
 
-1. **落点**：R5b 驾驶舱（[ui-demo §5](../../docs/design/ui-demo.md)）增加"组织在场板"切片，与既定的
+1. **落点**：R5b 驾驶舱（[ui-demo §5](../implemented/2026-11-10-ui-demo-rationale.md)）增加"组织在场板"切片，与既定的
    "协作动态流"共用同一条拉取通道（`remote.agentTeams.view` RPC，D-b 定案），不新增机制。
    **v1 边界（2026-09-23 机制核实）**：消息级动态流（谁给谁发了什么）需要 host 侧自建
    Typert Remote 折事件——但它的**客户端 stub 由 vendor 的 codegen 管线生成**

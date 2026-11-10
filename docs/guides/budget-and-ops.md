@@ -58,7 +58,7 @@
   整场（rc.2 API = `foldSubagentDescriptor`；`vendor/dsh/docs/subsystems/agent-team.md` §Replay）。复盘 = 读日志，不靠记忆。
 - 每场 demo 收尾动作：CEO `present` 交付物；人（你）把"值得留的教训"追加进对应角色
   journal——这是组织学习闭环的 v0。
-- 升级纪律（experimental 漂移、`sync-dsh.mjs` 升级环、兼容矩阵）见 [10](../design/architecture.md) §8，
+- 升级纪律（experimental 漂移、`sync-dsh.mjs` 升级环、兼容矩阵）见 [10](../architecture.md) §8，
   不在此重复。
 
 ## 5. 开工前检查单

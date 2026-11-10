@@ -11,14 +11,14 @@ import { join } from 'node:path'
 // 2026-11-10（DSH 步 2）：index 从“逐文档登记”改成“书架 + 入口”（树就是 inventory）。本门禁守三件事：
 // ① docs/AGENTS.md 在场且带「不属于这层」列（分层的**反例半边**不许丢）；
 // ② **顶层门/宪法**（docs/*.md，除 index.md）必须在 index 书架逐项列出；
-// ③ **tier 文档**（contracts/design/guides/reference/）只要求 tier 目录被 index 链接，不逐份登记；
+// ③ **tier 文档**（contracts/guides/reference/）只要求 tier 目录被 index 链接，不逐份登记；
 //    任何 docs/ 下的 md 不在 tier 或顶层 → 红（防新层长歪）。
 // 负例留证（2026-11-10 实跑，红→还原→绿）：
 // ① `docs/zz-taxonomy-probe.md` → `FAIL … 顶层门/宪法未在 index 书架列出：zz-taxonomy-probe.md`；删 → 绿。
 // ② `docs/zz-tier/zz.md` → `FAIL … 不在 tier 目录（contracts/design/guides/reference）或顶层：zz-tier/zz.md`；删 → 绿。
 // ③ 从 index 删 `[contracts/](./contracts/)` → `FAIL … tier 目录未在 index 书架链接：contracts`；还原 → 绿。
 // 旧负例仍有效：删 docs/AGENTS.md / 删「不属于这层」表头 → 红。
-const TIER_DIRS = new Set(['contracts', 'design', 'guides', 'reference'])
+const TIER_DIRS = new Set(['contracts', 'guides', 'reference'])
 
 export function run({ root, ok, fail }) {
   const taxonomyPath = join(root, 'docs/AGENTS.md')
@@ -61,7 +61,7 @@ export function run({ root, ok, fail }) {
     docTaxProblems.push(`顶层门/宪法未在 index 书架列出：${unregisteredTop.join('、')}`)
   }
   if (stray.length) {
-    docTaxProblems.push(`这些 docs/ 文件不在 tier 目录（contracts/design/guides/reference）或顶层：${stray.join('、')}`)
+    docTaxProblems.push(`这些 docs/ 文件不在 tier 目录（contracts/guides/reference）或顶层：${stray.join('、')}`)
   }
   if (unlinkedTiers.length) {
     docTaxProblems.push(`tier 目录未在 index 书架链接：${unlinkedTiers.join('、')}`)

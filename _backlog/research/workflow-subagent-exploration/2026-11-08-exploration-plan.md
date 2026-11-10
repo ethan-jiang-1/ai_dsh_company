@@ -208,7 +208,7 @@ pnpm typecheck                 # 类型面（改 TS/src 时）
 - 工作树有**未提交**改动，其中一部分来自并行会话（README/安装手册等）。**不要** `git checkout`/`revert` 整树。
 - 本工作相关：五个职能 preset 的 `maxDepth: 2`、vp-eng 的 workflow 两行、`eng-teaming`/`eng-workflow`、
   CEO `assembling-the-team`/persona、`docs/{delegation,presets,terminology,index}.md`、
-  `docs/design/architecture.md`、`docs/guides/budget-and-ops.md`、
+  `docs/architecture.md`、`docs/guides/budget-and-ops.md`、
   [vpeng workflow 频道](../../../notes/archived/2026-11-08-vpeng-workflow-channel.md)、`probes/team/vp-eng-workflow-probe.mjs`、
   `checks/gates/retired-claims.mjs`、`checks/INDEX.generated.md`、`pnpm-lock.yaml`（两行 peer）、
   本轮新增的 research 题。
@@ -376,7 +376,7 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 - [subagent 子系统](../../../vendor/dsh/docs/subsystems/subagent.md)
 - [agent-team README](../../../vendor/dsh/packages/experimental/agent-team/README.md)
 - [delegation 合同](../../../docs/contracts/delegation.md) · [presets 摘要](../../../docs/contracts/presets.md) ·
-  [architecture](../../../docs/design/architecture.md)
+  [architecture](../../../docs/architecture.md)
 - [常驻 probe](../../../probes/team/vp-eng-workflow-probe.mjs)
 - [preset 改动完成定义](../../../.agents/skills/preset-change-definition/SKILL.md)
 

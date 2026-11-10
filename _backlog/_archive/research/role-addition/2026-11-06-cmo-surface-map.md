@@ -43,7 +43,7 @@ SA/SQA 应走 **B 档**（VP-Eng 条线下专职岗，不是第七/第八条汇�
 | 11 | smoke | `preset-smoke`、`probe-smoke`、`channel-matrix-smoke`、`release-smoke`、`replay-smoke` | `preset-smoke`（自动）、`delegation-smoke`（深度）、`release-smoke`（首启/升级补种）、必要时 `probe-smoke` | 各脚本头注 |
 | 12 | 工具层字面量 | `authorship`、`candidate-scan`、`converge-rules`、`install-manual`、`bundle-init`、`converge`、`ask-latency`、`question-stop` | 按 grep 结果改：凡持角色字面量处补/说明；署名规则要决定 SA/SQA 稿署谁 | `pnpm test`；`candidate-scan`/`authorship` spec |
 | 13 | 测试 | presets（独立 ROLES 字面量）、company（bootstrap/host-composition/presence-board/prd-*）、client、harness（market-index/dev-install/foundation-safety） | **必需**：presets 断言（两个 support preset 声明 + 委托行 + maxDepth）、delegation 深度断言、E2E | `pnpm test`；真模型 E2E |
-| 14 | 文档 | presets/role-content-plan/architecture/roles-isolation/product-definition/budget-and-ops/index/orient/project-map/runtime-map/release/demo/multi-human/web-rpc | **必需**：`docs/contracts/presets.md`（子人格表）、`docs/contracts/delegation.md`（深度 2 与谁起）、`docs/design/role-content-plan.md`；其余按引用 | `pnpm verify`（md-links/doc-budget） |
+| 14 | 文档 | presets/role-content-plan/architecture/roles-isolation/product-definition/budget-and-ops/index/orient/project-map/runtime-map/release/demo/multi-human/web-rpc | **必需**：`docs/contracts/presets.md`（子人格表）、`docs/contracts/delegation.md`（深度 2 与谁起）、`notes/implemented/2026-11-10-role-content-rationale.md`；其余按引用 | `pnpm verify`（md-links/doc-budget） |
 | 15 | 发布面 | `package.json` 0.9.0、README、CHANGELOG、`market-index.json(.staged)`、`_dist` 手册 | 版本号决定（子人格新增 → minor）；README/CHANGELOG；市场索引若发布 | `pnpm release --check` |
 | 16 | 收口 | Note `2026-11-05-cmo-prd-product-definition.md` + backlog 卡 | Note + 卡归档（五道门） | `pnpm verify` backlog-liveness |
 

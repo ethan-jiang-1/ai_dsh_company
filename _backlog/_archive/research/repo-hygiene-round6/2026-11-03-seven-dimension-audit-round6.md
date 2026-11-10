@@ -18,7 +18,7 @@ intent: "第六轮七维打扫（2026-11-03）：fresh agent 独立复评七个�
 
 | 维 | 本轮 | 上轮 | 判据（证据） |
 |---|---|---|---|
-| D1 文档与渐进披露 | **A-** | A- | 入口链真实薄：根 AGENTS 84 行自动注入，`docs/AGENTS.md` / `_backlog/AGENTS.md` 触碰注入；32/32 文档有「何时读」；契约层 0 死链。残余：设计层两处与现役矛盾（`docs/design/ui-demo.md:139` 仍称已删的 `CompanyView.tsx`「仅测试引用」；`docs/index.md:17`「四条协作通道」而通道 D 已退役）；"51+6 名单"式过期枚举 7 处；129 篇 implemented 中 76 篇零入链。 |
+| D1 文档与渐进披露 | **A-** | A- | 入口链真实薄：根 AGENTS 84 行自动注入，`docs/AGENTS.md` / `_backlog/AGENTS.md` 触碰注入；32/32 文档有「何时读」；契约层 0 死链。残余：设计层两处与现役矛盾（`notes/implemented/2026-11-10-ui-demo-rationale.md:139` 仍称已删的 `CompanyView.tsx`「仅测试引用」；`docs/index.md:17`「四条协作通道」而通道 D 已退役）；"51+6 名单"式过期枚举 7 处；129 篇 implemented 中 76 篇零入链。 |
 | D2 代码与测试层次 | **B+** | A- | 源码三面（host/lib/client）方向由 `src-layering` + `tsc -b` 双守、0 环 0 反向边；但**平铺**：`src/client` 41 文件、`tests/client` 48、`tools/lib` 48、`checks/gates` 53、`tests/harness` 53；85 个源码模块只有 36 个有同名 spec（42%）；`src/host/cultivation/cultivation.ts`（710 行）无直接 spec，只有 `tests/support/cultivation-harness.ts` 间接引用。用户本轮明示要求层次化——与上轮 D2「不建议重组」相反，改判为 GAP。 |
 | D3 文档—执行—验收 | **A-** | A- | 授权（policy P1–P5）、执行（dev-loop 六节 + 重定向）、验收（testing 宪法 + tests/README 行级映射 + 五个完成定义 skill + 六行回执）各单家；pre-push 三件套接线。残余：验收结论仍靠人贴（`审查：` 手写）；`_backlog` 制度面 ~427 行服务 3 张活卡，比例偏重。 |
 | D4 上下文腐化 | **B** | A- | **当日实证腐化**：`d6d1f92` 把 `tests/lib/dag.spec.ts` 整体覆盖为 `cultivation-lib.spec.ts` 的字节副本（md5 相同），全绿、无人发现（→ 已修，见 §2 R6-01）。41 条死链全落在门禁三个豁免区（`snapshots/`、`runtime/`、`company-workspace/` 前缀 / `archive` 目录名 / 归档只查 `.md`）；设计层"现状声明"无人守（bare 文件名不进 `bare-path`）；76 篇零入链在"分诊"后数量不变。 |
@@ -41,7 +41,7 @@ intent: "第六轮七维打扫（2026-11-03）：fresh agent 独立复评七个�
 | R6-05 | D6 | **P1** | `diagnose` / `orient` 不实现 `--help`：未知参数被静默忽略，`--help` 会打印一份真实摘要并 exit 0（agent 以为拿到了用法）。 | 待修 |
 | R6-06 | D6 | **P1** | 首屏不指路：`pnpm orient` 的「便宜检查」只有 verify/test/orient --scenario；真页面、`diagnose`、`diagnosis/`、`company-client-errors.log` 分散在三份文档里。 | 待修 |
 | R6-07 | D4 | **P1** | 41 条死链全在门禁豁免区：`markdown-links.mjs:171` 对 `snapshots/ runtime/ company-workspace/` 前缀缺失直接 return；`EXCLUDED` 按目录名 `archive` 整类放行；`notes-archived-links.mjs:28` 只查 `.md`。活层也中招：`_backlog/methods/requirements-elicitation.md:36` 指向 gitignored 的 `company-workspace/AGENTS.md`。 | 待修 |
-| R6-08 | D1/D4 | **P1** | 设计层两处与现役相反：`docs/design/ui-demo.md:139`（已删的 `CompanyView.tsx`）、`docs/index.md:17`（「四条协作通道」，通道 D 已退役；`docs/reference/terminology.md:16` 同）。`runtime/second-machine*/` 里的旧源码副本让 `find` 仍能找到该文件——正是此类声明"看着为真"的原因。 | 待修 |
+| R6-08 | D1/D4 | **P1** | 设计层两处与现役相反：`notes/implemented/2026-11-10-ui-demo-rationale.md:139`（已删的 `CompanyView.tsx`）、`docs/index.md:17`（「四条协作通道」，通道 D 已退役；`docs/reference/terminology.md:16` 同）。`runtime/second-machine*/` 里的旧源码副本让 `find` 仍能找到该文件——正是此类声明"看着为真"的原因。 | 待修 |
 | R6-09 | D1 | **P2** | 「51 个不变量 spec（a/b/c/d/e/f）」在 7 处复述同一过期枚举；数字对、名单只覆盖 6 份。D28 同款病。 | 待修 |
 | R6-10 | D2 | **P1（用户点名）** | 平铺无层次：`src/client` 41、`tests/client` 48、`tools/lib` 48、`checks/gates` 53、`tests/harness` 53。Agent 进目录先吃 41–53 个名字。 | 待修（分批） |
 | R6-11 | D5 | **P2** | 18 个模块无直接 spec（`host/cultivation` 710 / `workspace-doors` 87 / `client/company-data-plane` / `client/session-source` 0 引用…）；`catalog-wiring.spec.ts:82-94` 有两条空断言；`candidate-scan-labels.spec.ts:298-301` 是 `expect(true).toBe(true)`。 | 待修 |

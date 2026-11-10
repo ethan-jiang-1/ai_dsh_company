@@ -1,9 +1,14 @@
-# 每个角色完全独立 · 深挖篇（context / tools / knowledge / workflow 的机制级安排）
+# 2026-11-10 · 角色隔离决策：六个独立面与 composition 分水岭
 
-> 什么时候读：动角色隔离、上下文/工具/KB 边界，或委派机制前。
-> 承接 [architecture.md](./architecture.md)。那一篇回答"repo 怎么摆"；
-> 这一篇回答你这次的问题：**长期做 Agent 的人最在乎的"每个 Agent 上下文完整独立"，
-> 在 DSH 里到底怎么安排最合理**。全部结论在 DSH 工作树源码逐条核实（关键处标了文件）。
+状态：implemented（2026-11-10 由 `notes/implemented/2026-11-10-roles-isolation-rationale.md` 转为 Note；现行语义以 `contracts/` 与 `presets/` 为准）
+上游 = [docs-dsh-alignment](../../_backlog/issues/2026-11-10-docs-dsh-alignment.md)（步 3：design/ → notes/ + architecture.md）
+
+## 决定
+
+- 每角色独立六面：上下文 / 工具 / 知识 / 工作流 / 人格有硬机制；角色间常驻对话 + 每角色独立组合是结构性缺口，按场景选 A/B/C/D。
+- composition 继承是机会性的；team 成员继承 Lead，命名 child 由 `agentPreset` 给组合。
+
+## 原设计正文（机制依据与证据）
 
 ---
 
@@ -108,7 +113,7 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
 - **0.2.1 更新（写这一节之后上游前进了一步）**：`dsh-tool-subagent` 的配置位现在带
   **`agentPreset`**——官方 provider 就能让 child 按另一个 preset 组合，M2 的"自己写 provider"
   那条路在本仓**已不需要**：六个角色 preset 各自可选，CEO 的三行委派工具直接钉 `agentPreset`
-  （现在时见 [delegation.md §1](../contracts/delegation.md)）。本节保留为 seam 来路的记录。
+  （现在时见 [delegation.md §1](../../docs/contracts/delegation.md)）。本节保留为 seam 来路的记录。
 - 实现提示：自定义 provider 不要从零拼创建窗口——复用 `packages/subagent/subagent`
   的组合路径（`applyChildComposition` / `appendDelegatedPolicyOverrides` / descriptor 追加），
   只把其中的 `composeFrom` 换成 `mount(childCtx, '<role-preset>')`，深度记账与权限收窄语义保持一致。
@@ -129,8 +134,8 @@ await childCtx.get('agentPresets').mount(childCtx, '<role-preset>') } })`。
 现成包（现行；rc.2 已核）：host 侧 = `@deepseek-ai/dsh-experimental-agent-team` +
 `@deepseek-ai/dsh-experimental-tool-agent-team`；Web UI 侧 = `@deepseek-ai/dsh-experimental-client-ui-agent-team`
 （名册/任务板/teammate 导航）。**本仓不装官方 profile bundle，改为在 pack 的 `cordis.patch.yml` 里直插这些行**
-（R1 起，避免 bundle 关掉全局续驶控制——见 [architecture §3 冲突注](./architecture.md)）。
-（`agent-team-profile` / `agent-team-web-profile` 两 bundle 包在 rc.2 vendor `experimental/` 均在；直插的取舍理由见上行与 [architecture §3 冲突注](./architecture.md)。）
+（R1 起，避免 bundle 关掉全局续驶控制——见 [architecture §3 冲突注](../../docs/architecture.md)）。
+（`agent-team-profile` / `agent-team-web-profile` 两 bundle 包在 rc.2 vendor `experimental/` 均在；直插的取舍理由见上行与 [architecture §3 冲突注](../../docs/architecture.md)。）
 
 - 代价（§2）：teammates **共享 Lead 的组合**——独立降级为"独立会话上下文 + per-child 无、
   靠 name/description + `team:policy` + KB 目录约定"。工具/skills 面是 CEO preset 的。
@@ -175,3 +180,9 @@ packages/company-pack/
 M1（R1/R2 轮内最窄验证：角色独立会话入戏探针）→ **M4（R1 起 demo 主循环）** → 通道 A
 命名委托工具（R3，零代码汇报线）→ M2（可选增强，触发条件见 §3 选型速查）；M3 仅当
 "连续谈判"被证明刚需时再上。
+
+
+## 相关
+
+- 现行语义与地图：[docs/architecture.md](../../docs/architecture.md)；文档层规矩：[docs/AGENTS.md](../../docs/AGENTS.md)。
+- 上游卡：[docs-dsh-alignment](../../_backlog/issues/2026-11-10-docs-dsh-alignment.md)。

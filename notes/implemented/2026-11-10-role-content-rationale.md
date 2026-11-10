@@ -1,9 +1,15 @@
-# 角色内容设计（persona / skills / KB / 模板）
+# 2026-11-10 · 角色内容决策：persona / skills / KB 的分工
 
-> 什么时候读：设计或重构角色内容（persona、skills、KB 骨架）时；现时语义查 [../presets.md](../contracts/presets.md)。
-> 机制已定（[10](./architecture.md) / [20](./roles-isolation.md)）；本篇只留**内容面的设计原则与落点**。
-> 状态：已定稿——六角色内容随 R2 + CMO（2026-11-05）落地；逐角色清单已退役
-> （[navigation-enumeration-retirement](../../notes/archived/2026-10-12-navigation-enumeration-retirement.md)）。
+状态：implemented（2026-11-10 由 `notes/implemented/2026-11-10-role-content-rationale.md` 转为 Note；现行角色语义 = `contracts/presets.md`）
+上游 = [docs-dsh-alignment](../../_backlog/issues/2026-11-10-docs-dsh-alignment.md)（步 3：design/ → notes/ + architecture.md）
+
+## 决定
+
+- CEO 是个体，VP 是职能；persona 管是谁、skills 管怎么做、KB 管知道什么。
+- 模板即流程；角色内容按 R2 + CMO 落地，逐角色清单已退役。
+
+## 原设计正文（设计原则与落点）
+
 
 ## 0. 设计原则
 
@@ -32,4 +38,10 @@
 - 入戏三探针（身份 / 知识 / 产出）的现行判据 = [`probe-smoke.mjs`](../../checks/smoke/probe-smoke.mjs) 头注；
   `--full` 档按 KB 事实与 veto 语义断言。
 - 闭合接口：Q2 → D16（全员同模型）、Q3 → D17（事实留 workspace）、Q4 → 2026-09-22 动议；
-  台账 = [decisions.md](../reference/decisions.md)。
+  台账 = [decisions.md](../../docs/reference/decisions.md)。
+
+
+## 相关
+
+- 现行语义与地图：[docs/architecture.md](../../docs/architecture.md)；文档层规矩：[docs/AGENTS.md](../../docs/AGENTS.md)。
+- 上游卡：[docs-dsh-alignment](../../_backlog/issues/2026-11-10-docs-dsh-alignment.md)。

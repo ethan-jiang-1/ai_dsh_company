@@ -43,7 +43,7 @@
 
 ## 语义审与未验面
 
-按授权原文、源码图与 `tests/README.md`、证据层级及当前 diff 复核：**blocker 0**；独立盲审也未发现行为漂移。`tests/README.md` 已把 Host registered callback 行为路由到 `tests/company`、Client slot 注册路由到 `tests/client`、`tools/lib` replay seams 路由到 `tests/harness`。未做固定 GUI URL `http://127.0.0.1:3080` 的人工视觉走查，也未核验 `dev:web` watcher；`client-load-smoke` 是本轮真实浏览器装载证据。`docs/design/ui-demo.md` 的旧 polling 与 CompanyView「用量」子页描述属于既有文档 drift，未纳入本轮；不相关的 CEO journal untracked 文件亦未纳入。
+按授权原文、源码图与 `tests/README.md`、证据层级及当前 diff 复核：**blocker 0**；独立盲审也未发现行为漂移。`tests/README.md` 已把 Host registered callback 行为路由到 `tests/company`、Client slot 注册路由到 `tests/client`、`tools/lib` replay seams 路由到 `tests/harness`。未做固定 GUI URL `http://127.0.0.1:3080` 的人工视觉走查，也未核验 `dev:web` watcher；`client-load-smoke` 是本轮真实浏览器装载证据。`notes/implemented/2026-11-10-ui-demo-rationale.md` 的旧 polling 与 CompanyView「用量」子页描述属于既有文档 drift，未纳入本轮；不相关的 CEO journal untracked 文件亦未纳入。
 
 - 测试资产：新增/扩展 4 个 seam spec/用例组，覆盖 tab catalog/lifecycle、Lead/follow projection、cultivation registered callbacks 三条行为路径、replay normalization/judges；未新增 replay 场景或视觉金样。
 - 收割三问：①未发现新异常，replay FAIL 与已知基线相同；②需要固定的行为由上述 keyless specs 覆盖，未新增场景或夹具；③确认 Seatbelt 不可用时 `run/env.sh` 导出 `danger-full-access`，属于已有运行环境事实，不是本轮修复目标。

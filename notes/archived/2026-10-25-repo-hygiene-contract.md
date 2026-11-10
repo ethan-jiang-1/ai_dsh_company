@@ -115,7 +115,7 @@ CI 先按「全配方」跑，连续红，逐条暴露（都不是本仓 tracked
 - **红 5**：pack build 报 `Cannot find module '@deepseek-ai/dsh-client-*/client'`——pack 的 client 面
   依赖 vendor client 类型；client aggregate 又带 vendor 测试面的既有类型错误。
 - **红 6（已修）**：干净 verify 在 `bare-path` 报
-  `docs/design/roles-isolation.md` → packages/subagent/subagent-in-process-driver（旧名）不存在。该包是
+  `notes/implemented/2026-11-10-roles-isolation-rationale.md` → packages/subagent/subagent-in-process-driver（旧名）不存在。该包是
   本机 vendor 残留（无 package.json/src），不在 submodule 里；本地残留目录把它掩盖了。
   已把设计文档改到现行的 `packages/subagent/subagent`（`applyChildComposition` 的现行家）。
 

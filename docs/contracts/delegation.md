@@ -2,8 +2,8 @@
 
 > 什么时候读：CEO 派活方式要改、或委派行为不符预期时。路线 = 通道表（A/B）→ 边界节。
 > 合同：CEO 的"派活"现在时语义——哪条路走什么、边界在哪、被什么检查守住。
-> 机制依据 [design/architecture.md](../design/architecture.md) §3（通道 A/B）与
-> [design/roles-isolation.md](../design/roles-isolation.md) §2–§3；0.2.1 的激活模型见
+> 机制依据 [architecture.md](../architecture.md) §3（通道 A/B）与
+> [roles-isolation Note](../../notes/implemented/2026-11-10-roles-isolation-rationale.md) §2–§3；0.2.1 的激活模型见
 > vendor `docs/upgrade-guide/v0.2.1-alpha.1/subagent-activations/guide.md`。
 
 ## 0. 一句话

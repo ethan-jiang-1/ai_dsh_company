@@ -131,6 +131,6 @@ intent: 二轮覆盖审计——确认 content/presets 是否逐文件覆盖、�
 ## 5. 辅助面改造后的文档过期面（11 处，同 diff 要改）
 
 `docs/contracts/presets.md` 的六角色身份表/会话形态表/工具行归属/方法层路径/显示名契约（:6,17-23,31-38,122-127,152）；
-`docs/design/architecture.md` 的 presets 目录枚举/内容分层/工具行清单（:17,79,95,240）；
-`docs/design/role-content-plan.md` 的角色内容落点（:5,24-25）；`docs/design/roles-isolation.md` 的六根会话与
-委派钉值（:64,111）；`docs/design/ui-demo.md:80` 的 bundle patch 枚举。
+`docs/architecture.md` 的 presets 目录枚举/内容分层/工具行清单（:17,79,95,240）；
+`notes/implemented/2026-11-10-role-content-rationale.md` 的角色内容落点（:5,24-25）；`notes/implemented/2026-11-10-roles-isolation-rationale.md` 的六根会话与
+委派钉值（:64,111）；`notes/implemented/2026-11-10-ui-demo-rationale.md:80` 的 bundle patch 枚举。

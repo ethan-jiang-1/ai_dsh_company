@@ -26,7 +26,7 @@
 
 并列面别混：**headless 通用 CLI**（无 preset 装配）；**Web 观察窗**（完整公司面）；
 **会话四形态**（独立 preset 根/CEO Lead/teammate/命名 child；[presets.md](./contracts/presets.md)）。spawn 成员
-**继承 Lead 组合** ≠ 根会话「自包含、无继承」——分水岭 = [roles-isolation §2](design/roles-isolation.md)。
+**继承 Lead 组合** ≠ 根会话「自包含、无继承」——分水岭 = [roles-isolation §2](../notes/implemented/2026-11-10-roles-isolation-rationale.md)。
 
 ## 二、四条状态轴（权威位置、生命周期、不能推断什么）
 

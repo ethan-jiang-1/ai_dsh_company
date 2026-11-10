@@ -2,7 +2,7 @@
 
 > 什么时候读：要启动公司看效果、演示前核对判据时。路线 = §前置（起观察窗）→ 分镜 → 验收判据。
 > 合同：demo 的剧本、分镜与观测点。R1 雏形（两人公司单动议）已并入本篇；R2 按
-> [design/ui-demo.md](../design/ui-demo.md) §3 分镜 v0 重排为**两空间镜头**并加场景 B；
+> [ui-demo Note](../../notes/implemented/2026-11-10-ui-demo-rationale.md) §3 分镜 v0 重排为**两空间镜头**并加场景 B；
 > **R4 定稿、后补场景 D/E**：R4 立的是场景 C（写作流水线）+ 交付物三态的落盘形状与**机器验收**（`deliverables/<日期>-<slug>/`，A1 命名）；
 > 场景 D（季度经营会）与 E（事件复盘）是 2026-09-25 新增动议类型的实战（见下方对应节）。
 
@@ -88,9 +88,9 @@ wrapper 复用上次 tarball（跳过构建打包，`--rebuild` 强制重打）�
 
 ## 已知边界
 
-- 动议必须在 **Web 面**跑（preset 只在 Web 面挂载，[architecture §6](../design/architecture.md) 要点 6）。
+- 动议必须在 **Web 面**跑（preset 只在 Web 面挂载，[architecture §6](../architecture.md) 要点 6）。
 - 团队里的 VP 是 **软隔离**（名册身份 + `team:policy` + KB 约定），不是 preset 级硬隔离；
-  硬隔离在独立 preset 会话里成立（[design/roles-isolation](../design/roles-isolation.md) §4 分水岭）。
+  硬隔离在独立 preset 会话里成立（[roles-isolation Note](../../notes/implemented/2026-11-10-roles-isolation-rationale.md) §4 分水岭）。
   要让团队内成员拿到完整 preset 面，走 R3 命名委托或上游 seam（D9）。
 - 五人同时在线时模型调用量上升；预算口径见 `kb/org.md`（AI 试点每案 $200/月硬顶）。
 - **交付物三态是硬约定，不是习惯**：`packages/company-pack/content/AGENTS.md` 的「交付物三态」一节随每个成员

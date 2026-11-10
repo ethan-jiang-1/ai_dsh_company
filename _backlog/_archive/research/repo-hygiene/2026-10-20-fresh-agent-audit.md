@@ -60,7 +60,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 **问题**
 
 1. **验收映射有四份，互相不完全一致**：`docs/testing.md` §1/§2、`tests/README.md` 的「改动面→最窄检查」、
-   `docs/guides/dev-loop.md` §9.1 的预算表、`docs/design/architecture.md` §10 的「改什么→该面验收」。
+   `docs/guides/dev-loop.md` §9.1 的预算表、`docs/architecture.md` §10 的「改什么→该面验收」。
    政策说「行级映射唯一家 = tests/README」，但另外三处仍各自展开表格与层名；其中 §10 已经落后于
    成品/培养/成品目录这些新面。fresh agent 不知道该信哪一份。
 2. **两份手维护总账就是漂移源**：
@@ -78,7 +78,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
    这些内容已经越层，但没有预算/门禁拦。
 5. **角色数量在 7 处写成「五」**：实际 `dsh.bundle.patch` 有 6 个 preset（5 公司角色 + researcher）。
    `README.md:19`、`docs/contracts/presets.md:30`（「五张卡」）、`docs/contracts/release.md:77`、`docs/guides/bootstrap.md` 第 75/105 行、
-   `docs/contracts/profile.md:39`、`docs/design/architecture.md:119` 都还写五；而 `docs/contracts/presets.md:24` 同一页又写
+   `docs/contracts/profile.md:39`、`docs/architecture.md:119` 都还写五；而 `docs/contracts/presets.md:24` 同一页又写
    「本 pack 6」——**同页自相矛盾**。这是 0.2.1 加 researcher 后没有做全量措辞清扫的典型上下文漂移。
 6. **`src/README` 的模块枚举也漂了**：写「十一模块」并列出 11 个，实际 `src/lib/` 有 12 个
    （漏 `deliverables-catalog.ts`）。`nav-enumeration` 门禁只查 `tests/README.md` §四区，不覆盖这里。

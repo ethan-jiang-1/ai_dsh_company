@@ -50,7 +50,7 @@ opened: 2026-11-08
   `@deepseek-ai/dsh-workflow-ptc`。
 - [eng-teaming](../../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md) 加 2.5 档；
   `eng-workflow` 第 3 步「深挖」点名判据。
-- `docs/contracts/delegation.md` §4、`docs/contracts/presets.md` 两行工具面、`docs/design/architecture.md` §2.3/§3、
+- `docs/contracts/delegation.md` §4、`docs/contracts/presets.md` 两行工具面、`docs/architecture.md` §2.3/§3、
   `docs/guides/budget-and-ops.md` §2 的既有漂移同 diff 改。
 - 交付 Note：[2026-11-08-vpeng-workflow-channel.md](./2026-11-08-vpeng-workflow-channel.md)：
   决定、输掉的方案、真证据、2026-10-12 先例与「没有使用场景」的更正。

@@ -8,8 +8,8 @@
 
 「哪层放什么」散在两处散文里（index §文档组织原则的表 + 各文件开头自述的「性质：」），而且那张表**只有正向职责、没有反例列**——DSH 的 tier 表每一行都带 "Does NOT belong there"，本仓没有这一半。边界靠读的人自己猜，实测后果：
 
-- **`docs/design/` 长成「动工前的设计决策记录」**（[architecture.md](../../docs/design/architecture.md):8 自述），共 4 份 791 行。这正是 DSH tier 表说**该归 Note** 的那一格：「decision rationale → Agent Notes」「migration plans / acceptance checklists / spec-speak excluded once shipped」。
-- **[role-content-plan.md](../../docs/design/role-content-plan.md) 自己声明「已定稿——五角色内容随 R2 全员落地」**——一份已完成的历史叙述留在设计层，而设计层的职责是「仍在指导未来选择的机制依据」。
+- **`docs/design/` 长成「动工前的设计决策记录」**（[architecture.md](../../docs/architecture.md):8 自述），共 4 份 791 行。这正是 DSH tier 表说**该归 Note** 的那一格：「decision rationale → Agent Notes」「migration plans / acceptance checklists / spec-speak excluded once shipped」。
+- **[role-content-plan.md](../implemented/2026-11-10-role-content-rationale.md) 自己声明「已定稿——五角色内容随 R2 全员落地」**——一份已完成的历史叙述留在设计层，而设计层的职责是「仍在指导未来选择的机制依据」。
 - **两份 docs 从未登记进 index §现有文档**：`docs/guides/cdp-probe.md`、`runtime-map.md`（后者是顶层合同，还挂在根 AGENTS.md 的入口链上）。登记全靠人记得，没有任何检查。
 
 全仓只有 **2 个** subtree `AGENTS.md`（根 + `company-workspace/`），vendor 有 **11 个**——按目录就近声明规矩的机制本仓基本没用。
@@ -32,7 +32,7 @@
 ## 输掉的方案
 
 - **只留 index 里的表、不建 AGENTS.md**：否决。规矩住地图里 = 改地图的人不自觉在改规矩；而且 `docs/AGENTS.md` 是 DSH 的原生载体（会话进 `docs/` 时自动注入），建它是**用现成机制**，不是发明。
-- **顺手把 `docs/design/role-content-plan.md` 迁进 `notes/`**：否决（本轮）。它是 94 行的「已定稿」文件，迁它要动 index 登记、presets.md 指针、可能还有别处引用，属于**独立一轮的搬迁**；本轮的交付是「把边界写清楚 + 装门禁」，让**下一个碰它的人**有判据。夹带搬迁会让本轮 diff 混两件事。
+- **顺手把 `notes/implemented/2026-11-10-role-content-rationale.md` 迁进 `notes/`**：否决（本轮）。它是 94 行的「已定稿」文件，迁它要动 index 登记、presets.md 指针、可能还有别处引用，属于**独立一轮的搬迁**；本轮的交付是「把边界写清楚 + 装门禁」，让**下一个碰它的人**有判据。夹带搬迁会让本轮 diff 混两件事。
 - **给 docs 加「每层行预算」**：否决。现有 `DOC_LINE_BUDGETS` 已按文件管；按层再管一遍是第二本账。
 - **门禁只查 docs/AGENTS.md 存在**：否决（这是首版的疏漏方向）。只查在场 = 挡不住「把反例列删掉」，而那正是本 gap 的病灶。必须查 `不属于这层` 列在场。
 

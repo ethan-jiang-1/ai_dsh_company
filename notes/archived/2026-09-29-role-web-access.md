@@ -41,7 +41,7 @@ CEO 会话的模型可见工具目录，读的是 `request/header`，不是模�
 
 **② 子会话（Subagent）**：`delegation-smoke --delegate` 真委派一次后解会话日志——
 Lead（depth=0）与**委派子会话（depth=1）都含** `web_search`×2 / `web_fetch`×3。
-机制依据 = `composeFrom` 先 join 父 preset（[roles-isolation §2/§4](../../docs/design/roles-isolation.md)），
+机制依据 = `composeFrom` 先 join 父 preset（[roles-isolation §2/§4](../implemented/2026-11-10-roles-isolation-rationale.md)），
 且本组 delegation 行**没有 `toolFilter`**（不裁剪）。
 
 **③ 端到端真搜一次**（走 dev-loop §8 的 RPC，cwd 指排练场、不碰真盘）：CEO 会话

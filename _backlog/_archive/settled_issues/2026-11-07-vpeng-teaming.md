@@ -13,7 +13,7 @@ opened: 2026-11-07
 
 **问题与期望结果：** `vp-eng` 加 `vp_cmo`；`eng-teaming` skill（四档决策树）；persona 写明成员不是角色；docs/handbook/UI 的继承说法修正；根=Lead 探针；CEO 不变。
 
-**范围：** `presets/vp-eng`（`vp_cmo` 行、persona、新 skill）；`docs/contracts/delegation.md`、`docs/contracts/presets.md`、`content/AGENTS.md`（只改「组合继承」「星型汇报」「多门模式」「问人两条路」段）、`docs/runtime-map.md`/`docs/design/roles-isolation.md`（如引用旧继承说法）、`packages/company-pack/README.md`（已知限制）、`CultivationBoard.tsx` + 测试；`tests/presets/presets.spec.ts`。
+**范围：** `presets/vp-eng`（`vp_cmo` 行、persona、新 skill）；`docs/contracts/delegation.md`、`docs/contracts/presets.md`、`content/AGENTS.md`（只改「组合继承」「星型汇报」「多门模式」「问人两条路」段）、`docs/runtime-map.md`/`notes/implemented/2026-11-10-roles-isolation-rationale.md`（如引用旧继承说法）、`packages/company-pack/README.md`（已知限制）、`CultivationBoard.tsx` + 测试；`tests/presets/presets.spec.ts`。
 
 **依赖：** A1/A3/A4a/A4b；BUG-034/035 已修（7da331a，卡归档）；`tests/presets` 串行改。
 

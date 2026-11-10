@@ -18,9 +18,8 @@
 
 | 层 | 目录 | 放什么 | 读者怎么进 |
 |---|---|---|---|
-| 门/宪法 | 顶层 | 每个人都可能先读：入口、规范、政策、测试宪法、git 边界、空间/运行态地图 | [AGENTS.md](./AGENTS.md) · [orient.md](./orient.md) · [policy.md](./policy.md) · [testing.md](./testing.md) · [repo-hygiene.md](./repo-hygiene.md) · [project-map.md](./project-map.md) · [runtime-map.md](./runtime-map.md) |
+| 门/宪法 | 顶层 | 每个人都可能先读：入口、架构地图、规范、政策、测试宪法、git 边界、空间/运行态地图 | [AGENTS.md](./AGENTS.md) · [architecture.md](./architecture.md) · [orient.md](./orient.md) · [policy.md](./policy.md) · [testing.md](./testing.md) · [repo-hygiene.md](./repo-hygiene.md) · [project-map.md](./project-map.md) · [runtime-map.md](./runtime-map.md) |
 | 合同 | [contracts/](./contracts/) | 按主题/子系统的当前语义；随代码同 diff | 进目录按文件名选；先看文件头「什么时候读」 |
-| 设计 | [design/](./design/) | 为什么选 A 不选 B；仍指导未来选择的机制依据 | 进目录；已定稿的先查 `notes/` |
 | 指南 | [guides/](./guides/) | 怎么做：runbook、环境、排障、发布 | 进目录按任务选 |
 | 参考 | [reference/](./reference/) | 查表与登记：D 号、术语、外部材料 | 进目录按需查 |
 
@@ -39,7 +38,7 @@
 
 | 面 | 事实家 / 导航 |
 |---|---|
-| 机制——公司怎么组装、角色怎么隔离、UI 往哪挂 | design/architecture + design/roles-isolation + design/ui-demo；源码与运行结论按对应合同核对 |
-| 内容——角色说什么话、带什么技能、KB 放哪 | design/role-content-plan + contracts/presets.md + `company-workspace/.dsh-company/kb/` + `packages/company-pack/content/AGENTS.md`（host 注入，不落盘） |
+| 机制——公司怎么组装、角色怎么隔离、UI 往哪挂 | [architecture.md](./architecture.md)（地图）+ contracts/（当前语义）+ notes/implemented/2026-11-10-*（why）；源码与运行结论按对应合同核对 |
+| 内容——角色说什么话、带什么技能、KB 放哪 | contracts/presets.md + notes/implemented/2026-11-10-role-content-rationale.md（why）+ `company-workspace/.dsh-company/kb/` + `packages/company-pack/content/AGENTS.md`（host 注入，不落盘） |
 | 运营——token 怎么省、现场出状况怎么办 | guides/budget-and-ops |
 | 流程——任务怎么进、证据怎么交、门禁怎么守 | guides/dev-loop + `notes/` + `checks/run-gates.mjs` |

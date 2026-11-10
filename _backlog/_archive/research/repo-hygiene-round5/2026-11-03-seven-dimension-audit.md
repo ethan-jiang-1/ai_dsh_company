@@ -56,7 +56,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 - **行预算错位**（R5-17）：`docs/reference/decisions.md` 62/62 零头寸，而台账规则「编号不重用、不删行」（`:5`）；4 份零头寸、15/35 <5%；`docs/guides/publish-handoff.md`（90 行，最新分发指南）**无预算**；`_backlog/README.md`（132）、`notes/README.md`（124）两个最大 owner 文档完全在棘轮外。反向棘轮因此长期常亮。
 - **索引与教义矛盾**（R5-18）：`checks/README.md` 头部说「触发/成本唯一家 = 脚本头注」，正文却手工枚举 26 smoke / 4 audit / 58 逻辑探针 / 53 门 / 18 工具；而 `script-index` 门禁**强制**每个公开脚本必须在 README 出现（`checks/gates/script-index.mjs`）。这与 D28「枚举的家 = 实现自己」相抵；要么生成索引段，要么放宽门禁。
 - **9/32 文档无「什么时候读」**（`project-map`、`repo-hygiene`、`release-runbook`、`orient`、`decisions` 等在列）；靠嵌套 AGENTS 注入补偿了一部分。
-- **`docs/reference/terminology.md:12`** 把组合链指向 `docs/architecture.md`，文件不存在（实际 `docs/design/architecture.md`）；`bare-path` 不查存在性，故绿。
+- **`docs/reference/terminology.md:12`** 把组合链指向 `docs/architecture.md`，文件不存在（实际 `docs/architecture.md`）；`bare-path` 不查存在性，故绿。
 
 ### D2 代码与测试层次（B）
 

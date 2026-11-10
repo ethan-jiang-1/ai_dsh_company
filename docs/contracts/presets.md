@@ -2,7 +2,7 @@
 
 > 什么时候读：改 persona、skills 或角色语义时。路线 = 六角色表 → 验证方式节。
 > 合同：六个角色 preset 的"现在时"语义（persona 定稿、skills 清单、验证方式）。
-> 内容来源 [design/role-content-plan.md](../design/role-content-plan.md)；命名约定见台账 D14
+> 内容来源 [role-content Note](../../notes/implemented/2026-11-10-role-content-rationale.md)；命名约定见台账 D14
 > （显示名 = 角色名；公司名只在品牌/身份面；preset id 保持 kebab）。R1 定稿 CEO / VP-Eng；R2 定稿 VP-Sales / COO，
 > 并增设 CFO（用户 2026-09-22 定案：50 人高科技公司，软件开发 / 服务 / 系统集成）。
 > **编制唯一事实家 = `company-workspace/.dsh-company/kb/org.md`**（细到岗位）；各角色 CHARTER 只留本条线事实
@@ -133,7 +133,7 @@ CEO 会话只拿到 10 个团队工具（读不了文件、写不出交付物）
 ⚠ **联网（`tool-web`）天生不继承，必须逐 preset 声明**（2026-09-29 补）：`web-app` bundle 把 host 上的
 `tool-web` 行 `disabled: true`，**改为按 agent preset 组合**（vendor base 注释原文）——所以漏写这一行时
 角色**静默无联网**（不报错，只是目录里少两个工具）。**子会话不用另配**：`subagent` 与 team teammate
-走 `composeFrom` **继承 Lead 的组合**（[roles-isolation §2/§4](../design/roles-isolation.md)；本组 delegation 行无 `toolFilter`，故不裁剪）——
+走 `composeFrom` **继承 Lead 的组合**（[roles-isolation §2/§4](../../notes/implemented/2026-11-10-roles-isolation-rationale.md)；本组 delegation 行无 `toolFilter`，故不裁剪）——
 实测 Lead 27 工具含 `web_search`/`web_fetch`，摘掉该行即回 25 且两个工具消失，委派子会话（depth=1）同含。
 
 ## 验证方式

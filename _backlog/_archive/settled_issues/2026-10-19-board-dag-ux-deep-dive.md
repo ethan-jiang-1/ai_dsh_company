@@ -24,7 +24,7 @@ opened: 2026-10-19
 
 ## 本轮实施（2026-10-19）
 
-- **新鲜度**：`company-tabs.tsx` 默认 `投影更新`；`CompanyView.tsx` 非培养子页 `投影更新`；`LedgerTab.tsx` 传 30s；`AttentionTab.tsx` 传 2s；`CultivationTab.tsx` 已有 30s。同 diff 修 `docs/design/ui-demo.md` 的「挂载即拉 + 5s 轮询」与 `docs/index.md` D22 的旧说法。
+- **新鲜度**：`company-tabs.tsx` 默认 `投影更新`；`CompanyView.tsx` 非培养子页 `投影更新`；`LedgerTab.tsx` 传 30s；`AttentionTab.tsx` 传 2s；`CultivationTab.tsx` 已有 30s。同 diff 修 `notes/implemented/2026-11-10-ui-demo-rationale.md` 的「挂载即拉 + 5s 轮询」与 `docs/index.md` D22 的旧说法。
 - **DAG 徽章**：`company-panels.tsx` 的 `statusBadge` 对 in_progress 返回 `wk-dag-progress`；`styles.ts` 用 `--dsw-alias-state-business-primary`。
 - **测试**：新增 `tests/client/tabs/panel-freshness.spec.ts`；更新 `tests/client/tabs/dag-panel.spec.ts`（默认文案 + 徽章独立类）；`tests/lib/dag.spec.ts` 加 21 节点链高 > 视口；`tests/client/tabs/dag-visual-fixture.spec.ts` 发 21 节点 chain SVG。
 - **探针**：`dag-visual-probe` 加「进行中徽章 ≠ 可开工」与 21 节点窄栏度量；`dag-midflight-probe` 加 `--narrow`（真 app 390×900，读页签文案，落 `narrow-metrics.json` + 截图）；`board-drift-probe` 复跑。
