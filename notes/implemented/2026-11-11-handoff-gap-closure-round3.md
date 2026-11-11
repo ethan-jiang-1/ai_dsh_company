@@ -32,11 +32,11 @@
 - `node tools/checks-index.mjs --write` → `checks-index: 已生成 …（137 行）`；script-index 绿。
 - `pnpm release --prepare` → `export-dist: ALL PASS`；tarball `0.11.5` 259 entries；sha256 `d1d7c14e924f324571c47e063549816c95c40b6db063ab85abbad3057126f730`；手册 0.11.5。
 - `pnpm release --verify` → `release: verify 全绿；提交后跑 --check`（verify/test/release-smoke/company-entry/client-load/preset/present-catalog 全 pass；preset 11/11）。
-- `release --check --allow-pre-publish-index` 的 READY 行见当轮回复（stamp 后给出 release commit SHA）。
+- `pnpm release --stamp` → `stamp 0.11.5 @ 97c63784`；`pnpm release --check --allow-pre-publish-index` → `READY 0.11.5 @ 97c63784（tgz 259 条目；7 项检查 pass）`；默认 `--check` 在 staged 期 exit 1（哨兵，设计）。
 
 ## 未验
 
-- `release --check` 的 READY 是点态：见当轮回复的 stamp 后 READY 行；本 Note 不预写未跑的输出。
+- 默认 `release --check` 在 `market-index.staged.json` 在场时仍 exit 1（设计）；publish 后删 staged 再跑才是托管前 READY。
 - clean clone 重跑仍按 round2 证据（`337c2db6`）；本轮是 warm checkout。
 - GitHub Actions 的 `setup-macos` 未在 GitHub 上执行；Desktop/Windows、真模型多轮行为未认证。
 
