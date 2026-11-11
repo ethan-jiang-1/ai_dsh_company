@@ -36,6 +36,8 @@
     `use-cultivation-board`。
   Cordis 各槽仍各自等待声明并负责卸载/重装；构建走 tsdown client 半（产物 `lib/client.js`）。
 
+**UI 文案纪律（Phase 0 起）**：任何 company Web UI 文案从第一个 commit 就必须 zh+en；改 UI 前加载 `company-ui-change-definition` skill；文案只住 typed `company` 字典，纯 view model 返回 token 而不是中文。A4 落成前由 skill + review 守，A4 后由 `docs/contracts/` 的 language 合同 + `checks/gates/` 的 `client-copy` 硬门禁守。
+
 **构建**：`tsc -b packages/company-pack` + tsdown 两面（事实家 = [bootstrap](../../../docs/guides/bootstrap.md)）。
 ⚠ 本目录**不进 tarball**（`files` 的现行清单 = [package.json](../package.json)：只发 runtime 两半、
 `presets/**`、`content/**`、`locale/`、`icon.svg`、`cordis.patch.yml`、`LICENSE`，不发 `src/**`（v3 起也没有 `workspace/**`））

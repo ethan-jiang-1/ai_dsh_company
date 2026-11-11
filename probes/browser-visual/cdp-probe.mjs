@@ -125,7 +125,8 @@ let tabs = [];
 try {
   const source = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/tabs/company-tab-registration.ts'), 'utf8');
   const identity = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/ui/tab-icons.tsx'), 'utf8');
-  tabs = parseCompanyTabCatalog(source, identity);
+  const copy = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/locales.ts'), 'utf8');
+  tabs = parseCompanyTabCatalog(source, identity, copy);
 } catch (error) {
   console.error(`cdp-probe: 读页签注册源失败：${String(error?.message ?? error)}`);
   process.exit(2);
@@ -163,7 +164,7 @@ const hasLoadingMarker = text => LOADING_MARKERS.some(marker => normalizedText(t
 
 /** 关掉 “Get started / Add API Key / Sign in” 引导模态（隔离 home 无凭据时会弹；可能晚于首屏）。 */
 const closeGetStarted = () => evaluate(`(() => {
-  const dlg = [...document.querySelectorAll('[role="dialog"]')].find(d => (d.innerText ?? '').includes('Get started'));
+  const dlg = [...document.querySelectorAll('[role="dialog"]')].find(d => /Get started|开始使用/.test(d.innerText ?? ''));
   if (dlg === undefined) return 'absent';
   const buttons = [...dlg.querySelectorAll('button')];
   const close = dlg.querySelector('button[aria-label*="Close"],button[aria-label*="关闭"]')
@@ -228,12 +229,16 @@ try {
 
   // 首启双模态（0.2.0 起两个：Internal Testing Notice + Preview Notice；Continue 同名按钮）。
   // 每个新浏览器上下文都会再弹——CDP 探针每次都是新上下文，必须处理。
-  for (const name of attachPort === undefined ? ['Internal Testing Notice', 'Preview Notice'] : []) {
+  // 2026-11-12：DSH 的预览版说明在中文界面下标题/按钮是中文；只认英文会让隔离金样被模态挡住（实测）。
+  for (const name of attachPort === undefined ? ['Internal Testing Notice', 'Preview Notice', '内部测试说明', '预览版说明'] : []) {
     const dismissed = await evaluate(`(() => {
       const dialogs = [...document.querySelectorAll('[role="dialog"]')];
       const dlg = dialogs.find(d => (d.innerText ?? '').includes(${JSON.stringify(name)}));
       if (dlg === undefined) return 'absent';
-      const btn = [...dlg.querySelectorAll('button')].find(b => (b.textContent ?? '').includes('Continue'));
+      const btn = [...dlg.querySelectorAll('button')].find(b => {
+        const text = (b.textContent ?? '').trim();
+        return text.includes('Continue') || text.includes('继续');
+      });
       if (btn === undefined) return 'no-continue';
       btn.click();
       return 'dismissed';
@@ -266,7 +271,7 @@ try {
       })()`) === true;
       if (onTabBar) { await sleep(400); return 'tab'; }
     }
-    await evaluate(`(() => { const back = [...document.querySelectorAll('[data-dockkit-tab]')].find(t => /start/i.test(t.textContent ?? '')); if (back !== undefined) back.click(); })()`);
+    await evaluate(`(() => { const back = [...document.querySelectorAll('[data-dockkit-tab]')].find(t => /start|开始/i.test(t.textContent ?? '')); if (back !== undefined) back.click(); })()`);
     await sleep(400);
     const clicked = await evaluate(`(() => {
       const entry = [...document.querySelectorAll('.wk-guide-entry-label')].find(e => (e.textContent ?? '').includes(${JSON.stringify(title)}));

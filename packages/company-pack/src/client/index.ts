@@ -1,5 +1,6 @@
 /** 浏览器半：部署品牌（侧栏）+ 团队任务板（会话头部）+ 公司驾驶舱页签（右栏，R5b）。 */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
+import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type { PaneId, TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
@@ -13,6 +14,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { FloatRectLike } from './ui/float-geometry.ts'
 import { DreamTeamBrandName } from './ui/Brand.tsx'
+import { COMPANY_NS, en, zh } from './locales.ts'
 import { startInstanceGuard } from './wiring/instance-guard.ts'
 import { createAttentionRegistry } from './wiring/attention-registry.ts'
 import { installAttentionObservers } from './wiring/attention-observers.ts'
@@ -34,7 +36,7 @@ import { TasksAction } from './tabs/TasksPanel.tsx'
 import { TEAM_TOOL_KEYS, TeamToolCard } from './ui/TeamToolCard.tsx'
 
 /** Required services: the slot registry plus the remote namespace we read. */
-export const inject = ['slots', 'remote', 'sessions']
+export const inject = ['slots', 'remote', 'sessions', 'locale']
 
 /** 培养主视图的 cell id（`conversation.view` list 槽的 id；与官方 chat 并列）。 */
 const CULTIVATION_VIEW_ID = 'dsh-company-pack/cultivation'
@@ -58,6 +60,9 @@ const CULTIVATION_VIEW_ID = 'dsh-company-pack/cultivation'
  */
 
 export async function apply(ctx: ClientContext): Promise<void> {
+  // typed zh/en 字典：先注册再登记任何带 locale 的槽，避免首帧显示 key。
+  ctx.effect(() => ctx.locale.register(COMPANY_NS, { zh, en }), 'company: dictionaries')
+
   // CSS 与 fiber 同寿命；重新挂载读取新样式，卸载仅清理本次节点。
   ctx.effect(installStyles)
 
@@ -147,6 +152,7 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
       readCatalog,
       contextSources: contextWiring.contextSources,
       openContext: contextWiring.openContext,
+      t: ctx.locale.bind(COMPANY_NS),
     })
   })
 }
@@ -175,7 +181,7 @@ function registerCultivationViewWiring(ctx: ClientContext): void {
       name: 'conversation.view',
       id: CULTIVATION_VIEW_ID,
       order: 20,
-      label: () => '培养',
+      label: () => ctx.locale.bind(COMPANY_NS)('view.cultivation'),
     }, CultivationView))
   })
 }

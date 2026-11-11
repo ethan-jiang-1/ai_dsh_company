@@ -19,6 +19,17 @@
   name: '@deepseek-ai/dsh-client-ui-sidebar-terminal'
   disabled: true
 
+# ── 语言缺省（Phase A1）：替换 web-app 的 locale 行，缺省中文 ──
+# 为什么替换：用户要求「缺省用中文启动」；locale 的 Host Config 有 volatile preference，
+#   web-app 不写 = 浏览器语言优先、fallback en。这里写 bundle 缺省 zh，用户 Settings 里的
+#   显式选择仍作为更高层 override 优先；reset 会回落到这个缺省。
+# 语法：web-app 已有 `- id: locale` 行，所以用替换语法；无此行的组合（headless）会 not found
+#   警告丢弃——那种场景没有浏览器面，Host 侧 language 桥另有 zh 缺省。
+- id: locale
+  name: '@deepseek-ai/dsh-client-locale'
+  config:
+    preference: zh
+
 # ── preset roster（替换 web-app 出厂行：default 改 ceo）──
 # 0.1.7 起预设声明模型变了：registry 一行（本处，按 id 替换 web-app 的 insert）+ **每个预设一行**
 #   `@deepseek-ai/dsh-agent-preset`（预设的子插件行内联进 `config.plugins`）。五行分别住

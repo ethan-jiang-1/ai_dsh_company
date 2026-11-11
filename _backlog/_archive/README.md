@@ -15,6 +15,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-12-bilingual-company.md](settled_issues/2026-11-12-bilingual-company.md) | 已结；中英文双语（默认中文）：代码盘面 + DSH locale 机制 + 默认 zh + 纪律三件套方案；去向 = [RFC](../../notes/proposed/2026-11-12-bilingual-company.md)；实施由 RFC 承载 | 2026-11-12 |
 | [2026-11-11-delegation-capability-scoping-regression-exploration.md](settled_issues/2026-11-11-delegation-capability-scoping-regression-exploration.md) | 已结；委派能力域化后回归+探索：A1–A6/B1–B6 已跑面 + 5 张 BUG-071..075（文案/support root/README/注入生命周期/skill 缩编）；verify/test/preset-smoke/delegation-smoke/release-smoke/product-team-e2e/vp-eng probe 全绿；未证 = teammate cold resume 等；去向 = none | 2026-11-11 |
 | [2026-11-11-delegation-policy-capability-scoped.md](settled_issues/2026-11-11-delegation-policy-capability-scoped.md) | 已结；capability header + 五段 section + core skill + per-agent workflow_runs；team 按 Lead 权限；6 座位真挂载 + CMO/COO/VP-Eng pilot + product-team-e2e-smoke ALL PASS；verify/test/typecheck/lint/dup/preset-smoke 全绿；去向 = [Note](../../notes/implemented/2026-11-11-delegation-policy-capability-scoped.md) | 2026-11-11 |
 | [2026-11-11-delegation-contract-truth.md](settled_issues/2026-11-11-delegation-contract-truth.md) | 已结；maxDepth 行上限、team 上下文 `fresh|fork`、`teamLeadWhenRoot`、native/repo 控制标签、A/B/C/D→原生四通道；vendor-parity spec 红→绿；presets/full test/typecheck/preset-smoke/verify 全绿；去向 = [Note](../../notes/implemented/2026-11-11-delegation-contract-truth.md) | 2026-11-11 |

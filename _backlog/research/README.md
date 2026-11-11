@@ -58,6 +58,8 @@ opened: YYYY-MM-DD
 
 ## 索引
 
+- [bilingual-company](bilingual-company/README.md) — 插件中英文双语与默认中文启动；消费者 = [2026-11-12 问题卡](../_archive/settled_issues/2026-11-12-bilingual-company.md)。
+
 （2026-11-11 dsh-native-orchestration-fit 随两张 issue 卡归档，迁入[研究归档](../_archive/research/README.md)。）
 
 

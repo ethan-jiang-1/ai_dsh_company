@@ -274,6 +274,9 @@ importers:
       '@deepseek-ai/dsh-api-workspace-files':
         specifier: workspace:*
         version: link:../../vendor/dsh/packages/api/workspace-files
+      '@deepseek-ai/dsh-client-locale':
+        specifier: workspace:*
+        version: link:../../vendor/dsh/packages/client/locale
       '@deepseek-ai/dsh-client-ui-conversation':
         specifier: workspace:*
         version: link:../../vendor/dsh/packages/client/ui-conversation

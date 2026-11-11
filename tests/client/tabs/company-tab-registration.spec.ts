@@ -21,6 +21,7 @@ import {
 } from '../../../packages/company-pack/src/client/ui/tab-icons.tsx'
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
 import { registerCompanyTabs } from '../../../packages/company-pack/src/client/tabs/company-tab-registration.ts'
+import { en, zh } from '../../../packages/company-pack/src/client/locales.ts'
 
 const EXPECTED_TYPES = [
   { id: 'dsh-company-pack/attention', kind: 'company-attention', title: '待办', order: 50, description: '人的待办收件箱：待批审批 / 待答问询 / 升级 + 完成通知' },
@@ -47,7 +48,7 @@ const GUIDE_OWNER = 'company.test.guide-owner'
 const EMPTY_ENTRY = () => null
 const KEYED_SESSION = { kind: 'keyed', scope: 'session' } as const
 
-function tabData() {
+function tabData(t: CompanyTabRegistrationData['t'] = ((key: keyof typeof zh) => zh[key]) as CompanyTabRegistrationData['t']) {
   const cultivationFiles: CultivationFiles = {
     listJournal: vi.fn(async () => []),
     readHead: vi.fn(async () => null),
@@ -69,6 +70,7 @@ function tabData() {
     roleSource,
     readLedger: vi.fn(async () => 'ledger text'),
     readCatalog: vi.fn(async () => 'catalog text'),
+    t,
   }
   return { data, pending }
 }
@@ -105,11 +107,11 @@ function mountKeyedDeclaration(ctx: Context, owner: string, slot: string) {
   })
 }
 
-async function mountHarness() {
+async function mountHarness(t?: CompanyTabRegistrationData['t']) {
   const ctx = new Context()
   const slots = new SlotRegistry(ctx)
   const sidebarRightTabs = new SidebarRightTabRegistry(ctx)
-  const { data, pending } = tabData()
+  const { data, pending } = tabData(t)
   const openTab = vi.fn()
   const openSession = vi.fn()
   ctx.provide('sidebarRightTabs', sidebarRightTabs)
@@ -203,12 +205,14 @@ describe('company tab registration', () => {
     const titleFiber = await declareSlot(harness, TITLE_OWNER, TITLE_SLOT)
     expect(harness.slots.entries(TITLE_SLOT).map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
     expect(harness.slots.entries(TITLE_SLOT).map(entry => entry.component)).toEqual(TITLE_COMPONENTS)
+    expect(harness.slots.entries(TITLE_SLOT).every(entry => entry.locale === 'company'), 'title 槽必须拿到 company t seat').toBe(true)
     expect(harness.slots.entries(GUIDE_SLOT)).toEqual([])
 
     const guideFiber = await declareSlot(harness, GUIDE_OWNER, GUIDE_SLOT)
     const guideEntries = harness.slots.entries(GUIDE_SLOT)
     expect(guideEntries.map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
     expect(guideEntries.map(entry => entry.component)).toEqual(GUIDE_COMPONENTS)
+    expect(guideEntries.every(entry => entry.locale === 'company'), 'guide 槽必须拿到 company t seat').toBe(true)
     for (const [index, entry] of guideEntries.entries()) {
       const props = entry.inject?.() ?? {}
       expect(Object.keys(props)).toEqual(['openTab'])
@@ -219,6 +223,21 @@ describe('company tab registration', () => {
     await bodyFiber.dispose()
     await titleFiber.dispose()
     await guideFiber.dispose()
+  })
+
+  it('页签 title/guide 文案随 locale 实时切换（不是注册时捕获）', async () => {
+    let dict: Record<string, string> = zh
+    const t = ((key: string) => dict[key] ?? key) as CompanyTabRegistrationData['t']
+    const harness = await mountHarness(t)
+    const attention = harness.sidebarRightTabs.entries().find(definition => definition.id === 'dsh-company-pack/attention')
+    expect(attention, 'attention tab type').toBeDefined()
+    expect(attention!.title()).toBe('待办')
+    expect(attention!.guide?.[0]?.description?.()).toContain('待办收件箱')
+    dict = en
+    expect(attention!.title()).toBe('Inbox')
+    expect(attention!.guide?.[0]?.description?.()).toContain('pending inbox')
+    dict = zh
+    expect(attention!.title()).toBe('待办')
   })
 
   it('collapses one declaration at a time; reinstallation and final unload stay scoped', async () => {

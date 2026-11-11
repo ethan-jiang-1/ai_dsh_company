@@ -13,6 +13,8 @@
  */
 import type { ReactNode } from 'react'
 import { Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
+import { tabCopyFor, type FaceKey } from '../tabs/tab-copy.ts'
+import type { CompanyT } from '../locales.ts'
 
 /** 平台 icon 组件的标准形状（照 ui-primitives 的 IconProps：size + className）。
  *  显式 `| undefined`：本仓 max-strict（exactOptionalPropertyTypes）下可选 prop 需明示可传 undefined。 */
@@ -201,36 +203,36 @@ function GuideEntry({ tone, glyph: GlyphComponent, label, tooltip, kind, openTab
 interface TabFace {
   readonly tone: string
   readonly glyph: (props: GlyphProps) => ReactNode
-  readonly label: string
-  readonly tooltip: string
 }
 
 const FACES = {
-  attention: { tone: 'attention', glyph: BellGlyph, label: '待办', tooltip: '「分身做不了的事」收件箱——待批审批 / 待答问询 / 升级 / 完成通知' },
-  board: { tone: 'overview', glyph: GridGlyph, label: '看板', tooltip: '任务推进全景：每张卡到哪一步（owner / 依赖 / 修订号），投影更新' },
-  dag: { tone: 'structure', glyph: DagGlyph, label: '依赖图', tooltip: '任务依赖关系：谁等谁出稿、关键路径在哪' },
-  presence: { tone: 'people', glyph: PeopleGlyph, label: '在场', tooltip: '谁在忙、忙什么——点行进成员空间；下方是流式协作动态' },
-  budget: { tone: 'burn', glyph: GaugeGlyph, label: '用量', tooltip: '令牌用量与占比（只做令牌，不做美元）' },
-  tasks: { tone: 'work', glyph: KanbanGlyph, label: '任务板', tooltip: '共享任务表：状态 / owner / 依赖 / 修订号一屏看全' },
-  cultivation: { tone: 'growth', glyph: SproutGlyph, label: '培养', tooltip: '分身成长线：journal 待审收件箱 + 人审提升（只采纳有证据的）' },
-  ledger: { tone: 'archive', glyph: LedgerGlyph, label: '台账', tooltip: '公司大事记：每场动议的日期 / 类型 / 参与 / 成品 / 结论' },
-  catalog: { tone: 'archive', glyph: CatalogGlyph, label: '成品', tooltip: '公司成品目录：按 final.md 列成品（日期 / 类型 / 结果 / 一句话结论）；静态索引，生成后重读' },
+  attention: { tone: 'attention', glyph: BellGlyph },
+  board: { tone: 'overview', glyph: GridGlyph },
+  dag: { tone: 'structure', glyph: DagGlyph },
+  presence: { tone: 'people', glyph: PeopleGlyph },
+  budget: { tone: 'burn', glyph: GaugeGlyph },
+  tasks: { tone: 'work', glyph: KanbanGlyph },
+  cultivation: { tone: 'growth', glyph: SproutGlyph },
+  ledger: { tone: 'archive', glyph: LedgerGlyph },
+  catalog: { tone: 'archive', glyph: CatalogGlyph },
 } as const satisfies Record<string, TabFace>
 
 /** 页签键（注册处按它取身份与三种渲染）。 */
-export type FaceKey = keyof typeof FACES
+export type { FaceKey }
 
-const titleOf = (face: TabFace) => function TabFaceTitle(): ReactNode {
-  return <TabTitle tone={face.tone} glyph={face.glyph} label={face.label} tooltip={face.tooltip} />
+const titleOf = (face: TabFace, key: FaceKey) => function TabFaceTitle({ t }: { readonly t: CompanyT }): ReactNode {
+  const copy = tabCopyFor(key, t)
+  return <TabTitle tone={face.tone} glyph={face.glyph} label={copy.label} tooltip={copy.tooltip} />
 }
-const entryOf = (face: TabFace) => function TabFaceEntry(props: GuideEntryProps): ReactNode {
-  return <GuideEntry {...props} tone={face.tone} glyph={face.glyph} label={face.label} tooltip={face.tooltip} />
+const entryOf = (face: TabFace, key: FaceKey) => function TabFaceEntry({ t, ...props }: GuideEntryProps & { readonly t: CompanyT }): ReactNode {
+  const copy = tabCopyFor(key, t)
+  return <GuideEntry {...props} tone={face.tone} glyph={face.glyph} label={copy.label} tooltip={copy.tooltip} />
 }
 const iconOf = (face: TabFace) => guideIcon(face.tone, face.glyph)
 
 interface TabFaceComponents extends TabFace {
-  readonly Title: () => ReactNode
-  readonly Entry: (props: GuideEntryProps) => ReactNode
+  readonly Title: (props: { readonly t: CompanyT }) => ReactNode
+  readonly Entry: (props: GuideEntryProps & { readonly t: CompanyT }) => ReactNode
   readonly Icon: (props: GlyphProps) => ReactNode
 }
 
@@ -238,7 +240,7 @@ interface TabFaceComponents extends TabFace {
 export const TAB_IDENTITY = Object.fromEntries(
   (Object.keys(FACES) as FaceKey[]).map((key) => {
     const face = FACES[key]
-    return [key, { ...face, Title: titleOf(face), Entry: entryOf(face), Icon: iconOf(face) }]
+    return [key, { ...face, Title: titleOf(face, key), Entry: entryOf(face, key), Icon: iconOf(face) }]
   }),
 ) as Record<FaceKey, TabFaceComponents>
 

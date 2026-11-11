@@ -17,6 +17,7 @@ import { createClientTest } from '../../vendor/dsh/packages/test-support/client-
 // 构建产物会炸；provide 与根仓「vitest 一律走 src 源码面」纪律一致，模块本体仍是生产实现。
 import * as companyClient from '../../packages/company-pack/src/client/index.ts'
 import { HEARTBEAT_KEY } from '../../packages/company-pack/src/client/wiring/instance-guard.ts'
+import { en as companyEn, zh as companyZh } from '../../packages/company-pack/src/client/locales.ts'
 
 /** The web profile's browser roster with the company pack as an extra bundle layer. */
 const roster = bundleRoster(
@@ -60,10 +61,30 @@ const test = createClientTest({ roster, provide: { 'dsh-company-pack': companyCl
 describe('company client apply through the whole-client tier', () => {
   test('boots the pack row and registers the nine company tabs with keyed slots', async ({ mock, start }) => {
     declareWorkspaceFilesNamespace(mock)
+    // A1：setLocale 会写 settings/mutate；给 mock 一个最小 namespace view，避免 unmatched。
+    mock.load({
+      unary: {
+        'settings/mutate': ok({
+          autoGenerate: false, ns: 'locale', schema: {}, value: { preference: 'zh' },
+          applies: 'live', secrets: [], revision: 1,
+        }),
+      },
+    })
     const client = await start()
 
     const entry = [...client.ctx.loader.entries()].find(e => e.options.name === 'dsh-company-pack')
     expect(entry?.fiber, 'the company row imported and activated').toBeDefined()
+
+    // A1：locale 服务在真 web roster 里组合成功，且 company 字典可切换。
+    const locale = client.ctx.get('locale') as {
+      bind(ns: string): (key: string) => string
+      setLocale(id: string): void
+    } | undefined
+    expect(locale, 'locale service composed by the roster').toBeDefined()
+    locale!.setLocale('zh')
+    expect(locale!.bind('company')('brand.name')).toBe(companyZh['brand.name'])
+    locale!.setLocale('en')
+    expect(locale!.bind('company')('brand.name')).toBe(companyEn['brand.name'])
 
     const tabs = client.ctx.get('sidebarRightTabs')
     expect(tabs, 'sidebarRightTabs service composed by the roster').toBeDefined()

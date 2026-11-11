@@ -34,6 +34,8 @@ import { registerCultivation, type CultivationHostConfig } from './host/cultivat
 import { registerHandbook } from './host/prompt/handbook.ts'
 import { registerWorkflowContract } from './host/prompt/contracts.ts'
 import { registerDelegationContracts } from './host/prompt/delegation-contracts.ts'
+import { createCompanyLanguage } from './host/language/company-language.ts'
+import { registerLanguagePolicy } from './host/prompt/language-policy.ts'
 import { registerTeamSeatGuard } from './host/delegation/team-seat-guard.ts'
 import { registerSubagentRetry } from './host/delegation/subagent-retry.ts'
 import { SUBAGENT_RETRY_SURFACE } from './lib/retry-policy.ts'
@@ -76,6 +78,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   registerWorkflowRuns(ctx)
 
   const runtime = prepareCompanyRuntime(ctx)
+  const language = createCompanyLanguage(ctx)
   const workspace = runtime.workspace
   const hasWorkspace = workspace !== ''
   const dataBlocked = runtime.dataBlocked || !hasWorkspace
@@ -124,6 +127,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
     // 默认跳过集合由 handbook.ts 按 NON_ROLE_PRESETS 派生（不在这里写 ID 白名单）；
     // 部署配置只作覆盖旋钮（BUG-047）。
     config.handbookSkipPresets === undefined ? {} : { skipPresets: config.handbookSkipPresets })
+  registerLanguagePolicy(ctx, language)
   registerWorkflowContract(ctx, contentDir, { workflowPresets: ['vp-eng'] })
   registerDelegationContracts(ctx, contentDir)
   // BUG-072：support preset 作为 root 时 vendor 仍给 Lead 工具面；产品侧用 per-agent guard 拒组队。
