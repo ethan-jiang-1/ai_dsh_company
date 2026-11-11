@@ -1,13 +1,13 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 // 何时跑：pnpm verify（每次）；新增/移动日志、探针输出、文档或快照说明后。
 // 为什么：BUG-029（2026-10-20）观察窗 token 再次随 runtime/web-logs 入库；BUG-013（2026-10-12）
-// 已经发生过一次同类。上次只修了 runtime/e2e/ 路径，没有类级守卫；本门禁扫 tracked 文件的
-// 「带 token 的 URL」形状，值不打印。vendor/ 只读，不在射程；snapshots/ 仍在射程（历史证据
-// 若含 token 也应被看见，而不是被目录名豁免）。
-import { execFileSync } from 'node:child_process'
+// 已经发生过一次同类。上次只修了 runtime/e2e/ 路径，没有类级守卫；本门禁扫 working-tree
+// （tracked + untracked 非 ignored）的「带 token 的 URL」形状，值不打印。vendor/ 只读，不在射程；
+// snapshots/ 仍在射程（历史证据若含 token 也应被看见，而不是被目录名豁免）。
 import { readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { findTokenUrls } from '../../tools/lib/tracked-token.mjs'
+import { worktreeFiles } from './lib/worktree-files.mjs'
 
 const MAX_BYTES = 2 * 1024 * 1024
 const SKIP_PREFIXES = ['vendor/']
@@ -15,11 +15,9 @@ const SKIP_PREFIXES = ['vendor/']
 export function run({ root, ok, fail }) {
   let files
   try {
-    files = execFileSync('git', ['ls-files', '-z'], { cwd: root, encoding: 'utf8' })
-      .split('\0')
-      .filter(Boolean)
+    files = worktreeFiles(root)
   } catch (error) {
-    fail('tracked-token', `git ls-files 失败，无法判定 tracked 面：${String(error.message ?? error)}`)
+    fail('tracked-token', `git ls-files 失败，无法判定 working-tree：${String(error.message ?? error)}`)
     return
   }
 
@@ -43,8 +41,8 @@ export function run({ root, ok, fail }) {
   }
 
   if (hits.length > 0) {
-    fail('tracked-token', `tracked 文件含 token URL（值不打印）：${hits.slice(0, 5).join('；')}${hits.length > 5 ? `；共 ${String(hits.length)} 件` : ''}`)
+    fail('tracked-token', `working-tree 文件含 token URL（值不打印）：${hits.slice(0, 5).join('；')}${hits.length > 5 ? `；共 ${String(hits.length)} 件` : ''}`)
   } else {
-    ok(`tracked-token ×${String(scanned)}（tracked 面零 token URL；跳过 ${String(skipped)} 个 >2MB 或非普通文件）`)
+    ok(`tracked-token ×${String(scanned)}（working-tree tracked + untracked 非 ignored，零 token URL；跳过 ${String(skipped)} 个 >2MB 或非普通文件）`)
   }
 }

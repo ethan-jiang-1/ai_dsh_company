@@ -8,9 +8,13 @@
 // → 红（点名 `quality-loop.md:88`）；`git checkout HEAD --` 还原 → 绿（×784）。
 // 同轮反证「相对路径不再误红」：`tests/fixtures/methods/home/company/methods/` 三处（guide / Note / spec）
 // 在收紧前连报 3 处假红，收紧后仍绿而真绝对路径仍红——两者都是本次实跑，不是推测。
+// 负例留证 2026-11-11（untracked 漏扫）：新建 untracked `docs/zz-untracked-portability.md` 写
+// `/Users/bowhead/...` → 修前 verify 全绿、commit 后才红；本门改扫 tracked + untracked 非 ignored 后，
+// 未 commit 也直接红（点名文件:行），删除即绿。
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { worktreeFiles } from './lib/worktree-files.mjs'
 
 const MAX_BYTES = 2 * 1024 * 1024
 // 「绝对」是这条规则的判据（规则唯一家 = docs/repo-hygiene.md §四.2），所以起点必须是真路径根：
@@ -30,14 +34,6 @@ const ALLOW_PREFIXES = [
 /** 合成 fixture 里允许的占位用户名（不是真实机器）。 */
 const ALLOW_PATH_RE = /^\/Users\/someone\//
 
-function trackedFiles(root) {
-  return execFileSync('git', ['ls-files', '-z'], {
-    cwd: root,
-    encoding: 'utf8',
-    maxBuffer: 10 * 1024 * 1024,
-  }).split('\0').filter(Boolean)
-}
-
 function isPortabilityScript(rel) {
   return rel.endsWith('.sh') || (rel.endsWith('.mjs') && /^(run|tools|checks)\//.test(rel))
 }
@@ -51,7 +47,9 @@ export function run({ root, ok, fail }) {
     problems.push('.gitattributes 缺 `* text=auto eol=lf`（跨环境 LF 基线）')
   }
 
-  const files = trackedFiles(root)
+  const files = worktreeFiles(root)
+  const tracked = new Set(execFileSync('git', ['ls-files', '-z'], { cwd: root, encoding: 'utf8' })
+    .split('\0').filter(Boolean))
   const lower = new Map()
   for (const rel of files) {
     const key = rel.toLowerCase()
@@ -76,6 +74,7 @@ export function run({ root, ok, fail }) {
     if (buffer.includes(0)) continue
     scanned++
     const text = buffer.toString('utf8')
+    if (!tracked.has(rel) && text.includes('\r\n')) problems.push(`${rel} CRLF（untracked 也应 LF）`)
     const lines = text.split('\n')
     for (let index = 0; index < lines.length; index++) {
       for (const match of lines[index].matchAll(HOME_PATH_RE)) {
@@ -89,7 +88,7 @@ export function run({ root, ok, fail }) {
   }
 
   if (problems.length === 0) {
-    ok(`tracked-portability ×${String(scanned)}（LF/无 home 路径/无大小写冲突/无 macOS 专属命令）`)
+    ok(`tracked-portability ×${String(scanned)}（working-tree tracked + untracked 非 ignored；LF/无 home 路径/无大小写冲突/无 macOS 专属命令）`)
   } else {
     fail('tracked-portability', problems.slice(0, 12).join('；') + (problems.length > 12 ? '；…' : ''))
   }

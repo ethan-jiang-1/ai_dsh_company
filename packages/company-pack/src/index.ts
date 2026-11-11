@@ -48,6 +48,7 @@ import { registerDelegationControl } from './host/delegation/delegation-control.
 import { registerWorkflowRuns } from './host/delegation/workflow-runs.ts'
 import { exportGovernance, type ExportLedgerSource } from './host/ledger/governance-export.ts'
 import { prepareCompanyRuntime } from './host/run-bundle/runtime-guard.ts'
+import { validateHostConfig } from './host/run-bundle/config.ts'
 import { staleWorkspacePaths, staleWorkspacePathsFromRegistry, type WorkspaceRegistryLike } from './host/workspace/workspace-registry.ts'
 import { canonicalPath } from './host/run-bundle/paths.ts'
 
@@ -65,6 +66,7 @@ export type HostConfig = CultivationHostConfig & {
  * opens a session in a workspace (the native DSH picker path) and the host is restarted/activated.
  */
 export async function apply(ctx: Context, config: HostConfig = {}): Promise<void> {
+  validateHostConfig(config)
   registerSignoffTool(ctx)
   // BUG-037/041 真修：根会话被团队版控制名 shadow 时，仍能列出/续驶自己的 subagent child。
   registerDelegationControl(ctx)

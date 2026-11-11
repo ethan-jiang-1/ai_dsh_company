@@ -86,7 +86,7 @@ tarball 的**绝对路径**。按提示重启正在使用的 profile，之后用
 - `DSH_COMPANY_BROWSER`：浏览器能力开关；缺省 = profile 能解析 browser 两包就开，否则关；`on`/`off` 强制。
 - `company-client` 行的 `cultivationRoot`：方法层根；缺席时 `/cultivation adopt|revoke` 明确报错。
 - 兼容窗口：`engines.dsh`（运行时只读这一行；没有它才看 peers）。
-- 本包不导出 Config schema（唯一可调项 `cultivationRoot` 是可选行 config，没有 schema 校验）。
+- 本包不导出 Config schema；`apply` 前对 `cultivationRoot` / `handbookSkipPresets` 做类型/空值 fail-loud 校验，路径存在性仍由运行时处理。
 
 ## Data
 

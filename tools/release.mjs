@@ -268,6 +268,9 @@ function check(allowDirtyTree = allowDirty) {
   if (checks.verify !== 'pass' || checks.test !== 'pass') fail('manifest 未记录 verify/test 通过（--prepare 后必须 --verify）')
   if (notPass.length > 0) fail(`manifest 有未通过的检查：${notPass.map(([name, status]) => `${name}=${String(status)}`).join(', ')}`)
   console.log(`release: READY ${manifest.version} @ ${manifest.gitSha.slice(0, 8)}（tgz ${artifact.entries} 条目；${String(Object.keys(checks).length)} 项检查 pass）`)
+  if (existsSync(join(ROOT, 'market-index.staged.json'))) {
+    console.log('release: WARN market-index.staged.json 在场：根 index 是发布前预览，不可托管；发布后删除 staged 并跑 pnpm market:hosted')
+  }
 }
 
 const mode = has('--all') ? 'all' : has('--prepare') ? 'prepare' : has('--verify') ? 'verify' : has('--stamp') ? 'stamp' : has('--bump') ? 'bump' : 'check'
