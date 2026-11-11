@@ -58,6 +58,7 @@ opened: YYYY-MM-DD
 
 ## 索引
 
+- [dsh-native-orchestration-fit/](dsh-native-orchestration-fit/README.md) · DSH 原生编排思路对照：公司角色的通道、合同与能力面 GAP 盘点（2026-11-11 已定性；产出两张 issue 卡）
 
 （2026-11-11 两产品结构审计题随其末张活卡归档，迁入[研究归档](../_archive/research/README.md)；同批 workflow + subagent 探索题也已归档。）
 （2026-11-10 preset 委派架构 / SA-SQA 产物评审 / 组织协同拓扑三题随各自末张活卡归档，迁入[研究归档](../_archive/research/README.md)。）

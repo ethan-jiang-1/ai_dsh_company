@@ -62,11 +62,11 @@ function mount(): { ctx: Context; tools: Map<string, unknown>; commands: Map<str
 const wait = (): Promise<void> => new Promise(resolve => { setImmediate(resolve) })
 
 describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）', () => {
-  it('全局注册面固定：四个工具 + 六个命令（两个 control 工具改 per-agent；名单漂移即红）', async () => {
+  it('全局注册面固定：三个工具 + 六个命令（control / workflow_runs 改 per-agent；名单漂移即红）', async () => {
     const { ctx, tools, commands } = mount()
     ctx.plugin({ inject: ['tools', 'approval', 'commands'], apply: (scoped: Context) => { apply(scoped, {}) } })
     await wait()
-    expect([...tools.keys()].sort()).toEqual(['cultivation_propose', 'request_signoff', 'workflow_runs', 'workspace_doors'])
+    expect([...tools.keys()].sort()).toEqual(['cultivation_propose', 'request_signoff', 'workspace_doors'])
     expect([...commands.keys()].sort()).toEqual(['company-diagnostics', 'cultivation', 'deliverables', 'delivery', 'prd', 'req'])
     await ctx.fiber.dispose()
   })
@@ -136,7 +136,7 @@ describe('Host 真实组合：注册面、dispose 与无会话守卫（R3-11）'
     const { ctx, tools, commands } = mount()
     ctx.plugin({ inject: ['tools', 'approval', 'commands'], apply: (scoped: Context) => { apply(scoped, {}) } })
     await wait()
-    expect(tools.size).toBe(4)
+    expect(tools.size).toBe(3)
     await ctx.fiber.dispose()
     expect(tools.size).toBe(0)
     expect(commands.size).toBe(0)

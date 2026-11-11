@@ -6,7 +6,7 @@
 //
 // 入口语义（2026-11-10 实测，见 research/2026-11-10-asset-first-round.md §5）：
 // - root：无 parent = Lead，**总是**有 9 个团队工具（cordis.patch.yml 的 agent-team overlay），
-//   即使 preset 声明 teamLead:false（support 能力档）。不要把 support root 判成越权。
+//   即使 preset 声明 teamLeadWhenRoot:false（support 能力档）。不要把 support root 判成越权。
 // - team member：继承 Lead 组合，团队工具在场；`send_to_subagent` 等宿主控制面也在场。
 // - one-shot child / workflow 分支：按 preset 组合，**没有**团队协作工具；`control` 才按声明判。
 // - `send_to_subagent` 在 root/member 是宿主面，只有 child 才能拿它判 preset 的 control（BUG-052 的判据）。

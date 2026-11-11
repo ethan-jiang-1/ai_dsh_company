@@ -12,6 +12,7 @@
  * 不是持久事实的来源）；不依赖 isolate 组里的 `sessionQuery`。
  */
 import type { Context } from '@deepseek-ai/cordis'
+import { scopeOf } from '@deepseek-ai/dsh-scope'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 
 type SessionEventLike = { type: string; data: unknown; seq?: number }
@@ -124,9 +125,38 @@ export function workflowRunRows(
   return rows.sort((a, b) => a.order - b.order).map(({ order: _order, ...row }) => row)
 }
 
-/** 注册 `workflow_runs`；只读父会话自己的 durable 记录，job 注册表只作 liveness 装饰。 */
-export function registerWorkflowRuns(ctx: Context): void {
-  ctx.tools.register(defineTool({
+interface ToolScopeLike {
+  readonly tools?: { register(tool: unknown): () => unknown; get?(name: string, scope?: object): unknown }
+  effect(callback: () => () => unknown): void
+}
+
+interface AgentLike {
+  readonly ctx: Context
+}
+
+/** 工具是否在这个 Agent scope 的真实工具面里。 */
+function hasWorkflowTool(scope: Context): boolean {
+  const tools = scope.get('tools') as ToolScopeLike['tools'] | undefined
+  if (tools?.get === undefined) return false
+  try {
+    return tools.get('workflow', scopeOf(scope)) !== undefined
+  } catch {
+    try {
+      return tools.get('workflow') !== undefined
+    } catch {
+      return false
+    }
+  }
+}
+
+/**
+ * 构造 `workflow_runs` 工具定义（纯构造，不注册）。
+ * 测试直接调用；host 在 per-agent 安装时注册。
+ * @param ctx - Host 上下文（execute 里读 jobs 注册表）。
+ * @returns 工具定义。
+ */
+export function createWorkflowRunsTool(ctx: Context): unknown {
+  return defineTool({
     name: 'workflow_runs',
     description: 'List the workflow runs recorded in THIS session\'s durable log, including runs whose '
       + 'host process died. `status` is `completed`/`cancelled`/`error` when the run recorded an end; '
@@ -168,10 +198,10 @@ export function registerWorkflowRuns(ctx: Context): void {
           },
         },
       },
-      render: (_args, value) => [{ type: 'text', text: JSON.stringify(value, null, 2) }],
+      render: (_args: unknown, value: unknown) => [{ type: 'text', text: JSON.stringify(value, null, 2) }],
     },
-    async execute(_args, exec) {
-      const agent = exec.agent as { session: { id: string; ownEvents(): readonly SessionEventLike[] } } | undefined
+    async execute(_args: never, exec: { agent?: { session: { id: string; ownEvents(): readonly SessionEventLike[] } } }) {
+      const agent = exec.agent
       if (agent === undefined) throw new Error('workflow_runs requires a calling agent')
       const jobs = ctx.get('jobs') as JobRegistryLike | undefined
       const jobKnown = (jobId: string): boolean => {
@@ -183,5 +213,30 @@ export function registerWorkflowRuns(ctx: Context): void {
       }
       return { runs: workflowRunRows(agent.session.ownEvents(), jobKnown) }
     },
-  }))
+  })
+}
+
+/**
+ * 注册 `workflow_runs`：**per-agent**，只在有 `workflow` 工具的会话里可见。
+ *
+ * 为什么不是全局：job 注册表是进程内的；CEO/COO/worker 没有 workflow，却曾能看到这个工具。
+ * 能力域即作用域：没有 workflow 的会话不需要这个 durable 视图。
+ * @param ctx - Host 上下文。
+ */
+export function registerWorkflowRuns(ctx: Context): void {
+  const installed = new WeakSet<object>()
+  const install = (agent: AgentLike): void => {
+    if (installed.has(agent)) return
+    installed.add(agent)
+    agent.ctx.inject(['tools'], (scope) => {
+      const scoped = scope as unknown as ToolScopeLike
+      const tools = scope.get('tools') as ToolScopeLike['tools'] | undefined
+      if (!hasWorkflowTool(scope) || tools === undefined) return
+      scoped.effect(() => {
+        const unregister = tools.register(createWorkflowRunsTool(ctx))
+        return () => { unregister?.() }
+      })
+    })
+  }
+  ctx.on('agent/created', ({ agent }: { agent: AgentLike }) => { install(agent) })
 }

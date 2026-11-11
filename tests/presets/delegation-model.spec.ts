@@ -96,6 +96,8 @@ describe('delegation model：唯一期望源', () => {
       expect(CHANNELS[id as keyof typeof CHANNELS].agentPreset, `${id} 不该宣称支持 agentPreset`).toBe(false)
     }
     expect(CHANNELS.fork.inheritsParentContext).toBe(true)
+    expect(CHANNELS.team.inheritsParentContext).toBe('optional')
+    expect(CHANNELS.team.context).toBe('fresh | fork (default fresh)')
     expect(CHANNELS.workflow.depth).toBe('parent+1 (branch activation)')
     expect(CHANNELS.team.depth).toBe('parent+1 (member activation)')
   })

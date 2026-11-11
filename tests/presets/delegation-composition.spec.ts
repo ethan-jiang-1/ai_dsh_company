@@ -52,7 +52,7 @@ function derive(id: string): Derived {
   if (spawnRows.length > 0) channels.push('spawn')
   if (forkRows.length > 0) channels.push('fork')
   if (workflow) channels.push('workflow')
-  if (spec.teamLead) channels.push('team')
+  if (spec.teamLeadWhenRoot) channels.push('team')
   const depthRows: Record<string, number | 'default'> = {}
   for (const row of [...spawnRows, ...forkRows]) {
     const config = pluginConfig(row)
@@ -99,6 +99,20 @@ describe('delegation composition：YAML 是模型的投影', () => {
         expect(observed.workflow, `${id}: worker 不该有 workflow`).toBe(false)
       }
     }
+  })
+
+  it('depth rows compose：CEO 的 vp_eng 行=1，vp-eng 自己的通用 subagent 行=3', () => {
+    const ceoRows = allRows(loadPresetDoc('ceo'))
+    const vpEngRow = ceoRows.find(row => row.name === TOOL_SUBAGENT && pluginConfig(row).toolName === 'vp_eng')
+    expect(vpEngRow, 'CEO 缺 vp_eng 命名行').toBeDefined()
+    expect(pluginConfig(vpEngRow).maxDepth, 'CEO 只把直接 child 钉在 depth 1').toBe(1)
+
+    const vpEngRows = allRows(loadPresetDoc('vp-eng'))
+    const generic = vpEngRows.find(row => row.name === TOOL_SUBAGENT
+      && pluginConfig(row).provider === 'spawn'
+      && String(pluginConfig(row).toolName ?? 'subagent') === 'subagent')
+    expect(generic, 'vp-eng 缺通用 subagent 行').toBeDefined()
+    expect(pluginConfig(generic).maxDepth, 'vp-eng child 自己的通用行放行到 3').toBe(3)
   })
 
   it('vp-eng：通用 subagent 钉 worker；fork 仍是无 agentPreset 的 clone', () => {

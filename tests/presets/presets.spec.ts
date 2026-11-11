@@ -231,7 +231,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       expect(match, `CEO 缺命名委托工具 ${tool}`).not.toBeNull()
       const block = (match as RegExpExecArray)[1] as string
       expect(block, `${tool} 必须用角色 preset 给人格（per-tool persona 已删）`).toContain(`agentPreset: ${preset}`)
-      expect(block, `${tool} 缺 maxDepth（禁止 VP→VP 平级派活）`).toContain('maxDepth: 1')
+      expect(block, `${tool} 的直接 child 绝对深度上限必须是 1（不是“禁止 child 再派”）`).toContain('maxDepth: 1')
       // 反向守卫：这些位在 0.2.1 会把 preset 标 broken，别再"修"回来。
       expect(block, `${tool} 仍有 0.2.1 已删除的配置位（preset 会被标 broken）`).not.toMatch(/^\s+(backgroundMode|enableRunInBackground|persona|toolFilter):/m)
     }

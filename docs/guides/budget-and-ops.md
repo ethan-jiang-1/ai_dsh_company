@@ -21,7 +21,7 @@
 - **常驻成本**：CEO 会话（全程）+ 4 个 VP 会话（spawn 后 resident）——每个会话独立计费、
   独立 KV cache（persona prefix 稳定对 cache 友好，roles-isolation §1）。
 - **脉冲成本**：workers（one-shot，随生随灭）、workflow 冲刺（vp-eng 的脚本内 agent() 并发）。
-- **省钱杠杆**：① `fork` teammate 下发会议上下文，比"CEO 逐个转述 brief"省重复输入；
+- **省钱杠杆**：① `context: 'fork'` 可带 Lead 已完成轮（只限已完成轮；当前任务书仍需 prompt/文件），默认 fresh + 任务书更稳，不要把它当默认省 token 杠杆；
   ② 稳定事实放 KB 文件按需读，不进 persona（role-content-plan §0.2）；③ 长稿交割走 workspace 文件 +
   消息里给路径（避开 64KiB 邮箱上限同时也省 token）；④ 需要压彩排成本时，在彩排动议的委托工具
   `agentOptions` 上临时收紧（正式场不动——D16 默认全员同模型）。

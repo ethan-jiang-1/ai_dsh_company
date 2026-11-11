@@ -48,27 +48,35 @@ export const CHANNELS = {
     agentPreset: true,
     inheritsParentContext: false,
     depth: 'parent+1',
-    control: ['list_subagents', 'send_to_subagent'],
+    // vendor 模型的直接子代控制名；本仓在 team shadow 下换成了 repoControl。
+    nativeControl: ['send_message', 'interrupt_agent'],
+    repoControl: ['list_subagents', 'send_to_subagent'],
   },
   fork: {
     agentPreset: false,
     inheritsParentContext: true,
     depth: 'parent+1',
-    control: ['list_subagents', 'send_to_subagent'],
+    nativeControl: ['send_message', 'interrupt_agent'],
+    repoControl: ['list_subagents', 'send_to_subagent'],
   },
   workflow: {
     agentPreset: false,
     inheritsParentContext: false,
     // 分支本身是 startActivation(parent) 的子代：深度 = parent+1；workflow 引擎没有独立的闸。
     depth: 'parent+1 (branch activation)',
-    control: ['workflow_runs'],
+    // native 只有 run 返回值 / 后台 job；workflow_runs 是本仓补的 durable 视图。
+    nativeControl: ['run return', 'job_output'],
+    repoControl: ['workflow_runs'],
   },
   team: {
     agentPreset: false,
-    inheritsParentContext: true,
+    // team 的上下文是可选的：fresh 默认；fork 才带 Lead 的已完成轮。别把它写成硬继承。
+    inheritsParentContext: 'optional',
+    context: 'fresh | fork (default fresh)',
     // teammate 也走 startActivation(root)：深度 = Lead+1；继承 Lead 组合。
     depth: 'parent+1 (member activation)',
-    control: ['send_message', 'list_agents', 'wait_agent', 'interrupt_agent'],
+    nativeControl: ['send_message', 'wait_agent', 'list_agents', 'interrupt_agent'],
+    repoControl: [],
   },
 }
 
@@ -159,11 +167,11 @@ export const CONTRACTS = {
  * - archetype：lead / full / worker / support。
  *   `support` = 非角色的能力档（质量环的 producer / verifier）：有方法槽与流程 skill，
  *   但没有任何委派面（不是 worker family 的 leaf 执行手）。
- * - teamLead：根会话是否天然是 Team Lead（full role 都是；leaf/worker/support 不是）。
+ * - teamLeadWhenRoot：preset 级期望——这个 preset 作为根会话时是不是 Team Lead（full role 都是；leaf/worker/support 不是）。运行时任何 root 都是 Lead，注入侧必须用 membership/parentSession 判，不能只看这个字段。
  * - genericSpawn：是否有通用 `subagent` 行（toolName = subagent）。
  * - workerProfile：当前已钉的 worker profile；null = 仍继承父组合（待铺开）。
  * - targetWorkerProfile：目标 profile（长期）；pilot 阶段只 vp-eng 已落地。
- * - channels：组合能开的通道（team 由 teamLead 推导，不在 YAML 行里）。
+ * - channels：组合能开的通道（team 由 teamLeadWhenRoot 推导，不在 YAML 行里）。
  * - namedDelegates：命名委托行的 toolName。
  * - depthRows：toolName → 行上 maxDepth（'default' = 省略，读 Host 默认 1）。
  * - control：是否有 subagent 控制行（CEO 没有：根/团队被 shadow，是死行）。
@@ -173,7 +181,7 @@ export const CONTRACTS = {
 export const COMPOSITIONS = {
   ceo: {
     archetype: 'lead',
-    teamLead: true,
+    teamLeadWhenRoot: true,
     genericSpawn: false,
     workerProfile: null,
     targetWorkerProfile: null,
@@ -201,7 +209,7 @@ export const COMPOSITIONS = {
   },
   'vp-eng': {
     archetype: 'full',
-    teamLead: true,
+    teamLeadWhenRoot: true,
     genericSpawn: true,
     workerProfile: 'worker',
     targetWorkerProfile: 'worker',
@@ -228,7 +236,7 @@ export const COMPOSITIONS = {
   },
   'vp-sales': {
     archetype: 'full',
-    teamLead: true,
+    teamLeadWhenRoot: true,
     genericSpawn: true,
     workerProfile: null,
     targetWorkerProfile: 'worker',
@@ -241,7 +249,7 @@ export const COMPOSITIONS = {
   },
   coo: {
     archetype: 'full',
-    teamLead: true,
+    teamLeadWhenRoot: true,
     genericSpawn: true,
     workerProfile: null,
     targetWorkerProfile: 'worker',
@@ -254,7 +262,7 @@ export const COMPOSITIONS = {
   },
   cfo: {
     archetype: 'full',
-    teamLead: true,
+    teamLeadWhenRoot: true,
     genericSpawn: true,
     workerProfile: null,
     targetWorkerProfile: 'worker',
@@ -267,7 +275,7 @@ export const COMPOSITIONS = {
   },
   cmo: {
     archetype: 'full',
-    teamLead: true,
+    teamLeadWhenRoot: true,
     genericSpawn: true,
     workerProfile: null,
     targetWorkerProfile: 'worker',
@@ -280,7 +288,7 @@ export const COMPOSITIONS = {
   },
   'worker-orchestrator': {
     archetype: 'worker',
-    teamLead: false,
+    teamLeadWhenRoot: false,
     genericSpawn: true,
     workerProfile: 'worker',
     targetWorkerProfile: null,
@@ -294,7 +302,7 @@ export const COMPOSITIONS = {
   },
   'worker-researcher': {
     archetype: 'worker',
-    teamLead: false,
+    teamLeadWhenRoot: false,
     genericSpawn: false,
     workerProfile: null,
     targetWorkerProfile: null,
@@ -307,7 +315,7 @@ export const COMPOSITIONS = {
   },
   worker: {
     archetype: 'worker',
-    teamLead: false,
+    teamLeadWhenRoot: false,
     genericSpawn: false,
     workerProfile: null,
     targetWorkerProfile: null,
@@ -322,7 +330,7 @@ export const COMPOSITIONS = {
   //    不暴露给通用 subagent。同一个 `quality-loop-` 前缀 = 一套东西，人按前缀就找齐。 ──
   'quality-loop-producer': {
     archetype: 'support',
-    teamLead: false,
+    teamLeadWhenRoot: false,
     genericSpawn: false,
     workerProfile: null,
     targetWorkerProfile: null,
@@ -336,7 +344,7 @@ export const COMPOSITIONS = {
   },
   'quality-loop-verifier': {
     archetype: 'support',
-    teamLead: false,
+    teamLeadWhenRoot: false,
     genericSpawn: false,
     workerProfile: null,
     targetWorkerProfile: null,

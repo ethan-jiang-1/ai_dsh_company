@@ -38,7 +38,7 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
   `backgroundMode` / `enableRunInBackground`（Config 硬拒）。每个工具行钉一个角色 preset，
   于是 child 拿到的是**该角色的 skills 与工具面**，而不是 CEO 的继承面。
 - **深度**：`maxDepth` 是 **child 的绝对 depth 上限**（`0` 禁止、`1` 只允许直接子代）；`parent+1 > maxDepth` 即抛 `SubagentDepthError`。真值：`0/1→1 ALLOW`、`1/1→2 THROW`、`1/2→2 ALLOW`、`2/3→3 ALLOW`、`2/2→3 THROW`。
-  `vp_eng`/`vp_sales` 行=1：只能从 depth 0（根/Lead）调用；depth 1 的成员调用会抛。`vp_cmo` 行=2：depth 1 的 VP-Eng 可调、child 落 2。`spawn_teammate` 仅 Lead 可调。
+  `vp_eng`/`vp_sales` 行=1：只能从 depth 0（根/Lead）调用；depth 1 的成员调用会抛。`vp_cmo` 行=2：depth 1 的 VP-Eng 可调、child 落 2。CEO 行=1 只钉**直接 child**；child 再派看它自己 preset 的行（vp-eng 的通用 `subagent` 行=3）。`spawn_teammate` 仅 Lead 可调。
 - **改稿方式**：优先 `send_to_subagent` 续同一个 named child（root/命名 child 都可用；带上一稿原文）；
   不可续或需要新上下文才再委派一次。CEO 团队的反复追加/互审仍归 team（`send_message` 按名）。
 - **工具行归属**：写在 `presets/ceo/agent.cordis.yml` 的 `delegation` 组内（preset 自包含，
@@ -78,7 +78,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 ## 3. 团队（通道 B，主通道 D4）
 
 - `spawn_teammate` 建具名成员；`send_message` 按成员名 Steer 投递；共享任务板（CAS 修订号 +
-  `blockedBy` DAG + `writeScopes` 告警）；`fork` 把会议上下文下发给新成员。
+  `blockedBy` DAG + `writeScopes` 告警）；`context` 默认 `fresh`，要带 Lead **已完成轮**时显式 `context: 'fork'`（当前任务书在**当前轮**，不在 fork 种子里）。
 - 成员是**持久**的：running 就近步边界投递、idle 开新轮、inactive 冷恢复、消息不丢不重——
   **这才是"跟 VP 连续对话"的载体**（Q1 的答案）。
 - 代价：teammates **共享 Lead 的组合**（工具/skills 面是 CEO 的，角色差异靠

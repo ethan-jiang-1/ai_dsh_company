@@ -6,7 +6,7 @@
  * 不证明：真实装配里模型会不会用它（那是 C7 探针）；原 job 结果可恢复（明确不恢复）。
  */
 import { describe, expect, it } from 'vitest'
-import { registerWorkflowRuns, workflowRunRows } from '../../../packages/company-pack/src/host/delegation/workflow-runs.ts'
+import { createWorkflowRunsTool, registerWorkflowRuns, workflowRunRows } from '../../../packages/company-pack/src/host/delegation/workflow-runs.ts'
 
 type ToolDefinition = {
   name: string
@@ -43,11 +43,39 @@ const foregroundText = (name: string, agents: number) => `workflow "${name}" com
 function harness(events: unknown[], jobs?: unknown) {
   const tools = new Map<string, ToolDefinition>()
   const ctx = {
-    tools: { register: (definition: ToolDefinition) => { tools.set(definition.name, definition) } },
     get: (name: string) => (name === 'jobs' ? jobs : undefined),
   }
-  registerWorkflowRuns(ctx as never)
+  const tool = createWorkflowRunsTool(ctx as never) as ToolDefinition
+  tools.set(tool.name, tool)
   return { tools, agent: { session: { id: 'parent', ownEvents: () => events } } }
+}
+
+/** 真装配形状：只有工具面里有 workflow 的 Agent 才拿到 workflow_runs。 */
+function installHarness(hasWorkflow: boolean) {
+  const tools = new Map<string, ToolDefinition>()
+  let listener: ((payload: { agent: unknown }) => void) | undefined
+  const ctx = {
+    on: (name: string, callback: (payload: { agent: unknown }) => void) => {
+      if (name === 'agent/created') listener = callback
+    },
+  }
+  const scope = {
+    get: (name: string) => name === 'tools'
+      ? {
+          get: (toolName: string) => (hasWorkflow && toolName === 'workflow' ? { name: 'workflow' } : undefined),
+          register: (definition: ToolDefinition) => { tools.set(definition.name, definition); return () => {} },
+        }
+      : undefined,
+    effect: (callback: () => () => unknown) => { callback() },
+  }
+  const agent = {
+    ctx: {
+      inject: (_deps: readonly string[], callback: (value: unknown) => void) => { callback(scope) },
+    },
+  }
+  registerWorkflowRuns(ctx as never)
+  listener?.({ agent })
+  return tools
 }
 
 describe('workflow run durable view', () => {
@@ -115,7 +143,7 @@ describe('workflow run durable view', () => {
     ])
   })
 
-  it('registers workflow_runs and reads the calling session own events', async () => {
+  it('builds workflow_runs and reads the calling session own events', async () => {
     const events = [
       call(0, 'c1', 'audit', true),
       runStart(1, 'r1', 'audit'),
@@ -129,6 +157,11 @@ describe('workflow run durable view', () => {
       runs: Array<{ runId: string; status: string }>
     }
     expect(output.runs).toEqual([expect.objectContaining({ runId: 'r1', status: 'lost' })])
+  })
+
+  it('per-agent install: only a scope with the workflow tool gets workflow_runs', () => {
+    expect(installHarness(true).has('workflow_runs')).toBe(true)
+    expect(installHarness(false).has('workflow_runs')).toBe(false)
   })
 
   it('treats a missing job registry as unknown, not as running', () => {

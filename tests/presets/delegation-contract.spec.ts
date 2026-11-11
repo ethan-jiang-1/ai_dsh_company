@@ -9,14 +9,17 @@ const POLICY = join(PRESETS, '_shared/delegation/skills/delegation-policy/SKILL.
 const ROLE_YML = (role: string): string => readFileSync(join(PRESETS, role, 'agent.cordis.yml'), 'utf8')
 
 describe('delegation-policy：共享委派政策（P2 单一政策家）', () => {
-  it('skill 在场、frontmatter 正确、关键政策节齐全、未超 8192 字符', () => {
+  it('skill 是 core：关键政策节齐全、通道细节交给 capability section、未超 8192 字符', () => {
     expect(existsSync(POLICY), '缺 delegation-policy/SKILL.md').toBe(true)
     const skill = readFileSync(POLICY, 'utf8')
     expect(skill).toContain('name: delegation-policy')
-    for (const section of ['四条通道', 'brief 四要素', 'effort 预算', '控制与寻址', '结果可读性', '链设计', '重试', 'worker profile']) {
+    for (const section of ['默认自己做', 'brief 四要素', 'effort 预算', '链设计', '结果可读性', '三条硬规则']) {
       expect(skill, `policy 缺「${section}」`).toContain(section)
     }
-    expect(skill, 'policy 不该复述引擎细节（schema/spill）').not.toMatch(/UNSUPPORTED_SCHEMA|maxResultChars|spill/)
+    expect(skill, 'core 必须指向 capability header').toContain('capability header')
+    expect(skill, 'core 必须指向注入的 channel section').toContain('company:delegation-')
+    expect(skill, '通道细节不该回 core（由 section 注入）').not.toMatch(/subagent_fork|spawn_teammate|subagent_retry/)
+    expect(skill, 'core 不该复述引擎细节（schema/spill）').not.toMatch(/UNSUPPORTED_SCHEMA|maxResultChars|spill/)
     expect([...skill].length, '共享 skill 超过 pruner 8192 字符阈值').toBeLessThan(8192)
   })
 

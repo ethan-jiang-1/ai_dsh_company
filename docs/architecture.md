@@ -34,14 +34,14 @@ delegation / Agent Teams / workflow，不自造调度器。
 team 两行、present）。名册与四形态 = [contracts/presets.md](./contracts/presets.md)；
 host 行 = [contracts/profile.md](./contracts/profile.md)；工具面 owner = `presets/<role>/agent.cordis.yml`。
 
-## 协作通道（四条，选着用）
+## 协作通道（原生四通道；C dsh-sdk 未启用）
 
-| 通道 | 机制 | 适合 | 合同 |
+| 原生通道 | 组织别名 / 机制 | 能力面 | 合同 |
 |---|---|---|---|
-| A 命名委托 | `tool-subagent` + `agentPreset`；activation；相邻层级 | 一次性出稿、深挖 | [contracts/delegation.md](./contracts/delegation.md) |
-| B Agent Teams | Lead + teammates、任务板、邮箱、团队工具 | 会议、互审、持续对话 | 同上 |
-| C dsh-sdk 子进程 | 完整独立 runtime，one-shot | 硬隔离编排 | 同上 |
-| D Workflow | vp-eng 同身份扇出，父收 JSON | 并行取证 / 覆盖审计 | 同上 |
+| `spawn` | A 命名委托（`tool-subagent` + `agentPreset`） | 独立 preset、fresh、parent+1 | [contracts/delegation.md](./contracts/delegation.md) |
+| `fork` | 命名 child 的续写/复核（`subagent_fork`） | 无独立 preset、已完成轮前缀 | 同上 |
+| `workflow` | D Workflow（vp-eng 同身份扇出） | 无独立 preset、fresh 分支、parent+1 | 同上 |
+| `team` | B Agent Teams（Lead + 任务板 + 邮箱） | 无独立 preset、继承 Lead、fresh/fork | 同上 |
 
 隔离与继承的分水岭（composition 机会性继承、skills per-preset layer、team 软隔离）=
 [roles-isolation Note](../notes/implemented/2026-11-10-roles-isolation-rationale.md)；

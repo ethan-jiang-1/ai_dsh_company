@@ -187,7 +187,10 @@
           #    ⚠ 能力边界（诚实记账，别写进 persona 骗模型）：child 现在**继承对应角色 preset**
           #    ⇒ 拿到的是该职能自己的 skills 与工具面（不再是 CEO 的 skills）。
           #
-          #    maxDepth: 1 ⇒ 职能 child 不能再往下派活（禁止平级派活）。
+          #    maxDepth: 1 = **直接 child 的绝对深度上限**，不是“child 不能再派活”。
+          #    child 再派由它自己 preset 的行决定：vp-eng 的通用 subagent 行 = 3，
+          #    CEO→vp_eng(1)→worker(2) 仍放行；真正的“禁止平级派活”靠 vp-eng 没有
+          #    vp_sales/coo/cfo 行，不靠这行 1。
           #    出处：docs/contracts/delegation.md；探针 checks/smoke/delegation-smoke.mjs（= 这条边界的回归守卫）。
           - id: delegation
             name: cordis:group
