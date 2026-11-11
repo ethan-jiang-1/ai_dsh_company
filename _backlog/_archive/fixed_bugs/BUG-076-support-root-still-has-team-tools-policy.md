@@ -1,12 +1,15 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-11
 ---
 
 # BUG-076：support root 不再有 team header，但仍拿到 vendor `team:policy` 与全套 team 工具；guard 只拦 `spawn_teammate`
 
-> 严重级别：P2（次要）｜发现：2026-11-11｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-11｜状态：已修
+>
+> **留痕**：Note [`notes/implemented/2026-11-11-seat-matrix-team-collaboration.md`](../../../notes/implemented/2026-11-11-seat-matrix-team-collaboration.md)
+> **审查**：agent — 九件套 guard + seat note spec 红→绿；pnpm test/typecheck/verify/preset-smoke 绿（真模型复跑未跑）
 
 ## 症状
 
@@ -62,6 +65,14 @@ BUG-072 的修复选了 **per-agent `spawn_teammate` guard**，理由是 vendor 
 - **产品侧**：root 选择器隐藏 support preset（fix Note 说 vendor 没 hidden 字段；client roster 过滤仍可做，需产品决定）。
 - 验收：support root 的 team 工具调用全部可见拒绝（或工具面不出现）；header/vendor policy/tools 三者一致；六角色与其他座位不变；`pnpm test`/`typecheck`/`verify`/`preset-smoke` 绿；反证 = 去掉 guard 恢复 ghost 调用。
 
+## 已修判定
+
+- support root（`teamRole=lead` + support preset）的**整套 team 工具**（spawn / list_agents / send_message / wait_agent / interrupt_agent / team_task_*）都由 per-agent guard 可见拒绝，不再产生 ghost task / ghost message。
+- support root 额外注入 `company:delegation-seat` 纠正段：点名 vendor `team:policy`/`team:identity` 不授予本座位 team 权限，并列出被拒工具；header 仍不列 team。
+- 六公司角色 root 与 teammate 的 team 行为不变；`spawn_teammate` 的拒绝理由仍点名 preset 与 support 座位。
+- keyless：guard 覆盖九件套（红→绿：只拒 spawn 即红）+ seat note 在场；`pnpm test` / `pnpm typecheck` / `pnpm verify` / `preset-smoke` 绿。
+- 残留（如实）：vendor `team:policy`/`team:identity` 文本仍在（host 没有删除同层 section/context 的 seam），由 seat note 纠正；上游 seam 建议 = per-seat team install/policy。
+
 ## 修复关联
 
-未修。发现于修复后复验（BUG-072 的残余）；相关 Note = [2026-11-11-capability-seat-single-source.md](../../notes/implemented/2026-11-11-capability-seat-single-source.md)；前置 BUG = [BUG-072](../_archive/fixed_bugs/BUG-072-support-root-can-spawn-team.md)。
+已修（2026-11-11）。发现于修复后复验（BUG-072 的残余）；相关 Note = [2026-11-11-capability-seat-single-source.md](../../../notes/implemented/2026-11-11-capability-seat-single-source.md)；前置 BUG = [BUG-072](./BUG-072-support-root-can-spawn-team.md)。

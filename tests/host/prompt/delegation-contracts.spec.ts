@@ -1,13 +1,20 @@
-/** 能力域委派政策注入：header + 五段 section，按 preset 能力 + Lead 座位选择。 */
+/** 能力域委派政策注入：header + 通道 section，按 preset 能力 + 运行时座位选择（BUG-071/072/076/077）。 */
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
-  DELEGATION_HEADER_SECTION, DELEGATION_SECTION_PREFIX, registerDelegationContracts,
+  DELEGATION_HEADER_SECTION, DELEGATION_SEAT_SECTION, DELEGATION_SECTION_PREFIX, registerDelegationContracts,
 } from '../../../packages/company-pack/src/host/prompt/delegation-contracts.ts'
 
-const CHANNELS = ['spawn', 'fork', 'workflow', 'team', 'retry'] as const
+// 负例留证 2026-11-11：把 team 判据从 `seat.teamCollaborate` 改回 `seat.teamLead` ⇒「teammate: collaboration」
+// 用例红（协作面被删）；还原 → 8 passed。BUG-077
+// 负例留证 2026-11-11：删掉 support seat note 注入 ⇒「support root」用例红（vendor policy 无人纠正）；
+// 还原 → 8 passed。BUG-076
+// 负例留证 2026-11-11：把 team 只按 Lead 判（seat.teamLead）⇒ support root 会拿到 team 段；
+// 与 072 的座位判据反向。还原 → 8 passed。BUG-072
+
+const CHANNELS = ['spawn', 'fork', 'workflow', 'team', 'team-spawn', 'retry'] as const
 
 function content(missing?: string): string {
   const dir = mkdtempSync(join(tmpdir(), 'delegation-contracts-'))
@@ -86,31 +93,36 @@ function harness(options: HarnessOptions): Harness {
 const names = (h: Harness): string[] => h.sections.map(section => section.name)
 
 describe('registerDelegationContracts', () => {
-  it('CEO root: header + spawn + team; no fork/workflow/retry', () => {
+  it('CEO root: collaboration + Lead-only spawn; no fork/workflow/retry', () => {
     const dir = content()
     try {
-      const h = harness({ preset: 'ceo', tools: ['spawn_teammate'], role: 'lead' })
+      const h = harness({ preset: 'ceo', tools: ['spawn_teammate', 'team_task_list'], role: 'lead' })
       registerDelegationContracts(h.ctx as never, dir)
       h.fire()
       expect(names(h)).toEqual([
         DELEGATION_HEADER_SECTION,
         `${DELEGATION_SECTION_PREFIX}spawn`,
         `${DELEGATION_SECTION_PREFIX}team`,
+        `${DELEGATION_SECTION_PREFIX}team-spawn`,
       ])
-      expect(h.sections[0]?.text).toContain('spawn')
-      expect(h.sections[0]?.text).toContain('team (Lead only)')
-      expect(h.sections[0]?.text).not.toContain('workflow')
+      const header = h.sections[0]?.text ?? ''
+      expect(header).toContain('spawn')
+      expect(header).toContain('team collaboration')
+      expect(header).toContain('team spawn (Lead only)')
+      expect(header).not.toContain('workflow')
       // 安装 != 座位可用：header 不再说“未安装”，并说明工具可能仍在（BUG-071）。
-      expect(h.sections[0]?.text).toContain('not available to this seat')
-      expect(h.sections[0]?.text).not.toContain('not installed')
+      expect(header).toContain('not available to this seat')
+      expect(header).not.toContain('not installed')
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
 
-  it('COO root: header + spawn/fork/team/retry; no workflow section', () => {
+  it('COO root: spawn/fork/collaboration/Lead spawn/retry; no workflow section', () => {
     const dir = content()
     try {
       const h = harness({
-        preset: 'coo', tools: ['subagent', 'subagent_fork', 'subagent_retry', 'spawn_teammate'], role: 'lead',
+        preset: 'coo',
+        tools: ['subagent', 'subagent_fork', 'subagent_retry', 'spawn_teammate', 'team_task_list'],
+        role: 'lead',
       })
       registerDelegationContracts(h.ctx as never, dir)
       h.fire()
@@ -119,19 +131,43 @@ describe('registerDelegationContracts', () => {
         `${DELEGATION_SECTION_PREFIX}spawn`,
         `${DELEGATION_SECTION_PREFIX}fork`,
         `${DELEGATION_SECTION_PREFIX}team`,
+        `${DELEGATION_SECTION_PREFIX}team-spawn`,
         `${DELEGATION_SECTION_PREFIX}retry`,
       ])
       expect(h.sections.some(section => section.name.endsWith('workflow'))).toBe(false)
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
 
-  it('vp-eng root: all five channels', () => {
+  it('vp-eng root: every channel, collaboration + Lead spawn', () => {
     const dir = content()
     try {
       const h = harness({
         preset: 'vp-eng',
-        tools: ['subagent', 'subagent_fork', 'subagent_retry', 'workflow', 'spawn_teammate'],
+        tools: ['subagent', 'subagent_fork', 'subagent_retry', 'workflow', 'spawn_teammate', 'team_task_list'],
         role: 'lead',
+      })
+      registerDelegationContracts(h.ctx as never, dir)
+      h.fire()
+      expect(names(h)).toEqual([
+        DELEGATION_HEADER_SECTION,
+        `${DELEGATION_SECTION_PREFIX}spawn`,
+        `${DELEGATION_SECTION_PREFIX}fork`,
+        `${DELEGATION_SECTION_PREFIX}workflow`,
+        `${DELEGATION_SECTION_PREFIX}team`,
+        `${DELEGATION_SECTION_PREFIX}team-spawn`,
+        `${DELEGATION_SECTION_PREFIX}retry`,
+      ])
+    } finally { rmSync(dir, { recursive: true, force: true }) }
+  })
+
+  it('teammate: collaboration present, Lead-only spawn absent (BUG-077)', () => {
+    const dir = content()
+    try {
+      const h = harness({
+        preset: 'vp-eng',
+        tools: ['subagent', 'subagent_fork', 'subagent_retry', 'workflow', 'spawn_teammate', 'team_task_list'],
+        role: 'teammate',
+        parentSession: 'parent',
       })
       registerDelegationContracts(h.ctx as never, dir)
       h.fire()
@@ -143,37 +179,48 @@ describe('registerDelegationContracts', () => {
         `${DELEGATION_SECTION_PREFIX}team`,
         `${DELEGATION_SECTION_PREFIX}retry`,
       ])
+      const header = h.sections[0]?.text ?? ''
+      expect(header).toContain('team collaboration')
+      expect(header).not.toContain('team spawn')
+      // 成员版 section 的正文是协作规则，不是 Lead 的 spawn 规则。
+      const teamSection = h.sections.find(section => section.name === `${DELEGATION_SECTION_PREFIX}team`)
+      expect(teamSection?.text).toContain('SECTION-team')
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
 
-  it('named child vp-eng: no team section (not Lead), even with spawn_teammate tool', () => {
+  it('named child: no team surface (not in the roster), even with team tools on the face', () => {
     const dir = content()
     try {
       const h = harness({
         preset: 'vp-eng',
-        tools: ['subagent', 'subagent_fork', 'subagent_retry', 'workflow', 'spawn_teammate'],
-        role: 'teammate',
+        tools: ['subagent', 'subagent_fork', 'subagent_retry', 'workflow', 'spawn_teammate', 'team_task_list'],
+        role: 'none',
         parentSession: 'parent',
       })
       registerDelegationContracts(h.ctx as never, dir)
       h.fire()
       expect(names(h)).not.toContain(`${DELEGATION_SECTION_PREFIX}team`)
+      expect(names(h)).not.toContain(`${DELEGATION_SECTION_PREFIX}team-spawn`)
       expect(names(h)).toContain(`${DELEGATION_SECTION_PREFIX}workflow`)
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
 
-  it('worker root: no header/sections (support seat, not a team seat)', () => {
+  it('support root: no header/sections except the seat correction (BUG-072/076)', () => {
     const dir = content()
     try {
-      const h = harness({ preset: 'worker', tools: ['spawn_teammate'], role: 'lead' })
+      const h = harness({ preset: 'worker', tools: ['spawn_teammate', 'team_task_list'], role: 'lead' })
       registerDelegationContracts(h.ctx as never, dir)
       h.fire()
-      // 引擎 root=Lead、团队工具也在场，但 support preset 不是 team 座位（BUG-072）。
-      expect(h.sections).toHaveLength(0)
+      expect(names(h)).toEqual([DELEGATION_SEAT_SECTION])
+      const note = h.sections[0]?.text ?? ''
+      expect(note).toContain('support capability seat')
+      expect(note).toContain('worker')
+      expect(note).toContain('team_task_*')
+      expect(note).toContain('calls are refused')
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
 
-  it('no available channel: no header/sections', () => {
+  it('no available channel: no header/sections, no seat note for a support child', () => {
     const dir = content()
     try {
       const h = harness({ preset: 'worker', tools: [], role: 'teammate', parentSession: 'parent' })
@@ -184,7 +231,7 @@ describe('registerDelegationContracts', () => {
   })
 
   it('missing one content file: warn and inject nothing (fail-safe)', () => {
-    const dir = content('team')
+    const dir = content('team-spawn')
     try {
       const h = harness({ preset: 'vp-eng', tools: ['workflow', 'spawn_teammate'], role: 'lead' })
       registerDelegationContracts(h.ctx as never, dir)

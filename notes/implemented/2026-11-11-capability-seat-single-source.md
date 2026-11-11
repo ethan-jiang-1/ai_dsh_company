@@ -3,11 +3,15 @@
 状态：implemented（2026-11-11；上游 = BUG-071/072/073/075；模型可见文案 + host 行为 + preset 内容 + 文档）
 上游 = [BUG-071](../../_backlog/_archive/fixed_bugs/BUG-071-capability-header-not-installed-wording.md) · [BUG-072](../../_backlog/_archive/fixed_bugs/BUG-072-support-root-can-spawn-team.md) · [BUG-073](../../_backlog/_archive/fixed_bugs/BUG-073-readme-one-shot-child-team-tools-stale.md) · [BUG-075](../../_backlog/_archive/fixed_bugs/BUG-075-eng-teaming-schema-rule-duplicated.md)
 
+> **2026-11-11 晚 部分取代**：team 通道拆成 `team collaboration` / `team spawn (Lead only)`，guard 从
+> `spawn_teammate` 扩到 vendor 九件套，control 按座位/child 能力安装；见
+> [座位矩阵 Note](./2026-11-11-seat-matrix-team-collaboration.md)。本 Note 的 071/073/075 记录仍现行。
+
 ## 决定
 
 1. **header 只回答“这个座位可用哪些通道”**，不回答“装没装”。未列 = 本座位不可用；工具可能仍安装着，调用会被拒。`buildCapabilityHeader()` 的文案与 `delegation-policy` core 首段同口径——不再把“可用集合”写成“安装集合”。
-2. **team 通道 = 引擎 Lead ∧ 工具在场 ∧ 非 support preset**。`isSupportPreset()` 是唯一座位判据（`NON_ROLE_PRESETS`，与 handbook 跳过集合同源）；support preset 作为 root 不列 team、不注入 team section，header 可能为空。
-3. **执行边界 = per-agent `tools.guard`**（`host/delegation/team-seat-guard.ts`）：support preset 的 `spawn_teammate` 被拒，理由点名 preset 与“support capability seat，不是公司角色”，并叫停重试。保留 vendor 工具、不改 vendor。
+2. **team 通道 = 引擎 Lead ∧ 工具在场 ∧ 非 support preset**。`isSupportPreset()` 是唯一座位判据（`NON_ROLE_PRESETS`，与 handbook 跳过集合同源）；support preset 作为 root 不列 team、不注入 team section，header 可能为空。（2026-11-11 晚 部分取代：team 拆协作/spawn，见 [座位矩阵 Note](./2026-11-11-seat-matrix-team-collaboration.md)）
+3. **执行边界 = per-agent `tools.guard`**（`host/delegation/team-seat-guard.ts`）：support preset 的 `spawn_teammate` 被拒，理由点名 preset 与“support capability seat，不是公司角色”，并叫停重试。保留 vendor 工具、不改 vendor。（2026-11-11 晚：guard 扩到九件套，见 [座位矩阵 Note](./2026-11-11-seat-matrix-team-collaboration.md)）
 4. **文档/内容只写现行事实**：README 已知限制删掉 0.2.0 的 one-shot child 旧观察；delegation 合同分写“引擎事实（任何 root = Lead）”与“产品座位（support 不组队）”；`team.md` 删掉“support root 会拿到本 section”的死句。
 5. **引擎事实只住 workflow 合同，表格短句也算**：`eng-teaming` 五档表删掉“分支不传 schema”，只留用法判据（一行可解析 JSON）；schema/截断/spill/重启仍只在 `company:workflow-contract`。
 
@@ -23,7 +27,7 @@
 ## 后果
 
 - support root（`worker` / `worker-researcher` / `worker-orchestrator` / `quality-loop-*`）不再有 team header/section；`worker-orchestrator` 仍列 spawn。`spawn_teammate` 工具仍在工具面（vendor 安装），调用被 guard 拒。
-- 六公司角色 root、命名 child、teammate 的通道不变；teammate 仍可能看到 `spawn_teammate`（Lead-only 执行），header 不再把它说成“未安装”。
+- 六公司角色 root、命名 child、teammate 的通道不变；teammate 仍可能看到 `spawn_teammate`（Lead-only 执行），header 不再把它说成“未安装”。（2026-11-11 晚：teammate 另列 `team collaboration`，见 [座位矩阵 Note](./2026-11-11-seat-matrix-team-collaboration.md)）
 - `delegation-contracts.spec` 的 worker root 期望从 “team only” 改为 “无 header/section”；新增 guard spec。
 - token：header 多两句（约 +160 字符），只在有可用通道的座位注入；support root 从一段变为零段。
 

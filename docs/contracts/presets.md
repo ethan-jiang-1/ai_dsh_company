@@ -123,7 +123,7 @@
 与 [cordis.patch.yml](../../packages/company-pack/cordis.patch.yml)；本文件不复刻枚举（D28）。
 三条不变式：① 工具行必须写在 preset 里（会话检索是唯一例外，必须与 isolated provider 同组）；
 ② `tool-web` 天生不继承，漏写 = 静默无联网；③ `maxDepth` / `agentPreset` / `subagent_fork` 的行级语义 =
-[delegation.md](./delegation.md) §1/§4；通道政策由 host 按能力面 + 座位注入的 capability header/section 给，header 没列的通道不可用（安装 ≠ 这个座位可用；support preset 作为 root 也不列 team），不在 preset 行里复制。
+[delegation.md](./delegation.md) §1/§4；通道政策由 host 按能力面 + 座位注入的 capability header/section 给，header 没列的通道不可用（安装 ≠ 这个座位可用；support 不列 team，team 分 collaboration/spawn），不在 preset 行里复制。
 
 ## 验证方式
 

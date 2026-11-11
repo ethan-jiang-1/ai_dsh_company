@@ -4,6 +4,16 @@
 
 ## 修复流水（倒序）
 
+- **BUG-076 / BUG-077 / BUG-078**（2026-11-11，根因组 S，P2）：座位矩阵第二层——同一个 `team` 布尔覆盖 spawn/协作/控制三种能力。
+  [076](BUG-076-support-root-still-has-team-tools-policy.md) support root 的 vendor team policy/identity + 九件套仍在，
+  guard 只拦 spawn（ghost task 可建）；[077](BUG-077-teammate-header-omits-team-collaboration.md) teammate header 只列 spawn，
+  把实际可用的协作面否掉；[078](BUG-078-teammate-dead-subagent-control-tools.md) CEO teammate 拿到无 child 的
+  `list_subagents`/`send_to_subagent`。修法 = `DelegationSeat`（`seat.ts`）单一判据 + team 拆
+  `team collaboration`/`team spawn (Lead only)` + guard 九件套 + seat note + control 按 child 能力装。
+  红→绿：guard 收窄到 spawn 1 failed、删 seat note 1 failed、team 回 lead-only 1 failed、去掉 teammate child 判据 1 failed；
+  还原全绿。`pnpm test` 199 files / 1594 tests；`typecheck`/`lint`/`dup`/`verify`、`preset-smoke` 全绿。详见
+  [座位矩阵 Note](../../../notes/implemented/2026-11-11-seat-matrix-team-collaboration.md)。
+
 - **BUG-071 / BUG-072 / BUG-073 / BUG-075**（2026-11-11，根因组 F/H，P2）：能力事实的四个载体各说各话——
   [071](BUG-071-capability-header-not-installed-wording.md) header 把“本座位不可用”写成“未安装”（teammate 工具面仍有
   `spawn_teammate`）；[072](BUG-072-support-root-can-spawn-team.md) support preset 作为 root 被 vendor 当 Lead、能实际组队，

@@ -15,8 +15,9 @@
  * subagent + 寻址：team 名 / session id）。**引擎身份**（preset / 委派深度）来自同一次
  * `sessionPersistence.open()` 的 durable header（BUG-046）：`agentPreset` / `delegationDepth`
  * 读不到时输出 `unavailable`（可见降级，不默认 worker/0）。承诺字段不静默省略：读不到时输出
- * `lastTurnEnd: 'unavailable'`。工具是 **per-agent 安装**的：worker family（声明无 control）不装，
- * full role / CEO / 未知 preset 保留（BUG-052）。已知边界：只给 reason.kind（如 `interrupted`），
+ * `lastTurnEnd: 'unavailable'`。工具是 **per-agent 安装**的：support（worker family/质量环）不装，
+ * teammate 只在有通用 child 通道时装，root Lead/命名 child/未知 preset 保留（BUG-052/078）。
+ * 已知边界：只给 reason.kind（如 `interrupted`），
  * 不给错过的通知内容。
  *
  * 退役条件：上游让根会话拿到全局控制名（team shadow 修复）后，本工具删除；
@@ -24,8 +25,8 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
-import { composedPresetOf } from '../prompt/handbook.ts'
-import { NON_ROLE_PRESETS } from '../../lib/delegation-surface.ts'
+import { scopeOf } from '@deepseek-ai/dsh-scope'
+import { delegationSeatOf } from './seat.ts'
 
 /** 父会话 durable catalog 里的 `subagent/catalog` 事件（只取本模块用到的字段）。 */
 interface CatalogEvent {
@@ -65,6 +66,7 @@ interface AgentLike {
 /** 受控 scope 的 tools 面（per-agent 安装；与 `subagent-retry` 同模式）。 */
 interface ToolsLike {
   register(tool: unknown): () => void
+  get?(name: string, scope?: object): unknown
 }
 
 interface ToolScopeLike {
@@ -261,8 +263,10 @@ export function subagentRows(
 }
 
 /**
- * 注册两个控制工具；**per-agent 安装**（BUG-052）：worker family 的声明里没有 control 面，
- * 所以不装；full role / CEO / 未知 preset 保留。服务缺席时 execute 报明确错误，而不是静默无操作。
+ * 注册两个控制工具；**per-agent 安装**，判据是运行时座位而不是 preset（BUG-052/078）：
+ * worker family 与 support 不装；teammate 只有在真有通用 child 通道（`subagent`/`subagent_fork`）
+ * 时才装——CEO teammate 没有 child，工具是死的；vp-eng teammate 能起 child，控制面仍可用。
+ * root Lead、命名 child、未知 preset 保留。服务缺席时 execute 报明确错误，而不是静默无操作。
  */
 export function registerDelegationControl(ctx: Context): void {
   const statusOf = (id: string): 'running' | 'inactive' => {
@@ -272,16 +276,28 @@ export function registerDelegationControl(ctx: Context): void {
 
   const fibers = new Map<AgentLike, ReturnType<Context['inject']>>()
 
+  /** 工具在不在这个 scope 的工具面里；没有 get / 服务缺席时 false。 */
+  const hasTool = (tools: ToolsLike, scope: Context, name: string): boolean => {
+    try {
+      return tools.get?.(name, scopeOf(scope)) !== undefined
+    } catch {
+      return false
+    }
+  }
+
   const install = (agent: AgentLike): void => {
     if (fibers.has(agent)) return
-    const preset = composedPresetOf(agent.ctx)
-    // 非角色 preset 的声明里没有 control 面：host 不能靠全局注册绕过它（BUG-052；2026-11-10 起
-    // producer/verifier 也在表内——验证者尤其不该拿 send_to_subagent）。
-    if (preset !== undefined && (NON_ROLE_PRESETS as readonly string[]).includes(preset)) return
+    // 座位优先：support（worker family / 质量环）与 teammate 没有 control 面。
+    // teammate 还要看能力：CEO teammate 无通用 child 通道（死工具），vp-eng teammate 有（保留）。
+    const seat = delegationSeatOf(agent)
+    if (seat.support) return
     const fiber = agent.ctx.inject(['tools'], scope => {
       const scoped = scope as unknown as ToolScopeLike
       const tools = scoped.tools
       if (tools === undefined) return
+      if (seat.teamRole === 'teammate'
+        && !hasTool(tools, scope, 'subagent')
+        && !hasTool(tools, scope, 'subagent_fork')) return
       scoped.effect(() => {
         const unregisterList = tools.register(defineTool({
           name: 'list_subagents',

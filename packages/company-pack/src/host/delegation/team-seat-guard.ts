@@ -9,12 +9,17 @@
  * seam；`tools.restrict` 只作用于 global 层，够不到 scope 注册。这里用 per-agent `tools.guard`
  * 留下工具、拒绝调用——**工具在 ≠ 这个座位有权**，与 header 的“本座位不可用”同一句话。
  *
+ * 覆盖范围 = vendor 九件套（BUG-076）：只拦 `spawn_teammate` 会留下可用的任务板/消息面，
+ * 模型能建 ghost task。guard 是执行面；vendor `team:policy`/`team:identity` 文本由
+ * `company:delegation-seat` 纠正段处理（删不掉同层 section，改由注入侧说清）。
+ *
  * guard 注册在 agent 自己的 tools layer（`scope.get('tools')` 是调用者 scope 的 facet）；重复的
  * `agent/created` 用 WeakSet 去重，service re-provide 的 callback 重跑由 fiber 负责（BUG-074）。
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { isSupportPreset } from '../../lib/delegation-surface.ts'
 import { composedPresetOf } from '../prompt/handbook.ts'
+import { TEAM_SURFACE_TOOLS } from './seat.ts'
 
 /** 只取本模块用到的 tools.guard 面（不扩大 peer 依赖）。 */
 interface GuardTools {
@@ -25,15 +30,15 @@ interface AgentLike {
   readonly ctx: Context
 }
 
-/** 模型可见的拒绝理由：点名座位、给出替代路径、叫停重试。 */
-export function supportTeamDenial(preset: string | undefined): string | undefined {
-  if (!isSupportPreset(preset)) return undefined
-  return `spawn_teammate is not available to this seat: preset "${String(preset)}" is a support capability seat, `
-    + 'not a company role, so it does not lead a team. Do the work in this session or return the result; do not retry.'
+/** 模型可见的拒绝理由：点名工具/座位、给出替代路径、叫停重试；非 support 或非 team 工具返回 undefined。 */
+export function supportTeamDenial(preset: string | undefined, tool: string): string | undefined {
+  if (!isSupportPreset(preset) || !TEAM_SURFACE_TOOLS.has(tool)) return undefined
+  return `"${tool}" is not available to this seat: preset "${String(preset)}" is a support capability seat, `
+    + 'not a company role, so it does not use Agent Teams. Do the work in this session or return the result; do not retry.'
 }
 
 /**
- * 给非角色 support preset 的 root 装一条拒绝 `spawn_teammate` 的 guard。
+ * 给非角色 support preset 装一条拒绝整套团队工具的 guard。
  * 六公司角色、命名 child、teammate 与未知 preset 都不受影响（未知 = 不猜，保持原行为）。
  * @param ctx - Host 上下文。
  */
@@ -45,11 +50,10 @@ export function registerTeamSeatGuard(ctx: Context): void {
     installed.add(agent)
     agent.ctx.inject(['tools'], (scope) => {
       const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
-      const denial = supportTeamDenial(preset)
-      if (denial === undefined) return
+      if (!isSupportPreset(preset)) return
       const tools = scope.get('tools') as GuardTools | undefined
       if (tools?.guard === undefined) return
-      scope.effect(() => tools.guard(exec => exec.name === 'spawn_teammate' ? denial : undefined))
+      scope.effect(() => tools.guard(exec => supportTeamDenial(preset, exec.name)))
     })
   })
 }

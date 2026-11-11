@@ -25,7 +25,7 @@ import { registerDelegationControl } from '../../../packages/company-pack/src/ho
 // callback（即 BUG-074 原假设的形状）→ 本文件「delegation contracts」用例 1 failed / 5 passed；
 // 还原 → 6 passed。证明本 spec 挡的是“把 Agent 键放进可重入 callback”，不是 `ctx.set` 读数。
 
-const CHANNELS = ['spawn', 'fork', 'workflow', 'team', 'retry'] as const
+const CHANNELS = ['spawn', 'fork', 'workflow', 'team', 'team-spawn', 'retry'] as const
 
 interface Section {
   name: string

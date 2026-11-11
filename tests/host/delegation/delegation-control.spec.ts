@@ -14,6 +14,9 @@
 import { describe, expect, it } from 'vitest'
 import { childTurnState, readChildTurnState, registerDelegationControl, subagentRows, terminalOf } from '../../../packages/company-pack/src/host/delegation/delegation-control.ts'
 
+// 负例留证 2026-11-11：去掉 teammate 的“无通用 child 通道”判据（只按 preset）⇒
+// 「teammate without a generic child channel」用例红（死工具回来）；还原 → 24 passed。BUG-078
+
 type ToolDefinition = {
   name: string
   description: string
@@ -22,7 +25,13 @@ type ToolDefinition = {
 }
 
 function harness(
-  options: { subagents?: unknown; agents?: unknown; agentTeams?: unknown; sessionPersistence?: unknown; warnings?: string[] } = {},
+  options: {
+    subagents?: unknown; agents?: unknown; agentTeams?: unknown; sessionPersistence?: unknown; warnings?: string[]
+    /** agent 工具面里的子通道名（teammate 能力判据）；默认空。 */
+    childTools?: readonly string[]
+    /** agent session header 的 parentSession；用于命名 child 座位。 */
+    parentSession?: string
+  } = {},
   preset: string | undefined = 'vp-eng',
 ) {
   const tools = new Map<string, ToolDefinition>()
@@ -40,10 +49,17 @@ function harness(
   }
   registerDelegationControl(ctx as never)
   // control 工具现在是 per-agent 安装（BUG-052）：fake 一个 agent scope，触发 agent/created。
+  const childTools = new Set(options.childTools ?? [])
   const agent = {
-    session: { id: 'parent', ownEvents: () => [] },
+    session: {
+      id: 'parent',
+      ownEvents: () => [],
+      header: options.parentSession === undefined ? {} : { parentSession: options.parentSession },
+    },
     ctx: {
-      get: (name: string) => name === 'agentPresets' ? { composedPreset: () => preset } : undefined,
+      get: (name: string) => name === 'agentPresets' ? { composedPreset: () => preset }
+        : name === 'agentTeams' ? options.agentTeams
+          : undefined,
       inject: (_deps: readonly string[], callback: (scope: unknown) => void) => {
         callback({
           tools: {
@@ -51,6 +67,7 @@ function harness(
               tools.set(definition.name, definition)
               return () => {}
             },
+            get: (name: string) => childTools.has(name) ? { name } : undefined,
           },
           effect: (callback: () => () => void) => callback(),
         })
@@ -103,6 +120,24 @@ describe('delegation control tools', () => {
     }
     // 未知 preset（非 company 组合）保持旧行为：安装，不因过滤漏掉根会话。
     expect([...harness({}, undefined).keys()].sort()).toEqual(['list_subagents', 'send_to_subagent'])
+  })
+
+  it('teammate without a generic child channel: no dead control tools (BUG-078)', () => {
+    const tools = harness({ agentTeams: { tryMembership: () => ({ role: 'teammate' }) } }, 'ceo')
+    expect([...tools.keys()]).toEqual([])
+  })
+
+  it('teammate with a generic child channel keeps control tools (vp-eng teammate)', () => {
+    const tools = harness({
+      agentTeams: { tryMembership: () => ({ role: 'teammate' }) },
+      childTools: ['subagent'],
+    }, 'vp-eng')
+    expect([...tools.keys()].sort()).toEqual(['list_subagents', 'send_to_subagent'])
+  })
+
+  it('named child (not in the roster) keeps control tools', () => {
+    const tools = harness({ parentSession: 'root', childTools: ['subagent'] }, 'vp-eng')
+    expect([...tools.keys()].sort()).toEqual(['list_subagents', 'send_to_subagent'])
   })
 
   it('folds the parent durable catalog last-wins and ignores unrelated events', () => {

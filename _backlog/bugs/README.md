@@ -14,9 +14,7 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-076](BUG-076-support-root-still-has-team-tools-policy.md) | support root 的 header/section 已撤，但 vendor `team:policy` + `team_task_*`/消息工具仍在；guard 只拦 `spawn_teammate` | P2 |
-| [BUG-077](BUG-077-teammate-header-omits-team-collaboration.md) | teammate header 只列 spawn 并说“未列不可用”，但 `team_task_*`/消息协作面实际在场且是成员该用的 | P2 |
-| [BUG-078](BUG-078-teammate-dead-subagent-control-tools.md) | teammate 继承 Lead 组合后仍装 `list_subagents`/`send_to_subagent`，但它没有 child，工具永远空/无目标 | P2 |
+| —（本轮） | BUG-076 / 077 / 078 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：座位矩阵第二层（team 拆协作/spawn、九件套 guard + seat note、control 按 child 能力）；见 [Note](../../notes/implemented/2026-11-11-seat-matrix-team-collaboration.md) | — |
 | —（本轮） | BUG-071 / 072 / 073 / 075 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：能力事实四载体（安装 / 座位 / header / 文档+内容）对齐；见 [Note](../../notes/implemented/2026-11-11-capability-seat-single-source.md) | — |
 | —（本轮） | BUG-074 复核为**误报**（WeakSet 不挡 re-provide；`ctx.set` 不是 re-provide），已迁 [fixed_bugs](../_archive/fixed_bugs/BUG-074-per-agent-inject-not-reinstalled-on-service-change.md)：保留 guard + 注释 + 真 Cordis spec；见 [Note](../../notes/implemented/2026-11-11-inject-reentrancy-false-positive.md) | — |
 | —（历史） | BUG-067 / BUG-068 / BUG-069 / BUG-070 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：pack 路径 / tier / 政策数字 / 委派真值四类声明↔载体对账；见 [Note](../../notes/implemented/2026-11-11-declaration-carrier-gates.md) | — |
@@ -27,6 +25,26 @@
 | —（历史） | BUG-050 复核为**环境陈旧误报**（dev profile 安装副本未更新），已迁 [fixed_bugs](../_archive/fixed_bugs/BUG-050-retry-depth-fix-fails-in-real-assembly.md)；BUG-045 / 046 / 047 / 048 / 049 已修 | — |
 | —（历史） | BUG-045 / BUG-046 / BUG-047 / BUG-048 / BUG-049 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：retry 注册面/深度单源 + 越界可见拒绝；`list_subagents` 暴露引擎身份；handbook 按 worker family 派生；UI 金样随显示名收窄刷新 | — |
 | —（历史） | BUG-034 / BUG-035 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：SA/SQA 证据链必查（时间源 + 故障路径耐受）+ 审计 Q8–Q11；2026-11-07 E2E v8 验收 | — |
+
+## 2026-11-11 修复交接（根因组 S：BUG-076 / 077 / 078）
+
+**用户指令（2026-11-11）**：「现在你再看看bug里头有3个新的bug……把这3个bug都修了，系统性的先看看明白。」
+本句即本轮授权（材料性：host 模型可见文案/行为 + content + docs），留痕 = Note。
+
+三张卡同一根因 = **座位矩阵只建了一半**：BUG-072 只建模了“能不能 spawn”一个布尔，其余座位面仍按
+preset 或单一 Lead 布尔推导：
+- **076** = support root 只撤了 spawn 守卫；vendor `team:policy`/`team:identity` 与任务/消息面仍在（ghost task）；
+- **077** = 一个 `team` 通道同时表示“Lead 的 spawn 权”与“成员的协作面”，teammate 被误伤；
+- **078** = 控制工具按 preset 装，不看这个座位有没有 child（CEO teammate 拿到死工具）。
+
+修法不逐卡打补丁：先建一个 `DelegationSeat`（lead/teammate/support + teamLead/teamCollaborate/controlsChildren），
+header/section、guard、control 三处都读它；team 在 header 拆成 `team collaboration` 与 `team spawn (Lead only)`；
+guard 从 spawn 扩到九件套；control 按“这个座位能不能拥有 child”装（不按 preset/角色一刀切）。
+次序 = seat 判据 + spec → header/section/guard → control → 文档与 Note。
+
+**收口（2026-11-11）**：三张卡已修并迁 [fixed_bugs](../_archive/fixed_bugs/)，两张索引同步；
+`pnpm test` 199 files / 1594 tests、`pnpm typecheck`、`pnpm lint`、`pnpm dup`、`pnpm verify`、`preset-smoke` 全绿。
+证据 = [座位矩阵 Note](../../notes/implemented/2026-11-11-seat-matrix-team-collaboration.md)。
 
 ## 2026-11-11 修复交接（根因组 F/G/H：BUG-071..075）
 

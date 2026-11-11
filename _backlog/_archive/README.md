@@ -208,6 +208,9 @@
 | [BUG-073-readme-one-shot-child-team-tools-stale.md](fixed_bugs/BUG-073-readme-one-shot-child-team-tools-stale.md) | README 已知限制删 0.2.0 旧观察，改现行 child 组合/Lead-only 事实 | 2026-11-11 |
 | [BUG-074-per-agent-inject-not-reinstalled-on-service-change.md](fixed_bugs/BUG-074-per-agent-inject-not-reinstalled-on-service-change.md) | **误报**：WeakSet 不挡 re-provide；`ctx.set` 不是 re-provide；保留 guard + 真 Cordis spec | 2026-11-11 |
 | [BUG-075-eng-teaming-schema-rule-duplicated.md](fixed_bugs/BUG-075-eng-teaming-schema-rule-duplicated.md) | `eng-teaming` 表内 schema 引擎句删除，引擎事实只住 workflow 合同 | 2026-11-11 |
+| [BUG-076-support-root-still-has-team-tools-policy.md](fixed_bugs/BUG-076-support-root-still-has-team-tools-policy.md) | support root 九件套 team 工具全拒 + `company:delegation-seat` 纠正 vendor policy | 2026-11-11 |
+| [BUG-077-teammate-header-omits-team-collaboration.md](fixed_bugs/BUG-077-teammate-header-omits-team-collaboration.md) | team 拆 `team collaboration` / `team spawn (Lead only)`；teammate 列协作、注入 member section | 2026-11-11 |
+| [BUG-078-teammate-dead-subagent-control-tools.md](fixed_bugs/BUG-078-teammate-dead-subagent-control-tools.md) | control 按座位/child 能力装：CEO teammate 无，vp-eng teammate 保留 | 2026-11-11 |
 
 ## 暂停卡
 

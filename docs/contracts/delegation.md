@@ -69,7 +69,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 ### 2.1 根门 = Team Lead（B1 机制事实）
 
 任何没有 `parentSession` 的根会话都是 Lead（`agentTeam` 投影 = 单成员 `lead`）；这是引擎事实，产品侧再叠座位：**公司角色**根门可以
-`spawn_teammate` 带研发小队（成员继承 VP-Eng 组合，是"VP-Eng 带的工程师"）；support preset（worker/quality-loop）不是 team 座位——header 不列 team，`spawn_teammate` 由 host seat guard 拒绝（BUG-072）。
+`spawn_teammate` 带研发小队（成员继承 VP-Eng 组合，是"VP-Eng 带的工程师"）；support preset 不是 team 座位——header 不列 team，九件套 team 工具由 host seat guard 拒并注入 `company:delegation-seat` 纠正段（BUG-072/076）；team 在 header 分 `team collaboration`（Lead+成员）与 `team spawn (Lead only)`（BUG-077）。
 三种门的能力不同，别用一个门承诺另一个：① VP-Eng 根门 = Lead，能组 team、能命名请 CMO；
 ② CEO 命名 `vp_eng` child = 不是 member，不能 spawn，但能请专家（depth 2）；③ CEO teammate `vp-eng`
 = 继承 CEO 组合，受 CEO 的 `vp_cmo maxDepth 1` 限制。root=Lead 的 keyless 证据 =
@@ -100,7 +100,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
    与 `send_to_subagent`（官方 `ctx.subagents`，续驶/催稿），名字不被 shadow。`list_subagents` 的每行还带
    **引擎身份**：`agentPreset` / `delegationDepth`（十进制字符串，例 `"3"`）读 child durable header，
    读不到显式 `unavailable`（不默认 worker/0）——父代理据此核对 preset/深度是否真生效（BUG-046）。`subagent`/`subagent_fork` 行
-   `maxDepth: 3`：CEO→VP（1）→workflow 分支（2）→worker（3）放行；VP 根门→分支→worker 仍有余量（2026-11-09 源码：分支/成员都是 activation 子代，深度 parent+1）。重试敏感的小活可用 `subagent_retry`（host 原语，仅五个有 generic subagent 的 full role；同步、最多 2 attempts、attempts/exhausted 可见；长/批量走 workflow）；**它的子代深度不另立预算**——上限 = 该 preset 通用 `subagent` 行的 `maxDepth`，到预算底部返回 `stopReason: depth-exceeded` 且不起 child（BUG-045）；generic child 需要子层时 `agent_preset` 选 `worker-orchestrator`（它只带 leaf；件数与 fan-out 预算由父代理 brief 决定，不承诺硬数字——BUG-051）。`list_subagents`/`send_to_subagent` 是 **per-agent 安装**：worker family（声明无 control）不装，full role/CEO 保留（BUG-052）。
+   `maxDepth: 3`：CEO→VP（1）→workflow 分支（2）→worker（3）放行；VP 根门→分支→worker 仍有余量（2026-11-09 源码：分支/成员都是 activation 子代，深度 parent+1）。重试敏感的小活可用 `subagent_retry`（host 原语，仅五个有 generic subagent 的 full role；同步、最多 2 attempts、attempts/exhausted 可见；长/批量走 workflow）；**它的子代深度不另立预算**——上限 = 该 preset 通用 `subagent` 行的 `maxDepth`，到预算底部返回 `stopReason: depth-exceeded` 且不起 child（BUG-045）；generic child 需要子层时 `agent_preset` 选 `worker-orchestrator`（它只带 leaf；件数与 fan-out 预算由父代理 brief 决定，不承诺硬数字——BUG-051）。`list_subagents`/`send_to_subagent` 是 **per-agent 安装**：support 与没有通用 child 通道的 teammate（CEO teammate）不装；root/命名 child/有通用 child 的 teammate 保留（BUG-052/078）。
 
 ## 5. UI：委派工具卡
 

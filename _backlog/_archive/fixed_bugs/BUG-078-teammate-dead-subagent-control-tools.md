@@ -1,12 +1,15 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-11
 ---
 
 # BUG-078：teammate 继承 Lead 组合后仍装 `list_subagents`/`send_to_subagent`，但没有 child 可用
 
-> 严重级别：P2（次要）｜发现：2026-11-11｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-11｜状态：已修
+>
+> **留痕**：Note [`notes/implemented/2026-11-11-seat-matrix-team-collaboration.md`](../../../notes/implemented/2026-11-11-seat-matrix-team-collaboration.md)
+> **审查**：agent — control 座位/能力 spec 红→绿（CEO teammate 无、vp-eng teammate 有）；pnpm test/typecheck/verify/preset-smoke 绿
 
 ## 症状
 
@@ -52,6 +55,13 @@ teammate 的 `composedPresetOf` 是 `ceo`/`vp-eng`（继承 Lead 组合），不
 - 不要只按 preset 判：teammate 的 composed preset 是 Lead 的，和根会话完全相同。
 - 验收：teammate 工具面无 `list_subagents`/`send_to_subagent`；CEO root 与命名 child 仍有；命名 child 的 child 控制仍可用；`pnpm test`/`typecheck`/`verify`/`preset-smoke` 绿；反证 = 放开判据后 teammate 工具面重新出现即红。
 
+## 已修判定
+
+- `registerDelegationControl` 的安装判据改为运行时座位 + 能力：support 不装；teammate **没有通用 child 通道**（无 `subagent`/`subagent_fork`，如 CEO teammate）不装；root Lead、命名 child、以及真有通用 child 的 teammate（vp-eng 等，`maxDepth` 允许它起 child）保留。
+- CEO teammate 工具面无 `list_subagents` / `send_to_subagent`；CEO root 与命名 child 仍有，命名 child 的 child 控制仍可用。
+- 判据是“这个座位能不能拥有 child”，不是 preset 角色；卡上“teammate 一律不装”按 vp-eng teammate 反例收窄（否则会误删可用控制面）。
+- keyless：seat matrix + control spec（红→绿：去掉座位/能力判据即红）；`pnpm test` / `pnpm typecheck` / `pnpm verify` / `preset-smoke` 绿。
+
 ## 修复关联
 
-未修。发现于修复后复验（teammate 座位面）；同型 = [BUG-052](../_archive/fixed_bugs/BUG-052-worker-leaf-control-surface.md)；相关合同 = [delegation.md §4](../../docs/contracts/delegation.md)。
+已修（2026-11-11）。发现于修复后复验（teammate 座位面）；同型 = [BUG-052](./BUG-052-worker-leaf-control-surface.md)；相关合同 = [delegation.md §4](../../../docs/contracts/delegation.md)。

@@ -1,12 +1,15 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-11
 ---
 
 # BUG-077：teammate header 只列 spawn，却说“未列=本座位不可用”；team_task_*/消息协作面实际在场
 
-> 严重级别：P2（次要）｜发现：2026-11-11｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-11｜状态：已修
+>
+> **留痕**：Note [`notes/implemented/2026-11-11-seat-matrix-team-collaboration.md`](../../../notes/implemented/2026-11-11-seat-matrix-team-collaboration.md)
+> **审查**：agent — teammate header/section spec 红→绿；pnpm test/typecheck/verify/preset-smoke 绿（真模型复跑未跑）
 
 ## 症状
 
@@ -48,6 +51,13 @@ opened: 2026-11-11
 - 文案侧至少改成“未列的 **spawn 权**不可用；协作面以 tool description/team:policy 为准”，不要用“本座位不可用”一概而论。
 - 验收：teammate header 含 team collaboration、无 team spawn；`team_task_*/send_message` 仍可用；CEO/命名 child/support root 的 header 不变；`pnpm test`/`typecheck`/`verify`/`preset-smoke` 绿；反证 = 把 member 协作面从 header 删掉 → spec/行为红。
 
+## 已修判定
+
+- header 把 team 拆成两个能力：`team collaboration`（Lead + teammate 共用）与 `team spawn (Lead only)`；teammate header 含前者、不含后者，不再用“未列 = 本座位不可用”否定它实际拥有的协作面。
+- teammate 注入 member 版 `company:delegation-team`（寻址/任务板/`wait_agent`/writeScopes/“只有 Lead 能 spawn”），不再注入 Lead 版；Lead 仍同时拿到 collaboration 与 spawn 两段。
+- CEO/命名 child/support root 的 header 不变（support 仍无 team，另有 seat note）；`team_task_*`/`send_message` 在 teammate 座位仍可用。
+- keyless：teammate header/section spec（红→绿：把 team 只按 lead 判即红）；`pnpm test` / `pnpm typecheck` / `pnpm verify` / `preset-smoke` 绿。
+
 ## 修复关联
 
-未修。发现于修复后复验（BUG-071 的 header 语义残余）；相关 Note = [2026-11-11-capability-seat-single-source.md](../../notes/implemented/2026-11-11-capability-seat-single-source.md)；前置 BUG = [BUG-071](../_archive/fixed_bugs/BUG-071-capability-header-not-installed-wording.md)。
+已修（2026-11-11）。发现于修复后复验（BUG-071 的 header 语义残余）；相关 Note = [2026-11-11-capability-seat-single-source.md](../../../notes/implemented/2026-11-11-capability-seat-single-source.md)；前置 BUG = [BUG-071](./BUG-071-capability-header-not-installed-wording.md)。

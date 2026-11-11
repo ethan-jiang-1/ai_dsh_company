@@ -1,9 +1,10 @@
-/** support preset 的 team 座位守卫（BUG-072）：工具在，但 spawn_teammate 调用被拒。 */
+/** support preset 的 team 座位守卫（BUG-072/076）：九件套都在工具面，但调用全部被拒。 */
 import { describe, expect, it } from 'vitest'
 import {
   registerTeamSeatGuard,
   supportTeamDenial,
 } from '../../../packages/company-pack/src/host/delegation/team-seat-guard.ts'
+import { TEAM_SURFACE_TOOLS } from '../../../packages/company-pack/src/host/delegation/seat.ts'
 
 type Guard = (exec: { readonly name: string }) => string | undefined
 
@@ -48,21 +49,27 @@ function mount(preset: string | undefined): Guard[] {
 }
 
 describe('supportTeamDenial', () => {
-  it('只对非角色 support preset 给理由', () => {
-    expect(supportTeamDenial('worker')).toContain('support capability seat')
-    expect(supportTeamDenial('quality-loop-verifier')).toContain('quality-loop-verifier')
-    expect(supportTeamDenial('ceo')).toBeUndefined()
-    expect(supportTeamDenial(undefined)).toBeUndefined()
+  it('只对非角色 support preset 的 team 工具给理由', () => {
+    expect(supportTeamDenial('worker', 'spawn_teammate')).toContain('support capability seat')
+    expect(supportTeamDenial('quality-loop-verifier', 'team_task_create')).toContain('quality-loop-verifier')
+    expect(supportTeamDenial('worker', 'write')).toBeUndefined()
+    expect(supportTeamDenial('ceo', 'spawn_teammate')).toBeUndefined()
+    expect(supportTeamDenial(undefined, 'spawn_teammate')).toBeUndefined()
   })
 })
 
 describe('registerTeamSeatGuard', () => {
-  it('worker root: 装一条 guard，只拒 spawn_teammate', () => {
+  it('worker root: 一条 guard 拒整套九件套 team 工具', () => {
     const guards = mount('worker')
     expect(guards).toHaveLength(1)
-    expect(guards[0]?.({ name: 'spawn_teammate' })).toContain('spawn_teammate is not available to this seat')
-    expect(guards[0]?.({ name: 'spawn_teammate' })).toContain('worker')
-    expect(guards[0]?.({ name: 'list_agents' })).toBeUndefined()
+    for (const tool of TEAM_SURFACE_TOOLS) {
+      const denial = guards[0]?.({ name: tool })
+      expect(denial, tool).toContain(`"${tool}" is not available to this seat`)
+      expect(denial, tool).toContain('worker')
+    }
+    // 非 team 工具不在拒绝范围。
+    expect(guards[0]?.({ name: 'write' })).toBeUndefined()
+    expect(guards[0]?.({ name: 'bash' })).toBeUndefined()
   })
 
   it('ceo root: 不装 guard', () => {

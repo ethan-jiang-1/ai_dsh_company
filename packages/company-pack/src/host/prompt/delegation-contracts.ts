@@ -1,14 +1,15 @@
 /**
- * 能力域委派政策注入：capability header + 五段 section，只给这个 Agent 真有的通道。
+ * 能力域委派政策注入：capability header + 通道 section，只给这个 Agent 真有的通道。
  *
  * 为什么不是一份共享 skill：六个角色共用一份 policy 时，CEO 会读到 fork/workflow/retry，
  * COO 会读到 workflow，命名 child VP 会读到 team——但这些工具不在它们的工具面里。原生
  * 原则是“策略随工具走/按能力存在性注入”；共享 skill 只留 core（brief/effort/链/结果），
  * 通道细节由这里按 preset 能力 + 运行时座位注入。
  *
- * team 不按 preset 判：任何 root 都是 Lead（worker/support root 也有团队工具），
- * 权限信号 = `agentTeams.membership(agent)?.role === 'lead'`，fallback `header.parentSession`。
- * 工具在场不等于有权：teammate 工具面里也有 `spawn_teammate`，但只有 Lead 能执行。
+ * team 拆成两个能力（BUG-077）：`team` = 名册成员的协作面（send_message / 任务板 / wait_agent；
+ * Lead 与 teammate 都有），`team-spawn` = 只有 Lead 有的 spawn 权。一个布尔不能覆盖两种能力。
+ * 座位来自 `delegationSeatOf(agent)`：membership 优先、`header.parentSession` 兜底，再叠 support
+ * preset 的产品座位；support root 额外注入一段 `company:delegation-seat` 纠正 vendor 的 team policy/identity。
  *
  * 内容源 = `content/contracts/delegation/<channel>.md`；workflow 引擎事实仍住
  * `content/contracts/workflow.md`（由 registerWorkflowContract 单独注入）。
@@ -18,13 +19,15 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { scopeOf } from '@deepseek-ai/dsh-scope'
 import { delegationCapabilitiesOf } from '../../lib/delegation-capabilities.ts'
-import { isSupportPreset } from '../../lib/delegation-surface.ts'
+import { delegationSeatOf } from '../delegation/seat.ts'
 import { composedPresetOf } from './handbook.ts'
 
 export const DELEGATION_HEADER_SECTION = 'company:delegation-capabilities'
+/** support root 的纠正段：vendor team:policy/identity 不授予本座位 team 权限（BUG-076）。 */
+export const DELEGATION_SEAT_SECTION = 'company:delegation-seat'
 export const DELEGATION_SECTION_PREFIX = 'company:delegation-'
 
-const CHANNELS = ['spawn', 'fork', 'workflow', 'team', 'retry'] as const
+const CHANNELS = ['spawn', 'fork', 'workflow', 'team', 'team-spawn', 'retry'] as const
 type Channel = (typeof CHANNELS)[number]
 
 const FILES: Readonly<Record<Channel, string>> = {
@@ -32,6 +35,7 @@ const FILES: Readonly<Record<Channel, string>> = {
   fork: 'fork.md',
   workflow: 'workflow.md',
   team: 'team.md',
+  'team-spawn': 'team-spawn.md',
   retry: 'retry.md',
 }
 
@@ -39,16 +43,13 @@ const LABELS: Readonly<Record<Channel, string>> = {
   spawn: 'spawn',
   fork: 'fork',
   workflow: 'workflow',
-  team: 'team (Lead only)',
+  team: 'team collaboration',
+  'team-spawn': 'team spawn (Lead only)',
   retry: 'retry',
 }
 
 interface ToolsLike {
   get(name: string, scope?: object): unknown
-}
-
-interface AgentTeamsLike {
-  tryMembership?(agent: unknown): { readonly role?: string } | undefined
 }
 
 interface AgentLike {
@@ -73,19 +74,17 @@ function hasTool(scope: Context, name: string): boolean {
 }
 
 /**
- * 运行时座位是不是 Team Lead。
- * 先用 agentTeams 的 membership（原生语义），服务缺席/非成员时用 parentSession 兜底。
- * @param agent - 正在创建的 Agent。
- * @returns 有团队工具且是 Lead 才 true 由调用方再与 `hasTool` 合判。
+ * support root 的模型可见纠正：vendor 的 team policy/identity 文本还在，但它不授予本座位 team 权限。
+ * @param preset - 当前 support preset（只用于点名）。
+ * @returns 一段纠正文本。
  */
-export function isTeamLead(agent: AgentLike): boolean {
-  const teams = agent.ctx.get('agentTeams') as AgentTeamsLike | undefined
-  try {
-    const membership = teams?.tryMembership?.(agent)
-    if (membership?.role === 'lead') return true
-    if (membership?.role === 'teammate') return false
-  } catch { /* fall through to parentSession */ }
-  return agent.session?.header?.parentSession === undefined
+export function supportSeatNote(preset: string | undefined): string {
+  const named = preset === undefined ? '' : ` (preset "${preset}")`
+  return 'Company delegation · seat note\n\n'
+    + `This session is a support capability seat${named}, not a company role. `
+    + 'The Agent Teams policy/identity text installed by the runtime does not grant this seat team authority. '
+    + 'spawn_teammate, list_agents, send_message, wait_agent, interrupt_agent, and team_task_* are not available here: calls are refused. '
+    + 'Do the work in this session or return the result; do not retry.'
 }
 
 /**
@@ -105,9 +104,9 @@ export function buildCapabilityHeader(available: Readonly<Record<Channel, boolea
 }
 
 /**
- * 读五段内容；任何一段缺失都跳过整组注入（打包错误 fail-safe，不注入半套政策）。
+ * 读全部通道内容；任何一段缺失都跳过整组注入（打包错误 fail-safe，不注入半套政策）。
  * @param contentDir - pack 的 `content/`。
- * @returns 五段文本；缺失时 undefined。
+ * @returns 通道文本；缺失时 undefined。
  */
 export function readDelegationSections(contentDir: string): SectionTexts | undefined {
   const channels: Partial<Record<Channel, string>> = {}
@@ -132,7 +131,7 @@ export function readDelegationSections(contentDir: string): SectionTexts | undef
 export function registerDelegationContracts(ctx: Context, contentDir: string): void {
   const texts = readDelegationSections(contentDir)
   if (texts === undefined) {
-    ctx.logger?.warn?.('company-pack：delegation 政策段缺失，跳过注入（检查 content/contracts/delegation/ 五段）')
+    ctx.logger?.warn?.('company-pack：delegation 政策段缺失，跳过注入（检查 content/contracts/delegation/ 六段）')
     return
   }
   // 只去重 `agent/created` 的重复投递：同一 Agent 建第二个 inject fiber 会重复 section。
@@ -145,18 +144,28 @@ export function registerDelegationContracts(ctx: Context, contentDir: string): v
     installed.add(agent)
     agent.ctx.inject(['systemPrompt', 'tools'], (scope) => {
       const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
+      const seat = delegationSeatOf(agent, preset)
       const caps = delegationCapabilitiesOf(preset)
-      // 座位判据叠加在引擎 Lead 之上：support preset 作为 root 仍被 vendor 当 Lead（团队工具也装着），
-      // 但产品侧不把 team 当它的可用通道——不列 header、不注入 team section（BUG-072）。
-      const lead = isTeamLead(agent) && hasTool(scope, 'spawn_teammate') && !isSupportPreset(preset)
+      // team 的两个能力分开：`team` = 名册成员的协作面；`team-spawn` = Lead 的 spawn 权。
+      // 工具在场是必要条件（vendor 按成员安装九件套），座位是充分判据（BUG-077）。
       const available: Record<Channel, boolean> = {
         // spawn 用能力表（CEO 的命名行不是 `subagent`，无法靠单名探测）；表由 parity spec 钉 YAML。
         spawn: caps?.spawn === true,
         fork: caps?.fork === true && hasTool(scope, 'subagent_fork'),
         workflow: caps?.workflow === true && hasTool(scope, 'workflow'),
-        team: lead,
+        team: seat.teamCollaborate && hasTool(scope, 'team_task_list'),
+        'team-spawn': seat.teamLead && hasTool(scope, 'spawn_teammate'),
         // retry 是 host per-agent 安装的，agent/created 监听顺序可能晚于本注入；能力表已由 parity spec 钉住。
         retry: caps?.retry === true,
+      }
+      // BUG-076：support root 的 vendor team:policy/identity 仍在；先纠正，再按 header 决定是否注入段。
+      if (seat.support && seat.teamRole === 'lead') {
+        scope.systemPrompt.section({
+          name: DELEGATION_SEAT_SECTION,
+          order: scope.systemPrompt.getSectionOrder('TEAM_POLICY') + 1,
+          text: supportSeatNote(preset),
+          interpolate: false,
+        })
       }
       const header = buildCapabilityHeader(available)
       if (header === undefined) return
