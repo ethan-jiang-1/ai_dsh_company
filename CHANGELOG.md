@@ -2,6 +2,20 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.11.1 — 2026-11-11
+
+### Fixed
+
+- 非法 `cultivationRoot` / `handbookSkipPresets` 现在在 host `apply` 前 fail-loud，不再静默带入
+  migration 或 preset 构造；包 README 的 Config 说明同步。
+- 新增 `pnpm market:hosted`：`market-index.staged.json` 在场时拒绝托管未发布版本；`release --check`
+  的 READY 行后同时打印 pre-publish 警告。
+
+### Changed
+
+- 仓库内容门禁改扫 working-tree（tracked + untracked 非 ignored），避免 `git add` 前 verify 假绿；
+  owner 文档相对路径测试扩到 `src/**/*.md` + pack README，并排除生成物 `lib/`。
+
 ## 0.11.0 — 2026-11-11
 
 ### Added
