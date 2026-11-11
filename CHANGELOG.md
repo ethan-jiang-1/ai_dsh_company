@@ -2,6 +2,24 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.11.0 — 2026-11-11
+
+### Added
+
+- 交付模式第二轴：`productized`（默认）/ `project-services` / `managed-service`；新增
+  `content/delivery-modes/` 包（SOW/UAT/RACI、SLA/Runbook/月报/续费模板与规则）。
+- 新增 `/delivery check <slug>`：按 `meta.md` 的交付模式检查交付文档与 requiredSections；
+  未知模式报错，`productized` 出现 SOW/SLA 只提醒。
+- 新增 `business-software` 产品类型、动议级路由与 `hardware-software/capabilities.md`
+  硬件能力前置清单（缺能力先报缺，不进入报价/承诺）。
+- CFO/COO/VP-Sales 各新增 `managed-service-*` 方法；经营工作流按产品类型 + 交付模式加载。
+
+### Fixed
+
+- `/req`、`/prd` 的只读检查改用会话 cwd，并修复 slug 越界读与停写回执的真实原因（BUG-057/058/060）。
+- 质量环 verifier 的原文索引在 R2 新会话不再假红；裁决头 `body-sha256` 只由 pack 工具回填（BUG-056/059）。
+- 团队任务书署名锚与 `kb` 旁路按 seed 派生，避免成员写入被误记（BUG-054/055）。
+
 ## 0.10.0 — 2026-11-10
 
 ### Added

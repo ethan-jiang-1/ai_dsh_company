@@ -74,13 +74,13 @@
           "multi-agent"
         ],
         "sortKeys": {
-          "published": 1794287013
+          "published": 1794355157
         }
       },
       "versions": [
         {
-          "version": "0.10.0",
-          "publishTimestamp": 1794287013,
+          "version": "0.11.0",
+          "publishTimestamp": 1794355157,
           "source": {
             "type": "npm"
           },
