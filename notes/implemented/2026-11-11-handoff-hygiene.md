@@ -59,6 +59,7 @@
   `workspaceRegistry`。修后同命令 → 2 passed。
 - 修前红：`pnpm release --check` → `pack 源码面已变但 _dist 没重打`，exit 1。修后
   `pnpm release --check` → `release: READY 0.11.0 @ d3343898（tgz 258 条目；7 项检查 pass）`，exit 0。
+  本 Note 修复提交后再次 `--stamp`；最终 manifest 的 `gitSha` 以 `_dist/release-manifest.json` 为准。
 - `pnpm verify` → `ALL PASS；2 门无对象`，exit 0。
 - `pnpm test` → `Test Files 186 passed (186)` / `Tests 1541 passed (1541)`，exit 0。
 - `pnpm typecheck` → exit 0；`pnpm lint` → 0 warnings/0 errors；`pnpm dup` → 0 clones。
@@ -72,7 +73,7 @@
   `runtime/harness-home/diagnosis/cdp-probe-2026-11-11T00-02-38-219Z/`。
 - `run/env.sh` 修复的复现：`/bin/bash -c 'X=/tmp/foo; echo "X=$X（bar）"'` 在 bash 3.2.57
   输出 `X=..bar`；改为 `${X}` 后输出完整路径；`source run/env.sh` 实跑显示
-  `DSH_HOME=/Users/bowhead/ai_dsh_company/runtime/harness-home`。
+  `DSH_HOME=<repo>/runtime/harness-home`。
 - 未造红的项：`attention-observers` 的 disposer 测试是新增守卫，修前未单独跑旧实现；
   行为依据 = vendor `typert` 的 `$on: () => void` 合同 + 新测试 green。
 
