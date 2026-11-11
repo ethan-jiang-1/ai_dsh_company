@@ -102,8 +102,8 @@ opened: 2026-11-11
 **已跑绿**
 
 - A1：`pnpm verify` / `pnpm test`（196 files/1571 tests）/ `typecheck` / `lint` / `dup` / `preset-smoke` 6+5 / `delegation-smoke --delegate`（child 75 tools，Team 工具不在场）/ `release-smoke`（tarball 真安装 + 11 preset 挂载）/ `product-team-e2e-smoke` / `vp-eng-workflow-probe` 全绿。
-- A2：CEO/COO/vp-eng/worker root；VP-Sales/CFO/CMO/quality-loop-producer/quality-loop-verifier/worker-orchestrator root；vp-eng teammate；workflow 分支；CEO→vp-eng 命名 child；cold resume（vp-eng/CEO/COO）——header/section/`workflow_runs` 与期望表一致，**除 BUG-071/072 的文案/权限面**。
-- A5：model-visible `systemText` bytes（旧→新）：CEO 15.7k→18.6k、COO 13.7k→18.0k、vp-eng 18.1k→23.4k、worker 6.8k→8.7k；vp-eng +5.2KB（含中文，不等于 code points）。成本观察，未见 pruner/compaction 异常。
+- A2：CEO/COO/vp-eng/worker root；VP-Sales/CFO/CMO/quality-loop-producer/quality-loop-verifier/worker-orchestrator root；vp-eng teammate；workflow 分支；CEO→vp-eng 命名 child；`quality_loop_produce`/`quality_loop_verify`/generic worker 命名 child（三者无 header/section/team/`workflow_runs`，符合 capability 表）；cold resume（vp-eng/CEO/COO）——header/section/`workflow_runs` 与期望表一致，**除 BUG-071/072 的文案/权限面**。
+- A5：model-visible `systemText` bytes（旧→新）：CEO 15.7k→18.6k、COO 13.7k→18.0k、vp-eng 18.1k→23.4k、worker 6.8k→8.7k；code points（可读新/旧会话的 vp-eng/worker）：vp-eng +≈2.3k、worker +≈1.0k，vp-eng 在卡内 2.5k 预算内；未见 pruner/compaction 异常。**注意**：inactive 会话的 `session/page` 可能只回持久 base prompt，不显示 section；行为面以 fresh/cold-resume 读数为准。
 - B1：CMO 两场（after no-poll）均 4×`subagent`、0 `workflow`、派发后结束本轮、无 `wait_agent`；bash 8/11 次主要在派发前/落盘，未见派发后轮询。
 - B2：COO 四合同，自己做，0 `workflow`、0 `subagent`。
 - B3：VP-Eng workflow probe ALL PASS；workflow 分支 header/workflow section/`workflow_runs` 在场；Lead 实调 `workflow_runs`。
@@ -125,6 +125,7 @@ opened: 2026-11-11
 - BUG-074 的真实 service re-provide 复现（需要 live recomposition；fake 形状不能单独当 red）。
 - A2 的 `quality_loop_produce` / `quality_loop_verify` / generic worker named child 座位；cold resume 的 named child/teammate。
 - release tarball 的 **seat section**（release-smoke 只证安装/挂载，未读 `system/message`）。
+- inactive `session/page` 的 section 可见性（证据层限制；不是 live 行为结论）。
 - B1 的更多 CMO 样本（当前 2 场）；B4 support root 的修复方向（产品决定）。
 - A5 的 code points 精确折算与 compaction 挤压；当前只记 bytes。
 
