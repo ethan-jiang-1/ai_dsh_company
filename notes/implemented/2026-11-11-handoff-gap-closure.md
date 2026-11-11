@@ -24,6 +24,8 @@
 - `node tools/release.mjs --prepare` → `0.11.3`；tarball 259 entries；`export-dist: ALL PASS`；manifest 写入 vendor 指纹。
 - `node tools/release.mjs --verify` → `verify`/`test`/`release-smoke`/`company-entry-smoke`/`client-load-smoke`/`preset-smoke`/`present-catalog-smoke` 全 pass；`pnpm test` 187 文件 / 1546 tests；`release-smoke: ALL PASS`。
 - `pnpm verify` → `ALL PASS；2 门无对象`（replay-fixture / replay-ui 显式 SKIP）。
+- `node tools/release.mjs --check --allow-pre-publish-index` → `READY 0.11.3 @ 26cd365e（tgz 259 条目；7 项检查 pass）`；仅 WARN staged 未发布。
+- vendor 指纹漂移反证：把 manifest 的 `vendor.cli.sha256` 改成 `deadbeef` → `release: manifest vendor CLI sha deadbeef ≠ 当前 …；重建过 vendor，重跑 --prepare/--verify`（exit 1）；还原 → READY 绿。
 - `dist-manual` 红/绿：把 pack README 的绝对手册 URL 改回相对 `_dist/安装手册.md` → `FAIL dist-manual pack README 缺指向仓库绝对 URL 的《安装手册》指针`；还原 → `OK dist-manual（版本 0.11.3 …）`。
 - `link-debt` → `archived 20 / moved 0 / live 0；基线 20/0/0`。
 
