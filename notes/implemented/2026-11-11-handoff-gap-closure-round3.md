@@ -33,11 +33,12 @@
 - `pnpm release --prepare` → `export-dist: ALL PASS`；tarball `0.11.5` 259 entries；sha256 `d1d7c14e924f324571c47e063549816c95c40b6db063ab85abbad3057126f730`；手册 0.11.5。
 - `pnpm release --verify` → `release: verify 全绿；提交后跑 --check`（verify/test/release-smoke/company-entry/client-load/preset/present-catalog 全 pass；preset 11/11）。
 - `pnpm release --stamp` → `stamp 0.11.5 @ 97c63784`；`pnpm release --check --allow-pre-publish-index` → `READY 0.11.5 @ 97c63784（tgz 259 条目；7 项检查 pass）`；默认 `--check` 在 staged 期 exit 1（哨兵，设计）。
+- clean clone（`bf84416d`，`/tmp/ai_dsh_company-clean-20261111-1130`，本地 vendor submodule）：`pnpm install` 39.4s → `bundle:init` → `pnpm setup` 3m58.6s → `setup --check` → `pnpm verify` 8.9s ALL PASS（3 门无对象：dist-freshness + 2 replay）→ `pnpm test` 19.7s（193 files；1551 passed | 3 skipped）。
+- 当前 HEAD 的最终 READY 在 `--stamp` 后由当轮回复给出（点态；本 Note 不预写未跑的输出）。
 
 ## 未验
 
 - 默认 `release --check` 在 `market-index.staged.json` 在场时仍 exit 1（设计）；publish 后删 staged 再跑才是托管前 READY。
-- clean clone 重跑仍按 round2 证据（`337c2db6`）；本轮是 warm checkout。
 - GitHub Actions 的 `setup-macos` 未在 GitHub 上执行；Desktop/Windows、真模型多轮行为未认证。
 
 ## 相关
