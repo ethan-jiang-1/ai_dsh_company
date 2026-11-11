@@ -76,22 +76,20 @@
   单独跑 vendor `tsx scripts/generate-typert.ts` → `wrote 30 Typert artifact(s) … in 3.7s`，
   再跑 setup → `SETUP_DONE=51s`；`pnpm setup --check` → `[ERROR] Unknown option: 'check'`（pnpm 内置命令）。
   修法 = setup 的 types() 加 typert pass + 带参统一 node 入口（本文决定 8/9）。
-- clean clone 二轮（`4f544a8b`，本地 submodule + `bundle:init`）：`pnpm install` 13s；
-  `pnpm run setup` 123s；`node tools/setup.mjs --check` → `setup: 产物齐全`；
-  `pnpm verify` 首次红 = `notes-archived-links` 2 处 + `link-debt archived 23 > 20`（runtime 证据树不在 clone）；
-  打上决定 10 的门禁补丁后 `pnpm verify` → `ALL PASS；3 门无对象`（dist-freshness 也无 manifest）。
-  `pnpm test` 首次 1 failed = `fs-record-sandbox` 的 cwd 在 /tmp；按决定 11 改 HOME 后
-  `Test Files 192 passed (192)` / `Tests 1549 passed | 3 skipped (1552)`。
+- clean clone 终轮（`337c2db6`，本地 submodule + `bundle:init`）：clone 3s / install 13s /
+  setup 137s（含 bundle:init；`node tools/setup.mjs --check` → 产物齐全）；verify 143s →
+  `ALL PASS；3 门无对象`；test 153s → `Test Files 192 passed (192)` / `Tests 1549 passed | 3 skipped (1552)`。
+  前两轮红：`0ffe4547` 缺 Typert（vendor client types 报 `/remote` 缺模块）；`4f544a8b` 缺 runtime 证据树
+  （`notes-archived-links` 2 处 + `link-debt archived 23 > 20`）与 /tmp 下 sandbox 反例误判；
+  修法 = 决定 8–11。此轮证明 clean clone 的 `setup → verify → test` 可复跑。
 - setup-invocation spec 红/绿：修前 `tools/setup.mjs`/bootstrap/workflow 出现 `pnpm setup --...` →
   测试红（`tools/setup.mjs 不应出现 pnpm setup --...`）；修后同 spec 绿。
 - `node tools/release.mjs --stamp` → `stamp 0.11.4 @ 0ffe4547`；`--check --allow-pre-publish-index` →
-  `release: READY 0.11.4 @ 0ffe4547（tgz 259 条目；7 项检查 pass）`（代码提交点；Note 提交后 manifest 以最终 stamp 为准）。
-- clean clone：见「未验」节（本轮稍后以独立 clone 跑）。
+  `release: READY 0.11.4 @ 0ffe4547（tgz 259 条目；7 项检查 pass）`（代码提交点；最终 commit 的 READY 见当轮回执）。
 
 ## 未验
 
-- GitHub Actions 的 `setup-macos` job 未在 GitHub 上执行（本地 clean clone 已用同一组命令证明）。
-- 最终 commit 3 的 clean clone 复跑（含门禁/测试补丁）尚未执行；`4f544a8b` clone 上已手打补丁验证。
+- GitHub Actions 的 `setup-macos` job 未在 GitHub 上执行（本地 clean clone `337c2db6` 已用同一组命令全绿）。
 - Desktop/Windows、真模型多轮行为仍按原合同未认证。
 
 ## 相关

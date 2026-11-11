@@ -10,6 +10,7 @@
 - `npm pack` 在缺 `lib/` 时由 prepack 守护 fail-loud，避免手工打包产出不可安装的空包。
 - 包 README 的卸载清单补齐 lease/日志/检索索引，并与《安装手册》§八 由 parity spec 对账。
 - 修正 `cordis.patch.yml` 的发布合同指针（`docs/release.md` → `docs/contracts/release.md`）；bootstrap 标明 setup 内部步骤勿重复。
+- clean clone 的 setup 补 vendor Typert pass；冻结层 runtime 证据链接不再让 verify 红；sandbox spec 反例改用 HOME；link-debt 基线 20→4。
 - fresh-clone CI 新增 macOS 全量 `setup + verify + test` job；`market-index.staged.json` 明确为未发布哨兵。
 
 ## 0.11.3 — 2026-11-11
