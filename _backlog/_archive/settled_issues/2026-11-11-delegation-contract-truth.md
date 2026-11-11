@@ -21,7 +21,7 @@ opened: 2026-11-11
 - G3 证据：`tools/lib/delegation-model.mjs:68`；`delegation-policy/SKILL.md:16`；`docs/contracts/delegation.md:81`；vendor `tool-agent-team/src/index.ts:61`、`:208`；B2 实测 CEO 两次 `spawn_teammate` 都传 `context: "fresh"`。
 - G4 证据：`docs/architecture.md:37`-`44`、`docs/reference/terminology.md:16` vs `tools/lib/delegation-model.mjs:46`-`73`；C（dsh-sdk）当前六角色未使用，fork 在 A/B/C/D 表里没有位置。
 - `teamLead` 语义：`COMPOSITIONS.*.teamLead` 是 preset 级期望；E5 实测 worker root 仍有 `spawn_teammate`（任何 root 都是 Lead，`tools/lib/surface-matrix.mjs` 头注同款结论）。
-- 完整证据与复读命令 = [实验第一轮](../../research/dsh-native-orchestration-fit/2026-11-11-experiment-results.md)；GAP 编号 = [GAP 登记](../../research/dsh-native-orchestration-fit/2026-11-11-repo-fit-gap-register.md)。
+- 完整证据与复读命令 = [实验第一轮](../research/dsh-native-orchestration-fit/2026-11-11-experiment-results.md)；GAP 编号 = [GAP 登记](../research/dsh-native-orchestration-fit/2026-11-11-repo-fit-gap-register.md)。
 
 **未决问题：** 没有需要用户拍板的产品选择；实现时需定两件小口径：① `teamLead` 改成 `teamLeadWhenRoot` 还是加 `runtimeAuthority` 字段（推荐前者：保留 preset 期望，另在注入侧用 `agentTeams.membership` 判运行时）；② A/B/C/D 表保留为组织别名，还是从 `architecture.md` 主表移除（推荐保留 A/B/D 为别名、C 标“未启用的外部 provider 通道”，能力矩阵以原生四通道为准）。
 

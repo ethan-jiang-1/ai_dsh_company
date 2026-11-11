@@ -18,6 +18,7 @@
 
 | 名头 | 材料 | 历史消费者 | 产出的卡 | 归档 |
 |---|---|---|---|---|
+| [dsh-native-orchestration-fit/](dsh-native-orchestration-fit/README.md) · DSH 原生编排对照：公司角色的通道、合同与能力面 GAP 盘点 | 5 份 | 用户 2026-11-11 研究请求；[委派合同事实纠偏](../settled_issues/2026-11-11-delegation-contract-truth.md)、[委派政策能力域化](../settled_issues/2026-11-11-delegation-policy-capability-scoped.md) | 同两张卡（[Note 1](../../../notes/implemented/2026-11-11-delegation-contract-truth.md)、[Note 2](../../../notes/implemented/2026-11-11-delegation-policy-capability-scoped.md)） | 2026-11-11 |
 | [two-product-structure-audit/](two-product-structure-audit/README.md) · 两产品结构审计：产品类型 / 组织 / 角色 / 流程 | 3 份 + experiments/ | [BUG-061–070](../fixed_bugs/README.md)、[两轴 v1](../settled_issues/2026-11-11-delivery-mode-axis.md)、[v2](../settled_issues/2026-11-11-delivery-mode-v2.md) | 同批卡 | 2026-11-11 |
 | [workflow-subagent-exploration/](workflow-subagent-exploration/README.md) · workflow + subagent 探索测试：八轮 + 资产先行 | 3 份 | [探索 bug-hunt 卡](../settled_issues/2026-11-08-workflow-subagent-exploratory-bug-hunt.md) | BUG-036–060（多轮） | 2026-11-11 |
 | [org-coordination-topology/](org-coordination-topology/README.md) · 组织协同拓扑：CEO 五条汇报线、VP-Eng 研发负载与 workflow/subagent 的分工 | 3 份 | [产品类型语义](../settled_issues/2026-11-10-product-type-semantics.md)、[动议级产品类型](../settled_issues/2026-11-10-motion-product-type.md)、[SA/SQA 方法包](../settled_issues/2026-11-10-sa-sqa-method-packs.md)、[COO/CFO 通道](../settled_issues/2026-11-10-coo-cfo-delegation.md) | 同四张卡 | 2026-11-10 |

@@ -17,7 +17,7 @@ opened: 2026-11-11
 
 **当前情况：**
 
-- E1 能力审计：政策行与工具面的不适用面 = CEO fork/workflow/retry；VP-Sales/COO/CFO/CMO workflow；命名 child VP team。见 [实验第一轮 §1](../../research/dsh-native-orchestration-fit/2026-11-11-experiment-results.md)。
+- E1 能力审计：政策行与工具面的不适用面 = CEO fork/workflow/retry；VP-Sales/COO/CFO/CMO workflow；命名 child VP team。见 [实验第一轮 §1](../research/dsh-native-orchestration-fit/2026-11-11-experiment-results.md)。
 - E5 真挂载：CEO/COO/worker root 都看得见 `workflow_runs`；worker root 还看得见 `spawn_teammate`/`list_agents`/`send_message`，但它不加载 policy、persona 写“不组队”。见实验 §2.2 / §6。
 - E3 拆分原型：A 方案可做到无规则丢失；常驻 section 估算 1.9–2.35k code points（vp-eng ~2k，其他 full ~1.8k，CEO ~1k）。见实验 §3。
 - B1：COO 加载 policy 后**没有**误调 workflow，选择自己做；所以本卡不写“模型已坏”，写“合同让模型面对不存在的选项”。B2：CEO 团队实际用 fresh + 任务书。B3：CEO 多轮任务**没有**自开 goal。B5（partial）：CMO 的 4 个细分市场用 4 个 `subagent` 替代缺失的 workflow，并出现 `bash` 轮询等待。见实验 §5。

@@ -67,4 +67,4 @@
 
 - 上游卡：[2026-11-11 委派政策能力域化](../../_backlog/_archive/settled_issues/2026-11-11-delegation-policy-capability-scoped.md)
 - 前置 Note：[委派合同事实纠偏](./2026-11-11-delegation-contract-truth.md)
-- 研究题：[dsh-native-orchestration-fit](../../_backlog/research/dsh-native-orchestration-fit/README.md)
+- 研究题：[dsh-native-orchestration-fit](../../_backlog/_archive/research/dsh-native-orchestration-fit/README.md)
