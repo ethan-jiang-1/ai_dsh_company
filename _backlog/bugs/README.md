@@ -14,11 +14,8 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-071](BUG-071-capability-header-not-installed-wording.md) | capability header 对 teammate 说“未列通道未安装”，但工具面仍有 `spawn_teammate`（Lead-only） | P2 |
-| [BUG-072](BUG-072-support-root-can-spawn-team.md) | support preset（worker/quality-loop）作为 root 仍有 `spawn_teammate` 且能实际组队；“不组队”只是文案 | P2 |
-| [BUG-073](BUG-073-readme-one-shot-child-team-tools-stale.md) | company-pack README 仍写 one-shot child 可见 Team 工具；0.2.1 守卫/实测已不在场 | P2 |
-| [BUG-074](BUG-074-per-agent-inject-not-reinstalled-on-service-change.md) | per-agent 注入用 WeakSet 短路；Cordis `inject` service 变化会 re-run，policy/`workflow_runs` 可能不重装 | P2 |
-| [BUG-075](BUG-075-eng-teaming-schema-rule-duplicated.md) | `eng-teaming` 声明“schema 事实不在本 skill”，五档表却仍复述“分支不传 schema” | P2 |
+| —（本轮） | BUG-071 / 072 / 073 / 075 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：能力事实四载体（安装 / 座位 / header / 文档+内容）对齐；见 [Note](../../notes/implemented/2026-11-11-capability-seat-single-source.md) | — |
+| —（本轮） | BUG-074 复核为**误报**（WeakSet 不挡 re-provide；`ctx.set` 不是 re-provide），已迁 [fixed_bugs](../_archive/fixed_bugs/BUG-074-per-agent-inject-not-reinstalled-on-service-change.md)：保留 guard + 注释 + 真 Cordis spec；见 [Note](../../notes/implemented/2026-11-11-inject-reentrancy-false-positive.md) | — |
 | —（历史） | BUG-067 / BUG-068 / BUG-069 / BUG-070 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：pack 路径 / tier / 政策数字 / 委派真值四类声明↔载体对账；见 [Note](../../notes/implemented/2026-11-11-declaration-carrier-gates.md) | — |
 | —（历史） | BUG-064 / BUG-065 / BUG-066 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：方法契约（类型适用性 + 事实载体 + fail-closed）+ `method-contract` 门禁；见 [Note](../../notes/implemented/2026-11-11-method-contract-type-facts.md) | — |
 | —（历史） | BUG-056 已修并迁 [fixed_bugs](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)：质量环裁决头哈希改由 pack 内 `verdict-hash.mjs` 回填；`未复验` 成为 audit warning | — |
@@ -27,6 +24,25 @@
 | —（历史） | BUG-050 复核为**环境陈旧误报**（dev profile 安装副本未更新），已迁 [fixed_bugs](../_archive/fixed_bugs/BUG-050-retry-depth-fix-fails-in-real-assembly.md)；BUG-045 / 046 / 047 / 048 / 049 已修 | — |
 | —（历史） | BUG-045 / BUG-046 / BUG-047 / BUG-048 / BUG-049 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：retry 注册面/深度单源 + 越界可见拒绝；`list_subagents` 暴露引擎身份；handbook 按 worker family 派生；UI 金样随显示名收窄刷新 | — |
 | —（历史） | BUG-034 / BUG-035 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：SA/SQA 证据链必查（时间源 + 故障路径耐受）+ 审计 Q8–Q11；2026-11-07 E2E v8 验收 | — |
+
+## 2026-11-11 修复交接（根因组 F/G/H：BUG-071..075）
+
+**用户指令（2026-11-11）**：「_backlog/bugs 有不少bug你要看看……最后把所有的bug都修了吧，你先盘算盘算。」
+本句即本轮授权（材料性：host 模型可见文案 + company-pack 公开行为 + preset skill + 文档），留痕 = Note。
+
+五张卡按**根因**分三组，不逐症状打补丁：
+
+| 组 | 卡 | 同一根因 | 修法 |
+|---|---|---|---|
+| **G 注入生命周期** | [074](../_archive/fixed_bugs/BUG-074-per-agent-inject-not-reinstalled-on-service-change.md) | 原假设 = 把可重入的 `ctx.inject` 当成“每 Agent 跑一次”的 setup；**实测证伪** = WeakSet 只挡重复 `agent/created`，re-provide 仍重跑；卡里的 `ctx.set` 复现不是 re-provide | 保留三个 WeakSet 在正确位置 + 注释；真 Cordis spec 钉「re-provide 重装 / `ctx.set` 不通知 / 重复 created 不重复装」；红证 = 把 WeakSet 挪进 callback 即红 |
+| **F 座位能力面** | [071](../_archive/fixed_bugs/BUG-071-capability-header-not-installed-wording.md) / [072](../_archive/fixed_bugs/BUG-072-support-root-can-spawn-team.md) / [073](../_archive/fixed_bugs/BUG-073-readme-one-shot-child-team-tools-stale.md) | 同一个能力事实有四个载体（工具安装 / 座位权限 / header 文案 / README+合同），各说各话 | 071 = 文案改“本座位不可用”（安装 ≠ 可用）；072 = support preset 不作 team 座位（header/section 不列）+ per-agent `spawn_teammate` guard；073 = README 已知限制改现行事实并回链守卫 |
+| **H 内容单源** | [075](../_archive/fixed_bugs/BUG-075-eng-teaming-schema-rule-duplicated.md) | 合同缩编只搬长段、没扫表格短句，形成“声明不复述 + 实际复述” | 五档表删 schema 引擎句，只留用法判据；全 preset 扫描同型残留 |
+
+**次序 = G → F → H**：G 先做（独立；结论 = 误报，保留 guard + 补真 Cordis spec）；F 再动 header/guard/文档；H 最后收内容。
+**收口（2026-11-11）**：五张卡已修/已证伪并迁 [fixed_bugs](../_archive/fixed_bugs/)，两张索引同步；
+`pnpm test` 198 files / 1581 tests、`pnpm typecheck`、`pnpm lint`、`pnpm verify`、`preset-smoke` 全绿。
+证据 = [座位 Note](../../notes/implemented/2026-11-11-capability-seat-single-source.md) ·
+[注入生命周期 Note](../../notes/implemented/2026-11-11-inject-reentrancy-false-positive.md)。
 
 **2026-11-11 后续（E5–E11，根因组 B/C/D/E）——已全部收口**：经营组 B/E（064–066）与
 内容/门禁组 C（067–069）+ 委派语义（070）均已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；

@@ -4,7 +4,7 @@ description: 公司委派政策（core）——默认自己做、brief 四要素
 ---
 # 委派政策（core）
 
-> **先看本会话的 capability header。** 它列出的通道才是可用的；header 没有的通道 = 本会话没有该工具，不要调用、也不要让下游“试试”。
+> **先看本会话的 capability header。** 它列出的是**这个座位**可用的通道；header 没有的通道 = 本座位没有该能力（工具可能仍安装着，调用会被拒），不要调用、也不要让下游“试试”。
 > 每条通道的具体规则在 `company:delegation-<channel>` section；workflow 引擎事实在 `company:workflow-contract` section。本 skill 只留跨通道的决策与纪律。
 
 ## 1 默认自己做

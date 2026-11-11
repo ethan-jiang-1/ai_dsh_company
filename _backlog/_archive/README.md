@@ -203,6 +203,11 @@
 | [BUG-068-base-clean-deployment-case-language.md](fixed_bugs/BUG-068-base-clean-deployment-case-language.md) | 服务类附赠搬 policy-lines + `base-clean` charter 个案语言 denylist | 2026-11-11 |
 | [BUG-069-tier-policy-gate-coverage.md](fixed_bugs/BUG-069-tier-policy-gate-coverage.md) | `加载：` 头与 manifest 对账 + policy 数字从 policy-lines 派生（9 个） | 2026-11-11 |
 | [BUG-070-delegation-maxdepth-example-wrong.md](fixed_bugs/BUG-070-delegation-maxdepth-example-wrong.md) | `maxDepth` 绝对语义真值 + vendor `resolveChildDepth` keyless spec | 2026-11-11 |
+| [BUG-071-capability-header-not-installed-wording.md](fixed_bugs/BUG-071-capability-header-not-installed-wording.md) | header 改「本座位不可用」口径：安装 ≠ 可用；工具在也可被拒 | 2026-11-11 |
+| [BUG-072-support-root-can-spawn-team.md](fixed_bugs/BUG-072-support-root-can-spawn-team.md) | support preset 不作 team 座位：不列 team + per-agent `spawn_teammate` guard | 2026-11-11 |
+| [BUG-073-readme-one-shot-child-team-tools-stale.md](fixed_bugs/BUG-073-readme-one-shot-child-team-tools-stale.md) | README 已知限制删 0.2.0 旧观察，改现行 child 组合/Lead-only 事实 | 2026-11-11 |
+| [BUG-074-per-agent-inject-not-reinstalled-on-service-change.md](fixed_bugs/BUG-074-per-agent-inject-not-reinstalled-on-service-change.md) | **误报**：WeakSet 不挡 re-provide；`ctx.set` 不是 re-provide；保留 guard + 真 Cordis spec | 2026-11-11 |
+| [BUG-075-eng-teaming-schema-rule-duplicated.md](fixed_bugs/BUG-075-eng-teaming-schema-rule-duplicated.md) | `eng-teaming` 表内 schema 引擎句删除，引擎事实只住 workflow 合同 | 2026-11-11 |
 
 ## 暂停卡
 

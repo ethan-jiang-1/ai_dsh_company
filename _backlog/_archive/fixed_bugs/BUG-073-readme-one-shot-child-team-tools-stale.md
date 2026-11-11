@@ -1,21 +1,24 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-11
 ---
 
 # BUG-073：company-pack README 仍写 one-shot child 可见 Team 工具，与 0.2.1 守卫相反
 
-> 严重级别：P2（次要）｜发现：2026-11-11｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-11｜状态：已修
+>
+> **留痕**：Note [`notes/implemented/2026-11-11-capability-seat-single-source.md`](../../../notes/implemented/2026-11-11-capability-seat-single-source.md)
+> **审查**：agent — README 与 delegation-smoke [3]/合同对齐；行数未超预算；verify 绿
 
 ## 症状
 
-[packages/company-pack/README.md](../../packages/company-pack/README.md) 的「已知限制」仍写：
+[packages/company-pack/README.md](../../../packages/company-pack/README.md) 的「已知限制」仍写：
 
 > **one-shot 委托 child 的目录里看得见 Team 工具但调不通**（上游已登记限制，vendor tool-agent-team README
 > "One-shot child tool visibility"；2026-10-02 真跑实证：child 目录 41 工具含全部六个 Team 工具，调用在身份确认后被拒）。
 
-但同一仓的 [delegation 合同](../../docs/contracts/delegation.md) 写：
+但同一仓的 [delegation 合同](../../../docs/contracts/delegation.md) 写：
 
 > `delegation-smoke --delegate` [3] 钉住 child 首帧 `agentPreset = vp-eng` 且工具目录**没有** Team 工具
 > （组合按 preset 解析，旧的"one-shot child 误见 Team 工具"不再复现）。
@@ -57,7 +60,13 @@ node checks/smoke/delegation-smoke.mjs --delegate
   见 BUG-071/BUG-072。
 - 验收：README 不再与 `delegation-smoke --delegate`/`delegation.md` 相反；`pnpm verify`/`pnpm test` 绿。
 
+## 已修判定
+
+- README「已知限制」删掉“one-shot child 可见 Team 工具”旧句，改写为现行事实：child 按 `agentPreset` 组合、`delegation-smoke --delegate` [3] 钉不在场；teammate 工具面仍可能含 `spawn_teammate`（Lead-only 执行）。
+- README 与 `docs/contracts/delegation.md` §4、`delegation-smoke` 的 [3] 守卫不相反；行数不超 doc 预算。
+- `pnpm verify` / `pnpm test` 绿。
+
 ## 修复关联
 
-未修。发现于 [委派能力域化回归 + 探索卡](../_archive/settled_issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
+已修（2026-11-11）。发现于 [委派能力域化回归 + 探索卡](../settled_issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
 A4 静态债；证据 = `delegation-smoke --delegate` 2026-11-11 实跑。

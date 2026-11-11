@@ -1,12 +1,15 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-11
 ---
 
 # BUG-071：capability header 的“未列通道未安装”对 teammate 是假话
 
-> 严重级别：P2（次要）｜发现：2026-11-11｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-11｜状态：已修
+>
+> **留痕**：Note [`notes/implemented/2026-11-11-capability-seat-single-source.md`](../../../notes/implemented/2026-11-11-capability-seat-single-source.md)
+> **审查**：agent — 文案 keyless 断言红→绿（改回旧句 1 failed）；pnpm test/typecheck/verify/preset-smoke 绿
 
 ## 症状
 
@@ -58,7 +61,13 @@ E5C 原始读数：`teammate {"preset":"ceo","header":true,"teamSection":false,"
 - 验收：header 不再说“not installed”；teammate 的 tools 仍含 `spawn_teammate` 时文案不矛盾；CEO/worker root
   的 team 文案不变；`pnpm test` + `preset-smoke` 绿。
 
+## 已修判定
+
+- header 不再把“未列”写成“未安装”：文案改为“本座位不可用；工具可能仍安装着，调用会被拒”，并保留“不要调用、不要让下游试试”。
+- `delegation-policy` core 首段同口径，不再说“header 没有 = 本会话没有该工具”。
+- keyless 断言钉住两句文案（改回旧句即红）；`pnpm test` / `pnpm verify` / `preset-smoke` 绿。
+
 ## 修复关联
 
-未修。发现于 [委派能力域化回归 + 探索卡](../_archive/settled_issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
+已修（2026-11-11）。发现于 [委派能力域化回归 + 探索卡](../settled_issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
 A2 座位矩阵；证据 = E5C teammate 会话。修复属材料性（model-facing host 文案），需用户点名或授权。

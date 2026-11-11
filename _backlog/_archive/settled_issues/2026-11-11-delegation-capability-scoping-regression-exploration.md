@@ -110,18 +110,18 @@ opened: 2026-11-11
 - B1：CMO 两场（after no-poll）均 4×`subagent`、0 `workflow`、派发后结束本轮、无 `wait_agent`；bash 8/11 次主要在派发前/落盘，未见派发后轮询。
 - B2：COO 四合同，自己做，0 `workflow`、0 `subagent`。
 - B3：VP-Eng workflow probe ALL PASS；workflow 分支 header/workflow section/`workflow_runs` 在场；Lead 实调 `workflow_runs`。
-- B4：teammate 调 `spawn_teammate` → `TEAM_LEAD_REQUIRED`（Lead-only 生效）；support root 可实际组队 = [BUG-072](../../bugs/BUG-072-support-root-can-spawn-team.md)。
+- B4：teammate 调 `spawn_teammate` → `TEAM_LEAD_REQUIRED`（Lead-only 生效）；support root 可实际组队 = [BUG-072](../fixed_bugs/BUG-072-support-root-can-spawn-team.md)。
 - B5/B6：cold resume root vp-eng/CEO/COO 后 header/section/`workflow_runs` 仍在；命名 child vp-eng cold resume 同样在；CMO/COO 未误调缺失 workflow。teammate cold resume **未判**（成员没有 request/header，`send_message` 未形成 turn），不写成 PASS/FAIL。
 
 **Round 1 缺陷卡**
 
 | BUG | 一句话 | 证据 |
 |---|---|---|
-| [BUG-071](../../bugs/BUG-071-capability-header-not-installed-wording.md) | header 对 teammate 说“未列通道未安装”，但 `spawn_teammate` 在工具面（Lead-only） | E5C teammate `session ba1f1e99-...`；header “Available channels: spawn” + tools 含 `spawn_teammate` |
-| [BUG-072](../../bugs/BUG-072-support-root-can-spawn-team.md) | support preset root 仍有 `spawn_teammate` 且能实际组队；“不组队”只是文案 | worker root `session-19bae5e2-...` calls `["spawn_teammate"]`；quality-loop roots 同工具面 |
-| [BUG-073](../../bugs/BUG-073-readme-one-shot-child-team-tools-stale.md) | README 仍写 one-shot child 可见 Team 工具；0.2.1 守卫/实测已不在场 | `delegation-smoke --delegate` [3] child 75 tools、Team 不在场；README:158 vs delegation.md:92 |
-| [BUG-074](../../bugs/BUG-074-per-agent-inject-not-reinstalled-on-service-change.md) | per-agent 注入 WeakSet 短路；Cordis `inject` service change re-run 后 section/tool 可能不重装 | `registry.ts:168`-`180` 合同 + 真 `Context` `ctx.set('tools')/ctx.set('systemPrompt')` 复现（新 tools 无 `workflow_runs`、新 prompt 无 section） |
-| [BUG-075](../../bugs/BUG-075-eng-teaming-schema-rule-duplicated.md) | `eng-teaming` 声明 schema 事实不在本 skill，五档表仍复述“分支不传 schema” | `eng-teaming:16` vs `:38` |
+| [BUG-071](../fixed_bugs/BUG-071-capability-header-not-installed-wording.md) | header 对 teammate 说“未列通道未安装”，但 `spawn_teammate` 在工具面（Lead-only） | E5C teammate `session ba1f1e99-...`；header “Available channels: spawn” + tools 含 `spawn_teammate` |
+| [BUG-072](../fixed_bugs/BUG-072-support-root-can-spawn-team.md) | support preset root 仍有 `spawn_teammate` 且能实际组队；“不组队”只是文案 | worker root `session-19bae5e2-...` calls `["spawn_teammate"]`；quality-loop roots 同工具面 |
+| [BUG-073](../fixed_bugs/BUG-073-readme-one-shot-child-team-tools-stale.md) | README 仍写 one-shot child 可见 Team 工具；0.2.1 守卫/实测已不在场 | `delegation-smoke --delegate` [3] child 75 tools、Team 不在场；README:158 vs delegation.md:92 |
+| [BUG-074](../fixed_bugs/BUG-074-per-agent-inject-not-reinstalled-on-service-change.md) | per-agent 注入 WeakSet 短路；Cordis `inject` service change re-run 后 section/tool 可能不重装 | `registry.ts:168`-`180` 合同 + 真 `Context` `ctx.set('tools')/ctx.set('systemPrompt')` 复现（新 tools 无 `workflow_runs`、新 prompt 无 section） |
+| [BUG-075](../fixed_bugs/BUG-075-eng-teaming-schema-rule-duplicated.md) | `eng-teaming` 声明 schema 事实不在本 skill，五档表仍复述“分支不传 schema” | `eng-teaming:16` vs `:38` |
 
 **未跑/未证（保留）**
 

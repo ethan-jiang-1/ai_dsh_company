@@ -100,6 +100,9 @@ describe('registerDelegationContracts', () => {
       expect(h.sections[0]?.text).toContain('spawn')
       expect(h.sections[0]?.text).toContain('team (Lead only)')
       expect(h.sections[0]?.text).not.toContain('workflow')
+      // 安装 != 座位可用：header 不再说“未安装”，并说明工具可能仍在（BUG-071）。
+      expect(h.sections[0]?.text).toContain('not available to this seat')
+      expect(h.sections[0]?.text).not.toContain('not installed')
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
 
@@ -159,14 +162,14 @@ describe('registerDelegationContracts', () => {
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
 
-  it('worker root: team section only (caps all false, but root is Lead)', () => {
+  it('worker root: no header/sections (support seat, not a team seat)', () => {
     const dir = content()
     try {
       const h = harness({ preset: 'worker', tools: ['spawn_teammate'], role: 'lead' })
       registerDelegationContracts(h.ctx as never, dir)
       h.fire()
-      expect(names(h)).toEqual([DELEGATION_HEADER_SECTION, `${DELEGATION_SECTION_PREFIX}team`])
-      expect(h.sections[0]?.text).toContain('team (Lead only)')
+      // 引擎 root=Lead、团队工具也在场，但 support preset 不是 team 座位（BUG-072）。
+      expect(h.sections).toHaveLength(0)
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
 

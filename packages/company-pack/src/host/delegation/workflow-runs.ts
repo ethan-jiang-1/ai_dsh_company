@@ -224,6 +224,7 @@ export function createWorkflowRunsTool(ctx: Context): unknown {
  * @param ctx - Host 上下文。
  */
 export function registerWorkflowRuns(ctx: Context): void {
+  // 只去重 `agent/created` 的重复投递；tools re-provide 时 callback 由 fiber 重跑（BUG-074）。
   const installed = new WeakSet<object>()
   const install = (agent: AgentLike): void => {
     if (installed.has(agent)) return

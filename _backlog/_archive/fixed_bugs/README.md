@@ -4,6 +4,24 @@
 
 ## 修复流水（倒序）
 
+- **BUG-071 / BUG-072 / BUG-073 / BUG-075**（2026-11-11，根因组 F/H，P2）：能力事实的四个载体各说各话——
+  [071](BUG-071-capability-header-not-installed-wording.md) header 把“本座位不可用”写成“未安装”（teammate 工具面仍有
+  `spawn_teammate`）；[072](BUG-072-support-root-can-spawn-team.md) support preset 作为 root 被 vendor 当 Lead、能实际组队，
+  “不组队”只是文案；[073](BUG-073-readme-one-shot-child-team-tools-stale.md) README 仍写 0.2.0 的 one-shot child 可见 Team 工具；
+  [075](BUG-075-eng-teaming-schema-rule-duplicated.md) `eng-teaming` 声明 schema 事实不在本 skill，表格短句却仍复述。
+  修法 = header 改“座位可用”口径 + `isSupportPreset()` 座位判据（support root 不列 team）+ per-agent
+  `spawn_teammate` guard + README/合同/内容改现行事实 + 删表内引擎句。红→绿：恢复 `team: lead` 与旧文案 →
+  `delegation-contracts.spec` 2 failed / 5 passed；还原 7 passed。新 guard spec 4 passed。`pnpm test`
+  198 files / 1581 tests、`typecheck`/`lint`/`verify`、`preset-smoke` 全绿。详见
+  [座位 Note](../../../notes/implemented/2026-11-11-capability-seat-single-source.md)。
+
+- **BUG-074**（2026-11-11，P2，**误报**）：[卡](BUG-074-per-agent-inject-not-reinstalled-on-service-change.md) 原假设
+  = per-agent 注入用 Agent 级 WeakSet 短路，Cordis `inject` re-provide 后不再装 section/`workflow_runs`。
+  真 Cordis 实测：provider 卸载/再挂时 callback 仍重跑，WeakSet 只挡重复 `agent/created`；卡里的
+  `ctx.set('tools', …)` 只覆盖值、不通知依赖，不是 re-provide。处置 = 保留 WeakSet + 注释 + 真 Cordis spec
+  `tests/host/index/inject-reentrancy.spec.ts`（6 项）；红证 = 把 WeakSet 挪进 callback → 1 failed / 5 passed。
+  详见 [误报 Note](../../../notes/implemented/2026-11-11-inject-reentrancy-false-positive.md)。
+
 - **BUG-067 / BUG-068 / BUG-069 / BUG-070**（2026-11-11，内容/门禁组 C + D）：
   [067](BUG-067-process-docs-dead-pointers.md) process-docs 的 4 处 pack-relative 死指针——新增
   `pack-content-paths` 门禁，指针改类型包；[068](BUG-068-base-clean-deployment-case-language.md)

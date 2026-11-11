@@ -37,6 +37,7 @@
   ],
   "exclude": [
     "tests/host/index/apply-lifecycle.spec.ts",
+    "tests/host/index/inject-reentrancy.spec.ts",
     "tests/host/cultivation/fs-record-sandbox.spec.ts",
     "tests/host/index/cultivation-propose-guards.spec.ts",
     "tests/host/cultivation/fs-record-write.spec.ts",

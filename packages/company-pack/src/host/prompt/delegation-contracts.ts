@@ -18,6 +18,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { scopeOf } from '@deepseek-ai/dsh-scope'
 import { delegationCapabilitiesOf } from '../../lib/delegation-capabilities.ts'
+import { isSupportPreset } from '../../lib/delegation-surface.ts'
 import { composedPresetOf } from './handbook.ts'
 
 export const DELEGATION_HEADER_SECTION = 'company:delegation-capabilities'
@@ -97,7 +98,8 @@ export function buildCapabilityHeader(available: Readonly<Record<Channel, boolea
   if (names.length === 0) return undefined
   return 'Company delegation · this session\n\n'
     + `Available channels: ${names.join(', ')}.\n`
-    + 'Channels not listed are not installed in this session: do not call them or ask downstream to try. '
+    + 'Channels not listed are not available to this seat: do not call them, and do not ask downstream to try. '
+    + 'A tool can still appear in your tool list when it is installed for the session but not enabled for your seat; calling it is refused. '
     + 'Dispatched children report back by completion notice: do not poll with bash/sleep, and do not use wait_agent for non-team subagent children. End the turn and let the notice start a new turn. '
     + 'The policy section for each available channel follows.'
 }
@@ -133,6 +135,10 @@ export function registerDelegationContracts(ctx: Context, contentDir: string): v
     ctx.logger?.warn?.('company-pack：delegation 政策段缺失，跳过注入（检查 content/contracts/delegation/ 五段）')
     return
   }
+  // 只去重 `agent/created` 的重复投递：同一 Agent 建第二个 inject fiber 会重复 section。
+  // 它**不挡** inject callback 的 re-run——required service re-provide 时 Cordis 复用同一 fiber
+  // 重跑 callback（BUG-074 实测：WeakSet 在位、systemPrompt/tools 重挂仍会重装；`ctx.set` 换值
+  // 不触发重跑，那不是 re-provide）。真正的重跑保护是 fiber 生命周期，不是这个 Agent 键。
   const installed = new WeakSet<object>()
   ctx.on('agent/created', ({ agent }: { agent: AgentLike }) => {
     if (installed.has(agent)) return
@@ -140,7 +146,9 @@ export function registerDelegationContracts(ctx: Context, contentDir: string): v
     agent.ctx.inject(['systemPrompt', 'tools'], (scope) => {
       const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
       const caps = delegationCapabilitiesOf(preset)
-      const lead = isTeamLead(agent) && hasTool(scope, 'spawn_teammate')
+      // 座位判据叠加在引擎 Lead 之上：support preset 作为 root 仍被 vendor 当 Lead（团队工具也装着），
+      // 但产品侧不把 team 当它的可用通道——不列 header、不注入 team section（BUG-072）。
+      const lead = isTeamLead(agent) && hasTool(scope, 'spawn_teammate') && !isSupportPreset(preset)
       const available: Record<Channel, boolean> = {
         // spawn 用能力表（CEO 的命名行不是 `subagent`，无法靠单名探测）；表由 parity spec 钉 YAML。
         spawn: caps?.spawn === true,

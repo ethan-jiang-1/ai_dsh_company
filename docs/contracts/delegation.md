@@ -68,8 +68,8 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 
 ### 2.1 根门 = Team Lead（B1 机制事实）
 
-任何没有 `parentSession` 的根会话都是 Lead（`agentTeam` 投影 = 单成员 `lead`）⇒ **VP-Eng 根门可以
-`spawn_teammate` 带研发小队**（成员继承 VP-Eng 组合，是"VP-Eng 带的工程师"，不是别的角色）。
+任何没有 `parentSession` 的根会话都是 Lead（`agentTeam` 投影 = 单成员 `lead`）；这是引擎事实，产品侧再叠座位：**公司角色**根门可以
+`spawn_teammate` 带研发小队（成员继承 VP-Eng 组合，是"VP-Eng 带的工程师"）；support preset（worker/quality-loop）不是 team 座位——header 不列 team，`spawn_teammate` 由 host seat guard 拒绝（BUG-072）。
 三种门的能力不同，别用一个门承诺另一个：① VP-Eng 根门 = Lead，能组 team、能命名请 CMO；
 ② CEO 命名 `vp_eng` child = 不是 member，不能 spawn，但能请专家（depth 2）；③ CEO teammate `vp-eng`
 = 继承 CEO 组合，受 CEO 的 `vp_cmo maxDepth 1` 限制。root=Lead 的 keyless 证据 =

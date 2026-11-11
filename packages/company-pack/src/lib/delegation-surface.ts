@@ -16,3 +16,16 @@
 export const NON_ROLE_PRESETS = [
   'worker', 'worker-researcher', 'worker-orchestrator', 'quality-loop-producer', 'quality-loop-verifier',
 ] as const
+
+/**
+ * 这个 preset 是不是**非角色 support 座位**（worker family / 质量环能力档）。
+ *
+ * 用途是座位判据，不是安装判据：vendor `agent-team` 把任何没有 parentSession 的 root 都当 Lead，
+ * `tool-agent-team` 因此仍会安装团队工具；产品侧只有公司角色才把 team 当可用通道（BUG-072）。
+ * 未知 / 缺省 preset 返回 false——不替别的组合猜。
+ * @param preset - `composedPresetOf(agent)` 的结果。
+ * @returns 属于非角色 support 表则 true。
+ */
+export function isSupportPreset(preset: string | undefined): boolean {
+  return preset !== undefined && (NON_ROLE_PRESETS as readonly string[]).includes(preset)
+}

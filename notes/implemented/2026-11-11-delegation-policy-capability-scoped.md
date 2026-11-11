@@ -4,6 +4,10 @@
 上游 = [委派政策能力域化](../../_backlog/_archive/settled_issues/2026-11-11-delegation-policy-capability-scoped.md)
 
 > 现行语义（canonical）= 文末链接；本 Note 只留决定/理由/证据，不复制现行表。
+>
+> **2026-11-11 部分取代**：item 6 的 support-root team 段已由
+> [能力事实四载体 Note](./2026-11-11-capability-seat-single-source.md) 收口——support preset 不再作 team 座位
+> （header/section 不列），`spawn_teammate` 由 host seat guard 拒。其余决定仍现行。
 
 ## 决定
 
@@ -12,7 +16,7 @@
 3. **内容拆家**：新增 `content/contracts/delegation/{spawn,fork,workflow,team,retry}.md`；`delegation-policy` skill 缩成 core（默认自己做/brief/effort/链/结果/硬规则，1,454 code points）；`eng-teaming` 的 schema/截断/spill/重启等引擎事实移回 `company:workflow-contract`/section，只留五档判据/角色边界/交稿。
 4. **`workflow_runs` per-agent**：只在工具面有 `workflow` 的 Agent 注册（vp-eng root、vp-eng 命名 child、vp-eng teammate、workflow 分支）；CEO/COO/worker 不再看见。host 全局工具面从 4 件降为 3 件。
 5. **no-poll 写进 header**：派发 child 后不要 `bash sleep`/轮询文件，也不要用 `wait_agent` 等 spawn child（只等 team 成员）；没有别的活就结束本轮，完成通知会开新轮。
-6. **support root 的 team 段**：worker/quality-loop 作为 root 也是 Lead，会拿到 team section；section 明说“你在 Lead 座位不等于你的角色该组队，leaf/support 按 persona 保持 leaf”。support preset 是否该出现在 root 选择器是产品/UX 决定，另卡。
+6. **support root 的 team 段**：worker/quality-loop 作为 root 也是 Lead，会拿到 team section；section 明说“你在 Lead 座位不等于你的角色该组队，leaf/support 按 persona 保持 leaf”。support preset 是否该出现在 root 选择器是产品/UX 决定，另卡。（2026-11-11 收口：不再列 team/注入 team section，`spawn_teammate` 由 host guard 拒——见 [seat Note](./2026-11-11-capability-seat-single-source.md)）
 
 ## 输掉的方案
 
@@ -25,7 +29,7 @@
 
 ## 后果
 
-- CEO 的 header = spawn/team；COO = spawn/fork/team/retry；vp-eng = 五段全；worker root = team only；命名 child vp-eng = spawn/fork/workflow/retry（无 team）；teammate = spawn only（无 team，团队工具仍在但工具描述说只有 Lead 能执行）。
+- CEO 的 header = spawn/team；COO = spawn/fork/team/retry；vp-eng = 五段全；worker root = **无 delegation header/section**（2026-11-11 收口，BUG-072；原为 team only）；命名 child vp-eng = spawn/fork/workflow/retry（无 team）；teammate = spawn only（无 team，团队工具仍在但工具描述说只有 Lead 能执行）。
 - `workflow_runs` 的工具面从全局收成 vp-eng 系；`host-composition` 全局注册面按 3 件更新。
 - CMO 没有 workflow 段；≥3 同构任务用 4 个 `subagent` 并在派发后结束本轮（不再 `wait_agent`/post-dispatch 轮询），把 `bash` 轮询从 16 次降到派发前 8 次。
 - `eng-teaming` 从 4,737 降到 2,892 code points；引擎事实只剩一个家。

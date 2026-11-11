@@ -7,4 +7,3 @@
 - 寻址：成员按**名字** `send_message`；`wait_agent` 只在另一个必需**团队成员** running/provisioning 时用，醒来/超时后重新 `list_agents`。它**不**等 spawn child；普通 subagent 的终稿走完成通知。
 - `writeScopes` 是告警不是锁：一个文件一个写者；Lead 收口时看最终 diff。
 - 团队会话里全局 `send_message`/`list_agents` 是团队版，够不到非名册 subagent child；那些用 `list_subagents` / `send_to_subagent`。
-- 若你的 preset 是 leaf/support 能力档：这个 section 在场只因为你坐在 Lead 座位，不表示你的角色该组队；按 persona 保持 leaf。

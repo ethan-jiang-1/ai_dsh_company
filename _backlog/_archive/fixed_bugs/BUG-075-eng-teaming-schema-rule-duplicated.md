@@ -1,16 +1,19 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-11
 ---
 
 # BUG-075：`eng-teaming` 一边说 schema 引擎事实住 workflow contract，一边又复述“分支不传 schema”
 
-> 严重级别：P2（次要）｜发现：2026-11-11｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-11｜状态：已修
+>
+> **留痕**：Note [`notes/implemented/2026-11-11-capability-seat-single-source.md`](../../../notes/implemented/2026-11-11-capability-seat-single-source.md)
+> **审查**：agent — 表内 schema 句删除；presets spec + preset-smoke 绿；全 preset 扫描无同型残留
 
 ## 症状
 
-[eng-teaming](../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md) 的两个位置互相矛盾：
+[eng-teaming](../../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md) 的两个位置互相矛盾：
 
 - 第 16 行（2.5 档表）仍写：`**分支不传 schema**，只回一行 JSON，父脚本 JSON.parse`；
 - 第 38 行（workflow 使用）写：`schema/截断/spill/重启/终态等**引擎事实**住 company:workflow-contract section；本 skill 不复述`。
@@ -45,7 +48,13 @@ rg -n "schema|workflow-contract" packages/company-pack/presets/vp-eng/skills/eng
 - 验收：`eng-teaming` 不再出现 schema 子集/`分支不传 schema` 的事实句；`pnpm test tests/presets` 绿；
   `preset-smoke` 绿；VP-Eng workflow probe 仍 ALL PASS。
 
+## 已修判定
+
+- `eng-teaming` 五档表不再出现“分支不传 schema”（或任何 schema 子集事实句）；只留用法判据，引擎事实指向 `company:workflow-contract`。
+- 全 preset skill 扫描无同类引擎事实残留（`schema 子集` / `spill` / `maxResultChars` / `restart`）。
+- `pnpm test tests/presets` 绿；改 preset skill 后 `preset-smoke` 绿。
+
 ## 修复关联
 
-未修。发现于 [委派能力域化回归 + 探索卡](../_archive/settled_issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
+已修（2026-11-11）。发现于 [委派能力域化回归 + 探索卡](../settled_issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
 A4 静态债；Issue 2 Note 的「无规则丢失」检查漏了表格短句。

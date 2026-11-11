@@ -9,7 +9,7 @@
 
 1. **`maxDepth` 是这一行的绝对 child 深度上限，不是“child 不能再派”的链预算。** CEO 的命名行 1 只钉直接 child；child 再派看它自己 preset 的行（vp-eng 的通用 `subagent` 行 = 3）。CEO preset 注释与 `tests/presets/presets.spec.ts` 的文案改成这个口径；`delegation-composition.spec.ts` 加“CEO 行 1 + vp-eng 行 3 同时在场”的组合钉子。
 2. **team 上下文是可选参数，不是硬继承。** `CHANNELS.team.inheritsParentContext` 从 `true` 改为 `'optional'`，新增 `context: 'fresh | fork (default fresh)'`；docs 写“默认 fresh；要带 Lead 已完成轮才显式 fork；当前任务书不在 fork 种子里”。CEO 的 `chairing-staff-meeting` 同 diff 改口。
-3. **`teamLead` 改名为 `teamLeadWhenRoot`。** 它是 preset 级期望；运行时任何 root 都是 Lead（worker/support root 也拿到团队工具），注入侧必须用 `agentTeams.membership`/`parentSession` 判，不能只看这个字段。
+3. **`teamLead` 改名为 `teamLeadWhenRoot`。** 它是 preset 级期望；运行时任何 root 都是 Lead（worker/support root 也拿到团队工具），注入侧必须用 `agentTeams.membership`/`parentSession` 判，并叠加 support 座位（不列 team、guard 拒 spawn——见 [seat Note](./2026-11-11-capability-seat-single-source.md)），不能只看这个字段。
 4. **控制面标签分开。** `CHANNELS.*.control` 拆成 `nativeControl`（vendor 名字）与 `repoControl`（本仓 workaround：`list_subagents`/`send_to_subagent`/`workflow_runs`）；不再把 workaround 写成通道硬能力。
 5. **通道分类归原生四通道。** A/B/D 只作组织别名：A = spawn，B = team，D = workflow；C（dsh-sdk）标未启用；fork 补进能力矩阵。`docs/architecture.md`、`docs/reference/terminology.md`、`docs/contracts/delegation.md` 同 diff 更新。
 6. **加 vendor-parity 钉子。** `tests/harness/contract/delegation-channel-parity.spec.ts` 直接读 vendor 源码断言 provider 能力位/team context/workflow options，并断言模型字段与之一致；升级 pin 时措辞变了就红。

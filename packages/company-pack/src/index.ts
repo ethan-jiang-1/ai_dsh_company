@@ -34,6 +34,7 @@ import { registerCultivation, type CultivationHostConfig } from './host/cultivat
 import { registerHandbook } from './host/prompt/handbook.ts'
 import { registerWorkflowContract } from './host/prompt/contracts.ts'
 import { registerDelegationContracts } from './host/prompt/delegation-contracts.ts'
+import { registerTeamSeatGuard } from './host/delegation/team-seat-guard.ts'
 import { registerSubagentRetry } from './host/delegation/subagent-retry.ts'
 import { SUBAGENT_RETRY_SURFACE } from './lib/retry-policy.ts'
 import { registerDelegationTerminal } from './host/delegation/delegation-terminal.ts'
@@ -125,6 +126,8 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
     config.handbookSkipPresets === undefined ? {} : { skipPresets: config.handbookSkipPresets })
   registerWorkflowContract(ctx, contentDir, { workflowPresets: ['vp-eng'] })
   registerDelegationContracts(ctx, contentDir)
+  // BUG-072：support preset 作为 root 时 vendor 仍给 Lead 工具面；产品侧用 per-agent guard 拒组队。
+  registerTeamSeatGuard(ctx)
   // 注册面/深度只从 SUBAGENT_RETRY_SURFACE 读（= 各 preset 通用 subagent 行的 maxDepth；
   // 模型 retrySurface() 同源，parity spec 钉着）；这里不再写第二份 preset 列表（BUG-045/049）。
   registerSubagentRetry(ctx, { surface: SUBAGENT_RETRY_SURFACE })

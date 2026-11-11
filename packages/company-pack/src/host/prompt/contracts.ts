@@ -68,6 +68,7 @@ export function registerWorkflowContract(
     return
   }
   const fallback = new Set(options.workflowPresets ?? [])
+  // 只去重 `agent/created` 的重复投递；inject callback 的 re-provide 重跑由 fiber 负责（BUG-074）。
   const installed = new WeakSet<object>()
   ctx.on('agent/created', ({ agent }: { agent: AgentLike }) => {
     if (installed.has(agent)) return
