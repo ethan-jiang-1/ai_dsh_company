@@ -33,9 +33,9 @@ node ./node_modules/typescript/bin/tsc -b \
   vendor/dsh/packages/feedback/command-feedback \
   vendor/dsh/packages/goal/goal \
   vendor/dsh/packages/subagent/subagent
-# 全量打包（发布/本机；需要 vendor lock + 大内存；7GB GitHub runner 会 OOM，故不进 fresh-clone CI）：
-# (cd vendor/dsh && ../../node_modules/typescript/bin/tsc -b tsconfig.host.json)
-# (cd vendor/dsh && ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE host)
+# 全量构建（host/client/native/web/pack）唯一入口；首次或 vendor pin 变后跑：
+pnpm setup
+# 只补 pack 构建前置的 vendor 类型（fresh-clone CI 用）：pnpm setup --types
 # 原生插件（flock，会话持久化刚需；macOS 用 CommandLineTools 的 cc；Linux 需 musl-tools 的 musl-gcc）：
 (cd vendor/dsh/native/system && ../../node_modules/.bin/tsx scripts/build.ts)
 # web 观察窗（可选；三件事缺一不可）：

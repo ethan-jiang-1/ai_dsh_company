@@ -8,7 +8,8 @@ kind: "package-reference"
 > **给收件人（先读这个）**：本包是 `dsh-company-pack`（版本见 `package.json` / 手册表头）；DSH 窗口 =
 > `engines.dsh`（`>=0.2.1-rc.2 <0.3.0`）。前置按运行时来源：**Desktop 自带 Node/pnpm**；
 > **npm 全局 CLI / `dsh web` 的 Plugins 页**用 DSH 的 Node，pnpm 需在 PATH（或 `corepack enable pnpm`）。
-> 安装、sha256 校验、升级、备份、卸载、回退见同版本生成的《安装手册》（仓库 `_dist/安装手册.md`）。
+> 安装、sha256 校验、升级、备份、卸载、回退见同版本生成的《安装手册》：
+> <https://github.com/ethan-jiang-1/ai_dsh_company/blob/master/_dist/安装手册.md>（手动分发时与 tarball 同目录）。
 > 许可 = MIT（`LICENSE` 随包）。
 
 ## Install
@@ -18,7 +19,7 @@ tarball 的**绝对路径**。按提示重启正在使用的 profile，之后用
 就从哪个入口启动，不要换到别处。
 
 完整安装、装好的标志、第一次怎么用、升级、备份、卸载与回退见《安装手册》
-（仓库 `_dist/安装手册.md`；手动分发时与 tarball 同目录）。CLI 安装（仅 `dsh web` 自动化）见该手册附录 A。
+（<https://github.com/ethan-jiang-1/ai_dsh_company/blob/master/_dist/安装手册.md>；手动分发时与 tarball 同目录，两件套）。CLI 安装（仅 `dsh web` 自动化）见该手册附录 A。
 
 ## Verify
 

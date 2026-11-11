@@ -15,7 +15,7 @@
 //   pnpm release --check [--allow-dirty]
 //   pnpm release --all [--allow-dirty] [--with-key]
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
@@ -25,6 +25,8 @@ import { expectedTag } from '../checks/gates/lib/pin.mjs'
 const PACK = join(ROOT, 'packages/company-pack')
 const DIST = join(ROOT, '_dist')
 const MANIFEST = join(DIST, 'release-manifest.json')
+const VENDOR = join(ROOT, 'vendor/dsh')
+const VENDOR_CLI = join(VENDOR, 'apps/cli/lib/bin.js')
 const args = process.argv.slice(2)
 const has = flag => args.includes(flag)
 const valueOf = flag => {
@@ -70,6 +72,44 @@ function pack() {
 
 function sha256(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex')
+}
+
+// vendor 是 release-smoke 的运行时前置，但它的构建物是 gitignored（不在 clean clone 里）。
+// 只记录 pack 源指纹无法回答“这次 7 项 pass 用的是哪次 vendor build”——把 HEAD、CLI 哈希和
+// mtime 写进 manifest；--check 对不上即红。mtime 不是源码指纹，但能让“重建过/没重建”可见。
+function vendorInfo() {
+  const head = capture('git', ['-C', VENDOR, 'rev-parse', 'HEAD']).trim()
+  const dirty = capture('git', ['-C', VENDOR, 'status', '--porcelain']).trim() !== ''
+  if (!existsSync(VENDOR_CLI)) {
+    fail('缺 vendor CLI（vendor/dsh/apps/cli/lib/bin.js）；先跑 `pnpm setup`，否则 release-smoke 用的是旧/无产物')
+  }
+  return {
+    head,
+    dirty,
+    cli: {
+      file: 'apps/cli/lib/bin.js',
+      sha256: sha256(VENDOR_CLI),
+      mtime: statSync(VENDOR_CLI).mtime.toISOString(),
+    },
+  }
+}
+
+function assertVendor(manifest) {
+  const current = vendorInfo()
+  const recorded = manifest.vendor
+  if (recorded?.head === undefined || recorded?.cli?.sha256 === undefined) {
+    fail('manifest 缺 vendor build 指纹（vendor.head / vendor.cli.sha256）；重跑 --prepare 再 --verify')
+  }
+  if (recorded.head !== current.head) {
+    fail(`manifest vendor HEAD ${recorded.head} ≠ 当前 ${current.head}；vendor 变了，重跑 --prepare/--verify`)
+  }
+  if (recorded.dirty !== current.dirty) {
+    fail(`manifest vendor dirty=${String(recorded.dirty)} ≠ 当前 dirty=${String(current.dirty)}；先还原 vendor 工作树`)
+  }
+  if (recorded.cli.sha256 !== current.cli.sha256) {
+    fail(`manifest vendor CLI sha ${recorded.cli.sha256} ≠ 当前 ${current.cli.sha256}；重建过 vendor，重跑 --prepare/--verify`)
+  }
+  return current
 }
 
 // 发布物的源指纹：tarball 里的包内容（构建产物 lib/ 除外，由 --prepare 的 build 负责）。
@@ -182,6 +222,7 @@ function writeManifest(checks) {
     generatedAt: new Date().toISOString(),
     dirty: capture('git', ['status', '--porcelain']).trim() !== '',
     sourceFingerprint: sourceFingerprint(PACK),
+    vendor: vendorInfo(),
     artifact,
     checks,
   }
@@ -242,6 +283,7 @@ function stamp() {
   sourceCheck()
   const artifact = artifactCheck()
   const manifest = readManifest()
+  assertVendor(manifest)
   if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
   if (manifest.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；先重跑 --prepare')
   if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
@@ -259,6 +301,7 @@ function check(allowDirtyTree = allowDirty) {
   sourceCheck(allowDirtyTree)
   const artifact = artifactCheck()
   const manifest = readManifest()
+  assertVendor(manifest)
   if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
   if (manifest.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；先重跑 --prepare')
   if (manifest.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest gitSha 不是当前 HEAD（发布后被改过？重跑 --prepare/--verify）')

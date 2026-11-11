@@ -44,7 +44,7 @@ if (!existsSync(workspace)) {
 }
 const cli = join(root, 'vendor/dsh/apps/cli/lib/bin.js')
 if (!existsSync(cli)) {
-  console.error('company(dev): vendor CLI 未构建；先按 docs/guides/bootstrap 构建 vendor')
+  console.error('company(dev): vendor CLI 未构建；先跑 `pnpm setup`（入口 = tools/setup.mjs）')
   process.exit(2)
 }
 const packDir = join(root, 'packages/company-pack')

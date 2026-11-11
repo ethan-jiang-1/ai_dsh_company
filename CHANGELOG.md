@@ -2,6 +2,16 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.11.3 — 2026-11-11
+
+### Changed
+
+- 干净 clone 首跑新增 `pnpm setup`：vendor host/client/native/web 与 pack 构建一条命令；`pnpm company` 缺 vendor CLI 时直接指向它。
+- 包 README 的《安装手册》指针改为仓库绝对 URL；tarball 与手册仍是同目录两件套，避免从 registry 安装时相对路径不可达。
+- `release-manifest.json` 记录 vendor HEAD、CLI sha256 与 mtime；`release --check` 对不上即红。
+- fresh-clone 的 global DSH 通道钉回 rc.5，并在导出前补 vendor 类型面。
+- `link-debt` 基线从 32 降到 20（归档层实测已下降）。
+
 ## 0.11.2 — 2026-11-11
 
 ### Fixed

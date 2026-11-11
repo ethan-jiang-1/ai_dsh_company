@@ -7,6 +7,7 @@
     "node": "^22.19.0 || >=24.0.0"
   },
   "scripts": {
+    "setup": "node tools/setup.mjs",
     "dsh": "node --import tsx/esm vendor/dsh/apps/cli/src/bin.ts",
     "company": "node tools/company.mjs",
     "bundle:init": "node tools/bundle-init.mjs",

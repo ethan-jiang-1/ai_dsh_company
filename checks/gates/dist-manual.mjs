@@ -47,6 +47,19 @@ export function run({ root, ok, fail }) {
     if (!existsSync(sidecar)) problems.push('_dist 缺 tgz 的 .sha256 旁文件——重跑 `node tools/export-dist.mjs`')
     else if (!readFileSync(sidecar, 'utf8').trim().startsWith(digest)) problems.push('_dist 的 .sha256 旁文件与 tgz 本体不一致——重跑 `node tools/export-dist.mjs`')
   }
+  // 2026-11-11 接手 gap：pack README 随 tarball/npm 分发，指向仓库内相对 `_dist/安装手册.md`
+  // 在包外不可达；必须有绝对仓库 URL（tarball 与手册仍为两件套）。负例留证 2026-11-11：
+  // 把 README 的 URL 改回 `_dist/安装手册.md` → 本门禁红；还原 → 绿。
+  const packReadmePath = join(root, 'packages/company-pack/README.md')
+  if (!existsSync(packReadmePath)) {
+    problems.push('pack README 缺失——无法核对安装手册指针')
+  } else {
+    const packReadme = readFileSync(packReadmePath, 'utf8')
+    const manualUrl = 'https://github.com/ethan-jiang-1/ai_dsh_company/blob/master/_dist/安装手册.md'
+    if (!packReadme.includes(manualUrl)) {
+      problems.push('pack README 缺指向仓库绝对 URL 的《安装手册》指针（相对 `_dist/安装手册.md` 在包外不可达）')
+    }
+  }
   // 2026-11-03（第六轮 D4-3）：tracked 手册必须**就是当前模板的产物**。此前只查版本/sha/关键句，
   // 模板改了（例如卸载清单）而手册没重生成，verify 仍绿——本轮实测存在过一次。
   // 渲染输入从手册自身读回（版本/包名/sha/日期）+ pin，可脱离本地 manifest 复核（fresh clone 也成立）。
