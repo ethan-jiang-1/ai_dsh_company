@@ -13,9 +13,9 @@
 
 | 区 | 测什么 | 不证明什么 |
 |---|---|---|
-| [tests/host](./host/) | `src/host/` 的 keyless 逻辑与真文件集成；**目录镜像 src/host 的八组**（`run-bundle/ workspace/ cultivation/ ledger/ delegation/ commands/ prompt/` + 根 `index` 组合面） | Cordis 真装配、profile 挂载、会话级行为 |
+| [tests/host](./host/) | `src/host/` 的 keyless 逻辑与真文件集成；**目录镜像 src/host 的九组**（`run-bundle/ workspace/ cultivation/ ledger/ delegation/ commands/ prompt/ language/` + 根 `index` 组合面） | Cordis 真装配、profile 挂载、会话级行为 |
 | [tests/lib](./lib/) · [tests/content](./content/) | `src/lib/` 纯逻辑 + `content/` 形状与合同（模板头、产品类型包、交付模式包、编号合同、两轴 scenario） | Host 注册/装配、运行时注入行为 |
-| [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫；Lead/follow 适配器与 tab 注册目录（真实 Cordis `Context`/`SlotRegistry`）；多实例探活 disposer 契约；whole-client 档（真 `bootClient` × web profile bundle roster）覆盖 `apply` 组合与 fiber 卸载/重载。**目录镜像 `src/client` 的五组**（`wiring/ data/ ui/ tabs/ cultivation/`；根只留 whole-client 组合 spec） | 真浏览器渲染交互（→ client-load-smoke；真页面页签/错误环 → ui-scene-smoke） |
+| [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫；Lead/follow 适配器与 tab 注册目录（真实 Cordis `Context`/`SlotRegistry`）；多实例探活 disposer 契约；whole-client 档（真 `bootClient` × web profile bundle roster）覆盖 `apply` 组合与 fiber 卸载/重载。**目录镜像 `src/client` 的五组**（`wiring/ data/ ui/ tabs/ cultivation/`；根只留 whole-client 组合 spec）；另有 `i18n/` 快速回归（字典/页签壳/缺省 locale），不镜像源码组 | 真浏览器渲染交互（→ client-load-smoke；真页面页签/错误环 → ui-scene-smoke） |
 | [tests/presets](./presets/) | persona / skills 声明内容；两轴 coverage（product-type 五件齐 + playbook + fixture / delivery-mode 经营侧方法 + workflow 分派 + awareness） | 组合装配与工具行实际生效（→ preset-smoke + 会话日志证据） |
 | [tests/harness](./harness/) | 仓库结构与测试分层合同 + `tools/lib/` 纯逻辑判据（如 replay normalization/judges）。**目录按关切分六组**：`repo/`（仓库/发布/包形状等不变量）、`tools/`（tools/lib 纯逻辑）、`session/`（会话日志/诊断/探针驱动）、`evidence/`（协作与证据判据）、`contract/`（引擎合同/真值表）、`ui/`（金样与页签目录） | 运行时或 CLI 端到端行为 |
 | [tests/support](./support/) · [tests/fixtures](./fixtures/) | 共享夹具/合成输入与 provenance（不是 spec；`fixture-provenance` 门禁） | 产品行为或运行时行为 |

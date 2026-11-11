@@ -36,8 +36,8 @@ export function languageFromPreference(value: unknown): CompanyLanguage {
   if (typeof value !== 'string') return 'zh'
   const tag = value.trim().toLowerCase()
   if (tag === '') return 'zh'
+  // 只有 zh 变体走中文；en 与所有外部语言都落 en（DSH fallback）。
   if (tag === 'zh' || tag.startsWith('zh-')) return 'zh'
-  if (tag === 'en' || tag.startsWith('en-')) return 'en'
   return 'en'
 }
 

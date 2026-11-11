@@ -254,7 +254,7 @@ try {
 
   // 品牌（AppFrame 主标题，DSH_CLIENT_TITLE 构建期注入）
   verdict.brandPresent = await evaluate(
-    `document.body.innerText.includes('DSH 梦之队')`) === true;
+    `/DSH (梦之队|Dream Team)/.test(document.body.innerText)`) === true;
 
   /**
    * 开一个公司页签。`direct` 先试页签条（新会话的 dock 可能还停在上一页签）；

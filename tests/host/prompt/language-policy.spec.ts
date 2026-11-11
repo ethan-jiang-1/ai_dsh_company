@@ -50,10 +50,13 @@ describe('languagePolicyText', () => {
 })
 
 describe('registerLanguagePolicy', () => {
-  it('公司角色与 support preset 注入；standard 不注入', () => {
-    for (const preset of ['ceo', 'vp-eng', 'worker', 'quality-loop-verifier']) {
-      expect(sectionsFor(preset), preset).toHaveLength(1)
-    }
+  it('11 个公司 preset（6 角色 + 5 support）都注入；standard 不注入', () => {
+    const presets = [
+      'ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo',
+      'worker', 'worker-researcher', 'worker-orchestrator',
+      'quality-loop-producer', 'quality-loop-verifier',
+    ]
+    for (const preset of presets) expect(sectionsFor(preset), preset).toHaveLength(1)
     expect(sectionsFor('standard')).toHaveLength(0)
   })
 

@@ -9,6 +9,7 @@ import {
   setCompanyIdentity,
 } from '../../../packages/company-pack/src/client/data/company-identity.ts'
 import { DreamTeamBrandName } from '../../../packages/company-pack/src/client/ui/Brand.tsx'
+import { en, zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 import { listCompanyFixtureIds, loadCompanyFixture } from '../../support/company-fixture.ts'
 
 /**
@@ -20,11 +21,15 @@ import { listCompanyFixtureIds, loadCompanyFixture } from '../../support/company
  */
 const ids = listCompanyFixtureIds()
 
+const t = ((key: keyof typeof zh) => zh[key]) as CompanyT
+const tEn = ((key: keyof typeof en) => en[key]) as CompanyT
+
 beforeEach(() => { resetCompanyIdentity() })
 
 describe('Brand', () => {
-  it('无部署身份 ⇒ 出厂词标', () => {
-    expect(renderToStaticMarkup(createElement(DreamTeamBrandName))).toContain('DSH 梦之队')
+  it('无部署身份 ⇒ 出厂词标（zh/en 跟随 t）', () => {
+    expect(renderToStaticMarkup(createElement(DreamTeamBrandName, { t }))).toContain(zh['brand.name'])
+    expect(renderToStaticMarkup(createElement(DreamTeamBrandName, { t: tEn }))).toContain(en['brand.name'])
   })
 
   it('身份解析：缺 frontmatter / 缺 company ⇒ 不覆盖出厂词标', () => {
@@ -43,6 +48,6 @@ describe.each(ids)('品牌跟随部署身份：%s', (id) => {
     expect(parsed, 'fixture identity 解析失败').not.toBeNull()
     expect(parsed?.company).toBe(fixture.identity['company'])
     setCompanyIdentity(parsed!)
-    expect(renderToStaticMarkup(createElement(DreamTeamBrandName))).toContain(fixture.identity['productName'] as string)
+    expect(renderToStaticMarkup(createElement(DreamTeamBrandName, { t }))).toContain(fixture.identity['productName'] as string)
   })
 })

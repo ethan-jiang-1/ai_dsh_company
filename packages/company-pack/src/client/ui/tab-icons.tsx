@@ -215,7 +215,7 @@ const FACES = {
   cultivation: { tone: 'growth', glyph: SproutGlyph },
   ledger: { tone: 'archive', glyph: LedgerGlyph },
   catalog: { tone: 'archive', glyph: CatalogGlyph },
-} as const satisfies Record<string, TabFace>
+} as const satisfies Record<FaceKey, TabFace>
 
 /** 页签键（注册处按它取身份与三种渲染）。 */
 export type { FaceKey }

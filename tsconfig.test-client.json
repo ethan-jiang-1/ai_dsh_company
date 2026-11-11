@@ -50,9 +50,12 @@
     "tests/client/**/*.tsx",
     "tests/support/temp-env.ts"
   ],
+  // 这些 spec 直接引 vendor 源码（Cordis/SlotRegistry/LocaleRuntime），单面项目无法同时满足两半类型；
+  // 运行由 vitest 的 Vite transform 负责，类型面不在这里重复编译 vendor。
   "exclude": [
     "tests/client/tabs/company-tab-registration.spec.ts",
     "tests/client/company-client-composition.spec.ts",
-    "tests/client/ui/style-lifecycle.spec.ts"
+    "tests/client/ui/style-lifecycle.spec.ts",
+    "tests/client/i18n/default-locale-runtime.spec.ts"
   ]
 }

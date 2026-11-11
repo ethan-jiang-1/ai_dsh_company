@@ -15,7 +15,7 @@ const ZH_LABEL = /'tabs\.([a-z-]+)\.label':\s*'([^']+)'/g
  * @param {string} source `packages/company-pack/src/client/tabs/company-tab-registration.ts` 全文。
  * @param {string} identitySource `packages/company-pack/src/client/ui/tab-icons.tsx` 全文。
  * @param {string} copySource `packages/company-pack/src/client/locales.ts` 全文（取 zh label）。
- * @returns {ReadonlyArray<{ id: string, title: string }>} 按注册源顺序；任一 face 在身份源里找不到 label ⇒ []。
+ * @returns {ReadonlyArray<{ id: string, title: string }>} 按注册源顺序；face 不在身份源 / copySource 无 zh label ⇒ []。
  */
 export function parseCompanyTabCatalog(source, identitySource, copySource) {
   if (typeof identitySource !== 'string' || typeof copySource !== 'string') return []

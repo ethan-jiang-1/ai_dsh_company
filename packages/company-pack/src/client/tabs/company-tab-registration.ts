@@ -58,7 +58,7 @@ export interface CompanyTabRegistrationData {
 interface TabRegistration {
   readonly id: string
   readonly kind: string
-  /** 身份行的键（label/tooltip/tone/glyph 与三种渲染的唯一家 = tab-icons 的 TAB_IDENTITY）。 */
+  /** 身份行的键（tone/glyph/组件唯一家 = tab-icons 的 TAB_IDENTITY；label/tooltip/description 的 key 与值住 tab-copy.ts / locales.ts）。 */
   readonly face: FaceKey
   readonly order: number
   readonly registerBody: (scoped: CompanyTabContext, id: string, data: CompanyTabRegistrationData) => Dispose

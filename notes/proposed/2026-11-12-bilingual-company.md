@@ -26,7 +26,7 @@ opened: 2026-11-12
 **在范围内（Phase 0 + Phase A1–A4）：**
 
 - Phase 0：`.agents/skills/company-ui-change-definition/SKILL.md`；`packages/company-pack/src/README.md` 与 `tests/README.md` 的 UI 入口指针；RFC/问题卡记录。**不写** `docs/contracts/` 下的现时合同，也不加根 `AGENTS.md` 的合同/门禁指针——现有 501 条中文还没迁，写了就是假合同/dead pointer。
-- A1：`packages/company-pack/cordis.patch.yml` 的 `locale.config.preference: zh`；client 入口接 `locale`；`packages/company-pack/src/client/` 下新增 `locales.ts` / `i18n.ts`；`company` typed namespace；`ctx.locale.register` effect；copy-bearing slot 加 `locale: NS`；文档/测试证明缺省中文与切换。
+- A1：`packages/company-pack/cordis.patch.yml` 的 `locale.config.preference: zh`；client 入口接 `locale`；`packages/company-pack/src/client/` 下新增 `locales.ts` / `tab-copy.ts`；`company` typed namespace；`ctx.locale.register` effect；copy-bearing **组件**的 slot 加 `locale: NS`（label/title thunk 用 `ctx.locale.bind`）；文档/测试证明缺省中文与切换。
 - A2：client/lib 文案迁移与展示事实 token 化（`packages/company-pack/src` 的 client + lib）。
 - A3：host `CompanyLanguage`（`settings.describe()`、默认 zh、live update）；动态 `company:language` policy；6 个命令回执/错误、7 个工具 note、`blocked-text`、signoff 双语；command description 重注册；工具 description 英文。
 - A4：11 个 preset 的 description 双语一行；`docs/contracts/` 下新增 `language.md` 现时合同；`checks/gates/` 下新增 `client-copy.mjs` 硬门禁 + 红→绿证据；根 `AGENTS.md` 纪律行；README/pack README 语言说明；安装手册模板语言段 + 重生成。
@@ -51,7 +51,7 @@ opened: 2026-11-12
 ### 2. Client：typed 字典 + 展示事实/文案分离
 
 - `packages/company-pack/src/client/` 下新增 `locales.ts`：`NS = 'company'`；`zh` 为 key 源；`en: Record<CompanyKey, string>`；declaration merge 进 `LocaleNamespaceMap`。
-- 入口 `inject` 加 `locale`；`ctx.effect(() => ctx.locale.register(NS, { zh, en }))`；所有 copy-bearing slot 注册加 `locale: NS`；嵌套组件 `t` prop 传递。
+- 入口 `inject` 加 `locale`；`ctx.effect(() => ctx.locale.register(NS, { zh, en }))`；所有 copy-bearing **组件**的 slot 注册加 `locale: NS`；纯 label/title thunk（如 `conversation.view`）用 `ctx.locale.bind`；嵌套组件 `t` prop 传递。
 - `packages/company-pack/src/lib/` 新增无 client 依赖的 `CopyToken`/`CopyKey`；纯函数 view model 返回 token/enum，不返回中文：
   - `presence-status` 返回 status enum；`presence` 事件返回 token；
   - `board` 返回列 key / 未分配 token；`budget` 返回 label key；
@@ -101,7 +101,7 @@ opened: 2026-11-12
 - [ ] `node vendor/dsh/apps/cli/lib/bin.js --profile company --dump-config` 的合成树里 `locale` 行有 `config.preference: zh`。
 - [ ] 隔离 profile 首启 UI 为中文、`<html lang="zh-CN">`；英文 locale 浏览器首屏稳定后中文（若闪英文可见，先修）。
 - [ ] 已有 `preference: en` 的用户升级后仍英文；reset 回中文；第二浏览器共享同一 home 同一选择。
-- [ ] `company` namespace 注册成功；zh/en key 集与 `{placeholder}` 一致；en 无 CJK；`ctx.locale.register` 在 effect 里；所有 copy-bearing slot 注册带 `locale: NS`。
+- [ ] `company` namespace 注册成功；zh/en key 集与 `{placeholder}` 一致；en 无 CJK；`ctx.locale.register` 在 effect 里；所有 copy-bearing **组件**的 slot 注册带 `locale: NS`；label/title thunk 用 `ctx.locale.bind`。
 - [ ] 红→绿：新增一个空 `en` 字典/少 key → typecheck 或 i18n spec 红；补 key → 绿。
 
 ### A2 验收（client/lib 文案迁移）
@@ -152,11 +152,14 @@ opened: 2026-11-12
 
 - 2026-11-12：RFC 立项；Phase 0 完成；A1 完成；A3a 完成；A2 第一片（页签壳）完成；A2 其余/A3b/A4 未开始。
 - Phase 0：`.agents/skills/company-ui-change-definition/SKILL.md` + `packages/company-pack/src/README.md` / `tests/README.md` 指针；`pnpm verify` ALL PASS。
-- A1：`cordis.patch.yml` 的 `locale.config.preference: zh`；client `inject` 加 `locale`；`packages/company-pack/src/client/locales.ts`（`company` typed 字典）与 `ctx.locale.register`；`conversation.view` label 走 `t`；新增 key/placeholder/缺省 locale spec；whole-client composition 证 locale 服务 + zh/en 切换。
-- A3a：`packages/company-pack/src/host/language/company-language.ts`（`settings.describe()` 读 `locale.preference`、默认 zh、live update、外部语言→en）；`packages/company-pack/src/host/prompt/language-policy.ts`（6 角色 + 5 support 的动态 `company:language` section，默认 zh，用户明确换语言时跟随）；`src/index.ts` 接线；新增 bridge/policy spec。
+- A1：`cordis.patch.yml` 的 `locale.config.preference: zh`；client `inject` 加 `locale`；`packages/company-pack/src/client/locales.ts`（`company` typed 字典）与 `ctx.locale.register`；`conversation.view` label 走 `t`；新增 key/placeholder 与 harness/repo 缺省 patch 结构 spec；`default-locale-runtime.spec.ts` 证 Host preference zh 覆盖英文浏览器 provisional；whole-client composition 证 locale 服务 + 字典切换（UI 组件由 tab/brand spec 覆盖）。
+- A3a：`packages/company-pack/src/host/language/company-language.ts`（`settings.describe()` 读 `locale.preference`、默认 zh、live update、外部语言→en）；`packages/company-pack/src/host/prompt/language-policy.ts`（11 个公司 preset 的动态 `company:language` section，默认 zh，用户明确换语言时跟随）；`src/index.ts` 接线；新增 bridge/policy spec + `apply-lifecycle` 的 wiring spec。真红：临时注释 `registerLanguagePolicy(ctx, language)` → wiring spec 红；还原 → 绿。
 - 证据：`pnpm test` **203 files / 1616 tests passed**；`pnpm typecheck` 0；`pnpm lint` 0；`pnpm dup` 0；`pnpm verify` **ALL PASS**；`--dump-config --patch packages/company-pack/cordis.patch.yml` 的 `locale` 行显示 `config.preference: zh`。
 - 真页面：`ui-scene-smoke --isolated --golden` **ALL PASS**（9 个公司页签 + 浏览器错误环零命中；默认 zh 与现有金样一致）。为让隔离场景在中文界面下可跑，`probes/browser-visual/cdp-probe.mjs` 的模态/Start-chip 匹配补了中文 `预览版说明` / `开始使用` / `开始`（probe-only，非产品行为）。
 - A2 第一片（页签壳）：9 个页签的 label/tooltip/guide description 住 `company` 字典；`TabTitle` / `GuideEntry` 的 title/guide 槽带 `locale: company`；`company-tab-catalog` 解析器改从 `locales.ts` 的 zh 取 label；新增 `tests/client/i18n/tab-copy.spec.ts` 对 9 个 face 断言 zh/en copy + 真实 `Title`/`GuideEntry` 组件静态渲染，`company-tab-registration.spec.ts` 断言槽 `locale === 'company'` 且注册处 title/guide thunks 随 locale 实时切换。`packages/company-pack/locale/README.md` 写清包元数据与运行时 UI 字典的分工。
 - 真红证据：注册处曾把 `copy` 捕获在注册时；新增切换测试在旧实现下红 = `expected '待办' to be 'Inbox'`；改成 thunk 内 `copyOf(face)` 后绿。
-- 最终证据：`pnpm test` **204 files / 1620 tests passed**；`pnpm typecheck` 0；`pnpm lint` 0；`pnpm dup` 0；`pnpm verify` **ALL PASS**；`ui-scene-smoke --isolated --golden` ALL PASS。
+- A1 补充：品牌 fallback 接 `brand.name` 字典（`FALLBACK_IDENTITY.productName = ''`，语言决定出厂词标）；`brand.spec.ts` 断言 zh/en；smoke 的品牌检查接受两种词标。新增 `default-locale-runtime.spec.ts`：英文浏览器 provisional=en + Host preference=zh → zh；无 preference → 保持 en。
+- 最终证据：`pnpm test` **205 files / 1617 tests passed**；`pnpm typecheck` 0；`pnpm lint` 0；`pnpm dup` 0；`pnpm verify` **ALL PASS**；`ui-scene-smoke --isolated --golden` ALL PASS。
 - 未做：A2（client/lib 全量文案迁移与 token 化）、A3b（host 回执/工具 note/命令 description）、A4（`docs/contracts/` 合同 + `checks/gates/` 的 client-copy 硬门禁 + preset 描述 + 文档/金样全量收口）。UI 在 English 下仍有中文，这是已知未完成项，不在本切片宣称已交付。
+- **未验证（本切片不宣称）**：英文 locale 浏览器首启稳定后中文、`<html lang="zh-CN">`、已有 `preference: en` 升级、reset、第二浏览器——**未执行**；English 真页面——**未跑**（页签壳只有 keyless 组件/注册 spec，zh 金样已跑）；真模型 prompt 里的 `company:language`——**未跑**（keyless + apply 接线）；`client-load-smoke` / `preset-smoke` / `release-smoke`——**未执行**。
+- 真合成证据：`node vendor/dsh/apps/cli/lib/bin.js --profile company --patch packages/company-pack/cordis.patch.yml --dump-config` 输出 `- id: locale` / `config: preference: zh`；`tests/harness/repo/default-locale.spec.ts` 只是结构守卫，不替代这条命令。

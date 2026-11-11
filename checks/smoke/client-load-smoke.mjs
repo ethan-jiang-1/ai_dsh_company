@@ -34,7 +34,7 @@ const arg = (name, fallback) => {
 }
 const PORT = Number(arg('port', '0'))
 const PROFILE = arg('profile', 'company')
-const BRAND = 'DSH 梦之队'
+const BRAND = /DSH (梦之队|Dream Team)/
 
 let home
 try {
@@ -72,10 +72,10 @@ try {
     else console.log('  PASS console 零 loader 错误')
 
     try {
-      await page.locator(`text=${BRAND}`).first().waitFor({ timeout: 30_000 })
-      console.log(`  PASS 品牌槽在场（${BRAND}）`)
+      await page.locator('text=/DSH (梦之队|Dream Team)/').first().waitFor({ timeout: 30_000 })
+      console.log(`  PASS 品牌槽在场（${String(BRAND)}）`)
     } catch {
-      fail('品牌槽在场', `${BRAND} 未渲染——app 未完成渲染，或本包 client 入口未成功 apply（fiber PENDING？）`)
+      fail('品牌槽在场', `${String(BRAND)} 未渲染——app 未完成渲染，或本包 client 入口未成功 apply（fiber PENDING？）`)
     }
   } finally {
     if (failures > 0 && page !== undefined) {

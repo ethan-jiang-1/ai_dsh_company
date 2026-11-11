@@ -5,21 +5,24 @@
  */
 import { describe, expect, it, vi } from 'vitest'
 import {
-  bindSettings, createCompanyLanguageState, languageFromPreference,
+  bindSettings, createCompanyLanguage, createCompanyLanguageState, languageFromPreference,
 } from '../../../packages/company-pack/src/host/language/company-language.ts'
 
 describe('languageFromPreference', () => {
-  it.each([
-    [undefined, 'zh'],
-    ['', 'zh'],
-    ['zh', 'zh'],
-    ['zh-CN', 'zh'],
-    ['en', 'en'],
-    ['en-US', 'en'],
-    ['ja', 'en'],
-    ['pt-BR', 'en'],
-  ] as const)('%s → %s', (value, expected) => {
-    expect(languageFromPreference(value)).toBe(expected)
+  it('把 zh/en 变体归到对应语言，外部语言回落 en，缺失回落 zh', () => {
+    const cases = [
+      [undefined, 'zh'],
+      ['', 'zh'],
+      ['zh', 'zh'],
+      ['zh-CN', 'zh'],
+      ['en', 'en'],
+      ['en-US', 'en'],
+      ['ja', 'en'],
+      ['pt-BR', 'en'],
+    ] as const
+    for (const [value, expected] of cases) {
+      expect(languageFromPreference(value), String(value)).toBe(expected)
+    }
   })
 })
 
@@ -75,6 +78,11 @@ describe('bindSettings', () => {
     expect(state.current()).toBe('zh')
     expect(listener).toHaveBeenCalledTimes(2)
     updates.get('settings/document-updated')?.('other')
+    expect(state.current()).toBe('zh')
+  })
+
+  it('没有 ctx.inject 的最小 host 替身也返回 zh 状态（不因测试/极简组合抛错）', () => {
+    const state = createCompanyLanguage({} as never)
     expect(state.current()).toBe('zh')
   })
 

@@ -7,7 +7,7 @@
   声明依赖、`apply(ctx)` 编排签字工具（`request_signoff`）、工作区门投影工具（`workspace_doors`）、培养工具/命令
   （接线在 `host/cultivation/cultivation.ts`）、公司盘首启自举（接线在 `host/run-bundle/bootstrap.ts`）与成品目录生成/present 投影
   （接线在 `host/ledger/catalog.ts`）；公开面只导出 loader 需要的 `apply`/`inject`（0.8.0 收窄，读模型走内部 import）。消费方向 = vendor runtime → 本入口。
-- `host/` —— **host-only 逻辑**（用 node 内建，浏览器面不许进），按关切分 **8 组**（2026-11-09；每组 = 一个目录，
+- `host/` —— **host-only 逻辑**（用 node 内建，浏览器面不许进），按关切分 **9 组**（2026-11-09；每组 = 一个目录，
   文件清单 = 目录本身，组地图 = [host/README](./host/README.md)）：`run-bundle/`（首启播种、bundle 身份、租约、
   运行前提）、`workspace/`（解析/登记/门）、`cultivation/`（提案与存储）、`ledger/`（presented 账本、成品目录、
   治理导出）、`delegation/`（child 控制、turn 终态、重试、workflow run 视图）、`commands/`（四个 `/命令` +
@@ -21,7 +21,7 @@
   host/client 各消费哪些**以各文件 import 为准**（host 面偏 signoff/doors，client 面占大多数）。
   （`client/cultivation/` 下另有 `cultivation-actions`＝人侧动作面纯模块：命令线构造 + host 结果折算 + 文案表；
   `CultivationCompose.tsx`＝创作面表单——2026-10-17 培养 GUI 卡）
-- `client/` —— **client 注册入口与浏览器面**，顶层只留 `index.ts`（`dsh.client` 注入面及组合），其余按关切分五组
+- `client/` —— **client 注册入口与浏览器面**，顶层只留 `index.ts`（`dsh.client` 注入面及组合）与 `locales.ts`（typed `company` 字典），其余按关切分五组
   （2026-11-03 第六轮；每组 = 一个目录，读目录名即知职责）：
   - `wiring/` —— 组合与接线：`context-wiring`（槽上下文）、`company-session-adapters`（Lead 归并 + follow 帧投影）、
     `attention-registry` / `attention-observers`、`member-navigation`、`title-state`、`instance-guard`、`error-ring`、
@@ -31,7 +31,7 @@
   - `ui/` —— 共用视觉件：`styles`（CSS 唯一源）、`Brand`、`RoleBadge`、`tab-icons`、`float-geometry`（浮窗几何）、
     `DelegationCard` / `TeamToolCard`（工具卡）。
   - `tabs/` —— 页签面：`company-tabs`（框架/浮出）、`company-panels`（看板/依赖图/在场/用量）、`company-tab-registration`
-    （固定页签目录 → 类型/body/title/guide 四处贡献）、四个页签体 + `TasksPanel`。
+    （固定页签目录 → 类型/body/title/guide 四处贡献）、`tab-copy`（页签三处文案的 key 表与纯取用）、四个页签体 + `TasksPanel`。
   - `cultivation/` —— 培养域：`CultivationView` / `CultivationTab` 壳、看板/收件箱/创作/背景选择器、`cultivation-actions|data|context-data`、
     `use-cultivation-board`。
   Cordis 各槽仍各自等待声明并负责卸载/重装；构建走 tsdown client 半（产物 `lib/client.js`）。

@@ -1,9 +1,9 @@
 /**
- * 缺省中文的 bundle 层守卫（Phase A1）。
+ * 缺省中文的 bundle 层结构守卫（Phase A1，repo 结构面）。
  *
- * 为什么：默认语言不是代码里的 fallback，而是组合层的 `locale.config.preference`。
- * 这里钉住「web-app 真有 locale 行（替换不是拼错）」+「本包确实把它写成 zh」；
- * 真合成结果另由 `--dump-config` 命令验收。
+ * 为什么住 harness/repo：它断言的是组合文件形状，不是运行时 UI 行为；按测试四区
+ * 该归结构面。真合成结果由 RFC 记录的 `--dump-config` 命令验收；这里只防
+ * 「web-app 没有 locale 行（替换拼错）」+「本包没写 zh」。
  */
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'

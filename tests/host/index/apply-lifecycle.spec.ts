@@ -65,6 +65,35 @@ describe('Host apply 生命周期：迟到 inject 与卸载后事件（R4-05）'
     await ctx.fiber.dispose()
   })
 
+  it('apply 注册的 company:language policy 在 agent/created 时真的注入', async () => {
+    const { ctx } = mount()
+    const scoped = await start(ctx)
+    const sections: Array<{ name: string; text: () => string }> = []
+    const presets = { composedPreset: () => 'ceo' }
+    const agent = {
+      ctx: {
+        get: (name: string) => name === 'agentPresets' ? presets : undefined,
+        inject: (_deps: readonly string[], callback: (scope: unknown) => void) => {
+          callback({
+            get: (name: string) => name === 'agentPresets' ? presets : undefined,
+            systemPrompt: {
+              getSectionOrder: () => 0,
+              section: (section: { name: string; text: () => string }) => {
+                sections.push(section)
+                return () => {}
+              },
+            },
+          })
+          return { dispose: async () => {} }
+        },
+      },
+    }
+    scoped.emit('agent/created', { agent })
+    expect(sections.some(section => section.name === 'company:language')).toBe(true)
+    expect(sections.find(section => section.name === 'company:language')?.text()).toContain('公司工作语言')
+    await ctx.fiber.dispose()
+  })
+
   it('dispose 后 api-session/added 不再触发告警（事件监听已摘）', async () => {
     const { ctx, warns, toolRegistrations } = mount()
     const scoped = await start(ctx)

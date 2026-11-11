@@ -235,7 +235,7 @@ function registerToolCards(ctx: ClientContext): void {
 function registerSidebarIdentity(ctx: ClientContext): void {
   ctx.inject(['sessions', 'remote.workspaceFiles', 'sidebarRight', 'slots'], (scoped) => {
     scoped.slots.inject('sidebar.brand.name', () =>
-      scoped.slots.register({ name: 'sidebar.brand.name' }, DreamTeamBrandName))
+      scoped.slots.register({ name: 'sidebar.brand.name', locale: COMPANY_NS }, DreamTeamBrandName))
 
     // 角色身份 UX · B 段：侧栏会话行首的角色徽标（官方 ambient 行装饰位，仅 idle 行渲染）。
     // root 作用域只给 sessionId（槽合同原话"nothing else"）⇒ 数据经 inject 面注入

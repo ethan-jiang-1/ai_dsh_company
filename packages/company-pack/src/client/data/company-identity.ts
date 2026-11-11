@@ -14,7 +14,8 @@ export interface CompanyIdentity {
 
 export const FALLBACK_IDENTITY: CompanyIdentity = {
   company: '',
-  productName: 'DSH 梦之队',
+  // 出厂词标由 `company` 字典按语言给（Brand 的 `t('brand.name')`），这里留空避免把中文写死。
+  productName: '',
   productType: '',
   timeZone: '',
 }
@@ -61,7 +62,7 @@ export function parseCompanyIdentity(text: string | null): CompanyIdentity | nul
   if (company === '') return null
   return {
     company,
-    productName: fields.productName ?? FALLBACK_IDENTITY.productName,
+    productName: fields.productName ?? '',
     productType: fields.productType ?? '',
     timeZone: fields.timeZone ?? '',
   }
