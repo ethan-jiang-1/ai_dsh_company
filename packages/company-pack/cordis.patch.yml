@@ -37,7 +37,7 @@
 #   只新增行、不触碰既有行，两条安装路径都绿——官方 @deepseek-ai/dsh-experimental-session-search
 #   就是这个形状（`isolate: { sessionQuery: true }` + 组内 provider + 组内工具）。
 # 代价（显式，别当没发生）：隔离组只服务组内消费者，所以 DSH 侧栏的 `session/search` 保持出厂行为
-#   （base 行仍是 `openAt: never`，有会话时搜索会报禁用），durable 索引只给五个角色的 `session_search` 工具用；
+#   （base 行仍是 `openAt: never`，有会话时搜索会报禁用），durable 索引只给六个公司角色的 `session_search` 工具用；
 #   索引仍按 profile 落 `<DSH_HOME>/cache/company/`，仍单进程 owner、不跨 profile 共享。
 # 工具行必须在组内：组外消费者看的是 root 的 host provider（未打开）。
 - insert:
@@ -60,7 +60,7 @@
     # 0.2.1 起实验性 schedule bundle 退役：宿主级 `schedule` 服务由
     # web-app 组合直接挂，`ui-schedule` 任务页随 web-app 一起出，而 `time-context` 与
     # `tool-schedule` 变成 **preset 行所有权**（上游升档指南 schedule-bundle-retired）。
-    # ⇒ 本包不再在这里替换/插入任何 schedule 行：五个角色 preset 各自声明一个 `preset-clock`
+    # ⇒ 本包不再在这里替换/插入任何 schedule 行：六个公司角色 preset 各自声明一个 `preset-clock`
     # 组（time-context 钉 Asia/Shanghai + tool-schedule），理由与「行必须随 preset 声明」同源
     # （R1 实证：bundle 工具到不了会话）。此处保持空 = 组合层只说"我不再拥有它"。
     # ── 交付物声明工具（base 无此行）──

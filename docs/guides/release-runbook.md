@@ -29,10 +29,10 @@ pnpm release --verify --with-key
 # ⑤ 提交发布字节，再在干净树上做最终核对
 git add -A && git commit -m "chore(release): <version>"
 pnpm release --stamp              # 把 manifest 的 gitSha 钉到发布 commit，不改产物
-pnpm release --check
+pnpm release --check --allow-pre-publish-index   # pre-publish；publish 后删 staged 再用默认 --check
 ```
 
-`--prepare` / `--verify` 会改 tracked 的 `_dist/安装手册.md`，所以它们允许发布产物造成的脏树；`--check` 默认要求干净树。`--verify` 装 `_dist` 同一份 tarball，并用 `sourceFingerprint` 拒绝“源变但产物没重打”；`--all` = prepare + verify，不 commit/push/publish。
+`--prepare` / `--verify` 会改 tracked 的 `_dist/安装手册.md`，所以它们允许发布产物造成的脏树；`--check` 默认要求干净树。`--verify` 装 `_dist` 同一份 tarball，并用 `sourceFingerprint` 拒绝“源变但产物没重打”；`--all` = prepare + verify，不 commit/push/publish。pre-publish 阶段（仓库根有 `market-index.staged.json`）默认 `--check` 会拒绝 READY；这是发布哨兵，不是失败。用 `--allow-pre-publish-index` 预检，发布成功后删 staged 再跑默认 `--check`。
 READY 是点态（只对 `--stamp` 的 commit 成立，之后提交再红是设计）；语义与证据要求 = [release.md §版本纪律](../contracts/release.md)。
 
 ## 2. 产物与证据

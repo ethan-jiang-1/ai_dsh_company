@@ -21,7 +21,7 @@
 
 ```sh
 git submodule update --init             # vendor/dsh 钉 tag
-corepack enable pnpm                    # 一次性：pnpm 读根 packageManager（钉 11.7.0）
+corepack enable pnpm                    # 一次性：pnpm 读根 packageManager（钉 11.28.5）
 pnpm install                            # 根 workspace（vendor/dsh 全树含 vendored cordis 与 native/system）
 (cd vendor/dsh && pnpm install --frozen-lockfile --ignore-scripts)  # vendor 自己的 lock：pi-ai 1.1.0 / vite 8.2.2 等；根 lock 会解析到更新版 → 类型漂移
 pnpm bundle:init                        # dev 公司状态 的 workspace（company-workspace/ 整树 gitignored；只建 .dsh-company/——公司事实/章程按 seed.json 补缺，手册/模板不复制）
@@ -81,7 +81,7 @@ node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名�
 
 - **pnpm 入口**：`/usr/local` 老 corepack shim 执行新 pnpm 会 VM 崩
   （ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING）——`corepack enable pnpm` 换 nvm 自带
-  corepack 的 shim；根 `packageManager: pnpm@11.7.0` 与 vendor 逐字一致。
+  corepack 的 shim；根 `packageManager: pnpm@11.28.5` 与 vendor 逐字一致（`package-manager-parity` 门禁）。
 - **编译器**：macOS 走 CommandLineTools（本机 xcode-select 已切换）。无垫片直连 CLT cc
   报 `errno.h not found` 时，`export SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk`
   兜底；不需要完整 Xcode。

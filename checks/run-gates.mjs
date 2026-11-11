@@ -57,6 +57,7 @@ import * as presets from './gates/presets.mjs'
 import * as presetRequiredConfig from './gates/preset-required-config.mjs'
 import * as claudeSymlink from './gates/claude-symlink.mjs'
 import * as vendorPin from './gates/vendor-pin.mjs'
+import * as packageManagerParity from './gates/package-manager-parity.mjs'
 import * as packShape from './gates/pack-shape.mjs'
 import * as releaseReady from './gates/release-ready.mjs'
 import * as distFreshness from './gates/dist-freshness.mjs'
@@ -143,6 +144,7 @@ presets.run(ctx)
 presetRequiredConfig.run(ctx)
 claudeSymlink.run(ctx)
 vendorPin.run(ctx)
+packageManagerParity.run(ctx)
 packShape.run(ctx)
 releaseReady.run(ctx)
 distFreshness.run(ctx)

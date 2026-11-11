@@ -3,6 +3,7 @@
 状态：implemented（用户 2026-11-11 直接授权：静默自主补齐审计 Y1–Y7）
 上游 = [handoff-gap-closure](2026-11-11-handoff-gap-closure.md)（clean clone 首跑、手册指针、发布证据）；
 本文补其「未验」中的 clean clone，并把 2026-11-11 只读审计新发现的 Y1–Y7 收口。
+后续（2026-11-11）：第三轮 [handoff-gap-closure-round3](2026-11-11-handoff-gap-closure-round3.md) 收口 pnpm 同钉、首跑顺序、pre-publish READY 与角色计数。
 
 ## 决定
 
