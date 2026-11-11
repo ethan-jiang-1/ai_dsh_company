@@ -109,7 +109,7 @@
 - **验证**：Web 会话选 `cfo` → 三探针（身份=视角与 veto 边界；知识=毛利底线与 SoD 纪律；
   产出=对一页报价出经济性意见，不越权）。
 
-## 职责边界与路由（唯一事实家 = 公司手册 `AGENTS.md`/碰名 `COMPANY.md`）
+## 职责边界与路由（唯一事实家 = 公司手册 T0 `content/AGENTS.md` + `generic/`）
 
 六角色的"管什么 / 签字线或 veto / 不碰什么"、**问题 → owner 路由表**、冲突升级规则与承诺权，
 写在**公司手册**里——T0 `content/AGENTS.md` 由 host 注册 `systemPrompt.section` 随成员会话注入；

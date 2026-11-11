@@ -98,8 +98,8 @@ node checks/smoke/delegation-smoke.mjs      # 汇报线边界守卫：控制名�
   ③ pack 装进 **company profile**（`pnpm company` 默认 pack + `plugin add file:`；`--link` 走符号
   链接快速通道。profile `.npmrc` 把 store/cache 钉在 repo 内，`~/Library` 不被碰。
   历史：file: 拷贝时代首次装会拦 koffi 构建审批 → profile 的 `pnpm-workspace.yaml` 改
-  `koffi: true` 再装；link: 下 profile 不再装 koffi，koffi 由源码域解析）。观察窗默认端口 3080，**与本 GUI 冲突**，用
-  `-- --port 0`（端口是环境状态，系统分配后从启动横幅读）。preset roster 出现在 UI 的 Built-in 组（6 公司角色 + 5 support preset；trust 分组见上文 R1 坑注）。
+  `koffi: true` 再装；link: 下 profile 不再装 koffi，koffi 由源码域解析）。观察窗默认端口由 wrapper 交系统分配（`--port 0`）；3080 是本 GUI，**永不动**，要固定端口用
+  `-- --port <n>`（端口是环境状态，从启动横幅读）。preset roster 出现在 UI 的 Built-in 组（6 公司角色 + 5 support preset；trust 分组见上文 R1 坑注）。
 - **bundle 叠加的重复行 id**（R1 实证）：web-app 已 insert `agent-presets`，pack 再 insert 同 id
   → `duplicate loader entry id` 硬拒。修法：对已存在的行用**替换**语法（`- id:`），只有真正
   新增的行才 insert。
