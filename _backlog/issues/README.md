@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-- [2026-11-11 委派能力域化后的回归 + 探索性验证](2026-11-11-delegation-capability-scoping-regression-exploration.md) — Task / 推敲中 / 毕业：未定：A 批 keyless 回归（11 preset × 4 入口、冷恢复、release、token）+ B 批 live 探索（CMO/COO no-poll、VP-Eng workflow、team authority）；live 待授权。
+- [2026-11-11 委派能力域化后的回归 + 探索性验证](2026-11-11-delegation-capability-scoping-regression-exploration.md) — Task / 待落地 / 毕业：做：A 批 keyless 回归（11 preset × 4 入口、冷恢复、release、token）+ B 批 live 探索（CMO/COO no-poll、VP-Eng workflow、team authority）；live 待授权。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
 

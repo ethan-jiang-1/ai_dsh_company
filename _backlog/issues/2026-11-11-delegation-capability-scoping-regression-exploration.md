@@ -1,13 +1,13 @@
 ---
-status: 推敲中
+status: 待落地
 opened: 2026-11-11
 ---
 
 # 推敲：委派能力域化后的回归 + 探索性验证（最近两次改动）
 
-> 立卡：2026-11-11 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：未定 ｜ 可关闭：否
+> 立卡：2026-11-11 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
 >
-> **结论（建议）**：做 — 先 keyless/静态回归，再按用户授权跑 live 探索；本卡不是真模型授权，也不改代码。
+> **结论/去向**：implementation — 本卡执行（测试/探索）；发现缺陷另开 `_backlog/bugs/` 卡，本卡不改产品代码。
 
 **问题与期望结果：** 最近两次改动（`9b8b30f4` 委派合同能力域化 + `6a1bc54f` 研究题归档）之后，旧的探索证据只覆盖改前的委派面。本轮要回答两个问题：① **regression 有吗**——`workflow_runs` 收成 per-agent、policy header/section 注入、`teamLeadWhenRoot`/`CHANNELS.control` 改名、core skill/`eng-teaming` 缩编、host 全局工具面 4→3，是否把旧行为改坏？② **新东西靠谱吗**——模型是否真的按 capability header 选通道、是否不再误调不存在的 workflow/retry、CMO/COO 的 no-poll 是否稳定、support root 拿到 team section 会不会越权组队、workflow 分支/teammate/冷恢复是否都拿到正确的 section/tool？目标不是“跑绿一张矩阵”，而是保留独立 oracle、来源坐标、可复判证据与停止边界；找真缺陷就开 `_backlog/bugs/` 卡，不把“没找到”写成“没有 bug”。
 
@@ -97,6 +97,37 @@ opened: 2026-11-11
 
 **停止/处置**：真缺陷 → `_backlog/bugs/` 卡（含红绿/复现），继续下一 charter；静态漂移/文案矛盾 → 观察并指明 owner；不改代码；不把单场结论写成“稳定”。
 
+## Round 1（2026-11-11）结果
+
+**已跑绿**
+
+- A1：`pnpm verify` / `pnpm test`（196 files/1571 tests）/ `typecheck` / `lint` / `dup` / `preset-smoke` 6+5 / `delegation-smoke --delegate`（child 75 tools，Team 工具不在场）/ `release-smoke`（tarball 真安装 + 11 preset 挂载）/ `product-team-e2e-smoke` / `vp-eng-workflow-probe` 全绿。
+- A2：CEO/COO/vp-eng/worker root；VP-Sales/CFO/CMO/quality-loop-producer/quality-loop-verifier/worker-orchestrator root；vp-eng teammate；workflow 分支；CEO→vp-eng 命名 child；cold resume（vp-eng/CEO/COO）——header/section/`workflow_runs` 与期望表一致，**除 BUG-071/072 的文案/权限面**。
+- A5：model-visible `systemText` bytes（旧→新）：CEO 15.7k→18.6k、COO 13.7k→18.0k、vp-eng 18.1k→23.4k、worker 6.8k→8.7k；vp-eng +5.2KB（含中文，不等于 code points）。成本观察，未见 pruner/compaction 异常。
+- B1：CMO 两场（after no-poll）均 4×`subagent`、0 `workflow`、派发后结束本轮、无 `wait_agent`；bash 8/11 次主要在派发前/落盘，未见派发后轮询。
+- B2：COO 四合同，自己做，0 `workflow`、0 `subagent`。
+- B3：VP-Eng workflow probe ALL PASS；workflow 分支 header/workflow section/`workflow_runs` 在场；Lead 实调 `workflow_runs`。
+- B4：teammate 调 `spawn_teammate` → `TEAM_LEAD_REQUIRED`（Lead-only 生效）；support root 可实际组队 = [BUG-072](../bugs/BUG-072-support-root-can-spawn-team.md)。
+- B5/B6：cold resume vp-eng/CEO/COO 后 header/section/`workflow_runs` 仍在；CMO/COO 未误调缺失 workflow。
+
+**Round 1 缺陷卡**
+
+| BUG | 一句话 | 证据 |
+|---|---|---|
+| [BUG-071](../bugs/BUG-071-capability-header-not-installed-wording.md) | header 对 teammate 说“未列通道未安装”，但 `spawn_teammate` 在工具面（Lead-only） | E5C teammate `session ba1f1e99-...`；header “Available channels: spawn” + tools 含 `spawn_teammate` |
+| [BUG-072](../bugs/BUG-072-support-root-can-spawn-team.md) | support preset root 仍有 `spawn_teammate` 且能实际组队；“不组队”只是文案 | worker root `session-19bae5e2-...` calls `["spawn_teammate"]`；quality-loop roots 同工具面 |
+| [BUG-073](../bugs/BUG-073-readme-one-shot-child-team-tools-stale.md) | README 仍写 one-shot child 可见 Team 工具；0.2.1 守卫/实测已不在场 | `delegation-smoke --delegate` [3] child 75 tools、Team 不在场；README:158 vs delegation.md:92 |
+| [BUG-074](../bugs/BUG-074-per-agent-inject-not-reinstalled-on-service-change.md) | per-agent 注入 WeakSet 短路；Cordis `inject` service change re-run 后 section/tool 可能不重装 | `registry.ts:168`-`180` 合同 + `delegation-contracts.ts`/`workflow-runs.ts` 代码；真 re-provide 复现待补 |
+| [BUG-075](../bugs/BUG-075-eng-teaming-schema-rule-duplicated.md) | `eng-teaming` 声明 schema 事实不在本 skill，五档表仍复述“分支不传 schema” | `eng-teaming:16` vs `:38` |
+
+**未跑/未证（保留）**
+
+- BUG-074 的真实 service re-provide 复现（需要 live recomposition；fake 形状不能单独当 red）。
+- A2 的 `quality_loop_produce` / `quality_loop_verify` / generic worker named child 座位；cold resume 的 named child/teammate。
+- release tarball 的 **seat section**（release-smoke 只证安装/挂载，未读 `system/message`）。
+- B1 的更多 CMO 样本（当前 2 场）；B4 support root 的修复方向（产品决定）。
+- A5 的 code points 精确折算与 compaction 挤压；当前只记 bytes。
+
 ## 范围与排除项
 
 **范围**：上述 A1–A5、B1–B6；最近两次改动涉及的 host/policy/section/workflow_runs/role skill/docs；测试资产可复用（优先用 `tools/lib/surface-matrix.mjs`、`session-evidence`、现有 probes），不足再补小探针。
@@ -115,6 +146,14 @@ opened: 2026-11-11
 - **矩阵优先于随机探索**：11×4 座位是真挂载可判的；行为只挑 B1–B6 会改变结论的假设，不做无限采样。
 - **不做“再跑一轮旧矩阵”**：旧轮证据只当历史；复发按新证据记回归。
 - **不改代码**：本卡只取证；真缺陷另开 bug 卡，修复另按授权。
+
+## 验收标准
+
+1. **A1–A5** 全跑，或逐项写明「未跑 + 原因」；11 preset × 4 入口矩阵每格有期望 vs 实测；冷恢复/re-provide 有 session/证据。
+2. **B1–B6** 在用户授权预算内跑完，或逐项写明未跑原因；每场有 session id、tool/call、turn 边界与 oracle 对照。
+3. 所有 finding 已分诊：真缺陷 → `_backlog/bugs/` 卡（含复现/红绿/影响面）；静态漂移/文案 → 观察并指明 owner；不写「没有 bug」。
+4. 证据落点（`runtime/`/卡/研究材料）可复读；`pnpm verify` + `pnpm test` 绿；本卡不改产品代码。
+5. 收口时更新本卡（结果/未覆盖面）与 `_backlog/issues/README.md`；审查记录写 `审查：agent｜用户｜跳过 — 理由` 后归档。
 
 ## 关闭条件
 

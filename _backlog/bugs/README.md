@@ -2,7 +2,7 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮拿到 ≥3 张卡，先按根因分组列表再逐卡修——逐症状打补丁会把同一根因修三遍。
 
-**下一个缺陷号**：Next BUG ID = 71；已分配 BUG-001..070。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 76；已分配 BUG-001..075。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。
 
@@ -14,7 +14,11 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| — | 当前无活跃缺陷卡（071+ 为新卡号） | — |
+| [BUG-071](BUG-071-capability-header-not-installed-wording.md) | capability header 对 teammate 说“未列通道未安装”，但工具面仍有 `spawn_teammate`（Lead-only） | P2 |
+| [BUG-072](BUG-072-support-root-can-spawn-team.md) | support preset（worker/quality-loop）作为 root 仍有 `spawn_teammate` 且能实际组队；“不组队”只是文案 | P2 |
+| [BUG-073](BUG-073-readme-one-shot-child-team-tools-stale.md) | company-pack README 仍写 one-shot child 可见 Team 工具；0.2.1 守卫/实测已不在场 | P2 |
+| [BUG-074](BUG-074-per-agent-inject-not-reinstalled-on-service-change.md) | per-agent 注入用 WeakSet 短路；Cordis `inject` service 变化会 re-run，policy/`workflow_runs` 可能不重装 | P2 |
+| [BUG-075](BUG-075-eng-teaming-schema-rule-duplicated.md) | `eng-teaming` 声明“schema 事实不在本 skill”，五档表却仍复述“分支不传 schema” | P2 |
 | —（历史） | BUG-067 / BUG-068 / BUG-069 / BUG-070 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：pack 路径 / tier / 政策数字 / 委派真值四类声明↔载体对账；见 [Note](../../notes/implemented/2026-11-11-declaration-carrier-gates.md) | — |
 | —（历史） | BUG-064 / BUG-065 / BUG-066 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)：方法契约（类型适用性 + 事实载体 + fail-closed）+ `method-contract` 门禁；见 [Note](../../notes/implemented/2026-11-11-method-contract-type-facts.md) | — |
 | —（历史） | BUG-056 已修并迁 [fixed_bugs](../_archive/fixed_bugs/BUG-056-quality-loop-verdict-hash-trailing-newline.md)：质量环裁决头哈希改由 pack 内 `verdict-hash.mjs` 回填；`未复验` 成为 audit warning | — |
