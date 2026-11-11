@@ -19,9 +19,9 @@ opened: 2026-11-11
 
 实测（2026-11-11 修复后）：
 
-- worker root `session-0c92acbe-5a85-4909-b9eb-b4d1c2f3161a`：`teamPolicy=true`、`spawnTeam=true`、`listAgents=true`、`teamTask=true`、header=false；
+- worker root `session-0c92acbe-5a85-4909-b9eb-b4d1c2f3161a`：`teamPolicy=true`、`spawnTeam=true`、`listAgents=true`、`teamTask=true`、header=false；后续同一 root `session-0f5064c5-…` 实际创建了 `task-1`；
 - quality-loop-verifier root `session-5339c88b-b7d3-4144-ab92-8ed87883394f`：同上；
-- 强制 prompt（worker root `session-0f5064c5-2784-4be7-99bd-217c8be72a3d`）：`spawn_teammate` 被 guard 拒（`support capability seat`），但模型紧接着**成功调用了 `list_agents`**——guard 只覆盖 spawn，team 控制/任务面仍可用。
+- 强制 prompt（worker root `session-0f5064c5-2784-4be7-99bd-217c8be72a3d`）：`spawn_teammate` 被 guard 拒（`support capability seat`），但模型紧接着**成功调用了 `list_agents`**；再 prompt `team_task_create` → **成功创建 `task-1`（subject=ghost-test, status=pending）**。guard 只覆盖 spawn，team 控制/任务面仍可用，实际产生了 ghost 任务。
 
 也就是说：产品文案说“support 不是 team 座位”，但模型仍被告知“Agent Teams is available”，且能看到/调团队任务与消息工具；只有 spawn 被拒。模型可能创建 ghost task、向 lead 发消息、或先被 vendor 政策诱导再被 guard 拒。
 
