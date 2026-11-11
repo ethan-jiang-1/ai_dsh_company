@@ -2,6 +2,16 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.11.4 — 2026-11-11
+
+### Changed
+
+- `pnpm install` 现在自动接 `.githooks`（prepare），fresh clone 不再依赖 `source run/env.sh` 才有 pre-push 门禁。
+- `npm pack` 在缺 `lib/` 时由 prepack 守护 fail-loud，避免手工打包产出不可安装的空包。
+- 包 README 的卸载清单补齐 lease/日志/检索索引，并与《安装手册》§八 由 parity spec 对账。
+- 修正 `cordis.patch.yml` 的发布合同指针（`docs/release.md` → `docs/contracts/release.md`）；bootstrap 标明 setup 内部步骤勿重复。
+- fresh-clone CI 新增 macOS 全量 `setup + verify + test` job；`market-index.staged.json` 明确为未发布哨兵。
+
 ## 0.11.3 — 2026-11-11
 
 ### Changed

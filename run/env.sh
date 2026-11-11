@@ -51,10 +51,11 @@ else
 fi
 
 # pre-push 门禁接线（enforcement 通道，2026-09-27）：push 前强制跑全量结构门禁（.githooks/pre-push）。
-# core.hooksPath 是本地 git config（不随 clone 走），故在此幂等设置——一切会话先 source 本文件，
-# 「push 前跑 verify」从此不依赖自觉（DSH 立场：gates over prose）。bypass = git push --no-verify（用后留 Note 说明）。
+# core.hooksPath 是本地 git config（不随 clone 走）；唯一实现 = tools/hooks-install.mjs，
+# `pnpm install` 的 prepare 也会调用它（2026-11-11），这里只保留复用，不再各写一份 git config。
+# bypass = git push --no-verify（用后留 Note 说明）。
 _repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-git -C "$_repo_root" config core.hooksPath "$_repo_root/.githooks" \
+node "$_repo_root/tools/hooks-install.mjs" \
   || echo "warn: pre-push hook 接线失败（enforcement 通道未生效）" >&2
 unset _repo_root
 

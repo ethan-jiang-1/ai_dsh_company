@@ -1,8 +1,9 @@
 # fresh-clone：干净 checkout 上的**仓库级**验收（安装 + bundle:init + 结构门禁）。
 # 为什么独立于 ci.yml：ci.yml 不建 dev run bundle 的 workspace；本 job 证明 fresh clone 能
 # 装依赖、建 company-workspace、跑全部 verify 门禁。
-# 范围（诚实声明）：本 job **不**构建 vendor 全量/native、不跑 pnpm test——这些在 7GB runner 上
-# 目前有已知缺口（vendor lock 双锁、全 host OOM、client aggregate 测试类型、musl-gcc），
+# 范围（诚实声明）：install-verify job **不**构建 vendor 全量/native、不跑 pnpm test；
+# 2026-11-11 起由 setup-macos job 在 macOS 上单独证明 `pnpm setup` 全量构建 + verify + test。
+# Ubuntu 全量构建仍有已知缺口（vendor lock 双锁、全 host OOM、client aggregate 测试类型、musl-gcc），
 # 记录见 notes/implemented/2026-10-25-repo-hygiene-contract.md「已知缺口」节；不在这里假绿。
 # 手动 + 每周一 03:00 UTC；Ubuntu + macOS 双跑（跨环境合同 = docs/repo-hygiene.md）。
 # install-channel：Ubuntu 上用**真实 npm 发布版 DSH** 验六角色（channel-matrix-smoke；不是 vendor 通道）。
@@ -37,6 +38,26 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm bundle:init
       - run: pnpm verify
+
+  # 2026-11-11：把「clean clone 一条命令到可跑」变成 CI 证据。只跑 macOS 全量构建；
+  # Linux 仍受 musl-gcc/vendor 双 lock 限制（见上），不在这里假绿。
+  setup-macos:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - run: corepack enable pnpm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm setup
+      - run: pnpm setup --check
+      - run: pnpm verify
+      - run: pnpm test
 
   install-channel:
     runs-on: ubuntu-latest

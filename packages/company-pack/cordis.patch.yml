@@ -5,7 +5,7 @@
 #   我们的替换行把 default 改成 ceo；在无此行的组合（纯 headless）会 not found 警告丢弃
 #   ——那种场景用 run/company.overlay.yml 的 insert 补。
 # 依赖纪律（R5a 起）：runtime 依赖声明为 peerDependencies（不精确钉死；pre-stable API），
-# 已认证 tag 台账在 checks/gates/lib/compat-tags.json（不随包分发）—— 合同见 docs/release.md。
+# 已认证 tag 台账在 checks/gates/lib/compat-tags.json（不随包分发）—— 合同见 docs/contracts/release.md。
 
 # ── 产品 UI 收口（2026-11-02：去掉 Trajectory 页签与 New Terminal 入口）──
 # 两行都是 web-app 出厂 UI 行；整行 disabled 是唯一不碰 vendor 的窄口径。

@@ -123,12 +123,16 @@ tarball 的**绝对路径**。按提示重启正在使用的 profile，之后用
 ```sh
 rm -rf <workspace>/.dsh-company                       # 公司状态（kb/deliverables/cultivation/bundle.json）
 rm -rf <DSH_HOME>/company                             # identity / methods / ledger
+rm -f  <DSH_HOME>/company-pack.lock                    # 并发写者锁（home 根）
+rm -f  <DSH_HOME>/logs/company-client-errors.log       # 已脱敏的客户端错误日志
 rm -f  <DSH_HOME>/storages/company_run_bundle_ledger.json
+rm -f  <DSH_HOME>/cache/company/session-search-*.db    # 派生索引，可删可重建
 # 会话、凭据、其他 profile 依赖 HOME 里的共享状态，不要整删 DSH_HOME
 ```
 
 `<DSH_HOME>/cache/company/session-search-*.db` 是派生索引，可删可重建；不要为了清插件删整个
-`DSH_HOME`（会话/凭据/workspace 登记都在那里）。详见《安装手册》卸载节。
+`DSH_HOME`（会话/凭据/workspace 登记都在那里）。完整清单以《安装手册》§八为准；本块与手册由
+`tests/harness/repo/uninstall-parity.spec.ts` 对账。
 
 ## 已知限制（随行为变更同 diff 更新）
 

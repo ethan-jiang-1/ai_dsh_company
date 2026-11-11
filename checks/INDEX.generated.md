@@ -117,19 +117,20 @@
 [worker-orchestrator-probe](../probes/team/worker-orchestrator-probe.mjs)
 [worker-researcher-probe](../probes/team/worker-researcher-probe.mjs)
 
-## 维护工具（tools/，22）
+## 维护工具（tools/，23）
 
 [ask-latency](../tools/ask-latency.mjs) · [bundle-init](../tools/bundle-init.mjs)
 [checks-index](../tools/checks-index.mjs) · [company](../tools/company.mjs)
 [converge](../tools/converge.mjs) · [deliverables-index](../tools/deliverables-index.mjs)
 [diagnose](../tools/diagnose.mjs) · [explore-evidence](../tools/explore-evidence.mjs)
-[export-dist](../tools/export-dist.mjs) · [market-index](../tools/market-index.mjs)
-[methods-init](../tools/methods-init.mjs) · [notes-audit](../tools/notes-audit.mjs)
-[orient](../tools/orient.mjs) · [propose-sampler](../tools/propose-sampler.mjs)
-[prune-runtime](../tools/prune-runtime.mjs) · [rehearsal-init](../tools/rehearsal-init.mjs)
-[release](../tools/release.mjs) · [session-log-export](../tools/session-log-export.mjs)
-[setup](../tools/setup.mjs) · [snapshot-motion](../tools/snapshot-motion.mjs)
-[snapshot-path](../tools/snapshot-path.mjs) · [sync-dsh](../tools/sync-dsh.mjs)
+[export-dist](../tools/export-dist.mjs) · [hooks-install](../tools/hooks-install.mjs)
+[market-index](../tools/market-index.mjs) · [methods-init](../tools/methods-init.mjs)
+[notes-audit](../tools/notes-audit.mjs) · [orient](../tools/orient.mjs)
+[propose-sampler](../tools/propose-sampler.mjs) · [prune-runtime](../tools/prune-runtime.mjs)
+[rehearsal-init](../tools/rehearsal-init.mjs) · [release](../tools/release.mjs)
+[session-log-export](../tools/session-log-export.mjs) · [setup](../tools/setup.mjs)
+[snapshot-motion](../tools/snapshot-motion.mjs) · [snapshot-path](../tools/snapshot-path.mjs)
+[sync-dsh](../tools/sync-dsh.mjs)
 
 ## 结构门禁（checks/gates/，69 个模块）
 

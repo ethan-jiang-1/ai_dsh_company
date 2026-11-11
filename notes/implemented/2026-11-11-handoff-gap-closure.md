@@ -1,6 +1,8 @@
 # 2026-11-11 · 接手 gap 收口：clean clone 首跑、手册指针与发布证据
 
 状态：implemented（用户 2026-11-11 直接授权：静默自主收口诊断 gap）
+后续（2026-11-11）：第二轮补齐 prepack/hook/卸载对账/CI setup，见
+[handoff-gap-closure-round2](2026-11-11-handoff-gap-closure-round2.md)；本文「未验」中的 clean clone 在该轮证明。
 
 ## 决定
 

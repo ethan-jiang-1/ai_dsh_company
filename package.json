@@ -8,6 +8,7 @@
   },
   "scripts": {
     "setup": "node tools/setup.mjs",
+    "prepare": "node tools/hooks-install.mjs",
     "dsh": "node --import tsx/esm vendor/dsh/apps/cli/src/bin.ts",
     "company": "node tools/company.mjs",
     "bundle:init": "node tools/bundle-init.mjs",

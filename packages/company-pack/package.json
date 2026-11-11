@@ -1,7 +1,10 @@
 {
   "name": "dsh-company-pack",
-  "version": "0.11.3",
+  "version": "0.11.4",
   "type": "module",
+  "scripts": {
+    "prepack": "node scripts/prepack-check.mjs"
+  },
   "description": "Six-role virtual company for DSH: CEO / VP-Eng / VP-Sales / COO / CFO / CMO presets (MRD/PRD product definition), worker/quality-loop support presets, company handbook and Web tabs.",
   "license": "MIT",
   "author": "ethan-jiang-1",
