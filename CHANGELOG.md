@@ -2,6 +2,21 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.11.2 — 2026-11-11
+
+### Fixed
+
+- host config 现在拒绝未知键（如 `cultivationroot` 拼写错误），不再静默回到默认；值类型/空值校验保持。
+- `release --check` 在 `market-index.staged.json` 与根 index 同时在场时默认拒绝 READY；
+  确认不托管时需显式 `--allow-pre-publish-index`。
+
+### Changed
+
+- `release --check` 明示 READY 的适用面 = 当前工作树（暖 `lib/` + `_dist/`）；干净 clone 只承诺
+  fresh-clone CI 的 `install + bundle:init + verify`。
+- `tracked-file-size` 只扫索引面（tracked + staged）；本地未提交大件不再让 verify 误红，
+  安全/portability 仍扫 working-tree。
+
 ## 0.11.1 — 2026-11-11
 
 ### Fixed
