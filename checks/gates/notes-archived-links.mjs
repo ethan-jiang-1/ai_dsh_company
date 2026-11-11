@@ -6,6 +6,8 @@
 //   外链、纯锚点、非 .md 目标不管；archived 的背引号裸路径仍按“历史事实”不判红（bare-path 观察档口径）。
 // 负例留证 2026-10-30：新建 notes/archived/zz-link-probe.md，写 `](zz-missing.md)`
 //   → FAIL notes-archived-links: …zz-link-probe.md → zz-missing.md；删文件 → PASS ×92。
+// 负例留证 2026-11-11（clean clone）：无 runtime/ 证据树时 2 处 runtime 链接红；改为跳过三棵证据树后绿；
+//   同 probe 里普通 zz-missing.md 仍红（证明不是全放行）。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, join, normalize, relative } from 'node:path'
 
@@ -18,6 +20,11 @@ const walk = (dir, out = []) => {
   return out
 }
 
+// 2026-11-11 clean clone 实测：归档笔记引用 runtime/... / company-workspace/... 运行证据，
+// warm 盘存在、clone 不存在；这些目标 gitignored，不属于 repo handoff 的链接面（md-links
+// 本来就豁免它们）。只跳过这三棵证据树，普通 .md 断链仍判红。
+const RUNTIME_ONLY_PREFIXES = ['runtime/', 'company-workspace/', 'snapshots/']
+
 export function run({ root, ok, fail }) {
   const dir = join(root, 'notes', 'archived')
   if (!existsSync(dir)) { fail('notes-archived-links', 'notes/archived 不在盘上——归档链接无从检查'); return }
@@ -28,7 +35,8 @@ export function run({ root, ok, fail }) {
     for (const m of readFileSync(file, 'utf8').matchAll(/\]\(([^)\s]+\.md)(?:#[^)]*)?\)/g)) {
       const href = m[1]
       if (/^(https?:|\/)/.test(href)) continue
-      const target = normalize(join(dirname(rel), href))
+      const target = normalize(join(dirname(rel), href)).split('\\').join('/')
+      if (RUNTIME_ONLY_PREFIXES.some(prefix => target.startsWith(prefix))) continue
       if (!existsSync(join(root, target))) bad.push(`${rel} → ${href}`)
     }
   }

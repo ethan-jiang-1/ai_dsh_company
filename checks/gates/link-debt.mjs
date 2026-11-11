@@ -21,6 +21,8 @@ import { markdownLinkTargets } from '../../tools/lib/markdown-links.mjs'
 //   末尾加 `[x](../../snapshots/visual/zz-missing.png)` →
 //   `FAIL link-debt: moved 1 > 基线 0（源头非冻结层、目标已移出产品仓的证据引用只许降）`；删除 → 绿
 //   `archived 39 / moved 0 / live 0`。同轮把 5 条 moved 死链改写成散文（证据已移私有仓）后才把基线降到 0。
+// 负例留证 2026-11-11（clean clone）：无 runtime/company-workspace 证据树时 archived 23 > 20；
+//   冻结层证据树目标改为跳过 → archived 4 ≤ 20 绿；普通 archived 目标仍计数（不放过普通断链）。
 const CLASSES = ['archived', 'moved', 'live']
 const MOVED_TARGET_PREFIXES = ['snapshots/', 'runtime/', 'company-workspace/']
 
@@ -73,6 +75,12 @@ export function run({ root, ok, fail }) {
     }
     for (const target of targets) {
       if (existsSync(target)) continue
+      const frozen = sourceRel.startsWith('notes/archived/') || sourceRel.startsWith('_backlog/_archive/')
+      const targetRel = relative(root, target).split(sep).join('/')
+      // 2026-11-11 clean clone 实测：冻结层引用 runtime/... 证据，warm 盘存在、clone 不存在。
+      // 冻结层不回写，且这类目标 gitignored（证据树不在 repo handoff 内）⇒ 不计 archived；
+      // 非冻结源引用证据树仍归 moved（baseline 0），不放过活层。
+      if (frozen && MOVED_TARGET_PREFIXES.some(prefix => targetRel.startsWith(prefix))) continue
       const kind = classify(root, sourceRel, target)
       counts[kind]++
       if (samples[kind].length < 5) samples[kind].push(`${sourceRel} → ${relative(root, target).split(sep).join('/')}`)

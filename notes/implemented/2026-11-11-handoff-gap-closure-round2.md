@@ -33,6 +33,12 @@
 9. **带参数的 setup 一律走 node 入口。** `pnpm setup` 是 pnpm 内置命令，`pnpm setup --check` 实测
    `[ERROR] Unknown option: 'check'`；CI/文档/帮助文本统一 `node tools/setup.mjs --check|--types`，
    并加 `tests/harness/repo/setup-invocation.spec.ts` 防回退。
+10. **冻结层链接到 runtime/company-workspace/snapshots 不计死链。** clean clone 没有这些 gitignored
+   证据树，`notes-archived-links`/`link-debt` 原按 warm 盘判定，clone 上必红（实测 2 处 + archived 23 > 20）。
+   只跳过冻结层 × 三棵证据树；普通 `.md` 断链与非冻结源 `moved` 仍判红。warm/clean 双测同为 4，
+  `checks/gates/lib/link-debt.json` 的 archived 基线由 20 下调到 4。
+11. **fs-record-sandbox 的反例改用 HOME。** 测试原拿 `process.cwd()` 当“platform temp 外”的反例；
+   clean clone 在 /tmp 时 cwd 本身落在 writableRoots，误判为可写。HOME 在两种 checkout 位置都在 policy 根外。
 
 ## 输掉的方案
 
@@ -45,6 +51,8 @@
 - **clean clone 直接跑 vendor `pnpm run build:artifacts`**：全量构建在 7GB runner 有 OOM 前科；用 vendor 自带的
   bundle-free Typert pass，只补 client aggregate 需要的声明。
 - **继续用 `pnpm setup --check`**：pnpm 内置 setup 会吞参数，clean clone 实测直接失败；带参统一 node 入口。
+- **改归档笔记删掉 runtime 链接**：冻结层不回写；且证据指针是历史记录，删了反而丢线索。
+- **跳过 fs-record-sandbox 整个测试**：会丢掉“policy 根外写入被拒”的守卫；只换稳定反例路径。
 
 ## 证据
 
@@ -68,6 +76,12 @@
   单独跑 vendor `tsx scripts/generate-typert.ts` → `wrote 30 Typert artifact(s) … in 3.7s`，
   再跑 setup → `SETUP_DONE=51s`；`pnpm setup --check` → `[ERROR] Unknown option: 'check'`（pnpm 内置命令）。
   修法 = setup 的 types() 加 typert pass + 带参统一 node 入口（本文决定 8/9）。
+- clean clone 二轮（`4f544a8b`，本地 submodule + `bundle:init`）：`pnpm install` 13s；
+  `pnpm run setup` 123s；`node tools/setup.mjs --check` → `setup: 产物齐全`；
+  `pnpm verify` 首次红 = `notes-archived-links` 2 处 + `link-debt archived 23 > 20`（runtime 证据树不在 clone）；
+  打上决定 10 的门禁补丁后 `pnpm verify` → `ALL PASS；3 门无对象`（dist-freshness 也无 manifest）。
+  `pnpm test` 首次 1 failed = `fs-record-sandbox` 的 cwd 在 /tmp；按决定 11 改 HOME 后
+  `Test Files 192 passed (192)` / `Tests 1549 passed | 3 skipped (1552)`。
 - setup-invocation spec 红/绿：修前 `tools/setup.mjs`/bootstrap/workflow 出现 `pnpm setup --...` →
   测试红（`tools/setup.mjs 不应出现 pnpm setup --...`）；修后同 spec 绿。
 - `node tools/release.mjs --stamp` → `stamp 0.11.4 @ 0ffe4547`；`--check --allow-pre-publish-index` →
@@ -76,8 +90,8 @@
 
 ## 未验
 
-- GitHub Actions 的 `setup-macos` job 未在 GitHub 上执行（本地 clean clone 用同一组命令证明，见下轮更新）。
-- patched setup 的新 clean clone 端到端尚在本轮后续；首轮 clone 已暴露缺 Typert 的红，修法见决定 8。
+- GitHub Actions 的 `setup-macos` job 未在 GitHub 上执行（本地 clean clone 已用同一组命令证明）。
+- 最终 commit 3 的 clean clone 复跑（含门禁/测试补丁）尚未执行；`4f544a8b` clone 上已手打补丁验证。
 - Desktop/Windows、真模型多轮行为仍按原合同未认证。
 
 ## 相关

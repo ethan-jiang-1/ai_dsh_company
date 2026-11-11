@@ -43,8 +43,10 @@ describe('writeRecordViaFs 的真 fs-sandbox 行为', () => {
     expect(existsSync(join(recordsDir, `${id}.md`))).toBe(true)
     expect(readFileSync(join(recordsDir, `${id}.md`), 'utf8')).toContain('sandbox 写')
 
-    // 平台 temp 本身是 writableRoots 允许面，不能拿 dir/.. 当反例；用仓库 cwd 外的路径。
-    const deniedPath = join(process.cwd(), `.fs-sandbox-denied-${process.pid}.md`)
+    // 平台 temp 本身是 writableRoots 允许面；用 home（非 temp、非 policy 根）当反例。
+    // 2026-11-11 clean clone 实测：clone 在 /tmp 时 process.cwd() 落在平台 temp 允许面，
+    // 原写法会误判为“可写”；home 在两种 checkout 位置下都稳定在允许面外。
+    const deniedPath = join(process.env.HOME ?? '/', `.fs-sandbox-denied-${process.pid}.md`)
     const outside = await ctx.fs.resolve(deniedPath)
     await expect(
       ctx.fs.writeText(outside, 'x', { kind: 'createIfAbsent' }, undefined, policy),
