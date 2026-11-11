@@ -133,7 +133,12 @@ reset/clean，不覆盖并发修改。安装限 180 秒、vendor build 与 relea
 - `release --check` 的 READY 是**点态**：只对 `--stamp` 钉住的 commit 成立；之后再有提交，`gitSha` 落后、
   `--check` 变红是设计。把 READY 行（带 commit SHA）贴进当版 Note；没有输出的“已发布/READY”不算证据。
 - **READY ≠ 索引可托管**：根 `market-index.json` 是发布前预览；`market-index.staged.json` 在场时
-  先 `npm publish`、删 staged，再跑 `pnpm market:hosted` 通过后才托管。staged 在场时该命令会拒绝。
+  默认 `release --check` 直接拒绝 READY。发布前要拿 READY，必须显式
+  `--allow-pre-publish-index` 确认“不会托管”；发布后 `npm publish`、删 staged，再跑
+  `pnpm market:hosted` 通过后才托管。
+- **READY 的适用面 = 当前工作树**（暖 `lib/` + `_dist/`）。fresh-clone CI 只跑
+  `install + bundle:init + verify`，不跑 test/release；干净 clone 上重放 release 是已知缺口，
+  不冒充 READY 的承诺。
 - **升级既有 workspace**：新增的状态默认值（如 `.dsh-company/kb/process-docs.md`）只在缺失时补种，用户改过的版本一个字节不覆盖；旧动议无 `编号体系:` 标记 = `/req check` 只读豁免（`skipped`），不回溯改历史。
 
 ## 手动分发（`node tools/export-dist.mjs`）

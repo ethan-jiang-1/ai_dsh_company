@@ -59,7 +59,7 @@
   `host/cultivation.ts`、`host/bootstrap.ts`、`host/catalog.ts` 不存在；README inject 少
   `workspaceRegistry`。修后同命令 → 2 passed。
 - 修前红：`pnpm release --check` → `pack 源码面已变但 _dist 没重打`，exit 1。修后
-  `pnpm release --check` → `release: READY 0.11.0 @ d3343898（tgz 258 条目；7 项检查 pass）`，exit 0。
+  `pnpm release --check` → `release: READY 0.11.0 @ d3343898（tgz 258 条目；7 项检查 pass）`，exit 0（**0.11.0 历史点**；当前版本以 [second-layer Note](2026-11-11-second-layer-gates.md) / `_dist/release-manifest.json` 为准）。
   本 Note 修复提交后再次 `--stamp`；最终 manifest 的 `gitSha` 以 `_dist/release-manifest.json` 为准。
 - `pnpm verify` → `ALL PASS；2 门无对象`，exit 0。
 - `pnpm test` → `Test Files 186 passed (186)` / `Tests 1541 passed (1541)`，exit 0。

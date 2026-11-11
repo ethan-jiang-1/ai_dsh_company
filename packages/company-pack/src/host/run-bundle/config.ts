@@ -10,6 +10,10 @@ export interface HostConfigLike {
 }
 
 export function validateHostConfig(config: HostConfigLike = {}): void {
+  const allowed = new Set(['cultivationRoot', 'handbookSkipPresets'])
+  for (const key of Object.keys(config)) {
+    if (!allowed.has(key)) throw new Error(`company-pack: 未知 host config 键 ${key}（只认 cultivationRoot / handbookSkipPresets）`)
+  }
   if (config.cultivationRoot !== undefined
     && (typeof config.cultivationRoot !== 'string' || config.cultivationRoot.trim() === '')) {
     throw new Error('company-pack: cultivationRoot 必须是非空字符串')

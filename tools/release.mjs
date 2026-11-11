@@ -34,13 +34,14 @@ const valueOf = flag => {
 const allowDirty = has('--allow-dirty')
 const withKey = has('--with-key')
 const allowStaleManifest = has('--allow-stale-manifest')
+const allowPrePublishIndex = has('--allow-pre-publish-index')
 
 if (has('--help') || has('-h')) {
   console.log(`用法：
   pnpm release --bump patch|minor|major
   pnpm release --prepare [--force]
   pnpm release --verify [--with-key] [--allow-stale-manifest]
-  pnpm release --check [--allow-dirty]
+  pnpm release --check [--allow-dirty] [--allow-pre-publish-index]
   pnpm release --stamp
   pnpm release --all [--with-key]`)
   process.exit(0)
@@ -267,6 +268,12 @@ function check(allowDirtyTree = allowDirty) {
   const notPass = Object.entries(checks).filter(([, status]) => status !== 'pass')
   if (checks.verify !== 'pass' || checks.test !== 'pass') fail('manifest 未记录 verify/test 通过（--prepare 后必须 --verify）')
   if (notPass.length > 0) fail(`manifest 有未通过的检查：${notPass.map(([name, status]) => `${name}=${String(status)}`).join(', ')}`)
+  if (!allowPrePublishIndex
+    && existsSync(join(ROOT, 'market-index.staged.json'))
+    && existsSync(join(ROOT, 'market-index.json'))) {
+    fail('market-index.staged.json 在场且根 index 可托管：默认拒绝 READY；发布后删 staged，或显式 --allow-pre-publish-index 确认不会托管')
+  }
+  console.log('release: SCOPE READY = 当前工作树（暖 lib/_dist）；干净 clone 的验收边界 = fresh-clone CI 的 install + bundle:init + verify')
   console.log(`release: READY ${manifest.version} @ ${manifest.gitSha.slice(0, 8)}（tgz ${artifact.entries} 条目；${String(Object.keys(checks).length)} 项检查 pass）`)
   if (existsSync(join(ROOT, 'market-index.staged.json'))) {
     console.log('release: WARN market-index.staged.json 在场：根 index 是发布前预览，不可托管；发布后删除 staged 并跑 pnpm market:hosted')

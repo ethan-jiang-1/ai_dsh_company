@@ -17,6 +17,12 @@ describe('validateHostConfig', () => {
     expect(() => validateHostConfig({ cultivationRoot: 42 as never })).toThrow(/cultivationRoot/)
   })
 
+  it('未知键（含键名 typo）fail-loud', () => {
+    expect(() => validateHostConfig({ cultivationroot: '/tmp/x' } as never)).toThrow(/未知 host config 键/)
+    expect(() => validateHostConfig({ handbookSkippresets: ['worker'] } as never)).toThrow(/未知 host config 键/)
+    expect(() => validateHostConfig({ cultivationRoot: '/tmp/x', extra: true } as never)).toThrow(/未知 host config 键/)
+  })
+
   it('handbookSkipPresets 非数组/含空值 fail-loud', () => {
     expect(() => validateHostConfig({ handbookSkipPresets: 'worker' as never })).toThrow(/handbookSkipPresets/)
     expect(() => validateHostConfig({ handbookSkipPresets: ['worker', ''] })).toThrow(/handbookSkipPresets/)

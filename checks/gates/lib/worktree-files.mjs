@@ -14,3 +14,15 @@ export function worktreeFiles(root) {
     maxBuffer: 32 * 1024 * 1024,
   }).split('\0').filter(Boolean)
 }
+
+/**
+ * 索引面（tracked + staged）文件：file-size 用这个，避免把本地未提交的大件当仓库资产。
+ * 安全/portability 门禁仍用 `worktreeFiles`，因为它们要看“即将提交/可能误提交”的内容。
+ */
+export function indexFiles(root) {
+  return execFileSync('git', ['ls-files', '-cz'], {
+    cwd: root,
+    encoding: 'utf8',
+    maxBuffer: 32 * 1024 * 1024,
+  }).split('\0').filter(Boolean)
+}
