@@ -47,5 +47,5 @@ rg -n "schema|workflow-contract" packages/company-pack/presets/vp-eng/skills/eng
 
 ## 修复关联
 
-未修。发现于 [委派能力域化回归 + 探索卡](../issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
+未修。发现于 [委派能力域化回归 + 探索卡](../_archive/settled_issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
 A4 静态债；Issue 2 Note 的「无规则丢失」检查漏了表格短句。

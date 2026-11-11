@@ -59,5 +59,5 @@ node checks/smoke/delegation-smoke.mjs --delegate
 
 ## 修复关联
 
-未修。发现于 [委派能力域化回归 + 探索卡](../issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
+未修。发现于 [委派能力域化回归 + 探索卡](../_archive/settled_issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
 A4 静态债；证据 = `delegation-smoke --delegate` 2026-11-11 实跑。

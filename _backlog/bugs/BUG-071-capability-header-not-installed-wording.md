@@ -60,5 +60,5 @@ E5C 原始读数：`teammate {"preset":"ceo","header":true,"teamSection":false,"
 
 ## 修复关联
 
-未修。发现于 [委派能力域化回归 + 探索卡](../issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
+未修。发现于 [委派能力域化回归 + 探索卡](../_archive/settled_issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
 A2 座位矩阵；证据 = E5C teammate 会话。修复属材料性（model-facing host 文案），需用户点名或授权。

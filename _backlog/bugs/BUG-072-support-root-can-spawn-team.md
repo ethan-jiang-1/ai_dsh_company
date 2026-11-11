@@ -60,6 +60,6 @@ A2 worker root `session-19bae5e2-c733-45b9-8e5b-6636eb69c5a8`（实际调用）�
 
 ## 修复关联
 
-未修。发现于 [委派能力域化回归 + 探索卡](../issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
+未修。发现于 [委派能力域化回归 + 探索卡](../_archive/settled_issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
 A2 座位矩阵；产品/UX 处理在 [政策能力域化 Note](../../notes/implemented/2026-11-11-delegation-policy-capability-scoped.md)
 「后果」节已记为残余，本卡给它一个可追踪的缺陷入口。

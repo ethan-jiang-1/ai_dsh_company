@@ -1,22 +1,24 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-11
 ---
 
 # 推敲：委派能力域化后的回归 + 探索性验证（最近两次改动）
 
-> 立卡：2026-11-11 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-11 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：implementation — 本卡执行（测试/探索）；发现缺陷另开 `_backlog/bugs/` 卡，本卡不改产品代码。
+> **结论/去向**：none — 本卡只产 BUG-071..075（五张缺陷卡）+ 回归/探索证据；无下游 Note，本卡不改产品代码。
+>
+> **审查**：agent — A1–A6/B1–B6 已跑面逐条对照；未跑/未证面见 Round 1「未跑/未证」；证据 = 卡内 session id + BUG 卡 + 提交。
 
 **问题与期望结果：** 最近两次改动（`9b8b30f4` 委派合同能力域化 + `6a1bc54f` 研究题归档）之后，旧的探索证据只覆盖改前的委派面。本轮要回答两个问题：① **regression 有吗**——`workflow_runs` 收成 per-agent、policy header/section 注入、`teamLeadWhenRoot`/`CHANNELS.control` 改名、core skill/`eng-teaming` 缩编、host 全局工具面 4→3，是否把旧行为改坏？② **新东西靠谱吗**——模型是否真的按 capability header 选通道、是否不再误调不存在的 workflow/retry、CMO/COO 的 no-poll 是否稳定、support root 拿到 team section 会不会越权组队、workflow 分支/teammate/冷恢复是否都拿到正确的 section/tool？目标不是“跑绿一张矩阵”，而是保留独立 oracle、来源坐标、可复判证据与停止边界；找真缺陷就开 `_backlog/bugs/` 卡，不把“没找到”写成“没有 bug”。
 
 **当前情况（2026-11-11 落地后）：**
 
-- 两张卡已落地归档：[委派合同事实纠偏](../_archive/settled_issues/2026-11-11-delegation-contract-truth.md) → [Note](../../notes/implemented/2026-11-11-delegation-contract-truth.md)；[委派政策能力域化](../_archive/settled_issues/2026-11-11-delegation-policy-capability-scoped.md) → [Note](../../notes/implemented/2026-11-11-delegation-policy-capability-scoped.md)。
+- 两张卡已落地归档：[委派合同事实纠偏](./2026-11-11-delegation-contract-truth.md) → [Note](../../../notes/implemented/2026-11-11-delegation-contract-truth.md)；[委派政策能力域化](./2026-11-11-delegation-policy-capability-scoped.md) → [Note](../../../notes/implemented/2026-11-11-delegation-policy-capability-scoped.md)。
 - 已跑过的绿：`pnpm test` 196 files/1571 tests、`typecheck`/`lint`/`dup`/`verify`、`preset-smoke` 6+5、`product-team-e2e-smoke` ALL PASS（295s）、`vp-eng-workflow-probe` ALL PASS；CMO/COO 各 1 场 pilot（CMO 4×subagent、无 workflow、结束本轮；COO 自己做）。
-- 真挂载只覆盖 6 个座位：CEO/COO/vp-eng/worker root、CEO→vp-eng 命名 child、CEO teammate。**没覆盖**：VP-Sales/CFO/CMO/quality-loop/worker-orchestrator root、vp-eng teammate、workflow 分支、冷恢复/重启、quality-loop 命名 child、worker-orchestrator 子代。
-- 研究题已归档：[dsh-native-orchestration-fit](../_archive/research/dsh-native-orchestration-fit/README.md)；GAP 登记与实验证据在题内。
+- Round 1 真挂载从 6 个座位扩到：6 root + VP-Sales/CFO/CMO/quality-loop/worker-orchestrator root + vp-eng teammate + workflow 分支 + quality-loop/generic worker 命名 child + cold resume（root vp-eng/CEO/COO、vp-eng 命名 child）；未判 = teammate cold resume（成员没有 request/header，send_message 未形成 turn）。
+- 研究题已归档：[dsh-native-orchestration-fit](../research/dsh-native-orchestration-fit/README.md)；GAP 登记与实验证据在题内。
 - 旧探索轮（第四–九轮）的 036–060 已修/归档；本卡不重跑旧矩阵，只把“改后是否复发”当回归。
 
 **未决问题：**
@@ -108,18 +110,18 @@ opened: 2026-11-11
 - B1：CMO 两场（after no-poll）均 4×`subagent`、0 `workflow`、派发后结束本轮、无 `wait_agent`；bash 8/11 次主要在派发前/落盘，未见派发后轮询。
 - B2：COO 四合同，自己做，0 `workflow`、0 `subagent`。
 - B3：VP-Eng workflow probe ALL PASS；workflow 分支 header/workflow section/`workflow_runs` 在场；Lead 实调 `workflow_runs`。
-- B4：teammate 调 `spawn_teammate` → `TEAM_LEAD_REQUIRED`（Lead-only 生效）；support root 可实际组队 = [BUG-072](../bugs/BUG-072-support-root-can-spawn-team.md)。
-- B5/B6：cold resume vp-eng/CEO/COO 后 header/section/`workflow_runs` 仍在；CMO/COO 未误调缺失 workflow。
+- B4：teammate 调 `spawn_teammate` → `TEAM_LEAD_REQUIRED`（Lead-only 生效）；support root 可实际组队 = [BUG-072](../../bugs/BUG-072-support-root-can-spawn-team.md)。
+- B5/B6：cold resume root vp-eng/CEO/COO 后 header/section/`workflow_runs` 仍在；命名 child vp-eng cold resume 同样在；CMO/COO 未误调缺失 workflow。teammate cold resume **未判**（成员没有 request/header，`send_message` 未形成 turn），不写成 PASS/FAIL。
 
 **Round 1 缺陷卡**
 
 | BUG | 一句话 | 证据 |
 |---|---|---|
-| [BUG-071](../bugs/BUG-071-capability-header-not-installed-wording.md) | header 对 teammate 说“未列通道未安装”，但 `spawn_teammate` 在工具面（Lead-only） | E5C teammate `session ba1f1e99-...`；header “Available channels: spawn” + tools 含 `spawn_teammate` |
-| [BUG-072](../bugs/BUG-072-support-root-can-spawn-team.md) | support preset root 仍有 `spawn_teammate` 且能实际组队；“不组队”只是文案 | worker root `session-19bae5e2-...` calls `["spawn_teammate"]`；quality-loop roots 同工具面 |
-| [BUG-073](../bugs/BUG-073-readme-one-shot-child-team-tools-stale.md) | README 仍写 one-shot child 可见 Team 工具；0.2.1 守卫/实测已不在场 | `delegation-smoke --delegate` [3] child 75 tools、Team 不在场；README:158 vs delegation.md:92 |
-| [BUG-074](../bugs/BUG-074-per-agent-inject-not-reinstalled-on-service-change.md) | per-agent 注入 WeakSet 短路；Cordis `inject` service change re-run 后 section/tool 可能不重装 | `registry.ts:168`-`180` 合同 + `delegation-contracts.ts`/`workflow-runs.ts` 代码；真 re-provide 复现待补 |
-| [BUG-075](../bugs/BUG-075-eng-teaming-schema-rule-duplicated.md) | `eng-teaming` 声明 schema 事实不在本 skill，五档表仍复述“分支不传 schema” | `eng-teaming:16` vs `:38` |
+| [BUG-071](../../bugs/BUG-071-capability-header-not-installed-wording.md) | header 对 teammate 说“未列通道未安装”，但 `spawn_teammate` 在工具面（Lead-only） | E5C teammate `session ba1f1e99-...`；header “Available channels: spawn” + tools 含 `spawn_teammate` |
+| [BUG-072](../../bugs/BUG-072-support-root-can-spawn-team.md) | support preset root 仍有 `spawn_teammate` 且能实际组队；“不组队”只是文案 | worker root `session-19bae5e2-...` calls `["spawn_teammate"]`；quality-loop roots 同工具面 |
+| [BUG-073](../../bugs/BUG-073-readme-one-shot-child-team-tools-stale.md) | README 仍写 one-shot child 可见 Team 工具；0.2.1 守卫/实测已不在场 | `delegation-smoke --delegate` [3] child 75 tools、Team 不在场；README:158 vs delegation.md:92 |
+| [BUG-074](../../bugs/BUG-074-per-agent-inject-not-reinstalled-on-service-change.md) | per-agent 注入 WeakSet 短路；Cordis `inject` service change re-run 后 section/tool 可能不重装 | `registry.ts:168`-`180` 合同 + 真 `Context` `ctx.set('tools')/ctx.set('systemPrompt')` 复现（新 tools 无 `workflow_runs`、新 prompt 无 section） |
+| [BUG-075](../../bugs/BUG-075-eng-teaming-schema-rule-duplicated.md) | `eng-teaming` 声明 schema 事实不在本 skill，五档表仍复述“分支不传 schema” | `eng-teaming:16` vs `:38` |
 
 **未跑/未证（保留）**
 

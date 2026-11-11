@@ -53,6 +53,6 @@ after ctx.set(systemPrompt)  oldSections=同上  newSections=[]              ←
 
 ## 修复关联
 
-未修。发现于 [委派能力域化回归 + 探索卡](../issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
+未修。发现于 [委派能力域化回归 + 探索卡](../_archive/settled_issues/2026-11-11-delegation-capability-scoping-regression-exploration.md)
 A3 生命周期；Cordis 合同 = `vendor/dsh/vendor/cordis/src/registry.ts:168`-`180`；同型代码 =
 `delegation-contracts.ts` / `workflow-runs.ts` / `delegation-control.ts`。
