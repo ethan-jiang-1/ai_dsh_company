@@ -14,6 +14,7 @@
  *   CEO teammate 没有，vp-eng teammate 有 `subagent`，不能按角色一刀切）。
  */
 import type { Context } from '@deepseek-ai/cordis'
+import { delegationCapabilitiesOf } from '../../lib/delegation-capabilities.ts'
 import { isSupportPreset } from '../../lib/delegation-surface.ts'
 import { composedPresetOf } from '../prompt/handbook.ts'
 
@@ -42,8 +43,10 @@ interface AgentTeamsLike {
 
 interface AgentLike {
   readonly ctx: Context
-  /** 只读 `header.parentSession`；用 unknown 是为了让各组的 AgentLike（session 形状各异）都能传入。 */
+  /** 只读 `header.parentSession` / `header.delegationDepth`；各组 AgentLike 的 session 形状各异。 */
   readonly session?: unknown
+  /** runtime 注入的委派深度（与 durable header 二选一，取较大值）。 */
+  readonly options?: { readonly subagentDepth?: number | string }
 }
 
 /** 一次算清的运行时座位。 */
@@ -58,7 +61,13 @@ export interface DelegationSeat {
   readonly teamLead: boolean
   /** 名册成员（Lead 或 teammate）：能用团队协作面。 */
   readonly teamCollaborate: boolean
-  /** 这个座位能拥有 child 会话（teammate / support 之外）。 */
+  /** durable/runtime 的委派深度；root = 0。 */
+  readonly depth: number
+  /** 该 preset 的 spawn/fork 行允许的最大 child depth；无 child 行 = 0。 */
+  readonly childDepth: number
+  /** 当前 depth 下还能起 child（childDepth > depth）。 */
+  readonly canStartChild: boolean
+  /** 这个座位能拥有 child 会话并装 control 面（support 之外，且还有 child 预算）。 */
   readonly controlsChildren: boolean
 }
 
@@ -81,6 +90,22 @@ export function teamRoleOf(agent: AgentLike): TeamRole | undefined {
 }
 
 /**
+ * 读当前 Agent 的委派深度：durable header 优先，runtime options 兜底，取较大值。
+ * @param agent - 正在创建的 Agent。
+ * @returns 非负整数深度；缺失/非法 = 0。
+ */
+export function delegationDepthOf(agent: AgentLike): number {
+  const header = (agent.session as { readonly header?: { readonly delegationDepth?: number | string } } | undefined)?.header
+  const candidates = [header?.delegationDepth, agent.options?.subagentDepth]
+  let depth = 0
+  for (const candidate of candidates) {
+    const value = typeof candidate === 'string' ? Number(candidate) : candidate
+    if (typeof value === 'number' && Number.isSafeInteger(value) && value >= 0) depth = Math.max(depth, value)
+  }
+  return depth
+}
+
+/**
  * 算出一个 Agent 的委派座位；纯读服务，不注册任何东西。
  * @param agent - 正在创建的 Agent。
  * @param preset - 已解析的 preset（调用方已有 scope 时传入，避免两次读）；省略时从 agent.ctx 读。
@@ -92,12 +117,19 @@ export function delegationSeatOf(
 ): DelegationSeat {
   const teamRole = teamRoleOf(agent)
   const support = isSupportPreset(preset)
+  const depth = delegationDepthOf(agent)
+  const childDepth = delegationCapabilitiesOf(preset)?.childDepth ?? 0
+  const canStartChild = childDepth > depth
   return {
     preset,
     teamRole,
     support,
     teamLead: teamRole === 'lead' && !support,
     teamCollaborate: teamRole !== undefined && !support,
-    controlsChildren: !support && teamRole !== 'teammate',
+    depth,
+    childDepth,
+    canStartChild,
+    // 未知 preset 没有能力表：保持旧行为（root/命名 child 装 control，teammate 不装），不猜 childDepth。
+    controlsChildren: !support && (preset === undefined ? teamRole !== 'teammate' : canStartChild),
   }
 }

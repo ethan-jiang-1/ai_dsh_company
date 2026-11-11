@@ -25,7 +25,6 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
-import { scopeOf } from '@deepseek-ai/dsh-scope'
 import { delegationSeatOf } from './seat.ts'
 
 /** 父会话 durable catalog 里的 `subagent/catalog` 事件（只取本模块用到的字段）。 */
@@ -56,6 +55,7 @@ interface SubagentsLike {
 interface SessionLike {
   id: string
   ownEvents(): readonly { type: string; data: unknown }[]
+  header?: { readonly parentSession?: string; readonly delegationDepth?: number }
 }
 
 interface AgentLike {
@@ -66,7 +66,6 @@ interface AgentLike {
 /** 受控 scope 的 tools 面（per-agent 安装；与 `subagent-retry` 同模式）。 */
 interface ToolsLike {
   register(tool: unknown): () => void
-  get?(name: string, scope?: object): unknown
 }
 
 interface ToolScopeLike {
@@ -276,28 +275,16 @@ export function registerDelegationControl(ctx: Context): void {
 
   const fibers = new Map<AgentLike, ReturnType<Context['inject']>>()
 
-  /** 工具在不在这个 scope 的工具面里；没有 get / 服务缺席时 false。 */
-  const hasTool = (tools: ToolsLike, scope: Context, name: string): boolean => {
-    try {
-      return tools.get?.(name, scopeOf(scope)) !== undefined
-    } catch {
-      return false
-    }
-  }
-
   const install = (agent: AgentLike): void => {
     if (fibers.has(agent)) return
-    // 座位优先：support（worker family / 质量环）与 teammate 没有 control 面。
-    // teammate 还要看能力：CEO teammate 无通用 child 通道（死工具），vp-eng teammate 有（保留）。
+    // 座位优先：support 与没有 child 预算的座位（CEO teammate）不装。
+    // vp-eng teammate childDepth 3 > depth 1 ⇒ controlsChildren true，保留。
     const seat = delegationSeatOf(agent)
-    if (seat.support) return
+    if (!seat.controlsChildren) return
     const fiber = agent.ctx.inject(['tools'], scope => {
       const scoped = scope as unknown as ToolScopeLike
       const tools = scoped.tools
       if (tools === undefined) return
-      if (seat.teamRole === 'teammate'
-        && !hasTool(tools, scope, 'subagent')
-        && !hasTool(tools, scope, 'subagent_fork')) return
       scoped.effect(() => {
         const unregisterList = tools.register(defineTool({
           name: 'list_subagents',

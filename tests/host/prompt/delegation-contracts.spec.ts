@@ -9,6 +9,8 @@ import {
 
 // 负例留证 2026-11-11：把 team 判据从 `seat.teamCollaborate` 改回 `seat.teamLead` ⇒「teammate: collaboration」
 // 用例红（协作面被删）；还原 → 8 passed。BUG-077
+// 负例留证 2026-11-11：把 spawn 门控从 `seat.canStartChild` 改回 `caps.spawn` ⇒「CEO teammate: no usable
+// child channel」红（spawn section 回来）；还原 → 9 passed。BUG-079
 // 负例留证 2026-11-11：删掉 support seat note 注入 ⇒「support root」用例红（vendor policy 无人纠正）；
 // 还原 → 8 passed。BUG-076
 // 负例留证 2026-11-11：把 team 只按 Lead 判（seat.teamLead）⇒ support root 会拿到 team 段；
@@ -31,6 +33,7 @@ interface HarnessOptions {
   readonly tools?: readonly string[]
   readonly role?: 'lead' | 'teammate' | 'none'
   readonly parentSession?: string
+  readonly depth?: number
 }
 
 interface Harness {
@@ -78,7 +81,12 @@ function harness(options: HarnessOptions): Harness {
       },
       inject: (_deps: readonly string[], callback: (value: unknown) => void) => { callback(scope) },
     },
-    session: { header: options.parentSession === undefined ? {} : { parentSession: options.parentSession } },
+    session: {
+      header: {
+        ...(options.parentSession === undefined ? {} : { parentSession: options.parentSession }),
+        ...(options.depth === undefined ? {} : { delegationDepth: options.depth }),
+      },
+    },
   }
   return {
     ctx,
@@ -168,6 +176,7 @@ describe('registerDelegationContracts', () => {
         tools: ['subagent', 'subagent_fork', 'subagent_retry', 'workflow', 'spawn_teammate', 'team_task_list'],
         role: 'teammate',
         parentSession: 'parent',
+        depth: 1,
       })
       registerDelegationContracts(h.ctx as never, dir)
       h.fire()
@@ -185,6 +194,28 @@ describe('registerDelegationContracts', () => {
       // 成员版 section 的正文是协作规则，不是 Lead 的 spawn 规则。
       const teamSection = h.sections.find(section => section.name === `${DELEGATION_SECTION_PREFIX}team`)
       expect(teamSection?.text).toContain('SECTION-team')
+    } finally { rmSync(dir, { recursive: true, force: true }) }
+  })
+
+  it('CEO teammate: no usable child channel ⇒ no spawn section/header (BUG-079)', () => {
+    const dir = content()
+    try {
+      const h = harness({
+        preset: 'ceo',
+        tools: ['spawn_teammate', 'team_task_list', 'subagent_research', 'vp_eng'],
+        role: 'teammate',
+        parentSession: 'parent',
+        depth: 1,
+      })
+      registerDelegationContracts(h.ctx as never, dir)
+      h.fire()
+      expect(names(h)).toEqual([
+        DELEGATION_HEADER_SECTION,
+        `${DELEGATION_SECTION_PREFIX}team`,
+      ])
+      const header = h.sections[0]?.text ?? ''
+      expect(header).toContain('team collaboration')
+      expect(header).not.toContain('spawn')
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
 

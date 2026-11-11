@@ -14,7 +14,7 @@
 
 | 卡 | 一句话 | 严重级 |
 |---|---|---|
-| [BUG-079](BUG-079-ceo-teammate-spawn-header-no-child-channel.md) | CEO teammate header 列 `spawn`，但它没有可用 child 通道；`controlsChildren` 又与 vp-eng teammate 相反 | P2 |
+| —（本轮） | BUG-079 已修并迁 [fixed_bugs](../_archive/fixed_bugs/BUG-079-ceo-teammate-spawn-header-no-child-channel.md)：spawn/fork/retry 按 `childDepth > depth` 门控，control 消费同一座位；见 [Note](../../notes/implemented/2026-11-11-seat-spawn-depth.md) | — |
 | —（本轮） | BUG-076 / 077 / 078 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：座位矩阵第二层（team 拆协作/spawn、九件套 guard + seat note、control 按 child 能力）；见 [Note](../../notes/implemented/2026-11-11-seat-matrix-team-collaboration.md) | — |
 | —（本轮） | BUG-071 / 072 / 073 / 075 已修并迁 [fixed_bugs](../_archive/fixed_bugs/)：能力事实四载体（安装 / 座位 / header / 文档+内容）对齐；见 [Note](../../notes/implemented/2026-11-11-capability-seat-single-source.md) | — |
 | —（本轮） | BUG-074 复核为**误报**（WeakSet 不挡 re-provide；`ctx.set` 不是 re-provide），已迁 [fixed_bugs](../_archive/fixed_bugs/BUG-074-per-agent-inject-not-reinstalled-on-service-change.md)：保留 guard + 注释 + 真 Cordis spec；见 [Note](../../notes/implemented/2026-11-11-inject-reentrancy-false-positive.md) | — |

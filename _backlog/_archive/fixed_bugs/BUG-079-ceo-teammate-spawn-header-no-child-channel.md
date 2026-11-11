@@ -1,12 +1,25 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-11
 ---
 
 # BUG-079：CEO teammate header 列 `spawn`，但它没有可用的 child 通道；`controlsChildren` 也与 vp-eng teammate 矛盾
 
-> 严重级别：P2（次要）｜发现：2026-11-11｜状态：调查中
+> 严重级别：P2（次要）｜发现：2026-11-11｜状态：已修
+>
+> **留痕**：Note [`notes/implemented/2026-11-11-seat-spawn-depth.md`](../../../notes/implemented/2026-11-11-seat-spawn-depth.md)
+> **审查**：agent — 座位/能力/contracts/control spec 红→绿；CEO/VP-Eng teammate 真座位复验；pnpm test 199 files/1596 tests；typecheck/lint/verify/preset-smoke 绿
+
+## 已修判定
+
+- 能力表 `childDepth` 与模型 `depthRows` 最大深度 parity；`DelegationSeat` 增加 `depth` /
+  `childDepth` / `canStartChild`，`controlsChildren = !support && canStartChild`。
+- `delegation-contracts` 的 spawn/fork/retry 用 `seat.canStartChild` 门控；`delegation-control`
+  消费 `seat.controlsChildren`，删除 teammate 的 `hasTool` 二次判据。
+- 验收：CEO teammate header 只剩 `team collaboration`，无 spawn/spawn section；
+  vp-eng teammate 保留 spawn/fork/workflow/team/retry 与 control；keyless 45 passed；
+  真座位 CEO/VP-Eng teammate 复验；全量 199 files/1596 tests 绿。
 
 ## 症状
 
@@ -60,4 +73,4 @@ spawn: caps?.spawn === true,
 
 ## 修复关联
 
-未修。发现于第二次修复后复验；相关 Note = [seat-matrix-team-collaboration](../../notes/implemented/2026-11-11-seat-matrix-team-collaboration.md)；前置 = [BUG-077](../_archive/fixed_bugs/BUG-077-teammate-header-omits-team-collaboration.md)（team 拆开了，spawn 还没拆）。
+已修（2026-11-11）。发现于第二次修复后复验；相关 Note = [seat-matrix-team-collaboration](../../../notes/implemented/2026-11-11-seat-matrix-team-collaboration.md)；前置 = [BUG-077](BUG-077-teammate-header-omits-team-collaboration.md)（team 拆开了，spawn 还没拆）。

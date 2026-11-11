@@ -22,6 +22,8 @@ describe('delegation runtime capabilities parity', () => {
       expect(observed?.fork, `${id}: fork`).toBe(spec.channels.includes('fork'))
       expect(observed?.workflow, `${id}: workflow`).toBe(spec.workflow)
       expect(observed?.retry, `${id}: retry`).toBe(retry[id] !== undefined)
+      const expectedChildDepth = Math.max(0, ...Object.values(spec.depthRows).map(depth => depth === 'default' ? 1 : depth))
+      expect(observed?.childDepth, `${id}: childDepth`).toBe(expectedChildDepth)
     }
   })
 

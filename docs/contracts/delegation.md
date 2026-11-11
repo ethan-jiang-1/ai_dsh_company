@@ -100,7 +100,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
    与 `send_to_subagent`（官方 `ctx.subagents`，续驶/催稿），名字不被 shadow。`list_subagents` 的每行还带
    **引擎身份**：`agentPreset` / `delegationDepth`（十进制字符串，例 `"3"`）读 child durable header，
    读不到显式 `unavailable`（不默认 worker/0）——父代理据此核对 preset/深度是否真生效（BUG-046）。`subagent`/`subagent_fork` 行
-   `maxDepth: 3`：CEO→VP（1）→workflow 分支（2）→worker（3）放行；VP 根门→分支→worker 仍有余量（2026-11-09 源码：分支/成员都是 activation 子代，深度 parent+1）。重试敏感的小活可用 `subagent_retry`（host 原语，仅五个有 generic subagent 的 full role；同步、最多 2 attempts、attempts/exhausted 可见；长/批量走 workflow）；**它的子代深度不另立预算**——上限 = 该 preset 通用 `subagent` 行的 `maxDepth`，到预算底部返回 `stopReason: depth-exceeded` 且不起 child（BUG-045）；generic child 需要子层时 `agent_preset` 选 `worker-orchestrator`（它只带 leaf；件数与 fan-out 预算由父代理 brief 决定，不承诺硬数字——BUG-051）。`list_subagents`/`send_to_subagent` 是 **per-agent 安装**：support 与没有通用 child 通道的 teammate（CEO teammate）不装；root/命名 child/有通用 child 的 teammate 保留（BUG-052/078）。
+   `maxDepth: 3`：CEO→VP（1）→workflow 分支（2）→worker（3）放行；VP 根门→分支→worker 仍有余量（2026-11-09 源码：分支/成员都是 activation 子代，深度 parent+1）。重试敏感的小活可用 `subagent_retry`（host 原语，仅五个有 generic subagent 的 full role；同步、最多 2 attempts、attempts/exhausted 可见；长/批量走 workflow）；**它的子代深度不另立预算**——上限 = 该 preset 通用 `subagent` 行的 `maxDepth`，到预算底部返回 `stopReason: depth-exceeded` 且不起 child（BUG-045）；generic child 需要子层时 `agent_preset` 选 `worker-orchestrator`（它只带 leaf；件数与 fan-out 预算由父代理 brief 决定，不承诺硬数字——BUG-051）。`list_subagents`/`send_to_subagent` 是 **per-agent 安装**：support 与没有 child 预算的座位（CEO teammate：childDepth 1 = depth 1）不装；root/命名 child/childDepth > depth 的 teammate（vp-eng teammate：3 > 1）保留（BUG-052/078/079）。
 
 ## 5. UI：委派工具卡
 

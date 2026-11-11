@@ -31,6 +31,8 @@ function harness(
     childTools?: readonly string[]
     /** agent session header 的 parentSession；用于命名 child 座位。 */
     parentSession?: string
+    /** agent session header 的 delegationDepth；teammate/命名 child 用。 */
+    depth?: number
   } = {},
   preset: string | undefined = 'vp-eng',
 ) {
@@ -54,7 +56,10 @@ function harness(
     session: {
       id: 'parent',
       ownEvents: () => [],
-      header: options.parentSession === undefined ? {} : { parentSession: options.parentSession },
+      header: {
+        ...(options.parentSession === undefined ? {} : { parentSession: options.parentSession }),
+        ...(options.depth === undefined ? {} : { delegationDepth: options.depth }),
+      },
     },
     ctx: {
       get: (name: string) => name === 'agentPresets' ? { composedPreset: () => preset }
@@ -123,7 +128,7 @@ describe('delegation control tools', () => {
   })
 
   it('teammate without a generic child channel: no dead control tools (BUG-078)', () => {
-    const tools = harness({ agentTeams: { tryMembership: () => ({ role: 'teammate' }) } }, 'ceo')
+    const tools = harness({ agentTeams: { tryMembership: () => ({ role: 'teammate' }) }, depth: 1 }, 'ceo')
     expect([...tools.keys()]).toEqual([])
   })
 
@@ -131,12 +136,13 @@ describe('delegation control tools', () => {
     const tools = harness({
       agentTeams: { tryMembership: () => ({ role: 'teammate' }) },
       childTools: ['subagent'],
+      depth: 1,
     }, 'vp-eng')
     expect([...tools.keys()].sort()).toEqual(['list_subagents', 'send_to_subagent'])
   })
 
   it('named child (not in the roster) keeps control tools', () => {
-    const tools = harness({ parentSession: 'root', childTools: ['subagent'] }, 'vp-eng')
+    const tools = harness({ parentSession: 'root', childTools: ['subagent'], depth: 1 }, 'vp-eng')
     expect([...tools.keys()].sort()).toEqual(['list_subagents', 'send_to_subagent'])
   })
 

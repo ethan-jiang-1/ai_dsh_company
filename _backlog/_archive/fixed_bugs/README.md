@@ -4,6 +4,13 @@
 
 ## 修复流水（倒序）
 
+- **BUG-079**（2026-11-11，P2）：[卡](BUG-079-ceo-teammate-spawn-header-no-child-channel.md) CEO teammate header 列
+  `spawn`，但 depth 1 / childDepth 1 没有可用 child 通道；`controlsChildren` 又与 vp-eng teammate 矛盾。
+  修法 = 能力表 `childDepth` + `DelegationSeat.depth/canStartChild`；spawn/fork/retry 按
+  `childDepth > depth` 门控，control 消费 `controlsChildren`。红→绿：8 failed / 37 passed → 45 passed；
+  `pnpm test` 199 files / 1596 tests；真座位 CEO/VP-Eng teammate 复验。详见
+  [座位 spawn depth Note](../../../notes/implemented/2026-11-11-seat-spawn-depth.md)。
+
 - **BUG-076 / BUG-077 / BUG-078**（2026-11-11，根因组 S，P2）：座位矩阵第二层——同一个 `team` 布尔覆盖 spawn/协作/控制三种能力。
   [076](BUG-076-support-root-still-has-team-tools-policy.md) support root 的 vendor team policy/identity + 九件套仍在，
   guard 只拦 spawn（ghost task 可建）；[077](BUG-077-teammate-header-omits-team-collaboration.md) teammate header 只列 spawn，

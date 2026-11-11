@@ -211,6 +211,7 @@
 | [BUG-076-support-root-still-has-team-tools-policy.md](fixed_bugs/BUG-076-support-root-still-has-team-tools-policy.md) | support root 九件套 team 工具全拒 + `company:delegation-seat` 纠正 vendor policy | 2026-11-11 |
 | [BUG-077-teammate-header-omits-team-collaboration.md](fixed_bugs/BUG-077-teammate-header-omits-team-collaboration.md) | team 拆 `team collaboration` / `team spawn (Lead only)`；teammate 列协作、注入 member section | 2026-11-11 |
 | [BUG-078-teammate-dead-subagent-control-tools.md](fixed_bugs/BUG-078-teammate-dead-subagent-control-tools.md) | control 按座位/child 能力装：CEO teammate 无，vp-eng teammate 保留 | 2026-11-11 |
+| [BUG-079-ceo-teammate-spawn-header-no-child-channel.md](fixed_bugs/BUG-079-ceo-teammate-spawn-header-no-child-channel.md) | spawn/fork/retry 按 `childDepth > depth` 门控；CEO teammate 无 spawn，vp-eng teammate 保留；control 消费同一座位 | 2026-11-11 |
 
 ## 暂停卡
 

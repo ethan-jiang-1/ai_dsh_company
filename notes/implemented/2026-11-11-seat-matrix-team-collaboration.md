@@ -3,6 +3,8 @@
 状态：implemented（2026-11-11；上游 = BUG-076/077/078；host 模型可见行为 + content + 文档）
 上游 = [BUG-076](../../_backlog/_archive/fixed_bugs/BUG-076-support-root-still-has-team-tools-policy.md) · [BUG-077](../../_backlog/_archive/fixed_bugs/BUG-077-teammate-header-omits-team-collaboration.md) · [BUG-078](../../_backlog/_archive/fixed_bugs/BUG-078-teammate-dead-subagent-control-tools.md)
 
+> **后续修正**：`controlsChildren` 的 `teamRole !== teammate` 一刀切由 BUG-079 改为 `childDepth > depth`；spawn/fork/retry 也按同一 childDepth 门控。见 [seat-spawn-depth](./2026-11-11-seat-spawn-depth.md)。
+
 ## 决定
 
 1. **一个 `DelegationSeat` 是唯一座位判据**（`host/delegation/seat.ts`）：preset + `teamRole`（lead / teammate / undefined）+ support → `teamLead` / `teamCollaborate` / `controlsChildren`。`teamRoleOf` 用 membership 优先、`header.parentSession` 兜底；support 叠在引擎 Lead 之上。header/section、guard、control 三处都读它，不再各自读 preset 或单一 Lead 布尔。

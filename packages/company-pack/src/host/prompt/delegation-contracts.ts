@@ -150,13 +150,15 @@ export function registerDelegationContracts(ctx: Context, contentDir: string): v
       // 工具在场是必要条件（vendor 按成员安装九件套），座位是充分判据（BUG-077）。
       const available: Record<Channel, boolean> = {
         // spawn 用能力表（CEO 的命名行不是 `subagent`，无法靠单名探测）；表由 parity spec 钉 YAML。
-        spawn: caps?.spawn === true,
-        fork: caps?.fork === true && hasTool(scope, 'subagent_fork'),
+        // BUG-079：能力表是 preset 级，还要叠座位 depth——CEO teammate depth 1 的命名行 maxDepth 1 不可用。
+        spawn: caps?.spawn === true && seat.canStartChild,
+        fork: caps?.fork === true && seat.canStartChild && hasTool(scope, 'subagent_fork'),
         workflow: caps?.workflow === true && hasTool(scope, 'workflow'),
         team: seat.teamCollaborate && hasTool(scope, 'team_task_list'),
         'team-spawn': seat.teamLead && hasTool(scope, 'spawn_teammate'),
         // retry 是 host per-agent 安装的，agent/created 监听顺序可能晚于本注入；能力表已由 parity spec 钉住。
-        retry: caps?.retry === true,
+        // retry 的 child 也受同一个 depth 预算；depth 用尽时 header 不再承诺。
+        retry: caps?.retry === true && seat.canStartChild,
       }
       // BUG-076：support root 的 vendor team:policy/identity 仍在；先纠正，再按 header 决定是否注入段。
       if (seat.support && seat.teamRole === 'lead') {
