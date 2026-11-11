@@ -304,7 +304,7 @@ function check(allowDirtyTree = allowDirty) {
   assertVendor(manifest)
   if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
   if (manifest.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；先重跑 --prepare')
-  if (manifest.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest gitSha 不是当前 HEAD（发布后被改过？重跑 --prepare/--verify）')
+  if (manifest.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest gitSha 不是当前 HEAD（发布后被改过？只提交 docs/receipt 时用 --stamp；重建产物才用 --prepare/--verify）')
   if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
   if (manifest.dirty !== false) fail('manifest 记录的是脏树（发布字节不对应一个干净 commit；重跑 --verify）')
   const checks = manifest.checks ?? {}
