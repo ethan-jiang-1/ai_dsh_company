@@ -2,7 +2,8 @@
 // 状态：常驻
 // 何时跑：fresh clone 首跑、vendor pin 变后、或 `pnpm company` 报 “vendor CLI 未构建” 时。
 // 成本：全量首次分钟级（取决于机器）；`--types` 只编类型；`--check` 秒级。
-// 用法：pnpm setup [--check|--types] [--skip-install]
+// 用法：node tools/setup.mjs [--check|--types] [--skip-install]
+//       （pnpm 有内置 `setup` 命令；带参数必须用 node 入口——pnpm 的 setup 会吞掉 --check）
 //
 // 这是 docs/guides/bootstrap.md 的机器入口：vendor host/client、native、web 与 pack 构建
 // 一条命令补齐。它不写 profile/patch，不改 vendor 源；vendor 仍只读。
@@ -34,6 +35,7 @@ const required = [
   ['vendor deps', join(vendor, 'node_modules')],
   ['vendor typeScript', vendorTsc],
   ['vendor tsdown', vendorTsdown],
+  ['vendor typert artifacts', join(vendor, 'packages/api/job-controller/lib/typert.remote-client.d.ts')],
   ['vendor CLI', join(vendor, 'apps/cli/lib/bin.js')],
   ['vendor market validator', join(vendor, 'packages/util/plugin-market-index/lib/index.js')],
   ['vendor web dist', join(vendor, 'apps/web/dist/index.html')],
@@ -49,7 +51,7 @@ function run(label, command, argv = [], options = {}) {
     process.exit(1)
   }
   if (result.status !== 0) {
-    console.error(`setup: ${label} 退出 ${String(result.status)}；修好后重跑 pnpm setup`)
+    console.error(`setup: ${label} 退出 ${String(result.status)}；修好后重跑 node tools/setup.mjs`)
     process.exit(result.status ?? 1)
   }
 }
@@ -57,7 +59,7 @@ function run(label, command, argv = [], options = {}) {
 function check() {
   const missing = required.filter(([, path]) => !existsSync(path)).map(([label]) => label)
   if (missing.length > 0) {
-    console.error(`setup: 缺 ${missing.join(' / ')}；跑 pnpm setup（或 pnpm setup --types）补齐`)
+    console.error(`setup: 缺 ${missing.join(' / ')}；跑 node tools/setup.mjs（或 node tools/setup.mjs --types）补齐`)
     process.exit(1)
   }
   console.log(`setup: 产物齐全（vendor CLI / client / web / pack）`)
@@ -75,6 +77,11 @@ function install() {
 
 function types() {
   run('vendor host types', process.execPath, [vendorTsc, '-b', 'tsconfig.host.json'], { cwd: vendor })
+  // 2026-11-11：`/typert` 与 `/remote` 声明由 vendor 的 bundle-free Typert pass 生成，不是 tsc 产物。
+  // 顺序对齐 vendor scripts/build.ts 的 typecheck 图：host-src → host-typert → client-src。
+  // 缺这一步时 clean clone 的 client aggregate 会报 `Cannot find module .../remote` 与
+  // `ClientRemote` 缺属性（实测 2026-11-11；warm checkout 因 lib/ 已有旧产物而看不出来）。
+  run('vendor typert artifacts', tsx, ['scripts/generate-typert.ts'], { cwd: vendor })
   run('vendor client types', process.execPath, [vendorTsc, '-b', 'tsconfig.client.json'], { cwd: vendor })
 }
 

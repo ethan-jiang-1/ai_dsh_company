@@ -25,6 +25,14 @@
    加一行：6 行哨兵不是待托管索引副本，不要编辑成 index。
 7. **版本 0.11.4。** 改动含 pack 的 `package.json`/README/`cordis.patch.yml`，按发布纪律 bump 并重导
    `_dist`（tarball + 手册 + manifest）；市场索引与 staged 同步 0.11.4。
+8. **clean clone 的 setup 补齐 Typert pass。** clean clone 实测 `pnpm run setup` 在
+   `vendor client types` 失败：`/typert` 与 `/remote` 声明不是 tsc 产物，warm checkout 的 `lib/`
+   掩盖了缺口。`tools/setup.mjs` 的 `types()` 在 host types 后加
+   vendor `scripts/generate-typert.ts`（bundle-free，30 artifacts / 3.7s），再跑 client types；
+   顺序对齐 vendor `scripts/build.ts` 的 `host-src → host-typert → client-src`。
+9. **带参数的 setup 一律走 node 入口。** `pnpm setup` 是 pnpm 内置命令，`pnpm setup --check` 实测
+   `[ERROR] Unknown option: 'check'`；CI/文档/帮助文本统一 `node tools/setup.mjs --check|--types`，
+   并加 `tests/harness/repo/setup-invocation.spec.ts` 防回退。
 
 ## 输掉的方案
 
@@ -34,13 +42,16 @@
 - **YAML 注释扫全部仓库路径**：会把 `vendor packages/...` 这类上游相对写法判红；只扫 `docs/`。
 - **把 setup 全量构建塞进每次 push 的 CI**：与 2026-09-28 的 CI 定界冲突；用每周/手动的 macOS job 单独证明。
 - **不 bump 版本、只在 0.11.3 上重打**：发布物已落盘且 manifest 指向 0.11.3；改内容不 bump 会制造 source/artifact 漂移。
+- **clean clone 直接跑 vendor `pnpm run build:artifacts`**：全量构建在 7GB runner 有 OOM 前科；用 vendor 自带的
+  bundle-free Typert pass，只补 client aggregate 需要的声明。
+- **继续用 `pnpm setup --check`**：pnpm 内置 setup 会吞参数，clean clone 实测直接失败；带参统一 node 入口。
 
 ## 证据
 
 - `node tools/release.mjs --prepare --allow-dirty` → `export-dist: ALL PASS`；tarball `0.11.4` 259 entries；
   sha `cd4beea4e440697cc7cc20de62870a89f1dd5d582fe74f33705f0aad52b43248`；手册 0.11.4。
 - `pnpm verify` → `verify: ALL PASS；2 门无对象`（replay-fixture / replay-ui 显式 SKIP）。
-- `pnpm test` → `Test Files 191 passed (191)` / `Tests 1551 passed (1551)`。
+- `pnpm test` → `Test Files 192 passed (192)` / `Tests 1552 passed (1552)`。
 - `pnpm typecheck` → exit 0；`pnpm lint` → 0 warnings/0 errors；`pnpm dup` → 0 clones。
 - prepack 红/绿（临时副本，不动仓库）：无 `lib/` 时 `npm pack --dry-run` exit 1，
   输出 `pack: 缺 lib/index.js / lib/client.js——先跑 pnpm setup…`；补两个 dummy 文件后 exit 0。
@@ -52,12 +63,21 @@
   `git config --get core.hooksPath` → `<repo>/.githooks`（本机绝对值）。
 - `node tools/release.mjs --verify --allow-dirty` → verify / test / release-smoke / company-entry-smoke /
   client-load-smoke / preset-smoke / present-catalog-smoke 全 pass；preset-smoke 11/11 可挂载。
+- clean clone 首轮（`0ffe4547`）`pnpm run setup` 在 vendor client types 失败：
+  `Cannot find module '@deepseek-ai/dsh-api-job-controller/remote'` / `ClientRemote` 缺属性；
+  单独跑 vendor `tsx scripts/generate-typert.ts` → `wrote 30 Typert artifact(s) … in 3.7s`，
+  再跑 setup → `SETUP_DONE=51s`；`pnpm setup --check` → `[ERROR] Unknown option: 'check'`（pnpm 内置命令）。
+  修法 = setup 的 types() 加 typert pass + 带参统一 node 入口（本文决定 8/9）。
+- setup-invocation spec 红/绿：修前 `tools/setup.mjs`/bootstrap/workflow 出现 `pnpm setup --...` →
+  测试红（`tools/setup.mjs 不应出现 pnpm setup --...`）；修后同 spec 绿。
+- `node tools/release.mjs --stamp` → `stamp 0.11.4 @ 0ffe4547`；`--check --allow-pre-publish-index` →
+  `release: READY 0.11.4 @ 0ffe4547（tgz 259 条目；7 项检查 pass）`（代码提交点；Note 提交后 manifest 以最终 stamp 为准）。
 - clean clone：见「未验」节（本轮稍后以独立 clone 跑）。
 
 ## 未验
 
 - GitHub Actions 的 `setup-macos` job 未在 GitHub 上执行（本地 clean clone 用同一组命令证明，见下轮更新）。
-- clean clone 从零（删 `node_modules`/`vendor` 后重跑 `pnpm setup`）尚在本轮后续；本机是 warm checkout。
+- patched setup 的新 clean clone 端到端尚在本轮后续；首轮 clone 已暴露缺 Typert 的红，修法见决定 8。
 - Desktop/Windows、真模型多轮行为仍按原合同未认证。
 
 ## 相关

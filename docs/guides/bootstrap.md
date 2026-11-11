@@ -35,7 +35,7 @@ node ./node_modules/typescript/bin/tsc -b \
   vendor/dsh/packages/subagent/subagent
 # 全量构建（host/client/native/web/pack）唯一入口；首次或 vendor pin 变后跑：
 pnpm setup
-# 只补 vendor 类型：pnpm setup --types（fresh-clone CI 用）；⚠ 以下命令 = pnpm setup 内部步骤，setup 成功后勿重复，仅失败时单步排障。
+# 只补 vendor 类型：node tools/setup.mjs --types（fresh-clone CI 用）；⚠ 以下命令 = pnpm setup 内部步骤，setup 成功后勿重复，仅失败时单步排障。
 # 原生插件（flock，会话持久化刚需；macOS 用 CommandLineTools 的 cc；Linux 需 musl-tools 的 musl-gcc）：
 (cd vendor/dsh/native/system && ../../node_modules/.bin/tsx scripts/build.ts)
 # web 观察窗（可选；三件事缺一不可）：
