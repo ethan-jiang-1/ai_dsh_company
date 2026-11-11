@@ -122,9 +122,9 @@ opened: 2026-11-11
 
 **未跑/未证（保留）**
 
-- BUG-074 的真实 service re-provide 复现（需要 live recomposition；fake 形状不能单独当 red）。
+- BUG-074 已用真实 Cordis `Context` + `ctx.set('tools')` / `ctx.set('systemPrompt')` 复现：新 tools 服务里 `workflow_runs` 为空、新 systemPrompt 里 section 为空；见 BUG-074「复现」节。
 - A2 的 `quality_loop_produce` / `quality_loop_verify` / generic worker named child 座位；cold resume 的 named child/teammate。
-- release tarball 的 **seat section**（release-smoke 只证安装/挂载，未读 `system/message`）。
+- A6 release tarball 的 **seat section**（release-smoke 只证安装/挂载，未读 `system/message`）；当前未跑。
 - inactive `session/page` 的 section 可见性（证据层限制；不是 live 行为结论）。
 - B1 的更多 CMO 样本（当前 2 场）；B4 support root 的修复方向（产品决定）。
 - A5 的 code points 精确折算与 compaction 挤压；当前只记 bytes。

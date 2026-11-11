@@ -30,11 +30,19 @@ opened: 2026-11-11
 
 **用一次性 guard 包住可重入生命周期**：`inject`/`plugin` 的 callback 是可能多次运行的；任何 `WeakSet`/`Map` “已安装”短路都要问：这个键是 Agent 还是 fiber？如果 effect 会随 fiber 释放，guard 不能放在 Agent 上。
 
-## 复现（待补真装配）
+## 复现（真 Cordis Context，已复现）
 
-- 代码级：跑 `runtime/tmp/orchestration-fit/a3-reinject-bug.mjs`（fake inject 手工 re-run）能看到“callback 再跑但 section/tool 不重装”的形状；但 fake 不具备真实 effect 释放，**不能单独当 red**。
-- 真装配待补：在 company profile 里 live re-provide `tools`/`systemPrompt`（或插件 recomposition），读受影响 Agent 的 `request/header.tools` + `system/message`：重装前有、re-provide 后应无（bug）；`vp-eng` 的 `workflow_runs` 同。
-- 反向：若不 re-provide，当前 6 座位真挂载全绿（A2/E5B/E5C），说明不是启动面问题。
+`runtime/tmp/orchestration-fit/a3-reinject-real.mjs` 用真实 `Context` + `ctx.set('tools', …)` / `ctx.set('systemPrompt', …)` 复现：
+
+```text
+after agent/created   sections=[header, spawn, fork, workflow, team, retry]  tools=[workflow_runs]
+after ctx.set(tools)  sections=同上  toolsOld=[workflow_runs]  toolsNew=[]   ← 新 tools 服务里没有 tool
+after ctx.set(systemPrompt)  oldSections=同上  newSections=[]              ← 新 systemPrompt 里没有 section
+```
+
+- tools 替换后，Agent 的 scope 读新 `tools` 服务 ⇒ `workflow_runs` 消失（old map 里的注册不可见）。
+- systemPrompt 替换后，新 scope 没有任何 delegation section ⇒ header/五段政策消失。
+- 反向：不替换服务时，A2/E5B/E5C 的 6 座位真挂载全绿；启动面不是问题。
 
 ## 修复方向（未授权）
 
