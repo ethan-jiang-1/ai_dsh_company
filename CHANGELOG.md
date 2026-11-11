@@ -2,6 +2,15 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.11.5 — 2026-11-11
+
+### Changed
+
+- root pnpm 与 vendor 同钉 11.28.5：clean clone 不再混用两套 pnpm；新增结构门禁防漂移。
+- 首跑文档补 `pnpm bundle:init` 顺序；`release --check` 的 pre-publish 用法写入命令表与 release runbook。
+- 修正随包 `cordis.patch.yml` 的角色计数（五→六）；新增角色计数回归 spec。
+- README 说明源码 clone 的 `_dist` 只有 tracked 手册，tarball 由 `pnpm release --prepare` 生成。
+
 ## 0.11.4 — 2026-11-11
 
 ### Changed

@@ -30,11 +30,13 @@
 - `pnpm typecheck` → exit 0；`pnpm lint` → 0 warnings/0 errors；`pnpm dup` → 0 clones。
 - `pnpm exec vitest run tests/harness/repo/role-count-claims.spec.ts tests/harness/repo/setup-invocation.spec.ts` → 3 passed。
 - `node tools/checks-index.mjs --write` → `checks-index: 已生成 …（137 行）`；script-index 绿。
-- 版本 0.11.5 的 `release --prepare` / `--verify` / `--check --allow-pre-publish-index` 见本轮 release commit 的回执（未跑完前不写 pass）。
+- `pnpm release --prepare` → `export-dist: ALL PASS`；tarball `0.11.5` 259 entries；sha256 `d1d7c14e924f324571c47e063549816c95c40b6db063ab85abbad3057126f730`；手册 0.11.5。
+- `pnpm release --verify` → `release: verify 全绿；提交后跑 --check`（verify/test/release-smoke/company-entry/client-load/preset/present-catalog 全 pass；preset 11/11）。
+- `release --check --allow-pre-publish-index` 的 READY 行见当轮回复（stamp 后给出 release commit SHA）。
 
 ## 未验
 
-- 0.11.5 的 `release --verify`（7 项 smoke）与 `release --check` 在本轮收口时尚未跑；跑完后把 READY 行贴进当版回执。
+- `release --check` 的 READY 是点态：见当轮回复的 stamp 后 READY 行；本 Note 不预写未跑的输出。
 - clean clone 重跑仍按 round2 证据（`337c2db6`）；本轮是 warm checkout。
 - GitHub Actions 的 `setup-macos` 未在 GitHub 上执行；Desktop/Windows、真模型多轮行为未认证。
 

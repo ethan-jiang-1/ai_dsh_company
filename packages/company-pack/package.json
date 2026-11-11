@@ -1,6 +1,6 @@
 {
   "name": "dsh-company-pack",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "type": "module",
   "scripts": {
     "prepack": "node scripts/prepack-check.mjs"
