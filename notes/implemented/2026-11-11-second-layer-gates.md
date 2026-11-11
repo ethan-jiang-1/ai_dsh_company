@@ -4,6 +4,7 @@
 
 上游 = 用户 2026-11-11 第二轮评估后的指令（“这些问题你来都修改了”）。
 相关 = [0.11.0 接手面卫生](2026-11-11-handoff-hygiene.md)（第一轮；本 Note 只记第二轮差异）。
+后续（2026-11-11）：第三轮 pre-publish READY 闸/config 未知键/READY 边界见 [third-layer Note](2026-11-11-third-layer-publish-scope.md)。
 
 ## 决定
 
