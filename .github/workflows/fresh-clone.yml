@@ -54,6 +54,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm bundle:init
       - run: pnpm run setup
       - run: node tools/setup.mjs --check
       - run: pnpm verify
