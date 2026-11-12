@@ -20,7 +20,7 @@ const CONTENT = 'packages/company-pack/content'
 const ALLOWED = 'company/policy-lines.md'
 const CODE_ROOTS = ['packages/company-pack/src', 'packages/company-pack/presets']
 const CODE_EXTS = /\.(?:ts|tsx|yml|md)$/
-const REQUIRED = ['毛利底线', '折扣底线', '固定支出会签线', '并行交付上限', '服务信用']
+const REQUIRED = ['Gross margin floor', 'Discount floor', 'Fixed-spend co-sign line', 'Parallel delivery limit', 'Service credit']
 
 /** 递归收集目录下的文本文件（相对路径）；`filter` 决定收哪些。 */
 function textFiles(dir, filter, prefix = '') {

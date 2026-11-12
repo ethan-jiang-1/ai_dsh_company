@@ -1,23 +1,23 @@
-# 公司政策线（唯一事实家）
+# Company policy lines (single source of truth)
 
-> 本文件是**部署配置**：报价、审批、预算与产能阈值的唯一家。手册、角色章程与 skill 只引用这里，
-> **不另写数字**；换公司只改本文件。数值口径与人事归属无关，人侧见 `owners.md`。
+> This file is **deployment configuration**: the single home of quoting, approval, budget, and capacity thresholds. The handbook, role charters, and skills only reference it,
+> **never restate the numbers**; changing company means changing only this file. The numbers are independent of staffing ownership; human-side ownership is in `owners.md`.
 
-- **毛利底线**：项目毛利 < **30%** → CFO 不签字；需 CFO + CEO 双签（走 `request_signoff`）。
-- **折扣底线**：对客折扣 < **9 折** → CFO + CEO 双签；对客让利一律按**等价折扣率**判，信用/减免/免费期不另立线。
-- **维护年费**：≈ 项目额的 **15–20%**（与项目款分开列，不冲减毛利）。
-- **固定支出会签线**：新增固定支出 ≥ **$500/月** → CFO 会签 + CEO 签（**文件层会签**，不发起 `request_signoff`）。
-- **基础设施预算**：云 **$2,000/月**（SRE 管控）。
-- **试点预算**：AI / agent 试点 API **每案 $200/月硬顶**，达线即停、不追加。
-- **并行交付上限**：**8 个**并行项目（PMO 3 人按 1 PM : 2–3 个项目）；超出即 COO「接不住」。
+- **Gross margin floor**: project gross margin < **30%** → CFO does not sign; requires CFO + CEO double sign (`request_signoff`).
+- **Discount floor**: customer discount deeper than **10% off** → CFO + CEO double sign; all customer concessions are judged by the **equivalent discount rate**; credit/waiver/free period get no separate line.
+- **Maintenance annual fee**: ≈ **15–20%** of the project amount (listed separately from project fees; does not reduce gross margin).
+- **Fixed-spend co-sign line**: new fixed spend ≥ **$500/month** → CFO co-sign + CEO sign (**file-layer co-sign**, no `request_signoff`).
+- **Infrastructure budget**: cloud **$2,000/month** (SRE-controlled).
+- **Pilot budget**: AI / agent pilot API **$200/month per case hard cap**; stops at the line; no top-up.
+- **Parallel delivery limit**: **8** concurrent projects (PMO 3 people, 1 PM : 2–3 projects); above it = COO "cannot carry".
 
-## 服务类附赠 / 服务信用
+## Service bonuses / service credit
 
-- **服务类附赠（免费人天 / 免费培训 / 驻场折现）**：不计入折扣对价；折扣线与毛利线仍**各自独立判定**、不合并。
-  一次性、不折现、不结转；年末未兑现即注销、不跨年；不挂「服务信用」、不冲减维护收入。
-  不引用为先例、不得批量化；不得写入合同作对价——对客文本禁出现「免费 / 对价 / 折现 / 结转」措辞，只写「随承诺附赠一次」。
-  入账：科目 = **销售费用—客户关系维护**（不挂合同履约成本）；成本 = `W·r + D`（`r` / `D` 无出处则**不给美元数**，W 只进工时台账）；
-  凭证四件 = 批准依据 / 交付记录（含客户签收）/ 费用票据（四流一致）/ 审核留痕（人 id + 时间戳）。
-  SoD：运营出交付记录、财务复核；**出纳不做账**；出稿与审核两个环节两个人。
-  批量化或写入合同 ⇒ 性质变为标准对价 ⇒ 回 CFO 重算毛利与折扣线，并重新过 CFO + CEO 双签闸门。
-- **服务信用**：违约补偿、只抵扣不下现金，**≤ 当年维护费 10%**；不得当赠品 / 附赠额度（禁科目串用）；与「客户礼品」（非现金实物、不写入合同作对价）不同类。
+- **Service bonus (free person-days / free training / on-site discounting)**: not counted as discount consideration; the discount line and gross-margin line remain **independently judged** and are not merged.
+  One-off, non-discountable, non-carryover; expires at year end and does not cross years; not booked as "service credit"; does not reduce maintenance revenue.
+  Not cited as precedent, not batched; may not be written into a contract as consideration — customer-facing text may not contain "free / consideration / discounted / carryover"; write only "one bonus included with the commitment".
+  Booking: account = **sales expense — customer relationship maintenance** (not contract fulfillment cost); cost = `W·r + D` (`r` / `D` without a source ⇒ **no dollar number**; W goes only into the timesheet);
+  four vouchers = approval basis / delivery record (with customer sign-off) / expense receipt (four-flow match) / review trail (person id + timestamp).
+  SoD: operations produces the delivery record, finance reviews; **the cashier does not keep the books**; drafting and review are two people.
+  Batching or writing it into a contract ⇒ it becomes standard consideration ⇒ back to CFO to recompute gross margin and discount line, and re-run CFO + CEO double sign.
+- **Service credit**: breach compensation, offsets only, no cash; **≤ 10% of that year's maintenance fee**; may not be used as a gift/bonus quota (no account mixing); different from "customer gifts" (non-cash physical items, not written into a contract as consideration).

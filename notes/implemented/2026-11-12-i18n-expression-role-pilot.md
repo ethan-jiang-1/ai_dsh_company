@@ -288,6 +288,13 @@
 - 新增 charters 英文棘轮；注入中文 → 红，还原 → 绿。
 - 全量 1658 tests；preset-smoke ALL PASS；verify ALL PASS。
 
+## P1 第三片（content/company）
+
+- policy-lines/rates/review-protocol 英文；保留全部政策数字与 `<to-fill>` 占位。
+- content-single-home 的 REQUIRED 改英文；gates-negative 的 Service credit / method-contract 变异同步。
+- templates.spec 的复核协议断言改英文；kb-seeds 的 Parallel delivery limit 同步。
+- 新增 company 英文棘轮；注入中文 → 红，还原 → 绿；全量 1659 tests，verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

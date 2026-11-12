@@ -65,7 +65,7 @@ describe('kb 旁路装配与生产 seed 同形（BUG-054）', () => {
       expect(readFileSync(join(workspace, target), 'utf8'))
         .toBe(readFileSync(join(CONTENT, seed?.source ?? ''), 'utf8'))
     }
-    expect(readFileSync(join(workspace, `${KB_DIR}/policy-lines.md`), 'utf8')).toContain('并行交付上限')
+    expect(readFileSync(join(workspace, `${KB_DIR}/policy-lines.md`), 'utf8')).toContain('Parallel delivery limit')
   })
 
   it('onlyMissing 不覆盖已有文件（bundle:init 与生产 only-fill 同语义）', () => {

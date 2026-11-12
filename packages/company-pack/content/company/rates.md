@@ -1,22 +1,22 @@
-# 人力费率卡（样例；装后按你的公司改）
+# Labor rate card (sample; replace with your company after install)
 
-> 层：公司 · 加载：按需（T2）。本文件是「人·周成本」的**唯一家**；项目报价、折扣与毛利线不在这里
-> （见 `policy-lines.md`）。
-> **出厂是占位模板**：`<待填>` = 尚未配置。CFO 读到 `<待填>` 必须报「配置缺口」，
-> **不得编费率**；确需测算时只用区间 / 上界并标【未证明成立】。
+> Layer: company · Load: on demand (T2). This file is the **only home** of "person-week cost"; project quotes, discounts, and gross-margin lines are not here
+> (see `policy-lines.md`).
+> **Factory version is a placeholder template**: `<to-fill>` = not configured. When CFO reads `<to-fill>`, report a "configuration gap",
+> **never invent a rate**; when modeling is truly needed, use a range / upper bound only and label it [not proven].
 >
-> 口径：人·周 = 5 个工作日；含税、社保、福利与管理分摊；币种 = USD；有效期 = `<待填>`。
-> 填法：按条线 / 职级填；一行一个口径；跨期或换公司重算。
+> Basis: person-week = 5 working days; includes tax, social insurance, benefits, and management allocation; currency = USD; valid until = `<to-fill>`.
+> How to fill: by line / level; one basis per row; recompute when crossing periods or changing company.
 
-| 条线 / 职级 | 人·周成本 | 备注 |
+| Line / level | Person-week cost | Note |
 |---|---|---|
-| 平台 / 后端 | `<待填>` | 含基础设施分摊 |
-| 前端 / 移动 | `<待填>` | |
-| 数据与 AI | `<待填>` | |
-| 测试 | `<待填>` | |
-| SRE / 研发效能 | `<待填>` | |
-| 系统集成工程师 | `<待填>` | ERP / 财务 / 业务系统集成 |
-| 定制开发 | `<待填>` | 项目派驻 |
-| PMO / 交付经理 | `<待填>` | |
-| 运维与支持 | `<待填>` | |
-| 财务 / 市场 / 销售 / 客户成功 | `<待填>` | 职能分摊口径另注 |
+| Platform / backend | `<to-fill>` | Includes infrastructure allocation |
+| Frontend / mobile | `<to-fill>` | |
+| Data and AI | `<to-fill>` | |
+| Test | `<to-fill>` | |
+| SRE / engineering productivity | `<to-fill>` | |
+| Systems-integration engineer | `<to-fill>` | ERP / finance / business-system integration |
+| Custom development | `<to-fill>` | Project on-site |
+| PMO / delivery manager | `<to-fill>` | |
+| Operations and support | `<to-fill>` | |
+| Finance / marketing / sales / customer success | `<to-fill>` | Functional allocation noted separately |

@@ -1,12 +1,12 @@
-# 复核协议（AI 使用声明 / 独立性层级 / 对外件闸门）
+# Review protocol (AI use statement / independence level / external-facing gate)
 
-> 层：公司 · 加载：按需（T2，模板引用）。本文件是复核声明文本的**唯一家**；产出模板只引用，不复制。
+> Layer: company · Load: on demand (T2, referenced by templates). This file is the **only home** of the review statement text; output templates reference it, never copy it.
 
-- **AI 使用声明**：起草 =（人 / AI 起草：具名）｜具名复核人 =（姓名；复核担责）｜复核日期 = YYYY-MM-DD｜版本 = v_（与稿首署名行同号）
-- **复核独立性层级** =（机械全量重算（规则确定性 ⇒ 独立性成立）｜上下文独立复核（同模但异上下文/异检索，独立性有限，**不得报成「异人」**）｜判断类复核（同模异线程，独立性有限））｜**关键结论边际宽度** =（差几格 / 几个百分点翻面；本件无因果结论写「无」）。
-- **缺声明不得进对外交付件**；`drafts/` 过程稿不强制，但进 `final` 或对外件必须齐。
-- 复核人栏**必须写姓名**；姓名册补名前**不得以岗位名充作姓名** ⇒ 对外件在补名完成前 **fail-closed（不得外发）**（与「未具名 = 不启动」同源）。
-- **质量环的独立性口径**：`quality-loop-producer` / `quality-loop-verifier` 两个能力档跑出来的裁决 = **上下文独立复核**（同模异上下文，独立性有限）——
-  它解决锚定、自我评分与注意力稀释，**不解决**同源盲区与模型相关性，**不得**记成「异人复核」或「双人复核」，关键结论旁仍标边际宽度。
-  裁决包（`quality-loop/verdict-r<N>.md` + 处置表）是需要人签字的**证据包**：它不替代上面的具名人类复核人，也不降低「缺声明不得进对外交付件」这道闸——
-  **对外签字仍归人**，本环只是把那个人要核对的东西备齐（流程 = pack skill `quality-loop`）。
+- **AI use statement**: drafted by = (person / AI drafter: named)｜named reviewer = (name; accountable for review)｜review date = YYYY-MM-DD｜version = v_ (same as the signature line at the top of the draft)
+- **Review independence level** = (mechanical full recompute (rule determinism ⇒ independence holds)｜context-independent review (same model, different context/retrieval; independence limited; **must not be reported as "different person"**)｜judgment review (same model, different thread; independence limited))｜**key-conclusion margin width** = (how many cells / percentage points flip it; write "none" when the item has no causal conclusion).
+- **No statement, no external deliverable**; `drafts/` process drafts are not forced, but anything entering `final` or an external deliverable must be complete.
+- The reviewer field **must carry a name**; before the name roster is filled, **a role title may not stand in for a name** ⇒ external deliverables **fail-closed (do not send)** until the name is filled (same source as "no name = do not start").
+- **Quality-loop independence wording**: the verdict from the two capability tiers `quality-loop-producer` / `quality-loop-verifier` = **context-independent review** (same model, different context; independence limited) —
+  it addresses anchoring, self-scoring, and attention dilution; it **does not** address same-source blind spots or model correlation; **must not** be recorded as "different-person review" or "two-person review"; key conclusions still carry margin width.
+  The verdict pack (`quality-loop/verdict-r<N>.md` + disposition table) is an **evidence pack** for a human signature: it does not replace the named human reviewer above, nor lower the "no statement, no external deliverable" gate —
+  **external signing still belongs to a human**; the loop only assembles what that person must check (process = pack skill `quality-loop`).

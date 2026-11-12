@@ -26,10 +26,10 @@ describe('复核协议（单家化：模板引用，协议持有正文）', () =
   it('协议文件在场，且含两条声明栏位与机械重算/异人口径', () => {
     expect(existsSync(PROTOCOL), '缺 company/review-protocol.md').toBe(true)
     const protocol = readFileSync(PROTOCOL, 'utf8')
-    expect(protocol, '协议缺「复核独立性层级」栏').toContain('复核独立性层级')
-    expect(protocol, '协议缺「边际宽度」栏').toContain('边际宽度')
-    expect(protocol, '协议必须点明机械全量重算这一层').toContain('机械全量重算')
-    expect(protocol, '协议必须写明同模复核不得报成「异人」').toMatch(/不得[^\n]*异人/)
+    expect(protocol, '协议缺「复核独立性层级」栏').toContain('Review independence level')
+    expect(protocol, '协议缺「边际宽度」栏').toContain('margin width')
+    expect(protocol, '协议必须点明机械全量重算这一层').toContain('mechanical full recompute')
+    expect(protocol, '协议必须写明同模复核不得报成「异人」').toMatch(/must not[^\n]*different-person/i)
   })
 
   it('带复核要求的模板必须引用协议（不复制正文）', () => {
@@ -44,7 +44,7 @@ describe('复核协议（单家化：模板引用，协议持有正文）', () =
     const files = readdirSync(TEMPLATES).filter(name => name.endsWith('.md'))
       .map(name => join(TEMPLATES, name))
     files.push(PROTOCOL)
-    const hits = files.filter(file => readFileSync(file, 'utf8').includes('机械全量重算'))
+    const hits = files.filter(file => readFileSync(file, 'utf8').includes('mechanical full recompute'))
     expect(hits.map(file => file.slice(CONTENT.length + 1)), '机械重算正文出现多处').toEqual(['company/review-protocol.md'])
   })
 

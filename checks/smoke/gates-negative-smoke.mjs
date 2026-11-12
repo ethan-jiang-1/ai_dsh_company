@@ -51,7 +51,7 @@ const report = (label, messages, needle) => {
   const root = makeRoot()
   try {
     const path = join(root, 'packages/company-pack/presets/cfo/skills/project-economics/SKILL.md')
-    writeFileSync(path, readFileSync(path, 'utf8').replace('适用交付模式 = project-services', '适用交付模式 = nope'))
+    writeFileSync(path, readFileSync(path, 'utf8').replace('applicable delivery modes = project-services', 'applicable delivery modes = nope'))
     report('method-contract：未知交付模式 → 红', run(methodContract, root), '没有交付模式包')
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
@@ -69,8 +69,8 @@ const report = (label, messages, needle) => {
   const root = makeRoot()
   try {
     const path = join(root, 'packages/company-pack/content/company/policy-lines.md')
-    writeFileSync(path, readFileSync(path, 'utf8').replace(/^- \*\*服务信用\*\*.*$/m, ''))
-    report('content-single-home：删服务信用 → 红', run(contentSingleHome, root), '缺政策线「服务信用」')
+    writeFileSync(path, readFileSync(path, 'utf8').replace(/^- \*\*Service credit\*\*.*$/m, ''))
+    report('content-single-home：删 Service credit → 红', run(contentSingleHome, root), '缺政策线「Service credit」')
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 
