@@ -8,7 +8,7 @@
 
 - **CEO**：按问题选人（默认 **CMO + VP-Eng**；要外部事实才加 worker-researcher）；建 DAG；收口 `present`。
   **不默认叫全员**——动议没问的域不进屋（见 CEO skill `assembling-the-team`）。
-- **CMO**：市场机会 → **MRD**（`drafts/mrd.md`，`MR-###`）；涉众诉求 → **StRS**（`drafts/strs.md`，`REQ-###`，证据标【事实/假设】）。
+- **CMO**：市场机会 → **MRD**（`drafts/mrd.md`，`MR-###`）；涉众诉求 → **StRS**（`drafts/strs.md`，`REQ-###`，证据标[fact/assumption]）。
 - **VP-Eng**：接 MRD/StRS → **PRD**（`drafts/prd.md`，`REQ-###`、验收 `AC-###-#`、slice）。
 - **VP-Sales / COO / CFO**：只有动议明确问到现有客户定价 / 交付承接 / 预算毛利才进屋。
 

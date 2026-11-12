@@ -89,7 +89,7 @@ export function convergenceResume(input) {
 export function pickArchivedJournal(input) {
   // ⚠ **只认文件名命中**（2026-10-16 两次实测定的口径）：
   //   ① 先试「文件名含 slug」——最强证据，唯一可靠；
-  //   ② 文件名认不出 slug 时（`日期待核-<slug>.md` 这类历史命名）**才**退回「文件名末尾段 == slug」
+  //   ② 文件名认不出 slug 时（`date-pending-<slug>.md` 这类历史命名）**才**退回「文件名末尾段 == slug」
   //      的精确等值，不做**正文包含**。
   // 为什么不做正文包含：journal 正文常引用别的 slug（判决、交叉引用），包含式匹配会把 A 场的
   // 纪要当成 B 场的证据——实测 `emergency-x` 的 coo 行被解析到 `role-boundary-diagnosis-2026/journal/coo/…`
@@ -104,7 +104,7 @@ export function pickArchivedJournal(input) {
       try { isFile = statSync(path).isFile() } catch { continue }
       if (!isFile) continue
       if (name.includes(input.slug)) return path
-      // 历史命名：`<前缀>-<slug>.md` / `日期待核-<slug>.md` ⇒ 剥 `.md` 后按 `-` 分段做**精确尾段**判等
+      // 历史命名：`<前缀>-<slug>.md` / `date-pending-<slug>.md` ⇒ 剥 `.md` 后按 `-` 分段做**精确尾段**判等
       const base = name.replace(/\.md$/, '')
       if (base === input.slug || base.endsWith(`-${input.slug}`)) return path
     }

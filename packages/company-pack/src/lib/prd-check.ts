@@ -105,11 +105,11 @@ function readEvidence(raw: unknown, where: string, errors: string[]): MrdEvidenc
     const kind = asString(item.kind)
     const source = asString(item.source)
     if (kind !== 'fact' && kind !== 'assumption') errors.push(`${where}.evidence[${index}].kind 必须是 fact|assumption`)
-    if (source === undefined) errors.push(`${where}.evidence[${index}].source 缺失（【事实/假设】必须带出处或待验证说明）`)
+    if (source === undefined) errors.push(`${where}.evidence[${index}].source 缺失（每条证据必须带出处或待验证说明）`)
     if ((kind === 'fact' || kind === 'assumption') && source !== undefined) out.push({ kind, source })
   }
   if (out.length === 0 && errors.every(error => !error.startsWith(`${where}.evidence`))) {
-    errors.push(`${where}.evidence 不能为空（至少一条【事实/假设】）`)
+    errors.push(`${where}.evidence 不能为空（至少一条证据）`)
   }
   return out
 }

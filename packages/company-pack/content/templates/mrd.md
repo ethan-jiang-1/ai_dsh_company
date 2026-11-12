@@ -7,7 +7,7 @@ definition: json-ledger
 
 > 主笔 = **CMO**；落 `drafts/mrd.md`；它是 PRD 的输入（VP-Eng 主笔 PRD）。
 > 回答"该不该做、做什么、为谁做、凭什么赢"；**不是功能清单**（那是 PRD），**不是定价判断**（归 VP-Sales/CFO）。
-> 每个机会一个编号 `MR-001…`；证据标【事实】/【假设】并给出处或待验证说明。
+> 每个机会一个编号 `MR-001…`；证据标[fact]/[assumption]并给出处或待验证说明。
 > `productType` 按动议类型替换（类型 id = `content/product-types/` 下的目录名；解析规则见 `meta.md`）。
 
 ```json
@@ -53,7 +53,7 @@ definition: json-ledger
 
 ## 规模与依据
 
-| 口径 | 数字 | 依据 | 事实/假设 |
+| 口径 | 数字 | 依据 | fact/assumption |
 |---|---|---|---|
 | TAM | | | |
 | SAM | | | |

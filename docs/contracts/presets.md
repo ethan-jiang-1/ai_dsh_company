@@ -71,7 +71,7 @@
   定价撑不住交付成本）；产出=市场判断 + 定价建议（`templates/decision-memo.md`，结论先行一页纸）；
   引用 KB 客户与竞品事实，**禁止虚构客户**；不替研发/运营下结论。
 - **工作流（1 号）**：`sales-workflow`（接活→备料→测算→出稿→回执）；打法 skill =
-  `market-sizing`（双向估算 + **MEDDIC 六问**单单资格 + 敏感度；数字标【事实/假设】）、
+  `market-sizing`（双向估算 + **MEDDIC 六问**单单资格 + 敏感度；数字标[fact/assumption]）、
   `customer-voice`（只认行为不认表态；每条判断带 KB 出处）、`pricing`（项目制/SI；business-software fail-closed）。
 - **KB**：`kb/vp-sales/CHARTER.md`（客户事实：9 家中型企业、痛点=系统间对不上账；竞品两类；
   定价原则：项目制/SI 3-4-3；维护年费、折扣/毛利线见 `policy-lines.md`；business-software 缺定价方法 → fail-closed）+ `journal/`。
@@ -79,7 +79,7 @@
   产出=对 PRD 出定价/现有客户影响意见（新市场归 CMO），不越权）。
 
 ## CMO（职能化身：市场与产品定义，2026-11-05 增设）
-- **persona**：视角=市场机会/产品定义/买点；"市场不成立"即 veto；产出 MRD（`MR-###`）+ StRS（`REQ-###`，`traces`→MR，标【事实/假设】）；不替 VP-Sales 定价、不替 VP-Eng 定技术。
+- **persona**：视角=市场机会/产品定义/买点；"市场不成立"即 veto；产出 MRD（`MR-###`）+ StRS（`REQ-###`，`traces`→MR，标[fact/assumption]）；不替 VP-Sales 定价、不替 VP-Eng 定技术。
 - **打法**：`mrd-playbook` + 共享 `product-definition`（脊柱 + 硬软一体 / 纯软 playbook；交付模式另轴 = `content/delivery-modes/` 的 `project-services` / `managed-service`，不是产品类型）。
 - **KB/验证**：`kb/cmo/CHARTER.md` + `journal/`；选 `cmo` 跑身份/知识/产出三探针；MRD→PRD 交接见 demo.md。
 

@@ -15,7 +15,7 @@ MRD / PRD 是这条脊柱的两种产物，不是两套模板。
 
 ## 脊柱（七步，两类产物共用）
 
-1. **问题/机会**：谁在什么场景下、因为什么限制而过不好？证据标【事实/假设】。
+1. **问题/机会**：谁在什么场景下、因为什么限制而过不好？证据标[fact/assumption]。
 2. **用户与场景**：买单人、使用者、决策链；现在怎么凑合（不做的代价）。
 3. **价值**：为什么是我们、凭什么赢；替代方案与竞品。
 4. **成功判据**：可观测的业务结果（不是功能清单）。
@@ -78,7 +78,7 @@ business-software 的 MRD→StRS→PRD，另加 SOW/UAT/RACI/里程碑，不改�
 
 ## 三种产物
 
-- **MRD（CMO 主笔）**：机会编号、细分与买单人、现有替代、竞品、买点、规模【事实/假设】、
+- **MRD（CMO 主笔）**：机会编号、细分与买单人、现有替代、竞品、买点、规模[fact/assumption]、
   成功判据、go/no-go 建议。落 `deliverables/<slug>/drafts/mrd.md`（`layer: MRD`、`definition: json-ledger`）。
 - **StRS（CMO 主笔）**：涉众诉求——谁在乎、在乎什么、验收时谁点头；每条 `REQ-###` 带
   `traces: [MR-###]`。落 `deliverables/<slug>/drafts/strs.md`（`layer: StRS`、`definition: headings`）。

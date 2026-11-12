@@ -160,7 +160,14 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 - 红→绿：把 parser 回退到旧中文格式 → candidate-scan spec **17 条红**；还原 → 27 passed。
 - 仍保留中文金标准标注状态（`GOLD_STATUSES`）作为独立仪器，不属于派活行。
 
-**剩余 I1b**：`【事实】/【假设】` 标签（`product-definition` + 模板/check 消息）。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
+**I1b 第五片（事实/假设标签）**：
+
+- `【事实】/【假设】/【事实/假设】` → `[fact]/[assumption]/[fact/assumption]`；`【事实/假设/待验】` → `[fact/assumption/to-verify]`。
+- 同步 templates（mrd/prd/decision-memo/meta/syrs）、cmo charter、product-definition、hardware reference、三份 docs；`prd-check` 消息去掉 token，改成普通中文句子。
+- 新增 `tests/content/fact-labels.spec.ts` 固定内容面棘轮：中文标签回潮 → 红；还原 → 绿。
+- I1b 机器 token 清单已清；`pnpm verify` **ALL PASS**。
+
+**剩余 I1**：5 个 skill 全文翻译（product-definition / assembling / chairing / fact-finding / quality-loop）；persona/agent.cordis.yml；content/**；领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 

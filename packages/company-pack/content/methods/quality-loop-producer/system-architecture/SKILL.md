@@ -44,7 +44,7 @@ metadata:
 
 `syrs.md`（`layer: SyRS` / `definition: headings`）、`irs.md`（`layer: IRS` / `definition: headings`）、
 `allocation.md`（`definition: none`，不立号）、`system-architecture.md`（引用面，不立号）。
-一页结论先行：架构一句话 + 三个关键权衡 + 风险；假设标【事实/假设/待验】。
+一页结论先行：架构一句话 + 三个关键权衡 + 风险；假设标[fact/assumption/to-verify]。
 
 ## 升级
 

@@ -47,7 +47,7 @@ wrapper 复用上次 tarball（跳过构建打包，`--rebuild` 强制重打）�
 | 2 | CEO | DAG 拆解：建任务 + `blockedBy` 依赖 + 指定 owner | 头部「任务板」按钮（开右栏页签）或「公司」视图·看板出现多行任务：owner 分别是 VP-Sales/VP-Eng/COO/CFO，依赖徽章非空；任务文本声明了依赖而板面没有边时，卡上另带 `⚠ 声明依赖未落板：…` |
 | 3 | CEO | `spawn_teammate` 拉起四个职能 | 名册出现 CEO + 四行成员，状态 running/idle 实时变化；任务板成员栏同步 |
 | 4 | **切到 VP-Eng 会话** | 它读自己的 KB、消化 brief、出稿 | 会话里能看到读 `kb/vp-eng/CHARTER.md` 的工具调用；产出写入 `deliverables/` |
-| 5 | **切到 VP-Sales 会话** | 市场与定价判断（MEDDIC 六问 / 双向估算） | 引用 `kb/vp-sales/` 客户事实；数字带【事实/假设】标注 |
+| 5 | **切到 VP-Sales 会话** | 市场与定价判断（MEDDIC 六问 / 双向估算） | 引用 `kb/vp-sales/` 客户事实；数字带[fact/assumption]标注 |
 | 6 | VP 之间互审 | 一封 `send_message` 从 A 空间到 B 空间，B 回执 | 两个会话里都有消息记录；任务板修订号（`id@rev`）增加 |
 | 7 | COO / CFO 会话 | 交付承接核查 / 毛利与合规意见 | COO 报并行项目池与人力；CFO 给毛利底线与 SoD 闸门 |
 | 8 | 回 CEO | `wait_agent` → 读板 → 合稿 → `present` | 交付卡片出现；分歧被保留（如 CFO 保留意见与销售定价冲突没被抹平） |

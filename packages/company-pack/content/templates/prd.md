@@ -56,7 +56,7 @@ definition: json-ledger
 
 ## 约束
 
-- 时间 / 人力 / 预算：<引用 `.dsh-company/kb/org.md`，标【事实】/【假设】>
+- 时间 / 人力 / 预算：<引用 `.dsh-company/kb/org.md`，标[fact]/[assumption]>
 - 技术前提：<引用 `.dsh-company/kb/vp-eng/CHARTER.md`>
 - 合规 / 认证 / 安全：<按产品类型，引用 CFO / COO 口径>
 

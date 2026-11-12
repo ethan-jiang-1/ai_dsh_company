@@ -220,7 +220,7 @@ export function metaLedgerFindings(input) {
       })
     }
     const ledgerDate = ledgerDateBySlug.get(slug)
-    if (ledgerDate !== undefined && ledgerDate !== '日期待核' && meta.fields.get('kickoff') !== ledgerDate) {
+    if (ledgerDate !== undefined && ledgerDate !== 'date-pending' && meta.fields.get('kickoff') !== ledgerDate) {
       results.push({
         kind: 'warning',
         code: WARNING.META_LEDGER_MISMATCH,
