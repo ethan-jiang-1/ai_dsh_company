@@ -1,45 +1,45 @@
 ---
 name: prd-playbook
-description: VP-Eng 的 PRD 打法：接 CMO 的 MRD+StRS，产出产品层可追溯、可验收、可分解的需求账本（REQ/AC/slice，source→MR、traces→StRS），过 DoR/DoD，过 /prd check + /req check；先读共享 product-definition 脊柱与品类 playbook。
+description: 'VP-Eng PRD playbook: take CMO MRD+StRS and produce a traceable, acceptance-ready, decomposable product-layer requirements ledger (REQ/AC/slice, source→MR, traces→StRS); pass DoR/DoD and /prd check + /req check; read the shared product-definition spine and the product-type playbook first.'
 ---
-# PRD playbook（VP-Eng）
+# PRD playbook (VP-Eng)
 
-先加载 `product-definition`（脊柱 + 品类 playbook）。PRD 是**需求账本**，不是一篇文章：
-研发按 slice 一批一批吃，每条 REQ 都能独立进任务板。
+Load `product-definition` first (spine + product-type playbook). The PRD is a **requirements ledger**, not an essay:
+engineering consumes it slice by slice, and each REQ can enter the task board independently.
 
-## 输入
+## Inputs
 
-- `deliverables/<slug>/drafts/mrd.md`（CMO 的市场机会，编号 `MR-###`）与 `drafts/strs.md`（CMO 的涉众需求，`REQ-###`）。
-- `.dsh-company/kb/vp-eng/CHARTER.md`（技术栈、人力、成本口径）与公司事实。
-- 品类 playbook（项目制/系统集成 或 硬软一体）——决定 PRD 多出哪些字段。
+- `deliverables/<slug>/drafts/mrd.md` (CMO's market opportunity, numbered `MR-###`) and `drafts/strs.md` (CMO's stakeholder requirements, `REQ-###`).
+- `.dsh-company/kb/vp-eng/CHARTER.md` (stack, staffing, cost basis) and company facts.
+- Product-type playbook (project/systems integration or hardware-software) — determines which extra fields the PRD needs.
 
-## 步骤
+## Steps
 
-1. **对齐机会**：逐条读 MR 与 StRS；PRD 的每条 REQ 用 `source` 指回至少一个 MR id、用 `traces` 指回
-   StRS 的 REQ。MR 不成立就退回 CMO，不在 PRD 里替它补市场结论。
-2. **切最小端到端**：先定 S1（能演示/能验收的最小闭环），再排后续 slice；
-   一条 REQ 只属于一个 slice。
-3. **拆需求**：每条 REQ 一个可独立验收的粒度；依赖写成 REQ id；不把两个需求塞进一条。
-4. **写验收**：每条 REQ 至少一条 AC，格式 given/when/then，能判真假；写不出事实的删掉。
-5. **补约束**：非功能（性能/安全/兼容/可维护）、技术前提、外部依赖、里程碑。
-6. **可行性**：>2 人周、跨系统、或依赖未定的条目，标"待核实"并写验证方式；不把猜测写成结论。
-7. **过 DoR/DoD**：`draft → ready` 前字段齐、AC 可判、来源可追、依赖已声明；
-   `accepted` 前全部 AC 验证。状态变化写 changeLog。
-8. **机械校验**：`/prd check <slug>`；红就改，别绕过。
+1. **Align the opportunity**: read every MR and StRS item; each PRD REQ uses `source` to point back to at least one MR id and `traces` to point back to
+   the StRS REQ. If an MR does not hold, return it to CMO; do not fill in the market conclusion inside the PRD.
+2. **Cut the smallest end-to-end slice**: define S1 first (the smallest demonstrable/acceptable loop), then order later slices;
+   a REQ belongs to exactly one slice.
+3. **Split requirements**: each REQ is independently acceptable; write dependencies as REQ ids; do not put two requirements in one REQ.
+4. **Write acceptance**: each REQ has at least one AC in given/when/then form that is true or false; delete anything that cannot be settled by facts.
+5. **Add constraints**: non-functional (performance/security/compatibility/maintainability), technical prerequisites, external dependencies, milestones.
+6. **Feasibility**: for items over 2 person-weeks, cross-system, or with an undecided dependency, mark "to verify" and write the verification method; do not write guesses as conclusions.
+7. **Pass DoR/DoD**: before `draft → ready`, fields are complete, AC is decidable, source is traceable, dependencies are declared;
+   before `accepted`, every AC is verified. Write state changes to the changeLog.
+8. **Mechanical check**: `/prd check <slug>`; fix red, do not bypass it.
 
-## PRD 产出
+## PRD output
 
-按 `<company-content>/templates/prd.md` 写，落 `deliverables/<slug>/drafts/prd.md`（`layer: PRD`、`definition: json-ledger`）。
-- **JSON 账本是唯一定义点**：每个 REQ 的 `id`/`source`/`traces`/`acceptance` 都在账本里；正文小节标题是引用
-  （「需求说明：REQ-###」），不得再以裸 ID 开头。
-- 正文：概述、范围与非范围、约束、依赖与风险、里程碑、每个 REQ 的说明。
-- 编号：REQ-###、AC-<REQ号>-<n>；只增不改号；撤销用状态（`withdrawn`→作废），不重排、不复用。
-- 机械校验：`/prd check <slug>`（结构）+ `/req check <slug>`（编号/层/追溯）；红就改。
+Write it with `<company-content>/templates/prd.md`, save to `deliverables/<slug>/drafts/prd.md` (`layer: PRD`, `definition: json-ledger`).
+- **The JSON ledger is the sole definition point**: every REQ's `id`/`source`/`traces`/`acceptance` lives in the ledger; body section headings are references
+  ("Requirement: REQ-###"), and must not start with a bare ID.
+- Body: overview, scope and non-scope, constraints, dependencies and risks, milestones, a description for each REQ.
+- Numbering: REQ-###, AC-<REQ>-<n>; append-only, never renumber; withdraw through status (`withdrawn`), do not reorder or reuse.
+- Mechanical check: `/prd check <slug>` (structure) + `/req check <slug>` (numbering/layer/traceability); fix red.
 
-## 边界
+## Boundary
 
-- 不替 CMO 判断"有没有人买"；不替 VP-Sales 定价；不替 COO 承诺交付日期。
-- **只写产品层**：下游系统/接口/验证文档若由 CEO 指派他人主笔，不代笔、不预填。
-- 技术不可行 / 成本失控 / 风险不可接受 → veto + 一句话理由；MRD 与 PRD 冲突时保留双方结论，
-  交 CEO 拍板。
-- PRD 通过后，研发按"一 REQ 一任务"进任务板；验收按 AC 号核，不按"感觉做完了"。
+- Do not judge "will anyone buy" for CMO; do not price for VP-Sales; do not commit delivery dates for COO.
+- **Product layer only**: if downstream system/interface/verification documents are assigned by the CEO to someone else, do not author or prefill them.
+- Technical infeasibility / cost blow-up / unacceptable risk → veto + one-line reason; when MRD and PRD conflict, keep both conclusions and
+  send them to the CEO for a decision.
+- After the PRD passes, engineering enters the task board as "one REQ, one task"; acceptance checks AC ids, not "it feels done".

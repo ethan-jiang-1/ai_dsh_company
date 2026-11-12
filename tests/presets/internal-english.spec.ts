@@ -24,9 +24,7 @@ const PENDING = new Set([
   'packages/company-pack/presets/ceo/skills/assembling-the-team/SKILL.md',
   'packages/company-pack/presets/ceo/skills/chairing-staff-meeting/SKILL.md',
   'packages/company-pack/presets/ceo/skills/fact-finding-playbook/SKILL.md',
-  'packages/company-pack/presets/cmo/skills/mrd-playbook/SKILL.md',
   'packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md',
-  'packages/company-pack/presets/vp-eng/skills/prd-playbook/SKILL.md',
 ])
 
 
