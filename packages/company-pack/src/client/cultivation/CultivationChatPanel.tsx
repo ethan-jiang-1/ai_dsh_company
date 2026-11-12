@@ -17,13 +17,14 @@ import { CULTIVATION_COPY } from './cultivation-actions.ts'
 type EventWindow = ReturnType<SessionBinding['eventSource']['getSnapshot']>
 
 /** 独立培养会话的范围前缀：同一个 agent 只在这个线程里谈培养。 */
-const CULTIVATION_SCOPE = '【培养对话】你只在这个线程里讨论培养：纠正、方法、journal、赞踩。不要处理其他项目或公司事务。回答要能落到方法/记录上。\n\n'
+const USER_MARKER = '[User question]'
+
+const CULTIVATION_SCOPE = '[Cultivation conversation] Discuss only cultivation in this thread: corrections, methods, journals, ratings. Do not handle other projects or company matters. Answers should land on a method or record.\n\n'
 
 /** 渲染时剥掉范围/附加前缀，用户看到的是自己写的那句。 */
 function stripScope(text: string): string {
-  const marker = '【用户问题】'
-  const at = text.indexOf(marker)
-  if (at >= 0) return text.slice(at + marker.length)
+  const at = text.indexOf(USER_MARKER)
+  if (at >= 0) return text.slice(at + USER_MARKER.length)
   return text.startsWith(CULTIVATION_SCOPE) ? text.slice(CULTIVATION_SCOPE.length) : text
 }
 
@@ -31,10 +32,10 @@ function stripScope(text: string): string {
 function attachedContext(record: CultivationRecord | undefined): string {
   if (record === undefined) return ''
   const body = record.body.length > 1200 ? `${record.body.slice(0, 1200)}…` : record.body
-  return `【附加记录】${record.id} · ${record.targetRole} · ${record.status}
-期望：${record.expectation}
-来源：${record.source || '来源未记录'}
-正文：${body}
+  return `[Attached record] ${record.id} · ${record.targetRole} · ${record.status}
+Expectation: ${record.expectation}
+Source: ${record.source || 'source not recorded'}
+Body: ${body}
 
 `
 }
@@ -237,7 +238,7 @@ function CultivationThread({ binding, attachments }: { readonly binding: Session
     setPending(text)
     setSending(true)
     try {
-      const result = await binding.session.prompt([{ type: 'text', text: `${CULTIVATION_SCOPE}${attachedContext(attached)}【用户问题】${text}` }], 'queue')
+      const result = await binding.session.prompt([{ type: 'text', text: `${CULTIVATION_SCOPE}${attachedContext(attached)}${USER_MARKER}${text}` }], 'queue')
       if (!result.ok) {
         // 失败不丢输入：恢复草稿，用户改一下就能重发。
         setError(`${result.error.code}: ${result.error.message}`)

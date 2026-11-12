@@ -82,7 +82,7 @@ describe('CultivationChatPanel（独立培养会话）', () => {
       .toHaveBeenCalledWith([{ type: 'text', text: expect.stringContaining('把这条 rejected 纠正整理成反例方法') }], 'queue')
 
     await act(async () => {
-      fake.pushEntry({ type: 'user/message', seq: 1, data: { content: [{ type: 'text', text: '【培养对话】你只在这个线程里讨论培养：纠正、方法、journal、赞踩。不要处理其他项目或公司事务。回答要能落到方法/记录上。\n\n把这条 rejected 纠正整理成反例方法' }] } })
+      fake.pushEntry({ type: 'user/message', seq: 1, data: { content: [{ type: 'text', text: '[Cultivation conversation] Discuss only cultivation in this thread: corrections, methods, journals, ratings. Do not handle other projects or company matters. Answers should land on a method or record.\n\n把这条 rejected 纠正整理成反例方法' }] } })
       fake.pushEntry({ type: 'assistant/message', seq: 2, data: { message: { content: [{ type: 'text', text: '建议整理成反例方法。' }] } } })
     })
     expect(host.textContent).toContain('建议整理成反例方法。')
@@ -119,9 +119,9 @@ describe('CultivationChatPanel（独立培养会话）', () => {
     await act(async () => { send?.dispatchEvent(new MouseEvent('click', { bubbles: true })) })
     const prompt = (fake.binding as unknown as { session: { prompt: ReturnType<typeof vi.fn> } }).session.prompt
     const text = prompt.mock.calls[0]?.[0]?.[0]?.text as string
-    expect(text).toContain('【附加记录】20261028-abc123')
+    expect(text).toContain('[Attached record] 20261028-abc123')
     expect(text).toContain('收口前列未决')
-    expect(text).toContain('【用户问题】这条怎么落成方法？')
+    expect(text).toContain('[User question]这条怎么落成方法？')
   })
 
   it('prompt 失败保留草稿并显示原因（不丢用户输入）', async () => {

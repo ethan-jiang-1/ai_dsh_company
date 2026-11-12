@@ -269,6 +269,11 @@
 - 修 tab body 注入 t（此前回落 zh）、Tasks/Cultivation 标题与 guide 对齐、DelegationFlow/Presence 表头、budget 括号/zh footer 文本。
 - zh 金样恢复一致；全量 1656 tests，verify ALL PASS。
 
+## P0 收尾（培养 prompt）
+
+- CULTIVATION_SCOPE、附加记录前缀、用户问题 marker 改英文；stripScope 同步。
+- 测试夹具同步；client 381 tests；金样 ALL PASS；全量 1656 tests，verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
