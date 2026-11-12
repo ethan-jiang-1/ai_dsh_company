@@ -169,21 +169,21 @@ describe('方法槽与流程 skill：身份不含方法，流程不含身份', (
     const skill = readFileSync(QUALITY_LOOP_SKILL, 'utf8')
     expect(skill).toContain('name: quality-loop')
     for (const [label, needle] of [
-      ['任务书字段', '## 1. 任务书'],
-      ['交接包', '## 2. 两轮交接'],
-      ['落盘与裁决头', '## 3. 落盘'],
-      ['处置三选一', '## 4. 处置'],
-      ['轮次与升级', '## 5. 轮次与升级'],
-      ['方法包契约', '## 6. 方法包契约'],
-      ['严格串行', '严格串行：先生产，再验证'],
-      ['独立性口径', '## 7. 独立性怎么说'],
+      ['任务书字段', '## 1. Brief'],
+      ['交接包', '## 2. Two-round handoff'],
+      ['落盘与裁决头', '## 3. Artifacts on disk'],
+      ['处置三选一', '## 4. Disposition'],
+      ['轮次与升级', '## 5. Rounds and escalation'],
+      ['方法包契约', '## 6. Method-pack contract'],
+      ['严格串行', 'strictly serial: produce first, then verify'],
+      ['独立性口径', '## 7. How to describe independence'],
     ] as const) {
       expect(skill.includes(needle), `quality-loop skill 缺「${label}」（${needle}）`).toBe(true)
     }
     // 方法是数据：流程 skill 不许点名任何具体方法包（换公司/换方法只换方法层）。
     expect(skill, 'quality-loop skill 不得点名具体方法包').not.toMatch(/requirements-trace|api-contract/)
     // 只读边界与真相：验证者写不了盘，所以裁决由调用方落盘——这条不许被写成"验证者自己写"。
-    expect(skill).toMatch(/验证者只读|只读/)
+    expect(skill).toMatch(/verifier is read-only|read-only/i)
   })
 })
 

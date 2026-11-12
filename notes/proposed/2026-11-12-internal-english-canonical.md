@@ -203,9 +203,11 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 - parser/audit/tests 同步；回退 `DISPOSITION_VALUES` 到中文 → `quality-loop.spec` **10 条红**；还原 → 40 passed。
 - `body-sha256=待填` 仍按回填脚本处理，未改语义。
 
-`quality-loop` 的处置 token 已清，但**全文仍是中文**，仍 PENDING；下一轮做全文翻译。
+`quality-loop` 的处置 token 已清，随后完成全文英文翻译。
 
-**剩余 I1**：`quality-loop`（先 I1c token）；persona/agent.cordis.yml；content/**；领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
+**I1 skill 正文完成（2026-11-12）**：`quality-loop` 全文英文；棘轮 `PENDING` 清空；`presets/**/SKILL.md` 24/24 英文。
+
+**剩余 I1**：`让位/占位` token；persona/agent.cordis.yml；content/**；领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 

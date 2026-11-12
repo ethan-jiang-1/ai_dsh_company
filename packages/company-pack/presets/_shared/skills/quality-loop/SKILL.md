@@ -1,131 +1,130 @@
 ---
 name: quality-loop
-description: 质量环（quality-loop-producer → quality-loop-verifier → 处置 → 复验）：把复杂产出交给两个独立 activation——一个按外部方法包做、一个按同一方法包独立复核，裁决原文落盘可审计。任务书必须点名方法包 `<pack>@<version>`，没给就 fail-closed 停下。
+description: 'Quality loop (quality-loop-producer → quality-loop-verifier → disposition → re-verify): give a complex artifact to two independent activations — one produces against an external method pack, one independently reviews against the same pack; the verdict text is written to disk and auditable. The brief must name the method pack `<pack>@<version>`; if not, fail-closed and stop.'
 ---
-# 质量环：一个做、一个验，方法与裁决都在纸面上
+# Quality loop: one produces, one verifies; method and verdict are on paper
 
-**什么时候用**：一份产出要"做得对"而不只是"做完了"——复杂设计/实现、需求或接口稿、要交给别人
-接着用或对外的东西。一个人在同一个上下文里既做又验会互相干扰（锚定、共享盲区、自我评分），
-这个流程用**两个独立 activation** 把它们分开。
+**When to use**: an artifact must be "done right", not merely "done" — complex design/implementation, requirements or interface drafts, or anything handed to another person
+to continue using or to an external party. One person producing and verifying in the same context interferes with themselves (anchoring, shared blind spots, self-scoring);
+this process uses **two independent activations** to separate the two.
 
-**前置**：调用方组合里有两条命名行 `quality_loop_produce`（→ `quality-loop-producer`，有手）
-与 `quality_loop_verify`（→ `quality-loop-verifier`，只读）——同一个 `quality-loop-` 前缀，一搜就是一整套。
-两者是**能力档**，不是公司角色：它们只有身份与工具面，没有方法、没有流程。
-本 skill 是流程的唯一家；**方法不在任何 preset 里**（`<DSH_HOME>/company/methods/<preset id>/<pack>/`）。
-裁决是内部质量闸的证据包，**对外签字仍归人**（`review-protocol.md` 的具名人类复核不因本流程豁免）。
+**Prerequisites**: the caller's composition has two named rows `quality_loop_produce` (→ `quality-loop-producer`, hands) and `quality_loop_verify` (→ `quality-loop-verifier`, read-only) — the same `quality-loop-` prefix; one search finds the whole set.
+They are **capability tiers**, not company roles: they have identity and a tool surface, but no method and no process.
+This skill is the single home of the process; **the method is not in any preset** (`<DSH_HOME>/company/methods/<preset id>/<pack>/`).
+The verdict is the evidence pack for an internal quality gate; **external signing still belongs to a human** (the named human review in `review-protocol.md` is not exempted by this process).
 
-## 0. 三句话
+## 0. Three sentences
 
-1. **方法必须先点名**：任务书写 `method: <pack>@<version>`，两侧同名同版本；缺了任一侧 = 停下，不猜。
-2. **验的人只看产物**：交接包给基线 + 产物路径 + 约束 + 方法，**不给产出者的推理与自评**。
-3. **裁决原样落盘**：验证者只读、写不了盘；由调用方（VP-Eng）把它的最终正文原样写进
-   `verdict-r<N>.md` 并带头（session / preset / depth / method / body-sha256）。改一个字节，哈希就对不上。
+1. **The method must be named first**: the brief writes `method: <pack>@<version>`, same name and version on both sides; if either side is missing = stop, do not guess.
+2. **The verifier sees only the artifact**: the handoff pack gives baseline + artifact path + constraints + method; **it does not give the producer's reasoning or self-assessment**.
+3. **The verdict lands verbatim**: the verifier is read-only and cannot write to disk; the caller (VP-Eng) writes its final text verbatim into
+   `verdict-r<N>.md` with the header (session / preset / depth / method / body-sha256). Change one byte and the hash no longer matches.
 
-## 1. 任务书（`brief.md`）
+## 1. Brief (`brief.md`)
 
-一次任务一份，字段齐全才算可以开工：
+One per task; work may start only when the fields are complete:
 
-| 字段 | 内容 |
+| Field | Content |
 |---|---|
-| 目标 | 这份产物要解决什么问题、给谁用（一句话） |
-| 约束 | 时间/成本/技术/合规/不许碰的范围 |
-| 基线 | 产物要建立在什么之上（文件路径、上游稿、版本） |
-| 产物路径 | 产出者写哪儿（相对交付目录）；验证者读同一个路径 |
-| 方法 | `method: <pack>@<version>`（两侧同名同版本） |
-| 轮次上限 | 默认 **2**（产→验→处置→复验）；超限升级，不加轮 |
-| 验收口径 | 什么算通过：方法检查表全覆盖 + 无 blocker 发现 |
+| Goal | What problem this artifact solves, for whom (one sentence) |
+| Constraints | Time/cost/technical/compliance/out-of-bounds |
+| Baseline | What the artifact builds on (file paths, upstream drafts, versions) |
+| Artifact path | Where the producer writes (relative to the delivery directory); the verifier reads the same path |
+| Method | `method: <pack>@<version>` (same name and version on both sides) |
+| Round limit | Default **2** (produce→verify→disposition→re-verify); over the limit escalate, do not add rounds |
+| Acceptance | What counts as pass: full method checklist coverage + no blocker findings |
 
-方法没给、或任一侧加载不到同名同版本 skill ⇒ **fail-closed**：不发工，回报缺什么。
+If the method is missing, or either side cannot load the same-name same-version skill ⇒ **fail-closed**: do not dispatch; report what is missing.
 
-## 2. 两轮交接（严格串行：先生产，再验证）
+## 2. Two-round handoff (strictly serial: produce first, then verify)
 
-**次序是硬的**：先 `quality_loop_produce` 落盘，**等它这一轮收工**，再发 `quality_loop_verify`。
-两个一起发出去没有意义——验证者拿到的会是半成品，那叫打断，不叫复核。
+**The order is hard**: first `quality_loop_produce` writes to disk, **wait for that round to finish**, then send `quality_loop_verify`.
+Sending both together is meaningless — the verifier would receive a half-finished artifact; that is interruption, not review.
 
-**发工（产出者）**：`quality_loop_produce` 的 brief = 任务书全文 + 产物路径 + "先加载 `method` 点名的 skill"。
+**Dispatch (producer)**: `quality_loop_produce` brief = full brief + artifact path + "load the skill named by `method` first".
 
-**交接包（给验证者）**：`handoff-r<N>.md`，只含四样——基线、产物路径、约束、方法。
-**不许**附产出者的推理链、自评、"我已经检查过了"。附了就等于让验证者复核自己。
+**Handoff pack (to verifier)**: `handoff-r<N>.md`, only four things — baseline, artifact path, constraints, method.
+**Do not** attach the producer's reasoning chain, self-assessment, or "I already checked it". Attaching them makes the verifier review itself.
 
-**裁决（验证者交回）**：最终正文即裁决。正文形状固定：
+**Verdict (verifier returns)**: the final text is the verdict. The shape is fixed:
 
 ```
-## 裁决：<pass | fail>
-### 检查表
-| check-id | 结果 | 证据 |
+## Verdict: <pass | fail>
+### Checklist
+| check-id | result | evidence |
 |---|---|---|
-| <方法里的 id> | pass / fail / skip | 一句可核对的证据；skip 必须写为什么 |
-### 发现
-- F1 [<check-id>][blocker] 一句话：哪里不对、影响什么
+| <id in the method> | pass / fail / skip | one checkable piece of evidence; skip must say why |
+### Findings
+- F1 [<check-id>][blocker] one sentence: what is wrong, what it affects
 - F2 [<check-id>][advisory] …
 ```
 
-规则：**方法检查表里的每个 check-id 都要有一行**（缺行 = 不通过，不是"没查"）；
-每条发现一个编号；裁决 append-only——复验是新的一块或新文件，**不改旧的**。
+Rules: **every check-id in the method checklist must have a row** (a missing row = not passed, not "not checked");
+one id per finding; the verdict is append-only — a re-verification is a new block or a new file, **never edits the old one**.
 
-## 3. 落盘（调用方做，验证者做不了）
-
-```
-<交付目录>/quality-loop/
-  brief.md              任务书
-  handoff-r<N>.md       交接包
-  verdict-r<N>.md       裁决原文：第一行头 + 正文（正文 = 验证者最终正文，一字不改）
-  dispositions-r<N>.md  处置表
-```
-
-`verdict-r<N>.md` 头行（**一行，机器解析**，`body-sha256` = 头行之后全部正文的 sha256；
-可先写 `body-sha256=待填`，落盘后用下面的命令回填）：
+## 3. Artifacts on disk (caller does this; the verifier cannot)
 
 ```
-<!-- quality-loop: round=1 session=<验证者 sessionId> preset=quality-loop-verifier depth=<delegationDepth> producer=<产出者 sessionId> method=<pack>@<version> body-sha256=<hex64> -->
+<delivery dir>/quality-loop/
+  brief.md              brief
+  handoff-r<N>.md       handoff pack
+  verdict-r<N>.md       verbatim verdict: header line + body (body = verifier's final text, unchanged)
+  dispositions-r<N>.md  disposition table
 ```
 
-取 session / depth / producer = `list_subagents` 对应行（读 child durable header；读不到写 `unavailable` 并说明）。
-`producer` 不是装饰：审计用它核**先产后验**（验证者会话必须在产出者首轮收工之后才创建）。
+`verdict-r<N>.md` header line (**one line, machine-parsed**, `body-sha256` = sha256 of all body text after the header line;
+you may write `body-sha256=to-fill` first and backfill with the command below after saving):
 
-**哈希只走工具，不手算**：先把正文和头写进 `verdict-r<N>.md`，再运行
+```
+<!-- quality-loop: round=1 session=<verifier sessionId> preset=quality-loop-verifier depth=<delegationDepth> producer=<producer sessionId> method=<pack>@<version> body-sha256=<hex64> -->
+```
+
+Get session / depth / producer from the matching `list_subagents` row (read the child durable header; if unreadable write `unavailable` and explain).
+`producer` is not decoration: the audit uses it to check **produce before verify** (the verifier session must be created after the producer's first round finished).
+
+**Hashing goes through the tool, never by hand**: write the body and header into `verdict-r<N>.md`, then run
 
 ```sh
 node <company-content>/../presets/_shared/skills/quality-loop/scripts/verdict-hash.mjs --fix .dsh-company/deliverables/<slug>/quality-loop/verdict-r1.md
 ```
 
-它按审计同一口径（正文去掉结尾空白）重算并回填。**不要用 `tail -n +2 file | shasum`**——它把文件
-尾随换行也算进哈希，audit 会判 `body-modified`（2026-11-10 真实事故 BUG-056）。只取正文哈希用
-`--body <正文文件>`；核对用 `--check <verdict文件>`。
-**别手改正文**：改了就与头、与验证者会话对不上（审计会红）。
+It recomputes and backfills with the same normalization as the audit (body without trailing whitespace). **Do not use `tail -n +2 file | shasum`** — it counts the trailing
+newline and the audit reports `body-modified` (real incident 2026-11-10 BUG-056). To hash only a body use
+`--body <body file>`; to check use `--check <verdict file>`.
+**Do not hand-edit the body**: once changed it no longer matches the header or the verifier session (the audit turns red).
 
-## 4. 处置（每条发现三选一，不许静默忽略）
+## 4. Disposition (one of three per finding; no silent ignoring)
 
-`dispositions-r<N>.md`：
+`dispositions-r<N>.md`:
 
 ```
-| 发现 | 处置 | 说明 |
+| Finding | Disposition | Note |
 |---|---|---|
-| F1（首格也可写 `F1 [check-id] 标题`） | fixed | 改了哪儿 + 复验怎么看到 |
-| F2 | rebut | 证据：为什么这条不成立（要有可核对的东西，不是"我觉得"） |
-| F3 | accept | 风险是什么 + 由谁接受（具名岗位/人；不加"谁接受"不算处置） |
+| F1 (or `F1 [check-id] title` in the first cell) | fixed | what changed + how re-verification sees it |
+| F2 | rebut | evidence: why it does not hold (must be checkable, not "I think") |
+| F3 | accept | what the risk is + who accepts it (named role/person; without "who accepts" it is not a disposition) |
 ```
 
-`blocker` 级发现不许用"接受"结案（要接受就升级给授权人，写进说明）。
+A `blocker` finding may not be closed with "accept" (to accept it, escalate to the authorizer and write it in the note).
 
-**裁决后改了产物/稿**：不能停在"裁决过、后来改了"——要么开 R2 新裁决（`verdict-r2.md`），
-要么在处置说明里显式写「unverified」并由授权人接受该残留。audit 对最后一轮 dispositions 里的
-「unverified」给 `post-verdict-unverified` warning（不冒充原文一致；不是运行时 veto）。
+**If the artifact/draft changes after the verdict**: do not stop at "it was verified, then changed" — either open a new R2 verdict (`verdict-r2.md`),
+or explicitly write "unverified" in the disposition note and have the authorizer accept the residue. The audit emits a `post-verdict-unverified` warning for
+"unverified" in the latest round's dispositions (it does not pretend the text still matches; it is not a runtime veto).
 
-## 5. 轮次与升级
+## 5. Rounds and escalation
 
-1. **R1**：产出收工 → 交接 → 才发验证 → 裁决 → 逐条处置。
-2. **R2**：修完复验（新裁决文件 `verdict-r2.md`），只看上一轮发现与检查表，不重开全线。
-   复验轮把上一轮的发现**重列为「已消除 / 仍成立」**即可，不必再抄一份处置表（处置归首次提出它的那一轮）；
-   只有**本轮新出现**的发现才要在 `dispositions-r2.md` 里处置。
-3. **超限**（R2 仍有 blocker，或产出者与验证者对同一条反复互不相让）⇒ **停下升级**：
-   把两轮裁决、处置表、分歧点原样交上去，由委派者（VP-Eng）裁决，必要时上 CEO/人。
-   **不许**自己加第三轮把分歧磨平——磨平的分歧会在交付时变成事故。
+1. **R1**: producer finishes → handoff → only then dispatch verify → verdict → disposition item by item.
+2. **R2**: re-verify after fixes (new verdict file `verdict-r2.md`); look only at the previous round's findings and checklist, do not reopen the whole line.
+   In the re-verify round, re-list the previous findings as **"resolved / still stands"**; no need to copy the disposition table (dispositions belong to the round that first raised them);
+   only findings **new in this round** need a disposition in `dispositions-r2.md`.
+3. **Over the limit** (R2 still has blockers, or producer and verifier keep disagreeing on the same item) ⇒ **stop and escalate**:
+   hand up both verdicts, the disposition tables, and the disagreement points verbatim; the delegator (VP-Eng) decides, and if needed the CEO/human.
+   **Never** add a third round to grind the disagreement flat — a flattened disagreement becomes an incident at delivery.
 
-## 6. 方法包契约
+## 6. Method-pack contract
 
-一份方法 = 两侧各一份 skill，**同 `method`、同 `version`，`side` 不同**（`side` 是方法包自己的词表：
-`producer` / `verifier`；目录名跟 preset id 走，所以是 `quality-loop-producer` / `quality-loop-verifier`）：
+One method = one skill on each side, **same `method`, same `version`, different `side`** (`side` is the method pack's own vocabulary:
+`producer` / `verifier`; directory names follow the preset id, so `quality-loop-producer` / `quality-loop-verifier`):
 
 ```
 <DSH_HOME>/company/methods/quality-loop-producer/<pack>/SKILL.md
@@ -135,25 +134,25 @@ node <company-content>/../presets/_shared/skills/quality-loop/scripts/verdict-ha
 ```yaml
 ---
 name: <pack>
-description: <一句话：这套方法管什么、产出什么>
+description: <one sentence: what this method covers, what it produces>
 metadata:
-  method: <pack>        # 两侧同名
-  version: <x.y.z>      # 两侧同版本
+  method: <pack>        # same name on both sides
+  version: <x.y.z>      # same version on both sides
   side: producer        # producer | verifier
 ---
 ```
 
-正文四段（顺序不重要，内容要在）：**输入契约**（吃什么）｜**程序**（怎么做）｜
-**检查表**（`check-id` + 判据 + 证据要求；验证侧逐条出结论）｜**输出契约**（产物必含哪些节）。
-产出侧与验证侧的检查表用**同一批** check-id——否则覆盖核对没有锚。
+The body has four sections (order does not matter, content does): **input contract** (what it consumes) | **procedure** (how) |
+**checklist** (`check-id` + criterion + evidence requirement; the verifier concludes item by item) | **output contract** (which sections the artifact must contain).
+Producer and verifier checklists use the **same** check-ids — otherwise coverage checking has no anchor.
 
-方法由**人**放进方法层（pack 升级不擦、新会话生效）；角色自己不能写它。
-换公司/换产品类型只换方法包，preset 与流程不动。
+A **human** places the method into the method layer (pack upgrades do not erase it; new sessions see it); a role may not write it.
+Changing company/product type only changes the method pack; the presets and process do not move.
 
-## 7. 独立性怎么说（别说过头）
+## 7. How to describe independence (do not overclaim)
 
-- 标注 = **上下文独立复核（同模异上下文，独立性有限）**——不得报成"异人"或"双人复核"。
-- 它解决锚定、自评、注意力稀释；**不解决**同源盲区与模型相关性。
-- 关键结论旁标**边际宽度**（差几格/几个百分点翻面）。
-- 对外交付件仍走 `review-protocol.md`：具名人类复核人 + 独立性层级 + 缺口数据 fail-closed。
-  本流程的产出是给那个人的**证据包**，不是签字。
+- The label is **context-independent review (same model, different context; independence is limited)** — never report it as "different person" or "two-person review".
+- It addresses anchoring, self-scoring, and attention dilution; it **does not** address same-source blind spots or model correlation.
+- Mark the **margin width** next to key conclusions (how many cells/percentage points flip it).
+- External deliverables still go through `review-protocol.md`: named human reviewer + independence level + missing-data fail-closed.
+  This process's output is the **evidence pack** for that person, not a signature.

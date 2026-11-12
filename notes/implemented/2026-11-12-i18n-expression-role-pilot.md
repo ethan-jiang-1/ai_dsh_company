@@ -115,6 +115,12 @@
 - 回退 DISPOSITION_VALUES 到中文 → quality-loop.spec 10 条红；还原 → 40 passed。
 - quality-loop 全文仍中文，仍 PENDING；`pnpm test` 207 files / 1637 tests；`pnpm verify` ALL PASS。
 
+## I1 skill 正文完成
+
+- quality-loop 全文英文；Checklist 段名中英双认；棘轮 PENDING 清空。
+- `presets/**/SKILL.md` 24/24 英文；`pnpm test` 207 files / 1637 tests；`preset-smoke` ALL PASS；`pnpm verify` ALL PASS。
+- 剩余：让位/占位 token、persona/content/领域值、I2/I3。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

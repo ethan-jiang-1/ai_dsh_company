@@ -399,7 +399,7 @@ describe('verdict hash 工具与「unverified」可见性（BUG-056）', () => {
   it('skill / guide 指向 verdict-hash 工具，不再教 `tail | shasum`', () => {
     const skill = readFileSync(join(ROOT, 'packages/company-pack/presets/_shared/skills/quality-loop/SKILL.md'), 'utf8')
     expect(skill).toContain('verdict-hash.mjs --fix')
-    expect(skill).toContain('不要用 `tail -n +2 file | shasum`')
+    expect(skill).toContain('Do not use `tail -n +2 file | shasum`')
     const guide = readFileSync(join(ROOT, 'docs/guides/quality-loop.md'), 'utf8')
     expect(guide).toContain('verdict-hash.mjs --fix')
     expect(guide).toContain('不要用 `tail -n +2 | shasum`')

@@ -92,7 +92,7 @@ export function parseTable(text) {
 
 /** 检查表：`| check-id | 结果 | 证据 |`（第一行是表头）。 */
 export function parseChecklist(body) {
-  const rows = parseTable(section(body, ['检查表']))
+  const rows = parseTable(section(body, ['检查表', 'Checklist']))
   if (rows.length === 0) return []
   const out = []
   for (const cells of rows.slice(1)) {
