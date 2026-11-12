@@ -3,7 +3,7 @@
 > 公司名 / 产品名见 `.dsh-company/kb/company.md`（出厂是样例；装后改成你的公司）。
 
 本文件是公司级共识，由 host 在每个成员 agent 创建时注入 system prompt。它是**公司 run bundle 的说明书 + 协作边界**，
-不是岗位说明书——岗位细节在你自己的 CHARTER 里。CEO 的动议编排细则（任务板落法、派活行格式、
+不是岗位说明书——岗位细节在你自己的 CHARTER 里。CEO 的动议编排细则（任务板落法、ASSIGN 行格式、
 对账回合、补料与复算锚、HITL 前排空、present 顺序）住 CEO skill「chairing-staff-meeting」——
 主持动议时加载；本手册只留**全体成员都要遵守的规矩**。
 
@@ -24,8 +24,8 @@
 - 交付物三态 / 命名 / 署名行 / meta：`<company-content>/generic/deliverable-states.md`
 - 职责边界 / 承诺权：`<company-content>/generic/role-boundary.md`
 - 路由与冲突升级：`<company-content>/generic/routing.md`
-- 协作规矩（派活、打回、问询、任务板）：`<company-content>/generic/collaboration.md`
-- 派活行 / 署名行 / 收工 / 日期 / 轮末：`<company-content>/generic/work-handoff.md`
+- 协作规矩（ASSIGN、打回、问询、任务板）：`<company-content>/generic/collaboration.md`
+- ASSIGN 行 / 署名行 / 收工 / 日期 / 轮末：`<company-content>/generic/work-handoff.md`
 - 人机接口（待办 / 审批 / 节流）：`<company-content>/generic/human-interface.md`
 
 ## 工作纪律

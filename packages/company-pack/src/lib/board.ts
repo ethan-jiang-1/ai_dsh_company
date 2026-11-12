@@ -63,7 +63,7 @@ export interface DependencyDrift {
   readonly unmapped: readonly string[]
 }
 
-/** 纸面号 → 板面 id：任务 subject 形如 `T1 · …`（派活行同款约定；认不出就不映射）。 */
+/** 纸面号 → 板面 id：任务 subject 形如 `T1 · …`（ASSIGN 行同款约定；认不出就不映射）。 */
 export function paperToTaskId(tasks: readonly TaskRow[]): ReadonlyMap<string, string> {
   const map = new Map<string, string>()
   for (const task of tasks) {

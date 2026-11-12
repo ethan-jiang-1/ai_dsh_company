@@ -8,12 +8,12 @@ import { mentionedRoles, parseAssignments, parseLabelsText, scoreLabels, scanR2,
  * 六任务稿（含互审稿）全部落盘、动议开着（无 final）。金标准（labels.md case 14 行）= 六任务全「待核实」。
  * 两个 describe 共用同一形状（漂移判定 vs 变体规则），故提文件级单一事实家。 */
 const CASE14_BRIEF = [
-  '派活｜T1｜vp-sales｜出定价与买点分层结论｜依赖：无｜状态：待办',
-  '派活｜T2｜vp-eng｜出交付包技术可行性｜依赖：无｜状态：待办',
-  '派活｜T3｜coo｜出产能承接结论｜依赖：T2｜状态：待办',
-  '派活｜T4｜cfo｜出毛利口径与合规闸门结论｜依赖：T1｜状态：待办',
-  '派活｜T5｜cfo｜审定价与毛利并出评审稿｜依赖：T1、T4｜状态：待办',
-  '派活｜T6｜coo｜审交付承接并出评审稿｜依赖：T1、T2、T3｜状态：待办',
+  'ASSIGN｜T1｜vp-sales｜出定价与买点分层结论｜deps: none｜status: todo',
+  'ASSIGN｜T2｜vp-eng｜出交付包技术可行性｜deps: none｜status: todo',
+  'ASSIGN｜T3｜coo｜出产能承接结论｜deps: T2｜status: todo',
+  'ASSIGN｜T4｜cfo｜出毛利口径与合规闸门结论｜deps: T1｜status: todo',
+  'ASSIGN｜T5｜cfo｜审定价与毛利并出评审稿｜deps: T1、T4｜status: todo',
+  'ASSIGN｜T6｜coo｜审交付承接并出评审稿｜deps: T1、T2、T3｜status: todo',
 ].join('\n')
 const CASE14_DRAFTS = ['ceo.md', 'cfo-review.md', 'cfo.md', 'coo-review.md', 'coo.md', 'vp-eng.md', 'vp-sales.md']
 
@@ -140,7 +140,7 @@ describe('打分（scoreLabels）：指标与零容忍计数', () => {
 })
 
 describe('双源核对（2026-09-26 采纳结论的一部分）', () => {
-  const BRIEF = '派活｜T1｜vp-sales｜市场门｜依赖：无｜状态：待办\n'
+  const BRIEF = 'ASSIGN｜T1｜vp-sales｜市场门｜deps: none｜status: todo\n'
   it('状态行待办 + 稿不在盘 ⇒ stale=false（正常候选）', () => {
     expect(scanR2(BRIEF, [])[0]!.stale).toBe(false)
     expect(scanR3(BRIEF, [], false).candidates[0]!.stale).toBe(false)
@@ -195,13 +195,13 @@ describe('真实状态漂移形状（case 14 = r6-baseline 录制收割，2026-1
 
 describe('规则变体（RFC scan-rule-iteration，2026-10-06：R2′ 关闭检查 + R3′ 双源依赖）', () => {
   const REWORK_BRIEF = [
-    '派活｜T1｜vp-eng｜可行性 v2 返工（v1 有结构性缺口须重写）｜依赖：无｜状态：待办',
-    '派活｜T2｜coo｜出承接排期与人力窗口｜依赖：T1｜状态：待办',
+    'ASSIGN｜T1｜vp-eng｜可行性 v2 返工（v1 有结构性缺口须重写）｜deps: none｜status: todo',
+    'ASSIGN｜T2｜coo｜出承接排期与人力窗口｜deps: T1｜status: todo',
   ].join('\n')
 
   it('scanR2Closed：final 在场即静默（quote-z 真盘实证的关闭误报修复）', () => {
-    expect(scanR2Closed('派活｜T1｜cfo｜毛利｜依赖：无｜状态：待办', [], true)).toEqual([])
-    const open = scanR2Closed('派活｜T1｜cfo｜毛利｜依赖：无｜状态：待办', [], false)
+    expect(scanR2Closed('ASSIGN｜T1｜cfo｜毛利｜deps: none｜status: todo', [], true)).toEqual([])
+    const open = scanR2Closed('ASSIGN｜T1｜cfo｜毛利｜deps: none｜status: todo', [], false)
     expect(open).toHaveLength(1)
     expect(open[0]!.rule).toBe('R2')
   })
@@ -224,7 +224,7 @@ describe('规则变体（RFC scan-rule-iteration，2026-10-06：R2′ 关闭检�
   it('scoreLabels 扩展键：变体在场计 R2C/R3D；缺省零填充且原指标不变', () => {
     const row = { id: 'x', kind: 'synthetic', closed: false, approvals: 0, remind: '', zeroNote: '',
       tasks: [{ role: 'cfo', task: 'T1', status: '待办' }] }
-    const brief = '派活｜T1｜cfo｜毛利｜依赖：无｜状态：待办\n'
+    const brief = 'ASSIGN｜T1｜cfo｜毛利｜deps: none｜status: todo\n'
     const r2 = scanR2(brief, [])
     const r3 = scanR3(brief, [], false)
     // 变体在场
@@ -242,16 +242,16 @@ describe('规则变体（RFC scan-rule-iteration，2026-10-06：R2′ 关闭检�
 
 describe('事实阻塞闸门状态「待补料」（2026-10-10 HITL，ai-transformation-2026 实证）', () => {
   const BRIEF = [
-    '派活｜T1｜vp-sales｜外部事实包（要读外部网页正文）｜依赖：无｜状态：待补料',
-    '派活｜T2｜coo｜承接方案｜依赖：T1｜状态：待办',
-    '派活｜T3｜cfo｜钱与闸门｜依赖：T1｜状态：待办',
+    'ASSIGN｜T1｜vp-sales｜外部事实包（要读外部网页正文）｜deps: none｜status: pending-sources',
+    'ASSIGN｜T2｜coo｜承接方案｜deps: T1｜status: todo',
+    'ASSIGN｜T3｜cfo｜钱与闸门｜deps: T1｜status: todo',
   ].join('\n')
 
   it('待补料浮出 blocked（不静默丢、不当候选）——闸门的可见性要求', () => {
     const r = scanR3(BRIEF, [], false)
     expect(r.candidates).toEqual([])
     expect(r.blocked.map(t => t.task)).toEqual(['T1', 'T2', 'T3'])
-    expect(r.blocked[0]!.why).toContain('待补料')
+    expect(r.blocked[0]!.why).toContain('pending-sources')
   })
 
   it('待补料不算依赖满足（只有 已出稿/完成 算），盘上有稿也不解锁', () => {
@@ -278,13 +278,13 @@ describe('派活行的「假设」段（BUG-011 的机械兜底，2026-10-11）'
   // 手册已立「指令与假设分离」（company-workspace/AGENTS.md:109），但"标没标假设"过去没有任何
   // 机器可读的落点 ⇒ 统计（本卡反证路径要的比例）也算不出来。本段把派活行扩成可选带 `假设：`，
   // 机械面只证**标了没有**，不判假设真假。
-  const WITH = '派活｜T1｜vp-sales｜市场门｜依赖：无｜状态：待办｜假设：待证（客户预算未核）'
-  const WITHOUT = '派活｜T1｜vp-sales｜市场门｜依赖：无｜状态：待办'
+  const WITH = 'ASSIGN｜T1｜vp-sales｜市场门｜deps: none｜status: todo｜assumption: 待证（客户预算未核）'
+  const WITHOUT = 'ASSIGN｜T1｜vp-sales｜市场门｜deps: none｜status: todo'
 
   it('带「假设」段的派活行：解析出该段，其余字段不受影响', () => {
     const parsed = parseAssignments(WITH)
     expect(parsed).toHaveLength(1)
-    expect(parsed[0]).toMatchObject({ id: 'T1', role: 'vp-sales', title: '市场门', deps: [], status: '待办' })
+    expect(parsed[0]).toMatchObject({ id: 'T1', role: 'vp-sales', title: '市场门', deps: [], status: 'todo' })
     expect(parsed[0]!.assumption, '「假设」段必须被解析出来（否则统计无从下手）').toBe('待证（客户预算未核）')
   })
 
@@ -295,15 +295,27 @@ describe('派活行的「假设」段（BUG-011 的机械兜底，2026-10-11）'
   })
 
   // 红配方（不设 `expect(true)` 空断言占位——空断言不是证据，配方本身写在判据旁边即可）：
-  // 注释掉 ASSIGN_LINE 的 `(?:｜假设：([^｜]*))?` 与 parseAssignments 的 assumption 字段
+  // 注释掉 ASSIGN_LINE 的 `(?:｜assumption: ([^｜]*))?` 与 parseAssignments 的 assumption 字段
   // ⇒ 上面第一条 `assumption` 断言转红。
 })
 
 describe('第六角色 CMO 的派活/点名（角色正则覆盖）', () => {
   it('cmo 派活行与点名都可识别', () => {
-    expect(parseAssignments('派活｜T6｜cmo｜写 MRD｜依赖：无｜状态：待办')).toEqual([
-      expect.objectContaining({ id: 'T6', role: 'cmo', status: '待办' }),
+    expect(parseAssignments('ASSIGN｜T6｜cmo｜写 MRD｜deps: none｜status: todo')).toEqual([
+      expect.objectContaining({ id: 'T6', role: 'cmo', status: 'todo' }),
     ])
     expect(mentionedRoles('### CMO 出 MRD')).toEqual(['cmo'])
+  })
+})
+
+describe('ASSIGN canonical 行（I1b）', () => {
+  it('英文 canonical 可解析；旧中文派活行不再解析', () => {
+    expect(parseAssignments('ASSIGN｜T1｜cfo｜毛利｜deps: none｜status: todo')).toEqual([
+      { id: 'T1', role: 'cfo', title: '毛利', deps: [], status: 'todo' },
+    ])
+    expect(parseAssignments('派活｜T1｜cfo｜毛利｜依赖：无｜状态：待办')).toEqual([])
+    expect(parseAssignments('ASSIGN｜T2｜coo｜排期｜deps: T1,T3｜status: pending-sources｜assumption: 待证')).toEqual([
+      { id: 'T2', role: 'coo', title: '排期', deps: ['T1', 'T3'], status: 'pending-sources', assumption: '待证' },
+    ])
   })
 })

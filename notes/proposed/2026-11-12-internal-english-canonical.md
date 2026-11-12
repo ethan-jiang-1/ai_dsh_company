@@ -152,7 +152,15 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 - `【待澄清】` → `[NEEDS-CLARIFICATION]`：`attention.ts` `ESCALATION_MARK`、AttentionTab 注释、generic collaboration、assembling 词面同步；attention spec 用字面量验证，改回中文 → 红，还原 → 绿。
 - `日期待核` → `date-pending`：work-handoff、chairing、ledger/converge 测试、deliverables audit、base-clean 门禁与 negative smoke、两份指南同步；把 `date-pending` 注入 charter → base-clean 红，还原 → 绿。
 
-**剩余 I1b**：派活行与状态枚举、`待补料` schedule 锚、`【事实】/【假设】`。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
+**I1b 第四片（派活行 + 待补料锚）**：
+
+- canonical 行：`ASSIGN｜T1｜role｜text｜deps: none｜status: todo`；状态 = `todo / drafted / done / cancelled / pending-sources`；可选 `｜assumption: ...`。
+- schedule 锚：`pending-sources·<slug>·<T#>`。
+- 同步 `candidate-scan.mjs`、`deliverables-audit.mjs`、`deliverables-check.mjs`、content generic、chairing/assembling/fact-finding、candidate-scan/deliverables-audit/orient 测试。
+- 红→绿：把 parser 回退到旧中文格式 → candidate-scan spec **17 条红**；还原 → 27 passed。
+- 仍保留中文金标准标注状态（`GOLD_STATUSES`）作为独立仪器，不属于派活行。
+
+**剩余 I1b**：`【事实】/【假设】` 标签（`product-definition` + 模板/check 消息）。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 

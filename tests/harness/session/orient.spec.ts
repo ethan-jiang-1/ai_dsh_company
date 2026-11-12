@@ -222,7 +222,7 @@ describe('session 视图（observation-closeout 条目 A）', () => {
 
 describe('待核工作候选扫描（RFC orient-scan-view，R3′ 口径）', () => {
   const brief = (lines: string[]) => `# 任务书\n${lines.join('\n')}\n`
-  const assign = (id: string, role: string, deps: string) => `派活｜${id}｜${role}｜事项 ${id}｜依赖：${deps}｜状态：待办`
+  const assign = (id: string, role: string, deps: string) => `ASSIGN｜${id}｜${role}｜事项 ${id}｜deps: ${deps}｜status: todo`
   const motion = (ws: string, slug: string, opts: { final?: boolean; ceo?: string; drafts?: string[] }) => {
     dir(join(ws, 'deliverables', slug, 'drafts'))
     if (opts.ceo) put(join(ws, 'deliverables', slug, 'drafts/ceo.md'), opts.ceo)
@@ -232,9 +232,9 @@ describe('待核工作候选扫描（RFC orient-scan-view，R3′ 口径）', ()
 
   it('三形状：已关闭不报 / 进行中候选+阻塞分列 / 盘上稿降档（depByDisk + stale）', () => {
     const ws = scratch('ws-scan')
-    motion(ws, 'motion-closed', { final: true, ceo: brief([assign('T1', 'vp-sales', '无')]) })
-    motion(ws, 'motion-open', { ceo: brief([assign('T1', 'vp-sales', '无'), assign('T2', 'cfo', 'T9')]) })
-    motion(ws, 'motion-drift', { ceo: brief([assign('T1', 'vp-eng', '无'), assign('T2', 'coo', 'T1'), assign('T3', 'vp-sales', 'T5')]), drafts: ['vp-eng.md'] })
+    motion(ws, 'motion-closed', { final: true, ceo: brief([assign('T1', 'vp-sales', 'none')]) })
+    motion(ws, 'motion-open', { ceo: brief([assign('T1', 'vp-sales', 'none'), assign('T2', 'cfo', 'T9')]) })
+    motion(ws, 'motion-drift', { ceo: brief([assign('T1', 'vp-eng', 'none'), assign('T2', 'coo', 'T1'), assign('T3', 'vp-sales', 'T5')]), drafts: ['vp-eng.md'] })
     const scan: any = scanDeliverables(ws)
     expect(scan['motion-closed']).toEqual({ closed: true, candidates: [], blocked: [] })
     const open = scan['motion-open']
@@ -249,8 +249,8 @@ describe('待核工作候选扫描（RFC orient-scan-view，R3′ 口径）', ()
 
   it('渲染：公司盘后带「待核工作候选」节（R3′ 口径 + 零容忍门槛声明）；空盘如实「无动议在盘」', () => {
     const ws = scratch('ws-scan-render')
-    motion(ws, 'motion-closed', { final: true, ceo: brief([assign('T1', 'vp-sales', '无')]) })
-    motion(ws, 'motion-open', { ceo: brief([assign('T1', 'vp-sales', '无'), assign('T2', 'cfo', 'T9')]) })
+    motion(ws, 'motion-closed', { final: true, ceo: brief([assign('T1', 'vp-sales', 'none')]) })
+    motion(ws, 'motion-open', { ceo: brief([assign('T1', 'vp-sales', 'none'), assign('T2', 'cfo', 'T9')]) })
     const text = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: ws }))
     expect(text).toContain('待核工作候选')
     expect(text).toContain('R3′')

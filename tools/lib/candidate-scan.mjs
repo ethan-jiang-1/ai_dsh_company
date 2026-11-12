@@ -7,18 +7,18 @@
 // 不叫"我的待办"，不自动通知。候选项必须带「待核实」标记。
 
 /**
- * 结构化派活行（R2/R3 用）。形状（一行一格，机器可读）：
- *   `派活｜T1｜vp-sales｜市场门证据｜依赖：无｜状态：待办`
- *   `派活｜T6｜coo｜审 VP-Sales 交付承诺｜依赖：T1,T3｜状态：待办`
- *   `派活｜T2｜vp-eng｜技术可行性｜依赖：无｜状态：取消`
- *   `派活｜T1｜vp-sales｜外部事实包｜依赖：无｜状态：待补料`
- *   `派活｜T1｜vp-sales｜市场门｜依赖：无｜状态：待办｜假设：待证（客户预算未核）`  ← 可选尾段
- * 状态枚举：待办 / 已出稿 / 完成 / 取消 / 待补料（事实阻塞闸门 2026-10-10 HITL：要外部正文
- * 而本部署读不到 ⇒ 该任务与其依赖链冻结——待补料不算完成、不算依赖满足、盘上有稿也不解锁）。
+ * 结构化 ASSIGN 行（R2/R3 用）。形状（一行一格，机器可读）：
+ *   `ASSIGN｜T1｜vp-sales｜市场门证据｜deps: none｜status: todo`
+ *   `ASSIGN｜T6｜coo｜审 VP-Sales 交付承诺｜deps: T1,T3｜status: todo`
+ *   `ASSIGN｜T2｜vp-eng｜技术可行性｜deps: none｜status: cancelled`
+ *   `ASSIGN｜T1｜vp-sales｜外部事实包｜deps: none｜status: pending-sources`
+ *   `ASSIGN｜T1｜vp-sales｜市场门｜deps: none｜status: todo｜assumption: 待证（客户预算未核）`  ← 可选尾段
+ * 状态枚举：todo / drafted / done / cancelled / pending-sources（事实阻塞闸门 2026-10-10 HITL：要外部正文
+ * 而本部署读不到 ⇒ 该任务与其依赖链冻结——pending-sources 不算完成、不算依赖满足、盘上有稿也不解锁）。
  * 可选「假设」段（BUG-011 机械兜底，2026-10-11）：手册「指令与假设分离」要求未经证实的因果猜测
  * 要么标「待证」要么不发；本段给"标了没有"一个机器可读落点（只证标没标，不判假设真假）。
  */
-export const ASSIGN_LINE = /^派活｜(T\d+)｜(vp-eng|vp-sales|coo|cfo|ceo|cmo)｜([^｜]*)｜依赖：([^｜]*)｜状态：(待办|已出稿|完成|取消|待补料)(?:｜假设：([^｜]*))?/
+export const ASSIGN_LINE = /^ASSIGN｜(T\d+)｜(vp-eng|vp-sales|coo|cfo|ceo|cmo)｜([^｜]*)｜deps: ([^｜]*)｜status: (todo|drafted|done|cancelled|pending-sources)(?:｜assumption: ([^｜]*))?/
 
 /** 自然语言"点名"（R1 用）：任务书正文里出现 `角色 —` 或 `T<n> · 角色` 的地方。 */
 export const MENTION = /^(?:###\s*)?(?:T\d+\s*·\s*|\*\*)?(VP-Eng|VP-Sales|COO|CFO|CEO|CMO|vp-eng|vp-sales|coo|cfo|ceo|cmo)\b/
@@ -32,7 +32,7 @@ export function parseAssignments(briefText) {
     if (m === null) continue
     out.push({
       id: m[1], role: m[2], title: m[3],
-      deps: m[4] === '无' || m[4] === '' ? [] : m[4].split(/[,，、]/).map(s => s.trim()).filter(Boolean),   // 分隔符含中文顿号/全角逗号——r6 真实 CEO 产出用「、」（2026-10-06 case 14 spec 红证）
+      deps: m[4] === 'none' || m[4] === '' ? [] : m[4].split(/[,，、]/).map(s => s.trim()).filter(Boolean),   // 分隔符含中文顿号/全角逗号——r6 真实 CEO 产出用「、」（2026-10-06 case 14 spec 红证）
       status: m[5],
       // 缺段 = undefined（旧任务书不返工）；有段 = 该文本（含「待证」这类标记）
       ...(m[6] === undefined ? {} : { assumption: m[6] }),
@@ -70,14 +70,14 @@ export function roleHasDraft(role, draftFiles) {
 }
 
 /**
- * R2 · 结构化派活行：按机器可读的派活行报"状态=待办"的任务（不看动议整体状态）。
+ * R2 · 结构化 ASSIGN 行：按机器可读的 ASSIGN 行报"状态=todo"的任务（不看动议整体状态）。
  * 双源核对（2026-09-26 采纳结论的一部分）：状态行"待办"但该角色稿已在盘上 ⇒ 标 `stale: true`
  * （显示为「待核实」——稿与状态行矛盾，谁漂了待查，不直接当候选催人）。
  */
 export function scanR2(briefText, draftFiles = []) {
   return parseAssignments(briefText)
-    .filter(t => t.status === '待办')
-    .map(t => ({ rule: 'R2', role: t.role, task: t.id, title: t.title, deps: t.deps, why: `派活行状态=待办`, needsVerify: true, stale: roleHasDraft(t.role, draftFiles) }))
+    .filter(t => t.status === 'todo')
+    .map(t => ({ rule: 'R2', role: t.role, task: t.id, title: t.title, deps: t.deps, why: `ASSIGN 行状态=todo`, needsVerify: true, stale: roleHasDraft(t.role, draftFiles) }))
 }
 
 /**
@@ -89,17 +89,17 @@ export function scanR2(briefText, draftFiles = []) {
 export function scanR3(briefText, draftFiles, motionHasFinal) {
   if (motionHasFinal) return { candidates: [], blocked: [], closed: true }
   const tasks = parseAssignments(briefText)
-  const done = new Set(tasks.filter(t => t.status === '已出稿' || t.status === '完成').map(t => t.id))
+  const done = new Set(tasks.filter(t => t.status === 'drafted' || t.status === 'done').map(t => t.id))
   const candidates = []
   const blocked = []
   for (const t of tasks) {
-    if (t.status === '待补料') {
-      blocked.push({ rule: 'R3', role: t.role, task: t.id, title: t.title, missingDeps: [], why: '状态=待补料（事实阻塞闸门：外部事实未到位，不许标完成）', needsVerify: true })
+    if (t.status === 'pending-sources') {
+      blocked.push({ rule: 'R3', role: t.role, task: t.id, title: t.title, missingDeps: [], why: '状态=pending-sources（事实阻塞闸门：外部事实未到位，不许标完成）', needsVerify: true })
       continue
     }
-    if (t.status !== '待办') continue
+    if (t.status !== 'todo') continue
     const missing = t.deps.filter(d => !done.has(d))
-    if (missing.length === 0) candidates.push({ rule: 'R3', role: t.role, task: t.id, title: t.title, why: '状态=待办且依赖已齐', needsVerify: true, stale: roleHasDraft(t.role, draftFiles) })
+    if (missing.length === 0) candidates.push({ rule: 'R3', role: t.role, task: t.id, title: t.title, why: '状态=todo且依赖已齐', needsVerify: true, stale: roleHasDraft(t.role, draftFiles) })
     else blocked.push({ rule: 'R3', role: t.role, task: t.id, title: t.title, missingDeps: missing, why: `依赖未齐：${missing.join(',')}`, needsVerify: true })
   }
   return { candidates, blocked, closed: false }
@@ -118,33 +118,33 @@ export function scanR2Closed(briefText, draftFiles, motionHasFinal) {
 }
 
 /**
- * R3′ · 双源依赖（RFC scan-rule-iteration 2026-10-06）：依赖完成 = 派活行状态完成 **或**
+ * R3′ · 双源依赖（RFC scan-rule-iteration 2026-10-06）：依赖完成 = ASSIGN 行状态完成 **或**
  * 依赖任务的角色稿在盘上。修 case 14 真实漂移形状（CEO 不回写状态行 ⇒ R3 把四个待核实任务
  * 沉入不可见 blocked）；**代价由 case 15 钉住**——返工与漂移文件层面同签名（状态待办+稿在场），
  * 盘上稿会在返工形状上假满足依赖。经盘上稿推断满足的候选带 `depByDisk: true` 且
- * `needsVerify` 恒真（降档显示，不升级为干净候选）。**待补料任务的盘上稿同样不满足依赖**
+ * `needsVerify` 恒真（降档显示，不升级为干净候选）。**pending-sources任务的盘上稿同样不满足依赖**
  * （事实没回来 ≠ 稿在盘上；2026-10-10 HITL 闸门同款语义）。
  */
 export function scanR3Dual(briefText, draftFiles, motionHasFinal) {
   if (motionHasFinal) return { candidates: [], blocked: [], closed: true }
   const tasks = parseAssignments(briefText)
-  const doneStatus = new Set(tasks.filter(t => t.status === '已出稿' || t.status === '完成').map(t => t.id))
-  const diskDone = new Set(tasks.filter(t => t.status !== '待补料' && roleHasDraft(t.role, draftFiles)).map(t => t.id))
+  const doneStatus = new Set(tasks.filter(t => t.status === 'drafted' || t.status === 'done').map(t => t.id))
+  const diskDone = new Set(tasks.filter(t => t.status !== 'pending-sources' && roleHasDraft(t.role, draftFiles)).map(t => t.id))
   const candidates = []
   const blocked = []
   for (const t of tasks) {
-    if (t.status === '待补料') {
-      blocked.push({ rule: 'R3′', role: t.role, task: t.id, title: t.title, missingDeps: [], why: '状态=待补料（事实阻塞闸门：外部事实未到位，不许标完成）', needsVerify: true })
+    if (t.status === 'pending-sources') {
+      blocked.push({ rule: 'R3′', role: t.role, task: t.id, title: t.title, missingDeps: [], why: '状态=pending-sources（事实阻塞闸门：外部事实未到位，不许标完成）', needsVerify: true })
       continue
     }
-    if (t.status !== '待办') continue
+    if (t.status !== 'todo') continue
     const missing = t.deps.filter(d => !doneStatus.has(d))
     const byDisk = missing.filter(d => diskDone.has(d))
     const trulyMissing = missing.filter(d => !diskDone.has(d))
     if (trulyMissing.length === 0) {
       candidates.push({
         rule: 'R3′', role: t.role, task: t.id, title: t.title,
-        why: byDisk.length > 0 ? '状态=待办且依赖由盘上稿推断满足（depByDisk）' : '状态=待办且依赖已齐',
+        why: byDisk.length > 0 ? '状态=todo且依赖由盘上稿推断满足（depByDisk）' : '状态=todo且依赖已齐',
         needsVerify: true, stale: roleHasDraft(t.role, draftFiles), depByDisk: byDisk.length > 0,
       })
     } else {
