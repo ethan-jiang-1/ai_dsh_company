@@ -8,13 +8,13 @@ import { CULTIVATION_COPY, adoptLine } from './cultivation-actions.ts'
 import { BODY_PREVIEW_LINES, type CultivationBoardState } from './use-cultivation-board.tsx'
 
 function recordKindLabel(record: CultivationRecord, roleLabel: (role: string) => string): string {
-  if (record.kind === 'suggestion') return `${roleLabel(record.proposerRole)}的建议`
-  return record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)}分身的纠正` : '我的纠正'
+  if (record.kind === 'suggestion') return CULTIVATION_COPY.inboxSuggestion(roleLabel(record.proposerRole))
+  return record.proposerKind === 'agent' ? CULTIVATION_COPY.inboxCorrectionAgent(roleLabel(record.proposerRole)) : CULTIVATION_COPY.inboxCorrectionHuman
 }
 
 function recordProvenance(record: CultivationRecord, roleLabel: (role: string) => string): string {
-  const proposer = record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)} 分身（Agent）` : `${roleLabel(record.proposerRole)} 角色语境下的人`
-  return `提出者：${proposer}；目标角色：${roleLabel(record.targetRole)}`
+  const proposer = record.proposerKind === 'agent' ? CULTIVATION_COPY.inboxProposerAgent(roleLabel(record.proposerRole)) : CULTIVATION_COPY.inboxProposerHuman(roleLabel(record.proposerRole))
+  return CULTIVATION_COPY.inboxProvenance(proposer, roleLabel(record.targetRole))
 }
 
 export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { readonly board: CultivationBoardState; readonly roleLabel?: (role: string) => string }) {
@@ -48,29 +48,29 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
     openContext,
   } = board
   return (
-      <div className="wk-activity-block" aria-label="需要我处理">
-        <strong>需要我处理</strong>
+      <div className="wk-activity-block" aria-label={CULTIVATION_COPY.inboxTitle}>
+        <strong>{CULTIVATION_COPY.inboxTitle}</strong>
         {(brokenRecords ?? []).length > 0 && (
           <div className="wk-meta">
-            {String(brokenRecords!.length)} 条记录读不动（文件仍在，未被当成 0 条）：{(brokenRecords ?? []).join('、')}
+            {CULTIVATION_COPY.inboxBroken(brokenRecords!.length, (brokenRecords ?? []).join('、'))}
           </div>
         )}
         {(unexpandedRecords ?? 0) > 0 && (
           <div className="wk-meta">
-            还有 {String(unexpandedRecords)} 条旧记录只读了摘要（未展开全文）；用 /cultivation archive &lt;天数&gt; 归档后重新加载。
+            {CULTIVATION_COPY.inboxUnexpanded(unexpandedRecords ?? 0)}
           </div>
         )}
         {records === null
-          ? <div className="wk-meta">培养记录尚未读到（目录缺失或读取失败）——不算 0 条。</div>
+          ? <div className="wk-meta">{CULTIVATION_COPY.inboxUnread}</div>
           : inbox.needsDecision.length === 0
-            ? <div className="wk-meta">没有给我的建议或纠正。</div>
+            ? <div className="wk-meta">{CULTIVATION_COPY.inboxEmpty}</div>
             : (
               <>
-              <div role="list" aria-label="待我处理的培养记录" className="wk-list wk-cultivation-list">
+              <div role="list" aria-label={CULTIVATION_COPY.inboxListAria} className="wk-list wk-cultivation-list">
                 {capList('inbox', inbox.needsDecision).map(record => {
                   const outcome = outcomeOf(record.id)
                   return (
-                    <div key={record.id} role="listitem" className="wk-row" aria-label={`待处理 ${record.id}`}>
+                    <div key={record.id} role="listitem" className="wk-row" aria-label={CULTIVATION_COPY.inboxRowAria(record.id)}>
                       <span className="wk-row-name">
                         {recordKindLabel(record, roleLabel)}
                         <Tag tone="info">{record.expectation}</Tag>
@@ -81,15 +81,15 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
                       {record.body === '' && (record.contexts?.length ?? 0) > 0 && (
                         <span className="wk-meta">{CULTIVATION_COPY.bodyEmptyWithContext}</span>
                       )}
-                      {record.work !== undefined && record.work !== '' && <span className="wk-row-task">这次工作：{record.work}</span>}
+                      {record.work !== undefined && record.work !== '' && <span className="wk-row-task">{CULTIVATION_COPY.inboxWork(record.work)}</span>}
                       <span className="wk-meta">{recordProvenance(record, roleLabel)}</span>
                       <span className="wk-meta">
-                        {stampOf(record.id) === null ? '' : `${String(stampOf(record.id))} 提出时间`}
+                        {stampOf(record.id) === null ? '' : CULTIVATION_COPY.inboxStamp(String(stampOf(record.id)))}
                         {(record.contexts?.length ?? 0) > 0
                           ? ''
                           : record.source === '（会话内提交）'
-                            ? '；来源：会话内提交，具体工作出处未记录'
-                            : record.source !== '' ? `${stampOf(record.id) === null ? '' : ' · '}出处：${record.source}` : '；来源未记录'}
+                            ? CULTIVATION_COPY.inboxSourceSession
+                            : record.source !== '' ? `${stampOf(record.id) === null ? '' : ' · '}${CULTIVATION_COPY.inboxSourceRecorded(record.source).replace(' · ', '')}` : CULTIVATION_COPY.inboxSourceMissing}
                       </span>
                       {(record.contexts?.length ?? 0) > 0 && (() => {
                         const background = record.contexts![0]!
@@ -98,14 +98,14 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
                           ? CULTIVATION_COPY.contextOpenSession
                           : CULTIVATION_COPY.contextOpenFile
                         return (
-                          <div className="wk-cultivation-context-card" aria-label={`背景：${background.title}`}>
+                          <div className="wk-cultivation-context-card" aria-label={CULTIVATION_COPY.inboxBackgroundAria(background.title)}>
                             <div className="wk-cultivation-context-card-head">
                               <strong>{background.title}</strong>
                               <span className="wk-meta">
                                 {[
                                   background.role === undefined ? '' : background.role,
                                   background.subtitle === undefined ? '' : background.subtitle,
-                                  background.turn === undefined ? '' : `第 ${String(background.turn)} 轮`,
+                                  background.turn === undefined ? '' : CULTIVATION_COPY.inboxTurn(background.turn),
                                 ].filter(part => part !== '').join(' · ')}
                               </span>
                             </div>
@@ -132,7 +132,7 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
                         )
                       })()}
                       {record.bodyTruncated === true && (
-                        <div className="wk-meta">正文只加载了摘要，可能不完整；完整原文在 `cultivation/records/{record.id}.md`。</div>
+                        <div className="wk-meta">{CULTIVATION_COPY.inboxBodyTruncated(record.id)}</div>
                       )}
                       {/* 判断要有材料（S4）：正文就地可见；但**长正文默认只展前几行**（场景轮实测 60 行撑出
                           1156px 行高，把后面 12 条待办顶到看不见的地方）⇒ 给明确的「展开全文（共 N 行）」。 */}
@@ -159,7 +159,7 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
                       {actions === undefined
                         ? (
                           <span className="wk-row-task">
-                            {`　采纳：/cultivation adopt ${record.id}　拒绝：/cultivation reject ${record.id} :: 理由`}
+                            {CULTIVATION_COPY.inboxCommand(record.id)}
                           </span>
                         )
                         : (

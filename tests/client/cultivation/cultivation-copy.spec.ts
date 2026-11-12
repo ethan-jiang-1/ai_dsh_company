@@ -17,5 +17,7 @@ describe('CULTIVATION_COPY 语言代理', () => {
     expect(CULTIVATION_COPY.running).toBe('Working…')
     expect(CULTIVATION_COPY.selfNote('CEO')).toContain('CEO')
     expect(CULTIVATION_COPY.selfNote('CEO')).toContain('your own role')
+    expect(CULTIVATION_COPY.inboxTitle).toBe('Needs me')
+    expect(CULTIVATION_COPY.inboxSuggestion('CFO')).toContain('CFO')
   })
 })
