@@ -14,8 +14,8 @@ import { mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, rmSync
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 
-/** 形状轴：根（`.dsh-company` 本身）/ 叶（根下目标文件）。 */
-export type ShapeAxis = 'root' | 'leaf'
+/** 形状轴：根（`.dsh-company` 本身）/ 叶（根下目标文件）/ 内容（叶存在但内容坏）。 */
+export type ShapeAxis = 'root' | 'leaf' | 'content'
 
 /** 归一后的形状类；Agreement 只断言 ok / not-ok，具体子类由 primary 载体断言。 */
 export type ShapeClass = 'ok' | 'missing' | 'unsafe'
@@ -89,8 +89,7 @@ export const ROOT_SHAPES: readonly Shape[] = [
 ]
 
 /** 叶形状：按每个载体自己的 targetRel 建目标。 */
-export const LEAF_SHAPES: readonly Shape[] = [
-  {
+export const LEAF_SHAPES: readonly Shape[] = [  {
     id: 'leaf-missing', axis: 'leaf', expected: 'missing', catches: [],
     build: (world) => { rootDir(world) },
   },
@@ -128,7 +127,27 @@ export const LEAF_SHAPES: readonly Shape[] = [
   },
 ]
 
-export const ALL_SHAPES: readonly Shape[] = [...ROOT_SHAPES, ...LEAF_SHAPES]
+/** 内容形状：叶是普通文件，但内容坏；路径载体应仍判 ok（坏内容是解析器的事）。 */
+export const CONTENT_SHAPES: readonly Shape[] = [
+  {
+    id: 'content-truncated', axis: 'content', expected: 'ok', catches: [123],
+    build: (world, rel) => {
+      const target = targetOf(world, rel)
+      mkdirSync(dirname(target), { recursive: true })
+      writeFileSync(target, '{"schema":1')
+    },
+  },
+  {
+    id: 'content-corrupt', axis: 'content', expected: 'ok', catches: [123, 85],
+    build: (world, rel) => {
+      const target = targetOf(world, rel)
+      mkdirSync(dirname(target), { recursive: true })
+      writeFileSync(target, 'not json\n')
+    },
+  },
+]
+
+export const ALL_SHAPES: readonly Shape[] = [...ROOT_SHAPES, ...LEAF_SHAPES, ...CONTENT_SHAPES]
 
 /** `outside/` 的完整快照（条目 + 文件内容 + symlink 目标）；用于断言「外部零变化」。 */
 export function outsideSnapshot(world: World): readonly string[] {
@@ -143,7 +162,7 @@ export function outsideSnapshot(world: World): readonly string[] {
   return walk(world.outside, '').sort()
 }
 
-/** 形状是否需要 targetRel：叶形状要，根形状不要。 */
+/** 形状是否需要 targetRel：非根形状要，根形状不要。 */
 export function needsTarget(shape: Shape): boolean {
-  return shape.axis === 'leaf'
+  return shape.axis !== 'root'
 }

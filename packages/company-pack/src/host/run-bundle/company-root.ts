@@ -116,8 +116,8 @@ export function companyFilePath(workspace: string, rawRel: string): string {
   return join(companyHomeOf(workspace), relToCompany(rawRel))
 }
 
-/** 可读普通文件判据：根/中间目录安全 + 叶子非 symlink 且在根内。 */
-export function companyFileProblem(workspace: string, rawRel: string): 'missing' | 'unsafe' | 'corrupt' | null {
+/** 可读普通文件判据：根/中间目录安全 + 叶子非 symlink 且在根内；只产生 missing / unsafe。 */
+export function companyFileProblem(workspace: string, rawRel: string): 'missing' | 'unsafe' | null {
   const rel = relToCompany(rawRel)
   let root: string
   try { root = ensureCompanyRoot(workspace) } catch { return 'unsafe' }
@@ -180,7 +180,7 @@ export function ensureCompanyDirAt(companyHome: string, rel: string, options: { 
   return walkCompanyDirs(ensureCompanyRootAt(companyHome, options), rel, options.create === true)
 }
 
-/** companyHome 下文件的形状：missing / corrupt（symlink/目录/越界）/ null（可读普通文件）。 */
+/** companyHome 下文件的形状：missing / unsafe（symlink/目录/越界）/ null（可读普通文件）。 */
 export function companyFileProblemAt(companyHome: string, rel: string): 'missing' | 'unsafe' | null {
   try { ensureCompanyRootAt(companyHome) } catch { return 'unsafe' }
   const parentRel = dirname(rel)

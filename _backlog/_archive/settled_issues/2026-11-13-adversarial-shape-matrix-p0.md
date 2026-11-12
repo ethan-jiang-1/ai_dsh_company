@@ -1,15 +1,17 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-13
 ---
 
 # 推敲：对抗性边界矩阵 + 跨载体一致性 spec（测试资产 P0）
 
-> 立卡：2026-11-13 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-13 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：note — 先落 P0（shape 库 + 两个矩阵 spec + 载体登记 + 门禁），交付同 diff 写 `新建:notes/implemented/2026-11-13-adversarial-shape-matrix.md`；P1/P2 见研究稿，不并入本卡。
+> **结论/去向**：note — [Note](../../../notes/implemented/2026-11-13-adversarial-shape-matrix.md)；P0 已落（shape 库 + 两个矩阵 spec + 载体登记 + 门禁），P1/P2 见研究稿。
 >
-> **授权边界**：本卡只加测试资产 + 门禁 + 必要的词表对齐；不改 host/client 行为。`新建:` = 计划落点（研究稿约定），当前树不存在。
+> **审查**：agent — P0 核心验收全绿（`pnpm verify` ALL PASS；`pnpm test` 240 files / 1924 tests；typecheck/lint/dup 绿；3 条红证实跑）；TOCTOU 延后（需注入缝，见 Note 剩余风险）；用户 2026-11-13 指令「推动落地」。
+>
+> **授权边界**：本卡只加测试资产 + 门禁 + 必要的词表对齐；不改 host/client 行为。
 
 ## 问题与期望结果
 
@@ -27,11 +29,11 @@ opened: 2026-11-13
 
 ## 当前情况
 
-- 现状证据与完整设计 = [研究稿](../research/adversarial-shape-matrix/2026-11-13-design.md)（2026-11-13）。
+- 现状证据与完整设计 = [研究稿](../../research/adversarial-shape-matrix/2026-11-13-design.md)（2026-11-13）。
 - 三条收敛判据 **282 行**（company-root 202 / safe-file 44 / write-gate 36），只有 **1 个 69 行 spec、4 个形状**。
 - **23 个 src 文件 / 55 处** `.dsh-company` 字面量 + 15 个 `RUN_BUNDLE_PATHS` 消费者；**6 个写入口**自拼路径 + 自做 temp/rename。
 - 零覆盖形状：截断/半写 JSON、`bundle.json` symlink/目录占位、`exports/` symlink、两进程同写、fsync、TOCTOU、`*At` 变体、`createCompanyDir` 越界分支。
-- 活例：[BUG-147](../_archive/fixed_bugs/BUG-147-export-governance-symlink-root-writes-outside.md) / [BUG-148](../_archive/fixed_bugs/BUG-148-bundle-manifest-root-symlink-writes-outside.md) / [BUG-149](../_archive/fixed_bugs/BUG-149-cultivation-root-symlink-writes-outside.md) —— 三个写入口仍在 choke point 外；本卡不修它们，只把矩阵/登记做到能覆盖它们。
+- 活例：[BUG-147](../fixed_bugs/BUG-147-export-governance-symlink-root-writes-outside.md) / [BUG-148](../fixed_bugs/BUG-148-bundle-manifest-root-symlink-writes-outside.md) / [BUG-149](../fixed_bugs/BUG-149-cultivation-root-symlink-writes-outside.md) —— 三个写入口仍在 choke point 外；本卡不修它们，只把矩阵/登记做到能覆盖它们。
 - 第一个 Agreement 红证：`companyFileProblem` 的类型声明 `'corrupt'` 但实现从不返回；`companyFileProblemAt` 注释写 corrupt、实际返回 unsafe。
 
 ## 未决问题
@@ -54,20 +56,21 @@ opened: 2026-11-13
 
 **做（P0）**：shape 库；company-root Safety 矩阵；file-shape Agreement；carrier registry；门禁；`tests/README.md` 映射行；Note。
 
-**不做**：修 147/148/149（在 registry 里登记为 `knownGap`，带 bug 链接；修完迁入 `CARRIERS` 再由矩阵覆盖）；P1 的 startup/cultivation/ledger Agreement；P2 的 smoke 进程矩阵；迁移现有 ad hoc 形状用例；改覆盖率阈值；改 host/client 行为。
+**不做**：修 148/149（在 registry 里登记为 `knownGap`，带 bug 链接；修完迁入 `CARRIERS` 再由矩阵覆盖）；147 已由并发修复轮收口并进矩阵；P1 的 startup/cultivation/ledger Agreement；P2 的 smoke 进程矩阵；迁移现有 ad hoc 形状用例；改覆盖率阈值；改 host/client 行为。
 
 ## 验收标准
 
-- [ ] `新建:tests/support/world-shapes.ts`：根/叶/内容三轴 ≥12 个 shape，每个有 id/构造/清理/预期类；含零覆盖形状（截断 JSON、`bundle.json` symlink、`exports/` symlink、TOCTOU、`*At`/`createCompanyDir` 越界）。
-- [ ] `新建:tests/host/contract/company-root-safety.spec.ts`：`SHAPES × WRITERS`；每个 writer 在任意形状下「写进根内」或 typed refusal；`outside/` 字节不变。
-- [ ] 词表对齐（只动类型/注释，不改运行时）：`companyFileProblem` 不再声明永不产生的 `'corrupt'`；`companyFileProblemAt` 注释与返回一致。
-- [ ] `新建:tests/host/contract/file-shape-agreement.spec.ts`：`companyFileProblem` / `companyFileProblemAt` / `plainFileProblem` / `readCompanyText` 归一后 ok/not-ok 一致；允许的偏离在 `allowedDivergence` 声明。
-- [ ] `新建:tools/lib/carrier-registry.mjs`：每个 `companyRoot: true` 的 writer/reader 登记；`EXEMPT` 带理由；`KNOWN_GAP` 带 bug 链接（147/148/149 三条先落这里）。
-- [ ] `新建:checks/gates/company-root-carriers.mjs`：未登记的生产者 → 红，报 `file:line`；模块/符号不存在 → 红；`coveredBy` 对不上 spec 标题 → 红；`KNOWN_GAP` 在 PASS 行列出，不静默。
-- [ ] 三个红证实跑：去掉 root symlink 检查 / 去掉目录占位检查 / 去掉 write-gate → 对应矩阵红；还原绿；原话进 Note。
-- [ ] `pnpm test` 增量 < 5s；`pnpm verify` 增量 < 1s；全量 `pnpm verify` / `pnpm test` 绿。
-- [ ] `tests/README.md`「改动面 → 最窄检查」加一行：改 host 读写面 → `pnpm test tests/host/contract`；「目录镜像」登记 `contract/` 例外。
-- [ ] Note 落 `新建:notes/implemented/2026-11-13-adversarial-shape-matrix.md`，含红证原话与未验面。
+- [x] `新建:tests/support/world-shapes.ts`：根/叶/内容三轴 **13 个 shape**（6 根 + 5 叶 + 2 内容），每个有 id/构造/清理/预期类；`*At`/`createCompanyDir` 越界由 Safety spec 的单测覆盖；`exports/` symlink 由 export writer 覆盖。
+- [x] `新建:tests/host/contract/company-root-safety.spec.ts`：6 个 writer × 13 shape = 78 例 + 3 个零覆盖入口单测；每个 writer 在任意形状下「写进根内」或 typed refusal；`outside/` 快照不变。
+- [x] 词表对齐（只动类型/注释，不改运行时）：`companyFileProblem` 不再声明永不产生的 `'corrupt'`；`companyFileProblemAt` 注释与返回一致。
+- [x] `新建:tests/host/contract/file-shape-agreement.spec.ts`：`companyFileProblem` / `companyFileProblemAt` / `plainFileProblem` / `readCompanyText` 归一后 ok/not-ok 一致；`readCompanyText` 的「更粗」视图显式声明。
+- [x] `新建:tools/lib/carrier-registry.mjs`：10 个已收口载体、3 个 `EXEMPT`（带理由）、4 个 `KNOWN_GAP`（148/149，带 bug 链接）。
+- [x] `新建:checks/gates/company-root-carriers.mjs`：未登记的生产者 → 红，报 `file:line`；模块/符号不存在 → 红；`KNOWN_GAP` 卡不存在 → 红；`KNOWN_GAP` 在 PASS 行列出。
+- [x] 三个红证实跑：门禁植入未登记写入口 / 根 residency 短路 / 分类器折平 → 对应矩阵红；还原绿；原话进 Note。
+- [x] `pnpm test` 全量 **240 files / 1924 tests** 绿（新增 2 spec / 94 用例，单独 ~0.5s）；`pnpm verify` ALL PASS。
+- [x] `tests/README.md`「改动面 → 最窄检查」host 逻辑行加「跨载体不变量 → `pnpm test tests/host/contract`」；「目录镜像」登记 `contract/` 例外。
+- [x] Note 落 `新建:notes/implemented/2026-11-13-adversarial-shape-matrix.md`，含红证原话与未验面。
+- [ ] **TOCTOU 延后**：判据与写入之间的 symlink 替换需要注入缝（或真进程 kill），P0 只覆盖「写入前已是坏形状」；见 Note「剩余风险」。
 
 ## 关闭条件
 

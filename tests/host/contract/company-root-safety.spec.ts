@@ -10,13 +10,20 @@
  *
  * 证明不了：读路径、跨进程/重启、147/148/149 三个 knownGap（登记在 registry，不在此矩阵）。
  */
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
-import { UnsafeCompanyPathError, writeCompanyAtomic } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
+import {
+  UnsafeCompanyPathError,
+  createCompanyDir,
+  readCompanyTextAt,
+  writeCompanyAtomic,
+  writeCompanyAtomicAt,
+} from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
 import { CompanyWriteBlockedError } from '../../../packages/company-pack/src/host/run-bundle/write-gate.ts'
 import { regenerateCatalog } from '../../../packages/company-pack/src/host/ledger/catalog.ts'
+import { exportGovernance } from '../../../packages/company-pack/src/host/ledger/governance-export.ts'
 import { writePresentedLedger, type PresentedLedger } from '../../../packages/company-pack/src/host/ledger/presented-ledger.ts'
 import { writeStartupSettings } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
 import { applyBootstrap, planBootstrap } from '../../../packages/company-pack/src/host/run-bundle/bootstrap.ts'
@@ -92,6 +99,11 @@ const WRITERS: readonly Writer[] = [
     target: 'kb/company.md',
     run: (workspace) => applyBootstrap(planBootstrap(CONTENT, workspace)),
   },
+  {
+    id: 'export.governance',
+    target: 'exports',
+    run: (workspace) => exportGovernance({ dshHome: join(workspace, '.dsh-home'), workspace }),
+  },
 ]
 
 type Outcome = { readonly kind: 'ok'; readonly value: unknown } | { readonly kind: 'error'; readonly error: unknown }
@@ -126,4 +138,32 @@ describe('公司盘 Safety 矩阵：形状 × 写入口', () => {
       }
     })
   }
+})
+
+describe('零覆盖入口：*At 与 createCompanyDir', () => {
+  it('createCompanyDir 拒绝越界 rel', () => {
+    const world = makeWorld()
+    try {
+      expect(() => createCompanyDir(world.ws, '../../outside-company')).toThrow(UnsafeCompanyPathError)
+    } finally { world.cleanup() }
+  })
+
+  it('writeCompanyAtomicAt / readCompanyTextAt 在 companyHome 域工作', () => {
+    const world = makeWorld()
+    const home = join(world.ws, '.dsh-company')
+    try {
+      writeCompanyAtomicAt(home, 'kb/x.json', 'x\n')
+      expect(readCompanyTextAt(home, 'kb/x.json')).toBe('x\n')
+    } finally { world.cleanup() }
+  })
+
+  it('writeCompanyAtomicAt 拒绝根 symlink，外部不写', () => {
+    const world = makeWorld()
+    const home = join(world.ws, '.dsh-company')
+    try {
+      symlinkSync(world.outside, home)
+      expect(() => writeCompanyAtomicAt(home, 'kb/x.json', 'x\n')).toThrow(UnsafeCompanyPathError)
+      expect(outsideSnapshot(world)).toEqual([])
+    } finally { world.cleanup() }
+  })
 })

@@ -71,6 +71,14 @@ export const CARRIERS = [
     coveredBy: 'company-root-safety',
   },
   {
+    id: 'export.governance',
+    module: 'packages/company-pack/src/host/ledger/governance-export.ts',
+    symbol: 'exportGovernance',
+    kind: 'writer',
+    companyRoot: true,
+    coveredBy: 'company-root-safety',
+  },
+  {
     id: 'company.fileProblem',
     module: 'packages/company-pack/src/host/run-bundle/company-root.ts',
     symbol: 'companyFileProblem',
@@ -120,31 +128,26 @@ export const EXEMPT = [
   },
 ]
 
-/** 已知未收口；每条的 `bug` 必须是 _backlog 里真实存在的卡。 */
+/** 矩阵未覆盖的已知入口；每条的 `bug` 必须是 _backlog（活跃或归档）里真实存在的卡。 */
 export const KNOWN_GAP = [
-  {
-    module: 'packages/company-pack/src/host/ledger/governance-export.ts',
-    bug: 'BUG-147',
-    reason: 'exportGovernance 仍直拼 .dsh-company/exports；P0 不修，门禁列出',
-  },
   {
     module: 'packages/company-pack/src/host/run-bundle/bundle-manifest.ts',
     bug: 'BUG-148',
-    reason: 'writeBundleManifest 仍直拼 .dsh-company/bundle.json；P0 不修，门禁列出',
+    reason: 'BUG-148 已修归档；bundle 入口未进 Safety 矩阵，下轮迁入 CARRIERS',
   },
   {
     module: 'packages/company-pack/src/host/cultivation/cultivation-storage.ts',
     bug: 'BUG-149',
-    reason: '只校验到 cultivation 父目录，不校验 .dsh-company 根；P0 不修，门禁列出',
+    reason: 'BUG-149 已修归档；cultivation 入口未进 Safety 矩阵，下轮迁入 CARRIERS',
   },
   {
     module: 'packages/company-pack/src/host/cultivation/revoke-journal.ts',
     bug: 'BUG-149',
-    reason: 'pending-revoke 路径随根 symlink 写外；P0 不修，门禁列出',
+    reason: 'BUG-149 已修归档；revoke-journal 入口未进 Safety 矩阵，下轮迁入 CARRIERS',
   },
   {
     module: 'packages/company-pack/src/host/logging/rotating-log.ts',
     bug: 'BUG-149',
-    reason: 'upgrade log 路径由 bundle-manifest 传入 .dsh-company/logs；P0 不修，门禁列出',
+    reason: 'BUG-149 已修归档；upgrade log 入口未进 Safety 矩阵，下轮迁入 CARRIERS',
   },
 ]
