@@ -7,7 +7,7 @@ intent: 把用户 2026-11-12 的方向修正落成可执行边界：双语只在
 
 > **2026-11-12 最终范围修正（覆盖本文对 I1/I2/I3 的落地建议）**：用户明确只做界面呈现层（TAB / Label / button 等可见文案）。
 > 本文第 2 节把「内部英文 canonical」列为方向，仍有参考价值，但**不是本研究的验收**；I2 注释/日志、I3 docs 不做全量迁移。
-> 落地卡 = [2026-11-12-bilingual-landing.md](../../_archive/settled_issues/2026-11-12-bilingual-landing.md)。
+> 落地卡（已归档） = [2026-11-12-bilingual-landing.md](../../_archive/settled_issues/2026-11-12-bilingual-landing.md)。
 # 表达层双语、内部英文 canonical 与角色名
 
 ## 1. 用户原话与我的理解
