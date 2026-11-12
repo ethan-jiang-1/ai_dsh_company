@@ -10,8 +10,9 @@
  * 远端，读不到 pack；而走命令读会往会话日志里写 `command/run`（面板一打开就多一个命令条）。
  * 派生文件既无日志噪声，又与既有 `.dsh-company/` 读盘形状一致。
  */
-import { existsSync, mkdirSync, readFileSync, renameSync, readdirSync, statSync, writeFileSync } from 'node:fs'
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
+import { mkdirSync, readFileSync, realpathSync, renameSync, readdirSync, statSync, writeFileSync } from 'node:fs'
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path'
+import { expandHomePath } from '@deepseek-ai/dsh-home-paths'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
 import {
   EMPTY_STARTUP_OPTIONS,
@@ -102,30 +103,53 @@ export function enumerateStartupOptions(contentDir: string | undefined): Startup
     productTypes: listContentDirs(contentDir, 'product-types'),
     deliveryModes: [IMPLICIT_DELIVERY_MODE, ...listContentDirs(contentDir, 'delivery-modes')],
     wikiCheck: EMPTY_WIKI_CHECK,
+    // 面板的「缺 index.md」提示给安装视图的绝对路径；pack 相对名对安装用户只是一个名字（BUG-087）。
+    wikiTemplate: join(contentDir, 'wiki-template'),
   }
 }
 
-/** wiki 指针解析成绝对路径：绝对路径原样，相对路径按 workspace 解释。 */
+/** wiki 指针解析成绝对路径：`~` 展开，绝对路径原样，相对路径按 workspace 解释。 */
 export function resolveWikiDir(workspace: string, value: string): string {
-  return isAbsolute(value) ? resolve(value) : resolve(workspace, value)
+  const expanded = expandHomePath(value.trim())
+  return isAbsolute(expanded) ? resolve(expanded) : resolve(workspace, expanded)
 }
 
-/** 目录在 workspace 内（agent 可写）还是外（agent 只读，沙箱写不进）。 */
+/**
+ * 真实路径；路径不存在时用最近存在祖先的 realpath + 未存在的后缀。
+ * 词法前缀在 symlink 面前会说反（BUG-084），所以权限判断必须落在真实目标上。
+ */
+function realOrNearest(path: string): string {
+  const absolute = resolve(path)
+  const suffix: string[] = []
+  let current = absolute
+  for (;;) {
+    try {
+      return join(realpathSync(current), ...suffix.reverse())
+    } catch { /* 继续向上找存在的祖先 */ }
+    const parent = dirname(current)
+    if (parent === current) return absolute
+    suffix.push(basename(current))
+    current = parent
+  }
+}
+
+/** 真实目标在 workspace 内（agent 可写）还是外（agent 只读，沙箱写不进）。 */
 export function wikiLocation(workspace: string, absolutePath: string): 'inside' | 'outside' {
-  const rel = relative(resolve(workspace), absolutePath)
+  const rel = relative(realOrNearest(workspace), realOrNearest(absolutePath))
   return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel)) ? 'inside' : 'outside'
 }
 
 /**
  * 查一个 wiki 指针是否可用（A3 的三档判据）。
  *
- * 只做三件事——目录存在 / 是目录 / 有 `index.md`。再多（解析 frontmatter、查链接活性）就变成
- * lint 工具，超出 v1；这三件足以挡住「指向空气」与「指向一个没有索引的杂目录」。
+ * 只做三件事——目录存在 / 是目录 / 有 `index.md`（且 `index.md` 必须是**文件**）。
+ * 再多（解析 frontmatter、查链接活性）就变成 lint 工具，超出 v1；这三件足以挡住「指向空气」
+ * 与「指向一个没有索引的杂目录」。symlink 判真实目标，`index.md` 判类型（BUG-084）。
  * @param workspace - workspace 根（相对路径按它解释）。
  * @param value - 指针值（null = 未设，不算失效）。
  * @returns 检查结果（纯数据，会写进派生文件给浏览器读）。
  */
-export function checkWikiPointer(workspace: string, value: string | null): WikiCheck {
+export function checkWikiPointer(workspace: string, value: string | null, checkedAt = new Date().toISOString()): WikiCheck {
   if (value === null) return EMPTY_WIKI_CHECK
   const path = resolveWikiDir(workspace, value)
   const location = wikiLocation(workspace, path)
@@ -133,11 +157,15 @@ export function checkWikiPointer(workspace: string, value: string | null): WikiC
   try {
     isDirectory = statSync(path).isDirectory()
   } catch {
-    return { value, ok: false, problem: 'missing', location }
+    return { value, ok: false, problem: 'missing', location, checkedAt }
   }
-  if (!isDirectory) return { value, ok: false, problem: 'not-directory', location }
-  if (!existsSync(join(path, 'index.md'))) return { value, ok: false, problem: 'no-index', location }
-  return { value, ok: true, problem: null, location }
+  if (!isDirectory) return { value, ok: false, problem: 'not-directory', location, checkedAt }
+  let indexIsFile = false
+  try {
+    indexIsFile = statSync(join(path, 'index.md')).isFile()
+  } catch { /* 缺 / 坏链接 = 没有 index */ }
+  if (!indexIsFile) return { value, ok: false, problem: 'no-index', location, checkedAt }
+  return { value, ok: true, problem: null, location, checkedAt }
 }
 
 /**

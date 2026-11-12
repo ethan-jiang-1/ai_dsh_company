@@ -72,4 +72,11 @@ describe('content/wiki-template', () => {
       expect(text(rel), `${rel} 含绝对 home 路径`).not.toMatch(/\/Users\/[a-z]/u)
     }
   })
+
+  it('拷贝命令是安装视角可执行的，不再给仓库相对路径', () => {
+    const readme = text('README.md')
+    expect(readme).toContain('node_modules/dsh-company-pack/content/wiki-template')
+    expect(readme).not.toContain('packages/company-pack/content/wiki-template')
+    expect(existsSync(join(DIR, 'README.md'))).toBe(true)
+  })
 })

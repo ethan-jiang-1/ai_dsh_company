@@ -2,6 +2,9 @@
 
 状态：implemented（2026-11-12 落地；验证见下）
 
+> 部分取代：模板链接门禁（`shipped-links` 不再整目录排除、按模板根验内部链接）与安装路径见
+> [启动策略 + wiki 缺陷横扫 Note](./2026-11-12-startup-strategy-wiki-bug-sweep.md)。
+
 上游 = 用户 2026-11-12 点名研究并要求落地（「wiki 可能不在 workspace 里面，agent 只读也可以」→「把它落地吧」）；
 研究 = [wiki-knowledge-map 研究题](../../_backlog/research/wiki-knowledge-map/README.md)（AK 一手 / OKF 规范 / 搜索阶梯 / 载体盘点 / 只读边界实测）；
 前置 = [项目启动策略 Note](2026-11-12-startup-settings.md)（`startup.json` 的 `wiki` 指针与注入段）；
@@ -58,8 +61,8 @@
 - `src/host/startup/startup-prompt.ts`：`wikiRule` 三档；`startupSettingsText(settings, wikiCheck)`。
 - `src/host/commands/settings-command.ts`：`show` 增 wiki 行（可用/只读/失效 + 原因）；`set wiki` 落盘后即查、失效时回执告警。
 - `src/client/startup/StrategyPanel.tsx`：wiki 行显示失效原因（缺目录/非目录/缺 index）与位置标签（可写/只读）；五条新文案 zh+en。
-- `checks/gates/shipped-links.mjs`：扫描面排除 `wiki-template/`（模板的相对链接解析目标是**拷贝后的那份 wiki**，
-  按安装读者视角必假红）；模板链接完整性改由 `tests/content/wiki-template.spec.ts` 守。
+- `checks/gates/shipped-links.mjs`：扫描**包含** `wiki-template/`，内部链接按模板根判存在；指向模板外的链接
+  不判存在（拷贝后的根未知），但仍禁指仓库。2026-11-12 的 bug sweep 收掉了「整目录排除」的旧做法。
 - `checks/smoke/preset-smoke.mjs`：共享 skill 根登记 `_shared/wiki/skills/`（不登记 → 「只看见自己的 skills」把正当共享报成泄漏）。
 - `docs/contracts/profile.md` 与 `packages/company-pack/content/README.md`：补 wiki 指针语义、校验档位与模板说明。
 

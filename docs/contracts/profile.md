@@ -49,9 +49,9 @@ host 的 `session/search`（侧栏内容搜索）保持出厂 `openAt: never`（
 
 ## 项目启动策略（workspace 级）
 
-`.dsh-company/startup.json`（人改；`productType` / `deliveryMode` / `wiki`，`null` = 自动 = 不约束）+ 派生的 `startup-options.json`（host 按 `content/` 枚举产品类型/交付模式，并带 wiki 指针的盘上检查）。面经 `workspaceFiles` 读、经 `/company-settings set|reset|show` 写；`company:startup-settings`（order 501）活读注入、全自动为空串、support preset 跳过。v1 软强制（`/req`、`/delivery` 解析链不读它）、公司默认只读。
+`.dsh-company/startup.json`（人改；`productType` / `deliveryMode` / `wiki`，`null` = 自动 = 不约束）+ 派生的 `startup-options.json`（host 按 `content/` 枚举产品类型/交付模式，并带 wiki 指针的盘上检查）。**workspace = 会话所在项目**（Lead 会话 cwd；子会话继承 parent cwd；boot workspace 只在会话无 cwd 时回退）——面板、`/company-settings`、注入段消费同一个 `startupWorkspace`。面经 `workspaceFiles` 读、经 `/company-settings set|reset|show` 写；`company:startup-settings`（order 501）活读注入、全自动为空串、support preset 跳过。v1 软强制（`/req`、`/delivery` 解析链不读它）、公司默认只读。
 
-**`wiki` 是本地目录指针**（可绝对路径、可在 workspace 外；不收 URL）：host 只验三件事——目录存在 / 是目录 / 有 `index.md`，结果进 `startup-options.json` 的 `wikiCheck`，面板与 `/company-settings show` 都点名失效原因（不静默沿用）；注入段按位置分三档——workspace 内=可写并给 ingest 回写纪律、workspace 外=只读且不许试写、失效=警示并让人先修。模板 = `content/wiki-template/`（拷贝即用，不被角色加载、不进 manifest）；使用协议 = `presets/_shared/wiki/skills/consulting-the-knowledge-map/`（六个角色共挂一份，按需加载）。
+**`wiki` 是本地目录指针**（可绝对路径、可在 workspace 外；不收 URL）：host 只验三件事——目录存在 / 是目录 / 有 `index.md`（且是文件；symlink 判真实目标）——结果进 `startup-options.json` 的 `wikiCheck`（带 `checkedAt`；host 在指针盘上变化时重派生），面板与 `/company-settings show` 都点名失效原因（不静默沿用）；面板只在检查对得上当前值且有 `checkedAt` 时给结论，并标「上次检查」，不拿快照冒充当前值。注入段按位置分三档——workspace 内=可写并给 ingest 回写纪律、workspace 外=只读且不许试写、失效=警示并让人先修。模板 = `content/wiki-template/`（拷贝即用，不被角色加载、不进 manifest；安装视图 = `node_modules/dsh-company-pack/content/wiki-template`）；使用协议 = `presets/_shared/wiki/skills/consulting-the-knowledge-map/`（六个角色共挂一份，按需加载）。
 
 ## 已知开放点
 

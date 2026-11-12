@@ -5,9 +5,16 @@ project's strategy at it, and let the team's agents maintain it.
 
 ## 1. Copy it out
 
+From the DSH profile that has this package installed (the directory holding
+`node_modules/dsh-company-pack`):
+
 ```sh
-cp -R packages/company-pack/content/wiki-template /path/to/your-wiki
+cp -R node_modules/dsh-company-pack/content/wiki-template /path/to/your-wiki
 ```
+
+If you are reading this inside the package source checkout, the same directory is the
+`content/wiki-template` folder next to this file. The installed copy is the one the panel's
+"no index.md" hint names, so prefer it when both exist.
 
 Put it anywhere readable: inside the workspace (agents may write) or outside it (agents read,
 only you write). The location decides the mode — nothing else does.

@@ -20,8 +20,39 @@
  */
 export const STARTUP_SETTINGS_READ_LIMIT = 16
 
-/** 派生选项文件的行数上限（见 `STARTUP_SETTINGS_READ_LIMIT` 的说明）。 */
-export const STARTUP_OPTIONS_READ_LIMIT = 64
+/**
+ * 派生选项里允许的最大条目数（产品类型 + 交付模式，跨两端预算）。
+ *
+ * 选项文件的行数随 `content/` 目录数线性长；固定 64 行在 60 个类型时就会截断。这里把
+ * 「内容能有多大」变成显式预算：读上限从它派生，`tests/content/startup-options-budget.spec.ts`
+ * 对真实内容目录验一次；超限时读方是「选项文件读坏了」的显式错误，不是静默空下拉。
+ */
+export const STARTUP_OPTIONS_MAX_ENTRIES = 256
+
+/** 派生选项文件的行数上限（见 `STARTUP_SETTINGS_READ_LIMIT` / `STARTUP_OPTIONS_MAX_ENTRIES`）。 */
+export const STARTUP_OPTIONS_READ_LIMIT = 32 + STARTUP_OPTIONS_MAX_ENTRIES
+
+/**
+ * 启动策略的 workspace 解析（2026-11-12，BUG-081/089）。
+ *
+ * 面板按 Lead 会话的 workspace 读（`workspaceFiles` 的会话寻址），命令与注入也必须读同一份：
+ * 会话 cwd 优先，会话没有 cwd（或命令来自无会话面）时才回退 boot workspace。
+ * 为什么不是 boot 优先：同一 home 可服务多个 workspace，boot 盘只是「宿主启动时所在的项目」；
+ * 用户在某个项目会话里改策略，改的必须是那个项目。返回空串 = 无处可写/可读。
+ */
+export interface StartupAgentLike {
+  readonly session?: {
+    readonly header?: {
+      readonly cwd?: string
+    }
+  }
+}
+
+export function startupWorkspace(bootWorkspace: string, agent: StartupAgentLike | undefined): string {
+  const cwd = agent?.session?.header?.cwd
+  if (typeof cwd === 'string' && cwd !== '') return cwd
+  return bootWorkspace
+}
 
 /** 三个可设字段（顺序即面板行序）。 */
 export const STARTUP_FIELDS = ['productType', 'deliveryMode', 'wiki'] as const
@@ -54,6 +85,11 @@ export interface StartupOptions {
   readonly deliveryModes: readonly string[]
   /** wiki 指针的存在性检查（host 每次派生时重算；client 只渲染）。 */
   readonly wikiCheck: WikiCheck
+  /**
+   * 当前部署里模板的绝对路径（`<pack>/content/wiki-template`；null = 不知道）。
+   * 面板的「缺 index.md」提示给可复制的安装路径，不再只写 pack 相对名（BUG-087）。
+   */
+  readonly wikiTemplate: string | null
 }
 
 /**
@@ -72,6 +108,14 @@ export interface WikiCheck {
   readonly problem: WikiProblem | null
   /** 目录在 workspace 内（agent 可写）还是外（agent 只读）；未设/失效时 null。 */
   readonly location: 'inside' | 'outside' | null
+  /**
+   * 这次检查的时间（ISO；null = 没有检查过，例如旧派生文件 / 未设 wiki）。
+   *
+   * 没有它，面板只能把派生文件里的 ok/location 当成「现在」——目录搬走后会无限期显示旧结论
+   * （BUG-082）。有了它，面板必须把结论标成「上次检查于 …」，并只在检查值与当前设置一致时
+   * 才给出可用/失效判断。
+   */
+  readonly checkedAt: string | null
 }
 
 /** wiki 指针失效的三种原因（A3 的三档判据）。 */
@@ -83,6 +127,7 @@ export const EMPTY_WIKI_CHECK: WikiCheck = Object.freeze({
   ok: true,
   problem: null,
   location: null,
+  checkedAt: null,
 })
 
 /** 还没有派生文件时的空集合。 */
@@ -90,6 +135,7 @@ export const EMPTY_STARTUP_OPTIONS: StartupOptions = Object.freeze({
   productTypes: [],
   deliveryModes: [],
   wikiCheck: EMPTY_WIKI_CHECK,
+  wikiTemplate: null,
 }) as StartupOptions
 
 /** 面板一行（纯数据；文案由组件按 `t` 取）。 */
@@ -155,22 +201,45 @@ export function parseStartupSettings(text: string | null | undefined): StartupSe
   }
 }
 
-/** 解析派生选项文件；缺失/坏值 → 空集合（面板只剩「自动」）。 */
-export function parseStartupOptions(text: string | null | undefined): StartupOptions {
-  if (typeof text !== 'string' || text.trim() === '') return EMPTY_STARTUP_OPTIONS
+/** 一次派生选项读取的结果：坏/截断的文件必须能被面板说出来，而不是静默空集合。 */
+export interface StartupOptionsState {
+  readonly options: StartupOptions
+  /** `'unreadable'` = 文件存在但读不出合法形状（典型：超过读上限被截断）；缺失不算错。 */
+  readonly problem: 'unreadable' | null
+}
+
+/**
+ * 解析派生选项文件；缺失/空 = 空集合（不是错），**坏 JSON / 坏形状 = `unreadable`**。
+ *
+ * 为什么要区分：读上限截断时 JSON 不完整，旧实现折成空集合 → 面板显示「公司内容里还没有
+ * 可选项」，用户以为内容包坏了（BUG-085）。现在面板能说「选项文件读不出来」。
+ */
+export function parseStartupOptionsState(text: string | null | undefined): StartupOptionsState {
+  if (typeof text !== 'string' || text.trim() === '') return { options: EMPTY_STARTUP_OPTIONS, problem: null }
   let raw: unknown
   try {
     raw = JSON.parse(text)
   } catch {
-    return EMPTY_STARTUP_OPTIONS
+    return { options: EMPTY_STARTUP_OPTIONS, problem: 'unreadable' }
   }
-  if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) return EMPTY_STARTUP_OPTIONS
+  if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
+    return { options: EMPTY_STARTUP_OPTIONS, problem: 'unreadable' }
+  }
   const record = raw as Record<string, unknown>
   return {
-    productTypes: cleanList(record.productTypes),
-    deliveryModes: cleanList(record.deliveryModes),
-    wikiCheck: parseWikiCheck(record.wikiCheck),
+    options: {
+      productTypes: cleanList(record.productTypes),
+      deliveryModes: cleanList(record.deliveryModes),
+      wikiCheck: parseWikiCheck(record.wikiCheck),
+      wikiTemplate: cleanScalar(record.wikiTemplate),
+    },
+    problem: null,
   }
+}
+
+/** 解析派生选项文件；坏值折成空集合（需要区分「读坏」时用 `parseStartupOptionsState`）。 */
+export function parseStartupOptions(text: string | null | undefined): StartupOptions {
+  return parseStartupOptionsState(text).options
 }
 
 /** 解析 wiki 检查块；坏值折成「未设」（宁可显示未知，也不谎报失效）。 */
@@ -186,6 +255,7 @@ function parseWikiCheck(value: unknown): WikiCheck {
     ok: record.ok === true,
     problem: record.ok === true ? null : problem,
     location,
+    checkedAt: cleanScalar(record.checkedAt),
   }
 }
 
@@ -212,7 +282,9 @@ export function serializeStartupOptions(options: StartupOptions): string {
       ok: options.wikiCheck.ok,
       problem: options.wikiCheck.problem,
       location: options.wikiCheck.location,
+      checkedAt: options.wikiCheck.checkedAt,
     },
+    wikiTemplate: options.wikiTemplate,
   }, null, 2)}\n`
 }
 

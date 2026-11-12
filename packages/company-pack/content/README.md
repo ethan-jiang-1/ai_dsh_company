@@ -12,7 +12,7 @@ This directory is `dsh-company-pack`'s **read-only product content**; it updates
 - `product-types/<id>/`: product-type layer (requirements chain, document map, terms, templates, checker rules).
 - `company/`: company layer (single home of policy lines, etc.); seeded into the run bundle's `kb/`.
 - `state/`: default state instances for company/org/owners/ledger; first start only fills missing files.
-- `wiki-template/`: starting skeleton for a project's reference wiki (protocol `AGENTS.md`, `index.md`, `log.md`, one example page). **Not loaded by roles** and not in `manifest.json`: it is copied out (`cp -R`) and then lives wherever the project's strategy `wiki` pointer says. Copying is the only way it enters a run; the pack never writes it.
+- `wiki-template/`: starting skeleton for a project's reference wiki (protocol `AGENTS.md`, `index.md`, `log.md`, one example page). **Not loaded by roles** and not in `manifest.json`: it is copied out (`cp -R`) and then lives wherever the project's strategy `wiki` pointer says. Install view = `node_modules/dsh-company-pack/content/wiki-template` under the profile that holds the package; the template's `README.md` gives the install-relative copy command. Copying is the only way it enters a run; the pack never writes it.
 
 The run bundle lives in the user's workspace `.dsh-company/`, initialized by the host; plugin code (`src/host`, `src/client`)
 and preset/persona/skills live in other package directories. **Do not write runtime data in this directory.**

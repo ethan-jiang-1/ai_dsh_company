@@ -137,18 +137,9 @@ if (tabs.length === 0) {
   console.error('cdp-probe: 页签注册源解析为空（格式漂移？）——拒绝以空清单通过');
   process.exit(2);
 }
-const EN_TAB_TITLES = {
-  '待办': 'Inbox',
-  '看板': 'Board',
-  '依赖图': 'Dependencies',
-  '在场': 'Presence',
-  '用量': 'Usage',
-  '任务板': 'Tasks',
-  '培养': 'Cultivation',
-  '台账': 'Ledger',
-  '成品': 'Deliverables',
-};
-if (PROBE_LANG === 'en') tabs = tabs.map(tab => ({ ...tab, title: EN_TAB_TITLES[tab.title] ?? tab.title }));
+// en 标题同源：`parseCompanyTabCatalog` 从 `locales.ts` 的 en 块派生 enTitle；缺 key 时整表为空
+// 并在上面 exit 2（不静默落回中文）。此前手维护的 EN_TAB_TITLES 漏「策略」→ en 假红（2026-11-12）。
+if (PROBE_LANG === 'en') tabs = tabs.map(tab => ({ ...tab, title: tab.enTitle }));
 verdict.catalog = tabs.map(tab => tab.title);
 
 // chromeBin 复用本仓 chromium 解析（loadChromium → executablePath；DSH_PROBE_CHROME 仍可覆盖——

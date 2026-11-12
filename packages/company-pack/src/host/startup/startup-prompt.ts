@@ -15,7 +15,13 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { NON_ROLE_PRESETS } from '../../lib/delegation-surface.ts'
-import { overriddenEntries, type StartupSettings, type WikiCheck } from '../../lib/startup-settings.ts'
+import {
+  overriddenEntries,
+  startupWorkspace,
+  type StartupAgentLike,
+  type StartupSettings,
+  type WikiCheck,
+} from '../../lib/startup-settings.ts'
 import { composedPresetOf } from '../prompt/handbook.ts'
 import { checkWikiPointer, readStartupSettings } from './startup-store.ts'
 
@@ -84,16 +90,33 @@ export function startupSettingsText(settings: StartupSettings, wikiCheck: WikiCh
   return lines.join('\n')
 }
 
-interface AgentLike {
+interface AgentLike extends StartupAgentLike {
   readonly ctx: Context
+}
+
+/** 注册选项：派生配置 + 可选的新鲜度 watcher。 */
+export interface StartupSettingsRegistration {
+  /** pack 的 `content/`（首次注册时补一次派生）。 */
+  readonly contentDir?: string
+  /** 派生选项刷新器（`StartupOptionsWatch`；测试可省）。 */
+  readonly watch?: { sync(workspace: string): unknown }
 }
 
 /**
  * 给公司角色的每个 agent 注册活读 section。
+ *
+ * 不依赖 boot 的 `hasWorkspace`：boot 没有 workspace 时，之后在会话 cwd 里设的策略也必须生效
+ * （BUG-089）。workspace 在每次 assembly 时按 agent 的会话 cwd 重解析（BUG-081）：面板按 Lead
+ * 会话读、命令按同一 agent 写，三处消费 `startupWorkspace` 这一个函数。
  * @param ctx - Host 上下文。
- * @param workspace - 公司 workspace 根（读 `.dsh-company/startup.json`，并查 wiki 指针）。
+ * @param bootWorkspace - host 启动时解析的 workspace（空串 = 没有；只作无 cwd 回退）。
+ * @param options - 派生配置与 watcher。
  */
-export function registerStartupSettings(ctx: Context, workspace: string): void {
+export function registerStartupSettings(
+  ctx: Context,
+  bootWorkspace: string,
+  options: StartupSettingsRegistration = {},
+): void {
   const installed = new WeakSet<object>()
   ctx.on('agent/created', ({ agent }: { agent: AgentLike }) => {
     if (installed.has(agent)) return
@@ -101,13 +124,21 @@ export function registerStartupSettings(ctx: Context, workspace: string): void {
     agent.ctx.inject(['systemPrompt'], (scope) => {
       const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
       if (preset !== undefined && (NON_ROLE_PRESETS as readonly string[]).includes(preset)) return
+      const workspace = startupWorkspace(bootWorkspace, agent)
+      if (workspace === '') return
+      // 首次安装时补一次派生：boot 无 workspace、会话 cwd 才有项目的场景也要有 options 文件。
+      try {
+        options.watch?.sync(workspace)
+      } catch { /* 派生失败不挡注入；面板会显示「还没检查」 */ }
       scope.systemPrompt.section({
         name: STARTUP_SETTINGS_SECTION,
         order: STARTUP_SETTINGS_ORDER,
         // 每次 assembly 重读盘 + 重查指针：改完下一轮生效（与 company:language 同款活读）。
         text: () => {
-          const settings = readStartupSettings(workspace)
-          return startupSettingsText(settings, checkWikiPointer(workspace, settings.wiki))
+          const current = startupWorkspace(bootWorkspace, agent)
+          if (current === '') return ''
+          const settings = readStartupSettings(current)
+          return startupSettingsText(settings, checkWikiPointer(current, settings.wiki))
         },
         interpolate: false,
       })

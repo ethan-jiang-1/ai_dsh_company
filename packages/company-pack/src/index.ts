@@ -32,7 +32,7 @@ import { registerReqCommand } from './host/commands/req-command.ts'
 import { registerDeliveryCommand } from './host/commands/delivery-command.ts'
 import { registerSettingsCommand } from './host/commands/settings-command.ts'
 import { registerStartupSettings } from './host/startup/startup-prompt.ts'
-import { refreshStartupOptions } from './host/startup/startup-store.ts'
+import { StartupOptionsWatch } from './host/startup/startup-watch.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation/cultivation.ts'
 import { roleLabelFor } from './lib/role-copy.ts'
 import { resultLabelFor } from './host/language/company-language.ts'
@@ -128,11 +128,16 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
 
   registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked, blockedReason, role => roleLabelFor(role, language.current()), result => resultLabelFor(result, language.current()))
   const contentDir = resolveContentDir(import.meta.url)
+  const startupWatch = new StartupOptionsWatch({ contentDir, logger: ctx.logger })
+  // 组合测试的最小 ctx 替身可能没有 effect；真实 Cordis 有。缺失时 watcher 随进程退出回收。
+  const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
+  if (typeof effect === 'function') effect.call(ctx, () => () => { startupWatch.dispose() })
   registerHandbook(ctx, contentDir, hasWorkspace ? workspace : undefined,
     // 默认跳过集合由 handbook.ts 按 NON_ROLE_PRESETS 派生（不在这里写 ID 白名单）；
     // 部署配置只作覆盖旋钮（BUG-047）。
     config.handbookSkipPresets === undefined ? {} : { skipPresets: config.handbookSkipPresets })
-  if (hasWorkspace) registerStartupSettings(ctx, workspace)
+  // 不按 hasWorkspace 门控：boot 无 workspace 时之后在会话 cwd 里设的策略也要生效（BUG-089）。
+  registerStartupSettings(ctx, workspace, { contentDir, watch: startupWatch })
   registerLanguagePolicy(ctx, language)
   registerWorkflowContract(ctx, contentDir, { workflowPresets: ['vp-eng'] })
   registerDelegationContracts(ctx, contentDir)
@@ -151,6 +156,15 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   registerSettingsCommand(ctx, {
     workspace, dataBlocked, ...blockedFields, contentDir,
     text: (zhText, enText) => language.text(zhText, enText),
+    language: { current: () => language.current(), subscribe: listener => language.subscribe(listener) },
+    // 写后重派生 + 按新指针重布 watcher（BUG-082）；不走命令自己再 import 一份刷新逻辑。
+    refreshOptions: (target) => {
+      try {
+        startupWatch.sync(target)
+      } catch (error) {
+        ctx.logger?.warn?.(`company-pack：启动策略选项刷新跳过（不影响写入）：${(error as Error).message}`)
+      }
+    },
   })
 
   ctx.on('api-session/added', (summary) => {
@@ -185,9 +199,9 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
 
   if (hasWorkspace && !runtime.dataBlocked) {
     ensureRunBundle(ctx, workspace, runtime.dshHome, runtime.bundleState)
-    // 浏览器面板的下拉选项来自内容包：boot 时派生一次（改内容/换公司后重启即刷新）。
+    // 浏览器面板的下拉选项来自内容包：boot 时派生一次，并按 wiki 指针布新鲜度哨（BUG-082）。
     try {
-      refreshStartupOptions(workspace, resolveContentDir(import.meta.url))
+      startupWatch.sync(workspace)
     } catch (error) {
       ctx.logger?.warn?.(`company-pack：启动策略选项派生跳过（不影响运行）：${(error as Error).message}`)
     }

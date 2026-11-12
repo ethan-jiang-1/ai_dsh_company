@@ -71,14 +71,17 @@ export function run({ root, ok, fail }) {
     fail('shipped-links', `${CONTENT} 不在盘上——随包分发的只读内容（手册/模板/默认章程/状态默认值）不许消失；发布面会少一整层`)
     return
   }
-  // `content/wiki-template/` 是**被拷贝出去**的起点，不是随包被角色阅读的内容：它的相对链接
-  // （`../index.md`）解析目标是**拷贝后的那份 wiki**，按安装读者视角判必然假红。它的链接完整性
-  // 由 `tests/content/wiki-template.spec.ts` 守（index→示例页在盘上、无仓库绝对路径）。
-  // 负例留证 2026-11-12（建模板当天实跑）：纳入扫描 → `.dsh-company`... 八条
-  // 「链接指向仓库/穿出 workspace」；排除后绿。spec 侧反证：把 index 的链接改名 → spec 红。
+  // `content/wiki-template/` 是**被拷贝出去**的起点：模板**内部**链接（`./AGENTS.md`、
+  // `sources/../index.md`）在拷贝后仍成立，必须把目标存在性判在模板根内；指向模板外的链接
+  // 才允许不判（拷贝后的 wiki 根未知）。2026-11-12 之前整目录排除，模板内坏链接两处门禁都
+  // 抓不到（BUG-088），这里改成换基准而不是关扫描。
   const files = [
-    ...mdFiles(contentRoot).filter(rel => !rel.startsWith('wiki-template/'))
-      .map(rel => ({ rel: `${CONTENT}/${rel}`, file: join(contentRoot, rel), kind: 'content' })),
+    ...mdFiles(contentRoot)
+      .map(rel => ({
+        rel: `${CONTENT}/${rel}`,
+        file: join(contentRoot, rel),
+        kind: rel.startsWith('wiki-template/') ? 'template' : 'content',
+      })),
     ...mdFiles(presetsRoot).filter(rel => rel.split('/').includes('skills')).map(rel => ({ rel: `${PRESETS}/${rel}`, file: join(presetsRoot, rel), kind: 'skill' })),
   ]
   const problems = []
@@ -98,7 +101,8 @@ export function run({ root, ok, fail }) {
         }
         return
       }
-      for (const raw of linkTargets(line)) {
+      // 行内代码里的 `[Title](path.md)` 是示例，不是链接；去掉代码跨度再抽链接。
+      for (const raw of linkTargets(line.replace(/`[^`\n]*`/g, ''))) {
         const target = stripTarget(raw)
         if (isExternal(target)) continue
         if (target.startsWith('/')) {
@@ -106,6 +110,20 @@ export function run({ root, ok, fail }) {
           continue
         }
         const top = topOf(target)
+        if (kind === 'template') {
+          const templateRoot = join(contentRoot, 'wiki-template')
+          const resolved = resolve(dirname(file), target)
+          const within = relative(templateRoot, resolved)
+          if (within.startsWith(`..${sep}`) || within === '..' || isAbsolute(within)) {
+            // 指向模板外：拷贝后的根未知，不判存在；但仍不许指仓库（安装用户没有仓库）。
+            if (REPO_TOP.has(top) || REPO_PATH.test(target)) {
+              problems.push(`${at} 模板链接指向仓库：${raw}`)
+            }
+            continue
+          }
+          if (!existsSync(resolved)) problems.push(`${at} 模板内部链接目标不在盘上：${raw}`)
+          continue
+        }
         if (REPO_TOP.has(top) || target.startsWith('../')) {
           problems.push(`${at} 链接指向仓库/穿出 workspace：${raw}`)
           continue

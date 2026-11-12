@@ -33,6 +33,9 @@
 v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajectory/New terminal 收回卡均已结归档。已结卡见[归档索引](../_archive/README.md)。新问题按 [backlog 入口](../README.md) 立卡，不从归档里自行开工。
 
 ## 近期归档
+
+- 启动策略（界面批）+ wiki 知识地图（配置批）回归/探索卡 2026-11-12 已结：A1–A5 / B1–B8 + named child；10 张 BUG-080..089；未证 teammate/workflow 等；去向 = none（只产证据/BUG 卡）；卡在[归档](../_archive/settled_issues/2026-11-12-startup-strategy-wiki-regression-exploration.md)。
+
 - Wiki 知识地图（M1）卡 2026-11-12 已结：`content/wiki-template/`（AK 三层 + OKF 最小 frontmatter）+ 六角色共享协议 skill + wiki 指针三档校验 + 注入按位置分档（内可写/外只读/失效警示）；去向 = implementation（[Note](../../notes/implemented/2026-11-12-wiki-knowledge-map-landing.md)）；卡在[归档](../_archive/settled_issues/2026-11-12-wiki-knowledge-map-landing.md)。
 
 

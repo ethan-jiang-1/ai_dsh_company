@@ -7,10 +7,14 @@
  *
  * 不主张：真 profile 装配、真 workspace registry / sessionQuery（那归 preset-smoke / release-smoke）。
  */
-import { mkdirSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
 import { apply } from '../../../packages/company-pack/src/index.ts'
+import { writeStartupSettings } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
+import { EMPTY_STARTUP_SETTINGS } from '../../../packages/company-pack/src/lib/startup-settings.ts'
 import { createTempEnv, type TempEnv } from '../../support/temp-env.ts'
 
 let env: TempEnv
@@ -106,5 +110,52 @@ describe('Host apply 生命周期：迟到 inject 与卸载后事件（R4-05）'
     scoped.emit('api-session/added', { sessionId: 'session-y', cwd: '/outside-r4-2', origin: 'human', running: true, projections: { values: {} } })
     await wait()
     expect(warns.length).toBe(before)
+  })
+
+
+  it('boot 无 workspace 仍注册 startup section，按会话 cwd 读策略', async () => {
+    env.set({
+      DSH_COMPANY_HOME: join(env.dir, 'missing-company'),
+      DSH_COMPANY_BOOTSTRAP: 'off',
+      DSH_COMPANY_REBIND: undefined,
+    })
+    const { ctx } = mount()
+    const scoped = await start(ctx)
+    const project = mkdtempSync(join(tmpdir(), 'startup-apply-'))
+    try {
+      writeStartupSettings(project, {
+        ...EMPTY_STARTUP_SETTINGS,
+        productType: 'hardware-software',
+        updatedAt: '2026-11-12T00:00:00.000Z',
+      })
+      const sections: Array<{ name: string; text: () => string }> = []
+      const presets = { composedPreset: () => 'ceo' }
+      const agent = {
+        session: { header: { cwd: project } },
+        ctx: {
+          get: (name: string) => name === 'agentPresets' ? presets : undefined,
+          inject: (_deps: readonly string[], callback: (scope: unknown) => void) => {
+            callback({
+              get: (name: string) => name === 'agentPresets' ? presets : undefined,
+              systemPrompt: {
+                getSectionOrder: () => 0,
+                section: (section: { name: string; text: () => string }) => {
+                  sections.push(section)
+                  return () => {}
+                },
+              },
+            })
+            return { dispose: async () => {} }
+          },
+        },
+      }
+      scoped.emit('agent/created', { agent })
+      const section = sections.find(entry => entry.name === 'company:startup-settings')
+      expect(section).toBeDefined()
+      expect(section?.text()).toContain('产品类型：hardware-software')
+    } finally {
+      await ctx.fiber.dispose()
+      rmSync(project, { recursive: true, force: true })
+    }
   })
 })

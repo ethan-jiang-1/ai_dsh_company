@@ -16,6 +16,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-12-startup-strategy-wiki-regression-exploration.md](settled_issues/2026-11-12-startup-strategy-wiki-regression-exploration.md) | 已结；启动策略（界面）+ wiki 知识地图（配置）回归/探索：A1–A5 / B1–B8 + named child；10 张 BUG-080..089；未证 teammate/workflow 等；去向 = none（只产证据/BUG 卡） | 2026-11-12 |
 | [2026-11-12-wiki-knowledge-map-landing.md](settled_issues/2026-11-12-wiki-knowledge-map-landing.md) | 已结；wiki 模板（AK 三层 + OKF 最小 frontmatter）+ 六角色共享协议 skill + 指针三档校验 + 注入按位置分档；verify/test(233 files/1723)/typecheck/preset-smoke 全绿 + 外部只读真会话实测；去向 = [Note](../../notes/implemented/2026-11-12-wiki-knowledge-map-landing.md) | 2026-11-12 |
 | [2026-11-12-startup-settings-landing.md](settled_issues/2026-11-12-startup-settings-landing.md) | 已结；composer 入口 + 右栏「策略」页签（三字段、首项自动、选项从 content 枚举）+ workspace 级 `startup.json` + `company:startup-settings` 软注入；verify/test(231 files/1704)/typecheck/ui-scene-smoke(10 页签) 全绿；去向 = [Note](../../notes/implemented/2026-11-12-startup-settings.md) | 2026-11-12 |
 | [2026-11-12-internal-english-canonical.md](settled_issues/2026-11-12-internal-english-canonical.md) | 已结；表达层双语 + 内部全英文 canonical（内容/persona/skills/注释/日志/领域值/picker 统一英文）；去向 = [RFC](../../notes/proposed/2026-11-12-internal-english-canonical.md) | 2026-11-12 |
@@ -217,6 +218,16 @@
 | [BUG-077-teammate-header-omits-team-collaboration.md](fixed_bugs/BUG-077-teammate-header-omits-team-collaboration.md) | team 拆 `team collaboration` / `team spawn (Lead only)`；teammate 列协作、注入 member section | 2026-11-11 |
 | [BUG-078-teammate-dead-subagent-control-tools.md](fixed_bugs/BUG-078-teammate-dead-subagent-control-tools.md) | control 按座位/child 能力装：CEO teammate 无，vp-eng teammate 保留 | 2026-11-11 |
 | [BUG-079-ceo-teammate-spawn-header-no-child-channel.md](fixed_bugs/BUG-079-ceo-teammate-spawn-header-no-child-channel.md) | spawn/fork/retry 按 `childDepth > depth` 门控；CEO teammate 无 spawn，vp-eng teammate 保留；control 消费同一座位 | 2026-11-11 |
+| [BUG-080](fixed_bugs/BUG-080-en-tab-title-map-missing-strategy.md) | en 页签标题从同一份字典派生：10/10 含 Strategy；缺 en key 探针 fail-loud | 2026-11-12 |
+| [BUG-081](fixed_bugs/BUG-081-strategy-panel-reads-session-workspace-command-writes-host.md) | 启动策略 workspace = 会话 cwd 优先（面板/命令/注入同一份） | 2026-11-12 |
+| [BUG-082](fixed_bugs/BUG-082-strategy-panel-stale-wiki-check.md) | wikiCheck 带 checkedAt + watcher 新鲜度；面板不拿快照冒充当前值 | 2026-11-12 |
+| [BUG-083](fixed_bugs/BUG-083-company-settings-host-command-strings-mixed-language.md) | /company-settings 描述/用法/错误/回执双语单一源；语言切换重注册 | 2026-11-12 |
+| [BUG-084](fixed_bugs/BUG-084-wiki-pointer-lexical-path-permission.md) | wiki 指针按真实路径判可写/只读；index.md 必须是文件；~ 展开 | 2026-11-12 |
+| [BUG-085](fixed_bugs/BUG-085-startup-options-read-limit-fixed-fixture.md) | 选项读上限从预算派生；截断 fail-loud + 真实 content 预算 spec | 2026-11-12 |
+| [BUG-086](fixed_bugs/BUG-086-strategy-button-tooltip-no-values.md) | 策略按钮 tooltip 逐字段列生效值（截断可补全） | 2026-11-12 |
+| [BUG-087](fixed_bugs/BUG-087-wiki-template-copy-path-repo-only.md) | 模板拷贝命令改安装视图；面板给当前部署绝对路径 | 2026-11-12 |
+| [BUG-088](fixed_bugs/BUG-088-shipped-links-excludes-wiki-template.md) | 模板按自身根验链（不再整目录排除）；坏链接 verify 红 | 2026-11-12 |
+| [BUG-089](fixed_bugs/BUG-089-boot-without-workspace-settings-not-injected.md) | boot 无 workspace 也按 agent 会话 cwd 注册 startup section | 2026-11-12 |
 
 ## 暂停卡
 

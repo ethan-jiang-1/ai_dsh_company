@@ -22,4 +22,21 @@ describe('company-tab-catalog', () => {
     expect(parseCompanyTabCatalog('id: x, title: y', 'const FACES = {}', '')).toEqual([])
     expect(parseCompanyTabCatalog("id: 'dsh-company-pack/x', kind: 'k', face: 'missing'", 'const FACES = {}', '')).toEqual([])
   })
+
+  it('en 标题从同一份字典派生：10/10 成对，含 Strategy（不再手维护映射）', () => {
+    const source = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/tabs/company-tab-registration.ts'), 'utf8')
+    const identity = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/ui/tab-icons.tsx'), 'utf8')
+    const copy = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/locales.ts'), 'utf8')
+    const tabs = parseCompanyTabCatalog(source, identity, copy)
+    expect(tabs).toHaveLength(10)
+    expect(tabs.map(tab => tab.enTitle)).toContain('Strategy')
+    expect(tabs.every(tab => tab.enTitle.length > 0)).toBe(true)
+  })
+
+  it('缺 en label → 整体为空（探针 fail-loud，不静默落回中文）', () => {
+    const source = "id: 'dsh-company-pack/x', kind: 'k', face: 'attention'"
+    const identity = "const FACES = {\n  attention: { tone: 'x', glyph: X }\n}"
+    const copy = "export const zh = {\n  'tabs.attention.label': '待办',\n}\nexport const en = {\n  'tabs.other.label': 'Other',\n}"
+    expect(parseCompanyTabCatalog(source, identity, copy)).toEqual([])
+  })
 })

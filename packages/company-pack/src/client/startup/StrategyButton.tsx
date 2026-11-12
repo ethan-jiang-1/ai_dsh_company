@@ -8,7 +8,7 @@ import { useEffect, useSyncExternalStore, type ReactNode } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { InjectFace } from '@deepseek-ai/dsh-client-ui-slots'
 import { overriddenEntries, startupRows } from '../../lib/startup-settings.ts'
-import type { CompanyT } from '../locales.ts'
+import type { CompanyKey, CompanyT } from '../locales.ts'
 import type { StartupStore } from './startup-store.ts'
 
 /** 注入面：会话 id + 共享仓 + 读盘闭包。 */
@@ -22,6 +22,13 @@ export interface StrategyButtonFace {
 
 /** 槽注入的 `t` 会与自带的同名 prop 冲突，故本组件不声明 `locale`，`t` 由 inject 给。 */
 export type StrategyButtonProps = InjectFace<StrategyButtonFace>
+
+/** 字段 → 文案 key（tooltip 列出生效值时用字段名，不只给裸值）。 */
+const FIELD_KEY: Readonly<Record<'productType' | 'deliveryMode' | 'wiki', CompanyKey>> = {
+  productType: 'strategy.field.productType',
+  deliveryMode: 'strategy.field.deliveryMode',
+  wiki: 'strategy.field.wiki',
+}
 
 /** 值 → 人话（面板/按钮共用；不翻译内容枚举，只翻译「自动」这一态）。 */
 export function strategySummary(values: readonly string[]): string {
@@ -47,9 +54,15 @@ export function StrategyButton(props: StrategyButtonProps): ReactNode {
     : overrides.length === 0
       ? props.t('strategy.button.auto')
       : props.t('strategy.button.value', { value: strategySummary(values) })
-  const tooltip = face.loaded && overrides.length === 0
-    ? props.t('strategy.button.tooltip.auto')
-    : props.t('strategy.button.tooltip')
+  // tooltip 必须能补全被 ellipsis 截断的 label：有覆盖时逐字段列「字段名: 值」（BUG-086）。
+  const valueLines = overrides
+    .map(([field, value]) => `${props.t(FIELD_KEY[field])}: ${value}`)
+    .join('\n')
+  const tooltip = !face.loaded
+    ? props.t('strategy.button.tooltip')
+    : overrides.length === 0
+      ? props.t('strategy.button.tooltip.auto')
+      : `${valueLines}\n${props.t('strategy.button.tooltip')}`
 
   return (
     <button

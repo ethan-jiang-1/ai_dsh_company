@@ -58,22 +58,40 @@ const WIKI_PROBLEM_KEY = {
   'no-index': 'strategy.wiki.noIndex',
 } as const
 
-function StrategyRow({ row, t, onPick, onWiki, busy, wikiCheck }: {
+/** 检查时间 → 人话（只到分钟；无法解析时原样）。 */
+export function formatCheckedAt(iso: string): string {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return iso
+  return date.toLocaleString(undefined, { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+}
+
+function StrategyRow({ row, t, onPick, onWiki, busy, wikiCheck, checkCurrent, templatePath }: {
   readonly row: StartupRow
   readonly t: CompanyT
   readonly onPick: (field: StartupField, value: string | null) => void
   readonly onWiki: (value: string | null) => void
   readonly busy: boolean
   readonly wikiCheck: WikiCheck
+  /** 这次检查是否对得上当前设置且有 `checkedAt`；false = 不拿快照冒充当前值。 */
+  readonly checkCurrent: boolean
+  /** 当前部署的模板绝对路径（缺 index.md 的提示用；null = 不知道）。 */
+  readonly templatePath: string | null
 }): ReactNode {
   const label = t(FIELD_LABEL[row.field])
   const options = optionsFor(row)
   // wiki 的失效原因来自 host 的盘上检查；另两行的失效是「值不在枚举里」。
-  const invalid = row.invalid
-    ? (row.field === 'wiki' && wikiCheck.problem !== null ? t(WIKI_PROBLEM_KEY[wikiCheck.problem]) : t('strategy.invalid'))
+  // 检查过期 / 对不上当前值时，失效结论也不许冒充（BUG-082 的对称面）。
+  const invalid = row.invalid && (row.field !== 'wiki' || checkCurrent)
+    ? (row.field === 'wiki' && wikiCheck.problem !== null
+        ? t(WIKI_PROBLEM_KEY[wikiCheck.problem], { path: templatePath ?? 'content/wiki-template' })
+        : t('strategy.invalid'))
     : null
-  const wikiNote = row.field === 'wiki' && row.value !== null && !row.invalid && wikiCheck.location !== null
+  const wikiNote = row.field === 'wiki' && row.value !== null && checkCurrent && !row.invalid && wikiCheck.location !== null
     ? t(wikiCheck.location === 'inside' ? 'strategy.wiki.inside' : 'strategy.wiki.outside')
+    : null
+  const wikiUnchecked = row.field === 'wiki' && row.value !== null && !checkCurrent ? t('strategy.wiki.unchecked') : null
+  const checkedAt = row.field === 'wiki' && checkCurrent && wikiCheck.checkedAt !== null
+    ? t('strategy.wiki.checkedAt', { time: formatCheckedAt(wikiCheck.checkedAt) })
     : null
   return (
     <div className="wk-strategy-row" data-field={row.field}>
@@ -99,6 +117,8 @@ function StrategyRow({ row, t, onPick, onWiki, busy, wikiCheck }: {
               </button>
             )}
             {wikiNote === null ? null : <span className="wk-strategy-auto-tag">{wikiNote}</span>}
+            {checkedAt === null ? null : <span className="wk-strategy-auto-tag">{checkedAt}</span>}
+            {wikiUnchecked === null ? null : <div className="wk-strategy-row-warning">{wikiUnchecked}</div>}
           </div>
         )
         : (
@@ -158,7 +178,12 @@ export function StrategyPanel(props: StrategyPanelProps): ReactNode {
   }, [reload, t])
 
   const rows = startupRows(face.settings, face.options)
-  const nothingToPick = face.options.productTypes.length === 0 && face.options.deliveryModes.length === 0
+  const optionsUnreadable = face.optionsProblem === 'unreadable'
+  const nothingToPick = !optionsUnreadable && face.options.productTypes.length === 0 && face.options.deliveryModes.length === 0
+  // 检查对得上 current settings 且有时间戳，才允许把 wiki 结论说成「现在」。
+  const checkCurrent = face.settings.wiki !== null
+    && face.options.wikiCheck.value === face.settings.wiki
+    && face.options.wikiCheck.checkedAt !== null
 
   return (
     <PanelFrame title={t('tabs.strategy.label')} tone="structure" tabProps={props} refreshLabel={t('strategy.refresh')}>
@@ -166,6 +191,7 @@ export function StrategyPanel(props: StrategyPanelProps): ReactNode {
         <h2 className="wk-strategy-heading">{t('strategy.title')}</h2>
         <p className="wk-strategy-sub">{t('strategy.subtitle')}</p>
         {error === null ? null : <p className="wk-strategy-error" role="status">{error}</p>}
+        {optionsUnreadable ? <p className="wk-strategy-error" role="status">{t('strategy.optionsUnreadable')}</p> : null}
         {nothingToPick ? <p className="wk-strategy-empty">{t('strategy.noOptions')}</p> : null}
         {rows.map(row => (
           <StrategyRow
@@ -174,6 +200,8 @@ export function StrategyPanel(props: StrategyPanelProps): ReactNode {
             t={t}
             busy={busy}
             wikiCheck={face.options.wikiCheck}
+            checkCurrent={checkCurrent}
+            templatePath={face.options.wikiTemplate}
             onPick={(field, value) => { void commit(() => save(sessionId, field, value)) }}
             onWiki={(value) => { void commit(() => save(sessionId, 'wiki', value)) }}
           />

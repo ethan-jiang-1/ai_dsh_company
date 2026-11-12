@@ -2,6 +2,9 @@
 
 状态：implemented（2026-11-12 落地；验证见下）
 
+> 部分取代：workspace 权威（会话 cwd 优先）、`wikiCheck` 新鲜度、选项读上限、模板安装路径见
+> [启动策略 + wiki 缺陷横扫 Note](./2026-11-12-startup-strategy-wiki-bug-sweep.md)。
+
 上游 = 用户 2026-11-12 三轮定形（「每个项目都可以改、公司有基线」「要 sidebar 不是弹卡」「选项不能写死，第一项自动」）；
 研究 = [startup-settings 研究题](../../_backlog/_archive/research/startup-settings/README.md)（机制 / 58 项候选盘点 / DSH 原生落地）；
 卡 = [2026-11-12 启动设置落地](../../_backlog/_archive/settled_issues/2026-11-12-startup-settings-landing.md)。

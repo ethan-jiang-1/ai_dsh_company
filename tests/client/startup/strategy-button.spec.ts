@@ -60,4 +60,22 @@ describe('StrategyButton', () => {
     expect(render({ ...EMPTY_STARTUP_SETTINGS, deliveryMode: 'project-services' }, true, en))
       .toContain('Strategy: project-services')
   })
+
+  it('tooltip 列出生效字段与值，长 wiki 截断后可从 hover 补全', () => {
+    const html = render({
+      ...EMPTY_STARTUP_SETTINGS,
+      productType: 'business-software',
+      deliveryMode: 'project-services',
+      wiki: '/very/long/path/to/a/wiki/directory',
+    }, true, zh)
+    expect(html).toContain('做什么: business-software')
+    expect(html).toContain('怎么交付: project-services')
+    expect(html).toContain('参考资料（wiki）: /very/long/path/to/a/wiki/directory')
+  })
+
+  it('全自动的 tooltip 仍是固定句，不塞空值', () => {
+    const html = render(EMPTY_STARTUP_SETTINGS, true, zh)
+    expect(html).toContain('现在是全自动')
+    expect(html).not.toContain('做什么:')
+  })
 })

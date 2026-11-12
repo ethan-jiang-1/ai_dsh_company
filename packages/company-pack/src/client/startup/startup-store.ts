@@ -18,6 +18,8 @@ export interface StartupFace {
   readonly loaded: boolean
   readonly settings: StartupSettings
   readonly options: StartupOptions
+  /** `'unreadable'` = 选项文件坏/被截断；空集合不能伪装成「内容里没有可选项」。 */
+  readonly optionsProblem?: 'unreadable' | null
 }
 
 /** 订阅仓（`useSyncExternalStore` 形状）。 */
@@ -32,6 +34,7 @@ export function createStartupStore(initial: StartupFace = {
   loaded: false,
   settings: EMPTY_STARTUP_SETTINGS,
   options: EMPTY_STARTUP_OPTIONS,
+  optionsProblem: null,
 }): StartupStore {
   let current = initial
   const listeners = new Set<() => void>()

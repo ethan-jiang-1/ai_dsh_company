@@ -2,11 +2,48 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮拿到 ≥3 张卡，先按根因分组列表再逐卡修——逐症状打补丁会把同一根因修三遍。
 
-**下一个缺陷号**：Next BUG ID = 80；已分配 BUG-001..079。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 90；已分配 BUG-001..089。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。
 
 ## 活跃清单
+
+**空**（2026-11-12 全部收口：BUG-080..089 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）。
+
+## 2026-11-12 修复交接（根因组 W/L/F/V：BUG-080..089）
+
+**用户指令（2026-11-12）**：「_backlog/bugs 都有不少bug，你好好看一看，我们怎么系统性地把这些bug给解决了，它终点是所有bug都得解决，想清楚了之后就set up一个goal」
+本句即本轮授权（材料性：host 模型可见文案/行为 + client UI + 随包内容 + docs 合同 + `notes/implemented` 决定），留痕 = Note。
+终点 = 本文件活跃清单清零、十张卡全部迁 [fixed_bugs](../_archive/fixed_bugs/) 且`审查：`与证据齐；`pnpm verify` / `pnpm test` / `pnpm typecheck` / `pnpm lint` 全绿。
+
+十张卡同出 [启动策略 + wiki 回归/探索卡](../_archive/settled_issues/2026-11-12-startup-strategy-wiki-regression-exploration.md)（A1–A5 / H1–H13）。
+按**根因**分四组，不逐症状打补丁：每组先定唯一事实源，再让所有载体消费它；每卡仍按「已修判定」留真红→绿证据。
+逐卡修之前先做一次**同类载体扫描**（同组其它手写清单 / 词法路径 / 固定上限 / 整块排除面），把类修掉而不是只修点。
+
+| 组 | 卡 | 同一根因 | 唯一事实源 / 修法 |
+|---|---|---|---|
+| **W workspace 权威与新鲜度** | [081](../_archive/fixed_bugs/BUG-081-strategy-panel-reads-session-workspace-command-writes-host.md) / [089](../_archive/fixed_bugs/BUG-089-boot-without-workspace-settings-not-injected.md) / [082](../_archive/fixed_bugs/BUG-082-strategy-panel-stale-wiki-check.md) | 同一份 `.dsh-company/startup.json` 有四处解释：面板按 Lead 会话盘读、命令/注入按 boot workspace、boot 无 workspace 时 section 根本不注册、派生 `wikiCheck` 无新鲜度契约 | 新增 `startupWorkspace(boot, agent)`：**会话 cwd 优先、boot 回退**，命令与 section 共用；section 无条件按 agent 注册并在 `agent/created` 补派生；派生检查带 `checkedAt`，过期只在「未刷新」态出现、绝不冒充当前可写/只读 |
+| **F 盘上事实** | [084](../_archive/fixed_bugs/BUG-084-wiki-pointer-lexical-path-permission.md) / [085](../_archive/fixed_bugs/BUG-085-startup-options-read-limit-fixed-fixture.md) / [087](../_archive/fixed_bugs/BUG-087-wiki-template-copy-path-repo-only.md) | 用字符串/固定常量冒充盘上事实：词法路径判权限、64 行读上限对照内容增长、仓库相对路径给安装用户 | 权限判据 = 真实路径（`realpath`）+ `statSync().isFile()`；读上限从写方形状派生、截断 fail-loud + 内容预算门禁；模板按安装根给可执行路径，面板给当前部署的绝对路径 |
+| **L 表达层单一源** | [080](../_archive/fixed_bugs/BUG-080-en-tab-title-map-missing-strategy.md) / [083](../_archive/fixed_bugs/BUG-083-company-settings-host-command-strings-mixed-language.md) | 页签/命令文案有第二份手写或单语载体：探针 `EN_TAB_TITLES`、host 命令 `description` / `SETTINGS_USAGE` / 未知字段错误 | 探针 en 标题从 `locales.ts` 同一份字典派生（不再手维护）；host 命令文案进同一字典、按语言注册/重注册；en 无 CJK 的 keyless 断言 |
+| **V 验证面** | [088](../_archive/fixed_bugs/BUG-088-shipped-links-excludes-wiki-template.md) / [086](../_archive/fixed_bugs/BUG-086-strategy-button-tooltip-no-values.md)（+ 各组守卫） | 门禁为消假红整块排除，测试只证「在场」不证承诺行为 | 模板按模板自身根验链（不再整目录排除）；tooltip 值进 spec + 真页面断言；每组新 spec/门禁都留红证 |
+
+**次序 = W → F → L → V**：W 先定 workspace/新鲜度契约（后面几组的读路径依赖它）；F 在同一 startup 模块收口盘上事实；
+L 依赖 `settings-command` 的 W 重构后再动命令文案；V 独立收口并在每组补守卫。
+
+**已定产品口径（BUG-081）**：启动策略跟随**会话所在项目**（Lead 会话 cwd；子会话继承 parent cwd，见 vendor
+`packages/subagent/subagent/src/child-agent.ts`），boot workspace 只在会话无 cwd 时回退。面板本来就按 Lead 读；
+命令与注入改齐即可，不为同一事实再造第二套解析。输掉的方案 = 「面板改读 host workspace」——需要新的
+host→client 读面，且会话在别的项目时会显示另一个项目的策略；`/req` / `/prd` 的 `commandWorkspace` 不动
+（公司数据根 ≠ 项目策略根）。本决定落 Note。
+
+**逐卡收口**：先写 `## 已修判定`（可点名验证搭载的工作）再翻 `修复就绪`；落树翻 `修复已落地` 并记 `审查：agent` +
+红→绿证据；最后 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/) 并同步两张索引。真页面/安装面按卡点名：
+`ui-scene-smoke --isolated --lang en`（080/086）、`release-smoke`（087）、模板内坏链接红证（088）。
+
+**收口（2026-11-12）**：十张卡全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)，两张索引同步；
+`pnpm test` 236 files / 1761 tests、`pnpm typecheck`、`pnpm lint`、`pnpm dup`、`pnpm verify` 全绿；
+`ui-scene-smoke --isolated --lang en` 10/10 无中文、`release-smoke` ALL PASS。
+决定、红→绿证据与未验面 = [Note](../../notes/implemented/2026-11-12-startup-strategy-wiki-bug-sweep.md)。
 
 **2026-11-11 根因组 A（产品类型轴三处各自为政）——已收口**：允许值、默认值、播种各有一份事实。
 三张卡已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；次序 = 先定单一来源 → 再校准默认 →

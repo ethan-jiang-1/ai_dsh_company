@@ -7,12 +7,13 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { blockedCompanyText } from './blocked-text.ts'
-import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import {
   clearStartupSettings,
   isStartupField,
   parseStartupSettings,
   STARTUP_FIELDS,
+  startupWorkspace,
+  type StartupAgentLike,
   type StartupField,
   type StartupSettings,
 } from '../../lib/startup-settings.ts'
@@ -23,16 +24,15 @@ import {
   refreshStartupOptions,
   writeStartupSettings,
 } from '../startup/startup-store.ts'
+import { STARTUP_COMMAND_COPY } from '../../lib/startup-command-copy.ts'
 import type { WikiProblem } from '../../lib/startup-settings.ts'
-
-/** 用法行。 */
-export const SETTINGS_USAGE = '用法：/company-settings [show | set <productType|deliveryMode|wiki> <值|auto> | reset]'
 
 export type ParsedSettingsCommand =
   | { readonly kind: 'show' }
   | { readonly kind: 'reset' }
   | { readonly kind: 'set'; readonly field: StartupField; readonly value: string | null }
-  | { readonly kind: 'error'; readonly text: string }
+  // 解析器只给**结构化错误码**；文案在 handler 里按当前语言取（zh/en 都可变）。
+  | { readonly kind: 'error'; readonly code: 'usage' | 'unknown-field'; readonly field?: string }
 
 /**
  * 解析子命令。
@@ -40,24 +40,28 @@ export type ParsedSettingsCommand =
  * @returns 归一化动作；非法输入给用法错误。
  */
 export function parseSettingsCommand(rawInput: string): ParsedSettingsCommand {
-  const tokens = rawInput.trim().split(/\s+/).filter(token => token !== '')
-  if (tokens.length === 0) return { kind: 'show' }
-  const [head] = tokens
-  if (head === 'show') return tokens.length === 1 ? { kind: 'show' } : { kind: 'error', text: SETTINGS_USAGE }
-  if (head === 'reset') return tokens.length === 1 ? { kind: 'reset' } : { kind: 'error', text: SETTINGS_USAGE }
-  if (head !== 'set') return { kind: 'error', text: SETTINGS_USAGE }
-  // `set wiki` 带空格路径时，值取剩余全体（wiki 是指针，可以是带空格的路径）。
-  const field = tokens[1]
-  if (field === undefined || tokens.length < 3) return { kind: 'error', text: SETTINGS_USAGE }
+  const trimmed = rawInput.trim()
+  if (trimmed === '') return { kind: 'show' }
+  const head = trimmed.split(/\s+/, 1)[0] ?? ''
+  if (head === 'show') return trimmed === 'show' ? { kind: 'show' } : { kind: 'error', code: 'usage' }
+  if (head === 'reset') return trimmed === 'reset' ? { kind: 'reset' } : { kind: 'error', code: 'usage' }
+  if (head !== 'set') return { kind: 'error', code: 'usage' }
+  // `set wiki` 的值是**原始剩余字符串**（wiki 可以带连续空格）；不要 split 后再 join 折叠（BUG-084）。
+  const rest = trimmed.slice(head.length).trim()
+  const matched = /^(\S+)\s+([\s\S]+)$/.exec(rest)
+  if (matched === null) return { kind: 'error', code: 'usage' }
+  const field = matched[1] as string
   if (!isStartupField(field)) {
-    return { kind: 'error', text: `未知字段「${field}」；可用：${STARTUP_FIELDS.join(' / ')}` }
+    return { kind: 'error', code: 'unknown-field', field }
   }
-  const raw = tokens.slice(2).join(' ')
+  const raw = (matched[2] ?? '').trim()
+  if (raw === '') return { kind: 'error', code: 'usage' }
   const value = raw === 'auto' ? null : raw
   return { kind: 'set', field, value }
 }
 
 export interface SettingsCommandOptions {
+  /** host 启动时解析的 workspace（空串 = 没有；只作会话无 cwd 的回退）。 */
   readonly workspace: string
   readonly dataBlocked: boolean
   readonly blockedReason?: string
@@ -65,6 +69,19 @@ export interface SettingsCommandOptions {
   readonly contentDir?: string
   /** 人可见文案按当前公司语言取（zh 缺省）。 */
   readonly text: (zh: string, en: string) => string
+  /**
+   * 当前公司语言（可选）。description/hint 在注册时是字符串，vendor 不支持 per-locale provider；
+   * 所以语言切换时用 subscribe 重注册（BUG-083）。
+   */
+  readonly language?: {
+    current(): 'zh' | 'en'
+    subscribe(listener: () => void): () => void
+  }
+  /**
+   * 写设置后重派生选项文件；生产传 watcher（顺带按新指针布哨），缺省直接写派生文件。
+   * 用回调而不是直接 import：spec 不需要真 watcher，host 又能在这里多接一步。
+   */
+  readonly refreshOptions?: (workspace: string) => void
 }
 
 /** 一行「字段 = 值」。 */
@@ -89,22 +106,31 @@ function wikiProblemText(problem: WikiProblem, text: (zh: string, en: string) =>
 /** 注册 `/company-settings`。 */
 export function registerSettingsCommand(ctx: Context, options: SettingsCommandOptions): void {
   const text = options.text
-  ctx.commands.register({
+  // 写后重派生：生产传 watcher（顺带布新鲜度哨），spec 缺省直接落派生文件。
+  const refresh = options.refreshOptions
+    ?? ((workspace: string): void => { refreshStartupOptions(workspace, options.contentDir) })
+  const definition = () => ({
     name: 'company-settings',
-    description: '项目启动策略：产品类型 / 交付模式 / 参考资料 wiki（auto = 不约束）',
-    input: { hint: 'show | set <field> <value|auto> | reset' },
-    handler: async ({ rawInput, agent }: { readonly rawInput: string, readonly agent?: CommandAgent }) => {
-      const workspace = commandWorkspace(options.workspace, agent)
+    description: text(STARTUP_COMMAND_COPY.description.zh, STARTUP_COMMAND_COPY.description.en),
+    input: { hint: text(STARTUP_COMMAND_COPY.hint.zh, STARTUP_COMMAND_COPY.hint.en) },
+    handler: async ({ rawInput, agent }: { readonly rawInput: string, readonly agent?: StartupAgentLike }) => {
+      // 会话 cwd 优先：面板按 Lead 会话读，写必须落在同一份（BUG-081）。
+      const workspace = startupWorkspace(options.workspace, agent)
       if (workspace === '') {
         return {
           kind: 'error' as const,
           text: options.dataBlocked
             ? blockedCompanyText(options.blockedReason, '设置')
-            : text('未指定 workspace；先选 workspace 再设置。', 'No workspace yet; pick a workspace before editing startup settings.'),
+            : text(STARTUP_COMMAND_COPY.noWorkspace.zh, STARTUP_COMMAND_COPY.noWorkspace.en),
         }
       }
       const parsed = parseSettingsCommand(rawInput)
-      if (parsed.kind === 'error') return { kind: 'error' as const, text: text(parsed.text, parsed.text) }
+      if (parsed.kind === 'error') {
+        const copy = parsed.code === 'unknown-field'
+          ? STARTUP_COMMAND_COPY.unknownField(parsed.field ?? '', STARTUP_FIELDS.join(' / '))
+          : STARTUP_COMMAND_COPY.usage
+        return { kind: 'error' as const, text: text(copy.zh, copy.en) }
+      }
 
       const current = readStartupSettings(workspace)
       if (parsed.kind === 'show') {
@@ -129,7 +155,7 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
       if (parsed.kind === 'reset') {
         const next = clearStartupSettings(new Date().toISOString())
         writeStartupSettings(workspace, next)
-        refreshStartupOptions(workspace, options.contentDir)
+        refresh(workspace)
         return {
           kind: 'success' as const,
           text: text('已恢复自动（三项全部不约束）；下一轮生效。', 'Reset to auto (no constraints); effective next turn.'),
@@ -159,7 +185,7 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
         updatedAt: new Date().toISOString(),
       }
       writeStartupSettings(workspace, parseStartupSettings(JSON.stringify(next)))
-      refreshStartupOptions(workspace, options.contentDir)
+      refresh(workspace)
       // A3：wiki 指针写进去就查一次——失效要说出来，不能等模型去 read 一个空气目录。
       const wikiWarning = parsed.field === 'wiki' && parsed.value !== null
         ? (() => {
@@ -179,4 +205,13 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
       }
     },
   })
+  let dispose = ctx.commands.register(definition())
+  if (options.language !== undefined) {
+    const unsubscribe = options.language.subscribe(() => {
+      dispose()
+      dispose = ctx.commands.register(definition())
+    })
+    const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
+    if (typeof effect === 'function') effect.call(ctx, () => () => { unsubscribe(); dispose() })
+  }
 }

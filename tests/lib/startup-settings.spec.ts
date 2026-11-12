@@ -10,7 +10,9 @@
  */
 import { describe, expect, it } from 'vitest'
 import {
+  EMPTY_STARTUP_OPTIONS,
   EMPTY_WIKI_CHECK,
+  STARTUP_OPTIONS_MAX_ENTRIES,
   STARTUP_OPTIONS_READ_LIMIT,
   STARTUP_SETTINGS_READ_LIMIT,
   EMPTY_STARTUP_SETTINGS,
@@ -18,14 +20,29 @@ import {
   overrideCount,
   overriddenEntries,
   parseStartupOptions,
+  parseStartupOptionsState,
   parseStartupSettings,
   patchStartupSettings,
   serializeStartupOptions,
   serializeStartupSettings,
   startupRows,
+  startupWorkspace,
 } from '../../packages/company-pack/src/lib/startup-settings.ts'
 
 const AT = '2026-11-12T00:00:00.000Z'
+
+describe('startupWorkspace', () => {
+  it('会话 cwd 优先（面板按 Lead 读，命令/注入必须读同一份）', () => {
+    expect(startupWorkspace('/host/company-workspace', { session: { header: { cwd: '/tmp/other-project' } } }))
+      .toBe('/tmp/other-project')
+  })
+
+  it('会话没有 cwd 才回退 boot workspace；都没有 → 空串', () => {
+    expect(startupWorkspace('/host/company-workspace', {})).toBe('/host/company-workspace')
+    expect(startupWorkspace('/host/company-workspace', { session: { header: {} } })).toBe('/host/company-workspace')
+    expect(startupWorkspace('', {})).toBe('')
+  })
+})
 
 describe('parseStartupSettings', () => {
   it('缺失/空/坏 JSON/错版本 → 全自动', () => {
@@ -89,6 +106,7 @@ describe('startupRows', () => {
     productTypes: ['business-software', 'hardware-software'],
     deliveryModes: ['productized', 'project-services'],
     wikiCheck: EMPTY_WIKI_CHECK,
+    wikiTemplate: '/t',
   }
 
   it('三项顺序固定，未设 = 自动', () => {
@@ -114,7 +132,7 @@ describe('startupRows', () => {
   it('wiki 检查指向同一值且失败 → invalid（A3：路径腐化不静默）', () => {
     const broken = {
       ...options,
-      wikiCheck: { value: '/outside/wiki', ok: false, problem: 'missing' as const, location: 'outside' as const },
+      wikiCheck: { value: '/outside/wiki', ok: false, problem: 'missing' as const, location: 'outside' as const, checkedAt: '2026-11-12T00:00:00.000Z' },
     }
     expect(startupRows({ ...EMPTY_STARTUP_SETTINGS, wiki: '/outside/wiki' }, broken)[2]?.invalid).toBe(true)
   })
@@ -122,7 +140,7 @@ describe('startupRows', () => {
   it('wiki 检查落后于设置（值不同）→ 不谎报失效', () => {
     const stale = {
       ...options,
-      wikiCheck: { value: '/old', ok: false, problem: 'missing' as const, location: 'outside' as const },
+      wikiCheck: { value: '/old', ok: false, problem: 'missing' as const, location: 'outside' as const, checkedAt: '2026-11-12T00:00:00.000Z' },
     }
     expect(startupRows({ ...EMPTY_STARTUP_SETTINGS, wiki: '/new' }, stale)[2]?.invalid).toBe(false)
   })
@@ -140,26 +158,54 @@ describe('浏览器读取上限（跨两端约束）', () => {
     expect(worst.split('\n').length).toBeLessThanOrEqual(STARTUP_SETTINGS_READ_LIMIT)
   })
 
-  it('最坏形状的 startup-options.json 行数 ≤ 读上限', () => {
+  it('最坏形状 = 预算上限条目数（不是当前内容快照）', () => {
+    const half = Math.floor(STARTUP_OPTIONS_MAX_ENTRIES / 2)
     const worst = serializeStartupOptions({
-      productTypes: ['business-software', 'hardware-software'],
-      deliveryModes: ['productized', 'project-services', 'managed-service'],
-      wikiCheck: { value: '/a/very/long/external/path/to/some/wiki/directory', ok: false, problem: 'no-index', location: 'outside' },
+      productTypes: Array.from({ length: half }, (_, i) => `type-${String(i)}`),
+      deliveryModes: ['productized', ...Array.from({ length: STARTUP_OPTIONS_MAX_ENTRIES - half }, (_, i) => `mode-${String(i)}`)],
+      wikiCheck: { value: '/a/very/long/external/path/to/some/wiki/directory', ok: false, problem: 'no-index', location: 'outside', checkedAt: '2026-11-12T00:00:00.000Z' },
+      wikiTemplate: '/some/profile/node_modules/dsh-company-pack/content/wiki-template',
     })
     expect(worst.split('\n').length).toBeLessThanOrEqual(STARTUP_OPTIONS_READ_LIMIT)
+  })
+
+  it('截断到读上限 = unreadable，不是静默空集合', () => {
+    const text = serializeStartupOptions({
+      productTypes: Array.from({ length: 400 }, (_, i) => `type-${String(i)}`),
+      deliveryModes: ['productized'],
+      wikiCheck: EMPTY_WIKI_CHECK,
+      wikiTemplate: null,
+    })
+    const truncated = text.split('\n').slice(0, STARTUP_OPTIONS_READ_LIMIT).join('\n')
+    expect(parseStartupOptionsState(truncated).problem).toBe('unreadable')
+    expect(parseStartupOptionsState(undefined).problem).toBeNull()
   })
 })
 
 describe('parseStartupOptions / serialize', () => {
   it('坏值折成空集合，重复项去重', () => {
-    expect(parseStartupOptions('nope')).toEqual({ productTypes: [], deliveryModes: [], wikiCheck: EMPTY_WIKI_CHECK })
+    expect(parseStartupOptions('nope')).toEqual({ ...EMPTY_STARTUP_OPTIONS })
     expect(parseStartupOptions(JSON.stringify({ productTypes: ['a', 'a', ' '], deliveryModes: ['x'] })))
-      .toEqual({ productTypes: ['a'], deliveryModes: ['x'], wikiCheck: EMPTY_WIKI_CHECK })
+      .toEqual({ productTypes: ['a'], deliveryModes: ['x'], wikiCheck: EMPTY_WIKI_CHECK, wikiTemplate: null })
   })
 
   it('序列化可往返', () => {
-    const options = { productTypes: ['a'], deliveryModes: ['productized', 'b'], wikiCheck: EMPTY_WIKI_CHECK }
+    const options = { productTypes: ['a'], deliveryModes: ['productized', 'b'], wikiCheck: EMPTY_WIKI_CHECK, wikiTemplate: '/t' }
     expect(parseStartupOptions(serializeStartupOptions(options))).toEqual(options)
+  })
+
+  it('checkedAt 往返：面板靠它判断「上次检查」而不是把快照当当前值', () => {
+    const options = {
+      productTypes: [],
+      deliveryModes: ['productized'],
+      wikiCheck: { value: '/w', ok: true, problem: null, location: 'outside' as const, checkedAt: AT },
+      wikiTemplate: null,
+    }
+    expect(parseStartupOptions(serializeStartupOptions(options)).wikiCheck).toEqual(options.wikiCheck)
+    const older = parseStartupOptions(JSON.stringify({
+      productTypes: [], deliveryModes: [], wikiCheck: { value: '/w', ok: true, problem: null, location: 'inside' },
+    }))
+    expect(older.wikiCheck.checkedAt).toBeNull()
   })
 
   it('overriddenEntries 只列已设项', () => {

@@ -4,6 +4,23 @@
 
 ## 修复流水（倒序）
 
+- **BUG-080..089**（2026-11-12，根因组 W/F/L/V，P1×2 + P2×8）：启动策略 + wiki 的十张同轮缺陷，
+  按根因收口——**W** [081](BUG-081-strategy-panel-reads-session-workspace-command-writes-host.md) /
+  [089](BUG-089-boot-without-workspace-settings-not-injected.md) /
+  [082](BUG-082-strategy-panel-stale-wiki-check.md) 统一 `startupWorkspace`（会话 cwd 优先）+ section 无条件注册 +
+  `checkedAt`/watcher 新鲜度；**F** [084](BUG-084-wiki-pointer-lexical-path-permission.md) /
+  [085](BUG-085-startup-options-read-limit-fixed-fixture.md) /
+  [087](BUG-087-wiki-template-copy-path-repo-only.md) 真实路径 / 选项预算 + fail-loud / 安装视图模板路径；
+  **L** [080](BUG-080-en-tab-title-map-missing-strategy.md) /
+  [083](BUG-083-company-settings-host-command-strings-mixed-language.md) en 页签从字典派生 + 命令文案双语单一源；
+  **V** [088](BUG-088-shipped-links-excludes-wiki-template.md) /
+  [086](BUG-086-strategy-button-tooltip-no-values.md) 模板按自身根验链 + tooltip 值。
+  红→绿：081 3 failed→42 passed、089 1→4、082 2+2→12、084 4→25、085 1+1→24、087 1→7、080 2→4、
+  083 2→12、086 1→6、088 verify FAIL→ALL PASS。`pnpm test` 236 files / 1761 tests；
+  `typecheck`/`lint`/`dup`/`verify` 全绿；`ui-scene-smoke --isolated --lang en` 10/10 无中文；
+  `release-smoke` ALL PASS。详见
+  [缺陷横扫 Note](../../../notes/implemented/2026-11-12-startup-strategy-wiki-bug-sweep.md)。
+
 - **BUG-079**（2026-11-11，P2）：[卡](BUG-079-ceo-teammate-spawn-header-no-child-channel.md) CEO teammate header 列
   `spawn`，但 depth 1 / childDepth 1 没有可用 child 通道；`controlsChildren` 又与 vp-eng teammate 矛盾。
   修法 = 能力表 `childDepth` + `DelegationSeat.depth/canStartChild`；spawn/fork/retry 按

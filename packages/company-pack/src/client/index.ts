@@ -34,7 +34,7 @@ import { installStyles } from './ui/styles.ts'
 import { createStartupStore } from './startup/startup-store.ts'
 import { StrategyButton } from './startup/StrategyButton.tsx'
 import {
-  parseStartupOptions,
+  parseStartupOptionsState,
   parseStartupSettings,
   STARTUP_OPTIONS_READ_LIMIT,
   STARTUP_SETTINGS_READ_LIMIT,
@@ -159,10 +159,13 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
         readStartupText(sessionId, signal),
         readStartupOptionsText(sessionId, signal),
       ])
+      const optionsState = parseStartupOptionsState(optionsText)
       startupStore.set({
         loaded: true,
         settings: parseStartupSettings(settingsText),
-        options: parseStartupOptions(optionsText),
+        options: optionsState.options,
+        // 截断/坏 JSON 必须说出来；折成空集合会伪装成「内容里没有可选项」（BUG-085）。
+        optionsProblem: optionsState.problem,
       })
     }
     const runSettingsCommand = async (sessionId: SessionId, line: string): Promise<SaveResult> => {

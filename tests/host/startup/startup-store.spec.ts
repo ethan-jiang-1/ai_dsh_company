@@ -8,8 +8,8 @@
  * ④ 内容目录缺失 → 空集合 / 只有 productized（不发明选项）；
  * ⑤ 读坏文件不抛（折成全自动 / 空集合）。
  */
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import {
@@ -18,6 +18,7 @@ import {
   readStartupOptions,
   readStartupSettings,
   refreshStartupOptions,
+  resolveWikiDir,
   startupOptionsPath,
   startupSettingsPath,
   writeStartupSettings,
@@ -98,7 +99,7 @@ describe('enumerate / refresh options', () => {
     expect(checkWikiPointer(root, 'empty-dir')).toMatchObject({ ok: false, problem: 'no-index' })
     mkdirSync(join(root, 'good'), { recursive: true })
     writeFileSync(join(root, 'good', 'index.md'), '# index\n')
-    expect(checkWikiPointer(root, 'good')).toEqual({ value: 'good', ok: true, problem: null, location: 'inside' })
+    expect(checkWikiPointer(root, 'good')).toMatchObject({ value: 'good', ok: true, problem: null, location: 'inside', checkedAt: expect.any(String) })
   })
 
   it('wiki 位置：workspace 内 → inside；绝对外路径 → outside；未设 → null', () => {
@@ -109,7 +110,7 @@ describe('enumerate / refresh options', () => {
     const outside = mkdtempSync(join(tmpdir(), 'zz-wiki-out-'))
     writeFileSync(join(outside, 'index.md'), '# o\n')
     expect(checkWikiPointer(root, outside).location).toBe('outside')
-    expect(checkWikiPointer(root, null)).toEqual({ value: null, ok: true, problem: null, location: null })
+    expect(checkWikiPointer(root, null)).toEqual({ value: null, ok: true, problem: null, location: null, checkedAt: null })
   })
 
   it('refresh 把当前 wiki 检查一起落盘（派生文件带 wikiCheck）', () => {
@@ -131,5 +132,43 @@ describe('enumerate / refresh options', () => {
     expect(existsSync(startupOptionsPath(root))).toBe(true)
     expect(readStartupOptions(root)).toEqual(options)
     expect(JSON.parse(readFileSync(startupOptionsPath(root), 'utf8')).v).toBe(1)
+  })
+})
+
+describe('wiki 指针的真实路径判据（盘上事实）', () => {
+  it('symlink 内→外：按真实目标判 outside（词法前缀会说反）', () => {
+    const root = workspace()
+    const outside = workspace()
+    mkdirSync(join(outside, 'wiki'), { recursive: true })
+    writeFileSync(join(outside, 'wiki', 'index.md'), '# i\n')
+    symlinkSync(join(outside, 'wiki'), join(root, 'link-out'))
+    expect(checkWikiPointer(root, 'link-out')).toMatchObject({ ok: true, location: 'outside' })
+  })
+
+  it('symlink 外→内：真实目标在 workspace 内 → inside', () => {
+    const root = workspace()
+    mkdirSync(join(root, 'real'), { recursive: true })
+    writeFileSync(join(root, 'real', 'index.md'), '# i\n')
+    const outside = workspace()
+    symlinkSync(join(root, 'real'), join(outside, 'back-in'))
+    expect(checkWikiPointer(root, join(outside, 'back-in'))).toMatchObject({ ok: true, location: 'inside' })
+  })
+
+  it('index.md 是目录 → no-index（必须是文件）', () => {
+    const root = workspace()
+    mkdirSync(join(root, 'dirindex', 'index.md'), { recursive: true })
+    expect(checkWikiPointer(root, 'dirindex')).toMatchObject({ ok: false, problem: 'no-index' })
+  })
+
+  it('~ 展开；相对路径仍按 workspace 解释', () => {
+    const root = workspace()
+    expect(resolveWikiDir(root, '~/wiki')).toBe(join(homedir(), 'wiki'))
+    expect(resolveWikiDir(root, 'wiki')).toBe(join(root, 'wiki'))
+  })
+
+  it('派生选项带当前部署的模板绝对路径（安装视图可用）', () => {
+    const content = workspace()
+    expect(enumerateStartupOptions(content).wikiTemplate).toBe(join(content, 'wiki-template'))
+    expect(enumerateStartupOptions(undefined).wikiTemplate).toBeNull()
   })
 })
