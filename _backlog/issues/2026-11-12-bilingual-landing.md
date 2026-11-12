@@ -70,6 +70,7 @@ opened: 2026-11-12
 - P1 content 顶层入口：AGENTS.md / README.md / manifest.json 英文；AGENTS 的 type/deliveryMode 字段名同步；T0 4.1KB；delivery-mode-sources / product-type-coverage 断言同步；新增 entries 英文棘轮。
 - P1 content 完成：kb-setup 4/4 + methods 4/4 英文；**content/**/*.md|json 全局零中文**；新增 kb-setup/methods/global content 英文棘轮。
 - 修 vv-plan verifier 版本 1.2.0→1.0.0（两侧同版本）。
+- I2/I3 基线门禁：src 116 文件 49,150 CJK、docs 37 文件 46,873 CJK 冻结；新增/增加即红；**不是完成**，是显式债务台账。
 - 修 tab body 未注入 t、Tasks/Cultivation 标题与 guide 不一致、DelegationFlow/Presence 表头、budget 括号。
 - content 模板 8/8 英文（meta/prd 补齐）；模板棘轮 PENDING 清零。
 

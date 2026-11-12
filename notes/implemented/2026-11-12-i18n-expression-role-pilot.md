@@ -343,6 +343,14 @@
 - 新增 content 全局英文棘轮：content/**/*.md|json 零中文（>50 文件）；注入中文 → 红，还原 → 绿。
 - 全量 1667 tests；preset-smoke ALL PASS；verify ALL PASS。
 
+## I2/I3 基线门禁（2026-11-12）
+
+- 新增 `i2-source-cjk-baseline.json`（116 files / 49,150 chars）与 `i3-docs-cjk-baseline.json`（37 files / 46,873 chars）。
+- 规格：存量冻结，新增/增加即红；翻译减少不回弹。
+- 红证：往 LedgerTab.tsx 注入中文注释 → I2 红；还原 → 绿。
+- I2/I3 仍未完成；基线是显式债务，不是“全英文”。
+- 全量 1669 tests；验 ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
