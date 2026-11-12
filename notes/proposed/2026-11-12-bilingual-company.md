@@ -7,6 +7,8 @@ opened: 2026-11-12
 
 > 状态：proposed（已批；Phase 0/A1/A3a/A2-tab-shell 已实现，A2 其余/A3b/A4 未开始）｜ 批准：用户 2026-11-12「按流程推动落地」｜ 上游：[问题卡](../../_backlog/_archive/settled_issues/2026-11-12-bilingual-company.md) · [研究题](../../_backlog/research/bilingual-company/README.md)
 >
+> **2026-11-12 方向修正**：双语只在**表达层**；内部代码/提示/内容用**英文单份 canonical**；角色名也属于表达层。Phase B 从「中文正文 + 英文 overlay」改为「内部英文单份 canonicalization」；详见[表达层方向材料](../../_backlog/research/bilingual-company/2026-11-12-expression-layer-direction.md)。
+>
 > 本 RFC 把「插件中英文双语、默认中文」拆成 Phase 0 / A1–A4 / B / C；**本 RFC 的实施单元 = Phase 0 + Phase A1–A4**，Phase B/C 另卡。语言开关唯一源 = DSH `locale.preference`；默认 `zh` 由 bundle patch 落；客户端用 typed `company` 字典；host 用 `CompanyLanguage` + 动态 policy；content/persona/skill/docs 的全量英文不在本 RFC 内。
 
 ## 问题
@@ -19,7 +21,8 @@ opened: 2026-11-12
 2. **输出双语**：agent 的回复、任务板、交付物跟随工作语言；缺省中文；用户明确换语言时跟随。
 3. **Host 人可见面双语**：命令回执/错误、工具结果 note、签字提示；命令 description 随语言更新。
 4. **纪律 day one**：任何新增/修改的界面文案从第一个 commit 就必须 zh+en；合同 + 门禁 + skill 三件套。
-5. **不伪造完成**：content/persona/skill/docs 的全量英文是 Phase B/C；本 RFC 明确写边界，不用「内部中文 + 模型翻译」冒充母语级英文内容。
+5. **表达层边界**：双语只做用户看得见的表达层（UI/角色名/回执/输出）；内部提示与内容用英文单份，不做中英双份；Phase B/C 另卡，不把「内部英文 canonical」冒充母语级英文内容。
+6. **角色名表达层**：role id + 英文名是 canonical；UI/host 可见角色名用 `roles.*` 字典映射 zh/en；数据/preset id/日志不变。
 
 ## 范围与排除项
 
@@ -27,14 +30,14 @@ opened: 2026-11-12
 
 - Phase 0：`.agents/skills/company-ui-change-definition/SKILL.md`；`packages/company-pack/src/README.md` 与 `tests/README.md` 的 UI 入口指针；RFC/问题卡记录。**不写** `docs/contracts/` 下的现时合同，也不加根 `AGENTS.md` 的合同/门禁指针——现有 501 条中文还没迁，写了就是假合同/dead pointer。
 - A1：`packages/company-pack/cordis.patch.yml` 的 `locale.config.preference: zh`；client 入口接 `locale`；`packages/company-pack/src/client/` 下新增 `locales.ts` / `tab-copy.ts`；`company` typed namespace；`ctx.locale.register` effect；copy-bearing **组件**的 slot 加 `locale: NS`（label/title thunk 用 `ctx.locale.bind`）；文档/测试证明缺省中文与切换。
-- A2：client/lib 文案迁移与展示事实 token 化（`packages/company-pack/src` 的 client + lib）。
+- A2：client/lib 文案迁移与展示事实 token 化（`packages/company-pack/src` 的 client + lib）；**表达层角色名目录**（`roles.*`：可见名/短标签/full/delegation）；数据/preset id 仍用英文 canonical。
 - A3：host `CompanyLanguage`（`settings.describe()`、默认 zh、live update）；动态 `company:language` policy；6 个命令回执/错误、7 个工具 note、`blocked-text`、signoff 双语；command description 重注册；工具 description 英文。
 - A4：11 个 preset 的 description 双语一行；`docs/contracts/` 下新增 `language.md` 现时合同；`checks/gates/` 下新增 `client-copy.mjs` 硬门禁 + 红→绿证据；根 `AGENTS.md` 纪律行；README/pack README 语言说明；安装手册模板语言段 + 重生成。
 
 **排除（Phase B/C）：**
 
-- `content/**` 全量英文正文（手册、合同、charter、template、product-types、delivery-modes、JSON 规则提示）。
-- `presets/**` persona 与 26 个 skill 的英文版；persona/skill 英文的架构选型。
+- `content/**` 与 `presets/**` 的**英文 canonicalization**（把现有中文正文翻成英文单份；中文由 language policy 表达，不做 `content/en/` 双语副本）。
+- `presets/**` persona 与 26 个 skill 的英文 canonical 正文（Phase B）；不建中英双份。
 - 全量 README/docs/安装手册英文；文档配对/一致性门禁。
 - 日志/telemetry/开发者诊断英文。
 - 第三语言、RTL、复数规则、locale 数字/日期格式。
@@ -63,11 +66,19 @@ opened: 2026-11-12
 
 - `packages/company-pack/src/host/` 下新增 `language/`：`createCompanyLanguage(ctx)`；默认 zh；`ctx.inject(['settings'], ...)` 后读 `settings.describe()` 找 `ns === 'locale'`；监听 `settings/document-updated`；缺失 settings 不报错；`current()/text(zh,en)/subscribe(fn)`。
 - `company:language` system section：公司 preset 的每个 agent 注入；order 紧跟 persona；`interpolate: false`；`text` 每次 assembly 读当前语言。
-- 默认 zh；用户明确要求另一种语言时跟随；读取到的中文手册/模板照常执行，产出时把人类可读标题/标签译成目标语言，机器可读字段名/ID 不变。
+- 默认 zh；用户明确要求另一种语言时跟随；Phase A 是过渡态：现有中文手册/模板照常执行，产出时把人类可读标题/标签译成目标语言，机器可读字段名/ID 不变。Phase B 后内部内容为英文单份，policy 只负责表达层语言。
 - 命令 description 在语言变化时 dispose + 重新注册；命令回执/错误、工具 note、`blocked-text`、signoff 走 `language.text`；工具 description 统一英文。
 - 日志/telemetry 保持单语，不进合同。
 
-### 4. 纪律设施
+### 3.5 Expression-layer role names
+
+- **canonical（内部，英文，不动）**：role id（`ceo` / `vp-eng` / …）+ 英文名（`CEO` / `VP-Eng` / …）；`PRESET_DISPLAY_NAMES` / `ROLE_LABEL` / org/owners 数据继续用它。
+- **表达层**：`roles.<id>.name`（zh 首席执行官 / en CEO）、`roles.<id>.short`（CEO/VPE…）、`roles.<id>.full`（首席执行官 / Chief Executive Officer）、`roles.<id>.delegation`（工程副总裁（研发） / VP-Eng (Engineering)）。
+- **消费**：在场行/任务板/委派卡/培养署名用 `name`；徽标/窗口标题用 `short`；tooltip/aria 用 `full`；数据/日志/API 用 canonical。
+- **preset picker**：自定义 preset 的 `name`/`description` 无 per-locale 机制（上游只本地化 4 个内置 preset）。picker 继续显示英文缩写（品牌名）；中文全称只出现在公司 UI。若要 picker 也中文，只有双语一行 / 上游支持 / 每语言一套 preset（已否决）。
+- **未知角色**：原样显示 id/name，不抛。
+
+## 4. 纪律设施
 
 | 用途 | 落点 | 内容 |
 |---|---|---|
@@ -81,9 +92,9 @@ opened: 2026-11-12
 ## 输掉的方案
 
 - **只做 UI**：英文壳 + 中文角色，不满足「插件支持英文」。
-- **全量改英文**：英文质量好，但放弃中文默认与内容资产。
+- **产品全量改英文（连表达层）**：英文质量好，但放弃中文默认与中文表达；否。内部英文 canonical ≠ 表达层单语。
 - **每 role 两套 preset**：roster 翻倍、会话身份分裂、方法层/历史分叉。
-- **现在就把全量 content/persona/skill 翻成英文**：约 5.6 万汉字正文 + 双份维护 + 质量审，不是本 RFC 的工期；Phase B 另卡。
+- **中英双份内容（`content/zh` + `content/en`）**：两本账、翻译/审校/门禁翻倍；与「内部英文单份」方向冲突，否。
 - **用「中文正文 + 模型翻译」冒充母语级英文内容**：本 RFC 只承诺功能双语与输出语言，不承诺内容母语级；边界写在合同里。
 
 ## 验收
@@ -107,7 +118,8 @@ opened: 2026-11-12
 ### A2 验收（client/lib 文案迁移）
 
 - [ ] `packages/company-pack/src/client/` 下 `locales.ts` 之外的 JSX/copy-bearing 字面量零中文（gate 预演或临时脚本）；`src/lib` 展示事实不再返回中文。
-- [ ] `pnpm test tests/client tests/lib` 全绿；新增 zh/en 两态 spec 覆盖状态、列名、事件句、预算行、卡片抬头。
+- [ ] `pnpm test tests/client tests/lib` 全绿；新增 zh/en 两态 spec 覆盖状态、列名、事件句、预算行、卡片抬头、**角色名**（`roles.*`：可见名/短标签/full/delegation）。
+- [ ] 角色数据防漂移：`ROLE_NAME_EN` / `PRESET_DISPLAY_NAMES` 仍等于 preset `config.name`；表达层映射不修改 canonical id/数据。
 - [ ] 真页面切换 English 后 company 自有 UI 无中文残留（允许：用户数据、canonical 领域词、日志/诊断）；切回中文不需刷新。
 - [ ] 红→绿：把一个组件文案改回中文 → gate（A4 前用临时扫描/走查）红；还原 → 绿。
 
@@ -151,6 +163,7 @@ opened: 2026-11-12
 ## 当前状态
 
 - 2026-11-12：RFC 立项；Phase 0 完成；A1 完成；A3a 完成；A2 第一片（页签壳）完成；A2 其余/A3b/A4 未开始。
+- 2026-11-12 方向修正：双语只在表达层；内部英文 canonical；角色名进表达层（A2）；Phase B 改为英文单份 canonicalization，不做 `content/en/` 双语副本。详见[表达层方向材料](../../_backlog/research/bilingual-company/2026-11-12-expression-layer-direction.md)。
 - Phase 0：`.agents/skills/company-ui-change-definition/SKILL.md` + `packages/company-pack/src/README.md` / `tests/README.md` 指针；`pnpm verify` ALL PASS。
 - A1：`cordis.patch.yml` 的 `locale.config.preference: zh`；client `inject` 加 `locale`；`packages/company-pack/src/client/locales.ts`（`company` typed 字典）与 `ctx.locale.register`；`conversation.view` label 走 `t`；新增 key/placeholder 与 harness/repo 缺省 patch 结构 spec；`default-locale-runtime.spec.ts` 证 Host preference zh 覆盖英文浏览器 provisional；whole-client composition 证 locale 服务 + 字典切换（UI 组件由 tab/brand spec 覆盖）。
 - A3a：`packages/company-pack/src/host/language/company-language.ts`（`settings.describe()` 读 `locale.preference`、默认 zh、live update、外部语言→en）；`packages/company-pack/src/host/prompt/language-policy.ts`（11 个公司 preset 的动态 `company:language` section，默认 zh，用户明确换语言时跟随）；`src/index.ts` 接线；新增 bridge/policy spec + `apply-lifecycle` 的 wiring spec。真红：临时注释 `registerLanguagePolicy(ctx, language)` → wiring spec 红；还原 → 绿。
@@ -161,5 +174,5 @@ opened: 2026-11-12
 - A1 补充：品牌 fallback 接 `brand.name` 字典（`FALLBACK_IDENTITY.productName = ''`，语言决定出厂词标）；`brand.spec.ts` 断言 zh/en；smoke 的品牌检查接受两种词标。新增 `default-locale-runtime.spec.ts`：英文浏览器 provisional=en + Host preference=zh → zh；无 preference → 保持 en。
 - 最终证据：`pnpm test` **205 files / 1617 tests passed**；`pnpm typecheck` 0；`pnpm lint` 0；`pnpm dup` 0；`pnpm verify` **ALL PASS**；`ui-scene-smoke --isolated --golden` ALL PASS。
 - 未做：A2（client/lib 全量文案迁移与 token 化）、A3b（host 回执/工具 note/命令 description）、A4（`docs/contracts/` 合同 + `checks/gates/` 的 client-copy 硬门禁 + preset 描述 + 文档/金样全量收口）。UI 在 English 下仍有中文，这是已知未完成项，不在本切片宣称已交付。
-- **未验证（本切片不宣称）**：英文 locale 浏览器首启稳定后中文、`<html lang="zh-CN">`、已有 `preference: en` 升级、reset、第二浏览器——**未执行**；English 真页面——**未跑**（页签壳只有 keyless 组件/注册 spec，zh 金样已跑）；真模型 prompt 里的 `company:language`——**未跑**（keyless + apply 接线）；`client-load-smoke` / `preset-smoke` / `release-smoke`——**未执行**。
+- **未验证（本切片不宣称）**：英文 locale 浏览器首启稳定后中文、`<html lang="zh-CN">`、已有 `preference: en` 升级、reset、第二浏览器——**未执行**；English 真页面——**未跑**（页签壳只有 keyless 组件/注册 spec，zh 金样已跑）；真模型 prompt 里的 `company:language`——**未跑**（keyless + apply 接线）；角色名表达层——**未实现/未测**；`client-load-smoke` / `preset-smoke` / `release-smoke`——**未执行**。
 - 真合成证据：`node vendor/dsh/apps/cli/lib/bin.js --profile company --patch packages/company-pack/cordis.patch.yml --dump-config` 输出 `- id: locale` / `config: preference: zh`；`tests/harness/repo/default-locale.spec.ts` 只是结构守卫，不替代这条命令。
