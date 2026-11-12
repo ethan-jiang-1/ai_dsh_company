@@ -140,7 +140,7 @@ opened: 2026-11-12
 - [ ] 11 个 preset 的 description 不是纯中文（双语一行或英文短句）；picker 不出现纯中文描述；role name 不变。
 - [ ] 根 README / pack README 语言说明（默认中文、Settings 切换、英文输出跟随）；`tools/lib/install-manual.mjs` 语言段 + `_dist/安装手册.md` 重生成；`dist-manual` 绿。
 - [ ] `pnpm verify` ALL PASS；`pnpm test` 全绿；`pnpm typecheck` 0；`pnpm lint` + `pnpm dup`（涉 src）绿；`client-load-smoke` ALL PASS；`ui-scene-smoke --isolated --golden` zh 与 en 都绿；`preset-smoke` ALL PASS。
-- [ ] 已有 `.dsh-company` 数据可读；无迁移；未把领域词/字段名改成英文。
+- [ ] 已有 `.dsh-company` 数据兼容**不再作为约束**：内部全英文 RFC 以新格式为准，旧盘一次性迁移/重建；表达层不要求旧盘可读。
 
 ### 验收怎么测（可复现命令与红形态）
 
@@ -173,8 +173,9 @@ opened: 2026-11-12
 - 真页面：`ui-scene-smoke --isolated --golden` **ALL PASS**（9 个公司页签 + 浏览器错误环零命中；默认 zh 与现有金样一致）。为让隔离场景在中文界面下可跑，`probes/browser-visual/cdp-probe.mjs` 的模态/Start-chip 匹配补了中文 `预览版说明` / `开始使用` / `开始`（probe-only，非产品行为）。
 - A2 第一片（页签壳）：9 个页签的 label/tooltip/guide description 住 `company` 字典；`TabTitle` / `GuideEntry` 的 title/guide 槽带 `locale: company`；`company-tab-catalog` 解析器改从 `locales.ts` 的 zh 取 label；新增 `tests/client/i18n/tab-copy.spec.ts` 对 9 个 face 断言 zh/en copy + 真实 `Title`/`GuideEntry` 组件静态渲染，`company-tab-registration.spec.ts` 断言槽 `locale === 'company'` 且注册处 title/guide thunks 随 locale 实时切换。`packages/company-pack/locale/README.md` 写清包元数据与运行时 UI 字典的分工。
 - 真红证据：注册处曾把 `copy` 捕获在注册时；新增切换测试在旧实现下红 = `expected '待办' to be 'Inbox'`；改成 thunk 内 `copyOf(face)` 后绿。
+- A2 角色第一片：`src/lib/role-copy.ts` 单源（canonical 英文 + zh/en 可见名/全称/短标签/委派），`src/client/roles.ts` 取用缝；`RoleBadge`、`DelegationCard`、`PresenceTab`、`TasksTab` 已走表达层；`roles.*` 30 个 key 进 `company` 字典。测试 = `role-copy.spec`（6 角色 zh/en/未知/委派映射）+ RoleBadge/DelegationCard/Tasks 静态渲染；未做 = Cultivation/Board/DAG/host `roleLabel`/picker description。
 - A1 补充：品牌 fallback 接 `brand.name` 字典（`FALLBACK_IDENTITY.productName = ''`，语言决定出厂词标）；`brand.spec.ts` 断言 zh/en；smoke 的品牌检查接受两种词标。新增 `default-locale-runtime.spec.ts`：英文浏览器 provisional=en + Host preference=zh → zh；无 preference → 保持 en。
-- 最终证据：`pnpm test` **205 files / 1617 tests passed**；`pnpm typecheck` 0；`pnpm lint` 0；`pnpm dup` 0；`pnpm verify` **ALL PASS**；`ui-scene-smoke --isolated --golden` ALL PASS。
+- 最终证据：`pnpm test` **206 files / 1625 tests passed**；`pnpm typecheck` 0；`pnpm lint` 0；`pnpm dup` 0；`ui-scene-smoke --isolated --golden` ALL PASS（金样因在场行角色名刻意更新）。`pnpm verify` 的代码/结构门禁通过；工作树另有两个**非本切片**的并行研究题名页（`startup-settings` / `wiki-knowledge-map`）缺材料，导致 `md-links` 红——未触碰，不影响本切片文件集的结论。
 - 未做：A2（client/lib 全量文案迁移与 token 化）、A3b（host 回执/工具 note/命令 description）、A4（`docs/contracts/` 合同 + `checks/gates/` 的 client-copy 硬门禁 + preset 描述 + 文档/金样全量收口）。UI 在 English 下仍有中文，这是已知未完成项，不在本切片宣称已交付。
-- **未验证（本切片不宣称）**：英文 locale 浏览器首启稳定后中文、`<html lang="zh-CN">`、已有 `preference: en` 升级、reset、第二浏览器——**未执行**；English 真页面——**未跑**（页签壳只有 keyless 组件/注册 spec，zh 金样已跑）；真模型 prompt 里的 `company:language`——**未跑**（keyless + apply 接线）；角色名表达层——**未实现/未测**；`client-load-smoke` / `preset-smoke` / `release-smoke`——**未执行**。
+- **未验证（本切片不宣称）**：英文 locale 浏览器首启稳定后中文、`<html lang="zh-CN">`、已有 `preference: en` 升级、reset、第二浏览器——**未执行**；English 真页面——**未跑**（页签壳只有 keyless 组件/注册 spec，zh 金样已跑）；真模型 prompt 里的 `company:language`——**未跑**（keyless + apply 接线）；角色名表达层——**第一片已实现（RoleBadge/Delegation/Presence/Tasks）；Cultivation/Board/DAG/host/picker 未做**；`client-load-smoke` / `preset-smoke` / `release-smoke`——**未执行**。
 - 真合成证据：`node vendor/dsh/apps/cli/lib/bin.js --profile company --patch packages/company-pack/cordis.patch.yml --dump-config` 输出 `- id: locale` / `config: preference: zh`；`tests/harness/repo/default-locale.spec.ts` 只是结构守卫，不替代这条命令。

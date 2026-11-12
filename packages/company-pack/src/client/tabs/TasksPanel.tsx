@@ -53,14 +53,14 @@ function DependencyLabel({ id, byId }: { readonly id: string; readonly byId: Rea
  * @param props.view - 团队视图（可空：未加载时给空态）。
  * @returns 表格。
  */
-export function TasksTableView({ view }: { readonly view: TeamViewLike | null }) {
+export function TasksTableView({ view, roleLabel = name => name }: { readonly view: TeamViewLike | null; readonly roleLabel?: (name: string) => string }) {
   if (view === null) return <StateNote kind="loading" text={LOADING_NOTE} />
   const tasks = tasksFromTeamView(view)
   const byId = new Map(tasks.map(task => [task.id, task]))
   return (
     <>
       <div className="wk-meta wk-mb-xs">
-        成员：{view.members.map(member => `${member.name}(${statusLabelFor(presenceStatusFromPhase(member.phase))})`).join('、') || '（无）'}
+        成员：{view.members.map(member => `${roleLabel(member.name)}(${statusLabelFor(presenceStatusFromPhase(member.phase))})`).join('、') || '（无）'}
       </div>
       {tasks.length === 0
         ? <StateNote text="还没有共享任务。" />

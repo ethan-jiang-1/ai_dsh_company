@@ -12,9 +12,13 @@ import { describe, expect, it } from 'vitest'
 import {
   BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab,
 } from '../../../packages/company-pack/src/client/tabs/company-tabs.tsx'
+import { zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
+
+const t = ((key: keyof typeof zh) => zh[key]) as CompanyT
 
 function props(over: Record<string, unknown> = {}) {
   return {
+    t,
     sessionId: 'session-test',
     useTabInfo: () => ({ tab: { id: 'tab-1', contentId: 'dsh-company-pack/board' } }),
     floatTab: () => {},

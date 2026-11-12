@@ -26,7 +26,7 @@ opened: 2026-11-12
 
 | 层 | 语言 | 内容 |
 |---|---|---|
-| **表达层** | zh/en 可切 | Web UI 文案、角色显示名、命令回执、交付物/回复、preset picker 的用户可见文本（统一英文；见下） |
+| **表达层** | zh/en 可切 | Web UI 文案、角色显示名、命令回执、交付物/回复、preset picker（英文 name + 混排 description；见下） |
 | **内部 canonical** | 英文单份 | 代码标识符/key/ID、preset id、角色 id、数据字段值、模型提示/内容（persona/skills/handbook/templates）、代码注释/日志/诊断 |
 | **发行文档** | 另定 | README/安装手册/docs；用户可见部分 zh/en，开发者文档另阶段 |
 
@@ -34,9 +34,28 @@ opened: 2026-11-12
 
 1. **内部不允许中英双份**：不建 `content/zh` + `content/en`，不建两套 preset id。
 2. **中文只允许出现在表达层字典/zh 内容测试夹具**；内部源文件（注释/日志/字符串/数据值）不得新增中文。
-3. **preset picker 统一英文**：自定义 preset 没有 per-locale 机制；不搞双语一行、不搞每语言一套 preset。picker 的 `name`/`description` 用英文一份；中文全称只出现在公司 UI 的 `roles.*` 表达层。
+3. **preset picker 规则**：自定义 preset 没有 per-locale 机制；不搞按语言切换、不搞每语言一套 preset。picker 的 `name` 用英文缩写（品牌名）；六个公司角色的 `description` 用中英混排一行（`中文职能 / English function`），support preset 用英文；中文全称不单独进 picker。
 4. **角色名**：canonical role id + 英文名；表达层 `roles.*` zh/en；数据/日志/API 用英文 canonical。
-5. **数据迁移**：领域值/字段 canonical 改英文 ID；已有 `.dsh-company` 数据**读兼容 + 写英文 + 一次性迁移**，不静默破坏旧盘。
+5. **数据迁移**：领域值/字段 canonical 改英文 ID；**兼容不是设计约束**——以新格式为准；旧盘可一次性迁移或重建，不保留长期双读。
+
+## 角色名（已由 agent 决定，不再请用户拍板）
+
+原则：**视觉统一 + 一眼看懂**；canonical 英文，表达层混排；统一用 ` · ` 分隔。
+
+| role id | canonical | zh 可见名 | en 可见名 | 短标签 | zh full | en full |
+|---|---|---|---|---|---|---|
+| ceo | CEO | CEO · 首席执行官 | CEO | CEO | 首席执行官 | Chief Executive Officer |
+| vp-eng | VP-Eng | VP-Eng · 工程副总裁 | VP-Eng | VPE | 工程副总裁 | VP of Engineering |
+| vp-sales | VP-Sales | VP-Sales · 销售副总裁 | VP-Sales | VPS | 销售副总裁 | VP of Sales |
+| coo | COO | COO · 首席运营官 | COO | COO | 首席运营官 | Chief Operating Officer |
+| cfo | CFO | CFO · 首席财务官 | CFO | CFO | 首席财务官 | Chief Financial Officer |
+| cmo | CMO | CMO · 首席营销官 | CMO | CMO | 首席营销官 | Chief Marketing Officer |
+
+- **徽标 / 窗口标题**：短标签（CEO/VPE/VPS…）两语言一致；tooltip 用 zh/en full。
+- **在场行 / 任务板 / 委派卡 / 培养**：zh 用 `zh 可见名`，en 用 `en 可见名`；委派卡 zh 用 `VP-Eng · 工程`，en 用 `VP-Eng · Engineering`。
+- **数据/日志/API/preset id**：canonical 英文，不随表达层变。
+- **picker**：`name` 用 canonical 英文缩写；`description` 中英混排一行；中文全称不单独进 picker。
+- **未知角色**：原样显示 id/name，不抛。
 
 ## 范围与阶段
 
@@ -44,9 +63,9 @@ opened: 2026-11-12
 
 - `presets/**`：11 个 preset 的 persona、description、26 个 skill、`_shared` 全部翻成英文；中文原文不保留在树内（git 历史保留）。
 - `content/**`：手册、contracts、generic、charters、templates、product-types、delivery-modes、JSON 规则提示全部英文；`manifest.json`/seed 同步。
-- **领域值**：`meta.md` 的类型/结果、账本表头/状态、catalog 字段、task status 等 canonical 改英文 ID；zh 表达层提供中文标签；旧盘读兼容 + 迁移。
+- **领域值**：`meta.md` 的类型/结果、账本表头/状态、catalog 字段、task status 等 canonical 改英文 ID；zh 表达层提供中文标签；旧盘兼容不是验收条件（一次性迁移/重建即可）。
 - **Host/model-facing strings**：工具 description、prompt section、system 文案英文；用户可见回执走表达层 zh/en 字典（英文 default）。
-- **preset picker**：`name`/`description` 英文；中文不出现。
+- **preset picker**：`name` 用英文缩写（`CEO`/`VP-Eng`，品牌名、视觉干净）；六个公司角色的 `description` 用**中英混排一行**（`中文职能 / English function`），support preset 用英文；不做 per-locale 切换、不做双语双行。混排只发生在表达层，内部仍是英文单份。
 - **无中文内部内容**：I1 结束时，`presets/**`、`content/**` 的模型可读正文无中文；`content/**` 不建中文副本。
 
 ### I2 — 代码内部英文（注释/日志/诊断/测试名）
@@ -70,7 +89,7 @@ opened: 2026-11-12
 - **中英双份内部内容**（`content/zh` + `content/en`）：两本账、翻译/审校/门禁翻倍；用户明确否。
 - **中文内部 canonical + 英文 overlay**（旧 RFC Phase B）：内部仍是中文，英文是第二套；用户明确否。
 - **每语言一套 preset**：roster 翻倍、会话身份分裂；否。
-- **picker 双语一行**：两语言都变长，且不是真切换；用户接受“统一英文”这一边界，否。
+- **picker 按语言双语双行/切换**：上游无 per-locale 机制；用户接受“统一形态”，否。采用英文 name + 混排一行 description。
 - **保留中文注释/日志，只翻模型内容**：仍是混合态；用户明确“要么全英文”，否。
 
 ## 验收
@@ -81,13 +100,13 @@ opened: 2026-11-12
 
 - [ ] `presets/**` 的 persona/description/skill 正文无中文（`grep -P '[\x{4e00}-\x{9fff}]'` 零命中；git 历史保留旧文）。
 - [ ] `content/**` 的模型可读正文/JSON 提示无中文；`content/manifest.json` 与 seed 同步；不新增 `content/zh` 或 `content/en`。
-- [ ] 领域值 canonical 英文 ID；旧 `.dsh-company` 盘可读（兼容别名/迁移），新写入英文；zh 表达层显示中文标签。
-- [ ] preset picker 的 `name`/`description` 英文；中文全称只出现在公司 UI `roles.*`。
+- [ ] 领域值 canonical 英文 ID；新盘按新格式读写；旧盘兼容不作为验收条件（一次性迁移/重建即可）；zh 表达层显示中文标签。
+- [ ] preset picker 的 `name` 用英文缩写；六个公司角色 `description` 中英混排一行；support preset 英文；无 per-locale 切换。
 - [ ] 相关 keyless content/preset/spec 全绿；`preset-smoke` ALL PASS；真模型/回放按受影响面重跑或明确降档。
 
 ### I2 验收
 
-- [ ] `src/**`、`tests/**` 的注释/日志/诊断/测试名无中文（allowlist：`locales.ts` zh 字典/中文夹具/zh 断言）。
+- [ ] `src/**`、`tests/**` 的注释/日志/诊断/测试名无中文（allowlist：`locales.ts` zh 字典、`role-copy.ts` 角色表达、中文夹具/zh 断言）。
 - [ ] `src-internal-cjk` 门禁：真实中文注释造红 → 还原绿；门禁头注写负例；`pnpm verify` 绿。
 - [ ] 不改表达层 zh 字典/中文测试的前提通过；`pnpm test`/`typecheck`/`lint`/`dup` 全绿。
 
@@ -104,7 +123,7 @@ opened: 2026-11-12
 
 - 内部中文扫描：`rg -nP '[\x{4e00}-\x{9fff}]' presets content` → 0（I1）；`rg` 对 `src`/`tests` → 只剩 allowlist（I2）。
 - 旧盘兼容：用 `snapshots/`/fixtures 的旧 `.dsh-company` 跑 `/req check`/`/prd check`/catalog；新写入英文；zh 标签在 UI/命令回执出现。
-- picker：真页面 picker 名称/描述英文；公司 UI 角色名 zh/en；`roles.*` spec。
+- picker：`name` 英文缩写；公司角色 `description` 混排、support 英文；公司 UI 角色名 zh/en；`roles.*` spec。
 - 翻译质量：内容审读（人工/抽样）+ `preset-smoke` + 受影响 replay 场景；不把 grep 当语义通过。
 
 ## 实施顺序与关系
@@ -117,5 +136,5 @@ opened: 2026-11-12
 
 ## 当前状态
 
-- 2026-11-12：RFC 立项；I1/I2/I3 未开始；E1 的 Phase 0/A1/A3a/A2-tab-shell 已实现（见旧 RFC）。
+- 2026-11-12：RFC 立项；I1/I2/I3 未开始；E1 的 Phase 0/A1/A3a/A2-tab-shell 已实现（见旧 RFC）。角色名表达层方案已定（上表），不再请用户拍板；兼容不作为设计约束，按新格式做对。
 - 未验证：所有 I1/I2/I3 项；本 RFC 不宣称内部已全英文。

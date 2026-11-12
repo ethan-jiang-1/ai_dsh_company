@@ -25,6 +25,8 @@ import { DelegationFlowPanel } from './DelegationFlowPanel.tsx'
 import { buildDelegationTree, type DelegationSessionSummaryLike } from '../../lib/delegation-tree.ts'
 import { TasksTableView } from './TasksPanel.tsx'
 import { useCompanyData, type CompanyDataInjected } from '../data/use-company-data.ts'
+import type { CompanyT } from '../locales.ts'
+import { presenceRoleText, roleText } from '../roles.ts'
 
 /** 页签体注入面：数据面 + 平台浮出操作。 */
 export interface CompanyTabInjected extends CompanyDataInjected {
@@ -35,7 +37,7 @@ export interface CompanyTabInjected extends CompanyDataInjected {
 }
 
 /** 页签体 props：槽标准 props（含 `sessionId` / `useProjection` / `useTabInfo`）+ 注入面。 */
-export type CompanyTabProps = PropsRuntime<'sidebar.right.pane.tab'> & CompanyTabInjected
+export type CompanyTabProps = PropsRuntime<'sidebar.right.pane.tab'> & CompanyTabInjected & { readonly t: CompanyT }
 
 /** 在场页签额外需要成员空间入口（行可点）。 */
 export type PresenceTabProps = CompanyTabProps & {
@@ -209,13 +211,14 @@ export function DagTab(props: CompanyTabProps) {
  * @returns 在场面板。
  */
 export function PresenceTab(props: PresenceTabProps) {
-  const { openMember, ...dataFace } = props
+  const { openMember, t, ...dataFace } = props
   const data = useCompanyData(dataFace, props.sessionId, props.useProjection, props.useSessions, { stream: true })
+  const rows = data.rows.map(row => ({ ...row, displayName: presenceRoleText(row, t) }))
   return (
     <PanelFrame title="在场" tone="people" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
       {data.streamError !== null && <div className="wk-error">动态流不可用：{data.streamError}</div>}
-      {data.rows.length === 0
+      {rows.length === 0
         ? <StateNote text="当前没有团队动议。" />
         : (
           <>
@@ -225,7 +228,7 @@ export function PresenceTab(props: PresenceTabProps) {
               <span className="wk-row-task">当前任务</span>
             </div>
             <div role="list" aria-label="组织在场板" className="wk-list">
-              {data.rows.map(row => (
+              {rows.map(row => (
                 <button
                   key={row.id}
                   type="button"
@@ -288,7 +291,7 @@ export function TasksTab(props: CompanyTabProps) {
   return (
     <PanelFrame title="任务板" tone="work" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
-      <TasksTableView view={data.team} />
+      <TasksTableView view={data.team} roleLabel={(name: string) => roleText(name, 'label', props.t, name)} />
     </PanelFrame>
   )
 }

@@ -3,18 +3,9 @@ import { useState, type KeyboardEvent, type ReactNode } from 'react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
 import { cardStateOf, parseArgsObject, resultTextOf, textOf, type CardState } from '../../lib/tool-card.ts'
-
-/**
- * 工具名 → 汇报对象显示名。这些 key 是 CEO preset 的**命名委托工具**
- * （`presets/ceo/agent.cordis.yml` ④，语义见 docs/contracts/delegation.md）。
- */
-const ROLE_LABEL: Record<string, string> = {
-  vp_eng: 'VP-Eng（研发）',
-  vp_sales: 'VP-Sales（销售）',
-  vp_cmo: 'CMO（市场与产品定义）',
-  coo: 'COO（运营与交付）',
-  cfo: 'CFO（财务与合规）',
-}
+import { DELEGATION_TOOL_ROLES, type RoleId } from '../../lib/role-copy.ts'
+import type { CompanyT } from '../locales.ts'
+import { roleText } from '../roles.ts'
 
 /** 卡片生命周期（S2 起与团队工具卡共用同一实现，见 `lib/tool-card.ts`）。 */
 export type { CardState }
@@ -34,7 +25,8 @@ export interface Brief {
 
 /** 一张卡的全部展示事实——**纯函数产物**，keyless 单测直接断言它（不需要 DOM、不需要模型）。 */
 export interface DelegationCardModel {
-  readonly role: string
+  /** canonical role id；未知工具为 null。 */
+  readonly roleId: RoleId | null
   readonly state: CardState
   readonly brief: Brief
   readonly output: string | null
@@ -64,7 +56,7 @@ export function delegationCardModel(toolName: string, block: ToolCallViewProps['
   const call = settled ? block.call : block
   const argsRaw = (call !== undefined && call !== null && 'argsRaw' in call ? call.argsRaw : undefined) ?? ''
   return {
-    role: ROLE_LABEL[toolName] ?? toolName,
+    roleId: DELEGATION_TOOL_ROLES[toolName] ?? null,
     state: cardStateOf(block),
     brief: parseBrief(argsRaw),
     output: resultTextOf(block),
@@ -80,8 +72,9 @@ export function delegationCardModel(toolName: string, block: ToolCallViewProps['
  * @param props - keyed toolview 载荷（`toolName` 决定汇报对象，`block` 是 call/result 节点）。
  * @returns 委派 brief 卡。
  */
-export function DelegationCard({ toolName, block, inspect }: ToolCallViewProps) {
-  const { role, state, brief, output } = delegationCardModel(toolName, block)
+export function DelegationCard({ toolName, block, inspect, t }: ToolCallViewProps & { readonly t: CompanyT }) {
+  const { roleId, state, brief, output } = delegationCardModel(toolName, block)
+  const role = roleId === null ? toolName : roleText(roleId, 'delegation', t)
   const [expanded, setExpanded] = useState(false)
   const expandable = output !== null || brief.prompt !== ''
   const open = expanded && expandable

@@ -65,6 +65,17 @@ describe('TasksTableView：「（阻塞）」只在待办行上（BUG-027 同族
   })
 })
 
+describe('TasksTableView：成员名可走表达层 roleLabel', () => {
+  it('roleLabel 把成员名换成当前语言文案（不改任务数据）', () => {
+    const html = renderToStaticMarkup(createElement(TasksTableView, {
+      view: VIEW,
+      roleLabel: name => name === 'lead' ? 'CEO · 首席执行官' : name,
+    }))
+    expect(html).toContain('CEO · 首席执行官')
+    expect(html).not.toContain('成员：lead(')
+  })
+})
+
 describe('TasksTableView：依赖列人读优先（owner · subject + id 次要）', () => {
   it('依赖列能直接回答「谁在等什么」，不是裸 task-N', () => {
     const blocked = row('t4')

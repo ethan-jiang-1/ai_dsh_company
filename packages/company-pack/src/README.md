@@ -21,7 +21,7 @@
   host/client 各消费哪些**以各文件 import 为准**（host 面偏 signoff/doors，client 面占大多数）。
   （`client/cultivation/` 下另有 `cultivation-actions`＝人侧动作面纯模块：命令线构造 + host 结果折算 + 文案表；
   `CultivationCompose.tsx`＝创作面表单——2026-10-17 培养 GUI 卡）
-- `client/` —— **client 注册入口与浏览器面**，顶层只留 `index.ts`（`dsh.client` 注入面及组合）与 `locales.ts`（typed `company` 字典），其余按关切分五组
+- `client/` —— **client 注册入口与浏览器面**，顶层只留 `index.ts`（`dsh.client` 注入面及组合）、`locales.ts`（typed `company` 字典）与 `roles.ts`（角色表达层取用缝），其余按关切分五组
   （2026-11-03 第六轮；每组 = 一个目录，读目录名即知职责）：
   - `wiring/` —— 组合与接线：`context-wiring`（槽上下文）、`company-session-adapters`（Lead 归并 + follow 帧投影）、
     `attention-registry` / `attention-observers`、`member-navigation`、`title-state`、`instance-guard`、`error-ring`、

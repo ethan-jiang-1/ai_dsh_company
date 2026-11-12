@@ -70,7 +70,7 @@ const TAB_REGISTRATIONS = [
     id: 'dsh-company-pack/attention', kind: 'company-attention', face: 'attention',
     order: 50,
     registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id, inject: () => ({
+      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS, inject: () => ({
         follow: data.follow,
         floatTab: data.floatTab,
         unfloatTab: data.unfloatTab,
@@ -84,7 +84,7 @@ const TAB_REGISTRATIONS = [
     id: 'dsh-company-pack/board', kind: 'company-board', face: 'board',
     order: 51,
     registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id,
+      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
       inject: () => ({ leadOf: data.leadOf, follow: data.follow, floatTab: data.floatTab, unfloatTab: data.unfloatTab }),
     }, BoardTab),
   },
@@ -92,7 +92,7 @@ const TAB_REGISTRATIONS = [
     id: 'dsh-company-pack/dag', kind: 'company-dag', face: 'dag',
     order: 52,
     registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id,
+      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
       inject: () => ({ leadOf: data.leadOf, follow: data.follow, floatTab: data.floatTab, unfloatTab: data.unfloatTab }),
     }, DagTab),
   },
@@ -100,7 +100,7 @@ const TAB_REGISTRATIONS = [
     id: 'dsh-company-pack/presence', kind: 'company-presence', face: 'presence',
     order: 53,
     registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id,
+      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
       inject: () => ({ leadOf: data.leadOf, follow: data.follow, openMember: data.openMember, floatTab: data.floatTab, unfloatTab: data.unfloatTab }),
     }, PresenceTab),
   },
@@ -108,7 +108,7 @@ const TAB_REGISTRATIONS = [
     id: 'dsh-company-pack/budget', kind: 'company-budget', face: 'budget',
     order: 54,
     registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id,
+      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
       inject: () => ({ leadOf: data.leadOf, follow: data.follow, floatTab: data.floatTab, unfloatTab: data.unfloatTab }),
     }, BudgetTab),
   },
@@ -116,7 +116,7 @@ const TAB_REGISTRATIONS = [
     id: 'dsh-company-pack/tasks', kind: 'company-tasks', face: 'tasks',
     order: 55,
     registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id,
+      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
       inject: () => ({ leadOf: data.leadOf, follow: data.follow, floatTab: data.floatTab, unfloatTab: data.unfloatTab }),
     }, TasksTab),
   },
@@ -124,7 +124,7 @@ const TAB_REGISTRATIONS = [
     id: 'dsh-company-pack/cultivation', kind: 'company-cultivation', face: 'cultivation',
     order: 56,
     registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id,
+      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
       inject: () => ({
         floatTab: data.floatTab,
         unfloatTab: data.unfloatTab,
@@ -141,7 +141,7 @@ const TAB_REGISTRATIONS = [
     id: 'dsh-company-pack/ledger', kind: 'company-ledger', face: 'ledger',
     order: 57,
     registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id,
+      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
       inject: () => ({ floatTab: data.floatTab, unfloatTab: data.unfloatTab, readLedger: data.readLedger }),
     }, LedgerTab),
   },
@@ -149,7 +149,7 @@ const TAB_REGISTRATIONS = [
     id: 'dsh-company-pack/deliverables', kind: 'company-deliverables', face: 'catalog',
     order: 58,
     registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id,
+      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
       inject: () => ({
         floatTab: data.floatTab,
         unfloatTab: data.unfloatTab,

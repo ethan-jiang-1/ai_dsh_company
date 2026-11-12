@@ -9,6 +9,7 @@
  * 这样 `ctx.locale.register(NS, { zh, en })` 和 slot 的 `locale: NS` 都是 typed 的。
  */
 import type { TranslateNS } from '@deepseek-ai/dsh-client-locale/client'
+import { ROLE_COPY } from '../lib/role-copy.ts'
 
 export const COMPANY_NS = 'company'
 
@@ -16,6 +17,30 @@ export const COMPANY_NS = 'company'
 export const zh = {
   'brand.name': 'DSH 梦之队',
   'view.cultivation': '培养',
+  'roles.ceo.label': ROLE_COPY['ceo'].zh.label,
+  'roles.ceo.full': ROLE_COPY['ceo'].zh.full,
+  'roles.ceo.short': ROLE_COPY['ceo'].zh.short,
+  'roles.ceo.delegation': ROLE_COPY['ceo'].zh.delegation,
+  'roles.vp-eng.label': ROLE_COPY['vp-eng'].zh.label,
+  'roles.vp-eng.full': ROLE_COPY['vp-eng'].zh.full,
+  'roles.vp-eng.short': ROLE_COPY['vp-eng'].zh.short,
+  'roles.vp-eng.delegation': ROLE_COPY['vp-eng'].zh.delegation,
+  'roles.vp-sales.label': ROLE_COPY['vp-sales'].zh.label,
+  'roles.vp-sales.full': ROLE_COPY['vp-sales'].zh.full,
+  'roles.vp-sales.short': ROLE_COPY['vp-sales'].zh.short,
+  'roles.vp-sales.delegation': ROLE_COPY['vp-sales'].zh.delegation,
+  'roles.coo.label': ROLE_COPY['coo'].zh.label,
+  'roles.coo.full': ROLE_COPY['coo'].zh.full,
+  'roles.coo.short': ROLE_COPY['coo'].zh.short,
+  'roles.coo.delegation': ROLE_COPY['coo'].zh.delegation,
+  'roles.cfo.label': ROLE_COPY['cfo'].zh.label,
+  'roles.cfo.full': ROLE_COPY['cfo'].zh.full,
+  'roles.cfo.short': ROLE_COPY['cfo'].zh.short,
+  'roles.cfo.delegation': ROLE_COPY['cfo'].zh.delegation,
+  'roles.cmo.label': ROLE_COPY['cmo'].zh.label,
+  'roles.cmo.full': ROLE_COPY['cmo'].zh.full,
+  'roles.cmo.short': ROLE_COPY['cmo'].zh.short,
+  'roles.cmo.delegation': ROLE_COPY['cmo'].zh.delegation,
 
   'tabs.attention.label': '待办',
   'tabs.attention.tooltip': '「分身做不了的事」收件箱——待批审批 / 待答问询 / 升级 / 完成通知',
@@ -56,6 +81,30 @@ export type CompanyT = TranslateNS<'company'>
 export const en: Record<CompanyKey, string> = {
   'brand.name': 'DSH Dream Team',
   'view.cultivation': 'Cultivation',
+  'roles.ceo.label': ROLE_COPY['ceo'].en.label,
+  'roles.ceo.full': ROLE_COPY['ceo'].en.full,
+  'roles.ceo.short': ROLE_COPY['ceo'].en.short,
+  'roles.ceo.delegation': ROLE_COPY['ceo'].en.delegation,
+  'roles.vp-eng.label': ROLE_COPY['vp-eng'].en.label,
+  'roles.vp-eng.full': ROLE_COPY['vp-eng'].en.full,
+  'roles.vp-eng.short': ROLE_COPY['vp-eng'].en.short,
+  'roles.vp-eng.delegation': ROLE_COPY['vp-eng'].en.delegation,
+  'roles.vp-sales.label': ROLE_COPY['vp-sales'].en.label,
+  'roles.vp-sales.full': ROLE_COPY['vp-sales'].en.full,
+  'roles.vp-sales.short': ROLE_COPY['vp-sales'].en.short,
+  'roles.vp-sales.delegation': ROLE_COPY['vp-sales'].en.delegation,
+  'roles.coo.label': ROLE_COPY['coo'].en.label,
+  'roles.coo.full': ROLE_COPY['coo'].en.full,
+  'roles.coo.short': ROLE_COPY['coo'].en.short,
+  'roles.coo.delegation': ROLE_COPY['coo'].en.delegation,
+  'roles.cfo.label': ROLE_COPY['cfo'].en.label,
+  'roles.cfo.full': ROLE_COPY['cfo'].en.full,
+  'roles.cfo.short': ROLE_COPY['cfo'].en.short,
+  'roles.cfo.delegation': ROLE_COPY['cfo'].en.delegation,
+  'roles.cmo.label': ROLE_COPY['cmo'].en.label,
+  'roles.cmo.full': ROLE_COPY['cmo'].en.full,
+  'roles.cmo.short': ROLE_COPY['cmo'].en.short,
+  'roles.cmo.delegation': ROLE_COPY['cmo'].en.delegation,
 
   'tabs.attention.label': 'Inbox',
   'tabs.attention.tooltip': 'Inbox for things your agents cannot do: approvals, questions, escalations, completion notices',

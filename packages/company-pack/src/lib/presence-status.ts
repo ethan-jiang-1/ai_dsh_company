@@ -7,7 +7,7 @@
 // 「未知值落未知」与 `PRESET_DISPLAY_NAMES` 与各 `presets/<role>/agent.cordis.yml` 的 `config.name` 同源，
 // 有防漂移断言钉着）——与 300 多行事件折算混住时，改文案的人要翻整个读模型。
 //
-// 依赖：本文件**零 import**（叶子模块）；presence.ts → 本文件单向。
+// 依赖：本文件只 import `role-copy.ts`（同样零依赖的叶子）；presence.ts → 本文件单向。
 // 为什么 `PRESET_KEYS` 留在这里而不引 `tools/lib/company-roles.mjs`：pack 发布面自包含
 // （`files` 不含 tools/），不许反向依赖维护工具层——同名决定见 notes/archived/2026-10-14-code-restructure.md
 // 「输掉的方案」（`CULTIVATION_ROLES`/`PRESET_KEYS` 同理）。
@@ -16,6 +16,8 @@
  * D-c：状态文案。`status` 是 agent driver 的**团队内**忙闲，不等于"这个人此刻在工作"——
  * 值一律走中文映射，未知值落「未知」，不直显英文裸值。
  */
+import { ROLE_CANONICAL, ROLE_IDS } from './role-copy.ts'
+
 export type PresenceStatus = 'running' | 'idle' | 'inactive' | 'provisioning' | 'failed' | 'unknown'
 
 export const STATUS_LABEL: Record<PresenceStatus, string> = {
@@ -69,14 +71,9 @@ function isPresetRole(name: string): name is PresetRoleId {
  * （本组织 lead 恒为 CEO）；未命中原样显示（任意组队名不崩）。与各 `presets/<role>/agent.cordis.yml`
  * 的 `config.name` 同源——`tests/company/presence-board.spec.ts` 有防漂移断言。
  */
-export const PRESET_DISPLAY_NAMES: Record<PresetRoleId, string> = {
-  ceo: 'CEO',
-  'vp-eng': 'VP-Eng',
-  'vp-sales': 'VP-Sales',
-  coo: 'COO',
-  cfo: 'CFO',
-  cmo: 'CMO',
-}
+export const PRESET_DISPLAY_NAMES: Record<PresetRoleId, string> = Object.fromEntries(
+  ROLE_IDS.map(id => [id, ROLE_CANONICAL[id]]),
+) as Record<PresetRoleId, string>
 
 /** 成员名 → 显示名（lead 行特殊：name 恒为 'lead'，按角色映射）。 */
 export function displayNameFor(name: string, role: 'lead' | 'teammate'): string {
@@ -86,14 +83,9 @@ export function displayNameFor(name: string, role: 'lead' | 'teammate'): string 
 
 /** 角色 → 短标签（培养面板/记录署名用；与 PRESET_DISPLAY_NAMES 分层——短标签不含公司名前缀；
  *  2026-10-21 自 lib/cultivation.ts 的 ROLE_LABELS 收进词汇层，单一事实家）。 */
-export const PRESET_SHORT_LABELS: Record<PresetRoleId, string> = {
-  ceo: 'CEO',
-  'vp-eng': 'VP-Eng',
-  'vp-sales': 'VP-Sales',
-  coo: 'COO',
-  cfo: 'CFO',
-  cmo: 'CMO',
-}
+export const PRESET_SHORT_LABELS: Record<PresetRoleId, string> = Object.fromEntries(
+  ROLE_IDS.map(id => [id, ROLE_CANONICAL[id]]),
+) as Record<PresetRoleId, string>
 
 /** 角色 → 显示名（未知角色原样返回；2026-10-21 随短标签收进词汇层——培养域 facade 再导出）。 */
 export function roleLabel(role: string): string {

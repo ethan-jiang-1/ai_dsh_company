@@ -12,6 +12,7 @@ import { homedir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 import { isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { yamlScalar } from '../../lib/yaml-scalar.ts'
+import { ROLE_CANONICAL } from '../../lib/role-copy.ts'
 import { RUN_BUNDLE_DIR, RUN_BUNDLE_REL } from '../run-bundle/run-bundle.ts'
 
 /** 六角色（researcher 没有 CHARTER）。 */
@@ -308,10 +309,8 @@ function orgSections(text: string): Map<string, string> {
   return sections
 }
 
-/** 角色 slug → 编制表里的显示名（org/owners 用显示名）。 */
-const ROLE_LABEL: Readonly<Record<string, string>> = {
-  ceo: 'CEO', 'vp-eng': 'VP-Eng', 'vp-sales': 'VP-Sales', coo: 'COO', cfo: 'CFO', cmo: 'CMO',
-}
+/** 角色 slug → 编制表里的显示名（org/owners 用显示名；canonical 来自 role-copy）。 */
+const ROLE_LABEL: Readonly<Record<string, string>> = ROLE_CANONICAL
 
 /** owners.md 里该角色的表格行。 */
 const ownersRow = (role: string): RegExp => new RegExp(`^\\|\\s*${role}\\s*\\|`, 'm')

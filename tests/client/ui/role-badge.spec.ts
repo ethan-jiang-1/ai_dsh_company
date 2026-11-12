@@ -3,8 +3,11 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { ROLE_MARK, ROLE_SHORT, RoleBadge, readPresetOf, sessionTitleOf } from '../../../packages/company-pack/src/client/ui/RoleBadge.tsx'
+import { en, zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 
 const SID = 'session-1111-2222' as Parameters<typeof readPresetOf>[1]
+const t = ((key: keyof typeof zh) => zh[key]) as CompanyT
+const tEn = ((key: keyof typeof en) => en[key]) as CompanyT
 
 /** 造一个最小快照源（ObservableSnapshot 形状）。 */
 const sourceOf = (values: Record<string, unknown> | undefined) => ({
@@ -59,14 +62,19 @@ describe('ROLE_MARK（座位标记字母；16px 格里放得下）', () => {
 
 describe('RoleBadge（静态渲染形状）', () => {
   it('有角色 ⇒ 标记：类名 + data-wk-role + 座位字母 + 全称缩写 title', () => {
-    const html = renderToStaticMarkup(createElement(RoleBadge, { sessionId: SID, roleSource: sourceOf({ agentPreset: 'cfo' }) }))
+    const html = renderToStaticMarkup(createElement(RoleBadge, { sessionId: SID, roleSource: sourceOf({ agentPreset: 'cfo' }), t }))
     expect(html).toContain('wk-role-badge')
     expect(html).toContain('data-wk-role="cfo"')
-    expect(html).toContain('title="CFO"')
+    expect(html).toContain('title="CFO · 首席财务官"')
     expect(html).toContain('>F</span>')
   })
   it('无值 / 未知 preset ⇒ 不渲染任何角色痕迹（优雅降级）', () => {
-    expect(renderToStaticMarkup(createElement(RoleBadge, { sessionId: SID, roleSource: sourceOf({}) }))).toBe('')
-    expect(renderToStaticMarkup(createElement(RoleBadge, { sessionId: SID, roleSource: sourceOf({ agentPreset: 'standard' }) }))).toBe('')
+    expect(renderToStaticMarkup(createElement(RoleBadge, { sessionId: SID, roleSource: sourceOf({}), t }))).toBe('')
+    expect(renderToStaticMarkup(createElement(RoleBadge, { sessionId: SID, roleSource: sourceOf({ agentPreset: 'standard' }), t }))).toBe('')
+  })
+  it('en 下同一角色用英文名（无中文）', () => {
+    const html = renderToStaticMarkup(createElement(RoleBadge, { sessionId: SID, roleSource: sourceOf({ agentPreset: 'cfo' }), t: tEn }))
+    expect(html).toContain('title="CFO"')
+    expect(html).not.toContain('首席财务官')
   })
 })

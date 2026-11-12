@@ -223,7 +223,7 @@ function registerToolCards(ctx: ClientContext): void {
     // 必须压过通用明细行 ⇒ 显式 -1（2026-09-25 UX 实验现场抓到，dag-probe 控制台红证）。
     for (const key of DELEGATION_TOOL_KEYS) {
       scoped.slots.inject('tool.call.toolview', () =>
-        scoped.slots.register({ name: 'tool.call.toolview', key, priority: -1 }, DelegationCard))
+        scoped.slots.register({ name: 'tool.call.toolview', key, priority: -1, locale: COMPANY_NS }, DelegationCard))
     }
     for (const key of TEAM_TOOL_KEYS) {
       scoped.slots.inject('tool.call.toolview', () =>
@@ -246,6 +246,7 @@ function registerSidebarIdentity(ctx: ClientContext): void {
         name: 'sidebar.session.row.leading',
         id: 'company-role-badge',
         order: 0,
+        locale: COMPANY_NS,
         inject: () => ({ roleSource: sessions.list }),
       }, RoleBadge))
 

@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { DelegationCard, delegationCardModel } from '../../../packages/company-pack/src/client/ui/DelegationCard.tsx'
+import { en, zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 
 /**
  * 委派工具卡的 keyless 层（R3）。
@@ -32,13 +33,16 @@ const settled = (argsRaw: string, text: string, extra: Record<string, unknown> =
   ...extra,
 } as unknown as Block)
 
+const t = ((key: keyof typeof zh) => zh[key]) as CompanyT
+const tEn = ((key: keyof typeof en) => en[key]) as CompanyT
+
 const BRIEF = JSON.stringify({ description: '技术可行性评估', prompt: '评估可复制交付包的技术可行性，一页纸。' })
 
 describe('委派工具卡（R3 keyless：纯函数视图模型）', () => {
   it('running：状态 running、汇报对象是显示名、brief 两段解析出来、还没有结果', () => {
     const model = delegationCardModel('vp_eng', running(BRIEF))
     expect(model.state).toBe('running')
-    expect(model.role).toBe('VP-Eng（研发）')
+    expect(model.roleId).toBe('vp-eng')
     expect(model.brief).toEqual({ title: '技术可行性评估', prompt: '评估可复制交付包的技术可行性，一页纸。' })
     expect(model.output).toBeNull()
   })
@@ -46,7 +50,7 @@ describe('委派工具卡（R3 keyless：纯函数视图模型）', () => {
   it('settled 成功：状态 ok 且结果正文可读（VP 交回的稿子）', () => {
     const model = delegationCardModel('vp_sales', settled(BRIEF, '结论：可复制交付包成立。'))
     expect(model.state).toBe('ok')
-    expect(model.role).toBe('VP-Sales（销售）')
+    expect(model.roleId).toBe('vp-sales')
     expect(model.output).toBe('结论：可复制交付包成立。')
   })
 
@@ -67,19 +71,30 @@ describe('委派工具卡（R3 keyless：纯函数视图模型）', () => {
   })
 
   it('未知工具名不炸：role 回退成工具名本身', () => {
-    expect(delegationCardModel('vp_marketing', running(BRIEF)).role).toBe('vp_marketing')
+    expect(delegationCardModel('vp_marketing', running(BRIEF)).roleId).toBeNull()
   })
 
   it('静态渲染出可断言的公司语义（data-tool / data-state / 汇报对象 / 状态文案）', () => {
     const html = renderToStaticMarkup(createElement(DelegationCard, {
       toolName: 'vp_eng',
       block: settled(BRIEF, '结论：可行。'),
+      t,
     } as unknown as CardProps))
     expect(html).toContain('data-tool="vp_eng"')
     expect(html).toContain('data-state="ok"')
     expect(html).toContain('委派')
-    expect(html).toContain('VP-Eng（研发）')
+    expect(html).toContain('VP-Eng · 研发')
     expect(html).toContain('已交稿')
     expect(html).toContain('技术可行性评估')
+  })
+
+  it('en 下委派对象用英文职能描述（无中文）', () => {
+    const html = renderToStaticMarkup(createElement(DelegationCard, {
+      toolName: 'vp_eng',
+      block: settled(BRIEF, '结论：可行。'),
+      t: tEn,
+    } as unknown as CardProps))
+    expect(html).toContain('VP-Eng · Engineering')
+    expect(html).not.toContain('研发')
   })
 })

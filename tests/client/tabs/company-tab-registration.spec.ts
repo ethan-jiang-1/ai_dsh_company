@@ -164,6 +164,7 @@ describe('company tab registration', () => {
     const bodyFiber = await declareSlot(harness, BODY_OWNER, BODY_SLOT)
     const bodyEntries = harness.slots.entries(BODY_SLOT)
     expect(bodyEntries.map(entry => entry.options.key)).toEqual(EXPECTED_TYPES.map(type => type.id))
+    expect(bodyEntries.every(entry => entry.locale === 'company'), 'body 槽必须拿到 company t seat').toBe(true)
     expect(bodyEntries.map(entry => entry.component)).toEqual(BODY_COMPONENTS)
     expect(harness.slots.entries(TITLE_SLOT)).toEqual([])
     expect(harness.slots.entries(GUIDE_SLOT)).toEqual([])

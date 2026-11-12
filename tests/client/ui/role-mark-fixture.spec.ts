@@ -16,10 +16,12 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { ROLE_MARK, ROLE_SHORT, RoleBadge } from '../../../packages/company-pack/src/client/ui/RoleBadge.tsx'
+import { zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 
 /** 六角色（顺序 = 出厂 preset 顺序；表里的角色少一个就会在图里露馅）。 */
 export const FIXTURE_ROLES: readonly string[] = ['ceo', 'cfo', 'coo', 'vp-eng', 'vp-sales', 'cmo']
 
+const t = ((key: keyof typeof zh) => zh[key]) as CompanyT
 const SID = 'session-fixture-role-mark' as Parameters<typeof RoleBadge>[0]['sessionId']
 
 /** 最小快照源：把某个 preset 喂给真组件。 */
@@ -52,7 +54,7 @@ export const DIAGRAM_CSS = `
 
 /** 一行：座位（虚线 16px 框）+ 真标记 + 真标题样例 + 右注（preset/字母/全称）。 */
 function rowHtml(role: string, options: { readonly clock?: boolean } = {}): string {
-  const badge = renderToStaticMarkup(createElement(RoleBadge, { sessionId: SID, roleSource: sourceOf(role) }))
+  const badge = renderToStaticMarkup(createElement(RoleBadge, { sessionId: SID, roleSource: sourceOf(role), t }))
   const clock = options.clock === true ? '<span class="fx-clock" title="计划任务时钟占位"></span>' : ''
   const tag = options.clock === true
     ? `${role} → ${ROLE_MARK[role] ?? '?'} · 同格时钟在场（12px 标记 + 16px 时钟跨度）`
@@ -63,7 +65,7 @@ function rowHtml(role: string, options: { readonly clock?: boolean } = {}): stri
 
 /** 放大条的一格：只放座位格 + 标记 + 短注（放整行会把标题/标签挤到一起，实测挤歪）。 */
 function zoomCellHtml(role: string): string {
-  const badge = renderToStaticMarkup(createElement(RoleBadge, { sessionId: SID, roleSource: sourceOf(role) }))
+  const badge = renderToStaticMarkup(createElement(RoleBadge, { sessionId: SID, roleSource: sourceOf(role), t }))
   return `    <div class="fx-cell"><span class="fx-seat">${badge}</span><span class="fx-tag">${role} → ${ROLE_MARK[role] ?? '?'}（${ROLE_SHORT[role] ?? '?'}）</span></div>`
 }
 

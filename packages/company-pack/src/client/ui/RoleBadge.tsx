@@ -27,6 +27,9 @@
  */
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { CompanyT } from '../locales.ts'
+import { roleText } from '../roles.ts'
+import { ROLE_COPY } from '../../lib/role-copy.ts'
 
 /**
  * 会话列表快照的最小结构面（本地声明，照 `use-company-data.ts` 的 `SessionsStoreLike`
@@ -54,17 +57,14 @@ export interface RoleBadgeInjected {
 /** 行槽的 owner props（vendor `SessionRowScheduleOwnerProps`）+ 本占位注入的数据面。 */
 export interface RoleBadgeProps extends RoleBadgeInjected {
   readonly sessionId: SessionId
+  /** 槽注入的 company translator。 */
+  readonly t: CompanyT
 }
 
 /** 角色 → 全称缩写（窗口标题【角色】前缀、标记 title、会话头 preset 标签用）。 */
-export const ROLE_SHORT: Readonly<Record<string, string>> = {
-  ceo: 'CEO',
-  cfo: 'CFO',
-  coo: 'COO',
-  cmo: 'CMO',
-  'vp-eng': 'VPE',
-  'vp-sales': 'VPS',
-}
+export const ROLE_SHORT: Readonly<Record<string, string>> = Object.fromEntries(
+  Object.entries(ROLE_COPY).map(([id, copy]) => [id, copy.en.short]),
+)
 
 /**
  * 角色 → **座位标记字母**（16px 格子里放得下的那一格；不在表内的 preset 不渲染）。
@@ -104,7 +104,7 @@ export function sessionTitleOf(session: unknown): string | undefined {
   return undefined
 }
 
-export function RoleBadge({ sessionId, roleSource }: RoleBadgeProps) {
+export function RoleBadge({ sessionId, roleSource, t }: RoleBadgeProps) {
   // subscribe 必须跨渲染稳定（每次 bind 会生成新引用 ⇒ 每渲染重订阅）。
   const subscribe = useMemo(() => roleSource.subscribe.bind(roleSource), [roleSource])
   // getServerSnapshot 同 getSnapshot：本组件只跑在浏览器（SPA 无 SSR），传它只为
@@ -114,7 +114,7 @@ export function RoleBadge({ sessionId, roleSource }: RoleBadgeProps) {
   const mark = preset === null ? undefined : ROLE_MARK[preset]
   if (mark === undefined) return null
   return (
-    <span className="wk-role-badge" data-wk-role={preset} title={preset === null ? undefined : ROLE_SHORT[preset]}>
+    <span className="wk-role-badge" data-wk-role={preset} title={preset === null ? undefined : roleText(preset, 'label', t, ROLE_SHORT[preset] ?? preset)}>
       {mark}
     </span>
   )
