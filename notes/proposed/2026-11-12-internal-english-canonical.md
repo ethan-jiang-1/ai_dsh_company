@@ -220,7 +220,13 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 - 同步 `deliverables.mjs`、`deliverables-catalog`（tools + src）、`deliverables-audit`、`converge`、meta 模板、catalog fixture、client catalog labels、host cultivation result labels、测试。
 - 表达层：catalog type/result 走 `catalog.*` 字典；host 成品背景 subtitle 走 `resultLabelFor`。
 
-**剩余 I1**：`编号体系` / `需求层`、`参与` / `墙钟` / `一句话结论` / `落地事件`、persona/agent.cordis.yml、content/**、领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
+**I1e 第二片（numbering/layers）**：
+
+- `编号体系` → `numbering`；`需求层` → `layers`。
+- 同步 requirements-check、req-command、meta 模板、product-type 文档与测试。
+- 旧中文标记不再解析：`编号体系: identity` 的 meta 落 `skipped`，红→绿（回退 regex → 5 条红；还原 → 20 passed）。
+
+**剩余 I1**：`参与` / `墙钟` / `一句话结论` / `落地事件`、persona/agent.cordis.yml、content/**、领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 

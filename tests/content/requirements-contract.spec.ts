@@ -52,7 +52,7 @@ describe('编号合同：requirements-model.md', () => {
     for (const form of ['json-ledger', 'headings', 'table-rows', 'none']) {
       expect(text, `定义形态缺 ${form}`).toContain(form)
     }
-    expect(text, '缺 `编号体系` 范围标记').toContain('编号体系:')
+    expect(text, '缺 `编号体系` 范围标记').toContain('numbering:')
     expect(text, '缺旧动议豁免的 skipped 口径').toContain('skipped')
     expect(text, '缺并发取号口径（max+1）').toMatch(/max\s*\+\s*1/)
     expect(text, '缺行首字段解析口径（traces 不能子串匹配）').toMatch(/traces:/)
@@ -60,14 +60,14 @@ describe('编号合同：requirements-model.md', () => {
 })
 
 describe('编号范围标记：meta 模板', () => {
-  it('meta 模板带 `编号体系:` / `productType:` / `deliveryMode:` / `需求层:` 标记', () => {
+  it('meta 模板带 `numbering:` / `productType:` / `deliveryMode:` / `layers:` 标记', () => {
     const meta = read(join(CONTENT, 'templates/meta.md'))
-    expect(meta, 'meta 模板缺 `编号体系:` 标记——新动议进不了编号检查').toMatch(/^编号体系:/m)
+    expect(meta, 'meta 模板缺 `numbering:` 标记——新动议进不了编号检查').toMatch(/^numbering:/m)
     expect(meta, 'meta 模板缺 `productType:` 标记——动议级类型没有声明面').toMatch(/^productType:/m)
     expect(meta, 'meta 模板缺 `deliveryMode:` 标记——交付模式没有声明面').toMatch(/^deliveryMode:/m)
     expect(meta, 'meta 模板仍用旧中文产品类型字段').not.toMatch(/^产品类型\s*[:：]/m)
     expect(meta, 'meta 模板仍用旧中文交付模式字段').not.toMatch(/^交付模式\s*[:：]/m)
-    expect(meta, 'meta 模板缺 `需求层:` 标记——缺层判红没有声明面').toMatch(/^需求层:/m)
+    expect(meta, 'meta 模板缺 `layers:` 标记——缺层判红没有声明面').toMatch(/^layers:/m)
   })
 
   it('validateMeta 接受额外字段（标记不破既有户口形状）', () => {
@@ -76,14 +76,14 @@ describe('编号范围标记：meta 模板', () => {
       'kickoff: 2026-11-07',
       'type: decision',
       'result: in-progress',
-      '编号体系: identity',
-      '需求层: MRD, StRS, PRD, SyRS, IRS',
+      'numbering: identity',
+      'layers: MRD, StRS, PRD, SyRS, IRS',
       '',
     ].join('\n')
     const result = validateMeta(sample)
     expect(result.problems, `validateMeta 拒绝带标记的 meta：${result.problems.join('；')}`).toEqual([])
-    expect(result.fields.get('编号体系')).toBe('identity')
-    expect(result.fields.get('需求层')).toBe('MRD, StRS, PRD, SyRS, IRS')
+    expect(result.fields.get('numbering')).toBe('identity')
+    expect(result.fields.get('layers')).toBe('MRD, StRS, PRD, SyRS, IRS')
   })
 })
 

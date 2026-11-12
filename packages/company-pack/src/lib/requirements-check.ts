@@ -11,7 +11,7 @@
  * - 号形 `KIND-NNN`（KIND ∈ MR/REQ/IF/TC），`AC-<REQ号>-<n>` 从属父 REQ。
  * - 字段按行首标签解析（`- traces:`），不子串匹配（V11 实测：散文里的「可追溯性」会误判孤儿）。
  * - 追溯只认作者写的边；`:` 跨动议引用 v1 未支持，不解析、不判红。
- * - 范围：meta 没写 `编号体系:` 的旧动议 = skipped（只读豁免）；`需求层:` 声明本轮层，缺层 = 红。
+ * - 范围：meta 没写 `numbering:` 的旧动议 = skipped（只读豁免）；`layers:` 声明本轮层，缺层 = 红。
  */
 
 export type Layer = 'MRD' | 'StRS' | 'PRD' | 'SyRS' | 'IRS' | 'V&V'
@@ -30,7 +30,7 @@ export const LAYER_FORMS: Readonly<Record<Layer, DefinitionForm>> = {
   IRS: 'headings',
   'V&V': 'table-rows',
 }
-/** 默认范围 = 到 PRD 为止（模板口径）；meta `需求层:` 可扩到 SyRS/IRS/V&V。 */
+/** 默认范围 = 到 PRD 为止（模板口径）；meta `layers:` 可扩到 SyRS/IRS/V&V。 */
 export const DEFAULT_LAYERS: readonly Layer[] = ['MRD', 'StRS', 'PRD']
 /** 下游写上游：本层条目的 traces/source 必须指向哪一层。 */
 const UPSTREAM_LAYER: Readonly<Record<Layer, readonly Layer[]>> = {
@@ -55,7 +55,7 @@ export interface MotionSnapshot {
 export interface CheckOptions {
   /** 期望在场的层（覆盖 meta 声明与默认值）；缺层 = 红。 */
   readonly layers?: readonly Layer[]
-  /** meta 没有声明 `需求层:` 时的默认范围（产品类型包给；缺省 = 本仓默认到 PRD）。 */
+  /** meta 没有声明 `layers:` 时的默认范围（产品类型包给；缺省 = 本仓默认到 PRD）。 */
   readonly defaultLayers?: readonly Layer[]
   /** 退役号前缀（产品类型包给；缺省 = 本仓默认）。空数组 = 该产品类型没有退役号概念。 */
   readonly retiredPrefixes?: readonly string[]
@@ -340,14 +340,14 @@ function tableRowDefinitions(rel: string, text: string, layer: Layer): Definitio
 
 function metaLayers(meta: string | undefined, errors: string[]): { layers: readonly Layer[] | undefined; skipped: boolean; reason: string } {
   if (meta === undefined) return { layers: undefined, skipped: false, reason: '' }
-  const marker = /^编号体系:\s*(.*)$/m.exec(meta)
-  if (marker === null) return { layers: undefined, skipped: true, reason: 'meta 无 `编号体系:` 标记——旧动议只读豁免' }
+  const marker = /^numbering:\s*(.*)$/m.exec(meta)
+  if (marker === null) return { layers: undefined, skipped: true, reason: 'meta 无 `numbering:` 标记——旧动议只读豁免' }
   const value = (marker[1] ?? '').trim()
   if (value !== 'identity') {
-    errors.push(`meta 的 \`编号体系: ${value}\` 不在词表（只认 identity）`)
+    errors.push(`meta 的 \`numbering: ${value}\` 不在词表（只认 identity）`)
     return { layers: undefined, skipped: false, reason: '' }
   }
-  const declared = /^需求层:\s*(.*)$/m.exec(meta)
+  const declared = /^layers:\s*(.*)$/m.exec(meta)
   if (declared === null) return { layers: undefined, skipped: false, reason: '' }
   const layers: Layer[] = []
   for (const item of parseList(declared[1] ?? '')) {
@@ -414,7 +414,7 @@ export function checkRequirements(snapshot: MotionSnapshot, options: CheckOption
 
   // 期望层到场（meta 声明 / options / 默认）。
   for (const layer of layers) {
-    if (!presentLayers.has(layer)) errors.push(`缺层 ${layer}：没有声明 layer: ${layer} 的文档（需求层声明要求它到场）`)
+    if (!presentLayers.has(layer)) errors.push(`缺层 ${layer}：没有声明 layer: ${layer} 的文档（layers 声明要求它到场）`)
   }
 
   // 重复定义。

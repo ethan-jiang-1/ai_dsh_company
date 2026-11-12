@@ -78,10 +78,10 @@ function parseDeliveryMode(text: string | undefined): string {
   return value
 }
 
-/** 读 meta 的 `需求层:` 声明（空 = 未声明）。 */
+/** 读 meta 的 `layers:` 声明（空 = 未声明）。 */
 function parseDeclaredLayers(text: string | undefined): string[] {
   if (text === undefined) return []
-  const match = /^需求层:\s*(.*)$/m.exec(text)
+  const match = /^layers:\s*(.*)$/m.exec(text)
   if (match === null) return []
   return (match[1] ?? '').split(/[,，、;；\s]+/).map(item => item.trim()).filter(item => item !== '')
 }

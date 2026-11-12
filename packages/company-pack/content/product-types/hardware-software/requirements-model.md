@@ -68,8 +68,8 @@ definition: headings
 
 ## 范围与豁免
 
-- 新动议在 `meta.md` 写 `编号体系: identity` 才进入编号检查；可另写 `需求层:` 声明本轮要到哪层，缺层按声明判红。
-- 没有 `编号体系:` 标记的旧动议 = **只读豁免**：不回溯判红，checker 记 `skipped`。
+- 新动议在 `meta.md` 写 `numbering: identity` 才进入编号检查；可另写 `layers:` 声明本轮要到哪层，缺层按声明判红。
+- 没有 `numbering:` 标记的旧动议 = **只读豁免**：不回溯判红，checker 记 `skipped`。
 - 豁免必须显式（marker 在场）、可复核；不得静默空过。
 
 ## 并发

@@ -38,8 +38,8 @@ function fixture(type: string, layers?: string, docs: Record<string, string> = {
   const root = join(workspace, '.dsh-company/deliverables/2026-11-11-demo')
   const drafts = join(root, 'drafts')
   mkdirSync(drafts, { recursive: true })
-  const meta = ['slug: demo', 'kickoff: 2026-11-11', '编号体系: identity', `productType: ${type}`]
-  if (layers !== undefined) meta.push(`需求层: ${layers}`)
+  const meta = ['slug: demo', 'kickoff: 2026-11-11', 'numbering: identity', `productType: ${type}`]
+  if (layers !== undefined) meta.push(`layers: ${layers}`)
   writeFileSync(join(root, 'meta.md'), `${meta.join('\n')}\n`)
   const base: Record<string, string> = { 'mrd.md': MRD, 'strs.md': STRS, 'prd.md': PRD, ...docs }
   for (const [name, body] of Object.entries(base)) writeFileSync(join(drafts, name), body)

@@ -204,23 +204,29 @@ describe('覆盖与计数', () => {
 })
 
 describe('范围与豁免（meta 标记）', () => {
-  it('无 `编号体系:` 标记 → skipped（旧动议只读豁免）', () => {
+  it('无 `numbering:` 标记 → skipped（旧动议只读豁免）', () => {
     const result = checkRequirements({ meta: meta(['slug: old-motion', 'kickoff: 2026-01-01']), docs: clean() })
     expect(result.skipped).toBe(true)
     expect(result.reason).toContain('只读豁免')
     expect(result.errors).toEqual([])
   })
 
-  it('`编号体系: identity` + `需求层:` → 缺层判红', () => {
+  it('旧中文 编号体系/需求层 不再解析（canonical = numbering/layers）', () => {
+    const result = checkRequirements({ meta: meta(['slug: old-motion', '编号体系: identity', '需求层: MRD']), docs: clean() })
+    expect(result.skipped).toBe(true)
+    expect(result.errors).toEqual([])
+  })
+
+  it('`numbering: identity` + `layers:` → 缺层判红', () => {
     const result = checkRequirements({
-      meta: meta(['slug: new-motion', '编号体系: identity', '需求层: MRD, StRS, PRD, SyRS']),
+      meta: meta(['slug: new-motion', 'numbering: identity', 'layers: MRD, StRS, PRD, SyRS']),
       docs: docs(['mrd.md', MRD], ['strs.md', STRS], ['prd.md', PRD]),
     })
     expect(result.errors.join()).toContain('缺层 SyRS')
   })
 
   it('未知编号体系值 → 红（不静默跳过）', () => {
-    const result = checkRequirements({ meta: meta(['编号体系: legacy']), docs: clean() })
+    const result = checkRequirements({ meta: meta(['numbering: legacy']), docs: clean() })
     expect(result.errors.join()).toContain('不在词表')
   })
 })
@@ -228,7 +234,7 @@ describe('范围与豁免（meta 标记）', () => {
 describe('产品类型包覆盖（2026-11-09）', () => {
   it('defaultLayers 覆盖缺省范围：不写需求层时不再要求 StRS', () => {
     const result = checkRequirements(
-      { meta: meta(['编号体系: identity']), docs: docs(['mrd.md', MRD], ['prd.md', PRD]) },
+      { meta: meta(['numbering: identity']), docs: docs(['mrd.md', MRD], ['prd.md', PRD]) },
       { defaultLayers: ['MRD', 'PRD'] },
     )
     expect(result.layers).toEqual(['MRD', 'PRD'])
@@ -238,7 +244,7 @@ describe('产品类型包覆盖（2026-11-09）', () => {
   it('retiredPrefixes 为空：VR-001 不再判退役词', () => {
     const prd = `${PRD}\n- 验证：VR-001\n`
     const result = checkRequirements(
-      { meta: meta(['编号体系: identity', '需求层: MRD, PRD']), docs: docs(['mrd.md', MRD], ['prd.md', prd]) },
+      { meta: meta(['numbering: identity', 'layers: MRD, PRD']), docs: docs(['mrd.md', MRD], ['prd.md', prd]) },
       { retiredPrefixes: [] },
     )
     expect(result.errors.join(), 'VR-001 不应判退役词').not.toContain('退役词')
@@ -246,7 +252,7 @@ describe('产品类型包覆盖（2026-11-09）', () => {
 
   it('未覆盖前缀仍按默认判红（回归：空数组不是关闭整个词表）', () => {
     const prd = `${PRD}\n- 验证：VR-001\n`
-    const result = checkRequirements({ meta: meta(['编号体系: identity', '需求层: MRD, PRD']), docs: docs(['mrd.md', MRD], ['prd.md', prd]) })
+    const result = checkRequirements({ meta: meta(['numbering: identity', 'layers: MRD, PRD']), docs: docs(['mrd.md', MRD], ['prd.md', prd]) })
     expect(result.errors.join()).toContain('退役词 VR-001')
   })
 })
