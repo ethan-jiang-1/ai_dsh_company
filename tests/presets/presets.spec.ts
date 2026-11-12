@@ -261,7 +261,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     for (const needle of ['role pack', 'CHARTER', '<company-content>/../presets/', 'Output', 'Boundary', 'Brief']) {
       expect(skill, `assembling-the-team 缺角色包要素：${needle}`).toContain(needle)
     }
-    expect(handbookSurface(), '通用协作面必须写 team 角色包').toContain('team 角色包')
+    expect(handbookSurface(), '通用协作面必须写 team 角色包').toMatch(/team role pack/i)
   })
 
   // 负例留证 2026-11-10：BUG-055 —— 修前本条实跑红：角色包没有 `任务书` 字段，`work-handoff`
@@ -277,11 +277,11 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
       .toMatch(/write the brief before spawning|before `spawn_teammate`/i)
     const handoff = readFileSync(join(PACK, 'content/generic/work-handoff.md'), 'utf8')
     expect(handoff, '署名行路径必须从角色包抄，不能写死默认路径')
-      .toMatch(/Brief = <角色包给的任务书路径>|Brief = <任务书路径>/)
+      .toMatch(/Brief = <brief path from the role pack>|Brief = <brief path>/i)
     expect(handoff, '没有任务书文件时显式写无文件，不得编造路径')
       .toContain('Brief = role pack (no file)')
     const collaboration = readFileSync(join(PACK, 'content/generic/collaboration.md'), 'utf8')
-    expect(collaboration, '手册的角色包清单必须含任务书').toMatch(/角色包[\s\S]*任务书/)
+    expect(collaboration, '手册的角色包清单必须含任务书').toMatch(/role pack[\s\S]*brief/i)
   })
 
   it('产物 owner 唯一：编制里查不到 ≠ 换人代行（缺角=补编制/报缺）', () => {
@@ -355,12 +355,12 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     for (const role of ['CEO', 'CFO', 'VP-Sales', 'VP-Eng', 'COO', 'CMO']) {
       expect(handbook, `手册缺 ${role} 的职责边界`).toContain(role)
     }
-    for (const section of ['职责边界', '这事问谁', '冲突与升级', '承诺权', '交付物三态']) {
+    for (const section of ['Role boundaries', 'Who to ask', 'Conflicts and escalation', 'Commitment authority', 'Deliverable states']) {
       expect(handbook, `手册缺「${section}」节`).toContain(section)
     }
     // 路由必须回答高频冲突：数字口径（毛利/成本）与排期/交付日期该找谁
-    expect(handbook).toMatch(/毛利/)
-    expect(handbook).toMatch(/交付日期|排期/)
+    expect(handbook).toMatch(/gross margin/i)
+    expect(handbook).toMatch(/delivery date|schedule/i)
   })
 
   it('渐进式披露：T0 手册只留指针，细则在 generic/ 且被点名', () => {
@@ -374,11 +374,11 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   it('交付物三态（R4）：手册写清成品归 CEO、职能写 drafts；模板不再是占位', () => {
     const handbook = handbookSurface()
     // 三态的字面形状必须与产品内词表一致（src/lib/deliverables-catalog.ts 的 META_TYPES/META_RESULTS）
-    expect(handbook, '三态必须点明成品路径').toContain('deliverables/<日期>-<slug>/final.md')
-    expect(handbook, '三态必须点明过程稿路径').toContain('deliverables/<日期>-<slug>/drafts/<角色>.md')
-    expect(handbook, '必须写明成品只归 CEO').toMatch(/只有 CEO/)
+    expect(handbook, '三态必须点明成品路径').toContain('deliverables/<date>-<slug>/final.md')
+    expect(handbook, '三态必须点明过程稿路径').toContain('deliverables/<date>-<slug>/drafts/<role>.md')
+    expect(handbook, '必须写明成品只归 CEO').toMatch(/Only the CEO/i)
     // 安装后的公司没有维护者仓库：核对入口必须是人/操作员，不是仓库审计脚本（D15 发现权随部署走）
-    expect(handbook, '三态要指向操作员核对入口').toContain('操作员在会话外核对')
+    expect(handbook, '三态要指向操作员核对入口').toContain('operator checks outside the session')
     expect(handbook, '注入内容不得再引用仓库审计脚本').not.toContain('checks/audit/')
 
     const presetGuide = readFileSync(join(ROOT, 'docs/contracts/presets.md'), 'utf8')
@@ -434,7 +434,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(chairing, '必须点破"同批建的还没有 id、不许猜"').toMatch(/do not guess|do not have ids yet/i)
     expect(chairing, '必须区分纸面号与板面 id').toContain('paper numbers')
     const handbook = handbookSurface()
-    expect(handbook, '派活行格式 owner（手册）必须点明 T 号是纸面号').toMatch(/`T<N>` 是纸面号/)
+    expect(handbook, '派活行格式 owner（手册）必须点明 T 号是纸面号').toMatch(/`T<N>`[^\n]*paper number/i)
   })
 
   it('职能 preset 一律指向 drafts/，不许自己写 final.md（成品是对外承诺，归 CEO）', () => {
@@ -468,10 +468,10 @@ describe('组队健壮性三层防御（2026-10-12 用户裁定；issue 2026-10-
   it('B3 · 成员侧打回规范在场（手册：域内核对义务 + 打回三件套 + 不追责）', () => {
     const handbook = handbookSurface()
     expect(handbook, '缺成员「域内核对」义务（收到分派先答：我的域？判据给我了吗？）')
-      .toMatch(/域内核对/)
+      .toMatch(/In-domain check/i)
     expect(handbook, '打回缺三件套形状（为什么不是我 / 缺什么 / 建议谁接）')
-      .toMatch(/建议谁接|为什么不是我/)
-    expect(handbook, '打回缺不追责句（andon：纠错贡献不是冒犯）').toMatch(/不追责|纠错贡献|不是冒犯/)
+      .toMatch(/who should take it|why it is not mine/i)
+    expect(handbook, '打回缺不追责句（andon：纠错贡献不是冒犯）').toMatch(/no blame|correction contribution|not an insult/i)
   })
 })
 
@@ -642,8 +642,8 @@ describe('VP-Eng 组队：根门带小队 + 命名专家（B1）', () => {
 
   it('继承口径分通道：teammate 继承 Lead；命名 child 由 agentPreset 给组合', () => {
     const handbook = handbookSurface()
-    expect(handbook, '手册必须写 teammate 继承 Lead 组合').toMatch(/teammate[^\n]*继承[^\n]*组合|继承[^\n]*Lead[^\n]*组合/)
-    expect(handbook, '手册必须写命名 child 按自己的 preset 组合').toMatch(/命名[^\n]*child[^\n]*(agentPreset|preset)/)
+    expect(handbook, '手册必须写 teammate 继承 Lead 组合').toMatch(/teammate[^\n]*inherits[^\n]*composition|inherits[^\n]*Lead[^\n]*composition/i)
+    expect(handbook, '手册必须写命名 child 按自己的 preset 组合').toMatch(/named child[^\n]*(agentPreset|preset)/i)
     const delegation = readFileSync(join(ROOT, 'docs/contracts/delegation.md'), 'utf8')
     expect(delegation, 'delegation.md 必须写根会话 = Team Lead').toMatch(/根会话[^\n]*Lead|Lead[^\n]*根会话/)
   })

@@ -1,20 +1,20 @@
-# 职责边界与承诺权
+# Role boundaries and commitment authority
 
-> 层：通用 · 加载：按需（T2）
+> Layer: generic · Load: on demand (T2)
 
-## 职责边界（谁管什么、谁签字、谁不碰）
+## Role boundaries (who owns what, who signs, who does not touch)
 
-| 角色 | 管（有决定权） | 签字线 / veto | 不碰（越权禁止） |
+| Role | Owns (decision authority) | Sign-off line / veto | Does not touch (no crossing) |
 |---|---|---|---|
-| **CEO** | 立项与砍项、优先级、资源总量、对外承诺与发布、收口合稿 | 只有 CEO 能说"这家公司不做了"；对外口径以 CEO 为准 | 不代笔技术 / 市场 / 交付 / 财务正文 |
-| **CFO** | 现金、成本、毛利口径、付款与发票、账务与税务合规 | 签字线（毛利/折扣）与预算会签线见 `.dsh-company/kb/policy-lines.md`——报价、折扣、新增固定支出前必读，本手册不复述数值；现金流撑不住即 veto | 不定市场判断、不承诺交付日期、不拍技术方案 |
-| **CMO** | 市场机会、新产品定义、MRD、买点判断 | "市场不成立"（无可验证需求 / 无清晰买单人 / 竞品把价值打平）即 veto | 不定现有客户与定价（归 VP-Sales）、不拍技术方案（归 VP-Eng）、不承诺交付日期 |
-| **VP-Sales** | 现有客户、销售、定价建议、商机取舍、客户沟通口径 | "没人买"（需求不成立 / 商机不成熟）即 veto；定价不得低于 CFO 毛利底线 | 不替 CMO 定义新产品/写 MRD、不承诺交付时间（归 COO）、不承诺功能（归 VP-Eng）、不替财务定毛利 |
-| **VP-Eng** | 技术选型、架构与可行性、技术风险、研发内部排期、**PRD 主笔**（接 CMO 的 MRD） | 技术不可行 / 成本失控 / 风险不可接受即 veto | 不定市场与定价、不承诺客户交付日期、不替财务 / 运营下结论 |
-| **COO** | 交付承接与排期、人力与流程、SLA 与维护承诺、运营预算核查 | 人力撑不住 / 流程没有 / 合规过不去即 veto；并行上限见 `.dsh-company/kb/policy-lines.md`，超出即"接不住" | 不拍技术方案、不定市场判断、不签毛利与付款 |
+| **CEO** | Initiation and cancellation, priority, total resources, external commitments and release, final merge | Only the CEO can say "this company will not do it"; external wording follows the CEO | Does not ghost-write technical / market / delivery / finance body text |
+| **CFO** | Cash, cost, gross-margin basis, payment and invoicing, accounting and tax compliance | Sign-off lines (gross margin/discount) and budget co-sign lines: see `.dsh-company/kb/policy-lines.md` — read before quoting, discounting, or adding fixed spend; this handbook does not restate the numbers; veto when cash flow cannot carry it | Does not decide market judgment, promise delivery dates, or decide technical solutions |
+| **CMO** | Market opportunity, new product definition, MRD, buying-point judgment | Veto when "the market does not hold" (no verifiable demand / no clear economic buyer / competitors flatten the value) | Does not decide existing customers or pricing (VP-Sales), technical solutions (VP-Eng), or delivery dates |
+| **VP-Sales** | Existing customers, sales, pricing recommendations, opportunity trade-offs, customer communication | Veto when "no one will buy" (demand does not hold / opportunity immature); pricing may not go below the CFO's gross-margin floor | Does not define new products or write MRDs for CMO, promise delivery time (COO), promise features (VP-Eng), or set gross margin for finance |
+| **VP-Eng** | Technology selection, architecture and feasibility, technical risk, engineering schedule, **PRD lead** (from CMO's MRD) | Veto when technically infeasible / cost out of control / risk unacceptable | Does not decide market or pricing, promise customer delivery dates, or conclude for finance / operations |
+| **COO** | Delivery acceptance and schedule, staffing and process, SLA and maintenance commitments, operations budget review | Veto when staffing cannot hold / no process / compliance cannot pass; parallel limit in `.dsh-company/kb/policy-lines.md`; above it = "cannot carry" | Does not decide technical solutions, market judgment, or sign gross margin and payment |
 
-## 承诺权（谁能对外）
+## Commitment authority (who can speak externally)
 
-- 只有 **CEO** 能对外发布结论、承诺整体交付；任何对外文本在 CEO `present` 之前都只是草稿。
-- 交付日期 **COO** 给；功能范围 **VP-Eng** 给；价格 **VP-Sales** 提、**CFO** 签毛利线；
-  合同与付款条款 = **CFO** + CEO 线商务 / 法务。
+- Only the **CEO** can publish conclusions externally and commit overall delivery; any external text is a draft until the CEO `present`s it.
+- Delivery dates come from **COO**; feature scope from **VP-Eng**; price is proposed by **VP-Sales** and the gross-margin line is signed by **CFO**;
+  contract and payment terms = **CFO** + CEO-line commercial / legal.

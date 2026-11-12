@@ -1,50 +1,50 @@
-# 人机接口
+# Human interface
 
-> 层：通用 · 加载：按需（T2）
+> Layer: generic · Load: on demand (T2)
 
-## 人机接口（四类：要审批 / 要资料 / 要建议 / 规矩不知道）
+## Human interface (four kinds: approval / material / advice / unknown rules)
 
-路由与权限按 `.dsh-company/kb/owners.md` 授权面；机制层未到位期间按本节**退化形状**执行。
+Routing and authority follow `.dsh-company/kb/owners.md`; while the mechanism layer is not in place, use this section's **degraded shape**.
 
-### 「待办」= 人的唯一收件箱（宪章级）
+### "Inbox" = the human's only inbox (charter-level)
 
-**定义**：数字分身能做的都自己做；**做不了的、不该替你做的**——要你批、要你给料、要你的判断、要你立规矩——
-**全都收在「待办」面板里等你**。面板四格 = **待批审批** / **待答问询**（要资料·要建议·规矩不知道）/ **升级待处理** / **完成通知**（`present` 落稿，是告知）。
+**Definition**: the digital double does everything it can itself; **what it cannot do, or should not do for you** — needs your approval, your material, your judgment, or your rule —
+**all land in the "Inbox" panel and wait for you**. The panel has four sections: **approval pending** / **question pending** (material · advice · unknown rule) / **escalation pending** / **completion notice** (`present` lands the final; that is informational).
 
-对分身的硬要求：
-1. **只在真需要人时拉人**——一事一卡、同一批内容不追问、非阻塞项不拦人；
-2. **把上下文备到人能一眼决定**——给结论与算式；
-3. **阻塞型 fail-closed**（不批不做，写「未决项」）；**非阻塞型带显式默认假设继续**并标「待人确认」；
-4. **不假装人答过**——没回就是没回；
-5. 人做完机器做不了的事**在会话里说一声即算收到**。
+Hard requirements for the double:
+1. **Pull a human only when truly needed** — one card per matter, do not re-ask the same batch, do not block a human with non-blocking items;
+2. **Prepare context so the human can decide at a glance** — give the conclusion and the formula;
+3. **Blocking = fail-closed** (no approval, no action; write "open item"); **non-blocking = continue with an explicit default assumption** and mark "to confirm";
+4. **Never pretend the human answered** — no reply means no reply;
+5. When the human does what the machine cannot, **saying so in the session counts as received**.
 
-**它只在一个地方兑现**：人坐在台面前、页面开着——卡是实时事件，**刷新即丢** ⇒ 人不在时你要的东西必须写进稿件「待人确认」。"谁的门上弹卡"是原生行为（面板按发起会话作用域）⇒ 人各钉自己角色的会话。
+**It is honored in exactly one place**: the human sits at the desk with the page open — cards are live events, **lost on refresh** ⇒ when the human is away, what you need must be written into the draft as "to confirm". "Whose gate a card pops on" is native behavior (the panel is scoped to the originating session) ⇒ each person pins their own role's session.
 
-### 审批三档
+### Three approval tiers
 
-> **机制事实**：**被委派的成员会话不能发起人机审批**——成员发起的 `request_signoff` / 问询自动被拒，人看不到
-> ⇒ 成员触线一律升级 CEO；⚠ 但多人模式你自己开的门是根会话，**该由它自己发起**。
-| 档 | 范围 | 形状 |
+> **Mechanism fact**: **a delegated member session cannot raise human approval** — a member's `request_signoff` / question is auto-rejected and the human does not see it
+> ⇒ a member hitting a line always escalates to the CEO; ⚠ but in multi-person mode the gate you opened yourself is the root session, **and it should raise it itself**.
+| Tier | Scope | Shape |
 |---|---|---|
-| **必批** | **走 `request_signoff` 的只有两条报价线**（毛利/折扣，数值唯一见 `.dsh-company/kb/policy-lines.md`；CFO+CEO 双签；**新签字线只有人能立**）。⚠ 预算侧固定支出会签线同见 policy-lines，是**文件层会签**，不发起 `request_signoff`。⚠ 多人模式双签：`request_signoff` 按发起会话路由 ⇒ 发起人发卡后在稿件标注「待 CEO 门补签」，CEO 门在同件上文件层具名，**两签齐才算完整**（BUG-005） | `request_signoff`（一次性、轮内有效、无应答 fail-closed）+ 文件层补签 |
-| **可事后告知** | 凡能变成**可回滚产出**的动作（稿件 / drafts / 清单）：先做、写进稿件与 journal，收尾时报告 | 事后审：可追溯、可撤回 |
-| **自主** | 其余运营决定（各自 CHARTER 边界内） | 直接做 |
+| **Must approve** | **Only two quotation lines go through `request_signoff`** (gross margin/discount; the numbers' single home is `.dsh-company/kb/policy-lines.md`; CFO+CEO double sign; **only a human can set a new sign-off line**). ⚠ The budget-side fixed-spend co-sign line is also in policy-lines; it is a **file-layer co-sign**, not `request_signoff`. ⚠ Multi-person double sign: `request_signoff` routes by the originating session ⇒ the initiator sends the card and marks the draft "awaiting the CEO gate", the CEO gate signs the same item at the file layer; **both signatures are required** (BUG-005) | `request_signoff` (one-shot, valid within the round, fail-closed on no reply) + file-layer co-sign |
+| **May inform after** | Any action that produces a **reversible artifact** (draft / drafts / list): do it first, write it into the draft and journal, report at close-out | after-the-fact review: traceable, revocable |
+| **Autonomous** | Other operational decisions (within each CHARTER's boundary) | do it directly |
 
-- **签字三判**：① **对客让利单闸门**——信用/减免/免费期/折扣一律按**等价折扣率**并折扣线判（两线并存即走松者绕双签），CFO 单方「减免线」作废；② **双签不得同源**——发起人不得为签署人之一，两签各自独立复核且记**复核证据类型**；③ **成本四格 assembler = CFO**，季度首周到期，**逾期 fail-closed**。
+- **Three sign-off judgments**: ① **one gate for customer concessions** — credit/waiver/free period/discount all use the **equivalent discount rate** and the discount line (two lines coexisting means the looser one bypasses double sign); the CFO's unilateral "waiver line" is void; ② **double sign must not be same-source** — the initiator may not be one of the signers; both signatures independently review and record the **evidence type**; ③ **cost four-cell assembler = CFO**, due the first week of the quarter, **overdue fail-closed**.
 
-### 规矩缺口（手册 / CHARTER / skill 都没覆盖时）
-1. 按 `.dsh-company/kb/owners.md` 授权面问人；2. **裁决回流**：人的答案改手册 / CHARTER / owners.md（先搜既有 owner，避免两份规矩）；3. journal 留痕。
-**同类事项第二次出现前规矩必须已回流**——批准即立法，不重复问。
+### Rule gaps (when handbook / CHARTER / skill does not cover it)
+1. Ask a human per the authority surface in `.dsh-company/kb/owners.md`; 2. **ruling flows back**: the human's answer changes the handbook / CHARTER / owners.md (search the existing owner first to avoid two rule homes); 3. journal it.
+**Before the same kind of matter appears a second time, the rule must have flowed back** — approval is legislation; do not ask again.
 
-### 不在场分档（人没回时）
-- 阻塞型 fail-closed（不批不做，写「未决项」）；非阻塞型带显式默认假设继续并标「待人确认」；人没回来**不假装已答复**。
+### Absence tiers (when the human has not replied)
+- Blocking = fail-closed (no approval, no action; write "open item"); non-blocking = continue with an explicit default assumption and mark "to confirm"; if the human does not return, **do not pretend they answered**.
 
-### 退化形状（机制层未到位期间）
-- **补料**：人把文件写进共享盘 + 在会话里说一声路径；agent 读到即算收到。**建议**：人在会话内直接答复——建议是输入，不授予落稿权。**审批**：现有 `request_signoff`。**路由**：按 `.dsh-company/kb/owners.md`（各人只答自己角色的问询）。
+### Degraded shape (while the mechanism layer is not in place)
+- **Material**: the human writes the file to the shared disk + says the path in the session; the agent reading it counts as received. **Advice**: the human answers in-session — advice is input, it does not grant the right to land a final. **Approval**: existing `request_signoff`. **Routing**: per `.dsh-company/kb/owners.md` (each person answers only their own role's questions).
 
-**赞/踩**：人在会话里对你的回复点赞/点踩 = 轻量反馈——当轮收工记进 journal 在场盘点（改表达不改结论）。
+**Up/down votes**: a human upvoting/downvoting your reply in-session = lightweight feedback — record it in the journal's presence inventory at close-out (changes expression, not conclusions).
 
-### 问询节流
-把人叫来问，**越少越好、越准越好**。
-- **同批内容不许追问**（首要）：人已表态而内容没到 ⇒ 按缺料出稿，把「未落实」写进未决项；
-- **一张卡只放同一性质的决定**（补料/建议/规矩缺口/数字澄清不混）；**非阻塞项不拦人**——能带默认假设继续的先继续，只有阻塞项才值得把人叫来。
+### Question throttling
+Pulling a human in to ask should be **as rare and as precise as possible**.
+- **Do not re-ask the same batch** (first): if the human has responded but the material has not arrived ⇒ produce the draft with the gap, and write "not implemented" into open items;
+- **one card carries one kind of decision** (material/advice/rule gap/number clarification do not mix); **do not block a human with non-blocking items** — continue with a default assumption where possible; only blocking items deserve pulling the human in.

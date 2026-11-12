@@ -1,32 +1,32 @@
-# 协作规矩
+# Collaboration rules
 
-> 层：通用 · 加载：按需（T2）
+> Layer: generic · Load: on demand (T2)
 
-## 协作规矩
+## Collaboration rules
 
-- **动议从 CEO 进出**：CEO 是唯一入口与出口；其他成员不越过 CEO 对外交付。
-- **组合继承（机制事实，分两通道）**：`spawn_teammate` 出来的 teammate **继承 Lead 的组合**——工具与 skills 面是
-  Lead preset 的，**不是你角色 preset 的**；身份来自成员名与任务书，方法论从自己的 CHARTER / KB 读，**别假设角色 skill 能加载**。
-- **team 角色包（补丁，不是机制）**：spawn 承担职能角色时，任务书带**角色包**——角色名 / **任务书路径** /
-  CHARTER / `<company-content>/../presets/<role>/skills/<skill>/SKILL.md` / KB / 产出 / 边界；成员先 `read`
-  这些文件再干，不要因为 `skill` 加载不到角色 skill 就跳过。角色包是任务书约定，不改变“成员继承 Lead 组合”的机制事实。
-- **命名 child 有自己的 preset（机制事实）**：`vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo` 由
-  `agentPreset` 给组合——child 拿到的是**该角色的 skills 与工具面**，能加载自己的角色 skill；根会话是 Team Lead，
-  可在自己的门里 `spawn_teammate` 带小队；多人模式下你的门是根会话、挂你自己的 preset（组合以本会话实际加载为准）。
-- **多人模式（开场由人声明「这场是多人模式」时启用）**：别的角色的活由那个人在他自己的会话里干——CEO **不要 spawn 成员代劳**，
-  改把**任务书**落 `.dsh-company/deliverables/<日期>-<slug>/drafts/ceo.md`（= CEO 自己的过程稿，含机器可读ASSIGN 行）；各角色的人**在自己的根会话**里读它、
-  出 `drafts/<角色>.md`，合稿仍归 CEO；**没声明就是单操作者模式**。细则见本节；人侧归属 = `.dsh-company/kb/owners.md`。
-- **写盘守卫（机制事实）**：先读再写——**盲写既有文件会被拒**；读后文件被旁人改过再写也拒（重读即可）。守卫按会话记账、**进程重启即清零**；它管新鲜度**不管独占**——要占坑就开场先落 `drafts/<角色>.md`，**首行一字不差写「claim=acknowledged, not a draft」**（机器可查）；**占位后必须重读同组对手文件**再定持认或让位；**让位时把首行改写为「yield=claim withdrawn, not a draft」**（持认判定 = 占位 ∧ ¬让位）。
-- **动议任务板**：单操作者模式下任务先落任务板再动笔——成员**先认领后写**（认领失败让位：不写该任务 owner-bound 产物，回报 lead 后转干别的）；owner-bound 产物仅 owner 或显式改派者可覆盖，共享产物需显式授权；写完**完成任务**并 journal 回执。路径重叠的警告由 CEO 就近协调（协调靠警告不靠锁）。**写共享盘的 DSH 进程保持一个**（多实例互踩实测在案）。
-- **事实阻塞纪律**：任务的事实前提需要外部材料时——**卡壳必跳出**：穷尽通道（打法 = CEO skill「fact-finding-playbook」）仍拿不到，立刻让 CEO 知道你卡在哪，**静默卡死 = 违纪**；依赖外部事实的任务ASSIGN 行状态写 **`pending-sources`**（机器可查枚举，**它与其依赖链一律不许标「完成」**）。补料落 `.dsh-company/deliverables/<日期>-<slug>/drafts/sources/`，落盘即算收到。
-- **问人两条路**：动议中被委派的成员有疑问用 `send_message` 升级 CEO（带[NEEDS-CLARIFICATION]前缀），成员**不直接问用户**；
-  **独立会话**（对方直接开你的会话、无动议上下文）可直接 `ask_user_question`。⚠ **多人模式下这条要反着用**：
-  你自己那扇门就是根会话 ⇒ 撞线/要资料时**由你自己发起**（`request_signoff` / `ask_user_question`），**不要"升级给 CEO"**。分水岭 = 会话有无 `parent`（被委派 ⇒ 必被拒；自己的门 ⇒ 能用）。
-- **域内核对与打回**：收到分派先问两件事——这在我的域内吗（对照「不碰」列与路由表）？判据给我了吗？
-  **整任务错配 ⇒ 打回**：`send_message` 给 CEO（带[NEEDS-CLARIFICATION]）三件套——**为什么不是我 + 缺什么 + 建议谁接**，
-  已认领的同时释放任务。**打回是纠错贡献，不是冒犯，不追责**（CEO 必须三选一响应：回收重派 / 收窄范围 / 补齐判据）。
-  **半域任务不打回**：执行域内部分，域外部分标「待确认」并在回报里点名。
-- **单一 owner**：每个任务只有一个负责人、有可验收的产出；稿子由 owner 出，CEO 只合成、不代笔。**分歧保留**：结论与分歧点都写进交付物。
-- **星型汇报 + 域内尊重**：成员一切沟通经 CEO、成员间不横向（**设计如此**）；收口时两造数字/判读不一致，CEO **先开对账回合再裁决**（程序 = chairing skill），final 须记"为什么没对账"。**域内判读以该域 owner 为准**——CEO 的裁决权用于跨域取舍与承诺面，压过域内意见须在 final 写明理由；角色的活由该角色会话做，CEO 不代劳；派活不过度预灌结论。
-- **互审稿命名**：评审稿落 `.dsh-company/deliverables/<日期>-<slug>/drafts/<角色>-review.md`（一角色一稿）。
-- **复核独立性分层**：复核措辞分**机械全量重算**（独立性成立）与**判断类复核**（同模异线程 ⇒ 独立性有限），不说笼统"异人复核"；关键因果结论旁标**边际宽度**（差几格翻面）。
+- **A motion enters and exits through the CEO**: only the CEO; other members do not deliver externally past the CEO.
+- **Composition inheritance (mechanism fact, two channels)**: a teammate from `spawn_teammate` **inherits the Lead's composition** — its tools and skills surface is
+  the Lead preset's, **not your role preset's**; use your own CHARTER / KB for method; **do not assume role skills load**.
+- **Team role pack (a brief convention, not a mechanism)**: when a spawn takes a functional role, the brief carries a **role pack** — role name / **brief path** /
+  CHARTER / `<company-content>/../presets/<role>/skills/<skill>/SKILL.md` / KB / output / boundary; the member `read`s
+  these files first; do not skip because `skill` cannot load role skills.
+- **A named child has its own preset (mechanism fact)**: `vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo` get their composition from
+  `agentPreset` — the child gets **that role's skills and tools** and can load its role skills; the root session is Team Lead,
+  and can `spawn_teammate` a squad in its own gate.
+- **Multi-person mode (enabled when a human declares "this is multi-person mode" at the start)**: another role's work is done by that person in their own session — the CEO **does not spawn members to do it**;
+  instead put the **brief** at `.dsh-company/deliverables/<date>-<slug>/drafts/ceo.md` (the CEO's own draft, with machine-readable ASSIGN lines); each role's person **in their own root session** reads it and
+  produces `drafts/<role>.md`; merging still belongs to the CEO; **without that declaration it is single-operator mode**. Details in this section; human-side ownership = `.dsh-company/kb/owners.md`.
+- **Write guard (mechanism fact)**: read before write — **blind-writing an existing file is rejected**; writing after someone else changed it is also rejected (re-read and retry). The guard is per session and **resets on restart**; it governs freshness, **not exclusivity** — to claim a slot, at the start drop `drafts/<role>.md` with **first line exactly `claim=acknowledged, not a draft`** (machine-checkable); **after claiming, re-read the other files in the same group** before deciding to hold or yield; to yield, rewrite the first line as `yield=claim withdrawn, not a draft` (holding = claim ∧ ¬yield).
+- **Motion task board**: in single-operator mode, land tasks on the board before writing — members **claim before writing** (claim failure = yield: do not write the task's owner-bound artifact, report to the lead, then move on); owner-bound artifacts may be overwritten only by the owner or an explicit reassignment; shared artifacts need explicit authorization; when done, **complete the task** and journal the receipt. **Keep one DSH process writing the shared disk** (multiple instances stepping on each other is a recorded case).
+- **Fact-blocking discipline**: when a task's factual premise needs external material — **a block must surface**: exhaust the channel (play = CEO skill `fact-finding-playbook`) and if still unavailable, immediately tell the CEO where you are stuck; **silent blocking = violation**; the task's ASSIGN status is **`pending-sources`** (machine-checkable enum; **it and its dependency chain may not be marked "done"**). Put material at `.dsh-company/deliverables/<date>-<slug>/drafts/sources/`; landing on disk counts as received.
+- **Two ways to ask a human**: a delegated member with a question uses `send_message` to escalate to the CEO (prefix `[NEEDS-CLARIFICATION]`); members **do not ask the user directly**;
+  an **independent session** (the other person opens your session directly, no motion context) may use `ask_user_question`. ⚠ **In multi-person mode this reverses**:
+  your gate is the root session ⇒ when hitting a line or needing material, **you raise it yourself** (`request_signoff` / `ask_user_question`), **do not "escalate to the CEO"**. The divide = whether the session has a `parent` (delegated ⇒ automatically rejected; your own gate ⇒ allowed).
+- **In-domain check and bounce-back**: on receiving a dispatch, ask two things — is this in my domain (against the "does not touch" column and routing table)? did I get acceptance criteria?
+  **Whole-task mismatch ⇒ bounce back**: `send_message` to the CEO (with `[NEEDS-CLARIFICATION]`) with three things — **why it is not mine + what is missing + who should take it**;
+  release the claimed task at the same time. **Bounce-back is a correction contribution, not an insult; no blame** (the CEO must respond with one of three: reclaim and reassign / narrow scope / supply criteria).
+  **A half-domain task is not bounced**: do the in-domain part, mark the out-of-domain part "to confirm", and name it in the report.
+- **Single owner**: every task has one owner and an acceptable output; the owner produces the draft, the CEO only merges and does not ghost-write. **Keep disagreement**: conclusions and disagreements both go into the deliverable.
+- **Star reporting + in-domain respect**: all member communication goes through the CEO; members do not go sideways (**by design**); if the two sides' numbers/readings disagree at close-out, the CEO **opens a reconciliation round before deciding** (procedure = chairing skill); final must note "why reconciliation did not happen". **In-domain judgment belongs to that domain's owner** — the CEO's decision authority is for cross-domain trade-offs and commitments; overriding an in-domain opinion must be justified in final; a role's work is done in that role's session, the CEO does not do it; do not over-preload conclusions when dispatching.
+- **Review draft naming**: review drafts go to `.dsh-company/deliverables/<date>-<slug>/drafts/<role>-review.md` (one per role).
+- **Review independence levels**: distinguish **mechanical full recompute** (independent) from **judgment review** (same model, different thread ⇒ limited independence); never say a blanket "different-person review"; mark **margin width** next to key causal conclusions (how many cells flip it).

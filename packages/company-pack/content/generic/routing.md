@@ -1,25 +1,25 @@
-# 路由与冲突升级
+# Routing and escalation
 
-> 层：通用 · 加载：按需（T2）
+> Layer: generic · Load: on demand (T2)
 
-## 这事问谁（路由表）
+## Who to ask (routing table)
 
-| 问题类型 | 找谁 |
+| Question type | Ask |
 |---|---|
-| 要不要做、优先级、对外怎么说、最终收口 | **CEO** |
-| 这单赚不赚钱、毛利够不够、能不能付款 / 开票、税务与合规 | **CFO** |
-| 该不该做新产品、市场机会在哪、为谁做、凭什么赢（MRD） | **CMO** |
-| 现有客户买不买、卖多少钱、竞品与客户怎么想、商机熟不熟 | **VP-Sales** |
-| 做不做得出、选什么技术、有什么风险、要多少人天、PRD 怎么写 | **VP-Eng** |
-| 接不接得住、什么时候交付、人力够不够、流程怎么走、维护怎么响应 | **COO** |
-| 合同条款与法务口径 | **CEO**（可指派商务 / 法务） |
-| 数据与信息安全 | **VP-Eng**（技术）+ **CFO**（合规闸门） |
+| Whether to do it, priority, external wording, final close-out | **CEO** |
+| Whether this deal makes money, gross margin, payment/invoicing, tax and compliance | **CFO** |
+| Whether to build a new product, where the market opportunity is, for whom, why we win (MRD) | **CMO** |
+| Whether existing customers will buy, price, competitors/customers, opportunity maturity | **VP-Sales** |
+| Whether we can build it, which technology, risks, person-days, how to write the PRD | **VP-Eng** |
+| Whether operations can carry it, when to deliver, staffing, process, maintenance response | **COO** |
+| Contract terms and legal wording | **CEO** (may assign commercial / legal) |
+| Data and information security | **VP-Eng** (technical) + **CFO** (compliance gate) |
 
-**路由规矩**：跨职能的事找 owner 要结论；owner 给不了就升级 CEO。结论必须署自己职能的名字
-（"我以销售职能判断…"），**不得替别人签字**；引用别人的结论要带出处，**出处核不到的明标「未核实」——引用与核实是两件事，不冒充已核实**。
+**Routing rule**: for cross-functional matters, ask the owner for a conclusion; if the owner cannot decide, escalate to the CEO. A conclusion must carry the name of the function that owns it
+("I judge this as the sales function…"); **never sign for someone else**; cite the source when quoting another's conclusion, and **mark "unverified" when the source cannot be checked — quoting and verifying are two different things; do not pretend something is verified**.
 
-## 冲突与升级
+## Conflicts and escalation
 
-- 职能之间意见冲突 → **CEO 拍板**（分歧保留，写进交付物，不抹平）。
-- 数字口径冲突（成本 / 毛利 / 人天）→ 以 **CFO 口径**为准；排期与承接 → **COO**；客户 / 市场事实 → **VP-Sales 的 KB 出处**；技术事实 → **VP-Eng 的 KB 出处**。
-- 升级必须带证据：结论 + 依据（文件 / 数字 / 算式）+ 你要对方做的决定。
+- Disagreement between functions → **the CEO decides** (keep the disagreement, write it into the deliverable, do not flatten it).
+- Conflicting numbers (cost / gross margin / person-days) → **CFO's basis** wins; schedule and delivery commitments → **COO**; customer/market facts → **VP-Sales's KB source**; technical facts → **VP-Eng's KB source**.
+- Escalation must carry evidence: conclusion + basis (file / number / formula) + the decision you need from the other party.

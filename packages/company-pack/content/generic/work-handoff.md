@@ -1,14 +1,14 @@
-# ASSIGN / 署名 / 收工口径
+# ASSIGN / signature / close-out rules
 
-> 层：通用 · 加载：按需（T2）
+> Layer: generic · Load: on demand (T2)
 
-- **ASSIGN 行（多人模式任务书）**：CEO 在 `drafts/ceo.md` 每任务一行 `ASSIGN｜T1｜<角色>｜<一句话>｜deps: <T号或none>｜status: todo`（状态枚举 = todo/drafted/done/cancelled/pending-sources；**`T<N>` 是纸面号**——板面 id 是板子发号的 `task-N`，依赖落板前先换号；未经证实的猜测行尾加 `｜assumption: <待证/内容>`）。没写 ASSIGN 行的任务书，成员凭盘面推活会漏报。
-- **指令与假设分离**：任务书里未经证实的因果猜测**要么标「待证」要么不发**；发现自己指令有错，立即补正。
-- **收工留痕**：向 `.dsh-company/kb/<你的角色>/journal/` 追加纪要（日期 + 结论 + 未决）。
-- **稿首署名行**：你出的每份稿，稿首引用行写
-  `By: <角色>｜Version v<N>｜Brief = <角色包给的任务书路径>`（操作员在收口时核对署名行与任务书）。
-  **路径只从任务书/角色包抄，不得按默认模板编造**；任务书确实是口头/角色包而没有文件时，写
-  `Brief = role pack (no file)`。返工换版本号并知会合稿人。
-- **日期口径**：**日期以注入的当前时间写真日期**——不许凭记忆猜、不许拿既有 journal 日期"取次日"（实测连锁漂过三代）。
-  注入缺失时 fail-closed：文件名与首行占位 `date-pending`（`.dsh-company/kb/<角色>/journal/date-pending-<slug>.md`），收工回报点名"日期待回填"。**宁缺勿错**。
-- **轮末收敛**：`journal/` 只保留**当前轮**（CHARTER 是长期摘要，journal 是当轮细节）；**只由人做，分身不删改自己的记忆**；程序 = 操作员在会话外执行：摘要进 CHARTER、清空 live journal；本手册不复述。
+- **ASSIGN line (multi-person brief)**: in `drafts/ceo.md`, the CEO writes one line per task: `ASSIGN｜T1｜<role>｜<one-line>｜deps: <T# or none>｜status: todo` (status enum = todo/drafted/done/cancelled/pending-sources; **`T<N>` is a paper number** — the board id is the board-assigned `task-N`; replace the paper number before landing dependencies; add `｜assumption: <to-verify/content>` to an unproven guess). A brief without ASSIGN lines lets members infer work from the disk and miss items.
+- **Separate instruction from assumption**: an unproven causal guess in a brief is **either labeled "to verify" or not sent**; if you find your instruction is wrong, correct it immediately.
+- **Close-out trail**: append minutes to `.dsh-company/kb/<your role>/journal/` (date + conclusion + open items).
+- **Signature line at the top of every draft**:
+  `By: <role>｜Version v<N>｜Brief = <brief path from the role pack>` (the operator checks the signature against the brief at close-out).
+  **Copy the path from the brief/role pack; never invent the default template path**; when the brief is truly verbal/role-pack only and there is no file, write
+  `Brief = role pack (no file)`. On rework, bump the version and tell the merger.
+- **Date basis**: **write the real date from the injected current time** — do not guess from memory, do not take "the next day" from an existing journal date (a real chain drifted across three generations).
+  If injection is missing, fail-closed: use the `date-pending` placeholder in the filename and first line (`.dsh-company/kb/<role>/journal/date-pending-<slug>.md`), and name "date to backfill" in the close-out report. **Better missing than wrong.**
+- **End-of-round convergence**: `journal/` keeps only the **current round** (CHARTER is the long-term summary; journal is this round's detail); **only a human does it; the double never deletes or edits its own memory**; procedure = the operator runs it outside the session: summary into CHARTER, clear the live journal; this handbook does not restate it.

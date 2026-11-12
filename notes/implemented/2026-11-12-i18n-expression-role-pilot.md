@@ -274,6 +274,13 @@
 - CULTIVATION_SCOPE、附加记录前缀、用户问题 marker 改英文；stripScope 同步。
 - 测试夹具同步；client 381 tests；金样 ALL PASS；全量 1656 tests，verify ALL PASS。
 
+## P1 第一片（content/generic）
+
+- generic 6/6 英文；heading 与手册断言同步英文。
+- 新增 tests/content/generic-english.spec.ts；注入中文 → 红，还原 → 绿。
+- collaboration 英文膨胀超 T2 6KB，压缩到 6141B；content-manifest 仍过。
+- 全量 1657 tests；preset-smoke ALL PASS；verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
