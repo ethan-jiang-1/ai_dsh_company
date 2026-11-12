@@ -33,13 +33,22 @@ const toolCallEvent = (name: string, argumentsJson: string | undefined, time = 1
 })
 
 describe('streamAttention · 升级待处理', () => {
-  it('只折带【待澄清】前缀的消息，摘要去掉标记', () => {
+  it('只折带 canonical 升级标记的消息，摘要去掉标记', () => {
     const items = streamAttention([
       messageEvent('vp-eng', `${ESCALATION_MARK}现场支持谁顶？`),
       messageEvent('vp-sales', '客户没有异议'),
     ], 'lead-1', 'CEO')
     expect(items).toHaveLength(1)
     expect(items[0]).toMatchObject({ kind: 'escalation', who: 'vp-eng', what: '现场支持谁顶？', jumpTo: 'lead-1' })
+  })
+
+  it('canonical 升级标记是 [NEEDS-CLARIFICATION]，字面量可直接折', () => {
+    expect(ESCALATION_MARK).toBe('[NEEDS-CLARIFICATION]')
+    const items = streamAttention([
+      messageEvent('vp-eng', '[NEEDS-CLARIFICATION]现场支持谁顶？'),
+    ], 'lead-1', 'CEO')
+    expect(items).toHaveLength(1)
+    expect(items[0]).toMatchObject({ kind: 'escalation', what: '现场支持谁顶？' })
   })
 
   it('多行消息取首行；空升级消息给（空）占位', () => {

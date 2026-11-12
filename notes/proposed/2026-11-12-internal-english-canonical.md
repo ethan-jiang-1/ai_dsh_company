@@ -149,8 +149,9 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 - `req-command` / `delivery-command` / bootstrap 解析器只认英文 canonical；旧中文字段不再解析。
 - 测试：中文-only `产品类型:` 回落 company 默认（红→绿），中文-only `交付模式:` 回落 productized（红→绿）；`delivery-mode-sources` 门禁改查 `deliveryMode:`，把模板改回中文 → 红，还原 → 绿。
 - `presets.spec` / `product-type-coverage` / `requirements-contract` 的字段断言同步。
+- `【待澄清】` → `[NEEDS-CLARIFICATION]`：`attention.ts` `ESCALATION_MARK`、AttentionTab 注释、generic collaboration、assembling 词面同步；attention spec 用字面量验证，改回中文 → 红，还原 → 绿。
 
-**剩余 I1b**：派活行与状态枚举、`待补料` schedule 锚、`【待澄清】`、`日期待核`、`【事实】/【假设】`。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
+**剩余 I1b**：派活行与状态枚举、`待补料` schedule 锚、`日期待核`、`【事实】/【假设】`。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 

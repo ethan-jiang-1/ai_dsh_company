@@ -6,7 +6,7 @@
  *   （待批审批）——由 client 入口的**观察者监听器**登记 / 销账（waterfall 委托、不拦截应答；
  *   机制同款 vendor `ui-approval` / `ui-user-questions` 的 `ctx.remote.$on`）。切片二落地前
  *   审批源不会触发（无工具请求审批），管线先行。
- * - **lead 会话事件流**（`session/follow`）：`tool/call`(present)（完成通知）与含【待澄清】
+ * - **lead 会话事件流**（`session/follow`）：`tool/call`(present)（完成通知）与含[NEEDS-CLARIFICATION]
  *   前缀的 `team/message/queued`（升级待处理 = 问询切片三甲的中继链显性化）。
  *
  * 纯函数、只依赖文本工具；wire 形状 → 领域形状，UI 只消费 {@link AttentionItem}。
@@ -50,7 +50,7 @@ export type AttentionEventLike =
   | { type: string; time: number; data: unknown }
 
 /** 升级消息的标记约定（切片三甲；VP skill 侧将配合输出此前缀——内容步随培养节奏落）。 */
-export const ESCALATION_MARK = '【待澄清】'
+export const ESCALATION_MARK = '[NEEDS-CLARIFICATION]'
 
 /** present 工具的 wire 名（vendor `packages/fs/tool-present/src/index.ts` `name: 'present'`）。 */
 export const PRESENT_TOOL_NAME = 'present'
