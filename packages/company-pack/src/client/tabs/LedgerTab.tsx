@@ -16,7 +16,7 @@ import { ledgerStats, parseMotionLedger } from '../../lib/ledger.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { useWorkspaceText } from '../data/workspace-text.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
-import type { CompanyT } from '../locales.ts'
+import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 
 /** 页签体注入面：台账文件读取闭包 + 浮出。 */
 export interface LedgerTabInjected {
@@ -27,6 +27,23 @@ export interface LedgerTabInjected {
 }
 
 export type LedgerTabProps = PropsRuntime<'sidebar.right.pane.tab'> & LedgerTabInjected & { readonly t: CompanyT }
+
+const defaultT = ((key: CompanyKey, params?: Record<string, string | number>) => {
+  const template = zh[key]
+  return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+}) as CompanyT
+
+const LEDGER_KIND_KEYS: Record<string, CompanyKey> = {
+  '决策': 'catalog.type.decision',
+  '生产': 'catalog.type.production',
+  '诊断': 'catalog.type.diagnostic',
+  '口径问答': 'catalog.type.qa',
+}
+
+function ledgerKindLabel(kind: string, t: CompanyT): string {
+  const key = LEDGER_KIND_KEYS[kind]
+  return key === undefined ? kind : t(key)
+}
 
 /** 刷新间隔（台账随当轮收敛更新，低频）。 */
 const REFRESH_MS = 30_000
@@ -67,7 +84,7 @@ function ledgerInline(text: string): ReactNode[] {
  * @param props - 摘要文本。
  * @returns 摘要行元素。
  */
-export function LedgerSummary({ summary }: { readonly summary: string }) {
+export function LedgerSummary({ summary, t = defaultT }: { readonly summary: string; readonly t?: CompanyT }) {
   const [expanded, setExpanded] = useState(false)
   const [clipped, setClipped] = useState(false)
   const textRef = useRef<HTMLSpanElement | null>(null)
@@ -88,13 +105,13 @@ export function LedgerSummary({ summary }: { readonly summary: string }) {
         <Button
           size="sm"
           variant="ghost"
-          title={expanded ? '收起完整结论' : '查看完整结论'}
+          title={expanded ? t('ledger.collapseTitle') : t('ledger.fullTitle')}
           // WCAG 2.5.3（Label in Name）：可访问名要包含可见标签（「全文」/「收起」）。
-          aria-label={expanded ? '收起（收起完整结论）' : '全文（查看完整结论）'}
+          aria-label={expanded ? t('ledger.collapseAria') : t('ledger.fullAria')}
           aria-expanded={expanded}
           onClick={() => { setExpanded(value => !value) }}
         >
-          {expanded ? '收起' : '全文'}
+          {expanded ? t('ledger.collapse') : t('ledger.full')}
         </Button>
       )}
     </span>
@@ -107,42 +124,43 @@ export function LedgerSummary({ summary }: { readonly summary: string }) {
  * @returns 动议台账面板。
  */
 export function LedgerTab(props: LedgerTabProps) {
+  const { t = defaultT } = props
   const { state } = useWorkspaceText(props.readLedger, props.sessionId, { refreshMs: REFRESH_MS })
   const rows = state.status === 'ready' ? [...parseMotionLedger(state.text)] : null
-  const error = state.status === 'unreadable' ? '台账不可读（kb/motion-ledger.md 缺失？）' : null
+  const error = state.status === 'unreadable' ? t('ledger.unreadable') : null
 
   const stats = rows === null ? null : ledgerStats(rows)
 
   return (
     <PanelFrame
       tone="archive"
-      title="台账"
+      title={t('ledger.title')}
       tabProps={props satisfies PanelFrameProps}
-      refreshLabel={`每 ${String(REFRESH_MS / 1000)} 秒自动刷新`}
+      refreshLabel={t('ledger.refresh', { seconds: REFRESH_MS / 1000 })}
     >
       {error !== null && <div className="wk-error">{error}</div>}
       {stats !== null && (
-        <div className="wk-meta" aria-label="台账统计">
-          共 {String(stats.total)} 场动议 · 成品 {String(stats.finals)} · 墙钟未记 {String(stats.untimed)}
+        <div className="wk-meta" aria-label={t('ledger.statsAria')}>
+          {t('ledger.stats', { total: stats.total, finals: stats.finals, untimed: stats.untimed })}
         </div>
       )}
       {rows === null
-        ? (error === null && <div className="wk-meta">读取中…</div>)
+        ? (error === null && <div className="wk-meta">{t('ledger.loading')}</div>)
         : (
-          <div role="list" aria-label="动议台账" className="wk-list wk-ledger-list">
+          <div role="list" aria-label={t('ledger.listAria')} className="wk-list wk-ledger-list">
             {rows.map(row => (
-              <div key={row.slug} role="listitem" className="wk-row" aria-label={`${row.slug}，${row.kind}，${row.date}`}>
+              <div key={row.slug} role="listitem" className="wk-row" aria-label={t('ledger.rowAria', { slug: row.slug, kind: ledgerKindLabel(row.kind, props.t), date: row.date })}>
                 <span className="wk-row-name">
-                  {row.final.includes('✅') ? <Tag tone="info">成品</Tag> : <Tag tone="outline">无成品</Tag>}
+                  {row.final.includes('✅') ? <Tag tone="info">{t('ledger.final')}</Tag> : <Tag tone="outline">{t('ledger.noFinal')}</Tag>}
                   {row.slug}
                 </span>
-                <span className="wk-row-status">{row.date} · {row.kind} · {row.roles}</span>
-                <LedgerSummary summary={row.summary} />
+                <span className="wk-row-status">{row.date} · {ledgerKindLabel(row.kind, props.t)} · {row.roles}</span>
+                <LedgerSummary summary={row.summary} t={props.t} />
               </div>
             ))}
           </div>
         )}
-      <div className="wk-meta">维护：当轮收敛时随 CHARTER 历史纪要追加一行（kb/motion-ledger.md）。</div>
+      <div className="wk-meta">{t('ledger.maintain')}</div>
     </PanelFrame>
   )
 }

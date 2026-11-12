@@ -45,6 +45,7 @@ opened: 2026-11-12
 - 看板/DAG 双语：列/空列/依赖就绪/等待/drift、DAG 状态徽章/空态/重画；client 373 passed；金样仍一致。
 - 在场/用量双语：成员行状态/aria/空态/协作动态标题、轮次/步数/工具占比/四路 token 行；client 375 passed；金样仍一致。
 - 协作动态结构化 token：`ActivityEntry.token` + presence.activity.* 字典；en 不再显示 lib 中文 text。
+- 台账双语：标题/刷新/统计/行 aria/成品标记/维护说明/摘要全文入口；kind 走 catalog.type.*；client 377 passed；金样仍一致。
 
 **剩余**：
 - `content/templates/meta.md`、`prd.md`（2 个）。
