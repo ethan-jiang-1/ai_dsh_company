@@ -1,74 +1,74 @@
-# 梦之队 · 公司编制（唯一事实家）
+# Dream Team · company roster (single source of truth)
 
-> 出厂默认：全员 **50 人**，细到岗位（装完按你的公司改）。本文件是编制的唯一权威——各角色 CHARTER
-> 只留本条线事实并引用此处，**禁止另写一套总数**（D10「一处事实一个家」的公司盘版本）。
-> 公司业务（同日定案）：高科技公司，三类业务 = 软件开发 / 服务 / 系统集成。
-> **人这一侧**：席位 / 姓名 / 投入见 `roster.md`，角色归属与授权面见 `owners.md`；
-> 人力费率见 `rates.md`。本文件只给岗位数，不重复姓名与费率。
+> Factory default: **50 people** total, down to positions (change for your company after install). This file is the single authority for staffing — each role's CHARTER
+> keeps only its line's facts and references this file; **never write a second total** (the company-disk version of D10 "one home per fact").
+> Company business (same-day decision): a high-tech company with three lines = software development / services / systems integration.
+> **The human side**: seats / names / allocation in `roster.md`; role ownership and authority in `owners.md`;
+> labor rates in `rates.md`. This file gives position counts only, not names or rates.
 
-## 六条线（50 人，岗位级）
+## Six lines (50 people, position level)
 
-### CEO 与公司职能（3）
+### CEO and company functions (3)
 
-| 岗位 | 人数 | 职责一句话 |
+| Position | Count | One-line responsibility |
 |---|---|---|
-| CEO | 1 | 全局结果唯一负责人；动议唯一出入口 |
-| 人事行政 | 1 | 招聘、入离职、办公与行政事务 |
-| 商务/法务 | 1 | 合同评审、投标资质、对外协议模板 |
+| CEO | 1 | Sole owner of the global result; sole entry/exit for a motion |
+| HR and administration | 1 | Recruiting, onboarding/offboarding, office and admin |
+| Commercial/legal | 1 | Contract review, bid qualifications, external agreement templates |
 
-### 财务（CFO，4）
+### Finance (CFO, 4)
 
-| 岗位 | 人数 | 职责一句话 |
+| Position | Count | One-line responsibility |
 |---|---|---|
-| CFO | 1 | 现金 / 成本 / 合规；毛利底线与签字线 |
-| 会计（应收与项目核算） | 1 | 项目核算、应收账款、里程碑开票 |
-| 会计（总账与税务） | 1 | 总账、报税、成本分摊口径 |
-| 出纳 | 1 | 收付款执行；**SoD：出纳不做账** |
+| CFO | 1 | Cash / cost / compliance; gross-margin floor and sign-off lines |
+| Accountant (receivables and project accounting) | 1 | Project accounting, receivables, milestone invoicing |
+| Accountant (general ledger and tax) | 1 | General ledger, tax filing, cost-allocation basis |
+| Cashier | 1 | Payment execution; **SoD: the cashier does not keep the books** |
 
-### 销售（VP-Sales，6）
+### Sales (VP-Sales, 6)
 
-| 岗位 | 人数 | 职责一句话 |
+| Position | Count | One-line responsibility |
 |---|---|---|
-| VP-Sales | 1 | 现有客户 / 销售 / 定价判断；"没人买"veto |
-| 售前方案 | 2 | 方案架构 1 + POC / 投标支持 1 |
-| 客户销售 | 3 | 大客户 2 + 新客开拓 1 |
+| VP-Sales | 1 | Existing customers / sales / pricing; "no one will buy" veto |
+| Pre-sales solution | 2 | Solution architecture 1 + POC/bid support 1 |
+| Account sales | 3 | Key accounts 2 + new-business development 1 |
 
-### 市场与产品（CMO，3）
+### Market and product (CMO, 3)
 
-| 岗位 | 人数 | 职责一句话 |
+| Position | Count | One-line responsibility |
 |---|---|---|
-| CMO | 1 | 市场机会 / 产品定义 / MRD；"市场不成立"veto |
-| 产品经理 | 1 | 产品需求定义、PRD 协作、产品路线 |
-| UX | 1 | 交互与可用性 |
+| CMO | 1 | Market opportunity / product definition / MRD; "market does not hold" veto |
+| Product manager | 1 | Product requirement definition, PRD collaboration, roadmap |
+| UX | 1 | Interaction and usability |
 
-### 产品研发（VP-Eng，16）
+### Product engineering (VP-Eng, 16)
 
-| 岗位 | 人数 | 职责一句话 |
+| Position | Count | One-line responsibility |
 |---|---|---|
-| VP-Eng | 1 | 可行性 / 成本 / 技术风险；技术 veto |
-| 平台/后端 | 6 | 两个内部服务与平台能力 |
-| 前端/移动 | 3 | 客户可见面与内部工具前端 |
-| 数据与 AI | 2 | agent 试点、数据管道与评估 |
-| 测试 | 2 | 功能测试 1 + 自动化 1 |
-| SRE/研发效能 | 2 | 基础设施（云预算见 `.dsh-company/kb/policy-lines.md`「基础设施预算」）、CI/研发效能；无 DBA（后端兼管） |
+| VP-Eng | 1 | Feasibility / cost / technical risk; technical veto |
+| Platform/backend | 6 | Two internal services and platform capability |
+| Frontend/mobile | 3 | Customer-facing surfaces and internal tool frontends |
+| Data and AI | 2 | Agent pilots, data pipeline and evaluation |
+| Test | 2 | Functional test 1 + automation 1 |
+| SRE/engineering productivity | 2 | Infrastructure (cloud budget in `.dsh-company/kb/policy-lines.md` "infrastructure budget"), CI/productivity; no DBA (backend covers) |
 
-### 交付与客户成功（COO，18）
+### Delivery and customer success (COO, 18)
 
-| 岗位 | 人数 | 职责一句话 |
+| Position | Count | One-line responsibility |
 |---|---|---|
-| COO | 1 | 落地 / 预算 / 流程合规；"接不住"veto |
-| PMO | 3 | 交付经理 2 + 项目专员 1；并行项目池与排期 |
-| 系统集成工程师 | 8 | ERP/财务集成 4 + 业务系统集成 4（对账与票据场景的主力） |
-| 定制开发 | 3 | 项目派驻开发 |
-| 运维与支持 | 2 | 维护合同工单（次工作日响应） |
-| 客户成功 | 1 | 续约与满意度 |
+| COO | 1 | Delivery / budget / process compliance; "cannot carry" veto |
+| PMO | 3 | Delivery managers 2 + project specialist 1; parallel project pool and scheduling |
+| Systems-integration engineer | 8 | ERP/finance integration 4 + business-system integration 4 (the main force for reconciliation and invoicing) |
+| Custom development | 3 | Project on-site development |
+| Operations and support | 2 | Maintenance-contract tickets (next-business-day response) |
+| Customer success | 1 | Renewal and satisfaction |
 
-| **合计** | **50** |  |
+| **Total** | **50** |  |
 
-## 由编制派生的公司事实（各案引用这里，不另立数）
+## Company facts derived from staffing (cite here; do not restate)
 
-- **基础设施有专人**：SRE 2 人（属研发条线）；无 DBA（后端兼管）——评审仍须答「谁维护」，具体到人。
-- **并行上限 / 报价签字线 / 预算线**：唯一见 `.dsh-company/kb/policy-lines.md`（本文件不另写数字）。
-- **客户盘**：现有客户 9 家中型企业（6 家带年费维护合同）——客户画像与定价细节归
-  `.dsh-company/kb/vp-sales/CHARTER.md`。
-- **内部系统**：两个内部服务（Node.js 22 + SQLite）；工具链 = Markdown + git + 每周例会纪要。
+- **Infrastructure has dedicated staff**: SRE 2 (engineering line); no DBA (backend covers) — reviews must still answer "who maintains it", naming a person.
+- **Parallel limit / quote sign-off lines / budget lines**: only in `.dsh-company/kb/policy-lines.md` (this file writes no numbers).
+- **Customer base**: 9 mid-sized existing customers (6 with annual maintenance contracts) — customer profiles and pricing detail belong to
+  `.dsh-company/kb/vp-sales/CHARTER.md`.
+- **Internal systems**: two internal services (Node.js 22 + SQLite); toolchain = Markdown + git + weekly meeting minutes.

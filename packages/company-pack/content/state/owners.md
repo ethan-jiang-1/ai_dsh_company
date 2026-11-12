@@ -1,26 +1,26 @@
-# 梦之队 · 人侧归属与授权面（本部署待填）
+# Dream Team · human-side ownership and authority (this deployment: to fill)
 
-> **出厂起动件**：本文件属于**部署配置**（哪个物理人对应哪个角色、各自能答什么），
-> 随安装落到你自己的公司盘后由你填。数字编制的唯一权威是 [org.md](./org.md)（出厂默认）；
-> 本文件拥有"人这一侧"。两根轴别混：org.md 管"公司有什么编制"，本文件管"编制背后是谁、有什么权限"。
-> **填法**：把下表 `<…>` 换成你的人；一行一个角色归属；一人可背多角色。角色会话按本表路由问询与审批。
+> **Factory starter**: this file is **deployment config** (which physical person maps to which role, what each may answer),
+> placed on your company disk after install for you to fill. The single authority for position counts is [org.md](./org.md) (factory default);
+> this file owns "the human side". Do not mix the two axes: org.md governs "what positions the company has"; this file governs "who is behind them and what authority they have".
+> **How to fill**: replace `<…>` with your people; one role per row; one person may hold multiple roles. Role sessions route questions and approvals per this table.
 
-## 角色归属
+## Role ownership
 
-| 角色 | 物理人 | 备注 |
+| Role | Physical person | Note |
 |---|---|---|
-| CEO | `<待填>` | 唯一对外口径与收口；多人场景里是 Lead |
-| CFO | `<待填>` | 签字线的一半；在自己根会话里触线时卡落到他自己的门 |
-| VP-Sales | `<待填>` | |
-| VP-Eng | `<待填>` | |
-| COO | `<待填>` | |
-| CMO | `<待填>` | 市场机会/产品定义；新市场与现有客户销售的边界按手册路由 |
+| CEO | `<to-fill>` | Sole external wording and close-out; Lead in multi-person scenes |
+| CFO | `<to-fill>` | Half of the sign-off line; when hitting a line in their own root session, the card lands on their own gate |
+| VP-Sales | `<to-fill>` | |
+| VP-Eng | `<to-fill>` | |
+| COO | `<to-fill>` | |
+| CMO | `<to-fill>` | Market opportunity/product definition; boundary with existing-customer sales routes per the handbook |
 
-## 授权面
+## Authority surface
 
-| 问题类型 | 谁能答 |
+| Question type | Who may answer |
 |---|---|
-| `<待填>` | `<待填>` |
+| `<to-fill>` | `<to-fill>` |
 
-> 授权面口径（必批 / 可答 / 只给建议 / 自主）与公司手册「人机接口」节配套；
-> 签字线本身由人立，改动本表即改路由。
+> The authority basis (must approve / may answer / advice only / autonomous) pairs with the handbook's "Human interface" section;
+> sign-off lines are set by humans; changing this table changes routing.

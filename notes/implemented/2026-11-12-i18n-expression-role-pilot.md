@@ -309,6 +309,13 @@
 - 新增 delivery-modes 英文棘轮；注入中文 → 红，还原 → 绿。
 - 全量 1661 tests；preset-smoke ALL PASS；verify ALL PASS。
 
+## P1 第六片（content/state）
+
+- company/org/owners/roster 英文；productName 留空，品牌回落 locale 词标（避免把中文写死）。
+- motion-ledger 仍 PENDING（中文表头 = 领域值切片）；state 棘轮 allowlist 只留它。
+- roster-backfill 的英文 heading/count（Five/Six lines）与 bootstrap bumpLineCount 同步。
+- 全量 1662 tests；preset-smoke、zh 金样、en 页面均 ALL PASS；verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

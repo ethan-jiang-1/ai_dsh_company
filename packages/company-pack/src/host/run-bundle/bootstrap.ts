@@ -349,9 +349,14 @@ function mergeOwnersRow(workspaceText: string, canonicalText: string, role: stri
 /** 「## N 条线」计数 +1（只在新补了部门时调用）。 */
 function bumpLineCount(text: string): string {
   const digits = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
-  return text.replace(/^(##\s+)([一二三四五六七八九十]+)(条线)/m, (whole, head: string, num: string, tail: string) => {
+  const english = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten']
+  const zh = text.replace(/^(##\s+)([一二三四五六七八九十]+)(条线)/m, (whole, head: string, num: string, tail: string) => {
     const at = digits.indexOf(num)
     return at === -1 || at === digits.length - 1 ? whole : `${head}${digits[at + 1]}${tail}`
+  })
+  return zh.replace(/^(##\s+)([A-Za-z]+)( lines)/m, (whole, head: string, num: string, tail: string) => {
+    const at = english.indexOf(num)
+    return at === -1 || at === english.length - 1 ? whole : `${head}${english[at + 1]}${tail}`
   })
 }
 

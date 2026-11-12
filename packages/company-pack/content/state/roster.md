@@ -1,35 +1,35 @@
-# 席位名册（样例；装后按你的公司改）
+# Seat roster (sample; change for your company after install)
 
-> 层：公司 · 加载：按需（legacy）。本文件是「席位 → 谁 / 投入 / 可承接」的**唯一家**：
-> `org.md` 管岗位数，`owners.md` 管角色 → 物理人与授权面。**`<待填>` = 名册未配置**：
-> COO 必须报「配置缺口（待补名册）」，**不得判「没人」，不得编人名**。
+> Layer: company · Load: on demand (legacy). This file is the **only home** of "seat → who / allocation / can take":
+> `org.md` governs position counts; `owners.md` governs role → physical person and authority. **`<to-fill>` = roster not configured**:
+> COO must report "configuration gap (roster to fill)", **must not judge "no one", must not invent names**.
 >
-> 填法：一行一个席位；同一人可占多席；投入比例 = 可投入本席位的 FTE。
-> 出厂样例只展开交付条线；其他条线按同形补行。
+> How to fill: one seat per row; one person may hold several seats; allocation = FTE available to this seat.
+> The factory sample expands only the delivery line; add other lines in the same shape.
 
-## 系统集成（org.md 8 席）
+## Systems integration (org.md: 8 seats)
 
-| 席位 | 姓名 | 投入比例 | 可承接 |
+| Seat | Name | Allocation | Can take |
 |---|---|---|---|
-| 系统集成工程师-1 | `<待填>` | `<待填>` | ERP / 财务集成 |
-| 系统集成工程师-2 | `<待填>` | `<待填>` | ERP / 财务集成 |
-| 系统集成工程师-3 | `<待填>` | `<待填>` | ERP / 财务集成 |
-| 系统集成工程师-4 | `<待填>` | `<待填>` | ERP / 财务集成 |
-| 系统集成工程师-5 | `<待填>` | `<待填>` | 业务系统集成 |
-| 系统集成工程师-6 | `<待填>` | `<待填>` | 业务系统集成 |
-| 系统集成工程师-7 | `<待填>` | `<待填>` | 业务系统集成 |
-| 系统集成工程师-8 | `<待填>` | `<待填>` | 业务系统集成 |
+| Systems-integration engineer-1 | `<to-fill>` | `<to-fill>` | ERP / finance integration |
+| Systems-integration engineer-2 | `<to-fill>` | `<to-fill>` | ERP / finance integration |
+| Systems-integration engineer-3 | `<to-fill>` | `<to-fill>` | ERP / finance integration |
+| Systems-integration engineer-4 | `<to-fill>` | `<to-fill>` | ERP / finance integration |
+| Systems-integration engineer-5 | `<to-fill>` | `<to-fill>` | Business-system integration |
+| Systems-integration engineer-6 | `<to-fill>` | `<to-fill>` | Business-system integration |
+| Systems-integration engineer-7 | `<to-fill>` | `<to-fill>` | Business-system integration |
+| Systems-integration engineer-8 | `<to-fill>` | `<to-fill>` | Business-system integration |
 
-## 交付支撑（按需展开）
+## Delivery support (expand as needed)
 
-| 席位 | 姓名 | 投入比例 | 可承接 |
+| Seat | Name | Allocation | Can take |
 |---|---|---|---|
-| PMO-1 | `<待填>` | `<待填>` | 项目池 / 排期 |
-| PMO-2 | `<待填>` | `<待填>` | 项目池 / 排期 |
-| PMO-3 | `<待填>` | `<待填>` | 项目池 / 排期 |
-| 定制开发-1 | `<待填>` | `<待填>` | 项目派驻 |
-| 定制开发-2 | `<待填>` | `<待填>` | 项目派驻 |
-| 定制开发-3 | `<待填>` | `<待填>` | 项目派驻 |
-| 运维与支持-1 | `<待填>` | `<待填>` | 维护合同工单 |
-| 运维与支持-2 | `<待填>` | `<待填>` | 维护合同工单 |
-| 客户成功 | `<待填>` | `<待填>` | 续约 / 满意度 |
+| PMO-1 | `<to-fill>` | `<to-fill>` | Project pool / scheduling |
+| PMO-2 | `<to-fill>` | `<to-fill>` | Project pool / scheduling |
+| PMO-3 | `<to-fill>` | `<to-fill>` | Project pool / scheduling |
+| Custom development-1 | `<to-fill>` | `<to-fill>` | Project on-site |
+| Custom development-2 | `<to-fill>` | `<to-fill>` | Project on-site |
+| Custom development-3 | `<to-fill>` | `<to-fill>` | Project on-site |
+| Operations and support-1 | `<to-fill>` | `<to-fill>` | Maintenance-contract tickets |
+| Operations and support-2 | `<to-fill>` | `<to-fill>` | Maintenance-contract tickets |
+| Customer success | `<to-fill>` | `<to-fill>` | Renewal / satisfaction |
