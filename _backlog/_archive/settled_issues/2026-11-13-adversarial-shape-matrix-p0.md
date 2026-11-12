@@ -9,7 +9,7 @@ opened: 2026-11-13
 >
 > **结论/去向**：note — [Note](../../../notes/implemented/2026-11-13-adversarial-shape-matrix.md)；P0 已落（shape 库 + 两个矩阵 spec + 载体登记 + 门禁），P1/P2 见研究稿。
 >
-> **审查**：agent — P0 核心验收全绿（`pnpm verify` ALL PASS；`pnpm test` 240 files / 1924 tests；typecheck/lint/dup 绿；3 条红证实跑）；TOCTOU 延后（需注入缝，见 Note 剩余风险）；用户 2026-11-13 指令「推动落地」。
+> **审查**：agent — P0 + P1/P2 收口全绿（`pnpm verify` ALL PASS；`pnpm test` 242 files / 1971 tests；typecheck/lint/dup 绿；4 条红证 + 进程 smoke ALL PASS）；TOCTOU 已收窄（recheck + 红证），残余窗口见 Note；用户 2026-11-13 指令「推动落地」「没做的都应该做掉」。
 >
 > **授权边界**：本卡只加测试资产 + 门禁 + 必要的词表对齐；不改 host/client 行为。
 
@@ -56,21 +56,25 @@ opened: 2026-11-13
 
 **做（P0）**：shape 库；company-root Safety 矩阵；file-shape Agreement；carrier registry；门禁；`tests/README.md` 映射行；Note。
 
-**不做**：修 148/149（在 registry 里登记为 `knownGap`，带 bug 链接；修完迁入 `CARRIERS` 再由矩阵覆盖）；147 已由并发修复轮收口并进矩阵；P1 的 startup/cultivation/ledger Agreement；P2 的 smoke 进程矩阵；迁移现有 ad hoc 形状用例；改覆盖率阈值；改 host/client 行为。
+**不做**：修 148/149（在 registry 里登记为 `knownGap`，带 bug 链接；修完迁入 `CARRIERS` 再由矩阵覆盖）；147 已由并发修复轮收口并进矩阵；P3 的 ad hoc 形状用例去重；改覆盖率阈值；改 host/client 行为。P1（startup/cultivation/ledger）与 P2 进程矩阵、TOCTOU 已在同轮补做。
 
 ## 验收标准
 
 - [x] `新建:tests/support/world-shapes.ts`：根/叶/内容三轴 **13 个 shape**（6 根 + 5 叶 + 2 内容），每个有 id/构造/清理/预期类；`*At`/`createCompanyDir` 越界由 Safety spec 的单测覆盖；`exports/` symlink 由 export writer 覆盖。
-- [x] `新建:tests/host/contract/company-root-safety.spec.ts`：6 个 writer × 13 shape = 78 例 + 3 个零覆盖入口单测；每个 writer 在任意形状下「写进根内」或 typed refusal；`outside/` 快照不变。
+- [x] `新建:tests/host/contract/company-root-safety.spec.ts`：**8 个 writer × 13 shape = 104 例 + 4 个零覆盖入口单测 = 108 例**；每个 writer 在任意形状下「写进根内」或 typed refusal；`outside/` 快照不变。
 - [x] 词表对齐（只动类型/注释，不改运行时）：`companyFileProblem` 不再声明永不产生的 `'corrupt'`；`companyFileProblemAt` 注释与返回一致。
 - [x] `新建:tests/host/contract/file-shape-agreement.spec.ts`：`companyFileProblem` / `companyFileProblemAt` / `plainFileProblem` / `readCompanyText` 归一后 ok/not-ok 一致；`readCompanyText` 的「更粗」视图显式声明。
-- [x] `新建:tools/lib/carrier-registry.mjs`：10 个已收口载体、3 个 `EXEMPT`（带理由）、4 个 `KNOWN_GAP`（148/149，带 bug 链接）。
+- [x] `新建:tools/lib/carrier-registry.mjs`：**12 个已收口载体、3 个 `EXEMPT`、2 个 `KNOWN_GAP`**（148 bundle / 149 rotating-log，带 bug 链接）。
 - [x] `新建:checks/gates/company-root-carriers.mjs`：未登记的生产者 → 红，报 `file:line`；模块/符号不存在 → 红；`KNOWN_GAP` 卡不存在 → 红；`KNOWN_GAP` 在 PASS 行列出。
-- [x] 三个红证实跑：门禁植入未登记写入口 / 根 residency 短路 / 分类器折平 → 对应矩阵红；还原绿；原话进 Note。
-- [x] `pnpm test` 全量 **240 files / 1924 tests** 绿（新增 2 spec / 94 用例，单独 ~0.5s）；`pnpm verify` ALL PASS。
+- [x] 四个红证实跑：门禁植入未登记写入口 / 根 residency 短路 / 分类器折平 / 去掉 TOCTOU recheck → 对应矩阵红；还原绿；原话进 Note。
+- [x] `pnpm test` 全量 **242 files / 1971 tests** 绿（契约目录 4 spec / 141 用例）；`pnpm verify` ALL PASS；进程 smoke 16 项 ALL PASS。
+- [x] P1 startup：`startup-state-agreement.spec.ts`（settings 9 形状 + options 3 形状，12 例；unsafe/corrupt 不采用外部值）。
+- [x] P1 ledger：`ledger-state-agreement.spec.ts`（presented 7 形状 + corrupt 导出沿用旧快照，8 例）。
+- [x] P1 cultivation：`writeRecord` / `pendingRevoke` 升进 Safety 矩阵；records 不可达/revoked/坏记录沿用既有 `cultivation-command.spec.ts`。
+- [x] P2 进程矩阵：`company-root-process-smoke.mjs`（同文件并发写 / 残留 temp / 根 symlink / 重启读回 / lease stale 接管 / 新鲜锁拒绝）。
 - [x] `tests/README.md`「改动面 → 最窄检查」host 逻辑行加「跨载体不变量 → `pnpm test tests/host/contract`」；「目录镜像」登记 `contract/` 例外。
 - [x] Note 落 `新建:notes/implemented/2026-11-13-adversarial-shape-matrix.md`，含红证原话与未验面。
-- [ ] **TOCTOU 延后**：判据与写入之间的 symlink 替换需要注入缝（或真进程 kill），P0 只覆盖「写入前已是坏形状」；见 Note「剩余风险」。
+- [x] **TOCTOU 收窄**：`CompanyAtomicWriteDeps` 注入缝 + temp 后 / rename 前 recheck；测试确定性复现；完全关闭受 Node 无 `renameat` 限制，残余窗口见 Note。
 
 ## 关闭条件
 

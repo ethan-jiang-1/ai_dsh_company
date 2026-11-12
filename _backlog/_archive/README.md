@@ -16,7 +16,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
-| [2026-11-13-adversarial-shape-matrix-p0.md](settled_issues/2026-11-13-adversarial-shape-matrix-p0.md) | 已结；shape 库 + Safety/Agreement 矩阵 + 载体登记 + 门禁；verify ALL PASS、test 240/1924、3 红证；去向 = [Note](../../notes/implemented/2026-11-13-adversarial-shape-matrix.md) | 2026-11-13 |
+| [2026-11-13-adversarial-shape-matrix-p0.md](settled_issues/2026-11-13-adversarial-shape-matrix-p0.md) | 已结；shape 库 + Safety/Agreement 矩阵 + 载体登记 + 门禁；verify ALL PASS、test 242/1971、4 红证 + 进程 smoke ALL PASS；去向 = [Note](../../notes/implemented/2026-11-13-adversarial-shape-matrix.md) | 2026-11-13 |
 | [BUG-140（撤回）](settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md) | 已结（撤回）：真页面默认新空会话；显式选中任务会话后任务板 (2)，原文保留测试方法证据 | 2026-11-13 |
 | [BUG-150（撤回）](settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md) | 已结（撤回）：复核时 spec 已传 workspace，company-root-safety 55 passed；无产品改动 | 2026-11-13 |
 | [2026-11-12-startup-strategy-wiki-regression-exploration.md](settled_issues/2026-11-12-startup-strategy-wiki-regression-exploration.md) | 已结；启动策略（界面）+ wiki 知识地图（配置）回归/探索：A1–A5 / B1–B8 + named child；10 张 BUG-080..089；未证 teammate/workflow 等；去向 = none（只产证据/BUG 卡） | 2026-11-12 |

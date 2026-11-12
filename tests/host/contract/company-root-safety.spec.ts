@@ -22,6 +22,8 @@ import {
   writeCompanyAtomicAt,
 } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
 import { CompanyWriteBlockedError } from '../../../packages/company-pack/src/host/run-bundle/write-gate.ts'
+import { nodeCultivationStorage, UnsafeCultivationPathError } from '../../../packages/company-pack/src/host/cultivation/cultivation-storage.ts'
+import { writePendingRevoke } from '../../../packages/company-pack/src/host/cultivation/revoke-journal.ts'
 import { regenerateCatalog } from '../../../packages/company-pack/src/host/ledger/catalog.ts'
 import { exportGovernance } from '../../../packages/company-pack/src/host/ledger/governance-export.ts'
 import { writePresentedLedger, type PresentedLedger } from '../../../packages/company-pack/src/host/ledger/presented-ledger.ts'
@@ -104,6 +106,21 @@ const WRITERS: readonly Writer[] = [
     target: 'exports',
     run: (workspace) => exportGovernance({ dshHome: join(workspace, '.dsh-home'), workspace }),
   },
+  {
+    id: 'cultivation.writeRecord',
+    target: 'cultivation/records',
+    run: (workspace) => nodeCultivationStorage.writeRecord(join(workspace, '.dsh-company/cultivation/records'), {
+      kind: 'correction', targetRole: 'ceo', proposerRole: 'ceo', proposerKind: 'human',
+      source: 'test', expectation: '稳', body: '先列清单',
+    }),
+  },
+  {
+    id: 'cultivation.pendingRevoke',
+    target: 'cultivation/.pending-revoke.json',
+    run: (workspace) => writePendingRevoke(workspace, {
+      schema: 1, role: 'ceo', slug: 'm1', revokedAt: 'x', createdAt: 'x', records: [],
+    }),
+  },
 ]
 
 type Outcome = { readonly kind: 'ok'; readonly value: unknown } | { readonly kind: 'error'; readonly error: unknown }
@@ -113,7 +130,9 @@ function capture(run: () => unknown): Outcome {
 }
 
 function isTypedRefusal(error: unknown): boolean {
-  return error instanceof UnsafeCompanyPathError || error instanceof CompanyWriteBlockedError
+  return error instanceof UnsafeCompanyPathError
+    || error instanceof CompanyWriteBlockedError
+    || error instanceof UnsafeCultivationPathError
 }
 
 describe('公司盘 Safety 矩阵：形状 × 写入口', () => {
@@ -164,6 +183,25 @@ describe('零覆盖入口：*At 与 createCompanyDir', () => {
       symlinkSync(world.outside, home)
       expect(() => writeCompanyAtomicAt(home, 'kb/x.json', 'x\n')).toThrow(UnsafeCompanyPathError)
       expect(outsideSnapshot(world)).toEqual([])
+    } finally { world.cleanup() }
+  })
+
+  it('temp 写入后父目录被换成 symlink → 拒绝且外部不写（TOCTOU 收窄）', () => {
+    const world = makeWorld()
+    const kb = join(world.ws, '.dsh-company', 'kb')
+    const outsideKb = join(world.outside, 'kb')
+    try {
+      mkdirSync(kb, { recursive: true })
+      mkdirSync(outsideKb)
+      const before = outsideSnapshot(world)
+      expect(() => writeCompanyAtomic(world.ws, '.dsh-company/kb/x.json', 'x\n', {
+        writeFile: (path, data, options) => {
+          writeFileSync(path, data, options)
+          rmSync(kb, { recursive: true, force: true })
+          symlinkSync(outsideKb, kb)
+        },
+      })).toThrow(UnsafeCompanyPathError)
+      expect(outsideSnapshot(world)).toEqual(before)
     } finally { world.cleanup() }
   })
 })

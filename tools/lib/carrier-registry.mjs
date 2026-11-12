@@ -79,6 +79,22 @@ export const CARRIERS = [
     coveredBy: 'company-root-safety',
   },
   {
+    id: 'cultivation.writeRecord',
+    module: 'packages/company-pack/src/host/cultivation/cultivation-storage.ts',
+    symbol: 'nodeCultivationStorage',
+    kind: 'writer',
+    companyRoot: true,
+    coveredBy: 'company-root-safety',
+  },
+  {
+    id: 'cultivation.pendingRevoke',
+    module: 'packages/company-pack/src/host/cultivation/revoke-journal.ts',
+    symbol: 'writePendingRevoke',
+    kind: 'writer',
+    companyRoot: true,
+    coveredBy: 'company-root-safety',
+  },
+  {
     id: 'company.fileProblem',
     module: 'packages/company-pack/src/host/run-bundle/company-root.ts',
     symbol: 'companyFileProblem',
@@ -134,16 +150,6 @@ export const KNOWN_GAP = [
     module: 'packages/company-pack/src/host/run-bundle/bundle-manifest.ts',
     bug: 'BUG-148',
     reason: 'BUG-148 已修归档；bundle 入口未进 Safety 矩阵，下轮迁入 CARRIERS',
-  },
-  {
-    module: 'packages/company-pack/src/host/cultivation/cultivation-storage.ts',
-    bug: 'BUG-149',
-    reason: 'BUG-149 已修归档；cultivation 入口未进 Safety 矩阵，下轮迁入 CARRIERS',
-  },
-  {
-    module: 'packages/company-pack/src/host/cultivation/revoke-journal.ts',
-    bug: 'BUG-149',
-    reason: 'BUG-149 已修归档；revoke-journal 入口未进 Safety 矩阵，下轮迁入 CARRIERS',
   },
   {
     module: 'packages/company-pack/src/host/logging/rotating-log.ts',
