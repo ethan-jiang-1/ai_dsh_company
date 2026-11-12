@@ -553,10 +553,10 @@ describe('共享 product-definition 能力（CMO + VP-Eng）', () => {
     expect(shared, 'product-definition 必须写 meta 优先/company 回落').toMatch(/meta\.md[\s\S]*产品类型/)
     expect(shared, 'product-definition 必须写 company.md 回落').toContain('company.md')
     const ceo = readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
-    expect(ceo, 'CEO 开局必须写产品类型，可选值指向类型包目录').toMatch(/产品类型: <id>/)
+    expect(ceo, 'CEO 开局必须写 productType，可选值指向类型包目录').toMatch(/productType: <id>/)
     expect(ceo, 'CEO 不手写第二套类型枚举').not.toMatch(/hardware-software\|business-software/)
     expect(shared, 'product-definition 必须写交付模式是第二轴').toContain('交付模式')
-    expect(ceo, 'CEO 开局必须写交付模式').toMatch(/交付模式: productized\|project-services/)
+    expect(ceo, 'CEO 开局必须写 deliveryMode').toMatch(/deliveryMode: productized\|project-services/)
   })
 
   it('CMO mrd-playbook 与 VP-Eng prd-playbook 引用共享能力', () => {

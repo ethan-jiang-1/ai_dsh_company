@@ -29,8 +29,8 @@ const MRD = `---\nlayer: MRD\ndefinition: json-ledger\n---\n\n\`\`\`json\n{"mrd"
 const STRS = `---\nlayer: StRS\ndefinition: headings\n---\n\n### REQ-001 涉众诉求\n\n- status: 草案\n- traces: [MR-001]\n`
 const PRD = `---\nlayer: PRD\ndefinition: json-ledger\n---\n\n\`\`\`json\n{"prd":{"version":"0.1","status":"draft","slices":[{"id":"S1","goal":"闭环","requirements":["REQ-002"]}],"requirements":[{"id":"REQ-002","title":"需求","type":"functional","priority":"P0","status":"draft","source":["MR-001"],"traces":["REQ-001"],"slice":"S1","userStory":"作为用户我要它","acceptance":[{"id":"AC-002-1","given":"g","when":"w","then":"t"}],"dependsOn":[],"verification":"test","openQuestions":[],"changeLog":[]}]}}\n\`\`\`\n`
 const META = 'slug: demo\nkickoff: 2026-11-07\n编号体系: identity\n'
-const META_DELIVERY = `${META}交付模式: project-services\n`
-const META_MANAGED = `${META}交付模式: managed-service\n`
+const META_DELIVERY = `${META}deliveryMode: project-services\n`
+const META_MANAGED = `${META}deliveryMode: managed-service\n`
 const META_LEGACY = 'slug: old-demo\nkickoff: 2026-01-01\n'
 
 type Definition = { name: string; handler: (input: { readonly rawInput: string, readonly agent?: { session?: { header?: { cwd?: string } } } }) => Promise<{ readonly kind: string, readonly text: string }> }
@@ -183,7 +183,7 @@ describe('registerReqCommand', () => {
   })
 
   it('交付模式未知 → error，列可用模式（productized + 包）', async () => {
-    const { workspace, cleanup } = fixture(['mrd.md', 'strs.md', 'prd.md'], `${META}交付模式: nope\n`)
+    const { workspace, cleanup } = fixture(['mrd.md', 'strs.md', 'prd.md'], `${META}deliveryMode: nope\n`)
     try {
       const result = await mount(workspace, { contentDir: CONTENT_DIR }).handler({ rawInput: 'check 2026-11-07-demo' })
       expect(result.kind).toBe('error')
@@ -194,7 +194,7 @@ describe('registerReqCommand', () => {
   })
 
   it('交付模式 productized（显式）→ success，回执点名', async () => {
-    const { workspace, cleanup } = fixture(['mrd.md', 'strs.md', 'prd.md'], `${META}交付模式: productized\n`)
+    const { workspace, cleanup } = fixture(['mrd.md', 'strs.md', 'prd.md'], `${META}deliveryMode: productized\n`)
     try {
       const result = await mount(workspace, { contentDir: CONTENT_DIR }).handler({ rawInput: 'check 2026-11-07-demo' })
       expect(result.kind).toBe('success')
@@ -263,7 +263,7 @@ describe('registerReqCommand', () => {
   })
 
   it('meta 的产品类型优先于 company.md', async () => {
-    const { workspace, cleanup } = fixture(undefined, `${META}产品类型: business-software\n`)
+    const { workspace, cleanup } = fixture(undefined, `${META}productType: business-software\n`)
     const contentDir = typeContentDir()
     try {
       mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
@@ -310,7 +310,7 @@ describe('registerReqCommand', () => {
   })
 
   it('未知产品类型 → 报错并列可用类型', async () => {
-    const { workspace, cleanup } = fixture(undefined, `${META}产品类型: nope\n`)
+    const { workspace, cleanup } = fixture(undefined, `${META}productType: nope\n`)
     const contentDir = typeContentDir()
     try {
       mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
@@ -325,8 +325,23 @@ describe('registerReqCommand', () => {
     }
   })
 
+  it('旧中文 `产品类型:` 不再解析（canonical = productType）', async () => {
+    const { workspace, cleanup } = fixture(undefined, `${META}产品类型: nope\n`)
+    const contentDir = typeContentDir()
+    try {
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: hardware-software\n---\n')
+      const result = await mount(workspace, { contentDir }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('动议类型 = hardware-software（company.md 默认')
+    } finally {
+      cleanup()
+      rmSync(contentDir, { recursive: true, force: true })
+    }
+  })
+
   it('meta 的模板占位 <...> 视为未声明', async () => {
-    const { workspace, cleanup } = fixture(undefined, `${META}产品类型: <hardware-software|business-software>\n`)
+    const { workspace, cleanup } = fixture(undefined, `${META}productType: <hardware-software|business-software>\n`)
     const contentDir = typeContentDir()
     try {
       mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })

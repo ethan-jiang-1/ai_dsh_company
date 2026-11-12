@@ -60,10 +60,13 @@ describe('编号合同：requirements-model.md', () => {
 })
 
 describe('编号范围标记：meta 模板', () => {
-  it('meta 模板带 `编号体系:` / `产品类型:` / `需求层:` 标记', () => {
+  it('meta 模板带 `编号体系:` / `productType:` / `deliveryMode:` / `需求层:` 标记', () => {
     const meta = read(join(CONTENT, 'templates/meta.md'))
     expect(meta, 'meta 模板缺 `编号体系:` 标记——新动议进不了编号检查').toMatch(/^编号体系:/m)
-    expect(meta, 'meta 模板缺 `产品类型:` 标记——动议级类型没有声明面').toMatch(/^产品类型:/m)
+    expect(meta, 'meta 模板缺 `productType:` 标记——动议级类型没有声明面').toMatch(/^productType:/m)
+    expect(meta, 'meta 模板缺 `deliveryMode:` 标记——交付模式没有声明面').toMatch(/^deliveryMode:/m)
+    expect(meta, 'meta 模板仍用旧中文产品类型字段').not.toMatch(/^产品类型\s*[:：]/m)
+    expect(meta, 'meta 模板仍用旧中文交付模式字段').not.toMatch(/^交付模式\s*[:：]/m)
     expect(meta, 'meta 模板缺 `需求层:` 标记——缺层判红没有声明面').toMatch(/^需求层:/m)
   })
 

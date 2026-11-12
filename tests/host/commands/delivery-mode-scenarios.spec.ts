@@ -33,8 +33,8 @@ function fixture(type: string, mode?: string): { workspace: string; cleanup: () 
   const root = join(workspace, '.dsh-company/deliverables/2026-11-11-demo')
   const drafts = join(root, 'drafts')
   mkdirSync(drafts, { recursive: true })
-  const meta = ['slug: demo', 'kickoff: 2026-11-11', '编号体系: identity', `产品类型: ${type}`]
-  if (mode !== undefined) meta.push(`交付模式: ${mode}`)
+  const meta = ['slug: demo', 'kickoff: 2026-11-11', '编号体系: identity', `productType: ${type}`]
+  if (mode !== undefined) meta.push(`deliveryMode: ${mode}`)
   writeFileSync(join(root, 'meta.md'), `${meta.join('\n')}\n`)
   for (const [name, body] of [['mrd.md', MRD], ['strs.md', STRS], ['prd.md', PRD]] as const) writeFileSync(join(drafts, name), body)
   return { workspace, cleanup: () => rmSync(workspace, { recursive: true, force: true }) }

@@ -9,7 +9,7 @@
 - 需要驻场、实施、培训、切换、第三方系统对接；
 - 合同按里程碑收款，交付物包含实施与验收，而不只是软件许可/订阅。
 
-**不要用**：纯产品售卖、SaaS 订阅、无 SOW/UAT/驻场的标准产品交付——那用 `交付模式: productized`。
+**不要用**：纯产品售卖、SaaS 订阅、无 SOW/UAT/驻场的标准产品交付——那用 `deliveryMode: productized`。
 
 ## 两轴组合
 
@@ -26,8 +26,8 @@
 ## 动议户口
 
 ```yaml
-产品类型: business-software
-交付模式: project-services
+productType: business-software
+deliveryMode: project-services
 ```
 
 不写 `交付模式` = `productized`。有 SOW / UAT / 驻场 / 里程碑验收，就写 `project-services`。

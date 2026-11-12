@@ -93,7 +93,7 @@ export interface CompanyProductType {
 function readProductType(path: string): string | null {
   if (!existsSync(path)) return null
   try {
-    const match = /^(?:productType|产品类型)\s*[:：]\s*(.+)$/m.exec(readFileSync(path, 'utf8'))
+    const match = /^productType\s*[:：]\s*(.+)$/m.exec(readFileSync(path, 'utf8'))
     const value = yamlScalar(match?.[1] ?? '')
     return value === '' || (value.startsWith('<') && value.endsWith('>')) ? null : value
   } catch {

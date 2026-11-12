@@ -47,10 +47,10 @@ interface DeliveryRules {
   readonly requiredSections?: Record<string, string[]>
 }
 
-/** 读 `交付模式:` / `deliveryMode:` 行；缺省/占位符 = productized。 */
+/** 读 `deliveryMode:` 行；缺省/占位符 = productized。 */
 function parseDeliveryMode(text: string | undefined): string {
   if (text === undefined) return 'productized'
-  const match = /^(?:交付模式|deliveryMode)\s*[:：]\s*(.+)$/m.exec(text)
+  const match = /^deliveryMode\s*[:：]\s*(.+)$/m.exec(text)
   const value = yamlScalar(match?.[1] ?? '')
   if (value === '' || (value.startsWith('<') && value.endsWith('>'))) return 'productized'
   return value

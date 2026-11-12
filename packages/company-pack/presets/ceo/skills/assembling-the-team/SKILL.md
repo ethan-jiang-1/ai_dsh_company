@@ -53,10 +53,10 @@ description: CEO 的组队方法：接到动议先过这六步（要不要叫人
    - 单职能但要来回改 → 也是组队（成员持久）。
 6. **定 slug**：给这次交付定 `<slug>`（短横线小写英文），分派时全员共用；
    过程稿落 `.dsh-company/deliverables/<slug>/drafts/<角色>.md`，定稿只有你能 `present`。
-   **同一步写产品类型**：在 `meta.md` 写 `产品类型: <id>`（可选值 = 产品类型包目录名，见 `meta.md` 模板）。用户声明优先；
+   **同一步写产品类型**：在 `meta.md` 写 `productType: <id>`（可选值 = 产品类型包目录名，见 `meta.md` 模板）。用户声明优先；
    没说就问一句，或按 `company.md` 的 `productType` 默认并在任务书标假设——不要按习惯猜。类型写错，
    `/req check` 会用错编号规则；改类型要重新确认层与文档链。
-   **同一步写交付模式**：`交付模式: productized|project-services|managed-service`；不写 = `productized`，有 SOW/UAT/驻场/里程碑验收 = `project-services`，有持续 SLA/值班/月报/续费 = `managed-service`。
+   **同一步写交付模式**：`deliveryMode: productized|project-services|managed-service`；不写 = `productized`，有 SOW/UAT/驻场/里程碑验收 = `project-services`，有持续 SLA/值班/月报/续费 = `managed-service`。
    规则/模板见 `content/delivery-modes/`，不要把它塞进 `产品类型`。
    **先落任务书再 spawn**：`spawn_teammate` 之前，把任务书写到
    `.dsh-company/deliverables/<slug>/drafts/ceo.md`——目标/约束/验收、在屋名单与通道、每个成员的

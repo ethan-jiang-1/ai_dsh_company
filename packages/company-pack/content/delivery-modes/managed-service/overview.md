@@ -30,8 +30,8 @@
 ## 动议户口
 
 ```yaml
-产品类型: business-software
-交付模式: managed-service
+productType: business-software
+deliveryMode: managed-service
 ```
 
 不写 `交付模式` = `productized`。有持续 SLA / 值班 / 月报 / 续费，就写 `managed-service`。

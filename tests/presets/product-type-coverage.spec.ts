@@ -78,13 +78,13 @@ describe('产品类型 coverage：每个类型五件齐 + playbook + fixture', (
 
   it('awareness 面：meta / 手册 / CEO 都指向产品类型唯一枚举', () => {
     const meta = readFileSync(join(PACK, 'content/templates/meta.md'), 'utf8')
-    expect(meta).toMatch(/^产品类型\s*[:：]/m)
+    expect(meta).toMatch(/^productType\s*[:：]/m)
     expect(meta).toContain('content/product-types/')
     const handbook = readFileSync(join(PACK, 'content/AGENTS.md'), 'utf8')
     expect(handbook).toContain('产品类型')
     expect(handbook).toContain('product-types')
     const ceo = readFileSync(join(PACK, 'presets/ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
-    expect(ceo).toMatch(/产品类型: <id>/)
+    expect(ceo).toMatch(/productType: <id>/)
   })
 
   it('references 与类型包一一对应（没有未来孤儿，也没有漏 reference 的类型包）', () => {

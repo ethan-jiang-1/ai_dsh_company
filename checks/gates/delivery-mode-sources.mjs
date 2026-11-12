@@ -5,9 +5,11 @@
 // 判据（交付模式包是一等能力，不是产品类型）：
 //   ① `content/delivery-modes/<id>/` 至少有 overview.md、document-map.md、delivery-rules.json；
 //   ② delivery-rules.json 的 deliveryMode = 目录名，entry 在场，每个 document 的 template 在场、owner 非空；
-//   ③ 动议户口模板必须有 `交付模式:` 字段；公司手册必须有“交付模式”与 `content/delivery-modes/` 指针；
+//   ③ 动议户口模板必须有 `deliveryMode:` 字段；公司手册必须有“交付模式”与 `content/delivery-modes/` 指针；
 //   ④ 产品类型目录不得出现 delivery-modes 的同名目录（避免把交付模式塞回类型轴）。
 // 负例留证（建门时实跑）：删 overview → 红；把 deliveryMode 改成 nope → 红；删 meta 的 交付模式 行 → 红；
+//   还原 → 绿。
+// 负例留证 2026-11-12（字段 canonical 英文化）：把 meta 的 `deliveryMode:` 改回 `交付模式:` → 红；
 //   还原 → 绿。
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
@@ -85,8 +87,8 @@ export function run({ root, ok, fail }) {
 
   const metaPath = join(root, CONTENT, 'templates/meta.md')
   if (!existsSync(metaPath)) problems.push(`${CONTENT}/templates/meta.md 缺失`)
-  else if (!/^交付模式\s*[:：]/m.test(readFileSync(metaPath, 'utf8'))) {
-    problems.push(`${CONTENT}/templates/meta.md: 缺「交付模式:」字段（动议没有选择面）`)
+  else if (!/^deliveryMode\s*[:：]/m.test(readFileSync(metaPath, 'utf8'))) {
+    problems.push(`${CONTENT}/templates/meta.md: 缺「deliveryMode:」字段（动议没有选择面）`)
   }
 
   const handbookPath = join(root, CONTENT, 'AGENTS.md')

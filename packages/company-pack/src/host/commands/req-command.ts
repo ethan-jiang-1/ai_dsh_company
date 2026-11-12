@@ -60,19 +60,19 @@ interface ProductTypeResolution {
   readonly error: string | null
 }
 
-/** 读 `产品类型:` / `productType:` 行；模板占位 `<...>` 视为未声明。 */
+/** 读 `productType:` 行；模板占位 `<...>` 视为未声明。 */
 function parseProductType(text: string | undefined): string | null {
   if (text === undefined) return null
-  const match = /^(?:产品类型|productType)\s*[:：]\s*(.+)$/m.exec(text)
+  const match = /^productType\s*[:：]\s*(.+)$/m.exec(text)
   const value = yamlScalar(match?.[1] ?? '')
   if (value === '' || (value.startsWith('<') && value.endsWith('>'))) return null
   return value
 }
 
-/** 读 `交付模式:` / `deliveryMode:` 行；缺省 = productized（不阻塞旧动议）。 */
+/** 读 `deliveryMode:` 行；缺省 = productized（不阻塞旧动议）。 */
 function parseDeliveryMode(text: string | undefined): string {
   if (text === undefined) return 'productized'
-  const match = /^(?:交付模式|deliveryMode)\s*[:：]\s*(.+)$/m.exec(text)
+  const match = /^deliveryMode\s*[:：]\s*(.+)$/m.exec(text)
   const value = yamlScalar(match?.[1] ?? '')
   if (value === '' || (value.startsWith('<') && value.endsWith('>'))) return 'productized'
   return value
@@ -89,7 +89,7 @@ function parseDeclaredLayers(text: string | undefined): string[] {
 /** 是否显式声明了真实交付模式（缺省/占位符不算）。 */
 function hasDeclaredDeliveryMode(text: string | undefined): boolean {
   if (text === undefined) return false
-  const match = /^(?:交付模式|deliveryMode)\s*[:：]\s*(.+)$/m.exec(text)
+  const match = /^deliveryMode\s*[:：]\s*(.+)$/m.exec(text)
   const value = yamlScalar(match?.[1] ?? '')
   return value !== '' && !(value.startsWith('<') && value.endsWith('>'))
 }

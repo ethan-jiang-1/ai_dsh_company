@@ -143,7 +143,14 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 | `【事实】` / `【假设】` | 内容/审计人工约定（无代码解析，需确认） | 改 `[fact]` / `[assumption]`；模板/文档同步 |
 | 状态枚举 `待办/已出稿/完成/取消/待补料` | 派活行消费侧/任务板 | 与派活行一起改英文枚举 |
 
-**结论**：剩余 4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）在 I1b 完成前保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。I1b 需独立红绿门禁（字段解析、派活行、schedule 锚、attention mark、journal 日期）。
+**I1b 已做（2026-11-12，产品/交付字段）**：
+
+- `meta.md` 模板、content 示例、`company.md` 字段引用改 `productType:` / `deliveryMode:`。
+- `req-command` / `delivery-command` / bootstrap 解析器只认英文 canonical；旧中文字段不再解析。
+- 测试：中文-only `产品类型:` 回落 company 默认（红→绿），中文-only `交付模式:` 回落 productized（红→绿）；`delivery-mode-sources` 门禁改查 `deliveryMode:`，把模板改回中文 → 红，还原 → 绿。
+- `presets.spec` / `product-type-coverage` / `requirements-contract` 的字段断言同步。
+
+**剩余 I1b**：派活行与状态枚举、`待补料` schedule 锚、`【待澄清】`、`日期待核`、`【事实】/【假设】`。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 

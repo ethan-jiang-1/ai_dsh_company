@@ -75,7 +75,7 @@ describe.each(modes)('交付模式包：%s', (mode) => {
 describe('交付模式 awareness：meta 与手册', () => {
   it('meta 模板有交付模式字段；手册有交付模式与包指针', () => {
     const meta = readFileSync(join(CONTENT, 'templates/meta.md'), 'utf8')
-    expect(meta).toMatch(/^交付模式\s*[:：]/m)
+    expect(meta).toMatch(/^deliveryMode\s*[:：]/m)
     const handbook = readFileSync(join(CONTENT, 'AGENTS.md'), 'utf8')
     expect(handbook).toContain('交付模式')
     expect(handbook).toContain('delivery-modes')

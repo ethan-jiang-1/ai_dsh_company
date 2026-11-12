@@ -31,7 +31,7 @@ function fixture(mode: string): { workspace: string; root: string; drafts: strin
   const root = join(workspace, `.dsh-company/deliverables/${SLUG}`)
   const drafts = join(root, 'drafts')
   mkdirSync(drafts, { recursive: true })
-  writeFileSync(join(root, 'meta.md'), `slug: demo\nkickoff: 2026-11-11\n产品类型: business-software\n交付模式: ${mode}\n`)
+  writeFileSync(join(root, 'meta.md'), `slug: demo\nkickoff: 2026-11-11\nproductType: business-software\ndeliveryMode: ${mode}\n`)
   return { workspace, root, drafts, cleanup: () => rmSync(workspace, { recursive: true, force: true }) }
 }
 
@@ -72,6 +72,17 @@ describe('registerDeliveryCommand', () => {
       const result = await mount(workspace).handler({ rawInput: `check ${SLUG}` })
       expect(result.kind).toBe('success')
       expect(result.text).toContain('确认交付模式')
+    } finally { cleanup() }
+  })
+
+  it('旧中文 `交付模式:` 不再解析（canonical = deliveryMode）', async () => {
+    const { workspace, root, cleanup } = fixture('managed-service')
+    try {
+      writeFileSync(join(root, 'meta.md'), 'slug: demo\nkickoff: 2026-11-11\n产品类型: business-software\n交付模式: managed-service\n')
+      const result = await mount(workspace).handler({ rawInput: `check ${SLUG}` })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('productized')
+      expect(result.text).not.toContain('managed-service')
     } finally { cleanup() }
   })
 

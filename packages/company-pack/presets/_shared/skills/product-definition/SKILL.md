@@ -51,7 +51,7 @@ MRD / PRD 是这条脊柱的两种产物，不是两套模板。
 | `project-services` | SOW / UAT / 驻场 / 里程碑验收 | SOW / UAT / RACI / 里程碑 |
 | `managed-service` | 持续 SLA / 值班 / 月报 / 续费 | SLA / 服务目录 / Runbook / 事件 / 月报 / 续约 |
 
-动议组合示例：`产品类型: business-software` + `交付模式: project-services`——需求链仍走
+动议组合示例：`productType: business-software` + `deliveryMode: project-services`——需求链仍走
 business-software 的 MRD→StRS→PRD，另加 SOW/UAT/RACI/里程碑，不改需求层。
 
 **生长方式**：pack 里的 playbook 随版本走；角色自己的打法（本行业话术、评估量表）经培养采纳进

@@ -43,6 +43,12 @@
 - 外部红（非本切片）：工作树另有两个并行研究材料正在写，`pnpm verify` 有
   md-newline / md-links / bare-path / pin-currency / tracked-portability 红；未触碰、未纳入 commit。
 
+## I1b 第一片（meta 字段）
+
+- `productType:` / `deliveryMode:` 成为 meta canonical；解析器只认英文；旧中文字段被忽略。
+- 测试：中文-only 字段回落默认（红→绿）；`delivery-mode-sources` 门禁改查 `deliveryMode:`，模板回退中文 → 红，还原 → 绿。
+- `pnpm test` 207 files / 1631 tests；`preset-smoke` ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
