@@ -1,0 +1,99 @@
+/**
+ * 启动策略落盘层的 keyless 判据（2026-11-12）。
+ *
+ * 判据：
+ * ① 写是原子的：目标文件要么旧内容、要么完整新内容（同目录临时文件 + rename）；
+ * ② 目录不存在时自动建（`.dsh-company/` 可能还没 bootstrap 完）；
+ * ③ 选项枚举来自 `content/`：产品类型 = 目录名排序；交付模式 = 隐式 `productized` 在前；
+ * ④ 内容目录缺失 → 空集合 / 只有 productized（不发明选项）；
+ * ⑤ 读坏文件不抛（折成全自动 / 空集合）。
+ */
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { afterEach, describe, expect, it } from 'vitest'
+import {
+  enumerateStartupOptions,
+  readStartupOptions,
+  readStartupSettings,
+  refreshStartupOptions,
+  startupOptionsPath,
+  startupSettingsPath,
+  writeStartupSettings,
+} from '../../../packages/company-pack/src/host/startup/startup-store.ts'
+import { EMPTY_STARTUP_SETTINGS } from '../../../packages/company-pack/src/lib/startup-settings.ts'
+
+const roots: string[] = []
+
+function workspace(): string {
+  const root = mkdtempSync(join(tmpdir(), 'startup-store-'))
+  roots.push(root)
+  return root
+}
+
+afterEach(() => {
+  for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true })
+})
+
+describe('paths', () => {
+  it('settings 与派生选项是两个文件，且都在 .dsh-company 下', () => {
+    const root = workspace()
+    expect(startupSettingsPath(root)).toBe(join(root, '.dsh-company', 'startup.json'))
+    expect(startupOptionsPath(root)).toBe(join(root, '.dsh-company', 'startup-options.json'))
+    expect(startupSettingsPath(root)).not.toBe(startupOptionsPath(root))
+  })
+})
+
+describe('read / write settings', () => {
+  it('缺失 → 全自动；写完能读回；目录自动创建', () => {
+    const root = workspace()
+    expect(readStartupSettings(root)).toEqual(EMPTY_STARTUP_SETTINGS)
+    const settings = { v: 1 as const, productType: 'business-software', deliveryMode: null, wiki: null, updatedAt: 'T' }
+    writeStartupSettings(root, settings)
+    expect(readStartupSettings(root)).toEqual(settings)
+  })
+
+  it('覆盖写是原子的：不留临时文件', () => {
+    const root = workspace()
+    writeStartupSettings(root, { v: 1, productType: 'a', deliveryMode: null, wiki: null, updatedAt: '1' })
+    writeStartupSettings(root, { v: 1, productType: 'b', deliveryMode: null, wiki: null, updatedAt: '2' })
+    const files = readdirSync(join(root, '.dsh-company'))
+    expect(files.filter(name => name.endsWith('.tmp'))).toEqual([])
+    expect(readStartupSettings(root).productType).toBe('b')
+  })
+
+  it('坏文件折成全自动，不抛', () => {
+    const root = workspace()
+    mkdirSync(join(root, '.dsh-company'), { recursive: true })
+    writeFileSync(startupSettingsPath(root), '{not json', 'utf8')
+    expect(readStartupSettings(root)).toEqual(EMPTY_STARTUP_SETTINGS)
+  })
+})
+
+describe('enumerate / refresh options', () => {
+  it('产品类型 = 目录名排序；交付模式 = productized 在前', () => {
+    const content = workspace()
+    mkdirSync(join(content, 'product-types', 'b-type'), { recursive: true })
+    mkdirSync(join(content, 'product-types', 'a-type'), { recursive: true })
+    mkdirSync(join(content, 'delivery-modes', 'managed-service'), { recursive: true })
+    expect(enumerateStartupOptions(content)).toEqual({
+      productTypes: ['a-type', 'b-type'],
+      deliveryModes: ['productized', 'managed-service'],
+    })
+  })
+
+  it('内容目录缺失 → 空产品类型 + 只有隐式 productized', () => {
+    expect(enumerateStartupOptions(workspace())).toEqual({ productTypes: [], deliveryModes: ['productized'] })
+    expect(enumerateStartupOptions(undefined)).toEqual({ productTypes: [], deliveryModes: [] })
+  })
+
+  it('refresh 落派生文件，读回一致', () => {
+    const root = workspace()
+    const content = workspace()
+    mkdirSync(join(content, 'product-types', 'x'), { recursive: true })
+    const options = refreshStartupOptions(root, content)
+    expect(existsSync(startupOptionsPath(root))).toBe(true)
+    expect(readStartupOptions(root)).toEqual(options)
+    expect(JSON.parse(readFileSync(startupOptionsPath(root), 'utf8')).v).toBe(1)
+  })
+})

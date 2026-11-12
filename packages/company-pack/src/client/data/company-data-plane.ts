@@ -29,6 +29,8 @@ export interface CompanyDataPlaneContext {
 export const WORKSPACE_TEXT_PATHS = {
   ledger: RUN_BUNDLE_PATHS.ledger,
   catalog: RUN_BUNDLE_PATHS.catalog,
+  startup: RUN_BUNDLE_PATHS.startup,
+  startupOptions: RUN_BUNDLE_PATHS.startupOptions,
 } as const
 
 /** 数据面输出（页签与公司视图共用同一实现）。 */

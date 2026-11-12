@@ -4,16 +4,17 @@ import { describe, expect, it } from 'vitest'
 import { repositoryRoot } from '../../../tools/lib/repository-layout.mjs'
 import { parseCompanyTabCatalog } from '../../../tools/lib/company-tab-catalog.mjs'
 
-// 2026-10-20 审计：cdp-probe 的 8 个页签 vs 注册面 9 个（成品缺）。本 spec 钉注册源形状，
+// 2026-10-20 审计：cdp-probe 的 8 个页签 vs 注册面 9 个（成品缺）；2026-11-12 加「策略」→ 10。本 spec 钉注册源形状，
 // live 面由 cdp-probe 从同一份 catalog 驱动；解析失败 = 探针不该静默跑 8/8。
 describe('company-tab-catalog', () => {
-  it('从真实注册源解析出 9 个页签，含成品', () => {
+  it('从真实注册源解析出 10 个页签，含成品与策略', () => {
     const source = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/tabs/company-tab-registration.ts'), 'utf8')
     const identity = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/ui/tab-icons.tsx'), 'utf8')
     const copy = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/locales.ts'), 'utf8')
     const tabs = parseCompanyTabCatalog(source, identity, copy)
-    expect(tabs).toHaveLength(9)
+    expect(tabs).toHaveLength(10)
     expect(tabs.map(tab => tab.title)).toContain('成品')
+    expect(tabs.map(tab => tab.title)).toContain('策略')
     expect(tabs.every(tab => tab.id.startsWith('dsh-company-pack/'))).toBe(true)
   })
 

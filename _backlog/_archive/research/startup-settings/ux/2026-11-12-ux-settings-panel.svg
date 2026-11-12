@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1160" viewBox="0 0 1200 1160" font-family="PingFang SC, Hiragino Sans GB, Noto Sans CJK SC, Microsoft YaHei, system-ui, sans-serif">
+  <defs>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="1160" fill="#f4f6f9"/>
+
+  <text x="60" y="52" font-size="22" font-weight="700" fill="#111827">启动设置 · 随时可改的项目策略</text>
+  <text x="60" y="80" font-size="14" fill="#6b7280">入口一直在工具栏；改了下一轮就生效；下拉里有什么，取决于这家公司装了什么内容——不写死。</text>
+
+  <!-- ═══════════ ① 入口 ═══════════ -->
+  <rect x="60" y="106" width="1080" height="306" rx="16" fill="#ffffff" stroke="#e3e7ee"/>
+
+  <circle cx="92" cy="140" r="4" fill="#22c55e"/>
+  <text x="104" y="145" font-size="12" fill="#8b93a1">项目已经在跑（第 3 轮）</text>
+
+  <rect x="88" y="158" width="360" height="38" rx="10" fill="#eef1f6"/>
+  <text x="104" y="182" font-size="13" fill="#374151">把成本测算补一下。</text>
+
+  <rect x="80" y="204" width="1040" height="150" rx="14" fill="#ffffff" stroke="#dfe3ea"/>
+  <text x="104" y="244" font-size="14" fill="#9aa1ad">让梦之队继续干活…</text>
+
+  <circle cx="112" cy="318" r="13" fill="#f2f4f8" stroke="#e0e4ec"/>
+  <text x="112" y="323" font-size="16" fill="#5b6472" text-anchor="middle">+</text>
+
+  <rect x="136" y="302" width="76" height="32" rx="16" fill="#f5f7fa" stroke="#e3e7ee"/>
+  <text x="174" y="322" font-size="12" fill="#4b5563" text-anchor="middle">权限 ▾</text>
+
+  <rect x="220" y="302" width="62" height="32" rx="16" fill="#f5f7fa" stroke="#e3e7ee"/>
+  <text x="251" y="322" font-size="12" fill="#4b5563" text-anchor="middle">Plan</text>
+
+  <rect x="298" y="310" width="34" height="18" rx="9" fill="#cfd6e2"/>
+  <circle cx="323" cy="319" r="7" fill="#ffffff"/>
+  <text x="340" y="323" font-size="12" fill="#6b7280">Follow default</text>
+
+  <!-- 入口按钮：设置，不是状态徽章 -->
+  <rect x="452" y="298" width="152" height="40" rx="10" fill="#eef4ff" stroke="#bcd3ff"/>
+  <line x1="468" y1="311" x2="484" y2="311" stroke="#2f6fe4" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="474" cy="311" r="2.5" fill="#2f6fe4"/>
+  <line x1="468" y1="319" x2="484" y2="319" stroke="#2f6fe4" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="480" cy="319" r="2.5" fill="#2f6fe4"/>
+  <line x1="468" y1="327" x2="484" y2="327" stroke="#2f6fe4" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="471" cy="327" r="2.5" fill="#2f6fe4"/>
+  <text x="494" y="323" font-size="13" fill="#1b4ea8">策略：自动</text>
+
+  <rect x="442" y="288" width="172" height="60" rx="14" fill="none" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+  <line x1="528" y1="288" x2="528" y2="262" stroke="#e5484d" stroke-width="2"/>
+  <text x="528" y="254" font-size="13" font-weight="700" fill="#e5484d" text-anchor="middle">① 任何时候都能点</text>
+
+  <rect x="900" y="302" width="118" height="32" rx="16" fill="#f5f7fa" stroke="#e3e7ee"/>
+  <text x="959" y="322" font-size="12" fill="#4b5563" text-anchor="middle">DeepSeek ▾</text>
+  <circle cx="1052" cy="318" r="15" fill="#2b3440"/>
+  <text x="1052" y="324" font-size="15" fill="#ffffff" text-anchor="middle">↑</text>
+
+  <text x="88" y="380" font-size="13" fill="#6b7280">不是「设置一次就锁死」：项目跑到一半想换套路，回来点它就行。</text>
+  <text x="88" y="402" font-size="13" fill="#6b7280">按钮上的字跟着当前设置走（现在是「自动」），换公司、换内容也不用改界面。</text>
+
+  <!-- ═══════════ 过渡 ═══════════ -->
+  <rect x="520" y="434" width="160" height="32" rx="16" fill="#2b3440"/>
+  <text x="600" y="455" font-size="13" fill="#ffffff" text-anchor="middle">点开 · 随时可改</text>
+  <line x1="600" y1="466" x2="600" y2="490" stroke="#9aa1ad" stroke-width="2"/>
+  <polygon points="600,498 594,486 606,486" fill="#9aa1ad"/>
+
+  <!-- ═══════════ ② 设置页 ═══════════ -->
+  <text x="60" y="530" font-size="14" font-weight="600" fill="#4b5563">② 点开之后：一页设置，不是一个一次性向导</text>
+
+  <rect x="60" y="538" width="1080" height="590" rx="16" fill="#39404e" opacity="0.55"/>
+
+  <!-- 设置卡 -->
+  <rect x="250" y="562" width="560" height="440" rx="16" fill="#ffffff" filter="url(#soft)"/>
+
+  <text x="278" y="608" font-size="20" font-weight="700" fill="#111827">项目策略</text>
+  <text x="278" y="632" font-size="13" fill="#6b7280">这个项目里所有角色都按这里来；随时可改，下一轮生效。</text>
+  <line x1="278" y1="650" x2="782" y2="650" stroke="#eceff4"/>
+
+  <!-- 行 1 -->
+  <text x="278" y="678" font-size="12" fill="#8b93a1">做什么</text>
+  <rect x="278" y="688" width="504" height="40" rx="10" fill="#fbfcfd" stroke="#e3e7ee"/>
+  <text x="294" y="713" font-size="13" fill="#374151">自动</text>
+  <rect x="340" y="697" width="62" height="22" rx="11" fill="#eef2f7"/>
+  <text x="371" y="712" font-size="11" fill="#6b7280" text-anchor="middle">不设限</text>
+  <polyline points="756,703 761,708 756,713" fill="none" stroke="#9aa1ad" stroke-width="1.6"/>
+
+  <!-- 行 2 -->
+  <text x="278" y="758" font-size="12" fill="#8b93a1">怎么交付</text>
+  <rect x="278" y="768" width="504" height="40" rx="10" fill="#fbfcfd" stroke="#e3e7ee"/>
+  <text x="294" y="793" font-size="13" fill="#374151">按项目做</text>
+  <polyline points="756,783 761,788 756,793" fill="none" stroke="#9aa1ad" stroke-width="1.6"/>
+
+  <!-- 行 3 -->
+  <text x="278" y="838" font-size="12" fill="#8b93a1">参考资料（wiki）</text>
+  <rect x="278" y="848" width="504" height="40" rx="10" fill="#fbfcfd" stroke="#e3e7ee"/>
+  <text x="294" y="873" font-size="13" fill="#b0b7c3">未设置</text>
+  <text x="766" y="873" font-size="12" fill="#6b7280" text-anchor="end">选择…</text>
+
+  <text x="278" y="918" font-size="12" fill="#a16207">没有「保存」按钮：离开即生效，最快下一轮。</text>
+  <line x1="278" y1="942" x2="782" y2="942" stroke="#eceff4"/>
+  <rect x="700" y="954" width="82" height="34" rx="10" fill="#1f2937"/>
+  <text x="741" y="976" font-size="13" fill="#ffffff" text-anchor="middle">完成</text>
+
+  <!-- 右侧：下拉的样子 -->
+  <rect x="834" y="562" width="300" height="380" rx="14" fill="#ffffff" opacity="0.97"/>
+  <text x="852" y="592" font-size="13" font-weight="700" fill="#111827">「怎么交付」的下拉里长这样</text>
+
+  <rect x="852" y="608" width="264" height="54" rx="10" fill="#eef4ff" stroke="#bcd3ff"/>
+  <text x="868" y="630" font-size="13" font-weight="600" fill="#1b4ea8">自动</text>
+  <text x="868" y="648" font-size="11" fill="#5b7fc7">不约束，模型自己判断</text>
+
+  <rect x="852" y="670" width="264" height="38" rx="10" fill="#fbfcfd" stroke="#e9edf3"/>
+  <text x="868" y="694" font-size="12" fill="#374151">按产品卖</text>
+
+  <rect x="852" y="716" width="264" height="38" rx="10" fill="#fbfcfd" stroke="#e9edf3"/>
+  <text x="868" y="740" font-size="12" fill="#374151">按项目做</text>
+
+  <rect x="852" y="762" width="264" height="38" rx="10" fill="#fbfcfd" stroke="#e9edf3"/>
+  <text x="868" y="786" font-size="12" fill="#374151">长期运维</text>
+
+  <rect x="852" y="816" width="264" height="66" rx="10" fill="#fff8e6" stroke="#f2d38a"/>
+  <text x="866" y="838" font-size="11" fill="#8a6100">这些选项不是写死的：</text>
+  <text x="866" y="856" font-size="11" fill="#8a6100">公司装了哪些内容，这里就出现哪些。</text>
+  <text x="866" y="874" font-size="11" fill="#8a6100">换一家公司，下拉自动变。</text>
+
+  <text x="60" y="1150" font-size="12" fill="#9aa1ad">同一套界面，服务任何一家公司：类型、交付方式、方法都从内容里来，界面不认公司。</text>
+</svg>

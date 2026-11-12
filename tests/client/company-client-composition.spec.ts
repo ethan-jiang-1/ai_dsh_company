@@ -36,6 +36,7 @@ const COMPANY_TAB_IDS = [
   'dsh-company-pack/cultivation',
   'dsh-company-pack/ledger',
   'dsh-company-pack/deliverables',
+  'dsh-company-pack/strategy',
 ] as const
 
 const COMPANY_SLOTS = [
@@ -59,7 +60,7 @@ function declareWorkspaceFilesNamespace(mock: { load(rules: unknown): unknown })
 const test = createClientTest({ roster, provide: { 'dsh-company-pack': companyClient } })
 
 describe('company client apply through the whole-client tier', () => {
-  test('boots the pack row and registers the nine company tabs with keyed slots', async ({ mock, start }) => {
+  test('boots the pack row and registers the ten company tabs with keyed slots', async ({ mock, start }) => {
     declareWorkspaceFilesNamespace(mock)
     // A1：setLocale 会写 settings/mutate；给 mock 一个最小 namespace view，避免 unmatched。
     mock.load({

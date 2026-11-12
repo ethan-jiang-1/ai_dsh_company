@@ -12,6 +12,9 @@ import type { CultivationContextSources } from '../cultivation/cultivation-conte
 import type { CultivationContext } from '../../lib/cultivation-context.ts'
 import { CultivationTab } from './CultivationTab.tsx'
 import { DeliverablesTab } from './DeliverablesTab.tsx'
+import { StrategyPanel, type SaveResult } from '../startup/StrategyPanel.tsx'
+import type { StartupStore } from '../startup/startup-store.ts'
+import type { StartupField } from '../../lib/startup-settings.ts'
 import { LedgerTab } from './LedgerTab.tsx'
 import { sessionFileAddress } from '../../lib/deliverables-address.ts'
 import { TAB_IDENTITY, type FaceKey } from '../ui/tab-icons.tsx'
@@ -53,6 +56,14 @@ export interface CompanyTabRegistrationData {
   readonly openContext: (sessionId: SessionId, context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false, readonly problem: string }>
   /** 当前语言的 translator（由 apply 绑定 `company` 字典）。 */
   readonly t: CompanyT
+  /** 启动策略共享仓（面板与 composer 按钮共用）。 */
+  readonly startupStore: StartupStore
+  /** 读盘刷新启动策略。 */
+  readonly loadStartup: (sessionId: SessionId, signal: AbortSignal) => Promise<void>
+  /** 保存一个启动策略字段。 */
+  readonly saveStartup: (sessionId: SessionId, field: StartupField, value: string | null) => Promise<SaveResult>
+  /** 全部恢复自动。 */
+  readonly resetStartup: (sessionId: SessionId) => Promise<SaveResult>
 }
 
 interface TabRegistration {
@@ -159,6 +170,21 @@ const TAB_REGISTRATIONS = [
         },
       }),
     }, DeliverablesTab),
+  },
+  {
+    id: 'dsh-company-pack/strategy', kind: 'company-strategy', face: 'strategy',
+    order: 20,
+    registerBody: (scoped, id, data) => scoped.slots.register({
+      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
+      inject: () => ({ t: data.t,
+        store: data.startupStore,
+        load: data.loadStartup,
+        save: data.saveStartup,
+        reset: data.resetStartup,
+        floatTab: data.floatTab,
+        unfloatTab: data.unfloatTab,
+      }),
+    }, StrategyPanel),
   },
 ] satisfies readonly TabRegistration[]
 

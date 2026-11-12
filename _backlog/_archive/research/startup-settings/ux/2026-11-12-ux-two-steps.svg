@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1020" viewBox="0 0 1200 1020" font-family="PingFang SC, Hiragino Sans GB, Noto Sans CJK SC, Microsoft YaHei, system-ui, sans-serif">
+  <defs>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="1020" fill="#f4f6f9"/>
+
+  <!-- 标题 -->
+  <text x="60" y="52" font-size="22" font-weight="700" fill="#111827">启动设置 · 用户看到的两步</text>
+  <text x="60" y="80" font-size="14" fill="#6b7280">① 输入框工具栏上有个小标签，显示这个项目当前的套路　→　② 点开是一张卡，三行，全都有默认值</text>
+
+  <!-- ═══════════ 第一步：composer ═══════════ -->
+  <rect x="60" y="106" width="1080" height="288" rx="16" fill="#ffffff" stroke="#e3e7ee"/>
+
+  <!-- 一条对话，交代场景 -->
+  <rect x="88" y="132" width="452" height="40" rx="10" fill="#eef1f6"/>
+  <text x="104" y="157" font-size="13" fill="#374151">这个项目要做一个设备管理平台，先出需求。</text>
+
+  <!-- composer 卡片 -->
+  <rect x="80" y="190" width="1040" height="150" rx="14" fill="#ffffff" stroke="#dfe3ea"/>
+  <text x="104" y="230" font-size="14" fill="#9aa1ad">让梦之队开始干活…</text>
+
+  <!-- 底部工具行 -->
+  <circle cx="112" cy="304" r="13" fill="#f2f4f8" stroke="#e0e4ec"/>
+  <text x="112" y="309" font-size="16" fill="#5b6472" text-anchor="middle">+</text>
+
+  <rect x="136" y="288" width="76" height="32" rx="16" fill="#f5f7fa" stroke="#e3e7ee"/>
+  <text x="174" y="308" font-size="12" fill="#4b5563" text-anchor="middle">权限 ▾</text>
+
+  <rect x="220" y="288" width="62" height="32" rx="16" fill="#f5f7fa" stroke="#e3e7ee"/>
+  <text x="251" y="308" font-size="12" fill="#4b5563" text-anchor="middle">Plan</text>
+
+  <!-- auto-continue -->
+  <rect x="298" y="296" width="34" height="18" rx="9" fill="#cfd6e2"/>
+  <circle cx="323" cy="305" r="7" fill="#ffffff"/>
+  <text x="340" y="309" font-size="12" fill="#6b7280">Follow default</text>
+
+  <!-- 新按钮：红框位 -->
+  <rect x="452" y="286" width="196" height="36" rx="10" fill="#eef4ff" stroke="#bcd3ff"/>
+  <rect x="466" y="299" width="5" height="5" rx="1" fill="#2f6fe4"/>
+  <rect x="474" y="299" width="5" height="5" rx="1" fill="#2f6fe4"/>
+  <rect x="466" y="307" width="5" height="5" rx="1" fill="#2f6fe4"/>
+  <rect x="474" y="307" width="5" height="5" rx="1" fill="#2f6fe4"/>
+  <text x="490" y="309" font-size="13" fill="#1b4ea8">业务软件 · 按产品卖</text>
+
+  <rect x="442" y="276" width="216" height="56" rx="14" fill="none" stroke="#e5484d" stroke-width="2" stroke-dasharray="6 4"/>
+  <line x1="550" y1="276" x2="550" y2="250" stroke="#e5484d" stroke-width="2"/>
+  <text x="550" y="242" font-size="13" font-weight="700" fill="#e5484d" text-anchor="middle">① 点这里</text>
+
+  <!-- 右侧模型与发送 -->
+  <rect x="900" y="288" width="118" height="32" rx="16" fill="#f5f7fa" stroke="#e3e7ee"/>
+  <text x="959" y="308" font-size="12" fill="#4b5563" text-anchor="middle">DeepSeek ▾</text>
+  <circle cx="1052" cy="304" r="15" fill="#2b3440"/>
+  <text x="1052" y="310" font-size="15" fill="#ffffff" text-anchor="middle">↑</text>
+
+  <text x="88" y="370" font-size="13" fill="#6b7280">这个标签一直在，显示本项目当前在用的套路——不点也看得见；觉得不对，再点。</text>
+
+  <!-- 过渡 -->
+  <rect x="540" y="410" width="120" height="32" rx="16" fill="#2b3440"/>
+  <text x="600" y="431" font-size="13" fill="#ffffff" text-anchor="middle">点一下</text>
+  <line x1="600" y1="444" x2="600" y2="468" stroke="#9aa1ad" stroke-width="2"/>
+  <polygon points="600,476 594,464 606,464" fill="#9aa1ad"/>
+
+  <!-- ═══════════ 第二步：卡片 ═══════════ -->
+  <text x="60" y="512" font-size="14" font-weight="600" fill="#4b5563">② 点开之后：这一张卡</text>
+
+  <rect x="60" y="526" width="1080" height="470" rx="16" fill="#39404e" opacity="0.55"/>
+
+  <!-- 卡片 -->
+  <rect x="330" y="548" width="540" height="426" rx="16" fill="#ffffff" filter="url(#soft)"/>
+
+  <text x="358" y="592" font-size="20" font-weight="700" fill="#111827">这个项目怎么跑</text>
+  <text x="358" y="617" font-size="13" fill="#6b7280">梦之队按这套干活，同一件事不用再解释一遍。</text>
+  <line x1="358" y1="634" x2="842" y2="634" stroke="#eceff4"/>
+
+  <!-- 行 1 -->
+  <text x="358" y="666" font-size="12" fill="#8b93a1">做什么</text>
+  <rect x="358" y="676" width="110" height="34" rx="17" fill="#1f2937"/>
+  <text x="413" y="698" font-size="13" fill="#ffffff" text-anchor="middle">业务软件</text>
+  <rect x="480" y="676" width="124" height="34" rx="17" fill="#f5f7fa" stroke="#e3e7ee"/>
+  <text x="542" y="698" font-size="13" fill="#374151" text-anchor="middle">软硬件一体</text>
+
+  <!-- 行 2 -->
+  <text x="358" y="740" font-size="12" fill="#8b93a1">怎么交付</text>
+  <rect x="358" y="750" width="104" height="34" rx="17" fill="#1f2937"/>
+  <text x="410" y="772" font-size="13" fill="#ffffff" text-anchor="middle">按产品卖</text>
+  <rect x="474" y="750" width="104" height="34" rx="17" fill="#f5f7fa" stroke="#e3e7ee"/>
+  <text x="526" y="772" font-size="13" fill="#374151" text-anchor="middle">按项目做</text>
+  <rect x="590" y="750" width="104" height="34" rx="17" fill="#f5f7fa" stroke="#e3e7ee"/>
+  <text x="642" y="772" font-size="13" fill="#374151" text-anchor="middle">长期运维</text>
+
+  <!-- 行 3 -->
+  <text x="358" y="814" font-size="12" fill="#8b93a1">参考资料</text>
+  <rect x="358" y="824" width="484" height="38" rx="10" fill="#fbfcfd" stroke="#e3e7ee"/>
+  <text x="374" y="848" font-size="13" fill="#9aa1ad">团队 wiki</text>
+  <text x="826" y="848" font-size="12" fill="#b0b7c3" text-anchor="end">未设置 · 选择…</text>
+
+  <text x="358" y="886" font-size="12" fill="#a16207">改了会影响这个项目里所有角色；已开工的项目改「做什么」，新老编号会对不上。</text>
+
+  <line x1="358" y1="904" x2="842" y2="904" stroke="#eceff4"/>
+  <text x="358" y="932" font-size="13" fill="#4b5563">跟公司默认一样 ▸</text>
+  <rect x="758" y="912" width="84" height="34" rx="10" fill="#1f2937"/>
+  <text x="800" y="934" font-size="13" fill="#ffffff" text-anchor="middle">好了</text>
+
+  <!-- 旁注 -->
+  <rect x="898" y="560" width="212" height="122" rx="12" fill="#ffffff" opacity="0.96"/>
+  <text x="916" y="590" font-size="13" font-weight="600" fill="#111827">三行，全都有默认值</text>
+  <text x="916" y="614" font-size="12" fill="#4b5563">不改也能直接开工；</text>
+  <text x="916" y="636" font-size="12" fill="#4b5563">只改你不同意的那一行，</text>
+  <text x="916" y="658" font-size="12" fill="#4b5563">改完就关掉。</text>
+
+  <text x="898" y="716" font-size="12" fill="#e5e7eb">不需要理解「配置」。</text>
+  <text x="898" y="738" font-size="12" fill="#e5e7eb">它只是一个「这次不一样」的开关。</text>
+</svg>

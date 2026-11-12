@@ -2,6 +2,7 @@
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type { PaneId, TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-api-session-controller/client'
@@ -30,6 +31,10 @@ import { registerCompanyTabs } from './tabs/company-tab-registration.ts'
 import { DELEGATION_TOOL_KEYS } from './wiring/delegation-keys.ts'
 import { DelegationCard } from './ui/DelegationCard.tsx'
 import { installStyles } from './ui/styles.ts'
+import { createStartupStore } from './startup/startup-store.ts'
+import { StrategyButton } from './startup/StrategyButton.tsx'
+import { parseStartupOptions, parseStartupSettings, type StartupField } from '../lib/startup-settings.ts'
+import type { SaveResult } from './startup/StrategyPanel.tsx'
 import { createErrorRelay, installErrorCapture, type ClientErrorEntry, type ErrorCaptureTarget } from './wiring/error-ring.ts'
 import { ROLE_SHORT, RoleBadge, readPresetOf, sessionTitleOf } from './ui/RoleBadge.tsx'
 import { TasksAction } from './tabs/TasksPanel.tsx'
@@ -138,6 +143,38 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
     const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, 2000)
     const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog)
 
+    // 启动策略：读走 workspaceFiles（无日志噪声），写走 /company-settings 命令；
+    // 面板与 composer 按钮共享一个仓，保存后按钮当帧跟着变。
+    const startupStore = createStartupStore()
+    const readStartupText = readWorkspaceText(WORKSPACE_TEXT_PATHS.startup, 8)
+    const readStartupOptionsText = readWorkspaceText(WORKSPACE_TEXT_PATHS.startupOptions, 16)
+    const loadStartup = async (sessionId: SessionId, signal: AbortSignal): Promise<void> => {
+      const [settingsText, optionsText] = await Promise.all([
+        readStartupText(sessionId, signal),
+        readStartupOptionsText(sessionId, signal),
+      ])
+      startupStore.set({
+        loaded: true,
+        settings: parseStartupSettings(settingsText),
+        options: parseStartupOptions(optionsText),
+      })
+    }
+    const runSettingsCommand = async (sessionId: SessionId, line: string): Promise<SaveResult> => {
+      try {
+        const settled = await scoped.remote.commands.execute(sessionId, line, [])
+        if (!settled.ok) return { ok: false, message: settled.error.message }
+        const result = settled.value?.result
+        if (result === undefined) return { ok: false, message: 'command unavailable' }
+        return result.kind === 'success' ? { ok: true } : { ok: false, message: result.text }
+      } catch (cause) {
+        return { ok: false, message: (cause as Error).message }
+      }
+    }
+    const saveStartup = (sessionId: SessionId, field: StartupField, value: string | null): Promise<SaveResult> =>
+      runSettingsCommand(sessionId, `/company-settings set ${field} ${value ?? 'auto'}`)
+    const resetStartup = (sessionId: SessionId): Promise<SaveResult> =>
+      runSettingsCommand(sessionId, '/company-settings reset')
+
     registerCompanyTabs(scoped, {
       attention,
       leadOf,
@@ -153,7 +190,25 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
       contextSources: contextWiring.contextSources,
       openContext: contextWiring.openContext,
       t: ctx.locale.bind(COMPANY_NS),
+      startupStore,
+      loadStartup,
+      saveStartup,
+      resetStartup,
     })
+
+    // composer 入口：排在 auto-continue（未设 order = 0）之后；只显示状态，不承担表单。
+    scoped.slots.inject('conversation.input.left', () => scoped.slots.register({
+      name: 'conversation.input.left',
+      id: 'company-strategy',
+      order: 10,
+      inject: (sessionId: SessionId) => ({
+        sessionId,
+        store: startupStore,
+        load: loadStartup,
+        open: () => { scoped.sidebarRight.openTab('company-strategy') },
+        t: ctx.locale.bind(COMPANY_NS),
+      }),
+    }, StrategyButton))
   })
 }
 

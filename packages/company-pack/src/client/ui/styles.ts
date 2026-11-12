@@ -792,6 +792,66 @@ html[data-dsh-cultivation-view] [data-composer-seat] { display: none !important;
 @media (max-width: 1180px) {
   .wk-cult-view-split { grid-template-columns: minmax(0, 1fr) 6px min(var(--wk-cult-chat-width, 320px), 45%); }
 }
+
+/* ── 项目策略（2026-11-12）：composer 入口按钮 + 右栏面板 ─────────────────────────
+   按钮是「会说话的状态」，不是齿轮：字号与相邻控件同档（12px），只给状态色一点暗示
+   （有覆盖时用品牌色描边），不抢注意力。 */
+.wk-strategy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 16px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  max-width: 220px;
+}
+.wk-strategy-button:hover { background: var(--dsw-alias-bg-layer-2); color: var(--dsw-alias-label-primary); }
+.wk-strategy-button[data-overridden='true'] {
+  border-color: var(--dsw-alias-brand-primary);
+  color: var(--dsw-alias-label-primary);
+}
+.wk-strategy-button-glyph { display: inline-flex; flex: none; }
+.wk-strategy-button-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.wk-strategy-panel { display: flex; flex-direction: column; gap: 10px; padding: 4px 2px 18px; }
+.wk-strategy-heading { margin: 0 0 2px; font-size: 13px; font-weight: 600; color: var(--dsw-alias-label-primary); }
+.wk-strategy-sub { margin: 0; color: var(--dsw-alias-label-tertiary); font-size: 11.5px; line-height: 1.5; }
+.wk-strategy-empty, .wk-strategy-error {
+  margin: 0; font-size: 11.5px; line-height: 1.5; padding: 6px 8px; border-radius: 6px;
+}
+.wk-strategy-error { color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-layer-2); }
+.wk-strategy-empty { color: var(--dsw-alias-label-tertiary); background: var(--dsw-alias-bg-layer-1); }
+.wk-strategy-row { display: flex; flex-direction: column; gap: 5px; }
+.wk-strategy-row-label { font-size: 11px; color: var(--dsw-alias-label-tertiary); }
+.wk-strategy-row-control { display: flex; align-items: center; gap: 8px; }
+.wk-strategy-select, .wk-strategy-input {
+  flex: 1; min-width: 0; height: 34px; padding: 0 9px;
+  border: 1px solid var(--dsw-alias-border-l1); border-radius: 8px;
+  background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-primary);
+  font-size: 12.5px;
+}
+.wk-strategy-select:disabled, .wk-strategy-input:disabled { opacity: .6; }
+.wk-strategy-auto-tag {
+  flex: none; font-size: 10px; color: var(--dsw-alias-label-tertiary);
+  border: 1px solid var(--dsw-alias-border-l1); border-radius: 9px; padding: 2px 7px;
+}
+.wk-strategy-clear {
+  flex: none; border: 0; background: none; padding: 0;
+  color: var(--dsw-alias-label-tertiary); font-size: 11px; cursor: pointer; text-decoration: underline;
+}
+.wk-strategy-row-warning { font-size: 10.5px; color: var(--dsw-alias-label-primary); }
+.wk-strategy-hint { margin: 0; font-size: 10.5px; color: var(--dsw-alias-label-tertiary); line-height: 1.5; }
+.wk-strategy-reset {
+  align-self: flex-start; margin-top: 2px; border: 0; background: none; padding: 0;
+  color: var(--dsw-alias-label-secondary); font-size: 11.5px; cursor: pointer; text-decoration: underline;
+}
+.wk-strategy-reset:disabled { opacity: .5; cursor: default; }
 `
 
 

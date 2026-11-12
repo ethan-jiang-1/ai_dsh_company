@@ -32,6 +32,19 @@ function Glyph({ size = 16, className, children }: GlyphProps & { readonly child
   )
 }
 
+
+/** 策略：三条滑杆（机制方向·与结构同色族）。 */
+function SlidersGlyph({ size, className }: GlyphProps): ReactNode {
+  return (
+    <Glyph size={size} className={className}>
+      <path d="M2.75 4.5h10.5M2.75 8h10.5M2.75 11.5h10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="6" cy="4.5" r="1.4" fill="currentColor" />
+      <circle cx="10" cy="8" r="1.4" fill="currentColor" />
+      <circle cx="5.25" cy="11.5" r="1.4" fill="currentColor" />
+    </Glyph>
+  )
+}
+
 /** 待办（原「需要你」）：铃铛（注意方向·主档）。 */
 function BellGlyph({ size, className }: GlyphProps): ReactNode {
   return (
@@ -215,6 +228,7 @@ const FACES = {
   cultivation: { tone: 'growth', glyph: SproutGlyph },
   ledger: { tone: 'archive', glyph: LedgerGlyph },
   catalog: { tone: 'archive', glyph: CatalogGlyph },
+  strategy: { tone: 'structure', glyph: SlidersGlyph },
 } as const satisfies Record<FaceKey, TabFace>
 
 /** 页签键（注册处按它取身份与三种渲染）。 */
@@ -253,6 +267,7 @@ export const LedgerTabTitle = TAB_IDENTITY.ledger.Title
 export const CatalogTabTitle = TAB_IDENTITY.catalog.Title
 export const PresenceTabTitle = TAB_IDENTITY.presence.Title
 export const CultivationTabTitle = TAB_IDENTITY.cultivation.Title
+export const StrategyTabTitle = TAB_IDENTITY.strategy.Title
 
 export const AttentionGuideEntry = TAB_IDENTITY.attention.Entry
 export const BoardGuideEntry = TAB_IDENTITY.board.Entry
@@ -263,6 +278,7 @@ export const TasksGuideEntry = TAB_IDENTITY.tasks.Entry
 export const CultivationGuideEntry = TAB_IDENTITY.cultivation.Entry
 export const LedgerGuideEntry = TAB_IDENTITY.ledger.Entry
 export const CatalogGuideEntry = TAB_IDENTITY.catalog.Entry
+export const StrategyGuideEntry = TAB_IDENTITY.strategy.Entry
 
 export const AttentionGuideIcon = TAB_IDENTITY.attention.Icon
 export const BoardGuideIcon = TAB_IDENTITY.board.Icon
@@ -273,3 +289,4 @@ export const TasksGuideIcon = TAB_IDENTITY.tasks.Icon
 export const CultivationGuideIcon = TAB_IDENTITY.cultivation.Icon
 export const LedgerGuideIcon = TAB_IDENTITY.ledger.Icon
 export const CatalogGuideIcon = TAB_IDENTITY.catalog.Icon
+export const StrategyGuideIcon = TAB_IDENTITY.strategy.Icon

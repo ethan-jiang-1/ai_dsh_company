@@ -30,6 +30,9 @@ import { registerDeliverablesCommand } from './host/commands/deliverables-comman
 import { registerPrdCommand } from './host/commands/prd-command.ts'
 import { registerReqCommand } from './host/commands/req-command.ts'
 import { registerDeliveryCommand } from './host/commands/delivery-command.ts'
+import { registerSettingsCommand } from './host/commands/settings-command.ts'
+import { registerStartupSettings } from './host/startup/startup-prompt.ts'
+import { refreshStartupOptions } from './host/startup/startup-store.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation/cultivation.ts'
 import { roleLabelFor } from './lib/role-copy.ts'
 import { resultLabelFor } from './host/language/company-language.ts'
@@ -129,6 +132,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
     // 默认跳过集合由 handbook.ts 按 NON_ROLE_PRESETS 派生（不在这里写 ID 白名单）；
     // 部署配置只作覆盖旋钮（BUG-047）。
     config.handbookSkipPresets === undefined ? {} : { skipPresets: config.handbookSkipPresets })
+  if (hasWorkspace) registerStartupSettings(ctx, workspace)
   registerLanguagePolicy(ctx, language)
   registerWorkflowContract(ctx, contentDir, { workflowPresets: ['vp-eng'] })
   registerDelegationContracts(ctx, contentDir)
@@ -144,6 +148,10 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   registerPrdCommand(ctx, { dataBlocked, ...blockedFields, workspace })
   registerReqCommand(ctx, { dataBlocked, ...blockedFields, workspace, contentDir })
   registerDeliveryCommand(ctx, { dataBlocked, ...blockedFields, workspace, contentDir })
+  registerSettingsCommand(ctx, {
+    workspace, dataBlocked, ...blockedFields, contentDir,
+    text: (zhText, enText) => language.text(zhText, enText),
+  })
 
   ctx.on('api-session/added', (summary) => {
     if (summary.origin === 'subagent') return
@@ -177,6 +185,12 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
 
   if (hasWorkspace && !runtime.dataBlocked) {
     ensureRunBundle(ctx, workspace, runtime.dshHome, runtime.bundleState)
+    // 浏览器面板的下拉选项来自内容包：boot 时派生一次（改内容/换公司后重启即刷新）。
+    try {
+      refreshStartupOptions(workspace, resolveContentDir(import.meta.url))
+    } catch (error) {
+      ctx.logger?.warn?.(`company-pack：启动策略选项派生跳过（不影响运行）：${(error as Error).message}`)
+    }
     const registration = registerWorkspace(ctx, workspace)
     if (registration !== undefined) await registration
   }

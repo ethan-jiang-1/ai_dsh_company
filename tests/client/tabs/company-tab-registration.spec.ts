@@ -11,13 +11,15 @@ import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from '../../../pac
 import { CultivationTab } from '../../../packages/company-pack/src/client/tabs/CultivationTab.tsx'
 import { DeliverablesTab } from '../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx'
 import { LedgerTab } from '../../../packages/company-pack/src/client/tabs/LedgerTab.tsx'
+import { StrategyPanel } from '../../../packages/company-pack/src/client/startup/StrategyPanel.tsx'
+import { createStartupStore } from '../../../packages/company-pack/src/client/startup/startup-store.ts'
 import {
   AttentionTabTitle, BoardTabTitle, BudgetTabTitle, CatalogTabTitle, CultivationTabTitle,
-  DagTabTitle, LedgerTabTitle, PresenceTabTitle, TasksTabTitle,
+  DagTabTitle, LedgerTabTitle, PresenceTabTitle, TasksTabTitle, StrategyTabTitle,
   AttentionGuideEntry, BoardGuideEntry, BudgetGuideEntry, CatalogGuideEntry, CultivationGuideEntry,
-  DagGuideEntry, LedgerGuideEntry, PresenceGuideEntry, TasksGuideEntry,
+  DagGuideEntry, LedgerGuideEntry, PresenceGuideEntry, TasksGuideEntry, StrategyGuideEntry,
   AttentionGuideIcon, BoardGuideIcon, DagGuideIcon, PresenceGuideIcon,
-  BudgetGuideIcon, TasksGuideIcon, CultivationGuideIcon, LedgerGuideIcon, CatalogGuideIcon,
+  BudgetGuideIcon, TasksGuideIcon, CultivationGuideIcon, LedgerGuideIcon, CatalogGuideIcon, StrategyGuideIcon,
 } from '../../../packages/company-pack/src/client/ui/tab-icons.tsx'
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
 import { registerCompanyTabs } from '../../../packages/company-pack/src/client/tabs/company-tab-registration.ts'
@@ -33,12 +35,13 @@ const EXPECTED_TYPES = [
   { id: 'dsh-company-pack/cultivation', kind: 'company-cultivation', title: '培养', order: 56, description: '养自己的角色分身：待处理建议 / 已采纳方法 / journal 待审 / 赞踩' },
   { id: 'dsh-company-pack/ledger', kind: 'company-ledger', title: '台账', order: 57, description: '动议台账：公司累计干了什么（日期/类型/参与/成品/结论）' },
   { id: 'dsh-company-pack/deliverables', kind: 'company-deliverables', title: '成品', order: 58, description: '公司成品目录：按 final.md 列成品（日期/类型/结果/结论）' },
+  { id: 'dsh-company-pack/strategy', kind: 'company-strategy', title: '策略', order: 20, description: '项目策略：三行、自动优先、选项来自公司内容' },
 ] as const
 
-const BODY_COMPONENTS = [AttentionTab, BoardTab, DagTab, PresenceTab, BudgetTab, TasksTab, CultivationTab, LedgerTab, DeliverablesTab]
-const TITLE_COMPONENTS = [AttentionTabTitle, BoardTabTitle, DagTabTitle, PresenceTabTitle, BudgetTabTitle, TasksTabTitle, CultivationTabTitle, LedgerTabTitle, CatalogTabTitle]
-const GUIDE_COMPONENTS = [AttentionGuideEntry, BoardGuideEntry, DagGuideEntry, PresenceGuideEntry, BudgetGuideEntry, TasksGuideEntry, CultivationGuideEntry, LedgerGuideEntry, CatalogGuideEntry]
-const GUIDE_ICONS = [AttentionGuideIcon, BoardGuideIcon, DagGuideIcon, PresenceGuideIcon, BudgetGuideIcon, TasksGuideIcon, CultivationGuideIcon, LedgerGuideIcon, CatalogGuideIcon]
+const BODY_COMPONENTS = [AttentionTab, BoardTab, DagTab, PresenceTab, BudgetTab, TasksTab, CultivationTab, LedgerTab, DeliverablesTab, StrategyPanel]
+const TITLE_COMPONENTS = [AttentionTabTitle, BoardTabTitle, DagTabTitle, PresenceTabTitle, BudgetTabTitle, TasksTabTitle, CultivationTabTitle, LedgerTabTitle, CatalogTabTitle, StrategyTabTitle]
+const GUIDE_COMPONENTS = [AttentionGuideEntry, BoardGuideEntry, DagGuideEntry, PresenceGuideEntry, BudgetGuideEntry, TasksGuideEntry, CultivationGuideEntry, LedgerGuideEntry, CatalogGuideEntry, StrategyGuideEntry]
+const GUIDE_ICONS = [AttentionGuideIcon, BoardGuideIcon, DagGuideIcon, PresenceGuideIcon, BudgetGuideIcon, TasksGuideIcon, CultivationGuideIcon, LedgerGuideIcon, CatalogGuideIcon, StrategyGuideIcon]
 const BODY_SLOT = 'sidebar.right.pane.tab'
 const TITLE_SLOT = 'sidebar.right.pane.tab.title'
 const GUIDE_SLOT = 'sidebar.right.tab.guide.entry'
@@ -70,6 +73,10 @@ function tabData(t: CompanyTabRegistrationData['t'] = ((key: keyof typeof zh) =>
     roleSource,
     readLedger: vi.fn(async () => 'ledger text'),
     readCatalog: vi.fn(async () => 'catalog text'),
+    startupStore: createStartupStore(),
+    loadStartup: vi.fn(async () => {}),
+    saveStartup: vi.fn(async () => ({ ok: true as const })),
+    resetStartup: vi.fn(async () => ({ ok: true as const })),
     t,
   }
   return { data, pending }

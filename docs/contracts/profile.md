@@ -18,20 +18,15 @@
 
 交付形态细节：
 
-- **一个安装 = 一个公司**；同一 home 可顺序服务多个 workspace；不同公司 = 不同 `DSH_HOME`。
-  换项目不新建 home/重装。
+- **一个安装 = 一个公司**；同一 home 可顺序服务多个 workspace；不同公司 = 不同 `DSH_HOME`。换项目不新建 home/重装。
 - **workspace 解析**：`DSH_COMPANY_HOME` → 启动 cwd（合理项目目录）→ `<DSH_HOME>/company/settings.json`
   最近选择 → DSH Workspace picker（本包不自建 onboarding）。Host boot 不等用户；无 workspace 时零写。
-- **插件内容只读**：presets/persona/skills/host/client/`content/`（手册/模板/默认章程/状态默认值）；
-  **不 seed** 手册/模板到 workspace。
-- **公司状态**：`<workspace>/.dsh-company/`（`kb/`、`deliverables/`、`cultivation/`、`logs/`、
-  `exports/`、`overrides/`、`bundle.json` v3）。workspace 根无本包写出的文件。
-- **home 治理**：sessions/凭据/workspace 登记/lease/`company/methods/`/`company/ledger/`/
-  `company/identity/`。方法层与 presented 账本不入模型可写区（D25/M2）。
-- **profile 不是隔离单位**：数据隔离靠独立 `DSH_HOME`；同 home 多 profile 共享 sessions/凭据/
-  方法层/账本/workspace 登记。
-- **安装三成功**：pnpm exit 0 → dependency 写入 → `dsh.profile.bundles`；只有第三个让功能存在。
-  装完重启；真启动无 `did not activate`/`skipping profile bundle` 才算挂上。
+- **插件内容只读**：presets/persona/skills/host/client/`content/`；**不 seed** 手册/模板到 workspace。
+- **公司状态**：`<workspace>/.dsh-company/`（`kb/`、`deliverables/`、`cultivation/`、`logs/`、`exports/`、
+  `overrides/`、`startup.json` + 派生的 `startup-options.json`、`bundle.json` v3）。workspace 根无本包写出的文件。
+- **home 治理**：sessions/凭据/workspace 登记/lease/`company/methods|ledger|identity/`；方法层与 presented 账本不入模型可写区（D25/M2）。
+- **profile 不是隔离单位**：数据隔离靠独立 `DSH_HOME`；同 home 多 profile 共享 sessions/凭据/方法层/账本/workspace 登记。
+- **安装三成功**：pnpm exit 0 → dependency 写入 → `dsh.profile.bundles`；只有第三个让功能存在。装完重启，真启动无 `did not activate`/`skipping profile bundle` 才算挂上。
 
 ## host 行清单（bundle 层）
 
@@ -42,7 +37,7 @@
 | `tool-present`（insert） | 交付物声明（deliverables 卡片） | ✅ |
 | `agent-team` + `tool-agent-team`（insert） | 团队协作主通道（M4/D4） | ✅ |
 | `ui-agent-team`（insert） | 团队 Web 可视面 | ✅ |
-| `company-client`（insert，`name: dsh-company-pack`） | 本包 host/client 入口：签字、工作区门、培养、公司状态初始化、workspace 登记、handbook `systemPrompt.section`、目录/账本、品牌/公司页签 | ✅ bundle 自带；应用内装即生效 |
+| `company-client`（insert，`name: dsh-company-pack`） | 本包 host/client 入口：签字、工作区门、培养、公司状态初始化、workspace 登记、handbook + 项目策略 `systemPrompt.section`、`/company-settings` 命令、目录/账本、品牌/公司页签（含「策略」） | ✅ bundle 自带；应用内装即生效 |
 | `company-session-search`（insert + isolate 组） | 会话全文检索（provider + `session_search` 工具同组；per profile 落 home cache） | ✅ 组内 provider/tool active；不替换 host 行 |
 | `time-context`（preset 内声明） | 日期通道（Asia/Shanghai） | ✅ |
 
@@ -52,10 +47,12 @@
 host 的 `session/search`（侧栏内容搜索）保持出厂 `openAt: never`（有会话时会报禁用），不是本包承诺。
 **没有 profile patch registrar**：旧 profile 里的 `company-workspace-register` 行会被忽略/告警，不写新行。
 
+## 项目启动策略（workspace 级）
+
+`.dsh-company/startup.json`（人改；`productType` / `deliveryMode` / `wiki`，`null` = 自动 = 不约束）+ 派生的 `startup-options.json`（host 按 `content/` 枚举）。面经 `workspaceFiles` 读、经 `/company-settings set|reset|show` 写；`company:startup-settings`（order 501）活读注入、全自动为空串、support preset 跳过。v1 软强制（`/req`、`/delivery` 解析链不读它）、公司默认只读。
+
 ## 已知开放点
 
-- `plugin add` 的行注册顺序：pnpm 成功后 CLI 才写 bundles 列表——若中途失败，重跑 `plugin add`，
-  用 `plugin list` 核状态；不要手写 `dsh.profile.bundles`。
-- **Team 容量与信箱背压**：`maxMembers`（代码默认 16，官方 bundle 与本仓 patch 钉 8）与
-  `maxMessageBytes` 在组合层调；`maxPendingMessagesPerMember` 已删除，本仓 patch 已同步。
+- `plugin add` 的行注册顺序：pnpm 成功后 CLI 才写 bundles 列表——中途失败就重跑 `plugin add` 并用 `plugin list` 核状态；不要手写 `dsh.profile.bundles`。
+- **Team 容量与信箱背压**：`maxMembers`（代码默认 16，本仓 patch 钉 8）与 `maxMessageBytes` 在组合层调；`maxPendingMessagesPerMember` 已删除。
 - **Desktop**：安装句同 Plugins 页；本机无 Desktop 壳，只做文档与 client 组合矩阵，不冒充真机验证。

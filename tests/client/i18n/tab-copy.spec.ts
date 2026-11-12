@@ -2,7 +2,7 @@
  * 公司页签壳的中英文回归（Phase A2 第一片）。
  *
  * 这不是端到端：它断言**真实 UI 用的那份 copy 函数和 Title 组件**在 zh/en 下
- * 返回不同语言的文案，且 9 个页签全覆盖。浏览器全页签归 ui-scene-smoke。
+ * 返回不同语言的文案，且 10 个页签全覆盖。浏览器全页签归 ui-scene-smoke。
  */
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -21,8 +21,8 @@ const enT = translate(en)
 const faces = Object.keys(TAB_COPY_KEYS) as FaceKey[]
 
 describe('company 页签壳 zh/en', () => {
-  it('9 个页签都有 zh/en 的 label/tooltip/description；en 无中文且与 zh 不同', () => {
-    expect(faces).toHaveLength(9)
+  it('10 个页签都有 zh/en 的 label/tooltip/description；en 无中文且与 zh 不同', () => {
+    expect(faces).toHaveLength(10)
     for (const face of faces) {
       const zhCopy = tabCopyFor(face, zhT)
       const enCopy = tabCopyFor(face, enT)

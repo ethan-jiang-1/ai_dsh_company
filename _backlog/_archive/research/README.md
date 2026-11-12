@@ -18,6 +18,7 @@
 
 | 名头 | 材料 | 历史消费者 | 产出的卡 | 归档 |
 |---|---|---|---|---|
+| [startup-settings/](startup-settings/README.md) · 启动设置：composer 入口、右侧策略栏、workspace 级持久化与注入机制 | 4 份 + ux/ | 用户 2026-11-12 点名研究；[启动设置落地卡](../settled_issues/2026-11-12-startup-settings-landing.md) | 同卡（[Note](../../../notes/implemented/2026-11-12-startup-settings.md)） | 2026-11-12 |
 | [bilingual-company/](bilingual-company/README.md) · 中英文双语与默认中文启动；最终只做界面呈现层 | 3 份 | 用户 2026-11-12 研究请求；[UI 落地卡](../settled_issues/2026-11-12-bilingual-landing.md) | 同卡 | 2026-11-12 |
 | [dsh-native-orchestration-fit/](dsh-native-orchestration-fit/README.md) · DSH 原生编排对照：公司角色的通道、合同与能力面 GAP 盘点 | 5 份 | 用户 2026-11-11 研究请求；[委派合同事实纠偏](../settled_issues/2026-11-11-delegation-contract-truth.md)、[委派政策能力域化](../settled_issues/2026-11-11-delegation-policy-capability-scoped.md) | 同两张卡（[Note 1](../../../notes/implemented/2026-11-11-delegation-contract-truth.md)、[Note 2](../../../notes/implemented/2026-11-11-delegation-policy-capability-scoped.md)） | 2026-11-11 |
 | [two-product-structure-audit/](two-product-structure-audit/README.md) · 两产品结构审计：产品类型 / 组织 / 角色 / 流程 | 3 份 + experiments/ | [BUG-061–070](../fixed_bugs/README.md)、[两轴 v1](../settled_issues/2026-11-11-delivery-mode-axis.md)、[v2](../settled_issues/2026-11-11-delivery-mode-v2.md) | 同批卡 | 2026-11-11 |

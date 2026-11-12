@@ -8,7 +8,7 @@
 import type { CompanyKey, CompanyT } from '../locales.ts'
 
 /** 九行页签身份键。 */
-export type FaceKey = 'attention' | 'board' | 'dag' | 'presence' | 'budget' | 'tasks' | 'cultivation' | 'ledger' | 'catalog'
+export type FaceKey = 'attention' | 'board' | 'dag' | 'presence' | 'budget' | 'tasks' | 'cultivation' | 'ledger' | 'catalog' | 'strategy'
 
 /** 一行的三处文案 key。 */
 export interface TabCopyKeys {
@@ -28,6 +28,7 @@ export const TAB_COPY_KEYS: Readonly<Record<FaceKey, TabCopyKeys>> = {
   cultivation: { label: 'tabs.cultivation.label', tooltip: 'tabs.cultivation.tooltip', description: 'tabs.cultivation.description' },
   ledger: { label: 'tabs.ledger.label', tooltip: 'tabs.ledger.tooltip', description: 'tabs.ledger.description' },
   catalog: { label: 'tabs.catalog.label', tooltip: 'tabs.catalog.tooltip', description: 'tabs.catalog.description' },
+  strategy: { label: 'tabs.strategy.label', tooltip: 'tabs.strategy.tooltip', description: 'tabs.strategy.description' },
 }
 
 /** 一行的当前语言文案。 */

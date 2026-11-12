@@ -24,6 +24,10 @@ export const RUN_BUNDLE_PATHS = {
   exports: `${RUN_BUNDLE_DIR}/exports`,
   overrides: `${RUN_BUNDLE_DIR}/overrides`,
   legacy: `${RUN_BUNDLE_DIR}/legacy`,
+  /** 项目级启动策略（人改；只存选择，不存规则正文）。 */
+  startup: `${RUN_BUNDLE_DIR}/startup.json`,
+  /** 派生文件：host 按 content/ 枚举的可选项，供浏览器面板渲染（人不可改）。 */
+  startupOptions: `${RUN_BUNDLE_DIR}/startup-options.json`,
 } as const
 
 /** 相对 workspace 的 POSIX 路径：`.dsh-company/<rel>`。 */
