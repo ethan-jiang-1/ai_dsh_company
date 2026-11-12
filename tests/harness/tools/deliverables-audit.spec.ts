@@ -377,17 +377,17 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
 
 describe('占位抢注判定（isPlaceholderClaim）', () => {
   it('首行恰好是占位首行 ⇒ true', () => {
-    expect(isPlaceholderClaim('占位=认领，非出稿\n\n正文随后换掉首行')).toBe(true)
+    expect(isPlaceholderClaim('claim=acknowledged, not a draft\n\n正文随后换掉首行')).toBe(true)
   })
 
   it('首行前有空行也算（首个非空行判定）', () => {
-    expect(isPlaceholderClaim('\n占位=认领，非出稿\n')).toBe(true)
+    expect(isPlaceholderClaim('\nclaim=acknowledged, not a draft\n')).toBe(true)
   })
 
   it('占位行不在首位 / 措辞走样 / 有标题在前 ⇒ false（一字不差是机器可查的前提）', () => {
-    expect(isPlaceholderClaim('# CFO 稿\n占位=认领，非出稿')).toBe(false)
-    expect(isPlaceholderClaim('占位=认领（非出稿）')).toBe(false)
-    expect(isPlaceholderClaim('占位 = 认领，非出稿')).toBe(false)
+    expect(isPlaceholderClaim('# CFO 稿\nclaim=acknowledged, not a draft')).toBe(false)
+    expect(isPlaceholderClaim('claim=acknowledged (not a draft)')).toBe(false)
+    expect(isPlaceholderClaim('claim = acknowledged, not a draft')).toBe(false)
     expect(isPlaceholderClaim('正文')).toBe(false)
     expect(isPlaceholderClaim('')).toBe(false)
   })
@@ -544,29 +544,29 @@ describe('证据可得性：声明给「这段时期拿不到」时，判据不�
 //（子串匹配 = BUG-004 要防的「措辞走样也认」）→ 本条红（改动前全套 355 项仍全绿，故本条是本轮新加的钉子）；
 // 也让 `持认 ∧ 让位` 同时为真。还原 → 绿。
 describe('让位行的机器可查面（BUG-004，2026-10-06 修复轮立——持认判定 = 占位 ∧ ¬让位）', () => {
-  it('首行恰好「让位=认领撤销，非出稿」⇒ isPlaceholderYield 为真', async () => {
+  it('首行恰好「yield=claim withdrawn, not a draft」⇒ isPlaceholderYield 为真', async () => {
     const { isPlaceholderYield, PLACEHOLDER_YIELD_LINE } = await import('../../../tools/lib/deliverables.mjs')
-    expect(PLACEHOLDER_YIELD_LINE).toBe('让位=认领撤销，非出稿')
-    expect(isPlaceholderYield('\n\n让位=认领撤销，非出稿\n\n出稿：cfo｜版本 v2…让位记录')).toBe(true)
+    expect(PLACEHOLDER_YIELD_LINE).toBe('yield=claim withdrawn, not a draft')
+    expect(isPlaceholderYield('\n\nyield=claim withdrawn, not a draft\n\n出稿：cfo｜版本 v2…让位记录')).toBe(true)
   })
 
   it('让位行不在首行 / 仍是占位首行 ⇒ 非让位（持认与让位靠首行互斥区分）', async () => {
     const { isPlaceholderYield, isPlaceholderClaim } = await import('../../../tools/lib/deliverables.mjs')
-    expect(isPlaceholderYield('占位=认领，非出稿\n\n（后文提了让位但首行未改写）')).toBe(false)
-    expect(isPlaceholderClaim('占位=认领，非出稿\n')).toBe(true)
-    expect(isPlaceholderYield('占位=认领，非出稿\n')).toBe(false)
+    expect(isPlaceholderYield('claim=acknowledged, not a draft\n\n（后文提了让位但首行未改写）')).toBe(false)
+    expect(isPlaceholderClaim('claim=acknowledged, not a draft\n')).toBe(true)
+    expect(isPlaceholderYield('claim=acknowledged, not a draft\n')).toBe(false)
   })
 
   // 关键盲点（2026-10-09 实测发现并补上）：上一条的 fixture 正文**不含让位行原文**，
   // 所以「首行相等」与「正文包含」两种实现都返回 false —— 拿它验不出实现被弱化成子串匹配。
   // 复现：把 isPlaceholderYield 改成 `body.includes(PLACEHOLDER_YIELD_LINE)`（正是 BUG-004
   // 要防的「措辞走样也认」失效），全套 355 项**依然全绿**，且能让 持认 ∧ 让位 同时为真
-  // （`'占位=认领，非出稿\n\n讨论：我本可以写 让位=认领撤销，非出稿 来放弃'`）——
+  // （`'claim=acknowledged, not a draft\n\n讨论：我本可以写 yield=claim withdrawn, not a draft 来放弃'`）——
   // 那正是 BUG-004 存在要防的互斥失效。⇒ 本条 fixture 必须让让位行**原文出现在正文、
   // 但不在首个非空行**：只有这样，子串实现才会返回 true 而被抓住。
   it('让位行原文出现在正文但不在首个非空行 ⇒ 非让位（钉死「首行相等」，防子串实现）', async () => {
     const { isPlaceholderYield, PLACEHOLDER_YIELD_LINE } = await import('../../../tools/lib/deliverables.mjs')
-    const bodyBesideYieldLine = `占位=认领，非出稿\n\n讨论：我本可以写 ${PLACEHOLDER_YIELD_LINE} 来放弃`
+    const bodyBesideYieldLine = `claim=acknowledged, not a draft\n\n讨论：我本可以写 ${PLACEHOLDER_YIELD_LINE} 来放弃`
     expect(bodyBesideYieldLine.includes(PLACEHOLDER_YIELD_LINE), 'fixture 必须真的含让位行原文，否则本条验不出子串实现').toBe(true)
     expect(isPlaceholderYield(bodyBesideYieldLine)).toBe(false)
   })

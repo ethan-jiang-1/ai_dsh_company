@@ -169,8 +169,8 @@ if (existsSync(ledgerPath) && unledgered.length > 0) {
 
 const leadSessions = sessions.filter(s => s.delegationDepth === 0 && s.agentPreset === 'ceo').length
 
-// 观察项③（R0-2 占位=认领，2026-10-03）：开场抢注登记面——谁占了这个 slug 的哪个坑。
-// 判据 = lib 的 isPlaceholderClaim（首行一字不差「占位=认领，非出稿」）；只登记不判红：
+// 观察项③（R0-2 claim=acknowledged，2026-10-03）：开场抢注登记面——谁占了这个 slug 的哪个坑。
+// 判据 = lib 的 isPlaceholderClaim（首行一字不差「claim=acknowledged, not a draft」）；只登记不判红：
 // 占位稿是过程稿的合法形状，它取代的是"文件存在 ≠ 认领"下无从查起的口头抢注。
 const claims = []
 for (const row of result.drafts) {
@@ -181,7 +181,7 @@ for (const row of result.drafts) {
 if (claims.length > 0) {
   warnings.push({
     code: WARNING.PLACEHOLDER_CLAIMS,
-    detail: `占位=认领的抢注登记：${claims.join('；')}——占坑 = 开场先落 \`drafts/<角色>.md\` 首行「占位=认领，非出稿」；真正出稿时换掉占位首行`,
+    detail: `claim=acknowledged 的抢注登记：${claims.join('；')}——占坑 = 开场先落 \`drafts/<角色>.md\` 首行「claim=acknowledged, not a draft」；真正出稿时换掉占位首行`,
   })
 }
 

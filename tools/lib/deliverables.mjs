@@ -42,7 +42,7 @@ export const WARNING = {
   SLUG_COLLISION: 'slug-collision',
   /** 盘上有 `deliverables/<slug>/` 但动议台账没有该行（跑完到轮末收敛之间的正常态，也含真漏登）。 */
   SLUG_UNLEDGERED: 'slug-unledgered',
-  /** 开场占位抢注登记（R0-2）：`drafts/<role>.md` 首行「占位=认领，非出稿」= 机器可查的认领面。 */
+  /** 开场占位抢注登记（R0-2）：`drafts/<role>.md` 首行「claim=acknowledged, not a draft」= 机器可查的认领面。 */
   PLACEHOLDER_CLAIMS: 'placeholder-claims',
   /** 成品在盘上但同 slug 没有 meta.md（T-9：绕过一切新检查、从生成台账消失的入口）。 */
   FINAL_WITHOUT_META: 'final-without-meta',
@@ -68,7 +68,7 @@ export const WARNING = {
 }
 
 /** 占位抢注的首行形状（R0-2，2026-10-03；「一字不差」是机器可查的前提，合同家 = multi-human.md §3 纪律 5）。 */
-export const PLACEHOLDER_CLAIM_LINE = '占位=认领，非出稿'
+export const PLACEHOLDER_CLAIM_LINE = 'claim=acknowledged, not a draft'
 
 /** 判一份稿是不是占位抢注稿：首个非空行（去首尾空白）恰好是占位首行。 */
 export function isPlaceholderClaim(body) {
@@ -80,7 +80,7 @@ export function isPlaceholderClaim(body) {
  * 让位的首行形状（BUG-004 修复轮，2026-10-06；合同家 = 公司手册「写盘守卫」行——
  * 占位后重读同组对手文件，让位时把首行改写为本行；持认判定 = 占位 ∧ ¬让位）。
  */
-export const PLACEHOLDER_YIELD_LINE = '让位=认领撤销，非出稿'
+export const PLACEHOLDER_YIELD_LINE = 'yield=claim withdrawn, not a draft'
 
 /** 判一份稿是不是让位稿：首个非空行恰好是让位首行（与占位靠首行互斥区分）。 */
 export function isPlaceholderYield(body) {

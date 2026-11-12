@@ -207,7 +207,13 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 
 **I1 skill 正文完成（2026-11-12）**：`quality-loop` 全文英文；棘轮 `PENDING` 清空；`presets/**/SKILL.md` 24/24 英文。
 
-**剩余 I1**：`让位/占位` token；persona/agent.cordis.yml；content/**；领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
+**I1d 补遗（claim/yield，2026-11-12）**：
+
+- `占位=认领，非出稿` → `claim=acknowledged, not a draft`；`让位=认领撤销，非出稿` → `yield=claim withdrawn, not a draft`。
+- 同步 `deliverables.mjs`、deliverables-check、content generic、multi-human runbook、deliverables-audit spec；回退常量到中文 → 4 条红，还原 → 41 passed。
+- **但 meta 形状字段（`类型` / `编号体系` / `需求层` / `参与` / `结果` / `一句话结论` 等）仍是中文机器面**；它们随 `meta.md`/content/领域值切片处理，不能宣称“全部 token 清零”。
+
+**剩余 I1**：meta 形状字段 + persona/agent.cordis.yml + content/** + 领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 
