@@ -13,6 +13,7 @@ import { join } from 'node:path'
 import { blockedCompanyText } from './blocked-text.ts'
 import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import { contentMemberFile, isSafeContentId } from './content-id.ts'
+import { isPlainFileInside, readTextInside } from '../fs/safe-file.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
 import { checkRequirements, isLayer, type MotionDoc } from '../../lib/requirements-check.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
@@ -151,8 +152,9 @@ function availableDeliveryModes(contentDir: string): string[] {
  */
 function resolveProductType(contentDir: string | undefined, workspace: string, root: string): ProductTypeResolution {
   if (contentDir === undefined) return { rules: null, id: null, source: null, error: null }
-  const motionType = parseProductType(readIfExists(join(root, 'meta.md')))
-  const companyType = parseProductType(readIfExists(join(workspace, RUN_BUNDLE_PATHS.company)))
+  const companyRoot = join(workspace, '.dsh-company')
+  const motionType = parseProductType(readTextInside(companyRoot, join(root, 'meta.md')))
+  const companyType = parseProductType(readTextInside(companyRoot, join(workspace, RUN_BUNDLE_PATHS.company)))
   const id = motionType ?? companyType
   const source = motionType !== null ? 'motion' : companyType !== null ? 'company' : null
   if (id === null) return { rules: null, id: null, source: null, error: null }
@@ -204,6 +206,7 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
             : '未指定 workspace；先选 workspace 再校验。',
         }
       }
+      const companyRoot = join(workspace, '.dsh-company')
       const parsed = parseReqCheck(rawInput)
       if (!parsed.ok) return { kind: 'error' as const, text: parsed.text }
       const resolved = resolveDeliverablePath(workspace, parsed.slug)
@@ -211,7 +214,7 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
       const { root, dir } = resolved
       const docs: MotionDoc[] = []
       for (const name of REQ_DOCS) {
-        const text = readIfExists(join(dir, name))
+        const text = readTextInside(companyRoot, join(dir, name))
         if (text !== undefined) docs.push({ rel: `drafts/${name}`, text })
       }
       if (docs.length === 0) {
@@ -228,7 +231,7 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
         : resolution.source === 'motion'
           ? `；动议类型 = ${resolution.id}（meta.md）`
           : `；动议类型 = ${resolution.id}（company.md 默认，未在 meta 声明）`
-      const metaText = readIfExists(join(root, 'meta.md'))
+      const metaText = readTextInside(companyRoot, join(root, 'meta.md'))
       const deliveryMode = parseDeliveryMode(metaText)
       if (options.contentDir !== undefined && deliveryMode !== 'productized'
         && !existsSync(join(options.contentDir, 'delivery-modes', deliveryMode))) {
@@ -254,7 +257,7 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
           }
         }
       }
-      const hasDoc = (name: string): boolean => existsSync(join(dir, name))
+      const hasDoc = (name: string): boolean => isPlainFileInside(companyRoot, join(dir, name))
       const deliveryWarnings: string[] = []
       if (deliveryMode === 'project-services' || deliveryMode === 'managed-service') {
         const missing = deliveryReminderFiles(options.contentDir, deliveryMode).filter(name => !hasDoc(name))

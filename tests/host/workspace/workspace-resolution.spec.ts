@@ -6,7 +6,7 @@
  * 本档只证解析与拒绝；真实登记/初始化归 bootstrap/catalog 的集成 spec。
  * 证明边界：不证 DSH workspaceRegistry 的登记行为（→ company-entry-smoke）。
  */
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -102,7 +102,7 @@ describe('readSavedWorkspace / writeSavedWorkspace', () => {
   it('坏 JSON 不抛，返回 path 无 workspace', () => {
     mkdirSync(join(dshHome, 'company'), { recursive: true })
     writeFileSync(settingsPath(dshHome), '{not json')
-    expect(readSavedWorkspace(dshHome)).toEqual({ path: settingsPath(dshHome) })
+    expect(readSavedWorkspace(dshHome)).toEqual({ path: settingsPath(dshHome), problem: 'corrupt' })
   })
 
   it('缺文件返回 path；写回后读得到 canonical 路径', () => {
@@ -123,5 +123,21 @@ describe('readSavedWorkspace / writeSavedWorkspace', () => {
       const result = resolveWorkspace({ dshHome, envWorkspace: '', cwd: project })
       expect(result).toMatchObject({ workspace: realpathSync(project), source: 'cwd' })
     } finally { rmSync(project, { recursive: true, force: true }) }
+  })
+
+  it('saved 坏 JSON → problem=corrupt（不是 missing），resolve 带 savedProblem', () => {
+    mkdirSync(join(dshHome, 'company'), { recursive: true })
+    writeFileSync(settingsPath(dshHome), '{"v":1,"workspace":')
+    expect(readSavedWorkspace(dshHome).problem).toBe('corrupt')
+    const result = resolveWorkspace({ dshHome, envWorkspace: '', cwd: '/' })
+    expect(result.source).toBe('none')
+    expect(result.savedProblem).toBe('corrupt')
+  })
+
+  it('写 saved 用 temp+rename：可回读、无 .tmp 残留', () => {
+    writeSavedWorkspace(dshHome, ws)
+    const path = settingsPath(dshHome)
+    expect(JSON.parse(readFileSync(path, 'utf8')).workspace).toBe(canonical(ws))
+    expect(readdirSync(join(dshHome, 'company')).some(name => name.endsWith('.tmp'))).toBe(false)
   })
 })

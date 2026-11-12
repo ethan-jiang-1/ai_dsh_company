@@ -4,6 +4,19 @@
 
 ## 修复流水（倒序）
 
+- **BUG-104..113**（2026-11-13，根因组 S1–S6，P2×10）：上一轮修复后的回归扫收口——
+  **S1** [104](BUG-104-team-task-merge-no-revision-null-view.md) / [112](BUG-112-team-task-unassign-keeps-old-owner.md) /
+  [105](BUG-105-stream-error-not-rendered-in-board-dag-tasks.md) 任务板 merge revision/基座/owner 语义 + 三页签流错误条；
+  **S2** [108](BUG-108-catalog-symlink-final-outside.md) / [113](BUG-113-command-doc-symlink-outside-workspace.md)
+  workspace symlink 穿透（`safe-file` lstat+realpath）；
+  **S3** [110](BUG-110-governance-export-rm-before-rename.md) / [111](BUG-111-saved-workspace-non-atomic-write.md)
+  导出整目录 staging + backup 回滚；saved temp+rename + corrupt；
+  **S4** [109](BUG-109-catalog-warnings-dropped-in-audit-present.md) warnings 传播；
+  **S5** [107](BUG-107-deliverables-audit-multi-space-path.md) audit 原始路径；
+  **S6** [106](BUG-106-lease-pid-reuse-blocks-writer.md) lease heartbeat/stale 接管。
+  红→绿逐卡见 Note；`pnpm test` 236 files / 1799 tests；`typecheck`/`lint`/`dup`/`verify` 全绿。详见
+  [回归扫 Note](../../../notes/implemented/2026-11-13-followup-bug-sweep.md)。
+
 - **BUG-090..103**（2026-11-13，根因组 G1–G7，P1×3 + P2×11）：高复杂度面持续探索的 14 张缺陷，按根因收口——
   **G1** [094](BUG-094-bundle-manifest-id-path-traversal.md) / [102](BUG-102-req-delivery-rule-path-traversal.md)
   不可信 id 进路径（单段 slug + residency + 成员校验）；**G3** [090](BUG-090-cultivation-revoke-unreachable-records-deletes-method.md) /

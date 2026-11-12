@@ -54,6 +54,9 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
   }
 
   const resolution = resolveWorkspace({ dshHome })
+  if (resolution.savedProblem === 'corrupt') {
+    warn(ctx, 'company-pack：最近 workspace 设置损坏（company/settings.json），已忽略；从项目目录启动或重新选择 workspace 会覆盖它')
+  }
   if (resolution.workspace === undefined) {
     const why = resolution.source === 'env'
       ? (resolution.error ?? 'DSH_COMPANY_HOME 无效')
@@ -81,6 +84,7 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
     warn(ctx, `company-pack：${lease.reason}；公司数据已停写（DSH 会话仍可用），先关掉另一个 writer`)
     block(`writer lease 被占用：${lease.reason}`)
   } else {
+    if (lease.warning !== undefined) warn(ctx, `company-pack：${lease.warning}`)
     const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
     if (typeof effect === 'function') effect.call(ctx, () => () => lease.release())
   }

@@ -2,15 +2,33 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮拿到 ≥3 张卡，先按根因分组列表再逐卡修——逐症状打补丁会把同一根因修三遍。
 
-**下一个缺陷号**：Next BUG ID = 104；已分配 BUG-001..103。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 114；已分配 BUG-001..113。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。
 
 ## 活跃清单
 
-**空**（2026-11-13 全部收口：BUG-090..103 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）。
+**空**（2026-11-13 第二轮全部收口：BUG-104..113 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）。
 
 **2026-11-12 收口**：BUG-080..089 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+
+## 2026-11-13 修复交接（第二轮，根因组 S1–S6：BUG-104..113）
+
+**用户指令（2026-11-13）**：「_backlog/bugs 这里又找到一堆bug，系统性地思考好怎么把这些bug能修好吧 setup goal 静默，自主执行……直到所有bug解决了……我给你最多的轮次」。
+本句即本轮授权（材料性：host/client 行为 + docs 合同 + 命令面），留痕 = Note。
+终点 = 活跃清单清零、10 张卡全部迁 [fixed_bugs](../_archive/fixed_bugs/) 且 `审查：`/证据齐。
+
+| 组 | 卡 | 同一根因 | 修法 |
+|---|---|---|---|
+| **S1 任务板 merge/流错误** | [104](../_archive/fixed_bugs/BUG-104-team-task-merge-no-revision-null-view.md) / [112](../_archive/fixed_bugs/BUG-112-team-task-unassign-keeps-old-owner.md) / [105](../_archive/fixed_bugs/BUG-105-stream-error-not-rendered-in-board-dag-tasks.md) | merge 无 revision/基座、owner 缺席语义错；流错误只有 Presence 渲染 | revision + null 基座 + 缺席清 owner；三页签统一 StreamErrorNotice |
+| **S2 symlink 穿透** | [108](../_archive/fixed_bugs/BUG-108-catalog-symlink-final-outside.md) / [113](../_archive/fixed_bugs/BUG-113-command-doc-symlink-outside-workspace.md) | workspace 可写目录的 symlink 被跟随读 | `safe-file`：lstat 非 symlink + realpath 在 root；catalog + 三条命令统一 |
+| **S3 持久化/导出原子性** | [110](../_archive/fixed_bugs/BUG-110-governance-export-rm-before-rename.md) / [111](../_archive/fixed_bugs/BUG-111-saved-workspace-non-atomic-write.md) | 先删再 rename；settings 直接写 | 整 exports staging + backup 回滚；saved temp+rename + corrupt 可诊断 |
+| **S4 warnings 传播** | [109](../_archive/fixed_bugs/BUG-109-catalog-warnings-dropped-in-audit-present.md) | 新增 warnings 只有 boot 消费 | audit 回执计数 + present/回扫逐条 warn |
+| **S5 路径空白** | [107](../_archive/fixed_bugs/BUG-107-deliverables-audit-multi-space-path.md) | split+join 折叠连续空格 | 取原始剩余串 |
+| **S6 lease PID 复用** | [106](../_archive/fixed_bugs/BUG-106-lease-pid-reuse-blocks-writer.md) | 只用 PID 存活判 stale | heartbeat mtime + 过期接管 + warning |
+
+**收口**：10 张卡全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；`pnpm test` 236 files / 1799 tests、
+`typecheck`/`lint`/`dup`/`verify` 全绿。证据与未验面 = [Note](../../notes/implemented/2026-11-13-followup-bug-sweep.md)。
 
 ## 2026-11-13 修复交接（根因组 G1–G7：BUG-090..103）
 

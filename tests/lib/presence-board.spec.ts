@@ -318,4 +318,18 @@ describe('第六角色 CMO 的显示名映射（防漂移）', () => {
       { id: 'task-1', subject: '写 PRD', status: 'in_progress', ownerName: 'vp-sales', revision: 2 },
     ])
   })
+
+  it('merge 顺序与基座：旧 revision 不回滚、null 视图建板、取消认领清 owner', () => {
+    const members = [{ id: LEAD, name: 'lead', role: 'lead' as const, phase: 'active' }]
+    const newer: TeamViewLike = { members, tasks: [{ id: 't1', revision: 5, subject: 'new', status: 'completed', ownerName: 'lead' }] }
+    const stale = teamWithEventTasks(newer, [taskEvent('t1', 1, 'old', 'pending', undefined, 1)])
+    expect(stale?.tasks[0]).toMatchObject({ revision: 5, subject: 'new', status: 'completed', ownerName: 'lead' })
+
+    const fromNull = teamWithEventTasks(null, [taskEvent('t2', 1, 'A', 'pending', undefined, 2)])
+    expect(fromNull?.tasks).toMatchObject([{ id: 't2', subject: 'A', status: 'pending' }])
+
+    const assigned: TeamViewLike = { members, tasks: [{ id: 't3', revision: 1, subject: 'x', status: 'in_progress', ownerName: 'lead' }] }
+    const unassigned = teamWithEventTasks(assigned, [taskEvent('t3', 2, 'x', 'in_progress', undefined, 3)])
+    expect(unassigned?.tasks[0]?.ownerName).toBeUndefined()
+  })
 })

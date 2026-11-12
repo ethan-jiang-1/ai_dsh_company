@@ -218,6 +218,16 @@
 | [BUG-077-teammate-header-omits-team-collaboration.md](fixed_bugs/BUG-077-teammate-header-omits-team-collaboration.md) | team 拆 `team collaboration` / `team spawn (Lead only)`；teammate 列协作、注入 member section | 2026-11-11 |
 | [BUG-078-teammate-dead-subagent-control-tools.md](fixed_bugs/BUG-078-teammate-dead-subagent-control-tools.md) | control 按座位/child 能力装：CEO teammate 无，vp-eng teammate 保留 | 2026-11-11 |
 | [BUG-079-ceo-teammate-spawn-header-no-child-channel.md](fixed_bugs/BUG-079-ceo-teammate-spawn-header-no-child-channel.md) | spawn/fork/retry 按 `childDepth > depth` 门控；CEO teammate 无 spawn，vp-eng teammate 保留；control 消费同一座位 | 2026-11-11 |
+| [BUG-104](fixed_bugs/BUG-104-team-task-merge-no-revision-null-view.md) | 任务板 merge 按 revision/null 基座；取消认领清 owner | 2026-11-13 |
+| [BUG-105](fixed_bugs/BUG-105-stream-error-not-rendered-in-board-dag-tasks.md) | board/dag/tasks 统一渲染 streamError（投影可能过期） | 2026-11-13 |
+| [BUG-106](fixed_bugs/BUG-106-lease-pid-reuse-blocks-writer.md) | lease heartbeat mtime；PID 复用旧锁可接管并 warning | 2026-11-13 |
+| [BUG-107](fixed_bugs/BUG-107-deliverables-audit-multi-space-path.md) | audit 路径保留原始空白（连续空格不折叠） | 2026-11-13 |
+| [BUG-108](fixed_bugs/BUG-108-catalog-symlink-final-outside.md) | catalog final/meta 拒绝 symlink/越界（safe-file） | 2026-11-13 |
+| [BUG-109](fixed_bugs/BUG-109-catalog-warnings-dropped-in-audit-present.md) | catalog warnings 进 audit 回执 + present/回扫日志 | 2026-11-13 |
+| [BUG-110](fixed_bugs/BUG-110-governance-export-rm-before-rename.md) | exports 整目录 staging + backup；失败回滚不丢旧版 | 2026-11-13 |
+| [BUG-111](fixed_bugs/BUG-111-saved-workspace-non-atomic-write.md) | saved workspace temp+rename；坏 JSON 标 corrupt | 2026-11-13 |
+| [BUG-112](fixed_bugs/BUG-112-team-task-unassign-keeps-old-owner.md) | 取消认领（无 ownerId）清空 ownerName | 2026-11-13 |
+| [BUG-113](fixed_bugs/BUG-113-command-doc-symlink-outside-workspace.md) | /prd /req /delivery 文档读面拒绝 symlink/越界 | 2026-11-13 |
 | [BUG-090](fixed_bugs/BUG-090-cultivation-revoke-unreachable-records-deletes-method.md) | revoke 先判 records 可达；0 记录需 --orphan，不再误删跨 workspace 方法 | 2026-11-13 |
 | [BUG-091](fixed_bugs/BUG-091-cultivation-check-revoked-broken-unsafe.md) | check 排除 revokedAt、计坏记录、非法 methodSlug 报「记录坏」 | 2026-11-13 |
 | [BUG-092](fixed_bugs/BUG-092-cultivation-propose-empty-fields.md) | propose 空字段拒绝 + recordText/parseRecord 往返，坏记录不落盘 | 2026-11-13 |

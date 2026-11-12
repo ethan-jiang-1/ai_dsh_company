@@ -16,15 +16,21 @@ export type ParsedDeliverablesAudit =
   | { readonly ok: true; readonly path: string; readonly value: boolean }
   | { readonly ok: false; readonly text: string }
 
-/** 解析 `audit <path> true|false`；path 允许空格（最终按 token 重新 join）。 */
+/** 解析 `audit <path> true|false`；path 取原始剩余串（保留连续空格），只裁两端。 */
 export function parseDeliverablesAudit(rawInput: string): ParsedDeliverablesAudit {
-  const tokens = rawInput.trim().split(/\s+/).filter(token => token !== '')
-  if (tokens[0] !== 'audit' || tokens.length < 3) return { ok: false, text: DELIVERABLES_USAGE }
-  const valueToken = tokens[tokens.length - 1]
+  const trimmed = rawInput.trim()
+  const head = /^audit\s+([\s\S]+)$/.exec(trimmed)
+  if (head === null) return { ok: false, text: DELIVERABLES_USAGE }
+  const rest = head[1] as string
+  const last = /\s+(\S+)$/.exec(rest)
+  if (last === null) return { ok: false, text: DELIVERABLES_USAGE }
+  const valueToken = last[1] as string
   if (valueToken !== 'true' && valueToken !== 'false') {
-    return { ok: false, text: `审计结论只认 true/false：${valueToken ?? ''}` }
+    return { ok: false, text: `审计结论只认 true/false：${valueToken}` }
   }
-  return { ok: true, path: tokens.slice(1, -1).join(' '), value: valueToken === 'true' }
+  const path = rest.slice(0, last.index).trim()
+  if (path === '') return { ok: false, text: DELIVERABLES_USAGE }
+  return { ok: true, path, value: valueToken === 'true' }
 }
 
 export interface DeliverablesCommandOptions {
@@ -61,11 +67,12 @@ export function registerDeliverablesCommand(ctx: Context, options: DeliverablesC
       if (result.ledger === undefined) {
         return { kind: 'error' as const, text: result.warning ?? '审计写入失败' }
       }
-      regenerate(options.workspace, result.ledger)
+      const regenerated = regenerate(options.workspace, result.ledger)
+      const skipped = regenerated?.warnings?.length ?? 0
       options.exportNow(store)
       return {
         kind: 'success' as const,
-        text: `已审计 ${result.path ?? parsed.path} = ${String(parsed.value)}（presented 账本 = ${store.kind}；索引已重生成）。`,
+        text: `已审计 ${result.path ?? parsed.path} = ${String(parsed.value)}（presented 账本 = ${store.kind}；索引已重生成${skipped > 0 ? `；另有 ${String(skipped)} 条坏形状被跳过` : ''}）。`,
       }
     },
   })

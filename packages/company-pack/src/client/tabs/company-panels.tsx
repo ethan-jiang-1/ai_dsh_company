@@ -102,6 +102,11 @@ function columnLabel(column: BoardColumn, t: CompanyT = defaultT): string {
   return key === undefined ? column.label : t(key)
 }
 
+/** 实时流断开时的统一错误条：显示的是投影快照，可能过期（BUG-105）。 */
+export function StreamErrorNotice({ message, t = defaultT }: { readonly message: string; readonly t?: CompanyT }) {
+  return <div className="wk-error" role="status">{t('stream.error', { message })}</div>
+}
+
 export function BoardPanel({ columns, roleLabel = label => label, t = defaultT }: { readonly columns: readonly BoardColumn[]; readonly roleLabel?: (ownerLabel: string) => string; readonly t?: CompanyT }) {
   return (
     <div className="wk-board" role="list" aria-label={t('board.aria')}>

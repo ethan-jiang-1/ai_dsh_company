@@ -10,7 +10,7 @@
 
 // 负例留证 2026-11-10：删掉 slug 校验 ⇒「越界 slug」用例红（读根外 + 调用 checker；BUG-057）；还原即绿。
 import { describe, expect, it } from 'vitest'
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
@@ -141,5 +141,40 @@ describe('registerPrdCommand', () => {
       expect(failed.text).toContain('PRD 校验失败')
       expect(failed.text).toContain('MR-999')
     } finally { cleanup() }
+  })
+
+  it('drafts 文档是 symlink（指向 workspace 外）→ 拒绝，不读外部内容', async () => {
+    const { workspace, cleanup } = fixture()
+    const outside = mkdtempSync(join(tmpdir(), 'prd-outside-'))
+    try {
+      writeFileSync(join(outside, 'mrd.md'), doc(mrdJson))
+      writeFileSync(join(outside, 'prd.md'), doc(prdJson))
+      const dir = join(workspace, '.dsh-company/deliverables/2026-11-05-demo/drafts')
+      symlinkSync(join(outside, 'mrd.md'), join(dir, 'mrd.md'))
+      symlinkSync(join(outside, 'prd.md'), join(dir, 'prd.md'))
+      const result = await mount(workspace).handler({ rawInput: 'check 2026-11-05-demo' })
+      expect(result.kind).toBe('error')
+      expect(result.text).toContain('普通文件')
+    } finally {
+      cleanup()
+      rmSync(outside, { recursive: true, force: true })
+    }
+  })
+
+  it('交付物目录本身是 symlink → 拒绝', async () => {
+    const { workspace, cleanup } = fixture()
+    const outside = mkdtempSync(join(tmpdir(), 'prd-outside-root-'))
+    try {
+      const target = join(workspace, '.dsh-company/deliverables/2026-11-05-demo')
+      rmSync(target, { recursive: true, force: true })
+      mkdirSync(join(outside, 'drafts'), { recursive: true })
+      symlinkSync(outside, target)
+      const result = await mount(workspace).handler({ rawInput: 'check 2026-11-05-demo' })
+      expect(result.kind).toBe('error')
+      expect(result.text).toContain('symlink')
+    } finally {
+      cleanup()
+      rmSync(outside, { recursive: true, force: true })
+    }
   })
 })

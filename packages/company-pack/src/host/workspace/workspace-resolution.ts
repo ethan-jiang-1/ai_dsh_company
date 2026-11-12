@@ -9,7 +9,8 @@
  *
  * 这是纯解析；落点校验/登记/初始化由调用方做。
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs'
+import { randomUUID } from 'node:crypto'
 import { join, resolve } from 'node:path'
 import { expandHomePath } from '@deepseek-ai/dsh-home-paths'
 import { canonicalPath } from '../run-bundle/paths.ts'
@@ -28,6 +29,8 @@ export interface WorkspaceResolution {
   readonly error?: string
   /** 产品保存的最近选择路径（诊断用）。 */
   readonly savedPath?: string
+  /** saved 文件存在但坏了（不是「没有保存」）：boot 应 warn，不能静默当 missing（BUG-111）。 */
+  readonly savedProblem?: 'corrupt'
 }
 
 export interface ResolveWorkspaceOptions {
@@ -56,20 +59,20 @@ export const settingsPath = (dshHome: string): string => join(dshHome, 'company/
 export function readSavedWorkspace(
   dshHome: string,
   options: { readonly path?: string; readonly exists?: (path: string) => boolean; readonly readFile?: (path: string) => string } = {},
-): { readonly workspace?: string; readonly path: string } {
+): { readonly workspace?: string; readonly path: string, readonly problem?: 'corrupt' } {
   const path = options.path ?? settingsPath(dshHome)
   const exists = options.exists ?? existsSync
   const read = options.readFile ?? ((file: string) => readFileSync(file, 'utf8'))
   if (!exists(path)) return { path }
   try {
     const parsed: unknown = JSON.parse(read(path))
-    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return { path }
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return { path, problem: 'corrupt' }
     const value = (parsed as Record<string, unknown>).workspace
     return typeof value === 'string' && value.trim() !== ''
       ? { workspace: resolve(expandHomePath(value.trim())), path }
-      : { path }
+      : { path, problem: 'corrupt' }
   } catch {
-    return { path }
+    return { path, problem: 'corrupt' }
   }
 }
 
@@ -82,7 +85,15 @@ export function writeSavedWorkspace(dshHome: string, workspace: string): Company
   }
   const path = settingsPath(dshHome)
   mkdirSync(join(dshHome, 'company'), { recursive: true })
-  writeFileSync(path, `${JSON.stringify(settings, null, 2)}\n`)
+  // 同目录 temp + rename：崩溃/半写不会把「最近 workspace」截断成坏 JSON（BUG-111）。
+  const temporary = `${path}.${String(process.pid)}.${randomUUID()}.tmp`
+  try {
+    writeFileSync(temporary, `${JSON.stringify(settings, null, 2)}\n`, { flag: 'wx' })
+    renameSync(temporary, path)
+  } catch (error) {
+    try { unlinkSync(temporary) } catch { /* 未创建或已 rename */ }
+    throw error
+  }
   return settings
 }
 
@@ -128,5 +139,9 @@ export function resolveWorkspace(options: ResolveWorkspaceOptions): WorkspaceRes
       return { workspace: canonicalPath(saved.workspace), source: 'saved', savedPath: saved.path }
     }
   }
-  return { source: 'none', savedPath: saved.path }
+  return {
+    source: 'none',
+    savedPath: saved.path,
+    ...(saved.problem === undefined ? {} : { savedProblem: saved.problem }),
+  }
 }

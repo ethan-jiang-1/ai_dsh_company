@@ -20,7 +20,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { PresenceRow } from '../../lib/presence.ts'
 import { memberDot } from '../../lib/presence-status.ts'
 import { clampRect, loadFloatRect, saveFloatRect, type FloatRectLike } from '../ui/float-geometry.ts'
-import { BoardPanel, BudgetPanel, DagPanel, StateNote, activityText } from './company-panels.tsx'
+import { BoardPanel, BudgetPanel, DagPanel, StateNote, StreamErrorNotice, activityText } from './company-panels.tsx'
 import { DelegationFlowPanel } from './DelegationFlowPanel.tsx'
 import { buildDelegationTree, type DelegationSessionSummaryLike } from '../../lib/delegation-tree.ts'
 import { TasksTableView } from './TasksPanel.tsx'
@@ -167,6 +167,7 @@ export function BoardTab(props: CompanyTabProps) {
   return (
     <PanelFrame title={props.t('tabs.board.label')} tone="overview" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
+      {data.streamError === null ? null : <StreamErrorNotice message={data.streamError} t={props.t} />}
       <BoardPanel columns={data.columns} t={props.t} />
     </PanelFrame>
   )
@@ -203,6 +204,7 @@ export function DagTab(props: CompanyTabProps) {
       )}
     >
       {data.error !== null && <div className="wk-error">{data.error}</div>}
+      {data.streamError === null ? null : <StreamErrorNotice message={data.streamError} t={props.t} />}
       <DelegationFlowPanel tree={tree} t={props.t} />
       <DagPanel key={redrawKey} layout={data.dag} roleLabel={label => roleTextForCanonical(label, props.t)} t={props.t} />
     </PanelFrame>
@@ -295,6 +297,7 @@ export function TasksTab(props: CompanyTabProps) {
   return (
     <PanelFrame title={props.t('tabs.tasks.label')} tone="work" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
+      {data.streamError === null ? null : <StreamErrorNotice message={data.streamError} t={props.t} />}
       <TasksTableView view={data.team} roleLabel={(name: string) => roleText(name, 'label', props.t, name)} t={props.t} />
     </PanelFrame>
   )

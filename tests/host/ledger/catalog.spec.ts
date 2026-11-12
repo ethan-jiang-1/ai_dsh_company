@@ -5,8 +5,9 @@
  * ③present 事件按 `.dsh-company/deliverables.../final.md` 投影；④meta/台账解析与仓库口径一致；
  * ⑤一个 workspace 的扫描不读另一个。
  */
-import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { tmpdir } from 'node:os'
 import { afterEach, describe, expect, it } from 'vitest'
 import {
   auditRelPath,
@@ -285,5 +286,20 @@ describe('坏形状：存在 ≠ 可读普通文件', () => {
     const result = setPresentedAudit(root, `${RUN_BUNDLE_PATHS.deliverables}/2026-10-25-dirfinal/final.md`, true)
     expect(result.ledger).toBeUndefined()
     expect(result.warning).toContain('不是普通文件')
+  })
+
+  it('final.md / meta.md 是 symlink（指向 workspace 外）→ warning 且不纳入成品', () => {
+    const root = workspace()
+    const outside = mkdtempSync(join(tmpdir(), 'catalog-outside-'))
+    const dir = join(root, RUN_BUNDLE_PATHS.deliverables, '2026-11-13-link')
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(outside, 'final.md'), '# outside final\n')
+    writeFileSync(join(outside, 'meta.md'), 'slug: linked\n')
+    symlinkSync(join(outside, 'final.md'), join(dir, 'final.md'))
+    symlinkSync(join(outside, 'meta.md'), join(dir, 'meta.md'))
+    const result = regenerateCatalog(root)
+    expect(result.catalog?.entries.some(entry => entry.dir === '2026-11-13-link')).toBe(false)
+    expect(result.warnings.some(warning => warning.includes('symlink'))).toBe(true)
+    rmSync(outside, { recursive: true, force: true })
   })
 })

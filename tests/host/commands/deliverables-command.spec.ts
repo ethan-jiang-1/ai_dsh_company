@@ -13,7 +13,7 @@ function mount(options = {}) {
   let definition: Def | undefined
   const ctx = { commands: { register: (def: Def) => { definition = def } } }
   const audit = vi.fn(async () => ({ ledger: { schema: 1, updatedAt: '', paths: {}, slugs: {} }, path: 'p' }))
-  const regenerate = vi.fn()
+  const regenerate = vi.fn(() => ({ warnings: [], written: false, catalog: null, path: 'x' }))
   const exportNow = vi.fn()
   registerDeliverablesCommand(ctx as unknown as Context, {
     dataBlocked: false,
@@ -33,6 +33,8 @@ describe('parseDeliverablesAudit', () => {
       .toEqual({ ok: true, path: '.dsh-company/deliverables/a/final.md', value: true })
     expect(parseDeliverablesAudit('audit .dsh-company/deliverables/a b/final.md false'))
       .toEqual({ ok: true, path: '.dsh-company/deliverables/a b/final.md', value: false })
+    expect(parseDeliverablesAudit('audit .dsh-company/deliverables/a  b/final.md true'))
+      .toEqual({ ok: true, path: '.dsh-company/deliverables/a  b/final.md', value: true })
   })
 
   it('缺 audit / 缺 path / 结论非 true|false → 用法错误', () => {
@@ -69,5 +71,14 @@ describe('registerDeliverablesCommand', () => {
     expect(audit).toHaveBeenCalledWith('/w', { kind: 'domain' }, 'x', true)
     expect(regenerate).toHaveBeenCalled()
     expect(exportNow).toHaveBeenCalled()
+  })
+
+  it('坏形状被跳过时回执点名数量', async () => {
+    const { definition } = mount({
+      regenerate: vi.fn(() => ({ warnings: ['bad meta', 'bad final'], written: true, catalog: null, path: 'x' })),
+    })
+    const result = await definition.handler({ rawInput: 'audit x true' })
+    expect(result.kind).toBe('success')
+    expect(result.text).toContain('2 条坏形状被跳过')
   })
 })

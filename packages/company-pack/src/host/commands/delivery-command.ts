@@ -6,11 +6,12 @@
  * `project-services` / `managed-service` 缺 SOW/UAT/SLA/Runbook 等应在操作员收口时红，而不是靠角色自证。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { blockedCompanyText } from './blocked-text.ts'
 import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import { contentMemberFile, isSafeContentId } from './content-id.ts'
+import { isPlainFileInside, readTextInside } from '../fs/safe-file.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
 import { yamlScalar } from '../../lib/yaml-scalar.ts'
 
@@ -98,13 +99,14 @@ export function registerDeliveryCommand(ctx: Context, options: DeliveryCommandOp
       const resolved = resolveDeliverablePath(workspace, parsed.slug)
       if (!resolved.ok) return { kind: 'error' as const, text: resolved.text }
       const { root } = resolved
-      const metaText = readIfExists(join(root, 'meta.md'))
+      const companyRoot = join(workspace, '.dsh-company')
+      const metaText = readTextInside(companyRoot, join(root, 'meta.md'))
       if (metaText === undefined) {
         return { kind: 'error' as const, text: `缺 meta.md：${root}（交付模式写在动议户口）` }
       }
       const mode = parseDeliveryMode(metaText)
       if (mode === 'productized') {
-        const extras = ['sow.md', 'sla.md'].filter(name => existsSync(join(root, 'drafts', name)))
+        const extras = ['sow.md', 'sla.md'].filter(name => isPlainFileInside(companyRoot, join(root, 'drafts', name)))
         return {
           kind: 'success' as const,
           text: extras.length === 0
@@ -142,7 +144,7 @@ export function registerDeliveryCommand(ctx: Context, options: DeliveryCommandOp
           continue
         }
         const path = join(root, file)
-        const text = readIfExists(path)
+        const text = readTextInside(companyRoot, path)
         if (text === undefined) {
           errors.push(`缺 ${key}（${file}）`)
           continue

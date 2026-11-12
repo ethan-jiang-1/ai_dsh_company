@@ -118,16 +118,22 @@ export interface TeamViewLike {
  * @returns 合并后的视图；`view === null` 时仍返回 null。
  */
 export function teamWithEventTasks(view: TeamViewLike | null, events: readonly TeamEventLike[]): TeamViewLike | null {
-  if (view === null) return null
-  const nameById = new Map(view.members.map(member => [member.id, member.name]))
-  const tasks = new Map(view.tasks.map(task => [task.id, task]))
+  // 没有投影时只有「事件里真有 team/task」才建最小视图；空流仍返回 null（页面显示加载态）。
+  if (view === null && !events.some(event => event.type === 'team/task')) return null
+  const base: TeamViewLike = view ?? { members: [], tasks: [] }
+  const nameById = new Map(base.members.map(member => [member.id, member.name]))
+  const tasks = new Map(base.tasks.map(task => [task.id, task]))
   for (const event of events) {
     if (event.type !== 'team/task') continue
     const task = (event.data as { task: { readonly id: string, readonly revision: number, readonly subject: string, readonly status: string, readonly ownerId?: string, readonly blockedBy?: readonly string[], readonly description?: string } }).task
+    const previous = tasks.get(task.id)
+    // 事件流的历史/实时顺序不等于投影新旧：旧 revision 不覆盖新投影（BUG-104）。
+    if (previous !== undefined && typeof previous.revision === 'number' && task.revision < previous.revision) continue
     if (task.status === 'deleted') { tasks.delete(task.id); continue }
+    // 事件是完整的 task snapshot：ownerId 缺席 = 明确无人认领（取消认领），不能保留旧 owner（BUG-112）。
     const ownerName = task.ownerId === undefined
-      ? tasks.get(task.id)?.ownerName
-      : nameById.get(task.ownerId) ?? tasks.get(task.id)?.ownerName
+      ? undefined
+      : nameById.get(task.ownerId) ?? previous?.ownerName
     tasks.set(task.id, {
       id: task.id,
       subject: task.subject,
@@ -138,7 +144,7 @@ export function teamWithEventTasks(view: TeamViewLike | null, events: readonly T
       ...(task.blockedBy === undefined ? {} : { blockedBy: task.blockedBy }),
     })
   }
-  return { ...view, tasks: [...tasks.values()] }
+  return { ...base, tasks: [...tasks.values()] }
 }
 
 /** lead 会话日志里的 `team/*` 事件（host 折算路径与回放 fixtures 的输入）。 */

@@ -8,7 +8,7 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { BudgetPanel, PresencePanel } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
+import { BudgetPanel, PresencePanel, StreamErrorNotice } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
 import type { BudgetSummary } from '../../../packages/company-pack/src/lib/budget.ts'
 import type { ActivityEntry, PresenceRow } from '../../../packages/company-pack/src/lib/presence.ts'
 
@@ -78,5 +78,13 @@ describe('用量面板', () => {
     expect(html).toContain('步数 —')
     expect(html).not.toContain('工具耗时占比')
     expect(html).toContain('只显示令牌')
+  })
+})
+
+describe('流错误提示', () => {
+  it('显示「实时流断开 / 投影快照可能过期」和具体错误', () => {
+    const html = renderToStaticMarkup(createElement(StreamErrorNotice, { message: 'follow failed' }))
+    expect(html).toContain('实时流断开')
+    expect(html).toContain('follow failed')
   })
 })

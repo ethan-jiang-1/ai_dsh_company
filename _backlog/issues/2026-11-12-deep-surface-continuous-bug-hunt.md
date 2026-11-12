@@ -374,6 +374,27 @@ opened: 2026-11-12
 
 **未跑：** 带 teammate 的任务板真页面（本卡先证「无 teammate 的 CEO root 写了任务但板空」）；多窗口/会话切换。
 
+## Round 15（BUG-090..103 修复后的回归扫：C5/C3/C6/C4）
+
+**背景：** 1b307755 收口了 14 张卡；用户要求继续找更多。本轮按修复面回归 + 相邻边界，一次开 10 张新卡（BUG-104..113），仍不改产品代码。
+
+| 卡 | 面 | 判决 |
+|---|---|---|
+| [BUG-104](../_archive/fixed_bugs/BUG-104-team-task-merge-no-revision-null-view.md) | C5 merge | 旧 `team/task` 事件覆盖新投影（无 revision 比较）；`view=null` 时事件整段丢 |
+| [BUG-105](../_archive/fixed_bugs/BUG-105-stream-error-not-rendered-in-board-dag-tasks.md) | C5 流 | follow 失败只有 PresenceTab 显示 `streamError`；board/dag/tasks 静默空/旧 |
+| [BUG-106](../_archive/fixed_bugs/BUG-106-lease-pid-reuse-blocks-writer.md) | C3 lease | PID 复用 + `startedAt` 不参与 → 旧锁永久挡 writer |
+| [BUG-107](../_archive/fixed_bugs/BUG-107-deliverables-audit-multi-space-path.md) | C6 parser | `/deliverables audit` 单空格 join，连续空格路径被改成另一路径 |
+| [BUG-108](../_archive/fixed_bugs/BUG-108-catalog-symlink-final-outside.md) | C4 catalog | `final.md`/`meta.md` symlink→workspace 外仍算成品（stat 跟随） |
+| [BUG-109](../_archive/fixed_bugs/BUG-109-catalog-warnings-dropped-in-audit-present.md) | C4 warnings | 坏形状 warnings 只在 boot 消费；audit/present 静默丢 |
+| [BUG-110](../_archive/fixed_bugs/BUG-110-governance-export-rm-before-rename.md) | C4 export | 目录替换先 `rm` 再 rename，失败丢上一份导出 |
+| [BUG-111](../_archive/fixed_bugs/BUG-111-saved-workspace-non-atomic-write.md) | C3 settings | `writeSavedWorkspace` 非原子写，崩溃成坏 JSON |
+| [BUG-112](../_archive/fixed_bugs/BUG-112-team-task-unassign-keeps-old-owner.md) | C5 task merge | 取消认领（无 ownerId）保留旧 ownerName |
+| [BUG-113](../_archive/fixed_bugs/BUG-113-command-doc-symlink-outside-workspace.md) | C6 docs | `/prd` `/req` `/delivery` 跟随 deliverables symlink 读 workspace 外文档 |
+
+**证据脚本：** `runtime/tmp/newbugs-merge.mts`、`newbugs-2.mts`（unassign/catalog symlink/audit spaces）、`newbugs-lease.mts`、`newbugs-doc-symlink.mts`。均为 upstream 生产函数直调或 handler 直调；未改产品代码。
+
+**未跑：** 真页面/真 WebSocket 断流（BUG-105 的视觉证据）；`exportGovernance` rename 失败的真实注入（BUG-110 为代码路径 + 推演）；`writeSavedWorkspace` 崩溃样本（BUG-111 为静态）；`/req` `/delivery` 的 symlink 复验（与 /prd 同 reader）。
+
 ## 证据、判据与处置
 
 - **oracle 纪律**：先写期望，再看实现；不拿实现当 oracle；spec 绿只说明覆盖，不说明行为正确。

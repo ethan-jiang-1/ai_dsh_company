@@ -7,7 +7,9 @@
  *
  * 只读路径；不创建目录、不读写文件。
  */
+import { lstatSync } from 'node:fs'
 import { isAbsolute, join, relative } from 'node:path'
+import { isInside } from '../fs/safe-file.ts'
 
 /** deliverables 目录名：字母/数字开头，允许 `._-`；拒绝 `.`/`..` 与路径分隔符。 */
 const SLUG = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
@@ -29,12 +31,20 @@ export function resolveDeliverablePath(workspace: string, slug: string): Deliver
       text: `非法 deliverables 目录名「${slug}」：只允许单段目录名（字母/数字/._-；不能含 /、\\、. 或 ..）`,
     }
   }
-  const deliverablesRoot = join(workspace, '.dsh-company/deliverables')
+  const companyRoot = join(workspace, '.dsh-company')
+  const deliverablesRoot = join(companyRoot, 'deliverables')
   const root = join(deliverablesRoot, slug)
   const dir = join(root, 'drafts')
   const rel = relative(deliverablesRoot, dir)
   if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
     return { ok: false, text: `非法 deliverables 目录名「${slug}」：越出 deliverables 根` }
   }
+  // 交付物目录本身是 symlink / 真实目标在 company root 外 → 不读（BUG-113）。
+  try {
+    const info = lstatSync(root)
+    if (info.isSymbolicLink()) return { ok: false, text: `交付物目录是 symlink，拒绝读取：${root}` }
+    if (!info.isDirectory()) return { ok: false, text: `交付物目录不是目录：${root}` }
+    if (!isInside(companyRoot, root)) return { ok: false, text: `交付物目录真实路径越出 company root：${root}` }
+  } catch { /* 目录缺失：交给命令报缺文档 */ }
   return { ok: true, root, dir }
 }

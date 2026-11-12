@@ -9,7 +9,7 @@
  * 它是“防静默互写”的护栏，不是高可用锁。
  */
 import { randomUUID } from 'node:crypto'
-import { readFileSync, unlinkSync, writeFileSync } from 'node:fs'
+import { readFileSync, statSync, unlinkSync, utimesSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 export const LEASE_FILENAME = 'company-pack.lock'
@@ -22,13 +22,19 @@ export interface LeaseHolder {
 }
 
 export type LeaseResult =
-  | { readonly acquired: true; readonly path: string; readonly release: () => void }
+  | { readonly acquired: true; readonly path: string; readonly release: () => void; readonly warning?: string }
   | { readonly acquired: false; readonly path: string; readonly reason: string; readonly holder?: LeaseHolder }
 
 interface HeldLease {
   readonly holder: LeaseHolder
   refs: number
+  timer?: ReturnType<typeof setInterval>
 }
+
+/** 心跳间隔：持有者每 30s touch 一次锁文件 mtime。 */
+export const LEASE_HEARTBEAT_MS = 30_000
+/** 超过这个 mtime age 且 PID 存活 = 很可能是 PID 复用留下的旧锁（真 writer 会持续心跳）。 */
+export const LEASE_STALE_MS = 120_000
 
 const held = new Map<string, HeldLease>()
 
@@ -43,6 +49,22 @@ function isAlive(pid: number): boolean {
   } catch (error) {
     return (error as NodeJS.ErrnoException).code === 'EPERM'
   }
+}
+
+/** 锁文件 mtime 距今毫秒；读不到返回 Infinity（按 stale）。 */
+function leaseAgeMs(path: string, now: Date): number {
+  try { return Math.max(0, now.getTime() - statSync(path).mtimeMs) } catch { return Number.POSITIVE_INFINITY }
+}
+
+/** 心跳：只在 token 仍属于自己时 touch mtime，不覆盖别人的锁。 */
+export function touchLease(path: string, token: string): void {
+  try {
+    const current = parseHolder(readFileSync(path, 'utf8'))
+    if (current?.token === token) {
+      const now = new Date()
+      utimesSync(path, now, now)
+    }
+  } catch { /* 锁已被删/替换：下次 release 自然不删别人的 */ }
 }
 
 function parseHolder(text: string): LeaseHolder | null {
@@ -89,17 +111,22 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
     startedAt: now.toISOString(),
   }
   const text = `${JSON.stringify(holder, null, 2)}\n`
+  let takeover: LeaseHolder | null = null
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
       writeFileSync(path, text, { flag: 'wx' })
-      held.set(path, { holder, refs: 1 })
+      const timer = setInterval(() => { touchLease(path, holder.token) }, LEASE_HEARTBEAT_MS)
+      ;(timer as unknown as { unref?: () => void }).unref?.()
+      held.set(path, { holder, refs: 1, timer })
       return {
         acquired: true,
         path,
+        ...(takeover === null ? {} : { warning: `接管了 stale writer lease（pid ${String(takeover.pid)}，PID 存活但锁 mtime 已过期；可能是 PID 复用）` }),
         release: () => {
           const entry = held.get(path)
           if (entry === undefined) return
           if (entry.refs > 1) { entry.refs -= 1; return }
+          if (entry.timer !== undefined) clearInterval(entry.timer)
           try {
             const current = parseHolder(readFileSync(path, 'utf8'))
             if (current?.token === entry.holder.token) unlinkSync(path)
@@ -116,8 +143,13 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
     try {
       current = parseHolder(readFileSync(path, 'utf8'))
     } catch { /* 读不到按 stale */ }
-    if (current !== null && current.pid !== pid && isAlive(current.pid)) {
-      return { acquired: false, path, reason: `另一个 writer 正在使用这个 home（pid ${String(current.pid)}）`, holder: current }
+    if (current !== null && current.pid !== pid) {
+      const age = leaseAgeMs(path, now)
+      // PID 存活 + 心跳新鲜 = 真 writer；PID 存活但锁已过期 = 很可能是 PID 复用（BUG-106）。
+      if (isAlive(current.pid) && age <= LEASE_STALE_MS) {
+        return { acquired: false, path, reason: `另一个 writer 正在使用这个 home（pid ${String(current.pid)}）`, holder: current }
+      }
+      if (isAlive(current.pid)) takeover = current
     }
     // 同 pid 但没有进程内登记 = 上次异常残留；stale/坏文件都清掉后重试一次。
     try { unlinkSync(path) } catch { /* 被别的进程抢先清掉 */ }

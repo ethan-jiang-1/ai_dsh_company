@@ -5,7 +5,7 @@
  * 审计账本 = presented-ledger.ts。索引 `kb/deliverables-index.json` 是盘上 meta/final + 账本的派生视图。
  */
 import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   buildDeliverablesCatalog,
@@ -20,6 +20,7 @@ import {
 } from '../../lib/deliverables-catalog.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
 import { catalogPath, readCatalogState } from '../ledger/catalog-state.ts'
+import { plainFileProblem } from '../fs/safe-file.ts'
 import { emptyPresentedLedger, presentedOf, readPresentedLedger, type PresentedLedger } from '../ledger/presented-ledger.ts'
 
 export { CATALOG_REL, catalogPath, readCatalog, readCatalogState, type CatalogReadState } from '../ledger/catalog-state.ts'
@@ -32,9 +33,12 @@ export {
   type PresentedScanResult, type PresentedSessionQuery,
 } from '../ledger/presented-ledger.ts'
 
-/** 存在且是普通文件；目录/坏链接一律当「没有」。 */
-function isRegularFile(path: string): boolean {
-  try { return statSync(path).isFile() } catch { return false }
+/** 成品文件必须可读且不越出 company root（symlink 不跟随，BUG-108）。 */
+/** 坏形状的人话标签。 */
+function labelOfProblem(problem: Exclude<ReturnType<typeof plainFileProblem>, null>): string {
+  return problem === 'symlink' ? '是 symlink，不跟随'
+    : problem === 'outside' ? '真实路径在 company root 外'
+      : '不是普通文件'
 }
 
 /** 扫描两个交付物根；presented 由账本按 path/slug 命中决定，未命中 = null。 */
@@ -47,11 +51,13 @@ function scanEntries(companyHome: string, ledger: PresentedLedger): { entries: C
     for (const item of readdirSync(dir, { withFileTypes: true })) {
       if (!item.isDirectory()) continue
       const finalPath = join(dir, item.name, 'final.md')
-      const final = isRegularFile(finalPath)
-      if (!final && existsSync(finalPath)) warnings.push(`${finalPath} 不是普通文件，按无 final 处理`)
+      const finalProblem = plainFileProblem(companyHome, finalPath)
+      const final = finalProblem === null
+      if (finalProblem !== null && finalProblem !== 'missing') warnings.push(`${finalPath} ${labelOfProblem(finalProblem)}，按无 final 处理`)
       const metaPath = join(dir, item.name, 'meta.md')
-      const metaIsFile = isRegularFile(metaPath)
-      if (!metaIsFile && existsSync(metaPath)) warnings.push(`${metaPath} 不是普通文件，按无 meta 处理`)
+      const metaProblem = plainFileProblem(companyHome, metaPath)
+      const metaIsFile = metaProblem === null
+      if (metaProblem !== null && metaProblem !== 'missing') warnings.push(`${metaPath} ${labelOfProblem(metaProblem)}，按无 meta 处理`)
       const body = metaIsFile ? readFileSync(metaPath, 'utf8') : ''
       const fields = parseMeta(body).fields
       const slug = fields.get('slug') ?? slugFromDirName(item.name)
@@ -96,8 +102,9 @@ export function regenerateCatalog(companyHome: string, presented?: PresentedLedg
   const scanned = scanEntries(companyHome, ledger)
   const warnings = [...scanned.warnings]
   const ledgerPath = join(companyHome, RUN_BUNDLE_PATHS.ledger)
-  const ledgerIsFile = isRegularFile(ledgerPath)
-  if (!ledgerIsFile && existsSync(ledgerPath)) warnings.push(`${ledgerPath} 不是普通文件，按空账本处理`)
+  const ledgerProblem = plainFileProblem(companyHome, ledgerPath)
+  const ledgerIsFile = ledgerProblem === null
+  if (ledgerProblem !== null && ledgerProblem !== 'missing') warnings.push(`${ledgerPath} ${labelOfProblem(ledgerProblem)}，按空账本处理`)
   const catalog = buildDeliverablesCatalog({
     entries: scanned.entries,
     ledgerSlugs: ledgerIsFile ? ledgerSlugsFromText(readFileSync(ledgerPath, 'utf8')) : new Set(),

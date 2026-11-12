@@ -229,7 +229,8 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
           ctx.logger?.warn?.(`company-pack 成品目录 present 投影未写账本（${recorded.warning ?? '未知原因'}）`)
           return
         }
-        regenerateCatalog(workspace, recorded.ledger)
+        const regenerated = regenerateCatalog(workspace, recorded.ledger)
+        for (const warning of regenerated.warnings) ctx.logger?.warn?.(`company-pack：present 投影跳过坏形状：${warning}`)
         exportNow(store)
       }).catch(error => ctx.logger?.warn?.(`company-pack 成品目录 present 投影跳过（不影响运行）：${(error as Error).message}`))
     } catch (error) {
@@ -372,6 +373,7 @@ async function initializeCatalog(
         return
       }
       const regenerated = regenerateCatalog(workspace, recorded.ledger)
+      for (const warning of regenerated.warnings) ctx.logger?.warn?.(`company-pack：presented 回扫跳过坏形状：${warning}`)
       exportNow(store)
       if (regenerated.written) {
         ctx.logger?.info?.(`company-pack：presented 回扫完成（扫 ${String(observed.scanned)} 会话 / 失败 ${String(observed.failed)}）`)

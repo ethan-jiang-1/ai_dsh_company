@@ -35,13 +35,38 @@ export interface GovernanceExportResult {
   readonly warnings: readonly string[]
 }
 
-function atomicReplaceDir(source: string, target: string): void {
-  mkdirSync(dirname(target), { recursive: true })
-  const staging = `${target}.tmp-${String(process.pid)}-${randomUUID()}`
-  rmSync(staging, { recursive: true, force: true })
-  cpSync(source, staging, { recursive: true, dereference: false })
-  rmSync(target, { recursive: true, force: true })
-  renameSync(staging, target)
+/**
+ * 用 staging 目录替换 target：旧目录先 rename 成 backup，staging rename 成功后才删 backup；
+ * 第二步失败把 backup rename 回去。非空目录不能用 rename 直接覆盖，所以「先删后 rename」会丢旧版（BUG-110）。
+ * 依赖可注入：spec 用假 rename 模拟第二步失败。
+ */
+export function swapDirWithBackup(
+  staging: string,
+  target: string,
+  deps: { readonly rename?: (from: string, to: string) => void, readonly rm?: (path: string, options?: { recursive?: boolean, force?: boolean }) => void } = {},
+): void {
+  const rename = deps.rename ?? renameSync
+  const rm = deps.rm ?? rmSync
+  const backup = `${target}.bak-${String(process.pid)}-${randomUUID()}`
+  let hadTarget = false
+  try {
+    rename(target, backup)
+    hadTarget = true
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+  }
+  try {
+    rename(staging, target)
+  } catch (error) {
+    if (hadTarget) {
+      try { rename(backup, target) } catch { /* 回滚失败也要把原错误抛出去 */ }
+    }
+    try { rm(staging, { recursive: true, force: true }) } catch { /* 清理失败不掩原错误 */ }
+    throw error
+  }
+  if (hadTarget) {
+    try { rm(backup, { recursive: true, force: true }) } catch { /* 备份清理失败只留垃圾目录 */ }
+  }
 }
 
 /**
@@ -59,52 +84,54 @@ export function exportGovernance(options: {
 }): GovernanceExportResult {
   const warnings: string[] = []
   const exportRoot = join(options.workspace, '.dsh-company/exports')
+  const staging = `${exportRoot}.tmp-${String(process.pid)}-${randomUUID()}`
   let methods = false
   let ledger = false
   try {
-    mkdirSync(exportRoot, { recursive: true })
-    writeFileSync(join(exportRoot, 'README.md'), EXPORT_README)
-  } catch (error) {
-    warnings.push(`exports 目录写不动：${(error as Error).message}`)
-    return { methods, ledger, warnings }
-  }
-  const methodsSource = join(options.dshHome, 'company/methods')
-  if (existsSync(methodsSource)) {
-    try {
-      atomicReplaceDir(methodsSource, join(exportRoot, 'methods'))
+    mkdirSync(dirname(exportRoot), { recursive: true })
+    rmSync(staging, { recursive: true, force: true })
+    mkdirSync(staging, { recursive: true })
+    // 整个 exports/ 在同一 staging 里生成：README / methods / ledger 不会混代。
+    writeFileSync(join(staging, 'README.md'), EXPORT_README)
+
+    const methodsSource = join(options.dshHome, 'company/methods')
+    if (existsSync(methodsSource)) {
+      cpSync(methodsSource, join(staging, 'methods'), { recursive: true, dereference: false })
       methods = true
-    } catch (error) {
-      warnings.push(`方法层导出失败：${(error as Error).message}`)
     }
-  }
-  if (options.ledger !== undefined) {
-    try {
+
+    if (options.ledger !== undefined) {
       const state = options.ledger.read()
       if (state.status === 'ok') {
-        const target = join(exportRoot, 'ledger.json')
-        // 幂等：内容没变就不写，避免每次 boot 的 exportedAt 把“二启零变更”打红。
+        // 幂等：与上一份导出内容相同就不重写，避免 exportedAt 把「二启零变更」打红。
         let unchanged = false
         try {
-          const existing = JSON.parse(readFileSync(target, 'utf8')) as { ledger?: unknown; source?: unknown }
+          const existing = JSON.parse(readFileSync(join(exportRoot, 'ledger.json'), 'utf8')) as { ledger?: unknown; source?: unknown }
           unchanged = existing.source === options.ledger.kind
             && JSON.stringify(existing.ledger) === JSON.stringify(state.ledger)
         } catch { /* 不存在/坏文件则重写 */ }
         if (!unchanged) {
-          const payload = {
+          writeFileSync(join(staging, 'ledger.json'), `${JSON.stringify({
             schema: 1,
             exportedAt: (options.now ?? new Date()).toISOString(),
             source: options.ledger.kind,
             ledger: state.ledger satisfies PresentedLedger,
-          }
-          writeFileSync(target, `${JSON.stringify(payload, null, 2)}\n`)
+          }, null, 2)}\n`)
+        } else {
+          // 内容不变：把旧 ledger 复制进新快照，保持字节一致。
+          try { cpSync(join(exportRoot, 'ledger.json'), join(staging, 'ledger.json')) } catch { /* 旧件不可读则跳过 */ }
         }
         ledger = true
       } else if (state.status === 'corrupt' || state.status === 'unsupported') {
         warnings.push(`账本不可导出（${state.status}），保留上次快照`)
       }
-    } catch (error) {
-      warnings.push(`账本导出失败：${(error as Error).message}`)
     }
+
+    swapDirWithBackup(staging, exportRoot)
+  } catch (error) {
+    warnings.push(`exports 导出失败（旧快照保留）：${(error as Error).message}`)
+    try { rmSync(staging, { recursive: true, force: true }) } catch { /* 清理失败不掩原错误 */ }
+    return { methods: false, ledger: false, warnings }
   }
   return { methods, ledger, warnings }
 }

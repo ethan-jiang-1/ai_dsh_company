@@ -5,7 +5,7 @@
  * 命令随 pack 发布，用户部署里也能用（与 `/deliverables audit` 同一载体）。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { readFileSync } from 'node:fs'
+import { readTextInside } from '../fs/safe-file.ts'
 import { join } from 'node:path'
 import { blockedCompanyText } from './blocked-text.ts'
 import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
@@ -56,19 +56,16 @@ export function registerPrdCommand(ctx: Context, options: PrdCommandOptions): vo
       const resolved = resolveDeliverablePath(workspace, parsed.slug)
       if (!resolved.ok) return { kind: 'error' as const, text: resolved.text }
       const { dir } = resolved
+      const companyRoot = join(workspace, '.dsh-company')
       const mrdPath = join(dir, 'mrd.md')
       const prdPath = join(dir, 'prd.md')
-      let mrd: string
-      let prd: string
-      try {
-        mrd = readFileSync(mrdPath, 'utf8')
-      } catch {
-        return { kind: 'error' as const, text: `缺 MRD：${mrdPath}` }
+      const mrd = readTextInside(companyRoot, mrdPath)
+      if (mrd === undefined) {
+        return { kind: 'error' as const, text: `缺 MRD（或不是 company root 内普通文件）：${mrdPath}` }
       }
-      try {
-        prd = readFileSync(prdPath, 'utf8')
-      } catch {
-        return { kind: 'error' as const, text: `缺 PRD：${prdPath}` }
+      const prd = readTextInside(companyRoot, prdPath)
+      if (prd === undefined) {
+        return { kind: 'error' as const, text: `缺 PRD（或不是 company root 内普通文件）：${prdPath}` }
       }
       const result = check(mrd, prd)
       if (!result.ok) {

@@ -4,11 +4,11 @@
  * 判据：方法层/账本导出到 workspace `.dsh-company/exports/`；导出是派生；账本内容不变时不重写
  * （避免二启 exportedAt 打红）；权威文件不被改动。
  */
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { exportGovernance, readLedgerExport } from '../../../packages/company-pack/src/host/ledger/governance-export.ts'
+import { exportGovernance, readLedgerExport, swapDirWithBackup } from '../../../packages/company-pack/src/host/ledger/governance-export.ts'
 import type { PresentedLedgerState } from '../../../packages/company-pack/src/host/ledger/catalog.ts'
 
 const LEDGER = {
@@ -59,5 +59,28 @@ describe('governance export', () => {
       expect(result.warnings.length).toBeGreaterThan(0)
       expect(existsSync(join(ws, '.dsh-company/exports/ledger.json'))).toBe(false)
     } finally { cleanup() }
+  })
+})
+
+describe('导出目录替换的回滚', () => {
+  it('staging→target 失败时把旧 target 恢复，不丢上一份导出', () => {
+    const root = mkdtempSync(join(tmpdir(), 'governance-swap-'))
+    const target = join(root, 'exports')
+    const staging = join(root, 'staging')
+    mkdirSync(target, { recursive: true })
+    mkdirSync(staging, { recursive: true })
+    writeFileSync(join(target, 'old.md'), 'old')
+    writeFileSync(join(staging, 'new.md'), 'new')
+    let calls = 0
+    const rename = (from: string, to: string): void => {
+      calls += 1
+      if (calls === 2) throw new Error('rename boom')
+      renameSync(from, to)
+    }
+    try {
+      expect(() => swapDirWithBackup(staging, target, { rename })).toThrow('rename boom')
+      expect(readFileSync(join(target, 'old.md'), 'utf8')).toBe('old')
+      expect(existsSync(join(root, 'exports.bak-'))).toBe(false)
+    } finally { rmSync(root, { recursive: true, force: true }) }
   })
 })
