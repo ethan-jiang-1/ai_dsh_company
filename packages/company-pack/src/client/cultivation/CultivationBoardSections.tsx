@@ -10,9 +10,9 @@ import type { CultivationBoardState } from './use-cultivation-board.tsx'
 
 /** 验证态 → Tag（V8：未验证 ≠ 已掌握）。 */
 function verificationTag(record: CultivationRecord): { readonly tone: 'success' | 'warning' | 'outline', readonly text: string } {
-  if (record.verification === 'pass') return { tone: 'success', text: '已验证' }
-  if (record.verification === 'fail') return { tone: 'warning', text: '验证未通过' }
-  return { tone: 'outline', text: '未验证' }
+  if (record.verification === 'pass') return { tone: 'success', text: CULTIVATION_COPY.adoptedVerified }
+  if (record.verification === 'fail') return { tone: 'warning', text: CULTIVATION_COPY.adoptedVerificationFailed }
+  return { tone: 'outline', text: CULTIVATION_COPY.adoptedUnverified }
 }
 
 const MAX_VISIBLE_VERIFICATIONS = 3
@@ -104,21 +104,21 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
     })
   }
   return (
-      <div className="wk-activity-block" aria-label="已采纳的方法">
-        <strong>已采纳的方法</strong>
+      <div className="wk-activity-block" aria-label={CULTIVATION_COPY.adoptedAria}>
+        <strong>{CULTIVATION_COPY.adoptedTitle}</strong>
         {records !== null && inbox.adoptedForViewer.length === 0
-          ? <div className="wk-meta">我的分身还没有已采纳的方法。</div>
+          ? <div className="wk-meta">{CULTIVATION_COPY.adoptedEmpty}</div>
           : records !== null && (
-            <div role="list" aria-label="已采纳的方法" className="wk-list wk-cultivation-list">
+            <div role="list" aria-label={CULTIVATION_COPY.adoptedAria} className="wk-list wk-cultivation-list">
               {capList('adopted', inbox.adoptedForViewer).map(record => {
                 const slug = record.methodSlug ?? record.id
                 const outcome = outcomeOf(record.id)
                 const revoked = record.revokedAt !== undefined
                 return (
-                  <div key={record.id} role="listitem" className="wk-row" aria-label={`方法 ${slug}`}>
+                  <div key={record.id} role="listitem" className="wk-row" aria-label={CULTIVATION_COPY.adoptedRowAria(slug)}>
                     <span className="wk-row-name">
                       {slug}
-                      {revoked ? <Tag tone="warning">已撤回</Tag> : <Tag tone="info">已采纳</Tag>}
+                      {revoked ? <Tag tone="warning">{CULTIVATION_COPY.adoptedRevoked}</Tag> : <Tag tone="info">{CULTIVATION_COPY.adoptedBadge}</Tag>}
                       {!revoked && (() => {
                         const v = verificationTag(record)
                         return <Tag tone={v.tone}>{v.text}</Tag>
@@ -126,44 +126,44 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
                     </span>
                     <span className="wk-row-task">
                       {record.expectation}
-                      {revoked ? '——方法已删除，本角色会话不再加载。' : '——新开的本角色会话带着它开工；已经在跑的会话也会随技能目录刷新看到它。'}
+                      {revoked ? CULTIVATION_COPY.adoptedRevokedSuffix : CULTIVATION_COPY.adoptedActiveSuffix}
                     </span>
                     <span className="wk-meta">
-                      提出者：{record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)} 分身（Agent）` : `${roleLabel(record.proposerRole)} 角色语境下的人`}；目标角色：{roleLabel(record.targetRole)}；目标角色语境下的人已采纳
+                      {CULTIVATION_COPY.adoptedProvenance(record.proposerKind === 'agent' ? CULTIVATION_COPY.adoptedProposerAgent(roleLabel(record.proposerRole)) : CULTIVATION_COPY.adoptedProposerHuman(roleLabel(record.proposerRole)), roleLabel(record.targetRole))}
                     </span>
-                    {record.work !== undefined && record.work !== '' && <span className="wk-row-task">这次工作：{record.work}</span>}
+                    {record.work !== undefined && record.work !== '' && <span className="wk-row-task">{CULTIVATION_COPY.adoptedWork(record.work)}</span>}
                     {(record.contexts?.length ?? 0) > 0
-                      ? <span className="wk-meta">原始工作依据：背景「{record.contexts![0]!.title}」</span>
+                      ? <span className="wk-meta">{CULTIVATION_COPY.adoptedBasisContext(record.contexts![0]!.title)}</span>
                       : record.source === '（会话内提交）'
-                        ? <span className="wk-meta">来源：会话内提交；具体工作出处未单独记录</span>
+                        ? <span className="wk-meta">{CULTIVATION_COPY.adoptedSourceSession}</span>
                         : record.source !== ''
-                          ? <span className="wk-meta">原始工作依据：{record.source}</span>
-                          : <span className="wk-meta">原始工作依据：来源未记录</span>}
-                    {stampOf(record.id) !== null && <span className="wk-meta">提出时间：{String(stampOf(record.id))}</span>}
-                    {record.decidedAt !== undefined && <span className="wk-meta">采纳时间：{record.decidedAt}</span>}
+                          ? <span className="wk-meta">{CULTIVATION_COPY.adoptedSourceRecorded(record.source)}</span>
+                          : <span className="wk-meta">{CULTIVATION_COPY.adoptedSourceMissing}</span>}
+                    {stampOf(record.id) !== null && <span className="wk-meta">{CULTIVATION_COPY.adoptedRaisedAt(String(stampOf(record.id)))}</span>}
+                    {record.decidedAt !== undefined && <span className="wk-meta">{CULTIVATION_COPY.adoptedDecidedAt(record.decidedAt)}</span>}
                     {record.body !== '' && (() => {
                       const expanded = expandedEvidence[record.id] === true
                       return (
                         <div className="wk-cultivation-body">
                           {expanded || record.body.length <= 360 ? record.body : `${record.body.slice(0, 360)}…`}
-                          {record.body.length > 360 && <Button size="sm" onClick={() => { setExpandedEvidence(previous => ({ ...previous, [record.id]: !expanded })) }}>{expanded ? '收起原始依据' : '展开原始依据'}</Button>}
+                          {record.body.length > 360 && <Button size="sm" onClick={() => { setExpandedEvidence(previous => ({ ...previous, [record.id]: !expanded })) }}>{expanded ? CULTIVATION_COPY.adoptedCollapseEvidence : CULTIVATION_COPY.adoptedExpandEvidence}</Button>}
                         </div>
                       )
                     })()}
-                    {record.bodyTruncated === true && <span className="wk-meta">原始依据只加载了摘要，可能不完整；完整原文在培养记录文件中。</span>}
+                    {record.bodyTruncated === true && <span className="wk-meta">{CULTIVATION_COPY.adoptedEvidenceTruncated}</span>}
                     {record.verificationHistoryProblem !== null && record.verificationHistoryProblem !== undefined && <span className="wk-meta wk-cultivation-problem">{record.verificationHistoryProblem}</span>}
-                    {record.verification !== undefined && (record.verificationHistory?.length ?? 0) === 0 && record.verificationHistoryProblem == null && <span className="wk-meta">历史验证结果已保存，但后续工作依据未记录；方法仍已采纳。</span>}
+                    {record.verification !== undefined && (record.verificationHistory?.length ?? 0) === 0 && record.verificationHistoryProblem == null && <span className="wk-meta">{CULTIVATION_COPY.adoptedHistoryNotRecorded}</span>}
                     {(record.verificationHistory?.length ?? 0) > 0 && (() => {
                       const history = record.verificationHistory ?? []
                       const expanded = expandedEvidence[`history:${record.id}`] === true
                       const visible = expanded ? history : history.slice(-MAX_VISIBLE_VERIFICATIONS)
                       return (
-                        <div className="wk-cultivation-verification-history" aria-label="后续工作观察历史">
-                          <span className="wk-meta">后续相似工作观察：{String(history.length)} 条</span>
+                        <div className="wk-cultivation-verification-history" aria-label={CULTIVATION_COPY.adoptedHistoryAria}>
+                          <span className="wk-meta">{CULTIVATION_COPY.adoptedHistoryCount(history.length)}</span>
                           {visible.map((entry, index) => (
                             <div key={`${entry.at}:${index}`} className="wk-cultivation-observation">
                               <div className="wk-cultivation-observation-head">
-                                <Tag tone={entry.outcome === 'pass' ? 'success' : 'warning'}>{entry.outcome === 'pass' ? '有用' : '没起作用'}</Tag>
+                                <Tag tone={entry.outcome === 'pass' ? 'success' : 'warning'}>{entry.outcome === 'pass' ? CULTIVATION_COPY.adoptedPass : CULTIVATION_COPY.adoptedFail}</Tag>
                                 <span className="wk-meta" title={entry.at}>{verificationTime(entry, now)}</span>
                               </div>
                               <div className="wk-cultivation-observation-evidence">{entry.evidence}</div>
@@ -171,12 +171,12 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
                           ))}
                           {!expanded && history.length > MAX_VISIBLE_VERIFICATIONS && (
                             <div className="wk-cultivation-actions">
-                              <Button size="sm" onClick={() => { setExpandedEvidence(previous => ({ ...previous, [`history:${record.id}`]: true })) }}>查看全部 {String(history.length)} 条观察</Button>
+                              <Button size="sm" onClick={() => { setExpandedEvidence(previous => ({ ...previous, [`history:${record.id}`]: true })) }}>{CULTIVATION_COPY.adoptedShowAll(history.length)}</Button>
                             </div>
                           )}
                           {expanded && history.length > MAX_VISIBLE_VERIFICATIONS && (
                             <div className="wk-cultivation-actions">
-                              <Button size="sm" onClick={() => { setExpandedEvidence(previous => ({ ...previous, [`history:${record.id}`]: false })) }}>只看最近 {String(MAX_VISIBLE_VERIFICATIONS)} 条</Button>
+                              <Button size="sm" onClick={() => { setExpandedEvidence(previous => ({ ...previous, [`history:${record.id}`]: false })) }}>{CULTIVATION_COPY.adoptedShowRecent(MAX_VISIBLE_VERIFICATIONS)}</Button>
                             </div>
                           )}
                         </div>
