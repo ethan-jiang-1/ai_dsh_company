@@ -37,10 +37,7 @@ const PENDING = new Set([
   'packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md',
   'packages/company-pack/presets/vp-eng/skills/eng-workflow/SKILL.md',
   'packages/company-pack/presets/vp-eng/skills/prd-playbook/SKILL.md',
-  'packages/company-pack/presets/vp-eng/skills/tech-feasibility-review/SKILL.md',
-  'packages/company-pack/presets/vp-sales/skills/managed-service-pricing/SKILL.md',
   'packages/company-pack/presets/vp-sales/skills/market-sizing/SKILL.md',
-  'packages/company-pack/presets/vp-sales/skills/pricing/SKILL.md',
   'packages/company-pack/presets/vp-sales/skills/sales-workflow/SKILL.md',
 ])
 

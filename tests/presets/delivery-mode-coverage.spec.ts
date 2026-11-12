@@ -44,7 +44,7 @@ describe('交付模式覆盖：每个 mode 都有经营侧方法 + workflow 分�
   for (const mode of modes) {
     it(`${mode}：CFO/COO/VP-Sales 各至少一个方法`, () => {
       for (const role of ROLES) {
-        const hit = skillsOf(role).filter(skill => new RegExp(`适用交付模式\\s*=\\s*${mode}(?:\\s|；|;|$)`).test(skill.text))
+        const hit = skillsOf(role).filter(skill => new RegExp(`(?:适用交付模式|applicable delivery modes)\\s*=\\s*${mode}(?:\\s|；|;|$)`, 'i').test(skill.text))
         expect(hit.length, `${role} 缺 ${mode} 方法`).toBeGreaterThan(0)
       }
     })

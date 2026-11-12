@@ -37,8 +37,12 @@ const METHODS = {
 
 function contractOf(text: string): { type: string; mode: string } | null {
   const block = text.split('\n').filter(line => line.startsWith('>')).join(' ')
-  const type = /适用产品类型\s*=\s*([^；;\n]+)/.exec(block)?.[1]?.trim() ?? ''
-  const mode = /适用交付模式\s*=\s*([^；;\n]+)/.exec(block)?.[1]?.trim() ?? ''
+  const type = /适用产品类型\s*=\s*([^；;\n]+)/.exec(block)?.[1]?.trim()
+    ?? /applicable product types\s*=\s*([^;；\n]+)/i.exec(block)?.[1]?.trim()
+    ?? ''
+  const mode = /适用交付模式\s*=\s*([^；;\n]+)/.exec(block)?.[1]?.trim()
+    ?? /applicable delivery modes\s*=\s*([^;；\n]+)/i.exec(block)?.[1]?.trim()
+    ?? ''
   return type === '' || mode === '' ? null : { type, mode }
 }
 

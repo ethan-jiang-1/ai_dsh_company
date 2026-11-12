@@ -676,7 +676,7 @@ describe('经营侧方法契约（CFO / COO / VP-Sales）', () => {
     expect(ops).toContain('roster.md')
     expect(ops, '不能再把「写不出人名」直接判成没人').not.toContain('写不出人名 = "没人"')
     const pricing = readFileSync(join(PRESETS_DIR, 'vp-sales/skills/pricing/SKILL.md'), 'utf8')
-    expect(pricing).toContain('适用交付模式 = project-services')
+    expect(pricing).toMatch(/适用交付模式 = project-services|applicable delivery modes = project-services/)
     expect(pricing).toContain('3-4-3')
     const managed = readFileSync(join(PRESETS_DIR, 'cfo/skills/managed-service-economics/SKILL.md'), 'utf8')
     expect(managed).toContain('适用交付模式 = managed-service')
