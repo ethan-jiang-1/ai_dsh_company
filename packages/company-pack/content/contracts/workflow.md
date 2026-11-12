@@ -1,36 +1,36 @@
-# Workflow engine contract（随 DSH pin 更新）
+# Workflow engine contract (updated with the DSH pin)
 
-> 这是 workflow 的**引擎事实**（capability-scoped，只注入有 workflow 的 preset）。公司委派政策见 delegation-policy skill；role 方法 skill 只留领域打法。
+> This is the workflow **engine facts** (capability-scoped; only injected into presets with workflow). Company delegation policy is the delegation-policy skill; role method skills keep only domain play.
 
-## schema（输入合同）
+## Schema (input contract)
 
-- schema 只吃子集：`enum` / `const` 必须同时写单值 `type`；`type` 不接受数组；`oneOf` 不能与 `type` 并列；根必须是 `object`。
-- 违反 = 整轮 `UNSUPPORTED_SCHEMA` fatal，不是分支失败；不要吞掉。
-- 分支**不传 schema**：让分支只回一行可解析 JSON，父脚本 `JSON.parse`；schema 只留给单次 `agent()`，并在 prompt 里明确调用 `structured_output`。
-- schema 分支拿不到 structured output 时，引擎会丢掉 child 已写好的文本并只给 `null`；这是已知引擎语义，不要把 `null` 当“没结果”。
+- Schema accepts only a subset: `enum` / `const` must also carry a single `type`; `type` does not accept arrays; `oneOf` cannot sit beside `type`; the root must be `object`.
+- Violation = the whole round fails with `UNSUPPORTED_SCHEMA` fatal, not a branch failure; do not swallow it.
+- Branches **do not pass schema**: have each branch return one parseable JSON line and let the parent `JSON.parse`; schema is only for a single `agent()`, and the prompt must explicitly call `structured_output`.
+- When a schema branch cannot get structured output, the engine discards the child's text and gives only `null`; this is known engine semantics — do not read `null` as "no result".
 
-## 结果（输出通道）
+## Results (output channel)
 
-- `maxResultChars` 处截断，截断发生在 spill 之前；spill 文件可能是截断副本。
-- 大结果优先让分支写文件，父只拿 path/行数/摘要；不要靠内联长文本跨层传递。
-- `completed` 不保证每个分支成功；失败分支可能折成 `null`，看数组/计数，不看分支自述。
-- 子代自述的“是否截断/长度”不可信；父用 read/tail 自己核。
+- Truncation happens at `maxResultChars`, before spill; the spill file may be a truncated copy.
+- For large results, make the branch write a file and return only path/line count/summary to the parent; do not pass long inline text across layers.
+- `completed` does not guarantee every branch succeeded; a failed branch may fold to `null` — read the array/counts, not the branch's self-report.
+- A child's self-reported "truncated/length" is not trustworthy; the parent verifies with read/tail.
 
-## 失败与重试
+## Failures and retry
 
-- `null` 可能是 refusal / error / aborted / 缺结构化结果，原因不保留；先判任务幂等且可重试。
-- `AGENT_START` / `AGENT_RESULT` / 取消是 fatal，不许 catch 后伪装成 null 或安全重试。
-- 同一幂等 task 最多再派一次（attempt label 不同）；仍失败记 `missing` / `exhausted`，不启动第三次。
-- 非幂等写操作不自动重试；必须可重试/可聚合的活走 workflow，而不是 subagent。
+- `null` may be refusal / error / aborted / missing structured output; the reason is not kept; first judge whether the task is idempotent and retryable.
+- `AGENT_START` / `AGENT_RESULT` / cancellation are fatal; do not catch and disguise as null or a safe retry.
+- For the same idempotent task, dispatch at most once more (different attempt label); if it still fails, record `missing` / `exhausted`; do not start a third.
+- Non-idempotent writes are not auto-retried; work that must be retryable/aggregatable goes to workflow, not subagent.
 
-## 生命周期
+## Lifecycle
 
-- 宿主重启会中断 in-flight child；child 记 interrupted，父收不到终态通知。
-- 重启后用 `list_subagents`（child 终态）或 `workflow_runs`（run 四态 + children）对账；`lost` = 原结果不可恢复。
-- 别把“job 起了”当“结果可恢复”；要当前事实就冷恢复/重派。
+- A host restart interrupts in-flight children; the child is recorded as interrupted and the parent receives no terminal notice.
+- After restart, reconcile with `list_subagents` (child terminal state) or `workflow_runs` (four run states + children); `lost` = the original result is unrecoverable.
+- Do not treat "the job started" as "the result is recoverable"; for current facts, cold-restore or re-dispatch.
 
-## 嵌套
+## Nesting
 
-- 分支是 `startActivation(parent)` 的子代：深度 = parent+1；没有 `agentPreset`，继承父组合。
-- 分支默认是叶子；确需两层时由父层显式开，并受**行级 maxDepth**/预算约束。
-- workflow 引擎没有独立的 depth 闸，但分支本身是 activation 子代，深度按 parent+1 计；嵌套 run 会叠加，父层负责预算。
+- A branch is a child of `startActivation(parent)`: depth = parent+1; no `agentPreset`, inherits the parent composition.
+- Branches are leaves by default; if two levels are truly needed, the parent opens it explicitly, under **row-level maxDepth**/budget.
+- The workflow engine has no separate depth gate, but a branch is an activation child and counts as parent+1; nested runs add up and the parent owns the budget.

@@ -66,6 +66,7 @@ opened: 2026-11-12
 - P1 content/delivery-modes 2/2 英文：project-services / managed-service 全部 md/json/templates；新增 delivery-modes 英文棘轮；delivery-command 的 SOW section 夹具同步。
 - P1 content/state 4/5 英文：company/org/owners/roster；roster-backfill 英文 heading/count 同步；新增 state 英文棘轮。
 - 领域值：motion-ledger 表头 canonical 英文（date/type/participants/wallClock/deliverable/summary）；parser 兼容旧中文头；LedgerTab kind 映射英文；state 棘轮 PENDING 清空。
+- P1 content/contracts：workflow engine + 6 条 delegation 合同英文；新增 contracts 英文棘轮。
 - 修 tab body 未注入 t、Tasks/Cultivation 标题与 guide 不一致、DelegationFlow/Presence 表头、budget 括号。
 - content 模板 8/8 英文（meta/prd 补齐）；模板棘轮 PENDING 清零。
 

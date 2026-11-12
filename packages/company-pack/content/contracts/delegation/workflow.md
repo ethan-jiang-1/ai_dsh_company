@@ -1,9 +1,9 @@
-# 公司委派 · workflow
+# Company delegation · workflow
 
-- 用在 **≥3 个同构分支**、需要合并/交叉核对/只回异常，且分支**不需要独立角色 preset**的活。
-- 分支是 fresh 克隆：每个 `agent()` 的 prompt 必须自包含；不要把本对话的隐含上下文丢给分支。
-- 返回形状：分支只回**一行可解析 JSON**，父脚本 `JSON.parse` 后聚合；不要把大段正文穿层传。
-- 分支失败可能折成 `null`：数组/计数/`missing` 自己核，不把 `null` 当“没结果”；fatal（选项/schema/cap/取消）不要 catch 成 null。
-- 分支默认是**叶子**：确需第二层时由父层显式开，并记住深度是绝对量——分支本身已 +1。
-- 引擎事实（schema 子集、截断/spill、重启、终态）住 **workflow engine contract** section；本段只讲公司怎么用。
-- 团队会话里长跑用 `run_in_background`；收结果用 run/job 视图，不靠轮询文件。
+- Use for **≥3 isomorphic branches** that need merge/cross-check/exception-only returns, where branches **do not need a separate role preset**.
+- A branch is a fresh clone: each `agent()` prompt must be self-contained; do not leak this conversation's implicit context to branches.
+- Return shape: a branch returns **one parseable JSON line**; the parent `JSON.parse`s and aggregates; do not pass large body text across layers.
+- A branch failure may fold to `null`: verify the array/counts/`missing` yourself; do not read `null` as "no result"; do not catch fatal (options/schema/cap/cancel) into null.
+- Branches are **leaves** by default: if a second level is truly needed, the parent opens it explicitly, remembering depth is absolute — the branch already adds +1.
+- Engine facts (schema subset, truncation/spill, restart, terminal state) live in the **workflow engine contract** section; this section covers only company usage.
+- For long runs in a team session use `run_in_background`; read results from the run/job view, not by polling files.

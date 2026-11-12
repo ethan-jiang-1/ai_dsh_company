@@ -322,6 +322,13 @@
 - ledgerStats 的 untimed 兼容 untimed/未记/—；LedgerTab kind 映射英文 enum。
 - state 棘轮 PENDING 清空；fixture/测试同步；全量 1662 tests，verify ALL PASS。
 
+## P1 第八片（content/contracts）
+
+- workflow engine contract + spawn/fork/workflow/team/team-spawn/retry 英文。
+- 工具名/通道名/fatal 词表/深度口径保留；delegation-contracts 测试仍绿。
+- 新增 contracts 英文棘轮；注入中文 → 红，还原 → 绿。
+- 全量 1663 tests；preset-smoke ALL PASS；verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
