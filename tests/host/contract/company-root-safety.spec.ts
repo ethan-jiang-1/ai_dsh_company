@@ -23,6 +23,8 @@ import {
 } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
 import { CompanyWriteBlockedError } from '../../../packages/company-pack/src/host/run-bundle/write-gate.ts'
 import { nodeCultivationStorage, UnsafeCultivationPathError } from '../../../packages/company-pack/src/host/cultivation/cultivation-storage.ts'
+import { planBundleManifest, writeBundleManifest } from '../../../packages/company-pack/src/host/run-bundle/bundle-manifest.ts'
+import { appendUpgradeLog } from '../../../packages/company-pack/src/host/run-bundle/bundle-manifest.ts'
 import { writePendingRevoke } from '../../../packages/company-pack/src/host/cultivation/revoke-journal.ts'
 import { regenerateCatalog } from '../../../packages/company-pack/src/host/ledger/catalog.ts'
 import { exportGovernance } from '../../../packages/company-pack/src/host/ledger/governance-export.ts'
@@ -113,6 +115,18 @@ const WRITERS: readonly Writer[] = [
       kind: 'correction', targetRole: 'ceo', proposerRole: 'ceo', proposerKind: 'human',
       source: 'test', expectation: '稳', body: '先列清单',
     }),
+  },
+  {
+    id: 'log.write',
+    target: 'logs/company-pack-upgrade.log',
+    run: (workspace) => appendUpgradeLog(workspace, 'probe'),
+  },
+  {
+    id: 'bundle.write',
+    target: 'bundle.json',
+    run: (workspace) => writeBundleManifest(planBundleManifest({
+      dshHome: join(workspace, '.dsh-home'), workspace, pack: { name: 'dsh-company-pack', version: '0.0.0-test' },
+    })),
   },
   {
     id: 'cultivation.pendingRevoke',

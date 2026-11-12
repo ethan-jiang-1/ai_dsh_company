@@ -79,6 +79,30 @@ export const CARRIERS = [
     coveredBy: 'company-root-safety',
   },
   {
+    id: 'bundle.write',
+    module: 'packages/company-pack/src/host/run-bundle/bundle-manifest.ts',
+    symbol: 'writeBundleManifest',
+    kind: 'writer',
+    companyRoot: true,
+    coveredBy: 'company-root-safety',
+  },
+  {
+    id: 'log.rotating',
+    module: 'packages/company-pack/src/host/logging/rotating-log.ts',
+    symbol: 'appendRotatingLine',
+    kind: 'writer',
+    companyRoot: true,
+    coveredBy: 'company-root-safety',
+  },
+  {
+    id: 'log.append',
+    module: 'packages/company-pack/src/host/run-bundle/bundle-manifest.ts',
+    symbol: 'appendUpgradeLog',
+    kind: 'writer',
+    companyRoot: true,
+    coveredBy: 'company-root-safety',
+  },
+  {
     id: 'cultivation.writeRecord',
     module: 'packages/company-pack/src/host/cultivation/cultivation-storage.ts',
     symbol: 'nodeCultivationStorage',
@@ -145,15 +169,5 @@ export const EXEMPT = [
 ]
 
 /** 矩阵未覆盖的已知入口；每条的 `bug` 必须是 _backlog（活跃或归档）里真实存在的卡。 */
-export const KNOWN_GAP = [
-  {
-    module: 'packages/company-pack/src/host/run-bundle/bundle-manifest.ts',
-    bug: 'BUG-148',
-    reason: 'BUG-148 已修归档；bundle 入口未进 Safety 矩阵，下轮迁入 CARRIERS',
-  },
-  {
-    module: 'packages/company-pack/src/host/logging/rotating-log.ts',
-    bug: 'BUG-149',
-    reason: 'BUG-149 已修归档；upgrade log 入口未进 Safety 矩阵，下轮迁入 CARRIERS',
-  },
-]
+export const KNOWN_GAP = []
+

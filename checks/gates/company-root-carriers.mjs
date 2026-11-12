@@ -99,7 +99,8 @@ export function run({ root, ok, fail }) {
   }
 
   const gaps = KNOWN_GAP.map(entry => entry.bug).filter((bug, index, all) => all.indexOf(bug) === index)
+  const gapText = KNOWN_GAP.length === 0 ? 'knownGap 0' : `knownGap ${String(KNOWN_GAP.length)}：${gaps.join('、')}`
   problems.length === 0
-    ? ok(`company-root-carriers ×${String(files.length)} 文件（写面文件 ${String(writers)} / knownGap ${String(KNOWN_GAP.length)}：${gaps.join('、')}）`)
+    ? ok(`company-root-carriers ×${String(files.length)} 文件（写面文件 ${String(writers)} / ${gapText}）`)
     : fail('company-root-carriers', problems.join('；'))
 }

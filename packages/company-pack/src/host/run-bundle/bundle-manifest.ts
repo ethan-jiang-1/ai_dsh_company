@@ -61,8 +61,9 @@ export const identityBackupPath = (dshHome: string, id: string): string => {
   return target
 }
 
-/** 基部升级日志（workspace 内、按次追加）。 */
+/** 基部升级日志（workspace 内、按次追加）；目标是 symlink/目录/越界时跳过，不跟随写外。 */
 export function appendUpgradeLog(workspace: string, message: string): void {
+  if (companyFileProblem(workspace, BUNDLE_UPGRADE_LOG) === 'unsafe') return
   appendRotatingLine(join(workspace, BUNDLE_UPGRADE_LOG), `${new Date().toISOString()} ${message}\n`)
 }
 

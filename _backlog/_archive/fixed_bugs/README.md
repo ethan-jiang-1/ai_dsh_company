@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-151**（2026-11-13，P1）：upgrade log 叶子目标被 symlink/目录占用时跟随写外/裸抛 EISDIR；
+  `appendUpgradeLog` 先 `companyFileProblem` 预检，unsafe 跳过。Safety 矩阵 134 passed；`KNOWN_GAP` 清零。
+  详见 [adversarial-shape-matrix Note](../../../notes/implemented/2026-11-13-adversarial-shape-matrix.md)。
+
 - **BUG-147..149**（2026-11-13，根因组 G，P1×3）：最后三处未迁 `company-root` 的直写面——
   [147](BUG-147-export-governance-symlink-root-writes-outside.md) 治理导出根/staging、
   [148](BUG-148-bundle-manifest-root-symlink-writes-outside.md) bundle 身份读写、
