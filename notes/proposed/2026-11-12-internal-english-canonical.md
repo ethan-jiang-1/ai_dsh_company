@@ -186,7 +186,20 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 
 **I1 第十一批**：`chairing-staff-meeting` 翻成英文（含 DAG、任务板、互审、收口、journal）；I1 已翻 23/24。剩余 1 个：`quality-loop`。
 
-**剩余 I1**：`quality-loop` 全文翻译；persona/agent.cordis.yml；content/**；领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
+**I1c：quality-loop 的处置 token 阻断（2026-11-12 翻译前发现）**：
+
+`quality-loop` 不是普通文案，处置表是机器解析的：
+
+| token | 消费方 | 处理方向 |
+|---|---|---|
+| `已修 / 反驳 / 接受` | `tools/lib/quality-loop.mjs` `DISPOSITION_VALUES`、audit、`quality-loop.spec` | 改 `fixed / rebut / accept`；parser + 审计 + 测试同步 |
+| `接受人：` | `parseDispositions` 的 acceptor 检查 | 改 `accepted-by:`；parser/测试同步 |
+| `未复验` | `post-verdict-unverified` warning 正则 | 改 `unverified`；warning 文案/测试同步 |
+| `body-sha256=待填` | `verdict-hash.mjs` 回填 | 改 `to-fill` 或保留占位；脚本/审计同步 |
+
+所以 `quality-loop` 仍 PENDING；先做 I1c token 英文化，再全文翻译。**不把“只剩 1 个”说成可直翻。**
+
+**剩余 I1**：`quality-loop`（先 I1c token）；persona/agent.cordis.yml；content/**；领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 
