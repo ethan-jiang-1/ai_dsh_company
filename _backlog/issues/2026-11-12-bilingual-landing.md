@@ -51,6 +51,7 @@ opened: 2026-11-12
 - 培养视图壳双语： eyebrow/title/sub/公司总览/拖拽 aria；CultivationBoard/Inbox/Chat/Compose 的 CULTIVATION_COPY 仍中文，下一批。
 - CULTIVATION_COPY zh/en + 语言代理：`meta.language` 驱动，CultivationView 每次渲染设置；Board/Inbox/Chat/Compose 无需逐个改引用。client 381 passed；金样仍一致。
 - Inbox 硬编码迁 copy：标题/空态/读不动/未展开/行 aria/提案者/来源/背景/正文摘要/命令回执。
+- 培养 Journal 素材 + 人的赞/踩块迁 copy。
 - content 模板 8/8 英文（meta/prd 补齐）；模板棘轮 PENDING 清零。
 
 **剩余**：

@@ -250,21 +250,21 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
 
 export function CultivationJournal({ rows }: { readonly rows: readonly CultivationRow[] | null }) {
   return (
-      <div className="wk-activity-block" aria-label="journal 素材">
-        <strong>journal 素材（不用你操作）</strong>
+      <div className="wk-activity-block" aria-label={CULTIVATION_COPY.journalAria}>
+        <strong>{CULTIVATION_COPY.journalTitle}</strong>
         {rows === null
-          ? <div className="wk-meta">读取中…</div>
+          ? <div className="wk-meta">{CULTIVATION_COPY.journalLoading}</div>
           : (
-            <div role="list" aria-label="培养待审收件箱" className="wk-list">
+            <div role="list" aria-label={CULTIVATION_COPY.journalListAria} className="wk-list">
               {rows.map(row => (
-                <div key={row.role} role="listitem" className="wk-row" aria-label={`${row.label} 待审 ${String(row.count)} 条`}>
+                <div key={row.role} role="listitem" className="wk-row" aria-label={CULTIVATION_COPY.journalRowAria(row.label, row.count)}>
                   <span className="wk-row-name">
                     {row.label}
                     {row.reach === 'unreachable'
-                      ? <Tag tone="warning">目录不可达</Tag>
+                      ? <Tag tone="warning">{CULTIVATION_COPY.journalUnreachable}</Tag>
                       : row.count > 0
-                        ? <Tag tone={row.count > 5 ? 'warning' : 'info'}>{`${String(row.count)} 待审`}</Tag>
-                        : <Tag tone="outline">无待审</Tag>}
+                        ? <Tag tone={row.count > 5 ? 'warning' : 'info'}>{CULTIVATION_COPY.journalPending(row.count)}</Tag>
+                        : <Tag tone="outline">{CULTIVATION_COPY.journalNone}</Tag>}
                   </span>
                   <span className="wk-row-task">
                     {row.reach === 'unreachable'
@@ -272,14 +272,14 @@ export function CultivationJournal({ rows }: { readonly rows: readonly Cultivati
                       : row.entries.length === 0
                         ? '—'
                         : row.entries.map(entry => entry.title).join('；')}
-                    {row.reach === 'ok' && row.count > row.entries.length ? ` …（共 ${String(row.count)} 条）` : ''}
+                    {row.reach === 'ok' && row.count > row.entries.length ? CULTIVATION_COPY.journalMore(row.count) : ''}
                   </span>
                 </div>
               ))}
             </div>
           )}
         <div className="wk-meta">
-          各角色的 journal = 角色自己攒的素材：轮末收敛时由该角色的驾驭者压进 CHARTER 历史纪要，**这里不用你操作**。
+          {CULTIVATION_COPY.journalNote}
         </div>
       </div>
   )
@@ -287,18 +287,18 @@ export function CultivationJournal({ rows }: { readonly rows: readonly Cultivati
 
 export function CultivationFeedback({ feedback, reachable }: { readonly feedback: readonly FeedbackItem[] | null; readonly reachable: boolean }) {
   return (
-      <div className="wk-activity-block" aria-label="人的赞踩">
-        <strong>人的赞/踩（本会话）</strong>
+      <div className="wk-activity-block" aria-label={CULTIVATION_COPY.feedbackAria}>
+        <strong>{CULTIVATION_COPY.feedbackTitle}</strong>
         {!reachable || feedback === null
-          ? <div className="wk-meta">事件流不可达——赞/踩块降级（其余面板不受影响）。</div>
+          ? <div className="wk-meta">{CULTIVATION_COPY.feedbackUnreachable}</div>
           : feedback.length === 0
-            ? <div className="wk-meta">还没有赞/踩——人点 👍/👎 会实时出现在这里。</div>
+            ? <div className="wk-meta">{CULTIVATION_COPY.feedbackEmpty}</div>
             : (
-              <div role="list" aria-label="赞踩清单" className="wk-list">
+              <div role="list" aria-label={CULTIVATION_COPY.feedbackListAria} className="wk-list">
                 {feedback.map(item => (
-                  <div key={item.messageId} role="listitem" className="wk-row" aria-label={item.rating === 'positive' ? '赞' : '踩'}>
+                  <div key={item.messageId} role="listitem" className="wk-row" aria-label={item.rating === 'positive' ? CULTIVATION_COPY.feedbackPositive : CULTIVATION_COPY.feedbackNegative}>
                     <span className="wk-row-name">
-                      {item.rating === 'positive' ? '👍 赞' : '👎 踩'}
+                      {item.rating === 'positive' ? CULTIVATION_COPY.feedbackPositive : CULTIVATION_COPY.feedbackNegative}
                       {item.note !== undefined && item.note !== '' ? `：${item.note}` : ''}
                     </span>
                   </div>
