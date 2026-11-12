@@ -26,7 +26,7 @@ import { buildDelegationTree, type DelegationSessionSummaryLike } from '../../li
 import { TasksTableView } from './TasksPanel.tsx'
 import { useCompanyData, type CompanyDataInjected } from '../data/use-company-data.ts'
 import type { CompanyT } from '../locales.ts'
-import { presenceRoleText, roleText } from '../roles.ts'
+import { presenceRoleText, roleText, roleTextForCanonical } from '../roles.ts'
 
 /** 页签体注入面：数据面 + 平台浮出操作。 */
 export interface CompanyTabInjected extends CompanyDataInjected {
@@ -200,7 +200,7 @@ export function DagTab(props: CompanyTabProps) {
     >
       {data.error !== null && <div className="wk-error">{data.error}</div>}
       <DelegationFlowPanel tree={tree} />
-      <DagPanel key={redrawKey} layout={data.dag} />
+      <DagPanel key={redrawKey} layout={data.dag} roleLabel={label => roleTextForCanonical(label, props.t)} />
     </PanelFrame>
   )
 }

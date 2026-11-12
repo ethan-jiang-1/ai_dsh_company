@@ -5,7 +5,7 @@
  * host 的人可见回执。
  */
 import type { CompanyKey, CompanyT } from './locales.ts'
-import { DELEGATION_TOOL_ROLES, isRoleId, ROLE_CANONICAL, type RoleId } from '../lib/role-copy.ts'
+import { DELEGATION_TOOL_ROLES, isRoleId, ROLE_CANONICAL, ROLE_IDS, type RoleId } from '../lib/role-copy.ts'
 
 export type RoleField = 'label' | 'full' | 'short' | 'delegation'
 
@@ -37,6 +37,12 @@ export function delegationRoleText(toolName: string, t: CompanyT): string {
 export function presenceRoleText(row: { readonly name: string; readonly role: 'lead' | 'teammate'; readonly displayName: string }, t: CompanyT): string {
   if (row.role === 'lead') return roleText('ceo', 'label', t)
   return roleText(row.name, 'label', t, row.displayName)
+}
+
+/** canonical 英文名 → 表达层 label；未知原样（board/DAG 的 ownerLabel 用）。 */
+export function roleTextForCanonical(name: string, t: CompanyT): string {
+  const id = ROLE_IDS.find(role => ROLE_CANONICAL[role] === name)
+  return id === undefined ? name : roleText(id, 'label', t)
 }
 
 /** canonical 名（数据/测试用；不随语言变）。 */

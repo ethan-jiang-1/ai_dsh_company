@@ -88,7 +88,7 @@ export const LOADING_NOTE = '读取团队状态…'
  * @param props.columns - 读模型折好的列。
  * @returns 看板。
  */
-export function BoardPanel({ columns }: { readonly columns: readonly BoardColumn[] }) {
+export function BoardPanel({ columns, roleLabel = label => label }: { readonly columns: readonly BoardColumn[]; readonly roleLabel?: (ownerLabel: string) => string }) {
   return (
     <div className="wk-board" role="list" aria-label="任务看板">
       {columns.map(column => (
@@ -103,7 +103,7 @@ export function BoardPanel({ columns }: { readonly columns: readonly BoardColumn
               <article className="wk-card" key={card.id}>
                 <div className="wk-card-subject">{card.subject}</div>
                 <div className="wk-card-foot">
-                  <Tag tone={taskTone(column.status)}>{card.ownerLabel}</Tag>
+                  <Tag tone={taskTone(column.status)}>{roleLabel(card.ownerLabel)}</Tag>
                   {/* 「依赖已就绪 / 等 …」只在**待办**卡上有意义：它是"这活现在能不能开工"的答案。
                       已完成/进行中的卡挂这枚徽章只会制造噪声——2026-10-19 真投影实测：147 枚徽章里
                       129 枚挂在已完成的卡上、2 枚挂在进行中的卡上，全是「等 …」的死信息（BUG-027）。
@@ -150,7 +150,7 @@ export function fitScale(availableWidth: number, graphWidth: number): number {
  * @param props.layout - `layoutDag` 算好的节点/边与画布尺寸。
  * @returns SVG（空图给空态文案）。
  */
-export function DagPanel({ layout }: { readonly layout: DagLayout }) {
+export function DagPanel({ layout, roleLabel = label => label }: { readonly layout: DagLayout; readonly roleLabel?: (ownerLabel: string) => string }) {
   const fitRef = useRef<HTMLDivElement | null>(null)
   const [availableWidth, setAvailableWidth] = useState(0)
   useEffect(() => {
@@ -211,7 +211,7 @@ export function DagPanel({ layout }: { readonly layout: DagLayout }) {
         // 都不可能错位。
         const [titleLine1, titleLine2] = wrapTitle(node.subject, node.width - 18 - 13)
         const badge = statusBadge(node)
-        const owner = node.ownerLabel === null ? null : truncateToWidth(node.ownerLabel, 90, 10)
+        const owner = node.ownerLabel === null ? null : truncateToWidth(roleLabel(node.ownerLabel), 90, 10)
         const ownerWidth = owner === null ? 0 : Math.round(textWidth(owner, 10) + 10)
         return (
           <g key={node.id} transform={`translate(${String(node.x)} ${String(node.y)})`}>

@@ -8,6 +8,8 @@ import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { roleLabel } from '../../lib/cultivation.ts'
+import type { CompanyT } from '../locales.ts'
+import { roleText } from '../roles.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { CultivationBoard } from '../cultivation/CultivationBoard.tsx'
 import type { CultivationActionsFactory } from '../cultivation/cultivation-actions.ts'
@@ -41,7 +43,7 @@ export interface CultivationTabInjected {
   readonly openContext?: ((sessionId: SessionId, context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false, readonly problem: string }>) | undefined
 }
 
-export type CultivationTabProps = PropsRuntime<'sidebar.right.pane.tab'> & CultivationTabInjected
+export type CultivationTabProps = PropsRuntime<'sidebar.right.pane.tab'> & CultivationTabInjected & { readonly t: CompanyT }
 
 /**
  * 培养页签体（壳）：PanelFrame + 领域视图。
@@ -72,7 +74,7 @@ export function CultivationTab(props: CultivationTabProps) {
     >
       <CultivationBoard
         viewerRole={viewerRole}
-        viewerLabel={viewerRole === null ? null : roleLabel(viewerRole)}
+        viewerLabel={viewerRole === null ? null : roleText(viewerRole, 'label', props.t, roleLabel(viewerRole))}
         journalRows={journalRows}
         records={records}
         brokenRecords={brokenRecords}

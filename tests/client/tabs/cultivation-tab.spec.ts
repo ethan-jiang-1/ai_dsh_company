@@ -11,6 +11,7 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it } from 'vitest'
 import { CultivationTab } from '../../../packages/company-pack/src/client/tabs/CultivationTab.tsx'
+import { zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -25,8 +26,11 @@ const flush = async (): Promise<void> => {
   await act(async () => { await new Promise(resolve => { setTimeout(resolve, 0) }) })
 }
 
+const t = ((key: keyof typeof zh) => zh[key]) as CompanyT
+
 function props(over: Record<string, unknown> = {}) {
   return {
+    t,
     sessionId: 'session-lead',
     useSessions: (selector: (state: { byId: Record<string, unknown> }) => unknown) => selector({ byId: {} }),
     useTabInfo: () => ({ tab: { id: 'tab-1', contentId: 'dsh-company-pack/cultivation' } }),
@@ -64,7 +68,7 @@ describe('培养页签：外壳、viewer 角色与真实记录（R5-06）', () =
   it('渲染面板外壳与 viewer 角色，而不是一张空白面板', async () => {
     const host = await mount(createElement(CultivationTab, props()))
     expect(host.querySelector('[data-company-tab-title="培养"]')).not.toBeNull()
-    expect(host.textContent).toContain('我的分身：CEO')
+    expect(host.textContent).toContain('我的分身：CEO · 首席执行官')
     expect(host.textContent).toContain('需要我处理')
     expect(host.textContent).toContain('我的分身还没有已采纳的方法')
   })

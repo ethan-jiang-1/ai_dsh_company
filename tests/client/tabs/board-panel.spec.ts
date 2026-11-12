@@ -64,6 +64,16 @@ describe('BoardPanel：声明 vs 板面分叉的可见警示', () => {
   })
 })
 
+describe('BoardPanel：owner 名可走表达层 roleLabel', () => {
+  it('roleLabel 把 canonical owner 名换成当前语言文案（不改任务数据）', () => {
+    const html = renderToStaticMarkup(createElement(BoardPanel, {
+      columns: boardColumns(tasksFromTeamView(INCIDENT)),
+      roleLabel: label => label === 'VP-Eng' ? 'VP-Eng · 工程副总裁' : label,
+    }))
+    expect(html).toContain('VP-Eng · 工程副总裁')
+  })
+})
+
 describe('BoardPanel：依赖徽章只在待办卡上（BUG-027 判据）', () => {
   /**
    * 为什么钉这条：「依赖已就绪 / 等 …」回答的是"这活现在能不能开工"，只对待办卡有意义。

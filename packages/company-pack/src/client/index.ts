@@ -181,6 +181,7 @@ function registerCultivationViewWiring(ctx: ClientContext): void {
       name: 'conversation.view',
       id: CULTIVATION_VIEW_ID,
       order: 20,
+      locale: COMPANY_NS,
       label: () => ctx.locale.bind(COMPANY_NS)('view.cultivation'),
     }, CultivationView))
   })

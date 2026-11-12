@@ -14,6 +14,8 @@ import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { roleLabel } from '../../lib/cultivation.ts'
+import type { CompanyT } from '../locales.ts'
+import { roleText } from '../roles.ts'
 import { CultivationBoard } from './CultivationBoard.tsx'
 import { CultivationChatPanel } from './CultivationChatPanel.tsx'
 import type { CultivationActionsFactory } from './cultivation-actions.ts'
@@ -40,7 +42,7 @@ export interface CultivationViewInjected {
   readonly openCompanyOverview: () => void
 }
 
-export type CultivationViewProps = PropsRuntime<'conversation.view'>
+export type CultivationViewProps = PropsRuntime<'conversation.view'> & { readonly t: CompanyT }
 
 /** 右栏宽度状态（拖动分界/键盘 Home 复位；按浏览器持久化）。 */
 const CHAT_WIDTH_KEY = 'dsh-company-cultivation-chat-width'
@@ -70,7 +72,7 @@ function initialChatWidth(): number {
  */
 export function createCultivationView(injected: CultivationViewInjected) {
   return function CultivationView(props: CultivationViewProps) {
-    const { sessionId } = props
+    const { sessionId, t } = props
     const subscribe = useMemo(() => injected.roleSource.subscribe.bind(injected.roleSource), [injected.roleSource])
     const getPreset = useCallback(() => readPresetOf(injected.roleSource, sessionId), [injected.roleSource, sessionId])
     const viewerRole = useSyncExternalStore(subscribe, getPreset, getPreset)
@@ -158,7 +160,7 @@ export function createCultivationView(injected: CultivationViewInjected) {
           <div className="wk-cult-view-board">
             <CultivationBoard
               viewerRole={viewerRole}
-              viewerLabel={viewerRole === null ? null : roleLabel(viewerRole)}
+              viewerLabel={viewerRole === null ? null : roleText(viewerRole, 'label', t, roleLabel(viewerRole))}
               journalRows={journalRows}
               records={records}
               brokenRecords={brokenRecords}

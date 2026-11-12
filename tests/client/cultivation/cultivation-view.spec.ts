@@ -7,6 +7,7 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createCultivationView } from '../../../packages/company-pack/src/client/cultivation/CultivationView.tsx'
+import { zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 import type { CultivationFiles } from '../../../packages/company-pack/src/client/cultivation/cultivation-data.ts'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
@@ -40,6 +41,7 @@ function props() {
   const state = { byId: { 'session-lead': { origin: 'human', cwd: '/tmp/company' } }, projectionsBySession: {} }
   return {
     sessionId: 'session-lead',
+    t: ((key: keyof typeof zh) => zh[key]) as CompanyT,
     useProjection: () => undefined,
     useSessions: (selector: (value: typeof state) => unknown) => selector(state),
   } as never
