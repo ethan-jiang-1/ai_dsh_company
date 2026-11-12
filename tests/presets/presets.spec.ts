@@ -687,7 +687,7 @@ describe('经营侧方法契约（CFO / COO / VP-Sales）', () => {
     const pairs = [['cfo', 'cfo-workflow'], ['coo', 'ops-workflow'], ['vp-sales', 'sales-workflow']] as const
     for (const [role, workflow] of pairs) {
       const text = readFileSync(join(PRESETS_DIR, role, 'skills', workflow, 'SKILL.md'), 'utf8')
-      expect(text, `${role}/${workflow} 缺交付模式分派`).toContain('交付模式')
+      expect(text, `${role}/${workflow} 缺交付模式分派`).toMatch(/交付模式|delivery mode/i)
       expect(text, `${role}/${workflow} 缺 fail-closed`).toContain('fail-closed')
     }
   })

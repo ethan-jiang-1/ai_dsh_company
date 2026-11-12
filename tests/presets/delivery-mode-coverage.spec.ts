@@ -82,7 +82,7 @@ describe('交付模式覆盖：每个 mode 都有经营侧方法 + workflow 分�
     const declared = new Set(modes)
     for (const role of ROLES) {
       for (const skill of skillsOf(role)) {
-        for (const match of skill.text.matchAll(/适用交付模式\s*=\s*([^（(；;\n]+)/g)) {
+        for (const match of skill.text.matchAll(/(?:适用交付模式|applicable delivery modes)\s*=\s*([^（(；;\n]+)/gi)) {
           const value = match[1].trim()
           if (value === 'all') continue
           expect(declared.has(value), `${role}/${skill.name} 声明了不存在的交付模式「${value}」`).toBe(true)
