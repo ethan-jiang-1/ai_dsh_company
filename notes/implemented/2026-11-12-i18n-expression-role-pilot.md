@@ -55,6 +55,11 @@
 - attention spec 加字面量断言；改回中文 → 1 条红，还原 → 10 passed。
 - `pnpm test` 207 files / 1633 tests；`preset-smoke` ALL PASS。
 
+## I1b 第三片（日期占位）
+
+- `日期待核` → `date-pending`；work-handoff / chairing / ledger / converge / deliverables audit / base-clean 同步。
+- base-clean 注入 `date-pending` → 红，还原 → 绿；`pnpm test` 207 files / 1633 tests；`preset-smoke` ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

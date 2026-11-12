@@ -88,10 +88,10 @@ describe('converge-rules · 归档 journal 检索（2026-10-16 立；事故 = �
   })
 
   it('历史命名（`<前缀>-<slug>.md`）按精确尾段命中', () => {
-    writeFileSync(join(dir, 'ceo', '日期待核-target-slug.md'), '# 日期待核的历史场次\n')
+    writeFileSync(join(dir, 'ceo', 'date-pending-target-slug.md'), '# date-pending的历史场次\n')
     expect(pickArchivedJournal({ dirs: [join(dir, 'ceo')], slug: 'target-slug' }))
-      .toContain('日期待核-target-slug.md')
-    rmSync(join(dir, 'ceo', '日期待核-target-slug.md'))
+      .toContain('date-pending-target-slug.md')
+    rmSync(join(dir, 'ceo', 'date-pending-target-slug.md'))
   })
 
   it('都没命中 ⇒ null（不误报在场）', () => {

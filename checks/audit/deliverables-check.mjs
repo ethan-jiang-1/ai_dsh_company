@@ -151,7 +151,7 @@ const ledgerSlugs = new Set()
 const ledgerDateBySlug = new Map()
 if (existsSync(ledgerPath)) {
   for (const line of readFileSync(ledgerPath, 'utf8').split('\n')) {
-    const m = /^\|\s*([a-z0-9][a-z0-9-]*)\s*\|\s*(\d{4}-\d{2}-\d{2}|日期待核)/.exec(line)
+    const m = /^\|\s*([a-z0-9][a-z0-9-]*)\s*\|\s*(\d{4}-\d{2}-\d{2}|date-pending)/.exec(line)
     if (m === null || m[1] === 'slug') continue
     ledgerSlugs.add(m[1])
     ledgerDateBySlug.set(m[1], m[2])

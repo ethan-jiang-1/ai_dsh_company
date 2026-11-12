@@ -9,7 +9,7 @@ import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 //   ① 六份默认章程不含历史条目与归档引用；
 //   ② 手册/README/模板/状态默认值不含部署日期与 snapshots/archive/deliverables-archive 引用；
 //   ③ content/ 不含 journal/deliverables/cultivation 的运行态文件（只读内容不装 run bundle）。
-//   ④ 出厂章程（`## 历史纪要` 之前）不含部署个案语言：公司/客户…agent…案、内部…动议、日期待核、本部署。
+//   ④ 出厂章程（`## 历史纪要` 之前）不含部署个案语言：公司/客户…agent…案、内部…动议、date-pending、本部署。
 const ROLES = [...COMPANY_ROLE_IDS]
 
 /** 部署个案语言：出厂章程只写中性事实，不写“某客户/某内部动议”的叙述。 */
@@ -17,7 +17,7 @@ const CASE_LANGUAGE = [
   { name: '公司…agent…案', re: /公司[^\n]{0,20}(?:agent|代理)[^\n]{0,10}案/ },
   { name: '客户…agent…案', re: /客户[^\n]{0,12}(?:agent|代理)[^\n]{0,10}案/ },
   { name: '内部…动议', re: /内部[^\n]{0,20}动议/ },
-  { name: '日期待核', re: /日期待核/ },
+  { name: 'date-pending', re: /date-pending/ },
 ]
 // 负例留证 2026-11-07（A1）：process-docs 落进 content 后同步纳入本表——删 `state/process-docs.md`
 // 走「缺失」判红（不抛异常）；把 `（2026-11-07` 写回正文 → 「含部署日期」判红。

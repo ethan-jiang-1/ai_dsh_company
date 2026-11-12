@@ -47,7 +47,7 @@ describe.skipIf(!hasLive)('live bundle 台账（dev only）', () => {
     expect(rows.length).toBeGreaterThan(0)
     expect(new Set(rows.map(row => row.slug)).size).toBe(rows.length)
     for (const row of rows) {
-      expect(row.date, `行 ${row.slug} 的日期不合口径`).toMatch(/^(\d{4}-\d{2}-\d{2}|日期待核)$/)
+      expect(row.date, `行 ${row.slug} 的日期不合口径`).toMatch(/^(\d{4}-\d{2}-\d{2}|date-pending)$/)
       expect(row.summary.length, `行 ${row.slug} 结论为空`).toBeGreaterThan(0)
     }
   })
@@ -89,7 +89,7 @@ describe('ledgerStats', () => {
       '| slug | 日期 | 类型 | 参与 | 墙钟 | 成品 | 一句话结论 |',
       '|---|---|---|---|---|---|---|',
       '| a | 2026-09-26 | 评估 | CEO | 241s | ✅ | 结论一 |',
-      '| b | 日期待核 | 评估 | CFO | 未记 | ✅ | 结论二 |',
+      '| b | date-pending | 评估 | CFO | 未记 | ✅ | 结论二 |',
       '| c | 2026-09-26 | 口径问答 | CFO | — | — | 结论三 |',
     ].join('\n'))
     expect(ledgerStats(rows)).toEqual({ total: 3, finals: 2, untimed: 2 })

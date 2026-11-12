@@ -10,7 +10,7 @@
 //   pack-content-paths    AGENTS 加 `` `content/nope.md` ``                    → 死指针
 //   content-single-home   删 policy-lines 的“服务信用”行                     → 缺政策线
 //   content-manifest      company/ 加一份未登记 .md                           → 未登记的 content 文件
-//   base-clean            charter 加“公司财务 agent 案（日期待核）”           → 含部署个案语言
+//   base-clean            charter 加“公司财务 agent 案（date-pending）”           → 含部署个案语言
 import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -86,7 +86,7 @@ const report = (label, messages, needle) => {
   const root = makeRoot()
   try {
     const path = join(root, 'packages/company-pack/content/charters/cfo.md')
-    writeFileSync(path, readFileSync(path, 'utf8').replace('## 历史纪要', '- 公司财务 agent 案（日期待核）。\n\n## 历史纪要'))
+    writeFileSync(path, readFileSync(path, 'utf8').replace('## 历史纪要', '- 公司财务 agent 案（date-pending）。\n\n## 历史纪要'))
     report('base-clean：部署个案语言 → 红', run(baseClean, root), '含部署个案语言')
   } finally { rmSync(root, { recursive: true, force: true }) }
 }

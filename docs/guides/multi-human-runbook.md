@@ -59,7 +59,7 @@ CI=true pnpm company --no-open   # 端口是环境状态；见下方"端口不�
 
 **已排练验证（2026-09-26）**：两个根会话（ceo + cfo，cwd = 排练场）跑了一遍上述协议——
 CEO 门落任务书 `drafts/ceo.md` → CFO 门读它、出 `drafts/cfo.md`、写自己的 journal（文件名用
-`日期待核-<slug>.md` 占位，日期口径也守住了）⇒ **PASS**。
+`date-pending-<slug>.md` 占位，日期口径也守住了）⇒ **PASS**。
 **真盘首跑已完成（2026-10-04，firstdeal-v-2026）**：三扇门全链（CEO 派活不 spawn → CFO/COO 各自
 根会话出稿 → CFO 半边 `request_signoff` 卡落 CFO 门、人经浏览器应答 allowed-once → CEO 半边卡落
 CEO 门、人应答 → final + present）。证据快照已随真实部署证据移私有归档（2026-10-25；产品仓不再保存）。
