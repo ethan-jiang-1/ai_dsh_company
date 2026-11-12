@@ -13,11 +13,8 @@ import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
 const ROOT = repositoryRoot
 const CJK = /[\u3400-\u9fff]/u
 const PRESETS = 'packages/company-pack/presets'
-const TRANSLATED = new Set(['cfo'])
-const PENDING = new Set([
-  'ceo', 'cmo', 'coo', 'quality-loop-producer', 'quality-loop-verifier',
-  'vp-eng', 'vp-sales', 'worker', 'worker-orchestrator', 'worker-researcher',
-])
+const TRANSLATED = new Set(['cfo', 'coo', 'vp-sales', 'cmo', 'vp-eng', 'ceo', 'worker', 'worker-orchestrator', 'worker-researcher', 'quality-loop-producer', 'quality-loop-verifier'])
+const PENDING = new Set([])
 
 /** 取 `prefix: |-` 起的缩进块（到缩进回退为止）。 */
 function personaOf(text: string): string {
@@ -36,7 +33,7 @@ function personaOf(text: string): string {
 }
 
 describe('persona 英文棘轮（I1）', () => {
-  it('CFO 是 pilot，persona 无中文；PENDING 清单与盘上 preset 对齐', () => {
+  it('全部 persona 无中文；PENDING 清单与盘上 preset 对齐', () => {
     for (const role of [...TRANSLATED, ...PENDING]) {
       const text = readFileSync(join(ROOT, PRESETS, role, 'agent.cordis.yml'), 'utf8')
       expect(personaOf(text), `${role} 没有 persona prefix`).not.toBe('')
@@ -47,7 +44,7 @@ describe('persona 英文棘轮（I1）', () => {
     expect(PENDING.has('cfo')).toBe(false)
   })
 
-  it('PENDING 之外的 persona 不得含中文', () => {
+  it('已翻 persona 不得含中文', () => {
     const offenders = [...TRANSLATED]
       .filter(role => !PENDING.has(role))
       .filter(role => CJK.test(personaOf(readFileSync(join(ROOT, PRESETS, role, 'agent.cordis.yml'), 'utf8'))))

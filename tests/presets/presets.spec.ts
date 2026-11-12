@@ -247,13 +247,13 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
 
   it('CEO 五职能在位；产物链归产品类型包（persona 不再内联 MRD/PRD）', () => {
     const ceo = roleYml('ceo')
-    expect(ceo, 'CEO persona 必须点名 CMO（六角色）').toContain('CMO（市场与产品定义）')
+    expect(ceo, 'CEO persona 必须点名 CMO（六角色）').toContain('CMO (market and product definition)')
     expect(ceo, 'persona 不得内联产品链术语').not.toMatch(/MRD|StRS|SyRS|IRS/)
     expect(ceo, 'persona 必须指到产品类型包的 document-map').toMatch(/document-map|产品类型包/)
     expect(ceo, '不得再把「市场」整体派给 VP-Sales').not.toContain('市场与定价派 VP-Sales')
     expect(ceo, '单职能快捷委派必须含五职能').toMatch(/vp_eng \/ vp_sales \/ vp_cmo \/ coo \/ cfo/)
-    expect(ceo, '两件及以上必须组队（否则 task board/DAG 空）').toMatch(/产出两件及以上[\s\S]*spawn_teammate/)
-    expect(ceo, 'vp_* 快捷路径只能用于单份单职能').toMatch(/只有用户明确只要一份[\s\S]*vp_eng/)
+    expect(ceo, '两件及以上必须组队（否则 task board/DAG 空）').toMatch(/two or more artifacts[\s\S]*spawn_teammate/i)
+    expect(ceo, 'vp_* 快捷路径只能用于单份单职能').toMatch(/only when the user explicitly wants one artifact[\s\S]*vp_eng/i)
   })
 
   it('team spawn 角色包：CHARTER + 角色 skill + KB + 产出 + 边界', () => {
@@ -288,9 +288,9 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     // 2026-11-06 用户实证：CEO 在「本部署无 CMO」的旧盘上把 MRD 派给 VP-Sales 代行——
     // 根因是旧 workspace 的 org.md/owners.md 没 CMO 席位 + 旧 journal 结论被当成事实。
     const ceo = roleYml('ceo')
-    expect(ceo, 'persona 必须钉「产物 owner 唯一」').toMatch(/产物 owner 唯一/)
-    expect(ceo, '缺角不等于代行').toMatch(/查不到该角色 ≠ 换人代行/)
-    expect(ceo, '旧 journal 的「本部署无 X」不作数').toMatch(/旧 journal[\s\S]*不作数/)
+    expect(ceo, 'persona 必须钉「产物 owner 唯一」').toMatch(/Product ownership is unique/i)
+    expect(ceo, '缺角不等于代行').toMatch(/not finding the role[^\n]*letting someone substitute/i)
+    expect(ceo, '旧 journal 的「本部署无 X」不作数').toMatch(/old journal[\s\S]*does not count/i)
     const skill = readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
     expect(skill, '组队 skill 必须同一条规则（MRD 只归 CMO）').toMatch(/Owner is unique; a missing seat does not mean substitution[\s\S]*MRD belongs only to CMO/)
   })
@@ -393,8 +393,8 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   it('CEO 人话出口规则必须覆盖阻塞、非阻塞和取证表达', () => {
     const ceo = roleYml('ceo')
     const chairing = readFileSync(join(PRESETS_DIR, 'ceo/skills/chairing-staff-meeting/SKILL.md'), 'utf8')
-    expect(ceo, 'CEO prefix 必须说明阻塞选择用 ask_user_question').toContain('阻塞型选择')
-    expect(ceo, 'CEO prefix 必须说明非阻塞缺口带假设继续').toContain('非阻塞')
+    expect(ceo, 'CEO prefix 必须说明阻塞选择用 ask_user_question').toMatch(/blocking choices/i)
+    expect(ceo, 'CEO prefix 必须说明非阻塞缺口带假设继续').toMatch(/non-blocking/i)
     expect(chairing, '收口规则必须保留三件套').toMatch(/conclusion \(≤3 business-language points\)/i)
     expect(chairing, '规则必须说明比较结构按场景选择').toMatch(/GFM table|short list/i)
     expect(chairing, '规则必须说明关键数字取证入口').toMatch(/file line anchors|key conclusions/i)
@@ -636,8 +636,8 @@ describe('VP-Eng 组队：根门带小队 + 命名专家（B1）', () => {
     for (const rule of ['must not impersonate', 'spawn_teammate', 'vp_cmo']) {
       expect(skill, `eng-teaming 缺 ${rule}`).toContain(rule)
     }
-    expect(roleYml('vp-eng'), 'persona 必须点名先加载 eng-teaming').toMatch(/先加载 `eng-teaming` skill/)
-    expect(roleYml('vp-eng'), 'persona 必须写明成员不是角色').toMatch(/成员[^\n]*(不是|而非)[^\n]*角色/)
+    expect(roleYml('vp-eng'), 'persona 必须点名先加载 eng-teaming').toMatch(/load `eng-teaming`|load the `eng-teaming` skill/i)
+    expect(roleYml('vp-eng'), 'persona 必须写明成员不是角色').toMatch(/members are[^\n]*(?:not|rather than)[^\n]*roles/i)
   })
 
   it('继承口径分通道：teammate 继承 Lead；命名 child 由 agentPreset 给组合', () => {

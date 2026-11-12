@@ -157,8 +157,8 @@ describe('delegation composition：YAML 是模型的投影', () => {
     }
     const persona = rowById(doc, 'persona')
     const prefix = String(pluginConfig(persona).prefix ?? '')
-    expect(prefix).toContain('不是公司角色')
-    expect(prefix).toContain('不委派')
+    expect(prefix).toContain('not a company role')
+    expect(prefix).toContain('Do not delegate')
   })
 
   it('worker 的 roster 语义：在 support、不在公司角色；声明行与 patch 都在场', () => {
@@ -180,7 +180,7 @@ describe('delegation composition：YAML 是模型的投影', () => {
     const persona = String(pluginConfig(rowById(doc, 'persona')).prefix ?? '')
     for (const [label, text] of [['description', description], ['persona', persona]] as const) {
       expect(text, `${label} 仍在承诺 1–2`).not.toMatch(/1[–-]2/)
-      expect(text, `${label} 缺父代理 brief 口径`).toMatch(/按 brief|父代理/)
+      expect(text, `${label} 缺父代理 brief 口径`).toMatch(/brief|parent agent/i)
     }
   })
 

@@ -215,8 +215,8 @@ describe('VP-Eng 的两条命名行：一个做、一个验', () => {
   it('VP-Eng persona 点名质量环，并把「先生产、再验证」写成硬次序', () => {
     const persona = personaOf('vp-eng')
     expect(persona).toContain('quality-loop')
-    expect(persona, 'persona 没写严格串行（同时发工 = 让验证者看半成品）').toContain('严格串行')
-    expect(persona).toMatch(/quality_loop_produce[^。]*收工[^。]*quality_loop_verify/)
+    expect(persona, 'persona 没写严格串行（同时发工 = 让验证者看半成品）').toMatch(/strictly serial/i)
+    expect(persona).toMatch(/quality_loop_produce[^\n]*wait for it to finish[^\n]*quality_loop_verify/i)
   })
 
   it('两个能力档的 description 各自标明是第几步（模型按工具描述选顺序）', () => {
