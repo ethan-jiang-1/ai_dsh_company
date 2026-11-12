@@ -57,7 +57,7 @@ const BRIEF = [
   '',
 ].join('\n')
 
-const DISPOSITIONS = ['| 发现 | 处置 | 说明 |', '|---|---|---|', '| F1 | 已修 | 补了 REQ-002 的来源 |', ''].join('\n')
+const DISPOSITIONS = ['| 发现 | 处置 | 说明 |', '|---|---|---|', '| F1 | fixed | 补了 REQ-002 的来源 |', ''].join('\n')
 
 function header(body: string, overrides: Record<string, string> = {}): string {
   const fields = { round: '1', session: 's1', preset: 'quality-loop-verifier', depth: '2', producer: 'p1', method: 'requirements-trace@1.0.0', 'body-sha256': verdictBodyHash(body), ...overrides }
@@ -143,7 +143,7 @@ describe('解析器：形状即事实', () => {
     expect(parseFindings(BODY)).toEqual([
       { id: 'F1', checkId: 'RT-02', level: 'blocker', text: 'REQ-002 没有来源' },
     ])
-    expect(parseDispositions(DISPOSITIONS)).toEqual([{ id: 'F1', disposition: '已修', note: '补了 REQ-002 的来源' }])
+    expect(parseDispositions(DISPOSITIONS)).toEqual([{ id: 'F1', disposition: 'fixed', note: '补了 REQ-002 的来源' }])
   })
 })
 
@@ -268,19 +268,19 @@ describe('审计判据：一条红配方一支用例', () => {
   })
 
   it('处置词不在三选一 / 没写说明 = 红', () => {
-    expect(DISPOSITION_VALUES).toEqual(['已修', '反驳', '接受'])
+    expect(DISPOSITION_VALUES).toEqual(['fixed', 'rebut', 'accept'])
     const rounds = [{ ...input().rounds[0], dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| F1 | 忽略 | 不重要 |\n' }]
     expect(codes(auditQualityLoop(input({ rounds })))).toContain('disposition-value')
-    const rounds2 = [{ ...input().rounds[0], dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| F1 | 已修 | |\n' }]
+    const rounds2 = [{ ...input().rounds[0], dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| F1 | fixed | |\n' }]
     expect(codes(auditQualityLoop(input({ rounds: rounds2 })))).toContain('disposition-note')
   })
 
   it('「接受」必须写接受人；blocker 不许自行接受', () => {
-    const noAcceptor = [{ ...input().rounds[0], dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| F1 | 接受 | 风险可控 |\n' }]
+    const noAcceptor = [{ ...input().rounds[0], dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| F1 | accept | 风险可控 |\n' }]
     expect(codes(auditQualityLoop(input({ rounds: noAcceptor })))).toContain('disposition-acceptor')
     const acceptedBlocker = [{
       ...input().rounds[0],
-      dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| F1 | 接受 | 接受人：VP-Eng |\n',
+      dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| F1 | accept | accepted-by: VP-Eng |\n',
     }]
     expect(codes(auditQualityLoop(input({ rounds: acceptedBlocker })))).toContain('blocker-accepted')
   })
@@ -315,7 +315,7 @@ describe('审计判据：一条红配方一支用例', () => {
   it('处置首格把发现标题抄进去（`F1 [RT-04][blocker] …`）仍按 F1 认', () => {
     const rounds = [{
       ...input().rounds[0],
-      dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| F1 [RT-02][blocker] REQ-002 没有来源 | 已修 | 补了来源 |\n',
+      dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| F1 [RT-02][blocker] REQ-002 没有来源 | fixed | 补了来源 |\n',
     }]
     expect(codes(auditQualityLoop(input({ rounds })))).toEqual([])
   })
@@ -351,17 +351,17 @@ describe('审计判据：一条红配方一支用例', () => {
   it('处置表里夹着「无 / 备注」这类非发现行 = 忽略，不冒充 id', () => {
     const rounds = [{
       ...input().rounds[0],
-      dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| 无 | — | 裁决无发现 |\n| F1 | 已修 | 补了来源 |\n',
+      dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| 无 | — | 裁决无发现 |\n| F1 | fixed | 补了来源 |\n',
     }]
     const result = auditQualityLoop(input({ rounds }))
     expect(result.problems).toEqual([])
     expect(result.warnings.map(warning => warning.code)).toEqual([])
   })
 
-  it('处置词带排版（`**已修**`）仍按词认', () => {
+  it('处置词带排版（`**fixed**`）仍按词认', () => {
     const rounds = [{
       ...input().rounds[0],
-      dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| F1 | **已修** | 补了来源 |\n',
+      dispositionsText: '| 发现 | 处置 | 说明 |\n|---|---|---|\n| F1 | **fixed** | 补了来源 |\n',
     }]
     expect(codes(auditQualityLoop(input({ rounds })))).toEqual([])
   })
@@ -376,7 +376,7 @@ describe('审计判据：一条红配方一支用例', () => {
 
 // 负例留证 2026-11-10：BUG-056 —— 修前没有 verdict-hash 工具；`--fix` 不归一尾随换行时，
 // 「含尾随换行的旧 hash」用例会红（audit 判 body-modified）。补工具 + audit warning 后绿。
-describe('verdict hash 工具与「未复验」可见性（BUG-056）', () => {
+describe('verdict hash 工具与「unverified」可见性（BUG-056）', () => {
   it('尾随换行/空白不改变正文哈希（与 audit 同口径）', () => {
     for (const body of ['x\n', 'x\n\n', 'x \n', 'x\t\n']) {
       expect(hashBody(body)).toBe(verdictBodyHash(body))
@@ -405,10 +405,10 @@ describe('verdict hash 工具与「未复验」可见性（BUG-056）', () => {
     expect(guide).toContain('不要用 `tail -n +2 | shasum`')
   })
 
-  it('处置表标「未经复验」且没有 R2 → warning（不冒充原文一致）', () => {
+  it('处置表标 unverified 且没有 R2 → warning（不冒充原文一致）', () => {
     const rounds = [{
       ...input().rounds[0],
-      dispositionsText: `${DISPOSITIONS}\n规则：本轮裁决后订正产物，未经第二个验证者复验。\n`,
+      dispositionsText: `${DISPOSITIONS}\n规则：本轮裁决后订正产物，unverified by a second verifier。\n`,
     }]
     const result = auditQualityLoop(input({ rounds }))
     expect(result.problems).toEqual([])

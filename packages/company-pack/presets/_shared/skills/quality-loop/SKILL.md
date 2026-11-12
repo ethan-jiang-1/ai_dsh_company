@@ -101,16 +101,16 @@ node <company-content>/../presets/_shared/skills/quality-loop/scripts/verdict-ha
 ```
 | 发现 | 处置 | 说明 |
 |---|---|---|
-| F1（首格也可写 `F1 [check-id] 标题`） | 已修 | 改了哪儿 + 复验怎么看到 |
-| F2 | 反驳 | 证据：为什么这条不成立（要有可核对的东西，不是"我觉得"） |
-| F3 | 接受 | 风险是什么 + 由谁接受（具名岗位/人；不加"谁接受"不算处置） |
+| F1（首格也可写 `F1 [check-id] 标题`） | fixed | 改了哪儿 + 复验怎么看到 |
+| F2 | rebut | 证据：为什么这条不成立（要有可核对的东西，不是"我觉得"） |
+| F3 | accept | 风险是什么 + 由谁接受（具名岗位/人；不加"谁接受"不算处置） |
 ```
 
 `blocker` 级发现不许用"接受"结案（要接受就升级给授权人，写进说明）。
 
 **裁决后改了产物/稿**：不能停在"裁决过、后来改了"——要么开 R2 新裁决（`verdict-r2.md`），
-要么在处置说明里显式写「未复验」并由授权人接受该残留。audit 对最后一轮 dispositions 里的
-「未复验」给 `post-verdict-unverified` warning（不冒充原文一致；不是运行时 veto）。
+要么在处置说明里显式写「unverified」并由授权人接受该残留。audit 对最后一轮 dispositions 里的
+「unverified」给 `post-verdict-unverified` warning（不冒充原文一致；不是运行时 veto）。
 
 ## 5. 轮次与升级
 

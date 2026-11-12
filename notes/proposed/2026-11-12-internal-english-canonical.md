@@ -197,7 +197,13 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 | `未复验` | `post-verdict-unverified` warning 正则 | 改 `unverified`；warning 文案/测试同步 |
 | `body-sha256=待填` | `verdict-hash.mjs` 回填 | 改 `to-fill` 或保留占位；脚本/审计同步 |
 
-所以 `quality-loop` 仍 PENDING；先做 I1c token 英文化，再全文翻译。**不把“只剩 1 个”说成可直翻。**
+**I1c 已做（2026-11-12）**：
+
+- 处置枚举 → `fixed / rebut / accept`；`accepted-by:`；`unverified`；skill 处置表同步。
+- parser/audit/tests 同步；回退 `DISPOSITION_VALUES` 到中文 → `quality-loop.spec` **10 条红**；还原 → 40 passed。
+- `body-sha256=待填` 仍按回填脚本处理，未改语义。
+
+`quality-loop` 的处置 token 已清，但**全文仍是中文**，仍 PENDING；下一轮做全文翻译。
 
 **剩余 I1**：`quality-loop`（先 I1c token）；persona/agent.cordis.yml；content/**；领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 

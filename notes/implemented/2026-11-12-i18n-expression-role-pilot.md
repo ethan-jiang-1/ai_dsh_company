@@ -109,6 +109,12 @@
 - `已修/反驳/接受` 被 `tools/lib/quality-loop.mjs` `DISPOSITION_VALUES` 解析；`接受人：` 被 acceptor 检查；`未复验` 被 warning 正则消费；`body-sha256=待填` 由回填脚本处理。
 - 这些都是机器合同，quality-loop 暂缓翻译；先做 I1c token 切片。
 
+## I1c（quality-loop 处置 token）
+
+- 处置枚举 → fixed/rebut/accept；accepted-by:；unverified；parser/audit/skill/测试同步。
+- 回退 DISPOSITION_VALUES 到中文 → quality-loop.spec 10 条红；还原 → 40 passed。
+- quality-loop 全文仍中文，仍 PENDING；`pnpm test` 207 files / 1637 tests；`pnpm verify` ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

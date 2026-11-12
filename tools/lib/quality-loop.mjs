@@ -11,8 +11,8 @@ import { createHash } from 'node:crypto'
 export const QUALITY_LOOP_DIR = 'quality-loop'
 /** 轮次上限：R1 产出+裁决，R2 复验；超限必须升级，不许自己加轮磨平分歧。 */
 export const MAX_ROUNDS = 2
-/** 处置三选一：已修 / 有证据的反驳 / 接受风险（写谁接受）。 */
-export const DISPOSITION_VALUES = ['已修', '反驳', '接受']
+/** 处置三选一：fixed / 有证据的 rebut / accept risk（写谁接受）。 */
+export const DISPOSITION_VALUES = ['fixed', 'rebut', 'accept']
 
 const HEADER_RE = /^<!--\s*quality-loop:\s*(.+?)\s*-->\s*$/
 
@@ -400,7 +400,7 @@ export function auditQualityLoop(input) {
         if (disposed.has(finding.id)) {
           warn('carried-forward', `${where}：${finding.id} 沿用前一轮的处置（本轮只作闭环陈述）`)
         } else {
-          add('disposition-missing', `${where}：发现 ${finding.id} 没有处置（三选一：已修 / 反驳 / 接受）`)
+          add('disposition-missing', `${where}：发现 ${finding.id} 没有处置（三选一：fixed / rebut / accept）`)
         }
         continue
       }
@@ -408,11 +408,11 @@ export function auditQualityLoop(input) {
         add('disposition-value', `${where}：${finding.id} 的处置「${row.disposition}」不是 ${DISPOSITION_VALUES.join(' / ')}`)
       }
       if (row.note === '') add('disposition-note', `${where}：${finding.id} 的处置没写说明（理由/证据/谁接受）`)
-      if (row.disposition === '接受' && !/接受人[:：]/.test(row.note)) {
-        add('disposition-acceptor', `${where}：${finding.id} 标了「接受」但没写「接受人：<岗位/姓名>」`)
+      if (row.disposition === 'accept' && !/accepted-by[:：]/i.test(row.note)) {
+        add('disposition-acceptor', `${where}：${finding.id} 标了 accept 但没写 accepted-by:<岗位/姓名>`)
       }
-      if (row.disposition === '接受' && /^blocker$/i.test(finding.level ?? '')) {
-        add('blocker-accepted', `${where}：${finding.id} 是 blocker 却以「接受」结案（blocker 要升级给授权人，不能自行接受）`)
+      if (row.disposition === 'accept' && /^blocker$/i.test(finding.level ?? '')) {
+        add('blocker-accepted', `${where}：${finding.id} 是 blocker 却以 accept 结案（blocker 要升级给授权人，不能自行接受）`)
       }
     }
     const findingIds = new Set(findings.map(finding => finding.id))
@@ -427,9 +427,9 @@ export function auditQualityLoop(input) {
   const latest = rounds.at(-1)
   const latestDispositions = latest?.dispositionsText
   if (typeof latestDispositions === 'string'
-    && /未(?:经|获)?[^\n]{0,8}复验|未复验/u.test(latestDispositions)) {
+    && /unverified/i.test(latestDispositions)) {
     warn('post-verdict-unverified',
-      `${String(latest?.file)}：处置表标了「未复验」但这是最后一轮——裁决后改产物必须 R2，或由授权人接受该残留`)
+      `${String(latest?.file)}：处置表标了 unverified 但这是最后一轮——裁决后改产物必须 R2，或由授权人接受该残留`)
   }
 
   return { problems, warnings }
