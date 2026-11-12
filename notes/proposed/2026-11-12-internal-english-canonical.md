@@ -232,7 +232,13 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 - 同步 `deliverables.mjs` parseMeta events、catalog（tools + src）、converge、meta 模板、catalog fixture、测试。
 - meta 模板字段现在全部英文：`slug / kickoff / type / numbering / productType / deliveryMode / layers / participants / result / closed / wallClock / summary / events`。
 
-**剩余 I1**：persona/agent.cordis.yml、content/**、领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
+**I1f persona pilot（2026-11-12）**：
+
+- CFO persona 翻成英文；`tests/presets/persona-english.spec.ts` 棘轮：CFO 不在 PENDING，其余 10 个在。
+- 注入中文到 persona 块 → 2 条红；还原 → 绿。
+- persona 只翻人格块，YAML 注释/plan-mode section 不动（I2 另说）。
+
+**剩余 I1**：其余 10 个 persona、content/**、领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 
