@@ -8,6 +8,7 @@ opened: 2026-11-12
 > 问题：这个插件要同时支持中文和英文，且**缺省用中文启动**。需要先彻底审视代码：哪些面有文案、哪些机制已由 DSH 提供、哪些面根本没法本地化、默认语言怎么落到启动形态；然后给出一份可以直接转 RFC/落地的方案。
 > 消费者：[2026-11-12 问题卡](../../_archive/settled_issues/2026-11-12-bilingual-company.md)（用户 2026-11-12 直接点名：先研究透彻，再提交 issue，准备落地）。
 > 产出的卡：[表达层问题卡](../../_archive/settled_issues/2026-11-12-bilingual-company.md) + [表达层 RFC](../../../notes/proposed/2026-11-12-bilingual-company.md)；[内部全英文卡](../../_archive/settled_issues/2026-11-12-internal-english-canonical.md) + [内部全英文 RFC](../../../notes/proposed/2026-11-12-internal-english-canonical.md)。
+> 活跃落地卡：[2026-11-12-bilingual-landing.md](../../issues/2026-11-12-bilingual-landing.md)（推动剩余 I1/I2/I3/E1；只有活跃 issue 驱动 repo 落地）。
 > 结论：**做，分阶段落地（Phase 0/A/B/C）**。语言开关唯一源 = DSH 的 `locale.preference`（默认 `zh`）；客户端用 DSH 现成的 typed locale 字典；host 侧通过 `settings.describe()` 读同一个偏好，注入动态工作语言 policy；默认中文用 bundle patch 的 `locale.config.preference: zh` 落，已有用户偏好优先、reset 回中文。**2026-11-12 方向修正**：双语只在表达层；内部代码/提示/内容用英文单份 canonical；角色名也属于表达层（`roles.*` zh/en 映射）；不建中英双份。内部英文的具体阶段 = [内部全英文 RFC](../../../notes/proposed/2026-11-12-internal-english-canonical.md)（I1/I2/I3 + 表达层 E1）；边界分析 = [表达层方向材料](2026-11-12-expression-layer-direction.md)。
 
 ## 材料

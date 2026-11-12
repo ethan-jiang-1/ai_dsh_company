@@ -1,49 +1,49 @@
-# 运营核查 · 一页纸（COO 模板）
+# Operations review · one page (COO template)
 
-> 用途：落地核查 / 运营方案 / 预算核查类产出（COO 主用）。结论先行，一页为限。
-> 与 `review-note.md`（VP-Eng 技术评审：自建/现成/混合）区分：本模板的三选一是
-> **接得住 / 有条件接得住 / 接不住（veto）**，并强制三格齐 —— 谁执行 / 走什么流程 / 花多少钱。
+> Use for delivery reviews / operations plans / budget checks (COO primary). Conclusion first, one page max.
+> Different from `review-note.md` (VP-Eng technical review: build/buy/hybrid): this template's three choices are
+> **can carry / can carry with conditions / cannot carry (veto)**, and it requires all three cells — who executes / which process / how much it costs.
 >
-> **AI 使用声明 / 复核独立性层级 / 对外件闸门**：见 `.dsh-company/kb/review-protocol.md`（本模板不重复声明文本）。
+> **AI use statement / review independence level / external-facing gate**: see `.dsh-company/kb/review-protocol.md` (this template does not repeat the statement text).
 
-## 一分钟摘要（说人话，先写这段）
+## One-minute summary (plain language, write this first)
 
-<给高层三段，禁内部黑话（闸门/T号/锚/等级/slug）：①发生了什么（一句话）；②结论（≤3 条，业务语言）；
-③下一步（谁/何时）＋要用户拍板的事（如有）。过程细节在下面的报告体里；这段同款文本写进 present 的 description。>
+<Give senior readers three paragraphs, no internal jargon (gates/T#/anchors/grades/slug): ① what happened (one sentence); ② conclusion (≤3 points, business language);
+③ next step (who/when) + what the user must decide (if any). Process detail goes in the report body below; the same text goes into `present`'s description.>
 
-## 结论（三选一 + 一句话理由）
+## Conclusion (choose one + one-line reason)
 
-- [ ] 接得住　- [ ] 有条件接得住（条件列全）　- [ ] 接不住（veto，一句话理由）
-- 一句话理由：……
-- 若行使 veto：在结论段直接声明（人力撑不住 / 流程没有 / 合规过不去）。
+- [ ] can carry　- [ ] can carry with conditions (list every condition)　- [ ] cannot carry (veto, one-line reason)
+- One-line reason: …
+- If exercising veto: state it in the conclusion (staffing cannot hold / no process / compliance cannot pass).
 
-## 三格（缺一格即"接不住"）
+## Three cells (missing one = "cannot carry")
 
-| 格 | 要求 | 本核对写什么 |
+| Cell | Requirement | What this review writes |
 |---|---|---|
-| **谁执行（人力）** | 写到人：编制里谁、每周几小时；写不出人名 = "没人" | …… |
-| **走什么流程** | SOW + 里程碑验收（UAT 通过才算数）；RACI 的 R 到人；无载体先立载体 | …… |
-| **花多少钱（预算）** | 对照 `.dsh-company/kb/coo/CHARTER.md` 预算基准；标【基准内】/【新增】/【超限】 | …… |
+| **Who executes (staffing)** | Name the person: who in the roster, how many hours per week; if you cannot name a person = "no one" | … |
+| **Which process** | SOW + milestone acceptance (counts only after UAT passes); RACI's R goes to a person; if there is no carrier, establish one first | … |
+| **How much it costs (budget)** | Against the budget baseline in `.dsh-company/kb/coo/CHARTER.md`; label [within baseline] / [new] / [over limit] | … |
 
-## 时程与并行
+## Timeline and parallelism
 
-- 关键路径每段的依赖与缓冲；外部依赖（客户/供应商/对方团队）单列 —— 不在我们手里的时间不是我们的工期。
-- 并行占用：本方案吃掉项目池几个位、池上限（见 `.dsh-company/kb/org.md` 派生事实）还剩几个；剩余位不可得时写明"未登记"。
+- Dependencies and buffers for each critical-path segment; list external dependencies (customer/supplier/counterpart team) separately — time outside our control is not our schedule.
+- Parallel load: how many slots this plan takes from the project pool, how many remain (see the derived facts in `.dsh-company/kb/org.md`); if slots are unavailable, write "not registered".
 
-## 最坏档压力测试
+## Worst-case stress test
 
-- 量 ×2、单价 ×2 各算一次；撞线方案必须带降档预案（"到时候再说"不算预案）。
+- Volume ×2 and unit price ×2, each calculated once; a plan that hits the line must carry a reduce-tier fallback ("we'll figure it out later" is not a plan).
 
-## 缺口与未核实（禁止当结论用）
+## Gaps and unverified items (do not use as conclusions)
 
-- ……
+- …
 
-## 分歧（不抹平）
+## Disagreements (do not flatten)
 
-- 与其他职能 / 与 CEO 的不同意见，原话保留。
+- Different opinions from other functions / the CEO, kept verbatim.
 
-## 下一步
+## Next step
 
-| 谁（人名或"没人"） | 何时 | 做哪一件事 |
+| Who (name or "no one") | When | Which one thing |
 |---|---|---|
 | | | |

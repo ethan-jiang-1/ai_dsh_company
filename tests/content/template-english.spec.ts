@@ -13,8 +13,8 @@ import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
 const ROOT = repositoryRoot
 const DIR = join(ROOT, 'packages/company-pack/content/templates')
 const CJK = /[\u3400-\u9fff]/u
-const TRANSLATED = new Set(['decision-memo.md'])
-const PENDING = new Set(['meta.md', 'mrd.md', 'ops-review-note.md', 'prd.md', 'review-note.md', 'strs.md', 'weekly-report.md'])
+const TRANSLATED = new Set(['decision-memo.md', 'mrd.md', 'ops-review-note.md', 'review-note.md', 'strs.md', 'weekly-report.md'])
+const PENDING = new Set(['meta.md', 'prd.md'])
 
 describe('content template 英文棘轮（I1）', () => {
   it('模板清单与 PENDING 对齐；pilot 无中文', () => {

@@ -1,31 +1,31 @@
-# 技术评审 · 一页纸模板
+# Technical review · one-page template
 
-> 用于 VP-Eng 的技术评估（skill：tech-feasibility-review）。结论先行，一页为限。
+> For VP-Eng technical assessments (skill: tech-feasibility-review). Conclusion first, one page max.
 >
-> **AI 使用声明 / 复核独立性层级 / 对外件闸门**：见 `.dsh-company/kb/review-protocol.md`（本模板不重复声明文本）。
+> **AI use statement / review independence level / external-facing gate**: see `.dsh-company/kb/review-protocol.md` (this template does not repeat the statement text).
 
-## 一分钟摘要（说人话，先写这段）
+## One-minute summary (plain language, write this first)
 
-<给高层三段，禁内部黑话（闸门/T号/锚/等级/slug）：①发生了什么（一句话）；②结论（≤3 条，业务语言）；
-③下一步（谁/何时）＋要用户拍板的事（如有）。过程细节在下面的报告体里；这段同款文本写进 present 的 description。>
+<Give senior readers three paragraphs, no internal jargon (gates/T#/anchors/grades/slug): ① what happened (one sentence); ② conclusion (≤3 points, business language);
+③ next step (who/when) + what the user must decide (if any). Process detail goes in the report body below; the same text goes into `present`'s description.>
 
-## 结论（三选一 + 一句话理由）
+## Conclusion (choose one + one-line reason)
 
-- [ ] 建议自建　- [ ] 建议用现成　- [ ] 建议混合　- [ ] veto（不做）
+- [ ] recommend build　- [ ] recommend buy　- [ ] recommend hybrid　- [ ] veto (do not do)
 
-理由：……
+Reason: …
 
-## 选项对比（每项 ≤3 行）
+## Option comparison (≤3 lines each)
 
-| | 自建 | 用现成 | 混合 |
+| | Build | Buy | Hybrid |
 |---|---|---|---|
-| 可行性（对照 KB 技术栈事实） | | | |
-| 成本（搭建+维护，人·周） | | | |
-| 最大风险 + 兜底 | | | |
+| Feasibility (against KB stack facts) | | | |
+| Cost (build + maintain, person-weeks) | | | |
+| Biggest risk + fallback | | | |
 
-## 依据
+## Basis
 
-- 引用 `.dsh-company/kb/vp-eng/CHARTER.md` 的技术栈事实（团队/预算/现有系统）；
-- worker 调研结论（如有）：……
+- Stack facts from `.dsh-company/kb/vp-eng/CHARTER.md` (team/budget/existing systems);
+- Worker research conclusions (if any): …
 
-## 保留意见（分歧不抹平，留给 CEO 合稿）
+## Reservations (do not flatten disagreement; leave for the CEO to merge)

@@ -1,38 +1,38 @@
-# weekly-report（周报 · 一页纸）
+# weekly-report (one page)
 
-> 用途：向 CEO 的结构化进展汇报（各职能自用）。结论先行，一页为限。
-> 纪律：**只写有出处的事实**——数字引 `.dsh-company/kb/`，进展引交付物路径（`.dsh-company/deliverables/<slug>/drafts/<角色>.md`）。
-> 没动的事写"没动"，不要用"推进中"盖过去。
+> Use for a structured progress report to the CEO (each function may use it). Conclusion first, one page max.
+> Discipline: **write only facts with sources** — cite numbers from `.dsh-company/kb/`, progress from deliverable paths (`.dsh-company/deliverables/<slug>/drafts/<role>.md`).
+> If something did not move, write "did not move"; do not cover it with "in progress".
 >
-> **AI 使用声明 / 复核独立性层级 / 对外件闸门**：见 `.dsh-company/kb/review-protocol.md`（本模板不重复声明文本）。
+> **AI use statement / review independence level / external-facing gate**: see `.dsh-company/kb/review-protocol.md` (this template does not repeat the statement text).
 
-## 一周结论（先行）
+## Weekly conclusion (first)
 
-<本周最重要的一个判断或变化，一句话 + 它意味着什么。>
+<The most important judgment or change this week, one sentence + what it means.>
 
-## 交付
+## Deliverables
 
-| 交付物（路径） | 状态 | 卡在哪 |
+| Deliverable (path) | Status | Where it is stuck |
 |---|---|---|
-| `.dsh-company/deliverables/<slug>/drafts/<角色>.md` | 草稿 / 已交 CEO / 被驳回 | |
+| `.dsh-company/deliverables/<slug>/drafts/<role>.md` | draft / handed to CEO / rejected | |
 
-## 数字（带出处）
+## Numbers (with sources)
 
-| 指标 | 本周 | 上周 | 出处 |
+| Metric | This week | Last week | Source |
 |---|---|---|---|
-| 本周重复劳动（供给输入，非 KPI、不考核） | | | |
+| Repeated work this week (supply input, not a KPI, not assessed) | | | |
 | | | | `.dsh-company/kb/...` |
 
-## 阻塞（要谁的决定）
+## Blockers (whose decision is needed)
 
-| 卡点 | 要谁拍 | 不拍会怎样 |
+| Blocker | Who must decide | What happens if no one does |
 |---|---|---|
 | | | |
 
-## 下周
+## Next week
 
-- <最多三条；每条一个可验收的产出。>
+- <At most three; each one an acceptable output.>
 
-## 风险与未核实
+## Risks and unverified items
 
-- <发现但还没证实的事；禁止当结论用。>
+- <Things noticed but not yet confirmed; do not use them as conclusions.>

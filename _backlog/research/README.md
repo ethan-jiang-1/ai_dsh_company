@@ -59,6 +59,8 @@ opened: YYYY-MM-DD
 ## 索引
 
 - [bilingual-company](bilingual-company/README.md) — 插件中英文双语与默认中文启动；消费者 = [2026-11-12 问题卡](../_archive/settled_issues/2026-11-12-bilingual-company.md)。
+- [wiki-knowledge-map](wiki-knowledge-map/README.md) — wiki 组织的动态知识地图（AK 式 LLM wiki）与轻依赖接入；消费者 = 用户 2026-11-12 点名研究。
+- [startup-settings](startup-settings/README.md) — composer 红框处总 settings 入口与启动强制配置（wiki 选择 / 产品类型 / 交付模式）；消费者 = 用户 2026-11-12 点名研究。
 
 （2026-11-11 dsh-native-orchestration-fit 随两张 issue 卡归档，迁入[研究归档](../_archive/research/README.md)。）
 

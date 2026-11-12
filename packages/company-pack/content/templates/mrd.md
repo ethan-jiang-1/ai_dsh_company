@@ -3,12 +3,12 @@ layer: MRD
 definition: json-ledger
 ---
 
-# MRD（市场需求 · 一页纸 + 机会账本）
+# MRD (market requirements · one page + opportunity ledger)
 
-> 主笔 = **CMO**；落 `drafts/mrd.md`；它是 PRD 的输入（VP-Eng 主笔 PRD）。
-> 回答"该不该做、做什么、为谁做、凭什么赢"；**不是功能清单**（那是 PRD），**不是定价判断**（归 VP-Sales/CFO）。
-> 每个机会一个编号 `MR-001…`；证据标[fact]/[assumption]并给出处或待验证说明。
-> `productType` 按动议类型替换（类型 id = `content/product-types/` 下的目录名；解析规则见 `meta.md`）。
+> Lead = **CMO**; save to `drafts/mrd.md`; it is the input to the PRD (VP-Eng leads the PRD).
+> Answer "should we do it, what should we do, for whom, why we win"; **not a feature list** (that is PRD), **not a pricing judgment** (VP-Sales/CFO owns it).
+> One opportunity gets one id `MR-001…`; label evidence [fact]/[assumption] and give the source or how it will be verified.
+> Replace `productType` with the motion's type (type id = directory name under `content/product-types/`; parsing rules in `meta.md`).
 
 ```json
 {
@@ -19,18 +19,18 @@ definition: json-ledger
     "opportunities": [
       {
         "id": "MR-001",
-        "title": "<一句话机会>",
-        "segment": "<细分：谁、什么场景>",
-        "buyer": "<买单人 / 决策链>",
-        "pain": "<现在怎么凑合、不做的代价>",
+        "title": "<one-line opportunity>",
+        "segment": "<segment: who, in what scenario>",
+        "buyer": "<economic buyer / decision chain>",
+        "pain": "<how they cope today, the cost of not doing it>",
         "evidence": [
-          { "kind": "fact", "source": "<客户访谈/合同/公开数据出处>" },
-          { "kind": "assumption", "source": "<待验证的推理与验证方式>" }
+          { "kind": "fact", "source": "<customer interview / contract / public data source>" },
+          { "kind": "assumption", "source": "<inference to verify and how to verify it>" }
         ],
-        "alternatives": ["<客户现在的替代方案>"],
-        "competitors": ["<竞品/替代者>"],
-        "value": "<一句话价值主张：凭什么赢>",
-        "success": ["<可观测的成功判据>"],
+        "alternatives": ["<what customers use instead today>"],
+        "competitors": ["<competitors / substitutes>"],
+        "value": "<one-line value proposition: why we win>",
+        "success": ["<observable success criteria>"],
         "confidence": "medium",
         "recommendation": "go"
       }
@@ -40,35 +40,35 @@ definition: json-ledger
 }
 ```
 
-## 一分钟摘要
+## One-minute summary
 
-<结论 ≤3 条 / 建议 go|no-go|defer 及一句话理由 / 下一步>
+<Conclusion ≤3 points / recommendation go|no-go|defer + one-line reason / next step>
 
-## 市场与竞争
+## Market and competition
 
-- **细分**：…
-- **替代方案**：客户现在怎么凑合（手工 / Excel / 外包 / 竞品 / 不做）
-- **竞品**：…（各自强在哪、我们凭什么不同）
-- **买点**：三个最强买点 + 最可能被拒绝的理由
+- **Segment**: …
+- **Alternatives**: how customers cope today (manual / Excel / outsourcing / competitors / doing nothing)
+- **Competitors**: … (where each is strong; why we are different)
+- **Buying points**: the three strongest buying points + the most likely reason for rejection
 
-## 规模与依据
+## Sizing and basis
 
-| 口径 | 数字 | 依据 | fact/assumption |
+| Basis | Number | Source | fact/assumption |
 |---|---|---|---|
 | TAM | | | |
 | SAM | | | |
 | SOM | | | |
 
-## 成功判据
+## Success criteria
 
-- <上线后看什么事实：签约数 / 试点转正 / 复购 / 交付周期…>
+- <What facts to observe after launch: signed deals / pilot conversion / repeat purchase / delivery cycle…>
 
-## 建议与未决
+## Recommendation and open items
 
-- **建议**：go / no-go / defer —— 一句话理由
-- **未决**（谁拍板、缺什么证据）：…
+- **Recommendation**: go / no-go / defer — one-line reason
+- **Open items** (who decides, what evidence is missing): …
 
-## 交给 VP-Eng 的说明
+## Handoff to VP-Eng
 
-- 先做哪个机会：MR-00x（理由）
-- 已知约束（时间 / 预算 / 合规 / 技术前提）：…
+- Which opportunity first: MR-00x (reason)
+- Known constraints (time / budget / compliance / technical prerequisites): …
