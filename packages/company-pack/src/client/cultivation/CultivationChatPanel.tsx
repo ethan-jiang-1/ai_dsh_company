@@ -12,6 +12,7 @@ import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionBinding, SessionReference } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { CultivationRecord } from '../../lib/cultivation.ts'
+import { CULTIVATION_COPY } from './cultivation-actions.ts'
 
 type EventWindow = ReturnType<SessionBinding['eventSource']['getSnapshot']>
 
@@ -96,13 +97,13 @@ function rowsOf(entries: EventEntries): readonly ThreadRow[] {
       continue
     }
     if (event.type === 'tool/call') {
-      rows.push({ id: `tc-${event.seq}`, who: 'tool', text: `工具 · ${event.data.name}` })
+      rows.push({ id: `tc-${event.seq}`, who: 'tool', text: CULTIVATION_COPY.chatTool(event.data.name) })
       continue
     }
     if (event.type === 'tool/result') {
       const failed = event.data.message.isError === true || event.data.error !== undefined
       const reason = event.data.error?.reason ?? ''
-      rows.push({ id: `tr-${event.seq}`, who: 'tool', text: failed ? `工具失败${reason === '' ? '' : ` · ${reason}`}` : '工具完成' })
+      rows.push({ id: `tr-${event.seq}`, who: 'tool', text: failed ? CULTIVATION_COPY.chatToolFailed(reason) : CULTIVATION_COPY.chatToolDone })
     }
   }
   return rows
@@ -165,22 +166,22 @@ export function CultivationChatPanel({ sessions, mainSessionId, cwd, agentPreset
   }, [sessions, mainSessionId, cwd, agentPreset])
 
   return (
-    <section className="wk-cult-chat" aria-label="培养对话">
+    <section className="wk-cult-chat" aria-label={CULTIVATION_COPY.chatAria}>
       <header className="wk-cult-chat-head">
         <div>
-          <div className="wk-cult-chat-title">培养对话</div>
-          <div className="wk-cult-chat-sub">独立培养会话 · 与主 Chat 分开</div>
+          <div className="wk-cult-chat-title">{CULTIVATION_COPY.chatTitle}</div>
+          <div className="wk-cult-chat-sub">{CULTIVATION_COPY.chatSub}</div>
         </div>
-        <span className="wk-cult-chat-badge">独立会话</span>
+        <span className="wk-cult-chat-badge">{CULTIVATION_COPY.chatBadge}</span>
       </header>
 
       <div className="wk-cult-chat-hint">
         只谈培养：纠正、方法、journal、赞踩；回复不会混进主 Chat。工具审批走平台审批面。
       </div>
 
-      {state.status === 'waiting' && <div className="wk-cult-chat-state">等待主会话的工作区与角色…</div>}
-      {state.status === 'creating' && <div className="wk-cult-chat-state">正在建立培养会话…</div>}
-      {state.status === 'error' && <div className="wk-cult-chat-state bad">培养会话打不开：{state.error}</div>}
+      {state.status === 'waiting' && <div className="wk-cult-chat-state">{CULTIVATION_COPY.chatWaiting}</div>}
+      {state.status === 'creating' && <div className="wk-cult-chat-state">{CULTIVATION_COPY.chatCreating}</div>}
+      {state.status === 'error' && <div className="wk-cult-chat-state bad">{CULTIVATION_COPY.chatError(state.error)}</div>}
       {state.status === 'ready' && <CultivationThread binding={state.binding} attachments={attachments} />}
     </section>
   )
@@ -259,40 +260,40 @@ function CultivationThread({ binding, attachments }: { readonly binding: Session
       <div className="wk-cult-chat-lines" ref={listRef} data-cultivation-chat-lines>
         {rows.length === 0 && pendingVisible === false && (
           <div className="wk-cult-chat-empty">
-            <b>这里只谈培养</b>
-            <span>把左侧的纠正、方法、journal 拿进来问；不会混进主对话。</span>
-            <span>例如：把这条 rejected 纠正整理成反例方法，别写空话。</span>
+            <b>{CULTIVATION_COPY.chatEmptyTitle}</b>
+            <span>{CULTIVATION_COPY.chatEmptyLine1}</span>
+            <span>{CULTIVATION_COPY.chatEmptyLine2}</span>
           </div>
         )}
         {rows.map(row => (
           <div key={row.id} className={`wk-cult-chat-line ${row.who}`}>
-            <div className="wk-cult-chat-who">{row.who === 'you' ? '你' : row.who === 'tool' ? '工具' : '培养 host'}</div>
+            <div className="wk-cult-chat-who">{row.who === 'you' ? CULTIVATION_COPY.chatWhoYou : row.who === 'tool' ? CULTIVATION_COPY.chatWhoTool : CULTIVATION_COPY.chatWhoHost}</div>
             <div className="wk-cult-chat-bubble">{row.text}</div>
           </div>
         ))}
         {liveText !== '' && snapshot.running && (
           <div className="wk-cult-chat-line host">
-            <div className="wk-cult-chat-who">培养 host · 生成中</div>
+            <div className="wk-cult-chat-who">{CULTIVATION_COPY.chatWhoHostGenerating}</div>
             <div className="wk-cult-chat-bubble streaming">{liveText}</div>
           </div>
         )}
         {pendingVisible && (
           <div className="wk-cult-chat-line you">
-            <div className="wk-cult-chat-who">你 · 发送中</div>
+            <div className="wk-cult-chat-who">{CULTIVATION_COPY.chatWhoYouSending}</div>
             <div className="wk-cult-chat-bubble">{pending}</div>
           </div>
         )}
         {snapshot.running && (
-          <div className="wk-cult-chat-status">培养会话正在回复…</div>
+          <div className="wk-cult-chat-status">{CULTIVATION_COPY.chatReplying}</div>
         )}
         {error !== null && <div className="wk-cult-chat-error">{error}</div>}
       </div>
 
       <div className="wk-cult-chat-composer">
         <label className="wk-cult-chat-attach">
-          <span>附加记录</span>
+          <span>{CULTIVATION_COPY.chatAttach}</span>
           <select value={attachedId} onChange={event => setAttachedId(event.target.value)}>
-            <option value="">不附加</option>
+            <option value="">{CULTIVATION_COPY.chatNoAttach}</option>
             {attachments.map(record => (
               <option key={record.id} value={record.id}>
                 {record.id.slice(0, 18)} · {record.expectation.slice(0, 42)}
@@ -303,8 +304,8 @@ function CultivationThread({ binding, attachments }: { readonly binding: Session
         <textarea
           value={draft}
           rows={3}
-          placeholder="只谈培养：纠正、方法、journal…"
-          aria-label="培养对话输入"
+          placeholder={CULTIVATION_COPY.chatPlaceholder}
+          aria-label={CULTIVATION_COPY.chatInputAria}
           onChange={event => setDraft(event.target.value)}
           onKeyDown={event => {
             if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
@@ -316,7 +317,7 @@ function CultivationThread({ binding, attachments }: { readonly binding: Session
         <div className="wk-cult-chat-actions">
           <span className="wk-cult-chat-session">session: {String(binding.sessionId).slice(0, 8)}</span>
           <button type="button" className="wk-cult-chat-send" disabled={sending || draft.trim() === ''} onClick={() => { void submit() }}>
-            {sending ? '发送中…' : '发送'}
+            {sending ? CULTIVATION_COPY.chatSending : CULTIVATION_COPY.chatSend}
           </button>
         </div>
       </div>
