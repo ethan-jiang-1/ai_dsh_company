@@ -156,6 +156,11 @@
 - `pnpm test` 208 files / 1641 tests；`preset-smoke` ALL PASS；`pnpm verify` ALL PASS。
 - 剩余 content/**、领域值、I2/I3。
 
+## I1g content pilot（decision-memo）
+
+- decision-memo 模板英文；template 棘轮 PENDING 7。
+- 注入中文 → 2 条红；还原 → 绿；`pnpm test` 208 files / 1643 tests；verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

@@ -1,34 +1,34 @@
-# decision memo（决定备忘 · 一页纸）
+# Decision memo (one page)
 
-> 用途：市场判断 / 定价建议 / 商机取舍类产出（VP-Sales 主用；其他角色记决定亦可）。
+> Use for market judgment / pricing recommendations / opportunity trade-offs (VP-Sales primary; other roles may also record decisions).
 >
-> **AI 使用声明 / 复核独立性层级 / 对外件闸门**：见 `.dsh-company/kb/review-protocol.md`（本模板不重复声明文本）。
+> **AI use statement / review independence level / external-facing gate**: see `.dsh-company/kb/review-protocol.md` (this template does not repeat the statement text).
 
-## 一分钟摘要（说人话，先写这段）
+## One-minute summary (plain language, write this first)
 
-<给高层三段，禁内部黑话（闸门/T号/锚/等级/slug）：①发生了什么（一句话）；②结论（≤3 条，业务语言）；
-③下一步（谁/何时）＋要用户拍板的事（如有）。过程细节在下面的报告体里；这段同款文本写进 present 的 description（高层看卡即懂）。>
+<Give senior readers three paragraphs, no internal jargon (gates/T#/anchors/grades/slug): ① what happened (one sentence); ② conclusion (≤3 points, business language);
+③ next step (who/when) + what the user must decide (if any). Process detail goes in the report body below; the same text goes into `present`'s description (a senior reader understands the card without opening it).>
 
-## 结论（先行）
+## Conclusion (first)
 
-<进 / 不进 / 有条件进 + 一句话理由；有 veto 行使时在此声明。>
+<Proceed / do not proceed / proceed with conditions + one-line reason; state any veto exercised here.>
 
-## 依据
+## Basis
 
-<事实（出处 = .dsh-company/kb/）与假设分开列；数字必须带[fact]/[assumption]标注。>
+<List facts (source = .dsh-company/kb/) and assumptions separately; every number carries a [fact]/[assumption] label.>
 
-## 选项与估算
+## Options and estimates
 
-<≥2 个选项；每选项三行内：算式、数字、最可能翻车的一件事。>
+<≥2 options; within three lines per option: formula, numbers, the one thing most likely to fail.>
 
-## 敏感度
+## Sensitivity
 
-<最不确定的两个假设各 ±50%，结论是否翻。>
+<Take the two most uncertain assumptions, vary each ±50%, and say whether the conclusion flips.>
 
-## 分歧（不抹平）
+## Disagreements (do not flatten)
 
-<与其他职能 / 与 CEO 的不同意见，原话保留。>
+<Different opinions from other functions / the CEO, kept verbatim.>
 
-## 下一步
+## Next step
 
-<谁、在何时、做哪一件事；负责人写人名或承认"没人"。>
+<Who, when, and which one thing; name the owner or admit "no one".>

@@ -240,7 +240,13 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 
 **I1f 完成（2026-11-12）**：11/11 个 persona 全英文；persona 棘轮 PENDING 清空；preset-smoke ALL PASS。
 
-**剩余 I1**：content/**、领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
+**I1g content pilot（2026-11-12）**：
+
+- `content/templates/decision-memo.md` 英文；`tests/content/template-english.spec.ts` 棘轮：
+  decision-memo 不在 PENDING，其余 7 个模板在。
+- 注入中文到 decision-memo → 2 条红；还原 → 绿。
+
+**剩余 I1**：其余 7 个模板、generic/charters/product-types/delivery-modes/state、领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 
