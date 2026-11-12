@@ -160,6 +160,17 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 - 红→绿：把 parser 回退到旧中文格式 → candidate-scan spec **17 条红**；还原 → 27 passed。
 - 仍保留中文金标准标注状态（`GOLD_STATUSES`）作为独立仪器，不属于派活行。
 
+**I1b 补遗（2026-11-12 翻译 assembling 时发现）**：
+
+最初 token 清单漏了**署名/认领行**，它们同样是机器消费：
+
+| token | 消费方 | 处理方向 |
+|---|---|---|
+| `出稿：<role>｜版本 v<N>｜任务书 = <path>` | `tools/lib/authorship.mjs` `SIG` / `DRAFT_VERSION`、`authorship-audit`、`presets.spec`、`work-handoff`、`assembling` | 改 `By: <role>｜Version v<N>｜Brief = <path>`；`SIG`/`DRAFT_VERSION` + 测试 + 模板同步 |
+| `让位=认领撤销，非出稿` / `占位=认领，非出稿` | `tools/lib/deliverables.mjs`、`deliverables-audit` 测试 | 改英文 canonical 行；`isPlaceholderYield`/`isPlaceholderClaim` + 测试同步 |
+
+因此 `assembling-the-team` / `chairing-staff-meeting` **暂缓**；`quality-loop` 可先翻。**此前“I1b token 清零”只指最初清单，署名/认领 token 仍待清。**
+
 **I1b 第五片（事实/假设标签）**：
 
 - `【事实】/【假设】/【事实/假设】` → `[fact]/[assumption]/[fact/assumption]`；`【事实/假设/待验】` → `[fact/assumption/to-verify]`。
