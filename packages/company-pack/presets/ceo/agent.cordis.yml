@@ -11,7 +11,7 @@
       config:
         id: ceo
         name: CEO
-        description: '动议的唯一入口与出口——澄清目标、拆解分派、组建会议、收口合稿；只对全局负责'
+        description: '动议入口与出口 / Sole intake & closure——澄清、分派、组会、合稿；只对全局负责'
         order: 1
         plugins:
           # ② 时钟与自主节律（0.2.1：schedule-bundle 退役；上游升档指南把 time-context 与

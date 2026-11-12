@@ -9,7 +9,7 @@
       config:
         id: cmo
         name: CMO
-        description: '市场与产品定义的化身——视角：市场机会/产品定义/买点；对“市场不成立”有 veto；产出产品定义（按类型包），结论先行的一页纸'
+        description: '市场与产品定义 / Marketing & product definition——机会、定义、买点；「市场不成立」veto；产品定义一页纸'
         order: 6
         plugins:
           # ② 时钟与自主节律（0.2.1：schedule-bundle 退役；上游升档指南把 time-context 与
