@@ -265,6 +265,12 @@ export const zh = {
   'teamCard.expand': '展开',
   'teamCard.result': '结果',
   'teamCard.inspect': '查看轨迹',
+  'cultivation.eyebrow': 'CULTIVATION · 培养',
+  'cultivation.title': '让角色今后的工作更好',
+  'cultivation.sub': '从一项真实工作或改进目标开始；左边看记录，右边只谈培养。',
+  'cultivation.overview': '公司总览 ↗',
+  'cultivation.resizeAria': '调整培养对话宽度',
+  'cultivation.resizeTitle': '拖动调整左右宽度；键盘 ←/→，Home 复位',
 } as const
 
 /** 本命名空间的 key 联合。 */
@@ -525,6 +531,12 @@ export const en: Record<CompanyKey, string> = {
   'teamCard.expand': 'Expand',
   'teamCard.result': 'Result',
   'teamCard.inspect': 'View trace',
+  'cultivation.eyebrow': 'CULTIVATION · Grow',
+  'cultivation.title': 'Make the role better at its work',
+  'cultivation.sub': 'Start from a real piece of work or an improvement goal; records on the left, only cultivation on the right.',
+  'cultivation.overview': 'Company overview ↗',
+  'cultivation.resizeAria': 'Resize the cultivation conversation',
+  'cultivation.resizeTitle': 'Drag to resize; ←/→ on the keyboard, Home to reset',
 }
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {

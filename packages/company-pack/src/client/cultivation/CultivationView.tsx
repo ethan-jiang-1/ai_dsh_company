@@ -143,12 +143,12 @@ export function createCultivationView(injected: CultivationViewInjected) {
       <div className="wk-cult-view">
         <header className="wk-cult-view-head">
           <div>
-            <div className="wk-cult-view-eyebrow">CULTIVATION · 培养</div>
-            <div className="wk-cult-view-title">让角色今后的工作更好</div>
-            <div className="wk-cult-view-sub">从一项真实工作或改进目标开始；左边看记录，右边只谈培养。</div>
+            <div className="wk-cult-view-eyebrow">{t('cultivation.eyebrow')}</div>
+            <div className="wk-cult-view-title">{t('cultivation.title')}</div>
+            <div className="wk-cult-view-sub">{t('cultivation.sub')}</div>
           </div>
           <button type="button" className="wk-cult-overview" onClick={injected.openCompanyOverview}>
-            公司总览 ↗
+            {t('cultivation.overview')}
           </button>
         </header>
 
@@ -180,12 +180,12 @@ export function createCultivationView(injected: CultivationViewInjected) {
             className="wk-cult-resize"
             role="separator"
             aria-orientation="vertical"
-            aria-label="调整培养对话宽度"
+            aria-label={t('cultivation.resizeAria')}
             aria-valuemin={CHAT_MIN}
             aria-valuemax={CHAT_MAX}
             aria-valuenow={Math.round(chatWidth)}
             tabIndex={0}
-            title="拖动调整左右宽度；键盘 ←/→，Home 复位"
+            title={t('cultivation.resizeTitle')}
             onPointerDown={beginResize}
             onKeyDown={onResizeKeyDown}
             onDoubleClick={() => setChatWidth(CHAT_DEFAULT)}
