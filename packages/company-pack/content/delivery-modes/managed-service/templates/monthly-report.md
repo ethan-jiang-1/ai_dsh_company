@@ -1,30 +1,30 @@
-# 月度服务报告模板（运维托管 / 维护服务）
+# Monthly service report template (managed operations / maintenance)
 
-> 层：交付模式 · 由 COO 主笔；续约的证据，不写“总体良好”这类不可判的话。
+> Layer: delivery mode · COO leads; evidence for renewal; do not write unjudgeable phrases like "generally good".
 
-## 1. SLA 实际值
+## 1. SLA actuals
 
-| 指标 | 承诺 | 实际 | 是否达标 | 赔付 |
+| Metric | Commitment | Actual | Met | Compensation |
 |---|---|---|---|---|
-| 可用性 | | | | |
-| P1 响应 | | | | |
-| P1 恢复 | | | | |
+| Availability | | | | |
+| P1 response | | | | |
+| P1 recovery | | | | |
 
-## 2. 事件
+## 2. Incidents
 
-- P1 / P2 数量与摘要（引用 `incidents.md`）：
-- 重复事件与根因：
+- P1 / P2 count and summary (cite `incidents.md`):
+- Recurring incidents and root causes:
 
-## 3. 变更
+## 3. Changes
 
-- 本月升级 / 配置变更 / 维护窗口：
-- 回滚次数与原因：
+- This month's upgrades / config changes / maintenance windows:
+- Rollback count and reasons:
 
-## 4. 风险与下月计划
+## 4. Risks and next month
 
-- 风险（容量 / 依赖 / 安全 / 人力）：
-- 下月计划与需要客户配合的事：
+- Risks (capacity / dependencies / security / staffing):
+- Next-month plan and what the customer must do:
 
-## 5. 结论
+## 5. Conclusion
 
-- 服务达标 / 有条件达标 / 未达标；下一步：
+- Service met / met with conditions / not met; next step:

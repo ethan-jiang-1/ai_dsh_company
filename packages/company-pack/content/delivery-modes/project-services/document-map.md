@@ -1,28 +1,28 @@
-# 项目制 / 系统集成 · 文档映射
+# Project services / systems integration · document map
 
-> 层：交付模式 · 加载：按需（T2）。本文件回答“project-services 动议多哪些文档、谁写、和 PRD 什么关系”。
+> Layer: delivery mode · Load: on demand (T2). This file answers "which extra documents a project-services motion needs, who writes them, and how they relate to the PRD".
 
-## 文档链
+## Document chain
 
 ```text
-产品类型链（business-software / hardware-software）
+product-type chain (business-software / hardware-software)
   MRD → StRS → PRD
         │
-        └─ 交付模式链（project-services）
-             SOW → 里程碑 → RACI → UAT → 验收/移交
+        └─ delivery-mode chain (project-services)
+             SOW → milestones → RACI → UAT → acceptance/handover
 ```
 
-## 文档与 owner
+## Documents and owners
 
-| 文档 | 文件 | owner | 什么时候写 | 与 PRD 的关系 |
+| Document | File | owner | When | Relation to PRD |
 |---|---|---|---|---|
-| SOW | `drafts/sow.md` | COO | PRD 初稿后 | 引用 PRD 的 REQ/AC；写 in/out of scope、依赖、里程碑、验收、变更控制 |
-| 里程碑计划 | `drafts/milestones.md` | COO | SOW 后 | 每个里程碑的出口条件与收款节点；不替代 PRD 的 slice |
-| RACI | `drafts/raci.md` | COO | 组队后 | 谁执行/谁负责/谁咨询/谁知情；人力引用 `kb/roster.md` |
-| UAT 计划 | `drafts/uat.md` | COO | PRD 的 AC 稳定后 | UAT 用例覆盖 REQ/AC；不新造需求 |
-| 验收/移交记录 | `drafts/acceptance.md` | COO | UAT 后 | 客户签字、遗留项、维护交接 |
+| SOW | `drafts/sow.md` | COO | after the PRD draft | cites PRD REQ/AC; writes in/out of scope, dependencies, milestones, acceptance, change control |
+| Milestone plan | `drafts/milestones.md` | COO | after SOW | exit criteria and payment points per milestone; does not replace PRD slices |
+| RACI | `drafts/raci.md` | COO | after teaming | who executes/owns/consults/is informed; staffing cites `kb/roster.md` |
+| UAT plan | `drafts/uat.md` | COO | after PRD AC stabilize | UAT cases cover REQ/AC; do not invent requirements |
+| Acceptance/handover | `drafts/acceptance.md` | COO | after UAT | customer sign-off, open items, maintenance handover |
 
-## 模板
+## Templates
 
 - [templates/sow.md](templates/sow.md)
 - [templates/milestones.md](templates/milestones.md)
@@ -30,7 +30,7 @@
 - [templates/uat.md](templates/uat.md)
 - [templates/acceptance.md](templates/acceptance.md)
 
-## 机器可读规则
+## Machine-readable rules
 
-[delivery-rules.json](delivery-rules.json) 声明“本模式需要哪些文档、谁 owner、哪些字段必填”。
-`/delivery check <slug>` 按 rules 检查 `documents.file` 与 `requiredSections`；`/req check` 仍管需求编号/追溯。
+[delivery-rules.json](delivery-rules.json) declares "which documents this mode needs, who owns them, which fields are required".
+`/delivery check <slug>` checks `documents.file` and `requiredSections` per the rules; `/req check` still governs requirement numbering/traceability.

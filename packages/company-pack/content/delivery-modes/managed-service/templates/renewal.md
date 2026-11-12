@@ -1,29 +1,29 @@
-# 续约 / 退出模板（运维托管 / 维护服务）
+# Renewal / exit template (managed operations / maintenance)
 
-> 层：交付模式 · 由 VP-Sales 主笔、COO 提供交付证据、CFO 看经济性。
+> Layer: delivery mode · VP-Sales leads, COO provides delivery evidence, CFO reviews economics.
 
-## 1. 价值回顾
+## 1. Value review
 
-- 本期 SLA 达标情况（引用月报）：
-- 客户业务变化 / 新增需求：
-- 没续约的风险与原因：
+- SLA performance this period (cite the monthly report):
+- Customer business changes / new needs:
+- Risk and reasons for non-renewal:
 
-## 2. 续约方案
+## 2. Renewal plan
 
-| 项 | 本期 | 续约 | 说明 |
+| Item | This period | Renewal | Note |
 |---|---|---|---|
-| 服务范围 | | | |
-| 服务时间 / 等级 | | | |
-| 价格 | | | 见 `policy-lines.md` 折扣/毛利线 |
-| 期限 | | | |
+| Service scope | | | |
+| Service hours / tier | | | |
+| Price | | | see `policy-lines.md` discount/gross-margin lines |
+| Term | | | |
 
-## 3. 退出 / 移交
+## 3. Exit / handover
 
-- 退出触发条件：
-- 数据 / 文档 / 账号移交：
-- 最后一个月服务与尾款：
+- Exit triggers:
+- Data / document / account handover:
+- Last month's service and final payment:
 
-## 4. 签字
+## 4. Sign-off
 
-- 客户（姓名 / 角色 / 日期）：
-- VP-Sales / COO / CFO：
+- Customer (name / role / date):
+- VP-Sales / COO / CFO:

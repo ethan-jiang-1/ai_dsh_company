@@ -1,58 +1,58 @@
-# 项目制 / 系统集成 · 交付模式
+# Project services / systems integration · delivery mode
 
-> 层：交付模式 · 加载：按需（T2）。这是**交付模式**，不是产品类型；产品类型回答“造什么”，
-> 交付模式回答“怎么交付”。动议可以组合：`business-software × project-services`。
+> Layer: delivery mode · Load: on demand (T2). This is a **delivery mode**, not a product type; the product type answers "what to build",
+> the delivery mode answers "how to deliver". A motion can combine them: `business-software × project-services`.
 
-## 什么时候用
+## When to use
 
-- 交付发生在客户现场，或按 SOW / 里程碑 / UAT 验收；
-- 需要驻场、实施、培训、切换、第三方系统对接；
-- 合同按里程碑收款，交付物包含实施与验收，而不只是软件许可/订阅。
+- Delivery happens at the customer site, or acceptance is by SOW / milestone / UAT;
+- On-site work, implementation, training, cutover, or third-party system integration is needed;
+- The contract collects by milestone, and the deliverable includes implementation and acceptance, not just a software license/subscription.
 
-**不要用**：纯产品售卖、SaaS 订阅、无 SOW/UAT/驻场的标准产品交付——那用 `deliveryMode: productized`。
+**Do not use**: pure product sales, SaaS subscription, or standard product delivery without SOW/UAT/on-site — use `deliveryMode: productized`.
 
-## 两轴组合
+## Two-axis combination
 
-| 产品类型 | 交付模式 | 需求链 | 追加交付物 |
+| Product type | Delivery mode | Requirements chain | Additional deliverables |
 |---|---|---|---|
-| business-software | productized | MRD → StRS → PRD | 无 SOW/UAT |
-| business-software | project-services | MRD → StRS → PRD | SOW / UAT / RACI / 里程碑 |
-| hardware-software | productized | MRD → StRS → PRD（可选 SyRS/IRS/V&V） | 无 SOW/UAT |
-| hardware-software | project-services | 同上 | SOW / UAT / RACI / 里程碑 |
+| business-software | productized | MRD → StRS → PRD | no SOW/UAT |
+| business-software | project-services | MRD → StRS → PRD | SOW / UAT / RACI / milestones |
+| hardware-software | productized | MRD → StRS → PRD (optional SyRS/IRS/V&V) | no SOW/UAT |
+| hardware-software | project-services | same as above | SOW / UAT / RACI / milestones |
 
-**需求链由产品类型决定；project-services 只追加交付文档与验收口径，不改需求层。**
-`project-services` 不是第三个产品类型，不要写进 `产品类型` 字段。
+**The requirements chain is decided by the product type; project-services only adds delivery documents and acceptance basis, not requirement layers.**
+`project-services` is not a third product type; do not write it into the product-type field.
 
-## 动议户口
+## Motion record
 
 ```yaml
 productType: business-software
 deliveryMode: project-services
 ```
 
-不写 `交付模式` = `productized`。有 SOW / UAT / 驻场 / 里程碑验收，就写 `project-services`。
+No delivery mode = `productized`. With SOW / UAT / on-site / milestone acceptance, write `project-services`.
 
-## 谁负责什么
+## Who owns what
 
-| 交付物 | owner | 说明 |
+| Deliverable | owner | Note |
 |---|---|---|
-| SOW / 范围边界 | COO | 与 VP-Eng 的 PRD 对齐；不替代 PRD |
-| UAT 计划与验收 | COO | 用例覆盖 PRD 的 REQ/AC；客户签字 |
-| RACI / 里程碑 | COO | 人力与排期以 `kb/roster.md` 为准 |
-| 项目经济性 | CFO | 3-4-3、维护年费、垫资；见 `content/company/policy-lines.md` |
-| 定价建议 | VP-Sales | 项目制定价；见 `pricing` skill |
-| 技术范围 | VP-Eng | 接口、依赖、可行性 |
+| SOW / scope boundary | COO | Align with VP-Eng's PRD; does not replace the PRD |
+| UAT plan and acceptance | COO | Cases cover PRD REQ/AC; customer signs |
+| RACI / milestones | COO | Staffing and schedule follow `kb/roster.md` |
+| Project economics | CFO | 3-4-3, maintenance fee, funding; see `content/company/policy-lines.md` |
+| Pricing recommendation | VP-Sales | Project pricing; see the `pricing` skill |
+| Technical scope | VP-Eng | Interfaces, dependencies, feasibility |
 
-## 边界
+## Boundary
 
-- 交付模式不改变产品类型的编号合同与需求层；SOW/UAT 是交付文档，不是需求层。
-- 没有 SOW/UAT/驻场就不要写 project-services；写了就要有对应文档，否则 COO/CFO 应报缺。
-- 项目制方法（`project-economics` / `ops-feasibility` / `pricing`）只适用于本交付模式；
-  `productized` 动议不要套 3-4-3 / SOW / 维护年费。
+- Delivery mode does not change the product type's numbering contract or requirement layers; SOW/UAT are delivery documents, not requirement layers.
+- Do not write project-services without SOW/UAT/on-site; if written, the documents must exist, otherwise COO/CFO report the gap.
+- Project methods (`project-economics` / `ops-feasibility` / `pricing`) apply only to this delivery mode;
+  `productized` motions do not force 3-4-3 / SOW / maintenance fee.
 
-## 相关
+## Related
 
-- 文档映射 = [document-map.md](document-map.md)
-- 机器可读规则 = [delivery-rules.json](delivery-rules.json)
-- 模板 = [templates/](templates/)
-- 术语 = [glossary.md](glossary.md)
+- Document map = [document-map.md](document-map.md)
+- Machine-readable rules = [delivery-rules.json](delivery-rules.json)
+- Templates = [templates/](templates/)
+- Terms = [glossary.md](glossary.md)

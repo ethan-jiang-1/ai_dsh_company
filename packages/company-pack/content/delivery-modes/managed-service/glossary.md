@@ -1,15 +1,15 @@
-# 运维托管 / 维护服务 · 术语
+# Managed operations / maintenance · glossary
 
-> 层：交付模式 · 加载：T2 按需。术语随交付模式变；通用层不得出现这些词。
+> Layer: delivery mode · Load: on demand (T2). Terms change with delivery mode; the generic layer must not use these words.
 
-| 术语 | 含义（本模式内） |
+| Term | Meaning (within this mode) |
 |---|---|
-| SLA | Service Level Agreement；可用性、响应/恢复时限、赔付口径、排除项 |
-| SLO | 内部服务目标；通常比 SLA 更严，用于预警 |
-| 服务目录 | 卖哪些服务项、服务时间、响应/恢复等级、价格指针 |
-| Runbook | 监控、备份、升级、维护窗口、值班与升级路径的可执行手册 |
-| 值班 / on-call | 谁在什么时段响应；升级路径与替补 |
-| 事件 / incident | 影响服务的异常；按严重级别沟通、处置、复盘 |
-| 月报 | SLA 实际值、事件、变更、风险、下月计划；续约的证据 |
-| 续约 / churn | 到期续费或流失；价值回顾、价格、退出/移交 |
-| 服务信用 | SLA 未达标的赔付/抵扣；上限见 `policy-lines.md` |
+| SLA | Service Level Agreement; availability, response/recovery windows, compensation, exclusions |
+| SLO | Internal service target; usually stricter than the SLA, used for early warning |
+| service catalog | Which service items are sold, hours, response/recovery tiers, price pointers |
+| runbook | Executable manual for monitoring, backup, upgrade, maintenance windows, on-call and escalation |
+| on-call | Who responds in which period; escalation path and backup |
+| incident | An anomaly affecting service; communicate, handle, and postmortem by severity |
+| monthly report | SLA actuals, incidents, changes, risks, next-month plan; evidence for renewal |
+| renewal / churn | Renew or lose at expiry; value review, price, exit/handover |
+| service credit | Compensation/offset for missed SLA; cap in `policy-lines.md` |

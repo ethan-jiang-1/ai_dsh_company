@@ -1,31 +1,31 @@
-# Runbook 模板（运维托管 / 维护服务）
+# Runbook template (managed operations / maintenance)
 
-> 层：交付模式 · 由 COO 主笔、VP-Eng 审技术内容；值班人员按本手册执行，不靠口口相传。
+> Layer: delivery mode · COO leads, VP-Eng reviews technical content; on-call staff follow this manual, not word of mouth.
 
-## 1. 监控与告警
+## 1. Monitoring and alerting
 
-- 监控项 / 阈值 / 告警去向：
-- 误报/漏报的处理：
+- Monitored items / thresholds / alert destination:
+- Handling false positives/misses:
 
-## 2. 备份与恢复
+## 2. Backup and recovery
 
-- 备份对象 / 频率 / 保留期：
-- 恢复演练频率与最近一次结果：
+- Backup targets / frequency / retention:
+- Recovery drill frequency and latest result:
 
-## 3. 升级与回滚
+## 3. Upgrade and rollback
 
-- 升级窗口 / 步骤 / 回滚条件：
-- 变更审批：
+- Upgrade window / steps / rollback conditions:
+- Change approval:
 
-## 4. 值班与升级路径
+## 4. On-call and escalation
 
-| 时段 | 一线 | 二线 | 升级触发 |
+| Period | First line | Second line | Escalation trigger |
 |---|---|---|---|
-| 工作时间 | | | |
-| 非工作时间 | | | |
+| Business hours | | | |
+| Non-business hours | | | |
 
-## 5. 维护窗口
+## 5. Maintenance window
 
-- 固定窗口：
-- 客户通知提前量：
-- 窗口内故障怎么算 SLA：
+- Fixed window:
+- Customer notice lead time:
+- How failures inside the window count for SLA:

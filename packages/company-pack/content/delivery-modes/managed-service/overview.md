@@ -1,62 +1,62 @@
-# 运维托管 / 维护服务 · 交付模式
+# Managed operations / maintenance · delivery mode
 
-> 层：交付模式 · 加载：按需（T2）。这是**持续服务**，不是一次性项目，也不是产品许可/订阅。
-> 产品类型回答“造什么”，交付模式回答“怎么持续交付”。动议可以组合：
-> `business-software × managed-service`（托管应用）、`hardware-software × managed-service`（设备运维）。
+> Layer: delivery mode · Load: on demand (T2). This is **continuous service**, not a one-off project, and not a product license/subscription.
+> The product type answers "what to build"; the delivery mode answers "how to keep delivering". A motion can combine:
+> `business-software × managed-service` (hosted app), `hardware-software × managed-service` (device operations).
 
-## 什么时候用
+## When to use
 
-- 客户买的是**持续 SLA**：可用性、响应/恢复时限、值班、监控、备份、维护窗口；
-- 有维护合同、托管运维、月度服务回顾、续费/退出；
-- 交付没有“项目结束”那一天，只有服务周期与续约。
+- The customer buys **ongoing SLA**: availability, response/recovery windows, on-call, monitoring, backup, maintenance windows;
+- There is a maintenance contract, managed operations, monthly service review, renewal/exit;
+- Delivery has no "project end"; only service periods and renewals.
 
-**不要用**：
-- 一次性实施/上线 → `project-services`；
-- 只卖许可/订阅、没有运维 SLA → `productized`；
-- 一个动议同时有“实施项目 + 长期维护”：拆成两个动议（实施 = project-services，维护 = managed-service），
-  或明确本次只做一个；**一个动议只写一个交付模式**。
+**Do not use**:
+- One-off implementation/launch → `project-services`;
+- License/subscription only, no operations SLA → `productized`;
+- One motion with "implementation project + long-term maintenance": split into two motions (implementation = project-services, maintenance = managed-service),
+  or state that this motion covers only one; **one motion, one delivery mode**.
 
-## 两轴组合
+## Two-axis combination
 
-| 产品类型 | 交付模式 | 需求链 | 追加交付物 |
+| Product type | Delivery mode | Requirements chain | Additional deliverables |
 |---|---|---|---|
-| business-software | managed-service | MRD → StRS → PRD | SLA / 服务目录 / Runbook / 事件 / 月报 / 续约 |
-| hardware-software | managed-service | 同上（可选 SyRS/IRS/V&V） | 同上 + 备件/现场响应 |
-| business-software | project-services | MRD → StRS → PRD | SOW / UAT / RACI / 里程碑 |
-| business-software | productized | MRD → StRS → PRD | 无 SOW/UAT/SLA |
+| business-software | managed-service | MRD → StRS → PRD | SLA / service catalog / runbook / incidents / monthly report / renewal |
+| hardware-software | managed-service | same as above (optional SyRS/IRS/V&V) | same + spares/on-site response |
+| business-software | project-services | MRD → StRS → PRD | SOW / UAT / RACI / milestones |
+| business-software | productized | MRD → StRS → PRD | no SOW/UAT/SLA |
 
-**需求链仍由产品类型决定；managed-service 只追加持续服务文档与 SLA 口径。**
+**The requirements chain still follows the product type; managed-service only adds continuous-service documents and SLA wording.**
 
-## 动议户口
+## Motion record
 
 ```yaml
 productType: business-software
 deliveryMode: managed-service
 ```
 
-不写 `交付模式` = `productized`。有持续 SLA / 值班 / 月报 / 续费，就写 `managed-service`。
+No delivery mode = `productized`. With ongoing SLA / on-call / monthly report / renewal, write `managed-service`.
 
-## 谁负责什么
+## Who owns what
 
-| 交付物 | owner | 说明 |
+| Deliverable | owner | Note |
 |---|---|---|
-| SLA / 服务目录 | COO | 可用性、响应/恢复、服务时间、赔付口径 |
-| Runbook / 值班 / 事件 | COO（技术内容与 VP-Eng） | 监控、升级、备份、维护窗口 |
-| 月度服务报告 | COO | SLA 实际值、事件、变更、风险、下月计划 |
-| 续约 / 退出 | VP-Sales（商务）+ COO（交付） | 续费、价格、退出/移交 |
-| 持续经济性 | CFO | 经常性收入、人力/值班成本、毛利、SLA 赔付、续约/流失 |
-| 技术边界 | VP-Eng | 可运维性、监控、备份、升级路径 |
+| SLA / service catalog | COO | Availability, response/recovery, service hours, compensation |
+| Runbook / on-call / incidents | COO (technical content with VP-Eng) | Monitoring, escalation, backup, maintenance windows |
+| Monthly service report | COO | SLA actuals, incidents, changes, risks, next month |
+| Renewal / exit | VP-Sales (commercial) + COO (delivery) | Renewal, price, exit/handover |
+| Continuous economics | CFO | Recurring revenue, staffing/on-call cost, gross margin, SLA credits, renewal/churn |
+| Technical boundary | VP-Eng | Operability, monitoring, backup, upgrade path |
 
-## 边界
+## Boundary
 
-- 不是项目：没有“项目结束验收单”，只有服务周期、月报与续约；
-- 不是产品订阅：SLA、值班、事件响应是人力服务，不能只写“系统可用”；
-- 一个动议一个交付模式；实施 + 维护要拆，或在户口里明确本期只做一个；
-- 没有 SLA / 值班 / 月报就不要写 managed-service；写了就要有对应文档，否则 COO/CFO 应报缺。
+- Not a project: no "project-end acceptance sheet", only service periods, monthly reports, renewals;
+- Not a product subscription: SLA, on-call, incident response are human services; do not write only "the system is available";
+- One motion, one delivery mode; implementation + maintenance are split, or the record states only one this round;
+- Do not write managed-service without SLA / on-call / monthly report; if written, documents must exist, otherwise COO/CFO report the gap.
 
-## 相关
+## Related
 
-- 文档映射 = [document-map.md](document-map.md)
-- 机器可读规则 = [delivery-rules.json](delivery-rules.json)
-- 模板 = [templates/](templates/)
-- 术语 = [glossary.md](glossary.md)
+- Document map = [document-map.md](document-map.md)
+- Machine-readable rules = [delivery-rules.json](delivery-rules.json)
+- Templates = [templates/](templates/)
+- Terms = [glossary.md](glossary.md)

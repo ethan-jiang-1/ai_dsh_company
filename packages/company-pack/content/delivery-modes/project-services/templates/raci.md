@@ -1,17 +1,17 @@
-# RACI 模板（项目制 / 系统集成）
+# RACI template (project services / systems integration)
 
-> 层：交付模式 · 由 COO 主笔；R = 执行，A = 最终负责，C = 咨询，I = 知情。一格只能有一个 A。
+> Layer: delivery mode · COO leads; R = responsible, A = accountable, C = consulted, I = informed. Exactly one A per row.
 
-| 活动 / 交付物 | COO | VP-Eng | CFO | VP-Sales | 客户 |
+| Activity / Deliverable | COO | VP-Eng | CFO | VP-Sales | Customer |
 |---|---|---|---|---|---|
-| SOW 范围 | A/R | C | C | C | C |
-| 技术方案 | C | A/R | I | I | I |
-| 项目经济性 | C | I | A/R | C | I |
-| 定价 / 合同 | C | I | C | A/R | C |
-| UAT 验收 | A/R | C | I | I | A |
-| 上线 / 移交 | A/R | C | I | I | C |
+| SOW scope | A/R | C | C | C | C |
+| Technical solution | C | A/R | I | I | I |
+| Project economics | C | I | A/R | C | I |
+| Pricing / contract | C | I | C | A/R | C |
+| UAT acceptance | A/R | C | I | I | A |
+| Launch / handover | A/R | C | I | I | C |
 
-## 人力与席位
+## Staffing and seats
 
-- 每个 R 必须落到 `kb/roster.md` 的席位；名册 `<待填>` = 配置缺口，不判“没人”。
-- 外部依赖与客户责任单独列，不混进我方 RACI。
+- Every R must land on a seat in `kb/roster.md`; `<to-fill>` = configuration gap, do not judge "no one".
+- List external dependencies and customer responsibilities separately; do not mix them into our RACI.

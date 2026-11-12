@@ -1,22 +1,22 @@
-# 服务目录模板（运维托管 / 维护服务）
+# Service catalog template (managed operations / maintenance)
 
-> 层：交付模式 · 由 COO 主笔；这是“卖哪些持续服务”的唯一清单，价格只写指针不写数字。
+> Layer: delivery mode · COO leads; this is the single list of "which continuous services are sold"; prices are pointers, not numbers.
 
-| 服务项 | 说明 | 服务时间 | 响应等级 | 价格指针 |
+| Service | Description | Service hours | Response tier | Price pointer |
 |---|---|---|---|---|
-| 基础运维 | 监控、备份、补丁 | | P2 | `pricing` |
-| 值班响应 | on-call / 事件处置 | | P1/P2 | `pricing` |
-| 版本升级 | 计划升级与回滚 | | P3 | `pricing` |
-| 现场支持 | 硬件/驻场（如适用） | | P1 | `pricing` |
+| Base operations | Monitoring, backup, patching | | P2 | `pricing` |
+| On-call response | on-call / incident handling | | P1/P2 | `pricing` |
+| Version upgrade | Planned upgrade and rollback | | P3 | `pricing` |
+| On-site support | Hardware/on-site (if applicable) | | P1 | `pricing` |
 
-## 分级 / 套餐
+## Tiers / packages
 
-- 套餐 A（基础）：
-- 套餐 B（标准）：
-- 套餐 C（关键业务）：
+- Package A (basic):
+- Package B (standard):
+- Package C (business-critical):
 
-## 边界
+## Boundary
 
-- 不包含的项目：
-- 超量/临时支持怎么计：
-- 服务时间外怎么计：
+- Items not included:
+- How overage/temporary support is billed:
+- How out-of-hours work is billed:

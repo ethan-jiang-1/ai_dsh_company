@@ -1,50 +1,50 @@
-# SOW 模板（项目制 / 系统集成）
+# SOW template (project services / systems integration)
 
-> 层：交付模式 · 由 COO 主笔；引用 PRD 的 REQ/AC，不替代 PRD。范围外的事写进“不做什么”。
+> Layer: delivery mode · COO leads; cites PRD REQ/AC, does not replace the PRD. Put out-of-scope work under "not doing".
 
-## 1. 双方与依据
+## 1. Parties and basis
 
-- 客户 / 我方主体：
-- 合同或框架协议编号：
-- 上游 PRD / MRD 路径：
-- 版本 / 日期：
+- Customer / our entity:
+- Contract or framework id:
+- Upstream PRD / MRD path:
+- Version / date:
 
-## 2. 范围
+## 2. Scope
 
-### 做（in scope）
+### In scope
 
-- 逐条列交付物，引用 `REQ-###`：
-- 现场 / 环境 / 数据责任：
+- List deliverables, citing `REQ-###`:
+- On-site / environment / data responsibility:
 
-### 不做（out of scope）
+### Out of scope
 
-- 明确排除项：
-- 客户或第三方责任：
+- Explicit exclusions:
+- Customer or third-party responsibility:
 
-## 3. 假设与依赖
+## 3. Assumptions and dependencies
 
-| 依赖 | 谁提供 | 什么时候要 | 缺失时怎么办 |
+| Dependency | Provided by | Needed by | If missing |
 |---|---|---|---|
 | | | | |
 
-## 4. 里程碑与验收
+## 4. Milestones and acceptance
 
-| 里程碑 | 出口条件 | 验收方式 | 收款节点 |
+| Milestone | Exit condition | Acceptance method | Payment point |
 |---|---|---|---|
 | | | | |
 
-## 5. 变更控制
+## 5. Change control
 
-- 变更提出 → 影响评估（范围/工期/费用）→ 双方书面确认 → 更新 SOW 版本；
-- 未确认的变更不进入交付。
+- Change request → impact assessment (scope/schedule/cost) → written bilateral confirmation → SOW version update;
+- Unconfirmed changes do not enter delivery.
 
-## 6. 商务与合规
+## 6. Commercial and compliance
 
-- 报价 / 折扣 / 毛利线：见 `kb/policy-lines.md`，由 CFO 签字；
-- 数据 / 安全 / 合规约束：
-- 维护与 SLA：见合同或维护条款。
+- Quote / discount / gross-margin line: see `kb/policy-lines.md`, signed by CFO;
+- Data / security / compliance constraints:
+- Maintenance and SLA: see contract or maintenance terms.
 
-## 7. 签字
+## 7. Sign-off
 
-- 客户方（姓名 / 角色 / 日期）：
-- 我方 COO（姓名 / 日期）：
+- Customer (name / role / date):
+- Our COO (name / date):

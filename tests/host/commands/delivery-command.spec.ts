@@ -112,10 +112,10 @@ describe('registerDeliveryCommand', () => {
     try {
       copyTemplates(root, 'project-services')
       const sow = readFileSync(join(CONTENT_DIR, 'delivery-modes/project-services/templates/sow.md'), 'utf8')
-      writeFileSync(join(root, 'drafts/sow.md'), sow.replace('## 5. 变更控制', '## 变更控制（改名）'))
+      writeFileSync(join(root, 'drafts/sow.md'), sow.replace('## 5. Change control', '## Change control (renamed)'))
       const result = await mount(workspace).handler({ rawInput: `check ${SLUG}` })
       expect(result.kind).toBe('error')
-      expect(result.text).toContain('SOW 缺 section「## 5. 变更控制」')
+      expect(result.text).toContain('SOW 缺 section「## 5. Change control」')
     } finally { cleanup() }
   })
 

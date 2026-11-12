@@ -61,26 +61,26 @@
       "signoff"
     ]
   },
-  "notes": "交付模式不是产品类型；需求链仍由产品类型决定。v1 不新增 /delivery check，操作员按 document-map 收口。",
+  "notes": "A delivery mode is not a product type; the requirements chain still follows the product type. v1 adds no /delivery check; the operator closes out per document-map.",
   "requiredSections": {
     "SOW": [
-      "## 2. 范围",
-      "## 4. 里程碑与验收",
-      "## 5. 变更控制"
+      "## 2. Scope",
+      "## 4. Milestones and acceptance",
+      "## 5. Change control"
     ],
     "MILESTONES": [
-      "| # | 里程碑 |"
+      "| # | Milestone |"
     ],
     "RACI": [
-      "| 活动 / 交付物 |"
+      "| Activity / Deliverable |"
     ],
     "UAT": [
-      "## 2. 用例",
-      "## 3. 准入 / 退出"
+      "## 2. Cases",
+      "## 3. Entry / exit"
     ],
     "ACCEPTANCE": [
-      "## 1. 验收清单",
-      "## 4. 签字"
+      "## 1. Acceptance checklist",
+      "## 4. Sign-off"
     ]
   },
   "v1Reminder": [

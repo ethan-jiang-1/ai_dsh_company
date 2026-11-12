@@ -1,20 +1,20 @@
-# 里程碑计划模板（项目制 / 系统集成）
+# Milestone plan template (project services / systems integration)
 
-> 层：交付模式 · 由 COO 主笔；每个里程碑必须有可判定的出口条件，不用“差不多了”。
+> Layer: delivery mode · COO leads; every milestone must have a judgeable exit condition, not "almost there".
 
-| # | 里程碑 | 出口条件（可判定） | 依赖 | owner | 收款节点 | 状态 |
+| # | Milestone | Exit condition (judgeable) | Dependency | owner | Payment point | Status |
 |---|---|---|---|---|---|---|
-| M1 | 环境就绪 | | | | | |
-| M2 | 联调完成 | | | | | |
-| M3 | UAT 通过 | | | | | |
-| M4 | 上线 / 移交 | | | | | |
+| M1 | Environment ready | | | | | |
+| M2 | Integration complete | | | | | |
+| M3 | UAT passed | | | | | |
+| M4 | Launch / handover | | | | | |
 
-## 关键路径与缓冲
+## Critical path and buffers
 
-- 关键路径：
-- 外部依赖（客户 / 供应商 / 对方团队）：
-- 缓冲与降档方案：
+- Critical path:
+- External dependencies (customer / supplier / counterpart team):
+- Buffers and reduce-tier plan:
 
-## 变更
+## Changes
 
-- 里程碑变更必须回写 SOW 的变更控制节，并同步收款节点。
+- Milestone changes must be written back to the SOW change-control section and synced to payment points.

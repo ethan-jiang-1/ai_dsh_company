@@ -1,31 +1,31 @@
-# 验收 / 移交记录模板（项目制 / 系统集成）
+# Acceptance / handover record template (project services / systems integration)
 
-> 层：交付模式 · 由 COO 主笔；UAT 通过后使用。客户签字是收款与维护交接的前提。
+> Layer: delivery mode · COO leads; used after UAT passes. Customer sign-off is the precondition for payment and maintenance handover.
 
-## 1. 验收清单
+## 1. Acceptance checklist
 
-| 项 | 依据（SOW / REQ / AC） | 结果 | 证据 |
+| Item | Basis (SOW / REQ / AC) | Result | Evidence |
 |---|---|---|---|
-| 范围完成 | | | |
-| UAT 通过 | | | |
-| 文档移交 | | | |
-| 培训完成 | | | |
-| 遗留项已接受 | | | |
+| Scope complete | | | |
+| UAT passed | | | |
+| Documents handed over | | | |
+| Training complete | | | |
+| Open items accepted | | | |
 
-## 2. 遗留项
+## 2. Open items
 
-| 遗留项 | 影响 | 谁接受 | 计划关闭 |
+| Open item | Impact | Accepted by | Planned close |
 |---|---|---|---|
 | | | | |
 
-## 3. 移交
+## 3. Handover
 
-- 运维 / 维护责任：
-- 监控 / 告警 / 备份：
-- 联系人 / 升级路径：
+- Operations / maintenance responsibility:
+- Monitoring / alerting / backup:
+- Contact / escalation path:
 
-## 4. 签字
+## 4. Sign-off
 
-- 客户方（姓名 / 角色 / 日期）：
-- 我方 COO（姓名 / 日期）：
-- CFO（如涉及收款/尾款）：
+- Customer (name / role / date):
+- Our COO (name / date):
+- CFO (if payment/final payment is involved):

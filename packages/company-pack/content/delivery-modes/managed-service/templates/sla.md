@@ -1,36 +1,36 @@
-# SLA 模板（运维托管 / 维护服务）
+# SLA template (managed operations / maintenance)
 
-> 层：交付模式 · 由 COO 主笔；把 PRD 的可用性/非功能要求落成可赔付承诺。
+> Layer: delivery mode · COO leads; turns PRD availability/non-functional requirements into compensable commitments.
 
-## 1. 服务范围
+## 1. Service scope
 
-- 覆盖的系统 / 设备 / 环境：
-- 不覆盖（明确排除）：
-- 依赖的第三方 / 客户责任：
+- Covered systems / devices / environments:
+- Not covered (explicit exclusions):
+- Third-party dependencies / customer responsibilities:
 
-## 2. 服务时间与可用性
+## 2. Service hours and availability
 
-| 项 | 承诺 | 计量方式 |
+| Item | Commitment | Measurement |
 |---|---|---|
-| 服务时间 | | |
-| 可用性 | | |
-| 维护窗口 | | |
+| Service hours | | |
+| Availability | | |
+| Maintenance window | | |
 
-## 3. 响应与恢复
+## 3. Response and recovery
 
-| 严重级别 | 响应时限 | 恢复/绕过时限 | 谁响应 |
+| Severity | Response window | Recovery/workaround window | Who responds |
 |---|---|---|---|
 | P1 | | | |
 | P2 | | | |
 | P3 | | | |
 
-## 4. 赔付 / 服务信用
+## 4. Compensation / service credit
 
-- 未达标口径：
-- 赔付上限：见 `kb/policy-lines.md` 的服务信用上限；
-- 不赔付的排除项（计划维护、客户侧、不可抗力）：
+- Missed-target basis:
+- Compensation cap: see the service-credit cap in `kb/policy-lines.md`;
+- Exclusions (planned maintenance, customer side, force majeure):
 
-## 5. 评审与变更
+## 5. Review and change
 
-- 月度服务回顾：
-- SLA 变更必须双方书面确认，并同步服务目录与价格。
+- Monthly service review:
+- SLA changes require written bilateral confirmation and sync with the service catalog and price.

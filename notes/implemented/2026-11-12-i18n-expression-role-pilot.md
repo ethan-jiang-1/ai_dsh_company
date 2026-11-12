@@ -302,6 +302,13 @@
 - 新增 product-types 英文棘轮；注入中文 → 红，还原 → 绿。
 - 全量 1660 tests；preset-smoke ALL PASS；verify ALL PASS。
 
+## P1 第五片（content/delivery-modes）
+
+- project-services / managed-service 全部 md/json/templates 英文；requiredSections 与模板 heading 同步。
+- delivery-command 的 SOW 缺 section 夹具改英文。
+- 新增 delivery-modes 英文棘轮；注入中文 → 红，还原 → 绿。
+- 全量 1661 tests；preset-smoke ALL PASS；verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

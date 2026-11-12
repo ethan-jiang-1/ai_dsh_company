@@ -75,26 +75,26 @@
       "exitPlan"
     ]
   },
-  "notes": "持续服务不是一次性项目；一个动议一个交付模式。实施 + 维护拆成两个动议。v1 不新增 /delivery check。",
+  "notes": "Continuous service is not a one-off project; one motion, one delivery mode. Implementation and maintenance are split into two motions. v1 adds no /delivery check.",
   "requiredSections": {
     "SLA": [
-      "## 2. 服务时间与可用性",
-      "## 3. 响应与恢复"
+      "## 2. Service hours and availability",
+      "## 3. Response and recovery"
     ],
     "SERVICE_CATALOG": [
-      "## 分级 / 套餐"
+      "## Tiers / packages"
     ],
     "RUNBOOK": [
-      "## 4. 值班与升级路径"
+      "## 4. On-call and escalation"
     ],
     "INCIDENT": [
-      "## 复盘规则"
+      "## Postmortem rules"
     ],
     "MONTHLY_REPORT": [
-      "## 1. SLA 实际值"
+      "## 1. SLA actuals"
     ],
     "RENEWAL": [
-      "## 3. 退出 / 移交"
+      "## 3. Exit / handover"
     ]
   },
   "v1Reminder": [

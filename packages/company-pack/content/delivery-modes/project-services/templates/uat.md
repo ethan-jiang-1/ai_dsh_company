@@ -1,26 +1,26 @@
-# UAT 计划模板（项目制 / 系统集成）
+# UAT plan template (project services / systems integration)
 
-> 层：交付模式 · 由 COO 主笔；UAT 用例必须覆盖 PRD 的 REQ/AC，不新造需求。
+> Layer: delivery mode · COO leads; UAT cases must cover PRD REQ/AC and must not invent requirements.
 
-## 1. 范围与环境
+## 1. Scope and environment
 
-- 覆盖的 REQ / AC：
-- 环境 / 数据 / 账号：
-- 不覆盖项与理由：
+- Covered REQ / AC:
+- Environment / data / accounts:
+- Uncovered items and reasons:
 
-## 2. 用例
+## 2. Cases
 
-| 用例 | 覆盖 REQ/AC | 前置数据 | 步骤 | 期望结果 | 执行人 | 结果 |
+| Case | Covers REQ/AC | Precondition data | Steps | Expected result | Executor | Result |
 |---|---|---|---|---|---|---|
 | UAT-001 | | | | | | |
 
-## 3. 准入 / 退出
+## 3. Entry / exit
 
-- 准入：环境就绪、数据齐、缺陷分级明确；
-- 退出：所有 P0/P1 用例通过；遗留项有书面接受人。
+- Entry: environment ready, data complete, defect severity defined;
+- Exit: all P0/P1 cases pass; open items have a written acceptor.
 
-## 4. 缺陷与签字
+## 4. Defects and sign-off
 
-- 缺陷分级 / 修复窗口 / 复测：
-- 客户签字（姓名 / 角色 / 日期）：
-- 遗留项与维护交接：
+- Defect severity / fix window / retest:
+- Customer sign-off (name / role / date):
+- Open items and maintenance handover:

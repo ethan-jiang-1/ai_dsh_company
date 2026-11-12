@@ -1,14 +1,14 @@
-# 项目制 / 系统集成 · 术语
+# Project services / systems integration · glossary
 
-> 层：交付模式 · 加载：T2 按需。术语随交付模式变；通用层不得出现这些词。
+> Layer: delivery mode · Load: on demand (T2). Terms change with delivery mode; the generic layer must not use these words.
 
-| 术语 | 含义（本模式内） |
+| Term | Meaning (within this mode) |
 |---|---|
-| SOW | Statement of Work；范围、依赖、里程碑、验收、变更控制的合同附件 |
-| UAT | User Acceptance Test；客户按 PRD 的 REQ/AC 验收；不新造需求 |
-| RACI | 执行 / 最终负责 / 咨询 / 知情；一格只能有一个 A |
-| 驻场 | 我方人员在客户现场交付；人力与差旅按 `kb/roster.md` / `kb/rates.md` |
-| 里程碑验收 | 每个里程碑有可判定出口条件；通过才进入下一阶段/收款 |
-| 变更控制 | 变更提出 → 影响评估 → 双方书面确认 → 更新 SOW 版本 |
-| 移交 | 上线后把运维/维护责任交给客户或运维团队，含文档与遗留项 |
-| in / out of scope | 这次做什么、明确不做什么；out of scope 不靠“以后再说” |
+| SOW | Statement of Work; contract annex covering scope, dependencies, milestones, acceptance, change control |
+| UAT | User Acceptance Test; the customer accepts PRD REQ/AC; no new requirements |
+| RACI | Responsible / Accountable / Consulted / Informed; exactly one A per row |
+| on-site | Our people deliver at the customer site; staffing and travel per `kb/roster.md` / `kb/rates.md` |
+| milestone acceptance | Each milestone has a judgeable exit criterion; pass before the next stage/payment |
+| change control | Change request → impact assessment → written bilateral confirmation → SOW version update |
+| handover | After launch, hand operations/maintenance to the customer or ops team, including documents and open items |
+| in / out of scope | What this engagement does and explicitly does not do; "later" is not an out-of-scope answer |
