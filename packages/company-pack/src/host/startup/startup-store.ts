@@ -10,17 +10,19 @@
  * 远端，读不到 pack；而走命令读会往会话日志里写 `command/run`（面板一打开就多一个命令条）。
  * 派生文件既无日志噪声，又与既有 `.dsh-company/` 读盘形状一致。
  */
-import { mkdirSync, readFileSync, renameSync, readdirSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { existsSync, mkdirSync, readFileSync, renameSync, readdirSync, statSync, writeFileSync } from 'node:fs'
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
 import {
   EMPTY_STARTUP_OPTIONS,
+  EMPTY_WIKI_CHECK,
   parseStartupOptions,
   parseStartupSettings,
   serializeStartupOptions,
   serializeStartupSettings,
   type StartupOptions,
   type StartupSettings,
+  type WikiCheck,
 } from '../../lib/startup-settings.ts'
 
 /** 隐式交付模式：`productized` 是缺省，不建内容包（见 delivery-mode 轴决定）。 */
@@ -99,17 +101,57 @@ export function enumerateStartupOptions(contentDir: string | undefined): Startup
   return {
     productTypes: listContentDirs(contentDir, 'product-types'),
     deliveryModes: [IMPLICIT_DELIVERY_MODE, ...listContentDirs(contentDir, 'delivery-modes')],
+    wikiCheck: EMPTY_WIKI_CHECK,
   }
+}
+
+/** wiki 指针解析成绝对路径：绝对路径原样，相对路径按 workspace 解释。 */
+export function resolveWikiDir(workspace: string, value: string): string {
+  return isAbsolute(value) ? resolve(value) : resolve(workspace, value)
+}
+
+/** 目录在 workspace 内（agent 可写）还是外（agent 只读，沙箱写不进）。 */
+export function wikiLocation(workspace: string, absolutePath: string): 'inside' | 'outside' {
+  const rel = relative(resolve(workspace), absolutePath)
+  return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel)) ? 'inside' : 'outside'
+}
+
+/**
+ * 查一个 wiki 指针是否可用（A3 的三档判据）。
+ *
+ * 只做三件事——目录存在 / 是目录 / 有 `index.md`。再多（解析 frontmatter、查链接活性）就变成
+ * lint 工具，超出 v1；这三件足以挡住「指向空气」与「指向一个没有索引的杂目录」。
+ * @param workspace - workspace 根（相对路径按它解释）。
+ * @param value - 指针值（null = 未设，不算失效）。
+ * @returns 检查结果（纯数据，会写进派生文件给浏览器读）。
+ */
+export function checkWikiPointer(workspace: string, value: string | null): WikiCheck {
+  if (value === null) return EMPTY_WIKI_CHECK
+  const path = resolveWikiDir(workspace, value)
+  const location = wikiLocation(workspace, path)
+  let isDirectory = false
+  try {
+    isDirectory = statSync(path).isDirectory()
+  } catch {
+    return { value, ok: false, problem: 'missing', location }
+  }
+  if (!isDirectory) return { value, ok: false, problem: 'not-directory', location }
+  if (!existsSync(join(path, 'index.md'))) return { value, ok: false, problem: 'no-index', location }
+  return { value, ok: true, problem: null, location }
 }
 
 /**
  * 重新派生并落盘选项文件（启动时 + 每次改动 settings 后各跑一次）。
+ * wiki 的检查跟着设置一起重算——它没有枚举集，只能查盘。
  * @param workspace - 公司 workspace 根。
  * @param contentDir - pack 的 `content/`。
  * @returns 本次枚举结果。
  */
 export function refreshStartupOptions(workspace: string, contentDir: string | undefined): StartupOptions {
-  const options = enumerateStartupOptions(contentDir)
+  const options = {
+    ...enumerateStartupOptions(contentDir),
+    wikiCheck: checkWikiPointer(workspace, readStartupSettings(workspace).wiki),
+  }
   writeStartupOptionsFile(workspace, options)
   return options
 }

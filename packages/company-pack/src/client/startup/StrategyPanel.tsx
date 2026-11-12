@@ -11,7 +11,7 @@ import { useCallback, useEffect, useSyncExternalStore, useState, type ReactNode 
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
-import { startupRows, type StartupField, type StartupRow } from '../../lib/startup-settings.ts'
+import { startupRows, type StartupField, type StartupRow, type WikiCheck } from '../../lib/startup-settings.ts'
 import type { CompanyKey, CompanyT } from '../locales.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
 import { PanelFrame } from '../tabs/company-tabs.tsx'
@@ -41,7 +41,7 @@ const FIELD_LABEL: Readonly<Record<StartupField, CompanyKey>> = {
   wiki: 'strategy.field.wiki',
 }
 
-/** 字段 → 该字段的可选项（wiki 是自由指针，没有枚举）。 */
+/** 字段 → 该字段的可选项（wiki 是本地目录指针，没有枚举；可用性见 `wikiCheck`）。 */
 function optionsFor(row: StartupRow): readonly string[] {
   return row.field === 'wiki' ? [] : row.options
 }
@@ -51,16 +51,30 @@ function optionsFor(row: StartupRow): readonly string[] {
  * @param props - 行数据 + 当前语言 + 改动回调。
  * @returns 行元素。
  */
-function StrategyRow({ row, t, onPick, onWiki, busy }: {
+/** wiki 失效原因 → 文案 key（A3：要说出是哪一种，不能只说「失效」）。 */
+const WIKI_PROBLEM_KEY = {
+  missing: 'strategy.wiki.missing',
+  'not-directory': 'strategy.wiki.notDirectory',
+  'no-index': 'strategy.wiki.noIndex',
+} as const
+
+function StrategyRow({ row, t, onPick, onWiki, busy, wikiCheck }: {
   readonly row: StartupRow
   readonly t: CompanyT
   readonly onPick: (field: StartupField, value: string | null) => void
   readonly onWiki: (value: string | null) => void
   readonly busy: boolean
+  readonly wikiCheck: WikiCheck
 }): ReactNode {
   const label = t(FIELD_LABEL[row.field])
   const options = optionsFor(row)
-  const invalid = row.invalid ? t('strategy.invalid') : null
+  // wiki 的失效原因来自 host 的盘上检查；另两行的失效是「值不在枚举里」。
+  const invalid = row.invalid
+    ? (row.field === 'wiki' && wikiCheck.problem !== null ? t(WIKI_PROBLEM_KEY[wikiCheck.problem]) : t('strategy.invalid'))
+    : null
+  const wikiNote = row.field === 'wiki' && row.value !== null && !row.invalid && wikiCheck.location !== null
+    ? t(wikiCheck.location === 'inside' ? 'strategy.wiki.inside' : 'strategy.wiki.outside')
+    : null
   return (
     <div className="wk-strategy-row" data-field={row.field}>
       <div className="wk-strategy-row-label">{label}</div>
@@ -84,6 +98,7 @@ function StrategyRow({ row, t, onPick, onWiki, busy }: {
                 {t('strategy.auto')}
               </button>
             )}
+            {wikiNote === null ? null : <span className="wk-strategy-auto-tag">{wikiNote}</span>}
           </div>
         )
         : (
@@ -158,6 +173,7 @@ export function StrategyPanel(props: StrategyPanelProps): ReactNode {
             row={row}
             t={t}
             busy={busy}
+            wikiCheck={face.options.wikiCheck}
             onPick={(field, value) => { void commit(() => save(sessionId, field, value)) }}
             onWiki={(value) => { void commit(() => save(sessionId, 'wiki', value)) }}
           />

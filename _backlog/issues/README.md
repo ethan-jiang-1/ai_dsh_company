@@ -4,6 +4,7 @@
 
 ## 活跃清单
 
+
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
 
 （2026-11-10 内容宪章卡已结归档：宪章正本 + 归位 skill + 入口门 + 卡/Note 字段；用户授权「commit 后若无问题即归档」；去向 = [content-charter Note](../../notes/implemented/2026-11-10-content-charter.md)，卡片见[归档](../_archive/settled_issues/2026-11-10-content-charter.md)。）
@@ -32,6 +33,8 @@
 v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajectory/New terminal 收回卡均已结归档。已结卡见[归档索引](../_archive/README.md)。新问题按 [backlog 入口](../README.md) 立卡，不从归档里自行开工。
 
 ## 近期归档
+- Wiki 知识地图（M1）卡 2026-11-12 已结：`content/wiki-template/`（AK 三层 + OKF 最小 frontmatter）+ 六角色共享协议 skill + wiki 指针三档校验 + 注入按位置分档（内可写/外只读/失效警示）；去向 = implementation（[Note](../../notes/implemented/2026-11-12-wiki-knowledge-map-landing.md)）；卡在[归档](../_archive/settled_issues/2026-11-12-wiki-knowledge-map-landing.md)。
+
 
 - 启动设置落地卡 2026-11-12 已结：composer 入口 + 右栏「策略」页签（三字段、首项自动、选项从 content 枚举）+ workspace 级 `startup.json` + `company:startup-settings` 软注入；去向 = implementation（[Note](../../notes/implemented/2026-11-12-startup-settings.md)）；卡在[归档](../_archive/settled_issues/2026-11-12-startup-settings-landing.md)。
 

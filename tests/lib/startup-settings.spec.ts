@@ -10,6 +10,9 @@
  */
 import { describe, expect, it } from 'vitest'
 import {
+  EMPTY_WIKI_CHECK,
+  STARTUP_OPTIONS_READ_LIMIT,
+  STARTUP_SETTINGS_READ_LIMIT,
   EMPTY_STARTUP_SETTINGS,
   clearStartupSettings,
   overrideCount,
@@ -82,7 +85,11 @@ describe('patch / clear', () => {
 })
 
 describe('startupRows', () => {
-  const options = { productTypes: ['business-software', 'hardware-software'], deliveryModes: ['productized', 'project-services'] }
+  const options = {
+    productTypes: ['business-software', 'hardware-software'],
+    deliveryModes: ['productized', 'project-services'],
+    wikiCheck: EMPTY_WIKI_CHECK,
+  }
 
   it('三项顺序固定，未设 = 自动', () => {
     const rows = startupRows(EMPTY_STARTUP_SETTINGS, options)
@@ -98,22 +105,60 @@ describe('startupRows', () => {
     expect(rows[1]?.invalid).toBe(false)
   })
 
-  it('wiki 是自由指针，永不判失效', () => {
+  it('wiki 未检查时不算失效（检查结果缺失 ≠ 指针坏了）', () => {
     const rows = startupRows({ ...EMPTY_STARTUP_SETTINGS, wiki: '/outside/wiki' }, options)
     expect(rows[2]?.invalid).toBe(false)
     expect(rows[2]?.value).toBe('/outside/wiki')
+  })
+
+  it('wiki 检查指向同一值且失败 → invalid（A3：路径腐化不静默）', () => {
+    const broken = {
+      ...options,
+      wikiCheck: { value: '/outside/wiki', ok: false, problem: 'missing' as const, location: 'outside' as const },
+    }
+    expect(startupRows({ ...EMPTY_STARTUP_SETTINGS, wiki: '/outside/wiki' }, broken)[2]?.invalid).toBe(true)
+  })
+
+  it('wiki 检查落后于设置（值不同）→ 不谎报失效', () => {
+    const stale = {
+      ...options,
+      wikiCheck: { value: '/old', ok: false, problem: 'missing' as const, location: 'outside' as const },
+    }
+    expect(startupRows({ ...EMPTY_STARTUP_SETTINGS, wiki: '/new' }, stale)[2]?.invalid).toBe(false)
+  })
+})
+
+describe('浏览器读取上限（跨两端约束）', () => {
+  it('最坏形状的 startup.json 行数 ≤ 读上限（否则 JSON 被截断 → 静默空集合）', () => {
+    const worst = serializeStartupSettings({
+      v: 1,
+      productType: 'hardware-software',
+      deliveryMode: 'managed-service',
+      wiki: '/a/very/long/external/path/to/some/wiki/directory',
+      updatedAt: '2026-11-12T00:00:00.000Z',
+    })
+    expect(worst.split('\n').length).toBeLessThanOrEqual(STARTUP_SETTINGS_READ_LIMIT)
+  })
+
+  it('最坏形状的 startup-options.json 行数 ≤ 读上限', () => {
+    const worst = serializeStartupOptions({
+      productTypes: ['business-software', 'hardware-software'],
+      deliveryModes: ['productized', 'project-services', 'managed-service'],
+      wikiCheck: { value: '/a/very/long/external/path/to/some/wiki/directory', ok: false, problem: 'no-index', location: 'outside' },
+    })
+    expect(worst.split('\n').length).toBeLessThanOrEqual(STARTUP_OPTIONS_READ_LIMIT)
   })
 })
 
 describe('parseStartupOptions / serialize', () => {
   it('坏值折成空集合，重复项去重', () => {
-    expect(parseStartupOptions('nope')).toEqual({ productTypes: [], deliveryModes: [] })
+    expect(parseStartupOptions('nope')).toEqual({ productTypes: [], deliveryModes: [], wikiCheck: EMPTY_WIKI_CHECK })
     expect(parseStartupOptions(JSON.stringify({ productTypes: ['a', 'a', ' '], deliveryModes: ['x'] })))
-      .toEqual({ productTypes: ['a'], deliveryModes: ['x'] })
+      .toEqual({ productTypes: ['a'], deliveryModes: ['x'], wikiCheck: EMPTY_WIKI_CHECK })
   })
 
   it('序列化可往返', () => {
-    const options = { productTypes: ['a'], deliveryModes: ['productized', 'b'] }
+    const options = { productTypes: ['a'], deliveryModes: ['productized', 'b'], wikiCheck: EMPTY_WIKI_CHECK }
     expect(parseStartupOptions(serializeStartupOptions(options))).toEqual(options)
   })
 

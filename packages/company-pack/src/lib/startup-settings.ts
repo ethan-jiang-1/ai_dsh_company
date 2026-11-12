@@ -10,6 +10,19 @@
  * 浏览器面读 `startup.json` 原样渲染；可选值由 host 枚举后写 `startup-options.json`（派生文件）。
  */
 
+/**
+ * 浏览器读两份 startup 文件时的行数上限（`workspaceFiles.read` 的 `limit` 是**行**数）。
+ *
+ * 为什么住这里而不是客户端常量：上限必须 ≥ `serialize*` 产出的行数，否则 JSON 被截断 →
+ * 解析折成空集合 → 面板静默显示「没有选项」。这是一条**跨两端**的约束，所以两个数字与
+ * `serialize*` 同家，并由 spec 直接断言「最坏形状的行数 ≤ 上限」。
+ * 2026-11-12 实修：`wikiCheck` 加进派生文件后 13 行 → 19 行，而客户端仍按 16 行读。
+ */
+export const STARTUP_SETTINGS_READ_LIMIT = 16
+
+/** 派生选项文件的行数上限（见 `STARTUP_SETTINGS_READ_LIMIT` 的说明）。 */
+export const STARTUP_OPTIONS_READ_LIMIT = 64
+
 /** 三个可设字段（顺序即面板行序）。 */
 export const STARTUP_FIELDS = ['productType', 'deliveryMode', 'wiki'] as const
 
@@ -39,12 +52,44 @@ export const EMPTY_STARTUP_SETTINGS: StartupSettings = Object.freeze({
 export interface StartupOptions {
   readonly productTypes: readonly string[]
   readonly deliveryModes: readonly string[]
+  /** wiki 指针的存在性检查（host 每次派生时重算；client 只渲染）。 */
+  readonly wikiCheck: WikiCheck
 }
+
+/**
+ * wiki 指针的检查结果（纯数据，浏览器安全）。
+ *
+ * 为什么 wiki 需要这个而产品类型/交付模式不需要：后两者的可选值来自 `content/` 目录枚举，
+ * 「失效」= 值不在枚举里；wiki 是**自由路径**，失效只能靠查盘——目录被改名、搬家、换机器，
+ * 指针就成了空气。不查就会把模型指向一个不存在的目录（A3）。
+ */
+export interface WikiCheck {
+  /** 被检查的值（null = 未设）。 */
+  readonly value: string | null
+  /** 目录存在、是目录、且有 `index.md`。 */
+  readonly ok: boolean
+  /** 失败原因；`ok` 时为 null。 */
+  readonly problem: WikiProblem | null
+  /** 目录在 workspace 内（agent 可写）还是外（agent 只读）；未设/失效时 null。 */
+  readonly location: 'inside' | 'outside' | null
+}
+
+/** wiki 指针失效的三种原因（A3 的三档判据）。 */
+export type WikiProblem = 'missing' | 'not-directory' | 'no-index'
+
+/** 未设 wiki 时的检查结果（不算失效）。 */
+export const EMPTY_WIKI_CHECK: WikiCheck = Object.freeze({
+  value: null,
+  ok: true,
+  problem: null,
+  location: null,
+})
 
 /** 还没有派生文件时的空集合。 */
 export const EMPTY_STARTUP_OPTIONS: StartupOptions = Object.freeze({
   productTypes: [],
   deliveryModes: [],
+  wikiCheck: EMPTY_WIKI_CHECK,
 }) as StartupOptions
 
 /** 面板一行（纯数据；文案由组件按 `t` 取）。 */
@@ -124,6 +169,23 @@ export function parseStartupOptions(text: string | null | undefined): StartupOpt
   return {
     productTypes: cleanList(record.productTypes),
     deliveryModes: cleanList(record.deliveryModes),
+    wikiCheck: parseWikiCheck(record.wikiCheck),
+  }
+}
+
+/** 解析 wiki 检查块；坏值折成「未设」（宁可显示未知，也不谎报失效）。 */
+function parseWikiCheck(value: unknown): WikiCheck {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return EMPTY_WIKI_CHECK
+  const record = value as Record<string, unknown>
+  const problem = record.problem === 'missing' || record.problem === 'not-directory' || record.problem === 'no-index'
+    ? record.problem
+    : null
+  const location = record.location === 'inside' || record.location === 'outside' ? record.location : null
+  return {
+    value: cleanScalar(record.value),
+    ok: record.ok === true,
+    problem: record.ok === true ? null : problem,
+    location,
   }
 }
 
@@ -141,7 +203,17 @@ export function serializeStartupSettings(settings: StartupSettings): string {
 
 /** 稳定序列化派生选项。 */
 export function serializeStartupOptions(options: StartupOptions): string {
-  return `${JSON.stringify({ v: 1, productTypes: [...options.productTypes], deliveryModes: [...options.deliveryModes] }, null, 2)}\n`
+  return `${JSON.stringify({
+    v: 1,
+    productTypes: [...options.productTypes],
+    deliveryModes: [...options.deliveryModes],
+    wikiCheck: {
+      value: options.wikiCheck.value,
+      ok: options.wikiCheck.ok,
+      problem: options.wikiCheck.problem,
+      location: options.wikiCheck.location,
+    },
+  }, null, 2)}\n`
 }
 
 /**
@@ -180,21 +252,25 @@ export function overrideCount(settings: StartupSettings): number {
 
 /**
  * 面板行视图（顺序 = `STARTUP_FIELDS`）。
- * `wiki` 没有枚举集（自由指针），永远不算失效。
+ * `wiki` 的失效判据与另两行不同：它不在枚举集里，而是看 host 的盘上检查（`options.wikiCheck`）。
+ * 只有「检查的就是这个值」时才判失效——检查结果落后于设置时宁可显示未知，不谎报。
  * @param settings - 当前设置。
- * @param options - host 枚举出来的可选项。
+ * @param options - host 枚举出来的可选项 + wiki 检查。
  * @returns 三行。
  */
 export function startupRows(settings: StartupSettings, options: StartupOptions): readonly StartupRow[] {
   return STARTUP_FIELDS.map((field) => {
     const value = settings[field]
     const allowed = field === 'productType' ? options.productTypes : field === 'deliveryMode' ? options.deliveryModes : null
+    const invalid = field === 'wiki'
+      ? value !== null && options.wikiCheck.value === value && !options.wikiCheck.ok
+      : value !== null && allowed !== null && !allowed.includes(value)
     return {
       field,
       value,
       isAuto: value === null,
       options: allowed ?? [],
-      invalid: value !== null && allowed !== null && !allowed.includes(value),
+      invalid,
     }
   })
 }

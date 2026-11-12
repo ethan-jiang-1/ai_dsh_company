@@ -53,6 +53,8 @@
               includeDefaultRoots: false
               customSkillDirs:
                 - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/coo/skills/', baseUrl))"
+                # 参考资料 wiki 的使用协议（2026-11-12 wiki 落地 M1）：六个角色共用一份，按需加载。
+                - !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('node_modules/dsh-company-pack/presets/_shared/wiki/skills/', baseUrl))"
                 # 角色方法层（2026-10-13 培养卡 C 路径）：本人经 /cultivation adopt 部署的做法落
                 # 公司级 <DSH_HOME>/company/methods/<role>/，新开的本角色会话加载；目录在分身
                 # workspace 沙箱之外（D25 自改否决维持）；缺目录容忍（skill-filesystem ENOENT

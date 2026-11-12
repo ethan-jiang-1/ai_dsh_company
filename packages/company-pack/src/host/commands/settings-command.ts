@@ -17,11 +17,13 @@ import {
   type StartupSettings,
 } from '../../lib/startup-settings.ts'
 import {
+  checkWikiPointer,
   enumerateStartupOptions,
   readStartupSettings,
   refreshStartupOptions,
   writeStartupSettings,
 } from '../startup/startup-store.ts'
+import type { WikiProblem } from '../../lib/startup-settings.ts'
 
 /** 用法行。 */
 export const SETTINGS_USAGE = '用法：/company-settings [show | set <productType|deliveryMode|wiki> <值|auto> | reset]'
@@ -72,6 +74,18 @@ function describe(settings: StartupSettings): string {
     .join(', ')
 }
 
+/** 失效原因的人话（zh/en 各一条；A3 要求回执点名具体问题，不能只说「失效」）。 */
+function wikiProblemText(problem: WikiProblem, text: (zh: string, en: string) => string): string {
+  switch (problem) {
+    case 'missing':
+      return text('目录不存在', 'directory does not exist')
+    case 'not-directory':
+      return text('这个路径不是目录', 'path is not a directory')
+    case 'no-index':
+      return text('目录里没有 index.md', 'directory has no index.md')
+  }
+}
+
 /** 注册 `/company-settings`。 */
 export function registerSettingsCommand(ctx: Context, options: SettingsCommandOptions): void {
   const text = options.text
@@ -95,11 +109,19 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
       const current = readStartupSettings(workspace)
       if (parsed.kind === 'show') {
         const available = enumerateStartupOptions(options.contentDir)
+        const wikiCheck = checkWikiPointer(workspace, current.wiki)
+        const wikiLine = current.wiki === null
+          ? text('wiki=auto', 'wiki=auto')
+          : wikiCheck.ok
+            ? text(`wiki=${current.wiki}（可用；${wikiCheck.location === 'inside' ? '可写' : '只读'}）`,
+              `wiki=${current.wiki} (ok; ${wikiCheck.location === 'inside' ? 'writable' : 'read-only'})`)
+            : text(`wiki=${current.wiki}（⚠ 失效：${wikiCheck.problem === null ? '未知原因' : wikiProblemText(wikiCheck.problem, text)}）`,
+              `wiki=${current.wiki} (invalid: ${wikiCheck.problem === null ? 'unknown' : wikiProblemText(wikiCheck.problem, text)})`)
         return {
           kind: 'success' as const,
           text: text(
-            `当前：${describe(current)}\n可选 产品类型：${available.productTypes.join(' / ') || '（无）'}\n可选 交付模式：${available.deliveryModes.join(' / ') || '（无）'}`,
-            `Current: ${describe(current)}\nProduct types: ${available.productTypes.join(' / ') || '(none)'}\nDelivery modes: ${available.deliveryModes.join(' / ') || '(none)'}`,
+            `当前：${describe(current)}\n${wikiLine}\n可选 产品类型：${available.productTypes.join(' / ') || '（无）'}\n可选 交付模式：${available.deliveryModes.join(' / ') || '（无）'}`,
+            `Current: ${describe(current)}\n${wikiLine}\nProduct types: ${available.productTypes.join(' / ') || '(none)'}\nDelivery modes: ${available.deliveryModes.join(' / ') || '(none)'}`,
           ),
         }
       }
@@ -138,11 +160,21 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
       }
       writeStartupSettings(workspace, parseStartupSettings(JSON.stringify(next)))
       refreshStartupOptions(workspace, options.contentDir)
+      // A3：wiki 指针写进去就查一次——失效要说出来，不能等模型去 read 一个空气目录。
+      const wikiWarning = parsed.field === 'wiki' && parsed.value !== null
+        ? (() => {
+            const check = checkWikiPointer(workspace, parsed.value)
+            if (check.ok) return ''
+            const why = check.problem === null ? '' : `：${wikiProblemText(check.problem, text)}`
+            return text(`\n⚠ 这个 wiki 指针暂时不可用${why}；修好目录或 index.md 前，角色会被告知「指针失效」。`,
+              `\nWarning: this wiki pointer is not usable${check.problem === null ? '' : `: ${wikiProblemText(check.problem, text)}`}; until the directory and index.md exist, roles are told the pointer is invalid.`)
+          })()
+        : ''
       return {
         kind: 'success' as const,
         text: text(
-          `已设置 ${parsed.field} = ${parsed.value ?? 'auto'}；下一轮生效。`,
-          `Set ${parsed.field} = ${parsed.value ?? 'auto'}; effective next turn.`,
+          `已设置 ${parsed.field} = ${parsed.value ?? 'auto'}；下一轮生效。${wikiWarning}`,
+          `Set ${parsed.field} = ${parsed.value ?? 'auto'}; effective next turn.${wikiWarning}`,
         ),
       }
     },

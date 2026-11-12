@@ -71,8 +71,14 @@ export function run({ root, ok, fail }) {
     fail('shipped-links', `${CONTENT} 不在盘上——随包分发的只读内容（手册/模板/默认章程/状态默认值）不许消失；发布面会少一整层`)
     return
   }
+  // `content/wiki-template/` 是**被拷贝出去**的起点，不是随包被角色阅读的内容：它的相对链接
+  // （`../index.md`）解析目标是**拷贝后的那份 wiki**，按安装读者视角判必然假红。它的链接完整性
+  // 由 `tests/content/wiki-template.spec.ts` 守（index→示例页在盘上、无仓库绝对路径）。
+  // 负例留证 2026-11-12（建模板当天实跑）：纳入扫描 → `.dsh-company`... 八条
+  // 「链接指向仓库/穿出 workspace」；排除后绿。spec 侧反证：把 index 的链接改名 → spec 红。
   const files = [
-    ...mdFiles(contentRoot).map(rel => ({ rel: `${CONTENT}/${rel}`, file: join(contentRoot, rel), kind: 'content' })),
+    ...mdFiles(contentRoot).filter(rel => !rel.startsWith('wiki-template/'))
+      .map(rel => ({ rel: `${CONTENT}/${rel}`, file: join(contentRoot, rel), kind: 'content' })),
     ...mdFiles(presetsRoot).filter(rel => rel.split('/').includes('skills')).map(rel => ({ rel: `${PRESETS}/${rel}`, file: join(presetsRoot, rel), kind: 'skill' })),
   ]
   const problems = []

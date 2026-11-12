@@ -47,9 +47,12 @@ const roleSkills = (role) => {
     .filter(entry => entry.isDirectory())
     .map(entry => entry.name)
   const yml = readFileSync(join(presetDir, 'agent.cordis.yml'), 'utf8')
+  // 共享 skill 根 = 本包认可的「一处内容、多角色挂载」目录。新增一个共享根时**必须**在这里登记，
+  // 否则「只看见自己的 skills」会把正当的共享 skill 报成组合泄漏（2026-11-12 wiki 协议 skill 首跑即红）。
   const sharedRoots = [
     ['presets/_shared/skills/', join(ROOT, 'packages/company-pack/presets/_shared/skills')],
     ['presets/_shared/delegation/skills/', join(ROOT, 'packages/company-pack/presets/_shared/delegation/skills')],
+    ['presets/_shared/wiki/skills/', join(ROOT, 'packages/company-pack/presets/_shared/wiki/skills')],
   ]
   const shared = sharedRoots.flatMap(([token, dir]) => yml.includes(token)
     ? readdirSync(dir, { withFileTypes: true })

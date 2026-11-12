@@ -33,7 +33,13 @@ import { DelegationCard } from './ui/DelegationCard.tsx'
 import { installStyles } from './ui/styles.ts'
 import { createStartupStore } from './startup/startup-store.ts'
 import { StrategyButton } from './startup/StrategyButton.tsx'
-import { parseStartupOptions, parseStartupSettings, type StartupField } from '../lib/startup-settings.ts'
+import {
+  parseStartupOptions,
+  parseStartupSettings,
+  STARTUP_OPTIONS_READ_LIMIT,
+  STARTUP_SETTINGS_READ_LIMIT,
+  type StartupField,
+} from '../lib/startup-settings.ts'
 import type { SaveResult } from './startup/StrategyPanel.tsx'
 import { createErrorRelay, installErrorCapture, type ClientErrorEntry, type ErrorCaptureTarget } from './wiring/error-ring.ts'
 import { ROLE_SHORT, RoleBadge, readPresetOf, sessionTitleOf } from './ui/RoleBadge.tsx'
@@ -146,8 +152,8 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
     // 启动策略：读走 workspaceFiles（无日志噪声），写走 /company-settings 命令；
     // 面板与 composer 按钮共享一个仓，保存后按钮当帧跟着变。
     const startupStore = createStartupStore()
-    const readStartupText = readWorkspaceText(WORKSPACE_TEXT_PATHS.startup, 8)
-    const readStartupOptionsText = readWorkspaceText(WORKSPACE_TEXT_PATHS.startupOptions, 16)
+    const readStartupText = readWorkspaceText(WORKSPACE_TEXT_PATHS.startup, STARTUP_SETTINGS_READ_LIMIT)
+    const readStartupOptionsText = readWorkspaceText(WORKSPACE_TEXT_PATHS.startupOptions, STARTUP_OPTIONS_READ_LIMIT)
     const loadStartup = async (sessionId: SessionId, signal: AbortSignal): Promise<void> => {
       const [settingsText, optionsText] = await Promise.all([
         readStartupText(sessionId, signal),

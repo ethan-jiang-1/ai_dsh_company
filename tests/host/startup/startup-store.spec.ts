@@ -13,6 +13,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import {
+  checkWikiPointer,
   enumerateStartupOptions,
   readStartupOptions,
   readStartupSettings,
@@ -76,15 +77,50 @@ describe('enumerate / refresh options', () => {
     mkdirSync(join(content, 'product-types', 'b-type'), { recursive: true })
     mkdirSync(join(content, 'product-types', 'a-type'), { recursive: true })
     mkdirSync(join(content, 'delivery-modes', 'managed-service'), { recursive: true })
-    expect(enumerateStartupOptions(content)).toEqual({
+    expect(enumerateStartupOptions(content)).toMatchObject({
       productTypes: ['a-type', 'b-type'],
       deliveryModes: ['productized', 'managed-service'],
     })
   })
 
   it('内容目录缺失 → 空产品类型 + 只有隐式 productized', () => {
-    expect(enumerateStartupOptions(workspace())).toEqual({ productTypes: [], deliveryModes: ['productized'] })
-    expect(enumerateStartupOptions(undefined)).toEqual({ productTypes: [], deliveryModes: [] })
+    expect(enumerateStartupOptions(workspace())).toMatchObject({ productTypes: [], deliveryModes: ['productized'] })
+    expect(enumerateStartupOptions(undefined).productTypes).toEqual([])
+    expect(enumerateStartupOptions(undefined).deliveryModes).toEqual([])
+  })
+
+  it('wiki 检查三档：目录不存在 / 不是目录 / 缺 index.md（A3）', () => {
+    const root = workspace()
+    expect(checkWikiPointer(root, 'no-such')).toMatchObject({ ok: false, problem: 'missing' })
+    writeFileSync(join(root, 'a-file'), 'x')
+    expect(checkWikiPointer(root, 'a-file')).toMatchObject({ ok: false, problem: 'not-directory' })
+    mkdirSync(join(root, 'empty-dir'), { recursive: true })
+    expect(checkWikiPointer(root, 'empty-dir')).toMatchObject({ ok: false, problem: 'no-index' })
+    mkdirSync(join(root, 'good'), { recursive: true })
+    writeFileSync(join(root, 'good', 'index.md'), '# index\n')
+    expect(checkWikiPointer(root, 'good')).toEqual({ value: 'good', ok: true, problem: null, location: 'inside' })
+  })
+
+  it('wiki 位置：workspace 内 → inside；绝对外路径 → outside；未设 → null', () => {
+    const root = workspace()
+    mkdirSync(join(root, 'in'), { recursive: true })
+    writeFileSync(join(root, 'in', 'index.md'), '# i\n')
+    expect(checkWikiPointer(root, 'in').location).toBe('inside')
+    const outside = mkdtempSync(join(tmpdir(), 'zz-wiki-out-'))
+    writeFileSync(join(outside, 'index.md'), '# o\n')
+    expect(checkWikiPointer(root, outside).location).toBe('outside')
+    expect(checkWikiPointer(root, null)).toEqual({ value: null, ok: true, problem: null, location: null })
+  })
+
+  it('refresh 把当前 wiki 检查一起落盘（派生文件带 wikiCheck）', () => {
+    const root = workspace()
+    const content = workspace()
+    mkdirSync(join(root, 'wiki'), { recursive: true })
+    writeFileSync(join(root, 'wiki', 'index.md'), '# i\n')
+    writeStartupSettings(root, { ...EMPTY_STARTUP_SETTINGS, wiki: 'wiki' })
+    const options = refreshStartupOptions(root, content)
+    expect(options.wikiCheck).toMatchObject({ value: 'wiki', ok: true, location: 'inside' })
+    expect(readStartupOptions(root).wikiCheck).toMatchObject({ value: 'wiki', ok: true })
   })
 
   it('refresh 落派生文件，读回一致', () => {
