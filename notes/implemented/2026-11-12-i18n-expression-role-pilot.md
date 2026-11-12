@@ -202,6 +202,12 @@
 - LedgerSummary 传 t；默认 t 带插值，旧 zh 测试不破。
 - en 静态渲染断言；client 378 tests；金样 9 页签 ALL PASS；全量 1653 tests，verify ALL PASS。
 
+## P0 UI 第八批（工具卡/委托卡）
+
+- DelegationCard/TeamToolCard 迁 delegation.*/teamCard.*；状态/抬头/展开收起/结果/轨迹。
+- TeamToolCard 加 title/detail token（纯函数保留中文 title 给旧测试）；toolview 注册 locale。
+- en 静态渲染断言；client 379 tests；金样 9 页签 ALL PASS；全量 1654 tests，verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

@@ -4,17 +4,17 @@ import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
 import { cardStateOf, parseArgsObject, resultTextOf, textOf, type CardState } from '../../lib/tool-card.ts'
 import { DELEGATION_TOOL_ROLES, type RoleId } from '../../lib/role-copy.ts'
-import type { CompanyT } from '../locales.ts'
+import type { CompanyKey, CompanyT } from '../locales.ts'
 import { roleText } from '../roles.ts'
 
 /** 卡片生命周期（S2 起与团队工具卡共用同一实现，见 `lib/tool-card.ts`）。 */
 export type { CardState }
 
-const STATE_LABEL: Record<CardState, string> = {
-  running: '等职能出稿…',
-  ok: '已交稿',
-  error: '委派失败',
-  stopped: '已中止',
+const STATE_KEYS: Record<CardState, CompanyKey> = {
+  running: 'delegation.running',
+  ok: 'delegation.ok',
+  error: 'delegation.error',
+  stopped: 'delegation.stopped',
 }
 
 /** brief 的两段：`description` 是短标题，`prompt` 是完整任务（dsh-tool-subagent 的 schema 字段）。 */
@@ -94,10 +94,10 @@ export function DelegationCard({ toolName, block, inspect, t }: ToolCallViewProp
       onClick={expandable ? toggle : undefined}
       onKeyDown={expandable ? toggleFromKeyboard : undefined}
     >
-      <span className="wk-delegation-role">委派 {role}</span>
-      <span className="wk-delegation-state">{STATE_LABEL[state]}</span>
+      <span className="wk-delegation-role">{t('delegation.assigned', { role })}</span>
+      <span className="wk-delegation-state">{t(STATE_KEYS[state])}</span>
       <span style={{ flex: 1 }} />
-      {expandable && <span className="wk-delegation-state">{open ? '收起' : '展开'}</span>}
+      {expandable && <span className="wk-delegation-state">{open ? t('delegation.collapse') : t('delegation.expand')}</span>}
     </div>
   )
 
@@ -110,13 +110,13 @@ export function DelegationCard({ toolName, block, inspect, t }: ToolCallViewProp
       </div>
       {open && output !== null ? (
         <div className="wk-mt-sm">
-          <div className="wk-delegation-state">VP 交回的稿子</div>
+          <div className="wk-delegation-state">{t('delegation.output')}</div>
           <pre className="wk-delegation-result" data-role="delegation-result">{output}</pre>
         </div>
       ) : null}
       {open && inspect !== undefined ? (
         <div className="wk-delegation-actions">
-          <Button size="sm" variant="outline" onClick={inspect}>查看轨迹</Button>
+          <Button size="sm" variant="outline" onClick={inspect}>{t('delegation.inspect')}</Button>
         </div>
       ) : null}
     </div>

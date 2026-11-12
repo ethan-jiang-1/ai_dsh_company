@@ -33,8 +33,12 @@ const settled = (argsRaw: string, text: string, extra: Record<string, unknown> =
   ...extra,
 } as unknown as Block)
 
-const t = ((key: keyof typeof zh) => zh[key]) as CompanyT
-const tEn = ((key: keyof typeof en) => en[key]) as CompanyT
+const withParams = (dict: Record<string, string>) => ((key: keyof typeof zh, params?: Record<string, string | number>) => {
+  const template = dict[key] ?? ''
+  return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+}) as CompanyT
+const t = withParams(zh)
+const tEn = withParams(en)
 
 const BRIEF = JSON.stringify({ description: '技术可行性评估', prompt: '评估可复制交付包的技术可行性，一页纸。' })
 

@@ -6,6 +6,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { TEAM_TOOL_KEYS, TeamToolCard, teamCardModel } from '../../../packages/company-pack/src/client/ui/TeamToolCard.tsx'
+import { en, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 
 type Block = Parameters<typeof teamCardModel>[1]
 
@@ -24,6 +25,11 @@ const settled = (name: string, argsRaw: string, text: string): Block => ({
   isError: false,
   subCalls: [],
 } as unknown as Block)
+
+const tEn = ((key: keyof typeof en, params?: Record<string, string | number>) => {
+  const template = en[key]
+  return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+}) as CompanyT
 
 describe('团队工具卡（S2 keyless：纯函数视图模型）', () => {
   it('spawn_teammate：抬头「派活 · <成员名>」，细节取 description', () => {
@@ -71,6 +77,15 @@ describe('团队工具卡（S2 keyless：纯函数视图模型）', () => {
     const model = teamCardModel('team_task_list', settled('team_task_list', '{}', 'task-1 待办 / task-2 进行中'))
     expect(model.state).toBe('ok')
     expect(model.output).toBe('task-1 待办 / task-2 进行中')
+  })
+
+  it('en：card title 走字典，不显示中文抬头', () => {
+    const html = renderToStaticMarkup(createElement(TeamToolCard, {
+      toolName: 'spawn_teammate',
+      block: running('spawn_teammate', JSON.stringify({ name: 'vp-sales', description: 'Market' })),
+      t: tEn,
+    } as Parameters<typeof TeamToolCard>[0]))
+    expect(html).toContain('Spawn · vp-sales')
   })
 
   it('组件能静态渲染出抬头文案（不需要浏览器）', () => {

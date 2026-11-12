@@ -47,6 +47,7 @@ opened: 2026-11-12
 - 协作动态结构化 token：`ActivityEntry.token` + presence.activity.* 字典；en 不再显示 lib 中文 text。
 - 台账双语：标题/刷新/统计/行 aria/成品标记/维护说明/摘要全文入口；kind 走 catalog.type.*；client 377 passed；金样仍一致。
 - 成品页双语：统计/筛选/空态/分组/行 aria/结果标签/打开/footer/索引错误；LedgerSummary 传 t；client 378 passed；金样仍一致。
+- 工具卡/委托卡双语：状态/抬头/展开收起/结果/查看轨迹；TeamToolCard 加 title/detail token；client 379 passed；金样仍一致。
 
 **剩余**：
 - `content/templates/meta.md`、`prd.md`（2 个）。

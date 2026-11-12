@@ -228,7 +228,7 @@ function registerToolCards(ctx: ClientContext): void {
     }
     for (const key of TEAM_TOOL_KEYS) {
       scoped.slots.inject('tool.call.toolview', () =>
-        scoped.slots.register({ name: 'tool.call.toolview', key, priority: -1 }, TeamToolCard))
+        scoped.slots.register({ name: 'tool.call.toolview', key, priority: -1, locale: COMPANY_NS }, TeamToolCard))
     }
   })
 }
