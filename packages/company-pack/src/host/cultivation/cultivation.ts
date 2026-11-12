@@ -157,12 +157,13 @@ interface CultivationCommandContext {
   readonly storage: CultivationStorage
   readonly ctx: Context
   readonly roleLabel: (role: string) => string
+  readonly resultLabel: (result: string) => string
 }
 
 type CultivationCommandResult = { readonly kind: 'error' | 'success'; readonly text: string }
 
 /** 命令行为只依赖会话输入、配置与培养存储；Cordis 注册留在外层适配器。 */
-function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel) {
+function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result) {
   return async ({ agent, rawInput }: { readonly agent?: AgentLike, readonly rawInput: string }) => {
     const face = sessionFaceOf(agent)
     if (face === null) {
@@ -181,42 +182,42 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
     // correct [--context=<token>] <期望行为一句话> :: <做法与证据正文>
     // suggest <角色> [--context=<token>] <期望行为一句话> :: <建议与证据>
     if (sub === 'correct' || sub === 'suggest') {
-      return commandCorrectOrSuggest({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, sub, tokens, body)
+      return commandCorrectOrSuggest({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, sub, tokens, body)
     }
 
     // adopt <id> [as <slug>]
     if (sub === 'adopt') {
-      return commandAdopt({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, tokens)
+      return commandAdopt({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, tokens)
     }
 
     // reject <id> :: <理由>
     if (sub === 'reject') {
-      return commandReject({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, tokens, body)
+      return commandReject({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, tokens, body)
     }
 
     // verify <id> <pass|fail> :: <后续相似工作的具体依据>
     if (sub === 'verify') {
-      return commandVerify({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, tokens, body)
+      return commandVerify({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, tokens, body)
     }
 
     // archive <days>：只归档已处理记录，open 不动（人工保留策略）
     if (sub === 'archive') {
-      return commandArchive({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, tokens)
+      return commandArchive({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, tokens)
     }
 
     // purge <days>：只清 records-archive 里的旧记录，不动 live records
     if (sub === 'purge') {
-      return commandPurge({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, tokens)
+      return commandPurge({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, tokens)
     }
 
     // check：只报告孤儿（不自动删/改）
     if (sub === 'check') {
-      return commandCheck({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel })
+      return commandCheck({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel })
     }
 
     // revoke <slug>
     if (sub === 'revoke') {
-      return commandRevoke({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, tokens)
+      return commandRevoke({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, tokens)
     }
 
     return {
@@ -267,7 +268,7 @@ async function commandCorrectOrSuggest(
     if (!decoded.ok) return { kind: 'error', text: decoded.problem }
     const item = decoded.command.items[0]
     if (item === undefined) return { kind: 'error', text: '背景只能带一段（v1）。' }
-    const read = await readContext(ctx, root, item, command.roleLabel)
+    const read = await readContext(ctx, root, item, command.roleLabel, command.resultLabel)
     if ('problem' in read) return { kind: 'error', text: read.problem }
     contexts = [read.context]
   }
@@ -597,7 +598,7 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
 }
 
 /** 「/cultivation」命令族与提案工具的注册面。 */
-export function registerCultivation(ctx: Context, config: CultivationHostConfig, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel): void {
+export function registerCultivation(ctx: Context, config: CultivationHostConfig, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result): void {
   const storage = nodeCultivationStorage
   if (!dataBlocked && companyHome !== undefined && config.cultivationRoot !== undefined) {
     try {
@@ -707,6 +708,6 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
     name: 'cultivation',
     description: '培养回路：给自己的角色提交纠正、给别的角色提建议、采纳/拒绝/验证/撤回方法（采纳仅目标角色本人）',
     input: { hint: 'correct <期望行为> :: <做法与证据> | suggest <角色> <期望行为> :: <建议> | adopt <id> [as <slug>] | reject <id> :: <理由> | verify <id> <pass|fail> :: <后续相似工作的具体依据> | revoke <slug>' },
-    handler: cultivationCommandHandler(config, storage, ctx, companyHome, dataBlocked, blockedReason, roleLabel),
+    handler: cultivationCommandHandler(config, storage, ctx, companyHome, dataBlocked, blockedReason, roleLabel, resultLabel),
   })
 }

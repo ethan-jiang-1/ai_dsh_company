@@ -22,65 +22,65 @@
       "path": ".dsh-company/deliverables/2026-10-07-theta/final.md",
       "ledgered": false,
       "presented": null,
-      "metaProblem": "缺行「类型:」；结果不在词表：「未知值」"
+      "metaProblem": "缺行「type:」；result 不在词表：「未知值」"
     },
     {
       "slug": "eta",
       "kickoff": "2026-10-06",
       "type": "",
-      "result": "已采纳",
+      "result": "accepted",
       "summary": "",
       "root": ".dsh-company/deliverables",
       "dir": "2026-10-06-eta",
       "path": ".dsh-company/deliverables/2026-10-06-eta/final.md",
       "ledgered": true,
       "presented": true,
-      "metaProblem": "缺行「类型:」"
+      "metaProblem": "缺行「type:」"
     },
     {
       "slug": "zeta",
       "kickoff": "2026-10-05",
       "type": "",
-      "result": "判不了",
+      "result": "undecidable",
       "summary": "",
       "root": ".dsh-company/deliverables",
       "dir": "2026-10-05-zeta",
       "path": ".dsh-company/deliverables/2026-10-05-zeta/final.md",
       "ledgered": false,
       "presented": null,
-      "metaProblem": "缺行「类型:」"
+      "metaProblem": "缺行「type:」"
     },
     {
       "slug": "epsilon",
       "kickoff": "2026-10-04",
       "type": "",
-      "result": "已废弃",
+      "result": "obsolete",
       "summary": "",
       "root": ".dsh-company/deliverables",
       "dir": "2026-10-04-epsilon",
       "path": ".dsh-company/deliverables/2026-10-04-epsilon/final.md",
       "ledgered": false,
       "presented": false,
-      "metaProblem": "缺行「类型:」"
+      "metaProblem": "缺行「type:」"
     },
     {
       "slug": "delta",
       "kickoff": "2026-10-03",
       "type": "",
-      "result": "已搁置",
+      "result": "deferred",
       "summary": "",
       "root": ".dsh-company/deliverables",
       "dir": "2026-10-03-delta",
       "path": ".dsh-company/deliverables/2026-10-03-delta/final.md",
       "ledgered": false,
       "presented": null,
-      "metaProblem": "缺行「类型:」"
+      "metaProblem": "缺行「type:」"
     },
     {
       "slug": "beta",
       "kickoff": "2026-10-02",
-      "type": "诊断",
-      "result": "进行中",
+      "type": "diagnostic",
+      "result": "in-progress",
       "summary": "乙",
       "root": ".dsh-company/deliverables",
       "dir": "2026-10-02-beta",
@@ -92,8 +92,8 @@
     {
       "slug": "alpha",
       "kickoff": "2026-10-01",
-      "type": "决策",
-      "result": "已完成",
+      "type": "decision",
+      "result": "completed",
       "summary": "甲",
       "root": ".dsh-company/deliverables",
       "dir": "2026-10-01-alpha",
@@ -106,14 +106,14 @@
       "slug": "gamma",
       "kickoff": "2026-09-30",
       "type": "",
-      "result": "已否决",
+      "result": "rejected",
       "summary": "",
       "root": ".dsh-company/deliverables-archive",
       "dir": "2026-09-30-gamma",
       "path": ".dsh-company/deliverables-archive/2026-09-30-gamma/final.md",
       "ledgered": true,
       "presented": null,
-      "metaProblem": "缺行「类型:」"
+      "metaProblem": "缺行「type:」"
     }
   ]
 }

@@ -137,7 +137,7 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
       writeFileSync(join(workspace, '.dsh-company/kb', 'deliverables-index.json'), JSON.stringify({
         schema: 1,
         entries: [{
-          slug: 'budget-review', result: '已采纳', kickoff: '2026-10-22',
+          slug: 'budget-review', result: 'accepted', kickoff: '2026-10-22',
           summary: '结论：先列假设，再给数字。', path: '.dsh-company/deliverables/budget-review/final.md',
         }],
       }))
@@ -146,8 +146,8 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
         `suggest cfo --context=${tokenOf({ kind: 'deliverable', ref: '.dsh-company/deliverables/budget-review/final.md' }, 'suggest')} 结论先列假设 ::`)
       expect(ok).toMatchObject({ kind: 'success' })
       const record = recordsOf(workspace)[0]!
-      expect(record.contexts?.[0]).toMatchObject({ kind: 'deliverable', title: 'budget-review', subtitle: '已采纳' })
-      expect(record.source).toBe('成品「budget-review」（已采纳）')
+      expect(record.contexts?.[0]).toMatchObject({ kind: 'deliverable', title: 'budget-review', subtitle: 'accepted' })
+      expect(record.source).toBe('成品「budget-review」（accepted）')
 
       const missing = await invokeCultivation(command, 'ceo', workspace,
         `suggest cfo --context=${tokenOf({ kind: 'deliverable', ref: '.dsh-company/deliverables/nope/final.md' }, 'suggest')} 期望 ::`)

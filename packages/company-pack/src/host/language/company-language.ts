@@ -103,3 +103,20 @@ export function createCompanyLanguage(ctx: Context): CompanyLanguageState {
   bindSettings(ctx, state)
   return state
 }
+
+
+/** 成品结果 → 表达层文案；未知值原样（catalog 的 machine value 不猜）。 */
+const RESULT_LABELS: Readonly<Record<string, { readonly zh: string; readonly en: string }>> = {
+  'in-progress': { zh: '进行中', en: 'In progress' },
+  accepted: { zh: '已采纳', en: 'Accepted' },
+  rejected: { zh: '已否决', en: 'Rejected' },
+  deferred: { zh: '已搁置', en: 'Deferred' },
+  obsolete: { zh: '已废弃', en: 'Obsolete' },
+  undecidable: { zh: '判不了', en: 'Undecidable' },
+  completed: { zh: '已完成', en: 'Completed' },
+}
+
+/** 成品结果标签；未知值原样。 */
+export function resultLabelFor(result: string, language: 'zh' | 'en'): string {
+  return RESULT_LABELS[result]?.[language] ?? result
+}

@@ -42,7 +42,7 @@ function deliverable(root: string, dir = `${RUN_BUNDLE_PATHS.deliverables}/2026-
   const path = join(root, dir)
   mkdirSync(path, { recursive: true })
   writeFileSync(join(path, 'final.md'), '# final\n')
-  writeFileSync(join(path, 'meta.md'), 'slug: alpha\nkickoff: 2026-10-25\n类型: 决策\n结果: 已完成\n一句话结论: 做完了\n')
+  writeFileSync(join(path, 'meta.md'), 'slug: alpha\nkickoff: 2026-10-25\ntype: decision\nresult: completed\n一句话结论: 做完了\n')
   return path
 }
 
@@ -52,9 +52,9 @@ afterEach(() => {
 
 describe('meta/catalog 纯逻辑', () => {
   it('解析中文字段与首现值，剥日期前缀', () => {
-    const meta = parseMeta('slug: alpha\n类型: 决策\n结果: 已完成\n落地事件: 第一版\n')
-    expect(meta.fields.get('类型')).toBe('决策')
-    expect(meta.fields.get('结果')).toBe('已完成')
+    const meta = parseMeta('slug: alpha\ntype: decision\nresult: completed\n落地事件: 第一版\n')
+    expect(meta.fields.get('type')).toBe('decision')
+    expect(meta.fields.get('result')).toBe('completed')
     expect(slugFromDirName('2026-10-25-alpha')).toBe('alpha')
   })
 
@@ -231,9 +231,9 @@ describe('host catalog', () => {
   it('meta 缺行/枚举外标出 metaProblem，不冒充形状通过', () => {
     const root = workspace()
     const dir = deliverable(root)
-    writeFileSync(join(dir, 'meta.md'), 'slug: alpha\nkickoff: 2026-10-25\n类型: 决策\n结果: 完成\n')
+    writeFileSync(join(dir, 'meta.md'), 'slug: alpha\nkickoff: 2026-10-25\ntype: decision\nresult: complete\n')
     const catalog = regenerateCatalog(root).catalog
-    expect(catalog?.entries[0]?.metaProblem).toContain('结果不在词表')
+    expect(catalog?.entries[0]?.metaProblem).toContain('result 不在词表')
   })
 
   it('host 生成物可被页签 parser 解析（schema 边界）', () => {

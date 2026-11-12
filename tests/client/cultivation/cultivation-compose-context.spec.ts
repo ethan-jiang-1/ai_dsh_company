@@ -40,7 +40,7 @@ function stubSources(over: Partial<CultivationContextSources> = {}): Cultivation
     listSessions: () => ({ ok: true, value: [currentRow] }),
     listDeliverables: async () => ({
       ok: true,
-      value: [{ slug: 'budget-review', result: '已采纳', kickoff: '2026-10-22', path: 'deliverables/budget-review/final.md', summary: '结论：先列假设。' }],
+      value: [{ slug: 'budget-review', result: 'accepted', kickoff: '2026-10-22', path: 'deliverables/budget-review/final.md', summary: '结论：先列假设。' }],
     }),
     readPreview: async () => ({ ok: true, turn: { turn: 1, text: '用户：收口前把未决项列一下\n分身：已收口' } }),
     ...over,

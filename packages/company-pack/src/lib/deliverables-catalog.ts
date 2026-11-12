@@ -12,9 +12,9 @@ export const CATALOG_ROOTS = [RUN_BUNDLE_PATHS.deliverables, RUN_BUNDLE_PATHS.ar
 export type CatalogRoot = (typeof CATALOG_ROOTS)[number]
 
 /** 动议分型（唯一词表；模板与校验共用）。 */
-export const META_TYPES = ['决策', '生产', '诊断', '口径问答'] as const
+export const META_TYPES = ['decision', 'production', 'diagnostic', 'qa'] as const
 /** 决议结果词表（跨型共用）。 */
-export const META_RESULTS = ['进行中', '已采纳', '已否决', '已搁置', '已废弃', '判不了', '已完成'] as const
+export const META_RESULTS = ['in-progress', 'accepted', 'rejected', 'deferred', 'obsolete', 'undecidable', 'completed'] as const
 
 export interface MetaFields {
   readonly fields: ReadonlyMap<string, string>
@@ -94,15 +94,15 @@ export interface CatalogScanEntry {
 /** meta 形状检查（与仓库 `deliverables-check` 的核心词表一致；缺行/枚举外/日期格式）。 */
 export function metaProblemsOf(fields: ReadonlyMap<string, string>): string[] {
   const problems: string[] = []
-  for (const key of ['kickoff', '类型', '结果']) {
+  for (const key of ['kickoff', 'type', 'result']) {
     if (!fields.has(key)) problems.push(`缺行「${key}:」`)
   }
   const kickoff = fields.get('kickoff') ?? ''
   if (kickoff !== '' && !/^\d{4}-\d{2}-\d{2}$/.test(kickoff)) problems.push(`kickoff 不是 YYYY-MM-DD：「${kickoff}」`)
-  const type = fields.get('类型') ?? ''
-  if (type !== '' && !META_TYPES.some(value => value === type)) problems.push(`类型不在词表：「${type}」`)
-  const result = fields.get('结果') ?? ''
-  if (result !== '' && !META_RESULTS.some(value => value === result)) problems.push(`结果不在词表：「${result}」`)
+  const type = fields.get('type') ?? ''
+  if (type !== '' && !META_TYPES.some(value => value === type)) problems.push(`type 不在词表：「${type}」`)
+  const result = fields.get('result') ?? ''
+  if (result !== '' && !META_RESULTS.some(value => value === result)) problems.push(`result 不在词表：「${result}」`)
   return problems
 }
 
@@ -120,8 +120,8 @@ export function buildDeliverablesCatalog(input: {
     rows.push({
       slug,
       kickoff: entry.fields.get('kickoff') ?? '',
-      type: entry.fields.get('类型') ?? '',
-      result: entry.fields.get('结果') ?? '',
+      type: entry.fields.get('type') ?? '',
+      result: entry.fields.get('result') ?? '',
       summary: entry.fields.get('一句话结论') ?? '',
       root: entry.root,
       dir: entry.dir,

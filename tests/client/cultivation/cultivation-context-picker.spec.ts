@@ -33,7 +33,7 @@ const recent: ContextSessionRow = {
   sessionId: 'session-alpha', title: 'Alpha 定价复盘', role: 'cfo', member: false, at: 2, current: false, ref: {} as never,
 }
 const deliverable: ContextDeliverableRow = {
-  slug: 'pricing-alpha', result: '已完成', kickoff: '2026-10-30', path: '.dsh-company/deliverables/pricing-alpha/final.md', summary: 'Alpha 定价结论',
+  slug: 'pricing-alpha', result: 'completed', kickoff: '2026-10-30', path: '.dsh-company/deliverables/pricing-alpha/final.md', summary: 'Alpha 定价结论',
 }
 
 function props(over: Record<string, unknown> = {}) {

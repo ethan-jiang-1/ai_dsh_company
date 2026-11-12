@@ -29,7 +29,7 @@ describe('两个 workspace 的 run bundle 隔离', () => {
       writeFileSync(join(wb, RUN_BUNDLE_PATHS.company), '公司名: Beta\n')
       mkdirSync(join(wa, RUN_BUNDLE_PATHS.deliverables, '2026-10-26-a'), { recursive: true })
       writeFileSync(join(wa, RUN_BUNDLE_PATHS.deliverables, '2026-10-26-a/final.md'), '# a\n')
-      writeFileSync(join(wa, RUN_BUNDLE_PATHS.deliverables, '2026-10-26-a/meta.md'), 'slug: a\nkickoff: 2026-10-26\n类型: 决策\n结果: 已完成\n')
+      writeFileSync(join(wa, RUN_BUNDLE_PATHS.deliverables, '2026-10-26-a/meta.md'), 'slug: a\nkickoff: 2026-10-26\ntype: decision\nresult: completed\n')
       const pa = planBundleManifest({ dshHome: a, workspace: wa, pack: PACK })
       const pb = planBundleManifest({ dshHome: b, workspace: wb, pack: PACK })
       expect(pa.manifest.id).not.toBe(pb.manifest.id)

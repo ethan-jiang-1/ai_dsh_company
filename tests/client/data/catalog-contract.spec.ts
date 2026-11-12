@@ -31,14 +31,14 @@ const INPUT = {
   generatedAt: '2026-10-23T00:00:00.000Z',
   ledgerSlugs: new Set(['alpha', 'gamma', 'eta']),
   entries: [
-    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-01-alpha', fields: new Map([['slug', 'alpha'], ['kickoff', '2026-10-01'], ['类型', '决策'], ['结果', '已完成'], ['一句话结论', '甲']]), final: true, presented: true },
-    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-02-beta', fields: new Map([['kickoff', '2026-10-02'], ['类型', '诊断'], ['结果', '进行中'], ['一句话结论', '乙']]), final: true, presented: false },
-    { root: RUN_BUNDLE_PATHS.archive, dir: '2026-09-30-gamma', fields: new Map([['slug', 'gamma'], ['kickoff', '2026-09-30'], ['结果', '已否决']]), final: true, presented: null },
-    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-03-delta', fields: new Map([['slug', 'delta'], ['kickoff', '2026-10-03'], ['结果', '已搁置']]), final: true, presented: undefined },
-    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-04-epsilon', fields: new Map([['slug', 'epsilon'], ['kickoff', '2026-10-04'], ['结果', '已废弃']]), final: true, presented: false },
-    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-05-zeta', fields: new Map([['slug', 'zeta'], ['kickoff', '2026-10-05'], ['结果', '判不了']]), final: true, presented: null },
-    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-06-eta', fields: new Map([['slug', 'eta'], ['kickoff', '2026-10-06'], ['结果', '已采纳']]), final: true, presented: true },
-    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-07-theta', fields: new Map([['slug', 'theta'], ['kickoff', '2026-10-07'], ['结果', '未知值']]), final: true, presented: undefined },
+    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-01-alpha', fields: new Map([['slug', 'alpha'], ['kickoff', '2026-10-01'], ['type', 'decision'], ['result', 'completed'], ['一句话结论', '甲']]), final: true, presented: true },
+    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-02-beta', fields: new Map([['kickoff', '2026-10-02'], ['type', 'diagnostic'], ['result', 'in-progress'], ['一句话结论', '乙']]), final: true, presented: false },
+    { root: RUN_BUNDLE_PATHS.archive, dir: '2026-09-30-gamma', fields: new Map([['slug', 'gamma'], ['kickoff', '2026-09-30'], ['result', 'rejected']]), final: true, presented: null },
+    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-03-delta', fields: new Map([['slug', 'delta'], ['kickoff', '2026-10-03'], ['result', 'deferred']]), final: true, presented: undefined },
+    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-04-epsilon', fields: new Map([['slug', 'epsilon'], ['kickoff', '2026-10-04'], ['result', 'obsolete']]), final: true, presented: false },
+    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-05-zeta', fields: new Map([['slug', 'zeta'], ['kickoff', '2026-10-05'], ['result', 'undecidable']]), final: true, presented: null },
+    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-06-eta', fields: new Map([['slug', 'eta'], ['kickoff', '2026-10-06'], ['result', 'accepted']]), final: true, presented: true },
+    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-07-theta', fields: new Map([['slug', 'theta'], ['kickoff', '2026-10-07'], ['result', '未知值']]), final: true, presented: undefined },
     { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-08-iota', fields: new Map([['slug', 'iota'], ['kickoff', '2026-10-08']]), final: false, presented: undefined },
   ],
 }
@@ -56,8 +56,8 @@ describe('成品目录契约（生成器 ↔ 页签 parser 共钉一份夹具）
 
   it('两侧 metaProblemsOf 同判据（防复制后漂移）', () => {
     const cases = [
-      new Map([['kickoff', '2026-10-01'], ['类型', '决策'], ['结果', '已完成']]),
-      new Map([['kickoff', '2026/10/01'], ['类型', '未知'], ['结果', '完成']]),
+      new Map([['kickoff', '2026-10-01'], ['type', 'decision'], ['result', 'completed']]),
+      new Map([['kickoff', '2026/10/01'], ['type', '未知'], ['result', '完成']]),
       new Map(),
     ]
     for (const fields of cases) expect(metaProblemsTs(fields)).toEqual(metaProblemsJs(fields))

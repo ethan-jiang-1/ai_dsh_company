@@ -74,8 +74,8 @@ describe('编号范围标记：meta 模板', () => {
     const sample = [
       'slug: numbering-demo',
       'kickoff: 2026-11-07',
-      '类型: 决策',
-      '结果: 进行中',
+      'type: decision',
+      'result: in-progress',
       '编号体系: identity',
       '需求层: MRD, StRS, PRD, SyRS, IRS',
       '',

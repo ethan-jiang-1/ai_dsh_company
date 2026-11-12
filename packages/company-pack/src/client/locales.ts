@@ -69,6 +69,17 @@ export const zh = {
   'tabs.catalog.label': '成品',
   'tabs.catalog.tooltip': '公司成品目录：按 final.md 列成品（日期 / 类型 / 结果 / 一句话结论）；静态索引，生成后重读',
   'tabs.catalog.description': '公司成品目录：按 final.md 列成品（日期/类型/结果/结论）',
+  'catalog.type.decision': '决策',
+  'catalog.type.production': '生产',
+  'catalog.type.diagnostic': '诊断',
+  'catalog.type.qa': '口径问答',
+  'catalog.result.in-progress': '进行中',
+  'catalog.result.accepted': '已采纳',
+  'catalog.result.rejected': '已否决',
+  'catalog.result.deferred': '已搁置',
+  'catalog.result.obsolete': '已废弃',
+  'catalog.result.undecidable': '判不了',
+  'catalog.result.completed': '已完成',
 } as const
 
 /** 本命名空间的 key 联合。 */
@@ -133,6 +144,17 @@ export const en: Record<CompanyKey, string> = {
   'tabs.catalog.label': 'Deliverables',
   'tabs.catalog.tooltip': 'Company deliverable catalog: final.md entries (date / type / result / one-line conclusion); static index, reread after generation',
   'tabs.catalog.description': 'Company deliverable catalog: list by final.md (date / type / result / conclusion)',
+  'catalog.type.decision': 'Decision',
+  'catalog.type.production': 'Production',
+  'catalog.type.diagnostic': 'Diagnostic',
+  'catalog.type.qa': 'Q&A',
+  'catalog.result.in-progress': 'In progress',
+  'catalog.result.accepted': 'Accepted',
+  'catalog.result.rejected': 'Rejected',
+  'catalog.result.deferred': 'Deferred',
+  'catalog.result.obsolete': 'Obsolete',
+  'catalog.result.undecidable': 'Undecidable',
+  'catalog.result.completed': 'Completed',
 }
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {

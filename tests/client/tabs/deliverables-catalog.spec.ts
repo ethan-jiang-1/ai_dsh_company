@@ -25,17 +25,17 @@ const CATALOG = parseCatalog(JSON.stringify({
   counts: { total: 3, active: 2, archive: 1, unledgered: 2, presented: 1, notPresented: 1, presentUnknown: 1 },
   entries: [
     {
-      slug: 'ledgered-one', kickoff: '2026-10-19', type: '诊断', result: '已完成',
+      slug: 'ledgered-one', kickoff: '2026-10-19', type: 'diagnostic', result: 'completed',
       summary: '一句结论一：这是看板上的成品摘要。', root: RUN_BUNDLE_PATHS.deliverables,
       dir: '2026-10-19-ledgered-one', path: `${RUN_BUNDLE_PATHS.deliverables}/2026-10-19-ledgered-one/final.md`, ledgered: true, presented: true,
     },
     {
-      slug: 'archive-two', kickoff: '2026-10-12', type: '生产', result: '已采纳',
+      slug: 'archive-two', kickoff: '2026-10-12', type: 'production', result: 'accepted',
       summary: '一句结论二：归档件。', root: RUN_BUNDLE_PATHS.archive,
       dir: '2026-10-12-archive-two', path: `${RUN_BUNDLE_PATHS.archive}/2026-10-12-archive-two/final.md`, ledgered: false, presented: false,
     },
     {
-      slug: 'active-three', kickoff: '2026-10-19', type: '口径问答', result: '判不了',
+      slug: 'active-three', kickoff: '2026-10-19', type: 'qa', result: 'undecidable',
       summary: '一句结论三：台账外。', root: RUN_BUNDLE_PATHS.deliverables,
       dir: '2026-10-19-active-three', path: `${RUN_BUNDLE_PATHS.deliverables}/2026-10-19-active-three/final.md`, ledgered: false, presented: null,
       metaProblem: '结果不在词表：「完成」',
@@ -136,7 +136,7 @@ describe('generator → parser 契约', () => {
       entries: [{
         root: RUN_BUNDLE_PATHS.deliverables,
         dir: '2026-10-20-contract',
-        fields: new Map([['slug', 'contract'], ['kickoff', '2026-10-20'], ['类型', '决策'], ['结果', '已采纳'], ['一句话结论', '一句结论']]),
+        fields: new Map([['slug', 'contract'], ['kickoff', '2026-10-20'], ['type', 'decision'], ['result', 'accepted'], ['一句话结论', '一句结论']]),
         final: true,
         presented: true,
       }],
@@ -145,7 +145,7 @@ describe('generator → parser 契约', () => {
     })
     const parsed = parseCatalog(JSON.stringify(built))
     expect(parsed?.entries).toEqual([{
-      slug: 'contract', kickoff: '2026-10-20', type: '决策', result: '已采纳', summary: '一句结论',
+      slug: 'contract', kickoff: '2026-10-20', type: 'decision', result: 'accepted', summary: '一句结论',
       root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-20-contract', path: `${RUN_BUNDLE_PATHS.deliverables}/2026-10-20-contract/final.md`,
       ledgered: true, presented: true, metaProblem: null,
     }])

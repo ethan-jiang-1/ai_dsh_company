@@ -209,7 +209,7 @@ for (const finding of metaLedger.results) {
 // 反向门禁（布局卡评审修正 6，2026-10-04 补落）：present 在而结果≠终态 → 红——
 // present 是收口动作，收了口状态必须落终态词（留空/进行中 = P6 病复发：结果靠自觉回写没人盯）。
 // 判据纯逻辑 = lib presentResultRows（keyless spec 在 tests/harness/tools/deliverables-audit.spec.ts）；无 meta 不在射程（T-9 观察项管）。
-const metaResultBySlug = new Map([...metaBySlug].map(([slug, meta]) => [slug, meta.fields.get('结果') ?? '']))
+const metaResultBySlug = new Map([...metaBySlug].map(([slug, meta]) => [slug, meta.fields.get('result') ?? '']))
 for (const row of presentResultRows(result.leadFinalSlugs, metaResultBySlug)) {
   violations.push({
     code: VIOLATION.PRESENT_RESULT_NOT_FINAL,

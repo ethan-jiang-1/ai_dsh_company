@@ -91,9 +91,9 @@ export function isPlaceholderYield(body) {
 
 
 /** 动议分型（决策点③：先分型再定词——试金 22 话题全覆盖的四型）。 */
-export const META_TYPES = ['决策', '生产', '诊断', '口径问答']
+export const META_TYPES = ['decision', 'production', 'diagnostic', 'qa']
 /** 决议结果枚举（跨型共用；单值装不下的历史由「落地事件」多行字段承载）。 */
-export const META_RESULTS = ['进行中', '已采纳', '已否决', '已搁置', '已废弃', '判不了', '已完成']
+export const META_RESULTS = ['in-progress', 'accepted', 'rejected', 'deferred', 'obsolete', 'undecidable', 'completed']
 
 /**
  * 解析 meta.md 全文：`字段: 值` 行进 fields（取首现），`落地事件:` 行逐条进 events（多值）。
@@ -118,17 +118,17 @@ export function parseMeta(body) {
 export function validateMeta(body) {
   const { fields } = parseMeta(body)
   const problems = []
-  for (const key of ['slug', 'kickoff', '类型', '结果']) {
+  for (const key of ['slug', 'kickoff', 'type', 'result']) {
     if (!fields.has(key)) problems.push(`缺行「${key}:」`)
   }
   if (fields.has('kickoff') && !/^\d{4}-\d{2}-\d{2}$/.test(fields.get('kickoff'))) {
     problems.push(`kickoff 不是 YYYY-MM-DD：「${fields.get('kickoff')}」`)
   }
-  if (fields.has('类型') && fields.get('类型') !== '' && !META_TYPES.includes(fields.get('类型'))) {
-    problems.push(`类型不在词表 ${JSON.stringify(META_TYPES)}：「${fields.get('类型')}」`)
+  if (fields.has('type') && fields.get('type') !== '' && !META_TYPES.includes(fields.get('type'))) {
+    problems.push(`type 不在词表 ${JSON.stringify(META_TYPES)}：「${fields.get('type')}」`)
   }
-  if (fields.has('结果') && fields.get('结果') !== '' && !META_RESULTS.includes(fields.get('结果'))) {
-    problems.push(`结果不在词表 ${JSON.stringify(META_RESULTS)}：「${fields.get('结果')}」`)
+  if (fields.has('result') && fields.get('result') !== '' && !META_RESULTS.includes(fields.get('result'))) {
+    problems.push(`result 不在词表 ${JSON.stringify(META_RESULTS)}：「${fields.get('result')}」`)
   }
   if (fields.has('slug') && /\d{4}-\d{2}-\d{2}-/.test(fields.get('slug'))) {
     problems.push('slug 字段写剥前缀形式（不带日期前缀——日期住 kickoff 字段）')

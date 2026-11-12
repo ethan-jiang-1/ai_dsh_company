@@ -78,8 +78,8 @@ describe('成品候选投影', () => {
     schema: 1,
     generatedAt: '2026-10-23',
     entries: [
-      { slug: 'old', path: 'deliverables/old/final.md', kickoff: '2026-10-01', result: '已采纳', summary: '旧' },
-      { slug: 'new', path: 'deliverables/new/final.md', kickoff: '2026-10-22', result: '已完成', summary: '新' },
+      { slug: 'old', path: 'deliverables/old/final.md', kickoff: '2026-10-01', result: 'accepted', summary: '旧' },
+      { slug: 'new', path: 'deliverables/new/final.md', kickoff: '2026-10-22', result: 'completed', summary: '新' },
     ],
   })
 
@@ -144,7 +144,7 @@ describe('makeCultivationContextSources', () => {
     const sources = makeCultivationContextSources({
       getSessions: () => [row({ sessionId: 'current' })],
       follow,
-      readCatalog: async () => JSON.stringify({ schema: 1, generatedAt: '', entries: [{ slug: 'x', path: 'deliverables/x/final.md', kickoff: '2026-10-01', result: '已完成', summary: 's' }] }),
+      readCatalog: async () => JSON.stringify({ schema: 1, generatedAt: '', entries: [{ slug: 'x', path: 'deliverables/x/final.md', kickoff: '2026-10-01', result: 'completed', summary: 's' }] }),
     })
     const sessions = sources.listSessions('current')
     expect(sessions.ok).toBe(true)

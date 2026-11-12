@@ -5,8 +5,17 @@
  */
 import { describe, expect, it, vi } from 'vitest'
 import {
-  bindSettings, createCompanyLanguage, createCompanyLanguageState, languageFromPreference,
+  bindSettings, createCompanyLanguage, createCompanyLanguageState, languageFromPreference, resultLabelFor,
 } from '../../../packages/company-pack/src/host/language/company-language.ts'
+
+describe('resultLabelFor', () => {
+  it('成品结果 zh/en 映射；未知值原样', () => {
+    expect(resultLabelFor('accepted', 'zh')).toBe('已采纳')
+    expect(resultLabelFor('accepted', 'en')).toBe('Accepted')
+    expect(resultLabelFor('in-progress', 'zh')).toBe('进行中')
+    expect(resultLabelFor('unknown', 'zh')).toBe('unknown')
+  })
+})
 
 describe('languageFromPreference', () => {
   it('把 zh/en 变体归到对应语言，外部语言回落 en，缺失回落 zh', () => {

@@ -32,7 +32,7 @@ beforeEach(() => {
   mkdirSync(join(workspace, RUN_BUNDLE_PATHS.deliverables, '2026-10-25-alpha'), { recursive: true })
   writeFileSync(join(workspace, RUN_BUNDLE_PATHS.deliverables, '2026-10-25-alpha/final.md'), '# final\n')
   writeFileSync(join(workspace, RUN_BUNDLE_PATHS.deliverables, '2026-10-25-alpha/meta.md'),
-    'slug: alpha\nkickoff: 2026-10-25\n类型: 决策\n结果: 已完成\n一句话结论: wiring\n')
+    'slug: alpha\nkickoff: 2026-10-25\ntype: decision\nresult: completed\n一句话结论: wiring\n')
   env.set({ DSH_HOME: root, DSH_COMPANY_HOME: workspace })
 })
 

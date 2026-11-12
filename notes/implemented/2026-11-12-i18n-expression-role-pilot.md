@@ -128,6 +128,12 @@
 - meta 形状字段仍是中文机器面，随 content/领域值切片处理。
 - `pnpm test` 207 files / 1637 tests；`pnpm verify` ALL PASS。
 
+## I1e 第一片（meta type/result）
+
+- 类型/结果字段与枚举英文化；catalog/audit/converge/模板/测试同步。
+- boutique 表达层：catalog type/result 字典 + host resultLabelFor。
+- `pnpm test` 208 files / 1638 tests；`pnpm verify` ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

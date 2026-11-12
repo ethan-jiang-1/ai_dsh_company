@@ -113,7 +113,7 @@ async function readSessionContext(query: SessionQueryLike, ref: CultivationConte
 }
 
 /** 成品背景：只认 `RUN_BUNDLE_PATHS.catalog` 里的条目（不做任意文件读）。 */
-function readDeliverableContext(companyRoot: string, ref: CultivationContextRef): ContextRead {
+function readDeliverableContext(companyRoot: string, ref: CultivationContextRef, resultLabel: (result: string) => string): ContextRead {
   let raw: unknown
   try {
     raw = JSON.parse(readFileSync(join(companyRoot, RUN_BUNDLE_PATHS.catalog), 'utf8'))
@@ -135,7 +135,7 @@ function readDeliverableContext(companyRoot: string, ref: CultivationContextRef)
     ref: ref.ref,
     title: slug,
     excerpt: clipped.text,
-    ...(result === undefined ? {} : { subtitle: result }),
+    ...(result === undefined ? {} : { subtitle: resultLabel(result) }),
     ...(typeof entry.kickoff === 'string' && entry.kickoff !== '' ? { at: entry.kickoff } : {}),
     ...(role === undefined ? {} : { role }),
     ...(clipped.truncated ? { truncated: true } : {}),
@@ -143,7 +143,7 @@ function readDeliverableContext(companyRoot: string, ref: CultivationContextRef)
   return { context }
 }
 
-export async function readContext(ctx: Context, companyRoot: string, ref: CultivationContextRef, roleLabel: (role: string) => string = defaultRoleLabel): Promise<ContextRead> {
+export async function readContext(ctx: Context, companyRoot: string, ref: CultivationContextRef, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result): Promise<ContextRead> {
   if (ref.kind === 'session') {
     const query = sessionQueryOf(ctx)
     if (query === undefined) return { problem: '这个界面读不了会话历史（sessionQuery 未挂）。' }
@@ -155,7 +155,7 @@ export async function readContext(ctx: Context, companyRoot: string, ref: Cultiv
   }
   if (ref.kind === 'deliverable') {
     try {
-      return readDeliverableContext(companyRoot, ref)
+      return readDeliverableContext(companyRoot, ref, resultLabel)
     } catch (error) {
       return { problem: `这段背景读不到：${errorMessage(error)}。` }
     }

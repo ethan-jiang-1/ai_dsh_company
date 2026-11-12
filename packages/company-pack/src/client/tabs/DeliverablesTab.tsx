@@ -20,6 +20,7 @@ import { LOADING_NOTE, StateNote } from './company-panels.tsx'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { LedgerSummary } from './LedgerTab.tsx'
 import { useWorkspaceText } from '../data/workspace-text.ts'
+import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
 import {
   filterCatalog,
@@ -40,7 +41,7 @@ export interface DeliverablesTabInjected {
   readonly openFinal: (sessionId: SessionId, path: string) => void
 }
 
-export type DeliverablesTabProps = PropsRuntime<'sidebar.right.pane.tab'> & DeliverablesTabInjected
+export type DeliverablesTabProps = PropsRuntime<'sidebar.right.pane.tab'> & DeliverablesTabInjected & { readonly t: CompanyT }
 
 type Filter = CatalogFilter
 
@@ -54,19 +55,47 @@ const FILTERS: readonly { readonly key: Filter; readonly label: string }[] = [
 
 /** 结果词表（唯一家 = 手册 meta 模板的枚举）→ Tag 色调。新增值必须在这里点名。 */
 const RESULT_TONES: Readonly<Record<string, 'success' | 'info' | 'warning' | 'danger'>> = {
-  已完成: 'success',
-  已采纳: 'success',
-  进行中: 'info',
-  判不了: 'warning',
-  已搁置: 'warning',
-  已否决: 'danger',
-  已废弃: 'danger',
+  completed: 'success',
+  accepted: 'success',
+  'in-progress': 'info',
+  undecidable: 'warning',
+  deferred: 'warning',
+  rejected: 'danger',
+  obsolete: 'danger',
 }
 
 /** 结果 → Tag 色调（未知值给 outline，不猜）。 */
 export function resultTone(result: string): 'success' | 'info' | 'warning' | 'danger' | 'outline' {
   return RESULT_TONES[result] ?? 'outline'
 }
+
+const TYPE_KEYS: Readonly<Record<string, CompanyKey>> = {
+  decision: 'catalog.type.decision',
+  production: 'catalog.type.production',
+  diagnostic: 'catalog.type.diagnostic',
+  qa: 'catalog.type.qa',
+}
+const RESULT_KEYS: Readonly<Record<string, CompanyKey>> = {
+  'in-progress': 'catalog.result.in-progress',
+  accepted: 'catalog.result.accepted',
+  rejected: 'catalog.result.rejected',
+  deferred: 'catalog.result.deferred',
+  obsolete: 'catalog.result.obsolete',
+  undecidable: 'catalog.result.undecidable',
+  completed: 'catalog.result.completed',
+}
+
+/** 目录字段的表达层文案；未知值原样显示，不猜。 */
+export function catalogTypeLabel(type: string, t: CompanyT): string {
+  const key = TYPE_KEYS[type]
+  return key === undefined ? type : t(key)
+}
+export function catalogResultLabel(result: string, t: CompanyT): string {
+  const key = RESULT_KEYS[result]
+  return key === undefined ? result : t(key)
+}
+
+const defaultT = ((key: CompanyKey) => zh[key]) as CompanyT
 
 /** 生成时间 → 稳定、可读的 UTC 文案（不依赖浏览器时区，跨机器一致）。 */
 export function formatGeneratedAt(value: string): string {
@@ -75,10 +104,11 @@ export function formatGeneratedAt(value: string): string {
 }
 
 /** 目录视图（纯展示 + 本地筛选；数据读取在页签体内，便于 keyless 静态渲染）。 */
-export function DeliverablesView({ catalog, sessionId, openFinal }: {
+export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }: {
   readonly catalog: DeliverablesCatalog
   readonly sessionId: SessionId
   readonly openFinal: (sessionId: SessionId, path: string) => void
+  readonly t?: CompanyT
 }) {
   const [filter, setFilter] = useState<Filter>('all')
   const entries = catalog.entries
@@ -145,17 +175,17 @@ export function DeliverablesView({ catalog, sessionId, openFinal }: {
                       key={entry.path}
                       role="listitem"
                       className="wk-row wk-deliverable-row"
-                      aria-label={`${entry.kickoff} ${entry.slug}，${entry.type || '未分型'}，${entry.result || '未填结果'}${entry.root === RUN_BUNDLE_PATHS.archive ? '，归档' : ''}${entry.ledgered ? '' : '，台账外'}${entry.presented === true ? '，已 present' : entry.presented === false ? '，未 present' : '，present 未核'}`}
+                      aria-label={`${entry.kickoff} ${entry.slug}，${entry.type === '' ? '未分型' : catalogTypeLabel(entry.type, t)}，${entry.result === '' ? '未填结果' : catalogResultLabel(entry.result, t)}${entry.root === RUN_BUNDLE_PATHS.archive ? '，归档' : ''}${entry.ledgered ? '' : '，台账外'}${entry.presented === true ? '，已 present' : entry.presented === false ? '，未 present' : '，present 未核'}`}
                     >
                       <span className="wk-row-name">
-                        <Tag tone={resultTone(entry.result)}>{entry.result || '未填'}</Tag>
+                        <Tag tone={resultTone(entry.result)}>{entry.result === '' ? '未填' : catalogResultLabel(entry.result, t)}</Tag>
                         <span className="wk-deliverable-slug" title={entry.slug}>{entry.slug}</span>
                         {entry.root === RUN_BUNDLE_PATHS.archive && <Tag tone="outline">归档</Tag>}
                         {!entry.ledgered && <Tag tone="warning">台账外</Tag>}
                         {entry.presented === false && <Tag tone="warning">未 present</Tag>}
                         {entry.presented === null && <Tag tone="outline">present 未核</Tag>}
                         {entry.metaProblem !== null && <span title={entry.metaProblem}><Tag tone="warning">meta 形状错</Tag></span>}
-                        <span className="wk-deliverable-meta">{entry.kickoff || '日期未记'} · {entry.type || '未分型'}</span>
+                        <span className="wk-deliverable-meta">{entry.kickoff || '日期未记'} · {entry.type === '' ? '未分型' : catalogTypeLabel(entry.type, t)}</span>
                       </span>
                       <LedgerSummary summary={entry.summary || '（meta 无一句话结论）'} />
                       <Button
@@ -217,7 +247,7 @@ export function DeliverablesTab(props: DeliverablesTabProps) {
       {error !== null && <div className="wk-error">{error}</div>}
       {catalog === null && error === null && <StateNote kind="loading" text={LOADING_NOTE} />}
       {catalog !== null && (
-        <DeliverablesView catalog={catalog} sessionId={props.sessionId} openFinal={props.openFinal} />
+        <DeliverablesView catalog={catalog} sessionId={props.sessionId} openFinal={props.openFinal} t={props.t} />
       )}
     </PanelFrame>
   )

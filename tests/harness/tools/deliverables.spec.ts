@@ -55,9 +55,9 @@ describe('meta.md 形状校验（validateMeta / parseMeta）', () => {
   const GOOD = [
     'slug: agentic-coworker',
     'kickoff: 2026-09-22',
-    '类型: 决策',
+    'type: decision',
     '参与: CEO+VP-Eng',
-    '结果: 已采纳',
+    'result: accepted',
     'closed: 2026-09-22',
     '墙钟: 未记',
     '一句话结论: 方向批做、只批只读窄口径',
@@ -68,26 +68,26 @@ describe('meta.md 形状校验（validateMeta / parseMeta）', () => {
   it('合法 meta ⇒ ok，落地事件多条进 events', () => {
     const { ok, fields, events } = parseAndValidate(GOOD)
     expect(ok).toBe(true)
-    expect(fields.get('结果')).toBe('已采纳')
+    expect(fields.get('result')).toBe('accepted')
     expect(events.length).toBe(2)
   })
 
   it('缺必填行 / 类型枚举外 / 结果枚举外 / kickoff 日期格式 ⇒ problems（红）', () => {
-    const missing = parseAndValidate('slug: foo\n结果: 已采纳')
+    const missing = parseAndValidate('slug: foo\nresult: accepted')
     expect(missing.ok).toBe(false)
     expect(missing.problems.length).toBeGreaterThanOrEqual(2) // 缺 kickoff、缺类型
-    expect(parseAndValidate(GOOD.replace('类型: 决策', '类型: 战略')).ok).toBe(false)
-    expect(parseAndValidate(GOOD.replace('结果: 已采纳', '结果: 大胜')).ok).toBe(false)
+    expect(parseAndValidate(GOOD.replace('type: decision', 'type: strategy')).ok).toBe(false)
+    expect(parseAndValidate(GOOD.replace('result: accepted', 'result: big-win')).ok).toBe(false)
     expect(parseAndValidate(GOOD.replace('kickoff: 2026-09-22', 'kickoff: 09-22')).ok).toBe(false)
   })
 
   it('结果留空 = 合法回填态（观察归脚本侧，不判红）', () => {
-    const { ok } = parseAndValidate('slug: foo\nkickoff: 2026-09-22\n类型: 决策\n结果:')
+    const { ok } = parseAndValidate('slug: foo\nkickoff: 2026-09-22\ntype: decision\nresult:')
     expect(ok).toBe(true)
   })
 
   it('slug 字段带日期前缀 ⇒ 拒（日期住 kickoff 字段，不重复住 slug）', () => {
-    const { ok, problems } = parseAndValidate('slug: 2026-09-22-foo\nkickoff: 2026-09-22\n类型: 决策\n结果: 已采纳')
+    const { ok, problems } = parseAndValidate('slug: 2026-09-22-foo\nkickoff: 2026-09-22\ntype: decision\nresult: accepted')
     expect(ok).toBe(false)
     expect(problems[0]).toContain('剥前缀')
   })

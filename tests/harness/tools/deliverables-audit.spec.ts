@@ -316,7 +316,7 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
   it('形状坏也登记户口：不因「meta 形状不合法」再报一条「没有 meta.md」（2026-10-16 真盘二次报）', () => {
     // 真盘现场：all-in-ai-2026 的 meta 用列表符写，旧实现形状坏就 continue、不登记 slug，
     // 于是又报一条 final-without-meta「盘上没有 meta.md」——meta 明明在盘上。判据 = lib 纯函数。
-    const badBody = '- slug: `bad`\n- kickoff: 2026-10-13\n- 类型: 决策\n- 结果: 已完成\n'
+    const badBody = '- slug: `bad`\n- kickoff: 2026-10-13\n- type: decision\n- result: completed\n'
     const { metas, results } = metaLedgerFindings({
       finalSlugs: ['bad'],
       metas: [{ slug: 'bad', path: 'deliverables/bad/meta.md' }],
@@ -450,10 +450,10 @@ describe('反向门禁（布局卡评审修正 6：present 在而结果≠终态
   it('present ∧ 结果留空 / 进行中 ⇒ 红；终态词 ⇒ 过；无 meta ⇒ 不在射程（T-9 观察项管）', () => {
     const rows = presentResultRows(['pilot', 'ghost-done', 'no-meta'], new Map<string, string>([
       ['pilot', ''],
-      ['ghost-done', '进行中'],
+      ['ghost-done', 'in-progress'],
       ['term', '已否决'],
     ]))
-    expect(rows).toEqual([{ slug: 'pilot', result: '' }, { slug: 'ghost-done', result: '进行中' }])
+    expect(rows).toEqual([{ slug: 'pilot', result: '' }, { slug: 'ghost-done', result: 'in-progress' }])
   })
 })
 

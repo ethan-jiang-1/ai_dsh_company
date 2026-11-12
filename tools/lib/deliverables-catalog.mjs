@@ -31,15 +31,15 @@ export const CATALOG_ROOTS = ['.dsh-company/deliverables', '.dsh-company/deliver
 /** meta 形状问题（缺行/枚举外/日期格式）；与产品 side 的 metaProblemsOf 同判据。 */
 export function metaProblemsOf(fields) {
   const problems = []
-  for (const key of ['kickoff', '类型', '结果']) {
+  for (const key of ['kickoff', 'type', 'result']) {
     if (!fields.has(key)) problems.push(`缺行「${key}:」`)
   }
   const kickoff = fields.get('kickoff') ?? ''
   if (kickoff !== '' && !/^\d{4}-\d{2}-\d{2}$/.test(kickoff)) problems.push(`kickoff 不是 YYYY-MM-DD：「${kickoff}」`)
-  const type = fields.get('类型') ?? ''
-  if (type !== '' && !META_TYPES.includes(type)) problems.push(`类型不在词表：「${type}」`)
-  const result = fields.get('结果') ?? ''
-  if (result !== '' && !META_RESULTS.includes(result)) problems.push(`结果不在词表：「${result}」`)
+  const type = fields.get('type') ?? ''
+  if (type !== '' && !META_TYPES.includes(type)) problems.push(`type 不在词表：「${type}」`)
+  const result = fields.get('result') ?? ''
+  if (result !== '' && !META_RESULTS.includes(result)) problems.push(`result 不在词表：「${result}」`)
   return problems
 }
 
@@ -60,8 +60,8 @@ export function buildDeliverablesCatalog({ entries, ledgerSlugs, generatedAt }) 
     rows.push({
       slug,
       kickoff: entry.fields.get('kickoff') ?? '',
-      type: entry.fields.get('类型') ?? '',
-      result: entry.fields.get('结果') ?? '',
+      type: entry.fields.get('type') ?? '',
+      result: entry.fields.get('result') ?? '',
       summary: entry.fields.get('一句话结论') ?? '',
       root: entry.root,
       dir: entry.dir,

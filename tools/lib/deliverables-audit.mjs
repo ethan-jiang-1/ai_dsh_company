@@ -40,7 +40,7 @@ import {
  * 终态词表（反向门禁用，布局卡评审修正 6）：present 是收口动作 ⇒ 收口后「结果」必须是终态词。
  * 「进行中」合法但非终态——present 在而结果=进行中 = P6 病（收口了还挂着进行中）⇒ 红。
  */
-export const META_FINAL_RESULTS = META_RESULTS.filter(word => word !== '进行中')
+export const META_FINAL_RESULTS = META_RESULTS.filter(word => word !== 'in-progress')
 
 
 /**
@@ -212,7 +212,7 @@ export function metaLedgerFindings(input) {
     }
   }
   for (const [slug, meta] of metas) {
-    if (meta.fields.get('结果') === '') {
+    if (meta.fields.get('result') === '') {
       results.push({
         kind: 'warning',
         code: WARNING.META_RESULT_PENDING,

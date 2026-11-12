@@ -182,7 +182,7 @@ const appendLedger = (fields) => {
     return null
   }
   // 参与列按口径规范化（写入点与门禁同一把尺；照抄 meta 原文会被自家门禁判红——2026-10-16 实测）
-  const row = `| ${fields.slug} | ${fields.kickoff} | ${fields.类型 || '—'} | ${canonicalParticipation(fields.参与)} | ${fields.墙钟 || '未记'} | ✅ | ${fields.结论} |`
+  const row = `| ${fields.slug} | ${fields.kickoff} | ${fields.type || '—'} | ${canonicalParticipation(fields.参与)} | ${fields.墙钟 || '未记'} | ✅ | ${fields.结论} |`
   const t = readFileSync(LEDGER, 'utf8')
   const lines = t.split('\n')
   let last = -1
@@ -220,7 +220,7 @@ const resume = (dirName) => {
   const metaBody = readFileSync(join(ARCHIVE, dirName, 'meta.md'), 'utf8')
   const field = k => (metaBody.match(new RegExp(`^${k}:\\s*(.*)$`, 'm'))?.[1] ?? '').trim()
   const fields = { slug: field('slug') || slug, kickoff: field('kickoff') || dirName.slice(0, 10),
-    类型: field('类型'), 参与: field('参与'), 墙钟: field('墙钟'), 结论: field('一句话结论') }
+    类型: field('type'), 参与: field('参与'), 墙钟: field('墙钟'), 结论: field('一句话结论') }
   console.log(`续跑收敛 · ${dirName}（剩余：${state.remaining.join(' / ')}）`)
   if (journal.length > 0) {
     const evDir = join(ARCHIVE, dirName)
@@ -338,7 +338,7 @@ const converge = (dirName) => {
   const fields = {
     slug: slugOf,
     kickoff: metaField(slugDir, 'kickoff') || dirName.slice(0, 10),
-    类型: metaField(slugDir, '类型'), 参与: metaField(slugDir, '参与'), 墙钟: metaField(slugDir, '墙钟'), 结论: concl,
+    类型: metaField(slugDir, 'type'), 参与: metaField(slugDir, '参与'), 墙钟: metaField(slugDir, '墙钟'), 结论: concl,
   }
   // 零 journal / 未结审计发现两道前置已并入 assess（本函数 prologue），此处不再重复判。
   // 计划清单与执行动作同源（converge-rules.steps）：dry-run 打印的就是执行器要逐条消费的序列。
@@ -362,7 +362,7 @@ const charterBackfill = (dirName) => {
   if (!existsSync(join(slugDir, 'meta.md'))) { console.error(`✗ ${dirName}: 归档家无此目录`); process.exit(1) }
   const slug = metaField(slugDir, 'slug') || dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '')
   const kickoff = metaField(slugDir, 'kickoff') || dirName.slice(0, 10)
-  const kind = metaField(slugDir, '类型') || '—'
+  const kind = metaField(slugDir, 'type') || '—'
   const concl = metaField(slugDir, '一句话结论')
   const participation = metaField(slugDir, '参与')
   let roles = [...new Set((participation.match(/CEO|VP-Eng|VP-Sales|COO|CFO|CMO/g) ?? []).map(r => ROLE_KEY[r]).filter(Boolean))]

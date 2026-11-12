@@ -213,7 +213,14 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 - 同步 `deliverables.mjs`、deliverables-check、content generic、multi-human runbook、deliverables-audit spec；回退常量到中文 → 4 条红，还原 → 41 passed。
 - **但 meta 形状字段（`类型` / `编号体系` / `需求层` / `参与` / `结果` / `一句话结论` 等）仍是中文机器面**；它们随 `meta.md`/content/领域值切片处理，不能宣称“全部 token 清零”。
 
-**剩余 I1**：meta 形状字段 + persona/agent.cordis.yml + content/** + 领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
+**I1e 第一片（meta type/result）**：
+
+- `类型` → `type`；枚举 `decision / production / diagnostic / qa`。
+- `结果` → `result`；枚举 `in-progress / accepted / rejected / deferred / obsolete / undecidable / completed`。
+- 同步 `deliverables.mjs`、`deliverables-catalog`（tools + src）、`deliverables-audit`、`converge`、meta 模板、catalog fixture、client catalog labels、host cultivation result labels、测试。
+- 表达层：catalog type/result 走 `catalog.*` 字典；host 成品背景 subtitle 走 `resultLabelFor`。
+
+**剩余 I1**：`编号体系` / `需求层`、`参与` / `墙钟` / `一句话结论` / `落地事件`、persona/agent.cordis.yml、content/**、领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 
