@@ -56,13 +56,13 @@ describe('meta.md 形状校验（validateMeta / parseMeta）', () => {
     'slug: agentic-coworker',
     'kickoff: 2026-09-22',
     'type: decision',
-    '参与: CEO+VP-Eng',
+    'participants: CEO+VP-Eng',
     'result: accepted',
     'closed: 2026-09-22',
-    '墙钟: 未记',
-    '一句话结论: 方向批做、只批只读窄口径',
-    '落地事件: vp-eng 2026-09-25 认领 T1（出处 = journal）',
-    '落地事件: 维护者 2026-09-26 收敛归档',
+    'wallClock: 未记',
+    'summary: 方向批做、只批只读窄口径',
+    'events: vp-eng 2026-09-25 认领 T1（出处 = journal）',
+    'events: 维护者 2026-09-26 收敛归档',
   ].join('\n')
 
   it('合法 meta ⇒ ok，落地事件多条进 events', () => {

@@ -17,13 +17,13 @@ describe('buildDeliverablesCatalog', () => {
       {
         root: '.dsh-company/deliverables',
         dir: '2026-10-18-ledgered-one',
-        fields: fields({ slug: 'ledgered-one', kickoff: '2026-10-18', type: 'diagnostic', result: 'completed', 一句话结论: '一句结论一' }),
+        fields: fields({ slug: 'ledgered-one', kickoff: '2026-10-18', type: 'diagnostic', result: 'completed', summary: '一句结论一' }),
         final: true, presented: true,
       },
       {
         root: '.dsh-company/deliverables-archive',
         dir: '2026-10-17-archived-two',
-        fields: fields({ slug: 'archived-two', kickoff: '2026-10-17', type: 'production', result: 'accepted', 一句话结论: '一句结论二' }),
+        fields: fields({ slug: 'archived-two', kickoff: '2026-10-17', type: 'production', result: 'accepted', summary: '一句结论二' }),
         final: true, presented: false,
       },
       {

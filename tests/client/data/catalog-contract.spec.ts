@@ -31,8 +31,8 @@ const INPUT = {
   generatedAt: '2026-10-23T00:00:00.000Z',
   ledgerSlugs: new Set(['alpha', 'gamma', 'eta']),
   entries: [
-    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-01-alpha', fields: new Map([['slug', 'alpha'], ['kickoff', '2026-10-01'], ['type', 'decision'], ['result', 'completed'], ['一句话结论', '甲']]), final: true, presented: true },
-    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-02-beta', fields: new Map([['kickoff', '2026-10-02'], ['type', 'diagnostic'], ['result', 'in-progress'], ['一句话结论', '乙']]), final: true, presented: false },
+    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-01-alpha', fields: new Map([['slug', 'alpha'], ['kickoff', '2026-10-01'], ['type', 'decision'], ['result', 'completed'], ['summary', '甲']]), final: true, presented: true },
+    { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-02-beta', fields: new Map([['kickoff', '2026-10-02'], ['type', 'diagnostic'], ['result', 'in-progress'], ['summary', '乙']]), final: true, presented: false },
     { root: RUN_BUNDLE_PATHS.archive, dir: '2026-09-30-gamma', fields: new Map([['slug', 'gamma'], ['kickoff', '2026-09-30'], ['result', 'rejected']]), final: true, presented: null },
     { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-03-delta', fields: new Map([['slug', 'delta'], ['kickoff', '2026-10-03'], ['result', 'deferred']]), final: true, presented: undefined },
     { root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-04-epsilon', fields: new Map([['slug', 'epsilon'], ['kickoff', '2026-10-04'], ['result', 'obsolete']]), final: true, presented: false },

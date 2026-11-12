@@ -96,7 +96,7 @@ export const META_TYPES = ['decision', 'production', 'diagnostic', 'qa']
 export const META_RESULTS = ['in-progress', 'accepted', 'rejected', 'deferred', 'obsolete', 'undecidable', 'completed']
 
 /**
- * 解析 meta.md 全文：`字段: 值` 行进 fields（取首现），`落地事件:` 行逐条进 events（多值）。
+ * 解析 meta.md 全文：`字段: 值` 行进 fields（取首现），`events:` 行逐条进 events（多值）。
  * 不认形状的行忽略——校验交给 {@link validateMeta}，解析不抛。
  */
 export function parseMeta(body) {
@@ -105,7 +105,7 @@ export function parseMeta(body) {
   for (const line of body.split('\n')) {
     const m = /^([\w一-鿿]+)\s*[:：]\s*(.*)$/.exec(line.trim())
     if (m === null) continue
-    if (m[1] === '落地事件') { if (m[2].trim() !== '') events.push(m[2].trim()); continue }
+    if (m[1] === 'events') { if (m[2].trim() !== '') events.push(m[2].trim()); continue }
     if (!fields.has(m[1])) fields.set(m[1], m[2].trim())
   }
   return { fields, events }

@@ -105,7 +105,7 @@ const scanSlugs = () => {
     const dir = join(ACTIVE, d)
     if (!existsSync(join(dir, 'meta.md'))) continue
     const closed = metaField(dir, 'closed')
-    const concl = metaField(dir, '一句话结论')
+    const concl = metaField(dir, 'summary')
     const hasFinal = existsSync(join(dir, 'final.md'))
     const archived = existsSync(join(ARCHIVE, d))
     const slugOf = d.replace(/^\d{4}-\d{2}-\d{2}-/, '')
@@ -182,7 +182,7 @@ const appendLedger = (fields) => {
     return null
   }
   // 参与列按口径规范化（写入点与门禁同一把尺；照抄 meta 原文会被自家门禁判红——2026-10-16 实测）
-  const row = `| ${fields.slug} | ${fields.kickoff} | ${fields.type || '—'} | ${canonicalParticipation(fields.参与)} | ${fields.墙钟 || '未记'} | ✅ | ${fields.结论} |`
+  const row = `| ${fields.slug} | ${fields.kickoff} | ${fields.type || '—'} | ${canonicalParticipation(fields.participants)} | ${fields.wallClock || '未记'} | ✅ | ${fields.summary} |`
   const t = readFileSync(LEDGER, 'utf8')
   const lines = t.split('\n')
   let last = -1
@@ -220,7 +220,7 @@ const resume = (dirName) => {
   const metaBody = readFileSync(join(ARCHIVE, dirName, 'meta.md'), 'utf8')
   const field = k => (metaBody.match(new RegExp(`^${k}:\\s*(.*)$`, 'm'))?.[1] ?? '').trim()
   const fields = { slug: field('slug') || slug, kickoff: field('kickoff') || dirName.slice(0, 10),
-    类型: field('type'), 参与: field('参与'), 墙钟: field('墙钟'), 结论: field('一句话结论') }
+    type: field('type'), participants: field('participants'), wallClock: field('wallClock'), summary: field('summary') }
   console.log(`续跑收敛 · ${dirName}（剩余：${state.remaining.join(' / ')}）`)
   if (journal.length > 0) {
     const evDir = join(ARCHIVE, dirName)
@@ -316,7 +316,7 @@ const converge = (dirName) => {
   if (!existsSync(join(slugDir, 'meta.md'))) { console.error(`✗ ${dirName}: deliverables/ 下无此目录或缺 meta.md`); process.exit(1) }
   const archived = existsSync(join(ARCHIVE, dirName))
   const closed = metaField(slugDir, 'closed')
-  const concl = metaField(slugDir, '一句话结论')
+  const concl = metaField(slugDir, 'summary')
   const hasFinal = existsSync(join(slugDir, 'final.md'))
   const slugOf = metaField(slugDir, 'slug') || dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '')
   const journal = harvestJournal(slugOf)
@@ -338,11 +338,11 @@ const converge = (dirName) => {
   const fields = {
     slug: slugOf,
     kickoff: metaField(slugDir, 'kickoff') || dirName.slice(0, 10),
-    类型: metaField(slugDir, 'type'), 参与: metaField(slugDir, '参与'), 墙钟: metaField(slugDir, '墙钟'), 结论: concl,
+    type: metaField(slugDir, 'type'), participants: metaField(slugDir, 'participants'), wallClock: metaField(slugDir, 'wallClock'), summary: concl,
   }
   // 零 journal / 未结审计发现两道前置已并入 assess（本函数 prologue），此处不再重复判。
   // 计划清单与执行动作同源（converge-rules.steps）：dry-run 打印的就是执行器要逐条消费的序列。
-  const plan = steps({ dirName, conclusion: fields.结论, journal, wsRel: WS_REL })
+  const plan = steps({ dirName, conclusion: fields.summary, journal, wsRel: WS_REL })
   console.log(`收敛计划 · ${dirName}${DRY ? '（dry-run）' : ''}`)
   for (const step of plan) if (step.label) console.log('  · ' + step.label)
   if (DRY) { console.log('dry-run 结束，未动盘'); return }
@@ -363,11 +363,11 @@ const charterBackfill = (dirName) => {
   const slug = metaField(slugDir, 'slug') || dirName.replace(/^\d{4}-\d{2}-\d{2}-/, '')
   const kickoff = metaField(slugDir, 'kickoff') || dirName.slice(0, 10)
   const kind = metaField(slugDir, 'type') || '—'
-  const concl = metaField(slugDir, '一句话结论')
-  const participation = metaField(slugDir, '参与')
+  const concl = metaField(slugDir, 'summary')
+  const participation = metaField(slugDir, 'participants')
   let roles = [...new Set((participation.match(/CEO|VP-Eng|VP-Sales|COO|CFO|CMO/g) ?? []).map(r => ROLE_KEY[r]).filter(Boolean))]
   if (roles.length === 0 && /全员/.test(participation)) roles = [...new Set(Object.values(ROLE_KEY))]
-  if (roles.length === 0) { console.error(`✗ ${dirName}: meta.参与 无可解析角色`); process.exit(1) }
+  if (roles.length === 0) { console.error(`✗ ${dirName}: meta.participants 无可解析角色`); process.exit(1) }
   const journalExists = existsSync(join(ARCHIVE, dirName, 'journal'))
   const journalNote = role => existsSync(join(ARCHIVE, dirName, 'journal', role))
     ? `journal 全文：\`deliverables-archive/${dirName}/journal/${role}/\``

@@ -31,7 +31,7 @@ export function parseMeta(body: string): MetaFields {
     const key = match[1] ?? ''
     const value = match[2] ?? ''
     if (key === '') continue
-    if (key === '落地事件') {
+    if (key === 'events') {
       if (value.trim() !== '') events.push(value.trim())
       continue
     }
@@ -122,7 +122,7 @@ export function buildDeliverablesCatalog(input: {
       kickoff: entry.fields.get('kickoff') ?? '',
       type: entry.fields.get('type') ?? '',
       result: entry.fields.get('result') ?? '',
-      summary: entry.fields.get('一句话结论') ?? '',
+      summary: entry.fields.get('summary') ?? '',
       root: entry.root,
       dir: entry.dir,
       path: `${entry.root}/${entry.dir}/final.md`,

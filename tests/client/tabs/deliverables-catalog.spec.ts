@@ -136,7 +136,7 @@ describe('generator → parser 契约', () => {
       entries: [{
         root: RUN_BUNDLE_PATHS.deliverables,
         dir: '2026-10-20-contract',
-        fields: new Map([['slug', 'contract'], ['kickoff', '2026-10-20'], ['type', 'decision'], ['result', 'accepted'], ['一句话结论', '一句结论']]),
+        fields: new Map([['slug', 'contract'], ['kickoff', '2026-10-20'], ['type', 'decision'], ['result', 'accepted'], ['summary', '一句结论']]),
         final: true,
         presented: true,
       }],

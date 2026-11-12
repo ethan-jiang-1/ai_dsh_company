@@ -62,7 +62,7 @@ export function buildDeliverablesCatalog({ entries, ledgerSlugs, generatedAt }) 
       kickoff: entry.fields.get('kickoff') ?? '',
       type: entry.fields.get('type') ?? '',
       result: entry.fields.get('result') ?? '',
-      summary: entry.fields.get('一句话结论') ?? '',
+      summary: entry.fields.get('summary') ?? '',
       root: entry.root,
       dir: entry.dir,
       path: `${entry.root}/${entry.dir}/final.md`,

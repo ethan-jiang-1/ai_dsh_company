@@ -42,7 +42,7 @@ function deliverable(root: string, dir = `${RUN_BUNDLE_PATHS.deliverables}/2026-
   const path = join(root, dir)
   mkdirSync(path, { recursive: true })
   writeFileSync(join(path, 'final.md'), '# final\n')
-  writeFileSync(join(path, 'meta.md'), 'slug: alpha\nkickoff: 2026-10-25\ntype: decision\nresult: completed\n一句话结论: 做完了\n')
+  writeFileSync(join(path, 'meta.md'), 'slug: alpha\nkickoff: 2026-10-25\ntype: decision\nresult: completed\nsummary: 做完了\n')
   return path
 }
 
@@ -52,7 +52,7 @@ afterEach(() => {
 
 describe('meta/catalog 纯逻辑', () => {
   it('解析中文字段与首现值，剥日期前缀', () => {
-    const meta = parseMeta('slug: alpha\ntype: decision\nresult: completed\n落地事件: 第一版\n')
+    const meta = parseMeta('slug: alpha\ntype: decision\nresult: completed\nevents: 第一版\n')
     expect(meta.fields.get('type')).toBe('decision')
     expect(meta.fields.get('result')).toBe('completed')
     expect(slugFromDirName('2026-10-25-alpha')).toBe('alpha')

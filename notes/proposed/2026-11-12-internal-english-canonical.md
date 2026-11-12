@@ -226,7 +226,13 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 - 同步 requirements-check、req-command、meta 模板、product-type 文档与测试。
 - 旧中文标记不再解析：`编号体系: identity` 的 meta 落 `skipped`，红→绿（回退 regex → 5 条红；还原 → 20 passed）。
 
-**剩余 I1**：`参与` / `墙钟` / `一句话结论` / `落地事件`、persona/agent.cordis.yml、content/**、领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
+**I1e 第三片（participants/wallClock/summary/events）**：
+
+- `参与` → `participants`；`墙钟` → `wallClock`；`一句话结论` → `summary`；`落地事件` → `events`。
+- 同步 `deliverables.mjs` parseMeta events、catalog（tools + src）、converge、meta 模板、catalog fixture、测试。
+- meta 模板字段现在全部英文：`slug / kickoff / type / numbering / productType / deliveryMode / layers / participants / result / closed / wallClock / summary / events`。
+
+**剩余 I1**：persona/agent.cordis.yml、content/**、领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 

@@ -41,7 +41,7 @@ try {
   const rel = `${RUN_BUNDLE_PATHS.deliverables}/2026-10-25-alpha/final.md`
   writeFileSync(join(workspace, rel), '# final\n')
   writeFileSync(join(workspace, RUN_BUNDLE_PATHS.deliverables, '2026-10-25-alpha/meta.md'),
-    'slug: alpha\nkickoff: 2026-10-25\ntype: decision\nresult: completed\n一句话结论: present e2e\n')
+    'slug: alpha\nkickoff: 2026-10-25\ntype: decision\nresult: completed\nsummary: present e2e\n')
 
   const listeners = new Map()
   const ctx = {

@@ -140,6 +140,11 @@
 - 旧中文标记被忽略（skipped）；回退 regex → 5 条红；还原 → 20 passed。
 - `pnpm test` 208 files / 1639 tests；`pnpm verify` ALL PASS。
 
+## I1e 第三片（participants/wallClock/summary/events）
+
+- meta 剩余字段英文化；catalog/converge/parseMeta/模板/测试同步。
+- meta 字段全集英文；`pnpm test` 208 files / 1639 tests；`pnpm verify` ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
