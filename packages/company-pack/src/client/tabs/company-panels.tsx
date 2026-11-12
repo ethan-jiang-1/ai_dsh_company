@@ -280,14 +280,15 @@ export function DagPanel({ layout, roleLabel = label => label, t = defaultT }: {
  * @param props.activity - 动态（打开期间的变化；流式升级见 S1 后续步）。
  * @returns 在场面板。
  */
-export function PresencePanel({ rows, activity }: {
+export function PresencePanel({ rows, activity, t = defaultT }: {
   readonly rows: readonly PresenceRow[]
   readonly activity: readonly ActivityEntry[]
+  readonly t?: CompanyT
 }) {
   return (
     <div>
       {rows.length === 0
-        ? <StateNote text="当前没有团队动议。" />
+        ? <StateNote text={t('presence.empty')} />
         : rows.map(row => (
           <div className="wk-row" key={row.id}>
             <span className="wk-row-name">
@@ -296,14 +297,14 @@ export function PresencePanel({ rows, activity }: {
               {row.role === 'lead' ? <Tag tone="neutral">Lead</Tag> : null}
             </span>
             <Tag tone={row.status === 'failed' ? 'danger' : row.status === 'running' ? 'info' : 'outline'}>
-              {row.statusLabel}
+              {t(`presence.status.${row.status}` as CompanyKey)}
             </Tag>
             <span className="wk-row-task" title={row.currentTask ?? ''}>{row.currentTask ?? '—'}</span>
           </div>
         ))}
-      <div className="wk-section-title">协作动态</div>
+      <div className="wk-section-title">{t('presence.activity')}</div>
       {activity.length === 0
-        ? <StateNote text="暂无动态（打开期间的变化会出现在这里）。" />
+        ? <StateNote text={t('presence.emptyActivity')} />
         : (
           <ul className="wk-activity">
             {activity.map(entry => (
@@ -365,19 +366,26 @@ function useCountUp(target: number): number {
  * @param props.summary - `budgetSummary` 折好的摘要。
  * @returns 用量面板。
  */
-export function BudgetPanel({ summary }: { readonly summary: BudgetSummary }) {
+const BUDGET_ROW_KEYS: Record<string, CompanyKey> = {
+  uncachedInput: 'budget.row.uncachedInput',
+  cacheRead: 'budget.row.cacheRead',
+  cacheWrite: 'budget.row.cacheWrite',
+  output: 'budget.row.output',
+}
+
+export function BudgetPanel({ summary, t = defaultT }: { readonly summary: BudgetSummary; readonly t?: CompanyT }) {
   const total = useCountUp(summary.totalTokens)
   return (
     <div>
       <div className="wk-usage-total">{formatTokens(total)} <span className="wk-meta">tokens</span></div>
       <div className="wk-meta">
-        轮次 {summary.turns ?? '—'} · 步数 {summary.steps ?? '—'}
-        {summary.toolShare === null ? '' : ` · 工具耗时占比 ${String(Math.round(summary.toolShare * 100))}%`}
+        {t('budget.turns', { turns: summary.turns ?? '—' })} · {t('budget.steps', { steps: summary.steps ?? '—' })}
+        {summary.toolShare === null ? '' : ` · ${t('budget.toolShare', { share: Math.round(summary.toolShare * 100) })}`}
       </div>
       {summary.rows.map(row => (
         <div className="wk-usage-row" key={row.label}>
           <div className="wk-usage-head">
-            <span>{row.label}</span>
+            <span>{BUDGET_ROW_KEYS[row.id] === undefined ? row.label : t(BUDGET_ROW_KEYS[row.id] as CompanyKey)}</span>
             <span>{formatTokens(row.tokens)}（{String(Math.round(row.share * 100))}%）</span>
           </div>
           <div className="wk-bar">
@@ -385,7 +393,7 @@ export function BudgetPanel({ summary }: { readonly summary: BudgetSummary }) {
           </div>
         </div>
       ))}
-      <StateNote text="只显示令牌（wire 上没有金额字段，不编单价）。" />
+      <StateNote text={t('budget.tokensOnly')} />
     </div>
   )
 }

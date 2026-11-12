@@ -219,11 +219,11 @@ export function PresenceTab(props: PresenceTabProps) {
   const data = useCompanyData(dataFace, props.sessionId, props.useProjection, props.useSessions, { stream: true })
   const rows = data.rows.map(row => ({ ...row, displayName: presenceRoleText(row, t) }))
   return (
-    <PanelFrame title="在场" tone="people" tabProps={props}>
+    <PanelFrame title={t('tabs.presence.label')} tone="people" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
-      {data.streamError !== null && <div className="wk-error">动态流不可用：{data.streamError}</div>}
+      {data.streamError !== null && <div className="wk-error">{t('presence.streamError', { message: data.streamError })}</div>}
       {rows.length === 0
-        ? <StateNote text="当前没有团队动议。" />
+        ? <StateNote text={t('presence.empty')} />
         : (
           <>
             <div className="wk-row wk-row-head" aria-hidden="true">
@@ -238,8 +238,8 @@ export function PresenceTab(props: PresenceTabProps) {
                   type="button"
                   role="listitem"
                   className="wk-row wk-row-button"
-                  aria-label={`${row.displayName}，${row.statusLabel}，${row.currentTask === null ? '无进行中任务' : `任务：${row.currentTask}`}`}
-                  title={row.role === 'lead' ? '进入 CEO（Lead）空间' : '进入该成员的空间'}
+                  aria-label={t('presence.rowAria', { name: row.displayName, status: t(`presence.status.${row.status}` as CompanyKey), task: row.currentTask === null ? t('presence.noTask') : t('presence.task', { task: row.currentTask }) })}
+                  title={row.role === 'lead' ? t('presence.openLead') : t('presence.openMember')}
                   onClick={() => { void openMember(props.sessionId, { id: row.id, role: row.role }) }}
                 >
                   <span className="wk-row-name">
@@ -247,18 +247,18 @@ export function PresenceTab(props: PresenceTabProps) {
                     {row.displayName}
                     {row.role === 'lead' ? <Tag tone="neutral">Lead</Tag> : null}
                   </span>
-                  <span className="wk-row-status"><Tag tone={memberTone(row.status)}>{row.statusLabel}</Tag></span>
+                  <span className="wk-row-status"><Tag tone={memberTone(row.status)}>{t(`presence.status.${row.status}` as CompanyKey)}</Tag></span>
                   <span className="wk-row-task" title={row.currentTask ?? ''}>{row.currentTask ?? '—'}</span>
                 </button>
               ))}
             </div>
-            <div className="wk-meta wk-lead-note">状态 = 该分身在本场团队动议中的忙闲</div>
+            <div className="wk-meta wk-lead-note">{t('presence.statusNote')}</div>
           </>
         )}
       <div className="wk-activity-block">
-        <strong>协作动态</strong>
+        <strong>{t('presence.activity')}</strong>
         {data.activity.length === 0
-          ? <StateNote text="暂无动态（打开期间的变化会出现在这里）。" />
+          ? <StateNote text={t('presence.emptyActivity')} />
           : (
             <ul className="wk-activity">
               {data.activity.map(entry => (
@@ -279,8 +279,8 @@ export function PresenceTab(props: PresenceTabProps) {
 export function BudgetTab(props: CompanyTabProps) {
   const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
   return (
-    <PanelFrame title="用量" tone="burn" tabProps={props}>
-      <BudgetPanel summary={data.summary} />
+    <PanelFrame title={props.t('tabs.budget.label')} tone="burn" tabProps={props}>
+      <BudgetPanel summary={data.summary} t={props.t} />
     </PanelFrame>
   )
 }

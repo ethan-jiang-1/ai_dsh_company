@@ -55,8 +55,8 @@ describe('用量面板', () => {
       steps: 18,
       toolShare: 0.25,
       rows: [
-        { label: 'CEO', tokens: 8_000, share: 0.65 },
-        { label: 'VP-Eng', tokens: 4_300, share: 0.35 },
+        { id: 'output', label: '输出', tokens: 8_000, share: 0.65 },
+        { id: 'cacheRead', label: '缓存读', tokens: 4_300, share: 0.35 },
       ],
     }
     const html = renderToStaticMarkup(createElement(BudgetPanel, { summary }))
@@ -64,7 +64,8 @@ describe('用量面板', () => {
     expect(html).toContain('轮次 4')
     expect(html).toContain('步数 18')
     expect(html).toContain('工具耗时占比 25%')
-    expect(html).toContain('CEO')
+    expect(html).toContain('输出')
+    expect(html).toContain('缓存读')
     expect(html).toContain('65%')
     expect(html).toContain('width:65%')
     expect(html).toContain('只显示令牌')   // 不编造金额的口径声明

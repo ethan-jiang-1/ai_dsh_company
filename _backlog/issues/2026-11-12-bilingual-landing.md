@@ -43,6 +43,8 @@ opened: 2026-11-12
 - `tests/client/i18n/attention-tab.spec.ts` zh/en 静态渲染；client 370 passed；`ui-scene-smoke --isolated --golden` 9 页签金样一致。
 - 任务板页签/表格/头部入口双语；`tasks.*` 字典；header action 注册 locale；client 371 passed；金样仍一致。
 - 看板/DAG 双语：列/空列/依赖就绪/等待/drift、DAG 状态徽章/空态/重画；client 373 passed；金样仍一致。
+- 在场/用量双语：成员行状态/aria/空态/协作动态标题、轮次/步数/工具占比/四路 token 行；client 375 passed；金样仍一致。
+- 已知残留：协作动态 `entry.text` 仍由 lib 生成中文，下一批改结构化 token。
 
 **剩余**：
 - `content/templates/meta.md`、`prd.md`（2 个）。

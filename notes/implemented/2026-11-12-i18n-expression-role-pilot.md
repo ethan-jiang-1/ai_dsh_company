@@ -177,6 +177,13 @@
 - 移除 UI 对中文 driftLabel 的依赖（lib 仍保留旧函数，UI 改字典）。
 - en 静态渲染断言；client 373 tests；金样 9 页签 ALL PASS；全量 1648 tests，verify ALL PASS。
 
+## P0 UI 第四批（在场/用量）
+
+- 在场状态/aria/空态/协作动态标题、用量轮次/步数/工具占比/四路行迁 presence.*/budget.*。
+- Budget UsageRow 加稳定 id，UI 不按中文 label 映射。
+- en 静态渲染断言；client 375 tests；金样 9 页签 ALL PASS；全量 1650 tests，verify ALL PASS。
+- 协作动态 entry.text 仍是 lib 中文，留下一批结构化 token。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

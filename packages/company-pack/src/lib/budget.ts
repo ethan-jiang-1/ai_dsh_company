@@ -25,7 +25,10 @@ export interface SessionStatsLike {
 }
 
 /** 一行用量。 */
+export type UsageRowId = 'uncachedInput' | 'cacheRead' | 'cacheWrite' | 'output'
+
 export interface UsageRow {
+  readonly id: UsageRowId
   readonly label: string
   readonly tokens: number
   /** 占总量比例 0..1（总量 0 时为 0）。 */
@@ -63,10 +66,10 @@ function trim(value: number): string {
  */
 export function budgetSummary(usage: TokenUsageLike | undefined, stats: SessionStatsLike | undefined): BudgetSummary {
   const rows: UsageRow[] = [
-    { label: '未缓存输入', tokens: usage?.uncachedInputTokens ?? 0, share: 0 },
-    { label: '缓存读', tokens: usage?.cacheReadTokens ?? 0, share: 0 },
-    { label: '缓存写', tokens: usage?.cacheWriteTokens ?? 0, share: 0 },
-    { label: '输出', tokens: usage?.outputTokens ?? 0, share: 0 },
+    { id: 'uncachedInput', label: '未缓存输入', tokens: usage?.uncachedInputTokens ?? 0, share: 0 },
+    { id: 'cacheRead', label: '缓存读', tokens: usage?.cacheReadTokens ?? 0, share: 0 },
+    { id: 'cacheWrite', label: '缓存写', tokens: usage?.cacheWriteTokens ?? 0, share: 0 },
+    { id: 'output', label: '输出', tokens: usage?.outputTokens ?? 0, share: 0 },
   ]
   const totalTokens = rows.reduce((sum, row) => sum + row.tokens, 0)
   const llmMs = stats?.llmMs ?? 0
