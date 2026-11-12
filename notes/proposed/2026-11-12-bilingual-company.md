@@ -9,6 +9,8 @@ opened: 2026-11-12
 >
 > **2026-11-12 方向修正**：双语只在**表达层**；内部代码/提示/内容用**英文单份 canonical**；角色名也属于表达层。Phase B 从「中文正文 + 英文 overlay」改为「内部英文单份 canonicalization」；详见[表达层方向材料](../../_backlog/research/bilingual-company/2026-11-12-expression-layer-direction.md)。
 >
+> **2026-11-12 后续决策**：[内部全英文 canonical RFC](2026-11-12-internal-english-canonical.md) 接管内部语言方向；本 RFC 的 Phase B 被它取代，Phase 0/A1–A4 的表达层地基仍是现行。
+>
 > 本 RFC 把「插件中英文双语、默认中文」拆成 Phase 0 / A1–A4 / B / C；**本 RFC 的实施单元 = Phase 0 + Phase A1–A4**，Phase B/C 另卡。语言开关唯一源 = DSH `locale.preference`；默认 `zh` 由 bundle patch 落；客户端用 typed `company` 字典；host 用 `CompanyLanguage` + 动态 policy；content/persona/skill/docs 的全量英文不在本 RFC 内。
 
 ## 问题
@@ -36,8 +38,8 @@ opened: 2026-11-12
 
 **排除（Phase B/C）：**
 
-- `content/**` 与 `presets/**` 的**英文 canonicalization**（把现有中文正文翻成英文单份；中文由 language policy 表达，不做 `content/en/` 双语副本）。
-- `presets/**` persona 与 26 个 skill 的英文 canonical 正文（Phase B）；不建中英双份。
+- `content/**` 与 `presets/**` 的**英文 canonicalization**（由[内部全英文 RFC](2026-11-12-internal-english-canonical.md) 接管；旧 RFC 不建 `content/en/` 双语副本）。
+- `presets/**` persona 与 26 个 skill 的英文 canonical 正文（由[内部全英文 RFC](2026-11-12-internal-english-canonical.md) 接管）；不建中英双份。
 - 全量 README/docs/安装手册英文；文档配对/一致性门禁。
 - 日志/telemetry/开发者诊断英文。
 - 第三语言、RTL、复数规则、locale 数字/日期格式。

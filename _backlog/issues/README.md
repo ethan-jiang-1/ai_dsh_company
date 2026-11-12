@@ -34,6 +34,7 @@ v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajecto
 
 ## 近期归档
 
+- 内部全英文 canonical 卡 2026-11-12 已结：表达层双语 + 内部全英文单份（内容/persona/skills/注释/日志/领域值/picker）；去向 = [RFC](../../notes/proposed/2026-11-12-internal-english-canonical.md)；卡在[归档](../_archive/settled_issues/2026-11-12-internal-english-canonical.md)。
 - 插件中英文双语卡 2026-11-12 已结：默认中文 + typed `company` 字典 + host `CompanyLanguage` + 纪律三件套（合同/门禁/skill）方案；去向 = [RFC](../../notes/proposed/2026-11-12-bilingual-company.md)；卡在[归档](../_archive/settled_issues/2026-11-12-bilingual-company.md)。
 - 两轴交付模式 v2 卡 2026-11-11 已结：`/delivery check`（独立命令，查 documents.file + requiredSections）+ 硬软能力前置 `capabilities.md`；productized 方法“以后做”、默认交付模式保留 `productized`；去向 = [Note](../../notes/implemented/2026-11-11-delivery-check-v2.md)；卡在[归档](../_archive/settled_issues/2026-11-11-delivery-mode-v2.md)。
 - 两轴交付模式卡 2026-11-11 已结：`project-services` + `managed-service` 落成 content 一等能力；meta 交付模式 / 经营方法 / workflow 分派 / awareness / sources 门禁 / 两轴测试矩阵；去向 = [Note](../../notes/implemented/2026-11-11-delivery-mode-axis.md)；卡在[归档](../_archive/settled_issues/2026-11-11-delivery-mode-axis.md)。

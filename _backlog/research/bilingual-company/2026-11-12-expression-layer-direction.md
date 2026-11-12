@@ -3,6 +3,8 @@ topic: 表达层双语、内部英文 canonical 与角色名映射
 intent: 把用户 2026-11-12 的方向修正落成可执行边界：双语只在表达层；内部代码/提示/内容用英文单份；角色名进入表达层；回答「这是否改变 Phase B」。
 ---
 
+> 下游：[内部全英文 canonical RFC](../../../notes/proposed/2026-11-12-internal-english-canonical.md)（I1/I2/I3 + 表达层 E1）；问题卡 = [归档卡](../../_archive/settled_issues/2026-11-12-internal-english-canonical.md)。
+
 # 表达层双语、内部英文 canonical 与角色名
 
 ## 1. 用户原话与我的理解
