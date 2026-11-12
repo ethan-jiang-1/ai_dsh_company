@@ -6,6 +6,7 @@
 //   （`pnpm company` 首跑建；`--isolated` 自建临时 profile，不依赖 dev home）。
 //   `--keep` 保留实例与他人接着看；`--ask` 透传给 cdp-probe（真模型一次调用，会建测试会话）。
 //   `--steps <file>` 透传给 cdp-probe（受控动作：clickText / waitText / expectText / typeText）。
+//   `--lang en`（必须配 --isolated）：隔离 home 写 locale.preference=en，跑 9 页签并断言无中文残留；不与 zh 金样同跑。
 //   `--isolated`：官方 web 模板建临时 `company` profile + `plugin add <pack 目录>`（link）再起
 //   （不读 dev 盘，也不读用户 OS 默认 workspace；`.dsh-company/` 由 host 首启自举，文本确定）。
 //   `--golden` / `--refresh-golden`：与 `snapshots/visual/company-shell/ui.golden.json` 比对/更新
@@ -34,6 +35,8 @@ const KEEP = args.includes('--keep')
 const ISOLATED = args.includes('--isolated')
 const GOLDEN = args.includes('--golden')
 const REFRESH_GOLDEN = args.includes('--refresh-golden')
+const langIndex = args.indexOf('--lang')
+const LANG = langIndex === -1 ? 'zh' : (args[langIndex + 1] ?? '')
 const askIndex = args.indexOf('--ask')
 const ASK = askIndex === -1 ? undefined : (args[askIndex + 1] ?? '用一句话自报角色与职责。')
 const stepsIndex = args.indexOf('--steps')
@@ -50,6 +53,18 @@ if ((GOLDEN || REFRESH_GOLDEN) && !ISOLATED) {
 }
 if (GOLDEN && REFRESH_GOLDEN) {
   console.error('ui-scene-smoke: --golden 与 --refresh-golden 只能二选一。')
+  process.exit(2)
+}
+if (LANG !== 'zh' && LANG !== 'en') {
+  console.error('ui-scene-smoke: --lang 只认 zh / en')
+  process.exit(2)
+}
+if (LANG === 'en' && !ISOLATED) {
+  console.error('ui-scene-smoke: --lang en 必须配 --isolated（英文页面检查不能污染日用 home）')
+  process.exit(2)
+}
+if (LANG === 'en' && (GOLDEN || REFRESH_GOLDEN)) {
+  console.error('ui-scene-smoke: 金样是 zh；--lang en 走独立「无中文残留」检查，不跑 --golden')
   process.exit(2)
 }
 
@@ -128,6 +143,11 @@ if (ISOLATED) {
     },
   }, null, 2)}\n`, 'utf8')
   // 不覆盖 HOME：真浏览器探针要按 homedir() 找 playwright 缓存；隔离只针对 DSH/公司状态。
+  // English page check: Home user-settings override the bundle default zh.
+  // The locale row is a per-home cordis.patch.yml layer; it does not change the committed pack.
+  if (LANG === 'en') {
+    writeFileSync(join(home, 'cordis.patch.yml'), '- id: locale\n  config:\n    preference: en\n', 'utf8')
+  }
   isolatedEnv = {
     ...process.env,
     DSH_HOME: home,
@@ -180,6 +200,7 @@ function runProbe(jsonOut) {
       ...(jsonOut === undefined ? [] : ['--texts', '--json-out', jsonOut]),
       ...(ASK === undefined ? [] : ['--ask', ASK]),
       ...(STEPS === undefined ? [] : ['--steps', STEPS]),
+      ...(LANG === 'zh' ? [] : ['--lang', LANG]),
     ], { cwd: ROOT, env: isolatedEnv ?? process.env, stdio: ['ignore', 'pipe', 'pipe'] })
     let output = ''
     const onData = (chunk) => {
@@ -204,10 +225,11 @@ let code = 1
 let output = ''
 let verdict = null
 try {
-  const result = await runProbe(GOLDEN || REFRESH_GOLDEN ? verdictPath : undefined)
+  const wantVerdict = GOLDEN || REFRESH_GOLDEN || LANG === 'en'
+  const result = await runProbe(wantVerdict ? verdictPath : undefined)
   code = result.code
   output = result.output
-  if (GOLDEN || REFRESH_GOLDEN) {
+  if (wantVerdict) {
     try { verdict = JSON.parse(readFileSync(verdictPath, 'utf8')) } catch { verdict = null }
   }
 } finally {
@@ -288,6 +310,19 @@ if (GOLDEN) {
   console.log(`ui-scene-smoke: 金样一致（${String((golden.catalog ?? []).length)} 个页签）`)
 } else if (!REFRESH_GOLDEN) {
   writeReceipt({ goldenResult: 'off' })
+}
+
+if (LANG === 'en') {
+  const texts = Object.entries(verdict?.tabTexts ?? {}).filter(([title]) => title !== '(attached)')
+  const cjk = texts.filter(([, text]) => /[\u3400-\u9fff]/u.test(String(text ?? '')))
+  if (cjk.length > 0) {
+    for (const [title] of cjk.slice(0, 9)) console.error(`  EN FAIL 页签「${title}」仍有中文`)
+    writeReceipt({ englishResult: 'fail' })
+    console.error('ui-scene-smoke: en 页面仍有中文残留')
+    process.exit(1)
+  }
+  writeReceipt({ englishResult: 'pass' })
+  console.log(`ui-scene-smoke: en 页面无中文残留（${String(texts.length)} 个页签）`)
 }
 
 console.log('ui-scene-smoke: ALL PASS（自起实例 + 全部公司页签 + 浏览器错误环零命中）')

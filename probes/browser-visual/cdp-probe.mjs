@@ -78,6 +78,8 @@ if (bodyOutIndex !== -1 && (bodyOut === undefined || bodyOut.startsWith('--'))) 
   console.error('cdp-probe: --body-out 需要一个文件路径');
   process.exit(2);
 }
+const langIndex = args.indexOf('--lang');
+const PROBE_LANG = langIndex === -1 ? 'zh' : (args[langIndex + 1] ?? 'zh');
 const stepsIndex = args.indexOf('--steps');
 const stepsPath = stepsIndex === -1 ? undefined : args[stepsIndex + 1];
 let steps = [];
@@ -135,6 +137,18 @@ if (tabs.length === 0) {
   console.error('cdp-probe: 页签注册源解析为空（格式漂移？）——拒绝以空清单通过');
   process.exit(2);
 }
+const EN_TAB_TITLES = {
+  '待办': 'Inbox',
+  '看板': 'Board',
+  '依赖图': 'Dependencies',
+  '在场': 'Presence',
+  '用量': 'Usage',
+  '任务板': 'Tasks',
+  '培养': 'Cultivation',
+  '台账': 'Ledger',
+  '成品': 'Deliverables',
+};
+if (PROBE_LANG === 'en') tabs = tabs.map(tab => ({ ...tab, title: EN_TAB_TITLES[tab.title] ?? tab.title }));
 verdict.catalog = tabs.map(tab => tab.title);
 
 // chromeBin 复用本仓 chromium 解析（loadChromium → executablePath；DSH_PROBE_CHROME 仍可覆盖——

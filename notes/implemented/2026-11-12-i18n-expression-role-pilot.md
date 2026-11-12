@@ -263,6 +263,12 @@
 - 培养 UI 文案面基本齐；下一步 en 真页面验证。
 - client 381 tests；金样 ALL PASS；全量 1656 tests，verify ALL PASS。
 
+## P0 en 真页面（2026-11-12）
+
+- `ui-scene-smoke --isolated --lang en`：隔离 home 写 locale.preference=en；cdp-probe `--lang en` 用英文页签标题；9 页签无中文残留。
+- 修 tab body 注入 t（此前回落 zh）、Tasks/Cultivation 标题与 guide 对齐、DelegationFlow/Presence 表头、budget 括号/zh footer 文本。
+- zh 金样恢复一致；全量 1656 tests，verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

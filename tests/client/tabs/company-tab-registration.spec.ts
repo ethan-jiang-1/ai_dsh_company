@@ -171,7 +171,7 @@ describe('company tab registration', () => {
 
     const bodyProps = bodyEntries.map(entry => entry.inject?.() ?? {})
     const attentionProps = bodyProps[0]!
-    expect(Object.keys(attentionProps).sort()).toEqual(['floatTab', 'follow', 'getPending', 'leadOf', 'openSession', 'unfloatTab'])
+    expect(Object.keys(attentionProps).sort()).toEqual(['floatTab', 'follow', 'getPending', 'leadOf', 'openSession', 't', 'unfloatTab'])
     expect(attentionProps.floatTab).toBe(harness.data.floatTab)
     expect(attentionProps.unfloatTab).toBe(harness.data.unfloatTab)
     expect(attentionProps.leadOf).toBe(harness.data.leadOf)
@@ -180,7 +180,7 @@ describe('company tab registration', () => {
     ;(attentionProps.openSession as (sessionId: SessionId) => void)('test-session' as SessionId)
     expect(harness.openSession).toHaveBeenCalledWith('test-session')
 
-    const sharedData = { leadOf: harness.data.leadOf, follow: harness.data.follow, floatTab: harness.data.floatTab, unfloatTab: harness.data.unfloatTab }
+    const sharedData = { leadOf: harness.data.leadOf, follow: harness.data.follow, floatTab: harness.data.floatTab, unfloatTab: harness.data.unfloatTab, t: harness.data.t }
     for (const index of [1, 2, 4, 5]) expect(bodyProps[index]).toEqual(sharedData)
     const presenceProps = bodyProps[3]!
     expect(presenceProps).toEqual({ ...sharedData, openMember: harness.data.openMember })
@@ -194,9 +194,10 @@ describe('company tab registration', () => {
       cultivationFiles: harness.data.cultivationFiles,
       followEvents: harness.data.follow,
       roleSource: harness.data.roleSource,
+      t: harness.data.t,
     })
     const signal = new AbortController().signal
-    expect(bodyProps[7]).toEqual({ floatTab: harness.data.floatTab, unfloatTab: harness.data.unfloatTab, readLedger: harness.data.readLedger })
+    expect(bodyProps[7]).toEqual({ floatTab: harness.data.floatTab, unfloatTab: harness.data.unfloatTab, readLedger: harness.data.readLedger, t: harness.data.t })
     await expect((bodyProps[7]!.readLedger as CompanyTabRegistrationData['readLedger'])('lead-session' as SessionId, signal)).resolves.toBe('ledger text')
     expect(harness.data.readLedger).toHaveBeenCalledWith('lead-session', signal)
     expect(bodyProps[8]!.readCatalog).toBe(harness.data.readCatalog)

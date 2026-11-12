@@ -386,7 +386,7 @@ export function BudgetPanel({ summary, t = defaultT }: { readonly summary: Budge
         <div className="wk-usage-row" key={row.label}>
           <div className="wk-usage-head">
             <span>{BUDGET_ROW_KEYS[row.id] === undefined ? row.label : t(BUDGET_ROW_KEYS[row.id] as CompanyKey)}</span>
-            <span>{formatTokens(row.tokens)}（{String(Math.round(row.share * 100))}%）</span>
+            <span>{formatTokens(row.tokens)}{t('budget.share', { share: Math.round(row.share * 100) })}</span>
           </div>
           <div className="wk-bar">
             <div className="wk-bar-fill" style={{ width: `${String(Math.round(row.share * 100))}%` }} />

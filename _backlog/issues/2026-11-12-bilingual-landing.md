@@ -57,6 +57,8 @@ opened: 2026-11-12
 - Board 说明区迁 copy：我的分身/怎么养/熟手命令。
 - ChatPanel 迁 copy：独立会话标题/提示/状态/空态/说话人/附加记录/输入/发送。
 - Compose 迁 copy：提案 aria/背景/轮次/建议后缀；培养 UI 文案面基本齐。
+- **en 真页面**：新增 `ui-scene-smoke --isolated --lang en`（隔离 home 写 locale.preference=en），9 页签无中文残留；zh 金样仍一致。
+- 修 tab body 未注入 t、Tasks/Cultivation 标题与 guide 不一致、DelegationFlow/Presence 表头、budget 括号。
 - content 模板 8/8 英文（meta/prd 补齐）；模板棘轮 PENDING 清零。
 
 **剩余**：

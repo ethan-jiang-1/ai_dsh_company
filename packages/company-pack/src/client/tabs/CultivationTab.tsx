@@ -8,6 +8,7 @@ import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { roleLabel } from '../../lib/cultivation.ts'
+import { setCultivationLanguage } from '../cultivation/cultivation-actions.ts'
 import type { CompanyT } from '../locales.ts'
 import { roleText } from '../roles.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
@@ -51,6 +52,7 @@ export type CultivationTabProps = PropsRuntime<'sidebar.right.pane.tab'> & Culti
  * @returns 培养面板。
  */
 export function CultivationTab(props: CultivationTabProps) {
+  setCultivationLanguage(props.t('meta.language') === 'en' ? 'en' : 'zh')
   // viewer 角色（上游 agentPreset 投影；订阅制，无轮询——照 RoleBadge 的手法）。
   const subscribe = useMemo(() => props.roleSource.subscribe.bind(props.roleSource), [props.roleSource])
   const getPreset = useCallback(() => readPresetOf(props.roleSource, props.sessionId), [props.roleSource, props.sessionId])
@@ -68,9 +70,9 @@ export function CultivationTab(props: CultivationTabProps) {
   return (
     <PanelFrame
       tone="growth"
-      title="培养"
+      title={props.t('tabs.cultivation.label')}
       tabProps={props satisfies PanelFrameProps}
-      refreshLabel={`每 ${String(CULTIVATION_REFRESH_MS / 1000)} 秒自动刷新`}
+      refreshLabel={props.t('cultivation.refresh', { seconds: CULTIVATION_REFRESH_MS / 1000 })}
     >
       <CultivationBoard
         viewerRole={viewerRole}

@@ -11,6 +11,12 @@
 import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { DelegationNode, DelegationTree } from '../../lib/delegation-tree.ts'
 import { StateNote } from './company-panels.tsx'
+import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
+
+const defaultT = ((key: CompanyKey, params?: Record<string, string | number>) => {
+  const template = zh[key]
+  return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+}) as CompanyT
 
 function stateOf(node: DelegationNode): 'ongoing' | 'idle' | 'warning' {
   if (node.missing || node.status === 'unknown') return 'warning'
@@ -22,14 +28,14 @@ function stateOf(node: DelegationNode): 'ongoing' | 'idle' | 'warning' {
  * @param props.tree - 由 `buildDelegationTree` 折好的只读树。
  * @returns 面板；根缺席时给空态。
  */
-export function DelegationFlowPanel({ tree }: { readonly tree: DelegationTree }) {
-  if (tree.root === null) return <StateNote text="当前会话还没有委派记录。" />
+export function DelegationFlowPanel({ tree, t = defaultT }: { readonly tree: DelegationTree; readonly t?: CompanyT }) {
+  if (tree.root === null) return <StateNote text={t('delegationFlow.empty')} />
   return (
-    <section className="wk-delegation-flow" aria-label="委派流程" data-company-delegation="flow">
+    <section className="wk-delegation-flow" aria-label={t('delegationFlow.aria')} data-company-delegation="flow">
       <div className="wk-delegation-flow-head">
-        <strong>委派流程</strong>
-        <span className="wk-meta">{tree.nodes.length} 个节点 · 最深 {tree.maxDepth} 层</span>
-        <span className="wk-meta">终态来自 host 投影；缺时不可见</span>
+        <strong>{t('delegationFlow.title')}</strong>
+        <span className="wk-meta">{t('delegationFlow.meta', { nodes: tree.nodes.length, depth: tree.maxDepth })}</span>
+        <span className="wk-meta">{t('delegationFlow.source')}</span>
       </div>
       <ol className="wk-delegation-flow-list">
         {tree.nodes.map(node => (

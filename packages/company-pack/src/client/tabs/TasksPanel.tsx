@@ -6,7 +6,7 @@ import { Button, IconChecklistOutlineMedium } from '@deepseek-ai/dsh-client-ui-p
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
-import { presenceStatusFromPhase, statusLabelFor, type TeamViewLike } from '../../lib/presence.ts'
+import { presenceStatusFromPhase, type TeamViewLike } from '../../lib/presence.ts'
 import { tasksFromTeamView, type TaskRow } from '../../lib/board.ts'
 import { StateNote } from './company-panels.tsx'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
@@ -65,7 +65,7 @@ export function TasksTableView({ view, roleLabel = name => name, t = defaultT }:
   return (
     <>
       <div className="wk-meta wk-mb-xs">
-        {t('tasks.members', { members: view.members.map(member => `${roleLabel(member.name)}(${statusLabelFor(presenceStatusFromPhase(member.phase))})`).join('、') || t('tasks.noMembers') })}
+        {t('tasks.members', { members: view.members.map(member => `${roleLabel(member.name)}(${t(`presence.status.${presenceStatusFromPhase(member.phase)}` as CompanyKey)})`).join('、') || t('tasks.noMembers') })}
       </div>
       {tasks.length === 0
         ? <StateNote text={t('tasks.empty')} />

@@ -203,7 +203,7 @@ export function DagTab(props: CompanyTabProps) {
       )}
     >
       {data.error !== null && <div className="wk-error">{data.error}</div>}
-      <DelegationFlowPanel tree={tree} />
+      <DelegationFlowPanel tree={tree} t={props.t} />
       <DagPanel key={redrawKey} layout={data.dag} roleLabel={label => roleTextForCanonical(label, props.t)} t={props.t} />
     </PanelFrame>
   )
@@ -227,9 +227,9 @@ export function PresenceTab(props: PresenceTabProps) {
         : (
           <>
             <div className="wk-row wk-row-head" aria-hidden="true">
-              <span className="wk-row-name">成员</span>
-              <span className="wk-row-status">团队内状态</span>
-              <span className="wk-row-task">当前任务</span>
+              <span className="wk-row-name">{t('presence.member')}</span>
+              <span className="wk-row-status">{t('presence.statusColumn')}</span>
+              <span className="wk-row-task">{t('presence.taskColumn')}</span>
             </div>
             <div role="list" aria-label="组织在场板" className="wk-list">
               {rows.map(row => (
@@ -293,7 +293,7 @@ export function BudgetTab(props: CompanyTabProps) {
 export function TasksTab(props: CompanyTabProps) {
   const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
   return (
-    <PanelFrame title={props.t('tasks.title')} tone="work" tabProps={props}>
+    <PanelFrame title={props.t('tabs.tasks.label')} tone="work" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
       <TasksTableView view={data.team} roleLabel={(name: string) => roleText(name, 'label', props.t, name)} t={props.t} />
     </PanelFrame>
