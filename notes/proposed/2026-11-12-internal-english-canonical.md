@@ -115,7 +115,7 @@ opened: 2026-11-12
 ## I1 进度（pilot + 棘轮）
 
 - **pilot**：`presets/vp-sales/skills/customer-voice/SKILL.md` 已翻成英文单份；frontmatter description 英文；方法契约标记用 `**Method contract**` / `applicable product types =` / `required facts =`。
-- **棘轮**：`tests/presets/internal-english.spec.ts` 扫全部 `presets/**/SKILL.md`；`PENDING` 之外的正文不得含中文。当前已翻 18 个（`customer-voice`、`tech-feasibility-review`、`pricing`、`managed-service-pricing`、`market-sizing`、`managed-service-ops`、`budget-check`、`finance-compliance`、`ops-workflow`、`cfo-workflow`、`managed-service-economics`、`eng-workflow`、`sales-workflow`、`delegation-policy`、`ops-feasibility`、`project-economics`、`mrd-playbook`、`prd-playbook`），其余 6 个在 PENDING。每翻完一个删一行，最终 PENDING 为空 = 硬门禁。
+- **棘轮**：`tests/presets/internal-english.spec.ts` 扫全部 `presets/**/SKILL.md`；`PENDING` 之外的正文不得含中文。当前已翻 19 个（`customer-voice`、`tech-feasibility-review`、`pricing`、`managed-service-pricing`、`market-sizing`、`managed-service-ops`、`budget-check`、`finance-compliance`、`ops-workflow`、`cfo-workflow`、`managed-service-economics`、`eng-workflow`、`sales-workflow`、`delegation-policy`、`ops-feasibility`、`project-economics`、`mrd-playbook`、`prd-playbook`、`eng-teaming`），其余 5 个在 PENDING。每翻完一个删一行，最终 PENDING 为空 = 硬门禁。
 - **门禁红证据**：临时给 pilot 追加中文 → 棘轮 2 条红；还原 → 绿。
 - **第二批**：`tech-feasibility-review`、`pricing`、`managed-service-pricing` 翻成英文；`two-axis-applicability` / `delivery-mode-coverage` 的契约解析改为中英双认。
 - **第三批**：`market-sizing`、`managed-service-ops`、`budget-check` 翻成英文；method-contract / delivery-mode 门禁继续绿。
@@ -123,10 +123,27 @@ opened: 2026-11-12
 - **第五批**：`managed-service-economics`、`eng-workflow`、`sales-workflow` 翻成英文；三个经营角色 workflow 已全部英文，method-contract 仍绿。
 - **第六批**：`delegation-policy`、`ops-feasibility`、`project-economics` 翻成英文；共享委派政策降到 8192 字符阈值内，delegation-contract 测试改中英双认。
 - **第七批**：`mrd-playbook`、`prd-playbook` 翻成英文；`fact-finding-playbook` **暂缓**——含机器可读的 `待补料·<slug>·<T号>` schedule title 与 `【事实】/【假设】` 审计锚，必须先做 token 英文化 + 消费方改造，不能盲翻。
+- **第八批**：`eng-teaming` 翻成英文；五档决策树/控制面/硬规则保留。CEO 组队与主持会议仍暂缓，原因同 token 阻断。
 - **测试/冒烟**：`pnpm test tests/presets` 132 passed；`pnpm test` 207 files / 1630 tests；`preset-smoke` ALL PASS（11 preset 可挂载）。
 - **门禁**：`checks/gates/method-contract.mjs` 接受中英契约块（`**方法契约**` / `**Method contract**`；`适用产品类型` / `applicable product types`；`需要事实` / `required facts`；`无` / `none`）；中文契约块继续绿，英文 pilot 也绿。
 - **门禁红证据**：把 pilot 的 `applicable product types` 改成 `nope` → 红（点名文件 + 没有类型包 + 未覆盖默认类型）；还原 → 绿。中文契约块两方向都跑过。
-- **未做**：其余 6 个 skill（含暂缓的 fact-finding）、persona/agent.cordis.yml、content/**、领域值。pilot + 六批只证明翻译/棘轮/门禁流程，不宣称 I1 完成。
+- **未做**：其余 5 个 skill（quality-loop + 4 个 token 阻断文件）、persona/agent.cordis.yml、content/**、领域值。pilot + 七批只证明翻译/棘轮/门禁流程，不宣称 I1 完成。
+
+## I1b 机器可读中文 token（阻断项）
+
+I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的，盲翻会静默破坏运行时：
+
+| token | 消费方 | 处理方向 |
+|---|---|---|
+| `产品类型` / `交付模式`（meta 字段） | `req-command` / `delivery-command` / bootstrap / `meta.md` 模板 / `/req check` / `/delivery check` | canonical 改 `productType` / `deliveryMode`；解析器只认英文；中文只留表达层标签 |
+| `派活｜T1｜…｜状态：待办`（成员任务书行） | 任务板/brief 读取侧、`board.ts` 纸面号映射 | 改英文行格式（如 `ASSIGN｜T1｜…｜status: todo`）；解析器 + 模板 + 测试同步 |
+| `待补料·<slug>·<T号>`（schedule title 审计锚） | schedule 审计/检查、fact-finding、chairing | 改英文锚（如 `pending-sources·<slug>·<T#>`）；schedule/audit 消费方同步 |
+| `【待澄清】` | `attention.ts` `ESCALATION_MARK` | 改 `[NEEDS-CLARIFICATION]`；attention 测试 + 手册 |
+| `日期待核`（journal 文件名 fallback） | CEO journal 日期闸门/检查 | 改 `date-pending`；检查/手册同步 |
+| `【事实】` / `【假设】` | 内容/审计人工约定（无代码解析，需确认） | 改 `[fact]` / `[assumption]`；模板/文档同步 |
+| 状态枚举 `待办/已出稿/完成/取消/待补料` | 派活行消费侧/任务板 | 与派活行一起改英文枚举 |
+
+**结论**：剩余 4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）在 I1b 完成前保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。I1b 需独立红绿门禁（字段解析、派活行、schedule 锚、attention mark、journal 日期）。
 
 ## 输掉的方案
 

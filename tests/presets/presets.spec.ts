@@ -630,10 +630,10 @@ describe('VP-Eng 组队：根门带小队 + 命名专家（B1）', () => {
   it('eng-teaming skill 四档决策树与硬规则在场', () => {
     expect(existsSync(ENG_TEAMING), 'vp-eng 缺 eng-teaming skill').toBe(true)
     const skill = readFileSync(ENG_TEAMING, 'utf8')
-    for (const tier of ['自己做', '一次性 worker', '命名专家', '持久小队']) {
+    for (const tier of ['Do it yourself', 'One-off worker', 'Named specialist', 'Durable squad']) {
       expect(skill, `eng-teaming 缺档位「${tier}」`).toContain(tier)
     }
-    for (const rule of ['不能冒充', 'spawn_teammate', 'vp_cmo']) {
+    for (const rule of ['must not impersonate', 'spawn_teammate', 'vp_cmo']) {
       expect(skill, `eng-teaming 缺 ${rule}`).toContain(rule)
     }
     expect(roleYml('vp-eng'), 'persona 必须点名先加载 eng-teaming').toMatch(/先加载 `eng-teaming` skill/)

@@ -34,7 +34,7 @@
 - I1 pilot + 第二/三批：`customer-voice`、`tech-feasibility-review`、`pricing`、
   `managed-service-pricing`、`market-sizing`、`managed-service-ops`、`budget-check`、
   `finance-compliance`、`ops-workflow`、`cfo-workflow`、`managed-service-economics`、
-  `eng-workflow`、`sales-workflow`、`delegation-policy`、`ops-feasibility`、`project-economics`、`mrd-playbook`、`prd-playbook` 英文单份；
+  `eng-workflow`、`sales-workflow`、`delegation-policy`、`ops-feasibility`、`project-economics`、`mrd-playbook`、`prd-playbook`、`eng-teaming` 英文单份；
   `tests/presets` 132 passed；`preset-smoke` ALL PASS（11 preset 可挂载）。
 - 棘轮红→绿：给 pilot 追加中文 → 2 条红；还原 → 绿。
 - 门禁红→绿：pilot 的 `applicable product types` 改成 `nope` → 红（点名文件 + 无类型包 +
@@ -43,13 +43,13 @@
 - 外部红（非本切片）：工作树另有两个并行研究材料正在写，`pnpm verify` 有
   md-newline / md-links / bare-path / pin-currency / tracked-portability 红；未触碰、未纳入 commit。
 
-## 暂缓
+## 暂缓 / 阻断
 
-- `fact-finding-playbook` 含机器可读的 `待补料·<slug>·<T号>` schedule title 与 `【事实】/【假设】` 审计锚；必须先做 token 英文化 + schedule/audit 消费方改造，不能和普通文案一起盲翻。
+- `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
 
 ## 后果 / 未做
 
 - 角色名主表面与 host 回执已混排；数据仍是 canonical 英文。
-- I1 还剩 6 个 skill（含暂缓的 `fact-finding-playbook`）、persona/agent.cordis.yml、`content/**`、领域值/picker 内部英文。
+- I1 还剩 5 个 skill（`quality-loop` + 4 个机器 token 阻断文件）、persona/agent.cordis.yml、`content/**`、领域值/picker 内部英文。
 - I2（注释/日志/测试名英文 + 内部 CJK 门禁）、I3（开发者文档）未开始。
 - 本 Note 只记录已交付切片；完整目标仍由两份 RFC 承载。
