@@ -3,21 +3,21 @@
  * 只读 board 状态；控件/文案/错误原话与拆前逐字一致。
  */
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
-import { roleLabel, type CultivationRecord } from '../../lib/cultivation.ts'
+import { roleLabel as defaultRoleLabel, type CultivationRecord } from '../../lib/cultivation.ts'
 import { CULTIVATION_COPY, adoptLine } from './cultivation-actions.ts'
 import { BODY_PREVIEW_LINES, type CultivationBoardState } from './use-cultivation-board.tsx'
 
-function recordKindLabel(record: CultivationRecord): string {
+function recordKindLabel(record: CultivationRecord, roleLabel: (role: string) => string): string {
   if (record.kind === 'suggestion') return `${roleLabel(record.proposerRole)}的建议`
   return record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)}分身的纠正` : '我的纠正'
 }
 
-function recordProvenance(record: CultivationRecord): string {
+function recordProvenance(record: CultivationRecord, roleLabel: (role: string) => string): string {
   const proposer = record.proposerKind === 'agent' ? `${roleLabel(record.proposerRole)} 分身（Agent）` : `${roleLabel(record.proposerRole)} 角色语境下的人`
   return `提出者：${proposer}；目标角色：${roleLabel(record.targetRole)}`
 }
 
-export function CultivationInbox({ board }: { readonly board: CultivationBoardState }) {
+export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { readonly board: CultivationBoardState; readonly roleLabel?: (role: string) => string }) {
   const {
     inbox,
     actions,
@@ -72,7 +72,7 @@ export function CultivationInbox({ board }: { readonly board: CultivationBoardSt
                   return (
                     <div key={record.id} role="listitem" className="wk-row" aria-label={`待处理 ${record.id}`}>
                       <span className="wk-row-name">
-                        {recordKindLabel(record)}
+                        {recordKindLabel(record, roleLabel)}
                         <Tag tone="info">{record.expectation}</Tag>
                         {highlightId === record.id && <Tag tone="success">{CULTIVATION_COPY.justSaved}</Tag>}
                       </span>
@@ -82,7 +82,7 @@ export function CultivationInbox({ board }: { readonly board: CultivationBoardSt
                         <span className="wk-meta">{CULTIVATION_COPY.bodyEmptyWithContext}</span>
                       )}
                       {record.work !== undefined && record.work !== '' && <span className="wk-row-task">这次工作：{record.work}</span>}
-                      <span className="wk-meta">{recordProvenance(record)}</span>
+                      <span className="wk-meta">{recordProvenance(record, roleLabel)}</span>
                       <span className="wk-meta">
                         {stampOf(record.id) === null ? '' : `${String(stampOf(record.id))} 提出时间`}
                         {(record.contexts?.length ?? 0) > 0

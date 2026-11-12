@@ -161,6 +161,7 @@ export function createCultivationView(injected: CultivationViewInjected) {
             <CultivationBoard
               viewerRole={viewerRole}
               viewerLabel={viewerRole === null ? null : roleText(viewerRole, 'label', t, roleLabel(viewerRole))}
+              roleLabel={role => roleText(role, 'label', t, roleLabel(role))}
               journalRows={journalRows}
               records={records}
               brokenRecords={brokenRecords}

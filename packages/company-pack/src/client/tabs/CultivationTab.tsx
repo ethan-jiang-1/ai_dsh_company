@@ -75,6 +75,7 @@ export function CultivationTab(props: CultivationTabProps) {
       <CultivationBoard
         viewerRole={viewerRole}
         viewerLabel={viewerRole === null ? null : roleText(viewerRole, 'label', props.t, roleLabel(viewerRole))}
+        roleLabel={role => roleText(role, 'label', props.t, roleLabel(role))}
         journalRows={journalRows}
         records={records}
         brokenRecords={brokenRecords}

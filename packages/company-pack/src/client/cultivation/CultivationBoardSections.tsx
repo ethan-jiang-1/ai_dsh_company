@@ -4,7 +4,7 @@
  */
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useState } from 'react'
-import { roleLabel, timeLabel, VERIFICATION_EVIDENCE_LIMIT, type CultivationRecord, type CultivationRow, type CultivationVerification, type FeedbackItem } from '../../lib/cultivation.ts'
+import { roleLabel as defaultRoleLabel, timeLabel, VERIFICATION_EVIDENCE_LIMIT, type CultivationRecord, type CultivationRow, type CultivationVerification, type FeedbackItem } from '../../lib/cultivation.ts'
 import { CULTIVATION_COPY, revokeLine, verifyLine } from './cultivation-actions.ts'
 import type { CultivationBoardState } from './use-cultivation-board.tsx'
 
@@ -33,7 +33,7 @@ function verificationTime(entry: CultivationVerification, now: number): string {
   return Number.isNaN(at) ? entry.at : timeLabel(at, now)
 }
 
-export function CultivationMine({ inbox }: { readonly inbox: CultivationBoardState['inbox'] }) {
+export function CultivationMine({ inbox, roleLabel = defaultRoleLabel }: { readonly inbox: CultivationBoardState['inbox']; readonly roleLabel?: (role: string) => string }) {
   return (
     <>
       {(inbox.mine.length > 0 || inbox.processedForViewer.length > 0) && (
@@ -78,7 +78,7 @@ export function CultivationMine({ inbox }: { readonly inbox: CultivationBoardSta
   )
 }
 
-export function CultivationAdopted({ board, records }: { readonly board: CultivationBoardState; readonly records: readonly CultivationRecord[] | null }) {
+export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabel }: { readonly board: CultivationBoardState; readonly records: readonly CultivationRecord[] | null; readonly roleLabel?: (role: string) => string }) {
   const { inbox, actions, pendingIds, revokingSlug, capList, capControl, stampOf, now, run, outcomeOf, setRevokingSlug } = board
   const [verifyingId, setVerifyingId] = useState<string | null>(null)
   const [verificationOutcome, setVerificationOutcome] = useState<'pass' | 'fail'>('pass')

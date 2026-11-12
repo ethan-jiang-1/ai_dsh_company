@@ -16,7 +16,7 @@
  */
 import { Button, Input, Pill } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useRef, useState } from 'react'
-import { CULTIVATION_ROLES, roleLabel } from '../../lib/cultivation.ts'
+import { CULTIVATION_ROLES, roleLabel as defaultRoleLabel } from '../../lib/cultivation.ts'
 import { clipExcerpt, encodeContextToken, secretLikeFindings, type CultivationContextRef } from '../../lib/cultivation-context.ts'
 import {
   CULTIVATION_COPY,
@@ -55,6 +55,8 @@ export interface CultivationComposeProps {
   readonly currentSessionId?: string | undefined
   /** 当前会话是 teammate 子会话（D2=A：只做源，按 Lead 身份记账，界面明说）。 */
   readonly teammate?: boolean | undefined
+  /** 角色名表达层取用；缺席 = canonical 英文。 */
+  readonly roleLabel?: (role: string) => string
 }
 
 type ContextStatus = 'idle' | 'loading'
@@ -87,6 +89,7 @@ const cardFromDeliverable = (row: ContextDeliverableRow): ComposeContextCard => 
  * @returns 入口按钮或展开的表单（含预览、回执与校验提示）。
  */
 export function CultivationCompose(props: CultivationComposeProps) {
+  const roleLabel = props.roleLabel ?? defaultRoleLabel
   const [open, setOpen] = useState(false)
   const [targetRole, setTargetRole] = useState(props.viewerRole)
   const [work, setWork] = useState('')

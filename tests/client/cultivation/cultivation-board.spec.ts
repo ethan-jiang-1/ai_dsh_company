@@ -102,6 +102,27 @@ describe('CultivationBoard：数据诚实与能力呈现（V2/V8/V9）', () => {
     expect(markup).toContain('目标角色语境下的人已采纳')
   })
 
+  it('roleLabel 可把培养子块的角色名换成表达层文案', () => {
+    const markup = render({
+      viewerRole: 'cfo',
+      viewerLabel: 'CFO · 首席财务官',
+      roleLabel: (role: string) => role === 'vp-eng' ? 'VP-Eng · 工程副总裁' : role === 'cfo' ? 'CFO · 首席财务官' : role,
+      records: [record({
+        id: '20261029-100000-evid',
+        source: 'deliverables/q4-review.md',
+        body: '报告结论用了预测数字，但没有列关键假设。',
+        proposerKind: 'agent',
+        proposerRole: 'vp-eng',
+        targetRole: 'cfo',
+        status: 'adopted',
+        methodSlug: 'assumption-check',
+        decidedAt: '2026-10-29T10:00:00.000Z',
+      })],
+    })
+    expect(markup).toContain('VP-Eng · 工程副总裁 分身（Agent）')
+    expect(markup).toContain('目标角色：CFO · 首席财务官')
+  })
+
   it('拒绝回执展示目标角色的人侧决定及决定时间', () => {
     const markup = render({ viewerRole: 'cfo', viewerLabel: 'CFO', records: [record({
       kind: 'suggestion', proposerRole: 'ceo', targetRole: 'cfo', status: 'rejected',

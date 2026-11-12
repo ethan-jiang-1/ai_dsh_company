@@ -28,6 +28,7 @@ import {
 import { CultivationCompose } from './CultivationCompose.tsx'
 import { useCultivationBoard } from './use-cultivation-board.tsx'
 import { CultivationInbox } from './CultivationInbox.tsx'
+import { roleLabel as defaultRoleLabel } from '../../lib/cultivation.ts'
 import { CultivationAdopted, CultivationFeedback, CultivationJournal, CultivationMine } from './CultivationBoardSections.tsx'
 import type { CultivationContextSources } from './cultivation-context-data.ts'
 import type { CultivationContext } from '../../lib/cultivation-context.ts'
@@ -64,6 +65,8 @@ export interface CultivationBoardProps {
   readonly teammate?: boolean | undefined
   /** 打开背景原文：容器做可达性预检与导航；失败给可读原因（不出现死按钮）。 */
   readonly openContext?: ((context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false, readonly problem: string }>) | undefined
+  /** 角色名表达层取用；缺席 = canonical 英文（测试/旧容器）。 */
+  readonly roleLabel?: (role: string) => string
 }
 
 /** 一条记录的操作行文案（待办给命令、已处理给回执）——**只在没有动作面时**当降级文案用。 */
@@ -73,6 +76,7 @@ export interface CultivationBoardProps {
  * @returns 面板内容（容器自己套壳：公司页直接放、侧栏套 PanelFrame）。
  */
 export function CultivationBoard(props: CultivationBoardProps) {
+  const roleLabel = props.roleLabel ?? defaultRoleLabel
   const board = useCultivationBoard(props)
   const {
     viewer,
@@ -106,14 +110,15 @@ export function CultivationBoard(props: CultivationBoardProps) {
           sources={props.contextSources}
           currentSessionId={props.currentSessionId}
           teammate={props.teammate}
+          roleLabel={roleLabel}
         />
       )}
 
-      <CultivationInbox board={board} />
+      <CultivationInbox board={board} roleLabel={roleLabel} />
 
-      <CultivationMine inbox={inbox} />
+      <CultivationMine inbox={inbox} roleLabel={roleLabel} />
 
-      <CultivationAdopted board={board} records={board.records} />
+      <CultivationAdopted board={board} records={board.records} roleLabel={roleLabel} />
 
       <CultivationJournal rows={props.journalRows} />
 
