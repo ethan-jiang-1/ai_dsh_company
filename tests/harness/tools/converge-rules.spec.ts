@@ -149,7 +149,7 @@ describe('converge-rules · 半态续跑（BUG-020；2026-10-16 真现场：崩�
 describe('converge-rules · CHARTER 历史纪要查重锚（BUG-014 假跳过）', () => {
   // BUG-014 的真实反例形状：证据路径里含 slug 字样，历史纪要并无条目
   const cooLike = [
-    '## 历史纪要（2026-09-25 首次收敛）',
+    '## Historical minutes (first convergence 2026-09-25)',
     '',
     '- 2026-09-22 · 旧条目（占位）——正文',
     '  - **归属**：……（原稿见 snapshots/archive/convergence-2026-10-12/2026-10-10-ai-sprint-2026/journal/coo/——决策内容已并入本行）',

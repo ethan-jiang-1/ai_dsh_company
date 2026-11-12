@@ -9,7 +9,7 @@ import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 //   ① 六份默认章程不含历史条目与归档引用；
 //   ② 手册/README/模板/状态默认值不含部署日期与 snapshots/archive/deliverables-archive 引用；
 //   ③ content/ 不含 journal/deliverables/cultivation 的运行态文件（只读内容不装 run bundle）。
-//   ④ 出厂章程（`## 历史纪要` 之前）不含部署个案语言：公司/客户…agent…案、内部…动议、date-pending、本部署。
+//   ④ 出厂章程（`## Historical minutes` 之前）不含部署个案语言：公司/客户…agent…案、内部…动议、date-pending、本部署。
 const ROLES = [...COMPANY_ROLE_IDS]
 
 /** 部署个案语言：出厂章程只写中性事实，不写“某客户/某内部动议”的叙述。 */
@@ -37,7 +37,7 @@ export function run({ root, ok, fail }) {
       if (/snapshots\/archive|deliverables-archive/.test(line)) problems.push(`${rel}:${String(index + 1)} 含归档引用`)
     }
     // 章程正文（历史纪要之前）不得出现部署个案语言；页脚“本部署的动议纪要…”是合法模板说明。
-    const body = readFileSync(path, 'utf8').split('\n## 历史纪要')[0]
+    const body = readFileSync(path, 'utf8').split('\n## Historical minutes')[0]
     for (const [index, line] of body.split('\n').entries()) {
       for (const rule of CASE_LANGUAGE) {
         if (rule.re.test(line)) problems.push(`${rel}:${String(index + 1)} 含部署个案语言「${rule.name}」（出厂章程只写中性事实）`)

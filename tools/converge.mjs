@@ -382,13 +382,13 @@ const charterBackfill = (dirName) => {
     let ct = existsSync(charter) ? readFileSync(charter, 'utf8') : ''
     if (charterHasEntry(ct, slug)) { console.log(`  · ${role}: CHARTER 历史纪要已有 ${slug} 条目——跳过`); continue }
     const entry = `- ${kickoff} · ${slug}（${kind}）—— ${concl}\n  （${journalNote(role)}；交付物：\`deliverables-archive/${dirName}/\`）`
-    const hdr = ct.match(/^## 历史纪要.*$/m)
+    const hdr = ct.match(/^## Historical minutes.*$/m)
     if (hdr) {
       const after = ct.indexOf('\n## ', hdr.index + 1)
       const insertAt = after === -1 ? ct.length : after
       ct = ct.slice(0, insertAt).replace(/\n$/, '') + '\n' + entry + '\n' + ct.slice(insertAt)
     } else {
-      ct = ct.replace(/\n$/, '') + '\n\n## 历史纪要（2026-10-12 起由收敛 CLI 登记）\n\n' + entry + '\n'
+      ct = ct.replace(/\n$/, '') + '\n\n## Historical minutes (registered by the convergence CLI since 2026-10-12)\n\n' + entry + '\n'
     }
     writeFileSync(charter, ct)
     console.log(`  · ${role} CHARTER 历史纪要 +1（${slug}）`)

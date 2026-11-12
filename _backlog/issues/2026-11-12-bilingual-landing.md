@@ -60,6 +60,7 @@ opened: 2026-11-12
 - **en 真页面**：新增 `ui-scene-smoke --isolated --lang en`（隔离 home 写 locale.preference=en），9 页签无中文残留；zh 金样仍一致。
 - 培养对话 prompt 英文化：CULTIVATION_SCOPE / [Attached record] / [User question]；测试夹具同步。
 - P1 content/generic 6/6 英文：routing/role-boundary/deliverable-states/work-handoff/collaboration/human-interface；新增 generic 英文棘轮；content-manifest T2 体积仍过。
+- P1 content/charters 6/6 英文；`## 历史纪要` 锚改 `## Historical minutes`（converge/base-clean/gates-negative 同步）；新增 charters 英文棘轮。
 - 修 tab body 未注入 t、Tasks/Cultivation 标题与 guide 不一致、DelegationFlow/Presence 表头、budget 括号。
 - content 模板 8/8 英文（meta/prd 补齐）；模板棘轮 PENDING 清零。
 
