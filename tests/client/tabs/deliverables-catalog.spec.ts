@@ -13,6 +13,7 @@ import {
 import { sessionFileAddress } from '../../../packages/company-pack/src/lib/deliverables-address.ts'
 import { buildDeliverablesCatalog } from '../../../tools/lib/deliverables-catalog.mjs'
 import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/run-bundle-paths.ts'
+import { en, type CompanyKey, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 
 /**
  * 成品目录的 keyless 层（2026-10-19 成品台账卡）：
@@ -149,6 +150,27 @@ describe('generator → parser 契约', () => {
       root: RUN_BUNDLE_PATHS.deliverables, dir: '2026-10-20-contract', path: `${RUN_BUNDLE_PATHS.deliverables}/2026-10-20-contract/final.md`,
       ledgered: true, presented: true, metaProblem: null,
     }])
+  })
+})
+
+describe('DeliverablesView i18n', () => {
+  const tEn = ((key: CompanyKey, params?: Record<string, string | number>) => {
+    const template = en[key]
+    return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+  }) as CompanyT
+
+  it('en：统计/筛选/目录/打开按钮走字典', () => {
+    const html = renderToStaticMarkup(createElement(DeliverablesView, {
+      catalog: CATALOG,
+      sessionId: 's1' as never,
+      openFinal: () => {},
+      t: tEn,
+    }))
+    expect(html).toContain('Total <strong>3</strong> deliverables')
+    expect(html).toContain('Active 2')
+    expect(html).toContain('Unledgered 2')
+    expect(html).toContain('Deliverable catalog')
+    expect(html).toContain('Open')
   })
 })
 

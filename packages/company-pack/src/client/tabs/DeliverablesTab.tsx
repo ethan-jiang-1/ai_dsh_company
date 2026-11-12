@@ -45,13 +45,30 @@ export type DeliverablesTabProps = PropsRuntime<'sidebar.right.pane.tab'> & Deli
 
 type Filter = CatalogFilter
 
-const FILTERS: readonly { readonly key: Filter; readonly label: string }[] = [
-  { key: 'all', label: '全部' },
-  { key: 'active', label: '活跃' },
-  { key: 'archive', label: '归档' },
-  { key: 'unledgered', label: '台账外' },
-  { key: 'unpresented', label: '未 present' },
-]
+const FILTERS: readonly Filter[] = ['all', 'active', 'archive', 'unledgered', 'unpresented']
+
+const FILTER_KEYS: Readonly<Record<Filter, CompanyKey>> = {
+  all: 'deliverables.filter.all',
+  active: 'deliverables.filter.active',
+  archive: 'deliverables.filter.archive',
+  unledgered: 'deliverables.filter.unledgered',
+  unpresented: 'deliverables.filter.unpresented',
+}
+
+function filterLabel(key: Filter, t: CompanyT): string {
+  return t(FILTER_KEYS[key])
+}
+
+function rowAria(entry: DeliverablesCatalogEntry, t: CompanyT): string {
+  const type = entry.type === '' ? t('deliverables.untyped') : catalogTypeLabel(entry.type, t)
+  const result = entry.result === '' ? t('deliverables.unfilledResult') : catalogResultLabel(entry.result, t)
+  const tags: string[] = []
+  if (entry.root === RUN_BUNDLE_PATHS.archive) tags.push(t('deliverables.archived'))
+  if (!entry.ledgered) tags.push(t('deliverables.unledgeredTag'))
+  if (entry.presented === false) tags.push(t('deliverables.notPresentedTag'))
+  if (entry.presented === null) tags.push(t('deliverables.presentUnknownTag'))
+  return [`${entry.kickoff || t('deliverables.dateMissing')} ${entry.slug}`, type, result, ...tags].join(', ')
+}
 
 /** 结果词表（唯一家 = 手册 meta 模板的枚举）→ Tag 色调。新增值必须在这里点名。 */
 const RESULT_TONES: Readonly<Record<string, 'success' | 'info' | 'warning' | 'danger'>> = {
@@ -95,7 +112,10 @@ export function catalogResultLabel(result: string, t: CompanyT): string {
   return key === undefined ? result : t(key)
 }
 
-const defaultT = ((key: CompanyKey) => zh[key]) as CompanyT
+const defaultT = ((key: CompanyKey, params?: Record<string, string | number>) => {
+  const template = zh[key]
+  return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+}) as CompanyT
 
 /** 生成时间 → 稳定、可读的 UTC 文案（不依赖浏览器时区，跨机器一致）。 */
 export function formatGeneratedAt(value: string): string {
@@ -125,7 +145,7 @@ export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }
   const groups = useMemo(() => {
     const byMonth = new Map<string, DeliverablesCatalogEntry[]>()
     for (const entry of filtered) {
-      const month = entry.kickoff.slice(0, 7) || '日期未记'
+      const month = entry.kickoff.slice(0, 7) || t('deliverables.dateMissing')
       byMonth.set(month, [...(byMonth.get(month) ?? []), entry])
     }
     return [...byMonth.entries()]
@@ -138,65 +158,65 @@ export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }
 
   return (
     <>
-      <div className="wk-catalog-summary" aria-label="成品统计">
-        <span>共 <strong>{counts.total}</strong> 份成品</span>
-        <Tag tone="info">活跃 {counts.active}</Tag>
-        <Tag tone="outline">归档 {counts.archive}</Tag>
-        {counts.unledgered > 0 && <Tag tone="warning">台账外 {counts.unledgered}</Tag>}
-        {counts.presented > 0 && <Tag tone="success">present {counts.presented}</Tag>}
-        {counts.notPresented > 0 && <Tag tone="warning">未 present {counts.notPresented}</Tag>}
-        {counts.presentUnknown > 0 && <Tag tone="outline">present 未核 {counts.presentUnknown}</Tag>}
+      <div className="wk-catalog-summary" aria-label={t('deliverables.statsAria')}>
+        <span>{t('deliverables.totalPrefix')} <strong>{counts.total}</strong> {t('deliverables.totalSuffix')}</span>
+        <Tag tone="info">{t('deliverables.active', { count: counts.active })}</Tag>
+        <Tag tone="outline">{t('deliverables.archive', { count: counts.archive })}</Tag>
+        {counts.unledgered > 0 && <Tag tone="warning">{t('deliverables.unledgered', { count: counts.unledgered })}</Tag>}
+        {counts.presented > 0 && <Tag tone="success">{t('deliverables.presented', { count: counts.presented })}</Tag>}
+        {counts.notPresented > 0 && <Tag tone="warning">{t('deliverables.notPresented', { count: counts.notPresented })}</Tag>}
+        {counts.presentUnknown > 0 && <Tag tone="outline">{t('deliverables.presentUnknown', { count: counts.presentUnknown })}</Tag>}
       </div>
-      <div className="wk-catalog-filters" role="group" aria-label="成品筛选">
+      <div className="wk-catalog-filters" role="group" aria-label={t('deliverables.filterAria')}>
         {FILTERS.map(item => (
-          (item.key !== 'unledgered' || counts.unledgered > 0)
-          && (item.key !== 'unpresented' || counts.notPresented > 0) && (
+          (item !== 'unledgered' || counts.unledgered > 0)
+          && (item !== 'unpresented' || counts.notPresented > 0) && (
             <Button
-              key={item.key}
+              key={item}
               size="sm"
-              variant={filter === item.key ? 'primary' : 'ghost'}
-              aria-pressed={filter === item.key}
-              onClick={() => { setFilter(item.key) }}
+              variant={filter === item ? 'primary' : 'ghost'}
+              aria-pressed={filter === item}
+              onClick={() => { setFilter(item) }}
             >
-              {item.label} {filterCount(item.key)}
+              {filterLabel(item, t)} {filterCount(item)}
             </Button>
           )
         ))}
       </div>
       {filtered.length === 0
-        ? <StateNote text={filter === 'all' ? '还没有带 final.md 的成品。' : '没有符合筛选的成品。'} />
+        ? <StateNote text={filter === 'all' ? t('deliverables.emptyAll') : t('deliverables.emptyFilter')} />
         : (
-            <div role="list" aria-label="成品目录" className="wk-deliverable-list">
+            <div role="list" aria-label={t('deliverables.listAria')} className="wk-deliverable-list">
               {groups.map(([month, rows]) => (
-                <div key={month} role="group" aria-label={`${month} 成品`}>
-                  <div className="wk-section-title">{month} · {rows.length} 份</div>
+                <div key={month} role="group" aria-label={t('deliverables.monthAria', { month })}>
+                  <div className="wk-section-title">{t('deliverables.monthCount', { month, count: rows.length })}</div>
                   {rows.map(entry => (
                     <div
                       key={entry.path}
                       role="listitem"
                       className="wk-row wk-deliverable-row"
-                      aria-label={`${entry.kickoff} ${entry.slug}，${entry.type === '' ? '未分型' : catalogTypeLabel(entry.type, t)}，${entry.result === '' ? '未填结果' : catalogResultLabel(entry.result, t)}${entry.root === RUN_BUNDLE_PATHS.archive ? '，归档' : ''}${entry.ledgered ? '' : '，台账外'}${entry.presented === true ? '，已 present' : entry.presented === false ? '，未 present' : '，present 未核'}`}
+                      aria-label={rowAria(entry, t)}
                     >
                       <span className="wk-row-name">
-                        <Tag tone={resultTone(entry.result)}>{entry.result === '' ? '未填' : catalogResultLabel(entry.result, t)}</Tag>
+                        <Tag tone={resultTone(entry.result)}>{entry.result === '' ? t('deliverables.unfilled') : catalogResultLabel(entry.result, t)}</Tag>
                         <span className="wk-deliverable-slug" title={entry.slug}>{entry.slug}</span>
-                        {entry.root === RUN_BUNDLE_PATHS.archive && <Tag tone="outline">归档</Tag>}
-                        {!entry.ledgered && <Tag tone="warning">台账外</Tag>}
-                        {entry.presented === false && <Tag tone="warning">未 present</Tag>}
-                        {entry.presented === null && <Tag tone="outline">present 未核</Tag>}
-                        {entry.metaProblem !== null && <span title={entry.metaProblem}><Tag tone="warning">meta 形状错</Tag></span>}
-                        <span className="wk-deliverable-meta">{entry.kickoff || '日期未记'} · {entry.type === '' ? '未分型' : catalogTypeLabel(entry.type, t)}</span>
+                        {entry.root === RUN_BUNDLE_PATHS.archive && <Tag tone="outline">{t('deliverables.archived')}</Tag>}
+                        {!entry.ledgered && <Tag tone="warning">{t('deliverables.unledgeredTag')}</Tag>}
+                        {entry.presented === false && <Tag tone="warning">{t('deliverables.notPresentedTag')}</Tag>}
+                        {entry.presented === null && <Tag tone="outline">{t('deliverables.presentUnknownTag')}</Tag>}
+                        {entry.metaProblem !== null && <span title={entry.metaProblem}><Tag tone="warning">{t('deliverables.metaShape')}</Tag></span>}
+                        <span className="wk-deliverable-meta">{entry.kickoff || t('deliverables.dateMissing')} · {entry.type === '' ? t('deliverables.untyped') : catalogTypeLabel(entry.type, t)}</span>
                       </span>
-                      <LedgerSummary summary={entry.summary || '（meta 无一句话结论）'} />
+                      <LedgerSummary summary={entry.summary || t('deliverables.summaryMissing')} t={t} />
                       <Button
                         size="sm"
                         variant="ghost"
                         className="wk-deliverable-open"
-                        title={`在右栏打开 ${entry.path}`}
-                        aria-label={`打开 ${entry.slug} 的 final.md`}
+                        title={t('deliverables.openPath', { path: entry.path })}
+                        aria-label={t('deliverables.openAria', { slug: entry.slug })}
                         onClick={() => { openFinal(sessionId, entry.path) }}
                       >
-                        打开
+                        {t('deliverables.open')}
                       </Button>
                     </div>
                   ))}
@@ -205,9 +225,7 @@ export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }
             </div>
           )}
       <div className="wk-meta wk-catalog-foot">
-        成品 = 目录里有 <code>final.md</code>；<code>present</code> 背书来自本部署 host 的审计账本（domain；
-        由 present 事件 + 操作员审计写入）。本索引是 host 生成的**派生显示**，不作为审计权威；
-        未记录的条目显示「未核」，面板只读。
+        {t('deliverables.footer')}
       </div>
     </>
   )
@@ -222,25 +240,25 @@ export function DeliverablesTab(props: DeliverablesTabProps) {
   const { state, reload } = useWorkspaceText(props.readCatalog, props.sessionId)
   const catalog = state.status === 'ready' ? parseCatalog(state.text) : null
   const error = state.status === 'unreadable'
-    ? '成品索引不可读（kb/deliverables-index.json 缺失？本部署 host 会在启动时生成；若仍缺失，请确认 workspace 是公司盘）'
+    ? props.t('deliverables.unreadable')
     : state.status === 'ready' && catalog === null
-      ? '成品索引形状不符（schema 1 / entries 缺失；本部署 host 会在下次启动时重建）'
+      ? props.t('deliverables.badShape')
       : null
 
   return (
     <PanelFrame
-      title="成品"
+      title={props.t('deliverables.title')}
       tone="archive"
       tabProps={props satisfies PanelFrameProps}
-      refreshLabel={catalog === null ? '静态索引' : `静态索引 · 生成于 ${formatGeneratedAt(catalog.generatedAt)}`}
+      refreshLabel={catalog === null ? props.t('deliverables.staticIndex') : props.t('deliverables.staticIndexGenerated', { time: formatGeneratedAt(catalog.generatedAt) })}
       action={(
         <Button
           size="sm"
           variant="ghost"
-          title="重读当前索引（host 会在 present 后重新生成）"
+          title={props.t('deliverables.rereadTitle')}
           onClick={reload}
         >
-          重读
+          {props.t('deliverables.reread')}
         </Button>
       )}
     >

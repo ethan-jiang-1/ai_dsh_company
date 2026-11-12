@@ -196,6 +196,12 @@
 - 台账 kind 中文值走 catalog.type.* 映射；LedgerSummary t 默认 zh，旧测试不破。
 - en 静态渲染断言；client 377 tests；金样 9 页签 ALL PASS；全量 1652 tests，verify ALL PASS。
 
+## P0 UI 第七批（成品）
+
+- DeliverablesView/DeliverablesTab 迁 deliverables.*：统计/筛选/空态/分组/行 aria/标签/打开/footer/索引错误。
+- LedgerSummary 传 t；默认 t 带插值，旧 zh 测试不破。
+- en 静态渲染断言；client 378 tests；金样 9 页签 ALL PASS；全量 1653 tests，verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
