@@ -73,6 +73,12 @@
 - `tests/content/fact-labels.spec.ts` 棘轮：中文标签回潮 → 红；还原 → 绿。
 - I1b 机器 token 清单已清；`pnpm verify` ALL PASS；`pnpm test` 207 files / 1636 tests。
 
+## I1 第九批（fact-finding / product-definition）
+
+- `fact-finding-playbook` 与 `product-definition` 翻成英文；I1 21/24。
+- 剩余 `assembling-the-team` / `chairing-staff-meeting` / `quality-loop`。
+- `pnpm test` 207 files / 1636 tests；`preset-smoke` ALL PASS；`pnpm verify` ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
