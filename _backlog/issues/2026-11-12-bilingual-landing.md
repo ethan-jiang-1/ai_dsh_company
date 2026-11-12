@@ -38,6 +38,10 @@ opened: 2026-11-12
 - 24/24 skill 正文英文；11/11 persona 英文；meta 全部机器字段英文；机器 token（ASSIGN/状态、pending-sources、claim/yield、quality-loop 处置、date-pending、`[NEEDS-CLARIFICATION]`、`[fact]/[assumption]`、`By/Version/Brief`）。
 - content/templates：decision-memo / review-note / ops-review-note / weekly-report / strs / mrd 已英文（6/8）。
 
+**P0 进展（2026-11-12，本轮）**：
+- 待办页签 + PanelFrame 浮出/收回双语；`attentionLabel` 中文纯函数移除，改字典 key。
+- `tests/client/i18n/attention-tab.spec.ts` zh/en 静态渲染；client 370 passed；`ui-scene-smoke --isolated --golden` 9 页签金样一致。
+
 **剩余**：
 - `content/templates/meta.md`、`prd.md`（2 个）。
 - `content/generic/`、`content/charters/`、`content/product-types/`、`content/delivery-modes/`、`content/state/`、`content/company/`。

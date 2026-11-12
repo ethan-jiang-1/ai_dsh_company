@@ -4,7 +4,6 @@ import {
   ESCALATION_MARK,
   PRESENT_TOOL_NAME,
   STREAM_ITEM_CAP,
-  attentionLabel,
   attentionTone,
   mergeAttention,
   streamAttention,
@@ -109,11 +108,7 @@ describe('mergeAttention', () => {
 })
 
 describe('标签与色调', () => {
-  it('四类标签齐备且等人类醒目', () => {
-    expect(attentionLabel('question')).toBe('待答问询')
-    expect(attentionLabel('approval')).toBe('待批审批')
-    expect(attentionLabel('escalation')).toBe('升级待处理')
-    expect(attentionLabel('completion')).toBe('完成通知')
+  it('类别色调：等人的醒目、告知的低调', () => {
     expect(attentionTone('approval')).toBe('danger')
     expect(attentionTone('completion')).toBe('outline')
   })

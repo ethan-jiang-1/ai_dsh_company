@@ -16,6 +16,7 @@ import { ledgerStats, parseMotionLedger } from '../../lib/ledger.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { useWorkspaceText } from '../data/workspace-text.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
+import type { CompanyT } from '../locales.ts'
 
 /** 页签体注入面：台账文件读取闭包 + 浮出。 */
 export interface LedgerTabInjected {
@@ -25,7 +26,7 @@ export interface LedgerTabInjected {
   readonly readLedger: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>
 }
 
-export type LedgerTabProps = PropsRuntime<'sidebar.right.pane.tab'> & LedgerTabInjected
+export type LedgerTabProps = PropsRuntime<'sidebar.right.pane.tab'> & LedgerTabInjected & { readonly t: CompanyT }
 
 /** 刷新间隔（台账随当轮收敛更新，低频）。 */
 const REFRESH_MS = 30_000

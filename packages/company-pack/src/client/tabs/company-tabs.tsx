@@ -25,7 +25,7 @@ import { DelegationFlowPanel } from './DelegationFlowPanel.tsx'
 import { buildDelegationTree, type DelegationSessionSummaryLike } from '../../lib/delegation-tree.ts'
 import { TasksTableView } from './TasksPanel.tsx'
 import { useCompanyData, type CompanyDataInjected } from '../data/use-company-data.ts'
-import type { CompanyT } from '../locales.ts'
+import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 import { presenceRoleText, roleText, roleTextForCanonical } from '../roles.ts'
 
 /** 页签体注入面：数据面 + 平台浮出操作。 */
@@ -52,6 +52,7 @@ export interface PanelFrameProps {
   readonly useTabInfo: CompanyTabProps['useTabInfo']
   readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
   readonly unfloatTab: (paneId: string) => void
+  readonly t?: CompanyT
 }
 
 /**
@@ -66,15 +67,18 @@ export interface PanelFrameProps {
  *   `useTabInfo()` 的 layout 是 observable，浮出/收回都会触发本组件重渲染，检查自然保持新鲜。
  *   浮窗的移动（grip）、缩放、置顶仍是平台能力，我们不自造窗口管理（D13）。
  */
-export function PanelFrame({ title, tone, tabProps, action, children, refreshLabel = '投影更新' }: {
+const defaultPanelT = ((key: CompanyKey) => zh[key]) as CompanyT
+
+export function PanelFrame({ title, tone, tabProps, action, children, refreshLabel }: {
   readonly title: string
   readonly tone: string
   readonly tabProps: PanelFrameProps
   readonly action?: ReactNode
   readonly children: ReactNode
-  /** 页签头的新鲜度文案；**必须说真话**（推送面板用默认「投影更新」；轮询面板各自传真实间隔——2026-10-18 走查抓到培养页签写 5 秒实际 30 秒）。 */
+  /** 页签头的新鲜度文案；**必须说真话**（推送面板用默认 projected；轮询面板各自传真实间隔——2026-10-18 走查抓到培养页签写 5 秒实际 30 秒）。 */
   readonly refreshLabel?: string
 }) {
+  const t = tabProps.t ?? defaultPanelT
   const info = tabProps.useTabInfo()
   const rootRef = useRef<HTMLDivElement | null>(null)
   const [floatPaneId, setFloatPaneId] = useState<string | null>(null)
@@ -108,7 +112,7 @@ export function PanelFrame({ title, tone, tabProps, action, children, refreshLab
       <div className={`wk-pane-strip wk-tone-${tone}`} aria-hidden="true" />
       <div className="wk-pane-head">
         <strong>{title}</strong>
-        <span className="wk-meta">{refreshLabel}</span>
+        <span className="wk-meta">{refreshLabel ?? t('panel.projected')}</span>
         <span style={{ flex: 1 }} />
         {action}
         {floatPaneId === null
@@ -116,24 +120,24 @@ export function PanelFrame({ title, tone, tabProps, action, children, refreshLab
             <Button
               size="sm"
               variant="ghost"
-              title="把这个面板拽出成浮窗（可移动 / 可缩放；下次浮出回到上次位置）"
+              title={t('panel.floatTitle')}
               onClick={() => {
                 const tabKey = info.tab.contentId !== '' ? info.tab.contentId : info.tab.id
                 const saved = loadFloatRect(window.localStorage, tabKey)
                 tabProps.floatTab(info.tab.id, saved === null ? undefined : clampRect(saved, window.innerWidth, window.innerHeight))
               }}
             >
-              浮出
+              {t('panel.float')}
             </Button>
           )
           : (
             <Button
               size="sm"
               variant="ghost"
-              title="收回右栏（浮窗回到侧栏页签）"
+              title={t('panel.dockTitle')}
               onClick={() => { captureFloatRect(); tabProps.unfloatTab(floatPaneId) }}
             >
-              收回
+              {t('panel.dock')}
             </Button>
           )}
       </div>

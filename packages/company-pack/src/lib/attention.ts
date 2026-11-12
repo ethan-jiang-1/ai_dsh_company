@@ -140,15 +140,6 @@ export function mergeAttention(
   return [...waiting.sort(byTimeDesc), ...streamItems.slice().sort(byTimeDesc)]
 }
 
-/** 类别 → 中文标签（面板行首 Tag）。 */
-export function attentionLabel(kind: AttentionKind): string {
-  switch (kind) {
-    case 'question': return '待答问询'
-    case 'approval': return '待批审批'
-    case 'escalation': return '升级待处理'
-    case 'completion': return '完成通知'
-  }
-}
 
 /** 类别 → Tag 色调（等人的醒目、告知的低调）。 */
 export function attentionTone(kind: AttentionKind): 'info' | 'danger' | 'warning' | 'outline' {

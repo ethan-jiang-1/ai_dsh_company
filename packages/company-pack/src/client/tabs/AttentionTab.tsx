@@ -15,7 +15,6 @@ import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import {
-  attentionLabel,
   attentionTone,
   mergeAttention,
   streamAttention,
@@ -26,6 +25,7 @@ import {
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
 import type { CompanyDataInjected } from '../data/use-company-data.ts'
+import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 
 /** 页签体注入面：follow 流 + 浮出 + 挂起项快照 + 会话跳转 + lead 归并。 */
 export interface AttentionTabInjected {
@@ -40,16 +40,23 @@ export interface AttentionTabInjected {
   readonly leadOf: (sessionId: SessionId) => SessionId
 }
 
-export type AttentionTabProps = PropsRuntime<'sidebar.right.pane.tab'> & AttentionTabInjected
+export type AttentionTabProps = PropsRuntime<'sidebar.right.pane.tab'> & AttentionTabInjected & { readonly t: CompanyT }
 
 /** 流累计上限（防长会话撑爆内存与折算扫描）。 */
 const MAX_EVENTS = 1_000
 
+const ATTENTION_KEYS: Readonly<Record<AttentionItem['kind'], CompanyKey>> = {
+  question: 'attention.kind.question',
+  approval: 'attention.kind.approval',
+  escalation: 'attention.kind.escalation',
+  completion: 'attention.kind.completion',
+}
+
 /** 相对时间（刚刚 / N 分钟前 / HH:MM）。 */
-function formatWhen(time: number): string {
+function formatWhen(time: number, t: CompanyT): string {
   const delta = Date.now() - time
-  if (delta < 60_000) return '刚刚'
-  if (delta < 3_600_000) return `${Math.floor(delta / 60_000)} 分钟前`
+  if (delta < 60_000) return t('attention.justNow')
+  if (delta < 3_600_000) return t('attention.minutesAgo', { minutes: Math.floor(delta / 60_000) })
   return new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
@@ -62,7 +69,13 @@ const itemKey = (item: AttentionItem): string =>
  * @param props - 槽 props + 注入面。
  * @returns 注意力面板。
  */
+const defaultAttentionT = ((key: CompanyKey, params?: Record<string, string | number>) => {
+  const template = zh[key]
+  return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+}) as CompanyT
+
 export function AttentionTab(props: AttentionTabProps) {
+  const { t = defaultAttentionT } = props
   const [live, setLive] = useState<readonly LivePending[]>([])
   const [events, setEvents] = useState<readonly AttentionEventLike[]>([])
   const [streamError, setStreamError] = useState<string | null>(null)
@@ -108,35 +121,35 @@ export function AttentionTab(props: AttentionTabProps) {
   const whoOf = (item: AttentionItem): string => {
     if (item.kind === 'completion' || item.kind === 'escalation') return item.who
     const summary = byId[item.jumpTo as SessionId]
-    return summary?.displayTitle ?? `会话 ${item.jumpTo.slice(0, 8)}`
+    return summary?.displayTitle ?? t('attention.session', { id: item.jumpTo.slice(0, 8) })
   }
 
   return (
     <PanelFrame
-      title="待办"
+      title={t('attention.title')}
       tone="attention"
       tabProps={props satisfies PanelFrameProps}
-      refreshLabel="每 2 秒自动刷新"
+      refreshLabel={t('attention.refresh')}
     >
-      {streamError !== null && <div className="wk-error">动态流不可用：{streamError}</div>}
+      {streamError !== null && <div className="wk-error">{t('attention.streamError', { message: streamError })}</div>}
       <div className="wk-activity-block">
-        <strong>等你处理</strong>
+        <strong>{t('attention.waiting')}</strong>
         {waiting.length === 0
-          ? <div className="wk-meta">没有等你的事——各角色都在正常推进。</div>
+          ? <div className="wk-meta">{t('attention.emptyWaiting')}</div>
           : (
-            <ul className="wk-activity" aria-label="待办事项">
+            <ul className="wk-activity" aria-label={t('attention.waitingList')}>
               {waiting.map(item => (
                 <li key={itemKey(item)}>
-                  <Tag tone={attentionTone(item.kind)}>{attentionLabel(item.kind)}</Tag>
+                  <Tag tone={attentionTone(item.kind)}>{t(ATTENTION_KEYS[item.kind])}</Tag>
                   {' '}{whoOf(item)}：{item.what}
-                  <span className="wk-meta"> · {formatWhen(item.time)}</span>{' '}
+                  <span className="wk-meta"> · {formatWhen(item.time, t)}</span>{' '}
                   <Button
                     size="sm"
                     variant="ghost"
-                    title="跳到发起这件事的会话"
+                    title={t('attention.handleTitle')}
                     onClick={() => { props.openSession(item.jumpTo as SessionId) }}
                   >
-                    去处理
+                    {t('attention.handle')}
                   </Button>
                 </li>
               ))}
@@ -144,16 +157,16 @@ export function AttentionTab(props: AttentionTabProps) {
           )}
       </div>
       <div className="wk-activity-block">
-        <strong>刚完成</strong>
+        <strong>{t('attention.done')}</strong>
         {completions.length === 0
-          ? <div className="wk-meta">暂无交付通知（CEO present 后出现在这里）。</div>
+          ? <div className="wk-meta">{t('attention.emptyDone')}</div>
           : (
-            <ul className="wk-activity" aria-label="刚完成的事">
+            <ul className="wk-activity" aria-label={t('attention.doneList')}>
               {completions.map(item => (
                 <li key={itemKey(item)}>
-                  <Tag tone={attentionTone(item.kind)}>{attentionLabel(item.kind)}</Tag>
+                  <Tag tone={attentionTone(item.kind)}>{t(ATTENTION_KEYS[item.kind])}</Tag>
                   {' '}{whoOf(item)} · {item.what}
-                  <span className="wk-meta"> · {formatWhen(item.time)}</span>
+                  <span className="wk-meta"> · {formatWhen(item.time, t)}</span>
                 </li>
               ))}
             </ul>

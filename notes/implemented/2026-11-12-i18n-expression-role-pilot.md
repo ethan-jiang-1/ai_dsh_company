@@ -161,6 +161,11 @@
 - decision-memo 模板英文；template 棘轮 PENDING 7。
 - 注入中文 → 2 条红；还原 → 绿；`pnpm test` 208 files / 1643 tests；verify ALL PASS。
 
+## P0 UI 第一批（待办 + PanelFrame）
+
+- 待办页签、PanelFrame 浮出/收回、attention 类别标签迁 company 字典；移除中文 `attentionLabel` 纯函数。
+- zh/en 静态渲染 spec；client 370 tests；ui-scene-smoke 9 页签金样 ALL PASS；全量 1645 tests，verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
