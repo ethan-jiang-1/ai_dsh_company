@@ -1,27 +1,27 @@
 ---
 name: market-sizing
-description: 市场与商机估算方法论：假设→双向估算→MEDDIC 资格→敏感度；每个数字标【事实/假设】；一页纸（<company-content>/templates/decision-memo.md）。
+description: 'Market and opportunity sizing: assumptions → two-way estimate → MEDDIC qualification → sensitivity; label every number [fact/assumption]; one page (<company-content>/templates/decision-memo.md).'
 ---
-# 市场与商机估算（一页纸）
+# Market and opportunity sizing (one page)
 
-> **方法契约**：适用产品类型 = all；需要事实 = 无。
+> **Method contract**: applicable product types = all; required facts = none.
 
-对"该不该投这个市场 / 这单值不值得追"的标准打法（行业框架：MEDDIC 资格认定）：
+The standard play for "should we invest in this market / is this deal worth pursuing?" (industry framework: MEDDIC qualification):
 
-1. **先列假设**：目标客户是谁、痛点强度、现用替代品——事实（出处 `.dsh-company/kb/vp-sales/CHARTER.md`）与假设分开列。
-2. **双向估算**：
-   - 自底向上 = 可触达客户数 × 年赢单率 × 单合同额（项目 + 首年维护）；
-   - 自顶向下 = 客户该类系统的年度预算池 × 我们可拿份额。
-   两遍差 3 倍以上 → 回去修假设，禁止取中位数糊弄。
-3. **单单资格过 MEDDIC 六问**：Metrics（客户要改善的指标）、Economic buyer（谁签字）、Decision criteria（验收标准）、Decision process（采购流程）、Identify pain（痛点）、Champion（我方内线）。六问答不上来 = 商机不成熟，不进 pipeline，更不许写进估算的分子。
-4. **敏感度**：挑最不确定的两个假设各 ±50%，结论翻掉就明说"估算不可用"。
-5. **结论先行**：投 / 不投 / 有条件投 + 一句话理由；"没人买"成立时直接行使 veto。
-6. **格式与交付**：按 `<company-content>/templates/decision-memo.md` 结构，一页纸为限，交付到 `.dsh-company/deliverables/<slug>/drafts/vp-sales.md`。
+1. **List assumptions first**: who the target customer is, pain intensity, current alternatives — keep facts (source `.dsh-company/kb/vp-sales/CHARTER.md`) and assumptions in separate columns.
+2. **Two-way estimate**:
+   - Bottom-up = reachable customers × annual win rate × contract value (project + first-year maintenance);
+   - Top-down = the customer's annual budget pool for this class of system × the share we can capture.
+   If the two estimates differ by more than 3×, go back and fix the assumptions; do not average them into a middle number.
+3. **Qualify each deal against the six MEDDIC questions**: Metrics (the metric the customer wants to improve), Economic buyer (who signs), Decision criteria (acceptance criteria), Decision process (procurement process), Identify pain, Champion (our internal sponsor). If you cannot answer all six, the opportunity is immature: do not put it in the pipeline, and never put it in the numerator of an estimate.
+4. **Sensitivity**: take the two most uncertain assumptions and vary each by ±50%; if the conclusion flips, say plainly "estimate unusable".
+5. **Conclusion first**: invest / do not invest / invest with conditions + one-line reason; when "no one will buy" holds, exercise veto directly.
+6. **Format and delivery**: use the structure in `<company-content>/templates/decision-memo.md`, one page max; deliver to `.dsh-company/deliverables/<slug>/drafts/vp-sales.md`.
 
-红线：只谈市场与定价；"做不做得出"归研发、"接不接得住"归运营，不代答。
-每个数字标【事实】（出处 = 自己 KB）或【假设】（待验证）；禁止无标注数字。
-需要更多客户事实支撑时读自己的 KB（`.dsh-company/kb/vp-sales/`），不够再用 `subagent` 派 worker 调研。
+Red lines: only market and pricing; "can we build it" belongs to engineering, "can operations carry it" to operations; do not answer for them.
+Label every number [fact] (source = own KB) or [assumption] (to verify); unlabeled numbers are forbidden.
+When more customer facts are needed, read your own KB (`.dsh-company/kb/vp-sales/`); if insufficient, use `subagent` to dispatch a worker to research.
 
-> **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
-> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对
-> （如署名行与任务书、交付物三态与 present），本文只留需要上下文判断的部分。
+> **Boundary**: this skill is guidance, not a checklist — it provides a stable entry point and judgment criteria; judgment stays with the executor.
+> When this skill applies, **read the full text before acting**; do not guess from the description. Mechanical checks remain with the operator at close-out
+> (signature line vs. task brief, deliverable tri-state vs. present); this text keeps only what needs context.

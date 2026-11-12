@@ -1,20 +1,20 @@
 ---
 name: budget-check
-description: 预算核查：花费逐项对照 .dsh-company/kb/coo/CHARTER.md 预算基准；人力换算成"人·周"记机会成本；按最坏档压力测试；超限即 veto。
+description: 'Budget check: compare each spend line with the budget baseline in .dsh-company/kb/coo/CHARTER.md; convert labor to person-weeks as opportunity cost; stress-test the worst case; veto when over limit.'
 ---
-# 预算核查（一页纸）
+# Budget check (one page)
 
-> **方法契约**：适用产品类型 = all；需要事实 = kb/rates.md（人·周成本）；缺 = fail-closed（报「配置缺口」，不编数）。
+> **Method contract**: applicable product types = all; required facts = kb/rates.md (person-week cost); missing = fail-closed (report "config gap"; do not invent numbers).
 
-1. **口径**：先问清"首月还是稳态月""含不含人力"——口径不同数字不可比。
-2. **逐项对照基准**：每笔花费对照 `.dsh-company/kb/policy-lines.md` 的预算基准（云基础设施、AI 试点 API 硬顶、固定支出审批线——唯一事实家 = `policy-lines.md`），标【基准内】/【新增】/【超限】。
-3. **人力是大头**：开发 / 服务业务的真成本是"人·周"——方案换算成占用几人几周，挤占并行项目上限的按机会成本记账；费率卡 = `.dsh-company/kb/rates.md`，`<待填>` = 配置缺口，先要费率，不编美元数。
-4. **最坏档压力测试**：量 ×2、单价 ×2 再算一次——撞线的方案必须带降频/降档预案；"到时候再说"不算预案。
-5. **结论**：可承受 / 有条件可承受（条件列全）/ 不可承受（veto），一句话理由。
-6. **格式与交付**：并入 `<company-content>/templates/ops-review-note.md` 结构，一页纸为限。
+1. **Basis**: first ask "first month or steady-state month?" and "does it include labor?" — numbers are not comparable across bases.
+2. **Compare each line with the baseline**: compare every spend line with the budget baseline in `.dsh-company/kb/policy-lines.md` (cloud infrastructure, AI pilot API hard cap, fixed-expense approval line — single source = `policy-lines.md`); label [within baseline] / [new] / [over limit].
+3. **Labor is the big cost**: the real cost of development / service work is person-weeks — convert the plan into how many people for how many weeks; when it crowds out the parallel-project limit, book it as opportunity cost; rate card = `.dsh-company/kb/rates.md`; `<to fill>` = config gap; ask for rates first; never invent dollar figures.
+4. **Worst-case stress test**: volume ×2, unit price ×2, calculate again — a plan that hits the line must carry a reduce-frequency / reduce-tier fallback; "we'll figure it out later" is not a plan.
+5. **Conclusion**: affordable / conditionally affordable (list every condition) / unaffordable (veto), with a one-line reason.
+6. **Format and delivery**: merge into the structure of `<company-content>/templates/ops-review-note.md`, one page max.
 
-红线：单价未核实时不编美元数——写"未证明成立"，用档位与上界表达（公司纪律，各案交付物同此口径）。
+Red line: when unit prices are unverified, do not invent dollar figures — write "unproven" and express it with tiers and upper bounds (company discipline; the same basis applies to every deliverable).
 
-> **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
-> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对
-> （如署名行与任务书、交付物三态与 present），本文只留需要上下文判断的部分。
+> **Boundary**: this skill is guidance, not a checklist — it provides a stable entry point and judgment criteria; judgment stays with the executor.
+> When this skill applies, **read the full text before acting**; do not guess from the description. Mechanical checks remain with the operator at close-out
+> (signature line vs. task brief, deliverable tri-state vs. present); this text keeps only what needs context.

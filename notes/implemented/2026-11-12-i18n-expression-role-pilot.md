@@ -31,9 +31,9 @@
 - 角色名：`role-copy.spec` 6 角色 zh/en/未知/委派映射；RoleBadge / DelegationCard /
   Presence / Tasks / Board / Cultivation 子块 / context picker / host `/cultivation` 回执
   静态/纯函数断言；`ui-scene-smoke --isolated --golden` ALL PASS。
-- I1 pilot + 第二批：`customer-voice`、`tech-feasibility-review`、`pricing`、
-  `managed-service-pricing` 英文单份；`tests/presets` 132 passed；`preset-smoke` ALL PASS
-  （11 preset 可挂载）。
+- I1 pilot + 第二/三批：`customer-voice`、`tech-feasibility-review`、`pricing`、
+  `managed-service-pricing`、`market-sizing`、`managed-service-ops`、`budget-check` 英文单份；
+  `tests/presets` 132 passed；`preset-smoke` ALL PASS（11 preset 可挂载）。
 - 棘轮红→绿：给 pilot 追加中文 → 2 条红；还原 → 绿。
 - 门禁红→绿：pilot 的 `applicable product types` 改成 `nope` → 红（点名文件 + 无类型包 +
   未覆盖默认类型）；还原 → 绿。中文契约块仍绿。
@@ -44,6 +44,6 @@
 ## 后果 / 未做
 
 - 角色名主表面与 host 回执已混排；数据仍是 canonical 英文。
-- I1 还剩 20 个 skill、persona/agent.cordis.yml、`content/**`、领域值/picker 内部英文。
+- I1 还剩 17 个 skill、persona/agent.cordis.yml、`content/**`、领域值/picker 内部英文。
 - I2（注释/日志/测试名英文 + 内部 CJK 门禁）、I3（开发者文档）未开始。
 - 本 Note 只记录已交付切片；完整目标仍由两份 RFC 承载。

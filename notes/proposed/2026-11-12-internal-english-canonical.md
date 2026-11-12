@@ -115,13 +115,14 @@ opened: 2026-11-12
 ## I1 进度（pilot + 棘轮）
 
 - **pilot**：`presets/vp-sales/skills/customer-voice/SKILL.md` 已翻成英文单份；frontmatter description 英文；方法契约标记用 `**Method contract**` / `applicable product types =` / `required facts =`。
-- **棘轮**：`tests/presets/internal-english.spec.ts` 扫全部 `presets/**/SKILL.md`；`PENDING` 之外的正文不得含中文。当前已翻 4 个（`customer-voice`、`tech-feasibility-review`、`pricing`、`managed-service-pricing`），其余 20 个在 PENDING。每翻完一个删一行，最终 PENDING 为空 = 硬门禁。
+- **棘轮**：`tests/presets/internal-english.spec.ts` 扫全部 `presets/**/SKILL.md`；`PENDING` 之外的正文不得含中文。当前已翻 7 个（`customer-voice`、`tech-feasibility-review`、`pricing`、`managed-service-pricing`、`market-sizing`、`managed-service-ops`、`budget-check`），其余 17 个在 PENDING。每翻完一个删一行，最终 PENDING 为空 = 硬门禁。
 - **门禁红证据**：临时给 pilot 追加中文 → 棘轮 2 条红；还原 → 绿。
 - **第二批**：`tech-feasibility-review`、`pricing`、`managed-service-pricing` 翻成英文；`two-axis-applicability` / `delivery-mode-coverage` 的契约解析改为中英双认。
+- **第三批**：`market-sizing`、`managed-service-ops`、`budget-check` 翻成英文；method-contract / delivery-mode 门禁继续绿。
 - **测试/冒烟**：`pnpm test tests/presets` 132 passed；`pnpm test` 207 files / 1630 tests；`preset-smoke` ALL PASS（11 preset 可挂载）。
 - **门禁**：`checks/gates/method-contract.mjs` 接受中英契约块（`**方法契约**` / `**Method contract**`；`适用产品类型` / `applicable product types`；`需要事实` / `required facts`；`无` / `none`）；中文契约块继续绿，英文 pilot 也绿。
 - **门禁红证据**：把 pilot 的 `applicable product types` 改成 `nope` → 红（点名文件 + 没有类型包 + 未覆盖默认类型）；还原 → 绿。中文契约块两方向都跑过。
-- **未做**：其余 20 个 skill、persona/agent.cordis.yml、content/**、领域值。pilot + 第二批只证明翻译/棘轮/门禁流程，不宣称 I1 完成。
+- **未做**：其余 17 个 skill、persona/agent.cordis.yml、content/**、领域值。pilot + 两批只证明翻译/棘轮/门禁流程，不宣称 I1 完成。
 
 ## 输掉的方案
 
