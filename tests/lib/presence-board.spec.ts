@@ -208,6 +208,7 @@ describe('diffActivity（live 动态流 = 快照差分）', () => {
     expect(texts).toContain('COO 上线')
     const t2 = { members: [member('s1', 'vp-eng', 'teammate', 'failed')], tasks: [] }
     expect(diffActivity(t1, t2, 9).map(entry => entry.text)).toEqual(['VP-Eng 故障'])
+    expect(diffActivity(t1, t2, 9)[0]?.token?.key).toBe('presence.activity.memberFailed')
   })
 
   it('任务：新任务 / 认领 / 完成；仅 revision 变化不产动态', () => {

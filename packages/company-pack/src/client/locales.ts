@@ -163,6 +163,18 @@ export const zh = {
   'budget.row.cacheRead': '缓存读',
   'budget.row.cacheWrite': '缓存写',
   'budget.row.output': '输出',
+  'presence.activity.memberOnline': '{name} 上线',
+  'presence.activity.memberProvisioning': '{name} 启动中',
+  'presence.activity.memberIdle': '{name} 转待命',
+  'presence.activity.memberInactive': '{name} 转未上线',
+  'presence.activity.memberRunning': '{name} 转执行中',
+  'presence.activity.memberFailed': '{name} 故障',
+  'presence.activity.memberFailedDetail': '{name} 故障：{error}',
+  'presence.activity.memberUnknown': '{name} 转未知',
+  'presence.activity.taskNew': '新任务 {id}：{subject}',
+  'presence.activity.taskClaimed': '{owner} 认领 {id}',
+  'presence.activity.taskCompleted': '{owner} 完成 {id}',
+  'presence.activity.taskDeleted': '{id} 已删除',
 } as const
 
 /** 本命名空间的 key 联合。 */
@@ -321,6 +333,18 @@ export const en: Record<CompanyKey, string> = {
   'budget.row.cacheRead': 'Cache read',
   'budget.row.cacheWrite': 'Cache write',
   'budget.row.output': 'Output',
+  'presence.activity.memberOnline': '{name} is online',
+  'presence.activity.memberProvisioning': '{name} is starting',
+  'presence.activity.memberIdle': '{name} is now idle',
+  'presence.activity.memberInactive': '{name} went offline',
+  'presence.activity.memberRunning': '{name} is now running',
+  'presence.activity.memberFailed': '{name} failed',
+  'presence.activity.memberFailedDetail': '{name} failed: {error}',
+  'presence.activity.memberUnknown': '{name} changed to unknown',
+  'presence.activity.taskNew': 'New task {id}: {subject}',
+  'presence.activity.taskClaimed': '{owner} claimed {id}',
+  'presence.activity.taskCompleted': '{owner} completed {id}',
+  'presence.activity.taskDeleted': '{id} was deleted',
 }
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {

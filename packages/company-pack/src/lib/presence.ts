@@ -41,11 +41,30 @@ export interface PresenceRow {
   readonly currentTask: string | null
 }
 
+/** 协作动态的结构化文案 token（UI 走字典；text 保留给旧夹具/离线回放）。 */
+export interface ActivityToken {
+  readonly key: string
+  readonly params?: Readonly<Record<string, string>>
+}
+
 /** 协作动态流一条（成员生命周期 / 任务迁移 / 消息投递）。 */
 export interface ActivityEntry {
   readonly time: number
   readonly kind: 'member' | 'task' | 'message'
   readonly text: string
+  readonly token?: ActivityToken
+}
+
+/** 成员状态 → 动态 token（上线/转状态/故障；文案由 client 字典渲染）。 */
+function memberToken(name: string, status: PresenceStatus): ActivityToken {
+  switch (status) {
+    case 'running': return { key: 'presence.activity.memberRunning', params: { name } }
+    case 'idle': return { key: 'presence.activity.memberIdle', params: { name } }
+    case 'inactive': return { key: 'presence.activity.memberInactive', params: { name } }
+    case 'provisioning': return { key: 'presence.activity.memberProvisioning', params: { name } }
+    case 'failed': return { key: 'presence.activity.memberFailed', params: { name } }
+    default: return { key: 'presence.activity.memberUnknown', params: { name } }
+  }
 }
 
 /** 事件折算的完整板（回放 / 离线路径的输出）。 */
@@ -181,12 +200,12 @@ export function diffActivity(prev: TeamViewLike | undefined, next: TeamViewLike,
     const before = prevMembers.get(member.id)
     const display = displayNameFor(member.name, member.role)
     if (before === undefined) {
-      entries.push({ time: now, kind: 'member', text: `${display} 上线` })
+      entries.push({ time: now, kind: 'member', text: `${display} 上线`, token: { key: 'presence.activity.memberOnline', params: { name: display } } })
     } else if (before.phase !== member.phase) {
       if (member.phase === 'failed') {
-        entries.push({ time: now, kind: 'member', text: `${display} 故障` })
+        entries.push({ time: now, kind: 'member', text: `${display} 故障`, token: memberToken(display, 'failed') })
       } else {
-        entries.push({ time: now, kind: 'member', text: `${display} 转${statusLabelFor(presenceStatusFromPhase(member.phase))}` })
+        entries.push({ time: now, kind: 'member', text: `${display} 转${statusLabelFor(presenceStatusFromPhase(member.phase))}`, token: memberToken(display, presenceStatusFromPhase(member.phase)) })
       }
     }
   }
@@ -194,18 +213,18 @@ export function diffActivity(prev: TeamViewLike | undefined, next: TeamViewLike,
     const before = prevTasks.get(task.id)
     if (before === undefined) {
       if (task.status !== 'deleted') {
-        entries.push({ time: now, kind: 'task', text: `新任务 ${task.id}：${clip(task.subject, 32)}` })
+        entries.push({ time: now, kind: 'task', text: `新任务 ${task.id}：${clip(task.subject, 32)}`, token: { key: 'presence.activity.taskNew', params: { id: task.id, subject: clip(task.subject, 32) } } })
       }
       continue
     }
     if (before.status === task.status) continue
     const owner = task.ownerName === undefined ? '未分配' : displayNameFor(task.ownerName, 'teammate')
     if (task.status === 'in_progress') {
-      entries.push({ time: now, kind: 'task', text: `${owner} 认领 ${task.id}` })
+      entries.push({ time: now, kind: 'task', text: `${owner} 认领 ${task.id}`, token: { key: 'presence.activity.taskClaimed', params: { owner, id: task.id } } })
     } else if (task.status === 'completed') {
-      entries.push({ time: now, kind: 'task', text: `${owner} 完成 ${task.id}` })
+      entries.push({ time: now, kind: 'task', text: `${owner} 完成 ${task.id}`, token: { key: 'presence.activity.taskCompleted', params: { owner, id: task.id } } })
     } else {
-      entries.push({ time: now, kind: 'task', text: `${task.id} 已删除` })
+      entries.push({ time: now, kind: 'task', text: `${task.id} 已删除`, token: { key: 'presence.activity.taskDeleted', params: { id: task.id } } })
     }
   }
   return entries
@@ -242,14 +261,15 @@ export function presenceFromEvents(
       teamId ??= event.data.teamId
       const display = displayNameFor(member.name, 'teammate')
       if (member.phase === 'provisioning') {
-        activity.push({ time: event.time, kind: 'member', text: `${display} 启动中` })
+        activity.push({ time: event.time, kind: 'member', text: `${display} 启动中`, token: memberToken(display, 'provisioning') })
       } else if (member.phase === 'active') {
-        activity.push({ time: event.time, kind: 'member', text: `${display} 上线` })
+        activity.push({ time: event.time, kind: 'member', text: `${display} 上线`, token: { key: 'presence.activity.memberOnline', params: { name: display } } })
       } else {
         activity.push({
           time: event.time,
           kind: 'member',
           text: `${display} 故障${member.error === undefined ? '' : `：${clip(member.error, 60)}`}`,
+          token: member.error === undefined ? memberToken(display, 'failed') : { key: 'presence.activity.memberFailedDetail', params: { name: display, error: clip(member.error, 60) } },
         })
       }
       members.set(member.id, { name: member.name, phase: member.phase, error: member.error })
@@ -258,15 +278,15 @@ export function presenceFromEvents(
       teamId ??= event.data.teamId
       const previous = tasks.get(task.id)
       if (previous === undefined) {
-        activity.push({ time: event.time, kind: 'task', text: `新任务 ${task.id}：${clip(task.subject, 32)}` })
+        activity.push({ time: event.time, kind: 'task', text: `新任务 ${task.id}：${clip(task.subject, 32)}`, token: { key: 'presence.activity.taskNew', params: { id: task.id, subject: clip(task.subject, 32) } } })
       } else if (previous.status !== task.status) {
         const owner = task.ownerId === undefined ? '未分配' : displayOf(task.ownerId)
         if (task.status === 'in_progress') {
-          activity.push({ time: event.time, kind: 'task', text: `${owner} 认领 ${task.id}` })
+          activity.push({ time: event.time, kind: 'task', text: `${owner} 认领 ${task.id}`, token: { key: 'presence.activity.taskClaimed', params: { owner, id: task.id } } })
         } else if (task.status === 'completed') {
-          activity.push({ time: event.time, kind: 'task', text: `${owner} 完成 ${task.id}` })
+          activity.push({ time: event.time, kind: 'task', text: `${owner} 完成 ${task.id}`, token: { key: 'presence.activity.taskCompleted', params: { owner, id: task.id } } })
         } else {
-          activity.push({ time: event.time, kind: 'task', text: `${task.id} 已删除` })
+          activity.push({ time: event.time, kind: 'task', text: `${task.id} 已删除`, token: { key: 'presence.activity.taskDeleted', params: { id: task.id } } })
         }
       }
       tasks.set(task.id, { subject: task.subject, status: task.status, ownerId: task.ownerId })

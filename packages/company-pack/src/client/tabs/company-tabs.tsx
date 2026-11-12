@@ -20,7 +20,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { PresenceRow } from '../../lib/presence.ts'
 import { memberDot } from '../../lib/presence-status.ts'
 import { clampRect, loadFloatRect, saveFloatRect, type FloatRectLike } from '../ui/float-geometry.ts'
-import { BoardPanel, BudgetPanel, DagPanel, StateNote } from './company-panels.tsx'
+import { BoardPanel, BudgetPanel, DagPanel, StateNote, activityText } from './company-panels.tsx'
 import { DelegationFlowPanel } from './DelegationFlowPanel.tsx'
 import { buildDelegationTree, type DelegationSessionSummaryLike } from '../../lib/delegation-tree.ts'
 import { TasksTableView } from './TasksPanel.tsx'
@@ -262,7 +262,7 @@ export function PresenceTab(props: PresenceTabProps) {
           : (
             <ul className="wk-activity">
               {data.activity.map(entry => (
-                <li key={`${String(entry.time)}-${entry.kind}-${entry.text}`}>{entry.text}</li>
+                <li key={`${String(entry.time)}-${entry.kind}-${entry.text}`}>{activityText(entry, t)}</li>
               ))}
             </ul>
           )}

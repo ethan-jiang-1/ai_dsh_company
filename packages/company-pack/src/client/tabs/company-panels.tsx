@@ -309,7 +309,7 @@ export function PresencePanel({ rows, activity, t = defaultT }: {
           <ul className="wk-activity">
             {activity.map(entry => (
               /* key 用内容而非下标：列表倒序重建时下标会整体位移，用下标会让**旧条目重放动画** */
-              <li key={`${String(entry.time)}-${entry.kind}-${entry.text}`}>{entry.text}</li>
+              <li key={`${String(entry.time)}-${entry.kind}-${entry.text}`}>{activityText(entry, t)}</li>
             ))}
           </ul>
         )}
@@ -396,6 +396,11 @@ export function BudgetPanel({ summary, t = defaultT }: { readonly summary: Budge
       <StateNote text={t('budget.tokensOnly')} />
     </div>
   )
+}
+
+/** 协作动态：优先结构化 token，旧夹具/离线条目回退 text。 */
+export function activityText(entry: ActivityEntry, t: CompanyT): string {
+  return entry.token === undefined ? entry.text : t(entry.token.key as CompanyKey, entry.token.params)
 }
 
 /** 未分配文案的再导出（面板内已用，避免调用方各自拼字符串）。 */

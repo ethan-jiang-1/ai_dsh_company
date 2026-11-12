@@ -17,6 +17,21 @@ describe('PresencePanel i18n', () => {
     expect(html).toContain('Collaboration activity')
     expect(html).toContain('No activity yet')
   })
+
+  it('en：动态 token 渲染，不显示中文 text', () => {
+    const html = renderToStaticMarkup(createElement(PresencePanel, {
+      rows: [],
+      t: tEn,
+      activity: [{
+        time: 1,
+        kind: 'task',
+        text: '中文占位',
+        token: { key: 'presence.activity.taskCompleted', params: { owner: 'CEO', id: 't1' } },
+      }],
+    }))
+    expect(html).toContain('CEO completed t1')
+    expect(html).not.toContain('中文占位')
+  })
 })
 
 describe('BudgetPanel i18n', () => {

@@ -184,6 +184,12 @@
 - en 静态渲染断言；client 375 tests；金样 9 页签 ALL PASS；全量 1650 tests，verify ALL PASS。
 - 协作动态 entry.text 仍是 lib 中文，留下一批结构化 token。
 
+## P0 UI 第五批（协作动态 token）
+
+- ActivityEntry 加 token；diffActivity/presenceFromEvents 全部成员/任务事件带 key+params。
+- PresenceTab/PresencePanel 用 activityText 渲染 token；旧 text 保留给夹具/离线。
+- en 静态渲染断言不再显示中文 text；client 376 tests；金样 9 页签 ALL PASS；全量 1651 tests。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
