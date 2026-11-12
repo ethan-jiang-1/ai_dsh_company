@@ -1,49 +1,49 @@
 ---
 name: vv-plan
-description: V&V 计划方法（硬软一体/系统级产品）的产出侧：把 V 模型左侧产物映射到右侧验证，用 TC-### + covers + L1–L4 写可复现计划。
+description: Producer side of the V&V-plan method (hardware-software / system products): map V-model left-side artifacts to right-side verification, using TC-### + covers + L1–L4.
 metadata:
   method: vv-plan
   version: 1.0.0
   side: producer
 ---
-# V&V 计划 · 产出侧（vv-plan@1.0.0）
+# V&V plan · producer side (vv-plan@1.0.0)
 
-> 适用：已有 PRD/架构/SyRS/IRS，需要独立的验证与确认计划。
-> 纯软/企业软件不用本方法；按产品类型的验收方式写 PRD 的 AC 即可。
+> Applies when PRD/architecture/SyRS/IRS exist and an independent verification and validation plan is needed.
+> Pure software / enterprise software does not use this method; write PRD AC in the product type's acceptance form.
 
-## 输入契约
+## Input contract
 
-- PRD（REQ/AC）、StRS、架构稿、SyRS、IRS、交付约束；
-- 任务书里的现场边界、样品/环境/认证要求；
-- 已知风险与故障路径（没有就标【假设/待验】）。
-缺左侧产物 → 停下，回报缺什么；不要用“实现即需求”补。
+- PRD (REQ/AC), StRS, architecture, SyRS, IRS, delivery constraints;
+- On-site boundary, sample/environment/certification requirements from the brief;
+- Known risks and fault paths (if none, label [assumption/to-verify]).
+Missing left-side artifacts → stop and report what is missing; do not substitute "implementation is the requirement".
 
-## 程序
+## Procedure
 
-1. **左→右映射**：每条需求/接口/架构关键件找到右侧验证（验收/系统/集成/单元）。
-2. **编号**：每条验证用例 `TC-###`，一条一个判据；`covers` 指 `REQ-###` / `IF-###`。
-3. **层级**：L1 单元 / L2 集成 / L3 系统 / L4 验收；四层都要有行，缺层写“本期不覆盖 + 补验条件”。
-4. **判据**：可度量、可复现、有环境与样本；失败态、记录时间可信、边界外耐受按适用性单列。
-5. **覆盖**：由索引派生，不手写“N 条”；检查每条 REQ/IF 至少一条 TC。
+1. **Left → right mapping**: every requirement/interface/key architecture item maps to right-side verification (acceptance/system/integration/unit).
+2. **Numbering**: each verification case `TC-###`, one criterion each; `covers` → `REQ-###` / `IF-###`.
+3. **Levels**: L1 unit / L2 integration / L3 system / L4 acceptance; all four levels need rows; a missing level states "not covered this round + conditions to cover".
+4. **Criteria**: measurable, reproducible, with environment and samples; failure state, recorded-time trust, and out-of-boundary tolerance listed separately when applicable.
+5. **Coverage**: derive from the index, do not hand-write "N items"; check every REQ/IF has at least one TC.
 
-## 检查表
+## Checklist
 
-| check-id | 判据 | 证据要求 |
+| check-id | Criterion | Evidence requirement |
 |---|---|---|
-| VV-P01 | 左侧每个产物有右侧验证 | 映射表/覆盖矩阵 |
-| VV-P02 | 每条 TC 有唯一编号 + covers（REQ/IF） | `TC-###` 行 |
-| VV-P03 | 每条判据可复现（数值/条件/样本） | 判据列 |
-| VV-P04 | L1–L4 四层有行，或声明缺口 + 补验条件 | 层级列 |
-| VV-P05 | 失败态/记录时间/边界外耐受有验证（适用时） | 对应 TC 行 |
-| VV-P06 | 覆盖计数与行数一致，不超额声明 | 计数核对 |
+| VV-P01 | Every left-side artifact has right-side verification | Mapping table / coverage matrix |
+| VV-P02 | Every TC has a unique id + covers (REQ/IF) | `TC-###` rows |
+| VV-P03 | Every criterion is reproducible (values/conditions/samples) | Criteria column |
+| VV-P04 | L1–L4 all have rows, or gap + conditions to cover | Level column |
+| VV-P05 | Failure state / recorded time / out-of-boundary tolerance verified (when applicable) | Corresponding TC rows |
+| VV-P06 | Coverage count matches row count; no overclaim | Count check |
 
-## 输出契约
+## Output contract
 
-`vv-plan.md`：`layer: V&V` + `definition: table-rows`；表头固定带 `covers` 列，一行一条 `TC-###`；
-列含层级、方法、判据、环境与样本、结果。结论先行：通过/不通过/待验各几条 + 最该先修的三件。
+`vv-plan.md`: `layer: V&V` + `definition: table-rows`; header carries `covers`; one `TC-###` per row;
+columns include level, method, criterion, environment and samples, result. Conclusion first: pass/fail/pending counts + the three things to fix first.
 
-## 升级
+## Escalation
 
-- `blocker` 级缺口（需求不可验证、关键风险无验证手段）→ 标 `[escalate]` 并说明缺什么；
-  由调用方进 final / 升级 CEO；不得以“接受”结案。
-- 动态证据由你跑，原始输出随计划交付；验证者没有 bash，不要让它替你跑。
+- A `blocker` gap (unverifiable requirement, key risk with no verification means) → mark `[escalate]` and state what is missing;
+  the caller carries it into final / escalates to the CEO; do not close by "accepting".
+- Run dynamic evidence yourself and deliver raw output with the plan; the verifier has no bash — do not make it run for you.

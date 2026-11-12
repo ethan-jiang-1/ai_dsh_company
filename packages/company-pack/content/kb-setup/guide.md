@@ -1,37 +1,37 @@
-# .dsh-company/kb · 公司事实目录
+# .dsh-company/kb · company fact directory
 
-> 这个目录属于当前部署，不属于插件。首启从 pack 的 `kb-setup/seed.json` 复制；之后由人和角色维护。
-> 升级只补缺，不覆盖你改过的内容。缺件时按「缺件纪律」办——**不要猜**。
+> This directory belongs to the current deployment, not the plugin. On first start it is copied from the pack's `kb-setup/seed.json`; afterward people and roles maintain it.
+> Upgrades only fill gaps and do not overwrite what you changed. For a missing file, follow the "missing-file discipline" — **do not guess**.
 
-## 一眼看懂
+## At a glance
 
-| 文件 | 是什么 | 谁维护 | 缺了怎么办 |
+| File | What it is | Maintained by | If missing |
 |---|---|---|---|
-| `company.md` | 公司身份 + `productType` + 时区 | 人 | 报缺；可从 seed 重建（样例标记仍在） |
-| `org.md` | 编制 / 部门 / 人数 | 人 | 报缺；重建后按你的公司改 |
-| `policy-lines.md` | 签字线 / 预算线 / 并行上限 | 人 | 报缺；**没有它不许报价** |
-| `owners.md` | 谁对应哪个角色、能答什么 | 人 | 报缺；按角色问人 |
-| `review-protocol.md` | 复核声明 / 对外件闸门 | 人 | 报缺；对外件 fail-closed |
-| `roster.md` | 席位名册（席位 → 谁 / 投入 / 可承接） | 人 | 报缺；`<待填>` = 配置缺口，不判“没人” |
-| `rates.md` | 人力费率卡（人·周成本） | 人 | 报缺；`<待填>` = 配置缺口，不编费率 |
-| `motion-ledger.md` | 动议台账 | CEO / 操作员 | 空可继续，台账从 0 起 |
-| `process-docs.md` | 编号合同的播种副本（权威在 pack 的类型包） | 人 | 报缺；以 pack 版为准 |
-| `<role>/CHARTER.md` | 角色长期摘要 | 人（收敛时） | 报缺；从默认章程重建 |
-| `<role>/journal/` | 当轮纪要 | 角色自己 | 空目录正常 |
+| `company.md` | Company identity + `productType` + timezone | human | report gap; rebuild from seed (sample marker remains) |
+| `org.md` | Staffing / lines / headcount | human | report gap; rebuild then edit for your company |
+| `policy-lines.md` | Sign-off / budget / parallel limits | human | report gap; **no quoting without it** |
+| `owners.md` | Who maps to which role, what they may answer | human | report gap; ask each role |
+| `review-protocol.md` | Review statement / external-facing gate | human | report gap; external deliverables fail-closed |
+| `roster.md` | Seat roster (seat → who / allocation / can take) | human | report gap; `<to-fill>` = configuration gap, do not judge "no one" |
+| `rates.md` | Labor rate card (person-week cost) | human | report gap; `<to-fill>` = configuration gap, never invent rates |
+| `motion-ledger.md` | Motion ledger | CEO / operator | empty is fine; starts at 0 |
+| `process-docs.md` | Seeded copy of the numbering contract (authority in the pack's type pack) | human | report gap; pack version wins |
+| `<role>/CHARTER.md` | Long-term role summary | human (at convergence) | report gap; rebuild from the default charter |
+| `<role>/journal/` | Current-round minutes | the role itself | empty directory is normal |
 
-## 读的顺序（角色会话）
+## Reading order (role session)
 
-1. `company.md` —— 我是谁、哪个 `productType`
-2. `policy-lines.md` —— 钱与线（报价 / 折扣 / 预算前必读）
-3. 按需：`org.md`（编制）、`roster.md`（席位）、`rates.md`（费率）、`owners.md`（人）、`review-protocol.md`（对外件）
-4. 自己的 `CHARTER.md` + 最近 3 篇 `journal/`
+1. `company.md` — who I am, which `productType`
+2. `policy-lines.md` — money and lines (read before quoting / discounting / budgeting)
+3. On demand: `org.md` (staffing), `roster.md` (seats), `rates.md` (rates), `owners.md` (people), `review-protocol.md` (external deliverables)
+4. Your own `CHARTER.md` + the latest 3 `journal/` entries
 
-## 缺件纪律（fail-loud）
+## Missing-file discipline (fail-loud)
 
-- 缺件先报告**缺哪个 + 影响什么**；不得用包内样例冒充部署事实，不得猜数字。
-- 只有标「样例」的种子可当占位；用户改过的文件永不覆盖。
+- Report **which file is missing + what it affects** first; never use the pack sample as deployment fact and never guess numbers.
+- Only seeds marked "sample" may stand in; files the user changed are never overwritten.
 
-## 这个目录怎么来的
+## Where this directory comes from
 
-`kb-setup/seed.json` 是唯一映射（source → target，只补缺）；本文件由 `kb-setup/guide.md` 复制。
-装配件目录 `content/kb-setup/` 只放装配件，公司事实仍在 `company/`、`state/`、`product-types/`。
+`kb-setup/seed.json` is the only mapping (source → target, only-fill); this file is copied from `kb-setup/guide.md`.
+The assembly directory `content/kb-setup/` holds assembly pieces only; company facts stay in `company/`, `state/`, `product-types/`.

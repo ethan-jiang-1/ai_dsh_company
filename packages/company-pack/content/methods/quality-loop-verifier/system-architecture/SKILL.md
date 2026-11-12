@@ -1,45 +1,45 @@
 ---
 name: system-architecture
-description: 系统架构方法的验证侧（只读）：逐 check-id 审计域判定、接口、追溯与验证点；出裁决，不改稿。
+description: Verifier side of the system-architecture method (read-only): audit domain judgment, interfaces, traceability, and verification points per check-id; issue a verdict, do not edit.
 metadata:
   method: system-architecture
   version: 1.0.0
   side: verifier
 ---
-# 系统架构 · 验证侧（system-architecture@1.0.0）
+# System architecture · verifier side (system-architecture@1.0.0)
 
-> 只读：没有 write/edit/bash；不改产物、不跑测试。动态证据要产出者交原始输出；拿不到就标“未验证”。
+> Read-only: no write/edit/bash; do not edit the artifact or run tests. Dynamic evidence must be supplied as raw output by the producer; if unavailable, mark "unverified".
 
-## 输入契约
+## Input contract
 
-交接包（基线 + 产物路径 + 约束 + 方法）与产物本身；**不要**索取产出者的推理或自评。
-输入至少含：PRD/StRS 基线、SyRS/IRS/架构稿、任务书边界。
+Handoff pack (baseline + artifact path + constraints + method) and the artifact itself; **do not** ask for the producer's reasoning or self-assessment.
+Input at least: PRD/StRS baseline, SyRS/IRS/architecture, brief boundary.
 
-## 程序
+## Procedure
 
-1. 按下面检查表逐条判 `pass` / `fail` / `skip`；skip 必写理由。
-2. 每条 `fail` 落一条发现 `F<N> [<check-id>][blocker|advisory]`，给最小修复方向。
-3. 检查表每个 id 都要有一行；缺行 = 不通过。
-4. 裁决 append-only：不改旧轮，复验新开一块或新文件。
+1. Judge each checklist row `pass` / `fail` / `skip`; skip must state why.
+2. Each `fail` becomes finding `F<N> [<check-id>][blocker|advisory]` with the minimum fix direction.
+3. Every checklist id needs a row; a missing row = not passed.
+4. Verdict is append-only: never edit an old round; re-verify in a new block or file.
 
-## 检查表
+## Checklist
 
-| check-id | 判据 | 证据要求 |
+| check-id | Criterion | Evidence requirement |
 |---|---|---|
-| SA-P01 | 五学科五行是否原样，判词/依据是否可反驳 | 指出改名/缺行/空依据 |
-| SA-P02 | 纯软是否硬凑；含物理件是否漏域 | 指出无依据的硬件条目或缺失域 |
-| SA-P03 | 系统/子系统/接口三层是否在场 | 指出缺失层 |
-| SA-P04 | SyRS→PRD、IRS→SyRS 追溯是否断/悬空 | 指出孤儿/悬空号 |
-| SA-P05 | 接口字段是否齐（方向/介质/协议/频率/失败态） | 指出缺字段的接口 |
-| SA-P06 | 权衡表与验证点是否引用 REQ/IF | 指出缺权衡或无引用的验证点 |
-| SA-P07 | 记录时间/故障路径验证点是否单列（适用时） | 指出漏列或写成结论 |
+| SA-P01 | Five domain rows intact; wording/basis falsifiable | Point out renamed/missing rows or empty basis |
+| SA-P02 | Pure software forced hardware; physical parts missing domains | Point out unsupported hardware entries or missing domains |
+| SA-P03 | System/subsystem/interface three levels present | Point out the missing level |
+| SA-P04 | SyRS→PRD and IRS→SyRS traceability broken/dangling | Point out orphan/dangling ids |
+| SA-P05 | Interface fields complete (direction/medium/protocol/frequency/failure state) | Point out interfaces missing fields |
+| SA-P06 | Trade-off table and verification points cite REQ/IF | Point out missing trade-offs or uncited verification points |
+| SA-P07 | Recorded-time/fault-path verification points listed separately (when applicable) | Point out missing rows or conclusions written as verification |
 
-## 输出契约
+## Output contract
 
-`## 裁决：pass|fail` + `### 检查表`（逐 id）+ `### 发现`（逐条编号、级别、check-id、最小修复）。
-结论先行；不确定写“未验证”，不要补全成看起来完整的样子。
+`## Verdict: pass|fail` + `### Checklist` (per id) + `### Findings` (numbered, level, check-id, minimum fix).
+Conclusion first; if uncertain write "unverified"; do not fill gaps to look complete.
 
-## 升级
+## Escalation
 
-- `blocker` 级发现必须原样进裁决并标明需升级；调用方（VP-Eng）应原样进 final / 升级 CEO。
-- 不得把 blocker 标成“接受”结案；不得因为排期压力放行。
+- A `blocker` finding must go into the verdict verbatim and be marked for escalation; the caller (VP-Eng) carries it into final / escalates to the CEO.
+- Do not close a blocker as "accepted"; do not pass it under schedule pressure.

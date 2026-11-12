@@ -68,6 +68,8 @@ opened: 2026-11-12
 - 领域值：motion-ledger 表头 canonical 英文（date/type/participants/wallClock/deliverable/summary）；parser 兼容旧中文头；LedgerTab kind 映射英文；state 棘轮 PENDING 清空。
 - P1 content/contracts：workflow engine + 6 条 delegation 合同英文；新增 contracts 英文棘轮。
 - P1 content 顶层入口：AGENTS.md / README.md / manifest.json 英文；AGENTS 的 type/deliveryMode 字段名同步；T0 4.1KB；delivery-mode-sources / product-type-coverage 断言同步；新增 entries 英文棘轮。
+- P1 content 完成：kb-setup 4/4 + methods 4/4 英文；**content/**/*.md|json 全局零中文**；新增 kb-setup/methods/global content 英文棘轮。
+- 修 vv-plan verifier 版本 1.2.0→1.0.0（两侧同版本）。
 - 修 tab body 未注入 t、Tasks/Cultivation 标题与 guide 不一致、DelegationFlow/Presence 表头、budget 括号。
 - content 模板 8/8 英文（meta/prd 补齐）；模板棘轮 PENDING 清零。
 

@@ -1,43 +1,43 @@
 ---
 name: vv-plan
-description: V&V 计划方法的验证侧（只读）：逐 check-id 审计覆盖、判据可复现性与层级缺口；不改计划、不跑测试。
+description: Verifier side of the V&V-plan method (read-only): audit coverage, criterion reproducibility, and level gaps per check-id; do not edit or run tests.
 metadata:
   method: vv-plan
   version: 1.0.0
   side: verifier
 ---
-# V&V 计划 · 验证侧（vv-plan@1.2.0）
+# V&V plan · verifier side (vv-plan@1.0.0)
 
-> 只读：没有 write/edit/bash；不改计划、不跑测试。动态证据要产出者交原始输出；拿不到就标“未验证”。
+> Read-only: no write/edit/bash; do not edit the plan or run tests. Dynamic evidence must be supplied as raw output by the producer; if unavailable, mark "unverified".
 
-## 输入契约
+## Input contract
 
-交接包（基线 + 产物路径 + 约束 + 方法）与 `vv-plan.md`；**不要**索取产出者的推理或自评。
+Handoff pack (baseline + artifact path + constraints + method) and `vv-plan.md`; **do not** ask for the producer's reasoning or self-assessment.
 
-## 程序
+## Procedure
 
-1. 按下面检查表逐条判 `pass` / `fail` / `skip`；skip 必写理由。
-2. 每条 `fail` 落一条发现 `F<N> [<check-id>][blocker|advisory]`，给最小修复方向。
-3. 检查表每个 id 都要有一行；缺行 = 不通过。
-4. 裁决 append-only：不改旧轮，复验新开一块或新文件。
+1. Judge each checklist row `pass` / `fail` / `skip`; skip must state why.
+2. Each `fail` becomes finding `F<N> [<check-id>][blocker|advisory]` with the minimum fix direction.
+3. Every checklist id needs a row; a missing row = not passed.
+4. Verdict is append-only: never edit an old round; re-verify in a new block or file.
 
-## 检查表
+## Checklist
 
-| check-id | 判据 | 证据要求 |
+| check-id | Criterion | Evidence requirement |
 |---|---|---|
-| VV-P01 | 左侧每个产物有右侧验证 | 指出缺映射的产物 |
-| VV-P02 | 每条 TC 有唯一编号 + covers（REQ/IF） | 指出重号/缺 covers |
-| VV-P03 | 每条判据可复现（数值/条件/样本） | 指出不可复现原文 |
-| VV-P04 | L1–L4 四层有行，或声明缺口 + 补验条件 | 指出缺层/假声明 |
-| VV-P05 | 失败态/记录时间/边界外耐受有验证（适用时） | 指出漏验项 |
-| VV-P06 | 覆盖计数与行数一致，不超额声明 | 指出计数不符 |
+| VV-P01 | Every left-side artifact has right-side verification | Point out artifacts missing mapping |
+| VV-P02 | Every TC has a unique id + covers (REQ/IF) | Point out duplicate ids/missing covers |
+| VV-P03 | Every criterion is reproducible (values/conditions/samples) | Point out the non-reproducible text |
+| VV-P04 | L1–L4 all have rows, or gap + conditions to cover | Point out missing levels/false claims |
+| VV-P05 | Failure state / recorded time / out-of-boundary tolerance verified (when applicable) | Point out missing verification |
+| VV-P06 | Coverage count matches row count; no overclaim | Point out count mismatch |
 
-## 输出契约
+## Output contract
 
-`## 裁决：pass|fail` + `### 检查表`（逐 id）+ `### 发现`（逐条编号、级别、check-id、最小修复）。
-结论先行；不确定写“未验证”，不要补全成看起来完整的样子。
+`## Verdict: pass|fail` + `### Checklist` (per id) + `### Findings` (numbered, level, check-id, minimum fix).
+Conclusion first; if uncertain write "unverified"; do not fill gaps to look complete.
 
-## 升级
+## Escalation
 
-- `blocker` 级发现必须原样进裁决并标明需升级；调用方（VP-Eng）应原样进 final / 升级 CEO。
-- 不得把 blocker 标成“接受”结案；不得因为排期压力放行。
+- A `blocker` finding must go into the verdict verbatim and be marked for escalation; the caller (VP-Eng) carries it into final / escalates to the CEO.
+- Do not close a blocker as "accepted"; do not pass it under schedule pressure.

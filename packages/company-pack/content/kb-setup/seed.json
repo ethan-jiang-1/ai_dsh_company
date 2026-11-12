@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "target 相对 workspace；mode 恒为 only-fill（wx，绝不覆盖）。source 相对 content/；`{productType}` = company.md 的 productType（缺/未知 fail-closed，不猜）。缺源 = 装配错误（fail-loud）。",
+  "note": "target is relative to the workspace; mode is always only-fill (wx, never overwrite). source is relative to content/; `{productType}` = company.md productType (missing/unknown fail-closed, do not guess). Missing source = assembly error (fail-loud).",
   "seeds": [
     {
       "source": "state/company.md",

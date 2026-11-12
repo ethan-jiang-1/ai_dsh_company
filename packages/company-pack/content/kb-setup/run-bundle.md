@@ -1,13 +1,13 @@
 # .dsh-company · run bundle
 
-这个目录属于当前公司/项目，**不是插件内容**。插件的人格、skills、公司手册、模板与默认章程
-住在安装包内；这里只放运行状态与产物：
+This directory belongs to the current company/project, **not plugin content**. The plugin's personas, skills, company handbook, templates, and default charters
+live in the installed package; here there is only runtime state and artifacts:
 
-- `kb/`：公司事实目录（先读 `kb/AGENTS.md` 的地图与缺件纪律）
-- `deliverables/`、`deliverables-archive/`：过程稿与定稿
-- `cultivation/records/`：培养记录
-- `bundle.json`：run bundle 身份
-- `logs/`、`exports/`：升级日志与治理只读导出
-- `overrides/`：可选的模板/章程覆盖（默认内容在插件包内）
+- `kb/`: company fact directory (read `kb/AGENTS.md` first for the map and missing-file discipline)
+- `deliverables/`, `deliverables-archive/`: drafts and finals
+- `cultivation/records/`: cultivation records
+- `bundle.json`: run bundle identity
+- `logs/`, `exports/`: upgrade logs and governance read-only exports
+- `overrides/`: optional template/charter overrides (default content is in the plugin package)
 
-方法层与 presented 审计账本的权威在 `DSH_HOME/company/`，不在这里；`exports/` 只是派生快照。
+The authority for the method layer and presented audit ledger is `DSH_HOME/company/`, not here; `exports/` is only a derived snapshot.

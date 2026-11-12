@@ -1,53 +1,53 @@
 ---
 name: system-architecture
-description: 系统架构方法（硬软一体/系统级产品）的产出侧：先判五学科域，再写 SyRS/IRS/架构稿与验证点；不写验证结论。
+description: Producer side of the system-architecture method (hardware-software / system products): judge five engineering domains, then write SyRS/IRS/architecture and verification points; do not write verification conclusions.
 metadata:
   method: system-architecture
   version: 1.0.0
   side: producer
 ---
-# 系统架构 · 产出侧（system-architecture@1.0.0）
+# System architecture · producer side (system-architecture@1.0.0)
 
-> 适用：硬软一体、含现场设备/固件/电气/机械件、或需要系统级需求与接口的产品。
-> 纯软/企业软件不用本方法；用 `business-software` 的产品定义链。
+> Applies to: hardware-software products with on-site devices/firmware/electrical/mechanical parts, or products needing system-level requirements and interfaces.
+> Pure software / enterprise software does not use this method; use the `business-software` product-definition chain.
 
-## 输入契约
+## Input contract
 
-- 产品层 PRD（`REQ-###` / `AC-###-#`）与 StRS；
-- 任务书里的现场边界、物理件声明、产物用途（是否要举证）；
-- 技术栈/约束（引用 KB 或任务书，不凭记忆）。
-缺基线或边界 → 停下，回报缺什么；不要凭空造需求。
+- Product-layer PRD (`REQ-###` / `AC-###-#`) and StRS;
+- On-site boundary, physical-part declarations, and artifact purpose (whether evidence is required) from the brief;
+- Tech stack/constraints (cite KB or brief; do not rely on memory).
+If the baseline or boundary is missing → stop and report what is missing; do not invent requirements.
 
-## 程序
+## Procedure
 
-1. **先判域**：固定五行——软件 / 固件 / 电气 / 机械 / 系统测试，逐行写 `在/不在 + 依据`；产品细分或任务书额外域只能追加，不得替换五行。
-2. **系统级**：系统上下文、部署形态、外部接口清单。
-3. **子系统级**：硬/软边界、供电/通信/存储/安装、责任方。
-4. **接口级**：每条 `IF-###` 写名字、方向、介质、协议、频率、失败态。
-5. **系统需求**：由 PRD 派生 `SyRS`（`REQ-###`，`traces` 指 PRD）；接口 `IRS`（`IF-###`，`traces` 指 SyRS）；分配附录写 `allocation.md`（不立号）。
-6. **权衡**：每个关键取舍一行——选了什么/放弃什么/代价/触发改判条件。
-7. **验证点**：列引用 `REQ-###` / `IF-###` 的清单，说明“必须证明什么”；不写验证方法或通过结论。
+1. **Judge domains first**: five fixed rows — software / firmware / electrical / mechanical / system test; write `in/out + basis` per row; product subdivisions or extra brief domains may only append, not replace the five.
+2. **System level**: system context, deployment shape, external interface list.
+3. **Subsystem level**: hardware/software boundaries, power/communication/storage/installation, accountable party.
+4. **Interface level**: each `IF-###` gets name, direction, medium, protocol, frequency, failure state.
+5. **System requirements**: derive `SyRS` from PRD (`REQ-###`, `traces` → PRD); interfaces `IRS` (`IF-###`, `traces` → SyRS); allocation appendix `allocation.md` (no ids).
+6. **Trade-offs**: one line per key choice — what was chosen / what was given up / cost / condition that would change the decision.
+7. **Verification points**: list references to `REQ-###` / `IF-###` and what must be proven; do not write verification methods or pass conclusions.
 
-## 检查表
+## Checklist
 
-| check-id | 判据 | 证据要求 |
+| check-id | Criterion | Evidence requirement |
 |---|---|---|
-| SA-P01 | 五学科五行齐全，每行有可反驳的依据 | 架构稿域判定表 |
-| SA-P02 | 纯软不硬凑；含物理件不漏电气/机械 | 五行 + 任务书边界 |
-| SA-P03 | 系统/子系统/接口三层在场 | 架构稿三节或等价结构 |
-| SA-P04 | SyRS 追溯 PRD、IRS 追溯 SyRS，无孤儿/悬空 | `traces:` 行 |
-| SA-P05 | 每条接口有方向/介质/协议/频率/失败态 | `IF-###` 条目 |
-| SA-P06 | 关键权衡表 + 验证点引用 REQ/IF | 权衡表、验证点清单 |
-| SA-P07 | 记录时间可信/故障路径耐受两类验证点单列（适用时） | 验证点清单单列 |
+| SA-P01 | Five domain rows complete; each has a falsifiable basis | Architecture domain table |
+| SA-P02 | Pure software does not force hardware; physical parts do not omit electrical/mechanical | Five rows + brief boundary |
+| SA-P03 | System/subsystem/interface three levels present | Three architecture sections or equivalent |
+| SA-P04 | SyRS traces PRD, IRS traces SyRS, no orphan/dangling | `traces:` lines |
+| SA-P05 | Every interface has direction/medium/protocol/frequency/failure state | `IF-###` entries |
+| SA-P06 | Trade-off table + verification points cite REQ/IF | Trade-off table, verification list |
+| SA-P07 | Recorded-time and fault-path tolerance verification points listed separately (when applicable) | Verification list rows |
 
-## 输出契约
+## Output contract
 
-`syrs.md`（`layer: SyRS` / `definition: headings`）、`irs.md`（`layer: IRS` / `definition: headings`）、
-`allocation.md`（`definition: none`，不立号）、`system-architecture.md`（引用面，不立号）。
-一页结论先行：架构一句话 + 三个关键权衡 + 风险；假设标[fact/assumption/to-verify]。
+`syrs.md` (`layer: SyRS` / `definition: headings`), `irs.md` (`layer: IRS` / `definition: headings`),
+`allocation.md` (`definition: none`, no ids), `system-architecture.md` (reference surface, no ids).
+Conclusion first on one page: architecture in one sentence + three key trade-offs + risks; label assumptions [fact/assumption/to-verify].
 
-## 升级
+## Escalation
 
-- `blocker` 级发现或无法消除的边界冲突 → 在最终正文标 `[escalate]` 并说明缺什么；
-  由调用方原样进 final / 升级 CEO；**不得以“接受风险”自行结案**。
-- 动态证据（测试/仿真/样品）由你跑，原始输出随产物交付给验证者；不要只写“已验证”。
+- A `blocker` finding or an unresolvable boundary conflict → mark `[escalate]` in the final body and state what is missing;
+  the caller carries it verbatim into final / escalates to the CEO; **do not close by "accepting the risk" yourself**.
+- Run dynamic evidence (tests/simulation/samples) yourself and deliver raw output with the artifact to the verifier; do not just write "verified".

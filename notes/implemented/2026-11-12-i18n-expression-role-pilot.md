@@ -336,6 +336,13 @@
 - delivery-mode-sources / product-type-coverage 断言同步；新增 entries 英文棘轮。
 - 全量 1664 tests；preset-smoke ALL PASS；verify ALL PASS。
 
+## P1 第十片（kb-setup + methods）— content 完成
+
+- kb-setup 4/4 英文（README/guide/run-bundle/seed note）；seed source/target 不动。
+- 4 个方法 skill 英文；vv-plan verifier 版本修正为 1.0.0，两侧同版本。
+- 新增 content 全局英文棘轮：content/**/*.md|json 零中文（>50 文件）；注入中文 → 红，还原 → 绿。
+- 全量 1667 tests；preset-smoke ALL PASS；verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
