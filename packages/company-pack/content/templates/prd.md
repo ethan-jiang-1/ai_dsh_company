@@ -3,14 +3,14 @@ layer: PRD
 definition: json-ledger
 ---
 
-# PRD（产品需求 · 需求账本 + 一页纸）
+# PRD (product requirements · requirements ledger + one page)
 
-> 主笔 = **VP-Eng**；输入 = 同目录 `drafts/mrd.md`（CMO 的市场机会）+ `drafts/strs.md`（CMO 的涉众需求）；落 `drafts/prd.md`。
-> **它不是文章**：研发按 slice 一批一批吃，**一 REQ 一任务**；每条 REQ 必须指回 MR id。
-> **JSON 账本是唯一定义点**（`definition: json-ledger`）：正文小节标题只是引用，不得再以裸 ID 开头。
-> `source` 指 MR 来源、`traces` 指上游 StRS 条目（跨层追溯由这两个字段写边，不靠正文聚集）。
-> 机械校验 = `/prd check <deliverables 目录名>`；编号/追溯 = `/req check <deliverables 目录名>`；字段写不出就写"未定"，别用形容词填。
-> 技术方案 ≠ 本文件（那是 `review-note.md`）；定价 ≠ 本文件（归 VP-Sales / CFO）。
+> Lead = **VP-Eng**; input = `drafts/mrd.md` (CMO's market opportunities) + `drafts/strs.md` (CMO's stakeholder requirements) in the same directory; save to `drafts/prd.md`.
+> **It is not an essay**: engineering consumes it slice by slice, **one REQ per task**; every REQ must point back to an MR id.
+> **The JSON ledger is the only definition point** (`definition: json-ledger`): section headings are references and may not start with a bare ID.
+> `source` names the MR source; `traces` names upstream StRS items (cross-layer traceability is written as edges through these two fields, not by prose proximity).
+> Mechanical check = `/prd check <deliverables dir>`; numbering/traceability = `/req check <deliverables dir>`; if a field cannot be written, write "undecided", not adjectives.
+> Technical solution ≠ this file (that is `review-note.md`); pricing ≠ this file (VP-Sales / CFO own it).
 
 ```json
 {
@@ -18,21 +18,21 @@ definition: json-ledger
     "version": "0.1",
     "status": "draft",
     "slices": [
-      { "id": "S1", "goal": "最小端到端：<能演示/能验收的最小闭环>", "requirements": ["REQ-002"] }
+      { "id": "S1", "goal": "Minimum end-to-end: <smallest demoable/acceptable loop>", "requirements": ["REQ-002"] }
     ],
     "requirements": [
       {
         "id": "REQ-002",
-        "title": "<一句话需求>",
+        "title": "<one-line requirement>",
         "type": "functional",
         "priority": "P0",
         "status": "draft",
         "source": ["MR-001"],
         "traces": ["REQ-001"],
         "slice": "S1",
-        "userStory": "作为<谁>，我要<做什么>，以便<得到什么>",
+        "userStory": "As <who>, I want <what>, so that <what I get>",
         "acceptance": [
-          { "id": "AC-002-1", "given": "<前置>", "when": "<动作>", "then": "<可观测结果>" }
+          { "id": "AC-002-1", "given": "<precondition>", "when": "<action>", "then": "<observable result>" }
         ],
         "dependsOn": [],
         "verification": "test",
@@ -44,53 +44,53 @@ definition: json-ledger
 }
 ```
 
-## 一分钟摘要（说人话）
+## One-minute summary (plain language)
 
-<结论 ≤3 条业务语言 / 下一步（谁·何时）/ 要 CEO 或用户拍板的事>
+<Conclusion ≤3 business-language points / next step (who · when) / what the CEO or user must decide>
 
-## 范围与非范围
+## Scope and non-scope
 
-| 这一版要 | 这一版明确不要 |
+| In this version | Explicitly out of this version |
 |---|---|
 | | |
 
-## 约束
+## Constraints
 
-- 时间 / 人力 / 预算：<引用 `.dsh-company/kb/org.md`，标[fact]/[assumption]>
-- 技术前提：<引用 `.dsh-company/kb/vp-eng/CHARTER.md`>
-- 合规 / 认证 / 安全：<按产品类型，引用 CFO / COO 口径>
+- Time / staffing / budget: <cite `.dsh-company/kb/org.md`; label [fact]/[assumption]>
+- Technical prerequisites: <cite `.dsh-company/kb/vp-eng/CHARTER.md`>
+- Compliance / certification / security: <per product type, cite CFO / COO>
 
-## 依赖与风险
+## Dependencies and risks
 
-| 依赖（不在我们手里的） | 谁给 | 什么时候要 | 缺失时兜底 |
+| Dependency (outside our control) | Provided by | Needed by | Fallback if missing |
 |---|---|---|---|
 | | | | |
 
-- **最可能翻车的一件事**：……　**兜底**：……
+- **The one thing most likely to fail**: …　**Fallback**: …
 
-## 里程碑与 slice
+## Milestones and slices
 
-| slice | 目标 | 包含 REQ | 出口条件 |
+| slice | Goal | Contains REQ | Exit condition |
 |---|---|---|---|
 | S1 | | | |
 
-## 需求详述（每个 REQ 一节，引用 JSON 定义点；本节不定义号）
+## Requirement detail (one section per REQ, referencing the JSON definition; this section defines no ids)
 
-### 需求说明：REQ-002 <标题>
+### Requirement: REQ-002 <title>
 
-- 来源：MR-001｜StRS：REQ-001｜slice：S1｜优先级：P0｜状态：草案（draft）｜验证：test
-- 用户故事：…
-- 验收：
+- Source: MR-001｜StRS: REQ-001｜slice: S1｜priority: P0｜status: draft｜verification: test
+- User story: …
+- Acceptance:
   - **AC-002-1** given … / when … / then …
-- 依赖：REQ-…（无写"无"）
-- 未决：…
+- Depends on: REQ-… (write "none" if none)
+- Open questions: …
 
-## 未决（禁止当结论用）
+## Open items (do not use as conclusions)
 
 - …
 
-## 下一步（一 REQ 一任务）
+## Next step (one REQ per task)
 
-| 任务 | REQ | 依赖 | 验收 |
+| Task | REQ | Depends on | Acceptance |
 |---|---|---|---|
 | | REQ-002 | | AC-002-1 |

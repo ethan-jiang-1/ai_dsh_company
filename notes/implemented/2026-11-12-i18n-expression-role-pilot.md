@@ -214,6 +214,11 @@
 - 培养主体 CultivationBoard/Inbox/Chat/Compose 与 CULTIVATION_COPY 仍中文；下一批处理。
 - client 379 tests；金样 9 页签 ALL PASS；全量 1654 tests，verify ALL PASS。
 
+## P1 模板完成（8/8）
+
+- prd/meta 模板英文；PRD 正文标题改 Requirement:，测试同步。
+- content template 棘轮 PENDING 清零；全量 1654 tests，verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

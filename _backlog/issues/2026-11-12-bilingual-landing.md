@@ -49,6 +49,7 @@ opened: 2026-11-12
 - 成品页双语：统计/筛选/空态/分组/行 aria/结果标签/打开/footer/索引错误；LedgerSummary 传 t；client 378 passed；金样仍一致。
 - 工具卡/委托卡双语：状态/抬头/展开收起/结果/查看轨迹；TeamToolCard 加 title/detail token；client 379 passed；金样仍一致。
 - 培养视图壳双语： eyebrow/title/sub/公司总览/拖拽 aria；CultivationBoard/Inbox/Chat/Compose 的 CULTIVATION_COPY 仍中文，下一批。
+- content 模板 8/8 英文（meta/prd 补齐）；模板棘轮 PENDING 清零。
 
 **剩余**：
 - `content/templates/meta.md`、`prd.md`（2 个）。

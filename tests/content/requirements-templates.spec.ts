@@ -85,7 +85,7 @@ describe('PRD 唯一定义点', () => {
     const headingDefs = [...text.matchAll(/^#{2,4}\s+((?:MR|REQ|IF|TC)-\d{3})\b/gm)].map(match => match[1])
     expect(headingDefs, `PRD 正文出现了定义形状的标题：${headingDefs.join(', ')}`).toEqual([])
     // 引用标题必须仍在（告诉模型 JSON 是定义、正文是说明）。
-    expect(text).toContain(`需求说明：${ids[0] ?? ''}`)
+    expect(text).toContain(`Requirement: ${ids[0] ?? ''}`)
   })
 
   it('PRD 样例保留 source（MR 来源）与 traces（跨层上游）', () => {
