@@ -258,7 +258,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
 
   it('team spawn 角色包：CHARTER + 角色 skill + KB + 产出 + 边界', () => {
     const skill = readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
-    for (const needle of ['角色包', 'CHARTER', '<company-content>/../presets/', '产出', '边界', '任务书']) {
+    for (const needle of ['role pack', 'CHARTER', '<company-content>/../presets/', 'Output', 'Boundary', 'Brief']) {
       expect(skill, `assembling-the-team 缺角色包要素：${needle}`).toContain(needle)
     }
     expect(handbookSurface(), '通用协作面必须写 team 角色包').toContain('team 角色包')
@@ -270,11 +270,11 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
   it('team 角色包给任务书路径，署名行不得编造（BUG-055）', () => {
     const skill = readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
     expect(skill, '角色包必须带任务书路径字段（成员署名行靠它）')
-      .toMatch(/任务书[^\n]{0,8}[：:]\s*`?\.dsh-company\/deliverables\/<slug>\/drafts\/ceo\.md/)
+      .toMatch(/Brief[^\n]{0,8}[：:]\s*`?\.dsh-company\/deliverables\/<slug>\/drafts\/ceo\.md/)
     expect(skill, '角色包必须给署名行格式（成员只看到角色包，不保证读 work-handoff）')
-      .toMatch(/署名行[^\n]*(?:By:|出稿：)\s*<角色>｜(?:Version|版本) v<N>｜(?:Brief|任务书) = <任务书路径>/)
+      .toMatch(/signature line[^\n]*By: <role>｜Version v<N>｜Brief = <brief path>/i)
     expect(skill, 'CEO 必须先落任务书再 spawn（spawn prompt 不是可回溯文件）')
-      .toMatch(/spawn 前[^\n]*任务书|先落任务书|任务书落盘后[^\n]*spawn/)
+      .toMatch(/write the brief before spawning|before `spawn_teammate`/i)
     const handoff = readFileSync(join(PACK, 'content/generic/work-handoff.md'), 'utf8')
     expect(handoff, '署名行路径必须从角色包抄，不能写死默认路径')
       .toMatch(/Brief = <角色包给的任务书路径>|Brief = <任务书路径>/)
@@ -292,7 +292,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(ceo, '缺角不等于代行').toMatch(/查不到该角色 ≠ 换人代行/)
     expect(ceo, '旧 journal 的「本部署无 X」不作数').toMatch(/旧 journal[\s\S]*不作数/)
     const skill = readFileSync(join(PRESETS_DIR, 'ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
-    expect(skill, '组队 skill 必须同一条规则（MRD 只归 CMO）').toMatch(/owner 唯一，缺角不代行[\s\S]*MRD 只归 CMO/)
+    expect(skill, '组队 skill 必须同一条规则（MRD 只归 CMO）').toMatch(/Owner is unique; a missing seat does not mean substitution[\s\S]*MRD belongs only to CMO/)
   })
 
   it('skill 目录必须配加载器：声明 skill-filesystem 的 preset 同时声明 tool-skill', () => {
@@ -457,12 +457,12 @@ describe('组队健壮性三层防御（2026-10-12 用户裁定；issue 2026-10-
   it('B3 · CEO 组队技能带结构性硬条款（最小在屋起步 / 菜单算术 / 字段≠入屋 / 收打回=纠错）', () => {
     const skill = readFileSync(join(PRESETS_DIR, 'ceo', 'skills', 'assembling-the-team', 'SKILL.md'), 'utf8')
     expect(skill, '缺「最小在屋起步」硬条款——单 owner 起步为推荐默认（负例：17 场 ~15 场四职起手）')
-      .toMatch(/最小在屋|单 owner 起步/)
+      .toMatch(/Minimum in-room start|single-owner option/)
     expect(skill, '缺「菜单算术一致性」——选项名单 = 工作项 owner 全集，spawn ⊆ 选中名单')
-      .toMatch(/菜单算术|在屋名单.*全集|spawn ⊆/)
+      .toMatch(/menu arithmetic|in-room roster[\s\S]*spawn list ⊆/i)
     expect(skill, '缺「验收字段 ≠ 入屋理由」——跨域字段初稿 + 待确认，不为字段拉人')
-      .toMatch(/字段.{0,6}入屋|待.{0,3}确认/)
-    expect(skill, '缺「收打回 = 纠错信号」处理句（andon：不追责）').toMatch(/打回.{0,12}(纠错|响应|不追责|三选一)/)
+      .toMatch(/acceptance fields ≠ a reason to enter|pending <domain> confirmation/i)
+    expect(skill, '缺「收打回 = 纠错信号」处理句（andon：不追责）').toMatch(/pushback = correction signal|respond with one of three|do not blame/i)
   })
 
   it('B3 · 成员侧打回规范在场（手册：域内核对义务 + 打回三件套 + 不追责）', () => {

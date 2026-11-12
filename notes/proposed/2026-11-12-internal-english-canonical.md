@@ -184,9 +184,9 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 - 新增 `tests/content/fact-labels.spec.ts` 固定内容面棘轮：中文标签回潮 → 红；还原 → 绿。
 - I1b 机器 token 清单已清；`pnpm verify` **ALL PASS**。
 
-**I1 第九批**：`fact-finding-playbook`、`product-definition` 翻成英文；I1 已翻 21/24。剩余 3 个：`assembling-the-team`、`chairing-staff-meeting`、`quality-loop`。
+**I1 第十批**：`assembling-the-team` 翻成英文（含六步、角色包、product-definition 动议）；I1 已翻 22/24。剩余 2 个：`chairing-staff-meeting`、`quality-loop`。
 
-**剩余 I1**：3 个 skill 全文翻译；persona/agent.cordis.yml；content/**；领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
+**剩余 I1**：2 个 skill 全文翻译；persona/agent.cordis.yml；content/**；领域值。这些完成前，4 个 token 阻断文件（`_shared/product-definition`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`ceo/fact-finding-playbook`）保持 PENDING；`_shared/quality-loop` 无机器 token，可先翻。
 
 ## 输掉的方案
 
