@@ -247,6 +247,11 @@
 - CultivationAdopted 迁 adopted* copy：验证态/观察历史/原始依据/来源/撤回后缀/展开收起。
 - cultivation-copy.spec 覆盖 en adoptedTitle/adoptedShowAll；client 381 tests；金样 ALL PASS。
 
+## P0 UI 第十五批（Board 说明）
+
+- CultivationBoard 的“我的分身/怎么养/熟手命令”迁 board* copy。
+- cultivation-copy.spec 覆盖 en boardHow/boardCmdCheck；client 381 tests；金样 ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

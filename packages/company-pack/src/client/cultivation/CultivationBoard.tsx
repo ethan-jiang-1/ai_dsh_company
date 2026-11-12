@@ -87,18 +87,18 @@ export function CultivationBoard(props: CultivationBoardProps) {
 
   return (
     <>
-      <div className="wk-activity-block" aria-label="我的分身">
-        <strong>{viewer === null ? '请选择负责的角色' : `我的分身：${props.viewerLabel ?? viewer}`}</strong>
+      <div className="wk-activity-block" aria-label={CULTIVATION_COPY.boardAria}>
+        <strong>{viewer === null ? CULTIVATION_COPY.boardChooseRole : CULTIVATION_COPY.boardMyDouble(props.viewerLabel ?? viewer)}</strong>
         <div className="wk-meta">
           {viewer === null
-            ? '当前会话不是公司角色——用公司角色之一开会话，这里就是那个角色的培养台。'
-            : `培养对象 = 公司盘 × ${props.viewerLabel ?? viewer}（每个人培养自己的角色分身）。`}
+            ? CULTIVATION_COPY.boardNotRole
+            : CULTIVATION_COPY.boardTarget(props.viewerLabel ?? viewer)}
         </div>
       </div>
 
-      <div className="wk-activity-block wk-cultivation-main" aria-label="让角色今后的工作更好">
-        <strong>让角色今后的工作更好</strong>
-        <div className="wk-meta">从一项真实工作或改进目标开始，写下下次想看到的做法。提交后仍需目标角色语境下的人决定。</div>
+      <div className="wk-activity-block wk-cultivation-main" aria-label={CULTIVATION_COPY.boardMainAria}>
+        <strong>{CULTIVATION_COPY.boardMainTitle}</strong>
+        <div className="wk-meta">{CULTIVATION_COPY.boardMainSub}</div>
       </div>
 
       {viewer !== null && actions !== undefined && (
@@ -125,24 +125,24 @@ export function CultivationBoard(props: CultivationBoardProps) {
       <CultivationFeedback feedback={props.feedback} reachable={props.feedbackReachable} />
 
       <div className="wk-activity-block">
-        <strong>怎么养</strong>
+        <strong>{CULTIVATION_COPY.boardHow}</strong>
         <ul className="wk-activity">
-          <li>要它改做法：点上面「开始记录一项工作」，在表单里写清这次工作、想改善什么与证据；它进「需要我处理」，你确认后点「{CULTIVATION_COPY.adopt}」。</li>
-          <li>要别的角色改：同一个入口，把目标角色改成对方即可变成建议——由对方本人在它的会话里采纳，你这边只留回执。</li>
-          <li>采纳 = 把做法写进那个角色的方法层：新开的该角色会话带着它开工；已经在跑的会话也会随技能目录刷新看到它。当前这段对话不受影响。</li>
-          <li>同类任务上见效后回填「{CULTIVATION_COPY.verifyPass}」；不灵了「{CULTIVATION_COPY.revoke}」撤回（会删掉方法，记录也不能再被采纳）。</li>
-          <li>分身自己也能提案（工具里叫 cultivation_propose）；采纳、拒绝、撤回、验证只能由人在这里点。</li>
-          <li>teammate 继承 CEO 组合（职能方法不会进 teammate）；命名委派 child 有自己的 preset——要用职能方法，改走命名委派（如 vp_eng）或开那个角色的会话。</li>
+          <li>{CULTIVATION_COPY.boardHowChange}</li>
+          <li>{CULTIVATION_COPY.boardHowOther}</li>
+          <li>{CULTIVATION_COPY.boardHowAdopt}</li>
+          <li>{CULTIVATION_COPY.boardHowVerify}</li>
+          <li>{CULTIVATION_COPY.boardHowPropose}</li>
+          <li>{CULTIVATION_COPY.boardHowTeammate}</li>
         </ul>
         <details className="wk-cultivation-commands">
-          <summary>熟手命令行</summary>
+          <summary>{CULTIVATION_COPY.boardCommands}</summary>
           <ul className="wk-activity">
-            <li>纠正：/cultivation correct 期望行为一句话 :: 做法与证据</li>
-            <li>建议：/cultivation suggest 角色 期望行为一句话 :: 建议与证据</li>
-            <li>采纳：/cultivation adopt 记录编号　拒绝：/cultivation reject 记录编号 :: 理由</li>
-            <li>验证：/cultivation verify 记录编号 pass｜fail　撤回：/cultivation revoke 方法名</li>
-            <li>归档：/cultivation archive 天数（只动已处理记录，open 不动）　清理归档：/cultivation purge 天数</li>
-            <li>体检：/cultivation check（报告记录缺方法/方法无记录，不自动改）</li>
+            <li>{CULTIVATION_COPY.boardCmdCorrect}</li>
+            <li>{CULTIVATION_COPY.boardCmdSuggest}</li>
+            <li>{CULTIVATION_COPY.boardCmdAdopt}</li>
+            <li>{CULTIVATION_COPY.boardCmdVerify}</li>
+            <li>{CULTIVATION_COPY.boardCmdArchive}</li>
+            <li>{CULTIVATION_COPY.boardCmdCheck}</li>
           </ul>
         </details>
       </div>

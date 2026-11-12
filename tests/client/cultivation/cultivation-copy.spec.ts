@@ -25,5 +25,7 @@ describe('CULTIVATION_COPY 语言代理', () => {
     expect(CULTIVATION_COPY.mineSuggestionFor('CFO')).toContain('CFO')
     expect(CULTIVATION_COPY.adoptedTitle).toBe('Adopted methods')
     expect(CULTIVATION_COPY.adoptedShowAll(3)).toContain('3')
+    expect(CULTIVATION_COPY.boardHow).toBe('How to cultivate')
+    expect(CULTIVATION_COPY.boardCmdCheck).toContain('/cultivation check')
   })
 })
