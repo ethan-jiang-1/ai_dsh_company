@@ -1,25 +1,25 @@
-# 企业软件 · 术语
+# Enterprise software · glossary
 
-> 层：产品类型 · 加载：T2 按需。术语随产品类型变；通用层不得出现这些词。
+> Layer: product type · Load: on demand (T2). Terms change with product type; the generic layer must not use these words.
 
-## 通用
+## General
 
-| 术语 | 含义（本类型内） |
+| Term | Meaning (within this type) |
 |---|---|
-| 企业软件 | 卖给组织、由组织部署/使用的软件；不等于 SaaS |
-| 私有化 | 部署在客户自己的环境；升级、兼容、回滚是验收重点 |
-| 永久授权 | 一次性授权 + 维护/升级；版本支持矩阵是验收重点 |
-| 席位 / 用量 | 订阅或计费的计量单位；定价归 VP-Sales/CFO |
+| enterprise software | Software sold to an organization and deployed/used by it; not the same as SaaS |
+| private deployment | Deployed in the customer's own environment; upgrade, compatibility, and rollback are the acceptance focus |
+| perpetual license | One-time license + maintenance/upgrade; the version-support matrix is the acceptance focus |
+| seat / usage | Billing units for subscription or metering; pricing belongs to VP-Sales/CFO |
 
-## SaaS 交付模式（子类）
+## SaaS delivery mode (subclass)
 
-| 术语 | 含义（本类型内） |
+| Term | Meaning (within this type) |
 |---|---|
-| tenant | 租户；数据隔离与配额的基本单位 |
-| SLA | 服务等级承诺；可用性、响应、赔付口径 |
-| activation | 激活：新租户完成首个价值动作 |
-| retention | 留存；按周/月看续用与流失 |
-| release train | 固定节奏的发布列车；灰度与回滚 |
-| feature flag | 功能开关；按租户/比例放量 |
+| tenant | A tenant; the basic unit of data isolation and quota |
+| SLA | Service-level commitment; availability, response, and compensation basis |
+| activation | Activation: a new tenant completes its first value action |
+| retention | Retention; weekly/monthly continued use and churn |
+| release train | A fixed-cadence release train; canary and rollback |
+| feature flag | A feature flag; rollout by tenant/percentage |
 
-SaaS 是本类型的一种交付模式，不是独立产品类型；不要把 tenant/SLA 当所有企业软件的必备字段。
+SaaS is a delivery mode of this type, not a separate product type; do not treat tenant/SLA as mandatory fields for all enterprise software.

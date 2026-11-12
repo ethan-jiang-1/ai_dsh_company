@@ -31,17 +31,17 @@ describe('fresh bootstrap 用真实 content：类型不同，合同不同', () =
   it('business-software → 三层合同', () => {
     const { processDocs, cleanup } = fresh('business-software')
     try {
-      expect(processDocs).toContain('# 产品文档链与编号合同（business-software）')
-      expect(processDocs).toContain('三层与 owner')
-      expect(processDocs).not.toContain('五层与 owner')
+      expect(processDocs).toContain('# Product document chain and numbering contract (business-software)')
+      expect(processDocs).toContain('Three layers and owners')
+      expect(processDocs).not.toContain('Five layers and owners')
     } finally { cleanup() }
   })
 
   it('hardware-software → 五层合同', () => {
     const { processDocs, cleanup } = fresh('hardware-software')
     try {
-      expect(processDocs).toContain('# 产品文档链与编号合同（hardware-software）')
-      expect(processDocs).toContain('五层与 owner')
+      expect(processDocs).toContain('# Product document chain and numbering contract (hardware-software)')
+      expect(processDocs).toContain('Five layers and owners')
       expect(processDocs).toContain('SyRS')
     } finally { cleanup() }
   })

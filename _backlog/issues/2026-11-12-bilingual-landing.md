@@ -62,6 +62,7 @@ opened: 2026-11-12
 - P1 content/generic 6/6 英文：routing/role-boundary/deliverable-states/work-handoff/collaboration/human-interface；新增 generic 英文棘轮；content-manifest T2 体积仍过。
 - P1 content/charters 6/6 英文；`## 历史纪要` 锚改 `## Historical minutes`（converge/base-clean/gates-negative 同步）；新增 charters 英文棘轮。
 - P1 content/company 3/3 英文：policy-lines/rates/review-protocol；content-single-home 的 REQUIRED 与负例同步英文；新增 company 英文棘轮。
+- P1 content/product-types 2/2 英文：business-software / hardware-software 全部 md/json/templates；新增 product-types 英文棘轮；硬件合同压到 5413B。
 - 修 tab body 未注入 t、Tasks/Cultivation 标题与 guide 不一致、DelegationFlow/Presence 表头、budget 括号。
 - content 模板 8/8 英文（meta/prd 补齐）；模板棘轮 PENDING 清零。
 

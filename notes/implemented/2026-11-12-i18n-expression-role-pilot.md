@@ -295,6 +295,13 @@
 - templates.spec 的复核协议断言改英文；kb-seeds 的 Parallel delivery limit 同步。
 - 新增 company 英文棘轮；注入中文 → 红，还原 → 绿；全量 1659 tests，verify ALL PASS。
 
+## P1 第四片（content/product-types）
+
+- business-software / hardware-software 全部 md/json/templates 英文；保留层/id/规则/检查命令。
+- 合同 heading/“退役词”/五层断言同步英文；hardware requirements-model 压到 5413B，过 T2 6KB。
+- 新增 product-types 英文棘轮；注入中文 → 红，还原 → 绿。
+- 全量 1660 tests；preset-smoke ALL PASS；verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

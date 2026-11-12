@@ -3,29 +3,28 @@ layer: SyRS
 definition: headings
 ---
 
-# SyRS（系统需求 · 系统作为黑盒必须满足什么、每条怎么验）
+# SyRS (system requirements · what the system as a black box must satisfy, how each is verified)
 
-> 主笔 = **<assigned>**；输入 = 同目录 `drafts/prd.md`；落 `drafts/syrs.md`。
-> `shall` 句式、单一可验证、带验证方法与追溯；**不写设计**（模块划分 / 代码结构归架构稿）。
-> 定义点 = `### REQ-###` 标题（`definition: headings`）；每条必须带行首 `traces: [REQ-###]`（上游 PRD）。
+> Lead = **<assigned>**; input = `drafts/prd.md` in the same directory; save to `drafts/syrs.md`.
+> `shall` phrasing, single and verifiable, with verification method and traceability; **do not write design** (module split / code structure belong to the architecture draft).
+> Definition point = `### REQ-###` heading (`definition: headings`); every item carries line-start `traces: [REQ-###]` (upstream PRD).
 
-## 一分钟摘要
+## One-minute summary
 
-<结论 ≤3 条：几条系统需求、哪条最难验、下一步>
+<Conclusion ≤3 points: how many system requirements, which is hardest to verify, next step>
 
-### REQ-003 <一句话系统需求>
+### REQ-003 <one-line system requirement>
 
 - kind: FR
-- status: 草案
+- status: draft
 - owner: <assigned>
-- verifier: <assigned / 第三方实验室 / 客户现场>
+- verifier: <assigned / third-party lab / customer site>
 - traces: [REQ-002]
-- 需求（shall）：系统应当…
-- 验证方法：测试 / 分析 / 演示 / 检验（可组合）
-- 验证判据：<可测句；不能量化就标[assumption]+ 验证方式>
-- 理由：…
+- Requirement (shall): the system shall…
+- Verification method: test / analysis / demonstration / inspection (may combine)
+- Verification criterion: <testable sentence; if not quantifiable, mark [assumption] + verification method>
+- Rationale: …
 
-## 覆盖与缺口
+## Coverage and gaps
 
-- 每条 PRD REQ 至少被一条 SyR 兑现；故意不覆盖的写明理由。
-- 未决（谁拍板、缺什么证据）：…
+- Every PRD REQ is fulfilled by at least one SyR; state the reason for any deliberate non-coverage.

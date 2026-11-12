@@ -3,31 +3,28 @@ layer: IRS
 definition: headings
 ---
 
-# IRS（接口需求 · 跨边界的接口长什么样）
+# IRS (interface requirements · what a cross-boundary interface looks like)
 
-> 主笔 = **<assigned>**；输入 = 同目录 `drafts/syrs.md`；落 `drafts/irs.md`。
-> 写**接口双方**（两端 owner）、类型、方向、格式与字段语义、频率与时限、异常与降级；**不写内部数据结构与算法**。
-> 定义点 = `### IF-###` 标题（`definition: headings`）；每条必须带行首 `traces: [REQ-###]`（上游 SyRS）。
-> 分配（需求落到子系统 / 采购件）见 `allocation.md` 附录——附录不立号。
+> Lead = **<assigned>**; input = `drafts/syrs.md` in the same directory; save to `drafts/irs.md`.
+> Write **both interface parties** (owners at both ends), type, direction, format and field semantics, frequency and timing, exceptions and degradation; **do not write internal data structures or algorithms**.
+> Definition point = `### IF-###` heading (`definition: headings`); every item carries line-start `traces: [REQ-###]` (upstream SyRS).
+> Allocation (requirements to subsystems / purchased parts) is the `allocation.md` appendix — an appendix defines no ids.
 
-## 一分钟摘要
+## One-minute summary
 
-<结论 ≤3 条：几个接口、哪个最脆、下一步>
+<Conclusion ≤3 points: how many interfaces, which is most fragile, next step>
 
-### IF-001 <接口名>
+### IF-001 <interface name>
 
-- status: 草案
+- status: draft
 - owners: [firmware, electronics]
 - traces: [REQ-003]
-- 接口双方：<A 侧 / B 侧>
-- 类型：数据 / 物理 / 人机 / 协议
-- 方向：…
-- 格式与字段语义：…
-- 频率与时限：…
-- 异常与降级：…
-- 验证方法：…
+- Interface parties: <A side / B side>
+- Type: data / physical / human-machine / protocol
+- Direction: …
+- Format and field semantics: …
+- Frequency and timing: …
+- Exceptions and degradation: …
+- Verification method: …
 
-## 覆盖与缺口
-
-- 每条 SyR 至少被一条 IF 兑现或被验证覆盖；故意不覆盖的写明理由。
-- 未决（谁拍板、缺什么证据）：…
+## Coverage and gaps

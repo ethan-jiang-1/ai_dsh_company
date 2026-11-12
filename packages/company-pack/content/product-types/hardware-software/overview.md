@@ -1,33 +1,33 @@
-# 硬软一体 / 系统集成 · 产品类型概览
+# Hardware-software / systems integration · product type overview
 
-> 层：产品类型 · 加载：按需（T2）；本文件是 ≤2KB 摘要。用于带硬件（设备/模组/整机）与软件联动、或以系统集成交付的产品。
+> Layer: product type · Load: on demand (T2); this file is a ≤2KB summary. Use for products with hardware (device/module/complete unit) plus software, or delivered as systems integration.
 
-## 什么时候用
+## When to use
 
-- 交付物里有硬件、固件、现场安装或第三方系统对接；
-- 验收发生在客户现场或第三方实验室，而不是只在软件环境；
-- 需求要落到子系统 / 采购件，接口跨组织边界。
+- The deliverable includes hardware, firmware, on-site installation, or third-party system integration;
+- Acceptance happens at the customer site or a third-party lab, not only in a software environment;
+- Requirements map to subsystems / purchased parts, and interfaces cross organizational boundaries.
 
-若按 SOW/UAT/驻场验收，**产品类型仍是 `hardware-software`**，把 `交付模式` 写成 `project-services`；
-交付文档与模板见 `content/delivery-modes/project-services/`。
-若卖的是持续 SLA / 设备运维 / 备件与现场响应，交付模式写 `managed-service`；文档见 `content/delivery-modes/managed-service/`。
+If delivered by SOW/UAT/on-site acceptance, **the product type is still `hardware-software`**; write delivery mode as `project-services`;
+delivery documents and templates are in `content/delivery-modes/project-services/`.
+If selling ongoing SLA / device operations / spares and on-site response, write delivery mode as `managed-service`; documents in `content/delivery-modes/managed-service/`.
 
-**能力前置**：进入 PRD / 报价前先核对 `capabilities.md`；缺席位（硬件/固件/电气/机械/认证/供应链/试产/现场）报缺，不进入报价/对外承诺。
+**Capability prerequisite**: check `capabilities.md` before entering PRD/quoting; report missing seats (hardware/firmware/electrical/mechanical/certification/supply chain/trial production/on-site); do not enter quoting or external commitments.
 
-## 阶段（与文档链对应）
+## Stages (mapped to the document chain)
 
-1. **机会与需求**：MRD（该不该做、为谁做）→ StRS（谁在乎、验收谁点头）。
-2. **产品定义**：PRD（卖的是什么）→ SyRS（系统黑盒必须满足什么）→ IRS（跨边界接口）。
-3. **设计/实现**：硬件、固件、软件并行；接口与分配（allocation）先定。
-4. **试产与认证**：EVT/DVT/PVT、DFM、送测与认证（CE/FCC/3C 按市场）。
-5. **量产与现场**：爬坡、良率、OTA/现场升级、备件与返修。
+1. **Opportunity and requirements**: MRD (should we do it, for whom) → StRS (who cares, who signs acceptance).
+2. **Product definition**: PRD (what we sell) → SyRS (what the system as a black box must satisfy) → IRS (cross-boundary interfaces).
+3. **Design/implementation**: hardware, firmware, software in parallel; interfaces and allocation fixed first.
+4. **Trial production and certification**: EVT/DVT/PVT, DFM, submission and certification (CE/FCC/3C per market).
+5. **Mass production and on-site**: ramp, yield, OTA/on-site upgrade, spares and repair.
 
-## 与纯软件的关键差异
+## Key differences from pure software
 
-- 需求多两层（SyRS/IRS），验收有"检验/送检/现场"形态；
-- 风险清单包含长交期器件、认证失败、试产良率、供应链单点；
-- 版本是"硬件 × 固件 × 软件"的兼容矩阵，不是单一语义版本。
+- Two more requirement layers (SyRS/IRS); acceptance has "inspection/submission/on-site" forms;
+- Risk list includes long-lead components, certification failure, trial-production yield, supply-chain single points;
+- A version is a "hardware × firmware × software" compatibility matrix, not a single semantic version.
 
-## 术语
+## Terms
 
-见 `glossary.md`（BOM / EVT / DVT / PVT / DFM / 认证 / OTA / FAT / SAT）。
+See `glossary.md` (BOM / EVT / DVT / PVT / DFM / certification / OTA / FAT / SAT).

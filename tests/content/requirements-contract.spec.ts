@@ -34,8 +34,8 @@ describe('编号合同：requirements-model.md', () => {
 
   it('退役词只住退役节：正文规则不出现旧号形', () => {
     const text = read(CONTRACT)
-    const start = text.indexOf('## 退役词')
-    expect(start, '合同缺「## 退役词」节——退役词没有可判定的落点').toBeGreaterThan(-1)
+    const start = text.indexOf('## Retired words')
+    expect(start, '合同缺「## Retired words」节——退役词没有可判定的落点').toBeGreaterThan(-1)
     const nextHeading = text.indexOf('\n## ', start + 1)
     const retiredSection = nextHeading === -1 ? text.slice(start) : text.slice(start, nextHeading)
     const outside = text.slice(0, start) + (nextHeading === -1 ? '' : text.slice(nextHeading))

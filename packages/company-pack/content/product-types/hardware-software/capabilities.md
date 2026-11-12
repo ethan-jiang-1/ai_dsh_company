@@ -1,33 +1,33 @@
-# 硬软一体 · 能力前置核对
+# Hardware-software · capability prerequisite check
 
-> 层：产品类型 · 加载：按需（T2）。这不是 `org.md`，而是**动议进入 PRD/报价前**的能力核对表：
-> 硬件产品不是“研发顺手做一下”，缺席位就要报缺，不靠默认值猜。
+> Layer: product type · Load: on demand (T2). This is not `org.md`; it is the capability check **before a motion enters PRD/quoting**:
+> hardware products are not "something engineering does on the side"; a missing seat must be reported, not guessed with defaults.
 
-## 必须核对的能力
+## Capabilities that must be checked
 
-| 能力 | 典型席位 | 在 `kb/org.md` / `kb/roster.md` 找什么 | 缺失时 |
+| Capability | Typical seats | What to look for in `kb/org.md` / `kb/roster.md` | If missing |
 |---|---|---|---|
-| 硬件 / 结构 | 硬件工程师、结构工程师 | 是否有该席位与投入 | 报缺；不进入报价/承诺 |
-| 固件 / 嵌入式 | 固件工程师 | 是否有该席位与投入 | 报缺；不进入报价/承诺 |
-| 电气 | 电气工程师 | 是否有该席位与投入 | 报缺；不进入报价/承诺 |
-| 机械 | 机械工程师 | 是否有该席位与投入 | 报缺；不进入报价/承诺 |
-| 认证 / 合规 | 认证 / 质量 | 谁负责 CE/FCC/3C 送测与整改 | 报缺；不承诺上市日期 |
-| 供应链 / BOM | 采购 / 供应链 | 谁管关键器件、替代料、交期 | 报缺；不给 BOM 成本结论 |
-| 试产 / 制造 | NPI / 制造 | 谁管 EVT/DVT/PVT、DFM、良率 | 报缺；不承诺量产 |
-| 现场 / 售后 | 现场服务 / 备件 | 谁安装、返修、备件、SLA | 报缺；不承诺现场响应 |
+| Hardware / mechanical structure | Hardware engineer, mechanical engineer | Whether the seat and allocation exist | Report gap; do not enter quoting/commitment |
+| Firmware / embedded | Firmware engineer | Whether the seat and allocation exist | Report gap; do not enter quoting/commitment |
+| Electrical | Electrical engineer | Whether the seat and allocation exist | Report gap; do not enter quoting/commitment |
+| Mechanical | Mechanical engineer | Whether the seat and allocation exist | Report gap; do not enter quoting/commitment |
+| Certification / compliance | Certification / quality | Who owns CE/FCC/3C submission and remediation | Report gap; do not promise a launch date |
+| Supply chain / BOM | Procurement / supply chain | Who owns key components, alternates, lead times | Report gap; do not give a BOM cost conclusion |
+| Trial production / manufacturing | NPI / manufacturing | Who owns EVT/DVT/PVT, DFM, yield | Report gap; do not promise mass production |
+| On-site / after-sales | Field service / spares | Who installs, repairs, stocks spares, owns SLA | Report gap; do not promise on-site response |
 
-## 规则
+## Rules
 
-- **谁核对**：VP-Eng（技术能力）+ COO（交付/现场）；CFO 看认证/试产/售后的成本；CEO 决定补人、外包或缩范围。
-- **什么时候**：PRD 初稿、报价、对外承诺之前；不是量产前才想起。
-- **缺失怎么办**：在 final 与任务书写“能力缺口：缺 <席位>，影响 <报价/交期/承诺>”，
-  **不进入报价/对外承诺**；用户点名要求继续时，CEO 书面接受风险。
-- **不得代行**：不能用“VP-Eng 兼管”“供应商会做”代替责任方；必须有席位或明确外包合同。
-- **项目制交付**：若同时是 `交付模式 = project-services`，再加载
-  `content/delivery-modes/project-services/` 的 SOW/UAT/RACI；本表只管能力，不管交付文档。
+- **Who checks**: VP-Eng (technical capability) + COO (delivery/on-site); CFO checks certification/trial-production/after-sales cost; the CEO decides to hire, outsource, or cut scope.
+- **When**: before the PRD draft, quoting, or external commitment; not only before mass production.
+- **What if missing**: write in final and the brief "capability gap: missing <seat>, affects <quote/lead time/commitment>",
+  **do not enter quoting/external commitment**; if the user explicitly asks to continue, the CEO accepts the risk in writing.
+- **No substitution**: "VP-Eng also covers it" or "the supplier will do it" does not replace an accountable party; there must be a seat or an explicit outsourcing contract.
+- **Project delivery**: if also `delivery mode = project-services`, load
+  `content/delivery-modes/project-services/` SOW/UAT/RACI; this table covers capability only, not delivery documents.
 
-## 与 org.md 的分工
+## Division with org.md
 
-- `kb/org.md` = 编制事实（岗位数/条线）；`kb/roster.md` = 席位 → 谁 / 投入；
-- 本文件 = 动议级核对表：**要哪些能力、缺了谁负责报、缺了能不能继续**；
-- 本文件不复制人数；人数以 `org.md` 为准。
+- `kb/org.md` = staffing facts (headcount/lines); `kb/roster.md` = seat → who / allocation;
+- This file = motion-level checklist: **which capabilities are needed, who reports a gap, whether work can continue**;
+- This file does not copy headcount; headcount follows `org.md`.

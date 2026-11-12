@@ -19,7 +19,7 @@ const read = (type: string, file: string): string => readFileSync(join(DIR, type
 describe('产品类型真实合同：business 三层 vs hardware 五层', () => {
   it('business 是 MRD/StRS/PRD，不出现 SyRS/IRS/V&V 层表行', () => {
     const text = read('business-software', 'requirements-model.md')
-    expect(text).toContain('三层与 owner')
+    expect(text).toContain('Three layers and owners')
     for (const layer of ['MRD', 'StRS', 'PRD']) expect(text).toContain(layer)
     expect(text).not.toMatch(/\|\s*4\s*\|\s*\*\*SyRS\*\*/)
     expect(text).not.toMatch(/\|\s*5\s*\|\s*\*\*IRS\*\*/)
@@ -28,7 +28,7 @@ describe('产品类型真实合同：business 三层 vs hardware 五层', () => 
 
   it('hardware 是五层 + V&V', () => {
     const text = read('hardware-software', 'requirements-model.md')
-    expect(text).toContain('五层与 owner')
+    expect(text).toContain('Five layers and owners')
     for (const layer of ['MRD', 'StRS', 'PRD', 'SyRS', 'IRS', 'V&V']) expect(text).toContain(layer)
   })
 

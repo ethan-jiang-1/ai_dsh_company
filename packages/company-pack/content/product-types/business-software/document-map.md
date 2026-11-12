@@ -1,12 +1,12 @@
-# 需求文档链与校验（business-software）
+# Requirements document chain and checks (business-software)
 
-> 层：产品类型 · 加载：按需（T2）。本文件是“哪些文档、什么编号、跑哪个校验”的唯一家。
+> Layer: product type · Load: on demand (T2). This file is the single home of "which documents, which numbering, which check".
 
-- **产品定义的文件名固定，编号只承载身份**：CMO 写 `drafts/mrd.md`（`MR-###`）+ `drafts/strs.md`
-  （`REQ-###`），VP-Eng 写 `drafts/prd.md`（`REQ-###` / `AC-###-#`）。
-- **链到 PRD 为止**：没有 SyRS / IRS / V&V 层；系统/接口/部署作为 PRD 的技术约束与风险写。
-  若动议确实需要系统级需求或独立验证计划，改用 `hardware-software` 类型。
-- **编号规则、退役词、追溯与范围豁免的唯一合同** = pack `content/product-types/business-software/requirements-model.md`。
-- **结构校验** = `/prd check <deliverables 目录名>`（MRD/PRD 结构、AC、changeLog）；
-  **编号/追溯** = `/req check <deliverables 目录名>`（操作员跑，角色不自证）。
-- `check-rules.json` 的层 = `MRD / StRS / PRD`，默认层 = 同三层；`layers:` 不需要再声明系统层。
+- **Product-definition file names are fixed; numbering carries identity only**: CMO writes `drafts/mrd.md` (`MR-###`) + `drafts/strs.md`
+  (`REQ-###`); VP-Eng writes `drafts/prd.md` (`REQ-###` / `AC-###-#`).
+- **The chain stops at the PRD**: no SyRS / IRS / V&V layer; system/interface/deployment are written as PRD technical constraints and risks.
+  If the motion truly needs system-level requirements or an independent verification plan, switch to the `hardware-software` type.
+- **The single contract for numbering rules, retired words, traceability, and scope exemption** = pack `content/product-types/business-software/requirements-model.md`.
+- **Structure check** = `/prd check <deliverables dir>` (MRD/PRD structure, AC, changeLog);
+  **numbering/traceability** = `/req check <deliverables dir>` (the operator runs it; roles do not self-certify).
+- The layers in `check-rules.json` = `MRD / StRS / PRD`, default layers = the same three; `layers:` does not need to declare a system layer.

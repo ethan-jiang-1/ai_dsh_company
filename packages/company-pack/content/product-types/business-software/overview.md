@@ -1,54 +1,53 @@
-# 企业软件 · 产品类型概览
+# Enterprise software · product type overview
 
-> 层：产品类型 · 加载：按需（T2）；本文件是 ≤2KB 摘要。用于**纯软 / 企业软件**：没有现场硬件、没有固件/电气/机械交付物，
-> 也不按项目制 SOW 交付。产品类型 = 工程学科；SaaS / 私有化 / 永久授权是**部署/商业形态**，
-> 不是产品类型，也不是第二轴的交付模式（交付模式 = `productized` / `project-services` / `managed-service`）。
+> Layer: product type · Load: on demand (T2); this file is a ≤2KB summary. Use for **pure software / enterprise software**: no on-site hardware, no firmware/electrical/mechanical deliverables,
+> and not delivered under a project SOW. Product type = engineering discipline; SaaS / private deployment / perpetual license are **deployment/commercial shapes**,
+> not product types, and not the second axis's delivery modes (delivery mode = `productized` / `project-services` / `managed-service`).
 
-## 什么时候用
+## When to use
 
-- 交付物是软件服务、桌面/企业应用、平台或工具链；
-- 没有需要现场安装、供电、采样、承力或认证的硬件件；
-- 收入可以是订阅、席位、用量或永久授权；交付可以是 SaaS、私有化或本地部署。
+- The deliverable is a software service, desktop/enterprise app, platform, or toolchain;
+- There is no hardware that needs on-site installation, power, sampling, load-bearing, or certification;
+- Revenue may be subscription, seats, usage, or perpetual license; delivery may be SaaS, private deployment, or on-prem.
+- If the motion includes on-site hardware, firmware, electrical/mechanical parts, or certification, switch to `hardware-software`.
+- If delivered by SOW/UAT/on-site, **the product type is still `business-software`**; write delivery mode as `project-services`;
+  delivery documents and templates are in `content/delivery-modes/project-services/`; do not force a SOW into this type.
+- If selling ongoing SLA / on-call / monthly report / renewal, write delivery mode as `managed-service`; documents in `content/delivery-modes/managed-service/`.
 
-若动议含现场硬件、固件、电气/机械件或认证，改用 `hardware-software`。
-若按 SOW/UAT/驻场交付，**产品类型仍是 `business-software`**，把 `交付模式` 写成 `project-services`；
-交付文档与模板见 `content/delivery-modes/project-services/`，不要在本类型里硬塞 SOW。
-若卖的是持续 SLA / 值班 / 月报 / 续费，交付模式写 `managed-service`；文档见 `content/delivery-modes/managed-service/`。
+## Document chain
 
-## 文档链
+`MRD → StRS → PRD`, stopping at the product layer:
 
-`MRD → StRS → PRD`，到产品层为止：
-
-| 层 | 回答什么 | owner | 文件 |
+| Layer | Answers | owner | File |
 |---|---|---|---|
-| MRD | 该不该做、为谁做、凭什么赢 | CMO | `drafts/mrd.md` |
-| StRS | 谁在乎、在乎什么、验收时谁点头 | CMO | `drafts/strs.md` |
-| PRD | 卖的是什么产品、怎么验收、怎么切片 | VP-Eng | `drafts/prd.md` |
+| MRD | Should we do it, for whom, why we win | CMO | `drafts/mrd.md` |
+| StRS | Who cares, what they care about, who signs off at acceptance | CMO | `drafts/strs.md` |
+| PRD | What product we sell, how it is accepted, how it is sliced | VP-Eng | `drafts/prd.md` |
 
-**没有 SyRS / IRS / V&V 层**；接口、系统边界、部署形态作为 PRD 的技术约束/风险写，不另立需求层。
-若动议确实需要系统级需求或独立验证计划，改用 `hardware-software`，不要在本类型里硬塞。
+**No SyRS / IRS / V&V layer**; interfaces, system boundaries, and deployment shape are written as PRD technical constraints/risks, not as a separate requirements layer.
+If the motion truly needs system-level requirements or an independent verification plan, switch to `hardware-software`; do not force it into this type.
 
-## 部署/商业形态（写在 PRD，不另立类型）
+## Deployment/commercial shape (written in the PRD; no separate type)
 
-- **SaaS**：tenant、SLA、activation、retention、release train、feature flag；验收看使用数据与 SLO。
-- **私有化 / 本地部署**：安装、升级、兼容矩阵、数据迁移、回滚；验收看现场升级与回滚演练。
-- **永久授权**：版本兼容、维护窗口、许可证与升级路径；验收看版本支持矩阵。
+- **SaaS**: tenant, SLA, activation, retention, release train, feature flag; acceptance looks at usage data and SLOs.
+- **Private deployment / on-prem**: installation, upgrade, compatibility matrix, data migration, rollback; acceptance looks at on-site upgrade and rollback drills.
+- **Perpetual license**: version compatibility, maintenance window, license and upgrade path; acceptance looks at the version-support matrix.
 
-部署/商业形态影响验收口径与发布方式，但不改变 MRD/StRS/PRD 的层与编号。
+Deployment/commercial shape affects acceptance and release, but does not change the MRD/StRS/PRD layers or numbering.
 
-## 成功判据
+## Success criteria
 
-- 每条 REQ 有可判真假的 AC；
-- 发布有灰度/回滚或升级/回滚路径；
-- 关键使用指标（激活、留存、SLO、工单）有基线或采集方式；
-- 范围外与未决单列，不用“以后再说”代替。
+- Every REQ has an AC that can be judged true/false;
+- Release has canary/rollback or upgrade/rollback paths;
+- Key usage metrics (activation, retention, SLO, tickets) have a baseline or collection method;
+- Out-of-scope and open items are listed separately; "later" is not a substitute.
 
-## 与硬软一体 / 项目制的差异
+## Difference from hardware-software / project delivery
 
-- 没有 BOM、认证、试产、现场安装、固件/硬件兼容矩阵；
-- 没有 SyRS/IRS/V&V 的强制层；接口与部署写在 PRD；
-- 验收偏使用数据/发布/升级，不是现场验收单或 UAT 签字。
+- No BOM, certification, trial production, on-site installation, firmware/hardware compatibility matrix;
+- No mandatory SyRS/IRS/V&V layer; interfaces and deployment live in the PRD;
+- Acceptance is usage/release/upgrade oriented, not an on-site acceptance sheet or UAT signature.
 
-## 术语
+## Terms
 
-见 `glossary.md`（tenant / SLA / activation / retention / release train / feature flag / on-prem / perpetual）。
+See `glossary.md` (tenant / SLA / activation / retention / release train / feature flag / on-prem / perpetual).

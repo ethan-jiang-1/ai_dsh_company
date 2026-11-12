@@ -8,5 +8,5 @@
     "PRD": "prd.md"
   },
   "retiredPrefixes": ["STR", "SYR", "IFR", "VR", "VP", "V"],
-  "notes": "纯软/企业软件：MRD → StRS → PRD；无系统需求/接口层；SaaS/私有化/永久授权是交付模式，见 overview。"
+  "notes": "Pure software / enterprise software: MRD → StRS → PRD; no system-requirements or interface layer; SaaS/private deployment/perpetual license are delivery modes, see overview."
 }

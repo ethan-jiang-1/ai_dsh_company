@@ -11,5 +11,5 @@
     "V&V": "vv-plan.md"
   },
   "retiredPrefixes": ["STR", "SYR", "IFR", "VR", "VP", "V"],
-  "notes": "系统工程 V 模型：需求分层、接口与分配是 IRS 附录；验收含检验/送检/现场。"
+  "notes": "Systems-engineering V model: layered requirements, interfaces and allocation are IRS appendices; acceptance includes inspection/submission/on-site."
 }

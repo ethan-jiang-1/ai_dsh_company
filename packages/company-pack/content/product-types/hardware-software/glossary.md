@@ -1,14 +1,14 @@
-# 硬软一体 / 系统集成 · 术语
+# Hardware-software / systems integration · glossary
 
-> 层：产品类型 · 加载：T2 按需。术语随产品类型变；通用层不得出现这些词。
+> Layer: product type · Load: on demand (T2). Terms change with product type; the generic layer must not use these words.
 
-| 术语 | 含义（本类型内） |
+| Term | Meaning (within this type) |
 |---|---|
-| BOM | 物料清单；关键器件、替代料、供货周期 |
-| EVT / DVT / PVT | 工程验证 / 设计验证 / 生产验证三个试产阶段 |
-| DFM | 可制造性设计；模具与试产里程碑 |
-| 认证 | CE / FCC / 3C 等强制准入；送测与整改路径 |
-| OTA | 设备固件/软件的远程升级通道与回滚 |
-| FAT / SAT | 工厂验收测试 / 现场验收测试 |
-| MTBF | 平均无故障时间；可靠性与售后指标 |
-| allocation | 需求落到子系统 / 采购件的分配附录（不立号） |
+| BOM | Bill of materials; key components, alternates, lead times |
+| EVT / DVT / PVT | Engineering / design / production validation build stages |
+| DFM | Design for manufacturing; tooling and trial-production milestones |
+| certification | CE / FCC / 3C and other mandatory market access; submission and remediation path |
+| OTA | Remote firmware/software upgrade channel and rollback |
+| FAT / SAT | Factory acceptance test / site acceptance test |
+| MTBF | Mean time between failures; reliability and after-sales metric |
+| allocation | Appendix mapping requirements to subsystems / purchased parts (no ids) |
