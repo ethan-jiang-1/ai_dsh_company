@@ -16,7 +16,7 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
-import { LOADING_NOTE, StateNote } from './company-panels.tsx'
+import { StateNote } from './company-panels.tsx'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { LedgerSummary } from './LedgerTab.tsx'
 import { useWorkspaceText } from '../data/workspace-text.ts'
@@ -263,7 +263,7 @@ export function DeliverablesTab(props: DeliverablesTabProps) {
       )}
     >
       {error !== null && <div className="wk-error">{error}</div>}
-      {catalog === null && error === null && <StateNote kind="loading" text={LOADING_NOTE} />}
+      {catalog === null && error === null && <StateNote kind="loading" text={props.t('deliverables.loading')} />}
       {catalog !== null && (
         <DeliverablesView catalog={catalog} sessionId={props.sessionId} openFinal={props.openFinal} t={props.t} />
       )}

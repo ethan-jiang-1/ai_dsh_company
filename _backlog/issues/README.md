@@ -4,7 +4,6 @@
 
 ## 活跃清单
 
-- [2026-11-12-bilingual-landing.md](2026-11-12-bilingual-landing.md) — 推动落地：内部全英文 + 表达层双语（I1 剩余 / I2 / I3 / E1）；去向 = implementation（两份已批 RFC）。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
 

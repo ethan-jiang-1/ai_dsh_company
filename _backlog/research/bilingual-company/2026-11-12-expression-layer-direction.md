@@ -5,6 +5,9 @@ intent: 把用户 2026-11-12 的方向修正落成可执行边界：双语只在
 
 > 下游：[内部全英文 canonical RFC](../../../notes/proposed/2026-11-12-internal-english-canonical.md)（I1/I2/I3 + 表达层 E1）；问题卡 = [归档卡](../../_archive/settled_issues/2026-11-12-internal-english-canonical.md)。
 
+> **2026-11-12 最终范围修正（覆盖本文对 I1/I2/I3 的落地建议）**：用户明确只做界面呈现层（TAB / Label / button 等可见文案）。
+> 本文第 2 节把「内部英文 canonical」列为方向，仍有参考价值，但**不是本研究的验收**；I2 注释/日志、I3 docs 不做全量迁移。
+> 落地卡 = [2026-11-12-bilingual-landing.md](../../_archive/settled_issues/2026-11-12-bilingual-landing.md)。
 # 表达层双语、内部英文 canonical 与角色名
 
 ## 1. 用户原话与我的理解
@@ -27,7 +30,7 @@ intent: 把用户 2026-11-12 的方向修正落成可执行边界：双语只在
 | **内部 canonical** | 英文单份 | 代码标识符/key/ID、preset id、角色 id、数据字段值、日志、模型提示/内容 | 代码/模型 |
 | **发行文档** | 按需 | README/安装手册/docs | 仓库/发行读者 |
 
-**关键**：表达层可以有 zh/en 两个字典；内部只能有一份。**禁止**把内部内容做成 `content/zh/` + `content/en/` 两套语义等价正文——那是两本账，翻译/审校/门禁都会翻倍。
+**关键**：表达层可以有 zh/en 两个字典；内部只能有一份。**禁止**把内部内容做成 `content/zh/` + `content/en/` 两套语义等价正文——那是两本账，翻译/审校/门禁都会翻倍。**但“内部英文”不等于要把存量全仓翻译**：用户最终只要求 UI 可见文案；I2/I3 是独立债务。
 
 ## 3. 角色名盘点
 

@@ -351,6 +351,13 @@
 - I2/I3 仍未完成；基线是显式债务，不是“全英文”。
 - 全量 1669 tests；验 ALL PASS。
 
+## 最终范围（2026-11-12 用户口径）
+
+- 只做界面呈现层：Tab / Label / Button / 空态 / 错误；默认 zh；角色名混排。
+- I2/I3 明确不做；已删基线棘轮，不再作为 goal 验收。
+- en 9 页签无中文、zh 金样一致、1667 tests、verify 全绿。
+- 活跃卡按 UI 收窄后归档；research 题名页/方向/设计材料加最终范围修正。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

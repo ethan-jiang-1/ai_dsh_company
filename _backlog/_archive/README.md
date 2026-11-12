@@ -1,5 +1,6 @@
 # _archive/ · 离开活跃区
 
+- [2026-11-12-bilingual-landing.md](settled_issues/2026-11-12-bilingual-landing.md) — 界面呈现层（Tab / Label / Button）zh/en；默认 zh、角色名混排；内部英文 I2/I3 不在范围；去向 = note。
 默认不要读；从活卡或索引点名才打开。路径表示离场状态；历史讨论与证据原文保留，迁移只修导航链接与索引。
 
 | 目录 | 放什么 |

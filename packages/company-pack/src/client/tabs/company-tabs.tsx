@@ -231,7 +231,7 @@ export function PresenceTab(props: PresenceTabProps) {
               <span className="wk-row-status">{t('presence.statusColumn')}</span>
               <span className="wk-row-task">{t('presence.taskColumn')}</span>
             </div>
-            <div role="list" aria-label="组织在场板" className="wk-list">
+            <div role="list" aria-label={t('presence.boardAria')} className="wk-list">
               {rows.map(row => (
                 <button
                   key={row.id}

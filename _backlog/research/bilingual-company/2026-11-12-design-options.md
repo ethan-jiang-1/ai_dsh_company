@@ -5,6 +5,10 @@ intent: 在盘面事实之上给出可落地的方案、阶段边界、测试门
 
 > **2026-11-12 方向修正**：用户明确「双语只在表达层，内部用英文」。本文件 §5 Phase B 的 `content/en/` overlay 方案已被取代；当前方案以 [题名页结论](README.md) + [表达层方向材料](2026-11-12-expression-layer-direction.md) 为准。以下保留当时的分析与取舍，作为历史证据。
 
+> **2026-11-12 最终范围（覆盖前文 Phase B/C 的全量建议）**：用户最终只要求**界面呈现层**（TAB / Label / button / 空态 / 错误）zh/en + 默认 zh + 角色名混排。
+> 本文件 §5 的 Phase B（内部内容英文）与 Phase C（docs）**不在本次落地验收**；I2/I3 是独立债务，不做全量迁移。
+> 当前落地卡 = [2026-11-12-bilingual-landing.md](../../_archive/settled_issues/2026-11-12-bilingual-landing.md)。
+
 # 范围、架构与纪律落点
 
 ## 1. 先把「支持双语」拆成三层

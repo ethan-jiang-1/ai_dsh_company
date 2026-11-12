@@ -3,6 +3,8 @@ status: proposed
 opened: 2026-11-12
 ---
 
+> **2026-11-12 最终范围修正**：用户明确只做界面呈现层（TAB / Label / button）。本文保留内部英文的盘面与原则；**I2 注释/日志/测试名、I3 开发者文档不做全量迁移**，不作为 UI 交付的验收条件。UI 落地 = [表达层 RFC](2026-11-12-bilingual-company.md) + [实施 Note](../implemented/2026-11-12-i18n-expression-role-pilot.md)。
+
 # 内部全英文 canonical + 表达层双语
 
 > 状态：proposed（已批，未实施）｜ 批准：用户 2026-11-12「同意你的想法……要么就全英文」｜ 上游：[问题卡](../../_backlog/_archive/settled_issues/2026-11-12-internal-english-canonical.md)

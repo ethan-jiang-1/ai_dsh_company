@@ -59,13 +59,13 @@ export function DelegationFlowPanel({ tree, t = defaultT }: { readonly tree: Del
             {node.preset !== null && <Tag tone="info">{node.preset}</Tag>}
             {node.mode !== null && <Tag tone="outline">{node.mode}</Tag>}
             <span className="wk-delegation-flow-depth">d{node.depth}</span>
-            {node.terminal === 'completed' && <Tag tone="success">完成</Tag>}
-            {node.terminal === 'failed' && <Tag tone="warning">未完成</Tag>}
-            {node.terminal === 'interrupted' && <Tag tone="warning">中断</Tag>}
-            {node.terminal === 'aborted' && <Tag tone="warning">中止</Tag>}
-            {node.terminal === 'max-tokens' && <Tag tone="warning">超限</Tag>}
-            {node.terminal === 'refusal' && <Tag tone="danger">拒绝</Tag>}
-            {node.terminal === 'lost' && <Tag tone="danger">丢失</Tag>}
+            {node.terminal === 'completed' && <Tag tone="success">{t('delegationFlow.terminal.completed')}</Tag>}
+            {node.terminal === 'failed' && <Tag tone="warning">{t('delegationFlow.terminal.failed')}</Tag>}
+            {node.terminal === 'interrupted' && <Tag tone="warning">{t('delegationFlow.terminal.interrupted')}</Tag>}
+            {node.terminal === 'aborted' && <Tag tone="warning">{t('delegationFlow.terminal.aborted')}</Tag>}
+            {node.terminal === 'max-tokens' && <Tag tone="warning">{t('delegationFlow.terminal.max-tokens')}</Tag>}
+            {node.terminal === 'refusal' && <Tag tone="danger">{t('delegationFlow.terminal.refusal')}</Tag>}
+            {node.terminal === 'lost' && <Tag tone="danger">{t('delegationFlow.terminal.lost')}</Tag>}
             {node.missing && <Tag tone="warning">missing</Tag>}
           </li>
         ))}

@@ -282,6 +282,15 @@ export const zh = {
   'presence.member': '成员',
   'presence.statusColumn': '团队内状态',
   'presence.taskColumn': '当前任务',
+  'delegationFlow.terminal.completed': '完成',
+  'delegationFlow.terminal.failed': '未完成',
+  'delegationFlow.terminal.interrupted': '中断',
+  'delegationFlow.terminal.aborted': '中止',
+  'delegationFlow.terminal.max-tokens': '超限',
+  'delegationFlow.terminal.refusal': '拒绝',
+  'delegationFlow.terminal.lost': '丢失',
+  'presence.boardAria': '组织在场板',
+  'deliverables.loading': '读取团队状态…',
 } as const
 
 /** 本命名空间的 key 联合。 */
@@ -559,6 +568,15 @@ export const en: Record<CompanyKey, string> = {
   'presence.member': 'Member',
   'presence.statusColumn': 'Team status',
   'presence.taskColumn': 'Current task',
+  'delegationFlow.terminal.completed': 'Completed',
+  'delegationFlow.terminal.failed': 'Failed',
+  'delegationFlow.terminal.interrupted': 'Interrupted',
+  'delegationFlow.terminal.aborted': 'Aborted',
+  'delegationFlow.terminal.max-tokens': 'Max tokens',
+  'delegationFlow.terminal.refusal': 'Refused',
+  'delegationFlow.terminal.lost': 'Lost',
+  'presence.boardAria': 'Organization presence',
+  'deliverables.loading': 'Reading team state…',
 }
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {

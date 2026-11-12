@@ -3,6 +3,8 @@ status: proposed
 opened: 2026-11-12
 ---
 
+> **2026-11-12 最终范围**：只做**界面呈现层** zh/en（Tab / Label / Button / 空态 / 错误）+ 默认 zh + 角色名混排。内部 content 存量 / 注释 / docs 的全量英文不在本 RFC 的验收；I2/I3 是独立债务。证据 = en 9 页签无中文、zh 金样一致、1669 tests、verify 全绿。
+
 # 插件中英文双语（默认中文启动）
 
 > 状态：proposed（已批；Phase 0/A1/A3a/A2-tab-shell 已实现，A2 其余/A3b/A4 未开始）｜ 批准：用户 2026-11-12「按流程推动落地」｜ 上游：[问题卡](../../_backlog/_archive/settled_issues/2026-11-12-bilingual-company.md) · [研究题](../../_backlog/research/bilingual-company/README.md)

@@ -92,9 +92,6 @@ export function StateNote({ text, kind = 'empty' }: { readonly text: string; rea
   return <div className={kind === 'loading' ? 'wk-meta wk-loading' : 'wk-meta wk-empty'}>{text}</div>
 }
 
-/** 统一的加载态文案（读权威团队态期间）。 */
-export const LOADING_NOTE = '读取团队状态…'
-
 /**
  * 看板：三列（待办 / 进行中 / 完成），卡上带 owner、依赖徽章与就绪状态。
  * @param props.columns - 读模型折好的列。
