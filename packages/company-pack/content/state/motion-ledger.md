@@ -1,10 +1,10 @@
-# 动议台账（motion ledger）
+# Motion ledger
 
-> **出厂起动件**：本文件是**本部署的经营账**，随安装落到你的公司盘后由你（或收敛维护者）追加。
-> 维护规矩：当轮收敛时（journal → CHARTER 历史纪要）维护者同步追加一行——与历史纪要同一动作，
-> 不另起流程。新增或修正的「一句话结论」必须逐字取自对应 `.dsh-company/deliverables/<日期>-<slug>/meta.md`，
-> 台账不另写第二份结论。字段口径：墙钟 = 真跑实测（未记 = 当轮未记录）；
-> 成品 = `.dsh-company/deliverables/<日期>-<slug>/final.md` 经 CEO `present`。
+> **Factory starter**: this file is **this deployment's operating account**; after install it lands on your company disk and you (or the convergence maintainer) append to it.
+> Maintenance rule: at the round's convergence (journal → CHARTER historical minutes) the maintainer appends one row in the same action —
+> do not start a separate process. A new or corrected "one-line conclusion" must be copied verbatim from the matching `.dsh-company/deliverables/<date>-<slug>/meta.md`;
+> the ledger writes no second conclusion. Field basis: wallClock = measured (untimed = not recorded this round);
+> deliverable = `.dsh-company/deliverables/<date>-<slug>/final.md` declared by the CEO via `present`.
 
-| slug | 日期 | 类型 | 参与 | 墙钟 | 成品 | 一句话结论 |
+| slug | date | type | participants | wallClock | deliverable | summary |
 |---|---|---|---|---|---|---|

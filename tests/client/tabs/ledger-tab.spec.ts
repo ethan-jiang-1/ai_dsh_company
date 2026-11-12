@@ -14,9 +14,9 @@ import { LedgerTab } from '../../../packages/company-pack/src/client/tabs/Ledger
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
 const SAMPLE = [
-  '| slug | 日期 | 类型 | 参与 | 墙钟 | 成品 | 一句话结论 |',
+  '| slug | date | type | participants | wallClock | deliverable | summary |',
   '| --- | --- | --- | --- | --- | --- | --- |',
-  '| 2026-10-30-demo | 2026-10-30 | 动议 | CEO/CFO | 12m | ✅ | 结论 A |',
+  '| 2026-10-30-demo | 2026-10-30 | decision | CEO/CFO | 12m | ✅ | 结论 A |',
 ].join('\n')
 
 let mounted: Root | null = null
@@ -52,7 +52,7 @@ describe('台账页签 ready 路径（R5-09）', () => {
     expect(host.textContent).toContain('共 1 场动议')
     expect(host.textContent).toContain('成品 1')
     expect(host.textContent).toContain('2026-10-30-demo')
-    expect(host.textContent).toContain('2026-10-30 · 动议 · CEO/CFO')
+    expect(host.textContent).toContain('2026-10-30 · 决策 · CEO/CFO')
     expect(host.textContent).toContain('结论 A')
     expect(host.textContent).toContain('成品')
   })

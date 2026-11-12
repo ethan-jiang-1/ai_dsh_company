@@ -19,7 +19,10 @@ export interface MotionRow {
 }
 
 /** 表头列名（顺序即解析顺序；台账表头的唯一权威形态）。 */
-const HEADER = ['slug', '日期', '类型', '参与', '墙钟', '成品', '一句话结论']
+const HEADER = ['slug', 'date', 'type', 'participants', 'wallClock', 'deliverable', 'summary']
+/** Legacy header (read-only for old company disks); canonical is HEADER above. */
+const LEGACY_HEADER = ['slug', '日期', '类型', '参与', '墙钟', '成品', '一句话结论']
+const HEADERS = [HEADER, LEGACY_HEADER]
 
 /**
  * 解析台账 markdown 表。容错规则：跳过非表行；列数不符的行跳过（不猜）；表头不符返回空
@@ -36,7 +39,7 @@ export function parseMotionLedger(text: string): readonly MotionRow[] {
     if (!trimmed.startsWith('|')) continue
     const cells = trimmed.slice(1, trimmed.endsWith('|') ? -1 : undefined).split('|').map(cell => cell.trim())
     if (!headerSeen) {
-      if (cells.length === HEADER.length && HEADER.every((name, i) => cells[i] === name)) headerSeen = true
+      if (HEADERS.some(header => cells.length === header.length && header.every((name, i) => cells[i] === name))) headerSeen = true
       continue
     }
     if (cells.every(cell => /^[-: ]*$/.test(cell))) continue // 分隔行
@@ -59,6 +62,6 @@ export function ledgerStats(rows: readonly MotionRow[]): { total: number; finals
   return {
     total: rows.length,
     finals: rows.filter(row => row.final.includes('✅')).length,
-    untimed: rows.filter(row => row.wallClock === '未记' || row.wallClock === '—').length,
+    untimed: rows.filter(row => row.wallClock === 'untimed' || row.wallClock === '未记' || row.wallClock === '—').length,
   }
 }

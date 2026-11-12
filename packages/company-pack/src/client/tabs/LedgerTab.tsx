@@ -34,6 +34,10 @@ const defaultT = ((key: CompanyKey, params?: Record<string, string | number>) =>
 }) as CompanyT
 
 const LEDGER_KIND_KEYS: Record<string, CompanyKey> = {
+  decision: 'catalog.type.decision',
+  production: 'catalog.type.production',
+  diagnostic: 'catalog.type.diagnostic',
+  qa: 'catalog.type.qa',
   '决策': 'catalog.type.decision',
   '生产': 'catalog.type.production',
   '诊断': 'catalog.type.diagnostic',
@@ -149,13 +153,13 @@ export function LedgerTab(props: LedgerTabProps) {
         : (
           <div role="list" aria-label={t('ledger.listAria')} className="wk-list wk-ledger-list">
             {rows.map(row => (
-              <div key={row.slug} role="listitem" className="wk-row" aria-label={t('ledger.rowAria', { slug: row.slug, kind: ledgerKindLabel(row.kind, props.t), date: row.date })}>
+              <div key={row.slug} role="listitem" className="wk-row" aria-label={t('ledger.rowAria', { slug: row.slug, kind: ledgerKindLabel(row.kind, t), date: row.date })}>
                 <span className="wk-row-name">
                   {row.final.includes('✅') ? <Tag tone="info">{t('ledger.final')}</Tag> : <Tag tone="outline">{t('ledger.noFinal')}</Tag>}
                   {row.slug}
                 </span>
-                <span className="wk-row-status">{row.date} · {ledgerKindLabel(row.kind, props.t)} · {row.roles}</span>
-                <LedgerSummary summary={row.summary} t={props.t} />
+                <span className="wk-row-status">{row.date} · {ledgerKindLabel(row.kind, t)} · {row.roles}</span>
+                <LedgerSummary summary={row.summary} t={t} />
               </div>
             ))}
           </div>

@@ -28,7 +28,7 @@ describe('parseMotionLedger', () => {
     const text = [
       '# 头',
       '',
-      '| slug | 日期 | 类型 | 参与 | 墙钟 | 成品 | 一句话结论 |',
+      '| slug | date | type | participants | wallClock | deliverable | summary |',
       '|---|---|---|---|---|---|---|',
       '| a | d | k | r | w | ✅ | s |',
       '| 坏行 | 只有 | 三列 |',
@@ -86,11 +86,11 @@ describe.skipIf(!hasLive)('live bundle 台账（dev only）', () => {
 describe('ledgerStats', () => {
   it('统计口径（fixture：总场数 / 成品数 / 未记墙钟数）', () => {
     const rows = parseMotionLedger([
-      '| slug | 日期 | 类型 | 参与 | 墙钟 | 成品 | 一句话结论 |',
+      '| slug | date | type | participants | wallClock | deliverable | summary |',
       '|---|---|---|---|---|---|---|',
-      '| a | 2026-09-26 | 评估 | CEO | 241s | ✅ | 结论一 |',
-      '| b | date-pending | 评估 | CFO | 未记 | ✅ | 结论二 |',
-      '| c | 2026-09-26 | 口径问答 | CFO | — | — | 结论三 |',
+      '| a | 2026-09-26 | decision | CEO | 241s | ✅ | 结论一 |',
+      '| b | date-pending | decision | CFO | untimed | ✅ | 结论二 |',
+      '| c | 2026-09-26 | qa | CFO | — | — | 结论三 |',
     ].join('\n'))
     expect(ledgerStats(rows)).toEqual({ total: 3, finals: 2, untimed: 2 })
   })

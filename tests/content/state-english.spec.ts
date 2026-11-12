@@ -6,8 +6,8 @@ import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
 
 const DIR = join(repositoryRoot, 'packages/company-pack/content/state')
 const CJK = /[\u3400-\u9fff]/u
-const TRANSLATED = new Set(['company.md', 'org.md', 'owners.md', 'roster.md'])
-const PENDING = new Set(['motion-ledger.md'])
+const TRANSLATED = new Set(['company.md', 'motion-ledger.md', 'org.md', 'owners.md', 'roster.md'])
+const PENDING = new Set<string>([])
 
 describe('content/state 英文棘轮', () => {
   it('文件清单与 PENDING 对齐；已翻文件无中文', () => {
