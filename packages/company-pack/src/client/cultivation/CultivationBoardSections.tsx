@@ -24,7 +24,7 @@ function isSelfRecord(record: CultivationRecord): boolean {
 
 /** 记录类型的人话名词（拒绝回执按 kind 说，不把纠正叫成建议）。 */
 function kindNoun(record: CultivationRecord): string {
-  return record.kind === 'suggestion' ? '建议' : '纠正'
+  return record.kind === 'suggestion' ? CULTIVATION_COPY.mineKindSuggestion : CULTIVATION_COPY.mineKindCorrection
 }
 
 /** 观察时间用人话；原始 ISO 只放在 title 里供核对。 */
@@ -37,37 +37,37 @@ export function CultivationMine({ inbox, roleLabel = defaultRoleLabel }: { reado
   return (
     <>
       {(inbox.mine.length > 0 || inbox.processedForViewer.length > 0) && (
-        <div className="wk-activity-block" aria-label="我提交的与我已处理">
-          <strong>我提交的 · 我已处理</strong>
-          <div className="wk-meta">自己的纠正在上面「需要我处理」里待你决定；给别的角色的建议等对方处理。</div>
-          <div role="list" aria-label="提案与处理回执" className="wk-list wk-cultivation-list">
+        <div className="wk-activity-block" aria-label={CULTIVATION_COPY.mineAria}>
+          <strong>{CULTIVATION_COPY.mineTitle}</strong>
+          <div className="wk-meta">{CULTIVATION_COPY.mineSub}</div>
+          <div role="list" aria-label={CULTIVATION_COPY.mineListAria} className="wk-list wk-cultivation-list">
             {inbox.processedForViewer.map(record => (
-              <div key={record.id} role="listitem" className="wk-row" aria-label={`已拒绝 ${record.id}`}>
+              <div key={record.id} role="listitem" className="wk-row" aria-label={CULTIVATION_COPY.mineRejectedAria(record.id)}>
                 <span className="wk-row-name">
-                  已拒绝 {roleLabel(record.proposerRole)} 的{kindNoun(record)}<Tag tone="outline">{record.expectation}</Tag>
-                  <Tag tone="warning">目标角色语境下的人已拒绝</Tag>
+                  {CULTIVATION_COPY.mineRejectedLine(roleLabel(record.proposerRole), kindNoun(record))}<Tag tone="outline">{record.expectation}</Tag>
+                  <Tag tone="warning">{CULTIVATION_COPY.mineRejectedByTarget}</Tag>
                 </span>
-                <span className="wk-row-task">理由：{record.reason ?? '（未留）'}</span>
-                {record.decidedAt !== undefined && <span className="wk-meta">目标角色语境下的人拒绝 · 拒绝时间：{record.decidedAt}</span>}
+                <span className="wk-row-task">{CULTIVATION_COPY.mineReason(record.reason ?? CULTIVATION_COPY.inboxNoReason)}</span>
+                {record.decidedAt !== undefined && <span className="wk-meta">{CULTIVATION_COPY.mineRejectedAt(record.decidedAt)}</span>}
 
               </div>
             ))}
             {inbox.mine.map(record => (
-              <div key={record.id} role="listitem" className="wk-row" aria-label={`我提交的 ${record.id}`}>
+              <div key={record.id} role="listitem" className="wk-row" aria-label={CULTIVATION_COPY.mineRowAria(record.id)}>
                 <span className="wk-row-name">
-                  {record.kind === 'suggestion' ? `给 ${roleLabel(record.targetRole)} 的建议` : '我的纠正'}
-                  {record.status === 'open' && <Tag tone="info">{isSelfRecord(record) ? '待我决定' : '待对方处理'}</Tag>}
-                  {record.status === 'adopted' && <Tag tone="success">目标角色语境下的人已采纳{record.methodSlug !== undefined ? ` → ${record.methodSlug}` : ''}</Tag>}
-                  {record.status === 'rejected' && <Tag tone="warning">目标角色语境下的人已拒绝</Tag>}
+                  {record.kind === 'suggestion' ? CULTIVATION_COPY.mineSuggestionFor(roleLabel(record.targetRole)) : CULTIVATION_COPY.mineMyCorrection}
+                  {record.status === 'open' && <Tag tone="info">{isSelfRecord(record) ? CULTIVATION_COPY.minePendingMe : CULTIVATION_COPY.minePendingOther}</Tag>}
+                  {record.status === 'adopted' && <Tag tone="success">{CULTIVATION_COPY.mineAdoptedByTarget(record.methodSlug)}</Tag>}
+                  {record.status === 'rejected' && <Tag tone="warning">{CULTIVATION_COPY.mineRejectedByTarget}</Tag>}
                 </span>
                 <span className="wk-row-task">
                   {record.status === 'rejected'
-                    ? `理由：${record.reason ?? '（未留）'}`
+                    ? CULTIVATION_COPY.mineReason(record.reason ?? CULTIVATION_COPY.inboxNoReason)
                     : record.body === '' && record.contexts?.[0] !== undefined ? record.contexts[0].title : record.title}
                 </span>
-                {record.work !== undefined && record.work !== '' && <span className="wk-meta">这次工作：{record.work}</span>}
+                {record.work !== undefined && record.work !== '' && <span className="wk-meta">{CULTIVATION_COPY.mineWork(record.work)}</span>}
                 {record.contexts?.[0] !== undefined && (
-                  <span className="wk-meta">背景：{record.contexts[0].kind === 'session' ? '会话' : '成品'}「{record.contexts[0].title}」</span>
+                  <span className="wk-meta">{CULTIVATION_COPY.mineBackground(record.contexts[0].kind === 'session' ? CULTIVATION_COPY.mineContextSession : CULTIVATION_COPY.mineContextDeliverable, record.contexts[0].title)}</span>
                 )}
               </div>
             ))}

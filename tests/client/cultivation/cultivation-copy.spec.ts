@@ -21,5 +21,7 @@ describe('CULTIVATION_COPY 语言代理', () => {
     expect(CULTIVATION_COPY.inboxSuggestion('CFO')).toContain('CFO')
     expect(CULTIVATION_COPY.journalTitle).toContain('Journal')
     expect(CULTIVATION_COPY.feedbackPositive).toContain('👍')
+    expect(CULTIVATION_COPY.mineTitle).toContain('Mine')
+    expect(CULTIVATION_COPY.mineSuggestionFor('CFO')).toContain('CFO')
   })
 })

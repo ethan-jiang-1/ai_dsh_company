@@ -237,6 +237,11 @@
 - copy 表新增函数型 key；zh/en 代理测试覆盖。
 - client 381 tests；金样 9 页签 ALL PASS；全量 1656 tests，verify ALL PASS。
 
+## P0 UI 第十三批（Mine）
+
+- CultivationMine 迁 mine* copy：标题/说明/行 aria/拒绝回执/状态/来源/背景/工作。
+- cultivation-copy.spec 覆盖 en mineTitle/mineSuggestionFor；client 381 tests；金样 ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。
