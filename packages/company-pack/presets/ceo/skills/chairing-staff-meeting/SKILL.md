@@ -1,73 +1,73 @@
 ---
 name: chairing-staff-meeting
-description: CEO 的动议节奏：澄清→DAG 拆解分派→追进度→VP 互审→收口→记账（名单与通道由 assembling-the-team 先行决定，本 skill 不再定名单）。
+description: 'CEO motion rhythm: clarify → DAG decomposition and dispatch → track progress → VP cross-review → close-out → bookkeeping (the roster and channels are decided first by assembling-the-team; this skill does not decide them again).'
 ---
-# 主持动议
+# Chairing a motion
 
-一条动议从进到出的六步（组队已完成——谁在屋里、走哪条通道，见 assembling-the-team）：
+Six steps from entry to exit (assembly is done — who is in the room and which channel, see assembling-the-team):
 
-1. **澄清**：用自己的话复述动议；明确三点——目标、约束（时间/预算/人）、验收标准。
-   写不下来就不开工。
-2. **拆解分派（DAG）**：拆成"单一 owner + 可验收"的任务，用团队任务板建任务，**验收标准写进任务**。
-   **开工先打能力探针**（一次 `web_search` + 一次 `bash curl`）再拆解——任务的事实前提若要读外部网页，
-   先确认通道打得开（打法清单 = fact-finding-playbook；"找不到"多数是"没换姿势"）。
-   **任务板落法**：每份交付物一个任务，`writeScopes` 填要写的路径前缀；两任务路径重叠时任务视图带
-   `writeScopeWarnings`，就近协调（协调靠警告不靠锁——任务所有权不是锁，假互斥比明示警告更危险）；
-   **写共享盘的 DSH 进程保持一个**（守卫管新鲜度不管跨进程独占，多实例互踩实测在案）。
-   **依赖分两拍落**（2026-10-13 立，实证：同批并行建任务时猜 id ⇒ `blocker task "3" not found`，
-   依赖边静默缺失）：板面 id 由**板子发号**（`task-N`，create 成功时才存在）⇒ ①先建任务
-   （可一批并行建多个；create 的 `blocked_by` 只许引用**已存在**的 id），②再用
-   `team_task_update(action='set_dependencies', blocked_by=[…])` 把依赖补上（谁等谁出稿）。
-   **同时建的几个任务彼此还没有 id，不许猜**；任务书里的「T1/T2」是**纸面号**——落板前用 create
-   的返回或 `team_task_list` 换成 `task-N`。谁在屋里、走哪条通道已由 assembling-the-team 定过——
-   本 skill 不再决定名单；brief 写全：目标、约束、验收、交期。
-   **多人模式任务书必落机器可读ASSIGN 行**（格式唯一家 = 本节；成员读侧的一句话版在公司手册）：
-   每个任务一行 `ASSIGN｜T1｜<角色>｜<一句话>｜deps: <T号或none>｜status: todo`（一行一格，格式照抄不改；
-   状态枚举 = todo/drafted/done/cancelled/pending-sources；未经证实的因果猜测行尾加可选段 `｜assumption: <待证/内容>`——
-   指令与假设分离）。落完任务书即写，别靠成员猜；**状态随盘面对齐**——谁出稿标"已出稿"、取消标"取消"、
-   合稿前标"完成"（实证：quote-z 收口后三条状态行仍"待办"，扫盘把过期待办报成活）。
-3. **追进度**：`wait_agent` 等稿；催促走任务板评论或 reopen，**不抢活不代笔**。
-   **单次等待 ≤ 3 分钟**（`timeout_ms` ≤ 180000）：超时先读任务板 + 成员状态，再决定「继续等 / 催促 /
-   自己做别的活」，**不要一次等 20 分钟**——界面会长时间停在等待态，人看起来就是「卡住了」
-   （2026-11-06 现场：lead 连发 5 次 `timeout_ms: 1200000`，成员仍在跑，用户判定会话卡死）。
-   **HITL 前排空**：要问人（`ask_user_question` / 等授权）之前，**先把不依赖该答复且依赖已满足的任务
-   全部派出**再进入等待——lead 阻塞期间全队停摆（V4 反事实：全队冻 11 小时）；等待中收到的完成回报，
-   恢复后第一时间处理。
-4. **VP 互审**：各职能出稿后指定交叉评审（例：VP-Sales 审 VP-Eng 的成本与量假设；COO 审交付可行性
-   与人力；CFO 审毛利与合规闸门）。**互审是重仪式（2026-10-12 硬条款）**：每条互审链必须写明
-   防的是哪个具体失效（如"两造数字不一致没人对"），写不出就不设——默认单审或你自己审。
-   评审意图用 `send_message` 发给对方（跨职能沟通走邮箱，消息与回执都在各自会话日志里），
-   owner 按意见修订并在任务板回执。
-   修订超过一轮的稿，owner 在稿首标**权威版号**（v1/v2/v3…），评审意见与回执都认版号。
-5. **收口**：亲自读稿、亲自合成。**合稿依据 = 权威版号的稿面原文**——回执与消息只当线索，
-   要引用的数字回到稿面核对。保留各职能的结论与保留意见，**不抹平分歧**；要改让 owner 改。
-   **两造数字/判读不一致先开对账回合再裁决**：两造各自一句陈词 → 你转述对方观点 → 各自一句回应；
-   对不齐才裁决或并列留档，final 须记"为什么没对账"（V4 反例在案）。
-   **事实收口规则**：final 的结论层**不得建立在未读到的事实上**——收口带 `pending-sources` 时要么降级
-   **「预案版（pending-sources 重算）」**并列出随之作废的结论，要么不收口；并用 schedule 立复算跟进
-   （到点 follow-up 自动回本会话查 `sources/` 复算），**title 必须含 `pending-sources·<slug>·<T#>`**（审计锚；
-   一条总锚可覆盖多个缺料任务——但**必须在 title 或 prompt 里点名**它解锁的下游 `T<N>`，没点名的照旧判
-   "无锚"）；follow-up 分两型——执行类（报告/查料/读档）到点照跑，决策类（花钱/对外承诺/砍项/签字）
-   到点只进待办；**口头"已立提醒"而无任务为证 = 行动幻觉**（schedule.json 可审计）。发**补料卡**给
-   驱动者：要什么 / 给 URL / 落 `.dsh-company/deliverables/<slug>/drafts/sources/`（一事一卡不算追问）；补料落盘即算
-   收到，owner 出下一版、状态改回待办。
-   **定稿前盘点保留账**：每个角色还留几条、归零还是明示，盘点结果写进纪要。
-   **定稿前另盘点 journal 在场**（2026-09-26 立；**换执行者**——缺席者不会报自己缺席）：本场出过活的
-   角色，逐个看 `.dsh-company/kb/<角色>/journal/` 有没有当轮纪要；**缺席的当场退回补写，补齐前不合稿**
-   （收工留痕是硬闸门：没写 = 该角色未收工）。
-   定稿写入 `.dsh-company/deliverables/<kickoff 日期>-<slug>/final.md`（**开局建目录就用注入的真日期**，同时写 `meta.md` 户口——**形状逐字照 `<company-content>/templates/meta.md` 模板**：核心字段是 `字段: 值` 平文本行、类型/结果用词表枚举值；markdown 加粗列表不合机器可查形状，成品页签会标「meta 形状错」、操作员收口核对），用 `present` 声明交付。
-   ⚠ **顺序是硬的：先 `present`、后**把 `meta.md` 的「结果」改成终态词——**没有 present 就没有「已完成」**。
-   写进 `final.md` 不等于收口：那次事故（all-in-ai-2026）就是写了 final、标了已完成，却一次没调 `present`
-   ⇒ 成品页签会显示「present 未核」，收口时由操作员核对并点名该 slug。
-   **首屏说人话（2026-10-10 用户批单）**：final 署名行后第一段 = 「一分钟摘要」——结论（≤3 条业务语言）、
-   下一步（谁/何时）、要用户拍板的事（如有）；**禁内部黑话**（闸门/T号/锚/等级进报告体）；
-   **阻塞型选择**必须用 `ask_user_question`，选项 label 写可执行动作、description 写关键后果；**非阻塞缺口**写明默认假设继续，并在轮末列待确认；
-   多个选项需按共同维度权衡时用短 GFM 表格，简单二选或窄屏不适合时用短列表；只为关键结论/复核数字提供文件行锚，重复和背景数字不逐项加锚；
-   drafts、任务书和成员消息保持内部协作密度，不为人话出口改浅；**present 的 description 写同款摘要**——交付卡直接显示给用户，高层看卡即懂，不点开也明白。
-6. **记账（硬闸门）**：向 `.dsh-company/kb/ceo/journal/` 追加当日纪要（动议 / 决定 / 分歧 / 遗留）——**没写 = 会议未收口**。**日期口径**（规则唯一见公司手册「日期口径」；2026-09-30 日期通道已上线）：**日期以会话注入的当前时间写真日期**（文件名与正文一致）；**仍不许凭记忆猜、不许拿既有 journal 日期"取次日"**。注入缺失（机制故障）时 fail-closed：占位 `date-pending`（`.dsh-company/kb/ceo/journal/date-pending-<slug>.md`）并在收工回报点名"日期待回填"。
+1. **Clarify**: restate the motion in your own words; make three things explicit — goal, constraints (time/budget/people), acceptance criteria.
+   If you cannot write them down, do not start.
+2. **Decompose and dispatch (DAG)**: split into "single owner + acceptable" tasks; create them on the team task board, and **write the acceptance criteria into the task**.
+   **Run the capability probe first** (one `web_search` + one `bash curl`) before splitting — if a task's factual premise needs an external web page,
+   confirm the channel opens first (playbook = fact-finding-playbook; "not found" usually means "did not change posture").
+   **Task-board placement**: one task per deliverable; put the path prefix to write in `writeScopes`; when two tasks overlap, the task view carries
+   `writeScopeWarnings`; coordinate locally (coordination relies on warnings, not locks — task ownership is not a lock; fake mutual exclusion is more dangerous than an explicit warning);
+   **keep one DSH process writing the shared disk** (the guard handles freshness, not cross-process exclusivity; multiple instances stepping on each other is a recorded case).
+   **Dependencies land in two beats** (2026-10-13, recorded: guessing ids while creating tasks in parallel ⇒ `blocker task "3" not found`,
+   dependency edges silently missing): the board assigns ids (`task-N`, which exists only after create succeeds) ⇒ ① create the tasks
+   (multiple can be created in parallel; create's `blocked_by` may only reference **existing** ids), ② then use
+   `team_task_update(action='set_dependencies', blocked_by=[…])` to add the dependencies (who waits for whose draft).
+   **Several tasks created at the same time do not have ids yet; do not guess**; `T1/T2` in the brief are **paper numbers** — before landing on the board, use create's
+   return or `team_task_list` to replace them with `task-N`. Who is in the room and which channel were already decided by assembling-the-team —
+   this skill does not decide the roster; the brief is complete: goal, constraints, acceptance, due date.
+   **A multi-person brief must carry machine-readable ASSIGN lines** (format owner = this section; the member-side one-liner is in the handbook):
+   one line per task `ASSIGN｜T1｜<role>｜<one-liner>｜deps: <T# or none>｜status: todo` (one line per cell, copy the format verbatim;
+   status enum = todo/drafted/done/cancelled/pending-sources; an unproven causal guess gets the optional tail `｜assumption: <to-verify/content>` —
+   instruction and assumption separated). Write it as soon as the brief is done; do not make members guess; **keep status aligned with the board** — mark drafted as `drafted`, cancelled as `cancelled`,
+   before merge as `done` (recorded: after quote-z closed out, three status lines still said `todo`; the scan reported them as overdue live work).
+3. **Track progress**: `wait_agent` for drafts; nudge through task-board comments or reopen; **do not grab the work and do not ghost-write**.
+   **A single wait ≤ 3 minutes** (`timeout_ms` ≤ 180000): on timeout, read the task board + member status first, then decide "keep waiting / nudge /
+   do other work yourself"; **do not wait 20 minutes in one go** — the UI stays in a waiting state for a long time, and to a human it looks "stuck"
+   (2026-11-06: lead sent 5 × `timeout_ms: 1200000`, members were still running, and the user judged the session stuck).
+   **Drain before HITL**: before asking a human (`ask_user_question` / waiting for authorization), **dispatch every task that does not depend on the answer and whose dependencies are satisfied**,
+   then wait — while the lead blocks, the whole team stalls (V4 counterfactual: the team froze for 11 hours); completion reports received while waiting
+   are handled first when you resume.
+4. **VP cross-review**: after each function produces a draft, assign a cross-review (e.g. VP-Sales reviews VP-Eng's cost and volume assumptions; COO reviews delivery feasibility
+   and staffing; CFO reviews gross margin and compliance gates). **Cross-review is a heavy ceremony (2026-10-12 hard clause)**: every cross-review chain must state
+   which concrete failure it prevents (e.g. "the two parties' numbers disagree and nobody reconciles"), otherwise do not set it — default to a single review or review it yourself.
+   Send the review intent to the other party with `send_message` (cross-function communication goes through the mailbox; messages and receipts are in each session log);
+   the owner revises per the feedback and receipts on the task board.
+   For a draft revised more than once, the owner puts the **authoritative version** (v1/v2/v3…) at the top of the draft; review comments and receipts refer to the version.
+5. **Close-out**: read the drafts yourself, merge them yourself. **The merge basis = the authoritative version's on-disk text** — receipts and messages are leads only;
+   numbers you cite must be checked against the draft. Preserve each function's conclusions and reservations; **do not flatten disagreement**; ask the owner to change.
+   **When the two parties' numbers/readings disagree, open a reconciliation round before deciding**: each party gives one sentence → you restate the other's view → each gives one response;
+   only if still misaligned do you decide or record both, and `final` must note "why reconciliation did not happen" (V4 counterexample on record).
+   **Fact close-out rule**: the conclusion layer of `final` **must not rest on facts you have not read** — when closing with `pending-sources`, either downgrade to
+   **"contingency version (pending-sources recompute)"** and list the conclusions invalidated with it, or do not close; create a recompute follow-up with schedule
+   (the follow-up returns to this session at due time and checks `sources/` to recompute); **the title must contain `pending-sources·<slug>·<T#>`** (audit anchor;
+   one master anchor may cover several missing-material tasks — but **the title or prompt must name** the downstream `T<N>` it unblocks; unnamed ones are still judged
+   "no anchor"); follow-ups have two types — execution (report / fact lookup / reading) runs at due time; decision (spending / external commitment / cutting scope / signing)
+   only enters the todo panel; **a verbal "reminder created" with no task as evidence = action hallucination** (schedule.json is auditable). Send a **source-request card** to
+   the driver: what is needed / URL / lands in `.dsh-company/deliverables/<slug>/drafts/sources/` (one card per matter is not nagging); material on disk counts as
+   received; the owner produces the next version and changes the status back to `todo`.
+   **Before finalizing, inventory reservations**: how many each role still holds, zero or explicit; write the result into the minutes.
+   **Also inventory journal presence before finalizing** (2026-09-26; **switch the executor** — absentees will not report themselves): for every role that worked this motion,
+   check `.dsh-company/kb/<role>/journal/` for a current-round entry; **send the absent ones back to write it; do not merge until complete**
+   (an off-work trail is a hard gate: no entry = that role has not finished).
+   Write the final to `.dsh-company/deliverables/<kickoff date>-<slug>/final.md` (**use the injected real date when creating the directory**, and write the `meta.md` dossier at the same time — **copy the shape of `<company-content>/templates/meta.md` verbatim**: the core fields are flat `field: value` lines, and type/result use enumerated values from the template; a markdown bold list does not match the machine-readable shape, the catalog tab marks "meta shape error", and the operator checks it at close-out), and declare delivery with `present`.
+   ⚠ **The order is hard: first `present`, then** change the `result` field in `meta.md` to the terminal word — **no present means no "done"**.
+   Writing `final.md` is not closing: that incident (all-in-ai-2026) wrote final and marked done but never called `present`
+   ⇒ the catalog tab shows "present unverified"; the operator checks it at close-out and names the slug.
+   **First screen in human language (2026-10-10 user ruling)**: the first paragraph after the final's signature line = the "one-minute summary" — conclusion (≤3 business-language points),
+   next step (who/when), decisions the user must make (if any); **no internal jargon** (gates/T#/anchors/grades in the report body);
+   **blocking choices** must use `ask_user_question`, with option labels as executable actions and descriptions as key consequences; **non-blocking gaps** state the default assumption and continue, list them at the end of the round as to-confirm;
+   when multiple options need weighing on common dimensions use a short GFM table; simple binary choices or narrow screens use a short list; provide file line anchors only for key conclusions/reviewed numbers, not for every repeated/background number;
+   drafts, briefs, and member messages keep their internal collaboration density; do not shallow them for the human-facing exit; **`present`'s description carries the same summary** — the delivery card is shown directly to the user; a senior reader understands it without opening it.
+6. **Bookkeeping (hard gate)**: append the day's minutes to `.dsh-company/kb/ceo/journal/` (motion / decisions / disagreements / leftovers) — **no entry = the meeting is not closed**. **Date basis** (rule single source = handbook "date basis"; the date channel went live 2026-09-30): **write the real date from the current time injected into the session** (filename and body agree); **still do not guess from memory and do not take "next day" from an existing journal date**. If injection is missing (mechanism failure), fail-closed: use the `date-pending` placeholder (`.dsh-company/kb/ceo/journal/date-pending-<slug>.md`) and name "date to be filled" in the close-out receipt.
 
-新成员入会：默认 fresh + 任务书（当前轮的任务书不在 fork 种子里）；要带 Lead **已完成轮**的会议上下文时，显式 `context: 'fork'`，别让它从零追问。
+New member joins: default fresh + brief (the current round's brief is not in the fork seed); to bring the Lead's **completed-round** meeting context, explicitly set `context: 'fork'`; do not make it ask from zero.
 
-> **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
-> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对
-> （如署名行与任务书、交付物三态与 present），本文只留需要上下文判断的部分。
+> **Boundary**: this skill is guidance, not a checklist — it provides a stable entry point and judgment criteria; judgment stays with the executor.
+> When this skill applies, **read the full text before acting**; do not guess from the description. Mechanical checks remain with the operator at close-out
+> (signature line vs. brief, deliverable tri-state vs. present); this text keeps only what needs context.

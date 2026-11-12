@@ -395,10 +395,10 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     const chairing = readFileSync(join(PRESETS_DIR, 'ceo/skills/chairing-staff-meeting/SKILL.md'), 'utf8')
     expect(ceo, 'CEO prefix 必须说明阻塞选择用 ask_user_question').toContain('阻塞型选择')
     expect(ceo, 'CEO prefix 必须说明非阻塞缺口带假设继续').toContain('非阻塞')
-    expect(chairing, '收口规则必须保留三件套').toContain('结论（≤3 条业务语言）')
-    expect(chairing, '规则必须说明比较结构按场景选择').toMatch(/GFM 表格|短列表/)
-    expect(chairing, '规则必须说明关键数字取证入口').toMatch(/行号锚|文件行锚|关键数字/)
-    expect(chairing, '规则必须保护 Agent 间内部密度').toMatch(/drafts|任务书|成员消息/)
+    expect(chairing, '收口规则必须保留三件套').toMatch(/conclusion \(≤3 business-language points\)/i)
+    expect(chairing, '规则必须说明比较结构按场景选择').toMatch(/GFM table|short list/i)
+    expect(chairing, '规则必须说明关键数字取证入口').toMatch(/file line anchors|key conclusions/i)
+    expect(chairing, '规则必须保护 Agent 间内部密度').toMatch(/drafts|briefs|member messages/i)
   })
 
   it('CEO 收口必须教「先 present、后标已完成」（2026-10-16 立，事故 = all-in-ai-2026 跳步收口）', () => {
@@ -407,7 +407,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     // 声明交付」，没有把顺序与「没 present 就没有已完成」写成硬约束 ⇒ 补钉子，防措辞被改回去。
     const chairing = readFileSync(join(PRESETS_DIR, 'ceo/skills/chairing-staff-meeting/SKILL.md'), 'utf8')
     expect(chairing, '收口步必须点名 present 工具').toContain('present')
-    expect(chairing, '必须钉住顺序：先 present、后标终态（缺 present 不得标「已完成」）').toMatch(/present[^\n]{0,40}(先|前)[^\n]{0,20}(标|改)[^\n]{0,20}(已完成|终态)|没有 present/)
+    expect(chairing, '必须钉住顺序：先 present、后标终态（缺 present 不得标「已完成」）').toMatch(/first `present`[^\n]*no present means no/i)
   })
 
   it('追进度必须钉短超时：单次 wait_agent ≤ 3 分钟，禁止 20 分钟长等（2026-11-06 用户判「卡住」）', () => {
@@ -415,7 +415,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     // 等待态 ⇒ 用户判定会话卡死（实际任务板 9/9 完成后正常收口）。钉住超时上限，防措辞被改回去。
     const chairing = readFileSync(join(PRESETS_DIR, 'ceo/skills/chairing-staff-meeting/SKILL.md'), 'utf8')
     expect(chairing, '必须钉 timeout_ms 上限 ≤ 180000').toMatch(/timeout_ms`? ≤ 180000/)
-    expect(chairing, '必须点名禁止一次等 20 分钟').toMatch(/不要一次等 20 分钟/)
+    expect(chairing, '必须点名禁止一次等 20 分钟').toMatch(/do not wait 20 minutes in one go/i)
   })
 
   it('任务依赖必须教"两拍落"（板面 id 由板子发号；2026-10-13 实证：同批并行建任务时猜 id）', () => {
@@ -431,8 +431,8 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
     expect(chairing, '不许再出现驼峰 blockedBy（真缺陷原形）').not.toContain('blockedBy')
     expect(chairing, '必须教第二拍 = team_task_update 的 set_dependencies').toContain('set_dependencies')
     expect(chairing, '必须说明板面 id 形状 task-N').toContain('task-N')
-    expect(chairing, '必须点破"同批建的还没有 id、不许猜"').toMatch(/不许猜|还没有 id/)
-    expect(chairing, '必须区分纸面号与板面 id').toContain('纸面号')
+    expect(chairing, '必须点破"同批建的还没有 id、不许猜"').toMatch(/do not guess|do not have ids yet/i)
+    expect(chairing, '必须区分纸面号与板面 id').toContain('paper numbers')
     const handbook = handbookSurface()
     expect(handbook, '派活行格式 owner（手册）必须点明 T 号是纸面号').toMatch(/`T<N>` 是纸面号/)
   })
