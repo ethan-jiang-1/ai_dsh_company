@@ -1,20 +1,20 @@
 ---
 name: customer-voice
-description: 客户之声提炼：从 KB 访谈与反馈记录找购买信号与拒绝理由；只认行为不认表态；每条判断带出处。
+description: 'Customer-voice distillation: find buying signals and rejection reasons in KB interviews and feedback; behavior over claims; every judgment cites its source.'
 ---
-# 客户之声（customer voice）
+# Customer voice
 
-> **方法契约**：适用产品类型 = all；需要事实 = 无。
+> **Method contract**: applicable product types = all; required facts = none.
 
-从 `.dsh-company/kb/vp-sales/` 的客户访谈与反馈记录提炼判断时的标准打法：
+The standard play when distilling judgments from customer interviews and feedback in `.dsh-company/kb/vp-sales/`:
 
-1. **只认行为，不认表态**："愿意付多少钱 / 什么时候付 / 推荐给谁了"是信号；"挺好的 / 有意思"是客气——分开两列。
-2. **拒绝理由比购买理由值钱**：每条拒绝逐字记录并归类（没预算 / 没痛点 / 有替代 / 不信我们）。
-3. **引用原文**：每条判断带 KB 出处（文件 + 行），禁止转述成自己想要的版本；KB 里没有的客户不提。
-4. **产出**：一页纸——三强三弱 + 一句话判断（买 / 不买 / 什么条件下买），按 `<company-content>/templates/decision-memo.md`。
+1. **Behavior over claims**: "how much would you pay / when would you pay / whom did you refer" is a signal; "sounds good / interesting" is politeness — keep two columns.
+2. **Rejection reasons are worth more than purchase reasons**: record every rejection verbatim and classify it (no budget / no pain / existing alternative / does not trust us).
+3. **Quote the source**: every judgment carries a KB source (file + line); never paraphrase it into the version you want; do not mention customers absent from the KB.
+4. **Output**: one page — three strengths, three weaknesses, one-line verdict (buy / do not buy / buy under what conditions), per `<company-content>/templates/decision-memo.md`.
 
-红线：不替研发承诺功能，不替运营承诺服务；客户记录不足就直说"样本不足"，不编。
+Red lines: do not promise features for engineering, or services for operations; if customer records are insufficient, say "insufficient sample"; never invent.
 
-> **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
-> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对
-> （如署名行与任务书、交付物三态与 present），本文只留需要上下文判断的部分。
+> **Boundary**: this skill is guidance, not a checklist — it provides a stable entry point and judgment criteria; judgment stays with the executor.
+> When this skill applies, **read the full text before acting**; do not guess from the description. Mechanical checks remain with the operator at close-out
+> (signature line vs. task brief, deliverable tri-state vs. present); this text keeps only what needs context.

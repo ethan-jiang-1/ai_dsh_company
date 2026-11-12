@@ -3,8 +3,9 @@
 //   发布前。跑法 = pnpm verify。
 //
 // 判据（经营侧方法契约）：
-//   ① 三个经营角色的每个 skill 必须有 `> **方法契约**：` 块，声明 `适用产品类型 = ...`、`需要事实 = ...`；
-//      方法可按交付模式适用，声明 `适用交付模式 = ...`；
+//   ① 三个经营角色的每个 skill 必须有 `> **方法契约**：` 或 `> **Method contract**:` 块，声明
+//      `适用产品类型 = ...` / `applicable product types = ...`、`需要事实 = ...` / `required facts = ...`；
+//      方法可按交付模式适用，声明 `适用交付模式 = ...` / `applicable delivery modes = ...`；
 //   ② 类型值 = `all` 或真实类型包 id；交付模式值 = `all` 或真实交付模式包 id；
 //      类型集不含公司默认类型时必须声明 `fail-closed`；
 //   ③ `需要事实` = `无` 或 `kb/<file>`，且每个 `<file>` 必须是 seed.json 的真实 target
@@ -16,6 +17,8 @@
 // 负例留证 2026-11-11（实地造红→还原→绿）：删 `project-economics` 的契约块 → 红；把
 //   `适用产品类型` 改成 `nope` → 红；把 `需要事实` 改成 `kb/nope.md` → 红；删 `cfo-workflow` 的
 //   `fail-closed` → 红；还原 → 绿。
+// 负例留证 2026-11-12（英文单份 pilot）：`customer-voice` 的 `> **Method contract**` 块被删/字段
+//   改成 `applicable product types = nope` → 红；还原 → 绿。中文契约块继续绿（两方向都跑）。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -26,10 +29,10 @@ const WORKFLOWS = { cfo: 'cfo-workflow', coo: 'ops-workflow', 'vp-sales': 'sales
 const TYPE_DIR = `${CONTENT}/product-types`
 const MODE_DIR = `${CONTENT}/delivery-modes`
 
-/** 收集 `> **方法契约**：…` 起的引用块（到第一个非 `>` 行为止），返回纯文本。 */
+/** 收集 `> **方法契约**：…` / `> **Method contract**: …` 起的引用块（到第一个非 `>` 行为止），返回纯文本。 */
 function contractBlock(text) {
   const lines = text.split('\n')
-  const start = lines.findIndex(line => line.startsWith('> **方法契约**'))
+  const start = lines.findIndex(line => /^> \*\*(?:方法契约|Method contract)\*\*/.test(line))
   if (start === -1) return null
   const block = []
   for (let index = start; index < lines.length; index += 1) {
@@ -41,10 +44,17 @@ function contractBlock(text) {
 }
 
 /** 去掉中文括号注释，便于从 `kb/roster.md（席位 / 人力）` 取路径。 */
-const stripNote = (text) => text.replace(/（[^）]*）/g, '').trim()
+const stripNote = (text) => text.replace(/（[^）]*）/g, '').replace(/\([^)]*\)/g, '').trim()
 
 /** 按中文/英文分隔符切列表。 */
 const splitList = (text) => text.split(/[,，、;；\s]+/).map(item => item.trim()).filter(item => item !== '')
+
+/** 取中英任一字段值（中文优先；英文大小写不敏感）。 */
+function fieldValue(block, zh, en) {
+  return new RegExp(`${zh}\\s*=\\s*([^（(；;]+)`).exec(block)?.[1]?.trim()
+    ?? new RegExp(`${en}\\s*=\\s*([^;；]+)`, 'i').exec(block)?.[1]?.trim()
+    ?? ''
+}
 
 export function run({ root, ok, fail }) {
   const content = join(root, CONTENT)
@@ -92,9 +102,9 @@ export function run({ root, ok, fail }) {
       const text = readFileSync(join(root, rel), 'utf8')
       const block = contractBlock(text)
       if (block === null) { problems.push(`${rel}: 缺 \`> **方法契约**\` 块`); continue }
-      const typeRaw = /适用产品类型\s*=\s*([^（(；;]+)/.exec(block)?.[1]?.trim() ?? ''
-      const modeRaw = /适用交付模式\s*=\s*([^（(；;]+)/.exec(block)?.[1]?.trim() ?? ''
-      const factRaw = (/需要事实\s*=\s*([^；;]+)/.exec(block)?.[1]?.trim() ?? '').replace(/[。.]$/, '')
+      const typeRaw = fieldValue(block, '适用产品类型', 'applicable product types')
+      const modeRaw = fieldValue(block, '适用交付模式', 'applicable delivery modes')
+      const factRaw = fieldValue(block, '需要事实', 'required facts').replace(/[。.]$/, '')
       if (typeRaw === '') { problems.push(`${rel}: 方法契约缺「适用产品类型 = ...」`); continue }
       if (factRaw === '') { problems.push(`${rel}: 方法契约缺「需要事实 = ...」`); continue }
       const typeList = splitList(stripNote(typeRaw))
@@ -120,7 +130,7 @@ export function run({ root, ok, fail }) {
           }
         }
       }
-      const facts = factRaw === '无' ? [] : splitList(stripNote(factRaw))
+      const facts = factRaw === '无' || factRaw.toLowerCase() === 'none' ? [] : splitList(stripNote(factRaw))
       for (const fact of facts) {
         if (!fact.startsWith('kb/')) {
           problems.push(`${rel}: 需要事实「${fact}」必须是 kb/<file>（workspace 事实载体）`)
@@ -141,7 +151,7 @@ export function run({ root, ok, fail }) {
       problems.push(`${workflowRel}: 缺 workflow skill（类型分派没有入口）`)
     } else {
       const text = readFileSync(join(root, workflowRel), 'utf8')
-      if (!text.includes('交付模式')) problems.push(`${workflowRel}: 缺交付模式分派（读动议 meta.md 的产品类型 + 交付模式）`)
+      if (!/交付模式|delivery mode/i.test(text)) problems.push(`${workflowRel}: 缺交付模式分派（读动议 meta.md 的产品类型 + 交付模式）`)
       if (!/fail-closed/.test(text)) problems.push(`${workflowRel}: 缺 fail-closed（类型/事实缺时不能静默）`)
     }
     if (typeAware === 0 && deliveryAware === 0) problems.push(`${PRESETS}/${role}/skills: 没有任何类型/交付模式敏感方法（全员 all = 切换不会触达经营模型）`)

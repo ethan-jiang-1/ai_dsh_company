@@ -38,6 +38,34 @@ opened: 2026-11-12
 4. **角色名**：canonical role id + 英文名；表达层 `roles.*` zh/en；数据/日志/API 用英文 canonical。
 5. **数据迁移**：领域值/字段 canonical 改英文 ID；**兼容不是设计约束**——以新格式为准；旧盘可一次性迁移或重建，不保留长期双读。
 
+## 翻译术语表（I1，持续补）
+
+| 中文 | English | 备注 |
+|---|---|---|
+| 动议 | motion | 与 `kb/motion-ledger.md` 一致 |
+| 台账 | ledger | motion ledger |
+| 交付物 / 成品 | deliverable | 成品 = presented final |
+| 角色 | role | preset id = role id |
+| 培养 | cultivation | 培养回路 = cultivation loop |
+| 方法层 | method layer | per-role methods |
+| 采纳 / 拒绝 / 撤回 / 验证 | adopt / reject / revoke / verify | 人侧动作 |
+| 提案 / 纠正 / 建议 | proposal / correction / suggestion | 记录类型 |
+| 收口 | close-out | 动议收口 |
+| 任务书 | task brief | 委派 brief |
+| 署名 | signature | 交付物署名 |
+| 三态 | tri-state | 交付物状态 |
+| 红线 | red line | 不可越过的边界 |
+| 交付模式 | delivery mode | productized / project-services / managed-service |
+| 产品类型 | product type | business-software / hardware-software |
+| 需求 / 验收 | requirement / acceptance | REQ / AC |
+| 客户之声 | customer voice | pilot skill |
+| 购买信号 / 拒绝理由 | buying signal / rejection reason | customer-voice |
+| 表态 | claim | 与 behavior 对举 |
+| 出处 | source | KB file + line |
+| 样本不足 | insufficient sample | 不编造 |
+
+原则：术语表只定英文 canonical；中文表达仍按目标语言写，不把术语表当译文模板。
+
 ## 角色名（已由 agent 决定，不再请用户拍板）
 
 原则：**视觉统一 + 一眼看懂**；canonical 英文，表达层混排；统一用 ` · ` 分隔。
@@ -83,6 +111,16 @@ opened: 2026-11-12
 
 - UI 全量 zh/en、角色名 `roles.*`、host 回执、命令 description、默认 zh、语言切换、真页面金样。
 - 旧 RFC 的 A2/A3b/A4 仍是表达层执行面；本 RFC 只接管“内部英文”。
+
+## I1 进度（pilot + 棘轮）
+
+- **pilot**：`presets/vp-sales/skills/customer-voice/SKILL.md` 已翻成英文单份；frontmatter description 英文；方法契约标记用 `**Method contract**` / `applicable product types =` / `required facts =`。
+- **棘轮**：`tests/presets/internal-english.spec.ts` 扫全部 `presets/**/SKILL.md`；`PENDING` 之外的正文不得含中文。pilot 不在 PENDING；其余 23 个仍在。每翻完一个删一行，最终 PENDING 为空 = 硬门禁。
+- **门禁红证据**：临时给 pilot 追加中文 → 棘轮 2 条红；还原 → 绿。
+- **测试/冒烟**：`pnpm test tests/presets` 132 passed；`preset-smoke` ALL PASS（11 preset 可挂载）。
+- **门禁**：`checks/gates/method-contract.mjs` 接受中英契约块（`**方法契约**` / `**Method contract**`；`适用产品类型` / `applicable product types`；`需要事实` / `required facts`；`无` / `none`）；中文契约块继续绿，英文 pilot 也绿。
+- **门禁红证据**：把 pilot 的 `applicable product types` 改成 `nope` → 红（点名文件 + 没有类型包 + 未覆盖默认类型）；还原 → 绿。中文契约块两方向都跑过。
+- **未做**：其余 23 个 skill、persona/agent.cordis.yml、content/**、领域值。pilot 只证明翻译与棘轮流程，不宣称 I1 完成。
 
 ## 输掉的方案
 
@@ -136,5 +174,5 @@ opened: 2026-11-12
 
 ## 当前状态
 
-- 2026-11-12：RFC 立项；I1/I2/I3 未开始；E1 的 Phase 0/A1/A3a/A2-tab-shell 已实现（见旧 RFC）。角色名表达层方案已定（上表），不再请用户拍板；兼容不作为设计约束，按新格式做对。
+- 2026-11-12：RFC 立项；I1 已开 pilot（customer-voice + 棘轮），其余未开始；E1 的 Phase 0/A1/A3a/A2-tab-shell 已实现（见旧 RFC）。角色名表达层方案已定（上表），不再请用户拍板；兼容不作为设计约束，按新格式做对。
 - 未验证：所有 I1/I2/I3 项；本 RFC 不宣称内部已全英文。

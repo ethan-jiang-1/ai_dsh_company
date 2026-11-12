@@ -659,9 +659,9 @@ describe('经营侧方法契约（CFO / COO / VP-Sales）', () => {
       expect(skills.length, `${role} 没有 skill`).toBeGreaterThan(0)
       for (const skill of skills) {
         const text = readFileSync(join(dir, skill, 'SKILL.md'), 'utf8')
-        expect(text, `${role}/${skill} 缺方法契约`).toContain('**方法契约**')
-        expect(text, `${role}/${skill} 缺适用产品类型`).toContain('适用产品类型 =')
-        expect(text, `${role}/${skill} 缺需要事实`).toContain('需要事实 =')
+        expect(text, `${role}/${skill} 缺方法契约`).toMatch(/\*\*方法契约\*\*|\*\*Method contract\*\*/)
+        expect(text, `${role}/${skill} 缺适用产品类型`).toMatch(/适用产品类型 =|applicable product types =/)
+        expect(text, `${role}/${skill} 缺需要事实`).toMatch(/需要事实 =|required facts =/)
       }
     }
   })
